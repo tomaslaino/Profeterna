@@ -9,16 +9,24 @@
 // versionen räknas upp; journalen (fas 3) visar vilken version som gjorde
 // varje prognos.
 //
-// Fas 2: INGEN kandidatfaktor styr prognosen. Grundmodellen bygger enbart på
-// mål efter 90 minuter. xG, skott, form, tabell, skador, inbördes möten och
-// odds visas som underlag i matchvyn men prövas först walk-forward i fas 4 –
-// samma krav som kandidatjakten i Gräva guld. Även modellens strukturval
-// nedan (halveringstid, fönster, cupmatcher med i skattningen) är
-// a priori-val, inte anpassade till utfallen; de prövas också i fas 4.
+// Grundmodellen bygger på mål efter 90 minuter. En faktor får påverka
+// prognosen först när den klarat kandidatjakten walk-forward
+// (src/candidates.js, kravet i README) och användaren beslutat om en ny
+// regelversion. Modellens strukturval nedan (halveringstid, fönster,
+// cupmatcher med i skattningen) är a priori-val som prövats i kandidatjakten
+// 2026-10-17 och fått stå kvar.
+//
+// Regelversioner:
+//   2026-10-17.1  grundmodellen (fas 2)
+//   2026-10-17.2  + tabelläget som faktor (fas 4, användarens beslut
+//                 2026-10-17). Form och marknaden klarade också kravet men
+//                 infördes inte: formen tillför inget utöver tabelläget, och
+//                 marknadens skattade vikt blev 100 % (den skulle ersätta
+//                 modellen).
 // ============================================================================
 
 module.exports = {
-  version: '2026-10-17.1',
+  version: '2026-10-17.2',
 
   // --------------------------------------------------------------------------
   // Grundmodell: Dixon & Coles (1997). Varje lag har en anfalls- och en
@@ -70,6 +78,25 @@ module.exports = {
     cupWeight: 1,
     shotsBlend: 0,
     xgBlend: 0,
+  },
+
+  // --------------------------------------------------------------------------
+  // Faktorer ovanpå skattningen (fas 4). Signalen z är skillnaden mellan
+  // lagen (hemma − borta), punkt-i-tiden; log λhemma += β·z, log λborta −= β·z
+  // (src/model.js, factorAdjust). Okänd signal = 0.
+  //
+  //   table  Tabelläget: poäng per match i årets liga, räknat ur resultaten
+  //          (mål efter 90 minuter, utan poängavdrag). Bara ligamatcher, och
+  //          bara när båda lagen spelat minst minMatches ligamatcher i år.
+  //          β skattad 2026-10-17 med maximum likelihood på backtestets
+  //          prognoser 2004/05–2026/27 (42 921 ligamatcher): +3,8 % mål per
+  //          poäng per match bättre än motståndaren. Kandidatjakten (vikten
+  //          skattad säsong för säsong på tidigare säsonger): log-poäng
+  //          −0,0006 (−0,0009 till −0,0002) mot grundmodellen. I backtestet
+  //          skattas β på samma sätt säsong för säsong, inte med värdet här.
+  // --------------------------------------------------------------------------
+  factors: {
+    table: { beta: 0.0373, minMatches: 5, candidate: 'table_ppg', since: '2026-10-17.2' },
   },
 
   // --------------------------------------------------------------------------

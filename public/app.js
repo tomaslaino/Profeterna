@@ -263,7 +263,7 @@ function renderDetail(d) {
   html += '<div class="grid2">' + oddsCard(d.odds, m) + formCard(d) + '</div>';
   html += sideCard(d);
   html += '<div class="grid2">' + squadCard(d) + unknownCard(d) + '</div>';
-  html += '<p class="legend">Prognosen bygger bara på mål efter 90 minuter. Spannet under varje sannolikhet visar osäkerheten i lagens styrka ' +
+  html += '<p class="legend">Prognosen bygger på mål efter 90 minuter och tabelläget i år (poäng per match). Spannet under varje sannolikhet visar osäkerheten i lagens styrka ' +
     '(omskattning med slumpvikter). "Drar mot" visar hur många procentenheter varje steg lägger på ett lags segerchans. ' +
     'Underlaget styr inte prognosen förrän det klarat kandidatjakten. <a href="#modell">Om modellen, backtestet och kandidaterna</a></p>';
   return html;
@@ -850,7 +850,10 @@ window.addEventListener('resize', () => {
 
 function renderModel(d) {
   const x = d.model;
-  let html = `<p class="intro">Regelversion <strong>${esc(d.rulesVersion)}</strong>. Prognosen bygger bara på mål efter 90 minuter. ` +
+  const factors = (d.model && d.model.factors) || [];
+  const fNames = { table: 'tabelläget' };
+  let html = `<p class="intro">Regelversion <strong>${esc(d.rulesVersion)}</strong>. Prognosen bygger på mål efter 90 minuter` +
+    `${factors.length ? ` och ${factors.map((f) => fNames[f.id] || f.id).join(', ')}` : ''}. ` +
     'En faktor får påverka den först när den bevisligen förbättrat prognoserna walk-forward – fram till dess visas den som underlag i matchvyn.</p>';
   if (!x) return html + `<p class="unknown">okänt – ${d.error ? `prognosmotorn fallerade i senaste bygget: ${esc(d.error)}` : 'inget underlag i källcachen att skatta modellen på'}.</p>`;
 
@@ -863,6 +866,9 @@ function renderModel(d) {
     `<dt>Hemmafördel</dt><dd>${pctSigned(x.homeAdvantage)} mål för hemmalaget (skattad)</dd>` +
     `<dt>Låga resultat</dt><dd>ρ = ${dec(x.rho, 3)} (skattad; negativ = fler 0–0 och 1–1 än oberoende mål ger)</dd>` +
     `<dt>Under National League</dt><dd>Ingen lagdata. Lagen skattas som ett gemensamt nivåsnitt ur ${x.lowerMatches} FA-cupmatcher sedan ${esc(x.lowerSince)} och märks i matchvyn.</dd>` +
+    factors.filter((f) => f.id === 'table').map((f) => `<dt>Tabelläget</dt><dd>Poäng per match i årets liga, hemmalaget mot bortalaget, räknat ur resultaten (utan poängavdrag). ` +
+      `${f.effect >= 0 ? '+' : '−'}${dec(Math.abs(f.effect) * 100, 1)} % mål per poäng per match bättre än motståndaren – vikten skattad på backtestets prognoser. ` +
+      `Bara ligamatcher där båda lagen spelat minst ${f.minMatches} ligamatcher i år. Sedan regelversion ${esc(f.since)}, efter kandidatjakten.</dd>`).join('') +
     `<dt>Cuper</dt><dd>Prognosen gäller 90 minuter. Chansen att gå vidare räknas ur samma modell: förlängning med samma målfrekvens, straffar 50/50. FA-cupen: förlängning och straffar. EFL-cupen: straffar direkt, utom i semifinalerna (två möten) och finalen.</dd>` +
     '</dl></div>';
 
@@ -881,7 +887,7 @@ function renderModel(d) {
     '</dl><p class="src-line">Modellen är värd något bara om den slår (b). Frågan över tid är om den någonsin slår (c).</p></div>';
 
   html += backtestSection(d.backtest, d.rulesVersion);
-  html += candidatesSection(d.backtest && d.backtest.candidates);
+  html += candidatesSection(d.backtest && d.backtest.candidates, new Map(factors.map((f) => [f.candidate, f.since])));
   return html;
 }
 
@@ -904,11 +910,20 @@ function backtestSection(bt, version) {
   const lg = b.leagues;
   html += `<p class="legend">Varje match ${esc(b.first)}–${esc(b.last)} fick en prognos skattad bara på matcherna före matchdagen, med samma kod och regler som i dag. ` +
     'Log-poäng: lägre är bättre. Skillnad = modell − baslinje, negativ = modellen bättre, med 95 % bootstrap-intervall där hela matchdagar dras om. ' +
-    'Varje rad jämför på de matcher där båda finns.</p>' +
+    'Varje rad jämför på de matcher där båda finns.' +
+    (b.factors ? ' Tabellägets vikt skattas här säsong för säsong enbart på tidigare säsonger (den första säsongen utan tabelläge), inte med regelkonfigens värde.' : '') + '</p>' +
     '<div class="table-wrap"><table><thead><tr><th>Ligorna, mot</th><th class="num">Matcher</th><th class="num">Modell</th><th class="num">Baslinje</th><th class="num">Skillnad</th><th class="num">Brier</th></tr></thead><tbody>' +
     lg.vs.filter((r) => r.n).map((r) => `<tr><td>${esc(r.label)}</td><td class="num">${n0(r.n)}</td><td class="num">${f3(r.logLoss[0])}</td><td class="num">${f3(r.logLoss[1])}</td>` +
       diffCell(r) + `<td class="num">${f3(r.brier[0])} / ${f3(r.brier[1])}</td></tr>`).join('') + '</tbody></table></div>';
 
+  if (bt.versions.length > 1) {
+    const vsOf = (v, key) => v.leagues.vs.find((c) => c.key === key);
+    html += '<h4 class="sub-h">Per regelversion <span class="hint">samma matcher, ligorna</span></h4><div class="table-wrap"><table><thead><tr><th>Regelversion</th><th class="num">Körd</th>' +
+      '<th class="num">Modell</th><th class="num">mot (b)</th><th class="num">mot (a)</th><th class="num">mot (c)</th></tr></thead><tbody>' +
+      bt.versions.map((v) => `<tr><td class="num">${esc(v.rulesVersion)}${v.rulesVersion === version ? ' <span class="muted">i dag</span>' : ''}</td><td class="num">${dateOnly(v.ranAt)}</td>` +
+        `<td class="num">${dec(vsOf(v, 'nv').logLoss[0], 4)}</td>` + ['ss', 'nv', 'mk'].map((k) => diffCell(vsOf(v, k), false)).join('') + '</tr>').join('') +
+      '</tbody></table></div>';
+  }
   html += '<h4 class="sub-h">Per säsong <span class="hint">ligorna</span></h4><div class="card chart-card"><div id="season-chart"></div></div>';
   html += '<details class="as-table"><summary>Som tabell</summary><div class="table-wrap"><table><thead><tr><th>Säsong</th><th class="num">Matcher</th><th class="num">Modell</th>' +
     '<th class="num">mot (b)</th><th class="num">mot (a)</th><th class="num">mot (c)</th><th class="num">mot Pinnacle</th></tr></thead><tbody>' +
@@ -984,7 +999,7 @@ function drawSeasonChart() {
     '<span class="muted">under noll = modellen bättre</span></div>' + svg;
 }
 
-function candidatesSection(L) {
+function candidatesSection(L, promoted = new Map()) {
   let html = '<h3>Kandidatjakt</h3>';
   if (!L || !L.entries || !L.entries.length) {
     return html + '<p class="unknown">Ingen kandidat prövad än (npm run kandidater).</p>';
@@ -999,11 +1014,12 @@ function candidatesSection(L) {
     `<p class="src-line">Senaste körningen ${dateOnly(run.ranAt)}: ${run.candidates} kandidater, intervall ${dec(run.level * 100, 2)} %, säsongerna ${esc(run.seasons[0])}–${esc(run.seasons[1])}` +
     `${run.through ? ` t.o.m. ${dateOnly(run.through)}` : '.'} En godkänd kandidat blir en ny regelversion först efter beslut.</p></div>`;
 
-  const verdict = (e) => (e.verdict === 'godkänd'
+  const verdict = (e) => (promoted.has(e.id) ? '<span class="badge ok">införd</span>' : e.verdict === 'godkänd'
     ? '<span class="badge ok">godkänd</span>' : e.verdict === 'underkänd' ? '<span class="badge no">underkänd</span>' : '<span class="badge">kunde inte prövas</span>');
   const rows = [...latest.values()].map((e) => {
     const earlier = count.get(e.id) - 1;
-    const why = e.verdict === 'godkänd' && e.rulesVersion === run.rulesVersion ? `${e.why} – styr inte prognosen än` : e.why;
+    const why = promoted.has(e.id) ? `${e.why} – styr prognosen från regelversion ${promoted.get(e.id)}`
+      : e.verdict === 'godkänd' ? `${e.why} – inte införd` : e.why;
     return `<tr><td>${esc(e.label)}<span class="sub">${esc(e.motive)}${e.scope ? ` · ${esc(e.scope)}` : ''}</span>` +
       `${e.paramText ? `<span class="sub">Skattat: ${esc(e.paramText)}</span>` : ''}</td>` +
       `<td class="num">${e.n ? `${n0(e.n)}<span class="sub">${esc(e.seasons[0])}–${esc(e.seasons[1])}</span>` : '–'}</td>` +

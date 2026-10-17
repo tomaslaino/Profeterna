@@ -32,6 +32,12 @@
 // Prognoserna per match cachas i data/cache/backtest_<variant>.json per
 // regelversion, variant och historikens innehåll, så att kandidatjakten
 // (src/candidates.js) och en omkörning bara räknar om det som ändrats.
+//
+// Faktorer (regelkonfigens factors, t.ex. tabelläget från 2026-10-17.2):
+// vikten β i konfigen är skattad på alla säsonger. I backtestet skattas den
+// i stället om säsong för säsong enbart på tidigare säsongers prognoser
+// (recordsOf), så att backtestet förblir walk-forward. Första säsongen får
+// ingen faktor.
 // ============================================================================
 
 const fs = require('fs');
@@ -49,7 +55,7 @@ const { outcome, logLoss, brier } = require('./check');
 
 // Räknas upp när posternas innehåll eller beräkning ändras (ogiltigförklarar
 // cachen).
-const CODE_VERSION = 3;
+const CODE_VERSION = 4;
 const OUT_DIR = path.join(__dirname, '..', 'data', 'backtest');
 const LEAGUES = ['pl', 'ch', 'l1', 'l2'];
 const HIST_IDS = ['fdcouk_hist_E0', 'fdcouk_hist_E1', 'fdcouk_hist_E2', 'fdcouk_hist_E3', 'fdcouk_hist_EC', 'espn_hist_fac', 'understat_hist_epl'];
@@ -137,6 +143,7 @@ function runSeason(target) {
       cl: s.closing ? r6(s.closing.p) : null,
       adv: p.advance && p.advance.home != null ? p.advance.home : null,
       win: s.winner || null,
+      ...(ok && p.factors ? { g0: r6(p.factors.goalsBefore), z: p.factors.z.map((x) => round(x, 6)) } : {}),
     });
   }
   return { season: target, records, through: list.length ? list[list.length - 1].date : null, ms: Date.now() - t0 };
@@ -267,9 +274,30 @@ async function backtestVariants(variants, { workers, log = () => {}, current = t
   return out;
 }
 
-// Alla poster för en variant, i säsongsordning.
+// Alla poster för en variant, i säsongsordning. Med faktorer skattas deras
+// vikter om säsong för säsong på tidigare säsonger (walk-forward) och
+// prognosen räknas om med dem; vikterna per säsong i variantResult.weights.
 function recordsOf(variantResult) {
-  return [...variantResult.seasons.keys()].sort().flatMap((k) => variantResult.seasons.get(k).records);
+  if (variantResult.final) return variantResult.final;
+  const codes = [...variantResult.seasons.keys()].sort();
+  const all = codes.flatMap((k) => variantResult.seasons.get(k).records);
+  if (!all.some((r) => r.z)) return (variantResult.final = all);
+  const k = all.find((r) => r.z).z.length;
+  const out = [];
+  const weights = [];
+  for (const code of codes) {
+    const train = all.filter((r) => r.s < code && r.z).map((r) => ({ g: r.g0, z: r.z, hg: r.hg, ag: r.ag }));
+    const beta = train.length ? M.fitFactorWeights(train) : new Array(k).fill(0);
+    weights.push({ season: seasonLabel(code), beta: beta.map((b) => round(b, 4)), trained: train.length });
+    for (const r of variantResult.seasons.get(code).records) {
+      if (!r.z) { out.push(r); continue; }
+      const g = M.factorAdjust(r.g0[0], r.g0[1], r.z, beta);
+      const p = M.outcomes(M.scoreMatrix(g[0], g[1], r.rho, rules.model.maxGoals)).x12;
+      out.push({ ...r, p: r6(p), g: r6(g) });
+    }
+  }
+  variantResult.weights = weights;
+  return (variantResult.final = out);
 }
 
 // ---------- jämförelse ----------
@@ -377,6 +405,7 @@ function summarize(variantResult, { ms = null } = {}) {
       return { ...meta(code), n: rs.length, known: known(rs), vs: vsBaselines(rs) };
     }),
     cups: ['fac', 'lc'].map(cup).filter(Boolean),
+    factors: variantResult.weights ? { ids: Object.keys(BASE_RULES.factors || {}), weights: variantResult.weights } : null,
     sources: sourceDates(),
     notes: [
       `Från ${seasonLabel(codes[0])}: ligorna finns från ${FIRST_YEAR}/${String((FIRST_YEAR + 1) % 100).padStart(2, '0')} och modellen behöver ${BASE_RULES.model.historySeasons} säsonger bakåt.`,

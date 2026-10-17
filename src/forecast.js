@@ -161,6 +161,70 @@ function teamUnknown(ctx, fit, k, name) {
   return null;
 }
 
+// ---------- faktorer ovanpå skattningen (fas 4) ----------
+
+// Faktorer som klarat kandidatjakten och blivit en regelversion
+// (config/forecast-rules.js, factors). Varje faktor ger en signal z
+// (hemmalaget − bortalaget, punkt-i-tiden: bara matcher före prognosdagen)
+// som flyttar de förväntade målen med vikten β (M.factorAdjust). Okänd
+// signal = 0, då ändras ingenting.
+
+const TABLE_LEAGUES = new Set(['pl', 'ch', 'l1', 'l2', 'nl']);
+
+// Tabelläget: poäng per match i årets liga, räknat ur resultaten (mål efter
+// 90 minuter, utan poängavdrag). Index per säsong, liga och lag med dagarna
+// och de ackumulerade poängen. games ska vara sorterade på dag. Samma
+// funktion används av kandidatjakten (src/candidates.js).
+function tableIndex(games) {
+  const idx = new Map();
+  const add = (k, day, pts) => {
+    if (!idx.has(k)) idx.set(k, { days: [], cum: [] });
+    const e = idx.get(k);
+    e.days.push(day);
+    e.cum.push((e.cum.length ? e.cum[e.cum.length - 1] : 0) + pts);
+  };
+  for (const g of games) {
+    if (!TABLE_LEAGUES.has(g.comp)) continue;
+    add(`${g.season}|${g.comp}|${g.h}`, g.day, g.hg > g.ag ? 3 : g.hg === g.ag ? 1 : 0);
+    add(`${g.season}|${g.comp}|${g.a}`, g.day, g.hg < g.ag ? 3 : g.hg === g.ag ? 1 : 0);
+  }
+  return idx;
+}
+
+function tablePpg(idx, season, comp, team, day, min) {
+  const e = idx.get(`${season}|${comp}|${team}`);
+  if (!e) return null;
+  let lo = 0;
+  let hi = e.days.length;
+  while (lo < hi) { const mid = (lo + hi) >> 1; if (e.days[mid] < day) lo = mid + 1; else hi = mid; }
+  return lo >= min ? { ppg: e.cum[lo - 1] / lo, n: lo } : null;
+}
+
+// z = poäng per match i år, hemmalaget − bortalaget; null om det inte är en
+// ligamatch eller något av lagen spelat färre än `min` ligamatcher i år.
+function tableSignal(idx, season, comp, hk, ak, day, min) {
+  if (!TABLE_LEAGUES.has(comp)) return null;
+  const h = tablePpg(idx, season, comp, hk, day, min);
+  const a = tablePpg(idx, season, comp, ak, day, min);
+  return h && a ? { z: h.ppg - a.ppg, home: h, away: a } : null;
+}
+
+function factorSignals(ctx, spec) {
+  const out = { ids: [], z: [], beta: [], info: {} };
+  for (const [id, cfg] of Object.entries(rules.factors || {})) {
+    let sig = null;
+    if (id === 'table') {
+      if (!ctx.table) ctx.table = tableIndex(ctx.games);
+      sig = tableSignal(ctx.table, ctx.target, spec.comp, spec.hk, spec.ak, spec.fitDay, cfg.minMatches);
+    }
+    out.ids.push(id);
+    out.z.push(sig ? sig.z : 0);
+    out.beta.push(cfg.beta);
+    out.info[id] = sig;
+  }
+  return out;
+}
+
 // ---------- baslinje (a): naiv ----------
 
 function naiveTable(games, target) {
@@ -344,15 +408,22 @@ function predict(ctx, spec, specsById) {
     return out;
   }
 
-  const [lh, la] = M.expectedGoals(fit, spec.hk, spec.ak, spec.neutral, homeGroup(spec.comp));
+  const [lh0, la0] = M.expectedGoals(fit, spec.hk, spec.ak, spec.neutral, homeGroup(spec.comp));
+  const sig = factorSignals(ctx, spec);
+  const [lh, la] = M.factorAdjust(lh0, la0, sig.z, sig.beta);
   const m = M.scoreMatrix(lh, la, fit.rho, rules.model.maxGoals);
   const o = M.outcomes(m);
   out.p = o.x12;
   out.goals = [lh, la];
+  if (sig.ids.length) {
+    // Förväntade mål före faktorerna och signalerna – backtestet skattar
+    // vikterna om säsong för säsong ur dem (walk-forward).
+    out.factors = { goalsBefore: [lh0, la0], ids: sig.ids, z: sig.z, beta: sig.beta, table: sig.info.table || null };
+  }
   out.over25 = o.over25;
   out.btts = o.btts;
   out.scores = topScores(m);
-  out.steps = steps(ctx, fit, spec);
+  out.steps = steps(ctx, fit, spec, sig);
   if (spec.hk === LOWER || spec.ak === LOWER) {
     notes.push(`Lag under National League saknar egen lagdata. Deras styrka är genomsnittet för alla lag under National League i FA-cupen sedan ${label(fdSeasonCode(HISTORY.espnFaCup.first))} – historiskt utfall för nivån, inte laget självt.`);
   }
@@ -402,7 +473,7 @@ function topScores(m) {
 // där varje steg lägger till en del av modellen. Sista steget är exakt
 // modellens prognos. Ordningen är fast (start → hemmaplan → nivåskillnad →
 // hemmalaget → bortalaget), och ett stegs effekt beror något på ordningen.
-function steps(ctx, fit, spec) {
+function steps(ctx, fit, spec, sig) {
   const th = tierOf(ctx, spec.hk);
   const ta = tierOf(ctx, spec.ak);
   const dh = fit.divisions.get(th);
@@ -434,6 +505,12 @@ function steps(ctx, fit, spec) {
   };
   own(spec.hk, spec.home, dh, true);
   own(spec.ak, spec.away, da, false);
+  const t = sig && sig.info.table;
+  if (t && t.z) {
+    [lh, la] = M.factorAdjust(lh, la, sig.z, sig.beta);
+    const ppg = (x) => x.ppg.toFixed(1).replace('.', ',');
+    push('Tabelläget', `${ppg(t.home)} mot ${ppg(t.away)} poäng per match i år`);
+  }
   return rows;
 }
 
@@ -447,7 +524,8 @@ function advance(ctx, fit, spec, m, specsById) {
   const rule = cupRule(spec.comp, spec.round);
   if (!rule) return null;
   const grp = homeGroup(spec.comp);
-  const [lh, la] = M.expectedGoals(fit, spec.hk, spec.ak, spec.neutral, grp);
+  const sig = factorSignals(ctx, spec);
+  const [lh, la] = M.factorAdjust(...M.expectedGoals(fit, spec.hk, spec.ak, spec.neutral, grp), sig.z, sig.beta);
   if (!rule.twoLeg) {
     const q = afterDraw(rule, lh, la);
     const [p1, px] = M.outcomes(m).x12;
@@ -499,12 +577,13 @@ function intervals(ctx, day, specs) {
   const { samples, interval, seed } = rules.uncertainty;
   const rand = M.rng(seed + day);
   const draws = specs.map(() => [[], [], []]);
+  const sigs = specs.map((sp) => factorSignals(ctx, sp));
   for (let s = 0; s < samples; s++) {
     const games = base.games.map((g) => ({ ...g, w: g.w * -Math.log(1 - rand()) }));
     const fit = M.fitPoisson(games, { init: base, tolerance: 1e-6, maxIterations: rules.model.maxIterations });
     specs.forEach((sp, i) => {
       if (!fit.A.has(sp.hk) || !fit.A.has(sp.ak)) return;
-      const [lh, la] = M.expectedGoals(fit, sp.hk, sp.ak, sp.neutral, homeGroup(sp.comp));
+      const [lh, la] = M.factorAdjust(...M.expectedGoals(fit, sp.hk, sp.ak, sp.neutral, homeGroup(sp.comp)), sigs[i].z, sigs[i].beta);
       const x = M.outcomes(M.scoreMatrix(lh, la, base.rho, rules.model.maxGoals)).x12;
       for (let k = 0; k < 3; k++) draws[i][k].push(x[k]);
     });
@@ -625,6 +704,9 @@ function modelSummary(ctx, fit) {
     seasonMinMatches: rules.baselines.season.minMatches,
     interval: rules.uncertainty.interval,
     samples: rules.uncertainty.samples,
+    factors: Object.entries(rules.factors || {}).map(([id, f]) => ({
+      id, candidate: f.candidate, since: f.since, beta: f.beta, minMatches: f.minMatches, effect: round4(Math.exp(f.beta) - 1),
+    })),
     sources: ctx.fetchedAt,
   };
 }
@@ -636,4 +718,7 @@ function x12Rounded(lh, la, rho) {
 function round4(x) { return x == null ? null : Math.round(x * 10000) / 10000; }
 function round2(x) { return x == null ? null : Math.round(x * 100) / 100; }
 
-module.exports = { forecastAll, context, predict, fitAt, intervals, currentSpecs, marketFrom, fdTriple, fdTotal, cupRule, dayNum, isoOf, LOWER };
+module.exports = {
+  forecastAll, context, predict, fitAt, intervals, currentSpecs, marketFrom, fdTriple, fdTotal, cupRule, dayNum, isoOf,
+  tableIndex, tableSignal, LOWER,
+};

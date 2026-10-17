@@ -221,6 +221,59 @@ function components(games) {
   return find;
 }
 
+// ---------- faktorer ovanpå skattningen (fas 4) ----------
+
+// En faktor flyttar de förväntade målen: log λhemma += β·z, log λborta −= β·z,
+// där z är skillnaden mellan lagen (hemma − borta) och β faktorns vikt. Flera
+// faktorer: summan av βᵢ·zᵢ.
+function factorAdjust(lh, la, z, beta) {
+  let lin = 0;
+  for (let i = 0; i < z.length; i++) lin += beta[i] * z[i];
+  return lin ? [lh * Math.exp(lin), la * Math.exp(-lin)] : [lh, la];
+}
+
+// Vikterna med maximum likelihood (Poisson, modellens förväntade mål utan
+// faktorer som offset), Newtons metod. rows: [{ g: [λh, λa], z: [...], hg, ag }].
+function fitFactorWeights(rows) {
+  const k = rows.length ? rows[0].z.length : 0;
+  let beta = new Array(k).fill(0);
+  for (let it = 0; it < 50; it++) {
+    const g = new Array(k).fill(0);
+    const h = Array.from({ length: k }, () => new Array(k).fill(0));
+    for (const r of rows) {
+      if (!r.z.some((x) => x)) continue;
+      const [eh, ea] = factorAdjust(r.g[0], r.g[1], r.z, beta);
+      for (let i = 0; i < k; i++) {
+        g[i] += r.z[i] * (r.hg - eh - (r.ag - ea));
+        for (let j = 0; j < k; j++) h[i][j] -= r.z[i] * r.z[j] * (eh + ea);
+      }
+    }
+    const step = solve(h, g.map((x) => -x));
+    if (!step) return beta.map(() => 0);
+    beta = beta.map((b, i) => b + step[i]);
+    if (Math.max(...step.map(Math.abs)) < 1e-9) break;
+  }
+  return beta;
+}
+
+// Löser A·x = b (litet system, Gauss med pivotering); null om singulärt.
+function solve(A, b) {
+  const n = b.length;
+  const m = A.map((row, i) => [...row, b[i]]);
+  for (let c = 0; c < n; c++) {
+    let p = c;
+    for (let r = c + 1; r < n; r++) if (Math.abs(m[r][c]) > Math.abs(m[p][c])) p = r;
+    if (Math.abs(m[p][c]) < 1e-12) return null;
+    [m[c], m[p]] = [m[p], m[c]];
+    for (let r = 0; r < n; r++) {
+      if (r === c) continue;
+      const f = m[r][c] / m[c][c];
+      for (let q = c; q <= n; q++) m[r][q] -= f * m[c][q];
+    }
+  }
+  return m.map((row, i) => row[n] / row[i]);
+}
+
 // ---------- resultatfördelning ----------
 
 function poissonPmf(lambda, max) {
@@ -332,5 +385,5 @@ function quantile(sorted, q) {
 
 module.exports = {
   fitPoisson, fitRho, expectedGoals, components, scoreMatrix, outcomes, extraTime, shin,
-  wholePercent, rng, quantile, tau,
+  factorAdjust, fitFactorWeights, wholePercent, rng, quantile, tau,
 };

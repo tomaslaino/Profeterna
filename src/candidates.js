@@ -155,19 +155,13 @@ function covariates(records) {
   const data = seasonData(SEASON.fdcouk);
   const games = data.games.map((g) => ({ ...g, day: F.dayNum(g.date) })).sort((a, b) => a.day - b.day);
   const team = new Map();
-  const league = new Map();
   const pair = new Map();
   const push = (map, k, v) => { if (!map.has(k)) map.set(k, []); map.get(k).push(v); };
-  const LEAGUE = new Set(['pl', 'ch', 'l1', 'l2', 'nl']);
   for (const g of games) {
     const ph = g.hg > g.ag ? 3 : g.hg === g.ag ? 1 : 0;
     const pa = g.hg < g.ag ? 3 : g.hg === g.ag ? 1 : 0;
     if (g.h !== LOWER) push(team, g.h, { day: g.day, pts: ph });
     if (g.a !== LOWER) push(team, g.a, { day: g.day, pts: pa });
-    if (LEAGUE.has(g.comp)) {
-      push(league, `${g.season}|${g.comp}|${g.h}`, { day: g.day, pts: ph });
-      push(league, `${g.season}|${g.comp}|${g.a}`, { day: g.day, pts: pa });
-    }
     if (g.h !== LOWER && g.a !== LOWER) push(pair, [g.h, g.a].sort().join('|'), { day: g.day, h: g.h, gd: g.hg - g.ag });
   }
   // Index för första posten på eller efter dagen (dvs. antal poster före).
@@ -185,25 +179,16 @@ function covariates(records) {
     for (let k = i - n; k < i; k++) s += arr[k].pts;
     return s / n;
   };
-  const seasonPpg = (arr, day) => {
-    if (!arr) return null;
-    const i = before(arr, day);
-    if (i < 5) return null;
-    let s = 0;
-    for (let k = 0; k < i; k++) s += arr[k].pts;
-    return s / i;
-  };
+  const tidx = F.tableIndex(games);
   const out = { form: new Map(), table: new Map(), h2h: new Map() };
   for (const r of records) {
     const day = F.dayNum(r.d);
     const fh = ppg(team.get(r.h), day, 5);
     const fa = ppg(team.get(r.a), day, 5);
     out.form.set(r.id, fh != null && fa != null ? fh - fa : 0);
-    if (LEAGUE.has(r.c)) {
-      const th = seasonPpg(league.get(`${r.s}|${r.c}|${r.h}`), day);
-      const ta = seasonPpg(league.get(`${r.s}|${r.c}|${r.a}`), day);
-      out.table.set(r.id, th != null && ta != null ? th - ta : 0);
-    } else out.table.set(r.id, 0);
+    // Tabelläget: samma funktion som prognosmotorn (src/forecast.js).
+    const t = F.tableSignal(tidx, r.s, r.c, r.h, r.a, day, 5);
+    out.table.set(r.id, t ? t.z : 0);
     const meet = pair.get([r.h, r.a].sort().join('|'));
     const i = before(meet, day);
     let gd = 0;
@@ -475,7 +460,11 @@ async function main() {
   const blocked = new Map();
   if (!us.ok) blocked.set('understat', `Understat svarade inte (${us.error}) och ingen tidigare historik finns.`);
 
-  const list = CANDIDATES.filter((c) => !only || only.includes(c.id));
+  // Kandidater som redan blivit en regelversion prövas inte igen – de ingår i
+  // grundmodellen.
+  const promoted = new Map(Object.values(rules.factors || {}).map((f) => [f.candidate, f.since]));
+  for (const [id, v] of promoted) log(`${id}: införd i regelversion ${v} – prövas inte igen.`);
+  const list = CANDIDATES.filter((c) => (!only || only.includes(c.id)) && !promoted.has(c.id));
   const testable = list.filter((c) => !(c.needs && blocked.has(c.needs)));
   const k = testable.length;
   const level = 1 - CRITERIA.alpha / Math.max(1, k);

@@ -23,8 +23,8 @@ ingen falsk precision · sidan kraschar aldrig av en död källa · endast fria 
 - [x] **Fas 4 – Backtest + kandidatjakt:** walk-forward-backtest 2004/05–2026/27 med samma
   kod som den skarpa prognosen, mot (a), (b), (c) och Pinnacle-stängningen per säsong och
   division; kandidatjakt med förhandsregistrerat krav, 13 kandidater + kombinationssteg,
-  kandidatlogg och inbördes möten från tidigare säsonger i matchvyn. Regelversionen är
-  oförändrad tills användaren beslutat om de godkända kandidaterna
+  kandidatlogg och inbördes möten från tidigare säsonger i matchvyn. Tabelläget infört som
+  regelversion **2026-10-17.2** (användarens beslut)
 - [ ] **Fas 5 – LLM-modul (valfri)**
 
 ## Publicering
@@ -177,6 +177,12 @@ bara lokalt.
   Brier inte sämre. Kandidaternas värden (180/730 dagar, 2/6 säsonger, halv vikt, hälften
   skott/xG, fem matcher, sex möten) är a priori-val. Se
   [Kandidatjakten](#kandidatjakten).
+- **Tabelläget införs (2026-10-17, användarens beslut):** regelversion 2026-10-17.2. Av de
+  tre godkända kandidaterna: tabelläget hade störst effekt bland fotbollsfaktorerna, och
+  formen tillför inget utöver det (kombinationen underkänd). Marknaden infördes inte – dess
+  skattade vikt blev 100 %, så den hade ersatt modellen och gjort jämförelsen mot (c)
+  meningslös. Vikten β = 0,0373 är fryst i regelkonfigen (skattad på backtestets prognoser
+  2004/05–2026/27), så att samma data alltid ger samma prognos.
 - **En godkänd kandidat ändrar inte prognosen av sig själv (2026-10-17):** den blir en ny
   regelversion med datum först efter användarens beslut, eftersom det ändrar prognoserna
   som loggas i journalen från nästa körning. Backtestet körs då om för den nya versionen.
@@ -243,12 +249,26 @@ mappa listas i källfliken och används inte. Läge 2026-10-17: 0 omappade.
 
 ## Prognosmotorn (fas 2)
 
-Regelversion **2026-10-17.1** i [config/forecast-rules.js](config/forecast-rules.js). Allt
+Regelversion **2026-10-17.2** i [config/forecast-rules.js](config/forecast-rules.js). Allt
 som bestämmer en prognos ligger där; samma data ger alltid samma prognos (även
-intervallen – slumpen är seedad). **Ingen kandidatfaktor styr prognosen:** grundmodellen
-bygger enbart på mål efter 90 minuter. xG, skott, form, tabell, skador, inbördes möten och
-odds visas som underlag; de prövas walk-forward i kandidatjakten (fas 4) och styr först
-när en kandidat klarat kravet och blivit en ny regelversion.
+intervallen – slumpen är seedad). Grundmodellen bygger på mål efter 90 minuter, och från
+2026-10-17.2 vägs **tabelläget** in (se nedan) – den enda faktor som klarat kandidatjakten
+och införts. xG, skott, form, skador, inbördes möten och odds visas som underlag men styr
+inte prognosen.
+
+| Regelversion | Innehåll |
+|---|---|
+| 2026-10-17.1 | Grundmodellen: Dixon–Coles på mål efter 90 minuter, cupregler, baslinjer |
+| 2026-10-17.2 | + tabelläget som faktor (kandidatjakten 2026-10-17, användarens beslut) |
+
+**Tabelläget (från 2026-10-17.2).** Poäng per match i årets liga för hemmalaget minus
+bortalaget, räknat ur resultaten före prognosdagen (mål efter 90 minuter, utan
+poängavdrag), flyttar de förväntade målen: log λ<sub>hemma</sub> += β·z,
+log λ<sub>borta</sub> −= β·z med β = 0,0373, dvs. +3,8 % mål per poäng per match bättre än
+motståndaren. Bara ligamatcher där båda lagen spelat minst fem ligamatcher i år; annars
+ingen justering. Ett lag med 2,0 poäng per match mot ett med 1,0 får alltså ~4 % fler
+förväntade mål och motståndaren ~4 % färre. Signalen räknas av samma funktion i
+prognosen och i kandidatjakten ([src/forecast.js](src/forecast.js), `tableSignal`).
 
 **Grundmodell – Dixon–Coles (1997).** Varje lag har en anfalls- och en försvarsstyrka,
 gemensam hemmafördel och en korrektion ρ för 0–0, 1–0, 0–1 och 1–1. Maximum likelihood på
@@ -294,11 +314,12 @@ styrka, inte modellfel. Räknas för kommande matcher.
 
 **Vad drog åt vilket håll.** Prognosen byggs upp steg för steg på log-skala: två
 genomsnittslag på hemmalagets nivå på neutral plan → hemmaplan → nivåskillnad (cupmöten
-mellan nivåer) → hemmalagets egen styrka mot nivåns snitt → bortalagets. Sista steget är
+mellan nivåer) → hemmalagets egen styrka mot nivåns snitt → bortalagets → tabelläget. Sista steget är
 exakt modellens prognos; ordningen är fast och ett stegs effekt beror något på den.
 
-**Kontroll mot 2025/26** (`npm run check`, ~9 s). Fram till fas 4 körde bygget den och
-visade den under Modell; nu visas i stället backtestet över alla säsonger, där 2025/26 ingår. Varje match fick en prognos skattad på
+**Kontroll mot 2025/26** (`npm run check`, ~9 s; siffrorna nedan gäller regelversion
+2026-10-17.1). Fram till fas 4 körde bygget den och visade den under Modell; nu visas i
+stället backtestet över alla säsonger, där 2025/26 ingår. Varje match fick en prognos skattad på
 matcherna före matchdagen med samma kod. Log-poäng, lägre = bättre; skillnad modell −
 baslinje med 95 % bootstrap-intervall:
 
@@ -394,25 +415,35 @@ under Modell: mot baslinjerna totalt, per säsong (diagram + tabell) och per div
   regelversion, variant och historikens innehåll (inte hämttiden – avslutade säsonger
   hämtas om var 30:e dag men ändras inte). Pågående säsong räknas alltid om.
 
-**Resultat** (regelversion 2026-10-17.1, körd 2026-10-17, 45 712 matcher):
+- **Faktorer:** regelkonfigens vikt (tabelläget, β = 0,0373) är skattad på alla säsonger.
+  Backtestet skattar i stället vikten om säsong för säsong enbart på tidigare säsongers
+  prognoser (den första säsongen utan faktor), så att det förblir walk-forward. Vikten
+  varierade mellan 0,022 och 0,055 de första säsongerna och har legat på 0,034–0,040
+  sedan 2017/18.
+
+**Resultat** (regelversion 2026-10-17.2, körd 2026-10-17, 45 712 matcher):
 
 | Ligorna, mot | Matcher | Modell | Baslinje | Skillnad | Brier modell / baslinje |
 |---|---|---|---|---|---|
-| (b) Poisson på säsongens mål | 39 624 | 1,039 | 1,069 | −0,030 (−0,034 till −0,026) | 0,625 / 0,642 |
-| (a) Naiv | 44 943 | 1,040 | 1,076 | −0,036 (−0,038 till −0,033) | 0,626 / 0,651 |
-| (c) Marknaden, öppning | 42 913 | 1,039 | 1,028 | +0,012 (+0,010 till +0,013) | 0,625 / 0,617 |
-| Pinnacle, stängning | 27 001 | 1,039 | 1,022 | +0,016 (+0,014 till +0,018) | 0,624 / 0,613 |
+| (b) Poisson på säsongens mål | 39 624 | 1,038 | 1,069 | −0,031 (−0,034 till −0,027) | 0,625 / 0,642 |
+| (a) Naiv | 44 943 | 1,039 | 1,076 | −0,036 (−0,039 till −0,034) | 0,625 / 0,651 |
+| (c) Marknaden, öppning | 42 913 | 1,039 | 1,028 | +0,011 (+0,010 till +0,012) | 0,625 / 0,617 |
+| Pinnacle, stängning | 27 001 | 1,038 | 1,022 | +0,016 (+0,014 till +0,018) | 0,624 / 0,613 |
+
+Mot regelversion 2026-10-17.1 på samma matcher: log-poäng 1,0400 → 1,0394 (−0,0006), som i
+kandidatjakten. Båda versionernas backtest ligger i `data/backtest/` och visas under Modell.
 
 45 678 av 45 712 matcher fick en modellprognos (övriga: för lite underlag för ett lag).
 Modellen slår (b) i **alla 22 hela säsonger** med intervallet under noll, och i alla fyra
-divisionerna (−0,027 till −0,034). Den ligger **efter marknaden i alla 21 säsonger med
-odds** – intervallet över noll i alla utom 2006/07–2008/09 – och avståndet har vuxit: kring
-+0,004 2006/07–2008/09, kring +0,015 de senaste säsongerna (marknaden har blivit
-skarpare). Mot Pinnacle-stängningen är modellen sämre i alla 14 säsonger. FA-cupen
+divisionerna (−0,028 till −0,035). Den ligger **efter marknaden i alla 21 säsonger med
+odds** – intervallet över noll i alla utom 2006/07–2008/09 och 2011/12 – och avståndet har
+vuxit: kring +0,004 2006/07–2008/09, kring +0,015 de senaste säsongerna (marknaden har
+blivit skarpare). Mot Pinnacle-stängningen är modellen sämre i alla 14 säsonger. FA-cupen
 2021/22–2025/26 (672 matcher): 0,992 mot naiv 1,071; att gå vidare 0,597 (slantsingling
 0,693). EFL-cupen finns bara för 2026/27 (76 matcher): 0,856 mot naiv 1,072. Pågående
 säsong t.o.m. 2026-10-17 (436 ligamatcher): −0,107 mot (b), som är extrem tidigt på
-säsongen, och +0,012 mot (c).
+säsongen, och +0,012 mot (c). Siffrorna för regelversion 2026-10-17.1 står i
+`data/backtest/2026-10-17.1.json`.
 
 ### Kandidatjakten
 
@@ -443,7 +474,8 @@ godkända faktorer prövas tillsammans med gemensamt skattade vikter och samma k
 kombinationen måste dessutom slå varje del ensam. Marknaden kombineras inte – den ersätter
 modellen snarare än justerar den.
 
-**Utfall 2026-10-17** (log-poäng, kandidat − grundmodell, intervall 99,62 %):
+**Utfall 2026-10-17** (grundmodell = regelversion 2026-10-17.1; log-poäng, kandidat −
+grundmodell, intervall 99,62 %):
 
 | Kandidat | Typ | Matcher | Skillnad | Halvorna | Utfall |
 |---|---|---|---|---|---|
@@ -457,7 +489,7 @@ modellen snarare än justerar den.
 | Skott på mål i skattningen (hälften) | regel | 45 678 | −0,0005 (−0,0015 till +0,0005) | −0,0009 / −0,0002 | underkänd – intervallet når noll |
 | xG i skattningen (hälften), PL 2014/15– | regel | 4 625 | −0,0011 (−0,0039 till +0,0013) | −0,0013 / −0,0008 | underkänd – intervallet når noll |
 | Form: poäng per match, senaste fem | faktor | 43 656 | −0,0004 (−0,0006 till −0,0002) | −0,0001 / −0,0006 | **godkänd** |
-| Tabelläge: poäng per match i år | faktor | 42 921 | −0,0006 (−0,0009 till −0,0002) | −0,0004 / −0,0008 | **godkänd** |
+| Tabelläge: poäng per match i år | faktor | 42 921 | −0,0006 (−0,0009 till −0,0002) | −0,0004 / −0,0008 | **godkänd, införd i 2026-10-17.2** |
 | Inbördes möten: målskillnad, senaste sex | faktor | 43 656 | ±0,0000 (−0,0001 till +0,0002) | ±0,0000 / ±0,0000 | underkänd – ingen skillnad |
 | Marknadens odds som faktor | faktor | 40 884 | −0,0117 (−0,0139 till −0,0098) | −0,0100 / −0,0139 | **godkänd** |
 | Kombination: form + tabelläge | kombination | 43 656 | −0,0005 (−0,0009 till −0,0002) | −0,0002 / −0,0008 | underkänd – inte bättre än tabelläget ensamt |
@@ -478,7 +510,9 @@ Läsning:
   blandningen är marknaden ensam, säsong för säsong. Modellen tillför alltså inget utöver
   öppningsoddsen. Att "införa" kandidaten vore att ersätta modellen med oddsen – då vore
   jämförelsen mot (c) meningslös och sidan inte längre en egen prognos.
-- **Ingen kandidat styr prognosen än.** En ny regelversion kräver beslut (se nedan).
+- **Tabelläget infördes** som regelversion 2026-10-17.2 efter användarens beslut; formen
+  och marknaden inte (se Beslut). En kandidat som blivit regelversion prövas inte igen –
+  nästa kandidatjakt prövar övriga kandidater ovanpå version 2026-10-17.2.
 
 **Går inte att pröva än:**
 
@@ -570,8 +604,15 @@ schemaintervall gammalt.
 - Kandidaternas värden är a priori-val; andra värden (t.ex. 270 dagars halveringstid) är
   inte prövade. Att pröva många värden och välja det bästa vore datamining – Bonferroni
   täcker bara de kandidater som faktiskt körts.
-- Tabelläget räknas ur resultaten, utan poängavdrag. Formen räknar alla tävlingar i
-  underlaget – före 2021/22 alltså bara ligamatcher.
+- Tabelläget räknas ur resultaten, utan poängavdrag – ett lag med avdrag får sin "sportsliga"
+  tabell, inte den officiella som ESPN visar. Formen räknar alla tävlingar i underlaget –
+  före 2021/22 alltså bara ligamatcher.
+- Tabellägets vikt är fryst i regelkonfigen (skattad 2026-10-17). Den skattas inte om
+  löpande; en ny vikt kräver en ny regelversion. Skattningen säsong för säsong i backtestet
+  har legat på 0,034–0,040 sedan 2017/18.
+- Övergången till 2026-10-17.2 ger nya journalrader för alla matcher inom 14 dagar vid
+  nästa körning (ny regelversion ändrar avtrycket) – avsiktligt, så att journalen visar
+  vilken version som gjorde varje prognos.
 - **Rättat i fas 4:** baslinje (b) kunde tidigt på säsongen ge 100 % oavgjort eller
   ogiltiga sannolikheter när skattningen saknade ändligt maximum för några lag (hittat i
   backtestet: 33 av 39 657 matcher, 24 av dem i augusti–september 2022). Nu är (b) okänd för de lagen. Inga
