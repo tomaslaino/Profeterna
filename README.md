@@ -161,9 +161,10 @@ schemaintervall gammalt.
 - Inbördes möten visas bara för innevarande säsong; historiken kommer i fas 4.
 - Skottstatistik från cupmatcher (finns hos ESPN) hämtas inte – lagens ligastatistik används.
 - ESPN anger ingen omgång för ligamatcher, så listan grupperas per datum.
-- Att källorna svarar från GitHub Actions servrar är inte verifierat. ESPN fungerar
-  därifrån för gravergrav.se; Understat, FPL och football-data.co.uk kan blockera
-  molnadresser. Gör de det visas de som fel i källtabellen, sidan fungerar ändå.
+- Alla källor svarade från GitHub Actions servrar vid första körningen (2026-10-17).
+  Börjar någon blockera molnadresser visas den som fel i källtabellen; sidan fungerar ändå.
+- Actions-stegen (checkout, setup-node, cache, Pages) är v4/v3 och ger varningen att
+  Node 20 fasas ut på GitHub; de körs ändå. Själva bygget körs på Node 22.
 - GitHub stänger av schemalagda workflows i publika repon efter 60 dagar utan aktivitet i
   repot. Journalens commits (fas 3) håller det vid liv; tills dess räcker en push.
 - football-data.co.uk:s datum är brittisk lokal tid. Matchningen mot ESPN sker på
