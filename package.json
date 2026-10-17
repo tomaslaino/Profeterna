@@ -7,7 +7,9 @@
     "start": "node server.js",
     "build": "node src/build.js",
     "refresh": "node src/build.js --force",
-    "check": "node src/check.js"
+    "check": "node src/check.js",
+    "backtest": "node src/backtest.js",
+    "kandidater": "node src/candidates.js"
   },
   "engines": {
     "node": ">=18"

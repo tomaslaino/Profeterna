@@ -1,0 +1,2639 @@
+{
+ "rulesVersion": "2026-10-17.1",
+ "ranAt": "2026-10-17T18:40:45.654Z",
+ "ms": null,
+ "bootstrap": {
+  "samples": 2000,
+  "level": 0.95,
+  "unit": "matchdag"
+ },
+ "seasons": [
+  {
+   "code": "0405",
+   "label": "2004/05",
+   "partial": false,
+   "through": "2005-05-15"
+  },
+  {
+   "code": "0506",
+   "label": "2005/06",
+   "partial": false,
+   "through": "2006-05-07"
+  },
+  {
+   "code": "0607",
+   "label": "2006/07",
+   "partial": false,
+   "through": "2007-05-13"
+  },
+  {
+   "code": "0708",
+   "label": "2007/08",
+   "partial": false,
+   "through": "2008-05-11"
+  },
+  {
+   "code": "0809",
+   "label": "2008/09",
+   "partial": false,
+   "through": "2009-05-24"
+  },
+  {
+   "code": "0910",
+   "label": "2009/10",
+   "partial": false,
+   "through": "2010-05-09"
+  },
+  {
+   "code": "1011",
+   "label": "2010/11",
+   "partial": false,
+   "through": "2011-05-22"
+  },
+  {
+   "code": "1112",
+   "label": "2011/12",
+   "partial": false,
+   "through": "2012-05-13"
+  },
+  {
+   "code": "1213",
+   "label": "2012/13",
+   "partial": false,
+   "through": "2013-05-19"
+  },
+  {
+   "code": "1314",
+   "label": "2013/14",
+   "partial": false,
+   "through": "2014-05-11"
+  },
+  {
+   "code": "1415",
+   "label": "2014/15",
+   "partial": false,
+   "through": "2015-05-24"
+  },
+  {
+   "code": "1516",
+   "label": "2015/16",
+   "partial": false,
+   "through": "2016-05-17"
+  },
+  {
+   "code": "1617",
+   "label": "2016/17",
+   "partial": false,
+   "through": "2017-05-21"
+  },
+  {
+   "code": "1718",
+   "label": "2017/18",
+   "partial": false,
+   "through": "2018-05-13"
+  },
+  {
+   "code": "1819",
+   "label": "2018/19",
+   "partial": false,
+   "through": "2019-05-12"
+  },
+  {
+   "code": "1920",
+   "label": "2019/20",
+   "partial": false,
+   "through": "2020-07-26"
+  },
+  {
+   "code": "2021",
+   "label": "2020/21",
+   "partial": false,
+   "through": "2021-05-23"
+  },
+  {
+   "code": "2122",
+   "label": "2021/22",
+   "partial": false,
+   "through": "2022-05-22"
+  },
+  {
+   "code": "2223",
+   "label": "2022/23",
+   "partial": false,
+   "through": "2023-05-28"
+  },
+  {
+   "code": "2324",
+   "label": "2023/24",
+   "partial": false,
+   "through": "2024-05-25"
+  },
+  {
+   "code": "2425",
+   "label": "2024/25",
+   "partial": false,
+   "through": "2025-05-25"
+  },
+  {
+   "code": "2526",
+   "label": "2025/26",
+   "partial": false,
+   "through": "2026-05-24"
+  },
+  {
+   "code": "2627",
+   "label": "2026/27",
+   "partial": true,
+   "through": "2026-10-17"
+  }
+ ],
+ "first": "2004/05",
+ "last": "2026/27",
+ "matches": 45712,
+ "modelKnown": 45678,
+ "leagues": {
+  "n": 44964,
+  "known": 44943,
+  "vs": [
+   {
+    "key": "ss",
+    "label": "(b) Poisson på säsongens mål",
+    "n": 39624,
+    "days": 3678,
+    "logLoss": [
+     1.0389,
+     1.069
+    ],
+    "brier": [
+     0.6249,
+     0.6421
+    ],
+    "diff": -0.0302,
+    "ci": [
+     -0.0339,
+     -0.0264
+    ],
+    "brierDiff": -0.0172
+   },
+   {
+    "key": "nv",
+    "label": "(a) Naiv",
+    "n": 44943,
+    "days": 4091,
+    "logLoss": [
+     1.04,
+     1.0755
+    ],
+    "brier": [
+     0.6256,
+     0.6507
+    ],
+    "diff": -0.0355,
+    "ci": [
+     -0.0379,
+     -0.0332
+    ],
+    "brierDiff": -0.0251
+   },
+   {
+    "key": "mk",
+    "label": "(c) Marknaden, öppning",
+    "n": 42913,
+    "days": 3900,
+    "logLoss": [
+     1.0394,
+     1.0278
+    ],
+    "brier": [
+     0.6252,
+     0.6172
+    ],
+    "diff": 0.0117,
+    "ci": [
+     0.0103,
+     0.013
+    ],
+    "brierDiff": 0.008
+   },
+   {
+    "key": "cl",
+    "label": "Pinnacle, stängning",
+    "n": 27001,
+    "days": 2522,
+    "logLoss": [
+     1.0385,
+     1.0222
+    ],
+    "brier": [
+     0.6243,
+     0.6131
+    ],
+    "diff": 0.0162,
+    "ci": [
+     0.0142,
+     0.0182
+    ],
+    "brierDiff": 0.0113
+   }
+  ]
+ },
+ "byDivision": [
+  {
+   "comp": "pl",
+   "name": "Premier League",
+   "n": 8425,
+   "known": 8425,
+   "vs": [
+    {
+     "key": "ss",
+     "label": "(b) Poisson på säsongens mål",
+     "n": 7265,
+     "days": 2064,
+     "logLoss": [
+      0.971,
+      1.0054
+     ],
+     "brier": [
+      0.5774,
+      0.5978
+     ],
+     "diff": -0.0344,
+     "ci": [
+      -0.0415,
+      -0.0276
+     ],
+     "brierDiff": -0.0204
+    },
+    {
+     "key": "nv",
+     "label": "(a) Naiv",
+     "n": 8425,
+     "days": 2373,
+     "logLoss": [
+      0.9721,
+      1.0641
+     ],
+     "brier": [
+      0.578,
+      0.6429
+     ],
+     "diff": -0.092,
+     "ci": [
+      -0.1003,
+      -0.0842
+     ],
+     "brierDiff": -0.0649
+    },
+    {
+     "key": "mk",
+     "label": "(c) Marknaden, öppning",
+     "n": 8045,
+     "days": 2274,
+     "logLoss": [
+      0.9715,
+      0.9587
+     ],
+     "brier": [
+      0.5774,
+      0.5688
+     ],
+     "diff": 0.0127,
+     "ci": [
+      0.0098,
+      0.0159
+     ],
+     "brierDiff": 0.0085
+    },
+    {
+     "key": "cl",
+     "label": "Pinnacle, stängning",
+     "n": 5150,
+     "days": 1488,
+     "logLoss": [
+      0.9688,
+      0.9522
+     ],
+     "brier": [
+      0.5746,
+      0.5632
+     ],
+     "diff": 0.0166,
+     "ci": [
+      0.0119,
+      0.0209
+     ],
+     "brierDiff": 0.0114
+    }
+   ]
+  },
+  {
+   "comp": "ch",
+   "name": "Championship",
+   "n": 12275,
+   "known": 12275,
+   "vs": [
+    {
+     "key": "ss",
+     "label": "(b) Poisson på säsongens mål",
+     "n": 10898,
+     "days": 2084,
+     "logLoss": [
+      1.0514,
+      1.0786
+     ],
+     "brier": [
+      0.6336,
+      0.6495
+     ],
+     "diff": -0.0272,
+     "ci": [
+      -0.0337,
+      -0.0208
+     ],
+     "brierDiff": -0.0159
+    },
+    {
+     "key": "nv",
+     "label": "(a) Naiv",
+     "n": 12275,
+     "days": 2340,
+     "logLoss": [
+      1.0532,
+      1.0769
+     ],
+     "brier": [
+      0.6349,
+      0.6516
+     ],
+     "diff": -0.0237,
+     "ci": [
+      -0.0275,
+      -0.0197
+     ],
+     "brierDiff": -0.0167
+    },
+    {
+     "key": "mk",
+     "label": "(c) Marknaden, öppning",
+     "n": 11723,
+     "days": 2228,
+     "logLoss": [
+      1.0525,
+      1.0414
+     ],
+     "brier": [
+      0.6345,
+      0.6269
+     ],
+     "diff": 0.0111,
+     "ci": [
+      0.0087,
+      0.0135
+     ],
+     "brierDiff": 0.0076
+    },
+    {
+     "key": "cl",
+     "label": "Pinnacle, stängning",
+     "n": 7445,
+     "days": 1456,
+     "logLoss": [
+      1.0508,
+      1.0358
+     ],
+     "brier": [
+      0.6331,
+      0.6227
+     ],
+     "diff": 0.015,
+     "ci": [
+      0.0115,
+      0.0186
+     ],
+     "brierDiff": 0.0105
+    }
+   ]
+  },
+  {
+   "comp": "l1",
+   "name": "League One",
+   "n": 12106,
+   "known": 12099,
+   "vs": [
+    {
+     "key": "ss",
+     "label": "(b) Poisson på säsongens mål",
+     "n": 10699,
+     "days": 1642,
+     "logLoss": [
+      1.0459,
+      1.0731
+     ],
+     "brier": [
+      0.6297,
+      0.6445
+     ],
+     "diff": -0.0273,
+     "ci": [
+      -0.0338,
+      -0.0208
+     ],
+     "brierDiff": -0.0148
+    },
+    {
+     "key": "nv",
+     "label": "(a) Naiv",
+     "n": 12099,
+     "days": 1805,
+     "logLoss": [
+      1.0474,
+      1.0753
+     ],
+     "brier": [
+      0.6308,
+      0.6506
+     ],
+     "diff": -0.0279,
+     "ci": [
+      -0.0315,
+      -0.0243
+     ],
+     "brierDiff": -0.0198
+    },
+    {
+     "key": "mk",
+     "label": "(c) Marknaden, öppning",
+     "n": 11552,
+     "days": 1710,
+     "logLoss": [
+      1.0466,
+      1.0348
+     ],
+     "brier": [
+      0.6303,
+      0.6221
+     ],
+     "diff": 0.0118,
+     "ci": [
+      0.0092,
+      0.0144
+     ],
+     "brierDiff": 0.0082
+    },
+    {
+     "key": "cl",
+     "label": "Pinnacle, stängning",
+     "n": 7182,
+     "days": 1029,
+     "logLoss": [
+      1.0453,
+      1.0285
+     ],
+     "brier": [
+      0.6294,
+      0.6179
+     ],
+     "diff": 0.0168,
+     "ci": [
+      0.0129,
+      0.0207
+     ],
+     "brierDiff": 0.0115
+    }
+   ]
+  },
+  {
+   "comp": "l2",
+   "name": "League Two",
+   "n": 12158,
+   "known": 12144,
+   "vs": [
+    {
+     "key": "ss",
+     "label": "(b) Poisson på säsongens mål",
+     "n": 10762,
+     "days": 1529,
+     "logLoss": [
+      1.0649,
+      1.0983
+     ],
+     "brier": [
+      0.6431,
+      0.662
+     ],
+     "diff": -0.0334,
+     "ci": [
+      -0.0398,
+      -0.027
+     ],
+     "brierDiff": -0.0189
+    },
+    {
+     "key": "nv",
+     "label": "(a) Naiv",
+     "n": 12144,
+     "days": 1667,
+     "logLoss": [
+      1.0664,
+      1.0821
+     ],
+     "brier": [
+      0.6442,
+      0.6553
+     ],
+     "diff": -0.0157,
+     "ci": [
+      -0.0191,
+      -0.0124
+     ],
+     "brierDiff": -0.0111
+    },
+    {
+     "key": "mk",
+     "label": "(c) Marknaden, öppning",
+     "n": 11593,
+     "days": 1585,
+     "logLoss": [
+      1.0661,
+      1.0549
+     ],
+     "brier": [
+      0.644,
+      0.636
+     ],
+     "diff": 0.0112,
+     "ci": [
+      0.0089,
+      0.0138
+     ],
+     "brierDiff": 0.008
+    },
+    {
+     "key": "cl",
+     "label": "Pinnacle, stängning",
+     "n": 7224,
+     "days": 942,
+     "logLoss": [
+      1.0686,
+      1.0519
+     ],
+     "brier": [
+      0.6457,
+      0.6339
+     ],
+     "diff": 0.0168,
+     "ci": [
+      0.013,
+      0.0203
+     ],
+     "brierDiff": 0.0118
+    }
+   ]
+  }
+ ],
+ "bySeason": [
+  {
+   "code": "0405",
+   "label": "2004/05",
+   "partial": false,
+   "through": "2005-05-15",
+   "n": 2036,
+   "known": 2022,
+   "vs": [
+    {
+     "key": "ss",
+     "label": "(b) Poisson på säsongens mål",
+     "n": 1801,
+     "days": 171,
+     "logLoss": [
+      1.0529,
+      1.0783
+     ],
+     "brier": [
+      0.6353,
+      0.65
+     ],
+     "diff": -0.0253,
+     "ci": [
+      -0.0423,
+      -0.0107
+     ],
+     "brierDiff": -0.0147
+    },
+    {
+     "key": "nv",
+     "label": "(a) Naiv",
+     "n": 2022,
+     "days": 190,
+     "logLoss": [
+      1.0515,
+      1.0734
+     ],
+     "brier": [
+      0.6343,
+      0.6491
+     ],
+     "diff": -0.0219,
+     "ci": [
+      -0.0303,
+      -0.0127
+     ],
+     "brierDiff": -0.0147
+    },
+    {
+     "key": "mk",
+     "label": "(c) Marknaden, öppning",
+     "n": 0
+    },
+    {
+     "key": "cl",
+     "label": "Pinnacle, stängning",
+     "n": 0
+    }
+   ]
+  },
+  {
+   "code": "0506",
+   "label": "2005/06",
+   "partial": false,
+   "through": "2006-05-07",
+   "n": 2036,
+   "known": 2029,
+   "vs": [
+    {
+     "key": "ss",
+     "label": "(b) Poisson på säsongens mål",
+     "n": 1800,
+     "days": 173,
+     "logLoss": [
+      1.0542,
+      1.0791
+     ],
+     "brier": [
+      0.6362,
+      0.652
+     ],
+     "diff": -0.0249,
+     "ci": [
+      -0.0387,
+      -0.0099
+     ],
+     "brierDiff": -0.0157
+    },
+    {
+     "key": "nv",
+     "label": "(a) Naiv",
+     "n": 2029,
+     "days": 191,
+     "logLoss": [
+      1.0566,
+      1.0774
+     ],
+     "brier": [
+      0.6379,
+      0.652
+     ],
+     "diff": -0.0208,
+     "ci": [
+      -0.031,
+      -0.0116
+     ],
+     "brierDiff": -0.0141
+    },
+    {
+     "key": "mk",
+     "label": "(c) Marknaden, öppning",
+     "n": 2029,
+     "days": 191,
+     "logLoss": [
+      1.0566,
+      1.0476
+     ],
+     "brier": [
+      0.6379,
+      0.6324
+     ],
+     "diff": 0.009,
+     "ci": [
+      0.0035,
+      0.0143
+     ],
+     "brierDiff": 0.0055
+    },
+    {
+     "key": "cl",
+     "label": "Pinnacle, stängning",
+     "n": 0
+    }
+   ]
+  },
+  {
+   "code": "0607",
+   "label": "2006/07",
+   "partial": false,
+   "through": "2007-05-13",
+   "n": 2036,
+   "known": 2036,
+   "vs": [
+    {
+     "key": "ss",
+     "label": "(b) Poisson på säsongens mål",
+     "n": 1803,
+     "days": 162,
+     "logLoss": [
+      1.031,
+      1.0619
+     ],
+     "brier": [
+      0.6189,
+      0.6355
+     ],
+     "diff": -0.0309,
+     "ci": [
+      -0.0518,
+      -0.0146
+     ],
+     "brierDiff": -0.0166
+    },
+    {
+     "key": "nv",
+     "label": "(a) Naiv",
+     "n": 2036,
+     "days": 183,
+     "logLoss": [
+      1.0322,
+      1.0636
+     ],
+     "brier": [
+      0.6198,
+      0.642
+     ],
+     "diff": -0.0314,
+     "ci": [
+      -0.0428,
+      -0.0206
+     ],
+     "brierDiff": -0.0222
+    },
+    {
+     "key": "mk",
+     "label": "(c) Marknaden, öppning",
+     "n": 2035,
+     "days": 182,
+     "logLoss": [
+      1.0321,
+      1.0288
+     ],
+     "brier": [
+      0.6197,
+      0.6177
+     ],
+     "diff": 0.0032,
+     "ci": [
+      -0.0026,
+      0.0086
+     ],
+     "brierDiff": 0.002
+    },
+    {
+     "key": "cl",
+     "label": "Pinnacle, stängning",
+     "n": 0
+    }
+   ]
+  },
+  {
+   "code": "0708",
+   "label": "2007/08",
+   "partial": false,
+   "through": "2008-05-11",
+   "n": 2036,
+   "known": 2036,
+   "vs": [
+    {
+     "key": "ss",
+     "label": "(b) Poisson på säsongens mål",
+     "n": 1799,
+     "days": 156,
+     "logLoss": [
+      1.0323,
+      1.0607
+     ],
+     "brier": [
+      0.6209,
+      0.6384
+     ],
+     "diff": -0.0284,
+     "ci": [
+      -0.0441,
+      -0.0136
+     ],
+     "brierDiff": -0.0175
+    },
+    {
+     "key": "nv",
+     "label": "(a) Naiv",
+     "n": 2036,
+     "days": 171,
+     "logLoss": [
+      1.0349,
+      1.0796
+     ],
+     "brier": [
+      0.6227,
+      0.6532
+     ],
+     "diff": -0.0447,
+     "ci": [
+      -0.0537,
+      -0.0354
+     ],
+     "brierDiff": -0.0304
+    },
+    {
+     "key": "mk",
+     "label": "(c) Marknaden, öppning",
+     "n": 2035,
+     "days": 171,
+     "logLoss": [
+      1.0348,
+      1.0304
+     ],
+     "brier": [
+      0.6227,
+      0.6193
+     ],
+     "diff": 0.0044,
+     "ci": [
+      -0.0013,
+      0.0096
+     ],
+     "brierDiff": 0.0034
+    },
+    {
+     "key": "cl",
+     "label": "Pinnacle, stängning",
+     "n": 0
+    }
+   ]
+  },
+  {
+   "code": "0809",
+   "label": "2008/09",
+   "partial": false,
+   "through": "2009-05-24",
+   "n": 2036,
+   "known": 2036,
+   "vs": [
+    {
+     "key": "ss",
+     "label": "(b) Poisson på säsongens mål",
+     "n": 1803,
+     "days": 145,
+     "logLoss": [
+      1.0424,
+      1.0718
+     ],
+     "brier": [
+      0.6275,
+      0.6435
+     ],
+     "diff": -0.0294,
+     "ci": [
+      -0.0435,
+      -0.0172
+     ],
+     "brierDiff": -0.016
+    },
+    {
+     "key": "nv",
+     "label": "(a) Naiv",
+     "n": 2036,
+     "days": 159,
+     "logLoss": [
+      1.0414,
+      1.0787
+     ],
+     "brier": [
+      0.627,
+      0.6529
+     ],
+     "diff": -0.0373,
+     "ci": [
+      -0.0493,
+      -0.0257
+     ],
+     "brierDiff": -0.0259
+    },
+    {
+     "key": "mk",
+     "label": "(c) Marknaden, öppning",
+     "n": 2036,
+     "days": 159,
+     "logLoss": [
+      1.0414,
+      1.036
+     ],
+     "brier": [
+      0.627,
+      0.6235
+     ],
+     "diff": 0.0054,
+     "ci": [
+      -0.0003,
+      0.0114
+     ],
+     "brierDiff": 0.0035
+    },
+    {
+     "key": "cl",
+     "label": "Pinnacle, stängning",
+     "n": 0
+    }
+   ]
+  },
+  {
+   "code": "0910",
+   "label": "2009/10",
+   "partial": false,
+   "through": "2010-05-09",
+   "n": 2036,
+   "known": 2036,
+   "vs": [
+    {
+     "key": "ss",
+     "label": "(b) Poisson på säsongens mål",
+     "n": 1798,
+     "days": 166,
+     "logLoss": [
+      1.0232,
+      1.0589
+     ],
+     "brier": [
+      0.6148,
+      0.6324
+     ],
+     "diff": -0.0357,
+     "ci": [
+      -0.0603,
+      -0.0148
+     ],
+     "brierDiff": -0.0177
+    },
+    {
+     "key": "nv",
+     "label": "(a) Naiv",
+     "n": 2036,
+     "days": 181,
+     "logLoss": [
+      1.0222,
+      1.0622
+     ],
+     "brier": [
+      0.6137,
+      0.6411
+     ],
+     "diff": -0.04,
+     "ci": [
+      -0.0509,
+      -0.0286
+     ],
+     "brierDiff": -0.0273
+    },
+    {
+     "key": "mk",
+     "label": "(c) Marknaden, öppning",
+     "n": 2036,
+     "days": 181,
+     "logLoss": [
+      1.0222,
+      1.0108
+     ],
+     "brier": [
+      0.6137,
+      0.6061
+     ],
+     "diff": 0.0114,
+     "ci": [
+      0.006,
+      0.0167
+     ],
+     "brierDiff": 0.0076
+    },
+    {
+     "key": "cl",
+     "label": "Pinnacle, stängning",
+     "n": 0
+    }
+   ]
+  },
+  {
+   "code": "1011",
+   "label": "2010/11",
+   "partial": false,
+   "through": "2011-05-22",
+   "n": 2036,
+   "known": 2036,
+   "vs": [
+    {
+     "key": "ss",
+     "label": "(b) Poisson på säsongens mål",
+     "n": 1804,
+     "days": 154,
+     "logLoss": [
+      1.0543,
+      1.0983
+     ],
+     "brier": [
+      0.6359,
+      0.6599
+     ],
+     "diff": -0.044,
+     "ci": [
+      -0.0639,
+      -0.0261
+     ],
+     "brierDiff": -0.024
+    },
+    {
+     "key": "nv",
+     "label": "(a) Naiv",
+     "n": 2036,
+     "days": 172,
+     "logLoss": [
+      1.0557,
+      1.0731
+     ],
+     "brier": [
+      0.6371,
+      0.6489
+     ],
+     "diff": -0.0174,
+     "ci": [
+      -0.0291,
+      -0.006
+     ],
+     "brierDiff": -0.0118
+    },
+    {
+     "key": "mk",
+     "label": "(c) Marknaden, öppning",
+     "n": 2036,
+     "days": 172,
+     "logLoss": [
+      1.0557,
+      1.0452
+     ],
+     "brier": [
+      0.6371,
+      0.6295
+     ],
+     "diff": 0.0105,
+     "ci": [
+      0.0048,
+      0.0162
+     ],
+     "brierDiff": 0.0076
+    },
+    {
+     "key": "cl",
+     "label": "Pinnacle, stängning",
+     "n": 0
+    }
+   ]
+  },
+  {
+   "code": "1112",
+   "label": "2011/12",
+   "partial": false,
+   "through": "2012-05-13",
+   "n": 2036,
+   "known": 2036,
+   "vs": [
+    {
+     "key": "ss",
+     "label": "(b) Poisson på säsongens mål",
+     "n": 1804,
+     "days": 160,
+     "logLoss": [
+      1.0309,
+      1.068
+     ],
+     "brier": [
+      0.6192,
+      0.6421
+     ],
+     "diff": -0.0372,
+     "ci": [
+      -0.0599,
+      -0.019
+     ],
+     "brierDiff": -0.0228
+    },
+    {
+     "key": "nv",
+     "label": "(a) Naiv",
+     "n": 2036,
+     "days": 175,
+     "logLoss": [
+      1.0358,
+      1.077
+     ],
+     "brier": [
+      0.6229,
+      0.6517
+     ],
+     "diff": -0.0412,
+     "ci": [
+      -0.053,
+      -0.0293
+     ],
+     "brierDiff": -0.0288
+    },
+    {
+     "key": "mk",
+     "label": "(c) Marknaden, öppning",
+     "n": 2036,
+     "days": 175,
+     "logLoss": [
+      1.0358,
+      1.0302
+     ],
+     "brier": [
+      0.6229,
+      0.6193
+     ],
+     "diff": 0.0056,
+     "ci": [
+      0.0002,
+      0.0108
+     ],
+     "brierDiff": 0.0036
+    },
+    {
+     "key": "cl",
+     "label": "Pinnacle, stängning",
+     "n": 0
+    }
+   ]
+  },
+  {
+   "code": "1213",
+   "label": "2012/13",
+   "partial": false,
+   "through": "2013-05-19",
+   "n": 2036,
+   "known": 2036,
+   "vs": [
+    {
+     "key": "ss",
+     "label": "(b) Poisson på säsongens mål",
+     "n": 1801,
+     "days": 160,
+     "logLoss": [
+      1.0656,
+      1.1016
+     ],
+     "brier": [
+      0.6434,
+      0.6637
+     ],
+     "diff": -0.036,
+     "ci": [
+      -0.0558,
+      -0.0205
+     ],
+     "brierDiff": -0.0203
+    },
+    {
+     "key": "nv",
+     "label": "(a) Naiv",
+     "n": 2036,
+     "days": 177,
+     "logLoss": [
+      1.06,
+      1.0816
+     ],
+     "brier": [
+      0.6396,
+      0.655
+     ],
+     "diff": -0.0216,
+     "ci": [
+      -0.0321,
+      -0.0115
+     ],
+     "brierDiff": -0.0154
+    },
+    {
+     "key": "mk",
+     "label": "(c) Marknaden, öppning",
+     "n": 2036,
+     "days": 177,
+     "logLoss": [
+      1.06,
+      1.0507
+     ],
+     "brier": [
+      0.6396,
+      0.6325
+     ],
+     "diff": 0.0094,
+     "ci": [
+      0.0036,
+      0.0149
+     ],
+     "brierDiff": 0.0071
+    },
+    {
+     "key": "cl",
+     "label": "Pinnacle, stängning",
+     "n": 2034,
+     "days": 177,
+     "logLoss": [
+      1.0602,
+      1.0483
+     ],
+     "brier": [
+      0.6397,
+      0.631
+     ],
+     "diff": 0.0119,
+     "ci": [
+      0.0046,
+      0.0185
+     ],
+     "brierDiff": 0.0087
+    }
+   ]
+  },
+  {
+   "code": "1314",
+   "label": "2013/14",
+   "partial": false,
+   "through": "2014-05-11",
+   "n": 2036,
+   "known": 2036,
+   "vs": [
+    {
+     "key": "ss",
+     "label": "(b) Poisson på säsongens mål",
+     "n": 1804,
+     "days": 155,
+     "logLoss": [
+      1.0422,
+      1.065
+     ],
+     "brier": [
+      0.6263,
+      0.6389
+     ],
+     "diff": -0.0227,
+     "ci": [
+      -0.0393,
+      -0.0079
+     ],
+     "brierDiff": -0.0125
+    },
+    {
+     "key": "nv",
+     "label": "(a) Naiv",
+     "n": 2036,
+     "days": 173,
+     "logLoss": [
+      1.0429,
+      1.0809
+     ],
+     "brier": [
+      0.6269,
+      0.6544
+     ],
+     "diff": -0.0379,
+     "ci": [
+      -0.0493,
+      -0.0269
+     ],
+     "brierDiff": -0.0275
+    },
+    {
+     "key": "mk",
+     "label": "(c) Marknaden, öppning",
+     "n": 2036,
+     "days": 173,
+     "logLoss": [
+      1.0429,
+      1.0255
+     ],
+     "brier": [
+      0.6269,
+      0.6148
+     ],
+     "diff": 0.0174,
+     "ci": [
+      0.0123,
+      0.0221
+     ],
+     "brierDiff": 0.0121
+    },
+    {
+     "key": "cl",
+     "label": "Pinnacle, stängning",
+     "n": 2036,
+     "days": 173,
+     "logLoss": [
+      1.0429,
+      1.0232
+     ],
+     "brier": [
+      0.6269,
+      0.6132
+     ],
+     "diff": 0.0197,
+     "ci": [
+      0.0142,
+      0.0251
+     ],
+     "brierDiff": 0.0137
+    }
+   ]
+  },
+  {
+   "code": "1415",
+   "label": "2014/15",
+   "partial": false,
+   "through": "2015-05-24",
+   "n": 2036,
+   "known": 2036,
+   "vs": [
+    {
+     "key": "ss",
+     "label": "(b) Poisson på säsongens mål",
+     "n": 1806,
+     "days": 157,
+     "logLoss": [
+      1.04,
+      1.0657
+     ],
+     "brier": [
+      0.6257,
+      0.6395
+     ],
+     "diff": -0.0257,
+     "ci": [
+      -0.0434,
+      -0.0097
+     ],
+     "brierDiff": -0.0139
+    },
+    {
+     "key": "nv",
+     "label": "(a) Naiv",
+     "n": 2036,
+     "days": 172,
+     "logLoss": [
+      1.0437,
+      1.0793
+     ],
+     "brier": [
+      0.6279,
+      0.6535
+     ],
+     "diff": -0.0356,
+     "ci": [
+      -0.0471,
+      -0.0245
+     ],
+     "brierDiff": -0.0257
+    },
+    {
+     "key": "mk",
+     "label": "(c) Marknaden, öppning",
+     "n": 2036,
+     "days": 172,
+     "logLoss": [
+      1.0437,
+      1.0338
+     ],
+     "brier": [
+      0.6279,
+      0.6205
+     ],
+     "diff": 0.0099,
+     "ci": [
+      0.0037,
+      0.016
+     ],
+     "brierDiff": 0.0073
+    },
+    {
+     "key": "cl",
+     "label": "Pinnacle, stängning",
+     "n": 2036,
+     "days": 172,
+     "logLoss": [
+      1.0437,
+      1.0334
+     ],
+     "brier": [
+      0.6279,
+      0.6205
+     ],
+     "diff": 0.0103,
+     "ci": [
+      0.0034,
+      0.0173
+     ],
+     "brierDiff": 0.0074
+    }
+   ]
+  },
+  {
+   "code": "1516",
+   "label": "2015/16",
+   "partial": false,
+   "through": "2016-05-17",
+   "n": 2036,
+   "known": 2036,
+   "vs": [
+    {
+     "key": "ss",
+     "label": "(b) Poisson på säsongens mål",
+     "n": 1804,
+     "days": 163,
+     "logLoss": [
+      1.0506,
+      1.0757
+     ],
+     "brier": [
+      0.6331,
+      0.6462
+     ],
+     "diff": -0.0251,
+     "ci": [
+      -0.0488,
+      -0.0047
+     ],
+     "brierDiff": -0.0131
+    },
+    {
+     "key": "nv",
+     "label": "(a) Naiv",
+     "n": 2036,
+     "days": 182,
+     "logLoss": [
+      1.0551,
+      1.0852
+     ],
+     "brier": [
+      0.6359,
+      0.6577
+     ],
+     "diff": -0.03,
+     "ci": [
+      -0.0396,
+      -0.0205
+     ],
+     "brierDiff": -0.0218
+    },
+    {
+     "key": "mk",
+     "label": "(c) Marknaden, öppning",
+     "n": 2036,
+     "days": 182,
+     "logLoss": [
+      1.0551,
+      1.0413
+     ],
+     "brier": [
+      0.6359,
+      0.6265
+     ],
+     "diff": 0.0138,
+     "ci": [
+      0.0079,
+      0.0201
+     ],
+     "brierDiff": 0.0094
+    },
+    {
+     "key": "cl",
+     "label": "Pinnacle, stängning",
+     "n": 2036,
+     "days": 182,
+     "logLoss": [
+      1.0551,
+      1.0364
+     ],
+     "brier": [
+      0.6359,
+      0.6231
+     ],
+     "diff": 0.0187,
+     "ci": [
+      0.0118,
+      0.026
+     ],
+     "brierDiff": 0.0128
+    }
+   ]
+  },
+  {
+   "code": "1617",
+   "label": "2016/17",
+   "partial": false,
+   "through": "2017-05-21",
+   "n": 2036,
+   "known": 2036,
+   "vs": [
+    {
+     "key": "ss",
+     "label": "(b) Poisson på säsongens mål",
+     "n": 1805,
+     "days": 170,
+     "logLoss": [
+      1.0238,
+      1.049
+     ],
+     "brier": [
+      0.614,
+      0.629
+     ],
+     "diff": -0.0252,
+     "ci": [
+      -0.0449,
+      -0.0095
+     ],
+     "brierDiff": -0.015
+    },
+    {
+     "key": "nv",
+     "label": "(a) Naiv",
+     "n": 2036,
+     "days": 188,
+     "logLoss": [
+      1.0275,
+      1.0668
+     ],
+     "brier": [
+      0.6167,
+      0.6446
+     ],
+     "diff": -0.0393,
+     "ci": [
+      -0.0507,
+      -0.0284
+     ],
+     "brierDiff": -0.0279
+    },
+    {
+     "key": "mk",
+     "label": "(c) Marknaden, öppning",
+     "n": 2036,
+     "days": 188,
+     "logLoss": [
+      1.0275,
+      1.008
+     ],
+     "brier": [
+      0.6167,
+      0.6029
+     ],
+     "diff": 0.0195,
+     "ci": [
+      0.0122,
+      0.0271
+     ],
+     "brierDiff": 0.0138
+    },
+    {
+     "key": "cl",
+     "label": "Pinnacle, stängning",
+     "n": 2036,
+     "days": 188,
+     "logLoss": [
+      1.0275,
+      1.0059
+     ],
+     "brier": [
+      0.6167,
+      0.6015
+     ],
+     "diff": 0.0216,
+     "ci": [
+      0.0137,
+      0.0295
+     ],
+     "brierDiff": 0.0151
+    }
+   ]
+  },
+  {
+   "code": "1718",
+   "label": "2017/18",
+   "partial": false,
+   "through": "2018-05-13",
+   "n": 2036,
+   "known": 2036,
+   "vs": [
+    {
+     "key": "ss",
+     "label": "(b) Poisson på säsongens mål",
+     "n": 1801,
+     "days": 163,
+     "logLoss": [
+      1.0352,
+      1.0561
+     ],
+     "brier": [
+      0.6223,
+      0.6327
+     ],
+     "diff": -0.021,
+     "ci": [
+      -0.0366,
+      -0.0063
+     ],
+     "brierDiff": -0.0104
+    },
+    {
+     "key": "nv",
+     "label": "(a) Naiv",
+     "n": 2036,
+     "days": 183,
+     "logLoss": [
+      1.0366,
+      1.075
+     ],
+     "brier": [
+      0.6233,
+      0.6504
+     ],
+     "diff": -0.0384,
+     "ci": [
+      -0.0515,
+      -0.0257
+     ],
+     "brierDiff": -0.0271
+    },
+    {
+     "key": "mk",
+     "label": "(c) Marknaden, öppning",
+     "n": 2036,
+     "days": 183,
+     "logLoss": [
+      1.0366,
+      1.0225
+     ],
+     "brier": [
+      0.6233,
+      0.6143
+     ],
+     "diff": 0.0141,
+     "ci": [
+      0.0078,
+      0.0206
+     ],
+     "brierDiff": 0.009
+    },
+    {
+     "key": "cl",
+     "label": "Pinnacle, stängning",
+     "n": 2036,
+     "days": 183,
+     "logLoss": [
+      1.0366,
+      1.0181
+     ],
+     "brier": [
+      0.6233,
+      0.6113
+     ],
+     "diff": 0.0185,
+     "ci": [
+      0.0119,
+      0.0255
+     ],
+     "brierDiff": 0.0119
+    }
+   ]
+  },
+  {
+   "code": "1819",
+   "label": "2018/19",
+   "partial": false,
+   "through": "2019-05-12",
+   "n": 2036,
+   "known": 2036,
+   "vs": [
+    {
+     "key": "ss",
+     "label": "(b) Poisson på säsongens mål",
+     "n": 1804,
+     "days": 161,
+     "logLoss": [
+      1.0197,
+      1.0476
+     ],
+     "brier": [
+      0.6116,
+      0.6294
+     ],
+     "diff": -0.0279,
+     "ci": [
+      -0.0417,
+      -0.0146
+     ],
+     "brierDiff": -0.0179
+    },
+    {
+     "key": "nv",
+     "label": "(a) Naiv",
+     "n": 2036,
+     "days": 181,
+     "logLoss": [
+      1.0198,
+      1.0721
+     ],
+     "brier": [
+      0.6117,
+      0.6485
+     ],
+     "diff": -0.0523,
+     "ci": [
+      -0.0635,
+      -0.041
+     ],
+     "brierDiff": -0.0368
+    },
+    {
+     "key": "mk",
+     "label": "(c) Marknaden, öppning",
+     "n": 2036,
+     "days": 181,
+     "logLoss": [
+      1.0198,
+      1.0103
+     ],
+     "brier": [
+      0.6117,
+      0.6053
+     ],
+     "diff": 0.0095,
+     "ci": [
+      0.0037,
+      0.0151
+     ],
+     "brierDiff": 0.0064
+    },
+    {
+     "key": "cl",
+     "label": "Pinnacle, stängning",
+     "n": 2034,
+     "days": 181,
+     "logLoss": [
+      1.0196,
+      1.0074
+     ],
+     "brier": [
+      0.6116,
+      0.6035
+     ],
+     "diff": 0.0122,
+     "ci": [
+      0.006,
+      0.0185
+     ],
+     "brierDiff": 0.0081
+    }
+   ]
+  },
+  {
+   "code": "1920",
+   "label": "2019/20",
+   "partial": false,
+   "through": "2020-07-26",
+   "n": 1772,
+   "known": 1772,
+   "vs": [
+    {
+     "key": "ss",
+     "label": "(b) Poisson på säsongens mål",
+     "n": 1542,
+     "days": 160,
+     "logLoss": [
+      1.0387,
+      1.0703
+     ],
+     "brier": [
+      0.6243,
+      0.6435
+     ],
+     "diff": -0.0316,
+     "ci": [
+      -0.0466,
+      -0.0166
+     ],
+     "brierDiff": -0.0191
+    },
+    {
+     "key": "nv",
+     "label": "(a) Naiv",
+     "n": 1772,
+     "days": 178,
+     "logLoss": [
+      1.0398,
+      1.0764
+     ],
+     "brier": [
+      0.6252,
+      0.6513
+     ],
+     "diff": -0.0366,
+     "ci": [
+      -0.049,
+      -0.0248
+     ],
+     "brierDiff": -0.026
+    },
+    {
+     "key": "mk",
+     "label": "(c) Marknaden, öppning",
+     "n": 1767,
+     "days": 178,
+     "logLoss": [
+      1.0395,
+      1.0261
+     ],
+     "brier": [
+      0.625,
+      0.6147
+     ],
+     "diff": 0.0134,
+     "ci": [
+      0.0054,
+      0.022
+     ],
+     "brierDiff": 0.0102
+    },
+    {
+     "key": "cl",
+     "label": "Pinnacle, stängning",
+     "n": 1768,
+     "days": 178,
+     "logLoss": [
+      1.0397,
+      1.0243
+     ],
+     "brier": [
+      0.6252,
+      0.6134
+     ],
+     "diff": 0.0154,
+     "ci": [
+      0.0071,
+      0.0248
+     ],
+     "brierDiff": 0.0118
+    }
+   ]
+  },
+  {
+   "code": "2021",
+   "label": "2020/21",
+   "partial": false,
+   "through": "2021-05-23",
+   "n": 2036,
+   "known": 2036,
+   "vs": [
+    {
+     "key": "ss",
+     "label": "(b) Poisson på säsongens mål",
+     "n": 1800,
+     "days": 171,
+     "logLoss": [
+      1.0546,
+      1.0898
+     ],
+     "brier": [
+      0.6355,
+      0.6557
+     ],
+     "diff": -0.0351,
+     "ci": [
+      -0.0499,
+      -0.0212
+     ],
+     "brierDiff": -0.0202
+    },
+    {
+     "key": "nv",
+     "label": "(a) Naiv",
+     "n": 2036,
+     "days": 193,
+     "logLoss": [
+      1.0571,
+      1.0857
+     ],
+     "brier": [
+      0.6372,
+      0.6586
+     ],
+     "diff": -0.0286,
+     "ci": [
+      -0.0405,
+      -0.0167
+     ],
+     "brierDiff": -0.0214
+    },
+    {
+     "key": "mk",
+     "label": "(c) Marknaden, öppning",
+     "n": 2036,
+     "days": 193,
+     "logLoss": [
+      1.0571,
+      1.0422
+     ],
+     "brier": [
+      0.6372,
+      0.6262
+     ],
+     "diff": 0.015,
+     "ci": [
+      0.0078,
+      0.0218
+     ],
+     "brierDiff": 0.0109
+    },
+    {
+     "key": "cl",
+     "label": "Pinnacle, stängning",
+     "n": 2029,
+     "days": 193,
+     "logLoss": [
+      1.0575,
+      1.0383
+     ],
+     "brier": [
+      0.6374,
+      0.6238
+     ],
+     "diff": 0.0192,
+     "ci": [
+      0.0113,
+      0.027
+     ],
+     "brierDiff": 0.0137
+    }
+   ]
+  },
+  {
+   "code": "2122",
+   "label": "2021/22",
+   "partial": false,
+   "through": "2022-05-22",
+   "n": 2036,
+   "known": 2036,
+   "vs": [
+    {
+     "key": "ss",
+     "label": "(b) Poisson på säsongens mål",
+     "n": 1803,
+     "days": 179,
+     "logLoss": [
+      1.0232,
+      1.0546
+     ],
+     "brier": [
+      0.6132,
+      0.6303
+     ],
+     "diff": -0.0314,
+     "ci": [
+      -0.0514,
+      -0.0145
+     ],
+     "brierDiff": -0.0171
+    },
+    {
+     "key": "nv",
+     "label": "(a) Naiv",
+     "n": 2036,
+     "days": 198,
+     "logLoss": [
+      1.0256,
+      1.0738
+     ],
+     "brier": [
+      0.6148,
+      0.6498
+     ],
+     "diff": -0.0483,
+     "ci": [
+      -0.0594,
+      -0.037
+     ],
+     "brierDiff": -0.035
+    },
+    {
+     "key": "mk",
+     "label": "(c) Marknaden, öppning",
+     "n": 2036,
+     "days": 198,
+     "logLoss": [
+      1.0256,
+      1.009
+     ],
+     "brier": [
+      0.6148,
+      0.6033
+     ],
+     "diff": 0.0166,
+     "ci": [
+      0.0089,
+      0.0243
+     ],
+     "brierDiff": 0.0116
+    },
+    {
+     "key": "cl",
+     "label": "Pinnacle, stängning",
+     "n": 2036,
+     "days": 198,
+     "logLoss": [
+      1.0256,
+      1.006
+     ],
+     "brier": [
+      0.6148,
+      0.601
+     ],
+     "diff": 0.0196,
+     "ci": [
+      0.0113,
+      0.0287
+     ],
+     "brierDiff": 0.0138
+    }
+   ]
+  },
+  {
+   "code": "2223",
+   "label": "2022/23",
+   "partial": false,
+   "through": "2023-05-28",
+   "n": 2036,
+   "known": 2036,
+   "vs": [
+    {
+     "key": "ss",
+     "label": "(b) Poisson på säsongens mål",
+     "n": 1775,
+     "days": 184,
+     "logLoss": [
+      1.0364,
+      1.0584
+     ],
+     "brier": [
+      0.6232,
+      0.6375
+     ],
+     "diff": -0.022,
+     "ci": [
+      -0.0376,
+      -0.0085
+     ],
+     "brierDiff": -0.0143
+    },
+    {
+     "key": "nv",
+     "label": "(a) Naiv",
+     "n": 2036,
+     "days": 204,
+     "logLoss": [
+      1.0372,
+      1.0752
+     ],
+     "brier": [
+      0.6239,
+      0.6506
+     ],
+     "diff": -0.0379,
+     "ci": [
+      -0.0491,
+      -0.0269
+     ],
+     "brierDiff": -0.0267
+    },
+    {
+     "key": "mk",
+     "label": "(c) Marknaden, öppning",
+     "n": 2035,
+     "days": 204,
+     "logLoss": [
+      1.0371,
+      1.0247
+     ],
+     "brier": [
+      0.6238,
+      0.6157
+     ],
+     "diff": 0.0123,
+     "ci": [
+      0.0064,
+      0.0184
+     ],
+     "brierDiff": 0.008
+    },
+    {
+     "key": "cl",
+     "label": "Pinnacle, stängning",
+     "n": 2035,
+     "days": 204,
+     "logLoss": [
+      1.0371,
+      1.0238
+     ],
+     "brier": [
+      0.6238,
+      0.6152
+     ],
+     "diff": 0.0133,
+     "ci": [
+      0.006,
+      0.0203
+     ],
+     "brierDiff": 0.0085
+    }
+   ]
+  },
+  {
+   "code": "2324",
+   "label": "2023/24",
+   "partial": false,
+   "through": "2024-05-25",
+   "n": 2036,
+   "known": 2036,
+   "vs": [
+    {
+     "key": "ss",
+     "label": "(b) Poisson på säsongens mål",
+     "n": 1797,
+     "days": 176,
+     "logLoss": [
+      1.0159,
+      1.0545
+     ],
+     "brier": [
+      0.6081,
+      0.6313
+     ],
+     "diff": -0.0386,
+     "ci": [
+      -0.0525,
+      -0.0264
+     ],
+     "brierDiff": -0.0232
+    },
+    {
+     "key": "nv",
+     "label": "(a) Naiv",
+     "n": 2036,
+     "days": 194,
+     "logLoss": [
+      1.0159,
+      1.0677
+     ],
+     "brier": [
+      0.6081,
+      0.6459
+     ],
+     "diff": -0.0518,
+     "ci": [
+      -0.0658,
+      -0.0381
+     ],
+     "brierDiff": -0.0378
+    },
+    {
+     "key": "mk",
+     "label": "(c) Marknaden, öppning",
+     "n": 2036,
+     "days": 194,
+     "logLoss": [
+      1.0159,
+      1.0067
+     ],
+     "brier": [
+      0.6081,
+      0.602
+     ],
+     "diff": 0.0092,
+     "ci": [
+      0.0028,
+      0.0154
+     ],
+     "brierDiff": 0.0061
+    },
+    {
+     "key": "cl",
+     "label": "Pinnacle, stängning",
+     "n": 2036,
+     "days": 194,
+     "logLoss": [
+      1.0159,
+      1.0015
+     ],
+     "brier": [
+      0.6081,
+      0.598
+     ],
+     "diff": 0.0144,
+     "ci": [
+      0.007,
+      0.0216
+     ],
+     "brierDiff": 0.0101
+    }
+   ]
+  },
+  {
+   "code": "2425",
+   "label": "2024/25",
+   "partial": false,
+   "through": "2025-05-25",
+   "n": 2036,
+   "known": 2036,
+   "vs": [
+    {
+     "key": "ss",
+     "label": "(b) Poisson på säsongens mål",
+     "n": 1801,
+     "days": 182,
+     "logLoss": [
+      1.0384,
+      1.0593
+     ],
+     "brier": [
+      0.6253,
+      0.6382
+     ],
+     "diff": -0.0209,
+     "ci": [
+      -0.0366,
+      -0.0061
+     ],
+     "brierDiff": -0.0129
+    },
+    {
+     "key": "nv",
+     "label": "(a) Naiv",
+     "n": 2036,
+     "days": 202,
+     "logLoss": [
+      1.0348,
+      1.0761
+     ],
+     "brier": [
+      0.6226,
+      0.6514
+     ],
+     "diff": -0.0414,
+     "ci": [
+      -0.0506,
+      -0.0325
+     ],
+     "brierDiff": -0.0287
+    },
+    {
+     "key": "mk",
+     "label": "(c) Marknaden, öppning",
+     "n": 2036,
+     "days": 202,
+     "logLoss": [
+      1.0348,
+      1.0212
+     ],
+     "brier": [
+      0.6226,
+      0.6135
+     ],
+     "diff": 0.0136,
+     "ci": [
+      0.0076,
+      0.02
+     ],
+     "brierDiff": 0.0091
+    },
+    {
+     "key": "cl",
+     "label": "Pinnacle, stängning",
+     "n": 2036,
+     "days": 202,
+     "logLoss": [
+      1.0348,
+      1.0187
+     ],
+     "brier": [
+      0.6226,
+      0.6113
+     ],
+     "diff": 0.0161,
+     "ci": [
+      0.0086,
+      0.0238
+     ],
+     "brierDiff": 0.0114
+    }
+   ]
+  },
+  {
+   "code": "2526",
+   "label": "2025/26",
+   "partial": false,
+   "through": "2026-05-24",
+   "n": 2036,
+   "known": 2036,
+   "vs": [
+    {
+     "key": "ss",
+     "label": "(b) Poisson på säsongens mål",
+     "n": 1804,
+     "days": 182,
+     "logLoss": [
+      1.0461,
+      1.08
+     ],
+     "brier": [
+      0.6298,
+      0.6472
+     ],
+     "diff": -0.034,
+     "ci": [
+      -0.0568,
+      -0.0147
+     ],
+     "brierDiff": -0.0175
+    },
+    {
+     "key": "nv",
+     "label": "(a) Naiv",
+     "n": 2036,
+     "days": 202,
+     "logLoss": [
+      1.0473,
+      1.0765
+     ],
+     "brier": [
+      0.6306,
+      0.6515
+     ],
+     "diff": -0.0292,
+     "ci": [
+      -0.0401,
+      -0.0178
+     ],
+     "brierDiff": -0.0209
+    },
+    {
+     "key": "mk",
+     "label": "(c) Marknaden, öppning",
+     "n": 2036,
+     "days": 202,
+     "logLoss": [
+      1.0473,
+      1.0256
+     ],
+     "brier": [
+      0.6306,
+      0.6163
+     ],
+     "diff": 0.0218,
+     "ci": [
+      0.0147,
+      0.0291
+     ],
+     "brierDiff": 0.0143
+    },
+    {
+     "key": "cl",
+     "label": "Pinnacle, stängning",
+     "n": 813,
+     "days": 97,
+     "logLoss": [
+      1.0481,
+      1.0315
+     ],
+     "brier": [
+      0.6314,
+      0.6206
+     ],
+     "diff": 0.0167,
+     "ci": [
+      0.0055,
+      0.0273
+     ],
+     "brierDiff": 0.0108
+    }
+   ]
+  },
+  {
+   "code": "2627",
+   "label": "2026/27",
+   "partial": true,
+   "through": "2026-10-17",
+   "n": 436,
+   "known": 436,
+   "vs": [
+    {
+     "key": "ss",
+     "label": "(b) Poisson på säsongens mål",
+     "n": 265,
+     "days": 28,
+     "logLoss": [
+      1.0589,
+      1.1655
+     ],
+     "brier": [
+      0.6395,
+      0.703
+     ],
+     "diff": -0.1066,
+     "ci": [
+      -0.19,
+      -0.0212
+     ],
+     "brierDiff": -0.0635
+    },
+    {
+     "key": "nv",
+     "label": "(a) Naiv",
+     "n": 436,
+     "days": 42,
+     "logLoss": [
+      1.0683,
+      1.0878
+     ],
+     "brier": [
+      0.6454,
+      0.6587
+     ],
+     "diff": -0.0195,
+     "ci": [
+      -0.044,
+      0.0021
+     ],
+     "brierDiff": -0.0133
+    },
+    {
+     "key": "mk",
+     "label": "(c) Marknaden, öppning",
+     "n": 436,
+     "days": 42,
+     "logLoss": [
+      1.0683,
+      1.0567
+     ],
+     "brier": [
+      0.6454,
+      0.6373
+     ],
+     "diff": 0.0116,
+     "ci": [
+      -0.0028,
+      0.0258
+     ],
+     "brierDiff": 0.0081
+    },
+    {
+     "key": "cl",
+     "label": "Pinnacle, stängning",
+     "n": 0
+    }
+   ]
+  }
+ ],
+ "cups": [
+  {
+   "comp": "fac",
+   "name": "FA Cup",
+   "n": 672,
+   "known": 659,
+   "seasons": [
+    "2021/22",
+    "2025/26"
+   ],
+   "vsNaive": {
+    "label": "(a) Naiv",
+    "n": 659,
+    "days": 147,
+    "logLoss": [
+     0.9924,
+     1.0714
+    ],
+    "brier": [
+     0.5801,
+     0.6486
+    ],
+    "diff": -0.079,
+    "ci": [
+     -0.1301,
+     -0.0311
+    ],
+    "brierDiff": -0.0685
+   },
+   "vsSeason": {
+    "label": "(b) Poisson på säsongens mål",
+    "n": 452,
+    "days": 133,
+    "logLoss": [
+     0.9787,
+     1.0603
+    ],
+    "brier": [
+     0.5775,
+     0.6161
+    ],
+    "diff": -0.0815,
+    "ci": [
+     -0.1468,
+     -0.0255
+    ],
+    "brierDiff": -0.0386
+   },
+   "advance": {
+    "n": 601,
+    "logLoss": 0.5966,
+    "coin": 0.6931
+   }
+  },
+  {
+   "comp": "lc",
+   "name": "EFL Cup",
+   "n": 76,
+   "known": 76,
+   "seasons": [
+    "2026/27",
+    "2026/27"
+   ],
+   "vsNaive": {
+    "label": "(a) Naiv",
+    "n": 76,
+    "days": 15,
+    "logLoss": [
+     0.8561,
+     1.072
+    ],
+    "brier": [
+     0.4953,
+     0.6511
+    ],
+    "diff": -0.2159,
+    "ci": [
+     -0.3173,
+     -0.1361
+    ],
+    "brierDiff": -0.1558
+   },
+   "vsSeason": {
+    "label": "(b) Poisson på säsongens mål",
+    "n": 6,
+    "days": 3,
+    "logLoss": [
+     1.0501,
+     0.9641
+    ],
+    "brier": [
+     0.6242,
+     0.5724
+    ],
+    "diff": 0.086,
+    "ci": [
+     -0.4859,
+     0.2444
+    ],
+    "brierDiff": 0.0518
+   },
+   "advance": {
+    "n": 76,
+    "logLoss": 0.5365,
+    "coin": 0.6931
+   }
+  }
+ ],
+ "sources": {
+  "fdcouk_hist_E0": "2026-10-17T17:04:41.210Z",
+  "fdcouk_hist_E1": "2026-10-17T17:04:41.241Z",
+  "fdcouk_hist_E2": "2026-10-17T17:04:41.301Z",
+  "fdcouk_hist_E3": "2026-10-17T17:04:41.278Z",
+  "fdcouk_hist_EC": "2026-10-17T17:04:41.138Z",
+  "espn_hist_fac": "2026-10-17T17:04:43.021Z",
+  "understat_hist_epl": "2026-10-17T17:52:22.973Z"
+ },
+ "notes": [
+  "Från 2004/05: ligorna finns från 2000/01 och modellen behöver 4 säsonger bakåt.",
+  "National League från 2005/06 – uppflyttade lag har kortare historik de första åren.",
+  "Cupmatcher bara från 2021/22 (FA-cupen, ESPN); EFL-cupens tidigare säsonger hämtas inte.",
+  "(c) är marknadssnittet vid öppning från 2005/06 (Betbrain t.o.m. 2018/19); Pinnacle vid stängning finns från 2012/13 och saknas 2026/27."
+ ]
+}

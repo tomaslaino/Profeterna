@@ -1,0 +1,1527 @@
+{
+ "criteria": {
+  "registered": "2026-10-17",
+  "alpha": 0.05,
+  "text": [
+   "Walk-forward: varje prognos skattas bara på matcher före matchdagen, och en faktors vikt bara på tidigare säsonger.",
+   "Log-poäng: kandidat − grundmodell under noll på samma matcher, med hela bootstrap-intervallet under noll (matchdagar dras om). Intervallet är 95 % justerat för antalet kandidater i körningen (Bonferroni).",
+   "Stabilt: lägre log-poäng i både första och andra halvan av säsongerna.",
+   "Brier-poängen får inte bli sämre."
+  ]
+ },
+ "runs": [
+  {
+   "ranAt": "2026-10-17T18:40:46.574Z",
+   "rulesVersion": "2026-10-17.1",
+   "data": "4b30ae9fc9c16a0e",
+   "through": "2026-10-17",
+   "candidates": 13,
+   "level": 0.99615,
+   "seasons": [
+    "2004/05",
+    "2026/27"
+   ]
+  }
+ ],
+ "entries": [
+  {
+   "id": "half_life_180",
+   "kind": "regel",
+   "label": "Halveringstid 180 dagar",
+   "motive": "Senare matcher väger tyngre – fångar form och förändrade trupper snabbare.",
+   "scope": null,
+   "testedAt": "2026-10-17",
+   "rulesVersion": "2026-10-17.1",
+   "through": "2026-10-17",
+   "fingerprint": "2026-10-17.1|4b30ae9fc9c16a0e|2026-10-17|d29d24d5c6|13",
+   "verdict": "underkänd",
+   "coverage": {
+    "lost": 0,
+    "gained": 0
+   },
+   "n": 45678,
+   "days": 4160,
+   "seasons": [
+    "2004/05",
+    "2026/27"
+   ],
+   "logLoss": [
+    1.0385,
+    1.039
+   ],
+   "brier": [
+    0.6244,
+    0.6248
+   ],
+   "diff": -0.0005,
+   "ci": [
+    -0.0016,
+    0.0007
+   ],
+   "level": 0.99615,
+   "brierDiff": -0.0004,
+   "halves": [
+    {
+     "seasons": [
+      "2004/05",
+      "2015/16"
+     ],
+     "n": 24411,
+     "diff": -0.0007
+    },
+    {
+     "seasons": [
+      "2016/17",
+      "2026/27"
+     ],
+     "n": 21267,
+     "diff": -0.0002
+    }
+   ],
+   "pass": false,
+   "why": "intervallet når upp till noll – förbättringen kan vara slump"
+  },
+  {
+   "id": "half_life_730",
+   "kind": "regel",
+   "label": "Halveringstid 730 dagar",
+   "motive": "Stabilare skattning med mer underlag per lag.",
+   "scope": null,
+   "testedAt": "2026-10-17",
+   "rulesVersion": "2026-10-17.1",
+   "through": "2026-10-17",
+   "fingerprint": "2026-10-17.1|4b30ae9fc9c16a0e|2026-10-17|eae33f9c5d|13",
+   "verdict": "underkänd",
+   "coverage": {
+    "lost": 0,
+    "gained": 0
+   },
+   "n": 45678,
+   "days": 4160,
+   "seasons": [
+    "2004/05",
+    "2026/27"
+   ],
+   "logLoss": [
+    1.0423,
+    1.039
+   ],
+   "brier": [
+    0.6271,
+    0.6248
+   ],
+   "diff": 0.0033,
+   "ci": [
+    0.0026,
+    0.0041
+   ],
+   "level": 0.99615,
+   "brierDiff": 0.0024,
+   "halves": [
+    {
+     "seasons": [
+      "2004/05",
+      "2015/16"
+     ],
+     "n": 24411,
+     "diff": 0.0034
+    },
+    {
+     "seasons": [
+      "2016/17",
+      "2026/27"
+     ],
+     "n": 21267,
+     "diff": 0.0032
+    }
+   ],
+   "pass": false,
+   "why": "högre log-poäng än grundmodellen"
+  },
+  {
+   "id": "window_2",
+   "kind": "regel",
+   "label": "Fönster två säsonger bakåt",
+   "motive": "Gamla säsonger kan beskriva lag som inte längre finns i samma form.",
+   "scope": null,
+   "testedAt": "2026-10-17",
+   "rulesVersion": "2026-10-17.1",
+   "through": "2026-10-17",
+   "fingerprint": "2026-10-17.1|4b30ae9fc9c16a0e|2026-10-17|0fc588ff04|13",
+   "verdict": "underkänd",
+   "coverage": {
+    "lost": 0,
+    "gained": 0
+   },
+   "n": 45678,
+   "days": 4160,
+   "seasons": [
+    "2004/05",
+    "2026/27"
+   ],
+   "logLoss": [
+    1.0393,
+    1.039
+   ],
+   "brier": [
+    0.625,
+    0.6248
+   ],
+   "diff": 0.0003,
+   "ci": [
+    -0.0002,
+    0.001
+   ],
+   "level": 0.99615,
+   "brierDiff": 0.0002,
+   "halves": [
+    {
+     "seasons": [
+      "2004/05",
+      "2015/16"
+     ],
+     "n": 24411,
+     "diff": 0.0003
+    },
+    {
+     "seasons": [
+      "2016/17",
+      "2026/27"
+     ],
+     "n": 21267,
+     "diff": 0.0004
+    }
+   ],
+   "pass": false,
+   "why": "högre log-poäng än grundmodellen"
+  },
+  {
+   "id": "window_6",
+   "kind": "regel",
+   "label": "Fönster sex säsonger bakåt",
+   "motive": "Mer underlag för lag som flyttats mellan divisionerna.",
+   "scope": null,
+   "testedAt": "2026-10-17",
+   "rulesVersion": "2026-10-17.1",
+   "through": "2026-10-17",
+   "fingerprint": "2026-10-17.1|4b30ae9fc9c16a0e|2026-10-17|e7a8fcf4d0|13",
+   "verdict": "underkänd",
+   "coverage": {
+    "lost": 0,
+    "gained": 0
+   },
+   "n": 41627,
+   "days": 3779,
+   "seasons": [
+    "2006/07",
+    "2026/27"
+   ],
+   "logLoss": [
+    1.0375,
+    1.0375
+   ],
+   "brier": [
+    0.6236,
+    0.6237
+   ],
+   "diff": 0,
+   "ci": [
+    -0.0002,
+    0.0001
+   ],
+   "level": 0.99615,
+   "brierDiff": 0,
+   "halves": [
+    {
+     "seasons": [
+      "2006/07",
+      "2016/17"
+     ],
+     "n": 22396,
+     "diff": -0.0001
+    },
+    {
+     "seasons": [
+      "2017/18",
+      "2026/27"
+     ],
+     "n": 19231,
+     "diff": 0
+    }
+   ],
+   "pass": false,
+   "why": "ingen skillnad mot grundmodellen"
+  },
+  {
+   "id": "home_per_division",
+   "kind": "regel",
+   "label": "Hemmafördel per division",
+   "motive": "Hemmafördelen kan skilja mellan nivåerna (resor, publik, planer).",
+   "scope": null,
+   "testedAt": "2026-10-17",
+   "rulesVersion": "2026-10-17.1",
+   "through": "2026-10-17",
+   "fingerprint": "2026-10-17.1|4b30ae9fc9c16a0e|2026-10-17|89c0363ed1|13",
+   "verdict": "underkänd",
+   "coverage": {
+    "lost": 0,
+    "gained": 0
+   },
+   "n": 45678,
+   "days": 4160,
+   "seasons": [
+    "2004/05",
+    "2026/27"
+   ],
+   "logLoss": [
+    1.0389,
+    1.039
+   ],
+   "brier": [
+    0.6247,
+    0.6248
+   ],
+   "diff": -0.0001,
+   "ci": [
+    -0.0004,
+    0.0003
+   ],
+   "level": 0.99615,
+   "brierDiff": 0,
+   "halves": [
+    {
+     "seasons": [
+      "2004/05",
+      "2015/16"
+     ],
+     "n": 24411,
+     "diff": -0.0003
+    },
+    {
+     "seasons": [
+      "2016/17",
+      "2026/27"
+     ],
+     "n": 21267,
+     "diff": 0.0002
+    }
+   ],
+   "pass": false,
+   "why": "intervallet når upp till noll – förbättringen kan vara slump"
+  },
+  {
+   "id": "cups_excluded",
+   "kind": "regel",
+   "label": "Cupmatcher utanför skattningen",
+   "motive": "Rotation i cuperna kan ge en missvisande bild av lagens styrka.",
+   "scope": "FA-cupen finns i historiken från 2021/22",
+   "testedAt": "2026-10-17",
+   "rulesVersion": "2026-10-17.1",
+   "through": "2026-10-17",
+   "fingerprint": "2026-10-17.1|4b30ae9fc9c16a0e|2026-10-17|7b33a19bc2|13",
+   "verdict": "underkänd",
+   "coverage": {
+    "lost": 104,
+    "gained": 0
+   },
+   "n": 11247,
+   "days": 1107,
+   "seasons": [
+    "2021/22",
+    "2026/27"
+   ],
+   "logLoss": [
+    1.0308,
+    1.0298
+   ],
+   "brier": [
+    0.6187,
+    0.6182
+   ],
+   "diff": 0.001,
+   "ci": [
+    -0.0003,
+    0.0022
+   ],
+   "level": 0.99615,
+   "brierDiff": 0.0005,
+   "halves": [
+    {
+     "seasons": [
+      "2021/22",
+      "2023/24"
+     ],
+     "n": 6456,
+     "diff": 0.0012
+    },
+    {
+     "seasons": [
+      "2024/25",
+      "2026/27"
+     ],
+     "n": 4791,
+     "diff": 0.0007
+    }
+   ],
+   "pass": false,
+   "why": "högre log-poäng än grundmodellen"
+  },
+  {
+   "id": "cups_half_weight",
+   "kind": "regel",
+   "label": "Cupmatcher med halv vikt (rotation)",
+   "motive": "Kompromiss: cupmötena kopplar ihop nivåerna, men storlagen roterar.",
+   "scope": "FA-cupen finns i historiken från 2021/22",
+   "testedAt": "2026-10-17",
+   "rulesVersion": "2026-10-17.1",
+   "through": "2026-10-17",
+   "fingerprint": "2026-10-17.1|4b30ae9fc9c16a0e|2026-10-17|96ceb661cc|13",
+   "verdict": "underkänd",
+   "coverage": {
+    "lost": 0,
+    "gained": 0
+   },
+   "n": 11351,
+   "days": 1111,
+   "seasons": [
+    "2021/22",
+    "2026/27"
+   ],
+   "logLoss": [
+    1.0303,
+    1.0301
+   ],
+   "brier": [
+    0.6179,
+    0.6178
+   ],
+   "diff": 0.0002,
+   "ci": [
+    -0.0003,
+    0.0008
+   ],
+   "level": 0.99615,
+   "brierDiff": 0.0001,
+   "halves": [
+    {
+     "seasons": [
+      "2021/22",
+      "2023/24"
+     ],
+     "n": 6522,
+     "diff": 0.0003
+    },
+    {
+     "seasons": [
+      "2024/25",
+      "2026/27"
+     ],
+     "n": 4829,
+     "diff": 0.0001
+    }
+   ],
+   "pass": false,
+   "why": "högre log-poäng än grundmodellen"
+  },
+  {
+   "id": "shots_on_target",
+   "kind": "regel",
+   "label": "Skott på mål i skattningen (hälften)",
+   "motive": "Skott på mål är mindre slumpmässiga än mål och borde mäta styrka bättre.",
+   "scope": "football-data.co.uk, ligorna; National League saknar skott från 2016/17",
+   "testedAt": "2026-10-17",
+   "rulesVersion": "2026-10-17.1",
+   "through": "2026-10-17",
+   "fingerprint": "2026-10-17.1|4b30ae9fc9c16a0e|2026-10-17|0e0aefeef8|13",
+   "verdict": "underkänd",
+   "coverage": {
+    "lost": 0,
+    "gained": 0
+   },
+   "n": 45678,
+   "days": 4160,
+   "seasons": [
+    "2004/05",
+    "2026/27"
+   ],
+   "logLoss": [
+    1.0385,
+    1.039
+   ],
+   "brier": [
+    0.6243,
+    0.6248
+   ],
+   "diff": -0.0005,
+   "ci": [
+    -0.0015,
+    0.0005
+   ],
+   "level": 0.99615,
+   "brierDiff": -0.0005,
+   "halves": [
+    {
+     "seasons": [
+      "2004/05",
+      "2015/16"
+     ],
+     "n": 24411,
+     "diff": -0.0009
+    },
+    {
+     "seasons": [
+      "2016/17",
+      "2026/27"
+     ],
+     "n": 21267,
+     "diff": -0.0002
+    }
+   ],
+   "pass": false,
+   "why": "intervallet når upp till noll – förbättringen kan vara slump"
+  },
+  {
+   "id": "xg_understat",
+   "kind": "regel",
+   "label": "xG i skattningen (hälften), Premier League",
+   "motive": "xG är det vanligaste måttet på chanskvalitet; finns fritt för Premier League.",
+   "scope": "Understat, Premier League från 2014/15",
+   "testedAt": "2026-10-17",
+   "rulesVersion": "2026-10-17.1",
+   "through": "2026-10-17",
+   "fingerprint": "2026-10-17.1|4b30ae9fc9c16a0e|2026-10-17|2ad8a5e022|13",
+   "verdict": "underkänd",
+   "coverage": {
+    "lost": 0,
+    "gained": 0
+   },
+   "n": 4625,
+   "days": 1369,
+   "seasons": [
+    "2014/15",
+    "2026/27"
+   ],
+   "logLoss": [
+    0.9747,
+    0.9757
+   ],
+   "brier": [
+    0.579,
+    0.5797
+   ],
+   "diff": -0.0011,
+   "ci": [
+    -0.0039,
+    0.0013
+   ],
+   "level": 0.99615,
+   "brierDiff": -0.0007,
+   "halves": [
+    {
+     "seasons": [
+      "2014/15",
+      "2020/21"
+     ],
+     "n": 2660,
+     "diff": -0.0013
+    },
+    {
+     "seasons": [
+      "2021/22",
+      "2026/27"
+     ],
+     "n": 1965,
+     "diff": -0.0008
+    }
+   ],
+   "pass": false,
+   "why": "intervallet når upp till noll – förbättringen kan vara slump"
+  },
+  {
+   "id": "form_last5",
+   "kind": "faktor",
+   "label": "Form: poäng per match, senaste fem",
+   "motive": "Lag i form kan vara bättre än deras tidsviktade styrka säger.",
+   "scope": null,
+   "testedAt": "2026-10-17",
+   "rulesVersion": "2026-10-17.1",
+   "through": "2026-10-17",
+   "fingerprint": "2026-10-17.1|4b30ae9fc9c16a0e|2026-10-17|3403924335|13",
+   "verdict": "godkänd",
+   "signalKnown": 41548,
+   "of": 45678,
+   "param": {
+    "beta": [
+     0.0188
+    ]
+   },
+   "paramText": "+1,9 % mål per poäng/match bättre form än motståndaren",
+   "params": [
+    {
+     "season": "2005/06",
+     "beta": [
+      -0.009
+     ]
+    },
+    {
+     "season": "2006/07",
+     "beta": [
+      0.0075
+     ]
+    },
+    {
+     "season": "2007/08",
+     "beta": [
+      0.0098
+     ]
+    },
+    {
+     "season": "2008/09",
+     "beta": [
+      0.0129
+     ]
+    },
+    {
+     "season": "2009/10",
+     "beta": [
+      0.0095
+     ]
+    },
+    {
+     "season": "2010/11",
+     "beta": [
+      0.0098
+     ]
+    },
+    {
+     "season": "2011/12",
+     "beta": [
+      0.0088
+     ]
+    },
+    {
+     "season": "2012/13",
+     "beta": [
+      0.0103
+     ]
+    },
+    {
+     "season": "2013/14",
+     "beta": [
+      0.0092
+     ]
+    },
+    {
+     "season": "2014/15",
+     "beta": [
+      0.0107
+     ]
+    },
+    {
+     "season": "2015/16",
+     "beta": [
+      0.0122
+     ]
+    },
+    {
+     "season": "2016/17",
+     "beta": [
+      0.0133
+     ]
+    },
+    {
+     "season": "2017/18",
+     "beta": [
+      0.0159
+     ]
+    },
+    {
+     "season": "2018/19",
+     "beta": [
+      0.0159
+     ]
+    },
+    {
+     "season": "2019/20",
+     "beta": [
+      0.0163
+     ]
+    },
+    {
+     "season": "2020/21",
+     "beta": [
+      0.017
+     ]
+    },
+    {
+     "season": "2021/22",
+     "beta": [
+      0.0168
+     ]
+    },
+    {
+     "season": "2022/23",
+     "beta": [
+      0.0179
+     ]
+    },
+    {
+     "season": "2023/24",
+     "beta": [
+      0.0186
+     ]
+    },
+    {
+     "season": "2024/25",
+     "beta": [
+      0.0191
+     ]
+    },
+    {
+     "season": "2025/26",
+     "beta": [
+      0.0186
+     ]
+    },
+    {
+     "season": "2026/27",
+     "beta": [
+      0.0194
+     ]
+    }
+   ],
+   "n": 43656,
+   "days": 3970,
+   "seasons": [
+    "2005/06",
+    "2026/27"
+   ],
+   "logLoss": [
+    1.038,
+    1.0384
+   ],
+   "brier": [
+    0.6241,
+    0.6243
+   ],
+   "diff": -0.0004,
+   "ci": [
+    -0.0006,
+    -0.0002
+   ],
+   "level": 0.99615,
+   "brierDiff": -0.0003,
+   "halves": [
+    {
+     "seasons": [
+      "2005/06",
+      "2015/16"
+     ],
+     "n": 22389,
+     "diff": -0.0001
+    },
+    {
+     "seasons": [
+      "2016/17",
+      "2026/27"
+     ],
+     "n": 21267,
+     "diff": -0.0006
+    }
+   ],
+   "pass": true,
+   "why": "klarade kravet"
+  },
+  {
+   "id": "table_ppg",
+   "kind": "faktor",
+   "label": "Tabelläge: poäng per match i år",
+   "motive": "Tabellen sammanfattar säsongen och kan bära information utöver målen.",
+   "scope": "ligamatcher; tabellen räknas ur resultaten (utan poängavdrag)",
+   "testedAt": "2026-10-17",
+   "rulesVersion": "2026-10-17.1",
+   "through": "2026-10-17",
+   "fingerprint": "2026-10-17.1|4b30ae9fc9c16a0e|2026-10-17|7b0c959184|13",
+   "verdict": "godkänd",
+   "signalKnown": 38509,
+   "of": 44943,
+   "param": {
+    "beta": [
+     0.0373
+    ]
+   },
+   "paramText": "+3,8 % mål per poäng/match högre i tabellen än motståndaren",
+   "params": [
+    {
+     "season": "2005/06",
+     "beta": [
+      0.0313
+     ]
+    },
+    {
+     "season": "2006/07",
+     "beta": [
+      0.0546
+     ]
+    },
+    {
+     "season": "2007/08",
+     "beta": [
+      0.0354
+     ]
+    },
+    {
+     "season": "2008/09",
+     "beta": [
+      0.0377
+     ]
+    },
+    {
+     "season": "2009/10",
+     "beta": [
+      0.028
+     ]
+    },
+    {
+     "season": "2010/11",
+     "beta": [
+      0.0299
+     ]
+    },
+    {
+     "season": "2011/12",
+     "beta": [
+      0.0252
+     ]
+    },
+    {
+     "season": "2012/13",
+     "beta": [
+      0.0279
+     ]
+    },
+    {
+     "season": "2013/14",
+     "beta": [
+      0.0221
+     ]
+    },
+    {
+     "season": "2014/15",
+     "beta": [
+      0.0259
+     ]
+    },
+    {
+     "season": "2015/16",
+     "beta": [
+      0.0299
+     ]
+    },
+    {
+     "season": "2016/17",
+     "beta": [
+      0.0326
+     ]
+    },
+    {
+     "season": "2017/18",
+     "beta": [
+      0.036
+     ]
+    },
+    {
+     "season": "2018/19",
+     "beta": [
+      0.0377
+     ]
+    },
+    {
+     "season": "2019/20",
+     "beta": [
+      0.0372
+     ]
+    },
+    {
+     "season": "2020/21",
+     "beta": [
+      0.0367
+     ]
+    },
+    {
+     "season": "2021/22",
+     "beta": [
+      0.0345
+     ]
+    },
+    {
+     "season": "2022/23",
+     "beta": [
+      0.0387
+     ]
+    },
+    {
+     "season": "2023/24",
+     "beta": [
+      0.0396
+     ]
+    },
+    {
+     "season": "2024/25",
+     "beta": [
+      0.0387
+     ]
+    },
+    {
+     "season": "2025/26",
+     "beta": [
+      0.0374
+     ]
+    },
+    {
+     "season": "2026/27",
+     "beta": [
+      0.0375
+     ]
+    }
+   ],
+   "n": 42921,
+   "days": 3901,
+   "seasons": [
+    "2005/06",
+    "2026/27"
+   ],
+   "logLoss": [
+    1.0389,
+    1.0394
+   ],
+   "brier": [
+    0.6249,
+    0.6252
+   ],
+   "diff": -0.0006,
+   "ci": [
+    -0.0009,
+    -0.0002
+   ],
+   "level": 0.99615,
+   "brierDiff": -0.0004,
+   "halves": [
+    {
+     "seasons": [
+      "2005/06",
+      "2015/16"
+     ],
+     "n": 22389,
+     "diff": -0.0004
+    },
+    {
+     "seasons": [
+      "2016/17",
+      "2026/27"
+     ],
+     "n": 20532,
+     "diff": -0.0008
+    }
+   ],
+   "pass": true,
+   "why": "klarade kravet"
+  },
+  {
+   "id": "head_to_head",
+   "kind": "faktor",
+   "label": "Inbördes möten: målskillnad, senaste sex",
+   "motive": "Vissa lag kan passa eller inte passa varandra.",
+   "scope": null,
+   "testedAt": "2026-10-17",
+   "rulesVersion": "2026-10-17.1",
+   "through": "2026-10-17",
+   "fingerprint": "2026-10-17.1|4b30ae9fc9c16a0e|2026-10-17|3014b3e84a|13",
+   "verdict": "underkänd",
+   "signalKnown": 38446,
+   "of": 45678,
+   "param": {
+    "beta": [
+     -0.007
+    ]
+   },
+   "paramText": "−0,7 % mål per mål i målskillnad (snitt av de sex senaste mötena)",
+   "params": [
+    {
+     "season": "2005/06",
+     "beta": [
+      -0.0139
+     ]
+    },
+    {
+     "season": "2006/07",
+     "beta": [
+      0.0015
+     ]
+    },
+    {
+     "season": "2007/08",
+     "beta": [
+      -0.0059
+     ]
+    },
+    {
+     "season": "2008/09",
+     "beta": [
+      -0.0038
+     ]
+    },
+    {
+     "season": "2009/10",
+     "beta": [
+      -0.0086
+     ]
+    },
+    {
+     "season": "2010/11",
+     "beta": [
+      -0.0116
+     ]
+    },
+    {
+     "season": "2011/12",
+     "beta": [
+      -0.0168
+     ]
+    },
+    {
+     "season": "2012/13",
+     "beta": [
+      -0.0116
+     ]
+    },
+    {
+     "season": "2013/14",
+     "beta": [
+      -0.016
+     ]
+    },
+    {
+     "season": "2014/15",
+     "beta": [
+      -0.0101
+     ]
+    },
+    {
+     "season": "2015/16",
+     "beta": [
+      -0.0071
+     ]
+    },
+    {
+     "season": "2016/17",
+     "beta": [
+      -0.01
+     ]
+    },
+    {
+     "season": "2017/18",
+     "beta": [
+      -0.0068
+     ]
+    },
+    {
+     "season": "2018/19",
+     "beta": [
+      -0.0084
+     ]
+    },
+    {
+     "season": "2019/20",
+     "beta": [
+      -0.0084
+     ]
+    },
+    {
+     "season": "2020/21",
+     "beta": [
+      -0.0094
+     ]
+    },
+    {
+     "season": "2021/22",
+     "beta": [
+      -0.0115
+     ]
+    },
+    {
+     "season": "2022/23",
+     "beta": [
+      -0.0078
+     ]
+    },
+    {
+     "season": "2023/24",
+     "beta": [
+      -0.0082
+     ]
+    },
+    {
+     "season": "2024/25",
+     "beta": [
+      -0.0077
+     ]
+    },
+    {
+     "season": "2025/26",
+     "beta": [
+      -0.0075
+     ]
+    },
+    {
+     "season": "2026/27",
+     "beta": [
+      -0.0067
+     ]
+    }
+   ],
+   "n": 43656,
+   "days": 3970,
+   "seasons": [
+    "2005/06",
+    "2026/27"
+   ],
+   "logLoss": [
+    1.0385,
+    1.0384
+   ],
+   "brier": [
+    0.6243,
+    0.6243
+   ],
+   "diff": 0,
+   "ci": [
+    -0.0001,
+    0.0002
+   ],
+   "level": 0.99615,
+   "brierDiff": 0,
+   "halves": [
+    {
+     "seasons": [
+      "2005/06",
+      "2015/16"
+     ],
+     "n": 22389,
+     "diff": 0
+    },
+    {
+     "seasons": [
+      "2016/17",
+      "2026/27"
+     ],
+     "n": 21267,
+     "diff": 0
+    }
+   ],
+   "pass": false,
+   "why": "ingen skillnad mot grundmodellen"
+  },
+  {
+   "id": "market_blend",
+   "kind": "faktor",
+   "label": "Marknadens odds som faktor",
+   "motive": "Marknaden har information modellen saknar (skador, startelvor, motivation).",
+   "scope": "ligamatcher med marknadssnitt (öppning) från 2005/06; vikten skattas på tidigare säsonger",
+   "testedAt": "2026-10-17",
+   "rulesVersion": "2026-10-17.1",
+   "through": "2026-10-17",
+   "fingerprint": "2026-10-17.1|4b30ae9fc9c16a0e|2026-10-17|5b3f9d58d9|13",
+   "verdict": "godkänd",
+   "signalKnown": 42913,
+   "of": 42913,
+   "param": {
+    "w": 1
+   },
+   "paramText": "marknadens vikt 100 % – modellen tillför inget utöver oddsen",
+   "params": [
+    {
+     "season": "2006/07",
+     "w": 1
+    },
+    {
+     "season": "2007/08",
+     "w": 0.8974
+    },
+    {
+     "season": "2008/09",
+     "w": 0.8551
+    },
+    {
+     "season": "2009/10",
+     "w": 0.8314
+    },
+    {
+     "season": "2010/11",
+     "w": 0.8806
+    },
+    {
+     "season": "2011/12",
+     "w": 0.9336
+    },
+    {
+     "season": "2012/13",
+     "w": 0.9239
+    },
+    {
+     "season": "2013/14",
+     "w": 0.9343
+    },
+    {
+     "season": "2014/15",
+     "w": 0.9982
+    },
+    {
+     "season": "2015/16",
+     "w": 1
+    },
+    {
+     "season": "2016/17",
+     "w": 1
+    },
+    {
+     "season": "2017/18",
+     "w": 1
+    },
+    {
+     "season": "2018/19",
+     "w": 1
+    },
+    {
+     "season": "2019/20",
+     "w": 1
+    },
+    {
+     "season": "2020/21",
+     "w": 1
+    },
+    {
+     "season": "2021/22",
+     "w": 1
+    },
+    {
+     "season": "2022/23",
+     "w": 1
+    },
+    {
+     "season": "2023/24",
+     "w": 1
+    },
+    {
+     "season": "2024/25",
+     "w": 1
+    },
+    {
+     "season": "2025/26",
+     "w": 1
+    },
+    {
+     "season": "2026/27",
+     "w": 1
+    }
+   ],
+   "n": 40884,
+   "days": 3709,
+   "seasons": [
+    "2006/07",
+    "2026/27"
+   ],
+   "logLoss": [
+    1.0268,
+    1.0386
+   ],
+   "brier": [
+    0.6165,
+    0.6246
+   ],
+   "diff": -0.0117,
+   "ci": [
+    -0.0139,
+    -0.0098
+   ],
+   "level": 0.99615,
+   "brierDiff": -0.0081,
+   "halves": [
+    {
+     "seasons": [
+      "2006/07",
+      "2016/17"
+     ],
+     "n": 22394,
+     "diff": -0.01
+    },
+    {
+     "seasons": [
+      "2017/18",
+      "2026/27"
+     ],
+     "n": 18490,
+     "diff": -0.0139
+    }
+   ],
+   "pass": true,
+   "why": "klarade kravet"
+  },
+  {
+   "id": "combo_form_last5+table_ppg",
+   "kind": "kombination",
+   "label": "Kombination: form + tabelläge",
+   "motive": "De godkända faktorerna tillsammans, med vikterna skattade gemensamt – så som de skulle bli en regelversion.",
+   "scope": null,
+   "testedAt": "2026-10-17",
+   "rulesVersion": "2026-10-17.1",
+   "through": "2026-10-17",
+   "fingerprint": "2026-10-17.1|4b30ae9fc9c16a0e|2026-10-17|3d1593dc33|13",
+   "verdict": "underkänd",
+   "signalKnown": 44836,
+   "of": 45678,
+   "param": {
+    "beta": [
+     0.0076,
+     0.0297
+    ]
+   },
+   "paramText": "+0,8 % mål per poäng/match bättre form än motståndaren; +3,0 % mål per poäng/match högre i tabellen än motståndaren",
+   "params": [
+    {
+     "season": "2005/06",
+     "beta": [
+      -0.0356,
+      0.0672
+     ]
+    },
+    {
+     "season": "2006/07",
+     "beta": [
+      -0.0222,
+      0.0766
+     ]
+    },
+    {
+     "season": "2007/08",
+     "beta": [
+      -0.0051,
+      0.0404
+     ]
+    },
+    {
+     "season": "2008/09",
+     "beta": [
+      -0.0019,
+      0.0396
+     ]
+    },
+    {
+     "season": "2009/10",
+     "beta": [
+      -0.0015,
+      0.0295
+     ]
+    },
+    {
+     "season": "2010/11",
+     "beta": [
+      -0.0025,
+      0.0323
+     ]
+    },
+    {
+     "season": "2011/12",
+     "beta": [
+      -0.0008,
+      0.026
+     ]
+    },
+    {
+     "season": "2012/13",
+     "beta": [
+      -0.0001,
+      0.0279
+     ]
+    },
+    {
+     "season": "2013/14",
+     "beta": [
+      0.0016,
+      0.0205
+     ]
+    },
+    {
+     "season": "2014/15",
+     "beta": [
+      0.0016,
+      0.0243
+     ]
+    },
+    {
+     "season": "2015/16",
+     "beta": [
+      0.0015,
+      0.0283
+     ]
+    },
+    {
+     "season": "2016/17",
+     "beta": [
+      0.0017,
+      0.031
+     ]
+    },
+    {
+     "season": "2017/18",
+     "beta": [
+      0.0037,
+      0.0323
+     ]
+    },
+    {
+     "season": "2018/19",
+     "beta": [
+      0.0025,
+      0.0352
+     ]
+    },
+    {
+     "season": "2019/20",
+     "beta": [
+      0.0032,
+      0.034
+     ]
+    },
+    {
+     "season": "2020/21",
+     "beta": [
+      0.0045,
+      0.0322
+     ]
+    },
+    {
+     "season": "2021/22",
+     "beta": [
+      0.0058,
+      0.0287
+     ]
+    },
+    {
+     "season": "2022/23",
+     "beta": [
+      0.0049,
+      0.0338
+     ]
+    },
+    {
+     "season": "2023/24",
+     "beta": [
+      0.0056,
+      0.0339
+     ]
+    },
+    {
+     "season": "2024/25",
+     "beta": [
+      0.007,
+      0.0317
+     ]
+    },
+    {
+     "season": "2025/26",
+     "beta": [
+      0.0069,
+      0.0306
+     ]
+    },
+    {
+     "season": "2026/27",
+     "beta": [
+      0.0083,
+      0.0293
+     ]
+    }
+   ],
+   "n": 43656,
+   "days": 3970,
+   "seasons": [
+    "2005/06",
+    "2026/27"
+   ],
+   "logLoss": [
+    1.0379,
+    1.0384
+   ],
+   "brier": [
+    0.624,
+    0.6243
+   ],
+   "diff": -0.0005,
+   "ci": [
+    -0.0009,
+    -0.0002
+   ],
+   "level": 0.99615,
+   "brierDiff": -0.0003,
+   "halves": [
+    {
+     "seasons": [
+      "2005/06",
+      "2015/16"
+     ],
+     "n": 22389,
+     "diff": -0.0002
+    },
+    {
+     "seasons": [
+      "2016/17",
+      "2026/27"
+     ],
+     "n": 21267,
+     "diff": -0.0008
+    }
+   ],
+   "pass": false,
+   "why": "inte bättre än tabelläge ensam"
+  }
+ ],
+ "untestable": [
+  {
+   "id": "xg_fdcouk",
+   "label": "xG från football-data.co.uk",
+   "reason": "Finns bara från 2026/27 (inga tidigare säsonger att pröva på), och leverantören är odokumenterad. Prövas när säsongen gett tillräckligt med matcher.",
+   "assessedAt": "2026-10-17"
+  },
+  {
+   "id": "injuries",
+   "label": "Skador och avstängningar (FPL)",
+   "reason": "FPL ger bara dagens läge – ingen historik att pröva walk-forward på. Bara Premier League.",
+   "assessedAt": "2026-10-17"
+  },
+  {
+   "id": "lineups",
+   "label": "Startelvor",
+   "reason": "Ingen fri källa med historik; publiceras först strax före avspark.",
+   "assessedAt": "2026-10-17"
+  },
+  {
+   "id": "table_deductions",
+   "label": "Tabelläge med poängavdrag (ESPN)",
+   "reason": "ESPN:s tabell är en ögonblicksbild utan historik. Prövas i stället som tabell räknad ur resultaten.",
+   "assessedAt": "2026-10-17"
+  },
+  {
+   "id": "rotation_lc",
+   "label": "Rotation i EFL-cupen",
+   "reason": "EFL-cupens tidigare säsonger hämtas inte – rotationen prövas på FA-cupen 2021/22–.",
+   "assessedAt": "2026-10-17"
+  },
+  {
+   "id": "market_cups",
+   "label": "Marknadens odds i cuperna",
+   "reason": "Fri cupoddshistorik saknas (DraftKings via ESPN är luckig); kan bara utvärderas framåt i journalen.",
+   "assessedAt": "2026-10-17"
+  }
+ ]
+}

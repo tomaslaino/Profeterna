@@ -265,7 +265,7 @@ function renderDetail(d) {
   html += '<div class="grid2">' + squadCard(d) + unknownCard(d) + '</div>';
   html += '<p class="legend">Prognosen bygger bara på mål efter 90 minuter. Spannet under varje sannolikhet visar osäkerheten i lagens styrka ' +
     '(omskattning med slumpvikter). "Drar mot" visar hur många procentenheter varje steg lägger på ett lags segerchans. ' +
-    'Underlaget styr inte prognosen förrän det klarat testet i fas 4. <a href="#modell">Om modellen och baslinjerna</a></p>';
+    'Underlaget styr inte prognosen förrän det klarat kandidatjakten. <a href="#modell">Om modellen, backtestet och kandidaterna</a></p>';
   return html;
 }
 
@@ -501,7 +501,16 @@ function formCard(d) {
     html += '<h4 style="margin-top:0.9rem">Möten i år</h4><ul class="plain">' +
       d.meetings.map((x) => `<li>${dateOnly(x.kickoff)} · ${esc(x.compShort)} · ${esc(x.home)} ${x.score.home}–${x.score.away} ${esc(x.away)}</li>`).join('') + '</ul>';
   }
-  html += '<p class="src-line">ESPN, alla tävlingar. Avgjort på 90 minuter – straffavgjorda cupmatcher räknas som oavgjorda.</p></div>';
+  html += '<p class="src-line">ESPN, alla tävlingar. Avgjort på 90 minuter – straffavgjorda cupmatcher räknas som oavgjorda.</p>';
+  const pm = d.pastMeetings;
+  if (pm) {
+    html += `<h4 style="margin-top:0.9rem">Tidigare säsonger <span class="hint">senaste ${pm.list.length || ''}</span></h4>` +
+      (pm.list.length
+        ? '<ul class="plain">' + pm.list.map((x) => `<li>${esc(x.season)} · ${esc(x.compShort)} · ${esc(x.home)} ${x.score.home}–${x.score.away} ${esc(x.away)}</li>`).join('') + '</ul>'
+        : `<p class="muted" style="margin:0">Inga möten i ligorna sedan ${esc(pm.first)} eller i FA-cupen sedan 2021/22.</p>`) +
+      `<p class="src-line">${esc(pm.source.provider)}, hämtat ${when(pm.source.fetchedAt)}. Mål efter 90 minuter.</p>`;
+  }
+  html += '</div>';
   return html;
 }
 
@@ -823,11 +832,21 @@ function topline(d) {
 async function loadModel() {
   const el = $('#model');
   try {
-    el.innerHTML = renderModel(await getJSON('data/model.json'));
+    const d = await getJSON('data/model.json');
+    el.innerHTML = renderModel(d);
+    state.backtest = d.backtest && d.backtest.current;
+    drawSeasonChart();
   } catch (err) {
     el.innerHTML = `<p class="empty">Kunde inte läsa modellen: ${esc(err.message)}</p>`;
   }
 }
+
+// Diagrammet ritas i containerns bredd (text i px, inte skalad med viewBox).
+let chartTimer = null;
+window.addEventListener('resize', () => {
+  clearTimeout(chartTimer);
+  chartTimer = setTimeout(drawSeasonChart, 150);
+});
 
 function renderModel(d) {
   const x = d.model;
@@ -861,29 +880,145 @@ function renderModel(d) {
     '<dt>(c) Marknaden</dt><dd>Odds utan marginal med Shins metod. Ligorna: marknadssnittet hos football-data.co.uk vid prognostillfället (öppningsodds, insamlade fre/tis); för spelade matcher också Betfair Exchange vid stängning som tuffaste referens. Cuperna: DraftKings via ESPN.</dd>' +
     '</dl><p class="src-line">Modellen är värd något bara om den slår (b). Frågan över tid är om den någonsin slår (c).</p></div>';
 
-  const c = d.check;
-  if (c) {
-    const f = (v) => dec(v, 3);
-    html += `<h3>Kontroll mot ${esc(c.season)}</h3><p class="legend">Varje match ${esc(c.season)} fick en prognos skattad bara på matcherna före matchdagen, med samma kod och regler. ` +
-      'Log-poäng: lägre är bättre. Skillnad = modell − baslinje med 95 % bootstrap-intervall; negativ = modellen bättre. ' +
-      'Ingen riktig utvärdering – reglerna valdes med vetskap om säsongen. Walk-forward över många säsonger kommer i fas 4.</p>' +
-      '<div class="table-wrap"><table><thead><tr><th>Ligorna, mot</th><th class="num">Matcher</th><th class="num">Modell</th><th class="num">Baslinje</th><th class="num">Skillnad</th><th class="num">Brier</th></tr></thead><tbody>' +
-      c.leagues.filter((r) => r.n).map((r) => `<tr><td>${esc(r.label)}</td><td class="num">${r.n}</td><td class="num">${f(r.logLoss[0])}</td><td class="num">${f(r.logLoss[1])}</td>` +
-        `<td class="num"><strong>${r.diff > 0 ? '+' : ''}${f(r.diff)}</strong><span class="sub">${f(r.ci[0])} till ${f(r.ci[1])}</span></td>` +
-        `<td class="num">${f(r.brier[0])} / ${f(r.brier[1])}</td></tr>`).join('') + '</tbody></table></div>';
-    const fa = c.faCup;
-    if (fa && fa.vsNaive.n) {
-      html += `<p class="legend">FA-cupen ${esc(c.season)} (${fa.vsNaive.n} matcher, ESPN): modellen ${f(fa.vsNaive.logLoss[0])} mot naiv ${f(fa.vsNaive.logLoss[1])}.` +
-        (fa.advance ? ` Att gå vidare: log-poäng ${f(fa.advance.logLoss)} (slantsingling ${f(Math.log(2))}).` : '') +
-        ` EFL-cupens tidigare säsonger hämtas inte. Körd ${when(c.ranAt)}, regelversion ${esc(c.rulesVersion)}.</p>`;
-    }
-  }
+  html += backtestSection(d.backtest, d.rulesVersion);
+  html += candidatesSection(d.backtest && d.backtest.candidates);
+  return html;
+}
 
-  html += '<h3>Styr inte prognosen</h3><div class="card"><p style="margin:0 0 0.5rem">Visas som underlag i matchvyn och prövas som kandidater walk-forward i fas 4:</p>' +
-    '<ul class="bullets"><li>xG – football-data.co.uk (leverantören odokumenterad, bara 2026/27) och Understat (Premier League)</li>' +
-    '<li>Skott och skott på mål</li><li>Form, tabelläge och inbördes möten</li><li>Skador och avstängningar (FPL, bara Premier League)</li>' +
-    '<li>Marknadens odds som faktor (nu bara jämförelse)</li><li>Rotation i cuperna, hemmafördel per division, annan halveringstid</li></ul>' +
-    '<p class="src-line">Kandidatlogg: inga kandidater testade än. Underkända idéer loggas här, så att de inte prövas igen.</p></div>';
+// ---------- backtest och kandidatjakt (fas 4) ----------
+
+// Skillnad i log-poäng med intervall: "−0,034" och "−0,050 till −0,018".
+function diffCell(c, strong = true) {
+  if (!c || !c.n) return '<td class="num muted">–</td>';
+  const v = strong ? `<strong>${sgn(c.diff)}</strong>` : sgn(c.diff);
+  return `<td class="num">${v}<span class="sub">${sgn(c.ci[0])} till ${sgn(c.ci[1])}</span></td>`;
+}
+
+function backtestSection(bt, version) {
+  let html = '<h3>Backtest <span class="hint">walk-forward</span></h3>';
+  const b = bt && bt.current;
+  if (!b) {
+    const other = bt && bt.versions && bt.versions.length ? ` Senaste backtestet gäller regelversion ${esc(bt.versions[bt.versions.length - 1].rulesVersion)}.` : '';
+    return html + `<p class="unknown">okänt – backtestet är inte kört för regelversion ${esc(version)} än (npm run backtest).${other}</p>`;
+  }
+  const lg = b.leagues;
+  html += `<p class="legend">Varje match ${esc(b.first)}–${esc(b.last)} fick en prognos skattad bara på matcherna före matchdagen, med samma kod och regler som i dag. ` +
+    'Log-poäng: lägre är bättre. Skillnad = modell − baslinje, negativ = modellen bättre, med 95 % bootstrap-intervall där hela matchdagar dras om. ' +
+    'Varje rad jämför på de matcher där båda finns.</p>' +
+    '<div class="table-wrap"><table><thead><tr><th>Ligorna, mot</th><th class="num">Matcher</th><th class="num">Modell</th><th class="num">Baslinje</th><th class="num">Skillnad</th><th class="num">Brier</th></tr></thead><tbody>' +
+    lg.vs.filter((r) => r.n).map((r) => `<tr><td>${esc(r.label)}</td><td class="num">${n0(r.n)}</td><td class="num">${f3(r.logLoss[0])}</td><td class="num">${f3(r.logLoss[1])}</td>` +
+      diffCell(r) + `<td class="num">${f3(r.brier[0])} / ${f3(r.brier[1])}</td></tr>`).join('') + '</tbody></table></div>';
+
+  html += '<h4 class="sub-h">Per säsong <span class="hint">ligorna</span></h4><div class="card chart-card"><div id="season-chart"></div></div>';
+  html += '<details class="as-table"><summary>Som tabell</summary><div class="table-wrap"><table><thead><tr><th>Säsong</th><th class="num">Matcher</th><th class="num">Modell</th>' +
+    '<th class="num">mot (b)</th><th class="num">mot (a)</th><th class="num">mot (c)</th><th class="num">mot Pinnacle</th></tr></thead><tbody>' +
+    b.bySeason.map((x) => `<tr><td class="num">${esc(x.label)}${x.partial ? `<span class="sub">t.o.m. ${dateOnly(x.through)}</span>` : ''}</td><td class="num">${n0(x.n)}</td>` +
+      `<td class="num">${x.vs[1].n ? f3(x.vs[1].logLoss[0]) : '–'}</td>` + x.vs.map((c) => diffCell(c, false)).join('') + '</tr>').join('') +
+    '</tbody></table></div></details>';
+
+  html += '<h4 class="sub-h">Per division</h4><div class="table-wrap"><table><thead><tr><th>Division</th><th class="num">Matcher</th><th class="num">Modell</th>' +
+    '<th class="num">mot (b)</th><th class="num">mot (a)</th><th class="num">mot (c)</th><th class="num">mot Pinnacle</th></tr></thead><tbody>' +
+    b.byDivision.map((x) => `<tr><td>${esc(x.name)}</td><td class="num">${n0(x.n)}</td><td class="num">${f3(x.vs[1].logLoss[0])}</td>` +
+      x.vs.map((c) => diffCell(c, false)).join('') + '</tr>').join('') + '</tbody></table></div>';
+
+  const cups = b.cups.map((c) => `${esc(c.name)} ${esc(c.seasons[0])}${c.seasons[1] !== c.seasons[0] ? `–${esc(c.seasons[1])}` : ''} (${n0(c.vsNaive.n)} matcher): ` +
+    `modellen ${f3(c.vsNaive.logLoss[0])} mot naiv ${f3(c.vsNaive.logLoss[1])}` +
+    (c.advance ? `, att gå vidare ${f3(c.advance.logLoss)} (slantsingling ${f3(c.advance.coin)})` : '') + '.');
+  html += `<p class="legend">${cups.join(' ')}</p>` +
+    `<div class="card"><ul class="bullets">${b.notes.map((n) => `<li>${esc(n)}</li>`).join('')}</ul>` +
+    `<p class="src-line">football-data.co.uk och ESPN. Körd ${when(b.ranAt)}, regelversion ${esc(b.rulesVersion)}: ${n0(b.modelKnown)} av ${n0(b.matches)} matcher fick en modellprognos (övriga: för lite underlag för ett lag). ` +
+    'Körs för hand när regelversionen ändras, inte i varje bygge.</p></div>';
+  return html;
+}
+
+// Skillnaden mot (b) och (c) per avslutad säsong, med 95 %-intervall.
+function drawSeasonChart() {
+  const el = document.getElementById('season-chart');
+  const b = state.backtest;
+  if (!el || !b) return;
+  const rows = b.bySeason.filter((x) => !x.partial);
+  const series = [
+    { i: 0, key: 'b', label: 'mot (b) säsongens mål' },
+    { i: 2, key: 'c', label: 'mot (c) marknaden' },
+  ];
+  const W = Math.max(260, el.clientWidth);
+  const H = 230;
+  const L = 46;
+  const R = 12;
+  const T = 12;
+  const B = 26;
+  const vals = rows.flatMap((x) => series.flatMap((s) => (x.vs[s.i].n ? x.vs[s.i].ci : [])));
+  const step = 0.02;
+  const lo = Math.floor(Math.min(0, ...vals) / step) * step;
+  const hi = Math.ceil(Math.max(0, ...vals) / step) * step;
+  const band = (W - L - R) / rows.length;
+  const x = (i) => L + band * (i + 0.5);
+  const y = (v) => T + ((hi - v) / (hi - lo)) * (H - T - B);
+  const off = Math.min(5, band / 5);
+  let svg = `<svg class="bt" width="${W}" height="${H}" role="img" aria-label="Skillnad i log-poäng per säsong mot baslinjerna (b) och (c)">`;
+  for (let v = lo; v <= hi + 1e-9; v += step) {
+    const zero = Math.abs(v) < 1e-9;
+    svg += `<line class="${zero ? 'zero' : 'grid'}" x1="${L}" x2="${W - R}" y1="${y(v).toFixed(1)}" y2="${y(v).toFixed(1)}"/>` +
+      `<text class="tick" x="${L - 6}" y="${(y(v) + 3.5).toFixed(1)}" text-anchor="end">${zero ? '0' : sgn(v, 2)}</text>`;
+  }
+  const every = Math.ceil(rows.length / Math.max(1, Math.floor((W - L - R) / 46)));
+  rows.forEach((r, i) => {
+    if (i % every === 0) svg += `<text class="tick" x="${x(i).toFixed(1)}" y="${H - 8}" text-anchor="middle">${esc(r.label.slice(2))}</text>`;
+  });
+  for (const s of series) {
+    rows.forEach((r, i) => {
+      const c = r.vs[s.i];
+      if (!c.n) return;
+      const cx = (x(i) + (s.i ? off : -off)).toFixed(1);
+      svg += `<line class="ci s-${s.key}" x1="${cx}" x2="${cx}" y1="${y(c.ci[0]).toFixed(1)}" y2="${y(c.ci[1]).toFixed(1)}"/>` +
+        `<circle class="pt s-${s.key}" cx="${cx}" cy="${y(c.diff).toFixed(1)}" r="4"/>`;
+    });
+  }
+  // Träffytor: hela säsongens kolumn, med båda värdena.
+  rows.forEach((r, i) => {
+    const t = series.map((s) => { const c = r.vs[s.i]; return c.n ? `${s.label}: ${sgn(c.diff)} (${sgn(c.ci[0])} till ${sgn(c.ci[1])}, ${c.n} matcher)` : `${s.label}: –`; }).join('\n');
+    svg += `<rect class="hit" x="${(x(i) - band / 2).toFixed(1)}" y="${T}" width="${band.toFixed(1)}" height="${H - T - B}"><title>${esc(r.label)}\n${esc(t)}</title></rect>`;
+  });
+  svg += '</svg>';
+  el.innerHTML = '<div class="chart-legend">' + series.map((s) => `<span><i class="key s-${s.key}"></i>${esc(s.label)}</span>`).join('') +
+    '<span class="muted">under noll = modellen bättre</span></div>' + svg;
+}
+
+function candidatesSection(L) {
+  let html = '<h3>Kandidatjakt</h3>';
+  if (!L || !L.entries || !L.entries.length) {
+    return html + '<p class="unknown">Ingen kandidat prövad än (npm run kandidater).</p>';
+  }
+  const crit = L.criteria;
+  const latest = new Map();
+  const count = new Map();
+  for (const e of L.entries) { latest.set(e.id, e); count.set(e.id, (count.get(e.id) || 0) + 1); }
+  const run = L.runs[L.runs.length - 1];
+  html += `<p class="legend">En faktor får styra prognosen först när den bevisligen förbättrat den walk-forward. Kravet skrevs ${dateOnly(crit.registered)}, före första körningen:</p>` +
+    `<div class="card"><ul class="bullets">${crit.text.map((t) => `<li>${esc(t)}</li>`).join('')}</ul>` +
+    `<p class="src-line">Senaste körningen ${dateOnly(run.ranAt)}: ${run.candidates} kandidater, intervall ${dec(run.level * 100, 2)} %, säsongerna ${esc(run.seasons[0])}–${esc(run.seasons[1])}` +
+    `${run.through ? ` t.o.m. ${dateOnly(run.through)}` : '.'} En godkänd kandidat blir en ny regelversion först efter beslut.</p></div>`;
+
+  const verdict = (e) => (e.verdict === 'godkänd'
+    ? '<span class="badge ok">godkänd</span>' : e.verdict === 'underkänd' ? '<span class="badge no">underkänd</span>' : '<span class="badge">kunde inte prövas</span>');
+  const rows = [...latest.values()].map((e) => {
+    const earlier = count.get(e.id) - 1;
+    const why = e.verdict === 'godkänd' && e.rulesVersion === run.rulesVersion ? `${e.why} – styr inte prognosen än` : e.why;
+    return `<tr><td>${esc(e.label)}<span class="sub">${esc(e.motive)}${e.scope ? ` · ${esc(e.scope)}` : ''}</span>` +
+      `${e.paramText ? `<span class="sub">Skattat: ${esc(e.paramText)}</span>` : ''}</td>` +
+      `<td class="num">${e.n ? `${n0(e.n)}<span class="sub">${esc(e.seasons[0])}–${esc(e.seasons[1])}</span>` : '–'}</td>` +
+      (e.n ? `<td class="num"><strong>${sgn(e.diff, 4)}</strong><span class="sub">${sgn(e.ci[0], 4)} till ${sgn(e.ci[1], 4)}</span></td>` : '<td class="num">–</td>') +
+      `<td>${verdict(e)}<span class="sub">${esc(why)}${e.testedAt !== run.ranAt.slice(0, 10) ? ` · ${dateOnly(e.testedAt)}` : ''}` +
+      `${earlier ? ` · prövad ${earlier} gång${earlier === 1 ? '' : 'er'} tidigare` : ''}</span></td></tr>`;
+  }).join('');
+  html += '<div class="table-wrap"><table><thead><tr><th>Kandidat</th><th class="num">Matcher</th><th class="num">Skillnad log-poäng</th><th>Utfall</th></tr></thead>' +
+    `<tbody>${rows}</tbody></table></div>`;
+  if (L.untestable && L.untestable.length) {
+    html += '<h4 class="sub-h">Går inte att pröva än</h4><div class="card"><ul class="plain">' +
+      L.untestable.map((u) => `<li><strong>${esc(u.label)}</strong><span class="sub">${esc(u.reason)}</span></li>`).join('') + '</ul></div>';
+  }
+  html += `<p class="legend">Skillnad = kandidat − grundmodell på samma matcher, med intervallet ovan. Allt som prövats loggas med utfall och datum, även det som inte fungerade, så att samma idé inte prövas igen utan ny evidens – ` +
+    '<a href="https://github.com/tomaslaino/Profeterna/blob/main/data/backtest/candidates.json" target="_blank" rel="noopener">hela loggen</a>.</p>';
   return html;
 }
 

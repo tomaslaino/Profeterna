@@ -53,6 +53,23 @@ module.exports = {
     maxGoals: 10,
     tolerance: 1e-7,
     maxIterations: 2000,
+
+    // Kandidatreglage (fas 4). Standardvärdena nedan ÄR grundmodellen ovan –
+    // de ändrar ingen prognos. Andra värden prövas walk-forward i
+    // kandidatjakten (src/candidates.js) och används skarpt först när en
+    // kandidat klarat kravet och fått en ny regelversion.
+    //   homeAdvantage  'common' = en gemensam hemmafördel; 'perDivision' =
+    //                  en per division, och cupmatcherna en egen
+    //   cupWeight      cupmatchernas vikt mot ligamatcherna (1 = samma)
+    //   shotsBlend     andel skott på mål i målen som skattas (0 = bara mål).
+    //                  Skott på mål räknas om till mål med andelen mål per
+    //                  skott på mål i underlaget före prognosdagen; matcher
+    //                  utan skottdata skattas på målen.
+    //   xgBlend        andel xG (Understat, bara Premier League) på samma sätt
+    homeAdvantage: 'common',
+    cupWeight: 1,
+    shotsBlend: 0,
+    xgBlend: 0,
   },
 
   // --------------------------------------------------------------------------

@@ -20,8 +20,11 @@ ingen falsk precision · sidan kraschar aldrig av en död källa · endast fria 
   committar, Brier- och log-poäng mot baslinjerna (a), (b), (c) och Betfair-stängningen,
   kalibreringskurva, att gå vidare i cuperna, värdespel, per tävling och regelversion,
   äkta före-matchen-prognos i matchvyn
-- [ ] **Fas 4 – Backtest + kandidatjakt:** walk-forward på tidigare säsonger,
-  kandidatfaktorer, regelversioner
+- [x] **Fas 4 – Backtest + kandidatjakt:** walk-forward-backtest 2004/05–2026/27 med samma
+  kod som den skarpa prognosen, mot (a), (b), (c) och Pinnacle-stängningen per säsong och
+  division; kandidatjakt med förhandsregistrerat krav, 13 kandidater + kombinationssteg,
+  kandidatlogg och inbördes möten från tidigare säsonger i matchvyn. Regelversionen är
+  oförändrad tills användaren beslutat om de godkända kandidaterna
 - [ ] **Fas 5 – LLM-modul (valfri)**
 
 ## Publicering
@@ -78,6 +81,8 @@ npm start              # bygger och serverar _site/ på http://localhost:3001, b
 npm run build          # bara bygget (hämtar källor vars cache är för gammal)
 npm run refresh        # bygget med omhämtning av alla källor
 npm run check          # prognosmotorns kontroll mot förra säsongen (se Prognosmotorn)
+npm run backtest       # walk-forward-backtest över alla säsonger, ~1,5 min (se Backtestet)
+npm run kandidater     # kandidatjakten, ~15 min första gången (se Kandidatjakten)
 ```
 
 Lokala byggen **läser** journalen som den ligger i repot men skriver aldrig i den – det gör
@@ -102,6 +107,7 @@ bara lokalt.
 | Skador och avstängningar | Fantasy Premier League (`bootstrap-static`) | PL | 3 h | Status, chans att spela och nyhetstext med datum. Status avser nästa omgång. |
 | National League | football-data.co.uk (`EC`) | underlag för FA-cupens non-league-lag | 12 h | Resultat, skott och odds, ingen xG. |
 | Tidigare säsonger, ligorna | football-data.co.uk (`mmz4281/<säsong>/E0–E3, EC.csv`) | PL–L2, National League | 30 d | E0–E3 2000/01–2025/26 (26 säsonger, 52 672 matcher), EC 2005/06–2025/26 (11 234; 2000/01–2004/05 svarar 300). Fulla säsonger utom League One/Two 2019/20 (400/440 matcher, avbruten säsong) och EC 2019/20–2021/22 (451, 477, 506). En fil per säsong, ~0,25 s styck – allt hämtas på ~4 s. Äldre filer är Windows-1252 (t.ex. "King’s Lynn" i EC 2021/22), nyare UTF-8; läses därefter. Sparar resultat, skott och odds (marknadssnitt hette `BbAv` före 2019/20). |
+| xG, tidigare säsonger | Understat (`getLeagueData/EPL/<år>`) | PL | 30 d, bara kandidatjakten | 2014/15–2025/26, 380/380 matcher med xG varje säsong (verifierat 2026-10-17), alla 4 560 parade mot football-data.co.uk på (hemma, borta). Hämtas av `npm run kandidater`, inte av bygget – används först om xG-kandidaten klarar kravet. |
 | Tidigare säsonger, FA-cupen | ESPN (`eng.fa`, månad för månad) | FA-cupen | 30 d | 2021/22–2025/26, 674 matcher från first round proper (ESPN har längre bak). Enda fria källan till matcher för lag under National League. Rundornas namn varierar mellan säsongerna. ESPN:s flagga för neutral plan är inte satt för Wembley-matcherna. |
 
 **Prövat och inte använt:**
@@ -165,6 +171,22 @@ bara lokalt.
 - **Litet underlag (2026-10-17):** snitt och skillnader visas först från 30 matcher,
   avkastning från 30 spel och en kalibreringskorg från 10 prognoser – före dess "för få"
   med antalet. Skillnader visas med 95 % bootstrap-intervall.
+- **Kandidatkravet (2026-10-17, skrivet före första körningen):** walk-forward, log-poäng
+  under grundmodellens med hela bootstrap-intervallet under noll (matchdagar dras om; 95 %
+  Bonferroni-justerat för antalet kandidater), bättre i båda halvorna av säsongerna och
+  Brier inte sämre. Kandidaternas värden (180/730 dagar, 2/6 säsonger, halv vikt, hälften
+  skott/xG, fem matcher, sex möten) är a priori-val. Se
+  [Kandidatjakten](#kandidatjakten).
+- **En godkänd kandidat ändrar inte prognosen av sig själv (2026-10-17):** den blir en ny
+  regelversion med datum först efter användarens beslut, eftersom det ändrar prognoserna
+  som loggas i journalen från nästa körning. Backtestet körs då om för den nya versionen.
+- **Backtestet körs inte i bygget (2026-10-17):** ~1,5 min för grundmodellen och ~15 min
+  för kandidatjakten på 9 trådar – för tungt var 30:e minut. Resultaten committas i
+  `data/backtest/` och visas med körningens datum och regelversion; saknas backtestet för
+  dagens regelversion står det "okänt" under Modell.
+- **Stängningsreferens i backtestet (2026-10-17):** Pinnacle vid stängning (2012/13–), som
+  finns för flest säsonger. Betfair Exchange, som journalen och kontrollen använder, finns
+  bara från 2024/25.
 
 ## Arkitektur
 
@@ -192,8 +214,14 @@ server:
   (underlaget: historik + innevarande säsong), [src/forecast.js](src/forecast.js) (modell,
   baslinjer, cuper, osäkerhet) och [src/check.js](src/check.js) (kontrollen). Bygget skriver
   prognosen i `data/match/<id>.json`, en kompakt 1X2 i `data/matches.json` och modellens
-  skattningar och kontroll i `data/model.json`. Fallerar motorn byggs sajten ändå, utan
-  prognoser och med felet synligt under Modell.
+  skattningar i `data/model.json`. Fallerar motorn byggs sajten ändå, utan prognoser och med
+  felet synligt under Modell.
+- **Backtest och kandidatjakt:** [src/backtest.js](src/backtest.js) (walk-forward över alla
+  säsonger, parallellt i trådar, prognoserna per match cachade i `data/cache/backtest_*.json`)
+  och [src/candidates.js](src/candidates.js) (kandidaterna, kravet, loggen). Körs för hand;
+  resultaten committas i `data/backtest/` – `<regelversion>.json` per regelversion och
+  `candidates.json` (kandidatloggen) – och bygget läser dem till `data/model.json`. Se
+  [Backtestet och kandidatjakten](#backtestet-och-kandidatjakten-fas-4).
 - **Journal:** [src/journal.js](src/journal.js) – append-only-loggning, innehållsavtryck,
   läsning och vilken rad som räknas. Filen är `data/journal/forecasts-<säsong>.jsonl`, en
   JSON-rad per post, committad av GitHub Actions; bygget kopierar den till sajten
@@ -203,7 +231,7 @@ server:
   `data/match/<id>.json`. Poängen och bootstrap-jämförelsen är samma kod som kontrollen
   ([src/check.js](src/check.js)). Fallerar utvärderingen byggs sajten ändå.
 - **Frontend:** ren HTML/CSS/JS i `public/`, flikarna Matcher, Utvärdering, Källor och
-  Modell. Läser JSON-filerna ovan. Urvalet av kommande/spelade matcher och källornas status
+  Modell (regelversion, backtest, kandidatlogg). Läser JSON-filerna ovan. Urvalet av kommande/spelade matcher och källornas status
   räknas i webbläsaren mot besökarens klocka, inte mot byggtiden.
 
 ### Lagnamn
@@ -219,7 +247,8 @@ Regelversion **2026-10-17.1** i [config/forecast-rules.js](config/forecast-rules
 som bestämmer en prognos ligger där; samma data ger alltid samma prognos (även
 intervallen – slumpen är seedad). **Ingen kandidatfaktor styr prognosen:** grundmodellen
 bygger enbart på mål efter 90 minuter. xG, skott, form, tabell, skador, inbördes möten och
-odds visas som underlag men prövas först walk-forward i fas 4.
+odds visas som underlag; de prövas walk-forward i kandidatjakten (fas 4) och styr först
+när en kandidat klarat kravet och blivit en ny regelversion.
 
 **Grundmodell – Dixon–Coles (1997).** Varje lag har en anfalls- och en försvarsstyrka,
 gemensam hemmafördel och en korrektion ρ för 0–0, 1–0, 0–1 och 1–1. Maximum likelihood på
@@ -268,8 +297,8 @@ genomsnittslag på hemmalagets nivå på neutral plan → hemmaplan → nivåski
 mellan nivåer) → hemmalagets egen styrka mot nivåns snitt → bortalagets. Sista steget är
 exakt modellens prognos; ordningen är fast och ett stegs effekt beror något på den.
 
-**Kontroll mot 2025/26** (`npm run check`, ~9 s; bygget kör den bara när regelversionen
-eller historiken ändrats och visar den under Modell). Varje match fick en prognos skattad på
+**Kontroll mot 2025/26** (`npm run check`, ~9 s). Fram till fas 4 körde bygget den och
+visade den under Modell; nu visas i stället backtestet över alla säsonger, där 2025/26 ingår. Varje match fick en prognos skattad på
 matcherna före matchdagen med samma kod. Log-poäng, lägre = bättre; skillnad modell −
 baslinje med 95 % bootstrap-intervall:
 
@@ -285,7 +314,7 @@ Two, medan intervallet i PL och Championship precis täcker noll – och slår (
 ~0,02 efter marknaden, vilket är väntat för en modell som bara ser mål. FA-cupen 2025/26 (122 matcher):
 0,949 mot naiv 1,067; att gå vidare log-poäng 0,608 (slantsingling 0,693). Kontrollen är
 **ingen utvärdering**: reglerna valdes med vetskap om att 2025/26 skulle användas här.
-Walk-forward över många säsonger kommer i fas 4.
+Walk-forward över alla säsonger: se [Backtestet](#backtestet-och-kandidatjakten-fas-4).
 
 **Byggtid** (lokalt, 2026-10-17): prognoserna för säsongens 2 120 matcher ~3,5 s, hela
 bygget ~7,5 s med vanlig hämtning; med full omhämtning av alla källor och ny kontroll ~25 s.
@@ -341,6 +370,134 @@ mot (b) i log-poäng, i linje med kontrollen mot 2025/26; rader loggade efter av
 räknades inte, och "för få"-läget visades med 5 matcher. Den riktiga journalen är tom tills
 första körningen på GitHub Actions efter push.
 
+## Backtestet och kandidatjakten (fas 4)
+
+### Backtestet
+
+`npm run backtest` ([src/backtest.js](src/backtest.js), ~1,5 min på 9 trådar). Varje match i
+varje säsong som går att använda får en prognos skattad bara på matcherna före matchdagen,
+med exakt samma kod som den skarpa prognosen (`predict`/`fitAt`) – fönstret expanderar dag
+för dag. Resultatet skrivs till `data/backtest/<regelversion>.json`, committas och visas
+under Modell: mot baslinjerna totalt, per säsong (diagram + tabell) och per division.
+
+- **Säsonger:** 2004/05–2025/26 plus pågående 2026/27 till senaste spelade match.
+  football-data.co.uk har ligorna från 2000/01 och modellen behöver `historySeasons` (4)
+  säsonger bakåt. National League finns från 2005/06, så lag som flyttats upp därifrån har
+  kortare historik de första åren. Cupmatcher finns bara från 2021/22 (FA-cupen hos ESPN) –
+  före dess skattas modellen utan cupmatcher; EFL-cupen finns bara för 2026/27.
+- **Baslinjer:** (a) och (b) som i den skarpa prognosen; (c) marknadssnittet vid öppning
+  (Betbrain-snittet t.o.m. 2018/19, därefter football-data.co.uk:s marknadssnitt) från
+  2005/06; Pinnacle vid stängning 2012/13–2025/26 (ungefär hälften av 2025/26).
+- **Osäkerhet:** 95 % bootstrap-intervall där hela matchdagar dras om (2 000 dragningar) –
+  matcher samma dag delar skattning och är inte oberoende.
+- **Cache:** prognoserna per match sparas i `data/cache/backtest_<variant>.json` per
+  regelversion, variant och historikens innehåll (inte hämttiden – avslutade säsonger
+  hämtas om var 30:e dag men ändras inte). Pågående säsong räknas alltid om.
+
+**Resultat** (regelversion 2026-10-17.1, körd 2026-10-17, 45 712 matcher):
+
+| Ligorna, mot | Matcher | Modell | Baslinje | Skillnad | Brier modell / baslinje |
+|---|---|---|---|---|---|
+| (b) Poisson på säsongens mål | 39 624 | 1,039 | 1,069 | −0,030 (−0,034 till −0,026) | 0,625 / 0,642 |
+| (a) Naiv | 44 943 | 1,040 | 1,076 | −0,036 (−0,038 till −0,033) | 0,626 / 0,651 |
+| (c) Marknaden, öppning | 42 913 | 1,039 | 1,028 | +0,012 (+0,010 till +0,013) | 0,625 / 0,617 |
+| Pinnacle, stängning | 27 001 | 1,039 | 1,022 | +0,016 (+0,014 till +0,018) | 0,624 / 0,613 |
+
+45 678 av 45 712 matcher fick en modellprognos (övriga: för lite underlag för ett lag).
+Modellen slår (b) i **alla 22 hela säsonger** med intervallet under noll, och i alla fyra
+divisionerna (−0,027 till −0,034). Den ligger **efter marknaden i alla 21 säsonger med
+odds** – intervallet över noll i alla utom 2006/07–2008/09 – och avståndet har vuxit: kring
++0,004 2006/07–2008/09, kring +0,015 de senaste säsongerna (marknaden har blivit
+skarpare). Mot Pinnacle-stängningen är modellen sämre i alla 14 säsonger. FA-cupen
+2021/22–2025/26 (672 matcher): 0,992 mot naiv 1,071; att gå vidare 0,597 (slantsingling
+0,693). EFL-cupen finns bara för 2026/27 (76 matcher): 0,856 mot naiv 1,072. Pågående
+säsong t.o.m. 2026-10-17 (436 ligamatcher): −0,107 mot (b), som är extrem tidigt på
+säsongen, och +0,012 mot (c).
+
+### Kandidatjakten
+
+`npm run kandidater` ([src/candidates.js](src/candidates.js), ~17 min första gången på
+9 trådar; avslutade säsonger cachas). Körs för hand när tillräckligt många nya matcher
+spelats – inte i bygget. Loggen `data/backtest/candidates.json` committas och visas under
+Modell.
+
+**Kravet** (skrivet 2026-10-17, före första körningen):
+
+1. Walk-forward: varje prognos skattas bara på matcher före matchdagen, och en faktors
+   vikt bara på tidigare säsonger.
+2. Log-poäng: kandidat − grundmodell under noll på samma matcher, med hela
+   bootstrap-intervallet under noll (matchdagar dras om). Intervallet är 95 % justerat för
+   antalet kandidater i körningen (Bonferroni: 13 kandidater → 99,62 %).
+3. Stabilt: lägre log-poäng i både första och andra halvan av säsongerna.
+4. Brier-poängen får inte bli sämre.
+
+Två slags kandidater: **regel** – ett annat värde på ett reglage i
+[config/forecast-rules.js](config/forecast-rules.js); hela backtestet körs om med värdet,
+samma kod som den skarpa prognosen. **Faktor** – en signal ovanpå grundmodellen:
+log λ<sub>hemma</sub> += β·z, log λ<sub>borta</sub> −= β·z, där z är skillnaden mellan
+lagen och β skattas med maximum likelihood säsong för säsong enbart på tidigare säsongers
+backtestprognoser (första säsongen räknas därför inte). Marknaden blandas log-linjärt,
+p ∝ modell<sup>1−w</sup> · marknad<sup>w</sup>, med w skattad på samma sätt.
+**Kombinationssteget** (lades till efter provkörningen, när två faktorer klarat kravet):
+godkända faktorer prövas tillsammans med gemensamt skattade vikter och samma krav, och
+kombinationen måste dessutom slå varje del ensam. Marknaden kombineras inte – den ersätter
+modellen snarare än justerar den.
+
+**Utfall 2026-10-17** (log-poäng, kandidat − grundmodell, intervall 99,62 %):
+
+| Kandidat | Typ | Matcher | Skillnad | Halvorna | Utfall |
+|---|---|---|---|---|---|
+| Halveringstid 180 dagar | regel | 45 678 | −0,0005 (−0,0016 till +0,0007) | −0,0007 / −0,0002 | underkänd – intervallet når noll |
+| Halveringstid 730 dagar | regel | 45 678 | +0,0033 (+0,0026 till +0,0041) | +0,0034 / +0,0032 | underkänd – sämre |
+| Fönster två säsonger bakåt | regel | 45 678 | +0,0003 (−0,0002 till +0,0010) | +0,0003 / +0,0004 | underkänd – sämre |
+| Fönster sex säsonger bakåt | regel | 41 627 | ±0,0000 (−0,0002 till +0,0001) | −0,0001 / ±0,0000 | underkänd – ingen skillnad |
+| Hemmafördel per division | regel | 45 678 | −0,0001 (−0,0004 till +0,0003) | −0,0003 / +0,0002 | underkänd – intervallet når noll |
+| Cupmatcher utanför skattningen (2021/22–) | regel | 11 247 | +0,0010 (−0,0003 till +0,0022) | +0,0012 / +0,0007 | underkänd – sämre |
+| Cupmatcher med halv vikt, rotation (2021/22–) | regel | 11 351 | +0,0002 (−0,0003 till +0,0008) | +0,0003 / +0,0001 | underkänd – sämre |
+| Skott på mål i skattningen (hälften) | regel | 45 678 | −0,0005 (−0,0015 till +0,0005) | −0,0009 / −0,0002 | underkänd – intervallet når noll |
+| xG i skattningen (hälften), PL 2014/15– | regel | 4 625 | −0,0011 (−0,0039 till +0,0013) | −0,0013 / −0,0008 | underkänd – intervallet når noll |
+| Form: poäng per match, senaste fem | faktor | 43 656 | −0,0004 (−0,0006 till −0,0002) | −0,0001 / −0,0006 | **godkänd** |
+| Tabelläge: poäng per match i år | faktor | 42 921 | −0,0006 (−0,0009 till −0,0002) | −0,0004 / −0,0008 | **godkänd** |
+| Inbördes möten: målskillnad, senaste sex | faktor | 43 656 | ±0,0000 (−0,0001 till +0,0002) | ±0,0000 / ±0,0000 | underkänd – ingen skillnad |
+| Marknadens odds som faktor | faktor | 40 884 | −0,0117 (−0,0139 till −0,0098) | −0,0100 / −0,0139 | **godkänd** |
+| Kombination: form + tabelläge | kombination | 43 656 | −0,0005 (−0,0009 till −0,0002) | −0,0002 / −0,0008 | underkänd – inte bättre än tabelläget ensamt |
+
+Läsning:
+
+- **Inget i modellens struktur behöver ändras.** Halveringstid 365 dagar, fyra säsonger
+  bakåt, gemensam hemmafördel och cupmatcher med full vikt håller; 730 dagar är tydligt
+  sämre, och att ta bort cupmatcherna gör prognosen sämre (cupmötena kopplar ihop nivåerna).
+  Skott på mål och xG pekar åt rätt håll men räcker inte – xG finns bara för
+  Premier League och 4 625 matcher.
+- **Form och tabelläge klarar kravet, men effekten är liten:** −0,0004 och −0,0006 i
+  log-poäng, en tjugondel av avståndet till marknaden. Skattat: +1,9 % mål per poäng/match
+  bättre form, +3,8 % per poäng/match högre i tabellen. Båda håller även med hela månader
+  eller hela säsonger som bootstrapenhet. Tillsammans (−0,0005) är de inte bättre än
+  tabelläget ensamt – formen tillför inget utöver tabellen.
+- **Marknaden klarar kravet med marginal, men vikten blev 100 %:** den bästa log-linjära
+  blandningen är marknaden ensam, säsong för säsong. Modellen tillför alltså inget utöver
+  öppningsoddsen. Att "införa" kandidaten vore att ersätta modellen med oddsen – då vore
+  jämförelsen mot (c) meningslös och sidan inte längre en egen prognos.
+- **Ingen kandidat styr prognosen än.** En ny regelversion kräver beslut (se nedan).
+
+**Går inte att pröva än:**
+
+| Idé | Varför |
+|---|---|
+| xG från football-data.co.uk | Finns bara från 2026/27 och leverantören är odokumenterad. Prövas när säsongen gett tillräckligt med matcher. |
+| Skador och avstängningar (FPL) | Bara dagens läge, ingen historik – och bara Premier League. |
+| Startelvor | Ingen fri källa med historik. |
+| Tabell med poängavdrag (ESPN) | Ögonblicksbild utan historik; prövad i stället som tabell räknad ur resultaten. |
+| Rotation i EFL-cupen | EFL-cupens tidigare säsonger hämtas inte; rotationen prövad på FA-cupen 2021/22–. |
+| Marknaden i cuperna | Fri cupoddshistorik saknas; kan bara utvärderas framåt i journalen. |
+
+**När en kandidat klarar kravet** ändras prognosen inte av sig själv. Den blir en ny
+regelversion med datum i [config/forecast-rules.js](config/forecast-rules.js) först efter
+beslut, eftersom det ändrar prognoserna som loggas i journalen från nästa körning; därefter
+körs `npm run backtest` för den nya versionen (en fil per regelversion i `data/backtest/`).
+En omkörning på samma underlag skriver inga nya poster i loggen; nya matcher, ny data eller
+en ny regelversion ger en ny post per kandidat med datum.
+
 ## Statusmärkning
 
 Räknas om i webbläsaren ur hämttid och källans gräns – stannar den schemalagda hämtningen
@@ -352,7 +509,7 @@ schemaintervall gammalt.
 - **Röd (fel):** senaste hämtningen misslyckades; senaste lyckade data visas med sitt datum.
 - **Grå (okänt):** inget verifierbart innehåll (t.ex. FA-cupen innan första omgången lottats).
 
-## Kända brister (fas 1–3)
+## Kända brister (fas 1–4)
 
 - ESPN-oddsen sparas bara som senaste ögonblicksbild i cachen. Oddsen vid
   prognostillfället finns från fas 3 i journalen, men bara för loggade matcher.
@@ -401,8 +558,27 @@ schemaintervall gammalt.
   marknadssnittet, inte bästa odds.
 - Matchvyn för en spelad match visar resten av underlaget (steg för steg, baslinjerna,
   resultatmatrisen) från den återskapade prognosen, inte från journalraden.
+- **Fas 4:** backtestet och kandidatjakten körs inte i bygget. Det som visas under Modell
+  gäller körningens datum och regelversion; ändras regelversionen utan ny körning står
+  backtestet som okänt.
+- Historiken har inga cupmatcher före 2021/22 och EFL-cupen bara för 2026/27, så backtestet
+  skattar modellen utan cupmöten de åren – till skillnad från den skarpa prognosen.
+- Bootstrap per matchdag tar hänsyn till att matcher samma dag delar skattning, men inte
+  till att felen för ett lag hänger ihop över veckor. Kontroll 2026-10-17: med hela månader
+  eller hela säsonger som enhet blev intervallen något bredare och samma kandidater klarade
+  kravet.
+- Kandidaternas värden är a priori-val; andra värden (t.ex. 270 dagars halveringstid) är
+  inte prövade. Att pröva många värden och välja det bästa vore datamining – Bonferroni
+  täcker bara de kandidater som faktiskt körts.
+- Tabelläget räknas ur resultaten, utan poängavdrag. Formen räknar alla tävlingar i
+  underlaget – före 2021/22 alltså bara ligamatcher.
+- **Rättat i fas 4:** baslinje (b) kunde tidigt på säsongen ge 100 % oavgjort eller
+  ogiltiga sannolikheter när skattningen saknade ändligt maximum för några lag (hittat i
+  backtestet: 33 av 39 657 matcher, 24 av dem i augusti–september 2022). Nu är (b) okänd för de lagen. Inga
+  modellprognoser ändras; i år fick en redan spelad match (5 september) (b) okänd, och
+  ingen journalrad har haft felet.
 
 ## Säkerhet
 
-Inga nycklar behövs i fas 1–3. `.env` är gitignorerad. Workflowens commit använder
+Inga nycklar behövs i fas 1–4. `.env` är gitignorerad. Workflowens commit använder
 `GITHUB_TOKEN` med `contents: write` bara i byggjobbet.

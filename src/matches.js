@@ -273,7 +273,6 @@ function matchDetail(id) {
     unknowns.push('Skador och avstängningar: fri källa finns bara för Premier League (FPL).');
   }
   if (!m.completed) unknowns.push('Startelvor: publiceras först strax före avspark.');
-  unknowns.push('Inbördes möten från tidigare säsonger: historiken finns, men visas först i fas 4.');
 
   return {
     match: {
@@ -290,6 +289,7 @@ function matchDetail(id) {
     rows: sideBySide(home, away),
     squad,
     meetings: seasonMeetings(D, hk, ak, m),
+    pastMeetings: pastMeetings(m),
     unknowns,
   };
 }
@@ -572,6 +572,37 @@ function seasonMeetings(D, hk, ak, current) {
       && ((m.hk === hk && m.ak === ak)
         || (m.hk === ak && m.ak === hk)))
     .map((m) => summary(D, m));
+}
+
+// Inbördes möten från tidigare säsonger (football-data.co.uk:s ligor och
+// ESPN:s FA-cuphistorik, mål efter 90 minuter), senaste först. Indexeras en
+// gång per inläst historik.
+const PAST_MEETINGS_N = 6;
+let pastIndex = null;
+
+function pastMeetings(m) {
+  const { history } = require('./modeldata'); // sent: modeldata kräver den här modulen
+  const H = history();
+  if (!pastIndex || pastIndex.H !== H) {
+    const byPair = new Map();
+    for (const g of H.games) {
+      const k = [g.h, g.a].sort().join('|');
+      if (!byPair.has(k)) byPair.set(k, []);
+      byPair.get(k).push(g);
+    }
+    pastIndex = { H, byPair };
+  }
+  const names = new Map([[m.hk, m.home.name], [m.ak, m.away.name]]);
+  const list = (pastIndex.byPair.get([m.hk, m.ak].sort().join('|')) || []).slice(-PAST_MEETINGS_N).reverse().map((g) => ({
+    date: g.date,
+    season: `20${g.season.slice(0, 2)}/${g.season.slice(2)}`,
+    compShort: competition(g.comp).short,
+    home: names.get(g.h),
+    away: names.get(g.a),
+    score: { home: g.hg, away: g.ag },
+  }));
+  const fetchedAt = [H.fetchedAt.pl, H.fetchedAt.fac].filter(Boolean).sort()[0] || null;
+  return { list, first: '2000/01', source: { provider: 'football-data.co.uk och ESPN (FA-cupen från 2021/22)', fetchedAt } };
 }
 
 function unmappedNames() {

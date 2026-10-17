@@ -19,7 +19,7 @@
 
 const fs = require('fs');
 const path = require('path');
-const { COMPETITIONS, NATIONAL_LEAGUE, SEASON } = require('../config/competitions');
+const { COMPETITIONS, NATIONAL_LEAGUE, SEASON, fdSeasonCode } = require('../config/competitions');
 const { readCache, CACHE_DIR } = require('./store');
 const { keyOf, espnKey } = require('./teams');
 const { load, regulationScore } = require('./matches');
@@ -34,7 +34,14 @@ function neutralOf(m, comp) {
   return !!m.neutral || !!(r && r.neutralRounds.includes(m.round));
 }
 const DIVISIONS = [...COMPETITIONS.filter((c) => c.fdcouk), NATIONAL_LEAGUE]; // nivå 1–5
-const HIST_IDS = [...DIVISIONS.map((c) => `fdcouk_hist_${c.fdcouk}`), 'espn_hist_fac'];
+// understat_hist_epl hämtas bara av kandidatjakten (src/candidates.js) –
+// saknas den har Premier League-matcherna helt enkelt ingen xG.
+const HIST_IDS = [...DIVISIONS.map((c) => `fdcouk_hist_${c.fdcouk}`), 'espn_hist_fac', 'understat_hist_epl'];
+
+// Skott på mål [hemma, borta] ur en football-data.co.uk-rad, om båda finns.
+function sotOf(r) {
+  return r && r.HST != null && r.AST != null ? [r.HST, r.AST] : null;
+}
 
 function startYear(code) {
   return 2000 + Number(code.slice(0, 2));
@@ -53,6 +60,17 @@ function history() {
   const tiers = new Map(); // säsong → Map(lag → nivå)
   const games = [];
   const fetchedAt = {};
+  // xG per match (Understat, Premier League): säsong → "hemma|borta" → [h, a]
+  const xg = new Map();
+  const us = readCache('understat_hist_epl');
+  if (us) fetchedAt.understat = us.fetchedAt;
+  if (us && us.data) {
+    for (const [year, ms] of Object.entries(us.data.seasons)) {
+      const byPair = new Map();
+      for (const m of ms) if (m.xg) byPair.set(`${keyOf(m.home)}|${keyOf(m.away)}`, [m.xg.home, m.xg.away]);
+      xg.set(fdSeasonCode(Number(year)), byPair);
+    }
+  }
   for (const c of DIVISIONS) {
     const cache = readCache(`fdcouk_hist_${c.fdcouk}`);
     fetchedAt[c.id] = cache ? cache.fetchedAt : null;
@@ -65,7 +83,9 @@ function history() {
         const a = keyOf(r.AwayTeam);
         t.set(h, c.tier);
         t.set(a, c.tier);
-        games.push({ date: r.date, season, comp: c.id, h, a, hg: r.FTHG, ag: r.FTAG, neutral: false, row: r });
+        const g = { date: r.date, season, comp: c.id, h, a, hg: r.FTHG, ag: r.FTAG, neutral: false, row: r, sot: sotOf(r) };
+        if (c.id === 'pl' && xg.has(season)) g.xg = xg.get(season).get(`${h}|${a}`) || null;
+        games.push(g);
       }
     }
   }
@@ -106,16 +126,26 @@ function currentSeason() {
   for (const m of D.matches) {
     if (!m.completed || !m.score90) continue;
     const c = COMPETITIONS.find((x) => x.id === m.comp);
-    games.push({
+    const g = {
       date: m.kickoff.slice(0, 10), season, comp: m.comp, round: m.round, cup: c.type === 'cup',
       h: tier.has(m.hk) ? m.hk : LOWER, a: tier.has(m.ak) ? m.ak : LOWER,
       names: [m.home.name, m.away.name],
       hg: m.score90.home, ag: m.score90.away, neutral: neutralOf(m, m.comp), id: m.id,
-    });
+    };
+    // Skott och xG för kandidatjakten: ligamatcherna ur football-data.co.uk
+    // och Understat (paras på hemma|borta, unikt inom en ligasäsong).
+    if (c.type === 'league') {
+      g.sot = sotOf(D.fd[c.id].byPair.get(`${m.hk}|${m.ak}`));
+      if (c.id === 'pl') {
+        const u = D.understat.byPair.get(`${m.hk}|${m.ak}`);
+        g.xg = u && u.xg ? [u.xg.home, u.xg.away] : null;
+      }
+    }
+    games.push(g);
   }
   for (const r of D.fd.nl.rows) {
     if (r.FTHG == null || !r.date) continue;
-    games.push({ date: r.date, season, comp: 'nl', h: r.hk, a: r.ak, hg: r.FTHG, ag: r.FTAG, neutral: false, row: r });
+    games.push({ date: r.date, season, comp: 'nl', h: r.hk, a: r.ak, hg: r.FTHG, ag: r.FTAG, neutral: false, row: r, sot: sotOf(r) });
   }
   games.sort((x, y) => x.date.localeCompare(y.date));
   return { season, games, tier };

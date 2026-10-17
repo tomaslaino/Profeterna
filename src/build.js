@@ -8,8 +8,8 @@
 //   data/sources.json      källtabell + täckning + omappade lagnamn
 //   data/matches.json      hela säsongens matcher, kompakt
 //   data/match/<id>.json   underlaget och prognosen för en match
-//   data/model.json        regelversion, skattade storheter och kontrollen
-//                          mot förra säsongen (fliken Modell)
+//   data/model.json        regelversion, skattade storheter, backtestet och
+//                          kandidatloggen (fliken Modell)
 //   data/evaluation.json   journalen och utvärderingen mot facit (fliken
 //                          Utvärdering)
 //   data/journal/*.jsonl   prognosjournalen som den ligger i repot
@@ -26,7 +26,8 @@ const { refreshAll } = require('./refresh');
 const { allMatches, matchIds, matchDetail } = require('./matches');
 const { sourceReport } = require('./sourcetable');
 const { forecastAll } = require('./forecast');
-const { storedCheck } = require('./check');
+const { readSummaries } = require('./backtest');
+const { readLog } = require('./candidates');
 const { readJournal, appendJournal, HORIZON_DAYS } = require('./journal');
 const { evaluate } = require('./evaluate');
 const { wholePercent } = require('./model');
@@ -72,13 +73,21 @@ function writeSite(outDir = OUT, { journal = false } = {}) {
     forecast.error = String(err.message || err);
     console.error('[build] prognosmotorn:', err);
   }
-  let check = null;
+  // Backtestet och kandidatjakten (fas 4) är för tunga för bygget – de körs
+  // för hand (npm run backtest, npm run kandidater) och committas i
+  // data/backtest/. Här läses de bara.
+  let backtest = { current: null, versions: [], candidates: null };
   try {
-    check = storedCheck();
+    const all = readSummaries();
+    backtest = {
+      current: all.find((b) => b.rulesVersion === rules.version) || null,
+      versions: all.map((b) => ({ rulesVersion: b.rulesVersion, ranAt: b.ranAt, first: b.first, last: b.last, leagues: b.leagues })),
+      candidates: readLog(),
+    };
   } catch (err) {
-    console.error('[build] kontrollen:', err);
+    console.error('[build] backtestet:', err);
   }
-  write('model.json', { rulesVersion: rules.version, model: forecast.model, error: forecast.error, check, ms: forecast.ms });
+  write('model.json', { rulesVersion: rules.version, model: forecast.model, error: forecast.error, backtest, ms: forecast.ms });
 
   const list = allMatches();
 

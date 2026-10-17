@@ -61,7 +61,10 @@ function fitAt(ctx, day) {
   let init = null;
   for (const [d, f] of ctx.fits) if (d < day && (!init || d > init.day)) init = f;
   const fit = M.fitPoisson(games, { init, tolerance: rules.model.tolerance, maxIterations: rules.model.maxIterations });
-  const { rho } = M.fitRho(games, fit);
+  // ρ skattas alltid på de faktiska målen (korrektionen gäller 0–0, 1–0,
+  // 0–1 och 1–1), även när anfall och försvar skattas på skott eller xG.
+  const real = games.some((g) => g.rg != null) ? games.map((g) => (g.rg != null ? { ...g, hg: g.rg, ag: g.ra } : g)) : games;
+  const { rho } = M.fitRho(real, fit);
   fit.rho = rho;
   fit.day = day;
   fit.games = games;
@@ -74,15 +77,54 @@ function fitAt(ctx, day) {
 
 function modelGames(ctx, day) {
   const out = [];
-  const half = rules.model.halfLifeDays;
+  const m = rules.model;
+  const half = m.halfLifeDays;
+  const perDivision = m.homeAdvantage === 'perDivision';
+  const inWindow = (g) => g.season >= ctx.minSeason || g.lower;
+  // Kandidat (skott på mål): andelen mål per skott på mål i fönstret före dagen.
+  let conv = null;
+  if (m.shotsBlend > 0) {
+    let goals = 0;
+    let shots = 0;
+    for (const g of ctx.games) {
+      if (g.day >= day) break;
+      if (g.sot && inWindow(g)) { goals += g.hg + g.ag; shots += g.sot[0] + g.sot[1]; }
+    }
+    conv = shots > 0 ? goals / shots : null;
+  }
   for (const g of ctx.games) {
     if (g.day >= day) break;
-    if (!rules.model.includeCups && (g.comp === 'fac' || g.comp === 'lc')) continue;
-    if (g.season < ctx.minSeason && !g.lower) continue;
-    const w = g.lower && !rules.lowerTier.decay ? 1 : Math.pow(0.5, (day - g.day) / half);
-    out.push({ h: g.h, a: g.a, hg: g.hg, ag: g.ag, neutral: g.neutral, w, day: g.day });
+    const cup = g.comp === 'fac' || g.comp === 'lc';
+    if (!m.includeCups && cup) continue;
+    if (!inWindow(g)) continue;
+    let w = g.lower && !rules.lowerTier.decay ? 1 : Math.pow(0.5, (day - g.day) / half);
+    if (cup && m.cupWeight !== 1) w *= m.cupWeight;
+    const x = { h: g.h, a: g.a, hg: g.hg, ag: g.ag, neutral: g.neutral, w, day: g.day };
+    if (perDivision) x.hgroup = homeGroup(g.comp);
+    // Kandidater: anfall och försvar skattas på en blandning av mål och xG
+    // eller skott på mål omräknade till mål (rg/ra = de faktiska målen).
+    if (m.xgBlend > 0 && g.xg) blend(x, g.xg, 1, m.xgBlend);
+    else if (conv && g.sot) blend(x, g.sot, conv, m.shotsBlend);
+    out.push(x);
   }
   return out;
+}
+
+function blend(x, v, scale, share) {
+  x.rg = x.hg;
+  x.ra = x.ag;
+  x.hg = (1 - share) * x.hg + share * scale * v[0];
+  x.ag = (1 - share) * x.ag + share * scale * v[1];
+}
+
+// Hemmafördelens grupp för en tävling (bara med homeAdvantage 'perDivision').
+function homeGroup(comp) {
+  if (rules.model.homeAdvantage !== 'perDivision') return undefined;
+  return comp === 'fac' || comp === 'lc' ? 'cup' : comp;
+}
+
+function homeFactor(fit, group) {
+  return fit.Hg && group != null && fit.Hg.has(group) ? fit.Hg.get(group) : fit.H;
 }
 
 // Genomsnittligt anfall/försvar (log-skala) per nivå bland lagen som spelar
@@ -161,6 +203,11 @@ function label(code) {
 
 // ---------- baslinje (b): Poisson på säsongens mål ----------
 
+// Under så här få förväntade mål i en match har lagens skala glidit iväg. I
+// backtestet (fyra säsonger, dag för dag) låg vanliga skattningar över 0,01
+// och de som gled iväg mellan 1e-20 och 0,001.
+const MIN_SEASON_GOALS = 0.001;
+
 function seasonFitAt(ctx, day) {
   if (ctx.seasonFits.has(day)) return ctx.seasonFits.get(day);
   const games = [];
@@ -176,7 +223,17 @@ function seasonFitAt(ctx, day) {
   for (const [d, f] of ctx.seasonFits) if (d < day && f.fit && (!prev || d > prev.day)) prev = f;
   const init = prev ? prev.fit : null;
   const fit = games.length ? M.fitPoisson(games, { init, tolerance: rules.model.tolerance, maxIterations: rules.model.maxIterations }) : null;
-  const res = { fit, count, find: M.components(games), day };
+  // Tidigt på säsongen kan skattningen sakna ändligt maximum för några lag
+  // (t.ex. när de inte gjort mål mot varandra): deras skala glider iväg och
+  // de skattade målen i deras matcher går mot noll. Sådana lag markeras.
+  const unstable = new Set();
+  if (fit) {
+    for (const x of games) {
+      if (fit.teams.get(x.h).degenerate || fit.teams.get(x.a).degenerate) continue;
+      if (Math.min(...M.expectedGoals(fit, x.h, x.a, x.neutral)) < MIN_SEASON_GOALS) { unstable.add(x.h); unstable.add(x.a); }
+    }
+  }
+  const res = { fit, count, find: M.components(games), unstable, day };
   ctx.seasonFits.set(day, res);
   return res;
 }
@@ -191,8 +248,16 @@ function seasonBaseline(ctx, day, hk, ak, neutral) {
   if (nh < min || na < min) return { p: null, reason: `kräver minst ${min} matcher i år per lag (${nh} resp. ${na})` };
   if (s.fit.teams.get(hk).degenerate || s.fit.teams.get(ak).degenerate) return { p: null, reason: 'ett av lagen har inte gjort eller släppt in mål i år' };
   if (s.find(hk) !== s.find(ak)) return { p: null, reason: 'lagen har inga gemensamma motståndare i år än' };
+  // Skattningen saknar ändligt maximum för ett av lagen (se seasonFitAt) –
+  // hittat i backtestet (fas 4): augusti–september 2022 gav (b) 100 %
+  // oavgjort i elva matcher och ogiltiga sannolikheter i tolv. Då är (b)
+  // okänd, den gissas inte.
+  const unstable = { p: null, reason: 'årets matcher räcker inte för en ändlig skattning än' };
+  if (s.unstable.has(hk) || s.unstable.has(ak)) return unstable;
   const [lh, la] = M.expectedGoals(s.fit, hk, ak, neutral);
-  const out = M.outcomes(M.scoreMatrix(lh, la, 0, rules.model.maxGoals));
+  const ok = (x) => x >= MIN_SEASON_GOALS && x <= rules.model.maxGoals;
+  const out = ok(lh) && ok(la) ? M.outcomes(M.scoreMatrix(lh, la, 0, rules.model.maxGoals)) : null;
+  if (!out || !out.x12.every(Number.isFinite)) return unstable;
   return { p: out.x12, goals: [lh, la], matches: [nh, na] };
 }
 
@@ -279,7 +344,7 @@ function predict(ctx, spec, specsById) {
     return out;
   }
 
-  const [lh, la] = M.expectedGoals(fit, spec.hk, spec.ak, spec.neutral);
+  const [lh, la] = M.expectedGoals(fit, spec.hk, spec.ak, spec.neutral, homeGroup(spec.comp));
   const m = M.scoreMatrix(lh, la, fit.rho, rules.model.maxGoals);
   const o = M.outcomes(m);
   out.p = o.x12;
@@ -353,7 +418,7 @@ function steps(ctx, fit, spec) {
   const divName = th === 6 ? 'lag under National League' : `lag i ${TIER_NAME[th]}`;
   push(`Två genomsnittliga ${divName}, neutral plan`);
   if (!spec.neutral) {
-    lh *= fit.H;
+    lh *= homeFactor(fit, homeGroup(spec.comp));
     push('Hemmaplan', `${spec.home} spelar hemma`);
   }
   if (th !== ta) {
@@ -381,7 +446,8 @@ function relative(x) {
 function advance(ctx, fit, spec, m, specsById) {
   const rule = cupRule(spec.comp, spec.round);
   if (!rule) return null;
-  const [lh, la] = M.expectedGoals(fit, spec.hk, spec.ak, spec.neutral);
+  const grp = homeGroup(spec.comp);
+  const [lh, la] = M.expectedGoals(fit, spec.hk, spec.ak, spec.neutral, grp);
   if (!rule.twoLeg) {
     const q = afterDraw(rule, lh, la);
     const [p1, px] = M.outcomes(m).x12;
@@ -394,7 +460,7 @@ function advance(ctx, fit, spec, m, specsById) {
   const first = spec.legs.leg === 1 ? spec : other;
   const X = first.hk;
   const Y = first.ak;
-  const [ly, lx] = M.expectedGoals(fit, Y, X, false); // returen: Y hemma
+  const [ly, lx] = M.expectedGoals(fit, Y, X, false, grp); // returen: Y hemma
   const q = 1 - afterDraw(rule, ly, lx); // X vinner efter oavgjort sammanlagt
   const d2 = diffDist(M.scoreMatrix(ly, lx, fit.rho, rules.model.maxGoals)); // Y − X i returen
   const G = (d2.length - 1) / 2;
@@ -438,7 +504,7 @@ function intervals(ctx, day, specs) {
     const fit = M.fitPoisson(games, { init: base, tolerance: 1e-6, maxIterations: rules.model.maxIterations });
     specs.forEach((sp, i) => {
       if (!fit.A.has(sp.hk) || !fit.A.has(sp.ak)) return;
-      const [lh, la] = M.expectedGoals(fit, sp.hk, sp.ak, sp.neutral);
+      const [lh, la] = M.expectedGoals(fit, sp.hk, sp.ak, sp.neutral, homeGroup(sp.comp));
       const x = M.outcomes(M.scoreMatrix(lh, la, base.rho, rules.model.maxGoals)).x12;
       for (let k = 0; k < 3; k++) draws[i][k].push(x[k]);
     });
@@ -570,4 +636,4 @@ function x12Rounded(lh, la, rho) {
 function round4(x) { return x == null ? null : Math.round(x * 10000) / 10000; }
 function round2(x) { return x == null ? null : Math.round(x * 100) / 100; }
 
-module.exports = { forecastAll, context, predict, fitAt, intervals, marketFrom, fdTriple, fdTotal, cupRule, dayNum, isoOf, LOWER };
+module.exports = { forecastAll, context, predict, fitAt, intervals, currentSpecs, marketFrom, fdTriple, fdTotal, cupRule, dayNum, isoOf, LOWER };

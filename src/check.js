@@ -7,19 +7,16 @@
 // (EFL-cupens tidigare säsonger hämtas inte).
 //
 // Det här är ingen utvärdering av modellen i statistisk mening: regelvalen
-// gjordes med vetskap om att 2025/26 skulle användas här. Den riktiga
-// walk-forward-utvärderingen över många säsonger kommer i fas 4.
+// gjordes med vetskap om att 2025/26 skulle användas här. Walk-forward-
+// backtestet över alla säsonger (fas 4, src/backtest.js) har ersatt den
+// under fliken Modell; kontrollen finns kvar som snabb sanity-kontroll.
 //
 //   npm run check        kör och skriver ut tabellen
-//
-// Bygget (src/build.js) kör samma kontroll när regelversionen eller
-// historiken ändrats och visar resultatet under fliken Modell.
 
 const rules = require('../config/forecast-rules');
 const { HISTORY, fdSeasonCode, competition } = require('../config/competitions');
 const F = require('./forecast');
 const M = require('./model');
-const { readCache, writeCache } = require('./store');
 
 const TARGET = fdSeasonCode(HISTORY.fdcouk.last);
 const BOOTSTRAP = 2000;
@@ -138,17 +135,6 @@ function runCheck() {
   return result;
 }
 
-// Bygget: kör om när regelversionen eller historiken ändrats.
-function storedCheck() {
-  const sig = [rules.version, ...['fdcouk_hist_E0', 'fdcouk_hist_E1', 'fdcouk_hist_E2', 'fdcouk_hist_E3', 'fdcouk_hist_EC', 'espn_hist_fac']
-    .map((id) => { const c = readCache(id); return c ? c.fetchedAt : null; })].join('|');
-  const cached = readCache('check');
-  if (cached && cached.data && cached.data.sig === sig) return cached.data.result;
-  const result = runCheck();
-  writeCache('check', { fetchedAt: result.ranAt, data: { sig, result } });
-  return result;
-}
-
 if (require.main === module) {
   const r = runCheck();
   const f = (x) => x.toFixed(4).replace('.', ',');
@@ -172,4 +158,4 @@ if (require.main === module) {
 
 // Poängen och jämförelsen återanvänds av utvärderingen mot journalen
 // (src/evaluate.js) – samma mått på båda ställena.
-module.exports = { runCheck, storedCheck, compare, outcome, logLoss, brier };
+module.exports = { runCheck, compare, outcome, logLoss, brier };

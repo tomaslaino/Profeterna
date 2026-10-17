@@ -13,11 +13,14 @@
 
 // ---------- skattning ----------
 
-// games: [{ h, a, hg, ag, neutral, w }] med lagnycklar h/a och vikt w > 0.
+// games: [{ h, a, hg, ag, neutral, w, hgroup? }] med lagnycklar h/a och vikt
+// w > 0. hgroup (valfritt) ger en egen hemmafördel per grupp, t.ex. per
+// division – utan hgroup är hemmafördelen gemensam.
 // init: tidigare skattning att starta från (snabbar upp skattning dag för dag).
-// Ger { A, B, H, teams } där teams per lag har viktat antal matcher,
+// Ger { A, B, H, Hg, teams } där teams per lag har viktat antal matcher,
 // antal matcher och om skattningen är degenererad (inga gjorda eller
-// insläppta mål – maximum likelihood saknas då).
+// insläppta mål – maximum likelihood saknas då). Hg = Map(grupp → H) när
+// grupper finns, annars null.
 function fitPoisson(games, { init = null, tolerance = 1e-7, maxIterations = 2000 } = {}) {
   const idx = new Map();
   const keys = [];
@@ -31,32 +34,47 @@ function fitPoisson(games, { init = null, tolerance = 1e-7, maxIterations = 2000
   const ga = new Int32Array(n);
   for (let g = 0; g < n; g++) { gh[g] = id(games[g].h); ga[g] = id(games[g].a); }
   const T = keys.length;
+  // Hemmafördelens grupper (utan hgroup: en gemensam, grupp 0).
+  const gidx = new Map();
+  const gkeys = [];
+  const gi = new Int32Array(n);
+  let grouped = false;
+  for (let g = 0; g < n; g++) {
+    const k = games[g].hgroup;
+    if (k == null) continue;
+    grouped = true;
+    let i = gidx.get(k);
+    if (i === undefined) { i = gkeys.length; gidx.set(k, i); gkeys.push(k); }
+    gi[g] = i;
+  }
+  const G = Math.max(1, gkeys.length);
   const forW = new Float64Array(T); // viktade gjorda mål
   const agW = new Float64Array(T); // viktade insläppta mål
   const wSum = new Float64Array(T);
   const count = new Int32Array(T);
-  let homeGoals = 0;
+  const homeGoals = new Float64Array(G);
   for (let g = 0; g < n; g++) {
     const x = games[g];
     forW[gh[g]] += x.w * x.hg; agW[gh[g]] += x.w * x.ag;
     forW[ga[g]] += x.w * x.ag; agW[ga[g]] += x.w * x.hg;
     wSum[gh[g]] += x.w; wSum[ga[g]] += x.w;
     count[gh[g]]++; count[ga[g]]++;
-    if (!x.neutral) homeGoals += x.w * x.hg;
+    if (!x.neutral) homeGoals[gi[g]] += x.w * x.hg;
   }
   const A = new Float64Array(T).fill(1);
   const B = new Float64Array(T).fill(1);
-  let H = 1.3;
+  const H = new Float64Array(G).fill(1.3);
   if (init) {
     for (let t = 0; t < T; t++) {
       if (init.A.has(keys[t])) { A[t] = init.A.get(keys[t]); B[t] = init.B.get(keys[t]); }
     }
-    H = init.H;
+    for (let k = 0; k < G; k++) H[k] = grouped && init.Hg && init.Hg.has(gkeys[k]) ? init.Hg.get(gkeys[k]) : init.H;
   }
   const degenerate = new Uint8Array(T);
   for (let t = 0; t < T; t++) if (forW[t] <= 0 || agW[t] <= 0) degenerate[t] = 1;
 
   const den = new Float64Array(T);
+  const exp = new Float64Array(G);
   let iterations = 0;
   for (; iterations < maxIterations; iterations++) {
     let maxChange = 0;
@@ -64,7 +82,7 @@ function fitPoisson(games, { init = null, tolerance = 1e-7, maxIterations = 2000
     den.fill(0);
     for (let g = 0; g < n; g++) {
       const x = games[g];
-      const hf = x.neutral ? 1 : H;
+      const hf = x.neutral ? 1 : H[gi[g]];
       den[gh[g]] += x.w * B[ga[g]] * hf;
       den[ga[g]] += x.w * B[gh[g]];
     }
@@ -77,7 +95,7 @@ function fitPoisson(games, { init = null, tolerance = 1e-7, maxIterations = 2000
     den.fill(0);
     for (let g = 0; g < n; g++) {
       const x = games[g];
-      const hf = x.neutral ? 1 : H;
+      const hf = x.neutral ? 1 : H[gi[g]];
       den[ga[g]] += x.w * A[gh[g]] * hf;
       den[gh[g]] += x.w * A[ga[g]];
     }
@@ -87,13 +105,16 @@ function fitPoisson(games, { init = null, tolerance = 1e-7, maxIterations = 2000
       B[t] = v;
     }
     // Hemmafördel: viktade hemmamål / förväntade hemmamål utan hemmafördel
-    let exp = 0;
+    // (per grupp)
+    exp.fill(0);
     for (let g = 0; g < n; g++) {
-      if (!games[g].neutral) exp += games[g].w * A[gh[g]] * B[ga[g]];
+      if (!games[g].neutral) exp[gi[g]] += games[g].w * A[gh[g]] * B[ga[g]];
     }
-    const Hn = exp > 0 ? homeGoals / exp : H;
-    maxChange = Math.max(maxChange, Math.abs(Math.log(Hn / H)));
-    H = Hn;
+    for (let k = 0; k < G; k++) {
+      const Hn = exp[k] > 0 ? homeGoals[k] / exp[k] : H[k];
+      maxChange = Math.max(maxChange, Math.abs(Math.log(Hn / H[k])));
+      H[k] = Hn;
+    }
     // Skala: geometriskt medel av anfallen = 1 (påverkar inga förväntade mål).
     let s = 0;
     let m = 0;
@@ -112,7 +133,16 @@ function fitPoisson(games, { init = null, tolerance = 1e-7, maxIterations = 2000
     const bad = degenerate[t] || !(A[t] > 0 && B[t] > 0 && Number.isFinite(A[t]) && Number.isFinite(B[t]));
     teams.set(keys[t], { weight: wSum[t], matches: count[t], degenerate: bad });
   }
-  return { A: outA, B: outB, H, teams, iterations, converged: iterations < maxIterations };
+  // Med grupper: H per grupp, och som sammanfattning kvoten av alla
+  // hemmamål mot förväntade hemmamål utan hemmafördel.
+  let Hall = H[0];
+  let Hg = null;
+  if (grouped) {
+    Hg = new Map(gkeys.map((k, i) => [k, H[i]]));
+    const e = exp.reduce((s, x) => s + x, 0);
+    Hall = e > 0 ? homeGoals.reduce((s, x) => s + x, 0) / e : H[0];
+  }
+  return { A: outA, B: outB, H: Hall, Hg, teams, iterations, converged: iterations < maxIterations };
 }
 
 // Relativ förändring mellan iterationer. Parametrar som är 0 (lag utan
@@ -130,7 +160,7 @@ function fitRho(games, fit) {
   let hi = 1;
   const low = [];
   for (const x of games) {
-    const [lh, la] = expectedGoals(fit, x.h, x.a, x.neutral);
+    const [lh, la] = expectedGoals(fit, x.h, x.a, x.neutral, x.hgroup);
     lo = Math.max(lo, -1 / lh, -1 / la);
     hi = Math.min(hi, 1 / (lh * la));
     if (x.hg <= 1 && x.ag <= 1) low.push([x.hg, x.ag, lh, la, x.w]);
@@ -164,8 +194,10 @@ function tau(x, y, lh, la, rho) {
   return 1;
 }
 
-function expectedGoals(fit, h, a, neutral) {
-  const hf = neutral ? 1 : fit.H;
+// group: hemmafördelens grupp (se fitPoisson); utan grupp eller okänd grupp
+// gäller den gemensamma.
+function expectedGoals(fit, h, a, neutral, group) {
+  const hf = neutral ? 1 : fit.Hg && group != null && fit.Hg.has(group) ? fit.Hg.get(group) : fit.H;
   return [fit.A.get(h) * fit.B.get(a) * hf, fit.A.get(a) * fit.B.get(h)];
 }
 

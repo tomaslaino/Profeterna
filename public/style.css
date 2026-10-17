@@ -487,6 +487,31 @@ svg.cal .pt { fill: var(--accent); }
 svg.cal .tick { fill: var(--muted); font-size: 10px; }
 svg.cal .axis { fill: var(--muted); font-size: 11px; font-weight: 600; }
 
+/* backtest och kandidatjakt (fas 4) */
+:root { --c-b: #2a52a0; --c-c: #b5562b; }
+@media (prefers-color-scheme: dark) { :root { --c-b: #5f88d4; --c-c: #cc7a47; } }
+h4.sub-h { margin: 1.2rem 0 0.5rem; font-size: 0.86rem; }
+.chart-card { padding: 0.8rem 0.9rem 0.4rem; }
+.chart-legend { display: flex; flex-wrap: wrap; gap: 0.3rem 1.1rem; font-size: 0.78rem; margin-bottom: 0.3rem; }
+.chart-legend .key { display: inline-block; width: 8px; height: 8px; border-radius: 50%; margin-right: 0.4rem; vertical-align: 0; }
+.key.s-b, svg.bt .pt.s-b { background: var(--c-b); fill: var(--c-b); }
+.key.s-c, svg.bt .pt.s-c { background: var(--c-c); fill: var(--c-c); }
+svg.bt { display: block; overflow: visible; }
+svg.bt .grid { stroke: var(--hair); stroke-width: 1; }
+svg.bt .zero { stroke: var(--border); stroke-width: 1.5; }
+svg.bt .tick { fill: var(--muted); font-size: 10px; font-variant-numeric: tabular-nums; }
+svg.bt .ci { stroke-width: 2; stroke-linecap: round; opacity: 0.45; }
+svg.bt .ci.s-b { stroke: var(--c-b); }
+svg.bt .ci.s-c { stroke: var(--c-c); }
+svg.bt .pt { stroke: var(--card); stroke-width: 2; }
+svg.bt .hit { fill: transparent; }
+svg.bt .hit:hover { fill: var(--hair); fill-opacity: 0.5; }
+details.as-table { margin: 0.4rem 0 0.6rem; font-size: 0.84rem; }
+details.as-table summary { cursor: pointer; color: var(--accent-deep); margin-bottom: 0.5rem; }
+.badge { display: inline-block; font-size: 0.74rem; font-weight: 650; padding: 0.05rem 0.5rem; border-radius: 999px; background: var(--hair); color: var(--muted); }
+.badge.ok { background: var(--up-soft); color: var(--fresh); }
+.badge.no { background: var(--down-soft); color: var(--down); }
+
 dl.facts { display: grid; grid-template-columns: max-content 1fr; gap: 0.45rem 1.2rem; margin: 0; }
 dl.facts dt { font-weight: 650; color: var(--muted); font-size: 0.8rem; }
 dl.facts dd { margin: 0; }
