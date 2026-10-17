@@ -1,0 +1,78 @@
+name: Hämta data och publicera
+
+# Bygger den statiska sajten (src/build.js) och publicerar den på GitHub Pages
+# (profeterna.se). Samma upplägg som gravergrav.se, med en skillnad: den
+# genererade datan committas inte till repot – den laddas upp som
+# Pages-artefakt. Annars skulle varje körning lägga nya versioner av
+# matchfilerna i git-historiken. Källcachen (data/cache/) sparas mellan
+# körningarna med actions/cache, så att en död källa visas med sin senaste
+# lyckade data och sitt datum i stället för att försvinna.
+#
+# Schemat: var 30:e minut (minut 7 och 37, utanför den rusning som brukar vara
+# vid hel timme). GitHub kan fördröja schemalagda körningar; sidan visar när
+# den senast byggdes och varnar om det dröjt ovanligt länge.
+
+on:
+  schedule:
+    - cron: "7,37 * * * *"
+  push:
+    branches: [main]
+  workflow_dispatch: {}
+
+concurrency:
+  group: pages
+  cancel-in-progress: false
+
+permissions:
+  contents: read
+  pages: write
+  id-token: write
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checka ut repo
+        uses: actions/checkout@v4
+
+      - name: Sätt upp Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: "20"
+          cache: "npm"
+
+      - name: Installera beroenden
+        run: npm ci --no-audit --no-fund
+
+      - name: Återställ källcachen
+        uses: actions/cache/restore@v4
+        with:
+          path: data/cache
+          key: kallcache-${{ github.run_id }}
+          restore-keys: kallcache-
+
+      - name: Hämta källor och bygg sajten
+        run: npm run build
+
+      - name: Spara källcachen
+        if: always()
+        uses: actions/cache/save@v4
+        with:
+          path: data/cache
+          key: kallcache-${{ github.run_id }}
+
+      - name: Ladda upp sajten
+        uses: actions/upload-pages-artifact@v3
+        with:
+          path: _site
+
+  deploy:
+    needs: build
+    runs-on: ubuntu-latest
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    steps:
+      - name: Publicera på GitHub Pages
+        id: deployment
+        uses: actions/deploy-pages@v4

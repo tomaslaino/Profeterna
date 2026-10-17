@@ -1,0 +1,14 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64" role="img" aria-label="Profeterna">
+  <defs>
+    <linearGradient id="badge" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0" stop-color="#3a64b0"/>
+      <stop offset="1" stop-color="#1d3b74"/>
+    </linearGradient>
+  </defs>
+  <rect x="2" y="2" width="60" height="60" rx="17" fill="url(#badge)"/>
+  <!-- tre staplar: sannolikhet för 1, X och 2 -->
+  <rect x="13" y="20" width="10" height="24" rx="2.5" fill="#f4f7fd"/>
+  <rect x="27" y="31" width="10" height="13" rx="2.5" fill="#f4f7fd" fill-opacity="0.75"/>
+  <rect x="41" y="25" width="10" height="19" rx="2.5" fill="#f4f7fd"/>
+  <path d="M12 50h40" stroke="#f4f7fd" stroke-width="2.5" stroke-linecap="round" stroke-opacity="0.6"/>
+</svg>

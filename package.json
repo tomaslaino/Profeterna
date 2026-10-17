@@ -1,0 +1,17 @@
+{
+  "name": "profeterna",
+  "version": "0.1.0",
+  "description": "Matchprognoser för engelsk fotboll som utvärderar sig själva mot facit",
+  "private": true,
+  "scripts": {
+    "start": "node server.js",
+    "build": "node src/build.js",
+    "refresh": "node src/build.js --force"
+  },
+  "engines": {
+    "node": ">=18"
+  },
+  "dependencies": {
+    "express": "^4.19.0"
+  }
+}

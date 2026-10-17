@@ -1,0 +1,89 @@
+<!DOCTYPE html>
+<html lang="sv">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Profeterna – matchprognoser för engelsk fotboll</title>
+  <meta name="theme-color" media="(prefers-color-scheme: light)" content="#f7f8fb">
+  <meta name="theme-color" media="(prefers-color-scheme: dark)" content="#11141a">
+  <link rel="icon" type="image/svg+xml" href="logo.svg">
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <header>
+    <div class="masthead">
+      <div class="brand">
+        <img class="logo" src="logo.svg" alt="" width="44" height="44">
+        <div class="brand-text">
+          <h1 id="brand-name">Profeterna</h1>
+          <p class="tagline">Matchprognoser för engelsk fotboll – rättade mot facit.</p>
+        </div>
+      </div>
+      <div id="topline" class="topline">Laddar …</div>
+    </div>
+  </header>
+
+  <nav class="tabs" role="tablist" aria-label="Sektioner">
+    <button type="button" role="tab" id="tab-matches" data-tab="matches-section"
+      aria-controls="matches-section" aria-selected="true">Matcher</button>
+    <button type="button" role="tab" id="tab-eval" data-tab="eval-section"
+      aria-controls="eval-section" aria-selected="false">Utvärdering</button>
+    <button type="button" role="tab" id="tab-sources" data-tab="sources-section"
+      aria-controls="sources-section" aria-selected="false">Källor</button>
+    <button type="button" role="tab" id="tab-model" data-tab="model-section"
+      aria-controls="model-section" aria-selected="false">Modell</button>
+  </nav>
+
+  <main>
+    <section id="matches-section" role="tabpanel" aria-labelledby="tab-matches">
+      <div id="match-list-view">
+        <div class="toolbar">
+          <div class="seg" role="group" aria-label="Visa">
+            <button type="button" data-view="upcoming" aria-pressed="true">Kommande</button>
+            <button type="button" data-view="played" aria-pressed="false">Spelade</button>
+          </div>
+          <div id="comp-chips" class="chips" role="group" aria-label="Tävling"></div>
+        </div>
+        <p class="legend" id="list-legend"></p>
+        <div id="match-list"></div>
+      </div>
+      <div id="match-detail-view" hidden></div>
+    </section>
+
+    <section id="eval-section" role="tabpanel" aria-labelledby="tab-eval" hidden>
+      <p class="intro">
+        Här rättas modellen: varje prognos loggas innan avspark och jämförs med facit och
+        med tre baslinjer. <span class="phase-tag">Byggs i fas 3</span>
+      </p>
+    </section>
+
+    <section id="sources-section" role="tabpanel" aria-labelledby="tab-sources" hidden>
+      <p class="intro" id="sources-summary"></p>
+      <p class="legend">
+        <span class="dot s-färsk"></span> färsk
+        <span class="dot s-gammal"></span> gammal
+        <span class="dot s-fel"></span> fel – senaste lyckade data visas
+        <span class="dot s-okänt"></span> okänt
+      </p>
+      <h3>Vad finns per tävling</h3>
+      <div id="coverage"></div>
+      <h3>Källorna</h3>
+      <div id="sources-table"></div>
+      <p class="legend" id="unmapped"></p>
+    </section>
+
+    <section id="model-section" role="tabpanel" aria-labelledby="tab-model" hidden>
+      <p class="intro">
+        Regelversioner och kandidatlogg – vilka faktorer som fått styra prognosen, och vilka
+        som testats och underkänts. <span class="phase-tag">Byggs i fas 2 och 4</span>
+      </p>
+    </section>
+  </main>
+
+  <footer>
+    <p>Endast fria datakällor. Siffrorna visar källa och datum; saknad data visas som <em>okänt</em>.</p>
+  </footer>
+
+  <script src="app.js"></script>
+</body>
+</html>
