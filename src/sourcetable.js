@@ -19,6 +19,7 @@ const KINDS = [
   { id: 'xg', label: 'xG' },
   { id: 'odds', label: 'Odds' },
   { id: 'squad', label: 'Skador och avstängningar' },
+  { id: 'history', label: 'Tidigare säsonger' },
 ];
 
 // Orsak när en cell saknar källa.
@@ -27,6 +28,7 @@ const GAPS = {
   stats: { cup: 'ligadata används' },
   xg: { cup: 'ligadata används' },
   squad: { default: 'ingen fri källa' },
+  history: { cup: 'hämtas inte' },
 };
 
 function sourceRows() {

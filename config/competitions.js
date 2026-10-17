@@ -26,8 +26,29 @@ const SEASON = {
   lastMonth: '2027-06',
 };
 
+// Tidigare säsonger – underlag för baslinjerna och grundmodellen (fas 2) och
+// för walk-forward-backtestet (fas 4). Avslutade säsonger ändras inte, så de
+// hämtas sällan (se src/sources.js).
+//
+// football-data.co.uk: E0–E3 finns från 2000/01, EC (National League) från
+// 2005/06 – 2000/01–2004/05 svarar 300 (verifierat 2026-10-17).
+// ESPN FA-cupen: från first round proper; behövs för lag under National
+// League, som saknar egen lagdata (historiskt utfall för samma nivå).
+// Rundornas namn varierar mellan säsongerna ("round-1", "1st-round",
+// "first-round") – därför används de inte i historiken.
+const HISTORY = {
+  fdcouk: { first: { E0: 2000, E1: 2000, E2: 2000, E3: 2000, EC: 2005 }, last: 2025 },
+  espnFaCup: { first: 2021, last: 2025, months: ['10', '11', '12', '01', '02', '03', '04', '05'] },
+};
+
+// Säsongskod hos football-data.co.uk: startår 2025 → "2526".
+function fdSeasonCode(startYear) {
+  const yy = (y) => String(y % 100).padStart(2, '0');
+  return `${yy(startYear)}${yy(startYear + 1)}`;
+}
+
 function competition(id) {
   return COMPETITIONS.find((c) => c.id === id) || (id === NATIONAL_LEAGUE.id ? NATIONAL_LEAGUE : null);
 }
 
-module.exports = { COMPETITIONS, NATIONAL_LEAGUE, SEASON, competition };
+module.exports = { COMPETITIONS, NATIONAL_LEAGUE, SEASON, HISTORY, fdSeasonCode, competition };

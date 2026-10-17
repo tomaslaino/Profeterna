@@ -6,7 +6,8 @@
   "scripts": {
     "start": "node server.js",
     "build": "node src/build.js",
-    "refresh": "node src/build.js --force"
+    "refresh": "node src/build.js --force",
+    "check": "node src/check.js"
   },
   "engines": {
     "node": ">=18"

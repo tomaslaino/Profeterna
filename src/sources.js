@@ -5,7 +5,7 @@
 // (staleAfterHours). Metadatan (leverantör, vad den ger, verifieringsdatum)
 // visas i källtabellen – samma uppgifter som README:ns källtabell.
 
-const { COMPETITIONS, NATIONAL_LEAGUE, SEASON } = require('../config/competitions');
+const { COMPETITIONS, NATIONAL_LEAGUE, SEASON, HISTORY, fdSeasonCode } = require('../config/competitions');
 const espn = require('./fetchers/espn');
 const fdcouk = require('./fetchers/fdcouk');
 const understat = require('./fetchers/understat');
@@ -101,6 +101,64 @@ for (const c of [...COMPETITIONS.filter((x) => x.fdcouk), NATIONAL_LEAGUE]) {
   });
 }
 
+// Tidigare säsonger (avslutade, ändras inte) – hämtas om en gång i månaden.
+// Fallerar hämtningen behålls senaste kompletta historik.
+for (const c of [...COMPETITIONS.filter((x) => x.fdcouk), NATIONAL_LEAGUE]) {
+  const { first, last } = HISTORY.fdcouk;
+  const codes = [];
+  for (let y = first[c.fdcouk]; y <= last; y++) codes.push(fdSeasonCode(y));
+  SOURCES.push({
+    id: `fdcouk_hist_${c.fdcouk}`,
+    provider: 'football-data.co.uk',
+    short: 'football-data',
+    label: `Tidigare säsonger ${seasonLabel(first[c.fdcouk])}–${seasonLabel(last)} – ${c.name}`,
+    comps: [c.id],
+    kinds: ['history'],
+    maxAgeHours: 24 * 30,
+    staleAfterHours: 24 * 60,
+    verified: VERIFIED,
+    fetch: () => fdcouk.fetchHistory(c.fdcouk, codes),
+    summarize: (d) => {
+      const n = Object.values(d.seasons).reduce((s, rows) => s + rows.length, 0);
+      const last = d.seasons[Object.keys(d.seasons).sort().pop()] || [];
+      return {
+        n,
+        detail: `${Object.keys(d.seasons).length} säsonger, ${n} matcher`,
+        latestData: last.map((r) => r.date).sort().pop() || null,
+      };
+    },
+  });
+}
+
+{
+  const { first, last, months } = HISTORY.espnFaCup;
+  const bySeason = {};
+  for (let y = first; y <= last; y++) {
+    bySeason[fdSeasonCode(y)] = months.map((m) => `${Number(m) >= 7 ? y : y + 1}${m}`);
+  }
+  SOURCES.push({
+    id: 'espn_hist_fac',
+    provider: 'ESPN',
+    short: 'ESPN',
+    label: `Tidigare säsonger ${seasonLabel(first)}–${seasonLabel(last)} – FA Cup`,
+    comps: ['fac'],
+    kinds: ['history'],
+    maxAgeHours: 24 * 30,
+    staleAfterHours: 24 * 60,
+    verified: VERIFIED,
+    fetch: () => espn.fetchHistory('eng.fa', bySeason),
+    summarize: (d) => {
+      const n = Object.values(d.seasons).reduce((s, ms) => s + ms.length, 0);
+      const last = d.seasons[Object.keys(d.seasons).sort().pop()] || [];
+      return {
+        n,
+        detail: `${Object.keys(d.seasons).length} säsonger, ${n} matcher från first round`,
+        latestData: last.length ? last[last.length - 1].kickoff.slice(0, 10) : null,
+      };
+    },
+  });
+}
+
 SOURCES.push({
   id: 'fdcouk_fixtures',
   provider: 'football-data.co.uk',
@@ -152,6 +210,11 @@ SOURCES.push({
     return { n: d.players.length, detail: `${d.players.length} spelare, ${out} skadade/tveksamma/avstängda` };
   },
 });
+
+// 2000 → "2000/01"
+function seasonLabel(y) {
+  return `${y}/${String((y + 1) % 100).padStart(2, '0')}`;
+}
 
 // Kommande matcher (alla tävlingar) inom `days` dagar ur spelprogramscachen.
 // null = inget spelprogram cachat än.

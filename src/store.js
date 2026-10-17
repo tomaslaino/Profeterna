@@ -17,7 +17,7 @@ function readCache(id) {
 
 function writeCache(id, entry) {
   fs.mkdirSync(CACHE_DIR, { recursive: true });
-  fs.writeFileSync(path.join(CACHE_DIR, id + '.json'), JSON.stringify(entry, null, 2));
+  fs.writeFileSync(path.join(CACHE_DIR, id + '.json'), JSON.stringify(entry));
 }
 
 function ageHours(iso) {

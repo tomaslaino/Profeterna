@@ -88,6 +88,21 @@ const ALIASES = {
   'Sutton': 'Sutton United',
   'Yeovil': 'Yeovil Town',
 
+  // football-data.co.uk, tidigare säsonger (2026-10-17): lag som spelat FA-cupen
+  // hos ESPN 2021/22–2025/26 som National League-lag. Utan raden räknas de
+  // som lag under National League den säsongen. Kontrollerat säsong för
+  // säsong mot EC-filerna; nya klubbar med gammalt namn (Hereford F.C.,
+  // Macclesfield FC, Scarborough Athletic) mappas avsiktligt inte.
+  'Boston': 'Boston United',
+  'Chester': 'Chester FC',
+  'Dag and Red': 'Dagenham & Redbridge',
+  'Dorking': 'Dorking Wanderers',
+  'Ebbsfleet': 'Ebbsfleet United',
+  "King's Lynn": 'Kings Lynn Town',
+  'Maidenhead': 'Maidenhead United',
+  'Maidstone': 'Maidstone United',
+  'Torquay': 'Torquay United',
+
   // FPL (det som inte redan täcks ovan)
   'Man Utd': 'Manchester United',
   'Spurs': 'Tottenham Hotspur',

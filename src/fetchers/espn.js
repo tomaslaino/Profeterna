@@ -38,6 +38,30 @@ async function fetchFixtures(slug, season) {
   return { matches, sourceUrl: `https://www.espn.com/soccer/schedule/_/league/${slug}` };
 }
 
+// Tidigare säsonger av en tävling: { startår: [månader YYYYMM] }. Bara
+// spelade matcher sparas.
+async function fetchHistory(slug, monthsBySeason) {
+  const jobs = [];
+  for (const [season, months] of Object.entries(monthsBySeason)) {
+    for (const m of months) jobs.push({ season, m });
+  }
+  const bySeason = {};
+  await mapLimit(jobs, 3, async ({ season, m }) => {
+    const j = await getJson(`${SITE}/${slug}/scoreboard?dates=${m}&limit=1000`);
+    const ms = (bySeason[season] = bySeason[season] || new Map());
+    for (const e of j.events || []) {
+      const p = parseEvent(e);
+      if (p.completed && p.score) ms.set(p.id, p);
+    }
+  });
+  const seasons = {};
+  for (const [season, ms] of Object.entries(bySeason)) {
+    seasons[season] = [...ms.values()].sort((a, b) => a.kickoff.localeCompare(b.kickoff));
+    if (!seasons[season].length) throw new Error(`${slug} ${season}: inga matcher`);
+  }
+  return { seasons, sourceUrl: `https://www.espn.com/soccer/schedule/_/league/${slug}` };
+}
+
 function parseEvent(e) {
   const c = e.competitions[0];
   const home = c.competitors.find((t) => t.homeAway === 'home') || c.competitors[0];
@@ -144,4 +168,4 @@ function decimal(american) {
   return Math.round(d * 1000) / 1000;
 }
 
-module.exports = { fetchFixtures, fetchStandings, fetchOdds, seasonMonths, decimal };
+module.exports = { fetchFixtures, fetchHistory, fetchStandings, fetchOdds, seasonMonths, decimal };

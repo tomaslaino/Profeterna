@@ -17,6 +17,10 @@
   --up-soft: #ebf3ea;
   --down-soft: #faedeb;
   --side-soft: #f6f1da;
+  /* prognosens tre utfall: hemma, oavgjort, borta */
+  --o-home: #2a52a0;
+  --o-draw: #c3c9d4;
+  --o-away: #b5562b;
   --shadow-card: 0 1px 2px rgba(20, 30, 60, 0.04), 0 10px 30px -18px rgba(20, 30, 60, 0.25);
   --serif: "Iowan Old Style", "Palatino Nova", Palatino, Georgia, serif;
 }
@@ -39,6 +43,9 @@
     --up-soft: #1d2a1e;
     --down-soft: #321d1a;
     --side-soft: #2b2712;
+    --o-home: #7ea3e6;
+    --o-draw: #4a5161;
+    --o-away: #e0956b;
     --shadow-card: 0 1px 2px rgba(0, 0, 0, 0.3), 0 10px 30px -18px rgba(0, 0, 0, 0.6);
   }
 }
@@ -364,6 +371,7 @@ th {
   letter-spacing: 0.07em;
   color: var(--muted);
 }
+.card h4 .hint { text-transform: none; letter-spacing: 0; font-weight: 400; }
 .card .src-line { color: var(--muted); font-size: 0.74rem; margin: 0.5rem 0 0; }
 .card.pending { color: var(--muted); }
 
@@ -408,5 +416,75 @@ ul.plain li { padding: 0.3rem 0; border-bottom: 1px solid var(--hair); }
 ul.plain li:last-child { border-bottom: none; }
 ul.bullets { margin: 0; padding-left: 1.1rem; color: var(--muted); }
 ul.bullets li { margin: 0.2rem 0; }
+
+/* ---------- prognos ---------- */
+
+.card.fc { margin-bottom: 1rem; }
+.fc-main {
+  display: grid;
+  grid-template-columns: 1fr 0.8fr 1fr;
+  gap: 0.75rem;
+  text-align: center;
+  margin: 0.2rem 0 0.6rem;
+}
+.fc-label { font-size: 0.8rem; color: var(--muted); font-weight: 600; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.fc-num { font-size: 1.9rem; font-weight: 750; font-variant-numeric: tabular-nums; line-height: 1.15; }
+.fc-col.draw .fc-num { font-size: 1.45rem; color: var(--muted); padding-top: 0.25rem; }
+.fc-range { font-size: 0.74rem; color: var(--muted); font-variant-numeric: tabular-nums; }
+.fc-bar { display: flex; height: 8px; border-radius: 999px; overflow: hidden; background: var(--hair); gap: 2px; }
+.fc-bar span { display: block; height: 100%; }
+.fc-bar .s0 { background: var(--o-home); }
+.fc-bar .s1 { background: var(--o-draw); }
+.fc-bar .s2 { background: var(--o-away); }
+.fc-stats { margin: 0.75rem 0 0; font-size: 0.84rem; }
+.fc-stats b, .fc-adv b { font-variant-numeric: tabular-nums; white-space: nowrap; }
+.fc-adv { margin: 0.45rem 0 0; font-size: 0.84rem; }
+.lower-tag {
+  font-size: 0.66rem;
+  font-weight: 700;
+  color: var(--stale);
+  background: var(--side-soft);
+  border-radius: 6px;
+  padding: 0.02rem 0.35rem;
+}
+.fc .note { color: var(--stale); }
+
+.fc-scores { margin-top: 0.6rem; font-size: 0.84rem; }
+.fc-scores summary { cursor: pointer; color: var(--accent-deep); }
+.sgrid-wrap { margin-top: 0.5rem; }
+table.sgrid { width: auto; border-collapse: separate; border-spacing: 3px; font-size: 0.78rem; }
+table.sgrid th { padding: 0 0.3rem; border: none; text-align: center; font-size: 0.7rem; }
+table.sgrid td {
+  min-width: 2.3rem;
+  padding: 0.3rem 0;
+  text-align: center;
+  border: none;
+  border-radius: 5px;
+  font-variant-numeric: tabular-nums;
+  background: color-mix(in srgb, var(--accent) calc(var(--a) * 0.55), var(--hair));
+}
+.sgrid-wrap .muted { font-size: 0.74rem; margin: 0.3rem 0; }
+
+table.cmp tr.model td { background: var(--accent-soft); }
+table.cmp tr.model td:first-child { border-radius: 8px 0 0 8px; }
+table.cmp tr.model td:last-child { border-radius: 0 8px 8px 0; }
+table.steps .pull { font-size: 0.76rem; font-weight: 650; }
+table.steps .pull.h { color: var(--o-home); }
+table.steps .pull.a { color: var(--o-away); }
+.mside b { color: var(--fg); }
+h3.underlag { margin-top: 1.6rem; }
+
+dl.facts { display: grid; grid-template-columns: max-content 1fr; gap: 0.45rem 1.2rem; margin: 0; }
+dl.facts dt { font-weight: 650; color: var(--muted); font-size: 0.8rem; }
+dl.facts dd { margin: 0; }
+
+@media (max-width: 640px) {
+  .fc-num { font-size: 1.5rem; }
+  .fc-col.draw .fc-num { font-size: 1.15rem; }
+  dl.facts { grid-template-columns: 1fr; gap: 0.1rem; }
+  table.steps .pull .t { display: none; }
+  table.odds td, table.odds th { padding-left: 0.3rem; padding-right: 0.3rem; }
+  dl.facts dd { margin-bottom: 0.5rem; }
+}
 
 footer { color: var(--muted); font-size: 0.78rem; padding-bottom: 2rem; }

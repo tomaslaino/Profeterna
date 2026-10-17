@@ -25,6 +25,10 @@ async function getText(url, headers) {
   return (await get(url, headers)).text();
 }
 
+async function getBytes(url, headers) {
+  return Buffer.from(await (await get(url, headers)).arrayBuffer());
+}
+
 // Kör uppgifter med begränsad samtidighet, i ordning. Fel i en uppgift
 // fäller hela körningen (anroparen avgör om delresultat duger).
 async function mapLimit(items, limit, fn) {
@@ -40,4 +44,4 @@ async function mapLimit(items, limit, fn) {
   return out;
 }
 
-module.exports = { getJson, getText, mapLimit };
+module.exports = { getJson, getText, getBytes, mapLimit };

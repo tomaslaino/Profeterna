@@ -34,8 +34,10 @@ function build() {
   const matches = [];
   const espnTeams = new Map(); // nyckel → { name, espnId }
   const teamLeague = new Map(); // nyckel → ligans comp-id
+  const fixturesFetchedAt = {};
   for (const c of COMPETITIONS) {
     const cache = readCache(`espn_fixtures_${c.id}`);
+    fixturesFetchedAt[c.id] = cache ? cache.fetchedAt : null;
     if (!cache || !cache.data) continue;
     for (const m of cache.data.matches) {
       matches.push({
@@ -126,6 +128,7 @@ function build() {
     byId: new Map(matches.map((m) => [m.id, m])),
     espnTeams,
     teamLeague,
+    fixturesFetchedAt,
     fd,
     fdFixtures,
     understat,
@@ -270,7 +273,7 @@ function matchDetail(id) {
     unknowns.push('Skador och avstängningar: fri källa finns bara för Premier League (FPL).');
   }
   if (!m.completed) unknowns.push('Startelvor: publiceras först strax före avspark.');
-  unknowns.push('Inbördes möten från tidigare säsonger: hämtas med historiken i fas 4.');
+  unknowns.push('Inbördes möten från tidigare säsonger: historiken finns, men visas först i fas 4.');
 
   return {
     match: {
@@ -315,7 +318,7 @@ function teamProfile(D, k, before) {
         const isHome = m.hk === k;
         return { date: m.kickoff.slice(0, 10), home: isHome, gf: isHome ? m.score.home : m.score.away, ga: isHome ? m.score.away : m.score.home };
       });
-    resultsSource = { provider: 'ESPN', fetchedAt: fetchedAtOf(`espn_fixtures_${leagueId}`) };
+    resultsSource = { provider: 'ESPN', fetchedAt: D.fixturesFetchedAt[leagueId] };
   }
   p.record = {
     all: record(results),
@@ -410,11 +413,6 @@ function record(rs) {
 
 function mean(xs) {
   return xs.length ? xs.reduce((s, x) => s + x, 0) / xs.length : null;
-}
-
-function fetchedAtOf(id) {
-  const c = readCache(id);
-  return c ? c.fetchedAt : null;
 }
 
 // Rader för "lagen sida vid sida". Värden formateras här (en plats), null =

@@ -44,6 +44,24 @@ function val(v) {
 function cap(s) {
   return s.charAt(0).toUpperCase() + s.slice(1);
 }
+function pct(x) {
+  return x == null ? null : Math.round(x * 100);
+}
+// Hela procent som summerar till 100 (största rest) – samma regel som bygget.
+function pct3(ps) {
+  const raw = ps.map((p) => p * 100);
+  const out = raw.map(Math.floor);
+  let left = 100 - out.reduce((a, b) => a + b, 0);
+  raw.map((x, i) => [x - Math.floor(x), i]).sort((a, b) => b[0] - a[0])
+    .forEach(([, i]) => { if (left > 0) { out[i]++; left--; } });
+  return out;
+}
+function dec(x, d = 1) {
+  return x == null ? '–' : x.toLocaleString('sv-SE', { minimumFractionDigits: d, maximumFractionDigits: d });
+}
+function monthYear(iso) {
+  return iso ? esc(fmt({ month: 'short', year: 'numeric' }).format(new Date(iso + 'T12:00:00Z'))) : '–';
+}
 
 // ---------- flikar och routning ----------
 
@@ -61,6 +79,7 @@ function showTab(sectionId) {
     document.getElementById(btn.dataset.tab).hidden = !on;
   }
   if (sectionId === 'sources-section') loadSources();
+  if (sectionId === 'model-section') loadModel();
 }
 
 function route() {
@@ -131,8 +150,8 @@ function renderMatchList() {
   const el = $('#match-list');
   const matches = selectMatches(state.view, state.comp, LIST_DAYS);
   $('#list-legend').innerHTML = state.view === 'played'
-    ? 'Resultat från ESPN. Klicka på en match för underlaget.'
-    : `Odds 1 · X · 2 från DraftKings via ESPN, hämtade ${when(state.all.oddsFetchedAt)}. Klicka på en match för underlaget.`;
+    ? 'Resultat från ESPN. Under resultatet modellens prognos 1 · X · 2 i procent, återskapad i efterhand med underlaget före matchdagen. Klicka på en match för underlaget.'
+    : 'Modellens sannolikhet i procent för hemmaseger · oavgjort · bortaseger efter 90 minuter. * = ett lag saknar egen lagdata. Klicka på en match för prognosen och underlaget.';
   el.innerHTML = renderList({ view: state.view, days: LIST_DAYS, matches });
   for (const r of el.querySelectorAll('.mrow')) {
     r.addEventListener('click', () => { location.hash = `match/${r.dataset.id}`; });
@@ -162,17 +181,22 @@ function compOf(id) {
   return state.comps.get(id) || { name: id, short: id };
 }
 
+// Kompakt prognos: 1 · X · 2 i hela procent, det troligaste utfallet i fetstil.
+function listForecast(f) {
+  if (!f) return '<span class="unknown">okänt</span>';
+  const max = Math.max(...f.p);
+  return f.p.map((x) => (x === max ? `<b>${x}</b>` : String(x))).join(' · ') + (f.lower ? ' *' : '');
+}
+
 function matchRow(m) {
   let side;
   if (m.completed && m.score) {
     side = `<span class="score">${m.score.home}–${m.score.away}</span>`;
     if (m.shootout) side += `<span class="sub">str. ${m.shootout.home}–${m.shootout.away}</span>`;
-  } else if (m.status === 'STATUS_POSTPONED') {
-    side = 'uppskjuten';
-  } else if (m.odds) {
-    side = m.odds.map(odds).join(' · ');
+    if (m.f) side += `<span class="sub">${m.f.p.join(' · ')}</span>`;
   } else {
-    side = '';
+    side = listForecast(m.f);
+    if (m.status === 'STATUS_POSTPONED') side += '<span class="sub">uppskjuten</span>';
   }
   return `<button type="button" class="mrow" data-id="${esc(m.id)}">` +
     `<span class="mtime">${esc(fTime.format(new Date(m.kickoff)))}</span>` +
@@ -227,13 +251,133 @@ function renderDetail(d) {
     `<div class="mhead-team away">${esc(m.away)}</div></div>` +
     (m.tierNote ? `<p class="note">${esc(m.tierNote)}</p>` : '') + '</div>';
 
-  html += `<div class="card pending" style="margin-bottom:1rem">Prognosen räknas fram i nästa fas – här visas underlaget den ska bygga på. <span class="phase-tag">Fas 2</span></div>`;
+  html += forecastCard(d);
+  if (d.prediction && d.prediction.status === 'ok') {
+    html += '<div class="grid2">' + compareCard(d) + stepsCard(d) + '</div>';
+  }
 
+  html += '<h3 class="underlag">Underlag <span class="hint">visas, men styr inte prognosen</span></h3>';
   html += '<div class="grid2">' + oddsCard(d.odds, m) + formCard(d) + '</div>';
   html += sideCard(d);
   html += '<div class="grid2">' + squadCard(d) + unknownCard(d) + '</div>';
-  html += '<p class="legend">Lagstatistiken bygger bara på matcher spelade före avspark. Tabell och trupp är aktuella ögonblicksbilder.</p>';
+  html += '<p class="legend">Prognosen bygger bara på mål efter 90 minuter. Spannet under varje sannolikhet visar osäkerheten i lagens styrka ' +
+    '(omskattning med slumpvikter). "Drar mot" visar hur många procentenheter varje steg lägger på ett lags segerchans. ' +
+    'Underlaget styr inte prognosen förrän det klarat testet i fas 4. <a href="#modell">Om modellen och baslinjerna</a></p>';
   return html;
+}
+
+// ---------- prognos ----------
+
+function forecastCard(d) {
+  const p = d.prediction;
+  const m = d.match;
+  if (!p) return '<div class="card fc"><h4>Prognos</h4><p class="unknown">okänt – prognosmotorn gav ingen prognos för matchen.</p></div>';
+  if (p.status !== 'ok') {
+    return `<div class="card fc"><h4>Prognos</h4><p class="unknown">okänt</p><ul class="bullets">` +
+      (p.reasons || []).map((r) => `<li>${esc(r)}</li>`).join('') + '</ul></div>';
+  }
+  const w = pct3(p.p);
+  const labels = [m.home, 'Oavgjort', m.away];
+  const cols = w.map((x, i) => {
+    const r = p.range && p.range[i];
+    return `<div class="fc-col${i === 1 ? ' draw' : ''}"><div class="fc-label">${esc(labels[i])}</div>` +
+      `<div class="fc-num">${x} %</div>` +
+      `<div class="fc-range">${r ? `${pct(r[0])}–${pct(r[1])}` : '&nbsp;'}</div></div>`;
+  }).join('');
+  const bar = `<div class="fc-bar" aria-hidden="true">${w.map((x, i) => `<span class="s${i}" style="width:${x}%"></span>`).join('')}</div>`;
+
+  const stats = [
+    `Förväntade mål <b>${dec(p.goals[0])}–${dec(p.goals[1])}</b>`,
+    `Över 2,5 mål <b>${pct(p.over25)} %</b>${p.baselines.market && p.baselines.market.over25 != null ? ` <span class="muted">(marknaden ${pct(p.baselines.market.over25)} %)</span>` : ''}`,
+    `Båda lagen gör mål <b>${pct(p.btts)} %</b>`,
+  ];
+  let adv = '';
+  if (p.advance) {
+    adv = p.advance.home == null
+      ? `<p class="fc-adv">Går vidare: <span class="unknown">okänt – ${esc(p.advance.reason || '')}</span></p>`
+      : `<p class="fc-adv">Går vidare: <b>${esc(m.home)} ${pct3([p.advance.home, p.advance.away])[0]} %</b> · <b>${esc(m.away)} ${pct3([p.advance.home, p.advance.away])[1]} %</b>` +
+        `<span class="sub">${esc(p.advance.rule)}${p.advance.firstLeg ? ` · första mötet ${esc(p.advance.firstLeg.home)} ${p.advance.firstLeg.score.home}–${p.advance.firstLeg.score.away} ${esc(p.advance.firstLeg.away)}` : ''}</span></p>`;
+  }
+  const notes = (p.notes || []).map((n) => `<p class="note">${esc(n)}</p>`).join('');
+  const basis = (t) => (t.basis === 'eget'
+    ? `${esc(t.name)} ${t.matches} matcher sedan ${monthYear(t.since)}, ${t.seasonMatches} i år`
+    : `${esc(t.name)} <span class="lower-tag">nivåsnitt</span> ${t.matches} FA-cupmatcher för lag under National League sedan ${monthYear(t.since)}`);
+  const head = m.completed
+    ? `Återskapad i efterhand med underlaget före matchdagen (t.o.m. ${dateOnly(p.fitThrough)})`
+    : `Skattad på matcher t.o.m. ${dateOnly(p.fitThrough)}`;
+  return `<div class="card fc"><h4>Prognos efter 90 minuter <span class="hint">${esc(head)}</span></h4>` +
+    `<div class="fc-main">${cols}</div>${bar}` +
+    `<p class="fc-stats">${stats.join(' · ')}</p>${adv}${scoreGrid(p, m)}${notes}` +
+    `<p class="src-line">Skattat på ${basis(p.teams.home)}; ${basis(p.teams.away)}. Regelversion ${esc(p.rulesVersion)}.</p></div>`;
+}
+
+function scoreGrid(p, m) {
+  const g = p.scores.grid;
+  const max = Math.max(...g.flat());
+  let rows = `<tr><th></th>${g[0].map((_, j) => `<th>${j}</th>`).join('')}</tr>`;
+  g.forEach((row, i) => {
+    rows += `<tr><th>${i}</th>${row.map((x) => {
+      const v = pct(x);
+      const a = Math.round((x / max) * 100);
+      return `<td style="--a:${a}%">${v >= 1 ? v : '<1'}</td>`;
+    }).join('')}</tr>`;
+  });
+  const top = p.scores.top.map((t) => `${t.home}–${t.away} ${pct(t.p)} %`).join(', ');
+  return `<details class="fc-scores"><summary>Resultat: troligast ${esc(top)}</summary>` +
+    `<div class="sgrid-wrap"><p class="muted">Procent. Rader: mål för ${esc(m.home)}, kolumner: mål för ${esc(m.away)}.</p><table class="sgrid">${rows}</table>` +
+    `<p class="muted">Övriga resultat (5 mål eller fler för ett lag): ${pct(p.scores.other)} %</p></div></details>`;
+}
+
+function compareCard(d) {
+  const p = d.prediction;
+  const b = p.baselines;
+  const rows = [];
+  const row = (label, sub, x, cls = '') => rows.push(`<tr class="${cls}"><td>${label}${sub ? `<span class="sub">${sub}</span>` : ''}</td>` +
+    (x ? pct3(x).map((v) => `<td class="num">${v}</td>`).join('') : '<td colspan="3" class="num unknown">okänt</td>') + '</tr>');
+  row('<strong>Modellen</strong>', null, p.p, 'model');
+  const mk = b.market;
+  row('(c) Marknaden', mk ? `${esc(mk.source)}, ${esc(mk.kind)}${mk.fetchedAt ? `, hämtat ${when(mk.fetchedAt)}` : ''}` : esc(marketMissing(d)), mk && mk.p);
+  if (b.closing) row('Betfair Exchange, stängning', 'tuffaste referensen', b.closing.p);
+  row('(b) Säsongens mål', b.season.p ? `Poisson på årets matcher (${b.season.matches[0]} resp. ${b.season.matches[1]})` : esc(b.season.reason), b.season.p);
+  row('(a) Naiv', b.naive.p ? `${esc(b.naive.scope)}, ${esc(b.naive.seasons[0])}–${esc(b.naive.seasons[1])}` : esc(b.naive.reason), b.naive.p);
+  let diff = '';
+  if (mk && mk.p) {
+    const a = pct3(p.p);
+    const c = pct3(mk.p);
+    const s = (x) => (x > 0 ? `+${x}` : x < 0 ? `−${-x}` : '±0');
+    diff = `<p class="src-line">Modellen minus marknaden: ${s(a[0] - c[0])} · ${s(a[1] - c[1])} · ${s(a[2] - c[2])} procentenheter.</p>`;
+  }
+  return `<div class="card"><h4>Mot baslinjerna</h4><table class="odds cmp"><thead><tr><th></th><th class="num">1</th><th class="num">X</th><th class="num">2</th></tr></thead>` +
+    `<tbody>${rows.join('')}</tbody></table>${diff}</div>`;
+}
+
+function marketMissing(d) {
+  if (d.match.type === 'cup') return d.odds.note || 'DraftKings har inga odds för matchen';
+  return d.match.completed ? 'inga öppningsodds sparade för matchen' : 'football-data.co.uk har inga odds för matchen ännu (läggs ut fre/tis)';
+}
+
+// Steg för steg: vad varje del av modellen gör med prognosen.
+function stepsCard(d) {
+  const st = d.prediction.steps;
+  if (!st) return '';
+  const m = d.match;
+  let prev = null;
+  const rows = st.map((x) => {
+    const w = pct3(x.p);
+    let pull = '';
+    if (prev) {
+      const d1 = x.p[0] - prev.p[0];
+      const d2 = x.p[2] - prev.p[2];
+      const [team, dv] = d1 >= d2 ? [m.home, d1] : [m.away, d2];
+      const v = Math.round(dv * 100);
+      pull = v >= 1 ? `<span class="pull ${d1 >= d2 ? 'h' : 'a'}" title="${esc(team)}"><span class="t">${esc(team)} </span>+${v}</span>` : '<span class="muted">–</span>';
+    }
+    prev = x;
+    return `<tr><td>${esc(x.label)}${x.sub ? `<span class="sub">${esc(x.sub)}</span>` : ''}</td>` +
+      w.map((v) => `<td class="num">${v}</td>`).join('') + `<td class="num">${pull}</td></tr>`;
+  }).join('');
+  return `<div class="card"><h4>Vad drog åt vilket håll</h4><table class="odds steps"><thead><tr><th></th><th class="num">1</th><th class="num">X</th><th class="num">2</th><th class="num">drar mot</th></tr></thead>` +
+    `<tbody>${rows}</tbody></table></div>`;
 }
 
 function oddsCard(o, m) {
@@ -380,7 +524,7 @@ function renderSources(d) {
       `<td><strong>${esc(s.provider)}</strong><span class="sub">${s.url ? `<a href="${esc(s.url)}" target="_blank" rel="noopener">${esc(s.label)}</a>` : esc(s.label)}</span></td>` +
       `<td class="num"><span class="dot s-${s.status}"></span>${esc(s.status)}` +
       `${s.lastError ? `<span class="err">${esc(s.lastError)} (${when(s.lastAttempt)})</span>` : ''}</td>` +
-      `<td class="num">${when(s.fetchedAt)}<span class="sub">var ${esc(String(s.cadenceHours).replace('.', ','))} h</span></td>` +
+      `<td class="num">${when(s.fetchedAt)}<span class="sub">var ${s.cadenceHours >= 48 ? `${Math.round(s.cadenceHours / 24)} d` : `${esc(String(s.cadenceHours).replace('.', ','))} h`}</span></td>` +
       `<td class="num">${s.latestData ? dateOnly(s.latestData) : '–'}</td>` +
       `<td>${val(s.detail)}<span class="sub">verifierad ${dateOnly(s.verified)}</span></td></tr>`).join('') +
     '</tbody></table></div>';
@@ -411,6 +555,75 @@ function topline(d) {
     `<br><strong>${fresh} av ${n}</strong> källor färska` +
     (issues ? ` · <a href="#kallor">${esc(issues)}</a>` : '') +
     (late ? ' · <span class="err" style="display:inline">datan är gammal</span>' : '');
+}
+
+// ---------- modell ----------
+
+async function loadModel() {
+  const el = $('#model');
+  try {
+    el.innerHTML = renderModel(await getJSON('data/model.json'));
+  } catch (err) {
+    el.innerHTML = `<p class="empty">Kunde inte läsa modellen: ${esc(err.message)}</p>`;
+  }
+}
+
+function renderModel(d) {
+  const x = d.model;
+  let html = `<p class="intro">Regelversion <strong>${esc(d.rulesVersion)}</strong>. Prognosen bygger bara på mål efter 90 minuter. ` +
+    'En faktor får påverka den först när den bevisligen förbättrat prognoserna walk-forward – fram till dess visas den som underlag i matchvyn.</p>';
+  if (!x) return html + `<p class="unknown">okänt – ${d.error ? `prognosmotorn fallerade i senaste bygget: ${esc(d.error)}` : 'inget underlag i källcachen att skatta modellen på'}.</p>`;
+
+  const pctSigned = (v) => `${v >= 1 ? '+' : '−'}${Math.abs(Math.round((v - 1) * 100))} %`;
+  html += '<h3>Grundmodellen</h3><div class="card"><dl class="facts">' +
+    `<dt>Modell</dt><dd>Dixon–Coles: varje lag har en anfalls- och en försvarsstyrka, en gemensam hemmafördel och en korrektion för 0–0, 1–0, 0–1 och 1–1.</dd>` +
+    `<dt>Underlag</dt><dd>${x.matches.toLocaleString('sv-SE')} matcher t.o.m. ${dateOnly(x.fitThrough)}: Premier League–National League sedan ${esc(x.firstSeason)} och årets cupmatcher (football-data.co.uk, ESPN). Alla nivåer skattas i samma modell – de kopplas ihop av lag som flyttats upp eller ned och av cupmöten.</dd>` +
+    `<dt>Tidsvikt</dt><dd>Halveringstid ${x.halfLifeDays} dagar – äldre matcher väger mindre.</dd>` +
+    `<dt>Osäkerhet</dt><dd>Spannet i matchvyn är de mittersta ${pct(x.interval)} % när modellen skattas om ${x.samples} gånger med slumpvikter på matcherna (Bayesiansk bootstrap) – osäkerheten i lagens styrka, inte modellfel. Räknas för kommande matcher.</dd>` +
+    `<dt>Hemmafördel</dt><dd>${pctSigned(x.homeAdvantage)} mål för hemmalaget (skattad)</dd>` +
+    `<dt>Låga resultat</dt><dd>ρ = ${dec(x.rho, 3)} (skattad; negativ = fler 0–0 och 1–1 än oberoende mål ger)</dd>` +
+    `<dt>Under National League</dt><dd>Ingen lagdata. Lagen skattas som ett gemensamt nivåsnitt ur ${x.lowerMatches} FA-cupmatcher sedan ${esc(x.lowerSince)} och märks i matchvyn.</dd>` +
+    `<dt>Cuper</dt><dd>Prognosen gäller 90 minuter. Chansen att gå vidare räknas ur samma modell: förlängning med samma målfrekvens, straffar 50/50. FA-cupen: förlängning och straffar. EFL-cupen: straffar direkt, utom i semifinalerna (två möten) och finalen.</dd>` +
+    '</dl></div>';
+
+  html += '<h3>Nivåerna</h3><p class="legend">Ett genomsnittslag på nivån mot ett genomsnittslag i Premier League på neutral plan, ur dagens skattning.</p>' +
+    '<div class="table-wrap"><table><thead><tr><th>Nivå</th><th class="num">Vinst</th><th class="num">Oavgjort</th><th class="num">PL-laget vinner</th><th class="num">Mål per lag inbördes</th></tr></thead><tbody>' +
+    x.tiers.map((t) => {
+      const w = t.vsTop ? pct3(t.vsTop) : null;
+      return `<tr><td>${esc(t.name)}${t.tier <= 5 ? ` <span class="muted">nivå ${t.tier}</span>` : ''}</td>` +
+        (w ? w.map((v) => `<td class="num">${v} %</td>`).join('') : '<td colspan="3">–</td>') + `<td class="num">${dec(t.goals, 2)}</td></tr>`;
+    }).join('') + '</tbody></table></div>';
+
+  html += '<h3>Baslinjerna</h3><div class="card"><dl class="facts">' +
+    `<dt>(a) Naiv</dt><dd>Divisionens fördelning av hemmaseger, oavgjort och bortaseger de senaste ${x.naiveSeasons} säsongerna. Cupmatcher: alla ligamatcher på nivå 1–4.</dd>` +
+    `<dt>(b) Säsongens mål</dt><dd>Poisson med anfall, försvar och hemmafördel skattade enbart på årets matcher – ingen historik, ingen tidsvikt. Okänd tills båda lagen spelat ${x.seasonMinMatches} matcher.</dd>` +
+    '<dt>(c) Marknaden</dt><dd>Odds utan marginal med Shins metod. Ligorna: marknadssnittet hos football-data.co.uk vid prognostillfället (öppningsodds, insamlade fre/tis); för spelade matcher också Betfair Exchange vid stängning som tuffaste referens. Cuperna: DraftKings via ESPN.</dd>' +
+    '</dl><p class="src-line">Modellen är värd något bara om den slår (b). Frågan över tid är om den någonsin slår (c).</p></div>';
+
+  const c = d.check;
+  if (c) {
+    const f = (v) => dec(v, 3);
+    html += `<h3>Kontroll mot ${esc(c.season)}</h3><p class="legend">Varje match ${esc(c.season)} fick en prognos skattad bara på matcherna före matchdagen, med samma kod och regler. ` +
+      'Log-poäng: lägre är bättre. Skillnad = modell − baslinje med 95 % bootstrap-intervall; negativ = modellen bättre. ' +
+      'Ingen riktig utvärdering – reglerna valdes med vetskap om säsongen. Walk-forward över många säsonger kommer i fas 4.</p>' +
+      '<div class="table-wrap"><table><thead><tr><th>Ligorna, mot</th><th class="num">Matcher</th><th class="num">Modell</th><th class="num">Baslinje</th><th class="num">Skillnad</th><th class="num">Brier</th></tr></thead><tbody>' +
+      c.leagues.filter((r) => r.n).map((r) => `<tr><td>${esc(r.label)}</td><td class="num">${r.n}</td><td class="num">${f(r.logLoss[0])}</td><td class="num">${f(r.logLoss[1])}</td>` +
+        `<td class="num"><strong>${r.diff > 0 ? '+' : ''}${f(r.diff)}</strong><span class="sub">${f(r.ci[0])} till ${f(r.ci[1])}</span></td>` +
+        `<td class="num">${f(r.brier[0])} / ${f(r.brier[1])}</td></tr>`).join('') + '</tbody></table></div>';
+    const fa = c.faCup;
+    if (fa && fa.vsNaive.n) {
+      html += `<p class="legend">FA-cupen ${esc(c.season)} (${fa.vsNaive.n} matcher, ESPN): modellen ${f(fa.vsNaive.logLoss[0])} mot naiv ${f(fa.vsNaive.logLoss[1])}.` +
+        (fa.advance ? ` Att gå vidare: log-poäng ${f(fa.advance.logLoss)} (slantsingling ${f(Math.log(2))}).` : '') +
+        ` EFL-cupens tidigare säsonger hämtas inte. Körd ${when(c.ranAt)}, regelversion ${esc(c.rulesVersion)}.</p>`;
+    }
+  }
+
+  html += '<h3>Styr inte prognosen</h3><div class="card"><p style="margin:0 0 0.5rem">Visas som underlag i matchvyn och prövas som kandidater walk-forward i fas 4:</p>' +
+    '<ul class="bullets"><li>xG – football-data.co.uk (leverantören odokumenterad, bara 2026/27) och Understat (Premier League)</li>' +
+    '<li>Skott och skott på mål</li><li>Form, tabelläge och inbördes möten</li><li>Skador och avstängningar (FPL, bara Premier League)</li>' +
+    '<li>Marknadens odds som faktor (nu bara jämförelse)</li><li>Rotation i cuperna, hemmafördel per division, annan halveringstid</li></ul>' +
+    '<p class="src-line">Kandidatlogg: inga kandidater testade än. Underkända idéer loggas här, så att de inte prövas igen.</p></div>';
+  return html;
 }
 
 // ---------- start ----------

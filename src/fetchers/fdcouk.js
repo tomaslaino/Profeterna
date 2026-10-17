@@ -10,7 +10,7 @@
 // www.football-data.co.uk svarar 302 till domänen utan www – därför den
 // direkt.
 
-const { getText } = require('./http');
+const { getBytes, mapLimit } = require('./http');
 
 const BASE = 'https://football-data.co.uk';
 
@@ -29,9 +29,20 @@ const KEEP = [
 ];
 const TEXT_COLS = new Set(['Date', 'Time', 'HomeTeam', 'AwayTeam', 'FTR', 'Referee', 'Div']);
 
+// Tidigare säsonger: resultat, skott och odds – det baslinjerna, modellen
+// och backtestets kandidater (fas 4) kan behöva. Kolumnnamnen har ändrats
+// över åren: marknadssnitt/max hette BbAv/BbMx (Betbrain, 2005–2019) innan
+// Avg/Max; stängningsodds finns från 2019/20, Betfair Exchange från 2024/25.
+const KEEP_HISTORY = [
+  'Date', 'HomeTeam', 'AwayTeam', 'FTHG', 'FTAG', 'HS', 'AS', 'HST', 'AST',
+  'AvgH', 'AvgD', 'AvgA', 'BbAvH', 'BbAvD', 'BbAvA', 'BFEH', 'BFED', 'BFEA', 'PSH', 'PSD', 'PSA',
+  'B365H', 'B365D', 'B365A', 'Avg>2.5', 'Avg<2.5', 'BbAv>2.5', 'BbAv<2.5',
+  'AvgCH', 'AvgCD', 'AvgCA', 'BFECH', 'BFECD', 'BFECA', 'PSCH', 'PSCD', 'PSCA', 'AvgC>2.5', 'AvgC<2.5',
+];
+
 async function fetchDivision(code, seasonCode) {
   const url = `${BASE}/mmz4281/${seasonCode}/${code}.csv`;
-  const rows = parseCsv(await getText(url)).map(pick);
+  const rows = parseCsv(await getCsv(url)).map((r) => pick(r));
   if (rows.length === 0) throw new Error(`${code}: tom fil`);
   const played = rows.filter((r) => r.FTHG != null);
   return {
@@ -41,18 +52,33 @@ async function fetchDivision(code, seasonCode) {
   };
 }
 
+// Alla avslutade säsonger för en division, en fil per säsong. Fallerar en
+// säsong fallerar hela hämtningen – cachen behåller då senaste kompletta
+// historik med sitt datum.
+async function fetchHistory(code, seasonCodes) {
+  const seasons = {};
+  await mapLimit(seasonCodes, 3, async (sc) => {
+    const rows = parseCsv(await getCsv(`${BASE}/mmz4281/${sc}/${code}.csv`))
+      .map((r) => pick(r, KEEP_HISTORY))
+      .filter((r) => r.date && r.FTHG != null && r.FTAG != null);
+    if (rows.length === 0) throw new Error(`${code} ${sc}: tom fil`);
+    seasons[sc] = rows;
+  });
+  return { seasons, sourceUrl: `${BASE}/englandm.php` };
+}
+
 // Kommande matcher med odds (alla ligor hos källan) – behåll engelska.
 async function fetchFixtures(codes) {
   const url = `${BASE}/fixtures.csv`;
-  const rows = parseCsv(await getText(url))
+  const rows = parseCsv(await getCsv(url))
     .filter((r) => codes.includes(r.Div))
     .map((r) => ({ div: r.Div, ...pick(r) }));
   return { rows, sourceUrl: url };
 }
 
-function pick(r) {
+function pick(r, keep = KEEP) {
   const o = { date: isoDate(r.Date) };
-  for (const k of KEEP) {
+  for (const k of keep) {
     if (!(k in r) || k === 'Date') continue;
     const v = r[k];
     if (v === '' || v == null) continue;
@@ -71,6 +97,18 @@ function isoDate(s) {
   return `${y}-${m[2].padStart(2, '0')}-${m[1].padStart(2, '0')}`;
 }
 
+// Nyare filer är UTF-8 (med BOM), äldre Windows-1252 – t.ex. "King’s Lynn"
+// i EC 2021/22 med byte 0x92. Ogiltig UTF-8 läses därför som latin1, och
+// Windows-1252:s typografiska apostrofer (0x91/0x92) blir vanliga.
+async function getCsv(url) {
+  const bytes = await getBytes(url);
+  try {
+    return new TextDecoder('utf-8', { fatal: true }).decode(bytes);
+  } catch {
+    return bytes.toString('latin1').replace(/[\u0091\u0092]/g, "'");
+  }
+}
+
 // Enkel CSV: källans filer har inga citerade fält (verifierat 2026-10-17).
 function parseCsv(text) {
   const lines = text.replace(/^﻿/, '').split(/\r?\n/).filter((l) => l.trim() !== '');
@@ -84,4 +122,4 @@ function parseCsv(text) {
   }).filter((o) => o.HomeTeam && o.AwayTeam);
 }
 
-module.exports = { fetchDivision, fetchFixtures };
+module.exports = { fetchDivision, fetchFixtures, fetchHistory };
