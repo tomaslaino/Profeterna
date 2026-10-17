@@ -40,6 +40,10 @@ GitHub Actions (var 30:e min)  →  källorna  →  src/build.js  →  _site/ (H
   fanns före avspark och aldrig skrivits om.
 - Källcachen (`data/cache/`) sparas mellan körningarna med `actions/cache`, så att en död
   källa visas med senaste lyckade data och sitt datum.
+- **Läge 2026-10-17:** sidan ligger tills vidare på <https://tomaslaino.github.io/Profeterna/>
+  utan egen domän, eftersom profeterna.se inte är registrerad än (med domänen inställd
+  skickades github.io-adressen vidare till en domän som inte svarar). Sätt tillbaka
+  profeterna.se som custom domain när DNS pekar rätt.
 - **Engångsinställningar:** registrera profeterna.se (ledig enligt whois 2026-10-17), skapa
   repot på GitHub (publikt, krävs för gratis Pages), välj *Settings → Pages → Source:
   GitHub Actions*, ange profeterna.se som custom domain och peka domänens A-poster på
