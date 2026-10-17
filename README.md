@@ -16,8 +16,10 @@ ingen falsk precision · sidan kraschar aldrig av en död källa · endast fria 
   säsongens mål, marknad utan marginal), grundmodell Dixon–Coles över nivå 1–5 med
   cupregler, osäkerhetsintervall och nedbrytning, prognos i matchvyn och matchlistan,
   kontroll mot 2025/26 (regelversion 2026-10-17.1)
-- [ ] **Fas 3 – Journal + utvärdering:** append-only prognosjournal, Brier/logg-poäng,
-  kalibrering, per tävling och regelversion
+- [x] **Fas 3 – Journal + utvärdering:** append-only prognosjournal som GitHub Actions
+  committar, Brier- och log-poäng mot baslinjerna (a), (b), (c) och Betfair-stängningen,
+  kalibreringskurva, att gå vidare i cuperna, värdespel, per tävling och regelversion,
+  äkta före-matchen-prognos i matchvyn
 - [ ] **Fas 4 – Backtest + kandidatjakt:** walk-forward på tidigare säsonger,
   kandidatfaktorer, regelversioner
 - [ ] **Fas 5 – LLM-modul (valfri)**
@@ -37,9 +39,24 @@ GitHub Actions (var 30:e min)  →  källorna  →  src/build.js  →  _site/ (H
   minut 7 och 37 varje timme, vid push till `main` och manuellt.
 - **Skillnad mot gravergrav.se:** den genererade datan committas inte. Den laddas upp som
   Pages-artefakt, eftersom varje körning annars skulle lägga nya versioner av ~2 000
-  matchfiler i git-historiken. Det enda som ska committas automatiskt är prognosjournalen
-  (fas 3) – där är git-historiken själva poängen: den visar offentligt att en prognos
-  fanns före avspark och aldrig skrivits om.
+  matchfiler i git-historiken. Det enda som committas automatiskt är prognosjournalen
+  (`data/journal/`) – där är git-historiken själva poängen: den visar offentligt att en
+  prognos fanns före avspark och aldrig skrivits om. Se
+  [Prognosjournalen och utvärderingen](#prognosjournalen-och-utvärderingen-fas-3).
+- **Journalens commit:** bygget körs med `--journal`, och steget *Committa
+  prognosjournalen* committar bara `data/journal/` och bara när filen växt, som
+  `github-actions[bot]` med meddelandet "Prognosjournal: N nya rader". Jobbet har
+  `contents: write`; deploy-jobbet bara `pages`/`id-token`. Steget stoppar körningen om en
+  befintlig rad ändrats eller tagits bort (append-only), och har main fått en ny commit
+  under körningen läggs journalcommiten ovanpå (`pull --rebase`). Misslyckas committen
+  publiceras inte heller sajten – nästa körning loggar raderna på nytt.
+- **Ingen loop, ingen krock:** push med `GITHUB_TOKEN` startar aldrig workflows, och
+  push-triggern har dessutom `paths-ignore: data/journal/**`. Concurrency-gruppen `pages`
+  kör en körning i taget, och checkout tar `ref: main` – grenens läge när jobbet startar,
+  inte commiten som köade körningen – så att en körning som väntat på den förra ser dess
+  journalrader och inte loggar om dem.
+- **Lokalt:** dra bottens commits innan du pushar (`git pull --rebase`). Journalen ändras
+  bara av boten, så det blir inga konflikter.
 - Källcachen (`data/cache/`) sparas mellan körningarna med `actions/cache`, så att en död
   källa visas med senaste lyckade data och sitt datum.
 - **Läge 2026-10-17:** sidan ligger tills vidare på <https://tomaslaino.github.io/Profeterna/>
@@ -62,6 +79,10 @@ npm run build          # bara bygget (hämtar källor vars cache är för gammal
 npm run refresh        # bygget med omhämtning av alla källor
 npm run check          # prognosmotorns kontroll mot förra säsongen (se Prognosmotorn)
 ```
+
+Lokala byggen **läser** journalen som den ligger i repot men skriver aldrig i den – det gör
+bara bygget på GitHub Actions (`npm run build -- --journal`). För att prova loggningen
+lokalt utan att röra den riktiga journalen: `JOURNAL_DIR=/tmp/journal npm run build -- --journal`.
 
 Inga nycklar behövs – alla källor i fas 1 är öppna. Porten är 3001 så att Gräva guld kan
 köra på 3000 samtidigt (ändras med `PORT` i `.env`, se `.env.example`). Express används
@@ -131,6 +152,19 @@ bara lokalt.
   och matchlistan (*).
 - **Cupmatcher i skattningen (2026-10-17):** ingår med samma vikt som ligamatcher – de är
   de enda direkta mötena mellan nivåerna under en säsong. Rotation i cuperna prövas i fas 4.
+- **Prognosen som räknas (2026-10-17, användarens beslut):** den sista raden i journalen som
+  loggades före avspark. Rader loggade vid eller efter avspark räknas inte.
+- **Journalens fönster (2026-10-17):** matcher loggas från 14 dagar före avspark – samma
+  fönster som listan Kommande. Hela säsongen varje gång skulle ge hundratals nya rader per
+  matchdag (varje resultat flyttar alla lags styrka lite) och tiotals MB i git per säsong,
+  utan att tillföra något: det är ändå den sista raden före avspark som räknas.
+- **När en ny rad skrivs (2026-10-17):** när prognosen ändrats på den precision sidan visar
+  (hela procent; förväntade mål med en decimal), när marknadens odds ändrats, eller vid ny
+  regelversion eller ny avspark – samma princip som Gräva guld, där avtrycket är det som
+  visas. Raden sparar ändå de exakta sannolikheterna (fyra decimaler).
+- **Litet underlag (2026-10-17):** snitt och skillnader visas först från 30 matcher,
+  avkastning från 30 spel och en kalibreringskorg från 10 prognoser – före dess "för få"
+  med antalet. Skillnader visas med 95 % bootstrap-intervall.
 
 ## Arkitektur
 
@@ -160,6 +194,14 @@ server:
   prognosen i `data/match/<id>.json`, en kompakt 1X2 i `data/matches.json` och modellens
   skattningar och kontroll i `data/model.json`. Fallerar motorn byggs sajten ändå, utan
   prognoser och med felet synligt under Modell.
+- **Journal:** [src/journal.js](src/journal.js) – append-only-loggning, innehållsavtryck,
+  läsning och vilken rad som räknas. Filen är `data/journal/forecasts-<säsong>.jsonl`, en
+  JSON-rad per post, committad av GitHub Actions; bygget kopierar den till sajten
+  (`data/journal/`) så att hela journalen går att ladda ned.
+- **Utvärdering:** [src/evaluate.js](src/evaluate.js) rättar journalen mot facit och
+  skriver `data/evaluation.json` (fliken Utvärdering) och journalinfo per match i
+  `data/match/<id>.json`. Poängen och bootstrap-jämförelsen är samma kod som kontrollen
+  ([src/check.js](src/check.js)). Fallerar utvärderingen byggs sajten ändå.
 - **Frontend:** ren HTML/CSS/JS i `public/`, flikarna Matcher, Utvärdering, Källor och
   Modell. Läser JSON-filerna ovan. Urvalet av kommande/spelade matcher och källornas status
   räknas i webbläsaren mot besökarens klocka, inte mot byggtiden.
@@ -248,6 +290,57 @@ Walk-forward över många säsonger kommer i fas 4.
 **Byggtid** (lokalt, 2026-10-17): prognoserna för säsongens 2 120 matcher ~3,5 s, hela
 bygget ~7,5 s med vanlig hämtning; med full omhämtning av alla källor och ny kontroll ~25 s.
 
+## Prognosjournalen och utvärderingen (fas 3)
+
+**Journalen.** Varje bygge på GitHub Actions loggar alla matcher i de sex tävlingarna som
+inte startat (status schemalagd, avspark i framtiden) och har avspark inom 14 dagar, i
+`data/journal/forecasts-2026-27.jsonl`. En rad innehåller:
+
+| Fält | Innehåll |
+|---|---|
+| `loggedAt` | när raden skrevs (UTC) |
+| `id`, `comp`, `kickoff`, `home`, `away` | matchen enligt ESPN |
+| `rulesVersion`, `fitThrough` | regelversion och underlagets sista matchdag |
+| `status`, `reasons` | `ok`, eller `okänt` med orsak – även det loggas |
+| `p`, `goals`, `over25`, `btts`, `advance` | 1X2, förväntade mål, över 2,5, båda lagen gör mål, P(går vidare) i cuperna – fyra decimaler |
+| `naive`, `season` | baslinjerna (a) och (b) vid tillfället (`null` = okänd) |
+| `market` | (c): sannolikheter utan marginal, odds, över 2,5, källa, slag (öppning/senaste) och hämttid |
+
+En ny rad skrivs bara när innehållet ändrats (se Beslut); omkörning med samma underlag
+skriver ingenting (verifierat: andra bygget i rad gav 0 nya rader). Raderna skrivs aldrig
+om – bygget lägger bara till, och workflowen stoppar om en befintlig rad ändrats. En
+avbruten skrivning lämnar en oläsbar rad som räknas och hoppas över. Årets redan spelade
+matcher har bara återskapade prognoser och kommer aldrig in i journalen. Ett provbygge
+2026-10-17 (till en tillfällig katalog) loggade 131 matcher – alla inom 14 dagar, inga
+dubbletter – och EFL-cupens omgång 4 utan marknad, eftersom DraftKings-oddsen kommer först
+7 dagar före avspark.
+
+**Vilken prognos som räknas.** Den sista raden före avspark enligt dagens spelprogram –
+flyttas en match räknas raderna före den faktiska avsparken. Matchvyn visar den med
+loggningstid, rättad mot facit, och skillnaden mot den återskapade prognosen. Listan Spelade
+visar journalens prognos; kursiv = matchen loggades aldrig och prognosen är återskapad.
+
+**Utvärderingen** (fliken Utvärdering), mot ställningen efter 90 minuter (okänd = matchen
+utvärderas inte):
+
+- **Brier och log-poäng** per prognos och i snitt, mot (c) marknaden, Betfair Exchange vid
+  stängning (ligorna – marknaden vid avspark), (b) och (a), alltid på de matcher där båda
+  finns. Skillnad modell − baslinje med 95 % bootstrap-intervall.
+- **Kalibrering:** alla tre utfallen per match i korgar om tio procentenheter, med antal
+  per korg och Wilson-intervall.
+- **Att gå vidare** i cuperna mot vem som gick vidare (ESPN:s vinnarflagga, som tar med
+  straffar – kontrollerat på EFL-cupen 2026/27), jämfört med slantsingling.
+- **Värdespel (sekundärt):** 1 insatt på varje utfall där modellens sannolikhet × oddsen i
+  journalraden > 1, vinst per 100 insatta, med antal spel.
+- **Per tävling och per regelversion**, och en kontroll av luckor: spelade matcher utan
+  journalpost efter att journalen startat visas i rött.
+
+Verifierat 2026-10-17 lokalt med en **testjournal** (återskapade prognoser loggade ett dygn
+före avspark, aldrig committad): 324 matcher gav modellen +0,011 mot marknaden och −0,109
+mot (b) i log-poäng, i linje med kontrollen mot 2025/26; rader loggade efter avspark
+räknades inte, och "för få"-läget visades med 5 matcher. Den riktiga journalen är tom tills
+första körningen på GitHub Actions efter push.
+
 ## Statusmärkning
 
 Räknas om i webbläsaren ur hämttid och källans gräns – stannar den schemalagda hämtningen
@@ -259,10 +352,10 @@ schemaintervall gammalt.
 - **Röd (fel):** senaste hämtningen misslyckades; senaste lyckade data visas med sitt datum.
 - **Grå (okänt):** inget verifierbart innehåll (t.ex. FA-cupen innan första omgången lottats).
 
-## Kända brister (fas 1–2)
+## Kända brister (fas 1–3)
 
-- ESPN-oddsen sparas bara som senaste ögonblicksbild. Historik över odds vid
-  prognostillfället börjar med journalen i fas 3.
+- ESPN-oddsen sparas bara som senaste ögonblicksbild i cachen. Oddsen vid
+  prognostillfället finns från fas 3 i journalen, men bara för loggade matcher.
 - Tabell och trupp är aktuella ögonblicksbilder, inte punkt-i-tiden, och kan inte användas
   i backtest.
 - Inbördes möten visas bara för innevarande säsong; historiken finns nu men visas i fas 4.
@@ -273,9 +366,11 @@ schemaintervall gammalt.
 - Actions-stegen (checkout, setup-node, cache, Pages) är v4/v3 och ger varningen att
   Node 20 fasas ut på GitHub; de körs ändå. Själva bygget körs på Node 22.
 - GitHub stänger av schemalagda workflows i publika repon efter 60 dagar utan aktivitet i
-  repot. Journalens commits (fas 3) håller det vid liv; tills dess räcker en push.
-- **Fas 2:** årets spelade matcher har återskapade prognoser, inte prognoser publicerade
-  före avspark – journalen (fas 3) behövs för äkta out-of-sample.
+  repot. Journalens commits håller det vid liv under säsongen, men i sommaruppehållet
+  (slutet av maj–början av augusti) skrivs inga rader – säsongsbytet kräver ändå en push,
+  som räknas som aktivitet. Har schemat stängts av: *Actions → workflowen → Enable*.
+- **Fas 2:** årets matcher fram till 2026-10-17 har bara återskapade prognoser, inte
+  prognoser publicerade före avspark – äkta out-of-sample börjar med journalen.
 - Osäkerhetsintervallen fångar bara osäkerheten i lagens styrka (ρ hålls fast), inte
   modellfel; de räknas inte för spelade matcher.
 - Förlängning antas ha samma målfrekvens per minut som de 90 minuterna, och straffar är
@@ -294,7 +389,20 @@ schemaintervall gammalt.
   säsongen; prognoserna ~3,5 s.
 - football-data.co.uk:s datum är brittisk lokal tid. Matchningen mot ESPN sker på
   (hemmalag, bortalag) inom ligan, som är unikt under en säsong, så datumet spelar ingen roll.
+- **Fas 3:** `loggedAt` är byggets klocka; det offentliga beviset är commit-tiden på GitHub,
+  som kan ligga någon minut senare. Går en commit inte igenom loggas raderna om i nästa
+  körning med ny tid.
+- Journalens storlek är uppskattad, inte mätt: ~0,4 kB per rad och omkring 5–15 rader per
+  match under 14 dagar ger några MB per säsong. En fil per säsong håller den nere.
+- Dubbelmöten (EFL-cupens semifinaler) utvärderas inte för att gå vidare än: hur ESPN
+  markerar vinnaren av ett dubbelmöte är inte kontrollerat. 1X2 utvärderas som vanligt.
+- Ligamarknaden i journalen är öppningsodds från fixtures.csv (fre/tis) – en match som
+  loggas innan de lagts ut har (c) okänd tills nästa rad. Värdespelen räknas mot
+  marknadssnittet, inte bästa odds.
+- Matchvyn för en spelad match visar resten av underlaget (steg för steg, baslinjerna,
+  resultatmatrisen) från den återskapade prognosen, inte från journalraden.
 
 ## Säkerhet
 
-Inga nycklar behövs i fas 1–2. `.env` är gitignorerad.
+Inga nycklar behövs i fas 1–3. `.env` är gitignorerad. Workflowens commit använder
+`GITHUB_TOKEN` med `contents: write` bara i byggjobbet.

@@ -170,4 +170,6 @@ if (require.main === module) {
     `; gå vidare: ${fa.advance ? `n=${fa.advance.n}, log-poäng ${f(fa.advance.logLoss)} (slantsingling ${f(Math.log(2))})` : '–'}`);
 }
 
-module.exports = { runCheck, storedCheck };
+// Poängen och jämförelsen återanvänds av utvärderingen mot journalen
+// (src/evaluate.js) – samma mått på båda ställena.
+module.exports = { runCheck, storedCheck, compare, outcome, logLoss, brier };

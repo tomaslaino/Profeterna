@@ -8,6 +8,12 @@ name: Hämta data och publicera
 # körningarna med actions/cache, så att en död källa visas med sin senaste
 # lyckade data och sitt datum i stället för att försvinna.
 #
+# Det enda som committas är prognosjournalen (data/journal/): bygget loggar
+# kommande matcher med --journal, och nya rader committas till main av
+# github-actions[bot]. Git-historiken visar då offentligt att en prognos
+# fanns före avspark och aldrig skrivits om. Commitsen håller också repot
+# aktivt, så att GitHub inte stänger av schemat efter 60 dagar.
+#
 # Schemat: var 30:e minut (minut 7 och 37, utanför den rusning som brukar vara
 # vid hel timme). GitHub kan fördröja schemalagda körningar; sidan visar när
 # den senast byggdes och varnar om det dröjt ovanligt länge.
@@ -17,23 +23,34 @@ on:
     - cron: "7,37 * * * *"
   push:
     branches: [main]
+    # Journalens egna commits startar ingen ny körning: push med GITHUB_TOKEN
+    # startar aldrig workflows, och det här är en extra spärr mot en loop.
+    paths-ignore: ["data/journal/**"]
   workflow_dispatch: {}
 
+# En körning i taget (hela workflowen, båda jobben). En körning som startar
+# medan en annan pågår väntar (GitHub behåller bara den senast köade), så att
+# två byggen aldrig loggar samtidigt.
 concurrency:
   group: pages
   cancel-in-progress: false
 
 permissions:
   contents: read
-  pages: write
-  id-token: write
 
 jobs:
   build:
     runs-on: ubuntu-latest
+    permissions:
+      contents: write # committa prognosjournalen
     steps:
       - name: Checka ut repo
         uses: actions/checkout@v4
+        with:
+          # Grenens senaste läge, inte commiten som startade körningen: en
+          # schemalagd körning kan ha köat medan den förra committade
+          # journalen, och utan de raderna skulle den logga om dem.
+          ref: main
 
       - name: Sätt upp Node
         uses: actions/setup-node@v4
@@ -51,8 +68,8 @@ jobs:
           key: kallcache-${{ github.run_id }}
           restore-keys: kallcache-
 
-      - name: Hämta källor och bygg sajten
-        run: npm run build
+      - name: Hämta källor, logga prognoser och bygg sajten
+        run: npm run build -- --journal
 
       - name: Spara källcachen
         if: always()
@@ -60,6 +77,37 @@ jobs:
         with:
           path: data/cache
           key: kallcache-${{ github.run_id }}
+
+      # Bara journalfilerna committas, och bara om de växt. Misslyckas
+      # committen publiceras inte heller sajten – den visade journalen ska
+      # alltid finnas i git. Nästa körning loggar då raderna på nytt.
+      - name: Committa prognosjournalen
+        run: |
+          git add data/journal
+          if git diff --cached --quiet; then
+            echo "Inga nya rader i journalen."
+            exit 0
+          fi
+          # Append-only: en borttagen eller ändrad rad stoppar körningen.
+          if git diff --cached -U0 -- data/journal | grep -q '^-{'; then
+            echo "::error::Journalen får bara växa – en befintlig rad har ändrats eller tagits bort."
+            exit 1
+          fi
+          rows=$(git diff --cached --numstat -- data/journal | awk '{ s += $1 } END { print s }')
+          [ "$rows" = 1 ] && what="1 ny rad" || what="${rows} nya rader"
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git commit -q -m "Prognosjournal: ${what}"
+          # Har main fått en ny commit under körningen (t.ex. ny kod) läggs
+          # journalcommiten ovanpå den.
+          for attempt in 1 2 3; do
+            if git push -q origin HEAD:main; then
+              echo "Committade ${what}."
+              exit 0
+            fi
+            git pull -q --rebase origin main || { git rebase --abort; exit 1; }
+          done
+          exit 1
 
       - name: Ladda upp sajten
         uses: actions/upload-pages-artifact@v3
@@ -69,6 +117,9 @@ jobs:
   deploy:
     needs: build
     runs-on: ubuntu-latest
+    permissions:
+      pages: write
+      id-token: write
     environment:
       name: github-pages
       url: ${{ steps.deployment.outputs.page_url }}

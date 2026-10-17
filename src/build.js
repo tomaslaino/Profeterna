@@ -10,10 +10,15 @@
 //   data/match/<id>.json   underlaget och prognosen för en match
 //   data/model.json        regelversion, skattade storheter och kontrollen
 //                          mot förra säsongen (fliken Modell)
+//   data/evaluation.json   journalen och utvärderingen mot facit (fliken
+//                          Utvärdering)
+//   data/journal/*.jsonl   prognosjournalen som den ligger i repot
 //
 // Den genererade datan committas inte (den skulle svälla repot med varje
 // körning) – den laddas upp som Pages-artefakt. Källcachen i data/cache/
-// sparas mellan körningarna med actions/cache.
+// sparas mellan körningarna med actions/cache. Det enda som committas är
+// prognosjournalen (data/journal/), som bara skrivs med --journal – det gör
+// bygget på GitHub Actions, inte lokala byggen (se src/journal.js).
 
 const fs = require('fs');
 const path = require('path');
@@ -22,6 +27,8 @@ const { allMatches, matchIds, matchDetail } = require('./matches');
 const { sourceReport } = require('./sourcetable');
 const { forecastAll } = require('./forecast');
 const { storedCheck } = require('./check');
+const { readJournal, appendJournal, HORIZON_DAYS } = require('./journal');
+const { evaluate } = require('./evaluate');
 const { wholePercent } = require('./model');
 const rules = require('../config/forecast-rules');
 const { COMPETITIONS, SEASON } = require('../config/competitions');
@@ -34,7 +41,7 @@ const OUT = path.join(ROOT, '_site');
 // datan borde vara.
 const UPDATE_EVERY_MINUTES = 30;
 
-function writeSite(outDir = OUT) {
+function writeSite(outDir = OUT, { journal = false } = {}) {
   const tmp = `${outDir}.tmp`;
   fs.rmSync(tmp, { recursive: true, force: true });
   fs.cpSync(PUBLIC, tmp, { recursive: true });
@@ -50,6 +57,7 @@ function writeSite(outDir = OUT) {
     updateEveryMinutes: UPDATE_EVERY_MINUTES,
     season: SEASON.label,
     rulesVersion: rules.version,
+    journalHorizonDays: HORIZON_DAYS,
     competitions: COMPETITIONS.map((c) => ({ id: c.id, name: c.name, short: c.short, type: c.type })),
   });
   const sources = sourceReport();
@@ -73,7 +81,37 @@ function writeSite(outDir = OUT) {
   write('model.json', { rulesVersion: rules.version, model: forecast.model, error: forecast.error, check, ms: forecast.ms });
 
   const list = allMatches();
-  for (const m of list.matches) m.f = compact(forecast.predictions.get(m.id));
+
+  // Prognosjournalen: loggar kommande matcher vars prognos är ny (bara med
+  // --journal), läser sedan hela journalen och rättar spelade matcher.
+  // Varken journalen eller utvärderingen får stoppa bygget.
+  let logged = [];
+  if (journal && !forecast.error) {
+    try {
+      logged = appendJournal(list.matches, forecast.predictions);
+    } catch (err) {
+      console.error('[build] journalen:', err);
+    }
+  }
+  let ev = { report: null, perMatch: new Map() };
+  let journalFiles = [];
+  try {
+    const j = readJournal();
+    journalFiles = j.files.map((f) => path.join(j.dir, f.name));
+    ev = evaluate(j, list.matches, forecast.predictions);
+  } catch (err) {
+    console.error('[build] utvärderingen:', err);
+    ev.error = String(err.message || err);
+  }
+  write('evaluation.json', { ...ev.report, error: ev.error || null });
+  fs.mkdirSync(path.join(dataDir, 'journal'), { recursive: true });
+  for (const f of journalFiles) fs.copyFileSync(f, path.join(dataDir, 'journal', path.basename(f)));
+
+  for (const m of list.matches) {
+    m.f = compact(forecast.predictions.get(m.id));
+    const c = m.completed && ev.perMatch.get(m.id);
+    if (c && c.counted) m.j = { p: c.counted.p ? wholePercent(c.counted.p) : null };
+  }
   write('matches.json', list);
 
   // En trasig match får inte stoppa bygget – den saknar då bara sin sida.
@@ -83,6 +121,7 @@ function writeSite(outDir = OUT) {
     try {
       const d = matchDetail(id);
       d.prediction = forecast.predictions.get(id) || null;
+      d.journal = ev.perMatch.get(id) || null;
       write(`match/${id}.json`, d);
       pages++;
     } catch (err) {
@@ -94,7 +133,7 @@ function writeSite(outDir = OUT) {
   // Byt hela katalogen på en gång, så att en halvfärdig sajt aldrig serveras.
   fs.rmSync(outDir, { recursive: true, force: true });
   fs.renameSync(tmp, outDir);
-  return { generatedAt, pages, failed, counts: sources.counts, forecastMs: forecast.ms };
+  return { generatedAt, pages, failed, counts: sources.counts, forecastMs: forecast.ms, logged: logged.length };
 }
 
 // Kompakt prognos för matchlistan: hela procent 1 · X · 2 (summa 100), och
@@ -110,19 +149,21 @@ function roundNumbers(key, v) {
   return typeof v === 'number' && !Number.isInteger(v) ? Math.round(v * 10000) / 10000 : v;
 }
 
-async function build({ force = false, fetch = true } = {}) {
+async function build({ force = false, fetch = true, journal = false } = {}) {
   const results = fetch ? await refreshAll({ force }) : [];
-  return { results, site: writeSite() };
+  return { results, site: writeSite(OUT, { journal }) };
 }
 
 if (require.main === module) {
   const force = process.argv.includes('--force');
   const fetch = !process.argv.includes('--no-fetch');
-  build({ force, fetch })
+  const journal = process.argv.includes('--journal');
+  build({ force, fetch, journal })
     .then(({ results, site }) => {
       for (const r of results) console.log(r.action.padEnd(8), r.id, r.error || '');
       const counts = Object.entries(site.counts).map(([k, v]) => `${v} ${k}`).join(', ');
       console.log(`Sajten byggd i _site/: ${site.pages} matchsidor, ${site.failed.length} fel, prognoser på ${site.forecastMs} ms. Källor: ${counts}.`);
+      console.log(journal ? `Prognosjournalen: ${site.logged} nya rader.` : 'Prognosjournalen: bara läst (skrivs med --journal).');
     })
     .catch((err) => {
       console.error(err);
