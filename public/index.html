@@ -18,7 +18,7 @@
     <div class="topbar-inner">
       <a class="brand" href="#matcher" aria-label="Profeterna – till matcherna">
         <img class="logo" src="logo.svg" alt="" width="36" height="36">
-        <span class="brand-txt"><b id="brand-name">Profeterna</b><small>Engelsk fotboll</small></span>
+        <span class="brand-txt"><b id="brand-name">Profeterna</b></span>
       </a>
       <nav class="tabs" aria-label="Sektioner">
         <div class="tablist" role="tablist">
@@ -28,10 +28,6 @@
             aria-controls="coupon-section" aria-selected="false">Kupong</button>
           <button type="button" role="tab" id="tab-eval" data-tab="eval-section"
             aria-controls="eval-section" aria-selected="false">Utvärdering</button>
-          <button type="button" role="tab" id="tab-sources" data-tab="sources-section"
-            aria-controls="sources-section" aria-selected="false">Källor</button>
-          <button type="button" role="tab" id="tab-model" data-tab="model-section"
-            aria-controls="model-section" aria-selected="false">Modell</button>
         </div>
         <a class="tab-link" href="divisioner.html">Divisioner</a>
         <a class="tab-link" href="om-oss.html">Om oss</a>
@@ -44,7 +40,6 @@
       <div id="match-list-view">
         <div class="hero">
           <div class="hero-main">
-            <p class="kicker">Engelsk fotboll</p>
             <h1 class="hero-title">Profeterna</h1>
             <div class="hero-lede">
               <!-- lagbilden står här på mobilen och till höger på breda skärmar -->
@@ -52,9 +47,8 @@
                 <a href="om-oss.html"><img src="profeterna/lag.jpg" alt="Daniel Johansson, Daniel Laino och Daniel Teijder under en grekisk flagga" width="640" height="800"></a>
               </figure>
               <p class="hero-motto">Sannolikheter för varje match.</p>
-              <p class="hero-sub">Varje prognos loggas före avspark och rättas mot facit.</p>
             </div>
-            <div id="topline" class="topline">Laddar …</div>
+            <div id="topline" class="topline"></div>
           </div>
           <!-- stora lagbilden visas bara på breda skärmar -->
           <div class="hero-aside">
@@ -72,7 +66,6 @@
           </div>
           <div id="comp-chips" class="chips" role="group" aria-label="Tävling"></div>
         </div>
-        <p class="legend" id="list-legend" hidden></p>
         <div id="match-list"></div>
       </div>
       <div id="match-detail-view" hidden></div>
@@ -87,17 +80,16 @@
       <div id="evaluation">Laddar …</div>
     </section>
 
-    <section id="sources-section" role="tabpanel" aria-labelledby="tab-sources" hidden>
+    <section id="sources-section" aria-label="Källor" hidden>
       <h2 class="page-title">Källor</h2>
       <p class="intro" id="sources-summary"></p>
-      <h3>Per tävling</h3>
       <div id="coverage"></div>
       <h3>Källorna</h3>
       <div id="sources-table"></div>
       <p class="legend" id="unmapped"></p>
     </section>
 
-    <section id="model-section" role="tabpanel" aria-labelledby="tab-model" hidden>
+    <section id="model-section" aria-label="Modell" hidden>
       <h2 class="page-title">Modell</h2>
       <div id="model">Laddar …</div>
     </section>
@@ -105,7 +97,8 @@
 
   <footer>
     <img class="logo-sm" src="logo.svg" alt="" width="20" height="20">
-    <p>Profeterna · Matchprognoser för engelsk fotboll · Endast fria datakällor</p>
+    <p>Profeterna</p>
+    <nav class="foot-links" aria-label="Mer"><a href="#kallor">Källor</a><a href="#modell">Modell</a><a href="historik.html">Kuponghistorik</a></nav>
   </footer>
 
   <script src="app.js"></script>
