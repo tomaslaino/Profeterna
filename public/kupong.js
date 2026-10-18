@@ -22,6 +22,7 @@ const KP = {
   liveAt: null,
   liveError: false,
   timer: null,
+  history: false, // finns historik.html
   wasLive: false,
   view: null, // { mode: 'show', id } | { mode: 'new', edit } | { mode: 'saved', ... }
   draft: null,
@@ -32,6 +33,8 @@ const KP = {
 const SIGNS = ['1', 'X', '2'];
 const LIVE_EVERY_MS = 60000;
 const PICK_DAYS = 14;
+// Så lång får en anteckning om en match vara (samma gräns som src/coupons.js).
+const NOTE_MAX = 140;
 const KP_DRAFT = 'profeterna.kupong.utkast';
 const KP_PENDING = 'profeterna.kupong.osparad';
 // ESPN:s ligakoder, om meta.json byggts före kupongen (annars därifrån).
@@ -59,12 +62,23 @@ function whenMatches() {
 
 async function loadCoupons() {
   if (KP.data) return KP.data;
-  try {
-    KP.data = await getJSON('data/kuponger.json');
-  } catch {
-    KP.data = { coupons: [], errors: [], repo: null, branch: 'main', dir: 'data/kuponger' };
-  }
+  const [data, history] = await Promise.all([
+    getJSON('data/kuponger.json').catch(() => ({ coupons: [], errors: [], repo: null, branch: 'main', dir: 'data/kuponger' })),
+    pageExists('historik.html'),
+  ]);
+  KP.history = history;
+  KP.data = data;
   return KP.data;
+}
+
+// Sidan Historik kan saknas på en sajt som byggts utan den – då visas inga
+// länkar dit.
+async function pageExists(path) {
+  try {
+    return (await fetch(path, { method: 'HEAD', cache: 'no-cache' })).ok;
+  } catch {
+    return false;
+  }
 }
 
 let kpIndex = { src: null, map: new Map() };
@@ -95,7 +109,7 @@ function clearPending(id) {
   kpStore(KP_PENDING, all);
 }
 
-const signature = (c) => c.matches.map((x) => `${x.id}:${x.sign}`).sort().join(',');
+const signature = (c) => c.matches.map((x) => `${x.id}:${x.sign}:${x.note || ''}`).sort().join(',');
 
 function allCoupons() {
   const list = (KP.data ? KP.data.coupons : []).slice();
@@ -115,7 +129,7 @@ const signIdx = (s) => (s.home > s.away ? 0 : s.home === s.away ? 1 : 2);
 
 function gradeRow(x, now) {
   const m = matchById(x.id);
-  const r = { id: x.id, sign: x.sign, label: x.label, m, state: 'missing', res: null, hit: null, score: null, clock: null, p: null, tip: null, kick: null };
+  const r = { id: x.id, sign: x.sign, label: x.label, note: x.note || null, m, state: 'missing', res: null, hit: null, score: null, clock: null, p: null, tip: null, kick: null };
   if (!m) return r;
   r.kick = new Date(m.kickoff).getTime();
   // Prognosen före avspark ur journalen om den finns, annars sajtens prognos.
@@ -292,7 +306,7 @@ function pearlTitle(r) {
     : r.state === 'live' ? `${scoreText(r)} ${r.clock || ''}`.trim()
       : r.state === 'off' ? 'uppskjuten' : r.state === 'missing' ? 'okänd match'
         : r.m ? fWeekdayTime.format(new Date(r.m.kickoff)) : '';
-  return `${teamsOf(r)} · ${r.sign} · ${what}`;
+  return `${teamsOf(r)} · ${r.sign} · ${what}${r.note ? ` · ”${r.note}”` : ''}`;
 }
 
 function pearls(rows, size = '') {
@@ -380,6 +394,7 @@ function renderCouponShow(id) {
     `<p class="kp-eyebrow">${esc(c.name || 'Kupong')}${c.pending ? ' <span class="kp-tag">väntar på GitHub</span>' : ''}</p>` +
     `<h2 class="page-title">${esc(dateRange(g.first, g.last))}</h2></div><div class="kp-actions">` +
     (canEdit ? `<a class="kp-btn" href="#kupong/andra/${esc(c.id)}">Ändra</a>` : '') +
+    (g.done && !c.pending && KP.history ? `<a class="kp-btn" href="historik.html#${encodeURIComponent(c.id)}">Historik</a>` : '') +
     '<a class="kp-btn primary" href="#kupong/ny">+ Ny kupong</a></div></div>';
 
   html += summaryCard(g);
@@ -445,7 +460,8 @@ function couponRows(g) {
         `<span class="kp-dot ${cls}" aria-hidden="true">${cls === 'ok' ? '✓' : cls === 'no' ? '✕' : ''}</span>` +
         `<span class="mtime">${when}</span>` +
         `<span class="ctag"${comp ? ` title="${esc(comp.name)}"` : ''}>${comp ? esc(comp.short) : ''}</span>` +
-        `<span class="mteams">${r.m ? `${esc(r.m.home)}<span class="vs">–</span>${esc(r.m.away)}` : esc(teamsOf(r))}</span>` +
+        `<span class="mteams"><span class="kp-tm">${r.m ? `${esc(r.m.home)}<span class="vs">–</span>${esc(r.m.away)}` : esc(teamsOf(r))}</span>` +
+        `${r.note ? `<span class="kp-note" title="${esc(r.note)}">”${esc(r.note)}”</span>` : ''}</span>` +
         signBoxes(r) +
         (r.p != null
           ? `<span class="kp-p" title="Modellens chans för vårt tecken, före avspark"><span class="kp-pbar"><i style="width:${Math.min(100, r.p)}%"></i></span>${r.p} %</span>`
@@ -467,7 +483,8 @@ function liveLine(g) {
 function pastSection(list, shown) {
   if (!list.length) return '';
   const done = list.filter((x) => x.g.done && x.g.n).slice(0, 12).reverse();
-  let html = `<h3>${list.every((x) => x.g.first < shown.first) ? 'Tidigare kuponger' : 'Fler kuponger'}</h3>`;
+  let html = `<h3 class="kp-h">${list.every((x) => x.g.first < shown.first) ? 'Tidigare kuponger' : 'Fler kuponger'}` +
+    `${KP.history ? '<a class="kp-h-link" href="historik.html">Historik ›</a>' : ''}</h3>`;
   if (done.length >= 2) {
     html += '<div class="card kp-hist" role="img" aria-label="Andel rätt per kupong, jämfört med modellens tips">' +
       done.map(({ c, g }) => {
@@ -495,7 +512,7 @@ function couponErrors() {
 // ---------- ny kupong ----------
 
 function newDraft(editId) {
-  const d = { edit: editId, name: '', picks: {}, locked: [] };
+  const d = { edit: editId, name: '', picks: {}, notes: {}, locked: [] };
   if (!editId) return d;
   const c = allCoupons().find((x) => x.id === editId);
   if (!c) return d;
@@ -504,8 +521,12 @@ function newDraft(editId) {
   // Startade matcher går inte att ändra – de följer med som de är.
   for (const x of c.matches) {
     const m = matchById(x.id);
-    if (m && !m.completed && new Date(m.kickoff).getTime() > Date.now()) d.picks[x.id] = x.sign;
-    else d.locked.push(x);
+    if (m && !m.completed && new Date(m.kickoff).getTime() > Date.now()) {
+      d.picks[x.id] = x.sign;
+      if (x.note) d.notes[x.id] = x.note;
+    } else {
+      d.locked.push(x);
+    }
   }
   return d;
 }
@@ -513,6 +534,7 @@ function newDraft(editId) {
 function renderCreate(editId) {
   const saved = kpLoad(KP_DRAFT);
   KP.draft = saved && saved.edit === editId ? saved : newDraft(editId);
+  KP.draft.notes = KP.draft.notes || {};
   KP.view = { mode: 'new', edit: editId };
   const el = $('#coupon');
   const comps = [{ id: 'all', short: 'Alla', name: 'Alla tävlingar' }, ...state.comps.values()];
@@ -545,6 +567,16 @@ function renderCreate(editId) {
   });
   $('#kp-name').addEventListener('input', (e) => { KP.draft.name = e.target.value; kpStore(KP_DRAFT, KP.draft); });
   $('#kp-save').addEventListener('click', saveCoupon);
+  // Anteckningen sparas i utkastet medan man skriver; listan ritas inte om,
+  // så att fältet behåller fokus.
+  $('#kp-pick-list').addEventListener('input', (e) => {
+    const f = e.target.closest('input[data-note]');
+    if (!f) return;
+    const v = f.value.slice(0, NOTE_MAX);
+    if (v.trim()) KP.draft.notes[f.dataset.note] = v;
+    else delete KP.draft.notes[f.dataset.note];
+    kpStore(KP_DRAFT, KP.draft);
+  });
   $('#kp-pick-list').addEventListener('click', (e) => {
     const b = e.target.closest('button[data-s]');
     if (!b) return;
@@ -603,7 +635,10 @@ function renderPickList() {
           `<span class="mteams">${esc(m.home)}<span class="vs">–</span>${esc(m.away)}</span>` +
           '<span class="kp-tg">' + SIGNS.map((s, i) =>
             `<button type="button" data-s="${s}" aria-pressed="${sign.includes(s)}" aria-label="${s} för ${esc(m.home)} – ${esc(m.away)}">` +
-            `${s}<small>${p ? `${p[i]} %` : '–'}</small></button>`).join('') + '</span></div>';
+            `${s}<small>${p ? `${p[i]} %` : '–'}</small></button>`).join('') + '</span>' +
+          (sign ? `<input type="text" class="kp-note-in" data-note="${esc(m.id)}" maxlength="${NOTE_MAX}" autocomplete="off"` +
+            ` placeholder="Anteckning (valfritt)" aria-label="Anteckning om ${esc(m.home)} – ${esc(m.away)}" value="${esc(KP.draft.notes[m.id] || '')}">` : '') +
+          '</div>';
       }
       html += '</div></div>';
     }
@@ -613,7 +648,9 @@ function renderPickList() {
 }
 
 function draftMatches() {
-  return Object.entries(KP.draft.picks).map(([id, sign]) => ({ id, sign, m: matchById(id) })).filter((x) => x.m);
+  return Object.entries(KP.draft.picks)
+    .map(([id, sign]) => ({ id, sign, note: ((KP.draft.notes || {})[id] || '').trim().slice(0, NOTE_MAX), m: matchById(id) }))
+    .filter((x) => x.m);
 }
 
 function updateBar() {
@@ -636,7 +673,8 @@ function updateBar() {
 function couponJSON(file) {
   const { matcher, ...head } = file;
   const lines = Object.entries(head).map(([k, v]) => `  ${JSON.stringify(k)}: ${JSON.stringify(v)},`);
-  const rows = matcher.map((r, i) => `    { "id": ${JSON.stringify(r.id)}, "match": ${JSON.stringify(r.match)}, "tecken": ${JSON.stringify(r.tecken)} }${i < matcher.length - 1 ? ',' : ''}`);
+  const rows = matcher.map((r, i) => `    { "id": ${JSON.stringify(r.id)}, "match": ${JSON.stringify(r.match)}, "tecken": ${JSON.stringify(r.tecken)}` +
+    `${r.kommentar ? `, "kommentar": ${JSON.stringify(r.kommentar)}` : ''} }${i < matcher.length - 1 ? ',' : ''}`);
   return ['{', ...lines, '  "matcher": [', ...rows, '  ]', '}', ''].join('\n');
 }
 
@@ -661,8 +699,8 @@ async function saveCoupon() {
   }
   const name = (d.name || '').trim();
   const rows = [
-    ...d.locked.map((x) => ({ id: x.id, match: x.label || teamsOf({ m: matchById(x.id), id: x.id }), tecken: x.sign })),
-    ...sel.map((x) => ({ id: x.id, match: `${x.m.home} – ${x.m.away}`, tecken: x.sign })),
+    ...d.locked.map((x) => ({ id: x.id, match: x.label || teamsOf({ m: matchById(x.id), id: x.id }), tecken: x.sign, ...(x.note ? { kommentar: x.note } : {}) })),
+    ...sel.map((x) => ({ id: x.id, match: `${x.m.home} – ${x.m.away}`, tecken: x.sign, ...(x.note ? { kommentar: x.note } : {}) })),
   ];
   const kick = (r) => { const m = matchById(r.id); return m ? m.kickoff : ''; };
   rows.sort((a, b) => kick(a).localeCompare(kick(b)));
@@ -673,7 +711,7 @@ async function saveCoupon() {
     matcher: rows,
   };
   const json = couponJSON(file);
-  const coupon = { id, name: name || null, created: file.skapad, matches: rows.map((r) => ({ id: r.id, sign: r.tecken, label: r.match })) };
+  const coupon = { id, name: name || null, created: file.skapad, matches: rows.map((r) => ({ id: r.id, sign: r.tecken, label: r.match, ...(r.kommentar ? { note: r.kommentar } : {}) })) };
   setPending(coupon);
   kpStore(KP_DRAFT, null);
 
