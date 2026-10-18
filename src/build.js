@@ -13,6 +13,7 @@
 //   data/evaluation.json   journalen och utvärderingen mot facit (fliken
 //                          Utvärdering)
 //   data/divisions.json    statistik per division (sidan Divisioner)
+//   data/kuponger.json     gängets kuponger ur data/kuponger/ (fliken Kupong)
 //   data/journal/*.jsonl   prognosjournalen som den ligger i repot
 //
 // Matchanalysen (fas 5) görs inte i bygget utan på begäran i matchvyn, via en
@@ -37,6 +38,7 @@ const { readJournal, appendJournal, HORIZON_DAYS } = require('./journal');
 const { evaluate } = require('./evaluate');
 const { divisionStats } = require('./divisions');
 const { playerFiles, teamSquad } = require('./players');
+const { readCoupons, REPO, BRANCH } = require('./coupons');
 const { wholePercent } = require('./model');
 const rules = require('../config/forecast-rules');
 const llm = require('../config/llm');
@@ -70,7 +72,7 @@ function writeSite(outDir = OUT, { journal = false, analysisEndpoint } = {}) {
     rulesVersion: rules.version,
     journalHorizonDays: HORIZON_DAYS,
     analysis: analysisInfo(analysisEndpoint),
-    competitions: COMPETITIONS.map((c) => ({ id: c.id, name: c.name, short: c.short, type: c.type })),
+    competitions: COMPETITIONS.map((c) => ({ id: c.id, name: c.name, short: c.short, type: c.type, espn: c.espn })),
   });
   const sources = sourceReport();
   write('sources.json', sources);
@@ -153,6 +155,17 @@ function writeSite(outDir = OUT, { journal = false, analysisEndpoint } = {}) {
     if (c && c.counted) m.j = { p: c.counted.p ? wholePercent(c.counted.p) : null };
   }
   write('matches.json', list);
+
+  // Kupongerna (fliken Kupong). Rättas på sidan mot matches.json och
+  // liveställningen; en trasig kupongfil visas som fel men stoppar inget.
+  let coupons;
+  try {
+    coupons = readCoupons();
+  } catch (err) {
+    console.error('[build] kupongerna:', err);
+    coupons = { coupons: [], errors: [{ file: '', errors: [String(err.message || err)] }] };
+  }
+  write('kuponger.json', { repo: REPO, branch: BRANCH, dir: 'data/kuponger', ...coupons });
 
   // En trasig match får inte stoppa bygget – den saknar då bara sin sida.
   const failed = [];

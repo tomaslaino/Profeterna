@@ -1,0 +1,714 @@
+'use strict';
+
+// ---------- kupongen ----------
+//
+// Gängets kupong för omgången: utvalda matcher med ett tecken var (1, X, 2
+// eller en gardering som 1X). Kupongerna ligger som filer i data/kuponger/ i
+// repot och läses av bygget till data/kuponger.json (src/coupons.js). Här
+// rättas de mot matches.json och – medan matcherna pågår – mot
+// liveställningen från ESPN:s öppna API, som hämtas direkt i webbläsaren varje
+// minut. Tecknet gäller ställningen efter 90 minuter, som prognosen.
+//
+// En ny kupong görs under Kupong → Ny kupong och sparas med en commit på
+// GitHub: sidan öppnar GitHub med filen ifylld. Tills bygget publicerat den
+// visas den i den här webbläsaren, märkt "väntar på GitHub".
+//
+// Läses efter app.js och använder dess hjälpare ($, esc, state, getJSON,
+// fmt, fTime, fDay, dayKey, cap, compOf).
+
+const KP = {
+  data: null, // data/kuponger.json
+  live: new Map(), // matchid → { state, name, detail, score }
+  liveAt: null,
+  liveError: false,
+  timer: null,
+  wasLive: false,
+  view: null, // { mode: 'show', id } | { mode: 'new', edit } | { mode: 'saved', ... }
+  draft: null,
+  q: '',
+  comp: 'all',
+  onlyPicked: false,
+};
+const SIGNS = ['1', 'X', '2'];
+const LIVE_EVERY_MS = 60000;
+const PICK_DAYS = 14;
+const KP_DRAFT = 'profeterna.kupong.utkast';
+const KP_PENDING = 'profeterna.kupong.osparad';
+// ESPN:s ligakoder, om meta.json byggts före kupongen (annars därifrån).
+const ESPN_CODE = { pl: 'eng.1', ch: 'eng.2', l1: 'eng.3', l2: 'eng.4', fac: 'eng.fa', lc: 'eng.league_cup' };
+
+const kpNum = (x) => x.toLocaleString('sv-SE', { minimumFractionDigits: 1, maximumFractionDigits: 1 });
+const fDayNum = fmt({ day: 'numeric' });
+const fMonth = fmt({ month: 'short' });
+const fWeekdayTime = fmt({ weekday: 'short', hour: '2-digit', minute: '2-digit' });
+
+// localStorage kan saknas eller kasta (privat läge) – då finns bara inget utkast.
+function kpLoad(key) {
+  try { return JSON.parse(localStorage.getItem(key) || 'null'); } catch { return null; }
+}
+function kpStore(key, v) {
+  try { if (v == null) localStorage.removeItem(key); else localStorage.setItem(key, JSON.stringify(v)); } catch { /* inget */ }
+}
+
+// ---------- data ----------
+
+function whenMatches() {
+  if (state.all) return Promise.resolve();
+  return new Promise((res) => document.addEventListener('matches-loaded', res, { once: true }));
+}
+
+async function loadCoupons() {
+  if (KP.data) return KP.data;
+  try {
+    KP.data = await getJSON('data/kuponger.json');
+  } catch {
+    KP.data = { coupons: [], errors: [], repo: null, branch: 'main', dir: 'data/kuponger' };
+  }
+  return KP.data;
+}
+
+let kpIndex = { src: null, map: new Map() };
+function matchById(id) {
+  if (kpIndex.src !== state.all) {
+    kpIndex = { src: state.all, map: new Map((state.all ? state.all.matches : []).map((m) => [m.id, m])) };
+  }
+  return kpIndex.map.get(id) || null;
+}
+
+// Kuponger som sparats här men ännu inte publicerats av bygget, per id.
+// Efter tre dygn antas de aldrig ha committats och glöms.
+function pendingCoupons() {
+  const all = kpLoad(KP_PENDING) || {};
+  const keep = {};
+  for (const [id, p] of Object.entries(all)) {
+    if (p && p.coupon && Date.now() - new Date(p.savedAt).getTime() < 3 * 86400000) keep[id] = p;
+  }
+  if (Object.keys(keep).length !== Object.keys(all).length) kpStore(KP_PENDING, keep);
+  return keep;
+}
+function setPending(coupon) {
+  kpStore(KP_PENDING, { ...pendingCoupons(), [coupon.id]: { savedAt: new Date().toISOString(), coupon } });
+}
+function clearPending(id) {
+  const all = pendingCoupons();
+  delete all[id];
+  kpStore(KP_PENDING, all);
+}
+
+const signature = (c) => c.matches.map((x) => `${x.id}:${x.sign}`).sort().join(',');
+
+function allCoupons() {
+  const list = (KP.data ? KP.data.coupons : []).slice();
+  for (const { coupon } of Object.values(pendingCoupons())) {
+    const p = { ...coupon, pending: true };
+    const i = list.findIndex((c) => c.id === p.id);
+    if (i >= 0 && signature(list[i]) === signature(p)) clearPending(p.id);
+    else if (i >= 0) list[i] = p;
+    else list.push(p);
+  }
+  return list;
+}
+
+// ---------- rättning ----------
+
+const signIdx = (s) => (s.home > s.away ? 0 : s.home === s.away ? 1 : 2);
+
+function gradeRow(x, now) {
+  const m = matchById(x.id);
+  const r = { id: x.id, sign: x.sign, label: x.label, m, state: 'missing', res: null, hit: null, score: null, clock: null, p: null, tip: null, kick: null };
+  if (!m) return r;
+  r.kick = new Date(m.kickoff).getTime();
+  // Prognosen före avspark ur journalen om den finns, annars sajtens prognos.
+  const pr = m.j && m.j.p ? m.j.p : m.f ? m.f.p : null;
+  if (pr) {
+    r.p = x.sign.split('').reduce((a, s) => a + pr[SIGNS.indexOf(s)], 0);
+    r.tip = pr.indexOf(Math.max(...pr));
+  }
+  const L = KP.live.get(m.id);
+  if (/POSTPONED|CANCEL|ABANDON|SUSPEND/.test(m.status || '')) {
+    r.state = 'off';
+  } else if (m.completed) {
+    r.state = 'final';
+    r.score = m.score;
+    const s90 = m.score90 || (/STATUS_(FULL_TIME|FINAL)$/.test(m.status) ? m.score : null);
+    r.res = s90 ? signIdx(s90) : null;
+    if (m.status === 'STATUS_FINAL_AET') r.extra = 'e.fl.';
+    if (m.shootout) r.extra = `str. ${m.shootout.home}–${m.shootout.away}`;
+  } else if (L && (L.state === 'in' || L.state === 'post')) {
+    r.state = L.state === 'in' ? 'live' : 'final';
+    r.score = L.score;
+    r.clock = L.state === 'in' ? L.detail : null;
+    // Förlängning och straffar: ställningen efter 90 minuter kommer med
+    // nästa bygge (målminuterna), inte ur liveställningen.
+    const regular = L.state === 'in' ? /FIRST_HALF|HALFTIME|SECOND_HALF|END_PERIOD/.test(L.name) : /STATUS_(FULL_TIME|FINAL)$/.test(L.name);
+    r.res = regular ? signIdx(L.score) : null;
+  } else if (r.kick <= now) {
+    r.state = 'started';
+  } else {
+    r.state = 'upcoming';
+  }
+  if (r.res != null) r.hit = x.sign.includes(SIGNS[r.res]);
+  return r;
+}
+
+function gradeCoupon(c, now = Date.now()) {
+  const rows = c.matches.map((x) => gradeRow(x, now)).sort((a, b) => (a.kick || 0) - (b.kick || 0));
+  const counted = rows.filter((r) => r.state !== 'off' && r.state !== 'missing');
+  const is = (st, hit) => counted.filter((r) => r.state === st && (hit === undefined || r.hit === hit)).length;
+  const g = {
+    rows,
+    n: counted.length,
+    ok: is('final', true),
+    no: is('final', false),
+    live: is('live'),
+    liveOk: is('live', true),
+    left: is('upcoming') + is('started'),
+    modelOk: counted.filter((r) => r.state === 'final' && r.res != null && r.tip === r.res).length,
+    first: rows.length ? rows[0].kick : null,
+    last: rows.length ? rows[rows.length - 1].kick : null,
+  };
+  g.max = g.n - g.no;
+  g.done = counted.every((r) => r.state === 'final');
+  // Väntat antal rätt: klara matcher räknas som de gick, resten med
+  // modellens sannolikhet för vårt tecken före avspark.
+  g.expected = counted.reduce((a, r) => a + (r.state === 'final' && r.hit != null ? (r.hit ? 1 : 0) : (r.p || 0) / 100), 0);
+  g.started = counted.some((r) => r.state !== 'upcoming');
+  return g;
+}
+
+// Kupongen som visas på förstasidan: den som pågår, annars nästa, annars den
+// senaste om den slutade de senaste fyra dagarna.
+function currentCoupon(now = Date.now()) {
+  const graded = allCoupons().map((c) => ({ c, g: gradeCoupon(c, now) })).filter((x) => x.g.first);
+  const running = graded.filter((x) => x.g.started && !x.g.done).sort((a, b) => b.g.first - a.g.first);
+  if (running.length) return running[0].c;
+  const next = graded.filter((x) => !x.g.started).sort((a, b) => a.g.first - b.g.first);
+  if (next.length) return next[0].c;
+  const recent = graded.filter((x) => x.g.done && x.g.last > now - 4 * 86400000).sort((a, b) => b.g.last - a.g.last);
+  return recent.length ? recent[0].c : null;
+}
+
+// ---------- liveställningen ----------
+
+function espnCode(comp) {
+  const c = state.meta && state.meta.competitions.find((x) => x.id === comp);
+  return (c && c.espn) || ESPN_CODE[comp] || null;
+}
+
+// Matcher på kupongerna som pågår enligt spelprogrammet men inte är klara i
+// matches.json.
+function liveNeeded(now = Date.now()) {
+  const out = [];
+  for (const c of allCoupons()) {
+    for (const x of c.matches) {
+      const m = matchById(x.id);
+      if (!m || m.completed || /POSTPONED|CANCEL/.test(m.status || '')) continue;
+      const t = new Date(m.kickoff).getTime();
+      if (t <= now + 2 * 60000 && t >= now - 5 * 3600000) out.push(m);
+    }
+  }
+  return out;
+}
+
+async function fetchLive(matches) {
+  const keys = new Set();
+  for (const m of matches) {
+    const code = espnCode(m.comp);
+    if (code) keys.add(`${code}|${m.kickoff.slice(0, 10).replace(/-/g, '')}`);
+  }
+  let failed = false;
+  await Promise.all([...keys].map(async (k) => {
+    const [code, date] = k.split('|');
+    try {
+      const res = await fetch(`https://site.api.espn.com/apis/site/v2/sports/soccer/${code}/scoreboard?dates=${date}`, { cache: 'no-store' });
+      if (!res.ok) throw new Error(`HTTP ${res.status}`);
+      const d = await res.json();
+      for (const e of d.events || []) {
+        const c = e.competitions && e.competitions[0];
+        if (!c) continue;
+        const h = c.competitors.find((t) => t.homeAway === 'home');
+        const a = c.competitors.find((t) => t.homeAway === 'away');
+        const st = c.status.type;
+        KP.live.set(String(e.id), {
+          state: st.state, name: st.name, detail: st.shortDetail || c.status.displayClock,
+          score: { home: Number(h.score), away: Number(a.score) },
+        });
+      }
+    } catch {
+      failed = true;
+    }
+  }));
+  KP.liveError = failed;
+  KP.liveAt = new Date().toISOString();
+}
+
+// Varje minut: hämta liveställningen om någon kupongmatch pågår och rita om
+// (en gång till när den sista slutat). En död källa ger bara ingen
+// liveställning – sidan fortsätter som vanligt.
+async function liveTick() {
+  clearTimeout(KP.timer);
+  try {
+    const need = liveNeeded();
+    if (need.length && !document.hidden) await fetchLive(need);
+    if (need.length || KP.wasLive) {
+      renderCouponHero();
+      if (KP.view && KP.view.mode === 'show' && !$('#coupon-section').hidden) renderCouponShow(KP.view.id);
+    }
+    KP.wasLive = need.length > 0;
+  } finally {
+    KP.timer = setTimeout(liveTick, LIVE_EVERY_MS);
+  }
+}
+
+// ---------- gemensamma bitar ----------
+
+function dateRange(a, b) {
+  if (!a) return '';
+  const A = new Date(a);
+  const B = new Date(b || a);
+  const mon = (d) => fMonth.format(d).replace('.', '');
+  if (dayKey.format(A) === dayKey.format(B)) return `${fDayNum.format(A)} ${mon(A)}`;
+  if (mon(A) === mon(B)) return `${fDayNum.format(A)}–${fDayNum.format(B)} ${mon(B)}`;
+  return `${fDayNum.format(A)} ${mon(A)} – ${fDayNum.format(B)} ${mon(B)}`;
+}
+
+function rowClass(r) {
+  if (r.state === 'final') return r.hit === true ? 'ok' : r.hit === false ? 'no' : 'unk';
+  if (r.state === 'live') return r.hit === true ? 'live ok' : r.hit === false ? 'live no' : 'live';
+  if (r.state === 'off' || r.state === 'missing') return 'off';
+  return 'wait';
+}
+
+function teamsOf(r) {
+  return r.m ? `${r.m.home} – ${r.m.away}` : r.label || `match ${r.id}`;
+}
+
+function scoreText(r) {
+  return r.score ? `${r.score.home}–${r.score.away}` : '';
+}
+
+function pearlTitle(r) {
+  const what = r.state === 'final' ? scoreText(r) || 'spelad'
+    : r.state === 'live' ? `${scoreText(r)} ${r.clock || ''}`.trim()
+      : r.state === 'off' ? 'uppskjuten' : r.state === 'missing' ? 'okänd match'
+        : r.m ? fWeekdayTime.format(new Date(r.m.kickoff)) : '';
+  return `${teamsOf(r)} · ${r.sign} · ${what}`;
+}
+
+function pearls(rows, size = '') {
+  return `<span class="kp-pearls ${size}">` + rows.map((r) => {
+    const cls = rowClass(r);
+    const icon = cls === 'ok' ? '✓' : cls === 'no' ? '✕' : '';
+    return `<span class="kp-dot ${cls}" title="${esc(pearlTitle(r))}">${icon}</span>`;
+  }).join('') + '</span>';
+}
+
+function bigNumber(g) {
+  if (!g.started) return `<span class="kp-big"><b>${g.n}</b><span>${g.n === 1 ? 'match' : 'matcher'}</span></span>`;
+  return `<span class="kp-big"><b>${g.ok}</b>` +
+    (g.liveOk ? `<em title="Rätt om ställningen håller">+${g.liveOk}</em>` : '') +
+    `<span>/ ${g.n} rätt</span></span>`;
+}
+
+function statusLine(g) {
+  if (!g.started) {
+    return `Startar ${esc(fWeekdayTime.format(new Date(g.first)))} · modellen väntar sig <b>${kpNum(g.expected)}</b> rätt`;
+  }
+  if (g.done) return `Klar · modellens tips gav <b>${g.modelOk}</b> rätt`;
+  return [
+    g.live ? `<span class="kp-livetxt">${g.live} pågår</span>` : null,
+    g.left ? `${g.left} kvar` : null,
+    `väntat <b>${kpNum(g.expected)}</b> rätt`,
+  ].filter(Boolean).join(' · ');
+}
+
+// ---------- förstasidan ----------
+
+function renderCouponHero() {
+  const el = $('#coupon-hero');
+  if (!el || !state.all || !KP.data) return;
+  const c = currentCoupon();
+  if (!c) {
+    el.innerHTML = '<a class="kp-new" href="#kupong/ny"><span aria-hidden="true">+</span> Skapa kupong</a>';
+    return;
+  }
+  const g = gradeCoupon(c);
+  el.innerHTML = `<a class="kp-hero${g.live ? ' is-live' : ''}" href="#kupong/${esc(c.id)}">` +
+    `<span class="kp-hero-num"><span class="kp-eyebrow">${esc(c.name || 'Kupongen')} · ${esc(dateRange(g.first, g.last))}` +
+    `${c.pending ? ' <span class="kp-tag">väntar på GitHub</span>' : ''}</span>${bigNumber(g)}</span>` +
+    `<span class="kp-hero-main">${pearls(g.rows)}<span class="kp-line">${statusLine(g)}</span></span>` +
+    '<span class="kp-chev" aria-hidden="true">›</span></a>';
+}
+
+// ---------- kupongvyn ----------
+
+async function showCoupon(arg) {
+  const el = $('#coupon');
+  el.innerHTML = '<p class="empty">Laddar …</p>';
+  await Promise.all([whenMatches(), loadCoupons()]);
+  if (!state.all) {
+    el.innerHTML = '<p class="empty">Kunde inte läsa matcherna.</p>';
+    return;
+  }
+  const [mode, id] = (arg || '').split('/');
+  if (mode === 'ny') return renderCreate(null);
+  if (mode === 'andra' && id) return renderCreate(id);
+  KP.view = { mode: 'show', id: mode || null };
+  renderCouponShow(KP.view.id);
+  window.scrollTo(0, 0);
+}
+
+function renderCouponShow(id) {
+  const el = $('#coupon');
+  const all = allCoupons();
+  const graded = all.map((c) => ({ c, g: gradeCoupon(c) })).sort((a, b) => (b.g.first || 0) - (a.g.first || 0));
+  if (!graded.length) {
+    el.innerHTML = '<div class="kp-empty card"><p class="kp-eyebrow">Kupong</p><h2 class="page-title">Omgångens kupong</h2>' +
+      '<p class="intro">Välj matcherna, sätt 1, X eller 2 och följ hur det går.</p>' +
+      '<a class="kp-btn primary" href="#kupong/ny">Skapa kupong</a></div>' + couponErrors();
+    return;
+  }
+  const curId = id || (currentCoupon() || {}).id;
+  const cur = graded.find((x) => x.c.id === curId) || (id ? null : graded[0]);
+  if (!cur) {
+    el.innerHTML = `<p class="empty">Kupongen ${esc(id)} finns inte. <a href="#kupong">Till kupongen</a></p>`;
+    return;
+  }
+  const { c, g } = cur;
+  const canEdit = g.rows.some((r) => r.state === 'upcoming');
+  let html = '<div class="kp-head"><div>' +
+    `<p class="kp-eyebrow">${esc(c.name || 'Kupong')}${c.pending ? ' <span class="kp-tag">väntar på GitHub</span>' : ''}</p>` +
+    `<h2 class="page-title">${esc(dateRange(g.first, g.last))}</h2></div><div class="kp-actions">` +
+    (canEdit ? `<a class="kp-btn" href="#kupong/andra/${esc(c.id)}">Ändra</a>` : '') +
+    '<a class="kp-btn primary" href="#kupong/ny">+ Ny kupong</a></div></div>';
+
+  html += summaryCard(g);
+  html += couponRows(g);
+  html += liveLine(g);
+  html += pastSection(graded.filter((x) => x !== cur), g);
+  html += couponErrors();
+  el.innerHTML = html;
+}
+
+function summaryCard(g) {
+  const w = (x) => (g.n ? (100 * x) / g.n : 0);
+  const open = Math.max(0, g.max - g.ok - g.liveOk);
+  const exp = Math.min(100, w(g.expected));
+  return `<div class="card kp-summary${g.live ? ' is-live' : ''}">` +
+    `<div class="kp-sum-num">${bigNumber(g)}<span class="kp-line">${statusLine(g)}</span></div>` +
+    '<div class="kp-sum-main">' +
+    `<div class="kp-scale" role="img" aria-label="${g.ok} rätt, högst ${g.max} möjliga, väntat ${kpNum(g.expected)}">` +
+    `<div class="kp-track"><i class="ok" style="width:${w(g.ok)}%"></i><i class="liveok" style="width:${w(g.liveOk)}%"></i>` +
+    `<i class="open" style="width:${w(open)}%"></i><b class="exp" style="left:${exp}%" title="Väntat antal rätt enligt modellen"></b></div>` +
+    `<div class="kp-scale-lab"><span>0</span><span class="exp" style="left:${exp}%">väntat ${kpNum(g.expected)}</span><span>${g.n}</span></div></div>` +
+    (g.started ? `<div class="kp-facts"><span><b>${g.max}</b> möjliga</span><span><b>${g.no}</b> fel</span>` +
+      `<span title="Om vi spelat modellens troligaste utfall i varje match">modellens tips <b>${g.modelOk}</b> rätt</span></div>` : '') +
+    '</div></div>';
+}
+
+function signBoxes(r) {
+  return '<span class="kp-sg">' + SIGNS.map((s, i) => {
+    const cls = [
+      r.sign.includes(s) ? 'on' : '',
+      r.res === i ? 'res' : '',
+      r.tip === i ? 'tip' : '',
+    ].filter(Boolean).join(' ');
+    return `<i class="${cls}">${s}</i>`;
+  }).join('') + '</span>';
+}
+
+function couponRows(g) {
+  const days = new Map();
+  for (const r of g.rows) {
+    const k = r.m ? dayKey.format(new Date(r.m.kickoff)) : 'okänd';
+    if (!days.has(k)) days.set(k, []);
+    days.get(k).push(r);
+  }
+  let html = '';
+  let head = '<span class="day-key" title="Vårt tecken · prickarna under är modellens tips · modellens chans för vårt tecken">Tecken · modellen</span>';
+  for (const rows of days.values()) {
+    const d = rows[0].m ? cap(fDay.format(new Date(rows[0].m.kickoff))) : 'Okänt datum';
+    html += `<div class="day"><div class="day-head">${esc(d)}${head}</div><div class="mlist kp-rows">`;
+    head = '';
+    for (const r of rows) {
+      const cls = rowClass(r);
+      const when = r.state === 'live' ? `<span class="kp-clock">${esc(r.clock || 'live')}</span>`
+        : r.m ? esc(fTime.format(new Date(r.m.kickoff))) : '';
+      const comp = r.m ? compOf(r.m.comp) : null;
+      // På mobilen saknas tidskolumnen: tiden (eller matchminuten) står då under resultatet.
+      const score = r.state === 'off' ? '<span class="sub">uppskjuten</span>'
+        : r.score ? `<span class="score">${esc(scoreText(r))}</span>${r.extra ? `<span class="sub">${esc(r.extra)}</span>` : ''}` +
+          (r.state === 'live' ? `<span class="sub kp-m">${esc(r.clock || 'live')}</span>` : '')
+          : `<span class="sub kp-d">–</span><span class="sub kp-m">${r.m ? esc(fTime.format(new Date(r.m.kickoff))) : ''}</span>`;
+      const tag = r.m ? 'a' : 'div';
+      html += `<${tag} class="kp-row s-${cls.replace(' ', ' s-')}"${r.m ? ` href="#match/${esc(r.id)}"` : ''}>` +
+        `<span class="kp-dot ${cls}" aria-hidden="true">${cls === 'ok' ? '✓' : cls === 'no' ? '✕' : ''}</span>` +
+        `<span class="mtime">${when}</span>` +
+        `<span class="ctag"${comp ? ` title="${esc(comp.name)}"` : ''}>${comp ? esc(comp.short) : ''}</span>` +
+        `<span class="mteams">${r.m ? `${esc(r.m.home)}<span class="vs">–</span>${esc(r.m.away)}` : esc(teamsOf(r))}</span>` +
+        signBoxes(r) +
+        (r.p != null
+          ? `<span class="kp-p" title="Modellens chans för vårt tecken, före avspark"><span class="kp-pbar"><i style="width:${Math.min(100, r.p)}%"></i></span>${r.p} %</span>`
+          : '<span class="kp-p unknown">okänt</span>') +
+        `<span class="kp-score">${score}</span></${tag}>`;
+    }
+    html += '</div></div>';
+  }
+  return html;
+}
+
+function liveLine(g) {
+  if (!KP.liveAt && !g.live) return '<p class="legend kp-src">Tecknet gäller ställningen efter 90 minuter.</p>';
+  return '<p class="legend kp-src">Tecknet gäller ställningen efter 90 minuter · ' +
+    (KP.liveError ? '<span class="note">ESPN svarar inte – liveställningen kan vara gammal</span>'
+      : `live från ESPN, ${esc(fTime.format(new Date(KP.liveAt)))}`) + '</p>';
+}
+
+function pastSection(list, shown) {
+  if (!list.length) return '';
+  const done = list.filter((x) => x.g.done && x.g.n).slice(0, 12).reverse();
+  let html = `<h3>${list.every((x) => x.g.first < shown.first) ? 'Tidigare kuponger' : 'Fler kuponger'}</h3>`;
+  if (done.length >= 2) {
+    html += '<div class="card kp-hist" role="img" aria-label="Andel rätt per kupong, jämfört med modellens tips">' +
+      done.map(({ c, g }) => {
+        const a = Math.round((100 * g.ok) / g.n);
+        const b = Math.round((100 * g.modelOk) / g.n);
+        return `<a class="kp-hcol" href="#kupong/${esc(c.id)}" title="${esc(dateRange(g.first, g.last))}: ${g.ok} av ${g.n} rätt · modellens tips ${g.modelOk}">` +
+          `<span class="kp-hbar"><i style="height:${a}%"></i><b style="bottom:${b}%"></b></span>` +
+          `<span class="kp-hlab">${esc(dateRange(g.first, g.first))}</span></a>`;
+      }).join('') +
+      '<span class="kp-hkey"><span><i class="us"></i>Vi</span><span><i class="mod"></i>Modellens tips</span></span></div>';
+  }
+  html += '<div class="mlist">' + list.map(({ c, g }) =>
+    `<a class="kp-past" href="#kupong/${esc(c.id)}"><span class="kp-past-date">${esc(dateRange(g.first, g.last))}` +
+    `${c.name ? `<span class="sub">${esc(c.name)}</span>` : ''}</span>${pearls(g.rows, 'sm')}` +
+    `<span class="kp-past-num"><b>${g.ok}</b>/${g.n}</span></a>`).join('') + '</div>';
+  return html;
+}
+
+function couponErrors() {
+  const errs = KP.data && KP.data.errors;
+  if (!errs || !errs.length) return '';
+  return '<p class="legend">' + errs.map((e) => `<span class="note">${esc(e.file)}: ${esc(e.errors.join(', '))}</span>`).join('<br>') + '</p>';
+}
+
+// ---------- ny kupong ----------
+
+function newDraft(editId) {
+  const d = { edit: editId, name: '', picks: {}, locked: [] };
+  if (!editId) return d;
+  const c = allCoupons().find((x) => x.id === editId);
+  if (!c) return d;
+  d.name = c.name || '';
+  d.created = c.created;
+  // Startade matcher går inte att ändra – de följer med som de är.
+  for (const x of c.matches) {
+    const m = matchById(x.id);
+    if (m && !m.completed && new Date(m.kickoff).getTime() > Date.now()) d.picks[x.id] = x.sign;
+    else d.locked.push(x);
+  }
+  return d;
+}
+
+function renderCreate(editId) {
+  const saved = kpLoad(KP_DRAFT);
+  KP.draft = saved && saved.edit === editId ? saved : newDraft(editId);
+  KP.view = { mode: 'new', edit: editId };
+  const el = $('#coupon');
+  const comps = [{ id: 'all', short: 'Alla', name: 'Alla tävlingar' }, ...state.comps.values()];
+  el.innerHTML = '<div class="kp-head"><div>' +
+    `<p class="kp-eyebrow">${editId ? 'Ändra kupong' : 'Ny kupong'}</p><h2 class="page-title">Välj matcher</h2></div>` +
+    `<div class="kp-actions"><a class="kp-btn" href="#kupong${editId ? `/${esc(editId)}` : ''}">Avbryt</a></div></div>` +
+    '<div class="toolbar kp-tools">' +
+    `<input type="search" id="kp-q" class="kp-search" placeholder="Sök lag" autocomplete="off" value="${esc(KP.q)}">` +
+    '<div class="chips" id="kp-comps" role="group" aria-label="Tävling">' + comps.map((c) =>
+      `<button type="button" data-comp="${c.id}" title="${esc(c.name)}" aria-pressed="${c.id === KP.comp}">${esc(c.short)}</button>`).join('') + '</div>' +
+    `<button type="button" id="kp-only" class="kp-only" aria-pressed="${KP.onlyPicked}">Bara valda</button></div>` +
+    (KP.draft.locked.length ? `<p class="legend">${KP.draft.locked.length} ${KP.draft.locked.length === 1 ? 'match har' : 'matcher har'} startat och ligger kvar som de är.</p>` : '') +
+    '<div id="kp-pick-list"></div>' +
+    '<div class="kp-bar"><span class="kp-bar-txt" id="kp-bar-txt"></span>' +
+    `<input type="text" id="kp-name" class="kp-name" maxlength="40" placeholder="Namn (valfritt)" value="${esc(KP.draft.name)}">` +
+    '<button type="button" id="kp-save" class="kp-btn primary">Spara kupong</button></div>';
+
+  $('#kp-q').addEventListener('input', (e) => { KP.q = e.target.value; renderPickList(); });
+  for (const b of document.querySelectorAll('#kp-comps button')) {
+    b.addEventListener('click', () => {
+      KP.comp = b.dataset.comp;
+      for (const x of document.querySelectorAll('#kp-comps button')) x.setAttribute('aria-pressed', String(x === b));
+      renderPickList();
+    });
+  }
+  $('#kp-only').addEventListener('click', (e) => {
+    KP.onlyPicked = !KP.onlyPicked;
+    e.currentTarget.setAttribute('aria-pressed', String(KP.onlyPicked));
+    renderPickList();
+  });
+  $('#kp-name').addEventListener('input', (e) => { KP.draft.name = e.target.value; kpStore(KP_DRAFT, KP.draft); });
+  $('#kp-save').addEventListener('click', saveCoupon);
+  $('#kp-pick-list').addEventListener('click', (e) => {
+    const b = e.target.closest('button[data-s]');
+    if (!b) return;
+    const id = b.closest('[data-id]').dataset.id;
+    const cur = KP.draft.picks[id] || '';
+    const s = b.dataset.s;
+    const next = SIGNS.filter((x) => (x === s ? !cur.includes(x) : cur.includes(x))).join('');
+    if (next) KP.draft.picks[id] = next;
+    else delete KP.draft.picks[id];
+    kpStore(KP_DRAFT, KP.draft);
+    renderPickList();
+  });
+  renderPickList();
+  window.scrollTo(0, 0);
+}
+
+// Gemener utan accenter, så att "malmo" hittar "Malmö" och "wolves" inte
+// behöver stora bokstäver.
+const fold = (s) => String(s).toLowerCase().normalize('NFD').replace(/[̀-ͯ]/g, '');
+
+function pickable(now = Date.now()) {
+  return state.all.matches.filter((m) => {
+    const t = new Date(m.kickoff).getTime();
+    return !m.completed && t > now && t <= now + PICK_DAYS * 86400000 && !/POSTPONED|CANCEL/.test(m.status || '');
+  });
+}
+
+function renderPickList() {
+  const el = $('#kp-pick-list');
+  if (!el) return;
+  const q = fold(KP.q.trim());
+  const picks = KP.draft.picks;
+  const list = pickable().filter((m) => {
+    if (KP.onlyPicked) return Boolean(picks[m.id]);
+    if (KP.comp !== 'all' && m.comp !== KP.comp) return false;
+    return !q || fold(`${m.home} ${m.away}`).includes(q);
+  });
+  if (!list.length) {
+    el.innerHTML = `<p class="empty">${KP.onlyPicked ? 'Inga valda matcher än.' : 'Inga matcher hittades.'}</p>`;
+  } else {
+    const days = new Map();
+    for (const m of list) {
+      const k = dayKey.format(new Date(m.kickoff));
+      if (!days.has(k)) days.set(k, []);
+      days.get(k).push(m);
+    }
+    let html = '';
+    for (const ms of days.values()) {
+      html += `<div class="day"><div class="day-head">${esc(cap(fDay.format(new Date(ms[0].kickoff))))}</div><div class="mlist">`;
+      for (const m of ms) {
+        const sign = picks[m.id] || '';
+        const p = m.f ? m.f.p : null;
+        html += `<div class="kp-pick${sign ? ' on' : ''}" data-id="${esc(m.id)}">` +
+          `<span class="mtime">${esc(fTime.format(new Date(m.kickoff)))}</span>` +
+          `<span class="ctag" title="${esc(compOf(m.comp).name)}">${esc(compOf(m.comp).short)}</span>` +
+          `<span class="mteams">${esc(m.home)}<span class="vs">–</span>${esc(m.away)}</span>` +
+          '<span class="kp-tg">' + SIGNS.map((s, i) =>
+            `<button type="button" data-s="${s}" aria-pressed="${sign.includes(s)}" aria-label="${s} för ${esc(m.home)} – ${esc(m.away)}">` +
+            `${s}<small>${p ? `${p[i]} %` : '–'}</small></button>`).join('') + '</span></div>';
+      }
+      html += '</div></div>';
+    }
+    el.innerHTML = html;
+  }
+  updateBar();
+}
+
+function draftMatches() {
+  return Object.entries(KP.draft.picks).map(([id, sign]) => ({ id, sign, m: matchById(id) })).filter((x) => x.m);
+}
+
+function updateBar() {
+  const t = $('#kp-bar-txt');
+  if (!t) return;
+  const sel = draftMatches();
+  const n = sel.length + KP.draft.locked.length;
+  if (!n) {
+    t.innerHTML = 'Tryck på 1, X eller 2';
+    return;
+  }
+  // Startade matcher (vid ändring) räknas som de gått, eller med prognosen.
+  const now = Date.now();
+  const exp = sel.reduce((a, x) => a + (x.m.f ? x.sign.split('').reduce((b, s) => b + x.m.f.p[SIGNS.indexOf(s)], 0) / 100 : 0), 0) +
+    KP.draft.locked.map((x) => gradeRow(x, now)).reduce((a, r) => a + (r.state === 'final' && r.hit != null ? (r.hit ? 1 : 0) : (r.p || 0) / 100), 0);
+  t.innerHTML = `<b>${n}</b> ${n === 1 ? 'match' : 'matcher'}` + (sel.length ? ` · modellen väntar sig <b>${kpNum(exp)}</b> rätt` : '');
+}
+
+// Filen med en match per rad, så att den går att läsa och ändra på GitHub.
+function couponJSON(file) {
+  const { matcher, ...head } = file;
+  const lines = Object.entries(head).map(([k, v]) => `  ${JSON.stringify(k)}: ${JSON.stringify(v)},`);
+  const rows = matcher.map((r, i) => `    { "id": ${JSON.stringify(r.id)}, "match": ${JSON.stringify(r.match)}, "tecken": ${JSON.stringify(r.tecken)} }${i < matcher.length - 1 ? ',' : ''}`);
+  return ['{', ...lines, '  "matcher": [', ...rows, '  ]', '}', ''].join('\n');
+}
+
+// Kupongen blir en fil i repot. En ny fil öppnas ifylld på GitHub; finns
+// filen redan öppnas den för redigering och innehållet kopieras, eftersom
+// GitHub inte kan fylla i en befintlig fil.
+async function saveCoupon() {
+  const sel = draftMatches();
+  if (!sel.length && !KP.draft.locked.length) {
+    $('#kp-bar-txt').innerHTML = '<span class="note">Välj minst en match</span>';
+    return;
+  }
+  const d = KP.draft;
+  const published = (KP.data.coupons || []).map((c) => c.id);
+  let id = d.edit;
+  if (!id) {
+    const first = sel.map((x) => x.m.kickoff).sort()[0];
+    const base = fmt({ year: 'numeric', month: '2-digit', day: '2-digit' }).format(new Date(first));
+    const taken = new Set(allCoupons().map((c) => c.id));
+    id = base;
+    for (let i = 2; taken.has(id); i++) id = `${base}-${i}`;
+  }
+  const name = (d.name || '').trim();
+  const rows = [
+    ...d.locked.map((x) => ({ id: x.id, match: x.label || teamsOf({ m: matchById(x.id), id: x.id }), tecken: x.sign })),
+    ...sel.map((x) => ({ id: x.id, match: `${x.m.home} – ${x.m.away}`, tecken: x.sign })),
+  ];
+  const kick = (r) => { const m = matchById(r.id); return m ? m.kickoff : ''; };
+  rows.sort((a, b) => kick(a).localeCompare(kick(b)));
+  const file = {
+    ...(name ? { namn: name } : {}),
+    skapad: d.created || new Date().toISOString(),
+    ...(d.edit ? { 'ändrad': new Date().toISOString() } : {}),
+    matcher: rows,
+  };
+  const json = couponJSON(file);
+  const coupon = { id, name: name || null, created: file.skapad, matches: rows.map((r) => ({ id: r.id, sign: r.tecken, label: r.match })) };
+  setPending(coupon);
+  kpStore(KP_DRAFT, null);
+
+  const repo = KP.data.repo || 'tomaslaino/Profeterna';
+  const branch = KP.data.branch || 'main';
+  const path = `${KP.data.dir || 'data/kuponger'}/${id}.json`;
+  const exists = published.includes(id);
+  const url = exists
+    ? `https://github.com/${repo}/edit/${branch}/${path}`
+    : `https://github.com/${repo}/new/${branch}?filename=${encodeURIComponent(path)}&value=${encodeURIComponent(json)}`;
+  KP.view = { mode: 'saved', id };
+  $('#coupon').innerHTML = '<div class="kp-head"><div><p class="kp-eyebrow">Kupongen är klar</p>' +
+    `<h2 class="page-title">${esc(dateRange(matchById(rows[0].id) && matchById(rows[0].id).kickoff, matchById(rows[rows.length - 1].id) && matchById(rows[rows.length - 1].id).kickoff))}</h2></div></div>` +
+    '<div class="card kp-saved">' +
+    (exists
+      ? '<p>Öppna filen på GitHub, markera allt, klistra in och tryck <b>Commit changes</b>. Innehållet kopieras när du trycker på knappen.</p>'
+      : '<p>Tryck <b>Commit changes</b> på GitHub. Kupongen syns för alla när sajten byggts om, om några minuter.</p>') +
+    `<div class="kp-actions"><a class="kp-btn primary" id="kp-gh" href="${esc(url)}" target="_blank" rel="noopener">Spara på GitHub</a>` +
+    '<button type="button" class="kp-btn" id="kp-copy">Kopiera</button>' +
+    `<a class="kp-btn" href="#kupong/${esc(id)}">Visa kupongen</a></div>` +
+    `<details class="kp-file"><summary>${esc(path)}</summary><pre>${esc(json)}</pre></details></div>`;
+  const copy = async () => {
+    try { await navigator.clipboard.writeText(json); $('#kp-copy').textContent = 'Kopierad'; } catch { /* markera själv i filen nedan */ }
+  };
+  $('#kp-copy').addEventListener('click', copy);
+  if (exists) $('#kp-gh').addEventListener('click', copy);
+  renderCouponHero();
+  window.scrollTo(0, 0);
+}
+
+// ---------- start ----------
+
+(async function initCoupons() {
+  await Promise.all([whenMatches(), loadCoupons()]);
+  renderCouponHero();
+  liveTick();
+  document.addEventListener('visibilitychange', () => { if (!document.hidden) liveTick(); });
+})();
