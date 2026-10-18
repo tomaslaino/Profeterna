@@ -35,6 +35,10 @@ ingen falsk precision · sidan kraschar aldrig av en död källa · endast fria 
 - [x] **Kupongen:** gängets gemensamma kupong per omgång – utvalda matcher med 1, X, 2 eller
   gardering. Kort på förstasidan, fliken Kupong med liveställning från ESPN, Ny kupong med
   sökning. Sparas som fil i `data/kuponger/` med en commit på GitHub (se [Kupongen](#kupongen))
+- [x] **Kuponghistoriken:** sidan Historik med varje färdigspelad kupong – antal rätt,
+  betyg 1–5 mot modellens väntade antal rätt, sortering efter hur det gick och en kort
+  AI-kommentar som läser gängets anteckningar. Fryses in i `data/kupong-historik.json`
+  (se [Kuponghistoriken](#kuponghistoriken))
 
 ## Publicering
 
@@ -54,10 +58,12 @@ GitHub Actions (var 30:e min)  →  källorna  →  src/build.js  →  _site/ (H
   matchfiler i git-historiken. Det enda som committas automatiskt är prognosjournalen
   (`data/journal/`) – där är git-historiken själva poängen: den visar offentligt att en
   prognos fanns före avspark och aldrig skrivits om. Se
-  [Prognosjournalen och utvärderingen](#prognosjournalen-och-utvärderingen-fas-3).
+  [Prognosjournalen och utvärderingen](#prognosjournalen-och-utvärderingen-fas-3) – och
+  kuponghistoriken (`data/kupong-historik.json`, se [Kuponghistoriken](#kuponghistoriken)).
 - **Journalens commit:** bygget körs med `--journal`, och steget *Committa
-  prognosjournalen* committar bara `data/journal/` och bara när filen växt, som
-  `github-actions[bot]` med meddelandet "Prognosjournal: N nya rader". Jobbet har
+  prognosjournalen och kuponghistoriken* committar bara `data/journal/` och
+  `data/kupong-historik.json`, och bara när de ändrats, som `github-actions[bot]` med
+  meddelandet "Prognosjournal: N nya rader" (och/eller "kuponghistoriken uppdaterad"). Jobbet har
   `contents: write`; deploy-jobbet bara `pages`/`id-token`. Steget stoppar körningen om en
   befintlig rad ändrats eller tagits bort (append-only), och har main fått en ny commit
   under körningen läggs journalcommiten ovanpå (`pull --rebase`). Misslyckas committen
@@ -289,6 +295,12 @@ server:
   `data/kuponger/` och bygget skriver `data/kuponger.json`. Rättningen, liveställningen och
   Ny kupong finns i [public/kupong.js](public/kupong.js) och
   [public/kupong.css](public/kupong.css). Se [Kupongen](#kupongen).
+- **Kuponghistoriken:** [src/history.js](src/history.js) rättar färdiga kuponger, räknar
+  betyget, fryser in dem i `data/kupong-historik.json` och skriver `data/historik.json`.
+  Sidan är [public/historik.html](public/historik.html) med
+  [public/historik.js](public/historik.js) och [public/historik.css](public/historik.css);
+  AI-kommentaren skrivs av [worker/kommentar.mjs](worker/kommentar.mjs) med prompten i
+  [config/kommentar.js](config/kommentar.js). Se [Kuponghistoriken](#kuponghistoriken).
 - **Frontend:** ren HTML/CSS/JS i `public/`, flikarna Matcher, Kupong, Utvärdering, Källor och
   Modell (regelversion, backtest, kandidatlogg); i matchvyn kortet Analys när
   matchanalysen är påslagen. Läser JSON-filerna ovan. Urvalet av kommande/spelade matcher och källornas status
@@ -749,6 +761,66 @@ matchid):
 
 En trasig fil stoppar inte bygget; felet visas längst ned under fliken Kupong. Lokalt går
 det att prova med en egen mapp: `KUPONG_DIR=/tmp/kuponger npm run build`.
+
+## Kuponghistoriken
+
+Sidan **Historik** (`historik.html`, länkad från fliken Kupong) visar varje färdigspelad
+kupong: antal rätt, en prick per match, betyget, AI:ns kommentar och – under *Matcherna* –
+varje match med tecken, resultat, modellens chans och gängets anteckning. Överst antal
+kuponger, andel rätt, snittbetyg och antal rätt mot det väntade, och en stapel per kupong
+(andel rätt, strecket = väntat). Sorteras efter *Senaste*, *Betyg*, *Andel rätt* eller
+*Mot modellen* (rätt jämfört med modellens tips); ett tryck till vänder ordningen.
+
+**Betyget** (1–5 stjärnor: Haveri, Svagt, Godkänt, Starkt, Profetiskt) räknas fram, inte
+sätts för hand. Väntat antal rätt = summan av modellens chans för gängets tecken före
+avspark (journalen om den finns, annars sajtens prognos). Saknas modellen för en match –
+t.ex. på en kupong lagd någon annanstans – används en schablon: 45 % för ett tecken, 75 %
+för två. `z = (rätt − väntat) / √(Σ p(1−p))` (spridningen minst √0,5), och betyget är 5
+vid z ≥ 1,25, 4 vid ≥ 0,5, 3 vid > −0,5, 2 vid > −1,25, annars 1. En skräll som sitter
+lyfter alltså mer än en storfavorit, och en rätt mer än väntat väger tyngre på en kort
+kupong. Grunden står i [src/history.js](src/history.js).
+
+**AI-kommentaren** skrivs av samma språkmodell och proxy som matchanalysen
+(`POST …/kommentar {"id"}`, [worker/kommentar.mjs](worker/kommentar.mjs)): 2–4 meningar
+med glimten i ögat, som väver in anteckningarna ("Teijder drev X2"). Proxyn tar bara ett
+kupong-id och läser kupongen ur den publicerade `data/historik.json`. Samma regler som
+analysen: inga egna fakta om lag och matcher, inga påhittade målförlopp, och varje tal ska
+finnas i underlaget (annars skrivs texten om, därefter visas ingen). Texten cachas utan
+slutdatum per kupong och underlag. Prompten står i [config/kommentar.js](config/kommentar.js).
+
+**Filen** `data/kupong-historik.json` är själva historiken och committas:
+
+- När varje match på en kupong ur `data/kuponger/` är spelad fryser bygget på GitHub
+  Actions (`--journal`) in den med resultat efter 90 minuter, modellens prognos och
+  anteckningarna – så finns den kvar när säsongens matcher inte längre gör det. Nästa
+  bygge hämtar AI:ns kommentar från proxyn och skriver in den (`"ai"`). Steget *Committa
+  prognosjournalen och kuponghistoriken* committar filen. Lokalt visas en färdig kupong
+  ändå, bara inte fryst.
+- Kuponger lagda någon annanstans (t.ex. Stryktipset) läggs in för hand i samma format,
+  utan `"källa"`. `resultat` är ställningen efter 90 minuter; finns bara utfallet, skriv
+  `"utfall": "1"`. `"struken": true` = matchen spelades inte. `modell`, `kommentar`, `spel`
+  och `till` är valfria. En kupong med fel visas som fel men tas aldrig bort ur filen.
+
+```json
+{
+  "kuponger": [
+    {
+      "id": "2026-10-10",
+      "namn": "Omgång 8",
+      "datum": "2026-10-10",
+      "till": "2026-10-11",
+      "källa": "sidan",
+      "matcher": [
+        { "match": "Arsenal – Leeds United", "tecken": "1", "resultat": "2–1", "modell": [68, 20, 12], "id": "401879268" },
+        { "match": "Aston Villa – Brentford", "tecken": "1X", "resultat": "2–2", "modell": [52, 25, 23], "kommentar": "Halvgarderad efter lång diskussion", "id": "401878776" }
+      ],
+      "ai": { "text": "…", "modell": "deepseek-v4-pro", "skriven": "2026-10-12T08:07:00.000Z" }
+    }
+  ]
+}
+```
+
+Lokalt med egna filer: `KUPONG_DIR=/tmp/kuponger KUPONG_HISTORIK=/tmp/historik.json npm run build`.
 
 ## Statusmärkning
 

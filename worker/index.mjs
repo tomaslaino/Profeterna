@@ -18,6 +18,9 @@
 // Samma analyze() körs lokalt av server.js (POST /api/analyze), med underlaget
 // från _site/ och cachen i data/cache/analysis/.
 //
+// Kuponghistoriken: POST /kommentar {"id": "<kupong-id>"} skriver AI:ns
+// kommentar till en färdig kupong (worker/kommentar.mjs).
+//
 // Nyheterna (cfg.news): vid varje klick hämtas det senaste om matchen och
 // lagen online (src/news.mjs – förhandsartiklar, skador, trupp, tränarläge,
 // väder) och läggs i underlaget som avsnittet nyheter. Modellen skriver då
@@ -28,6 +31,7 @@
 import cfg from '../config/llm.js';
 import { payloadOf, fingerprint, foreignNumbers } from './analysis.mjs';
 import { gatherNews, newsPayload, citeNews, withoutRefs } from '../src/news.mjs';
+import { comment } from './kommentar.mjs';
 
 const ID_RE = /^\d{1,12}$/;
 
@@ -111,6 +115,11 @@ export async function analyze(id, { env, loadMatch, store = null, now = () => ne
   const entry = { ok: false, error: problem, generatedAt: now().toISOString(), usage };
   await safely(() => store && store.put(key, entry));
   return answer(entry, d, false);
+}
+
+// Kommentaren till en färdig kupong, med samma anrop till språkmodellen.
+export function couponComment(id, opts) {
+  return comment(id, { complete, ...opts });
 }
 
 async function complete(messages, apiKey, env) {
@@ -223,7 +232,7 @@ export default {
   async fetch(request, env) {
     if (request.method === 'OPTIONS') return new Response(null, { status: 204, headers: CORS });
     const url = new URL(request.url);
-    if (url.pathname !== '/analyze' || request.method !== 'POST') return json(404, { ok: false, error: 'Finns inte.' });
+    if (!['/analyze', '/kommentar'].includes(url.pathname) || request.method !== 'POST') return json(404, { ok: false, error: 'Finns inte.' });
     let id;
     try {
       ({ id } = await request.json());
@@ -233,6 +242,15 @@ export default {
     try {
       const site = String(env.SITE || cfg.site).replace(/\/+$/, '');
       const kv = env.ANALYSER;
+      if (url.pathname === '/kommentar') {
+        // En kommentar sparas utan slutdatum – samma kupong kommenteras en gång.
+        const store = kv ? {
+          get: (k) => kv.get(k, 'json'),
+          put: (k, v, ttl) => kv.put(k, JSON.stringify(v), ttl ? { expirationTtl: ttl } : {}),
+        } : null;
+        const r = await couponComment(id, { env, store, loadHistory: () => siteHistory(site) });
+        return json(r.status, r.body);
+      }
       const store = kv ? {
         get: (k) => kv.get(k, 'json'),
         put: (k, v, ttl) => kv.put(k, JSON.stringify(v), { expirationTtl: ttl || cfg.cacheDays * 86400 }),
@@ -245,6 +263,13 @@ export default {
     }
   },
 };
+
+async function siteHistory(site) {
+  const res = await fetch(`${site}/data/historik.json?t=${Date.now()}`);
+  if (res.status === 404) return null;
+  if (!res.ok) throw new Error(`HTTP ${res.status}`);
+  return res.json();
+}
 
 // Underlaget från den publicerade sajten. Frågeparametern går förbi
 // CDN-cachen, så att proxyn läser det senaste bygget.

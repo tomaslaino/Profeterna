@@ -7,6 +7,7 @@
 // Matchanalysen (fas 5): finns DEEPSEEK_API_KEY i .env visas knappen
 // Analysera, och servern gör analysen själv (POST /api/analyze) med samma kod
 // som proxyn på Cloudflare (worker/index.mjs). Utan nyckel ingen knapp.
+// Samma nyckel ger AI:ns kommentarer på sidan Historik (POST /api/kommentar).
 
 const fs = require('fs');
 const path = require('path');
@@ -51,6 +52,28 @@ function analysisRoute(siteDir = OUT, store = fileStore()) {
   };
 }
 
+// POST /api/kommentar {id} – AI:ns kommentar till en färdig kupong, ur den
+// byggda historiken i siteDir (sidan Historik).
+function commentRoute(siteDir = OUT, store = fileStore(path.join(CACHE_DIR, 'kommentarer'))) {
+  return async (req, res) => {
+    try {
+      const { couponComment } = await import('./worker/index.mjs');
+      const r = await couponComment(req.body && req.body.id, {
+        env: process.env,
+        store,
+        loadHistory: async () => {
+          const f = path.join(siteDir, 'data', 'historik.json');
+          return fs.existsSync(f) ? JSON.parse(fs.readFileSync(f, 'utf8')) : null;
+        },
+      });
+      res.status(r.status).json(r.body);
+    } catch (err) {
+      console.error('[kommentar]', err);
+      res.status(500).json({ ok: false, error: 'Internt fel i servern.' });
+    }
+  };
+}
+
 if (require.main === module) {
   loadEnv();
   const analysisEndpoint = process.env[llm.keyEnv] ? '/api/analyze' : null;
@@ -69,6 +92,7 @@ if (require.main === module) {
 
   const app = express();
   if (analysisEndpoint) app.post('/api/analyze', express.json(), analysisRoute());
+  if (analysisEndpoint) app.post('/api/kommentar', express.json(), commentRoute());
   app.use(express.static(OUT));
 
   const port = parseInt(process.env.PORT || '3001', 10);
@@ -82,4 +106,4 @@ if (require.main === module) {
   });
 }
 
-module.exports = { analysisRoute, fileStore };
+module.exports = { analysisRoute, commentRoute, fileStore };

@@ -8,9 +8,10 @@ name: Hämta data och publicera
 # körningarna med actions/cache, så att en död källa visas med sin senaste
 # lyckade data och sitt datum i stället för att försvinna.
 #
-# Det enda som committas är prognosjournalen (data/journal/): bygget loggar
-# kommande matcher med --journal, och nya rader committas till main av
-# github-actions[bot]. Git-historiken visar då offentligt att en prognos
+# Det enda som committas är prognosjournalen (data/journal/) och
+# kuponghistoriken (data/kupong-historik.json): bygget loggar kommande matcher
+# och fryser in färdiga kuponger med --journal, och det nya committas till main
+# av github-actions[bot]. Git-historiken visar då offentligt att en prognos
 # fanns före avspark och aldrig skrivits om. Commitsen håller också repot
 # aktivt, så att GitHub inte stänger av schemat efter 60 dagar.
 #
@@ -78,14 +79,16 @@ jobs:
           path: data/cache
           key: kallcache-${{ github.run_id }}
 
-      # Bara journalfilerna committas, och bara om de växt. Misslyckas
-      # committen publiceras inte heller sajten – den visade journalen ska
-      # alltid finnas i git. Nästa körning loggar då raderna på nytt.
-      - name: Committa prognosjournalen
+      # Bara journalfilerna och kuponghistoriken committas, och bara om de
+      # ändrats. Misslyckas committen publiceras inte heller sajten – den
+      # visade journalen ska alltid finnas i git. Nästa körning loggar då
+      # raderna på nytt (och fryser in samma kuponger igen).
+      - name: Committa prognosjournalen och kuponghistoriken
         run: |
           git add data/journal
+          if [ -f data/kupong-historik.json ]; then git add data/kupong-historik.json; fi
           if git diff --cached --quiet; then
-            echo "Inga nya rader i journalen."
+            echo "Inga nya rader i journalen och inget nytt i kuponghistoriken."
             exit 0
           fi
           # Append-only: en borttagen eller ändrad rad stoppar körningen.
@@ -93,16 +96,23 @@ jobs:
             echo "::error::Journalen får bara växa – en befintlig rad har ändrats eller tagits bort."
             exit 1
           fi
-          rows=$(git diff --cached --numstat -- data/journal | awk '{ s += $1 } END { print s }')
-          [ "$rows" = 1 ] && what="1 ny rad" || what="${rows} nya rader"
+          rows=$(git diff --cached --numstat -- data/journal | awk '{ s += $1 } END { print s + 0 }')
+          if [ "$rows" = 0 ]; then what=""; elif [ "$rows" = 1 ]; then what="1 ny rad"; else what="${rows} nya rader"; fi
+          if git diff --cached --quiet -- data/kupong-historik.json; then
+            msg="Prognosjournal: ${what}"
+          elif [ -n "$what" ]; then
+            msg="Prognosjournal: ${what}; kuponghistoriken uppdaterad"
+          else
+            msg="Kuponghistoriken uppdaterad"
+          fi
           git config user.name "github-actions[bot]"
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
-          git commit -q -m "Prognosjournal: ${what}"
+          git commit -q -m "${msg}"
           # Har main fått en ny commit under körningen (t.ex. ny kod) läggs
           # journalcommiten ovanpå den.
           for attempt in 1 2 3; do
             if git push -q origin HEAD:main; then
-              echo "Committade ${what}."
+              echo "Committade: ${msg}."
               exit 0
             fi
             git pull -q --rebase origin main || { git rebase --abort; exit 1; }
