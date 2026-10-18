@@ -1,0 +1,564 @@
+/* Sidan Divisioner (divisioner.html) och länken dit i fliklistan. Bygger på
+   style.css (färger, kort, tabeller); egna klasser har prefixet dv-. */
+
+/* En färg per division, fast ordning (validerad för färgblindhet mot kortens
+   bakgrund i båda lägena). Text bär aldrig seriefärgen – den sitter på
+   linjen, punkten eller nyckeln bredvid. */
+:root {
+  --dv-pl: #2a78d6;
+  --dv-ch: #eb6834;
+  --dv-l1: #1baf7a;
+  --dv-l2: #eda100;
+  --dv-nl: #e87ba4;
+}
+@media (prefers-color-scheme: dark) {
+  :root {
+    --dv-pl: #3987e5;
+    --dv-ch: #d95926;
+    --dv-l1: #199e70;
+    --dv-l2: #c98500;
+    --dv-nl: #d55181;
+  }
+}
+
+/* ---------- länkar i fliklistan (sidbyte i stället för flik) ---------- */
+
+.tabs a.tab-link {
+  display: inline-block;
+  border: 1px solid transparent;
+  border-radius: 999px;
+  font-size: 0.86rem;
+  font-weight: 600;
+  color: var(--muted);
+  padding: 0.42rem 1rem;
+  white-space: nowrap;
+  text-decoration: none;
+}
+.tabs a.tab-link:hover { color: var(--fg); background: var(--hair); }
+.tabs a.tab-link[aria-current="page"] {
+  color: var(--accent-deep);
+  background: var(--accent-soft);
+  border-color: color-mix(in srgb, var(--accent) 25%, transparent);
+}
+
+/* ---------- reglage ---------- */
+
+.dv-select {
+  appearance: none;
+  -webkit-appearance: none;
+  font: inherit;
+  font-size: 0.85rem;
+  font-weight: 600;
+  color: var(--fg);
+  background: var(--card) url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='10' height='6'%3E%3Cpath d='M1 1l4 4 4-4' fill='none' stroke='%237a8293' stroke-width='1.5'/%3E%3C/svg%3E") no-repeat right 0.85rem center;
+  border: 1px solid var(--border);
+  border-radius: 999px;
+  padding: 0.38rem 2.1rem 0.38rem 0.95rem;
+  max-width: 100%;
+  cursor: pointer;
+}
+.dv-select:hover { border-color: var(--accent); }
+.dv-label { font-size: 0.8rem; color: var(--muted); font-weight: 600; }
+
+/* ---------- jämförelsetabellen ---------- */
+
+table.dv-cmp th.num, table.dv-cmp td.num { text-align: right; }
+table.dv-cmp td:first-child { min-width: 11rem; }
+table.dv-cmp td strong { font-weight: 650; }
+table.dv-cmp tr.group td {
+  background: var(--hair);
+  font-size: 0.68rem;
+  font-weight: 650;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  color: var(--muted);
+  padding: 0.3rem 0.85rem;
+}
+.dv-flag { font-size: 0.7rem; margin-left: 0.25rem; color: var(--fg); cursor: help; }
+.dv-key {
+  display: inline-block;
+  width: 14px;
+  height: 3px;
+  border-radius: 2px;
+  background: var(--c);
+  vertical-align: middle;
+  margin-right: 0.45rem;
+}
+.dv-key.dot { width: 9px; height: 9px; border-radius: 50%; }
+.dv-legend { display: flex; flex-wrap: wrap; gap: 0.3rem 1.1rem; font-size: 0.78rem; margin: 0 0 0.3rem; }
+.dv-legend .muted { margin-left: auto; }
+
+/* ---------- diagram ---------- */
+
+.dv-chart { width: 100%; }
+svg.dv-svg { display: block; overflow: visible; }
+svg.dv-svg .grid { stroke: var(--hair); stroke-width: 1; }
+svg.dv-svg .base { stroke: var(--border); stroke-width: 1; }
+svg.dv-svg .tick { fill: var(--muted); font-size: 10px; font-variant-numeric: tabular-nums; }
+svg.dv-svg .val { fill: var(--fg); font-size: 10.5px; font-weight: 600; font-variant-numeric: tabular-nums; }
+svg.dv-svg .axis { fill: var(--muted); font-size: 11px; font-weight: 600; }
+svg.dv-svg .line { fill: none; stroke: var(--c); stroke-width: 2; stroke-linejoin: round; stroke-linecap: round; }
+svg.dv-svg .line.partial { stroke-dasharray: 2 4; }
+svg.dv-svg .dot { fill: var(--c); stroke: var(--card); stroke-width: 2; }
+svg.dv-svg .dot.partial { fill: var(--card); stroke: var(--c); stroke-width: 2; }
+svg.dv-svg .end { fill: var(--fg); font-size: 11px; font-weight: 650; }
+svg.dv-svg .band { fill: var(--hair); }
+svg.dv-svg .band-label { fill: var(--muted); font-size: 9.5px; }
+svg.dv-svg .col .cross { stroke: var(--border); stroke-width: 1; opacity: 0; }
+svg.dv-svg .col:hover .cross { opacity: 1; }
+svg.dv-svg .col .hd { opacity: 0; }
+svg.dv-svg .col:hover .hd { opacity: 1; }
+svg.dv-svg .hit { fill: transparent; }
+svg.dv-svg .bar { fill: var(--accent); }
+svg.dv-svg .bar.soft { fill: color-mix(in srgb, var(--accent) 45%, var(--card)); }
+svg.dv-svg .col:hover .bar { fill: var(--accent-deep); }
+svg.dv-svg .diag { stroke: var(--unknown); stroke-width: 1; stroke-dasharray: 4 4; }
+svg.dv-svg .pt { fill: var(--accent); stroke: var(--card); stroke-width: 2; }
+svg.dv-svg .pt:hover { fill: var(--accent-deep); }
+svg.dv-svg .zero { stroke: var(--border); stroke-width: 1.5; }
+
+.dv-tip {
+  position: fixed;
+  z-index: 50;
+  pointer-events: none;
+  max-width: 280px;
+  padding: 0.45rem 0.65rem;
+  font-size: 0.78rem;
+  line-height: 1.45;
+  white-space: pre-line;
+  color: var(--fg);
+  background: var(--card);
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  box-shadow: var(--shadow-card);
+  font-variant-numeric: tabular-nums;
+}
+.dv-tip b { font-weight: 650; }
+
+/* ---------- resultatmatris (sekventiell, en nyans) ---------- */
+
+table.dv-heat { width: auto; border-collapse: separate; border-spacing: 3px; font-size: 0.76rem; margin: 0 auto; }
+table.dv-heat th { padding: 0 0.25rem; border: none; text-align: center; font-size: 0.68rem; }
+table.dv-heat th.rowh { text-align: right; padding-right: 0.4rem; }
+table.dv-heat td {
+  min-width: 2.5rem;
+  padding: 0.32rem 0;
+  text-align: center;
+  border: none;
+  border-radius: 5px;
+  font-variant-numeric: tabular-nums;
+  background: color-mix(in srgb, var(--accent) calc(var(--a) * 100%), var(--hair));
+  cursor: default;
+}
+table.dv-heat td.hi { color: var(--bg); font-weight: 600; }
+
+/* ---------- tabeller med staplar ---------- */
+
+table.dv-bars td, table.dv-bars th { padding: 0.35rem 0.45rem; }
+table.dv-bars td.num, table.dv-bars th.num { text-align: right; }
+table.dv-bars td.barcell { width: 22%; min-width: 3.5rem; padding-right: 0; }
+.dv-bar { display: block; height: 6px; border-radius: 0 3px 3px 0; background: var(--accent); min-width: 2px; }
+.dv-bar.soft { background: color-mix(in srgb, var(--accent) 45%, var(--card)); }
+table.dv-bars tr.thin td { color: var(--muted); }
+
+table.dv-htft td.num, table.dv-htft th.num { text-align: right; }
+table.dv-htft td.max { font-weight: 700; }
+
+.dv-scroll { max-height: 26rem; overflow-y: auto; }
+.dv-scroll thead th { position: sticky; top: 0; background: var(--card); z-index: 1; }
+table tr.avg td { background: var(--accent-soft); font-weight: 600; }
+
+dl.facts.dv-facts { margin-top: 0.7rem; }
+dl.facts.dv-facts dd { font-variant-numeric: tabular-nums; }
+.dv-detail .card h4 + .legend { margin-top: -0.3rem; }
+.dv-grid3, .dv-grid2 { display: grid; grid-template-columns: repeat(auto-fit, minmax(min(100%, 300px), 1fr)); gap: 1rem; margin-bottom: 1rem; }
+.dv-grid2 { grid-template-columns: repeat(auto-fit, minmax(min(100%, 400px), 1fr)); }
+.dv-x { overflow-x: auto; }
+.dv-newc + .dv-newc { margin-top: 1rem; padding-top: 0.9rem; border-top: 1px solid var(--hair); }
+.dv-newc h5 { margin: 0 0 0.3rem; font-size: 0.86rem; }
+.dv-note { font-size: 0.78rem; color: var(--muted); margin: 0.5rem 0 0; }
+
+@media (max-width: 640px) {
+  table.dv-cmp td:first-child { min-width: 8.5rem; }
+  table.dv-cmp th, table.dv-cmp td { padding-left: 0.5rem; padding-right: 0.5rem; }
+  table.dv-heat td { min-width: 2.05rem; }
+  table.dv-bars .n { display: none; }
+  table.dv-bars td, table.dv-bars th { padding-left: 0.3rem; padding-right: 0.3rem; }
+  table.dv-bars td.barcell { min-width: 1.6rem; }
+  .dv-legend .muted { margin-left: 0; }
+}
+
+/* =====================================================================
+   Pedagogisk presentation (division + flikar, som gravergrav.se).
+   Färger via tokens i style.css – och theme.css när temat är laddat
+   (--glass, --pill, --pill-line, --eyebrow, --display); fallback annars.
+   ===================================================================== */
+
+.dv-head {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  margin: 0 0 18px;
+}
+.dv-divs { display: flex; flex-wrap: wrap; gap: 6px; transition: opacity 0.15s ease; }
+.dv-divs.dim { opacity: 0.55; }
+.dv-divs button {
+  display: inline-flex;
+  align-items: center;
+  gap: 2px;
+  font: inherit;
+  font-size: 13px;
+  font-weight: 700;
+  letter-spacing: 0.01em;
+  padding: 6px 13px;
+  border-radius: 999px;
+  border: 1px solid var(--pill-line, var(--border));
+  background: var(--pill, var(--card));
+  color: var(--ink-soft, var(--muted));
+  cursor: pointer;
+  box-shadow: none;
+}
+.dv-divs button:hover { color: var(--fg); border-color: var(--pill-line-hi, var(--accent)); }
+.dv-divs button[aria-pressed="true"] { color: var(--fg); border-color: var(--accent); background: var(--accent-soft); }
+.dv-views {
+  display: flex;
+  gap: 2px;
+  padding: 3px;
+  width: max-content;
+  max-width: 100%;
+  overflow-x: auto;
+  scrollbar-width: none;
+  border: 1px solid var(--pill-line, var(--border));
+  border-radius: 13px;
+  background: var(--pill, var(--card));
+}
+.dv-views::-webkit-scrollbar { display: none; }
+.dv-views a {
+  padding: 7px 14px;
+  border-radius: 10px;
+  font-size: 14px;
+  font-weight: 600;
+  color: var(--ink-soft, var(--muted));
+  text-decoration: none;
+  white-space: nowrap;
+}
+.dv-views a:hover { color: var(--fg); background: var(--hair); }
+.dv-views a[aria-current="page"] {
+  color: var(--fg);
+  background: var(--accent-soft);
+  box-shadow: inset 0 -2px 0 var(--accent);
+}
+
+.dv-view { min-height: 40vh; }
+.dv-sechead { margin: 26px 0 12px; }
+.dv-sechead:first-child { margin-top: 4px; }
+.dv-sechead h3 {
+  margin: 0;
+  font-family: var(--display, inherit);
+  font-size: 26px;
+  font-weight: 800;
+  letter-spacing: 0.01em;
+  line-height: 1.1;
+}
+.dv-sechead p { margin: 4px 0 0; color: var(--muted); font-size: 14px; max-width: 70ch; }
+.dv-meta { font-size: 14px; color: var(--muted); margin: 2px 0 14px; }
+.dv-key-line { margin: -4px 0 12px; font-size: 12.5px; color: var(--muted); }
+.dv-key-line b { color: var(--ink-soft, var(--fg)); font-weight: 650; }
+
+/* ---------- nyckeltal ---------- */
+
+.dv-tiles { display: grid; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); gap: 12px; margin-bottom: 16px; }
+.dv-tile {
+  background: var(--glass, var(--card));
+  border: 1px solid var(--border);
+  border-radius: var(--radius, 16px);
+  box-shadow: var(--shadow-card);
+  padding: 14px 16px 12px;
+  cursor: help;
+}
+.dv-tile-label { font-size: 11px; font-weight: 800; letter-spacing: 0.12em; text-transform: uppercase; color: var(--eyebrow, var(--muted)); }
+.dv-tile-num { font-family: var(--display, inherit); font-size: 34px; font-weight: 800; line-height: 1.05; margin: 6px 0 2px; font-variant-numeric: tabular-nums; }
+.dv-tile-sub { font-size: 12.5px; color: var(--muted); margin-bottom: 8px; }
+.dv-chip {
+  display: inline-block;
+  font-size: 11.5px;
+  font-weight: 700;
+  padding: 2px 8px;
+  border-radius: 999px;
+  background: var(--hair);
+  color: var(--muted);
+}
+.dv-chip.up { background: var(--up-soft); color: var(--fresh); }
+.dv-chip.down { background: var(--down-soft); color: var(--down); }
+
+/* ---------- kort ---------- */
+
+.dv-card { margin-bottom: 16px; }
+.dv-standout { margin: 0; padding-left: 1.1rem; line-height: 1.7; }
+.dv-calm { margin: 0 0 6px; color: var(--ink-soft, var(--muted)); line-height: 1.55; }
+.dv-h5 { margin: 16px 0 8px; font-size: 11.5px; font-weight: 800; letter-spacing: 0.12em; text-transform: uppercase; color: var(--eyebrow, var(--muted)); }
+.dv-note { line-height: 1.5; }
+
+/* ---------- topplistor ---------- */
+
+.dv-leaders { display: grid; grid-template-columns: repeat(auto-fit, minmax(260px, 1fr)); gap: 14px; margin-bottom: 16px; }
+.dv-leader {
+  position: relative;
+  background: var(--glass, var(--card));
+  border: 1px solid var(--border);
+  border-radius: var(--radius, 16px);
+  box-shadow: var(--shadow-card);
+  padding: 14px 16px 12px;
+  overflow: hidden;
+}
+.dv-leader::before {
+  content: "";
+  position: absolute;
+  inset: 0 0 auto 0;
+  height: 2px;
+  background: linear-gradient(90deg, var(--down, #c0392b), var(--accent));
+  opacity: 0.8;
+}
+.dv-leader h4 { margin: 0 0 8px; font-size: 11.5px; font-weight: 800; letter-spacing: 0.12em; text-transform: uppercase; color: var(--eyebrow, var(--muted)); }
+.dv-licon { margin-right: 6px; font-size: 12px; }
+.dv-leader ol { list-style: none; margin: 0; padding: 0; }
+.dv-leader li + li { border-top: 1px solid var(--hair); }
+.dv-lrow {
+  display: grid;
+  grid-template-columns: 1.4rem 1fr auto;
+  align-items: center;
+  gap: 8px;
+  width: 100%;
+  padding: 7px 2px;
+  font: inherit;
+  text-align: left;
+  color: inherit;
+  background: none;
+  border: 0;
+  box-shadow: none;
+  border-radius: 8px;
+  cursor: pointer;
+}
+.dv-lrow:hover { background: var(--hair); }
+.dv-lrank { font-size: 12px; font-weight: 700; color: var(--muted); text-align: center; }
+li:first-child .dv-lrank { color: var(--stale); }
+.dv-lname { font-size: 14px; font-weight: 600; line-height: 1.25; min-width: 0; overflow: hidden; text-overflow: ellipsis; }
+.dv-lname small { display: block; font-size: 12px; font-weight: 400; color: var(--muted); }
+li:first-child .dv-lname { font-weight: 750; }
+.dv-lval { text-align: right; font-variant-numeric: tabular-nums; white-space: nowrap; }
+.dv-lval b { font-size: 15px; }
+.dv-lval small { display: block; font-size: 11px; color: var(--muted); }
+.dv-lempty { padding: 8px 2px; color: var(--muted); font-size: 13px; }
+.dv-lnote { margin: 8px 0 0; font-size: 12px; color: var(--muted); }
+.dv-lmore { display: inline-block; margin-top: 8px; font-size: 13px; font-weight: 600; }
+
+.dv-card-y, .dv-card-r {
+  display: inline-block;
+  width: 8px;
+  height: 11px;
+  border-radius: 2px;
+  margin: 0 3px 0 2px;
+  vertical-align: -1px;
+  background: #f1c40f;
+}
+.dv-card-r { background: #e8394a; }
+
+/* ---------- tabeller ---------- */
+
+.dv-tw { margin-bottom: 0; }
+table.dv-league td, table.dv-league th,
+table.dv-players td, table.dv-players th,
+table.dv-teams td, table.dv-teams th,
+table.dv-squad td, table.dv-squad th { padding: 8px 9px; vertical-align: middle; }
+table.dv-players td, table.dv-players th { padding-left: 7px; padding-right: 7px; }
+.dv-view > .src-line { font-size: 12px; color: var(--muted); margin: -4px 2px 16px; }
+table.dv-league .num, table.dv-players .num, table.dv-teams .num, table.dv-squad .num { text-align: right; font-variant-numeric: tabular-nums; }
+table.dv-league .c, table.dv-players .c, table.dv-squad .c { text-align: center; }
+table.dv-league .rank, table.dv-players .rank { color: var(--muted); font-weight: 700; width: 2.2rem; }
+table.dv-league .team { font-weight: 600; }
+table.dv-league .pts { font-weight: 800; }
+table.dv-league .dv-scorer { font-size: 13px; color: var(--ink-soft, var(--fg)); white-space: nowrap; }
+table.dv-league .dv-cards { white-space: nowrap; }
+table.dv-league tr.dv-gap td { text-align: center; color: var(--muted); padding: 2px; letter-spacing: 0.3em; }
+tr.dv-trow, tr.dv-prow { cursor: pointer; }
+tr.dv-trow:focus-visible, tr.dv-prow:focus-visible { outline: 2px solid var(--accent); outline-offset: -2px; }
+table.dv-league tr td:first-child { box-shadow: inset 3px 0 0 transparent; }
+table.dv-league tr.z-up td:first-child { box-shadow: inset 3px 0 0 var(--fresh); }
+table.dv-league tr.z-up td.rank { color: var(--fresh); }
+table.dv-league tr.z-eu td:first-child { box-shadow: inset 3px 0 0 var(--accent); }
+table.dv-league tr.z-eu td.rank { color: var(--accent-deep); }
+table.dv-league tr.z-po td:first-child { box-shadow: inset 3px 0 0 var(--stale); }
+table.dv-league tr.z-po td.rank { color: var(--stale); }
+table.dv-league tr.z-down td:first-child { box-shadow: inset 3px 0 0 var(--down); }
+table.dv-league tr.z-down td.rank { color: var(--down); }
+.dv-zones { display: flex; flex-wrap: wrap; gap: 6px 16px; margin: 12px 2px 0; font-size: 12.5px; color: var(--muted); }
+.dv-zones i { display: inline-block; width: 10px; height: 10px; border-radius: 3px; margin-right: 6px; vertical-align: -1px; }
+.dv-zones .z-up i { background: var(--fresh); }
+.dv-zones .z-eu i { background: var(--accent); }
+.dv-zones .z-po i { background: var(--stale); }
+.dv-zones .z-down i { background: var(--down); }
+
+table.dv-players th button, table.dv-teams th button {
+  font: inherit;
+  letter-spacing: inherit;
+  text-transform: inherit;
+  color: inherit;
+  background: none;
+  border: 0;
+  padding: 0;
+  box-shadow: none;
+  cursor: pointer;
+  white-space: nowrap;
+}
+table.dv-players th.on, table.dv-teams th.on { color: var(--fg); }
+table.dv-players .pname { font-weight: 600; white-space: nowrap; }
+table.dv-players .pname small, .dv-natline { display: block; font-size: 12px; font-weight: 400; color: var(--muted); }
+table.dv-players .pname small.show-sm { display: none; }
+table.dv-players td.pteam, table.dv-players td.pnat { color: var(--ink-soft, var(--fg)); font-size: 13.5px; white-space: nowrap; }
+table.dv-squad tr.idle td { color: var(--muted); }
+.dv-nil { color: var(--unknown); }
+.dv-zero { color: var(--unknown); opacity: 0.8; }
+
+.dv-filters { display: flex; flex-wrap: wrap; gap: 8px; align-items: center; margin-bottom: 12px; }
+.dv-input {
+  flex: 1 1 220px;
+  min-width: 0;
+  font: inherit;
+  font-size: 14px;
+  color: var(--fg);
+  background: var(--pill, var(--card));
+  border: 1px solid var(--pill-line, var(--border));
+  border-radius: 11px;
+  padding: 8px 12px;
+}
+.dv-input:focus { outline: none; border-color: var(--accent); }
+.dv-toggle {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 13.5px;
+  color: var(--ink-soft, var(--muted));
+  padding: 6px 12px;
+  border: 1px solid var(--pill-line, var(--border));
+  border-radius: 11px;
+  background: var(--pill, var(--card));
+  cursor: pointer;
+}
+.dv-more {
+  display: block;
+  margin: 12px auto 0;
+  font: inherit;
+  font-size: 13.5px;
+  font-weight: 600;
+  color: var(--accent-deep);
+  background: var(--pill, var(--card));
+  border: 1px solid var(--pill-line, var(--border));
+  border-radius: 999px;
+  padding: 7px 16px;
+  cursor: pointer;
+}
+.dv-count { margin: 10px 2px 0; font-size: 12.5px; color: var(--muted); text-align: right; }
+
+.dv-barlist { list-style: none; margin: 0; padding: 0; }
+.dv-barlist li { display: grid; grid-template-columns: minmax(6.5rem, 34%) 1fr auto; gap: 10px; align-items: center; padding: 5px 0; font-size: 13.5px; }
+.dv-barlist .bl-b { height: 7px; border-radius: 4px; background: var(--hair); overflow: hidden; }
+.dv-barlist .bl-b i { display: block; height: 100%; border-radius: 4px; background: var(--accent); }
+.dv-barlist .bl-v { text-align: right; font-variant-numeric: tabular-nums; font-weight: 650; white-space: nowrap; }
+.dv-barlist .bl-v small { display: block; font-size: 11px; font-weight: 400; color: var(--muted); }
+
+.dv-glossary { margin: 28px 0 8px; padding: 14px 18px; border: 1px solid var(--border); border-radius: var(--radius, 16px); background: var(--glass, var(--card)); }
+.dv-glossary dl { display: grid; grid-template-columns: minmax(9rem, max-content) 1fr; gap: 6px 18px; margin: 12px 0 2px; font-size: 13.5px; }
+.dv-glossary dt { font-weight: 700; }
+.dv-glossary dd { margin: 0; color: var(--ink-soft, var(--muted)); }
+
+/* ---------- spelarkort och lagkort ---------- */
+
+dialog.dv-modal {
+  width: min(620px, calc(100vw - 24px));
+  max-height: min(86vh, 900px);
+  padding: 0;
+  border: 1px solid var(--pill-line, var(--border));
+  border-radius: 18px;
+  background: var(--card);
+  color: var(--fg);
+  box-shadow: 0 40px 90px -30px rgba(0, 0, 0, 0.9);
+  overflow: hidden;
+}
+dialog.dv-modal::backdrop { background: rgba(4, 9, 18, 0.62); backdrop-filter: blur(4px); }
+.dv-mbox { position: relative; padding: 22px 22px 18px; max-height: min(86vh, 900px); overflow-y: auto; background: var(--glass-hi, var(--card)); }
+.dv-mclose {
+  position: absolute;
+  top: 14px;
+  right: 14px;
+  width: 34px;
+  height: 34px;
+  font-size: 20px;
+  line-height: 1;
+  color: var(--fg);
+  background: var(--hair);
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  cursor: pointer;
+}
+.dv-mhead { display: flex; align-items: center; gap: 14px; margin: 0 40px 16px 0; }
+.dv-mhead h3 { margin: 0; font-size: 20px; line-height: 1.2; }
+.dv-mhead p { margin: 2px 0 0; color: var(--muted); font-size: 13.5px; }
+.dv-avatar {
+  flex: none;
+  display: grid;
+  place-items: center;
+  width: 52px;
+  height: 52px;
+  border-radius: 50%;
+  border: 2px solid var(--pill-line-hi, var(--accent));
+  background: var(--pill, var(--accent-soft));
+  font-family: var(--display, inherit);
+  font-size: 22px;
+  font-weight: 800;
+}
+.dv-avatar.team { border-radius: 14px; font-size: 18px; }
+.dv-mtiles { display: grid; grid-template-columns: repeat(auto-fit, minmax(110px, 1fr)); gap: 8px; margin-bottom: 14px; }
+.dv-mtile { border: 1px solid var(--border); border-radius: 12px; padding: 10px 8px; text-align: center; background: var(--hair); }
+.dv-mtile b { display: block; font-size: 22px; font-variant-numeric: tabular-nums; }
+.dv-mtile span { font-size: 11px; font-weight: 700; letter-spacing: 0.08em; text-transform: uppercase; color: var(--muted); }
+.dv-mrows { display: grid; grid-template-columns: 1fr auto; margin: 0; font-size: 14px; }
+.dv-mrows dt, .dv-mrows dd { padding: 9px 0; border-bottom: 1px solid var(--hair); margin: 0; }
+.dv-mrows dt { color: var(--ink-soft, var(--muted)); }
+.dv-mrows dd { text-align: right; font-weight: 650; font-variant-numeric: tabular-nums; }
+.dv-mnote { margin: 12px 0 0; font-size: 12px; color: var(--muted); text-align: center; line-height: 1.5; }
+.dv-mback { margin: 10px 0 0; text-align: center; }
+.dv-linkbtn { font: inherit; font-size: 13.5px; font-weight: 600; color: var(--accent-deep); background: none; border: 0; box-shadow: none; cursor: pointer; padding: 4px; }
+.dv-avail { margin: 12px 0 0; padding: 9px 12px; border-radius: 10px; background: var(--side-soft); color: var(--stale); font-size: 13.5px; }
+.dv-avlist { margin: 0; padding-left: 1.1rem; font-size: 13.5px; line-height: 1.5; }
+.dv-avlist small { display: block; color: var(--muted); font-size: 12px; }
+.dv-modal .dv-tw { max-height: none; }
+
+.show-sm { display: none; }
+@media (max-width: 1100px) {
+  .hide-md { display: none; }
+}
+@media (max-width: 720px) {
+  .hide-sm { display: none; }
+  .show-sm, table.dv-players .pname small.show-sm { display: block; }
+  table.dv-players .pname { white-space: normal; }
+  .dv-divs { flex-wrap: nowrap; overflow-x: auto; scrollbar-width: none; margin: 0 -20px; padding: 0 20px; }
+  .dv-divs::-webkit-scrollbar { display: none; }
+  .dv-divs button { flex: none; }
+  .dv-sechead h3 { font-size: 22px; }
+  .dv-tile-num { font-size: 28px; }
+  table.dv-league td, table.dv-league th,
+  table.dv-players td, table.dv-players th,
+  table.dv-teams td, table.dv-teams th,
+  table.dv-squad td, table.dv-squad th { padding: 7px 6px; }
+  .dv-glossary dl { grid-template-columns: 1fr; gap: 2px; }
+  .dv-glossary dd { margin-bottom: 8px; }
+}
+@media (max-width: 480px) {
+  .hide-xs { display: none; }
+  .dv-tiles { grid-template-columns: repeat(2, 1fr); gap: 8px; }
+  .dv-tile { padding: 12px; }
+  .dv-mbox { padding: 18px 14px 14px; }
+  table.dv-players td, table.dv-players th { padding-left: 5px; padding-right: 5px; }
+  .card.dv-card.dv-wide { padding-left: 10px; padding-right: 10px; }
+  .dv-filters .dv-select { flex: 1 1 45%; }
+}
