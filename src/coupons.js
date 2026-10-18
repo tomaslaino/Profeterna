@@ -13,12 +13,15 @@
 //     "skapad": "2026-10-16T18:20:11.000Z",
 //     "matcher": [
 //       { "id": "401879263", "match": "AFC Bournemouth – Sunderland", "tecken": "1" },
-//       { "id": "401879260", "match": "Leeds United – Manchester United", "tecken": "X2" }
+//       { "id": "401879260", "match": "Leeds United – Manchester United", "tecken": "X2",
+//         "kommentar": "Teijder vägrade tro på United" }
 //     ]
 //   }
 //
 // "match" är bara till för den som läser filen; det är id (ESPN:s matchid)
-// som räknas. En trasig fil stoppar inte bygget – den visas som fel.
+// som räknas. "kommentar" är gängets valfria anteckning om matchen – den följer
+// med till historiken och AI:ns kommentar (src/history.js). En trasig fil
+// stoppar inte bygget – den visas som fel.
 
 const fs = require('fs');
 const path = require('path');
@@ -29,6 +32,8 @@ const COUPON_DIR = process.env.KUPONG_DIR || path.join(__dirname, '..', 'data', 
 // finns det i GITHUB_REPOSITORY.
 const REPO = process.env.GITHUB_REPOSITORY || 'tomaslaino/Profeterna';
 const BRANCH = 'main';
+// Så många tecken får en anteckning om en match vara.
+const NOTE_MAX = 140;
 
 // Tecknen skrivs alltid i ordningen 1, X, 2.
 function normSign(s) {
@@ -51,7 +56,8 @@ function parseCoupon(id, raw) {
     if (!sign) { errors.push(`match ${i + 1}: tecken saknas`); continue; }
     if (seen.has(mid)) { errors.push(`match ${i + 1}: finns redan på kupongen`); continue; }
     seen.add(mid);
-    matches.push({ id: mid, sign, label: m.match ? String(m.match) : null });
+    const note = m.kommentar ? String(m.kommentar).trim().slice(0, NOTE_MAX) : '';
+    matches.push({ id: mid, sign, label: m.match ? String(m.match) : null, ...(note ? { note } : {}) });
   }
   const created = raw.skapad && !Number.isNaN(Date.parse(raw.skapad)) ? new Date(raw.skapad).toISOString() : null;
   return {
@@ -80,4 +86,4 @@ function readCoupons(dir = COUPON_DIR) {
   return { coupons, errors };
 }
 
-module.exports = { readCoupons, parseCoupon, normSign, COUPON_DIR, REPO, BRANCH };
+module.exports = { readCoupons, parseCoupon, normSign, COUPON_DIR, REPO, BRANCH, NOTE_MAX };

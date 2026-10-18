@@ -62,10 +62,12 @@ GitHub Actions (var 30:e min)  →  källorna  →  src/build.js  →  _site/ (H
   matchfiler i git-historiken. Det enda som committas automatiskt är prognosjournalen
   (`data/journal/`) – där är git-historiken själva poängen: den visar offentligt att en
   prognos fanns före avspark och aldrig skrivits om. Se
-  [Prognosjournalen och utvärderingen](#prognosjournalen-och-utvärderingen-fas-3).
+  [Prognosjournalen och utvärderingen](#prognosjournalen-och-utvärderingen-fas-3) – och
+  kuponghistoriken (`data/kupong-historik.json`, se [Kuponghistoriken](#kuponghistoriken)).
 - **Journalens commit:** bygget körs med `--journal`, och steget *Committa
-  prognosjournalen* committar bara `data/journal/` och bara när filen växt, som
-  `github-actions[bot]` med meddelandet "Prognosjournal: N nya rader". Jobbet har
+  prognosjournalen och kuponghistoriken* committar bara `data/journal/` och
+  `data/kupong-historik.json`, och bara när de ändrats, som `github-actions[bot]` med
+  meddelandet "Prognosjournal: N nya rader" (och/eller "kuponghistoriken uppdaterad"). Jobbet har
   `contents: write`; deploy-jobbet bara `pages`/`id-token`. Steget stoppar körningen om en
   befintlig rad ändrats eller tagits bort (append-only), och har main fått en ny commit
   under körningen läggs journalcommiten ovanpå (`pull --rebase`). Misslyckas committen

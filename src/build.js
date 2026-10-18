@@ -16,6 +16,8 @@
 //   data/season.json       säsongsprognosen, modellens styrka för alla lag
 //                          och programmet framåt (Divisioner → Prognos)
 //   data/kuponger.json     gängets kuponger ur data/kuponger/ (fliken Kupong)
+//   data/historik.json     färdiga kuponger med facit, betyg och AI:ns
+//                          kommentar (sidan Historik, src/history.js)
 //   data/journal/*.jsonl   prognosjournalen som den ligger i repot
 //
 // Matchanalysen (fas 5) görs inte i bygget utan på begäran i matchvyn, via en
@@ -26,7 +28,9 @@
 // körning) – den laddas upp som Pages-artefakt. Källcachen i data/cache/
 // sparas mellan körningarna med actions/cache. Det enda som committas är
 // prognosjournalen (data/journal/), som bara skrivs med --journal – det gör
-// bygget på GitHub Actions, inte lokala byggen (se src/journal.js).
+// bygget på GitHub Actions, inte lokala byggen (se src/journal.js). Samma
+// flagga fryser in färdiga kuponger och AI:ns kommentarer i
+// data/kupong-historik.json, som också committas.
 
 const fs = require('fs');
 const path = require('path');
@@ -41,6 +45,7 @@ const { evaluate } = require('./evaluate');
 const { divisionStats } = require('./divisions');
 const { playerFiles, teamSquad } = require('./players');
 const { readCoupons, REPO, BRANCH } = require('./coupons');
+const { buildHistory, writeComments } = require('./history');
 const { wholePercent } = require('./model');
 const rules = require('../config/forecast-rules');
 const llm = require('../config/llm');
@@ -172,6 +177,17 @@ function writeSite(outDir = OUT, { journal = false, analysisEndpoint } = {}) {
   }
   write('kuponger.json', { repo: REPO, branch: BRANCH, dir: 'data/kuponger', ...coupons });
 
+  // Kuponghistoriken (sidan Historik): färdiga kuponger med facit och betyg.
+  // Med --journal fryses nya färdiga kuponger in i data/kupong-historik.json.
+  let history;
+  try {
+    history = buildHistory({ coupons: coupons.coupons, matches: list.matches, freeze: journal });
+  } catch (err) {
+    console.error('[build] kuponghistoriken:', err);
+    history = { coupons: [], errors: [String(err.message || err)], frozen: [] };
+  }
+  write('historik.json', { comment: commentInfo(analysisEndpoint), coupons: history.coupons, errors: history.errors });
+
   // En trasig match får inte stoppa bygget – den saknar då bara sin sida.
   const failed = [];
   let pages = 0;
@@ -195,7 +211,7 @@ function writeSite(outDir = OUT, { journal = false, analysisEndpoint } = {}) {
   // Byt hela katalogen på en gång, så att en halvfärdig sajt aldrig serveras.
   fs.rmSync(outDir, { recursive: true, force: true });
   fs.renameSync(tmp, outDir);
-  return { generatedAt, pages, failed, counts: sources.counts, forecastMs: forecast.ms, logged: logged.length };
+  return { generatedAt, pages, failed, counts: sources.counts, forecastMs: forecast.ms, logged: logged.length, frozen: history.frozen.length };
 }
 
 function squads(m) {
@@ -210,6 +226,13 @@ function squads(m) {
 function analysisInfo(override) {
   const endpoint = override !== undefined ? override : (llm.enabled ? llm.endpoint : null);
   return endpoint ? { endpoint, provider: llm.provider, model: llm.model, news: Boolean(llm.news) } : null;
+}
+
+// AI:ns kommentar till kupongerna går via samma proxy som analysen
+// (…/analyze → …/kommentar, lokalt /api/kommentar).
+function commentInfo(override) {
+  const a = analysisInfo(override);
+  return a ? { endpoint: a.endpoint.replace(/analyze$/, 'kommentar') } : null;
 }
 
 // Kompakt prognos för matchlistan: hela procent 1 · X · 2 (summa 100), och
@@ -227,7 +250,19 @@ function roundNumbers(key, v) {
 
 async function build({ force = false, fetch = true, journal = false, analysisEndpoint } = {}) {
   const results = fetch ? await refreshAll({ force }) : [];
-  return { results, site: writeSite(OUT, { journal, analysisEndpoint }) };
+  const site = writeSite(OUT, { journal, analysisEndpoint });
+  // AI:ns kommentarer skrivs in i historiken efter bygget: proxyn läser
+  // kupongen ur den publicerade sajten (se src/history.js).
+  site.comments = 0;
+  if (journal) {
+    try {
+      const c = commentInfo(analysisEndpoint);
+      site.comments = (await writeComments({ endpoint: c && c.endpoint })).length;
+    } catch (err) {
+      console.error('[build] kommentarerna:', err);
+    }
+  }
+  return { results, site };
 }
 
 if (require.main === module) {
@@ -240,6 +275,7 @@ if (require.main === module) {
       const counts = Object.entries(site.counts).map(([k, v]) => `${v} ${k}`).join(', ');
       console.log(`Sajten byggd i _site/: ${site.pages} matchsidor, ${site.failed.length} fel, prognoser på ${site.forecastMs} ms. Källor: ${counts}.`);
       console.log(journal ? `Prognosjournalen: ${site.logged} nya rader.` : 'Prognosjournalen: bara läst (skrivs med --journal).');
+      if (journal) console.log(`Kuponghistoriken: ${site.frozen} nya kuponger, ${site.comments} nya kommentarer.`);
     })
     .catch((err) => {
       console.error(err);

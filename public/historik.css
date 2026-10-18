@@ -1,0 +1,175 @@
+/* Sidan Historik (historik.js). Laddas efter theme.css och kupong.css och
+   lånar deras tokens, prickar, teckenrutor och stora siffror. Betygets färg:
+   5 grön, 4 ljusblå, 3 blå, 2 gul, 1 röd – samma i stjärnorna och staplarna. */
+
+:root {
+  --hk-5: var(--fresh);
+  --hk-4: #7fb0ff;
+  --hk-3: var(--accent);
+  --hk-2: var(--stale);
+  --hk-1: var(--down);
+}
+
+.hk-head { margin-top: clamp(18px, 3vw, 34px); }
+.hk-head .page-title { margin-top: 6px; }
+.hk-head .kp-eyebrow a { color: inherit; text-decoration: none; }
+.hk-head .kp-eyebrow a::before { content: "‹ "; }
+.hk-head .kp-eyebrow a:hover { color: #fff; }
+
+/* ---------- sammanfattningen ---------- */
+
+.hk-tiles {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 12px;
+  margin-bottom: 14px;
+}
+.hk-tile {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  padding: 16px 18px;
+  background: var(--glass);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  box-shadow: var(--shadow-card);
+}
+.hk-tile b {
+  font-family: var(--display);
+  font-weight: 800;
+  font-size: clamp(34px, 4.4vw, 46px);
+  line-height: 0.9;
+  color: var(--bone);
+  letter-spacing: 0.01em;
+}
+.hk-tile b small { font-size: 0.55em; margin-left: 4px; color: var(--hk-2); vertical-align: 0.35em; }
+.hk-tile .sub { font-size: 12.5px; }
+
+.hk-chart { position: relative; padding: 18px 20px 42px; margin-bottom: 26px; }
+.hk-cols { display: flex; align-items: flex-end; gap: 10px; height: 150px; }
+.hk-col {
+  flex: 1 1 0;
+  min-width: 0;
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 8px;
+  text-decoration: none;
+}
+.hk-bar { position: relative; flex: 1; width: 100%; max-width: 46px; border-radius: 6px; background: rgba(255, 255, 255, 0.04); }
+.hk-bar i { position: absolute; left: 0; right: 0; bottom: 0; border-radius: 6px; background: var(--hk-3); }
+.hk-bar i.g5 { background: var(--hk-5); }
+.hk-bar i.g4 { background: var(--hk-4); }
+.hk-bar i.g2 { background: var(--hk-2); }
+.hk-bar i.g1 { background: var(--hk-1); }
+.hk-bar b { position: absolute; left: -4px; right: -4px; height: 3px; margin-bottom: -1.5px; border-radius: 2px; background: var(--bone); opacity: 0.85; }
+.hk-col:hover .hk-bar i { filter: brightness(1.15); }
+.hk-lab { font-size: 11px; color: var(--muted); white-space: nowrap; overflow: hidden; text-overflow: clip; max-width: 100%; }
+.hk-key { position: absolute; right: 20px; bottom: 12px; display: flex; gap: 14px; font-size: 11.5px; color: var(--muted); }
+.hk-key i { display: inline-block; width: 10px; height: 10px; margin-right: 6px; border-radius: 2px; vertical-align: -1px; }
+.hk-key i.us { background: linear-gradient(90deg, var(--hk-1), var(--hk-2), var(--hk-3), var(--hk-4), var(--hk-5)); width: 16px; }
+.hk-key i.exp { height: 3px; width: 14px; vertical-align: 2px; background: var(--bone); }
+
+/* ---------- sortering ---------- */
+
+.hk-tools { display: flex; margin-bottom: 16px; }
+.hk-dir { margin-left: 6px; color: var(--accent-deep); }
+
+/* ---------- kupongkorten ---------- */
+
+.hk-list { display: flex; flex-direction: column; gap: 14px; }
+.hk-card { padding: 20px 22px; scroll-margin-top: 84px; }
+.hk-card:target { border-color: var(--pill-line-hi); }
+.hk-top { display: flex; justify-content: space-between; align-items: flex-start; gap: 16px; }
+.hk-title h4 {
+  margin: 4px 0 0;
+  font-family: var(--display);
+  font-weight: 800;
+  font-size: 26px;
+  line-height: 1;
+  letter-spacing: 0.03em;
+  text-transform: uppercase;
+  color: var(--bone);
+}
+.hk-grade { display: flex; flex-direction: column; align-items: flex-end; gap: 4px; font-size: 12px; font-weight: 700; letter-spacing: 0.08em; text-transform: uppercase; color: var(--ink-soft); white-space: nowrap; }
+
+.hk-stars { display: inline-flex; gap: 2px; font-size: 20px; line-height: 1; }
+.hk-stars i { font-style: normal; color: rgba(255, 255, 255, 0.12); }
+.hk-stars.g5 i.on { color: var(--hk-5); }
+.hk-stars.g4 i.on { color: var(--hk-4); }
+.hk-stars.g3 i.on { color: var(--hk-3); }
+.hk-stars.g2 i.on { color: var(--hk-2); }
+.hk-stars.g1 i.on { color: var(--hk-1); }
+.hk-stars.none { color: var(--muted); }
+
+.hk-mid { display: grid; grid-template-columns: auto minmax(0, 1fr); align-items: center; gap: clamp(16px, 3vw, 30px); margin-top: 14px; }
+.hk-mid .kp-big b { font-size: clamp(46px, 6vw, 60px); }
+.hk-mid .kp-big span { font-size: 20px; }
+.hk-facts { display: flex; flex-direction: column; gap: 10px; min-width: 0; }
+.hk-facts .up { color: var(--fresh); font-weight: 700; }
+.hk-facts .down { color: var(--down); font-weight: 700; }
+
+/* AI:ns kommentar: ett citat med en tunn linje i betygets ton */
+.hk-ai {
+  position: relative;
+  margin: 16px 0 0;
+  padding: 12px 16px 13px 18px;
+  border-radius: 12px;
+  background: rgba(91, 140, 255, 0.07);
+  box-shadow: inset 3px 0 0 color-mix(in srgb, var(--accent) 70%, transparent);
+}
+.hk-ai-who { display: block; font-size: 10.5px; font-weight: 800; letter-spacing: 0.14em; text-transform: uppercase; color: var(--accent-deep); }
+.hk-ai p { margin: 4px 0 0; font-size: 15px; line-height: 1.55; color: var(--fg); max-width: 70ch; }
+.hk-ai.is-loading p { color: var(--muted); font-size: 13.5px; }
+.hk-dots { display: inline-flex; gap: 3px; margin-right: 4px; vertical-align: 1px; }
+.hk-dots i { width: 5px; height: 5px; border-radius: 50%; background: var(--accent-deep); animation: hk-blink 1.2s infinite; }
+.hk-dots i:nth-child(2) { animation-delay: 0.2s; }
+.hk-dots i:nth-child(3) { animation-delay: 0.4s; }
+@keyframes hk-blink { 0%, 80%, 100% { opacity: 0.25; } 40% { opacity: 1; } }
+
+/* ---------- matcherna ---------- */
+
+.hk-rows { margin-top: 14px; }
+.hk-rows > summary { font-size: 13.5px; font-weight: 600; color: var(--ink-soft); }
+.hk-count { font-weight: 500; color: var(--muted); }
+.hk-rows .mlist { margin-top: 10px; }
+.hk-row {
+  display: grid;
+  grid-template-columns: 24px minmax(0, 1fr) auto 7.5rem 5.5rem;
+  align-items: center;
+  gap: 14px;
+  padding: 10px 16px;
+  border-bottom: 1px solid var(--hair);
+}
+.hk-row:last-child { border-bottom: 0; }
+.hk-match { font-weight: 600; font-size: 14.5px; min-width: 0; }
+.hk-note { display: block; margin-top: 2px; font-size: 12.5px; font-weight: 400; font-style: italic; color: var(--eyebrow); }
+.hk-note::before { content: "”"; margin-right: 2px; }
+.hk-note::after { content: "”"; margin-left: 1px; }
+.hk-res { text-align: right; display: flex; flex-direction: column; align-items: flex-end; }
+.hk-res .score { font-family: var(--display); font-weight: 800; font-size: 19px; color: var(--bone); letter-spacing: 0.02em; }
+.hk-res .sub { font-size: 11.5px; }
+.hk-row.s-no .hk-match, .hk-row.s-no .kp-p { opacity: 0.7; }
+.hk-row .kp-p.unknown { justify-content: center; }
+
+@media (max-width: 760px) {
+  .hk-tiles { grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 10px; }
+  .hk-tile { padding: 14px; }
+  .hk-chart { padding: 14px 12px 42px; }
+  .hk-cols { gap: 5px; height: 120px; }
+  .hk-lab { font-size: 10px; }
+  .hk-key { right: 12px; }
+  .hk-tools .seg { max-width: 100%; overflow-x: auto; }
+  .hk-tools .seg button { padding: 6px 9px; font-size: 13px; white-space: nowrap; }
+  .hk-card { padding: 16px; }
+  .hk-title h4 { font-size: 22px; }
+  .hk-mid { grid-template-columns: 1fr; gap: 10px; }
+  .hk-row { grid-template-columns: 22px minmax(0, 1fr) auto auto; gap: 10px; padding: 10px 12px; }
+  .hk-row .kp-p { display: none; }
+  .hk-row .kp-sg i { width: 23px; height: 23px; font-size: 14px; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .hk-dots i { animation: none; opacity: 0.7; }
+}
