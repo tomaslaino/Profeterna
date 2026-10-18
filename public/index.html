@@ -4,7 +4,7 @@
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <title>Profeterna – matchprognoser för engelsk fotboll</title>
-  <meta name="theme-color" content="#0a1628">
+  <meta name="theme-color" content="#0e0d0b">
   <link rel="icon" type="image/svg+xml" href="logo.svg">
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -44,10 +44,21 @@
       <div id="match-list-view">
         <div class="hero">
           <div class="hero-main">
-            <p class="kicker"><span class="kicker-dot"></span>Engelsk fotboll</p>
+            <p class="kicker">Engelsk fotboll</p>
             <h1 class="hero-title">Profeterna</h1>
-            <p class="hero-sub">Sannolikheter för varje match – rättade mot facit.</p>
+            <div class="hero-lede">
+              <!-- myntet står här på mobilen och till höger på breda skärmar -->
+              <img class="coin coin-sm" src="mynt.svg" alt="Sannolikhet att vi blir stenrika: 0,4 procent"
+                title="Modellen tvekar. Vi har redan beställt marmorn." width="200" height="200">
+              <p class="hero-motto">Snart stenrika.<sup>*</sup></p>
+              <p class="hero-sub">Sannolikheter för varje match – rättade mot facit.</p>
+            </div>
             <div id="topline" class="topline">Laddar …</div>
+          </div>
+          <!-- stora myntet visas bara på breda skärmar; lazy så att mobilen inte hämtar det -->
+          <div class="hero-aside">
+            <img class="coin coin-lg" src="mynt.svg" alt="Sannolikhet att vi blir stenrika: 0,4 procent"
+              title="Modellen tvekar. Vi har redan beställt marmorn." width="200" height="200" loading="lazy">
           </div>
         </div>
         <div id="coupon-hero"></div>
@@ -92,6 +103,7 @@
   <footer>
     <img class="logo-sm" src="logo.svg" alt="" width="20" height="20">
     <p>Profeterna · Daniel Laino, Daniel Teijder och Daniel Johansson · Endast fria datakällor</p>
+    <p class="fotnot">* Historisk avkastning är ingen garanti för framtida avkastning.</p>
   </footer>
 
   <script src="app.js"></script>
