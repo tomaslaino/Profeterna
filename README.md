@@ -785,16 +785,42 @@ ställningen efter 90 minuter (samma utfall som prognosen).
    eller 2 på matcherna (flera tecken = gardering). En vald match får ett fält för en
    valfri anteckning (högst 140 tecken), t.ex. vem som drev tecknet – den visas under
    lagnamnen i kupongvyn och följer med till Historik. Utkastet sparas i webbläsaren.
-2. *Spara kupong* → *Spara på GitHub* öppnar GitHub med filen ifylld
-   (`data/kuponger/<datum för första matchen>.json`). Tryck **Commit changes** (kräver
-   inloggning med skrivrätt till repot). Pushen startar workflowen och kupongen syns för
-   alla efter bygget, några minuter senare. Git-historiken visar när kupongen lades.
+2. *Spara kupong* → skriv **kodordet** → *Spara*. Tjänsten *profeterna-kupong* på
+   Cloudflare (`POST …/kupong`, [worker/kupong-proxy.mjs](worker/kupong-proxy.mjs) och
+   [worker/kupong.mjs](worker/kupong.mjs), adressen i [config/kupong.js](config/kupong.js))
+   kontrollerar kodordet och kupongen och committar filen `data/kuponger/<datum för första
+   matchen>.json` via GitHubs API. Pushen startar workflowen och kupongen syns för alla
+   efter bygget, några minuter senare. Git-historiken visar när kupongen lades; tiden i
+   `skapad` sätts av proxyn. Kodordet sparas på enheten, så nästa gång räcker ett tryck.
+   Är datumet redan taget av en annan kupong får filen `-2` (osv.).
 3. Tills dess visas kupongen i den webbläsaren där den skapades, märkt *väntar på GitHub*.
    Märkningen försvinner när den publicerade kupongen är likadan, och glöms efter tre dygn.
+4. **Reserv:** *Spara via GitHub i stället* (eller automatiskt erbjudet om proxyn inte kan
+   spara) öppnar GitHub med filen ifylld – tryck **Commit changes** (kräver inloggning med
+   skrivrätt till repot).
+
+**Spara direkt – inställningar (en gång):** en egen tjänst, skild från proxyn för
+matchanalysen, så att GitHub-nyckeln bara finns där. Driftsätts med
+`npx wrangler@4.147.0 deploy --config worker/kupong.toml` och behöver två hemligheter.
+
+- `GITHUB_TOKEN`: på GitHub, *Settings → Developer settings → Personal access tokens →
+  Fine-grained tokens → Generate new token*. *Repository access: Only select repositories*
+  → Profeterna; *Permissions → Contents: Read and write* (inget annat). Lägg in den med
+  `npx wrangler@4.147.0 secret put GITHUB_TOKEN --config worker/kupong.toml`. Tokenen
+  har ett slutdatum – när den gått ut svarar Spara att GitHub nekar, och reservvägen
+  gäller tills en ny lagts in.
+- `KUPONG_KOD`: gängets kodord, `npx wrangler@4.147.0 secret put KUPONG_KOD --config
+  worker/kupong.toml`. Byt kodord genom att lägga in ett nytt; enheterna frågar då igen.
+- Tio fel kodord från samma IP-adress spärrar i en timme (räknas i samma KV-namnrymd som
+  analysens cache, bindningen `KUPONG`).
+- Lokalt: `KUPONG_KOD=…` i `.env` ger samma knapp mot `POST /api/kupong`, som skriver
+  filen direkt i `data/kuponger/` (eller `KUPONG_DIR`) utan GitHub.
 
 **Ändra:** knappen *Ändra* (bara medan någon match återstår). Startade matcher ligger kvar
-som de är, med sina anteckningar. GitHub kan inte fylla i en fil som redan finns, så *Spara på GitHub* kopierar
-innehållet och öppnar filen för redigering – markera allt, klistra in, Commit changes.
+som de är, med sina anteckningar. Spara direkt skriver över filen (behåller `skapad`,
+lägger till `ändrad`). Via GitHub kan inte en befintlig fil fyllas i, så *Spara på GitHub*
+kopierar innehållet och öppnar filen för redigering – markera allt, klistra in, Commit
+changes.
 **Ta bort:** radera filen på GitHub.
 
 **Filen** (går också att skriva för hand; `match` är bara för läsaren, `id` är ESPN:s
@@ -1007,7 +1033,9 @@ schemaintervall gammalt.
   xG-källa.
 - Europacupernas kvalomgångar hämtas bara för juli–augusti.
 - **Kupongen:** att GitHub fyller i den nya filen ur länken (`?filename=…&value=…`) är
-  provat fram till inloggningen 2026-10-18, inte hela vägen till en commit. Märkningen
+  provat fram till inloggningen 2026-10-18, inte hela vägen till en commit. Spara direkt
+  är provat lokalt och mot ett låtsas-GitHub; kodordet är det enda skyddet, så den som
+  har det kan lägga och ändra kuponger (fel kodord spärras efter tio försök). Märkningen
   *väntar på GitHub* finns bara i webbläsaren där kupongen skapades. Liveställningen bygger
   på ESPN:s inofficiella API, som resten av sajten.
 

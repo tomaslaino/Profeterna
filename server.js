@@ -8,6 +8,10 @@
 // Analysera, och servern gör analysen själv (POST /api/analyze) med samma kod
 // som proxyn på Cloudflare (worker/index.mjs). Utan nyckel ingen knapp.
 // Samma nyckel ger AI:ns kommentarer på sidan Historik (POST /api/kommentar).
+//
+// Kupongen: finns KUPONG_KOD i .env sparar knappen Spara kupongen direkt
+// (POST /api/kupong) – lokalt skrivs filen i data/kuponger/ (eller
+// KUPONG_DIR), inte på GitHub. Samma saveCoupon() som proxyn.
 
 const fs = require('fs');
 const path = require('path');
@@ -15,6 +19,7 @@ const express = require('express');
 const { loadEnv } = require('./src/env');
 const { build, OUT } = require('./src/build');
 const { CACHE_DIR } = require('./src/store');
+const { COUPON_DIR } = require('./src/coupons');
 const llm = require('./config/llm');
 
 const TICK_MINUTES = 15;
@@ -74,13 +79,53 @@ function commentRoute(siteDir = OUT, store = fileStore(path.join(CACHE_DIR, 'kom
   };
 }
 
+// Lokalt skrivs kupongen som fil i stället för med en commit på GitHub.
+function couponFileWriter(dir = COUPON_DIR) {
+  const file = (p) => path.join(dir, path.basename(p));
+  return {
+    get: async (p) => (fs.existsSync(file(p)) ? { sha: 'lokal' } : null),
+    put: async (p, text) => {
+      fs.mkdirSync(dir, { recursive: true });
+      fs.writeFileSync(file(p), text);
+      return { url: null };
+    },
+  };
+}
+
+// POST /api/kupong {kod, kupong, andra} – kodordet ur KUPONG_KOD.
+function couponSaveRoute(writer = couponFileWriter()) {
+  const wrong = new Map(); // fel kodord per IP-adress, glöms efter en timme
+  return async (req, res) => {
+    try {
+      const { saveCoupon } = await import('./worker/kupong.mjs');
+      const ip = req.ip;
+      const r = await saveCoupon(req.body, {
+        env: process.env,
+        writer,
+        limiter: {
+          count: async () => ((wrong.get(ip) || {}).until > Date.now() ? wrong.get(ip).n : 0),
+          bump: async () => {
+            const w = wrong.get(ip);
+            wrong.set(ip, w && w.until > Date.now() ? { n: w.n + 1, until: w.until } : { n: 1, until: Date.now() + 3600000 });
+          },
+        },
+      });
+      res.status(r.status).json(r.body);
+    } catch (err) {
+      console.error('[kupong]', err);
+      res.status(500).json({ ok: false, error: 'Internt fel i servern.' });
+    }
+  };
+}
+
 if (require.main === module) {
   loadEnv();
   const analysisEndpoint = process.env[llm.keyEnv] ? '/api/analyze' : null;
+  const couponEndpoint = process.env.KUPONG_KOD ? '/api/kupong' : null;
 
   const cycle = async () => {
     try {
-      const { results, site } = await build({ analysisEndpoint });
+      const { results, site } = await build({ analysisEndpoint, couponEndpoint });
       const fetched = results.filter((r) => r.action === 'fetched').length;
       const errors = results.filter((r) => r.action === 'error');
       console.log(`[build] ${site.generatedAt}: ${fetched} källor hämtade, ${errors.length} fel, ${site.pages} matchsidor`);
@@ -93,6 +138,7 @@ if (require.main === module) {
   const app = express();
   if (analysisEndpoint) app.post('/api/analyze', express.json(), analysisRoute());
   if (analysisEndpoint) app.post('/api/kommentar', express.json(), commentRoute());
+  if (couponEndpoint) app.post('/api/kupong', express.json({ limit: '20kb' }), couponSaveRoute());
   app.use(express.static(OUT));
 
   const port = parseInt(process.env.PORT || '3001', 10);
@@ -106,4 +152,4 @@ if (require.main === module) {
   });
 }
 
-module.exports = { analysisRoute, commentRoute, fileStore };
+module.exports = { analysisRoute, commentRoute, couponSaveRoute, couponFileWriter, fileStore };

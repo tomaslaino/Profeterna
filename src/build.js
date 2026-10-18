@@ -49,6 +49,7 @@ const { buildHistory, writeComments } = require('./history');
 const { wholePercent } = require('./model');
 const rules = require('../config/forecast-rules');
 const llm = require('../config/llm');
+const kupongCfg = require('../config/kupong');
 const { COMPETITIONS, SEASON } = require('../config/competitions');
 
 const ROOT = path.join(__dirname, '..');
@@ -61,7 +62,9 @@ const UPDATE_EVERY_MINUTES = 30;
 
 // analysisEndpoint: undefined = enligt config/llm.js, null = ingen knapp,
 // annars adressen (lokalt '/api/analyze', se server.js).
-function writeSite(outDir = OUT, { journal = false, analysisEndpoint } = {}) {
+// couponEndpoint: Spara-knappen för kupongen – undefined = enligt
+// config/kupong.js, null = ingen (bara GitHub-länken), annars adressen.
+function writeSite(outDir = OUT, { journal = false, analysisEndpoint, couponEndpoint } = {}) {
   const tmp = `${outDir}.tmp`;
   fs.rmSync(tmp, { recursive: true, force: true });
   fs.cpSync(PUBLIC, tmp, { recursive: true });
@@ -175,7 +178,7 @@ function writeSite(outDir = OUT, { journal = false, analysisEndpoint } = {}) {
     console.error('[build] kupongerna:', err);
     coupons = { coupons: [], errors: [{ file: '', errors: [String(err.message || err)] }] };
   }
-  write('kuponger.json', { repo: REPO, branch: BRANCH, dir: 'data/kuponger', ...coupons });
+  write('kuponger.json', { repo: REPO, branch: BRANCH, dir: 'data/kuponger', save: couponSaveInfo(couponEndpoint), ...coupons });
 
   // Kuponghistoriken (sidan Historik): färdiga kuponger med facit och betyg.
   // Med --journal fryses nya färdiga kuponger in i data/kupong-historik.json.
@@ -230,6 +233,13 @@ function analysisInfo(override) {
 
 // AI:ns kommentar till kupongerna går via samma proxy som analysen
 // (…/analyze → …/kommentar, lokalt /api/kommentar).
+// Kupongen sparas av tjänsten profeterna-kupong, som committar filen i repot
+// (worker/kupong-proxy.mjs).
+function couponSaveInfo(override) {
+  if (override !== undefined) return override;
+  return kupongCfg.enabled ? kupongCfg.endpoint : null;
+}
+
 function commentInfo(override) {
   const a = analysisInfo(override);
   return a ? { endpoint: a.endpoint.replace(/analyze$/, 'kommentar') } : null;
@@ -248,9 +258,9 @@ function roundNumbers(key, v) {
   return typeof v === 'number' && !Number.isInteger(v) ? Math.round(v * 10000) / 10000 : v;
 }
 
-async function build({ force = false, fetch = true, journal = false, analysisEndpoint } = {}) {
+async function build({ force = false, fetch = true, journal = false, analysisEndpoint, couponEndpoint } = {}) {
   const results = fetch ? await refreshAll({ force }) : [];
-  const site = writeSite(OUT, { journal, analysisEndpoint });
+  const site = writeSite(OUT, { journal, analysisEndpoint, couponEndpoint });
   // AI:ns kommentarer skrivs in i historiken efter bygget: proxyn läser
   // kupongen ur den publicerade sajten (se src/history.js).
   site.comments = 0;

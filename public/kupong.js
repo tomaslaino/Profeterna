@@ -678,9 +678,11 @@ function couponJSON(file) {
   return ['{', ...lines, '  "matcher": [', ...rows, '  ]', '}', ''].join('\n');
 }
 
-// Kupongen blir en fil i repot. En ny fil öppnas ifylld på GitHub; finns
-// filen redan öppnas den för redigering och innehållet kopieras, eftersom
-// GitHub inte kan fylla i en befintlig fil.
+// Kupongen blir en fil i repot. Med proxyn (KP.data.save) sparas den direkt
+// med kodordet – proxyn committar filen (worker/kupong.mjs). Annars, eller om
+// proxyn inte kan spara, via GitHub: en ny fil öppnas ifylld; finns filen
+// redan öppnas den för redigering och innehållet kopieras, eftersom GitHub
+// inte kan fylla i en befintlig fil.
 async function saveCoupon() {
   const sel = draftMatches();
   if (!sel.length && !KP.draft.locked.length) {
@@ -688,7 +690,6 @@ async function saveCoupon() {
     return;
   }
   const d = KP.draft;
-  const published = (KP.data.coupons || []).map((c) => c.id);
   let id = d.edit;
   if (!id) {
     const first = sel.map((x) => x.m.kickoff).sort()[0];
@@ -710,28 +711,109 @@ async function saveCoupon() {
     ...(d.edit ? { 'ändrad': new Date().toISOString() } : {}),
     matcher: rows,
   };
-  const json = couponJSON(file);
-  const coupon = { id, name: name || null, created: file.skapad, matches: rows.map((r) => ({ id: r.id, sign: r.tecken, label: r.match, ...(r.kommentar ? { note: r.kommentar } : {}) })) };
-  setPending(coupon);
-  kpStore(KP_DRAFT, null);
+  const ctx = {
+    id, edit: d.edit, name, rows, file,
+    range: dateRange(kick(rows[0]) || null, kick(rows[rows.length - 1]) || null),
+    coupon: { id, name: name || null, created: file.skapad, matches: rows.map((r) => ({ id: r.id, sign: r.tecken, label: r.match, ...(r.kommentar ? { note: r.kommentar } : {}) })) },
+  };
+  KP.view = { mode: 'saved', id };
+  if (KP.data.save) renderDirect(ctx);
+  else renderViaGitHub(ctx);
+  window.scrollTo(0, 0);
+}
 
+const KP_CODE = 'profeterna.kupong.kod';
+
+function savedHead(eyebrow, ctx) {
+  return `<div class="kp-head"><div><p class="kp-eyebrow">${esc(eyebrow)}</p><h2 class="page-title">${esc(ctx.range)}</h2></div></div>`;
+}
+
+// Spara direkt: kodordet en gång per enhet, sedan sparas kupongen med ett tryck.
+function renderDirect(ctx) {
+  const code = kpLoad(KP_CODE) || '';
+  $('#coupon').innerHTML = savedHead('Spara kupongen', ctx) +
+    '<form class="card kp-saved" id="kp-direct" autocomplete="on">' +
+    '<label class="kp-lab" for="kp-kod">Kodord</label>' +
+    `<div class="kp-coderow"><input type="password" id="kp-kod" class="kp-name" autocomplete="current-password" required value="${esc(code)}">` +
+    '<button type="submit" class="kp-btn primary" id="kp-send">Spara</button></div>' +
+    '<p class="kp-msg" id="kp-msg" role="status"></p>' +
+    `<p class="legend kp-alt"><a href="#kupong/${ctx.edit ? `andra/${esc(ctx.edit)}` : 'ny'}">Tillbaka</a> · ` +
+    '<button type="button" class="kp-linkbtn" id="kp-viagh">Spara via GitHub i stället</button></p></form>';
+  $('#kp-direct').addEventListener('submit', (e) => { e.preventDefault(); sendDirect(ctx); });
+  $('#kp-viagh').addEventListener('click', () => renderViaGitHub(ctx));
+  if (code) sendDirect(ctx);
+  else $('#kp-kod').focus();
+}
+
+async function sendDirect(ctx) {
+  const msg = (h) => { $('#kp-msg').innerHTML = h; };
+  const btn = $('#kp-send');
+  const code = $('#kp-kod').value;
+  if (!code) { msg('Skriv kodordet.'); return; }
+  btn.disabled = true;
+  msg('Sparar …');
+  let res;
+  let body = {};
+  try {
+    res = await fetch(KP.data.save, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ kod: code, andra: ctx.edit || null, kupong: { id: ctx.id, namn: ctx.name, skapad: ctx.file.skapad, matcher: ctx.rows } }),
+    });
+    body = await res.json().catch(() => ({}));
+  } catch {
+    res = null;
+  }
+  btn.disabled = false;
+  if (res && res.ok && body.ok) {
+    kpStore(KP_CODE, code);
+    const coupon = { ...ctx.coupon, id: body.id || ctx.id, created: body.skapad || ctx.coupon.created };
+    setPending(coupon);
+    kpStore(KP_DRAFT, null);
+    KP.view = { mode: 'saved', id: coupon.id };
+    $('#coupon').innerHTML = savedHead('Sparad', ctx) +
+      '<div class="card kp-saved"><p>Kupongen är sparad. Den syns för alla när sajten byggts om, om några minuter.</p>' +
+      `<div class="kp-actions"><a class="kp-btn primary" href="#kupong/${esc(coupon.id)}">Visa kupongen</a>` +
+      (body.commit ? `<a class="kp-btn" href="${esc(body.commit)}" target="_blank" rel="noopener">Commit på GitHub</a>` : '') + '</div></div>';
+    renderCouponHero();
+    return;
+  }
+  if (res && res.status === 403) {
+    kpStore(KP_CODE, null);
+    msg('<span class="note">Fel kodord.</span>');
+    $('#kp-kod').select();
+    return;
+  }
+  if (res && [400, 409, 429].includes(res.status)) {
+    msg(`<span class="note">${esc(body.error || 'Det gick inte att spara.')}</span>`);
+    return;
+  }
+  // Proxyn kan inte spara just nu (inte påslaget, GitHub svarar inte, ingen
+  // kontakt) – GitHub-vägen finns kvar.
+  msg(`<span class="note">${esc((body && body.error) || 'Ingen kontakt med servern.')}</span> ` +
+    '<button type="button" class="kp-linkbtn" id="kp-viagh2">Spara via GitHub i stället</button>');
+  $('#kp-viagh2').addEventListener('click', () => renderViaGitHub(ctx));
+}
+
+function renderViaGitHub(ctx) {
+  const json = couponJSON(ctx.file);
+  setPending(ctx.coupon);
+  kpStore(KP_DRAFT, null);
   const repo = KP.data.repo || 'tomaslaino/Profeterna';
   const branch = KP.data.branch || 'main';
-  const path = `${KP.data.dir || 'data/kuponger'}/${id}.json`;
-  const exists = published.includes(id);
+  const path = `${KP.data.dir || 'data/kuponger'}/${ctx.id}.json`;
+  const exists = (KP.data.coupons || []).some((c) => c.id === ctx.id);
   const url = exists
     ? `https://github.com/${repo}/edit/${branch}/${path}`
     : `https://github.com/${repo}/new/${branch}?filename=${encodeURIComponent(path)}&value=${encodeURIComponent(json)}`;
-  KP.view = { mode: 'saved', id };
-  $('#coupon').innerHTML = '<div class="kp-head"><div><p class="kp-eyebrow">Kupongen är klar</p>' +
-    `<h2 class="page-title">${esc(dateRange(matchById(rows[0].id) && matchById(rows[0].id).kickoff, matchById(rows[rows.length - 1].id) && matchById(rows[rows.length - 1].id).kickoff))}</h2></div></div>` +
+  $('#coupon').innerHTML = savedHead('Kupongen är klar', ctx) +
     '<div class="card kp-saved">' +
     (exists
       ? '<p>Öppna filen på GitHub, markera allt, klistra in och tryck <b>Commit changes</b>. Innehållet kopieras när du trycker på knappen.</p>'
       : '<p>Tryck <b>Commit changes</b> på GitHub. Kupongen syns för alla när sajten byggts om, om några minuter.</p>') +
     `<div class="kp-actions"><a class="kp-btn primary" id="kp-gh" href="${esc(url)}" target="_blank" rel="noopener">Spara på GitHub</a>` +
     '<button type="button" class="kp-btn" id="kp-copy">Kopiera</button>' +
-    `<a class="kp-btn" href="#kupong/${esc(id)}">Visa kupongen</a></div>` +
+    `<a class="kp-btn" href="#kupong/${esc(ctx.id)}">Visa kupongen</a></div>` +
     `<details class="kp-file"><summary>${esc(path)}</summary><pre>${esc(json)}</pre></details></div>`;
   const copy = async () => {
     try { await navigator.clipboard.writeText(json); $('#kp-copy').textContent = 'Kopierad'; } catch { /* markera själv i filen nedan */ }
@@ -739,7 +821,6 @@ async function saveCoupon() {
   $('#kp-copy').addEventListener('click', copy);
   if (exists) $('#kp-gh').addEventListener('click', copy);
   renderCouponHero();
-  window.scrollTo(0, 0);
 }
 
 // ---------- start ----------
