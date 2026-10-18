@@ -684,6 +684,12 @@ invocation" – rättad före commit.)
 **Inte verifierat:** riktiga svar från deepseek-v4-pro – hur ofta texten klarar
 sifferkontrollen, verklig kostnad per text och svarstid.
 
+**Läge 2026-10-18:** påslagen. Proxyn ligger på
+<https://profeterna-analys.fritid-moln.workers.dev/analyze> (Cloudflare-kontot fritid-moln,
+samma som Fritid; wrangler är inloggad på MacBook Air) och nyckeln är lagd som hemlighet.
+Första riktiga svaret (Tottenham–Coventry) kom på 17 s och klarade kontrollen. Proxyn driftsattes från commit 4da2d4e – senare ändringar i `worker/`,
+`src/news.mjs` eller `config/llm.js` når den först vid nästa `deploy`.
+
 **Slå på** (kräver konton hos DeepSeek och Cloudflare, och Node ≥ 22 för wrangler):
 
 1. Skapa en API-nyckel på <https://platform.deepseek.com> och fyll på saldo.

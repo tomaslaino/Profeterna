@@ -11,8 +11,8 @@ name = "profeterna-analys"
 main = "index.mjs"
 compatibility_date = "2026-10-01"
 
-# Cachen: en text per match och underlag. Byt id mot det som
-# "kv namespace create" skriver ut.
+# Cachen: en text per match och underlag. Namnrymden skapades 2026-10-18
+# med "kv namespace create ANALYSER".
 [[kv_namespaces]]
 binding = "ANALYSER"
-id = "byt-mot-id-fran-kv-namespace-create"
+id = "d890672594e449589f9f3cd97ca6e6de"
