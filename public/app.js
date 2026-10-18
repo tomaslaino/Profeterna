@@ -4,7 +4,7 @@
 
 const TZ = 'Europe/Stockholm';
 const $ = (s) => document.querySelector(s);
-const state = { view: 'upcoming', comp: 'all', meta: null, comps: new Map(), all: null };
+const state = { view: 'upcoming', comp: 'all', meta: null, comps: new Map(), all: null, detail: null };
 const LIST_DAYS = 14;
 
 function esc(s) {
@@ -217,6 +217,7 @@ async function openMatch(id) {
   el.innerHTML = '<p class="empty">Laddar …</p>';
   try {
     const d = await getJSON(`data/match/${encodeURIComponent(id)}.json`);
+    state.detail = d;
     el.innerHTML = renderDetail(d);
     window.scrollTo({ top: 0 });
   } catch (err) {
@@ -255,6 +256,7 @@ function renderDetail(d) {
 
   if (m.completed && d.journal && d.journal.counted) html += journalCard(d);
   html += forecastCard(d);
+  html += analysisCard(d);
   if (d.prediction && d.prediction.status === 'ok') {
     html += '<div class="grid2">' + compareCard(d) + stepsCard(d) + '</div>';
   }
@@ -265,7 +267,9 @@ function renderDetail(d) {
   html += '<div class="grid2">' + squadCard(d) + unknownCard(d) + '</div>';
   html += '<p class="legend">Prognosen bygger på mål efter 90 minuter och tabelläget i år (poäng per match). Spannet under varje sannolikhet visar osäkerheten i lagens styrka ' +
     '(omskattning med slumpvikter). "Drar mot" visar hur många procentenheter varje steg lägger på ett lags segerchans. ' +
-    'Underlaget styr inte prognosen förrän det klarat kandidatjakten. <a href="#modell">Om modellen, backtestet och kandidaterna</a></p>';
+    'Underlaget styr inte prognosen förrän det klarat kandidatjakten. ' +
+    (analysisOn(d) ? 'Analysen skrivs på begäran av en språkmodell, bara ur underlaget på sidan – en text med ett tal som inte finns i underlaget visas inte. ' : '') +
+    '<a href="#modell">Om modellen, backtestet och kandidaterna</a></p>';
   return html;
 }
 
@@ -564,6 +568,79 @@ function unknownCard(d) {
   return `<div class="card"><h4>Okänt för den här matchen</h4><ul class="bullets">` +
     d.unknowns.map((u) => `<li>${esc(u)}</li>`).join('') + '</ul></div>';
 }
+
+// ---------- matchanalys (fas 5, valfri) ----------
+
+// Senaste svaret från analysen per match (text eller fel).
+const analyses = new Map();
+
+// Knappen finns bara när bygget pekat ut en analys (meta.analysis) och matchen
+// är kommande med en prognos – annars renderas inget alls.
+function analysisOn(d) {
+  const a = state.meta && state.meta.analysis;
+  const m = d.match;
+  return Boolean(a && a.endpoint && !m.completed && m.status === 'STATUS_SCHEDULED' &&
+    Date.parse(m.kickoff) > Date.now() && d.prediction && d.prediction.status === 'ok');
+}
+
+function analysisCard(d) {
+  if (!analysisOn(d)) return '';
+  const a = state.meta.analysis;
+  const r = analyses.get(d.match.id);
+  if (r && r.ok) {
+    const other = r.builtAt && d.builtAt && r.builtAt !== d.builtAt
+      ? ' Sidan visar ett annat bygge – ladda om för samma underlag.' : '';
+    return `<div class="card analysis" id="analysis-card"><h4>Analys <span class="hint">genererad text</span></h4>` +
+      `<p class="analysis-text">${esc(r.text).replace(/(\d) %/g, '$1&nbsp;%')}</p>` +
+      `<p class="src-line">Skriven av ${esc(r.model)} ${when(r.generatedAt)} ur underlaget från bygget ${when(r.builtAt)}. ` +
+      `Alla tal i texten finns i underlaget.${other}</p></div>`;
+  }
+  // retry: false = svaret klarade inte kontrollen; samma underlag ger samma svar.
+  const final = r && r.retry === false;
+  return `<div class="card analysis" id="analysis-card"><h4>Analys <span class="hint">${esc(a.model)}</span></h4>` +
+    (r ? `<p class="unknown">Ingen analys: ${esc(r.error || 'okänt fel')}${final ? ' En ny text kan skrivas när underlaget ändrats.' : ''}</p>` : '') +
+    (final ? '' : `<button type="button" class="analyze" data-id="${esc(d.match.id)}">${r ? 'Försök igen' : 'Analysera'}</button>`) + '</div>';
+}
+
+async function runAnalysis(id, btn) {
+  btn.disabled = true;
+  btn.textContent = 'Skriver … (kan ta en minut)';
+  let r;
+  try {
+    const res = await fetch(state.meta.analysis.endpoint, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ id }),
+    });
+    r = await res.json().catch(() => ({ ok: false, error: `HTTP ${res.status}` }));
+  } catch {
+    r = { ok: false, error: 'analysen gick inte att nå.' };
+  }
+  analyses.set(id, r);
+  const d = state.detail;
+  if (!d || d.match.id !== id || location.hash !== `#match/${id}`) return;
+  // Texten och sidan ska bygga på samma underlag: är sidan från ett annat bygge
+  // än det analysen läste ur laddas matchen om (förbi CDN-cachen).
+  if (r.ok && r.builtAt && r.builtAt !== d.builtAt) {
+    try {
+      const fresh = await getJSON(`data/match/${encodeURIComponent(id)}.json?b=${encodeURIComponent(r.builtAt)}`);
+      if (location.hash === `#match/${id}`) {
+        state.detail = fresh;
+        $('#match-detail-view').innerHTML = renderDetail(fresh);
+      }
+      return;
+    } catch {
+      // Visa texten ändå – kortet säger att sidan visar ett annat bygge.
+    }
+  }
+  const card = $('#analysis-card');
+  if (card) card.outerHTML = analysisCard(d);
+}
+
+$('#match-detail-view').addEventListener('click', (e) => {
+  const b = e.target.closest('button.analyze');
+  if (b && !b.disabled) runAnalysis(b.dataset.id, b);
+});
 
 // ---------- utvärdering ----------
 

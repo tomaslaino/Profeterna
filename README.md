@@ -3,7 +3,8 @@
 Hemsida (profeterna.se) som gör matchprognoser för Premier League, Championship,
 League One, League Two, FA-cupen och EFL-cupen – och sedan rättar sina egna
 prognoser mot facit. Byggd efter samma principer och arbetssätt som Gräva guld
-(`~/Kod/Gräverguld`), utan betalda tjänster. Under utvecklingen körs sidan lokalt.
+(`~/Kod/Gräverguld`), utan betalda tjänster – utom den valfria matchanalysen (fas 5), som
+är avstängd som standard. Under utvecklingen körs sidan lokalt.
 
 **Principer:** ingen siffra utan källa och datum · "okänt" är ett giltigt värde ·
 ingen falsk precision · sidan kraschar aldrig av en död källa · endast fria källor.
@@ -25,7 +26,11 @@ ingen falsk precision · sidan kraschar aldrig av en död källa · endast fria 
   division; kandidatjakt med förhandsregistrerat krav, 13 kandidater + kombinationssteg,
   kandidatlogg och inbördes möten från tidigare säsonger i matchvyn. Tabelläget infört som
   regelversion **2026-10-17.2** (användarens beslut)
-- [ ] **Fas 5 – LLM-modul (valfri)**
+- [x] **Fas 5 – Matchanalys (valfri):** knappen Analysera i matchvyn låter en språkmodell
+  (DeepSeek, deepseek-v4-pro) skriva en kort text ur matchens underlag, via en proxy på
+  Cloudflare Workers. Sifferkontroll mot underlaget, cache på underlagets innehållsavtryck,
+  märkt med modell och tid. **Avstängd som standard** – proxyn är inte driftsatt (se
+  [Matchanalysen](#matchanalysen-fas-5))
 
 ## Publicering
 
@@ -62,6 +67,9 @@ GitHub Actions (var 30:e min)  →  källorna  →  src/build.js  →  _site/ (H
   bara av boten, så det blir inga konflikter.
 - Källcachen (`data/cache/`) sparas mellan körningarna med `actions/cache`, så att en död
   källa visas med senaste lyckade data och sitt datum.
+- **Matchanalysen (fas 5)** ingår inte i bygget och kostar ingenting där: workflowen har
+  ingen nyckel. Bygget skriver bara i `data/meta.json` om knappen ska visas. Analysen görs
+  på begäran av proxyn i [worker/](worker/), som driftsätts för hand på Cloudflare.
 - **Läge 2026-10-17:** sidan ligger tills vidare på <https://tomaslaino.github.io/Profeterna/>
   utan egen domän, eftersom profeterna.se inte är registrerad än (med domänen inställd
   skickades github.io-adressen vidare till en domän som inte svarar). Sätt tillbaka
@@ -89,9 +97,11 @@ Lokala byggen **läser** journalen som den ligger i repot men skriver aldrig i d
 bara bygget på GitHub Actions (`npm run build -- --journal`). För att prova loggningen
 lokalt utan att röra den riktiga journalen: `JOURNAL_DIR=/tmp/journal npm run build -- --journal`.
 
-Inga nycklar behövs – alla källor i fas 1 är öppna. Porten är 3001 så att Gräva guld kan
+Inga nycklar behövs – alla källor är öppna. Porten är 3001 så att Gräva guld kan
 köra på 3000 samtidigt (ändras med `PORT` i `.env`, se `.env.example`). Express används
-bara lokalt.
+bara lokalt. Med `DEEPSEEK_API_KEY` i `.env` visar `npm start` knappen Analysera och gör
+analysen själv (`POST /api/analyze`, samma kod som proxyn); varje ny text kostar då pengar.
+Utan nyckel ingen knapp.
 
 ## Datakällor (verifierade 2026-10-17)
 
@@ -193,6 +203,25 @@ bara lokalt.
 - **Stängningsreferens i backtestet (2026-10-17):** Pinnacle vid stängning (2012/13–), som
   finns för flest säsonger. Betfair Exchange, som journalen och kontrollen använder, finns
   bara från 2024/25.
+- **Matchanalysen på begäran (2026-10-18, användarens beslut):** besökaren går in på en
+  kommande match och klickar på Analysera; texten skrivs ur underlaget just då. Inga
+  analyser i bygget och inga för matcher som ingen öppnar.
+- **DeepSeek i stället för `@anthropic-ai/sdk` (2026-10-18, användarens beslut):**
+  kravspecen nämner Anthropics SDK; användaren valde DeepSeek, modell deepseek-v4-pro.
+  API:t är OpenAI-kompatibelt och anropas med `fetch` – inget nytt beroende. Leverantör,
+  adress och modell står i [config/llm.js](config/llm.js), så att byte är en konfigändring.
+- **Användaren betalar för allas klick, utan skydd mot missbruk (2026-10-18, användarens
+  beslut):** därför en proxy (Cloudflare Workers, användarens val) som håller nyckeln – en
+  nyckel i sajtens JavaScript hade kunnat användas till vad som helst. Proxyn tar bara emot
+  ett match-id och hämtar underlaget själv från den publicerade sajten, och samma underlag
+  genereras aldrig två gånger. Kostnaden begränsas av antalet underlagsversioner, inte av
+  antalet klick.
+- **Avstängd som standard (2026-10-18, användarens beslut):** modulen är byggd och
+  verifierad men inte påslagen på sajten. Den slås på genom att driftsätta proxyn och
+  ange dess adress i [config/llm.js](config/llm.js) (se Matchanalysen).
+- **En text med ett främmande tal visas inte (2026-10-18):** strängare än Gräva gulds
+  flaggning. Varje tal i texten måste finnas i underlaget; annars ett nytt försök med
+  talen utpekade, och klarar inte heller det kontrollen visas ingen text alls.
 
 ## Arkitektur
 
@@ -236,8 +265,14 @@ server:
   skriver `data/evaluation.json` (fliken Utvärdering) och journalinfo per match i
   `data/match/<id>.json`. Poängen och bootstrap-jämförelsen är samma kod som kontrollen
   ([src/check.js](src/check.js)). Fallerar utvärderingen byggs sajten ändå.
+- **Matchanalys (fas 5, valfri):** [config/llm.js](config/llm.js) (av/på, leverantör,
+  modell, prompt), [worker/analysis.mjs](worker/analysis.mjs) (underlaget, avtrycket,
+  sifferkontrollen) och [worker/index.mjs](worker/index.mjs) (`analyze()` och
+  Cloudflare-proxyn, [worker/wrangler.toml](worker/wrangler.toml)). Lokalt kör
+  [server.js](server.js) samma `analyze()`. Se [Matchanalysen](#matchanalysen-fas-5).
 - **Frontend:** ren HTML/CSS/JS i `public/`, flikarna Matcher, Utvärdering, Källor och
-  Modell (regelversion, backtest, kandidatlogg). Läser JSON-filerna ovan. Urvalet av kommande/spelade matcher och källornas status
+  Modell (regelversion, backtest, kandidatlogg); i matchvyn kortet Analys när
+  matchanalysen är påslagen. Läser JSON-filerna ovan. Urvalet av kommande/spelade matcher och källornas status
   räknas i webbläsaren mot besökarens klocka, inte mot byggtiden.
 
 ### Lagnamn
@@ -532,6 +567,76 @@ körs `npm run backtest` för den nya versionen (en fil per regelversion i `data
 En omkörning på samma underlag skriver inga nya poster i loggen; nya matcher, ny data eller
 en ny regelversion ger en ny post per kandidat med datum.
 
+## Matchanalysen (fas 5)
+
+Valfri och **avstängd som standard**. När den är påslagen har matchvyn för en kommande
+match med prognos ett kort *Analys* med knappen **Analysera**. Ett klick ger en kort text
+(3–5 meningar) som DeepSeek skriver ur matchens underlag, märkt *genererad text* med
+modell, när den skrevs och vilket bygge underlaget kommer ur. Är modulen avstängd, saknar
+proxyn nyckel eller fallerar API:t ser sidan ut som annars – kortet säger bara varför det
+inte blev någon text.
+
+```
+knappen  →  proxyn (Cloudflare Worker, nyckeln som hemlighet)  →  DeepSeek
+              ↑ hämtar <sajten>/data/match/<id>.json själv
+```
+
+- **Underlaget** ([worker/analysis.mjs](worker/analysis.mjs)) är det matchvyn visar, med
+  sidans precision: prognosen (1X2 i hela procent, osäkerhet, förväntade mål med en
+  decimal, över 2,5, båda gör mål, troligaste resultat, gå vidare), stegen i *Vad drog åt
+  vilket håll*, baslinjerna och marknaden, oddsen, *Lagen sida vid sida*, form, möten,
+  skador och listan med okänt – med källor och "t.o.m."-datum men utan hämttider. Cirka
+  1 600 tokens plus prompten (~500).
+- **Prompten** står i [config/llm.js](config/llm.js): bara underlaget, ingen egen kunskap om
+  lag eller spelare, varje tal skrivet som i underlaget, inga egna uträkningar, okänt
+  sägs vara okänt, prognosen är huvudsaken och underlaget som inte styr den sägs inte
+  vara orsaker, inga spelråd, lag- och tävlingsnamn på engelska. Svaret är JSON
+  (`{"analys": …}`, DeepSeeks JSON-läge), tänkande på låg nivå.
+- **Sifferkontroll:** varje tal i texten – siffror och räkneord två–tjugo – måste finnas i
+  underlaget. Annars ett nytt försök där talen pekas ut; klarar inte heller det kontrollen
+  visas ingen text ("Texten innehöll tal som inte finns i underlaget …").
+- **Cache på innehållsavtrycket:** SHA-256 av promptversion, modell och underlag. Samma
+  underlag genereras aldrig två gånger – nästa klick, från vem som helst, får texten ur
+  cachen (Cloudflare KV, 60 dagar; lokalt `data/cache/analysis/`). Även en avvisad text
+  cachas, så att den inte kostar igen. Tillfälliga fel (överlast, timeout, saldo) cachas
+  inte.
+- **Samma bygge:** svaret säger vilket bygge underlaget lästes ur (`builtAt`, som bygget
+  skriver i varje matchfil). Visar sidan ett annat bygge laddas matchen om, så att talen
+  i texten och på sidan stämmer.
+- **Bara kommande matcher:** proxyn avvisar spelade och påbörjade matcher, matcher utan
+  prognos och allt som inte är ett match-id.
+- **Kostnad** (DeepSeeks prislista 2026-10-18, deepseek-v4-pro: $1,32 / $3,96 per miljon
+  tokens in/ut, halva priset utanför 01–04 och 06–10 UTC på vardagar): uppskattat
+  $0,005–0,009 per ny text, högst två anrop per text. Cachade klick kostar inget.
+  Proxyn ryms i Cloudflares gratisnivå. DeepSeek är förbetalt, så saldot är taket.
+
+**Verifierat 2026-10-18** med ett simulerat DeepSeek-API (ingen riktig nyckel fanns): den
+lokala routen och själva Workern i Cloudflares körmiljö (`wrangler dev`, workerd) – text,
+cache-träff utan nytt anrop, avvisad text (och cachad avvisning), godkänd text vid andra
+försöket, överlast, långsamt svar ("Skriver …"), proxy utan nyckel, proxy som inte svarar, äldre bygge på
+sidan än i analysen. I webbläsaren: av (standardkonfigen – inget kort, ingen extra text,
+inga konsolfel), på, utan nyckel, mobilbredd, ljust och mörkt.
+**Inte verifierat:** riktiga svar från deepseek-v4-pro – hur ofta texten klarar
+sifferkontrollen, verklig kostnad per text och svarstid.
+
+**Slå på** (kräver konton hos DeepSeek och Cloudflare, och Node ≥ 22 för wrangler):
+
+1. Skapa en API-nyckel på <https://platform.deepseek.com> och fyll på saldo.
+2. `npx wrangler@4.147.0 login`
+3. `npx wrangler@4.147.0 kv namespace create ANALYSER --config worker/wrangler.toml` och
+   byt `id` i [worker/wrangler.toml](worker/wrangler.toml) mot det som skrivs ut.
+4. `npx wrangler@4.147.0 secret put DEEPSEEK_API_KEY --config worker/wrangler.toml` – klistra
+   in nyckeln när wrangler frågar. Den hamnar bara hos Cloudflare.
+5. `npx wrangler@4.147.0 deploy --config worker/wrangler.toml` – skriver ut adressen,
+   `https://profeterna-analys.<konto>.workers.dev`.
+6. I [config/llm.js](config/llm.js): `enabled: true` och `endpoint:
+   'https://profeterna-analys.<konto>.workers.dev/analyze'`. Committa och pusha – nästa
+   bygge visar knappen.
+
+**Stänga av:** `enabled: false` och push – knappen försvinner vid nästa bygge. Ändras
+prompten, modellen eller underlaget: byt `promptVersion` i konfigen och kör `deploy` igen
+(proxyn bygger in konfigen vid deploy).
+
 ## Statusmärkning
 
 Räknas om i webbläsaren ur hämttid och källans gräns – stannar den schemalagda hämtningen
@@ -543,7 +648,7 @@ schemaintervall gammalt.
 - **Röd (fel):** senaste hämtningen misslyckades; senaste lyckade data visas med sitt datum.
 - **Grå (okänt):** inget verifierbart innehåll (t.ex. FA-cupen innan första omgången lottats).
 
-## Kända brister (fas 1–4)
+## Kända brister (fas 1–5)
 
 - ESPN-oddsen sparas bara som senaste ögonblicksbild i cachen. Oddsen vid
   prognostillfället finns från fas 3 i journalen, men bara för loggade matcher.
@@ -618,8 +723,31 @@ schemaintervall gammalt.
   backtestet: 33 av 39 657 matcher, 24 av dem i augusti–september 2022). Nu är (b) okänd för de lagen. Inga
   modellprognoser ändras; i år fick en redan spelad match (5 september) (b) okänd, och
   ingen journalrad har haft felet.
+- **Fas 5:** sifferkontrollen ser att varje tal finns i underlaget, inte att det används i
+  rätt sammanhang – "3 raka segrar" går igenom om talet 3 står någonstans i underlaget, och
+  små tal finns nästan alltid (datum, antal matcher). Ordningstal ("tredje") kontrolleras
+  inte. Prompten är det främsta skyddet; kontrollen fångar påhittade siffror som 73 %.
+- Två klick på samma match innan den första texten är klar ger två anrop; KV är dessutom
+  eventuellt konsistent (upp till ~60 s mellan Cloudflares datacenter).
+- Ingen gräns för antalet anrop (användarens beslut). En robot som klickar på alla
+  kommande matcher efter varje ändring i underlaget kan kosta: ~1 600 matcher × några
+  underlagsversioner per dag × $0,005–0,009. Saldot hos DeepSeek är taket.
+- Cloudflares gratisnivå tillåter 1 000 skrivningar i KV per dygn. Därutöver cachas inte
+  nya texter (analysen fungerar, men nästa klick kostar igen).
+- Texten finns bara för kommande matcher och bara i den webbläsare som klickat (och i
+  proxyns cache) – den sparas inte i journalen och visas inte efter avspark.
+- Prompten och kontrollen är provade mot ett simulerat API, inte mot riktiga svar från
+  deepseek-v4-pro (ingen nyckel 2026-10-18).
 
 ## Säkerhet
 
 Inga nycklar behövs i fas 1–4. `.env` är gitignorerad. Workflowens commit använder
 `GITHUB_TOKEN` med `contents: write` bara i byggjobbet.
+
+Matchanalysen (fas 5): `DEEPSEEK_API_KEY` finns bara som Cloudflare-hemlighet i proxyn och,
+lokalt, i `.env` – aldrig i repot, i workflowen eller i webbläsaren. Proxyn tar bara emot ett
+match-id (siffror) och hämtar underlaget själv från den publicerade sajten, så nyckeln kan
+inte användas för egna frågor. CORS är öppet (`*`), eftersom proxyn bara analyserar sajtens
+egna, publika matcher. Till DeepSeek skickas bara matchens publika underlag – inklusive
+spelarnamn och skadenyheter från Fantasy Premier League – och inga uppgifter om besökaren.
+`.dev.vars` och `.wrangler/` (wranglers lokala hemligheter och tillstånd) är gitignorerade.

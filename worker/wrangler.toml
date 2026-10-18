@@ -1,0 +1,18 @@
+# Proxyn för matchanalysen (fas 5) på Cloudflare Workers. Driftsätts för hand,
+# inte av GitHub Actions – se README, avsnittet Matchanalysen (fas 5):
+#
+#   npx wrangler@4.147.0 login
+#   npx wrangler@4.147.0 kv namespace create ANALYSER --config worker/wrangler.toml
+#   npx wrangler@4.147.0 secret put DEEPSEEK_API_KEY --config worker/wrangler.toml
+#   npx wrangler@4.147.0 deploy --config worker/wrangler.toml
+#
+# Modell, prompt och sajtens adress står i config/llm.js och byggs in vid deploy.
+name = "profeterna-analys"
+main = "index.mjs"
+compatibility_date = "2026-10-01"
+
+# Cachen: en text per match och underlag. Byt id mot det som
+# "kv namespace create" skriver ut.
+[[kv_namespaces]]
+binding = "ANALYSER"
+id = "byt-mot-id-fran-kv-namespace-create"

@@ -14,6 +14,10 @@
 //                          Utvärdering)
 //   data/journal/*.jsonl   prognosjournalen som den ligger i repot
 //
+// Matchanalysen (fas 5) görs inte i bygget utan på begäran i matchvyn, via en
+// proxy (worker/). Bygget skriver bara i meta.json om knappen ska visas och
+// vart den anropar (config/llm.js; avstängd som standard).
+//
 // Den genererade datan committas inte (den skulle svälla repot med varje
 // körning) – den laddas upp som Pages-artefakt. Källcachen i data/cache/
 // sparas mellan körningarna med actions/cache. Det enda som committas är
@@ -32,6 +36,7 @@ const { readJournal, appendJournal, HORIZON_DAYS } = require('./journal');
 const { evaluate } = require('./evaluate');
 const { wholePercent } = require('./model');
 const rules = require('../config/forecast-rules');
+const llm = require('../config/llm');
 const { COMPETITIONS, SEASON } = require('../config/competitions');
 
 const ROOT = path.join(__dirname, '..');
@@ -42,7 +47,9 @@ const OUT = path.join(ROOT, '_site');
 // datan borde vara.
 const UPDATE_EVERY_MINUTES = 30;
 
-function writeSite(outDir = OUT, { journal = false } = {}) {
+// analysisEndpoint: undefined = enligt config/llm.js, null = ingen knapp,
+// annars adressen (lokalt '/api/analyze', se server.js).
+function writeSite(outDir = OUT, { journal = false, analysisEndpoint } = {}) {
   const tmp = `${outDir}.tmp`;
   fs.rmSync(tmp, { recursive: true, force: true });
   fs.cpSync(PUBLIC, tmp, { recursive: true });
@@ -59,6 +66,7 @@ function writeSite(outDir = OUT, { journal = false } = {}) {
     season: SEASON.label,
     rulesVersion: rules.version,
     journalHorizonDays: HORIZON_DAYS,
+    analysis: analysisInfo(analysisEndpoint),
     competitions: COMPETITIONS.map((c) => ({ id: c.id, name: c.name, short: c.short, type: c.type })),
   });
   const sources = sourceReport();
@@ -131,6 +139,8 @@ function writeSite(outDir = OUT, { journal = false } = {}) {
       const d = matchDetail(id);
       d.prediction = forecast.predictions.get(id) || null;
       d.journal = ev.perMatch.get(id) || null;
+      // Bygget som underlaget kommer ur – matchanalysen jämför mot det.
+      d.builtAt = generatedAt;
       write(`match/${id}.json`, d);
       pages++;
     } catch (err) {
@@ -143,6 +153,11 @@ function writeSite(outDir = OUT, { journal = false } = {}) {
   fs.rmSync(outDir, { recursive: true, force: true });
   fs.renameSync(tmp, outDir);
   return { generatedAt, pages, failed, counts: sources.counts, forecastMs: forecast.ms, logged: logged.length };
+}
+
+function analysisInfo(override) {
+  const endpoint = override !== undefined ? override : (llm.enabled ? llm.endpoint : null);
+  return endpoint ? { endpoint, provider: llm.provider, model: llm.model } : null;
 }
 
 // Kompakt prognos för matchlistan: hela procent 1 · X · 2 (summa 100), och
@@ -158,9 +173,9 @@ function roundNumbers(key, v) {
   return typeof v === 'number' && !Number.isInteger(v) ? Math.round(v * 10000) / 10000 : v;
 }
 
-async function build({ force = false, fetch = true, journal = false } = {}) {
+async function build({ force = false, fetch = true, journal = false, analysisEndpoint } = {}) {
   const results = fetch ? await refreshAll({ force }) : [];
-  return { results, site: writeSite(OUT, { journal }) };
+  return { results, site: writeSite(OUT, { journal, analysisEndpoint }) };
 }
 
 if (require.main === module) {

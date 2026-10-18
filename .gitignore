@@ -5,3 +5,8 @@ _site/
 _site.tmp/
 .DS_Store
 .claude/settings.local.json
+# Matchanalysens proxy (wrangler): lokala hemligheter och tillstånd
+.dev.vars
+worker/.dev.vars
+.wrangler/
+worker/.wrangler/

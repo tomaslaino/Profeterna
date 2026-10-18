@@ -420,6 +420,11 @@ ul.bullets li { margin: 0.2rem 0; }
 /* ---------- prognos ---------- */
 
 .card.fc { margin-bottom: 1rem; }
+
+/* Matchanalysen (fas 5) – bara när den är påslagen. */
+.card.analysis { margin-bottom: 1rem; }
+.card.analysis .unknown { margin: 0 0 0.6rem; }
+.analysis-text { margin: 0; font-size: 0.92rem; line-height: 1.55; max-width: 46rem; }
 .fc-main {
   display: grid;
   grid-template-columns: 1fr 0.8fr 1fr;
