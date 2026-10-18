@@ -47,7 +47,7 @@ module.exports = {
 
   // Ändras prompten eller reglerna för underlaget byts versionen, så att gamla
   // texter i cachen inte återanvänds (versionen ingår i innehållsavtrycket).
-  promptVersion: '2026-10-18.2',
+  promptVersion: '2026-10-18.4',
   // En text sparas per match och underlag så här länge i proxyns cache.
   cacheDays: 60,
   // Ett nytt försök om svaret inte klarar kontrollen (tom text, ogiltig JSON
@@ -78,7 +78,7 @@ Svara med ett JSON-objekt och inget annat: {"analys": "<text>", "nyheter": "<tex
 
 "analys": 3–5 meningar, högst 90 ord, bara ur sidans underlag – inte ur "nyheter". Prognosen är huvudsaken: förklara vad som drar den åt vilket håll (stegen) och hur den skiljer sig från marknaden om marknaden finns. Bara mål efter 90 minuter och tabelläget styr prognosen – form, skott, xG, skador och tidigare möten är underlag, inte orsaker till prognosen.
 
-"nyheter": 4–8 meningar, högst 150 ord, bara ur avsnittet "nyheter": skador och avstängningar, troliga startelvor, rotation, tränarläge och vädret vid avspark. Hänvisa varje påstående till artikelns id i hakparentes och nämn källan, t.ex. "enligt Sports Mole [N3]"; vädret "enligt Open-Meteo". Sammanfatta med egna ord och citera inte. Säg om nyheterna talar för eller emot prognosen, men ge inga egna sannolikheter. Motsäger en artikel skadelistan på sidan, säg det. Gäller en artikel en tidigare match, säg det. Finns inga artiklar, skriv att nyhetsläget är okänt.
+"nyheter": 4–8 meningar, högst 150 ord, bara ur avsnittet "nyheter": skador och avstängningar, troliga startelvor, rotation, tränarläge och vädret vid avspark. Hänvisa varje påstående till artikelns id i hakparentes och nämn källan, t.ex. "enligt Sports Mole [N3]"; vädret "enligt Open-Meteo". Skriv aldrig ett id utan hakparentes (inte "N3 anger …"), och hänvisa aldrig till artiklarna i "analys". Sammanfatta med egna ord och citera inte. Säg om nyheterna talar för eller emot prognosen, men ge inga egna sannolikheter. Prognosen bygger bara på mål efter 90 minuter och tabelläget: skriv aldrig att den redan tar hänsyn till skador, avstängningar, startelvor, tränarläge, väder eller annat ur nyheterna eller skadelistan, och inte heller att den bör eller inte behöver justeras. Motsäger en artikel skadelistan på sidan, säg det. Gäller en artikel en tidigare match, säg det. Finns inga artiklar, skriv att nyhetsläget är okänt.
 
 Regler för båda fälten, utan undantag:
 1. Ingen egen kunskap om lagen, spelarna, tränarna, arenan eller historien. Det som inte står i underlaget finns inte.

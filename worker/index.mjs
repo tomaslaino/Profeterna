@@ -93,7 +93,8 @@ export async function analyze(id, { env, loadMatch, store = null, now = () => ne
     // saknar då källa, så texten skrivs om (och visas annars inte).
     const ids = new Set(news ? news.items.map((x) => x.id) : []);
     const badRefs = [...new Set(refsIn(parts.news))].filter((x) => !ids.has(x));
-    if (!bad.length && !badRefs.length) {
+    const raw = rawRefsIn(text, parts.news);
+    if (!bad.length && !badRefs.length && !raw.length) {
       const cited = news && parts.news ? { ...citeNews(parts.news, news), gatheredAt: news.gatheredAt } : null;
       const entry = { ok: true, text, news: cited && cited.text ? cited : null, model: r.model, generatedAt: now().toISOString(), attempts: attempt, usage };
       // Svarade ingen nyhetskälla är texten ett tillfälligt "okänt" – den
@@ -104,10 +105,12 @@ export async function analyze(id, { env, loadMatch, store = null, now = () => ne
     const why = [];
     if (bad.length) why.push(`tal som inte finns i underlaget (${bad.join(', ')})`);
     if (badRefs.length) why.push(`hänvisningar till artiklar som inte finns (${badRefs.join(', ')})`);
+    if (raw.length) why.push(`artikel-id utanför hakparentes eller i analysen (${raw.join(', ')})`);
     problem = `Texten innehöll ${why.join(' och ')} och visas inte.`;
+    const howRefs = raw.length ? ' Hänvisa till artiklarna bara i "nyheter" och bara med id i hakparentes, t.ex. "enligt Sports Mole [N3]" – aldrig N3 utan hakparentes.' : '';
     messages.push(
       { role: 'assistant', content: r.content },
-      { role: 'user', content: `Texten innehöll ${why.join(' och ')}. Skriv om texten utan dem och följ reglerna. Svara med JSON: ${news ? '{"analys": "<text>", "nyheter": "<text>"}' : '{"analys": "<texten>"}'}` },
+      { role: 'user', content: `Texten innehöll ${why.join(' och ')}. Skriv om texten utan dem och följ reglerna.${howRefs} Svara med JSON: ${news ? '{"analys": "<text>", "nyheter": "<text>"}' : '{"analys": "<texten>"}'}` },
     );
   }
   // Ett svar som inte klarade kontrollen cachas också, så att samma underlag
@@ -171,6 +174,14 @@ function httpProblem(status) {
 function refsIn(text) {
   return [...String(text || '').matchAll(/\[(N\d+(?:\s*[,;]\s*N?\d+)*)\]/g)]
     .flatMap((x) => x[1].split(/\s*[,;]\s*/).map((y) => (y.startsWith('N') ? y : `N${y}`)));
+}
+
+// Artikel-id som skulle synas rått för besökaren: i nyhetsläget ett N3 utan
+// hakparentes (bara [N3] numreras om till [1], [2] …), i analysen varje N3 –
+// analysen bygger inte på nyheterna och numreras aldrig om.
+function rawRefsIn(text, newsText) {
+  const ids = (s) => String(s || '').match(/\bN\d+\b/g) || [];
+  return [...new Set([...ids(text), ...ids(withoutRefs(newsText))])];
 }
 
 // {"analys": …, "nyheter": …}. Analysen krävs; saknas nyhetsläget visas
