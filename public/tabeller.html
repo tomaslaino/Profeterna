@@ -1,0 +1,52 @@
+<!DOCTYPE html>
+<html lang="sv">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Tabeller – Profeterna</title>
+  <meta name="description" content="Tabeller för engelsk fotboll nivå 1–4: tabellen just nu, säsongsprognosen och modellens styrka för alla lag.">
+  <meta name="theme-color" content="#0e0d0b">
+  <link rel="icon" type="image/svg+xml" href="logo.svg">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link rel="stylesheet" href="style.css">
+  <link rel="stylesheet" href="divisioner.css">
+  <link rel="stylesheet" href="theme.css">
+  <link rel="stylesheet" href="spoiler.css">
+</head>
+<body data-page="tabeller">
+  <header class="topbar">
+    <div class="topbar-inner">
+      <a class="brand" href="index.html#matcher" aria-label="Profeterna – till matcherna">
+        <img class="logo" src="logo.svg" alt="" width="36" height="36">
+        <span class="brand-txt"><b>Profeterna</b></span>
+      </a>
+      <nav class="tabs" aria-label="Sektioner">
+        <div class="tablist">
+          <a class="tab-link" href="index.html#matcher">Matcher</a>
+          <a class="tab-link" href="index.html#kupong">Kupong</a>
+          <a class="tab-link" href="index.html#utvardering">Utvärdering</a>
+        </div>
+        <a class="tab-link" href="tabeller.html" aria-current="page">Tabeller</a>
+        <a class="tab-link" href="statistik.html">Statistik</a>
+        <a class="tab-link" href="om-oss.html">Om oss</a>
+      </nav>
+    </div>
+  </header>
+
+  <main>
+    <h2 class="page-title">Tabeller</h2>
+    <div id="divisions">Laddar …</div>
+  </main>
+
+  <footer>
+    <img class="logo-sm" src="logo.svg" alt="" width="20" height="20">
+    <p>Profeterna</p>
+    <nav class="foot-links" aria-label="Mer"><a href="index.html#kallor">Källor</a><a href="index.html#modell">Modell</a><a href="historik.html">Kuponghistorik</a></nav>
+  </footer>
+
+  <div class="dv-tip" id="dv-tip" hidden></div>
+  <script src="spoiler.js"></script>
+  <script src="divisioner.js"></script>
+</body>
+</html>

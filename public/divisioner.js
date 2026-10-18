@@ -1,8 +1,10 @@
 'use strict';
 
-// Sidan Divisioner: en division åt gången, med flikar som på gravergrav.se –
-// översikt, tabell, säsongsprognos, spelare, lag, matchbilden och jämförelse
-// mellan divisionerna. Data: data/divisions.json (src/divisions.js),
+// Sidorna Tabeller och Statistik: en division åt gången, med flikar som på
+// gravergrav.se. Tabeller har tabellen, säsongsprognosen och modellens styrka
+// för alla lag; Statistik har översikten, spelarna, lagen, matchbilden och
+// jämförelsen mellan divisionerna. Vilken sida det är står i <body
+// data-page>. Data: data/divisions.json (src/divisions.js),
 // data/players/<liga>.json (src/players.js) och data/season.json
 // (src/season.js, prognosmotorns säsongsprognos). Fristående från app.js – egna
 // hjälpare och diagram i ren SVG, en fast färg per division ur divisioner.css.
@@ -13,22 +15,36 @@
 
 const $ = (s) => document.querySelector(s);
 const TZ = 'Europe/Stockholm';
-const VIEWS = [
-  { id: 'oversikt', label: 'Översikt' },
-  { id: 'tabell', label: 'Tabell' },
-  { id: 'prognos', label: 'Prognos' },
-  { id: 'spelare', label: 'Spelare' },
-  { id: 'lag', label: 'Lag' },
-  { id: 'matchbilden', label: 'Matchbilden' },
-  { id: 'jamfor', label: 'Jämför divisioner' },
-];
+const PAGES = {
+  tabeller: [
+    { id: 'tabell', label: 'Tabell' },
+    { id: 'prognos', label: 'Säsongsprognos' },
+    { id: 'styrka', label: 'Styrka' },
+  ],
+  statistik: [
+    { id: 'oversikt', label: 'Översikt' },
+    { id: 'spelare', label: 'Spelare' },
+    { id: 'lag', label: 'Lag' },
+    { id: 'matchbilden', label: 'Matchbilden' },
+    { id: 'jamfor', label: 'Jämför divisioner' },
+  ],
+};
+const PAGE = document.body.dataset.page === 'statistik' ? 'statistik' : 'tabeller';
+const VIEWS = PAGES[PAGE];
+// Vyerna som gäller alla divisioner på en gång (divisionsvalet dämpas).
+const ALL_DIVS = new Set(['jamfor', 'styrka']);
+// Länk till en vy, på den här sidan eller den andra.
+function viewHref(div, view) {
+  const page = Object.keys(PAGES).find((p) => PAGES[p].some((v) => v.id === view)) || PAGE;
+  return `${page === PAGE ? '' : `${page}.html`}#${div}/${view}`;
+}
 const state = {
   data: null,
   meta: null,
   players: new Map(), // division → spelarfilen (eller { unknown })
   season: null, // säsongsprognosen (data/season.json), laddas vid behov
   div: 'pl',
-  view: 'oversikt',
+  view: VIEWS[0].id,
   metric: 'home',
   pf: { q: '', team: '', pos: '', played: true, sort: 'g', dir: -1, limit: 60 },
   tf: { sort: 'goals', dir: -1 },
@@ -535,14 +551,7 @@ function overviewView(dv, P) {
   } else if (dv.inApp) {
     html += `<p class="note">Spelardata: ${unknown(P ? P.reason : 'laddas inte')}</p>`;
   }
-
-  if (P && P.table) {
-    html += sectionHead('Tabellen', `<a href="#${esc(dv.id)}/tabell">Hela tabellen →</a>`);
-    const rows = P.table.rows;
-    const short = rows.length > 8 ? [...rows.slice(0, 4), null, ...rows.slice(-3)] : rows;
-    html += `<div class="card dv-tablecard">${leagueTable(short, P, { compact: true })}</div>`;
-  }
-  if (!dv.inApp) html += '<p class="note">Ingen tabell eller spelardata för National League i de fria källorna.</p>';
+  if (!dv.inApp) html += '<p class="note">Ingen spelardata för National League i de fria källorna.</p>';
   return html;
 }
 
@@ -734,13 +743,13 @@ function seasonMethod(S, F) {
     ['Osäkerheten', `Simuleringarna fördelas på modellens ${S.samples} omskattningar med slumpvikter (samma som ger spannet under varje prognos). Ett lag som är bättre än skattningen är det då i alla sina matcher i samma simulering – som i verkligheten.${F.uncertainty ? '' : ' Den här gången saknades omskattningar för några matcher; där används bara skattningen.'}`],
     ['Förenklingar', 'Lagens styrka och tabelläget hålls fasta resten av säsongen – skador, övergångar och tränarbyten räknas inte in. Lika poäng skiljs på målskillnad, sedan gjorda mål, sedan lott. Playoff spelas inte: chansen gäller en playoffplats. Europaplatser via cuperna räknas inte.'],
     ['Zonerna', 'Vilka placeringar som ger uppflyttning, playoff, Europa och nedflyttning läses ur ESPN:s tabell.'],
-    ['Styrka', 'Modellens förväntade målskillnad per match mot ett genomsnittligt Premier League-lag på neutral plan. Alla fem divisioner på samma skala – se Jämför divisioner.'],
+    ['Styrka', 'Modellens förväntade målskillnad per match mot ett genomsnittligt Premier League-lag på neutral plan. Alla fem divisioner på samma skala – se fliken Styrka.'],
     ['Programmet framåt', 'Förväntade poäng per match räknas med lagets egen styrka, så starka lag hamnar högt. Färgerna visar hur svår varje match är för just det laget.'],
   ];
   return `<details class="help dv-glossary"><summary>Så räknas prognosen</summary><dl>${items.map(([k, v]) => `<dt>${esc(k)}</dt><dd>${esc(v)}</dd>`).join('')}</dl></details>`;
 }
 
-// Modellens styrka för alla lag i nivå 1–5 (Jämför divisioner).
+// Modellens styrka för alla lag i nivå 1–5 (Tabeller → Styrka).
 function strengthSection(S) {
   if (!S || S.error || !S.strength || !S.strength.length) {
     return card('Modellens styrka – alla lag', { body: `<p class="empty">${unknown(`okänt – ${S && S.error ? S.error : 'ingen skattning'}`)}</p>`, cls: 'dv-wide' });
@@ -1042,7 +1051,7 @@ function openTeam(id) {
     if (ft.next && ft.next.list.length) {
       html += `<p class="dv-calm">De närmaste ligamatcherna – hemma (H) eller borta (B) och vinstchansen i procent:</p><div class="dv-fxs dv-fxs-wide">${ft.next.list.map(fxChip).join('')}</div>`;
     }
-    html += `<p class="dv-mnote">Prognosmotorn · ${int(state.season.sims)} simuleringar · <a href="#${esc(state.div)}/prognos">Hela prognosen</a></p>`;
+    html += `<p class="dv-mnote">Prognosmotorn · ${int(state.season.sims)} simuleringar · <a href="${esc(viewHref(state.div, 'prognos'))}">Hela prognosen</a></p>`;
   }
   const av = P.availability && !P.availability.unknown ? P.availability[id] : null;
   if (av && !av.unknown) {
@@ -1367,37 +1376,39 @@ function drawTrend() {
 
 // ---------- ordlistan ----------
 
+// [term, förklaring, sidan den hör till – utan sida på båda]
 const GLOSSARY = [
-  ['1 X 2', 'Hemmaseger (1), oavgjort (X) och bortaseger (2) efter 90 minuter.'],
-  ['S V O F P', 'Tabellen: spelade, vunna, oavgjorda, förlorade och poäng (3 för vinst, 1 för oavgjort). Lika poäng skiljs åt på målskillnad (+/−) och sedan gjorda mål.'],
-  ['Zonerna', 'Färgen till vänster i tabellen: vad placeringen ger i slutet av säsongen enligt ESPN – uppflyttning, kval (playoff), Europa eller nedflyttning.'],
-  ['M, Start, Ass, M+A', 'Spelartabellen: matcher (från start och inhopp), matcher från start, assist och mål plus assist.'],
+  ['1 X 2', 'Hemmaseger (1), oavgjort (X) och bortaseger (2) efter 90 minuter.', 'statistik'],
+  ['S V O F P', 'Tabellen: spelade, vunna, oavgjorda, förlorade och poäng (3 för vinst, 1 för oavgjort). Lika poäng skiljs åt på målskillnad (+/−) och sedan gjorda mål.', 'tabeller'],
+  ['Zonerna', 'Färgen till vänster i tabellen: vad placeringen ger i slutet av säsongen enligt ESPN – uppflyttning, kval (playoff), Europa eller nedflyttning.', 'tabeller'],
+  ['M, Start, Ass, M+A', 'Spelartabellen: matcher (från start och inhopp), matcher från start, assist och mål plus assist.', 'statistik'],
   ['– och grå 0', 'Streck = okänt (ESPN har ingen statistik för spelaren), grå 0 = noll.'],
-  ['Spelarstatistiken', 'Bara ligamatcher i år, ur ESPN:s trupper. Den släpar ofta en omgång efter tabellen; självmål och spelare som lämnat klubben saknas.'],
-  ['Snittålder', 'Viktad med matcher, så att ordinarie spelare väger mer än de som hoppat in en gång.'],
-  ['Beroende', 'Hur stor del av lagets mål den bäste målskytten gjort.'],
-  ['Effektivast', 'Mål per skott, bland spelare med minst tio skott.'],
-  ['Över 2,5 mål', 'Matchen slutar med tre mål eller fler, båda lagen tillsammans.'],
-  ['Båda lagen gör mål', 'Båda lagen gör minst ett mål var.'],
-  ['Hemmalagets målövervikt', 'Hemmalagets mål minus bortalagets, i snitt per match – ett mått på hemmafördelen.'],
-  ['Assist', 'Passningen (eller skottet som räddas och slås in) som leder direkt till ett mål, enligt ESPN.'],
-  ['Skott på mål', 'Skott som skulle ha gått in om målvakten inte räddat. Skott utanför och i stolpen räknas inte.'],
-  ['Räddningsprocent', 'Räddningar delat med skotten på mål som målvakten mött (räddningar + insläppta).'],
-  ['xG', 'Förväntade mål: hur många mål chanserna brukar ge i snitt, oavsett om de gick in.'],
-  ['Marginal', 'Spelbolagens påslag: hur mycket summan av 1/odds överstiger 100 %.'],
-  ['Log-poäng', 'Hur väl sannolikheterna träffade. Lägre är bättre; ett mått på hur förutsägbar divisionen är.'],
-  ['▲ ▼, ovanligt', 'Årets värde ligger mer än två standardfel från tioårssnittet – mer än slumpen brukar ge på så många matcher.'],
-  ['Kalibrering', 'Marknaden i Matchbilden: av de gånger oddsen gav t.ex. 40–50 %, hur ofta hände det? På diagonalen stämmer oddsen.'],
-  ['Domare', 'Domaren tillsätts några dagar före matchen och finns inte i prognosunderlaget. Med 10–40 matcher per domare är skillnaderna till stor del slump.'],
+  ['Spelarstatistiken', 'Bara ligamatcher i år, ur ESPN:s trupper. Den släpar ofta en omgång efter tabellen; självmål och spelare som lämnat klubben saknas.', 'statistik'],
+  ['Snittålder', 'Viktad med matcher, så att ordinarie spelare väger mer än de som hoppat in en gång.', 'statistik'],
+  ['Beroende', 'Hur stor del av lagets mål den bäste målskytten gjort.', 'statistik'],
+  ['Effektivast', 'Mål per skott, bland spelare med minst tio skott.', 'statistik'],
+  ['Över 2,5 mål', 'Matchen slutar med tre mål eller fler, båda lagen tillsammans.', 'statistik'],
+  ['Båda lagen gör mål', 'Båda lagen gör minst ett mål var.', 'statistik'],
+  ['Hemmalagets målövervikt', 'Hemmalagets mål minus bortalagets, i snitt per match – ett mått på hemmafördelen.', 'statistik'],
+  ['Assist', 'Passningen (eller skottet som räddas och slås in) som leder direkt till ett mål, enligt ESPN.', 'statistik'],
+  ['Skott på mål', 'Skott som skulle ha gått in om målvakten inte räddat. Skott utanför och i stolpen räknas inte.', 'statistik'],
+  ['Räddningsprocent', 'Räddningar delat med skotten på mål som målvakten mött (räddningar + insläppta).', 'statistik'],
+  ['xG', 'Förväntade mål: hur många mål chanserna brukar ge i snitt, oavsett om de gick in.', 'statistik'],
+  ['Marginal', 'Spelbolagens påslag: hur mycket summan av 1/odds överstiger 100 %.', 'statistik'],
+  ['Log-poäng', 'Hur väl sannolikheterna träffade. Lägre är bättre; ett mått på hur förutsägbar divisionen är.', 'statistik'],
+  ['▲ ▼, ovanligt', 'Årets värde ligger mer än två standardfel från tioårssnittet – mer än slumpen brukar ge på så många matcher.', 'statistik'],
+  ['Kalibrering', 'Marknaden i Matchbilden: av de gånger oddsen gav t.ex. 40–50 %, hur ofta hände det? På diagonalen stämmer oddsen.', 'statistik'],
+  ['Domare', 'Domaren tillsätts några dagar före matchen och finns inte i prognosunderlaget. Med 10–40 matcher per domare är skillnaderna till stor del slump.', 'statistik'],
   ['Grundserien', 'Ligans ordinarie matcher, utan kvalspel (playoff) och cuper.'],
-  ['Säsongsprognos', 'Resten av säsongen spelas tusentals gånger med modellens sannolikheter för varje match. Andelen gånger ett lag hamnar på en plats är chansen. 0 och 100 betyder i ingen respektive alla simuleringar – inte att saken är avgjord.'],
-  ['Förväntade poäng', 'Snittet av slutpoängen i simuleringarna, med spannet där 80 % av dem hamnar.'],
-  ['Styrka', 'Modellens förväntade målskillnad per match mot ett genomsnittligt Premier League-lag på neutral plan. Alla fem divisioner på samma skala.'],
+  ['Säsongsprognos', 'Resten av säsongen spelas tusentals gånger med modellens sannolikheter för varje match. Andelen gånger ett lag hamnar på en plats är chansen. 0 och 100 betyder i ingen respektive alla simuleringar – inte att saken är avgjord.', 'tabeller'],
+  ['Förväntade poäng', 'Snittet av slutpoängen i simuleringarna, med spannet där 80 % av dem hamnar.', 'tabeller'],
+  ['Styrka', 'Modellens förväntade målskillnad per match mot ett genomsnittligt Premier League-lag på neutral plan. Alla fem divisioner på samma skala.', 'tabeller'],
 ];
 
 function glossary() {
   return '<details class="help dv-glossary"><summary>Ordlista</summary><dl>' +
-    GLOSSARY.map(([k, v]) => `<dt>${esc(k)}</dt><dd>${esc(v)}</dd>`).join('') + '</dl></details>';
+    GLOSSARY.filter(([, , page]) => !page || page === PAGE)
+      .map(([k, v]) => `<dt>${esc(k)}</dt><dd>${esc(v)}</dd>`).join('') + '</dl></details>';
 }
 
 // ---------- sidan ----------
@@ -1438,11 +1449,11 @@ async function renderView() {
     if (a.dataset.view === state.view) a.setAttribute('aria-current', 'page');
     else a.removeAttribute('aria-current');
   }
-  $('#dv-divs').classList.toggle('dim', state.view === 'jamfor');
+  $('#dv-divs').classList.toggle('dim', ALL_DIVS.has(state.view));
   charts.clear();
   const el = $('#dv-view');
-  const P = state.view === 'jamfor' || state.view === 'matchbilden' ? null : await loadPlayers(dv.id);
-  if (state.view === 'prognos' || state.view === 'jamfor') await loadSeason();
+  const P = ALL_DIVS.has(state.view) || state.view === 'matchbilden' ? null : await loadPlayers(dv.id);
+  if (state.view === 'prognos' || state.view === 'styrka') await loadSeason();
   // Spoilerskyddet behöver matcherna innan något ritas, annars hinner det dolda synas.
   if (window.Spoiler && Spoiler.on()) await Spoiler.matches();
   // Användaren kan ha bytt vy medan spelarfilen laddades.
@@ -1458,9 +1469,11 @@ async function renderView() {
     for (const [k, fn] of v.draw) charts.set(k, fn);
   } else if (state.view === 'jamfor') {
     el.innerHTML = sectionHead('Jämför divisionerna', 'Alla fem · sedan 2000/01') +
-      compareSection(d) + trendSection() + strengthSection(state.season);
+      compareSection(d) + trendSection();
     $('#dv-metric').addEventListener('change', (e) => { state.metric = e.target.value; drawTrend(); });
     charts.set('trend', drawTrend);
+  } else if (state.view === 'styrka') {
+    el.innerHTML = sectionHead('Styrka', 'Alla lag i nivå 1–5 på samma skala') + strengthSection(state.season);
   } else {
     el.innerHTML = overviewView(dv, P);
   }
@@ -1470,9 +1483,9 @@ async function renderView() {
 
 // Spoilerskyddet (spoiler.js): har divisionen matcher som döljs just nu läggs
 // vyn bakom en ridå – tabellen och statistiken räknar redan med resultaten.
-// Jämförelsen mellan divisionerna går över hela säsonger och visas ändå.
+// Jämförelsen och styrkan gäller alla divisioner på en gång och visas ändå.
 async function veil(dv, view) {
-  if (!window.Spoiler || !Spoiler.on() || view === 'jamfor') return;
+  if (!window.Spoiler || !Spoiler.on() || ALL_DIVS.has(view)) return;
   const recent = (await Spoiler.matches()).filter((m) => m.comp === dv.id && Spoiler.hides(m.kickoff));
   const n = recent.filter(Spoiler.hidden).length;
   if (!n || dv.id !== state.div || view !== state.view) return;
@@ -1502,7 +1515,7 @@ function wire() {
   root.addEventListener('click', (e) => {
     const div = e.target.closest('#dv-divs button');
     if (div) {
-      if (state.view === 'jamfor') state.view = 'oversikt';
+      if (ALL_DIVS.has(state.view)) state.view = VIEWS[0].id;
       go(div.dataset.div, state.view);
       return;
     }
@@ -1577,7 +1590,7 @@ function apply() {
   const { div, view } = parseHash();
   const divs = state.data.divisions;
   const nd = div && divs.some((x) => x.id === div) ? div : state.div;
-  const nv = view && VIEWS.some((v) => v.id === view) ? view : (div ? 'oversikt' : state.view);
+  const nv = view && VIEWS.some((v) => v.id === view) ? view : (div ? VIEWS[0].id : state.view);
   if (nd !== state.div) {
     state.pf = { ...state.pf, q: '', team: '', limit: 60 };
   }

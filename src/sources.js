@@ -164,7 +164,7 @@ for (const c of [...COMPETITIONS.filter((x) => x.fdcouk), NATIONAL_LEAGUE]) {
   });
 }
 
-// Divisionsstatistiken (sidan Divisioner): samma filer som historiken ovan
+// Divisionsstatistiken (sidan Statistik): samma filer som historiken ovan
 // men med halvtid, hörnor, kort och domare. Egen cache, så att prognos-
 // motorns och backtestets underlag inte ändras.
 for (const c of [...COMPETITIONS.filter((x) => x.fdcouk), NATIONAL_LEAGUE]) {

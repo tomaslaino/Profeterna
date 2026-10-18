@@ -164,7 +164,7 @@ function build() {
 
 // Domarna: alla ligamatcher nivå 1–5 med domare och kort de senaste
 // REF_SEASONS avslutade säsongerna (fdcouk_stats_*, samma filer som sidan
-// Divisioner) och i år (fdcouk_*). Index per domare och per division, i
+// Statistik) och i år (fdcouk_*). Index per domare och per division, i
 // datumordning, så att en match bara ser matcher före sin egen dag.
 const REF_SEASONS = 3;
 const REF_MIN = 10;
@@ -240,7 +240,7 @@ function refereeInfo(D, m, c, hk, ak) {
   const stats = mine.length ? refSummary(mine) : { n: 0 };
   const avg = div.length ? { ...refSummary(div), division: c.name } : null;
   // Ovanligt = mer än två standardfel från divisionens snitt, och bara från
-  // REF_MIN matcher (samma gräns som domartabellen på sidan Divisioner).
+  // REF_MIN matcher (samma gräns som domartabellen på sidan Statistik).
   const flags = {};
   if (avg && stats.n >= REF_MIN) {
     const sd = Math.sqrt(mine.reduce((t, x) => t + (x.y - stats.yellow) ** 2, 0) / (stats.n - 1));

@@ -12,9 +12,9 @@
 //                          kandidatloggen (fliken Modell)
 //   data/evaluation.json   journalen och utvärderingen mot facit (fliken
 //                          Utvärdering)
-//   data/divisions.json    statistik per division (sidan Divisioner)
+//   data/divisions.json    statistik per division (sidan Statistik)
 //   data/season.json       säsongsprognosen, modellens styrka för alla lag
-//                          och programmet framåt (Divisioner → Prognos)
+//                          och programmet framåt (Tabeller → Säsongsprognos)
 //   data/kuponger.json     gängets kuponger ur data/kuponger/ (fliken Kupong)
 //   data/historik.json     färdiga kuponger med facit, betyg och AI:ns
 //                          kommentar (sidan Historik, src/history.js)
@@ -115,7 +115,7 @@ function writeSite(outDir = OUT, { journal = false, analysisEndpoint, couponEndp
   // skattningar. Saknas den visar sidan okänt med orsaken.
   write('season.json', forecast.season || { error: forecast.error || 'prognosmotorn gav ingen säsongsprognos' });
 
-  // Divisionsstatistiken (sidan Divisioner) är beskrivande och styr inte
+  // Divisionsstatistiken (sidan Statistik) är beskrivande och styr inte
   // prognoserna. Fallerar den saknas bara sidans siffror.
   let divisions;
   try {
@@ -126,7 +126,7 @@ function writeSite(outDir = OUT, { journal = false, analysisEndpoint, couponEndp
   }
   write('divisions.json', divisions);
 
-  // Spelare per division (sidan Divisioner). Beskrivande och styr inte
+  // Spelare per division (sidorna Tabeller och Statistik). Beskrivande och styr inte
   // prognoserna; fallerar det saknas bara sidans spelare.
   fs.mkdirSync(path.join(dataDir, 'players'), { recursive: true });
   try {

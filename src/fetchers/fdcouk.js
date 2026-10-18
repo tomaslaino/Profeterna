@@ -40,7 +40,7 @@ const KEEP_HISTORY = [
   'AvgCH', 'AvgCD', 'AvgCA', 'BFECH', 'BFECD', 'BFECA', 'PSCH', 'PSCD', 'PSCA', 'AvgC>2.5', 'AvgC<2.5',
 ];
 
-// Divisionsstatistiken (sidan Divisioner): halvtid, hörnor, frisparkar, kort,
+// Divisionsstatistiken (sidan Statistik): halvtid, hörnor, frisparkar, kort,
 // domare, avsparkstid (från 2019/20) och publik (bara de första säsongerna)
 // plus marknadssnittets odds. Egen källa, så att prognosmotorns historik
 // (och backtestets signatur på den) inte ändras.

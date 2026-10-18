@@ -133,11 +133,11 @@ Utan nyckel ingen knapp.
 | Tidigare säsonger, ligorna | football-data.co.uk (`mmz4281/<säsong>/E0–E3, EC.csv`) | PL–L2, National League | 30 d | E0–E3 2000/01–2025/26 (26 säsonger, 52 672 matcher), EC 2005/06–2025/26 (11 234; 2000/01–2004/05 svarar 300). Fulla säsonger utom League One/Two 2019/20 (400/440 matcher, avbruten säsong) och EC 2019/20–2021/22 (451, 477, 506). En fil per säsong, ~0,25 s styck – allt hämtas på ~4 s. Äldre filer är Windows-1252 (t.ex. "King’s Lynn" i EC 2021/22), nyare UTF-8; läses därefter. Sparar resultat, skott och odds (marknadssnitt hette `BbAv` före 2019/20). |
 | xG, tidigare säsonger | Understat (`getLeagueData/EPL/<år>`) | PL | 30 d, bara kandidatjakten | 2014/15–2025/26, 380/380 matcher med xG varje säsong (verifierat 2026-10-17), alla 4 560 parade mot football-data.co.uk på (hemma, borta). Hämtas av `npm run kandidater`, inte av bygget – används först om xG-kandidaten klarar kravet. |
 | Tidigare säsonger, FA-cupen | ESPN (`eng.fa`, månad för månad) | FA-cupen | 30 d | 2021/22–2025/26, 674 matcher från first round proper (ESPN har längre bak). Enda fria källan till matcher för lag under National League. Rundornas namn varierar mellan säsongerna. ESPN:s flagga för neutral plan är inte satt för Wembley-matcherna. |
-| Halvtid, hörnor, kort och domare, tidigare säsonger | football-data.co.uk (samma filer som raden ovan, fler kolumner) | PL–L2, National League – bara sidan Divisioner | 30 d | Verifierat 2026-10-18. Egen cache (`fdcouk_stats_*`), så att prognosmotorns underlag och backtestets signatur inte ändras. Halvtidsresultat, kort och domare finns i stort sett alla säsonger sedan 2000/01 (EC sedan 2005/06); domare saknas 2012/13 i E1–EC, och skott, hörnor och frisparkar saknas i EC från 2016/17. Avsparkstid (brittisk tid) från 2019/20, publik bara 2000/01–2001/02. Sparar också marknadssnittets 1X2 och över/under 2,5. |
+| Halvtid, hörnor, kort och domare, tidigare säsonger | football-data.co.uk (samma filer som raden ovan, fler kolumner) | PL–L2, National League – bara sidan Statistik | 30 d | Verifierat 2026-10-18. Egen cache (`fdcouk_stats_*`), så att prognosmotorns underlag och backtestets signatur inte ändras. Halvtidsresultat, kort och domare finns i stort sett alla säsonger sedan 2000/01 (EC sedan 2005/06); domare saknas 2012/13 i E1–EC, och skott, hörnor och frisparkar saknas i EC från 2016/17. Avsparkstid (brittisk tid) från 2019/20, publik bara 2000/01–2001/02. Sparar också marknadssnittets 1X2 och över/under 2,5. |
 | Europacuperna (för vila och form) | ESPN (`uefa.champions`, `uefa.europa`, `uefa.europa.conf`, kvalomgångarna i `*_qual` juli–augusti) | PL och cuperna – bara underlag | 3 h | Verifierat 2026-10-18: 234/224/366 matcher 2026/27 med kvalet, nio engelska lag (Brighton i Conference Leagues playoffomgång i augusti). Kopplas på ESPN:s lag-id, samma i alla ESPN:s turneringar. Ingen prognos för matcherna och inte med i prognosmotorns underlag. |
-| Domare, kommande ligamatcher | football-data.co.uk (`fixtures.csv`, kolumnen `Referee`) | ligorna | 6 h | Verifierat 2026-10-18: namnet finns för alla 46 kommande matcher i filen (läggs ut med oddsen fre/tis). Domarens historik ur samma statistikfiler som sidan Divisioner. |
+| Domare, kommande ligamatcher | football-data.co.uk (`fixtures.csv`, kolumnen `Referee`) | ligorna | 6 h | Verifierat 2026-10-18: namnet finns för alla 46 kommande matcher i filen (läggs ut med oddsen fre/tis). Domarens historik ur samma statistikfiler som sidan Statistik. |
 | Liveställning | ESPN scoreboard (`site.api.espn.com/…/<liga>/scoreboard?dates=YYYYMMDD`), hämtas **i webbläsaren** | kupongens matcher | 1 min medan en kupongmatch pågår | Verifierat 2026-10-18: svarar med `Access-Control-Allow-Origin: *`, så sidan kan hämta direkt. Samma matchid som spelprogrammet. Status, matchminut och ställning; används bara av kupongen, inte av prognosen eller bygget. |
-| Målminuter och publik, tidigare säsonger | ESPN (`eng.1`–`eng.4`, månad för månad) | ligorna – bara sidan Divisioner | 30 d | Verifierat 2026-10-18. 2021/22–2025/26; grundserien räknas, play-off filtreras bort. Målhändelserna går ihop med slutresultatet i 99,9 % av matcherna, publik finns i 98–100 % per liga och säsong. Kompakt format (`parseCrowd`): målminut med sida och publiksiffra. Årets publik saknas (spelprogrammets format ändras inte). |
+| Målminuter och publik, tidigare säsonger | ESPN (`eng.1`–`eng.4`, månad för månad) | ligorna – bara sidan Statistik | 30 d | Verifierat 2026-10-18. 2021/22–2025/26; grundserien räknas, play-off filtreras bort. Målhändelserna går ihop med slutresultatet i 99,9 % av matcherna, publik finns i 98–100 % per liga och säsong. Kompakt format (`parseCrowd`): målminut med sida och publiksiffra. Årets publik saknas (spelprogrammets format ändras inte). |
 
 **Prövat och inte använt:**
 
@@ -263,7 +263,11 @@ Utan nyckel ingen knapp.
   inte, och playoff spelas inte – chansen gäller en playoffplats.
 - **Domaren mot divisionens snitt (2026-10-18):** de senaste tre avslutade säsongerna och
   i år, alla nivå 1–5, bara matcher före matchdagen. ▲▼ först från tio matcher och mer
-  än två standardfel från snittet – samma gräns som domartabellen på Divisioner.
+  än två standardfel från snittet – samma gräns som domartabellen på Statistik.
+- **Divisioner delas i Tabeller och Statistik (2026-10-18, användarens beslut):** menyvalet
+  Divisioner ersätts av två: Tabeller (tabellen, säsongsprognosen och modellens styrka för
+  alla lag) och Statistik (översikten, spelarna, lagen, matchbilden och jämförelsen mellan
+  divisionerna). Gamla länkar till `divisioner.html` leds vidare till rätt sida.
 
 ## Arkitektur
 
@@ -329,8 +333,9 @@ server:
   [config/kommentar.js](config/kommentar.js). Se [Kuponghistoriken](#kuponghistoriken).
 - **Frontend:** ren HTML/CSS/JS i `public/`, flikarna Matcher, Kupong, Utvärdering, Källor och
   Modell (regelversion, backtest, kandidatlogg); i matchvyn kortet Analys när
-  matchanalysen är påslagen. Sidan Divisioner ([public/divisioner.js](public/divisioner.js))
-  med vyn Prognos. Läser JSON-filerna ovan. Urvalet av kommande/spelade matcher och källornas status
+  matchanalysen är påslagen. Sidorna Tabeller och Statistik
+  ([public/tabeller.html](public/tabeller.html), [public/statistik.html](public/statistik.html),
+  båda med [public/divisioner.js](public/divisioner.js)); Tabeller har vyn Säsongsprognos. Läser JSON-filerna ovan. Urvalet av kommande/spelade matcher och källornas status
   räknas i webbläsaren mot besökarens klocka, inte mot byggtiden.
 
 ### Lagnamn
@@ -731,7 +736,7 @@ prompten, modellen eller underlaget: byt `promptVersion` i konfigen och kör `de
 
 ## Säsongsprognosen
 
-Under Divisioner → Prognos. Resten av ligasäsongen spelas 10 000 gånger: varje
+Under Tabeller → Säsongsprognos. Resten av ligasäsongen spelas 10 000 gånger: varje
 återstående match får ett resultat dragen ur prognosmotorns resultatmatris (Dixon–Coles,
 samma förväntade mål som prognosen under Matcher), och tabellen räknas ut med poäng,
 målskillnad, gjorda mål och sist lott. Läget nu räknas ur ESPN:s resultat med ESPN:s
@@ -750,7 +755,7 @@ poängavdrag (kontrollerat mot ESPN:s tabell 2026-10-18: alla 92 lag stämmer).
   förväntade poängen per match.
 - **Styrkan:** förväntad målskillnad per match mot ett genomsnittligt Premier League-lag
   på neutral plan, ur den senaste skattningen – alla fem nivåerna på samma skala, med
-  placeringens spann i omskattningarna (Jämför divisioner).
+  placeringens spann i omskattningarna (Tabeller → Styrka).
 - **Slumpen** är seedad med dagen och divisionen: samma data samma dag ger samma prognos.
 - Körtid ~0,8 s i bygget.
 

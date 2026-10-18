@@ -170,7 +170,7 @@
 }
 .sp-show:hover { color: #fff; border-color: var(--gold); }
 
-/* Divisioner: vyn bakom en ridå */
+/* Tabeller och Statistik: vyn bakom en ridå */
 .sp-veiled > :not(.sp-card) {
   filter: blur(10px);
   opacity: 0.45;

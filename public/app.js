@@ -63,14 +63,14 @@ function monthYear(iso) {
   return iso ? esc(fmt({ month: 'short', year: 'numeric' }).format(new Date(iso + 'T12:00:00Z'))) : '–';
 }
 
-// Nyckeltal som rutor: [etikett, tal, rad under, title]. Samma rutor som Divisioner.
+// Nyckeltal som rutor: [etikett, tal, rad under, title]. Samma rutor som Statistik.
 function tiles(list) {
   return '<div class="dv-tiles">' + list.filter(Boolean).map(([label, num, sub, what]) =>
     `<div class="dv-tile"${what ? ` title="${esc(what)}"` : ' style="cursor:auto"'}><div class="dv-tile-label">${esc(label)}</div>` +
     `<div class="dv-tile-num">${num}</div>${sub ? `<div class="dv-tile-sub">${sub}</div>` : ''}</div>`).join('') + '</div>';
 }
 
-// Metodtexten hopfälld, som ordlistan på Divisioner: [term, html].
+// Metodtexten hopfälld, som ordlistan på Tabeller och Statistik: [term, html].
 function method(title, items) {
   return `<details class="help dv-glossary"><summary>${esc(title)}</summary><dl>` +
     items.filter(Boolean).map(([k, v]) => `<dt>${esc(k)}</dt><dd>${v}</dd>`).join('') + '</dl></details>';
@@ -693,7 +693,7 @@ function teamSquadCard(name, s) {
     '<thead><tr><th>Spelare</th><th class="num" title="Matcher">M</th><th class="num">Mål</th><th class="num" title="Assist">Ass</th><th class="num" title="Gula kort">Gul</th><th class="num" title="Röda kort">Röd</th></tr></thead>' +
     `<tbody>${rows}</tbody></table></div></details>` +
     `<p class="src-line">ESPN · ligamatcher i år · hämtat ${when(s.source.fetchedAt)}${cov.behind ? ` · ${cov.covered} av ${cov.matches} matcher införda` : ''}` +
-    `${page ? ` · <a href="divisioner.html#${page}/spelare">Alla spelare</a>` : ''}</p></div>`;
+    `${page ? ` · <a href="statistik.html#${page}/spelare">Alla spelare</a>` : ''}</p></div>`;
 }
 
 // ---------- matchanalys (fas 5, valfri) ----------

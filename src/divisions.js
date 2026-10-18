@@ -1,6 +1,6 @@
 'use strict';
 
-// Divisionsstatistik (sidan Divisioner): beskrivande statistik per division
+// Divisionsstatistik (sidan Statistik): beskrivande statistik per division
 // som kan påverka matcherna – hemmafördel, mål, halvtid, skott, hörnor, kort,
 // domare, marknaden, nykomlingar, målminuter och publik – säsong för säsong
 // och för de senaste avslutade säsongerna. Påverkar inte prognoserna: det som

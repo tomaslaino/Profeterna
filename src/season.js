@@ -1,6 +1,6 @@
 'use strict';
 
-// Säsongsprognosen (sidan Divisioner → Prognos): resten av ligasäsongen
+// Säsongsprognosen (sidan Tabeller → Säsongsprognos): resten av ligasäsongen
 // spelas SIMS gånger med prognosmotorns egna förväntade mål för varje
 // återstående match, och det som räknas är var lagen hamnar – seger i
 // serien, uppflyttning, kval (playoff), Europa och nedflyttning – och hur

@@ -683,7 +683,7 @@ function forecastAll({ now = new Date() } = {}) {
     intervals(ctx, day, list, sink).forEach((r, i) => { out.get(list[i].id).range = r; });
   }
   const latest = ctx.fits.size ? fitAt(ctx, Math.max(...ctx.fits.keys())) : null;
-  // Säsongsprognosen och styrkan för alla lag (sidan Divisioner). Beskrivande
+  // Säsongsprognosen och styrkan för alla lag (sidan Tabeller). Beskrivande
   // ur samma skattningar; fallerar den saknas bara den.
   let season = null;
   try {
