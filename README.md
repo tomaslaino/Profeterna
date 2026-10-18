@@ -706,7 +706,8 @@ ställningen efter 90 minuter (samma utfall som prognosen).
   modellens väntade antal rätt, och varje match med vårt tecken som tre rutor (valda fyllda,
   utfallet grönt om vi hade det och rödringat om inte), modellens tips som en prick under
   rutan och modellens chans för vårt tecken. Under: tidigare kuponger med staplar för andel
-  rätt mot hur många rätt modellens tips hade gett.
+  rätt mot hur många rätt modellens tips hade gett, och länken *Historik* (en färdig kupong
+  länkas som `historik.html#<id>`).
 - **Väntat antal rätt** = spelade matcher som de gick + modellens sannolikhet för vårt tecken
   i resten (prognosen före avspark ur journalen om den finns, annars sajtens prognos).
 - **Live:** medan en kupongmatch pågår hämtar sidan ESPN:s scoreboard varje minut, direkt i
@@ -717,7 +718,9 @@ ställningen efter 90 minuter (samma utfall som prognosen).
 **Skapa och spara**
 
 1. *Kupong → Ny kupong* (`#kupong/ny`): sök lag eller filtrera på tävling, tryck 1, X
-   eller 2 på matcherna (flera tecken = gardering). Utkastet sparas i webbläsaren.
+   eller 2 på matcherna (flera tecken = gardering). En vald match får ett fält för en
+   valfri anteckning (högst 140 tecken), t.ex. vem som drev tecknet – den visas under
+   lagnamnen i kupongvyn och följer med till Historik. Utkastet sparas i webbläsaren.
 2. *Spara kupong* → *Spara på GitHub* öppnar GitHub med filen ifylld
    (`data/kuponger/<datum för första matchen>.json`). Tryck **Commit changes** (kräver
    inloggning med skrivrätt till repot). Pushen startar workflowen och kupongen syns för
@@ -726,7 +729,7 @@ ställningen efter 90 minuter (samma utfall som prognosen).
    Märkningen försvinner när den publicerade kupongen är likadan, och glöms efter tre dygn.
 
 **Ändra:** knappen *Ändra* (bara medan någon match återstår). Startade matcher ligger kvar
-som de är. GitHub kan inte fylla i en fil som redan finns, så *Spara på GitHub* kopierar
+som de är, med sina anteckningar. GitHub kan inte fylla i en fil som redan finns, så *Spara på GitHub* kopierar
 innehållet och öppnar filen för redigering – markera allt, klistra in, Commit changes.
 **Ta bort:** radera filen på GitHub.
 
@@ -739,7 +742,7 @@ matchid):
   "skapad": "2026-10-16T18:20:11.000Z",
   "matcher": [
     { "id": "401879263", "match": "AFC Bournemouth – Sunderland", "tecken": "1" },
-    { "id": "401879260", "match": "Leeds United – Manchester United", "tecken": "X2" }
+    { "id": "401879260", "match": "Leeds United – Manchester United", "tecken": "X2", "kommentar": "Teijder drev X2" }
   ]
 }
 ```
