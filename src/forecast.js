@@ -572,18 +572,26 @@ function advance(ctx, fit, spec, m, specsById) {
 
 // Bayesiansk bootstrap för en skattningsdag: skattningen görs om med
 // slumpvikter, och för varje match samlas 1X2 från varje omskattning.
-function intervals(ctx, day, specs) {
+// sink (valfri): sparar omskattningarna och varje matchs förväntade mål per
+// omskattning – säsongsprognosen (src/season.js) spelar säsongen med dem.
+function intervals(ctx, day, specs, sink = null) {
   const base = fitAt(ctx, day);
   const { samples, interval, seed } = rules.uncertainty;
   const rand = M.rng(seed + day);
   const draws = specs.map(() => [[], [], []]);
   const sigs = specs.map((sp) => factorSignals(ctx, sp));
+  if (sink) {
+    sink.fits.set(day, []);
+    for (const sp of specs) sink.goals.set(sp.id, []);
+  }
   for (let s = 0; s < samples; s++) {
     const games = base.games.map((g) => ({ ...g, w: g.w * -Math.log(1 - rand()) }));
     const fit = M.fitPoisson(games, { init: base, tolerance: 1e-6, maxIterations: rules.model.maxIterations });
+    if (sink) sink.fits.get(day).push(fit);
     specs.forEach((sp, i) => {
       if (!fit.A.has(sp.hk) || !fit.A.has(sp.ak)) return;
       const [lh, la] = M.factorAdjust(...M.expectedGoals(fit, sp.hk, sp.ak, sp.neutral, homeGroup(sp.comp)), sigs[i].z, sigs[i].beta);
+      if (sink) sink.goals.get(sp.id)[s] = [lh, la];
       const x = M.outcomes(M.scoreMatrix(lh, la, base.rho, rules.model.maxGoals)).x12;
       for (let k = 0; k < 3; k++) draws[i][k].push(x[k]);
     });
@@ -670,11 +678,22 @@ function forecastAll({ now = new Date() } = {}) {
     if (!byDay.has(s.fitDay)) byDay.set(s.fitDay, []);
     byDay.get(s.fitDay).push(s);
   }
+  const sink = { fits: new Map(), goals: new Map() };
   for (const [day, list] of byDay) {
-    intervals(ctx, day, list).forEach((r, i) => { out.get(list[i].id).range = r; });
+    intervals(ctx, day, list, sink).forEach((r, i) => { out.get(list[i].id).range = r; });
   }
   const latest = ctx.fits.size ? fitAt(ctx, Math.max(...ctx.fits.keys())) : null;
-  return { predictions: out, model: modelSummary(ctx, latest), ms: Date.now() - t0 };
+  // Säsongsprognosen och styrkan för alla lag (sidan Divisioner). Beskrivande
+  // ur samma skattningar; fallerar den saknas bara den.
+  let season = null;
+  try {
+    const { seasonForecast } = require('./season');
+    season = seasonForecast({ ctx, specs, predictions: out, sink, fitAt: (day) => fitAt(ctx, day), now });
+  } catch (err) {
+    console.error('[forecast] säsongsprognosen:', err);
+    season = { error: String(err.message || err) };
+  }
+  return { predictions: out, model: modelSummary(ctx, latest), season, ms: Date.now() - t0 };
 }
 
 // Det som visas under fliken Modell: regelversion och skattade storheter.

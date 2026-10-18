@@ -16,6 +16,16 @@ const COMPETITIONS = [
 // non-league-lagen i FA-cupen (football-data.co.uk "EC").
 const NATIONAL_LEAGUE = { id: 'nl', name: 'National League', short: 'NL', fdcouk: 'EC', tier: 5, type: 'league' };
 
+// Europacuperna: ingen prognos, bara underlag om lagens schema (vila och
+// matcher i veckan) och formen. ESPN har gruppspel/ligafas och slutspel under
+// `espn`, kvalomgångarna (juli–augusti) under `qual` – verifierat 2026-10-18
+// (Brighton i Conference Leagues playoffomgång i augusti 2026).
+const EUROPE = [
+  { id: 'ucl', name: 'Champions League', short: 'CL', espn: 'uefa.champions', qual: 'uefa.champions_qual', type: 'europe' },
+  { id: 'uel', name: 'Europa League', short: 'EL', espn: 'uefa.europa', qual: 'uefa.europa_qual', type: 'europe' },
+  { id: 'uecl', name: 'Conference League', short: 'ECL', espn: 'uefa.europa.conf', qual: 'uefa.europa.conf_qual', type: 'europe' },
+];
+
 // Innevarande säsong. ESPN hämtas månad för månad (datumintervall ger
 // HTTP 400, månadsformatet YYYYMM fungerar – verifierat 2026-10-17).
 const SEASON = {
@@ -53,7 +63,8 @@ function fdSeasonCode(startYear) {
 }
 
 function competition(id) {
-  return COMPETITIONS.find((c) => c.id === id) || (id === NATIONAL_LEAGUE.id ? NATIONAL_LEAGUE : null);
+  return COMPETITIONS.find((c) => c.id === id) || (id === NATIONAL_LEAGUE.id ? NATIONAL_LEAGUE : null)
+    || EUROPE.find((c) => c.id === id) || null;
 }
 
-module.exports = { COMPETITIONS, NATIONAL_LEAGUE, SEASON, HISTORY, fdSeasonCode, competition };
+module.exports = { COMPETITIONS, NATIONAL_LEAGUE, EUROPE, SEASON, HISTORY, fdSeasonCode, competition };

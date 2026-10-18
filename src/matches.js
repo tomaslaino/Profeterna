@@ -11,7 +11,7 @@
 
 const fs = require('fs');
 const path = require('path');
-const { COMPETITIONS, NATIONAL_LEAGUE, competition } = require('../config/competitions');
+const { COMPETITIONS, NATIONAL_LEAGUE, EUROPE, competition } = require('../config/competitions');
 const { readCache, CACHE_DIR } = require('./store');
 const { SOURCES, ODDS_WINDOW_DAYS } = require('./sources');
 const { keyOf, espnKey } = require('./teams');
@@ -82,6 +82,8 @@ function build() {
     };
   }
 
+  const referees = refereeIndex(fd);
+
   const fdfx = readCache('fdcouk_fixtures');
   const fdFixtures = { byPair: new Map(), fetchedAt: fdfx ? fdfx.fetchedAt : null };
   if (fdfx && fdfx.data) {
@@ -123,12 +125,33 @@ function build() {
     }
   }
 
+  // Europacuperna: bara matcher med ett engelskt lag, kopplade på ESPN:s
+  // lag-id (samma id i alla ESPN:s turneringar). Ingår inte i `matches` – de
+  // får ingen prognos och ska inte in i prognosmotorns underlag.
+  const keyById = new Map([...espnTeams].map(([k, t]) => [t.espnId, k]));
+  const europe = [];
+  const europeFetchedAt = {};
+  for (const c of EUROPE) {
+    const cache = readCache(`espn_europe_${c.id}`);
+    europeFetchedAt[c.id] = cache ? cache.fetchedAt : null;
+    if (!cache || !cache.data) continue;
+    for (const m of cache.data.matches) {
+      const hk = keyById.get(m.home.espnId) || null;
+      const ak = keyById.get(m.away.espnId) || null;
+      if (hk || ak) europe.push({ ...m, comp: c.id, score90: regulationScore(m), hk, ak });
+    }
+  }
+  europe.sort((a, b) => a.kickoff.localeCompare(b.kickoff));
+
   return {
     matches,
     byId: new Map(matches.map((m) => [m.id, m])),
     espnTeams,
     teamLeague,
     fixturesFetchedAt,
+    europe,
+    europeFetchedAt,
+    referees,
     fd,
     fdFixtures,
     understat,
@@ -136,6 +159,107 @@ function build() {
     standings,
     fpl,
     unmapped: [...unmapped.values()],
+  };
+}
+
+// Domarna: alla ligamatcher nivå 1–5 med domare och kort de senaste
+// REF_SEASONS avslutade säsongerna (fdcouk_stats_*, samma filer som sidan
+// Divisioner) och i år (fdcouk_*). Index per domare och per division, i
+// datumordning, så att en match bara ser matcher före sin egen dag.
+const REF_SEASONS = 3;
+const REF_MIN = 10;
+const DIV_IDS = { E0: 'pl', E1: 'ch', E2: 'l1', E3: 'l2', EC: 'nl' };
+
+function refereeIndex(fd) {
+  const { SEASON } = require('../config/competitions');
+  const byName = new Map();
+  const byDiv = new Map();
+  const fetchedAt = [];
+  const add = (r, div) => {
+    if (!r.Referee || r.HY == null || r.AY == null || r.FTHG == null) return;
+    const x = {
+      date: r.date, div,
+      y: r.HY + r.AY, r: (r.HR || 0) + (r.AR || 0),
+      f: r.HF != null && r.AF != null ? r.HF + r.AF : null,
+      res: r.FTHG > r.FTAG ? 0 : r.FTHG === r.FTAG ? 1 : 2,
+    };
+    const name = r.Referee.trim().replace(/\s+/g, ' ');
+    if (!byName.has(name)) byName.set(name, []);
+    byName.get(name).push(x);
+    if (!byDiv.has(div)) byDiv.set(div, []);
+    byDiv.get(div).push(x);
+  };
+  for (const [code, div] of Object.entries(DIV_IDS)) {
+    const st = readCache(`fdcouk_stats_${code}`);
+    if (st && st.data) {
+      fetchedAt.push(st.fetchedAt);
+      const seasons = Object.keys(st.data.seasons).filter((c) => c !== SEASON.fdcouk).sort().slice(-REF_SEASONS);
+      for (const c of seasons) for (const r of st.data.seasons[c]) add(r, div);
+    }
+    if (fd[div]) {
+      fetchedAt.push(fd[div].fetchedAt);
+      for (const r of fd[div].rows) add(r, div);
+    }
+  }
+  for (const list of [...byName.values(), ...byDiv.values()]) list.sort((a, b) => a.date.localeCompare(b.date));
+  return { byName, byDiv, seasons: REF_SEASONS, fetchedAt: fetchedAt.filter(Boolean).sort()[0] || null };
+}
+
+function refSummary(list) {
+  const n = list.length;
+  const sum = (fn) => list.reduce((t, x) => t + fn(x), 0);
+  const withF = list.filter((x) => x.f != null);
+  return {
+    n,
+    yellow: sum((x) => x.y) / n,
+    red: sum((x) => x.r) / n,
+    fouls: withF.length ? withF.reduce((t, x) => t + x.f, 0) / withF.length : null,
+    home: list.filter((x) => x.res === 0).length / n,
+    draw: list.filter((x) => x.res === 1).length / n,
+    away: list.filter((x) => x.res === 2).length / n,
+  };
+}
+
+// Domaren för en ligamatch (football-data.co.uk tillsätter namnet när
+// oddsen läggs ut, fre/tis) och hans eller hennes matcher före matchdagen.
+function refereeInfo(D, m, c, hk, ak) {
+  if (c.type !== 'league') return { unknown: true, reason: 'Domare finns bara för ligamatcherna i de fria källorna.' };
+  const key = `${hk}|${ak}`;
+  const row = (m.completed ? D.fd[c.id].byPair.get(key) : null) || D.fdFixtures.byPair.get(key);
+  if (!row || !row.Referee) {
+    return { unknown: true, reason: m.completed ? 'Domaren saknas i källan för matchen.' : 'Domaren är inte utsedd än – football-data.co.uk lägger ut namnet med oddsen (fre/tis).' };
+  }
+  const name = row.Referee.trim().replace(/\s+/g, ' ');
+  const date = m.kickoff.slice(0, 10);
+  const before = (list) => (list || []).filter((x) => x.date < date);
+  const mine = before(D.referees.byName.get(name));
+  const div = before(D.referees.byDiv.get(c.id));
+  const divs = {};
+  for (const x of mine) divs[x.div] = (divs[x.div] || 0) + 1;
+  const first = mine.length ? mine[0].date : null;
+  const stats = mine.length ? refSummary(mine) : { n: 0 };
+  const avg = div.length ? { ...refSummary(div), division: c.name } : null;
+  // Ovanligt = mer än två standardfel från divisionens snitt, och bara från
+  // REF_MIN matcher (samma gräns som domartabellen på sidan Divisioner).
+  const flags = {};
+  if (avg && stats.n >= REF_MIN) {
+    const sd = Math.sqrt(mine.reduce((t, x) => t + (x.y - stats.yellow) ** 2, 0) / (stats.n - 1));
+    const zy = (stats.yellow - avg.yellow) / (sd / Math.sqrt(stats.n));
+    flags.yellow = zy > 2 ? 'more' : zy < -2 ? 'less' : null;
+    const zh = (stats.home - avg.home) / Math.sqrt((avg.home * (1 - avg.home)) / stats.n);
+    flags.home = zh > 2 ? 'more' : zh < -2 ? 'less' : null;
+  }
+  return {
+    unknown: false,
+    name,
+    min: REF_MIN,
+    stats,
+    flags,
+    divisions: Object.entries(divs).sort((a, b) => b[1] - a[1]).map(([id, n]) => ({ id, short: competition(id).short, n })),
+    avg,
+    since: first,
+    seasons: REF_SEASONS,
+    source: { provider: 'football-data.co.uk', fetchedAt: D.referees.fetchedAt },
   };
 }
 
@@ -288,6 +412,7 @@ function matchDetail(id) {
     teams: { home, away },
     rows: sideBySide(home, away),
     squad,
+    referee: refereeInfo(D, m, c, hk, ak),
     meetings: seasonMeetings(D, hk, ak, m),
     pastMeetings: pastMeetings(m),
     unknowns,
@@ -327,6 +452,16 @@ function teamProfile(D, k, before) {
     through: results.length ? results[results.length - 1].date : null,
     source: resultsSource,
   };
+  // Målprofilen i ligan: hur ofta lagets matcher gett över 2,5 mål, mål av
+  // båda lagen, hållen nolla och inget eget mål – samma mått som prognosens
+  // "över 2,5" och "båda lagen gör mål".
+  p.goalProfile = {
+    n: results.length,
+    over25: results.filter((r) => r.gf + r.ga > 2.5).length,
+    btts: results.filter((r) => r.gf > 0 && r.ga > 0).length,
+    cleanSheets: results.filter((r) => r.ga === 0).length,
+    blanks: results.filter((r) => r.gf === 0).length,
+  };
 
   // Skott och xG (football-data.co.uk) – ligamatcher före avspark
   const fdLeague = D.fd[leagueId];
@@ -344,6 +479,12 @@ function teamProfile(D, k, before) {
       xgFor: avg((r) => r[side(r)[0] + 'xG']),
       xgAgainst: avg((r) => r[side(r)[1] + 'xG']),
       xgN: rows.filter((r) => r.HxG != null).length,
+      // Mål minus xG, summerat över matcherna med xG (plus = fler mål än
+      // chanserna brukar ge).
+      xgDiff: goalsMinusXg(rows.filter((r) => r.HxG != null && r.AxG != null).map((r) => {
+        const [f, a] = side(r);
+        return { gf: r[`FT${f}G`], ga: r[`FT${a}G`], xf: r[`${f}xG`], xa: r[`${a}xG`] };
+      })),
       through: rows.length ? rows[rows.length - 1].date : null,
       source: { provider: 'football-data.co.uk', fetchedAt: fdLeague.fetchedAt },
     };
@@ -356,6 +497,9 @@ function teamProfile(D, k, before) {
       n: ms.length,
       xgFor: mean(ms.map((m) => (m.hk === k ? m.xg.home : m.xg.away))),
       xgAgainst: mean(ms.map((m) => (m.hk === k ? m.xg.away : m.xg.home))),
+      xgDiff: goalsMinusXg(ms.filter((m) => m.goals).map((m) => (m.hk === k
+        ? { gf: m.goals.home, ga: m.goals.away, xf: m.xg.home, xa: m.xg.away }
+        : { gf: m.goals.away, ga: m.goals.home, xf: m.xg.away, xa: m.xg.home }))),
       through: ms.length ? ms[ms.length - 1].kickoff.slice(0, 10) : null,
       source: { provider: 'Understat', fetchedAt: D.understat.fetchedAt },
     };
@@ -372,35 +516,100 @@ function teamProfile(D, k, before) {
     };
   }
 
-  // Form: senaste matcherna i alla tävlingar före avspark, avgjorda på
-  // 90 minuter (straffavgjorda cupmatcher räknas som oavgjorda).
-  const form = D.matches
-    .filter((m) => m.completed && m.kickoff < before && (m.hk === k || m.ak === k))
-    .map((m) => {
-      const isHome = m.hk === k;
-      const s = m.score90 || (m.status === 'STATUS_FULL_TIME' ? m.score : null);
-      const gf = s ? (isHome ? s.home : s.away) : null;
-      const ga = s ? (isHome ? s.away : s.home) : null;
-      return {
-        date: m.kickoff.slice(0, 10),
-        comp: competition(m.comp).short,
-        home: isHome,
-        opponent: isHome ? m.away.name : m.home.name,
-        gf, ga,
-        result: gf == null ? null : gf > ga ? 'V' : gf < ga ? 'F' : 'O',
-        decided: m.shootout ? 'straffar' : m.status === 'STATUS_FINAL_AET' ? 'förlängning' : null,
-      };
-    });
-  if (leagueId === 'nl') {
-    for (const r of results) form.push({ date: r.date, comp: 'NL', home: r.home, opponent: null, gf: r.gf, ga: r.ga, result: r.gf > r.ga ? 'V' : r.gf < r.ga ? 'F' : 'O', decided: null });
-    form.sort((a, b) => a.date.localeCompare(b.date));
-  }
+  // Form: senaste matcherna i alla tävlingar före avspark (även Europa),
+  // avgjorda på 90 minuter (straffavgjorda cupmatcher räknas som oavgjorda).
+  const cal = calendar(D, k);
+  const form = cal.filter((x) => x.completed && x.kickoff < before).map((x) => {
+    const s = x.score90 || (x.status === 'STATUS_FULL_TIME' ? x.score : null);
+    const gf = s ? (x.home ? s.home : s.away) : null;
+    const ga = s ? (x.home ? s.away : s.home) : null;
+    return {
+      date: x.kickoff.slice(0, 10),
+      comp: competition(x.comp).short,
+      home: x.home,
+      opponent: x.opponent,
+      gf, ga,
+      result: gf == null ? null : gf > ga ? 'V' : gf < ga ? 'F' : 'O',
+      decided: x.shootout ? 'straffar' : x.status === 'STATUS_FINAL_AET' ? 'förlängning' : null,
+    };
+  });
+  p.schedule = schedule(D, cal, before, leagueId);
   p.form = form.slice(-FORM_N).reverse();
   return p;
 }
 
+// Lagets matcher i alla tävlingar som källorna har, i tidsordning: ligan och
+// cuperna (ESPN), Europacuperna (ESPN) och – för lag i National League –
+// ligaresultaten från football-data.co.uk (bara spelade, utan motståndare i
+// ESPN:s namn). Cachad per inläsning.
+function calendar(D, k) {
+  if (!D.calendars) D.calendars = new Map();
+  if (D.calendars.has(k)) return D.calendars.get(k);
+  const out = [];
+  const add = (m, europe) => {
+    if (m.hk !== k && m.ak !== k) return;
+    const home = m.hk === k;
+    out.push({
+      kickoff: m.kickoff, comp: m.comp, europe, home,
+      opponent: home ? m.away.name : m.home.name,
+      completed: m.completed, status: m.status, score: m.score, score90: m.score90, shootout: m.shootout,
+    });
+  };
+  for (const m of D.matches) add(m, false);
+  for (const m of D.europe) add(m, true);
+  if (!D.teamLeague.has(k) && inNationalLeague(D, k)) {
+    for (const r of D.fd.nl.rows) {
+      if (r.FTHG == null || (r.hk !== k && r.ak !== k)) continue;
+      const home = r.hk === k;
+      const score = { home: r.FTHG, away: r.FTAG };
+      out.push({
+        kickoff: `${r.date}T15:00Z`, comp: 'nl', europe: false, home, opponent: home ? r.AwayTeam : r.HomeTeam,
+        completed: true, status: 'STATUS_FULL_TIME', score, score90: score, shootout: null,
+      });
+    }
+  }
+  out.sort((a, b) => a.kickoff.localeCompare(b.kickoff));
+  D.calendars.set(k, out);
+  return out;
+}
+
+const SCHEDULE_DAYS = 14;
+const INACTIVE = new Set(['STATUS_POSTPONED', 'STATUS_CANCELED', 'STATUS_ABANDONED']);
+const dateDays = (a, b) => Math.round((Date.parse(b.slice(0, 10)) - Date.parse(a.slice(0, 10))) / 86400000);
+
+// Schemat runt en match: förra matchen, nästa match och antalet matcher de
+// senaste 14 dagarna före avspark. För en match längre fram räknas även
+// matcher som är inlagda före den men inte spelade än – laget har spelat dem
+// när det är dags. Uppskjutna och inställda räknas inte. Dagar räknas mellan
+// matchdagarna (torsdag → söndag = 3). Nästa match är okänd för lag i
+// National League – deras ligaprogram finns inte i källorna.
+function schedule(D, cal, before, leagueId) {
+  const brief = (x, days) => (x ? { date: x.kickoff.slice(0, 10), comp: competition(x.comp).short, compName: competition(x.comp).name, home: x.home, opponent: x.opponent, days, played: x.completed } : null);
+  const past = cal.filter((x) => x.kickoff < before && (x.completed || !INACTIVE.has(x.status)));
+  const last = past.length ? past[past.length - 1] : null;
+  const next = leagueId === 'nl' ? null : cal.find((x) => x.kickoff > before && !INACTIVE.has(x.status)) || null;
+  const from = Date.parse(before) - SCHEDULE_DAYS * 86400000;
+  const recent = past.filter((x) => Date.parse(x.kickoff) >= from);
+  const fetched = [...Object.values(D.fixturesFetchedAt), ...Object.values(D.europeFetchedAt)].filter(Boolean).sort();
+  return {
+    last: brief(last, last ? dateDays(last.kickoff, before) : null),
+    next: brief(next, next ? dateDays(before, next.kickoff) : null),
+    nextUnknown: leagueId === 'nl',
+    recent: recent.length,
+    recentEurope: recent.filter((x) => x.europe).length,
+    windowDays: SCHEDULE_DAYS,
+    source: { provider: 'ESPN, alla tävlingar inklusive Europacuperna', fetchedAt: fetched[0] || null },
+  };
+}
+
 function inNationalLeague(D, k) {
   return D.fd.nl.rows.some((r) => r.hk === k || r.ak === k);
+}
+
+function goalsMinusXg(rs) {
+  if (!rs.length) return null;
+  const sum = (fn) => rs.reduce((t, r) => t + fn(r), 0);
+  return { n: rs.length, for: sum((r) => r.gf - r.xf), against: sum((r) => r.ga - r.xa) };
 }
 
 function record(rs) {
@@ -441,6 +650,21 @@ function sideBySide(h, a) {
     });
   }
 
+  if (h.schedule || a.schedule) {
+    const sc = (p) => p.schedule;
+    const tag = (x) => (x ? `${x.days} (${x.comp})` : null);
+    groups.push({
+      title: 'Schemat',
+      sources: [h.schedule && h.schedule.source, a.schedule && a.schedule.source],
+      note: 'Dagar räknas mellan matchdagarna. Inom parentes: tävlingen för förra respektive nästa match.',
+      rows: [
+        { label: 'Dagar sedan förra matchen', values: both((p) => (sc(p) ? tag(sc(p).last) : null)) },
+        { label: `Matcher senaste ${(h.schedule || a.schedule).windowDays} dagarna`, values: both((p) => (sc(p) ? `${sc(p).recent}${sc(p).recentEurope ? ` (${sc(p).recentEurope} i Europa)` : ''}` : null)) },
+        { label: 'Dagar till nästa match', values: both((p) => (sc(p) && sc(p).next ? tag(sc(p).next) : sc(p) && !sc(p).nextUnknown ? 'ingen inlagd' : null)) },
+      ],
+    });
+  }
+
   groups.push({
     title: 'Ligan hittills',
     sources: [src(h, 'record'), src(a, 'record')],
@@ -455,17 +679,37 @@ function sideBySide(h, a) {
     ],
   });
 
+  const gp = (p, key) => (p.goalProfile && p.goalProfile.n ? `${p.goalProfile[key]} av ${p.goalProfile.n}` : null);
+  groups.push({
+    title: 'Målprofil i ligan',
+    sources: [src(h, 'record'), src(a, 'record')],
+    through: [h.record && h.record.through, a.record && a.record.through],
+    rows: [
+      { label: 'Över 2,5 mål', values: both((p) => gp(p, 'over25')) },
+      { label: 'Båda lagen gör mål', values: both((p) => gp(p, 'btts')) },
+      { label: 'Hållit nollan', values: both((p) => gp(p, 'cleanSheets')) },
+      { label: 'Inte gjort mål', values: both((p) => gp(p, 'blanks')) },
+    ],
+  });
+
+  // Mål mot xG: Understat för PL (etablerad leverantör), annars
+  // football-data.co.uk.
+  const xgd = (p) => (p.understat && p.understat.xgDiff) || (p.stats && p.stats.xgDiff) || null;
   groups.push({
     title: 'Skott och xG per match',
     sources: [src(h, 'stats'), src(a, 'stats')],
     through: [h.stats && h.stats.through, a.stats && a.stats.through],
-    note: 'Gjorda–insläppta. xG från football-data.co.uk: leverantören är odokumenterad, finns bara 2026/27.',
+    note: 'Gjorda–insläppta. xG från football-data.co.uk: leverantören är odokumenterad, finns bara 2026/27. '
+      + 'Mål mot xG: mål minus xG i år, summerat – plus betyder fler mål än chanserna brukar ge, och sådant brukar jämna ut sig. '
+      + 'Premier League räknas mot Understat, övriga mot football-data.co.uk.',
     rows: [
       { label: 'Skott', values: both((p) => pair(p.stats, 'shotsFor', 'shotsAgainst', 1)) },
       { label: 'Skott på mål', values: both((p) => pair(p.stats, 'sotFor', 'sotAgainst', 1)) },
       { label: 'xG (football-data)', values: both((p) => (p.stats && p.stats.xgN ? pair(p.stats, 'xgFor', 'xgAgainst', 2) : null)) },
       ...(h.understat || a.understat
         ? [{ label: 'xG (Understat)', values: both((p) => pair(p.understat, 'xgFor', 'xgAgainst', 2)) }] : []),
+      { label: 'Gjorda mål mot xG', values: both((p) => (xgd(p) ? signedDec(xgd(p).for, 1) : null)) },
+      { label: 'Insläppta mål mot xG', values: both((p) => (xgd(p) ? signedDec(xgd(p).against, 1) : null)) },
     ],
   });
 
@@ -483,6 +727,13 @@ function vof(r) {
 
 function dec(x, d) {
   return x.toLocaleString('sv-SE', { minimumFractionDigits: d, maximumFractionDigits: d });
+}
+
+// +1,4 / −0,3 / ±0,0 (minustecken, inte bindestreck)
+function signedDec(x, d) {
+  const r = Number(x.toFixed(d));
+  if (r === 0) return `±${dec(0, d)}`;
+  return r > 0 ? `+${dec(r, d)}` : `−${dec(-r, d)}`;
 }
 
 function signed(x) {

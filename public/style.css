@@ -411,6 +411,10 @@ table.side tr.group .sub { display: inline; text-transform: none; letter-spacing
 .form-row { display: flex; justify-content: space-between; align-items: center; gap: 0.8rem; margin: 0.3rem 0; }
 .form-row .t { font-weight: 600; font-size: 0.84rem; }
 
+/* Domaren i matchvyn */
+.ref-name { margin: 0 0 0.5rem; }
+.ref-flag { color: var(--stale); font-size: 0.7rem; }
+
 ul.plain { list-style: none; padding: 0; margin: 0; }
 ul.plain li { padding: 0.3rem 0; border-bottom: 1px solid var(--hair); }
 ul.plain li:last-child { border-bottom: none; }

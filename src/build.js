@@ -13,6 +13,8 @@
 //   data/evaluation.json   journalen och utvärderingen mot facit (fliken
 //                          Utvärdering)
 //   data/divisions.json    statistik per division (sidan Divisioner)
+//   data/season.json       säsongsprognosen, modellens styrka för alla lag
+//                          och programmet framåt (Divisioner → Prognos)
 //   data/journal/*.jsonl   prognosjournalen som den ligger i repot
 //
 // Matchanalysen (fas 5) görs inte i bygget utan på begäran i matchvyn, via en
@@ -99,6 +101,9 @@ function writeSite(outDir = OUT, { journal = false, analysisEndpoint } = {}) {
     console.error('[build] backtestet:', err);
   }
   write('model.json', { rulesVersion: rules.version, model: forecast.model, error: forecast.error, backtest, ms: forecast.ms });
+  // Säsongsprognosen räknas i prognosmotorn (src/season.js) ur samma
+  // skattningar. Saknas den visar sidan okänt med orsaken.
+  write('season.json', forecast.season || { error: forecast.error || 'prognosmotorn gav ingen säsongsprognos' });
 
   // Divisionsstatistiken (sidan Divisioner) är beskrivande och styr inte
   // prognoserna. Fallerar den saknas bara sidans siffror.

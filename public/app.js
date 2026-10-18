@@ -264,8 +264,9 @@ function renderDetail(d) {
   html += '<h3 class="underlag">Underlag <span class="hint">visas, men styr inte prognosen</span></h3>';
   html += '<div class="grid2">' + oddsCard(d.odds, m) + formCard(d) + '</div>';
   html += sideCard(d);
+  html += '<div class="grid2">' + refereeCard(d) + squadCard(d) + '</div>';
   html += squadsSection(d);
-  html += '<div class="grid2">' + squadCard(d) + unknownCard(d) + '</div>';
+  html += '<div class="grid2">' + unknownCard(d) + '</div>';
   html += '<p class="legend">Prognosen bygger på mål efter 90 minuter och tabelläget i år (poäng per match). Spannet under varje sannolikhet visar osäkerheten i lagens styrka ' +
     '(omskattning med slumpvikter). "Drar mot" visar hur många procentenheter varje steg lägger på ett lags segerchans. ' +
     'Underlaget styr inte prognosen förrän det klarat kandidatjakten. ' +
@@ -506,7 +507,7 @@ function formCard(d) {
     html += '<h4 style="margin-top:0.9rem">Möten i år</h4><ul class="plain">' +
       d.meetings.map((x) => `<li>${dateOnly(x.kickoff)} · ${esc(x.compShort)} · ${esc(x.home)} ${x.score.home}–${x.score.away} ${esc(x.away)}</li>`).join('') + '</ul>';
   }
-  html += '<p class="src-line">ESPN, alla tävlingar. Avgjort på 90 minuter – straffavgjorda cupmatcher räknas som oavgjorda.</p>';
+  html += '<p class="src-line">ESPN, alla tävlingar inklusive Europacuperna. Avgjort på 90 minuter – straffavgjorda cupmatcher räknas som oavgjorda.</p>';
   const pm = d.pastMeetings;
   if (pm) {
     html += `<h4 style="margin-top:0.9rem">Tidigare säsonger <span class="hint">senaste ${pm.list.length || ''}</span></h4>` +
@@ -563,6 +564,35 @@ function squadCard(d) {
   return `<div class="card"><h4>Skador och avstängningar</h4>` +
     block(d.match.home, d.squad.home) + block(d.match.away, d.squad.away) +
     (src ? `<p class="src-line">${esc(src.source.provider)}, hämtat ${when(src.source.fetchedAt)}.${src.note ? ' ' + esc(src.note) : ''} Sorterat efter speltid.</p>` : '') + '</div>';
+}
+
+// Domaren (football-data.co.uk): hans eller hennes ligamatcher före
+// matchdagen mot divisionens snitt under samma period.
+function refereeCard(d) {
+  const r = d.referee;
+  if (!r) return '';
+  if (r.unknown) return `<div class="card"><h4>Domaren</h4><p class="unknown" style="margin:0">okänt – ${esc(r.reason)}</p></div>`;
+  const s = r.stats;
+  const a = r.avg;
+  const divs = r.divisions.map((x) => `${esc(x.short)} ${x.n}`).join(', ');
+  let html = `<div class="card"><h4>Domaren</h4><p class="ref-name"><strong>${esc(r.name)}</strong>` +
+    (s.n ? ` · ${s.n} ligamatcher sedan ${monthYear(r.since)}${divs ? ` <span class="muted">(${divs})</span>` : ''}` : ' · inga ligamatcher i underlaget') + '</p>';
+  if (s.n) {
+    const flag = (f) => (f === 'more' ? ' <span class="ref-flag" title="Mer än två standardfel över snittet">▲</span>'
+      : f === 'less' ? ' <span class="ref-flag" title="Mer än två standardfel under snittet">▼</span>' : '');
+    const rows = [
+      ['Gula kort per match', dec(s.yellow, 1) + flag(r.flags.yellow), a && dec(a.yellow, 1)],
+      ['Röda kort per match', dec(s.red, 2), a && dec(a.red, 2)],
+      ['Frisparkar per match', s.fouls == null ? '–' : dec(s.fouls, 1), a && a.fouls != null ? dec(a.fouls, 1) : null],
+      ['Hemmaseger', `${pct(s.home)} %` + flag(r.flags.home), a && `${pct(a.home)} %`],
+    ];
+    html += `<table class="odds"><thead><tr><th></th><th class="num">Domaren</th><th class="num">Snitt ${esc(a ? d.match.compShort : '')}</th></tr></thead><tbody>` +
+      rows.map(([k, v, w]) => `<tr><td>${k}</td><td class="num"><b>${v}</b></td><td class="num muted">${w == null ? '–' : w}</td></tr>`).join('') + '</tbody></table>';
+    if (s.n < r.min) html += `<p class="note">Färre än ${r.min} matcher – för lite för att säga något om domaren.</p>`;
+  }
+  html += `<p class="src-line">${esc(r.source.provider)}, hämtat ${when(r.source.fetchedAt)}. Ligamatcher nivå 1–5 de senaste ${r.seasons} avslutade säsongerna och i år, före matchdagen. ` +
+    'Båda lagens kort tillsammans. ▲▼ = mer än två standardfel från snittet; annars är skillnaden inom slumpen. Domaren styr inte prognosen.</p></div>';
+  return html;
 }
 
 function unknownCard(d) {

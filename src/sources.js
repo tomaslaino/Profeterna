@@ -5,7 +5,7 @@
 // (staleAfterHours). Metadatan (leverantör, vad den ger, verifieringsdatum)
 // visas i källtabellen – samma uppgifter som README:ns källtabell.
 
-const { COMPETITIONS, NATIONAL_LEAGUE, SEASON, HISTORY, fdSeasonCode } = require('../config/competitions');
+const { COMPETITIONS, NATIONAL_LEAGUE, EUROPE, SEASON, HISTORY, fdSeasonCode } = require('../config/competitions');
 const espn = require('./fetchers/espn');
 const fdcouk = require('./fetchers/fdcouk');
 const understat = require('./fetchers/understat');
@@ -36,6 +36,40 @@ for (const c of COMPETITIONS) {
       return {
         n: d.matches.length,
         detail: d.matches.length ? `${played.length} spelade av ${d.matches.length}` : 'inga matcher publicerade än',
+        latestData: played.length ? played[played.length - 1].kickoff.slice(0, 10) : null,
+      };
+    },
+  });
+}
+
+// Europacuperna (ESPN): bara underlag om de engelska lagens schema – vila,
+// matcher i veckan och formen. Ingen prognos görs för matcherna, och de ingår
+// inte i prognosmotorns underlag. Kvalomgångarna hämtas för juli–augusti.
+for (const c of EUROPE) {
+  SOURCES.push({
+    id: `espn_europe_${c.id}`,
+    provider: 'ESPN',
+    short: 'ESPN',
+    label: `Spelprogram och resultat – ${c.name} (för vila och form)`,
+    // Engelska lag i Europa spelar i PL och i cuperna.
+    comps: ['pl', 'fac', 'lc'],
+    kinds: ['europe'],
+    maxAgeHours: 3,
+    staleAfterHours: 24,
+    verified: '2026-10-18',
+    fetch: async () => {
+      const [main, qual] = await Promise.all([
+        espn.fetchFixtures(c.espn, SEASON),
+        espn.fetchFixtures(c.qual, { ...SEASON, lastMonth: SEASON.firstMonth.replace(/-\d\d$/, '-08') }),
+      ]);
+      const matches = [...qual.matches, ...main.matches].sort((a, b) => a.kickoff.localeCompare(b.kickoff));
+      return { matches, sourceUrl: main.sourceUrl };
+    },
+    summarize: (d) => {
+      const played = d.matches.filter((m) => m.completed);
+      return {
+        n: d.matches.length,
+        detail: d.matches.length ? `${played.length} spelade av ${d.matches.length}, alla lag` : 'inga matcher publicerade än',
         latestData: played.length ? played[played.length - 1].kickoff.slice(0, 10) : null,
       };
     },
