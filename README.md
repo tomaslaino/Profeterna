@@ -771,7 +771,7 @@ kuponger, andel rätt, snittbetyg och antal rätt mot det väntade, och en stape
 (andel rätt, strecket = väntat). Sorteras efter *Senaste*, *Betyg*, *Andel rätt* eller
 *Mot modellen* (rätt jämfört med modellens tips); ett tryck till vänder ordningen.
 
-**Betyget** (1–5 stjärnor: Haveri, Svagt, Godkänt, Starkt, Profetiskt) räknas fram, inte
+**Betyget** (1–5 stjärnor: Mycket svagt, Svagt, Som väntat, Bra, Utmärkt) räknas fram, inte
 sätts för hand. Väntat antal rätt = summan av modellens chans för gängets tecken före
 avspark (journalen om den finns, annars sajtens prognos). Saknas modellen för en match –
 t.ex. på en kupong lagd någon annanstans – används en schablon: 45 % för ett tecken, 75 %
@@ -782,7 +782,7 @@ kupong. Grunden står i [src/history.js](src/history.js).
 
 **AI-kommentaren** skrivs av samma språkmodell och proxy som matchanalysen
 (`POST …/kommentar {"id"}`, [worker/kommentar.mjs](worker/kommentar.mjs)): 2–4 meningar
-med glimten i ögat, som väver in anteckningarna ("Teijder drev X2"). Proxyn tar bara ett
+i saklig ton, utan skämt, som tar upp anteckningarna ("Teijder drev X2"). Proxyn tar bara ett
 kupong-id och läser kupongen ur den publicerade `data/historik.json`. Samma regler som
 analysen: inga egna fakta om lag och matcher, inga påhittade målförlopp, och varje tal ska
 finnas i underlaget (annars skrivs texten om, därefter visas ingen). Texten cachas utan
