@@ -531,3 +531,37 @@ dl.facts dd { margin: 0; }
 }
 
 footer { color: var(--muted); font-size: 0.78rem; padding-bottom: 2rem; }
+
+/* ---------- matchvyn: trupperna ---------- */
+
+.mv-squad h4 { margin-bottom: 0.3rem; }
+.mv-facts { margin: 0 0 0.8rem; color: var(--ink-soft, var(--muted)); font-size: 0.84rem; line-height: 1.5; }
+.mv-keys { display: grid; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); gap: 0.6rem 1rem; }
+.mv-key h5 {
+  margin: 0 0 0.3rem;
+  font-size: 0.66rem;
+  font-weight: 800;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: var(--eyebrow, var(--muted));
+}
+.mv-key ol { list-style: none; margin: 0; padding: 0; }
+.mv-key li { display: flex; justify-content: space-between; gap: 0.5rem; padding: 0.22rem 0; border-bottom: 1px solid var(--hair); font-size: 0.84rem; }
+.mv-key li:last-child { border-bottom: none; }
+.mv-key .n { min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.mv-key .v { font-variant-numeric: tabular-nums; white-space: nowrap; }
+.mv-key p { margin: 0; font-size: 0.8rem; }
+.mv-yc, .mv-rc { display: inline-block; width: 7px; height: 10px; border-radius: 2px; margin: 0 2px 0 1px; vertical-align: -1px; background: #f1c40f; }
+.mv-rc { background: #e8394a; }
+details.mv-full { margin-top: 0.8rem; font-size: 0.84rem; }
+details.mv-full .table-wrap { margin: 0.5rem 0 0; max-height: 24rem; overflow-y: auto; }
+table.mv-table td, table.mv-table th { padding: 0.3rem 0.5rem; }
+table.mv-table tr.group td {
+  font-size: 0.64rem;
+  font-weight: 800;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: var(--eyebrow, var(--muted));
+  background: var(--hair);
+}
+table.mv-table tr.idle td { color: var(--muted); }

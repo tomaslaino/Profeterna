@@ -19,6 +19,7 @@ const KINDS = [
   { id: 'xg', label: 'xG' },
   { id: 'odds', label: 'Odds' },
   { id: 'squad', label: 'Skador och avstängningar' },
+  { id: 'players', label: 'Spelare' },
   { id: 'history', label: 'Tidigare säsonger' },
 ];
 
@@ -28,6 +29,7 @@ const GAPS = {
   stats: { cup: 'ligadata används' },
   xg: { cup: 'ligadata används' },
   squad: { default: 'ingen fri källa' },
+  players: { cup: 'ligadata används' },
   history: { cup: 'hämtas inte' },
 };
 

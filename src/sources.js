@@ -235,4 +235,7 @@ function upcomingEvents(days) {
   return any ? out : null;
 }
 
+// Trupper och spelarstatistik per liga (src/playersources.js).
+SOURCES.push(...require('./playersources').PLAYER_SOURCES);
+
 module.exports = { SOURCES, VERIFIED, ODDS_WINDOW_DAYS };

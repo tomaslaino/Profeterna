@@ -34,6 +34,7 @@ const { readSummaries } = require('./backtest');
 const { readLog } = require('./candidates');
 const { readJournal, appendJournal, HORIZON_DAYS } = require('./journal');
 const { evaluate } = require('./evaluate');
+const { playerFiles, teamSquad } = require('./players');
 const { wholePercent } = require('./model');
 const rules = require('../config/forecast-rules');
 const llm = require('../config/llm');
@@ -97,6 +98,15 @@ function writeSite(outDir = OUT, { journal = false, analysisEndpoint } = {}) {
   }
   write('model.json', { rulesVersion: rules.version, model: forecast.model, error: forecast.error, backtest, ms: forecast.ms });
 
+  // Spelare per division (sidan Divisioner). Beskrivande och styr inte
+  // prognoserna; fallerar det saknas bara sidans spelare.
+  fs.mkdirSync(path.join(dataDir, 'players'), { recursive: true });
+  try {
+    for (const f of playerFiles()) write(f.path, f.data);
+  } catch (err) {
+    console.error('[build] spelarna:', err);
+  }
+
   const list = allMatches();
 
   // Prognosjournalen: loggar kommande matcher vars prognos är ny (bara med
@@ -139,6 +149,8 @@ function writeSite(outDir = OUT, { journal = false, analysisEndpoint } = {}) {
       const d = matchDetail(id);
       d.prediction = forecast.predictions.get(id) || null;
       d.journal = ev.perMatch.get(id) || null;
+      // Trupperna (ESPN) visas i matchvyn men ingår inte i analysens underlag.
+      d.squads = squads(d.match);
       // Bygget som underlaget kommer ur – matchanalysen jämför mot det.
       d.builtAt = generatedAt;
       write(`match/${id}.json`, d);
@@ -153,6 +165,15 @@ function writeSite(outDir = OUT, { journal = false, analysisEndpoint } = {}) {
   fs.rmSync(outDir, { recursive: true, force: true });
   fs.renameSync(tmp, outDir);
   return { generatedAt, pages, failed, counts: sources.counts, forecastMs: forecast.ms, logged: logged.length };
+}
+
+function squads(m) {
+  try {
+    return { home: teamSquad(m.home), away: teamSquad(m.away) };
+  } catch (err) {
+    console.error(`[build] trupperna ${m.id}: ${err.message || err}`);
+    return null;
+  }
 }
 
 function analysisInfo(override) {

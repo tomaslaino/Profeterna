@@ -264,6 +264,7 @@ function renderDetail(d) {
   html += '<h3 class="underlag">Underlag <span class="hint">visas, men styr inte prognosen</span></h3>';
   html += '<div class="grid2">' + oddsCard(d.odds, m) + formCard(d) + '</div>';
   html += sideCard(d);
+  html += squadsSection(d);
   html += '<div class="grid2">' + squadCard(d) + unknownCard(d) + '</div>';
   html += '<p class="legend">Prognosen bygger på mål efter 90 minuter och tabelläget i år (poäng per match). Spannet under varje sannolikhet visar osäkerheten i lagens styrka ' +
     '(omskattning med slumpvikter). "Drar mot" visar hur många procentenheter varje steg lägger på ett lags segerchans. ' +
@@ -567,6 +568,57 @@ function squadCard(d) {
 function unknownCard(d) {
   return `<div class="card"><h4>Okänt för den här matchen</h4><ul class="bullets">` +
     d.unknowns.map((u) => `<li>${esc(u)}</li>`).join('') + '</ul></div>';
+}
+
+// ---------- trupperna (ESPN, ligamatcher i år) ----------
+
+const POS_NAME = { MV: 'Målvakter', B: 'Backar', MF: 'Mittfältare', A: 'Anfallare' };
+const COMP_PAGE = { pl: 'pl', ch: 'ch', l1: 'l1', l2: 'l2' };
+
+function squadsSection(d) {
+  const s = d.squads;
+  if (!s) return '';
+  return '<h3 class="underlag">Trupperna</h3>' +
+    `<div class="grid2">${teamSquadCard(d.match.home, s.home)}${teamSquadCard(d.match.away, s.away)}</div>`;
+}
+
+function keyList(title, list, value, empty) {
+  return `<div class="mv-key"><h5>${esc(title)}</h5>` + (list.length
+    ? `<ol>${list.map((p) => `<li><span class="n">${esc(p.name)}</span><span class="v">${value(p)}</span></li>`).join('')}</ol>`
+    : `<p class="muted">${esc(empty)}</p>`) + '</div>';
+}
+
+function teamSquadCard(name, s) {
+  if (!s || s.unknown) {
+    return `<div class="card mv-squad"><h4>${esc(name)}</h4><p class="unknown">okänt – ${esc(s ? s.reason : 'ingen spelardata')}</p></div>`;
+  }
+  const t = s.summary;
+  const facts = [
+    t.avgAge != null ? `snittålder <b>${dec(t.avgAge)}</b> år` : null,
+    `<b>${t.used}</b> spelare har spelat`,
+    t.topScorer && t.topScorer.g ? `${esc(t.topScorer.name)} <b>${pct(t.topScorerShare)} %</b> av målen` : null,
+  ].filter(Boolean).join(' · ');
+  const yc = (p) => `<i class="mv-yc"></i>${p.yc}${p.rc ? ` <i class="mv-rc"></i>${p.rc}` : ''}`;
+  const byPos = {};
+  for (const p of s.players) (byPos[p.pos || '?'] = byPos[p.pos || '?'] || []).push(p);
+  const v = (x, strong) => (x == null ? '<span class="muted">–</span>' : x === 0 ? '<span class="muted">0</span>' : strong ? `<b>${x}</b>` : x);
+  const rows = ['MV', 'B', 'MF', 'A', '?'].filter((k) => byPos[k]).map((k) =>
+    `<tr class="group"><td colspan="6">${esc(POS_NAME[k] || 'Okänd position')}</td></tr>` +
+    byPos[k].map((p) => `<tr${p.app ? '' : ' class="idle"'}><td>${p.jersey ? `<span class="muted">${esc(p.jersey)}</span> ` : ''}${esc(p.name)}</td>` +
+      `<td class="num">${v(p.app)}</td><td class="num">${v(p.g, true)}</td><td class="num">${v(p.a)}</td><td class="num">${v(p.yc)}</td><td class="num">${v(p.rc)}</td></tr>`).join('')).join('');
+  const cov = t.coverage;
+  const page = COMP_PAGE[s.comp];
+  return `<div class="card mv-squad"><h4>${esc(name)}</h4><p class="mv-facts">${facts}</p>` +
+    '<div class="mv-keys">' +
+    keyList('Målskyttar', s.key.scorers.filter((p) => p.g > 0), (p) => `<b>${p.g}</b>`, 'inga mål än') +
+    keyList('Assist', s.key.creators.filter((p) => p.a > 0), (p) => `<b>${p.a}</b>`, 'inga assist än') +
+    keyList('Flest gula kort', s.key.cards, yc, 'ingen med 3 eller fler') +
+    '</div>' +
+    `<details class="mv-full"><summary>Hela truppen (${s.players.length})</summary><div class="table-wrap"><table class="odds mv-table">` +
+    '<thead><tr><th>Spelare</th><th class="num" title="Matcher">M</th><th class="num">Mål</th><th class="num" title="Assist">Ass</th><th class="num" title="Gula kort">Gul</th><th class="num" title="Röda kort">Röd</th></tr></thead>' +
+    `<tbody>${rows}</tbody></table></div></details>` +
+    `<p class="src-line">ESPN · ligamatcher i år · hämtat ${when(s.source.fetchedAt)}${cov.behind ? ` · ${cov.covered} av ${cov.matches} matcher införda` : ''}` +
+    `${page ? ` · <a href="divisioner.html#${page}/spelare">Alla spelare</a>` : ''}</p></div>`;
 }
 
 // ---------- matchanalys (fas 5, valfri) ----------
