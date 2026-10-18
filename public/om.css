@@ -1,0 +1,100 @@
+/* Om oss: lagbilden och de tre som tippar. Bygger bara på tokens från
+   theme.css, så sidan följer med om temat byts. */
+
+.about {
+  display: grid;
+  gap: 28px;
+  padding-top: clamp(16px, 3vw, 40px);
+}
+.about-intro .page-title { margin-top: 0; }
+.about-lede {
+  margin: 0 0 10px;
+  max-width: 28ch;
+  font-family: var(--display);
+  font-weight: 600;
+  font-size: clamp(24px, 3vw, 34px);
+  line-height: 1.15;
+  color: var(--bone);
+}
+.about-text { margin: 0; max-width: 46ch; color: var(--ink-soft, var(--muted)); }
+
+/* lagbilden som ett polaroidfoto, lite snett */
+.about-photo {
+  justify-self: center;
+  width: min(100%, 340px);
+  margin: 0;
+  padding: 10px 10px 34px;
+  background: #f1e9db;
+  border-radius: 3px;
+  box-shadow: 0 34px 60px -26px rgba(0, 0, 0, 0.95), 0 2px 6px rgba(0, 0, 0, 0.4);
+  transform: rotate(2deg);
+}
+.about-photo img { display: block; width: 100%; height: auto; }
+
+.about-crew {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 12px;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+.about-member {
+  --tint: var(--accent);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 12px;
+  padding: 20px 4px 18px;
+  text-align: center;
+  background: var(--glass);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  box-shadow: var(--shadow-card);
+}
+.about-face {
+  position: relative;
+  display: grid;
+  place-items: center;
+  width: clamp(64px, 9vw, 96px);
+  aspect-ratio: 1;
+  overflow: hidden;
+  border-radius: 50%;
+  font-family: var(--display);
+  font-weight: 700;
+  font-size: 22px;
+  color: var(--bone);
+  background: color-mix(in srgb, var(--tint) 35%, var(--card));
+  box-shadow: 0 0 0 2px var(--bg), 0 0 0 4px color-mix(in srgb, var(--tint) 80%, transparent), 0 14px 28px -14px rgba(0, 0, 0, 0.9);
+}
+/* bilden täcker initialerna, som syns om den inte laddar */
+.about-face img { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; }
+.about-name { display: flex; flex-direction: column; line-height: 1.1; }
+.about-name small {
+  font-size: 10.5px;
+  font-weight: 700;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+  color: var(--muted);
+}
+.about-name b {
+  font-family: var(--display);
+  font-weight: 700;
+  /* krymper på smala skärmar så att Johansson får plats på en rad */
+  font-size: clamp(14px, 4vw, 22px);
+  color: var(--fg);
+}
+
+/* breda skärmar: text och porträtt till vänster, fotot till höger */
+@media (min-width: 900px) {
+  .about {
+    grid-template-columns: minmax(0, 1fr) auto;
+    grid-template-areas: "intro photo" "crew photo";
+    column-gap: clamp(40px, 6vw, 88px);
+    row-gap: 36px;
+    align-items: start;
+  }
+  .about-intro { grid-area: intro; }
+  .about-crew { grid-area: crew; }
+  .about-photo { grid-area: photo; align-self: center; width: clamp(260px, 28vw, 340px); }
+}
