@@ -23,9 +23,9 @@
 // ============================================================================
 
 module.exports = {
-  enabled: false,
-  // Proxyns adress, t.ex. 'https://profeterna-analys.<konto>.workers.dev/analyze'.
-  endpoint: null,
+  enabled: true,
+  // Proxyns adress (påslagen 2026-10-18, Cloudflare-kontot fritid-moln).
+  endpoint: 'https://profeterna-analys.fritid-moln.workers.dev/analyze',
 
   // Sajten som proxyn hämtar underlaget från: <site>/data/match/<id>.json.
   site: 'https://tomaslaino.github.io/Profeterna',
