@@ -12,6 +12,7 @@
 //                          kandidatloggen (fliken Modell)
 //   data/evaluation.json   journalen och utvärderingen mot facit (fliken
 //                          Utvärdering)
+//   data/divisions.json    statistik per division (sidan Divisioner)
 //   data/journal/*.jsonl   prognosjournalen som den ligger i repot
 //
 // Matchanalysen (fas 5) görs inte i bygget utan på begäran i matchvyn, via en
@@ -34,6 +35,7 @@ const { readSummaries } = require('./backtest');
 const { readLog } = require('./candidates');
 const { readJournal, appendJournal, HORIZON_DAYS } = require('./journal');
 const { evaluate } = require('./evaluate');
+const { divisionStats } = require('./divisions');
 const { playerFiles, teamSquad } = require('./players');
 const { wholePercent } = require('./model');
 const rules = require('../config/forecast-rules');
@@ -97,6 +99,17 @@ function writeSite(outDir = OUT, { journal = false, analysisEndpoint } = {}) {
     console.error('[build] backtestet:', err);
   }
   write('model.json', { rulesVersion: rules.version, model: forecast.model, error: forecast.error, backtest, ms: forecast.ms });
+
+  // Divisionsstatistiken (sidan Divisioner) är beskrivande och styr inte
+  // prognoserna. Fallerar den saknas bara sidans siffror.
+  let divisions;
+  try {
+    divisions = divisionStats();
+  } catch (err) {
+    console.error('[build] divisionerna:', err);
+    divisions = { error: String(err.message || err) };
+  }
+  write('divisions.json', divisions);
 
   // Spelare per division (sidan Divisioner). Beskrivande och styr inte
   // prognoserna; fallerar det saknas bara sidans spelare.

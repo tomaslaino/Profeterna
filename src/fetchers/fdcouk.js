@@ -40,6 +40,16 @@ const KEEP_HISTORY = [
   'AvgCH', 'AvgCD', 'AvgCA', 'BFECH', 'BFECD', 'BFECA', 'PSCH', 'PSCD', 'PSCA', 'AvgC>2.5', 'AvgC<2.5',
 ];
 
+// Divisionsstatistiken (sidan Divisioner): halvtid, hörnor, frisparkar, kort,
+// domare, avsparkstid (från 2019/20) och publik (bara de första säsongerna)
+// plus marknadssnittets odds. Egen källa, så att prognosmotorns historik
+// (och backtestets signatur på den) inte ändras.
+const KEEP_STATS = [
+  'Date', 'Time', 'HomeTeam', 'AwayTeam', 'FTHG', 'FTAG', 'HTHG', 'HTAG', 'Referee', 'Attendance',
+  'HS', 'AS', 'HST', 'AST', 'HC', 'AC', 'HF', 'AF', 'HY', 'AY', 'HR', 'AR',
+  'AvgH', 'AvgD', 'AvgA', 'BbAvH', 'BbAvD', 'BbAvA', 'Avg>2.5', 'Avg<2.5', 'BbAv>2.5', 'BbAv<2.5',
+];
+
 async function fetchDivision(code, seasonCode) {
   const url = `${BASE}/mmz4281/${seasonCode}/${code}.csv`;
   const rows = parseCsv(await getCsv(url)).map((r) => pick(r));
@@ -55,11 +65,11 @@ async function fetchDivision(code, seasonCode) {
 // Alla avslutade säsonger för en division, en fil per säsong. Fallerar en
 // säsong fallerar hela hämtningen – cachen behåller då senaste kompletta
 // historik med sitt datum.
-async function fetchHistory(code, seasonCodes) {
+async function fetchHistory(code, seasonCodes, keep = KEEP_HISTORY) {
   const seasons = {};
   await mapLimit(seasonCodes, 3, async (sc) => {
     const rows = parseCsv(await getCsv(`${BASE}/mmz4281/${sc}/${code}.csv`))
-      .map((r) => pick(r, KEEP_HISTORY))
+      .map((r) => pick(r, keep))
       .filter((r) => r.date && r.FTHG != null && r.FTAG != null);
     if (rows.length === 0) throw new Error(`${code} ${sc}: tom fil`);
     seasons[sc] = rows;
@@ -122,4 +132,4 @@ function parseCsv(text) {
   }).filter((o) => o.HomeTeam && o.AwayTeam);
 }
 
-module.exports = { fetchDivision, fetchFixtures, fetchHistory };
+module.exports = { fetchDivision, fetchFixtures, fetchHistory, KEEP_STATS };
