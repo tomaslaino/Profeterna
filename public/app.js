@@ -106,14 +106,15 @@ function route() {
     openMatch(m[1]);
     return;
   }
-  // Kupongen (kupong.js): #kupong, #kupong/<id>, #kupong/ny, #kupong/andra/<id>
+  // Förstasidan är kupongen (kupong.js): #kupong, #kupong/<id>, #kupong/ny,
+  // #kupong/andra/<id> – och utan eller med okänd adress.
   const k = /^kupong(?:\/(.+))?$/.exec(h);
-  if (k) {
+  if (k || !TABS[h]) {
     showTab('coupon-section');
-    showCoupon(k[1] || '');
+    showCoupon(k ? k[1] || '' : '');
     return;
   }
-  showTab(TABS[h] || 'matches-section');
+  showTab(TABS[h]);
   $('#match-detail-view').hidden = true;
   $('#match-list-view').hidden = false;
 }
@@ -121,7 +122,7 @@ function route() {
 for (const btn of document.querySelectorAll('[role="tab"]')) {
   btn.addEventListener('click', () => {
     const name = Object.keys(TABS).find((k) => TABS[k] === btn.dataset.tab);
-    location.hash = name;
+    location.hash = name === 'kupong' ? '' : name;
   });
 }
 window.addEventListener('hashchange', route);

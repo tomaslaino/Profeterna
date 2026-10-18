@@ -77,43 +77,26 @@
 .kp-line b { color: var(--fg); }
 .kp-livetxt { color: var(--accent-deep); font-weight: 600; }
 
-/* ---------- förstasidan ---------- */
+/* ---------- förstasidan: ny kupong när den gamla är färdigspelad ---------- */
 
-#coupon-hero { margin: 0 0 26px; }
-.kp-hero {
-  display: grid;
-  grid-template-columns: auto minmax(0, 1fr) auto;
+.kp-next {
+  display: flex;
   align-items: center;
-  gap: clamp(16px, 3vw, 32px);
+  justify-content: center;
+  gap: 10px;
+  margin: 0 0 28px;
   padding: 18px 22px;
-  color: var(--fg);
-  text-decoration: none;
-  background: var(--glass-hi);
-  border: 1px solid var(--border);
-  border-radius: var(--radius);
-  box-shadow: var(--shadow-card);
-  transition: border-color 0.15s ease, transform 0.15s ease;
-}
-.kp-hero:hover { color: var(--fg); border-color: var(--pill-line-hi); transform: translateY(-1px); }
-.kp-hero.is-live { border-color: color-mix(in srgb, var(--accent) 45%, transparent); }
-.kp-hero-num { display: flex; flex-direction: column; gap: 10px; }
-.kp-hero-main { display: flex; flex-direction: column; gap: 12px; min-width: 0; }
-.kp-chev { font-size: 30px; line-height: 1; color: var(--muted); }
-.kp-new {
-  display: inline-flex;
-  align-items: center;
-  gap: 8px;
-  padding: 8px 16px;
-  font-size: 14px;
+  font-size: 16px;
   font-weight: 600;
   text-decoration: none;
   color: var(--accent-deep);
-  border: 1px solid var(--pill-line-hi);
-  border-radius: 999px;
+  border: 1px dashed var(--pill-line-hi);
+  border-radius: var(--radius);
   background: var(--pill);
+  transition: border-color 0.15s ease, color 0.15s ease;
 }
-.kp-new:hover { color: #fff; border-color: var(--accent); }
-.kp-new span { font-size: 18px; line-height: 1; }
+.kp-next:hover { color: #fff; border-color: var(--accent); }
+.kp-next span { font-size: 22px; line-height: 1; }
 
 /* ---------- knappar ---------- */
 
@@ -403,9 +386,6 @@ a.kp-row:hover { color: var(--fg); background: rgba(255, 255, 255, 0.04); }
 /* ---------- mobil ---------- */
 
 @media (max-width: 760px) {
-  .kp-hero { grid-template-columns: minmax(0, 1fr) auto; padding: 16px; }
-  .kp-hero-main { grid-column: 1 / -1; grid-row: 2; }
-  .kp-hero .kp-chev { grid-column: 2; grid-row: 1; }
   .kp-summary { grid-template-columns: 1fr; padding: 18px; }
   .kp-row { grid-template-columns: 22px minmax(0, 1fr) auto 3.2rem; gap: 10px; padding: 12px 14px; }
   .kp-row .mtime, .kp-row .ctag, .kp-row .kp-p { display: none; }

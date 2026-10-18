@@ -205,7 +205,7 @@ main { padding-top: 8px; padding-bottom: 48px; }
 .tabs [role="tab"]:focus-visible,
 .tabs a.tab-link:focus-visible { outline-offset: -6px; }
 
-/* ---------- hjälte (matchlistan) ---------- */
+/* ---------- hjälte (förstasidan, ovanför kupongen) ---------- */
 
 .hero {
   position: relative;
@@ -213,6 +213,7 @@ main { padding-top: 8px; padding-bottom: 48px; }
   padding: clamp(40px, 7vw, 88px) 0 clamp(48px, 6vw, 72px);
   isolation: isolate;
 }
+.hero[hidden] { display: none; }
 /* meanderbården som avslutar hjälten */
 .hero::after {
   content: "";

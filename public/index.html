@@ -17,16 +17,16 @@
 <body>
   <header class="topbar">
     <div class="topbar-inner">
-      <a class="brand" href="#matcher" aria-label="Profeterna – till matcherna">
+      <a class="brand" href="#" aria-label="Profeterna – till förstasidan">
         <img class="logo" src="logo.svg" alt="" width="36" height="36">
         <span class="brand-txt"><b id="brand-name">Profeterna</b></span>
       </a>
       <nav class="tabs" aria-label="Sektioner">
         <div class="tablist" role="tablist">
-          <button type="button" role="tab" id="tab-matches" data-tab="matches-section"
-            aria-controls="matches-section" aria-selected="true">Matcher</button>
           <button type="button" role="tab" id="tab-coupon" data-tab="coupon-section"
-            aria-controls="coupon-section" aria-selected="false">Kupong</button>
+            aria-controls="coupon-section" aria-selected="true">Kupong</button>
+          <button type="button" role="tab" id="tab-matches" data-tab="matches-section"
+            aria-controls="matches-section" aria-selected="false">Matcher</button>
           <button type="button" role="tab" id="tab-eval" data-tab="eval-section"
             aria-controls="eval-section" aria-selected="false">Utvärdering</button>
         </div>
@@ -38,29 +38,34 @@
   </header>
 
   <main>
-    <section id="matches-section" role="tabpanel" aria-labelledby="tab-matches">
-      <div id="match-list-view">
-        <div class="hero">
-          <div class="hero-main">
-            <h1 class="hero-title">Profeterna</h1>
-            <div class="hero-lede">
-              <!-- lagbilden står här på mobilen och till höger på breda skärmar -->
-              <figure class="team-photo team-photo-sm">
-                <a href="om-oss.html"><img src="profeterna/lag.jpg" alt="Daniel Johansson, Daniel Laino och Daniel Teijder under en grekisk flagga" width="640" height="800"></a>
-              </figure>
-              <p class="hero-motto">Grekisk bokföring, engelsk fotboll.</p>
-            </div>
-            <div id="topline" class="topline"></div>
-          </div>
-          <!-- stora lagbilden visas bara på breda skärmar -->
-          <div class="hero-aside">
-            <figure class="team-photo team-photo-lg">
-              <a href="om-oss.html"><img src="profeterna/lag.jpg" alt="Daniel Johansson, Daniel Laino och Daniel Teijder under en grekisk flagga"
-                width="640" height="800" loading="lazy"></a>
+    <!-- förstasidan: hjälten och den aktuella (eller senaste) kupongen -->
+    <section id="coupon-section" role="tabpanel" aria-labelledby="tab-coupon">
+      <div id="hero" class="hero">
+        <div class="hero-main">
+          <h1 class="hero-title">Profeterna</h1>
+          <div class="hero-lede">
+            <!-- lagbilden står här på mobilen och till höger på breda skärmar -->
+            <figure class="team-photo team-photo-sm">
+              <a href="om-oss.html"><img src="profeterna/lag.jpg" alt="Daniel Johansson, Daniel Laino och Daniel Teijder under en grekisk flagga" width="640" height="800"></a>
             </figure>
+            <p class="hero-motto">Grekisk bokföring, engelsk fotboll.</p>
           </div>
+          <div id="topline" class="topline"></div>
         </div>
-        <div id="coupon-hero"></div>
+        <!-- stora lagbilden visas bara på breda skärmar -->
+        <div class="hero-aside">
+          <figure class="team-photo team-photo-lg">
+            <a href="om-oss.html"><img src="profeterna/lag.jpg" alt="Daniel Johansson, Daniel Laino och Daniel Teijder under en grekisk flagga"
+              width="640" height="800" loading="lazy"></a>
+          </figure>
+        </div>
+      </div>
+      <div id="coupon"></div>
+    </section>
+
+    <section id="matches-section" role="tabpanel" aria-labelledby="tab-matches" hidden>
+      <div id="match-list-view">
+        <h2 class="page-title">Matcher</h2>
         <div class="toolbar">
           <div class="seg" role="group" aria-label="Visa">
             <button type="button" data-view="upcoming" aria-pressed="true">Kommande</button>
@@ -71,10 +76,6 @@
         <div id="match-list"></div>
       </div>
       <div id="match-detail-view" hidden></div>
-    </section>
-
-    <section id="coupon-section" role="tabpanel" aria-labelledby="tab-coupon" hidden>
-      <div id="coupon"></div>
     </section>
 
     <section id="eval-section" role="tabpanel" aria-labelledby="tab-eval" hidden>

@@ -37,8 +37,8 @@ ingen falsk precision · sidan kraschar aldrig av en död källa · endast fria 
   en säsongsprognos (Prognos), programmet framåt och modellens styrka för alla lag. Inget
   av det styr prognoserna (se [Säsongsprognosen](#säsongsprognosen))
 - [x] **Kupongen:** gängets gemensamma kupong per omgång – utvalda matcher med 1, X, 2 eller
-  gardering. Kort på förstasidan, fliken Kupong med liveställning från ESPN, Ny kupong med
-  sökning. Sparas som fil i `data/kuponger/` med en commit på GitHub (se [Kupongen](#kupongen))
+  gardering. Förstasidan är kupongen, med liveställning från ESPN; Ny kupong med
+  sökning. Matcherna har en egen flik. Sparas som fil i `data/kuponger/` med en commit på GitHub (se [Kupongen](#kupongen))
 - [x] **Kuponghistoriken:** sidan Historik med varje färdigspelad kupong – antal rätt,
   betyg 1–5 mot modellens väntade antal rätt, sortering efter hur det gick och en kort
   AI-kommentar som läser gängets anteckningar. Fryses in i `data/kupong-historik.json`
@@ -767,16 +767,16 @@ ställningen efter 90 minuter (samma utfall som prognosen).
 
 **Var den syns**
 
-- **Förstasidan:** ett kort under rubriken med antal rätt och en prick per match – grön
-  fylld = rätt, röd fylld = fel, pulserande ring = pågår (grön/röd efter om tecknet håller
-  just nu), grå ring = inte startad. Kortet visar kupongen som pågår, annars nästa, annars
-  den senaste i fyra dagar efter sista matchen. Utan kupong: knappen *Skapa kupong*.
-- **Fliken Kupong** (`#kupong`, `#kupong/<id>`): antal rätt, en skala med rätt, möjliga och
-  modellens väntade antal rätt, och varje match med vårt tecken som tre rutor (valda fyllda,
-  utfallet grönt om vi hade det och rödringat om inte), modellens tips som en prick under
-  rutan och modellens chans för vårt tecken. Under: tidigare kuponger med staplar för andel
-  rätt mot hur många rätt modellens tips hade gett, och länken *Historik* (en färdig kupong
-  länkas som `historik.html#<id>`).
+- **Förstasidan** (fliken Kupong, utan adress eller `#kupong`): rubriken och kupongen som
+  pågår, annars nästa, annars den som spelades färdigt senast. Antal rätt, en skala med
+  rätt, möjliga och modellens väntade antal rätt, och varje match med vårt tecken som tre
+  rutor (valda fyllda, utfallet grönt om vi hade det och rödringat om inte), modellens tips
+  som en prick under rutan och modellens chans för vårt tecken. När alla matcher är spelade
+  (även om spoilerskyddet döljer resultaten) visas knappen *Skapa ny kupong*. Utan kupong:
+  knappen *Skapa kupong*. Matchlistan ligger under fliken Matcher (`#matcher`).
+- **En viss kupong** (`#kupong/<id>`): samma vy utan rubriken, och under den tidigare
+  kuponger med staplar för andel rätt mot hur många rätt modellens tips hade gett, och
+  länken *Historik* (en färdig kupong länkas som `historik.html#<id>`).
 - **Väntat antal rätt** = spelade matcher som de gick + modellens sannolikhet för vårt tecken
   i resten (prognosen före avspark ur journalen om den finns, annars sajtens prognos).
 - **Live:** medan en kupongmatch pågår hämtar sidan ESPN:s scoreboard varje minut, direkt i
