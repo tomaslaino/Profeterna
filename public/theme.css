@@ -47,7 +47,7 @@
   --dv-nl: #d55181;
   --dv-fac: #e0485e;
   --dv-lc: #9b7cf0;
-  /* guldet är förbehållet förmögenheten som ännu inte finns */
+  /* guldet till detaljerna: fokusringen, linjerna och mottot */
   --gold: #d8b06a;
   --gold-hi: #f0d699;
   --terra: #c8643a;
@@ -285,12 +285,7 @@ main { padding-top: 8px; padding-bottom: 48px; }
   line-height: 1.15;
   letter-spacing: -0.01em;
   color: var(--gold-hi);
-  background: linear-gradient(100deg, #f6e2ac 0%, #d9a94f 42%, #f2d48c 64%, #b98a3a 100%);
-  -webkit-background-clip: text;
-  background-clip: text;
-  -webkit-text-fill-color: transparent;
 }
-.hero-motto sup { font-size: 0.55em; margin-left: 2px; }
 .hero-sub {
   margin: 0;
   max-width: 44ch;
@@ -299,14 +294,22 @@ main { padding-top: 8px; padding-bottom: 48px; }
   color: var(--ink-soft);
 }
 
-/* myntet: litet bredvid mottot på mobilen, stort till höger på breda skärmar */
-.coin { display: block; height: auto; border-radius: 50%; }
-.coin-sm {
+/* lagbilden som ett polaroidfoto: litet bredvid texten på mobilen, stort till
+   höger på breda skärmar */
+.team-photo {
+  margin: 0;
+  background: #f1e9db;
+  border-radius: 3px;
+  box-shadow: 0 34px 60px -26px rgba(0, 0, 0, 0.95), 0 2px 6px rgba(0, 0, 0, 0.4);
+}
+.team-photo a { display: block; }
+.team-photo img { display: block; width: 100%; height: auto; }
+.team-photo-sm {
   float: right;
-  width: 76px;
-  margin: -4px 0 6px 14px;
-  transform: rotate(-10deg);
-  filter: drop-shadow(0 10px 16px rgba(0, 0, 0, 0.55));
+  width: 84px;
+  margin: -2px 0 8px 16px;
+  padding: 4px 4px 13px;
+  transform: rotate(3deg);
 }
 .hero-aside { display: none; }
 
@@ -319,24 +322,21 @@ main { padding-top: 8px; padding-bottom: 48px; }
 }
 .hero .topline strong { color: var(--fg); }
 
-/* breda skärmar: det stora myntet till höger om rubriken */
+/* breda skärmar: den stora lagbilden till höger om rubriken */
 @media (min-width: 900px) {
   .hero { display: flex; align-items: center; gap: clamp(40px, 6vw, 88px); }
   .hero-main { flex: 1 1 auto; min-width: 0; }
-  .coin-sm { display: none; }
+  .team-photo-sm { display: none; }
   .hero-aside {
     display: block;
     flex: none;
     margin: 0 clamp(8px, 3vw, 48px) 0 0;
   }
-  .coin-lg {
-    width: clamp(150px, 16vw, 200px);
-    transform: rotate(-12deg);
-    filter: drop-shadow(0 16px 20px rgba(0, 0, 0, 0.6));
-    transition: transform 0.9s cubic-bezier(0.3, 0.7, 0.2, 1);
+  .team-photo-lg {
+    width: clamp(220px, 23vw, 280px);
+    padding: 10px 10px 34px;
+    transform: rotate(2deg);
   }
-  /* för musen över myntet singlas det – passande för en tippningssajt */
-  .coin-lg:hover { transform: rotate(-12deg) rotateY(360deg); }
 }
 
 /* ---------- rubriker ---------- */
@@ -744,8 +744,6 @@ footer::before {
 }
 footer p { margin: 0; }
 footer .logo-sm { width: 20px; height: 20px; border-radius: 6px; flex: none; opacity: 0.9; }
-/* fotnoten till mottot, i fondbolagens ton */
-footer .fotnot { flex-basis: 100%; padding-left: 30px; font-style: italic; color: color-mix(in srgb, var(--muted) 80%, transparent); }
 
 /* ---------- mobil ---------- */
 
@@ -776,10 +774,8 @@ footer .fotnot { flex-basis: 100%; padding-left: 30px; font-style: italic; color
   .fc-main { gap: 6px; }
   .fc-label { font-size: 10.5px; letter-spacing: 0.04em; }
   h3 { font-size: 22px; margin-top: 32px; }
-  footer .fotnot { padding-left: 0; }
 }
 
 @media (prefers-reduced-motion: reduce) {
-  .coin-lg:hover { transform: rotate(-12deg); }
   * { transition: none !important; }
 }

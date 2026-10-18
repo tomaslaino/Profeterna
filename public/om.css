@@ -1,4 +1,4 @@
-/* Om oss: lagbilden och de tre som tippar. Bygger bara på tokens från
+/* Om oss: lagbilden och de som tippar. Bygger bara på tokens från
    theme.css, så sidan följer med om temat byts. */
 
 .about {
@@ -33,7 +33,8 @@
 
 .about-crew {
   display: grid;
-  grid-template-columns: repeat(3, minmax(0, 1fr));
+  /* tre i bredd på mobilen; fler medlemmar fyller på nya rader */
+  grid-template-columns: repeat(auto-fit, minmax(96px, 1fr));
   gap: 12px;
   margin: 0;
   padding: 0;

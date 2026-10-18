@@ -58,11 +58,11 @@ const signIdx = (s) => (s.home > s.away ? 0 : s.home === s.away ? 1 : 2);
 // lyfter mer än en storfavorit.
 const BASE = { 1: 0.45, 2: 0.75, 3: 1 };
 const GRADES = [
-  { min: 1.25, grade: 5, label: 'Profetiskt' },
-  { min: 0.5, grade: 4, label: 'Starkt' },
-  { min: -0.5, grade: 3, label: 'Godkänt' },
+  { min: 1.25, grade: 5, label: 'Utmärkt' },
+  { min: 0.5, grade: 4, label: 'Bra' },
+  { min: -0.5, grade: 3, label: 'Som väntat' },
   { min: -1.25, grade: 2, label: 'Svagt' },
-  { min: -Infinity, grade: 1, label: 'Haveri' },
+  { min: -Infinity, grade: 1, label: 'Mycket svagt' },
 ];
 
 function gradeOf(z) {

@@ -147,9 +147,9 @@ function sorted(list) {
 function aiBlock(c) {
   const a = c.ai || H.ai.get(c.id);
   if (!a) return '';
-  if (a === 'loading') return '<div class="hk-ai is-loading"><span class="hk-ai-who">AI-krönikören</span><p><span class="hk-dots"><i></i><i></i><i></i></span> skriver …</p></div>';
+  if (a === 'loading') return '<div class="hk-ai is-loading"><span class="hk-ai-who">AI-kommentar</span><p><span class="hk-dots"><i></i><i></i><i></i></span> skriver …</p></div>';
   if (a.error) return '';
-  return `<div class="hk-ai"><span class="hk-ai-who"${a.model ? ` title="${esc(a.model)}"` : ''}>AI-krönikören</span><p>${esc(a.text)}</p></div>`;
+  return `<div class="hk-ai"><span class="hk-ai-who"${a.model ? ` title="${esc(a.model)}"` : ''}>AI-kommentar</span><p>${esc(a.text)}</p></div>`;
 }
 
 function card(c) {
