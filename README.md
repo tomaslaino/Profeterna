@@ -28,8 +28,9 @@ ingen falsk precision · sidan kraschar aldrig av en död källa · endast fria 
   regelversion **2026-10-17.2** (användarens beslut)
 - [x] **Fas 5 – Matchanalys (valfri):** knappen Analysera i matchvyn låter en språkmodell
   (DeepSeek, deepseek-v4-pro) skriva en kort text ur matchens underlag, via en proxy på
-  Cloudflare Workers. Sifferkontroll mot underlaget, cache på underlagets innehållsavtryck,
-  märkt med modell och tid. **Avstängd som standard** – proxyn är inte driftsatt (se
+  Cloudflare Workers, och ett eget avsnitt *Nyhetsläget* ur nyheter som hämtas online vid
+  klicket (artiklar med källa och länk, väder). Sifferkontroll mot underlaget, cache på
+  underlagets innehållsavtryck, märkt med modell och tid. **Avstängd som standard** – proxyn är inte driftsatt (se
   [Matchanalysen](#matchanalysen-fas-5))
 
 ## Publicering
@@ -221,6 +222,12 @@ Utan nyckel ingen knapp.
 - **Avstängd som standard (2026-10-18, användarens beslut):** modulen är byggd och
   verifierad men inte påslagen på sajten. Den slås på genom att driftsätta proxyn och
   ange dess adress i [config/llm.js](config/llm.js) (se Matchanalysen).
+- **Nyhetsläget (2026-10-18, användarens beslut):** Analysera hämtar också det senaste om
+  matchen online – förhandsartiklar, skador och trupp, tränarläge, väder – och modellen
+  skriver ett eget avsnitt om det under analysen, med en hänvisning till artikeln för varje
+  påstående och en källista med länkar. Analysen själv bygger fortfarande bara på sidans
+  underlag. Nyheterna är rapporterat i media, inte en källa till prognosen, och ändrar
+  inga siffror. Kostnaden per text blir ungefär tre gånger högre (större underlag).
 - **En text med ett främmande tal visas inte (2026-10-18):** strängare än Gräva gulds
   flaggning. Varje tal i texten måste finnas i underlaget; annars ett nytt försök med
   talen utpekade, och klarar inte heller det kontrollen visas ingen text alls.
@@ -269,8 +276,10 @@ server:
   ([src/check.js](src/check.js)). Fallerar utvärderingen byggs sajten ändå.
 - **Matchanalys (fas 5, valfri):** [config/llm.js](config/llm.js) (av/på, leverantör,
   modell, prompt), [worker/analysis.mjs](worker/analysis.mjs) (underlaget, avtrycket,
-  sifferkontrollen) och [worker/index.mjs](worker/index.mjs) (`analyze()` och
-  Cloudflare-proxyn, [worker/wrangler.toml](worker/wrangler.toml)). Lokalt kör
+  sifferkontrollen), [worker/index.mjs](worker/index.mjs) (`analyze()` och
+  Cloudflare-proxyn, [worker/wrangler.toml](worker/wrangler.toml)) och
+  [src/news.mjs](src/news.mjs) med [config/news.js](config/news.js) (Nyhetsläget:
+  hämtning, urval, källista). Lokalt kör
   [server.js](server.js) samma `analyze()`. Se [Matchanalysen](#matchanalysen-fas-5).
 - **Frontend:** ren HTML/CSS/JS i `public/`, flikarna Matcher, Utvärdering, Källor och
   Modell (regelversion, backtest, kandidatlogg); i matchvyn kortet Analys när
@@ -573,14 +582,17 @@ en ny regelversion ger en ny post per kandidat med datum.
 
 Valfri och **avstängd som standard**. När den är påslagen har matchvyn för en kommande
 match med prognos ett kort *Analys* med knappen **Analysera**. Ett klick ger en kort text
-(3–5 meningar) som DeepSeek skriver ur matchens underlag, märkt *genererad text* med
-modell, när den skrevs och vilket bygge underlaget kommer ur. Är modulen avstängd, saknar
+(3–5 meningar) som DeepSeek skriver ur matchens underlag och, under rubriken
+*Nyhetsläget*, 4–8 meningar ur nyheter som hämtas online just då, med hänvisningar och en
+källista med länkar. Allt är märkt *genererad text* med modell, när den skrevs, vilket
+bygge underlaget kommer ur och när nyheterna hämtades. Är modulen avstängd, saknar
 proxyn nyckel eller fallerar API:t ser sidan ut som annars – kortet säger bara varför det
 inte blev någon text.
 
 ```
 knappen  →  proxyn (Cloudflare Worker, nyckeln som hemlighet)  →  DeepSeek
               ↑ hämtar <sajten>/data/match/<id>.json själv
+              ↑ hämtar nyheterna (Bing News, ESPN, BBC Sport, Open-Meteo)
 ```
 
 - **Underlaget** ([worker/analysis.mjs](worker/analysis.mjs)) är det matchvyn visar, med
@@ -588,16 +600,33 @@ knappen  →  proxyn (Cloudflare Worker, nyckeln som hemlighet)  →  DeepSeek
   decimal, över 2,5, båda gör mål, troligaste resultat, gå vidare), stegen i *Vad drog åt
   vilket håll*, baslinjerna och marknaden, oddsen, *Lagen sida vid sida*, form, möten,
   skador och listan med okänt – med källor och "t.o.m."-datum men utan hämttider. Cirka
-  1 600 tokens plus prompten (~500).
+  1 600 tokens plus prompten (~700).
+- **Nyhetsläget** ([src/news.mjs](src/news.mjs), [config/news.js](config/news.js)) läggs i
+  underlaget som avsnittet `nyheter`: artiklar från de senaste 10 dagarna om matchen eller
+  lagen via Bing News (RSS, brittiska medier), ESPN och BBC Sports lagflöden, högst 14,
+  förhandsartiklar och skade- och truppnyheter först; för högst 8 hämtas texten (2 500
+  tecken, bara till modellen – den visas aldrig på sajten). Spelreklam, tips och
+  tittarguider filtreras bort; betalväggar ger bara rubrik och ingress. Väderprognos vid
+  avspark från Open-Meteo. En källa som inte svarar står som okänd och resten används.
+  Nyheterna hämtas högst var 30:e minut per match och sparas en timme. Underlaget växer
+  till cirka 8 000 tokens. Provkörs utan språkmodell: `node src/news-cli.mjs nästa`.
 - **Prompten** står i [config/llm.js](config/llm.js): bara underlaget, ingen egen kunskap om
   lag eller spelare, varje tal skrivet som i underlaget, inga egna uträkningar, okänt
   sägs vara okänt, prognosen är huvudsaken och underlaget som inte styr den sägs inte
-  vara orsaker, inga spelråd, lag- och tävlingsnamn på engelska. Svaret är JSON
-  (`{"analys": …}`, DeepSeeks JSON-läge), tänkande på låg nivå.
-- **Sifferkontroll:** varje tal i texten – siffror och räkneord två–tjugo – måste finnas i
-  underlaget. Annars ett nytt försök där talen pekas ut; klarar inte heller det kontrollen
-  visas ingen text ("Texten innehöll tal som inte finns i underlaget …").
-- **Cache på innehållsavtrycket:** SHA-256 av promptversion, modell och underlag. Samma
+  vara orsaker, inga spelråd, lag- och tävlingsnamn på engelska. Med Nyhetsläget
+  (`news: true`) en egen prompt: analysen bara ur sidans underlag, nyhetsavsnittet bara ur
+  `nyheter`, varje påstående hänvisat till artikeln och källan, sammanfattat med egna
+  ord, utan egna sannolikheter, och motsägelser mot sidans skadelista sägs. Svaret är JSON
+  (`{"analys": …, "nyheter": …}`, DeepSeeks JSON-läge), tänkande på låg nivå. Hänvisningarna
+  numreras om till [1], [2] … i den ordning de citeras, och källistan visar bara de
+  citerade artiklarna.
+- **Sifferkontroll:** varje tal i texten – siffror och räkneord två–tjugo, i båda
+  avsnitten – måste finnas i underlaget (tal ur nyheterna finns där). Annars ett nytt
+  försök där talen pekas ut; klarar inte heller det kontrollen visas ingen text ("Texten
+  innehöll tal som inte finns i underlaget …"). Samma för hänvisningar till artiklar som
+  inte finns.
+- **Cache på innehållsavtrycket:** SHA-256 av promptversion, modell och underlag (utan
+  nyheternas hämttid, så att samma artiklar ger samma text). Samma
   underlag genereras aldrig två gånger – nästa klick, från vem som helst, får texten ur
   cachen (Cloudflare KV, 60 dagar; lokalt `data/cache/analysis/`). Även en avvisad text
   cachas, så att den inte kostar igen. Tillfälliga fel (överlast, timeout, saldo) cachas
@@ -609,15 +638,22 @@ knappen  →  proxyn (Cloudflare Worker, nyckeln som hemlighet)  →  DeepSeek
   prognos och allt som inte är ett match-id.
 - **Kostnad** (DeepSeeks prislista 2026-10-18, deepseek-v4-pro: $1,32 / $3,96 per miljon
   tokens in/ut, halva priset utanför 01–04 och 06–10 UTC på vardagar): uppskattat
-  $0,005–0,009 per ny text, högst två anrop per text. Cachade klick kostar inget.
-  Proxyn ryms i Cloudflares gratisnivå. DeepSeek är förbetalt, så saldot är taket.
+  $0,015–0,02 per ny text med Nyhetsläget ($0,005–0,009 utan), högst två anrop per text.
+  Cachade klick kostar inget. Proxyn ryms i Cloudflares gratisnivå (se Kända brister om
+  processortiden). DeepSeek är förbetalt, så saldot är taket.
 
 **Verifierat 2026-10-18** med ett simulerat DeepSeek-API (ingen riktig nyckel fanns): den
 lokala routen och själva Workern i Cloudflares körmiljö (`wrangler dev`, workerd) – text,
 cache-träff utan nytt anrop, avvisad text (och cachad avvisning), godkänd text vid andra
 försöket, överlast, långsamt svar ("Skriver …"), proxy utan nyckel, proxy som inte svarar, äldre bygge på
 sidan än i analysen. I webbläsaren: av (standardkonfigen – inget kort, ingen extra text,
-inga konsolfel), på, utan nyckel, mobilbredd, ljust och mörkt.
+inga konsolfel), på, utan nyckel, mobilbredd, ljust och mörkt. Nyhetsläget med riktig
+hämtning (inte simulerad), lokalt och i workerd: 14 artiklar på 2–3 s, hänvisningar
+omnumrerade och källista med länkar, samma artiklar 31 minuter senare gav cachad text,
+påhittad hänvisning gav nytt försök och sedan avvisning, alla nyhetskällor nere gav en
+text som inte cachades, `news: false` gav samma beteende som utan nyheter. (Provet i
+workerd hittade en bugg som Node inte visar – `fetch` anropad som metod gav "Illegal
+invocation" – rättad före commit.)
 **Inte verifierat:** riktiga svar från deepseek-v4-pro – hur ofta texten klarar
 sifferkontrollen, verklig kostnad per text och svarstid.
 
@@ -635,7 +671,8 @@ sifferkontrollen, verklig kostnad per text och svarstid.
    'https://profeterna-analys.<konto>.workers.dev/analyze'`. Committa och pusha – nästa
    bygge visar knappen.
 
-**Stänga av:** `enabled: false` och push – knappen försvinner vid nästa bygge. Ändras
+**Stänga av:** `enabled: false` och push – knappen försvinner vid nästa bygge. Bara
+Nyhetsläget: `news: false` och `deploy` igen. Ändras
 prompten, modellen eller underlaget: byt `promptVersion` i konfigen och kör `deploy` igen
 (proxyn bygger in konfigen vid deploy).
 
@@ -740,6 +777,21 @@ schemaintervall gammalt.
   proxyns cache) – den sparas inte i journalen och visas inte efter avspark.
 - Prompten och kontrollen är provade mot ett simulerat API, inte mot riktiga svar från
   deepseek-v4-pro (ingen nyckel 2026-10-18).
+- **Nyhetsläget:** Cloudflares gratisnivå ger 10 ms processortid per anrop. Att tolka
+  RSS och artikelsidor tog 2–4 ms i Node; i den driftsatta Workern är det inte mätt – slår
+  den i taket avbryts anropet och kortet visar ett fel (Workers Paid har 30 s).
+- Att Bing News, ESPN, BBC och MSN svarar på anrop från Cloudflares adresser är inte
+  provat – lokalt svarade alla. En källa som blockerar står som okänd i underlaget.
+- Urvalet av artiklar bygger på lagnamn och nyckelord i rubrikerna; en artikel kan
+  hamna fel eller missas, och klubbar som det skrivs lite om får få artiklar. Sajter med
+  betalvägg (och de som är spärrade på utvecklingsdatorn) bidrar bara med rubrik och
+  ingress.
+- Artikeltexten (högst 2 500 tecken per artikel) skickas till DeepSeek och sparas en timme
+  i proxyns cache, men visas aldrig på sajten; Nyhetsläget ska sammanfatta med egna ord.
+- Nyheterna ger en skrivning i KV per hämtning, utöver texten – taket på 1 000 per dygn
+  nås därför ungefär dubbelt så fort.
+- Svarar ingen nyhetskälla cachas varken nyheterna eller texten (Nyhetsläget blir då
+  "okänt"), så varje klick under ett sådant avbrott är ett nytt betalt anrop.
 
 ## Säkerhet
 
@@ -752,4 +804,6 @@ match-id (siffror) och hämtar underlaget själv från den publicerade sajten, s
 inte användas för egna frågor. CORS är öppet (`*`), eftersom proxyn bara analyserar sajtens
 egna, publika matcher. Till DeepSeek skickas bara matchens publika underlag – inklusive
 spelarnamn och skadenyheter från Fantasy Premier League – och inga uppgifter om besökaren.
+Nyhetsläget hämtar bara öppna källor utan nyckel (Bing News RSS, ESPN, BBC Sport, MSN,
+Open-Meteo) och skickar inget om besökaren dit; artikeltexten går bara till DeepSeek.
 `.dev.vars` och `.wrangler/` (wranglers lokala hemligheter och tillstånd) är gitignorerade.

@@ -4,7 +4,9 @@
 // (DEEPSEEK_API_KEY) och lämnar aldrig proxyn.
 //
 //   POST /analyze  {"id": "<match-id>"}
-//   → 200 {ok: true, text, model, generatedAt, builtAt, cached}
+//   → 200 {ok: true, text, news, model, generatedAt, builtAt, cached}
+//     news = {text, sources} – nyhetsläget med hänvisningar [1], [2] … och
+//     källistan (src/news.mjs), eller null
 //   → 4xx/5xx {ok: false, error}
 //
 // Proxyn tar bara emot ett match-id. Underlaget hämtar den själv från den
@@ -15,9 +17,17 @@
 //
 // Samma analyze() körs lokalt av server.js (POST /api/analyze), med underlaget
 // från _site/ och cachen i data/cache/analysis/.
+//
+// Nyheterna (cfg.news): vid varje klick hämtas det senaste om matchen och
+// lagen online (src/news.mjs – förhandsartiklar, skador, trupp, tränarläge,
+// väder) och läggs i underlaget som avsnittet nyheter. Modellen skriver då
+// också nyhetsläget, ett eget avsnitt med hänvisningar till artiklarna.
+// Nyhetsunderlaget cachas en stund per match (config/news.js), så att flera
+// klick i rad ger samma underlag och samma cachade text.
 
 import cfg from '../config/llm.js';
 import { payloadOf, fingerprint, foreignNumbers } from './analysis.mjs';
+import { gatherNews, newsPayload, citeNews, withoutRefs } from '../src/news.mjs';
 
 const ID_RE = /^\d{1,12}$/;
 
@@ -39,7 +49,16 @@ export async function analyze(id, { env, loadMatch, store = null, now = () => ne
   }
 
   const payload = payloadOf(d);
-  const key = `${cfg.promptVersion}:${id}:${await fingerprint({ promptVersion: cfg.promptVersion, model: cfg.model, payload })}`;
+  // Hämtningen kastar aldrig – det som inte gick att nå står som okänt.
+  // Nyheterna (med artikeltext) sparas bara en timme i cachen.
+  const newsStore = store && { get: (k) => store.get(k), put: (k, v) => store.put(k, v, 3600) };
+  const news = cfg.news ? await gatherNews(m, { store: newsStore, now: now() }) : null;
+  if (news) payload.nyheter = newsPayload(news);
+  const newsDown = Boolean(news) && !news.sources.some((s) => s.ok && s.name !== 'Open-Meteo');
+  // Avtrycket räknas utan nyheternas hämttider, så att samma artiklar ger
+  // samma (cachade) text även efter att nyheterna hämtats om.
+  const stable = news ? { ...payload, nyheter: { ...payload.nyheter, hämtat: undefined, 'artiklar från': undefined } } : payload;
+  const key = `${cfg.promptVersion}:${id}:${await fingerprint({ promptVersion: cfg.promptVersion, model: cfg.model, news: Boolean(news), payload: stable })}`;
   const hit = await safely(() => store && store.get(key));
   if (hit) return answer(hit, d, true);
 
@@ -47,7 +66,7 @@ export async function analyze(id, { env, loadMatch, store = null, now = () => ne
   if (!apiKey) return fail(503, 'Analysen är inte påslagen (nyckel saknas).');
 
   const messages = [
-    { role: 'system', content: cfg.systemPrompt },
+    { role: 'system', content: news ? cfg.systemPromptNews : cfg.systemPrompt },
     { role: 'user', content: `Underlag (JSON):\n${JSON.stringify(payload)}` },
   ];
   const usage = [];
@@ -62,18 +81,29 @@ export async function analyze(id, { env, loadMatch, store = null, now = () => ne
     }
     usage.push(r.usage);
     if (r.finish === 'content_filter') { problem = `${cfg.provider} avböjde att skriva texten.`; break; }
-    const text = r.finish === 'length' ? null : textOf(r.content);
-    if (!text) { problem = `${cfg.provider} gav inget läsbart svar.`; continue; }
-    const bad = foreignNumbers(text, payload);
-    if (!bad.length) {
-      const entry = { ok: true, text, model: r.model, generatedAt: now().toISOString(), attempts: attempt, usage };
-      await safely(() => store && store.put(key, entry));
+    const parts = r.finish === 'length' ? null : partsOf(r.content);
+    if (!parts) { problem = `${cfg.provider} gav inget läsbart svar.`; continue; }
+    const { text } = parts;
+    const bad = foreignNumbers(withoutRefs(`${text}\n${parts.news || ''}`), payload);
+    // Hänvisningar till artiklar som inte finns i underlaget: påståendet
+    // saknar då källa, så texten skrivs om (och visas annars inte).
+    const ids = new Set(news ? news.items.map((x) => x.id) : []);
+    const badRefs = [...new Set(refsIn(parts.news))].filter((x) => !ids.has(x));
+    if (!bad.length && !badRefs.length) {
+      const cited = news && parts.news ? { ...citeNews(parts.news, news), gatheredAt: news.gatheredAt } : null;
+      const entry = { ok: true, text, news: cited && cited.text ? cited : null, model: r.model, generatedAt: now().toISOString(), attempts: attempt, usage };
+      // Svarade ingen nyhetskälla är texten ett tillfälligt "okänt" – den
+      // visas men cachas inte.
+      if (!newsDown) await safely(() => store && store.put(key, entry));
       return answer(entry, d, false);
     }
-    problem = `Texten innehöll tal som inte finns i underlaget (${bad.join(', ')}) och visas inte.`;
+    const why = [];
+    if (bad.length) why.push(`tal som inte finns i underlaget (${bad.join(', ')})`);
+    if (badRefs.length) why.push(`hänvisningar till artiklar som inte finns (${badRefs.join(', ')})`);
+    problem = `Texten innehöll ${why.join(' och ')} och visas inte.`;
     messages.push(
       { role: 'assistant', content: r.content },
-      { role: 'user', content: `Talen ${bad.join(', ')} finns inte i underlaget. Skriv om texten utan dem och följ reglerna. Svara med JSON: {"analys": "<texten>"}` },
+      { role: 'user', content: `Texten innehöll ${why.join(' och ')}. Skriv om texten utan dem och följ reglerna. Svara med JSON: ${news ? '{"analys": "<text>", "nyheter": "<text>"}' : '{"analys": "<texten>"}'}` },
     );
   }
   // Ett svar som inte klarade kontrollen cachas också, så att samma underlag
@@ -128,10 +158,20 @@ function httpProblem(status) {
   return `${cfg.provider} avvisade anropet (HTTP ${status}).`;
 }
 
-function textOf(content) {
+// Artikel-id:n som texten hänvisar till: [N3], [N1, N4], [N2; 5].
+function refsIn(text) {
+  return [...String(text || '').matchAll(/\[(N\d+(?:\s*[,;]\s*N?\d+)*)\]/g)]
+    .flatMap((x) => x[1].split(/\s*[,;]\s*/).map((y) => (y.startsWith('N') ? y : `N${y}`)));
+}
+
+// {"analys": …, "nyheter": …}. Analysen krävs; saknas nyhetsläget visas
+// analysen ändå, utan nyhetsavsnitt.
+function partsOf(content) {
   try {
-    const t = JSON.parse(content).analys;
-    return typeof t === 'string' && t.trim() ? t.trim() : null;
+    const j = JSON.parse(content);
+    const str = (v) => (typeof v === 'string' && v.trim() ? v.trim() : null);
+    const text = str(j.analys);
+    return text ? { text, news: str(j.nyheter) } : null;
   } catch {
     return null;
   }
@@ -144,7 +184,7 @@ function answer(entry, d, cached) {
   // varje bygge med samma underlag.
   return {
     status: 200,
-    body: { ok: true, text: entry.text, model: entry.model, generatedAt: entry.generatedAt, builtAt: d.builtAt || null, cached },
+    body: { ok: true, text: entry.text, news: entry.news || null, model: entry.model, generatedAt: entry.generatedAt, builtAt: d.builtAt || null, cached },
   };
 }
 
@@ -195,7 +235,7 @@ export default {
       const kv = env.ANALYSER;
       const store = kv ? {
         get: (k) => kv.get(k, 'json'),
-        put: (k, v) => kv.put(k, JSON.stringify(v), { expirationTtl: cfg.cacheDays * 86400 }),
+        put: (k, v, ttl) => kv.put(k, JSON.stringify(v), { expirationTtl: ttl || cfg.cacheDays * 86400 }),
       } : null;
       const r = await analyze(id, { env, store, loadMatch: (mid) => siteMatch(site, mid) });
       return json(r.status, r.body);

@@ -644,6 +644,7 @@ function analysisCard(d) {
       ? ' Sidan visar ett annat bygge – ladda om för samma underlag.' : '';
     return `<div class="card analysis" id="analysis-card"><h4>Analys <span class="hint">genererad text</span></h4>` +
       `<p class="analysis-text">${esc(r.text).replace(/(\d) %/g, '$1&nbsp;%')}</p>` +
+      (r.news ? newsSection(r.news) : '') +
       `<p class="src-line">Skriven av ${esc(r.model)} ${when(r.generatedAt)} ur underlaget från bygget ${when(r.builtAt)}. ` +
       `Alla tal i texten finns i underlaget.${other}</p></div>`;
   }
@@ -651,7 +652,34 @@ function analysisCard(d) {
   const final = r && r.retry === false;
   return `<div class="card analysis" id="analysis-card"><h4>Analys <span class="hint">${esc(a.model)}</span></h4>` +
     (r ? `<p class="unknown">Ingen analys: ${esc(r.error || 'okänt fel')}${final ? ' En ny text kan skrivas när underlaget ändrats.' : ''}</p>` : '') +
-    (final ? '' : `<button type="button" class="analyze" data-id="${esc(d.match.id)}">${r ? 'Försök igen' : 'Analysera'}</button>`) + '</div>';
+    (final ? '' : `<button type="button" class="analyze" data-id="${esc(d.match.id)}" title="En språkmodell skriver bara ur underlaget på sidan – en text med ett tal som inte finns där visas inte">${r ? 'Försök igen' : 'Analysera'}</button>`) + '</div>';
+}
+
+// Nyhetsläget: eget avsnitt under analysen, som Redaktionens analys på
+// gravergrav.se – upphöjda hänvisningar [1], [2] … och en numrerad källista
+// med bara de citerade artiklarna. Hänvisningen länkar direkt till artikeln
+// (ett #-ankare skulle byta vy, sidan navigerar med #match/…).
+function newsSection(n) {
+  const src = new Map(n.sources.map((s) => [String(s.n), s]));
+  const href = (u) => (/^https?:\/\//i.test(u || '') ? esc(u) : null);
+  const link = (k) => {
+    const s = src.get(k);
+    const u = s && href(s.url);
+    return u ? `<a href="${u}" target="_blank" rel="noopener" title="${esc(`${s.source}: ${s.title}`)}">${k}</a>` : k;
+  };
+  const refs = (t) => t.replace(/\[(\d+(?:, \d+)*)\]/g, (m, ks) => `<sup class="ref">${ks.split(', ').map(link).join(',')}</sup>`);
+  const paras = n.text.split(/\n\s*\n/).filter((p) => p.trim())
+    .map((p) => `<p class="analysis-text">${refs(esc(p.trim())).replace(/(\d) %/g, '$1&nbsp;%')}</p>`).join('');
+  const list = n.sources.length
+    ? '<ol class="news-sources">' + n.sources.map((s) => {
+      const u = href(s.url);
+      const title = u ? `<a href="${u}" target="_blank" rel="noopener">${esc(s.title)}</a>` : esc(s.title);
+      return `<li value="${s.n}">${title} <span class="muted">${esc(s.source)} · ${dateOnly(s.publishedAt)}</span></li>`;
+    }).join('') + '</ol>'
+    : '';
+  const lead = n.gatheredAt ? `Ur nyheter hämtade ${when(n.gatheredAt)} – rapporterat` : 'Rapporterat';
+  return `<div class="analysis-news"><h5>Nyhetsläget</h5>${paras}${list}` +
+    `<p class="src-line">${lead} i media, inte kontrollerat av Profeterna och inte med i prognosen.</p></div>`;
 }
 
 async function runAnalysis(id, btn) {
