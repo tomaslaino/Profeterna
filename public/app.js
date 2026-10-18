@@ -150,6 +150,7 @@ async function loadMatches() {
   el.innerHTML = '<p class="empty">Laddar …</p>';
   try {
     state.all = await getJSON('data/matches.json');
+    if (window.Spoiler) Spoiler.useMatches(state.all.matches);
     renderMatchList();
   } catch (err) {
     el.innerHTML = `<p class="empty">Kunde inte läsa matcherna: ${esc(err.message)}</p>`;
@@ -216,11 +217,19 @@ function listForecast(f) {
     (f.lower ? ' <span title="Ett lag saknar egen lagdata">*</span>' : '');
 }
 
+// Spoilerskyddet (spoiler.js): ska matchens resultat döljas just nu?
+function isHidden(m) {
+  return Boolean(window.Spoiler && Spoiler.hidden(m));
+}
+
 function matchRow(m) {
   let side;
   if (m.completed && m.score) {
-    side = `<span class="score">${m.score.home}–${m.score.away}</span>`;
-    if (m.shootout) side += `<span class="sub">str. ${m.shootout.home}–${m.shootout.away}</span>`;
+    if (isHidden(m)) side = Spoiler.chip();
+    else {
+      side = `<span class="score">${m.score.home}–${m.score.away}</span>`;
+      if (m.shootout) side += `<span class="sub">str. ${m.shootout.home}–${m.shootout.away}</span>`;
+    }
     if (m.j) side += `<span class="sub" title="Prognosen före avspark, ur journalen">${m.j.p ? m.j.p.join(' · ') : 'okänt'}</span>`;
     else if (m.f) side += `<span class="sub retro" title="Inte loggad – återskapad i efterhand med underlaget före matchdagen">${m.f.p.join(' · ')}</span>`;
   } else {
@@ -259,9 +268,12 @@ function backLink() {
 
 function renderDetail(d) {
   const m = d.match;
+  const hide = m.completed && isHidden(m);
   let mid;
   let midSub = '';
-  if (m.completed && m.score) {
+  if (hide) {
+    mid = '';
+  } else if (m.completed && m.score) {
     mid = `${m.score.home}–${m.score.away}`;
     const s90 = m.score90;
     const extra = [];
@@ -278,9 +290,15 @@ function renderDetail(d) {
   let html = backLink();
   html += `<div class="mhead"><div class="mhead-meta">${meta}</div>` +
     `<div class="mhead-teams"><div class="mhead-team">${esc(m.home)}</div>` +
-    `<div class="mhead-mid">${esc(mid)}${midSub ? `<span class="sub">${esc(midSub)}</span>` : ''}</div>` +
+    `<div class="mhead-mid">${hide ? Spoiler.chip() : esc(mid)}${midSub ? `<span class="sub">${esc(midSub)}</span>` : ''}</div>` +
     `<div class="mhead-team away">${esc(m.away)}</div></div>` +
     (m.tierNote ? `<p class="note">${esc(m.tierNote)}</p>` : '') + '</div>';
+
+  // Dold match: bara rubriken – prognosens rättning och underlaget efter
+  // matchen avslöjar resultatet.
+  if (hide) {
+    return html + Spoiler.card({ title: 'Resultatet är dolt', text: 'Spoilerskyddet är på.', keys: [m.id], button: 'Visa resultatet' });
+  }
 
   if (m.completed && d.journal && d.journal.counted) html += journalCard(d);
   html += forecastCard(d);
@@ -522,7 +540,9 @@ function formCard(d) {
   const row = (name, p) => {
     const f = p.form || [];
     const chips = f.length
-      ? f.map((x) => `<span class="${x.result || ''}" title="${esc(`${x.date} ${x.comp} ${x.home ? 'hemma' : 'borta'}${x.opponent ? ` mot ${x.opponent}` : ''}: ${x.gf}–${x.ga}${x.decided ? ` (${x.decided})` : ''}`)}">${x.result || '?'}</span>`).join('')
+      ? f.map((x) => (window.Spoiler && Spoiler.hidesDay(x.date)
+        ? '<span class="sp-form" title="Dold av spoilerskyddet">?</span>'
+        : `<span class="${x.result || ''}" title="${esc(`${x.date} ${x.comp} ${x.home ? 'hemma' : 'borta'}${x.opponent ? ` mot ${x.opponent}` : ''}: ${x.gf}–${x.ga}${x.decided ? ` (${x.decided})` : ''}`)}">${x.result || '?'}</span>`)).join('')
       : '<span class="muted" style="width:auto;background:none;font-weight:400">inga tidigare matcher</span>';
     return `<div class="form-row"><span class="t">${esc(name)}</span><span class="form">${chips}</span></div>`;
   };
@@ -960,7 +980,11 @@ function valueTable(d, minBets) {
     `<tbody>${rows}</tbody></table></div>`;
 }
 
-function recentTable(list) {
+function recentTable(all) {
+  const list = all.filter((r) => !isHidden(r));
+  const n = all.length - list.length;
+  const note = n ? `<p class="legend">${Spoiler.chip(`${n} ${n === 1 ? 'match' : 'matcher'}`)} visas inte – spoilerskyddet är på.</p>` : '';
+  if (!list.length) return note;
   const rows = list.map((r) => {
     const w = pct3(r.p).map((v, k) => (k === r.o ? `<b>${v}</b>` : String(v))).join(' · ');
     return `<tr><td><a href="#match/${esc(r.id)}">${esc(r.home)}–${esc(r.away)}</a><span class="sub">${esc(compOf(r.comp).short)} · ${dateOnly(r.kickoff)}</span></td>` +
@@ -968,7 +992,7 @@ function recentTable(list) {
       `<td class="num">${dec(r.logLoss, 2)} / ${r.market != null ? dec(r.market, 2) : '–'}</td></tr>`;
   }).join('');
   return '<div class="table-wrap"><table><thead><tr><th>Match</th><th class="num" title="1 · X · 2 i procent, utfallet i fetstil">Före avspark</th><th class="num">Efter 90</th>' +
-    `<th class="num">Log-poäng modell / (c)</th></tr></thead><tbody>${rows}</tbody></table></div>`;
+    `<th class="num">Log-poäng modell / (c)</th></tr></thead><tbody>${rows}</tbody></table></div>` + note;
 }
 
 function journalTable(j) {
@@ -1302,6 +1326,22 @@ function candidatesSection(L, promoted = new Map()) {
     ['Loggen', 'Allt som prövats loggas med utfall och datum, även det som inte fungerade, så att samma idé inte prövas igen utan ny evidens.'],
   ]);
   return html;
+}
+
+// ---------- spoilerskyddet ----------
+
+// Läget ändrades eller en match visades ändå: rita om det som syns (kupongen
+// ritar om sig själv, se kupong.js).
+if (window.Spoiler) {
+  Spoiler.onChange(() => {
+    renderMatchList();
+    const dv = $('#match-detail-view');
+    if (!dv.hidden && state.detail) {
+      dv.innerHTML = renderDetail(state.detail);
+      setShowSources(showSources());
+    }
+    if (!$('#eval-section').hidden) loadEvaluation();
+  });
 }
 
 // ---------- start ----------

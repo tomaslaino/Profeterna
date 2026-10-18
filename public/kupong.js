@@ -161,6 +161,10 @@ function gradeRow(x, now) {
   } else {
     r.state = 'upcoming';
   }
+  // Spoilerskyddet: startad match utan ställning och utan rättning.
+  if (r.state !== 'upcoming' && r.state !== 'off' && isHidden(m)) {
+    return { ...r, state: 'hidden', score: null, res: null, clock: null, extra: null };
+  }
   if (r.res != null) r.hit = x.sign.includes(SIGNS[r.res]);
   return r;
 }
@@ -177,6 +181,7 @@ function gradeCoupon(c, now = Date.now()) {
     live: is('live'),
     liveOk: is('live', true),
     left: is('upcoming') + is('started'),
+    hidden: is('hidden'),
     modelOk: counted.filter((r) => r.state === 'final' && r.res != null && r.tip === r.res).length,
     first: rows.length ? rows[0].kick : null,
     last: rows.length ? rows[rows.length - 1].kick : null,
@@ -287,6 +292,7 @@ function dateRange(a, b) {
 }
 
 function rowClass(r) {
+  if (r.state === 'hidden') return 'hid';
   if (r.state === 'final') return r.hit === true ? 'ok' : r.hit === false ? 'no' : 'unk';
   if (r.state === 'live') return r.hit === true ? 'live ok' : r.hit === false ? 'live no' : 'live';
   if (r.state === 'off' || r.state === 'missing') return 'off';
@@ -304,7 +310,7 @@ function scoreText(r) {
 function pearlTitle(r) {
   const what = r.state === 'final' ? scoreText(r) || 'spelad'
     : r.state === 'live' ? `${scoreText(r)} ${r.clock || ''}`.trim()
-      : r.state === 'off' ? 'uppskjuten' : r.state === 'missing' ? 'okänd match'
+      : r.state === 'off' ? 'uppskjuten' : r.state === 'missing' ? 'okänd match' : r.state === 'hidden' ? 'dolt'
         : r.m ? fWeekdayTime.format(new Date(r.m.kickoff)) : '';
   return `${teamsOf(r)} · ${r.sign} · ${what}${r.note ? ` · ”${r.note}”` : ''}`;
 }
@@ -319,8 +325,10 @@ function pearls(rows, size = '') {
 
 function bigNumber(g) {
   if (!g.started) return `<span class="kp-big"><b>${g.n}</b><span>${g.n === 1 ? 'match' : 'matcher'}</span></span>`;
-  return `<span class="kp-big"><b>${g.ok}</b>` +
+  // Spoilerskyddet: rätt bland matcherna som syns, + ? för de dolda.
+  return `<span class="kp-big"><b>${g.hidden && !g.ok ? '?' : g.ok}</b>` +
     (g.liveOk ? `<em title="Rätt om ställningen håller">+${g.liveOk}</em>` : '') +
+    (g.hidden && g.ok ? '<em class="sp-q" title="Dolt av spoilerskyddet">+?</em>' : '') +
     `<span>/ ${g.n} rätt</span></span>`;
 }
 
@@ -331,6 +339,7 @@ function statusLine(g) {
   if (g.done) return `Klar · modellens tips gav <b>${g.modelOk}</b> rätt`;
   return [
     g.live ? `<span class="kp-livetxt">${g.live} pågår</span>` : null,
+    g.hidden ? Spoiler.chip(`${g.hidden} ${g.hidden === 1 ? 'dold' : 'dolda'}`) : null,
     g.left ? `${g.left} kvar` : null,
     `väntat <b>${kpNum(g.expected)}</b> rätt`,
   ].filter(Boolean).join(' · ');
@@ -398,6 +407,15 @@ function renderCouponShow(id) {
     '<a class="kp-btn primary" href="#kupong/ny">+ Ny kupong</a></div></div>';
 
   html += summaryCard(g);
+  if (g.hidden) {
+    const ids = g.rows.filter((r) => r.state === 'hidden').map((r) => r.id);
+    html += Spoiler.card({
+      title: `${g.hidden} ${g.hidden === 1 ? 'match är dold' : 'matcher är dolda'}`,
+      text: 'Spoilerskyddet är på.',
+      keys: ids,
+      button: 'Visa resultaten',
+    });
+  }
   html += couponRows(g);
   html += liveLine(g);
   html += pastSection(graded.filter((x) => x !== cur), g);
@@ -416,7 +434,7 @@ function summaryCard(g) {
     `<div class="kp-track"><i class="ok" style="width:${w(g.ok)}%"></i><i class="liveok" style="width:${w(g.liveOk)}%"></i>` +
     `<i class="open" style="width:${w(open)}%"></i><b class="exp" style="left:${exp}%" title="Väntat antal rätt enligt modellen"></b></div>` +
     `<div class="kp-scale-lab"><span>0</span><span class="exp" style="left:${exp}%">väntat ${kpNum(g.expected)}</span><span>${g.n}</span></div></div>` +
-    (g.started ? `<div class="kp-facts"><span><b>${g.max}</b> möjliga</span><span><b>${g.no}</b> fel</span>` +
+    (g.started && !g.hidden ? `<div class="kp-facts"><span><b>${g.max}</b> möjliga</span><span><b>${g.no}</b> fel</span>` +
       `<span title="Om vi spelat modellens troligaste utfall i varje match">modellens tips <b>${g.modelOk}</b> rätt</span></div>` : '') +
     '</div></div>';
 }
@@ -452,6 +470,7 @@ function couponRows(g) {
       const comp = r.m ? compOf(r.m.comp) : null;
       // På mobilen saknas tidskolumnen: tiden (eller matchminuten) står då under resultatet.
       const score = r.state === 'off' ? '<span class="sub">uppskjuten</span>'
+        : r.state === 'hidden' ? `${Spoiler.chip()}<span class="sub kp-m">${r.m ? esc(fTime.format(new Date(r.m.kickoff))) : ''}</span>`
         : r.score ? `<span class="score">${esc(scoreText(r))}</span>${r.extra ? `<span class="sub">${esc(r.extra)}</span>` : ''}` +
           (r.state === 'live' ? `<span class="sub kp-m">${esc(r.clock || 'live')}</span>` : '')
           : `<span class="sub kp-d">–</span><span class="sub kp-m">${r.m ? esc(fTime.format(new Date(r.m.kickoff))) : ''}</span>`;
@@ -499,7 +518,7 @@ function pastSection(list, shown) {
   html += '<div class="mlist">' + list.map(({ c, g }) =>
     `<a class="kp-past" href="#kupong/${esc(c.id)}"><span class="kp-past-date">${esc(dateRange(g.first, g.last))}` +
     `${c.name ? `<span class="sub">${esc(c.name)}</span>` : ''}</span>${pearls(g.rows, 'sm')}` +
-    `<span class="kp-past-num"><b>${g.ok}</b>/${g.n}</span></a>`).join('') + '</div>';
+    `<span class="kp-past-num"><b>${g.hidden ? '?' : g.ok}</b>/${g.n}</span></a>`).join('') + '</div>';
   return html;
 }
 
@@ -830,4 +849,11 @@ function renderViaGitHub(ctx) {
   renderCouponHero();
   liveTick();
   document.addEventListener('visibilitychange', () => { if (!document.hidden) liveTick(); });
+  // Spoilerskyddet ändrades: rätta om med det som får synas.
+  if (window.Spoiler) {
+    Spoiler.onChange(() => {
+      renderCouponHero();
+      if (KP.view && KP.view.mode === 'show' && !$('#coupon-section').hidden) renderCouponShow(KP.view.id);
+    });
+  }
 })();

@@ -1,0 +1,185 @@
+/* Spoilerskyddet (spoiler.js): skölden i toppbaren, panelen och allt som
+   visas i stället för ett dolt resultat. Laddas efter theme.css och använder
+   dess färger. */
+
+/* ---------- knappen ---------- */
+
+.sp-ctl { position: relative; align-self: center; flex: none; }
+.sp-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  height: 32px;
+  padding: 0 11px 0 9px;
+  border: 1px solid var(--pill-line);
+  border-radius: 999px;
+  background: var(--pill);
+  color: var(--muted);
+  font: 600 12.5px/1 var(--sans);
+  font-variant-numeric: tabular-nums;
+  white-space: nowrap;
+  cursor: pointer;
+  transition: color 0.15s ease, border-color 0.15s ease, background 0.15s ease;
+}
+.sp-btn:hover { color: var(--fg); border-color: var(--pill-line-hi); }
+.sp-btn .sp-ic { width: 15px; height: 15px; }
+.sp-btn.is-on {
+  color: var(--bone);
+  border-color: color-mix(in srgb, var(--terra) 70%, transparent);
+  background: color-mix(in srgb, var(--terra) 22%, transparent);
+}
+.sp-btn.is-on .sp-ic { color: var(--gold-hi); }
+
+.sp-ic { flex: none; display: block; }
+
+/* ---------- panelen ---------- */
+
+.sp-panel {
+  position: absolute;
+  top: calc(100% + 12px);
+  right: 0;
+  z-index: 50;
+  width: 280px;
+  max-width: calc(100vw - 2 * var(--gutter));
+  padding: 16px;
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  background: var(--glass-hi);
+  box-shadow: 0 24px 48px -20px rgba(0, 0, 0, 0.9);
+}
+.sp-panel[hidden] { display: none; }
+.sp-head { display: flex; align-items: center; justify-content: space-between; margin-bottom: 12px; }
+.sp-head h3 {
+  margin: 0;
+  padding: 0;
+  border: 0;
+  font-family: var(--display);
+  font-size: 20px;
+  font-weight: 650;
+  color: var(--bone);
+}
+.sp-x {
+  width: 28px;
+  height: 28px;
+  border: 0;
+  border-radius: 50%;
+  background: none;
+  color: var(--muted);
+  font-size: 20px;
+  line-height: 1;
+  cursor: pointer;
+}
+.sp-x:hover { color: var(--fg); background: var(--hair); }
+
+.sp-opts { display: flex; flex-direction: column; gap: 6px; }
+.sp-opt {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  width: 100%;
+  padding: 10px 12px;
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  background: var(--pill);
+  color: var(--fg);
+  font: 600 14px/1.2 var(--sans);
+  text-align: left;
+  cursor: pointer;
+}
+.sp-opt:hover { border-color: var(--pill-line-hi); }
+.sp-radio {
+  flex: none;
+  width: 16px;
+  height: 16px;
+  border: 2px solid var(--pill-line-hi);
+  border-radius: 50%;
+}
+.sp-opt[aria-checked="true"] {
+  border-color: color-mix(in srgb, var(--terra) 70%, transparent);
+  background: color-mix(in srgb, var(--terra) 14%, transparent);
+}
+.sp-opt[aria-checked="true"] .sp-radio { border-color: var(--terra); box-shadow: inset 0 0 0 3px var(--card), inset 0 0 0 8px var(--terra); }
+
+.sp-field { display: flex; flex-direction: column; gap: 5px; margin-top: 12px; }
+.sp-field > span { font-size: 11px; font-weight: 700; letter-spacing: 0.06em; text-transform: uppercase; color: var(--eyebrow); }
+.sp-field select {
+  height: 38px;
+  padding: 0 10px;
+  border: 1px solid var(--pill-line);
+  border-radius: 10px;
+  background: var(--card);
+  color: var(--fg);
+  font: 500 14px var(--sans);
+}
+
+.sp-status { margin: 12px 0 0; font-size: 12.5px; line-height: 1.45; color: var(--muted); min-height: 1.45em; }
+
+/* ---------- dolt resultat ---------- */
+
+.sp-chip {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  padding: 3px 8px 3px 6px;
+  border: 1px dashed color-mix(in srgb, var(--terra) 65%, transparent);
+  border-radius: 999px;
+  color: var(--gold);
+  font: 600 12px/1.2 var(--sans);
+  letter-spacing: 0.02em;
+  vertical-align: middle;
+  white-space: nowrap;
+}
+.sp-chip .sp-ic { width: 12px; height: 12px; }
+.mhead-mid .sp-chip { font-size: 14px; padding: 6px 12px 6px 9px; }
+.mhead-mid .sp-chip .sp-ic { width: 16px; height: 16px; }
+.mside .sp-chip + .sub, .kp-score .sp-chip + .sub { margin-top: 4px; }
+
+/* formrutan för en dold match */
+.form span.sp-form { background: none; box-shadow: inset 0 0 0 1px var(--pill-line-hi); color: var(--muted); }
+
+/* kupongens prick och stora siffra */
+.kp-dot.hid { border-style: dashed; border-color: var(--terra); }
+.kp-big em.sp-q { color: var(--gold); }
+
+/* ---------- kortet med Visa-knappen ---------- */
+
+.sp-card {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  margin: 16px 0;
+  padding: 16px 18px;
+  border: 1px solid color-mix(in srgb, var(--terra) 45%, transparent);
+  border-radius: var(--radius);
+  background: color-mix(in srgb, var(--terra) 9%, var(--card));
+}
+.sp-card > .sp-ic { width: 26px; height: 26px; color: var(--gold); }
+.sp-msg { flex: 1 1 auto; min-width: 0; display: flex; flex-direction: column; gap: 2px; }
+.sp-msg strong { color: var(--bone); font-size: 15px; }
+.sp-msg span { color: var(--muted); font-size: 13px; }
+.sp-show {
+  flex: none;
+  height: 36px;
+  padding: 0 16px;
+  border: 1px solid var(--pill-line-hi);
+  border-radius: 999px;
+  background: var(--pill);
+  color: var(--fg);
+  font: 600 13.5px var(--sans);
+  cursor: pointer;
+}
+.sp-show:hover { color: #fff; border-color: var(--gold); }
+
+/* Divisioner: vyn bakom en ridå */
+.sp-veiled > :not(.sp-card) {
+  filter: blur(10px);
+  opacity: 0.45;
+  pointer-events: none;
+  user-select: none;
+}
+
+@media (max-width: 760px) {
+  .sp-btn { height: 30px; padding: 0 9px 0 8px; font-size: 12px; }
+  .sp-card { flex-wrap: wrap; }
+  .sp-show { margin-left: 40px; }
+}

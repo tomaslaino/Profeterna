@@ -1443,8 +1443,11 @@ async function renderView() {
   const el = $('#dv-view');
   const P = state.view === 'jamfor' || state.view === 'matchbilden' ? null : await loadPlayers(dv.id);
   if (state.view === 'prognos' || state.view === 'jamfor') await loadSeason();
+  // Spoilerskyddet behöver matcherna innan något ritas, annars hinner det dolda synas.
+  if (window.Spoiler && Spoiler.on()) await Spoiler.matches();
   // Användaren kan ha bytt vy medan spelarfilen laddades.
   if (dv.id !== state.div) return;
+  el.classList.remove('sp-veiled');
   if (state.view === 'tabell') el.innerHTML = tableView(dv, P);
   else if (state.view === 'prognos') el.innerHTML = forecastView(dv, P);
   else if (state.view === 'spelare') el.innerHTML = playersView(dv, P);
@@ -1462,6 +1465,29 @@ async function renderView() {
     el.innerHTML = overviewView(dv, P);
   }
   redraw();
+  veil(dv, state.view);
+}
+
+// Spoilerskyddet (spoiler.js): har divisionen matcher som döljs just nu läggs
+// vyn bakom en ridå – tabellen och statistiken räknar redan med resultaten.
+// Jämförelsen mellan divisionerna går över hela säsonger och visas ändå.
+async function veil(dv, view) {
+  if (!window.Spoiler || !Spoiler.on() || view === 'jamfor') return;
+  const recent = (await Spoiler.matches()).filter((m) => m.comp === dv.id && Spoiler.hides(m.kickoff));
+  const n = recent.filter(Spoiler.hidden).length;
+  if (!n || dv.id !== state.div || view !== state.view) return;
+  const el = $('#dv-view');
+  if (el.querySelector(':scope > .sp-card')) return;
+  // En ny match i perioden ger en ny nyckel – då dras ridån för igen.
+  const key = `div:${dv.id}:${recent.map((m) => m.id).sort().join(',')}`;
+  if (Spoiler.isShown(key)) return;
+  for (const c of el.children) c.inert = true;
+  el.classList.add('sp-veiled');
+  el.insertAdjacentHTML('afterbegin', Spoiler.card({
+    title: `${n} ${n === 1 ? 'match' : 'matcher'} i ${dv.name} är dolda`,
+    text: 'Tabellen och statistiken räknar med resultaten.',
+    keys: [key],
+  }));
 }
 
 function updatePlayerTable() {
@@ -1594,4 +1620,5 @@ window.addEventListener('hashchange', () => { if (state.data && !state.data.erro
   wire();
   renderView();
   loadSeason(); // lagkortet visar säsongsprognosen när den finns
+  if (window.Spoiler) Spoiler.onChange(renderView);
 })();

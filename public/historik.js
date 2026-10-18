@@ -189,10 +189,34 @@ function rowHtml(r) {
     `<span class="hk-res">${res}</span></div>`;
 }
 
+// ---------- spoilerskyddet ----------
+
+// Kupongen döljs om någon av dess matcher döljs (spoiler.js). Kuponger utan
+// matchid (inskrivna för hand) bedöms på sista matchens dag.
+function isHidden(c) {
+  if (!window.Spoiler || !Spoiler.on()) return false;
+  const known = c.rows.map((r) => (r.id ? Spoiler.hiddenId(r.id) : null)).filter((x) => x != null);
+  if (known.length) return known.some(Boolean);
+  return !Spoiler.isShown(`kupong:${c.id}`) && Spoiler.hidesDay(c.till || c.date);
+}
+
+function hiddenCard(c) {
+  const keys = [`kupong:${c.id}`, ...c.rows.map((r) => r.id).filter(Boolean)];
+  return `<article class="card hk-card" id="${esc(c.id)}">` +
+    `<div class="hk-top"><div class="hk-title"><p class="kp-eyebrow">${esc(c.name ? dateRange(c.date, c.till) : c.game || 'Kupong')}</p>` +
+    `<h4>${esc(c.name || dateRange(c.date, c.till))}</h4></div></div>` +
+    Spoiler.card({ title: 'Resultatet är dolt', text: 'Spoilerskyddet är på.', keys, button: 'Visa resultatet' }) +
+    '</article>';
+}
+
 function render() {
   const el = $('#history');
-  const list = H.data.coupons || [];
-  if (!list.length) {
+  const all = H.data.coupons || [];
+  // Dolda kuponger överst och utanför sammanfattningen, så att varken
+  // siffrorna eller sorteringen avslöjar hur det gick.
+  const hidden = all.filter(isHidden);
+  const list = all.filter((c) => !hidden.includes(c));
+  if (!all.length) {
     el.innerHTML = '<div class="card kp-empty"><p class="intro">Inga färdiga kuponger än. När alla matcher på en kupong är spelade hamnar den här, med betyg och AI:ns kommentar.</p>' +
       '<a class="kp-btn primary" href="index.html#kupong">Till kupongen</a></div>' + errors();
     return;
@@ -204,7 +228,7 @@ function render() {
       const arrow = on ? `<span class="hk-dir" aria-hidden="true">${H.dir > 0 ? '↓' : '↑'}</span>` : '';
       return `<button type="button" data-sort="${s.id}" aria-pressed="${on}" title="${esc(on ? 'Tryck igen för omvänd ordning' : s.title)}">${s.label}${arrow}</button>`;
     }).join('') + '</div></div>' +
-    `<div class="hk-list">${sorted(list).map(card).join('')}</div>` +
+    `<div class="hk-list">${hidden.map(hiddenCard).join('')}${sorted(list).map(card).join('')}</div>` +
     '<p class="legend">Betyget jämför antal rätt med det väntade enligt modellen före avspark – en skräll som sitter väger mer än en storfavorit. ' +
     'Prickarna under 1 X 2 är modellens tips.' + (list.some((c) => c.basis !== 'modell') ? ' * Väntat delvis enligt schablon.' : '') + '</p>' +
     errors();
@@ -260,12 +284,17 @@ async function fetchComments() {
   const saved = load(SORT_KEY);
   if (saved && SORTS.some((s) => s.id === saved.sort)) { H.sort = saved.sort; H.dir = saved.dir === -1 ? -1 : 1; }
   try {
-    H.data = await getJSON('data/historik.json');
+    // Med spoilerskyddet på behövs matchernas avsparkstider först.
+    [H.data] = await Promise.all([
+      getJSON('data/historik.json'),
+      window.Spoiler && Spoiler.on() ? Spoiler.matches() : null,
+    ]);
   } catch (err) {
     $('#history').innerHTML = `<p class="empty">Historiken kunde inte läsas (${esc(err.message)}).</p>`;
     return;
   }
   render();
+  if (window.Spoiler) Spoiler.onChange(async () => { await Spoiler.matches(); render(); });
   if (location.hash.length > 1) {
     const t = document.getElementById(decodeURIComponent(location.hash.slice(1)));
     if (t) t.scrollIntoView();
