@@ -67,6 +67,7 @@ function monthYear(iso) {
 
 const TABS = {
   matcher: 'matches-section',
+  kupong: 'coupon-section',
   utvardering: 'eval-section',
   kallor: 'sources-section',
   modell: 'model-section',
@@ -89,6 +90,13 @@ function route() {
   if (m) {
     showTab('matches-section');
     openMatch(m[1]);
+    return;
+  }
+  // Kupongen (kupong.js): #kupong, #kupong/<id>, #kupong/ny, #kupong/andra/<id>
+  const k = /^kupong(?:\/(.+))?$/.exec(h);
+  if (k) {
+    showTab('coupon-section');
+    showCoupon(k[1] || '');
     return;
   }
   showTab(TABS[h] || 'matches-section');
@@ -132,6 +140,8 @@ async function loadMatches() {
   } catch (err) {
     el.innerHTML = `<p class="empty">Kunde inte läsa matcherna: ${esc(err.message)}</p>`;
   }
+  // Kupongen väntar på matcherna (kupong.js).
+  document.dispatchEvent(new Event('matches-loaded'));
 }
 
 // Urvalet görs här, mot besökarens klocka – inte mot när sajten byggdes.

@@ -11,6 +11,7 @@
   <link rel="stylesheet" href="style.css">
   <link rel="stylesheet" href="divisioner.css">
   <link rel="stylesheet" href="theme.css">
+  <link rel="stylesheet" href="kupong.css">
 </head>
 <body>
   <header class="topbar">
@@ -23,6 +24,8 @@
         <div class="tablist" role="tablist">
           <button type="button" role="tab" id="tab-matches" data-tab="matches-section"
             aria-controls="matches-section" aria-selected="true">Matcher</button>
+          <button type="button" role="tab" id="tab-coupon" data-tab="coupon-section"
+            aria-controls="coupon-section" aria-selected="false">Kupong</button>
           <button type="button" role="tab" id="tab-eval" data-tab="eval-section"
             aria-controls="eval-section" aria-selected="false">Utvärdering</button>
           <button type="button" role="tab" id="tab-sources" data-tab="sources-section"
@@ -69,6 +72,7 @@
             <figcaption>Aten, april 2026</figcaption>
           </figure>
         </div>
+        <div id="coupon-hero"></div>
         <div class="toolbar">
           <div class="seg" role="group" aria-label="Visa">
             <button type="button" data-view="upcoming" aria-pressed="true">Kommande</button>
@@ -80,6 +84,10 @@
         <div id="match-list"></div>
       </div>
       <div id="match-detail-view" hidden></div>
+    </section>
+
+    <section id="coupon-section" role="tabpanel" aria-labelledby="tab-coupon" hidden>
+      <div id="coupon"></div>
     </section>
 
     <section id="eval-section" role="tabpanel" aria-labelledby="tab-eval" hidden>
@@ -109,5 +117,6 @@
   </footer>
 
   <script src="app.js"></script>
+  <script src="kupong.js"></script>
 </body>
 </html>

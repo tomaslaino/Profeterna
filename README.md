@@ -36,6 +36,9 @@ ingen falsk precision · sidan kraschar aldrig av en död källa · endast fria 
   Europacuper), domaren med kortsnitt, lagens målprofil och mål mot xG; under Divisioner
   en säsongsprognos (Prognos), programmet framåt och modellens styrka för alla lag. Inget
   av det styr prognoserna (se [Säsongsprognosen](#säsongsprognosen))
+- [x] **Kupongen:** gängets gemensamma kupong per omgång – utvalda matcher med 1, X, 2 eller
+  gardering. Kort på förstasidan, fliken Kupong med liveställning från ESPN, Ny kupong med
+  sökning. Sparas som fil i `data/kuponger/` med en commit på GitHub (se [Kupongen](#kupongen))
 
 ## Publicering
 
@@ -127,6 +130,7 @@ Utan nyckel ingen knapp.
 | Halvtid, hörnor, kort och domare, tidigare säsonger | football-data.co.uk (samma filer som raden ovan, fler kolumner) | PL–L2, National League – bara sidan Divisioner | 30 d | Verifierat 2026-10-18. Egen cache (`fdcouk_stats_*`), så att prognosmotorns underlag och backtestets signatur inte ändras. Halvtidsresultat, kort och domare finns i stort sett alla säsonger sedan 2000/01 (EC sedan 2005/06); domare saknas 2012/13 i E1–EC, och skott, hörnor och frisparkar saknas i EC från 2016/17. Avsparkstid (brittisk tid) från 2019/20, publik bara 2000/01–2001/02. Sparar också marknadssnittets 1X2 och över/under 2,5. |
 | Europacuperna (för vila och form) | ESPN (`uefa.champions`, `uefa.europa`, `uefa.europa.conf`, kvalomgångarna i `*_qual` juli–augusti) | PL och cuperna – bara underlag | 3 h | Verifierat 2026-10-18: 234/224/366 matcher 2026/27 med kvalet, nio engelska lag (Brighton i Conference Leagues playoffomgång i augusti). Kopplas på ESPN:s lag-id, samma i alla ESPN:s turneringar. Ingen prognos för matcherna och inte med i prognosmotorns underlag. |
 | Domare, kommande ligamatcher | football-data.co.uk (`fixtures.csv`, kolumnen `Referee`) | ligorna | 6 h | Verifierat 2026-10-18: namnet finns för alla 46 kommande matcher i filen (läggs ut med oddsen fre/tis). Domarens historik ur samma statistikfiler som sidan Divisioner. |
+| Liveställning | ESPN scoreboard (`site.api.espn.com/…/<liga>/scoreboard?dates=YYYYMMDD`), hämtas **i webbläsaren** | kupongens matcher | 1 min medan en kupongmatch pågår | Verifierat 2026-10-18: svarar med `Access-Control-Allow-Origin: *`, så sidan kan hämta direkt. Samma matchid som spelprogrammet. Status, matchminut och ställning; används bara av kupongen, inte av prognosen eller bygget. |
 | Målminuter och publik, tidigare säsonger | ESPN (`eng.1`–`eng.4`, månad för månad) | ligorna – bara sidan Divisioner | 30 d | Verifierat 2026-10-18. 2021/22–2025/26; grundserien räknas, play-off filtreras bort. Målhändelserna går ihop med slutresultatet i 99,9 % av matcherna, publik finns i 98–100 % per liga och säsong. Kompakt format (`parseCrowd`): målminut med sida och publiksiffra. Årets publik saknas (spelprogrammets format ändras inte). |
 
 **Prövat och inte använt:**
@@ -307,7 +311,11 @@ server:
 - **Säsongsprognos:** [src/season.js](src/season.js) körs i slutet av prognosmotorn och
   skriver `data/season.json`: simuleringen per liga, programmet framåt per lag och
   modellens styrka för alla lag i nivå 1–5. Se [Säsongsprognosen](#säsongsprognosen).
-- **Frontend:** ren HTML/CSS/JS i `public/`, flikarna Matcher, Utvärdering, Källor och
+- **Kupongen:** [src/coupons.js](src/coupons.js) läser och kontrollerar filerna i
+  `data/kuponger/` och bygget skriver `data/kuponger.json`. Rättningen, liveställningen och
+  Ny kupong finns i [public/kupong.js](public/kupong.js) och
+  [public/kupong.css](public/kupong.css). Se [Kupongen](#kupongen).
+- **Frontend:** ren HTML/CSS/JS i `public/`, flikarna Matcher, Kupong, Utvärdering, Källor och
   Modell (regelversion, backtest, kandidatlogg); i matchvyn kortet Analys när
   matchanalysen är påslagen. Sidan Divisioner ([public/divisioner.js](public/divisioner.js))
   med vyn Prognos. Läser JSON-filerna ovan. Urvalet av kommande/spelade matcher och källornas status
@@ -734,6 +742,63 @@ poängavdrag (kontrollerat mot ESPN:s tabell 2026-10-18: alla 92 lag stämmer).
 - **Slumpen** är seedad med dagen och divisionen: samma data samma dag ger samma prognos.
 - Körtid ~0,8 s i bygget.
 
+## Kupongen
+
+Gängets gemensamma kupong för omgången: de utvalda matcherna med ett tecken var – `1`, `X`,
+`2` eller en gardering (`1X`, `X2`, `12`, `1X2`). Det som räknas är antal rätt, mot
+ställningen efter 90 minuter (samma utfall som prognosen).
+
+**Var den syns**
+
+- **Förstasidan:** ett kort under rubriken med antal rätt och en prick per match – grön
+  fylld = rätt, röd fylld = fel, pulserande ring = pågår (grön/röd efter om tecknet håller
+  just nu), grå ring = inte startad. Kortet visar kupongen som pågår, annars nästa, annars
+  den senaste i fyra dagar efter sista matchen. Utan kupong: knappen *Skapa kupong*.
+- **Fliken Kupong** (`#kupong`, `#kupong/<id>`): antal rätt, en skala med rätt, möjliga och
+  modellens väntade antal rätt, och varje match med vårt tecken som tre rutor (valda fyllda,
+  utfallet grönt om vi hade det och rödringat om inte), modellens tips som en prick under
+  rutan och modellens chans för vårt tecken. Under: tidigare kuponger med staplar för andel
+  rätt mot hur många rätt modellens tips hade gett.
+- **Väntat antal rätt** = spelade matcher som de gick + modellens sannolikhet för vårt tecken
+  i resten (prognosen före avspark ur journalen om den finns, annars sajtens prognos).
+- **Live:** medan en kupongmatch pågår hämtar sidan ESPN:s scoreboard varje minut, direkt i
+  webbläsaren (se Datakällor). Går matchen till förlängning väntar rättningen på nästa
+  bygge, som räknar fram ställningen efter 90 minuter ur målminuterna. Svarar inte ESPN
+  visas det, och kupongen rättas mot `matches.json` som vanligt.
+
+**Skapa och spara**
+
+1. *Kupong → Ny kupong* (`#kupong/ny`): sök lag eller filtrera på tävling, tryck 1, X
+   eller 2 på matcherna (flera tecken = gardering). Utkastet sparas i webbläsaren.
+2. *Spara kupong* → *Spara på GitHub* öppnar GitHub med filen ifylld
+   (`data/kuponger/<datum för första matchen>.json`). Tryck **Commit changes** (kräver
+   inloggning med skrivrätt till repot). Pushen startar workflowen och kupongen syns för
+   alla efter bygget, några minuter senare. Git-historiken visar när kupongen lades.
+3. Tills dess visas kupongen i den webbläsaren där den skapades, märkt *väntar på GitHub*.
+   Märkningen försvinner när den publicerade kupongen är likadan, och glöms efter tre dygn.
+
+**Ändra:** knappen *Ändra* (bara medan någon match återstår). Startade matcher ligger kvar
+som de är. GitHub kan inte fylla i en fil som redan finns, så *Spara på GitHub* kopierar
+innehållet och öppnar filen för redigering – markera allt, klistra in, Commit changes.
+**Ta bort:** radera filen på GitHub.
+
+**Filen** (går också att skriva för hand; `match` är bara för läsaren, `id` är ESPN:s
+matchid):
+
+```json
+{
+  "namn": "Omgång 9",
+  "skapad": "2026-10-16T18:20:11.000Z",
+  "matcher": [
+    { "id": "401879263", "match": "AFC Bournemouth – Sunderland", "tecken": "1" },
+    { "id": "401879260", "match": "Leeds United – Manchester United", "tecken": "X2" }
+  ]
+}
+```
+
+En trasig fil stoppar inte bygget; felet visas längst ned under fliken Kupong. Lokalt går
+det att prova med en egen mapp: `KUPONG_DIR=/tmp/kuponger npm run build`.
+
 ## Statusmärkning
 
 Räknas om i webbläsaren ur hämttid och källans gräns – stannar den schemalagda hämtningen
@@ -866,6 +931,10 @@ schemaintervall gammalt.
   leverantör är odokumenterad. I en cupmatch mellan nivåerna kan lagen alltså ha olika
   xG-källa.
 - Europacupernas kvalomgångar hämtas bara för juli–augusti.
+- **Kupongen:** att GitHub fyller i den nya filen ur länken (`?filename=…&value=…`) är
+  provat fram till inloggningen 2026-10-18, inte hela vägen till en commit. Märkningen
+  *väntar på GitHub* finns bara i webbläsaren där kupongen skapades. Liveställningen bygger
+  på ESPN:s inofficiella API, som resten av sajten.
 
 ## Säkerhet
 
