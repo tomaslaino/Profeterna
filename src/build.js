@@ -191,7 +191,7 @@ function squads(m) {
 
 function analysisInfo(override) {
   const endpoint = override !== undefined ? override : (llm.enabled ? llm.endpoint : null);
-  return endpoint ? { endpoint, provider: llm.provider, model: llm.model } : null;
+  return endpoint ? { endpoint, provider: llm.provider, model: llm.model, news: Boolean(llm.news) } : null;
 }
 
 // Kompakt prognos för matchlistan: hela procent 1 · X · 2 (summa 100), och

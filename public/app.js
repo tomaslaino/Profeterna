@@ -652,7 +652,9 @@ function analysisCard(d) {
   const final = r && r.retry === false;
   return `<div class="card analysis" id="analysis-card"><h4>Analys <span class="hint">${esc(a.model)}</span></h4>` +
     (r ? `<p class="unknown">Ingen analys: ${esc(r.error || 'okänt fel')}${final ? ' En ny text kan skrivas när underlaget ändrats.' : ''}</p>` : '') +
-    (final ? '' : `<button type="button" class="analyze" data-id="${esc(d.match.id)}" title="En språkmodell skriver bara ur underlaget på sidan – en text med ett tal som inte finns där visas inte">${r ? 'Försök igen' : 'Analysera'}</button>`) + '</div>';
+    (final ? '' : `<button type="button" class="analyze" data-id="${esc(d.match.id)}" title="${a.news
+      ? 'En språkmodell skriver ur underlaget på sidan och nyheter som hämtas online – en text med ett tal som inte finns där visas inte'
+      : 'En språkmodell skriver bara ur underlaget på sidan – en text med ett tal som inte finns där visas inte'}">${r ? 'Försök igen' : 'Analysera'}</button>`) + '</div>';
 }
 
 // Nyhetsläget: eget avsnitt under analysen, som Redaktionens analys på
