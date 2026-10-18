@@ -194,8 +194,8 @@ function renderList(d) {
   }
   // Kolumnens nyckel står i första dagens rubrik i stället för en förklaring.
   let key = d.view === 'played'
-    ? '<span class="day-key" style="float:right;margin-right:20px" title="Resultat, under det prognosen 1 · X · 2 i procent före avspark">Resultat · prognos</span>'
-    : '<span class="day-key" style="float:right;margin-right:20px" title="Hemmaseger · oavgjort · bortaseger efter 90 minuter, i procent">1 · X · 2 %</span>';
+    ? '<span class="day-key" style="float:right;margin-right:20px" title="Resultat, under det prognosen 1 · X · 2 som odds före avspark">Resultat · odds</span>'
+    : '<span class="day-key" style="float:right;margin-right:20px" title="Profeternas odds på hemmaseger · oavgjort · bortaseger efter 90 minuter (1 delat med sannolikheten)">Odds 1 · X · 2</span>';
   let html = '';
   for (const ms of days.values()) {
     html += `<div class="day"><div class="day-head">${esc(cap(fDay.format(new Date(ms[0].kickoff))))}${key}</div><div class="mlist">`;
@@ -210,11 +210,18 @@ function compOf(id) {
   return state.comps.get(id) || { name: id, short: id };
 }
 
-// Kompakt prognos: 1 · X · 2 i hela procent, det troligaste utfallet i fetstil.
+// Prognosen som odds på svenskt vis: decimalodds = 1 / sannolikheten, med
+// decimalkomma. Räknas från hela procent, samma precision som journalen.
+function listOdds(p) {
+  return p.map((x) => (x > 0 ? odds(100 / x) : '–'));
+}
+
+// Kompakt prognos: 1 · X · 2 som odds, det troligaste utfallet i fetstil.
 function listForecast(f) {
   if (!f) return '<span class="unknown">okänt</span>';
   const max = Math.max(...f.p);
-  return f.p.map((x) => (x === max ? `<b>${x}</b>` : String(x))).join(' · ') +
+  const o = listOdds(f.p);
+  return f.p.map((x, i) => (x === max ? `<b>${o[i]}</b>` : o[i])).join(' · ') +
     (f.lower ? ' <span title="Ett lag saknar egen lagdata">*</span>' : '');
 }
 
@@ -231,8 +238,8 @@ function matchRow(m) {
       side = `<span class="score">${m.score.home}–${m.score.away}</span>`;
       if (m.shootout) side += `<span class="sub">str. ${m.shootout.home}–${m.shootout.away}</span>`;
     }
-    if (m.j) side += `<span class="sub" title="Prognosen före avspark, ur journalen">${m.j.p ? m.j.p.join(' · ') : 'okänt'}</span>`;
-    else if (m.f) side += `<span class="sub retro" title="Inte loggad – återskapad i efterhand med underlaget före matchdagen">${m.f.p.join(' · ')}</span>`;
+    if (m.j) side += `<span class="sub" title="Prognosen före avspark, ur journalen">${m.j.p ? listOdds(m.j.p).join(' · ') : 'okänt'}</span>`;
+    else if (m.f) side += `<span class="sub retro" title="Inte loggad – återskapad i efterhand med underlaget före matchdagen">${listOdds(m.f.p).join(' · ')}</span>`;
   } else {
     side = listForecast(m.f);
     if (m.status === 'STATUS_POSTPONED') side += '<span class="sub">uppskjuten</span>';
@@ -242,7 +249,7 @@ function matchRow(m) {
     `<span class="ctag" title="${esc(compOf(m.comp).name)}">${esc(compOf(m.comp).short)}</span>` +
     `<span class="mteams">${esc(m.home)}<span class="vs">–</span>${esc(m.away)}` +
     `${m.round ? `<span class="sub">${esc(m.round)}</span>` : ''}</span>` +
-    `<span class="mside">${side}</span></button>`;
+    `<span class="mside${m.completed && m.score ? '' : ' mside-odds'}">${side}</span></button>`;
 }
 
 // ---------- matchvy ----------

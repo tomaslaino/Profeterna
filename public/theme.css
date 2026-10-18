@@ -741,6 +741,12 @@ footer .foot-links a:hover { color: var(--fg); }
   h3 { font-size: 22px; margin-top: 32px; }
 }
 
+/* smal mobil: oddsen på en egen rad under lagen, så att namnen får plats */
+@media (max-width: 640px) {
+  .mrow { row-gap: 5px; }
+  .mside-odds { grid-column: 2 / -1; text-align: left; }
+}
+
 @media (prefers-reduced-motion: reduce) {
   * { transition: none !important; }
 }

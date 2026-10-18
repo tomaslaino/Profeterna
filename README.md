@@ -773,7 +773,9 @@ ställningen efter 90 minuter (samma utfall som prognosen).
   rutor (valda fyllda, utfallet grönt om vi hade det och rödringat om inte), modellens tips
   som en prick under rutan och modellens chans för vårt tecken. När alla matcher är spelade
   (även om spoilerskyddet döljer resultaten) visas knappen *Skapa ny kupong*. Utan kupong:
-  knappen *Skapa kupong*. Matchlistan ligger under fliken Matcher (`#matcher`).
+  knappen *Skapa kupong*. Matchlistan ligger under fliken Matcher (`#matcher`) och visar
+  prognosen som svenska decimalodds (1 / sannolikheten, t.ex. 1,85), räknade från hela
+  procent; på smala mobiler står oddsen på en egen rad under lagen.
 - **En viss kupong** (`#kupong/<id>`): samma vy utan rubriken, och under den tidigare
   kuponger med staplar för andel rätt mot hur många rätt modellens tips hade gett, och
   länken *Historik* (en färdig kupong länkas som `historik.html#<id>`).
