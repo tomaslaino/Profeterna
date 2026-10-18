@@ -1,0 +1,686 @@
+/* Profeterna – mörkt tema i Gräver Gravs formspråk (gravergrav.se): navy glas,
+   kondenserad displayfont, smal klistrad toppbar och få ord. Laddas sist och
+   skriver över färger och komponenter i style.css och divisioner.css, så att
+   de filerna kan ändras för sig utan att utseendet går förlorat. */
+@import url("https://fonts.googleapis.com/css2?family=Big+Shoulders+Display:wght@700;800&display=swap");
+
+/* Medvetet bara mörkt läge, som Gräver Grav: glaskorten och glöden bygger på
+   en mörk botten. Tokens skrivs utan media-fråga så de vinner över båda
+   lägena i style.css. */
+:root {
+  color-scheme: dark;
+  --bg: #070d18;
+  --fg: #eef3fa;
+  --ink-soft: #b3c4d9;
+  --muted: #8a9db6;
+  --eyebrow: #9fb4cd;
+  --card: #0f1c30;
+  --glass: linear-gradient(180deg, rgba(20, 36, 60, 0.8), rgba(11, 21, 38, 0.86));
+  --glass-hi: linear-gradient(180deg, rgba(24, 43, 72, 0.86), rgba(11, 21, 38, 0.9));
+  --pill: rgba(10, 22, 40, 0.48);
+  --pill-line: rgba(80, 115, 160, 0.32);
+  --pill-line-hi: rgba(120, 160, 210, 0.6);
+  --border: rgba(255, 255, 255, 0.085);
+  --hair: rgba(255, 255, 255, 0.06);
+  --accent: #5b8cff;
+  --accent-deep: #a9c2ff;
+  --accent-soft: rgba(91, 140, 255, 0.16);
+  --fresh: #2db87a;
+  --stale: #e8b84a;
+  --down: #ff6b7d;
+  --unknown: #6f8098;
+  --up-soft: rgba(45, 184, 122, 0.15);
+  --down-soft: rgba(255, 107, 125, 0.14);
+  --side-soft: rgba(232, 184, 74, 0.14);
+  --o-home: #5b8cff;
+  --o-draw: #46536a;
+  --o-away: #ff8a4c;
+  --c-b: #5b8cff;
+  --c-c: #ff8a4c;
+  /* divisionsfärgerna från divisioner.css, mörka varianten */
+  --dv-pl: #3987e5;
+  --dv-ch: #d95926;
+  --dv-l1: #199e70;
+  --dv-l2: #c98500;
+  --dv-nl: #d55181;
+  --dv-fac: #e0485e;
+  --dv-lc: #9b7cf0;
+  --shadow-card: 0 22px 50px -28px rgba(0, 0, 0, 0.85), inset 0 1px 0 rgba(255, 255, 255, 0.05);
+  --shadow-hero: 0 30px 70px -28px rgba(0, 0, 0, 0.9), inset 0 1px 0 rgba(255, 255, 255, 0.07);
+  --display: "Big Shoulders Display", "Arial Narrow", "Roboto Condensed", system-ui, sans-serif;
+  --serif: var(--display);
+  --bone: #efe7d9;
+  --radius: 16px;
+  --maxw: 1120px;
+  --gutter: 20px;
+}
+
+html {
+  background: var(--bg);
+  scrollbar-color: #2a3d5c transparent;
+  scroll-padding-top: 72px; /* under den klistrade toppbaren */
+}
+
+body {
+  font-family: -apple-system, BlinkMacSystemFont, "SF Pro Text", "Segoe UI", Roboto, "Helvetica Neue", sans-serif;
+  font-size: 15px;
+  line-height: 1.5;
+  color: var(--fg);
+  background: var(--bg);
+  /* glöd: hemmablått från vänster, bortaorange från höger */
+  background-image:
+    radial-gradient(1100px 560px at 92% -12%, rgba(255, 138, 76, 0.1), transparent 62%),
+    radial-gradient(1000px 560px at 0% -8%, rgba(91, 140, 255, 0.17), transparent 60%),
+    radial-gradient(900px 700px at 50% 115%, rgba(18, 36, 61, 0.85), transparent 70%);
+  background-attachment: fixed;
+}
+
+::selection { background: rgba(91, 140, 255, 0.35); color: #fff; }
+
+a { color: var(--accent-deep); text-decoration-color: rgba(169, 194, 255, 0.35); text-underline-offset: 2px; }
+a:hover { color: #fff; }
+
+:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
+
+main, footer {
+  max-width: var(--maxw);
+  padding-left: var(--gutter);
+  padding-right: var(--gutter);
+}
+main { padding-top: 8px; padding-bottom: 48px; }
+
+/* ---------- toppbar (index.html) ---------- */
+
+.topbar {
+  position: sticky;
+  top: 0;
+  z-index: 40;
+  max-width: none;
+  margin: 0;
+  padding: 0;
+  background: color-mix(in srgb, #0a1628 80%, transparent);
+  -webkit-backdrop-filter: blur(14px) saturate(130%);
+  backdrop-filter: blur(14px) saturate(130%);
+  box-shadow: inset 0 -1px 0 rgba(120, 150, 190, 0.16);
+}
+.topbar-inner {
+  max-width: var(--maxw);
+  margin: 0 auto;
+  padding: 10px var(--gutter);
+  display: flex;
+  align-items: center;
+  gap: 20px;
+}
+
+.brand {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  flex: none;
+  color: inherit;
+  text-decoration: none;
+}
+.brand:hover { color: inherit; }
+.brand .logo {
+  width: 36px;
+  height: 36px;
+  border-radius: 11px;
+  box-shadow: 0 5px 16px rgba(58, 100, 176, 0.5), 0 1px 2px rgba(0, 0, 0, 0.35);
+  transition: transform 0.18s ease;
+}
+.brand:hover .logo { transform: translateY(-1px); }
+.brand-txt { display: flex; flex-direction: column; gap: 3px; }
+.brand-txt b {
+  font-family: var(--display);
+  font-weight: 800;
+  font-size: 23px;
+  line-height: 0.9;
+  letter-spacing: 0.045em;
+  text-transform: uppercase;
+  color: var(--bone);
+}
+.brand-txt small {
+  font-size: 9.5px;
+  font-weight: 800;
+  letter-spacing: 0.3em;
+  text-transform: uppercase;
+  color: var(--ink-soft);
+}
+
+/* Flikarna som en segmenterad glaspanel, som Gräver Gravs meny. */
+.topbar .tabs {
+  position: static;
+  max-width: none;
+  margin: 0 0 0 auto;
+  padding: 4px;
+  display: flex;
+  gap: 2px;
+  min-width: 0;
+  background: var(--pill);
+  border: 1px solid var(--pill-line);
+  border-radius: 12px;
+  -webkit-backdrop-filter: none;
+  backdrop-filter: none;
+}
+.tabs .tablist { display: flex; gap: 2px; }
+
+.tabs [role="tab"],
+.tabs a.tab-link {
+  border: 0;
+  border-radius: 9px;
+  background: transparent;
+  box-shadow: none;
+  color: #b9c9dd;
+  font-size: 14px;
+  font-weight: 600;
+  padding: 7px 14px;
+  line-height: 1.3;
+  transition: color 0.15s ease, background-color 0.15s ease, box-shadow 0.15s ease;
+}
+.tabs [role="tab"]:hover,
+.tabs a.tab-link:hover { color: #fff; background: rgba(255, 255, 255, 0.05); }
+.tabs [role="tab"][aria-selected="true"],
+.tabs a.tab-link[aria-current="page"] {
+  color: #f4f7fd;
+  background: linear-gradient(180deg, color-mix(in srgb, #16294a 82%, var(--accent) 18%), #122238);
+  border-color: transparent;
+  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.35), 0 8px 22px rgba(0, 0, 0, 0.35), inset 0 -2px 0 var(--accent);
+}
+
+/* ---------- gammalt sidhuvud (divisioner.html tills den får toppbaren) ---------- */
+
+body > header:not(.topbar) {
+  max-width: var(--maxw);
+  padding: 22px var(--gutter) 0;
+}
+body > header:not(.topbar) .masthead { margin-bottom: 16px; }
+body > header:not(.topbar) .brand h1 {
+  font-family: var(--display);
+  font-weight: 800;
+  font-size: 26px;
+  line-height: 0.95;
+  letter-spacing: 0.045em;
+  text-transform: uppercase;
+  color: var(--bone);
+}
+body > header:not(.topbar) .tagline { display: none; }
+body > header:not(.topbar) .logo { border-radius: 12px; box-shadow: 0 5px 16px rgba(58, 100, 176, 0.5); }
+body > nav.tabs {
+  max-width: none;
+  margin: 0 0 24px;
+  padding: 8px max(var(--gutter), calc((100% - var(--maxw)) / 2 + var(--gutter)));
+  gap: 2px;
+  background: color-mix(in srgb, #0a1628 80%, transparent);
+  -webkit-backdrop-filter: blur(14px) saturate(130%);
+  backdrop-filter: blur(14px) saturate(130%);
+  border-bottom: 0;
+  box-shadow: inset 0 -1px 0 rgba(120, 150, 190, 0.16);
+}
+
+/* ---------- hjälte (matchlistan) ---------- */
+
+.hero {
+  position: relative;
+  padding: clamp(36px, 7vw, 84px) 0 clamp(26px, 4vw, 44px);
+  isolation: isolate;
+}
+/* en plan i hårlinjer som anas bakom rubriken */
+.hero::before {
+  content: "";
+  position: absolute;
+  z-index: -1;
+  top: clamp(8px, 2vw, 24px);
+  right: calc(var(--gutter) * -1);
+  width: min(62%, 640px);
+  aspect-ratio: 3 / 2;
+  background: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 600 400' fill='none' stroke='%23cfe0ff' stroke-width='2'%3E%3Crect x='2' y='2' width='596' height='396' rx='6'/%3E%3Cpath d='M300 2v396'/%3E%3Ccircle cx='300' cy='200' r='68'/%3E%3Ccircle cx='300' cy='200' r='3' fill='%23cfe0ff'/%3E%3Crect x='2' y='104' width='92' height='192'/%3E%3Crect x='2' y='160' width='34' height='80'/%3E%3Crect x='506' y='104' width='92' height='192'/%3E%3Crect x='564' y='160' width='34' height='80'/%3E%3Cpath d='M94 166a40 40 0 0 1 0 68M506 166a40 40 0 0 0 0 68'/%3E%3C/svg%3E") center / contain no-repeat;
+  opacity: 0.075;
+  -webkit-mask-image: radial-gradient(ellipse 50% 50% at 55% 44%, #000 25%, transparent 100%);
+  mask-image: radial-gradient(ellipse 50% 50% at 55% 44%, #000 25%, transparent 100%);
+  pointer-events: none;
+}
+.kicker {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  margin: 0 0 clamp(16px, 2.2vw, 22px);
+  padding: 5px 13px;
+  font-size: 11px;
+  font-weight: 800;
+  letter-spacing: 1.6px;
+  text-transform: uppercase;
+  color: #dfe8ff;
+  border-radius: 999px;
+  background: linear-gradient(180deg, color-mix(in srgb, var(--accent) 42%, rgba(10, 18, 32, 0.5)), color-mix(in srgb, var(--accent) 26%, rgba(10, 18, 32, 0.7)));
+  border: 1px solid color-mix(in srgb, var(--accent) 62%, transparent);
+  box-shadow: 0 6px 18px rgba(0, 0, 0, 0.4);
+}
+.kicker-dot {
+  width: 7px;
+  height: 7px;
+  border-radius: 50%;
+  background: #9dbcff;
+  animation: pulse 2.2s infinite;
+}
+@keyframes pulse {
+  0% { box-shadow: 0 0 0 0 rgba(157, 188, 255, 0.55); }
+  70% { box-shadow: 0 0 0 6px rgba(157, 188, 255, 0); }
+  100% { box-shadow: 0 0 0 0 rgba(157, 188, 255, 0); }
+}
+.hero-title {
+  margin: 0 0 16px;
+  padding-top: 0.04em;
+  font-family: var(--display);
+  font-weight: 800;
+  font-size: clamp(64px, 13vw, 156px);
+  line-height: 0.86;
+  letter-spacing: 0.004em;
+  text-transform: uppercase;
+  color: var(--bone);
+  text-shadow: 0 6px 30px rgba(0, 0, 0, 0.55), 0 1px 2px rgba(0, 0, 0, 0.55);
+}
+.hero-sub {
+  margin: 0;
+  max-width: 44ch;
+  font-size: clamp(16px, 1.8vw, 20px);
+  line-height: 1.5;
+  color: #d4e2f1;
+}
+.hero .topline {
+  margin-top: 18px;
+  text-align: left;
+  font-size: 13px;
+  line-height: 1.6;
+  color: var(--muted);
+}
+.hero .topline strong { color: var(--fg); }
+
+/* ---------- rubriker ---------- */
+
+.page-title {
+  margin: clamp(18px, 3vw, 34px) 0 22px;
+  padding-top: 0.05em;
+  font-family: var(--display);
+  font-weight: 800;
+  font-size: clamp(36px, 5vw, 52px);
+  line-height: 0.95;
+  letter-spacing: 0.02em;
+  text-transform: uppercase;
+  color: var(--bone);
+}
+
+h3 {
+  margin: 40px 0 14px;
+  padding-top: 0;
+  border-top: 0;
+  font-family: var(--display);
+  font-weight: 800;
+  font-size: 24px;
+  line-height: 1;
+  letter-spacing: 0.03em;
+  text-transform: uppercase;
+  color: var(--bone);
+}
+h3 .hint,
+h3 .phase-tag {
+  font-family: -apple-system, BlinkMacSystemFont, "SF Pro Text", "Segoe UI", Roboto, sans-serif;
+  text-transform: none;
+  letter-spacing: 0;
+  vertical-align: 3px;
+}
+h3 .hint { font-size: 13px; font-weight: 500; color: var(--muted); margin-left: 8px; }
+.page-title + h3, .intro + h3, .legend + h3 { margin-top: 18px; }
+h4.sub-h { font-size: 14px; color: var(--ink-soft); }
+
+.intro { color: var(--ink-soft); font-size: 15px; max-width: 62ch; }
+.legend { color: var(--muted); font-size: 13px; line-height: 1.55; }
+.hint { color: var(--muted); }
+
+/* ---------- reglage ---------- */
+
+button {
+  border: 1px solid var(--pill-line);
+  border-radius: 11px;
+  background: var(--pill);
+  color: var(--fg);
+  box-shadow: none;
+  transition: color 0.15s ease, border-color 0.15s ease, background-color 0.15s ease;
+}
+button:hover { border-color: var(--pill-line-hi); color: #fff; }
+
+.toolbar { gap: 12px; margin: 0 0 22px; }
+
+.seg {
+  gap: 2px;
+  padding: 4px;
+  background: var(--pill);
+  border: 1px solid var(--pill-line);
+  border-radius: 12px;
+}
+.seg button {
+  border-radius: 9px;
+  padding: 6px 16px;
+  font-size: 14px;
+  color: #b9c9dd;
+}
+.seg button:hover { color: #fff; background: rgba(255, 255, 255, 0.05); }
+.seg button[aria-pressed="true"] {
+  color: #f4f7fd;
+  background: linear-gradient(180deg, color-mix(in srgb, #16294a 82%, var(--accent) 18%), #122238);
+  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.35), inset 0 -2px 0 var(--accent);
+}
+
+.chips { gap: 6px; }
+.chips button {
+  --c: var(--accent);
+  padding: 6px 13px;
+  font-size: 13px;
+  font-weight: 700;
+  letter-spacing: 0.02em;
+  border-radius: 999px;
+  color: #b9c9dd;
+}
+.chips button[data-comp="pl"], .ctag[title="Premier League"] { --c: var(--dv-pl); }
+.chips button[data-comp="ch"], .ctag[title="Championship"] { --c: var(--dv-ch); }
+.chips button[data-comp="l1"], .ctag[title="League One"] { --c: var(--dv-l1); }
+.chips button[data-comp="l2"], .ctag[title="League Two"] { --c: var(--dv-l2); }
+.chips button[data-comp="nl"], .ctag[title="National League"] { --c: var(--dv-nl); }
+.chips button[data-comp="fac"], .ctag[title="FA Cup"] { --c: var(--dv-fac); }
+.chips button[data-comp="lc"], .ctag[title="EFL Cup"] { --c: var(--dv-lc); }
+.chips button[aria-pressed="true"] {
+  color: #fff;
+  background: color-mix(in srgb, var(--c) 30%, rgba(10, 22, 40, 0.6));
+  border-color: color-mix(in srgb, var(--c) 70%, transparent);
+}
+
+.dv-select {
+  background-color: var(--pill);
+  border-color: var(--pill-line);
+  border-radius: 11px;
+  color: var(--fg);
+}
+.dv-select:hover { border-color: var(--pill-line-hi); }
+.dv-select option { background: var(--card); color: var(--fg); }
+
+/* disclosure-pil i stället för webbläsarens triangel */
+details > summary {
+  list-style: none;
+  cursor: pointer;
+  color: var(--accent-deep);
+  font-weight: 600;
+}
+details > summary::-webkit-details-marker { display: none; }
+details > summary::before {
+  content: "";
+  display: inline-block;
+  width: 6px;
+  height: 6px;
+  margin: 0 9px 0 2px;
+  border-right: 2px solid currentColor;
+  border-bottom: 2px solid currentColor;
+  transform: rotate(-45deg);
+  vertical-align: 2px;
+  transition: transform 0.2s ease;
+}
+details[open] > summary::before { transform: rotate(45deg); vertical-align: 3px; }
+details > summary:hover { color: #fff; }
+
+/* ---------- kort och tabeller ---------- */
+
+.card,
+.mlist,
+.table-wrap {
+  background: var(--glass);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  box-shadow: var(--shadow-card);
+}
+.card { padding: 18px 20px; font-size: 14px; }
+.card h4 {
+  margin: 0 0 12px;
+  font-size: 11.5px;
+  font-weight: 800;
+  letter-spacing: 0.14em;
+  color: var(--eyebrow);
+}
+.card h4 .hint { font-size: 12.5px; font-weight: 500; color: var(--muted); }
+.card .src-line { font-size: 12px; color: var(--muted); }
+/* tabeller som redan ligger i ett kort får inget eget glas */
+.card .table-wrap {
+  background: transparent;
+  border-color: var(--hair);
+  border-radius: 12px;
+  box-shadow: none;
+}
+.grid2 { gap: 16px; margin-bottom: 16px; }
+
+table { font-size: 14px; }
+th, td { border-bottom: 1px solid var(--hair); }
+th {
+  font-size: 10.5px;
+  font-weight: 800;
+  letter-spacing: 0.1em;
+  color: var(--eyebrow);
+  border-bottom: 1px solid var(--border);
+}
+.table-wrap tbody tr { transition: background-color 0.12s ease; }
+.table-wrap tbody tr:hover > td { background: rgba(255, 255, 255, 0.025); }
+.sub { color: var(--muted); }
+
+table.side tr.group td {
+  background: rgba(255, 255, 255, 0.035);
+  color: var(--eyebrow);
+  font-size: 10.5px;
+  font-weight: 800;
+  letter-spacing: 0.12em;
+}
+table.cmp tr.model td { background: var(--accent-soft); color: #fff; }
+
+.form span { border-radius: 7px; }
+
+/* ---------- matchlistan ---------- */
+
+.day { margin: 0 0 26px; }
+.day-head {
+  margin: 0 0 9px 4px;
+  font-size: 11.5px;
+  font-weight: 800;
+  letter-spacing: 0.16em;
+  color: var(--eyebrow);
+}
+.mlist { overflow: hidden; }
+.mrow {
+  grid-template-columns: 3.2rem 3.3rem 1fr auto;
+  gap: 14px;
+  padding: 14px 20px;
+  border: 0;
+  border-bottom: 1px solid var(--hair);
+  border-radius: 0;
+  background: transparent;
+  color: var(--fg);
+  transition: background-color 0.15s ease;
+}
+.mrow:last-child { border-bottom: 0; }
+.mrow:hover { background: rgba(255, 255, 255, 0.04); color: var(--fg); border-color: var(--hair); }
+.mrow:focus-visible { outline-offset: -3px; }
+.mtime { color: var(--ink-soft); font-weight: 600; font-size: 13.5px; }
+.ctag {
+  --c: var(--accent);
+  padding: 3px 8px;
+  font-size: 10.5px;
+  font-weight: 800;
+  letter-spacing: 0.05em;
+  border-radius: 999px;
+  color: color-mix(in srgb, var(--c) 45%, #fff);
+  background: color-mix(in srgb, var(--c) 22%, transparent);
+  box-shadow: inset 0 0 0 1px color-mix(in srgb, var(--c) 35%, transparent);
+}
+.mteams { font-size: 15px; font-weight: 600; letter-spacing: -0.005em; }
+.mteams .vs { color: var(--muted); margin: 0 0.4rem; }
+.mside { font-size: 14px; color: var(--muted); }
+.mside b { color: var(--fg); font-weight: 750; }
+.mside .score {
+  font-family: var(--display);
+  font-size: 22px;
+  font-weight: 800;
+  letter-spacing: 0.02em;
+  color: var(--bone);
+}
+.empty { color: var(--muted); }
+
+/* ---------- matchvyn ---------- */
+
+.back { margin: 22px 0 16px; }
+.back a {
+  display: inline-flex;
+  align-items: center;
+  padding: 7px 14px;
+  font-size: 14px;
+  font-weight: 600;
+  color: #b9c9dd;
+  text-decoration: none;
+  background: var(--pill);
+  border: 1px solid var(--pill-line);
+  border-radius: 11px;
+  transition: color 0.15s ease, border-color 0.15s ease;
+}
+.back a:hover { color: #fff; border-color: var(--pill-line-hi); }
+
+.mhead {
+  padding: clamp(20px, 3vw, 32px) clamp(18px, 3.4vw, 38px);
+  margin-bottom: 16px;
+  background: var(--glass-hi);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  border-radius: 22px;
+  box-shadow: var(--shadow-hero);
+}
+/* tunn linje överst i hemma- och bortafärg */
+.mhead::before {
+  inset: 0 0 auto 0;
+  width: auto;
+  height: 3px;
+  background: linear-gradient(90deg, var(--o-home), var(--o-away));
+  opacity: 0.9;
+}
+.mhead-meta {
+  font-size: 11.5px;
+  font-weight: 800;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: var(--eyebrow);
+}
+.mhead-teams { margin: 16px 0 4px; gap: 18px; }
+.mhead-team {
+  font-family: var(--display);
+  font-weight: 800;
+  font-size: clamp(30px, 4.8vw, 54px);
+  line-height: 0.95;
+  letter-spacing: 0.01em;
+  color: var(--bone);
+}
+.mhead-mid {
+  font-family: var(--display);
+  font-weight: 800;
+  font-size: clamp(36px, 5.4vw, 62px);
+  line-height: 1;
+  color: var(--bone);
+}
+.mhead-mid .sub { font-family: -apple-system, BlinkMacSystemFont, "SF Pro Text", sans-serif; font-size: 12px; font-weight: 500; }
+.note { color: var(--stale); }
+
+/* prognoskortet är matchvyns huvudnummer */
+.card.fc {
+  position: relative;
+  overflow: hidden;
+  padding: 22px clamp(18px, 3vw, 30px);
+  margin-bottom: 16px;
+  background: var(--glass-hi);
+  border-color: rgba(255, 255, 255, 0.1);
+  border-radius: 20px;
+  box-shadow: var(--shadow-hero);
+}
+.fc-main { gap: 12px; margin: 6px 0 16px; }
+.fc-label {
+  font-size: 11.5px;
+  font-weight: 800;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: var(--eyebrow);
+}
+.fc-num {
+  font-family: var(--display);
+  font-weight: 800;
+  font-size: clamp(44px, 6vw, 68px);
+  line-height: 1;
+  letter-spacing: 0.01em;
+  color: var(--bone);
+  margin-top: 4px;
+}
+.fc-col.draw .fc-num { font-size: clamp(32px, 4.2vw, 48px); color: var(--muted); padding-top: 0.2em; }
+.fc-range { font-size: 12px; margin-top: 2px; }
+.fc-bar { height: 10px; gap: 3px; background: transparent; }
+.fc-bar span { border-radius: 999px; }
+.fc-stats, .fc-adv { font-size: 14px; color: var(--ink-soft); }
+.fc-stats b, .fc-adv b { color: var(--fg); }
+table.sgrid td { border-radius: 6px; }
+
+/* ---------- källor och utvärdering ---------- */
+
+.s-färsk { background: var(--fresh); box-shadow: 0 0 8px rgba(45, 184, 122, 0.55); }
+.s-fel { background: var(--down); box-shadow: 0 0 8px rgba(255, 107, 125, 0.5); }
+.badge, .phase-tag, .lower-tag { border-radius: 999px; }
+.phase-tag { color: var(--accent-deep); background: var(--accent-soft); }
+.chart-card { padding: 14px 16px 8px; }
+.dv-tip {
+  background: var(--card);
+  border: 1px solid rgba(90, 125, 165, 0.42);
+  border-radius: 12px;
+  box-shadow: 0 18px 44px rgba(0, 0, 0, 0.55);
+}
+
+/* ---------- sidfot ---------- */
+
+footer {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding-top: 26px;
+  padding-bottom: 44px;
+  border-top: 1px solid var(--hair);
+  font-size: 12.5px;
+  color: var(--muted);
+}
+footer p { margin: 0; }
+footer .logo-sm { width: 20px; height: 20px; border-radius: 6px; flex: none; opacity: 0.9; }
+
+/* ---------- mobil ---------- */
+
+@media (max-width: 760px) {
+  :root { --gutter: 16px; }
+  .topbar-inner { gap: 12px; padding-top: 8px; padding-bottom: 8px; }
+  .brand-txt { display: none; }
+  .brand .logo { width: 32px; height: 32px; border-radius: 10px; }
+  /* flikarna rullar i sidled och tonar ut i kanten */
+  .topbar .tabs {
+    margin-left: 0;
+    flex: 1 1 auto;
+    overflow-x: auto;
+    scrollbar-width: none;
+    -webkit-mask-image: linear-gradient(90deg, #000 85%, transparent);
+    mask-image: linear-gradient(90deg, #000 85%, transparent);
+  }
+  .topbar .tabs::-webkit-scrollbar { display: none; }
+  .tabs [role="tab"], .tabs a.tab-link { padding: 6px 11px; font-size: 13.5px; white-space: nowrap; }
+  .hero::before { width: 92%; opacity: 0.05; }
+  .mrow { grid-template-columns: 2.9rem 1fr auto; gap: 10px; padding: 13px 14px; }
+  .card { padding: 16px; }
+  .mhead-teams { gap: 10px; }
+  .fc-main { gap: 6px; }
+  .fc-label { font-size: 10.5px; letter-spacing: 0.03em; }
+  h3 { font-size: 22px; margin-top: 32px; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .kicker-dot { animation: none; }
+  * { transition: none !important; }
+}

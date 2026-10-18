@@ -4,39 +4,46 @@
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <title>Profeterna – matchprognoser för engelsk fotboll</title>
-  <meta name="theme-color" media="(prefers-color-scheme: light)" content="#f7f8fb">
-  <meta name="theme-color" media="(prefers-color-scheme: dark)" content="#11141a">
+  <meta name="theme-color" content="#0a1628">
   <link rel="icon" type="image/svg+xml" href="logo.svg">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link rel="stylesheet" href="style.css">
+  <link rel="stylesheet" href="divisioner.css">
+  <link rel="stylesheet" href="theme.css">
 </head>
 <body>
-  <header>
-    <div class="masthead">
-      <div class="brand">
-        <img class="logo" src="logo.svg" alt="" width="44" height="44">
-        <div class="brand-text">
-          <h1 id="brand-name">Profeterna</h1>
-          <p class="tagline">Matchprognoser för engelsk fotboll – rättade mot facit.</p>
+  <header class="topbar">
+    <div class="topbar-inner">
+      <a class="brand" href="#matcher" aria-label="Profeterna – till matcherna">
+        <img class="logo" src="logo.svg" alt="" width="36" height="36">
+        <span class="brand-txt"><b id="brand-name">Profeterna</b><small>Engelsk fotboll</small></span>
+      </a>
+      <nav class="tabs" aria-label="Sektioner">
+        <div class="tablist" role="tablist">
+          <button type="button" role="tab" id="tab-matches" data-tab="matches-section"
+            aria-controls="matches-section" aria-selected="true">Matcher</button>
+          <button type="button" role="tab" id="tab-eval" data-tab="eval-section"
+            aria-controls="eval-section" aria-selected="false">Utvärdering</button>
+          <button type="button" role="tab" id="tab-sources" data-tab="sources-section"
+            aria-controls="sources-section" aria-selected="false">Källor</button>
+          <button type="button" role="tab" id="tab-model" data-tab="model-section"
+            aria-controls="model-section" aria-selected="false">Modell</button>
         </div>
-      </div>
-      <div id="topline" class="topline">Laddar …</div>
+        <a class="tab-link" href="divisioner.html">Divisioner</a>
+      </nav>
     </div>
   </header>
-
-  <nav class="tabs" role="tablist" aria-label="Sektioner">
-    <button type="button" role="tab" id="tab-matches" data-tab="matches-section"
-      aria-controls="matches-section" aria-selected="true">Matcher</button>
-    <button type="button" role="tab" id="tab-eval" data-tab="eval-section"
-      aria-controls="eval-section" aria-selected="false">Utvärdering</button>
-    <button type="button" role="tab" id="tab-sources" data-tab="sources-section"
-      aria-controls="sources-section" aria-selected="false">Källor</button>
-    <button type="button" role="tab" id="tab-model" data-tab="model-section"
-      aria-controls="model-section" aria-selected="false">Modell</button>
-  </nav>
 
   <main>
     <section id="matches-section" role="tabpanel" aria-labelledby="tab-matches">
       <div id="match-list-view">
+        <div class="hero">
+          <p class="kicker"><span class="kicker-dot"></span>Engelsk fotboll</p>
+          <h1 class="hero-title">Profeterna</h1>
+          <p class="hero-sub">Sannolikheter för varje match – rättade mot facit.</p>
+          <div id="topline" class="topline">Laddar …</div>
+        </div>
         <div class="toolbar">
           <div class="seg" role="group" aria-label="Visa">
             <button type="button" data-view="upcoming" aria-pressed="true">Kommande</button>
@@ -44,25 +51,21 @@
           </div>
           <div id="comp-chips" class="chips" role="group" aria-label="Tävling"></div>
         </div>
-        <p class="legend" id="list-legend"></p>
+        <p class="legend" id="list-legend" hidden></p>
         <div id="match-list"></div>
       </div>
       <div id="match-detail-view" hidden></div>
     </section>
 
     <section id="eval-section" role="tabpanel" aria-labelledby="tab-eval" hidden>
+      <h2 class="page-title">Utvärdering</h2>
       <div id="evaluation">Laddar …</div>
     </section>
 
     <section id="sources-section" role="tabpanel" aria-labelledby="tab-sources" hidden>
+      <h2 class="page-title">Källor</h2>
       <p class="intro" id="sources-summary"></p>
-      <p class="legend">
-        <span class="dot s-färsk"></span> färsk
-        <span class="dot s-gammal"></span> gammal
-        <span class="dot s-fel"></span> fel – senaste lyckade data visas
-        <span class="dot s-okänt"></span> okänt
-      </p>
-      <h3>Vad finns per tävling</h3>
+      <h3>Per tävling</h3>
       <div id="coverage"></div>
       <h3>Källorna</h3>
       <div id="sources-table"></div>
@@ -70,12 +73,14 @@
     </section>
 
     <section id="model-section" role="tabpanel" aria-labelledby="tab-model" hidden>
+      <h2 class="page-title">Modell</h2>
       <div id="model">Laddar …</div>
     </section>
   </main>
 
   <footer>
-    <p>Endast fria datakällor. Siffrorna visar källa och datum; saknad data visas som <em>okänt</em>.</p>
+    <img class="logo-sm" src="logo.svg" alt="" width="20" height="20">
+    <p>Profeterna · Endast fria datakällor</p>
   </footer>
 
   <script src="app.js"></script>
