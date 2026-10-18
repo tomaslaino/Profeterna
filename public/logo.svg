@@ -1,14 +1,21 @@
 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64" role="img" aria-label="Profeterna">
   <defs>
-    <linearGradient id="badge" x1="0" y1="0" x2="1" y2="1">
-      <stop offset="0" stop-color="#3a64b0"/>
-      <stop offset="1" stop-color="#1d3b74"/>
+    <linearGradient id="lera" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0" stop-color="#dc7543"/>
+      <stop offset="1" stop-color="#a3471f"/>
     </linearGradient>
   </defs>
-  <rect x="2" y="2" width="60" height="60" rx="17" fill="url(#badge)"/>
-  <!-- tre staplar: sannolikhet för 1, X och 2 -->
-  <rect x="13" y="20" width="10" height="24" rx="2.5" fill="#f4f7fd"/>
-  <rect x="27" y="31" width="10" height="13" rx="2.5" fill="#f4f7fd" fill-opacity="0.75"/>
-  <rect x="41" y="25" width="10" height="19" rx="2.5" fill="#f4f7fd"/>
-  <path d="M12 50h40" stroke="#f4f7fd" stroke-width="2.5" stroke-linecap="round" stroke-opacity="0.6"/>
+  <rect x="2" y="2" width="60" height="60" rx="16" fill="url(#lera)"/>
+  <!-- tre kolonner, höga som sannolikheterna för 1, X och 2 -->
+  <g fill="#f6eee0">
+    <rect x="12.5" y="15" width="12" height="3.5" rx="1"/>
+    <rect x="14" y="18.5" width="9" height="24.5"/>
+    <rect x="26" y="27" width="12" height="3.5" rx="1"/>
+    <rect x="27.5" y="30.5" width="9" height="12.5"/>
+    <rect x="39.5" y="21" width="12" height="3.5" rx="1"/>
+    <rect x="41" y="24.5" width="9" height="18.5"/>
+    <rect x="10" y="43" width="44" height="3.5" rx="1"/>
+    <rect x="8" y="47.5" width="48" height="3" rx="1" fill-opacity="0.7"/>
+  </g>
+  <path d="M18.5 20.5v20.5M32 32.5v8.5M45.5 26.5v14.5" stroke="#b9552a" stroke-width="1.2" stroke-opacity="0.55"/>
 </svg>
