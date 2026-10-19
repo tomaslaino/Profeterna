@@ -159,37 +159,92 @@
   animation: kr-pulse 4s ease-in-out infinite;
 }
 
-.kr-ikaros .kr-figs { bottom: -16px; }
+.kr-ikaros .kr-figs { bottom: 24px; }
+/* Upp och ner, huvudet före mot havet, bort från solen. */
 .kr-ikaros .kr-fig {
-  transform-origin: 50% 45%;
-  transform: rotate(-28deg);
-  animation: kr-fall 3.4s ease-in-out infinite;
+  transform-origin: 50% 50%;
+  transform: rotate(-155deg);
+  animation: kr-fall 2.6s ease-in-out infinite;
 }
-.kr-ikaros .kr-fig img { filter: saturate(0.8) drop-shadow(0 8px 12px rgba(0, 0, 0, 0.5)); }
+.kr-ikaros .kr-fig img { filter: saturate(0.8) drop-shadow(0 -6px 10px rgba(0, 0, 0, 0.5)); }
+.kr-ikaros .kr-noimg { transform: rotate(-25deg); animation: none; }
 
 .kr-wings {
   position: absolute;
   z-index: 0;
   left: var(--hx);
-  top: calc(var(--sy) - var(--fh) * 0.13);
+  top: calc(var(--sy) - var(--fh) * 0.2);
   width: calc(var(--fh) * 1.05);
   overflow: visible;
   transform: translateX(-50%);
+  filter: drop-shadow(0 0 3px rgba(240, 130, 60, 0.75));
 }
-.kr-drip { transform-box: fill-box; animation: kr-drip 2.2s ease-in infinite; animation-delay: var(--d, 0s); }
+.kr-drip { transform-box: fill-box; animation: kr-drip 1.8s ease-in infinite; animation-delay: var(--d, 0s); }
 
+/* Fartstreck bakom honom, snett uppåt mot solen. */
+.kr-speed {
+  position: absolute;
+  inset: 0 6% 30% 30%;
+  transform: rotate(25deg);
+}
+.kr-speed i {
+  position: absolute;
+  bottom: 0;
+  width: 2px;
+  height: 52px;
+  border-radius: 1px;
+  background: linear-gradient(to top, rgba(243, 237, 227, 0.6), transparent);
+  opacity: 0;
+  animation: kr-streak 0.9s linear infinite;
+}
+.kr-speed i:nth-child(1) { left: 10%; animation-delay: 0s; }
+.kr-speed i:nth-child(2) { left: 28%; animation-delay: 0.35s; height: 70px; }
+.kr-speed i:nth-child(3) { left: 46%; animation-delay: 0.15s; }
+.kr-speed i:nth-child(4) { left: 62%; animation-delay: 0.55s; height: 64px; }
+.kr-speed i:nth-child(5) { left: 78%; animation-delay: 0.25s; height: 44px; }
+.kr-speed i:nth-child(6) { left: 92%; animation-delay: 0.7s; }
+
+/* Rök från vaxet som smälter. */
+.kr-smoke i {
+  position: absolute;
+  bottom: 34%;
+  width: 26px;
+  height: 26px;
+  border-radius: 50%;
+  background: radial-gradient(circle, rgba(220, 212, 200, 0.42), transparent 68%);
+  opacity: 0;
+  animation: kr-smoke 3s ease-out infinite;
+}
+.kr-smoke i:nth-child(1) { left: 20%; }
+.kr-smoke i:nth-child(2) { left: 48%; animation-delay: 1s; }
+.kr-smoke i:nth-child(3) { left: 70%; animation-delay: 2s; }
+
+/* Lösa fjädrar som blir kvar ovanför. */
 .kr-feathers i {
   position: absolute;
-  top: 30%;
+  top: 6%;
   width: 7px;
   height: 21px;
   opacity: 0;
-  animation: kr-feather 6s linear infinite;
+  animation: kr-feather 5s linear infinite;
 }
 .kr-feathers svg { display: block; width: 100%; height: 100%; }
-.kr-feathers i:nth-child(1) { left: 22%; animation-delay: 0s; }
-.kr-feathers i:nth-child(2) { left: 64%; animation-delay: 2s; animation-duration: 7s; }
-.kr-feathers i:nth-child(3) { left: 40%; animation-delay: 4.2s; }
+.kr-feathers i:nth-child(1) { left: 20%; animation-delay: 0s; }
+.kr-feathers i:nth-child(2) { left: 58%; animation-delay: 1.6s; animation-duration: 6s; }
+.kr-feathers i:nth-child(3) { left: 38%; animation-delay: 3.1s; }
+.kr-feathers i:nth-child(4) { left: 74%; animation-delay: 4s; animation-duration: 5.5s; }
+
+.kr-splash {
+  position: absolute;
+  z-index: 3;
+  left: calc(50% - var(--fh) * 0.22);
+  bottom: 16px;
+  width: 64px;
+  transform: translateX(-50%);
+  transform-origin: 50% 100%;
+  fill: rgba(205, 228, 238, 0.7);
+  animation: kr-splash 1.3s ease-out infinite;
+}
 
 .kr-sea {
   position: absolute;
@@ -242,13 +297,29 @@
 @keyframes kr-glint { 0%, 100% { filter: drop-shadow(0 0 4px rgba(240, 214, 153, 0.45)); } 50% { filter: drop-shadow(0 0 9px rgba(250, 226, 160, 0.9)); } }
 @keyframes kr-pulse { 0%, 100% { transform: scale(1); } 50% { transform: scale(1.07); } }
 @keyframes kr-fall {
-  0%, 100% { transform: rotate(-24deg) translateY(-3px); }
-  50% { transform: rotate(-33deg) translateY(5px); }
+  0%, 100% { transform: rotate(-150deg); }
+  50% { transform: rotate(-161deg); }
 }
+/* Vingen är vänd upp och ner, så droppen faller uppåt i vingens led. */
 @keyframes kr-drip {
-  0% { transform: translateY(-3px) scale(0.6); opacity: 0; }
-  25% { opacity: 1; }
-  100% { transform: translateY(16px) scale(1); opacity: 0; }
+  0% { transform: translateY(2px) scale(0.5); opacity: 0; }
+  20% { opacity: 1; }
+  100% { transform: translateY(-26px) scale(1); opacity: 0; }
+}
+@keyframes kr-smoke {
+  0% { transform: translateY(0) scale(0.5); opacity: 0; }
+  30% { opacity: 1; }
+  100% { transform: translateY(-70px) scale(2.2); opacity: 0; }
+}
+@keyframes kr-streak {
+  0% { transform: translateY(30px); opacity: 0; }
+  25% { opacity: 0.85; }
+  100% { transform: translateY(-110px); opacity: 0; }
+}
+@keyframes kr-splash {
+  0% { transform: translateX(-50%) scale(0.55, 0.35); opacity: 0.2; }
+  45% { opacity: 0.95; }
+  100% { transform: translateX(-50%) scale(1.05, 1.1); opacity: 0; }
 }
 @keyframes kr-feather {
   0% { transform: translate(0, -10px) rotate(10deg); opacity: 0; }
@@ -272,7 +343,9 @@
   .kr-plinth { height: 21px; }
   .kr-orakel .kr-figs { bottom: 21px; }
   .kr-laurel { bottom: calc(21px + var(--fh) * 0.16); }
-  .kr-wings { width: calc(var(--fh) * 0.95); }
+  .kr-wings { width: calc(var(--fh) * 0.95); top: calc(var(--sy) - var(--fh) * 0.18); }
+  .kr-ikaros .kr-figs { bottom: 20px; }
+  .kr-splash { width: 50px; bottom: 14px; }
   .kr-given { display: none; }
   .kr-title { font-size: 9.5px; letter-spacing: 0.06em; }
   .kr-name { font-size: 18px; }

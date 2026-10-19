@@ -61,16 +61,20 @@ window.Kronan = (() => {
       `<g fill="url(#kr-gold)" stroke="#8a6122" stroke-width="0.45">${leaves}</g>${bow}</svg>`;
   })();
 
-  // En vaxvinge från axeln (0, 12) ut åt höger; den vänstra är spegelvänd.
-  // Bakre raden är långa pennor, främre korta täckfjädrar, och vaxet droppar.
+  // En smältande vaxvinge från axeln (0, 12) ut åt höger; den vänstra är
+  // spegelvänd. Ikaros störtar med huvudet före (figuren vänds upp och ner i
+  // kronan.css), så pennorna som hänger nedåt här fladdrar uppåt bakom honom.
+  // De är ojämna, några har lossnat (0) och spetsarna glöder av solen. Vaxet
+  // sitter i klumpar på framkanten och droppar åt andra hållet – mot havet.
   const WING = (() => {
     const bone = (t) => [t * 96, 12 - Math.sin(t * Math.PI * 0.9) * 11];
-    const row = (n, len, ang, w, fill) => {
+    const row = (n, len, ang, w, fill, kvar) => {
       let s = '';
       for (let i = 0; i < n; i++) {
         const t = 0.08 + (i / (n - 1)) * 0.9;
         const [x, y] = bone(t);
-        const L = len(t);
+        const L = len(t) * kvar[i % kvar.length];
+        if (!L) continue;
         const a = ang(t);
         const cx = x + Math.cos(a) * L / 2;
         const cy = y + Math.sin(a) * L / 2;
@@ -79,16 +83,27 @@ window.Kronan = (() => {
       return s;
     };
     const down = (from, to) => (t) => (from + (to - from) * t) * Math.PI / 180;
-    const back = row(11, (t) => 26 + 34 * t, down(98, 52), 4.6, '#d8c9ac');
-    const front = row(9, (t) => 15 + 14 * t, down(100, 60), 4.2, '#f3ead9');
-    const drips = [[22, 44], [47, 52], [71, 58], [88, 50]].map(([x, y], i) =>
-      `<path class="kr-drip" style="--d:${i * 0.7}s" d="M${x} ${y}c-2.2 3.2-3 5-3 6.3a3 3 0 0 0 6 0c0-1.3-.8-3.1-3-6.3z"/>`).join('');
+    const back = row(12, (t) => 26 + 34 * t, down(98, 52), 4.6, 'url(#kr-wax)', [1, 0.85, 1.05, 0, 0.9, 0.62, 1, 0, 0.78, 0.55, 0.9, 0.4]);
+    const front = row(9, (t) => 15 + 14 * t, down(100, 60), 4.2, '#f3ead9', [1, 0.8, 1, 0.7, 0, 0.9, 0.75, 0.6, 0.5]);
+    const at = [0.16, 0.38, 0.6, 0.82, 0.97];
+    const globs = at.map((t) => { const [x, y] = bone(t); return `<ellipse cx="${r1(x)}" cy="${r1(y - 1)}" rx="4.2" ry="2.6"/>`; }).join('');
+    const drips = at.map((t, i) => {
+      const [x, y] = bone(t);
+      return `<path class="kr-drip" style="--d:${r1(i * 0.45)}s" d="M${r1(x)} ${r1(y - 2)}c-1.6-3.4-2.8-6-2.8-7.8a2.8 2.8 0 0 1 5.6 0c0 1.8-1.2 4.4-2.8 7.8z"/>`;
+    }).join('');
     return '<g stroke="#9c8a68" stroke-width="0.5">' + back + front + '</g>' +
-      `<path d="M0 12 Q48 -8 96 8" fill="none" stroke="#c9b48c" stroke-width="3" stroke-linecap="round"/>` +
-      `<g fill="#e9b25a">${drips}</g>`;
+      '<path d="M0 12 Q48 -8 96 8" fill="none" stroke="#dba25a" stroke-width="3.4" stroke-linecap="round"/>' +
+      `<g fill="#eaa24f">${globs}${drips}</g>`;
   })();
-  const WINGS = '<svg class="kr-wings" viewBox="-104 -14 208 92" aria-hidden="true">' +
+  const WINGS = '<svg class="kr-wings" viewBox="-104 -28 208 106" aria-hidden="true">' +
+    '<defs><linearGradient id="kr-wax" x1="0" y1="0" x2="1" y2="0"><stop offset="0" stop-color="#efe3cb"/>' +
+    '<stop offset=".55" stop-color="#e6c48c"/><stop offset="1" stop-color="#e0773f"/></linearGradient></defs>' +
     `<g transform="scale(-1 1)">${WING}</g><g>${WING}</g></svg>`;
+
+  // Plasket där han slår i havet.
+  const SPLASH = '<svg class="kr-splash" viewBox="0 0 80 36" aria-hidden="true">' +
+    '<path d="M6 36C12 29 15 21 12 11C19 20 23 26 26 31C28 21 30 12 33 3C36 13 38 22 40 31C43 23 47 15 55 9C53 19 55 27 61 32C64 26 68 22 74 19C72 26 72 31 76 36Z"/>' +
+    '<circle cx="9" cy="6" r="1.8"/><circle cx="22" cy="4" r="1.3"/><circle cx="45" cy="2" r="1.5"/><circle cx="64" cy="7" r="1.9"/><circle cx="75" cy="12" r="1.2"/></svg>';
 
   const FEATHER = '<svg viewBox="0 0 10 30" aria-hidden="true"><path d="M5 0C9 7 9 20 5 30C1 20 1 7 5 0z" fill="#f3ead9" stroke="#9c8a68" stroke-width=".6"/><path d="M5 3V29" stroke="#9c8a68" stroke-width=".6"/></svg>';
 
@@ -120,8 +135,11 @@ window.Kronan = (() => {
     const scene = orakel
       ? `<div class="kr-rays"></div>${LAUREL}<div class="kr-figs n${people.length}">${figs}</div><div class="kr-plinth"></div>`
       : '<div class="kr-sun"></div>' +
+        '<div class="kr-speed"><i></i><i></i><i></i><i></i><i></i><i></i></div>' +
         `<div class="kr-figs n${people.length}">${figs}</div>` +
-        `<div class="kr-feathers"><i>${FEATHER}</i><i>${FEATHER}</i><i>${FEATHER}</i></div>` +
+        '<div class="kr-smoke"><i></i><i></i><i></i></div>' +
+        `<div class="kr-feathers"><i>${FEATHER}</i><i>${FEATHER}</i><i>${FEATHER}</i><i>${FEATHER}</i></div>` +
+        SPLASH +
         '<svg class="kr-sea" viewBox="0 0 400 40" preserveAspectRatio="none" aria-hidden="true">' +
         '<path class="kr-wave b" d="M0 14q25-10 50 0t50 0 50 0 50 0 50 0 50 0 50 0 50 0V40H0z"/>' +
         '<path class="kr-wave f" d="M0 22q25-9 50 0t50 0 50 0 50 0 50 0 50 0 50 0 50 0V40H0z"/></svg>';
