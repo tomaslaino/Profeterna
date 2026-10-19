@@ -17,17 +17,6 @@
   text-transform: uppercase;
   color: var(--eyebrow);
 }
-.kp-tag {
-  display: inline-block;
-  margin-left: 6px;
-  padding: 1px 8px;
-  font-size: 10px;
-  letter-spacing: 0.06em;
-  border-radius: 999px;
-  color: var(--stale);
-  background: var(--side-soft);
-  vertical-align: 1px;
-}
 
 /* ---------- prickarna ---------- */
 
@@ -232,75 +221,9 @@
 .kp-btn.kp-danger { border-color: var(--down); background: var(--down-soft); color: var(--down); }
 .kp-btn.kp-danger:hover { border-color: var(--down); background: var(--down); color: #fff; }
 
-/* ---------- kupongvyn ---------- */
+/* ---------- tecknen i historiken (historik.js); kupongen själv: papper.css ---------- */
 
-.kp-summary {
-  display: grid;
-  grid-template-columns: auto minmax(0, 1fr);
-  gap: clamp(18px, 4vw, 44px);
-  align-items: center;
-  margin-bottom: 28px;
-  padding: 22px 24px;
-}
-.kp-summary.is-live { border-color: color-mix(in srgb, var(--accent) 45%, transparent); }
-.kp-sum-num { display: flex; flex-direction: column; gap: 10px; }
-.kp-sum-main { display: flex; flex-direction: column; gap: 14px; min-width: 0; }
-
-.kp-scale { position: relative; padding-top: 4px; }
-.kp-track {
-  position: relative;
-  display: flex;
-  height: 12px;
-  border-radius: 999px;
-  background: rgba(255, 255, 255, 0.06);
-  box-shadow: inset 0 0 0 1px var(--hair);
-}
-.kp-track i { display: block; height: 100%; }
-.kp-track i:first-child { border-radius: 999px 0 0 999px; }
-.kp-track .ok { background: var(--kp-ok); }
-.kp-track .liveok {
-  background: repeating-linear-gradient(135deg, rgba(45, 184, 122, 0.75) 0 5px, rgba(45, 184, 122, 0.4) 5px 10px);
-  animation: kp-blink 1.6s infinite;
-}
-.kp-track .open { background: rgba(91, 140, 255, 0.18); }
-.kp-track .exp {
-  position: absolute;
-  top: -5px;
-  bottom: -5px;
-  width: 3px;
-  margin-left: -1.5px;
-  border-radius: 2px;
-  background: var(--o-away);
-}
-@keyframes kp-blink { 50% { opacity: 0.55; } }
-.kp-scale-lab { position: relative; display: flex; justify-content: space-between; margin-top: 8px; font-size: 12px; color: var(--muted); }
-.kp-scale-lab .exp { position: absolute; transform: translateX(-50%); color: var(--o-away); font-weight: 600; white-space: nowrap; }
-.kp-facts { display: flex; flex-wrap: wrap; gap: 6px 18px; font-size: 13px; color: var(--muted); }
-.kp-facts b { color: var(--fg); font-weight: 700; }
-
-#coupon .day-head .day-key { float: right; margin-right: 20px; font-weight: 600; letter-spacing: 0.08em; }
-.kp-row {
-  display: grid;
-  grid-template-columns: 24px 3.2rem 3.3rem minmax(0, 1fr) auto 6.5rem 3.6rem;
-  align-items: center;
-  gap: 14px;
-  padding: 12px 20px;
-  color: var(--fg);
-  text-decoration: none;
-  border-bottom: 1px solid var(--hair);
-  transition: background-color 0.15s ease;
-}
-.kp-row:last-child { border-bottom: 0; }
-a.kp-row:hover { color: var(--fg); background: rgba(255, 255, 255, 0.04); }
-.kp-row .ctag { justify-self: start; }
-.kp-row .mteams { min-width: 0; }
-.kp-row .kp-tm, .kp-note { display: block; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
-.kp-note { margin-top: 2px; font-size: 12.5px; font-weight: 400; font-style: italic; letter-spacing: 0; color: var(--ink-soft); }
-.kp-row.s-no:not(.s-live) .mteams, .kp-row.s-no:not(.s-live) .kp-p { opacity: 0.6; }
-.kp-row.s-live { background: rgba(91, 140, 255, 0.05); }
-.kp-clock { color: var(--accent-deep); font-weight: 700; }
-
-/* tecknet: tre rutor, de valda fyllda; utfallet (eller ställningen just nu)
+/* tecknet: tre rutor, de valda fyllda; utfallet
    grönt om vi hade det, rött ring om inte; pricken under = modellens tips */
 .kp-sg { display: inline-flex; gap: 4px; }
 .kp-sg i {
@@ -321,8 +244,6 @@ a.kp-row:hover { color: var(--fg); background: rgba(255, 255, 255, 0.04); }
 .kp-sg i.on { color: #1d1509; background: color-mix(in srgb, var(--gold) 80%, transparent); box-shadow: none; }
 .kp-sg i.res { box-shadow: inset 0 0 0 2px var(--kp-no); color: var(--fg); }
 .kp-sg i.on.res { background: var(--kp-ok); box-shadow: none; color: #06101e; }
-.kp-row.s-no:not(.s-live) .kp-sg i.on:not(.res) { color: var(--fg); background: color-mix(in srgb, var(--gold) 25%, transparent); }
-.kp-row.s-live .kp-sg i.res { animation: kp-blink 1.6s infinite; }
 .kp-sg i.tip::after {
   content: "";
   position: absolute;
@@ -338,13 +259,6 @@ a.kp-row:hover { color: var(--fg); background: rgba(255, 255, 255, 0.04); }
 .kp-p { display: flex; align-items: center; gap: 8px; font-size: 12.5px; color: var(--muted); font-variant-numeric: tabular-nums; white-space: nowrap; }
 .kp-pbar { flex: 1; height: 5px; border-radius: 3px; background: rgba(255, 255, 255, 0.07); overflow: hidden; }
 .kp-pbar i { display: block; height: 100%; background: var(--accent); border-radius: 3px; }
-.kp-score { text-align: right; white-space: nowrap; }
-.kp-score .score { font-family: var(--display); font-size: 22px; font-weight: 800; letter-spacing: 0.02em; color: var(--bone); }
-.kp-row.s-live .kp-score .score { color: var(--accent-deep); }
-.kp-score .sub { display: block; font-size: 11.5px; }
-.kp-score .kp-m { display: none; }
-.kp-row.s-live .kp-score .kp-m { color: var(--accent-deep); font-weight: 700; }
-.kp-src { margin-top: -8px; }
 .kp-h { display: flex; align-items: baseline; justify-content: space-between; gap: 12px; }
 
 /* fler kuponger */
@@ -507,16 +421,7 @@ a.kp-row:hover { color: var(--fg); background: rgba(255, 255, 255, 0.04); }
 /* ---------- mobil ---------- */
 
 @media (max-width: 760px) {
-  .kp-summary { grid-template-columns: 1fr; padding: 18px; }
-  .kp-row { grid-template-columns: 22px minmax(0, 1fr) auto 3.2rem; gap: 10px; padding: 12px 14px; }
-  .kp-row .mtime, .kp-row .ctag, .kp-row .kp-p { display: none; }
-  .kp-row .mteams { font-size: 14px; line-height: 1.3; }
-  .kp-row .kp-tm, .kp-note { white-space: normal; overflow: visible; }
-  .kp-row .kp-dot { width: 22px; height: 22px; }
   .kp-sg i { width: 23px; height: 23px; font-size: 14px; }
-  #coupon .day-head .day-key { display: none; }
-  .kp-score .kp-m { display: block; }
-  .kp-score .kp-d { display: none; }
   .kp-pick { grid-template-columns: minmax(0, 1fr) auto; gap: 10px; padding: 10px 14px; }
   .kp-pick .mtime, .kp-pick .ctag { display: none; }
   .kp-pick .mteams { font-size: 14px; }
@@ -532,5 +437,5 @@ a.kp-row:hover { color: var(--fg); background: rgba(255, 255, 255, 0.04); }
 }
 
 @media (prefers-reduced-motion: reduce) {
-  .kp-dot.live, .kp-track .liveok, .kp-row.s-live .kp-sg i.res { animation: none; }
+  .kp-dot.live { animation: none; }
 }
