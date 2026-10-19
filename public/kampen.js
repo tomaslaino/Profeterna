@@ -157,7 +157,7 @@ function kampStanding(rounds, live, gang) {
       return '<li class="km-row km-model">' +
         `<span class="km-rank"></span><span class="km-face km-face-txt km-face-model" aria-hidden="true">M</span>` +
         `<span class="km-who"><b>Modellen</b></span>` +
-        `<span class="km-ok" title="Rätt av de spelade matcherna">${p.ok}<span>/${p.n}</span></span>` +
+        `<span class="km-ok" title="Antal rätt av spelade matcher">${p.ok}<span>/${p.n}</span></span>` +
         `<span class="km-pts ${tpTone(p.pts)}">${tpPts(p.pts)}</span></li>`;
     }
     rank += 1;
@@ -169,16 +169,16 @@ function kampStanding(rounds, live, gang) {
       `<span class="km-who"><b title="${esc(p.name)}">${tpNameHtml(p.name)}</b><span class="km-badges">${tpAwards(p)}` +
       (kampTook(now) ? `<span class="km-now ${tpTone(now.pts)}" title="Preliminärt, i omgången som pågår">${tpPts(now.pts)} i omgången</span>` : '') +
       '</span></span>' +
-      `<span class="km-ok" title="Rätt av de spelade matcherna">${p.ok}<span>/${p.n}</span></span>` +
+      `<span class="km-ok" title="Antal rätt av spelade matcher">${p.ok}<span>/${p.n}</span></span>` +
       `<span class="km-pts ${tpTone(p.pts)}">${tpPts(p.pts)}${gap}</span></li>`;
   }).join('');
   const done = rounds.filter((r) => r.done).length;
   const status = live
-    ? `<p class="kp-line km-status">${live.done ? 'Omgången är klar' : `Preliminärt · omgången pågår, ${live.n} av ${live.total} spelade`}` +
+    ? `<p class="kp-line km-status">${live.done ? 'Omgången är färdigspelad' : `Preliminärt · omgången pågår, ${live.n} av ${live.total} matcher spelade`}` +
       `${live.hidden ? ` · ${Spoiler.chip(`${live.hidden} ${live.hidden === 1 ? 'dold' : 'dolda'}`)}` : ''}</p>`
     : '';
   return '<div class="card km-card">' +
-    `<p class="kp-eyebrow">Ställningen · ${done} ${done === 1 ? 'omgång' : 'omgångar'}${live && !live.done ? ' och en som pågår' : ''}</p>` +
+    `<p class="kp-eyebrow">${done ? `Ställningen efter ${done} ${done === 1 ? 'omgång' : 'omgångar'}` : 'Ställningen'}</p>` +
     `<ol class="km-list">${rows}</ol>${status}</div>`;
 }
 
@@ -298,18 +298,19 @@ function kampPairsCard(rounds, gang) {
     const d = Math.round(p.diff * 10) / 10;
     const ahead = d > 0 ? p.a : d < 0 ? p.b : null;
     const line = [
-      p.eq ? `${p.eq} lika` : null,
-      ahead ? `${tpPts(Math.abs(d))} i poäng till ${esc(kampSurname(ahead.name))}` : 'Lika i poäng',
+      `${n} ${n === 1 ? 'omgång' : 'omgångar'}`,
+      p.eq ? `${p.eq} ${p.eq === 1 ? 'oavgjord' : 'oavgjorda'}` : null,
+      ahead ? `${esc(kampSurname(ahead.name))} ${kpNumShort(Math.abs(d))} poäng före` : 'lika på poäng',
     ].filter(Boolean).join(' · ');
     return '<li class="km-pair">' +
       `<span class="km-side">${kampFace(p.a, ' km-face-sm')}<b>${esc(kampSurname(p.a.name))}</b></span>` +
       `<span class="km-score"><b class="${p.wa > p.wb ? 'win' : ''}">${p.wa}</b>–<b class="${p.wb > p.wa ? 'win' : ''}">${p.wb}</b></span>` +
       `<span class="km-side km-side-b"><b>${esc(kampSurname(p.b.name))}</b>${kampFace(p.b, ' km-face-sm')}</span>` +
       `<span class="km-bar" aria-hidden="true"><i style="flex:${p.wa};background:${p.a.color}"></i><i class="km-eq" style="flex:${p.eq}"></i><i style="flex:${p.wb};background:${p.b.color}"></i></span>` +
-      `<span class="km-pair-sub">${line} · ${n} ${n === 1 ? 'omgång' : 'omgångar'}</span></li>`;
+      `<span class="km-pair-sub">${line}</span></li>`;
   }).join('');
   return '<div class="card km-card">' +
-    '<p class="kp-eyebrow">Inbördes</p>' +
+    '<p class="kp-eyebrow">Inbördes möten</p>' +
     `<ul class="km-pairs">${rows}</ul></div>`;
 }
 
@@ -338,11 +339,11 @@ function kampKassa(t, gang) {
 function kampKassaCard(t, gang) {
   const k = kampKassa(t, gang);
   if (!k.people.length) return '';
-  const best = (b) => (b ? `största vinsten ${Math.round(b.pay)} kr på ${esc(b.x.sign)} i ${esc(b.x.m.match)}` : 'ingen vinst än');
+  const best = (b) => (b ? `största vinsten ${Math.round(b.pay)} kr på ${esc(b.x.sign)} i ${esc(b.x.m.match)}` : 'ingen vinst ännu');
   const row = (g, x, model) => `<li class="km-krow${model ? ' km-model' : ''}">` +
     (model ? '<span class="km-face km-face-txt km-face-model" aria-hidden="true">M</span>' : kampFace(g)) +
     `<span class="km-who"><b>${esc(model ? 'Modellen' : kampSurname(g.name))}</b>` +
-    `<span class="sub">${x.n} ${x.n === 1 ? 'match' : 'matcher'}, ${x.in.toLocaleString('sv-SE')} kr · ${best(x.best)}</span></span>` +
+    `<span class="sub">${x.in.toLocaleString('sv-SE')} kr på ${x.n} ${x.n === 1 ? 'match' : 'matcher'} · ${best(x.best)}</span></span>` +
     `<span class="km-kr ${x.net >= 0.5 ? 'pos' : x.net <= -0.5 ? 'neg' : ''}">${kampKr(x.net)}</span></li>`;
   return '<div class="card km-card">' +
     `<p class="kp-eyebrow">Spelkassan <span class="km-hint">${KAMP_INSATS} kr per match</span></p>` +
@@ -360,7 +361,7 @@ function kampHighlights(rounds, t, gang) {
   const top = per.length ? per.reduce((a, b) => (b.p.pts > a.p.pts ? b : a)) : null;
   const low = per.length ? per.reduce((a, b) => (b.p.pts < a.p.pts ? b : a)) : null;
   const list = [
-    bomb && ['Säsongens skräll', kampOdds(bomb.prob), `odds · ${nameOf(bomb.id)} · ${esc(bomb.sign)} i ${esc(bomb.m.match)}`],
+    bomb && ['Säsongens skräll', kampOdds(bomb.prob), `odds · ${nameOf(bomb.id)} tippade ${esc(bomb.sign)} i ${esc(bomb.m.match)}`],
     top && ['Bästa omgången', tpPts(top.p.pts), `${nameOf(top.p.id)} · ${kampRound(top.r)}`],
     low && low !== top && ['Sämsta omgången', tpPts(low.p.pts), `${nameOf(low.p.id)} · ${kampRound(low.r)}`],
   ];
@@ -389,12 +390,12 @@ function kampStyle(rounds, t, gang) {
   }).filter((c) => c.n);
   if (!cols.length) return '';
   const rows = [
-    ['Snittodds', 'odds', 'Modellens odds för tipsen i snitt – högre är djärvare'],
-    ['Garderat', 'hedge', 'Andel av tipsen med två eller tre tecken'],
-    ['Med modellens tips', 'model', 'Andel av tipsen där modellens troligaste utfall är med'],
+    ['Snittodds', 'odds', 'Modellens odds för tipsen i genomsnitt – högre är djärvare'],
+    ['Garderade', 'hedge', 'Andel tips med två eller tre tecken'],
+    ['Höll med modellen', 'model', 'Andel tips där modellens troligaste utfall fanns med'],
     ['Ensam om rätt', 'alone', 'Matcher där ingen annan i gänget hade rätt'],
     ['Skrällar som satt', 'bombs', 'Rätt på tips med odds över 3,00'],
-    ['Bästa omgången', 'best', 'Högsta poängen i en omgång'],
+    ['Bästa omgången', 'best', 'Högsta poäng i en enskild omgång'],
   ];
   const head = cols.map((c) => `<th scope="col" title="${esc(c.g.name)}"><span class="km-dot" style="--km-c:${c.g.color}"></span><span class="km-long">${esc(kampSurname(c.g.name))}</span><span class="km-short">${esc(c.g.id)}</span></th>`).join('');
   const body = rows.map(([label, k, what]) => `<tr><th scope="row" title="${esc(what)}">${esc(label)}</th>${cols.map((c) => `<td>${c[k]}</td>`).join('')}</tr>`).join('');
@@ -409,7 +410,7 @@ function kampStyle(rounds, t, gang) {
 function kampRoundsCard(rounds, gang) {
   if (!rounds.length) return '';
   const cols = [...gang.filter((g) => rounds.some((r) => kampTook((r.people || []).find((p) => p.id === g.id)))), { id: 'modellen', model: true }];
-  const head = cols.map((c) => `<th scope="col" title="${esc(c.model ? 'Modellens troligaste utfall' : c.name)}">${c.model ? 'Mod.' : esc(c.id)}</th>`).join('');
+  const head = cols.map((c) => `<th scope="col" title="${esc(c.model ? 'Modellen' : c.name)}">${c.model ? 'M' : esc(c.id)}</th>`).join('');
   const body = rounds.slice().reverse().map((r) => {
     const cells = cols.map((c) => {
       const p = c.model ? r.model : (r.people || []).find((x) => x.id === c.id);
@@ -418,7 +419,7 @@ function kampRoundsCard(rounds, gang) {
       const title = p.award === 'best' ? 'Omgångens orakel' : p.award === 'worst' ? 'Omgångens Ikaros' : '';
       return `<td><span class="${(tpTone(p.pts) + aw).trim()}"${title ? ` title="${title}"` : ''}>${tpPts(p.pts)}</span></td>`;
     }).join('');
-    const n = r.live ? `${r.n} av ${r.total} spelade` : `${r.n} ${r.n === 1 ? 'match' : 'matcher'}`;
+    const n = r.live ? `${r.n} av ${r.total} matcher` : `${r.n} ${r.n === 1 ? 'match' : 'matcher'}`;
     return `<tr${r.live && !r.done ? ' class="km-live"' : ''}><th scope="row">${kampRound(r)}<span class="sub">${r.live && !r.done ? 'pågår · ' : ''}${n}</span></th>${cells}</tr>`;
   }).join('');
   return '<div class="card km-card tp-card tp-rounds">' +
@@ -440,7 +441,7 @@ const KAMP_HJALP = '<details class="help km-help"><summary>Så räknas poängen<
   '<tr><th scope="row">Skräll</th><td>20 %</td><td class="pos">+0,8</td><td class="neg">−0,2</td></tr></tbody></table>' +
   '<p>Garderar du läggs chanserna för dina tecken ihop. Har krysset 20 % räknas 1X i exemplet som 90 %: ' +
   '+0,1 om det sitter och −0,9 om det spricker. En helgardering täcker alltid 100 % och ger därför 0.</p>' +
-  '<p>Över en omgång blir summan helt enkelt antal rätt minus så många rätt som modellen väntade sig av dina tips. ' +
+  '<p>För en hel omgång blir summan helt enkelt antal rätt minus så många rätt som modellen väntade sig av dina tips. ' +
   'Plus betyder att du fick fler rätt än modellen trodde, minus färre. ' +
   'Bäst i omgången blir Omgångens orakel och sämst Omgångens Ikaros.</p></details>';
 
