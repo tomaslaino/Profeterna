@@ -372,7 +372,7 @@ server:
   [public/kupong.css](public/kupong.css). Se [Kupongen](#kupongen).
 - **Inför samtalet:** [worker/samtal.mjs](worker/samtal.mjs) håller omgången och gängets
   egna tips (Cloudflare KV, i tjänsten profeterna-kupong; lokalt filer via
-  [server.js](server.js)); vyerna under Kupong → Samtalet finns i
+  [server.js](server.js)); vyerna under Kupong → Omgången (steg 1–3) finns i
   [public/samtal.js](public/samtal.js) och [public/samtal.css](public/samtal.css). Se
   [Inför samtalet](#inför-samtalet).
 - **Kuponghistoriken:** [src/history.js](src/history.js) rättar färdiga kuponger, räknar
@@ -948,6 +948,13 @@ sig: ett tecken, en halvgardering eller en helgardering per match. Man ser de an
 först när man själv har lämnat in. Allas tips blir underlaget för telefonsamtalet där
 gängets kupong bestäms.
 
+Allt ligger under *Kupong → Omgången* (bredvid *Historik*). Överst visar fyra steg var
+omgången står: *Välj matcher*, *Alla tippar* (med hur många som har lämnat in), *Samtalet*
+(med tiden, om den är satt) och *Matcherna*. Medan kupongen fylls i och tipsen jämförs visar
+`#kupong` omgången; när gängets kupong är gjord visar den gängets kupong, med knappen
+*Allas tips* tillbaka till underlaget (`#kupong/samtal`). Kuponger som spelas under tiden står
+under omgången.
+
 **Gången**
 
 1. **Skapa kupong** (*Kupong → Skapa kupong* eller *+ Ny kupong*, `#kupong/samtal/ny`):
@@ -960,7 +967,7 @@ gängets kupong bestäms.
    på enheten), tippar varje match och kan skriva en kort motivering (högst 140 tecken).
    Nederst står hur många rader tipsen blir. *Lämna in och se de andras* kräver tecken i
    alla matcher och kupongens kodord. Inlämnade tips går inte att ändra.
-3. **De andras tips** (`#kupong/samtal`): den som inte har lämnat in ser bara vem som har
+3. **De andras tips** (`#kupong`): den som inte har lämnat in ser bara vem som har
    gjort det och när. Den som har lämnat in ser allas inlämnade tips – så fort minst en
    till är inne – och vilka som fortfarande fyller i. Sidan frågar tjänsten var 20:e sekund
    och visar nya tips av sig själv.
@@ -980,7 +987,7 @@ gängets kupong bestäms.
    lämnas tomma – och sparas bara på enheten, så en håller i pennan under samtalet. Nederst
    syns kupongen som rutor med antal rader. *Gör gängets kupong* öppnar Ny kupong (eller
    *Ändra*, om gängets kupong för matcherna redan finns) med tecknen ifyllda, och den sparas
-   som vanligt (se [Kupongen](#kupongen)). Därefter står gängets kupong överst.
+   som vanligt (se [Kupongen](#kupongen)). Därefter står gängets kupong under Omgången.
 
 **Tjänsten** är samma som sparar kupongen (*profeterna-kupong*, adressen i
 [config/kupong.js](config/kupong.js) med `/samtal` i stället för `/kupong`; bygget skriver

@@ -367,7 +367,7 @@ function statusLine(g) {
 
 // ---------- kupongvyn ----------
 
-// Kupong: #kupong (omgångens kupong), #kupong/historik och
+// Kupong: #kupong (omgången), #kupong/historik och
 // #kupong/historik/<id> (historik.js), #kupong/samtal… (samtal.js),
 // #kupong/<id>, #kupong/ny, #kupong/andra/<id> och #kupong/bort/<id>.
 async function showCoupon(arg) {
@@ -381,6 +381,12 @@ async function showCoupon(arg) {
     return;
   }
   if (mode === 'samtal' && window.Samtal) return Samtal.show(id || '');
+  // Medan omgångens kupong fylls i eller tipsen jämförs är det omgången
+  // (samtal.js).
+  if (!mode && hasSamtal()) {
+    await Samtal.load();
+    if (Samtal.active()) return Samtal.show('', true);
+  }
   if (mode === 'ny') return renderCreate(null);
   if (mode === 'andra' && id) return renderCreate(id);
   if (mode === 'bort' && id) return renderRemove(id);
@@ -389,14 +395,31 @@ async function showCoupon(arg) {
   window.scrollTo(0, 0);
 }
 
-// Kupongsidans lägen: omgångens kupong, samtalet (om tjänsten finns) och de
-// färdigspelade.
+// Kupongsidans två lägen: omgången – från att matcherna väljs tills gängets
+// kupong är färdigspelad – och de färdigspelade.
 function viewNav(on) {
   const link = (key, href, label) => `<a href="${href}"${on === key ? ' aria-current="page"' : ''}>${label}</a>`;
-  // Samtalet: gängets egna tips inför telefonsamtalet (samtal.js).
-  const samtal = hasSamtal() ? link('samtal', '#kupong/samtal', 'Samtalet') : '';
   return '<nav class="kp-views" aria-label="Kupong">' +
-    link('omgang', '#kupong', 'Omgången') + samtal + link('historik', '#kupong/historik', 'Historik') + '</nav>';
+    link('omgang', '#kupong', 'Omgången') + link('historik', '#kupong/historik', 'Historik') + '</nav>';
+}
+
+// Omgångens gång i fyra steg under flikarna, när gänget tippar var för sig
+// först (samtal.js). now: steget som pågår (5 = klar). info: en rad om läget
+// i stället för förklaringen under ett steg.
+const STEPS = [
+  ['Välj matcher', 'någon i gänget'],
+  ['Alla tippar', 'var för sig'],
+  ['Samtalet', 'ni jämför och gör gängets kupong'],
+  ['Matcherna', 'följ hur det går'],
+];
+function roundSteps(now, info = {}) {
+  if (!hasSamtal()) return '';
+  return '<ol class="kp-steps" aria-label="Omgångens gång">' + STEPS.map(([name, sub], i) => {
+    const n = i + 1;
+    return `<li class="${n < now ? 'done' : n === now ? 'now' : ''}"${n === now ? ' aria-current="step"' : ''}>` +
+      `<span class="kp-step-n" aria-hidden="true">${n < now ? '✓' : n}</span>` +
+      `<span class="kp-step-t"><b>${name}</b><span>${esc(info[n] || sub)}</span></span></li>`;
+  }).join('') + '</ol>';
 }
 
 // Ny kupong börjar med att någon väljer omgångens matcher, som var och en
@@ -404,13 +427,13 @@ function viewNav(on) {
 // görs gängets kupong direkt.
 const hasSamtal = () => Boolean(window.Samtal && KP.data && KP.data.samtal);
 const newCouponHref = () => (hasSamtal() ? '#kupong/samtal/ny' : '#kupong/ny');
-// Omgången som fylls i inför samtalet, överst där omgångens kupong står.
+// Omgången som fylls i inför samtalet, överst på förstasidan.
 const samtalTeaser = () => (hasSamtal() ? Samtal.teaser() : '');
 
 function emptyCard() {
   return '<div class="kp-empty card"><p class="kp-eyebrow">Kupong</p><h2 class="page-title">Omgångens kupong</h2>' +
     (hasSamtal()
-      ? '<p class="intro">Välj matcherna. Sedan fyller alla i kupongen var för sig och ser de andras tips när de själva har lämnat in.</p>' +
+      ? '<p class="intro">Välj omgångens matcher. Sedan tippar alla var för sig och ser de andras tips när de själva har lämnat in.</p>' +
         '<p class="legend sm-alt"><a href="#kupong/ny">Eller gör gängets kupong direkt</a></p>'
       : '<p class="intro">Välj matcherna, sätt 1, X eller 2 och följ hur det går.</p>') +
     `<a class="kp-btn primary" href="${newCouponHref()}">Skapa kupong</a></div>`;
@@ -422,7 +445,7 @@ function renderCouponShow(id) {
   const all = allCoupons();
   const graded = all.map((c) => ({ c, g: gradeCoupon(c) })).sort((a, b) => (b.g.first || 0) - (a.g.first || 0));
   if (!graded.length) {
-    el.innerHTML = viewNav('omgang') + (samtalTeaser() || emptyCard()) + couponErrors();
+    el.innerHTML = viewNav('omgang') + roundSteps(1) + emptyCard() + couponErrors();
     return;
   }
   const curId = id || (currentCoupon() || {}).id;
@@ -435,9 +458,13 @@ function renderCouponShow(id) {
   // Är omgångens kupong färdigspelad görs nästa med den stora knappen under.
   const round = !id;
   const canEdit = g.rows.some((r) => r.state === 'upcoming');
-  let html = viewNav(round ? 'omgang' : null) + (round ? samtalTeaser() : '') + '<div class="kp-head"><div>' +
+  // Gängets kupong ur omgången som alla tippade: sista steget, och allas tips
+  // finns kvar att titta på.
+  const fromTips = round && hasSamtal() && Samtal.covers(c);
+  let html = viewNav(round ? 'omgang' : null) + (fromTips ? roundSteps(g.done ? 5 : 4) : '') + '<div class="kp-head"><div>' +
     `<p class="kp-eyebrow">${esc(c.name || 'Kupong')}${c.pending ? ' <span class="kp-tag">väntar på GitHub</span>' : ''}</p>` +
     `<h2 class="page-title">${esc(dateRange(g.first, g.last))}</h2></div><div class="kp-actions">` +
+    (fromTips ? '<a class="kp-btn" href="#kupong/samtal">Allas tips</a>' : '') +
     (canEdit ? `<a class="kp-btn" href="#kupong/andra/${esc(c.id)}">Ändra</a>` : '') +
     // En färdigspelad står kvar i historiken och tas inte bort.
     (g.done ? '' : `<a class="kp-btn" href="#kupong/bort/${esc(c.id)}">Ta bort</a>`) +
@@ -599,6 +626,8 @@ function liveLine(g) {
 
 // Fler kuponger som inte är färdigspelade, t.ex. nästa omgångs medan den
 // här pågår. De färdiga finns under Historik.
+const openCoupons = () => moreSection(allCoupons().map((c) => ({ c, g: gradeCoupon(c) }))
+  .filter((x) => x.g.first && !x.g.done).sort((a, b) => b.g.first - a.g.first));
 function moreSection(list) {
   if (!list.length) return '';
   return '<h3 class="kp-h">Fler kuponger</h3><div class="mlist">' + list.map(({ c, g }) =>
