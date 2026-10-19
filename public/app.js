@@ -1165,7 +1165,7 @@ function renderSources(d) {
     : '';
 }
 
-// Bara när datan uppdaterades – källorna nämns först när något är fel.
+// När datan uppdaterades – källorna nämns först när något är fel.
 function topline(d) {
   const count = (st) => d.sources.filter((s) => s.status === st).length;
   const issues = [
@@ -1181,15 +1181,17 @@ function topline(d) {
   summary.innerHTML = late
     ? `<span class="err" style="display:inline">Senaste bygget ${when(meta.generatedAt)} – ovanligt länge sedan (ska ske var ${meta.updateEveryMinutes}:e minut). Den schemalagda hämtningen kan ha stannat.</span>`
     : '';
-  // Raden syns bara när något är fel.
+  // Står i sidfoten, inte mitt på sidan.
   const parts = [
-    meta ? null : 'Kunde inte läsa sajtens data.',
+    meta
+      ? `<span title="Säsong ${esc(meta.season)} · byggs var ${meta.updateEveryMinutes}:e minut">Uppdaterad ${when(meta.generatedAt)}</span>`
+      : 'Kunde inte läsa sajtens data.',
     issues ? `<a href="#kallor">${esc(issues)}</a>` : null,
     late ? '<span class="err" style="display:inline">datan är gammal</span>' : null,
   ].filter(Boolean);
   const tl = $('#topline');
   tl.innerHTML = parts.join(' · ');
-  tl.hidden = !parts.length;
+  tl.hidden = false;
 }
 
 // ---------- modell ----------

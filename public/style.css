@@ -103,8 +103,6 @@ header { padding-top: 2rem; }
   line-height: 1.15;
 }
 .tagline { margin: 0.15rem 0 0; color: var(--muted); font-size: 0.83rem; }
-.topline { text-align: right; font-size: 0.8rem; color: var(--muted); }
-.topline strong { color: var(--fg); }
 
 /* ---------- flikar ---------- */
 
@@ -312,7 +310,6 @@ th {
 @media (max-width: 640px) {
   .mrow { grid-template-columns: 2.8rem 1fr auto; }
   .mrow .ctag { display: none; }
-  .topline { text-align: left; }
 }
 
 /* ---------- matchvy ---------- */

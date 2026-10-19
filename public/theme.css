@@ -269,17 +269,7 @@ main { padding-top: 8px; padding-bottom: 48px; }
 }
 .hero-aside { display: none; }
 
-/* varningsraden under mottot – syns bara när något är fel */
-.hero .topline {
-  margin-top: 18px;
-  text-align: left;
-  font-size: 13px;
-  line-height: 1.6;
-  color: var(--muted);
-}
-.hero .topline strong { color: var(--fg); }
-
-/* smala skärmar: fotot bredvid mottot och statusraden, utan glapp under */
+/* smala skärmar: fotot bredvid mottot, utan glapp under */
 @media (max-width: 899px) {
   .hero-main {
     display: grid;
@@ -290,8 +280,7 @@ main { padding-top: 8px; padding-bottom: 48px; }
   .hero-title { grid-column: 1 / -1; }
   .hero-lede { display: contents; }
   .hero-motto { grid-column: 1; grid-row: 2; }
-  .hero .topline { grid-column: 1; grid-row: 3; }
-  .team-photo-sm { grid-column: 2; grid-row: 2 / span 2; }
+  .team-photo-sm { grid-column: 2; grid-row: 2; }
 }
 
 /* breda skärmar: den stora lagbilden till höger om rubriken */
@@ -773,6 +762,11 @@ footer::before {
 }
 footer p { margin: 0; }
 footer .logo-sm { width: 20px; height: 20px; border-radius: 6px; flex: none; opacity: 0.9; }
+/* när datan byggdes, och varningar – efter namnet, före länkarna */
+footer .topline { font-size: inherit; text-align: left; color: var(--muted); }
+footer .topline::before { content: "·"; margin-right: 10px; }
+footer .topline a { color: inherit; }
+footer .topline a:hover { color: var(--fg); }
 footer .foot-links { display: flex; flex-wrap: wrap; gap: 4px 18px; margin-left: auto; }
 footer .foot-links a { color: var(--muted); text-decoration: none; }
 footer .foot-links a:hover,
