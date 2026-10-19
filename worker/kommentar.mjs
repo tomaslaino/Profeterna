@@ -25,7 +25,7 @@ const dec = (x) => (Math.round(x * 10) / 10).toFixed(1).replace('.', ',');
 export function couponPayload(c) {
   return {
     kupong: c.name || null,
-    spel: c.game || 'Profeternas kupong',
+    spel: c.game || 'Matchfixarnas kupong',
     datum: c.till ? `${c.date} – ${c.till}` : c.date,
     'antal rätt': `${c.ok} av ${c.n}`,
     'väntat antal rätt': dec(c.exp),

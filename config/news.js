@@ -6,7 +6,7 @@
 // trupp- och skadeläge, presskonferenser, väder – och lägger det i underlaget
 // som datapunkter med källa, datum och länk, på samma sätt som Gräva guld gör
 // med sin datatabell. Nyheterna är rapporterat i media, inte kontrollerat av
-// Profeterna, och påverkar aldrig prognosens siffror.
+// Matchfixarna, och påverkar aldrig prognosens siffror.
 //
 // Alla källor är öppna och kräver ingen nyckel, så samma kod kan köras både i
 // proxyn (Cloudflare Workers) och lokalt i Express-servern.

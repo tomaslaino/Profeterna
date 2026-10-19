@@ -195,7 +195,7 @@ function renderList(d) {
   // Kolumnens nyckel står i första dagens rubrik i stället för en förklaring.
   let key = d.view === 'played'
     ? '<span class="day-key" style="float:right;margin-right:20px" title="Resultat, under det prognosen 1 · X · 2 som odds före avspark">Resultat · odds</span>'
-    : '<span class="day-key" style="float:right;margin-right:20px" title="Profeternas odds på hemmaseger · oavgjort · bortaseger efter 90 minuter (1 delat med sannolikheten)">Odds 1 · X · 2</span>';
+    : '<span class="day-key" style="float:right;margin-right:20px" title="Matchfixarnas odds på hemmaseger · oavgjort · bortaseger efter 90 minuter (1 delat med sannolikheten)">Odds 1 · X · 2</span>';
   let html = '';
   for (const ms of days.values()) {
     html += `<div class="day"><div class="day-head">${esc(cap(fDay.format(new Date(ms[0].kickoff))))}${key}</div><div class="mlist">`;
@@ -773,7 +773,7 @@ function newsSection(n) {
     : '';
   const lead = n.gatheredAt ? `Ur nyheter hämtade ${when(n.gatheredAt)} – rapporterat` : 'Rapporterat';
   return `<div class="analysis-news"><h5>Nyhetsläget</h5>${paras}${list}` +
-    `<p class="src-line">${lead} i media, inte kontrollerat av Profeterna och inte med i prognosen.</p></div>`;
+    `<p class="src-line">${lead} i media, inte kontrollerat av Matchfixarna och inte med i prognosen.</p></div>`;
 }
 
 async function runAnalysis(id, btn) {

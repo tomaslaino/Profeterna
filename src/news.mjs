@@ -80,7 +80,7 @@ export async function gatherNews(match, { now = new Date(), store = null, fetchI
 // underlaget (worker/analysis.mjs). Artikeltexten finns bara här.
 export function newsPayload(news) {
   const out = {
-    förklaring: 'Hämtat online när analysen begärdes. Rapporterat i media, inte kontrollerat av Profeterna och inte med i prognosen. Hänvisa med artikelns id, t.ex. [N1], och ange källan.',
+    förklaring: 'Hämtat online när analysen begärdes. Rapporterat i media, inte kontrollerat av Matchfixarna och inte med i prognosen. Hänvisa med artikelns id, t.ex. [N1], och ange källan.',
     hämtat: `${fDate.format(new Date(news.gatheredAt))} svensk tid`,
     'artiklar från': `${fDate.format(new Date(news.window.from))} svensk tid`,
   };

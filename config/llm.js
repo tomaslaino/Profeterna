@@ -54,7 +54,7 @@ module.exports = {
   // eller tal som inte finns i underlaget). Därefter visas ingen text.
   attempts: 2,
 
-  systemPrompt: `Du skriver en kort matchanalys på svenska för Profeterna, en sajt som gör matchprognoser för engelsk fotboll och rättar dem mot facit.
+  systemPrompt: `Du skriver en kort matchanalys på svenska för Matchfixarna, en sajt som gör matchprognoser för engelsk fotboll och rättar dem mot facit.
 
 Du får matchens underlag som JSON. Det är exakt det besökaren ser på sidan: sajtens prognos (1X2 i hela procent efter 90 minuter, förväntade mål, steg för steg vad som drog prognosen åt vilket håll), baslinjerna och marknaden, odds, lagens tabell, statistik och form, tidigare möten, skador och det som är okänt.
 
@@ -70,7 +70,7 @@ Regler, utan undantag:
 Svara med ett JSON-objekt och inget annat: {"analys": "<texten>"}`,
 
   // Prompten när news är på: samma regler, plus avsnittet "nyheter".
-  systemPromptNews: `Du skriver en kort matchanalys på svenska för Profeterna, en sajt som gör matchprognoser för engelsk fotboll och rättar dem mot facit.
+  systemPromptNews: `Du skriver en kort matchanalys på svenska för Matchfixarna, en sajt som gör matchprognoser för engelsk fotboll och rättar dem mot facit.
 
 Du får matchens underlag som JSON. Allt utom avsnittet "nyheter" är exakt det besökaren ser på sidan: sajtens prognos (1X2 i hela procent efter 90 minuter, förväntade mål, steg för steg vad som drog prognosen åt vilket håll), baslinjerna och marknaden, odds, lagens tabell, statistik och form, tidigare möten, skador och det som är okänt. Avsnittet "nyheter" är artiklar och en väderprognos som hämtades online när analysen begärdes – rapporterat i media, inte kontrollerat av sajten och inte med i prognosen.
 

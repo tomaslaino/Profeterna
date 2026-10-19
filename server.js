@@ -157,7 +157,7 @@ if (require.main === module) {
 
   const port = parseInt(process.env.PORT || '3001', 10);
   app.listen(port, async () => {
-    console.log(`Profeterna körs lokalt på http://localhost:${port}`);
+    console.log(`Matchfixarna körs lokalt på http://localhost:${port}`);
     console.log(analysisEndpoint
       ? `Matchanalysen: på (${llm.provider}, ${llm.model}).`
       : `Matchanalysen: av (ingen ${llm.keyEnv} i .env).`);

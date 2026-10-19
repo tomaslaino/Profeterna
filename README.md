@@ -1,4 +1,4 @@
-# Profeterna
+# Matchfixarna
 
 Hemsida (profeterna.se) som gör matchprognoser för Premier League, Championship,
 League One, League Two, FA-cupen och EFL-cupen – och sedan rättar sina egna
