@@ -402,7 +402,7 @@ function renderCouponShow(id) {
   if (!graded.length) {
     el.innerHTML = '<div class="kp-empty card"><p class="kp-eyebrow">Kupong</p><h2 class="page-title">Omgångens kupong</h2>' +
       '<p class="intro">Välj matcherna, sätt 1, X eller 2 och följ hur det går.</p>' +
-      '<a class="kp-btn primary" href="#kupong/ny">Skapa kupong</a></div>' + couponErrors();
+      '<a class="kp-btn primary" href="#kupong/ny">Skapa kupong</a></div>' + couponErrors() + (id ? '' : oracle());
     return;
   }
   const curId = id || (currentCoupon() || {}).id;
@@ -438,7 +438,43 @@ function renderCouponShow(id) {
   html += liveLine(g);
   if (!front) html += pastSection(graded.filter((x) => x !== cur), g);
   html += couponErrors();
+  if (front) html += oracle();
   el.innerHTML = html;
+}
+
+// Säkraste spelen: de tre kommande matcherna (sju dagar framåt) där modellen
+// är mest säker, högst en match per lag så att samma storlag inte står där
+// varje vecka. Under kupongen på förstasidan.
+const ORACLE_SIDE = ['hemma', 'oavgjort', 'borta'];
+function oracle() {
+  const now = Date.now();
+  const seen = new Set();
+  const picks = state.all.matches
+    .filter((m) => !m.completed && m.f && m.status !== 'STATUS_POSTPONED')
+    .filter((m) => { const t = Date.parse(m.kickoff); return t > now && t < now + 7 * 86400000; })
+    .map((m) => ({ m, top: Math.max(...m.f.p) }))
+    .sort((a, b) => b.top - a.top)
+    .filter(({ m }) => {
+      if (seen.has(m.home) || seen.has(m.away)) return false;
+      seen.add(m.home).add(m.away);
+      return true;
+    })
+    .slice(0, 3);
+  if (!picks.length) return '';
+  const cards = picks.map(({ m, top }) => {
+    const i = m.f.p.indexOf(top);
+    const team = (name, side) => `<span${i === side ? ' class="fav"' : ''}>${esc(name)}</span>`;
+    return `<a class="ocard" href="#match/${esc(m.id)}">` +
+      `<span class="ocard-meta"><span class="ctag" title="${esc(compOf(m.comp).name)}">${esc(compOf(m.comp).short)}</span>${esc(fWeekdayTime.format(new Date(m.kickoff)))}</span>` +
+      `<span class="ocard-teams">${team(m.home, 0)}${team(m.away, 2)}</span>` +
+      `<span class="ocard-num">${top}<small>%</small><em>${ORACLE_SIDE[i]} · ${odds(100 / top)}</em></span>` +
+      probBar(m.f.p) + '</a>';
+  }).join('');
+  return '<section class="oracle" aria-labelledby="oracle-h"><div class="oracle-head"><div>' +
+    '<p class="kp-eyebrow">Oraklet har talat</p><h2 id="oracle-h">Säkraste spelen<sup>*</sup></h2></div>' +
+    '<a class="oracle-all" href="#matcher">Alla matcher →</a></div>' +
+    `<div class="oracle-grid">${cards}</div>` +
+    '<p class="oracle-fine">* Enligt oraklet. Inga pengar tillbaka.</p></section>';
 }
 
 function summaryCard(g) {

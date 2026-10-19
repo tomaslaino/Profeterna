@@ -230,6 +230,14 @@ function isHidden(m) {
   return Boolean(window.Spoiler && Spoiler.hidden(m));
 }
 
+// 1 · X · 2 som en tunn stapel i hemma-, oavgjort- och bortafärg, det
+// troligaste utfallet starkast (theme.css .pbar). Används också av kupong.js.
+function probBar(p) {
+  const max = Math.max(...p);
+  return '<span class="pbar" aria-hidden="true">' +
+    p.map((x) => `<i style="--w:${x}"${x === max ? ' class="max"' : ''}></i>`).join('') + '</span>';
+}
+
 function matchRow(m) {
   let side;
   if (m.completed && m.score) {
@@ -243,6 +251,7 @@ function matchRow(m) {
   } else {
     side = listForecast(m.f);
     if (m.status === 'STATUS_POSTPONED') side += '<span class="sub">uppskjuten</span>';
+    else if (m.f) side += probBar(m.f.p);
   }
   return `<button type="button" class="mrow" data-id="${esc(m.id)}">` +
     `<span class="mtime">${esc(fTime.format(new Date(m.kickoff)))}</span>` +

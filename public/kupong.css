@@ -118,8 +118,15 @@
   cursor: pointer;
 }
 .kp-btn:hover { color: #fff; border-color: var(--pill-line-hi); }
-.kp-btn.primary { background: var(--accent); border-color: var(--accent); color: #fff; }
-.kp-btn.primary:hover { background: color-mix(in srgb, var(--accent) 85%, #fff); }
+/* Guld betyder dina val och huvudknappen; blått finns kvar för det som pågår. */
+.kp-btn.primary {
+  border-color: transparent;
+  background: var(--gold-grad);
+  color: #1d1509;
+  font-weight: 700;
+  box-shadow: 0 10px 24px -12px rgba(216, 176, 106, 0.8), inset 0 1px 0 rgba(255, 255, 255, 0.45);
+}
+.kp-btn.primary:hover { background: linear-gradient(180deg, #f9e8bf, #dcb46b); color: #1d1509; }
 
 /* ---------- kupongvyn ---------- */
 
@@ -207,10 +214,10 @@ a.kp-row:hover { color: var(--fg); background: rgba(255, 255, 255, 0.04); }
   color: rgba(179, 196, 217, 0.4);
   box-shadow: inset 0 0 0 1px var(--hair);
 }
-.kp-sg i.on { color: #fff; background: color-mix(in srgb, var(--accent) 55%, transparent); box-shadow: none; }
+.kp-sg i.on { color: #1d1509; background: color-mix(in srgb, var(--gold) 80%, transparent); box-shadow: none; }
 .kp-sg i.res { box-shadow: inset 0 0 0 2px var(--kp-no); color: var(--fg); }
 .kp-sg i.on.res { background: var(--kp-ok); box-shadow: none; color: #06101e; }
-.kp-row.s-no:not(.s-live) .kp-sg i.on:not(.res) { background: color-mix(in srgb, var(--accent) 25%, transparent); }
+.kp-row.s-no:not(.s-live) .kp-sg i.on:not(.res) { color: var(--fg); background: color-mix(in srgb, var(--gold) 25%, transparent); }
 .kp-row.s-live .kp-sg i.res { animation: kp-blink 1.6s infinite; }
 .kp-sg i.tip::after {
   content: "";
@@ -275,9 +282,105 @@ a.kp-row:hover { color: var(--fg); background: rgba(255, 255, 255, 0.04); }
 .kp-past-num { font-size: 13px; color: var(--muted); }
 .kp-past-num b { font-family: var(--display); font-size: 22px; font-weight: 800; color: var(--bone); }
 
-.kp-empty { max-width: 560px; margin-top: clamp(18px, 3vw, 34px); padding: 26px 28px; }
+.kp-empty { position: relative; overflow: hidden; isolation: isolate; padding: 26px 28px; }
 .kp-empty .page-title { margin: 6px 0 12px; }
 .kp-empty .intro { margin: 0 0 20px; }
+/* 1X2 som en svag inskription i marmorn */
+.kp-empty::after {
+  content: "1X2";
+  position: absolute;
+  z-index: -1;
+  right: -0.06em;
+  bottom: -0.3em;
+  font-family: var(--display);
+  font-size: clamp(120px, 16vw, 190px);
+  font-weight: 700;
+  line-height: 1;
+  letter-spacing: -0.04em;
+  color: var(--gold);
+  opacity: 0.07;
+  pointer-events: none;
+}
+/* breda skärmar: texten till vänster, knappen till höger */
+@media (min-width: 720px) {
+  .kp-empty {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) auto;
+    column-gap: 40px;
+    align-items: center;
+    padding: 28px 34px;
+  }
+  .kp-empty > * { grid-column: 1; }
+  .kp-empty .intro { margin-bottom: 0; }
+  .kp-empty .kp-btn { grid-column: 2; grid-row: 1 / span 3; margin-right: clamp(0px, 8vw, 150px); padding: 12px 22px; font-size: 15px; }
+}
+
+/* ---------- Säkraste spelen (förstasidan, under kupongen) ---------- */
+
+.oracle { margin: 40px 0 8px; }
+.oracle-head { display: flex; align-items: flex-end; justify-content: space-between; gap: 12px; margin: 0 0 14px; }
+.oracle-head .kp-eyebrow { margin-bottom: 4px; }
+.oracle-head h2 {
+  margin: 0;
+  font-family: var(--display);
+  font-weight: 650;
+  font-size: clamp(28px, 3.2vw, 36px);
+  line-height: 1;
+  letter-spacing: -0.02em;
+  color: var(--bone);
+}
+.oracle-head h2 sup { margin-left: 2px; font-size: 0.55em; color: var(--gold); }
+.oracle-all { flex: none; padding-bottom: 2px; font-size: 14px; font-weight: 600; color: var(--ink-soft); text-decoration: none; }
+.oracle-all:hover { color: #fff; }
+.oracle-grid { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 14px; }
+.ocard {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto;
+  grid-template-areas: "meta meta" "teams num" "bar bar";
+  gap: 14px 12px;
+  padding: 18px 20px 20px;
+  color: inherit;
+  text-decoration: none;
+  background: var(--glass);
+  border: 1px solid var(--border);
+  border-radius: 16px;
+  box-shadow: var(--shadow-card);
+  transition: transform 0.18s ease, border-color 0.18s ease;
+}
+.ocard:hover { color: inherit; transform: translateY(-2px); border-color: rgba(216, 176, 106, 0.35); }
+.ocard-meta { grid-area: meta; display: flex; align-items: center; gap: 8px; font-size: 12.5px; font-weight: 600; color: var(--muted); }
+.ocard-teams { grid-area: teams; display: flex; flex-direction: column; justify-content: center; gap: 3px; min-width: 0; }
+.ocard-teams span { position: relative; font-size: 15px; font-weight: 600; line-height: 1.3; color: var(--muted); }
+.ocard-teams .fav { color: var(--fg); }
+/* guldpricken i marginalen vid laget oraklet tror på */
+.ocard-teams .fav::before { content: ""; position: absolute; left: -12px; top: 0.5em; width: 6px; height: 6px; border-radius: 50%; background: var(--gold); }
+.ocard-num {
+  grid-area: num;
+  align-self: center;
+  text-align: right;
+  font-family: var(--display);
+  font-weight: 650;
+  font-size: 46px;
+  font-variant-numeric: lining-nums;
+  line-height: 0.9;
+  letter-spacing: -0.03em;
+  color: var(--bone);
+}
+.ocard-num small { margin-left: 1px; font-size: 0.5em; color: var(--muted); }
+.ocard-num em {
+  display: block;
+  margin-top: 6px;
+  font-family: var(--sans);
+  font-size: 10.5px;
+  font-style: normal;
+  font-weight: 700;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  white-space: nowrap;
+  color: var(--eyebrow);
+}
+.ocard .pbar { grid-area: bar; height: 6px; }
+.oracle-fine { margin: 12px 2px 0; font-size: 12px; font-style: italic; color: var(--muted); }
 
 /* ---------- ny kupong ---------- */
 
@@ -293,10 +396,10 @@ a.kp-row:hover { color: var(--fg); background: rgba(255, 255, 255, 0.04); }
   border-radius: 11px;
   background: var(--pill);
 }
-.kp-search:focus { outline: none; border-color: var(--accent); box-shadow: 0 0 0 3px var(--accent-soft); }
+.kp-search:focus { outline: none; border-color: var(--gold); box-shadow: 0 0 0 3px rgba(216, 176, 106, 0.16); }
 .kp-search::placeholder, .kp-name::placeholder { color: var(--muted); }
 .kp-only { padding: 6px 13px; font-size: 13px; font-weight: 700; border-radius: 999px; color: #b9c9dd; }
-.kp-only[aria-pressed="true"] { color: #fff; background: var(--accent-soft); border-color: var(--accent); }
+.kp-only[aria-pressed="true"] { color: var(--bone); background: rgba(216, 176, 106, 0.14); border-color: var(--gold); }
 
 .kp-pick {
   display: grid;
@@ -308,7 +411,7 @@ a.kp-row:hover { color: var(--fg); background: rgba(255, 255, 255, 0.04); }
   transition: background-color 0.15s ease;
 }
 .kp-pick:last-child { border-bottom: 0; }
-.kp-pick.on { background: rgba(91, 140, 255, 0.07); box-shadow: inset 3px 0 0 var(--accent); }
+.kp-pick.on { background: rgba(216, 176, 106, 0.06); box-shadow: inset 3px 0 0 var(--gold); }
 .kp-pick .mteams { min-width: 0; }
 .kp-note-in {
   grid-column: 3 / -1;
@@ -322,7 +425,7 @@ a.kp-row:hover { color: var(--fg); background: rgba(255, 255, 255, 0.04); }
   background: var(--pill);
 }
 .kp-note-in::placeholder { color: var(--muted); }
-.kp-note-in:focus { outline: none; border-color: var(--accent); box-shadow: 0 0 0 3px var(--accent-soft); }
+.kp-note-in:focus { outline: none; border-color: var(--gold); box-shadow: 0 0 0 3px rgba(216, 176, 106, 0.16); }
 .kp-tg { display: inline-flex; gap: 6px; }
 .kp-tg button {
   width: 50px;
@@ -336,8 +439,8 @@ a.kp-row:hover { color: var(--fg); background: rgba(255, 255, 255, 0.04); }
   cursor: pointer;
 }
 .kp-tg button small { display: block; margin-top: 3px; font-family: -apple-system, BlinkMacSystemFont, "SF Pro Text", sans-serif; font-size: 10.5px; font-weight: 500; color: var(--muted); }
-.kp-tg button[aria-pressed="true"] { color: #fff; background: var(--accent); border-color: var(--accent); }
-.kp-tg button[aria-pressed="true"] small { color: rgba(255, 255, 255, 0.85); }
+.kp-tg button[aria-pressed="true"] { color: #1d1509; background: var(--gold-grad); border-color: transparent; }
+.kp-tg button[aria-pressed="true"] small { color: rgba(29, 21, 9, 0.75); }
 
 .kp-bar {
   position: sticky;
@@ -349,9 +452,9 @@ a.kp-row:hover { color: var(--fg); background: rgba(255, 255, 255, 0.04); }
   gap: 10px 14px;
   margin-top: 8px;
   padding: 12px 14px 12px 20px;
-  border: 1px solid var(--pill-line-hi);
+  border: 1px solid rgba(216, 176, 106, 0.28);
   border-radius: 16px;
-  background: color-mix(in srgb, #0f1c30 88%, transparent);
+  background: color-mix(in srgb, #1b1814 90%, transparent);
   -webkit-backdrop-filter: blur(14px);
   backdrop-filter: blur(14px);
   box-shadow: 0 20px 40px -18px rgba(0, 0, 0, 0.9);
@@ -369,7 +472,7 @@ a.kp-row:hover { color: var(--fg); background: rgba(255, 255, 255, 0.04); }
   border-radius: 10px;
   background: var(--pill);
 }
-.kp-name:focus { outline: none; border-color: var(--accent); }
+.kp-name:focus { outline: none; border-color: var(--gold); }
 
 .kp-saved { max-width: 640px; }
 .kp-saved p { margin: 0 0 16px; color: var(--ink-soft); }
@@ -404,7 +507,11 @@ a.kp-row:hover { color: var(--fg); background: rgba(255, 255, 255, 0.04); }
   .kp-past { grid-template-columns: 1fr auto; padding: 12px 14px; }
   .kp-past .kp-pearls { grid-column: 1 / -1; grid-row: 2; }
   .kp-search { max-width: none; }
-  .kp-bar { padding: 10px 12px; bottom: 10px; }
+  /* ovanför appmenyn i nederkant (theme.css) */
+  .kp-bar { padding: 10px 12px; bottom: calc(var(--tab-h) + 10px + env(safe-area-inset-bottom)); }
+  .oracle-grid { grid-template-columns: 1fr; gap: 10px; }
+  .ocard { padding: 16px 18px 18px; gap: 12px; }
+  .ocard-num { font-size: 42px; }
   .kp-bar-txt { flex-basis: 100%; }
   .kp-name { flex: 1 1 120px; }
   .kp-hist { padding: 14px 12px 40px; gap: 6px; }
@@ -413,4 +520,5 @@ a.kp-row:hover { color: var(--fg); background: rgba(255, 255, 255, 0.04); }
 
 @media (prefers-reduced-motion: reduce) {
   .kp-dot.live, .kp-track .liveok, .kp-row.s-live .kp-sg i.res { animation: none; }
+  .ocard:hover { transform: none; }
 }
