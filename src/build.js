@@ -16,6 +16,7 @@
 //   data/season.json       säsongsprognosen, modellens styrka för alla lag
 //                          och programmet framåt (Tabeller → Säsongsprognos)
 //   data/kuponger.json     gängets kuponger ur data/kuponger/ (fliken Kupong)
+//                          och vart egna tips inför samtalet skickas
 //   data/historik.json     färdiga kuponger med facit, betyg och AI:ns
 //                          kommentar (sidan Historik, src/history.js)
 //   data/journal/*.jsonl   prognosjournalen som den ligger i repot
@@ -189,7 +190,7 @@ function writeSite(outDir = OUT, { journal = false, analysisEndpoint, couponEndp
     console.error('[build] kupongerna:', err);
     coupons = { coupons: [], errors: [{ file: '', errors: [String(err.message || err)] }] };
   }
-  write('kuponger.json', { repo: REPO, branch: BRANCH, dir: 'data/kuponger', save: couponSaveInfo(couponEndpoint), ...coupons });
+  write('kuponger.json', { repo: REPO, branch: BRANCH, dir: 'data/kuponger', save: couponSaveInfo(couponEndpoint), samtal: samtalInfo(couponEndpoint), ...coupons });
 
   // Kuponghistoriken (sidan Historik): färdiga kuponger med facit och betyg.
   // Med --journal fryses nya färdiga kuponger in i data/kupong-historik.json.
@@ -249,6 +250,13 @@ function analysisInfo(override) {
 function couponSaveInfo(override) {
   if (override !== undefined) return override;
   return kupongCfg.enabled ? kupongCfg.endpoint : null;
+}
+
+// Inför samtalet: gängets egna tips ligger i samma tjänst (…/kupong →
+// …/samtal, lokalt /api/samtal), och gang är vilka som tippar.
+function samtalInfo(override) {
+  const save = couponSaveInfo(override);
+  return save ? { endpoint: save.replace(/kupong$/, 'samtal'), gang: kupongCfg.gang || [] } : null;
 }
 
 function commentInfo(override) {
