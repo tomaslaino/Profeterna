@@ -140,25 +140,24 @@ const ZONES = [
 ];
 const zoneOf = (note) => (note ? ZONES.find((z) => z.test(note)) || null : null);
 
-function leagueTable(rows, P, { compact = false } = {}) {
-  const top = new Map(P.teams.map((t) => [t.espnId, t]));
+// Som en vanlig tabell: S V O F, målen och poängen; korten efter poängen
+// eftersom de inte påverkar placeringen.
+function leagueTable(rows, { compact = false } = {}) {
   const head = '<thead><tr><th class="c">#</th><th>Lag</th><th class="num" title="Spelade matcher">S</th>' +
     '<th class="num" title="Vunna">V</th><th class="num" title="Oavgjorda">O</th><th class="num" title="Förlorade">F</th>' +
     '<th class="num" title="Gjorda–insläppta mål">Mål</th><th class="num" title="Målskillnad">+/−</th>' +
-    (compact ? '' : '<th class="num hide-sm" title="Gula och röda kort (spelarnas, ur trupperna)">Kort</th><th class="hide-sm">Bäste målskytt</th>') +
-    '<th class="num" title="Poäng: 3 för vinst, 1 för oavgjort">P</th></tr></thead>';
+    '<th class="num" title="Poäng: 3 för vinst, 1 för oavgjort">P</th>' +
+    (compact ? '' : '<th class="num hide-sm" title="Gula och röda kort (spelarnas, ur trupperna)">Kort</th>') + '</tr></thead>';
   const body = rows.map((r) => {
-    if (!r) return `<tr class="dv-gap"><td colspan="${compact ? 9 : 11}">⋯</td></tr>`;
+    if (!r) return `<tr class="dv-gap"><td colspan="${compact ? 9 : 10}">⋯</td></tr>`;
     const z = zoneOf(r.note);
-    const t = top.get(r.espnId);
     const gd = r.gd > 0 ? `+${r.gd}` : r.gd < 0 ? `−${-r.gd}` : '0';
     return `<tr class="dv-trow ${z ? z.cls : ''}" data-team="${esc(r.espnId)}" tabindex="0" title="${z ? esc(z.label) : ''}">` +
       `<td class="c rank">${r.rank}</td><td class="team">${esc(r.name)}</td><td class="num">${r.played}</td>` +
       `<td class="num">${r.won}</td><td class="num">${r.drawn}</td><td class="num">${r.lost}</td>` +
       `<td class="num">${r.gf}–${r.ga}</td><td class="num">${gd}</td>` +
-      (compact ? '' : `<td class="num hide-sm dv-cards">${r.yc == null ? '–' : `<i class="dv-card-y"></i>${r.yc}${r.rc ? ` <i class="dv-card-r"></i>${r.rc}` : ''}`}</td>` +
-        `<td class="hide-sm dv-scorer">${t && t.topScorer && t.topScorer.g ? `${esc(t.topScorer.name)} <b>${t.topScorer.g}</b>` : '<span class="muted">–</span>'}</td>`) +
-      `<td class="num pts">${r.points}${r.deductions ? `<sup title="${r.deductions} poängs avdrag">*</sup>` : ''}</td></tr>`;
+      `<td class="num pts">${r.points}${r.deductions ? `<sup title="${r.deductions} poängs avdrag">*</sup>` : ''}</td>` +
+      (compact ? '' : `<td class="num hide-sm dv-cards">${r.yc == null ? '–' : `<i class="dv-card-y"></i>${r.yc}${r.rc ? ` <i class="dv-card-r"></i>${r.rc}` : ''}`}</td>`) + '</tr>';
   }).join('');
   return `<div class="table-wrap dv-tw"><table class="dv-league">${head}<tbody>${body}</tbody></table></div>`;
 }
@@ -176,10 +175,10 @@ function tableView(dv, P) {
   const ded = rows.filter((r) => r.deductions);
   return sectionHead(`Tabell – ${dv.name}`, `${esc(state.data.season)} · ${Math.max(...rows.map((r) => r.played))} omgångar`) +
     card('Tabellen', {
-      body: leagueTable(rows, P) +
+      body: leagueTable(rows) +
         `<div class="dv-zones">${zones.map((z) => `<span class="${z.cls}"><i></i>${esc(z.label)}</span>`).join('')}</div>` +
         (ded.length ? `<p class="dv-note">* Poängavdrag: ${ded.map((r) => `${esc(r.name)} −${r.deductions}`).join(', ')}.</p>` : ''),
-      src: `Tabell: ESPN, hämtat ${when(P.table.fetchedAt)} · kort och målskyttar: ESPN-trupperna, hämtat ${when(P.source.fetchedAt)} · ` +
+      src: `Tabell: ESPN, hämtat ${when(P.table.fetchedAt)} · kort: ESPN-trupperna, hämtat ${when(P.source.fetchedAt)} · ` +
         `<a href="#${esc(dv.id)}/prognos">Säsongsprognosen →</a>`,
       cls: 'dv-tablecard',
     });
