@@ -9,6 +9,8 @@ const LIST_DAYS = 14;
 // Ovanför nu-linjen syns först bara de senaste resultaten: den senaste
 // speldagen, högst så här många matcher. Resten ligger bakom en knapp.
 const RECENT_ROWS = 4;
+// Inbördes möten på matchsidan: så här många år bakåt.
+const PAST_YEARS = 5;
 
 function esc(s) {
   return String(s == null ? '' : s).replace(/[&<>"']/g, (c) => ({
@@ -212,8 +214,8 @@ function showEarlier() {
 
 // Kolumnens nyckel står i första dagens rubrik på var sida om nu-linjen i
 // stället för en förklaring.
-const KEY_PLAYED = '<span class="day-key" style="float:right;margin-right:20px" title="Resultat, under det prognosen 1 · X · 2 som odds före avspark">Resultat · odds</span>';
-const KEY_UPCOMING = '<span class="day-key" style="float:right;margin-right:20px" title="Matchfixarnas odds på hemmaseger · oavgjort · bortaseger efter 90 minuter (1 delat med sannolikheten)">Odds 1 · X · 2</span>';
+const KEY_PLAYED = '<span class="day-key" style="float:right;margin-right:20px" title="Resultat, under det prognosen 1 · X · 2 i procent före avspark">Resultat · %</span>';
+const KEY_UPCOMING = '<span class="day-key" style="float:right;margin-right:20px" title="Matchfixarnas chans i procent för hemmaseger · oavgjort · bortaseger efter 90 minuter">% 1 · X · 2</span>';
 
 function renderList(d) {
   if (!d.played.length && !d.upcoming.length) {
@@ -255,17 +257,17 @@ function compOf(id) {
   return state.comps.get(id) || { name: id, short: id };
 }
 
-// Prognosen som odds på svenskt vis: decimalodds = 1 / sannolikheten, med
-// decimalkomma. Räknas från hela procent, samma precision som journalen.
-function listOdds(p) {
-  return p.map((x) => (x > 0 ? odds(100 / x) : '–'));
+// Prognosen i hela procent, som på matchsidan och i kupongen – samma
+// precision som journalen.
+function listPct(p) {
+  return p.map((x) => (x == null ? '–' : String(x)));
 }
 
-// Kompakt prognos: 1 · X · 2 som odds, det troligaste utfallet i fetstil.
+// Kompakt prognos: 1 · X · 2 i procent, det troligaste utfallet i fetstil.
 function listForecast(f) {
   if (!f) return '<span class="unknown">okänt</span>';
   const max = Math.max(...f.p);
-  const o = listOdds(f.p);
+  const o = listPct(f.p);
   return f.p.map((x, i) => (x === max ? `<b>${o[i]}</b>` : o[i])).join(' · ') +
     (f.lower ? ' <span title="Ett lag saknar egen lagdata">*</span>' : '');
 }
@@ -292,10 +294,10 @@ function tipHit(m) {
   return m.j.p.indexOf(Math.max(...m.j.p)) === res;
 }
 
-// Journalens odds under resultatet, det troligaste utfallet grönt om det
-// slog in och rött om inte. Utan rättning (dold eller okänd): bara oddsen.
-function tipOdds(p, hit) {
-  const o = listOdds(p);
+// Journalens prognos under resultatet, det troligaste utfallet grönt om det
+// slog in och rött om inte. Utan rättning (dold eller okänd): bara procenten.
+function tipPct(p, hit) {
+  const o = listPct(p);
   if (hit == null) return o.join(' · ');
   const tip = p.indexOf(Math.max(...p));
   const cls = hit ? 'tip-ok' : 'tip-no';
@@ -311,8 +313,8 @@ function matchRow(m) {
       side = `<span class="score">${m.score.home}–${m.score.away}</span>`;
       if (m.shootout) side += `<span class="sub">str. ${m.shootout.home}–${m.shootout.away}</span>`;
     }
-    if (m.j) side += `<span class="sub" title="Prognosen före avspark, ur journalen">${m.j.p ? tipOdds(m.j.p, isHidden(m) ? null : tipHit(m)) : 'okänt'}</span>`;
-    else if (m.f) side += `<span class="sub retro" title="Inte loggad – återskapad i efterhand med underlaget före matchdagen">${listOdds(m.f.p).join(' · ')}</span>`;
+    if (m.j) side += `<span class="sub" title="Prognosen före avspark, ur journalen">${m.j.p ? tipPct(m.j.p, isHidden(m) ? null : tipHit(m)) : 'okänt'}</span>`;
+    else if (m.f) side += `<span class="sub retro" title="Inte loggad – återskapad i efterhand med underlaget före matchdagen">${listPct(m.f.p).join(' · ')}</span>`;
   } else {
     side = listForecast(m.f);
     if (m.status === 'STATUS_POSTPONED') side += '<span class="sub">uppskjuten</span>';
@@ -395,8 +397,10 @@ function renderDetail(d) {
 
   html += '<h3 class="underlag">Underlag</h3>';
   html += '<div class="grid2">' + oddsCard(d.odds, m) + formCard(d) + '</div>';
+  html += squadCard(d);
+  // Resten är hopfällt: rubriken syns, innehållet när man trycker på den.
   html += sideCard(d);
-  html += '<div class="grid2">' + refereeCard(d) + squadCard(d) + '</div>';
+  html += refereeCard(d);
   html += squadsSection(d);
   html += '<div class="grid2 src-only">' + unknownCard(d) + '</div>';
   html += '<p class="detail-foot"><button type="button" class="src-toggle" aria-pressed="false">Visa detaljer</button>' +
@@ -521,14 +525,14 @@ function scoreTable(j, r, m) {
     ['<strong>Modellen</strong>', null, 'model', 'model'],
     [BASE.market, mk ? `(c) ${esc(mk.source)}, ${esc(mk.kind)}${mk.fetchedAt ? `, hämtat ${when(mk.fetchedAt)}` : ''}` : 'okänt vid loggningen', 'market'],
     [BASE.closing, 'Betfair Exchange, marknaden vid avspark', 'closing'],
-    [BASE.season, null, 'season'],
-    [BASE.naive, null, 'naive'],
+    [BASE.season, null, 'season', 'src-only'],
+    [BASE.naive, null, 'naive', 'src-only'],
   ];
   const rows = lines.map(([label, sub, key, cls]) => {
     const s = j.scores[key];
     if (!s && key === 'closing') return '';
     const head = `<td>${label}${sub ? `<span class="sub src-sub">${sub}</span>` : ''}</td>`;
-    if (!s) return `<tr>${head}<td colspan="5" class="num unknown">okänt</td></tr>`;
+    if (!s) return `<tr class="${cls || ''}">${head}<td colspan="5" class="num unknown">okänt</td></tr>`;
     return `<tr class="${cls || ''}">${head}${pct3(s.p).map((v, k) => `<td class="num${k === o ? ' hit' : ''}">${v}</td>`).join('')}` +
       `<td class="num src-only">${dec(s.logLoss, 2)}</td><td class="num src-only">${dec(s.brier, 2)}</td></tr>`;
   }).join('');
@@ -563,8 +567,9 @@ function compareCard(d) {
   const mk = b.market;
   row(BASE.market, mk ? `(c) ${esc(mk.source)}, ${esc(mk.kind)}${mk.fetchedAt ? `, hämtat ${when(mk.fetchedAt)}` : ''}` : esc(marketMissing(d)), mk && mk.p);
   if (b.closing) row(BASE.closing, 'Betfair Exchange, tuffaste referensen', b.closing.p);
-  row(BASE.season, b.season.p ? `(b) Poisson på årets matcher (${b.season.matches[0]} resp. ${b.season.matches[1]})` : esc(b.season.reason), b.season.p);
-  row(BASE.naive, b.naive.p ? `(a) ${esc(b.naive.scope)}, ${esc(b.naive.seasons[0])}–${esc(b.naive.seasons[1])}` : esc(b.naive.reason), b.naive.p);
+  // De enkla baslinjerna är modellens egna måttstockar – syns med detaljerna.
+  row(BASE.season, b.season.p ? `(b) Poisson på årets matcher (${b.season.matches[0]} resp. ${b.season.matches[1]})` : esc(b.season.reason), b.season.p, 'src-only');
+  row(BASE.naive, b.naive.p ? `(a) ${esc(b.naive.scope)}, ${esc(b.naive.seasons[0])}–${esc(b.naive.seasons[1])}` : esc(b.naive.reason), b.naive.p, 'src-only');
   let diff = '';
   if (mk && mk.p) {
     const a = pct3(p.p);
@@ -648,16 +653,32 @@ function formCard(d) {
       d.meetings.map((x) => `<li>${dateOnly(x.kickoff)} · ${esc(x.compShort)} · ${esc(x.home)} ${x.score.home}–${x.score.away} ${esc(x.away)}</li>`).join('') + '</ul>';
   }
   html += '<p class="src-line">ESPN, alla tävlingar inkl. Europacuperna · efter 90 minuter, straffavgjort = oavgjort</p>';
+  // Tidigare säsonger: bara möten de senaste åren – äldre säger lite om lagen i dag.
   const pm = d.pastMeetings;
-  if (pm) {
-    html += `<h4 style="margin-top:0.9rem">Tidigare säsonger <span class="hint">senaste ${pm.list.length || ''}</span></h4>` +
-      (pm.list.length
-        ? '<ul class="plain">' + pm.list.map((x) => `<li>${esc(x.season)} · ${esc(x.compShort)} · ${esc(x.home)} ${x.score.home}–${x.score.away} ${esc(x.away)}</li>`).join('') + '</ul>'
-        : `<p class="muted" style="margin:0">Inga möten i ligorna sedan ${esc(pm.first)} eller i FA-cupen sedan 2021/22.</p>`) +
+  const since = Date.now() - PAST_YEARS * 365.25 * 86400000;
+  const past = pm ? pm.list.filter((x) => x.date && Date.parse(x.date) >= since) : [];
+  if (past.length) {
+    html += `<h4 style="margin-top:0.9rem">Tidigare säsonger <span class="hint">senaste ${PAST_YEARS} åren</span></h4>` +
+      '<ul class="plain">' + past.map((x) => `<li>${esc(x.season)} · ${esc(x.compShort)} · ${esc(x.home)} ${x.score.home}–${x.score.away} ${esc(x.away)}</li>`).join('') + '</ul>' +
       `<p class="src-line">${esc(pm.source.provider)}, hämtat ${when(pm.source.fetchedAt)} · efter 90 minuter</p>`;
   }
   html += '</div>';
   return html;
+}
+
+// Hopfällt avsnitt på matchsidan: rubriken (och en kort hint) syns, innehållet
+// när man trycker på den.
+function foldSection(title, body, hint = '') {
+  return `<details class="fold"><summary>${esc(title)}${hint ? `<span class="hint">${hint}</span>` : ''}</summary>` +
+    `<div class="fold-body">${body}</div></details>`;
+}
+
+// xG finns för Premier League från två källor. Bara en visas: Understat där
+// den finns (etablerad leverantör), annars football-data.co.uk.
+function oneXg(rows) {
+  const xg = rows.filter((r) => /^xG \(/.test(r.label));
+  const keep = xg.find((r) => r.label === 'xG (Understat)') || xg[0];
+  return rows.filter((r) => !xg.includes(r) || r === keep).map((r) => (r === keep ? { ...r, label: 'xG' } : r));
 }
 
 function sideCard(d) {
@@ -678,30 +699,51 @@ function sideCard(d) {
       }
     }
     rows += `<tr class="group"><td colspan="3">${esc(g.title)}${srcTxt ? `<span class="sub src-sub">${srcTxt}</span>` : ''}</td></tr>`;
-    for (const r of g.rows) {
+    for (const r of oneXg(g.rows)) {
       rows += `<tr><td class="h">${val(r.values[0])}</td><td class="mid">${esc(r.label)}</td><td class="a">${val(r.values[1])}</td></tr>`;
     }
     if (g.note) notes.push(g.note);
   }
-  return `<div class="card" style="margin-bottom:1rem"><h4>Lagen sida vid sida</h4>` +
+  return foldSection('Lagen sida vid sida',
     `<div class="table-wrap" style="box-shadow:none;margin:0"><table class="side"><thead><tr>` +
     `<th style="text-align:right">${esc(d.match.home)}</th><th class="mid"></th><th>${esc(d.match.away)}</th></tr></thead>` +
     `<tbody>${rows}</tbody></table></div>` +
-    (notes.length ? `<p class="src-line">${notes.map(esc).join(' ')}</p>` : '') + '</div>';
+    (notes.length ? `<p class="src-line">${notes.map(esc).join(' ')}</p>` : ''),
+    'tabell, schema och xG');
 }
+
+// Skadorna i korthet: namnen per status på en rad. FPL:s egen text (på
+// engelska) och chansen att spela syns med detaljerna.
+const SQUAD_GROUPS = [
+  ['skadad', 'Skadade'],
+  ['avstängd', 'Avstängda'],
+  ['ej uttagbar', 'Ej uttagbara'],
+  ['tveksam', 'Osäkra'],
+];
 
 function squadCard(d) {
   const block = (name, s) => {
     let h = `<p style="margin:0.2rem 0 0.3rem"><strong>${esc(name)}</strong></p>`;
     if (s.unknown) return h + `<p class="unknown" style="margin:0 0 0.6rem">okänt – ${esc(s.reason)}</p>`;
     if (!s.players.length) return h + '<p class="muted" style="margin:0 0 0.6rem">Inga skador eller avstängningar rapporterade.</p>';
-    return h + '<ul class="plain" style="margin-bottom:0.6rem">' + s.players.map((p) =>
+    const groups = SQUAD_GROUPS.map(([status, label]) => {
+      const ps = s.players.filter((p) => p.status === status);
+      if (!ps.length) return '';
+      const names = ps.map((p) => `<span${p.news ? ` title="${esc(p.news)}"` : ''}>${esc(p.name)}</span>` +
+        (status === 'tveksam' && p.chance != null ? ` <span class="muted">${p.chance}&nbsp;%</span>` : '')).join(', ');
+      return `<p class="inj-line"><span class="muted">${label}:</span> ${names}</p>`;
+    }).join('');
+    // Med detaljerna byts raderna mot hela listan.
+    return h + `<div class="src-hide">${groups}</div>` + '<ul class="plain src-only" style="margin-bottom:0.6rem">' + s.players.map((p) =>
       `<li>${esc(p.name)} <span class="muted">${esc(p.pos || '')}</span> – ${esc(p.status)}` +
       `${p.chance != null ? ` (${p.chance} % chans att spela)` : ''}` +
       `${p.news ? `<span class="sub">${esc(p.news)}${p.since ? ` · ${dateOnly(p.since)}` : ''}</span>` : ''}</li>`).join('') + '</ul>';
   };
   const src = [d.squad.home, d.squad.away].find((s) => s.source);
-  return `<div class="card"><h4>Skador och avstängningar</h4>` +
+  // Utanför Premier League finns ingen fri källa – då är kortet bara "okänt"
+  // två gånger och syns med detaljerna.
+  const none = d.squad.home.unknown && d.squad.away.unknown;
+  return `<div class="card inj${none ? ' src-only' : ''}"><h4>Skador och avstängningar</h4>` +
     block(d.match.home, d.squad.home) + block(d.match.away, d.squad.away) +
     (src ? `<p class="src-line">${esc(src.source.provider)}, hämtat ${when(src.source.fetchedAt)}.${src.note ? ' ' + esc(src.note) : ''} Sorterat efter speltid.</p>` : '') + '</div>';
 }
@@ -711,11 +753,11 @@ function squadCard(d) {
 function refereeCard(d) {
   const r = d.referee;
   if (!r) return '';
-  if (r.unknown) return `<div class="card src-only"><h4>Domaren</h4><p class="unknown" style="margin:0">okänt – ${esc(r.reason)}</p></div>`;
+  if (r.unknown) return `<div class="src-only">${foldSection('Domaren', `<p class="unknown" style="margin:0">okänt – ${esc(r.reason)}</p>`)}</div>`;
   const s = r.stats;
   const a = r.avg;
   const divs = r.divisions.map((x) => `${esc(x.short)} ${x.n}`).join(', ');
-  let html = `<div class="card"><h4>Domaren</h4><p class="ref-name"><strong>${esc(r.name)}</strong>` +
+  let html = `<p class="ref-name"><strong>${esc(r.name)}</strong>` +
     (s.n ? ` · ${s.n} ligamatcher sedan ${monthYear(r.since)}${divs ? ` <span class="muted">(${divs})</span>` : ''}` : ' · inga ligamatcher i underlaget') + '</p>';
   if (s.n) {
     const flag = (f) => (f === 'more' ? ' <span class="ref-flag" title="Mer än två standardfel över snittet">▲</span>'
@@ -731,8 +773,8 @@ function refereeCard(d) {
     if (s.n < r.min) html += `<p class="note">För få matcher för att dra slutsatser.</p>`;
   }
   html += `<p class="src-line">${esc(r.source.provider)}, hämtat ${when(r.source.fetchedAt)}. Ligamatcher nivå 1–5 de senaste ${r.seasons} avslutade säsongerna och i år, före matchdagen. ` +
-    'Båda lagens kort tillsammans. ▲▼ = mer än två standardfel från snittet; annars är skillnaden inom slumpen. Domaren styr inte prognosen.</p></div>';
-  return html;
+    'Båda lagens kort tillsammans. ▲▼ = mer än två standardfel från snittet; annars är skillnaden inom slumpen. Domaren styr inte prognosen.</p>';
+  return foldSection('Domaren', html, esc(r.name));
 }
 
 function unknownCard(d) {
@@ -748,8 +790,8 @@ const COMP_PAGE = { pl: 'pl', ch: 'ch', l1: 'l1', l2: 'l2' };
 function squadsSection(d) {
   const s = d.squads;
   if (!s) return '';
-  return '<h3 class="underlag">Trupperna</h3>' +
-    `<div class="grid2">${teamSquadCard(d.match.home, s.home)}${teamSquadCard(d.match.away, s.away)}</div>`;
+  return foldSection('Trupperna', `<div class="grid2">${teamSquadCard(d.match.home, s.home)}${teamSquadCard(d.match.away, s.away)}</div>`,
+    'målskyttar, assist och kort');
 }
 
 function keyList(title, list, value, empty) {
@@ -1225,6 +1267,13 @@ function renderModel(d) {
 
   const pctSigned = (v) => `${v >= 1 ? '+' : '−'}${Math.abs(Math.round((v - 1) * 100))} %`;
   const table = factors.find((f) => f.id === 'table');
+  // Kort sagt: modellen på vanlig svenska, före siffrorna.
+  const halfLife = x.halfLifeDays === 365 ? 'ett år' : `${x.halfLifeDays} dagar`;
+  html += '<div class="card model-plain"><h4>Kort sagt</h4>' +
+    `<p>Modellen läser in ${n0(x.matches)} matcher i de fem högsta divisionerna sedan ${esc(x.firstSeason)} och räknar ut hur många mål varje lag brukar göra och släppa in. ` +
+    `Nyare matcher väger tyngre – en match för ${halfLife} sedan räknas hälften så mycket som en från i dag.</p>` +
+    `<p>Hemmalaget får ett tillägg${table ? ', och laget med bäst poängsnitt i årets liga lite extra' : ''}. Ur lagens väntade mål blir det en chans i procent för 1, X och 2.</p>` +
+    '<p>Varje prognos sparas före avspark och rättas mot facit. Längre ned syns hur modellen står sig mot enklare gissningar och mot spelbolagen.</p></div>';
   html += '<h3>Grundmodellen <span class="hint">Dixon–Coles</span></h3><div class="card"><dl class="facts">' +
     `<dt>Underlag</dt><dd>${n0(x.matches)} matcher t.o.m. ${dateOnly(x.fitThrough)} · Premier League–National League sedan ${esc(x.firstSeason)} och årets cuper</dd>` +
     `<dt>Tidsvikt</dt><dd>halveringstid ${x.halfLifeDays} dagar</dd>` +

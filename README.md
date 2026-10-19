@@ -57,6 +57,14 @@ ingen falsk precision · sidan kraschar aldrig av en död källa · endast fria 
   betyg 1–5 mot modellens väntade antal rätt, sortering efter hur det gick och en kort
   AI-kommentar som läser gängets anteckningar. Fryses in i `data/kupong-historik.json`
   (se [Kuponghistoriken](#kuponghistoriken))
+- [x] **Enklare sidor (2026-10-19):** matchsidan visar prognosen, jämförelsen med
+  spelbolagen, vad som drog åt vilket håll, oddsen, formen och skadorna (namnen i korthet);
+  Lagen sida vid sida, Domaren och Trupperna fälls ut. De enkla baslinjerna, FPL:s
+  skadetext och lagens skadekort utanför Premier League syns med *Visa detaljer*, xG visas
+  på en rad (Understat där den finns) och inbördes möten bara de senaste fem åren.
+  Matchlistan visar prognosen i procent som resten av sajten, Ny kupong visar först
+  närmaste omgången, fliken Styrka under Tabeller är borta och Modell börjar med en
+  förklaring på vanlig svenska
 
 ## Publicering
 
@@ -785,9 +793,9 @@ poängavdrag (kontrollerat mot ESPN:s tabell 2026-10-18: alla 92 lag stämmer).
   styrka. Programmet framåt: de fem närmaste ligamatcherna med vinstchansen och de
   förväntade poängen per match.
 - **Styrkan:** förväntad målskillnad per match mot ett genomsnittligt Premier League-lag
-  på neutral plan, ur den senaste skattningen – alla fyra ligorna på samma skala, med
-  placeringens spann i omskattningarna (Tabeller → Styrka). National League skattas
-  men visas inte.
+  på neutral plan, ur den senaste skattningen – alla fyra ligorna på samma skala
+  (kolumnen Styrka i säsongsprognosen; egen flik fanns till 2026-10-19). National
+  League skattas men visas inte.
 - **Slumpen** är seedad med dagen och divisionen: samma data samma dag ger samma prognos.
 - Körtid ~0,8 s i bygget.
 
@@ -832,6 +840,9 @@ ställningen efter 90 minuter (samma utfall som prognosen).
    eller 2 på matcherna (flera tecken = gardering). En vald match får ett fält för en
    valfri anteckning (högst 140 tecken), t.ex. vem som drev tecknet – den visas under
    lagnamnen i kupongvyn och följer med till Historik. Utkastet sparas i webbläsaren.
+   Listan visar först närmaste omgången – till och med måndagen efter nästa lördag –
+   och *Visa fler dagar* resten av de 14 dagarna; sökningen och *Bara valda* gäller alla
+   dagar.
 2. *Spara kupong* → skriv **kodordet** → *Spara*. Tjänsten *profeterna-kupong* på
    Cloudflare (`POST …/kupong`, [worker/kupong-proxy.mjs](worker/kupong-proxy.mjs) och
    [worker/kupong.mjs](worker/kupong.mjs), adressen i [config/kupong.js](config/kupong.js))

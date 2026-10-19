@@ -28,6 +28,7 @@ const KP = {
   q: '',
   comp: 'all',
   onlyPicked: false,
+  allDays: false, // Ny kupong: alla PICK_DAYS dagar, inte bara närmaste omgången
 };
 const SIGNS = ['1', 'X', '2'];
 const LIVE_EVERY_MS = 60000;
@@ -655,6 +656,7 @@ function renderCreate(editId) {
   KP.draft.notes = KP.draft.notes || {};
   KP.draftNote = stale ? 'Kupongen har ändrats sedan ditt utkast – du börjar från den nya versionen.' : null;
   KP.view = { mode: 'new', edit: editId };
+  KP.allDays = false;
   const el = $('#coupon');
   const comps = [{ id: 'all', short: 'Alla', name: 'Alla tävlingar' }, ...state.comps.values()];
   el.innerHTML = '<div class="kp-head"><div>' +
@@ -697,6 +699,11 @@ function renderCreate(editId) {
     kpStore(KP_DRAFT, KP.draft);
   });
   $('#kp-pick-list').addEventListener('click', (e) => {
+    if (e.target.closest('#kp-more')) {
+      KP.allDays = true;
+      renderPickList();
+      return;
+    }
     const b = e.target.closest('button[data-s]');
     if (!b) return;
     const id = b.closest('[data-id]').dataset.id;
@@ -723,6 +730,15 @@ function pickable(now = Date.now()) {
   });
 }
 
+// Närmaste omgången: till och med måndagen efter nästa lördag (svensk tid),
+// som dag på formen ÅÅÅÅ-MM-DD. På söndagen gäller nästa helg.
+function roundEnd(now = Date.now()) {
+  const [y, mo, d] = dayKey.format(new Date(now)).split('-').map(Number);
+  const today = Date.UTC(y, mo - 1, d);
+  const toSat = (6 - new Date(today).getUTCDay() + 7) % 7;
+  return new Date(today + (toSat + 2) * 86400000).toISOString().slice(0, 10);
+}
+
 function renderPickList() {
   const el = $('#kp-pick-list');
   if (!el) return;
@@ -734,13 +750,20 @@ function renderPickList() {
   lockInfo();
   const q = fold(KP.q.trim());
   const picks = KP.draft.picks;
-  const list = pickable().filter((m) => {
+  const all = pickable().filter((m) => {
     if (KP.onlyPicked) return Boolean(picks[m.id]);
     if (KP.comp !== 'all' && m.comp !== KP.comp) return false;
     return !q || fold(`${m.home} ${m.away}`).includes(q);
   });
+  // Först bara närmaste omgången (och det som redan är valt); sökningen och
+  // Bara valda gäller alla dagar.
+  const end = roundEnd();
+  const list = KP.allDays || q || KP.onlyPicked ? all
+    : all.filter((m) => picks[m.id] || dayKey.format(new Date(m.kickoff)) <= end);
+  const later = all.length - list.length;
+  const more = later ? `<button type="button" class="earlier" id="kp-more">Visa fler dagar <span class="n">${later}</span></button>` : '';
   if (!list.length) {
-    el.innerHTML = `<p class="empty">${KP.onlyPicked ? 'Inga valda matcher än.' : 'Inga matcher hittades.'}</p>`;
+    el.innerHTML = `<p class="empty">${KP.onlyPicked ? 'Inga valda matcher än.' : later ? 'Inga matcher den närmaste omgången.' : 'Inga matcher hittades.'}</p>${more}`;
   } else {
     const days = new Map();
     for (const m of list) {
@@ -767,7 +790,7 @@ function renderPickList() {
       }
       html += '</div></div>';
     }
-    el.innerHTML = html;
+    el.innerHTML = html + more;
   }
   updateBar();
 }

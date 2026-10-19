@@ -1,8 +1,8 @@
 'use strict';
 
 // Sidorna Tabeller och Statistik: en division åt gången, med flikar som på
-// gravergrav.se. Tabeller har tabellen, säsongsprognosen och modellens styrka
-// för alla lag; Statistik har översikten, spelarna, lagen, matchbilden och
+// gravergrav.se. Tabeller har tabellen och säsongsprognosen (med modellens
+// styrka per lag); Statistik har översikten, spelarna, lagen, matchbilden och
 // jämförelsen mellan divisionerna. Vilken sida det är står i <body
 // data-page>. Data: data/divisions.json (src/divisions.js),
 // data/players/<liga>.json (src/players.js) och data/season.json
@@ -19,7 +19,6 @@ const PAGES = {
   tabeller: [
     { id: 'tabell', label: 'Tabell' },
     { id: 'prognos', label: 'Säsongsprognos' },
-    { id: 'styrka', label: 'Styrka' },
   ],
   statistik: [
     { id: 'oversikt', label: 'Översikt' },
@@ -32,7 +31,9 @@ const PAGES = {
 const PAGE = document.body.dataset.page === 'statistik' ? 'statistik' : 'tabeller';
 const VIEWS = PAGES[PAGE];
 // Vyerna som gäller alla divisioner på en gång (divisionsvalet dämpas).
-const ALL_DIVS = new Set(['jamfor', 'styrka']);
+const ALL_DIVS = new Set(['jamfor']);
+// Flikar som tagits bort: gamla länkar hamnar här i stället.
+const MOVED = { styrka: 'prognos' };
 // Länk till en vy, på den här sidan eller den andra.
 function viewHref(div, view) {
   const page = Object.keys(PAGES).find((p) => PAGES[p].some((v) => v.id === view)) || PAGE;
@@ -737,33 +738,10 @@ function seasonMethod(S, F) {
     ['Osäkerheten', `Simuleringarna fördelas på modellens ${S.samples} omskattningar med slumpvikter (samma som ger spannet under varje prognos). Ett lag som är bättre än skattningen är det då i alla sina matcher i samma simulering – som i verkligheten.${F.uncertainty ? '' : ' Den här gången saknades omskattningar för några matcher; där används bara skattningen.'}`],
     ['Förenklingar', 'Lagens styrka och tabelläget hålls fasta resten av säsongen – skador, övergångar och tränarbyten räknas inte in. Lika poäng skiljs på målskillnad, sedan gjorda mål, sedan lott. Playoff spelas inte: chansen gäller en playoffplats. Europaplatser via cuperna räknas inte.'],
     ['Zonerna', 'Vilka placeringar som ger uppflyttning, playoff, Europa och nedflyttning läses ur ESPN:s tabell.'],
-    ['Styrka', 'Modellens förväntade målskillnad per match mot ett genomsnittligt Premier League-lag på neutral plan. Alla fyra divisioner på samma skala – se fliken Styrka.'],
+    ['Styrka', 'Modellens förväntade målskillnad per match mot ett genomsnittligt Premier League-lag på neutral plan. Alla fyra divisioner på samma skala.'],
     ['Programmet framåt', 'Förväntade poäng per match räknas med lagets egen styrka, så starka lag hamnar högt. Färgerna visar hur svår varje match är för just det laget.'],
   ];
   return `<details class="help dv-glossary src-only"><summary>Så räknas prognosen</summary><dl>${items.map(([k, v]) => `<dt>${esc(k)}</dt><dd>${esc(v)}</dd>`).join('')}</dl></details>`;
-}
-
-// Modellens styrka för alla lag i nivå 1–4 (Tabeller → Styrka).
-function strengthSection(S) {
-  if (!S || S.error || !S.strength || !S.strength.length) {
-    return card('Modellens styrka – alla lag', { body: `<p class="empty">${unknown(`okänt – ${S && S.error ? S.error : 'ingen skattning'}`)}</p>`, cls: 'dv-wide' });
-  }
-  const divOf = new Map(state.data.divisions.map((x) => [x.short, x]));
-  const rows = S.strength.map((t) => {
-    const d = divOf.get(t.division);
-    return `<tr><td class="c rank">${t.rank}</td><td class="team">${esc(t.name)}</td>` +
-      `<td>${d ? `<i class="dv-key dot" style="--c:${color(d.id)}"></i>` : ''}${esc(t.division)}</td>` +
-      `<td class="num pts">${signed(t.rating)}</td><td class="num hide-sm">${num(t.gf, 2)}–${num(t.ga, 2)}</td>` +
-      `<td class="num hide-sm muted">${t.range ? (t.range[0] === t.range[1] ? t.range[0] : `${t.range[0]}–${t.range[1]}`) : '–'}</td></tr>`;
-  }).join('');
-  return card('Modellens styrka – alla lag', {
-    hint: `${S.strength.length} lag · skattat t.o.m. ${dateLabel(S.fitThrough)}`,
-    body: '<div class="table-wrap dv-tw dv-scroll"><table class="dv-league"><thead><tr><th class="c">#</th><th>Lag</th><th>Division</th>' +
-      '<th class="num" title="Förväntad målskillnad per match mot ett genomsnittligt Premier League-lag på neutral plan">Styrka</th>' +
-      `<th class="num hide-sm" title="Förväntade mål för–emot i samma match">Mål</th><th class="num hide-sm" title="Placeringen i 80 % av omskattningarna">Spann</th></tr></thead><tbody>${rows}</tbody></table></div>`,
-    src: 'Prognosmotorn: mål efter 90 minuter i alla tävlingar sedan fyra säsonger, nyare matcher väger tyngre. Lag med för få matcher i underlaget saknas.',
-    cls: 'dv-wide',
-  });
 }
 
 // ---------- sorterbara tabeller (spelarna och lagen) ----------
@@ -1702,7 +1680,7 @@ async function renderView() {
   const el = $('#dv-view');
   const P = ALL_DIVS.has(state.view) || state.view === 'matchbilden' ? null : await loadPlayers(dv.id);
   const T = state.view === 'lag' ? await loadTeams(dv.id) : null;
-  if (state.view === 'prognos' || state.view === 'styrka') await loadSeason();
+  if (state.view === 'prognos') await loadSeason();
   // Spoilerskyddet behöver matcherna innan något ritas, annars hinner det dolda synas.
   if (window.Spoiler && Spoiler.on()) await Spoiler.matches();
   // Användaren kan ha bytt vy medan spelarfilen laddades.
@@ -1721,8 +1699,6 @@ async function renderView() {
       compareSection(d) + trendSection();
     $('#dv-metric').addEventListener('change', (e) => { state.metric = e.target.value; drawTrend(); });
     charts.set('trend', drawTrend);
-  } else if (state.view === 'styrka') {
-    el.innerHTML = sectionHead('Styrka', 'Alla lag i nivå 1–4 på samma skala') + strengthSection(state.season);
   } else {
     el.innerHTML = overviewView(dv, P);
   }
@@ -1732,7 +1708,7 @@ async function renderView() {
 
 // Spoilerskyddet (spoiler.js): har divisionen matcher som döljs just nu läggs
 // vyn bakom en ridå – tabellen och statistiken räknar redan med resultaten.
-// Jämförelsen och styrkan gäller alla divisioner på en gång och visas ändå.
+// Jämförelsen gäller alla divisioner på en gång och visas ändå.
 async function veil(dv, view) {
   if (!window.Spoiler || !Spoiler.on() || ALL_DIVS.has(view)) return;
   const recent = (await Spoiler.matches()).filter((m) => m.comp === dv.id && Spoiler.hides(m.kickoff));
@@ -1845,7 +1821,7 @@ function wire() {
 // #pl (bara division) fungerar också.
 function parseHash() {
   const [div, view] = location.hash.replace(/^#/, '').split('/');
-  return { div: div || null, view: view || null };
+  return { div: div || null, view: (view && MOVED[view]) || view || null };
 }
 
 function go(div, view) {

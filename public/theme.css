@@ -470,6 +470,30 @@ details > summary:hover { color: #fff; }
 .detail-foot a:hover { color: var(--fg); }
 .src-toggle { padding: 7px 14px; font: inherit; font-weight: 600; cursor: pointer; }
 .src-toggle[aria-pressed="true"] { color: var(--bone); border-color: var(--pill-line-hi); }
+#match-detail-view.show-src .src-hide { display: none; }
+
+/* matchsidan: avsnitt som fälls ut när man trycker på rubriken */
+details.fold {
+  margin: 0 0 12px;
+  background: var(--glass);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  box-shadow: var(--shadow-card);
+}
+details.fold > summary { padding: 16px 20px; font-size: 15px; color: var(--fg); }
+details.fold > summary:hover { color: #fff; }
+details.fold > summary .hint { margin-left: 10px; font-size: 13px; font-weight: 500; color: var(--muted); }
+details.fold[open] > summary { border-bottom: 1px solid var(--hair); }
+.fold-body { padding: 16px 20px; font-size: 14px; }
+.fold-body > :first-child { margin-top: 0; }
+.fold-body .src-line { font-size: 12px; color: var(--muted); }
+.fold-body .grid2 { margin-bottom: 0; }
+.fold-body .card { background: transparent; box-shadow: none; }
+.inj-line { margin: 0 0 2px; line-height: 1.5; }
+.inj .src-hide { margin-bottom: 0.8rem; }
+.model-plain { margin-top: 20px; font-size: 15px; line-height: 1.6; color: var(--ink-soft); }
+.model-plain p { margin: 0 0 0.7rem; max-width: 68ch; }
+.model-plain p:last-child { margin-bottom: 0; }
 
 /* Utvärderingen: Fler tabeller hopfällt längst ner */
 details.more {
@@ -519,6 +543,7 @@ table.cmp tr.model td { background: var(--accent-soft); color: #fff; }
 .day { margin: 0 0 28px; }
 /* dagen som en rad i en almanacka: kursiv serif, nyckeln i små versaler */
 .day-head {
+  display: flow-root; /* nyckeln till höger trycker aldrig in i listan under */
   margin: 0 0 10px 4px;
   font-family: var(--display);
   font-style: italic;
@@ -713,6 +738,7 @@ table.cmp tr.model td { background: var(--accent-soft); color: #fff; }
   letter-spacing: -0.02em;
   color: var(--bone);
   margin-top: 4px;
+  white-space: nowrap;
 }
 .fc-col.draw .fc-num { font-size: clamp(32px, 4.2vw, 48px); color: var(--muted); padding-top: 0.2em; }
 .fc-range { font-size: 12px; margin-top: 2px; }
@@ -849,6 +875,11 @@ footer .foot-links a[aria-current="page"] { color: var(--fg); }
   .mrow { row-gap: 5px; }
   .mside-odds { grid-column: 2 / -1; text-align: left; }
   .mside-odds .pbar { max-width: 150px; }
+  /* prognosens procent på en rad även i smala kolumner */
+  .fc-num { font-size: 38px; }
+  .fc-col.draw .fc-num { font-size: 28px; }
+  details.fold > summary { padding: 14px 16px; }
+  .fold-body { padding: 14px 16px; }
 }
 
 @media (prefers-reduced-motion: reduce) {
