@@ -1121,15 +1121,19 @@ helgardering alltid ger 0). Poängen läggs ihop för omgången.
   orakel* och lägst *Omgångens Ikaros*. Medan matcher återstår står det *Leder* och *Sist*,
   och rutan är märkt *Preliminärt*. Har alla samma poäng delas inga etiketter ut. Den som
   inte lämnade in står under listan och placeras inte.
+- Rutan heter efter omgångens datum, t.ex. *Omgången 17–18 okt*.
 - Överst i rutan kröns de med bild (`public/kronan.js`, `kronan.css`): oraklet på en
-  marmorsockel framför en lagerkrans och solstrålar, Ikaros fallande med smältande
-  vaxvingar mot havet. Kropparna är urklippta foton i `public/profeterna/kropp-*.png`
-  (klippta med macOS Vision); `KRONAN_KROPPAR` i kronan.js säger var huvudet och axlarna
-  sitter i varje bild så att vingarna fäster rätt. Delat vid lika står alla med samma
-  utmärkelse ihop.
+  marmorsockel framför en lagerkrans och solstrålar. Ikaros är en åttasekunders slinga:
+  han flyger kaxigt upp mot solen med hela vingar, vingarna smälter (hänger, glöder,
+  droppar och ryker) och han störtar i havet med plask. Ansiktet syns rättvänt större
+  delen av tiden. Utan rörelse (prefers-reduced-motion) står han stilla mitt i fallet.
+  Kropparna är urklippta foton i `public/profeterna/kropp-*.png` (klippta med macOS
+  Vision); `KRONAN_KROPPAR` i kronan.js säger var huvudet och axlarna sitter i varje bild
+  så att vingarna fäster rätt. Delat vid lika står alla med samma utmärkelse ihop.
 - Pågår ingen omgång (eller är inget spelat än) står den senaste avslutade omgångens
-  orakel och Ikaros kvar i en egen ruta, *Senaste omgången*. Före första omgången är det
-  `KRONAN_START` i kronan.js: Daniel Laino som orakel och Daniel Johansson som Ikaros.
+  orakel och Ikaros kvar i en egen ruta med den omgångens datum. Före första omgången
+  heter rutan *Före första omgången* och det är `KRONAN_START` i kronan.js: Daniel Laino
+  som orakel och Daniel Johansson som Ikaros.
 - Saknas modellen för en match används kuponghistorikens schablon: 45 % för ett tecken,
   75 % för två. Uppskjutna och inställda matcher räknas inte.
 - *Poäng per match* (utfällbar) visar varje tips med poängen.

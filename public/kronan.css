@@ -140,12 +140,19 @@
 
 /* ---------- Ikaros ---------- */
 
+/* En åttasekunders berättelse som går runt: han stiger kaxigt ur havet upp
+   mot solen med hela vingar (0–30 %), vingarna smälter medan han vinglar
+   där uppe (30–46 %) och han störtar i havet med plask (46–76 %). Utan
+   rörelse (prefers-reduced-motion) står han stilla mitt i fallet. */
+
 .kr-ikaros {
   border-color: rgba(200, 100, 58, 0.38);
   background:
     radial-gradient(70% 55% at 80% 6%, rgba(240, 150, 80, 0.38), transparent 70%),
     linear-gradient(180deg, #43200f 0%, #2a1912 40%, #15191d 76%, #0d161d 100%);
 }
+.kr-ikaros .kr-scene { --fh: 138px; }
+.kr-ikaros .kr-figs.n2, .kr-ikaros .kr-figs.n3 { --fh: 114px; }
 
 .kr-sun {
   position: absolute;
@@ -156,36 +163,71 @@
   border-radius: 50%;
   background: radial-gradient(circle at 42% 40%, #fff4c8, #f7c35f 45%, #e0773f 100%);
   box-shadow: 0 0 22px 8px rgba(246, 170, 80, 0.45), 0 0 70px 24px rgba(224, 119, 63, 0.25);
-  animation: kr-pulse 4s ease-in-out infinite;
+  animation: kr-sunflare 8s infinite;
 }
 
-.kr-ikaros .kr-figs { bottom: 24px; }
-/* Upp och ner, huvudet före mot havet, bort från solen. */
+.kr-ikaros .kr-figs {
+  bottom: 46px;
+  transform: translate(4%, 14%);
+  animation: kr-flight 8s infinite;
+}
 .kr-ikaros .kr-fig {
   transform-origin: 50% 50%;
-  transform: rotate(-155deg);
-  animation: kr-fall 2.6s ease-in-out infinite;
+  transform: rotate(-30deg);
+  animation: kr-tilt 8s infinite;
 }
-.kr-ikaros .kr-fig img { filter: saturate(0.8) drop-shadow(0 -6px 10px rgba(0, 0, 0, 0.5)); }
-.kr-ikaros .kr-noimg { transform: rotate(-25deg); animation: none; }
+.kr-ikaros .kr-fig img { filter: drop-shadow(0 6px 10px rgba(0, 0, 0, 0.5)); }
 
 .kr-wings {
+  --ww: calc(var(--fh) * 1.1);
   position: absolute;
   z-index: 0;
   left: var(--hx);
-  top: calc(var(--sy) - var(--fh) * 0.2);
-  width: calc(var(--fh) * 1.05);
+  top: calc(var(--sy) - var(--ww) * 0.134);
+  width: var(--ww);
   overflow: visible;
   transform: translateX(-50%);
-  filter: drop-shadow(0 0 3px rgba(240, 130, 60, 0.75));
+  animation: kr-heat 8s infinite;
 }
-.kr-drip { transform-box: fill-box; animation: kr-drip 1.8s ease-in infinite; animation-delay: var(--d, 0s); }
+.kr-flap { transform-box: view-box; transform-origin: 0 12px; }
+.kr-flap.r { animation: kr-flap-r 0.45s ease-in-out infinite alternate; }
+.kr-flap.l { animation: kr-flap-l 0.45s ease-in-out infinite alternate; }
+.kr-w-hel { opacity: 0; animation: kr-hel 8s infinite; }
+.kr-w-smalt { animation: kr-smalt 8s infinite; }
+.kr-drip { transform-box: fill-box; animation: kr-drip 1.4s ease-in infinite; animation-delay: var(--d, 0s); }
 
-/* Fartstreck bakom honom, snett uppåt mot solen. */
+/* Rök från vaxet – följer med honom men stiger uppåt. */
+.kr-smoke {
+  position: absolute;
+  left: 0;
+  right: 0;
+  top: 4%;
+  height: 30%;
+  opacity: 0;
+  pointer-events: none;
+  animation: kr-smokeon 8s infinite;
+}
+.kr-smoke i {
+  position: absolute;
+  bottom: 0;
+  width: 24px;
+  height: 24px;
+  border-radius: 50%;
+  background: radial-gradient(circle, rgba(220, 212, 200, 0.5), transparent 68%);
+  opacity: 0;
+  animation: kr-puff 1.3s ease-out infinite;
+}
+.kr-smoke i:nth-child(1) { left: 30%; }
+.kr-smoke i:nth-child(2) { left: 48%; animation-delay: 0.45s; }
+.kr-smoke i:nth-child(3) { left: 64%; animation-delay: 0.9s; }
+
+/* Fartstreck under fallet, snett uppåt mot solen. */
 .kr-speed {
   position: absolute;
-  inset: 0 6% 30% 30%;
-  transform: rotate(25deg);
+  inset: 8% 16% 24% 22%;
+  transform: rotate(28deg);
+  opacity: 0;
+  animation: kr-speedon 8s infinite;
 }
 .kr-speed i {
   position: absolute;
@@ -193,57 +235,43 @@
   width: 2px;
   height: 52px;
   border-radius: 1px;
-  background: linear-gradient(to top, rgba(243, 237, 227, 0.6), transparent);
+  background: linear-gradient(to top, rgba(243, 237, 227, 0.65), transparent);
   opacity: 0;
-  animation: kr-streak 0.9s linear infinite;
+  animation: kr-streak 0.55s linear infinite;
 }
-.kr-speed i:nth-child(1) { left: 10%; animation-delay: 0s; }
-.kr-speed i:nth-child(2) { left: 28%; animation-delay: 0.35s; height: 70px; }
-.kr-speed i:nth-child(3) { left: 46%; animation-delay: 0.15s; }
-.kr-speed i:nth-child(4) { left: 62%; animation-delay: 0.55s; height: 64px; }
-.kr-speed i:nth-child(5) { left: 78%; animation-delay: 0.25s; height: 44px; }
-.kr-speed i:nth-child(6) { left: 92%; animation-delay: 0.7s; }
+.kr-speed i:nth-child(1) { left: 8%; animation-delay: 0s; }
+.kr-speed i:nth-child(2) { left: 26%; animation-delay: 0.2s; height: 70px; }
+.kr-speed i:nth-child(3) { left: 44%; animation-delay: 0.1s; }
+.kr-speed i:nth-child(4) { left: 60%; animation-delay: 0.32s; height: 64px; }
+.kr-speed i:nth-child(5) { left: 76%; animation-delay: 0.15s; height: 44px; }
+.kr-speed i:nth-child(6) { left: 92%; animation-delay: 0.42s; }
 
-/* Rök från vaxet som smälter. */
-.kr-smoke i {
-  position: absolute;
-  bottom: 34%;
-  width: 26px;
-  height: 26px;
-  border-radius: 50%;
-  background: radial-gradient(circle, rgba(220, 212, 200, 0.42), transparent 68%);
-  opacity: 0;
-  animation: kr-smoke 3s ease-out infinite;
-}
-.kr-smoke i:nth-child(1) { left: 20%; }
-.kr-smoke i:nth-child(2) { left: 48%; animation-delay: 1s; }
-.kr-smoke i:nth-child(3) { left: 70%; animation-delay: 2s; }
-
-/* Lösa fjädrar som blir kvar ovanför. */
+/* Fjädrar som lossnar där uppe vid solen och dalar efter honom. */
 .kr-feathers i {
   position: absolute;
-  top: 6%;
+  top: 12%;
   width: 7px;
   height: 21px;
   opacity: 0;
-  animation: kr-feather 5s linear infinite;
+  animation: kr-loose 8s infinite;
 }
 .kr-feathers svg { display: block; width: 100%; height: 100%; }
-.kr-feathers i:nth-child(1) { left: 20%; animation-delay: 0s; }
-.kr-feathers i:nth-child(2) { left: 58%; animation-delay: 1.6s; animation-duration: 6s; }
-.kr-feathers i:nth-child(3) { left: 38%; animation-delay: 3.1s; }
-.kr-feathers i:nth-child(4) { left: 74%; animation-delay: 4s; animation-duration: 5.5s; }
+.kr-feathers i:nth-child(1) { left: 58%; animation-delay: 0.1s; }
+.kr-feathers i:nth-child(2) { left: 68%; animation-delay: 0.4s; }
+.kr-feathers i:nth-child(3) { left: 74%; animation-delay: 0.75s; }
+.kr-feathers i:nth-child(4) { left: 82%; animation-delay: 1.05s; }
 
 .kr-splash {
   position: absolute;
   z-index: 3;
-  left: calc(50% - var(--fh) * 0.22);
-  bottom: 16px;
+  left: 32%;
+  bottom: 14px;
   width: 64px;
   transform: translateX(-50%);
   transform-origin: 50% 100%;
-  fill: rgba(205, 228, 238, 0.7);
-  animation: kr-splash 1.3s ease-out infinite;
+  fill: rgba(205, 228, 238, 0.75);
+  opacity: 0;
+  animation: kr-splash 8s infinite;
 }
 
 .kr-sea {
@@ -295,38 +323,67 @@
 
 @keyframes kr-spin { to { transform: rotate(360deg); } }
 @keyframes kr-glint { 0%, 100% { filter: drop-shadow(0 0 4px rgba(240, 214, 153, 0.45)); } 50% { filter: drop-shadow(0 0 9px rgba(250, 226, 160, 0.9)); } }
-@keyframes kr-pulse { 0%, 100% { transform: scale(1); } 50% { transform: scale(1.07); } }
-@keyframes kr-fall {
-  0%, 100% { transform: rotate(-150deg); }
-  50% { transform: rotate(-161deg); }
+/* Ikaros: vägen (kr-flight, i procent av scenens bredd och kroppens höjd)
+   och lutningen (kr-tilt) har samma tider. Uppåt bromsar han in, nedåt
+   accelererar han. */
+@keyframes kr-flight {
+  0% { transform: translate(-34%, 150%); animation-timing-function: cubic-bezier(0.25, 0.7, 0.4, 1); }
+  30% { transform: translate(16%, -18%); animation-timing-function: ease-in-out; }
+  35% { transform: translate(20%, -24%); animation-timing-function: ease-in-out; }
+  40% { transform: translate(17%, -19%); animation-timing-function: ease-in-out; }
+  46% { transform: translate(20%, -22%); animation-timing-function: cubic-bezier(0.55, 0, 0.95, 0.5); }
+  76%, 100% { transform: translate(-12%, 180%); }
 }
-/* Vingen är vänd upp och ner, så droppen faller uppåt i vingens led. */
+@keyframes kr-tilt {
+  0% { transform: rotate(32deg); animation-timing-function: cubic-bezier(0.25, 0.7, 0.4, 1); }
+  30% { transform: rotate(20deg); animation-timing-function: ease-in-out; }
+  35% { transform: rotate(4deg); animation-timing-function: ease-in-out; }
+  40% { transform: rotate(28deg); animation-timing-function: ease-in-out; }
+  46% { transform: rotate(0deg); animation-timing-function: cubic-bezier(0.55, 0, 0.95, 0.5); }
+  76%, 100% { transform: rotate(-145deg); }
+}
+@keyframes kr-flap-r { from { transform: rotate(-18deg); } to { transform: rotate(10deg); } }
+@keyframes kr-flap-l { from { transform: rotate(18deg); } to { transform: rotate(-10deg); } }
+@keyframes kr-hel { 0%, 32% { opacity: 1; } 44%, 92% { opacity: 0; } 96%, 100% { opacity: 1; } }
+@keyframes kr-smalt { 0%, 32% { opacity: 0; } 44%, 92% { opacity: 1; } 96%, 100% { opacity: 0; } }
+@keyframes kr-heat {
+  0%, 30% { filter: drop-shadow(0 0 0 rgba(240, 130, 60, 0)); }
+  40% { filter: drop-shadow(0 0 7px rgba(255, 150, 60, 0.95)); }
+  62% { filter: drop-shadow(0 0 4px rgba(240, 130, 60, 0.7)); }
+  80%, 100% { filter: drop-shadow(0 0 0 rgba(240, 130, 60, 0)); }
+}
+@keyframes kr-sunflare {
+  0%, 28%, 52%, 100% { transform: scale(1); box-shadow: 0 0 22px 8px rgba(246, 170, 80, 0.45), 0 0 70px 24px rgba(224, 119, 63, 0.25); }
+  38% { transform: scale(1.18); box-shadow: 0 0 34px 16px rgba(255, 190, 90, 0.7), 0 0 110px 44px rgba(240, 130, 60, 0.4); }
+}
 @keyframes kr-drip {
-  0% { transform: translateY(2px) scale(0.5); opacity: 0; }
+  0% { transform: translateY(0) scale(0.5); opacity: 0; }
   20% { opacity: 1; }
-  100% { transform: translateY(-26px) scale(1); opacity: 0; }
+  100% { transform: translateY(24px) scale(1); opacity: 0; }
 }
-@keyframes kr-smoke {
+@keyframes kr-smokeon { 0%, 33% { opacity: 0; } 38%, 60% { opacity: 1; } 70%, 100% { opacity: 0; } }
+@keyframes kr-puff {
   0% { transform: translateY(0) scale(0.5); opacity: 0; }
   30% { opacity: 1; }
-  100% { transform: translateY(-70px) scale(2.2); opacity: 0; }
+  100% { transform: translateY(-40px) scale(2); opacity: 0; }
 }
+@keyframes kr-speedon { 0%, 50% { opacity: 0; } 56%, 72% { opacity: 1; } 77%, 100% { opacity: 0; } }
 @keyframes kr-streak {
   0% { transform: translateY(30px); opacity: 0; }
   25% { opacity: 0.85; }
   100% { transform: translateY(-110px); opacity: 0; }
 }
-@keyframes kr-splash {
-  0% { transform: translateX(-50%) scale(0.55, 0.35); opacity: 0.2; }
-  45% { opacity: 0.95; }
-  100% { transform: translateX(-50%) scale(1.05, 1.1); opacity: 0; }
+@keyframes kr-loose {
+  0%, 38% { transform: translate(0, 0) rotate(0deg); opacity: 0; }
+  41% { opacity: 0.95; }
+  70% { transform: translate(-18px, 70px) rotate(-40deg); opacity: 0.8; }
+  100% { transform: translate(6px, 140px) rotate(30deg); opacity: 0; }
 }
-@keyframes kr-feather {
-  0% { transform: translate(0, -10px) rotate(10deg); opacity: 0; }
-  12% { opacity: 0.9; }
-  50% { transform: translate(14px, 50px) rotate(-30deg); }
-  85% { opacity: 0.7; }
-  100% { transform: translate(-6px, 110px) rotate(25deg); opacity: 0; }
+@keyframes kr-splash {
+  0%, 66% { transform: translateX(-50%) scale(0.4, 0.3); opacity: 0; }
+  68% { opacity: 0.95; }
+  80% { transform: translateX(-50%) scale(1.15, 1.2); opacity: 0; }
+  100% { transform: translateX(-50%) scale(1.15, 1.2); opacity: 0; }
 }
 @keyframes kr-sea { to { transform: translateX(-25%); } }
 
@@ -343,9 +400,10 @@
   .kr-plinth { height: 21px; }
   .kr-orakel .kr-figs { bottom: 21px; }
   .kr-laurel { bottom: calc(21px + var(--fh) * 0.16); }
-  .kr-wings { width: calc(var(--fh) * 0.95); top: calc(var(--sy) - var(--fh) * 0.18); }
-  .kr-ikaros .kr-figs { bottom: 20px; }
-  .kr-splash { width: 50px; bottom: 14px; }
+  .kr-ikaros .kr-scene { --fh: 106px; }
+  .kr-ikaros .kr-figs.n2, .kr-ikaros .kr-figs.n3 { --fh: 88px; }
+  .kr-ikaros .kr-figs { bottom: 40px; }
+  .kr-splash { width: 46px; bottom: 14px; }
   .kr-given { display: none; }
   .kr-title { font-size: 9.5px; letter-spacing: 0.06em; }
   .kr-name { font-size: 18px; }

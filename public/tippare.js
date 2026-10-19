@@ -192,7 +192,7 @@ function tpCard(now = Date.now()) {
   const list = tpPlaced(s.ranked, s.model).map((p) => tpRow(p, p.model ? 0 : ++rank, s));
   const none = s.people.filter((p) => p.none);
   return '<div class="card tp-card">' +
-    `<p class="kp-eyebrow">Omgångens tippare${kicks.length ? ` · ${esc(dateRange(Math.min(...kicks), Math.max(...kicks)))}` : ''}</p>` +
+    `<p class="kp-eyebrow">Omgången${kicks.length ? ` ${esc(dateRange(Math.min(...kicks), Math.max(...kicks)))}` : ''}</p>` +
     // Orakel och Ikaros som bild (kronan.js).
     (window.Kronan ? Kronan.html(s, tpPts) : '') +
     `<ol class="tp-list">${list.join('')}</ol>` +

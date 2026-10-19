@@ -2,10 +2,11 @@
 
 // ---------- kröningen ----------
 //
-// Förstasidan: Omgångens orakel och Omgångens Ikaros som bild överst i rutan
-// Omgångens tippare (tippare.js anropar Kronan.html med omgångens poäng).
+// Förstasidan: Omgångens orakel och Omgångens Ikaros som bild överst i
+// omgångens ruta (tippare.js anropar Kronan.html med omgångens poäng).
 // Oraklet står på en marmorsockel med lagerkrans och solstrålar bakom sig;
-// Ikaros faller med smältande vaxvingar mot havet under solen. Medan
+// Ikaros flyger kaxigt upp mot solen, vingarna smälter och han störtar i
+// havet – om och om igen. Medan
 // omgången pågår heter de Leder och Sist. Delat vid lika står alla med samma
 // utmärkelse bredvid varandra.
 //
@@ -61,11 +62,11 @@ window.Kronan = (() => {
       `<g fill="url(#kr-gold)" stroke="#8a6122" stroke-width="0.45">${leaves}</g>${bow}</svg>`;
   })();
 
-  // En smältande vaxvinge från axeln (0, 12) ut åt höger; den vänstra är
-  // spegelvänd. Ikaros störtar med huvudet före (figuren vänds upp och ner i
-  // kronan.css), så pennorna som hänger nedåt här fladdrar uppåt bakom honom.
-  // De är ojämna, några har lossnat (0) och spetsarna glöder av solen. Vaxet
-  // sitter i klumpar på framkanten och droppar åt andra hållet – mot havet.
+  // Vaxvingarna från axeln (0, 12) ut åt höger; den vänstra är spegelvänd.
+  // Varje vinge finns i två lägen som tonar över i varandra i kronan.css:
+  // hel (på väg upp mot solen) och smält (nära solen och på väg ner) – då
+  // hänger pennorna, några har lossnat (0), spetsarna glöder och vaxet sitter
+  // i klumpar på framkanten och droppar.
   const WING = (() => {
     const bone = (t) => [t * 96, 12 - Math.sin(t * Math.PI * 0.9) * 11];
     const row = (n, len, ang, w, fill, kvar) => {
@@ -73,7 +74,7 @@ window.Kronan = (() => {
       for (let i = 0; i < n; i++) {
         const t = 0.08 + (i / (n - 1)) * 0.9;
         const [x, y] = bone(t);
-        const L = len(t) * kvar[i % kvar.length];
+        const L = len(t) * (kvar ? kvar[i % kvar.length] : 1);
         if (!L) continue;
         const a = ang(t);
         const cx = x + Math.cos(a) * L / 2;
@@ -83,22 +84,27 @@ window.Kronan = (() => {
       return s;
     };
     const down = (from, to) => (t) => (from + (to - from) * t) * Math.PI / 180;
-    const back = row(12, (t) => 26 + 34 * t, down(98, 52), 4.6, 'url(#kr-wax)', [1, 0.85, 1.05, 0, 0.9, 0.62, 1, 0, 0.78, 0.55, 0.9, 0.4]);
-    const front = row(9, (t) => 15 + 14 * t, down(100, 60), 4.2, '#f3ead9', [1, 0.8, 1, 0.7, 0, 0.9, 0.75, 0.6, 0.5]);
+    const hel = '<g class="kr-w-hel"><g stroke="#9c8a68" stroke-width="0.5">' +
+      row(12, (t) => 26 + 34 * t, down(98, 40), 4.6, '#e2d6bf') +
+      row(9, (t) => 15 + 14 * t, down(100, 50), 4.2, '#f6efe1') + '</g>' +
+      '<path d="M0 12 Q48 -8 96 8" fill="none" stroke="#d8c7a4" stroke-width="3" stroke-linecap="round"/></g>';
     const at = [0.16, 0.38, 0.6, 0.82, 0.97];
     const globs = at.map((t) => { const [x, y] = bone(t); return `<ellipse cx="${r1(x)}" cy="${r1(y - 1)}" rx="4.2" ry="2.6"/>`; }).join('');
     const drips = at.map((t, i) => {
       const [x, y] = bone(t);
-      return `<path class="kr-drip" style="--d:${r1(i * 0.45)}s" d="M${r1(x)} ${r1(y - 2)}c-1.6-3.4-2.8-6-2.8-7.8a2.8 2.8 0 0 1 5.6 0c0 1.8-1.2 4.4-2.8 7.8z"/>`;
+      return `<path class="kr-drip" style="--d:${r1(i * 0.35)}s" d="M${r1(x)} ${r1(y + 4)}c-2.2 3.2-3 5-3 6.3a3 3 0 0 0 6 0c0-1.3-.8-3.1-3-6.3z"/>`;
     }).join('');
-    return '<g stroke="#9c8a68" stroke-width="0.5">' + back + front + '</g>' +
+    const smalt = '<g class="kr-w-smalt"><g stroke="#9c8a68" stroke-width="0.5">' +
+      row(12, (t) => 26 + 34 * t, down(100, 78), 4.6, 'url(#kr-wax)', [1, 0.85, 1.05, 0, 0.9, 0.62, 1, 0, 0.78, 0.55, 0.9, 0.4]) +
+      row(9, (t) => 15 + 14 * t, down(102, 84), 4.2, '#f3ead9', [1, 0.8, 1, 0.7, 0, 0.9, 0.75, 0.6, 0.5]) + '</g>' +
       '<path d="M0 12 Q48 -8 96 8" fill="none" stroke="#dba25a" stroke-width="3.4" stroke-linecap="round"/>' +
-      `<g fill="#eaa24f">${globs}${drips}</g>`;
+      `<g fill="#eaa24f">${globs}${drips}</g></g>`;
+    return hel + smalt;
   })();
-  const WINGS = '<svg class="kr-wings" viewBox="-104 -28 208 106" aria-hidden="true">' +
+  const WINGS = '<svg class="kr-wings" viewBox="-104 -16 208 96" aria-hidden="true">' +
     '<defs><linearGradient id="kr-wax" x1="0" y1="0" x2="1" y2="0"><stop offset="0" stop-color="#efe3cb"/>' +
     '<stop offset=".55" stop-color="#e6c48c"/><stop offset="1" stop-color="#e0773f"/></linearGradient></defs>' +
-    `<g transform="scale(-1 1)">${WING}</g><g>${WING}</g></svg>`;
+    `<g class="kr-flap l"><g transform="scale(-1 1)">${WING}</g></g><g class="kr-flap r">${WING}</g></svg>`;
 
   // Plasket där han slår i havet.
   const SPLASH = '<svg class="kr-splash" viewBox="0 0 80 36" aria-hidden="true">' +
@@ -136,8 +142,7 @@ window.Kronan = (() => {
       ? `<div class="kr-rays"></div>${LAUREL}<div class="kr-figs n${people.length}">${figs}</div><div class="kr-plinth"></div>`
       : '<div class="kr-sun"></div>' +
         '<div class="kr-speed"><i></i><i></i><i></i><i></i><i></i><i></i></div>' +
-        `<div class="kr-figs n${people.length}">${figs}</div>` +
-        '<div class="kr-smoke"><i></i><i></i><i></i></div>' +
+        `<div class="kr-figs n${people.length}">${figs}<div class="kr-smoke"><i></i><i></i><i></i></div></div>` +
         `<div class="kr-feathers"><i>${FEATHER}</i><i>${FEATHER}</i><i>${FEATHER}</i><i>${FEATHER}</i></div>` +
         SPLASH +
         '<svg class="kr-sea" viewBox="0 0 400 40" preserveAspectRatio="none" aria-hidden="true">' +
@@ -178,13 +183,13 @@ window.Kronan = (() => {
     if (last) {
       best = last.people.filter((p) => p.award === 'best');
       worst = last.people.filter((p) => p.award === 'worst');
-      if (typeof dateRange === 'function' && last.from) when = ` · ${esc2(dateRange(last.from, last.to || last.from))}`;
+      if (typeof dateRange === 'function' && last.from) when = esc2(dateRange(last.from, last.to || last.from));
     } else {
       const who = (id) => ({ id, name: (KRONAN_KROPPAR[id] && KRONAN_KROPPAR[id].namn) || id });
       best = KRONAN_START.orakel.map(who);
       worst = KRONAN_START.ikaros.map(who);
     }
-    return `<div class="card tp-card kr-reign"><p class="kp-eyebrow">${last ? 'Senaste omgången' : 'Omgångens tippare'}${when}</p>` +
+    return `<div class="card tp-card kr-reign"><p class="kp-eyebrow">${last ? `Omgången${when ? ` ${when}` : ''}` : 'Före första omgången'}</p>` +
       `${stage(best, worst, true, pts)}</div>`;
   }
 
