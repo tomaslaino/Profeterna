@@ -214,8 +214,8 @@ function showEarlier() {
 
 // Kolumnens nyckel står i första dagens rubrik på var sida om nu-linjen i
 // stället för en förklaring.
-const KEY_PLAYED = '<span class="day-key" style="float:right;margin-right:20px" title="Resultat, under det prognosen 1 · X · 2 i procent före avspark">Resultat · %</span>';
-const KEY_UPCOMING = '<span class="day-key" style="float:right;margin-right:20px" title="Matchfixarnas chans i procent för hemmaseger · oavgjort · bortaseger efter 90 minuter">% 1 · X · 2</span>';
+const KEY_PLAYED = '<span class="day-key" style="float:right;margin-right:20px" title="Resultat, under det prognosen 1 · X · 2 som odds före avspark">Resultat · odds</span>';
+const KEY_UPCOMING = '<span class="day-key" style="float:right;margin-right:20px" title="Matchfixarnas odds för hemmaseger · oavgjort · bortaseger efter 90 minuter – rättvisa odds, utan spelbolagens marginal">Odds 1 · X · 2</span>';
 
 function renderList(d) {
   if (!d.played.length && !d.upcoming.length) {
@@ -257,17 +257,17 @@ function compOf(id) {
   return state.comps.get(id) || { name: id, short: id };
 }
 
-// Prognosen i hela procent, som på matchsidan och i kupongen – samma
-// precision som journalen.
-function listPct(p) {
-  return p.map((x) => (x == null ? '–' : String(x)));
+// Prognosen som odds med två decimaler och komma, som hos svenska spelbolag:
+// 100 / procenten, så 58 % blir 1,72. Rättvisa odds utan spelbolagets marginal.
+function listOdds(p) {
+  return p.map((x) => (x ? (100 / x).toFixed(2).replace('.', ',') : '–'));
 }
 
-// Kompakt prognos: 1 · X · 2 i procent, det troligaste utfallet i fetstil.
+// Kompakt prognos: 1 · X · 2 som odds, det troligaste utfallet i fetstil.
 function listForecast(f) {
   if (!f) return '<span class="unknown">okänt</span>';
   const max = Math.max(...f.p);
-  const o = listPct(f.p);
+  const o = listOdds(f.p);
   return f.p.map((x, i) => (x === max ? `<b>${o[i]}</b>` : o[i])).join(' · ') +
     (f.lower ? ' <span title="Ett lag saknar egen lagdata">*</span>' : '');
 }
@@ -295,9 +295,9 @@ function tipHit(m) {
 }
 
 // Journalens prognos under resultatet, det troligaste utfallet grönt om det
-// slog in och rött om inte. Utan rättning (dold eller okänd): bara procenten.
-function tipPct(p, hit) {
-  const o = listPct(p);
+// slog in och rött om inte. Utan rättning (dold eller okänd): bara oddsen.
+function tipOdds(p, hit) {
+  const o = listOdds(p);
   if (hit == null) return o.join(' · ');
   const tip = p.indexOf(Math.max(...p));
   const cls = hit ? 'tip-ok' : 'tip-no';
@@ -313,8 +313,8 @@ function matchRow(m) {
       side = `<span class="score">${m.score.home}–${m.score.away}</span>`;
       if (m.shootout) side += `<span class="sub">str. ${m.shootout.home}–${m.shootout.away}</span>`;
     }
-    if (m.j) side += `<span class="sub" title="Prognosen före avspark, ur journalen">${m.j.p ? tipPct(m.j.p, isHidden(m) ? null : tipHit(m)) : 'okänt'}</span>`;
-    else if (m.f) side += `<span class="sub retro" title="Inte loggad – återskapad i efterhand med underlaget före matchdagen">${listPct(m.f.p).join(' · ')}</span>`;
+    if (m.j) side += `<span class="sub" title="Prognosen före avspark, ur journalen">${m.j.p ? tipOdds(m.j.p, isHidden(m) ? null : tipHit(m)) : 'okänt'}</span>`;
+    else if (m.f) side += `<span class="sub retro" title="Inte loggad – återskapad i efterhand med underlaget före matchdagen">${listOdds(m.f.p).join(' · ')}</span>`;
   } else {
     side = listForecast(m.f);
     if (m.status === 'STATUS_POSTPONED') side += '<span class="sub">uppskjuten</span>';
