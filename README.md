@@ -36,6 +36,14 @@ ingen falsk precision · sidan kraschar aldrig av en död källa · endast fria 
   Europacuper), domaren med kortsnitt, lagens målprofil och mål mot xG; under Divisioner
   en säsongsprognos (Prognos), programmet framåt och modellens styrka för alla lag. Inget
   av det styr prognoserna (se [Säsongsprognosen](#säsongsprognosen))
+- [x] **Statistik som på gravergrav.se (2026-10-19):** Spelare får kolumngrupperna Översikt
+  och Avslut, Topp 20 för varje topplista och – i Premier League – speltid, xG, ±xG, xA, per
+  90 minuter och FPL-pris. Lag är en ny lagtabell för nivå 1–4 med grupperna Tabell, xG
+  (för, emot, ±, motståndets styrka), Spelet (skott, hörnor, kort, över 2,5, båda gör mål),
+  Oddsen (poäng mot stängningsoddsen, avkastning) och Truppen; lagkortet visar samma siffror.
+  Tabellen är ESPN:s, resten räknas ur football-data.co.uk och visas per match eller som
+  skillnad inom samma matcher, eftersom den källan släpar en omgång
+  ([src/teamstats.js](src/teamstats.js), `data/teams/<division>.json`). Inget styr prognoserna
 - [x] **Kupongen:** gängets gemensamma kupong per omgång – utvalda matcher med 1, X, 2 eller
   gardering. Fliken Kupong har omgångens kupong med liveställning från ESPN och
   historiken; förstasidan visar kupongen i korthet. Ny kupong med
@@ -129,7 +137,7 @@ Utan nyckel ingen knapp.
 | xG | Understat (`getLeagueData/EPL`) | PL | 12 h | 2014/15 → idag (380/380 matcher för 2014, 2019 och 2025). Kräver headers `X-Requested-With` och `Referer`. Täcker inte EFL. |
 | Odds, ligorna | football-data.co.uk (resultatfiler + `fixtures.csv`) | ligorna | 12 h / 6 h | 1X2 och över/under 2,5 (asiatiskt handikapp finns men sparas inte än). Öppningsodds (insamlade fre/tis enligt källan) och stängningsodds. Bet365, Betfred, BetVictor, Bwin, Paddy Power, Sky Bet, marknadssnitt/max och Betfair Exchange. **Pinnacle:** fullt 2012/13–2024/25, ungefär halva 2025/26, saknas 2026/27. Marknadssnitt vid stängning från 2019/20 (före dess Betbrain-snitt 2005–2019, bara öppning). Betfair Exchange från 2024/25. |
 | Odds, alla tävlingar | ESPN matchsammanfattning (DraftKings) | alla sex | 6 h, matcher inom 7 dagar | Amerikanska odds räknas om till decimalodds. Ögonblicksbild; historiken är luckig (Bet365 2021/22, inget 2022/23–2024/25). Enda fria källan för cupodds. |
-| Skador och avstängningar | Fantasy Premier League (`bootstrap-static`) | PL | 3 h | Status, chans att spela och nyhetstext med datum. Status avser nästa omgång. |
+| Skador och avstängningar; speltid, xG/xA, pris och poäng per spelare | Fantasy Premier League (`bootstrap-static`) | PL | 3 h | Status, chans att spela och nyhetstext med datum. Status avser nästa omgång. Speltid och xG (Opta) gäller säsongen hittills, verifierat 2026-10-19. Kopplas till ESPN-truppen inom laget på födelsedatum, annars namnet, bara vid entydig träff (547 av 592 spelare 2026-10-19; okopplade får inga FPL-siffror). |
 | National League | football-data.co.uk (`EC`) | underlag för FA-cupens non-league-lag | 12 h | Resultat, skott och odds, ingen xG. |
 | Tidigare säsonger, ligorna | football-data.co.uk (`mmz4281/<säsong>/E0–E3, EC.csv`) | PL–L2, National League | 30 d | E0–E3 2000/01–2025/26 (26 säsonger, 52 672 matcher), EC 2005/06–2025/26 (11 234; 2000/01–2004/05 svarar 300). Fulla säsonger utom League One/Two 2019/20 (400/440 matcher, avbruten säsong) och EC 2019/20–2021/22 (451, 477, 506). En fil per säsong, ~0,25 s styck – allt hämtas på ~4 s. Äldre filer är Windows-1252 (t.ex. "King’s Lynn" i EC 2021/22), nyare UTF-8; läses därefter. Sparar resultat, skott och odds (marknadssnitt hette `BbAv` före 2019/20). |
 | xG, tidigare säsonger | Understat (`getLeagueData/EPL/<år>`) | PL | 30 d, bara kandidatjakten | 2014/15–2025/26, 380/380 matcher med xG varje säsong (verifierat 2026-10-17), alla 4 560 parade mot football-data.co.uk på (hemma, borta). Hämtas av `npm run kandidater`, inte av bygget – används först om xG-kandidaten klarar kravet. |
@@ -191,7 +199,7 @@ Utan nyckel ingen knapp.
 - **Prognosen som räknas (2026-10-17, användarens beslut):** den sista raden i journalen som
   loggades före avspark. Rader loggade vid eller efter avspark räknas inte.
 - **Journalens fönster (2026-10-17):** matcher loggas från 14 dagar före avspark – samma
-  fönster som listan Kommande. Hela säsongen varje gång skulle ge hundratals nya rader per
+  fönster som de kommande matcherna i matchlistan. Hela säsongen varje gång skulle ge hundratals nya rader per
   matchdag (varje resultat flyttar alla lags styrka lite) och tiotals MB i git per säsong,
   utan att tillföra något: det är ändå den sista raden före avspark som räknas.
 - **När en ny rad skrivs (2026-10-17):** när prognosen ändrats på den precision sidan visar
@@ -478,8 +486,11 @@ dubbletter – och EFL-cupens omgång 4 utan marknad, eftersom DraftKings-oddsen
 
 **Vilken prognos som räknas.** Den sista raden före avspark enligt dagens spelprogram –
 flyttas en match räknas raderna före den faktiska avsparken. Matchvyn visar den med
-loggningstid, rättad mot facit, och skillnaden mot den återskapade prognosen. Listan Spelade
-visar journalens prognos; kursiv = matchen loggades aldrig och prognosen är återskapad.
+loggningstid, rättad mot facit, och skillnaden mot den återskapade prognosen. Matchlistan visar
+spelade och kommande matcher i en följd med en nu-linje emellan (de senaste resultaten först,
+resten bakom knappen Tidigare matcher). Spelade matcher visar journalens prognos med det
+troligaste utfallet grönt om det slog in efter 90 minuter och rött om inte; kursiv = matchen
+loggades aldrig och prognosen är återskapad (rättas inte i listan).
 
 **Utvärderingen** (fliken Utvärdering), mot ställningen efter 90 minuter (okänd = matchen
 utvärderas inte):

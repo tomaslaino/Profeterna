@@ -618,6 +618,41 @@ table.cmp tr.model td { background: var(--accent-soft); color: #fff; }
 .pbar i.max { opacity: 1; }
 .mside-odds .pbar { min-width: 112px; margin-top: 7px; }
 
+/* Prognosen under resultatet: det troligaste utfallet grönt om det slog in,
+   rött om inte. */
+.mside .tip-ok { color: var(--fresh); }
+.mside .tip-no { color: var(--down); }
+
+/* Nu-linjen i matchlistan: spelat ovanför, kommande under. Guldet som i
+   resten av detaljerna. */
+.now-line {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  margin: -4px 0 26px;
+  font-size: 10.5px;
+  font-weight: 700;
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+  color: var(--gold);
+}
+.now-line::before,
+.now-line::after { content: ""; flex: 1; height: 1px; background: color-mix(in srgb, var(--gold) 50%, transparent); }
+
+/* Knappen ovanför de senaste resultaten: tar fram resten av de spelade. */
+.earlier {
+  margin: 0 0 20px;
+  padding: 6px 14px;
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--ink-soft);
+  background: var(--pill);
+  border: 1px solid var(--pill-line);
+  box-shadow: none;
+}
+.earlier:hover { color: var(--fg); border-color: var(--pill-line-hi); }
+.earlier .n { margin-left: 4px; font-weight: 500; color: var(--muted); }
+
 /* ---------- matchvyn ---------- */
 
 .back { margin: 22px 0 16px; }

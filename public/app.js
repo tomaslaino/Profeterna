@@ -4,8 +4,11 @@
 
 const TZ = 'Europe/Stockholm';
 const $ = (s) => document.querySelector(s);
-const state = { view: 'upcoming', comp: 'all', meta: null, comps: new Map(), all: null, detail: null };
+const state = { comp: 'all', earlier: false, meta: null, comps: new Map(), all: null, detail: null };
 const LIST_DAYS = 14;
+// Ovanför nu-linjen syns först bara de senaste resultaten: den senaste
+// speldagen, högst så här många matcher. Resten ligger bakom en knapp.
+const RECENT_ROWS = 4;
 
 function esc(s) {
   return String(s == null ? '' : s).replace(/[&<>"']/g, (c) => ({
@@ -145,14 +148,6 @@ function renderChips() {
   }
 }
 
-for (const b of document.querySelectorAll('.seg button')) {
-  b.addEventListener('click', () => {
-    state.view = b.dataset.view;
-    for (const x of document.querySelectorAll('.seg button')) x.setAttribute('aria-pressed', String(x === b));
-    renderMatchList();
-  });
-}
-
 async function loadMatches() {
   const el = $('#match-list');
   el.innerHTML = '<p class="empty">Laddar …</p>';
@@ -168,46 +163,84 @@ async function loadMatches() {
 }
 
 // Urvalet görs här, mot besökarens klocka – inte mot när sajten byggdes.
-function selectMatches(view, comp, days) {
+// Spelade matcher hamnar ovanför nu-linjen, kommande under, båda i tidsordning.
+function selectMatches(comp, days) {
   const now = Date.now();
   const span = days * 86400000;
   const inComp = (m) => comp === 'all' || m.comp === comp;
   const t = (m) => new Date(m.kickoff).getTime();
-  if (view === 'played') {
-    return state.all.matches.filter((m) => inComp(m) && m.completed && t(m) >= now - span).reverse();
-  }
-  return state.all.matches.filter((m) => inComp(m) && !m.completed && t(m) >= now - 3 * 3600000 && t(m) <= now + span);
+  return {
+    played: state.all.matches.filter((m) => inComp(m) && m.completed && t(m) >= now - span),
+    upcoming: state.all.matches.filter((m) => inComp(m) && !m.completed && t(m) >= now - 3 * 3600000 && t(m) <= now + span),
+  };
 }
 
 function renderMatchList() {
   if (!state.all) return;
   const el = $('#match-list');
-  const matches = selectMatches(state.view, state.comp, LIST_DAYS);
-  el.innerHTML = renderList({ view: state.view, days: LIST_DAYS, matches });
+  const { played, upcoming } = selectMatches(state.comp, LIST_DAYS);
+  let shown = played;
+  if (!state.earlier && played.length) {
+    const last = dayKey.format(new Date(played[played.length - 1].kickoff));
+    shown = played.filter((m) => dayKey.format(new Date(m.kickoff)) === last).slice(-RECENT_ROWS);
+  }
+  el.innerHTML = renderList({ played: shown, more: played.length - shown.length, upcoming, days: LIST_DAYS });
   for (const r of el.querySelectorAll('.mrow')) {
     r.addEventListener('click', () => { location.hash = `match/${r.dataset.id}`; });
   }
+  const more = el.querySelector('.earlier');
+  if (more) more.addEventListener('click', showEarlier);
 }
 
+// De tidigare matcherna läggs in ovanför och sidan hålls still, så att det
+// man tittade på inte hoppar iväg – man skrollar uppåt för att se dem.
+function showEarlier() {
+  const anchor = $('#match-list .day');
+  const top = anchor ? anchor.getBoundingClientRect().top : 0;
+  state.earlier = true;
+  renderMatchList();
+  const same = anchor && $(`#match-list .day[data-day="${anchor.dataset.day}"]`);
+  if (same) window.scrollBy(0, same.getBoundingClientRect().top - top);
+  const first = $('#match-list .mrow');
+  if (first) first.focus({ preventScroll: true });
+}
+
+// Kolumnens nyckel står i första dagens rubrik på var sida om nu-linjen i
+// stället för en förklaring.
+const KEY_PLAYED = '<span class="day-key" style="float:right;margin-right:20px" title="Resultat, under det prognosen 1 · X · 2 som odds före avspark">Resultat · odds</span>';
+const KEY_UPCOMING = '<span class="day-key" style="float:right;margin-right:20px" title="Matchfixarnas odds på hemmaseger · oavgjort · bortaseger efter 90 minuter (1 delat med sannolikheten)">Odds 1 · X · 2</span>';
+
 function renderList(d) {
-  if (!d.matches.length) {
-    return `<p class="empty">Inga ${d.view === 'played' ? 'spelade' : 'kommande'} matcher de närmaste ${d.days} dagarna.</p>`;
+  if (!d.played.length && !d.upcoming.length) {
+    return `<p class="empty">Inga matcher de senaste eller närmaste ${d.days} dagarna.</p>`;
   }
+  let html = '';
+  if (d.more) {
+    html += `<button type="button" class="earlier"><span aria-hidden="true">↑</span> Tidigare matcher <span class="n">${d.more}</span></button>`;
+  }
+  html += renderDays(d.played, KEY_PLAYED);
+  if (d.played.length) html += '<div class="now-line" role="separator"><span>Nu</span></div>';
+  html += d.upcoming.length
+    ? renderDays(d.upcoming, KEY_UPCOMING)
+    : `<p class="empty">Inga kommande matcher de närmaste ${d.days} dagarna.</p>`;
+  return html;
+}
+
+// En rubrik per dag. Dagens datum kan stå på båda sidor om nu-linjen.
+function renderDays(ms, key) {
   const days = new Map();
-  for (const m of d.matches) {
+  for (const m of ms) {
     const k = dayKey.format(new Date(m.kickoff));
     if (!days.has(k)) days.set(k, []);
     days.get(k).push(m);
   }
-  // Kolumnens nyckel står i första dagens rubrik i stället för en förklaring.
-  let key = d.view === 'played'
-    ? '<span class="day-key" style="float:right;margin-right:20px" title="Resultat, under det prognosen 1 · X · 2 som odds före avspark">Resultat · odds</span>'
-    : '<span class="day-key" style="float:right;margin-right:20px" title="Matchfixarnas odds på hemmaseger · oavgjort · bortaseger efter 90 minuter (1 delat med sannolikheten)">Odds 1 · X · 2</span>';
+  const today = dayKey.format(new Date());
   let html = '';
-  for (const ms of days.values()) {
-    html += `<div class="day"><div class="day-head">${esc(cap(fDay.format(new Date(ms[0].kickoff))))}${key}</div><div class="mlist">`;
+  for (const [k, list] of days) {
+    const name = fDay.format(new Date(list[0].kickoff));
+    html += `<div class="day" data-day="${esc(k)}"><div class="day-head">${esc(k === today ? `I dag, ${name}` : cap(name))}${key}</div><div class="mlist">`;
     key = '';
-    for (const m of ms) html += matchRow(m);
+    for (const m of list) html += matchRow(m);
     html += '</div></div>';
   }
   return html;
@@ -245,6 +278,26 @@ function probBar(p) {
     p.map((x) => `<i style="--w:${x}"${x === max ? ' class="max"' : ''}></i>`).join('') + '</span>';
 }
 
+// Slog prognosens troligaste utfall in? Rättas mot ställningen efter 90
+// minuter, som utvärderingen; okänd ställning ger null.
+function tipHit(m) {
+  const s = m.score90 || (/^STATUS_(FULL_TIME|FINAL)$/.test(m.status) ? m.score : null);
+  if (!s) return null;
+  const res = s.home > s.away ? 0 : s.home < s.away ? 2 : 1;
+  return m.j.p.indexOf(Math.max(...m.j.p)) === res;
+}
+
+// Journalens odds under resultatet, det troligaste utfallet grönt om det
+// slog in och rött om inte. Utan rättning (dold eller okänd): bara oddsen.
+function tipOdds(p, hit) {
+  const o = listOdds(p);
+  if (hit == null) return o.join(' · ');
+  const tip = p.indexOf(Math.max(...p));
+  const cls = hit ? 'tip-ok' : 'tip-no';
+  return o.map((x, i) => (i === tip ? `<b class="${cls}">${x}</b>` : x)).join(' · ') +
+    ` <span class="${cls}" title="Prognosens troligaste utfall ${hit ? 'slog in' : 'slog inte in'}">${hit ? '✓' : '✗'}</span>`;
+}
+
 function matchRow(m) {
   let side;
   if (m.completed && m.score) {
@@ -253,7 +306,7 @@ function matchRow(m) {
       side = `<span class="score">${m.score.home}–${m.score.away}</span>`;
       if (m.shootout) side += `<span class="sub">str. ${m.shootout.home}–${m.shootout.away}</span>`;
     }
-    if (m.j) side += `<span class="sub" title="Prognosen före avspark, ur journalen">${m.j.p ? listOdds(m.j.p).join(' · ') : 'okänt'}</span>`;
+    if (m.j) side += `<span class="sub" title="Prognosen före avspark, ur journalen">${m.j.p ? tipOdds(m.j.p, isHidden(m) ? null : tipHit(m)) : 'okänt'}</span>`;
     else if (m.f) side += `<span class="sub retro" title="Inte loggad – återskapad i efterhand med underlaget före matchdagen">${listOdds(m.f.p).join(' · ')}</span>`;
   } else {
     side = listForecast(m.f);

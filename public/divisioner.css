@@ -349,6 +349,14 @@ li:first-child .dv-lname { font-weight: 750; }
 .dv-lempty { padding: 8px 2px; color: var(--muted); font-size: 13px; }
 .dv-lnote { margin: 8px 0 0; font-size: 12px; color: var(--muted); }
 .dv-lmore { display: inline-block; margin-top: 8px; font-size: 13px; font-weight: 600; }
+button.dv-lmore { padding: 0; }
+.dv-leaders4 { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+@media (max-width: 640px) { .dv-leaders4 { grid-template-columns: 1fr; } }
+.dv-lrow:disabled { cursor: default; }
+.dv-lrow:disabled:hover { background: none; }
+.dv-toplist { list-style: none; margin: 0; padding: 0; }
+.dv-toplist li + li { border-top: 1px solid var(--hair); }
+.dv-toplist li:first-child .dv-lrank { color: var(--stale); }
 
 .dv-card-y, .dv-card-r {
   display: inline-block;
@@ -446,6 +454,45 @@ table.dv-players .pname small, .dv-natline { display: block; font-size: 12px; fo
 table.dv-players .pname small.show-sm { display: none; }
 table.dv-players td.pteam, table.dv-players td.pnat { color: var(--ink-soft, var(--fg)); font-size: 13.5px; white-space: nowrap; }
 table.dv-squad tr.idle td { color: var(--muted); }
+/* plus/minus och för litet underlag */
+.dv-pos { color: var(--fresh); font-weight: 700; }
+.dv-neg { color: var(--down); font-weight: 700; }
+.dv-even { color: var(--ink-soft, var(--fg)); }
+.dv-unq { opacity: 0.45; }
+.dv-price { color: var(--gold, var(--fg)); font-weight: 650; }
+/* kolumngrupperna ovanför spelar- och lagtabellen */
+.dv-seg {
+  display: inline-flex;
+  gap: 2px;
+  padding: 3px;
+  margin-bottom: 12px;
+  max-width: 100%;
+  overflow-x: auto;
+  scrollbar-width: none;
+  border: 1px solid var(--pill-line, var(--border));
+  border-radius: 999px;
+  background: var(--pill, var(--card));
+}
+.dv-seg::-webkit-scrollbar { display: none; }
+.dv-seg button {
+  flex: none;
+  font: inherit;
+  font-size: 13px;
+  font-weight: 650;
+  padding: 5px 13px;
+  border: 0;
+  border-radius: 999px;
+  background: none;
+  box-shadow: none;
+  color: var(--ink-soft, var(--muted));
+  cursor: pointer;
+}
+.dv-seg button:hover { color: var(--fg); background: var(--hair); }
+.dv-seg button[aria-pressed="true"] { color: var(--bg); background: var(--bone, var(--fg)); }
+/* lagnamnet och spelarnamnet står kvar när tabellen rullas i sidled */
+table.dv-players td.dv-stick, table.dv-teams td.dv-stick,
+table.dv-players th.dv-stick, table.dv-teams th.dv-stick { position: sticky; left: 0; z-index: 1; background: var(--card); }
+table.dv-teams .team { font-weight: 600; white-space: nowrap; }
 .dv-nil { color: var(--unknown); }
 .dv-zero { color: var(--unknown); opacity: 0.8; }
 
@@ -547,7 +594,7 @@ dialog.dv-modal::backdrop { background: rgba(4, 9, 18, 0.62); backdrop-filter: b
   font-weight: 800;
 }
 .dv-avatar.team { border-radius: 14px; font-size: 18px; }
-.dv-mtiles { display: grid; grid-template-columns: repeat(auto-fit, minmax(110px, 1fr)); gap: 8px; margin-bottom: 14px; }
+.dv-mtiles { display: grid; grid-template-columns: repeat(auto-fit, minmax(92px, 1fr)); gap: 8px; margin-bottom: 14px; }
 .dv-mtile { border: 1px solid var(--border); border-radius: 12px; padding: 10px 8px; text-align: center; background: var(--hair); }
 .dv-mtile b { display: block; font-size: 22px; font-variant-numeric: tabular-nums; }
 .dv-mtile span { font-size: 11px; font-weight: 700; letter-spacing: 0.08em; text-transform: uppercase; color: var(--muted); }
@@ -571,6 +618,7 @@ dialog.dv-modal::backdrop { background: rgba(4, 9, 18, 0.62); backdrop-filter: b
   .hide-sm { display: none; }
   .show-sm, table.dv-players .pname small.show-sm { display: block; }
   table.dv-players .pname { white-space: normal; }
+  table.dv-teams .team { white-space: normal; min-width: 7.5rem; }
   .dv-divs { flex-wrap: nowrap; overflow-x: auto; scrollbar-width: none; margin: 0 -20px; padding: 0 20px; }
   .dv-divs::-webkit-scrollbar { display: none; }
   .dv-divs button { flex: none; }

@@ -8,6 +8,8 @@
 //                                   (matcher, inhopp, mål, assist, skott,
 //                                   kort, fouls, offside; målvakter även
 //                                   räddningar, skott mot och insläppta)
+//                                   och födelsedatum (kopplar ihop spelaren
+//                                   med FPL, se src/players.js)
 // Stickprov: Will Lankshear (Middlesbrough) 10 matcher/8 mål i truppen,
 // samma som ESPN:s skytteliga (/statistics). ESPN:s skadefält var tomt för
 // alla lag i stickprovet (Middlesbrough, Arsenal) – skador tas inte härifrån.
@@ -73,6 +75,7 @@ function player(a) {
     name: a.displayName,
     pos: POS[posAbbr] || null,
     age: Number.isFinite(a.age) ? a.age : null,
+    dob: typeof a.dateOfBirth === 'string' ? a.dateOfBirth.slice(0, 10) : null,
     nat: a.citizenship || null,
     jersey: a.jersey || null,
     stats: stats(a, posAbbr === 'G'),

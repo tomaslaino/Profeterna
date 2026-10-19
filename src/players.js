@@ -1,8 +1,9 @@
 'use strict';
 
 // Spelardata per division och per lag, ur ESPN-trupperna (src/playersources.js)
-// och FPL:s skadelista (bara Premier League). Allt räknas ur cachen vid
-// bygget; inget här styr prognoserna.
+// och FPL (bara Premier League: skadelistan och speltid, xG/xA, pris och
+// poäng per spelare). Allt räknas ur cachen vid bygget; inget här styr
+// prognoserna.
 //
 // Principer som i resten av appen: spelare utan statistik är okända, inte
 // nollor, och topplistor med kvoter (mål per skott, räddningsprocent) kräver
@@ -17,14 +18,15 @@ const { COMPETITIONS, SEASON } = require('../config/competitions');
 const fs = require('fs');
 const path = require('path');
 const { CACHE_DIR } = require('./store');
-const { keyOf, espnKey } = require('./teams');
+const { keyOf, espnKey, norm } = require('./teams');
 
 const LEAGUES = COMPETITIONS.filter((c) => c.type === 'league');
 const SEASON_YEAR = Number(SEASON.label.slice(0, 4));
 
-const TOP = 15;
+const TOP = 20;
 const MIN_SHOTS_CONVERSION = 10; // mål per skott: minst så många skott
 const MIN_SHARE_KEEPER = 0.5; // målvakter: minst halva lagets matcher
+const MIN_MINUTES_P90 = 270; // per 90 minuter: minst tre hela matcher
 const HOME_NATION = 'England';
 
 // Bygget frågar efter trupperna en gång per matchsida – cachefilerna läses
@@ -57,9 +59,10 @@ const played = (p) => !!(p.stats && p.stats.app > 0);
 const round1 = (x) => Math.round(x * 10) / 10;
 const share = (a, b) => (b > 0 ? Math.round((a / b) * 1000) / 1000 : null);
 
-function row(p, t) {
+function row(p, t, fx) {
   const s = p.stats;
   return {
+    ...(fx && fx.get(p.id)),
     id: p.id,
     name: p.name,
     team: t.name,
@@ -142,6 +145,61 @@ function keepers(teams, standings) {
   return out.sort((a, b) => (b.savePct ?? -1) - (a.savePct ?? -1));
 }
 
+// FPL-siffrorna för en ESPN-spelare. Kopplingen görs inom samma lag: i
+// första hand på födelsedatum, annars på hela namnet och sist på efternamn
+// plus förnamnets initial – och bara när träffen är entydig. Den som inte
+// går att koppla får inga FPL-siffror (okänt, inte gissat).
+function fplIndex(compId, teams) {
+  if (compId !== 'pl') return null;
+  const fc = readCache('fpl');
+  // Cache från före 2026-10-19 saknar xG och speltidsfälten.
+  if (!fc || !fc.data || !fc.data.players.some((p) => p.xg !== undefined)) return null;
+  const out = new Map();
+  let of = 0;
+  for (const t of teams) {
+    const ft = fc.data.teams.find((x) => keyOf(x.name) === espnKey(t.name));
+    if (!ft) continue;
+    const pool = fc.data.players.filter((x) => x.teamId === ft.id);
+    const used = new Set();
+    const pick = (list) => {
+      const free = list.filter((x) => !used.has(x.id));
+      return free.length === 1 ? free[0] : null;
+    };
+    for (const p of t.players) {
+      of++;
+      const full = norm(p.name);
+      const parts = full.split(' ');
+      const last = parts[parts.length - 1];
+      const hit = (p.dob && pick(pool.filter((x) => x.birth === p.dob)))
+        || pick(pool.filter((x) => [`${x.first} ${x.second}`, x.known, x.name].some((n) => n && norm(n) === full)))
+        || pick(pool.filter((x) => {
+          const sec = norm(x.second).split(' ');
+          return sec[sec.length - 1] === last && norm(x.first)[0] === full[0];
+        }));
+      if (!hit) continue;
+      used.add(hit.id);
+      out.set(p.id, {
+        min: hit.minutes,
+        fg: hit.goals,
+        fa: hit.assists,
+        xg: hit.xg,
+        xa: hit.xa,
+        cs: hit.cs,
+        dc: hit.dc,
+        cost: hit.cost,
+        sel: hit.sel,
+        fpts: hit.points,
+        bonus: hit.bonus,
+        pen: hit.pens,
+      });
+    }
+  }
+  return { map: out, matched: out.size, of, fetchedAt: fc.fetchedAt };
+}
+
+// Mål minus xG (FPL:s egna mål, så att båda gäller samma matcher).
+const overXg = (r) => (r.xg != null && r.fg != null ? Math.round((r.fg - r.xg) * 100) / 100 : null);
+
 function divisionPlayers(compId) {
   const comp = LEAGUES.find((c) => c.id === compId);
   const cache = cacheFor(compId);
@@ -150,12 +208,14 @@ function divisionPlayers(compId) {
   }
   const d = cache.data;
   const standings = standingsFor(compId);
+  const fpl = fplIndex(compId, d.teams);
+  const fx = fpl ? fpl.map : null;
   const rows = [];
   const all = [];
   for (const t of d.teams) {
     for (const p of t.players) {
-      if (played(p)) rows.push(row(p, t));
-      all.push(p.stats ? { ...row(p, t), ...gk(p) } : bare(p, t));
+      if (played(p)) rows.push(row(p, t, fx));
+      all.push(p.stats ? { ...row(p, t, fx), ...gk(p) } : { ...bare(p, t), ...(fx && fx.get(p.id)) });
     }
   }
 
@@ -217,6 +277,9 @@ function divisionPlayers(compId) {
       yellow: top(rows, (r) => r.yc, { n: 10, tiebreak: (a, b) => a.app - b.app }),
       red: top(rows, (r) => r.rc, { n: 20 }),
       keepers: keepers(d.teams, standings),
+      // Bara med FPL (Premier League): mål över och under xG.
+      overXg: fx ? top(rows, overXg, { min: 0.01 }).map((r) => ({ ...r, dxg: overXg(r) })) : null,
+      underXg: fx ? top(rows, (r) => (overXg(r) == null ? null : -overXg(r)), { min: 0.01 }).map((r) => ({ ...r, dxg: overXg(r) })) : null,
     },
     teams,
     table: table(compId, standings, d.teams),
@@ -226,7 +289,9 @@ function divisionPlayers(compId) {
       : { unknown: true, reason: 'Ingen fri källa för skador och avstängningar utanför Premier League.' },
     // Hela truppen i ligan – spelartabellen på sidan filtrerar och sorterar själv.
     players: all.sort((a, b) => (b.g || 0) - (a.g || 0) || (b.a || 0) - (a.a || 0) || a.name.localeCompare(b.name)),
-    thresholds: { minShotsConversion: MIN_SHOTS_CONVERSION, minShareKeeper: MIN_SHARE_KEEPER, top: TOP },
+    // Speltid, xG och pris per spelare (bara Premier League).
+    fpl: fpl ? { provider: 'Fantasy Premier League', fetchedAt: fpl.fetchedAt, matched: fpl.matched, of: fpl.of } : null,
+    thresholds: { minShotsConversion: MIN_SHOTS_CONVERSION, minShareKeeper: MIN_SHARE_KEEPER, minMinutesP90: MIN_MINUTES_P90, top: TOP },
   };
 }
 

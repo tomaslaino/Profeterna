@@ -44,6 +44,7 @@ const { readJournal, appendJournal, HORIZON_DAYS } = require('./journal');
 const { evaluate } = require('./evaluate');
 const { divisionStats } = require('./divisions');
 const { playerFiles, teamSquad } = require('./players');
+const { teamFiles } = require('./teamstats');
 const { readCoupons, REPO, BRANCH } = require('./coupons');
 const { buildHistory, writeComments } = require('./history');
 const { wholePercent } = require('./model');
@@ -133,6 +134,16 @@ function writeSite(outDir = OUT, { journal = false, analysisEndpoint, couponEndp
     for (const f of playerFiles()) write(f.path, f.data);
   } catch (err) {
     console.error('[build] spelarna:', err);
+  }
+
+  // Lagstatistik per division (fliken Lag på sidan Statistik): xG, skott,
+  // marknaden och motståndets styrka. Beskrivande; fallerar det saknas bara
+  // sidans lagtabell.
+  fs.mkdirSync(path.join(dataDir, 'teams'), { recursive: true });
+  try {
+    for (const f of teamFiles(forecast.season)) write(f.path, f.data);
+  } catch (err) {
+    console.error('[build] lagen:', err);
   }
 
   const list = allMatches();
