@@ -1,6 +1,6 @@
 # Matchfixarna
 
-Hemsida (profeterna.se) som gör matchprognoser för Premier League, Championship,
+Hemsida (matchfixarna.se) som gör matchprognoser för Premier League, Championship,
 League One, League Two, FA-cupen och EFL-cupen – och sedan rättar sina egna
 prognoser mot facit. Byggd efter samma principer och arbetssätt som Gräva guld
 (`~/Kod/Gräverguld`), utan betalda tjänster – utom den valfria matchanalysen (fas 5), som
@@ -88,13 +88,13 @@ ingen falsk precision · sidan kraschar aldrig av en död källa · endast fria 
 
 ## Publicering
 
-Sidan är statisk och ligger på GitHub Pages under profeterna.se – samma upplägg som
+Sidan är statisk och ligger på GitHub Pages under matchfixarna.se – samma upplägg som
 gravergrav.se:
 
 ```
 GitHub Actions (var 30:e min)  →  källorna  →  src/build.js  →  _site/ (HTML + data/*.json)
                                                                    ↓
-                                    GitHub Pages serverar sajten på profeterna.se
+                                    GitHub Pages serverar sajten på matchfixarna.se
 ```
 
 - Workflowen [.github/workflows/publicera.yml](.github/workflows/publicera.yml) körs på
@@ -128,14 +128,16 @@ GitHub Actions (var 30:e min)  →  källorna  →  src/build.js  →  _site/ (H
 - **Matchanalysen (fas 5)** ingår inte i bygget och kostar ingenting där: workflowen har
   ingen nyckel. Bygget skriver bara i `data/meta.json` om knappen ska visas. Analysen görs
   på begäran av proxyn i [worker/](worker/), som driftsätts för hand på Cloudflare.
-- **Läge 2026-10-17:** sidan ligger tills vidare på <https://tomaslaino.github.io/Profeterna/>
-  utan egen domän, eftersom profeterna.se inte är registrerad än (med domänen inställd
-  skickades github.io-adressen vidare till en domän som inte svarar). Sätt tillbaka
-  profeterna.se som custom domain när DNS pekar rätt.
-- **Engångsinställningar:** registrera profeterna.se (ledig enligt whois 2026-10-17), skapa
-  repot på GitHub (publikt, krävs för gratis Pages), välj *Settings → Pages → Source:
-  GitHub Actions*, ange profeterna.se som custom domain och peka domänens A-poster på
-  GitHub Pages (185.199.108.153, .109.153, .110.153, .111.153), som gravergrav.se hos Loopia.
+- **Läge 2026-10-19:** sidan ligger på <https://matchfixarna.se/> (custom domain i
+  *Settings → Pages*, HTTPS påtvingat). Gamla <https://tomaslaino.github.io/Profeterna/>
+  skickas vidare dit, så även proxyns `site` i [config/llm.js](config/llm.js) fungerar via
+  omdirigeringen. profeterna.se registrerades aldrig.
+- **Engångsinställningar:** skapa repot på GitHub (publikt, krävs för gratis Pages), välj
+  *Settings → Pages → Source: GitHub Actions*, ange matchfixarna.se som custom domain och
+  peka domänens A-poster på GitHub Pages (185.199.108.153, .109.153, .110.153, .111.153)
+  och `www` som CNAME på tomaslaino.github.io. Domänen måste stå i Pages-inställningen –
+  annars visar GitHub "There isn't a GitHub Pages site here" och ett certifikat för
+  *.github.io (webbläsaren säger "inte säker").
 
 ## Lokalt
 

@@ -1,7 +1,7 @@
 name: Hämta data och publicera
 
 # Bygger den statiska sajten (src/build.js) och publicerar den på GitHub Pages
-# (profeterna.se). Samma upplägg som gravergrav.se, med en skillnad: den
+# (matchfixarna.se). Samma upplägg som gravergrav.se, med en skillnad: den
 # genererade datan committas inte till repot – den laddas upp som
 # Pages-artefakt. Annars skulle varje körning lägga nya versioner av
 # matchfilerna i git-historiken. Källcachen (data/cache/) sparas mellan
