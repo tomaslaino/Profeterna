@@ -775,8 +775,11 @@ sifferkontrollen, verklig kostnad per text och svarstid.
 **Läge 2026-10-18:** påslagen. Proxyn ligger på
 <https://profeterna-analys.fritid-moln.workers.dev/analyze> (Cloudflare-kontot fritid-moln,
 samma som Fritid; wrangler är inloggad på MacBook Air) och nyckeln är lagd som hemlighet.
-Första riktiga svaret (Tottenham–Coventry) kom på 17 s och klarade kontrollen. Proxyn driftsattes från commit 4da2d4e – senare ändringar i `worker/`,
-`src/news.mjs` eller `config/llm.js` når den först vid nästa `deploy`.
+Första riktiga svaret (Tottenham–Coventry) kom på 17 s och klarade kontrollen. Senast
+driftsatt 2026-10-19 med commiten "AI-texterna anger modellens chanser som odds" (analys
+och kupongkommentar med odds i stället för procent; provad mot proxyn samma kväll) –
+senare ändringar i `worker/`, `src/news.mjs`, `config/llm.js` eller `config/kommentar.js`
+når den först vid nästa `deploy`.
 
 **Slå på** (kräver konton hos DeepSeek och Cloudflare, och Node ≥ 22 för wrangler):
 
