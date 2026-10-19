@@ -268,6 +268,12 @@ Utan nyckel ingen knapp.
   Divisioner ersätts av två: Tabeller (tabellen, säsongsprognosen och modellens styrka för
   alla lag) och Statistik (översikten, spelarna, lagen, matchbilden och jämförelsen mellan
   divisionerna). Gamla länkar till `divisioner.html` leds vidare till rätt sida.
+- **National League tas bort från Tabeller och Statistik (2026-10-19, användarens
+  beslut):** sidorna visar nivå 1–4 – inget divisionsval för National League, inga
+  National League-lag i Styrka och fyra divisioner i Jämför divisioner. Prognosmotorn
+  skattar fortfarande alla fem nivåerna, och National League läses fortfarande för att
+  visa var League Twos nykomlingar kom ifrån och tog vägen. Gamla länkar till `#nl/…`
+  hamnar på Premier League.
 
 ## Arkitektur
 
@@ -320,7 +326,7 @@ server:
   [server.js](server.js) samma `analyze()`. Se [Matchanalysen](#matchanalysen-fas-5).
 - **Säsongsprognos:** [src/season.js](src/season.js) körs i slutet av prognosmotorn och
   skriver `data/season.json`: simuleringen per liga, programmet framåt per lag och
-  modellens styrka för alla lag i nivå 1–5. Se [Säsongsprognosen](#säsongsprognosen).
+  modellens styrka för alla lag i nivå 1–4. Se [Säsongsprognosen](#säsongsprognosen).
 - **Kupongen:** [src/coupons.js](src/coupons.js) läser och kontrollerar filerna i
   `data/kuponger/` och bygget skriver `data/kuponger.json`. Rättningen, liveställningen och
   Ny kupong finns i [public/kupong.js](public/kupong.js) och
@@ -754,8 +760,9 @@ poängavdrag (kontrollerat mot ESPN:s tabell 2026-10-18: alla 92 lag stämmer).
   styrka. Programmet framåt: de fem närmaste ligamatcherna med vinstchansen och de
   förväntade poängen per match.
 - **Styrkan:** förväntad målskillnad per match mot ett genomsnittligt Premier League-lag
-  på neutral plan, ur den senaste skattningen – alla fem nivåerna på samma skala, med
-  placeringens spann i omskattningarna (Tabeller → Styrka).
+  på neutral plan, ur den senaste skattningen – alla fyra ligorna på samma skala, med
+  placeringens spann i omskattningarna (Tabeller → Styrka). National League skattas
+  men visas inte.
 - **Slumpen** är seedad med dagen och divisionen: samma data samma dag ger samma prognos.
 - Körtid ~0,8 s i bygget.
 

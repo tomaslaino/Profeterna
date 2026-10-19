@@ -27,9 +27,8 @@
 
 const rules = require('../config/forecast-rules');
 const M = require('./model');
-const { COMPETITIONS, NATIONAL_LEAGUE, SEASON } = require('../config/competitions');
+const { COMPETITIONS, SEASON } = require('../config/competitions');
 const { load } = require('./matches');
-const { keyOf } = require('./teams');
 
 const SIMS = 10000;
 const NEXT_N = 5;
@@ -73,7 +72,6 @@ function seasonForecast({ ctx, specs, predictions, sink, fitAt, now = new Date()
     fitThrough: strength.fitThrough,
     divisions,
     strength: strength.list,
-    nl: { id: NATIONAL_LEAGUE.id, name: NATIONAL_LEAGUE.name },
     ms: Date.now() - t0,
   };
 }
@@ -261,21 +259,18 @@ function nextFixtures(D, k, comp, predictions, now) {
 
 // ---------- styrkan: alla lag på samma skala ----------
 
-// Modellens styrka för alla lag i nivå 1–5: förväntade mål för och emot mot
+// Modellens styrka för alla lag i nivå 1–4: förväntade mål för och emot mot
 // ett genomsnittligt lag i Premier League på neutral plan, med den senaste
 // skattningen (samma som ger prognoserna för kommande matcher). Spannet för
-// placeringen kommer ur omskattningarna med slumpvikter.
+// placeringen kommer ur omskattningarna med slumpvikter. National League
+// skattas i modellen men visas inte på sajten.
 function strengthTable(ctx, D, specs, sink, fitAt) {
   const future = specs.filter((s) => !s.completed);
   const day = future.length ? Math.max(...future.map((s) => s.fitDay)) : Math.max(...specs.map((s) => s.fitDay));
   const fit = fitAt(day);
   const names = new Map();
   for (const [k, t] of D.espnTeams) names.set(k, t.name);
-  for (const r of D.fd.nl.rows) {
-    if (!names.has(keyOf(r.HomeTeam))) names.set(keyOf(r.HomeTeam), r.HomeTeam);
-    if (!names.has(keyOf(r.AwayTeam))) names.set(keyOf(r.AwayTeam), r.AwayTeam);
-  }
-  const tierKeys = [...ctx.tier].filter(([k]) => fit.teams.has(k) && !fit.teams.get(k).degenerate && fit.teams.get(k).weight >= rules.model.minEffectiveMatches);
+  const tierKeys = [...ctx.tier].filter(([k, t]) => t <= 4 && fit.teams.has(k) && !fit.teams.get(k).degenerate && fit.teams.get(k).weight >= rules.model.minEffectiveMatches);
   const top = tierKeys.filter(([, t]) => t === 1).map(([k]) => k);
   const rate = (f) => {
     const n = top.filter((k) => f.A.has(k)).length;
@@ -305,7 +300,7 @@ function strengthTable(ctx, D, specs, sink, fitAt) {
       key: k,
       name: names.get(k) || k,
       tier,
-      division: tier === 5 ? NATIONAL_LEAGUE.short : (COMPETITIONS.find((c) => c.tier === tier) || {}).short,
+      division: (COMPETITIONS.find((c) => c.tier === tier) || {}).short,
       gf: v.gf,
       ga: v.ga,
       rating: v.gf - v.ga,

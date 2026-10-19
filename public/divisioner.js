@@ -152,7 +152,7 @@ const METRICS = [
   },
   {
     group: 'Övrigt', id: 'attendance', label: 'Publik per match', get: (s) => s.attendance && s.attendance.mean, kind: 'int', covid: true,
-    note: 'football-data.co.uk 2000/01–2001/02 och ESPN 2021/22–2025/26; åren däremellan saknas i de fria källorna. National League saknas.',
+    note: 'football-data.co.uk 2000/01–2001/02 och ESPN 2021/22–2025/26; åren däremellan saknas i de fria källorna.',
   },
 ];
 const metric = (id) => METRICS.find((m) => m.id === id);
@@ -548,10 +548,9 @@ function overviewView(dv, P) {
       leaderCard('Flest kort', '🟨', byCards(L.yellow.concat(L.red.filter((r) => !L.yellow.some((y) => y.id === r.id)))).slice(0, 5), cardsVal, { more }) +
       '</div>';
     html += playersCaveat(P);
-  } else if (dv.inApp) {
+  } else {
     html += `<p class="note">Spelardata: ${unknown(P ? P.reason : 'laddas inte')}</p>`;
   }
-  if (!dv.inApp) html += '<p class="note">Ingen spelardata för National League i de fria källorna.</p>';
   return html;
 }
 
@@ -599,7 +598,7 @@ function leagueTable(rows, P, { compact = false } = {}) {
 
 function tableView(dv, P) {
   if (!P || P.unknown || !P.table) {
-    return `<p class="empty">${unknown(dv.inApp ? 'okänt – ingen tabell hämtad för divisionen' : 'okänt – National League har ingen tabell i de fria källorna')}</p>`;
+    return `<p class="empty">${unknown('okänt – ingen tabell hämtad för divisionen')}</p>`;
   }
   const rows = P.table.rows;
   const zones = [];
@@ -666,7 +665,7 @@ function forecastView(dv, P) {
   const S = state.season;
   if (!S || S.error) return `<p class="empty">${unknown(`okänt – ${S ? S.error : 'ingen säsongsprognos'}`)}</p>`;
   const F = seasonOf(dv.id);
-  if (!F) return `<p class="empty">${unknown('okänt – National League har inget spelprogram i de fria källorna, så säsongen kan inte spelas klart')}</p>`;
+  if (!F) return `<p class="empty">${unknown('okänt – ingen säsongsprognos för divisionen')}</p>`;
   if (F.unknown) return `<p class="empty">${unknown(`okänt – ${F.unknown}`)}</p>`;
   const now = new Map(P && !P.unknown && P.table ? P.table.rows.map((r) => [r.espnId, r]) : []);
   const zones = F.zones;
@@ -685,7 +684,7 @@ function forecastView(dv, P) {
       `<td class="num pts">${int(t.points.mean)} <small class="muted hide-xs">${t.points.lo}–${t.points.hi}</small></td>` +
       zones.map((z) => `<td class="num">${chance(t.p[z.key])}</td>`).join('') +
       `<td class="hide-sm">${posStrip(t.pos, F)}</td>` +
-      `<td class="num hide-md"${t.strength && total ? ` title="${t.strength.rank}:a av ${total} lag i nivå 1–5"` : ''}>${t.strength ? signed(t.strength.rating) : '–'}</td></tr>`;
+      `<td class="num hide-md"${t.strength && total ? ` title="${t.strength.rank}:a av ${total} lag i nivå 1–4"` : ''}>${t.strength ? signed(t.strength.rating) : '–'}</td></tr>`;
   }).join('');
   const zoneKey = zones.map((z) => `<span class="${ZONE_CLS[z.key] || ''}"><i></i>${esc(z.label)}: ${esc(ranksText(z.ranks))}</span>`).join('');
   const ded = F.teams.filter((t) => t.now.ded);
@@ -743,13 +742,13 @@ function seasonMethod(S, F) {
     ['Osäkerheten', `Simuleringarna fördelas på modellens ${S.samples} omskattningar med slumpvikter (samma som ger spannet under varje prognos). Ett lag som är bättre än skattningen är det då i alla sina matcher i samma simulering – som i verkligheten.${F.uncertainty ? '' : ' Den här gången saknades omskattningar för några matcher; där används bara skattningen.'}`],
     ['Förenklingar', 'Lagens styrka och tabelläget hålls fasta resten av säsongen – skador, övergångar och tränarbyten räknas inte in. Lika poäng skiljs på målskillnad, sedan gjorda mål, sedan lott. Playoff spelas inte: chansen gäller en playoffplats. Europaplatser via cuperna räknas inte.'],
     ['Zonerna', 'Vilka placeringar som ger uppflyttning, playoff, Europa och nedflyttning läses ur ESPN:s tabell.'],
-    ['Styrka', 'Modellens förväntade målskillnad per match mot ett genomsnittligt Premier League-lag på neutral plan. Alla fem divisioner på samma skala – se fliken Styrka.'],
+    ['Styrka', 'Modellens förväntade målskillnad per match mot ett genomsnittligt Premier League-lag på neutral plan. Alla fyra divisioner på samma skala – se fliken Styrka.'],
     ['Programmet framåt', 'Förväntade poäng per match räknas med lagets egen styrka, så starka lag hamnar högt. Färgerna visar hur svår varje match är för just det laget.'],
   ];
   return `<details class="help dv-glossary"><summary>Så räknas prognosen</summary><dl>${items.map(([k, v]) => `<dt>${esc(k)}</dt><dd>${esc(v)}</dd>`).join('')}</dl></details>`;
 }
 
-// Modellens styrka för alla lag i nivå 1–5 (Tabeller → Styrka).
+// Modellens styrka för alla lag i nivå 1–4 (Tabeller → Styrka).
 function strengthSection(S) {
   if (!S || S.error || !S.strength || !S.strength.length) {
     return card('Modellens styrka – alla lag', { body: `<p class="empty">${unknown(`okänt – ${S && S.error ? S.error : 'ingen skattning'}`)}</p>`, cls: 'dv-wide' });
@@ -758,7 +757,7 @@ function strengthSection(S) {
   const rows = S.strength.map((t) => {
     const d = divOf.get(t.division);
     return `<tr><td class="c rank">${t.rank}</td><td class="team">${esc(t.name)}</td>` +
-      `<td><i class="dv-key dot" style="--c:${color(d ? d.id : 'nl')}"></i>${esc(t.division)}</td>` +
+      `<td>${d ? `<i class="dv-key dot" style="--c:${color(d.id)}"></i>` : ''}${esc(t.division)}</td>` +
       `<td class="num pts">${signed(t.rating)}</td><td class="num hide-sm">${num(t.gf, 2)}–${num(t.ga, 2)}</td>` +
       `<td class="num hide-sm muted">${t.range ? (t.range[0] === t.range[1] ? t.range[0] : `${t.range[0]}–${t.range[1]}`) : '–'}</td></tr>`;
   }).join('');
@@ -836,7 +835,7 @@ function playerTableHtml(P) {
 
 function playersView(dv, P) {
   if (!P || P.unknown) {
-    return `<p class="empty">${unknown(dv.inApp ? `okänt – ${P ? P.reason : 'ingen spelardata'}` : 'okänt – National League finns inte i ESPN:s spelardata')}</p>`;
+    return `<p class="empty">${unknown(`okänt – ${P ? P.reason : 'ingen spelardata'}`)}</p>`;
   }
   const L = P.leaders;
   const t = P.totals;
@@ -916,7 +915,7 @@ const TCOLS = [
 ];
 
 function teamsView(dv, P) {
-  if (!P || P.unknown) return `<p class="empty">${unknown(dv.inApp ? 'okänt – ingen spelardata' : 'okänt – National League finns inte i ESPN:s spelardata')}</p>`;
+  if (!P || P.unknown) return `<p class="empty">${unknown('okänt – ingen spelardata')}</p>`;
   const f = state.tf;
   const col = TCOLS.find((c) => c.key === f.sort) || TCOLS[4];
   const list = [...P.teams].sort((a, b) => {
@@ -1220,7 +1219,6 @@ function matchView(dv) {
   const newc = [];
   if (dv.promoted) newc.push(newcomerBlock(dv.promoted, 'up', 0));
   if (dv.relegated) newc.push(newcomerBlock(dv.relegated, 'down', 1));
-  if (!dv.promoted && dv.tier === 5) newc.unshift('<p class="dv-note">Uppflyttade lag från nivå 6 (National League North/South) finns inte i underlaget.</p>');
   if (newc.length) {
     html += card('Nykomlingarna', {
       hint: 'alla säsonger',
@@ -1402,7 +1400,7 @@ const GLOSSARY = [
   ['Grundserien', 'Ligans ordinarie matcher, utan kvalspel (playoff) och cuper.'],
   ['Säsongsprognos', 'Resten av säsongen spelas tusentals gånger med modellens sannolikheter för varje match. Andelen gånger ett lag hamnar på en plats är chansen. 0 och 100 betyder i ingen respektive alla simuleringar – inte att saken är avgjord.', 'tabeller'],
   ['Förväntade poäng', 'Snittet av slutpoängen i simuleringarna, med spannet där 80 % av dem hamnar.', 'tabeller'],
-  ['Styrka', 'Modellens förväntade målskillnad per match mot ett genomsnittligt Premier League-lag på neutral plan. Alla fem divisioner på samma skala.', 'tabeller'],
+  ['Styrka', 'Modellens förväntade målskillnad per match mot ett genomsnittligt Premier League-lag på neutral plan. Alla fyra divisioner på samma skala.', 'tabeller'],
 ];
 
 function glossary() {
@@ -1427,8 +1425,8 @@ async function loadPlayers(div) {
   if (state.players.has(div)) return state.players.get(div);
   const dv = state.data.divisions.find((x) => x.id === div);
   let P;
-  if (!dv || !dv.inApp) {
-    P = { unknown: true, reason: 'National League finns inte i ESPN:s spelardata' };
+  if (!dv) {
+    P = { unknown: true, reason: 'okänd division' };
   } else {
     try {
       P = await getJSON(`data/players/${div}.json`);
@@ -1468,12 +1466,12 @@ async function renderView() {
     el.innerHTML = v.html;
     for (const [k, fn] of v.draw) charts.set(k, fn);
   } else if (state.view === 'jamfor') {
-    el.innerHTML = sectionHead('Jämför divisionerna', 'Alla fem · sedan 2000/01') +
+    el.innerHTML = sectionHead('Jämför divisionerna', 'Alla fyra · sedan 2000/01') +
       compareSection(d) + trendSection();
     $('#dv-metric').addEventListener('change', (e) => { state.metric = e.target.value; drawTrend(); });
     charts.set('trend', drawTrend);
   } else if (state.view === 'styrka') {
-    el.innerHTML = sectionHead('Styrka', 'Alla lag i nivå 1–5 på samma skala') + strengthSection(state.season);
+    el.innerHTML = sectionHead('Styrka', 'Alla lag i nivå 1–4 på samma skala') + strengthSection(state.season);
   } else {
     el.innerHTML = overviewView(dv, P);
   }

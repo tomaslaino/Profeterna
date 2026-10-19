@@ -4,7 +4,9 @@
 // som kan påverka matcherna – hemmafördel, mål, halvtid, skott, hörnor, kort,
 // domare, marknaden, nykomlingar, målminuter och publik – säsong för säsong
 // och för de senaste avslutade säsongerna. Påverkar inte prognoserna: det som
-// får styra dem prövas walk-forward först (src/candidates.js).
+// får styra dem prövas walk-forward först (src/candidates.js). Sidan visar
+// nivå 1–4; National League läses bara för att veta var League Twos
+// nykomlingar kom ifrån och tog vägen.
 //
 //   football-data.co.uk  fdcouk_stats_<div> (2000/01–, National League
 //                        2005/06–) och årets fdcouk_<div>. Saknas statistik-
@@ -479,7 +481,7 @@ function divisionStats() {
   for (const d of DIVS) for (const [code, s] of fd.get(d.id).seasons) if (!s.partial) completedCodes.add(code);
   const lastDone = [...completedCodes].sort(byYear).slice(-WINDOW);
 
-  const divisions = DIVS.map((d) => {
+  const divisions = DIVS.filter((d) => d.id !== NATIONAL_LEAGUE.id).map((d) => {
     const F = fd.get(d.id);
     const codes = [...F.seasons.keys()];
     const done = codes.filter((c) => !F.seasons.get(c).partial);
@@ -509,7 +511,7 @@ function divisionStats() {
       if (n) windowSum.attendance = { n, mean: xs.reduce((s, x) => s + x.mean * x.n, 0) / n, source: 'ESPN', seasons: xs.map((x) => x.label) };
     }
     return {
-      id: d.id, name: d.name, short: d.short, tier: d.tier, inApp: d.id !== NATIONAL_LEAGUE.id,
+      id: d.id, name: d.name, short: d.short, tier: d.tier,
       full: F.full,
       seasons,
       window: windowSum ? { seasons: [label(win[0]), label(win[win.length - 1])], count: win.length, ...windowSum } : null,
