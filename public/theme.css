@@ -755,12 +755,6 @@ table.sgrid td { border-radius: 6px; }
 .badge, .phase-tag, .lower-tag { border-radius: 999px; }
 .phase-tag { color: var(--accent-deep); background: var(--accent-soft); }
 .chart-card { padding: 14px 16px 8px; }
-.dv-tip {
-  background: var(--card);
-  border: 1px solid var(--pill-line);
-  border-radius: 12px;
-  box-shadow: 0 18px 44px rgba(0, 0, 0, 0.6);
-}
 
 /* ---------- sidfot ---------- */
 

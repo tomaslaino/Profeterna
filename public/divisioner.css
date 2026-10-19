@@ -56,23 +56,9 @@
   cursor: pointer;
 }
 .dv-select:hover { border-color: var(--accent); }
-.dv-label { font-size: 0.8rem; color: var(--muted); font-weight: 600; }
 
-/* ---------- jämförelsetabellen ---------- */
+/* ---------- divisionens färg ---------- */
 
-table.dv-cmp th.num, table.dv-cmp td.num { text-align: right; }
-table.dv-cmp td:first-child { min-width: 11rem; }
-table.dv-cmp td strong { font-weight: 650; }
-table.dv-cmp tr.group td {
-  background: var(--hair);
-  font-size: 0.68rem;
-  font-weight: 650;
-  text-transform: uppercase;
-  letter-spacing: 0.06em;
-  color: var(--muted);
-  padding: 0.3rem 0.85rem;
-}
-.dv-flag { font-size: 0.7rem; margin-left: 0.25rem; color: var(--fg); cursor: help; }
 .dv-key {
   display: inline-block;
   width: 14px;
@@ -83,108 +69,6 @@ table.dv-cmp tr.group td {
   margin-right: 0.45rem;
 }
 .dv-key.dot { width: 9px; height: 9px; border-radius: 50%; }
-.dv-legend { display: flex; flex-wrap: wrap; gap: 0.3rem 1.1rem; font-size: 0.78rem; margin: 0 0 0.3rem; }
-.dv-legend .muted { margin-left: auto; }
-
-/* ---------- diagram ---------- */
-
-.dv-chart { width: 100%; }
-svg.dv-svg { display: block; overflow: visible; }
-svg.dv-svg .grid { stroke: var(--hair); stroke-width: 1; }
-svg.dv-svg .base { stroke: var(--border); stroke-width: 1; }
-svg.dv-svg .tick { fill: var(--muted); font-size: 10px; font-variant-numeric: tabular-nums; }
-svg.dv-svg .val { fill: var(--fg); font-size: 10.5px; font-weight: 600; font-variant-numeric: tabular-nums; }
-svg.dv-svg .axis { fill: var(--muted); font-size: 11px; font-weight: 600; }
-svg.dv-svg .line { fill: none; stroke: var(--c); stroke-width: 2; stroke-linejoin: round; stroke-linecap: round; }
-svg.dv-svg .line.partial { stroke-dasharray: 2 4; }
-svg.dv-svg .dot { fill: var(--c); stroke: var(--card); stroke-width: 2; }
-svg.dv-svg .dot.partial { fill: var(--card); stroke: var(--c); stroke-width: 2; }
-svg.dv-svg .end { fill: var(--fg); font-size: 11px; font-weight: 650; }
-svg.dv-svg .band { fill: var(--hair); }
-svg.dv-svg .band-label { fill: var(--muted); font-size: 9.5px; }
-svg.dv-svg .col .cross { stroke: var(--border); stroke-width: 1; opacity: 0; }
-svg.dv-svg .col:hover .cross { opacity: 1; }
-svg.dv-svg .col .hd { opacity: 0; }
-svg.dv-svg .col:hover .hd { opacity: 1; }
-svg.dv-svg .hit { fill: transparent; }
-svg.dv-svg .bar { fill: var(--accent); }
-svg.dv-svg .bar.soft { fill: color-mix(in srgb, var(--accent) 45%, var(--card)); }
-svg.dv-svg .col:hover .bar { fill: var(--accent-deep); }
-svg.dv-svg .diag { stroke: var(--unknown); stroke-width: 1; stroke-dasharray: 4 4; }
-svg.dv-svg .pt { fill: var(--accent); stroke: var(--card); stroke-width: 2; }
-svg.dv-svg .pt:hover { fill: var(--accent-deep); }
-svg.dv-svg .zero { stroke: var(--border); stroke-width: 1.5; }
-
-.dv-tip {
-  position: fixed;
-  z-index: 50;
-  pointer-events: none;
-  max-width: 280px;
-  padding: 0.45rem 0.65rem;
-  font-size: 0.78rem;
-  line-height: 1.45;
-  white-space: pre-line;
-  color: var(--fg);
-  background: var(--card);
-  border: 1px solid var(--border);
-  border-radius: 10px;
-  box-shadow: var(--shadow-card);
-  font-variant-numeric: tabular-nums;
-}
-.dv-tip b { font-weight: 650; }
-
-/* ---------- resultatmatris (sekventiell, en nyans) ---------- */
-
-table.dv-heat { width: auto; border-collapse: separate; border-spacing: 3px; font-size: 0.76rem; margin: 0 auto; }
-table.dv-heat th { padding: 0 0.25rem; border: none; text-align: center; font-size: 0.68rem; }
-table.dv-heat th.rowh { text-align: right; padding-right: 0.4rem; }
-table.dv-heat td {
-  min-width: 2.5rem;
-  padding: 0.32rem 0;
-  text-align: center;
-  border: none;
-  border-radius: 5px;
-  font-variant-numeric: tabular-nums;
-  background: color-mix(in srgb, var(--accent) calc(var(--a) * 100%), var(--hair));
-  cursor: default;
-}
-table.dv-heat td.hi { color: var(--bg); font-weight: 600; }
-
-/* ---------- tabeller med staplar ---------- */
-
-table.dv-bars td, table.dv-bars th { padding: 0.35rem 0.45rem; }
-table.dv-bars td.num, table.dv-bars th.num { text-align: right; }
-table.dv-bars td.barcell { width: 22%; min-width: 3.5rem; padding-right: 0; }
-.dv-bar { display: block; height: 6px; border-radius: 0 3px 3px 0; background: var(--accent); min-width: 2px; }
-.dv-bar.soft { background: color-mix(in srgb, var(--accent) 45%, var(--card)); }
-table.dv-bars tr.thin td { color: var(--muted); }
-
-table.dv-htft td.num, table.dv-htft th.num { text-align: right; }
-table.dv-htft td.max { font-weight: 700; }
-
-.dv-scroll { max-height: 26rem; overflow-y: auto; }
-.dv-scroll thead th { position: sticky; top: 0; background: var(--card); z-index: 1; }
-table tr.avg td { background: var(--accent-soft); font-weight: 600; }
-
-dl.facts.dv-facts { margin-top: 0.7rem; }
-dl.facts.dv-facts dd { font-variant-numeric: tabular-nums; }
-.dv-detail .card h4 + .legend { margin-top: -0.3rem; }
-.dv-grid3, .dv-grid2 { display: grid; grid-template-columns: repeat(auto-fit, minmax(min(100%, 300px), 1fr)); gap: 1rem; margin-bottom: 1rem; }
-.dv-grid2 { grid-template-columns: repeat(auto-fit, minmax(min(100%, 400px), 1fr)); }
-.dv-x { overflow-x: auto; }
-.dv-newc + .dv-newc { margin-top: 1rem; padding-top: 0.9rem; border-top: 1px solid var(--hair); }
-.dv-newc h5 { margin: 0 0 0.3rem; font-size: 0.86rem; }
-.dv-note { font-size: 0.78rem; color: var(--muted); margin: 0.5rem 0 0; }
-
-@media (max-width: 640px) {
-  table.dv-cmp td:first-child { min-width: 8.5rem; }
-  table.dv-cmp th, table.dv-cmp td { padding-left: 0.5rem; padding-right: 0.5rem; }
-  table.dv-heat td { min-width: 2.05rem; }
-  table.dv-bars .n { display: none; }
-  table.dv-bars td, table.dv-bars th { padding-left: 0.3rem; padding-right: 0.3rem; }
-  table.dv-bars td.barcell { min-width: 1.6rem; }
-  .dv-legend .muted { margin-left: 0; }
-}
 
 /* =====================================================================
    Pedagogisk presentation (division + flikar, som gravergrav.se).
@@ -198,8 +82,7 @@ dl.facts.dv-facts dd { font-variant-numeric: tabular-nums; }
   gap: 10px;
   margin: 0 0 18px;
 }
-.dv-divs { display: flex; flex-wrap: wrap; gap: 6px; transition: opacity 0.15s ease; }
-.dv-divs.dim { opacity: 0.55; }
+.dv-divs { display: flex; flex-wrap: wrap; gap: 6px; }
 .dv-divs button {
   display: inline-flex;
   align-items: center;
@@ -259,7 +142,6 @@ dl.facts.dv-facts dd { font-variant-numeric: tabular-nums; }
   line-height: 1.1;
 }
 .dv-sechead p { margin: 4px 0 0; color: var(--muted); font-size: 14px; max-width: 70ch; }
-.dv-meta { font-size: 14px; color: var(--muted); margin: 2px 0 14px; }
 .dv-key-line { margin: -4px 0 12px; font-size: 12.5px; color: var(--muted); }
 .dv-key-line b { color: var(--ink-soft, var(--fg)); font-weight: 650; }
 
@@ -277,25 +159,17 @@ dl.facts.dv-facts dd { font-variant-numeric: tabular-nums; }
 .dv-tile-label { font-size: 11px; font-weight: 800; letter-spacing: 0.12em; text-transform: uppercase; color: var(--eyebrow, var(--muted)); }
 .dv-tile-num { font-family: var(--display, inherit); font-size: 34px; font-weight: 800; line-height: 1.05; margin: 6px 0 2px; font-variant-numeric: tabular-nums; }
 .dv-tile-sub { font-size: 12.5px; color: var(--muted); margin-bottom: 8px; }
-.dv-chip {
-  display: inline-block;
-  font-size: 11.5px;
-  font-weight: 700;
-  padding: 2px 8px;
-  border-radius: 999px;
-  background: var(--hair);
-  color: var(--muted);
-}
-.dv-chip.up { background: var(--up-soft); color: var(--fresh); }
-.dv-chip.down { background: var(--down-soft); color: var(--down); }
 
 /* ---------- kort ---------- */
 
 .dv-card { margin-bottom: 16px; }
-.dv-standout { margin: 0; padding-left: 1.1rem; line-height: 1.7; }
+.dv-grid2 { display: grid; grid-template-columns: repeat(auto-fit, minmax(min(100%, 400px), 1fr)); gap: 1rem; margin-bottom: 1rem; }
+dl.facts.dv-facts { margin-top: 0.7rem; }
+dl.facts.dv-facts dd { font-variant-numeric: tabular-nums; }
+.dv-detail .card h4 + .legend { margin-top: -0.3rem; }
 .dv-calm { margin: 0 0 6px; color: var(--ink-soft, var(--muted)); line-height: 1.55; }
 .dv-h5 { margin: 16px 0 8px; font-size: 11.5px; font-weight: 800; letter-spacing: 0.12em; text-transform: uppercase; color: var(--eyebrow, var(--muted)); }
-.dv-note { line-height: 1.5; }
+.dv-note { font-size: 0.78rem; line-height: 1.5; color: var(--muted); margin: 0.5rem 0 0; }
 
 /* ---------- topplistor ---------- */
 
