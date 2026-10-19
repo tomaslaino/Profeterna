@@ -350,10 +350,10 @@
         const cls = ['sm-cell', on ? 'on' : '', g.res === i ? 'res' : ''].filter(Boolean).join(' ');
         // Gängets tecken väljs när alla har lämnat in, och bara i matcher som inte startat.
         return `<button type="button" class="${cls}" data-s="${sg}" aria-pressed="${on}"${s.visas && r.open ? '' : ' disabled'}` +
-          ` aria-label="${esc(`${label}, ${sg}: ${who.length ? who.join(', ') : 'ingen'}${r.pr ? `, modellen ${r.pr[i]} %` : ''}`)}">` +
+          ` aria-label="${esc(`${label}, ${sg}: ${who.length ? who.join(', ') : 'ingen'}${r.pr ? `, modellens odds ${pctOdds(r.pr[i])}` : ''}`)}">` +
           `<span class="sm-s"><b>${sg}</b>${who.length ? `<small>${who.length}/${r.n}</small>` : ''}</span>` +
           `<span class="sm-chips">${who.map((k) => chip(k, r.t[k].length > 1)).join('')}</span>` +
-          `<span class="sm-pc${r.fav === i ? ' fav' : ''}">${r.pr ? `${r.pr[i]} %` : '–'}</span></button>`;
+          `<span class="sm-pc${r.fav === i ? ' fav' : ''}">${r.pr ? pctOdds(r.pr[i]) : '–'}</span></button>`;
       }).join('') + '</div>';
   }
 
@@ -515,7 +515,7 @@
           `<span class="mteams">${teamsHtml(x, m)}</span>` +
           '<span class="kp-tg">' + SIGNS.map((sg, i) =>
             `<button type="button" data-s="${sg}" aria-pressed="${sign.includes(sg)}" aria-label="${sg} för ${esc(label)}">` +
-            `${sg}<small>${p ? `${p[i]} %` : '–'}</small></button>`).join('') + '</span>' +
+            `${sg}<small>${p ? pctOdds(p[i]) : '–'}</small></button>`).join('') + '</span>' +
           (sign ? `<input type="text" class="kp-note-in" data-note="${esc(x.id)}" maxlength="${NOTE_MAX}" autocomplete="off"` +
             ` placeholder="Motivering (valfritt)" aria-label="Motivering för ${esc(label)}" value="${esc(d.kommentarer[x.id] || '')}">` : '') +
           '</div>';

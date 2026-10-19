@@ -169,7 +169,7 @@ function tpTable(s) {
       if (!r) return '<td class="tp-none">–</td>';
       const pts = r.pts != null ? `<span class="${tpTone(r.pts)}">${tpPts(r.pts)}</span>` : '';
       const hit = r.pts == null ? '' : r.hit ? ' ok' : ' no';
-      return `<td><span class="tp-sign${hit}" title="Modellens chans ${Math.round(r.prob * 100)} %">${esc(r.sign)}</span>${pts}</td>`;
+      return `<td><span class="tp-sign${hit}" title="Modellens odds ${oddsP(r.prob)}">${esc(r.sign)}</span>${pts}</td>`;
     }).join('');
     return `<tr><th scope="row"><span class="tp-m">${esc(teamsOf(st))}</span>${res}</th>${cells}</tr>`;
   }).join('');

@@ -275,15 +275,23 @@ function dateLabel(iso) {
   return `${d.getUTCDate()} ${MONTHS[d.getUTCMonth()]}`;
 }
 
-// En kommande match som ruta: motståndarens förkortning, H/B och
-// vinstchansen; färgen går från rött till grönt med de förväntade poängen.
+// Matchprognos som odds, som hos svenska spelbolag (58 % blir 1,72): ur hela
+// procent som på matchsidan, från 100 och uppåt i hela tal.
+const oddsText = (x) => {
+  const v = Math.round(x * 100);
+  if (!v) return '–';
+  return 100 / v >= 100 ? String(Math.round(100 / v)) : (100 / v).toFixed(2).replace('.', ',');
+};
+
+// En kommande match som ruta: motståndarens förkortning, H/B och oddset på
+// seger; färgen går från rött till grönt med de förväntade poängen.
 function fxChip(n) {
   if (!n.p) return `<span class="dv-fx unknown" title="${esc(`${n.opponent}: prognos okänd`)}"><b>${esc(n.abbr || '?')}</b><small>?</small></span>`;
   const [w, d, l] = n.p;
   // Förväntade poäng 0,6–2,4 per match spänner upp färgskalan rött → grönt.
   const e = Math.min(1, Math.max(0, ((3 * w + d) - 0.6) / 1.8));
-  const tip = `${fShort.format(new Date(n.date))} · ${n.home ? 'hemma' : 'borta'} mot ${n.opponent}: vinst ${chanceText(w)} %, oavgjort ${chanceText(d)} %, förlust ${chanceText(l)} %`;
-  return `<span class="dv-fx" style="--e:${Math.round(e * 100)}%" title="${esc(tip)}"><b>${esc(n.abbr || n.opponent.slice(0, 3).toUpperCase())}</b><small>${n.home ? 'H' : 'B'} ${chanceText(w)}</small></span>`;
+  const tip = `${fShort.format(new Date(n.date))} · ${n.home ? 'hemma' : 'borta'} mot ${n.opponent} – odds: vinst ${oddsText(w)}, oavgjort ${oddsText(d)}, förlust ${oddsText(l)}`;
+  return `<span class="dv-fx" style="--e:${Math.round(e * 100)}%" title="${esc(tip)}"><b>${esc(n.abbr || n.opponent.slice(0, 3).toUpperCase())}</b><small>${n.home ? 'H' : 'B'} ${oddsText(w)}</small></span>`;
 }
 
 function fixturesCard(F) {
@@ -294,7 +302,7 @@ function fixturesCard(F) {
     `<td class="num pts">${t.next.xp == null ? '–' : num(t.next.xp, 2)}</td></tr>`).join('');
   return card('Programmet framåt', {
     hint: `de närmaste ${F.teams[0].next.n} ligamatcherna`,
-    key: 'Vinstchans i % · H hemma, B borta · grönt lätt, rött svårt',
+    key: 'Odds på seger · H hemma, B borta · grönt lätt, rött svårt',
     body: `<div class="table-wrap dv-tw"><table class="dv-league dv-fxtable"><thead><tr><th>Lag</th><th>Matcherna</th><th class="num" title="Förväntade poäng per match de närmaste matcherna">Poäng/match</th></tr></thead><tbody>${rows}</tbody></table></div>`,
     src: 'Prognosmotorn · samma sannolikheter som under Matcher',
     cls: 'dv-tablecard',
@@ -896,7 +904,7 @@ async function openTeam(id) {
       mtile(num(ft.meanPos, 1), 'Förv. placering') +
       F.zones.filter((z) => z.key !== 'title' || ft.p.title > 0).map((z) => mtile(`${chanceText(ft.p[z.key])} %`, z.label)).join('') + '</div>';
     if (ft.next && ft.next.list.length) {
-      html += `<p class="dv-calm">De närmaste ligamatcherna – hemma (H) eller borta (B) och vinstchansen i procent:</p><div class="dv-fxs dv-fxs-wide">${ft.next.list.map(fxChip).join('')}</div>`;
+      html += `<p class="dv-calm">De närmaste ligamatcherna – hemma (H) eller borta (B) och oddset på seger:</p><div class="dv-fxs dv-fxs-wide">${ft.next.list.map(fxChip).join('')}</div>`;
     }
     html += `<p class="dv-mnote">Prognosmotorn · ${int(state.season.sims)} simuleringar · <a href="${esc(viewHref(state.div, 'prognos'))}">Hela prognosen</a></p>`;
   }

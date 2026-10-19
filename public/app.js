@@ -61,6 +61,20 @@ function pct3(ps) {
     .forEach(([, i]) => { if (left > 0) { out[i]++; left--; } });
   return out;
 }
+// Odds som hos svenska spelbolag: 1 / chansen med två decimaler och
+// decimalkomma, så 58 % blir 1,72 – rättvisa odds, utan spelbolagets marginal.
+// Från 100 och uppåt i hela tal.
+function fmtOdds(o) {
+  return o >= 100 ? String(Math.round(o)) : o.toFixed(2).replace('.', ',');
+}
+// Odds ur hela procent, samma precision som journalen (0 % ger –).
+function pctOdds(pctInt) {
+  return pctInt ? fmtOdds(100 / pctInt) : '–';
+}
+// Odds ur en sannolikhet, avrundad till hela procent som på resten av sidan.
+function oddsP(x) {
+  return x == null ? '–' : pctOdds(pct(x));
+}
 function dec(x, d = 1) {
   return x == null ? '–' : x.toLocaleString('sv-SE', { minimumFractionDigits: d, maximumFractionDigits: d });
 }
@@ -257,10 +271,9 @@ function compOf(id) {
   return state.comps.get(id) || { name: id, short: id };
 }
 
-// Prognosen som odds med två decimaler och komma, som hos svenska spelbolag:
-// 100 / procenten, så 58 % blir 1,72. Rättvisa odds utan spelbolagets marginal.
+// Prognosen 1 · X · 2 i hela procent som odds (se odds ovan).
 function listOdds(p) {
-  return p.map((x) => (x ? (100 / x).toFixed(2).replace('.', ',') : '–'));
+  return p.map(pctOdds);
 }
 
 // Kompakt prognos: 1 · X · 2 som odds, det troligaste utfallet i fetstil.
@@ -420,14 +433,14 @@ function forecastCard(d) {
   }
   const stats = [
     `Förväntade mål <b>${dec(p.goals[0])}–${dec(p.goals[1])}</b>`,
-    `Över 2,5 mål <b>${pct(p.over25)} %</b>${p.baselines.market && p.baselines.market.over25 != null ? ` <span class="muted">(marknaden ${pct(p.baselines.market.over25)} %)</span>` : ''}`,
-    `Båda lagen gör mål <b>${pct(p.btts)} %</b>`,
+    `Över 2,5 mål <b>${oddsP(p.over25)}</b>${p.baselines.market && p.baselines.market.over25 != null ? ` <span class="muted">(marknaden ${oddsP(p.baselines.market.over25)})</span>` : ''}`,
+    `Båda lagen gör mål <b>${oddsP(p.btts)}</b>`,
   ];
   let adv = '';
   if (p.advance) {
     adv = p.advance.home == null
       ? `<p class="fc-adv">Går vidare: <span class="unknown">okänt – ${esc(p.advance.reason || '')}</span></p>`
-      : `<p class="fc-adv">Går vidare: <b>${esc(m.home)} ${pct3([p.advance.home, p.advance.away])[0]} %</b> · <b>${esc(m.away)} ${pct3([p.advance.home, p.advance.away])[1]} %</b>` +
+      : `<p class="fc-adv">Går vidare: <b>${esc(m.home)} ${pctOdds(pct3([p.advance.home, p.advance.away])[0])}</b> · <b>${esc(m.away)} ${pctOdds(pct3([p.advance.home, p.advance.away])[1])}</b>` +
         `<span class="sub">${esc(p.advance.rule)}${p.advance.firstLeg ? ` · första mötet ${esc(p.advance.firstLeg.home)} ${p.advance.firstLeg.score.home}–${p.advance.firstLeg.score.away} ${esc(p.advance.firstLeg.away)}` : ''}</span></p>`;
   }
   const notes = (p.notes || []).map((n) => `<p class="note">${esc(n)}</p>`).join('');
@@ -443,14 +456,15 @@ function forecastCard(d) {
     `<p class="src-line">Skattat på ${basis(p.teams.home)}; ${basis(p.teams.away)}. Regelversion ${esc(p.rulesVersion)}.${journalLine(d)}</p></div>`;
 }
 
-// 1 · X · 2 i hela procent med stapel; range = osäkerhetsspannet om det finns.
+// 1 · X · 2 som odds med stapel (stapeln i hela procent); range =
+// osäkerhetsspannet om det finns, också som odds.
 function fcMain(p, labels, range) {
   const w = pct3(p);
   const cols = w.map((x, i) => {
     const r = range && range[i];
     return `<div class="fc-col${i === 1 ? ' draw' : ''}"><div class="fc-label">${esc(labels[i])}</div>` +
-      `<div class="fc-num">${x} %</div>` +
-      `<div class="fc-range"${r ? ' title="Osäkerheten i lagens styrka (omskattning med slumpvikter)"' : ''}>${r ? `${pct(r[0])}–${pct(r[1])}` : '&nbsp;'}</div></div>`;
+      `<div class="fc-num">${pctOdds(x)}</div>` +
+      `<div class="fc-range"${r ? ' title="Osäkerheten i lagens styrka (omskattning med slumpvikter), som odds"' : ''}>${r ? `${oddsP(r[1])}–${oddsP(r[0])}` : '&nbsp;'}</div></div>`;
   }).join('');
   const bar = `<div class="fc-bar" aria-hidden="true">${w.map((x, i) => `<span class="s${i}" style="width:${x}%"></span>`).join('')}</div>`;
   return `<div class="fc-main">${cols}</div>${bar}`;
@@ -482,14 +496,14 @@ function journalCard(d) {
   }
   const stats = [
     `Förväntade mål <b>${dec(r.goals[0])}–${dec(r.goals[1])}</b>`,
-    `Över 2,5 mål <b>${pct(r.over25)} %</b>${r.market && r.market.over25 != null ? ` <span class="muted">(marknaden ${pct(r.market.over25)} %)</span>` : ''}`,
-    `Båda lagen gör mål <b>${pct(r.btts)} %</b>`,
+    `Över 2,5 mål <b>${oddsP(r.over25)}</b>${r.market && r.market.over25 != null ? ` <span class="muted">(marknaden ${oddsP(r.market.over25)})</span>` : ''}`,
+    `Båda lagen gör mål <b>${oddsP(r.btts)}</b>`,
   ];
   let adv = '';
   if (r.advance !== undefined) {
     const a = r.advance && pct3(r.advance);
     adv = a
-      ? `<p class="fc-adv">Går vidare: <b>${esc(m.home)} ${a[0]} %</b> · <b>${esc(m.away)} ${a[1]} %</b>` +
+      ? `<p class="fc-adv">Går vidare: <b>${esc(m.home)} ${pctOdds(a[0])}</b> · <b>${esc(m.away)} ${pctOdds(a[1])}</b>` +
         `${j.advanced ? `<span class="sub">${esc(j.advanced === 'home' ? m.home : m.away)} gick vidare</span>` : ''}</p>`
       : '<p class="fc-adv">Går vidare: <span class="unknown">okänt</span></p>';
   }
@@ -497,10 +511,7 @@ function journalCard(d) {
     : `<p class="unknown">${m.score90 ? '' : 'Ställningen efter 90 minuter är okänd – utvärderas inte.'}</p>`;
   let retro = '';
   if (d.prediction && d.prediction.status === 'ok') {
-    const a = pct3(r.p);
-    const b = pct3(d.prediction.p);
-    const s = (x) => (x > 0 ? `+${x}` : x < 0 ? `−${-x}` : '±0');
-    retro = `<p class="src-line">Återskapad i efterhand: ${b.join(' · ')} <span class="muted">(${b.map((x, i) => s(x - a[i])).join(' · ')} mot före avspark)</span></p>`;
+    retro = `<p class="src-line">Återskapad i efterhand: ${listOdds(pct3(d.prediction.p)).join(' · ')}</p>`;
   }
   return `<div class="card fc"><h4>Prognos före avspark <span class="hint">${head}</span></h4>` +
     fcMain(r.p, [m.home, 'Oavgjort', m.away], null) +
@@ -533,7 +544,7 @@ function scoreTable(j, r, m) {
     if (!s && key === 'closing') return '';
     const head = `<td>${label}${sub ? `<span class="sub src-sub">${sub}</span>` : ''}</td>`;
     if (!s) return `<tr class="${cls || ''}">${head}<td colspan="5" class="num unknown">okänt</td></tr>`;
-    return `<tr class="${cls || ''}">${head}${pct3(s.p).map((v, k) => `<td class="num${k === o ? ' hit' : ''}">${v}</td>`).join('')}` +
+    return `<tr class="${cls || ''}">${head}${listOdds(pct3(s.p)).map((v, k) => `<td class="num${k === o ? ' hit' : ''}">${v}</td>`).join('')}` +
       `<td class="num src-only">${dec(s.logLoss, 2)}</td><td class="num src-only">${dec(s.brier, 2)}</td></tr>`;
   }).join('');
   return `<table class="odds cmp facit"><thead><tr><th>Efter 90 min ${m.score90.home}–${m.score90.away}</th><th class="num">1</th><th class="num">X</th><th class="num">2</th>` +
@@ -546,15 +557,15 @@ function scoreGrid(p, m) {
   let rows = `<tr><th></th>${g[0].map((_, j) => `<th>${j}</th>`).join('')}</tr>`;
   g.forEach((row, i) => {
     rows += `<tr><th>${i}</th>${row.map((x) => {
-      const v = pct(x);
       const a = Math.round((x / max) * 100);
-      return `<td style="--a:${a}%">${v >= 1 ? v : '<1'}</td>`;
+      return `<td style="--a:${a}%">${x > 0.005 ? fmtOdds(1 / x) : '200+'}</td>`;
     }).join('')}</tr>`;
   });
-  const top = p.scores.top.map((t) => `${t.home}–${t.away} ${pct(t.p)} %`).join(', ');
+  // Resultaten har små chanser, så oddsen räknas utan avrundning till procent.
+  const top = p.scores.top.map((t) => `${t.home}–${t.away} ${fmtOdds(1 / t.p)}`).join(', ');
   return `<details class="fc-scores"><summary>Resultat: troligast ${esc(top)}</summary>` +
-    `<div class="sgrid-wrap"><p class="muted">Procent · rader ${esc(m.home)} · kolumner ${esc(m.away)}</p><table class="sgrid">${rows}</table>` +
-    `<p class="muted">5 mål eller fler för ett lag: ${pct(p.scores.other)} %</p></div></details>`;
+    `<div class="sgrid-wrap"><p class="muted">Odds · rader ${esc(m.home)} · kolumner ${esc(m.away)}</p><table class="sgrid">${rows}</table>` +
+    `<p class="muted">5 mål eller fler för ett lag: ${p.scores.other > 0.005 ? fmtOdds(1 / p.scores.other) : '200+'}</p></div></details>`;
 }
 
 function compareCard(d) {
@@ -562,7 +573,7 @@ function compareCard(d) {
   const b = p.baselines;
   const rows = [];
   const row = (label, sub, x, cls = '') => rows.push(`<tr class="${cls}"><td>${label}${sub ? `<span class="sub src-sub">${sub}</span>` : ''}</td>` +
-    (x ? pct3(x).map((v) => `<td class="num">${v}</td>`).join('') : '<td colspan="3" class="num unknown">okänt</td>') + '</tr>');
+    (x ? listOdds(pct3(x)).map((v) => `<td class="num">${v}</td>`).join('') : '<td colspan="3" class="num unknown">okänt</td>') + '</tr>');
   row('<strong>Modellen</strong>', null, p.p, 'model');
   const mk = b.market;
   row(BASE.market, mk ? `(c) ${esc(mk.source)}, ${esc(mk.kind)}${mk.fetchedAt ? `, hämtat ${when(mk.fetchedAt)}` : ''}` : esc(marketMissing(d)), mk && mk.p);
@@ -570,15 +581,8 @@ function compareCard(d) {
   // De enkla baslinjerna är modellens egna måttstockar – syns med detaljerna.
   row(BASE.season, b.season.p ? `(b) Poisson på årets matcher (${b.season.matches[0]} resp. ${b.season.matches[1]})` : esc(b.season.reason), b.season.p, 'src-only');
   row(BASE.naive, b.naive.p ? `(a) ${esc(b.naive.scope)}, ${esc(b.naive.seasons[0])}–${esc(b.naive.seasons[1])}` : esc(b.naive.reason), b.naive.p, 'src-only');
-  let diff = '';
-  if (mk && mk.p) {
-    const a = pct3(p.p);
-    const c = pct3(mk.p);
-    const s = (x) => (x > 0 ? `+${x}` : x < 0 ? `−${-x}` : '±0');
-    diff = `<p class="src-line">Modell − marknad: ${s(a[0] - c[0])} · ${s(a[1] - c[1])} · ${s(a[2] - c[2])} procentenheter</p>`;
-  }
-  return `<div class="card"><h4>Jämförelse</h4><table class="odds cmp"><thead><tr><th></th><th class="num">1</th><th class="num">X</th><th class="num">2</th></tr></thead>` +
-    `<tbody>${rows.join('')}</tbody></table>${diff}</div>`;
+  return `<div class="card"><h4>Jämförelse <span class="hint">odds utan spelbolagens marginal</span></h4><table class="odds cmp"><thead><tr><th></th><th class="num">1</th><th class="num">X</th><th class="num">2</th></tr></thead>` +
+    `<tbody>${rows.join('')}</tbody></table></div>`;
 }
 
 function marketMissing(d) {
@@ -588,7 +592,7 @@ function marketMissing(d) {
 
 // Steg för steg som en dragkamp: startläget överst, sedan en stapel per del
 // av modellen åt det lag den hjälper (procentenheter på segerchansen), och
-// sist slutprognosen. Kolumnen till höger är favoritens chans efter varje steg.
+// sist slutprognosen. Kolumnen till höger är favoritens odds efter varje steg.
 function stepsCard(d) {
   const st = d.prediction.steps;
   if (!st) return '';
@@ -603,9 +607,11 @@ function stepsCard(d) {
   });
   const scale = Math.max(8, ...pulls.map((p) => (p ? p.v : 0)));
   const gen = (n) => (/[sxz]$/i.test(n) ? n : `${n}s`);
+  // Stackens delar är lika breda som chansen men märks med oddset; under 11 %
+  // (odds över 9) får siffran inte plats.
   const stack = (p) => '<div class="tug-stack">' + pct3(p).map((v, i) =>
-    `<span class="s${i}" style="flex:${v} 1 0">${v >= 10 ? `${v} %` : ''}</span>`).join('') + '</div>';
-  const run = (x) => `<div class="tug-run">${pct3(x.p)[fi]} %</div>`;
+    `<span class="s${i}" style="flex:${v} 1 0">${v >= 11 ? pctOdds(v) : ''}</span>`).join('') + '</div>';
+  const run = (x) => `<div class="tug-run">${pctOdds(pct3(x.p)[fi])}</div>`;
   const lab = (label, sub) => `<div class="tug-lab">${label}${sub ? `<span class="sub">${esc(sub)}</span>` : ''}</div>`;
 
   const rows = st.map((x, i) => {
@@ -635,7 +641,7 @@ function stepsCard(d) {
   const end = `<div class="tug-row tug-end"><div class="tug-lab">Slutprognos</div>${stack(st[st.length - 1].p)}<div></div></div>` +
     `<div class="tug-row tug-names"><div class="tug-lab"></div><div class="tug-sides"><span>${esc(m.home)}</span><span>${esc(m.away)}</span></div><div></div></div>`;
   return `<div class="card tug"><h4>Vad drog åt vilket håll</h4>` +
-    `<p class="tug-note">Staplarna visar hur många procentenheter varje del flyttar segerchansen. Siffran längst till höger är ${esc(gen(fav))} chans att vinna efter varje steg.</p>` +
+    `<p class="tug-note">Staplarna visar hur många procentenheter varje del flyttar segerchansen. Siffran längst till höger är oddset på att ${esc(fav)} vinner efter varje steg – lägre odds betyder större chans.</p>` +
     rows[0] + axis + rows.slice(1).join('') + end + '</div>';
 }
 
@@ -1155,20 +1161,20 @@ function recentTable(all) {
   const note = n ? `<p class="legend">${Spoiler.chip(`${n} ${n === 1 ? 'match' : 'matcher'}`)} visas inte – du har valt att dölja resultat.</p>` : '';
   if (!list.length) return note;
   const rows = list.map((r) => {
-    const w = pct3(r.p).map((v, k) => (k === r.o ? `<b>${v}</b>` : String(v))).join(' · ');
+    const w = listOdds(pct3(r.p)).map((v, k) => (k === r.o ? `<b>${v}</b>` : v)).join(' · ');
     return `<tr><td><a href="#match/${esc(r.id)}">${esc(r.home)}–${esc(r.away)}</a><span class="sub">${esc(compOf(r.comp).short)} · ${dateOnly(r.kickoff)}</span></td>` +
       `<td class="num">${w}<span class="sub">loggad ${when(r.loggedAt)}</span></td><td class="num">${r.score90.home}–${r.score90.away}</td>` +
       `<td class="num">${dec(r.logLoss, 2)} / ${r.market != null ? dec(r.market, 2) : '–'}</td></tr>`;
   }).join('');
-  return '<div class="table-wrap"><table><thead><tr><th>Match</th><th class="num" title="1 · X · 2 i procent, utfallet i fetstil">Före avspark</th><th class="num">Efter 90</th>' +
+  return '<div class="table-wrap"><table><thead><tr><th>Match</th><th class="num" title="1 · X · 2 som odds, utfallet i fetstil">Före avspark</th><th class="num">Efter 90</th>' +
     `<th class="num">Log-poäng modell / ${esc(BASE.market.toLowerCase())}</th></tr></thead><tbody>${rows}</tbody></table></div>` + note;
 }
 
 function journalTable(j) {
   const rows = j.latest.map((r) => `<tr><td class="num">${when(r.loggedAt)}</td>` +
     `<td><a href="#match/${esc(r.id)}">${esc(r.home)}–${esc(r.away)}</a><span class="sub">${esc(compOf(r.comp).short)} · avspark ${when(r.kickoff)}</span></td>` +
-    `<td class="num">${r.p ? pct3(r.p).join(' · ') : '<span class="unknown">okänt</span>'}</td>` +
-    `<td class="num">${r.market ? `${pct3(r.market.p).join(' · ')}<span class="sub">${esc(r.market.source)}</span>` : '–'}</td>` +
+    `<td class="num">${r.p ? listOdds(pct3(r.p)).join(' · ') : '<span class="unknown">okänt</span>'}</td>` +
+    `<td class="num">${r.market ? `${listOdds(pct3(r.market.p)).join(' · ')}<span class="sub">${esc(r.market.source)}</span>` : '–'}</td>` +
     `<td class="num">${esc(r.rulesVersion)}</td></tr>`).join('');
   const files = j.files.map((f) => `<a href="data/journal/${encodeURIComponent(f.name)}">${esc(f.name)}</a> (${n0(f.rows)} rader, ${n0(Math.round(f.bytes / 1024))} kB)`).join(', ');
   return '<div class="table-wrap"><table><thead><tr><th>Loggad</th><th>Match</th><th class="num">Prognos</th><th class="num">' + esc(BASE.market) + '</th><th class="num">Regelversion</th></tr></thead>' +
@@ -1301,7 +1307,7 @@ function renderModel(d) {
   html += '<div class="card model-plain"><h4>Kort sagt</h4>' +
     `<p>Modellen läser in ${n0(x.matches)} matcher i de fem högsta divisionerna sedan ${esc(x.firstSeason)} och räknar ut hur många mål varje lag brukar göra och släppa in. ` +
     `Nyare matcher väger tyngre – en match för ${halfLife} sedan räknas hälften så mycket som en från i dag.</p>` +
-    `<p>Hemmalaget får ett tillägg${table ? ', och laget med bäst poängsnitt i årets liga lite extra' : ''}. Ur lagens väntade mål blir det en chans i procent för 1, X och 2.</p>` +
+    `<p>Hemmalaget får ett tillägg${table ? ', och laget med bäst poängsnitt i årets liga lite extra' : ''}. Ur lagens väntade mål blir det en chans för 1, X och 2, som sidan visar som odds (58 % blir 1,72).</p>` +
     '<p>Varje prognos sparas före avspark och rättas mot facit. Längre ned syns hur modellen står sig mot enklare gissningar och mot spelbolagen.</p></div>';
   html += '<h3>Grundmodellen <span class="hint">Dixon–Coles</span></h3><div class="card"><dl class="facts">' +
     `<dt>Underlag</dt><dd>${n0(x.matches)} matcher t.o.m. ${dateOnly(x.fitThrough)} · Premier League–National League sedan ${esc(x.firstSeason)} och årets cuper</dd>` +
@@ -1330,12 +1336,12 @@ function renderModel(d) {
         'FA-cupen: förlängning och straffar. EFL-cupen: straffar direkt, utom i semifinalerna (två möten) och finalen.'],
     ]);
 
-  html += '<h3>Nivåerna <span class="hint">snittlaget mot ett snittlag i Premier League · neutral plan</span></h3>' +
+  html += '<h3>Nivåerna <span class="hint">snittlaget mot ett snittlag i Premier League · neutral plan · odds</span></h3>' +
     '<div class="table-wrap"><table><thead><tr><th>Nivå</th><th class="num">Vinst</th><th class="num">Oavgjort</th><th class="num">PL-laget vinner</th><th class="num">Mål per lag inbördes</th></tr></thead><tbody>' +
     x.tiers.map((t) => {
       const w = t.vsTop ? pct3(t.vsTop) : null;
       return `<tr><td>${esc(t.name)}${t.tier <= 5 ? ` <span class="muted">nivå ${t.tier}</span>` : ''}</td>` +
-        (w ? w.map((v) => `<td class="num">${v} %</td>`).join('') : '<td colspan="3">–</td>') + `<td class="num">${dec(t.goals, 2)}</td></tr>`;
+        (w ? listOdds(w).map((v) => `<td class="num">${v}</td>`).join('') : '<td colspan="3">–</td>') + `<td class="num">${dec(t.goals, 2)}</td></tr>`;
     }).join('') + '</tbody></table></div>';
 
   html += '<h3>Baslinjerna <span class="hint">modellen ska slå (b) – och på sikt (c)</span></h3><div class="card"><dl class="facts">' +

@@ -189,7 +189,7 @@
       `<span class="hk-match">${esc(r.match)}${r.note ? `<span class="hk-note">${esc(r.note)}</span>` : ''}</span>` +
       signBoxes(r) +
       (r.p != null
-        ? `<span class="kp-p" title="Modellens chans för ert tecken, före avspark"><span class="kp-pbar"><i style="width:${Math.min(100, r.p)}%"></i></span>${r.p} %</span>`
+        ? `<span class="kp-p" title="Modellens odds för ert tecken, före avspark (${r.p} % chans)"><span class="kp-pbar"><i style="width:${Math.min(100, r.p)}%"></i></span>${pctOdds(r.p)}</span>`
         : '<span class="kp-p unknown" title="Modellens chans är okänd för matchen">–</span>') +
       `<span class="hk-res">${res}</span></div>`;
   }

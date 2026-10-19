@@ -581,7 +581,7 @@ function couponRows(g) {
         `${r.note ? `<span class="kp-note" title="${esc(r.note)}">”${esc(r.note)}”</span>` : ''}</span>` +
         signBoxes(r) +
         (r.p != null
-          ? `<span class="kp-p" title="Modellens chans för vårt tecken, före avspark"><span class="kp-pbar"><i style="width:${Math.min(100, r.p)}%"></i></span>${r.p} %</span>`
+          ? `<span class="kp-p" title="Modellens odds för vårt tecken, före avspark (${r.p} % chans)"><span class="kp-pbar"><i style="width:${Math.min(100, r.p)}%"></i></span>${pctOdds(r.p)}</span>`
           : '<span class="kp-p unknown">okänt</span>') +
         `<span class="kp-score">${score}</span></${tag}>`;
     }
@@ -811,7 +811,7 @@ function renderPickList() {
           `<span class="mteams">${esc(m.home)}<span class="vs">–</span>${esc(m.away)}</span>` +
           '<span class="kp-tg">' + SIGNS.map((s, i) =>
             `<button type="button" data-s="${s}" aria-pressed="${sign.includes(s)}" aria-label="${s} för ${esc(m.home)} – ${esc(m.away)}">` +
-            `${s}<small>${p ? `${p[i]} %` : '–'}</small></button>`).join('') + '</span>' +
+            `${s}<small>${p ? pctOdds(p[i]) : '–'}</small></button>`).join('') + '</span>' +
           (sign ? `<input type="text" class="kp-note-in" data-note="${esc(m.id)}" maxlength="${NOTE_MAX}" autocomplete="off"` +
             ` placeholder="Anteckning (valfritt)" aria-label="Anteckning om ${esc(m.home)} – ${esc(m.away)}" value="${esc(KP.draft.notes[m.id] || '')}">` : '') +
           '</div>';
