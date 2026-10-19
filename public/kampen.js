@@ -432,12 +432,18 @@ function kampRoundsCard(rounds, gang) {
 // ---------- sidan ----------
 
 const KAMP_HJALP = '<details class="help km-help"><summary>Så räknas poängen</summary>' +
-  '<p>Varje match ger 1 för rätt minus modellens chans för tipset före avspark. En gardering räknas med tecknens chans ihop, så att en helgardering alltid ger 0.</p>' +
-  '<table class="km-rules"><thead><tr><th scope="col">Tips</th><th scope="col">Odds</th><th scope="col">Rätt</th><th scope="col">Fel</th></tr></thead><tbody>' +
-  '<tr><th scope="row">Storfavorit</th><td>1,43</td><td class="pos">+0,3</td><td class="neg">−0,7</td></tr>' +
-  '<tr><th scope="row">Jämn match</th><td>2,50</td><td class="pos">+0,6</td><td class="neg">−0,4</td></tr>' +
-  '<tr><th scope="row">Skräll</th><td>5,00</td><td class="pos">+0,8</td><td class="neg">−0,2</td></tr></tbody></table>' +
-  '<p>Den som tippar som modellen hamnar kring noll i längden. Plus betyder att man haft rätt där modellen tvekade. ' +
+  '<p>Rätt tips ger 1 poäng och fel tips 0. Från det dras modellens chans för ditt tips, räknad före avspark. ' +
+  'Ett säkert tips ger alltså lite när det sitter och kostar mycket när det spricker.</p>' +
+  '<p>Exempel: modellen ger hemmalaget 70 % chans att vinna. Tippar du 1 och hemmalaget vinner får du 1 − 0,7 = +0,3. ' +
+  'Blir det kryss eller bortavinst får du 0 − 0,7 = −0,7. Samma räkning för tre sorters tips:</p>' +
+  '<table class="km-rules"><thead><tr><th scope="col">Tips</th><th scope="col">Chans</th><th scope="col">Rätt</th><th scope="col">Fel</th></tr></thead><tbody>' +
+  '<tr><th scope="row">Storfavorit</th><td>70 %</td><td class="pos">+0,3</td><td class="neg">−0,7</td></tr>' +
+  '<tr><th scope="row">Jämn match</th><td>40 %</td><td class="pos">+0,6</td><td class="neg">−0,4</td></tr>' +
+  '<tr><th scope="row">Skräll</th><td>20 %</td><td class="pos">+0,8</td><td class="neg">−0,2</td></tr></tbody></table>' +
+  '<p>Garderar du läggs chanserna för dina tecken ihop. Har krysset 20 % räknas 1X i exemplet som 90 %: ' +
+  '+0,1 om det sitter och −0,9 om det spricker. En helgardering täcker alltid 100 % och ger därför 0.</p>' +
+  '<p>Över en omgång blir summan helt enkelt antal rätt minus så många rätt som modellen väntade sig av dina tips. ' +
+  'Plus betyder att du fick fler rätt än modellen trodde, minus färre. ' +
   'Bäst i omgången blir Omgångens orakel och sämst Omgångens Ikaros.</p></details>';
 
 function kampEmpty(gang) {
