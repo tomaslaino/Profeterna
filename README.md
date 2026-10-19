@@ -854,9 +854,11 @@ ställningen efter 90 minuter (samma utfall som prognosen).
 **Var den syns**
 
 - **Förstasidan** (utan adress, ingen flik – dit leder namnet): rubriken, omgångens kupong
-  i korthet och Säkraste spelen. Omgångens kupong är den som pågår, annars nästa, annars den
-  som spelades färdigt senast; rutan visar antal rätt (eller antal matcher), läget, en prick
-  per match och knappen in till kupongen – och *+ Ny kupong* när den är färdigspelad.
+  i korthet och Säkraste spelen. Omgångens kupong är gängets kupong ur omgången som alla
+  tippade (se [Inför samtalet](#inför-samtalet)) tills den är färdigspelad, annars den som
+  pågår, annars nästa, annars den som spelades färdigt senast; rutan visar antal rätt
+  (eller antal matcher), läget, en prick per match och knappen in till kupongen – och
+  *+ Ny kupong* när den är färdigspelad.
 - **Fliken Kupong** har två lägen överst, *Omgången* och *Historik*.
   *Omgången* (`#kupong`) är hela omgångens kupong: antal rätt, en skala med
   rätt, möjliga och modellens väntade antal rätt, och varje match med vårt tecken som tre
@@ -872,11 +874,12 @@ ställningen efter 90 minuter (samma utfall som prognosen).
 - **Väntat antal rätt** = spelade matcher som de gick + modellens sannolikhet för vårt tecken
   i resten (prognosen före avspark ur journalen om den finns, annars sajtens prognos).
 - **Live:** medan en kupongmatch pågår hämtar sidan ESPN:s scoreboard varje minut, direkt i
-  webbläsaren (se Datakällor). Går matchen till förlängning väntar rättningen på nästa
-  bygge, som räknar fram ställningen efter 90 minuter ur målminuterna. Svarar inte ESPN
-  visas det, och kupongen rättas mot `matches.json` som vanligt. En match som ESPN anger
-  som uppskjuten, inställd eller avbruten visas så direkt (inte som slutspelad) och räknas
-  inte, redan före nästa bygge.
+  webbläsaren (se Datakällor) – också för omgångens matcher inför samtalet innan gängets
+  kupong finns, så att underlaget och Omgångens tippare visar ställningen. Går matchen till
+  förlängning väntar rättningen på nästa bygge, som räknar fram ställningen efter 90
+  minuter ur målminuterna. Svarar inte ESPN visas det, och kupongen rättas mot
+  `matches.json` som vanligt. En match som ESPN anger som uppskjuten, inställd eller
+  avbruten visas så direkt (inte som slutspelad) och räknas inte, redan före nästa bygge.
 - **Spoilerskyddet:** en kupong där alla matcher är slut räknas som klar även när skyddet
   döljer resultaten – då visar förstasidan nästa kupong i stället för den gamla.
 
@@ -991,11 +994,13 @@ under omgången.
 2. **Fyll i kupongen** (`#kupong/samtal/tips`): man väljer vem man är (DL, DT, DJ – sparas
    på enheten), tippar varje match och kan skriva en kort motivering (högst 140 tecken).
    Nederst står hur många rader tipsen blir. *Lämna in och se de andras* kräver tecken i
-   alla matcher och kupongens kodord. Inlämnade tips går inte att ändra.
+   alla matcher och kupongens kodord. Inlämnade tips går inte att ändra. Har matcherna
+   ändrats sedan sidan öppnades säger tjänsten till, och sidan visar de nya matcherna med
+   ens tecken kvar där matchen fortfarande är med.
 3. **De andras tips** (`#kupong`): den som inte har lämnat in ser bara vem som har
    gjort det och när. Den som har lämnat in ser allas inlämnade tips – så fort minst en
    till är inne – och vilka som fortfarande fyller i. Sidan frågar tjänsten var 20:e sekund
-   och visar nya tips av sig själv.
+   och visar nya tips av sig själv – också förstasidans ruta, medan tipsen lämnas in.
 4. **Underlaget** – för alla när alla har lämnat in, när samtalet börjar eller senast när
    första matchen startar; sedan går ingenting att lämna in eller ändra. Överst allas
    garderingar, rader och (när matcher spelats) antal rätt. Varje match har rutorna
@@ -1009,10 +1014,25 @@ under omgången.
    - *Eniga* – klubbas utan snack
 5. **Gängets kupong** (när alla tips är inne): man trycker på rutorna (två rutor =
    gardering). Den börjar som förslaget – tecknen som fler än hälften har med; *Alla olika*
-   lämnas tomma – och sparas bara på enheten, så en håller i pennan under samtalet. Nederst
-   syns kupongen som rutor med antal rader. *Gör gängets kupong* öppnar Ny kupong (eller
-   *Ändra*, om gängets kupong för matcherna redan finns) med tecknen ifyllda, och den sparas
-   som vanligt (se [Kupongen](#kupongen)). Därefter står gängets kupong under Omgången.
+   lämnas tomma – och sparas bara på enheten, så en håller i pennan under samtalet (*Börja
+   om* går tillbaka till förslaget). Nederst syns kupongen som rutor med antal rader.
+   - *Spara gängets kupong* sparar den direkt därifrån med kodordet (ett fält bredvid
+     knappen om det inte finns på enheten) – samma tjänst och kontroller som *Spara kupong*
+     under Ny kupong (se [Kupongen](#kupongen)). Matcher utan tecken kommer inte med; sidan
+     frågar först. Därefter står gängets kupong under Omgången, med en rad om att den är
+     sparad och syns för alla efter bygget.
+   - *Justera först* öppnar i stället Ny kupong (eller *Ändra*) med tecknen ifyllda – för
+     namn, anteckningar eller fler matcher. Utan tjänsten heter knappen *Gör gängets
+     kupong* och gör samma sak.
+   - Finns gängets kupong redan blir knappen *Spara ändringen* (kupongen ändras, ingen ny
+     görs), och står rutorna som den sparade kupongen visas *Sparad*. Har man inte själv
+     tryckt på rutorna följer de den sparade kupongen – så den som öppnar underlaget på en
+     annan enhet ser gängets kupong, inte förslaget, och kan inte skriva över den av misstag.
+   - Har någon annan sparat eller ändrat gängets kupong under tiden säger sidan till, med
+     *Visa den* och *Spara våra tecken över den* (en ändring av den, ingen dubblett).
+   - Gängets kupong räknas som gjord också när alla dess matcher har startat, så att
+     underlaget inte ber om den igen medan omgångens sista matcher återstår. *Allas tips*
+     under Omgången leder tillbaka till underlaget så länge omgången finns.
 
 **Tjänsten** är samma som sparar kupongen (*profeterna-kupong*, adressen i
 [config/kupong.js](config/kupong.js) med `/samtal` i stället för `/kupong`; bygget skriver
@@ -1020,10 +1040,14 @@ den i `data/kuponger.json` under `samtal`, med `gang` – vilka som tippar). Tip
 KV-bindningen `KUPONG`, inte på GitHub: `samtal:aktuellt` (omgången),
 `samtal:<id>:tips:<vem>` (en nyckel per person, så att två som lämnar in samtidigt inte
 skriver över varandra) och `samtal:<id>` (en tidigare omgång, sparad när nästa startas).
-`GET /samtal` ger omgången och vem som lämnat in – tipsen bara när de visas för alla.
-`POST /samtal` med kodordet: `starta`, `matcher`, `tips`, `se` och `mina` (ens egna tips
-till en annan enhet). `tips` svarar med en slumpad nyckel som sidan sparar på enheten; med
-den ger `se` allas inlämnade tips.
+`GET /samtal` ger omgången och vem som lämnat in – tipsen bara när de visas för alla – och
+`forra`, omgången före, om dess tips visades när den ersattes (`samtal:forra`; så att
+bygget hinner spara den i tipparhistoriken). `POST /samtal` med kodordet: `starta`,
+`matcher`, `tips` och `se`. `tips` skickar med omgångens matcher som sidan visade dem
+(ändrade matcher → 409 med `andrade`) och svarar med en slumpad nyckel som sidan sparar på
+enheten; med den ger `se` allas inlämnade tips. Tjänsten lämnar aldrig ut någons tips med
+bara kodordet och namnet – kodordet är gemensamt, så nyckeln är det som hindrar att man
+tittar innan man själv har lämnat in.
 Samma spärr för fel kodord som kupongen. Lokalt: med `KUPONG_KOD` i `.env` finns
 `/api/samtal`, som sparar i `data/cache/samtal/` (eller `SAMTAL_DIR`).
 
@@ -1157,7 +1181,9 @@ en omgång räknas hela omgången bort, med *Visa ändå*.
 avgjord fylls resultatet efter 90 minuter och modellens prognos före avspark i, och
 omgången får `klar`. Sedan ändras den aldrig. Eftersom tipsen sparas redan när de visas
 finns omgången kvar även om nästa omgång startas innan sista matchen är spelad –
-resultaten tas ur sajtens egna matcher, inte ur tjänsten.
+resultaten tas ur sajtens egna matcher, inte ur tjänsten. Startas nästa omgång innan något
+bygge hunnit se tipsen ger `GET …/samtal` den ändå, som `forra`, tills omgången därefter
+startas. En omgång som ersattes innan tipsen visades räknas inte.
 
 ```json
 {

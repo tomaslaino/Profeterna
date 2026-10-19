@@ -70,7 +70,8 @@ const UPDATE_EVERY_MINUTES = 30;
 // annars adressen (lokalt '/api/analyze', se server.js).
 // couponEndpoint: Spara-knappen för kupongen – undefined = enligt
 // config/kupong.js, null = ingen (bara GitHub-länken), annars adressen.
-// samtal: omgången ur GET …/samtal (hämtas av build() med --journal).
+// samtal: omgången och den förra ur GET …/samtal (hämtas av build() med
+// --journal, src/tippare.js).
 function writeSite(outDir = OUT, { journal = false, analysisEndpoint, couponEndpoint, samtal = null } = {}) {
   const tmp = `${outDir}.tmp`;
   fs.rmSync(tmp, { recursive: true, force: true });

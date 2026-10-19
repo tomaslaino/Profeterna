@@ -7,7 +7,9 @@
 // alla har lämnat in (eller samtalet börjar, senast när första matchen
 // startar) ser alla allt. Sidan blir underlaget för telefonsamtalet:
 // matcherna sorteras efter hur oeniga vi är, och gängets kupong växer fram
-// när man trycker på rutorna. Den sparas sedan som vanligt (Ny kupong → Spara).
+// när man trycker på rutorna. Den sparas direkt därifrån med kodordet
+// (postCoupon i kupong.js, samma som Ny kupong → Spara) – eller öppnas i Ny
+// kupong med tecknen ifyllda, för namn, anteckningar eller fler matcher.
 //
 //   #kupong                  omgången medan den fylls i och tills gängets kupong är gjord
 //   #kupong/samtal           samma vy, också efteråt (Allas tips)
@@ -34,7 +36,7 @@
     comp: 'all',
     only: false,
     draft: null, // dina tips: {id, vem, tecken, kommentarer, inne, nyckel}
-    again: false, // Gör kupongen trots matcher utan tecken
+    again: false, // Spara gängets kupong trots matcher utan tecken
   };
   const VEM = 'profeterna.samtal.vem';
   const TIPS = 'profeterna.samtal.tips';
@@ -117,15 +119,24 @@
     return { ...out, ok: false, status: res && res.status, error: out.error || 'Ingen kontakt med servern.' };
   }
 
-  // Ritar om när omgången ändrats, t.ex. när någon lämnat in.
+  // Frågar tjänsten var 20:e sekund och ritar om när omgången ändrats, t.ex.
+  // när någon lämnat in – under Omgången, och på förstasidan medan tipsen
+  // lämnas in. Slutar när man lämnar sidorna.
+  const onHome = () => Boolean(KP.view && KP.view.mode === 'home' && !$('#home-section').hidden);
   function poll() {
-    clearInterval(SM.timer);
+    if (SM.timer) return;
     SM.timer = setInterval(async () => {
-      if (!here('')) { clearInterval(SM.timer); return; }
-      if (document.hidden) return;
+      if (!here('') && !onHome()) {
+        clearInterval(SM.timer);
+        SM.timer = null;
+        return;
+      }
+      if (document.hidden || (!here('') && !(SM.data && !SM.data.visas))) return;
       const before = JSON.stringify(SM.data);
       await load();
-      if (here('') && JSON.stringify(SM.data) !== before) renderRound();
+      if (JSON.stringify(SM.data) === before) return;
+      if (here('')) renderRound();
+      else if (onHome()) redraw();
     }, POLL_MS);
   }
 
@@ -178,6 +189,8 @@
   function renderRound() {
     const el = $('#coupon');
     const s = SM.data;
+    // Ett påbörjat kodord står kvar när rutan ritas om (liveställningen).
+    const typed = $('#sm-kod') ? $('#sm-kod').value : '';
     let html = viewNav('omgang');
     if (s === undefined || (SM.error && !s)) {
       el.innerHTML = html + `<p class="empty">Kunde inte läsa omgången (${esc(SM.error || 'okänt fel')}).</p>`;
@@ -198,6 +211,7 @@
     // Gängets kuponger som spelas under tiden, t.ex. veckans matcher.
     html += openCoupons();
     el.innerHTML = html;
+    if (typed && $('#sm-kod')) $('#sm-kod').value = typed;
     wire(s);
   }
 
@@ -286,12 +300,17 @@
   ];
   const groupName = (k, s) => GROUPS[k][0] || (s.gang.length === 3 ? 'Två mot en' : 'Delade meningar');
 
-  // Gängets tecken under samtalet, på enheten. Börjar som förslaget.
+  // Gängets tecken under samtalet, på enheten. Tills man själv har tryckt på
+  // rutorna (own) följer de gängets kupong, om den redan är sparad (t.ex. på
+  // en annan enhet), annars förslaget.
+  const proposal = (rows) => Object.fromEntries(rows.filter((r) => r.proposal).map((r) => [r.x.id, r.proposal]));
   function decisions(s, rows) {
     const saved = kpLoad(DECIDE);
-    if (saved && saved.id === s.id && saved.val) return saved.val;
-    const val = {};
-    for (const r of rows) if (r.proposal) val[r.x.id] = r.proposal;
+    const c = existing(s);
+    if (saved && saved.id === s.id && saved.val && (saved.own || !c)) return saved.val;
+    const val = c
+      ? Object.fromEntries(c.matches.filter((x) => rows.some((r) => r.x.id === x.id)).map((x) => [x.id, x.sign]))
+      : proposal(rows);
     kpStore(DECIDE, { id: s.id, val });
     return val;
   }
@@ -338,14 +357,32 @@
     const chosen = ordered.map((r) => val[r.x.id] || '');
     const done = chosen.filter(Boolean);
     const gard = done.filter((x) => x.length > 1).length;
+    // Med tjänsten sparas gängets kupong direkt härifrån; Justera först
+    // öppnar den i Ny kupong (eller Ändra) med tecknen ifyllda.
+    const direct = Boolean(KP.data && KP.data.save);
+    const made = existing(s);
+    const same = made && savedAsIs(made, rows, val);
+    const label = direct ? (same ? 'Sparad' : made ? 'Spara ändringen' : 'Spara gängets kupong')
+      : made ? 'Ändra gängets kupong' : 'Gör gängets kupong';
     html += '<div class="kp-bar sm-bar">' +
       `<span class="kp-bar-txt"><b>Gängets kupong</b> · ${done.length} av ${rows.length} klara` +
-      `${gard ? ` · ${plural(gard, 'gardering', 'garderingar')}` : ''} · <b>${rader(done)}</b> ${rader(done) === 1 ? 'rad' : 'rader'}</span>` +
+      `${gard ? ` · ${plural(gard, 'gardering', 'garderingar')}` : ''} · <b>${rader(done)}</b> ${rader(done) === 1 ? 'rad' : 'rader'}` +
+      `${same ? ' · <a href="#kupong">sparad</a>' : ''}</span>` +
       '<span class="sm-slots" aria-hidden="true">' + chosen.map((x) => `<i${x ? ' class="set"' : ''}>${x || '?'}</i>`).join('') + '</span>' +
       '<button type="button" class="kp-linkbtn" id="sm-reset" title="Gängets tecken som de flesta tippade">Börja om</button>' +
-      `<button type="button" class="kp-btn primary" id="sm-make">${existing(s) ? 'Ändra gängets kupong' : 'Gör gängets kupong'}</button>` +
+      (direct ? '<button type="button" class="kp-linkbtn" id="sm-adjust" title="Öppna kupongen med tecknen ifyllda – för namn, anteckningar eller fler matcher">Justera först</button>' +
+        (same ? '' : codeField()) : '') +
+      `<button type="button" class="kp-btn primary" id="sm-make"${same && direct ? ' disabled' : ''}>${label}</button>` +
       '<span class="sm-bar-msg" id="sm-msg" role="status"></span></div>';
     return html;
+  }
+
+  // Gängets kupong har redan tecknen som är valda här, i varje match som
+  // inte har startat.
+  function savedAsIs(c, rows, val) {
+    const now = Date.now();
+    const on = new Map(c.matches.map((x) => [x.id, x.sign]));
+    return rows.filter((r) => isOpen(r.m, now)).every((r) => (val[r.x.id] || '') === (on.get(r.x.id) || ''));
   }
 
   function boardRow(r, chosen, s) {
@@ -371,31 +408,32 @@
       }).join('') + '</div>';
   }
 
-  // Gängets kupong för omgångens matcher, om den redan finns och inte är
-  // färdigspelad – då ändras den i stället för att en ny görs.
+  // Gängets kupong för omgångens matcher – den som har flest av dem – om den
+  // finns, också när alla dess matcher har startat (då är omgångens kupong
+  // gjord, och underlaget ska inte be om den igen). Sparas gängets kupong på
+  // nytt ändras den i stället för att en till görs.
   function existing(s) {
     const ids = new Set(s.matcher.map((x) => x.id));
-    return allCoupons().find((c) => c.matches.some((x) => ids.has(x.id)) && gradeCoupon(c).rows.some((r) => r.state === 'upcoming')) || null;
+    let best = null;
+    let most = 0;
+    for (const c of allCoupons()) {
+      const n = c.matches.filter((x) => ids.has(x.id)).length;
+      if (n > most) {
+        best = c;
+        most = n;
+      }
+    }
+    return best;
   }
 
-  // Gängets tecken blir ett utkast i Ny kupong (eller Ändra), där kupongen
-  // sparas som vanligt.
-  function makeCoupon(s) {
+  // Gängets tecken som utkast till gängets kupong: en ändring av den om den
+  // finns (startade matcher står kvar som de är), annars en ny. Matcher som
+  // inte startat och saknar tecken kommer inte med.
+  function gangDraft(s) {
     const rows = analyse(s);
     const val = decisions(s, rows);
     const now = Date.now();
     const open = rows.filter((r) => isOpen(r.m, now));
-    const undecided = open.filter((r) => !val[r.x.id]).length;
-    if (!open.length) {
-      $('#sm-msg').innerHTML = '<span class="note">Alla matcher har startat.</span>';
-      return;
-    }
-    if (undecided && !SM.again) {
-      SM.again = true;
-      $('#sm-msg').innerHTML = `<span class="note">${undecided === 1 ? 'En match saknar' : `${undecided} matcher saknar`} tecken och kommer inte med. Tryck igen för att fortsätta ändå.</span>`;
-      return;
-    }
-    SM.again = false;
     const c = existing(s);
     const d = newDraft(c ? c.id : null);
     for (const r of open) {
@@ -405,9 +443,98 @@
         delete d.notes[r.x.id];
       }
     }
-    kpStore(KP_DRAFT, d);
-    KP.onlyPicked = true;
-    location.hash = c ? `kupong/andra/${c.id}` : 'kupong/ny';
+    return { d, c, open, undecided: open.filter((r) => !val[r.x.id]).length };
+  }
+
+  const SAVED = 'Gängets kupong är sparad. Den syns för alla när sajten har uppdaterats, om några minuter.';
+  // Efter sparat visar Omgången gängets kupong.
+  function toCoupon() {
+    KP.flash = SAVED;
+    if (location.hash === '#kupong') showCoupon('');
+    else location.hash = 'kupong';
+  }
+
+  // Spara gängets kupong. Med tjänsten direkt härifrån, med kodordet på
+  // enheten (eller fältet bredvid knappen). Utan tjänsten – eller med
+  // Justera först (adjust) – öppnas Ny kupong (eller Ändra) med tecknen
+  // ifyllda, och kupongen sparas där.
+  async function makeCoupon(s, { adjust = false } = {}) {
+    const msg = (h) => { $('#sm-msg').innerHTML = h; };
+    const { d, c, open, undecided } = gangDraft(s);
+    if (!open.length) {
+      msg('<span class="note">Alla matcher har startat.</span>');
+      return;
+    }
+    const ctx = couponCtx(d);
+    if (!ctx) {
+      msg('<span class="note">Tryck på rutorna för gängets tecken först.</span>');
+      return;
+    }
+    if (!adjust && undecided && !SM.again) {
+      SM.again = true;
+      msg(`<span class="note">${undecided === 1 ? 'En match saknar' : `${undecided} matcher saknar`} tecken och kommer inte med. Tryck igen för att spara ändå.</span>`);
+      return;
+    }
+    SM.again = false;
+    if (adjust || !(KP.data && KP.data.save)) {
+      kpStore(KP_DRAFT, d);
+      KP.onlyPicked = true;
+      location.hash = c ? `kupong/andra/${c.id}` : 'kupong/ny';
+      return;
+    }
+    const field = $('#sm-kod');
+    const code = field ? field.value : kpLoad(KP_CODE);
+    if (!code) {
+      if (!field) $('#sm-make').insertAdjacentHTML('beforebegin', codeField());
+      msg('Skriv kodordet.');
+      $('#sm-kod').focus();
+      return;
+    }
+    const btn = $('#sm-make');
+    btn.disabled = true;
+    msg('Sparar …');
+    const r = await postCoupon(ctx, code);
+    if (!here('')) return;
+    btn.disabled = false;
+    if (r.ok) {
+      toCoupon();
+      return;
+    }
+    if (r.code) {
+      if (!$('#sm-kod')) $('#sm-make').insertAdjacentHTML('beforebegin', codeField());
+      msg('<span class="note">Fel kodord.</span>');
+      $('#sm-kod').focus();
+      return;
+    }
+    // Någon annan hann före. Är det gängets kupong för omgången (någon annan
+    // sparade eller ändrade den samtidigt) går det att spara de här tecknen
+    // över den – annars som en kupong till för samma dag.
+    if (r.changed || r.taken) {
+      const ours = covers(r.other);
+      msg(`<span class="note">${esc(ours ? 'Någon annan har just sparat gängets kupong.' : r.error)}</span> ` +
+        `<a href="#kupong/${esc(r.other.id)}">Visa den</a> · ` +
+        `<button type="button" class="kp-linkbtn" id="sm-over">${ours ? 'Spara våra tecken över den' : 'Spara ändå, som en kupong till'}</button>`);
+      $('#sm-over').addEventListener('click', async () => {
+        if (ours) {
+          SM.again = true; // frågan om matcher utan tecken är redan besvarad
+          makeCoupon(s);
+          return;
+        }
+        msg('Sparar …');
+        const again = await postCoupon({ ...ctx, anyway: true }, code);
+        if (!here('')) return;
+        if (again.ok) toCoupon();
+        else msg(`<span class="note">${esc(again.error)}</span>`);
+      });
+      return;
+    }
+    if (!r.offline) {
+      msg(`<span class="note">${esc(r.error)}</span>`);
+      return;
+    }
+    // Tjänsten kan inte spara just nu: Ny kupong har GitHub-vägen.
+    msg(`<span class="note">${esc(r.error)}</span> <button type="button" class="kp-linkbtn" id="sm-via">Spara via Ny kupong i stället</button>`);
+    $('#sm-via').addEventListener('click', () => makeCoupon(s, { adjust: true }));
   }
 
   function wire(s) {
@@ -424,7 +551,7 @@
         const b = e.target.closest('button[data-s]');
         if (!b || b.disabled) return;
         const id = b.closest('[data-id]').dataset.id;
-        const saved = kpLoad(DECIDE) || { id: s.id, val: {} };
+        const saved = { id: s.id, val: { ...decisions(s, analyse(s)) }, own: true };
         const cur = saved.val[id] || '';
         const next = SIGNS.filter((x) => (x === b.dataset.s ? !cur.includes(x) : cur.includes(x))).join('');
         if (next) saved.val[id] = next;
@@ -434,11 +561,15 @@
         renderRound();
       });
     }
+    // Börja om: tecknen som fler än hälften har med.
     $('#sm-reset').addEventListener('click', () => {
-      kpStore(DECIDE, null);
+      kpStore(DECIDE, { id: s.id, val: proposal(analyse(s)), own: true });
+      SM.again = false;
       renderRound();
     });
     $('#sm-make').addEventListener('click', () => makeCoupon(s));
+    const adjust = $('#sm-adjust');
+    if (adjust) adjust.addEventListener('click', () => makeCoupon(s, { adjust: true }));
   }
 
   // ---------- dina tips ----------
@@ -561,6 +692,7 @@
       gor: 'tips',
       id: s.id,
       vem: d.vem,
+      matcher: s.matcher.map((x) => x.id),
       tecken: Object.fromEntries(s.matcher.map((x) => [x.id, d.tecken[x.id]])),
       kommentarer: Object.fromEntries(s.matcher.filter((x) => (d.kommentarer[x.id] || '').trim()).map((x) => [x.id, d.kommentarer[x.id].trim()])),
     });
@@ -573,6 +705,13 @@
     }
     if (out.code) {
       renderTips().then(() => msg('<span class="note">Fel kodord.</span>'));
+      return;
+    }
+    // Matcherna har ändrats sedan sidan visade dem: de nya visas, med dina
+    // tecken kvar i matcherna som fortfarande är med.
+    if (out.andrade && SM.data && SM.data.id === s.id) {
+      await renderTips();
+      $('#sm-msg').innerHTML = `<span class="note">${esc(out.error)}</span>`;
       return;
     }
     msg(`<span class="note">${esc(out.error)}</span>` + (out.status === 409 ? ' <a href="#kupong">Till omgången</a>' : ''));
@@ -759,5 +898,13 @@
     if (KP.view && KP.view.mode === 'home') redraw();
   })();
 
-  window.Samtal = { show, load, active, covers, teaser, redraw: () => { if (here('')) renderRound(); } };
+  // Omgångens matcher (liveställningen i kupong.js hämtar dem också), om
+  // allas tips visas, gängets kupong ur omgången och bevakningen av
+  // förstasidans ruta.
+  const ids = () => (SM.data ? SM.data.matcher.map((x) => x.id) : []);
+  const visible = () => Boolean(SM.data && SM.data.visas);
+  const made = () => (SM.data && SM.data.visas ? existing(SM.data) : null);
+  const watch = () => { if (active() && !SM.data.visas) poll(); };
+
+  window.Samtal = { show, load, active, covers, teaser, ids, visible, made, watch, redraw: () => { if (here('')) renderRound(); } };
 })();

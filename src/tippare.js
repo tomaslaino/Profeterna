@@ -22,8 +22,10 @@
 //   }
 //
 // Omgången skrivs in när tipsen visas för alla – då kan de inte längre
-// ändras – med matcherna och var och ens tecken. När varje match är avgjord
-// fylls resultatet efter 90 minuter och modellens prognos före avspark (1 · X ·
+// ändras – med matcherna och var och ens tecken. GET …/samtal ger också den
+// förra omgången (forra) om dess tips visades, så att en omgång som ersätts
+// av nästa innan ett bygge hunnit se den ändå kommer med. När varje match är
+// avgjord fylls resultatet efter 90 minuter och modellens prognos före avspark (1 · X ·
 // 2 i hela procent, journalen om den finns, annars sajtens prognos) i, och
 // omgången får "klar". Sedan ändras den aldrig. Så finns omgången kvar även om
 // nästa startas innan sista matchen är spelad. "slut" visar förlängning och
@@ -223,16 +225,22 @@ function summarize(r) {
 
 // ---------- bygget ----------
 
-// samtal: omgången ur GET …/samtal (eller null). Med freeze (bygget på
-// GitHub Actions) skrivs nya omgångar och färdiga resultat in i filen.
-// Tillbaka: de avslutade omgångarna för sidan, nyaste först.
+// samtal: omgången ur GET …/samtal, eller en lista med den och den förra
+// (fetchSamtal), eller null. Med freeze (bygget på GitHub Actions) skrivs nya
+// omgångar och färdiga resultat in i filen. Tillbaka: de avslutade
+// omgångarna för sidan, nyaste först.
 function buildTippare({ samtal = null, matches = [], freeze = false, file = FILE, now = Date.now() } = {}) {
   const h = readRounds(file);
   const byId = new Map(matches.map((m) => [String(m.id), m]));
   const known = new Set(h.raw.map((r) => r && String(r.id || '')));
   const added = [];
-  const fresh = entryFromSamtal(samtal);
-  if (fresh && !known.has(fresh.id)) added.push(fresh);
+  for (const s of [].concat(samtal || [])) {
+    const fresh = entryFromSamtal(s);
+    if (fresh && !known.has(fresh.id)) {
+      known.add(fresh.id);
+      added.push(fresh);
+    }
+  }
   // Omgångar som väntar på resultat fylls i när alla matcher är avgjorda.
   const valid = new Set([...h.rounds, ...added]);
   const done = [];
@@ -261,8 +269,9 @@ function buildTippare({ samtal = null, matches = [], freeze = false, file = FILE
   };
 }
 
-// GET …/samtal → omgången, eller null om tjänsten inte svarar. Ett fel
-// stoppar inget – nästa bygge försöker igen.
+// GET …/samtal → omgången och den förra (om dess tips visades), som en
+// lista, eller null om tjänsten inte svarar. Ett fel stoppar inget – nästa
+// bygge försöker igen.
 async function fetchSamtal(endpoint, { fetchImpl = fetch, log = console.log } = {}) {
   if (!endpoint || !/^https?:/.test(endpoint)) return null;
   try {
@@ -272,7 +281,7 @@ async function fetchSamtal(endpoint, { fetchImpl = fetch, log = console.log } = 
       log(`[tippare] samtalet: ${(j && j.error) || `HTTP ${res.status}`}`);
       return null;
     }
-    return j.samtal || null;
+    return [j.samtal, j.forra].filter(Boolean);
   } catch (err) {
     log(`[tippare] samtalet: ${err.message || err}`);
     return null;

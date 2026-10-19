@@ -29,6 +29,7 @@ const KP = {
   comp: 'all',
   onlyPicked: false,
   allDays: false, // Ny kupong: alla PICK_DAYS dagar, inte bara närmaste omgången
+  flash: null, // en rad överst i kupongvyn nästa gång den ritas (t.ex. "sparad")
 };
 const SIGNS = ['1', 'X', '2'];
 const LIVE_EVERY_MS = 60000;
@@ -217,9 +218,12 @@ function gradeCoupon(c, now = Date.now()) {
   return g;
 }
 
-// Omgångens kupong (förstasidan och Kupong → Omgången): den som pågår,
-// annars nästa, annars den som spelades färdigt senast.
+// Omgångens kupong (förstasidan och Kupong → Omgången): gängets kupong ur
+// omgången som alla tippade (samtal.js) tills den är färdigspelad, annars den
+// som pågår, annars nästa, annars den som spelades färdigt senast.
 function currentCoupon(now = Date.now()) {
+  const made = hasSamtal() ? Samtal.made() : null;
+  if (made && !gradeCoupon(made, now).done) return made;
   const graded = allCoupons().map((c) => ({ c, g: gradeCoupon(c, now) })).filter((x) => x.g.first);
   const running = graded.filter((x) => x.g.started && !x.g.done).sort((a, b) => b.g.first - a.g.first);
   if (running.length) return running[0].c;
@@ -236,17 +240,18 @@ function espnCode(comp) {
   return (c && c.espn) || ESPN_CODE[comp] || null;
 }
 
-// Matcher på kupongerna som pågår enligt spelprogrammet men inte är klara i
-// matches.json.
+// Matcher på kupongerna – och i omgången som gänget tippar (samtal.js), också
+// innan gängets kupong finns – som pågår enligt spelprogrammet men inte är
+// klara i matches.json.
 function liveNeeded(now = Date.now()) {
+  const ids = new Set(allCoupons().flatMap((c) => c.matches.map((x) => x.id)));
+  if (window.Samtal) for (const id of Samtal.ids()) ids.add(id);
   const out = [];
-  for (const c of allCoupons()) {
-    for (const x of c.matches) {
-      const m = matchById(x.id);
-      if (!m || m.completed || OFF.test(m.status || '')) continue;
-      const t = new Date(m.kickoff).getTime();
-      if (t <= now + 2 * 60000 && t >= now - 5 * 3600000) out.push(m);
-    }
+  for (const id of ids) {
+    const m = matchById(id);
+    if (!m || m.completed || OFF.test(m.status || '')) continue;
+    const t = new Date(m.kickoff).getTime();
+    if (t <= now + 2 * 60000 && t >= now - 5 * 3600000) out.push(m);
   }
   return out;
 }
@@ -445,7 +450,9 @@ function renderCouponShow(id) {
   const all = allCoupons();
   const graded = all.map((c) => ({ c, g: gradeCoupon(c) })).sort((a, b) => (b.g.first || 0) - (a.g.first || 0));
   if (!graded.length) {
-    el.innerHTML = viewNav('omgang') + roundSteps(1) + emptyCard() + couponErrors();
+    // Omgångens tips finns kvar att titta på, också utan gängets kupong.
+    el.innerHTML = viewNav('omgang') + roundSteps(1) + emptyCard() +
+      (!id && hasSamtal() && Samtal.visible() ? '<p class="legend"><a href="#kupong/samtal">Förra omgångens tips</a></p>' : '') + couponErrors();
     return;
   }
   const curId = id || (currentCoupon() || {}).id;
@@ -461,16 +468,23 @@ function renderCouponShow(id) {
   // Gängets kupong ur omgången som alla tippade: sista steget, och allas tips
   // finns kvar att titta på.
   const fromTips = round && hasSamtal() && Samtal.covers(c);
+  // Allas tips går att se så länge omgången finns – också om gängets kupong
+  // inte gjordes ur den.
+  const tipsLink = round && hasSamtal() && Samtal.visible();
   let html = viewNav(round ? 'omgang' : null) + (fromTips ? roundSteps(g.done ? 5 : 4) : '') + '<div class="kp-head"><div>' +
     `<p class="kp-eyebrow">${esc(c.name || 'Kupong')}${c.pending ? ' <span class="kp-tag">väntar på GitHub</span>' : ''}</p>` +
     `<h2 class="page-title">${esc(dateRange(g.first, g.last))}</h2></div><div class="kp-actions">` +
-    (fromTips ? '<a class="kp-btn" href="#kupong/samtal">Allas tips</a>' : '') +
+    (tipsLink ? '<a class="kp-btn" href="#kupong/samtal">Allas tips</a>' : '') +
     (canEdit ? `<a class="kp-btn" href="#kupong/andra/${esc(c.id)}">Ändra</a>` : '') +
     // En färdigspelad står kvar i historiken och tas inte bort.
     (g.done ? '' : `<a class="kp-btn" href="#kupong/bort/${esc(c.id)}">Ta bort</a>`) +
     (g.done && !c.pending ? `<a class="kp-btn" href="#kupong/historik/${esc(c.id)}">Betyg och kommentar</a>` : '') +
     (round && g.done ? '' : `<a class="kp-btn primary" href="${newCouponHref()}">+ Ny kupong</a>`) + '</div></div>';
 
+  if (KP.flash) {
+    html += `<p class="legend kp-flash" role="status">${esc(KP.flash)}</p>`;
+    KP.flash = null;
+  }
   html += summaryCard(g);
   // Färdigspelad även om spoilerskyddet döljer resultaten (g.done).
   if (round && g.done) html += `<a class="kp-next" href="${newCouponHref()}"><span aria-hidden="true">+</span> Skapa ny kupong</a>`;
@@ -520,8 +534,10 @@ async function showHome() {
 
 function renderHome() {
   const c = currentCoupon();
-  // Pågår en omgång inför samtalet står den överst (samtal.js).
+  // Pågår en omgång inför samtalet står den överst (samtal.js), och rutan
+  // ritas om när någon lämnar in.
   const samtal = samtalTeaser();
+  if (samtal) Samtal.watch();
   $('#home').innerHTML = samtal + (c ? teaser(c, gradeCoupon(c)) : samtal ? '' : emptyCard());
 }
 
@@ -852,9 +868,9 @@ function renderPickList() {
   updateBar();
 }
 
-function draftMatches() {
-  return Object.entries(KP.draft.picks)
-    .map(([id, sign]) => ({ id, sign, note: ((KP.draft.notes || {})[id] || '').trim().slice(0, NOTE_MAX), m: matchById(id) }))
+function draftMatches(d = KP.draft) {
+  return Object.entries(d.picks)
+    .map(([id, sign]) => ({ id, sign, note: ((d.notes || {})[id] || '').trim().slice(0, NOTE_MAX), m: matchById(id) }))
     .filter((x) => x.m);
 }
 
@@ -898,12 +914,24 @@ async function saveCoupon() {
     renderPickList();
     return;
   }
-  const sel = draftMatches();
-  if (!sel.length && !KP.draft.locked.length) {
+  const ctx = couponCtx(KP.draft);
+  if (!ctx) {
     $('#kp-bar-txt').innerHTML = '<span class="note">Välj minst en match</span>';
     return;
   }
-  const d = KP.draft;
+  KP.view = { mode: 'saved', id: ctx.id };
+  if (KP.data.save) renderDirect(ctx);
+  else renderViaGitHub(ctx);
+  window.scrollTo(0, 0);
+}
+
+// Utkastet → det som sparas: filen, raderna och kupongen som sidan visar
+// den. En ny kupong får första lediga id från datumet för första matchen.
+// null om ingen match är vald. Används också av samtalsunderlaget, som
+// sparar gängets kupong direkt (samtal.js).
+function couponCtx(d) {
+  const sel = draftMatches(d);
+  if (!sel.length && !d.locked.length) return null;
   let id = d.edit;
   if (!id) {
     const first = sel.map((x) => x.m.kickoff).sort()[0];
@@ -925,15 +953,11 @@ async function saveCoupon() {
     ...(d.edit ? { 'ändrad': new Date().toISOString() } : {}),
     matcher: rows,
   };
-  const ctx = {
+  return {
     id, edit: d.edit, base: d.base || null, name, rows, file,
     range: dateRange(kick(rows[0]) || null, kick(rows[rows.length - 1]) || null),
     coupon: { id, name: name || null, created: file.skapad, matches: rows.map((r) => ({ id: r.id, sign: r.tecken, label: r.match, ...(r.kommentar ? { note: r.kommentar } : {}) })) },
   };
-  KP.view = { mode: 'saved', id };
-  if (KP.data.save) renderDirect(ctx);
-  else renderViaGitHub(ctx);
-  window.scrollTo(0, 0);
 }
 
 const KP_CODE = 'profeterna.kupong.kod';
@@ -959,14 +983,20 @@ function renderDirect(ctx) {
   else $('#kp-kod').focus();
 }
 
-async function sendDirect(ctx) {
-  const msg = (h) => { $('#kp-msg').innerHTML = h; };
-  const btn = $('#kp-send');
-  const code = $('#kp-kod').value;
-  if (!code) { msg('Skriv kodordet.'); return; }
-  btn.disabled = true;
-  msg('Sparar …');
-  let res;
+// Skickar kupongen till tjänsten med kodordet. Tillbaka:
+//   {ok, coupon, commit}        sparad – och visas här tills bygget publicerat den
+//   {code}                      fel kodord (det sparade glöms)
+//   {other, changed | taken}    någon annan hann före: changed = kupongen har
+//                               ändrats sedan versionen ändringen utgick från,
+//                               taken = en kupong som sidan inte kände till har
+//                               sparats för samma dag. other visas här tills
+//                               bygget publicerat den, och sparas inte över
+//                               utan att man sett den.
+//   {error, offline}            tjänsten kan inte spara just nu (inte påslaget,
+//                               GitHub svarar inte, ingen kontakt) – GitHub-vägen
+//                               finns kvar; utan offline: kupongen har fel e.d.
+async function postCoupon(ctx, code) {
+  let res = null;
   let body = {};
   try {
     res = await fetch(KP.data.save, {
@@ -984,32 +1014,56 @@ async function sendDirect(ctx) {
   } catch {
     res = null;
   }
-  btn.disabled = false;
   if (res && res.ok && body.ok) {
     kpStore(KP_CODE, code);
     const coupon = { ...ctx.coupon, id: body.id || ctx.id, created: body.skapad || ctx.coupon.created, sha: body.sha || null };
     setPending(coupon, ctx.edit ? ctx.base : null);
-    kpStore(KP_DRAFT, null);
-    KP.view = { mode: 'saved', id: coupon.id };
-    $('#coupon').innerHTML = savedHead('Sparad', ctx) +
-      '<div class="card kp-saved"><p>Kupongen är sparad. Den syns för alla när sajten har uppdaterats, om några minuter.</p>' +
-      `<div class="kp-actions"><a class="kp-btn primary" href="#kupong/${esc(coupon.id)}">Visa kupongen</a>` +
-      (body.commit ? `<a class="kp-btn" href="${esc(body.commit)}" target="_blank" rel="noopener">Ändringen på GitHub</a>` : '') + '</div></div>';
-    return;
+    return { ok: true, coupon, commit: body.commit || null };
   }
   if (res && res.status === 403) {
     kpStore(KP_CODE, null);
+    return { code: true, error: 'Fel kodord.' };
+  }
+  const other = res && res.status === 409 ? fromStored(body.kupong) : null;
+  if (other && body.changed) {
+    setPending(other, ctx.base);
+    return { other, changed: true, error: body.error };
+  }
+  if (other && body.taken) {
+    setPending(other, null);
+    return { other, taken: true, error: body.error };
+  }
+  if (res && [400, 409, 429].includes(res.status)) return { error: body.error || 'Det gick inte att spara.' };
+  return { offline: true, error: (body && body.error) || 'Ingen kontakt med servern.' };
+}
+
+async function sendDirect(ctx) {
+  const msg = (h) => { $('#kp-msg').innerHTML = h; };
+  const btn = $('#kp-send');
+  const code = $('#kp-kod').value;
+  if (!code) { msg('Skriv kodordet.'); return; }
+  btn.disabled = true;
+  msg('Sparar …');
+  const r = await postCoupon(ctx, code);
+  btn.disabled = false;
+  if (r.ok) {
+    kpStore(KP_DRAFT, null);
+    KP.view = { mode: 'saved', id: r.coupon.id };
+    $('#coupon').innerHTML = savedHead('Sparad', ctx) +
+      '<div class="card kp-saved"><p>Kupongen är sparad. Den syns för alla när sajten har uppdaterats, om några minuter.</p>' +
+      `<div class="kp-actions"><a class="kp-btn primary" href="#kupong/${esc(r.coupon.id)}">Visa kupongen</a>` +
+      (r.commit ? `<a class="kp-btn" href="${esc(r.commit)}" target="_blank" rel="noopener">Ändringen på GitHub</a>` : '') + '</div></div>';
+    return;
+  }
+  if (r.code) {
     msg('<span class="note">Fel kodord.</span>');
     $('#kp-kod').select();
     return;
   }
-  // Någon annan hann före. Den versionen visas här tills bygget publicerat
-  // den, och utkastet finns kvar – men sparas inte över den utan att man sett
-  // den.
-  const other = res && res.status === 409 ? fromStored(body.kupong) : null;
-  if (other && body.changed) {
-    setPending(other, ctx.base);
-    msg(`<span class="note">${esc(body.error)}</span> ` +
+  // Någon annan hann före: utkastet finns kvar, men sparas inte över den
+  // andra versionen utan att man sett den.
+  if (r.changed) {
+    msg(`<span class="note">${esc(r.error)}</span> ` +
       `<button type="button" class="kp-linkbtn" id="kp-restart">Börja om från den nya versionen</button>`);
     $('#kp-restart').addEventListener('click', () => {
       kpStore(KP_DRAFT, null);
@@ -1017,20 +1071,17 @@ async function sendDirect(ctx) {
     });
     return;
   }
-  if (other && body.taken) {
-    setPending(other, null);
-    msg(`<span class="note">${esc(body.error)}</span> <a href="#kupong/${esc(other.id)}">Visa den</a> · ` +
+  if (r.taken) {
+    msg(`<span class="note">${esc(r.error)}</span> <a href="#kupong/${esc(r.other.id)}">Visa den</a> · ` +
       '<button type="button" class="kp-linkbtn" id="kp-anyway">Spara ändå, som en kupong till</button>');
     $('#kp-anyway').addEventListener('click', () => sendDirect({ ...ctx, anyway: true }));
     return;
   }
-  if (res && [400, 409, 429].includes(res.status)) {
-    msg(`<span class="note">${esc(body.error || 'Det gick inte att spara.')}</span>`);
+  if (!r.offline) {
+    msg(`<span class="note">${esc(r.error)}</span>`);
     return;
   }
-  // Proxyn kan inte spara just nu (inte påslaget, GitHub svarar inte, ingen
-  // kontakt) – GitHub-vägen finns kvar.
-  msg(`<span class="note">${esc((body && body.error) || 'Ingen kontakt med servern.')}</span> ` +
+  msg(`<span class="note">${esc(r.error)}</span> ` +
     '<button type="button" class="kp-linkbtn" id="kp-viagh2">Spara via GitHub i stället</button>');
   $('#kp-viagh2').addEventListener('click', () => renderViaGitHub(ctx));
 }

@@ -4,22 +4,27 @@
 // som inte har det ser inga. Då jämförs de på sidan (public/samtal.js) under
 // telefonsamtalet, och gängets kupong sparas som vanligt (worker/kupong.mjs).
 //
-//   GET  /samtal → {ok, samtal}   samtal = omgången som den ser ut för alla, eller null
+//   GET  /samtal → {ok, samtal, forra}   samtal = omgången som den ser ut för alla,
+//                 eller null; forra = omgången före den, om dess tips visades
+//                 när den ersattes (så att bygget hinner spara den i
+//                 tipparhistoriken, src/tippare.js)
 //   POST /samtal {kod, gor: "starta", matcher: [id], tid: ISO | null, ersatt: <id> | null}
 //                 ny omgång; tid = när samtalet börjar (valfritt). Pågår en
 //                 omgång (någon match har inte startat) krävs ersatt = dess id.
 //   POST /samtal {kod, gor: "matcher", id, matcher: [id]}   ändra omgångens
 //                 matcher – bara tills någon har lämnat in
-//   POST /samtal {kod, gor: "tips", id, vem, tecken: {<matchid>: "1X"}, kommentarer: {<matchid>: "…"}}
+//   POST /samtal {kod, gor: "tips", id, vem, matcher: [id], tecken: {<matchid>: "1X"}, kommentarer: {<matchid>: "…"}}
 //                 lämna in sina tips – ett tecken i varje match. Går inte att
-//                 ändra sedan. → {ok, samtal, nyckel}: samtal med de andras
+//                 ändra sedan. matcher = omgångens matcher som sidan visade
+//                 dem. → {ok, samtal, nyckel}: samtal med de andras
 //                 inlämnade tips; nyckel = ens bevis för att få se dem igen
 //   POST /samtal {kod, gor: "se", id, vem, nyckel} → {ok, samtal}   samtal med
 //                 allas inlämnade tips, för den som har lämnat in
-//   POST /samtal {kod, gor: "mina", id, vem} → {ok, tips}   ens egna tips, till en annan enhet
 //   → 400 fel i förfrågan · 403 fel kodord · 429 för många fel kodord
-//   → 409 omgången har bytts ({samtal}), man har redan lämnat in, se utan rätt
-//          nyckel, tipsen visas redan för alla, eller en omgång pågår ({finns: true, samtal})
+//   → 409 omgången har bytts ({samtal}), matcherna har ändrats sedan sidan
+//          visade dem ({samtal, andrade: true}), man har redan lämnat in, se
+//          utan rätt nyckel, tipsen visas redan för alla, eller en omgång
+//          pågår ({finns: true, samtal})
 //   → 503 inte påslaget (kodordet saknas) eller matcherna kan inte läsas
 //
 // Tipsen är dolda: GET ger bara vem som har lämnat in. Den som lämnar in får
@@ -28,7 +33,8 @@
 // eller första matchen har startat visas tipsen för alla, och sedan går
 // ingenting att lämna in eller ändra. Kodordet är gemensamt och vem man är
 // väljer man själv, så nyckeln – inte kodordet – är det som hindrar att
-// någon tittar på de andras tips innan den själv har lämnat in.
+// någon tittar på de andras tips innan den själv har lämnat in. Därför
+// lämnar tjänsten aldrig ut en persons tips med bara kodordet och namnet.
 //
 // Lagringen är en nyckel per omgång och en per person (så att två som lämnar
 // in samtidigt inte skriver över varandra): på Cloudflare KV-bindningen
@@ -36,6 +42,8 @@
 //   samtal:aktuellt                  omgången {id, skapad, tid, matcher: [{id, match, avspark}]}
 //   samtal:<id>:tips:<vem>           {inne, tecken, kommentarer, nyckel}
 //   samtal:<id>                      en tidigare omgång, sparad när nästa startades
+//   samtal:forra                     omgången före den aktuella, om dess tips
+//                                    visades när den ersattes (annars null)
 
 import { normSign, sameSecret } from './kupong.mjs';
 
@@ -48,6 +56,7 @@ const MATCH_ID = /^\d{1,12}$/;
 // Matcher som inte spelas (samma som worker/kupong.mjs).
 const OFF = /POSTPONED|CANCEL|ABANDON|SUSPEND/;
 const CURRENT = 'samtal:aktuellt';
+const PREVIOUS = 'samtal:forra';
 const tipsKey = (id, vem) => `samtal:${id}:tips:${vem}`;
 
 const text = (s, max) => String(s == null ? '' : s).replace(/\s+/g, ' ').trim().slice(0, max);
@@ -121,10 +130,13 @@ function roundMatches(list, matches, now) {
 // limiter: {count(), bump()} – valfri, samma spärr som kupongen.
 export async function getRound({ store, gang, now = () => new Date() }) {
   if (!store) return fail(503, 'Samtalet är inte påslaget.');
-  const round = await store.get(CURRENT);
-  if (!round) return { status: 200, body: { ok: true, samtal: null } };
-  const tips = await loadTips(store, round, gang);
-  return { status: 200, body: { ok: true, samtal: publicView(round, tips, gang, now().getTime()) } };
+  const ms = now().getTime();
+  const [round, prev] = await Promise.all([store.get(CURRENT), store.get(PREVIOUS)]);
+  const view = async (r) => (r ? publicView(r, await loadTips(store, r, gang), gang, ms) : null);
+  const [samtal, forra] = await Promise.all([view(round), view(prev)]);
+  // Den förra omgången bara om dess tips visas (de visades redan när den
+  // ersattes, så det gör de fortfarande).
+  return { status: 200, body: { ok: true, samtal, forra: forra && forra.visas ? forra : null } };
 }
 
 export async function postRound(body, { env, store, gang, loadMatches, limiter = null, now = () => new Date(), newId = randomId }) {
@@ -161,8 +173,14 @@ export async function postRound(body, { env, store, gang, loadMatches, limiter =
       matcher: v.rows,
     };
     // Den gamla omgången sparas under sitt id, så att tipsen går att para
-    // ihop med matcherna efteråt.
-    if (round) await store.put(`samtal:${round.id}`, round);
+    // ihop med matcherna efteråt. Visades dess tips står den också kvar i
+    // GET som den förra omgången tills nästa startas, så att bygget hinner
+    // spara den i tipparhistoriken. En omgång som ersattes innan tipsen
+    // visades räknas inte.
+    if (round) {
+      await store.put(`samtal:${round.id}`, round);
+      await store.put(PREVIOUS, shown(round, tips, gang, ms) ? round : null);
+    }
     await store.put(CURRENT, next);
     return ok({ samtal: publicView(next, {}, gang, ms) });
   }
@@ -173,12 +191,6 @@ export async function postRound(body, { env, store, gang, loadMatches, limiter =
     return fail(409, 'Omgången har bytts sedan du öppnade sidan.', { samtal: view() });
   }
   const vem = gang.find((g) => g.id === b.vem);
-
-  if (b.gor === 'mina') {
-    if (!vem) return fail(400, 'Okänd person.');
-    const own = tips[vem.id];
-    return ok({ tips: own ? { inne: own.inne, tecken: own.tecken, kommentarer: own.kommentarer || {} } : null });
-  }
 
   // Allas inlämnade tips, för den som själv har lämnat in (med nyckeln från
   // inlämningen).
@@ -208,6 +220,13 @@ export async function postRound(body, { env, store, gang, loadMatches, limiter =
   if (b.gor === 'tips') {
     if (!vem) return fail(400, 'Okänd person.');
     if (tips[vem.id]) return fail(409, 'Du har redan lämnat in, och tipsen går inte att ändra.', { samtal: view() });
+    // Matcherna har ändrats sedan sidan visade dem: sidan visar de nya.
+    if (Array.isArray(b.matcher)) {
+      const seen = new Set(b.matcher.map(String));
+      if (seen.size !== round.matcher.length || round.matcher.some((m) => !seen.has(m.id))) {
+        return fail(409, 'Matcherna har ändrats sedan du öppnade kupongen – tippa de nya och lämna in igen.', { samtal: view(), andrade: true });
+      }
+    }
     const raw = b.tecken && typeof b.tecken === 'object' ? b.tecken : {};
     const notes = b.kommentarer && typeof b.kommentarer === 'object' ? b.kommentarer : {};
     const tecken = {};
