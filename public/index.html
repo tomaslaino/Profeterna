@@ -29,8 +29,6 @@
             aria-controls="coupon-section" aria-selected="false">Kupong</button>
           <button type="button" role="tab" id="tab-matches" data-tab="matches-section"
             aria-controls="matches-section" aria-selected="false">Matcher</button>
-          <button type="button" role="tab" id="tab-eval" data-tab="eval-section"
-            aria-controls="eval-section" aria-selected="false">Utvärdering</button>
         </div>
         <a class="tab-link" href="tabeller.html">Tabeller</a>
         <a class="tab-link" href="statistik.html">Statistik</a>
@@ -80,11 +78,6 @@
       <div id="match-detail-view" hidden></div>
     </section>
 
-    <section id="eval-section" role="tabpanel" aria-labelledby="tab-eval" hidden>
-      <h2 class="page-title">Utvärdering</h2>
-      <div id="evaluation">Laddar …</div>
-    </section>
-
     <section id="sources-section" aria-label="Källor" hidden>
       <h2 class="page-title">Källor</h2>
       <p class="intro" id="sources-summary"></p>
@@ -94,9 +87,13 @@
       <p class="legend" id="unmapped"></p>
     </section>
 
-    <section id="model-section" aria-label="Modell" hidden>
+    <!-- Modell: hur prognoserna räknas och, sist, utvärderingen mot facit
+         (#modell och #utvardering) -->
+    <section id="model-section" aria-label="Modell och utvärdering" hidden>
       <h2 class="page-title">Modell</h2>
       <div id="model">Laddar …</div>
+      <h2 class="page-title eval-title" id="eval-title">Utvärdering</h2>
+      <div id="evaluation">Laddar …</div>
     </section>
   </main>
 

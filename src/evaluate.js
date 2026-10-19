@@ -48,7 +48,8 @@ const BASELINES = [
 
 // journal = readJournal(), matches = matchlistan (allMatches), predictions =
 // Map(id → dagens prognos; för spelade matcher den återskapade). Ger
-// rapporten till fliken Utvärdering och journalinfo per match till matchvyn.
+// rapporten till Utvärdering (sist på Modell-sidan) och journalinfo per match
+// till matchvyn.
 function evaluate(journal, matches, predictions) {
   const D = load();
   const rowsBy = byMatch(journal.rows);

@@ -75,8 +75,11 @@ function tiles(list) {
 
 // Metodtexten hopfälld, som ordlistan på Tabeller och Statistik: [term, html].
 function method(title, items) {
-  return `<details class="help dv-glossary"><summary>${esc(title)}</summary><dl>` +
-    items.filter(Boolean).map(([k, v]) => `<dt>${esc(k)}</dt><dd>${v}</dd>`).join('') + '</dl></details>';
+  return `<details class="help dv-glossary"><summary>${esc(title)}</summary>${defs(items)}</details>`;
+}
+// Samma lista utan egen vikning, för text som redan ligger i en.
+function defs(items) {
+  return '<dl class="dv-defs">' + items.filter(Boolean).map(([k, v]) => `<dt>${esc(k)}</dt><dd>${v}</dd>`).join('') + '</dl>';
 }
 
 // ---------- flikar och routning ----------
@@ -84,9 +87,10 @@ function method(title, items) {
 const TABS = {
   matcher: 'matches-section',
   kupong: 'coupon-section',
-  utvardering: 'eval-section',
   kallor: 'sources-section',
   modell: 'model-section',
+  // Utvärderingen ligger sist på Modell-sidan; gamla länkar hamnar där.
+  utvardering: 'model-section',
 };
 
 // Källor och Modell har ingen flik i toppbaren, bara länkar i sidfoten.
@@ -96,10 +100,10 @@ function showTab(sectionId) {
   for (const btn of document.querySelectorAll('[role="tab"]')) {
     btn.setAttribute('aria-selected', String(btn.dataset.tab === sectionId));
   }
-  if (sectionId === 'eval-section') loadEvaluation();
   if (sectionId === 'sources-section') loadSources();
-  if (sectionId === 'model-section') loadModel();
   window.scrollTo(0, 0);
+  // Modell-sidan: klar när både modellen och utvärderingen är ritade.
+  if (sectionId === 'model-section') return Promise.all([loadModel(), loadEvaluation()]);
 }
 
 function route() {
@@ -124,9 +128,10 @@ function route() {
     showHome();
     return;
   }
-  showTab(TABS[h]);
+  const loading = showTab(TABS[h]);
   $('#match-detail-view').hidden = true;
   $('#match-list-view').hidden = false;
+  if (h === 'utvardering') loading.then(() => $('#eval-title').scrollIntoView());
 }
 
 for (const btn of document.querySelectorAll('[role="tab"]')) {
@@ -377,11 +382,15 @@ function renderDetail(d) {
     return html + Spoiler.card({ title: 'Resultatet är dolt', text: 'Spoilerskyddet är på.', keys: [m.id], button: 'Visa resultatet' });
   }
 
-  if (m.completed && d.journal && d.journal.counted) html += journalCard(d);
-  html += forecastCard(d);
+  // Spelad match med prognos före avspark: den återskapade prognosen och dess
+  // jämförelse upprepar samma sak och visas bara med detaljerna.
+  const logged = m.completed && d.journal && d.journal.counted;
+  const detailOnly = (s) => (logged && s ? `<div class="src-only">${s}</div>` : s);
+  if (logged) html += journalCard(d);
+  html += detailOnly(forecastCard(d));
   html += analysisCard(d);
   if (d.prediction && d.prediction.status === 'ok') {
-    html += '<div class="grid2">' + compareCard(d) + stepsCard(d) + '</div>';
+    html += '<div class="grid2">' + detailOnly(compareCard(d)) + stepsCard(d) + '</div>';
   }
 
   html += '<h3 class="underlag">Underlag</h3>';
@@ -389,8 +398,8 @@ function renderDetail(d) {
   html += sideCard(d);
   html += '<div class="grid2">' + refereeCard(d) + squadCard(d) + '</div>';
   html += squadsSection(d);
-  html += '<div class="grid2">' + unknownCard(d) + '</div>';
-  html += '<p class="detail-foot"><button type="button" class="src-toggle" aria-pressed="false">Visa källor</button>' +
+  html += '<div class="grid2 src-only">' + unknownCard(d) + '</div>';
+  html += '<p class="detail-foot"><button type="button" class="src-toggle" aria-pressed="false">Visa detaljer</button>' +
     '<a href="#modell">Så fungerar modellen</a></p>';
   return html;
 }
@@ -494,6 +503,15 @@ function journalCard(d) {
     `<p class="fc-stats">${stats.join(' · ')}</p>${adv}${scores}${retro}${foot}</div>`;
 }
 
+// Baslinjernas namn på matchsidan, i klarspråk. Bokstäverna (a)–(c) som
+// Modell och Utvärdering använder står i källraden under namnet.
+const BASE = {
+  market: 'Spelbolagen',
+  closing: 'Spelbolagen vid avspark',
+  season: 'Bara årets mål',
+  naive: 'Ligasnittet',
+};
+
 // Prognosen och baslinjerna vid loggningen, rättade mot ställningen efter
 // 90 minuter. Stängningen är marknaden vid avspark (ligamatcher).
 function scoreTable(j, r, m) {
@@ -501,21 +519,21 @@ function scoreTable(j, r, m) {
   const mk = r.market;
   const lines = [
     ['<strong>Modellen</strong>', null, 'model', 'model'],
-    ['(c) Marknaden', mk ? `${esc(mk.source)}, ${esc(mk.kind)}${mk.fetchedAt ? `, hämtat ${when(mk.fetchedAt)}` : ''}` : 'okänt vid loggningen', 'market'],
-    ['Betfair Exchange, stängning', 'marknaden vid avspark', 'closing'],
-    ['(b) Säsongens mål', null, 'season'],
-    ['(a) Naiv', null, 'naive'],
+    [BASE.market, mk ? `(c) ${esc(mk.source)}, ${esc(mk.kind)}${mk.fetchedAt ? `, hämtat ${when(mk.fetchedAt)}` : ''}` : 'okänt vid loggningen', 'market'],
+    [BASE.closing, 'Betfair Exchange, marknaden vid avspark', 'closing'],
+    [BASE.season, null, 'season'],
+    [BASE.naive, null, 'naive'],
   ];
   const rows = lines.map(([label, sub, key, cls]) => {
     const s = j.scores[key];
     if (!s && key === 'closing') return '';
-    const head = `<td>${label}${sub ? `<span class="sub">${sub}</span>` : ''}</td>`;
+    const head = `<td>${label}${sub ? `<span class="sub src-sub">${sub}</span>` : ''}</td>`;
     if (!s) return `<tr>${head}<td colspan="5" class="num unknown">okänt</td></tr>`;
     return `<tr class="${cls || ''}">${head}${pct3(s.p).map((v, k) => `<td class="num${k === o ? ' hit' : ''}">${v}</td>`).join('')}` +
-      `<td class="num">${dec(s.logLoss, 2)}</td><td class="num">${dec(s.brier, 2)}</td></tr>`;
+      `<td class="num src-only">${dec(s.logLoss, 2)}</td><td class="num src-only">${dec(s.brier, 2)}</td></tr>`;
   }).join('');
   return `<table class="odds cmp facit"><thead><tr><th>Efter 90 min ${m.score90.home}–${m.score90.away}</th><th class="num">1</th><th class="num">X</th><th class="num">2</th>` +
-    `<th class="num">Log</th><th class="num">Brier</th></tr></thead><tbody>${rows}</tbody></table>`;
+    `<th class="num src-only">Log</th><th class="num src-only">Brier</th></tr></thead><tbody>${rows}</tbody></table>`;
 }
 
 function scoreGrid(p, m) {
@@ -539,14 +557,14 @@ function compareCard(d) {
   const p = d.prediction;
   const b = p.baselines;
   const rows = [];
-  const row = (label, sub, x, cls = '') => rows.push(`<tr class="${cls}"><td>${label}${sub ? `<span class="sub">${sub}</span>` : ''}</td>` +
+  const row = (label, sub, x, cls = '') => rows.push(`<tr class="${cls}"><td>${label}${sub ? `<span class="sub src-sub">${sub}</span>` : ''}</td>` +
     (x ? pct3(x).map((v) => `<td class="num">${v}</td>`).join('') : '<td colspan="3" class="num unknown">okänt</td>') + '</tr>');
   row('<strong>Modellen</strong>', null, p.p, 'model');
   const mk = b.market;
-  row('(c) Marknaden', mk ? `${esc(mk.source)}, ${esc(mk.kind)}${mk.fetchedAt ? `, hämtat ${when(mk.fetchedAt)}` : ''}` : esc(marketMissing(d)), mk && mk.p);
-  if (b.closing) row('Betfair Exchange, stängning', 'tuffaste referensen', b.closing.p);
-  row('(b) Säsongens mål', b.season.p ? `Poisson på årets matcher (${b.season.matches[0]} resp. ${b.season.matches[1]})` : esc(b.season.reason), b.season.p);
-  row('(a) Naiv', b.naive.p ? `${esc(b.naive.scope)}, ${esc(b.naive.seasons[0])}–${esc(b.naive.seasons[1])}` : esc(b.naive.reason), b.naive.p);
+  row(BASE.market, mk ? `(c) ${esc(mk.source)}, ${esc(mk.kind)}${mk.fetchedAt ? `, hämtat ${when(mk.fetchedAt)}` : ''}` : esc(marketMissing(d)), mk && mk.p);
+  if (b.closing) row(BASE.closing, 'Betfair Exchange, tuffaste referensen', b.closing.p);
+  row(BASE.season, b.season.p ? `(b) Poisson på årets matcher (${b.season.matches[0]} resp. ${b.season.matches[1]})` : esc(b.season.reason), b.season.p);
+  row(BASE.naive, b.naive.p ? `(a) ${esc(b.naive.scope)}, ${esc(b.naive.seasons[0])}–${esc(b.naive.seasons[1])}` : esc(b.naive.reason), b.naive.p);
   let diff = '';
   if (mk && mk.p) {
     const a = pct3(p.p);
@@ -554,7 +572,7 @@ function compareCard(d) {
     const s = (x) => (x > 0 ? `+${x}` : x < 0 ? `−${-x}` : '±0');
     diff = `<p class="src-line">Modell − marknad: ${s(a[0] - c[0])} · ${s(a[1] - c[1])} · ${s(a[2] - c[2])} procentenheter</p>`;
   }
-  return `<div class="card"><h4>Mot baslinjerna</h4><table class="odds cmp"><thead><tr><th></th><th class="num">1</th><th class="num">X</th><th class="num">2</th></tr></thead>` +
+  return `<div class="card"><h4>Jämförelse</h4><table class="odds cmp"><thead><tr><th></th><th class="num">1</th><th class="num">X</th><th class="num">2</th></tr></thead>` +
     `<tbody>${rows.join('')}</tbody></table>${diff}</div>`;
 }
 
@@ -659,7 +677,7 @@ function sideCard(d) {
         }
       }
     }
-    rows += `<tr class="group"><td colspan="3">${esc(g.title)}${srcTxt ? `<span class="sub">${srcTxt}</span>` : ''}</td></tr>`;
+    rows += `<tr class="group"><td colspan="3">${esc(g.title)}${srcTxt ? `<span class="sub src-sub">${srcTxt}</span>` : ''}</td></tr>`;
     for (const r of g.rows) {
       rows += `<tr><td class="h">${val(r.values[0])}</td><td class="mid">${esc(r.label)}</td><td class="a">${val(r.values[1])}</td></tr>`;
     }
@@ -693,7 +711,7 @@ function squadCard(d) {
 function refereeCard(d) {
   const r = d.referee;
   if (!r) return '';
-  if (r.unknown) return `<div class="card"><h4>Domaren</h4><p class="unknown" style="margin:0">okänt – ${esc(r.reason)}</p></div>`;
+  if (r.unknown) return `<div class="card src-only"><h4>Domaren</h4><p class="unknown" style="margin:0">okänt – ${esc(r.reason)}</p></div>`;
   const s = r.stats;
   const a = r.avg;
   const divs = r.divisions.map((x) => `${esc(x.short)} ${x.n}`).join(', ');
@@ -710,7 +728,7 @@ function refereeCard(d) {
     ];
     html += `<table class="odds"><thead><tr><th></th><th class="num">Domaren</th><th class="num">Snitt ${esc(a ? d.match.compShort : '')}</th></tr></thead><tbody>` +
       rows.map(([k, v, w]) => `<tr><td>${k}</td><td class="num"><b>${v}</b></td><td class="num muted">${w == null ? '–' : w}</td></tr>`).join('') + '</tbody></table>';
-    if (s.n < r.min) html += `<p class="note">Färre än ${r.min} matcher – för lite för att säga något om domaren.</p>`;
+    if (s.n < r.min) html += `<p class="note">För få matcher för att dra slutsatser.</p>`;
   }
   html += `<p class="src-line">${esc(r.source.provider)}, hämtat ${when(r.source.fetchedAt)}. Ligamatcher nivå 1–5 de senaste ${r.seasons} avslutade säsongerna och i år, före matchdagen. ` +
     'Båda lagens kort tillsammans. ▲▼ = mer än två standardfel från snittet; annars är skillnaden inom slumpen. Domaren styr inte prognosen.</p></div>';
@@ -877,8 +895,9 @@ $('#match-detail-view').addEventListener('click', (e) => {
   if (e.target.closest('button.src-toggle')) setShowSources(!showSources());
 });
 
-// Källraderna och de små rubriktilläggen på matchsidan är dolda tills man ber
-// om dem; valet sparas på enheten.
+// Källraderna, de små rubriktilläggen och det som är okänt (.src-sub,
+// .src-only) på matchsidan är dolda tills man ber om dem; valet sparas på
+// enheten.
 function showSources() {
   try { return localStorage.getItem('visaKallor') === '1'; } catch { return false; }
 }
@@ -887,7 +906,7 @@ function setShowSources(on) {
   const el = $('#match-detail-view');
   el.classList.toggle('show-src', on);
   const b = el.querySelector('button.src-toggle');
-  if (b) { b.setAttribute('aria-pressed', String(on)); b.textContent = on ? 'Dölj källor' : 'Visa källor'; }
+  if (b) { b.setAttribute('aria-pressed', String(on)); b.textContent = on ? 'Dölj detaljer' : 'Visa detaljer'; }
 }
 
 // ---------- utvärdering ----------
@@ -926,8 +945,7 @@ function renderEvaluation(d) {
     c.lateOnly ? `${c.lateOnly} loggade först efter avspark` : null,
   ].filter(Boolean);
   html += tiles([
-    ['Rader', n0(j.rows), `sedan ${dateOnly(j.firstLoggedAt)}`, `Loggade ${when(j.firstLoggedAt)} – ${when(j.lastLoggedAt)}`],
-    ['Matcher', n0(j.matches), 'i journalen', null],
+    ['Matcher', n0(j.matches), `loggade sedan ${dateOnly(j.firstLoggedAt)}`, `${n0(j.rows)} rader i journalen, loggade ${when(j.firstLoggedAt)} – ${when(j.lastLoggedAt)}`],
     ['Utvärderade', n0(c.evaluated),
       c.evaluated ? (extra.length ? `utanför: ${extra.join(', ')}` : 'spelade matcher')
         : d.next ? `först ut: ${esc(d.next.home)}–${esc(d.next.away)}, ${when(d.next.kickoff)}` : 'ingen spelad än',
@@ -935,32 +953,35 @@ function renderEvaluation(d) {
   ]);
   if (c.missed) html += `<p class="err">${c.missed} ${c.missed === 1 ? 'match' : 'matcher'} spelades efter att journalen startade utan att loggas.</p>`;
 
-  // Det viktigaste syns direkt; resten ligger hopfällt under Fler tabeller.
+  // Det viktigaste syns direkt; resten, metoden med, ligger i en enda vikning.
+  // Före minsta underlaget räcker en rad i stället för tabeller med "för få".
   let more = '';
   if (c.evaluated) {
-    html += '<h3>Mot baslinjerna <span class="hint">lägre är bättre</span></h3>' + overallTable(d.overall, min);
+    html += d.overall.model
+      ? '<h3>Jämförelse <span class="hint">lägre är bättre</span></h3>' + overallTable(d.overall, min)
+      : `<p class="legend">Snittet visas när ${min} matcher är spelade – ${n0(d.overall.n)} hittills.</p>`;
     html += '<h3>Senast utvärderade</h3>' + recentTable(d.recent);
-    html += '<h3>Kalibrering</h3>' + calibrationBlock(d.calibration);
+    if (d.calibration.bins.some((b) => b.freq != null)) html += '<h3>Kalibrering</h3>' + calibrationBlock(d.calibration);
     more += '<h3>Per tävling</h3>' + breakdownTable(d.byComp.map((g) => ({ ...g, label: esc(g.name) })), min);
     more += '<h3>Per regelversion</h3>' + breakdownTable(d.byVersion.map((g) => ({ ...g, label: `<span class="num">${esc(g.version)}</span>` })), min);
     more += '<h3>Att gå vidare</h3>' + advanceTable(d.advance, min);
     more += '<h3>Värdespel</h3>' + valueTable(d, d.minBets);
   }
   more += '<h3>Journalen</h3>' + journalTable(j);
-  html += `<details class="more"><summary>Fler tabeller</summary>${more}</details>`;
-  html += method('Så räknas det', [
+  more += '<h3>Så räknas det</h3>' + defs([
     ['Journalen', 'Varje prognos loggas före avspark och skrivs aldrig om. Ny rad när prognosen ändrats på den precision sidan visar, eller när marknadens odds ändrats.'],
     ['Facit', 'Den sista raden före avspark räknas, mot ställningen efter 90 minuter.'],
     ['Log-poäng, Brier', 'Hur väl sannolikheterna träffade. Lägre är bättre.'],
     ['Skillnad', 'Modell − baslinje i log-poäng med 95 % bootstrap-intervall; negativ = modellen bättre. Varje rad jämför på de matcher där båda fanns.'],
     ['Minsta underlag', `Snitt och skillnader visas från ${min} matcher – före dess är underlaget för litet för att säga något.`],
-    ['(a) (b) (c)', 'Baslinjerna naiv, säsongens mål och marknaden – <a href="#modell">se Modell</a>.'],
+    ['Jämförelsen', `${BASE.market} är (c), ${BASE.season.toLowerCase()} (b) och ${BASE.naive.toLowerCase()} (a) – se Baslinjerna ovan.`],
     ['Kalibrering', 'Varje match ger tre prognoser – hemmaseger, oavgjort och bortaseger – som sorteras i korgar om tio procentenheter. ' +
       `Strecket är ett 95 %-intervall${d.minBin ? `; korgar med färre än ${d.minBin} prognoser visas inte i kurvan` : ''}.`],
     ['Att gå vidare', 'Modellens sannolikhet att gå vidare mot vem som gick vidare (förlängning och straffar inräknade), jämfört med slantsingling. Dubbelmöten (EFL-cupens semifinaler) utvärderas inte än.'],
     ['Värdespel', 'Teoretiskt: 1 insatt på varje utfall där modellens sannolikhet gånger marknadens odds i journalraden är större än 1, vinst eller förlust per 100 insatta' +
       `${d.minBets ? ` (visas från ${d.minBets} spel)` : ''}. Ligorna mot marknadssnittet, cuperna mot DraftKings. Inte ett mått på hur bra prognoserna är.`],
   ]);
+  html += `<details class="more"><summary>Fler tabeller och förklaringar</summary>${more}</details>`;
   return html;
 }
 
@@ -969,10 +990,10 @@ function overallTable(g, min) {
     ? `<p class="legend">Modellen: log-poäng <strong>${f3(g.model.logLoss)}</strong> · Brier <strong>${f3(g.model.brier)}</strong> · ${g.n} matcher</p>`
     : `<p class="legend">Modellen: ${g.n} matcher – för få för ett snitt (minst ${min})</p>`;
   const rows = g.vs.map((v) => (v.logLoss
-    ? `<tr><td>${esc(v.label)}</td><td class="num">${v.n}</td><td class="num">${f3(v.logLoss[0])} / ${f3(v.logLoss[1])}</td>` +
+    ? `<tr><td>${esc(BASE[v.key] || v.label)}</td><td class="num">${v.n}</td><td class="num">${f3(v.logLoss[0])} / ${f3(v.logLoss[1])}</td>` +
       `<td class="num"><strong>${sgn(v.diff)}</strong><span class="sub">${sgn(v.ci[0])} till ${sgn(v.ci[1])}</span></td>` +
       `<td class="num">${f3(v.brier[0])} / ${f3(v.brier[1])}</td></tr>`
-    : `<tr><td>${esc(v.label)}</td><td class="num">${v.n}</td><td colspan="3" class="muted">för få matcher (minst ${min})</td></tr>`)).join('');
+    : `<tr><td>${esc(BASE[v.key] || v.label)}</td><td class="num">${v.n}</td><td colspan="3" class="muted">för få matcher (minst ${min})</td></tr>`)).join('');
   return head + '<div class="table-wrap"><table><thead><tr><th>Modellen mot</th><th class="num">Matcher</th>' +
     '<th class="num">Log-poäng modell / baslinje</th><th class="num" title="Modell − baslinje, 95 % bootstrap-intervall. Negativ = modellen bättre.">Skillnad</th><th class="num">Brier modell / baslinje</th></tr></thead>' +
     `<tbody>${rows}</tbody></table></div>`;
@@ -993,7 +1014,7 @@ function breakdownTable(groups, min) {
       : g.n ? `<td class="num" colspan="2">${few(g.n)}</td>` : '<td class="num muted" colspan="2">–</td>') +
     vs(g, 'market') + vs(g, 'season') + vs(g, 'naive') + '</tr>').join('');
   return '<div class="table-wrap"><table><thead><tr><th></th><th class="num">Matcher</th><th class="num">Log-poäng</th><th class="num">Brier</th>' +
-    ['c', 'b', 'a'].map((k) => `<th class="num" title="Skillnad i log-poäng mot (${k}). Negativ = modellen bättre.">Mot (${k})</th>`).join('') + '</tr></thead>' +
+    [['market', 'c'], ['season', 'b'], ['naive', 'a']].map(([key, k]) => `<th class="num" title="Skillnad i log-poäng mot (${k}). Negativ = modellen bättre.">Mot ${esc(BASE[key].toLowerCase())}</th>`).join('') + '</tr></thead>' +
     `<tbody>${rows}</tbody></table></div>`;
 }
 
@@ -1069,7 +1090,7 @@ function recentTable(all) {
       `<td class="num">${dec(r.logLoss, 2)} / ${r.market != null ? dec(r.market, 2) : '–'}</td></tr>`;
   }).join('');
   return '<div class="table-wrap"><table><thead><tr><th>Match</th><th class="num" title="1 · X · 2 i procent, utfallet i fetstil">Före avspark</th><th class="num">Efter 90</th>' +
-    `<th class="num">Log-poäng modell / (c)</th></tr></thead><tbody>${rows}</tbody></table></div>` + note;
+    `<th class="num">Log-poäng modell / ${esc(BASE.market.toLowerCase())}</th></tr></thead><tbody>${rows}</tbody></table></div>` + note;
 }
 
 function journalTable(j) {
@@ -1079,7 +1100,7 @@ function journalTable(j) {
     `<td class="num">${r.market ? `${pct3(r.market.p).join(' · ')}<span class="sub">${esc(r.market.source)}</span>` : '–'}</td>` +
     `<td class="num">${esc(r.rulesVersion)}</td></tr>`).join('');
   const files = j.files.map((f) => `<a href="data/journal/${encodeURIComponent(f.name)}">${esc(f.name)}</a> (${n0(f.rows)} rader, ${n0(Math.round(f.bytes / 1024))} kB)`).join(', ');
-  return '<div class="table-wrap"><table><thead><tr><th>Loggad</th><th>Match</th><th class="num">Prognos</th><th class="num">(c) Marknaden</th><th class="num">Regelversion</th></tr></thead>' +
+  return '<div class="table-wrap"><table><thead><tr><th>Loggad</th><th>Match</th><th class="num">Prognos</th><th class="num">' + esc(BASE.market) + '</th><th class="num">Regelversion</th></tr></thead>' +
     `<tbody>${rows}</tbody></table></div>` +
     `<p class="legend">Hela journalen: ${files}${j.invalid ? ` · ${j.invalid} oläsbara rader hoppas över` : ''}</p>`;
 }
@@ -1417,7 +1438,7 @@ if (window.Spoiler) {
       dv.innerHTML = renderDetail(state.detail);
       setShowSources(showSources());
     }
-    if (!$('#eval-section').hidden) loadEvaluation();
+    if (!$('#model-section').hidden) loadEvaluation();
   });
 }
 

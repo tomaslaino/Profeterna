@@ -487,10 +487,9 @@ function tile(t, dv) {
   const f = fmtOf(m);
   const c = dv.current ? m.get(dv.current) : null;
   const w = dv.window ? m.get(dv.window) : null;
+  // Chippet bara när året avviker; som vanligt och för få matcher syns inte.
   const d = deviation(row, dv.current, dv.window);
-  const verdict = d == null ? '<span class="dv-chip">för få matcher</span>'
-    : d === 0 ? '<span class="dv-chip">som vanligt</span>'
-      : `<span class="dv-chip ${d > 0 ? 'up' : 'down'}">${d > 0 ? '▲ ovanligt högt' : '▼ ovanligt lågt'}</span>`;
+  const verdict = d ? `<span class="dv-chip ${d > 0 ? 'up' : 'down'}">${d > 0 ? '▲ ovanligt högt' : '▼ ovanligt lågt'}</span>` : '';
   return `<div class="dv-tile" title="${esc(t.what)}"><div class="dv-tile-label">${esc(t.label)}</div>` +
     `<div class="dv-tile-num">${c == null ? unknown() : esc(f(c))}</div>` +
     `<div class="dv-tile-sub">snitt ${w == null ? 'okänt' : esc(f(w))}</div>${verdict}</div>`;
@@ -528,16 +527,12 @@ function overviewView(dv, P) {
   const d = state.data;
   const w = d.window;
   let html = '';
-  html += `<p class="dv-meta">Nivå ${dv.tier} · ${esc(d.season)}: ${dv.current ? `${int(dv.current.n)} matcher` : 'inga matcher än'}` +
-    ` · jämfört med snittet ${w ? `${esc(w.first)}–${esc(w.last)}` : 'okänt'}</p>`;
+  html += `<p class="dv-meta">${esc(d.season)} · ${dv.current ? `${int(dv.current.n)} matcher` : 'inga matcher än'}` +
+    ` · snitt = ${w ? `${esc(w.first)}–${esc(w.last)}` : 'okänt'}</p>`;
   html += `<div class="dv-tiles">${TILES.map((t) => tile(t, dv)).join('')}</div>`;
 
   const so = standouts(dv);
-  html += card('Sticker ut i år', {
-    body: so.length ? `<ul class="dv-standout">${so.join('')}</ul>`
-      : '<p class="dv-calm">Inget avviker mer än slumpen – ett vanligt år hittills.</p>',
-    cls: 'dv-wide',
-  });
+  if (so.length) html += card('Sticker ut i år', { body: `<ul class="dv-standout">${so.join('')}</ul>`, cls: 'dv-wide' });
 
   if (P && !P.unknown) {
     const L = P.leaders;
@@ -689,15 +684,14 @@ function forecastView(dv, P) {
   }).join('');
   const zoneKey = zones.map((z) => `<span class="${ZONE_CLS[z.key] || ''}"><i></i>${esc(z.label)}: ${esc(ranksText(z.ranks))}</span>`).join('');
   const ded = F.teams.filter((t) => t.now.ded);
-  let html = sectionHead(`Säsongsprognos – ${dv.name}`,
-    `Resten av säsongen – ${int(F.remaining)} matcher – spelad ${int(F.sims)} gånger med modellens sannolikheter · skattat på matcher t.o.m. ${esc(dateLabel(S.fitThrough))}`);
+  let html = sectionHead(`Säsongsprognos – ${dv.name}`, `${int(F.remaining)} matcher kvar`);
   html += card('Var lagen hamnar', {
     hint: 'modellens prognos, inte facit',
-    key: '<b>%</b> = chansen i simuleringarna · <b>förv. poäng</b> med spannet för 80 % av utfallen · klicka på ett lag för mer',
     body: `<div class="table-wrap dv-tw"><table class="dv-league dv-proj">${head}<tbody>${body}</tbody></table></div>` +
       `<div class="dv-zones">${zoneKey}</div>` +
       (ded.length ? `<p class="dv-note">* Poängavdrag (ESPN), redan dragna: ${ded.map((t) => `${esc(t.name)} −${t.now.ded}`).join(', ')}.</p>` : ''),
-    src: `Prognosmotorn, regelversion ${esc(S.rulesVersion)} · resultat och spelprogram: ESPN, hämtat ${when(F.fixturesFetchedAt)} · zoner: ESPN:s tabell, hämtad ${when(F.standingsFetchedAt)}`,
+    src: `Prognosmotorn, regelversion ${esc(S.rulesVersion)}: resten av säsongen spelad ${int(F.sims)} gånger med modellens sannolikheter, ` +
+      `skattat på matcher t.o.m. ${esc(dateLabel(S.fitThrough))} · resultat och spelprogram: ESPN, hämtat ${when(F.fixturesFetchedAt)} · zoner: ESPN:s tabell, hämtad ${when(F.standingsFetchedAt)}`,
     cls: 'dv-tablecard',
   });
   html += fixturesCard(F);
@@ -730,7 +724,7 @@ function fixturesCard(F) {
     `<td class="num pts">${t.next.xp == null ? '–' : num(t.next.xp, 2)}</td></tr>`).join('');
   return card('Programmet framåt', {
     hint: `de närmaste ${F.teams[0].next.n} ligamatcherna`,
-    key: '<b>ruta</b> = motståndare · H/B hemma/borta och vinstchansen i procent · grönt = lätt, rött = svårt · <b>poäng per match</b> = förväntade, med lagets egen styrka',
+    key: 'Vinstchans i % · H hemma, B borta · grönt lätt, rött svårt',
     body: `<div class="table-wrap dv-tw"><table class="dv-league dv-fxtable"><thead><tr><th>Lag</th><th>Matcherna</th><th class="num" title="Förväntade poäng per match de närmaste matcherna">Poäng/match</th></tr></thead><tbody>${rows}</tbody></table></div>`,
     src: 'Prognosmotorn · samma sannolikheter som under Matcher',
     cls: 'dv-tablecard',
@@ -746,7 +740,7 @@ function seasonMethod(S, F) {
     ['Styrka', 'Modellens förväntade målskillnad per match mot ett genomsnittligt Premier League-lag på neutral plan. Alla fyra divisioner på samma skala – se fliken Styrka.'],
     ['Programmet framåt', 'Förväntade poäng per match räknas med lagets egen styrka, så starka lag hamnar högt. Färgerna visar hur svår varje match är för just det laget.'],
   ];
-  return `<details class="help dv-glossary"><summary>Så räknas prognosen</summary><dl>${items.map(([k, v]) => `<dt>${esc(k)}</dt><dd>${esc(v)}</dd>`).join('')}</dl></details>`;
+  return `<details class="help dv-glossary src-only"><summary>Så räknas prognosen</summary><dl>${items.map(([k, v]) => `<dt>${esc(k)}</dt><dd>${esc(v)}</dd>`).join('')}</dl></details>`;
 }
 
 // Modellens styrka för alla lag i nivå 1–4 (Tabeller → Styrka).
@@ -764,8 +758,9 @@ function strengthSection(S) {
   }).join('');
   return card('Modellens styrka – alla lag', {
     hint: `${S.strength.length} lag · skattat t.o.m. ${dateLabel(S.fitThrough)}`,
-    key: '<b>styrka</b> = förväntad målskillnad per match mot ett genomsnittligt Premier League-lag på neutral plan · <b>mål</b> = för–emot i samma match · <b>spann</b> = placeringen i 80 % av omskattningarna',
-    body: `<div class="table-wrap dv-tw dv-scroll"><table class="dv-league"><thead><tr><th class="c">#</th><th>Lag</th><th>Division</th><th class="num">Styrka</th><th class="num hide-sm">Mål</th><th class="num hide-sm" title="Placeringen i 80 % av omskattningarna">Spann</th></tr></thead><tbody>${rows}</tbody></table></div>`,
+    body: '<div class="table-wrap dv-tw dv-scroll"><table class="dv-league"><thead><tr><th class="c">#</th><th>Lag</th><th>Division</th>' +
+      '<th class="num" title="Förväntad målskillnad per match mot ett genomsnittligt Premier League-lag på neutral plan">Styrka</th>' +
+      `<th class="num hide-sm" title="Förväntade mål för–emot i samma match">Mål</th><th class="num hide-sm" title="Placeringen i 80 % av omskattningarna">Spann</th></tr></thead><tbody>${rows}</tbody></table></div>`,
     src: 'Prognosmotorn: mål efter 90 minuter i alla tävlingar sedan fyra säsonger, nyare matcher väger tyngre. Lag med för få matcher i underlaget saknas.',
     cls: 'dv-wide',
   });
@@ -927,7 +922,7 @@ function playersView(dv, P) {
   const f = state.pf;
   const xg = !!(P.fpl && L.overXg);
   const teams = [...P.teams].sort((a, b) => a.name.localeCompare(b.name, 'sv'));
-  let html = sectionHead('Spelarstatistik', `${xg ? 'Mål · assist · xG · speltid' : 'Mål · assist · skott · kort'} – ligamatcher ${esc(state.data.season)}`);
+  let html = sectionHead('Spelarstatistik', `Ligamatcher ${esc(state.data.season)}`);
   const xgVal = (p) => `<b>${delta(p.dxg, { d: 1 })}</b><small>${p.fg} mål · ${num(p.xg, 1)} xG</small>`;
   html += '<div class="dv-leaders">' +
     topCard('goals', 'Skytteliga', '⚽', L.goals, (p) => `<b>${p.g}</b><small>${p.app} m</small>`) +
@@ -1125,7 +1120,7 @@ function teamsView(dv, P, T) {
     : teamTop('Skjuter mest', '⚡', all, (t) => `<b>${num(per(t.fd.sh, 'f'), 1)}</b><small>skott per match</small>`, { get: (t) => per(fdOf(t, 'sh'), 'f') }) +
       teamTop('Tillåter minst', '🛡️', all, (t) => `<b>${num(per(t.fd.sh, 'a'), 1)}</b><small>skott mot per match</small>`, { get: (t) => per(fdOf(t, 'sh'), 'a'), asc: true });
 
-  return sectionHead('Lagen', `${esc(dv.name)} ${esc(state.data.season)}`) +
+  return sectionHead('Lagen') +
     '<div class="dv-leaders dv-leaders4">' + leaders +
     teamTop('Slår oddsen', '📈', all, (t) => `<b>${delta(vsOdds(t), { d: 1 })}</b><small>${t.fd.mkt.pts} p · ${num(t.fd.mkt.xp, 1)} väntat</small>`, { get: vsOdds, note: 'Poäng mot vad stängningsoddsen väntade sig' }) +
     teamTop('Bäst att spela på', '💰', all, (t) => `<b>${delta(roi(t), { fmt: signedPct })}</b><small>${t.fd.mkt.n} matcher</small>`, { get: roi, note: 'Samma insats på seger i varje match' }) +
@@ -1295,7 +1290,7 @@ async function openTeam(id) {
 function heatmap(D) {
   const max = Math.max(...D.grid.flat());
   const lab = (i) => (i === D.grid.length - 1 ? `${i}+` : String(i));
-  let html = '<table class="dv-heat"><thead><tr><th></th>' + D.grid[0].map((_, j) => `<th>${lab(j)}</th>`).join('') + '</tr></thead><tbody>';
+  let html = '<table class="dv-heat"><thead><tr><th title="Rader = hemmamål, kolumner = bortamål, andel av matcherna i procent">%</th>' + D.grid[0].map((_, j) => `<th>${lab(j)}</th>`).join('') + '</tr></thead><tbody>';
   D.grid.forEach((row, i) => {
     html += `<tr><th class="rowh">${lab(i)}</th>`;
     row.forEach((c, j) => {
@@ -1306,8 +1301,7 @@ function heatmap(D) {
   });
   html += '</tbody></table>';
   const top = D.grid.flatMap((row, i) => row.map((c, j) => ({ c, s: `${lab(i)}–${lab(j)}` }))).sort((a, b) => b.c - a.c).slice(0, 3);
-  return `${html}<p class="dv-note">Rader = hemmamål · kolumner = bortamål · procent. Vanligast ` +
-    `${top.map((t) => `${esc(t.s)} (${pct(t.c / D.n, 1)})`).join(', ')}.</p>`;
+  return `${html}<p class="dv-note">Vanligast: ${top.map((t) => `${esc(t.s)} (${pct(t.c / D.n, 1)})`).join(', ')}.</p>`;
 }
 
 function htftTable(D, w) {
@@ -1367,7 +1361,7 @@ function newcomerBlock(x, kind, idx) {
     `<dt>Säsongen efter</dt><dd>${after}${nx.gone ? `, lämnade nivå 1–5 ${pct(nx.gone)}` : ''}</dd>` +
     `<dt>I år</dt><dd>${cur}</dd></dl>` +
     `<div class="dv-chart" id="d-rank-${idx}" style="margin-top:0.6rem"></div>` +
-    `<p class="dv-note">Slutplacering, ${int(x.teamSeasons)} lag ${esc(x.seasons[0])}–${esc(x.seasons[1])} (tabell ur resultaten, utan poängavdrag).</p></div>`;
+    `<p class="dv-note">Slutplacering, ${int(x.teamSeasons)} lag ${esc(x.seasons[0])}–${esc(x.seasons[1])}.</p></div>`;
 }
 
 function rankBars(x) {
@@ -1443,7 +1437,7 @@ function matchView(dv) {
   if (newc.length) {
     html += card('Nykomlingarna', {
       hint: 'alla säsonger',
-      body: newc.join(''), src: 'football-data.co.uk · var laget spelade säsongen före och efter',
+      body: newc.join(''), src: 'football-data.co.uk · var laget spelade säsongen före och efter · slutplaceringen ur en tabell räknad på resultaten, utan poängavdrag',
     });
   }
   if (dv.promoted) draw.push(['d-rank-0', () => columnChart($('#d-rank-0'), { aria: 'Slutplacering för uppflyttade lag', fmt: (v) => pct(v), labels: 'max', H: 120, bars: rankBars(dv.promoted) })]);
@@ -1536,7 +1530,7 @@ function compareSection(d) {
   }
   html += '</tbody></table></div>';
   return card(`${d.season} mot snittet`, {
-    key: `<b>stor</b> = ${esc(d.season)} hittills · <b>liten</b> = snitt ${w ? `${esc(w.first)}–${esc(w.last)}` : 'okänt'} · <b>▲▼</b> = ovanligt`,
+    key: `Stor siffra = i år · liten = snitt ${w ? `${esc(w.first)}–${esc(w.last)}` : 'okänt'} · ▲▼ = ovanligt`,
     body: html,
     src: 'football-data.co.uk och ESPN · grundserien, mål efter 90 minuter',
     cls: 'dv-wide',
@@ -1634,7 +1628,7 @@ const GLOSSARY = [
 ];
 
 function glossary() {
-  return '<details class="help dv-glossary"><summary>Ordlista</summary><dl>' +
+  return '<details class="help dv-glossary src-only"><summary>Ordlista</summary><dl>' +
     GLOSSARY.filter(([, , page]) => !page || page === PAGE)
       .map(([k, v]) => `<dt>${esc(k)}</dt><dd>${esc(v)}</dd>`).join('') + '</dl></details>';
 }
@@ -1648,7 +1642,22 @@ function frame() {
       `<button type="button" data-div="${x.id}" aria-pressed="${x.id === state.div}" title="${esc(x.name)}"><i class="dv-key dot" style="--c:${color(x.id)}"></i>${esc(x.name)}</button>`).join('')}</div>` +
     `<nav class="dv-views" id="dv-views" aria-label="Vy">${VIEWS.map((v) =>
       `<a href="#${state.div}/${v.id}" data-view="${v.id}"${v.id === state.view ? ' aria-current="page"' : ''}>${esc(v.label)}</a>`).join('')}</nav>` +
-    '</div><div id="dv-view" class="dv-view"></div>' + glossary();
+    '</div><div id="dv-view" class="dv-view"></div>' +
+    '<p class="detail-foot"><button type="button" class="src-toggle" aria-pressed="false">Visa detaljer</button></p>' + glossary();
+}
+
+// Källraderna, förklaringarna och ordlistan (.src-line, .src-only m.fl.) är
+// dolda tills man ber om dem – samma val och nyckel som på matchsidan,
+// sparat på enheten.
+function showSources() {
+  try { return localStorage.getItem('visaKallor') === '1'; } catch { return false; }
+}
+function setShowSources(on) {
+  try { localStorage.setItem('visaKallor', on ? '1' : '0'); } catch { /* inget lagringsutrymme */ }
+  const el = $('#divisions');
+  el.classList.toggle('show-src', on);
+  const b = el.querySelector('button.src-toggle');
+  if (b) { b.setAttribute('aria-pressed', String(on)); b.textContent = on ? 'Dölj detaljer' : 'Visa detaljer'; }
 }
 
 async function loadPlayers(div) {
@@ -1742,6 +1751,7 @@ function updatePlayerTable() {
 function wire() {
   const root = $('#divisions');
   root.addEventListener('click', (e) => {
+    if (e.target.closest('button.src-toggle')) { setShowSources(!showSources()); return; }
     const div = e.target.closest('#dv-divs button');
     if (div) {
       if (ALL_DIVS.has(state.view)) state.view = VIEWS[0].id;
@@ -1877,6 +1887,7 @@ window.addEventListener('hashchange', () => { if (state.data && !state.data.erro
   if (div && state.data.divisions.some((x) => x.id === div)) state.div = div;
   if (view && VIEWS.some((v) => v.id === view)) state.view = view;
   $('#divisions').innerHTML = frame();
+  setShowSources(showSources());
   wire();
   renderView();
   loadSeason(); // lagkortet visar säsongsprognosen när den finns

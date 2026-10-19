@@ -1,9 +1,11 @@
 // Tjänsten profeterna-kupong – Cloudflare Worker som sparar gängets kupong
 // direkt från sidan (worker/kupong.mjs). Egen tjänst, skild från proxyn för
 // matchanalysen: GitHub-nyckeln finns bara här, och tjänsten gör inget annat
-// än att committa en kontrollerad kupongfil i data/kuponger/.
+// än att committa en kontrollerad kupongfil i data/kuponger/ – och hålla
+// gängets egna tips inför samtalet (worker/samtal.mjs, i KV, inte på GitHub).
 //
 //   POST /kupong {"kod", "kupong", "andra", "bas", "ändå"}   (se worker/kupong.mjs)
+//   GET  /samtal · POST /samtal {"kod", "gor", …}             (se worker/samtal.mjs)
 //
 // Driftsätts för hand med worker/kupong.toml; hemligheterna GITHUB_TOKEN och
 // KUPONG_KOD läggs in med "wrangler secret put" (README, avsnittet Kupongen).
@@ -13,7 +15,9 @@
 // läser (config/llm.js, eller SITE).
 
 import cfg from '../config/llm.js';
+import kupongCfg from '../config/kupong.js';
 import { saveCoupon, githubWriter, kvLimiter } from './kupong.mjs';
+import { getRound, postRound, kvStore } from './samtal.mjs';
 
 // Frågeparametern går förbi CDN-cachen, så att det senaste bygget läses.
 async function siteMatches(site) {
@@ -25,7 +29,7 @@ async function siteMatches(site) {
 
 const CORS = {
   'Access-Control-Allow-Origin': '*',
-  'Access-Control-Allow-Methods': 'POST, OPTIONS',
+  'Access-Control-Allow-Methods': 'GET, POST, OPTIONS',
   'Access-Control-Allow-Headers': 'Content-Type',
   'Access-Control-Max-Age': '86400',
 };
@@ -38,7 +42,18 @@ export default {
   async fetch(request, env) {
     if (request.method === 'OPTIONS') return new Response(null, { status: 204, headers: CORS });
     const url = new URL(request.url);
-    if (url.pathname !== '/kupong' || request.method !== 'POST') return json(404, { ok: false, error: 'Finns inte.' });
+    const samtal = url.pathname === '/samtal';
+    const store = env.KUPONG ? kvStore(env.KUPONG) : null;
+    if (samtal && request.method === 'GET') {
+      try {
+        const r = await getRound({ store, gang: kupongCfg.gang });
+        return json(r.status, r.body);
+      } catch (err) {
+        console.error('[samtal]', err);
+        return json(500, { ok: false, error: 'Internt fel i tjänsten.' });
+      }
+    }
+    if ((url.pathname !== '/kupong' && !samtal) || request.method !== 'POST') return json(404, { ok: false, error: 'Finns inte.' });
     if (Number(request.headers.get('Content-Length') || 0) > 20000) return json(413, { ok: false, error: 'För stor förfrågan.' });
     let body;
     try {
@@ -48,12 +63,14 @@ export default {
     }
     try {
       const site = String(env.SITE || cfg.site).replace(/\/+$/, '');
-      const r = await saveCoupon(body, {
+      const ctx = {
         env,
-        writer: env.GITHUB_TOKEN ? githubWriter(env.GITHUB_TOKEN) : null,
         loadMatches: () => siteMatches(site),
         limiter: env.KUPONG ? kvLimiter(env.KUPONG, request.headers.get('CF-Connecting-IP')) : null,
-      });
+      };
+      const r = samtal
+        ? await postRound(body, { ...ctx, store, gang: kupongCfg.gang })
+        : await saveCoupon(body, { ...ctx, writer: env.GITHUB_TOKEN ? githubWriter(env.GITHUB_TOKEN) : null });
       return json(r.status, r.body);
     } catch (err) {
       console.error('[kupong]', err);

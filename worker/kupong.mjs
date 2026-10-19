@@ -113,8 +113,9 @@ export function couponJSON(file) {
   return ['{', ...lines, '  "matcher": [', ...rows, '  ]', '}', ''].join('\n');
 }
 
-// Jämför kodordet utan att svarstiden avslöjar hur mycket som stämde.
-async function sameSecret(a, b) {
+// Jämför kodordet utan att svarstiden avslöjar hur mycket som stämde
+// (också för samtalet, worker/samtal.mjs).
+export async function sameSecret(a, b) {
   const enc = new TextEncoder();
   const [x, y] = await Promise.all([a, b].map((s) => crypto.subtle.digest('SHA-256', enc.encode(String(s)))));
   const u = new Uint8Array(x);

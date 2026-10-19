@@ -544,9 +544,17 @@ table.dv-teams .team { font-weight: 600; white-space: nowrap; }
 .dv-barlist .bl-v small { display: block; font-size: 11px; font-weight: 400; color: var(--muted); }
 
 .dv-glossary { margin: 28px 0 8px; padding: 14px 18px; border: 1px solid var(--border); border-radius: var(--radius, 16px); background: var(--glass, var(--card)); }
-.dv-glossary dl { display: grid; grid-template-columns: minmax(9rem, max-content) 1fr; gap: 6px 18px; margin: 12px 0 2px; font-size: 13.5px; }
-.dv-glossary dt { font-weight: 700; }
-.dv-glossary dd { margin: 0; color: var(--ink-soft, var(--muted)); }
+.dv-glossary dl, dl.dv-defs { display: grid; grid-template-columns: minmax(9rem, max-content) 1fr; gap: 6px 18px; margin: 12px 0 2px; font-size: 13.5px; }
+.dv-glossary dt, dl.dv-defs dt { font-weight: 700; }
+.dv-glossary dd, dl.dv-defs dd { margin: 0; color: var(--ink-soft, var(--muted)); }
+
+/* Källraderna, förklaringarna och ordlistan döljs tills man trycker på Visa
+   detaljer längst ner – samma val som på matchsidan. */
+#divisions:not(.show-src) .src-line,
+#divisions:not(.show-src) .src-only,
+#divisions:not(.show-src) .card h4 .hint,
+#divisions:not(.show-src) .dv-lnote { display: none; }
+#divisions > .detail-foot + .dv-glossary { margin-top: 16px; }
 
 /* ---------- spelarkort och lagkort ---------- */
 
@@ -619,7 +627,8 @@ dialog.dv-modal::backdrop { background: rgba(4, 9, 18, 0.62); backdrop-filter: b
   .show-sm, table.dv-players .pname small.show-sm { display: block; }
   table.dv-players .pname { white-space: normal; }
   table.dv-teams .team { white-space: normal; min-width: 7.5rem; }
-  .dv-divs { flex-wrap: nowrap; overflow-x: auto; scrollbar-width: none; margin: 0 -20px; padding: 0 20px; }
+  /* ut till skärmkanten – sidans marginal är 16 px på mobilen */
+  .dv-divs { flex-wrap: nowrap; overflow-x: auto; scrollbar-width: none; margin: 0 calc(-1 * var(--gutter, 20px)); padding: 0 var(--gutter, 20px); }
   .dv-divs::-webkit-scrollbar { display: none; }
   .dv-divs button { flex: none; }
   .dv-sechead h3 { font-size: 22px; }
@@ -628,8 +637,8 @@ dialog.dv-modal::backdrop { background: rgba(4, 9, 18, 0.62); backdrop-filter: b
   table.dv-players td, table.dv-players th,
   table.dv-teams td, table.dv-teams th,
   table.dv-squad td, table.dv-squad th { padding: 7px 6px; }
-  .dv-glossary dl { grid-template-columns: 1fr; gap: 2px; }
-  .dv-glossary dd { margin-bottom: 8px; }
+  .dv-glossary dl, dl.dv-defs { grid-template-columns: 1fr; gap: 2px; }
+  .dv-glossary dd, dl.dv-defs dd { margin-bottom: 8px; }
 }
 @media (max-width: 480px) {
   .hide-xs { display: none; }

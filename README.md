@@ -329,7 +329,7 @@ server:
   JSON-rad per post, committad av GitHub Actions; bygget kopierar den till sajten
   (`data/journal/`) så att hela journalen går att ladda ned.
 - **Utvärdering:** [src/evaluate.js](src/evaluate.js) rättar journalen mot facit och
-  skriver `data/evaluation.json` (fliken Utvärdering) och journalinfo per match i
+  skriver `data/evaluation.json` (Utvärdering, sist på Modell-sidan) och journalinfo per match i
   `data/match/<id>.json`. Poängen och bootstrap-jämförelsen är samma kod som kontrollen
   ([src/check.js](src/check.js)). Fallerar utvärderingen byggs sajten ändå.
 - **Matchanalys (fas 5, valfri):** [config/llm.js](config/llm.js) (av/på, leverantör,
@@ -352,8 +352,9 @@ server:
   [public/historik.css](public/historik.css) (gamla `historik.html` leder dit);
   AI-kommentaren skrivs av [worker/kommentar.mjs](worker/kommentar.mjs) med prompten i
   [config/kommentar.js](config/kommentar.js). Se [Kuponghistoriken](#kuponghistoriken).
-- **Frontend:** ren HTML/CSS/JS i `public/`, flikarna Matcher, Kupong, Utvärdering, Källor och
-  Modell (regelversion, backtest, kandidatlogg); i matchvyn kortet Analys när
+- **Frontend:** ren HTML/CSS/JS i `public/`, flikarna Matcher, Kupong, Källor och
+  Modell (regelversion, backtest, kandidatlogg och sist Utvärdering; `#utvardering`
+  leder dit); i matchvyn kortet Analys när
   matchanalysen är påslagen. Sidorna Tabeller och Statistik
   ([public/tabeller.html](public/tabeller.html), [public/statistik.html](public/statistik.html),
   båda med [public/divisioner.js](public/divisioner.js)); Tabeller har vyn Säsongsprognos. Läser JSON-filerna ovan. Urvalet av kommande/spelade matcher och källornas status
@@ -492,7 +493,7 @@ resten bakom knappen Tidigare matcher). Spelade matcher visar journalens prognos
 troligaste utfallet grönt om det slog in efter 90 minuter och rött om inte; kursiv = matchen
 loggades aldrig och prognosen är återskapad (rättas inte i listan).
 
-**Utvärderingen** (fliken Utvärdering), mot ställningen efter 90 minuter (okänd = matchen
+**Utvärderingen** (sist på Modell-sidan), mot ställningen efter 90 minuter (okänd = matchen
 utvärderas inte):
 
 - **Brier och log-poäng** per prognos och i snitt, mot (c) marknaden, Betfair Exchange vid

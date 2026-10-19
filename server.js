@@ -11,7 +11,9 @@
 //
 // Kupongen: finns KUPONG_KOD i .env sparar knappen Spara kupongen direkt
 // (POST /api/kupong) – lokalt skrivs filen i data/kuponger/ (eller
-// KUPONG_DIR), inte på GitHub. Samma saveCoupon() som proxyn.
+// KUPONG_DIR), inte på GitHub. Samma saveCoupon() som proxyn. Samma kodord
+// slår på gängets egna tips inför samtalet (GET/POST /api/samtal), som
+// lokalt ligger som filer i data/cache/samtal/ (eller SAMTAL_DIR).
 
 const fs = require('fs');
 const path = require('path');
@@ -132,6 +134,49 @@ function couponSaveRoute(writer = couponFileWriter(), loadMatches = siteMatches(
   };
 }
 
+// Samtalets lagring lokalt: en fil per nyckel (på Cloudflare KV).
+function samtalFileStore(dir = process.env.SAMTAL_DIR || path.join(CACHE_DIR, 'samtal')) {
+  const file = (k) => path.join(dir, k.replace(/[^\w.-]/g, '_') + '.json');
+  return {
+    get: async (k) => (fs.existsSync(file(k)) ? JSON.parse(fs.readFileSync(file(k), 'utf8')) : null),
+    put: async (k, v) => {
+      fs.mkdirSync(dir, { recursive: true });
+      fs.writeFileSync(file(k), JSON.stringify(v));
+    },
+  };
+}
+
+// GET och POST /api/samtal – samma getRound()/postRound() som tjänsten.
+function samtalRoute(store = samtalFileStore(), loadMatches = siteMatches()) {
+  const wrong = new Map(); // fel kodord per IP-adress, glöms efter en timme
+  return async (req, res) => {
+    try {
+      const { getRound, postRound } = await import('./worker/samtal.mjs');
+      const { gang } = require('./config/kupong');
+      const ip = req.ip;
+      const r = req.method === 'GET'
+        ? await getRound({ store, gang })
+        : await postRound(req.body, {
+          env: process.env,
+          store,
+          gang,
+          loadMatches,
+          limiter: {
+            count: async () => ((wrong.get(ip) || {}).until > Date.now() ? wrong.get(ip).n : 0),
+            bump: async () => {
+              const w = wrong.get(ip);
+              wrong.set(ip, w && w.until > Date.now() ? { n: w.n + 1, until: w.until } : { n: 1, until: Date.now() + 3600000 });
+            },
+          },
+        });
+      res.status(r.status).json(r.body);
+    } catch (err) {
+      console.error('[samtal]', err);
+      res.status(500).json({ ok: false, error: 'Internt fel i servern.' });
+    }
+  };
+}
+
 if (require.main === module) {
   loadEnv();
   const analysisEndpoint = process.env[llm.keyEnv] ? '/api/analyze' : null;
@@ -153,6 +198,7 @@ if (require.main === module) {
   if (analysisEndpoint) app.post('/api/analyze', express.json(), analysisRoute());
   if (analysisEndpoint) app.post('/api/kommentar', express.json(), commentRoute());
   if (couponEndpoint) app.post('/api/kupong', express.json({ limit: '20kb' }), couponSaveRoute());
+  if (couponEndpoint) app.all('/api/samtal', express.json({ limit: '20kb' }), samtalRoute());
   app.use(express.static(OUT));
 
   const port = parseInt(process.env.PORT || '3001', 10);
@@ -166,4 +212,4 @@ if (require.main === module) {
   });
 }
 
-module.exports = { analysisRoute, commentRoute, couponSaveRoute, couponFileWriter, siteMatches, fileStore };
+module.exports = { analysisRoute, commentRoute, couponSaveRoute, couponFileWriter, samtalRoute, samtalFileStore, siteMatches, fileStore };

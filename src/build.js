@@ -10,8 +10,8 @@
 //   data/match/<id>.json   underlaget och prognosen för en match
 //   data/model.json        regelversion, skattade storheter, backtestet och
 //                          kandidatloggen (fliken Modell)
-//   data/evaluation.json   journalen och utvärderingen mot facit (fliken
-//                          Utvärdering)
+//   data/evaluation.json   journalen och utvärderingen mot facit (sist på
+//                          Modell-sidan)
 //   data/divisions.json    statistik per division (sidan Statistik)
 //   data/season.json       säsongsprognosen, modellens styrka för alla lag
 //                          och programmet framåt (Tabeller → Säsongsprognos)
