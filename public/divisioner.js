@@ -334,12 +334,62 @@ function sortBy(list, col, dir, tiebreak) {
   });
 }
 
+// Rubriken kan ha en kort underrad (sub); förklaringen (title, med name som
+// rubrik) visas i förklaringsrutan när man pekar på kolumnen – se tips().
 function sortHead(cols, f, attr, lead = '') {
   return `<thead><tr>${lead}` + cols.map((c) => {
     const on = c.key === f.sort;
-    return `<th class="${c.cls}${on ? ' on' : ''}" aria-sort="${on ? (f.dir > 0 ? 'ascending' : 'descending') : 'none'}">` +
-      `<button type="button" ${attr}="${c.key}"${c.title ? ` title="${esc(c.title)}"` : ''}>${esc(c.label)}${on ? (f.dir > 0 ? ' ▲' : ' ▼') : ''}</button></th>`;
+    const tip = c.title ? ` data-tip="${esc(c.title)}" data-tip-head="${esc(c.name || c.label)}"` : '';
+    return `<th class="${c.cls}${on ? ' on' : ''}" aria-sort="${on ? (f.dir > 0 ? 'ascending' : 'descending') : 'none'}"${tip}>` +
+      `<button type="button" ${attr}="${c.key}">${esc(c.label)}${on ? (f.dir > 0 ? ' ▲' : ' ▼') : ''}` +
+      `${c.sub ? `<small>${esc(c.sub)}</small>` : ''}</button></th>`;
   }).join('') + '</tr></thead>';
+}
+
+// Förklaringsrutan: syns direkt när musen pekar på något med data-tip (eller
+// när det får fokus från tangentbordet). Ligger i body med position: fixed så
+// att tabellens rullruta inte klipper den. Pekskärmar får ingen – där sorterar
+// ett tryck, och ordlistan förklarar.
+function tips(root) {
+  const box = document.createElement('div');
+  box.id = 'dv-tip';
+  box.className = 'dv-tip';
+  box.setAttribute('role', 'tooltip');
+  box.hidden = true;
+  document.body.appendChild(box);
+  let cur = null;
+  const hide = () => {
+    if (cur) cur.removeAttribute('aria-describedby');
+    cur = null;
+    box.hidden = true;
+  };
+  const show = (el) => {
+    if (el === cur) return;
+    hide();
+    cur = el;
+    el.setAttribute('aria-describedby', 'dv-tip');
+    box.innerHTML = `<b>${esc(el.dataset.tipHead || '')}</b>${esc(el.dataset.tip)}`;
+    box.hidden = false;
+    const r = el.getBoundingClientRect();
+    const w = box.offsetWidth;
+    const h = box.offsetHeight;
+    box.style.left = `${Math.max(8, Math.min(r.left + r.width / 2 - w / 2, window.innerWidth - w - 8))}px`;
+    box.style.top = `${r.bottom + 8 + h <= window.innerHeight ? r.bottom + 8 : Math.max(8, r.top - h - 8)}px`;
+  };
+  root.addEventListener('pointerover', (e) => {
+    if (e.pointerType !== 'mouse') return;
+    const el = e.target.closest('[data-tip]');
+    if (el) show(el); else hide();
+  });
+  root.addEventListener('pointerleave', hide);
+  root.addEventListener('focusin', (e) => {
+    const el = e.target.closest('[data-tip]');
+    if (el && e.target.matches(':focus-visible')) show(el);
+  });
+  root.addEventListener('focusout', hide);
+  root.addEventListener('click', hide);
+  document.addEventListener('keydown', (e) => { if (e.key === 'Escape') hide(); });
+  window.addEventListener('scroll', hide, { passive: true, capture: true });
 }
 
 function colCell(c, x) {
@@ -613,13 +663,23 @@ const TCOLS = [
   { key: 'o25', label: 'Ö2,5', title: 'Andel av lagets matcher med tre mål eller fler', get: (t) => share(t, 'o25'), pct: true, cls: 'num', in: ['spelet'] },
   { key: 'btts', label: 'BLGM', title: 'Båda lagen gör mål – andel av lagets matcher', get: (t) => share(t, 'btts'), pct: true, cls: 'num', in: ['spelet'] },
 
-  { key: 'mxp', label: 'Väntat', title: 'Poängen oddsen väntade sig, match för match (oddsen vid avspark, utan spelbolagens marginal)', get: (t) => (fdOf(t, 'mkt') ? fdOf(t, 'mkt').xp : null), d: 1, cls: 'num', in: ['marknaden'] },
-  { key: 'mpts', label: 'Poäng', title: 'Poängen i samma matcher', get: (t) => (fdOf(t, 'mkt') ? fdOf(t, 'mkt').pts : null), cls: 'num', in: ['marknaden'] },
-  { key: 'vso', label: '±', title: 'Poäng minus väntade poäng – plus = bättre än oddsen trodde', get: vsOdds, cls: 'num', in: ['marknaden'],
-    show: (t) => delta(vsOdds(t), { d: 1 }) },
-  { key: 'fav', label: 'Favorit', title: 'Andel matcher där laget var favorit enligt oddsen', get: (t) => { const m = fdOf(t, 'mkt'); return m ? m.fav / m.n : null; }, pct: true, cls: 'num hide-xs', in: ['marknaden'] },
-  { key: 'roi', label: 'Avkastning', title: 'Lika stor insats på att laget vinner varje match, till oddset vid avspark: vinst eller förlust i procent av insatserna', get: roi, cls: 'num', in: ['marknaden'],
-    show: (t) => delta(roi(t), { dead: 0.005, fmt: signedPct }) },
+  // Oddsen läses från vänster: hur ofta laget var favorit, vad oddsen
+  // väntade sig, vad laget tog, skillnaden och vad ett spel på laget gav.
+  { key: 'fav', label: 'Favorit', sub: 'andel matcher', name: 'Favorit enligt oddsen',
+    title: 'Hur ofta laget hade större chans än motståndaren att vinna, enligt spelbolagens odds före avspark. 100 % = favorit i varje match, 0 % = aldrig favorit.',
+    get: (t) => { const m = fdOf(t, 'mkt'); return m ? m.fav / m.n : null; }, pct: true, cls: 'num hide-xs', in: ['marknaden'] },
+  { key: 'mxp', label: 'Väntat', sub: 'poäng enligt oddsen', name: 'Väntade poäng',
+    title: 'Så många poäng oddsen räknade med att laget skulle ta. Före varje match görs oddsen om till chanser (utan spelbolagens påslag), och matchen ger 3 × vinstchansen + oavgjortchansen. Exempel: 60 % vinst och 25 % oavgjort = 2,05 poäng.',
+    get: (t) => (fdOf(t, 'mkt') ? fdOf(t, 'mkt').xp : null), d: 1, cls: 'num', in: ['marknaden'] },
+  { key: 'mpts', label: 'Tog', sub: 'poäng', name: 'Tagna poäng',
+    title: 'Poängen laget faktiskt tog i samma matcher. Kan vara färre än i tabellen – oddsen kommer ibland en omgång efter.',
+    get: (t) => (fdOf(t, 'mkt') ? fdOf(t, 'mkt').pts : null), cls: 'num', in: ['marknaden'] },
+  { key: 'vso', label: 'Mot oddsen', sub: 'poäng över/under', name: 'Poäng mot oddsen',
+    title: 'Tagna minus väntade poäng. Plus (grönt) = laget har tagit fler poäng än oddsen trodde. Minus (rött) = färre än väntat.',
+    get: vsOdds, cls: 'num', in: ['marknaden'], show: (t) => delta(vsOdds(t), { d: 1 }) },
+  { key: 'roi', label: 'Spel på seger', sub: 'vinst på insatsen', name: 'Om man spelat på laget',
+    title: 'Om man satsat lika mycket på att laget vinner varje match, till oddset före avspark: så mycket hade man vunnit (+) eller förlorat (−) av det man satsat. +50 % = varje hundralapp hade blivit 150 kr. Spelbolagens påslag är inräknat.',
+    get: roi, cls: 'num', in: ['marknaden'], show: (t) => delta(roi(t), { dead: 0.005, fmt: signedPct }) },
 
   { key: 'used', label: 'Spelare', title: 'Spelare som spelat minst en ligamatch', get: (t) => sqOf(t, 'used'), cls: 'num', in: ['truppen'] },
   { key: 'avgAge', label: 'Ålder', title: 'Snittålder, viktad med matcher', get: (t) => sqOf(t, 'avgAge'), cls: 'num', d: 1, in: ['truppen'] },
@@ -881,8 +941,8 @@ const GLOSSARY = [
   ['±xG, ±xGA', 'Mål minus xG och insläppta minus xGA. Stora avvikelser är ofta tur eller otur och brukar jämna ut sig under en säsong.', 'statistik'],
   ['Motst', 'Motståndets styrka hittills enligt modellen, mot vad ett lag i divisionen möter i snitt. Plus = svårare program än snittet.', 'statistik'],
   ['Nollor, Ö2,5, BLGM', 'Andel av lagets matcher utan insläppt mål, med tre mål eller fler, och där båda lagen gjort mål.', 'statistik'],
-  ['Väntat, ±', 'Poängen oddsen vid avspark väntade sig – 3 × vinstchansen plus oavgjortchansen, match för match – och lagets poäng minus det.', 'statistik'],
-  ['Avkastning', 'Vinst eller förlust i procent av insatserna om man satsat lika mycket på att laget vinner varje match, till oddset vid avspark. Spelbolagens marginal är inräknad.', 'statistik'],
+  ['Väntat, Tog, Mot oddsen', 'Poängen oddsen vid avspark väntade sig – 3 × vinstchansen plus oavgjortchansen, match för match – poängen laget tog i samma matcher, och skillnaden. Plus = bättre än oddsen trodde.', 'statistik'],
+  ['Spel på seger', 'Vinst eller förlust i procent av insatserna om man satsat lika mycket på att laget vinner varje match, till oddset vid avspark. Spelbolagens marginal är inräknad.', 'statistik'],
   ['Marginal', 'Spelbolagens påslag: hur mycket summan av 1/odds överstiger 100 %.', 'statistik'],
   ['Grundserien', 'Ligans ordinarie matcher, utan kvalspel (playoff) och cuper.'],
   ['Säsongsprognos', 'Resten av säsongen spelas tusentals gånger med modellens sannolikheter för varje match. Andelen gånger ett lag hamnar på en plats är chansen. 0 och 100 betyder i ingen respektive alla simuleringar – inte att saken är avgjord.', 'tabeller'],
@@ -995,6 +1055,7 @@ function updatePlayerTable() {
 // Händelser via delegering: allt i #divisions renderas om ofta.
 function wire() {
   const root = $('#divisions');
+  tips(root);
   root.addEventListener('click', (e) => {
     if (e.target.closest('button.src-toggle')) { setShowSources(!showSources()); return; }
     const div = e.target.closest('#dv-divs button');

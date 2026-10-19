@@ -314,6 +314,7 @@ table.dv-players th button, table.dv-teams th button {
   font: inherit;
   letter-spacing: inherit;
   text-transform: inherit;
+  text-align: inherit;
   color: inherit;
   background: none;
   border: 0;
@@ -323,6 +324,32 @@ table.dv-players th button, table.dv-teams th button {
   white-space: nowrap;
 }
 table.dv-players th.on, table.dv-teams th.on { color: var(--fg); }
+/* Rubrikens underrad, t.ex. "poäng enligt oddsen" */
+table.dv-players th small, table.dv-teams th small {
+  display: block;
+  margin-top: 3px;
+  font-size: 11px;
+  font-weight: 400;
+  letter-spacing: 0.01em;
+  text-transform: none;
+  color: var(--muted);
+}
+/* Förklaringsrutan vid kolumnrubrikerna (tips() i divisioner.js) */
+.dv-tip {
+  position: fixed;
+  z-index: 60;
+  max-width: min(300px, calc(100vw - 16px));
+  padding: 10px 13px 11px;
+  border: 1px solid var(--pill-line);
+  border-radius: 10px;
+  background: #24211d;
+  box-shadow: 0 14px 34px -12px rgba(0, 0, 0, 0.85);
+  color: var(--ink-soft);
+  font-size: 13px;
+  line-height: 1.45;
+  pointer-events: none;
+}
+.dv-tip b { display: block; margin-bottom: 3px; color: var(--fg); font-weight: 700; }
 table.dv-players .pname { font-weight: 600; white-space: nowrap; }
 table.dv-players .pname small, .dv-natline { display: block; font-size: 12px; font-weight: 400; color: var(--muted); }
 table.dv-players .pname small.show-sm { display: none; }
@@ -501,6 +528,7 @@ dialog.dv-modal::backdrop { background: rgba(4, 9, 18, 0.62); backdrop-filter: b
   .show-sm, table.dv-players .pname small.show-sm { display: block; }
   table.dv-players .pname { white-space: normal; }
   table.dv-teams .team { white-space: normal; min-width: 7.5rem; }
+  table.dv-players th small, table.dv-teams th small { white-space: normal; }
   /* ut till skärmkanten – sidans marginal är 16 px på mobilen */
   .dv-divs { flex-wrap: nowrap; overflow-x: auto; scrollbar-width: none; margin: 0 calc(-1 * var(--gutter, 20px)); padding: 0 var(--gutter, 20px); }
   .dv-divs::-webkit-scrollbar { display: none; }
