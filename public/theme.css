@@ -269,7 +269,7 @@ main { padding-top: 8px; padding-bottom: 48px; }
 }
 .hero-aside { display: none; }
 
-/* Uppdaterad … som en statuspille med en pulserande prick */
+/* varningsraden under mottot – syns bara när något är fel */
 .hero .topline {
   margin-top: 18px;
   text-align: left;
@@ -278,28 +278,6 @@ main { padding-top: 8px; padding-bottom: 48px; }
   color: var(--muted);
 }
 .hero .topline strong { color: var(--fg); }
-.hero .topline > span:first-child {
-  display: inline-flex;
-  align-items: center;
-  gap: 8px;
-  padding: 4px 12px 4px 10px;
-  border-radius: 999px;
-  background: rgba(61, 179, 124, 0.08);
-  box-shadow: inset 0 0 0 1px rgba(61, 179, 124, 0.24);
-  color: var(--ink-soft);
-}
-.hero .topline > span:first-child::before {
-  content: "";
-  width: 7px;
-  height: 7px;
-  border-radius: 50%;
-  background: var(--fresh);
-  animation: live-pulse 2.4s ease-out infinite;
-}
-@keyframes live-pulse {
-  0% { box-shadow: 0 0 0 0 rgba(61, 179, 124, 0.6); }
-  70%, 100% { box-shadow: 0 0 0 7px rgba(61, 179, 124, 0); }
-}
 
 /* smala skärmar: fotot bredvid mottot och statusraden, utan glapp under */
 @media (max-width: 899px) {
@@ -881,5 +859,4 @@ footer .foot-links a[aria-current="page"] { color: var(--fg); }
 
 @media (prefers-reduced-motion: reduce) {
   * { transition: none !important; }
-  .hero .topline > span:first-child::before { animation: none; }
 }

@@ -1181,9 +1181,15 @@ function topline(d) {
   summary.innerHTML = late
     ? `<span class="err" style="display:inline">Senaste bygget ${when(meta.generatedAt)} – ovanligt länge sedan (ska ske var ${meta.updateEveryMinutes}:e minut). Den schemalagda hämtningen kan ha stannat.</span>`
     : '';
-  $('#topline').innerHTML = `<span${meta ? ` title="Säsong ${esc(meta.season)} · byggs var ${meta.updateEveryMinutes}:e minut"` : ''}>Uppdaterad ${meta ? when(meta.generatedAt) : '–'}</span>` +
-    (issues ? ` · <a href="#kallor">${esc(issues)}</a>` : '') +
-    (late ? ' · <span class="err" style="display:inline">datan är gammal</span>' : '');
+  // Raden syns bara när något är fel.
+  const parts = [
+    meta ? null : 'Kunde inte läsa sajtens data.',
+    issues ? `<a href="#kallor">${esc(issues)}</a>` : null,
+    late ? '<span class="err" style="display:inline">datan är gammal</span>' : null,
+  ].filter(Boolean);
+  const tl = $('#topline');
+  tl.innerHTML = parts.join(' · ');
+  tl.hidden = !parts.length;
 }
 
 // ---------- modell ----------
@@ -1450,6 +1456,7 @@ if (window.Spoiler) {
     state.comps = new Map(state.meta.competitions.map((c) => [c.id, c]));
   } catch {
     $('#topline').textContent = 'Kunde inte läsa sajtens data.';
+    $('#topline').hidden = false;
   }
   renderChips();
   loadMatches();
