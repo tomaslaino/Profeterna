@@ -9,16 +9,21 @@
 // omgången pågår heter de Leder och Sist. Delat vid lika står alla med samma
 // utmärkelse bredvid varandra.
 //
+// Utan pågående omgång (Kronan.reigning) står den senaste avslutade
+// omgångens orakel och Ikaros kvar i en egen ruta. Före första omgången är
+// det KRONAN_START.
+//
 // Kropparna är urklippta foton (public/profeterna/kropp-*.png). hx är
 // huvudets mitt i procent av bildens bredd och sy axlarnas höjd i procent av
 // bildens höjd – där fäster Ikaros vingar. Den som saknar bild får
 // initialerna på en marmorskiva.
 
 const KRONAN_KROPPAR = {
-  DL: { bild: 'profeterna/kropp-laino.png', hx: 49.7, sy: 16 },
-  DT: { bild: 'profeterna/kropp-teijder.png', hx: 52.8, sy: 16.7 },
-  DJ: { bild: 'profeterna/kropp-johansson.png', hx: 60.5, sy: 18.1 },
+  DL: { namn: 'Daniel Laino', bild: 'profeterna/kropp-laino.png', hx: 49.7, sy: 16 },
+  DT: { namn: 'Daniel Teijder', bild: 'profeterna/kropp-teijder.png', hx: 52.8, sy: 16.7 },
+  DJ: { namn: 'Daniel Johansson', bild: 'profeterna/kropp-johansson.png', hx: 60.5, sy: 18.1 },
 };
+const KRONAN_START = { orakel: ['DL'], ikaros: ['DJ'] };
 
 window.Kronan = (() => {
   const r1 = (x) => Math.round(x * 10) / 10;
@@ -110,7 +115,7 @@ window.Kronan = (() => {
     const orakel = kind === 'orakel';
     const title = orakel ? (done ? 'Omgångens orakel' : 'Leder just nu') : (done ? 'Omgångens Ikaros' : 'Sist just nu');
     const p0 = people[0];
-    const stat = `${pts(p0.pts)} · ${p0.ok}/${p0.n} rätt`;
+    const stat = p0.pts != null ? `<span class="kr-stat ${tone(p0.pts)}">${pts(p0.pts)} · ${p0.ok}/${p0.n} rätt</span>` : '';
     const figs = people.map((p) => fig(p, orakel ? '' : WINGS)).join('');
     const scene = orakel
       ? `<div class="kr-rays"></div>${LAUREL}<div class="kr-figs n${people.length}">${figs}</div><div class="kr-plinth"></div>`
@@ -123,8 +128,14 @@ window.Kronan = (() => {
     const names = people.map(name).join('<span class="kr-amp"> &amp; </span>');
     return `<figure class="kr-panel kr-${kind}${done ? '' : ' is-prel'}" aria-label="${esc2(title)}: ${esc2(people.map((p) => p.name).join(' och '))}">` +
       `<div class="kr-scene">${scene}</div>` +
-      `<figcaption><span class="kr-title">${title}</span><b class="kr-name">${names}</b>` +
-      `<span class="kr-stat ${tone(p0.pts)}">${stat}</span></figcaption></figure>`;
+      `<figcaption><span class="kr-title">${title}</span><b class="kr-name">${names}</b>${stat}</figcaption></figure>`;
+  }
+
+  // s = omgångens poäng (tpScore i tippare.js): ranked med award best/worst.
+  const fmt0 = (x) => String(Math.round(x * 10) / 10);
+
+  function stage(best, worst, done, pts) {
+    return `<div class="kr-stage">${panel('orakel', best, done, pts || fmt0)}${panel('ikaros', worst, done, pts || fmt0)}</div>`;
   }
 
   // s = omgångens poäng (tpScore i tippare.js): ranked med award best/worst.
@@ -133,9 +144,31 @@ window.Kronan = (() => {
     const best = ranked.filter((p) => p.award === 'best');
     const worst = ranked.filter((p) => p.award === 'worst');
     if (!best.length || !worst.length) return '';
-    const fmt = pts || ((x) => String(Math.round(x * 10) / 10));
-    return `<div class="kr-stage">${panel('orakel', best, s.done, fmt)}${panel('ikaros', worst, s.done, fmt)}</div>`;
+    return stage(best, worst, s.done, pts);
   }
 
-  return { html };
+  // Egen ruta när ingen omgång pågår: den senaste avslutade omgången med både
+  // orakel och Ikaros (säsongens omgångar, data/tippare.json), annars
+  // KRONAN_START utan poäng.
+  function reigning(rounds, pts) {
+    const has = (r, a) => (r.people || []).some((p) => p.award === a);
+    const last = (rounds || []).filter((r) => has(r, 'best') && has(r, 'worst'))
+      .sort((a, b) => String(b.to || b.from).localeCompare(String(a.to || a.from)))[0];
+    let best;
+    let worst;
+    let when = '';
+    if (last) {
+      best = last.people.filter((p) => p.award === 'best');
+      worst = last.people.filter((p) => p.award === 'worst');
+      if (typeof dateRange === 'function' && last.from) when = ` · ${esc2(dateRange(last.from, last.to || last.from))}`;
+    } else {
+      const who = (id) => ({ id, name: (KRONAN_KROPPAR[id] && KRONAN_KROPPAR[id].namn) || id });
+      best = KRONAN_START.orakel.map(who);
+      worst = KRONAN_START.ikaros.map(who);
+    }
+    return `<div class="card tp-card kr-reign"><p class="kp-eyebrow">${last ? 'Senaste omgången' : 'Omgångens tippare'}${when}</p>` +
+      `${stage(best, worst, true, pts)}</div>`;
+  }
+
+  return { html, reigning };
 })();

@@ -279,7 +279,9 @@ function tpSeasonCard() {
 function tpRender() {
   const el = $('#tippare');
   if (!el) return;
-  const html = tpCard() + tpSeasonCard();
+  // Utan pågående omgång står den senaste kröningen kvar (kronan.js).
+  const seen = ((TP.season && TP.season.rounds) || []).filter((r) => !tpRoundHidden(r));
+  const html = (tpCard() || (window.Kronan ? Kronan.reigning(seen, tpPts) : '')) + tpSeasonCard();
   if (html === TP.html) return;
   TP.html = html;
   el.innerHTML = html;

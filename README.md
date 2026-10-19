@@ -1094,6 +1094,9 @@ helgardering alltid ger 0). Poängen läggs ihop för omgången.
   (klippta med macOS Vision); `KRONAN_KROPPAR` i kronan.js säger var huvudet och axlarna
   sitter i varje bild så att vingarna fäster rätt. Delat vid lika står alla med samma
   utmärkelse ihop.
+- Pågår ingen omgång (eller är inget spelat än) står den senaste avslutade omgångens
+  orakel och Ikaros kvar i en egen ruta, *Senaste omgången*. Före första omgången är det
+  `KRONAN_START` i kronan.js: Daniel Laino som orakel och Daniel Johansson som Ikaros.
 - Saknas modellen för en match används kuponghistorikens schablon: 45 % för ett tecken,
   75 % för två. Uppskjutna och inställda matcher räknas inte.
 - *Poäng per match* (utfällbar) visar varje tips med poängen.
