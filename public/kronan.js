@@ -116,11 +116,11 @@ window.Kronan = (() => {
   const esc2 = (s) => (typeof esc === 'function' ? esc(s) : String(s));
   const tone = (x) => (Math.round(x * 10) > 0 ? 'pos' : Math.round(x * 10) < 0 ? 'neg' : '');
 
-  // Förnamnet döljs på smala skärmar – alla i gänget heter Daniel.
+  // Bara efternamnet syns – alla i gänget heter Daniel.
   function name(p) {
     const n = String(p.name || p.id);
     const i = n.indexOf(' ');
-    return i > 0 ? `<span class="kr-given">${esc2(n.slice(0, i))} </span>${esc2(n.slice(i + 1))}` : esc2(n);
+    return esc2(i > 0 ? n.slice(i + 1) : n);
   }
 
   function fig(p, extra) {
