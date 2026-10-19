@@ -784,7 +784,11 @@ ställningen efter 90 minuter (samma utfall som prognosen).
 - **Live:** medan en kupongmatch pågår hämtar sidan ESPN:s scoreboard varje minut, direkt i
   webbläsaren (se Datakällor). Går matchen till förlängning väntar rättningen på nästa
   bygge, som räknar fram ställningen efter 90 minuter ur målminuterna. Svarar inte ESPN
-  visas det, och kupongen rättas mot `matches.json` som vanligt.
+  visas det, och kupongen rättas mot `matches.json` som vanligt. En match som ESPN anger
+  som uppskjuten, inställd eller avbruten visas så direkt (inte som slutspelad) och räknas
+  inte, redan före nästa bygge.
+- **Spoilerskyddet:** en kupong där alla matcher är slut räknas som klar även när skyddet
+  döljer resultaten – då visar förstasidan nästa kupong i stället för den gamla.
 
 **Skapa och spara**
 
@@ -799,9 +803,16 @@ ställningen efter 90 minuter (samma utfall som prognosen).
    matchen>.json` via GitHubs API. Pushen startar workflowen och kupongen syns för alla
    efter bygget, några minuter senare. Git-historiken visar när kupongen lades; tiden i
    `skapad` sätts av proxyn. Kodordet sparas på enheten, så nästa gång räcker ett tryck.
-   Är datumet redan taget av en annan kupong får filen `-2` (osv.).
+   Är datumet redan taget av en kupong som sidan kände till får filen `-2` (osv.). Har
+   någon annan just sparat en kupong för samma dag – som sidan inte visar än – frågar sidan
+   först: *Visa den* eller *Spara ändå, som en kupong till*.
+   **Startade matcher är låsta:** en match som har startat (eller ställts in) kan inte
+   läggas till. Hinner en vald match starta medan man väljer tas den bort, med en rad om
+   det, innan något sparas. Proxyn kontrollerar detsamma mot avsparkstiderna i den
+   publicerade `data/matches.json`, inte mot det sidan skickar.
 3. Tills dess visas kupongen i den webbläsaren där den skapades, märkt *väntar på GitHub*.
-   Märkningen försvinner när den publicerade kupongen är likadan, och glöms efter tre dygn.
+   Märkningen försvinner när bygget visar den sparade kupongen – eller en senare version
+   som någon annan sparat – och glöms efter tre dygn.
 4. **Reserv:** *Spara via GitHub i stället* (eller automatiskt erbjudet om proxyn inte kan
    spara) öppnar GitHub med filen ifylld – tryck **Commit changes** (kräver inloggning med
    skrivrätt till repot).
@@ -824,8 +835,14 @@ matchanalysen, så att GitHub-nyckeln bara finns där. Driftsätts med
   filen direkt i `data/kuponger/` (eller `KUPONG_DIR`) utan GitHub.
 
 **Ändra:** knappen *Ändra* (bara medan någon match återstår). Startade matcher ligger kvar
-som de är, med sina anteckningar. Spara direkt skriver över filen (behåller `skapad`,
-lägger till `ändrad`). Via GitHub kan inte en befintlig fil fyllas i, så *Spara på GitHub*
+som de är, med sina anteckningar – också om de hunnit starta medan man ändrade; proxyn
+nekar att de ändras eller tas bort. Spara direkt skriver över filen (behåller filens
+`skapad`, lägger till `ändrad`), men bara den version som ändringen utgick från: varje
+kupong i `kuponger.json` har filens version (`sha`, git-blobbens, samma som GitHubs API
+anger), sidan skickar den med (`bas`), och har någon annan sparat en ändring under tiden
+svarar proxyn att någon annan har ändrat kupongen. Ingenting skrivs över; sidan visar den
+nya versionen och erbjuder *Börja om från den nya versionen*. Ett sparat utkast till en
+kupong som ändrats sedan dess kastas på samma sätt när man öppnar Ändra. Via GitHub kan inte en befintlig fil fyllas i, så *Spara på GitHub*
 kopierar innehållet och öppnar filen för redigering – markera allt, klistra in, Commit
 changes.
 **Ta bort:** radera filen på GitHub.
@@ -1045,6 +1062,15 @@ schemaintervall gammalt.
   har det kan lägga och ändra kuponger (fel kodord spärras efter tio försök). Märkningen
   *väntar på GitHub* finns bara i webbläsaren där kupongen skapades. Liveställningen bygger
   på ESPN:s inofficiella API, som resten av sajten.
+- Låset för startade matcher och versionskontrollen (2026-10-18) är provade lokalt och mot
+  ett låtsas-GitHub, inte mot den driftsatta tjänsten – den måste driftsättas om
+  (`npx wrangler@4.147.0 deploy --config worker/kupong.toml`) för att de ska gälla där.
+  Proxyn läser hela `matches.json` (~0,5 MB) vid varje sparning; processortiden på
+  Cloudflares gratisnivå (10 ms) är inte mätt. Svarar inte sajten kan inget sparas direkt
+  (reservvägen via GitHub finns kvar). Avsparkstiderna är byggets, högst en halvtimme
+  gamla: en match som flyttats till en tidigare tid efter senaste bygget låses först vid
+  den gamla tiden. En sida laddad före ändringen skickar ingen version, och då görs ingen
+  versionskontroll (låset gäller ändå).
 
 ## Säkerhet
 

@@ -23,6 +23,7 @@
 // med till historiken och AI:ns kommentar (src/history.js). En trasig fil
 // stoppar inte bygget – den visas som fel.
 
+const crypto = require('crypto');
 const fs = require('fs');
 const path = require('path');
 
@@ -66,6 +67,13 @@ function parseCoupon(id, raw) {
   };
 }
 
+// Filens version som git räknar den (blob-sha) – samma som GitHubs API
+// svarar med. Spara direkt skriver bara över den version som en ändring
+// utgick från (worker/kupong.mjs).
+function blobSha(buf) {
+  return crypto.createHash('sha1').update(`blob ${buf.length}\0`).update(buf).digest('hex');
+}
+
 function readCoupons(dir = COUPON_DIR) {
   const coupons = [];
   const errors = [];
@@ -73,17 +81,19 @@ function readCoupons(dir = COUPON_DIR) {
   for (const f of fs.readdirSync(dir).filter((x) => x.endsWith('.json')).sort()) {
     const id = f.replace(/\.json$/, '');
     let raw;
+    let buf;
     try {
-      raw = JSON.parse(fs.readFileSync(path.join(dir, f), 'utf8'));
+      buf = fs.readFileSync(path.join(dir, f));
+      raw = JSON.parse(buf.toString('utf8'));
     } catch (err) {
       errors.push({ file: f, errors: [`kan inte läsas: ${err.message}`] });
       continue;
     }
     const r = parseCoupon(id, raw);
-    if (r.coupon) coupons.push(r.coupon);
+    if (r.coupon) coupons.push({ ...r.coupon, sha: blobSha(buf) });
     if (r.errors.length) errors.push({ file: f, errors: r.errors });
   }
   return { coupons, errors };
 }
 
-module.exports = { readCoupons, parseCoupon, normSign, COUPON_DIR, REPO, BRANCH, NOTE_MAX };
+module.exports = { readCoupons, parseCoupon, normSign, blobSha, COUPON_DIR, REPO, BRANCH, NOTE_MAX };

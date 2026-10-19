@@ -3,12 +3,25 @@
 // matchanalysen: GitHub-nyckeln finns bara här, och tjänsten gör inget annat
 // än att committa en kontrollerad kupongfil i data/kuponger/.
 //
-//   POST /kupong {"kod", "kupong", "andra"}   (se worker/kupong.mjs)
+//   POST /kupong {"kod", "kupong", "andra", "bas", "ändå"}   (se worker/kupong.mjs)
 //
 // Driftsätts för hand med worker/kupong.toml; hemligheterna GITHUB_TOKEN och
 // KUPONG_KOD läggs in med "wrangler secret put" (README, avsnittet Kupongen).
+//
+// Avsparkstiderna (startade matcher är låsta) läses ur den publicerade
+// sajten, <site>/data/matches.json – samma sajt som matchanalysens proxy
+// läser (config/llm.js, eller SITE).
 
+import cfg from '../config/llm.js';
 import { saveCoupon, githubWriter, kvLimiter } from './kupong.mjs';
+
+// Frågeparametern går förbi CDN-cachen, så att det senaste bygget läses.
+async function siteMatches(site) {
+  const res = await fetch(`${site}/data/matches.json?t=${Date.now()}`);
+  if (!res.ok) throw new Error(`HTTP ${res.status}`);
+  const d = await res.json();
+  return Array.isArray(d.matches) ? d.matches : [];
+}
 
 const CORS = {
   'Access-Control-Allow-Origin': '*',
@@ -34,9 +47,11 @@ export default {
       return json(400, { ok: false, error: 'Ogiltig förfrågan.' });
     }
     try {
+      const site = String(env.SITE || cfg.site).replace(/\/+$/, '');
       const r = await saveCoupon(body, {
         env,
         writer: env.GITHUB_TOKEN ? githubWriter(env.GITHUB_TOKEN) : null,
+        loadMatches: () => siteMatches(site),
         limiter: env.KUPONG ? kvLimiter(env.KUPONG, request.headers.get('CF-Connecting-IP')) : null,
       });
       return json(r.status, r.body);

@@ -39,6 +39,10 @@ const KP_DRAFT = 'profeterna.kupong.utkast';
 const KP_PENDING = 'profeterna.kupong.osparad';
 // ESPN:s ligakoder, om meta.json byggts före kupongen (annars därifrån).
 const ESPN_CODE = { pl: 'eng.1', ch: 'eng.2', l1: 'eng.3', l2: 'eng.4', fac: 'eng.fa', lc: 'eng.league_cup' };
+// Matcher som inte spelas, i spelprogrammet eller i liveställningen (samma
+// som worker/kupong.mjs och src/history.js). De räknas inte på kupongen.
+const OFF = /POSTPONED|CANCEL|ABANDON|SUSPEND/;
+const offLabel = (s) => (/CANCEL/.test(s) ? 'inställd' : /ABANDON|SUSPEND/.test(s) ? 'avbruten' : 'uppskjuten');
 
 const kpNum = (x) => x.toLocaleString('sv-SE', { minimumFractionDigits: 1, maximumFractionDigits: 1 });
 const fDayNum = fmt({ day: 'numeric' });
@@ -89,8 +93,10 @@ function matchById(id) {
   return kpIndex.map.get(id) || null;
 }
 
-// Kuponger som sparats här men ännu inte publicerats av bygget, per id.
-// Efter tre dygn antas de aldrig ha committats och glöms.
+// Kuponger som sparats här men ännu inte publicerats av bygget, per id, med
+// versionerna (sha) som de ersätter (older: den som ändringen utgick från,
+// den som bygget visade då och de som tidigare osparade ersatte). Efter tre
+// dygn antas de aldrig ha committats och glöms.
 function pendingCoupons() {
   const all = kpLoad(KP_PENDING) || {};
   const keep = {};
@@ -100,8 +106,11 @@ function pendingCoupons() {
   if (Object.keys(keep).length !== Object.keys(all).length) kpStore(KP_PENDING, keep);
   return keep;
 }
-function setPending(coupon) {
-  kpStore(KP_PENDING, { ...pendingCoupons(), [coupon.id]: { savedAt: new Date().toISOString(), coupon } });
+function setPending(coupon, base) {
+  const all = pendingCoupons();
+  const pub = KP.data ? KP.data.coupons.find((c) => c.id === coupon.id) : null;
+  const older = [...new Set([base, pub && pub.sha, ...((all[coupon.id] && all[coupon.id].older) || [])].filter(Boolean))];
+  kpStore(KP_PENDING, { ...all, [coupon.id]: { savedAt: new Date().toISOString(), coupon, older } });
 }
 function clearPending(id) {
   const all = pendingCoupons();
@@ -111,16 +120,29 @@ function clearPending(id) {
 
 const signature = (c) => c.matches.map((x) => `${x.id}:${x.sign}:${x.note || ''}`).sort().join(',');
 
+// Den osparade ersätter den publicerade bara så länge bygget visar en äldre
+// version. Visar bygget den – eller en senare, som någon annan sparat –
+// gäller den publicerade.
 function allCoupons() {
   const list = (KP.data ? KP.data.coupons : []).slice();
-  for (const { coupon } of Object.values(pendingCoupons())) {
+  for (const { coupon, older } of Object.values(pendingCoupons())) {
     const p = { ...coupon, pending: true };
     const i = list.findIndex((c) => c.id === p.id);
-    if (i >= 0 && signature(list[i]) === signature(p)) clearPending(p.id);
-    else if (i >= 0) list[i] = p;
-    else list.push(p);
+    if (i < 0) { list.push(p); continue; }
+    const pub = list[i];
+    if (signature(pub) === signature(p) || (p.sha && pub.sha === p.sha) || !(older || []).includes(pub.sha)) clearPending(p.id);
+    else list[i] = p;
   }
   return list;
+}
+
+// En kupong som tjänsten svarat med (filens format) → sidans format.
+function fromStored(k) {
+  if (!k || !Array.isArray(k.matcher)) return null;
+  const sign = (s) => { const t = String(s || '').toUpperCase(); return SIGNS.filter((x) => t.includes(x)).join(''); };
+  const matches = k.matcher.filter((r) => r && r.id != null && sign(r.tecken))
+    .map((r) => ({ id: String(r.id), sign: sign(r.tecken), label: r.match ? String(r.match) : null, ...(r.kommentar ? { note: String(r.kommentar) } : {}) }));
+  return matches.length ? { id: String(k.id), name: k.namn || null, created: k.skapad || null, sha: k.sha || null, matches } : null;
 }
 
 // ---------- rättning ----------
@@ -139,8 +161,13 @@ function gradeRow(x, now) {
     r.tip = pr.indexOf(Math.max(...pr));
   }
   const L = KP.live.get(m.id);
-  if (/POSTPONED|CANCEL|ABANDON|SUSPEND/.test(m.status || '')) {
+  // Uppskjuten, inställd eller avbruten – enligt bygget, eller enligt
+  // liveställningen innan nästa bygge vet om det (ESPN ger dem läget "post",
+  // som en slutspelad match).
+  const off = OFF.test(m.status || '') ? m.status : !m.completed && L && OFF.test(L.name || '') ? L.name : null;
+  if (off) {
     r.state = 'off';
+    r.off = offLabel(off);
   } else if (m.completed) {
     r.state = 'final';
     r.score = m.score;
@@ -154,13 +181,16 @@ function gradeRow(x, now) {
     r.clock = L.state === 'in' ? L.detail : null;
     // Förlängning och straffar: ställningen efter 90 minuter kommer med
     // nästa bygge (målminuterna), inte ur liveställningen.
-    const regular = L.state === 'in' ? /FIRST_HALF|HALFTIME|SECOND_HALF|END_PERIOD/.test(L.name) : /STATUS_(FULL_TIME|FINAL)$/.test(L.name);
+    const regular = L.state === 'in' ? /^STATUS_(FIRST_HALF|HALFTIME|SECOND_HALF|END_PERIOD)$/.test(L.name) : /STATUS_(FULL_TIME|FINAL)$/.test(L.name);
     r.res = regular ? signIdx(L.score) : null;
   } else if (r.kick <= now) {
     r.state = 'started';
   } else {
     r.state = 'upcoming';
   }
+  // Slutspelad – också när spoilerskyddet döljer resultatet: att matchen är
+  // slut avslöjar inget.
+  r.over = r.state === 'final';
   // Spoilerskyddet: startad match utan ställning och utan rättning.
   if (r.state !== 'upcoming' && r.state !== 'off' && isHidden(m)) {
     return { ...r, state: 'hidden', score: null, res: null, clock: null, extra: null };
@@ -187,7 +217,7 @@ function gradeCoupon(c, now = Date.now()) {
     last: rows.length ? rows[rows.length - 1].kick : null,
   };
   g.max = g.n - g.no;
-  g.done = counted.every((r) => r.state === 'final');
+  g.done = counted.every((r) => r.over);
   // Väntat antal rätt: klara matcher räknas som de gick, resten med
   // modellens sannolikhet för vårt tecken före avspark.
   g.expected = counted.reduce((a, r) => a + (r.state === 'final' && r.hit != null ? (r.hit ? 1 : 0) : (r.p || 0) / 100), 0);
@@ -221,7 +251,7 @@ function liveNeeded(now = Date.now()) {
   for (const c of allCoupons()) {
     for (const x of c.matches) {
       const m = matchById(x.id);
-      if (!m || m.completed || /POSTPONED|CANCEL/.test(m.status || '')) continue;
+      if (!m || m.completed || OFF.test(m.status || '')) continue;
       const t = new Date(m.kickoff).getTime();
       if (t <= now + 2 * 60000 && t >= now - 5 * 3600000) out.push(m);
     }
@@ -309,7 +339,7 @@ function scoreText(r) {
 function pearlTitle(r) {
   const what = r.state === 'final' ? scoreText(r) || 'spelad'
     : r.state === 'live' ? `${scoreText(r)} ${r.clock || ''}`.trim()
-      : r.state === 'off' ? 'uppskjuten' : r.state === 'missing' ? 'okänd match' : r.state === 'hidden' ? 'dolt'
+      : r.state === 'off' ? r.off : r.state === 'missing' ? 'okänd match' : r.state === 'hidden' ? 'dolt'
         : r.m ? fWeekdayTime.format(new Date(r.m.kickoff)) : '';
   return `${teamsOf(r)} · ${r.sign} · ${what}${r.note ? ` · ”${r.note}”` : ''}`;
 }
@@ -335,6 +365,7 @@ function statusLine(g) {
   if (!g.started) {
     return `Startar ${esc(fWeekdayTime.format(new Date(g.first)))} · modellen väntar sig <b>${kpNum(g.expected)}</b> rätt`;
   }
+  if (g.done && g.hidden) return `Klar · ${Spoiler.chip(`${g.hidden} ${g.hidden === 1 ? 'dold' : 'dolda'}`)}`;
   if (g.done) return `Klar · modellens tips gav <b>${g.modelOk}</b> rätt`;
   return [
     g.live ? `<span class="kp-livetxt">${g.live} pågår</span>` : null,
@@ -392,10 +423,8 @@ function renderCouponShow(id) {
     (front ? '' : '<a class="kp-btn primary" href="#kupong/ny">+ Ny kupong</a>') + '</div></div>';
 
   html += summaryCard(g);
-  // Färdigspelad även om spoilerskyddet döljer resultaten – att matcherna är
-  // slut avslöjar inget.
-  const over = g.rows.every((r) => ['final', 'off', 'missing'].includes(r.state) || (r.state === 'hidden' && r.m.completed));
-  if (front && over) html += '<a class="kp-next" href="#kupong/ny"><span aria-hidden="true">+</span> Skapa ny kupong</a>';
+  // Färdigspelad även om spoilerskyddet döljer resultaten (g.done).
+  if (front && g.done) html += '<a class="kp-next" href="#kupong/ny"><span aria-hidden="true">+</span> Skapa ny kupong</a>';
   if (g.hidden) {
     const ids = g.rows.filter((r) => r.state === 'hidden').map((r) => r.id);
     html += Spoiler.card({
@@ -458,7 +487,7 @@ function couponRows(g) {
         : r.m ? esc(fTime.format(new Date(r.m.kickoff))) : '';
       const comp = r.m ? compOf(r.m.comp) : null;
       // På mobilen saknas tidskolumnen: tiden (eller matchminuten) står då under resultatet.
-      const score = r.state === 'off' ? '<span class="sub">uppskjuten</span>'
+      const score = r.state === 'off' ? `<span class="sub">${esc(r.off)}</span>`
         : r.state === 'hidden' ? `${Spoiler.chip()}<span class="sub kp-m">${r.m ? esc(fTime.format(new Date(r.m.kickoff))) : ''}</span>`
         : r.score ? `<span class="score">${esc(scoreText(r))}</span>${r.extra ? `<span class="sub">${esc(r.extra)}</span>` : ''}` +
           (r.state === 'live' ? `<span class="sub kp-m">${esc(r.clock || 'live')}</span>` : '')
@@ -490,7 +519,7 @@ function liveLine(g) {
 
 function pastSection(list, shown) {
   if (!list.length) return '';
-  const done = list.filter((x) => x.g.done && x.g.n).slice(0, 12).reverse();
+  const done = list.filter((x) => x.g.done && x.g.n && !x.g.hidden).slice(0, 12).reverse();
   let html = `<h3 class="kp-h">${list.every((x) => x.g.first < shown.first) ? 'Tidigare kuponger' : 'Fler kuponger'}` +
     `${KP.history ? '<a class="kp-h-link" href="historik.html">Historik ›</a>' : ''}</h3>`;
   if (done.length >= 2) {
@@ -519,30 +548,74 @@ function couponErrors() {
 
 // ---------- ny kupong ----------
 
+// base = versionen (sha) av kupongen som en ändring utgår från. Tjänsten
+// sparar bara över den versionen, så att ingen skriver över någon annans
+// ändring utan att veta om den.
 function newDraft(editId) {
-  const d = { edit: editId, name: '', picks: {}, notes: {}, locked: [] };
+  const d = { edit: editId, name: '', picks: {}, notes: {}, locked: [], base: null };
   if (!editId) return d;
   const c = allCoupons().find((x) => x.id === editId);
   if (!c) return d;
   d.name = c.name || '';
   d.created = c.created;
-  // Startade matcher går inte att ändra – de följer med som de är.
+  d.base = c.sha || null;
   for (const x of c.matches) {
-    const m = matchById(x.id);
-    if (m && !m.completed && new Date(m.kickoff).getTime() > Date.now()) {
-      d.picks[x.id] = x.sign;
-      if (x.note) d.notes[x.id] = x.note;
-    } else {
-      d.locked.push(x);
-    }
+    d.picks[x.id] = x.sign;
+    if (x.note) d.notes[x.id] = x.note;
   }
+  settleDraft(d);
   return d;
+}
+
+const isOpen = (m, now) => Boolean(m && !m.completed && !OFF.test(m.status || '') && new Date(m.kickoff).getTime() > now);
+
+// Startade matcher går inte att ändra. På en kupong som ändras ligger de
+// kvar som de stod (locked) – också om de valts bort eller fått ett annat
+// tecken i utkastet innan de startade – och på en ny kupong tas de bort.
+// Körs varje gång listan ritas och när kupongen sparas, så att en match som
+// startar medan man väljer inte följer med. Tjänsten kontrollerar detsamma.
+function settleDraft(d, now = Date.now()) {
+  const pub = d.edit ? allCoupons().find((c) => c.id === d.edit) : null;
+  const was = new Map((pub ? pub.matches : []).map((x) => [x.id, x]));
+  const out = { dropped: 0, reverted: 0 };
+  for (const [id, sign] of Object.entries(d.picks)) {
+    if (isOpen(matchById(id), now)) continue;
+    delete d.picks[id];
+    delete d.notes[id];
+    if (!was.has(id)) out.dropped++;
+    else if (was.get(id).sign !== sign) out.reverted++;
+  }
+  d.locked = [...was.values()].filter((x) => !isOpen(matchById(x.id), now));
+  return out;
+}
+
+function startedNote({ dropped, reverted }) {
+  return [
+    dropped ? `${dropped === 1 ? 'En match' : `${dropped} matcher`} som du valt har startat och togs bort.` : null,
+    reverted ? `${reverted === 1 ? 'En match' : `${reverted} matcher`} har startat – där gäller det som stod på kupongen.` : null,
+  ].filter(Boolean).join(' ');
+}
+
+function lockInfo() {
+  const el = $('#kp-lockinfo');
+  if (!el) return;
+  const n = KP.draft.locked.length;
+  el.innerHTML = [
+    KP.draftNote ? `<span class="note">${esc(KP.draftNote)}</span>` : null,
+    n ? `${n} ${n === 1 ? 'match har' : 'matcher har'} startat och ligger kvar som de är.` : null,
+  ].filter(Boolean).join(' ');
+  el.hidden = !el.innerHTML;
 }
 
 function renderCreate(editId) {
   const saved = kpLoad(KP_DRAFT);
-  KP.draft = saved && saved.edit === editId ? saved : newDraft(editId);
+  // Ett sparat utkast till en kupong som ändrats sedan dess gäller inte – då
+  // börjar man om från den nya versionen.
+  const cur = editId ? allCoupons().find((x) => x.id === editId) : null;
+  const stale = Boolean(saved && editId && saved.edit === editId && cur && (saved.base || null) !== (cur.sha || null));
+  KP.draft = saved && saved.edit === editId && !stale ? saved : newDraft(editId);
   KP.draft.notes = KP.draft.notes || {};
+  KP.draftNote = stale ? 'Kupongen har ändrats sedan ditt utkast – du börjar från den nya versionen.' : null;
   KP.view = { mode: 'new', edit: editId };
   const el = $('#coupon');
   const comps = [{ id: 'all', short: 'Alla', name: 'Alla tävlingar' }, ...state.comps.values()];
@@ -554,7 +627,7 @@ function renderCreate(editId) {
     '<div class="chips" id="kp-comps" role="group" aria-label="Tävling">' + comps.map((c) =>
       `<button type="button" data-comp="${c.id}" title="${esc(c.name)}" aria-pressed="${c.id === KP.comp}">${esc(c.short)}</button>`).join('') + '</div>' +
     `<button type="button" id="kp-only" class="kp-only" aria-pressed="${KP.onlyPicked}">Bara valda</button></div>` +
-    (KP.draft.locked.length ? `<p class="legend">${KP.draft.locked.length} ${KP.draft.locked.length === 1 ? 'match har' : 'matcher har'} startat och ligger kvar som de är.</p>` : '') +
+    '<p class="legend" id="kp-lockinfo" hidden></p>' +
     '<div id="kp-pick-list"></div>' +
     '<div class="kp-bar"><span class="kp-bar-txt" id="kp-bar-txt"></span>' +
     `<input type="text" id="kp-name" class="kp-name" maxlength="40" placeholder="Namn (valfritt)" value="${esc(KP.draft.name)}">` +
@@ -608,13 +681,19 @@ const fold = (s) => String(s).toLowerCase().normalize('NFD').replace(/[̀-ͯ]/g,
 function pickable(now = Date.now()) {
   return state.all.matches.filter((m) => {
     const t = new Date(m.kickoff).getTime();
-    return !m.completed && t > now && t <= now + PICK_DAYS * 86400000 && !/POSTPONED|CANCEL/.test(m.status || '');
+    return isOpen(m, now) && t <= now + PICK_DAYS * 86400000;
   });
 }
 
 function renderPickList() {
   const el = $('#kp-pick-list');
   if (!el) return;
+  const moved = settleDraft(KP.draft);
+  if (moved.dropped || moved.reverted) {
+    KP.draftNote = startedNote(moved);
+    kpStore(KP_DRAFT, KP.draft);
+  }
+  lockInfo();
   const q = fold(KP.q.trim());
   const picks = KP.draft.picks;
   const list = pickable().filter((m) => {
@@ -692,6 +771,15 @@ function couponJSON(file) {
 // redan öppnas den för redigering och innehållet kopieras, eftersom GitHub
 // inte kan fylla i en befintlig fil.
 async function saveCoupon() {
+  // Har en vald match hunnit starta visas det först, i stället för att
+  // kupongen sparas utan den.
+  const moved = settleDraft(KP.draft);
+  if (moved.dropped || moved.reverted) {
+    kpStore(KP_DRAFT, KP.draft);
+    KP.draftNote = startedNote(moved);
+    renderPickList();
+    return;
+  }
   const sel = draftMatches();
   if (!sel.length && !KP.draft.locked.length) {
     $('#kp-bar-txt').innerHTML = '<span class="note">Välj minst en match</span>';
@@ -720,7 +808,7 @@ async function saveCoupon() {
     matcher: rows,
   };
   const ctx = {
-    id, edit: d.edit, name, rows, file,
+    id, edit: d.edit, base: d.base || null, name, rows, file,
     range: dateRange(kick(rows[0]) || null, kick(rows[rows.length - 1]) || null),
     coupon: { id, name: name || null, created: file.skapad, matches: rows.map((r) => ({ id: r.id, sign: r.tecken, label: r.match, ...(r.kommentar ? { note: r.kommentar } : {}) })) },
   };
@@ -766,7 +854,13 @@ async function sendDirect(ctx) {
     res = await fetch(KP.data.save, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ kod: code, andra: ctx.edit || null, kupong: { id: ctx.id, namn: ctx.name, skapad: ctx.file.skapad, matcher: ctx.rows } }),
+      body: JSON.stringify({
+        kod: code,
+        andra: ctx.edit || null,
+        ...(ctx.edit ? { bas: ctx.base } : {}),
+        ...(ctx.anyway ? { 'ändå': true } : {}),
+        kupong: { id: ctx.id, namn: ctx.name, skapad: ctx.file.skapad, matcher: ctx.rows },
+      }),
     });
     body = await res.json().catch(() => ({}));
   } catch {
@@ -775,8 +869,8 @@ async function sendDirect(ctx) {
   btn.disabled = false;
   if (res && res.ok && body.ok) {
     kpStore(KP_CODE, code);
-    const coupon = { ...ctx.coupon, id: body.id || ctx.id, created: body.skapad || ctx.coupon.created };
-    setPending(coupon);
+    const coupon = { ...ctx.coupon, id: body.id || ctx.id, created: body.skapad || ctx.coupon.created, sha: body.sha || null };
+    setPending(coupon, ctx.edit ? ctx.base : null);
     kpStore(KP_DRAFT, null);
     KP.view = { mode: 'saved', id: coupon.id };
     $('#coupon').innerHTML = savedHead('Sparad', ctx) +
@@ -789,6 +883,27 @@ async function sendDirect(ctx) {
     kpStore(KP_CODE, null);
     msg('<span class="note">Fel kodord.</span>');
     $('#kp-kod').select();
+    return;
+  }
+  // Någon annan hann före. Den versionen visas här tills bygget publicerat
+  // den, och utkastet finns kvar – men sparas inte över den utan att man sett
+  // den.
+  const other = res && res.status === 409 ? fromStored(body.kupong) : null;
+  if (other && body.changed) {
+    setPending(other, ctx.base);
+    msg(`<span class="note">${esc(body.error)}</span> ` +
+      `<button type="button" class="kp-linkbtn" id="kp-restart">Börja om från den nya versionen</button>`);
+    $('#kp-restart').addEventListener('click', () => {
+      kpStore(KP_DRAFT, null);
+      renderCreate(ctx.edit);
+    });
+    return;
+  }
+  if (other && body.taken) {
+    setPending(other, null);
+    msg(`<span class="note">${esc(body.error)}</span> <a href="#kupong/${esc(other.id)}">Visa den</a> · ` +
+      '<button type="button" class="kp-linkbtn" id="kp-anyway">Spara ändå, som en kupong till</button>');
+    $('#kp-anyway').addEventListener('click', () => sendDirect({ ...ctx, anyway: true }));
     return;
   }
   if (res && [400, 409, 429].includes(res.status)) {
@@ -804,7 +919,7 @@ async function sendDirect(ctx) {
 
 function renderViaGitHub(ctx) {
   const json = couponJSON(ctx.file);
-  setPending(ctx.coupon);
+  setPending(ctx.coupon, ctx.edit ? ctx.base : null);
   kpStore(KP_DRAFT, null);
   const repo = KP.data.repo || 'tomaslaino/Profeterna';
   const branch = KP.data.branch || 'main';

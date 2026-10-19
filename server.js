@@ -19,7 +19,7 @@ const express = require('express');
 const { loadEnv } = require('./src/env');
 const { build, OUT } = require('./src/build');
 const { CACHE_DIR } = require('./src/store');
-const { COUPON_DIR } = require('./src/coupons');
+const { COUPON_DIR, blobSha } = require('./src/coupons');
 const llm = require('./config/llm');
 
 const TICK_MINUTES = 15;
@@ -79,21 +79,34 @@ function commentRoute(siteDir = OUT, store = fileStore(path.join(CACHE_DIR, 'kom
   };
 }
 
-// Lokalt skrivs kupongen som fil i stället för med en commit på GitHub.
+// Lokalt skrivs kupongen som fil i stället för med en commit på GitHub –
+// med samma versionskontroll (filens blob-sha) som GitHubs API.
 function couponFileWriter(dir = COUPON_DIR) {
   const file = (p) => path.join(dir, path.basename(p));
+  const read = (p) => {
+    if (!fs.existsSync(file(p))) return null;
+    const buf = fs.readFileSync(file(p));
+    return { sha: blobSha(buf), text: buf.toString('utf8') };
+  };
   return {
-    get: async (p) => (fs.existsSync(file(p)) ? { sha: 'lokal' } : null),
-    put: async (p, text) => {
+    get: async (p) => read(p),
+    put: async (p, text, { sha } = {}) => {
+      const cur = read(p);
+      if (cur ? cur.sha !== sha : sha) throw Object.assign(new Error('konflikt'), { conflict: true });
       fs.mkdirSync(dir, { recursive: true });
       fs.writeFileSync(file(p), text);
-      return { url: null };
+      return { url: null, sha: blobSha(Buffer.from(text, 'utf8')) };
     },
   };
 }
 
-// POST /api/kupong {kod, kupong, andra} – kodordet ur KUPONG_KOD.
-function couponSaveRoute(writer = couponFileWriter()) {
+// Sajtens matcher (avsparkstiderna) ur den byggda sajten i siteDir.
+function siteMatches(siteDir = OUT) {
+  return async () => JSON.parse(fs.readFileSync(path.join(siteDir, 'data', 'matches.json'), 'utf8')).matches || [];
+}
+
+// POST /api/kupong {kod, kupong, andra, bas, ändå} – kodordet ur KUPONG_KOD.
+function couponSaveRoute(writer = couponFileWriter(), loadMatches = siteMatches()) {
   const wrong = new Map(); // fel kodord per IP-adress, glöms efter en timme
   return async (req, res) => {
     try {
@@ -102,6 +115,7 @@ function couponSaveRoute(writer = couponFileWriter()) {
       const r = await saveCoupon(req.body, {
         env: process.env,
         writer,
+        loadMatches,
         limiter: {
           count: async () => ((wrong.get(ip) || {}).until > Date.now() ? wrong.get(ip).n : 0),
           bump: async () => {
@@ -152,4 +166,4 @@ if (require.main === module) {
   });
 }
 
-module.exports = { analysisRoute, commentRoute, couponSaveRoute, couponFileWriter, fileStore };
+module.exports = { analysisRoute, commentRoute, couponSaveRoute, couponFileWriter, siteMatches, fileStore };
