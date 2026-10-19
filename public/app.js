@@ -586,28 +586,57 @@ function marketMissing(d) {
   return d.match.completed ? 'inga öppningsodds sparade för matchen' : 'football-data.co.uk har inga odds för matchen ännu (läggs ut fre/tis)';
 }
 
-// Steg för steg: vad varje del av modellen gör med prognosen.
+// Steg för steg som en dragkamp: startläget överst, sedan en stapel per del
+// av modellen åt det lag den hjälper (procentenheter på segerchansen), och
+// sist slutprognosen. Kolumnen till höger är favoritens chans efter varje steg.
 function stepsCard(d) {
   const st = d.prediction.steps;
   if (!st) return '';
   const m = d.match;
-  let prev = null;
-  const rows = st.map((x) => {
-    const w = pct3(x.p);
-    let pull = '';
-    if (prev) {
-      const d1 = x.p[0] - prev.p[0];
-      const d2 = x.p[2] - prev.p[2];
-      const [team, dv] = d1 >= d2 ? [m.home, d1] : [m.away, d2];
-      const v = Math.round(dv * 100);
-      pull = v >= 1 ? `<span class="pull ${d1 >= d2 ? 'h' : 'a'}" title="${esc(team)}"><span class="t">${esc(team)} </span>+${v}</span>` : '<span class="muted">–</span>';
+  const fi = st[st.length - 1].p[0] >= st[st.length - 1].p[2] ? 0 : 2;
+  const fav = fi === 0 ? m.home : m.away;
+  const pulls = st.map((x, i) => {
+    if (!i) return null;
+    const d1 = x.p[0] - st[i - 1].p[0];
+    const d2 = x.p[2] - st[i - 1].p[2];
+    return { home: d1 >= d2, v: Math.round(Math.max(d1, d2) * 100) };
+  });
+  const scale = Math.max(8, ...pulls.map((p) => (p ? p.v : 0)));
+  const gen = (n) => (/[sxz]$/i.test(n) ? n : `${n}s`);
+  const stack = (p) => '<div class="tug-stack">' + pct3(p).map((v, i) =>
+    `<span class="s${i}" style="flex:${v} 1 0">${v >= 10 ? `${v} %` : ''}</span>`).join('') + '</div>';
+  const run = (x) => `<div class="tug-run">${pct3(x.p)[fi]} %</div>`;
+  const lab = (label, sub) => `<div class="tug-lab">${label}${sub ? `<span class="sub">${esc(sub)}</span>` : ''}</div>`;
+
+  const rows = st.map((x, i) => {
+    if (!i) {
+      const sub = x.label.charAt(0).toLowerCase() + x.label.slice(1);
+      return `<div class="tug-row tug-start">${lab('Startpunkt', sub)}${stack(x.p)}${run(x)}</div>`;
     }
-    prev = x;
-    return `<tr><td>${esc(x.label)}${x.sub ? `<span class="sub">${esc(x.sub)}</span>` : ''}</td>` +
-      w.map((v) => `<td class="num">${v}</td>`).join('') + `<td class="num">${pull}</td></tr>`;
-  }).join('');
-  return `<div class="card"><h4>Vad drog åt vilket håll</h4><table class="odds steps"><thead><tr><th></th><th class="num">1</th><th class="num">X</th><th class="num">2</th><th class="num" title="Procentenheter som steget lägger på lagets segerchans">drar mot</th></tr></thead>` +
-    `<tbody>${rows}</tbody></table></div>`;
+    let label = esc(x.label);
+    if (x.label === 'Hemmaplan') label = `${esc(m.home)} spelar hemma`;
+    else if (x.label === m.home || x.label === m.away) label = `${esc(gen(x.label))} anfall och försvar`;
+    const sub = x.label === 'Hemmaplan' ? null : x.sub;
+    const p = pulls[i];
+    let track = '<i class="tug-mid"></i>';
+    if (p.v >= 1) {
+      const w = (p.v / scale) * 36;
+      const [side, cls, team] = p.home ? ['right', 'h', m.home] : ['left', 'a', m.away];
+      track += `<i class="tug-bar ${cls}" style="${side}:50%;width:${w.toFixed(1)}%"></i>` +
+        `<b class="tug-v" style="${side}:calc(50% + ${w.toFixed(1)}% + 5px)" title="${esc(team)}s segerchans +${p.v} procentenheter">+${p.v}</b>`;
+    } else {
+      track += '<span class="tug-none">ingen märkbar effekt</span>';
+    }
+    return `<div class="tug-row${p.v >= 1 ? '' : ' none'}">${lab(label, sub)}<div class="tug-track">${track}</div>${run(x)}</div>`;
+  });
+
+  const axis = `<div class="tug-row tug-axis"><div class="tug-lab"></div><div class="tug-sides">` +
+    `<span><i class="k h"></i>← hjälper ${esc(m.home)}</span><span>hjälper ${esc(m.away)} →<i class="k a"></i></span></div><div></div></div>`;
+  const end = `<div class="tug-row tug-end"><div class="tug-lab">Slutprognos</div>${stack(st[st.length - 1].p)}<div></div></div>` +
+    `<div class="tug-row tug-names"><div class="tug-lab"></div><div class="tug-sides"><span>${esc(m.home)}</span><span>${esc(m.away)}</span></div><div></div></div>`;
+  return `<div class="card tug"><h4>Vad drog åt vilket håll</h4>` +
+    `<p class="tug-note">Staplarna visar hur många procentenheter varje del flyttar segerchansen. Siffran längst till höger är ${esc(gen(fav))} chans att vinna efter varje steg.</p>` +
+    rows[0] + axis + rows.slice(1).join('') + end + '</div>';
 }
 
 function oddsCard(o, m) {
