@@ -200,8 +200,21 @@ function summarize(r) {
     id: r.id,
     from: kicks[0] || null,
     to: kicks[kicks.length - 1] || null,
-    // Matcherna bara för spoilerskyddet: döljs någon av dem döljs omgången.
-    matches: r.matcher.map((row) => ({ id: String(row.id), kickoff: row.avspark, ...(row.struken ? { off: true } : {}) })),
+    // Matcherna för spoilerskyddet (döljs någon av dem döljs omgången) och för
+    // Kampen (public/kampen.js): utfallet, modellens prognos och allas tecken.
+    matches: r.matcher.map((row) => {
+      const res = resOf(row);
+      const model = validModel(row.modell);
+      return {
+        id: String(row.id),
+        kickoff: row.avspark,
+        ...(row.struken ? { off: true } : {}),
+        match: String(row.match || ''),
+        ...(res != null ? { res: SIGNS[res], score: row.resultat } : {}),
+        ...(model ? { model } : {}),
+        tips: row.tips && typeof row.tips === 'object' ? row.tips : {},
+      };
+    }),
     n: r.matcher.filter((row) => resOf(row) != null).length,
     people,
     model: Tippoang.tally(scoreRows(r, (row) => Tippoang.modelSign(validModel(row.modell)))),

@@ -65,6 +65,10 @@ ingen falsk precision · sidan kraschar aldrig av en död källa · endast fria 
   säsongen för gängets egna tips – poäng, omgångar, rätt och antal gånger som omgångens
   bästa och sämsta, med modellen som jämförelse. Varje omgång sparas i
   `data/tippar-historik.json` (se [Säsongens tippare](#säsongens-tippare))
+- [x] **Kampen (2026-10-19):** en egen flik (`#kampen`) för gängets inbördes kamp om
+  tipsen – ställningen med den pågående omgången, en kurva omgång för omgång, inbördes
+  möten, spelkassan (10 kr per match till modellens odds), höjdpunkter och hur var och en
+  tippar (se [Kampen](#kampen))
 - [x] **Enklare sidor (2026-10-19):** matchsidan visar prognosen, jämförelsen med
   spelbolagen, vad som drog åt vilket håll, oddsen, formen och skadorna (namnen i korthet);
   Lagen sida vid sida, Domaren och Trupperna fälls ut. De enkla baslinjerna, FPL:s
@@ -1177,9 +1181,41 @@ resultaten tas ur sajtens egna matcher, inte ur tjänsten.
   (journalen om den finns, annars sajtens prognos); saknas den används schablonen.
 - Saknas ställningen efter 90 minuter tre dagar efter avspark fryses raden utan resultat.
 - Bygget skriver poängen per omgång och person i `data/tippare.json`
-  ([src/tippare.js](src/tippare.js)); sidan lägger ihop dem.
+  ([src/tippare.js](src/tippare.js)); sidan lägger ihop dem. Varje omgång har också
+  matcherna med utfallet, modellens prognos och allas tecken, för Kampen.
 - Lokalt (utan `--journal`) läses filen bara. Prova med en egen fil:
   `TIPPAR_HISTORIK=/tmp/tippare.json npm run build`.
+
+## Kampen
+
+Fliken **Kampen** (`#kampen`, [public/kampen.js](public/kampen.js), `kampen.css`) följer
+gängets inbördes kamp om tipsen säsongen igenom. Underlaget är detsamma som Säsongens
+tippare: de avslutade omgångarna i `data/tippare.json` och – medan den pågår – omgången ur
+`GET …/samtal`, preliminärt och rättad som kupongen (ställningen efter 90 minuter, aktuell
+ställning, Dölj resultat). Poängen är också densamma, 1 för rätt minus modellens chans
+för tipset före avspark ([public/tippoang.js](public/tippoang.js)).
+
+- **Ställningen:** summan av omgångarnas poäng med avståndet till ledaren, antal rätt och
+  antal gånger som orakel och Ikaros. Den pågående omgången räknas med och står vid namnet
+  (*+0,4 i omgången*); orakel och Ikaros delas ut först när den är klar.
+- **Omgång för omgång:** poängen hittills efter varje omgång, en linje per tippare och
+  modellen streckad. Ritas i sidans bredd. Den pågående omgången är prickad (*nu*).
+- **Inbördes:** för varje par antal omgångar som var och en vann, med samma ordning som
+  placeringen (poängen med en decimal, sedan antal rätt), lika och poängen mot varandra – i
+  de avslutade omgångar som båda tippade.
+- **Spelkassan:** som om var och en satsat 10 kr per match på sitt tips till modellens odds
+  före avspark (samma odds som sajten visar). En gardering delar tian så att vinsten blir
+  densamma vilket av tecknen som än sitter: insatsen genom tecknens chans ihop. Väntat
+  utfall med modellens egna chanser är 0 kr. Modellen spelar sitt troligaste utfall.
+- **Höjdpunkterna:** säsongens skräll (tipset med högst odds som satt), bästa och sämsta
+  omgången.
+- **Så tippar vi:** snittodds för tipsen (1 / modellens chans i snitt – högre är djärvare),
+  andel garderingar, andel tips där modellens troligaste utfall är med, matcher där man var
+  ensam om rätt, skrällar som satt (odds över 3,00) och bästa omgången.
+- **Omgångarna:** alla omgångar med poängen, orakel och Ikaros inramade.
+
+Före första omgången står alla på noll med en länk till Kupong → Omgången. Säsongens
+tippare på förstasidan länkar hit (*Hela kampen*).
 
 ## Statusmärkning
 

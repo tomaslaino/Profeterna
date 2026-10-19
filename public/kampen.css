@@ -1,0 +1,210 @@
+/* Kampen (kampen.js): gängets inbördes kamp om tipsen. Laddas efter
+   kupong.css och tippare.css och använder deras tokens (--kp-ok, --kp-no),
+   .kp-eyebrow/.kp-line och tabellen .tp-table. Varje tippare har en färg
+   (--km-c) vid porträttet, i kurvan och i inbördes möten. */
+
+#kampen { display: grid; gap: 16px; }
+#kampen > * { min-width: 0; margin: 0; }
+#kampen .page-title { margin-bottom: -8px; }
+
+.km-card { display: grid; gap: 12px; padding: 22px 24px; }
+.km-card > * { min-width: 0; margin: 0; }
+.km-card .pos { color: var(--kp-ok); }
+.km-card .neg { color: var(--kp-no); }
+.km-hint {
+  margin-left: 6px;
+  font-weight: 500;
+  letter-spacing: 0;
+  text-transform: none;
+  color: var(--muted);
+}
+.km-status { color: var(--muted); }
+
+/* porträtten, med tipparens färg som ring */
+.km-face {
+  --km-c: var(--muted);
+  display: inline-grid;
+  place-items: center;
+  flex: none;
+  width: 40px;
+  height: 40px;
+  overflow: hidden;
+  border-radius: 50%;
+  box-shadow: 0 0 0 2px var(--bg), 0 0 0 3.5px var(--km-c);
+  background: #2a2520;
+}
+.km-face img { width: 100%; height: 100%; object-fit: cover; }
+.km-face-sm { width: 28px; height: 28px; }
+.km-face-txt { font-family: var(--display); font-size: 14px; font-weight: 650; color: var(--bone); }
+.km-face-model { box-shadow: 0 0 0 1px var(--pill-line); background: none; color: var(--muted); }
+
+/* ställningen */
+.km-list, .km-pairs, .km-kassa { list-style: none; margin: 0; padding: 0; }
+.km-row {
+  display: grid;
+  grid-template-columns: 1.4em 40px minmax(0, 1fr) auto 5.2em;
+  align-items: center;
+  gap: 4px 14px;
+  padding: 12px 0;
+  border-top: 1px solid var(--hair);
+}
+.km-row:first-child { border-top: 0; padding-top: 4px; }
+.km-rank { font-family: var(--display); font-size: 22px; color: var(--muted); text-align: center; }
+.km-row.is-lead .km-rank { color: var(--gold-hi); }
+.km-row.is-lead .km-face { box-shadow: 0 0 0 2px var(--bg), 0 0 0 3.5px var(--km-c), 0 0 22px -4px var(--gold); }
+.km-who { display: grid; gap: 5px; min-width: 0; }
+.km-who b { font-size: 17px; font-weight: 650; color: var(--fg); overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.km-who .sub { font-size: 12.5px; }
+.km-badges { display: flex; flex-wrap: wrap; gap: 4px 6px; align-items: center; }
+.km-badges:empty { display: none; }
+.km-now { font-size: 12px; font-weight: 650; font-variant-numeric: tabular-nums; color: var(--muted); }
+.km-ok { font-variant-numeric: tabular-nums; font-size: 15px; font-weight: 650; color: var(--ink-soft); }
+.km-ok span { color: var(--muted); font-weight: 500; }
+.km-pts {
+  display: grid;
+  justify-items: end;
+  font-family: var(--display);
+  font-size: 28px;
+  font-weight: 650;
+  line-height: 1.05;
+  font-variant-numeric: tabular-nums;
+  color: var(--ink-soft);
+}
+.km-gap { font-family: var(--sans); font-size: 12px; font-weight: 600; color: var(--muted); }
+.km-model { opacity: 0.75; }
+.km-model .km-who b { font-weight: 500; color: var(--ink-soft); }
+.km-model .km-pts { font-size: 20px; }
+
+/* kurvan */
+.km-curve { display: block; width: 100%; height: auto; overflow: visible; }
+.km-gl { stroke: var(--hair); stroke-width: 1; }
+.km-zero { stroke: var(--pill-line-hi); stroke-width: 1; }
+.km-tick { font-size: 11px; fill: var(--muted); font-variant-numeric: tabular-nums; }
+.km-lines path { fill: none; stroke-width: 2.4; stroke-linejoin: round; stroke-linecap: round; }
+.km-lines path.km-prel { stroke-dasharray: 2 4; }
+.km-end { font-size: 11.5px; font-weight: 750; }
+.km-keys { display: flex; flex-wrap: wrap; gap: 6px 16px; font-size: 12.5px; color: var(--ink-soft); }
+.km-key { display: inline-flex; align-items: center; gap: 7px; }
+.km-key::before { content: ""; width: 16px; height: 3px; border-radius: 2px; background: var(--km-c); }
+.km-key-model::before { background: repeating-linear-gradient(90deg, var(--km-c) 0 5px, transparent 5px 8px); }
+.km-key-model { color: var(--muted); }
+
+/* inbördes och spelkassan bredvid varandra på breda skärmar */
+.km-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(320px, 1fr)); gap: 16px; }
+.km-grid > .km-card { align-content: start; }
+
+.km-pair {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto minmax(0, 1fr);
+  align-items: center;
+  gap: 8px 12px;
+  padding: 12px 0;
+  border-top: 1px solid var(--hair);
+}
+.km-pair:first-child { border-top: 0; padding-top: 2px; }
+.km-side { display: flex; align-items: center; gap: 10px; min-width: 0; }
+.km-side b { font-size: 15px; font-weight: 650; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.km-side-b { justify-content: flex-end; }
+.km-score {
+  font-family: var(--display);
+  font-size: 26px;
+  font-weight: 650;
+  font-variant-numeric: tabular-nums;
+  color: var(--muted);
+}
+.km-score b { font-weight: inherit; }
+.km-score b.win { color: var(--bone); }
+.km-bar {
+  grid-column: 1 / -1;
+  display: flex;
+  gap: 2px;
+  height: 6px;
+  overflow: hidden;
+  border-radius: 3px;
+  background: var(--pill);
+}
+.km-bar i { min-width: 0; }
+.km-bar i[style*="flex:0"] { display: none; }
+.km-bar .km-eq { background: var(--pill-line); }
+.km-pair-sub { grid-column: 1 / -1; font-size: 12.5px; color: var(--muted); text-align: center; }
+
+.km-krow {
+  display: grid;
+  grid-template-columns: 40px minmax(0, 1fr) auto;
+  align-items: center;
+  gap: 4px 14px;
+  padding: 12px 0;
+  border-top: 1px solid var(--hair);
+}
+.km-krow:first-child { border-top: 0; padding-top: 2px; }
+.km-krow .km-who b { font-size: 15px; }
+.km-krow .sub { white-space: normal; }
+.km-kr {
+  font-family: var(--display);
+  font-size: 24px;
+  font-weight: 650;
+  font-variant-numeric: tabular-nums;
+  white-space: nowrap;
+  color: var(--ink-soft);
+}
+.km-krow.km-model .km-kr { font-size: 19px; }
+
+/* höjdpunkterna: samma rutor som Statistik */
+.km-tiles { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 12px; }
+.km-tile { cursor: auto; }
+.km-tile .dv-tile-sub { margin-bottom: 0; line-height: 1.4; }
+
+/* så tippar vi */
+.km-style { width: 100%; }
+.km-style th, .km-style td { text-align: right; font-variant-numeric: tabular-nums; }
+.km-style tbody th { text-align: left; font-size: 14px; font-weight: 500; letter-spacing: 0; text-transform: none; color: var(--ink-soft); }
+.km-style td { font-weight: 650; }
+.km-style thead th { white-space: nowrap; }
+.km-short { display: none; }
+.km-dot { display: inline-block; width: 8px; height: 8px; margin-right: 6px; border-radius: 50%; background: var(--km-c); }
+
+.km-live th, .km-live td { color: var(--muted); }
+
+/* tom: före första omgången */
+.km-empty { justify-items: center; text-align: center; padding: 30px 24px; }
+.km-faces { display: flex; gap: 18px; }
+.km-faces .km-face { width: 64px; height: 64px; }
+.km-empty-title { font-family: var(--display); font-size: 24px; font-weight: 650; color: var(--bone); }
+.km-empty .legend { max-width: 44ch; }
+
+.km-help { margin: 0; }
+.km-help p { max-width: 62ch; }
+.km-rules { width: auto; margin: 8px 0; font-variant-numeric: tabular-nums; }
+.km-rules th, .km-rules td { padding: 5px 0 5px 22px; text-align: right; }
+.km-rules th:first-child { padding-left: 0; text-align: left; }
+.km-rules tbody th { font-size: 14px; font-weight: 500; letter-spacing: 0; text-transform: none; color: var(--ink-soft); }
+.km-rules .pos { color: var(--kp-ok); }
+.km-rules .neg { color: var(--kp-no); }
+
+@media (max-width: 520px) {
+  .km-card { padding: 18px 16px; }
+  .km-row { grid-template-columns: 1.1em 34px minmax(0, 1fr) auto 4.4em; gap: 4px 10px; }
+  .km-face { width: 34px; height: 34px; }
+  .km-face-sm { width: 26px; height: 26px; }
+  .km-rank { font-size: 19px; }
+  .km-who b { font-size: 15.5px; }
+  .km-pts { font-size: 23px; }
+  .km-ok { font-size: 14px; }
+  .km-krow { grid-template-columns: 34px minmax(0, 1fr) auto; gap: 4px 10px; }
+  .km-kr { font-size: 20px; }
+  .km-score { font-size: 22px; }
+  .km-side { gap: 8px; }
+  .km-side b { font-size: 14px; }
+  .km-grid { grid-template-columns: minmax(0, 1fr); }
+  .km-tiles { grid-template-columns: 1fr 1fr; gap: 10px; }
+  .km-tile:first-child { grid-column: 1 / -1; }
+  .km-tile .dv-tile-num { font-size: 28px; }
+  .km-style th, .km-style td { padding-left: 0.4rem; padding-right: 0.4rem; }
+  .km-style tbody th { white-space: normal; }
+  .km-long { display: none; }
+  .km-short { display: inline; }
+}
+
+/* länken från Säsongens tippare på förstasidan (tippare.js) */
+.km-link { font-weight: 600; color: var(--ink-soft); text-decoration: none; }
+.km-link:hover { color: var(--fg); }

@@ -273,7 +273,9 @@ function tpSeasonCard() {
     '<div class="tp-swrap"><table class="tp-stable"><thead><tr><th scope="col"><span class="tp-vh">Placering</span></th><th scope="col">Tippare</th>' +
     '<th scope="col" class="tp-c" title="Omgångar">Omg.</th><th scope="col" class="tp-c" title="Rätt av de spelade matcherna">Rätt</th>' +
     '<th scope="col" class="tp-c" title="Summan av omgångarnas poäng">Poäng</th></tr></thead>' +
-    `<tbody>${rows}</tbody></table></div>` + hid + tpRoundsTable(rounds, s) + '</div>';
+    `<tbody>${rows}</tbody></table></div>` + hid + tpRoundsTable(rounds, s) +
+    // Fliken Kampen (kampen.js): inbördes, kurvan och spelkassan.
+    '<p class="kp-line"><a class="km-link" href="#kampen">Hela kampen →</a></p></div>';
 }
 
 function tpRender() {

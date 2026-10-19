@@ -103,6 +103,7 @@ function defs(items) {
 const TABS = {
   matcher: 'matches-section',
   kupong: 'coupon-section',
+  kampen: 'battle-section',
   kallor: 'sources-section',
   modell: 'model-section',
   // Utvärderingen ligger sist på Modell-sidan; gamla länkar hamnar där.

@@ -16,6 +16,7 @@
   <link rel="stylesheet" href="samtal.css">
   <link rel="stylesheet" href="tippare.css">
   <link rel="stylesheet" href="kronan.css">
+  <link rel="stylesheet" href="kampen.css">
   <link rel="stylesheet" href="historik.css">
   <link rel="stylesheet" href="spoiler.css">
   <link rel="stylesheet" href="matchruta.css">
@@ -31,6 +32,8 @@
         <div class="tablist" role="tablist">
           <button type="button" role="tab" id="tab-coupon" data-tab="coupon-section"
             aria-controls="coupon-section" aria-selected="false">Kupong</button>
+          <button type="button" role="tab" id="tab-battle" data-tab="battle-section"
+            aria-controls="battle-section" aria-selected="false">Kampen</button>
           <button type="button" role="tab" id="tab-matches" data-tab="matches-section"
             aria-controls="matches-section" aria-selected="false">Matcher</button>
         </div>
@@ -70,6 +73,11 @@
     <!-- kupongen: omgångens kupong, samtalet och historiken (kupong.js, samtal.js, historik.js) -->
     <section id="coupon-section" role="tabpanel" aria-labelledby="tab-coupon" hidden>
       <div id="coupon"></div>
+    </section>
+
+    <!-- kampen: gängets inbördes kamp om tipsen, säsongen igenom (kampen.js) -->
+    <section id="battle-section" role="tabpanel" aria-labelledby="tab-battle" hidden>
+      <div id="kampen"></div>
     </section>
 
     <section id="matches-section" role="tabpanel" aria-labelledby="tab-matches" hidden>
@@ -123,5 +131,6 @@
   <script src="tippoang.js"></script>
   <script src="kronan.js"></script>
   <script src="tippare.js"></script>
+  <script src="kampen.js"></script>
 </body>
 </html>
