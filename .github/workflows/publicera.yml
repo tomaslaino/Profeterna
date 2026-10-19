@@ -8,12 +8,14 @@ name: Hämta data och publicera
 # körningarna med actions/cache, så att en död källa visas med sin senaste
 # lyckade data och sitt datum i stället för att försvinna.
 #
-# Det enda som committas är prognosjournalen (data/journal/) och
-# kuponghistoriken (data/kupong-historik.json): bygget loggar kommande matcher
-# och fryser in färdiga kuponger med --journal, och det nya committas till main
-# av github-actions[bot]. Git-historiken visar då offentligt att en prognos
-# fanns före avspark och aldrig skrivits om. Commitsen håller också repot
-# aktivt, så att GitHub inte stänger av schemat efter 60 dagar.
+# Det enda som committas är prognosjournalen (data/journal/),
+# kuponghistoriken (data/kupong-historik.json) och tipparhistoriken
+# (data/tippar-historik.json): bygget loggar kommande matcher, fryser in
+# färdiga kuponger och sparar gängets egna tips omgång för omgång med
+# --journal, och det nya committas till main av github-actions[bot].
+# Git-historiken visar då offentligt att en prognos fanns före avspark och
+# aldrig skrivits om. Commitsen håller också repot aktivt, så att GitHub inte
+# stänger av schemat efter 60 dagar.
 #
 # Schemat: var 30:e minut (minut 7 och 37, utanför den rusning som brukar vara
 # vid hel timme). GitHub kan fördröja schemalagda körningar; sidan visar när
@@ -79,16 +81,17 @@ jobs:
           path: data/cache
           key: kallcache-${{ github.run_id }}
 
-      # Bara journalfilerna och kuponghistoriken committas, och bara om de
-      # ändrats. Misslyckas committen publiceras inte heller sajten – den
-      # visade journalen ska alltid finnas i git. Nästa körning loggar då
-      # raderna på nytt (och fryser in samma kuponger igen).
+      # Bara journalfilerna, kuponghistoriken och tipparhistoriken committas,
+      # och bara om de ändrats. Misslyckas committen publiceras inte heller
+      # sajten – den visade journalen ska alltid finnas i git. Nästa körning
+      # loggar då raderna på nytt (och fryser in samma kuponger igen).
       - name: Committa prognosjournalen och kuponghistoriken
         run: |
           git add data/journal
           if [ -f data/kupong-historik.json ]; then git add data/kupong-historik.json; fi
+          if [ -f data/tippar-historik.json ]; then git add data/tippar-historik.json; fi
           if git diff --cached --quiet; then
-            echo "Inga nya rader i journalen och inget nytt i kuponghistoriken."
+            echo "Inga nya rader i journalen och inget nytt i kupong- eller tipparhistoriken."
             exit 0
           fi
           # Append-only: en borttagen eller ändrad rad stoppar körningen.
@@ -98,12 +101,19 @@ jobs:
           fi
           rows=$(git diff --cached --numstat -- data/journal | awk '{ s += $1 } END { print s + 0 }')
           if [ "$rows" = 0 ]; then what=""; elif [ "$rows" = 1 ]; then what="1 ny rad"; else what="${rows} nya rader"; fi
-          if git diff --cached --quiet -- data/kupong-historik.json; then
+          also=""
+          if ! git diff --cached --quiet -- data/kupong-historik.json; then also="kuponghistoriken"; fi
+          if ! git diff --cached --quiet -- data/tippar-historik.json; then also="${also:+${also} och }tipparhistoriken"; fi
+          if [ -z "$also" ]; then
             msg="Prognosjournal: ${what}"
           elif [ -n "$what" ]; then
-            msg="Prognosjournal: ${what}; kuponghistoriken uppdaterad"
-          else
+            msg="Prognosjournal: ${what}; ${also} uppdaterad"
+          elif [ "$also" = "kuponghistoriken" ]; then
             msg="Kuponghistoriken uppdaterad"
+          elif [ "$also" = "tipparhistoriken" ]; then
+            msg="Tipparhistoriken uppdaterad"
+          else
+            msg="Kupong- och tipparhistoriken uppdaterade"
           fi
           git config user.name "github-actions[bot]"
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"

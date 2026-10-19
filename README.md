@@ -61,6 +61,10 @@ ingen falsk precision · sidan kraschar aldrig av en död källa · endast fria 
   betyg 1–5 mot modellens väntade antal rätt, sortering efter hur det gick och en kort
   AI-kommentar som läser gängets anteckningar. Fryses in i `data/kupong-historik.json`
   (se [Kuponghistoriken](#kuponghistoriken))
+- [x] **Säsongens tippare:** förstasidan visar under omgångens ruta en topplista över
+  säsongen för gängets egna tips – poäng, omgångar, rätt och antal gånger som omgångens
+  bästa och sämsta, med modellen som jämförelse. Varje omgång sparas i
+  `data/tippar-historik.json` (se [Säsongens tippare](#säsongens-tippare))
 - [x] **Enklare sidor (2026-10-19):** matchsidan visar prognosen, jämförelsen med
   spelbolagen, vad som drog åt vilket håll, oddsen, formen och skadorna (namnen i korthet);
   Lagen sida vid sida, Domaren och Trupperna fälls ut. De enkla baslinjerna, FPL:s
@@ -89,11 +93,13 @@ GitHub Actions (var 30:e min)  →  källorna  →  src/build.js  →  _site/ (H
   (`data/journal/`) – där är git-historiken själva poängen: den visar offentligt att en
   prognos fanns före avspark och aldrig skrivits om. Se
   [Prognosjournalen och utvärderingen](#prognosjournalen-och-utvärderingen-fas-3) – och
-  kuponghistoriken (`data/kupong-historik.json`, se [Kuponghistoriken](#kuponghistoriken)).
+  kuponghistoriken (`data/kupong-historik.json`, se [Kuponghistoriken](#kuponghistoriken))
+  och tipparhistoriken (`data/tippar-historik.json`, se [Säsongens tippare](#säsongens-tippare)).
 - **Journalens commit:** bygget körs med `--journal`, och steget *Committa
-  prognosjournalen och kuponghistoriken* committar bara `data/journal/` och
-  `data/kupong-historik.json`, och bara när de ändrats, som `github-actions[bot]` med
-  meddelandet "Prognosjournal: N nya rader" (och/eller "kuponghistoriken uppdaterad"). Jobbet har
+  prognosjournalen och kuponghistoriken* committar bara `data/journal/`,
+  `data/kupong-historik.json` och `data/tippar-historik.json`, och bara när de ändrats, som
+  `github-actions[bot]` med meddelandet "Prognosjournal: N nya rader" (och/eller
+  "kuponghistoriken uppdaterad", "tipparhistoriken uppdaterad"). Jobbet har
   `contents: write`; deploy-jobbet bara `pages`/`id-token`. Steget stoppar körningen om en
   befintlig rad ändrats eller tagits bort (append-only), och har main fått en ny commit
   under körningen läggs journalcommiten ovanpå (`pull --rebase`). Misslyckas committen
@@ -375,6 +381,12 @@ server:
   [public/historik.css](public/historik.css) (gamla `historik.html` leder dit);
   AI-kommentaren skrivs av [worker/kommentar.mjs](worker/kommentar.mjs) med prompten i
   [config/kommentar.js](config/kommentar.js). Se [Kuponghistoriken](#kuponghistoriken).
+- **Omgångens och säsongens tippare:** [src/tippare.js](src/tippare.js) sparar varje
+  omgång av gängets egna tips i `data/tippar-historik.json` och skriver `data/tippare.json`;
+  rutorna på förstasidan ritas av [public/tippare.js](public/tippare.js) med
+  [public/tippare.css](public/tippare.css). Poängen räknas av
+  [public/tippoang.js](public/tippoang.js), som både bygget och sidan använder. Se
+  [Omgångens tippare](#omgångens-tippare).
 - **Frontend:** ren HTML/CSS/JS i `public/`, flikarna Matcher, Kupong, Källor och
   Modell (regelversion, backtest, kandidatlogg och sist Utvärdering; `#utvardering`
   leder dit); i matchvyn kortet Analys när
@@ -1045,7 +1057,8 @@ omgången. Underlaget är var och ens egna tips inför samtalet (`GET …/samtal
 [worker/samtal.mjs](worker/samtal.mjs)). Rutan syns när tipsen visas för alla och första
 matchen är spelad. Poängen räknas i webbläsaren ([public/tippare.js](public/tippare.js))
 med samma rättning som kupongen: ställningen efter 90 minuter, liveställningen och
-spoilerskyddet.
+spoilerskyddet. Själva poängen, placeringen och bäst/sämst finns i
+[public/tippoang.js](public/tippoang.js), som bygget också använder för säsongen.
 
 **Poäng per match = 1 om tipset satt (annars 0) − modellens chans för tipset före avspark**
 (journalen om den finns, annars sajtens prognos; för en gardering chanserna ihop, så att en
@@ -1074,7 +1087,55 @@ helgardering alltid ger 0). Poängen läggs ihop för omgången.
 - *Poäng per match* (utfällbar) visar varje tips med poängen.
 
 Bara den pågående omgången finns i `GET …/samtal`. När nästa omgång startas försvinner
-rutan, och det finns ännu ingen topplista över flera omgångar.
+rutan – men omgången finns kvar i säsongen nedan.
+
+### Säsongens tippare
+
+Under omgångens ruta står en topplista över säsongen: summan av omgångarnas poäng, antal
+omgångar, antal rätt av de spelade matcherna och antal gånger som *Omgångens orakel*
+(bäst) och *Omgångens Ikaros* (sämst), som märken under namnet. Modellen står med som
+jämförelse, utan placering. Placering efter summan med en decimal, sedan antal rätt. En
+omgång räknas för den som tippade i den. *Poäng per omgång* (utfällbar) visar varje
+omgång med orakel och Ikaros inramade i guld och rött. Döljer spoilerskyddet någon match i
+en omgång räknas hela omgången bort, med *Visa ändå*.
+
+**Filen** `data/tippar-historik.json` committas och växer bara. Bygget på GitHub Actions
+(`--journal`) hämtar `GET …/samtal` och skriver in omgången **när tipsen visas för alla**
+– då kan de inte längre ändras – med matcherna och var och ens tecken. När varje match är
+avgjord fylls resultatet efter 90 minuter och modellens prognos före avspark i, och
+omgången får `klar`. Sedan ändras den aldrig. Eftersom tipsen sparas redan när de visas
+finns omgången kvar även om nästa omgång startas innan sista matchen är spelad –
+resultaten tas ur sajtens egna matcher, inte ur tjänsten.
+
+```json
+{
+  "omgangar": [
+    {
+      "id": "2026-10-17-k3x9q2",
+      "datum": "2026-10-17",
+      "till": "2026-10-18",
+      "gang": [
+        { "id": "DL", "namn": "Daniel Laino" },
+        { "id": "DT", "namn": "Daniel Teijder" },
+        { "id": "DJ", "namn": "Daniel Johansson" }
+      ],
+      "klar": "2026-10-18T18:07:00.000Z",
+      "matcher": [
+        { "id": "401878771", "match": "Everton – Chelsea", "avspark": "2026-10-17T11:30:00.000Z", "tips": { "DL": "2", "DT": "X", "DJ": "1X" }, "resultat": "0–2", "modell": [35, 26, 39] }
+      ]
+    }
+  ]
+}
+```
+
+- `resultat` är ställningen efter 90 minuter, `slut` förlängning och straffar, `struken`:
+  `true` en match som inte spelades (räknas inte). `modell` är 1 · X · 2 i hela procent
+  (journalen om den finns, annars sajtens prognos); saknas den används schablonen.
+- Saknas ställningen efter 90 minuter tre dagar efter avspark fryses raden utan resultat.
+- Bygget skriver poängen per omgång och person i `data/tippare.json`
+  ([src/tippare.js](src/tippare.js)); sidan lägger ihop dem.
+- Lokalt (utan `--journal`) läses filen bara. Prova med en egen fil:
+  `TIPPAR_HISTORIK=/tmp/tippare.json npm run build`.
 
 ## Statusmärkning
 
