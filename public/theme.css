@@ -610,7 +610,7 @@ table.cmp tr.model td { background: var(--accent-soft); color: #fff; }
 .empty { color: var(--muted); }
 
 /* Sannolikhetsstapeln 1 · X · 2 i hemma-, oavgjort- och bortafärg, det
-   troligaste utfallet starkast. Under oddsen i listan och i Säkraste spelen. */
+   troligaste utfallet starkast. Under oddsen i matchlistan. */
 .pbar { display: flex; gap: 3px; width: 100%; height: 4px; }
 .pbar i { flex: var(--w) 1 0; min-width: 3px; border-radius: 999px; background: var(--o-home); opacity: 0.4; }
 .pbar i:nth-child(2) { background: #8a8073; }

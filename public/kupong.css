@@ -349,73 +349,6 @@ a.kp-row:hover { color: var(--fg); background: rgba(255, 255, 255, 0.04); }
   .kp-empty .kp-btn { grid-column: 2; grid-row: 1 / span 3; margin-right: clamp(0px, 8vw, 150px); padding: 12px 22px; font-size: 15px; }
 }
 
-/* ---------- Säkraste spelen (förstasidan, under kupongen) ---------- */
-
-.oracle { margin: 40px 0 8px; }
-.oracle-head { display: flex; align-items: flex-end; justify-content: space-between; gap: 12px; margin: 0 0 14px; }
-.oracle-head .kp-eyebrow { margin-bottom: 4px; }
-.oracle-head h2 {
-  margin: 0;
-  font-family: var(--display);
-  font-weight: 650;
-  font-size: clamp(28px, 3.2vw, 36px);
-  line-height: 1;
-  letter-spacing: -0.02em;
-  color: var(--bone);
-}
-.oracle-head h2 sup { margin-left: 2px; font-size: 0.55em; color: var(--gold); }
-.oracle-all { flex: none; padding-bottom: 2px; font-size: 14px; font-weight: 600; color: var(--ink-soft); text-decoration: none; }
-.oracle-all:hover { color: #fff; }
-.oracle-grid { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 14px; }
-.ocard {
-  display: grid;
-  grid-template-columns: minmax(0, 1fr) auto;
-  grid-template-areas: "meta meta" "teams num" "bar bar";
-  gap: 14px 12px;
-  padding: 18px 20px 20px;
-  color: inherit;
-  text-decoration: none;
-  background: var(--glass);
-  border: 1px solid var(--border);
-  border-radius: 16px;
-  box-shadow: var(--shadow-card);
-  transition: transform 0.18s ease, border-color 0.18s ease;
-}
-.ocard:hover { color: inherit; transform: translateY(-2px); border-color: rgba(216, 176, 106, 0.35); }
-.ocard-meta { grid-area: meta; display: flex; align-items: center; gap: 8px; font-size: 12.5px; font-weight: 600; color: var(--muted); }
-.ocard-teams { grid-area: teams; display: flex; flex-direction: column; justify-content: center; gap: 3px; min-width: 0; }
-.ocard-teams span { position: relative; font-size: 15px; font-weight: 600; line-height: 1.3; color: var(--muted); }
-.ocard-teams .fav { color: var(--fg); }
-/* guldpricken i marginalen vid laget oraklet tror på */
-.ocard-teams .fav::before { content: ""; position: absolute; left: -12px; top: 0.5em; width: 6px; height: 6px; border-radius: 50%; background: var(--gold); }
-.ocard-num {
-  grid-area: num;
-  align-self: center;
-  text-align: right;
-  font-family: var(--display);
-  font-weight: 650;
-  font-size: 46px;
-  font-variant-numeric: lining-nums;
-  line-height: 0.9;
-  letter-spacing: -0.03em;
-  color: var(--bone);
-}
-.ocard-num small { margin-left: 1px; font-size: 0.5em; color: var(--muted); }
-.ocard-num em {
-  display: block;
-  margin-top: 6px;
-  font-family: var(--sans);
-  font-size: 10.5px;
-  font-style: normal;
-  font-weight: 700;
-  letter-spacing: 0.12em;
-  text-transform: uppercase;
-  white-space: nowrap;
-  color: var(--eyebrow);
-}
-.ocard .pbar { grid-area: bar; height: 6px; }
-.oracle-fine { margin: 12px 2px 0; font-size: 12px; font-style: italic; color: var(--muted); }
-
 /* ---------- ny kupong ---------- */
 
 .kp-tools { display: flex; flex-wrap: wrap; align-items: center; }
@@ -543,14 +476,10 @@ a.kp-row:hover { color: var(--fg); background: rgba(255, 255, 255, 0.04); }
   .kp-search { max-width: none; }
   /* ovanför appmenyn i nederkant (theme.css) */
   .kp-bar { padding: 10px 12px; bottom: calc(var(--tab-h) + 10px + env(safe-area-inset-bottom)); }
-  .oracle-grid { grid-template-columns: 1fr; gap: 10px; }
-  .ocard { padding: 16px 18px 18px; gap: 12px; }
-  .ocard-num { font-size: 42px; }
   .kp-bar-txt { flex-basis: 100%; }
   .kp-name { flex: 1 1 120px; }
 }
 
 @media (prefers-reduced-motion: reduce) {
   .kp-dot.live, .kp-track .liveok, .kp-row.s-live .kp-sg i.res { animation: none; }
-  .ocard:hover { transform: none; }
 }
