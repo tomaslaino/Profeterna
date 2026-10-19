@@ -119,8 +119,8 @@ const tpTone = (x) => (Math.round(x * 10) > 0 ? 'pos' : Math.round(x * 10) < 0 ?
 const tpInitials = (p) => (p.model ? 'Mod.' : p.id);
 
 function tpBadge(p, done) {
-  if (p.award === 'best') return `<span class="tp-badge best">${done ? 'Omgångens tippare' : 'Leder'}</span>`;
-  if (p.award === 'worst') return `<span class="tp-badge worst">${done ? 'Omgångens sämsta' : 'Sist'}</span>`;
+  if (p.award === 'best') return `<span class="tp-badge best">${done ? 'Omgångens orakel' : 'Leder'}</span>`;
+  if (p.award === 'worst') return `<span class="tp-badge worst">${done ? 'Omgångens Ikaros' : 'Sist'}</span>`;
   return '';
 }
 
@@ -193,6 +193,8 @@ function tpCard(now = Date.now()) {
   const none = s.people.filter((p) => p.none);
   return '<div class="card tp-card">' +
     `<p class="kp-eyebrow">Omgångens tippare${kicks.length ? ` · ${esc(dateRange(Math.min(...kicks), Math.max(...kicks)))}` : ''}</p>` +
+    // Orakel och Ikaros som bild (kronan.js).
+    (window.Kronan ? Kronan.html(s, tpPts) : '') +
     `<ol class="tp-list">${list.join('')}</ol>` +
     (none.length ? `<p class="legend tp-missing">Tippade inte: ${none.map((p) => esc(p.name)).join(', ')}</p>` : '') +
     `<p class="kp-line tp-status">${tpStatus(s)}</p>` +

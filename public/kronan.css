@@ -1,0 +1,280 @@
+/* Kröningen (kronan.js): Omgångens orakel och Omgångens Ikaros som bild
+   överst i rutan Omgångens tippare. Oraklet i guld på marmorsockel, Ikaros
+   i solnedgång på väg ner i havet. --fh är kropparnas höjd; vingarna fästs
+   vid huvudets mitt (--hx) och axlarnas höjd (--sy) i varje bild. */
+
+.kr-stage {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+  gap: 12px;
+}
+
+.kr-panel {
+  margin: 0;
+  position: relative;
+  display: grid;
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  overflow: hidden;
+  isolation: isolate;
+}
+
+.kr-scene {
+  --sh: 232px;
+  --fh: 180px;
+  position: relative;
+  height: var(--sh);
+  overflow: hidden;
+}
+
+.kr-figs {
+  position: absolute;
+  left: 0;
+  right: 0;
+  display: flex;
+  justify-content: center;
+  align-items: flex-end;
+}
+.kr-figs.n2, .kr-figs.n3 { --fh: 150px; }
+.kr-figs > .kr-fig + .kr-fig { margin-left: -14px; }
+
+.kr-fig {
+  position: relative;
+  flex: none;
+  height: var(--fh);
+}
+.kr-fig img {
+  position: relative;
+  z-index: 1;
+  display: block;
+  height: 100%;
+  width: auto;
+  user-select: none;
+  -webkit-user-select: none;
+}
+
+/* Utan bild: initialerna på en marmorskiva. */
+.kr-noimg { display: grid; place-items: end center; width: calc(var(--fh) * 0.55); --hx: 50%; --sy: 30%; }
+.kr-ini {
+  position: relative;
+  z-index: 1;
+  display: grid;
+  place-items: center;
+  width: 100%;
+  aspect-ratio: 1;
+  margin-bottom: 20%;
+  border-radius: 50%;
+  font-family: var(--display);
+  font-size: calc(var(--fh) * 0.2);
+  font-weight: 600;
+  color: #2a2116;
+  background: linear-gradient(180deg, #f3ead9, #cdbfa6);
+}
+
+/* ---------- oraklet ---------- */
+
+.kr-orakel {
+  border-color: rgba(216, 176, 106, 0.38);
+  background:
+    radial-gradient(110% 80% at 50% 40%, rgba(240, 214, 153, 0.24), rgba(216, 176, 106, 0.07) 48%, transparent 72%),
+    linear-gradient(180deg, #221c12, #14110c);
+}
+
+.kr-rays {
+  position: absolute;
+  left: 50%;
+  top: 40%;
+  width: 560px;
+  height: 560px;
+  margin: -280px 0 0 -280px;
+  background: repeating-conic-gradient(from 0deg, rgba(240, 214, 153, 0.17) 0deg 5deg, transparent 5deg 15deg);
+  -webkit-mask-image: radial-gradient(circle, #000 0, #000 12%, transparent 58%);
+  mask-image: radial-gradient(circle, #000 0, #000 12%, transparent 58%);
+  animation: kr-spin 90s linear infinite;
+}
+
+.kr-orakel .kr-figs { bottom: 25px; }
+.kr-orakel .kr-fig img { filter: drop-shadow(0 8px 12px rgba(0, 0, 0, 0.55)) drop-shadow(0 0 14px rgba(240, 214, 153, 0.18)); }
+
+.kr-laurel {
+  position: absolute;
+  left: 50%;
+  bottom: calc(25px + var(--fh) * 0.16);
+  width: calc(var(--fh) * 1.02);
+  transform: translateX(-50%);
+  filter: drop-shadow(0 0 5px rgba(240, 214, 153, 0.45));
+  animation: kr-glint 3.6s ease-in-out infinite;
+}
+
+/* Marmorsockeln med meanderband. */
+.kr-plinth {
+  position: absolute;
+  left: 50%;
+  bottom: 0;
+  width: 62%;
+  height: 25px;
+  transform: translateX(-50%);
+  background: linear-gradient(180deg, #efe6d3, #c8b99d);
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.5), 0 -10px 24px -8px rgba(240, 214, 153, 0.35);
+}
+.kr-plinth::before {
+  content: "";
+  position: absolute;
+  left: -5%;
+  right: -5%;
+  top: -6px;
+  height: 6px;
+  border-radius: 2px 2px 0 0;
+  background: linear-gradient(180deg, #f7f0e2, #dccfb6);
+}
+.kr-plinth::after {
+  content: "";
+  position: absolute;
+  left: 10px;
+  right: 10px;
+  top: 8px;
+  height: 9px;
+  background: var(--meander) repeat-x center / 9px 9px;
+  opacity: 0.85;
+}
+
+/* ---------- Ikaros ---------- */
+
+.kr-ikaros {
+  border-color: rgba(200, 100, 58, 0.38);
+  background:
+    radial-gradient(70% 55% at 80% 6%, rgba(240, 150, 80, 0.38), transparent 70%),
+    linear-gradient(180deg, #43200f 0%, #2a1912 40%, #15191d 76%, #0d161d 100%);
+}
+
+.kr-sun {
+  position: absolute;
+  right: 13%;
+  top: 14px;
+  width: 44px;
+  height: 44px;
+  border-radius: 50%;
+  background: radial-gradient(circle at 42% 40%, #fff4c8, #f7c35f 45%, #e0773f 100%);
+  box-shadow: 0 0 22px 8px rgba(246, 170, 80, 0.45), 0 0 70px 24px rgba(224, 119, 63, 0.25);
+  animation: kr-pulse 4s ease-in-out infinite;
+}
+
+.kr-ikaros .kr-figs { bottom: -16px; }
+.kr-ikaros .kr-fig {
+  transform-origin: 50% 45%;
+  transform: rotate(-28deg);
+  animation: kr-fall 3.4s ease-in-out infinite;
+}
+.kr-ikaros .kr-fig img { filter: saturate(0.8) drop-shadow(0 8px 12px rgba(0, 0, 0, 0.5)); }
+
+.kr-wings {
+  position: absolute;
+  z-index: 0;
+  left: var(--hx);
+  top: calc(var(--sy) - var(--fh) * 0.13);
+  width: calc(var(--fh) * 1.05);
+  overflow: visible;
+  transform: translateX(-50%);
+}
+.kr-drip { transform-box: fill-box; animation: kr-drip 2.2s ease-in infinite; animation-delay: var(--d, 0s); }
+
+.kr-feathers i {
+  position: absolute;
+  top: 30%;
+  width: 7px;
+  height: 21px;
+  opacity: 0;
+  animation: kr-feather 6s linear infinite;
+}
+.kr-feathers svg { display: block; width: 100%; height: 100%; }
+.kr-feathers i:nth-child(1) { left: 22%; animation-delay: 0s; }
+.kr-feathers i:nth-child(2) { left: 64%; animation-delay: 2s; animation-duration: 7s; }
+.kr-feathers i:nth-child(3) { left: 40%; animation-delay: 4.2s; }
+
+.kr-sea {
+  position: absolute;
+  z-index: 3;
+  left: 0;
+  bottom: 0;
+  width: 200%;
+  height: 40px;
+  animation: kr-sea 10s linear infinite;
+}
+.kr-wave.b { fill: #24495b; }
+.kr-wave.f { fill: #142c38; stroke: rgba(243, 237, 227, 0.22); stroke-width: 1; vector-effect: non-scaling-stroke; }
+
+/* ---------- texten ---------- */
+
+.kr-panel figcaption {
+  position: relative;
+  z-index: 4;
+  display: grid;
+  gap: 1px;
+  padding: 10px 12px 12px;
+  text-align: center;
+  border-top: 1px solid var(--hair);
+  background: rgba(10, 9, 7, 0.55);
+}
+.kr-title {
+  font-size: 10.5px;
+  font-weight: 800;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+}
+.kr-orakel .kr-title { color: var(--gold-hi); }
+.kr-ikaros .kr-title { color: #ef9a6d; }
+.kr-name {
+  font-family: var(--display);
+  font-size: 21px;
+  font-weight: 600;
+  line-height: 1.2;
+  color: var(--fg);
+  overflow-wrap: anywhere;
+}
+.kr-amp { color: var(--muted); font-weight: 400; }
+.kr-stat { font-size: 13px; font-weight: 600; font-variant-numeric: tabular-nums; color: var(--ink-soft); }
+.kr-stat.pos { color: var(--kp-ok, var(--fresh)); }
+.kr-stat.neg { color: var(--kp-no, var(--down)); }
+
+/* ---------- rörelse ---------- */
+
+@keyframes kr-spin { to { transform: rotate(360deg); } }
+@keyframes kr-glint { 0%, 100% { filter: drop-shadow(0 0 4px rgba(240, 214, 153, 0.45)); } 50% { filter: drop-shadow(0 0 9px rgba(250, 226, 160, 0.9)); } }
+@keyframes kr-pulse { 0%, 100% { transform: scale(1); } 50% { transform: scale(1.07); } }
+@keyframes kr-fall {
+  0%, 100% { transform: rotate(-24deg) translateY(-3px); }
+  50% { transform: rotate(-33deg) translateY(5px); }
+}
+@keyframes kr-drip {
+  0% { transform: translateY(-3px) scale(0.6); opacity: 0; }
+  25% { opacity: 1; }
+  100% { transform: translateY(16px) scale(1); opacity: 0; }
+}
+@keyframes kr-feather {
+  0% { transform: translate(0, -10px) rotate(10deg); opacity: 0; }
+  12% { opacity: 0.9; }
+  50% { transform: translate(14px, 50px) rotate(-30deg); }
+  85% { opacity: 0.7; }
+  100% { transform: translate(-6px, 110px) rotate(25deg); opacity: 0; }
+}
+@keyframes kr-sea { to { transform: translateX(-25%); } }
+
+@media (prefers-reduced-motion: reduce) {
+  .kr-stage *, .kr-stage *::before, .kr-stage *::after { animation: none !important; }
+  .kr-feathers { display: none; }
+}
+
+@media (max-width: 560px) {
+  .kr-stage { gap: 10px; }
+  .kr-scene { --sh: 190px; --fh: 144px; }
+  .kr-figs.n2, .kr-figs.n3 { --fh: 118px; }
+  .kr-sun { width: 34px; height: 34px; top: 10px; }
+  .kr-plinth { height: 21px; }
+  .kr-orakel .kr-figs { bottom: 21px; }
+  .kr-laurel { bottom: calc(21px + var(--fh) * 0.16); }
+  .kr-wings { width: calc(var(--fh) * 0.95); }
+  .kr-given { display: none; }
+  .kr-title { font-size: 9.5px; letter-spacing: 0.06em; }
+  .kr-name { font-size: 18px; }
+  .kr-panel figcaption { padding: 8px 8px 10px; }
+}

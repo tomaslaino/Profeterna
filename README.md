@@ -1079,9 +1079,15 @@ helgardering alltid ger 0). Poängen läggs ihop för omgången.
 - **Modellen** räknas likadant med sitt troligaste utfall och står med som jämförelse,
   utan placering.
 - Placering efter poängen med en decimal, sedan antal rätt. Högst blir *Omgångens
-  tippare* och lägst *Omgångens sämsta*. Medan matcher återstår står det *Leder* och *Sist*,
+  orakel* och lägst *Omgångens Ikaros*. Medan matcher återstår står det *Leder* och *Sist*,
   och rutan är märkt *Preliminärt*. Har alla samma poäng delas inga etiketter ut. Den som
   inte lämnade in står under listan och placeras inte.
+- Överst i rutan kröns de med bild (`public/kronan.js`, `kronan.css`): oraklet på en
+  marmorsockel framför en lagerkrans och solstrålar, Ikaros fallande med smältande
+  vaxvingar mot havet. Kropparna är urklippta foton i `public/profeterna/kropp-*.png`
+  (klippta med macOS Vision); `KRONAN_KROPPAR` i kronan.js säger var huvudet och axlarna
+  sitter i varje bild så att vingarna fäster rätt. Delat vid lika står alla med samma
+  utmärkelse ihop.
 - Saknas modellen för en match används kuponghistorikens schablon: 45 % för ett tecken,
   75 % för två. Uppskjutna och inställda matcher räknas inte.
 - *Poäng per match* (utfällbar) visar varje tips med poängen.
