@@ -394,16 +394,26 @@ async function showCoupon(arg) {
 function viewNav(on) {
   const link = (key, href, label) => `<a href="${href}"${on === key ? ' aria-current="page"' : ''}>${label}</a>`;
   // Samtalet: gängets egna tips inför telefonsamtalet (samtal.js).
-  const samtal = window.Samtal && KP.data && KP.data.samtal ? link('samtal', '#kupong/samtal', 'Samtalet') : '';
+  const samtal = hasSamtal() ? link('samtal', '#kupong/samtal', 'Samtalet') : '';
   return '<nav class="kp-views" aria-label="Kupong">' +
     link('omgang', '#kupong', 'Omgången') + samtal + link('historik', '#kupong/historik', 'Historik') + '</nav>';
 }
 
+// Ny kupong börjar med att någon väljer omgångens matcher, som var och en
+// sedan fyller i för sig inför samtalet (samtal.js). Utan samtalstjänsten
+// görs gängets kupong direkt.
+const hasSamtal = () => Boolean(window.Samtal && KP.data && KP.data.samtal);
+const newCouponHref = () => (hasSamtal() ? '#kupong/samtal/ny' : '#kupong/ny');
+// Omgången som fylls i inför samtalet, överst där omgångens kupong står.
+const samtalTeaser = () => (hasSamtal() ? Samtal.teaser() : '');
+
 function emptyCard() {
   return '<div class="kp-empty card"><p class="kp-eyebrow">Kupong</p><h2 class="page-title">Omgångens kupong</h2>' +
-    '<p class="intro">Välj matcherna, sätt 1, X eller 2 och följ hur det går.</p>' +
-    (window.Samtal && KP.data && KP.data.samtal ? '<p class="legend sm-alt"><a href="#kupong/samtal/ny">Eller tippa var för sig först, inför samtalet</a></p>' : '') +
-    '<a class="kp-btn primary" href="#kupong/ny">Skapa kupong</a></div>';
+    (hasSamtal()
+      ? '<p class="intro">Välj matcherna. Sedan fyller alla i kupongen var för sig och ser de andras tips när de själva har lämnat in.</p>' +
+        '<p class="legend sm-alt"><a href="#kupong/ny">Eller gör gängets kupong direkt</a></p>'
+      : '<p class="intro">Välj matcherna, sätt 1, X eller 2 och följ hur det går.</p>') +
+    `<a class="kp-btn primary" href="${newCouponHref()}">Skapa kupong</a></div>`;
 }
 
 // Utan id omgångens kupong, annars en viss kupong.
@@ -412,7 +422,7 @@ function renderCouponShow(id) {
   const all = allCoupons();
   const graded = all.map((c) => ({ c, g: gradeCoupon(c) })).sort((a, b) => (b.g.first || 0) - (a.g.first || 0));
   if (!graded.length) {
-    el.innerHTML = viewNav('omgang') + emptyCard() + couponErrors();
+    el.innerHTML = viewNav('omgang') + (samtalTeaser() || emptyCard()) + couponErrors();
     return;
   }
   const curId = id || (currentCoupon() || {}).id;
@@ -425,18 +435,18 @@ function renderCouponShow(id) {
   // Är omgångens kupong färdigspelad görs nästa med den stora knappen under.
   const round = !id;
   const canEdit = g.rows.some((r) => r.state === 'upcoming');
-  let html = viewNav(round ? 'omgang' : null) + '<div class="kp-head"><div>' +
+  let html = viewNav(round ? 'omgang' : null) + (round ? samtalTeaser() : '') + '<div class="kp-head"><div>' +
     `<p class="kp-eyebrow">${esc(c.name || 'Kupong')}${c.pending ? ' <span class="kp-tag">väntar på GitHub</span>' : ''}</p>` +
     `<h2 class="page-title">${esc(dateRange(g.first, g.last))}</h2></div><div class="kp-actions">` +
     (canEdit ? `<a class="kp-btn" href="#kupong/andra/${esc(c.id)}">Ändra</a>` : '') +
     // En färdigspelad står kvar i historiken och tas inte bort.
     (g.done ? '' : `<a class="kp-btn" href="#kupong/bort/${esc(c.id)}">Ta bort</a>`) +
     (g.done && !c.pending ? `<a class="kp-btn" href="#kupong/historik/${esc(c.id)}">Betyg och kommentar</a>` : '') +
-    (round && g.done ? '' : '<a class="kp-btn primary" href="#kupong/ny">+ Ny kupong</a>') + '</div></div>';
+    (round && g.done ? '' : `<a class="kp-btn primary" href="${newCouponHref()}">+ Ny kupong</a>`) + '</div></div>';
 
   html += summaryCard(g);
   // Färdigspelad även om spoilerskyddet döljer resultaten (g.done).
-  if (round && g.done) html += '<a class="kp-next" href="#kupong/ny"><span aria-hidden="true">+</span> Skapa ny kupong</a>';
+  if (round && g.done) html += `<a class="kp-next" href="${newCouponHref()}"><span aria-hidden="true">+</span> Skapa ny kupong</a>`;
   if (g.hidden) {
     const ids = g.rows.filter((r) => r.state === 'hidden').map((r) => r.id);
     html += Spoiler.card({
@@ -484,14 +494,14 @@ async function showHome() {
 function renderHome() {
   const c = currentCoupon();
   // Pågår en omgång inför samtalet står den överst (samtal.js).
-  const samtal = window.Samtal ? Samtal.teaser() : '';
-  $('#home').innerHTML = samtal + (c ? teaser(c, gradeCoupon(c)) : emptyCard());
+  const samtal = samtalTeaser();
+  $('#home').innerHTML = samtal + (c ? teaser(c, gradeCoupon(c)) : samtal ? '' : emptyCard());
 }
 
 // Omgångens kupong i korthet: siffran, en prick per match och vägen in.
 function teaser(c, g) {
   const go = g.done
-    ? '<a class="kp-btn primary" href="#kupong/ny">+ Ny kupong</a><a class="kp-btn" href="#kupong">Se kupongen</a>'
+    ? `<a class="kp-btn primary" href="${newCouponHref()}">+ Ny kupong</a><a class="kp-btn" href="#kupong">Se kupongen</a>`
     : `<a class="kp-btn primary" href="#kupong">${g.started ? 'Följ kupongen' : 'Till kupongen'}</a>`;
   return `<div class="card kp-teaser${g.live ? ' is-live' : ''}">` +
     `<div class="kp-teaser-txt"><p class="kp-eyebrow">Omgångens kupong${c.name ? ` · ${esc(c.name)}` : ''}` +

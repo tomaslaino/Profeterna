@@ -1,20 +1,23 @@
 'use strict';
 
-// Inför samtalet (Kupong → Samtalet): var och en i gänget tippar omgångens
-// matcher för sig – ett tecken eller en gardering per match – och ingen ser
-// de andras tips förrän alla har lämnat in (eller samtalet börjar, senast när
-// första matchen startar). Då blir sidan underlaget för telefonsamtalet:
+// Omgångens kupong inför samtalet (Kupong → Samtalet): någon skapar kupongen
+// – väljer matcherna – och var och en fyller i den för sig, ett tecken eller
+// en gardering per match. Den som har lämnat in ser de andras inlämnade tips
+// (och kan inte längre ändra sina); den som inte har lämnat in ser inga. När
+// alla har lämnat in (eller samtalet börjar, senast när första matchen
+// startar) ser alla allt. Sidan blir underlaget för telefonsamtalet:
 // matcherna sorteras efter hur oeniga vi är, och gängets kupong växer fram
-// när man trycker på rutorna. Den görs sedan som vanligt (Ny kupong → Spara).
+// när man trycker på rutorna. Den sparas sedan som vanligt (Ny kupong → Spara).
 //
-//   #kupong/samtal           omgången: vem som lämnat in, sedan underlaget
-//   #kupong/samtal/tips      dina tips
-//   #kupong/samtal/ny        ny omgång: välj matcherna (och tiden för samtalet)
-//   #kupong/samtal/matcher   ändra omgångens matcher
+//   #kupong/samtal           omgången: vem som lämnat in, sedan allas tips
+//   #kupong/samtal/tips      fyll i din kupong
+//   #kupong/samtal/ny        skapa omgångens kupong: välj matcherna (och tiden för samtalet)
+//   #kupong/samtal/matcher   ändra matcherna, tills någon har lämnat in
 //
 // Omgången och tipsen ligger i tjänsten profeterna-kupong (worker/samtal.mjs,
-// GET/POST …/samtal; lokalt /api/samtal), som håller tipsen dolda. Vem man
-// är och gängets tecken under samtalet sparas bara på enheten.
+// GET/POST …/samtal; lokalt /api/samtal), som håller tipsen dolda. Den som
+// lämnar in får en nyckel som sparas på enheten och visar de andras tips. Vem
+// man är och gängets tecken under samtalet sparas också bara på enheten.
 //
 // Läses efter app.js och kupong.js och använder deras hjälpare (KP, SIGNS,
 // matchById, isOpen, pickable, gradeRow …). kupong.js ritar vyerna med
@@ -25,11 +28,11 @@
     data: undefined, // omgången som tjänsten visar den; null = ingen, undefined = inte hämtad
     error: null,
     timer: null,
-    pick: null, // ny omgång / ändra matcherna: {ids: Set, tid}
+    pick: null, // skapa kupongen / ändra matcherna: {ids: Set}
     q: '',
     comp: 'all',
     only: false,
-    draft: null, // dina tips: {id, vem, tecken, kommentarer, inne}
+    draft: null, // dina tips: {id, vem, tecken, kommentarer, inne, nyckel}
     again: false, // Gör kupongen trots matcher utan tecken
   };
   const VEM = 'profeterna.samtal.vem';
@@ -52,6 +55,13 @@
   const kicks = (s) => s.matcher.map((x) => Date.parse(x.avspark)).filter(Number.isFinite);
   const over = (s) => Date.now() >= Math.max(...kicks(s));
   const teamsHtml = (x, m) => (m ? `${esc(m.home)}<span class="vs">–</span>${esc(m.away)}` : esc(x.match));
+  // Dina inlämnade tips för omgången på den här enheten, med nyckeln som
+  // visar de andras.
+  const handedIn = (s) => {
+    const d = kpLoad(TIPS);
+    return s && d && d.id === s.id && d.vem && d.nyckel ? d : null;
+  };
+  const submitted = (s, v) => Boolean(s && v && s.gang.some((g) => g.id === v && g.inne));
 
   // ---------- tjänsten ----------
 
@@ -64,6 +74,12 @@
       SM.error = null;
     } catch (err) {
       SM.error = err.message || 'ingen kontakt';
+      return;
+    }
+    // Har du lämnat in här ser du de andras inlämnade tips.
+    const d = handedIn(SM.data);
+    if (SM.data && !SM.data.visas && d && kpLoad(KP_CODE)) {
+      await send({ gor: 'se', id: SM.data.id, vem: d.vem, nyckel: d.nyckel }, { stored: true });
     }
   }
 
@@ -73,8 +89,10 @@
     return kpLoad(KP_CODE) ? '' : '<input type="password" id="sm-kod" class="kp-name sm-kod" placeholder="Kodord" autocomplete="current-password" aria-label="Kodord">';
   }
 
-  async function send(body) {
-    const field = $('#sm-kod');
+  // stored: bara kodordet som är sparat på enheten, inte fältet (när sidan
+  // hämtar i bakgrunden).
+  async function send(body, { stored = false } = {}) {
+    const field = stored ? null : $('#sm-kod');
     const kod = field ? field.value : kpLoad(KP_CODE);
     if (!kod) return { error: 'Skriv kodordet.' };
     let res = null;
@@ -92,7 +110,8 @@
       if ('samtal' in out) SM.data = out.samtal;
       return out;
     }
-    // 409: omgången har bytts eller tipsen visas redan – sidan visar läget.
+    // 409: omgången har bytts, du har redan lämnat in eller tipsen visas
+    // redan – sidan visar läget.
     if (res && res.status === 409 && 'samtal' in out) SM.data = out.samtal;
     return { ...out, ok: false, status: res && res.status, error: out.error || 'Ingen kontakt med servern.' };
   }
@@ -135,11 +154,11 @@
     const k = s ? kicks(s) : [];
     return '<div class="kp-head"><div>' +
       `<p class="kp-eyebrow">${esc(eyebrow)}</p>` +
-      `<h2 class="page-title">${s ? esc(dateRange(Math.min(...k), Math.max(...k))) : 'Ny omgång'}</h2></div>` +
+      `<h2 class="page-title">${s ? esc(dateRange(Math.min(...k), Math.max(...k))) : 'Omgångens kupong'}</h2></div>` +
       `<div class="kp-actions">${actions}</div></div>`;
   }
 
-  // När samtalet börjar, efter "Inför samtalet" överst.
+  // När samtalet börjar, överst på sidan.
   const callTime = (s) => (s && s.tid ? fWeekdayTime.format(new Date(s.tid)) : '');
 
   function renderRound() {
@@ -151,22 +170,24 @@
       return;
     }
     if (!s) {
-      el.innerHTML = html + '<div class="kp-empty card"><p class="kp-eyebrow">Inför samtalet</p><h2 class="page-title">Var och en tippar för sig</h2>' +
-        '<p class="intro">Välj omgångens matcher. Sedan fyller alla i sina egna tips – med garderingar om man vill – och ingen ser de andras ' +
-        'förrän alla har lämnat in. Då jämför ni dem här när ni ringer, och gör gängets kupong.</p>' +
-        '<a class="kp-btn primary" href="#kupong/samtal/ny">Starta omgång</a></div>';
+      el.innerHTML = html + '<div class="kp-empty card"><p class="kp-eyebrow">Inför samtalet</p><h2 class="page-title">Omgångens kupong</h2>' +
+        '<p class="intro">Välj omgångens matcher. Sedan fyller alla i kupongen var för sig – med garderingar om man vill – och ser de andras ' +
+        'tips först när de själva har lämnat in. Ni jämför dem här när ni ringer och gör gängets kupong.</p>' +
+        '<a class="kp-btn primary" href="#kupong/samtal/ny">Skapa kupong</a></div>';
       return;
     }
-    const eyebrow = ['Inför samtalet', callTime(s)].filter(Boolean).join(' · ');
-    const actions = (s.visas ? '' : '<a class="kp-btn" href="#kupong/samtal/matcher">Ändra matcherna</a>') +
-      (s.visas || over(s) ? '<a class="kp-btn" href="#kupong/samtal/ny">+ Ny omgång</a>' : '');
+    const eyebrow = ['Omgångens kupong', s.tid ? `samtal ${callTime(s)}` : ''].filter(Boolean).join(' · ');
+    const anyIn = s.gang.some((g) => g.inne);
+    const actions = (s.visas || anyIn ? '' : '<a class="kp-btn" href="#kupong/samtal/matcher">Ändra matcherna</a>') +
+      (s.visas || over(s) ? '<a class="kp-btn" href="#kupong/samtal/ny">+ Ny kupong</a>' : '');
     html += head(s, eyebrow, actions);
-    html += s.visas ? board(s) : waiting(s);
+    // Allas tips så snart du ser fler än dina egna.
+    html += s.tips && Object.keys(s.tips).length >= (s.visas ? 1 : 2) ? board(s) : waiting(s);
     el.innerHTML = html;
     wire(s);
   }
 
-  // Vem är du – sparas på enheten, så att Fyll i dina tips vet vems de är.
+  // Vem är du – sparas på enheten, så att Fyll i kupongen vet vems den är.
   function whoAmI() {
     const v = me();
     return '<div class="sm-vem" role="group" aria-label="Vem är du?"><span class="sm-vem-q">Du är</span>' +
@@ -174,20 +195,28 @@
         `${chip(g.id)}<span>${esc(g.namn)}</span></button>`).join('') + '</div>';
   }
 
-  // Innan tipsen visas: vem som lämnat in, dina tips och omgångens matcher.
+  // Innan du ser de andras tips: vem som lämnat in, dina tips och
+  // omgångens matcher.
   function waiting(s) {
     const v = me();
     const inne = s.gang.filter((g) => g.inne).length;
-    const mine = v && s.gang.find((g) => g.id === v && g.inne);
-    const local = kpLoad(TIPS);
-    const own = local && local.id === s.id && local.vem === v && mine ? local.tecken : null;
+    const done = submitted(s, v);
+    const local = handedIn(s);
+    const own = done ? (s.tips && s.tips[v] ? s.tips[v].tecken : local && local.vem === v ? local.tecken : null) : null;
+    // Du har lämnat in men ser inte de andra: ingen annan är klar, eller du
+    // lämnade in på en annan enhet.
+    const text = !done
+      ? `<b>${inne} av ${s.gang.length}</b> har lämnat in. Du ser de andras tips när du själv har lämnat in.`
+      : local && local.vem === v
+        ? 'Du har lämnat in. De andras tips syns här när de har lämnat in.'
+        : 'Du har lämnat in på en annan enhet. De andras tips syns där – och här när alla har lämnat in' +
+          `${s.tid ? ` eller samtalet börjar ${esc(fWeekdayTime.format(new Date(s.tid)))}` : ''}.`;
     let html = '<div class="card sm-wait">' +
       '<div class="sm-folk">' + s.gang.map((g) => `<span class="sm-person${g.inne ? ' inne' : ''}">${chip(g.id)}` +
-        `<span>${g.inne ? `inne ${esc(fWeekdayTime.format(new Date(g.inne)))}` : 'väntar'}${g.id === v ? ' · du' : ''}</span></span>`).join('') + '</div>' +
-      `<p class="sm-wait-txt"><b>${inne} av ${s.gang.length}</b> har lämnat in. Tipsen visas när alla har gjort det` +
-      `${s.tid ? `, eller när samtalet börjar ${esc(fWeekdayTime.format(new Date(s.tid)))}` : ''}.</p>` +
+        `<span>${g.inne ? `inne ${esc(fWeekdayTime.format(new Date(g.inne)))}` : 'fyller i'}${g.id === v ? ' · du' : ''}</span></span>`).join('') + '</div>' +
+      `<p class="sm-wait-txt">${text}</p>` +
       whoAmI() +
-      (v ? `<div class="kp-actions"><a class="kp-btn primary" href="#kupong/samtal/tips">${mine ? 'Ändra dina tips' : 'Fyll i dina tips'}</a></div>` : '') +
+      (v && !done ? '<div class="kp-actions"><a class="kp-btn primary" href="#kupong/samtal/tips">Fyll i kupongen</a></div>' : '') +
       '</div>';
     html += '<div class="mlist sm-list">' + s.matcher.map((x) => {
       const m = matchById(x.id);
@@ -255,12 +284,14 @@
 
   function board(s) {
     const rows = analyse(s);
-    const val = decisions(s, rows);
+    // Förslaget räknas först när alla tips är inne (annars blir det fel och
+    // sparas så).
+    const val = s.visas ? decisions(s, rows) : {};
     const ordered = [0, 1, 2, 3, 4, 5].flatMap((k) => rows.filter((r) => r.kind === k));
     const missing = s.gang.filter((g) => !(s.tips && s.tips[g.id]));
     let html = '<div class="sm-folk sm-folk-board">' + s.gang.map((g) => {
       const tip = s.tips && s.tips[g.id];
-      if (!tip) return `<span class="sm-person">${chip(g.id)}<span>lämnade inte in</span></span>`;
+      if (!tip) return `<span class="sm-person">${chip(g.id)}<span>${s.visas ? 'lämnade inte in' : 'fyller i'}</span></span>`;
       const signs = s.matcher.map((x) => tip.tecken[x.id] || '');
       const hel = signs.filter((x) => x.length === 3).length;
       const halv = signs.filter((x) => x.length === 2).length;
@@ -271,20 +302,25 @@
         done.length ? `<b>${ok}</b> rätt av ${done.length}` : null].filter(Boolean);
       return `<span class="sm-person inne">${chip(g.id)}<span>${parts.join(' · ')}</span></span>`;
     }).join('') + '</div>';
-    if (missing.length) {
-      html += `<p class="legend"><span class="note">${esc(missing.map((g) => g.id).join(' och '))} hann inte lämna in` +
+    const names = esc(missing.map((g) => g.id).join(' och '));
+    if (missing.length && s.visas) {
+      html += `<p class="legend"><span class="note">${names} hann inte lämna in` +
         `${s.orsak === 'samtalet' ? ' innan samtalet började' : s.orsak === 'avspark' ? ' innan första matchen startade' : ''}.</span></p>`;
+    } else if (missing.length) {
+      html += `<p class="legend">${names} har inte lämnat in än – tipsen syns här när de är inne. Gängets kupong görs när alla har lämnat in.</p>`;
     }
     html += '<p class="legend sm-legend">' +
       `<span>${chip(s.gang[0].id)} enda tecknet</span><span>${chip(s.gang[0].id, true)} del av en gardering</span>` +
-      '<span>siffran är modellens chans</span><span>tryck på rutorna för gängets tecken</span></p>';
+      `<span>siffran är modellens chans</span>${s.visas ? '<span>tryck på rutorna för gängets tecken</span>' : ''}</p>`;
     for (let k = 0; k <= 5; k++) {
       const list = rows.filter((r) => r.kind === k);
       if (!list.length) continue;
       html += `<div class="sm-group"><h3>${esc(groupName(k, s))} <span class="sm-count">${list.length}</span></h3><span>${esc(GROUPS[k][1])}</span></div>`;
-      html += '<div class="mlist sm-board">' + list.map((r) => boardRow(r, val[r.x.id] || '', s)).join('') + '</div>';
+      html += '<div class="mlist sm-board">' + list.map((r) => boardRow(r, s.visas ? val[r.x.id] || '' : '', s)).join('') + '</div>';
     }
-    // Gängets kupong: rutorna i samma ordning som matcherna ovan.
+    // Gängets kupong när alla har lämnat in: rutorna i samma ordning som
+    // matcherna ovan.
+    if (!s.visas) return html;
     const chosen = ordered.map((r) => val[r.x.id] || '');
     const done = chosen.filter(Boolean);
     const gard = done.filter((x) => x.length > 1).length;
@@ -293,7 +329,7 @@
       `${gard ? ` · ${plural(gard, 'gardering', 'garderingar')}` : ''} · <b>${rader(done)}</b> ${rader(done) === 1 ? 'rad' : 'rader'}</span>` +
       '<span class="sm-slots" aria-hidden="true">' + chosen.map((x) => `<i${x ? ' class="set"' : ''}>${x || '?'}</i>`).join('') + '</span>' +
       '<button type="button" class="kp-linkbtn" id="sm-reset" title="Gängets tecken som de flesta tippade">Börja om</button>' +
-      `<button type="button" class="kp-btn primary" id="sm-make">${existing(s) ? 'Ändra kupongen' : 'Gör kupongen'}</button>` +
+      `<button type="button" class="kp-btn primary" id="sm-make">${existing(s) ? 'Ändra gängets kupong' : 'Gör gängets kupong'}</button>` +
       '<span class="sm-bar-msg" id="sm-msg" role="status"></span></div>';
     return html;
   }
@@ -312,7 +348,8 @@
         const who = r.cov[i];
         const on = chosen.includes(sg);
         const cls = ['sm-cell', on ? 'on' : '', g.res === i ? 'res' : ''].filter(Boolean).join(' ');
-        return `<button type="button" class="${cls}" data-s="${sg}" aria-pressed="${on}"${r.open ? '' : ' disabled'}` +
+        // Gängets tecken väljs när alla har lämnat in, och bara i matcher som inte startat.
+        return `<button type="button" class="${cls}" data-s="${sg}" aria-pressed="${on}"${s.visas && r.open ? '' : ' disabled'}` +
           ` aria-label="${esc(`${label}, ${sg}: ${who.length ? who.join(', ') : 'ingen'}${r.pr ? `, modellen ${r.pr[i]} %` : ''}`)}">` +
           `<span class="sm-s"><b>${sg}</b>${who.length ? `<small>${who.length}/${r.n}</small>` : ''}</span>` +
           `<span class="sm-chips">${who.map((k) => chip(k, r.t[k].length > 1)).join('')}</span>` +
@@ -395,14 +432,15 @@
   async function renderTips() {
     const s = SM.data;
     const el = $('#coupon');
-    if (!s || s.visas) {
+    // Inlämnade tips går inte att ändra.
+    if (!s || s.visas || submitted(s, me())) {
       location.hash = 'kupong/samtal';
       return;
     }
     const v = me();
     if (!v) {
-      el.innerHTML = viewNav('samtal') + head(s, 'Dina tips') +
-        `<div class="card sm-wait"><p class="sm-wait-txt">Vem är du? Tipsen sparas i ditt namn.</p>${whoAmI()}</div>`;
+      el.innerHTML = viewNav('samtal') + head(s, 'Din kupong') +
+        `<div class="card sm-wait"><p class="sm-wait-txt">Vem är du? Kupongen sparas i ditt namn.</p>${whoAmI()}</div>`;
       for (const b of document.querySelectorAll('.sm-vem button')) {
         b.addEventListener('click', () => {
           kpStore(VEM, b.dataset.vem);
@@ -411,27 +449,20 @@
       }
       return;
     }
-    // Utkastet på enheten, eller – om du lämnat in från en annan enhet – det
-    // inlämnade (kräver kodordet).
+    // Utkastet sparas på enheten medan du fyller i.
     let d = kpLoad(TIPS);
-    if (!d || d.id !== s.id || d.vem !== v) {
+    if (!d || d.id !== s.id || d.vem !== v || d.nyckel) {
       d = { id: s.id, vem: v, tecken: {}, kommentarer: {} };
-      const g = s.gang.find((x) => x.id === v);
-      if (g && g.inne && kpLoad(KP_CODE)) {
-        const out = await send({ gor: 'mina', id: s.id, vem: v });
-        if (!here('tips')) return;
-        if (out.ok && out.tips) d = { ...d, tecken: out.tips.tecken || {}, kommentarer: out.tips.kommentarer || {}, inne: out.tips.inne };
-      }
       kpStore(TIPS, d);
     }
     SM.draft = d;
     const name = (gang().find((g) => g.id === v) || {}).namn || v;
-    el.innerHTML = viewNav('samtal') + head(s, `Dina tips · ${name}`, '<a class="kp-btn" href="#kupong/samtal">Avbryt</a>') +
+    el.innerHTML = viewNav('samtal') + head(s, `Din kupong · ${name}`, '<a class="kp-btn" href="#kupong/samtal">Avbryt</a>') +
       '<p class="legend">Välj ett eller flera tecken i varje match – två är en halvgardering, alla tre en helgardering. ' +
-      'Ingen ser dina tips förrän alla har lämnat in. En kort motivering hjälper samtalet.</p>' +
+      'En kort motivering hjälper samtalet. När du har lämnat in ser du de andras tips, och dina går inte längre att ändra.</p>' +
       '<div id="sm-tips-list"></div>' +
       `<div class="kp-bar"><span class="kp-bar-txt" id="sm-bar-txt"></span>${codeField()}` +
-      `<button type="button" class="kp-btn primary" id="sm-send">${d.inne ? 'Lämna in igen' : 'Lämna in'}</button>` +
+      '<button type="button" class="kp-btn primary" id="sm-send">Lämna in och se de andras</button>' +
       '<span class="sm-bar-msg" id="sm-msg" role="status"></span></div>';
     const list = $('#sm-tips-list');
     list.addEventListener('click', (e) => {
@@ -522,7 +553,7 @@
     if (!here('tips')) return;
     btn.disabled = false;
     if (out.ok) {
-      kpStore(TIPS, { ...d, inne: new Date().toISOString() });
+      kpStore(TIPS, { ...d, inne: new Date().toISOString(), nyckel: out.nyckel });
       location.hash = 'kupong/samtal';
       return;
     }
@@ -533,11 +564,12 @@
     msg(`<span class="note">${esc(out.error)}</span>` + (out.status === 409 ? ' <a href="#kupong/samtal">Till omgången</a>' : ''));
   }
 
-  // ---------- ny omgång och ändra matcherna ----------
+  // ---------- skapa omgångens kupong och ändra matcherna ----------
 
   function renderStart(edit) {
     const s = SM.data;
-    if (edit && (!s || s.visas)) {
+    // Matcherna står fast när någon har lämnat in.
+    if (edit && (!s || s.visas || s.gang.some((g) => g.inne))) {
       location.hash = 'kupong/samtal';
       return;
     }
@@ -546,14 +578,14 @@
     const comps = [{ id: 'all', short: 'Alla', name: 'Alla tävlingar' }, ...state.comps.values()];
     const min = new Date(Date.now() - new Date().getTimezoneOffset() * 60000).toISOString().slice(0, 16);
     $('#coupon').innerHTML = viewNav('samtal') +
-      '<div class="kp-head"><div><p class="kp-eyebrow">Inför samtalet</p>' +
-      `<h2 class="page-title">${edit ? 'Ändra matcherna' : 'Ny omgång'}</h2></div>` +
+      '<div class="kp-head"><div><p class="kp-eyebrow">Omgångens kupong</p>' +
+      `<h2 class="page-title">${edit ? 'Ändra matcherna' : 'Välj matcher'}</h2></div>` +
       '<div class="kp-actions"><a class="kp-btn" href="#kupong/samtal">Avbryt</a></div></div>' +
-      `<p class="legend">${edit ? 'Tips som redan lämnats in finns kvar för matcherna som är kvar. Den som lämnat in får tippa nya matcher när du sparat.'
-        : 'Välj matcherna som ska vara med. Sedan tippar var och en för sig.'}</p>` +
+      `<p class="legend">${edit ? 'Matcherna går att ändra tills någon har lämnat in.'
+        : 'Välj matcherna som ska vara med. Sedan fyller alla i kupongen var för sig.'}</p>` +
       (edit ? '' : '<div class="sm-when"><label for="sm-tid">Samtalet</label>' +
         `<input type="datetime-local" id="sm-tid" class="kp-name" min="${min}">` +
-        '<span class="legend">valfritt – då visas tipsen senast när ni ringer</span></div>') +
+        '<span class="legend">valfritt – då ser alla allas tips när ni ringer, även om någon inte hunnit lämna in</span></div>') +
       '<div class="toolbar kp-tools">' +
       `<input type="search" id="sm-q" class="kp-search" placeholder="Sök lag" autocomplete="off" value="${esc(SM.q)}">` +
       '<div class="chips" id="sm-comps" role="group" aria-label="Tävling">' + comps.map((c) =>
@@ -561,7 +593,7 @@
       `<button type="button" id="sm-only" class="kp-only" aria-pressed="${SM.only}">Bara valda</button></div>` +
       '<div id="sm-pick-list"></div>' +
       `<div class="kp-bar"><span class="kp-bar-txt" id="sm-bar-txt"></span>${codeField()}` +
-      `<button type="button" class="kp-btn primary" id="sm-start">${edit ? 'Spara matcherna' : 'Starta omgången'}</button>` +
+      `<button type="button" class="kp-btn primary" id="sm-start">${edit ? 'Spara matcherna' : 'Skapa kupongen'}</button>` +
       '<span class="sm-bar-msg" id="sm-msg" role="status"></span></div>';
 
     $('#sm-q').addEventListener('input', (e) => { SM.q = e.target.value; pickList(); });
@@ -658,12 +690,12 @@
       $('#sm-kod').focus();
       return;
     }
-    // Det finns redan en omgång som pågår: ersätt den bara om man vill.
+    // Det finns redan en kupong som fylls i: ersätt den bara om man vill.
     if (out.finns && out.samtal) {
       const o = out.samtal;
       const k = kicks(o);
       const inne = o.gang.filter((g) => g.inne).length;
-      msg(`<span class="note">Det finns redan en omgång (${esc(dateRange(Math.min(...k), Math.max(...k)))})` +
+      msg(`<span class="note">Det finns redan en kupong som fylls i (${esc(dateRange(Math.min(...k), Math.max(...k)))})` +
         `${inne ? ` där ${inne} har lämnat in` : ''}.</span> <button type="button" class="kp-linkbtn" id="sm-replace">Ersätt den</button>`);
       $('#sm-replace').addEventListener('click', () => startRound(false, o.id));
       return;
@@ -673,18 +705,21 @@
 
   // ---------- förstasidan ----------
 
-  // Rutan överst på förstasidan medan en omgång pågår.
+  // Rutan överst på förstasidan och under Kupong → Omgången medan omgångens
+  // kupong fylls i. När gängets kupong är gjord tar den över.
   function teaser() {
     const s = SM.data;
-    if (!info() || !s || over(s)) return '';
+    if (!info() || !s || over(s) || (s.visas && existing(s))) return '';
     const v = me();
     const inne = s.gang.filter((g) => g.inne).length;
-    const mine = v && s.gang.some((g) => g.id === v && g.inne);
-    const go = s.visas ? 'Öppna underlaget' : mine ? 'Ändra dina tips' : 'Fyll i dina tips';
-    const href = s.visas || !v ? '#kupong/samtal' : '#kupong/samtal/tips';
+    const done = submitted(s, v);
+    const go = s.visas ? 'Se allas tips' : done ? 'Se de andras tips' : 'Fyll i kupongen';
+    const href = s.visas || done || !v ? '#kupong/samtal' : '#kupong/samtal/tips';
+    const title = s.visas ? (s.orsak === 'alla' ? 'Alla har lämnat in' : 'Allas tips visas')
+      : done ? 'Du har lämnat in' : `${inne} av ${s.gang.length} har lämnat in`;
     return '<div class="card sm-teaser">' +
-      `<div><p class="kp-eyebrow">${esc(['Inför samtalet', callTime(s)].filter(Boolean).join(' · '))}</p>` +
-      `<h2 class="page-title"><a href="#kupong/samtal">${s.visas ? 'Alla tips är inne' : `${inne} av ${s.gang.length} har lämnat in`}</a></h2></div>` +
+      `<div><p class="kp-eyebrow">${esc(['Omgångens kupong', s.tid ? `samtal ${callTime(s)}` : ''].filter(Boolean).join(' · '))}</p>` +
+      `<h2 class="page-title"><a href="#kupong/samtal">${esc(title)}</a></h2></div>` +
       '<div class="sm-folk">' + s.gang.map((g) => `<span class="sm-person${g.inne ? ' inne' : ''}">${chip(g.id)}<span>${g.inne ? '✓' : '…'}</span></span>`).join('') + '</div>' +
       `<a class="kp-btn primary" href="${href}">${go}</a></div>`;
   }

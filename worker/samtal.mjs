@@ -1,31 +1,40 @@
-// Inför samtalet: var och en i gänget tippar omgångens matcher för sig – ett
-// tecken eller en gardering per match – och tipsen visas för alla först när
-// alla har lämnat in. Då jämförs de på sidan (public/samtal.js) under
+// Omgångens kupong inför samtalet: någon väljer omgångens matcher, och var
+// och en fyller i kupongen för sig – ett tecken eller en gardering per match.
+// Den som har lämnat in ser de andras tips (de som också har lämnat in); den
+// som inte har det ser inga. Då jämförs de på sidan (public/samtal.js) under
 // telefonsamtalet, och gängets kupong sparas som vanligt (worker/kupong.mjs).
 //
 //   GET  /samtal → {ok, samtal}   samtal = omgången som den ser ut för alla, eller null
 //   POST /samtal {kod, gor: "starta", matcher: [id], tid: ISO | null, ersatt: <id> | null}
 //                 ny omgång; tid = när samtalet börjar (valfritt). Pågår en
 //                 omgång (någon match har inte startat) krävs ersatt = dess id.
-//   POST /samtal {kod, gor: "matcher", id, matcher: [id]}   ändra omgångens matcher
+//   POST /samtal {kod, gor: "matcher", id, matcher: [id]}   ändra omgångens
+//                 matcher – bara tills någon har lämnat in
 //   POST /samtal {kod, gor: "tips", id, vem, tecken: {<matchid>: "1X"}, kommentarer: {<matchid>: "…"}}
-//                 lämna in (eller ändra) sina tips – ett tecken i varje match
+//                 lämna in sina tips – ett tecken i varje match. Går inte att
+//                 ändra sedan. → {ok, samtal, nyckel}: samtal med de andras
+//                 inlämnade tips; nyckel = ens bevis för att få se dem igen
+//   POST /samtal {kod, gor: "se", id, vem, nyckel} → {ok, samtal}   samtal med
+//                 allas inlämnade tips, för den som har lämnat in
 //   POST /samtal {kod, gor: "mina", id, vem} → {ok, tips}   ens egna tips, till en annan enhet
 //   → 400 fel i förfrågan · 403 fel kodord · 429 för många fel kodord
-//   → 409 omgången har bytts ({samtal}), tipsen visas redan, eller en omgång
-//          pågår ({finns: true, samtal})
+//   → 409 omgången har bytts ({samtal}), man har redan lämnat in, se utan rätt
+//          nyckel, tipsen visas redan för alla, eller en omgång pågår ({finns: true, samtal})
 //   → 503 inte påslaget (kodordet saknas) eller matcherna kan inte läsas
 //
-// Tipsen är dolda: GET ger bara vem som har lämnat in, tills alla har gjort
-// det – eller samtalet har börjat, eller första matchen har startat. Sedan
-// visas alla tips för alla och ingenting går att ändra, så att ingen kan
-// tippa om efter att ha sett de andras.
+// Tipsen är dolda: GET ger bara vem som har lämnat in. Den som lämnar in får
+// en nyckel (sparad på enheten) och ser med den allas inlämnade tips – men
+// kan inte längre ändra sina. När alla har lämnat in, samtalet har börjat
+// eller första matchen har startat visas tipsen för alla, och sedan går
+// ingenting att lämna in eller ändra. Kodordet är gemensamt och vem man är
+// väljer man själv, så nyckeln – inte kodordet – är det som hindrar att
+// någon tittar på de andras tips innan den själv har lämnat in.
 //
 // Lagringen är en nyckel per omgång och en per person (så att två som lämnar
 // in samtidigt inte skriver över varandra): på Cloudflare KV-bindningen
 // KUPONG, lokalt filer (server.js).
 //   samtal:aktuellt                  omgången {id, skapad, tid, matcher: [{id, match, avspark}]}
-//   samtal:<id>:tips:<vem>           {inne, tecken, kommentarer}
+//   samtal:<id>:tips:<vem>           {inne, tecken, kommentarer, nyckel}
 //   samtal:<id>                      en tidigare omgång, sparad när nästa startades
 
 import { normSign, sameSecret } from './kupong.mjs';
@@ -65,9 +74,9 @@ function shown(round, tips, gang, now) {
   return null;
 }
 
-// Omgången som alla får se. Tipsen bara om de visas, och bara för omgångens
-// matcher (en match som tagits bort efter att någon lämnat in syns inte).
-export function publicView(round, tips, gang, now) {
+// Omgången som alla får se. Tipsen bara om de visas – för alla, eller för
+// den som själv har lämnat in (own) – och bara för omgångens matcher.
+export function publicView(round, tips, gang, now, own = false) {
   const why = shown(round, tips, gang, now);
   const ids = new Set(round.matcher.map((m) => m.id));
   const only = (o) => Object.fromEntries(Object.entries(o || {}).filter(([k]) => ids.has(k)));
@@ -80,7 +89,7 @@ export function publicView(round, tips, gang, now) {
     visas: Boolean(why),
     orsak: why,
     gang: gang.map((g) => ({ id: g.id, namn: g.namn, inne: tips[g.id] ? tips[g.id].inne : null })),
-    tips: why ? Object.fromEntries(Object.entries(tips).map(([k, t]) => [k, { inne: t.inne, tecken: only(t.tecken), kommentarer: only(t.kommentarer) }])) : null,
+    tips: why || own ? Object.fromEntries(Object.entries(tips).map(([k, t]) => [k, { inne: t.inne, tecken: only(t.tecken), kommentarer: only(t.kommentarer) }])) : null,
   };
 }
 
@@ -159,7 +168,7 @@ export async function postRound(body, { env, store, gang, loadMatches, limiter =
   }
 
   // Resten gäller omgången som pågår – och bara den som sidan visade.
-  if (!round) return fail(409, 'Det finns ingen omgång. Starta en först.', { samtal: null });
+  if (!round) return fail(409, 'Det finns ingen kupong för omgången. Skapa den först.', { samtal: null });
   if (String(b.id || '') !== round.id || !ROUND_ID.test(round.id)) {
     return fail(409, 'Omgången har bytts sedan du öppnade sidan.', { samtal: view() });
   }
@@ -167,14 +176,26 @@ export async function postRound(body, { env, store, gang, loadMatches, limiter =
 
   if (b.gor === 'mina') {
     if (!vem) return fail(400, 'Okänd person.');
-    const own = (await store.get(tipsKey(round.id, vem.id))) || null;
-    return ok({ tips: own });
+    const own = tips[vem.id];
+    return ok({ tips: own ? { inne: own.inne, tecken: own.tecken, kommentarer: own.kommentarer || {} } : null });
   }
 
-  // Tipsen visas redan: inget går att ändra.
+  // Allas inlämnade tips, för den som själv har lämnat in (med nyckeln från
+  // inlämningen).
+  if (b.gor === 'se') {
+    const own = vem && tips[vem.id];
+    if (!own || !own.nyckel || !b.nyckel || !(await sameSecret(b.nyckel, own.nyckel))) {
+      return fail(409, 'Du ser de andras tips när du själv har lämnat in.', { samtal: view() });
+    }
+    return ok({ samtal: publicView(round, tips, gang, ms, true) });
+  }
+
+  // Tipsen visas redan för alla: inget går att lämna in eller ändra.
   if (shown(round, tips, gang, ms)) return fail(409, 'Tipsen visas redan och kan inte ändras.', { samtal: view() });
 
   if (b.gor === 'matcher') {
+    // Den som har lämnat in har sett de andras tips – matcherna står fast.
+    if (Object.keys(tips).length) return fail(409, 'Någon har redan lämnat in, så matcherna går inte att ändra.', { samtal: view() });
     let matches;
     try { matches = await loadMatches(); } catch { return fail(503, 'Kan inte läsa matcherna från sajten just nu.'); }
     const v = roundMatches(b.matcher, matches, ms);
@@ -186,6 +207,7 @@ export async function postRound(body, { env, store, gang, loadMatches, limiter =
 
   if (b.gor === 'tips') {
     if (!vem) return fail(400, 'Okänd person.');
+    if (tips[vem.id]) return fail(409, 'Du har redan lämnat in, och tipsen går inte att ändra.', { samtal: view() });
     const raw = b.tecken && typeof b.tecken === 'object' ? b.tecken : {};
     const notes = b.kommentarer && typeof b.kommentarer === 'object' ? b.kommentarer : {};
     const tecken = {};
@@ -199,16 +221,16 @@ export async function postRound(body, { env, store, gang, loadMatches, limiter =
       if (n) kommentarer[m.id] = n;
     }
     if (missing.length) return fail(400, `Tippa alla matcher – det saknas tecken i ${missing.join(', ')}.`);
-    const mine = { inne: t.toISOString(), tecken, kommentarer };
+    const mine = { inne: t.toISOString(), tecken, kommentarer, nyckel: newId(24) };
     await store.put(tipsKey(round.id, vem.id), mine);
-    return ok({ samtal: publicView(round, { ...tips, [vem.id]: mine }, gang, ms) });
+    return ok({ samtal: publicView(round, { ...tips, [vem.id]: mine }, gang, ms, true), nyckel: mine.nyckel });
   }
 
   return fail(400, 'Okänd åtgärd.');
 }
 
-function randomId() {
-  return Array.from(crypto.getRandomValues(new Uint8Array(6)), (x) => 'abcdefghijklmnopqrstuvwxyz0123456789'[x % 36]).join('');
+function randomId(n = 6) {
+  return Array.from(crypto.getRandomValues(new Uint8Array(n)), (x) => 'abcdefghijklmnopqrstuvwxyz0123456789'[x % 36]).join('');
 }
 
 // Cloudflare KV som lagring (JSON).
