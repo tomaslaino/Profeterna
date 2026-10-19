@@ -601,7 +601,7 @@
     SM.draft = d;
     const name = (gang().find((g) => g.id === v) || {}).namn || v;
     el.innerHTML = viewNav('omgang') + steps(s) + head(s, `Din kupong · ${name}`, '<a class="kp-btn" href="#kupong">Avbryt</a>') +
-      '<div id="sm-tips-list"></div>' +
+      Papper.fill('sm-tips-list') +
       `<div class="kp-bar"><span class="kp-bar-txt" id="sm-bar-txt"></span>${codeField()}` +
       '<button type="button" class="kp-btn primary" id="sm-send">Lämna in och se de andras</button>' +
       '<span class="sm-bar-msg" id="sm-msg" role="status"></span></div>';

@@ -668,7 +668,7 @@ function renderCreate(editId) {
       `<button type="button" data-comp="${c.id}" title="${esc(c.name)}" aria-pressed="${c.id === KP.comp}">${esc(c.short)}</button>`).join('') + '</div>' +
     `<button type="button" id="kp-only" class="kp-only" aria-pressed="${KP.onlyPicked}">Bara valda</button></div>` +
     '<p class="legend" id="kp-lockinfo" hidden></p>' +
-    '<div id="kp-pick-list"></div>' +
+    Papper.fill('kp-pick-list') +
     '<div class="kp-bar"><span class="kp-bar-txt" id="kp-bar-txt"></span>' +
     `<input type="text" id="kp-name" class="kp-name" maxlength="40" placeholder="Namn (valfritt)" value="${esc(KP.draft.name)}">` +
     '<button type="button" id="kp-save" class="kp-btn primary">Spara kupong</button></div>';

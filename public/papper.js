@@ -216,5 +216,13 @@
       head(c, g) + '<div class="pp-band" aria-hidden="true"></div>' + rows(g) + foot(c, g) + '</article></div>';
   }
 
-  window.Papper = { coupon, cross };
+  // Tomma kupongen som fylls i (Ny kupong och Din kupong): papperet runt
+  // listan med id, som ritas av kupong.js eller samtal.js.
+  function fill(id) {
+    return '<div class="pp-wrap"><div class="pp pp-fill">' +
+      '<p class="pp-brand"><img src="logo.svg" alt="" width="20" height="20">Matchfixarna<span>Kupong</span></p>' +
+      `<div class="pp-band" aria-hidden="true"></div><div id="${id}"></div></div></div>`;
+  }
+
+  window.Papper = { coupon, fill };
 }());
