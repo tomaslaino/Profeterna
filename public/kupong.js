@@ -536,15 +536,15 @@ function renderHome() {
 }
 
 // Omgångens kupong i korthet: siffran, en prick per match och vägen in.
+// Resten (väntat, modellens tips, GitHub) står på kupongsidan.
 function teaser(c, g) {
   const go = g.done
     ? `<a class="kp-btn primary" href="${newCouponHref()}">+ Ny kupong</a><a class="kp-btn" href="#kupong">Se kupongen</a>`
     : `<a class="kp-btn primary" href="#kupong">${g.started ? 'Följ kupongen' : 'Till kupongen'}</a>`;
   return `<div class="card kp-teaser${g.live ? ' is-live' : ''}">` +
-    `<div class="kp-teaser-txt"><p class="kp-eyebrow">Omgångens kupong${c.name ? ` · ${esc(c.name)}` : ''}` +
-    `${c.pending ? ' <span class="kp-tag">väntar på GitHub</span>' : ''}</p>` +
+    `<div class="kp-teaser-txt"><p class="kp-eyebrow">Omgångens kupong${c.name ? ` · ${esc(c.name)}` : ''}</p>` +
     `<h2 class="page-title"><a href="#kupong">${esc(dateRange(g.first, g.last))}</a></h2>` +
-    `<span class="kp-line">${statusLine(g)}</span></div>` +
+    (g.started ? '' : `<span class="kp-line">Startar ${esc(fWeekdayTime.format(new Date(g.first)))}</span>`) + '</div>' +
     `<a class="kp-teaser-num" href="#kupong" aria-label="Till kupongen">${bigNumber(g)}</a>` +
     pearls(g.rows) +
     `<div class="kp-teaser-go">${go}</div></div>`;
