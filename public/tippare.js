@@ -175,8 +175,6 @@ function tpTable(s) {
   }).join('');
   const foot = cols.map((p) => `<td class="${tpTone(p.pts)}">${tpPts(p.pts)}</td>`).join('');
   return `<details class="tp-more"${TP.open ? ' open' : ''}><summary>Poäng per match</summary>` +
-    '<p class="legend">Poäng = 1 för rätt minus modellens chans för tipset före avspark. ' +
-    'En rätt storfavorit ger lite och en missad kostar mycket – tvärtom för en skräll.</p>' +
     `<div class="table-wrap"><table class="tp-table"><thead><tr><th scope="col">Match</th>${head}</tr></thead>` +
     `<tbody>${body}</tbody><tfoot><tr><th scope="row">Summa</th>${foot}</tr></tfoot></table></div></details>`;
 }
@@ -249,8 +247,6 @@ function tpRoundsTable(rounds, s) {
   }).join('');
   const foot = cols.map((p) => `<td class="${tpTone(p.pts)}">${tpPts(p.pts)}</td>`).join('');
   return `<details class="tp-more tp-rounds"${TP.seasonOpen ? ' open' : ''}><summary>Poäng per omgång</summary>` +
-    '<p class="legend">Omgångens poäng är summan av 1 för rätt minus modellens chans för tipset före avspark. ' +
-    'Märkena under namnen räknar gånger som Omgångens orakel (bäst) och Omgångens Ikaros (sämst) – inramade i guld och rött nedan.</p>' +
     `<div class="table-wrap"><table class="tp-table"><thead><tr><th scope="col">Omgång</th>${head}</tr></thead>` +
     `<tbody>${body}</tbody><tfoot><tr><th scope="row">Summa</th>${foot}</tr></tfoot></table></div></details>`;
 }

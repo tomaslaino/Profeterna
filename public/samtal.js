@@ -339,12 +339,10 @@
     if (missing.length && s.visas) {
       html += `<p class="legend"><span class="note">${names} hann inte lämna in` +
         `${s.orsak === 'samtalet' ? ' innan samtalet började' : s.orsak === 'avspark' ? ' innan första matchen startade' : ''}.</span></p>`;
-    } else if (missing.length) {
-      html += `<p class="legend">${names} har inte lämnat in än – tipsen syns här när de är inne. Gängets kupong görs när alla har lämnat in.</p>`;
     }
     html += '<p class="legend sm-legend">' +
       `<span>${chip(s.gang[0].id)} enda tecknet</span><span>${chip(s.gang[0].id, true)} del av en gardering</span>` +
-      `<span>siffran är modellens chans</span>${s.visas ? '<span>tryck på rutorna för gängets tecken</span>' : ''}</p>`;
+      '<span>siffran är modellens chans</span></p>';
     for (let k = 0; k <= 5; k++) {
       const list = rows.filter((r) => r.kind === k);
       if (!list.length) continue;
@@ -603,8 +601,6 @@
     SM.draft = d;
     const name = (gang().find((g) => g.id === v) || {}).namn || v;
     el.innerHTML = viewNav('omgang') + steps(s) + head(s, `Din kupong · ${name}`, '<a class="kp-btn" href="#kupong">Avbryt</a>') +
-      '<p class="legend">Välj ett eller flera tecken i varje match – två är en halvgardering, alla tre en helgardering. ' +
-      'En kort motivering hjälper samtalet. När du har lämnat in ser du de andras tips, och dina går inte längre att ändra.</p>' +
       '<div id="sm-tips-list"></div>' +
       `<div class="kp-bar"><span class="kp-bar-txt" id="sm-bar-txt"></span>${codeField()}` +
       '<button type="button" class="kp-btn primary" id="sm-send">Lämna in och se de andras</button>' +
@@ -734,11 +730,9 @@
       '<div class="kp-head"><div><p class="kp-eyebrow">Omgångens kupong</p>' +
       `<h2 class="page-title">${edit ? 'Ändra matcherna' : 'Välj matcher'}</h2></div>` +
       '<div class="kp-actions"><a class="kp-btn" href="#kupong">Avbryt</a></div></div>' +
-      `<p class="legend">${edit ? 'Matcherna går att ändra tills någon har lämnat in.'
-        : 'Välj matcherna som ska vara med. Sedan fyller alla i kupongen var för sig.'}</p>` +
       (edit ? '' : '<div class="sm-when"><label for="sm-tid">Samtalet</label>' +
         `<input type="datetime-local" id="sm-tid" class="kp-name" min="${min}">` +
-        '<span class="legend">valfritt – då ser alla allas tips när ni ringer, även om någon inte hunnit lämna in</span></div>') +
+        '<span class="legend">valfritt</span></div>') +
       '<div class="toolbar kp-tools">' +
       `<input type="search" id="sm-q" class="kp-search" placeholder="Sök lag" autocomplete="off" value="${esc(SM.q)}">` +
       '<div class="chips" id="sm-comps" role="group" aria-label="Tävling">' + comps.map((c) =>

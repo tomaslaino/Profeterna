@@ -411,19 +411,14 @@ function viewNav(on) {
 // Omgångens gång i fyra steg under flikarna, när gänget tippar var för sig
 // först (samtal.js). now: steget som pågår (5 = klar). info: en rad om läget
 // i stället för förklaringen under ett steg.
-const STEPS = [
-  ['Välj matcher', 'någon i gänget'],
-  ['Alla tippar', 'var för sig'],
-  ['Samtalet', 'ni jämför och gör gängets kupong'],
-  ['Matcherna', 'följ hur det går'],
-];
+const STEPS = ['Välj matcher', 'Alla tippar', 'Samtalet', 'Matcherna'];
 function roundSteps(now, info = {}) {
   if (!hasSamtal()) return '';
-  return '<ol class="kp-steps" aria-label="Omgångens gång">' + STEPS.map(([name, sub], i) => {
+  return '<ol class="kp-steps" aria-label="Omgångens gång">' + STEPS.map((name, i) => {
     const n = i + 1;
     return `<li class="${n < now ? 'done' : n === now ? 'now' : ''}"${n === now ? ' aria-current="step"' : ''}>` +
       `<span class="kp-step-n" aria-hidden="true">${n < now ? '✓' : n}</span>` +
-      `<span class="kp-step-t"><b>${name}</b><span>${esc(info[n] || sub)}</span></span></li>`;
+      `<span class="kp-step-t"><b>${name}</b>${info[n] ? `<span>${esc(info[n])}</span>` : ''}</span></li>`;
   }).join('') + '</ol>';
 }
 
@@ -438,9 +433,8 @@ const samtalTeaser = () => (hasSamtal() ? Samtal.teaser() : '');
 function emptyCard() {
   return '<div class="kp-empty card"><p class="kp-eyebrow">Kupong</p><h2 class="page-title">Omgångens kupong</h2>' +
     (hasSamtal()
-      ? '<p class="intro">Välj omgångens matcher. Sedan tippar alla var för sig och ser de andras tips när de själva har lämnat in.</p>' +
-        '<p class="legend sm-alt"><a href="#kupong/ny">Eller gör gängets kupong direkt</a></p>'
-      : '<p class="intro">Välj matcherna, sätt 1, X eller 2 och följ hur det går.</p>') +
+      ? '<p class="legend sm-alt"><a href="#kupong/ny">Eller gör gängets kupong direkt</a></p>'
+      : '') +
     `<a class="kp-btn primary" href="${newCouponHref()}">Skapa kupong</a></div>`;
 }
 
@@ -634,8 +628,8 @@ function couponRows(g) {
 }
 
 function liveLine(g) {
-  if (!KP.liveAt && !g.live) return '<p class="legend kp-src">Tecknet gäller ställningen efter 90 minuter.</p>';
-  return '<p class="legend kp-src">Tecknet gäller ställningen efter 90 minuter · ' +
+  if (!KP.liveAt && !g.live) return '<p class="legend kp-src">Efter 90 minuter</p>';
+  return '<p class="legend kp-src">Efter 90 minuter · ' +
     (KP.liveError ? '<span class="note">ESPN svarar inte – ställningen kan vara gammal</span>'
       : `aktuell ställning från ESPN, ${esc(fTime.format(new Date(KP.liveAt)))}`) + '</p>';
 }

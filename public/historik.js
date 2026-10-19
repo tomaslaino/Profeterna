@@ -222,7 +222,7 @@
     const hidden = all.filter(isHidden);
     const list = all.filter((c) => !hidden.includes(c));
     if (!all.length) {
-      el.innerHTML = '<div class="card kp-empty"><p class="intro">Inga färdiga kuponger än. När alla matcher på en kupong är spelade hamnar den här, med betyg och AI:ns kommentar.</p>' +
+      el.innerHTML = '<div class="card kp-empty"><p class="intro">Inga färdiga kuponger än.</p>' +
         '<a class="kp-btn primary" href="#kupong">Till kupongen</a></div>' + errors();
       return;
     }
@@ -234,8 +234,7 @@
         return `<button type="button" data-sort="${s.id}" aria-pressed="${on}" title="${esc(on ? 'Tryck igen för omvänd ordning' : s.title)}">${s.label}${arrow}</button>`;
       }).join('') + '</div></div>' +
       `<div class="hk-list">${hidden.map(hiddenCard).join('')}${sorted(list).map(card).join('')}</div>` +
-      '<p class="legend">Betyget jämför antal rätt med det väntade enligt modellen före avspark – en skräll som sitter väger mer än en storfavorit. ' +
-      'Prickarna under 1 X 2 är modellens tips.' + (list.some((c) => c.basis !== 'modell') ? ' * Väntat delvis enligt schablon.' : '') + '</p>' +
+      (list.some((c) => c.basis !== 'modell') ? '<p class="legend">* Väntat delvis enligt schablon.</p>' : '') +
       errors();
     for (const b of el.querySelectorAll('[data-sort]')) {
       b.addEventListener('click', () => {
