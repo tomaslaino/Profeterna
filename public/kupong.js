@@ -22,7 +22,6 @@ const KP = {
   liveAt: null,
   liveError: false,
   timer: null,
-  history: false, // finns historik.html
   wasLive: false,
   view: null, // { mode: 'show', id } | { mode: 'new', edit } | { mode: 'saved', ... }
   draft: null,
@@ -66,23 +65,8 @@ function whenMatches() {
 
 async function loadCoupons() {
   if (KP.data) return KP.data;
-  const [data, history] = await Promise.all([
-    getJSON('data/kuponger.json').catch(() => ({ coupons: [], errors: [], repo: null, branch: 'main', dir: 'data/kuponger' })),
-    pageExists('historik.html'),
-  ]);
-  KP.history = history;
-  KP.data = data;
+  KP.data = await getJSON('data/kuponger.json').catch(() => ({ coupons: [], errors: [], repo: null, branch: 'main', dir: 'data/kuponger' }));
   return KP.data;
-}
-
-// Sidan Historik kan saknas på en sajt som byggts utan den – då visas inga
-// länkar dit.
-async function pageExists(path) {
-  try {
-    return (await fetch(path, { method: 'HEAD', cache: 'no-cache' })).ok;
-  } catch {
-    return false;
-  }
 }
 
 let kpIndex = { src: null, map: new Map() };
@@ -225,8 +209,8 @@ function gradeCoupon(c, now = Date.now()) {
   return g;
 }
 
-// Kupongen som visas på förstasidan: den som pågår, annars nästa, annars den
-// som spelades färdigt senast.
+// Omgångens kupong (förstasidan och Kupong → Omgången): den som pågår,
+// annars nästa, annars den som spelades färdigt senast.
 function currentCoupon(now = Date.now()) {
   const graded = allCoupons().map((c) => ({ c, g: gradeCoupon(c, now) })).filter((x) => x.g.first);
   const running = graded.filter((x) => x.g.started && !x.g.done).sort((a, b) => b.g.first - a.g.first);
@@ -299,9 +283,7 @@ async function liveTick() {
   try {
     const need = liveNeeded();
     if (need.length && !document.hidden) await fetchLive(need);
-    if (need.length || KP.wasLive) {
-      if (KP.view && KP.view.mode === 'show' && !$('#coupon-section').hidden) renderCouponShow(KP.view.id);
-    }
+    if (need.length || KP.wasLive) redraw();
     KP.wasLive = need.length > 0;
   } finally {
     KP.timer = setTimeout(liveTick, LIVE_EVERY_MS);
@@ -377,17 +359,19 @@ function statusLine(g) {
 
 // ---------- kupongvyn ----------
 
-// Utan arg är det förstasidan: hjälten och den aktuella kupongen.
+// Kupong: #kupong (omgångens kupong), #kupong/historik och
+// #kupong/historik/<id> (historik.js), #kupong/<id>, #kupong/ny och
+// #kupong/andra/<id>.
 async function showCoupon(arg) {
+  const [mode, id] = (arg || '').split('/');
+  if (mode === 'historik') return renderHistory(id || null);
   const el = $('#coupon');
-  $('#hero').hidden = Boolean(arg);
   el.innerHTML = '<p class="empty">Laddar …</p>';
   await Promise.all([whenMatches(), loadCoupons()]);
   if (!state.all) {
     el.innerHTML = '<p class="empty">Kunde inte läsa matcherna.</p>';
     return;
   }
-  const [mode, id] = (arg || '').split('/');
   if (mode === 'ny') return renderCreate(null);
   if (mode === 'andra' && id) return renderCreate(id);
   KP.view = { mode: 'show', id: mode || null };
@@ -395,36 +379,48 @@ async function showCoupon(arg) {
   window.scrollTo(0, 0);
 }
 
+// Kupongsidans två lägen: omgångens kupong och de färdigspelade.
+function viewNav(on) {
+  const link = (key, href, label) => `<a href="${href}"${on === key ? ' aria-current="page"' : ''}>${label}</a>`;
+  return '<nav class="kp-views" aria-label="Kupong">' +
+    link('omgang', '#kupong', 'Omgången') + link('historik', '#kupong/historik', 'Historik') + '</nav>';
+}
+
+function emptyCard() {
+  return '<div class="kp-empty card"><p class="kp-eyebrow">Kupong</p><h2 class="page-title">Omgångens kupong</h2>' +
+    '<p class="intro">Välj matcherna, sätt 1, X eller 2 och följ hur det går.</p>' +
+    '<a class="kp-btn primary" href="#kupong/ny">Skapa kupong</a></div>';
+}
+
+// Utan id omgångens kupong, annars en viss kupong.
 function renderCouponShow(id) {
   const el = $('#coupon');
   const all = allCoupons();
   const graded = all.map((c) => ({ c, g: gradeCoupon(c) })).sort((a, b) => (b.g.first || 0) - (a.g.first || 0));
   if (!graded.length) {
-    el.innerHTML = '<div class="kp-empty card"><p class="kp-eyebrow">Kupong</p><h2 class="page-title">Omgångens kupong</h2>' +
-      '<p class="intro">Välj matcherna, sätt 1, X eller 2 och följ hur det går.</p>' +
-      '<a class="kp-btn primary" href="#kupong/ny">Skapa kupong</a></div>' + couponErrors() + (id ? '' : oracle());
+    el.innerHTML = viewNav('omgang') + emptyCard() + couponErrors();
     return;
   }
   const curId = id || (currentCoupon() || {}).id;
   const cur = graded.find((x) => x.c.id === curId) || (id ? null : graded[0]);
   if (!cur) {
-    el.innerHTML = `<p class="empty">Kupongen ${esc(id)} finns inte. <a href="#kupong">Till kupongen</a></p>`;
+    el.innerHTML = viewNav(null) + `<p class="empty">Kupongen ${esc(id)} finns inte. <a href="#kupong">Till kupongen</a></p>`;
     return;
   }
   const { c, g } = cur;
-  // Förstasidan visar bara kupongen; en ny görs där när den är färdigspelad.
-  const front = !id;
+  // Är omgångens kupong färdigspelad görs nästa med den stora knappen under.
+  const round = !id;
   const canEdit = g.rows.some((r) => r.state === 'upcoming');
-  let html = '<div class="kp-head"><div>' +
+  let html = viewNav(round ? 'omgang' : null) + '<div class="kp-head"><div>' +
     `<p class="kp-eyebrow">${esc(c.name || 'Kupong')}${c.pending ? ' <span class="kp-tag">väntar på GitHub</span>' : ''}</p>` +
     `<h2 class="page-title">${esc(dateRange(g.first, g.last))}</h2></div><div class="kp-actions">` +
     (canEdit ? `<a class="kp-btn" href="#kupong/andra/${esc(c.id)}">Ändra</a>` : '') +
-    (g.done && !c.pending && KP.history ? `<a class="kp-btn" href="historik.html#${encodeURIComponent(c.id)}">Historik</a>` : '') +
-    (front ? '' : '<a class="kp-btn primary" href="#kupong/ny">+ Ny kupong</a>') + '</div></div>';
+    (g.done && !c.pending ? `<a class="kp-btn" href="#kupong/historik/${esc(c.id)}">Betyg och kommentar</a>` : '') +
+    (round && g.done ? '' : '<a class="kp-btn primary" href="#kupong/ny">+ Ny kupong</a>') + '</div></div>';
 
   html += summaryCard(g);
   // Färdigspelad även om spoilerskyddet döljer resultaten (g.done).
-  if (front && g.done) html += '<a class="kp-next" href="#kupong/ny"><span aria-hidden="true">+</span> Skapa ny kupong</a>';
+  if (round && g.done) html += '<a class="kp-next" href="#kupong/ny"><span aria-hidden="true">+</span> Skapa ny kupong</a>';
   if (g.hidden) {
     const ids = g.rows.filter((r) => r.state === 'hidden').map((r) => r.id);
     html += Spoiler.card({
@@ -436,15 +432,69 @@ function renderCouponShow(id) {
   }
   html += couponRows(g);
   html += liveLine(g);
-  if (!front) html += pastSection(graded.filter((x) => x !== cur), g);
+  html += moreSection(graded.filter((x) => x !== cur && !x.g.done));
   html += couponErrors();
-  if (front) html += oracle();
   el.innerHTML = html;
+}
+
+// Kupong → Historik: de färdigspelade kupongerna med betyg och AI:ns
+// kommentar (historik.js).
+function renderHistory(id) {
+  KP.view = { mode: 'history', id };
+  $('#coupon').innerHTML = viewNav('historik') +
+    '<div class="kp-head"><div><p class="kp-eyebrow">Färdigspelade kuponger</p><h2 class="page-title">Historik</h2></div></div>' +
+    '<div id="history"><p class="empty">Laddar …</p></div>';
+  window.scrollTo(0, 0);
+  Historik.show($('#history'), id);
+}
+
+// ---------- förstasidan ----------
+
+// Förstasidan: hjälten, omgångens kupong i korthet (hela finns under Kupong)
+// och Säkraste spelen.
+async function showHome() {
+  const el = $('#home');
+  KP.view = { mode: 'home' };
+  if (!KP.data || !state.all) el.innerHTML = '<p class="empty">Laddar …</p>';
+  await Promise.all([whenMatches(), loadCoupons()]);
+  if (KP.view.mode !== 'home') return;
+  if (!state.all) {
+    el.innerHTML = '<p class="empty">Kunde inte läsa matcherna.</p>';
+    return;
+  }
+  renderHome();
+}
+
+function renderHome() {
+  const c = currentCoupon();
+  $('#home').innerHTML = (c ? teaser(c, gradeCoupon(c)) : emptyCard()) + oracle();
+}
+
+// Omgångens kupong i korthet: siffran, en prick per match och vägen in.
+function teaser(c, g) {
+  const go = g.done
+    ? '<a class="kp-btn primary" href="#kupong/ny">+ Ny kupong</a><a class="kp-btn" href="#kupong">Se kupongen</a>'
+    : `<a class="kp-btn primary" href="#kupong">${g.started ? 'Följ kupongen' : 'Till kupongen'}</a>`;
+  return `<div class="card kp-teaser${g.live ? ' is-live' : ''}">` +
+    `<div class="kp-teaser-txt"><p class="kp-eyebrow">Omgångens kupong${c.name ? ` · ${esc(c.name)}` : ''}` +
+    `${c.pending ? ' <span class="kp-tag">väntar på GitHub</span>' : ''}</p>` +
+    `<h2 class="page-title"><a href="#kupong">${esc(dateRange(g.first, g.last))}</a></h2>` +
+    `<span class="kp-line">${statusLine(g)}</span></div>` +
+    `<a class="kp-teaser-num" href="#kupong" aria-label="Till kupongen">${bigNumber(g)}</a>` +
+    pearls(g.rows) +
+    `<div class="kp-teaser-go">${go}</div></div>`;
+}
+
+// Liveställningen eller spoilerskyddet ändrades: rita om det som syns.
+function redraw() {
+  if (!KP.view) return;
+  if (KP.view.mode === 'home' && !$('#home-section').hidden) renderHome();
+  if (KP.view.mode === 'show' && !$('#coupon-section').hidden) renderCouponShow(KP.view.id);
 }
 
 // Säkraste spelen: de tre kommande matcherna (sju dagar framåt) där modellen
 // är mest säker, högst en match per lag så att samma storlag inte står där
-// varje vecka. Under kupongen på förstasidan.
+// varje vecka. På förstasidan, under kupongen.
 const ORACLE_SIDE = ['hemma', 'oavgjort', 'borta'];
 function oracle() {
   const now = Date.now();
@@ -553,27 +603,14 @@ function liveLine(g) {
       : `live från ESPN, ${esc(fTime.format(new Date(KP.liveAt)))}`) + '</p>';
 }
 
-function pastSection(list, shown) {
+// Fler kuponger som inte är färdigspelade, t.ex. nästa omgångs medan den
+// här pågår. De färdiga finns under Historik.
+function moreSection(list) {
   if (!list.length) return '';
-  const done = list.filter((x) => x.g.done && x.g.n && !x.g.hidden).slice(0, 12).reverse();
-  let html = `<h3 class="kp-h">${list.every((x) => x.g.first < shown.first) ? 'Tidigare kuponger' : 'Fler kuponger'}` +
-    `${KP.history ? '<a class="kp-h-link" href="historik.html">Historik ›</a>' : ''}</h3>`;
-  if (done.length >= 2) {
-    html += '<div class="card kp-hist" role="img" aria-label="Andel rätt per kupong, jämfört med modellens tips">' +
-      done.map(({ c, g }) => {
-        const a = Math.round((100 * g.ok) / g.n);
-        const b = Math.round((100 * g.modelOk) / g.n);
-        return `<a class="kp-hcol" href="#kupong/${esc(c.id)}" title="${esc(dateRange(g.first, g.last))}: ${g.ok} av ${g.n} rätt · modellens tips ${g.modelOk}">` +
-          `<span class="kp-hbar"><i style="height:${a}%"></i><b style="bottom:${b}%"></b></span>` +
-          `<span class="kp-hlab">${esc(dateRange(g.first, g.first))}</span></a>`;
-      }).join('') +
-      '<span class="kp-hkey"><span><i class="us"></i>Vi</span><span><i class="mod"></i>Modellens tips</span></span></div>';
-  }
-  html += '<div class="mlist">' + list.map(({ c, g }) =>
+  return '<h3 class="kp-h">Fler kuponger</h3><div class="mlist">' + list.map(({ c, g }) =>
     `<a class="kp-past" href="#kupong/${esc(c.id)}"><span class="kp-past-date">${esc(dateRange(g.first, g.last))}` +
     `${c.name ? `<span class="sub">${esc(c.name)}</span>` : ''}</span>${pearls(g.rows, 'sm')}` +
     `<span class="kp-past-num"><b>${g.hidden ? '?' : g.ok}</b>/${g.n}</span></a>`).join('') + '</div>';
-  return html;
 }
 
 function couponErrors() {
@@ -989,7 +1026,7 @@ function renderViaGitHub(ctx) {
   // Spoilerskyddet ändrades: rätta om med det som får synas.
   if (window.Spoiler) {
     Spoiler.onChange(() => {
-      if (KP.view && KP.view.mode === 'show' && !$('#coupon-section').hidden) renderCouponShow(KP.view.id);
+      redraw();
     });
   }
 })();

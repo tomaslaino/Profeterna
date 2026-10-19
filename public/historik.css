@@ -1,4 +1,4 @@
-/* Sidan Historik (historik.js). Laddas efter theme.css och kupong.css och
+/* Kupong → Historik (historik.js). Laddas efter theme.css och kupong.css och
    lånar deras tokens, prickar, teckenrutor och stora siffror. Betygets färg:
    5 grön, 4 ljusblå, 3 blå, 2 gul, 1 röd – samma i stjärnorna och staplarna. */
 
@@ -9,12 +9,6 @@
   --hk-2: var(--stale);
   --hk-1: var(--down);
 }
-
-.hk-head { margin-top: clamp(18px, 3vw, 34px); }
-.hk-head .page-title { margin-top: 6px; }
-.hk-head .kp-eyebrow a { color: inherit; text-decoration: none; }
-.hk-head .kp-eyebrow a::before { content: "‹ "; }
-.hk-head .kp-eyebrow a:hover { color: #fff; }
 
 /* ---------- sammanfattningen ---------- */
 

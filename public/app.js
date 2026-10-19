@@ -87,6 +87,7 @@ const TABS = {
 };
 
 // Källor och Modell har ingen flik i toppbaren, bara länkar i sidfoten.
+// Förstasidan (home-section) har ingen flik heller – dit leder namnet.
 function showTab(sectionId) {
   for (const sec of document.querySelectorAll('main > section')) sec.hidden = sec.id !== sectionId;
   for (const btn of document.querySelectorAll('[role="tab"]')) {
@@ -106,12 +107,18 @@ function route() {
     openMatch(m[1]);
     return;
   }
-  // Förstasidan är kupongen (kupong.js): #kupong, #kupong/<id>, #kupong/ny,
-  // #kupong/andra/<id> – och utan eller med okänd adress.
+  // Kupongen (kupong.js): #kupong, #kupong/historik, #kupong/<id>,
+  // #kupong/ny, #kupong/andra/<id>.
   const k = /^kupong(?:\/(.+))?$/.exec(h);
-  if (k || !TABS[h]) {
+  if (k) {
     showTab('coupon-section');
-    showCoupon(k ? k[1] || '' : '');
+    showCoupon(k[1] || '');
+    return;
+  }
+  // Förstasidan: utan eller med okänd adress.
+  if (!TABS[h]) {
+    showTab('home-section');
+    showHome();
     return;
   }
   showTab(TABS[h]);
@@ -122,7 +129,7 @@ function route() {
 for (const btn of document.querySelectorAll('[role="tab"]')) {
   btn.addEventListener('click', () => {
     const name = Object.keys(TABS).find((k) => TABS[k] === btn.dataset.tab);
-    location.hash = name === 'kupong' ? '' : name;
+    location.hash = name;
   });
 }
 window.addEventListener('hashchange', route);

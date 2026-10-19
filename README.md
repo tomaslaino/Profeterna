@@ -37,9 +37,10 @@ ingen falsk precision · sidan kraschar aldrig av en död källa · endast fria 
   en säsongsprognos (Prognos), programmet framåt och modellens styrka för alla lag. Inget
   av det styr prognoserna (se [Säsongsprognosen](#säsongsprognosen))
 - [x] **Kupongen:** gängets gemensamma kupong per omgång – utvalda matcher med 1, X, 2 eller
-  gardering. Förstasidan är kupongen, med liveställning från ESPN; Ny kupong med
+  gardering. Fliken Kupong har omgångens kupong med liveställning från ESPN och
+  historiken; förstasidan visar kupongen i korthet. Ny kupong med
   sökning. Matcherna har en egen flik. Sparas som fil i `data/kuponger/` med en commit på GitHub (se [Kupongen](#kupongen))
-- [x] **Kuponghistoriken:** sidan Historik med varje färdigspelad kupong – antal rätt,
+- [x] **Kuponghistoriken:** Kupong → Historik med varje färdigspelad kupong – antal rätt,
   betyg 1–5 mot modellens väntade antal rätt, sortering efter hur det gick och en kort
   AI-kommentar som läser gängets anteckningar. Fryses in i `data/kupong-historik.json`
   (se [Kuponghistoriken](#kuponghistoriken))
@@ -274,6 +275,12 @@ Utan nyckel ingen knapp.
   skattar fortfarande alla fem nivåerna, och National League läses fortfarande för att
   visa var League Twos nykomlingar kom ifrån och tog vägen. Gamla länkar till `#nl/…`
   hamnar på Premier League.
+- **Förstasidan och Kupong delas, historiken flyttar till Kupong (2026-10-19, användarens
+  önskemål):** förstasidan var samma sida som fliken Kupong. Nu är förstasidan en överblick
+  (rubriken, omgångens kupong i korthet och Säkraste spelen) och fliken Kupong har lägena
+  Omgången (hela kupongen) och Historik (förut en egen sida, länkad i sidfoten på alla
+  sidor). Länken Kuponghistorik i sidfoten tas bort; `historik.html` leder till
+  `#kupong/historik`.
 
 ## Arkitektur
 
@@ -333,8 +340,8 @@ server:
   [public/kupong.css](public/kupong.css). Se [Kupongen](#kupongen).
 - **Kuponghistoriken:** [src/history.js](src/history.js) rättar färdiga kuponger, räknar
   betyget, fryser in dem i `data/kupong-historik.json` och skriver `data/historik.json`.
-  Sidan är [public/historik.html](public/historik.html) med
-  [public/historik.js](public/historik.js) och [public/historik.css](public/historik.css);
+  Vyn Kupong → Historik ritas av [public/historik.js](public/historik.js) med
+  [public/historik.css](public/historik.css) (gamla `historik.html` leder dit);
   AI-kommentaren skrivs av [worker/kommentar.mjs](worker/kommentar.mjs) med prompten i
   [config/kommentar.js](config/kommentar.js). Se [Kuponghistoriken](#kuponghistoriken).
 - **Frontend:** ren HTML/CSS/JS i `public/`, flikarna Matcher, Kupong, Utvärdering, Källor och
@@ -774,18 +781,22 @@ ställningen efter 90 minuter (samma utfall som prognosen).
 
 **Var den syns**
 
-- **Förstasidan** (fliken Kupong, utan adress eller `#kupong`): rubriken och kupongen som
-  pågår, annars nästa, annars den som spelades färdigt senast. Antal rätt, en skala med
+- **Förstasidan** (utan adress, ingen flik – dit leder namnet): rubriken, omgångens kupong
+  i korthet och Säkraste spelen. Omgångens kupong är den som pågår, annars nästa, annars den
+  som spelades färdigt senast; rutan visar antal rätt (eller antal matcher), läget, en prick
+  per match och knappen in till kupongen – och *+ Ny kupong* när den är färdigspelad.
+- **Fliken Kupong** har två lägen överst, *Omgången* och *Historik*.
+  *Omgången* (`#kupong`) är hela omgångens kupong: antal rätt, en skala med
   rätt, möjliga och modellens väntade antal rätt, och varje match med vårt tecken som tre
   rutor (valda fyllda, utfallet grönt om vi hade det och rödringat om inte), modellens tips
   som en prick under rutan och modellens chans för vårt tecken. När alla matcher är spelade
-  (även om spoilerskyddet döljer resultaten) visas knappen *Skapa ny kupong*. Utan kupong:
-  knappen *Skapa kupong*. Matchlistan ligger under fliken Matcher (`#matcher`) och visar
+  (även om spoilerskyddet döljer resultaten) visas knappen *Skapa ny kupong*, och
+  *Betyg och kommentar* leder till kupongen under Historik. Under den står andra kuponger
+  som inte är färdigspelade (t.ex. nästa omgångs). Utan kupong: knappen *Skapa kupong*.
+  *Historik* (`#kupong/historik`), se [Kuponghistoriken](#kuponghistoriken). Matchlistan ligger under fliken Matcher (`#matcher`) och visar
   prognosen som svenska decimalodds (1 / sannolikheten, t.ex. 1,85), räknade från hela
   procent; på smala mobiler står oddsen på en egen rad under lagen.
-- **En viss kupong** (`#kupong/<id>`): samma vy utan rubriken, och under den tidigare
-  kuponger med staplar för andel rätt mot hur många rätt modellens tips hade gett, och
-  länken *Historik* (en färdig kupong länkas som `historik.html#<id>`).
+- **En viss kupong** (`#kupong/<id>`): samma vy för den kupongen.
 - **Väntat antal rätt** = spelade matcher som de gick + modellens sannolikhet för vårt tecken
   i resten (prognosen före avspark ur journalen om den finns, annars sajtens prognos).
 - **Live:** medan en kupongmatch pågår hämtar sidan ESPN:s scoreboard varje minut, direkt i
@@ -873,7 +884,8 @@ det att prova med en egen mapp: `KUPONG_DIR=/tmp/kuponger npm run build`.
 
 ## Kuponghistoriken
 
-Sidan **Historik** (`historik.html`, länkad från fliken Kupong) visar varje färdigspelad
+**Kupong → Historik** (`#kupong/historik`, en viss kupong `#kupong/historik/<id>`; gamla
+länkar till `historik.html#<id>` leds dit) visar varje färdigspelad
 kupong: antal rätt, en prick per match, betyget, AI:ns kommentar och – under *Matcherna* –
 varje match med tecken, resultat, modellens chans och gängets anteckning. Överst antal
 kuponger, andel rätt, snittbetyg och antal rätt mot det väntade, och en stapel per kupong

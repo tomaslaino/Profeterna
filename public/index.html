@@ -13,6 +13,7 @@
   <link rel="stylesheet" href="divisioner.css">
   <link rel="stylesheet" href="theme.css">
   <link rel="stylesheet" href="kupong.css">
+  <link rel="stylesheet" href="historik.css">
   <link rel="stylesheet" href="spoiler.css">
 </head>
 <body>
@@ -25,7 +26,7 @@
       <nav class="tabs" aria-label="Sektioner">
         <div class="tablist" role="tablist">
           <button type="button" role="tab" id="tab-coupon" data-tab="coupon-section"
-            aria-controls="coupon-section" aria-selected="true">Kupong</button>
+            aria-controls="coupon-section" aria-selected="false">Kupong</button>
           <button type="button" role="tab" id="tab-matches" data-tab="matches-section"
             aria-controls="matches-section" aria-selected="false">Matcher</button>
           <button type="button" role="tab" id="tab-eval" data-tab="eval-section"
@@ -38,8 +39,8 @@
   </header>
 
   <main>
-    <!-- förstasidan: hjälten och den aktuella (eller senaste) kupongen -->
-    <section id="coupon-section" role="tabpanel" aria-labelledby="tab-coupon">
+    <!-- förstasidan: hjälten, omgångens kupong i korthet och Säkraste spelen -->
+    <section id="home-section" aria-label="Förstasidan">
       <div id="hero" class="hero">
         <div class="hero-main">
           <h1 class="hero-title">Matchfixarna</h1>
@@ -60,6 +61,11 @@
           </figure>
         </div>
       </div>
+      <div id="home"></div>
+    </section>
+
+    <!-- kupongen: omgångens kupong och historiken (kupong.js, historik.js) -->
+    <section id="coupon-section" role="tabpanel" aria-labelledby="tab-coupon" hidden>
       <div id="coupon"></div>
     </section>
 
@@ -101,10 +107,11 @@
   <footer>
     <img class="logo-sm" src="logo.svg" alt="" width="20" height="20">
     <p>Matchfixarna</p>
-    <nav class="foot-links" aria-label="Mer"><a href="#kallor">Källor</a><a href="#modell">Modell</a><a href="historik.html">Kuponghistorik</a><a href="om-oss.html">Om oss</a></nav>
+    <nav class="foot-links" aria-label="Mer"><a href="#kallor">Källor</a><a href="#modell">Modell</a><a href="om-oss.html">Om oss</a></nav>
   </footer>
 
   <script src="spoiler.js"></script>
+  <script src="historik.js"></script>
   <script src="app.js"></script>
   <script src="kupong.js"></script>
 </body>

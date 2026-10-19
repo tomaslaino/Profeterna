@@ -2,56 +2,15 @@
 <html lang="sv">
 <head>
   <meta charset="utf-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1">
   <title>Kuponghistorik – Matchfixarna</title>
-  <meta name="description" content="Matchfixarnas färdigspelade kuponger: antal rätt, betyg mot modellen och AI:ns kommentar.">
-  <meta name="theme-color" content="#0e0d0b">
-  <link rel="icon" type="image/svg+xml" href="logo.svg">
-  <link rel="apple-touch-icon" href="apple-touch-icon.png">
-  <link rel="preconnect" href="https://fonts.googleapis.com">
-  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link rel="stylesheet" href="style.css">
-  <link rel="stylesheet" href="theme.css">
-  <link rel="stylesheet" href="kupong.css">
-  <link rel="stylesheet" href="historik.css">
-  <link rel="stylesheet" href="spoiler.css">
+  <!-- Historiken ligger på kupongsidan (Kupong → Historik). Gamla länkar
+       (historik.html#2026-10-17) leds dit med samma kupong. -->
+  <script>
+    location.replace('index.html#kupong/historik' + (location.hash.length > 1 ? '/' + location.hash.slice(1) : ''));
+  </script>
+  <meta http-equiv="refresh" content="0; url=index.html#kupong/historik">
 </head>
 <body>
-  <header class="topbar">
-    <div class="topbar-inner">
-      <a class="brand" href="index.html" aria-label="Matchfixarna – till förstasidan">
-        <img class="logo" src="logo.svg" alt="" width="36" height="36">
-        <span class="brand-txt"><b>Matchfixarna</b></span>
-      </a>
-      <nav class="tabs" aria-label="Sektioner">
-        <div class="tablist">
-          <a class="tab-link" href="index.html" aria-current="page">Kupong</a>
-          <a class="tab-link" href="index.html#matcher">Matcher</a>
-          <a class="tab-link" href="index.html#utvardering">Utvärdering</a>
-        </div>
-        <a class="tab-link" href="tabeller.html">Tabeller</a>
-        <a class="tab-link" href="statistik.html">Statistik</a>
-      </nav>
-    </div>
-  </header>
-
-  <main>
-    <div class="hk-head">
-      <div>
-        <p class="kp-eyebrow"><a href="index.html#kupong">Kupong</a></p>
-        <h2 class="page-title">Historik</h2>
-      </div>
-    </div>
-    <div id="history">Laddar …</div>
-  </main>
-
-  <footer>
-    <img class="logo-sm" src="logo.svg" alt="" width="20" height="20">
-    <p>Matchfixarna</p>
-    <nav class="foot-links" aria-label="Mer"><a href="index.html#kallor">Källor</a><a href="index.html#modell">Modell</a><a href="historik.html">Kuponghistorik</a><a href="om-oss.html">Om oss</a></nav>
-  </footer>
-
-  <script src="spoiler.js"></script>
-  <script src="historik.js"></script>
+  <p><a href="index.html#kupong/historik">Kuponghistoriken</a></p>
 </body>
 </html>
