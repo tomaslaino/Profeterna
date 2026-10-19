@@ -103,6 +103,8 @@ function defs(items) {
 const TABS = {
   matcher: 'matches-section',
   kupong: 'coupon-section',
+  olympen: 'battle-section',
+  // Fliken hette Kampen först; gamla länkar hamnar på Olympen.
   kampen: 'battle-section',
   kallor: 'sources-section',
   modell: 'model-section',

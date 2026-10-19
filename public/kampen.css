@@ -1,4 +1,4 @@
-/* Kampen (kampen.js): gängets inbördes kamp om tipsen. Laddas efter
+/* Olympen (kampen.js): gängets inbördes kamp om tipsen. Laddas efter
    kupong.css och tippare.css och använder deras tokens (--kp-ok, --kp-no),
    .kp-eyebrow/.kp-line och tabellen .tp-table. Varje tippare har en färg
    (--km-c) vid porträttet, i kurvan och i inbördes möten. */

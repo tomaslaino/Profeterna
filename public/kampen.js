@@ -1,8 +1,9 @@
 'use strict';
 
-// ---------- Kampen ----------
+// ---------- Olympen ----------
 //
-// Fliken Kampen (#kampen): gängets inbördes kamp om tipsen, säsongen igenom.
+// Fliken Olympen (#olympen, först Kampen – filerna heter kampen): gängets
+// inbördes kamp om tipsen, säsongen igenom.
 // Samma tips och poäng som Omgångens och Säsongens tippare på förstasidan
 // (tippare.js, tippoang.js): 1 för rätt minus modellens chans för tipset före
 // avspark – plus är bättre än modellen, minus sämre.
@@ -444,7 +445,7 @@ function kampEmpty(gang) {
   return '<div class="card km-card km-empty">' +
     `<div class="km-faces">${faces}</div>` +
     '<p class="km-empty-title">Alla står på noll.</p>' +
-    '<p class="legend">Kampen börjar när första omgångens tips visas för alla och en match är spelad. ' +
+    '<p class="legend">Klättringen börjar när första omgångens tips visas för alla och en match är spelad. ' +
     'Var och en tippar under Kupong → Omgången.</p>' +
     '<p><a class="kp-btn" href="#kupong">Till omgången</a></p></div>';
 }
@@ -456,8 +457,8 @@ function kampHtml(width) {
     ? `<p class="kp-line km-status">${Spoiler.chip(`${hidden.length} ${hidden.length === 1 ? 'omgång dold' : 'omgångar dolda'}`)}` +
       `<button type="button" class="tp-show" data-sp-show="${esc(hidden.flatMap((r) => r.matches.map((m) => m.id)).join(' '))}">Visa ändå</button></p>`
     : '';
-  const head = '<h2 class="page-title">Kampen</h2>' +
-    '<p class="intro">Vem av oss tippar bäst? Var och ens egna tips inför samtalet, rättade mot modellen. Plus är bättre än modellen, minus sämre.</p>';
+  const head = '<h2 class="page-title">Olympen</h2>' +
+    '<p class="intro">Vem av oss tronar högst? Var och ens egna tips inför samtalet, rättade mot modellen. Plus är bättre än modellen, minus sämre.</p>';
   if (!list.length) return head + kampEmpty(gang) + hid + KAMP_HJALP;
   const t = kampTips(list);
   const pair = [kampPairsCard(list, gang), kampKassaCard(t, gang)].filter(Boolean);
