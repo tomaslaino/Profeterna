@@ -961,6 +961,44 @@ slutdatum per kupong och underlag. Prompten står i [config/kommentar.js](config
 
 Lokalt med egna filer: `KUPONG_DIR=/tmp/kuponger KUPONG_HISTORIK=/tmp/historik.json npm run build`.
 
+## Omgångens tippare
+
+Förstasidan har under kupongen en ruta som visar vem i gänget som tippade bäst och sämst i
+omgången. Underlaget är var och ens egna tips inför samtalet (`GET …/samtal`,
+[worker/samtal.mjs](worker/samtal.mjs)). Rutan syns när tipsen visas för alla och första
+matchen är spelad. Poängen räknas i webbläsaren ([public/tippare.js](public/tippare.js))
+med samma rättning som kupongen: ställningen efter 90 minuter, liveställningen och
+spoilerskyddet.
+
+**Poäng per match = 1 om tipset satt (annars 0) − modellens chans för tipset före avspark**
+(journalen om den finns, annars sajtens prognos; för en gardering chanserna ihop, så att en
+helgardering alltid ger 0). Poängen läggs ihop för omgången.
+
+| Tips | Modellens chans | Rätt | Fel |
+|---|---|---|---|
+| Storfavorit | 70 % | +0,30 | −0,70 |
+| Jämn match | 40 % | +0,60 | −0,40 |
+| Skräll | 20 % | +0,80 | −0,20 |
+
+- Räknat med modellens egna sannolikheter blir det väntade 0, vad man än tippar. Plus
+  betyder alltså bättre än modellen och minus sämre. Att alltid ta favoriten eller att jaga
+  skrällar lönar sig inte i sig – det som ger poäng är att ha rätt där modellen tvekade. Det
+  är samma tanke som kupongens betyg (rätt − väntat), men per person.
+- Ren oddspoäng (1/chansen vid rätt) valdes bort: med 6–10 matcher per omgång skulle en
+  enda skräll avgöra.
+- **Modellen** räknas likadant med sitt troligaste utfall och står med som jämförelse,
+  utan placering.
+- Placering efter poängen med en decimal, sedan antal rätt. Högst blir *Omgångens
+  tippare* och lägst *Omgångens sämsta*. Medan matcher återstår står det *Leder* och *Sist*,
+  och rutan är märkt *Preliminärt*. Har alla samma poäng delas inga etiketter ut. Den som
+  inte lämnade in står under listan och placeras inte.
+- Saknas modellen för en match används kuponghistorikens schablon: 45 % för ett tecken,
+  75 % för två. Uppskjutna och inställda matcher räknas inte.
+- *Poäng per match* (utfällbar) visar varje tips med poängen.
+
+Bara den pågående omgången finns i `GET …/samtal`. När nästa omgång startas försvinner
+rutan, och det finns ännu ingen topplista över flera omgångar.
+
 ## Statusmärkning
 
 Räknas om i webbläsaren ur hämttid och källans gräns – stannar den schemalagda hämtningen
