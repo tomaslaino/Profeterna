@@ -361,8 +361,8 @@ function statusLine(g) {
 // ---------- kupongvyn ----------
 
 // Kupong: #kupong (omgångens kupong), #kupong/historik och
-// #kupong/historik/<id> (historik.js), #kupong/<id>, #kupong/ny och
-// #kupong/andra/<id>.
+// #kupong/historik/<id> (historik.js), #kupong/samtal… (samtal.js),
+// #kupong/<id>, #kupong/ny och #kupong/andra/<id>.
 async function showCoupon(arg) {
   const [mode, id] = (arg || '').split('/');
   if (mode === 'historik') return renderHistory(id || null);
@@ -373,6 +373,7 @@ async function showCoupon(arg) {
     el.innerHTML = '<p class="empty">Kunde inte läsa matcherna.</p>';
     return;
   }
+  if (mode === 'samtal' && window.Samtal) return Samtal.show(id || '');
   if (mode === 'ny') return renderCreate(null);
   if (mode === 'andra' && id) return renderCreate(id);
   KP.view = { mode: 'show', id: mode || null };
@@ -380,16 +381,20 @@ async function showCoupon(arg) {
   window.scrollTo(0, 0);
 }
 
-// Kupongsidans två lägen: omgångens kupong och de färdigspelade.
+// Kupongsidans lägen: omgångens kupong, samtalet (om tjänsten finns) och de
+// färdigspelade.
 function viewNav(on) {
   const link = (key, href, label) => `<a href="${href}"${on === key ? ' aria-current="page"' : ''}>${label}</a>`;
+  // Samtalet: gängets egna tips inför telefonsamtalet (samtal.js).
+  const samtal = window.Samtal && KP.data && KP.data.samtal ? link('samtal', '#kupong/samtal', 'Samtalet') : '';
   return '<nav class="kp-views" aria-label="Kupong">' +
-    link('omgang', '#kupong', 'Omgången') + link('historik', '#kupong/historik', 'Historik') + '</nav>';
+    link('omgang', '#kupong', 'Omgången') + samtal + link('historik', '#kupong/historik', 'Historik') + '</nav>';
 }
 
 function emptyCard() {
   return '<div class="kp-empty card"><p class="kp-eyebrow">Kupong</p><h2 class="page-title">Omgångens kupong</h2>' +
     '<p class="intro">Välj matcherna, sätt 1, X eller 2 och följ hur det går.</p>' +
+    (window.Samtal && KP.data && KP.data.samtal ? '<p class="legend sm-alt"><a href="#kupong/samtal/ny">Eller tippa var för sig först, inför samtalet</a></p>' : '') +
     '<a class="kp-btn primary" href="#kupong/ny">Skapa kupong</a></div>';
 }
 
@@ -468,7 +473,9 @@ async function showHome() {
 
 function renderHome() {
   const c = currentCoupon();
-  $('#home').innerHTML = c ? teaser(c, gradeCoupon(c)) : emptyCard();
+  // Pågår en omgång inför samtalet står den överst (samtal.js).
+  const samtal = window.Samtal ? Samtal.teaser() : '';
+  $('#home').innerHTML = samtal + (c ? teaser(c, gradeCoupon(c)) : emptyCard());
 }
 
 // Omgångens kupong i korthet: siffran, en prick per match och vägen in.
@@ -491,6 +498,7 @@ function redraw() {
   if (!KP.view) return;
   if (KP.view.mode === 'home' && !$('#home-section').hidden) renderHome();
   if (KP.view.mode === 'show' && !$('#coupon-section').hidden) renderCouponShow(KP.view.id);
+  if (KP.view.mode === 'samtal' && window.Samtal) Samtal.redraw();
 }
 
 function summaryCard(g) {

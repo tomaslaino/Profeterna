@@ -1,0 +1,229 @@
+/* Inför samtalet (samtal.js): vem som lämnat in, dina tips och underlaget
+   där allas tips står i rutorna 1, X och 2. Laddas efter kupong.css och
+   använder dess knappar och listor. Färgspråket: varje person har en egen
+   färg på initialerna (fylld = enda tecknet, streckad = del av en
+   gardering), guld = gängets tecken, grön ram = så slutade matchen. */
+
+.sm-ch {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 26px;
+  height: 21px;
+  padding: 0 5px;
+  box-sizing: border-box;
+  font-size: 11px;
+  font-weight: 750;
+  letter-spacing: 0.03em;
+  border: 1px solid transparent;
+  border-radius: 6px;
+}
+.sm-p0 { color: #b3cffb; background: rgba(77, 143, 240, 0.2); }
+.sm-p1 { color: #97e0bd; background: rgba(61, 179, 124, 0.2); }
+.sm-p2 { color: #f5bb96; background: rgba(224, 122, 69, 0.22); }
+.sm-ch.g { background: transparent; border: 1px dashed currentColor; }
+
+/* ---------- vem som lämnat in ---------- */
+
+.sm-folk { display: flex; flex-wrap: wrap; gap: 8px; }
+.sm-person {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  padding: 4px 12px 4px 5px;
+  font-size: 13px;
+  color: var(--muted);
+  border: 1px solid var(--pill-line);
+  border-radius: 999px;
+  background: var(--pill);
+}
+.sm-person.inne { color: var(--ink-soft); }
+.sm-person b { color: var(--fg); }
+.sm-folk-board { margin-bottom: 14px; }
+
+.sm-wait { display: grid; gap: 16px; max-width: 760px; margin-bottom: 26px; }
+.sm-wait-txt { margin: 0; color: var(--ink-soft); }
+.sm-wait-txt b { color: var(--fg); }
+.sm-wait .kp-actions { margin-bottom: 0; }
+
+.sm-vem { display: flex; flex-wrap: wrap; align-items: center; gap: 6px; }
+.sm-vem-q { margin-right: 4px; font-size: 13px; font-weight: 600; color: var(--ink-soft); }
+.sm-vem button {
+  display: inline-flex;
+  align-items: center;
+  gap: 7px;
+  padding: 4px 12px 4px 5px;
+  font: inherit;
+  font-size: 13px;
+  color: var(--ink-soft);
+  border: 1px solid var(--pill-line);
+  border-radius: 999px;
+  background: var(--pill);
+  cursor: pointer;
+}
+.sm-vem button:hover { color: #fff; border-color: var(--pill-line-hi); }
+.sm-vem button[aria-pressed="true"] { color: var(--fg); border-color: var(--gold); background: rgba(216, 176, 106, 0.1); }
+
+/* omgångens matcher innan tipsen visas */
+.sm-li {
+  display: grid;
+  grid-template-columns: 6.4rem 3.3rem minmax(0, 1fr) auto;
+  align-items: center;
+  gap: 14px;
+  padding: 11px 20px;
+  border-bottom: 1px solid var(--hair);
+  font-size: 14.5px;
+}
+.sm-li:last-child { border-bottom: 0; }
+.sm-li .mtime { white-space: nowrap; }
+.sm-mine { font-family: var(--display); font-weight: 800; color: var(--gold-hi); }
+.sm-mine-lab { margin-right: 6px; font-family: var(--sans); font-size: 11px; font-weight: 600; color: var(--muted); }
+
+/* ---------- underlaget ---------- */
+
+.sm-legend { display: flex; flex-wrap: wrap; align-items: center; gap: 6px 16px; }
+.sm-legend > span { display: inline-flex; align-items: center; gap: 6px; }
+
+.sm-group { display: flex; flex-wrap: wrap; align-items: baseline; gap: 4px 12px; margin: 28px 0 10px 4px; }
+.sm-group h3 { margin: 0; font-family: var(--display); font-style: italic; font-weight: 500; font-size: 19px; color: var(--bone); }
+.sm-count { margin-left: 4px; font-family: var(--sans); font-style: normal; font-size: 12px; font-weight: 700; color: var(--eyebrow); }
+.sm-group > span { font-size: 13px; color: var(--muted); }
+
+.sm-row {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) repeat(3, 96px);
+  align-items: stretch;
+  gap: 8px;
+  padding: 12px 16px 12px 20px;
+  border-bottom: 1px solid var(--hair);
+}
+.sm-row:last-child { border-bottom: 0; }
+.sm-tm { display: flex; flex-direction: column; justify-content: center; gap: 5px; min-width: 0; }
+.sm-teams { font-weight: 600; color: var(--fg); text-decoration: none; }
+.sm-teams:hover { color: #fff; text-decoration: underline; text-underline-offset: 3px; }
+.sm-teams .vs { margin: 0 0.4rem; font-weight: 400; color: var(--muted); }
+.sm-meta { display: flex; align-items: center; gap: 8px; font-size: 12.5px; color: var(--muted); }
+.sm-note { display: flex; align-items: baseline; gap: 7px; font-size: 13px; line-height: 1.4; color: var(--ink-soft); }
+.sm-note .sm-ch { flex: none; height: 18px; min-width: 24px; font-size: 10px; }
+
+.sm-cell {
+  display: flex;
+  flex-direction: column;
+  gap: 5px;
+  min-height: 70px;
+  padding: 6px 7px;
+  font: inherit;
+  text-align: left;
+  color: var(--ink-soft);
+  border: 1px solid var(--pill-line);
+  border-radius: 10px;
+  background: var(--pill);
+  cursor: pointer;
+  transition: border-color 0.15s ease, background-color 0.15s ease;
+}
+.sm-cell:hover { border-color: var(--pill-line-hi); }
+.sm-cell:disabled { cursor: default; }
+.sm-cell:disabled:hover { border-color: var(--pill-line); }
+.sm-s { display: flex; justify-content: space-between; align-items: baseline; }
+.sm-s b { font-family: var(--display); font-size: 17px; font-weight: 800; line-height: 1; color: var(--ink-soft); }
+.sm-s small { font-size: 11px; font-weight: 600; color: var(--muted); }
+.sm-chips { display: flex; flex-wrap: wrap; align-content: flex-start; gap: 3px; flex: 1; }
+.sm-pc { font-size: 11px; color: var(--muted); }
+.sm-pc.fav { font-weight: 700; color: var(--fg); }
+/* gängets tecken */
+.sm-cell.on { border-color: transparent; background: rgba(216, 176, 106, 0.13); box-shadow: inset 0 0 0 2px var(--gold); }
+.sm-cell.on .sm-s b { color: var(--gold-hi); }
+/* så slutade matchen */
+.sm-cell.res { border-color: var(--fresh); }
+.sm-cell.res.on { box-shadow: inset 0 0 0 2px var(--gold), 0 0 0 1px var(--fresh); }
+
+/* gängets kupong i nederkant */
+.sm-slots { display: flex; flex-wrap: wrap; gap: 4px; }
+.sm-slots i {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 26px;
+  height: 24px;
+  padding: 0 4px;
+  box-sizing: border-box;
+  font-style: normal;
+  font-size: 12px;
+  font-weight: 700;
+  color: var(--muted);
+  border: 1px solid var(--pill-line);
+  border-radius: 6px;
+}
+.sm-slots i.set { color: #1d1509; border-color: transparent; background: var(--gold-grad); }
+.sm-bar-msg { flex-basis: 100%; font-size: 13.5px; }
+.sm-bar-msg:empty { display: none; }
+.sm-kod { flex: 0 1 160px; }
+
+/* ---------- ny omgång ---------- */
+
+.sm-when { display: flex; flex-wrap: wrap; align-items: center; gap: 8px 12px; margin: 0 0 20px; }
+.sm-when label { font-size: 13px; font-weight: 600; color: var(--ink-soft); }
+.sm-when .kp-name { flex: 0 1 230px; color-scheme: dark; }
+.sm-when .legend { margin: 0; }
+
+.sm-pick {
+  width: 100%;
+  font: inherit;
+  text-align: left;
+  color: inherit;
+  background: transparent;
+  border: 0;
+  border-bottom: 1px solid var(--hair);
+  cursor: pointer;
+}
+.sm-pick:hover { background: rgba(243, 237, 227, 0.03); }
+.sm-tick {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 30px;
+  height: 30px;
+  font-size: 15px;
+  font-weight: 700;
+  color: var(--muted);
+  border: 1px solid var(--pill-line);
+  border-radius: 50%;
+}
+.sm-pick.on .sm-tick { color: #1d1509; border-color: transparent; background: var(--gold-grad); }
+
+/* ---------- förstasidan ---------- */
+
+.sm-teaser {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto auto;
+  align-items: center;
+  gap: 14px 24px;
+  margin-bottom: 18px;
+  border-color: rgba(216, 176, 106, 0.3);
+}
+.sm-teaser .page-title { margin: 6px 0 0; font-size: clamp(22px, 3vw, 28px); }
+.sm-teaser .page-title a { color: inherit; text-decoration: none; }
+
+/* ---------- mobil ---------- */
+
+@media (max-width: 760px) {
+  .sm-li { grid-template-columns: 4.6rem minmax(0, 1fr) auto; gap: 10px; padding: 10px 14px; font-size: 14px; }
+  .sm-li .ctag { display: none; }
+  .sm-li .mtime { font-size: 12.5px; }
+  /* lagen överst, rutorna i tre lika breda kolumner under */
+  .sm-row { grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 6px; padding: 12px 14px; }
+  .sm-tm { grid-column: 1 / -1; margin-bottom: 4px; }
+  .sm-cell { min-height: 64px; }
+  .sm-pick { grid-template-columns: minmax(0, 1fr) auto; gap: 10px; padding: 10px 14px; }
+  .sm-pick .mtime, .sm-pick .ctag { display: none; }
+  .sm-pick .mteams { font-size: 14px; }
+  .sm-teaser { grid-template-columns: 1fr; }
+  .sm-teaser .kp-btn { justify-self: start; }
+  .sm-kod { flex: 1 1 120px; }
+}
+
+/* länken under texten i Omgångens kupong, när det inte finns någon kupong */
+.sm-alt { margin: -8px 0 18px; }
+@media (min-width: 720px) {
+  .sm-alt { margin: 10px 0 0; }
+}
