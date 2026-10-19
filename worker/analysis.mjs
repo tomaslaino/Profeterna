@@ -2,10 +2,11 @@
 // innehållsavtrycket och sifferkontrollen. Ren kod utan beroenden – körs i
 // proxyn på Cloudflare (worker/index.mjs) och lokalt i Express-servern.
 //
-// Underlaget är det matchvyn visar, med sidans precision: hela procent, mål
-// med en decimal, odds med två, decimalkomma. Ingen hämttid ingår, så samma
-// underlag ger samma avtryck oavsett när källorna hämtades. Det är också
-// facit för sifferkontrollen – ett tal som inte står här får inte stå i texten.
+// Underlaget är det matchvyn visar, med sidans precision: prognosens chanser
+// som odds med två decimaler (ur hela procent, som på sidan), mål med en
+// decimal, decimalkomma. Ingen hämttid ingår, så samma underlag ger samma
+// avtryck oavsett när källorna hämtades. Det är också facit för
+// sifferkontrollen – ett tal som inte står här får inte stå i texten.
 
 const TZ = 'Europe/Stockholm';
 const fKickoff = new Intl.DateTimeFormat('sv-SE', {
@@ -22,8 +23,14 @@ export function pct3(ps) {
   return out;
 }
 const pct = (x) => Math.round(x * 100);
+// Odds som på sidan (public/app.js): 1 / chansen med två decimaler och
+// decimalkomma, så 58 % blir 1,72 – rättvisa odds, utan spelbolagets marginal.
+// Från 100 och uppåt i hela tal.
+export const fmtOdds = (o) => (o >= 100 ? String(Math.round(o)) : o.toFixed(2).replace('.', ','));
+// Odds ur hela procent (0 % ger –), och ur en sannolikhet avrundad till hela procent.
+export const pctOdds = (n) => (n ? fmtOdds(100 / n) : '–');
+const oddsP = (x) => pctOdds(pct(x));
 const dec = (x, d = 1) => (x == null ? '–' : x.toFixed(d).replace('.', ','));
-const sgn = (x) => (x > 0 ? `+${x}` : x < 0 ? `−${-x}` : '±0');
 const line = (x) => String(x).replace('.', ',');
 
 function seasonOf(iso) {
@@ -57,19 +64,21 @@ export function payloadOf(d) {
   const prognos = {
     regelversion: p.rulesVersion,
     'skattad på matcher t.o.m.': p.fitThrough,
-    '1X2 efter 90 minuter, %': trio(w),
+    '1X2 efter 90 minuter, odds': trio(w.map(pctOdds)),
   };
-  if (p.range) prognos['osäkerhet i lagens styrka, mittersta 80 %, %'] = trio(p.range.map((r) => `${pct(r[0])}–${pct(r[1])}`));
+  // Större chans ger lägre odds, så spannet går från r[1] till r[0] – som på sidan.
+  if (p.range) prognos['osäkerhet i lagens styrka, mittersta 80 %, odds'] = trio(p.range.map((r) => `${oddsP(r[1])}–${oddsP(r[0])}`));
   prognos['förväntade mål'] = { [H]: dec(p.goals[0]), [A]: dec(p.goals[1]) };
-  prognos['över 2,5 mål, %'] = pct(p.over25);
-  prognos['båda lagen gör mål, %'] = pct(p.btts);
-  prognos['troligaste resultat'] = p.scores.top.map((t) => `${t.home}–${t.away} (${pct(t.p)} %)`);
+  prognos['över 2,5 mål, odds'] = oddsP(p.over25);
+  prognos['båda lagen gör mål, odds'] = oddsP(p.btts);
+  // Resultaten har små chanser, så oddsen räknas utan avrundning till procent.
+  prognos['troligaste resultat, odds'] = p.scores.top.map((t) => `${t.home}–${t.away} (${fmtOdds(1 / t.p)})`);
   if (p.advance) {
     if (p.advance.home == null) {
       prognos['går vidare'] = `okänt – ${p.advance.reason || ''}`.trim();
     } else {
       const a = pct3([p.advance.home, p.advance.away]);
-      const adv = { [H]: `${a[0]} %`, [A]: `${a[1]} %`, regel: p.advance.rule };
+      const adv = { odds: { [H]: pctOdds(a[0]), [A]: pctOdds(a[1]) }, regel: p.advance.rule };
       const f = p.advance.firstLeg;
       if (f) adv['första mötet'] = `${f.home} ${f.score.home}–${f.score.away} ${f.away}`;
       prognos['går vidare'] = adv;
@@ -85,13 +94,14 @@ export function payloadOf(d) {
   const steg = (p.steps || []).map((x) => {
     const row = { steg: x.label };
     if (x.sub) row.detalj = x.sub;
-    row['1X2, %'] = pct3(x.p).join(' · ');
+    row['1X2, odds'] = pct3(x.p).map(pctOdds).join(' · ');
     if (prev) {
       const d1 = x.p[0] - prev.p[0];
       const d2 = x.p[2] - prev.p[2];
       const [team, dv] = d1 >= d2 ? [H, d1] : [A, d2];
       const v = Math.round(dv * 100);
-      row['drar mot'] = v >= 1 ? `${team} +${v} procentenheter` : 'ingen märkbar effekt';
+      // Som staplarna på sidan: procentenheter på segerchansen.
+      row['drar mot'] = v >= 1 ? `${team}, segerchansen +${v} ${v === 1 ? 'procentenhet' : 'procentenheter'}` : 'ingen märkbar effekt';
     }
     prev = x;
     return row;
@@ -99,20 +109,26 @@ export function payloadOf(d) {
 
   const b = p.baselines;
   const mk = b.market;
-  const baslinjer = { 'ordning för 1X2': `${H} · oavgjort · ${A}`, modellen: w.join(' · ') };
+  const baslinjer = {
+    'ordning för 1X2': `${H} · oavgjort · ${A}`,
+    oddsen: 'utan spelbolagens marginal (1 / chansen); lägre odds betyder större chans',
+    modellen: w.map(pctOdds).join(' · '),
+  };
   if (mk && mk.p) {
     const c = pct3(mk.p);
-    baslinjer['(c) marknaden'] = { '1X2, %': c.join(' · '), källa: `${mk.source}, ${mk.kind}` };
-    if (mk.over25 != null) baslinjer['(c) marknaden']['över 2,5 mål, %'] = pct(mk.over25);
-    baslinjer['modellen minus marknaden, procentenheter'] = w.map((x, i) => sgn(x - c[i])).join(' · ');
+    baslinjer['(c) marknaden'] = { '1X2, odds': c.map(pctOdds).join(' · '), källa: `${mk.source}, ${mk.kind}` };
+    if (mk.over25 != null) baslinjer['(c) marknaden']['över 2,5 mål, odds'] = oddsP(mk.over25);
+    // Riktningen i ord, så att ingen skillnad behöver räknas fram ur oddsen.
+    baslinjer['modellen mot marknaden'] = trio(w.map((x, i) => (x > c[i] ? 'lägre odds än marknaden (större chans)'
+      : x < c[i] ? 'högre odds än marknaden (mindre chans)' : 'samma odds som marknaden')));
   } else {
     baslinjer['(c) marknaden'] = `okänt – ${marketMissing(d)}`;
   }
   baslinjer['(b) säsongens mål'] = b.season.p
-    ? { '1X2, %': pct3(b.season.p).join(' · '), underlag: `Poisson på årets matcher (${b.season.matches[0]} resp. ${b.season.matches[1]})` }
+    ? { '1X2, odds': pct3(b.season.p).map(pctOdds).join(' · '), underlag: `Poisson på årets matcher (${b.season.matches[0]} resp. ${b.season.matches[1]})` }
     : `okänt – ${b.season.reason}`;
   baslinjer['(a) naiv'] = b.naive.p
-    ? { '1X2, %': pct3(b.naive.p).join(' · '), underlag: `${b.naive.scope}, ${b.naive.seasons[0]}–${b.naive.seasons[1]}` }
+    ? { '1X2, odds': pct3(b.naive.p).map(pctOdds).join(' · '), underlag: `${b.naive.scope}, ${b.naive.seasons[0]}–${b.naive.seasons[1]}` }
     : `okänt – ${b.naive.reason}`;
 
   const out = { match, prognos, 'vad drog åt vilket håll': steg, 'mot baslinjerna': baslinjer };

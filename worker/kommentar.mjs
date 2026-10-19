@@ -15,7 +15,7 @@
 
 import cfg from '../config/llm.js';
 import kc from '../config/kommentar.js';
-import { fingerprint, foreignNumbers } from './analysis.mjs';
+import { fingerprint, foreignNumbers, pctOdds } from './analysis.mjs';
 
 const ID_RE = /^[\w-]{1,40}$/;
 const SIGNS = ['1', 'X', '2'];
@@ -37,7 +37,8 @@ export function couponPayload(c) {
       resultat: r.off ? 'struken, räknas inte' : r.score || (r.res != null ? SIGNS[r.res] : 'okänt'),
       ...(r.end ? { slutresultat: r.end } : {}),
       satt: r.hit == null ? 'räknas inte' : r.hit ? 'ja' : 'nej',
-      'modellens chans för gängets tecken': r.p != null ? `${r.p} %` : 'okänd',
+      // Odds som på sidan: chansen i hela procent, 58 blir 1,72.
+      'modellens odds för gängets tecken': r.p != null ? pctOdds(r.p) : 'okänt',
       'modellens tips': r.tip != null ? SIGNS[r.tip] : 'okänt',
       ...(r.note ? { anteckning: r.note } : {}),
     })),

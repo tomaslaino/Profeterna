@@ -708,9 +708,11 @@ knappen  →  proxyn (Cloudflare Worker, nyckeln som hemlighet)  →  DeepSeek
 ```
 
 - **Underlaget** ([worker/analysis.mjs](worker/analysis.mjs)) är det matchvyn visar, med
-  sidans precision: prognosen (1X2 i hela procent, osäkerhet, förväntade mål med en
-  decimal, över 2,5, båda gör mål, troligaste resultat, gå vidare), stegen i *Vad drog åt
-  vilket håll*, baslinjerna och marknaden, oddsen, *Lagen sida vid sida*, form, möten,
+  sidans precision: prognosen som odds (1X2, osäkerhet, över 2,5, båda gör mål, troligaste
+  resultat, gå vidare – 58 % blir 1,72, som på sidan), förväntade mål med en decimal,
+  stegen i *Vad drog åt vilket håll* (odds, och dragen i procentenheter som staplarna),
+  baslinjerna och marknaden som odds utan marginal och i ord om modellen ger lägre eller
+  högre odds än marknaden, spelbolagens odds, *Lagen sida vid sida*, form, möten,
   skador och listan med okänt – med källor och "t.o.m."-datum men utan hämttider. Cirka
   1 600 tokens plus prompten (~700).
 - **Nyhetsläget** ([src/news.mjs](src/news.mjs), [config/news.js](config/news.js)) läggs i
@@ -723,17 +725,18 @@ knappen  →  proxyn (Cloudflare Worker, nyckeln som hemlighet)  →  DeepSeek
   Nyheterna hämtas högst var 30:e minut per match och sparas en timme. Underlaget växer
   till cirka 8 000 tokens. Provkörs utan språkmodell: `node src/news-cli.mjs nästa`.
 - **Prompten** står i [config/llm.js](config/llm.js): bara underlaget, ingen egen kunskap om
-  lag eller spelare, varje tal skrivet som i underlaget, inga egna uträkningar, okänt
-  sägs vara okänt, prognosen är huvudsaken och underlaget som inte styr den sägs inte
-  vara orsaker, inga spelråd, lag- och tävlingsnamn på engelska. Med Nyhetsläget
-  (`news: true`) en egen prompt: analysen bara ur sidans underlag, nyhetsavsnittet bara ur
-  `nyheter`, varje påstående hänvisat till artikeln och källan, sammanfattat med egna
-  ord, utan egna sannolikheter, och motsägelser mot sidans skadelista sägs. Svaret är JSON
-  (`{"analys": …, "nyheter": …}`, DeepSeeks JSON-läge), tänkande på låg nivå. Hänvisningarna
-  numreras om till [1], [2] … i den ordning de citeras, och källistan visar bara de
-  citerade artiklarna.
+  lag eller spelare, varje tal skrivet som i underlaget, chanser som odds och aldrig som
+  procent, inga egna uträkningar, okänt sägs vara okänt, prognosen är huvudsaken och
+  underlaget som inte styr den sägs inte vara orsaker, inga spelråd, lag- och tävlingsnamn
+  på engelska. Med Nyhetsläget (`news: true`) en egen prompt: analysen bara ur sidans
+  underlag, nyhetsavsnittet bara ur `nyheter`, varje påstående hänvisat till artikeln och
+  källan, sammanfattat med egna ord, utan egna sannolikheter, och motsägelser mot sidans
+  skadelista sägs. Svaret är JSON (`{"analys": …, "nyheter": …}`, DeepSeeks JSON-läge),
+  tänkande på låg nivå. Hänvisningarna numreras om till [1], [2] … i den ordning de citeras,
+  och källistan visar bara de citerade artiklarna.
 - **Sifferkontroll:** varje tal i texten – siffror och räkneord två–tjugo, i båda
-  avsnitten – måste finnas i underlaget (tal ur nyheterna finns där). Annars ett nytt
+  avsnitten – måste finnas i underlaget (tal ur nyheterna finns där). Prognosen står bara
+  som odds, så en chans som modellen räknat om till procent stoppas också. Annars ett nytt
   försök där talen pekas ut; klarar inte heller det kontrollen visas ingen text ("Texten
   innehöll tal som inte finns i underlaget …"). Samma för hänvisningar till artiklar som
   inte finns.
@@ -1025,9 +1028,10 @@ kupong. Grunden står i [src/history.js](src/history.js).
 (`POST …/kommentar {"id"}`, [worker/kommentar.mjs](worker/kommentar.mjs)): 2–4 meningar
 i saklig ton, utan skämt, som tar upp anteckningarna ("Teijder drev X2"). Proxyn tar bara ett
 kupong-id och läser kupongen ur den publicerade `data/historik.json`. Samma regler som
-analysen: inga egna fakta om lag och matcher, inga påhittade målförlopp, och varje tal ska
-finnas i underlaget (annars skrivs texten om, därefter visas ingen). Texten cachas utan
-slutdatum per kupong och underlag. Prompten står i [config/kommentar.js](config/kommentar.js).
+analysen: inga egna fakta om lag och matcher, inga påhittade målförlopp, modellens chans
+för gängets tecken som odds (som på sidan), och varje tal ska finnas i underlaget (annars
+skrivs texten om, därefter visas ingen). Texten cachas utan slutdatum per kupong och
+underlag. Prompten står i [config/kommentar.js](config/kommentar.js).
 
 **Filen** `data/kupong-historik.json` är själva historiken och committas:
 
