@@ -5,6 +5,7 @@
 // gängets egna tips inför samtalet (worker/samtal.mjs, i KV, inte på GitHub).
 //
 //   POST /kupong {"kod", "kupong", "andra", "bas", "ändå"}   (se worker/kupong.mjs)
+//   POST /kupong {"kod", "bort", "bas"}                       ta bort en kupong
 //   GET  /samtal · POST /samtal {"kod", "gor", …}             (se worker/samtal.mjs)
 //
 // Driftsätts för hand med worker/kupong.toml; hemligheterna GITHUB_TOKEN och

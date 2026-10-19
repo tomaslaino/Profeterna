@@ -78,24 +78,25 @@ function matchById(id) {
   return kpIndex.map.get(id) || null;
 }
 
-// Kuponger som sparats här men ännu inte publicerats av bygget, per id, med
-// versionerna (sha) som de ersätter (older: den som ändringen utgick från,
-// den som bygget visade då och de som tidigare osparade ersatte). Efter tre
-// dygn antas de aldrig ha committats och glöms.
+// Kuponger som sparats (eller tagits bort, removed) här men ännu inte
+// publicerats av bygget, per id, med versionerna (sha) som de ersätter
+// (older: den som ändringen utgick från, den som bygget visade då och de som
+// tidigare osparade ersatte). Efter tre dygn antas de aldrig ha committats
+// och glöms.
 function pendingCoupons() {
   const all = kpLoad(KP_PENDING) || {};
   const keep = {};
   for (const [id, p] of Object.entries(all)) {
-    if (p && p.coupon && Date.now() - new Date(p.savedAt).getTime() < 3 * 86400000) keep[id] = p;
+    if (p && (p.coupon || p.removed) && Date.now() - new Date(p.savedAt).getTime() < 3 * 86400000) keep[id] = p;
   }
   if (Object.keys(keep).length !== Object.keys(all).length) kpStore(KP_PENDING, keep);
   return keep;
 }
-function setPending(coupon, base) {
+function setPending(coupon, base, removed = false) {
   const all = pendingCoupons();
   const pub = KP.data ? KP.data.coupons.find((c) => c.id === coupon.id) : null;
   const older = [...new Set([base, pub && pub.sha, ...((all[coupon.id] && all[coupon.id].older) || [])].filter(Boolean))];
-  kpStore(KP_PENDING, { ...all, [coupon.id]: { savedAt: new Date().toISOString(), coupon, older } });
+  kpStore(KP_PENDING, { ...all, [coupon.id]: { savedAt: new Date().toISOString(), ...(removed ? { removed: true } : { coupon }), older } });
 }
 function clearPending(id) {
   const all = pendingCoupons();
@@ -107,12 +108,18 @@ const signature = (c) => c.matches.map((x) => `${x.id}:${x.sign}:${x.note || ''}
 
 // Den osparade ersätter den publicerade bara så länge bygget visar en äldre
 // version. Visar bygget den – eller en senare, som någon annan sparat –
-// gäller den publicerade.
+// gäller den publicerade. En borttagen döljs så länge bygget visar en version
+// som togs bort.
 function allCoupons() {
   const list = (KP.data ? KP.data.coupons : []).slice();
-  for (const { coupon, older } of Object.values(pendingCoupons())) {
+  for (const [id, { coupon, removed, older }] of Object.entries(pendingCoupons())) {
+    const i = list.findIndex((c) => c.id === id);
+    if (removed) {
+      if (i >= 0 && (older || []).includes(list[i].sha)) list.splice(i, 1);
+      else if (i >= 0) clearPending(id);
+      continue;
+    }
     const p = { ...coupon, pending: true };
-    const i = list.findIndex((c) => c.id === p.id);
     if (i < 0) { list.push(p); continue; }
     const pub = list[i];
     if (signature(pub) === signature(p) || (p.sha && pub.sha === p.sha) || !(older || []).includes(pub.sha)) clearPending(p.id);
@@ -362,7 +369,7 @@ function statusLine(g) {
 
 // Kupong: #kupong (omgångens kupong), #kupong/historik och
 // #kupong/historik/<id> (historik.js), #kupong/samtal… (samtal.js),
-// #kupong/<id>, #kupong/ny och #kupong/andra/<id>.
+// #kupong/<id>, #kupong/ny, #kupong/andra/<id> och #kupong/bort/<id>.
 async function showCoupon(arg) {
   const [mode, id] = (arg || '').split('/');
   if (mode === 'historik') return renderHistory(id || null);
@@ -376,6 +383,7 @@ async function showCoupon(arg) {
   if (mode === 'samtal' && window.Samtal) return Samtal.show(id || '');
   if (mode === 'ny') return renderCreate(null);
   if (mode === 'andra' && id) return renderCreate(id);
+  if (mode === 'bort' && id) return renderRemove(id);
   KP.view = { mode: 'show', id: mode || null };
   renderCouponShow(KP.view.id);
   window.scrollTo(0, 0);
@@ -421,6 +429,8 @@ function renderCouponShow(id) {
     `<p class="kp-eyebrow">${esc(c.name || 'Kupong')}${c.pending ? ' <span class="kp-tag">väntar på GitHub</span>' : ''}</p>` +
     `<h2 class="page-title">${esc(dateRange(g.first, g.last))}</h2></div><div class="kp-actions">` +
     (canEdit ? `<a class="kp-btn" href="#kupong/andra/${esc(c.id)}">Ändra</a>` : '') +
+    // En färdigspelad står kvar i historiken och tas inte bort.
+    (g.done ? '' : `<a class="kp-btn" href="#kupong/bort/${esc(c.id)}">Ta bort</a>`) +
     (g.done && !c.pending ? `<a class="kp-btn" href="#kupong/historik/${esc(c.id)}">Betyg och kommentar</a>` : '') +
     (round && g.done ? '' : '<a class="kp-btn primary" href="#kupong/ny">+ Ny kupong</a>') + '</div></div>';
 
@@ -1011,6 +1021,112 @@ function renderViaGitHub(ctx) {
   };
   $('#kp-copy').addEventListener('click', copy);
   if (exists) $('#kp-gh').addEventListener('click', copy);
+}
+
+// ---------- ta bort ----------
+
+function removeOnGitHub(id) {
+  const repo = KP.data.repo || 'tomaslaino/Profeterna';
+  return `https://github.com/${repo}/delete/${KP.data.branch || 'main'}/${KP.data.dir || 'data/kuponger'}/${id}.json`;
+}
+
+// Ta bort en kupong som inte är färdigspelad (en färdigspelad fryses in i
+// historiken och står kvar där). Med tjänsten tas filen bort med en commit
+// (worker/kupong.mjs) och kupongen är borta i den här webbläsaren tills
+// bygget publicerat det. Annars öppnas GitHubs sida för att ta bort filen.
+// Kodordet fylls i men skickas inte förrän man tryckt – till skillnad från
+// Spara.
+function renderRemove(id) {
+  const el = $('#coupon');
+  const c = allCoupons().find((x) => x.id === id);
+  KP.view = { mode: 'remove', id };
+  window.scrollTo(0, 0);
+  if (!c) {
+    el.innerHTML = viewNav(null) + `<p class="empty">Kupongen ${esc(id)} finns inte. <a href="#kupong">Till kupongen</a></p>`;
+    return;
+  }
+  const g = gradeCoupon(c);
+  const ctx = { c, range: dateRange(g.first, g.last) };
+  if (g.done) {
+    el.innerHTML = savedHead('Ta bort kupongen', ctx) +
+      '<div class="card kp-saved"><p>Kupongen är färdigspelad och står kvar i historiken.</p>' +
+      `<div class="kp-actions"><a class="kp-btn" href="#kupong/${esc(id)}">Tillbaka</a></div></div>`;
+    return;
+  }
+  const gh = esc(removeOnGitHub(id));
+  const what = `<p>Hela kupongen${c.name ? ` ${esc(c.name)}` : ''} tas bort för alla, ${g.n === 1 ? 'med sin match' : `med alla ${g.n} matcher`}` +
+    `${g.started ? ' – också de som redan har spelats' : ''}. Den försvinner när sajten byggts om, om några minuter.</p>`;
+  if (!KP.data.save) {
+    el.innerHTML = savedHead('Ta bort kupongen', ctx) + `<div class="card kp-saved">${what}` +
+      '<p>Tryck <b>Commit changes</b> på GitHub.</p>' +
+      `<div class="kp-actions"><a class="kp-btn kp-danger" href="${gh}" target="_blank" rel="noopener">Ta bort på GitHub</a>` +
+      `<a class="kp-btn" href="#kupong/${esc(id)}">Avbryt</a></div></div>`;
+    return;
+  }
+  el.innerHTML = savedHead('Ta bort kupongen', ctx) +
+    `<form class="card kp-saved" id="kp-remove" autocomplete="on">${what}` +
+    '<label class="kp-lab" for="kp-kod">Kodord</label>' +
+    `<div class="kp-coderow"><input type="password" id="kp-kod" class="kp-name" autocomplete="current-password" required value="${esc(kpLoad(KP_CODE) || '')}">` +
+    '<button type="submit" class="kp-btn kp-danger" id="kp-send">Ta bort kupongen</button></div>' +
+    '<p class="kp-msg" id="kp-msg" role="status"></p>' +
+    `<p class="legend kp-alt"><a href="#kupong/${esc(id)}">Avbryt</a> · ` +
+    `<a href="${gh}" target="_blank" rel="noopener">Ta bort via GitHub i stället</a></p></form>`;
+  $('#kp-remove').addEventListener('submit', (e) => { e.preventDefault(); sendRemove(ctx); });
+}
+
+async function sendRemove(ctx) {
+  const { c } = ctx;
+  const msg = (h) => { $('#kp-msg').innerHTML = h; };
+  const btn = $('#kp-send');
+  const code = $('#kp-kod').value;
+  if (!code) { msg('Skriv kodordet.'); return; }
+  btn.disabled = true;
+  msg('Tar bort …');
+  let res;
+  let body = {};
+  try {
+    res = await fetch(KP.data.save, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ kod: code, bort: c.id, ...(c.sha ? { bas: c.sha } : {}) }),
+    });
+    body = await res.json().catch(() => ({}));
+  } catch {
+    res = null;
+  }
+  btn.disabled = false;
+  if (res && res.ok && body.ok) {
+    kpStore(KP_CODE, code);
+    setPending(c, c.sha, true);
+    const d = kpLoad(KP_DRAFT);
+    if (d && d.edit === c.id) kpStore(KP_DRAFT, null);
+    KP.view = { mode: 'removed', id: c.id };
+    $('#coupon').innerHTML = savedHead('Borttagen', ctx) +
+      '<div class="card kp-saved"><p>Kupongen är borttagen. Den försvinner för alla när sajten byggts om, om några minuter.</p>' +
+      '<div class="kp-actions"><a class="kp-btn primary" href="#kupong">Till kupongen</a>' +
+      (body.commit ? `<a class="kp-btn" href="${esc(body.commit)}" target="_blank" rel="noopener">Commit på GitHub</a>` : '') + '</div></div>';
+    return;
+  }
+  if (res && res.status === 403) {
+    kpStore(KP_CODE, null);
+    msg('<span class="note">Fel kodord.</span>');
+    $('#kp-kod').select();
+    return;
+  }
+  // Någon annan har ändrat kupongen: den versionen visas här tills bygget
+  // publicerat den, och tas inte bort utan att man sett den.
+  const other = res && res.status === 409 && body.changed ? fromStored(body.kupong) : null;
+  if (other) {
+    setPending(other, c.sha);
+    msg(`<span class="note">${esc(body.error)}</span> <a href="#kupong/${esc(other.id)}">Visa den nya versionen</a>`);
+    return;
+  }
+  if (res && [400, 409, 429].includes(res.status)) {
+    msg(`<span class="note">${esc(body.error || 'Det gick inte att ta bort kupongen.')}</span>`);
+    return;
+  }
+  msg(`<span class="note">${esc((body && body.error) || 'Ingen kontakt med servern.')}</span> ` +
+    `<a href="${esc(removeOnGitHub(c.id))}" target="_blank" rel="noopener">Ta bort via GitHub i stället</a>`);
 }
 
 // ---------- start ----------

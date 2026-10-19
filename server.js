@@ -99,6 +99,13 @@ function couponFileWriter(dir = COUPON_DIR) {
       fs.writeFileSync(file(p), text);
       return { url: null, sha: blobSha(Buffer.from(text, 'utf8')) };
     },
+    remove: async (p, { sha } = {}) => {
+      const cur = read(p);
+      if (!cur) return { url: null };
+      if (cur.sha !== sha) throw Object.assign(new Error('konflikt'), { conflict: true });
+      fs.unlinkSync(file(p));
+      return { url: null };
+    },
   };
 }
 
@@ -107,7 +114,8 @@ function siteMatches(siteDir = OUT) {
   return async () => JSON.parse(fs.readFileSync(path.join(siteDir, 'data', 'matches.json'), 'utf8')).matches || [];
 }
 
-// POST /api/kupong {kod, kupong, andra, bas, ändå} – kodordet ur KUPONG_KOD.
+// POST /api/kupong {kod, kupong, andra, bas, ändå} eller {kod, bort, bas} –
+// kodordet ur KUPONG_KOD.
 function couponSaveRoute(writer = couponFileWriter(), loadMatches = siteMatches()) {
   const wrong = new Map(); // fel kodord per IP-adress, glöms efter en timme
   return async (req, res) => {

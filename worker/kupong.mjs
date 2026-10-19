@@ -20,6 +20,12 @@
 //          visa den.
 //   → 503 inte påslaget (hemligheterna saknas) eller matcherna kan inte läsas
 //
+//   POST /kupong {"kod": "…", "bort": "<kupong-id>", "bas": "<sha>" (valfritt)}
+//   → 200 {ok: true, id, removed: true, commit}   filen är borttagen (eller
+//          fanns inte)
+//   → 400 kupongen är färdigspelad – den finns i historiken och står kvar
+//   → 409 {changed: true, kupong} – kupongen har ändrats sedan versionen "bas"
+//
 // Startade matcher: en match som har startat (eller ställts in) enligt den
 // publicerade sajten (data/matches.json, inte förfrågan) får inte läggas
 // till, ändras eller tas bort – det som stod när den startade gäller.
@@ -141,9 +147,55 @@ const asStored = (id, cur) => {
   return f && typeof f === 'object' ? { ...f, id, sha: cur.sha } : null;
 };
 
-// writer: {get(path) → {sha, text} | null, put(path, text, {sha, message}) → {url, sha}}
-//   put kastar {conflict: true} om filen inte längre har versionen sha (eller
-//   redan finns, utan sha).
+// Färdigspelad: varje match på kupongen som finns bland sajtens matcher är
+// slutspelad eller inställd (som rättningen på sidan, public/kupong.js).
+function finished(rows, matches) {
+  const byId = new Map(matches.map((m) => [String(m.id), m]));
+  return rows.every((r) => {
+    const m = r && r.id != null ? byId.get(String(r.id).trim()) : null;
+    return !m || m.completed || OFF.test(m.status || '');
+  });
+}
+
+// Ta bort: filen tas bort med en commit, men bara den version som sidan
+// visade (bas). Startade matcher hindrar inte – kupongen försvinner hel. En
+// färdigspelad kupong fryses in i historiken (src/history.js) och står kvar
+// där, så den tas inte bort här.
+async function removeCoupon(id, bas, { writer, loadMatches }) {
+  if (!COUPON_ID.test(id)) return fail(400, 'Ogiltig kupong.');
+  const p = `${DIR}/${id}.json`;
+  const removed = (r) => ({ status: 200, body: { ok: true, id, removed: true, commit: (r && r.url) || null } });
+  const changed = (cur) => ({
+    status: 409,
+    body: { ok: false, changed: true, error: 'Någon annan har ändrat kupongen sedan du öppnade den. Den är inte borttagen.', kupong: asStored(id, cur) },
+  });
+  const cur = await writer.get(p);
+  if (!cur) return removed(null);
+  if (bas !== undefined && bas !== cur.sha) return changed(cur);
+  let matches;
+  try {
+    matches = await loadMatches();
+  } catch {
+    return fail(503, 'Kan inte läsa matcherna från sajten just nu.');
+  }
+  const f = parseFile(cur);
+  if (finished(f && Array.isArray(f.matcher) ? f.matcher : [], matches)) {
+    return fail(400, 'Kupongen är färdigspelad och står kvar i historiken.');
+  }
+  const name = f && f.namn ? text(f.namn, NAME_MAX) : '';
+  try {
+    return removed(await writer.remove(p, { sha: cur.sha, message: `Kupong ${id}${name ? ` (${name})` : ''} borttagen` }));
+  } catch (err) {
+    if (!err.conflict) throw err;
+    const now2 = await writer.get(p);
+    return now2 ? changed(now2) : removed(null);
+  }
+}
+
+// writer: {get(path) → {sha, text} | null, put(path, text, {sha, message}) → {url, sha},
+//          remove(path, {sha, message}) → {url}}
+//   put och remove kastar {conflict: true} om filen inte längre har versionen
+//   sha (put: eller redan finns, utan sha).
 // loadMatches() → sajtens matcher [{id, kickoff, completed, status}].
 // limiter: {count() → antal fel kodord, bump()} – valfri.
 export async function saveCoupon(body, { env, writer, loadMatches, limiter = null, now = () => new Date() }) {
@@ -154,6 +206,7 @@ export async function saveCoupon(body, { env, writer, loadMatches, limiter = nul
     if (limiter) await limiter.bump();
     return fail(403, 'Fel kodord.');
   }
+  if (b.bort != null && b.bort !== '') return removeCoupon(String(b.bort), b.bas, { writer, loadMatches });
   const edit = b.andra == null || b.andra === '' ? null : String(b.andra);
   if (edit && !COUPON_ID.test(edit)) return fail(400, 'Ogiltig kupong.');
   const v = validateCoupon(b.kupong);
@@ -269,6 +322,19 @@ export function githubWriter(token, { repo = REPO, branch = BRANCH, fetchImpl = 
       if (!res.ok) throw problem(res);
       const d = await res.json();
       return { url: d.commit && d.commit.html_url, sha: d.content && d.content.sha };
+    },
+    async remove(p, { sha, message }) {
+      const res = await fetchImpl(`${api}${p}`, {
+        method: 'DELETE',
+        headers: { ...headers, 'Content-Type': 'application/json' },
+        body: JSON.stringify({ message, sha, branch }),
+      });
+      // 404: redan borttagen; 409/422: filen ändrades sedan vi läste den.
+      if (res.status === 404) return { url: null };
+      if (res.status === 409 || res.status === 422) throw conflict();
+      if (!res.ok) throw problem(res);
+      const d = await res.json();
+      return { url: d.commit && d.commit.html_url };
     },
   };
 }

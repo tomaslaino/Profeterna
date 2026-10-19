@@ -901,7 +901,16 @@ nya versionen och erbjuder *Börja om från den nya versionen*. Ett sparat utkas
 kupong som ändrats sedan dess kastas på samma sätt när man öppnar Ändra. Via GitHub kan inte en befintlig fil fyllas i, så *Spara på GitHub*
 kopierar innehållet och öppnar filen för redigering – markera allt, klistra in, Commit
 changes.
-**Ta bort:** radera filen på GitHub.
+
+**Ta bort:** knappen *Ta bort* (`#kupong/bort/<id>`, bara medan kupongen inte är
+färdigspelad – en färdigspelad fryses in i historiken och står kvar där) → bekräfta med
+kodordet → *Ta bort kupongen*. Kodordet fylls i men inget skickas förrän man tryckt.
+Proxyn (`POST …/kupong {"kod", "bort": "<id>", "bas"}`) tar bort filen med en commit, men
+bara den version som sidan visade (`bas`) – har någon annan ändrat kupongen under tiden
+svarar den som vid Ändra, och sidan visar den nya versionen. Proxyn nekar en kupong där
+varje match är spelad eller inställd. Tills bygget publicerat det är kupongen borta i den
+webbläsaren där den togs bort. Reserv: *Ta bort via GitHub i stället* öppnar GitHubs sida
+för att radera filen – tryck **Commit changes**. Git-historiken har kupongen kvar.
 
 **Filen** (går också att skriva för hand; `match` är bara för läsaren, `id` är ESPN:s
 matchid):
