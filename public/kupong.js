@@ -144,12 +144,13 @@ const signIdx = (s) => (s.home > s.away ? 0 : s.home === s.away ? 1 : 2);
 
 function gradeRow(x, now) {
   const m = matchById(x.id);
-  const r = { id: x.id, sign: x.sign, label: x.label, note: x.note || null, m, state: 'missing', res: null, hit: null, score: null, clock: null, p: null, tip: null, kick: null };
+  const r = { id: x.id, sign: x.sign, label: x.label, note: x.note || null, m, state: 'missing', res: null, hit: null, score: null, clock: null, p: null, pr: null, tip: null, kick: null };
   if (!m) return r;
   r.kick = new Date(m.kickoff).getTime();
   // Prognosen före avspark ur journalen om den finns, annars sajtens prognos.
   const pr = m.j && m.j.p ? m.j.p : m.f ? m.f.p : null;
   if (pr) {
+    r.pr = pr;
     r.p = x.sign.split('').reduce((a, s) => a + pr[SIGNS.indexOf(s)], 0);
     r.tip = pr.indexOf(Math.max(...pr));
   }
@@ -430,12 +431,11 @@ const newCouponHref = () => (hasSamtal() ? '#kupong/samtal/ny' : '#kupong/ny');
 // Omgången som fylls i inför samtalet, överst på förstasidan.
 const samtalTeaser = () => (hasSamtal() ? Samtal.teaser() : '');
 
+// En kupong per omgång: den som är först väljer matcherna, sedan fyller alla
+// i samma kupong.
 function emptyCard() {
   return '<div class="kp-empty card"><p class="kp-eyebrow">Kupong</p><h2 class="page-title">Omgångens kupong</h2>' +
-    (hasSamtal()
-      ? '<p class="legend sm-alt"><a href="#kupong/ny">Eller gör gängets kupong direkt</a></p>'
-      : '') +
-    `<a class="kp-btn primary" href="${newCouponHref()}">Skapa kupong</a></div>`;
+    `<a class="kp-btn primary" href="${newCouponHref()}">Välj matcher</a></div>`;
 }
 
 // Utan id omgångens kupong, annars en viss kupong.
@@ -465,23 +465,20 @@ function renderCouponShow(id) {
   // Allas tips går att se så länge omgången finns – också om gängets kupong
   // inte gjordes ur den.
   const tipsLink = round && hasSamtal() && Samtal.visible();
-  let html = viewNav(round ? 'omgang' : null) + (fromTips ? roundSteps(g.done ? 5 : 4) : '') + '<div class="kp-head"><div>' +
-    `<p class="kp-eyebrow">${esc(c.name || 'Kupong')}${c.pending ? ' <span class="kp-tag">väntar på GitHub</span>' : ''}</p>` +
-    `<h2 class="page-title">${esc(dateRange(g.first, g.last))}</h2></div><div class="kp-actions">` +
+  // En kupong i taget: nästa görs först när den här är färdigspelad, med den
+  // stora knappen under kupongen.
+  let html = '<div class="pp-top">' + viewNav(round ? 'omgang' : null) + '<div class="kp-actions">' +
     (tipsLink ? '<a class="kp-btn" href="#kupong/samtal">Allas tips</a>' : '') +
     (canEdit ? `<a class="kp-btn" href="#kupong/andra/${esc(c.id)}">Ändra</a>` : '') +
     // En färdigspelad står kvar i historiken och tas inte bort.
     (g.done ? '' : `<a class="kp-btn" href="#kupong/bort/${esc(c.id)}">Ta bort</a>`) +
     (g.done && !c.pending ? `<a class="kp-btn" href="#kupong/historik/${esc(c.id)}">Betyg och kommentar</a>` : '') +
-    (round && g.done ? '' : `<a class="kp-btn primary" href="${newCouponHref()}">+ Ny kupong</a>`) + '</div></div>';
+    '</div></div>' + (fromTips ? roundSteps(g.done ? 5 : 4) : '');
 
   if (KP.flash) {
     html += `<p class="legend kp-flash" role="status">${esc(KP.flash)}</p>`;
     KP.flash = null;
   }
-  html += summaryCard(g);
-  // Färdigspelad även om spoilerskyddet döljer resultaten (g.done).
-  if (round && g.done) html += `<a class="kp-next" href="${newCouponHref()}"><span aria-hidden="true">+</span> Skapa ny kupong</a>`;
   if (g.hidden) {
     const ids = g.rows.filter((r) => r.state === 'hidden').map((r) => r.id);
     html += Spoiler.card({
@@ -491,8 +488,9 @@ function renderCouponShow(id) {
       button: 'Visa resultaten',
     });
   }
-  html += couponRows(g);
-  html += liveLine(g);
+  html += Papper.coupon(c, g);
+  // Färdigspelad även om spoilerskyddet döljer resultaten (g.done).
+  if (round && g.done) html += `<a class="kp-next" href="${newCouponHref()}"><span aria-hidden="true">+</span> Skapa ny kupong</a>`;
   html += moreSection(graded.filter((x) => x !== cur && !x.g.done));
   html += couponErrors();
   el.innerHTML = html;
@@ -556,75 +554,6 @@ function redraw() {
   if (KP.view.mode === 'home' && !$('#home-section').hidden) renderHome();
   if (KP.view.mode === 'show' && !$('#coupon-section').hidden) renderCouponShow(KP.view.id);
   if (KP.view.mode === 'samtal' && window.Samtal) Samtal.redraw();
-}
-
-function summaryCard(g) {
-  const w = (x) => (g.n ? (100 * x) / g.n : 0);
-  const open = Math.max(0, g.max - g.ok - g.liveOk);
-  const exp = Math.min(100, w(g.expected));
-  return `<div class="card kp-summary${g.live ? ' is-live' : ''}">` +
-    `<div class="kp-sum-num">${bigNumber(g)}<span class="kp-line">${statusLine(g)}</span></div>` +
-    '<div class="kp-sum-main">' +
-    `<div class="kp-scale" role="img" aria-label="${g.ok} rätt, högst ${g.max} möjliga, väntat ${kpNum(g.expected)}">` +
-    `<div class="kp-track"><i class="ok" style="width:${w(g.ok)}%"></i><i class="liveok" style="width:${w(g.liveOk)}%"></i>` +
-    `<i class="open" style="width:${w(open)}%"></i><b class="exp" style="left:${exp}%" title="Väntat antal rätt enligt modellen"></b></div>` +
-    `<div class="kp-scale-lab"><span>0</span><span class="exp" style="left:${exp}%">väntat ${kpNum(g.expected)}</span><span>${g.n}</span></div></div>` +
-    (g.started && !g.hidden ? `<div class="kp-facts"><span><b>${g.max}</b> möjliga</span><span><b>${g.no}</b> fel</span>` +
-      `<span title="Om vi spelat modellens troligaste utfall i varje match">modellens tips <b>${g.modelOk}</b> rätt</span></div>` : '') +
-    '</div></div>';
-}
-
-function signBoxes(r) {
-  return '<span class="kp-sg">' + SIGNS.map((s, i) => {
-    const cls = [
-      r.sign.includes(s) ? 'on' : '',
-      r.res === i ? 'res' : '',
-      r.tip === i ? 'tip' : '',
-    ].filter(Boolean).join(' ');
-    return `<i class="${cls}">${s}</i>`;
-  }).join('') + '</span>';
-}
-
-function couponRows(g) {
-  const days = new Map();
-  for (const r of g.rows) {
-    const k = r.m ? dayKey.format(new Date(r.m.kickoff)) : 'okänd';
-    if (!days.has(k)) days.set(k, []);
-    days.get(k).push(r);
-  }
-  let html = '';
-  let head = '<span class="day-key" title="Vårt tecken · prickarna under är modellens tips · modellens chans för vårt tecken">Tecken · modellen</span>';
-  for (const rows of days.values()) {
-    const d = rows[0].m ? cap(fDay.format(new Date(rows[0].m.kickoff))) : 'Okänt datum';
-    html += `<div class="day"><div class="day-head">${esc(d)}${head}</div><div class="mlist kp-rows">`;
-    head = '';
-    for (const r of rows) {
-      const cls = rowClass(r);
-      const when = r.state === 'live' ? `<span class="kp-clock">${esc(r.clock || 'pågår')}</span>`
-        : r.m ? esc(fTime.format(new Date(r.m.kickoff))) : '';
-      const comp = r.m ? compOf(r.m.comp) : null;
-      // På mobilen saknas tidskolumnen: tiden (eller matchminuten) står då under resultatet.
-      const score = r.state === 'off' ? `<span class="sub">${esc(r.off)}</span>`
-        : r.state === 'hidden' ? `${Spoiler.chip()}<span class="sub kp-m">${r.m ? esc(fTime.format(new Date(r.m.kickoff))) : ''}</span>`
-        : r.score ? `<span class="score">${esc(scoreText(r))}</span>${r.extra ? `<span class="sub">${esc(r.extra)}</span>` : ''}` +
-          (r.state === 'live' ? `<span class="sub kp-m">${esc(r.clock || 'pågår')}</span>` : '')
-          : `<span class="sub kp-d">–</span><span class="sub kp-m">${r.m ? esc(fTime.format(new Date(r.m.kickoff))) : ''}</span>`;
-      const tag = r.m ? 'a' : 'div';
-      html += `<${tag} class="kp-row s-${cls.replace(' ', ' s-')}"${r.m ? ` href="#match/${esc(r.id)}"` : ''}>` +
-        `<span class="kp-dot ${cls}" aria-hidden="true">${cls === 'ok' ? '✓' : cls === 'no' ? '✕' : ''}</span>` +
-        `<span class="mtime">${when}</span>` +
-        `<span class="ctag"${comp ? ` title="${esc(comp.name)}"` : ''}>${comp ? esc(comp.short) : ''}</span>` +
-        `<span class="mteams"><span class="kp-tm">${r.m ? `${esc(r.m.home)}<span class="vs">–</span>${esc(r.m.away)}` : esc(teamsOf(r))}</span>` +
-        `${r.note ? `<span class="kp-note" title="${esc(r.note)}">”${esc(r.note)}”</span>` : ''}</span>` +
-        signBoxes(r) +
-        (r.p != null
-          ? `<span class="kp-p" title="Modellens odds för vårt tecken, före avspark (${r.p} % chans)"><span class="kp-pbar"><i style="width:${Math.min(100, r.p)}%"></i></span>${pctOdds(r.p)}</span>`
-          : '<span class="kp-p unknown">okänt</span>') +
-        `<span class="kp-score">${score}</span></${tag}>`;
-    }
-    html += '</div></div>';
-  }
-  return html;
 }
 
 function liveLine(g) {

@@ -223,9 +223,3 @@
   .sm-teaser .kp-btn { justify-self: start; }
   .sm-kod { flex: 1 1 120px; }
 }
-
-/* länken under texten i Omgångens kupong, när det inte finns någon kupong */
-.sm-alt { margin: -8px 0 18px; }
-@media (min-width: 720px) {
-  .sm-alt { margin: 10px 0 0; }
-}
