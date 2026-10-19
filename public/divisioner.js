@@ -824,6 +824,10 @@ function segHtml(groups, cur, attr) {
 // Gränserna för kvoter, ur spelarfilen (thresholds).
 const TH = { shots: 10, min: 270 };
 const per90 = (x, p) => (x == null || !p.min ? null : (x / p.min) * 90);
+// Mål och assist till per 90: FPL:s egna i Premier League (samma matcher som
+// FPL-minuterna), annars truppens – speltiden räknas för samma matcher.
+const goals90 = (p) => (p.fg !== undefined ? p.fg : p.g);
+const ga90Of = (p) => (goals90(p) == null ? null : goals90(p) + ((p.fg !== undefined ? p.fa : p.a) || 0));
 const dxgOf = (p) => (p.xg != null && p.fg != null ? p.fg - p.xg : null);
 const qMin = { ok: (p) => p.min >= TH.min, okWhy: 'mindre än tre hela matchers speltid' };
 
@@ -841,7 +845,7 @@ const PCOLS = [
   { key: 'nat', label: 'Nation', get: (p) => natSv(p.nat), text: true, cls: 'pnat hide-sm', in: ['oversikt'], show: (p) => esc(natSv(p.nat) || '–') },
   { key: 'app', label: 'M', title: 'Matcher – från start och inhopp', get: (p) => p.app, cls: 'num', in: PA },
   { key: 'starts', label: 'Start', title: 'Matcher från start', get: (p) => p.starts, cls: 'num hide-md hide-sm', in: ['oversikt'] },
-  { key: 'min', label: 'Min', title: 'Spelade minuter (FPL)', get: (p) => p.min, cls: 'num hide-xs', fpl: true, in: PA },
+  { key: 'min', label: 'Min', title: 'Spelade minuter', get: (p) => p.min, cls: 'num hide-xs', mins: true, in: PA },
   { key: 'g', label: 'Mål', get: (p) => p.g, cls: 'num', strong: true, in: PA },
   { key: 'a', label: 'Ass', title: 'Assist – passningen eller skottet före målet', get: (p) => p.a, cls: 'num', in: ['oversikt'] },
   { key: 'ga', label: 'M+A', title: 'Mål plus assist', get: (p) => (p.noStats ? null : (p.g || 0) + (p.a || 0)), cls: 'num hide-xs', in: ['oversikt'] },
@@ -853,19 +857,22 @@ const PCOLS = [
   { key: 'sot', label: 'På mål', title: 'Skott på mål', get: (p) => p.sot, cls: 'num', in: ['avslut'] },
   { key: 'conv', label: 'Mål/skott', title: 'Mål per skott', get: (p) => (p.sh ? p.g / p.sh : null), pct: true, cls: 'num hide-xs', in: ['avslut'],
     ok: (p) => p.sh >= TH.shots, okWhy: 'färre än tio skott' },
-  { key: 'gpm', label: 'Mål/M', title: 'Mål per match', get: (p) => (p.app ? p.g / p.app : null), d: 2, cls: 'num', nofpl: true, in: ['avslut'] },
+  { key: 'gpm', label: 'Mål/M', title: 'Mål per match', get: (p) => (p.app ? p.g / p.app : null), d: 2, cls: 'num', nomins: true, in: ['avslut'] },
   { key: 'xg', label: 'xG', title: 'Förväntade mål ur chanserna', get: (p) => p.xg, d: 1, cls: 'num', fpl: true, in: ['avslut'] },
   { key: 'dxg', label: '±xG', title: 'Mål minus xG – plus = fler mål än chanserna brukar ge', get: dxgOf, cls: 'num', fpl: true, in: ['avslut'],
     show: (p) => delta(dxgOf(p), { d: 1, dead: 0.05 }) },
   { key: 'xa', label: 'xA', title: 'Förväntade assist', get: (p) => p.xa, d: 1, cls: 'num hide-xs', fpl: true, in: ['avslut'] },
-  { key: 'g90', label: 'Mål/90', title: 'Mål per 90 minuter', get: (p) => per90(p.fg, p), d: 2, cls: 'num', fpl: true, in: ['avslut'], ...qMin },
+  { key: 'g90', label: 'Mål/90', title: 'Mål per 90 minuter', get: (p) => per90(goals90(p), p), d: 2, cls: 'num', mins: true, in: ['avslut'], ...qMin },
   { key: 'xg90', label: 'xG/90', title: 'xG per 90 minuter', get: (p) => per90(p.xg, p), d: 2, cls: 'num hide-sm', fpl: true, in: ['avslut'], ...qMin },
-  { key: 'ga90', label: 'M+A/90', title: 'Mål plus assist per 90 minuter', get: (p) => per90(p.fg == null ? null : p.fg + (p.fa || 0), p), d: 2, cls: 'num hide-xs', fpl: true, in: ['avslut'], ...qMin },
+  { key: 'ga90', label: 'M+A/90', title: 'Mål plus assist per 90 minuter', get: (p) => per90(ga90Of(p), p), d: 2, cls: 'num hide-xs', mins: true, in: ['avslut'], ...qMin },
 ];
 
+// fpl = xG och pris (bara Premier League), mins = speltiden (alla ligor
+// där den är känd).
 function playerCols(P) {
   const fpl = !!P.fpl;
-  return PCOLS.filter((c) => c.in.includes(state.pf.cols) && (!c.fpl || fpl) && (!c.nofpl || !fpl));
+  const mins = !!(P.minutes || P.fpl);
+  return PCOLS.filter((c) => c.in.includes(state.pf.cols) && (!c.fpl || fpl) && (!c.mins || mins) && (!c.nomins || !mins));
 }
 
 function filteredPlayers(P, cols) {
@@ -947,7 +954,8 @@ function playersView(dv, P) {
       '</div><div id="dv-ptable">' + playerTableHtml(P) + '</div>',
     src: `ESPN, hämtat ${when(P.source.fetchedAt)} · ${int(t.used)} av ${int(t.players)} har spelat` +
       (t.teamsBehind ? ` · släpar en omgång för ${t.teamsBehind} lag` : '') +
-      (P.fpl ? ` · speltid, xG och pris: Fantasy Premier League, hämtat ${when(P.fpl.fetchedAt)}` : ''),
+      (P.fpl ? ` · speltid, xG och pris: Fantasy Premier League, hämtat ${when(P.fpl.fetchedAt)}` : '') +
+      (!P.fpl && P.minutes ? ` · speltid: ESPN:s matchrapporter, hämtat ${when(P.minutes.fetchedAt)}` : ''),
     cls: 'dv-wide',
   });
 
@@ -1198,6 +1206,8 @@ function openPlayer(id) {
         rows.push(['xG / xA', `${num(p.xg, 2)} / ${num(p.xa, 2)}`]);
         rows.push(['Mål mot xG', `${delta(dxgOf(p), { d: 1 })} <span class="muted">(${p.fg} mål på ${num(p.xg, 1)} xG)</span>`]);
         if (p.min >= TH.min) rows.push(['Per 90 minuter', `${num(per90(p.fg, p), 2)} mål · ${num(per90(p.xg, p), 2)} xG`]);
+      } else if (p.min >= TH.min) {
+        rows.push(['Per 90 minuter', `${num(per90(p.g, p), 2)} mål · ${num(per90(ga90Of(p), p), 2)} mål + assist`]);
       }
     }
     rows.push(['Kort', p.yc || p.rc ? `${p.yc ? `<i class="dv-card-y"></i>${p.yc} gula` : ''}${p.rc ? ` <i class="dv-card-r"></i>${p.rc} röda` : ''}` : 'inga']);
@@ -1220,7 +1230,8 @@ function openPlayer(id) {
     if (hit) html += `<p class="dv-avail">⚠ ${esc(hit.status)}${hit.chance != null ? ` (${hit.chance} % chans att spela)` : ''}${hit.news ? ` – ${esc(hit.news)}` : ''}</p>`;
   }
   html += `<p class="dv-mnote">ESPN · ligamatcher ${esc(state.data.season)} · hämtat ${when(P.source.fetchedAt)}` +
-    `${p.min != null ? ` · speltid, xG och FPL: Fantasy Premier League, hämtat ${when(P.fpl.fetchedAt)}` : ''}</p>` +
+    `${p.min != null && P.fpl ? ` · speltid, xG och FPL: Fantasy Premier League, hämtat ${when(P.fpl.fetchedAt)}` : ''}` +
+    `${p.min != null && !P.fpl && P.minutes ? ` · speltid: ESPN:s matchrapporter, hämtat ${when(P.minutes.fetchedAt)}` : ''}</p>` +
     `<p class="dv-mback"><button type="button" class="dv-linkbtn" data-team-open="${esc(p.teamId)}">← ${esc(p.team)}: hela truppen</button></p>`;
   showModal(html);
 }
@@ -1596,8 +1607,8 @@ const GLOSSARY = [
   ['Zonerna', 'Färgen till vänster i tabellen: vad placeringen ger i slutet av säsongen enligt ESPN – uppflyttning, kval (playoff), Europa eller nedflyttning.', 'tabeller'],
   ['M, Start, Min, Ass, M+A', 'Spelartabellen: matcher (från start och inhopp), matcher från start, spelade minuter, assist och mål plus assist.', 'statistik'],
   ['– och grå 0', 'Streck = okänt (ESPN har ingen statistik för spelaren), grå 0 = noll.'],
-  ['Spelarstatistiken', 'Bara ligamatcher i år, ur ESPN:s trupper. Den släpar ofta en omgång efter tabellen; självmål och spelare som lämnat klubben saknas. I Premier League kommer speltid, xG och pris från Fantasy Premier League.', 'statistik'],
-  ['Per 90', 'Per 90 spelade minuter, för spelare med minst tre hela matchers speltid. Bara Premier League, där speltiden är känd. Dämpade värden har för litet underlag.', 'statistik'],
+  ['Spelarstatistiken', 'Bara ligamatcher i år, ur ESPN:s trupper. Den släpar ofta en omgång efter tabellen; självmål och spelare som lämnat klubben saknas. I Premier League kommer speltid, xG och pris från Fantasy Premier League, i övriga ligor räknas speltiden ur ESPN:s matchrapporter (byten och röda kort, utan tilläggstid).', 'statistik'],
+  ['Per 90', 'Per 90 spelade minuter, för spelare med minst tre hela matchers speltid. Dämpade värden har för litet underlag.', 'statistik'],
   ['Pris', 'Spelarens pris i Fantasy Premier League, i miljoner pund – spelets värdering, som stiger när många köper spelaren.', 'statistik'],
   ['Lagstatistiken', 'Tabellen är ESPN:s. xG, skott, hörnor, kort och odds kommer från football-data.co.uk, som ofta ligger en omgång efter – därför visas de per match eller som skillnad inom samma matcher.', 'statistik'],
   ['Snittålder', 'Viktad med matcher, så att ordinarie spelare väger mer än de som hoppat in en gång.', 'statistik'],

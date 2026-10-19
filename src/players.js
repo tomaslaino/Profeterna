@@ -1,9 +1,9 @@
 'use strict';
 
-// Spelardata per division och per lag, ur ESPN-trupperna (src/playersources.js)
-// och FPL (bara Premier League: skadelistan och speltid, xG/xA, pris och
-// poäng per spelare). Allt räknas ur cachen vid bygget; inget här styr
-// prognoserna.
+// Spelardata per division och per lag, ur ESPN-trupperna (src/playersources.js),
+// FPL (bara Premier League: skadelistan och speltid, xG/xA, pris och poäng per
+// spelare) och ESPN:s matchrapporter (speltiden i Championship, League One och
+// League Two). Allt räknas ur cachen vid bygget; inget här styr prognoserna.
 //
 // Principer som i resten av appen: spelare utan statistik är okända, inte
 // nollor, och topplistor med kvoter (mål per skott, räddningsprocent) kräver
@@ -197,6 +197,40 @@ function fplIndex(compId, teams) {
   return { map: out, matched: out.size, of, fetchedAt: fc.fetchedAt };
 }
 
+// Speltiden utanför Premier League, ur matchrapporterna (espn_minutes_<liga>).
+// Truppens statistik släpar ofta en omgång efter rapporterna, så minuterna
+// räknas för spelarens första `app` matcher i laget – samma matcher som målen
+// i truppen. Har rapporterna färre matcher än truppen (en rapport saknas,
+// eller spelaren har bytt klubb inom ligan) är speltiden okänd, inte för låg.
+function minutesIndex(compId, teams) {
+  const comp = LEAGUES.find((c) => c.id === compId);
+  if (!comp || comp.fpl) return null;
+  const c = readCache(`espn_minutes_${compId}`);
+  if (!c || !c.data || !c.data.matches) return null;
+  const apps = new Map(); // "lag|spelare" → minuter per match i tidsordning
+  for (const m of Object.values(c.data.matches).sort((a, b) => a.k.localeCompare(b.k))) {
+    for (const [teamId, ps] of Object.entries(m.t)) {
+      for (const [id, min] of Object.entries(ps)) {
+        const k = `${teamId}|${id}`;
+        if (!apps.has(k)) apps.set(k, []);
+        apps.get(k).push(min);
+      }
+    }
+  }
+  const out = new Map();
+  let of = 0;
+  for (const t of teams) {
+    for (const p of t.players) {
+      if (!p.stats || p.stats.app == null) continue;
+      of++;
+      const list = apps.get(`${t.espnId}|${p.id}`) || [];
+      if (list.length < p.stats.app) continue;
+      out.set(p.id, { min: list.slice(0, p.stats.app).reduce((s, x) => s + x, 0) });
+    }
+  }
+  return { map: out, matched: out.size, of, matches: Object.keys(c.data.matches).length, fetchedAt: c.fetchedAt };
+}
+
 // Mål minus xG (FPL:s egna mål, så att båda gäller samma matcher).
 const overXg = (r) => (r.xg != null && r.fg != null ? Math.round((r.fg - r.xg) * 100) / 100 : null);
 
@@ -209,7 +243,8 @@ function divisionPlayers(compId) {
   const d = cache.data;
   const standings = standingsFor(compId);
   const fpl = fplIndex(compId, d.teams);
-  const fx = fpl ? fpl.map : null;
+  const mins = fpl ? null : minutesIndex(compId, d.teams);
+  const fx = fpl ? fpl.map : mins ? mins.map : null;
   const rows = [];
   const all = [];
   for (const t of d.teams) {
@@ -278,8 +313,8 @@ function divisionPlayers(compId) {
       red: top(rows, (r) => r.rc, { n: 20 }),
       keepers: keepers(d.teams, standings),
       // Bara med FPL (Premier League): mål över och under xG.
-      overXg: fx ? top(rows, overXg, { min: 0.01 }).map((r) => ({ ...r, dxg: overXg(r) })) : null,
-      underXg: fx ? top(rows, (r) => (overXg(r) == null ? null : -overXg(r)), { min: 0.01 }).map((r) => ({ ...r, dxg: overXg(r) })) : null,
+      overXg: fpl ? top(rows, overXg, { min: 0.01 }).map((r) => ({ ...r, dxg: overXg(r) })) : null,
+      underXg: fpl ? top(rows, (r) => (overXg(r) == null ? null : -overXg(r)), { min: 0.01 }).map((r) => ({ ...r, dxg: overXg(r) })) : null,
     },
     teams,
     table: table(compId, standings, d.teams),
@@ -291,6 +326,11 @@ function divisionPlayers(compId) {
     players: all.sort((a, b) => (b.g || 0) - (a.g || 0) || (b.a || 0) - (a.a || 0) || a.name.localeCompare(b.name)),
     // Speltid, xG och pris per spelare (bara Premier League).
     fpl: fpl ? { provider: 'Fantasy Premier League', fetchedAt: fpl.fetchedAt, matched: fpl.matched, of: fpl.of } : null,
+    // Speltiden: FPL i Premier League, ESPN:s matchrapporter i övriga ligor.
+    // matched av of = spelare med statistik vars speltid är känd.
+    minutes: fpl
+      ? { provider: 'Fantasy Premier League', fetchedAt: fpl.fetchedAt, matched: fpl.matched, of: fpl.of }
+      : mins ? { provider: 'ESPN', fetchedAt: mins.fetchedAt, matched: mins.matched, of: mins.of, matches: mins.matches } : null,
     thresholds: { minShotsConversion: MIN_SHOTS_CONVERSION, minShareKeeper: MIN_SHARE_KEEPER, minMinutesP90: MIN_MINUTES_P90, top: TOP },
   };
 }
