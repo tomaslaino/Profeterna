@@ -73,6 +73,14 @@ ingen falsk precision · sidan kraschar aldrig av en död källa · endast fria 
   Matchlistan visar prognosen i procent som resten av sajten, Ny kupong visar först
   närmaste omgången, fliken Styrka under Tabeller är borta och Modell börjar med en
   förklaring på vanlig svenska
+- [x] **Matchrutan (2026-10-19):** en match öppnas i en ruta ovanpå sidan man är på (som
+  på gravergrav.se), med flikarna Matchen (mål, kort, byten, statistik och publik från
+  ESPN, varje minut medan matchen pågår – bara för påbörjade matcher), Prognos, Startelvor
+  (trolig elva, sedan den bekräftade och efter matchen elvorna med mål, kort och byten, på
+  en plan, plus avbytare, tränare och vilka som saknas – från 365Scores), Form (formen,
+  möten och lagen sida vid sida), Lagen (skador och trupperna) och Domaren. Startelvorna
+  och matchhändelserna hämtas i webbläsaren när rutan öppnas och styr inte prognoserna
+  ([public/matchruta.js](public/matchruta.js))
 
 ## Publicering
 
@@ -169,6 +177,8 @@ Utan nyckel ingen knapp.
 | Halvtid, hörnor, kort och domare, tidigare säsonger | football-data.co.uk (samma filer som raden ovan, fler kolumner) | PL–L2, National League – bara sidan Statistik | 30 d | Verifierat 2026-10-18. Egen cache (`fdcouk_stats_*`), så att prognosmotorns underlag och backtestets signatur inte ändras. Halvtidsresultat, kort och domare finns i stort sett alla säsonger sedan 2000/01 (EC sedan 2005/06); domare saknas 2012/13 i E1–EC, och skott, hörnor och frisparkar saknas i EC från 2016/17. Avsparkstid (brittisk tid) från 2019/20, publik bara 2000/01–2001/02. Sparar också marknadssnittets 1X2 och över/under 2,5. |
 | Europacuperna (för vila och form) | ESPN (`uefa.champions`, `uefa.europa`, `uefa.europa.conf`, kvalomgångarna i `*_qual` juli–augusti) | PL och cuperna – bara underlag | 3 h | Verifierat 2026-10-18: 234/224/366 matcher 2026/27 med kvalet, nio engelska lag (Brighton i Conference Leagues playoffomgång i augusti). Kopplas på ESPN:s lag-id, samma i alla ESPN:s turneringar. Ingen prognos för matcherna och inte med i prognosmotorns underlag. |
 | Domare, kommande ligamatcher | football-data.co.uk (`fixtures.csv`, kolumnen `Referee`) | ligorna | 6 h | Verifierat 2026-10-18: namnet finns för alla 46 kommande matcher i filen (läggs ut med oddsen fre/tis). Domarens historik ur samma statistikfiler som sidan Statistik. |
+| Startelvor och frånvaro | 365Scores öppna webb-API (`webws.365scores.com/web/games/` och `/web/game/?gameId=`), hämtas **i webbläsaren** | alla sex | när matchrutan öppnas, varje minut medan matchen pågår | Verifierat 2026-10-19: ingen nyckel, `Access-Control-Allow-Origin: *`. Trolig elva (`NotConfirmed`) dagar före matchen i Premier League och Championship (inte i League One, League Two och EFL-cupen), bekräftad (`Confirmed`) ungefär en timme före avspark, efter matchen elvorna med mål, kort och byten. Spelarnas plats som linje och sida, så planen ritas utan positionstolkning. Vilka som saknas (skada med orsak och väntad återkomst, avstängning) även utanför Premier League. ESPN:s matchid finns inte där: matchen hittas på tävling (PL 7, CH 1, L1 2, L2 3, FA-cupen 8, EFL-cupen 9), avspark inom tre timmar och lagnamn – 505 av 505 matcher 1/9–8/11 2026 hittades (MK Dons heter så där). Samma källa som Gräver Gravs startelvor. Styr inte prognosen. |
+| Matchhändelser och lagstatistik | ESPN matchsammanfattning (`summary?event=<id>`, samma som oddsen), hämtas **i webbläsaren** | alla sex | när matchrutan öppnas för en påbörjad match, varje minut medan den pågår | Verifierat 2026-10-19: `Access-Control-Allow-Origin: *`. Mål med assist, självmål och straff, kort, byten, halvtid, lagstatistik (bollinnehav, skott, hörnor, passningar m.m.) och publik. Passningsandelen räknas ur antalen (ESPN avrundar den till en decimal). ~400 kB per match. Styr inte prognosen. |
 | Liveställning | ESPN scoreboard (`site.api.espn.com/…/<liga>/scoreboard?dates=YYYYMMDD`), hämtas **i webbläsaren** | kupongens matcher | 1 min medan en kupongmatch pågår | Verifierat 2026-10-18: svarar med `Access-Control-Allow-Origin: *`, så sidan kan hämta direkt. Samma matchid som spelprogrammet. Status, matchminut och ställning; används bara av kupongen, inte av prognosen eller bygget. |
 | Målminuter och publik, tidigare säsonger | ESPN (`eng.1`–`eng.4`, månad för månad) | ligorna – bara sidan Statistik | 30 d | Verifierat 2026-10-18. 2021/22–2025/26; grundserien räknas, play-off filtreras bort. Målhändelserna går ihop med slutresultatet i 99,9 % av matcherna, publik finns i 98–100 % per liga och säsong. Kompakt format (`parseCrowd`): målminut med sida och publiksiffra. Årets publik saknas (spelprogrammets format ändras inte). |
 
@@ -189,7 +199,10 @@ Utan nyckel ingen knapp.
   first round till finalen, inklusive non-league-lag; kvalomgångarna saknas.
 - Att ESPN:s inofficiella API fortsätter att fungera.
 - När football-data.co.uk samlar in öppningsodds (notes.txt: fredag och tisdag eftermiddag).
-- När ESPN publicerar startelvor.
+- När 365Scores publicerar de bekräftade startelvorna (antaget: ungefär en timme före
+  avspark, när klubbarna lämnar dem). Troliga elvor fanns 2026-10-19 för 14 av 23
+  kommande matcher i Premier League och Championship upp till fem dagar fram (ingen sex
+  dagar fram), men för ingen av 61 i League One, League Two och EFL-cupen.
 - ESPN-namnen för National League-lag som ännu inte spelat FA-cup hos ESPN (aliastabellen).
   För 2021/22–2025/26 är de kontrollerade säsong för säsong mot EC-filerna.
 - Cupreglerna 2026/27 (se Prognosmotorn): kontrollerade mot ESPN:s utfall 2025/26 och
@@ -389,8 +402,10 @@ server:
   [Omgångens tippare](#omgångens-tippare).
 - **Frontend:** ren HTML/CSS/JS i `public/`, flikarna Matcher, Kupong, Källor och
   Modell (regelversion, backtest, kandidatlogg och sist Utvärdering; `#utvardering`
-  leder dit); i matchvyn kortet Analys när
-  matchanalysen är påslagen. Sidorna Tabeller och Statistik
+  leder dit); matchen öppnas i matchrutan (`#match/<id>`, en `<dialog>` ovanpå sidan man
+  var på – stängs den går man tillbaka dit) med flikarna Matchen, Prognos, Startelvor,
+  Form, Lagen och Domaren och, i Prognos, kortet Analys när matchanalysen är påslagen;
+  Startelvor och Matchen hämtas av [public/matchruta.js](public/matchruta.js). Sidorna Tabeller och Statistik
   ([public/tabeller.html](public/tabeller.html), [public/statistik.html](public/statistik.html),
   båda med [public/divisioner.js](public/divisioner.js)); Tabeller har vyn Säsongsprognos. Läser JSON-filerna ovan. Urvalet av kommande/spelade matcher och källornas status
   räknas i webbläsaren mot besökarens klocka, inte mot byggtiden.

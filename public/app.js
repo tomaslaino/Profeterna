@@ -112,23 +112,50 @@ const TABS = {
 // Källor och Modell har ingen flik i toppbaren, bara länkar i sidfoten.
 // Förstasidan (home-section) har ingen flik heller – dit leder namnet.
 function showTab(sectionId) {
+  // Samma sida som förut (till exempel när matchrutan stängs): ingen skroll till toppen.
+  const same = !$(`#${sectionId}`).hidden;
   for (const sec of document.querySelectorAll('main > section')) sec.hidden = sec.id !== sectionId;
-  for (const btn of document.querySelectorAll('[role="tab"]')) {
+  for (const btn of document.querySelectorAll('.tablist [role="tab"]')) {
     btn.setAttribute('aria-selected', String(btn.dataset.tab === sectionId));
   }
   if (sectionId === 'sources-section') loadSources();
-  window.scrollTo(0, 0);
+  if (!same) window.scrollTo(0, 0);
   // Modell-sidan: klar när både modellen och utvärderingen är ritade.
   if (sectionId === 'model-section') return Promise.all([loadModel(), loadEvaluation()]);
 }
 
-function route() {
+// Matchrutan ligger ovanpå sidan man var på (#match/<id>); under den ligger
+// adressen man kom ifrån, och stängs rutan går man tillbaka dit. Kom man
+// direkt till matchen ligger matchlistan under.
+const modal = { active: false, under: null, depth: 0, closing: false };
+let routed = false;
+
+function route(e) {
   const h = location.hash.replace(/^#/, '');
+  const old = e && e.oldURL ? new URL(e.oldURL).hash.replace(/^#/, '') : null;
   const m = /^match\/(\d+)$/.exec(h);
   if (m) {
-    showTab('matches-section');
+    if (!routed) showTab('matches-section');
+    // Hur många matcher bort sidan under ligger sparas i historiken, så att
+    // bakåt och framåt mellan matcher i rutan räknas rätt.
+    const saved = history.state && history.state.md;
+    if (!modal.active) {
+      modal.under = old != null && !/^match\//.test(old) ? old : null;
+      modal.depth = 1;
+    } else {
+      modal.depth = saved || modal.depth + 1;
+    }
+    history.replaceState({ ...(history.state || {}), md: modal.depth }, '');
+    routed = true;
     openMatch(m[1]);
     return;
+  }
+  routed = true;
+  if (modal.active) {
+    const back = modal.under === h;
+    hideMatch();
+    // Tillbaka till sidan under rutan: den syns redan, inget ritas om.
+    if (back) return;
   }
   // Kupongen (kupong.js): #kupong, #kupong/historik, #kupong/<id>,
   // #kupong/ny, #kupong/andra/<id>.
@@ -145,12 +172,10 @@ function route() {
     return;
   }
   const loading = showTab(TABS[h]);
-  $('#match-detail-view').hidden = true;
-  $('#match-list-view').hidden = false;
   if (h === 'utvardering') loading.then(() => $('#eval-title').scrollIntoView());
 }
 
-for (const btn of document.querySelectorAll('[role="tab"]')) {
+for (const btn of document.querySelectorAll('.tablist [role="tab"]')) {
   btn.addEventListener('click', () => {
     const name = Object.keys(TABS).find((k) => TABS[k] === btn.dataset.tab);
     location.hash = name;
@@ -341,26 +366,131 @@ function matchRow(m) {
     `<span class="mside${m.completed && m.score ? '' : ' mside-odds'}">${side}</span></button>`;
 }
 
-// ---------- matchvy ----------
+// ---------- matchrutan ----------
+
+// Matchen öppnas i en ruta ovanpå sidan, med flikar som på gravergrav.se.
+// Startelvor och Matchen hämtas i webbläsaren av matchruta.js.
+const CLOSE_BTN = '<button type="button" class="mr-close" data-close aria-label="Stäng">×</button>';
 
 async function openMatch(id) {
+  const dlg = $('#match-modal');
   const el = $('#match-detail-view');
-  $('#match-list-view').hidden = true;
-  el.hidden = false;
-  el.innerHTML = '<p class="empty">Laddar …</p>';
+  if (!state.detail || state.detail.match.id !== id) {
+    state.mtab = null;
+    el.innerHTML = `<div class="mr-top">${CLOSE_BTN}</div><div class="mr-body"><p class="empty">Laddar …</p></div>`;
+  }
+  modal.active = true;
+  if (!dlg.open) {
+    dlg.showModal();
+    document.documentElement.classList.add('mr-open');
+  }
   try {
     const d = await getJSON(`data/match/${encodeURIComponent(id)}.json`);
+    if (location.hash !== `#match/${id}`) return;
+    const fresh = !state.detail || state.detail.match.id !== id;
     state.detail = d;
-    el.innerHTML = renderDetail(d);
-    setShowSources(showSources());
-    window.scrollTo({ top: 0 });
+    drawDetail();
+    if (fresh) el.querySelector('.mr-body').scrollTop = 0;
   } catch (err) {
-    el.innerHTML = backLink() + `<p class="empty">Kunde inte läsa matchen: ${esc(err.message)}</p>`;
+    el.innerHTML = `<div class="mr-top">${CLOSE_BTN}</div><div class="mr-body"><p class="empty">Kunde inte läsa matchen: ${esc(err.message)}</p></div>`;
   }
 }
 
-function backLink() {
-  return '<div class="back"><a href="#matcher">← Alla matcher</a></div>';
+function drawDetail() {
+  const el = $('#match-detail-view');
+  const d = state.detail;
+  $('#match-modal').setAttribute('aria-label', `${d.match.home}–${d.match.away}`);
+  el.innerHTML = renderDetail(d);
+  setShowSources(showSources());
+  if (window.Matchruta) Matchruta.hydrate(el, d, compOf(d.match.comp).espn);
+}
+
+// Stänger rutan utan att röra adressen (route sköter den).
+function hideMatch() {
+  modal.active = false;
+  modal.closing = false;
+  const dlg = $('#match-modal');
+  if (dlg.open) dlg.close();
+  document.documentElement.classList.remove('mr-open');
+  if (window.Matchruta) Matchruta.stop();
+  state.detail = null;
+}
+
+// Krysset, Esc och klick utanför: tillbaka till sidan under rutan. En gång –
+// Esc kan ge både cancel och close innan adressen hunnit ändras.
+function closeMatch() {
+  if (modal.closing) return;
+  modal.closing = true;
+  if (modal.under != null) history.go(-modal.depth);
+  else location.hash = 'matcher';
+  // Gick det inte att backa (ingen historik) hamnar man på matchlistan.
+  setTimeout(() => {
+    if (!modal.closing) return;
+    modal.closing = false;
+    if (/^#match\//.test(location.hash)) location.hash = 'matcher';
+  }, 700);
+}
+
+$('#match-modal').addEventListener('cancel', (e) => {
+  e.preventDefault();
+  closeMatch();
+});
+// Webbläsaren kan stänga rutan själv (Esc två gånger): då följer adressen med.
+$('#match-modal').addEventListener('close', () => {
+  document.documentElement.classList.remove('mr-open');
+  if (/^#match\//.test(location.hash)) closeMatch();
+});
+$('#match-modal').addEventListener('click', (e) => {
+  if (e.target === e.currentTarget) closeMatch();
+});
+
+function selectMatchTab(id, focus) {
+  state.mtab = id;
+  const el = $('#match-detail-view');
+  for (const b of el.querySelectorAll('[data-mtab]')) {
+    const on = b.dataset.mtab === id;
+    b.setAttribute('aria-selected', String(on));
+    b.tabIndex = on ? 0 : -1;
+    if (on && focus) b.focus();
+    if (on) b.scrollIntoView({ block: 'nearest', inline: 'nearest' });
+  }
+  for (const p of el.querySelectorAll('.mr-pane')) p.hidden = p.dataset.pane !== id;
+  const body = el.querySelector('.mr-body');
+  if (body) body.scrollTop = 0;
+}
+
+// Flikarna: spelad (eller påbörjad) match börjar med Matchen, kommande med
+// prognosen. Startelvor och Matchen fylls av matchruta.js.
+function matchPanes(d) {
+  const m = d.match;
+  const started = m.completed || (Date.parse(m.kickoff) <= Date.now() && !/POSTPONED|CANCEL/.test(m.status || ''));
+  const R = window.Matchruta;
+  const panes = [];
+  if (started && R) panes.push(['matchen', 'Matchen', R.eventsPane(m)]);
+  panes.push(['prognos', 'Prognos', prognosPane(d)]);
+  if (R) panes.splice(started ? 2 : 1, 0, ['startelvor', 'Startelvor', R.lineupPane(m)]);
+  panes.push(['form', 'Form', formCard(d) + sideCard(d)]);
+  panes.push(['lagen', 'Lagen', squadCard(d) + squadsSection(d)]);
+  if (d.referee && !d.referee.unknown) panes.push(['domaren', 'Domaren', refereeCard(d)]);
+  return panes;
+}
+
+function prognosPane(d) {
+  const m = d.match;
+  // Spelad match med prognos före avspark: den återskapade prognosen och dess
+  // jämförelse upprepar samma sak och visas bara med detaljerna.
+  const logged = m.completed && d.journal && d.journal.counted;
+  const detailOnly = (s) => (logged && s ? `<div class="src-only">${s}</div>` : s);
+  let html = '';
+  if (logged) html += journalCard(d);
+  html += detailOnly(forecastCard(d));
+  html += analysisCard(d);
+  if (d.prediction && d.prediction.status === 'ok') {
+    html += '<div class="grid2">' + detailOnly(compareCard(d)) + stepsCard(d) + '</div>';
+  }
+  html += oddsCard(d.odds, m);
+  html += '<div class="grid2 src-only">' + unknownCard(d) + '</div>';
+  return html;
 }
 
 function renderDetail(d) {
@@ -384,8 +514,7 @@ function renderDetail(d) {
   const meta = [m.compName, m.round, cap(fDay.format(new Date(m.kickoff))) + ' ' + fTime.format(new Date(m.kickoff)), m.venue]
     .filter(Boolean).map(esc).join(' · ');
 
-  let html = backLink();
-  html += `<div class="mhead"><div class="mhead-meta">${meta}</div>` +
+  const head = `<div class="mhead mr-head"><div class="mhead-meta">${meta}</div>` +
     `<div class="mhead-teams"><div class="mhead-team">${esc(m.home)}</div>` +
     `<div class="mhead-mid">${hide ? Spoiler.chip() : esc(mid)}${midSub ? `<span class="sub">${esc(midSub)}</span>` : ''}</div>` +
     `<div class="mhead-team away">${esc(m.away)}</div></div>` +
@@ -394,31 +523,19 @@ function renderDetail(d) {
   // Dold match: bara rubriken – prognosens rättning och underlaget efter
   // matchen avslöjar resultatet.
   if (hide) {
-    return html + Spoiler.card({ title: 'Resultatet är dolt', text: 'Du har valt att dölja resultat.', keys: [m.id], button: 'Visa resultatet' });
+    return `<div class="mr-top">${CLOSE_BTN}${head}</div><div class="mr-body">` +
+      Spoiler.card({ title: 'Resultatet är dolt', text: 'Du har valt att dölja resultat.', keys: [m.id], button: 'Visa resultatet' }) + '</div>';
   }
 
-  // Spelad match med prognos före avspark: den återskapade prognosen och dess
-  // jämförelse upprepar samma sak och visas bara med detaljerna.
-  const logged = m.completed && d.journal && d.journal.counted;
-  const detailOnly = (s) => (logged && s ? `<div class="src-only">${s}</div>` : s);
-  if (logged) html += journalCard(d);
-  html += detailOnly(forecastCard(d));
-  html += analysisCard(d);
-  if (d.prediction && d.prediction.status === 'ok') {
-    html += '<div class="grid2">' + detailOnly(compareCard(d)) + stepsCard(d) + '</div>';
-  }
-
-  html += '<h3 class="underlag">Underlag</h3>';
-  html += '<div class="grid2">' + oddsCard(d.odds, m) + formCard(d) + '</div>';
-  html += squadCard(d);
-  // Resten är hopfällt: rubriken syns, innehållet när man trycker på den.
-  html += sideCard(d);
-  html += refereeCard(d);
-  html += squadsSection(d);
-  html += '<div class="grid2 src-only">' + unknownCard(d) + '</div>';
-  html += '<p class="detail-foot"><button type="button" class="src-toggle" aria-pressed="false">Visa detaljer</button>' +
-    '<a href="#modell">Så fungerar modellen</a></p>';
-  return html;
+  const panes = matchPanes(d);
+  const tab = panes.some(([id]) => id === state.mtab) ? state.mtab : panes[0][0];
+  const tabs = '<div class="mr-tabs" role="tablist" aria-label="Om matchen">' + panes.map(([id, label]) =>
+    `<button type="button" role="tab" id="mr-tab-${id}" data-mtab="${id}" aria-controls="mr-pane-${id}" aria-selected="${id === tab}"${id === tab ? '' : ' tabindex="-1"'}>${label}</button>`).join('') + '</div>';
+  const body = panes.map(([id, , html]) =>
+    `<section class="mr-pane" id="mr-pane-${id}" data-pane="${id}" role="tabpanel" aria-labelledby="mr-tab-${id}"${id === tab ? '' : ' hidden'}>${html}</section>`).join('');
+  return `<div class="mr-top">${CLOSE_BTN}${head}${tabs}</div><div class="mr-body">${body}` +
+    '<p class="detail-foot"><button type="button" class="src-toggle" aria-pressed="false">Visa detaljer</button>' +
+    '<a href="#modell">Så fungerar modellen</a></p></div>';
 }
 
 // ---------- prognos ----------
@@ -701,13 +818,6 @@ function formCard(d) {
   return html;
 }
 
-// Hopfällt avsnitt på matchsidan: rubriken (och en kort hint) syns, innehållet
-// när man trycker på den.
-function foldSection(title, body, hint = '') {
-  return `<details class="fold"><summary>${esc(title)}${hint ? `<span class="hint">${hint}</span>` : ''}</summary>` +
-    `<div class="fold-body">${body}</div></details>`;
-}
-
 // xG finns för Premier League från två källor. Bara en visas: Understat där
 // den finns (etablerad leverantör), annars football-data.co.uk.
 function oneXg(rows) {
@@ -739,12 +849,11 @@ function sideCard(d) {
     }
     if (g.note) notes.push(g.note);
   }
-  return foldSection('Lagen sida vid sida',
-    `<div class="table-wrap" style="box-shadow:none;margin:0"><table class="side"><thead><tr>` +
+  return '<div class="card"><h4>Lagen sida vid sida <span class="hint">tabell, schema och xG</span></h4>' +
+    `<div class="table-wrap" style="margin:0"><table class="side"><thead><tr>` +
     `<th style="text-align:right">${esc(d.match.home)}</th><th class="mid"></th><th>${esc(d.match.away)}</th></tr></thead>` +
     `<tbody>${rows}</tbody></table></div>` +
-    (notes.length ? `<p class="src-line">${notes.map(esc).join(' ')}</p>` : ''),
-    'tabell, schema och xG');
+    (notes.length ? `<p class="src-line">${notes.map(esc).join(' ')}</p>` : '') + '</div>';
 }
 
 // Skadorna i korthet: namnen per status på en rad. FPL:s egen text (på
@@ -788,7 +897,7 @@ function squadCard(d) {
 function refereeCard(d) {
   const r = d.referee;
   if (!r) return '';
-  if (r.unknown) return `<div class="src-only">${foldSection('Domaren', `<p class="unknown" style="margin:0">okänt – ${esc(r.reason)}</p>`)}</div>`;
+  if (r.unknown) return `<div class="card src-only"><h4>Domaren</h4><p class="unknown" style="margin:0">okänt – ${esc(r.reason)}</p></div>`;
   const s = r.stats;
   const a = r.avg;
   const divs = r.divisions.map((x) => `${esc(x.short)} ${x.n}`).join(', ');
@@ -809,12 +918,14 @@ function refereeCard(d) {
   }
   html += `<p class="src-line">${esc(r.source.provider)}, hämtat ${when(r.source.fetchedAt)}. Ligamatcher nivå 1–5 de senaste ${r.seasons} avslutade säsongerna och i år, före matchdagen. ` +
     'Båda lagens kort tillsammans. ▲▼ = mer än två standardfel från snittet; annars är skillnaden inom slumpen. Domaren styr inte prognosen.</p>';
-  return foldSection('Domaren', html, esc(r.name));
+  return `<div class="card"><h4>Domaren</h4>${html}</div>`;
 }
 
 function unknownCard(d) {
+  // Startelvorna har en egen flik (matchruta.js, 365Scores).
+  const list = d.unknowns.filter((u) => !(window.Matchruta && /^Startelvor/.test(u)));
   return `<div class="card"><h4>Okänt för den här matchen</h4><ul class="bullets">` +
-    d.unknowns.map((u) => `<li>${esc(u)}</li>`).join('') + '</ul></div>';
+    list.map((u) => `<li>${esc(u)}</li>`).join('') + '</ul></div>';
 }
 
 // ---------- trupperna (ESPN, ligamatcher i år) ----------
@@ -825,8 +936,7 @@ const COMP_PAGE = { pl: 'pl', ch: 'ch', l1: 'l1', l2: 'l2' };
 function squadsSection(d) {
   const s = d.squads;
   if (!s) return '';
-  return foldSection('Trupperna', `<div class="grid2">${teamSquadCard(d.match.home, s.home)}${teamSquadCard(d.match.away, s.away)}</div>`,
-    'målskyttar, assist och kort');
+  return `<div class="grid2">${teamSquadCard(d.match.home, s.home)}${teamSquadCard(d.match.away, s.away)}</div>`;
 }
 
 function keyList(title, list, value, empty) {
@@ -955,7 +1065,7 @@ async function runAnalysis(id, btn) {
       const fresh = await getJSON(`data/match/${encodeURIComponent(id)}.json?b=${encodeURIComponent(r.builtAt)}`);
       if (location.hash === `#match/${id}`) {
         state.detail = fresh;
-        $('#match-detail-view').innerHTML = renderDetail(fresh);
+        drawDetail();
       }
       return;
     } catch {
@@ -970,6 +1080,19 @@ $('#match-detail-view').addEventListener('click', (e) => {
   const b = e.target.closest('button.analyze');
   if (b && !b.disabled) runAnalysis(b.dataset.id, b);
   if (e.target.closest('button.src-toggle')) setShowSources(!showSources());
+  if (e.target.closest('[data-close]')) closeMatch();
+  const t = e.target.closest('[data-mtab]');
+  if (t) selectMatchTab(t.dataset.mtab);
+});
+// Piltangenterna mellan flikarna.
+$('#match-detail-view').addEventListener('keydown', (e) => {
+  const t = e.target.closest('[data-mtab]');
+  if (!t || !['ArrowLeft', 'ArrowRight', 'Home', 'End'].includes(e.key)) return;
+  const all = [...$('#match-detail-view').querySelectorAll('[data-mtab]')];
+  const i = all.indexOf(t);
+  const j = e.key === 'Home' ? 0 : e.key === 'End' ? all.length - 1 : (i + (e.key === 'ArrowRight' ? 1 : -1) + all.length) % all.length;
+  e.preventDefault();
+  selectMatchTab(all[j].dataset.mtab, true);
 });
 
 // Källraderna, de små rubriktilläggen och det som är okänt (.src-sub,
@@ -1525,11 +1648,7 @@ function candidatesSection(L, promoted = new Map()) {
 if (window.Spoiler) {
   Spoiler.onChange(() => {
     renderMatchList();
-    const dv = $('#match-detail-view');
-    if (!dv.hidden && state.detail) {
-      dv.innerHTML = renderDetail(state.detail);
-      setShowSources(showSources());
-    }
+    if ($('#match-modal').open && state.detail) drawDetail();
     if (!$('#model-section').hidden) loadEvaluation();
   });
 }

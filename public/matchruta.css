@@ -1,0 +1,387 @@
+/* Matchrutan: matchen öppnas ovanpå sidan med flikar (app.js, matchruta.js).
+   Laddas efter theme.css och bygger på dess färger: hemmalaget blått
+   (--o-home), bortalaget terrakotta (--o-away), guld för valt läge. */
+
+html.mr-open { overflow: hidden; }
+
+dialog.mr-modal {
+  width: min(880px, calc(100vw - 32px));
+  max-width: none;
+  height: min(88vh, 960px);
+  max-height: none;
+  padding: 0;
+  color: var(--fg);
+  background: var(--card);
+  border: 1px solid var(--pill-line);
+  border-radius: 20px;
+  box-shadow: 0 40px 90px -30px rgba(0, 0, 0, 0.95);
+  overflow: hidden;
+}
+dialog.mr-modal[open] { display: flex; }
+dialog.mr-modal::backdrop {
+  background: rgba(8, 7, 5, 0.66);
+  -webkit-backdrop-filter: blur(5px);
+  backdrop-filter: blur(5px);
+}
+#match-detail-view {
+  display: flex;
+  flex-direction: column;
+  flex: 1;
+  min-width: 0;
+  min-height: 0;
+}
+
+/* ---------- rubriken och flikarna ---------- */
+
+.mr-top {
+  position: relative;
+  flex: none;
+  min-height: 56px;
+  background: var(--glass-hi);
+  border-bottom: 1px solid var(--border);
+}
+.mr-close {
+  position: absolute;
+  z-index: 2;
+  top: 14px;
+  right: 14px;
+  display: grid;
+  place-items: center;
+  width: 36px;
+  height: 36px;
+  padding: 0;
+  font-size: 22px;
+  line-height: 1;
+  color: var(--ink-soft);
+  border-radius: 50%;
+}
+.mr-close:hover { color: #fff; }
+.mhead.mr-head {
+  margin: 0;
+  padding: 20px 64px 12px 24px;
+  background: none;
+  border: 0;
+  border-radius: 0;
+  box-shadow: none;
+}
+.mr-head .mhead-meta { padding-right: 8px; }
+.mr-head .mhead-teams { margin: 12px 0 2px; gap: 14px; }
+.mr-head .mhead-team { font-size: clamp(21px, 3vw, 32px); }
+.mr-head .mhead-mid { font-size: clamp(28px, 3.8vw, 42px); }
+
+.mr-tabs {
+  display: flex;
+  gap: 2px;
+  padding: 0 14px;
+  overflow-x: auto;
+  scrollbar-width: none;
+}
+.mr-tabs::-webkit-scrollbar { display: none; }
+.mr-tabs button {
+  position: relative;
+  flex: none;
+  padding: 10px 13px 13px;
+  font-size: 14px;
+  font-weight: 600;
+  color: var(--muted);
+  background: none;
+  border: 0;
+  border-radius: 0;
+}
+.mr-tabs button:hover { color: var(--fg); }
+.mr-tabs button[aria-selected="true"] { color: var(--bone); }
+.mr-tabs button[aria-selected="true"]::after {
+  content: "";
+  position: absolute;
+  left: 11px;
+  right: 11px;
+  bottom: 0;
+  height: 2px;
+  border-radius: 2px 2px 0 0;
+  background: var(--gold);
+}
+
+.mr-body {
+  flex: 1;
+  min-height: 0;
+  overflow-y: auto;
+  overscroll-behavior: contain;
+  padding: 20px 24px 26px;
+}
+.mr-body .card { margin-bottom: 14px; }
+.mr-body .grid2 { gap: 14px; margin-bottom: 0; }
+.mr-body .grid2 > .card,
+.mr-body .grid2 > div > .card { margin-bottom: 14px; }
+.mr-body .detail-foot { margin-top: 10px; }
+.mr-pane > :first-child { margin-top: 0; }
+.mr-wait { margin: 0; padding: 8px 0; color: var(--muted); }
+
+/* ---------- startelvorna ---------- */
+
+.mr-lu-head { display: flex; flex-wrap: wrap; align-items: center; gap: 6px 12px; margin-bottom: 8px; }
+.mr-chip {
+  display: inline-flex;
+  padding: 4px 11px;
+  font-size: 12px;
+  font-weight: 700;
+  letter-spacing: 0.03em;
+  color: var(--ink-soft);
+  background: var(--pill);
+  border: 1px solid var(--pill-line);
+  border-radius: 999px;
+}
+.mr-chip.prob { color: var(--gold-hi); background: rgba(216, 176, 106, 0.1); border-color: rgba(216, 176, 106, 0.45); }
+.mr-chip.ok { color: #8fe0b4; background: var(--up-soft); border-color: rgba(61, 179, 124, 0.45); }
+.mr-src { font-size: 12px; color: var(--muted); }
+.mr-lu-note { margin: 0 0 14px; font-size: 13px; color: var(--muted); }
+
+.mr-pitch-wrap {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  grid-template-areas: "h a" "p p";
+  gap: 8px 12px;
+  margin: 0 0 18px;
+}
+.mr-pitch { grid-area: p; }
+.mr-leg {
+  grid-area: h;
+  display: flex;
+  align-items: center;
+  min-width: 0;
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--ink-soft);
+}
+.mr-leg.a { grid-area: a; flex-direction: row-reverse; }
+.mr-leg .n { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.mr-leg b { flex: none; margin: 0 8px; color: var(--bone); font-variant-numeric: tabular-nums; }
+.mr-key {
+  display: inline-block;
+  flex: none;
+  width: 9px;
+  height: 9px;
+  margin-right: 7px;
+  border-radius: 50%;
+  background: var(--o-home);
+  vertical-align: 1px;
+}
+.mr-leg.a .mr-key { margin: 0 0 0 7px; }
+.mr-leg.a .mr-key, .mr-team.a .mr-key { background: var(--o-away); }
+
+/* Planen: liggande, hemmalaget anfaller åt höger. --l är linjen (0 = egna
+   målet, 100 = längst fram), --s sidan (0 = lagets vänsterkant). */
+.mr-pitch {
+  position: relative;
+  aspect-ratio: 105 / 68;
+  overflow: hidden;
+  background: repeating-linear-gradient(90deg, #1b3125 0 9.09%, #1e3529 9.09% 18.18%);
+  border: 1px solid rgba(243, 237, 227, 0.12);
+  border-radius: 14px;
+  box-shadow: inset 0 0 60px rgba(0, 0, 0, 0.35);
+}
+.mr-lines {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  fill: none;
+  stroke: rgba(243, 237, 227, 0.2);
+  stroke-width: 1.2px;
+  vector-effect: non-scaling-stroke;
+}
+.mr-lines * { vector-effect: non-scaling-stroke; }
+.mr-lines.tall { display: none; }
+
+.mr-pl {
+  position: absolute;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 3px;
+  transform: translate(-50%, -14px);
+  cursor: default;
+}
+.mr-pl.h { left: calc(5% + var(--l) * 0.37%); top: calc(9% + var(--s) * 0.82%); }
+.mr-pl.a { left: calc(95% - var(--l) * 0.37%); top: calc(91% - var(--s) * 0.82%); }
+.mr-dot {
+  position: relative;
+  display: grid;
+  place-items: center;
+  width: 28px;
+  height: 28px;
+  font-size: 12px;
+  font-weight: 700;
+  font-variant-numeric: tabular-nums;
+  color: #fff;
+  background: var(--o-home);
+  border: 2px solid rgba(255, 250, 240, 0.9);
+  border-radius: 50%;
+  box-shadow: 0 3px 10px -2px rgba(0, 0, 0, 0.7);
+}
+.mr-pl.a .mr-dot { background: var(--o-away); }
+.mr-nm {
+  max-width: 82px;
+  overflow: hidden;
+  font-size: 11.5px;
+  font-weight: 600;
+  line-height: 1.2;
+  color: #f8f2e8;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  text-shadow: 0 1px 3px rgba(0, 0, 0, 0.95);
+}
+.mr-badges {
+  position: absolute;
+  top: -5px;
+  left: calc(100% - 6px);
+  display: flex;
+  gap: 1px;
+}
+.mr-off { margin-left: 3px; font-size: 10px; font-weight: 700; color: #f6a596; }
+.mr-off::before { content: "▼"; margin-right: 1px; font-size: 7px; vertical-align: 1px; }
+.mr-on { margin-left: 4px; font-size: 11px; font-weight: 700; color: #8fe0b4; }
+.mr-on::before { content: "▲"; margin-right: 2px; font-size: 8px; vertical-align: 1px; }
+
+/* små ikoner: mål, kort och byte */
+.mr-b { display: inline-block; flex: none; }
+.mr-b.goal {
+  width: 13px;
+  height: 13px;
+  background: #fff radial-gradient(circle, #1a1814 0 2.4px, transparent 2.8px);
+  border: 1px solid #1a1814;
+  border-radius: 50%;
+}
+.mr-b.goal.own { background-color: #f06d5e; }
+.mr-b.yc, .mr-b.rc { width: 9px; height: 12px; background: #f2c94c; border-radius: 2px; box-shadow: 0 0 0 1px rgba(0, 0, 0, 0.35); }
+.mr-b.rc { background: #e5484d; }
+.mr-b.sub { display: inline-flex; flex-direction: column; align-items: center; width: 12px; font-size: 8px; line-height: 8px; }
+.mr-b.sub::before { content: "▲"; color: var(--fresh); }
+.mr-b.sub::after { content: "▼"; color: var(--down); }
+
+.mr-teams { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; }
+.mr-team {
+  padding: 16px 18px;
+  font-size: 14px;
+  background: var(--glass);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+}
+.mr-team h4 {
+  display: flex;
+  align-items: center;
+  margin: 0 0 8px;
+  font-size: 15px;
+  font-weight: 650;
+  letter-spacing: 0;
+  text-transform: none;
+  color: var(--bone);
+}
+.mr-team h4 .hint { margin-left: 8px; font-size: 13px; font-weight: 500; }
+.mr-team h5 {
+  margin: 14px 0 6px;
+  font-size: 10.5px;
+  font-weight: 700;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: var(--eyebrow);
+}
+.mr-coach { margin: 0; font-size: 13.5px; }
+.mr-names, .mr-out { margin: 0; padding: 0; list-style: none; }
+.mr-names li, .mr-out li { display: flex; flex-wrap: wrap; align-items: center; gap: 0 4px; padding: 3px 0; line-height: 1.35; }
+.mr-out li .muted { font-size: 12.5px; }
+.mr-nr { flex: none; width: 1.9em; font-size: 12.5px; color: var(--muted); font-variant-numeric: tabular-nums; }
+.mr-names .mr-badges { position: static; display: inline-flex; gap: 2px; margin-left: 4px; }
+
+/* ---------- Matchen ---------- */
+
+.mr-live { display: flex; flex-wrap: wrap; align-items: center; gap: 4px 8px; margin: 0 0 14px; font-size: 14px; }
+.mr-live i { width: 8px; height: 8px; border-radius: 50%; background: var(--down); animation: mr-pulse 1.6s ease-in-out infinite; }
+.mr-live b { font-family: var(--display); font-size: 18px; font-weight: 650; color: var(--bone); }
+@keyframes mr-pulse { 50% { opacity: 0.35; } }
+
+.mr-ev {
+  display: grid;
+  grid-template-columns: 1fr 3.6rem 1fr;
+  align-items: center;
+  padding: 8px 0;
+  border-bottom: 1px solid var(--hair);
+}
+.mr-ev:last-child { border-bottom: 0; }
+.mr-min { font-size: 12.5px; font-weight: 700; text-align: center; color: var(--eyebrow); font-variant-numeric: tabular-nums; }
+.mr-evx { display: flex; align-items: center; gap: 10px; min-width: 0; }
+.mr-ev > .mr-evx:first-child { flex-direction: row-reverse; text-align: right; }
+.mr-evx .sub { display: block; font-size: 12px; }
+.mr-score { margin-left: 6px; font-family: var(--display); font-weight: 650; color: var(--bone); white-space: nowrap; }
+.mr-ev.subst { font-size: 13px; color: var(--ink-soft); }
+.mr-in { color: var(--fg); }
+.mr-ht { grid-template-columns: 1fr; padding: 10px 0; text-align: center; }
+.mr-ht span { font-size: 11px; font-weight: 700; letter-spacing: 0.14em; text-transform: uppercase; color: var(--eyebrow); }
+
+.mr-stat {
+  display: grid;
+  grid-template-columns: 4.5rem 1fr 4.5rem;
+  align-items: center;
+  row-gap: 6px;
+  padding: 8px 0;
+}
+.mr-stat > b { font-size: 15px; font-weight: 650; font-variant-numeric: tabular-nums; }
+.mr-stat > b:last-of-type { text-align: right; }
+.mr-stat > span { font-size: 13px; text-align: center; color: var(--ink-soft); }
+.mr-bar { grid-column: 1 / -1; display: flex; gap: 3px; height: 5px; }
+.mr-bar i { display: block; height: 100%; border-radius: 3px; background: var(--o-home); opacity: 0.4; }
+.mr-bar i + i { background: var(--o-away); }
+.mr-stat.h .mr-bar i:first-child,
+.mr-stat.a .mr-bar i:last-child { opacity: 1; }
+.mr-facts { margin: 4px 0 0; font-size: 13px; color: var(--ink-soft); }
+
+/* ---------- smalare skärmar: planen står upp, hemmalaget nerifrån ---------- */
+
+@media (max-width: 760px) {
+  .mr-pitch {
+    aspect-ratio: 68 / 105;
+    background: repeating-linear-gradient(0deg, #1b3125 0 9.09%, #1e3529 9.09% 18.18%);
+  }
+  .mr-pitch-wrap {
+    grid-template-columns: minmax(0, 420px);
+    grid-template-areas: "a" "p" "h";
+    justify-content: center;
+  }
+  .mr-leg.a { flex-direction: row; }
+  .mr-leg.a .mr-key { margin: 0 7px 0 0; }
+  .mr-lines.wide { display: none; }
+  .mr-lines.tall { display: block; }
+  .mr-pl.h { left: calc(10% + var(--s) * 0.8%); top: calc(93% - var(--l) * 0.37%); }
+  .mr-pl.a { left: calc(90% - var(--s) * 0.8%); top: calc(7% + var(--l) * 0.37%); }
+  .mr-pl { transform: translate(-50%, -13px); }
+  .mr-dot { width: 26px; height: 26px; font-size: 11px; }
+  .mr-nm { max-width: 72px; font-size: 10.5px; }
+}
+
+/* mobilen: rutan glider upp nerifrån och tar nästan hela skärmen */
+@media (max-width: 640px) {
+  dialog.mr-modal {
+    width: 100%;
+    height: calc(100dvh - 24px);
+    margin: auto 0 0;
+    border-bottom: 0;
+    border-radius: 18px 18px 0 0;
+  }
+  .mhead.mr-head { padding: 16px 56px 8px 16px; }
+  .mr-close { top: 10px; right: 10px; }
+  .mr-head .mhead-meta { font-size: 10px; letter-spacing: 0.1em; }
+  .mr-head .mhead-teams { gap: 8px; margin-top: 10px; }
+  .mr-head .mhead-team { font-size: 19px; }
+  .mr-head .mhead-mid { font-size: 26px; }
+  .mr-tabs { padding: 0 6px; }
+  .mr-tabs button { padding: 9px 10px 12px; font-size: 13.5px; }
+  .mr-body { padding: 14px 12px 28px; }
+  .mr-teams { grid-template-columns: 1fr; gap: 10px; }
+  .mr-team { padding: 14px; }
+  .mr-ev { grid-template-columns: 1fr 2.9rem 1fr; font-size: 13.5px; }
+  .mr-evx { gap: 7px; }
+  .mr-stat { grid-template-columns: 3.6rem 1fr 3.6rem; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .mr-live i { animation: none; }
+}
