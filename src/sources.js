@@ -237,7 +237,7 @@ for (const c of COMPETITIONS.filter((x) => x.type === 'league')) {
       const last = d.seasons[Object.keys(d.seasons).sort().pop()] || [];
       return {
         n,
-        detail: `${Object.keys(d.seasons).length} säsonger, ${n} matcher från first round`,
+        detail: `${Object.keys(d.seasons).length} säsonger, ${n} matcher från första omgången`,
         latestData: last.length ? last[last.length - 1].kickoff.slice(0, 10) : null,
       };
     },

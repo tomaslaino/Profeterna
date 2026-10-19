@@ -1496,7 +1496,7 @@
   {
    "id": "injuries",
    "label": "Skador och avstängningar (FPL)",
-   "reason": "FPL ger bara dagens läge – ingen historik att pröva walk-forward på. Bara Premier League.",
+   "reason": "FPL ger bara dagens läge – ingen historik att pröva bakåt i tiden. Bara Premier League.",
    "assessedAt": "2026-10-17"
   },
   {

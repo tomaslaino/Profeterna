@@ -381,7 +381,7 @@ function renderDetail(d) {
   // Dold match: bara rubriken – prognosens rättning och underlaget efter
   // matchen avslöjar resultatet.
   if (hide) {
-    return html + Spoiler.card({ title: 'Resultatet är dolt', text: 'Spoilerskyddet är på.', keys: [m.id], button: 'Visa resultatet' });
+    return html + Spoiler.card({ title: 'Resultatet är dolt', text: 'Du har valt att dölja resultat.', keys: [m.id], button: 'Visa resultatet' });
   }
 
   // Spelad match med prognos före avspark: den återskapade prognosen och dess
@@ -464,7 +464,7 @@ function journalLine(d) {
   const h = state.meta && state.meta.journalHorizonDays;
   if (!h) return '';
   const days = (new Date(d.match.kickoff).getTime() - Date.now()) / 86400000;
-  return days > h ? ` Loggas i journalen ${h} dagar före avspark.` : ' Loggas i journalen vid nästa bygge.';
+  return days > h ? ` Loggas i journalen ${h} dagar före avspark.` : ' Loggas i journalen vid nästa uppdatering.';
 }
 
 // Spelad match med journalpost: den äkta prognosen före avspark (den sista
@@ -566,7 +566,7 @@ function compareCard(d) {
   row('<strong>Modellen</strong>', null, p.p, 'model');
   const mk = b.market;
   row(BASE.market, mk ? `(c) ${esc(mk.source)}, ${esc(mk.kind)}${mk.fetchedAt ? `, hämtat ${when(mk.fetchedAt)}` : ''}` : esc(marketMissing(d)), mk && mk.p);
-  if (b.closing) row(BASE.closing, 'Betfair Exchange, tuffaste referensen', b.closing.p);
+  if (b.closing) row(BASE.closing, 'Betfair Exchange, den svåraste att slå', b.closing.p);
   // De enkla baslinjerna är modellens egna måttstockar – syns med detaljerna.
   row(BASE.season, b.season.p ? `(b) Poisson på årets matcher (${b.season.matches[0]} resp. ${b.season.matches[1]})` : esc(b.season.reason), b.season.p, 'src-only');
   row(BASE.naive, b.naive.p ? `(a) ${esc(b.naive.scope)}, ${esc(b.naive.seasons[0])}–${esc(b.naive.seasons[1])}` : esc(b.naive.reason), b.naive.p, 'src-only');
@@ -618,8 +618,8 @@ function oddsCard(o, m) {
     if (o.fdOpen.betfair) rows.push(['Betfair Exchange, öppning', o.fdOpen.betfair, null]);
   }
   if (o.fdClose) {
-    if (o.fdClose.avg) rows.push(['Snitt, stängning', o.fdClose.avg, o.fdClose.total25 && { line: 2.5, ...o.fdClose.total25 }]);
-    if (o.fdClose.betfair) rows.push(['Betfair Exchange, stängning', o.fdClose.betfair, null]);
+    if (o.fdClose.avg) rows.push(['Snitt, vid avspark', o.fdClose.avg, o.fdClose.total25 && { line: 2.5, ...o.fdClose.total25 }]);
+    if (o.fdClose.betfair) rows.push(['Betfair Exchange, vid avspark', o.fdClose.betfair, null]);
   }
   let body;
   if (!rows.length) {
@@ -641,7 +641,7 @@ function formCard(d) {
     const f = p.form || [];
     const chips = f.length
       ? f.map((x) => (window.Spoiler && Spoiler.hidesDay(x.date)
-        ? '<span class="sp-form" title="Dold av spoilerskyddet">?</span>'
+        ? '<span class="sp-form" title="Dold – du har valt att dölja resultat">?</span>'
         : `<span class="${x.result || ''}" title="${esc(`${x.date} ${x.comp} ${x.home ? 'hemma' : 'borta'}${x.opponent ? ` mot ${x.opponent}` : ''}: ${x.gf}–${x.ga}${x.decided ? ` (${x.decided})` : ''}`)}">${x.result || '?'}</span>`)).join('')
       : '<span class="muted" style="width:auto;background:none;font-weight:400">inga tidigare matcher</span>';
     return `<div class="form-row"><span class="t">${esc(name)}</span><span class="form">${chips}</span></div>`;
@@ -853,11 +853,11 @@ function analysisCard(d) {
   const r = analyses.get(d.match.id);
   if (r && r.ok) {
     const other = r.builtAt && d.builtAt && r.builtAt !== d.builtAt
-      ? ' Sidan visar ett annat bygge – ladda om för samma underlag.' : '';
+      ? ' Sidan och texten bygger på olika uppdateringar – ladda om sidan.' : '';
     return `<div class="card analysis" id="analysis-card"><h4>Analys <span class="hint">genererad text</span></h4>` +
       `<p class="analysis-text">${esc(r.text).replace(/(\d) %/g, '$1&nbsp;%')}</p>` +
       (r.news ? newsSection(r.news) : '') +
-      `<p class="src-line">Skriven av ${esc(r.model)} ${when(r.generatedAt)} ur underlaget från bygget ${when(r.builtAt)}. ` +
+      `<p class="src-line">Skriven av ${esc(r.model)} ${when(r.generatedAt)} ur underlaget från uppdateringen ${when(r.builtAt)}. ` +
       `Alla tal i texten finns i underlaget.${other}</p></div>`;
   }
   // retry: false = svaret klarade inte kontrollen; samma underlag ger samma svar.
@@ -865,7 +865,7 @@ function analysisCard(d) {
   return `<div class="card analysis" id="analysis-card"><h4>Analys <span class="hint">${esc(a.model)}</span></h4>` +
     (r ? `<p class="unknown">Ingen analys: ${esc(r.error || 'okänt fel')}${final ? ' En ny text kan skrivas när underlaget ändrats.' : ''}</p>` : '') +
     (final ? '' : `<button type="button" class="analyze" data-id="${esc(d.match.id)}" title="${a.news
-      ? 'En språkmodell skriver ur underlaget på sidan och nyheter som hämtas online – en text med ett tal som inte finns där visas inte'
+      ? 'En språkmodell skriver ur underlaget på sidan och nyheter som hämtas från nätet – en text med ett tal som inte finns där visas inte'
       : 'En språkmodell skriver bara ur underlaget på sidan – en text med ett tal som inte finns där visas inte'}">${r ? 'Försök igen' : 'Analysera'}</button>`) + '</div>';
 }
 
@@ -973,7 +973,7 @@ function sgn(x, d = 3) {
 function renderEvaluation(d) {
   const min = d.minMatches;
   let html = '';
-  if (d.error) html += `<p class="err">Utvärderingen fallerade i senaste bygget: ${esc(d.error)}</p>`;
+  if (d.error) html += `<p class="err">Utvärderingen misslyckades vid senaste uppdateringen: ${esc(d.error)}</p>`;
   const j = d.journal;
   if (!j) return html + '<p class="unknown">okänt – journalen kunde inte läsas.</p>';
   if (!j.rows) {
@@ -1011,7 +1011,7 @@ function renderEvaluation(d) {
   }
   more += '<h3>Journalen</h3>' + journalTable(j);
   more += '<h3>Så räknas det</h3>' + defs([
-    ['Journalen', 'Varje prognos loggas före avspark och skrivs aldrig om. Ny rad när prognosen ändrats på den precision sidan visar, eller när marknadens odds ändrats.'],
+    ['Journalen', 'Varje prognos loggas före avspark och skrivs aldrig om. Ny rad när prognosen ändrats så mycket att det syns på sidan, eller när marknadens odds ändrats.'],
     ['Facit', 'Den sista raden före avspark räknas, mot ställningen efter 90 minuter.'],
     ['Log-poäng, Brier', 'Hur väl sannolikheterna träffade. Lägre är bättre.'],
     ['Skillnad', 'Modell − baslinje i log-poäng med 95 % bootstrap-intervall; negativ = modellen bättre. Varje rad jämför på de matcher där båda fanns.'],
@@ -1123,7 +1123,7 @@ function valueTable(d, minBets) {
 function recentTable(all) {
   const list = all.filter((r) => !isHidden(r));
   const n = all.length - list.length;
-  const note = n ? `<p class="legend">${Spoiler.chip(`${n} ${n === 1 ? 'match' : 'matcher'}`)} visas inte – spoilerskyddet är på.</p>` : '';
+  const note = n ? `<p class="legend">${Spoiler.chip(`${n} ${n === 1 ? 'match' : 'matcher'}`)} visas inte – du har valt att dölja resultat.</p>` : '';
   if (!list.length) return note;
   const rows = list.map((r) => {
     const w = pct3(r.p).map((v, k) => (k === r.o ? `<b>${v}</b>` : String(v))).join(' · ');
@@ -1202,7 +1202,7 @@ function renderSources(d) {
     '</tbody></table></div>';
 
   $('#unmapped').innerHTML = d.unmapped.length
-    ? '<strong title="Används inte förrän de lagts in i aliastabellen">Omappade lagnamn</strong>: ' +
+    ? '<strong title="Används inte förrän de lagts in i aliastabellen">Okända lagnamn</strong>: ' +
       d.unmapped.map((u) => `${esc(u.name)} <span class="muted">(${esc(u.source)}, ${esc(u.comp)})</span>`).join(', ')
     : '';
 }
@@ -1221,12 +1221,12 @@ function topline(d) {
   const summary = $('#sources-summary');
   summary.hidden = !late;
   summary.innerHTML = late
-    ? `<span class="err" style="display:inline">Senaste bygget ${when(meta.generatedAt)} – ovanligt länge sedan (ska ske var ${meta.updateEveryMinutes}:e minut). Den schemalagda hämtningen kan ha stannat.</span>`
+    ? `<span class="err" style="display:inline">Senaste uppdateringen ${when(meta.generatedAt)} – ovanligt länge sedan (sker normalt var ${meta.updateEveryMinutes}:e minut). Den schemalagda hämtningen kan ha stannat.</span>`
     : '';
   // Står i sidfoten, inte mitt på sidan.
   const parts = [
     meta
-      ? `<span title="Säsong ${esc(meta.season)} · byggs var ${meta.updateEveryMinutes}:e minut">Uppdaterad ${when(meta.generatedAt)}</span>`
+      ? `<span title="Säsong ${esc(meta.season)} · uppdateras var ${meta.updateEveryMinutes}:e minut">Uppdaterad ${when(meta.generatedAt)}</span>`
       : 'Kunde inte läsa sajtens data.',
     issues ? `<a href="#kallor">${esc(issues)}</a>` : null,
     late ? '<span class="err" style="display:inline">datan är gammal</span>' : null,
@@ -1263,7 +1263,7 @@ function renderModel(d) {
   const fNames = { table: 'tabelläget' };
   let html = `<p class="intro">Regelversion <strong>${esc(d.rulesVersion)}</strong> · mål efter 90 minuter` +
     `${factors.length ? ` och ${factors.map((f) => fNames[f.id] || f.id).join(', ')}` : ''}</p>`;
-  if (!x) return html + `<p class="unknown">okänt – ${d.error ? `prognosmotorn fallerade i senaste bygget: ${esc(d.error)}` : 'inget underlag i källcachen att skatta modellen på'}.</p>`;
+  if (!x) return html + `<p class="unknown">okänt – ${d.error ? `prognosmotorn misslyckades vid senaste uppdateringen: ${esc(d.error)}` : 'inget underlag i källcachen att skatta modellen på'}.</p>`;
 
   const pctSigned = (v) => `${v >= 1 ? '+' : '−'}${Math.abs(Math.round((v - 1) * 100))} %`;
   const table = factors.find((f) => f.id === 'table');
@@ -1294,9 +1294,9 @@ function renderModel(d) {
         '(Bayesiansk bootstrap) – osäkerheten i lagens styrka, inte modellfel. Räknas för kommande matcher.'],
       ['Hemmafördel och ρ', 'Båda skattas. Negativt ρ = fler 0–0 och 1–1 än oberoende mål ger.'],
       ['Under National League', 'Ingen lagdata. Lagen skattas som ett gemensamt nivåsnitt och märks i matchvyn.'],
-      table && ['Tabelläget', 'Poäng per match i årets liga, hemmalaget mot bortalaget, räknat ur resultaten (utan poängavdrag). Vikten är skattad på backtestets prognoser. ' +
+      table && ['Tabelläget', 'Poäng per match i årets liga, hemmalaget mot bortalaget, räknat ur resultaten (utan poängavdrag). Vikten är skattad på efterhandstestets prognoser. ' +
         `Bara ligamatcher där båda lagen spelat minst ${table.minMatches} ligamatcher i år. Infört i regelversion ${esc(table.since)}, efter kandidatjakten.`],
-      ['Nya faktorer', 'En faktor får påverka prognosen först när den bevisligen förbättrat den walk-forward – fram till dess visas den som underlag i matchvyn.'],
+      ['Nya faktorer', 'En faktor får påverka prognosen först när den bevisligen förbättrat den i efterhandstestet – fram till dess visas den som underlag i matchvyn.'],
       ['Cuper', 'Prognosen gäller 90 minuter. Chansen att gå vidare räknas ur samma modell: förlängning med samma målfrekvens, straffar 50/50. ' +
         'FA-cupen: förlängning och straffar. EFL-cupen: straffar direkt, utom i semifinalerna (två möten) och finalen.'],
     ]);
@@ -1313,7 +1313,7 @@ function renderModel(d) {
     `<dt>(a) Naiv</dt><dd>divisionens 1 · X · 2 de senaste ${x.naiveSeasons} säsongerna · cuper: alla ligamatcher på nivå 1–4</dd>` +
     `<dt>(b) Säsongens mål</dt><dd>Poisson på enbart årets matcher · okänd tills båda lagen spelat ${x.seasonMinMatches} matcher</dd>` +
     '<dt>(c) Marknaden</dt><dd>odds utan marginal (Shins metod) · ligorna: snittet hos football-data.co.uk, öppningsodds fre/tis, ' +
-    'för spelade matcher också Betfair Exchange vid stängning · cuperna: DraftKings via ESPN</dd>' +
+    'för spelade matcher också Betfair Exchange vid avspark · cuperna: DraftKings via ESPN</dd>' +
     '</dl></div>';
 
   html += backtestSection(d.backtest, d.rulesVersion);
@@ -1333,12 +1333,12 @@ function diffCell(c, strong = true) {
 function backtestSection(bt, version) {
   const b = bt && bt.current;
   if (!b) {
-    const other = bt && bt.versions && bt.versions.length ? ` Senaste backtestet gäller regelversion ${esc(bt.versions[bt.versions.length - 1].rulesVersion)}.` : '';
-    return '<h3>Backtest <span class="hint">walk-forward</span></h3>' +
-      `<p class="unknown">okänt – backtestet är inte kört för regelversion ${esc(version)} än (npm run backtest).${other}</p>`;
+    const other = bt && bt.versions && bt.versions.length ? ` Senaste efterhandstestet gäller regelversion ${esc(bt.versions[bt.versions.length - 1].rulesVersion)}.` : '';
+    return '<h3>Efterhandstest <span class="hint">steg för steg</span></h3>' +
+      `<p class="unknown">okänt – efterhandstestet är inte kört för regelversion ${esc(version)} än (npm run backtest).${other}</p>`;
   }
   const lg = b.leagues;
-  let html = `<h3>Backtest <span class="hint">walk-forward · ${esc(b.first)}–${esc(b.last)}</span></h3>` +
+  let html = `<h3>Efterhandstest <span class="hint">steg för steg · ${esc(b.first)}–${esc(b.last)}</span></h3>` +
     '<div class="table-wrap"><table><thead><tr><th>Ligorna, mot</th><th class="num">Matcher</th><th class="num">Modell</th><th class="num">Baslinje</th>' +
     '<th class="num" title="Modell − baslinje i log-poäng, 95 % bootstrap-intervall. Negativ = modellen bättre.">Skillnad</th><th class="num">Brier</th></tr></thead><tbody>' +
     lg.vs.filter((r) => r.n).map((r) => `<tr><td>${esc(r.label)}</td><td class="num">${n0(r.n)}</td><td class="num">${f3(r.logLoss[0])}</td><td class="num">${f3(r.logLoss[1])}</td>` +
@@ -1374,13 +1374,13 @@ function backtestSection(bt, version) {
   }
   html += `<p class="legend">football-data.co.uk och ESPN · körd ${when(b.ranAt)} · regelversion ${esc(b.rulesVersion)} · ` +
     `${n0(b.modelKnown)} av ${n0(b.matches)} matcher med modellprognos</p>` +
-    method('Så gjordes backtestet', [
-      ['Walk-forward', `Varje match ${esc(b.first)}–${esc(b.last)} fick en prognos skattad bara på matcherna före matchdagen, med samma kod och regler som i dag.`],
+    method('Så gjordes efterhandstestet', [
+      ['Steg för steg', `Varje match ${esc(b.first)}–${esc(b.last)} fick en prognos skattad bara på matcherna före matchdagen, med samma kod och regler som i dag.`],
       ['Skillnad', 'Modell − baslinje i log-poäng (lägre är bättre); negativ = modellen bättre, med 95 % bootstrap-intervall där hela matchdagar dras om. ' +
         'Varje rad jämför på de matcher där båda finns.'],
-      b.factors && ['Tabelläget', 'Vikten skattas säsong för säsong enbart på tidigare säsonger (den första säsongen utan tabelläge), inte med regelkonfigens värde.'],
+      b.factors && ['Tabelläget', 'Vikten skattas säsong för säsong enbart på tidigare säsonger (den första säsongen utan tabelläge), inte med värdet i regelfilen.'],
       ['Täckning', `${n0(b.modelKnown)} av ${n0(b.matches)} matcher fick en modellprognos; övriga hade för lite underlag för ett lag.`],
-      ['Körning', 'För hand när regelversionen ändras, inte i varje bygge.'],
+      ['Körning', 'För hand när regelversionen ändras, inte vid varje uppdatering.'],
       b.notes.length && ['Begränsningar', `<ul class="bullets">${b.notes.map((n) => `<li>${esc(n)}</li>`).join('')}</ul>`],
     ]);
   return html;
@@ -1474,11 +1474,11 @@ function candidatesSection(L, promoted = new Map()) {
       L.untestable.map((u) => `<li><strong>${esc(u.label)}</strong><span class="sub">${esc(u.reason)}</span></li>`).join('') + '</ul></div>';
   }
   html += method('Så prövas en kandidat', [
-    ['Kravet', `En faktor får styra prognosen först när den bevisligen förbättrat den walk-forward. Kravet skrevs ${dateOnly(crit.registered)}, före första körningen:` +
+    ['Kravet', `En faktor får styra prognosen först när den bevisligen förbättrat den i efterhandstest. Kravet skrevs ${dateOnly(crit.registered)}, före första körningen:` +
       `<ul class="bullets">${crit.text.map((t) => `<li>${esc(t)}</li>`).join('')}</ul>`],
     ['Skillnad', 'Kandidat − grundmodell i log-poäng på samma matcher, med intervallet ovan. Negativ = kandidaten bättre.'],
     ['Beslut', 'En godkänd kandidat blir en ny regelversion först efter beslut.'],
-    ['Loggen', 'Allt som prövats loggas med utfall och datum, även det som inte fungerade, så att samma idé inte prövas igen utan ny evidens.'],
+    ['Loggen', 'Allt som prövats loggas med utfall och datum, även det som inte fungerade, så att samma idé inte prövas igen utan nya belägg.'],
   ]);
   return html;
 }

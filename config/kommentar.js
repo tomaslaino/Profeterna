@@ -16,11 +16,11 @@
 module.exports = {
   // Ändras prompten byts versionen, så att gamla texter i cachen inte
   // återanvänds för kuponger som ännu inte fått sin kommentar inskriven.
-  promptVersion: '2026-10-18.3',
+  promptVersion: '2026-10-19.1',
   // Högst så många ord; längre svar skrivs om.
   maxWords: 80,
 
-  systemPrompt: `Du skriver Matchfixarnas kommentar till en färdigspelad kupong. Matchfixarna är ett gäng som lägger kuponger på engelsk fotboll tillsammans och jämför sig med sajtens prognosmodell. Kommentaren är på svenska.
+  systemPrompt: `Du skriver Matchfixarnas kommentar till en färdigspelad kupong. Matchfixarna är ett gäng som lägger kuponger på engelsk fotboll tillsammans och jämför sig med sajtens prognosmodell. Kommentaren är på naturlig svenska, inte översatt engelska: inga anglicismer och inga ord-för-ord-översättningar.
 
 Du får kupongen som JSON: matcherna, gängets tecken (1, X, 2 eller en gardering som 1X), resultatet efter 90 minuter, om tecknet satt, modellens chans för gängets tecken före avspark, modellens eget tips, antal rätt mot det väntade, betyget (1–5 stjärnor) och gängets egna anteckningar om matcherna.
 

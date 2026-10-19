@@ -41,7 +41,7 @@ const INACTIVE = new Set(['STATUS_CANCELED', 'STATUS_ABANDONED']);
 const ZONES = [
   { key: 'cl', label: 'Champions League', short: 'CL', test: (n) => /champions league/i.test(n) },
   { key: 'promo', label: 'Upp direkt', short: 'Upp', test: (n) => /promotion/i.test(n) && !/playoff/i.test(n) },
-  { key: 'playoff', label: 'Playoff', short: 'Playoff', test: (n) => /playoff/i.test(n) },
+  { key: 'playoff', label: 'Kval', short: 'Kval', test: (n) => /playoff/i.test(n) },
   { key: 'down', label: 'Åker ur', short: 'Ur', test: (n) => /relegation/i.test(n) },
 ];
 
@@ -61,7 +61,7 @@ function seasonForecast({ ctx, specs, predictions, sink, fitAt, now = new Date()
       divisions.push(simulateDivision(c, i, { D, specById, predictions, sink, fitAt, today, now, strength }));
     } catch (err) {
       console.error(`[season] ${c.id}: ${err.message || err}`);
-      divisions.push({ id: c.id, name: c.name, unknown: `simuleringen fallerade: ${err.message || err}` });
+      divisions.push({ id: c.id, name: c.name, unknown: `simuleringen misslyckades: ${err.message || err}` });
     }
   });
   return {

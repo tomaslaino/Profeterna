@@ -347,7 +347,7 @@ function bigNumber(g) {
   // Spoilerskyddet: rätt bland matcherna som syns, + ? för de dolda.
   return `<span class="kp-big"><b>${g.hidden && !g.ok ? '?' : g.ok}</b>` +
     (g.liveOk ? `<em title="Rätt om ställningen håller">+${g.liveOk}</em>` : '') +
-    (g.hidden && g.ok ? '<em class="sp-q" title="Dolt av spoilerskyddet">+?</em>' : '') +
+    (g.hidden && g.ok ? '<em class="sp-q" title="Dolt – du har valt att dölja resultat">+?</em>' : '') +
     `<span>/ ${g.n} rätt</span></span>`;
 }
 
@@ -451,7 +451,7 @@ function renderCouponShow(id) {
     const ids = g.rows.filter((r) => r.state === 'hidden').map((r) => r.id);
     html += Spoiler.card({
       title: `${g.hidden} ${g.hidden === 1 ? 'match är dold' : 'matcher är dolda'}`,
-      text: 'Spoilerskyddet är på.',
+      text: 'Du har valt att dölja resultat.',
       keys: ids,
       button: 'Visa resultaten',
     });
@@ -563,14 +563,14 @@ function couponRows(g) {
     head = '';
     for (const r of rows) {
       const cls = rowClass(r);
-      const when = r.state === 'live' ? `<span class="kp-clock">${esc(r.clock || 'live')}</span>`
+      const when = r.state === 'live' ? `<span class="kp-clock">${esc(r.clock || 'pågår')}</span>`
         : r.m ? esc(fTime.format(new Date(r.m.kickoff))) : '';
       const comp = r.m ? compOf(r.m.comp) : null;
       // På mobilen saknas tidskolumnen: tiden (eller matchminuten) står då under resultatet.
       const score = r.state === 'off' ? `<span class="sub">${esc(r.off)}</span>`
         : r.state === 'hidden' ? `${Spoiler.chip()}<span class="sub kp-m">${r.m ? esc(fTime.format(new Date(r.m.kickoff))) : ''}</span>`
         : r.score ? `<span class="score">${esc(scoreText(r))}</span>${r.extra ? `<span class="sub">${esc(r.extra)}</span>` : ''}` +
-          (r.state === 'live' ? `<span class="sub kp-m">${esc(r.clock || 'live')}</span>` : '')
+          (r.state === 'live' ? `<span class="sub kp-m">${esc(r.clock || 'pågår')}</span>` : '')
           : `<span class="sub kp-d">–</span><span class="sub kp-m">${r.m ? esc(fTime.format(new Date(r.m.kickoff))) : ''}</span>`;
       const tag = r.m ? 'a' : 'div';
       html += `<${tag} class="kp-row s-${cls.replace(' ', ' s-')}"${r.m ? ` href="#match/${esc(r.id)}"` : ''}>` +
@@ -593,8 +593,8 @@ function couponRows(g) {
 function liveLine(g) {
   if (!KP.liveAt && !g.live) return '<p class="legend kp-src">Tecknet gäller ställningen efter 90 minuter.</p>';
   return '<p class="legend kp-src">Tecknet gäller ställningen efter 90 minuter · ' +
-    (KP.liveError ? '<span class="note">ESPN svarar inte – liveställningen kan vara gammal</span>'
-      : `live från ESPN, ${esc(fTime.format(new Date(KP.liveAt)))}`) + '</p>';
+    (KP.liveError ? '<span class="note">ESPN svarar inte – ställningen kan vara gammal</span>'
+      : `aktuell ställning från ESPN, ${esc(fTime.format(new Date(KP.liveAt)))}`) + '</p>';
 }
 
 // Fler kuponger som inte är färdigspelade, t.ex. nästa omgångs medan den
@@ -963,9 +963,9 @@ async function sendDirect(ctx) {
     kpStore(KP_DRAFT, null);
     KP.view = { mode: 'saved', id: coupon.id };
     $('#coupon').innerHTML = savedHead('Sparad', ctx) +
-      '<div class="card kp-saved"><p>Kupongen är sparad. Den syns för alla när sajten byggts om, om några minuter.</p>' +
+      '<div class="card kp-saved"><p>Kupongen är sparad. Den syns för alla när sajten har uppdaterats, om några minuter.</p>' +
       `<div class="kp-actions"><a class="kp-btn primary" href="#kupong/${esc(coupon.id)}">Visa kupongen</a>` +
-      (body.commit ? `<a class="kp-btn" href="${esc(body.commit)}" target="_blank" rel="noopener">Commit på GitHub</a>` : '') + '</div></div>';
+      (body.commit ? `<a class="kp-btn" href="${esc(body.commit)}" target="_blank" rel="noopener">Ändringen på GitHub</a>` : '') + '</div></div>';
     return;
   }
   if (res && res.status === 403) {
@@ -1021,7 +1021,7 @@ function renderViaGitHub(ctx) {
     '<div class="card kp-saved">' +
     (exists
       ? '<p>Öppna filen på GitHub, markera allt, klistra in och tryck <b>Commit changes</b>. Innehållet kopieras när du trycker på knappen.</p>'
-      : '<p>Tryck <b>Commit changes</b> på GitHub. Kupongen syns för alla när sajten byggts om, om några minuter.</p>') +
+      : '<p>Tryck <b>Commit changes</b> på GitHub. Kupongen syns för alla när sajten har uppdaterats, om några minuter.</p>') +
     `<div class="kp-actions"><a class="kp-btn primary" id="kp-gh" href="${esc(url)}" target="_blank" rel="noopener">Spara på GitHub</a>` +
     '<button type="button" class="kp-btn" id="kp-copy">Kopiera</button>' +
     `<a class="kp-btn" href="#kupong/${esc(ctx.id)}">Visa kupongen</a></div>` +
@@ -1065,7 +1065,7 @@ function renderRemove(id) {
   }
   const gh = esc(removeOnGitHub(id));
   const what = `<p>Hela kupongen${c.name ? ` ${esc(c.name)}` : ''} tas bort för alla, ${g.n === 1 ? 'med sin match' : `med alla ${g.n} matcher`}` +
-    `${g.started ? ' – också de som redan har spelats' : ''}. Den försvinner när sajten byggts om, om några minuter.</p>`;
+    `${g.started ? ' – också de som redan har spelats' : ''}. Den försvinner när sajten har uppdaterats, om några minuter.</p>`;
   if (!KP.data.save) {
     el.innerHTML = savedHead('Ta bort kupongen', ctx) + `<div class="card kp-saved">${what}` +
       '<p>Tryck <b>Commit changes</b> på GitHub.</p>' +
@@ -1112,9 +1112,9 @@ async function sendRemove(ctx) {
     if (d && d.edit === c.id) kpStore(KP_DRAFT, null);
     KP.view = { mode: 'removed', id: c.id };
     $('#coupon').innerHTML = savedHead('Borttagen', ctx) +
-      '<div class="card kp-saved"><p>Kupongen är borttagen. Den försvinner för alla när sajten byggts om, om några minuter.</p>' +
+      '<div class="card kp-saved"><p>Kupongen är borttagen. Den försvinner för alla när sajten har uppdaterats, om några minuter.</p>' +
       '<div class="kp-actions"><a class="kp-btn primary" href="#kupong">Till kupongen</a>' +
-      (body.commit ? `<a class="kp-btn" href="${esc(body.commit)}" target="_blank" rel="noopener">Commit på GitHub</a>` : '') + '</div></div>';
+      (body.commit ? `<a class="kp-btn" href="${esc(body.commit)}" target="_blank" rel="noopener">Ändringen på GitHub</a>` : '') + '</div></div>';
     return;
   }
   if (res && res.status === 403) {

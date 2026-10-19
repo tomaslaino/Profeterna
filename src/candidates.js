@@ -139,7 +139,7 @@ const CANDIDATES = [
 // Det som inte går att pröva än – och varför. Loggas också.
 const UNTESTABLE = [
   { id: 'xg_fdcouk', label: 'xG från football-data.co.uk', reason: 'Finns bara från 2026/27 (inga tidigare säsonger att pröva på), och leverantören är odokumenterad. Prövas när säsongen gett tillräckligt med matcher.' },
-  { id: 'injuries', label: 'Skador och avstängningar (FPL)', reason: 'FPL ger bara dagens läge – ingen historik att pröva walk-forward på. Bara Premier League.' },
+  { id: 'injuries', label: 'Skador och avstängningar (FPL)', reason: 'FPL ger bara dagens läge – ingen historik att pröva bakåt i tiden. Bara Premier League.' },
   { id: 'lineups', label: 'Startelvor', reason: 'Ingen fri källa med historik; publiceras först strax före avspark.' },
   { id: 'table_deductions', label: 'Tabelläge med poängavdrag (ESPN)', reason: 'ESPN:s tabell är en ögonblicksbild utan historik. Prövas i stället som tabell räknad ur resultaten.' },
   { id: 'rotation_lc', label: 'Rotation i EFL-cupen', reason: 'EFL-cupens tidigare säsonger hämtas inte – rotationen prövas på FA-cupen 2021/22–.' },

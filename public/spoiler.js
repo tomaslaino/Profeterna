@@ -115,7 +115,7 @@
   // ---------- byggstenar för sidorna ----------
 
   function chip(text = 'dolt') {
-    return `<span class="sp-chip" title="Dolt av spoilerskyddet">${SHIELD}${esc(text)}</span>`;
+    return `<span class="sp-chip" title="Dolt – du har valt att dölja resultat">${SHIELD}${esc(text)}</span>`;
   }
   // Kort med knappen som visar det dolda: keys är matchid eller egna nycklar.
   function card({ title, text, keys, button = 'Visa ändå' }) {
@@ -216,7 +216,7 @@
     const label = S.mode === 'off' ? 'Av' : S.mode === 'auto' ? '24 h' : `fr. ${shortDay(from())}`;
     btn.classList.toggle('is-on', S.mode !== 'off');
     btn.querySelector('.sp-state').textContent = label;
-    btn.title = `Spoilerskydd: ${S.mode === 'off' ? 'av' : S.mode === 'auto' ? 'döljer det senaste dygnet' : `döljer från ${dayLabel(from()).toLowerCase()}`}`;
+    btn.title = `Dölj resultat: ${S.mode === 'off' ? 'av' : S.mode === 'auto' ? 'det senaste dygnet' : `från ${dayLabel(from()).toLowerCase()}`}`;
     btn.setAttribute('aria-label', btn.title);
     if (panel && !panel.hidden) paint();
   }
@@ -228,7 +228,7 @@
     const days = [];
     for (let i = 0; i < PICK_DAYS; i++) days.push(dayOf(now - i * DAY));
     if (S.from && !days.includes(S.from)) days.push(S.from);
-    panel.innerHTML = '<div class="sp-head"><h3 id="sp-title">Spoilerskydd</h3>' +
+    panel.innerHTML = '<div class="sp-head"><h3 id="sp-title">Dölj resultat</h3>' +
       '<button type="button" class="sp-x" aria-label="Stäng">×</button></div>' +
       '<div class="sp-opts" role="radiogroup" aria-labelledby="sp-title">' +
       opt('off', 'Visa allt') + opt('auto', 'Senaste dygnet') + opt('custom', 'Från en viss dag') + '</div>' +

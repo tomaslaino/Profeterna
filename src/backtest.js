@@ -354,7 +354,7 @@ const BASELINES = [
   { key: 'ss', label: '(b) Poisson på säsongens mål' },
   { key: 'nv', label: '(a) Naiv' },
   { key: 'mk', label: '(c) Marknaden, öppning' },
-  { key: 'cl', label: 'Pinnacle, stängning' },
+  { key: 'cl', label: 'Pinnacle, vid avspark' },
 ];
 
 function vsBaselines(rows) {
@@ -411,7 +411,7 @@ function summarize(variantResult, { ms = null } = {}) {
       `Från ${seasonLabel(codes[0])}: ligorna finns från ${FIRST_YEAR}/${String((FIRST_YEAR + 1) % 100).padStart(2, '0')} och modellen behöver ${BASE_RULES.model.historySeasons} säsonger bakåt.`,
       'National League från 2005/06 – uppflyttade lag har kortare historik de första åren.',
       `Cupmatcher bara från ${HISTORY.espnFaCup.first}/${String((HISTORY.espnFaCup.first + 1) % 100).padStart(2, '0')} (FA-cupen, ESPN); EFL-cupens tidigare säsonger hämtas inte.`,
-      '(c) är marknadssnittet vid öppning från 2005/06 (Betbrain t.o.m. 2018/19); Pinnacle vid stängning finns från 2012/13 och saknas 2026/27.',
+      '(c) är marknadssnittet vid öppning från 2005/06 (Betbrain t.o.m. 2018/19); Pinnacle vid avspark finns från 2012/13 och saknas 2026/27.',
     ],
   };
 }

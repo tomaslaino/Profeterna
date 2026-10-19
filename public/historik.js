@@ -210,7 +210,7 @@
     return `<article class="card hk-card" id="${esc(c.id)}">` +
       `<div class="hk-top"><div class="hk-title"><p class="kp-eyebrow">${esc(c.name ? dateRange(c.date, c.till) : c.game || 'Kupong')}</p>` +
       `<h4>${esc(c.name || dateRange(c.date, c.till))}</h4></div></div>` +
-      Spoiler.card({ title: 'Resultatet är dolt', text: 'Spoilerskyddet är på.', keys, button: 'Visa resultatet' }) +
+      Spoiler.card({ title: 'Resultatet är dolt', text: 'Du har valt att dölja resultat.', keys, button: 'Visa resultatet' }) +
       '</article>';
   }
 

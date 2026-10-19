@@ -41,7 +41,7 @@ const LATEST_N = 30; // senaste journalraderna i fliken
 
 const BASELINES = [
   { key: 'market', label: '(c) Marknaden' },
-  { key: 'closing', label: 'Betfair Exchange, stängning' },
+  { key: 'closing', label: 'Betfair Exchange, vid avspark' },
   { key: 'season', label: '(b) Säsongens mål' },
   { key: 'naive', label: '(a) Naiv' },
 ];

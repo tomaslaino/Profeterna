@@ -306,8 +306,8 @@ function seasonMethod(S, F) {
   const items = [
     ['Simuleringen', `Varje återstående ligamatch spelas med modellens förväntade mål för matchen – samma som ger prognoserna under Matcher – och tabellen räknas ut. Det görs ${int(S.sims)} gånger; andelen gånger ett lag hamnar på en plats är chansen.`],
     ['Osäkerheten', `Simuleringarna fördelas på modellens ${S.samples} omskattningar med slumpvikter (samma som ger spannet under varje prognos). Ett lag som är bättre än skattningen är det då i alla sina matcher i samma simulering – som i verkligheten.${F.uncertainty ? '' : ' Den här gången saknades omskattningar för några matcher; där används bara skattningen.'}`],
-    ['Förenklingar', 'Lagens styrka och tabelläget hålls fasta resten av säsongen – skador, övergångar och tränarbyten räknas inte in. Lika poäng skiljs på målskillnad, sedan gjorda mål, sedan lott. Playoff spelas inte: chansen gäller en playoffplats. Europaplatser via cuperna räknas inte.'],
-    ['Zonerna', 'Vilka placeringar som ger uppflyttning, playoff, Europa och nedflyttning läses ur ESPN:s tabell.'],
+    ['Förenklingar', 'Lagens styrka och tabelläget hålls fasta resten av säsongen – skador, övergångar och tränarbyten räknas inte in. Lika poäng skiljs på målskillnad, sedan gjorda mål, sedan lott. Kvalet spelas inte: chansen gäller en kvalplats. Europaplatser via cuperna räknas inte.'],
+    ['Zonerna', 'Vilka placeringar som ger uppflyttning, kval, Europaspel och nedflyttning läses ur ESPN:s tabell.'],
     ['Styrka', 'Modellens förväntade målskillnad per match mot ett genomsnittligt Premier League-lag på neutral plan. Alla fyra divisioner på samma skala.'],
     ['Programmet framåt', 'Förväntade poäng per match räknas med lagets egen styrka, så starka lag hamnar högt. Färgerna visar hur svår varje match är för just det laget.'],
   ];
@@ -552,7 +552,7 @@ function nationsCard(P) {
   return card('Nationaliteter', {
     hint: 'andel av matcherna',
     body: barList(list, { label: (n) => esc(natSv(n.nat)), value: (n) => n.apps, fmt: (n) => pct(n.appShare), sub: (n) => `${n.players} spelare` }),
-    src: 'ESPN · nationalitet enligt spelarens registrering (citizenship)',
+    src: 'ESPN · nationalitet enligt spelarens registrering',
   });
 }
 
@@ -601,7 +601,7 @@ const TCOLS = [
     show: (t) => { const x = fdOf(t, 'xg'); return delta(x ? x.gf - x.f : null, { d: 1 }); } },
   { key: 'dxga', label: '±xGA', title: 'Insläppta minus xGA – minus = färre insläppta än chanserna brukar ge', get: (t) => { const x = fdOf(t, 'xg'); return x ? x.ga - x.a : null; }, cls: 'num', asc: true, in: ['xg'],
     show: (t) => { const x = fdOf(t, 'xg'); return delta(x ? x.ga - x.a : null, { d: 1, invert: true }); } },
-  { key: 'opp', label: 'Motst', title: 'Motståndets styrka hittills mot snittet i divisionen – plus = tuffare program', get: (t) => fdOf(t, 'opp'), cls: 'num hide-xs', in: ['xg'],
+  { key: 'opp', label: 'Motst', title: 'Motståndets styrka hittills mot snittet i divisionen – plus = svårare program', get: (t) => fdOf(t, 'opp'), cls: 'num hide-xs', in: ['xg'],
     show: (t) => (fdOf(t, 'opp') == null ? cell(null) : `<span class="dv-even">${signed(fdOf(t, 'opp'), 2)}</span>`) },
 
   { key: 'shf', label: 'Skott/M', title: 'Skott per match', get: (t) => per(fdOf(t, 'sh'), 'f'), d: 1, cls: 'num', in: ['spelet'] },
@@ -613,12 +613,12 @@ const TCOLS = [
   { key: 'o25', label: 'Ö2,5', title: 'Andel av lagets matcher med tre mål eller fler', get: (t) => share(t, 'o25'), pct: true, cls: 'num', in: ['spelet'] },
   { key: 'btts', label: 'BLGM', title: 'Båda lagen gör mål – andel av lagets matcher', get: (t) => share(t, 'btts'), pct: true, cls: 'num', in: ['spelet'] },
 
-  { key: 'mxp', label: 'Väntat', title: 'Poängen oddsen väntade sig, match för match (stängningsodds, marginalen bortdragen)', get: (t) => (fdOf(t, 'mkt') ? fdOf(t, 'mkt').xp : null), d: 1, cls: 'num', in: ['marknaden'] },
+  { key: 'mxp', label: 'Väntat', title: 'Poängen oddsen väntade sig, match för match (oddsen vid avspark, utan spelbolagens marginal)', get: (t) => (fdOf(t, 'mkt') ? fdOf(t, 'mkt').xp : null), d: 1, cls: 'num', in: ['marknaden'] },
   { key: 'mpts', label: 'Poäng', title: 'Poängen i samma matcher', get: (t) => (fdOf(t, 'mkt') ? fdOf(t, 'mkt').pts : null), cls: 'num', in: ['marknaden'] },
   { key: 'vso', label: '±', title: 'Poäng minus väntade poäng – plus = bättre än oddsen trodde', get: vsOdds, cls: 'num', in: ['marknaden'],
     show: (t) => delta(vsOdds(t), { d: 1 }) },
   { key: 'fav', label: 'Favorit', title: 'Andel matcher där laget var favorit enligt oddsen', get: (t) => { const m = fdOf(t, 'mkt'); return m ? m.fav / m.n : null; }, pct: true, cls: 'num hide-xs', in: ['marknaden'] },
-  { key: 'roi', label: 'Avkastning', title: 'Lika stor insats på att laget vinner varje match, till stängningsoddset: vinst eller förlust i procent av insatserna', get: roi, cls: 'num', in: ['marknaden'],
+  { key: 'roi', label: 'Avkastning', title: 'Lika stor insats på att laget vinner varje match, till oddset vid avspark: vinst eller förlust i procent av insatserna', get: roi, cls: 'num', in: ['marknaden'],
     show: (t) => delta(roi(t), { dead: 0.005, fmt: signedPct }) },
 
   { key: 'used', label: 'Spelare', title: 'Spelare som spelat minst en ligamatch', get: (t) => sqOf(t, 'used'), cls: 'num', in: ['truppen'] },
@@ -680,7 +680,7 @@ function teamsView(dv, P, T) {
     tabell: `Tabell: ${esc(T.source.table.provider)}, hämtat ${when(T.source.table.fetchedAt)} · nollor: ${fd}`,
     xg: `xG: ${fd}${T.source.strength ? ` · motståndet: prognosmotorns styrka t.o.m. ${esc(dateLabel(T.source.strength.fitThrough))}` : ''}`,
     spelet: fd,
-    marknaden: `Stängningsodds, snittet hos spelbolagen: ${fd}`,
+    marknaden: `Odds vid avspark, snittet hos spelbolagen: ${fd}`,
     truppen: P && !P.unknown ? `ESPN-trupperna, hämtat ${when(P.source.fetchedAt)}` : '',
   }[f.cols];
 
@@ -692,7 +692,7 @@ function teamsView(dv, P, T) {
 
   return sectionHead('Lagen') +
     '<div class="dv-leaders dv-leaders4">' + leaders +
-    teamTop('Slår oddsen', '📈', all, (t) => `<b>${delta(vsOdds(t), { d: 1 })}</b><small>${t.fd.mkt.pts} p · ${num(t.fd.mkt.xp, 1)} väntat</small>`, { get: vsOdds, note: 'Poäng mot vad stängningsoddsen väntade sig' }) +
+    teamTop('Slår oddsen', '📈', all, (t) => `<b>${delta(vsOdds(t), { d: 1 })}</b><small>${t.fd.mkt.pts} p · ${num(t.fd.mkt.xp, 1)} väntat</small>`, { get: vsOdds, note: 'Poäng mot vad oddsen vid avspark väntade sig' }) +
     teamTop('Bäst att spela på', '💰', all, (t) => `<b>${delta(roi(t), { fmt: signedPct })}</b><small>${t.fd.mkt.n} matcher</small>`, { get: roi, note: 'Samma insats på seger i varje match' }) +
     '</div>' +
     card('Alla lag', {
@@ -780,7 +780,7 @@ function openPlayer(id) {
     const f = [
       ['Pris', `£${num(p.cost, 1)}m`],
       ['Vald av', p.sel == null ? '–' : `${num(p.sel, 1)} % av lagen`],
-      ['Poäng', `${p.fpts ?? '–'}${p.bonus ? ` <span class="muted">(${p.bonus} bonus)</span>` : ''}`],
+      ['Poäng', `${p.fpts ?? '–'}${p.bonus ? ` <span class="muted">(${p.bonus} bonuspoäng)</span>` : ''}`],
     ];
     if ((p.pos === 'MV' || p.pos === 'B') && p.cs != null) f.push(['Hållna nollor', p.cs]);
     if (p.pen === 1 || p.pen === 2) f.push(['Straffskytt', p.pen === 1 ? 'förstaval' : 'andraval']);
@@ -816,7 +816,7 @@ async function openTeam(id) {
     `<p>${esc(state.data.divisions.find((x) => x.id === state.div).name)}${r ? ` · ${ordinal(r.rank)} plats` : ''}${z ? ` · ${esc(z.label)}` : ''}</p></div></div>`;
   html += '<div class="dv-mtiles">' +
     (r ? mtile(r.points, 'Poäng') + mtile(`${r.gf}–${r.ga}`, 'Mål') : '') +
-    mtile(t.avgAge == null ? '–' : num(t.avgAge, 1), 'Snittålder') + mtile(t.used, 'Spelare använda') + '</div>';
+    mtile(t.avgAge == null ? '–' : num(t.avgAge, 1), 'Snittålder') + mtile(t.used, 'Använda spelare') + '</div>';
   if (t.topScorer && t.topScorer.g) {
     html += `<p class="dv-calm">Bäste målskytt <b>${esc(t.topScorer.name)}</b> · ${t.topScorer.g} av ${t.goals} mål (${pct(t.topScorerShare)})</p>`;
   }
@@ -878,11 +878,11 @@ const GLOSSARY = [
   ['Räddningsprocent', 'Räddningar delat med skotten på mål som målvakten mött (räddningar + insläppta).', 'statistik'],
   ['xG', 'Förväntade mål: hur många mål chanserna brukar ge i snitt, oavsett om de gick in.', 'statistik'],
   ['xGA, xA', 'Förväntade insläppta mål ur motståndarnas chanser, och förväntade assist ur passningarna före skotten.', 'statistik'],
-  ['±xG, ±xGA', 'Mål minus xG och insläppta minus xGA. Stora avvikelser är ofta tur eller otur och brukar krympa över en säsong.', 'statistik'],
-  ['Motst', 'Motståndets styrka hittills enligt modellen, mot vad ett lag i divisionen möter i snitt. Plus = tuffare program än snittet.', 'statistik'],
+  ['±xG, ±xGA', 'Mål minus xG och insläppta minus xGA. Stora avvikelser är ofta tur eller otur och brukar jämna ut sig under en säsong.', 'statistik'],
+  ['Motst', 'Motståndets styrka hittills enligt modellen, mot vad ett lag i divisionen möter i snitt. Plus = svårare program än snittet.', 'statistik'],
   ['Nollor, Ö2,5, BLGM', 'Andel av lagets matcher utan insläppt mål, med tre mål eller fler, och där båda lagen gjort mål.', 'statistik'],
-  ['Väntat, ±', 'Poängen stängningsoddsen väntade sig – 3 × vinstchansen plus oavgjortchansen, match för match – och lagets poäng minus det.', 'statistik'],
-  ['Avkastning', 'Vinst eller förlust i procent av insatserna om man satsat lika mycket på att laget vinner varje match, till stängningsoddset. Spelbolagens marginal är inräknad.', 'statistik'],
+  ['Väntat, ±', 'Poängen oddsen vid avspark väntade sig – 3 × vinstchansen plus oavgjortchansen, match för match – och lagets poäng minus det.', 'statistik'],
+  ['Avkastning', 'Vinst eller förlust i procent av insatserna om man satsat lika mycket på att laget vinner varje match, till oddset vid avspark. Spelbolagens marginal är inräknad.', 'statistik'],
   ['Marginal', 'Spelbolagens påslag: hur mycket summan av 1/odds överstiger 100 %.', 'statistik'],
   ['Grundserien', 'Ligans ordinarie matcher, utan kvalspel (playoff) och cuper.'],
   ['Säsongsprognos', 'Resten av säsongen spelas tusentals gånger med modellens sannolikheter för varje match. Andelen gånger ett lag hamnar på en plats är chansen. 0 och 100 betyder i ingen respektive alla simuleringar – inte att saken är avgjord.', 'tabeller'],
@@ -1112,7 +1112,7 @@ window.addEventListener('hashchange', () => { if (state.data && !state.data.erro
   try {
     state.meta = await getJSON('data/meta.json');
     const tl = $('#topline');
-    if (tl) tl.innerHTML = `Säsong <strong>${esc(state.meta.season)}</strong> · byggd ${esc(fDateTime.format(new Date(state.meta.generatedAt)))}`;
+    if (tl) tl.innerHTML = `Säsong <strong>${esc(state.meta.season)}</strong> · uppdaterad ${esc(fDateTime.format(new Date(state.meta.generatedAt)))}`;
   } catch {
     const tl = $('#topline');
     if (tl) tl.textContent = '';
@@ -1124,7 +1124,7 @@ window.addEventListener('hashchange', () => { if (state.data && !state.data.erro
     return;
   }
   if (state.data.error) {
-    $('#divisions').innerHTML = `<p class="empty">Divisionsstatistiken kunde inte räknas fram vid bygget: ${esc(state.data.error)}</p>`;
+    $('#divisions').innerHTML = `<p class="empty">Divisionsstatistiken kunde inte räknas fram vid senaste uppdateringen: ${esc(state.data.error)}</p>`;
     return;
   }
   const { div, view } = parseHash();

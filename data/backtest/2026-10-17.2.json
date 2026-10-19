@@ -217,7 +217,7 @@
    },
    {
     "key": "cl",
-    "label": "Pinnacle, stängning",
+    "label": "Pinnacle, vid avspark",
     "n": 27001,
     "days": 2522,
     "logLoss": [
@@ -306,7 +306,7 @@
     },
     {
      "key": "cl",
-     "label": "Pinnacle, stängning",
+     "label": "Pinnacle, vid avspark",
      "n": 5150,
      "days": 1488,
      "logLoss": [
@@ -394,7 +394,7 @@
     },
     {
      "key": "cl",
-     "label": "Pinnacle, stängning",
+     "label": "Pinnacle, vid avspark",
      "n": 7445,
      "days": 1456,
      "logLoss": [
@@ -482,7 +482,7 @@
     },
     {
      "key": "cl",
-     "label": "Pinnacle, stängning",
+     "label": "Pinnacle, vid avspark",
      "n": 7182,
      "days": 1029,
      "logLoss": [
@@ -570,7 +570,7 @@
     },
     {
      "key": "cl",
-     "label": "Pinnacle, stängning",
+     "label": "Pinnacle, vid avspark",
      "n": 7224,
      "days": 942,
      "logLoss": [
@@ -647,7 +647,7 @@
     },
     {
      "key": "cl",
-     "label": "Pinnacle, stängning",
+     "label": "Pinnacle, vid avspark",
      "n": 0
     }
    ]
@@ -722,7 +722,7 @@
     },
     {
      "key": "cl",
-     "label": "Pinnacle, stängning",
+     "label": "Pinnacle, vid avspark",
      "n": 0
     }
    ]
@@ -797,7 +797,7 @@
     },
     {
      "key": "cl",
-     "label": "Pinnacle, stängning",
+     "label": "Pinnacle, vid avspark",
      "n": 0
     }
    ]
@@ -872,7 +872,7 @@
     },
     {
      "key": "cl",
-     "label": "Pinnacle, stängning",
+     "label": "Pinnacle, vid avspark",
      "n": 0
     }
    ]
@@ -947,7 +947,7 @@
     },
     {
      "key": "cl",
-     "label": "Pinnacle, stängning",
+     "label": "Pinnacle, vid avspark",
      "n": 0
     }
    ]
@@ -1022,7 +1022,7 @@
     },
     {
      "key": "cl",
-     "label": "Pinnacle, stängning",
+     "label": "Pinnacle, vid avspark",
      "n": 0
     }
    ]
@@ -1097,7 +1097,7 @@
     },
     {
      "key": "cl",
-     "label": "Pinnacle, stängning",
+     "label": "Pinnacle, vid avspark",
      "n": 0
     }
    ]
@@ -1172,7 +1172,7 @@
     },
     {
      "key": "cl",
-     "label": "Pinnacle, stängning",
+     "label": "Pinnacle, vid avspark",
      "n": 0
     }
    ]
@@ -1247,7 +1247,7 @@
     },
     {
      "key": "cl",
-     "label": "Pinnacle, stängning",
+     "label": "Pinnacle, vid avspark",
      "n": 2034,
      "days": 177,
      "logLoss": [
@@ -1337,7 +1337,7 @@
     },
     {
      "key": "cl",
-     "label": "Pinnacle, stängning",
+     "label": "Pinnacle, vid avspark",
      "n": 2036,
      "days": 173,
      "logLoss": [
@@ -1427,7 +1427,7 @@
     },
     {
      "key": "cl",
-     "label": "Pinnacle, stängning",
+     "label": "Pinnacle, vid avspark",
      "n": 2036,
      "days": 172,
      "logLoss": [
@@ -1517,7 +1517,7 @@
     },
     {
      "key": "cl",
-     "label": "Pinnacle, stängning",
+     "label": "Pinnacle, vid avspark",
      "n": 2036,
      "days": 182,
      "logLoss": [
@@ -1607,7 +1607,7 @@
     },
     {
      "key": "cl",
-     "label": "Pinnacle, stängning",
+     "label": "Pinnacle, vid avspark",
      "n": 2036,
      "days": 188,
      "logLoss": [
@@ -1697,7 +1697,7 @@
     },
     {
      "key": "cl",
-     "label": "Pinnacle, stängning",
+     "label": "Pinnacle, vid avspark",
      "n": 2036,
      "days": 183,
      "logLoss": [
@@ -1787,7 +1787,7 @@
     },
     {
      "key": "cl",
-     "label": "Pinnacle, stängning",
+     "label": "Pinnacle, vid avspark",
      "n": 2034,
      "days": 181,
      "logLoss": [
@@ -1877,7 +1877,7 @@
     },
     {
      "key": "cl",
-     "label": "Pinnacle, stängning",
+     "label": "Pinnacle, vid avspark",
      "n": 1768,
      "days": 178,
      "logLoss": [
@@ -1967,7 +1967,7 @@
     },
     {
      "key": "cl",
-     "label": "Pinnacle, stängning",
+     "label": "Pinnacle, vid avspark",
      "n": 2029,
      "days": 193,
      "logLoss": [
@@ -2057,7 +2057,7 @@
     },
     {
      "key": "cl",
-     "label": "Pinnacle, stängning",
+     "label": "Pinnacle, vid avspark",
      "n": 2036,
      "days": 198,
      "logLoss": [
@@ -2147,7 +2147,7 @@
     },
     {
      "key": "cl",
-     "label": "Pinnacle, stängning",
+     "label": "Pinnacle, vid avspark",
      "n": 2035,
      "days": 204,
      "logLoss": [
@@ -2237,7 +2237,7 @@
     },
     {
      "key": "cl",
-     "label": "Pinnacle, stängning",
+     "label": "Pinnacle, vid avspark",
      "n": 2036,
      "days": 194,
      "logLoss": [
@@ -2327,7 +2327,7 @@
     },
     {
      "key": "cl",
-     "label": "Pinnacle, stängning",
+     "label": "Pinnacle, vid avspark",
      "n": 2036,
      "days": 202,
      "logLoss": [
@@ -2417,7 +2417,7 @@
     },
     {
      "key": "cl",
-     "label": "Pinnacle, stängning",
+     "label": "Pinnacle, vid avspark",
      "n": 813,
      "days": 97,
      "logLoss": [
@@ -2507,7 +2507,7 @@
     },
     {
      "key": "cl",
-     "label": "Pinnacle, stängning",
+     "label": "Pinnacle, vid avspark",
      "n": 0
     }
    ]
@@ -2802,6 +2802,6 @@
   "Från 2004/05: ligorna finns från 2000/01 och modellen behöver 4 säsonger bakåt.",
   "National League från 2005/06 – uppflyttade lag har kortare historik de första åren.",
   "Cupmatcher bara från 2021/22 (FA-cupen, ESPN); EFL-cupens tidigare säsonger hämtas inte.",
-  "(c) är marknadssnittet vid öppning från 2005/06 (Betbrain t.o.m. 2018/19); Pinnacle vid stängning finns från 2012/13 och saknas 2026/27."
+  "(c) är marknadssnittet vid öppning från 2005/06 (Betbrain t.o.m. 2018/19); Pinnacle vid avspark finns från 2012/13 och saknas 2026/27."
  ]
 }
