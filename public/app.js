@@ -354,6 +354,7 @@ function matchRow(m) {
       side = `<span class="score">${m.score.home}–${m.score.away}</span>`;
       if (m.shootout) side += `<span class="sub">str. ${m.shootout.home}–${m.shootout.away}</span>`;
     }
+    if (window.Hojdpunkter) side = Hojdpunkter.row(m) + side;
     if (m.j) side += `<span class="sub" title="Prognosen före avspark, ur journalen">${m.j.p ? tipOdds(m.j.p, isHidden(m) ? null : tipHit(m)) : 'okänt'}</span>`;
     else if (m.f) side += `<span class="sub retro" title="Inte loggad – återskapad i efterhand med underlaget före matchdagen">${listOdds(m.f.p).join(' · ')}</span>`;
   } else {
@@ -521,6 +522,7 @@ function renderDetail(d) {
     `<div class="mhead-teams"><div class="mhead-team">${esc(m.home)}</div>` +
     `<div class="mhead-mid">${hide ? Spoiler.chip() : esc(mid)}${midSub ? `<span class="sub">${esc(midSub)}</span>` : ''}</div>` +
     `<div class="mhead-team away">${esc(m.away)}</div></div>` +
+    (window.Hojdpunkter ? Hojdpunkter.head(d) : '') +
     (m.tierNote ? `<p class="note">${esc(m.tierNote)}</p>` : '') + '</div>';
 
   // Dold match: bara rubriken – prognosens rättning och underlaget efter

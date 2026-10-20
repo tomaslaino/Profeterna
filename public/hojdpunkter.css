@@ -1,0 +1,58 @@
+/* Höjdpunkterna (hojdpunkter.js): spelikonen på matchraden och knapparna i
+   matchrutans rubrik. Guldet som i resten av detaljerna. */
+
+.hl-play {
+  display: inline-grid;
+  place-items: center;
+  width: 26px;
+  height: 26px;
+  margin-right: 10px;
+  vertical-align: 3px;
+  border-radius: 50%;
+  color: var(--gold);
+  background: color-mix(in srgb, var(--gold) 10%, transparent);
+  box-shadow: inset 0 0 0 1px color-mix(in srgb, var(--gold) 45%, transparent);
+  cursor: pointer;
+  transition: background-color 0.15s ease, color 0.15s ease;
+}
+.hl-play svg { width: 13px; height: 13px; margin-left: 2px; }
+.hl-play:hover { color: var(--bg); background: var(--gold); }
+
+.hl-links {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 8px;
+  margin: 14px 0 4px;
+}
+.hl-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 7px;
+  padding: 7px 15px 7px 12px;
+  border-radius: 999px;
+  font-size: 13.5px;
+  font-weight: 650;
+  line-height: 1.2;
+  color: var(--bg);
+  background: var(--gold);
+  text-decoration: none;
+  transition: filter 0.15s ease, background-color 0.15s ease;
+}
+.hl-btn svg { width: 14px; height: 14px; }
+.hl-btn .hl-len { font-weight: 500; opacity: 0.72; font-variant-numeric: tabular-nums; }
+.hl-btn:hover { color: var(--bg); filter: brightness(1.1); }
+.hl-btn:focus-visible { outline: 2px solid var(--gold); outline-offset: 2px; }
+.hl-btn.alt {
+  padding: 7px 13px;
+  color: var(--gold);
+  background: transparent;
+  box-shadow: inset 0 0 0 1px color-mix(in srgb, var(--gold) 50%, transparent);
+}
+.hl-btn.alt .hl-len { opacity: 1; }
+.hl-btn.alt:hover { color: var(--bg); background: var(--gold); filter: none; }
+
+@media (max-width: 640px) {
+  .hl-play { width: 24px; height: 24px; margin-right: 8px; }
+  .hl-links { margin-top: 10px; }
+}

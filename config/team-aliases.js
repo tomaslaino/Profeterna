@@ -107,6 +107,13 @@ const ALIASES = {
   'Man Utd': 'Manchester United',
   'Spurs': 'Tottenham Hotspur',
   'Sheffield Utd': 'Sheffield United',
+
+  // Viaplay (höjdpunkterna, src/hojdpunkter.js) – det som inte täcks ovan
+  // eller av att orden är början av ESPN-namnets ord
+  'Sheff Utd': 'Sheffield United',
+  'Sheff Wed': 'Sheffield Wednesday',
+  'Palace': 'Crystal Palace',
+  'MK Dons': 'Milton Keynes Dons',
 };
 
 module.exports = { ALIASES };

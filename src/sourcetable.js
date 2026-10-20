@@ -22,6 +22,7 @@ const KINDS = [
   { id: 'europe', label: 'Europaspel (vila och form)' },
   { id: 'players', label: 'Spelare' },
   { id: 'history', label: 'Tidigare säsonger' },
+  { id: 'video', label: 'Höjdpunkter' },
 ];
 
 // Orsak när en cell saknar källa.
@@ -33,6 +34,7 @@ const GAPS = {
   players: { cup: 'ligadata används' },
   history: { cup: 'hämtas inte' },
   europe: { default: 'inga lag i Europa' },
+  video: { default: 'inga gratis sammandrag' },
 };
 
 function sourceRows() {

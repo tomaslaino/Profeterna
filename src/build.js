@@ -6,8 +6,10 @@
 //
 //   data/meta.json         säsong, tävlingar, byggtid
 //   data/sources.json      källtabell + täckning + omappade lagnamn
-//   data/matches.json      hela säsongens matcher, kompakt
-//   data/match/<id>.json   underlaget och prognosen för en match
+//   data/matches.json      hela säsongens matcher, kompakt (med längsta
+//                          sammandraget hos Viaplay, src/hojdpunkter.js)
+//   data/match/<id>.json   underlaget och prognosen för en match, och
+//                          matchens sammandrag
 //   data/model.json        regelversion, skattade storheter, backtestet och
 //                          kandidatloggen (fliken Modell)
 //   data/evaluation.json   journalen och utvärderingen mot facit (sist på
@@ -52,6 +54,7 @@ const { teamFiles } = require('./teamstats');
 const { readCoupons, REPO, BRANCH } = require('./coupons');
 const { buildHistory, writeComments } = require('./history');
 const { buildTippare, fetchSamtal } = require('./tippare');
+const { highlightsByMatch } = require('./hojdpunkter');
 const { wholePercent } = require('./model');
 const rules = require('../config/forecast-rules');
 const llm = require('../config/llm');
@@ -180,10 +183,21 @@ function writeSite(outDir = OUT, { journal = false, analysisEndpoint, couponEndp
   fs.mkdirSync(path.join(dataDir, 'journal'), { recursive: true });
   for (const f of journalFiles) fs.copyFileSync(f, path.join(dataDir, 'journal', path.basename(f)));
 
+  // Höjdpunkterna (Viaplays gratis sammandrag) per spelad match: längsta
+  // klippet på matchraden, alla i matchrutan. Fallerar det saknas bara länkarna.
+  let video = new Map();
+  try {
+    video = highlightsByMatch(list.matches).byMatch;
+  } catch (err) {
+    console.error('[build] höjdpunkterna:', err);
+  }
+
   for (const m of list.matches) {
     m.f = compact(forecast.predictions.get(m.id));
     const c = m.completed && ev.perMatch.get(m.id);
     if (c && c.counted) m.j = { p: c.counted.p ? wholePercent(c.counted.p) : null };
+    const v = video.get(m.id);
+    if (v) m.v = { u: v[0].url, s: v[0].sec };
   }
   write('matches.json', list);
 
@@ -231,6 +245,7 @@ function writeSite(outDir = OUT, { journal = false, analysisEndpoint, couponEndp
       d.journal = ev.perMatch.get(id) || null;
       // Trupperna (ESPN) visas i matchvyn men ingår inte i analysens underlag.
       d.squads = squads(d.match);
+      d.highlights = video.get(id) || null;
       // Bygget som underlaget kommer ur – matchanalysen jämför mot det.
       d.builtAt = generatedAt;
       write(`match/${id}.json`, d);

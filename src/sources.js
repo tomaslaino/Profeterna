@@ -10,6 +10,7 @@ const espn = require('./fetchers/espn');
 const fdcouk = require('./fetchers/fdcouk');
 const understat = require('./fetchers/understat');
 const fpl = require('./fetchers/fpl');
+const viaplay = require('./fetchers/viaplay');
 const { readCache } = require('./store');
 
 const VERIFIED = '2026-10-17';
@@ -294,6 +295,27 @@ SOURCES.push({
     const out = d.players.filter((p) => ['i', 's', 'd'].includes(p.status)).length;
     return { n: d.players.length, detail: `${d.players.length} spelare, ${out} skadade/tveksamma/avstängda` };
   },
+});
+
+// Höjdpunkterna (src/hojdpunkter.js): Viaplays gratis sammandrag. Läser sin
+// egen förra hämtning, så att klipp som fallit ur Viaplays listor men ligger
+// ute ändå finns kvar. Varje körning, så att ett nytt sammandrag syns inom en
+// halvtimme.
+SOURCES.push({
+  id: 'viaplay_hojdpunkter',
+  provider: 'Viaplay',
+  short: 'Viaplay',
+  label: 'Höjdpunkter – gratis sammandrag med reklam',
+  comps: Object.keys(viaplay.PAGES),
+  kinds: ['video'],
+  maxAgeHours: 0.4,
+  staleAfterHours: 24,
+  verified: '2026-10-20',
+  fetch: () => {
+    const prev = readCache('viaplay_hojdpunkter');
+    return viaplay.fetchClips(prev && prev.data, `${SEASON.firstMonth}-01`);
+  },
+  summarize: (d) => ({ n: d.clips.length, detail: `${d.clips.length} sammandrag` }),
 });
 
 // 2000 → "2000/01"
