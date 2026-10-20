@@ -199,7 +199,7 @@ export async function roundName(id, { env, loadRound, loadSite, complete, store 
       return answer(entry, false);
     }
     problem = `Namnet hade ${why.join(' och ')}.`;
-    say = `Svaret hade ${why.join(' och ')}. Välj ett annat förslag eller hitta på ett nytt och följ reglerna: högst ${nc.maxWords} ord och ${nc.maxChars} tecken i namnet, inga siffror där, och i "syftar" bara tal som står i underlaget. Svara med JSON: {"förslag": [...], "namn": "<namnet>", "syftar": "<vad det anspelar på>"}`;
+    say = `Svaret hade ${why.join(' och ')}. Hitta på ett nytt: högst ${nc.maxWords} ord och ${nc.maxChars} tecken i namnet, inga siffror där, och i "syftar" bara tal som står i underlaget. Svara med JSON: {"namn": "…", "syftar": "…"}`;
   }
   // Ett avvisat svar sparas en timme, så att varje sidvisning inte kostar ett
   // nytt anrop. Därefter försöker nästa besök igen.
