@@ -38,21 +38,30 @@
   background: var(--pill);
 }
 .sm-person.inne { color: var(--ink-soft); }
+.sm-person.ute { padding-right: 10px; }
 .sm-person b { color: var(--fg); }
 .sm-folk-board { margin-bottom: 14px; }
 
+/* bock = inne, tre prickar = fyller i */
+.sm-ok { width: 15px; height: 15px; fill: none; stroke: var(--fresh); stroke-width: 2.2; stroke-linecap: round; stroke-linejoin: round; }
+.sm-dots { display: inline-flex; gap: 3px; }
+.sm-dots i { width: 4px; height: 4px; border-radius: 50%; background: var(--muted); animation: sm-dot 1.4s ease-in-out infinite; }
+.sm-dots i:nth-child(2) { animation-delay: 0.2s; }
+.sm-dots i:nth-child(3) { animation-delay: 0.4s; }
+@keyframes sm-dot { 0%, 60%, 100% { opacity: 0.25; } 30% { opacity: 1; } }
+@media (prefers-reduced-motion: reduce) { .sm-dots i { animation: none; opacity: 0.6; } }
+.ute > .sm-ch { opacity: 0.6; }
+
 .sm-wait { display: grid; gap: 16px; max-width: 760px; margin-bottom: 26px; }
-.sm-wait-txt { margin: 0; color: var(--ink-soft); }
-.sm-wait-txt b { color: var(--fg); }
 .sm-wait .kp-actions { margin-bottom: 0; }
 
-.sm-vem { display: flex; flex-wrap: wrap; align-items: center; gap: 6px; }
+.sm-vem { display: flex; flex-wrap: wrap; align-items: center; gap: 8px; }
 .sm-vem-q { margin-right: 4px; font-size: 13px; font-weight: 600; color: var(--ink-soft); }
 .sm-vem button {
   display: inline-flex;
   align-items: center;
-  gap: 7px;
-  padding: 4px 12px 4px 5px;
+  gap: 8px;
+  padding: 4px 10px 4px 5px;
   font: inherit;
   font-size: 13px;
   color: var(--ink-soft);

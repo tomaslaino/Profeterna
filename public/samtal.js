@@ -196,35 +196,29 @@
     wire(s);
   }
 
-  // Vem är du – sparas på enheten, så att Fyll i kupongen vet vems den är.
-  function whoAmI() {
+  // Bock = tipsen är inne, tre prickar = fyller i.
+  const CHECK = '<svg class="sm-ok" viewBox="0 0 16 16" aria-hidden="true"><path d="M3.5 8.5l3 3 6-7"/></svg>';
+  const DOTS = '<span class="sm-dots" aria-hidden="true"><i></i><i></i><i></i></span>';
+  const mark = (s, g) => (g.inne ? CHECK : s.visas ? '' : DOTS);
+  const state = (s, g) => (g.inne ? 'inne' : s.visas ? 'lämnade inte in' : 'fyller i');
+
+  // Gänget, och vem du är: tryck på dig själv (guldram, sparas på enheten),
+  // så att Fyll i kupongen vet vems den är.
+  function whoAmI(s) {
     const v = me();
-    return '<div class="sm-vem" role="group" aria-label="Vem är du?"><span class="sm-vem-q">Du är</span>' +
-      gang().map((g) => `<button type="button" data-vem="${esc(g.id)}" aria-pressed="${g.id === v}" title="${esc(g.namn)}">` +
-        `${chip(g.id)}<span>${esc(g.namn)}</span></button>`).join('') + '</div>';
+    return `<div class="sm-vem" role="group" aria-label="Vem är du?">${v ? '' : '<span class="sm-vem-q">Vem är du?</span>'}` +
+      s.gang.map((g) => `<button type="button" class="${g.inne ? 'inne' : 'ute'}" data-vem="${esc(g.id)}" aria-pressed="${g.id === v}" ` +
+        `title="${esc(`${g.namn} · ${state(s, g)}`)}">${chip(g.id)}${mark(s, g)}</button>`).join('') + '</div>';
   }
 
   // Innan du ser de andras tips: vem som lämnat in, dina tips och
   // omgångens matcher.
   function waiting(s) {
     const v = me();
-    const inne = s.gang.filter((g) => g.inne).length;
     const done = submitted(s, v);
     const local = handedIn(s);
     const own = done ? (s.tips && s.tips[v] ? s.tips[v].tecken : local && local.vem === v ? local.tecken : null) : null;
-    // Du har lämnat in men ser inte de andra: ingen annan är klar, eller du
-    // lämnade in på en annan enhet.
-    const text = !done
-      ? `<b>${inne} av ${s.gang.length}</b> har lämnat in`
-      : local && local.vem === v
-        ? 'Du har lämnat in'
-        : 'Du har lämnat in på en annan enhet' +
-          `${s.tid ? ` · uppgörelsen ${esc(fWeekdayTime.format(new Date(s.tid)))}` : ''}`;
-    let html = '<div class="card sm-wait">' +
-      '<div class="sm-folk">' + s.gang.map((g) => `<span class="sm-person${g.inne ? ' inne' : ''}">${chip(g.id)}` +
-        `<span>${g.inne ? `inne ${esc(fWeekdayTime.format(new Date(g.inne)))}` : 'fyller i'}${g.id === v ? ' · du' : ''}</span></span>`).join('') + '</div>' +
-      `<p class="sm-wait-txt">${text}</p>` +
-      whoAmI() +
+    let html = '<div class="card sm-wait">' + whoAmI(s) +
       (v && !done ? '<div class="kp-actions"><a class="kp-btn primary" href="#kupong/samtal/tips">Fyll i kupongen</a></div>' : '') +
       '</div>';
     html += '<div class="mlist sm-list">' + s.matcher.map((x) => {
@@ -305,7 +299,7 @@
     const missing = s.gang.filter((g) => !(s.tips && s.tips[g.id]));
     let html = '<div class="sm-folk sm-folk-board">' + s.gang.map((g) => {
       const tip = s.tips && s.tips[g.id];
-      if (!tip) return `<span class="sm-person">${chip(g.id)}<span>${s.visas ? 'lämnade inte in' : 'fyller i'}</span></span>`;
+      if (!tip) return `<span class="sm-person ute" title="${esc(`${g.namn} · ${state(s, g)}`)}">${chip(g.id)}${mark(s, g)}</span>`;
       const signs = s.matcher.map((x) => tip.tecken[x.id] || '');
       const hel = signs.filter((x) => x.length === 3).length;
       const halv = signs.filter((x) => x.length === 2).length;
@@ -545,7 +539,7 @@
     const v = me();
     if (!v) {
       el.innerHTML = viewNav('omgang') + steps(s) + head(s, 'Din kupong') +
-        `<div class="card sm-wait"><p class="sm-wait-txt">Vem är du?</p>${whoAmI()}</div>`;
+        `<div class="card sm-wait">${whoAmI(s)}</div>`;
       for (const b of document.querySelectorAll('.sm-vem button')) {
         b.addEventListener('click', () => {
           kpStore(VEM, b.dataset.vem);
