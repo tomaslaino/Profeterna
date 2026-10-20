@@ -7,7 +7,9 @@
 //   GET  /samtal → {ok, samtal, forra}   samtal = omgången som den ser ut för alla,
 //                 eller null; forra = omgången före den, om dess tips visades
 //                 när den ersattes (så att bygget hinner spara den i
-//                 tipparhistoriken, src/tippare.js)
+//                 tipparhistoriken, src/tippare.js). Pågår ingen omgång
+//                 och Svenska Spel har öppnat veckans Stryktips startar det
+//                 som omgång av sig själv (autoRound)
 //   POST /samtal {gor: "starta", matcher: [id], ersatt: <id> | null, spel}
 //                 ny omgång. Pågår en omgång (någon match har inte startat)
 //                 krävs ersatt = dess id. Matcherna står i den ordning de
@@ -64,8 +66,12 @@
 //                                    eller när den togs bort (borttagen)
 //   samtal:forra                     omgången före den aktuella, om dess tips
 //                                    visades när den ersattes (annars null)
+//   samtal:auto                      Stryktipsomgången som senast startades av sig
+//                                    själv {nr, startad, id} – eller prövades
+//                                    utan att alla matcherna fanns {nr, provad}
 
 import { normSign, sameSecret } from './kupong.mjs';
+import { linkDraw } from './stryktipset.mjs';
 
 const MATCHES_MAX = 40;
 const NOTE_MAX = 140; // samma gräns som kupongens anteckningar
@@ -76,6 +82,13 @@ const MATCH_ID = /^\d{1,12}$/;
 const OFF = /POSTPONED|CANCEL|ABANDON|SUSPEND/;
 const CURRENT = 'samtal:aktuellt';
 const PREVIOUS = 'samtal:forra';
+const AUTO = 'samtal:auto';
+// Så länge efter sista avsparken står en omgång kvar innan veckans
+// Stryktips tar över – matcherna hinner spelas färdigt.
+const AUTO_AFTER_MS = 3 * 3600000;
+// Fanns inte alla Stryktipsets matcher på sajten prövas det igen efter en
+// timme (spelprogrammet byggs om under dagen).
+const AUTO_RETRY_MS = 3600000;
 const tipsKey = (id, vem) => `samtal:${id}:tips:${vem}`;
 const draftKey = (id, vem) => `samtal:${id}:utkast:${vem}`;
 
@@ -161,13 +174,81 @@ function roundMatches(list, matches, now) {
   return { rows: out, errors };
 }
 
+// Ny omgång i stället för round. Den gamla sparas under sitt id, så att
+// tipsen går att para ihop med matcherna efteråt. Visades dess tips står den
+// också kvar i GET som den förra omgången tills nästa startas, så att bygget
+// hinner spara den i tipparhistoriken. En omgång som ersattes innan tipsen
+// visades räknas inte. → den förra omgången som den sparades, eller
+// undefined utan gammal omgång (då står den förra kvar).
+async function replaceRound(store, round, tips, gang, ms, next) {
+  let prev;
+  if (round) {
+    prev = shown(round, tips, gang, ms) ? round : null;
+    await store.put(`samtal:${round.id}`, round);
+    await store.put(PREVIOUS, prev);
+  }
+  await store.put(CURRENT, next);
+  return prev;
+}
+
+// Veckans Stryktips blir omgångens kupong av sig själv, i Stryktipsets
+// ordning, när ingen omgång pågår: den förra har spelats färdigt (sista
+// avsparken för AUTO_AFTER_MS sedan) eller tagits bort, och Svenska Spel har
+// öppnat en ny omgång (måndagar kl. 07). Matcherna går att ändra som vanligt
+// tills någon har lämnat in. Varje Stryktipsomgång startas bara en gång
+// (samtal:auto), så en som tas bort eller ersätts kommer inte tillbaka. Finns
+// inte alla matcherna på sajten (andra ligor) eller har någon startat blir
+// det ingen omgång – då väljer någon matcherna, med Stryktipset ifyllt.
+// Omgångens id slutar på Svenska Spels nummer, så två som frågar samtidigt
+// startar samma omgång.
+// auto: {draw() → den öppna omgången (worker/stryktipset.mjs) | null,
+//        loadMatches()} → {round, prev}: den nya omgången och den förra
+//        (som replaceRound), eller null.
+async function autoRound(round, { store, gang, auto, t }) {
+  const ms = t.getTime();
+  if (round && ms < lastKick(round) + AUTO_AFTER_MS) return null;
+  const draw = await auto.draw();
+  if (!draw || !Number.isInteger(draw.nr) || !(Date.parse(draw.stang) > ms)) return null;
+  if (round && round.spel && round.spel.nr === draw.nr) return null;
+  const mark = await store.get(AUTO);
+  if (mark && mark.nr === draw.nr && (mark.startad || ms - Date.parse(mark.provad) < AUTO_RETRY_MS)) return null;
+  const matches = await auto.loadMatches();
+  const want = linkDraw(draw, matches).filter((x) => !x.struken);
+  const v = want.length && want.every((x) => x.m) ? roundMatches(want.map((x) => x.m.id), matches, ms) : null;
+  if (!v || v.errors.length || v.rows.length !== want.length) {
+    await store.put(AUTO, { nr: draw.nr, provad: t.toISOString() });
+    return null;
+  }
+  const next = {
+    id: `${swedishDate(v.rows.map((m) => m.avspark).sort()[0])}-st${draw.nr}`,
+    skapad: t.toISOString(),
+    matcher: v.rows,
+    spel: { namn: 'Stryktipset', nr: draw.nr },
+  };
+  const prev = await replaceRound(store, round, round ? await loadTips(store, round, gang) : {}, gang, ms, next);
+  await store.put(AUTO, { nr: draw.nr, startad: next.skapad, id: next.id });
+  return { round: next, prev };
+}
+
 // store: {get(key) → objekt | null, put(key, objekt)}
 // loadMatches() → sajtens matcher [{id, home, away, kickoff, completed, status}].
 // gang: [{id: "DL", namn: "Daniel Laino"}, …] (config/kupong.js).
-export async function getRound({ store, gang, now = () => new Date() }) {
+// auto: veckans Stryktips som omgång (autoRound) – utan den startar ingen
+// omgång av sig själv.
+export async function getRound({ store, gang, auto = null, now = () => new Date() }) {
   if (!store) return fail(503, 'Att tippa var för sig är inte påslaget.');
-  const ms = now().getTime();
-  const [round, prev] = await Promise.all([store.get(CURRENT), store.get(PREVIOUS)]);
+  const t = now();
+  const ms = t.getTime();
+  let [round, prev] = await Promise.all([store.get(CURRENT), store.get(PREVIOUS)]);
+  if (auto) {
+    // Svarar inte Svenska Spel eller sajten visas omgången som den är.
+    let got = null;
+    try { got = await autoRound(round, { store, gang, auto, t }); } catch (err) { console.error('[samtal] Stryktipset', err); }
+    if (got) {
+      round = got.round;
+      if (got.prev !== undefined) prev = got.prev;
+    }
+  }
   const view = async (r, sparade = false) => (r ? publicView(r, await loadTips(store, r, gang), gang, ms, false,
     sparade ? await loadDrafts(store, r, gang) : {}) : null);
   const [samtal, forra] = await Promise.all([view(round, true), view(prev)]);
@@ -202,16 +283,7 @@ export async function postRound(body, { store, gang, loadMatches, now = () => ne
       matcher: v.rows,
       ...(spel ? { spel } : {}),
     };
-    // Den gamla omgången sparas under sitt id, så att tipsen går att para
-    // ihop med matcherna efteråt. Visades dess tips står den också kvar i
-    // GET som den förra omgången tills nästa startas, så att bygget hinner
-    // spara den i tipparhistoriken. En omgång som ersattes innan tipsen
-    // visades räknas inte.
-    if (round) {
-      await store.put(`samtal:${round.id}`, round);
-      await store.put(PREVIOUS, shown(round, tips, gang, ms) ? round : null);
-    }
-    await store.put(CURRENT, next);
+    await replaceRound(store, round, tips, gang, ms, next);
     return ok({ samtal: publicView(next, {}, gang, ms) });
   }
 

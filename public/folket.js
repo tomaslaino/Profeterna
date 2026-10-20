@@ -57,7 +57,8 @@ window.Folket = (() => {
   // ---------- Svenska Spels lag → sajtens matcher ----------
 
   // Svenska Spels korta namn ("QPR", "Wolves", "West Brom", "Bristol C") är
-  // början av sajtens, sedan smeknamnen översatts.
+  // början av sajtens, sedan smeknamnen översatts. Samma regler i tjänsten,
+  // som startar veckans omgång (linkDraw i worker/stryktipset.mjs).
   const ALIAS = [
     [/\bman\.?\s+(?:utd|u|united)\b/g, 'manchester united'],
     [/\bman\.?\s+city\b/g, 'manchester city'],

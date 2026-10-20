@@ -6,7 +6,8 @@
 //
 //   POST /kupong {"kupong", "andra", "bas", "ändå"}   (se worker/kupong.mjs)
 //   POST /kupong {"bort", "bas"}                       ta bort en kupong
-//   GET  /samtal · POST /samtal {"gor", …}             (se worker/samtal.mjs)
+//   GET  /samtal · POST /samtal {"gor", …}             (se worker/samtal.mjs; GET startar
+//                                                      veckans Stryktips som omgång)
 //   GET  /stryktipset[?nr=…]                           veckans Stryktips och Svenska
 //                                                      folket (se worker/stryktipset.mjs)
 //
@@ -52,9 +53,12 @@ export default {
     }
     const samtal = url.pathname === '/samtal';
     const store = env.KUPONG ? kvStore(env.KUPONG) : null;
+    const site = String(env.SITE || cfg.site).replace(/\/+$/, '');
     if (samtal && request.method === 'GET') {
       try {
-        const r = await getRound({ store, gang: kupongCfg.gang });
+        // Pågår ingen omgång startar veckans Stryktips av sig själv.
+        const auto = { draw: async () => (await getStryktipset()).body.omgang || null, loadMatches: () => siteMatches(site) };
+        const r = await getRound({ store, gang: kupongCfg.gang, auto });
         return json(r.status, r.body);
       } catch (err) {
         console.error('[samtal]', err);
@@ -70,7 +74,6 @@ export default {
       return json(400, { ok: false, error: 'Ogiltig förfrågan.' });
     }
     try {
-      const site = String(env.SITE || cfg.site).replace(/\/+$/, '');
       const ctx = { loadMatches: () => siteMatches(site) };
       const r = samtal
         ? await postRound(body, { ...ctx, store, gang: kupongCfg.gang })

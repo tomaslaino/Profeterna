@@ -114,6 +114,12 @@ ingen falsk precision · sidan kraschar aldrig av en död källa · endast fria 
   modellens odds, grönt där modellen ger tecknet klart större chans än folket spelar det.
   Siffrorna uppdateras varje minut fram till spelstoppet. Matcherna står i den ordning de
   valdes, och numret syns också i telefonen (se [Inför uppgörelsen](#inför-uppgörelsen))
+- [x] **Stryktipset som veckans kupong (2026-10-20):** när Svenska Spel öppnar veckans
+  Stryktips (måndagar kl. 07) och förra omgången är färdigspelad blir dess tretton matcher
+  omgångens kupong av sig själv, utan att någon väljer. *Ändra matcherna* går som förut
+  tills någon har lämnat in, och *Välj matcher* börjar med Stryktipset ifyllt. Gängets
+  kupong behåller Stryktipsets ordning 1–13 – också när den sparas, ändras och hamnar i
+  Olympen – i stället för att sorteras efter avsparken
 - [x] **Spelarbetyg (2026-10-20):** Statistik → Spelare visar spelarnas snittbetyg från
   365Scores, som sätter ett betyg från 1 till 10 efter varje match: topplistan *Högst betyg*
   i stället för Målvakter (som finns kvar under Försvar), kolumnen Betyg under Översikt
@@ -1043,6 +1049,11 @@ matchid):
 }
 ```
 
+Matcherna står efter avsparken. En kupong som gjordes ur en omgång från Stryktipset har
+`"spel": "Stryktipset"` och står i filens ordning – Stryktipsets nummer – på sidan, när den
+ändras och i historiken (matcher som läggs till efteråt hamnar sist). Går matcherna då inte
+i datumordning står veckodagen på raden i stället för dagens rubrik.
+
 En trasig fil stoppar inte bygget; felet visas längst ned under fliken Kupong. Lokalt går
 det att prova med en egen mapp: `KUPONG_DIR=/tmp/kuponger npm run build`.
 
@@ -1064,8 +1075,14 @@ under omgången.
 
 1. **Skapa kupong** (*Kupong → Skapa kupong* eller *+ Ny kupong*, `#kupong/samtal/ny`):
    någon väljer kupongens tretton matcher (samma sökning och tävlingsfilter som Ny kupong).
-   Matcherna står i den ordning de valdes – det är numren på kupongen. *Hämta Stryktipset*
-   fyller kupongen med veckans Stryktips från Svenska Spel, i deras ordning (matcher som
+   Oftast behövs det inte: när Svenska Spel öppnar veckans Stryktips (måndagar kl. 07) och
+   förra omgången är färdigspelad – tre timmar efter sista avsparken – blir Stryktipsets
+   matcher omgångens kupong av sig själv, och *Ändra matcherna* (steg 1) byter ut dem man
+   vill. Det händer bara om alla tretton finns på sajten och ingen har startat, och bara en
+   gång per Stryktipsomgång – en som tas bort eller ersätts kommer inte tillbaka.
+   Matcherna står i den ordning de valdes – det är numren på kupongen. *Välj matcher*
+   börjar med veckans Stryktips ifyllt (utom när omgången som pågår redan är det), och
+   *Hämta Stryktipset* fyller kupongen med det igen, i Svenska Spels ordning (matcher som
    inte finns på sajten eller har startat kommer inte med, med en rad om vilka). Kommer
    matcherna inte i datumordning står veckodagen på raden i stället för dagens rubrik.
    Kupongen bredvid programmet har tretton tryckta rader som fylls i uppifrån; när den är
@@ -1159,9 +1176,14 @@ KV-bindningen `KUPONG`, inte på GitHub: `samtal:aktuellt` (omgången),
 `samtal:<id>:tips:<vem>` (en nyckel per person, så att två som lämnar in samtidigt inte
 skriver över varandra), `samtal:<id>:utkast:<vem>` (en sparad kupong som inte är inlämnad:
 bara antalet tippade, för omgångens matcher som de var då) och `samtal:<id>` (en tidigare
-omgång, sparad när nästa startas). En omgång som skapades med *Hämta Stryktipset* har
+omgång, sparad när nästa startas). En omgång som skapades med *Hämta Stryktipset* – eller
+av sig själv – har
 `spel: {"namn": "Stryktipset", "nr": <Svenska Spels omgång>}` (`starta` och `matcher` tar
 `spel`; utan det står omgångens kvar).
+`GET /samtal` startar veckans Stryktips när ingen omgång pågår (id:t slutar på `st<nr>`, så
+två som frågar samtidigt startar samma omgång) och minns det i `samtal:auto`
+(`{nr, startad, id}`, eller `{nr, provad}` när inte alla matcherna fanns – då prövas det igen
+efter en timme). Svarar inte Svenska Spel eller sajten visas omgången som den är.
 `GET /samtal` ger omgången, vem som lämnat in och hur många matcher var och en har tippat
 (`gang[].tippat`, ur de inlämnade tipsen eller en sparad kupong) – tipsen bara när de visas
 för alla – och
@@ -1181,7 +1203,8 @@ Lokalt: med `KUPONG_LOKALT=1` i `.env` finns
 **Stryktipset** hämtas av samma tjänst, `GET /stryktipset` (den öppna omgången) och
 `GET /stryktipset?nr=<omgång>` ([worker/stryktipset.mjs](worker/stryktipset.mjs)) – Svenska
 Spel svarar inte på anrop direkt från sajten. Svaret sparas en minut i tjänsten. Sidan
-([public/folket.js](public/folket.js)) knyter matcherna till sajtens på lagen och avsparken.
+([public/folket.js](public/folket.js)) knyter matcherna till sajtens på lagen och avsparken –
+tjänsten med samma regler när den startar omgången (`linkDraw`).
 Har omgången inget `spel` används den öppna omgången, om den har någon av kupongens matcher,
 och dess nummer sparas på enheten så att siffrorna finns kvar efter spelstoppet. Lokalt
 `/api/stryktipset` (med `KUPONG_LOKALT=1`).

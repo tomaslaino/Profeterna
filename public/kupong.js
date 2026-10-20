@@ -134,7 +134,7 @@ function fromStored(k) {
   const sign = (s) => { const t = String(s || '').toUpperCase(); return SIGNS.filter((x) => t.includes(x)).join(''); };
   const matches = k.matcher.filter((r) => r && r.id != null && sign(r.tecken))
     .map((r) => ({ id: String(r.id), sign: sign(r.tecken), label: r.match ? String(r.match) : null, ...(r.kommentar ? { note: String(r.kommentar) } : {}) }));
-  return matches.length ? { id: String(k.id), name: k.namn || null, created: k.skapad || null, sha: k.sha || null, matches } : null;
+  return matches.length ? { id: String(k.id), name: k.namn || null, created: k.skapad || null, sha: k.sha || null, ...(k.spel === 'Stryktipset' ? { spel: k.spel } : {}), matches } : null;
 }
 
 // ---------- rättning ----------
@@ -196,8 +196,12 @@ function gradeRow(x, now) {
   return r;
 }
 
+// Raderna efter avsparken – eller, på en kupong för Stryktipset (c.spel), i
+// dess ordning.
 function gradeCoupon(c, now = Date.now()) {
-  const rows = c.matches.map((x) => gradeRow(x, now)).sort((a, b) => (a.kick || 0) - (b.kick || 0));
+  const rows = c.matches.map((x) => gradeRow(x, now));
+  if (!c.spel) rows.sort((a, b) => (a.kick || 0) - (b.kick || 0));
+  const kicks = rows.map((r) => r.kick).filter((k) => k != null);
   const counted = rows.filter((r) => r.state !== 'off' && r.state !== 'missing');
   const is = (st, hit) => counted.filter((r) => r.state === st && (hit === undefined || r.hit === hit)).length;
   const g = {
@@ -210,8 +214,8 @@ function gradeCoupon(c, now = Date.now()) {
     left: is('upcoming') + is('started'),
     hidden: is('hidden'),
     modelOk: counted.filter((r) => r.state === 'final' && r.res != null && r.tip === r.res).length,
-    first: rows.length ? rows[0].kick : null,
-    last: rows.length ? rows[rows.length - 1].kick : null,
+    first: kicks.length ? Math.min(...kicks) : null,
+    last: kicks.length ? Math.max(...kicks) : null,
   };
   g.max = g.n - g.no;
   g.done = counted.every((r) => r.over);
@@ -615,7 +619,8 @@ function couponErrors() {
 
 // base = versionen (sha) av kupongen som en ändring utgår från. Tjänsten
 // sparar bara över den versionen, så att ingen skriver över någon annans
-// ändring utan att veta om den.
+// ändring utan att veta om den. En kupong för Stryktipset (spel) behåller
+// sin ordning (order: matchernas id), också för matcher som läggs till.
 function newDraft(editId) {
   const d = { edit: editId, name: '', picks: {}, notes: {}, locked: [], base: null };
   if (!editId) return d;
@@ -624,6 +629,12 @@ function newDraft(editId) {
   d.name = c.name || '';
   d.created = c.created;
   d.base = c.sha || null;
+  // Ur omgången som alla tippade (samtal.js) står de i omgångens ordning,
+  // så att en match som tas bort och läggs till igen får tillbaka sitt nummer.
+  if (c.spel) {
+    d.spel = c.spel;
+    d.order = [...new Set([...(window.Samtal && Samtal.covers(c) ? Samtal.ids() : []), ...c.matches.map((x) => x.id)])];
+  }
   for (const x of c.matches) {
     d.picks[x.id] = x.sign;
     if (x.note) d.notes[x.id] = x.note;
@@ -818,6 +829,15 @@ function renderPickList() {
   drawSlip();
 }
 
+// Ordningen på kupongen: Stryktipsets (d.order) på en kupong för
+// Stryktipset – matcher som lagts till efteråt sist – annars avsparken.
+// kick(x) → avsparken som text.
+function draftSort(d, list, kick) {
+  const at = new Map((d.spel && d.order ? d.order : []).map((id, i) => [id, i]));
+  const pos = (x) => (at.has(x.id) ? at.get(x.id) : Infinity);
+  return list.slice().sort((a, b) => pos(a) - pos(b) || kick(a).localeCompare(kick(b)));
+}
+
 function draftMatches(d = KP.draft) {
   return Object.entries(d.picks)
     .map(([id, sign]) => ({ id, sign, note: ((d.notes || {})[id] || '').trim().slice(0, NOTE_MAX), m: matchById(id) }))
@@ -840,9 +860,10 @@ function drawSlip() {
     fields.push(['Rader', rows, 'Antal rader med garderingarna'], ['Väntat', kpNum(exp), 'Väntat antal rätt enligt modellen']);
   }
   Papper.slip('kp-build', {
-    rows: [...sel.map((x) => ({ ...x, note: KP.draft.notes[x.id] || '' })), ...locked],
+    rows: draftSort(KP.draft, [...sel.map((x) => ({ ...x, note: KP.draft.notes[x.id] || '' })), ...locked], (x) => (x.m ? x.m.kickoff : '')),
     signs: true,
     fields,
+    ordered: Boolean(KP.draft.spel),
   });
   if (sel.length === signed.length) $('#kp-build').classList.remove('need');
 }
@@ -908,22 +929,23 @@ function couponCtx(d) {
     for (let i = 2; taken.has(id); i++) id = `${base}-${i}`;
   }
   const name = (d.name || '').trim();
-  const rows = [
+  const kick = (r) => { const m = matchById(r.id); return m ? m.kickoff : ''; };
+  const rows = draftSort(d, [
     ...d.locked.map((x) => ({ id: x.id, match: x.label || teamsOf({ m: matchById(x.id), id: x.id }), tecken: x.sign, ...(x.note ? { kommentar: x.note } : {}) })),
     ...sel.map((x) => ({ id: x.id, match: `${x.m.home} – ${x.m.away}`, tecken: x.sign, ...(x.note ? { kommentar: x.note } : {}) })),
-  ];
-  const kick = (r) => { const m = matchById(r.id); return m ? m.kickoff : ''; };
-  rows.sort((a, b) => kick(a).localeCompare(kick(b)));
+  ], kick);
+  const kicks = rows.map(kick).filter(Boolean).sort();
   const file = {
     ...(name ? { namn: name } : {}),
+    ...(d.spel ? { spel: d.spel } : {}),
     skapad: d.created || new Date().toISOString(),
     ...(d.edit ? { 'ändrad': new Date().toISOString() } : {}),
     matcher: rows,
   };
   return {
     id, edit: d.edit, base: d.base || null, name, rows, file,
-    range: dateRange(kick(rows[0]) || null, kick(rows[rows.length - 1]) || null),
-    coupon: { id, name: name || null, created: file.skapad, matches: rows.map((r) => ({ id: r.id, sign: r.tecken, label: r.match, ...(r.kommentar ? { note: r.kommentar } : {}) })) },
+    range: dateRange(kicks[0] || null, kicks[kicks.length - 1] || null),
+    coupon: { id, name: name || null, created: file.skapad, ...(d.spel ? { spel: d.spel } : {}), matches: rows.map((r) => ({ id: r.id, sign: r.tecken, label: r.match, ...(r.kommentar ? { note: r.kommentar } : {}) })) },
   };
 }
 
@@ -966,7 +988,7 @@ async function postCoupon(ctx) {
         andra: ctx.edit || null,
         ...(ctx.edit ? { bas: ctx.base } : {}),
         ...(ctx.anyway ? { 'ändå': true } : {}),
-        kupong: { id: ctx.id, namn: ctx.name, skapad: ctx.file.skapad, matcher: ctx.rows },
+        kupong: { id: ctx.id, namn: ctx.name, skapad: ctx.file.skapad, ...(ctx.file.spel ? { spel: ctx.file.spel } : {}), matcher: ctx.rows },
       }),
     });
     body = await res.json().catch(() => ({}));

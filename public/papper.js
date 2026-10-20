@@ -166,10 +166,10 @@
     return '<span class="pp-blank" aria-hidden="true"></span>';
   }
 
-  function row(r, i) {
+  function row(r, i, weekday = false) {
     const cls = rowClass(r);
     const comp = r.m ? compOf(r.m.comp) : null;
-    const small = r.m ? `${esc(fTime.format(new Date(r.m.kickoff)))}${comp ? ` · <abbr title="${esc(comp.name)}">${esc(comp.short)}</abbr>` : ''}` : '';
+    const small = r.m ? `${esc((weekday ? fWeekdayTime : fTime).format(new Date(r.m.kickoff)))}${comp ? ` · <abbr title="${esc(comp.name)}">${esc(comp.short)}</abbr>` : ''}` : '';
     const tag = r.m ? 'a' : 'div';
     const mark = cls === 'ok' || cls === 'no' ? tick(r.id, cls === 'ok') : '';
     return `<${tag} class="pp-row s-${cls.replace(' ', ' s-')}${i % 2 ? ' alt' : ''}"${r.m ? ` href="#match/${esc(r.id)}"` : ''}>` +
@@ -186,14 +186,17 @@
   function rows(g) {
     let html = '<div class="pp-cols" aria-hidden="true"><span>Nr</span><span>Match</span>' +
       '<span class="pp-cols-s" title="Under rutorna: modellens odds före avspark, modellens tips i fetstil"><b>1</b><b>X</b><b>2</b></span><span>Res.</span><span></span></div>';
+    // Under sin dag – utom på en kupong i Stryktipsets ordning över flera
+    // dagar, där veckodagen står på raden (som i slip).
+    const days = inDayOrder(g.rows, (r) => r.m && r.m.kickoff);
     let day = null;
     g.rows.forEach((r, i) => {
       const k = r.m ? dayKey.format(new Date(r.m.kickoff)) : 'okänd';
-      if (k !== day) {
+      if (days && k !== day) {
         day = k;
         html += `<p class="pp-day">${esc(r.m ? cap(fDay.format(new Date(r.m.kickoff))) : 'Okänt datum')}</p>`;
       }
-      html += row(r, i);
+      html += row(r, i, !days);
     });
     return html;
   }

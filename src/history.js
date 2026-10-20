@@ -9,7 +9,8 @@
 //       {
 //         "id": "2026-10-17",
 //         "namn": "Omgång 9",                    (valfritt)
-//         "spel": "Stryktipset",                 (valfritt – lagd någon annanstans)
+//         "spel": "Stryktipset",                 (valfritt – lagd någon annanstans; från
+//                                                 sidan: matcherna i Stryktipsets ordning)
 //         "datum": "2026-10-17",                 första matchens dag
 //         "till": "2026-10-19",                  (valfritt) sista matchens dag
 //         "källa": "sidan",                      fryst ur data/kuponger/; saknas = inlagd för hand
@@ -189,13 +190,16 @@ function entryFromCoupon(c, byId, now = Date.now(), rounds = []) {
     });
   }
   if (!rows.length) return null;
-  rows.sort((a, b) => a.kick.localeCompare(b.kick));
-  const first = dayOf(rows[0].kick);
-  const last = dayOf(rows[rows.length - 1].kick);
+  // En kupong för Stryktipset står i dess ordning, andra efter avsparken.
+  if (!c.spel) rows.sort((a, b) => a.kick.localeCompare(b.kick));
+  const kicks = rows.map((r) => r.kick).sort();
+  const first = dayOf(kicks[0]);
+  const last = dayOf(kicks[kicks.length - 1]);
   const name = c.name || roundNameFor(c, rounds);
   return {
     id: c.id,
     ...(name ? { namn: name } : {}),
+    ...(c.spel ? { spel: c.spel } : {}),
     datum: first,
     ...(last !== first ? { till: last } : {}),
     'källa': 'sidan',

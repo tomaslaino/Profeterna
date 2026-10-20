@@ -6,7 +6,10 @@
 //
 //   POST /kupong {"andra": "<kupong-id>" | null, "bas": "<sha>" | null,
 //                 "ändå": true (valfritt),
-//                 "kupong": {"id", "namn", "skapad", "matcher": [{"id", "match", "tecken", "kommentar"}]}}
+//                 "kupong": {"id", "namn", "skapad", "spel", "matcher": [{"id", "match", "tecken", "kommentar"}]}}
+//          spel = "Stryktipset": matcherna står i Stryktipsets ordning, som
+//          de skickades (annars efter avsparken). Utan spel behåller en
+//          ändring filens.
 //   → 200 {ok: true, id, skapad, sha, commit}   id får ett tillägg (-2 …) om
 //          datumet redan är taget av en kupong som sidan kände till; sha =
 //          filens nya version; commit = länk
@@ -78,8 +81,11 @@ export function validateCoupon(k) {
     const note = text(m.kommentar, NOTE_MAX);
     rows.push({ id: mid, match: text(m.match, LABEL_MAX) || `match ${mid}`, tecken: sign, ...(note ? { kommentar: note } : {}) });
   }
-  return { id, name: text(k.namn, NAME_MAX), rows, errors };
+  return { id, name: text(k.namn, NAME_MAX), spel: gameOf(k.spel), rows, errors };
 }
+
+// Spelet som kupongen gjordes för – då står matcherna i dess ordning.
+const gameOf = (s) => (s === 'Stryktipset' ? s : null);
 
 const isoOrNull = (s) => (s && !Number.isNaN(Date.parse(s)) ? new Date(s).toISOString() : null);
 
@@ -228,8 +234,10 @@ export async function saveCoupon(body, { writer, loadMatches, now = () => new Da
     const before = cur ? parseFile(cur) : null;
     const locked = lockErrors(v.rows, before && Array.isArray(before.matcher) ? before.matcher : [], matches, t.getTime());
     if (locked.length) return fail(400, `${locked.join('. ')}.`);
+    const spel = 'spel' in b.kupong ? v.spel : gameOf(before && before.spel);
     const file = {
       ...(v.name ? { namn: v.name } : {}),
+      ...(spel ? { spel } : {}),
       // En ändrad kupong behåller filens första tid.
       skapad: (before && isoOrNull(before.skapad)) || stamp,
       ...(cur ? { 'ändrad': stamp } : {}),
@@ -254,7 +262,7 @@ export async function saveCoupon(body, { writer, loadMatches, now = () => new Da
     status: 409,
     body: { ok: false, taken: true, error: 'Någon annan har just sparat en kupong för samma dag.', kupong: asStored(id, cur) },
   });
-  const file = { ...(v.name ? { namn: v.name } : {}), skapad: stamp, matcher: v.rows };
+  const file = { ...(v.name ? { namn: v.name } : {}), ...(v.spel ? { spel: v.spel } : {}), skapad: stamp, matcher: v.rows };
   const base = v.id.slice(0, 10);
   for (let i = 1; i <= 20; i++) {
     const id = i === 1 ? base : `${base}-${i}`;

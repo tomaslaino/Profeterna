@@ -659,6 +659,12 @@
     const d = newDraft(c ? c.id : null);
     // Gängets kupong får omgångens namn, om den inte redan har ett.
     if (!d.name) d.name = nameOf(s) || '';
+    // Är omgången Stryktipset står gängets kupong i dess ordning – matcher
+    // som bara finns på gängets kupong sist.
+    if (s.spel) {
+      d.spel = 'Stryktipset';
+      d.order = [...new Set([...s.matcher.map((x) => x.id), ...(d.order || [])])];
+    }
     for (const r of open) {
       if (val[r.x.id]) d.picks[r.x.id] = val[r.x.id];
       else {
@@ -1210,7 +1216,8 @@
   // en rad för varje vald match (Papper.builder i papper.js), i den ordning
   // de valdes. Kupongen har tretton matcher (Papper.RADER). Rutorna står
   // tomma tills var och en fyller i sin kupong. Hämta Stryktipset fyller
-  // kupongen med veckans Stryktips i Svenska Spels ordning (folket.js).
+  // kupongen med veckans Stryktips i Svenska Spels ordning (folket.js) – en
+  // ny kupong börjar med det.
   function renderStart(edit) {
     const s = SM.data;
     // Matcherna står fast när någon har lämnat in.
@@ -1269,12 +1276,16 @@
     $('#sm-start').addEventListener('click', () => startRound(edit));
     if ($('#sm-stryk')) $('#sm-stryk').addEventListener('click', () => importStryk(edit));
     pickList();
+    // En ny kupong börjar med veckans Stryktips.
+    if (!edit && $('#sm-stryk')) importStryk(false, true);
   }
 
   // Veckans Stryktips från Svenska Spel blir kupongens matcher, i deras
   // ordning. Matcher som inte finns på sajten (andra ligor) eller som har
-  // startat kommer inte med – då står det vilka.
-  async function importStryk(edit) {
+  // startat kommer inte med – då står det vilka. first: en ny kupong börjar
+  // med Stryktipset (renderStart) – tyst om ingen omgång är öppen, om man
+  // hunnit välja själv eller om omgången som pågår redan är Stryktipset.
+  async function importStryk(edit, first = false) {
     const msg = (h) => { $('#sm-msg').innerHTML = h; };
     const btn = $('#sm-stryk');
     btn.disabled = true;
@@ -1282,6 +1293,11 @@
     const got = await Folket.open();
     if (!here(edit ? 'matcher' : 'ny')) return;
     btn.disabled = false;
+    const s = SM.data;
+    if (first && (!got || SM.pick.ids.size || (s && s.spel && s.spel.nr === got.omgang.nr && !over(s)))) {
+      msg('');
+      return;
+    }
     if (!got) {
       msg('<span class="note">Svenska Spel har ingen öppen Stryktipsomgång just nu.</span>');
       return;
@@ -1295,7 +1311,7 @@
     if ($('#sm-q')) $('#sm-q').value = '';
     pickList();
     // I telefonen dras kupongen fram, som efter Ladda upp system.
-    if (window.matchMedia('(max-width: 640px)').matches) Papper.open('sm-build');
+    if (!first && window.matchMedia('(max-width: 640px)').matches) Papper.open('sm-build');
     const v = got.omgang.vecka ? ` v ${got.omgang.vecka}` : '';
     msg(out.length
       ? `<span class="note">Stryktipset${esc(v)}: ${out.map((r) => `${esc(r.nr)}. ${esc(r.hemma)} – ${esc(r.borta)}${r.m ? ' har startat' : ''}`).join(', ')} kom inte med.</span>`

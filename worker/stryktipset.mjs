@@ -18,6 +18,9 @@
 //
 // Svaret sparas en minut i tjänsten, så att Svenska Spel får högst ett anrop
 // i minuten per omgång hur många som än tittar.
+//
+// Pågår ingen omgång blir den öppna Stryktipsomgången omgångens kupong av
+// sig själv (worker/samtal.mjs, linkDraw här).
 
 const API = 'https://api.spela.svenskaspel.se/draw/1/stryktipset/draws';
 const TTL_MS = 60000;
@@ -60,6 +63,49 @@ export function trimDraw(d) {
         };
       }),
   };
+}
+
+// ---------- Svenska Spels lag → sajtens matcher ----------
+
+// Samma regler som på sidan (public/folket.js): Svenska Spels korta namn
+// ("QPR", "Wolves", "West Brom", "Bristol C") är början av sajtens, sedan
+// smeknamnen översatts.
+const ALIAS = [
+  [/\bman\.?\s+(?:utd|u|united)\b/g, 'manchester united'],
+  [/\bman\.?\s+city\b/g, 'manchester city'],
+  [/\bsheff\.?\b/g, 'sheffield'],
+  [/\butd\b/g, 'united'],
+  [/\bwed\b/g, 'wednesday'],
+  [/\bwolves\b/g, 'wolverhampton'],
+  [/\bspurs\b/g, 'tottenham'],
+  [/\bq\.?p\.?r\b/g, 'queens park rangers'],
+  [/\bmk\s+dons\b/g, 'milton keynes dons'],
+  [/\bnott'?m\.?\s+forest\b/g, 'nottingham forest'],
+  [/\bboro\b/g, 'middlesbrough'],
+];
+const fold = (s) => String(s).toLowerCase().normalize('NFD').replace(/[̀-ͯ]/g, '');
+const key = (s) => ALIAS.reduce((t, [re, to]) => t.replace(re, to), fold(s))
+  .replace(/^(?:afc|fc)\s+/, '').replace(/[^a-z0-9]/g, '');
+const same = (a, b) => {
+  const x = key(a);
+  const y = key(b);
+  return x.length >= 3 && y.length >= 3 && (x.startsWith(y) || y.startsWith(x));
+};
+
+// Omgångens matcher (trimDraw) → sajtens [{id, home, away, kickoff}], i
+// kupongens ordning: samma lag i samma ordning, närmast avsparken (inom ett
+// och ett halvt dygn). m = null där matchen inte finns på sajten.
+export function linkDraw(omgang, matches) {
+  return omgang.matcher.map((x) => {
+    const t = Date.parse(x.avspark);
+    let best = null;
+    for (const m of matches) {
+      const d = Math.abs(Date.parse(m.kickoff) - t);
+      if (!(d <= 36 * 3600000) || !same(x.hemma, m.home) || !same(x.borta, m.away)) continue;
+      if (!best || d < best.d) best = { m, d };
+    }
+    return { ...x, m: best ? best.m : null };
+  });
 }
 
 // fetchImpl och now går att byta i provet.

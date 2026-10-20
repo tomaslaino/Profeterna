@@ -10,6 +10,7 @@
 //   data/kuponger/2026-10-17.json
 //   {
 //     "namn": "Omgång 9",                      (valfritt)
+//     "spel": "Stryktipset",                   (valfritt – matcherna i Stryktipsets ordning)
 //     "skapad": "2026-10-16T18:20:11.000Z",
 //     "matcher": [
 //       { "id": "401879263", "match": "AFC Bournemouth – Sunderland", "tecken": "1" },
@@ -62,7 +63,9 @@ function parseCoupon(id, raw) {
   }
   const created = raw.skapad && !Number.isNaN(Date.parse(raw.skapad)) ? new Date(raw.skapad).toISOString() : null;
   return {
-    coupon: matches.length ? { id, name: raw.namn ? String(raw.namn).slice(0, 60) : null, created, matches } : null,
+    // Med spel ("Stryktipset") står matcherna i spelets ordning, som i
+    // filen – annars efter avsparken.
+    coupon: matches.length ? { id, name: raw.namn ? String(raw.namn).slice(0, 60) : null, created, ...(raw.spel === 'Stryktipset' ? { spel: raw.spel } : {}), matches } : null,
     errors,
   };
 }
