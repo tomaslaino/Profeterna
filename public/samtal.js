@@ -930,32 +930,30 @@
     return d < 3 && h % 24 ? `${plural(d, 'dag', 'dagar')} ${h % 24} tim` : plural(d, 'dag', 'dagar');
   }
 
-  // Rutan på förstasidan: hur många som har lämnat in och hur länge till det
-  // går – till första avsparken. När allas tips visas är det dags för
-  // uppgörelsen, och när gängets kupong är gjord tar den över (kupong.js).
+  // Rutan på förstasidan, med så lite som möjligt: tiden kvar att lämna in
+  // (till första avsparken; klockslaget när man pekar), vilka som är inne och
+  // en knapp. När allas tips visas är det dags för uppgörelsen, och när
+  // gängets kupong är gjord tar den över (kupong.js).
   function teaser() {
     const s = SM.data;
     if (!active()) return '';
     const v = me();
-    const inne = s.gang.filter((g) => g.inne).length;
     const done = submitted(s, v);
     const stop = Math.min(...kicks(s));
     const open = !s.visas && Date.now() < stop;
-    const ute = s.gang.filter((g) => !g.inne).map((g) => g.id);
     const go = !open ? 'Till uppgörelsen' : done ? 'Se de andras tips' : 'Fyll i kupongen';
-    const title = !open ? 'Dags för uppgörelsen' : done ? 'Du har lämnat in' : `${inne} av ${s.gang.length} har lämnat in`;
     const ms = stop - Date.now();
-    const line = open
-      ? `<span class="kp-line sm-kvar${ms < HOUR ? ' snart' : ''}"><b data-kvar="${stop}">${left(ms)}</b> kvar att lämna in · <span>senast ${esc(fWeekdayTime.format(new Date(stop)))}</span></span>`
-      : ute.length ? `<span class="kp-line sm-kvar">${esc(ute.join(' och '))} lämnade inte in</span>` : '';
+    const title = open
+      ? `<a href="#kupong" class="sm-kvar${ms < HOUR ? ' snart' : ''}" title="${esc(`Senast ${fWeekdayTime.format(new Date(stop))}`)}"><span data-kvar="${stop}">${left(ms)}</span> kvar</a>`
+      : '<a href="#kupong">Dags för uppgörelsen</a>';
     return '<div class="card sm-teaser">' +
-      '<div><p class="kp-eyebrow">Omgångens kupong</p>' +
-      `<h2 class="page-title"><a href="#kupong">${esc(title)}</a></h2>${line}</div>` +
-      // Som överst på kupongen under Omgången: bock, tre prickar, guldram för dig.
-      '<div class="sm-folk">' + s.gang.map((g) => {
+      `<div><p class="kp-eyebrow">Omgångens kupong</p><h2 class="page-title">${title}</h2></div>` +
+      // Initialerna: egen färg och bock = inne, grå = inte inne, guldring = du.
+      '<div class="sm-faces">' + s.gang.map((g) => {
         const st = g.inne ? 'inne' : open ? 'fyller i' : 'lämnade inte in';
-        return `<span class="sm-person ${g.inne ? 'inne' : 'ute'}${g.id === v ? ' du' : ''}" title="${esc(`${g.namn} · ${st}`)}">` +
-          `${chip(g.id)}${g.inne ? CHECK : open ? DOTS : ''}</span>`;
+        const p = Math.max(0, gang().findIndex((x) => x.id === g.id));
+        return `<span class="sm-face sm-p${p}${g.inne ? ' inne' : ''}${g.id === v ? ' du' : ''}" title="${esc(`${g.namn} · ${st}`)}">` +
+          `${esc(g.id)}${g.inne ? CHECK : ''}</span>`;
       }).join('') + '</div>' +
       '<a class="kp-btn primary" href="#kupong">' + go + '</a></div>';
   }
