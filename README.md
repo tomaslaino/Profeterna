@@ -91,6 +91,9 @@ ingen falsk precision · sidan kraschar aldrig av en död källa · endast fria 
   inget konto. Finns för Premier League, Championship, Ligacupen, FA-cupen och enstaka
   League One-matcher; League Two saknas hos Viaplay. Bygget hämtar klippen och knyter dem
   till matcherna på tävling, lag och datum ([src/hojdpunkter.js](src/hojdpunkter.js))
+- [x] **Ladda upp system (2026-10-20):** en skärmbild av systemet ni spelat (Svenska Spels
+  app) blir gängets kupong med matcher och tecken. Bilden läses i webbläsaren och lämnar
+  aldrig telefonen (se [Ladda upp system](#ladda-upp-system))
 
 ## Publicering
 
@@ -921,6 +924,37 @@ ställningen efter 90 minuter (samma utfall som prognosen).
 4. **Reserv:** *Spara via GitHub i stället* (eller automatiskt erbjudet om proxyn inte kan
    spara) öppnar GitHub med filen ifylld – tryck **Commit changes** (kräver inloggning med
    skrivrätt till repot).
+
+### Ladda upp system
+
+Knappen *Ladda upp system* (i Ny kupong och Ändra, under omgångens kupong och i
+underlagets rad för gängets kupong) tar en eller flera skärmbilder av ett spelat system –
+som raderna i Svenska Spels app, med lagen och rutorna 1, X och 2 där de valda är
+färgade – och fyller i kupongen. Allt sker i webbläsaren
+([public/systembild.js](public/systembild.js)); ingen tjänst och ingen nyckel behövs:
+
+1. **Texten** läses med [Tesseract.js](https://github.com/naptha/tesseract.js) 7.0.0
+   (OCR i WebAssembly, engelsk språkdata), som hämtas från jsDelivr första gången man
+   trycker. Bilden skickas ingenstans.
+2. **Matcherna:** orden läggs ihop till rader efter höjden, och varje rad knyts till en
+   match i spelprogrammet (från tre dagar bakåt till 14 dagar framåt): hemmalaget följt av
+   bortalaget, där namnet på bilden får vara början av sajtens ("Sheffield U", "Queens
+   Par…", "Hull") och ett fel per namn tolereras. Några smeknamn översätts (Wolves, Spurs,
+   QPR, Man Utd, MK Dons, Nott'm Forest, Boro). Möts samma lag två gånger avgör
+   avsparkstiden på raden.
+3. **Tecknen:** rutorna till höger på raden letas upp i bildpunkterna, och en färgad ruta
+   räknas som vald, en vit eller grå som tom. Går tecknen på en rad inte att läsa kommer
+   matchen med utan tecken, med en rad om att trycka i dem.
+4. **Namnet:** vecka och system blir kupongens namn, t.ex. *Vecka 42 · R0-7-16* (eller
+   systemet efter ett namn som redan finns). Kupongen rättas per match som vanligt; ett
+   R-systems reducering räknas inte.
+
+Sedan öppnas Ny kupong med bara de valda matcherna synliga och en rad om vad som kom
+med (startade matcher och rader som inte hittades står där). Har en kupong som inte är
+färdigspelad redan minst hälften av matcherna öppnas den i stället i Ändra, så att det
+inte blir två kuponger för samma omgång; tecknen från bilden ersätter dess tecken i de
+matcherna och anteckningarna ligger kvar. Man ser över kupongen och sparar som vanligt.
+Matcher utanför sajtens tävlingar (t.ex. Allsvenskan eller Serie A) kan inte komma med.
 
 **Spara direkt – inställningar (en gång):** en egen tjänst, skild från proxyn för
 matchanalysen, så att GitHub-nyckeln bara finns där. Driftsätts med

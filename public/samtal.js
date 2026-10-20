@@ -339,6 +339,8 @@
       '<span class="sm-slots" aria-hidden="true">' + chosen.map((x) => `<i${x ? ' class="set"' : ''}>${x || '?'}</i>`).join('') + '</span>' +
       '<button type="button" class="kp-linkbtn" id="sm-reset" title="Gängets tecken som de flesta tippade">Börja om</button>' +
       (direct ? '<button type="button" class="kp-linkbtn" id="sm-adjust" title="Öppna kupongen med tecknen ifyllda – för namn, anteckningar eller fler matcher">Justera först</button>' : '') +
+      // Systemet ni spelade, som skärmbild: tecknen därifrån (systembild.js).
+      (window.Systembild ? Systembild.button('kp-linkbtn') : '') +
       `<button type="button" class="kp-btn primary" id="sm-make"${same && direct ? ' disabled' : ''}>${label}</button>` +
       '<span class="sm-bar-msg" id="sm-msg" role="status"></span></div>';
     return html;

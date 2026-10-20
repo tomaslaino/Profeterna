@@ -450,6 +450,7 @@ function renderCouponShow(id) {
   if (!graded.length) {
     // Omgångens tips finns kvar att titta på, också utan gängets kupong.
     el.innerHTML = viewNav('omgang') + roundSteps(1) + emptyCard() +
+      (window.Systembild ? `<p class="legend">${Systembild.button('kp-linkbtn')}</p>` : '') +
       (!id && hasSamtal() && Samtal.visible() ? '<p class="legend"><a href="#kupong/samtal">Förra omgångens tips</a></p>' : '') + couponErrors();
     return;
   }
@@ -477,6 +478,9 @@ function renderCouponShow(id) {
     // En färdigspelad står kvar i historiken och tas inte bort.
     (g.done ? '' : `<a class="kp-btn" href="#kupong/bort/${esc(c.id)}">Ta bort</a>`) +
     (g.done && !c.pending ? `<a class="kp-btn" href="#kupong/historik/${esc(c.id)}">Betyg och kommentar</a>` : '') +
+    // En skärmbild av systemet: ändrar den här kupongen om det är samma
+    // matcher, annars blir det en ny (systembild.js).
+    (round && window.Systembild ? Systembild.button() : '') +
     '</div></div>' + (fromTips ? roundSteps(g.done ? 5 : 4) : '');
 
   if (KP.flash) {
@@ -663,13 +667,15 @@ function renderCreate(editId) {
   const comps = [{ id: 'all', short: 'Alla', name: 'Alla tävlingar' }, ...state.comps.values()];
   el.innerHTML = '<div class="kp-head"><div>' +
     `<p class="kp-eyebrow">${editId ? 'Ändra kupong' : 'Ny kupong'}</p><h2 class="page-title">Välj matcher</h2></div>` +
-    `<div class="kp-actions"><a class="kp-btn" href="#kupong${editId ? `/${esc(editId)}` : ''}">Avbryt</a></div></div>` +
+    `<div class="kp-actions">${window.Systembild ? Systembild.button() : ''}<a class="kp-btn" href="#kupong${editId ? `/${esc(editId)}` : ''}">Avbryt</a></div></div>` +
     '<div class="toolbar kp-tools">' +
     `<input type="search" id="kp-q" class="kp-search" placeholder="Sök lag" autocomplete="off" value="${esc(KP.q)}">` +
     '<div class="chips" id="kp-comps" role="group" aria-label="Tävling">' + comps.map((c) =>
       `<button type="button" data-comp="${c.id}" title="${esc(c.name)}" aria-pressed="${c.id === KP.comp}">${esc(c.short)}</button>`).join('') + '</div>' +
     `<button type="button" id="kp-only" class="kp-only" aria-pressed="${KP.onlyPicked}">Bara valda</button></div>` +
     '<p class="legend" id="kp-lockinfo" hidden></p>' +
+    // Efter Ladda upp system: vad som kom med från bilden (systembild.js).
+    (window.Systembild ? Systembild.note() : '') +
     Papper.fill('kp-pick-list') +
     '<div class="kp-bar"><span class="kp-bar-txt" id="kp-bar-txt"></span>' +
     `<input type="text" id="kp-name" class="kp-name" maxlength="40" placeholder="Namn (valfritt)" value="${esc(KP.draft.name)}">` +
@@ -753,7 +759,9 @@ function renderPickList() {
   const q = fold(KP.q.trim());
   const picks = KP.draft.picks;
   const all = pickable().filter((m) => {
-    if (KP.onlyPicked) return Boolean(picks[m.id]);
+    // Matcher från en uppladdad bild där tecknen inte gick att läsa syns
+    // också, så att man kan trycka i dem.
+    if (KP.onlyPicked) return Boolean(picks[m.id] || (window.Systembild && Systembild.asks(m.id)));
     if (KP.comp !== 'all' && m.comp !== KP.comp) return false;
     return !q || fold(`${m.home} ${m.away}`).includes(q);
   });
