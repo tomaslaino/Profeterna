@@ -75,9 +75,8 @@ function renderSources(d) {
 
   let html = '<div class="src-page">';
   html += tiles([
-    ['Källor', String(providers.length), 'alla fria och öppna'],
     ['Hämtningar', String(d.sources.length),
-      problems ? [n('fel') && `${n('fel')} med fel`, n('gammal') && `${n('gammal')} gamla`].filter(Boolean).join(' · ') : 'alla fungerar',
+      `${providers.length} fria källor · ${problems ? [n('fel') && `${n('fel')} med fel`, n('gammal') && `${n('gammal')} gamla`].filter(Boolean).join(' · ') : 'alla fungerar'}`,
       'Sajten hämtar själv från källorna. Startelvorna, matchhändelserna och Stryktipset hämtas i stället när du tittar på dem.'],
     ['Uppdaterad', meta ? esc(fTime.format(new Date(meta.generatedAt))) : '–', meta ? `${srcAgo(meta.generatedAt).replace(/ \d\d:\d\d$/, '')}, var ${meta.updateEveryMinutes}:e minut` : '',
       meta ? `Sajten uppdaterades ${fDateTime.format(new Date(meta.generatedAt))}. Varje källa hämtas när dess intervall gått ut.` : null],

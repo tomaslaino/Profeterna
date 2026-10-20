@@ -2,6 +2,8 @@
    källa i två lika breda spalter. Bygger på tokens från theme.css. */
 
 .src-late { margin: 0 0 16px; }
+/* två lika breda rutor överst, som i skarpt läge på Modell */
+.src-page .dv-tiles { grid-template-columns: repeat(2, minmax(0, 1fr)); }
 
 /* ---------- vad som kommer varifrån ---------- */
 
@@ -83,12 +85,6 @@ details.src-runs td .dot { margin-right: 6px; }
   .src-grid { grid-template-columns: minmax(0, 1fr); }
 }
 @media (max-width: 520px) {
-  /* tre lika breda rutor även i telefonen */
-  .src-page .dv-tiles { grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 8px; }
-  .src-page .dv-tile { padding: 12px 12px 4px; }
-  .src-page .dv-tile-num { font-size: 26px; }
-  .src-page .dv-tile-sub { font-size: 11.5px; }
-  .src-page .dv-tile-label { letter-spacing: 0.06em; }
   .src-card { padding: 18px 16px; }
   .src-facts { grid-template-columns: minmax(0, 1fr); gap: 1px; }
   .src-facts dd { margin-bottom: 8px; }
