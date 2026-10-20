@@ -122,9 +122,9 @@ for (const c of [...COMPETITIONS.filter((x) => x.fdcouk), NATIONAL_LEAGUE]) {
     id: `fdcouk_${c.fdcouk}`,
     provider: 'football-data.co.uk',
     short: 'football-data',
-    label: `Resultat, skott, xG och odds – ${c.name}`,
+    label: `Resultat, skott, kort, xG och odds – ${c.name}`,
     comps: [c.id],
-    kinds: c.id === 'nl' ? ['stats', 'odds'] : ['stats', 'xg', 'odds'],
+    kinds: c.id === 'nl' ? ['stats', 'odds', 'referee'] : ['stats', 'xg', 'odds', 'referee'],
     maxAgeHours: 12,
     staleAfterHours: 48,
     verified: VERIFIED,
@@ -166,53 +166,32 @@ for (const c of [...COMPETITIONS.filter((x) => x.fdcouk), NATIONAL_LEAGUE]) {
   });
 }
 
-// Divisionsstatistiken (sidan Statistik): samma filer som historiken ovan
-// men med halvtid, hörnor, kort och domare. Egen cache, så att prognos-
-// motorns och backtestets underlag inte ändras.
+// Domarna (matchrutan): kort och frisparkar per domare de senaste avslutade
+// säsongerna – samma filer som historiken ovan men med domaren. Egen cache,
+// så att prognosmotorns och efterhandstestets underlag inte ändras. Årets
+// domare kommer ur säsongens fil (fdcouk_<div>) och kommande matchers ur
+// fdcouk_fixtures.
 for (const c of [...COMPETITIONS.filter((x) => x.fdcouk), NATIONAL_LEAGUE]) {
-  const { first, last } = HISTORY.fdcouk;
+  const { last } = HISTORY.fdcouk;
+  const first = last - HISTORY.referees.seasons + 1;
   const codes = [];
-  for (let y = first[c.fdcouk]; y <= last; y++) codes.push(fdSeasonCode(y));
+  for (let y = first; y <= last; y++) codes.push(fdSeasonCode(y));
   SOURCES.push({
     id: `fdcouk_stats_${c.fdcouk}`,
     provider: 'football-data.co.uk',
     short: 'football-data',
-    label: `Halvtid, hörnor, kort och domare ${seasonLabel(first[c.fdcouk])}–${seasonLabel(last)} – ${c.name}`,
+    label: `Domare och kort ${seasonLabel(first)}–${seasonLabel(last)} – ${c.name}`,
     comps: [c.id],
-    kinds: ['history'],
+    kinds: ['referee'],
     maxAgeHours: 24 * 30,
     staleAfterHours: 24 * 60,
     verified: VERIFIED,
     fetch: () => fdcouk.fetchHistory(c.fdcouk, codes, fdcouk.KEEP_STATS),
+    // En äldre hämtning kan ha fler säsonger – bara de som används räknas.
     summarize: (d) => {
-      const n = Object.values(d.seasons).reduce((s, rows) => s + rows.length, 0);
-      return { n, detail: `${Object.keys(d.seasons).length} säsonger, ${n} matcher` };
-    },
-  });
-}
-
-// Målminuter och publik per ligamatch (ESPN) – bara divisionsstatistiken.
-for (const c of COMPETITIONS.filter((x) => x.type === 'league')) {
-  const { first, last, months } = HISTORY.espnLeagues;
-  const bySeason = {};
-  for (let y = first; y <= last; y++) {
-    bySeason[fdSeasonCode(y)] = months.map((m) => `${Number(m) >= 7 ? y : y + 1}${m}`);
-  }
-  SOURCES.push({
-    id: `espn_hist_${c.id}`,
-    provider: 'ESPN',
-    short: 'ESPN',
-    label: `Målminuter och publik ${seasonLabel(first)}–${seasonLabel(last)} – ${c.name}`,
-    comps: [c.id],
-    kinds: ['history'],
-    maxAgeHours: 24 * 30,
-    staleAfterHours: 24 * 60,
-    verified: '2026-10-18',
-    fetch: () => espn.fetchHistory(c.espn, bySeason, espn.parseCrowd),
-    summarize: (d) => {
-      const all = Object.values(d.seasons).flat();
-      const crowd = all.filter((m) => m.attendance).length;
-      return { n: all.length, detail: `${Object.keys(d.seasons).length} säsonger, ${all.length} matcher, publik i ${crowd}` };
+      const used = codes.filter((k) => d.seasons[k]);
+      const n = used.reduce((s, k) => s + d.seasons[k].length, 0);
+      return { n, detail: `${used.length} säsonger, ${n} matcher` };
     },
   });
 }
@@ -250,9 +229,9 @@ SOURCES.push({
   id: 'fdcouk_fixtures',
   provider: 'football-data.co.uk',
   short: 'football-data',
-  label: 'Kommande ligamatcher med odds',
+  label: 'Kommande ligamatcher med odds och domare',
   comps: ['pl', 'ch', 'l1', 'l2', 'nl'],
-  kinds: ['odds'],
+  kinds: ['odds', 'referee'],
   maxAgeHours: 6,
   staleAfterHours: 48,
   verified: VERIFIED,

@@ -1,0 +1,189 @@
+/* Modell (modell.js): stegen, exemplet, avståndet mellan divisionerna,
+   stegen med måttstockarna och kandidatlistan. Bygger på tokens från
+   theme.css och lånar staplarna (.tug-stack) från matchrutan. */
+
+.ml-meta { margin-bottom: 0; }
+
+/* bättre / sämre / går inte att skilja åt – samma färger i alla tabeller */
+.ml-better { color: var(--fresh); }
+.ml-worse { color: var(--down); }
+.ml-even { color: var(--muted); }
+.ml-pass { color: var(--gold); }
+
+/* ---------- så räknas en prognos ---------- */
+
+.ml-steps {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 16px;
+  margin: 0 0 16px;
+  padding: 0;
+  list-style: none;
+}
+.ml-steps .card { padding: 22px 24px; }
+.ml-step-n {
+  display: block;
+  margin-bottom: 10px;
+  font-family: var(--display);
+  font-size: 30px;
+  font-weight: 650;
+  line-height: 1;
+  color: var(--gold);
+}
+.ml-steps p { margin: 0; font-size: 14px; line-height: 1.55; color: var(--ink-soft); }
+
+.ml-example { padding: 22px 24px; }
+.ml-example h4 .hint a { color: var(--accent-deep); }
+.ml-example .table-wrap { margin: 0; }
+.ml-example td:first-child { white-space: normal; }
+.ml-plus { display: inline-block; width: 1.1em; color: var(--muted); }
+.ml-example td .sub { padding-left: 1.1em; }
+.ml-example tr.ml-final td { font-weight: 700; color: var(--bone); border-top: 1px solid var(--pill-line-hi); }
+
+/* ---------- avståndet mellan divisionerna ---------- */
+
+.ml-tiers { padding: 18px 24px 10px; }
+.ml-tier {
+  display: grid;
+  grid-template-columns: minmax(0, 11rem) minmax(0, 1fr) 3rem;
+  gap: 0 16px;
+  align-items: center;
+  padding: 9px 0;
+  border-top: 1px solid var(--hair);
+}
+.ml-tier-head { padding: 0 0 8px; border-top: 0; }
+.ml-tier-head .chart-legend { margin: 0; }
+.ml-tier-name { font-size: 14px; font-weight: 600; }
+.ml-tier-name .sub { display: inline; margin-left: 6px; }
+.ml-tier-goals { text-align: right; font-size: 13px; color: var(--muted); cursor: help; }
+.key.ml-k0 { background: var(--o-home); }
+.key.ml-k1 { background: var(--o-draw); }
+.key.ml-k2 { background: var(--o-away); }
+
+/* ---------- hur bra är den? ---------- */
+
+.ml-lede {
+  max-width: 46ch;
+  margin: 0 0 6px;
+  font-family: var(--display);
+  font-weight: 550;
+  font-size: clamp(19px, 2.2vw, 23px);
+  line-height: 1.3;
+  color: var(--bone);
+  text-wrap: pretty;
+}
+.ml-lede + .legend { margin-bottom: 16px; max-width: 70ch; }
+
+.ml-ladder { padding: 18px 24px 14px; }
+.ml-lrow {
+  display: grid;
+  grid-template-columns: minmax(0, 12rem) minmax(0, 1fr) 3.5rem;
+  gap: 0 16px;
+  align-items: center;
+  padding: 8px 0;
+}
+.ml-lname { font-size: 14px; color: var(--ink-soft); }
+.ml-lval { text-align: right; font-size: 14px; color: var(--ink-soft); }
+.ml-ltrack { position: relative; height: 18px; }
+.ml-ltrack::before {
+  content: "";
+  position: absolute;
+  left: 0;
+  right: 0;
+  top: 50%;
+  height: 1px;
+  background: var(--hair);
+}
+.ml-grid { position: absolute; top: 0; bottom: 0; width: 1px; background: var(--hair); }
+.ml-ldot {
+  position: absolute;
+  top: 50%;
+  width: 11px;
+  height: 11px;
+  border-radius: 50%;
+  background: var(--ink-soft);
+  box-shadow: 0 0 0 2px var(--card);
+  transform: translate(-50%, -50%);
+  cursor: help;
+}
+.ml-lrow.is-model .ml-lname,
+.ml-lrow.is-model .ml-lval { font-weight: 700; color: var(--gold-hi); }
+.ml-lrow.is-model .ml-ldot { width: 14px; height: 14px; background: var(--gold); }
+.ml-laxis { padding: 2px 0 0; }
+.ml-laxis .ml-ltrack { height: 16px; }
+.ml-laxis .ml-ltrack::before { content: none; }
+.ml-laxis b {
+  position: absolute;
+  top: 0;
+  transform: translateX(-50%);
+  font-size: 11px;
+  font-weight: 500;
+  color: var(--muted);
+  font-variant-numeric: tabular-nums;
+}
+.ml-laxis b.ml-many { display: none; }
+.ml-defs { margin: 18px 0 8px; max-width: 76ch; }
+
+/* ---------- i skarpt läge ---------- */
+
+.eval-title { margin-top: 40px; }
+
+/* ---------- prövat och förkastat ---------- */
+
+.ml-cands tr.ml-group th {
+  padding-top: 14px;
+  font-size: 11px;
+  font-weight: 750;
+  letter-spacing: 0.15em;
+  border-bottom-color: var(--hair);
+}
+.ml-cands tr.ml-group th.ml-better { color: var(--fresh); }
+.ml-cands tr.ml-group th.ml-pass { color: var(--gold); }
+.ml-cands tr.ml-group th.ml-worse { color: var(--down); }
+.ml-cands tr.ml-group .muted { margin-left: 6px; font-weight: 600; letter-spacing: 0; }
+.ml-cands tbody:first-of-type tr.ml-group th { padding-top: 10px; }
+.ml-cands td:first-child { min-width: 14rem; }
+.ml-why { font-size: 12.5px; }
+.ml-why-sm { display: none; }
+
+.ml-details { margin-top: 12px; }
+/* förklaringslistorna på sidan linjerar: samma bredd på termerna */
+.ml-defs,
+.ml-details dl.dv-defs,
+#model-more .dv-glossary dl.dv-defs { grid-template-columns: minmax(0, 12rem) minmax(0, 1fr); }
+#model-more .dv-glossary ul.plain li { padding: 6px 0; }
+.ml-details > summary { cursor: pointer; }
+.ml-details h4.sub-h:first-of-type { margin-top: 18px; }
+
+@media (max-width: 980px) {
+  .ml-steps { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+}
+@media (max-width: 560px) {
+  .ml-steps { grid-template-columns: minmax(0, 1fr); }
+  .ml-steps .card,
+  .ml-example { padding: 18px 16px; }
+  .ml-tiers,
+  .ml-ladder { padding-left: 16px; padding-right: 16px; }
+  /* divisionen på en egen rad ovanför stapeln, så att stapeln får hela bredden */
+  .ml-tier { grid-template-columns: minmax(0, 1fr) 2.4rem; gap: 6px 10px; }
+  .ml-tier-name { grid-column: 1 / -1; }
+  .ml-tier-head > div:first-child { display: none; }
+  /* exemplet: steget på en rad, siffrorna under */
+  .ml-example thead tr,
+  .ml-example tbody tr { display: grid; grid-template-columns: minmax(0, 1fr) repeat(3, 3.2rem); }
+  .ml-example th:first-child { display: none; }
+  .ml-example td:first-child { grid-column: 1 / -1; padding-bottom: 2px; border-bottom: 0; }
+  .ml-example tr.ml-final td { border-top: 0; }
+  .ml-example tr.ml-final td:first-child { border-top: 1px solid var(--pill-line-hi); }
+  .ml-example td.num { text-align: right; }
+  .ml-example td:nth-child(2) { text-align: left; }
+  .ml-lrow { grid-template-columns: minmax(0, 7.5rem) minmax(0, 1fr) 2.8rem; gap: 0 10px; }
+  .ml-lname { font-size: 13px; }
+  .ml-laxis b.ml-odd { display: none; }
+  .ml-cands td:first-child { min-width: 0; }
+  .ml-cands .ml-why-col { display: none; }
+  .ml-cands .ml-why-sm { display: block; margin-top: 4px; color: var(--ink-soft); }
+  .ml-defs,
+  .ml-details dl.dv-defs,
+  #model-more .dv-glossary dl.dv-defs { grid-template-columns: minmax(0, 1fr); }
+}

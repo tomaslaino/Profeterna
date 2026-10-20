@@ -28,6 +28,8 @@
   <link rel="stylesheet" href="enhet.css">
   <link rel="stylesheet" href="systembild.css">
   <link rel="stylesheet" href="forklaring.css">
+  <link rel="stylesheet" href="kallor.css">
+  <link rel="stylesheet" href="modell.css">
 </head>
 <body>
   <header class="topbar">
@@ -99,22 +101,21 @@
       </div>
     </section>
 
+    <!-- Källor: läget, vad som kommer varifrån och ett kort per källa (kallor.js) -->
     <section id="sources-section" aria-label="Källor" hidden>
       <h2 class="page-title">Källor</h2>
-      <p class="intro" id="sources-summary"></p>
-      <div id="coverage"></div>
-      <h3>Källorna</h3>
-      <div id="sources-table"></div>
-      <p class="legend" id="unmapped"></p>
+      <div id="sources">Laddar …</div>
     </section>
 
-    <!-- Modell: hur prognoserna räknas och, sist, utvärderingen mot facit
-         (#modell och #utvardering) -->
-    <section id="model-section" aria-label="Modell och utvärdering" hidden>
+    <!-- Modell: hur prognoserna räknas och hur bra de är, prognosjournalen
+         rättad mot facit (#utvardering) och sist det som prövats och
+         detaljerna (modell.js) -->
+    <section id="model-section" aria-label="Modell" hidden>
       <h2 class="page-title">Modell</h2>
       <div id="model">Laddar …</div>
-      <h2 class="page-title eval-title" id="eval-title">Utvärdering</h2>
+      <h3 class="eval-title" id="eval-title">I skarpt läge</h3>
       <div id="evaluation">Laddar …</div>
+      <div id="model-more"></div>
     </section>
   </main>
 
@@ -136,6 +137,8 @@
   <script src="matchruta.js"></script>
   <script src="hojdpunkter.js"></script>
   <script src="forklaring.js"></script>
+  <script src="kallor.js"></script>
+  <script src="modell.js"></script>
   <script src="app.js"></script>
   <script src="kupong.js"></script>
   <script src="systembild.js"></script>

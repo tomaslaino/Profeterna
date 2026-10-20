@@ -40,7 +40,7 @@ async function fetchFixtures(slug, season) {
 
 // Tidigare säsonger av en tävling: { startår: [månader YYYYMM] }. Bara
 // spelade matcher sparas. parse = hur en match sparas (standard: som i
-// spelprogrammet; parseCrowd för divisionsstatistiken).
+// spelprogrammet).
 async function fetchHistory(slug, monthsBySeason, parse = parseEvent) {
   const jobs = [];
   for (const [season, months] of Object.entries(monthsBySeason)) {
@@ -94,24 +94,6 @@ function parseEvent(e) {
         shootout: !!d.shootout,
       }))
       : [],
-  };
-}
-
-// Kompakt match för divisionsstatistiken: målminuterna med sida (h/a, det
-// lag som krediteras målet) och publiksiffran (0/saknas = okänd).
-function parseCrowd(e) {
-  const p = parseEvent(e);
-  const att = num(e.competitions[0].attendance);
-  return {
-    id: p.id,
-    kickoff: p.kickoff,
-    completed: p.completed,
-    round: p.round,
-    home: p.home.name,
-    away: p.away.name,
-    score: p.score,
-    goals: p.goals.filter((g) => !g.shootout).map((g) => [g.clock, g.teamId === p.home.espnId ? 'h' : 'a']),
-    attendance: att > 0 ? att : null,
   };
 }
 
@@ -187,4 +169,4 @@ function decimal(american) {
   return Math.round(d * 1000) / 1000;
 }
 
-module.exports = { fetchFixtures, fetchHistory, fetchStandings, fetchOdds, seasonMonths, decimal, parseCrowd };
+module.exports = { fetchFixtures, fetchHistory, fetchStandings, fetchOdds, seasonMonths, decimal };

@@ -164,10 +164,10 @@ function build() {
 }
 
 // Domarna: alla ligamatcher nivå 1–5 med domare och kort de senaste
-// REF_SEASONS avslutade säsongerna (fdcouk_stats_*, samma filer som sidan
-// Statistik) och i år (fdcouk_*). Index per domare och per division, i
-// datumordning, så att en match bara ser matcher före sin egen dag.
-const REF_SEASONS = 3;
+// REF_SEASONS avslutade säsongerna (fdcouk_stats_*) och i år (fdcouk_*).
+// Index per domare och per division, i datumordning, så att en match bara
+// ser matcher före sin egen dag.
+const REF_SEASONS = require('../config/competitions').HISTORY.referees.seasons;
 const REF_MIN = 10;
 const DIV_IDS = { E0: 'pl', E1: 'ch', E2: 'l1', E3: 'l2', EC: 'nl' };
 

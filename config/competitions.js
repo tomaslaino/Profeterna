@@ -47,13 +47,12 @@ const SEASON = {
 // Rundornas namn varierar mellan säsongerna ("round-1", "1st-round",
 // "first-round") – därför används de inte i historiken.
 //
-// ESPN ligorna: målminuter och publik per match – bara underlag för
-// divisionsstatistiken (sidan Divisioner), inte för prognoserna. Fem
-// säsonger räcker för fördelningarna; säsongen kan börja i juli.
+// Domarna (matchrutan): kort och frisparkar de senaste avslutade säsongerna
+// ur football-data.co.uk, med samma säsonger på alla nivåer.
 const HISTORY = {
   fdcouk: { first: { E0: 2000, E1: 2000, E2: 2000, E3: 2000, EC: 2005 }, last: 2025 },
   espnFaCup: { first: 2021, last: 2025, months: ['10', '11', '12', '01', '02', '03', '04', '05'] },
-  espnLeagues: { first: 2021, last: 2025, months: ['07', '08', '09', '10', '11', '12', '01', '02', '03', '04', '05'] },
+  referees: { seasons: 3 },
 };
 
 // Säsongskod hos football-data.co.uk: startår 2025 → "2526".

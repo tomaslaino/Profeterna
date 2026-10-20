@@ -40,14 +40,11 @@ const KEEP_HISTORY = [
   'AvgCH', 'AvgCD', 'AvgCA', 'BFECH', 'BFECD', 'BFECA', 'PSCH', 'PSCD', 'PSCA', 'AvgC>2.5', 'AvgC<2.5',
 ];
 
-// Divisionsstatistiken (sidan Statistik): halvtid, hörnor, frisparkar, kort,
-// domare, avsparkstid (från 2019/20) och publik (bara de första säsongerna)
-// plus marknadssnittets odds. Egen källa, så att prognosmotorns historik
-// (och backtestets signatur på den) inte ändras.
+// Domarna (matchrutan): domaren, korten och frisparkarna per match. Egen
+// källa, så att prognosmotorns historik (och efterhandstestets signatur på
+// den) inte ändras.
 const KEEP_STATS = [
-  'Date', 'Time', 'HomeTeam', 'AwayTeam', 'FTHG', 'FTAG', 'HTHG', 'HTAG', 'Referee', 'Attendance',
-  'HS', 'AS', 'HST', 'AST', 'HC', 'AC', 'HF', 'AF', 'HY', 'AY', 'HR', 'AR',
-  'AvgH', 'AvgD', 'AvgA', 'BbAvH', 'BbAvD', 'BbAvA', 'Avg>2.5', 'Avg<2.5', 'BbAv>2.5', 'BbAv<2.5',
+  'Date', 'HomeTeam', 'AwayTeam', 'FTHG', 'FTAG', 'Referee', 'HF', 'AF', 'HY', 'AY', 'HR', 'AR',
 ];
 
 async function fetchDivision(code, seasonCode) {
