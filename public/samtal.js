@@ -62,9 +62,19 @@
     return gang().some((g) => g.id === v) ? v : null;
   };
   const here = (sub) => Boolean(KP.view && KP.view.mode === 'samtal' && KP.view.sub === sub && !$('#coupon-section').hidden);
-  // Initialerna i en egen färg per person; streckad = del av en gardering.
-  const chip = (id, hedge = false) =>
-    `<span class="sm-ch sm-p${Math.max(0, gang().findIndex((g) => g.id === id))}${hedge ? ' g' : ''}"${hedge ? ' title="Del av en gardering"' : ''}>${esc(id)}</span>`;
+  // Var och en med sitt porträtt (bild i config/kupong.js) i en ring i sin
+  // färg – alla heter D-något, så initialerna skiljer dåligt. Initialerna om
+  // bilden saknas; streckad ring = del av en gardering.
+  const pnum = (id) => Math.max(0, gang().findIndex((g) => g.id === id));
+  const person = (id) => gang().find((g) => g.id === id) || { id, namn: id };
+  const photo = (id) => {
+    const g = person(id);
+    return g.bild ? `<img src="${esc(g.bild)}" alt="${esc(g.id)}" width="40" height="40" decoding="async" draggable="false">` : esc(g.id);
+  };
+  const chip = (id, hedge = false) => {
+    const g = person(id);
+    return `<span class="sm-ch sm-p${pnum(id)}${g.bild ? ' bild' : ''}${hedge ? ' g' : ''}" title="${esc(`${g.namn}${hedge ? ' · del av en gardering' : ''}`)}">${photo(id)}</span>`;
+  };
   const rader = (signs) => signs.reduce((a, s) => a * Math.max(1, s.length), 1);
   const plural = (n, one, many) => `${n} ${n === 1 ? one : many}`;
   const kicks = (s) => s.matcher.map((x) => Date.parse(x.avspark)).filter(Number.isFinite);
@@ -578,11 +588,12 @@
 
   // ---------- kupongen ----------
 
-  // Omgångens kupong på papper med en kolumn per person, i gängets ordning
-  // och i var sin bläckfärg. Din kolumn fyller du i direkt; de andras är
-  // täckta (inne) eller tomma (fyller i) tills du själv har lämnat in.
-  // Överst initialerna med bock eller tre prickar, din inringad. Har du inte
-  // valt vem du är trycker du på dina initialer.
+  // Omgångens kupong på papper: en ruta per tecken i varje match, och var och
+  // en står med sitt porträtt i rutorna hen har valt – så syns direkt vem som
+  // tippat vad och var ni är eniga. Dina rutor trycker du på direkt; de
+  // andras porträtt syns först när du själv har lämnat in. Överst porträtten
+  // med bock eller tre prickar, ditt inringat. Har du inte valt vem du är
+  // trycker du på ditt porträtt.
   //   edit: du ändrar dina inlämnade tips (#kupong/samtal/tips)
   function sheet(s, edit) {
     const v = me();
@@ -590,7 +601,7 @@
     SM.edit = edit;
     SM.draft = fill ? draftFor(s, v, edit) : null;
     const stop = Math.min(...kicks(s));
-    return `<div class="pp-wrap sm-wrap"><div class="pp pp-fill sm-sheet" id="sm-sheet" style="--n: ${s.gang.length}">` +
+    return '<div class="pp-wrap sm-wrap"><div class="pp pp-fill sm-sheet" id="sm-sheet">' +
       '<div class="sm-sheet-head"><p class="pp-brand"><img src="logo.svg" alt="" width="20" height="20">Matchfixarna<span>Kupong</span></p>' +
       `<div class="pp-stop"><span>Spelstopp</span><b>${esc(fWeekdayTime.format(new Date(stop)))}</b></div></div>` +
       '<div class="pp-band" aria-hidden="true"></div>' +
@@ -614,7 +625,7 @@
     return d;
   }
 
-  // Vad som står i en persons kolumn: fill = ditt utkast, shown = tips du får
+  // Vad som syns av en persons tips: fill = ditt utkast, shown = tips du får
   // se, own = dina inlämnade på den här enheten, hidden = inne men dolt,
   // blank = inget ännu.
   function column(s, g, v) {
@@ -626,25 +637,30 @@
     return { st: g.inne ? 'hidden' : 'blank', t: {} };
   }
 
-  const box = (sg, on, key) => `<span class="pp-box"><i>${sg}</i>${on ? Papper.cross(key) : ''}</span>`;
+  // Porträttet på papperet, i en ring i personens bläck.
+  const face = (id, tip = true) =>
+    `<span class="sm-fc sm-k${pnum(id)}"${tip ? ` title="${esc(person(id).namn)}"` : ''}>${photo(id)}</span>`;
+  // Rutan för ett tecken med porträtten för dem som har valt det.
+  const box = (sg, who) => `<span class="pp-box sm-bx${who.length ? ' on' : ''}"><i>${sg}</i>${who.map((id) => face(id)).join('')}</span>`;
 
   function sheetList() {
     const s = SM.data;
     const v = me();
     const d = SM.draft;
     const now = Date.now();
-    const cols = s.gang.map((g, k) => ({ g, k, ...column(s, g, v) }));
+    const cols = s.gang.map((g) => ({ g, ...column(s, g, v) }));
     // Vem du är går att välja tills du har lämnat in.
     const choose = !submitted(s, v);
     let html = '<div class="sm-r sm-hd"><span class="sm-hd-nr" aria-hidden="true">Nr</span>' +
-      `<span class="sm-m">${v ? '<span aria-hidden="true">Match</span>' : '<span class="sm-q">Vem är du?</span>'}</span>` +
-      cols.map(({ g, k }) => {
+      `<span class="sm-m">${v ? '<span class="sm-hd-l" aria-hidden="true">Match</span>' : '<span class="sm-q">Vem är du?</span>'}` +
+      '<span class="sm-folk-pp">' + cols.map(({ g }) => {
         const du = g.id === v;
         const tag = choose ? 'button' : 'span';
-        return `<${tag}${choose ? ` type="button" aria-pressed="${du}"` : ''} class="sm-k sm-k${k}${du ? ' du' : ''}" data-vem="${esc(g.id)}" ` +
-          `title="${esc(`${g.namn} · ${du ? 'du · ' : ''}${lage(s, g)}`)}"><b class="sm-who">${esc(g.id)}` +
-          `${du ? Papper.ring(`du${s.id}${g.id}`, 'sm-du-ring', 25) : ''}</b>${mark(s, g)}</${tag}>`;
-      }).join('') + '</div>';
+        return `<${tag}${choose ? ` type="button" aria-pressed="${du}"` : ''} class="sm-who sm-k${pnum(g.id)}${du ? ' du' : ''}" data-vem="${esc(g.id)}" ` +
+          `title="${esc(`${g.namn} · ${du ? 'du · ' : ''}${lage(s, g)}`)}"><span class="sm-fw">${face(g.id, false)}` +
+          `${du ? Papper.ring(`du${s.id}${g.id}`, 'sm-du-ring', 25) : ''}</span>${mark(s, g)}</${tag}>`;
+      }).join('') + '</span></span>' +
+      SIGNS.map((sg) => `<b class="sm-hd-s" aria-hidden="true">${sg}</b>`).join('') + '</div>';
     let day = null;
     s.matcher.forEach((x, i) => {
       const k = dayKey.format(new Date(x.avspark));
@@ -659,21 +675,22 @@
       // När du ändrar står matcher som har startat kvar som de var.
       const locked = SM.edit && started(x, now);
       const sign = d ? d.tecken[x.id] || '' : '';
+      // Dina rutor är knappar medan du fyller i; skärmläsaren får de andras
+      // tips som text.
+      const own = Boolean(d) && !locked;
+      const sr = cols.filter((c) => !(own && c.st === 'fill')).map((c) =>
+        `${c.g.id}: ${c.st === 'hidden' ? 'dolt' : c.st === 'blank' ? 'inget ännu' : c.t[x.id] || 'inget'}`);
       html += `<div class="sm-r${i % 2 ? ' alt' : ''}${locked ? ' sm-locked' : ''}${d && !sign ? ' unsigned' : ''}" data-id="${esc(x.id)}">` +
         `<span class="pp-nr">${i + 1}</span>` +
         `<span class="sm-m"><span class="pp-tm">${teamsHtml(x, m)}</span>` +
-        `<span class="pp-small">${esc(fTime.format(new Date(x.avspark)))}${comp ? ` · <abbr title="${esc(comp.name)}">${esc(comp.short)}</abbr>` : ''}</span></span>` +
-        cols.map((c) => {
-          const cls = `sm-k sm-k${c.k}${c.g.id === v ? ' du' : ''}`;
-          if (c.st === 'fill' && !locked) {
-            return `<span class="${cls}">` + SIGNS.map((sg, j) =>
-              `<button type="button" data-s="${sg}" aria-pressed="${sign.includes(sg)}" aria-label="${sg} för ${esc(label)}">` +
-              `${box(sg, sign.includes(sg), `${c.g.id}${x.id}${sg}`)}<small>${p ? pctOdds(p[j]) : '–'}</small></button>`).join('') + '</span>';
-          }
-          const t = c.t[x.id] || '';
-          return `<span class="${cls} ${c.st}">` + SIGNS.map((sg) => box(sg, t.includes(sg), `${c.g.id}${x.id}${sg}`)).join('') +
-            `<span class="pp-sr">${esc(c.g.id)}: ${c.st === 'hidden' ? 'dolt' : t || 'inget'}</span>` +
-            (c.st === 'hidden' ? '<span class="sm-foil" aria-hidden="true"></span>' : '') + '</span>';
+        `<span class="pp-small">${esc(fTime.format(new Date(x.avspark)))}${comp ? ` · <abbr title="${esc(comp.name)}">${esc(comp.short)}</abbr>` : ''}</span>` +
+        (sr.length ? `<span class="pp-sr">${esc(sr.join(', '))}</span>` : '') + '</span>' +
+        SIGNS.map((sg, j) => {
+          const who = cols.filter((c) => (c.t[x.id] || '').includes(sg)).map((c) => c.g.id);
+          return own
+            ? `<button type="button" class="sm-c sm-k${pnum(v)}" data-s="${sg}" aria-pressed="${sign.includes(sg)}" aria-label="${sg} för ${esc(label)}">` +
+              `${box(sg, who)}<small>${p ? pctOdds(p[j]) : '–'}</small></button>`
+            : `<span class="sm-c" aria-hidden="true">${box(sg, who)}</span>`;
         }).join('') +
         // Motiveringen under matchen du just tippade, och där du har skrivit en.
         (sign && !locked && (SM.noteRow === x.id || d.kommentarer[x.id]) ? `<input type="text" class="kp-note-in" data-note="${esc(x.id)}" maxlength="${NOTE_MAX}" autocomplete="off"` +
@@ -1019,12 +1036,12 @@
       : '<a href="#kupong">Dags för uppgörelsen</a>';
     return '<div class="card sm-teaser">' +
       `<div>${eyebrow(s)}<h2 class="page-title">${title}</h2></div>` +
-      // Initialerna: egen färg och bock = inne, grå = inte inne, guldring = du.
+      // Porträtten: ring i egen färg och bock = inne, grått = inte inne,
+      // guldring = du.
       '<div class="sm-faces">' + s.gang.map((g) => {
         const st = g.inne ? 'inne' : open ? 'fyller i' : 'lämnade inte in';
-        const p = Math.max(0, gang().findIndex((x) => x.id === g.id));
-        return `<span class="sm-face sm-p${p}${g.inne ? ' inne' : ''}${g.id === v ? ' du' : ''}" title="${esc(`${g.namn} · ${st}`)}">` +
-          `${esc(g.id)}${g.inne ? CHECK : ''}</span>`;
+        return `<span class="sm-face sm-p${pnum(g.id)}${person(g.id).bild ? ' bild' : ''}${g.inne ? ' inne' : ''}${g.id === v ? ' du' : ''}" title="${esc(`${g.namn} · ${st}`)}">` +
+          `${photo(g.id)}${g.inne ? CHECK : ''}</span>`;
       }).join('') + '</div>' +
       '<a class="kp-btn primary" href="#kupong">' + go + '</a></div>';
   }
