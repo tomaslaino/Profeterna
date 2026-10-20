@@ -555,9 +555,9 @@ dubbletter – och EFL-cupens omgång 4 utan marknad, eftersom DraftKings-oddsen
 flyttas en match räknas raderna före den faktiska avsparken. Matchvyn visar den med
 loggningstid, rättad mot facit, och skillnaden mot den återskapade prognosen. Matchlistan visar
 spelade och kommande matcher i en följd med en nu-linje emellan (de senaste resultaten först,
-resten bakom knappen Tidigare matcher). Spelade matcher visar journalens prognos med det
-troligaste utfallet grönt om det slog in efter 90 minuter och rött om inte; kursiv = matchen
-loggades aldrig och prognosen är återskapad (rättas inte i listan).
+resten bakom knappen Tidigare matcher). Spelade matcher visar bara resultatet, med
+höjdpunkternas spelikon i en egen kolumn framför; journalens prognos och om den slog in efter
+90 minuter står i resultatets tooltip (återskapad prognos om matchen aldrig loggades).
 
 **Utvärderingen** (sist på Modell-sidan), mot ställningen efter 90 minuter (okänd = matchen
 utvärderas inte):

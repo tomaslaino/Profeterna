@@ -645,10 +645,21 @@ table.cmp tr.model td { background: var(--accent-soft); color: #fff; }
 .pbar i.max { opacity: 1; }
 .mside-odds .pbar { min-width: 112px; margin-top: 7px; }
 
-/* Prognosen under resultatet: det troligaste utfallet grönt om det slog in,
-   rött om inte. */
-.mside .tip-ok { color: var(--fresh); }
-.mside .tip-no { color: var(--down); }
+/* Spelad match: spelikonen (hojdpunkter.css) och resultatet i var sin fast
+   kolumn, så att båda står i rak linje rad för rad – också där klipp saknas.
+   Prognosen före avspark står i resultatets tooltip. Raden är lika hög med
+   resultatet dolt (spoiler.css .sp-chip). */
+.mside-res {
+  display: grid;
+  grid-template-columns: 26px 3.2rem;
+  grid-template-rows: minmax(33px, auto);
+  column-gap: 12px;
+  align-items: center;
+  justify-items: center;
+}
+.mside-res > :not(.mres-hl) { grid-column: 2; }
+.mres-hl { display: grid; }
+.mside-res .sub { margin-top: 2px; font-size: 11.5px; }
 
 /* Nu-linjen i matchlistan: spelat ovanför, kommande under. Guldet som i
    resten av detaljerna. */
@@ -886,6 +897,8 @@ footer .foot-links a[aria-current="page"] { color: var(--fg); }
   .mrow { grid-template-columns: 2.9rem 1fr auto; row-gap: 5px; }
   .mside-odds { grid-column: 2 / -1; text-align: left; }
   .mside-odds .pbar { max-width: 150px; }
+  .mside-res { grid-template-columns: 24px 3.2rem; column-gap: 8px; }
+  .mside-res .hl-play { width: 24px; height: 24px; }
   /* prognosens procent på en rad även i smala kolumner */
   .fc-num { font-size: 38px; }
   .fc-col.draw .fc-num { font-size: 28px; }

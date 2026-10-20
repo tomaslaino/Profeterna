@@ -254,9 +254,8 @@ function showEarlier() {
   if (first) first.focus({ preventScroll: true });
 }
 
-// Kolumnens nyckel står i första dagens rubrik på var sida om nu-linjen i
-// stället för en förklaring.
-const KEY_PLAYED = '<span class="day-key" style="float:right;margin-right:20px" title="Resultat, under det prognosen 1 · X · 2 som odds före avspark">Resultat · odds</span>';
+// Kolumnens nyckel står i första kommande dagens rubrik i stället för en
+// förklaring. Spelade matcher visar bara resultatet och behöver ingen.
 const KEY_UPCOMING = '<span class="day-key" style="float:right;margin-right:20px" title="Matchfixarnas odds för hemmaseger · oavgjort · bortaseger efter 90 minuter – rättvisa odds, utan spelbolagens marginal">Odds 1 · X · 2</span>';
 
 function renderList(d) {
@@ -267,7 +266,7 @@ function renderList(d) {
   if (d.more) {
     html += `<button type="button" class="earlier"><span aria-hidden="true">↑</span> Tidigare matcher <span class="n">${d.more}</span></button>`;
   }
-  html += renderDays(d.played, KEY_PLAYED);
+  html += renderDays(d.played, '');
   if (d.played.length) html += '<div class="now-line" role="separator"><span>Nu</span></div>';
   html += d.upcoming.length
     ? renderDays(d.upcoming, KEY_UPCOMING)
@@ -335,28 +334,28 @@ function tipHit(m) {
   return m.j.p.indexOf(Math.max(...m.j.p)) === res;
 }
 
-// Journalens prognos under resultatet, det troligaste utfallet grönt om det
-// slog in och rött om inte. Utan rättning (dold eller okänd): bara oddsen.
-function tipOdds(p, hit) {
-  const o = listOdds(p);
-  if (hit == null) return o.join(' · ');
-  const tip = p.indexOf(Math.max(...p));
-  const cls = hit ? 'tip-ok' : 'tip-no';
-  return o.map((x, i) => (i === tip ? `<b class="${cls}">${x}</b>` : x)).join(' · ') +
-    ` <span class="${cls}" title="Prognosens troligaste utfall ${hit ? 'slog in' : 'slog inte in'}">${hit ? '✓' : '✗'}</span>`;
+// Prognosen före avspark i resultatets tooltip – på raden står bara
+// resultatet. Journalens prognos rättas mot ställningen efter 90 minuter.
+function tipTitle(m) {
+  if (m.j && m.j.p) {
+    const hit = tipHit(m);
+    return `Prognosen före avspark ${listOdds(m.j.p).join(' · ')}${hit == null ? '' : hit ? ' – slog in' : ' – slog inte in'}`;
+  }
+  return m.f ? `Prognosen i efterhand ${listOdds(m.f.p).join(' · ')}` : '';
 }
 
+// Spelad match: spelikonen och resultatet i var sin fast kolumn (theme.css
+// .mside-res), så att båda står i rak linje rad för rad.
 function matchRow(m) {
   let side;
   if (m.completed && m.score) {
-    if (isHidden(m)) side = Spoiler.chip();
+    side = `<span class="mres-hl">${window.Hojdpunkter ? Hojdpunkter.row(m) : ''}</span>`;
+    if (isHidden(m)) side += Spoiler.chip();
     else {
-      side = `<span class="score">${m.score.home}–${m.score.away}</span>`;
+      const t = tipTitle(m);
+      side += `<span class="score"${t ? ` title="${esc(t)}"` : ''}>${m.score.home}–${m.score.away}</span>`;
       if (m.shootout) side += `<span class="sub">str. ${m.shootout.home}–${m.shootout.away}</span>`;
     }
-    if (window.Hojdpunkter) side = Hojdpunkter.row(m) + side;
-    if (m.j) side += `<span class="sub" title="Prognosen före avspark, ur journalen">${m.j.p ? tipOdds(m.j.p, isHidden(m) ? null : tipHit(m)) : 'okänt'}</span>`;
-    else if (m.f) side += `<span class="sub retro" title="Inte loggad – återskapad i efterhand med underlaget före matchdagen">${listOdds(m.f.p).join(' · ')}</span>`;
   } else {
     side = listForecast(m.f);
     if (m.status === 'STATUS_POSTPONED') side += '<span class="sub">uppskjuten</span>';
@@ -367,7 +366,7 @@ function matchRow(m) {
     `<span class="ctag" title="${esc(compOf(m.comp).name)}">${esc(compOf(m.comp).short)}</span>` +
     `<span class="mteams">${esc(m.home)}<span class="vs">–</span>${esc(m.away)}` +
     `${m.round ? `<span class="sub">${esc(m.round)}</span>` : ''}</span>` +
-    `<span class="mside${m.completed && m.score ? '' : ' mside-odds'}">${side}</span></button>`;
+    `<span class="mside${m.completed && m.score ? ' mside-res' : ' mside-odds'}">${side}</span></button>`;
 }
 
 // ---------- matchrutan ----------
