@@ -183,6 +183,8 @@
           line: y.fieldLine,
           side: y.fieldSide,
           pos: (x.position && x.position.name) || '',
+          // Betyget efter matchen, 1–10; -1 eller inget = inget betyg (kort inhopp).
+          rt: x.ranking > 0 ? x.ranking : null,
           ev: ev.get(x.id) || null,
         };
       };
@@ -214,7 +216,12 @@
     const home = side(g.homeCompetitor);
     const away = side(g.awayCompetitor);
     for (const t of [home, away]) for (const p of [...t.starters, ...t.bench]) p.ev = ev.get(p.id) || null;
-    return { home, away, state: g.statusGroup, played: g.statusGroup === 4 || g.statusGroup === 3 };
+    // Högsta betyget i matchen (365Scores egna hasHighestRanking gäller per lag).
+    const rts = [home, away].flatMap((t) => [...t.starters, ...t.bench]).map((p) => p.rt).filter((v) => v != null);
+    return {
+      home, away, state: g.statusGroup, played: g.statusGroup === 4 || g.statusGroup === 3,
+      top: rts.length ? Math.max(...rts) : null,
+    };
   }
 
   // ---------- Startelvor ----------
@@ -236,11 +243,19 @@
     return h ? `<span class="mr-badges">${h}</span>` : '';
   }
 
-  function spots(t, cls) {
+  // Betyget från matchen; top är matchens högsta, null före slutsignalen.
+  function rating(p, top) {
+    if (top == null || p.rt == null) return '';
+    const best = p.rt === top;
+    return `<span class="mr-rt${best ? ' top' : ''}" title="Betyg från 365Scores, 1–10${best ? ' · högst i matchen' : ''}">` +
+      `${p.rt.toFixed(1).replace('.', ',')}</span>`;
+  }
+
+  function spots(t, cls, top) {
     return t.starters.map((p) => {
       const off = p.ev && p.ev.off != null ? `<span class="mr-off" title="Utbytt">${p.ev.off}′</span>` : '';
       return `<div class="mr-pl ${cls}" style="--l:${p.line};--s:${p.side}" title="${esc(p.name)}${POS_SV[p.pos] ? `, ${POS_SV[p.pos]}` : ''}">` +
-        `<span class="mr-dot">${p.nr == null ? '' : p.nr}${badges(p.ev)}</span>` +
+        `<span class="mr-dot">${p.nr == null ? '' : p.nr}${rating(p, top)}${badges(p.ev)}</span>` +
         `<span class="mr-nm">${esc(p.short)}${off}</span></div>`;
     }).join('');
   }
@@ -255,10 +270,10 @@
     '<rect x="0.5" y="0.5" width="67" height="104" rx="1"/><path d="M0.5 52.5h67"/><circle cx="34" cy="52.5" r="9.15"/>' +
     '<path d="M13.84 0.5v16.5h40.32V0.5M24.84 0.5v5.5h18.32V0.5M13.84 104.5V88h40.32v16.5M24.84 104.5V99h18.32v5.5"/></svg>';
 
-  function playerList(list, played) {
+  function playerList(list, played, top) {
     return '<ul class="mr-names">' + list.map((p) => {
       const on = played && p.ev && p.ev.on != null ? ` <span class="mr-on" title="Inbytt">${p.ev.on}′</span>` : '';
-      return `<li><span class="mr-nr">${p.nr == null ? '' : p.nr}</span>${esc(p.name)}${on}${badges(p.ev)}</li>`;
+      return `<li><span class="mr-nr">${p.nr == null ? '' : p.nr}</span>${esc(p.name)}${on}${badges(p.ev)}${rating(p, top)}</li>`;
     }).join('') + '</ul>';
   }
 
@@ -272,11 +287,11 @@
     return h;
   }
 
-  function teamBlock(name, t, played, cls) {
+  function teamBlock(name, t, played, cls, top) {
     let h = `<div class="mr-team ${cls}"><h4><i class="mr-key"></i>${esc(name)}${t.formation ? ` <span class="hint">${esc(t.formation)}</span>` : ''}</h4>`;
     if (t.coach) h += `<p class="mr-coach"><span class="muted">Tränare</span> ${esc(t.coach)}</p>`;
-    if (t.starters.length && !t.placedBoth) h += `<h5>Startelva</h5>${playerList(t.starters, played)}`;
-    if (t.bench.length) h += `<h5>Avbytare</h5>${playerList(t.bench, played)}`;
+    if (t.starters.length && !t.placedBoth) h += `<h5>Startelva</h5>${playerList(t.starters, played, top)}`;
+    if (t.bench.length) h += `<h5>Avbytare</h5>${playerList(t.bench, played, top)}`;
     h += outList(t);
     if (!t.starters.length && !t.bench.length && !t.out.length) h += '<p class="muted">Inget från 365Scores än.</p>';
     return h + '</div>';
@@ -304,17 +319,18 @@
     else if (confirmed(home) && confirmed(away)) chip = '<span class="mr-chip ok">Bekräftad startelva</span>';
     else chip = '<span class="mr-chip prob" title="Bedömd av 365Scores · bekräftad ungefär en timme före avspark">Trolig startelva</span>';
     let h = `<div class="mr-lu-head">${chip}<span class="mr-src">365Scores, hämtat ${esc(fClock.format(new Date(r.at)))}</span></div>`;
+    const played = L.played || m.completed;
+    const top = played ? L.top : null;
     if (both) {
       // Lagens rader står ovanför planen på breda skärmar och vid var sin
       // planhalva på mobilen (bortalaget överst).
       const leg = (name, t, cls) => `<div class="mr-leg ${cls}"><i class="mr-key"></i><span class="n">${esc(name)}</span>` +
         `${t.formation ? `<b>${esc(t.formation)}</b>` : ''}</div>`;
       h += `<div class="mr-pitch-wrap">${leg(m.home, home, 'h')}${leg(m.away, away, 'a')}` +
-        `<div class="mr-pitch">${LINES_WIDE}${LINES_TALL}${spots(home, 'h')}${spots(away, 'a')}</div></div>`;
+        `<div class="mr-pitch">${LINES_WIDE}${LINES_TALL}${spots(home, 'h', top)}${spots(away, 'a', top)}</div></div>`;
     }
-    const played = L.played || m.completed;
     const some = (t) => t.starters.length || t.bench.length || t.out.length || t.coach;
-    if (some(home) || some(away)) h += `<div class="mr-teams">${teamBlock(m.home, home, played, 'h')}${teamBlock(m.away, away, played, 'a')}</div>`;
+    if (some(home) || some(away)) h += `<div class="mr-teams">${teamBlock(m.home, home, played, 'h', top)}${teamBlock(m.away, away, played, 'a', top)}</div>`;
     return h;
   }
 

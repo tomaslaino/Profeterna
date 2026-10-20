@@ -236,6 +236,22 @@ dialog.mr-modal::backdrop {
   display: flex;
   gap: 1px;
 }
+/* betyget från matchen: uppe till vänster om markeringen (målen och korten
+   sitter till höger), matchens högsta i guld */
+.mr-dot .mr-rt {
+  position: absolute;
+  top: -7px;
+  right: calc(100% - 9px);
+  padding: 1px 3px;
+  font-size: 9.5px;
+  font-weight: 700;
+  line-height: 1.15;
+  color: #f8f2e8;
+  background: rgba(14, 13, 10, 0.86);
+  border-radius: 4px;
+  box-shadow: 0 1px 4px rgba(0, 0, 0, 0.5);
+}
+.mr-dot .mr-rt.top { color: var(--gold-hi); box-shadow: 0 0 0 1px var(--gold), 0 1px 4px rgba(0, 0, 0, 0.5); }
 .mr-off { margin-left: 3px; font-size: 10px; font-weight: 700; color: #f6a596; }
 .mr-off::before { content: "▼"; margin-right: 1px; font-size: 7px; vertical-align: 1px; }
 .mr-on { margin-left: 4px; font-size: 11px; font-weight: 700; color: #8fe0b4; }
@@ -290,6 +306,8 @@ dialog.mr-modal::backdrop {
 .mr-out li .muted { font-size: 12.5px; }
 .mr-nr { flex: none; width: 1.9em; font-size: 12.5px; color: var(--muted); font-variant-numeric: tabular-nums; }
 .mr-names .mr-badges { position: static; display: inline-flex; gap: 2px; margin-left: 4px; }
+.mr-names .mr-rt { margin-left: auto; padding-left: 10px; font-size: 13px; font-weight: 650; color: var(--ink-soft); font-variant-numeric: tabular-nums; }
+.mr-names .mr-rt.top { color: var(--gold-hi); }
 
 /* ---------- Matchen ---------- */
 
