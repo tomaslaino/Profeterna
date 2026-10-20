@@ -81,7 +81,8 @@
   const plural = (n, one, many) => `${n} ${n === 1 ? one : many}`;
   const kicks = (s) => s.matcher.map((x) => Date.parse(x.avspark)).filter(Number.isFinite);
   const over = (s) => Date.now() >= Math.max(...kicks(s));
-  const teamsHtml = (x, m) => (m ? `${esc(m.home)}<span class="vs">–</span>${esc(m.away)}` : esc(x.match));
+  // Matchnamnet öppnar matchrutan, som på uppgörelsens papper.
+  const teamsHtml = (x, m) => (m ? `<a class="pp-t" href="#match/${esc(x.id)}">${esc(m.home)}<span class="vs">–</span>${esc(m.away)}</a>` : esc(x.match));
   // Dina inlämnade tips för omgången på den här enheten, med nyckeln som
   // visar de andras.
   const handedIn = (s) => {

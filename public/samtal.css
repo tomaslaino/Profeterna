@@ -254,6 +254,9 @@ button.sm-who:focus-visible { outline: 2px solid var(--ink); outline-offset: 1px
 /* foten: hur långt du har kommit */
 .sm-foot { margin-top: 18px; }
 .sm-m .vs { margin: 0 0.35em; }
+/* matchnamnet öppnar matchrutan */
+.sm-r a.pp-t { color: inherit; text-decoration: none; }
+.sm-r a.pp-t:hover { text-decoration: underline; text-decoration-thickness: 1px; text-underline-offset: 3px; }
 
 /* Allt man gör med kupongen står på ett ställe: raden längst ner på
    papperet, som står kvar nederst medan man bläddrar – som raden med
@@ -405,8 +408,6 @@ button.sm-who:focus-visible { outline: 2px solid var(--ink); outline-offset: 1px
 .sm-up .sm-r:not(.sm-hd) { min-height: 58px; }
 .sm-up .sm-m { display: flex; align-items: center; gap: 12px; }
 .sm-mt { flex: 1 1 auto; min-width: 0; }
-.sm-up a.pp-t { color: inherit; text-decoration: none; }
-.sm-up a.pp-t:hover { text-decoration: underline; text-decoration-thickness: 1px; text-underline-offset: 3px; }
 .sm-up .s-off .pp-t { text-decoration: line-through 2px var(--pp-pen); color: var(--pp-ink-soft); }
 /* gängets kupong: en match som gänget inte gav något tecken */
 .sm-r.sm-out > :not(.pp-nr) { opacity: 0.5; }
