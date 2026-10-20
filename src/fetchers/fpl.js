@@ -8,8 +8,10 @@
 //
 // Samma svar har speltid, xG/xA (Opta) och FPL:s pris och poäng per spelare
 // – underlag för spelartabellen på sidan Statistik (verifierat 2026-10-19:
-// Haaland 619 min, 8 mål på 5,69 xG). Namn och födelsedatum kopplar ihop
-// spelaren med ESPN-truppen (src/players.js).
+// Haaland 619 min, 8 mål på 5,69 xG) – och försvarsspelet: tacklingar,
+// bollvinster och rensningar/blockeringar/brytningar (verifierat 2026-10-20:
+// Khalaili 25 tacklingar efter sju omgångar). Namn och födelsedatum kopplar
+// ihop spelaren med ESPN-truppen (src/players.js).
 
 const { getJson } = require('./http');
 
@@ -43,6 +45,9 @@ async function fetchBootstrap() {
     xgc: dec(p.expected_goals_conceded),
     cs: p.clean_sheets,
     dc: p.defensive_contribution ?? null,
+    tackles: p.tackles ?? null,
+    recoveries: p.recoveries ?? null,
+    cbi: p.clearances_blocks_interceptions ?? null,
     cost: Number.isFinite(p.now_cost) ? p.now_cost / 10 : null, // miljoner pund
     sel: dec(p.selected_by_percent),
     points: p.total_points,

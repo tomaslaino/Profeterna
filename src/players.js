@@ -1,9 +1,9 @@
 'use strict';
 
 // Spelardata per division och per lag, ur ESPN-trupperna (src/playersources.js),
-// FPL (bara Premier League: skadelistan och speltid, xG/xA, pris och poäng per
-// spelare) och ESPN:s matchrapporter (speltiden i Championship, League One och
-// League Two). Allt räknas ur cachen vid bygget; inget här styr prognoserna.
+// FPL (bara Premier League: skadelistan och speltid, xG/xA, försvarsspel, pris
+// och poäng per spelare) och ESPN:s matchrapporter (målen i alla fyra ligor,
+// speltiden i Championship, League One och League Two). Allt räknas ur cachen vid bygget; inget här styr prognoserna.
 //
 // Principer som i resten av appen: spelare utan statistik är okända, inte
 // nollor, och topplistor med kvoter (mål per skott, räddningsprocent) kräver
@@ -80,6 +80,10 @@ function row(p, t, fx) {
     sot: s.sot,
     yc: s.yc,
     rc: s.rc,
+    fc: s.fc,
+    fs: s.fs,
+    off: s.off,
+    og: s.og,
   };
 }
 
@@ -187,6 +191,10 @@ function fplIndex(compId, teams) {
         xa: hit.xa,
         cs: hit.cs,
         dc: hit.dc,
+        // Cache från före 2026-10-20 saknar försvarsspelet: okänt.
+        tk: hit.tackles ?? null,
+        rec: hit.recoveries ?? null,
+        cbi: hit.cbi ?? null,
         cost: hit.cost,
         sel: hit.sel,
         fpts: hit.points,
@@ -203,9 +211,10 @@ function fplIndex(compId, teams) {
 // räknas för spelarens första `app` matcher i laget – samma matcher som målen
 // i truppen. Har rapporterna färre matcher än truppen (en rapport saknas,
 // eller spelaren har bytt klubb inom ligan) är speltiden okänd, inte för låg.
+// I Premier League är FPL:s speltid den som visas; rapporternas (emin) delar
+// bara ESPN:s siffror per 90 minuter, eftersom FPL kan ligga en omgång före.
 function minutesIndex(compId, teams) {
-  const comp = LEAGUES.find((c) => c.id === compId);
-  if (!comp || comp.fpl) return null;
+  if (!LEAGUES.some((c) => c.id === compId)) return null;
   const c = readCache(`espn_minutes_${compId}`);
   if (!c || !c.data || !c.data.matches) return null;
   const apps = new Map(); // "lag|spelare" → minuter per match i tidsordning
@@ -232,6 +241,92 @@ function minutesIndex(compId, teams) {
   return { map: out, matched: out.size, of, matches: Object.keys(c.data.matches).length, fetchedAt: c.fetchedAt };
 }
 
+// Målen ur matchrapporterna (espn_minutes_<liga>, alla fyra ligor): sorten,
+// när de kom och vad de betydde för resultatet. Som speltiden räknas de för
+// spelarens första `app` matcher i laget – samma matcher som målen i truppen –
+// och bara när rapporternas mål för spelaren är lika många som truppens.
+// Saknar en av matcherna målen, eller stämmer antalet inte, är allt okänt.
+// Målens sort (KIND_KEYS) är okänd om någon av matcherna bara har minut och
+// målskytt (d = 0, League One och League Two).
+//
+//   gw   segermål: målet som gav vinnaren den ledning den aldrig tappade
+//        (vid 3–1 lagets andra mål)
+//   gpts poäng som målen gav: vad laget tappat utan just det målet – 2 i en
+//        match vunnen med ett mål, 1 i en oavgjord, annars 0
+//   g1   matchens första mål     ghd nick     gpen straff     gfk frispark
+//   gout utanför straffområdet   glate från 80:e minuten (tilläggstid räknas)
+//   gsub som inhoppare           pmiss missade straffar
+const GOAL_KEYS = ['g', 'gw', 'gpts', 'g1', 'ghd', 'gpen', 'gfk', 'gout', 'glate', 'gsub', 'pmiss'];
+const KIND_KEYS = ['ghd', 'gpen', 'gfk', 'gout', 'pmiss'];
+const LATE_MINUTE = 80;
+
+function matchGoals(m) {
+  const out = new Map();
+  const add = (k, field) => {
+    if (!out.has(k)) out.set(k, Object.fromEntries(GOAL_KEYS.map((x) => [x, 0])));
+    out.get(k)[field]++;
+  };
+  const final = {};
+  for (const x of m.g) final[x.t] = (final[x.t] || 0) + 1;
+  const run = {};
+  m.g.forEach((x, i) => {
+    run[x.t] = (run[x.t] || 0) + 1;
+    if (x.o || !x.p) return;
+    const k = `${x.t}|${x.p}`;
+    const us = final[x.t];
+    const them = Object.keys(m.t).filter((t) => t !== x.t).reduce((sum, t) => sum + (final[t] || 0), 0);
+    add(k, 'g');
+    if (us > them && run[x.t] === them + 1) add(k, 'gw');
+    if (us - them === 1) { add(k, 'gpts'); add(k, 'gpts'); } else if (us === them) add(k, 'gpts');
+    if (i === 0) add(k, 'g1');
+    if (x.s === 'n') add(k, 'ghd');
+    if (x.s === 's') add(k, 'gpen');
+    if (x.s === 'f') add(k, 'gfk');
+    if (x.u) add(k, 'gout');
+    if (x.m >= LATE_MINUTE) add(k, 'glate');
+    if (x.i) add(k, 'gsub');
+  });
+  for (const x of m.pm || []) add(`${x.t}|${x.p}`, 'pmiss');
+  return out;
+}
+
+function goalsIndex(compId, teams) {
+  const c = readCache(`espn_minutes_${compId}`);
+  if (!c || !c.data || !c.data.matches) return null;
+  const matches = Object.values(c.data.matches).sort((a, b) => a.k.localeCompare(b.k));
+  const apps = new Map(); // "lag|spelare" → { s: målen, d } per match i tidsordning (undefined = okänt)
+  for (const m of matches) {
+    const goals = Array.isArray(m.g) ? matchGoals(m) : null;
+    for (const [teamId, ps] of Object.entries(m.t)) {
+      for (const id of Object.keys(ps)) {
+        const k = `${teamId}|${id}`;
+        if (!apps.has(k)) apps.set(k, []);
+        apps.get(k).push(goals ? { s: goals.get(k) || null, d: m.d } : undefined);
+      }
+    }
+  }
+  const out = new Map();
+  let of = 0;
+  for (const t of teams) {
+    for (const p of t.players) {
+      if (!p.stats || !p.stats.app) continue;
+      of++;
+      const list = (apps.get(`${t.espnId}|${p.id}`) || []).slice(0, p.stats.app);
+      if (list.length < p.stats.app || list.includes(undefined)) continue;
+      const sum = Object.fromEntries(GOAL_KEYS.map((x) => [x, 0]));
+      for (const e of list) if (e.s) for (const x of GOAL_KEYS) sum[x] += e.s[x];
+      if (sum.g !== (p.stats.g || 0)) continue;
+      delete sum.g;
+      if (list.some((e) => e.d === 0)) for (const x of KIND_KEYS) delete sum[x];
+      out.set(p.id, sum);
+    }
+  }
+  // kinds: de flesta rapporterna i ligan beskriver målens sort (annars visas
+  // den inte – League Two hade 3 sådana av 115 matcher med mål).
+  const detailed = matches.filter((m) => m.d === 1).length;
+  return { map: out, matched: out.size, of, fetchedAt: c.fetchedAt, kinds: detailed > matches.filter((m) => m.d === 0).length };
+}
+
 // Mål minus xG (FPL:s egna mål, så att båda gäller samma matcher).
 const overXg = (r) => (r.xg != null && r.fg != null ? Math.round((r.fg - r.xg) * 100) / 100 : null);
 
@@ -244,14 +339,18 @@ function divisionPlayers(compId) {
   const d = cache.data;
   const standings = standingsFor(compId);
   const fpl = fplIndex(compId, d.teams);
-  const mins = fpl ? null : minutesIndex(compId, d.teams);
+  const mins = minutesIndex(compId, d.teams);
   const fx = fpl ? fpl.map : mins ? mins.map : null;
+  const emin = (p) => (fpl && mins && mins.map.has(p.id) ? { emin: mins.map.get(p.id).min } : null);
+  const goalTypes = goalsIndex(compId, d.teams);
   const rows = [];
   const all = [];
   for (const t of d.teams) {
     for (const p of t.players) {
       if (played(p)) rows.push(row(p, t, fx));
-      all.push(p.stats ? { ...row(p, t, fx), ...gk(p) } : { ...bare(p, t), ...(fx && fx.get(p.id)) });
+      all.push(p.stats
+        ? { ...row(p, t, fx), ...emin(p), ...gk(p), ...(goalTypes && goalTypes.map.get(p.id)) }
+        : { ...bare(p, t), ...(fx && fx.get(p.id)) });
     }
   }
 
@@ -332,6 +431,9 @@ function divisionPlayers(compId) {
     minutes: fpl
       ? { provider: 'Fantasy Premier League', fetchedAt: fpl.fetchedAt, matched: fpl.matched, of: fpl.of }
       : mins ? { provider: 'ESPN', fetchedAt: mins.fetchedAt, matched: mins.matched, of: mins.of, matches: mins.matches } : null,
+    // Målens sort och betydelse ur matchrapporterna (alla fyra ligor).
+    // matched av of = spelare med statistik vars mål går att följa.
+    goalTypes: goalTypes ? { provider: 'ESPN', fetchedAt: goalTypes.fetchedAt, matched: goalTypes.matched, of: goalTypes.of, kinds: goalTypes.kinds } : null,
     thresholds: { minShotsConversion: MIN_SHOTS_CONVERSION, minShareKeeper: MIN_SHARE_KEEPER, minMinutesP90: MIN_MINUTES_P90, top: TOP },
   };
 }

@@ -434,12 +434,30 @@ const goals90 = (p) => (p.fg !== undefined ? p.fg : p.g);
 const ga90Of = (p) => (goals90(p) == null ? null : goals90(p) + ((p.fg !== undefined ? p.fa : p.a) || 0));
 const dxgOf = (p) => (p.xg != null && p.fg != null ? p.fg - p.xg : null);
 const qMin = { ok: (p) => p.min >= TH.min, okWhy: 'Osäker siffra: mindre än tre hela matchers speltid' };
+// ESPN:s siffror per 90 minuter: i Premier League med speltiden ur
+// matchrapporterna (emin, samma matcher som truppen), annars FPL:s.
+const espnMin = (p) => (p.emin !== undefined ? p.emin : p.min);
+const per90e = (x, p) => (x == null || !espnMin(p) ? null : (x / espnMin(p)) * 90);
+const qMinE = { ok: (p) => espnMin(p) >= TH.min, okWhy: qMin.okWhy };
+// Lagets mål i truppen (samma matcher som spelarnas), per lag-id.
+const teamGoals = new Map();
+const goalShare = (p) => {
+  const tg = teamGoals.get(p.teamId);
+  return p.noStats || !tg ? null : ((p.g || 0) + (p.a || 0)) / tg;
+};
+const onlyMv = (p, v) => (p.pos === 'MV' ? v : null);
 
+// sort = förvald sortering när gruppen väljs (den första som finns).
+// needs: 'goals' = målen ur matchrapporterna.
 const P_GROUPS = [
-  { id: 'oversikt', label: 'Översikt' },
-  { id: 'avslut', label: 'Avslut' },
+  { id: 'oversikt', label: 'Översikt', sort: ['g'] },
+  { id: 'avslut', label: 'Avslut', sort: ['g'] },
+  { id: 'malen', label: 'Målen', sort: ['gw', 'g'], needs: 'goals' },
+  { id: 'forsvar', label: 'Försvar', sort: ['def90', 'svp'] },
+  { id: 'regelbrott', label: 'Regelbrott', sort: ['fs'] },
 ];
-const PA = ['oversikt', 'avslut'];
+const PA = P_GROUPS.map((g) => g.id);
+const MIN_IN = ['oversikt', 'avslut', 'forsvar', 'regelbrott'];
 const PCOLS = [
   { key: 'name', label: 'Spelare', get: (p) => p.name, text: true, cls: 'pname dv-stick', in: PA,
     show: (p) => `${esc(p.name)}<small class="show-sm">${esc(p.team)}</small>` },
@@ -451,14 +469,46 @@ const PCOLS = [
     get: (p) => natSv(p.nat), text: true, cls: 'pnat hide-sm', in: ['oversikt'], show: (p) => esc(natSv(p.nat) || '–') },
   { key: 'app', label: 'M', name: 'Matcher', title: 'Ligamatcher i år – både från start och som inhoppare.', get: (p) => p.app, cls: 'num', in: PA },
   { key: 'starts', label: 'Start', name: 'Från start', title: 'Ligamatcher där spelaren fanns med i startelvan.', get: (p) => p.starts, cls: 'num hide-md hide-sm', in: ['oversikt'] },
-  { key: 'min', label: 'Min', name: 'Speltid', title: 'Spelade minuter i ligan i år.', get: (p) => p.min, cls: 'num hide-xs', mins: true, in: PA },
-  { key: 'g', label: 'Mål', title: 'Ligamål i år. Självmål räknas inte.', get: (p) => p.g, cls: 'num', strong: true, in: PA },
+  { key: 'min', label: 'Min', name: 'Speltid', title: 'Spelade minuter i ligan i år.', get: (p) => p.min, cls: 'num hide-xs', mins: true, in: MIN_IN },
+  { key: 'g', label: 'Mål', title: 'Ligamål i år. Självmål räknas inte.', get: (p) => p.g, cls: 'num', strong: true, in: ['oversikt', 'avslut', 'malen'] },
+
+  // Målen: ur ESPN:s matchrapporter. kinds = målens sort, som bara finns där
+  // rapporterna beskriver målen (inte League One och League Two).
+  { key: 'gshare', label: 'Inblandad', sub: 'i lagets mål', name: 'Inblandad i lagets mål',
+    title: 'Mål och assist delat med lagets mål: hur stor del av lagets mål spelaren har gjort eller lagt sista passningen till. Dämpade siffror: laget har gjort färre än fem mål.',
+    get: goalShare, pct: true, cls: 'num hide-xs', in: ['malen'],
+    ok: (p) => teamGoals.get(p.teamId) >= 5, okWhy: 'Osäker siffra: laget har gjort färre än fem mål' },
+  { key: 'gw', label: 'Segermål', title: 'Mål som avgjorde en vunnen match: målet som gav laget den ledning det sedan aldrig tappade. Vid 3–1 är lagets andra mål segermålet.',
+    get: (p) => p.gw, cls: 'num', strong: true, in: ['malen'] },
+  { key: 'gpts', label: 'Poäng', sub: 'åt laget', name: 'Poäng som målen gav',
+    title: 'Poängen laget hade tappat utan spelarens mål. Ett mål i en match som vanns med ett mål är värt två poäng (seger i stället för oavgjort), ett mål i en oavgjord match en poäng. Mål i matcher som vanns stort eller förlorades ger inga.',
+    get: (p) => p.gpts, cls: 'num', in: ['malen'] },
+  { key: 'g1', label: 'Första', sub: 'målet i matchen', name: 'Matchens första mål', title: 'Mål som var matchens första – det som gav laget ledningen med 1–0.',
+    get: (p) => p.g1, cls: 'num hide-sm', in: ['malen'] },
+  { key: 'ghd', label: 'Nick', name: 'Nickmål', title: 'Mål gjorda med huvudet.', get: (p) => p.ghd, cls: 'num', kinds: true, in: ['malen'] },
+  { key: 'gpen', label: 'Straff', name: 'Straffar', title: 'Straffmål av slagna straffar i ligan – räddade, missade och i ramen räknas som slagna. Straffläggningar räknas inte.',
+    get: (p) => p.gpen, cls: 'num', kinds: true, in: ['malen'],
+    show: (p) => (p.gpen == null ? cell(null) : p.gpen + (p.pmiss || 0) ? `${p.gpen} <span class="muted">av ${p.gpen + (p.pmiss || 0)}</span>` : cell(0)) },
+  { key: 'gfk', label: 'Frispark', name: 'Frisparksmål', title: 'Mål direkt på frispark.', get: (p) => p.gfk, cls: 'num hide-xs', kinds: true, in: ['malen'] },
+  { key: 'gout', label: 'Utifrån', name: 'Mål utanför straffområdet', title: 'Mål på skott utanför straffområdet.', get: (p) => p.gout, cls: 'num hide-xs', kinds: true, in: ['malen'] },
+  { key: 'glate', label: 'Sena', sub: 'från 80:e min', name: 'Sena mål', title: 'Mål från den 80:e minuten och framåt, tilläggstiden inräknad.',
+    get: (p) => p.glate, cls: 'num hide-sm', in: ['malen'] },
+  { key: 'gsub', label: 'Inhopp', sub: 'mål', name: 'Mål som inhoppare', title: 'Mål gjorda efter att spelaren bytts in.', get: (p) => p.gsub, cls: 'num hide-sm', in: ['malen'] },
   { key: 'a', label: 'Ass', name: 'Assist', title: 'Sista passningen före ett mål – eller ett skott som räddas och slås in av en lagkamrat. Enligt ESPN.',
     get: (p) => p.a, cls: 'num', in: ['oversikt'] },
   { key: 'ga', label: 'M+A', name: 'Mål plus assist', title: 'Mål och assist tillsammans: hur många av lagets mål spelaren har varit direkt inblandad i.',
     get: (p) => (p.noStats ? null : (p.g || 0) + (p.a || 0)), cls: 'num hide-xs', in: ['oversikt'] },
-  { key: 'yc', label: 'Gul', name: 'Gula kort', title: 'Gula kort i ligan i år.', get: (p) => p.yc, cls: 'num', in: ['oversikt'] },
-  { key: 'rc', label: 'Röd', name: 'Röda kort', title: 'Röda kort i ligan i år.', get: (p) => p.rc, cls: 'num', in: ['oversikt'] },
+  { key: 'fs', label: 'Fälld', name: 'Fälld', title: 'Gånger spelaren har blivit fälld eller utsatt för en annan förseelse som domaren blåst för.',
+    get: (p) => p.fs, cls: 'num', strong: true, in: ['regelbrott'] },
+  { key: 'fs90', label: 'Fälld', sub: 'per 90 min', name: 'Fälld per 90 minuter', title: 'Gånger spelaren har blivit fälld per 90 minuters speltid. Dämpade siffror: mindre än tre hela matchers speltid.',
+    get: (p) => per90e(p.fs, p), d: 1, cls: 'num hide-xs', mins: true, in: ['regelbrott'], ...qMinE },
+  { key: 'fc', label: 'Fäller', name: 'Begångna regelbrott', title: 'Regelbrott spelaren har begått som domaren blåst frispark eller straff för.',
+    get: (p) => p.fc, cls: 'num', in: ['regelbrott'] },
+  { key: 'fc90', label: 'Fäller', sub: 'per 90 min', name: 'Begångna regelbrott per 90 minuter', title: 'Begångna regelbrott per 90 minuters speltid. Dämpade siffror: mindre än tre hela matchers speltid.',
+    get: (p) => per90e(p.fc, p), d: 1, cls: 'num hide-xs', mins: true, in: ['regelbrott'], ...qMinE },
+  { key: 'yc', label: 'Gul', name: 'Gula kort', title: 'Gula kort i ligan i år.', get: (p) => p.yc, cls: 'num', in: ['oversikt', 'regelbrott'] },
+  { key: 'rc', label: 'Röd', name: 'Röda kort', title: 'Röda kort i ligan i år.', get: (p) => p.rc, cls: 'num', in: ['oversikt', 'regelbrott'] },
+  { key: 'off', label: 'Offside', title: 'Gånger spelaren har blivit avblåst för offside.', get: (p) => p.off, cls: 'num', in: ['regelbrott'] },
   { key: 'cost', label: 'Pris', name: 'Pris i Fantasy Premier League',
     title: 'Spelarens pris i managerspelet Fantasy Premier League, i miljoner pund. Priset stiger när många köper spelaren, så det speglar form och popularitet – inte lön eller övergångssumma.',
     get: (p) => p.cost, cls: 'num', fpl: true, in: ['oversikt'],
@@ -489,20 +539,58 @@ const PCOLS = [
     get: (p) => per90(p.xg, p), d: 2, cls: 'num hide-sm', fpl: true, in: ['avslut'], ...qMin },
   { key: 'ga90', label: 'M+A', sub: 'per 90 min', name: 'Mål plus assist per 90 minuter', title: 'Mål och assist tillsammans per 90 minuters speltid.',
     get: (p) => per90(ga90Of(p), p), d: 2, cls: 'num hide-xs', mins: true, in: ['avslut'], ...qMin },
+
+  // Försvar: närkamperna från Fantasy Premier League, målvakterna från ESPN.
+  { key: 'tk', label: 'Tacklingar', title: 'Gånger spelaren har tagit bollen från en motståndare i en närkamp. Från Fantasy Premier League.',
+    get: (p) => p.tk, cls: 'num', fpl: true, in: ['forsvar'] },
+  { key: 'rec', label: 'Bollvinster', title: 'Gånger spelaren har tagit hand om en lös boll åt laget. Målvakter får många när de plockar inlägg och långbollar. Från Fantasy Premier League.',
+    get: (p) => p.rec, cls: 'num hide-xs', fpl: true, in: ['forsvar'] },
+  { key: 'cbi', label: 'Rensningar', sub: 'block, brytningar', name: 'Rensningar, blockeringar och brytningar',
+    title: 'Bollar spelaren har rensat bort, skott och passningar som blockerats och passningar som brutits. Från Fantasy Premier League.',
+    get: (p) => p.cbi, cls: 'num', fpl: true, in: ['forsvar'] },
+  { key: 'def90', label: 'Försvar', sub: 'per 90 min', name: 'Försvarsaktioner per 90 minuter',
+    title: 'Tacklingar, rensningar, blockeringar och brytningar per 90 minuters speltid. Dämpade siffror: mindre än tre hela matchers speltid.',
+    get: (p) => (p.tk == null || p.cbi == null ? null : per90(p.tk + p.cbi, p)), d: 1, cls: 'num', strong: true, fpl: true, in: ['forsvar'], ...qMin },
+  { key: 'cs', label: 'Nollor', name: 'Hållna nollor', title: 'Matcher där laget inte släppte in något mål medan spelaren var på planen, minst 60 minuter. Från Fantasy Premier League.',
+    get: (p) => p.cs, cls: 'num hide-xs', fpl: true, in: ['forsvar'] },
+  { key: 'sv', label: 'Räddningar', title: 'Målvaktens räddningar i ligan i år.', get: (p) => onlyMv(p, p.sv), cls: 'num', in: ['forsvar'],
+    show: (p) => (p.pos === 'MV' ? cell(p.sv) : '') },
+  { key: 'svp', label: 'Räddade', sub: 'av skotten på mål', name: 'Räddningsprocent',
+    title: 'Räddningar delat med skotten på mål som målvakten mött. Dämpade siffror: färre än tio skott på mål.',
+    get: (p) => onlyMv(p, p.savePct), cls: 'num', in: ['forsvar'],
+    show: (p) => (p.pos !== 'MV' ? '' : p.savePct == null ? cell(null) : pct(p.savePct)),
+    ok: (p) => (p.sv || 0) + (p.gc || 0) >= 10, okWhy: 'Osäker siffra: färre än tio skott på mål' },
+  { key: 'og', label: 'Självmål', title: 'Självmål i ligan i år.', get: (p) => p.og, cls: 'num hide-xs', in: ['forsvar'] },
 ];
 
-// fpl = xG och pris (bara Premier League), mins = speltiden (alla ligor
-// där den är känd).
+// fpl = xG, försvarsspel och pris (bara Premier League), mins = speltiden
+// (alla ligor där den är känd), kinds = målens sort.
+function playerGroups(P) {
+  return P_GROUPS.filter((g) => g.needs !== 'goals' || P.goalTypes);
+}
+
+function playerGroup(P) {
+  const list = playerGroups(P);
+  return list.find((g) => g.id === state.pf.cols) || list[0];
+}
+
 function playerCols(P) {
   const fpl = !!P.fpl;
   const mins = !!(P.minutes || P.fpl);
-  return PCOLS.filter((c) => c.in.includes(state.pf.cols) && (!c.fpl || fpl) && (!c.mins || mins) && (!c.nomins || !mins));
+  const kinds = !!(P.goalTypes && P.goalTypes.kinds);
+  const g = playerGroup(P).id;
+  return PCOLS.filter((c) => c.in.includes(g) && (!c.fpl || fpl) && (!c.mins || mins) && (!c.nomins || !mins) && (!c.kinds || kinds));
+}
+
+// Gruppens förvalda sortering: den första av dess kolumner som finns.
+function groupSort(P, cols) {
+  return playerGroup(P).sort.map((k) => cols.find((c) => c.key === k)).find(Boolean) || cols.find((c) => !c.text);
 }
 
 function filteredPlayers(P, cols) {
   const f = state.pf;
   const q = f.q.trim().toLowerCase();
-  const col = cols.find((c) => c.key === f.sort) || cols.find((c) => c.key === 'g');
+  const col = cols.find((c) => c.key === f.sort) || groupSort(P, cols);
   const list = P.players.filter((p) => (!f.played || (p.app > 0)) && (!f.team || p.teamId === f.team) && (!f.pos || p.pos === f.pos) &&
     (!q || p.name.toLowerCase().includes(q) || p.team.toLowerCase().includes(q) || (natSv(p.nat) || '').toLowerCase().includes(q)));
   return sortBy(list, col, col.key === f.sort ? f.dir : -1,
@@ -560,6 +648,8 @@ function playersView(dv, P) {
   }
   TH.shots = P.thresholds.minShotsConversion;
   TH.min = P.thresholds.minMinutesP90 || 270;
+  teamGoals.clear();
+  for (const t of P.teams) teamGoals.set(t.espnId, t.goals);
   tops.clear();
   const L = P.leaders;
   const t = P.totals;
@@ -583,7 +673,7 @@ function playersView(dv, P) {
     '</div>';
 
   html += card('Alla spelare', {
-    body: segHtml(P_GROUPS, f.cols, 'data-pcols') + '<div class="dv-filters">' +
+    body: segHtml(playerGroups(P), playerGroup(P).id, 'data-pcols') + '<div class="dv-filters">' +
       `<input type="search" id="pf-q" class="dv-input" placeholder="Sök spelare, lag eller nation …" value="${esc(f.q)}" aria-label="Sök spelare">` +
       `<select id="pf-team" class="dv-select" aria-label="Lag"><option value="">Alla lag</option>${teams.map((x) => `<option value="${esc(x.espnId)}"${x.espnId === f.team ? ' selected' : ''}>${esc(x.name)}</option>`).join('')}</select>` +
       `<select id="pf-pos" class="dv-select" aria-label="Position"><option value="">Alla positioner</option>${Object.keys(POS).map((k) => `<option value="${k}"${k === f.pos ? ' selected' : ''}>${POS_PLURAL[k]}</option>`).join('')}</select>` +
@@ -591,8 +681,9 @@ function playersView(dv, P) {
       '</div><div id="dv-ptable">' + playerTableHtml(P) + '</div>',
     src: `ESPN, hämtat ${when(P.source.fetchedAt)} · ${int(t.used)} av ${int(t.players)} har spelat` +
       (t.teamsBehind ? ` · släpar en omgång för ${t.teamsBehind} lag` : '') +
-      (P.fpl ? ` · speltid, xG och pris: Fantasy Premier League, hämtat ${when(P.fpl.fetchedAt)}` : '') +
-      (!P.fpl && P.minutes ? ` · speltid: ESPN:s matchrapporter, hämtat ${when(P.minutes.fetchedAt)}` : ''),
+      (P.fpl ? ` · speltid, xG, försvarsspel och pris: Fantasy Premier League, hämtat ${when(P.fpl.fetchedAt)}` : '') +
+      (!P.fpl && P.minutes ? ` · speltid${P.goalTypes ? ' och målen' : ''}: ESPN:s matchrapporter, hämtat ${when(P.minutes.fetchedAt)}` : '') +
+      (P.fpl && P.goalTypes ? ` · målen: ESPN:s matchrapporter, hämtat ${when(P.goalTypes.fetchedAt)}` : ''),
     cls: 'dv-wide',
   });
 
@@ -961,6 +1052,8 @@ function openPlayer(id) {
       [p.app != null && p.starts != null ? cell(p.app - p.starts) : cell(null), 'Inhopp'],
       p.min != null && p.app ? [`${int(p.min / p.app)} min`, 'Speltid per match'] : null,
       [p.yc || p.rc ? cardsVal(p) : cell(p.yc == null ? null : 0), 'Kort'],
+      [cell(p.fs), 'Fälld', 'Gånger spelaren har blivit fälld eller utsatt för en annan förseelse som domaren blåst för'],
+      [cell(p.fc), 'Regelbrott', 'Regelbrott spelaren har begått som domaren blåst för'],
     ]));
     if (mv) {
       html += msec('I målet', facts([
@@ -979,6 +1072,31 @@ function openPlayer(id) {
       ]) + (team && team.goals && p.g
         ? meters([{ label: 'Andel av lagets mål', sub: `${p.g} av ${team.goals}`, v: p.g / team.goals, text: pct(p.g / team.goals) }])
         : ''));
+      // Målens betydelse och sort ur matchrapporterna – sorten bara där den finns.
+      if (p.g && p.gw != null) {
+        const pens = (p.gpen || 0) + (p.pmiss || 0);
+        html += msec('Målen', facts([
+          [cell(p.gw, { strong: true }), 'Segermål', 'Mål som avgjorde en vunnen match: målet som gav laget den ledning det sedan aldrig tappade'],
+          [cell(p.gpts), 'Poäng åt laget', 'Poängen laget hade tappat utan spelarens mål'],
+          [cell(p.g1), 'Matchens första'],
+          [cell(p.glate), 'Från 80:e minuten'],
+          p.ghd != null ? [cell(p.ghd), 'Nick'] : null,
+          p.gpen != null && pens ? [`${p.gpen} av ${pens}`, 'Straffar', 'Straffmål av slagna straffar'] : null,
+          p.gout ? [cell(p.gout), 'Utanför straffområdet'] : null,
+          p.gfk ? [cell(p.gfk), 'Frispark'] : null,
+          p.gsub ? [cell(p.gsub), 'Som inhoppare'] : null,
+        ]));
+      } else if (p.pmiss) {
+        html += msec('Målen', facts([['0 av ' + p.pmiss, 'Straffar', 'Straffmål av slagna straffar']]));
+      }
+      if (p.tk != null) {
+        html += msec('Försvar', facts([
+          [cell(p.tk), 'Tacklingar'],
+          [cell(p.cbi), 'Rensningar m.m.', 'Rensningar, blockeringar och brytningar'],
+          [cell(p.rec), 'Bollvinster', 'Lösa bollar spelaren har tagit hand om åt laget'],
+          p.min >= TH.min && p.cbi != null ? [num(per90(p.tk + p.cbi, p), 1), 'Per 90 min', 'Tacklingar, rensningar, blockeringar och brytningar per 90 minuters speltid'] : null,
+        ]));
+      }
       if (p.xg != null) {
         html += msec('Chanserna', facts([
           [num(p.xg, 1), 'xG', 'Förväntade mål: hur många mål spelarens skott brukar ge'],
@@ -1003,6 +1121,7 @@ function openPlayer(id) {
     `ESPN · ligamatcher ${esc(state.data.season)} · hämtat ${when(P.source.fetchedAt)}`,
     p.min != null && P.fpl ? `Speltid, xG och FPL: Fantasy Premier League · hämtat ${when(P.fpl.fetchedAt)}` : null,
     p.min != null && !P.fpl && P.minutes ? `Speltid: ESPN:s matchrapporter · hämtat ${when(P.minutes.fetchedAt)}` : null,
+    p.gw != null && P.goalTypes ? `Målen: ESPN:s matchrapporter · hämtat ${when(P.goalTypes.fetchedAt)}` : null,
   ], `<button type="button" class="dv-mbtn" data-team-open="${esc(p.teamId)}">Truppen i ${esc(p.team)}</button>`);
   showModal(html);
 }
@@ -1235,7 +1354,7 @@ function wire() {
       state.pf.cols = pc.dataset.pcols;
       for (const b of pc.parentElement.children) b.setAttribute('aria-pressed', String(b === pc));
       const P = state.players.get(state.div);
-      if (P && !P.unknown && !playerCols(P).some((c) => c.key === state.pf.sort)) Object.assign(state.pf, { sort: 'g', dir: -1 });
+      if (P && !P.unknown) Object.assign(state.pf, { sort: groupSort(P, playerCols(P)).key, dir: -1 });
       updatePlayerTable();
       return;
     }

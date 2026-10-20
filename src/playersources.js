@@ -1,7 +1,7 @@
 'use strict';
 
 // Källorna för spelardatan (trupp och spelarstatistik per liga, speltiden
-// utanför Premier League). Egen fil så att registret i src/sources.js bara
+// utanför Premier League och målen ur matchrapporterna i alla fyra ligor). Egen fil så att registret i src/sources.js bara
 // behöver en rad för att ta med dem.
 
 const { COMPETITIONS } = require('../config/competitions');
@@ -30,21 +30,22 @@ const PLAYER_SOURCES = LEAGUES.map((c) => ({
   },
 }));
 
-// Speltid per spelare ur ESPN:s matchrapporter – Premier League har den
-// redan från FPL. Läser spelprogrammet ur cachen (andra steget) och hämtar
-// bara rapporterna för matcher som inte redan finns sparade.
-for (const c of LEAGUES.filter((x) => !x.fpl)) {
+// Speltid och mål per spelare ur ESPN:s matchrapporter. Premier League har
+// speltiden redan från FPL och använder rapporterna bara för målen. Läser
+// spelprogrammet ur cachen (andra steget) och hämtar bara rapporterna för
+// matcher som inte redan finns sparade.
+for (const c of LEAGUES) {
   const id = `espn_minutes_${c.id}`;
   PLAYER_SOURCES.push({
     id,
     provider: 'ESPN',
     short: 'ESPN',
-    label: `Speltid per spelare ur matchrapporterna – ${c.name}`,
+    label: `${c.fpl ? 'Målen' : 'Speltid och mål'} per spelare ur matchrapporterna – ${c.name}`,
     comps: [c.id],
     kinds: ['players'],
     maxAgeHours: 6,
     staleAfterHours: 72,
-    verified: '2026-10-19',
+    verified: '2026-10-20',
     stage: 2,
     fetch: () => {
       const fx = readCache(`espn_fixtures_${c.id}`);
