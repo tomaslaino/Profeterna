@@ -16,8 +16,6 @@
 //   data/evaluation.json   journalen och utvärderingen mot facit (sist på
 //                          Modell-sidan)
 //   data/divisions.json    statistik per division (sidan Statistik)
-//   data/season.json       säsongsprognosen, modellens styrka för alla lag
-//                          och programmet framåt (Tabeller → Säsongsprognos)
 //   data/kuponger.json     gängets kuponger ur data/kuponger/ (fliken Kupong)
 //                          och vart egna tips inför samtalet skickas
 //   data/historik.json     färdiga kuponger med facit, betyg och AI:ns
@@ -123,9 +121,6 @@ function writeSite(outDir = OUT, { journal = false, analysisEndpoint, couponEndp
     console.error('[build] backtestet:', err);
   }
   write('model.json', { rulesVersion: rules.version, model: forecast.model, error: forecast.error, backtest, ms: forecast.ms });
-  // Säsongsprognosen räknas i prognosmotorn (src/season.js) ur samma
-  // skattningar. Saknas den visar sidan okänt med orsaken.
-  write('season.json', forecast.season || { error: forecast.error || 'prognosmotorn gav ingen säsongsprognos' });
 
   // Divisionsstatistiken (sidan Statistik) är beskrivande och styr inte
   // prognoserna. Fallerar den saknas bara sidans siffror.
@@ -152,7 +147,7 @@ function writeSite(outDir = OUT, { journal = false, analysisEndpoint, couponEndp
   // sidans lagtabell.
   fs.mkdirSync(path.join(dataDir, 'teams'), { recursive: true });
   try {
-    for (const f of teamFiles(forecast.season)) write(f.path, f.data);
+    for (const f of teamFiles(forecast.strength)) write(f.path, f.data);
   } catch (err) {
     console.error('[build] lagen:', err);
   }

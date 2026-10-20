@@ -35,7 +35,8 @@ ingen falsk precision · sidan kraschar aldrig av en död källa · endast fria 
 - [x] **Mer statistik (2026-10-18):** i matchvyn vila och Europaspel (ny källa: ESPN:s
   Europacuper), domaren med kortsnitt, lagens målprofil och mål mot xG; under Divisioner
   en säsongsprognos (Prognos), programmet framåt och modellens styrka för alla lag. Inget
-  av det styr prognoserna (se [Säsongsprognosen](#säsongsprognosen))
+  av det styr prognoserna. Säsongsprognosen och programmet framåt togs bort 2026-10-20;
+  styrkan finns kvar som motståndet i lagstatistiken (se [Styrkan](#styrkan))
 - [x] **Statistik som på gravergrav.se (2026-10-19):** Spelare får kolumngrupperna Översikt
   och Avslut, Topp 20 för varje topplista och – i Premier League – speltid, xG, ±xG, xA, per
   90 minuter och FPL-pris. Lag är en ny lagtabell för nivå 1–4 med grupperna Tabell, xG
@@ -354,6 +355,11 @@ Utan nyckel ingen knapp.
   Omgången (hela kupongen) och Historik (förut en egen sida, länkad i sidfoten på alla
   sidor). Länken Kuponghistorik i sidfoten tas bort; `historik.html` leder till
   `#kupong/historik`.
+- **Säsongsprognosen tas bort (2026-10-20, användarens beslut):** vyn under Tabeller och
+  simuleringen i bygget (`src/season.js`, `data/season.json`) försvinner, liksom
+  programmet framåt och prognosdelen i lagkortet. Tabeller visar bara tabellen, med
+  divisionerna som numrerade flikar (nivå 1–4); gamla länkar till `#…/prognos` hamnar på
+  tabellen. Styrkan för alla lag räknas fortfarande – den är motståndet i lagstatistiken.
 
 ## Arkitektur
 
@@ -404,9 +410,9 @@ server:
   [src/news.mjs](src/news.mjs) med [config/news.js](config/news.js) (Nyhetsläget:
   hämtning, urval, källista). Lokalt kör
   [server.js](server.js) samma `analyze()`. Se [Matchanalysen](#matchanalysen-fas-5).
-- **Säsongsprognos:** [src/season.js](src/season.js) körs i slutet av prognosmotorn och
-  skriver `data/season.json`: simuleringen per liga, programmet framåt per lag och
-  modellens styrka för alla lag i nivå 1–4. Se [Säsongsprognosen](#säsongsprognosen).
+- **Styrkan:** [src/strength.js](src/strength.js) körs i slutet av prognosmotorn och ger
+  modellens styrka för alla lag i nivå 1–4 – motståndet i lagstatistiken
+  (`data/teams/<division>.json`). Se [Styrkan](#styrkan).
 - **Kupongen:** [src/coupons.js](src/coupons.js) läser och kontrollerar filerna i
   `data/kuponger/` och bygget skriver `data/kuponger.json`. Rättningen, liveställningen och
   Ny kupong finns i [public/kupong.js](public/kupong.js) och
@@ -437,7 +443,7 @@ server:
   Form, Lagen och Domaren och, i Prognos, kortet Analys när matchanalysen är påslagen;
   Startelvor och Matchen hämtas av [public/matchruta.js](public/matchruta.js). Sidorna Tabeller och Statistik
   ([public/tabeller.html](public/tabeller.html), [public/statistik.html](public/statistik.html),
-  båda med [public/divisioner.js](public/divisioner.js)); Tabeller har vyn Säsongsprognos. Läser JSON-filerna ovan. Urvalet av kommande/spelade matcher och källornas status
+  båda med [public/divisioner.js](public/divisioner.js)). Läser JSON-filerna ovan. Urvalet av kommande/spelade matcher och källornas status
   räknas i webbläsaren mot besökarens klocka, inte mot byggtiden.
 
 ### Lagnamn
@@ -845,31 +851,16 @@ Nyhetsläget: `news: false` och `deploy` igen. Ändras
 prompten, modellen eller underlaget: byt `promptVersion` i konfigen och kör `deploy` igen
 (proxyn bygger in konfigen vid deploy).
 
-## Säsongsprognosen
+## Styrkan
 
-Under Tabeller → Säsongsprognos. Resten av ligasäsongen spelas 10 000 gånger: varje
-återstående match får ett resultat dragen ur prognosmotorns resultatmatris (Dixon–Coles,
-samma förväntade mål som prognosen under Matcher), och tabellen räknas ut med poäng,
-målskillnad, gjorda mål och sist lott. Läget nu räknas ur ESPN:s resultat med ESPN:s
-poängavdrag (kontrollerat mot ESPN:s tabell 2026-10-18: alla 92 lag stämmer).
+Modellens styrka för alla lag i nivå 1–4, i [src/strength.js](src/strength.js): förväntad
+målskillnad per match mot ett genomsnittligt Premier League-lag på neutral plan, ur den
+senaste skattningen – alla fyra ligorna på samma skala. National League skattas men räknas
+inte. Används som motståndet i lagstatistiken (kolumnen Motstånd under Statistik → Lag):
+snittet av motståndarnas styrka mot vad ett lag i divisionen möter i snitt.
 
-- **Osäkerheten:** simuleringarna fördelas på de 50 omskattningarna med slumpvikter som
-  ger spannet under varje prognos – 200 säsonger per omskattning. Inom en simulering är
-  ett lag alltså lika mycket bättre eller sämre än skattningen i alla sina matcher.
-- **Kontroll 2026-10-18:** de förväntade slutpoängen ligger högst 0,25 poäng från läget
-  nu plus summan av 3 × vinst + oavgjort i lagets återstående matchprognoser; varje
-  placering och varje zon summerar till rätt antal lag.
-- **Visas:** chansen per zon i hela procent (0 och 100 = i ingen respektive alla
-  simuleringar, `<1` och `>99` i stället för att avrunda dit), förväntade poäng med
-  spannet för 80 % av simuleringarna, fördelningen över alla placeringar och modellens
-  styrka. Programmet framåt: de fem närmaste ligamatcherna med vinstchansen och de
-  förväntade poängen per match.
-- **Styrkan:** förväntad målskillnad per match mot ett genomsnittligt Premier League-lag
-  på neutral plan, ur den senaste skattningen – alla fyra ligorna på samma skala
-  (kolumnen Styrka i säsongsprognosen; egen flik fanns till 2026-10-19). National
-  League skattas men visas inte.
-- **Slumpen** är seedad med dagen och divisionen: samma data samma dag ger samma prognos.
-- Körtid ~0,8 s i bygget.
+Säsongsprognosen (resten av säsongen spelad 10 000 gånger, under Tabeller) och programmet
+framåt fanns 2026-10-18 – 2026-10-20 och togs bort på användarens begäran.
 
 ## Kupongen
 
@@ -1532,12 +1523,6 @@ schemaintervall gammalt.
   nås därför ungefär dubbelt så fort.
 - Svarar ingen nyhetskälla cachas varken nyheterna eller texten (Nyhetsläget blir då
   "okänt"), så varje klick under ett sådant avbrott är ett nytt betalt anrop.
-- **Mer statistik (2026-10-18):** säsongsprognosen håller lagens styrka och tabelläget
-  fasta resten av säsongen; skador, övergångar, tränarbyten och nya poängavdrag räknas
-  inte in. Lika poäng efter gjorda mål avgörs med lott, inte inbördes möten. Playoff spelas
-  inte, och Europaplatser via cuperna räknas inte.
-- Säsongsprognosen sparas inte i journalen och utvärderas inte – den är ett härlett mått
-  ur prognoserna, inte en egen prognos med facit.
 - Vilan räknas i hela dagar mellan matchdagarna (UTC-datum): torsdag kväll → söndag lunch
   blir 3 dagar, fast det är under tre dygn. För lag i National League finns bara spelade
   ligamatcher – nästa match är okänd.

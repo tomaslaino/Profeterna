@@ -111,12 +111,12 @@ function add(e, r, s, strengthOf, oppKey) {
   }
 }
 
-function divisionTeams(div, season) {
+function divisionTeams(div, strengthAll) {
   const cur = readCache(`fdcouk_${div.fdcouk}`);
   if (!cur || !cur.data || !Array.isArray(cur.data.rows)) {
     return { comp: div.id, unknown: true, reason: 'Ingen matchstatistik hämtad än för divisionen.' };
   }
-  const strength = new Map(((season && season.strength) || []).map((t) => [t.key, t.rating]));
+  const strength = new Map(((strengthAll && strengthAll.list) || []).map((t) => [t.key, t.rating]));
   const strengthOf = (k) => (strength.has(k) ? strength.get(k) : null);
 
   const byKey = new Map();
@@ -202,7 +202,7 @@ function divisionTeams(div, season) {
     source: {
       table: espnRows ? { provider: 'ESPN', fetchedAt: st.fetchedAt } : { provider: 'football-data.co.uk', fetchedAt: cur.fetchedAt },
       stats: { provider: 'football-data.co.uk', fetchedAt: cur.fetchedAt, last: cur.data.lastMatchDate || null, matches: rows.length, url: cur.data.sourceUrl || null },
-      strength: season && season.fitThrough ? { fitThrough: season.fitThrough } : null,
+      strength: strengthAll && strengthAll.fitThrough ? { fitThrough: strengthAll.fitThrough } : null,
     },
     unmapped,
     teams: out,
@@ -210,8 +210,8 @@ function divisionTeams(div, season) {
 }
 
 // Filerna bygget skriver: teams/<division>.json för nivå 1–4.
-function teamFiles(season) {
-  return DIVS.map((d) => ({ path: `teams/${d.id}.json`, data: divisionTeams(d, season) }));
+function teamFiles(strength) {
+  return DIVS.map((d) => ({ path: `teams/${d.id}.json`, data: divisionTeams(d, strength) }));
 }
 
 module.exports = { teamFiles, divisionTeams };
