@@ -11,6 +11,7 @@ const fdcouk = require('./fetchers/fdcouk');
 const understat = require('./fetchers/understat');
 const fpl = require('./fetchers/fpl');
 const viaplay = require('./fetchers/viaplay');
+const youtube = require('./fetchers/youtube');
 const { readCache } = require('./store');
 
 const VERIFIED = '2026-10-17';
@@ -316,6 +317,30 @@ SOURCES.push({
     return viaplay.fetchClips(prev && prev.data, `${SEASON.firstMonth}-01`);
   },
   summarize: (d) => ({ n: d.clips.length, detail: `${d.clips.length} sammandrag` }),
+});
+
+// Höjdpunkterna på YouTube (src/hojdpunkter.js): klubbarnas och sändarnas
+// kanaler (config/youtube.js), som spelas på sajten. Läser sin egen förra
+// hämtning, eftersom kanalernas flöden bara har de 15 senaste klippen.
+SOURCES.push({
+  id: 'youtube_hojdpunkter',
+  provider: 'YouTube',
+  short: 'YouTube',
+  label: 'Höjdpunkter – klubbarnas och sändarnas egna klipp',
+  comps: COMPETITIONS.map((c) => c.id),
+  kinds: ['video'],
+  maxAgeHours: 0.4,
+  staleAfterHours: 24,
+  verified: '2026-10-20',
+  fetch: () => {
+    const prev = readCache('youtube_hojdpunkter');
+    return youtube.fetchVideos(prev && prev.data, `${SEASON.firstMonth}-01`);
+  },
+  summarize: (d) => ({
+    n: d.videos.length,
+    detail: `${d.videos.length} klipp ur ${d.channels - d.failed.length} kanaler` +
+      (d.failed.length ? ` (${d.failed.length} svarade inte)` : ''),
+  }),
 });
 
 // 2000 → "2000/01"

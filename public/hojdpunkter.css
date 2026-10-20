@@ -1,5 +1,6 @@
-/* Höjdpunkterna (hojdpunkter.js): spelikonen på matchraden och knapparna i
-   matchrutans rubrik. Guldet som i resten av detaljerna. */
+/* Höjdpunkterna (hojdpunkter.js): spelikonen på matchraden, knapparna i
+   matchrutans rubrik och spelaren nere i hörnet. Guldet som i resten av
+   detaljerna. */
 
 .hl-play {
   display: inline-grid;
@@ -25,6 +26,9 @@
 }
 .hl-btn {
   display: inline-flex;
+  border: 0;
+  font: inherit;
+  cursor: pointer;
   align-items: center;
   gap: 7px;
   padding: 7px 15px 7px 12px;
@@ -50,6 +54,124 @@
 .hl-btn.alt .hl-len { opacity: 1; }
 .hl-btn.alt:hover { color: var(--bg); background: var(--gold); filter: none; }
 
+/* ---------- spelaren ----------
+   Liten nere till höger, förstorad mitt på sidan. Samma ruta i båda lägena,
+   så att klippet spelar vidare när storleken ändras. */
+
+.hlp {
+  position: fixed;
+  inset: 0;
+  z-index: 1000;
+  pointer-events: none;
+}
+.hlp-dim {
+  position: absolute;
+  inset: 0;
+  background: rgba(8, 7, 5, 0.72);
+  opacity: 0;
+  transition: opacity 0.25s ease;
+}
+.hlp.big .hlp-dim { opacity: 1; pointer-events: auto; }
+
+.hlp-box {
+  position: absolute;
+  right: 18px;
+  bottom: 18px;
+  width: 400px;
+  overflow: hidden;
+  pointer-events: auto;
+  background: var(--card);
+  border: 1px solid var(--pill-line);
+  border-radius: 14px;
+  box-shadow: 0 28px 60px -18px rgba(0, 0, 0, 0.95);
+  transition: width 0.28s ease, right 0.28s ease, bottom 0.28s ease, transform 0.28s ease;
+}
+.hlp.big .hlp-box {
+  right: 50%;
+  bottom: 50%;
+  width: min(1100px, calc(100vw - 48px), calc((100vh - 120px) * 16 / 9));
+  transform: translate(50%, 50%);
+}
+
+.hlp-bar {
+  display: flex;
+  align-items: center;
+  gap: 2px;
+  height: 38px;
+  padding: 0 4px 0 14px;
+  background: var(--glass-hi);
+  border-bottom: 1px solid var(--border);
+}
+.hlp-name {
+  flex: 1;
+  min-width: 0;
+  overflow: hidden;
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--ink-soft);
+  white-space: nowrap;
+  text-overflow: ellipsis;
+}
+.hlp-ic {
+  display: grid;
+  place-items: center;
+  flex: none;
+  width: 32px;
+  height: 32px;
+  padding: 0;
+  color: var(--muted);
+  background: none;
+  border: 0;
+  border-radius: 50%;
+  cursor: pointer;
+}
+.hlp-ic svg { width: 16px; height: 16px; }
+.hlp-ic:hover { color: var(--gold); background: color-mix(in srgb, var(--gold) 12%, transparent); }
+.hlp-ic:focus-visible { outline: 2px solid var(--gold); outline-offset: -2px; }
+
+.hlp-frame {
+  position: relative;
+  aspect-ratio: 16 / 9;
+  background: #000;
+}
+.hlp-video, .hlp-video iframe {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  border: 0;
+}
+/* Dolda resultat: täcker klippets titel, där resultatet brukar stå. */
+.hlp-mask {
+  position: absolute;
+  inset: 0 0 auto;
+  height: 64px;
+  background: linear-gradient(180deg, #000 70%, transparent);
+  pointer-events: none;
+}
+.hlp-out {
+  position: absolute;
+  inset: 0;
+  display: grid;
+  place-content: center;
+  justify-items: center;
+  gap: 12px;
+  color: var(--muted);
+  font-size: 14px;
+}
+.hlp-out[hidden] { display: none; }
+.hlp-out p { margin: 0; }
+
 @media (max-width: 640px) {
   .hl-links { margin-top: 10px; }
+  .hlp-box {
+    right: 8px;
+    bottom: calc(8px + env(safe-area-inset-bottom));
+    width: calc(100vw - 16px);
+  }
+  .hlp.big .hlp-box { width: calc(100vw - 16px); }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .hlp-box, .hlp-dim { transition: none; }
 }

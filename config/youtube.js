@@ -1,0 +1,142 @@
+'use strict';
+
+// Kanalerna som höjdpunkterna hämtas från (src/fetchers/youtube.js,
+// src/hojdpunkter.js).
+//
+// CLUBS: klubbens egen kanal, ESPN-namn → kanal-id ("UC…") eller kanalens
+// adress på youtube.com ("@namn", "user/namn", "namn"), som slås upp en gång
+// och sparas i cachen. Id:na kommer ur Wikidata (P2397, hämtat 2026-10-20),
+// adresserna ur länkarna på klubbarnas egna sajter. Ett klipp i en klubbs
+// kanal knyts till en av klubbens matcher; motståndaren ska stå i titeln.
+//
+// CHANNELS: sändarnas och ligornas kanaler. Där ska båda lagen stå i titeln.
+// order = i vilken ordning spelaren provar klippen (lägst först) –
+// klubbarnas kanaler kommer efter dem.
+//
+// NAMES: namn som står i titlarna men inte följer av ESPN-namnet (src/
+// hojdpunkter.js tar själv bort "City", "Town", "United" osv. och läser
+// config/team-aliases.js).
+
+const CLUBS = {
+  'Accrington Stanley': 'UCdiU0-drBxTVIhqSppSlqKA',
+  'AFC Bournemouth': 'UCeOCuVSSweaEj6oVtJZEKQw',
+  'AFC Wimbledon': 'user/AFCWimbledonTV',
+  'Arsenal': 'UCpryVRk_VDudG8SHXgWcG0w',
+  'Aston Villa': 'UCICNP0mvtr0prFwGUQIABfQ',
+  'Barnet': 'UCFJecvbDoJHQ-LSRYfI_52g',
+  'Barnsley': 'UCli5AB-aSOhTxiF0XZL58gQ',
+  'Birmingham City': 'UCW1HMToSBse9JgQtsm2vMsQ',
+  'Blackburn Rovers': 'UCg4185wSpo9swSCSUEYUGTg',
+  'Blackpool': 'UCsmmd7s-vJZDzfXtCnLFYPA',
+  'Bolton Wanderers': 'UC6oTkDRXLR6GO53l44i0LFw',
+  'Bradford City': 'UCApKWe9YYSzSsZ0m5mLhl7g',
+  'Brentford': 'UCAalMUm3LIf504ItA3rqfug',
+  'Brighton & Hove Albion': 'UCf-cpC9WAdOsas19JHipukA',
+  'Bristol City': 'UCq_5VYwAoOvaL4lyGkwoboQ',
+  'Bristol Rovers': 'UC7dLKUWi0j2nvokTme6U4TQ',
+  'Bromley': 'user/bromleyfctv',
+  'Burnley': 'UChvUXuSDeEFSQZS8GcPMtkg',
+  'Burton Albion': 'UCeNszHpOSL1pTKih-ea33JQ',
+  'Cambridge United': 'UC_d0U8QyXIQ6M86zEzgsikw',
+  'Cardiff City': 'UCfBVy8PAMwyNbac6D0Mk8gQ',
+  'Charlton Athletic': 'UC99akEsugT_s4tv_r2oxuOQ',
+  'Chelsea': 'UCU2PacFf99vhb3hNiYDmxww',
+  'Cheltenham Town': '@ctfcofficial',
+  'Chesterfield': '@ChesterfieldFCOfficial',
+  'Colchester United': 'UCxNNr7jmuxIOeopgjDN6eUQ',
+  'Coventry City': 'UCch_NWdo3JWKngAyO9XlycA',
+  'Crawley Town': 'user/1896CrawleyTownFC',
+  'Crewe Alexandra': 'UCVJZAAd_SeqpV5QAaj2m7tQ',
+  'Crystal Palace': 'UCWB9N0012fG6bGyj486Qxmg',
+  'Derby County': 'UCsOKCDfSRPwRhnbCqBO8CQw',
+  'Doncaster Rovers': 'UCllNtBaf35q89ML6S759O2Q',
+  'Everton': 'UCtK4QAczAN2mt2ow_jlGinQ',
+  'Exeter City': 'UCcGc3MFnRh4EI1Mv3CFX3Xg',
+  'Fleetwood Town': 'UCiH5V60s7eNIdnRBkmzIbfg',
+  'Fulham': 'UC2VLfz92cTT8jHIFOecC-LA',
+  'Gillingham': 'UCVzjJLBJPlt3UJBjvTGCeaw',
+  'Grimsby Town': 'officialgtfc',
+  'Huddersfield Town': 'UCPzdw2bYGCq6XfjEl61_iyw',
+  'Hull City': 'UC8MRV5E-Bi5qWomGjOF0ZQg',
+  'Ipswich Town': 'UCjNwxJec96lMWgCXjEDhXgQ',
+  'Leeds United': 'UCyQcJHDN4uYfPa1DHzKVSnw',
+  'Leicester City': 'UCo6UhE0V2WmVY6k9G4seHUw',
+  'Leyton Orient': 'UCkwWn4ICfzVLD5ts_RW3TRw',
+  'Lincoln City': 'UCCLmGW0zE-1Gdagxg52G7sA',
+  'Liverpool': 'UC9LQwHZoucFT94I2h6JOcjw',
+  'Luton Town': 'UCQoDXQ4Z2Ie3fTPrpjfT97w',
+  'Manchester City': 'UCkzCjdRMrW2vXLx8mvPVLdQ',
+  'Manchester United': 'UC6yW44UGJJBvYTlfC7CRg2Q',
+  'Mansfield Town': 'UCzxQ90H1Ctzf8cSaaIQUYsA',
+  'Middlesbrough': 'UCdXWsJhkXzx5hFJGcxjy_5Q',
+  'Millwall': 'UCPyLfjCylafteypHYuYvGbQ',
+  'Milton Keynes Dons': 'UCCuo5VY346080kg6D3Fz3-Q',
+  'Newcastle United': 'UCywGl_BPp9QhD0uAcP2HsJw',
+  'Newport County': 'user/OfficialNCAFC',
+  'Northampton Town': 'UC3Gsny6v5RKGCN3VFbH5mGw',
+  'Norwich City': 'UCzdkZv6--BWsUQ9rKUtQ1TQ',
+  'Nottingham Forest': '@NottinghamForestFC',
+  'Notts County': 'UCL0tl-6YAAdE6U4QKK_eb3A',
+  'Oldham Athletic': 'UCOvOgSUASukdu4DsGyA9WYg',
+  'Oxford United': '@OxfordUnitedOfficial',
+  'Peterborough United': 'UC_1sTBQpgEfOQAaUBBwg13w',
+  'Plymouth Argyle': 'UCfbUujPfGq9_20QyyInwXWA',
+  'Port Vale': 'UCmy6WUZcvvJFRDQ6cPvSu3A',
+  'Portsmouth': 'UC2pUjr6WECIEprPQxcD51OA',
+  'Preston North End': 'pnefcofficial',
+  'Queens Park Rangers': 'UCiegSQxYwraPK5efklvTO5w',
+  'Reading': 'UC2q3yt0x2irVXrLfeGPv-IA',
+  'Rochdale': '@officiallydale',
+  'Rotherham United': '@RotherhamUnitedFC',
+  'Salford City': '@SalfordCityFootballClub',
+  'Sheffield United': 'UCVER_UoBt84YUrA6s402Q-g',
+  'Sheffield Wednesday': 'user/officialswfc',
+  'Shrewsbury Town': 'UCuw4eS-62hDecs_cMO9vKGg',
+  'Southampton': 'UCxvXjfiIHQ2O6saVx_ZFqnw',
+  'Stevenage': '@stevenagefcofficial',
+  'Stockport County': 'UC0O8TEWDtPpMxc9LLZYWFxw',
+  'Stoke City': 'UCmFPjHUFr0hyE6eFGvCm7IA',
+  'Sunderland': 'UCrw-7k6yJc0EMJdf-0BAkoQ',
+  'Swansea City': 'UCSMZZFBE92Yn-_XYdDiiANA',
+  'Swindon Town': 'UC0AktHYTM_3ck3ND-ecdTcg',
+  'Tottenham Hotspur': 'UCEg25rdRZXg32iwai6N6l0w',
+  'Tranmere Rovers': 'UCNMoCVGAOprD7EIJlffOUPg',
+  'Walsall': 'UC18ZxZ80qKecD0bpimpyGcA',
+  'Watford': 'UCptKljTrbdMTgmuekGKhRug',
+  'West Bromwich Albion': 'UCnDBNo0zLm11TTXPVXvEN1g',
+  'West Ham United': 'UCCNOsmurvpEit9paBOzWtUg',
+  'Wigan Athletic': 'UCwgHNCFB8INrM2o4xBhKsAg',
+  'Wolverhampton Wanderers': 'UCQ7Lqg5Czh5djGK6iOG53KQ',
+  'Wrexham': 'UCS7BAYpqOSaYy-pZp6oO4PA',
+  'Wycombe Wanderers': '@officialwwfc',
+  'York City': 'UCpkc1g75A0UXDIBpqunFIpA',
+};
+
+const CHANNELS = [
+  { key: 'pl', name: 'Premier League', id: 'UCG5qGWdu8nIRZqJ_GgDwQ-w' },
+  { key: 'skypl', name: 'Sky Sports Premier League', id: 'UCNAf1k0yIjyGu3k9BwAg3lg' },
+  { key: 'sky', name: 'Sky Sports Football', id: 'UCZ7wY7MRDSygp63HIEfdQZA' },
+  { key: 'efl', name: 'EFL', id: 'UCCmo_NIuQR5eU4AvBa6sEQQ' },
+  { key: 'facup', name: 'Emirates FA Cup', path: 'thefacup' },
+];
+
+const NAMES = {
+  'Queens Park Rangers': ['QPR'],
+  'Wolverhampton Wanderers': ['Wolves'],
+  'West Bromwich Albion': ['West Brom'],
+  'Manchester City': ['Man City'],
+  'Manchester United': ['Man Utd', 'Man United'],
+  'Nottingham Forest': ['Forest', "Nott'm Forest", 'Notts Forest'],
+  'Tottenham Hotspur': ['Spurs'],
+  'Sheffield United': ['Sheff Utd', 'Sheffield Utd'],
+  'Sheffield Wednesday': ['Sheff Wed'],
+  'Milton Keynes Dons': ['MK Dons'],
+  'Brighton & Hove Albion': ['Brighton'],
+  'Leyton Orient': ['Orient'],
+  'Middlesbrough': ['Boro'],
+  'Crystal Palace': ['Palace'],
+  'Peterborough United': ['Posh'],
+  'Wycombe Wanderers': ['Wycombe'],
+};
+
+module.exports = { CLUBS, CHANNELS, NAMES };

@@ -1,8 +1,12 @@
 'use strict';
 
-// Höjdpunkterna: Viaplays gratis sammandrag (src/fetchers/viaplay.js) knutna
-// till matcherna i spelprogrammet, som repriserna på gravergrav.se. Visas i
-// matchrutan och på matchraden; inget här styr prognoserna.
+// Höjdpunkterna knutna till matcherna i spelprogrammet: YouTube-klipp ur
+// klubbarnas och sändarnas kanaler (src/fetchers/youtube.js), som spelas på
+// sajten, och Viaplays gratis sammandrag (src/fetchers/viaplay.js), som
+// öppnas hos Viaplay när inget YouTube-klipp finns. Visas i matchrutan och på
+// matchraden; inget här styr prognoserna.
+//
+// ---------- Viaplay ----------
 //
 // Klippen har inget matchid, bara en titel – "Tottenham - Coventry",
 // "Höjdpunkter: Fulham-Manchester United", "FLC: West Brom - Burnley |
@@ -25,9 +29,13 @@
 const { readCache } = require('./store');
 const { keyOf, espnKey, norm } = require('./teams');
 const { clipUrl } = require('./fetchers/viaplay');
+const { ALIASES } = require('../config/team-aliases');
+const { CLUBS, CHANNELS, NAMES } = require('../config/youtube');
 
 const SOURCE_ID = 'viaplay_hojdpunkter';
+const YT_SOURCE_ID = 'youtube_hojdpunkter';
 const DAY = 86400000;
+const MIN = 60000;
 
 // Klippets två lag, eller null om titeln inte är en match.
 function teams(title) {
@@ -87,4 +95,139 @@ function highlightsByMatch(matches) {
   return { byMatch, clips: clips.length, matched: byMatch.size };
 }
 
-module.exports = { highlightsByMatch, teams, sameTeam, SOURCE_ID };
+// ---------- YouTube ----------
+//
+// Klippen har bara titel, kanal och tid: "Birmingham City 3-0 Queens Park
+// Rangers | Championship highlights", "HIGHLIGHTS | Blues 3-0 QPR". Ett klipp
+// hör till en spelad match som började 95 minuter till sex dygn innan det
+// lades ut, och där
+//   - i en klubbs kanal: klubben spelade och motståndaren står i titeln
+//     (klubben kallar ofta sig själv vid smeknamn, "Blues", "Pompey");
+//   - i en sändares kanal: båda lagen står i titeln.
+// Står ett resultat i titeln ska det vara matchens, åt något håll (efter
+// förlängning eller efter 90 minuter). Passar flera matcher väljs den där
+// mest av titeln stämmer, sedan den närmast i tid.
+//
+// Ett lag står i titeln under ESPN-namnet, under det utan "City", "Town",
+// "United" osv. ("Birmingham"), under namnen i aliastabellerna
+// (config/team-aliases.js, config/youtube.js NAMES) – som hela ord. Det
+// kortaste namnet kan vara tvetydigt ("Bristol", "Manchester"), men bara
+// lagen i matcherna som passar i tid prövas.
+
+const SUFFIX = / (city|town|united|rovers|athletic|wanderers|county|albion|hotspur|argyle|alexandra|stanley|north end)$/;
+const EXTENDED = /\bextended\b/i;
+const plain = (s) => ` ${norm(s).replace(/[^a-z0-9]+/g, ' ').trim()} `;
+
+const variantCache = new Map();
+function variants(team) {
+  if (variantCache.has(team)) return variantCache.get(team);
+  const out = new Set();
+  const add = (s) => {
+    const p = plain(s).trim();
+    if (p.length >= 3) out.add(p);
+  };
+  const base = plain(team).trim().replace(/^afc /, '').replace(/ afc$/, '');
+  add(team);
+  add(base);
+  add(base.replace(SUFFIX, ''));
+  for (const [alias, espn] of Object.entries(ALIASES)) if (espn === team) add(alias);
+  for (const alias of NAMES[team] || []) add(alias);
+  const list = [...out].sort((a, b) => b.length - a.length);
+  variantCache.set(team, list);
+  return list;
+}
+
+// Var i titeln (plain) laget står, med det längsta namnet: [början, slut]
+// eller null. Spannet skip är redan taget av det andra laget.
+function locate(t, team, skip) {
+  for (const v of variants(team)) {
+    for (let i = t.indexOf(` ${v} `); i >= 0; i = t.indexOf(` ${v} `, i + 1)) {
+      const span = [i + 1, i + 1 + v.length];
+      if (!skip || span[1] <= skip[0] || span[0] >= skip[1]) return span;
+    }
+  }
+  return null;
+}
+const len = (span) => (span ? span[1] - span[0] : 0);
+
+// Resultatet i titeln, om det finns, ska vara matchens.
+function scoreFits(title, m) {
+  const x = String(title).match(/(?:^|\D)(\d{1,2}) ?[-–] ?(\d{1,2})(?!\d)/);
+  if (!x) return true;
+  const a = Number(x[1]);
+  const b = Number(x[2]);
+  return [m.score, m.score90].filter(Boolean)
+    .some((s) => (s.home === a && s.away === b) || (s.home === b && s.away === a));
+}
+
+// Hur väl titeln passar matchen (antal tecken som stämmer), 0 = inte alls.
+// club = kanalens klubb, eller null för en sändare.
+function fit(title, m, club) {
+  if (!scoreFits(title, m)) return 0;
+  const t = plain(title);
+  if (club) {
+    const opp = locate(t, club === m.home ? m.away : m.home, null);
+    return opp ? len(opp) + len(locate(t, club, opp)) : 0;
+  }
+  let best = 0;
+  for (const [a, b] of [[m.home, m.away], [m.away, m.home]]) {
+    const sa = locate(t, a, null);
+    const sb = sa && locate(t, b, sa);
+    if (sb) best = Math.max(best, len(sa) + len(sb));
+  }
+  return best;
+}
+
+const ORDER = new Map(CHANNELS.map((c, i) => [c.key, c.order != null ? c.order : i]));
+const NAME = new Map(CHANNELS.map((c) => [c.key, c.name]));
+
+// I vilken ordning spelaren provar klippen: längre sammandrag först, sedan
+// sändarna, hemmalagets kanal och bortalagets.
+function rank(v, m) {
+  const ch = v.ch in CLUBS ? (v.ch === m.home ? 50 : 60) : (ORDER.get(v.ch) || 0);
+  return (EXTENDED.test(v.title) ? 0 : 100) + ch;
+}
+
+// Spelade matcher → { byMatch: Map(id → klipp i den ordning de provas),
+// videos, matched }. Klipp: { id, ch (kanalens namn), t (titeln) }.
+function youtubeByMatch(matches) {
+  const cache = readCache(YT_SOURCE_ID);
+  const videos = (cache && cache.data && cache.data.videos) || [];
+  const played = matches.filter((m) => m.completed && m.score);
+  const byTeam = new Map();
+  for (const m of played) {
+    for (const t of [m.home, m.away]) {
+      if (!byTeam.has(t)) byTeam.set(t, []);
+      byTeam.get(t).push(m);
+    }
+  }
+  const found = new Map();
+  for (const v of videos) {
+    const pub = Date.parse(v.pub);
+    const club = v.ch in CLUBS ? v.ch : null;
+    let best = null;
+    let bestFit = 0;
+    for (const m of club ? byTeam.get(club) || [] : played) {
+      const k = Date.parse(m.kickoff);
+      if (pub < k + 95 * MIN || pub > k + 6 * DAY) continue;
+      const f = fit(v.title, m, club);
+      if (f > bestFit || (f && f === bestFit && k > Date.parse(best.kickoff))) {
+        best = m;
+        bestFit = f;
+      }
+    }
+    if (!best) continue;
+    if (!found.has(best.id)) found.set(best.id, []);
+    found.get(best.id).push({ v, r: rank(v, best) });
+  }
+  const byMatch = new Map();
+  for (const [id, list] of found) {
+    byMatch.set(id, list
+      .sort((a, b) => a.r - b.r || a.v.pub.localeCompare(b.v.pub))
+      .slice(0, 4)
+      .map(({ v }) => ({ id: v.id, ch: NAME.get(v.ch) || v.ch, t: v.title })));
+  }
+  return { byMatch, videos: videos.length, matched: byMatch.size };
+}
+
+module.exports = { highlightsByMatch, youtubeByMatch, teams, sameTeam, fit, variants, SOURCE_ID, YT_SOURCE_ID };
