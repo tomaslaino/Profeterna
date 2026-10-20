@@ -186,7 +186,7 @@ const tpLiveName = () => (window.Samtal && Samtal.name ? Samtal.name() : null);
 function tpRoundHead(r, sub) {
   const when = esc(dateRange(r.from, r.to));
   return r.name
-    ? `<span class="tp-rname"${r.hint ? ` title="${esc(r.hint)}"` : ''}>${esc(r.name)}</span><span class="sub">${when} · ${sub}</span>`
+    ? `<span class="tp-rname"${r.hint ? ` title="${esc(r.hint)}"` : ''}>${esc(r.name)}</span><span class="sub"><span class="tp-nw">${when}</span> · <span class="tp-nw">${sub}</span></span>`
     : `${when}<span class="sub">${sub}</span>`;
 }
 
