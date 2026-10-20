@@ -26,13 +26,14 @@ const OEMBED_PER_RUN = 80;
 
 // Sammandrag, inte allt annat klubbarna lägger ut. Damlag, ungdomslag,
 // träningsmatcher, EFL Trophy, halvlekar och gamla matcher hör inte till
-// någon match i spelprogrammet.
+// någon match i spelprogrammet, och bakom kulisserna-klipp är inga sammandrag.
 const HIGHLIGHTS = /\bhighlights?\b/i;
 const NOT_MATCH = new RegExp('\\b(' + [
   'women', 'wsl', 'lionesses', 'girls', 'u-?\\d\\d', 'under[- ]?\\d\\d', 'academy', 'pl2', 'premier league 2',
   'youth', 'reserves?', 'friendly', 'friendlies', 'pre-?season', 'legends', 'futsal', 'trophy', 'half[- ]time',
   'first half', 'second half', 'classic', 'rewind', 'throwback', 'on this day', 'retro', 'archive', 'season review',
-  'best of', 'every goal', 'compilation', 'shorts',
+  'best of', 'every goal', 'compilation', 'shorts', 'bts', 'behind the scenes', 'roving cam', 'tunnel cam',
+  'fan cam', 'alternative', 'reaction',
 ].join('|') + ')\\b', 'i');
 
 const status = async (url) => {
@@ -96,7 +97,7 @@ function channelList() {
 async function fetchVideos(prev, since) {
   const ids = { ...((prev && prev.ids) || {}) };
   const byId = new Map();
-  for (const v of (prev && prev.videos) || []) if (v.pub >= since) byId.set(v.id, v);
+  for (const v of (prev && prev.videos) || []) if (v.pub >= since && isHighlights(v.title)) byId.set(v.id, v);
   const failed = [];
   const channels = channelList();
 
