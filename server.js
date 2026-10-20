@@ -7,7 +7,8 @@
 // Matchanalysen (fas 5): finns DEEPSEEK_API_KEY i .env visas knappen
 // Analysera, och servern gör analysen själv (POST /api/analyze) med samma kod
 // som proxyn på Cloudflare (worker/index.mjs). Utan nyckel ingen knapp.
-// Samma nyckel ger AI:ns kommentarer på sidan Historik (POST /api/kommentar).
+// Samma nyckel ger AI:ns kommentarer på sidan Historik (POST /api/kommentar)
+// och, med KUPONG_LOKALT, omgångens namn (POST /api/namn).
 //
 // Kupongen: med KUPONG_LOKALT=1 i .env sparar knappen Spara kupongen direkt
 // (POST /api/kupong) – lokalt skrivs filen i data/kuponger/ (eller
@@ -77,6 +78,36 @@ function commentRoute(siteDir = OUT, store = fileStore(path.join(CACHE_DIR, 'kom
       res.status(r.status).json(r.body);
     } catch (err) {
       console.error('[kommentar]', err);
+      res.status(500).json({ ok: false, error: 'Internt fel i servern.' });
+    }
+  };
+}
+
+// POST /api/namn {id} – AI:ns namn på omgången som gänget tippar, ur
+// omgången i samtalets lagring och matcherna och tabellerna i siteDir.
+function nameRoute(siteDir = OUT, samtal = samtalFileStore(), store = fileStore(path.join(CACHE_DIR, 'namn'))) {
+  return async (req, res) => {
+    try {
+      const { nameRound, teamRanks } = await import('./worker/index.mjs');
+      const read = (p) => {
+        const f = path.join(siteDir, 'data', p);
+        return fs.existsSync(f) ? JSON.parse(fs.readFileSync(f, 'utf8')) : null;
+      };
+      const r = await nameRound(req.body && req.body.id, {
+        env: process.env,
+        store,
+        loadRound: async (id) => {
+          const cur = await samtal.get('samtal:aktuellt');
+          return cur && cur.id === id ? cur : samtal.get(`samtal:${id}`);
+        },
+        loadSite: async () => ({
+          matches: (read('matches.json') || {}).matches || [],
+          teams: teamRanks(['pl', 'ch', 'l1', 'l2'].map((c) => read(`teams/${c}.json`))),
+        }),
+      });
+      res.status(r.status).json(r.body);
+    } catch (err) {
+      console.error('[namn]', err);
       res.status(500).json({ ok: false, error: 'Internt fel i servern.' });
     }
   };
@@ -180,6 +211,7 @@ if (require.main === module) {
   if (analysisEndpoint) app.post('/api/kommentar', express.json(), commentRoute());
   if (couponEndpoint) app.post('/api/kupong', express.json({ limit: '20kb' }), couponSaveRoute());
   if (couponEndpoint) app.all('/api/samtal', express.json({ limit: '20kb' }), samtalRoute());
+  if (analysisEndpoint && couponEndpoint) app.post('/api/namn', express.json(), nameRoute());
   app.use(express.static(OUT));
 
   const port = parseInt(process.env.PORT || '3001', 10);
@@ -193,4 +225,4 @@ if (require.main === module) {
   });
 }
 
-module.exports = { analysisRoute, commentRoute, couponSaveRoute, couponFileWriter, samtalRoute, samtalFileStore, siteMatches, fileStore };
+module.exports = { analysisRoute, commentRoute, nameRoute, couponSaveRoute, couponFileWriter, samtalRoute, samtalFileStore, siteMatches, fileStore };

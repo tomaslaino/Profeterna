@@ -1126,6 +1126,22 @@ lämnat in, eller ändrar någon annans.
 Lokalt: med `KUPONG_LOKALT=1` i `.env` finns
 `/api/samtal`, som sparar i `data/cache/samtal/` (eller `SAMTAL_DIR`).
 
+**Omgångens namn** (2026-10-20): i stället för *Omgångens kupong* får varje omgång ett eget
+namn av AI:n – kort, svenskt och lågmält ironiskt, efter det som utmärker just den omgången
+(ett derby, ett lag som spelar två gånger, en helgdag, botten mot topp …), t.ex. *En Chelsea
+för mycket*. Vad namnet syftar på står när man pekar på det. Namnet skrivs när någon först
+öppnar omgången efter att matcherna valts (det tar ungefär en minut, och så länge står
+*Omgångens kupong* kvar) och syns sedan likadant för alla: på förstasidan, under Omgången och
+när matcherna ändras. Ändras matcherna får omgången ett nytt namn. Gängets kupong får
+omgångens namn när den sparas (`namn` i kupongfilen, så också i Historik), om den inte redan
+har ett. Namnet skrivs i samma proxy som matchanalysen och kommentaren (`POST /namn
+{"id": "<omgångens id>"}`, [worker/namn.mjs](worker/namn.mjs), prompten i
+[config/namn.js](config/namn.js)): proxyn läser omgången ur samma KV-namnrymd som tipsen och
+lagen, tabelläget och modellens odds ur den publicerade sajten, och sparar namnet för alltid
+per omgång och matcher (`namn:<promptversion>:<omgång>:<matcherna>`). Bygget skriver
+adressen i `data/kuponger.json` under `samtal.namn`. Lokalt `/api/namn` (med nyckeln och
+`KUPONG_LOKALT=1`).
+
 ## Kuponghistoriken
 
 **Kupong → Historik** (`#kupong/historik`, en viss kupong `#kupong/historik/<id>`; gamla

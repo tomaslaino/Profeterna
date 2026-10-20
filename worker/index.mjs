@@ -21,6 +21,10 @@
 // Kuponghistoriken: POST /kommentar {"id": "<kupong-id>"} skriver AI:ns
 // kommentar till en färdig kupong (worker/kommentar.mjs).
 //
+// Omgångens namn: POST /namn {"id": "<omgångens id>"} döper omgången som
+// gänget tippar (worker/namn.mjs). Omgången läses ur samma KV-namnrymd som
+// gängets tips (nycklarna "samtal:…", worker/samtal.mjs).
+//
 // Nyheterna (cfg.news): vid varje klick hämtas det senaste om matchen och
 // lagen online (src/news.mjs – förhandsartiklar, skador, trupp, tränarläge,
 // väder) och läggs i underlaget som avsnittet nyheter. Modellen skriver då
@@ -32,6 +36,7 @@ import cfg from '../config/llm.js';
 import { payloadOf, fingerprint, foreignNumbers } from './analysis.mjs';
 import { gatherNews, newsPayload, citeNews, withoutRefs } from '../src/news.mjs';
 import { comment } from './kommentar.mjs';
+import { roundName } from './namn.mjs';
 
 const ID_RE = /^\d{1,12}$/;
 
@@ -123,6 +128,11 @@ export async function analyze(id, { env, loadMatch, store = null, now = () => ne
 // Kommentaren till en färdig kupong, med samma anrop till språkmodellen.
 export function couponComment(id, opts) {
   return comment(id, { complete, ...opts });
+}
+
+// Omgångens namn, med samma anrop till språkmodellen.
+export function nameRound(id, opts) {
+  return roundName(id, { complete, ...opts });
 }
 
 async function complete(messages, apiKey, env) {
@@ -243,7 +253,7 @@ export default {
   async fetch(request, env) {
     if (request.method === 'OPTIONS') return new Response(null, { status: 204, headers: CORS });
     const url = new URL(request.url);
-    if (!['/analyze', '/kommentar'].includes(url.pathname) || request.method !== 'POST') return json(404, { ok: false, error: 'Finns inte.' });
+    if (!['/analyze', '/kommentar', '/namn'].includes(url.pathname) || request.method !== 'POST') return json(404, { ok: false, error: 'Finns inte.' });
     let id;
     try {
       ({ id } = await request.json());
@@ -262,6 +272,15 @@ export default {
         const r = await couponComment(id, { env, store, loadHistory: () => siteHistory(site) });
         return json(r.status, r.body);
       }
+      if (url.pathname === '/namn') {
+        // Ett namn sparas utan slutdatum – omgången döps en gång.
+        const store = kv ? {
+          get: (k) => kv.get(k, 'json'),
+          put: (k, v, ttl) => kv.put(k, JSON.stringify(v), ttl ? { expirationTtl: ttl } : {}),
+        } : null;
+        const r = await nameRound(id, { env, store, loadRound: (rid) => kvRound(kv, rid), loadSite: () => siteRound(site) });
+        return json(r.status, r.body);
+      }
       const store = kv ? {
         get: (k) => kv.get(k, 'json'),
         put: (k, v, ttl) => kv.put(k, JSON.stringify(v), { expirationTtl: ttl || cfg.cacheDays * 86400 }),
@@ -274,6 +293,32 @@ export default {
     }
   },
 };
+
+// Omgången där gängets tips ligger: den aktuella, eller en tidigare under
+// sitt id.
+async function kvRound(kv, id) {
+  if (!kv) return null;
+  const cur = await kv.get('samtal:aktuellt', 'json');
+  if (cur && cur.id === id) return cur;
+  return kv.get(`samtal:${id}`, 'json');
+}
+
+// Matcherna (modellens odds) och tabellerna ur den publicerade sajten.
+async function siteRound(site) {
+  const get = async (p) => {
+    const res = await fetch(`${site}/data/${p}?t=${Date.now()}`);
+    if (!res.ok) throw new Error(`HTTP ${res.status}`);
+    return res.json();
+  };
+  const [m, ...tables] = await Promise.all([get('matches.json'), ...['pl', 'ch', 'l1', 'l2'].map((c) => get(`teams/${c}.json`).catch(() => null))]);
+  return { matches: m.matches || [], teams: teamRanks(tables) };
+}
+
+// Tabellplaceringen per lag: [{name, comp, rank, of}].
+export function teamRanks(tables) {
+  return tables.filter((t) => t && Array.isArray(t.teams))
+    .flatMap((t) => t.teams.map((x) => ({ name: x.name, comp: t.comp, rank: x.rank, of: t.teams.length })));
+}
 
 async function siteHistory(site) {
   const res = await fetch(`${site}/data/historik.json?t=${Date.now()}`);

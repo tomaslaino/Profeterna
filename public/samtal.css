@@ -54,6 +54,12 @@
 .sm-dots i:nth-child(3) { animation-delay: 0.4s; }
 @keyframes sm-dot { 0%, 60%, 100% { opacity: 0.25; } 30% { opacity: 1; } }
 @media (prefers-reduced-motion: reduce) { .sm-dots i { animation: none; opacity: 0.6; } }
+
+/* Omgångens namn (AI:n) tonar fram när det kommer. */
+.sm-namn[title] { cursor: help; }
+.sm-namn.fram { animation: sm-fram 0.9s ease both; }
+@keyframes sm-fram { from { opacity: 0; } to { opacity: 1; } }
+@media (prefers-reduced-motion: reduce) { .sm-namn.fram { animation: none; } }
 .ute > .sm-ch { opacity: 0.6; }
 
 /* ---------- underlaget ---------- */

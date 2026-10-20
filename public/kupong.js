@@ -496,7 +496,7 @@ function renderCouponShow(id) {
       button: 'Visa resultaten',
     });
   }
-  html += Papper.coupon(c, g);
+  html += Papper.coupon(c.name ? c : { ...c, name: couponName(c) }, g);
   // Färdigspelad även om spoilerskyddet döljer resultaten (g.done).
   if (round && g.done) html += `<a class="kp-next" href="${newCouponHref()}"><span aria-hidden="true">+</span> Skapa ny kupong</a>`;
   html += moreSection(graded.filter((x) => x !== cur && !x.g.done));
@@ -543,6 +543,10 @@ function renderHome() {
   $('#home').innerHTML = samtal + (c && !(samtal && g.done) ? teaser(c, g) : samtal ? '' : emptyCard());
 }
 
+// Kupongens namn: det som sparades med den, annars omgångens namn om den
+// gjordes ur omgången som gänget tippade (samtal.js).
+const couponName = (c) => c.name || (hasSamtal() && Samtal.covers(c) && Samtal.name()) || null;
+
 // Omgångens kupong i korthet: siffran, en prick per match och vägen in.
 // Resten (väntat, modellens tips, GitHub) står på kupongsidan.
 function teaser(c, g) {
@@ -550,7 +554,7 @@ function teaser(c, g) {
     ? `<a class="kp-btn primary" href="${newCouponHref()}">+ Ny kupong</a><a class="kp-btn" href="#kupong">Se kupongen</a>`
     : `<a class="kp-btn primary" href="#kupong">${g.started ? 'Följ kupongen' : 'Till kupongen'}</a>`;
   return `<div class="card kp-teaser${g.live ? ' is-live' : ''}">` +
-    `<div class="kp-teaser-txt"><p class="kp-eyebrow">Omgångens kupong${c.name ? ` · ${esc(c.name)}` : ''}</p>` +
+    `<div class="kp-teaser-txt"><p class="kp-eyebrow">${esc(couponName(c) || 'Omgångens kupong')}</p>` +
     `<h2 class="page-title"><a href="#kupong">${esc(dateRange(g.first, g.last))}</a></h2>` +
     (g.started ? '' : `<span class="kp-line">Startar ${esc(fWeekdayTime.format(new Date(g.first)))}</span>`) + '</div>' +
     `<a class="kp-teaser-num" href="#kupong" aria-label="Till kupongen">${bigNumber(g)}</a>` +

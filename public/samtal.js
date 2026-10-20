@@ -21,6 +21,10 @@
 //
 // Ta bort (tills allas tips visas) frågar i en ruta ovanpå omgången.
 //
+// Omgången får ett namn av AI:n när matcherna är valda (worker/namn.mjs, i
+// samma proxy som matchanalysen) – samma för alla, och det följer med när
+// gängets kupong sparas. Tills namnet finns heter den "Omgångens kupong".
+//
 // Omgången och tipsen ligger i tjänsten profeterna-kupong (worker/samtal.mjs,
 // GET/POST …/samtal; lokalt /api/samtal), som håller tipsen dolda. Den som
 // lämnar in får en nyckel som sparas på enheten och visar de andras tips. Vem
@@ -43,10 +47,12 @@
     noteRow: null, // matchen du senast tippade: där står fältet för motiveringen
     edit: false, // draft är en ändring av dina inlämnade tips
     again: false, // Spara gängets kupong trots matcher utan tecken
+    names: new Map(), // omgång och matcher → {namn, syftar} | null (inget namn) | 'loading'
   };
   const VEM = 'profeterna.samtal.vem';
   const TIPS = 'profeterna.samtal.tips';
   const DECIDE = 'profeterna.samtal.beslut';
+  const NAMN = 'profeterna.samtal.namn';
   const POLL_MS = 20000;
 
   const info = () => (KP.data && KP.data.samtal) || null;
@@ -116,6 +122,54 @@
     return { ...out, ok: false, status: res && res.status, error: out.error || 'Ingen kontakt med servern.' };
   }
 
+  // ---------- omgångens namn ----------
+
+  // Namnet hämtas en gång per omgång och matcher (ändras matcherna får
+  // omgången ett nytt) och sparas på enheten. Första gången skriver AI:n det,
+  // vilket kan ta en minut – då står "Omgångens kupong" kvar så länge.
+  const nameKey = (s) => `${s.id}:${s.matcher.map((x) => x.id).sort().join(',')}`;
+  function named(s) {
+    const url = info() && info().namn;
+    if (!s || !url) return null;
+    const k = nameKey(s);
+    if (!SM.names.has(k)) {
+      const saved = kpLoad(NAMN);
+      if (saved && saved.key === k && saved.namn) SM.names.set(k, saved);
+      else {
+        SM.names.set(k, 'loading');
+        fetchName(url, s.id, k);
+      }
+    }
+    const n = SM.names.get(k);
+    return n && n !== 'loading' ? n : null;
+  }
+
+  async function fetchName(url, id, k) {
+    let n = null;
+    try {
+      const res = await fetch(url, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ id }) });
+      const j = await res.json().catch(() => ({}));
+      if (res.ok && j.ok && j.namn) n = { key: k, namn: j.namn, syftar: j.syftar || null };
+    } catch { /* inget namn den här gången */ }
+    SM.names.set(k, n);
+    if (!n) return;
+    kpStore(NAMN, n);
+    if (!SM.data || nameKey(SM.data) !== k) return;
+    // Byt bara rubriken, så att inget annat på sidan ritas om.
+    for (const el of document.querySelectorAll(`[data-sm-namn="${CSS.escape(k)}"]`)) el.outerHTML = eyebrow(SM.data, 'fram');
+  }
+
+  const nameOf = (s) => { const n = named(s); return n ? n.namn : null; };
+
+  // Namnet ovanför rubriken; vad det syftar på när man pekar på det.
+  function eyebrow(s, cls = '') {
+    const n = named(s);
+    const key = s && info() && info().namn ? ` data-sm-namn="${esc(nameKey(s))}"` : '';
+    return n
+      ? `<p class="kp-eyebrow sm-namn ${cls}"${key}${n.syftar ? ` title="${esc(n.syftar)}"` : ''}>${esc(n.namn)}</p>`
+      : `<p class="kp-eyebrow"${key}>Omgångens kupong</p>`;
+  }
+
   // Frågar tjänsten var 20:e sekund och ritar om när omgången ändrats, t.ex.
   // när någon lämnat in – under Omgången, och på förstasidan medan tipsen
   // lämnas in. Slutar när man lämnar sidorna.
@@ -161,10 +215,11 @@
 
   // ---------- omgången ----------
 
-  function head(s, eyebrow, actions = '') {
+  // eyebrow: texten ovanför rubriken, annars omgångens namn.
+  function head(s, label, actions = '') {
     const k = s ? kicks(s) : [];
     return '<div class="kp-head"><div>' +
-      `<p class="kp-eyebrow">${esc(eyebrow)}</p>` +
+      (label ? `<p class="kp-eyebrow">${esc(label)}</p>` : eyebrow(s)) +
       `<h2 class="page-title">${s ? esc(dateRange(Math.min(...k), Math.max(...k))) : 'Omgångens kupong'}</h2></div>` +
       `<div class="kp-actions">${actions}</div></div>`;
   }
@@ -198,7 +253,7 @@
       (s.visas ? '' : '<button type="button" class="kp-btn" data-sm-remove>Ta bort</button>') +
       (s.visas && existing(s) ? '<a class="kp-btn" href="#kupong">Gängets kupong</a>' : '') +
       (s.visas || over(s) ? '<a class="kp-btn" href="#kupong/samtal/ny">+ Ny kupong</a>' : '');
-    html += steps(s) + head(s, 'Omgångens kupong', actions);
+    html += steps(s) + head(s, null, actions);
     html += all ? board(s) : sheet(s, false);
     // Gängets kuponger som spelas under tiden, t.ex. veckans matcher.
     html += openCoupons();
@@ -404,6 +459,8 @@
     const open = rows.filter((r) => isOpen(r.m, now));
     const c = existing(s);
     const d = newDraft(c ? c.id : null);
+    // Gängets kupong får omgångens namn, om den inte redan har ett.
+    if (!d.name) d.name = nameOf(s) || '';
     for (const r of open) {
       if (val[r.x.id]) d.picks[r.x.id] = val[r.x.id];
       else {
@@ -820,7 +877,7 @@
       '<div class="chips" id="sm-comps" role="group" aria-label="Tävling">' + comps.map((c) =>
         `<button type="button" data-comp="${c.id}" title="${esc(c.name)}" aria-pressed="${c.id === SM.comp}">${esc(c.short)}</button>`).join('') + '</div></div>';
     $('#coupon').innerHTML = viewNav('omgang') + roundSteps(1) +
-      '<div class="kp-head"><div><p class="kp-eyebrow">Omgångens kupong</p>' +
+      '<div class="kp-head"><div>' + (edit ? eyebrow(s) : '<p class="kp-eyebrow">Omgångens kupong</p>') +
       `<h2 class="page-title">${edit ? 'Ändra matcherna' : 'Välj matcher'}</h2></div>` +
       '<div class="kp-actions"><a class="kp-btn" href="#kupong">Avbryt</a></div></div>' +
       Papper.builder({
@@ -961,7 +1018,7 @@
       ? `<a href="#kupong" class="sm-kvar${ms < HOUR ? ' snart' : ''}" title="${esc(`Senast ${fWeekdayTime.format(new Date(stop))}`)}"><span data-kvar="${stop}">${left(ms)}</span> kvar</a>`
       : '<a href="#kupong">Dags för uppgörelsen</a>';
     return '<div class="card sm-teaser">' +
-      `<div><p class="kp-eyebrow">Omgångens kupong</p><h2 class="page-title">${title}</h2></div>` +
+      `<div>${eyebrow(s)}<h2 class="page-title">${title}</h2></div>` +
       // Initialerna: egen färg och bock = inne, grå = inte inne, guldring = du.
       '<div class="sm-faces">' + s.gang.map((g) => {
         const st = g.inne ? 'inne' : open ? 'fyller i' : 'lämnade inte in';
@@ -999,5 +1056,5 @@
   const made = () => (SM.data && SM.data.visas ? existing(SM.data) : null);
   const watch = () => { if (active() && !SM.data.visas) poll(); };
 
-  window.Samtal = { show, load, active, covers, teaser, ids, visible, made, watch, redraw: () => { if (here('')) renderRound(); } };
+  window.Samtal = { show, load, active, covers, teaser, ids, visible, made, watch, name: () => nameOf(SM.data), redraw: () => { if (here('')) renderRound(); } };
 })();

@@ -220,7 +220,7 @@ function writeSite(outDir = OUT, { journal = false, analysisEndpoint, couponEndp
     console.error('[build] kupongerna:', err);
     coupons = { coupons: [], errors: [{ file: '', errors: [String(err.message || err)] }] };
   }
-  write('kuponger.json', { repo: REPO, branch: BRANCH, dir: 'data/kuponger', save: couponSaveInfo(couponEndpoint), samtal: samtalInfo(couponEndpoint), ...coupons });
+  write('kuponger.json', { repo: REPO, branch: BRANCH, dir: 'data/kuponger', save: couponSaveInfo(couponEndpoint), samtal: samtalInfo(couponEndpoint, analysisEndpoint), ...coupons });
 
   // Kuponghistoriken (sidan Historik): färdiga kuponger med facit och betyg.
   // Med --journal fryses nya färdiga kuponger in i data/kupong-historik.json.
@@ -297,10 +297,13 @@ function couponSaveInfo(override) {
 }
 
 // Inför samtalet: gängets egna tips ligger i samma tjänst (…/kupong →
-// …/samtal, lokalt /api/samtal), och gang är vilka som tippar.
-function samtalInfo(override) {
+// …/samtal, lokalt /api/samtal), och gang är vilka som tippar. Omgångens
+// namn skriver AI:n i samma proxy som analysen (…/analyze → …/namn, lokalt
+// /api/namn).
+function samtalInfo(override, analysis) {
   const save = couponSaveInfo(override);
-  return save ? { endpoint: save.replace(/kupong$/, 'samtal'), gang: kupongCfg.gang || [] } : null;
+  const a = analysisInfo(analysis);
+  return save ? { endpoint: save.replace(/kupong$/, 'samtal'), gang: kupongCfg.gang || [], namn: a ? a.endpoint.replace(/analyze$/, 'namn') : null } : null;
 }
 
 function commentInfo(override) {
