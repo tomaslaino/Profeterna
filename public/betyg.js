@@ -18,6 +18,13 @@
 // - Hushållning: spelkassan, 10 kr per match till modellens odds.
 // - Närvaro: omgångar som man tippade.
 // Gränserna (steps) är lägsta värde för A, B, C, D och E – under E blir det F.
+// De är provade på simulerade säsonger om 25 omgångar med 13 riktiga
+// ligamatcher (2026/27, modellens chans före avspark) och fem sätt att tippa:
+// den som följer modellen får C i Träffsäkerhet och Mod, den som garderar
+// mycket A–B i Träffsäkerhet men E i Mod, skrällspelaren tvärtom och slumpen
+// F i Träffsäkerhet och Lagkänsla. Skarpsinne och Hushållning är C från noll:
+// bättre än modellen och plus i kassan – A och F är ungefär 1,5 standard-
+// avvikelser av turen under en säsong.
 // Meritvärdet är som i skolan: A 20, B 17,5, C 15, D 12,5, E 10 och F 0.
 //
 // Läses efter tippoang.js och papper.js och använder app.js och kupong.js
@@ -58,7 +65,7 @@ window.Betyg = (() => {
       key: 'traff',
       name: 'Träffsäkerhet',
       what: 'Andel rätt tips',
-      steps: [0.6, 0.54, 0.48, 0.43, 0.38],
+      steps: [0.57, 0.51, 0.44, 0.39, 0.34],
       value: (s) => s.ok / s.n,
       text: (s) => `${Math.round((s.ok / s.n) * 100)} %`,
       at: (v) => `${Math.round(v * 100)} %`,
@@ -67,7 +74,7 @@ window.Betyg = (() => {
       key: 'skarp',
       name: 'Skarpsinne',
       what: 'Poängen i Olympen: fler rätt än modellen väntade sig',
-      steps: [0.06, 0.03, 0, -0.03, -0.06],
+      steps: [0.04, 0.02, 0, -0.02, -0.04],
       value: (s) => s.pts / s.n,
       text: (s) => signed(s.pts),
       at: (v, s) => signed(v * s.n),
@@ -76,7 +83,7 @@ window.Betyg = (() => {
       key: 'mod',
       name: 'Mod',
       what: 'Snittoddset för tipsen',
-      steps: [2.8, 2.5, 2.2, 1.95, 1.7],
+      steps: [2.65, 2.35, 2.05, 1.85, 1.65],
       value: (s) => s.n / s.prob,
       text: (s) => odds(s.n / s.prob),
       at: (v) => odds(v),
@@ -85,7 +92,7 @@ window.Betyg = (() => {
       key: 'lag',
       name: 'Lagkänsla',
       what: 'Andel av lagets rätt som du också hade',
-      steps: [0.9, 0.82, 0.74, 0.66, 0.58],
+      steps: [0.92, 0.84, 0.76, 0.68, 0.6],
       value: (s) => (s.team ? s.gave / s.team : null),
       text: (s) => `${s.gave} av ${s.team}`,
       at: (v, s) => `${Math.ceil(v * s.team - 1e-9)} av ${s.team}`,
@@ -94,7 +101,7 @@ window.Betyg = (() => {
       key: 'kassa',
       name: 'Hushållning',
       what: `Spelkassan: ${INSATS} kr per match till modellens odds`,
-      steps: [0.15, 0.07, 0, -0.07, -0.15],
+      steps: [0.1, 0.05, 0, -0.05, -0.1],
       value: (s) => (s.back - s.n * INSATS) / (s.n * INSATS),
       text: (s) => kr(s.back - s.n * INSATS),
       at: (v, s) => kr(v * s.n * INSATS),
