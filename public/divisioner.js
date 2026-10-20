@@ -571,8 +571,8 @@ function playersView(dv, P) {
   let html = sectionHead('Spelarstatistik', `Ligamatcher ${esc(state.data.season)}`);
   const xgVal = (p) => `<b>${delta(p.dxg, { d: 1 })}</b><small>${p.fg} mål · ${num(p.xg, 1)} xG</small>`;
   html += '<div class="dv-leaders">' +
-    topCard('goals', 'Skytteliga', L.goals, (p) => `<b>${p.g}</b><small>${p.app} matcher</small>`) +
-    topCard('assists', 'Flest assist', L.assists, (p) => `<b>${p.a}</b><small>${p.app} matcher</small>`) +
+    topCard('goals', 'Skytteliga', L.goals, (p) => `<b>${p.g}</b>`) +
+    topCard('assists', 'Flest assist', L.assists, (p) => `<b>${p.a}</b>`) +
     (xg
       ? topCard('overxg', 'Över xG', L.overXg, xgVal, { note: 'Fler mål än chanserna brukar ge (mål minus xG)' }) +
         topCard('underxg', 'Under xG', L.underXg, xgVal, { note: 'Färre mål än chanserna brukar ge (mål minus xG)' })
@@ -580,7 +580,7 @@ function playersView(dv, P) {
         topCard('conversion', 'Effektivast', L.conversion, (p) => `<b>${pct(p.conv)}</b><small>${p.g}/${p.sh}</small>`,
           { note: `Mål per skott · minst ${P.thresholds.minShotsConversion} skott`, empty: 'ingen har tillräckligt många skott än' })) +
     topCard('cards', 'Flest kort', byCards(L.yellow.concat(L.red.filter((r) => !L.yellow.some((y) => y.id === r.id)))), cardsVal) +
-    topCard('keepers', 'Målvakter', L.keepers, (p) => `<b>${pct(p.savePct)}</b><small>${p.gc} insläppta</small>`,
+    topCard('keepers', 'Målvakter', L.keepers, (p) => `<b>${pct(p.savePct)}</b>`,
       { note: 'Andel räddade skott på mål · minst halva lagets matcher', empty: 'okänt' }) +
     '</div>';
 
@@ -824,7 +824,7 @@ function teamsView(dv, P, T) {
   return sectionHead('Lagen') +
     '<div class="dv-leaders dv-leaders4">' + leaders +
     teamTop('Slår oddsen', all, (t) => `<b>${delta(vsOdds(t), { d: 1 })}</b><small>${t.fd.mkt.pts} p · ${num(t.fd.mkt.xp, 1)} väntat</small>`, { get: vsOdds, note: 'Poäng mot vad oddsen vid avspark väntade sig' }) +
-    teamTop('Bäst att spela på', all, (t) => `<b>${delta(roi(t), { fmt: signedPct })}</b><small>${t.fd.mkt.n} matcher</small>`, { get: roi, note: 'Samma insats på seger i varje match' }) +
+    teamTop('Bäst att spela på', all, (t) => `<b>${delta(roi(t), { fmt: signedPct })}</b>`, { get: roi, note: 'Samma insats på seger i varje match' }) +
     '</div>' +
     card('Alla lag', {
       body: segHtml(groups, f.cols, 'data-tcols') +
