@@ -18,7 +18,8 @@
 //   #kupong/samtal/tips      ändra kupongen du har lämnat in
 //   #kupong/samtal/ny        skapa omgångens kupong: välj matcherna
 //   #kupong/samtal/matcher   ändra matcherna, tills någon har lämnat in
-//   #kupong/samtal/bort      ta bort omgångens kupong, tills allas tips visas
+//
+// Ta bort (tills allas tips visas) frågar i en ruta ovanpå omgången.
 //
 // Omgången och tipsen ligger i tjänsten profeterna-kupong (worker/samtal.mjs,
 // GET/POST …/samtal; lokalt /api/samtal), som håller tipsen dolda. Den som
@@ -151,7 +152,6 @@
     if (sub === 'ny') renderStart(false);
     else if (sub === 'matcher') renderStart(true);
     else if (sub === 'tips') await renderTips();
-    else if (sub === 'bort') renderRemove();
     else {
       renderRound();
       poll();
@@ -195,7 +195,7 @@
     const all = Boolean(s.tips && Object.keys(s.tips).length >= (s.visas ? 1 : 2));
     const actions = (s.visas || anyIn ? '' : '<a class="kp-btn" href="#kupong/samtal/matcher">Ändra matcherna</a>') +
       (all && canEdit(s) ? '<a class="kp-btn" href="#kupong/samtal/tips">Ändra din kupong</a>' : '') +
-      (s.visas ? '' : '<a class="kp-btn" href="#kupong/samtal/bort">Ta bort</a>') +
+      (s.visas ? '' : '<button type="button" class="kp-btn" data-sm-remove>Ta bort</button>') +
       (s.visas && existing(s) ? '<a class="kp-btn" href="#kupong">Gängets kupong</a>' : '') +
       (s.visas || over(s) ? '<a class="kp-btn" href="#kupong/samtal/ny">+ Ny kupong</a>' : '');
     html += steps(s) + head(s, 'Omgångens kupong', actions);
@@ -204,6 +204,8 @@
     html += openCoupons();
     keepFocus(() => {
       el.innerHTML = html;
+      const bort = el.querySelector('[data-sm-remove]');
+      if (bort) bort.addEventListener('click', confirmRemove);
       if (all) wire(s);
       else wireSheet();
     });
@@ -747,42 +749,54 @@
 
   // ---------- ta bort ----------
 
-  // Omgångens kupong tas bort för alla, med tipsen som har lämnats in. När
-  // allas tips visas står den kvar (tipparhistoriken) – då startar man en ny.
-  function renderRemove() {
+  // Omgångens kupong tas bort för alla, med tipsen som har lämnats in – efter
+  // en fråga i en ruta ovanpå sidan. När allas tips visas står den kvar
+  // (tipparhistoriken) – då startar man en ny.
+  function confirmRemove() {
     const s = SM.data;
-    if (!s || s.visas) {
-      location.hash = 'kupong';
-      return;
+    if (!s || s.visas) return;
+    let d = document.getElementById('sm-remove');
+    if (!d) {
+      d = document.createElement('dialog');
+      d.id = 'sm-remove';
+      d.className = 'kp-confirm';
+      d.setAttribute('aria-label', 'Ta bort kupongen');
+      // Avbryt, Esc eller ett klick utanför rutan stänger den.
+      d.addEventListener('click', (e) => { if (e.target === d || e.target.closest('[data-close]')) d.close(); });
+      document.body.appendChild(d);
     }
     const inne = s.gang.filter((g) => g.inne).map((g) => g.namn);
-    $('#coupon').innerHTML = viewNav('omgang') + steps(s) + head(s, 'Ta bort kupongen') +
-      '<form class="card kp-saved" id="sm-remove">' +
-      `<p>Kupongen tas bort för alla${inne.length ? `, med tipsen som ${esc(inne.join(' och '))} har lämnat in` : ''}.</p>` +
-      '<div class="kp-actions"><button type="submit" class="kp-btn kp-danger" id="sm-send">Ta bort kupongen</button>' +
-      '<a class="kp-btn" href="#kupong">Avbryt</a></div>' +
-      '<p class="kp-msg" id="sm-msg" role="status"></p></form>';
-    $('#sm-remove').addEventListener('submit', (e) => { e.preventDefault(); removeRound(s); });
+    d.innerHTML = '<div class="kp-confirm-box"><h2>Ta bort kupongen?</h2>' +
+      `<p>Den tas bort för alla${inne.length ? `, med tipsen som ${esc(inne.join(' och '))} har lämnat in` : ''}.</p>` +
+      '<div class="kp-actions"><button type="button" class="kp-btn kp-danger" data-ok>Ta bort</button>' +
+      '<button type="button" class="kp-btn" data-close autofocus>Avbryt</button></div>' +
+      '<p class="kp-msg" role="status"></p></div>';
+    d.querySelector('[data-ok]').addEventListener('click', () => removeRound(s, d));
+    d.showModal();
   }
 
-  async function removeRound(s) {
-    const msg = (h) => { $('#sm-msg').innerHTML = h; };
-    const btn = $('#sm-send');
+  async function removeRound(s, d) {
+    const msg = (h) => { d.querySelector('.kp-msg').innerHTML = h; };
+    const btn = d.querySelector('[data-ok]');
     btn.disabled = true;
     msg('Tar bort …');
     const out = await send({ gor: 'bort', id: s.id });
-    if (!here('bort')) return;
     btn.disabled = false;
     if (out.ok) {
       // Utkast och gängets tecken för omgången på enheten går inte längre att använda.
       for (const k of [TIPS, DECIDE]) {
-        const d = kpLoad(k);
-        if (d && d.id === s.id) kpStore(k, null);
+        const x = kpLoad(k);
+        if (x && x.id === s.id) kpStore(k, null);
       }
-      location.hash = 'kupong';
+      d.close();
+      // Kupongsidan ritas om utan omgången (showCoupon i kupong.js).
+      if (location.hash === '#kupong') showCoupon('');
+      else location.hash = 'kupong';
       return;
     }
-    msg(`<span class="note">${esc(out.error)}</span>` + (out.status === 409 ? ' <a href="#kupong">Till omgången</a>' : ''));
+    msg(`<span class="note">${esc(out.error)}</span>`);
+    // 409: allas tips visas redan eller omgången har bytts – sidan under visar läget.
+    if (out.status === 409 && here('')) renderRound();
   }
 
   // ---------- skapa omgångens kupong och ändra matcherna ----------
