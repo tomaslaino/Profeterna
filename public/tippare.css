@@ -154,6 +154,8 @@
 .tp-table .tp-aw.worst { border-color: var(--kp-no); }
 .tp-rounds .tp-table tbody th { white-space: nowrap; }
 .tp-rounds .tp-table tbody th .sub { display: block; font-size: 12px; margin-top: 2px; }
+/* omgångens namn får bryta rad, så att tabellen inte blir bredare */
+.tp-rounds .tp-table tbody th .tp-rname { display: block; min-width: 9em; max-width: 13em; white-space: normal; }
 
 @media (max-width: 520px) {
   .tp-card { padding: 18px 16px; }
@@ -161,6 +163,7 @@
   .tp-stable th, .tp-stable td { padding-left: 10px; }
   .tp-stable .tp-rank { width: 1.3em; font-size: 18px; }
   .tp-rounds .tp-table tbody th, .tp-rounds .tp-table tfoot th { min-width: 5.5em; }
+  .tp-rounds .tp-table tbody th .tp-rname { min-width: 7em; max-width: 9em; }
   .tp-rounds .tp-table th, .tp-rounds .tp-table td { padding-left: 0.35rem; padding-right: 0.35rem; }
   .tp-row { grid-template-columns: 1.3em minmax(0, 1fr) auto 3.6em; gap: 4px 10px; }
   .tp-name b { font-size: 15px; }

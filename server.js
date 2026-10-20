@@ -96,6 +96,7 @@ function nameRoute(siteDir = OUT, samtal = samtalFileStore(), store = fileStore(
       const r = await nameRound(req.body && req.body.id, {
         env: process.env,
         store,
+        readOnly: Boolean(req.body && req.body.las === true),
         loadRound: async (id) => {
           const cur = await samtal.get('samtal:aktuellt');
           return cur && cur.id === id ? cur : samtal.get(`samtal:${id}`);

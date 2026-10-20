@@ -179,6 +179,17 @@ function tpTable(s) {
     `<tbody>${body}</tbody><tfoot><tr><th scope="row">Summa</th>${foot}</tr></tfoot></table></div></details>`;
 }
 
+// Omgångens namn (som AI:n gav den, src/tippare.js och samtal.js): i
+// tabellerna som radrubrik med datumen under, och vad det syftar på när man
+// pekar. Utan namn bara datumen, som förut.
+const tpLiveName = () => (window.Samtal && Samtal.name ? Samtal.name() : null);
+function tpRoundHead(r, sub) {
+  const when = esc(dateRange(r.from, r.to));
+  return r.name
+    ? `<span class="tp-rname"${r.hint ? ` title="${esc(r.hint)}"` : ''}>${esc(r.name)}</span><span class="sub">${when} · ${sub}</span>`
+    : `${when}<span class="sub">${sub}</span>`;
+}
+
 function tpCard(now = Date.now()) {
   const round = TP.round;
   if (!round || !round.visas || !round.tips || !Array.isArray(round.matcher) || !round.matcher.length || !state.all) return '';
@@ -190,7 +201,7 @@ function tpCard(now = Date.now()) {
   const list = tpPlaced(s.ranked, s.model).map((p) => tpRow(p, p.model ? 0 : ++rank, s));
   const none = s.people.filter((p) => p.none);
   return '<div class="card tp-card">' +
-    `<p class="kp-eyebrow">Omgången${kicks.length ? ` ${esc(dateRange(Math.min(...kicks), Math.max(...kicks)))}` : ''}</p>` +
+    `<p class="kp-eyebrow">${tpLiveName() ? `${esc(tpLiveName())} · ` : 'Omgången '}${kicks.length ? esc(dateRange(Math.min(...kicks), Math.max(...kicks))) : ''}</p>` +
     // Orakel och Ikaros som bild (kronan.js), och när omgången är klar
     // utmärkelserna efter hur var och en tippade (utmarkelser.js).
     (window.Kronan ? Kronan.html(s, tpPts) : '') +
@@ -245,7 +256,7 @@ function tpRoundsTable(rounds, s) {
       const title = p.award === 'best' ? 'Omgångens orakel' : p.award === 'worst' ? 'Omgångens Ikaros' : '';
       return `<td><span class="${(tpTone(p.pts) + aw).trim()}"${title ? ` title="${title}"` : ''}>${tpPts(p.pts)}</span></td>`;
     }).join('');
-    return `<tr><th scope="row">${esc(dateRange(r.from, r.to))}<span class="sub">${r.n} ${r.n === 1 ? 'match' : 'matcher'}</span></th>${cells}</tr>`;
+    return `<tr><th scope="row">${tpRoundHead(r, `${r.n} ${r.n === 1 ? 'match' : 'matcher'}`)}</th>${cells}</tr>`;
   }).join('');
   const foot = cols.map((p) => `<td class="${tpTone(p.pts)}">${tpPts(p.pts)}</td>`).join('');
   return `<details class="tp-more tp-rounds"${TP.seasonOpen ? ' open' : ''}><summary>Poäng per omgång</summary>` +

@@ -9,6 +9,8 @@
 //     "omgangar": [
 //       {
 //         "id": "2026-10-18-k3x9q2",          omgångens id i tjänsten
+//         "namn": "Bolton brukar ju slå Boro", (valfritt) namnet AI:n gav omgången
+//         "syftar": "Middlesbrough har …",     (valfritt) vad namnet syftar på
 //         "datum": "2026-10-18",              första matchens dag
 //         "till": "2026-10-20",               (valfritt) sista matchens dag
 //         "gang": [{ "id": "DL", "namn": "Daniel Laino" }, …],
@@ -117,7 +119,9 @@ function writeRounds(list, file = FILE) {
 // ---------- in i filen ----------
 
 // Omgången från GET …/samtal som ny rad, när tipsen visas – annars null.
-function entryFromSamtal(s) {
+// Namnet (fetchSamtal) följer med; gick det inte att hämta den här gången
+// står namnet från förra bygget (prev) kvar.
+function entryFromSamtal(s, prev = null) {
   if (!s || !s.visas || !s.tips || !s.id || !Array.isArray(s.matcher) || !s.matcher.length) return null;
   const gang = (s.gang || []).filter((g) => g && g.id).map((g) => ({ id: String(g.id), namn: String(g.namn || g.id) }));
   const matcher = s.matcher.slice().sort((a, b) => String(a.avspark).localeCompare(String(b.avspark))).map((m) => {
@@ -131,7 +135,15 @@ function entryFromSamtal(s) {
   });
   const first = dayOf(matcher[0].avspark);
   const last = dayOf(matcher[matcher.length - 1].avspark);
-  return { id: String(s.id), datum: first, ...(last !== first ? { till: last } : {}), gang, matcher };
+  const named = s.namn ? s : prev && prev.namn ? prev : null;
+  return {
+    id: String(s.id),
+    ...(named ? { namn: String(named.namn).slice(0, 60), ...(named.syftar ? { syftar: String(named.syftar).slice(0, 200) } : {}) } : {}),
+    datum: first,
+    ...(last !== first ? { till: last } : {}),
+    gang,
+    matcher,
+  };
 }
 
 // Matchens utfall ur sajtens matcher, eller null om den inte är avgjord än.
@@ -201,6 +213,8 @@ function summarize(r) {
   const kicks = r.matcher.map((row) => row.avspark).filter(Boolean).sort();
   return {
     id: r.id,
+    ...(r.namn ? { name: String(r.namn) } : {}),
+    ...(r.syftar ? { hint: String(r.syftar) } : {}),
     from: kicks[0] || null,
     to: kicks[kicks.length - 1] || null,
     // Matcherna för spoilerskyddet (döljs någon av dem döljs omgången) och för
@@ -234,10 +248,11 @@ function buildTippare({ samtal = null, matches = [], freeze = false, file = FILE
   const h = readRounds(file);
   const byId = new Map(matches.map((m) => [String(m.id), m]));
   const known = new Set(h.raw.map((r) => r && String(r.id || '')));
+  const stored = new Map(h.raw.filter((r) => r && r.id).map((r) => [String(r.id), r]));
   const fresh = new Map();
   const added = [];
   for (const s of [].concat(samtal || [])) {
-    const f = entryFromSamtal(s);
+    const f = entryFromSamtal(s, s && stored.get(String(s.id)));
     if (!f) continue;
     fresh.set(f.id, f);
     if (!known.has(f.id)) {
@@ -285,9 +300,10 @@ function buildTippare({ samtal = null, matches = [], freeze = false, file = FILE
 }
 
 // GET …/samtal → omgången och den förra (om dess tips visades), som en
-// lista, eller null om tjänsten inte svarar. Ett fel stoppar inget – nästa
-// bygge försöker igen.
-async function fetchSamtal(endpoint, { fetchImpl = fetch, log = console.log } = {}) {
+// lista, eller null om tjänsten inte svarar. Med nameEndpoint (…/namn)
+// hämtas också namnet AI:n senast gav varje omgång – bara läsning, inget nytt
+// skrivs. Ett fel stoppar inget – nästa bygge försöker igen.
+async function fetchSamtal(endpoint, { nameEndpoint = null, fetchImpl = fetch, log = console.log } = {}) {
   if (!endpoint || !/^https?:/.test(endpoint)) return null;
   try {
     const res = await fetchImpl(endpoint, { headers: { accept: 'application/json' }, signal: AbortSignal.timeout(20000) });
@@ -296,11 +312,39 @@ async function fetchSamtal(endpoint, { fetchImpl = fetch, log = console.log } = 
       log(`[tippare] samtalet: ${(j && j.error) || `HTTP ${res.status}`}`);
       return null;
     }
-    return [j.samtal, j.forra].filter(Boolean);
+    const list = [j.samtal, j.forra].filter(Boolean);
+    if (nameEndpoint && /^https?:/.test(nameEndpoint)) {
+      await Promise.all(list.map(async (s) => {
+        try {
+          const r = await fetchImpl(nameEndpoint, {
+            method: 'POST',
+            headers: { 'content-type': 'application/json' },
+            body: JSON.stringify({ id: s.id, las: true }),
+            signal: AbortSignal.timeout(15000),
+          });
+          const n = await r.json().catch(() => null);
+          if (r.ok && n && n.ok && n.namn) Object.assign(s, { namn: n.namn, ...(n.syftar ? { syftar: n.syftar } : {}) });
+        } catch (err) {
+          log(`[tippare] namnet på ${s.id}: ${err.message || err}`);
+        }
+      }));
+    }
+    return list;
   } catch (err) {
     log(`[tippare] samtalet: ${err.message || err}`);
     return null;
   }
 }
 
-module.exports = { FILE, readRounds, writeRounds, serialize, entryFromSamtal, finish, summarize, buildTippare, fetchSamtal };
+// Omgångarnas namn med sina matcher – ur filen och ur tjänsten (samtal) –
+// så att gängets kupong i historiken kan få namnet på omgången den gjordes ur
+// (src/history.js).
+function roundNames({ samtal = null, file = FILE } = {}) {
+  const out = [];
+  for (const r of [...readRounds(file).raw, ...[].concat(samtal || [])]) {
+    if (r && r.namn && Array.isArray(r.matcher)) out.push({ namn: String(r.namn), ids: new Set(r.matcher.map((m) => String(m.id))) });
+  }
+  return out;
+}
+
+module.exports = { FILE, readRounds, writeRounds, serialize, entryFromSamtal, finish, summarize, buildTippare, fetchSamtal, roundNames };

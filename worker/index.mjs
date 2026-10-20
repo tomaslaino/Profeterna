@@ -22,7 +22,7 @@
 // kommentar till en färdig kupong (worker/kommentar.mjs).
 //
 // Omgångens namn: POST /namn {"id": "<omgångens id>"} döper omgången som
-// gänget tippar (worker/namn.mjs). Omgången läses ur samma KV-namnrymd som
+// gänget tippar (worker/namn.mjs); med "las": true bara läser bygget namnet. Omgången läses ur samma KV-namnrymd som
 // gängets tips (nycklarna "samtal:…", worker/samtal.mjs).
 //
 // Nyheterna (cfg.news): vid varje klick hämtas det senaste om matchen och
@@ -255,8 +255,9 @@ export default {
     const url = new URL(request.url);
     if (!['/analyze', '/kommentar', '/namn'].includes(url.pathname) || request.method !== 'POST') return json(404, { ok: false, error: 'Finns inte.' });
     let id;
+    let las;
     try {
-      ({ id } = await request.json());
+      ({ id, las } = await request.json());
     } catch {
       return json(400, { ok: false, error: 'Ogiltig förfrågan.' });
     }
@@ -278,7 +279,7 @@ export default {
           get: (k) => kv.get(k, 'json'),
           put: (k, v, ttl) => kv.put(k, JSON.stringify(v), ttl ? { expirationTtl: ttl } : {}),
         } : null;
-        const r = await nameRound(id, { env, store, loadRound: (rid) => kvRound(kv, rid), loadSite: (round) => siteRound(site, round) });
+        const r = await nameRound(id, { env, store, readOnly: las === true, loadRound: (rid) => kvRound(kv, rid), loadSite: (round) => siteRound(site, round) });
         return json(r.status, r.body);
       }
       const store = kv ? {

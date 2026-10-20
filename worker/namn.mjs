@@ -4,7 +4,10 @@
 // (config/llm.js). Prompten, modellen och gränserna står i config/namn.js.
 //
 //   POST /namn  {"id": "<omgångens id>"}
-//   → 200 {ok: true, namn, syftar, model, generatedAt, cached}
+//   → 200 {ok: true, namn, syftar, forslag, model, generatedAt, cached}
+//   POST /namn  {"id": "<omgångens id>", "las": true}
+//   → 200 {ok: true, namn, syftar} – bara namnet omgången senast fick, utan
+//     att något skrivs (bygget, som fryser in namnet i tipparhistoriken)
 //   → 4xx/5xx {ok: false, error}
 //
 // Proxyn tar bara emot omgångens id. Omgången läser den själv där gängets
@@ -142,9 +145,13 @@ export function dreamOf(id) {
   return (h % 1000) / 1000 < nc.storkovan;
 }
 
-export async function roundName(id, { env, loadRound, loadSite, complete, store = null, now = () => new Date() }) {
+export async function roundName(id, { env, loadRound, loadSite, complete, store = null, readOnly = false, now = () => new Date() }) {
   id = String(id == null ? '' : id);
   if (!ROUND_ID.test(id)) return fail(400, 'Okänd omgång.');
+  if (readOnly) {
+    const last = ((await safely(() => store && store.get(RECENT))) || []).find((r) => r && r.id === id && r.namn);
+    return last ? answer({ ok: true, namn: last.namn, syftar: last.syftar || null }, true) : fail(404, 'Omgången har inget namn.');
+  }
   let round;
   try {
     round = await loadRound(id);
@@ -188,7 +195,7 @@ export async function roundName(id, { env, loadRound, loadSite, complete, store 
       const entry = { ok: true, namn: parts.namn, syftar: parts.syftar, forslag: parts.forslag, model: r.model, generatedAt: now().toISOString() };
       await safely(() => store && store.put(key, entry));
       // De senaste namnen, så att nästa omgång inte går i samma mönster.
-      await safely(() => store && store.put(RECENT, [{ id, namn: entry.namn }, ...recent.filter((x) => x.id !== id)].slice(0, RECENT_MAX)));
+      await safely(() => store && store.put(RECENT, [{ id, namn: entry.namn, syftar: entry.syftar }, ...recent.filter((x) => x.id !== id)].slice(0, RECENT_MAX)));
       return answer(entry, false);
     }
     problem = `Namnet hade ${why.join(' och ')}.`;

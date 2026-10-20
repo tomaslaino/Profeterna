@@ -72,6 +72,7 @@ function kampLive(frozen, now) {
   const people = s.people.map(({ rows, award, ...p }) => (s.done && award ? { ...p, award } : p));
   return {
     id: round.id,
+    ...(tpLiveName() ? { name: tpLiveName() } : {}),
     from: new Date(Math.min(...kicks)).toISOString(),
     to: new Date(Math.max(...kicks)).toISOString(),
     live: true,
@@ -136,7 +137,12 @@ const kampKr = (x) => {
 };
 const kampOdds = (prob) => (prob > 0 ? fmtOdds(1 / prob) : '–');
 const kampSurname = (name) => { const i = name.indexOf(' '); return i > 0 ? name.slice(i + 1) : name; };
-const kampRound = (r) => esc(dateRange(r.from, r.to));
+// Omgångens namn, med datumen och vad det syftar på när man pekar – annars
+// datumen.
+const kampRound = (r) => (r.name
+  ? `<span title="${esc([dateRange(r.from, r.to), r.hint].filter(Boolean).join(' · '))}">${esc(r.name)}</span>`
+  : esc(dateRange(r.from, r.to)));
+const kampRoundText = (r) => (r.name ? `${r.name} (${dateRange(r.from, r.to)})` : dateRange(r.from, r.to));
 
 function kampFace(g, size = '') {
   const style = `style="--km-c:${g.color}"`;
@@ -239,7 +245,7 @@ function kampCurve(rounds, gang, width) {
     let d = solid.length > 1 ? `<path d="M${solid.join(' L')}" stroke="${sx.color}"${dash}/>` : '';
     if (liveLast) d += `<path class="km-prel" d="M${p.slice(-2).join(' L')}" stroke="${sx.color}"/>`;
     const dots = sx.model ? '' : sx.pts.slice(1).map((v, i) =>
-      `<circle cx="${r1(x(i + 1))}" cy="${r1(y(v))}" r="3" fill="${sx.color}"><title>${esc(kampSurname(sx.name))} efter ${esc(dateRange(rounds[i].from, rounds[i].to))}: ${tpPts(v)}</title></circle>`).join('');
+      `<circle cx="${r1(x(i + 1))}" cy="${r1(y(v))}" r="3" fill="${sx.color}"><title>${esc(kampSurname(sx.name))} efter ${esc(kampRoundText(rounds[i]))}: ${tpPts(v)}</title></circle>`).join('');
     return d + dots;
   }).join('');
   // Initialerna vid linjernas slut, isärflyttade om de hamnar för nära.
@@ -420,7 +426,7 @@ function kampRoundsCard(rounds, gang) {
       return `<td><span class="${(tpTone(p.pts) + aw).trim()}"${title ? ` title="${title}"` : ''}>${tpPts(p.pts)}</span></td>`;
     }).join('');
     const n = r.live ? `${r.n} av ${r.total} matcher` : `${r.n} ${r.n === 1 ? 'match' : 'matcher'}`;
-    return `<tr${r.live && !r.done ? ' class="km-live"' : ''}><th scope="row">${kampRound(r)}<span class="sub">${r.live && !r.done ? 'pågår · ' : ''}${n}</span></th>${cells}</tr>`;
+    return `<tr${r.live && !r.done ? ' class="km-live"' : ''}><th scope="row">${tpRoundHead(r, `${r.live && !r.done ? 'pågår · ' : ''}${n}`)}</th>${cells}</tr>`;
   }).join('');
   return '<div class="card km-card tp-card tp-rounds">' +
     '<p class="kp-eyebrow">Omgångarna</p>' +

@@ -161,7 +161,7 @@ function writeHistory(entries, file = HISTORY_FILE) {
 // En kupong från sidan som rad i historiken, eller null om någon match inte
 // är klar. Ställningen efter 90 minuter i en match med förlängning kommer med
 // målminuterna; saknas den tre dagar efter avspark fryses raden utan resultat.
-function entryFromCoupon(c, byId, now = Date.now()) {
+function entryFromCoupon(c, byId, now = Date.now(), rounds = []) {
   const rows = [];
   for (const x of c.matches) {
     const m = byId.get(x.id);
@@ -192,9 +192,10 @@ function entryFromCoupon(c, byId, now = Date.now()) {
   rows.sort((a, b) => a.kick.localeCompare(b.kick));
   const first = dayOf(rows[0].kick);
   const last = dayOf(rows[rows.length - 1].kick);
+  const name = c.name || roundNameFor(c, rounds);
   return {
     id: c.id,
-    ...(c.name ? { namn: c.name } : {}),
+    ...(name ? { namn: name } : {}),
     datum: first,
     ...(last !== first ? { till: last } : {}),
     'källa': 'sidan',
@@ -202,9 +203,26 @@ function entryFromCoupon(c, byId, now = Date.now()) {
   };
 }
 
-function finishedFromCoupons(coupons, matches, now = Date.now()) {
+// Gängets kupong utan eget namn får namnet på omgången den gjordes ur (AI:ns,
+// src/tippare.js roundNames): den som har flest av kupongens matcher, minst
+// hälften.
+function roundNameFor(c, rounds = []) {
+  const ids = (c.matches || []).map((x) => String(x.id));
+  let best = null;
+  let most = 0;
+  for (const r of rounds) {
+    const n = ids.filter((id) => r.ids.has(id)).length;
+    if (n > most) {
+      most = n;
+      best = r;
+    }
+  }
+  return best && ids.length && most * 2 >= ids.length ? best.namn : null;
+}
+
+function finishedFromCoupons(coupons, matches, now = Date.now(), rounds = []) {
   const byId = new Map(matches.map((m) => [m.id, m]));
-  return coupons.map((c) => entryFromCoupon(c, byId, now)).filter(Boolean);
+  return coupons.map((c) => entryFromCoupon(c, byId, now, rounds)).filter(Boolean);
 }
 
 // ---------- sammanställningen för sidan ----------
@@ -264,10 +282,11 @@ function summarize(e) {
 
 // Historiken som sidan visar: filen plus sidans färdiga kuponger som inte
 // frysts in än. Med freeze (bygget på GitHub Actions) skrivs de in i filen.
-function buildHistory({ coupons, matches, freeze = false, file = HISTORY_FILE, now = Date.now() }) {
+// roundNames: omgångarnas namn (src/tippare.js), för kuponger utan eget namn.
+function buildHistory({ coupons, matches, freeze = false, file = HISTORY_FILE, now = Date.now(), roundNames = [] }) {
   const h = readHistory(file);
   const known = new Set(h.raw.map((e) => e && String(e.id || '').trim()));
-  const fresh = finishedFromCoupons(coupons, matches, now).filter((e) => !known.has(e.id));
+  const fresh = finishedFromCoupons(coupons, matches, now, roundNames).filter((e) => !known.has(e.id));
   let frozen = [];
   if (freeze && fresh.length && !h.broken) {
     writeHistory([...h.raw, ...fresh], file);

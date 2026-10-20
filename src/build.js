@@ -54,7 +54,7 @@ const { playerFiles, teamSquad } = require('./players');
 const { teamFiles } = require('./teamstats');
 const { readCoupons, REPO, BRANCH } = require('./coupons');
 const { buildHistory, writeComments } = require('./history');
-const { buildTippare, fetchSamtal } = require('./tippare');
+const { buildTippare, fetchSamtal, roundNames } = require('./tippare');
 const { highlightsByMatch, youtubeByMatch } = require('./hojdpunkter');
 const { wholePercent } = require('./model');
 const rules = require('../config/forecast-rules');
@@ -226,7 +226,8 @@ function writeSite(outDir = OUT, { journal = false, analysisEndpoint, couponEndp
   // Med --journal fryses nya färdiga kuponger in i data/kupong-historik.json.
   let history;
   try {
-    history = buildHistory({ coupons: coupons.coupons, matches: list.matches, freeze: journal });
+    // Gängets kupong utan eget namn får omgångens namn (AI:ns, src/tippare.js).
+    history = buildHistory({ coupons: coupons.coupons, matches: list.matches, freeze: journal, roundNames: roundNames({ samtal }) });
   } catch (err) {
     console.error('[build] kuponghistoriken:', err);
     history = { coupons: [], errors: [String(err.message || err)], frozen: [] };
@@ -328,7 +329,7 @@ async function build({ force = false, fetch = true, journal = false, analysisEnd
   const results = fetch ? await refreshAll({ force }) : [];
   // Gängets egna tips hämtas bara när de ska frysas in (src/tippare.js).
   const s = journal ? samtalInfo(couponEndpoint) : null;
-  const samtal = s ? await fetchSamtal(s.endpoint) : null;
+  const samtal = s ? await fetchSamtal(s.endpoint, { nameEndpoint: s.namn }) : null;
   const site = writeSite(OUT, { journal, analysisEndpoint, couponEndpoint, samtal });
   // AI:ns kommentarer skrivs in i historiken efter bygget: proxyn läser
   // kupongen ur den publicerade sajten (se src/history.js).
