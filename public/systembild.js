@@ -20,7 +20,7 @@
 //
 // Resultatet blir ett utkast i Ny kupong – eller Ändra, om en kupong som inte
 // är färdigspelad redan har minst hälften av matcherna, så att det inte blir
-// två kuponger för samma omgång – med bara de valda matcherna synliga. Där ser
+// två kuponger för samma omgång – med matcherna på papperskupongen. Där ser
 // man över det och sparar som vanligt.
 //
 // Läses efter kupong.js och använder dess hjälpare (KP, KP_DRAFT, kpStore,
@@ -36,7 +36,6 @@ window.Systembild = (() => {
     input: null,
     toast: null,
     note: null, // raden överst i Ny kupong efter inläsningen (html)
-    asks: new Set(), // matcher vars tecken inte gick att läsa – visas ändå under Bara valda
   };
 
   // ---------- text → matcher ----------
@@ -384,23 +383,27 @@ window.Systembild = (() => {
     const d = here ? KP.draft : newDraft(editId);
     d.notes = d.notes || {};
     const started = [];
-    S.asks = new Set();
+    // Matcher vars tecken inte gick att läsa står på kupongen med tomma
+    // rutor (tomt tecken), så att man kan kryssa i dem där.
+    const blank = [];
     for (const x of found) {
       if (!isOpen(x.m, now)) started.push(x.m);
       else if (x.sign) d.picks[x.m.id] = x.sign;
-      else S.asks.add(x.m.id);
+      else {
+        d.picks[x.m.id] = '';
+        blank.push(x.m);
+      }
     }
     d.name = nameWith(d.name, info);
     kpStore(KP_DRAFT, d);
-    const added = found.length - started.length - S.asks.size;
+    const added = found.length - started.length - blank.length;
     const teams = (ms) => ms.map((m) => `${m.home} – ${m.away}`).join(', ');
     S.note = [
       `<b>${added}</b> ${added === 1 ? 'match' : 'matcher'} från bilden${info.system ? ` · ${esc(info.system)}` : ''}.`,
-      S.asks.size ? `<span class="note">Tryck i tecknen: ${esc(teams(found.filter((x) => S.asks.has(x.m.id)).map((x) => x.m)))}.</span>` : null,
+      blank.length ? `<span class="note">Tryck i tecknen: ${esc(teams(blank))}.</span>` : null,
       started.length ? `<span class="note">Har startat: ${esc(teams(started))}.</span>` : null,
       missing.length ? `<span class="note">Hittades inte: ${esc(missing.join(', '))}.</span>` : null,
     ].filter(Boolean).join(' ');
-    KP.onlyPicked = true;
     KP.q = '';
     KP.comp = 'all';
     const hash = editId ? `#kupong/andra/${editId}` : '#kupong/ny';
@@ -496,7 +499,5 @@ window.Systembild = (() => {
       S.note = null;
       return n ? `<p class="legend kp-flash" role="status">${n}</p>` : '';
     },
-    // Matcher vars tecken inte gick att läsa syns under Bara valda.
-    asks: (id) => S.asks.has(id),
   };
 })();
