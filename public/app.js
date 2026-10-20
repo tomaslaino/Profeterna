@@ -1011,8 +1011,10 @@ function squadsSection(d) {
   return `<div class="grid2">${teamSquadCard(d.match.home, s.home)}${teamSquadCard(d.match.away, s.away)}</div>`;
 }
 
-function keyList(title, list, value, empty) {
-  return `<div class="mv-key"><h5>${esc(title)}</h5>` + (list.length
+// tip = förklaringen när man pekar på rubriken (forklaring.js).
+function keyList(title, list, value, empty, tip) {
+  const head = tip ? ` data-tip="${esc(tip)}" data-tip-head="${esc(title)}"` : '';
+  return `<div class="mv-key"><h5${head}>${esc(title)}</h5>` + (list.length
     ? `<ol>${list.map((p) => `<li><span class="n">${esc(p.name)}</span><span class="v">${value(p)}</span></li>`).join('')}</ol>`
     : `<p class="muted">${esc(empty)}</p>`) + '</div>';
 }
@@ -1041,7 +1043,12 @@ function teamSquadCard(name, s) {
     '<div class="mv-keys">' +
     keyList('Målskyttar', s.key.scorers.filter((p) => p.g > 0), (p) => `<b>${p.g}</b>`, 'inga mål än') +
     keyList('Assist', s.key.creators.filter((p) => p.a > 0), (p) => `<b>${p.a}</b>`, 'inga assist än') +
-    keyList('Flest gula kort', s.key.cards, yc, 'ingen med 3 eller fler') +
+    // Högst tre listor: segermålen i stället för korten där de finns (korten
+    // står kvar i hela truppen).
+    (s.key.winners
+      ? keyList('Segermål', s.key.winners.filter((p) => p.gw > 0), (p) => `<b>${p.gw}</b>`, 'inga segermål än',
+        'Målet som gav laget den ledning det sedan aldrig tappade. Vid 3–1 är lagets andra mål segermålet.')
+      : keyList('Flest gula kort', s.key.cards, yc, 'ingen med 3 eller fler')) +
     '</div>' +
     `<details class="mv-full"><summary>Hela truppen (${s.players.length})</summary><div class="table-wrap"><table class="odds mv-table">` +
     '<thead><tr><th>Spelare</th><th class="num" title="Matcher">M</th><th class="num">Mål</th><th class="num" title="Assist">Ass</th><th class="num" title="Gula kort">Gul</th><th class="num" title="Röda kort">Röd</th></tr></thead>' +

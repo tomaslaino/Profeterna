@@ -111,8 +111,11 @@ const natSv = (n) => (n ? NAT[n] || n : null);
 // Ett kort: rubrik, valfri kort förklaring (en rad, t.ex. hur en tabell läses),
 // innehåll och källrad. Definitioner står i ordlistan och i kolumnernas
 // title-texter, inte som löptext – sidan ska gå att läsa utan förklaringar.
-function card(title, { hint, key, body, src, cls = '' }) {
-  return `<section class="card dv-card ${cls}"><h4>${esc(title)}${hint ? ` <span class="hint">${esc(hint)}</span>` : ''}</h4>` +
+// tip = förklaringen som visas när man pekar på rubriken.
+const tipAttr = (head, tip) => (tip ? ` data-tip="${esc(tip)}" data-tip-head="${esc(head)}"` : '');
+
+function card(title, { hint, key, body, src, cls = '', tip }) {
+  return `<section class="card dv-card ${cls}"><h4${tipAttr(title, tip)}>${esc(title)}${hint ? ` <span class="hint">${esc(hint)}</span>` : ''}</h4>` +
     (key ? `<p class="dv-key-line">${key}</p>` : '') + body +
     (src ? `<p class="src-line">${src}</p>` : '') + '</section>';
 }
@@ -545,11 +548,11 @@ const PCOLS = [
     get: (p) => p.tk, cls: 'num', fpl: true, in: ['forsvar'] },
   { key: 'rec', label: 'Bollvinster', title: 'Gånger spelaren har tagit hand om en lös boll åt laget. Målvakter får många när de plockar inlägg och långbollar. Från Fantasy Premier League.',
     get: (p) => p.rec, cls: 'num hide-xs', fpl: true, in: ['forsvar'] },
-  { key: 'cbi', label: 'Rensningar', sub: 'block, brytningar', name: 'Rensningar, blockeringar och brytningar',
-    title: 'Bollar spelaren har rensat bort, skott och passningar som blockerats och passningar som brutits. Från Fantasy Premier League.',
+  { key: 'cbi', label: 'Rensningar', sub: 'täckningar, brytningar', name: 'Rensningar, täckningar och brytningar',
+    title: 'Bollar spelaren har rensat bort, skott och passningar spelaren har täckt och passningar spelaren har brutit. Från Fantasy Premier League.',
     get: (p) => p.cbi, cls: 'num', fpl: true, in: ['forsvar'] },
-  { key: 'def90', label: 'Försvar', sub: 'per 90 min', name: 'Försvarsaktioner per 90 minuter',
-    title: 'Tacklingar, rensningar, blockeringar och brytningar per 90 minuters speltid. Dämpade siffror: mindre än tre hela matchers speltid.',
+  { key: 'def90', label: 'Insatser', sub: 'per 90 min', name: 'Försvarsinsatser per 90 minuter',
+    title: 'Tacklingar, rensningar, täckningar och brytningar per 90 minuters speltid. Dämpade siffror: mindre än tre hela matchers speltid.',
     get: (p) => (p.tk == null || p.cbi == null ? null : per90(p.tk + p.cbi, p)), d: 1, cls: 'num', strong: true, fpl: true, in: ['forsvar'], ...qMin },
   { key: 'cs', label: 'Nollor', name: 'Hållna nollor', title: 'Matcher där laget inte släppte in något mål medan spelaren var på planen, minst 60 minuter. Från Fantasy Premier League.',
     get: (p) => p.cs, cls: 'num hide-xs', fpl: true, in: ['forsvar'] },
@@ -610,13 +613,13 @@ function playerTableHtml(P) {
     `<p class="dv-count" id="dv-count">${list.length} spelare${f.played ? ' som spelat' : ''}${f.team || f.pos || f.q ? ' med filtret' : ''}</p>`;
 }
 
-function leaderCard(title, list, value, { empty = 'inga än', note, top } = {}) {
+function leaderCard(title, list, value, { empty = 'inga än', note, top, tip } = {}) {
   const rows = list.length
     ? list.map((p, i) => `<li><button type="button" class="dv-lrow" data-pid="${esc(p.id)}">` +
       `<span class="dv-lrank">${i + 1}</span><span class="dv-lname">${esc(p.name)}<small>${esc(p.team)}</small></span>` +
       `<span class="dv-lval">${value(p)}</span></button></li>`).join('')
     : `<li class="dv-lempty">${esc(empty)}</li>`;
-  return `<section class="dv-leader"><h4>${esc(title)}</h4><ol>${rows}</ol>` +
+  return `<section class="dv-leader"><h4${tipAttr(title, tip)}>${esc(title)}</h4><ol>${rows}</ol>` +
     (note ? `<p class="dv-lnote">${note}</p>` : '') +
     (top ? `<button type="button" class="dv-lmore dv-linkbtn" data-top="${esc(top)}">Topp 20 →</button>` : '') + '</section>';
 }
@@ -671,6 +674,7 @@ function playersView(dv, P) {
     topCard('keepers', 'Målvakter', L.keepers, (p) => `<b>${pct(p.savePct)}</b>`,
       { note: 'Andel räddade skott på mål · minst halva lagets matcher', empty: 'okänt' }) +
     '</div>';
+  html += '<div class="dv-grid2">' + pointsCard(P) + leagueGoalsCard(P) + '</div>';
 
   html += card('Alla spelare', {
     body: segHtml(playerGroups(P), playerGroup(P).id, 'data-pcols') + '<div class="dv-filters">' +
@@ -689,6 +693,56 @@ function playersView(dv, P) {
 
   html += '<div class="dv-grid2">' + squadFacts(P, dv) + nationsCard(P) + '</div>';
   return html;
+}
+
+// Topplista ur spelartabellen: störst värde först, bara de som har något.
+function rank(list, value, tiebreak = () => 0) {
+  return list.filter((p) => value(p) > 0)
+    .sort((a, b) => value(b) - value(a) || tiebreak(a, b) || a.name.localeCompare(b.name, 'sv'))
+    .slice(0, 20);
+}
+
+// Poängen spelarnas mål har gett laget (ur matchrapporterna).
+function pointsCard(P) {
+  if (!P.goalTypes) return '';
+  const list = rank(P.players.filter((p) => p.app > 0), (p) => p.gpts, (a, b) => a.g - b.g || b.gw - a.gw).slice(0, 8);
+  const max = list.length ? list[0].gpts : 1;
+  return card('Poäng åt laget', {
+    hint: 'poängen laget hade tappat utan målen',
+    tip: 'Ett mål i en match som vanns med ett mål är värt två poäng – seger i stället för oavgjort. Ett mål i en oavgjord match är värt en poäng – oavgjort i stället för förlust. Mål i matcher som vanns stort eller förlorades ger inga poäng.',
+    body: list.length
+      ? meters(list.map((p) => ({
+        pid: p.id,
+        label: `<b>${esc(p.name)}</b>`,
+        sub: `${esc(p.team)} · ${p.g} mål${p.gw ? `, varav ${p.gw} segermål` : ''}`,
+        v: p.gpts / max,
+        text: p.gpts,
+      })))
+      : `<p class="dv-calm">inga mål som gett poäng än</p>`,
+    src: `ESPN:s matchrapporter, hämtat ${when(P.goalTypes.fetchedAt)}`,
+  });
+}
+
+// När och hur målen görs i hela ligan (ur matchrapporterna).
+const HOW_LABEL = {
+  inifrån: 'Skott i straffområdet', utifrån: 'Skott utanför straffområdet', nick: 'Nick',
+  straff: 'Straff', frispark: 'Frispark', självmål: 'Självmål',
+};
+function leagueGoalsCard(P) {
+  const G = P.leagueGoals;
+  if (!G || !G.goals) return '';
+  const share = (n, of) => pct(n / of);
+  const how = G.how ? [...G.how.kinds].sort((a, b) => b.goals - a.goals) : null;
+  return card('Målen i ligan', {
+    hint: `${int(G.goals)} mål i ${int(G.matches)} matcher`,
+    body: '<h5 class="dv-h5" data-tip-head="När görs målen?" data-tip="Målen per kvart. Tilläggstiden räknas till halvlekens sista kvart.">När görs målen?</h5>' +
+      barList(G.when, { label: (w) => `${w.from}–${w.to} min`, value: (w) => w.goals, fmt: (w) => share(w.goals, G.goals), sub: (w) => `${w.goals} mål` }) +
+      (how
+        ? '<h5 class="dv-h5">Hur görs målen?</h5>' +
+          barList(how, { label: (k) => esc(HOW_LABEL[k.kind] || k.kind), value: (k) => k.goals, fmt: (k) => share(k.goals, G.how.goals), sub: (k) => `${k.goals} mål` })
+        : ''),
+    src: `ESPN:s matchrapporter, hämtat ${when(G.fetchedAt)}`,
+  });
 }
 
 function barList(rows, { label, value, fmt, sub }) {
@@ -1092,9 +1146,9 @@ function openPlayer(id) {
       if (p.tk != null) {
         html += msec('Försvar', facts([
           [cell(p.tk), 'Tacklingar'],
-          [cell(p.cbi), 'Rensningar m.m.', 'Rensningar, blockeringar och brytningar'],
+          [cell(p.cbi), 'Rensningar m.m.', 'Rensningar, täckningar och brytningar'],
           [cell(p.rec), 'Bollvinster', 'Lösa bollar spelaren har tagit hand om åt laget'],
-          p.min >= TH.min && p.cbi != null ? [num(per90(p.tk + p.cbi, p), 1), 'Per 90 min', 'Tacklingar, rensningar, blockeringar och brytningar per 90 minuters speltid'] : null,
+          p.min >= TH.min && p.cbi != null ? [num(per90(p.tk + p.cbi, p), 1), 'Insatser per 90 min', 'Tacklingar, rensningar, täckningar och brytningar per 90 minuters speltid'] : null,
         ]));
       }
       if (p.xg != null) {
@@ -1203,13 +1257,19 @@ const GLOSSARY = [
   ['Zonerna', 'Färgen till vänster i tabellen: vad placeringen ger i slutet av säsongen enligt ESPN – uppflyttning, kval (playoff), Europa eller nedflyttning.', 'tabeller'],
   ['M, Start, Min, Ass, M+A', 'Spelartabellen: matcher (från start och inhopp), matcher från start, spelade minuter, assist och mål plus assist.', 'statistik'],
   ['– och grå 0', 'Streck = okänt (ESPN har ingen statistik för spelaren), grå 0 = noll.'],
-  ['Spelarstatistiken', 'Bara ligamatcher i år, ur ESPN:s trupper. Den släpar ofta en omgång efter tabellen; självmål och spelare som lämnat klubben saknas. I Premier League kommer speltid, xG och pris från Fantasy Premier League, i övriga ligor räknas speltiden ur ESPN:s matchrapporter (byten och röda kort, utan tilläggstid).', 'statistik'],
+  ['Spelarstatistiken', 'Bara ligamatcher i år, ur ESPN:s trupper. Den släpar ofta en omgång efter tabellen; självmål och spelare som lämnat klubben saknas. I Premier League kommer speltid, xG, försvarsspel och pris från Fantasy Premier League, i övriga ligor räknas speltiden ur ESPN:s matchrapporter (byten och röda kort, utan tilläggstid). Målens sort och betydelse kommer från matchrapporterna i alla fyra ligor.', 'statistik'],
   ['Per 90', 'Per 90 spelade minuter – som om spelaren spelat hela matcher. Visas för spelare med minst tre hela matchers speltid; dämpade siffror har för litet underlag.', 'statistik'],
   ['Pris', 'Spelarens pris i Fantasy Premier League, i miljoner pund – spelets värdering, som stiger när många köper spelaren.', 'statistik'],
   ['Lagstatistiken', 'Tabellen är ESPN:s. xG, skott, hörnor, kort och odds kommer från football-data.co.uk, som ofta ligger en omgång efter – därför visas de per match eller som skillnad inom samma matcher.', 'statistik'],
   ['Snittålder', 'Varje spelare räknas en gång per match den spelat, så ordinarie spelare väger tyngre än de som bara hoppat in någon gång.', 'statistik'],
   ['Beroende', 'Hur stor del av lagets mål den bäste målskytten gjort.', 'statistik'],
   ['Effektivast', 'Mål per skott, bland spelare med minst tio skott.', 'statistik'],
+  ['Segermål', 'Målet som gav laget den ledning det sedan aldrig tappade. Vid 3–1 är lagets andra mål segermålet, vid 1–0 det enda.', 'statistik'],
+  ['Poäng åt laget', 'Poängen laget hade tappat utan spelarens mål. Ett mål i en match som vanns med ett mål är värt två poäng (seger i stället för oavgjort), ett mål i en oavgjord match en poäng (oavgjort i stället för förlust). Mål i matcher som vanns stort eller förlorades ger inga poäng.', 'statistik'],
+  ['Inblandad i lagets mål', 'Mål och assist delat med lagets mål: hur stor del av lagets mål spelaren har gjort eller lagt sista passningen till.', 'statistik'],
+  ['Målen', 'Segermål, poäng åt laget, matchens första mål, sena mål (från 80:e minuten, tilläggstiden inräknad) och mål som inhoppare finns för alla fyra ligor. Nick, straff, frispark och mål utanför straffområdet bara för Premier League och Championship – i League One och League Two anger matchrapporterna bara minut och målskytt.', 'statistik'],
+  ['Fälld, Fäller', 'Gånger spelaren har blivit fälld, och gånger spelaren själv har begått ett regelbrott som domaren blåst för.', 'statistik'],
+  ['Försvarsinsatser', 'Tacklingar, rensningar, täckningar och brytningar. Bara Premier League, från Fantasy Premier League.', 'statistik'],
   ['Assist', 'Passningen (eller skottet som räddas och slås in) som leder direkt till ett mål, enligt ESPN.', 'statistik'],
   ['Skott på mål', 'Skott som skulle ha gått in om målvakten inte räddat. Skott utanför och i stolpen räknas inte.', 'statistik'],
   ['Räddningsprocent', 'Räddningar delat med skotten på mål som målvakten mött (räddningar + insläppta).', 'statistik'],

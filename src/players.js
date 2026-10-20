@@ -327,6 +327,54 @@ function goalsIndex(compId, teams) {
   return { map: out, matched: out.size, of, fetchedAt: c.fetchedAt, kinds: detailed > matches.filter((m) => m.d === 0).length };
 }
 
+// Bygget frågar efter målen en gång per matchsida: räkna om först när
+// rapporterna eller trupperna har lästs om.
+const goalsMemo = new Map();
+function goalTypesFor(compId) {
+  const c = readCache(`espn_minutes_${compId}`);
+  const pc = cacheFor(compId);
+  const hit = goalsMemo.get(compId);
+  if (hit && hit.c === c && hit.pc === pc) return hit.v;
+  const v = pc ? goalsIndex(compId, pc.data.teams) : null;
+  goalsMemo.set(compId, { c, pc, v });
+  return v;
+}
+
+// Målen i hela ligan ur matchrapporterna (alla matcher, inte bara de
+// trupperna hunnit föra in): när de görs, per kvart – tilläggstiden räknas
+// till halvlekens sista kvart – och hur, där rapporterna beskriver målen.
+const QUARTERS = [[1, 15], [16, 30], [31, 45], [46, 60], [61, 75], [76, 90]];
+const HOW = [
+  ['nick', (x) => x.s === 'n'],
+  ['straff', (x) => x.s === 's'],
+  ['frispark', (x) => x.s === 'f'],
+  ['utifrån', (x) => x.u],
+  ['självmål', (x) => x.o],
+  ['inifrån', () => true],
+];
+function leagueGoals(compId) {
+  const c = readCache(`espn_minutes_${compId}`);
+  if (!c || !c.data || !c.data.matches) return null;
+  const matches = Object.values(c.data.matches).filter((m) => Array.isArray(m.g));
+  if (!matches.length) return null;
+  const goals = matches.flatMap((m) => m.g);
+  const when = QUARTERS.map(([from, to]) => ({ from, to, goals: 0 }));
+  for (const x of goals) {
+    const q = when.find((w) => x.m >= w.from && x.m <= w.to) || (x.m > 90 ? when[when.length - 1] : null);
+    if (q) q.goals++;
+  }
+  const detailed = matches.filter((m) => m.d === 1);
+  const plain = matches.filter((m) => m.d === 0).length;
+  let how = null;
+  if (detailed.length > plain) {
+    const counts = new Map(HOW.map(([k]) => [k, 0]));
+    const dg = detailed.flatMap((m) => m.g);
+    for (const x of dg) { const k = HOW.find(([, test]) => test(x))[0]; counts.set(k, counts.get(k) + 1); }
+    how = { matches: detailed.length, goals: dg.length, kinds: [...counts].map(([kind, n]) => ({ kind, goals: n })) };
+  }
+  return { fetchedAt: c.fetchedAt, matches: matches.length, goals: goals.length, when, how };
+}
+
 // Mål minus xG (FPL:s egna mål, så att båda gäller samma matcher).
 const overXg = (r) => (r.xg != null && r.fg != null ? Math.round((r.fg - r.xg) * 100) / 100 : null);
 
@@ -342,7 +390,7 @@ function divisionPlayers(compId) {
   const mins = minutesIndex(compId, d.teams);
   const fx = fpl ? fpl.map : mins ? mins.map : null;
   const emin = (p) => (fpl && mins && mins.map.has(p.id) ? { emin: mins.map.get(p.id).min } : null);
-  const goalTypes = goalsIndex(compId, d.teams);
+  const goalTypes = goalTypesFor(compId);
   const rows = [];
   const all = [];
   for (const t of d.teams) {
@@ -434,6 +482,7 @@ function divisionPlayers(compId) {
     // Målens sort och betydelse ur matchrapporterna (alla fyra ligor).
     // matched av of = spelare med statistik vars mål går att följa.
     goalTypes: goalTypes ? { provider: 'ESPN', fetchedAt: goalTypes.fetchedAt, matched: goalTypes.matched, of: goalTypes.of, kinds: goalTypes.kinds } : null,
+    leagueGoals: leagueGoals(compId),
     thresholds: { minShotsConversion: MIN_SHOTS_CONVERSION, minShareKeeper: MIN_SHARE_KEEPER, minMinutesP90: MIN_MINUTES_P90, top: TOP },
   };
 }
@@ -474,6 +523,9 @@ function teamSquad(teamName) {
     const standing = standingsFor(c.id).get(t.espnId);
     const players = t.players.map((p) => (p.stats ? { ...row(p, t), ...gk(p) } : bare(p, t)));
     const used = players.filter((p) => p.app > 0);
+    // Segermålen följer bara med i nyckellistan, inte i hela truppen.
+    const goals = goalTypesFor(c.id);
+    const gw = (p) => (goals && goals.map.has(p.id) ? goals.map.get(p.id).gw : null);
     return {
       unknown: false,
       comp: c.id,
@@ -485,6 +537,7 @@ function teamSquad(teamName) {
         scorers: top(used, (p) => p.g, { n: 3, tiebreak: (a, b) => a.app - b.app }),
         creators: top(used, (p) => p.a, { n: 3, tiebreak: (a, b) => a.app - b.app }),
         cards: top(used, (p) => p.yc, { min: 3, n: 5 }),
+        winners: goals ? top(used, gw, { n: 3, tiebreak: (a, b) => a.app - b.app }).map((p) => ({ ...p, gw: gw(p) })) : null,
       },
       availability: availability(c.id, t.name),
     };
