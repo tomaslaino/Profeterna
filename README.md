@@ -106,6 +106,12 @@ ingen falsk precision · sidan kraschar aldrig av en död källa · endast fria 
 - [x] **Ladda upp system (2026-10-20):** en skärmbild av systemet ni spelat (Svenska Spels
   app) blir gängets kupong med matcher och tecken. Bilden läses i webbläsaren och lämnar
   aldrig telefonen (se [Ladda upp system](#ladda-upp-system))
+- [x] **Stryktipset och Svenska folket (2026-10-20):** *Hämta Stryktipset* i Välj matcher
+  fyller omgångens kupong med veckans Stryktips från Svenska Spel, i deras ordning, och
+  kupongen visar Svenska folket – hur stor del av raderna som har med 1, X och 2 – under
+  modellens odds, grönt där modellen ger tecknet klart större chans än folket spelar det.
+  Siffrorna uppdateras varje minut fram till spelstoppet. Matcherna står i den ordning de
+  valdes, och numret syns också i telefonen (se [Inför uppgörelsen](#inför-uppgörelsen))
 - [x] **Spelarbetyg (2026-10-20):** Statistik → Spelare visar spelarnas snittbetyg från
   365Scores, som sätter ett betyg från 1 till 10 efter varje match: topplistan *Högst betyg*
   i stället för Målvakter (som finns kvar under Försvar), kolumnen Betyg under Översikt
@@ -215,6 +221,7 @@ Utan nyckel ingen knapp.
 | Startelvor och frånvaro | 365Scores öppna webb-API (`webws.365scores.com/web/games/` och `/web/game/?gameId=`), hämtas **i webbläsaren** | alla sex | när matchrutan öppnas, varje minut medan matchen pågår | Verifierat 2026-10-19: ingen nyckel, `Access-Control-Allow-Origin: *`. Trolig elva (`NotConfirmed`) dagar före matchen i Premier League och Championship (inte i League One, League Two och EFL-cupen), bekräftad (`Confirmed`) ungefär en timme före avspark, efter matchen elvorna med mål, kort och byten. Spelarnas plats som linje och sida, så planen ritas utan positionstolkning. Vilka som saknas (skada med orsak och väntad återkomst, avstängning) även utanför Premier League. ESPN:s matchid finns inte där: matchen hittas på tävling (PL 7, CH 1, L1 2, L2 3, FA-cupen 8, EFL-cupen 9), avspark inom tre timmar och lagnamn – 505 av 505 matcher 1/9–8/11 2026 hittades (MK Dons heter så där). Samma källa som Gräver Gravs startelvor. Styr inte prognosen. |
 | Spelarbetyg | 365Scores öppna webb-API (`/web/games/results/?competitions=<id>` bakåt via `paging.previousPage`, sedan `/web/game/?gameId=`) | ligorna | 6 h, bara nya matcher | Verifierat 2026-10-20: betyg 1–10 med en decimal (`ranking`) för alla i startelvan och för inhoppare som spelat en stund (några minuter ger -1, inget betyg). 365Scores räknar betyget ur spelarens statistik i matchen; metoden är odokumenterad. Snittet är 6,6–6,8 per liga och vart tionde betyg är över 7,5. Alla 70, 131 och 114 spelade matcher i PL, CH och L1 hade betyg; i League Two 66 av 126 – matcherna före 12 september saknar betyg och sparas som utan. Säsongens matcher listas ~20 per sida tills förra säsongens (`seasonNum`) börjar. Matchen hittas på avspark inom tre timmar och lagnamn som i matchrutan (alla 441 hittades). Samma spelare kan ha olika id i olika matcher, så spelarna hålls isär på namnet inom laget. Kopplas till ESPN-truppen inom laget på hela namnet, efternamn med förnamnets initial och sist tröjnummer med lika början på efternamnet (Yarmoliuk–Yarmolyuk, Sávio–Savinho), bara vid entydig träff. En match är ~135 kB men sparas kompakt (~70–140 kB per liga). Svarar även från GitHub Actions (verifierat 2026-10-20); svarar den inte visas topplistan Målvakter som förut. Styr inte prognosen. |
 | Matchhändelser och lagstatistik | ESPN matchsammanfattning (`summary?event=<id>`, samma som oddsen), hämtas **i webbläsaren** | alla sex | när matchrutan öppnas för en påbörjad match, varje minut medan den pågår | Verifierat 2026-10-19: `Access-Control-Allow-Origin: *`. Mål med assist, självmål och straff, kort, byten, halvtid, lagstatistik (bollinnehav, skott, hörnor, passningar m.m.) och publik. Passningsandelen räknas ur antalen (ESPN avrundar den till en decimal). ~400 kB per match. Styr inte prognosen. |
+| Stryktipset och Svenska folket | Svenska Spels öppna API (`api.spela.svenskaspel.se/draw/1/stryktipset/draws` och `…/draws/<nr>`), hämtas av tjänsten profeterna-kupong åt webbläsaren | omgångens kupong | 1 min medan kupongen visas, fram till spelstoppet | Verifierat 2026-10-20: ingen nyckel, men inget `Access-Control-Allow-Origin` för andra sajter – därför via tjänsten, som sparar svaret en minut. Omgångens tretton matcher med nummer, lag (korta namn: *QPR*, *Wolves*, *Bristol C*), avspark och `svenskaFolket` i hela procent. Svenska Spel räknar om fördelningen ungefär varje minut och fryser den vid spelstoppet; `/draws/<nr>` ger den också efteråt. Inget matchid som ESPN:s – matchen hittas på lagen (början av namnet efter några smeknamn) och avspark inom 36 timmar: 13 av 13 i vecka 43. Styr inte prognosen. |
 | Liveställning | ESPN scoreboard (`site.api.espn.com/…/<liga>/scoreboard?dates=YYYYMMDD`), hämtas **i webbläsaren** | kupongens matcher | 1 min medan en kupongmatch pågår | Verifierat 2026-10-18: svarar med `Access-Control-Allow-Origin: *`, så sidan kan hämta direkt. Samma matchid som spelprogrammet. Status, matchminut och ställning; används bara av kupongen, inte av prognosen eller bygget. |
 | Målminuter och publik, tidigare säsonger | ESPN (`eng.1`–`eng.4`, månad för månad) | ligorna – bara sidan Statistik | 30 d | Verifierat 2026-10-18. 2021/22–2025/26; grundserien räknas, play-off filtreras bort. Målhändelserna går ihop med slutresultatet i 99,9 % av matcherna, publik finns i 98–100 % per liga och säsong. Kompakt format (`parseCrowd`): målminut med sida och publiksiffra. Årets publik saknas (spelprogrammets format ändras inte). |
 | Höjdpunkter (sammandrag) | Viaplays öppna innehålls-API (`content.viaplay.se/pcdash-se/sport/fotboll/<tävling>`) | PL, CH, L1, FA-cupen, EFL-cupen | 30 min | Verifierat 2026-10-20: ingen nyckel, svarar även från USA (GitHub Actions). Viaplay har rättigheterna i Sverige och lägger ut sammandrag som spelas utloggad efter en kort reklamfilm. Listorna *Höjdpunkter* och *Utvalda klipp* per tävling, 40 klipp per sida; sammandragen känns igen på formatet (*Höjdpunkter från Premier League*, *Sporthöjdpunkter*). Premier Leagues femminutersklipp ligger ute en månad, övriga ett år; klipp som faller ur listorna behålls tills de går ut. Inget matchid – matchen hittas på tävling, båda lagen (alias eller ordens början, t.ex. *Bristol C*) och avspark 30 dagar före till 3 dagar efter att klippet lades ut: alla 212 sammandrag med två lag i titeln från säsongens start hittade exakt en match (170 matcher). League Two har inga. Länken går direkt till Viaplays spelare (`viaplay.se/player/default/sport/<guid>`, startar utan Börja titta) och öppnas i ett eget 16:9-fönster på datorn, i ny flik på telefonen – Viaplay tillåter inte att sidorna visas inuti andra sajter (`X-Frame-Options: DENY`, `frame-ancestors 'none'`), så klippen går inte att bädda in. Styr inte prognosen. |
@@ -1047,6 +1054,10 @@ under omgången.
 
 1. **Skapa kupong** (*Kupong → Skapa kupong* eller *+ Ny kupong*, `#kupong/samtal/ny`):
    någon väljer kupongens tretton matcher (samma sökning och tävlingsfilter som Ny kupong).
+   Matcherna står i den ordning de valdes – det är numren på kupongen. *Hämta Stryktipset*
+   fyller kupongen med veckans Stryktips från Svenska Spel, i deras ordning (matcher som
+   inte finns på sajten eller har startat kommer inte med, med en rad om vilka). Kommer
+   matcherna inte i datumordning står veckodagen på raden i stället för dagens rubrik.
    Kupongen bredvid programmet har tretton tryckta rader som fylls i uppifrån; när den är
    full tonas plustecknen ner, och *Skapa kupongen* (och *Spara matcherna*) kräver precis
    tretton. Papperet i Ny kupong har samma tretton rader men inget krav. Ingen tid för
@@ -1071,7 +1082,12 @@ under omgången.
    kupongen medan man kryssar, de andras syns när de har sparat. Man trycker på sina
    initialer (*Vem är du?* – sparas på enheten, de ringas in), kryssar i sin kolumn med
    modellens odds under rutorna och kan skriva en kort motivering under matchen man just
-   tippade (högst 140 tecken). Raden med initialerna står kvar överst när man bläddrar.
+   tippade (högst 140 tecken). Är matchen med på Stryktipset står Svenska folket under
+   oddsen – andelen av raderna med tecknet, i kupongens röda, och grönt och fett där
+   modellens chans är minst en fjärdedel större och minst fyra procentenheter högre. I foten
+   står när Svenska Spel räknade om senast; sidan frågar varje minut till spelstoppet och
+   skriver om siffrorna där de står. Samma siffror står i underlaget och på gängets kupong.
+   I telefonen står matchens nummer före lagen. Raden med initialerna står kvar överst när man bläddrar.
    Nederst hur många matcher som är tippade, garderingar och rader, och under dem raden
    med allt man gör med kupongen, som står kvar nederst medan man bläddrar (som raden med
    initialerna överst): till höger *Spara* och *Lämna in och se de andras*, till vänster
@@ -1133,7 +1149,9 @@ KV-bindningen `KUPONG`, inte på GitHub: `samtal:aktuellt` (omgången),
 `samtal:<id>:tips:<vem>` (en nyckel per person, så att två som lämnar in samtidigt inte
 skriver över varandra), `samtal:<id>:utkast:<vem>` (en sparad kupong som inte är inlämnad:
 bara antalet tippade, för omgångens matcher som de var då) och `samtal:<id>` (en tidigare
-omgång, sparad när nästa startas).
+omgång, sparad när nästa startas). En omgång som skapades med *Hämta Stryktipset* har
+`spel: {"namn": "Stryktipset", "nr": <Svenska Spels omgång>}` (`starta` och `matcher` tar
+`spel`; utan det står omgångens kvar).
 `GET /samtal` ger omgången, vem som lämnat in och hur många matcher var och en har tippat
 (`gang[].tippat`, ur de inlämnade tipsen eller en sparad kupong) – tipsen bara när de visas
 för alla – och
@@ -1149,6 +1167,14 @@ någons tips med bara namnet – nyckeln är det som hindrar att man tittar inna
 lämnat in, eller ändrar någon annans.
 Lokalt: med `KUPONG_LOKALT=1` i `.env` finns
 `/api/samtal`, som sparar i `data/cache/samtal/` (eller `SAMTAL_DIR`).
+
+**Stryktipset** hämtas av samma tjänst, `GET /stryktipset` (den öppna omgången) och
+`GET /stryktipset?nr=<omgång>` ([worker/stryktipset.mjs](worker/stryktipset.mjs)) – Svenska
+Spel svarar inte på anrop direkt från sajten. Svaret sparas en minut i tjänsten. Sidan
+([public/folket.js](public/folket.js)) knyter matcherna till sajtens på lagen och avsparken.
+Har omgången inget `spel` används den öppna omgången, om den har någon av kupongens matcher,
+och dess nummer sparas på enheten så att siffrorna finns kvar efter spelstoppet. Lokalt
+`/api/stryktipset` (med `KUPONG_LOKALT=1`).
 
 **Omgångens namn** (2026-10-20): i stället för *Omgångens kupong* får varje omgång ett eget
 namn av AI:n – det mest intressanta med just den omgången, sagt med lågmäld ironi, t.ex.

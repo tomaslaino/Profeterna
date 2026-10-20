@@ -46,7 +46,7 @@
     data: undefined, // omgången som tjänsten visar den; null = ingen, undefined = inte hämtad
     error: null,
     timer: null,
-    pick: null, // skapa kupongen / ändra matcherna: {ids: Set}
+    pick: null, // skapa kupongen / ändra matcherna: {ids: Set, spel}
     q: '',
     comp: 'all',
     allDays: false, // välj matcher: alla dagar, inte bara närmaste omgången
@@ -296,6 +296,7 @@
     // Allas tips så snart du ser fler än dina egna, annars kupongen. Knapparna
     // står i raden längst ner på papperet, i båda.
     const all = Boolean(s.tips && Object.keys(s.tips).length >= (s.visas ? 1 : 2));
+    if (window.Folket) Folket.watch(s);
     html += steps(s, all) + head(s, null);
     html += all ? board(s) : sheet(s, false);
     // Gängets kuponger som spelas under tiden, t.ex. veckans matcher.
@@ -449,6 +450,7 @@
       gard ? ['Garderingar', gard] : null,
       ['Rader', rader(chosen), 'Antal rader med garderingarna'],
       odds ? ['Odds', oddsText(odds), 'Oddset för att alla gängets tecken går in – matchernas odds gånger varandra'] : null,
+      folkField(),
     ]) + '</div>';
     const act = boardActions(s, rows, val);
     return html + `<div class="sm-act${actMore ? ' more' : ''}" id="sm-act"${act ? '' : ' hidden'}><div class="sm-act-in" id="sm-act-in">${act}</div>` +
@@ -498,9 +500,14 @@
     '<div class="sm-sheet-head"><p class="pp-brand"><img src="logo.svg" alt="" width="20" height="20">Matchfixarna<span>Kupong</span></p>' +
     `${stamp}${corner}</div><div class="pp-band" aria-hidden="true"></div>`;
   const stopBox = (s) => `<div class="pp-stop"><span>Spelstopp</span><b>${esc(fWeekdayTime.format(new Date(Math.min(...kicks(s)))))}</b></div>`;
-  // Fälten i foten: [[etikett, värde, title]].
-  const fieldList = (list, id = '') => `<div class="pp-fields pb-fields"${id ? ` id="${id}"` : ''}>` + list.filter(Boolean).map(([label, val, title]) =>
-    `<span class="pp-field"${title ? ` title="${esc(title)}"` : ''}><span>${label}</span><b>${val}</b></span>`).join('') + '</div>';
+  // Fälten i foten: [[etikett, värde, title]] – eller ett färdigt fält
+  // (Svenska folket, folket.js).
+  const fieldList = (list, id = '') => `<div class="pp-fields pb-fields"${id ? ` id="${id}"` : ''}>` + list.filter(Boolean).map((x) => (typeof x === 'string' ? x
+    : `<span class="pp-field"${x[2] ? ` title="${esc(x[2])}"` : ''}><span>${x[0]}</span><b>${x[1]}</b></span>`)).join('') + '</div>';
+  // Svenska folket under rutorna och i foten, när kupongen har matcher från
+  // Stryktipset (folket.js).
+  const folk = (id, i, p) => (window.Folket ? Folket.cell(id, i, p) : '');
+  const folkField = () => (window.Folket ? Folket.field() : null);
   const oddsText = (o) => (o >= 100 ? Math.round(o).toLocaleString('sv-SE') : fmtOdds(o));
   const DOTS3 = '<svg viewBox="0 0 20 20" aria-hidden="true"><circle cx="4.5" cy="10" r="1.7"/><circle cx="10" cy="10" r="1.7"/><circle cx="15.5" cy="10" r="1.7"/></svg>';
 
@@ -569,7 +576,7 @@
       SIGNS.map((sg, i) => {
         const on = sign.includes(sg);
         const b = box(sg, who[i], ids, on ? `${id}${sg}` : null, g.res === i ? `${id}${sg}` : null);
-        const odds = `<small${on ? ' class="on"' : ''}>${g.pr ? pctOdds(g.pr[i]) : '–'}</small>`;
+        const odds = `<small${on ? ' class="on"' : ''}>${g.pr ? pctOdds(g.pr[i]) : '–'}</small>${folk(id, i, g.pr ? g.pr[i] : null)}`;
         if (!pick) return `<span class="sm-c" aria-hidden="true">${b}${odds}</span>`;
         // Gängets tecken väljs bara i matcher som inte har startat.
         return `<button type="button" class="sm-c" data-s="${sg}" aria-pressed="${on}"${open ? '' : ' disabled'}` +
@@ -592,11 +599,13 @@
     const rows = [...g.rows, ...s.matcher.filter((x) => !on.has(x.id)).map((x) => ({ ...gradeRow({ id: x.id, sign: '', label: x.match }, now), out: true }))]
       .sort((a, b) => nr.get(a.id) - nr.get(b.id));
     const stamp = c.pending ? '<span class="pp-stamp wait">Väntar på GitHub</span>' : g.done && !g.hidden ? '<span class="pp-stamp">Rättad</span>' : '';
+    if (window.Folket) Folket.watch(s);
     let html = paperTop(Papper.grade(c, g), ' sm-up', stamp) + upHead(s, ids, rows.filter((r) => r.res != null).map((r) => [r.id, r.res]));
+    const days = Papper.inDayOrder(rows, (r) => r.m && r.m.kickoff);
     let day = null;
     rows.forEach((r, i) => {
       const k = r.m ? dayKey.format(new Date(r.m.kickoff)) : 'okänd';
-      if (k !== day) {
+      if (days && k !== day) {
         day = k;
         html += `<p class="pp-day">${esc(r.m ? cap(fDay.format(new Date(r.m.kickoff))) : 'Okänt datum')}</p>`;
       }
@@ -604,7 +613,7 @@
       html += upRow({
         id: r.id, m: r.m, label: teamsOf(r), g: r, nr: nr.get(r.id), who: SIGNS.map((sg) => ids.filter((p) => tip(p).includes(sg))),
         sign: r.sign, note: r.note, notes: ids.map((p) => ({ k: p, text: (s.tips[p].kommentarer || {})[r.id] })).filter((o) => o.text),
-        ids, alt: i % 2, day: true, out: r.out,
+        ids, alt: i % 2, day: days, out: r.out,
       });
     });
     return html + Papper.foot(c, g) + '</div></div>';
@@ -863,10 +872,13 @@
       }).join('') + '</span></span>' +
       // 1 X 2 som en tom ruta utan kant, så att tecknen står rakt över rutornas.
       SIGNS.map((sg) => `<span class="sm-hd-s" aria-hidden="true">${box(sg, [], ids)}</span>`).join('') + '</div>';
+    // Under sin dag när matcherna kommer i datumordning, annars med veckodagen
+    // på raden.
+    const days = Papper.inDayOrder(s.matcher, (x) => x.avspark);
     let day = null;
     s.matcher.forEach((x, i) => {
       const k = dayKey.format(new Date(x.avspark));
-      if (k !== day) {
+      if (days && k !== day) {
         day = k;
         html += `<p class="pp-day">${esc(cap(fDay.format(new Date(x.avspark))))}</p>`;
       }
@@ -885,7 +897,7 @@
       html += `<div class="sm-r${i % 2 ? ' alt' : ''}${locked ? ' sm-locked' : ''}${d && !sign ? ' unsigned' : ''}" data-id="${esc(x.id)}">` +
         `<span class="pp-nr">${i + 1}</span>` +
         `<span class="sm-m"><span class="pp-tm">${teamsHtml(x, m)}</span>` +
-        `<span class="sm-meta"><span class="pp-small">${esc(fTime.format(new Date(x.avspark)))}${comp ? ` · <abbr title="${esc(comp.name)}">${esc(comp.short)}</abbr>` : ''}</span>` +
+        `<span class="sm-meta"><span class="pp-small">${esc((days ? fTime : fWeekdayTime).format(new Date(x.avspark)))}${comp ? ` · <abbr title="${esc(comp.name)}">${esc(comp.short)}</abbr>` : ''}</span>` +
         // Motiveringen: en penna efter tiden när du har tippat matchen. Man
         // skriver på samma rad, så att ingenting flyttar sig.
         (own && (sign || d.kommentarer[x.id]) ? `<label class="sm-note-w sm-k${pnum(v)}" title="Motivering">${PEN}` +
@@ -896,8 +908,8 @@
           const who = cols.filter((c) => (c.t[x.id] || '').includes(sg)).map((c) => c.g.id);
           return own
             ? `<button type="button" class="sm-c sm-k${pnum(v)}" data-s="${sg}" aria-pressed="${sign.includes(sg)}" aria-label="${sg} för ${esc(label)}">` +
-              `${box(sg, who, ids)}<small>${p ? pctOdds(p[j]) : '–'}</small></button>`
-            : `<span class="sm-c" aria-hidden="true">${box(sg, who, ids)}</span>`;
+              `${box(sg, who, ids)}<small>${p ? pctOdds(p[j]) : '–'}</small>${folk(x.id, j, p ? p[j] : null)}</button>`
+            : `<span class="sm-c" aria-hidden="true">${box(sg, who, ids)}${folk(x.id, j, p ? p[j] : null)}</span>`;
         }).join('') + '</div>';
     });
     keepFocus(() => { $('#sm-rows').innerHTML = html; });
@@ -911,6 +923,7 @@
       gard ? ['Garderingar', gard] : null,
       ['Rader', rader(signs), 'Antal rader med garderingarna'],
       odds ? ['Odds', oddsText(odds), 'Oddset för att alla dina tecken går in – matchernas odds gånger varandra'] : null,
+      folkField(),
     ], 'sm-fields');
     actionRow();
     // Alla tecken på plats: de röda rutorna försvinner.
@@ -1048,6 +1061,7 @@
       location.hash = 'kupong';
       return;
     }
+    if (window.Folket) Folket.watch(s);
     $('#coupon').innerHTML = steps(s) +
       head(s, 'Ändra din kupong') + sheet(s, true);
     wireSheet();
@@ -1192,9 +1206,10 @@
   // ---------- skapa omgångens kupong och ändra matcherna ----------
 
   // Programmet till vänster och omgångens kupong på papper bredvid, som får
-  // en rad för varje vald match (Papper.builder i papper.js). Kupongen har
-  // tretton matcher (Papper.RADER). Rutorna står tomma tills var och en
-  // fyller i sin kupong.
+  // en rad för varje vald match (Papper.builder i papper.js), i den ordning
+  // de valdes. Kupongen har tretton matcher (Papper.RADER). Rutorna står
+  // tomma tills var och en fyller i sin kupong. Hämta Stryktipset fyller
+  // kupongen med veckans Stryktips i Svenska Spels ordning (folket.js).
   function renderStart(edit) {
     const s = SM.data;
     // Matcherna står fast när någon har lämnat in.
@@ -1202,7 +1217,7 @@
       location.hash = 'kupong';
       return;
     }
-    SM.pick = { ids: new Set(edit ? s.matcher.map((x) => x.id) : []) };
+    SM.pick = { ids: new Set(edit ? s.matcher.map((x) => x.id) : []), spel: undefined };
     SM.allDays = false;
     const comps = [{ id: 'all', short: 'Alla', name: 'Alla tävlingar' }, ...state.comps.values()];
     const tools = '<div class="toolbar kp-tools">' +
@@ -1212,7 +1227,9 @@
     $('#coupon').innerHTML = roundSteps(1) +
       '<div class="kp-head"><div>' + (edit ? nameBlock(s, 'rad') : '<p class="kp-eyebrow">Omgångens kupong</p>') +
       `<h2 class="page-title">${edit ? 'Ändra matcherna' : 'Välj matcher'}</h2></div>` +
-      '<div class="kp-actions"><a class="kp-btn" href="#kupong">Avbryt</a></div></div>' +
+      '<div class="kp-actions">' +
+      (window.Folket && info().endpoint ? '<button type="button" class="kp-btn" id="sm-stryk" title="Veckans Stryktips från Svenska Spel, i deras ordning">Hämta Stryktipset</button>' : '') +
+      '<a class="kp-btn" href="#kupong">Avbryt</a></div></div>' +
       Papper.builder({
         id: 'sm-build',
         list: 'sm-pick-list',
@@ -1249,7 +1266,39 @@
       pickList();
     });
     $('#sm-start').addEventListener('click', () => startRound(edit));
+    if ($('#sm-stryk')) $('#sm-stryk').addEventListener('click', () => importStryk(edit));
     pickList();
+  }
+
+  // Veckans Stryktips från Svenska Spel blir kupongens matcher, i deras
+  // ordning. Matcher som inte finns på sajten (andra ligor) eller som har
+  // startat kommer inte med – då står det vilka.
+  async function importStryk(edit) {
+    const msg = (h) => { $('#sm-msg').innerHTML = h; };
+    const btn = $('#sm-stryk');
+    btn.disabled = true;
+    msg('Hämtar Stryktipset …');
+    const got = await Folket.open();
+    if (!here(edit ? 'matcher' : 'ny')) return;
+    btn.disabled = false;
+    if (!got) {
+      msg('<span class="note">Svenska Spel har ingen öppen Stryktipsomgång just nu.</span>');
+      return;
+    }
+    const now = Date.now();
+    const ok = got.rows.filter((r) => r.m && isOpen(r.m, now));
+    const out = got.rows.filter((r) => !ok.includes(r));
+    SM.pick.ids = new Set(ok.map((r) => r.m.id));
+    SM.pick.spel = { namn: 'Stryktipset', nr: got.omgang.nr };
+    SM.q = '';
+    if ($('#sm-q')) $('#sm-q').value = '';
+    pickList();
+    // I telefonen dras kupongen fram, som efter Ladda upp system.
+    if (window.matchMedia('(max-width: 640px)').matches) Papper.open('sm-build');
+    const v = got.omgang.vecka ? ` v ${got.omgang.vecka}` : '';
+    msg(out.length
+      ? `<span class="note">Stryktipset${esc(v)}: ${out.map((r) => `${esc(r.nr)}. ${esc(r.hemma)} – ${esc(r.borta)}${r.m ? ' har startat' : ''}`).join(', ')} kom inte med.</span>`
+      : `Stryktipset${esc(v)}.`);
   }
 
   function pickList() {
@@ -1270,7 +1319,7 @@
     const more = later ? `<button type="button" class="earlier" id="sm-more">Visa fler dagar <span class="n">${later}</span></button>` : '';
     $('#sm-pick-list').innerHTML = (list.length ? Papper.program(list, (id) => ids.has(id), ids.size >= Papper.RADER)
       : `<p class="empty">${later ? 'Inga matcher den närmaste omgången.' : 'Inga matcher hittades.'}</p>`) + more;
-    Papper.slip('sm-build', { rows: [...ids].map((id) => ({ id, m: matchById(id) })), max: Papper.RADER });
+    Papper.slip('sm-build', { rows: [...ids].map((id) => ({ id, m: matchById(id) })), max: Papper.RADER, ordered: true });
   }
 
   async function startRound(edit, ersatt = null) {
@@ -1285,9 +1334,12 @@
     const btn = $('#sm-start');
     btn.disabled = true;
     msg('Sparar …');
+    // Hämtades matcherna från Stryktipset följer omgångens nummer med, så att
+    // kupongen visar Svenska folket för just den.
+    const spel = SM.pick.spel;
     const out = edit
-      ? await send({ gor: 'matcher', id: SM.data.id, matcher: ids })
-      : await send({ gor: 'starta', matcher: ids, ersatt });
+      ? await send({ gor: 'matcher', id: SM.data.id, matcher: ids, spel })
+      : await send({ gor: 'starta', matcher: ids, ersatt, spel });
     if (!here(edit ? 'matcher' : 'ny')) return;
     btn.disabled = false;
     if (out.ok) {

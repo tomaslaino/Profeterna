@@ -7,6 +7,8 @@
 //   POST /kupong {"kupong", "andra", "bas", "ändå"}   (se worker/kupong.mjs)
 //   POST /kupong {"bort", "bas"}                       ta bort en kupong
 //   GET  /samtal · POST /samtal {"gor", …}             (se worker/samtal.mjs)
+//   GET  /stryktipset[?nr=…]                           veckans Stryktips och Svenska
+//                                                      folket (se worker/stryktipset.mjs)
 //
 // Driftsätts för hand med worker/kupong.toml; hemligheten GITHUB_TOKEN läggs
 // in med "wrangler secret put" (README, avsnittet Kupongen).
@@ -19,6 +21,7 @@ import cfg from '../config/llm.js';
 import kupongCfg from '../config/kupong.js';
 import { saveCoupon, githubWriter } from './kupong.mjs';
 import { getRound, postRound, kvStore } from './samtal.mjs';
+import { getStryktipset } from './stryktipset.mjs';
 
 // Frågeparametern går förbi CDN-cachen, så att det senaste bygget läses.
 async function siteMatches(site) {
@@ -43,6 +46,10 @@ export default {
   async fetch(request, env) {
     if (request.method === 'OPTIONS') return new Response(null, { status: 204, headers: CORS });
     const url = new URL(request.url);
+    if (url.pathname === '/stryktipset' && request.method === 'GET') {
+      const r = await getStryktipset(url.searchParams.get('nr'));
+      return json(r.status, r.body);
+    }
     const samtal = url.pathname === '/samtal';
     const store = env.KUPONG ? kvStore(env.KUPONG) : null;
     if (samtal && request.method === 'GET') {

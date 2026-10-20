@@ -15,7 +15,7 @@
 // KUPONG_DIR), inte på GitHub. Samma saveCoupon() som proxyn. Samma
 // inställning slår på gängets egna tips inför uppgörelsen (GET/POST
 // /api/samtal), som lokalt ligger som filer i data/cache/samtal/ (eller
-// SAMTAL_DIR).
+// SAMTAL_DIR), och Stryktipset med Svenska folket (GET /api/stryktipset).
 
 const fs = require('fs');
 const path = require('path');
@@ -190,6 +190,20 @@ function samtalRoute(store = samtalFileStore(), loadMatches = siteMatches()) {
   };
 }
 
+// GET /api/stryktipset[?nr=…] – samma getStryktipset() som tjänsten.
+function stryktipsetRoute() {
+  return async (req, res) => {
+    try {
+      const { getStryktipset } = await import('./worker/stryktipset.mjs');
+      const r = await getStryktipset(req.query.nr);
+      res.status(r.status).json(r.body);
+    } catch (err) {
+      console.error('[stryktipset]', err);
+      res.status(500).json({ ok: false, error: 'Internt fel i servern.' });
+    }
+  };
+}
+
 if (require.main === module) {
   loadEnv();
   const analysisEndpoint = process.env[llm.keyEnv] ? '/api/analyze' : null;
@@ -212,6 +226,7 @@ if (require.main === module) {
   if (analysisEndpoint) app.post('/api/kommentar', express.json(), commentRoute());
   if (couponEndpoint) app.post('/api/kupong', express.json({ limit: '20kb' }), couponSaveRoute());
   if (couponEndpoint) app.all('/api/samtal', express.json({ limit: '20kb' }), samtalRoute());
+  if (couponEndpoint) app.get('/api/stryktipset', stryktipsetRoute());
   if (analysisEndpoint && couponEndpoint) app.post('/api/namn', express.json(), nameRoute());
   app.use(express.static(OUT));
 
@@ -226,4 +241,4 @@ if (require.main === module) {
   });
 }
 
-module.exports = { analysisRoute, commentRoute, nameRoute, couponSaveRoute, couponFileWriter, samtalRoute, samtalFileStore, siteMatches, fileStore };
+module.exports = { analysisRoute, commentRoute, nameRoute, couponSaveRoute, couponFileWriter, samtalRoute, samtalFileStore, stryktipsetRoute, siteMatches, fileStore };

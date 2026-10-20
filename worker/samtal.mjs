@@ -8,11 +8,16 @@
 //                 eller null; forra = omgången före den, om dess tips visades
 //                 när den ersattes (så att bygget hinner spara den i
 //                 tipparhistoriken, src/tippare.js)
-//   POST /samtal {gor: "starta", matcher: [id], ersatt: <id> | null}
+//   POST /samtal {gor: "starta", matcher: [id], ersatt: <id> | null, spel}
 //                 ny omgång. Pågår en omgång (någon match har inte startat)
-//                 krävs ersatt = dess id.
-//   POST /samtal {gor: "matcher", id, matcher: [id]}   ändra omgångens
-//                 matcher – bara tills någon har lämnat in
+//                 krävs ersatt = dess id. Matcherna står i den ordning de
+//                 valdes – numren på kupongen, som på Stryktipset. spel =
+//                 {namn: "Stryktipset", nr} när matcherna hämtades från
+//                 Svenska Spel (worker/stryktipset.mjs), så att sidan visar
+//                 Svenska folket för just den omgången (valfritt)
+//   POST /samtal {gor: "matcher", id, matcher: [id], spel}   ändra omgångens
+//                 matcher – bara tills någon har lämnat in. Utan spel står
+//                 omgångens kvar; spel: null tar bort det
 //   POST /samtal {gor: "tips", id, vem, matcher: [id], tecken: {<matchid>: "1X"}, kommentarer: {<matchid>: "…"}, nyckel}
 //                 lämna in sina tips – ett tecken i varje match. matcher =
 //                 omgångens matcher som sidan visade dem. → {ok, samtal,
@@ -51,7 +56,7 @@
 // Lagringen är en nyckel per omgång och en per person (så att två som lämnar
 // in samtidigt inte skriver över varandra): på Cloudflare KV-bindningen
 // KUPONG, lokalt filer (server.js).
-//   samtal:aktuellt                  omgången {id, skapad, matcher: [{id, match, avspark}]}
+//   samtal:aktuellt                  omgången {id, skapad, matcher: [{id, match, avspark}], spel}
 //   samtal:<id>:tips:<vem>           {inne, ändrad, tecken, kommentarer, nyckel}
 //   samtal:<id>:utkast:<vem>         {sparad, tippat, matcher} – en sparad kupong som
 //                                    inte är inlämnad: bara antalet tippade
@@ -79,6 +84,13 @@ const fail = (status, error, extra = {}) => ({ status, body: { ok: false, error,
 
 // Datumet för omgångens första match i svensk tid, som kupongernas id.
 const swedishDate = (iso) => new Intl.DateTimeFormat('sv-SE', { timeZone: 'Europe/Stockholm', year: 'numeric', month: '2-digit', day: '2-digit' }).format(new Date(iso));
+
+// Stryktipsomgången som matcherna hämtades från, eller null.
+function gameOf(x) {
+  if (!x || typeof x !== 'object') return null;
+  const nr = Number(x.nr);
+  return x.namn === 'Stryktipset' && Number.isInteger(nr) && nr > 0 && nr < 1e6 ? { namn: 'Stryktipset', nr } : null;
+}
 
 // Första avsparken – senast då visas tipsen.
 const firstKick = (round) => Math.min(...round.matcher.map((m) => Date.parse(m.avspark)).filter(Number.isFinite));
@@ -120,6 +132,7 @@ export function publicView(round, tips, gang, now, own = false, drafts = {}) {
     skapad: round.skapad,
     ...(round['ändrad'] ? { 'ändrad': round['ändrad'] } : {}),
     matcher: round.matcher,
+    ...(round.spel ? { spel: round.spel } : {}),
     visas: Boolean(why),
     orsak: why,
     gang: gang.map((g) => ({ id: g.id, namn: g.namn, inne: tips[g.id] ? tips[g.id].inne : null, tippat: tippat(g.id) })),
@@ -128,7 +141,7 @@ export function publicView(round, tips, gang, now, own = false, drafts = {}) {
 }
 
 // Matcherna från sidan → omgångens matcher, med lag och avspark ur sajtens
-// matcher. Bara matcher som inte har startat.
+// matcher, i den ordning de valdes. Bara matcher som inte har startat.
 function roundMatches(list, matches, now) {
   if (!Array.isArray(list) || !list.length) return { errors: ['inga matcher'] };
   if (list.length > MATCHES_MAX) return { errors: [`högst ${MATCHES_MAX} matcher`] };
@@ -145,7 +158,6 @@ function roundMatches(list, matches, now) {
     if (m.completed || OFF.test(m.status || '') || !(Date.parse(m.kickoff) > now)) { errors.push(`${label} har redan startat`); continue; }
     out.push({ id, match: label, avspark: new Date(m.kickoff).toISOString() });
   }
-  out.sort((a, b) => a.avspark.localeCompare(b.avspark));
   return { rows: out, errors };
 }
 
@@ -183,10 +195,12 @@ export async function postRound(body, { store, gang, loadMatches, now = () => ne
     try { matches = await loadMatches(); } catch { return fail(503, 'Kan inte läsa matcherna från sajten just nu.'); }
     const v = roundMatches(b.matcher, matches, ms);
     if (v.errors.length) return fail(400, `Omgången har fel: ${v.errors.join(', ')}.`);
+    const spel = gameOf(b.spel);
     const next = {
-      id: `${swedishDate(v.rows[0].avspark)}-${newId()}`,
+      id: `${swedishDate(v.rows.map((m) => m.avspark).sort()[0])}-${newId()}`,
       skapad: t.toISOString(),
       matcher: v.rows,
+      ...(spel ? { spel } : {}),
     };
     // Den gamla omgången sparas under sitt id, så att tipsen går att para
     // ihop med matcherna efteråt. Visades dess tips står den också kvar i
@@ -235,7 +249,9 @@ export async function postRound(body, { store, gang, loadMatches, now = () => ne
     try { matches = await loadMatches(); } catch { return fail(503, 'Kan inte läsa matcherna från sajten just nu.'); }
     const v = roundMatches(b.matcher, matches, ms);
     if (v.errors.length) return fail(400, `Omgången har fel: ${v.errors.join(', ')}.`);
-    const next = { ...round, 'ändrad': t.toISOString(), matcher: v.rows };
+    const { spel: was, ...rest } = round;
+    const spel = b.spel === undefined ? gameOf(was) : gameOf(b.spel);
+    const next = { ...rest, 'ändrad': t.toISOString(), matcher: v.rows, ...(spel ? { spel } : {}) };
     await store.put(CURRENT, next);
     return ok({ samtal: publicView(next, tips, gang, ms, false, drafts) });
   }

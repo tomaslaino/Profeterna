@@ -372,6 +372,9 @@ button.sm-who:focus-visible { outline: 2px solid var(--ink); outline-offset: 1px
   .sm-sheet .pp-stop span { font-size: 8.5px; letter-spacing: 0.14em; }
   .sm-sheet .pp-stop b { font-size: 15px; }
   .sm-sheet .pp-band { margin-top: 10px; }
+  /* numret – som på Stryktipset – i hörnet före lagen */
+  .sm-r:not(.sm-hd) > .pp-nr { position: absolute; top: 9px; left: 4px; display: grid; width: 20px; height: 20px; font-size: 11px; }
+  .sm-r:not(.sm-hd) .sm-m { padding-left: 30px; }
 }
 /* i mobilen rullar loggraden undan och menyraden blir kvar */
 @media (max-width: 760px) { .sm-sheet { --sm-top: 58px; } }
@@ -430,6 +433,15 @@ button.sm-who:focus-visible { outline: 2px solid var(--ink); outline-offset: 1px
 /* oddset under varje ruta – fetstil där gängets kryss står */
 .sm-up .sm-c small { font-size: 10.5px; line-height: 1; text-align: center; color: var(--pp-ink-soft); font-variant-numeric: tabular-nums; }
 .sm-up .sm-c small.on { font-weight: 800; color: var(--pp-ink); }
+
+/* Svenska folket under oddset: andelen av raderna på Stryktipset, tryckt i
+   kupongens röda – grön och fet där modellen ger tecknet klart större chans
+   än folket spelar det (folket.js) */
+.sm-c small.sm-sf,
+.sm-up .sm-c small.sm-sf { font-size: 10px; font-weight: 600; color: var(--pp-print); letter-spacing: 0.02em; }
+.sm-c small.sm-sf-v,
+.sm-up .sm-c small.sm-sf-v { font-weight: 800; color: var(--pp-ok); }
+span.sm-c small.sm-sf { line-height: 1; text-align: center; font-variant-numeric: tabular-nums; }
 .sm-up button.sm-c { --ink: var(--pp-pen); }
 .sm-up button.sm-c:disabled { cursor: default; }
 .sm-up button.sm-c:disabled:hover .sm-bx { background: var(--pp-box); }

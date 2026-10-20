@@ -339,11 +339,19 @@
     return html;
   }
 
-  function slipRow(r, i, signs, fresh) {
+  // Matcherna står under sin dag när de kommer i datumordning. Annars – en
+  // kupong i Stryktipsets ordning över flera dagar – står veckodagen på
+  // raden i stället. kick(rad) → avsparken.
+  function inDayOrder(list, kick) {
+    const ks = list.map((r) => (kick(r) ? dayKey.format(new Date(kick(r))) : ''));
+    return ks.every((k, i) => !i || k >= ks[i - 1]);
+  }
+
+  function slipRow(r, i, signs, fresh, weekday = false) {
     const m = r.m;
     const label = m ? `${m.home} – ${m.away}` : r.label || `match ${r.id}`;
     const comp = m ? compOf(m.comp) : null;
-    const small = m ? `${esc(fTime.format(new Date(m.kickoff)))}${comp ? ` · <abbr title="${esc(comp.name)}">${esc(comp.short)}</abbr>` : ''}` : '';
+    const small = m ? `${esc((weekday ? fWeekdayTime : fTime).format(new Date(m.kickoff)))}${comp ? ` · <abbr title="${esc(comp.name)}">${esc(comp.short)}</abbr>` : ''}` : '';
     const sign = r.sign || '';
     let cells;
     if (signs && !r.locked) {
@@ -378,14 +386,17 @@
   }
 
   // Ritar papperet: rows [{id, m, label, sign, note, locked}] i
-  // avsparksordning, fields [[etikett, värde, title]] i foten. Med signs
-  // kryssas tecknen på papperet. max: så många matcher ska kupongen ha.
-  // Raden som just lagts till trycks fram.
-  function slip(id, { rows, signs = false, fields = [], max = 0 }) {
+  // avsparksordning – eller, med ordered, i den ordning de kommer (omgångens
+  // kupong: i den ordning matcherna valdes, som numren på Stryktipset) –
+  // fields [[etikett, värde, title]] i foten. Med signs kryssas tecknen på
+  // papperet. max: så många matcher ska kupongen ha. Raden som just lagts
+  // till trycks fram.
+  function slip(id, { rows, signs = false, fields = [], max = 0, ordered = false }) {
     const root = document.getElementById(id);
     if (!root) return;
     root.classList.toggle('pb-signs', signs);
-    const list = rows.slice().sort((a, b) => (a.m ? Date.parse(a.m.kickoff) : 0) - (b.m ? Date.parse(b.m.kickoff) : 0));
+    const list = ordered ? rows.slice() : rows.slice().sort((a, b) => (a.m ? Date.parse(a.m.kickoff) : 0) - (b.m ? Date.parse(b.m.kickoff) : 0));
+    const days = inDayOrder(list, (r) => r.m && r.m.kickoff);
     const was = B.ids;
     B.ids = new Set(list.map((r) => r.id));
     const added = was ? list.filter((r) => !was.has(r.id)).map((r) => r.id) : [];
@@ -407,11 +418,11 @@
     let day = null;
     list.forEach((r, i) => {
       const k = r.m ? dayKey.format(new Date(r.m.kickoff)) : 'okänd';
-      if (k !== day) {
+      if (days && k !== day) {
         day = k;
         html += `<p class="pp-day">${esc(r.m ? cap(fDay.format(new Date(r.m.kickoff))) : 'Okänt datum')}</p>`;
       }
-      html += slipRow(r, i, signs, added.includes(r.id));
+      html += slipRow(r, i, signs, added.includes(r.id), !days);
     });
     for (let i = n; i < RADER; i++) html += blankRow(i);
     const box = root.querySelector('.pb-rows');
@@ -441,5 +452,5 @@
     }
   }
 
-  window.Papper = { RADER, coupon, builder, reveal, program, slip, bump, open: pull, cross, ring, tick, grade, result, foot };
+  window.Papper = { RADER, coupon, builder, reveal, program, slip, bump, open: pull, cross, ring, tick, grade, result, foot, inDayOrder };
 }());
