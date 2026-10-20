@@ -849,7 +849,12 @@
     return '<div class="card sm-teaser">' +
       '<div><p class="kp-eyebrow">Omgångens kupong</p>' +
       `<h2 class="page-title"><a href="#kupong">${esc(title)}</a></h2>${line}</div>` +
-      '<div class="sm-folk">' + s.gang.map((g) => `<span class="sm-person${g.inne ? ' inne' : ''}">${chip(g.id)}<span>${g.inne ? '✓' : open ? '…' : '–'}</span></span>`).join('') + '</div>' +
+      // Samma som Vem är du under Omgången: bock, tre prickar, guldram för dig.
+      '<div class="sm-folk">' + s.gang.map((g) => {
+        const st = g.inne ? 'inne' : open ? 'fyller i' : 'lämnade inte in';
+        return `<span class="sm-person ${g.inne ? 'inne' : 'ute'}${g.id === v ? ' du' : ''}" title="${esc(`${g.namn} · ${st}`)}">` +
+          `${chip(g.id)}${g.inne ? CHECK : open ? DOTS : ''}</span>`;
+      }).join('') + '</div>' +
       `<a class="kp-btn primary" href="${href}">${go}</a></div>`;
   }
 

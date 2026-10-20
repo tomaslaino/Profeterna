@@ -41,9 +41,14 @@
 .sm-person.ute { padding-right: 10px; }
 .sm-person b { color: var(--fg); }
 .sm-folk-board { margin-bottom: 14px; }
+/* förstasidan: bara bock eller prickar, som Vem är du */
+.sm-teaser .sm-person { padding-right: 10px; }
+.sm-person.du { color: var(--fg); border-color: var(--gold); background: rgba(216, 176, 106, 0.1); }
+/* bara initialerna: lika mycket luft runt om */
+.sm-person:not(:has(> :nth-child(2))), .sm-vem button:not(:has(> :nth-child(2))) { padding-right: 5px; }
 
-/* bock = inne, tre prickar = fyller i */
-.sm-ok { width: 15px; height: 15px; fill: none; stroke: var(--fresh); stroke-width: 2.2; stroke-linecap: round; stroke-linejoin: round; }
+/* bock = inne, tre prickar = fyller i – lika breda, så att pillren blir det */
+.sm-ok { width: 18px; height: 15px; fill: none; stroke: var(--fresh); stroke-width: 2.2; stroke-linecap: round; stroke-linejoin: round; }
 .sm-dots { display: inline-flex; gap: 3px; }
 .sm-dots i { width: 4px; height: 4px; border-radius: 50%; background: var(--muted); animation: sm-dot 1.4s ease-in-out infinite; }
 .sm-dots i:nth-child(2) { animation-delay: 0.2s; }
