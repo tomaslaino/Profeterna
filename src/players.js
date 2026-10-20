@@ -4,7 +4,8 @@
 // FPL (bara Premier League: skadelistan och speltid, xG/xA, försvarsspel, pris
 // och poäng per spelare), ESPN:s matchrapporter (målen i alla fyra ligor,
 // speltiden i Championship, League One och League Two) och 365Scores (betygen
-// per match). Allt räknas ur cachen vid bygget; inget här styr prognoserna.
+// per match och spelarnas bilder). Allt räknas ur cachen vid bygget; inget här
+// styr prognoserna.
 //
 // Principer som i resten av appen: spelare utan statistik är okända, inte
 // nollor, och topplistor med kvoter (mål per skott, räddningsprocent) kräver
@@ -326,6 +327,50 @@ function ratingsIndex(compId, teams) {
   };
 }
 
+// Bilderna ur 365Scores-trupperna (s365_squads_<liga>): [athleteId,
+// imageVersion] per ESPN-spelare, bara för dem som har en bild (version över
+// 1). Kopplingen görs inom laget som för betygen: hela namnet, sedan samma
+// födelsedatum och ett gemensamt namn eller tröjnummer, sedan efternamn och
+// förnamnets initial, sist samma tröja och ett gemensamt namn – och bara när
+// träffen är entydig. Den som inte går att koppla får ingen bild.
+function photosIndex(compId, teams) {
+  const c = readCache(`s365_squads_${compId}`);
+  if (!c || !c.data || !c.data.teams) return null;
+  const out = new Map();
+  let of = 0;
+  for (const t of teams) {
+    const sq = c.data.teams[t.espnId];
+    const pool = sq ? sq.a.map(([aid, name, jersey, dob, v]) => ({ aid, q: pname(name).split(' '), jersey, dob, v })) : [];
+    const used = new Set();
+    const pick = (test) => {
+      const free = pool.filter((x) => !used.has(x) && test(x));
+      return free.length === 1 ? free[0] : null;
+    };
+    const left = [];
+    const take = (p, hit) => {
+      used.add(hit);
+      if (hit.v > 1) out.set(p.id, [hit.aid, hit.v]);
+    };
+    for (const p of t.players) {
+      of++;
+      const full = pname(p.name);
+      const hit = pick((x) => x.q.join(' ') === full);
+      if (hit) take(p, hit); else left.push(p);
+    }
+    for (const p of left) {
+      const parts = pname(p.name).split(' ');
+      const last = parts[parts.length - 1];
+      const shared = (x) => x.q.some((w) => w.length > 2 && parts.includes(w));
+      const sameShirt = (x) => p.jersey && String(x.jersey) === String(p.jersey);
+      const hit = (p.dob && pick((x) => x.dob === p.dob && (shared(x) || sameShirt(x))))
+        || pick((x) => x.q[x.q.length - 1] === last && x.q[0][0] === parts[0][0])
+        || pick((x) => sameShirt(x) && (shared(x) || x.q[x.q.length - 1].slice(0, 2) === last.slice(0, 2)));
+      if (hit) take(p, hit);
+    }
+  }
+  return { map: out, matched: out.size, of, fetchedAt: c.fetchedAt };
+}
+
 // Målen ur matchrapporterna (espn_minutes_<liga>, alla fyra ligor): sorten,
 // när de kom och vad de betydde för resultatet. Som speltiden räknas de för
 // spelarens första `app` matcher i laget – samma matcher som målen i truppen –
@@ -481,14 +526,16 @@ function divisionPlayers(compId) {
     const r = ratings && ratings.map.get(p.id);
     return r ? { rt: r.rt, rn: r.rn, rb: r.rb } : null;
   };
+  const photos = photosIndex(compId, d.teams);
+  const ph = (p) => (photos && photos.map.has(p.id) ? { ph: photos.map.get(p.id) } : null);
   const rows = [];
   const all = [];
   for (const t of d.teams) {
     for (const p of t.players) {
       if (played(p)) rows.push({ ...row(p, t, fx), ...rat(p) });
       all.push(p.stats
-        ? { ...row(p, t, fx), ...emin(p), ...gk(p), ...(goalTypes && goalTypes.map.get(p.id)), ...rat(p) }
-        : { ...bare(p, t), ...(fx && fx.get(p.id)), ...rat(p) });
+        ? { ...row(p, t, fx), ...emin(p), ...gk(p), ...(goalTypes && goalTypes.map.get(p.id)), ...rat(p), ...ph(p) }
+        : { ...bare(p, t), ...(fx && fx.get(p.id)), ...rat(p), ...ph(p) });
     }
   }
 
@@ -584,6 +631,8 @@ function divisionPlayers(compId) {
     ratings: ratings
       ? { provider: '365Scores', fetchedAt: ratings.fetchedAt, matched: ratings.matched, of: ratings.of, games: ratings.games, played: ratings.played }
       : null,
+    // Bilderna i spelarkortet. matched av of = spelare i truppen med bild.
+    photos: photos ? { provider: '365Scores', fetchedAt: photos.fetchedAt, matched: photos.matched, of: photos.of } : null,
     thresholds: {
       minShotsConversion: MIN_SHOTS_CONVERSION, minShareKeeper: MIN_SHARE_KEEPER, minMinutesP90: MIN_MINUTES_P90,
       minRated: MIN_RATED, minShareRated: MIN_SHARE_RATED, top: TOP,

@@ -529,6 +529,26 @@ dialog.dv-modal::backdrop { background: rgba(4, 9, 18, 0.62); backdrop-filter: b
   font-variant-numeric: lining-nums;
 }
 .dv-avatar.team { border-radius: 16px; font-size: 19px; }
+/* Spelarens bild (365Scores, ljus bakgrund) i samma guldring, något större än
+   märket; tröjnumret i hörnet. Utan bild står märket som förut. */
+.dv-avatar.photo { position: relative; width: 76px; height: 76px; background: var(--bone, #f3ead9); }
+.dv-avatar.photo img { display: block; width: 100%; height: 100%; border-radius: 50%; object-fit: cover; }
+.dv-avatar.photo span { display: none; }
+.dv-avatar.photo span.dv-shirt {
+  position: absolute;
+  right: -5px;
+  bottom: -3px;
+  display: grid;
+  place-items: center;
+  min-width: 26px;
+  height: 26px;
+  padding: 0 6px;
+  border-radius: 13px;
+  border: 1.5px solid color-mix(in srgb, var(--gold, var(--accent)) 55%, transparent);
+  background: var(--card, var(--bg));
+  font-size: 13px;
+  line-height: 1;
+}
 
 /* skadad, avstängd eller tveksam – direkt under huvudet */
 .dv-avail {
@@ -696,6 +716,8 @@ button.dv-meter-row:hover { background: var(--hair); }
   .dv-mhead h3 { font-size: 21px; }
   .dv-avatar { width: 48px; height: 48px; font-size: 20px; }
   .dv-avatar.team { border-radius: 14px; font-size: 17px; }
+  .dv-avatar.photo { width: 64px; height: 64px; }
+  .dv-avatar.photo span.dv-shirt { min-width: 24px; height: 24px; font-size: 12px; }
   .dv-kpis > div { padding: 12px 4px 11px; }
   .dv-kpis b { font-size: 24px; }
   .dv-kpis > div > span { font-size: 9.5px; letter-spacing: 0.08em; }

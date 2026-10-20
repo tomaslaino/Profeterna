@@ -962,11 +962,19 @@ function selectMtab(id, focus) {
 const divName = () => state.data.divisions.find((x) => x.id === state.div).name;
 
 // Huvudet: märket (tröjnummer eller lagets två första bokstäver), namnet och
-// underrader som redan är escapade.
-function mhead(badge, title, subs, cls = '') {
-  return '<div class="dv-mhead">' + (badge ? `<div class="dv-avatar${cls}">${esc(badge)}</div>` : '') +
+// underrader som redan är escapade. Med photo står spelarens bild i ringen och
+// tröjnumret i hörnet; går bilden inte att ladda blir det märket som förut.
+function mhead(badge, title, subs, cls = '', photo = '') {
+  const shirt = /^\d+$/.test(badge || '') ? ' class="dv-shirt"' : '';
+  const av = photo
+    ? `<div class="dv-avatar photo${cls}"><img src="${esc(photo)}" alt="" onerror="this.parentNode.classList.remove('photo');this.remove()"><span${shirt}>${esc(badge)}</span></div>`
+    : badge ? `<div class="dv-avatar${cls}">${esc(badge)}</div>` : '';
+  return '<div class="dv-mhead">' + av +
     `<div><h3>${esc(title)}</h3>${subs.filter(Boolean).map((s) => `<p>${s}</p>`).join('')}</div></div>`;
 }
+
+// Spelarens bild hos 365Scores ([athleteId, imageVersion] ur spelarfilen).
+const photoUrl = (ph) => (ph ? `https://imagecache.365scores.com/image/upload/f_png,w_100,h_100,c_limit,q_auto:eco,dpr_2/v${ph[1]}/Athletes/${ph[0]}` : '');
 
 // Nyckeltalen: högst fyra, [värde (html), etikett, förklaring].
 function kpis(list) {
@@ -1029,7 +1037,7 @@ function openPlayer(id) {
   let html = mhead(initials, p.name, [
     [p.team, POS[p.pos]].filter(Boolean).map(esc).join(' · '),
     [natSv(p.nat), p.age != null ? `${p.age} år` : null].filter(Boolean).map(esc).join(' · '),
-  ]);
+  ], '', photoUrl(p.ph));
 
   // Skadad, avstängd eller tveksam: överst, i FPL:s ord (på svenska).
   if (avail && !avail.unknown) {
