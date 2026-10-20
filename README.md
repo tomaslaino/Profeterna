@@ -1034,7 +1034,10 @@ under omgången.
 **Gången**
 
 1. **Skapa kupong** (*Kupong → Skapa kupong* eller *+ Ny kupong*, `#kupong/samtal/ny`):
-   någon väljer matcherna (samma sökning och tävlingsfilter som Ny kupong). Ingen tid för
+   någon väljer kupongens tretton matcher (samma sökning och tävlingsfilter som Ny kupong).
+   Kupongen bredvid programmet har tretton tryckta rader som fylls i uppifrån; när den är
+   full tonas plustecknen ner, och *Skapa kupongen* (och *Spara matcherna*) kräver precis
+   tretton. Papperet i Ny kupong har samma tretton rader men inget krav. Ingen tid för
    uppgörelsen behövs – tipsen visas av sig själva (punkt 4). En åt gången; fylls en i (någon match har inte startat) frågar sidan
    först *Ersätt den*. *Ändra matcherna* går tills någon har lämnat in. Den gamla vägen –
    gängets kupong direkt – finns kvar under länken *Eller gör gängets kupong direkt*.

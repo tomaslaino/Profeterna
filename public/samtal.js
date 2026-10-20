@@ -723,8 +723,9 @@
   // ---------- skapa omgångens kupong och ändra matcherna ----------
 
   // Programmet till vänster och omgångens kupong på papper bredvid, som får
-  // en rad för varje vald match (Papper.builder i papper.js). Rutorna står
-  // tomma tills var och en fyller i sin kupong.
+  // en rad för varje vald match (Papper.builder i papper.js). Kupongen har
+  // tretton matcher (Papper.RADER). Rutorna står tomma tills var och en
+  // fyller i sin kupong.
   function renderStart(edit) {
     const s = SM.data;
     // Matcherna står fast när någon har lämnat in.
@@ -770,7 +771,11 @@
       if (!b) return;
       const id = b.dataset.add || b.dataset.drop;
       if (b.dataset.drop || SM.pick.ids.has(id)) SM.pick.ids.delete(id);
-      else SM.pick.ids.add(id);
+      else if (SM.pick.ids.size >= Papper.RADER) {
+        $('#sm-msg').innerHTML = '<span class="note">Kupongen är full.</span>';
+        Papper.bump('sm-build');
+        return;
+      } else SM.pick.ids.add(id);
       $('#sm-msg').innerHTML = '';
       pickList();
     });
@@ -794,16 +799,18 @@
     const list = SM.allDays || q ? all : all.filter((m) => ids.has(m.id) || dayKey.format(new Date(m.kickoff)) <= end);
     const later = all.length - list.length;
     const more = later ? `<button type="button" class="earlier" id="sm-more">Visa fler dagar <span class="n">${later}</span></button>` : '';
-    $('#sm-pick-list').innerHTML = (list.length ? Papper.program(list, (id) => ids.has(id))
+    $('#sm-pick-list').innerHTML = (list.length ? Papper.program(list, (id) => ids.has(id), ids.size >= Papper.RADER)
       : `<p class="empty">${later ? 'Inga matcher den närmaste omgången.' : 'Inga matcher hittades.'}</p>`) + more;
-    Papper.slip('sm-build', { rows: [...ids].map((id) => ({ id, m: matchById(id) })) });
+    Papper.slip('sm-build', { rows: [...ids].map((id) => ({ id, m: matchById(id) })), max: Papper.RADER });
   }
 
   async function startRound(edit, ersatt = null) {
     const msg = (h) => { $('#sm-msg').innerHTML = h; };
     const ids = [...SM.pick.ids];
-    if (!ids.length) {
-      msg('<span class="note">Välj minst en match.</span>');
+    const left = Papper.RADER - ids.length;
+    if (left) {
+      msg(`<span class="note">${left > 0 ? `Välj ${plural(left, 'match', 'matcher')} till.` : `Ta bort ${plural(-left, 'match', 'matcher')}.`}</span>`);
+      Papper.bump('sm-build');
       return;
     }
     const btn = $('#sm-start');

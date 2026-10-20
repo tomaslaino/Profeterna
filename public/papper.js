@@ -238,7 +238,12 @@
   // lyssnar på hela byggets id: button[data-add] i programmet,
   // button[data-drop] (ta bort) och – med tecken – button[data-s] och
   // input[data-note] på papperet.
+  //
+  // Papperet har tretton tryckta rader som en tipskupong; de valda matcherna
+  // fylls i uppifrån och resten står tomma. Omgångens kupong ska ha precis
+  // så många matcher (samtal.js).
 
+  const RADER = 13;
   const B = { ids: null }; // raderna som stod på papperet förra gången, för att se vilken som är ny
 
   function builder({ id, list, tools = '', head = '', foot = '' }) {
@@ -248,12 +253,24 @@
       '<div class="pb-head">' +
       '<p class="pp-brand"><img src="logo.svg" alt="" width="20" height="20">Matchfixarna<span>Kupong</span></p>' +
       '<h2 class="pp-title pb-title"></h2>' +
-      `<p class="pp-meta"><span class="pb-count"></span>${head}</p></div>` +
+      `<p class="pp-meta"><span class="pb-count"></span>${head}</p>` +
+      '<div class="pp-stop pb-stop"><span>Spelstopp</span><b></b></div></div>' +
       '<div class="pp-band" aria-hidden="true"></div>' +
       '<div class="pb-rows"></div>' +
       `<div class="pb-foot"><div class="pp-fields pb-fields"></div>${foot}</div>` +
       '</div></div></aside></div>';
   }
+
+  // Papperet räcker ner till fönstrets nederkant, också innan det har fastnat
+  // under toppraden, så att knappen längst ner alltid syns.
+  function fit() {
+    const slip = document.querySelector('.pb-slip');
+    if (!slip) return;
+    const top = parseFloat(getComputedStyle(slip.closest('.pb')).getPropertyValue('--pb-top')) || 0;
+    slip.style.maxHeight = `${Math.max(320, window.innerHeight - Math.max(top, slip.getBoundingClientRect().top) - 18)}px`;
+  }
+  window.addEventListener('scroll', fit, { passive: true });
+  window.addEventListener('resize', fit);
 
   // Rullar papperet (inte sidan) så att raden syns.
   function reveal(id, sel) {
@@ -266,8 +283,9 @@
     }
   }
 
-  // Programmet: de valbara matcherna per dag, en knapp per match.
-  function program(matches, isOn) {
+  // Programmet: de valbara matcherna per dag, en knapp per match. full: alla
+  // rader på papperet är ifyllda, så plustecknen tonas ner.
+  function program(matches, isOn, full = false) {
     const days = new Map();
     for (const m of matches) {
       const k = dayKey.format(new Date(m.kickoff));
@@ -280,7 +298,7 @@
       for (const m of ms) {
         const on = isOn(m.id);
         const comp = compOf(m.comp);
-        html += `<button type="button" class="kp-pick pb-pick${on ? ' on' : ''}" data-add="${esc(m.id)}" aria-pressed="${on}">` +
+        html += `<button type="button" class="kp-pick pb-pick${on ? ' on' : ''}" data-add="${esc(m.id)}" aria-pressed="${on}"${full && !on ? ' aria-disabled="true"' : ''}>` +
           `<span class="mtime">${esc(fTime.format(new Date(m.kickoff)))}</span>` +
           `<span class="ctag" title="${esc(comp.name)}">${esc(comp.short)}</span>` +
           `<span class="mteams">${esc(m.home)}<span class="vs">–</span>${esc(m.away)}</span>` +
@@ -322,20 +340,31 @@
       note + '</div>';
   }
 
+  // En tom rad: numret, en linje att skriva matchen på och tomma rutor.
+  function blankRow(i) {
+    return `<div class="pb-row pb-blank${i % 2 ? ' alt' : ''}" aria-hidden="true">` +
+      `<span class="pp-nr">${i + 1}</span><span class="pb-line"></span><span class="pp-signs">` +
+      SIGNS.map((s) => `<span class="pp-cell"><span class="pp-box"><i>${s}</i></span></span>`).join('') + '</span><span></span></div>';
+  }
+
   // Ritar papperet: rows [{id, m, label, sign, note, locked}] i
   // avsparksordning, fields [[etikett, värde, title]] i foten. Med signs
-  // kryssas tecknen på papperet. Raden som just lagts till trycks fram.
-  function slip(id, { rows, signs = false, fields = [] }) {
+  // kryssas tecknen på papperet. max: så många matcher ska kupongen ha.
+  // Raden som just lagts till trycks fram.
+  function slip(id, { rows, signs = false, fields = [], max = 0 }) {
     const root = document.getElementById(id);
     if (!root) return;
+    root.classList.toggle('pb-signs', signs);
     const list = rows.slice().sort((a, b) => (a.m ? Date.parse(a.m.kickoff) : 0) - (b.m ? Date.parse(b.m.kickoff) : 0));
     const was = B.ids;
     B.ids = new Set(list.map((r) => r.id));
     const added = was ? list.filter((r) => !was.has(r.id)).map((r) => r.id) : [];
     const kicks = list.filter((r) => r.m).map((r) => Date.parse(r.m.kickoff));
+    const open = list.filter((r) => r.m && !r.locked).map((r) => Date.parse(r.m.kickoff));
     const n = list.length;
     root.querySelector('.pb-title').innerHTML = kicks.length ? esc(dateRange(Math.min(...kicks), Math.max(...kicks))) : '<span class="pb-blankline"></span>';
-    root.querySelector('.pb-count').textContent = `${n} ${n === 1 ? 'match' : 'matcher'}`;
+    root.querySelector('.pb-count').textContent = max ? `${n} av ${max} matcher` : `${n} ${n === 1 ? 'match' : 'matcher'}`;
+    root.querySelector('.pb-stop b').innerHTML = open.length ? esc(fWeekdayTime.format(new Date(Math.min(...open)))) : '<span class="pb-blankline"></span>';
     let html = '';
     let day = null;
     list.forEach((r, i) => {
@@ -346,8 +375,7 @@
       }
       html += slipRow(r, i, signs, added.includes(r.id));
     });
-    // Tomt papper: några otryckta rader att fylla.
-    if (!n) html = '<div class="pb-empty" aria-hidden="true">' + [1, 2, 3].map((i) => `<div class="pb-row"><span class="pp-nr">${i}</span><span class="pb-line"></span></div>`).join('') + '</div>';
+    for (let i = n; i < RADER; i++) html += blankRow(i);
     const box = root.querySelector('.pb-rows');
     // Fokus i en anteckning behålls: fältet ritas om bara om raderna ändrats.
     const keep = document.activeElement && box.contains(document.activeElement) && document.activeElement.matches('input') ? document.activeElement.dataset.note : null;
@@ -361,12 +389,19 @@
     if (added.length) {
       // Den nya raden rullas fram på papperet, och antalet studsar.
       reveal(id, `.pb-row[data-id="${CSS.escape(added[added.length - 1])}"]`);
-      const count = root.querySelector('.pb-count');
-      count.classList.remove('pb-bump');
-      void count.offsetWidth;
-      count.classList.add('pb-bump');
+      bump(id);
     }
+    fit();
   }
 
-  window.Papper = { coupon, fill, builder, reveal, program, slip };
+  // Antalet matcher studsar.
+  function bump(id) {
+    const count = document.querySelector(`#${id} .pb-count`);
+    if (!count) return;
+    count.classList.remove('pb-bump');
+    void count.offsetWidth;
+    count.classList.add('pb-bump');
+  }
+
+  window.Papper = { RADER, coupon, fill, builder, reveal, program, slip, bump };
 }());

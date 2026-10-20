@@ -557,7 +557,7 @@ a.pp-row:focus-visible { outline: 2px solid var(--pp-pen); outline-offset: -2px;
 .pb {
   --pb-top: 78px;
   display: grid;
-  grid-template-columns: minmax(0, 1fr) minmax(360px, 430px);
+  grid-template-columns: repeat(2, minmax(0, 1fr));
   grid-template-rows: auto 1fr;
   grid-template-areas: "tools side" "prog side";
   column-gap: 28px;
@@ -574,7 +574,13 @@ a.pp-row:focus-visible { outline: 2px solid var(--pp-pen); outline-offset: -2px;
   padding: 24px 20px 20px 40px;
 }
 .pb-slip .pp-band { flex: none; margin: 12px 0 2px; }
-.pb-head { position: relative; flex: none; }
+/* huvudet som på den färdiga kupongen: spelstoppet i hörnet */
+.pb-head { position: relative; flex: none; display: grid; grid-template-columns: minmax(0, 1fr) auto; column-gap: 14px; align-items: center; }
+.pb-head > * { grid-column: 1; }
+.pb-head > .pp-brand { grid-column: 1 / -1; }
+.pb-stop { grid-column: 2; grid-row: 2 / span 2; margin-top: 8px; padding: 7px 12px 8px; }
+.pb-stop b { min-height: 26px; font-size: 19px; white-space: nowrap; }
+.pb-stop .pb-blankline { width: 70px; height: 22px; }
 .pb-title { min-height: 34px; margin-top: 8px; font-size: 34px; }
 .pb-blankline { display: inline-block; width: 62%; height: 30px; border-bottom: 1.5px dotted var(--pp-print-line); vertical-align: bottom; }
 .pb-count { display: inline-block; font-weight: 700; color: var(--pp-ink); }
@@ -618,8 +624,8 @@ a.pp-row:focus-visible { outline: 2px solid var(--pp-pen); outline-offset: -2px;
   grid-template-columns: 24px minmax(0, 1fr) auto 24px;
   column-gap: 10px;
   align-items: center;
-  min-height: 56px;
-  padding: 7px 0 6px 6px;
+  min-height: 50px;
+  padding: 6px 0 5px 6px;
   border-bottom: 1px solid var(--pp-print-line);
 }
 .pb-row.alt { background: var(--pp-print-tint); }
@@ -635,8 +641,6 @@ a.pp-row:focus-visible { outline: 2px solid var(--pp-pen); outline-offset: -2px;
 }
 .pb-match { min-width: 0; }
 .pb-row .pp-tm { font-size: 14px; line-height: 1.25; }
-/* hemmalaget och bortalaget på var sin rad */
-.pb-row .pp-tm .vs { display: block; height: 0; overflow: hidden; }
 .pb-row .pp-small { margin-top: 2px; }
 .pb-row .kp-tg { gap: 5px; }
 .pb-row .kp-note-in, .pb-row .pp-note { grid-column: 2 / -1; }
@@ -667,9 +671,14 @@ a.pp-row:focus-visible { outline: 2px solid var(--pp-pen); outline-offset: -2px;
   from { opacity: 0; transform: translateY(-8px); background-color: rgba(169, 69, 43, 0.18); }
   55% { opacity: 1; transform: none; background-color: rgba(169, 69, 43, 0.12); }
 }
-/* tomt papper: otryckta rader */
-.pb-empty .pp-nr { opacity: 0.35; }
-.pb-line { grid-column: 2 / -1; height: 20px; margin-right: 8px; border-bottom: 1.5px dotted var(--pp-print-line); }
+/* tomma rader: en linje att skriva matchen på och tomma rutor, i samma
+   spalter som de ifyllda */
+.pb-line { height: 22px; border-bottom: 1.5px dotted var(--pp-print-line); }
+/* med tecken: rutorna lika stora som knapparna, med plats för oddset under */
+.pb-signs .pb-blank .pp-signs { gap: 5px; }
+.pb-signs .pb-blank .pp-cell { width: 36px; }
+.pb-signs .pb-blank .pp-box { width: 32px; height: 32px; }
+.pb-signs .pb-blank .pp-cell::after { content: ""; height: 13px; }
 
 .pb-foot { flex: none; display: flex; flex-wrap: wrap; align-items: center; gap: 10px; margin-top: 14px; }
 .pp-fields.pb-fields { flex: 1 1 auto; gap: 8px; }
@@ -685,6 +694,8 @@ a.pp-row:focus-visible { outline: 2px solid var(--pp-pen); outline-offset: -2px;
   border-radius: 5px;
   box-shadow: 0 1px 0 rgba(0, 0, 0, 0.18), inset 0 1px 0 rgba(255, 255, 255, 0.18);
 }
+/* utan fält i foten: knappen över hela bredden */
+.pb-fields:empty + .kp-btn.primary { flex: 1 1 100%; justify-content: center; margin-left: 0; }
 .pb-foot .kp-btn.primary:hover { color: var(--pp-paper); background: #8f3a24; }
 .pb-foot .kp-btn.primary:disabled { opacity: 0.55; cursor: default; }
 .pb-msg { flex: 1 1 100%; margin: 0; font-size: 12.5px; color: var(--pp-ink-soft); }
@@ -720,33 +731,48 @@ a.pp-row:focus-visible { outline: 2px solid var(--pp-pen); outline-offset: -2px;
 }
 .pb-pick:hover .pb-tick { color: var(--fg); border-color: var(--pill-line-hi); }
 .pb-pick.on .pb-tick { color: #1d1509; border-color: transparent; background: var(--gold-grad); }
+/* kupongen är full: plustecknen tonas ner */
+.pb-pick[aria-disabled="true"] { cursor: default; }
+.pb-pick[aria-disabled="true"]:hover { background: transparent; }
+.pb-pick[aria-disabled="true"] .pb-tick { color: var(--muted); border-color: var(--pill-line); opacity: 0.35; }
 
-/* smalare skärmar: papperet i en smalare spalt, rutorna under lagen */
+/* smalare skärmar: rutorna under lagen */
 @media (max-width: 899px) {
-  .pb { grid-template-columns: minmax(0, 1fr) minmax(0, 0.9fr); grid-template-areas: "tools tools" "prog side"; column-gap: 14px; }
+  .pb { grid-template-areas: "tools tools" "prog side"; column-gap: 14px; }
   .pp.pb-slip { --pp-hole: 4px; padding: 18px 12px 16px 28px; }
   .pb-slip .pp-band { height: 14px; margin: 10px 0 2px; background-size: 11px 11px; }
   .pb-title { min-height: 0; margin-top: 6px; font-size: 26px; }
   .pb-blankline { height: 22px; }
   .pb-head .pp-meta { gap: 4px 10px; margin-top: 6px; }
+  .pb-stop { margin-top: 6px; padding: 5px 9px 6px; }
+  .pb-stop span { font-size: 8.5px; letter-spacing: 0.14em; }
+  .pb-stop b { min-height: 20px; font-size: 15px; }
+  .pb-stop .pb-blankline { width: 54px; height: 18px; }
   .pb-name { flex-basis: 100%; max-width: none; font-size: 21px; }
   .pb-rows { margin: 0 -6px 0 -28px; padding: 0 6px 0 28px; }
-  .pb-row { grid-template-columns: minmax(0, 1fr) 24px; row-gap: 5px; min-height: 0; padding: 7px 0 7px 2px; }
+  /* lagen överst, numret och rutorna under */
+  .pb-row {
+    grid-template-columns: auto minmax(0, 1fr) 24px;
+    grid-template-areas: "m m d" "n s s";
+    column-gap: 8px;
+    row-gap: 5px;
+    min-height: 0;
+    padding: 7px 0 7px 2px;
+  }
   .pb-row::before { top: 16px; left: -21px; width: 11px; height: 5px; margin-top: 0; }
-  .pb-row .pp-nr { display: none; }
+  .pb-match, .pb-line { grid-area: m; }
+  .pb-row .pp-nr { grid-area: n; display: grid; width: 20px; height: 20px; font-size: 11px; }
+  .pb-signs .pb-row .pp-nr { align-self: start; margin-top: 6px; }
   .pb-row .pp-tm { font-size: 13px; }
+  /* hemmalaget och bortalaget på var sin rad */
+  .pb-row .pp-tm .vs { display: block; height: 0; overflow: hidden; }
   .pb-row .pp-small { font-size: 10.5px; }
-  .pb-drop { grid-column: 2; grid-row: 1; align-self: start; }
-  /* rutorna på en egen rad under lagen */
-  .pb-row .kp-tg, .pb-row .pp-signs { grid-column: 1 / -1; grid-row: 2; justify-self: start; }
+  .pb-drop { grid-area: d; align-self: start; }
+  .pb-row .kp-tg, .pb-row .pp-signs { grid-area: s; justify-self: start; }
   .pb-row .kp-note-in, .pb-row .pp-note { grid-column: 1 / -1; }
   .pb-row .kp-note-in { margin-top: 0; font-size: 18px; }
   .pb-row .pp-box { width: 24px; height: 24px; }
   .pb-row .pp-box i { font-size: 12px; }
-  .pb-empty .pb-row { grid-template-columns: 22px minmax(0, 1fr); padding-block: 9px; }
-  .pb-empty .pp-nr { display: grid; width: 20px; height: 20px; font-size: 11px; }
-  .pb-empty .pb-line { grid-column: 2; }
-  .pb-empty .pb-row::before { top: 50%; margin-top: -2.5px; }
   .pb-foot { gap: 8px; margin-top: 12px; }
   .pb-fields .pp-field { flex: 1 1 0; padding: 3px 7px 4px; }
   .pb-fields .pp-field > span { font-size: 8.5px; letter-spacing: 0.12em; }
@@ -770,10 +796,13 @@ a.pp-row:focus-visible { outline: 2px solid var(--pp-pen); outline-offset: -2px;
   .pb-head .pp-brand span { padding-left: 0; font-size: 9.5px; letter-spacing: 0.16em; border-left: 0; }
   .pb-title { font-size: 21px; }
   .pb-head .pp-meta { font-size: 12px; }
+  .pb-stop { display: none; }
   .pb-name { font-size: 19px; }
   .pb-rows { margin-left: -20px; padding-left: 20px; margin-right: -4px; padding-right: 4px; }
   .pb-row::before { left: -15px; width: 8px; height: 4px; top: 15px; }
-  .pb-row { grid-template-columns: minmax(0, 1fr) 20px; padding-left: 0; }
+  .pb-row { grid-template-columns: auto minmax(0, 1fr) 20px; column-gap: 6px; padding-left: 0; }
+  .pb-row .pp-nr { width: 18px; height: 18px; font-size: 10px; }
+  .pb-signs .pb-row .pp-nr { margin-top: 4.5px; }
   .pb-rows .pp-day { margin-top: 8px; padding: 4px 2px 3px; font-size: 9px; letter-spacing: 0.1em; }
   .pb-row .pp-tm { font-size: 12.5px; }
   .pb-drop { width: 20px; height: 20px; }
@@ -787,6 +816,10 @@ a.pp-row:focus-visible { outline: 2px solid var(--pp-pen); outline-offset: -2px;
   .pb-row .pp-signs { gap: 4px; }
   .pb-row .pp-box { width: 21px; height: 21px; }
   .pb-row .pp-box i { font-size: 11px; }
+  .pb-signs .pb-blank .pp-signs { gap: 3px; }
+  .pb-signs .pb-blank .pp-cell { width: 30px; }
+  .pb-signs .pb-blank .pp-box { width: 27px; height: 27px; }
+  .pb-signs .pb-blank .pp-cell::after { height: 11px; }
   .pb-foot .kp-btn.primary { padding: 9px 8px; font-size: 13px; }
   .pb-fields .pp-field { padding: 2px 5px 3px; }
   .pb-fields .pp-field b { font-size: 14px; }
