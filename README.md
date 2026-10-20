@@ -51,14 +51,14 @@ ingen falsk precision · sidan kraschar aldrig av en död källa · endast fria 
   går rapporterna och truppen isär är speltiden okänd. xG per spelare finns fortfarande
   bara i Premier League ([src/fetchers/espnminutes.js](src/fetchers/espnminutes.js))
 - [x] **Kupongen:** gängets gemensamma kupong per omgång – utvalda matcher med 1, X, 2 eller
-  gardering. Fliken Kupong har omgångens kupong med liveställning från ESPN – de
-  färdigspelade ligger i Olympen; förstasidan visar kupongen i korthet. Ny kupong med
+  gardering. Fliken Kupong har omgångens kupong med liveställning från ESPN och
+  historiken; förstasidan visar kupongen i korthet. Ny kupong med
   sökning. Matcherna har en egen flik. Sparas som fil i `data/kuponger/` med en commit på GitHub (se [Kupongen](#kupongen))
 - [x] **Inför uppgörelsen:** någon skapar omgångens kupong (väljer matcherna) och var och en
   fyller i den för sig (gärna med garderingar). Man ser de andras tips först när man själv
   har lämnat in, och ens egna går att ändra tills matcherna startar. Allas tips blir ett underlag sorterat
   efter hur oeniga vi är, där gängets kupong växer fram (se [Inför uppgörelsen](#inför-uppgörelsen))
-- [x] **Kuponghistoriken:** Olympen → Grupparbetena med varje färdigspelad kupong – antal rätt,
+- [x] **Kuponghistoriken:** Kupong → Historik med varje färdigspelad kupong – antal rätt,
   betyg 1–5 mot modellens väntade antal rätt, sortering efter hur det gick och en kort
   AI-kommentar som läser gängets anteckningar. Fryses in i `data/kupong-historik.json`
   (se [Kuponghistoriken](#kuponghistoriken))
@@ -360,12 +360,6 @@ Utan nyckel ingen knapp.
   programmet framåt och prognosdelen i lagkortet. Tabeller visar bara tabellen, med
   divisionerna som numrerade flikar (nivå 1–4); gamla länkar till `#…/prognos` hamnar på
   tabellen. Styrkan för alla lag räknas fortfarande – den är motståndet i lagstatistiken.
-- **Kuponghistoriken flyttar till Olympen (2026-10-20, användarens önskemål):** Kupong
-  handlar bara om nästa kupong – växlaren Omgången | Historik försvinner. De färdigspelade
-  kupongerna står sist i Olympen under rubriken *Grupparbetena* (`#olympen/kuponger`, en
-  viss kupong `#olympen/kuponger/<id>`), och tabellen Omgångarna visar gängets kupong ur
-  varje omgång med länk ner till den. Gamla länkar till `#kupong/historik/<id>` och
-  `historik.html#<id>` leds dit.
 
 ## Arkitektur
 
@@ -425,12 +419,12 @@ server:
   [public/kupong.css](public/kupong.css). Se [Kupongen](#kupongen).
 - **Inför uppgörelsen:** [worker/samtal.mjs](worker/samtal.mjs) håller omgången och gängets
   egna tips (Cloudflare KV, i tjänsten profeterna-kupong; lokalt filer via
-  [server.js](server.js)); vyerna under Kupong (steg 1–3) finns i
+  [server.js](server.js)); vyerna under Kupong → Omgången (steg 1–3) finns i
   [public/samtal.js](public/samtal.js) och [public/samtal.css](public/samtal.css). Se
   [Inför uppgörelsen](#inför-uppgörelsen).
 - **Kuponghistoriken:** [src/history.js](src/history.js) rättar färdiga kuponger, räknar
   betyget, fryser in dem i `data/kupong-historik.json` och skriver `data/historik.json`.
-  Grupparbetena sist i Olympen ritas av [public/historik.js](public/historik.js) med
+  Vyn Kupong → Historik ritas av [public/historik.js](public/historik.js) med
   [public/historik.css](public/historik.css) (gamla `historik.html` leder dit);
   AI-kommentaren skrivs av [worker/kommentar.mjs](worker/kommentar.mjs) med prompten i
   [config/kommentar.js](config/kommentar.js). Se [Kuponghistoriken](#kuponghistoriken).
@@ -882,15 +876,15 @@ ställningen efter 90 minuter (samma utfall som prognosen).
   pågår, annars nästa, annars den som spelades färdigt senast; rutan visar antal rätt
   (eller antal matcher), läget, en prick per match och knappen in till kupongen – och
   *+ Ny kupong* när den är färdigspelad.
-- **Fliken Kupong** (`#kupong`) handlar bara om nästa kupong – de färdigspelade står i
-  Olympen. Den är hela omgångens kupong: antal rätt, en skala med
+- **Fliken Kupong** har två lägen överst, *Omgången* och *Historik*.
+  *Omgången* (`#kupong`) är hela omgångens kupong: antal rätt, en skala med
   rätt, möjliga och modellens väntade antal rätt, och varje match med vårt tecken som tre
   rutor (valda fyllda, utfallet grönt om vi hade det och rödringat om inte), modellens tips
   som en prick under rutan och modellens chans för vårt tecken. När alla matcher är spelade
   (även om spoilerskyddet döljer resultaten) visas knappen *Skapa ny kupong*, och
-  *Betyg och kommentar* leder till kupongen i Olympen. Under den står andra kuponger
+  *Betyg och kommentar* leder till kupongen under Historik. Under den står andra kuponger
   som inte är färdigspelade (t.ex. nästa omgångs). Utan kupong: knappen *Skapa kupong*.
-  De färdigspelade: se [Kuponghistoriken](#kuponghistoriken). Matchlistan ligger under fliken Matcher (`#matcher`) och visar
+  *Historik* (`#kupong/historik`), se [Kuponghistoriken](#kuponghistoriken). Matchlistan ligger under fliken Matcher (`#matcher`) och visar
   prognosen som svenska decimalodds (1 / sannolikheten, t.ex. 1,85), räknade från hela
   procent; på smala mobiler står oddsen på en egen rad under lagen.
 - **En viss kupong** (`#kupong/<id>`): samma vy för den kupongen.
@@ -911,7 +905,7 @@ ställningen efter 90 minuter (samma utfall som prognosen).
 1. *Kupong → Ny kupong* (`#kupong/ny`): sök lag eller filtrera på tävling, tryck 1, X
    eller 2 på matcherna (flera tecken = gardering). En vald match får ett fält för en
    valfri anteckning (högst 140 tecken), t.ex. vem som drev tecknet – den visas under
-   lagnamnen i kupongvyn och följer med till kuponghistoriken. Utkastet sparas i webbläsaren.
+   lagnamnen i kupongvyn och följer med till Historik. Utkastet sparas i webbläsaren.
    Listan visar först närmaste omgången – till och med måndagen efter nästa lördag –
    och *Visa fler dagar* resten av de 14 dagarna; sökningen och *Bara valda* gäller alla
    dagar.
@@ -1027,7 +1021,7 @@ sig: ett tecken, en halvgardering eller en helgardering per match. Man ser de an
 först när man själv har lämnat in. Allas tips blir underlaget för uppgörelsen i telefon där
 gängets kupong bestäms.
 
-Allt ligger under *Kupong*. Överst visar fyra steg var
+Allt ligger under *Kupong → Omgången* (bredvid *Historik*). Överst visar fyra steg var
 omgången står: *Välj matcher*, *Alla tippar* (med hur många som har lämnat in), *Uppgörelsen*
 och *Matcherna*. Medan kupongen fylls i och tipsen jämförs visar
 `#kupong` omgången; när gängets kupong är gjord visar den gängets kupong, med knappen
@@ -1044,15 +1038,15 @@ under omgången.
    uppgörelsen behövs – tipsen visas av sig själva (punkt 4). En åt gången; fylls en i (någon match har inte startat) frågar sidan
    först *Ersätt den*. *Ändra matcherna* går tills någon har lämnat in. Den gamla vägen –
    gängets kupong direkt – finns kvar under länken *Eller gör gängets kupong direkt*.
-   Medan kupongen fylls i står den överst på förstasidan och under Kupong.
+   Medan kupongen fylls i står den överst på förstasidan och under Kupong → Omgången.
    Förstasidans ruta visar hur många som har lämnat in och hur lång tid som är kvar –
    till första avsparken, då inlämningen stänger (nedräkningen går av sig själv och blir
    bärnstensfärgad den sista timmen). När alla har lämnat in, eller tiden är ute, står det
    *Dags för uppgörelsen* (och vem som inte lämnade in) utan någon tid; när gängets kupong
    är gjord tar den över rutan. Porträtten där har samma märken som på kupongen (bock eller
    tårtbit, se punkt 2), och har man börjat på sin kupong heter knappen *Fyll i resten*. En
-   färdigspelad kupong visas inte bredvid medan en ny omgång fylls i – den står bland
-   Grupparbetena i Olympen.
+   färdigspelad kupong visas inte bredvid medan en ny omgång fylls i – den står under
+   Historik.
 2. **Fyll i kupongen** (direkt under Omgången, `#kupong`): kupongen står på papper med en
    kolumn per person – DL, DT och DJ i gängets ordning, var och en i sin färg (blått,
    grönt, lila) – och spelstoppet (första avsparken) i hörnet. Överst i varje kolumn
@@ -1151,7 +1145,7 @@ ovanför) och på omgångens sida (datumen ovanför). Det skrivs när någon fö
 efter att matcherna valts (några sekunder med Claude; så länge står *Omgångens kupong* kvar,
 sedan tonar namnet fram) och syns sedan likadant för alla. Ändras matcherna får omgången ett
 nytt namn. Gängets kupong får omgångens namn när den sparas (`namn` i kupongfilen, så också i
-kuponghistoriken och som rubrik i förstasidans ruta), om den inte redan har ett; saknas det när kupongen
+Historik och som rubrik i förstasidans ruta), om den inte redan har ett; saknas det när kupongen
 fryses in i kuponghistoriken tar bygget namnet från omgången med flest av kupongens matcher
 (minst hälften). Bygget (`--journal`) fryser också in namnet och vad det syftar på i
 tipparhistoriken (`namn`, `syftar` per omgång; `tippare.json` har `name` och `hint`), med
@@ -1180,10 +1174,9 @@ och `KUPONG_LOKALT=1`). Claudes nyckel läggs in en gång:
 
 ## Kuponghistoriken
 
-**Olympen → Grupparbetena** (sist i Olympen, `#olympen/kuponger`, en viss kupong
-`#olympen/kuponger/<id>`; gamla länkar till `#kupong/historik/<id>` och
-`historik.html#<id>` leds dit, [public/historik.js](public/historik.js)) visar varje
-färdigspelad kupong: antal rätt, en prick per match, betyget, AI:ns kommentar och – under *Matcherna* –
+**Kupong → Historik** (`#kupong/historik`, en viss kupong `#kupong/historik/<id>`; gamla
+länkar till `historik.html#<id>` leds dit) visar varje färdigspelad
+kupong: antal rätt, en prick per match, betyget, AI:ns kommentar och – under *Matcherna* –
 varje match med tecken, resultat, modellens chans och gängets anteckning. Överst antal
 kuponger, andel rätt, snittbetyg och antal rätt mot det väntade, och en stapel per kupong
 (andel rätt, strecket = väntat). Sorteras efter *Senaste*, *Betyg*, *Andel rätt* eller
@@ -1421,14 +1414,9 @@ för tipset före avspark ([public/tippoang.js](public/tippoang.js)).
 - **Så tippar vi:** snittodds för tipsen (1 / modellens chans i snitt – högre är djärvare),
   andel garderingar, andel tips där modellens troligaste utfall är med, matcher där man var
   ensam om rätt, skrällar som satt (odds över 3,00) och bästa omgången.
-- **Omgångarna:** alla omgångar med poängen, orakel och Ikaros inramade – och gängets
-  kupong ur omgången (antal rätt i betygets färg, länk ner till den i Grupparbetena). Kupongen
-  är den färdigspelade med flest av omgångens matcher, minst hälften av kupongens. I
-  telefonen står den som en rad under omgångens namn i stället för en egen kolumn.
-- **Grupparbetena:** de färdigspelade kupongerna, se [Kuponghistoriken](#kuponghistoriken).
-  Syns inte förrän den första är färdigspelad.
+- **Omgångarna:** alla omgångar med poängen, orakel och Ikaros inramade.
 
-Före första omgången står alla på noll med en länk till Kupong. Säsongens
+Före första omgången står alla på noll med en länk till Kupong → Omgången. Säsongens
 tippare på förstasidan länkar hit (*Till Olympen*).
 
 ## Statusmärkning
