@@ -430,8 +430,7 @@
   .kp-past { grid-template-columns: 1fr auto; padding: 12px 14px; }
   .kp-past .kp-pearls { grid-column: 1 / -1; grid-row: 2; }
   .kp-search { max-width: none; }
-  /* ovanför appmenyn i nederkant (theme.css) */
-  .kp-bar { padding: 10px 12px; bottom: calc(var(--tab-h) + 10px + env(safe-area-inset-bottom)); }
+  .kp-bar { padding: 10px 12px; bottom: calc(10px + env(safe-area-inset-bottom)); }
   .kp-bar-txt { flex-basis: 100%; }
   .kp-name { flex: 1 1 120px; }
 }
