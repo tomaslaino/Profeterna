@@ -1,4 +1,4 @@
-// Omgångens kupong inför samtalet: någon väljer omgångens matcher, och var
+// Omgångens kupong inför uppgörelsen: någon väljer omgångens matcher, och var
 // och en fyller i kupongen för sig – ett tecken eller en gardering per match.
 // Den som har lämnat in ser de andras tips (de som också har lämnat in); den
 // som inte har det ser inga. Då jämförs de på sidan (public/samtal.js) under
@@ -8,33 +8,33 @@
 //                 eller null; forra = omgången före den, om dess tips visades
 //                 när den ersattes (så att bygget hinner spara den i
 //                 tipparhistoriken, src/tippare.js)
-//   POST /samtal {kod, gor: "starta", matcher: [id], tid: ISO | null, ersatt: <id> | null}
-//                 ny omgång; tid = när samtalet börjar (valfritt). Pågår en
+//   POST /samtal {gor: "starta", matcher: [id], tid: ISO | null, ersatt: <id> | null}
+//                 ny omgång; tid = när uppgörelsen börjar (valfritt). Pågår en
 //                 omgång (någon match har inte startat) krävs ersatt = dess id.
-//   POST /samtal {kod, gor: "matcher", id, matcher: [id]}   ändra omgångens
+//   POST /samtal {gor: "matcher", id, matcher: [id]}   ändra omgångens
 //                 matcher – bara tills någon har lämnat in
-//   POST /samtal {kod, gor: "tips", id, vem, matcher: [id], tecken: {<matchid>: "1X"}, kommentarer: {<matchid>: "…"}}
+//   POST /samtal {gor: "tips", id, vem, matcher: [id], tecken: {<matchid>: "1X"}, kommentarer: {<matchid>: "…"}}
 //                 lämna in sina tips – ett tecken i varje match. Går inte att
 //                 ändra sedan. matcher = omgångens matcher som sidan visade
 //                 dem. → {ok, samtal, nyckel}: samtal med de andras
 //                 inlämnade tips; nyckel = ens bevis för att få se dem igen
-//   POST /samtal {kod, gor: "se", id, vem, nyckel} → {ok, samtal}   samtal med
+//   POST /samtal {gor: "se", id, vem, nyckel} → {ok, samtal}   samtal med
 //                 allas inlämnade tips, för den som har lämnat in
-//   → 400 fel i förfrågan · 403 fel kodord · 429 för många fel kodord
+//   → 400 fel i förfrågan
 //   → 409 omgången har bytts ({samtal}), matcherna har ändrats sedan sidan
 //          visade dem ({samtal, andrade: true}), man har redan lämnat in, se
 //          utan rätt nyckel, tipsen visas redan för alla, eller en omgång
 //          pågår ({finns: true, samtal})
-//   → 503 inte påslaget (kodordet saknas) eller matcherna kan inte läsas
+//   → 503 inte påslaget (lagringen saknas) eller matcherna kan inte läsas
 //
 // Tipsen är dolda: GET ger bara vem som har lämnat in. Den som lämnar in får
 // en nyckel (sparad på enheten) och ser med den allas inlämnade tips – men
-// kan inte längre ändra sina. När alla har lämnat in, samtalet har börjat
+// kan inte längre ändra sina. När alla har lämnat in, uppgörelsen har börjat
 // eller första matchen har startat visas tipsen för alla, och sedan går
-// ingenting att lämna in eller ändra. Kodordet är gemensamt och vem man är
-// väljer man själv, så nyckeln – inte kodordet – är det som hindrar att
-// någon tittar på de andras tips innan den själv har lämnat in. Därför
-// lämnar tjänsten aldrig ut en persons tips med bara kodordet och namnet.
+// ingenting att lämna in eller ändra. Vem man är väljer man själv, så
+// nyckeln är det som hindrar att någon tittar på de andras tips innan den
+// själv har lämnat in. Därför lämnar tjänsten aldrig ut en persons tips med
+// bara namnet.
 //
 // Lagringen är en nyckel per omgång och en per person (så att två som lämnar
 // in samtidigt inte skriver över varandra): på Cloudflare KV-bindningen
@@ -50,7 +50,6 @@ import { normSign, sameSecret } from './kupong.mjs';
 const MATCHES_MAX = 40;
 const NOTE_MAX = 140; // samma gräns som kupongens anteckningar
 const LABEL_MAX = 120;
-const WRONG_MAX = 10;
 const ROUND_ID = /^\d{4}-\d{2}-\d{2}-[a-z0-9]{4,10}$/;
 const MATCH_ID = /^\d{1,12}$/;
 // Matcher som inte spelas (samma som worker/kupong.mjs).
@@ -74,7 +73,7 @@ async function loadTips(store, round, gang) {
   return Object.fromEntries(gang.map((g, i) => [g.id, list[i]]).filter(([, t]) => t && t.tecken));
 }
 
-// Visas tipsen, och varför: alla har lämnat in, samtalet har börjat eller
+// Visas tipsen, och varför: alla har lämnat in, uppgörelsen har börjat eller
 // första matchen har startat.
 function shown(round, tips, gang, now) {
   if (gang.every((g) => tips[g.id])) return 'alla';
@@ -127,9 +126,8 @@ function roundMatches(list, matches, now) {
 // store: {get(key) → objekt | null, put(key, objekt)}
 // loadMatches() → sajtens matcher [{id, home, away, kickoff, completed, status}].
 // gang: [{id: "DL", namn: "Daniel Laino"}, …] (config/kupong.js).
-// limiter: {count(), bump()} – valfri, samma spärr som kupongen.
 export async function getRound({ store, gang, now = () => new Date() }) {
-  if (!store) return fail(503, 'Samtalet är inte påslaget.');
+  if (!store) return fail(503, 'Att tippa var för sig är inte påslaget.');
   const ms = now().getTime();
   const [round, prev] = await Promise.all([store.get(CURRENT), store.get(PREVIOUS)]);
   const view = async (r) => (r ? publicView(r, await loadTips(store, r, gang), gang, ms) : null);
@@ -139,14 +137,9 @@ export async function getRound({ store, gang, now = () => new Date() }) {
   return { status: 200, body: { ok: true, samtal, forra: forra && forra.visas ? forra : null } };
 }
 
-export async function postRound(body, { env, store, gang, loadMatches, limiter = null, now = () => new Date(), newId = randomId }) {
-  if (!env.KUPONG_KOD || !store) return fail(503, 'Samtalet är inte påslaget.');
+export async function postRound(body, { store, gang, loadMatches, now = () => new Date(), newId = randomId }) {
+  if (!store) return fail(503, 'Att tippa var för sig är inte påslaget.');
   const b = body && typeof body === 'object' ? body : {};
-  if (limiter && (await limiter.count()) >= WRONG_MAX) return fail(429, 'För många fel kodord. Vänta en timme.');
-  if (!b.kod || !(await sameSecret(b.kod, env.KUPONG_KOD))) {
-    if (limiter) await limiter.bump();
-    return fail(403, 'Fel kodord.');
-  }
   const t = now();
   const ms = t.getTime();
   const round = await store.get(CURRENT);
@@ -160,8 +153,8 @@ export async function postRound(body, { env, store, gang, loadMatches, limiter =
       return fail(409, 'Det finns redan en omgång som pågår.', { finns: true, samtal: view() });
     }
     const tid = b.tid ? Date.parse(b.tid) : null;
-    if (b.tid && !Number.isFinite(tid)) return fail(400, 'Ogiltig tid för samtalet.');
-    if (tid && tid < ms) return fail(400, 'Samtalet måste ligga framåt i tiden.');
+    if (b.tid && !Number.isFinite(tid)) return fail(400, 'Ogiltig tid för uppgörelsen.');
+    if (tid && tid < ms) return fail(400, 'Uppgörelsen måste ligga framåt i tiden.');
     let matches;
     try { matches = await loadMatches(); } catch { return fail(503, 'Kan inte läsa matcherna från sajten just nu.'); }
     const v = roundMatches(b.matcher, matches, ms);

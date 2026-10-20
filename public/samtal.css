@@ -157,7 +157,6 @@
 .sm-slots i.set { color: #1d1509; border-color: transparent; background: var(--gold-grad); }
 .sm-bar-msg { flex-basis: 100%; font-size: 13.5px; }
 .sm-bar-msg:empty { display: none; }
-.sm-kod { flex: 0 1 160px; }
 
 /* ---------- ny omgång ---------- */
 
@@ -221,5 +220,4 @@
   .sm-pick .mteams { font-size: 14px; }
   .sm-teaser { grid-template-columns: 1fr; }
   .sm-teaser .kp-btn { justify-self: start; }
-  .sm-kod { flex: 1 1 120px; }
 }

@@ -2,25 +2,23 @@
 // den som sparar behöver ett GitHub-konto. Tjänsten profeterna-kupong
 // (worker/kupong-proxy.mjs) skriver kupongen som fil i
 // data/kuponger/ med en commit via GitHubs API, så git-historiken visar
-// fortfarande när kupongen lades – och pushen bygger om sajten. Skyddat med
-// ett gemensamt kodord.
+// fortfarande när kupongen lades – och pushen bygger om sajten.
 //
-//   POST /kupong {"kod": "…", "andra": "<kupong-id>" | null, "bas": "<sha>" | null,
+//   POST /kupong {"andra": "<kupong-id>" | null, "bas": "<sha>" | null,
 //                 "ändå": true (valfritt),
 //                 "kupong": {"id", "namn", "skapad", "matcher": [{"id", "match", "tecken", "kommentar"}]}}
 //   → 200 {ok: true, id, skapad, sha, commit}   id får ett tillägg (-2 …) om
 //          datumet redan är taget av en kupong som sidan kände till; sha =
 //          filens nya version; commit = länk
 //   → 400 kupongen har fel, eller rör en match som redan startat
-//   → 403 fel kodord · 429 för många fel kodord
 //   → 409 någon annan hann före: {changed: true} – kupongen har ändrats sedan
 //          versionen "bas" som ändringen utgick från – eller {taken: true} – en
 //          kupong som sidan inte kände till har sparats för samma dag ("ändå"
 //          sparar ändå, som en till). kupong = den versionen, så att sidan kan
 //          visa den.
-//   → 503 inte påslaget (hemligheterna saknas) eller matcherna kan inte läsas
+//   → 503 inte påslaget (GitHub-nyckeln saknas) eller matcherna kan inte läsas
 //
-//   POST /kupong {"kod": "…", "bort": "<kupong-id>", "bas": "<sha>" (valfritt)}
+//   POST /kupong {"bort": "<kupong-id>", "bas": "<sha>" (valfritt)}
 //   → 200 {ok: true, id, removed: true, commit}   filen är borttagen (eller
 //          fanns inte)
 //   → 400 kupongen är färdigspelad – den finns i historiken och står kvar
@@ -30,8 +28,8 @@
 // publicerade sajten (data/matches.json, inte förfrågan) får inte läggas
 // till, ändras eller tas bort – det som stod när den startade gäller.
 //
-// Hemligheter i tjänsten: KUPONG_KOD (kodordet) och GITHUB_TOKEN (en
-// fine-grained token med bara Contents: Read and write på repot). Lokalt kör
+// Hemlighet i tjänsten: GITHUB_TOKEN (en fine-grained token med bara
+// Contents: Read and write på repot). Lokalt kör
 // server.js samma saveCoupon() men skriver filen direkt i data/kuponger/.
 //
 // Filen skrivs här, inte på sidan: tecken, längder och format kontrolleras,
@@ -46,7 +44,6 @@ const NOTE_MAX = 140; // samma gräns som src/coupons.js
 const NAME_MAX = 60;
 const LABEL_MAX = 120;
 const MATCHES_MAX = 40;
-const WRONG_MAX = 10; // fel kodord per timme och IP-adress
 const COUPON_ID = /^\d{4}-\d{2}-\d{2}(-\d{1,2})?$/;
 const MATCH_ID = /^\d{1,12}$/;
 // Matcher som inte spelas (samma som public/kupong.js och src/history.js).
@@ -119,8 +116,8 @@ export function couponJSON(file) {
   return ['{', ...lines, '  "matcher": [', ...rows, '  ]', '}', ''].join('\n');
 }
 
-// Jämför kodordet utan att svarstiden avslöjar hur mycket som stämde
-// (också för samtalet, worker/samtal.mjs).
+// Jämför nyckeln till de egna tipsen (worker/samtal.mjs) utan att
+// svarstiden avslöjar hur mycket som stämde.
 export async function sameSecret(a, b) {
   const enc = new TextEncoder();
   const [x, y] = await Promise.all([a, b].map((s) => crypto.subtle.digest('SHA-256', enc.encode(String(s)))));
@@ -197,15 +194,9 @@ async function removeCoupon(id, bas, { writer, loadMatches }) {
 //   put och remove kastar {conflict: true} om filen inte längre har versionen
 //   sha (put: eller redan finns, utan sha).
 // loadMatches() → sajtens matcher [{id, kickoff, completed, status}].
-// limiter: {count() → antal fel kodord, bump()} – valfri.
-export async function saveCoupon(body, { env, writer, loadMatches, limiter = null, now = () => new Date() }) {
-  if (!env.KUPONG_KOD || !writer || !loadMatches) return fail(503, 'Att spara direkt är inte påslaget.');
+export async function saveCoupon(body, { writer, loadMatches, now = () => new Date() }) {
+  if (!writer || !loadMatches) return fail(503, 'Att spara direkt är inte påslaget.');
   const b = body && typeof body === 'object' ? body : {};
-  if (limiter && (await limiter.count()) >= WRONG_MAX) return fail(429, 'För många fel kodord. Vänta en timme.');
-  if (!b.kod || !(await sameSecret(b.kod, env.KUPONG_KOD))) {
-    if (limiter) await limiter.bump();
-    return fail(403, 'Fel kodord.');
-  }
   if (b.bort != null && b.bort !== '') return removeCoupon(String(b.bort), b.bas, { writer, loadMatches });
   const edit = b.andra == null || b.andra === '' ? null : String(b.andra);
   if (edit && !COUPON_ID.test(edit)) return fail(400, 'Ogiltig kupong.');
@@ -336,14 +327,5 @@ export function githubWriter(token, { repo = REPO, branch = BRANCH, fetchImpl = 
       const d = await res.json();
       return { url: d.commit && d.commit.html_url };
     },
-  };
-}
-
-// Fel kodord räknas per IP-adress i en timme (KV-bindningen KUPONG).
-export function kvLimiter(kv, ip) {
-  const key = `kupong-fel:${ip || 'okänd'}`;
-  return {
-    count: async () => Number(await kv.get(key)) || 0,
-    bump: async () => kv.put(key, String((Number(await kv.get(key)) || 0) + 1), { expirationTtl: 3600 }),
   };
 }

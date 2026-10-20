@@ -5,15 +5,14 @@
 #
 #   npx wrangler@4.147.0 deploy --config worker/kupong.toml
 #   npx wrangler@4.147.0 secret put GITHUB_TOKEN --config worker/kupong.toml
-#   npx wrangler@4.147.0 secret put KUPONG_KOD --config worker/kupong.toml
 #
 # Adressen (…workers.dev/kupong) står i config/kupong.js och byggs in i sajten.
 name = "profeterna-kupong"
 main = "kupong-proxy.mjs"
 compatibility_date = "2026-10-01"
 
-# Spärren för fel kodord räknas i samma KV-namnrymd som analysens cache
-# (nycklar "kupong-fel:<ip>", en timme).
+# Gängets egna tips (worker/samtal.mjs) ligger i samma KV-namnrymd som
+# analysens cache (nycklar "samtal:…").
 [[kv_namespaces]]
 binding = "KUPONG"
 id = "d890672594e449589f9f3cd97ca6e6de"

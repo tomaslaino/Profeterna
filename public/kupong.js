@@ -416,7 +416,7 @@ function viewNav(on) {
 // Omgångens gång i fyra steg under flikarna, när gänget tippar var för sig
 // först (samtal.js). now: steget som pågår (5 = klar). info: en rad om läget
 // i stället för förklaringen under ett steg.
-const STEPS = ['Välj matcher', 'Alla tippar', 'Samtalet', 'Matcherna'];
+const STEPS = ['Välj matcher', 'Alla tippar', 'Uppgörelsen', 'Matcherna'];
 function roundSteps(now, info = {}) {
   if (!hasSamtal()) return '';
   return '<ol class="kp-steps" aria-label="Omgångens gång">' + STEPS.map((name, i) => {
@@ -827,7 +827,7 @@ function couponJSON(file) {
 }
 
 // Kupongen blir en fil i repot. Med proxyn (KP.data.save) sparas den direkt
-// med kodordet – proxyn committar filen (worker/kupong.mjs). Annars, eller om
+// – proxyn committar filen (worker/kupong.mjs). Annars, eller om
 // proxyn inte kan spara, via GitHub: en ny fil öppnas ifylld; finns filen
 // redan öppnas den för redigering och innehållet kopieras, eftersom GitHub
 // inte kan fylla i en befintlig fil.
@@ -887,32 +887,25 @@ function couponCtx(d) {
   };
 }
 
-const KP_CODE = 'profeterna.kupong.kod';
-
 function savedHead(eyebrow, ctx) {
   return `<div class="kp-head"><div><p class="kp-eyebrow">${esc(eyebrow)}</p><h2 class="page-title">${esc(ctx.range)}</h2></div></div>`;
 }
 
-// Spara direkt: kodordet en gång per enhet, sedan sparas kupongen med ett tryck.
+// Spara direkt: kupongen skickas med en gång; Spara står kvar om det inte gick.
 function renderDirect(ctx) {
-  const code = kpLoad(KP_CODE) || '';
   $('#coupon').innerHTML = savedHead('Spara kupongen', ctx) +
-    '<form class="card kp-saved" id="kp-direct" autocomplete="on">' +
-    '<label class="kp-lab" for="kp-kod">Kodord</label>' +
-    `<div class="kp-coderow"><input type="password" id="kp-kod" class="kp-name" autocomplete="current-password" required value="${esc(code)}">` +
-    '<button type="submit" class="kp-btn primary" id="kp-send">Spara</button></div>' +
+    '<form class="card kp-saved" id="kp-direct">' +
+    '<div class="kp-actions"><button type="submit" class="kp-btn primary" id="kp-send">Spara</button></div>' +
     '<p class="kp-msg" id="kp-msg" role="status"></p>' +
     `<p class="legend kp-alt"><a href="#kupong/${ctx.edit ? `andra/${esc(ctx.edit)}` : 'ny'}">Tillbaka</a> · ` +
     '<button type="button" class="kp-linkbtn" id="kp-viagh">Spara via GitHub i stället</button></p></form>';
   $('#kp-direct').addEventListener('submit', (e) => { e.preventDefault(); sendDirect(ctx); });
   $('#kp-viagh').addEventListener('click', () => renderViaGitHub(ctx));
-  if (code) sendDirect(ctx);
-  else $('#kp-kod').focus();
+  sendDirect(ctx);
 }
 
-// Skickar kupongen till tjänsten med kodordet. Tillbaka:
+// Skickar kupongen till tjänsten. Tillbaka:
 //   {ok, coupon, commit}        sparad – och visas här tills bygget publicerat den
-//   {code}                      fel kodord (det sparade glöms)
 //   {other, changed | taken}    någon annan hann före: changed = kupongen har
 //                               ändrats sedan versionen ändringen utgick från,
 //                               taken = en kupong som sidan inte kände till har
@@ -922,7 +915,7 @@ function renderDirect(ctx) {
 //   {error, offline}            tjänsten kan inte spara just nu (inte påslaget,
 //                               GitHub svarar inte, ingen kontakt) – GitHub-vägen
 //                               finns kvar; utan offline: kupongen har fel e.d.
-async function postCoupon(ctx, code) {
+async function postCoupon(ctx) {
   let res = null;
   let body = {};
   try {
@@ -930,7 +923,6 @@ async function postCoupon(ctx, code) {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({
-        kod: code,
         andra: ctx.edit || null,
         ...(ctx.edit ? { bas: ctx.base } : {}),
         ...(ctx.anyway ? { 'ändå': true } : {}),
@@ -942,14 +934,9 @@ async function postCoupon(ctx, code) {
     res = null;
   }
   if (res && res.ok && body.ok) {
-    kpStore(KP_CODE, code);
     const coupon = { ...ctx.coupon, id: body.id || ctx.id, created: body.skapad || ctx.coupon.created, sha: body.sha || null };
     setPending(coupon, ctx.edit ? ctx.base : null);
     return { ok: true, coupon, commit: body.commit || null };
-  }
-  if (res && res.status === 403) {
-    kpStore(KP_CODE, null);
-    return { code: true, error: 'Fel kodord.' };
   }
   const other = res && res.status === 409 ? fromStored(body.kupong) : null;
   if (other && body.changed) {
@@ -960,18 +947,16 @@ async function postCoupon(ctx, code) {
     setPending(other, null);
     return { other, taken: true, error: body.error };
   }
-  if (res && [400, 409, 429].includes(res.status)) return { error: body.error || 'Det gick inte att spara.' };
+  if (res && [400, 409].includes(res.status)) return { error: body.error || 'Det gick inte att spara.' };
   return { offline: true, error: (body && body.error) || 'Ingen kontakt med servern.' };
 }
 
 async function sendDirect(ctx) {
   const msg = (h) => { $('#kp-msg').innerHTML = h; };
   const btn = $('#kp-send');
-  const code = $('#kp-kod').value;
-  if (!code) { msg('Skriv kodordet.'); return; }
   btn.disabled = true;
   msg('Sparar …');
-  const r = await postCoupon(ctx, code);
+  const r = await postCoupon(ctx);
   btn.disabled = false;
   if (r.ok) {
     kpStore(KP_DRAFT, null);
@@ -980,11 +965,6 @@ async function sendDirect(ctx) {
       '<div class="card kp-saved"><p>Kupongen är sparad. Den syns för alla när sajten har uppdaterats, om några minuter.</p>' +
       `<div class="kp-actions"><a class="kp-btn primary" href="#kupong/${esc(r.coupon.id)}">Visa kupongen</a>` +
       (r.commit ? `<a class="kp-btn" href="${esc(r.commit)}" target="_blank" rel="noopener">Ändringen på GitHub</a>` : '') + '</div></div>';
-    return;
-  }
-  if (r.code) {
-    msg('<span class="note">Fel kodord.</span>');
-    $('#kp-kod').select();
     return;
   }
   // Någon annan hann före: utkastet finns kvar, men sparas inte över den
@@ -1051,8 +1031,7 @@ function removeOnGitHub(id) {
 // historiken och står kvar där). Med tjänsten tas filen bort med en commit
 // (worker/kupong.mjs) och kupongen är borta i den här webbläsaren tills
 // bygget publicerat det. Annars öppnas GitHubs sida för att ta bort filen.
-// Kodordet fylls i men skickas inte förrän man tryckt – till skillnad från
-// Spara.
+// Inget skickas förrän man tryckt – till skillnad från Spara.
 function renderRemove(id) {
   const el = $('#coupon');
   const c = allCoupons().find((x) => x.id === id);
@@ -1081,10 +1060,8 @@ function renderRemove(id) {
     return;
   }
   el.innerHTML = savedHead('Ta bort kupongen', ctx) +
-    `<form class="card kp-saved" id="kp-remove" autocomplete="on">${what}` +
-    '<label class="kp-lab" for="kp-kod">Kodord</label>' +
-    `<div class="kp-coderow"><input type="password" id="kp-kod" class="kp-name" autocomplete="current-password" required value="${esc(kpLoad(KP_CODE) || '')}">` +
-    '<button type="submit" class="kp-btn kp-danger" id="kp-send">Ta bort kupongen</button></div>' +
+    `<form class="card kp-saved" id="kp-remove">${what}` +
+    '<div class="kp-actions"><button type="submit" class="kp-btn kp-danger" id="kp-send">Ta bort kupongen</button></div>' +
     '<p class="kp-msg" id="kp-msg" role="status"></p>' +
     `<p class="legend kp-alt"><a href="#kupong/${esc(id)}">Avbryt</a> · ` +
     `<a href="${gh}" target="_blank" rel="noopener">Ta bort via GitHub i stället</a></p></form>`;
@@ -1095,8 +1072,6 @@ async function sendRemove(ctx) {
   const { c } = ctx;
   const msg = (h) => { $('#kp-msg').innerHTML = h; };
   const btn = $('#kp-send');
-  const code = $('#kp-kod').value;
-  if (!code) { msg('Skriv kodordet.'); return; }
   btn.disabled = true;
   msg('Tar bort …');
   let res;
@@ -1105,7 +1080,7 @@ async function sendRemove(ctx) {
     res = await fetch(KP.data.save, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ kod: code, bort: c.id, ...(c.sha ? { bas: c.sha } : {}) }),
+      body: JSON.stringify({ bort: c.id, ...(c.sha ? { bas: c.sha } : {}) }),
     });
     body = await res.json().catch(() => ({}));
   } catch {
@@ -1113,7 +1088,6 @@ async function sendRemove(ctx) {
   }
   btn.disabled = false;
   if (res && res.ok && body.ok) {
-    kpStore(KP_CODE, code);
     setPending(c, c.sha, true);
     const d = kpLoad(KP_DRAFT);
     if (d && d.edit === c.id) kpStore(KP_DRAFT, null);
@@ -1124,12 +1098,6 @@ async function sendRemove(ctx) {
       (body.commit ? `<a class="kp-btn" href="${esc(body.commit)}" target="_blank" rel="noopener">Ändringen på GitHub</a>` : '') + '</div></div>';
     return;
   }
-  if (res && res.status === 403) {
-    kpStore(KP_CODE, null);
-    msg('<span class="note">Fel kodord.</span>');
-    $('#kp-kod').select();
-    return;
-  }
   // Någon annan har ändrat kupongen: den versionen visas här tills bygget
   // publicerat den, och tas inte bort utan att man sett den.
   const other = res && res.status === 409 && body.changed ? fromStored(body.kupong) : null;
@@ -1138,7 +1106,7 @@ async function sendRemove(ctx) {
     msg(`<span class="note">${esc(body.error)}</span> <a href="#kupong/${esc(other.id)}">Visa den nya versionen</a>`);
     return;
   }
-  if (res && [400, 409, 429].includes(res.status)) {
+  if (res && [400, 409].includes(res.status)) {
     msg(`<span class="note">${esc(body.error || 'Det gick inte att ta bort kupongen.')}</span>`);
     return;
   }

@@ -53,10 +53,10 @@ ingen falsk precision · sidan kraschar aldrig av en död källa · endast fria 
   gardering. Fliken Kupong har omgångens kupong med liveställning från ESPN och
   historiken; förstasidan visar kupongen i korthet. Ny kupong med
   sökning. Matcherna har en egen flik. Sparas som fil i `data/kuponger/` med en commit på GitHub (se [Kupongen](#kupongen))
-- [x] **Inför samtalet:** någon skapar omgångens kupong (väljer matcherna) och var och en
+- [x] **Inför uppgörelsen:** någon skapar omgångens kupong (väljer matcherna) och var och en
   fyller i den för sig (gärna med garderingar). Man ser de andras tips först när man själv
-  har lämnat in, och då är ens egna låsta. Allas tips blir ett samtalsunderlag sorterat
-  efter hur oeniga vi är, där gängets kupong växer fram (se [Inför samtalet](#inför-samtalet))
+  har lämnat in, och då är ens egna låsta. Allas tips blir ett underlag sorterat
+  efter hur oeniga vi är, där gängets kupong växer fram (se [Inför uppgörelsen](#inför-uppgörelsen))
 - [x] **Kuponghistoriken:** Kupong → Historik med varje färdigspelad kupong – antal rätt,
   betyg 1–5 mot modellens väntade antal rätt, sortering efter hur det gick och en kort
   AI-kommentar som läser gängets anteckningar. Fryses in i `data/kupong-historik.json`
@@ -389,11 +389,11 @@ server:
   `data/kuponger/` och bygget skriver `data/kuponger.json`. Rättningen, liveställningen och
   Ny kupong finns i [public/kupong.js](public/kupong.js) och
   [public/kupong.css](public/kupong.css). Se [Kupongen](#kupongen).
-- **Inför samtalet:** [worker/samtal.mjs](worker/samtal.mjs) håller omgången och gängets
+- **Inför uppgörelsen:** [worker/samtal.mjs](worker/samtal.mjs) håller omgången och gängets
   egna tips (Cloudflare KV, i tjänsten profeterna-kupong; lokalt filer via
   [server.js](server.js)); vyerna under Kupong → Omgången (steg 1–3) finns i
   [public/samtal.js](public/samtal.js) och [public/samtal.css](public/samtal.css). Se
-  [Inför samtalet](#inför-samtalet).
+  [Inför uppgörelsen](#inför-uppgörelsen).
 - **Kuponghistoriken:** [src/history.js](src/history.js) rättar färdiga kuponger, räknar
   betyget, fryser in dem i `data/kupong-historik.json` och skriver `data/historik.json`.
   Vyn Kupong → Historik ritas av [public/historik.js](public/historik.js) med
@@ -857,7 +857,7 @@ ställningen efter 90 minuter (samma utfall som prognosen).
 
 - **Förstasidan** (utan adress, ingen flik – dit leder namnet): rubriken, omgångens kupong
   i korthet och Säkraste spelen. Omgångens kupong är gängets kupong ur omgången som alla
-  tippade (se [Inför samtalet](#inför-samtalet)) tills den är färdigspelad, annars den som
+  tippade (se [Inför uppgörelsen](#inför-uppgörelsen)) tills den är färdigspelad, annars den som
   pågår, annars nästa, annars den som spelades färdigt senast; rutan visar antal rätt
   (eller antal matcher), läget, en prick per match och knappen in till kupongen – och
   *+ Ny kupong* när den är färdigspelad.
@@ -876,7 +876,7 @@ ställningen efter 90 minuter (samma utfall som prognosen).
 - **Väntat antal rätt** = spelade matcher som de gick + modellens sannolikhet för vårt tecken
   i resten (prognosen före avspark ur journalen om den finns, annars sajtens prognos).
 - **Live:** medan en kupongmatch pågår hämtar sidan ESPN:s scoreboard varje minut, direkt i
-  webbläsaren (se Datakällor) – också för omgångens matcher inför samtalet innan gängets
+  webbläsaren (se Datakällor) – också för omgångens matcher inför uppgörelsen innan gängets
   kupong finns, så att underlaget och Omgångens tippare visar ställningen. Går matchen till
   förlängning väntar rättningen på nästa bygge, som räknar fram ställningen efter 90
   minuter ur målminuterna. Svarar inte ESPN visas det, och kupongen rättas mot
@@ -894,13 +894,13 @@ ställningen efter 90 minuter (samma utfall som prognosen).
    Listan visar först närmaste omgången – till och med måndagen efter nästa lördag –
    och *Visa fler dagar* resten av de 14 dagarna; sökningen och *Bara valda* gäller alla
    dagar.
-2. *Spara kupong* → skriv **kodordet** → *Spara*. Tjänsten *profeterna-kupong* på
+2. *Spara kupong* sparar direkt. Tjänsten *profeterna-kupong* på
    Cloudflare (`POST …/kupong`, [worker/kupong-proxy.mjs](worker/kupong-proxy.mjs) och
    [worker/kupong.mjs](worker/kupong.mjs), adressen i [config/kupong.js](config/kupong.js))
-   kontrollerar kodordet och kupongen och committar filen `data/kuponger/<datum för första
+   kontrollerar kupongen och committar filen `data/kuponger/<datum för första
    matchen>.json` via GitHubs API. Pushen startar workflowen och kupongen syns för alla
    efter bygget, några minuter senare. Git-historiken visar när kupongen lades; tiden i
-   `skapad` sätts av proxyn. Kodordet sparas på enheten, så nästa gång räcker ett tryck.
+   `skapad` sätts av proxyn. Går det inte står *Spara* kvar för ett nytt försök.
    Är datumet redan taget av en kupong som sidan kände till får filen `-2` (osv.). Har
    någon annan just sparat en kupong för samma dag – som sidan inte visar än – frågar sidan
    först: *Visa den* eller *Spara ändå, som en kupong till*.
@@ -917,7 +917,7 @@ ställningen efter 90 minuter (samma utfall som prognosen).
 
 **Spara direkt – inställningar (en gång):** en egen tjänst, skild från proxyn för
 matchanalysen, så att GitHub-nyckeln bara finns där. Driftsätts med
-`npx wrangler@4.147.0 deploy --config worker/kupong.toml` och behöver två hemligheter.
+`npx wrangler@4.147.0 deploy --config worker/kupong.toml` och behöver en hemlighet.
 
 - `GITHUB_TOKEN`: på GitHub, *Settings → Developer settings → Personal access tokens →
   Fine-grained tokens → Generate new token*. *Repository access: Only select repositories*
@@ -925,11 +925,8 @@ matchanalysen, så att GitHub-nyckeln bara finns där. Driftsätts med
   `npx wrangler@4.147.0 secret put GITHUB_TOKEN --config worker/kupong.toml`. Tokenen
   har ett slutdatum – när den gått ut svarar Spara att GitHub nekar, och reservvägen
   gäller tills en ny lagts in.
-- `KUPONG_KOD`: gängets kodord, `npx wrangler@4.147.0 secret put KUPONG_KOD --config
-  worker/kupong.toml`. Byt kodord genom att lägga in ett nytt; enheterna frågar då igen.
-- Tio fel kodord från samma IP-adress spärrar i en timme (räknas i samma KV-namnrymd som
-  analysens cache, bindningen `KUPONG`).
-- Lokalt: `KUPONG_KOD=…` i `.env` ger samma knapp mot `POST /api/kupong`, som skriver
+- Inget kodord sedan 2026-10-20 – gänget valde bort det (se Kända brister).
+- Lokalt: `KUPONG_LOKALT=1` i `.env` ger samma knapp mot `POST /api/kupong`, som skriver
   filen direkt i `data/kuponger/` (eller `KUPONG_DIR`) utan GitHub.
 
 **Ändra:** knappen *Ändra* (bara medan någon match återstår). Startade matcher ligger kvar
@@ -945,9 +942,9 @@ kopierar innehållet och öppnar filen för redigering – markera allt, klistra
 changes.
 
 **Ta bort:** knappen *Ta bort* (`#kupong/bort/<id>`, bara medan kupongen inte är
-färdigspelad – en färdigspelad fryses in i historiken och står kvar där) → bekräfta med
-kodordet → *Ta bort kupongen*. Kodordet fylls i men inget skickas förrän man tryckt.
-Proxyn (`POST …/kupong {"kod", "bort": "<id>", "bas"}`) tar bort filen med en commit, men
+färdigspelad – en färdigspelad fryses in i historiken och står kvar där) → *Ta bort
+kupongen*. Inget skickas förrän man tryckt.
+Proxyn (`POST …/kupong {"bort": "<id>", "bas"}`) tar bort filen med en commit, men
 bara den version som sidan visade (`bas`) – har någon annan ändrat kupongen under tiden
 svarar den som vid Ändra, och sidan visar den nya versionen. Proxyn nekar en kupong där
 varje match är spelad eller inställd. Tills bygget publicerat det är kupongen borta i den
@@ -971,15 +968,15 @@ matchid):
 En trasig fil stoppar inte bygget; felet visas längst ned under fliken Kupong. Lokalt går
 det att prova med en egen mapp: `KUPONG_DIR=/tmp/kuponger npm run build`.
 
-## Inför samtalet
+## Inför uppgörelsen
 
 Någon i gänget skapar omgångens kupong – väljer matcherna – och var och en fyller i den för
 sig: ett tecken, en halvgardering eller en helgardering per match. Man ser de andras tips
-först när man själv har lämnat in. Allas tips blir underlaget för telefonsamtalet där
+först när man själv har lämnat in. Allas tips blir underlaget för uppgörelsen i telefon där
 gängets kupong bestäms.
 
 Allt ligger under *Kupong → Omgången* (bredvid *Historik*). Överst visar fyra steg var
-omgången står: *Välj matcher*, *Alla tippar* (med hur många som har lämnat in), *Samtalet*
+omgången står: *Välj matcher*, *Alla tippar* (med hur många som har lämnat in), *Uppgörelsen*
 (med tiden, om den är satt) och *Matcherna*. Medan kupongen fylls i och tipsen jämförs visar
 `#kupong` omgången; när gängets kupong är gjord visar den gängets kupong, med knappen
 *Allas tips* tillbaka till underlaget (`#kupong/samtal`). Kuponger som spelas under tiden står
@@ -989,21 +986,21 @@ under omgången.
 
 1. **Skapa kupong** (*Kupong → Skapa kupong* eller *+ Ny kupong*, `#kupong/samtal/ny`):
    någon väljer matcherna (samma sökning och tävlingsfilter som Ny kupong) och, valfritt,
-   när samtalet börjar. En åt gången; fylls en i (någon match har inte startat) frågar sidan
+   när uppgörelsen börjar. En åt gången; fylls en i (någon match har inte startat) frågar sidan
    först *Ersätt den*. *Ändra matcherna* går tills någon har lämnat in. Den gamla vägen –
    gängets kupong direkt – finns kvar under länken *Eller gör gängets kupong direkt*.
    Medan kupongen fylls i står den överst på förstasidan och under Kupong → Omgången.
 2. **Fyll i kupongen** (`#kupong/samtal/tips`): man väljer vem man är (DL, DT, DJ – sparas
    på enheten), tippar varje match och kan skriva en kort motivering (högst 140 tecken).
    Nederst står hur många rader tipsen blir. *Lämna in och se de andras* kräver tecken i
-   alla matcher och kupongens kodord. Inlämnade tips går inte att ändra. Har matcherna
+   alla matcher. Inlämnade tips går inte att ändra. Har matcherna
    ändrats sedan sidan öppnades säger tjänsten till, och sidan visar de nya matcherna med
    ens tecken kvar där matchen fortfarande är med.
 3. **De andras tips** (`#kupong`): den som inte har lämnat in ser bara vem som har
    gjort det och när. Den som har lämnat in ser allas inlämnade tips – så fort minst en
    till är inne – och vilka som fortfarande fyller i. Sidan frågar tjänsten var 20:e sekund
    och visar nya tips av sig själv – också förstasidans ruta, medan tipsen lämnas in.
-4. **Underlaget** – för alla när alla har lämnat in, när samtalet börjar eller senast när
+4. **Underlaget** – för alla när alla har lämnat in, när uppgörelsen börjar eller senast när
    första matchen startar; sedan går ingenting att lämna in eller ändra. Överst allas
    garderingar, rader och (när matcher spelats) antal rätt. Varje match har rutorna
    1, X och 2 med initialerna på dem som tippat tecknet (streckad ram = del av en
@@ -1016,10 +1013,9 @@ under omgången.
    - *Eniga* – klubbas utan snack
 5. **Gängets kupong** (när alla tips är inne): man trycker på rutorna (två rutor =
    gardering). Den börjar som förslaget – tecknen som fler än hälften har med; *Alla olika*
-   lämnas tomma – och sparas bara på enheten, så en håller i pennan under samtalet (*Börja
+   lämnas tomma – och sparas bara på enheten, så en håller i pennan under uppgörelsen (*Börja
    om* går tillbaka till förslaget). Nederst syns kupongen som rutor med antal rader.
-   - *Spara gängets kupong* sparar den direkt därifrån med kodordet (ett fält bredvid
-     knappen om det inte finns på enheten) – samma tjänst och kontroller som *Spara kupong*
+   - *Spara gängets kupong* sparar den direkt därifrån – samma tjänst och kontroller som *Spara kupong*
      under Ny kupong (se [Kupongen](#kupongen)). Matcher utan tecken kommer inte med; sidan
      frågar först. Därefter står gängets kupong under Omgången, med en rad om att den är
      sparad och syns för alla efter bygget.
@@ -1044,13 +1040,12 @@ KV-bindningen `KUPONG`, inte på GitHub: `samtal:aktuellt` (omgången),
 skriver över varandra) och `samtal:<id>` (en tidigare omgång, sparad när nästa startas).
 `GET /samtal` ger omgången och vem som lämnat in – tipsen bara när de visas för alla – och
 `forra`, omgången före, om dess tips visades när den ersattes (`samtal:forra`; så att
-bygget hinner spara den i tipparhistoriken). `POST /samtal` med kodordet: `starta`,
+bygget hinner spara den i tipparhistoriken). `POST /samtal`: `starta`,
 `matcher`, `tips` och `se`. `tips` skickar med omgångens matcher som sidan visade dem
 (ändrade matcher → 409 med `andrade`) och svarar med en slumpad nyckel som sidan sparar på
 enheten; med den ger `se` allas inlämnade tips. Tjänsten lämnar aldrig ut någons tips med
-bara kodordet och namnet – kodordet är gemensamt, så nyckeln är det som hindrar att man
-tittar innan man själv har lämnat in.
-Samma spärr för fel kodord som kupongen. Lokalt: med `KUPONG_KOD` i `.env` finns
+bara namnet – nyckeln är det som hindrar att man tittar innan man själv har lämnat in.
+Lokalt: med `KUPONG_LOKALT=1` i `.env` finns
 `/api/samtal`, som sparar i `data/cache/samtal/` (eller `SAMTAL_DIR`).
 
 ## Kuponghistoriken
@@ -1384,8 +1379,9 @@ schemaintervall gammalt.
 - Europacupernas kvalomgångar hämtas bara för juli–augusti.
 - **Kupongen:** att GitHub fyller i den nya filen ur länken (`?filename=…&value=…`) är
   provat fram till inloggningen 2026-10-18, inte hela vägen till en commit. Spara direkt
-  är provat lokalt och mot ett låtsas-GitHub; kodordet är det enda skyddet, så den som
-  har det kan lägga och ändra kuponger (fel kodord spärras efter tio försök). Märkningen
+  är provat lokalt och mot ett låtsas-GitHub. Det finns inget kodord (borttaget
+  2026-10-20): den som hittar tjänstens adress kan lägga, ändra och ta bort kuponger och
+  lämna in tips i någons namn. Märkningen
   *väntar på GitHub* finns bara i webbläsaren där kupongen skapades. Liveställningen bygger
   på ESPN:s inofficiella API, som resten av sajten.
 - Låset för startade matcher och versionskontrollen (2026-10-18) är provade lokalt och mot
@@ -1413,8 +1409,7 @@ Nyhetsläget hämtar bara öppna källor utan nyckel (Bing News RSS, ESPN, BBC S
 Open-Meteo) och skickar inget om besökaren dit; artikeltexten går bara till DeepSeek.
 `.dev.vars` och `.wrangler/` (wranglers lokala hemligheter och tillstånd) är gitignorerade.
 
-Inför samtalet: tipsen är dolda av tjänsten, inte av sidan – `GET /samtal` skickar dem inte
-förrän de visas för alla, och `se` bara mot nyckeln som den som lämnade in fick. Kodordet är
-gemensamt och vem man är väljer man själv på enheten, så det är nyckeln som hindrar att
-någon tittar på de andras tips innan den själv har lämnat in. Den som har kodordet kan
-hämta en persons egna tips med `mina` (utan nyckeln).
+Inför uppgörelsen: tipsen är dolda av tjänsten, inte av sidan – `GET /samtal` skickar dem inte
+förrän de visas för alla, och `se` bara mot nyckeln som den som lämnade in fick. Vem man är
+väljer man själv på enheten, så det är nyckeln som hindrar att någon tittar på de andras
+tips innan den själv har lämnat in.

@@ -9,11 +9,12 @@
 // som proxyn på Cloudflare (worker/index.mjs). Utan nyckel ingen knapp.
 // Samma nyckel ger AI:ns kommentarer på sidan Historik (POST /api/kommentar).
 //
-// Kupongen: finns KUPONG_KOD i .env sparar knappen Spara kupongen direkt
+// Kupongen: med KUPONG_LOKALT=1 i .env sparar knappen Spara kupongen direkt
 // (POST /api/kupong) – lokalt skrivs filen i data/kuponger/ (eller
-// KUPONG_DIR), inte på GitHub. Samma saveCoupon() som proxyn. Samma kodord
-// slår på gängets egna tips inför samtalet (GET/POST /api/samtal), som
-// lokalt ligger som filer i data/cache/samtal/ (eller SAMTAL_DIR).
+// KUPONG_DIR), inte på GitHub. Samma saveCoupon() som proxyn. Samma
+// inställning slår på gängets egna tips inför uppgörelsen (GET/POST
+// /api/samtal), som lokalt ligger som filer i data/cache/samtal/ (eller
+// SAMTAL_DIR).
 
 const fs = require('fs');
 const path = require('path');
@@ -114,26 +115,12 @@ function siteMatches(siteDir = OUT) {
   return async () => JSON.parse(fs.readFileSync(path.join(siteDir, 'data', 'matches.json'), 'utf8')).matches || [];
 }
 
-// POST /api/kupong {kod, kupong, andra, bas, ändå} eller {kod, bort, bas} –
-// kodordet ur KUPONG_KOD.
+// POST /api/kupong {kupong, andra, bas, ändå} eller {bort, bas}.
 function couponSaveRoute(writer = couponFileWriter(), loadMatches = siteMatches()) {
-  const wrong = new Map(); // fel kodord per IP-adress, glöms efter en timme
   return async (req, res) => {
     try {
       const { saveCoupon } = await import('./worker/kupong.mjs');
-      const ip = req.ip;
-      const r = await saveCoupon(req.body, {
-        env: process.env,
-        writer,
-        loadMatches,
-        limiter: {
-          count: async () => ((wrong.get(ip) || {}).until > Date.now() ? wrong.get(ip).n : 0),
-          bump: async () => {
-            const w = wrong.get(ip);
-            wrong.set(ip, w && w.until > Date.now() ? { n: w.n + 1, until: w.until } : { n: 1, until: Date.now() + 3600000 });
-          },
-        },
-      });
+      const r = await saveCoupon(req.body, { writer, loadMatches });
       res.status(r.status).json(r.body);
     } catch (err) {
       console.error('[kupong]', err);
@@ -142,7 +129,7 @@ function couponSaveRoute(writer = couponFileWriter(), loadMatches = siteMatches(
   };
 }
 
-// Samtalets lagring lokalt: en fil per nyckel (på Cloudflare KV).
+// Tipsens lagring lokalt: en fil per nyckel (på Cloudflare KV).
 function samtalFileStore(dir = process.env.SAMTAL_DIR || path.join(CACHE_DIR, 'samtal')) {
   const file = (k) => path.join(dir, k.replace(/[^\w.-]/g, '_') + '.json');
   return {
@@ -156,27 +143,13 @@ function samtalFileStore(dir = process.env.SAMTAL_DIR || path.join(CACHE_DIR, 's
 
 // GET och POST /api/samtal – samma getRound()/postRound() som tjänsten.
 function samtalRoute(store = samtalFileStore(), loadMatches = siteMatches()) {
-  const wrong = new Map(); // fel kodord per IP-adress, glöms efter en timme
   return async (req, res) => {
     try {
       const { getRound, postRound } = await import('./worker/samtal.mjs');
       const { gang } = require('./config/kupong');
-      const ip = req.ip;
       const r = req.method === 'GET'
         ? await getRound({ store, gang })
-        : await postRound(req.body, {
-          env: process.env,
-          store,
-          gang,
-          loadMatches,
-          limiter: {
-            count: async () => ((wrong.get(ip) || {}).until > Date.now() ? wrong.get(ip).n : 0),
-            bump: async () => {
-              const w = wrong.get(ip);
-              wrong.set(ip, w && w.until > Date.now() ? { n: w.n + 1, until: w.until } : { n: 1, until: Date.now() + 3600000 });
-            },
-          },
-        });
+        : await postRound(req.body, { store, gang, loadMatches });
       res.status(r.status).json(r.body);
     } catch (err) {
       console.error('[samtal]', err);
@@ -188,7 +161,7 @@ function samtalRoute(store = samtalFileStore(), loadMatches = siteMatches()) {
 if (require.main === module) {
   loadEnv();
   const analysisEndpoint = process.env[llm.keyEnv] ? '/api/analyze' : null;
-  const couponEndpoint = process.env.KUPONG_KOD ? '/api/kupong' : null;
+  const couponEndpoint = process.env.KUPONG_LOKALT ? '/api/kupong' : null;
 
   const cycle = async () => {
     try {

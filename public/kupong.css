@@ -410,8 +410,6 @@
 .kp-saved p { margin: 0 0 16px; color: var(--ink-soft); }
 .kp-saved .kp-actions { margin-bottom: 14px; }
 .kp-lab { display: block; margin-bottom: 8px; font-size: 13px; font-weight: 600; color: var(--ink-soft); }
-.kp-coderow { display: flex; gap: 10px; flex-wrap: wrap; }
-.kp-coderow .kp-name { flex: 1 1 200px; }
 .kp-msg { min-height: 1.4em; margin: 12px 0 0 !important; font-size: 14px; }
 .kp-alt { margin: 6px 0 0 !important; }
 .kp-linkbtn { padding: 0; border: 0; background: none; font: inherit; color: var(--accent-deep); text-decoration: underline; text-underline-offset: 2px; cursor: pointer; }

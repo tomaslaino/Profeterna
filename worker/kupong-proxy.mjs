@@ -2,14 +2,14 @@
 // direkt från sidan (worker/kupong.mjs). Egen tjänst, skild från proxyn för
 // matchanalysen: GitHub-nyckeln finns bara här, och tjänsten gör inget annat
 // än att committa en kontrollerad kupongfil i data/kuponger/ – och hålla
-// gängets egna tips inför samtalet (worker/samtal.mjs, i KV, inte på GitHub).
+// gängets egna tips inför uppgörelsen (worker/samtal.mjs, i KV, inte på GitHub).
 //
-//   POST /kupong {"kod", "kupong", "andra", "bas", "ändå"}   (se worker/kupong.mjs)
-//   POST /kupong {"kod", "bort", "bas"}                       ta bort en kupong
-//   GET  /samtal · POST /samtal {"kod", "gor", …}             (se worker/samtal.mjs)
+//   POST /kupong {"kupong", "andra", "bas", "ändå"}   (se worker/kupong.mjs)
+//   POST /kupong {"bort", "bas"}                       ta bort en kupong
+//   GET  /samtal · POST /samtal {"gor", …}             (se worker/samtal.mjs)
 //
-// Driftsätts för hand med worker/kupong.toml; hemligheterna GITHUB_TOKEN och
-// KUPONG_KOD läggs in med "wrangler secret put" (README, avsnittet Kupongen).
+// Driftsätts för hand med worker/kupong.toml; hemligheten GITHUB_TOKEN läggs
+// in med "wrangler secret put" (README, avsnittet Kupongen).
 //
 // Avsparkstiderna (startade matcher är låsta) läses ur den publicerade
 // sajten, <site>/data/matches.json – samma sajt som matchanalysens proxy
@@ -17,7 +17,7 @@
 
 import cfg from '../config/llm.js';
 import kupongCfg from '../config/kupong.js';
-import { saveCoupon, githubWriter, kvLimiter } from './kupong.mjs';
+import { saveCoupon, githubWriter } from './kupong.mjs';
 import { getRound, postRound, kvStore } from './samtal.mjs';
 
 // Frågeparametern går förbi CDN-cachen, så att det senaste bygget läses.
@@ -64,11 +64,7 @@ export default {
     }
     try {
       const site = String(env.SITE || cfg.site).replace(/\/+$/, '');
-      const ctx = {
-        env,
-        loadMatches: () => siteMatches(site),
-        limiter: env.KUPONG ? kvLimiter(env.KUPONG, request.headers.get('CF-Connecting-IP')) : null,
-      };
+      const ctx = { loadMatches: () => siteMatches(site) };
       const r = samtal
         ? await postRound(body, { ...ctx, store, gang: kupongCfg.gang })
         : await saveCoupon(body, { ...ctx, writer: env.GITHUB_TOKEN ? githubWriter(env.GITHUB_TOKEN) : null });
