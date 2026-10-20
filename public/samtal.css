@@ -175,33 +175,6 @@
 .sm-locked .kp-tg button { cursor: default; }
 .pp-fill .sm-locked .kp-tg button:hover::before { background: var(--pp-box); }
 
-/* ---------- ny omgång ---------- */
-
-.sm-pick {
-  width: 100%;
-  font: inherit;
-  text-align: left;
-  color: inherit;
-  background: transparent;
-  border: 0;
-  border-bottom: 1px solid var(--hair);
-  cursor: pointer;
-}
-.sm-pick:hover { background: rgba(243, 237, 227, 0.03); }
-.sm-tick {
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  width: 30px;
-  height: 30px;
-  font-size: 15px;
-  font-weight: 700;
-  color: var(--muted);
-  border: 1px solid var(--pill-line);
-  border-radius: 50%;
-}
-.sm-pick.on .sm-tick { color: #1d1509; border-color: transparent; background: var(--gold-grad); }
-
 /* ---------- förstasidan ---------- */
 
 .sm-teaser {
@@ -231,9 +204,6 @@
   .sm-row { grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 6px; padding: 12px 14px; }
   .sm-tm { grid-column: 1 / -1; margin-bottom: 4px; }
   .sm-cell { min-height: 64px; }
-  .sm-pick { grid-template-columns: minmax(0, 1fr) auto; gap: 10px; padding: 10px 14px; }
-  .sm-pick .mtime, .sm-pick .ctag { display: none; }
-  .sm-pick .mteams { font-size: 14px; }
   .sm-teaser { grid-template-columns: 1fr; }
   .sm-teaser .kp-btn { justify-self: start; }
 }

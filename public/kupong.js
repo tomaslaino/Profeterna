@@ -27,7 +27,6 @@ const KP = {
   draft: null,
   q: '',
   comp: 'all',
-  onlyPicked: false,
   allDays: false, // Ny kupong: alla PICK_DAYS dagar, inte bara närmaste omgången
   flash: null, // en rad överst i kupongvyn nästa gång den ritas (t.ex. "sparad")
 };
@@ -644,14 +643,15 @@ function startedNote({ dropped, reverted }) {
 function lockInfo() {
   const el = $('#kp-lockinfo');
   if (!el) return;
-  const n = KP.draft.locked.length;
-  el.innerHTML = [
-    KP.draftNote ? `<span class="note">${esc(KP.draftNote)}</span>` : null,
-    n ? `${n} ${n === 1 ? 'match har' : 'matcher har'} startat och ligger kvar som de är.` : null,
-  ].filter(Boolean).join(' ');
+  // Vilka som har startat står på papperet.
+  el.innerHTML = KP.draftNote ? `<span class="note">${esc(KP.draftNote)}</span>` : '';
   el.hidden = !el.innerHTML;
 }
 
+// Programmet till vänster och kupongen på papper bredvid (Papper.builder i
+// papper.js): + i programmet lägger en rad på papperet, där tecknen kryssas
+// och anteckningen skrivs. En vald match utan kryss står i utkastet med
+// tomt tecken ('').
 function renderCreate(editId) {
   const saved = kpLoad(KP_DRAFT);
   // Ett sparat utkast till en kupong som ändrats sedan dess gäller inte – då
@@ -665,21 +665,24 @@ function renderCreate(editId) {
   KP.allDays = false;
   const el = $('#coupon');
   const comps = [{ id: 'all', short: 'Alla', name: 'Alla tävlingar' }, ...state.comps.values()];
+  const tools = '<div class="toolbar kp-tools">' +
+    `<input type="search" id="kp-q" class="kp-search" placeholder="Sök lag" autocomplete="off" value="${esc(KP.q)}">` +
+    '<div class="chips" id="kp-comps" role="group" aria-label="Tävling">' + comps.map((c) =>
+      `<button type="button" data-comp="${c.id}" title="${esc(c.name)}" aria-pressed="${c.id === KP.comp}">${esc(c.short)}</button>`).join('') + '</div></div>' +
+    '<p class="legend" id="kp-lockinfo" hidden></p>' +
+    // Efter Ladda upp system: vad som kom med från bilden (systembild.js).
+    (window.Systembild ? Systembild.note() : '');
   el.innerHTML = '<div class="kp-head"><div>' +
     `<p class="kp-eyebrow">${editId ? 'Ändra kupong' : 'Ny kupong'}</p><h2 class="page-title">Välj matcher</h2></div>` +
     `<div class="kp-actions">${window.Systembild ? Systembild.button() : ''}<a class="kp-btn" href="#kupong${editId ? `/${esc(editId)}` : ''}">Avbryt</a></div></div>` +
-    '<div class="toolbar kp-tools">' +
-    `<input type="search" id="kp-q" class="kp-search" placeholder="Sök lag" autocomplete="off" value="${esc(KP.q)}">` +
-    '<div class="chips" id="kp-comps" role="group" aria-label="Tävling">' + comps.map((c) =>
-      `<button type="button" data-comp="${c.id}" title="${esc(c.name)}" aria-pressed="${c.id === KP.comp}">${esc(c.short)}</button>`).join('') + '</div>' +
-    `<button type="button" id="kp-only" class="kp-only" aria-pressed="${KP.onlyPicked}">Bara valda</button></div>` +
-    '<p class="legend" id="kp-lockinfo" hidden></p>' +
-    // Efter Ladda upp system: vad som kom med från bilden (systembild.js).
-    (window.Systembild ? Systembild.note() : '') +
-    Papper.fill('kp-pick-list') +
-    '<div class="kp-bar"><span class="kp-bar-txt" id="kp-bar-txt"></span>' +
-    `<input type="text" id="kp-name" class="kp-name" maxlength="40" placeholder="Namn (valfritt)" value="${esc(KP.draft.name)}">` +
-    '<button type="button" id="kp-save" class="kp-btn primary">Spara kupong</button></div>';
+    Papper.builder({
+      id: 'kp-build',
+      list: 'kp-pick-list',
+      tools,
+      head: `<input type="text" id="kp-name" class="pb-name" maxlength="40" placeholder="Namn (valfritt)" aria-label="Kupongens namn" value="${esc(KP.draft.name)}">`,
+      foot: '<button type="button" id="kp-save" class="kp-btn primary">Spara kupong</button><p class="pb-msg" id="kp-pick-msg" role="status"></p>',
+    });
+  Papper.wireBuilder('kp-build');
 
   $('#kp-q').addEventListener('input', (e) => { KP.q = e.target.value; renderPickList(); });
   for (const b of document.querySelectorAll('#kp-comps button')) {
@@ -689,16 +692,12 @@ function renderCreate(editId) {
       renderPickList();
     });
   }
-  $('#kp-only').addEventListener('click', (e) => {
-    KP.onlyPicked = !KP.onlyPicked;
-    e.currentTarget.setAttribute('aria-pressed', String(KP.onlyPicked));
-    renderPickList();
-  });
   $('#kp-name').addEventListener('input', (e) => { KP.draft.name = e.target.value; kpStore(KP_DRAFT, KP.draft); });
   $('#kp-save').addEventListener('click', saveCoupon);
-  // Anteckningen sparas i utkastet medan man skriver; listan ritas inte om,
-  // så att fältet behåller fokus.
-  $('#kp-pick-list').addEventListener('input', (e) => {
+  const build = $('#kp-build');
+  // Anteckningen sparas i utkastet medan man skriver; papperet ritas inte
+  // om, så att fältet behåller fokus.
+  build.addEventListener('input', (e) => {
     const f = e.target.closest('input[data-note]');
     if (!f) return;
     const v = f.value.slice(0, NOTE_MAX);
@@ -706,20 +705,32 @@ function renderCreate(editId) {
     else delete KP.draft.notes[f.dataset.note];
     kpStore(KP_DRAFT, KP.draft);
   });
-  $('#kp-pick-list').addEventListener('click', (e) => {
+  build.addEventListener('click', (e) => {
     if (e.target.closest('#kp-more')) {
       KP.allDays = true;
       renderPickList();
       return;
     }
-    const b = e.target.closest('button[data-s]');
-    if (!b) return;
-    const id = b.closest('[data-id]').dataset.id;
-    const cur = KP.draft.picks[id] || '';
-    const s = b.dataset.s;
-    const next = SIGNS.filter((x) => (x === s ? !cur.includes(x) : cur.includes(x))).join('');
-    if (next) KP.draft.picks[id] = next;
-    else delete KP.draft.picks[id];
+    const picks = KP.draft.picks;
+    // + och bock i programmet, × på kupongen.
+    const add = e.target.closest('button[data-add], button[data-drop]');
+    if (add) {
+      const id = add.dataset.add || add.dataset.drop;
+      if (add.dataset.drop || picks[id] != null) {
+        delete picks[id];
+        delete KP.draft.notes[id];
+      } else {
+        picks[id] = '';
+      }
+    } else {
+      // Kryssen på papperet: utan kryss står matchen kvar, med tomma rutor.
+      const b = e.target.closest('button[data-s]');
+      if (!b) return;
+      const id = b.closest('[data-id]').dataset.id;
+      const cur = picks[id] || '';
+      picks[id] = SIGNS.filter((x) => (x === b.dataset.s ? !cur.includes(x) : cur.includes(x))).join('');
+    }
+    $('#kp-pick-msg').innerHTML = '';
     kpStore(KP_DRAFT, KP.draft);
     renderPickList();
   });
@@ -759,50 +770,19 @@ function renderPickList() {
   const q = fold(KP.q.trim());
   const picks = KP.draft.picks;
   const all = pickable().filter((m) => {
-    // Matcher från en uppladdad bild där tecknen inte gick att läsa syns
-    // också, så att man kan trycka i dem.
-    if (KP.onlyPicked) return Boolean(picks[m.id] || (window.Systembild && Systembild.asks(m.id)));
     if (KP.comp !== 'all' && m.comp !== KP.comp) return false;
     return !q || fold(`${m.home} ${m.away}`).includes(q);
   });
-  // Först bara närmaste omgången (och det som redan är valt); sökningen och
-  // Bara valda gäller alla dagar.
+  // Först bara närmaste omgången (och det som redan är valt); sökningen
+  // gäller alla dagar.
   const end = roundEnd();
-  const list = KP.allDays || q || KP.onlyPicked ? all
-    : all.filter((m) => picks[m.id] || dayKey.format(new Date(m.kickoff)) <= end);
+  const list = KP.allDays || q ? all
+    : all.filter((m) => picks[m.id] != null || dayKey.format(new Date(m.kickoff)) <= end);
   const later = all.length - list.length;
   const more = later ? `<button type="button" class="earlier" id="kp-more">Visa fler dagar <span class="n">${later}</span></button>` : '';
-  if (!list.length) {
-    el.innerHTML = `<p class="empty">${KP.onlyPicked ? 'Inga valda matcher än.' : later ? 'Inga matcher den närmaste omgången.' : 'Inga matcher hittades.'}</p>${more}`;
-  } else {
-    const days = new Map();
-    for (const m of list) {
-      const k = dayKey.format(new Date(m.kickoff));
-      if (!days.has(k)) days.set(k, []);
-      days.get(k).push(m);
-    }
-    let html = '';
-    for (const ms of days.values()) {
-      html += `<div class="day"><div class="day-head">${esc(cap(fDay.format(new Date(ms[0].kickoff))))}</div><div class="mlist">`;
-      for (const m of ms) {
-        const sign = picks[m.id] || '';
-        const p = m.f ? m.f.p : null;
-        html += `<div class="kp-pick${sign ? ' on' : ''}" data-id="${esc(m.id)}">` +
-          `<span class="mtime">${esc(fTime.format(new Date(m.kickoff)))}</span>` +
-          `<span class="ctag" title="${esc(compOf(m.comp).name)}">${esc(compOf(m.comp).short)}</span>` +
-          `<span class="mteams">${esc(m.home)}<span class="vs">–</span>${esc(m.away)}</span>` +
-          '<span class="kp-tg">' + SIGNS.map((s, i) =>
-            `<button type="button" data-s="${s}" aria-pressed="${sign.includes(s)}" aria-label="${s} för ${esc(m.home)} – ${esc(m.away)}">` +
-            `${s}<small>${p ? pctOdds(p[i]) : '–'}</small></button>`).join('') + '</span>' +
-          (sign ? `<input type="text" class="kp-note-in" data-note="${esc(m.id)}" maxlength="${NOTE_MAX}" autocomplete="off"` +
-            ` placeholder="Anteckning (valfritt)" aria-label="Anteckning om ${esc(m.home)} – ${esc(m.away)}" value="${esc(KP.draft.notes[m.id] || '')}">` : '') +
-          '</div>';
-      }
-      html += '</div></div>';
-    }
-    el.innerHTML = html + more;
-  }
-  updateBar();
+  el.innerHTML = (list.length ? Papper.program(list, (id) => picks[id] != null)
+    : `<p class="empty">${later ? 'Inga matcher den närmaste omgången.' : 'Inga matcher hittades.'}</p>`) + more;
+  drawSlip();
 }
 
 function draftMatches(d = KP.draft) {
@@ -811,20 +791,27 @@ function draftMatches(d = KP.draft) {
     .filter((x) => x.m);
 }
 
-function updateBar() {
-  const t = $('#kp-bar-txt');
-  if (!t) return;
+// Papperet: de valda matcherna och – vid ändring – de som har startat, som
+// står kvar som de var. I foten rader och väntat antal rätt; startade
+// matcher räknas som de gått, eller med prognosen.
+function drawSlip() {
   const sel = draftMatches();
-  const n = sel.length + KP.draft.locked.length;
-  if (!n) {
-    t.innerHTML = '<b>0</b> matcher';
-    return;
-  }
-  // Startade matcher (vid ändring) räknas som de gått, eller med prognosen.
   const now = Date.now();
-  const exp = sel.reduce((a, x) => a + (x.m.f ? x.sign.split('').reduce((b, s) => b + x.m.f.p[SIGNS.indexOf(s)], 0) / 100 : 0), 0) +
-    KP.draft.locked.map((x) => gradeRow(x, now)).reduce((a, r) => a + (r.state === 'final' && r.hit != null ? (r.hit ? 1 : 0) : (r.p || 0) / 100), 0);
-  t.innerHTML = `<b>${n}</b> ${n === 1 ? 'match' : 'matcher'}` + (sel.length ? ` · väntat <b>${kpNum(exp)}</b> rätt` : '');
+  const locked = KP.draft.locked.map((x) => ({ ...x, m: matchById(x.id), locked: true }));
+  const signed = sel.filter((x) => x.sign);
+  const fields = [];
+  if (signed.length || locked.length) {
+    const rows = [...signed, ...locked].reduce((a, x) => a * Math.max(1, x.sign.length), 1);
+    const exp = signed.reduce((a, x) => a + (x.m.f ? x.sign.split('').reduce((b, s) => b + x.m.f.p[SIGNS.indexOf(s)], 0) / 100 : 0), 0) +
+      KP.draft.locked.map((x) => gradeRow(x, now)).reduce((a, r) => a + (r.state === 'final' && r.hit != null ? (r.hit ? 1 : 0) : (r.p || 0) / 100), 0);
+    fields.push(['Rader', rows, 'Antal rader med garderingarna'], ['Väntat', kpNum(exp), 'Väntat antal rätt enligt modellen']);
+  }
+  Papper.slip('kp-build', {
+    rows: [...sel.map((x) => ({ ...x, note: KP.draft.notes[x.id] || '' })), ...locked],
+    signs: true,
+    fields,
+  });
+  if (sel.length === signed.length) $('#kp-build').classList.remove('need');
 }
 
 // Filen med en match per rad, så att den går att läsa och ändra på GitHub.
@@ -851,9 +838,17 @@ async function saveCoupon() {
     renderPickList();
     return;
   }
+  // En vald match utan kryss: rutorna blir röda, och remsan fälls upp.
+  const blank = draftMatches().filter((x) => !x.sign).length;
+  if (blank) {
+    $('#kp-build').classList.add('need');
+    Papper.openSlip('kp-build');
+    $('#kp-pick-msg').innerHTML = `<span class="note">Kryssa i alla matcher – ${blank === 1 ? 'en saknar' : `${blank} saknar`} tecken.</span>`;
+    return;
+  }
   const ctx = couponCtx(KP.draft);
   if (!ctx) {
-    $('#kp-bar-txt').innerHTML = '<span class="note">Välj minst en match</span>';
+    $('#kp-pick-msg').innerHTML = '<span class="note">Välj minst en match.</span>';
     return;
   }
   KP.view = { mode: 'saved', id: ctx.id };
@@ -867,7 +862,7 @@ async function saveCoupon() {
 // null om ingen match är vald. Används också av samtalsunderlaget, som
 // sparar gängets kupong direkt (samtal.js).
 function couponCtx(d) {
-  const sel = draftMatches(d);
+  const sel = draftMatches(d).filter((x) => x.sign);
   if (!sel.length && !d.locked.length) return null;
   let id = d.edit;
   if (!id) {

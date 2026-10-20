@@ -13,9 +13,11 @@
 // Pennstrecken ritas med ett slumptal som utgår från matchen och tecknet, så
 // att varje kryss ser handritat ut men ser likadant ut varje gång sidan ritas.
 //
-// Läses efter kupong.js och använder dess hjälpare (SIGNS, rowClass, teamsOf,
-// scoreText, kpNum, dateRange, liveLine, fWeekdayTime) och app.js (esc, fTime,
-// fDay, dayKey, cap, compOf, pctOdds).
+// Längst ner kupongen som växer fram medan man väljer matcher (builder, slip).
+//
+// Läses efter kupong.js och använder dess hjälpare (SIGNS, NOTE_MAX, rowClass,
+// teamsOf, scoreText, kpNum, dateRange, liveLine, fWeekdayTime) och app.js
+// (esc, fTime, fDay, dayKey, cap, compOf, pctOdds).
 
 (function () {
   // Slumptal ur en nyckel (mulberry32 med FNV-hash som frö).
@@ -216,13 +218,179 @@
       head(c, g) + '<div class="pp-band" aria-hidden="true"></div>' + rows(g) + foot(c, g) + '</article></div>';
   }
 
-  // Tomma kupongen som fylls i (Ny kupong och Din kupong): papperet runt
-  // listan med id, som ritas av kupong.js eller samtal.js.
+  // Tomma kupongen som fylls i (Din kupong): papperet runt listan med id,
+  // som ritas av samtal.js.
   function fill(id) {
     return '<div class="pp-wrap"><div class="pp pp-fill">' +
       '<p class="pp-brand"><img src="logo.svg" alt="" width="20" height="20">Matchfixarna<span>Kupong</span></p>' +
       `<div class="pp-band" aria-hidden="true"></div><div id="${id}"></div></div></div>`;
   }
 
-  window.Papper = { coupon, fill };
+  // ---------- kupongen som växer fram ----------
+  //
+  // Ny kupong, Ändra och Välj matcher i omgången: programmet – matcherna att
+  // välja bland – och bredvid det papperskupongen, som får en tryckt rad för
+  // varje vald match. I Ny kupong och Ändra kryssas tecknen på papperet; i
+  // omgången står rutorna tomma tills var och en fyller i sin kupong. På
+  // smala skärmar ligger kupongen som en remsa längst ner som fälls upp.
+  //
+  // Sidan (kupong.js, samtal.js) ritar programmet i listan med id list och
+  // lyssnar på hela byggets id: button[data-add] i programmet,
+  // button[data-drop] (ta bort) och – med tecken – button[data-s] och
+  // input[data-note] på papperet.
+
+  const B = { ids: null }; // raderna som stod på papperet förra gången, för att se vilken som är ny
+  const NARROW = '(max-width: 899px)';
+
+  function builder({ id, list, tools = '', head = '', foot = '' }) {
+    B.ids = null;
+    return `<div class="pb" id="${id}"><div class="pb-prog">${tools}<div id="${list}"></div></div>` +
+      '<div class="pb-dim" aria-hidden="true"></div>' +
+      '<aside class="pb-side" aria-label="Kupongen"><div class="pp-wrap pb-wrap"><div class="pp pp-fill pb-slip">' +
+      '<div class="pb-head">' +
+      '<p class="pp-brand"><img src="logo.svg" alt="" width="20" height="20">Matchfixarna<span>Kupong</span></p>' +
+      '<h2 class="pp-title pb-title"></h2>' +
+      `<p class="pp-meta"><span class="pb-count"></span>${head}</p>` +
+      '<button type="button" class="pb-toggle" aria-expanded="false" aria-label="Visa kupongen">' +
+      '<svg viewBox="0 0 20 20" aria-hidden="true"><path d="M5 12.5l5-5 5 5"/></svg></button></div>' +
+      '<p class="pb-peek" aria-hidden="true"></p>' +
+      '<div class="pp-band" aria-hidden="true"></div>' +
+      '<div class="pb-rows"></div>' +
+      `<div class="pb-foot"><div class="pp-fields pb-fields"></div>${foot}</div>` +
+      '</div></div></aside></div>';
+  }
+
+  // Remsan fälls upp och ihop: tryck på huvudet, utanför eller Esc.
+  function openSlip(id, open = true) {
+    const root = document.getElementById(id);
+    if (!root) return;
+    root.classList.toggle('is-open', open);
+    const t = root.querySelector('.pb-toggle');
+    t.setAttribute('aria-expanded', String(open));
+    t.setAttribute('aria-label', open ? 'Fäll ihop kupongen' : 'Visa kupongen');
+  }
+
+  function wireBuilder(id) {
+    const root = document.getElementById(id);
+    if (!root) return;
+    const set = (open) => openSlip(id, open);
+    root.querySelector('.pb-head').addEventListener('click', (e) => {
+      if (!window.matchMedia(NARROW).matches) return;
+      if (e.target.closest('input, a, button:not(.pb-toggle)')) return;
+      set(!root.classList.contains('is-open'));
+    });
+    root.querySelector('.pb-dim').addEventListener('click', () => set(false));
+    root.addEventListener('keydown', (e) => {
+      if (e.key === 'Escape' && root.classList.contains('is-open')) set(false);
+    });
+  }
+
+  // Programmet: de valbara matcherna per dag, en knapp per match.
+  function program(matches, isOn) {
+    const days = new Map();
+    for (const m of matches) {
+      const k = dayKey.format(new Date(m.kickoff));
+      if (!days.has(k)) days.set(k, []);
+      days.get(k).push(m);
+    }
+    let html = '';
+    for (const ms of days.values()) {
+      html += `<div class="day"><div class="day-head">${esc(cap(fDay.format(new Date(ms[0].kickoff))))}</div><div class="mlist">`;
+      for (const m of ms) {
+        const on = isOn(m.id);
+        const comp = compOf(m.comp);
+        html += `<button type="button" class="kp-pick pb-pick${on ? ' on' : ''}" data-add="${esc(m.id)}" aria-pressed="${on}">` +
+          `<span class="mtime">${esc(fTime.format(new Date(m.kickoff)))}</span>` +
+          `<span class="ctag" title="${esc(comp.name)}">${esc(comp.short)}</span>` +
+          `<span class="mteams">${esc(m.home)}<span class="vs">–</span>${esc(m.away)}</span>` +
+          `<span class="pb-tick" aria-hidden="true">${on ? '✓' : '+'}</span></button>`;
+      }
+      html += '</div></div>';
+    }
+    return html;
+  }
+
+  function slipRow(r, i, signs, fresh) {
+    const m = r.m;
+    const label = m ? `${m.home} – ${m.away}` : r.label || `match ${r.id}`;
+    const comp = m ? compOf(m.comp) : null;
+    const small = m ? `${esc(fTime.format(new Date(m.kickoff)))}${comp ? ` · <abbr title="${esc(comp.name)}">${esc(comp.short)}</abbr>` : ''}` : '';
+    const sign = r.sign || '';
+    let cells;
+    if (signs && !r.locked) {
+      const p = m && m.f ? m.f.p : null;
+      cells = '<span class="kp-tg">' + SIGNS.map((s, k) =>
+        `<button type="button" data-s="${s}" aria-pressed="${sign.includes(s)}" aria-label="${s} för ${esc(label)}">` +
+        `${s}<small>${p ? pctOdds(p[k]) : '–'}</small></button>`).join('') + '</span>';
+    } else {
+      // Startad (står som den stod) eller omgången (fylls i av var och en).
+      cells = '<span class="pp-signs" aria-hidden="true">' + SIGNS.map((s) =>
+        `<span class="pp-cell"><span class="pp-box"><i>${s}</i>${sign.includes(s) ? cross(`${r.id}${s}`) : ''}</span></span>`).join('') + '</span>';
+    }
+    const note = signs && !r.locked && sign
+      ? `<input type="text" class="kp-note-in" data-note="${esc(r.id)}" maxlength="${NOTE_MAX}" autocomplete="off"` +
+        ` placeholder="Anteckning (valfritt)" aria-label="Anteckning om ${esc(label)}" value="${esc(r.note || '')}">`
+      : r.note ? `<span class="pp-note">${esc(r.note)}</span>` : '';
+    return `<div class="pb-row${i % 2 ? ' alt' : ''}${r.locked ? ' locked' : ''}${fresh ? ' pb-new' : ''}${signs && !r.locked && !sign ? ' unsigned' : ''}" data-id="${esc(r.id)}">` +
+      `<span class="pp-nr">${i + 1}</span>` +
+      `<span class="pb-match"><span class="pp-tm">${m ? `${esc(m.home)}<span class="vs"> – </span>${esc(m.away)}` : esc(label)}</span>` +
+      `${small ? `<span class="pp-small">${small}${r.locked ? ' · har startat' : ''}</span>` : ''}</span>` +
+      cells +
+      (r.locked ? '<span></span>' : `<button type="button" class="pb-drop" data-drop="${esc(r.id)}" aria-label="Ta bort ${esc(label)}" title="Ta bort">` +
+        '<svg viewBox="0 0 20 20" aria-hidden="true"><path d="M6 6l8 8M14 6l-8 8"/></svg></button>') +
+      note + '</div>';
+  }
+
+  // Ritar papperet: rows [{id, m, label, sign, note, locked}] i
+  // avsparksordning, fields [[etikett, värde, title]] i foten. Med signs
+  // kryssas tecknen på papperet. Raden som just lagts till trycks fram.
+  function slip(id, { rows, signs = false, fields = [] }) {
+    const root = document.getElementById(id);
+    if (!root) return;
+    const list = rows.slice().sort((a, b) => (a.m ? Date.parse(a.m.kickoff) : 0) - (b.m ? Date.parse(b.m.kickoff) : 0));
+    const was = B.ids;
+    B.ids = new Set(list.map((r) => r.id));
+    const added = was ? list.filter((r) => !was.has(r.id)).map((r) => r.id) : [];
+    const kicks = list.filter((r) => r.m).map((r) => Date.parse(r.m.kickoff));
+    const n = list.length;
+    root.querySelector('.pb-title').innerHTML = kicks.length ? esc(dateRange(Math.min(...kicks), Math.max(...kicks))) : '<span class="pb-blankline"></span>';
+    root.querySelector('.pb-count').textContent = `${n} ${n === 1 ? 'match' : 'matcher'}`;
+    root.querySelector('.pb-peek').textContent = list.map((r, i) => `${i + 1} ${r.m ? `${r.m.home}–${r.m.away}` : r.label || r.id}`).join(' · ');
+    let html = '';
+    let day = null;
+    list.forEach((r, i) => {
+      const k = r.m ? dayKey.format(new Date(r.m.kickoff)) : 'okänd';
+      if (k !== day) {
+        day = k;
+        html += `<p class="pp-day">${esc(r.m ? cap(fDay.format(new Date(r.m.kickoff))) : 'Okänt datum')}</p>`;
+      }
+      html += slipRow(r, i, signs, added.includes(r.id));
+    });
+    // Tomt papper: några otryckta rader att fylla.
+    if (!n) html = '<div class="pb-empty" aria-hidden="true">' + [1, 2, 3].map((i) => `<div class="pb-row"><span class="pp-nr">${i}</span><span class="pb-line"></span></div>`).join('') + '</div>';
+    const box = root.querySelector('.pb-rows');
+    // Fokus i en anteckning behålls: fältet ritas om bara om raderna ändrats.
+    const keep = document.activeElement && box.contains(document.activeElement) && document.activeElement.matches('input') ? document.activeElement.dataset.note : null;
+    box.innerHTML = html;
+    if (keep) {
+      const f = box.querySelector(`input[data-note="${CSS.escape(keep)}"]`);
+      if (f) { f.focus(); f.setSelectionRange(f.value.length, f.value.length); }
+    }
+    root.querySelector('.pb-fields').innerHTML = fields.map(([label, v, title]) =>
+      `<span class="pp-field"${title ? ` title="${esc(title)}"` : ''}><span>${label}</span><b>${v}</b></span>`).join('');
+    if (added.length) {
+      // Den nya raden syns: på papperet bredvid rullas den fram, på remsan
+      // studsar siffran.
+      const row = box.querySelector(`.pb-row[data-id="${CSS.escape(added[added.length - 1])}"]`);
+      if (row && box.clientHeight && (row.offsetTop < box.scrollTop || row.offsetTop + row.offsetHeight > box.scrollTop + box.clientHeight)) {
+        box.scrollTo({ top: row.offsetTop - box.clientHeight / 3, behavior: 'smooth' });
+      }
+      const count = root.querySelector('.pb-count');
+      count.classList.remove('pb-bump');
+      void count.offsetWidth;
+      count.classList.add('pb-bump');
+    }
+  }
+
+  window.Papper = { coupon, fill, builder, wireBuilder, openSlip, program, slip };
 }());

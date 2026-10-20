@@ -35,7 +35,7 @@
     pick: null, // skapa kupongen / ändra matcherna: {ids: Set}
     q: '',
     comp: 'all',
-    only: false,
+    allDays: false, // välj matcher: alla dagar, inte bara närmaste omgången
     draft: null, // dina tips: {id, vem, tecken, kommentarer, inne, nyckel}
     edit: false, // draft är en ändring av dina inlämnade tips
     again: false, // Spara gängets kupong trots matcher utan tecken
@@ -722,6 +722,9 @@
 
   // ---------- skapa omgångens kupong och ändra matcherna ----------
 
+  // Programmet till vänster och omgångens kupong på papper bredvid, som får
+  // en rad för varje vald match (Papper.builder i papper.js). Rutorna står
+  // tomma tills var och en fyller i sin kupong.
   function renderStart(edit) {
     const s = SM.data;
     // Matcherna står fast när någon har lämnat in.
@@ -730,21 +733,24 @@
       return;
     }
     SM.pick = { ids: new Set(edit ? s.matcher.map((x) => x.id) : []) };
-    SM.only = false;
+    SM.allDays = false;
     const comps = [{ id: 'all', short: 'Alla', name: 'Alla tävlingar' }, ...state.comps.values()];
+    const tools = '<div class="toolbar kp-tools">' +
+      `<input type="search" id="sm-q" class="kp-search" placeholder="Sök lag" autocomplete="off" value="${esc(SM.q)}">` +
+      '<div class="chips" id="sm-comps" role="group" aria-label="Tävling">' + comps.map((c) =>
+        `<button type="button" data-comp="${c.id}" title="${esc(c.name)}" aria-pressed="${c.id === SM.comp}">${esc(c.short)}</button>`).join('') + '</div></div>';
     $('#coupon').innerHTML = viewNav('omgang') + roundSteps(1) +
       '<div class="kp-head"><div><p class="kp-eyebrow">Omgångens kupong</p>' +
       `<h2 class="page-title">${edit ? 'Ändra matcherna' : 'Välj matcher'}</h2></div>` +
       '<div class="kp-actions"><a class="kp-btn" href="#kupong">Avbryt</a></div></div>' +
-      '<div class="toolbar kp-tools">' +
-      `<input type="search" id="sm-q" class="kp-search" placeholder="Sök lag" autocomplete="off" value="${esc(SM.q)}">` +
-      '<div class="chips" id="sm-comps" role="group" aria-label="Tävling">' + comps.map((c) =>
-        `<button type="button" data-comp="${c.id}" title="${esc(c.name)}" aria-pressed="${c.id === SM.comp}">${esc(c.short)}</button>`).join('') + '</div>' +
-      `<button type="button" id="sm-only" class="kp-only" aria-pressed="${SM.only}">Bara valda</button></div>` +
-      '<div id="sm-pick-list"></div>' +
-      '<div class="kp-bar"><span class="kp-bar-txt" id="sm-bar-txt"></span>' +
-      `<button type="button" class="kp-btn primary" id="sm-start">${edit ? 'Spara matcherna' : 'Skapa kupongen'}</button>` +
-      '<span class="sm-bar-msg" id="sm-msg" role="status"></span></div>';
+      Papper.builder({
+        id: 'sm-build',
+        list: 'sm-pick-list',
+        tools,
+        foot: `<button type="button" class="kp-btn primary" id="sm-start">${edit ? 'Spara matcherna' : 'Skapa kupongen'}</button>` +
+          '<p class="pb-msg" id="sm-msg" role="status"></p>',
+      });
+    Papper.wireBuilder('sm-build');
 
     $('#sm-q').addEventListener('input', (e) => { SM.q = e.target.value; pickList(); });
     for (const b of document.querySelectorAll('#sm-comps button')) {
@@ -754,16 +760,17 @@
         pickList();
       });
     }
-    $('#sm-only').addEventListener('click', (e) => {
-      SM.only = !SM.only;
-      e.currentTarget.setAttribute('aria-pressed', String(SM.only));
-      pickList();
-    });
-    $('#sm-pick-list').addEventListener('click', (e) => {
-      const b = e.target.closest('button[data-id]');
+    // + och bock i programmet, × på kupongen.
+    $('#sm-build').addEventListener('click', (e) => {
+      if (e.target.closest('#sm-more')) {
+        SM.allDays = true;
+        pickList();
+        return;
+      }
+      const b = e.target.closest('button[data-add], button[data-drop]');
       if (!b) return;
-      const id = b.dataset.id;
-      if (SM.pick.ids.has(id)) SM.pick.ids.delete(id);
+      const id = b.dataset.add || b.dataset.drop;
+      if (b.dataset.drop || SM.pick.ids.has(id)) SM.pick.ids.delete(id);
       else SM.pick.ids.add(id);
       $('#sm-msg').innerHTML = '';
       pickList();
@@ -778,38 +785,19 @@
     const now = Date.now();
     // Valda matcher som hunnit starta faller bort.
     for (const id of [...ids]) if (!isOpen(matchById(id), now)) ids.delete(id);
-    const list = pickable(now).filter((m) => {
-      if (SM.only) return ids.has(m.id);
+    const all = pickable(now).filter((m) => {
       if (SM.comp !== 'all' && m.comp !== SM.comp) return false;
       return !q || fold(`${m.home} ${m.away}`).includes(q);
     });
-    const el = $('#sm-pick-list');
-    if (!list.length) {
-      el.innerHTML = `<p class="empty">${SM.only ? 'Inga valda matcher än.' : 'Inga matcher hittades.'}</p>`;
-    } else {
-      const days = new Map();
-      for (const m of list) {
-        const k = dayKey.format(new Date(m.kickoff));
-        if (!days.has(k)) days.set(k, []);
-        days.get(k).push(m);
-      }
-      let html = '';
-      for (const ms of days.values()) {
-        html += `<div class="day"><div class="day-head">${esc(cap(fDay.format(new Date(ms[0].kickoff))))}</div><div class="mlist">`;
-        for (const m of ms) {
-          const on = ids.has(m.id);
-          html += `<button type="button" class="kp-pick sm-pick${on ? ' on' : ''}" data-id="${esc(m.id)}" aria-pressed="${on}">` +
-            `<span class="mtime">${esc(fTime.format(new Date(m.kickoff)))}</span>` +
-            `<span class="ctag" title="${esc(compOf(m.comp).name)}">${esc(compOf(m.comp).short)}</span>` +
-            `<span class="mteams">${esc(m.home)}<span class="vs">–</span>${esc(m.away)}</span>` +
-            `<span class="sm-tick" aria-hidden="true">${on ? '✓' : '+'}</span></button>`;
-        }
-        html += '</div></div>';
-      }
-      el.innerHTML = html;
-    }
-    const n = ids.size;
-    $('#sm-bar-txt').innerHTML = n ? `<b>${n}</b> ${n === 1 ? 'match' : 'matcher'} valda` : 'Tryck på matcherna som ska vara med';
+    // Först bara närmaste omgången (och det som redan är valt); sökningen
+    // gäller alla dagar.
+    const end = roundEnd(now);
+    const list = SM.allDays || q ? all : all.filter((m) => ids.has(m.id) || dayKey.format(new Date(m.kickoff)) <= end);
+    const later = all.length - list.length;
+    const more = later ? `<button type="button" class="earlier" id="sm-more">Visa fler dagar <span class="n">${later}</span></button>` : '';
+    $('#sm-pick-list').innerHTML = (list.length ? Papper.program(list, (id) => ids.has(id))
+      : `<p class="empty">${later ? 'Inga matcher den närmaste omgången.' : 'Inga matcher hittades.'}</p>`) + more;
+    Papper.slip('sm-build', { rows: [...ids].map((id) => ({ id, m: matchById(id) })) });
   }
 
   async function startRound(edit, ersatt = null) {
