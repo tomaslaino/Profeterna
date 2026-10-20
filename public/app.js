@@ -1218,6 +1218,9 @@ if (window.Spoiler) {
     $('#topline').textContent = 'Kunde inte läsa sajtens data.';
     $('#topline').hidden = false;
   }
+  // meta.json kan komma ur cachen innan skripten efter app.js (kupong.js och
+  // resten) har körts – route() och matchlistan anropar dem.
+  if (document.readyState === 'loading') await new Promise((ok) => document.addEventListener('DOMContentLoaded', ok, { once: true }));
   renderChips();
   loadMatches();
   loadSources();
