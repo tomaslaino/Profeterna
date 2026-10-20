@@ -152,6 +152,11 @@
 .kp-teaser-num { color: inherit; text-decoration: none; }
 .kp-teaser-go { display: flex; flex-wrap: wrap; gap: 8px; }
 .kp-teaser.is-live { border-color: color-mix(in srgb, var(--accent) 45%, transparent); }
+/* telefonen: knapparna fyller raden – bredvid varandra om de ryms, annars
+   lika breda under varandra */
+@media (max-width: 719px) {
+  .kp-teaser-go > .kp-btn { flex: 1 1 auto; justify-content: center; padding: 11px 18px; }
+}
 @media (min-width: 720px) {
   .kp-teaser {
     grid-template-columns: minmax(0, 1fr) auto auto;
@@ -165,6 +170,9 @@
   .kp-teaser .kp-pearls { grid-area: dots; }
   .kp-teaser-go { grid-area: go; margin-right: clamp(0px, 8vw, 150px); }
   .kp-teaser-go .kp-btn { padding: 12px 22px; font-size: 15px; }
+  /* med Ladda upp system: knapparna under varandra, så att namnet får plats */
+  .kp-teaser-go:has(.sb-btn) { flex-direction: column; }
+  .kp-teaser-go:has(.sb-btn) .kp-btn { justify-content: center; }
 }
 
 /* ---------- ny kupong när den gamla är färdigspelad ---------- */

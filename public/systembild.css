@@ -19,6 +19,6 @@
 .sb-toast[hidden] { display: none; }
 .sb-toast.error { border-color: var(--down); color: var(--down); border-radius: 14px; }
 
-/* Knappen med en bild, i omgångens tomma kupong */
+/* Knappen med en bild: i omgångens tomma kupong och i förstasidans ruta */
 .sb-btn { gap: 8px; }
 .sb-ic { width: 18px; height: 18px; flex: none; }

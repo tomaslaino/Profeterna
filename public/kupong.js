@@ -435,12 +435,12 @@ const newCouponHref = () => (hasSamtal() ? '#kupong/samtal/ny' : '#kupong/ny');
 const samtalTeaser = () => (hasSamtal() ? Samtal.teaser() : '');
 
 // En kupong per omgång: den som är först väljer matcherna, sedan fyller alla
-// i samma kupong. På kupongsidan går systemet ni spelade också att ladda upp
-// som skärmbild (systembild.js).
-function emptyCard(upload = false) {
+// i samma kupong. Systemet ni spelade går också att ladda upp som
+// skärmbild, på förstasidan och på kupongsidan (systembild.js).
+function emptyCard() {
   return '<div class="kp-empty card"><p class="kp-eyebrow">Kupong</p><h2 class="page-title">Omgångens kupong</h2>' +
     `<div class="kp-empty-go"><a class="kp-btn primary" href="${newCouponHref()}">Välj matcher</a>` +
-    (upload && window.Systembild ? Systembild.button('kp-btn', true) : '') + '</div></div>';
+    (window.Systembild ? Systembild.button('kp-btn', true) : '') + '</div></div>';
 }
 
 // Utan id omgångens kupong, annars en viss kupong.
@@ -450,7 +450,7 @@ function renderCouponShow(id) {
   const graded = all.map((c) => ({ c, g: gradeCoupon(c) })).sort((a, b) => (b.g.first || 0) - (a.g.first || 0));
   if (!graded.length) {
     // Omgångens tips finns kvar att titta på, också utan gängets kupong.
-    el.innerHTML = viewNav('omgang') + roundSteps(1) + emptyCard(true) +
+    el.innerHTML = viewNav('omgang') + roundSteps(1) + emptyCard() +
       (!id && hasSamtal() && Samtal.visible() ? '<p class="legend"><a href="#kupong/samtal">Förra omgångens tips</a></p>' : '') + couponErrors();
     return;
   }
@@ -551,9 +551,12 @@ const couponName = (c) => c.name || (hasSamtal() && Samtal.covers(c) && Samtal.n
 // Resten (väntat, modellens tips, GitHub) står på kupongsidan.
 function teaser(c, g) {
   const name = couponName(c);
+  // Innan matcherna startar går systemet ni spelade att ladda upp direkt
+  // härifrån – är det samma matcher ändras kupongen (systembild.js).
   const go = g.done
     ? `<a class="kp-btn primary" href="${newCouponHref()}">+ Ny kupong</a><a class="kp-btn" href="#kupong">Se kupongen</a>`
-    : `<a class="kp-btn primary" href="#kupong">${g.started ? 'Följ kupongen' : 'Till kupongen'}</a>`;
+    : `<a class="kp-btn primary" href="#kupong">${g.started ? 'Följ kupongen' : 'Till kupongen'}</a>` +
+      (!g.started && window.Systembild ? Systembild.button('kp-btn', true) : '');
   return `<div class="card kp-teaser${g.live ? ' is-live' : ''}">` +
     // Namnet som rubrik och datumen ovanför; utan namn som förut.
     `<div class="kp-teaser-txt"><p class="kp-eyebrow">${esc(name ? dateRange(g.first, g.last) : 'Omgångens kupong')}</p>` +
@@ -672,13 +675,13 @@ function renderCreate(editId) {
   KP.allDays = false;
   const el = $('#coupon');
   const comps = [{ id: 'all', short: 'Alla', name: 'Alla tävlingar' }, ...state.comps.values()];
+  // Efter Ladda upp system: vad som kom med från bilden (systembild.js).
+  const note = window.Systembild ? Systembild.note() : '';
   const tools = '<div class="toolbar kp-tools">' +
     `<input type="search" id="kp-q" class="kp-search" placeholder="Sök lag" autocomplete="off" value="${esc(KP.q)}">` +
     '<div class="chips" id="kp-comps" role="group" aria-label="Tävling">' + comps.map((c) =>
       `<button type="button" data-comp="${c.id}" title="${esc(c.name)}" aria-pressed="${c.id === KP.comp}">${esc(c.short)}</button>`).join('') + '</div></div>' +
-    '<p class="legend" id="kp-lockinfo" hidden></p>' +
-    // Efter Ladda upp system: vad som kom med från bilden (systembild.js).
-    (window.Systembild ? Systembild.note() : '');
+    '<p class="legend" id="kp-lockinfo" hidden></p>' + note;
   el.innerHTML = '<div class="kp-head"><div>' +
     `<p class="kp-eyebrow">${editId ? 'Ändra kupong' : 'Ny kupong'}</p><h2 class="page-title">Välj matcher</h2></div>` +
     `<div class="kp-actions">${window.Systembild ? Systembild.button() : ''}<a class="kp-btn" href="#kupong${editId ? `/${esc(editId)}` : ''}">Avbryt</a></div></div>` +
@@ -741,6 +744,19 @@ function renderCreate(editId) {
     renderPickList();
   });
   renderPickList();
+  // Från en skärmbild i telefonen: kupongen dras fram direkt, med raden om
+  // vad som kom med bredvid Spara – det är bara att se över och spara.
+  if (note && window.matchMedia('(max-width: 640px)').matches) {
+    const t = document.createElement('div');
+    t.innerHTML = note;
+    $('#kp-pick-msg').innerHTML = t.firstElementChild.innerHTML;
+    Papper.open('kp-build');
+  }
+  // Tecken som inte gick att läsa på bilden: rutorna röda direkt.
+  if (note && draftMatches().some((x) => !x.sign)) {
+    $('#kp-build').classList.add('need');
+    Papper.reveal('kp-build', '.pb-row.unsigned');
+  }
   window.scrollTo(0, 0);
 }
 
