@@ -22,6 +22,9 @@
 //                 står de kvar som de var.
 //   POST /samtal {gor: "se", id, vem, nyckel} → {ok, samtal}   samtal med
 //                 allas inlämnade tips, för den som har lämnat in
+//   POST /samtal {gor: "bort", id} → {ok, samtal: null}   ta bort omgången
+//                 för alla, med de inlämnade tipsen – tills allas tips visas
+//                 (då hör den till tipparhistoriken)
 //   → 400 fel i förfrågan
 //   → 409 omgången har bytts ({samtal}), matcherna har ändrats sedan sidan
 //          visade dem ({samtal, andrade: true}), man har redan lämnat in och
@@ -45,6 +48,7 @@
 //   samtal:aktuellt                  omgången {id, skapad, matcher: [{id, match, avspark}]}
 //   samtal:<id>:tips:<vem>           {inne, ändrad, tecken, kommentarer, nyckel}
 //   samtal:<id>                      en tidigare omgång, sparad när nästa startades
+//                                    eller när den togs bort (borttagen)
 //   samtal:forra                     omgången före den aktuella, om dess tips
 //                                    visades när den ersattes (annars null)
 
@@ -180,6 +184,15 @@ export async function postRound(body, { store, gang, loadMatches, now = () => ne
   if (String(b.id || '') !== round.id || !ROUND_ID.test(round.id)) {
     return fail(409, 'Omgången har bytts sedan du öppnade sidan.', { samtal: view() });
   }
+  // Som när omgången ersätts innan tipsen visats: den sparas under sitt id
+  // men räknas inte, och den förra omgången står kvar.
+  if (b.gor === 'bort') {
+    if (shown(round, tips, gang, ms)) return fail(409, 'Allas tips visas redan, så kupongen går inte att ta bort.', { samtal: view() });
+    await store.put(`samtal:${round.id}`, { ...round, borttagen: t.toISOString() });
+    await store.put(CURRENT, null);
+    return ok({ samtal: null });
+  }
+
   const vem = gang.find((g) => g.id === b.vem);
 
   // Allas inlämnade tips, för den som själv har lämnat in (med nyckeln från

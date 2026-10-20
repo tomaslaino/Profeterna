@@ -16,6 +16,7 @@
 //   #kupong/samtal/tips      fyll i din kupong, eller ändra den du har lämnat in
 //   #kupong/samtal/ny        skapa omgångens kupong: välj matcherna
 //   #kupong/samtal/matcher   ändra matcherna, tills någon har lämnat in
+//   #kupong/samtal/bort      ta bort omgångens kupong, tills allas tips visas
 //
 // Omgången och tipsen ligger i tjänsten profeterna-kupong (worker/samtal.mjs,
 // GET/POST …/samtal; lokalt /api/samtal), som håller tipsen dolda. Den som
@@ -146,6 +147,7 @@
     if (sub === 'ny') renderStart(false);
     else if (sub === 'matcher') renderStart(true);
     else if (sub === 'tips') await renderTips();
+    else if (sub === 'bort') renderRemove();
     else {
       renderRound();
       poll();
@@ -187,6 +189,7 @@
     const anyIn = s.gang.some((g) => g.inne);
     const actions = (s.visas || anyIn ? '' : '<a class="kp-btn" href="#kupong/samtal/matcher">Ändra matcherna</a>') +
       (canEdit(s) ? '<a class="kp-btn" href="#kupong/samtal/tips">Ändra din kupong</a>' : '') +
+      (s.visas ? '' : '<a class="kp-btn" href="#kupong/samtal/bort">Ta bort</a>') +
       (s.visas && existing(s) ? '<a class="kp-btn" href="#kupong">Gängets kupong</a>' : '') +
       (s.visas || over(s) ? '<a class="kp-btn" href="#kupong/samtal/ny">+ Ny kupong</a>' : '');
     html += steps(s) + head(s, 'Omgångens kupong', actions);
@@ -563,7 +566,8 @@
     SM.draft = d;
     const keep = () => { if (!SM.edit) kpStore(TIPS, SM.draft); };
     const name = (gang().find((g) => g.id === v) || {}).namn || v;
-    el.innerHTML = viewNav('omgang') + steps(s) + head(s, `Din kupong · ${name}`, '<a class="kp-btn" href="#kupong">Avbryt</a>') +
+    el.innerHTML = viewNav('omgang') + steps(s) +
+      head(s, `Din kupong · ${name}`, (s.visas ? '' : '<a class="kp-btn" href="#kupong/samtal/bort">Ta bort</a>') + '<a class="kp-btn" href="#kupong">Avbryt</a>') +
       Papper.fill('sm-tips-list') +
       '<div class="kp-bar"><span class="kp-bar-txt" id="sm-bar-txt"></span>' +
       `<button type="button" class="kp-btn primary" id="sm-send">${SM.edit ? 'Spara ändringarna' : 'Lämna in och se de andras'}</button>` +
@@ -671,6 +675,46 @@
     if (out.andrade && SM.data && SM.data.id === s.id) {
       await renderTips();
       $('#sm-msg').innerHTML = `<span class="note">${esc(out.error)}</span>`;
+      return;
+    }
+    msg(`<span class="note">${esc(out.error)}</span>` + (out.status === 409 ? ' <a href="#kupong">Till omgången</a>' : ''));
+  }
+
+  // ---------- ta bort ----------
+
+  // Omgångens kupong tas bort för alla, med tipsen som har lämnats in. När
+  // allas tips visas står den kvar (tipparhistoriken) – då startar man en ny.
+  function renderRemove() {
+    const s = SM.data;
+    if (!s || s.visas) {
+      location.hash = 'kupong';
+      return;
+    }
+    const inne = s.gang.filter((g) => g.inne).map((g) => g.namn);
+    $('#coupon').innerHTML = viewNav('omgang') + steps(s) + head(s, 'Ta bort kupongen') +
+      '<form class="card kp-saved" id="sm-remove">' +
+      `<p>Kupongen tas bort för alla${inne.length ? `, med tipsen som ${esc(inne.join(' och '))} har lämnat in` : ''}.</p>` +
+      '<div class="kp-actions"><button type="submit" class="kp-btn kp-danger" id="sm-send">Ta bort kupongen</button>' +
+      '<a class="kp-btn" href="#kupong">Avbryt</a></div>' +
+      '<p class="kp-msg" id="sm-msg" role="status"></p></form>';
+    $('#sm-remove').addEventListener('submit', (e) => { e.preventDefault(); removeRound(s); });
+  }
+
+  async function removeRound(s) {
+    const msg = (h) => { $('#sm-msg').innerHTML = h; };
+    const btn = $('#sm-send');
+    btn.disabled = true;
+    msg('Tar bort …');
+    const out = await send({ gor: 'bort', id: s.id });
+    if (!here('bort')) return;
+    btn.disabled = false;
+    if (out.ok) {
+      // Utkast och gängets tecken för omgången på enheten går inte längre att använda.
+      for (const k of [TIPS, DECIDE]) {
+        const d = kpLoad(k);
+        if (d && d.id === s.id) kpStore(k, null);
+      }
+      location.hash = 'kupong';
       return;
     }
     msg(`<span class="note">${esc(out.error)}</span>` + (out.status === 409 ? ' <a href="#kupong">Till omgången</a>' : ''));
