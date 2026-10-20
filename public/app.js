@@ -523,12 +523,15 @@ function renderDetail(d) {
   const meta = [m.compName, m.round, cap(fDay.format(new Date(m.kickoff))) + ' ' + fTime.format(new Date(m.kickoff)), m.venue]
     .filter(Boolean).map(esc).join(' · ');
 
-  const head = `<div class="mhead mr-head"><div class="mhead-meta">${meta}</div>` +
+  // Matchrutan är ett tryckt matchblad (matchblad.css): märket som på
+  // kupongen överst och meanderbården mellan rubriken och flikarna.
+  const head = '<div class="mhead mr-head"><p class="pp-brand"><img src="logo.svg" alt="" width="20" height="20">Matchfixarna<span>Matchblad</span></p>' +
+    `<div class="mhead-meta">${meta}</div>` +
     `<div class="mhead-teams"><div class="mhead-team">${esc(m.home)}</div>` +
     `<div class="mhead-mid">${hide ? Spoiler.chip() : esc(mid)}${midSub ? `<span class="sub">${esc(midSub)}</span>` : ''}</div>` +
     `<div class="mhead-team away">${esc(m.away)}</div></div>` +
     (window.Hojdpunkter ? Hojdpunkter.head(d) : '') +
-    (m.tierNote ? `<p class="note">${esc(m.tierNote)}</p>` : '') + '</div>';
+    (m.tierNote ? `<p class="note">${esc(m.tierNote)}</p>` : '') + '</div><div class="pp-band mr-band" aria-hidden="true"></div>';
 
   // Dold match: bara rubriken – prognosens rättning och underlaget efter
   // matchen avslöjar resultatet.
@@ -558,11 +561,7 @@ function forecastCard(d) {
     return `<div class="card fc"><h4>Prognos</h4><p class="unknown">okänt</p><ul class="bullets">` +
       (p.reasons || []).map((r) => `<li>${esc(r)}</li>`).join('') + '</ul></div>';
   }
-  const stats = [
-    `Förväntade mål <b>${dec(p.goals[0])}–${dec(p.goals[1])}</b>`,
-    `Över 2,5 mål <b>${oddsP(p.over25)}</b>${p.baselines.market && p.baselines.market.over25 != null ? ` <span class="muted">(marknaden ${oddsP(p.baselines.market.over25)})</span>` : ''}`,
-    `Båda lagen gör mål <b>${oddsP(p.btts)}</b>`,
-  ];
+  const stats = goalLines(p.goals, p.over25, p.btts, p.baselines.market);
   let adv = '';
   if (p.advance) {
     adv = p.advance.home == null
@@ -577,24 +576,62 @@ function forecastCard(d) {
   const head = m.completed
     ? `Återskapad i efterhand med underlaget före matchdagen (t.o.m. ${dateOnly(p.fitThrough)})`
     : `Skattad på matcher t.o.m. ${dateOnly(p.fitThrough)}`;
+  const j = d.journal;
+  const stamp = !m.completed && j && j.latestAt ? `<span class="pp-stamp fc-stamp">I journalen<br>${when(j.latestAt)}</span>` : '';
   return `<div class="card fc"><h4>${m.completed ? 'Återskapad prognos' : 'Prognos efter 90 minuter'} <span class="hint">${esc(head)}</span></h4>` +
-    fcMain(p.p, [m.home, 'Oavgjort', m.away], p.range) +
-    `<p class="fc-stats">${stats.join(' · ')}</p>${adv}${scoreGrid(p, m)}${notes}` +
-    `<p class="src-line">Skattat på ${basis(p.teams.home)}; ${basis(p.teams.away)}. Regelversion ${esc(p.rulesVersion)}.${journalLine(d)}</p></div>`;
+    fcMain(p.p, [m.home, 'Oavgjort', m.away], p.range, m.id) +
+    `<div class="fc-two"><div><h5>Målen</h5>${stats}</div><div><h5>Troligast</h5>${topScores(p)}</div></div>` +
+    `${adv}${scoreGrid(p, m)}${notes}` +
+    `<div class="fc-fine"><p class="src-line">Skattat på ${basis(p.teams.home)}; ${basis(p.teams.away)}. Regelversion ${esc(p.rulesVersion)}.${journalLine(d)}</p>${stamp}</div></div>`;
 }
 
-// 1 · X · 2 som odds med stapel (stapeln i hela procent); range =
-// osäkerhetsspannet om det finns, också som odds.
-function fcMain(p, labels, range) {
+// 1 · X · 2 som kupongens rutor: tecknet, oddset och osäkerhetsspannet (range,
+// också som odds) i rutan och chansen under. Modellen ringar in sina tecken
+// med kulspetspenna och skriver en rad i marginalen (penMarks). Efter matchen
+// ringas utfallet (outcome) in som på kupongen: grönt om modellen hade det
+// inringat, annars rött. key gör pennstrecken likadana varje gång (papper.js).
+function fcMain(p, labels, range, key, outcome) {
   const w = pct3(p);
+  const pen = penMarks(p);
+  const P = window.Papper;
   const cols = w.map((x, i) => {
     const r = range && range[i];
-    return `<div class="fc-col${i === 1 ? ' draw' : ''}"><div class="fc-label">${esc(labels[i])}</div>` +
-      `<div class="fc-num">${pctOdds(x)}</div>` +
-      `<div class="fc-range"${r ? ' title="Osäkerheten i lagens styrka (omskattning med slumpvikter), som odds"' : ''}>${r ? `${oddsP(r[1])}–${oddsP(r[0])}` : '&nbsp;'}</div></div>`;
+    const mine = pen.signs.includes(i);
+    const res = outcome === i ? (mine ? ' s-ok' : ' s-no') : '';
+    return `<div class="fc-col${i === 1 ? ' draw' : ''}${res}"><div class="fc-label"><span>${esc(labels[i])}</span>` +
+      (i === pen.at ? `<em class="fc-note">${pen.note}</em>` : '') + '</div>' +
+      `<div class="fc-box"><i>${'1X2'[i]}</i><div class="fc-num">${pctOdds(x)}${mine && P ? P.ring(`penna${key}${i}`, 'fc-pen', 23) : ''}</div>` +
+      `<div class="fc-range"${r ? ' title="Osäkerheten i lagens styrka (omskattning med slumpvikter), som odds"' : ''}>${r ? `${oddsP(r[1])}–${oddsP(r[0])}` : '&nbsp;'}</div>` +
+      `${res && P ? P.ring(`utfall${key}`, 'fc-ring', 27) : ''}</div><div class="fc-pct">${x} %</div></div>`;
   }).join('');
-  const bar = `<div class="fc-bar" aria-hidden="true">${w.map((x, i) => `<span class="s${i}" style="width:${x}%"></span>`).join('')}</div>`;
-  return `<div class="fc-main">${cols}</div>${bar}`;
+  return `<div class="fc-main">${cols}</div>`;
+}
+
+// Tecknen modellen skulle ringa in på kupongen och raden i marginalen: en spik
+// när favoriten har minst 65 %, nästan en spik från 52 %, halvgardering när
+// det minst troliga har högst 27 %, annars helgardering utan något inringat.
+function penMarks(p) {
+  const o = [0, 1, 2].sort((a, b) => p[b] - p[a]);
+  if (p[o[0]] >= 0.65) return { signs: [o[0]], at: o[0], note: 'spik' };
+  if (p[o[0]] >= 0.52) return { signs: [o[0]], at: o[0], note: 'spik, nästan' };
+  if (p[o[2]] <= 0.27) return { signs: [o[0], o[1]], at: Math.min(o[0], o[1]), note: 'halvgardera' };
+  return { signs: [], at: 1, note: 'helgardera' };
+}
+
+// Målen som en prislista: namnet, prickar fram till oddset.
+function goalLines(goals, over25, btts, market) {
+  const rows = [
+    ['Förväntade mål', `${dec(goals[0])}–${dec(goals[1])}`],
+    [`Över 2,5 mål${market && market.over25 != null ? ` <small>marknaden ${oddsP(market.over25)}</small>` : ''}`, oddsP(over25)],
+    ['Båda lagen gör mål', oddsP(btts)],
+  ];
+  return '<ul class="fc-lead">' + rows.map(([label, v]) => `<li><span>${label}</span><i></i><b>${v}</b></li>`).join('') + '</ul>';
+}
+
+// De tre troligaste resultaten i var sin ruta, med oddset under.
+function topScores(p) {
+  return '<div class="fc-top">' + p.scores.top.slice(0, 3).map((t) =>
+    `<div class="fc-tbox"><b>${t.home}–${t.away}</b><span>${fmtOdds(1 / t.p)}</span></div>`).join('') + '</div>';
 }
 
 // Kommande match: när prognosen senast loggades i journalen.
@@ -621,11 +658,7 @@ function journalCard(d) {
     return `<div class="card fc"><h4>Prognos före avspark <span class="hint">${head}</span></h4><p class="unknown">okänt</p><ul class="bullets">` +
       (r.reasons || []).map((x) => `<li>${esc(x)}</li>`).join('') + `</ul>${foot}</div>`;
   }
-  const stats = [
-    `Förväntade mål <b>${dec(r.goals[0])}–${dec(r.goals[1])}</b>`,
-    `Över 2,5 mål <b>${oddsP(r.over25)}</b>${r.market && r.market.over25 != null ? ` <span class="muted">(marknaden ${oddsP(r.market.over25)})</span>` : ''}`,
-    `Båda lagen gör mål <b>${oddsP(r.btts)}</b>`,
-  ];
+  const stats = goalLines(r.goals, r.over25, r.btts, r.market);
   let adv = '';
   if (r.advance !== undefined) {
     const a = r.advance && pct3(r.advance);
@@ -640,9 +673,17 @@ function journalCard(d) {
   if (d.prediction && d.prediction.status === 'ok') {
     retro = `<p class="src-line">Återskapad i efterhand: ${listOdds(pct3(d.prediction.p)).join(' · ')}</p>`;
   }
+  // Ställningen skriven för hand bredvid målen, med rättarens bock om
+  // modellen hade utfallet inringat och kryss annars, som på kupongen.
+  const out = m.score90 && j.outcome != null ? j.outcome : null;
+  const ok = out != null && penMarks(r.p).signs.includes(out);
+  const graded = out == null ? '<p class="unknown">okänt</p>'
+    : `<div class="fc-graded ${ok ? 's-ok' : 's-no'}"><span class="fc-hand">${m.score90.home}–${m.score90.away}</span>` +
+      `${window.Papper ? Papper.tick(`journal${m.id}`, ok) : ''}</div>`;
   return `<div class="card fc"><h4>Prognos före avspark <span class="hint">${head}</span></h4>` +
-    fcMain(r.p, [m.home, 'Oavgjort', m.away], null) +
-    `<p class="fc-stats">${stats.join(' · ')}</p>${adv}${scores}${retro}${foot}</div>`;
+    fcMain(r.p, [m.home, 'Oavgjort', m.away], null, m.id, out) +
+    `<div class="fc-two"><div><h5>Målen</h5>${stats}</div><div><h5>Efter 90 minuter</h5>${graded}</div></div>` +
+    `${adv}${scores}${retro}<div class="fc-fine">${foot}${out == null ? '' : '<span class="pp-stamp fc-stamp">Rättad</span>'}</div></div>`;
 }
 
 // Baslinjernas namn på matchsidan, i klarspråk. Bokstäverna (a)–(c) som
@@ -689,8 +730,8 @@ function scoreGrid(p, m) {
     }).join('')}</tr>`;
   });
   // Resultaten har små chanser, så oddsen räknas utan avrundning till procent.
-  const top = p.scores.top.map((t) => `${t.home}–${t.away} ${fmtOdds(1 / t.p)}`).join(', ');
-  return `<details class="fc-scores"><summary>Resultat: troligast ${esc(top)}</summary>` +
+  // De troligaste står redan i rutorna ovanför (topScores).
+  return '<details class="fc-scores"><summary>Alla resultat</summary>' +
     `<div class="sgrid-wrap"><p class="muted">Odds · rader ${esc(m.home)} · kolumner ${esc(m.away)}</p><table class="sgrid">${rows}</table>` +
     `<p class="muted">5 mål eller fler för ett lag: ${p.scores.other > 0.005 ? fmtOdds(1 / p.scores.other) : '200+'}</p></div></details>`;
 }

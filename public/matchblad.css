@@ -1,0 +1,404 @@
+/* Matchbladet: matchrutan (matchruta.css) tryckt på samma papper som kupongen
+   (papper.css) – krämvitt med perforerade kanter, tryck i terrakotta, lagen
+   och siffrorna i Fraunces. Prognosen står i kupongens rutor 1 X 2, modellens
+   tecken inringade med kulspetspenna och en rad för hand i marginalen, och
+   efter matchen är utfallet inringat i grönt eller rött med ställningen
+   skriven för hand och en stämpel, som på kupongen.
+
+   Sajtens tokens (theme.css) skrivs om till tryck inuti rutan, så att korten,
+   tabellerna, formen och flikarna följer med av sig själva. Här står papperet,
+   rubriken, prognosen och det som har egna färger. Allt gäller bara i
+   dialog.mr-modal och laddas efter matchruta.css. */
+
+dialog.mr-modal {
+  /* papperets tokens, desamma som .pp i papper.css */
+  --pp-paper: #f1e8d5;
+  --pp-ink: #2a231d;
+  --pp-ink-soft: rgba(42, 35, 29, 0.66);
+  --pp-print: #a9452b;
+  --pp-print-line: rgba(169, 69, 43, 0.28);
+  --pp-print-tint: rgba(169, 69, 43, 0.055);
+  --pp-box: #fbf7ec;
+  --pp-pen: #2146a6;
+  --pp-ok: #17824a;
+  --pp-no: #cf2a20;
+  --pp-pencil: #6f6c69;
+  --pp-hand: "Caveat", "Bradley Hand", "Segoe Print", cursive;
+  --pp-grain: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='180' height='180'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.85' numOctaves='2' stitchTiles='stitch'/%3E%3CfeColorMatrix values='0 0 0 0 .35 0 0 0 0 .27 0 0 0 0 .18 0 0 0 .09 0'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
+  --pp-hole: 5px;
+
+  /* sajtens tokens i tryck */
+  --bg: var(--pp-paper);
+  --fg: var(--pp-ink);
+  --bone: var(--pp-ink);
+  --ink-soft: #5b5046;
+  --muted: #85786a;
+  --eyebrow: var(--pp-print);
+  --card: var(--pp-paper);
+  --glass: none;
+  --glass-hi: none;
+  --pill: var(--pp-print-tint);
+  --pill-line: rgba(169, 69, 43, 0.35);
+  --pill-line-hi: var(--pp-print);
+  --border: var(--pp-print-line);
+  --hair: rgba(42, 35, 29, 0.1);
+  --accent: var(--pp-pen);
+  --accent-deep: var(--pp-pen);
+  --accent-soft: rgba(33, 70, 166, 0.09);
+  --fresh: var(--pp-ok);
+  --down: var(--pp-no);
+  --stale: #a5650a;
+  --unknown: #8d8274;
+  --up-soft: rgba(23, 130, 74, 0.13);
+  --down-soft: rgba(207, 42, 32, 0.1);
+  --side-soft: rgba(165, 101, 10, 0.13);
+  --o-home: #2f6fd6;
+  --o-draw: #8f826e;
+  --o-away: #d0642c;
+  --gold: var(--pp-print);
+  --gold-hi: var(--pp-print);
+  --shadow-card: none;
+  --shadow-hero: none;
+
+  color-scheme: light;
+  color: var(--fg);
+  /* papperet ligger på #match-detail-view, så att hålen i kanten visar sidan
+     bakom; skuggan följer rutans kant */
+  background: transparent;
+  border: 0;
+  border-radius: 0;
+  box-shadow: 0 2px 3px rgba(0, 0, 0, 0.4), 0 40px 80px -24px rgba(0, 0, 0, 0.9);
+}
+
+/* papperet med perforeringen upptill och nedtill */
+dialog.mr-modal #match-detail-view {
+  background:
+    var(--pp-grain),
+    linear-gradient(170deg, rgba(255, 255, 255, 0.42), rgba(255, 255, 255, 0) 38%, rgba(120, 90, 50, 0.06)),
+    var(--pp-paper);
+  -webkit-mask:
+    radial-gradient(circle at 50% 0, transparent var(--pp-hole), #000 calc(var(--pp-hole) + 0.5px)) 0 0 / 15px 51% repeat-x,
+    radial-gradient(circle at 50% 100%, transparent var(--pp-hole), #000 calc(var(--pp-hole) + 0.5px)) 0 100% / 15px 51% repeat-x;
+  mask:
+    radial-gradient(circle at 50% 0, transparent var(--pp-hole), #000 calc(var(--pp-hole) + 0.5px)) 0 0 / 15px 51% repeat-x,
+    radial-gradient(circle at 50% 100%, transparent var(--pp-hole), #000 calc(var(--pp-hole) + 0.5px)) 0 100% / 15px 51% repeat-x;
+}
+
+/* sådant som är vitt på det mörka blir bläck */
+dialog.mr-modal button:hover,
+dialog.mr-modal details > summary:hover,
+dialog.mr-modal a:hover { color: var(--pp-ink); }
+dialog.mr-modal .muted { color: var(--muted); }
+
+/* förklaringsrutan (forklaring.js) läggs inuti rutan: ett tryckt kort */
+dialog.mr-modal .dv-tip {
+  background: var(--pp-box);
+  border: 1.5px solid var(--pp-print);
+  border-radius: 3px;
+  box-shadow: 0 12px 26px -12px rgba(42, 35, 29, 0.55);
+}
+
+/* ---------- rubriken ---------- */
+
+dialog.mr-modal .mr-top { background: none; border-bottom: 0; }
+dialog.mr-modal .mhead.mr-head { padding: 30px 72px 0 30px; }
+dialog.mr-modal .mhead::before { content: none; }
+dialog.mr-modal .mr-head .pp-brand { margin: 0 0 14px; }
+dialog.mr-modal .mr-head .mhead-meta {
+  font-size: 13px;
+  font-weight: 500;
+  letter-spacing: 0;
+  text-transform: none;
+  color: var(--pp-ink-soft);
+}
+dialog.mr-modal .mr-head .mhead-teams { margin: 6px 0 0; }
+dialog.mr-modal .mhead-team,
+dialog.mr-modal .mhead-mid { font-weight: 700; color: var(--pp-ink); }
+dialog.mr-modal .mhead-mid .sub { color: var(--pp-ink-soft); }
+
+dialog.mr-modal .mr-close {
+  top: 24px;
+  right: 24px;
+  color: var(--pp-print);
+  background: var(--pp-box);
+  border: 1.5px solid var(--pp-print-line);
+}
+dialog.mr-modal .mr-close:hover { color: var(--pp-ink); border-color: var(--pp-print); }
+
+dialog.mr-modal .mr-band { margin: 18px 30px 0; }
+
+/* flikarna: tryckta ord på en linje, den valda med terrakotta under */
+dialog.mr-modal .mr-tabs {
+  gap: 24px;
+  margin: 0 30px;
+  padding: 0;
+  border-bottom: 1.5px solid var(--pp-print);
+}
+dialog.mr-modal .mr-tabs button { padding: 13px 0 11px; color: var(--pp-ink-soft); }
+dialog.mr-modal .mr-tabs button:hover,
+dialog.mr-modal .mr-tabs button[aria-selected="true"] { color: var(--pp-ink); }
+dialog.mr-modal .mr-tabs button[aria-selected="true"]::after {
+  left: 0;
+  right: 0;
+  height: 3px;
+  border-radius: 0;
+  background: var(--pp-print);
+}
+
+/* ---------- korten blir tryckta avsnitt ---------- */
+
+dialog.mr-modal .mr-body {
+  padding: 24px 30px 34px;
+  scrollbar-color: rgba(169, 69, 43, 0.4) transparent;
+}
+dialog.mr-modal .card,
+dialog.mr-modal .mr-team {
+  padding: 18px 0 8px;
+  background: none;
+  border: 0;
+  border-top: 1.5px solid var(--pp-print-line);
+  border-radius: 0;
+  box-shadow: none;
+}
+dialog.mr-modal .mr-pane > .card:first-child,
+dialog.mr-modal .mr-pane > :first-child > .card:first-child { padding-top: 0; border-top: 0; }
+dialog.mr-modal .mr-body .grid2 { gap: 0 32px; }
+dialog.mr-modal .mr-teams { gap: 0 32px; }
+dialog.mr-modal .card .table-wrap,
+dialog.mr-modal .table-wrap { background: none; border: 0; border-radius: 0; box-shadow: none; }
+
+dialog.mr-modal th { color: var(--pp-print); border-bottom: 1.5px solid var(--pp-print-line); }
+dialog.mr-modal td { border-bottom-color: var(--hair); }
+dialog.mr-modal .table-wrap tbody tr:hover > td { background: var(--pp-print-tint); }
+dialog.mr-modal table.side tr.group td { color: var(--pp-print); background: var(--pp-print-tint); }
+dialog.mr-modal table.cmp tr.model td { color: var(--pp-ink); background: var(--pp-print-tint); }
+dialog.mr-modal .tug-stack { border-radius: 2px; }
+
+dialog.mr-modal .detail-foot a { color: var(--pp-ink-soft); }
+
+/* ---------- prognosen: kupongens rutor ---------- */
+
+dialog.mr-modal .card.fc { overflow: visible; padding-bottom: 14px; }
+dialog.mr-modal .fc-main {
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 14px;
+  margin: 26px 0 0;
+}
+dialog.mr-modal .fc-col { position: relative; min-width: 0; }
+dialog.mr-modal .fc-label {
+  position: relative;
+  margin-bottom: 7px;
+  overflow: visible;
+  font-size: 11px;
+  font-weight: 800;
+  letter-spacing: 0.2em;
+  color: var(--pp-print);
+}
+dialog.mr-modal .fc-label span { display: block; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+/* raden i marginalen, med samma penna som kupongens anteckningar */
+dialog.mr-modal .fc-note {
+  position: absolute;
+  z-index: 2;
+  top: -27px;
+  right: -2px;
+  font-family: var(--pp-hand);
+  font-size: 23px;
+  font-style: normal;
+  font-weight: 700;
+  line-height: 1;
+  letter-spacing: 0;
+  text-transform: none;
+  white-space: nowrap;
+  color: var(--pp-pen);
+  transform: rotate(-6deg);
+  pointer-events: none;
+}
+dialog.mr-modal .fc-box {
+  position: relative;
+  padding: 10px 8px 9px;
+  background: var(--pp-box);
+  border: 1.5px solid var(--pp-print);
+  border-radius: 3px;
+}
+dialog.mr-modal .fc-box > i {
+  display: block;
+  font-family: var(--display);
+  font-size: 16px;
+  font-style: normal;
+  font-weight: 700;
+  line-height: 1;
+  color: var(--pp-print);
+}
+dialog.mr-modal .fc-num,
+dialog.mr-modal .fc-col.draw .fc-num {
+  position: relative;
+  display: inline-block;
+  margin-top: 4px;
+  padding: 0 0.14em;
+  font-size: clamp(32px, 4.6vw, 46px);
+  font-weight: 700;
+  line-height: 1.08;
+  color: var(--pp-ink);
+}
+dialog.mr-modal .fc-range { margin-top: 2px; font-size: 12px; color: var(--pp-ink-soft); }
+dialog.mr-modal .fc-pct {
+  margin-top: 8px;
+  font-size: 11px;
+  font-weight: 800;
+  letter-spacing: 0.12em;
+  color: var(--pp-print);
+  font-variant-numeric: tabular-nums;
+}
+/* modellens ring runt oddset och utfallets ring runt rutan (papper.js) */
+dialog.mr-modal .fc-pen,
+dialog.mr-modal .fc-ring {
+  position: absolute;
+  overflow: visible;
+  fill: none;
+  stroke-linecap: round;
+  pointer-events: none;
+}
+dialog.mr-modal .fc-pen path,
+dialog.mr-modal .fc-ring path { vector-effect: non-scaling-stroke; }
+dialog.mr-modal .fc-pen {
+  top: -22%;
+  left: -15%;
+  width: 130%;
+  height: 144%;
+  stroke: var(--pp-pen);
+  stroke-width: 2.4;
+  opacity: 0.92;
+}
+dialog.mr-modal .fc-ring {
+  top: -10px;
+  left: -11px;
+  width: calc(100% + 22px);
+  height: calc(100% + 20px);
+  stroke: var(--pp-no);
+  stroke-width: 2.6;
+}
+dialog.mr-modal .s-ok .fc-ring { stroke: var(--pp-ok); }
+
+/* målen som en prislista och de troligaste resultaten i rutor */
+dialog.mr-modal .fc-two {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 32px;
+  margin-top: 26px;
+  padding-top: 16px;
+  border-top: 1.5px solid var(--pp-print-line);
+}
+dialog.mr-modal .fc h5 {
+  margin: 0 0 10px;
+  font-size: 11px;
+  font-weight: 800;
+  letter-spacing: 0.2em;
+  text-transform: uppercase;
+  color: var(--pp-print);
+}
+dialog.mr-modal .fc-lead { margin: 0; padding: 0; list-style: none; }
+dialog.mr-modal .fc-lead li { display: flex; align-items: baseline; gap: 6px; padding: 4px 0; font-size: 14px; }
+dialog.mr-modal .fc-lead span { white-space: nowrap; }
+dialog.mr-modal .fc-lead i { flex: 1; min-width: 14px; border-bottom: 1.5px dotted rgba(169, 69, 43, 0.5); }
+dialog.mr-modal .fc-lead b { font-weight: 700; font-variant-numeric: tabular-nums; white-space: nowrap; }
+dialog.mr-modal .fc-lead small { margin-left: 4px; font-size: 12px; color: var(--pp-ink-soft); }
+dialog.mr-modal .fc-top { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 8px; }
+dialog.mr-modal .fc-tbox {
+  display: grid;
+  gap: 1px;
+  padding: 7px 4px 6px;
+  text-align: center;
+  background: var(--pp-box);
+  border: 1.5px solid var(--pp-print);
+  border-radius: 3px;
+}
+dialog.mr-modal .fc-tbox b { font-family: var(--display); font-size: 22px; font-weight: 700; line-height: 1.1; }
+dialog.mr-modal .fc-tbox span { font-size: 12px; color: var(--pp-ink-soft); font-variant-numeric: tabular-nums; }
+
+/* efter matchen: ställningen för hand och rättarens bock eller kryss */
+dialog.mr-modal .fc-graded { display: flex; align-items: center; gap: 12px; }
+dialog.mr-modal .fc-hand {
+  font-family: var(--pp-hand);
+  font-size: 42px;
+  font-weight: 700;
+  line-height: 0.9;
+  color: var(--pp-pen);
+}
+dialog.mr-modal .fc-graded .pp-tick { width: 34px; height: 34px; }
+dialog.mr-modal .fc-two .unknown { margin: 0; }
+
+dialog.mr-modal .fc-adv { margin-top: 16px; }
+dialog.mr-modal .fc-scores { margin-top: 18px; font-size: 14px; }
+dialog.mr-modal .fc-scores summary { color: var(--pp-pen); }
+dialog.mr-modal table.sgrid td {
+  background: color-mix(in srgb, var(--pp-print) calc(var(--a) * 0.45), var(--pp-box));
+  border-radius: 3px;
+}
+dialog.mr-modal table.sgrid th { color: var(--pp-ink-soft); }
+
+/* det finstilta och stämpeln längst ner */
+dialog.mr-modal .fc-fine {
+  display: flex;
+  align-items: flex-end;
+  justify-content: space-between;
+  gap: 18px;
+  margin-top: 18px;
+}
+dialog.mr-modal .fc-fine .src-line { margin: 0; font-size: 11px; line-height: 1.5; color: var(--pp-ink-soft); }
+dialog.mr-modal .fc-stamp { flex: none; margin: 0 6px 4px auto; text-align: center; line-height: 1.35; }
+
+/* ---------- startelvorna: planen tryckt på papperet ---------- */
+
+dialog.mr-modal .mr-pitch {
+  background:
+    repeating-linear-gradient(90deg, rgba(169, 69, 43, 0.075) 0 9.09%, rgba(169, 69, 43, 0.03) 9.09% 18.18%),
+    var(--pp-box);
+  border: 1.5px solid var(--pp-print);
+  border-radius: 3px;
+  box-shadow: none;
+}
+dialog.mr-modal .mr-lines { stroke: rgba(169, 69, 43, 0.55); }
+dialog.mr-modal .mr-dot { border-color: var(--pp-box); box-shadow: 0 1px 3px rgba(42, 35, 29, 0.35); }
+dialog.mr-modal .mr-nm { color: var(--pp-ink); text-shadow: 0 0 3px var(--pp-box), 0 0 2px var(--pp-box), 0 0 1px var(--pp-box); }
+dialog.mr-modal .mr-dot .mr-rt { color: var(--pp-paper); background: var(--pp-ink); box-shadow: none; }
+dialog.mr-modal .mr-dot .mr-rt.top { color: #f0d699; box-shadow: 0 0 0 1px #d8b06a; }
+dialog.mr-modal .mr-names .mr-rt.top { color: var(--pp-print); }
+dialog.mr-modal .mr-chip.ok { color: var(--pp-ok); }
+dialog.mr-modal .mr-off { color: var(--pp-no); }
+dialog.mr-modal .mr-on { color: var(--pp-ok); }
+
+@media (max-width: 760px) {
+  dialog.mr-modal .mr-pitch {
+    background:
+      repeating-linear-gradient(0deg, rgba(169, 69, 43, 0.075) 0 9.09%, rgba(169, 69, 43, 0.03) 9.09% 18.18%),
+      var(--pp-box);
+  }
+}
+
+/* ---------- mobilen: bladet glider upp nerifrån, perforerat bara upptill ---------- */
+
+@media (max-width: 640px) {
+  dialog.mr-modal { border-radius: 0; }
+  dialog.mr-modal #match-detail-view {
+    -webkit-mask: radial-gradient(circle at 50% 0, transparent var(--pp-hole), #000 calc(var(--pp-hole) + 0.5px)) 0 0 / 15px 100% repeat-x;
+    mask: radial-gradient(circle at 50% 0, transparent var(--pp-hole), #000 calc(var(--pp-hole) + 0.5px)) 0 0 / 15px 100% repeat-x;
+  }
+  dialog.mr-modal .mhead.mr-head { padding: 24px 60px 0 16px; }
+  dialog.mr-modal .mr-head .pp-brand { margin-bottom: 10px; }
+  dialog.mr-modal .mr-head .mhead-meta { font-size: 12px; }
+  dialog.mr-modal .mr-close { top: 18px; right: 14px; }
+  dialog.mr-modal .mr-band { margin: 14px 16px 0; }
+  dialog.mr-modal .mr-tabs { gap: 18px; margin: 0 16px; }
+  dialog.mr-modal .mr-tabs button { padding: 11px 0 10px; }
+  dialog.mr-modal .mr-body { padding: 20px 16px 30px; }
+  dialog.mr-modal .mr-teams { gap: 0; }
+  dialog.mr-modal .fc-main { gap: 8px; }
+  dialog.mr-modal .fc-label { letter-spacing: 0.12em; }
+  dialog.mr-modal .fc-box { padding: 8px 4px 7px; }
+  dialog.mr-modal .fc-num,
+  dialog.mr-modal .fc-col.draw .fc-num { font-size: 28px; }
+  dialog.mr-modal .fc-range { font-size: 11px; }
+  dialog.mr-modal .fc-note { top: -24px; font-size: 20px; }
+  dialog.mr-modal .fc-pen { top: -18%; height: 138%; }
+  dialog.mr-modal .fc-two { grid-template-columns: 1fr; gap: 22px; }
+}

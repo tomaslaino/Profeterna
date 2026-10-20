@@ -776,10 +776,8 @@ table.cmp tr.model td { background: var(--accent-soft); color: #fff; }
 }
 .fc-col.draw .fc-num { font-size: clamp(32px, 4.2vw, 48px); color: var(--muted); padding-top: 0.2em; }
 .fc-range { font-size: 12px; margin-top: 2px; }
-.fc-bar { height: 10px; gap: 3px; background: transparent; }
-.fc-bar span { border-radius: 999px; }
-.fc-stats, .fc-adv { font-size: 14px; color: var(--ink-soft); }
-.fc-stats b, .fc-adv b { color: var(--fg); }
+.fc-adv { font-size: 14px; color: var(--ink-soft); }
+.fc-adv b { color: var(--fg); }
 table.sgrid td { border-radius: 6px; }
 
 /* ---------- källor och utvärdering ---------- */
