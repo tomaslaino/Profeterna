@@ -29,6 +29,7 @@
 const { readCache } = require('./store');
 const { keyOf, espnKey, norm } = require('./teams');
 const { clipUrl } = require('./fetchers/viaplay');
+const { playable } = require('./fetchers/youtube');
 const { ALIASES } = require('../config/team-aliases');
 const { CLUBS, CHANNELS, NAMES } = require('../config/youtube');
 
@@ -192,7 +193,7 @@ function rank(v, m) {
 // videos, matched }. Klipp: { id, ch (kanalens namn), t (titeln) }.
 function youtubeByMatch(matches) {
   const cache = readCache(YT_SOURCE_ID);
-  const videos = (cache && cache.data && cache.data.videos) || [];
+  const videos = ((cache && cache.data && cache.data.videos) || []).filter(playable);
   const played = matches.filter((m) => m.completed && m.score);
   const byTeam = new Map();
   for (const m of played) {

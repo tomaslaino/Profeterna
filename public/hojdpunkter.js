@@ -7,9 +7,10 @@
 //
 // YouTube-klippen spelas i en liten spelare nere i hörnet, ovanpå sidan, som
 // går att förstora och som ligger kvar medan man bläddrar. Nästa klipp tar
-// samma spelare. Går ett klipp inte att spela här (spärrat i landet,
-// borttaget) provas nästa i listan, och klippet hoppas över nästa gång. När
-// inget går visas Viaplays sammandrag i stället, om det finns.
+// samma spelare. Klipp som är spärrade i Sverige sorterar bygget bort. Går
+// ett klipp ändå inte att spela här (spärrat i landet, borttaget) provas
+// nästa i listan, och klippet hoppas över nästa gång. När inget går visas
+// Viaplays sammandrag i stället, om det finns.
 //
 // Viaplay tillåter inte att spelaren visas inuti sajten (X-Frame-Options:
 // DENY), så Viaplays klipp öppnas i ett litet eget fönster – på telefon och
@@ -106,36 +107,16 @@
 
   // ---------- YouTubes spelare ----------
 
-  // YouTubes spelar-API, eller null om det inte går att ladda (t.ex. spärrat
-  // i webbläsaren) – då spelas första klippet i en vanlig inbäddning.
-  let apiP = null;
-  function api() {
-    if (apiP) return apiP;
-    apiP = new Promise((resolve) => {
-      if (window.YT && window.YT.Player) {
-        resolve(window.YT);
-        return;
-      }
-      const prev = window.onYouTubeIframeAPIReady;
-      window.onYouTubeIframeAPIReady = () => {
-        if (prev) prev();
-        resolve(window.YT);
-      };
-      const s = document.createElement('script');
-      s.src = 'https://www.youtube.com/iframe_api';
-      s.async = true;
-      s.onerror = () => resolve(null);
-      document.head.appendChild(s);
-      setTimeout(() => resolve(window.YT && window.YT.Player ? window.YT : null), 8000);
-    });
-    return apiP;
-  }
-
+  // Klippet spelas i YouTubes inbäddade spelare. Med enablejsapi=1 berättar
+  // den via postMessage hur det går (fel, hur långt det spelats) – samma
+  // meddelanden som YouTubes eget spelar-API bygger på, men utan dess skript
+  // från www.youtube.com, som kan vara spärrat i webbläsaren. Spelaren börjar
+  // svara först när sidan sagt "listening".
   const HOST = 'https://www.youtube-nocookie.com';
   // 100 borttaget/privat, 101 och 150 får inte visas här (oftast spärrat i landet).
   const GONE = new Set([100, 101, 150]);
 
-  const P = { root: null, yt: null, list: [], i: 0, via: null, t: 0, seq: 0, timer: null, watch: null };
+  const P = { root: null, frame: null, ready: false, ping: null, list: [], i: 0, via: null, t: 0, seq: 0, watch: null };
 
   function build() {
     const root = document.createElement('div');
@@ -199,60 +180,71 @@
     if (P.i < P.list.length) load(P.t);
   }
 
-  function stopPlayer() {
-    clearInterval(P.timer);
-    P.timer = null;
-    if (P.yt) {
-      try {
-        P.yt.destroy();
-      } catch {
-        // redan borta
-      }
-      P.yt = null;
-    }
+  function listen(f, id) {
+    f.contentWindow.postMessage(JSON.stringify({ event: 'listening', id, channel: 'widget' }), HOST);
   }
 
-  // Klippet P.list[P.i], från sekund `start`.
-  async function load(start) {
+  function stopPlayer() {
+    clearTimeout(P.ping);
+    P.ping = null;
+    P.frame = null;
+    P.ready = false;
+  }
+
+  // Klippet P.list[P.i], från sekund `start`. Spelarens id i meddelandena är
+  // P.seq, så att svar från ett tidigare klipp inte räknas.
+  function load(start) {
     const seq = ++P.seq;
     const root = P.root;
-    const box = root.querySelector('.hlp-video');
     root.querySelector('.hlp-out').hidden = true;
     stopPlayer();
-    box.innerHTML = '<div></div>';
-    const id = P.list[P.i];
-    const YT = await api();
-    if (seq !== P.seq) return;
-    const vars = { autoplay: 1, rel: 0, playsinline: 1, iv_load_policy: 3, start: Math.floor(start || 0) };
-    if (!YT) {
-      const q = new URLSearchParams(vars);
-      box.innerHTML = `<iframe src="${HOST}/embed/${encodeURIComponent(id)}?${q}" title="Höjdpunkter" ` +
-        'allow="autoplay; encrypted-media; picture-in-picture; fullscreen" allowfullscreen ' +
-        'referrerpolicy="strict-origin-when-cross-origin"></iframe>';
+    const q = new URLSearchParams({
+      autoplay: 1, rel: 0, playsinline: 1, iv_load_policy: 3, start: Math.floor(start || 0),
+      enablejsapi: 1, origin: location.origin, widgetid: seq,
+    });
+    const f = document.createElement('iframe');
+    f.src = `${HOST}/embed/${encodeURIComponent(P.list[P.i])}?${q}`;
+    f.title = 'Höjdpunkter';
+    f.allow = 'autoplay; encrypted-media; picture-in-picture; fullscreen';
+    f.allowFullscreen = true;
+    f.referrerPolicy = 'strict-origin-when-cross-origin';
+    // "listening" när spelaren säger att den är redo (readyToListen), och
+    // från att ramen laddats var fjärdedels sekund tills den svarar, högst
+    // tio sekunder.
+    const hello = (n) => {
+      if (seq !== P.seq || P.ready || !n) return;
+      listen(f, seq);
+      P.ping = setTimeout(hello, 250, n - 1);
+    };
+    f.addEventListener('load', () => hello(40));
+    P.frame = f;
+    root.querySelector('.hlp-video').replaceChildren(f);
+  }
+
+  // Spelarens meddelanden: ett fel tar nästa klipp, tiden behövs om spelaren
+  // måste laddas om när den flyttas.
+  window.addEventListener('message', (e) => {
+    const f = P.frame;
+    if (!f || e.source !== f.contentWindow || e.origin !== HOST || typeof e.data !== 'string') return;
+    let d;
+    try {
+      d = JSON.parse(e.data);
+    } catch {
       return;
     }
-    P.yt = new YT.Player(box.firstChild, {
-      host: HOST,
-      videoId: id,
-      width: '100%',
-      height: '100%',
-      playerVars: { ...vars, origin: location.origin },
-      events: {
-        onError: (e) => {
-          if (seq !== P.seq) return;
-          if (GONE.has(e.data)) markBad(P.list[P.i]);
-          next();
-        },
-      },
-    });
-    P.timer = setInterval(() => {
-      try {
-        P.t = P.yt.getCurrentTime() || P.t;
-      } catch {
-        // spelaren laddar
-      }
-    }, 1000);
-  }
+    if (!d || d.id !== P.seq) return;
+    if (d.event === 'readyToListen') {
+      listen(f, P.seq);
+      return;
+    }
+    P.ready = true;
+    if (d.event === 'onError') {
+      if (GONE.has(d.info)) markBad(P.list[P.i]);
+      next();
+    } else if (d.event === 'infoDelivery' && d.info && typeof d.info.currentTime === 'number') {
+      P.t = d.info.currentTime;
+    }
+  });
 
   function next() {
     P.t = 0;

@@ -336,11 +336,14 @@ SOURCES.push({
     const prev = readCache('youtube_hojdpunkter');
     return youtube.fetchVideos(prev && prev.data, `${SEASON.firstMonth}-01`);
   },
-  summarize: (d) => ({
-    n: d.videos.length,
-    detail: `${d.videos.length} klipp ur ${d.channels - d.failed.length} kanaler` +
-      (d.failed.length ? ` (${d.failed.length} svarade inte)` : ''),
-  }),
+  summarize: (d) => {
+    const n = d.videos.filter(youtube.playable).length;
+    return {
+      n,
+      detail: `${n} klipp ur ${d.channels - d.failed.length} kanaler` +
+        (d.failed.length ? ` (${d.failed.length} svarade inte)` : ''),
+    };
+  },
 });
 
 // 2000 → "2000/01"
