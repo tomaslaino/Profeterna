@@ -26,6 +26,7 @@
     sort: 'senaste',
     dir: 1, // 1 = bäst/senast först, -1 = omvänt
     ai: new Map(), // id → { text } | { error } | 'loading'
+    wait: new Map(), // id → kommentaren som hämtas (Promise)
   };
 
   function esc(s) {
@@ -257,11 +258,11 @@
 
   // AI:ns kommentar till kuponger som inte har den inskriven än – en i taget,
   // senaste först. Proxyn cachar texten, så det här kostar bara första gången.
-  async function fetchComments() {
-    const endpoint = H.data.comment && H.data.comment.endpoint;
-    if (!endpoint) return;
-    const todo = (H.data.coupons || []).filter((c) => !c.ai && c.n);
-    for (const c of todo) {
+  // Varje kupong frågas en gång, också när rättningen (rattning.js) ber om
+  // samma kommentar.
+  function fetchComment(c, endpoint) {
+    if (H.wait.has(c.id)) return H.wait.get(c.id);
+    const p = (async () => {
       H.ai.set(c.id, 'loading');
       paintAi(c.id);
       let a;
@@ -278,7 +279,17 @@
       }
       H.ai.set(c.id, a);
       paintAi(c.id);
-    }
+      return a;
+    })();
+    H.wait.set(c.id, p);
+    return p;
+  }
+
+  async function fetchComments() {
+    const endpoint = H.data.comment && H.data.comment.endpoint;
+    if (!endpoint) return;
+    const todo = (H.data.coupons || []).filter((c) => !c.ai && c.n);
+    for (const c of todo) await fetchComment(c, endpoint);
   }
 
   function load() {
@@ -319,5 +330,17 @@
     focus(id);
   }
 
-  window.Historik = { show, focus };
+  // Kupongens betyg och kommentar till rättningen på papperet
+  // (rattning.js): { label, text, model }, eller null om kupongen inte finns
+  // i historiken än.
+  async function entry(id) {
+    await load();
+    const c = (H.data.coupons || []).find((x) => x.id === id);
+    if (!c || !c.n) return null;
+    const endpoint = H.data.comment && H.data.comment.endpoint;
+    const a = c.ai || (endpoint ? await fetchComment(c, endpoint) : null);
+    return { label: c.label || null, text: (a && a.text) || null, model: (a && a.model) || null };
+  }
+
+  window.Historik = { show, focus, entry };
 })();

@@ -524,6 +524,9 @@ function renderCouponShow(id) {
   html += moreSection(graded.filter((x) => x !== cur && !x.g.done));
   html += couponErrors();
   el.innerHTML = html;
+  // Färdigspelad: rättas inför ögonen första gången, och klassföreståndaren
+  // skriver betyget under raderna (rattning.js).
+  if (window.Rattning) Rattning.after(el, c, g);
 }
 
 // Kupong → Historik: de färdigspelade kupongerna med betyg och AI:ns

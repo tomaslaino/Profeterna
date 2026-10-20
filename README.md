@@ -1196,6 +1196,14 @@ för gängets tecken som odds (som på sidan), och varje tal ska finnas i underl
 skrivs texten om, därefter visas ingen). Texten cachas utan slutdatum per kupong och
 underlag. Prompten står i [config/kommentar.js](config/kommentar.js).
 
+**Rättningen på papperet** ([public/rattning.js](public/rattning.js)): första gången man ser
+en färdigspelad kupong under *Kupong* rättas den inför ögonen – ringen runt utfallet dras en
+match i taget, ställningen skrivs och bocken sätts, sedan antalet rätt i hörnet och sist
+stämpeln *Rättad*. Webbläsaren minns vilka kuponger som rättats; ett tryck på stämpeln rättar
+en gång till, och med reducerad rörelse står allt klart direkt. Under raderna skriver
+*Klassföreståndaren* betyget och AI-kommentaren i rödpenna, ur historiken – de kommer när
+bygget har tagit in kupongen där, och skrivs fram när man skrollat dit.
+
 **Filen** `data/kupong-historik.json` är själva historiken och committas:
 
 - När varje match på en kupong ur `data/kuponger/` är spelad fryser bygget på GitHub

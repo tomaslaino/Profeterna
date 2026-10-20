@@ -1,0 +1,71 @@
+/* ---------- rättningen (rattning.js) ---------- */
+
+/* ringen runt utfallet och rättarens bock dras, ställningen skrivs – en match i taget */
+.rt-play :is(.pp-row, .sm-r) :is(.pp-ring, .pp-tick) path {
+  stroke-dasharray: 1;
+  animation: rt-draw 0.42s ease-out both;
+  animation-delay: var(--rt, 0ms);
+}
+.rt-play :is(.pp-row, .sm-r) .pp-tick path { animation-duration: 0.3s; animation-delay: calc(var(--rt, 0ms) + 300ms); }
+.rt-play :is(.pp-row, .sm-r) .pp-hand { animation: rt-pop 0.3s ease-out both; animation-delay: calc(var(--rt, 0ms) + 150ms); }
+
+/* antalet rätt i hörnet – och var och ens överst på omgångens papper */
+.rt-play .pp-gnum,
+.rt-play .sm-score { animation: rt-pop 0.45s cubic-bezier(0.2, 0.8, 0.3, 1.25) both; animation-delay: var(--rt-grade, 0ms); }
+
+/* stämpeln slår ner och papperet hoppar till */
+.rt-play .pp-stamp { animation: rt-stamp 0.34s cubic-bezier(0.3, 0.6, 0.4, 1) both; animation-delay: var(--rt-stamp, 0ms); }
+.rt-play { animation: rt-thud 0.22s ease-out calc(var(--rt-stamp, 0ms) + 200ms); }
+.pp-stamp[role="button"] { cursor: pointer; }
+
+@keyframes rt-draw {
+  from { stroke-dashoffset: 1; opacity: 0; }
+  2% { opacity: 1; }
+  to { stroke-dashoffset: 0; opacity: 1; }
+}
+@keyframes rt-pop {
+  from { opacity: 0; transform: scale(1.25); }
+  to { opacity: 1; transform: none; }
+}
+@keyframes rt-stamp {
+  0% { opacity: 0; transform: rotate(-7deg) scale(2.4); }
+  70% { opacity: 0.82; transform: rotate(-7deg) scale(0.94); }
+  100% { opacity: 0.82; transform: rotate(-7deg) scale(1); }
+}
+@keyframes rt-thud { 40% { transform: translateY(2px); } }
+
+/* klassföreståndarens betyg och kommentar i rödpenna, under raderna */
+.rt-note {
+  margin: 20px 4% 4px 16%;
+  font-family: var(--pp-hand);
+  font-size: 23px;
+  font-weight: 600;
+  line-height: 1.12;
+  color: var(--pp-no);
+  transform: rotate(-1deg);
+}
+.rt-grade {
+  font-weight: 700;
+  text-decoration: underline;
+  text-decoration-thickness: 2px;
+  text-underline-offset: 4px;
+}
+.rt-sig { display: block; margin-top: 6px; text-align: right; font-size: 21px; }
+.rt-sig::before { content: "– "; }
+.rt-hold { opacity: 0; }
+.rt-write { animation: rt-write 2.4s cubic-bezier(0.45, 0.1, 0.55, 0.9) both; }
+@keyframes rt-write {
+  from { clip-path: inset(-12px 100% -12px -12px); }
+  to { clip-path: inset(-12px -12px -12px -12px); }
+}
+
+@media (max-width: 640px) {
+  .rt-note { margin: 16px 2px 2px 6%; font-size: 20px; }
+  .rt-sig { font-size: 19px; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .rt-play,
+  .rt-play *,
+  .rt-write { animation: none !important; }
+}
