@@ -31,25 +31,34 @@ const RECENT_MAX = 12;
 const COMP = { pl: 'Premier League', ch: 'Championship', l1: 'League One', l2: 'League Two', fac: 'FA-cupen', lc: 'Ligacupen' };
 // Tävlingarna i lagens form och schema (ESPN:s förkortningar).
 const OTHER = { EFL: 'ligacupen', FAC: 'FA-cupen', CL: 'Champions League', EL: 'Europa League', ECL: 'Conference League' };
-const RES = { V: 'vinst', O: 'oavgjort', F: 'förlust' };
+const RES = { V: 'seger', O: 'oavgjort', F: 'förlust' };
 const tz = { timeZone: 'Europe/Stockholm' };
 const kickFmt = new Intl.DateTimeFormat('sv-SE', { ...tz, weekday: 'long', day: 'numeric', month: 'long', hour: '2-digit', minute: '2-digit' });
 const dayFmt = new Intl.DateTimeFormat('sv-SE', { ...tz, weekday: 'long', day: 'numeric', month: 'long' });
+const todayFmt = new Intl.DateTimeFormat('sv-SE', { ...tz, weekday: 'long', day: 'numeric', month: 'long', year: 'numeric' });
 const ordinal = (n) => `${n}:${n % 10 <= 2 && n % 10 >= 1 && ![11, 12].includes(n % 100) ? 'a' : 'e'}`;
 const dec = (x, d = 1) => x.toLocaleString('sv-SE', { minimumFractionDigits: d, maximumFractionDigits: d });
 const odds = (x) => (x ? dec(x, 2) : '–');
 const plural = (n, one, many) => `${n} ${n === 1 ? one : many}`;
+// Som man säger det: "ingen seger", "1 seger", "3 segrar".
+const count = (n, none, one, many) => (n === 0 ? none : plural(n, one, many));
+// Tabelläget i ord först: "sist i League One (24:e av 24)".
+const place = (rank, size, league) => {
+  const where = league ? ` i ${league}` : '';
+  const word = rank === 1 ? 'etta' : rank === size ? 'sist' : rank === size - 1 ? 'näst sist' : null;
+  return word ? `${word}${where} (${ordinal(rank)} av ${size})` : `${ordinal(rank)} av ${size}${where}`;
+};
 
 // Lagets läge inför matchen, ur matchens underlag (teams.home/away).
 function teamFacts(t, side) {
   if (!t) return null;
   const out = {};
   if (t.table && t.table.rank) {
-    out.tabell = `${ordinal(t.table.rank)} av ${t.table.size}${t.league ? ` i ${t.league.name}` : ''}, ${plural(t.table.points, 'poäng', 'poäng')} på ${plural(t.table.played, 'match', 'matcher')}`;
+    out.tabell = `${place(t.table.rank, t.table.size, t.league && t.league.name)}, ${plural(t.table.points, 'poäng', 'poäng')} på ${plural(t.table.played, 'match', 'matcher')}`;
   }
   const rec = t.record && t.record[side];
   if (rec && rec.n) {
-    out[side === 'home' ? 'hemma i år' : 'borta i år'] = `${plural(rec.w, 'vinst', 'vinster')}, ${plural(rec.d, 'oavgjord', 'oavgjorda')}, ${plural(rec.l, 'förlust', 'förluster')}, mål ${rec.gf}–${rec.ga}`;
+    out[side === 'home' ? 'hemma i år' : 'borta i år'] = `${count(rec.w, 'ingen seger', 'seger', 'segrar')}, ${count(rec.d, 'ingen oavgjord', 'oavgjord', 'oavgjorda')}, ${count(rec.l, 'ingen förlust', 'förlust', 'förluster')}, ${plural(rec.gf, 'gjort mål', 'gjorda mål')} och ${plural(rec.ga, 'insläppt', 'insläppta')}`;
   }
   if (Array.isArray(t.form) && t.form.length) {
     const own = t.league ? t.league.id : null;
@@ -174,7 +183,7 @@ export async function roundName(id, { env, loadRound, loadSite, complete, store 
   try { site = (await loadSite(round)) || {}; } catch { /* lagen räcker */ }
   const recent = ((await safely(() => store && store.get(RECENT))) || []).filter((r) => r && r.namn);
   const payload = roundPayload(round, { ...site, recent });
-  let say = `Omgången (JSON):\n${JSON.stringify(payload)}` + (dreamOf(id) ? `\n\n${nc.storkovanHint}` : '');
+  let say = `Idag är det ${todayFmt.format(now())}.\n\nOmgången (JSON):\n${JSON.stringify(payload)}` + (dreamOf(id) ? `\n\n${nc.storkovanHint}` : '');
   let problem = null;
   for (let attempt = 1; attempt <= cfg.attempts; attempt++) {
     let r;
@@ -186,7 +195,13 @@ export async function roundName(id, { env, loadRound, loadSite, complete, store 
     }
     if (r.refused) { problem = `${chat.provider} avböjde att döpa omgången.`; break; }
     const parts = partsOf(r.content);
-    const why = parts ? problems(parts, payload) : ['inget svar i rätt form'];
+    // Tal i förklaringen får också komma ur det AI:n hittade på nätet.
+    const why = parts ? problems(parts, [payload, r.sources || '']) : ['inget svar i rätt form'];
+    // Sista försöket: håller namnet men inte förklaringen visas namnet utan den.
+    if (why.length && parts && attempt === cfg.attempts && !problems({ ...parts, syftar: null }, payload).length) {
+      parts.syftar = null;
+      why.length = 0;
+    }
     if (!why.length) {
       // Hann någon annan före gäller dess namn, så att alla ser samma.
       const first = await safely(() => store && store.get(key));
@@ -210,33 +225,48 @@ export async function roundName(id, { env, loadRound, loadSite, complete, store 
 
 // Ett samtal med språkmodellen: say(text) → {content, model, refused}. Varje
 // svar läggs till i samtalet som det kom, så att ett nytt försök bygger på det.
+// Claude får söka på nätet (nyheter kring lagen) med Anthropics sökverktyg,
+// som körs hos Anthropic. sources: rubrikerna och de citerade styckena ur det
+// som hittades, för kontrollen av talen i förklaringen.
 function claudeChat(apiKey) {
   // Adressen anges, så att en ANTHROPIC_BASE_URL i miljön inte styr om anropet.
-  const client = new Anthropic({ apiKey, baseURL: 'https://api.anthropic.com', timeout: cfg.timeoutMs, maxRetries: 1 });
+  const client = new Anthropic({ apiKey, baseURL: 'https://api.anthropic.com', timeout: nc.claude.timeoutMs || cfg.timeoutMs, maxRetries: 1 });
   const turns = [];
+  const tools = nc.claude.searches ? [{ type: 'web_search_20260209', name: 'web_search', max_uses: nc.claude.searches }] : undefined;
   return {
     provider: nc.claude.provider,
     async say(text) {
       turns.push({ role: 'user', content: text });
       let r;
-      try {
-        r = await client.beta.messages.create({
-          model: nc.claude.model,
-          max_tokens: nc.claude.maxTokens,
-          betas: ['server-side-fallback-2026-07-01'],
-          fallbacks: 'default',
-          output_config: { effort: nc.claude.effort },
-          system: nc.systemPrompt,
-          messages: turns,
-        });
-      } catch (err) {
-        throw claudeProblem(err);
+      const found = [];
+      // Ett långt sökande kan pausas (pause_turn): då skickas svaret hittills
+      // tillbaka och Claude fortsätter där den var.
+      for (let round = 0; round < 3; round++) {
+        try {
+          r = await client.beta.messages.create({
+            model: nc.claude.model,
+            max_tokens: nc.claude.maxTokens,
+            betas: ['server-side-fallback-2026-07-01'],
+            fallbacks: 'default',
+            output_config: { effort: nc.claude.effort },
+            system: nc.systemPrompt,
+            ...(tools ? { tools } : {}),
+            messages: turns,
+          });
+        } catch (err) {
+          throw claudeProblem(err);
+        }
+        for (const b of r.content) {
+          if (b.type === 'web_search_tool_result' && Array.isArray(b.content)) for (const x of b.content) found.push(x.title || '');
+          if (b.type === 'text' && Array.isArray(b.citations)) for (const c of b.citations) found.push(c.cited_text || '', c.title || '');
+        }
+        turns.push({ role: 'assistant', content: r.content });
+        if (r.stop_reason !== 'pause_turn') break;
       }
-      turns.push({ role: 'assistant', content: r.content });
       // Nekade också reservmodellen finns ingen text att läsa.
       if (r.stop_reason === 'refusal') return { content: '', model: r.model, refused: true };
       const content = r.content.filter((b) => b.type === 'text').map((b) => b.text).join('');
-      return { content, model: r.model, refused: false };
+      return { content, model: r.model, refused: false, sources: found.join('\n') };
     },
   };
 }
@@ -281,7 +311,9 @@ function partsOf(content) {
   }
 }
 
-function problems({ namn, syftar }, payload) {
+// known: underlaget (och det som hittades på nätet) – talen i förklaringen
+// måste finnas där.
+function problems({ namn, syftar }, known) {
   const why = [];
   const words = namn.split(/\s+/).filter(Boolean).length;
   if (namn.length > nc.maxChars || words > nc.maxWords) why.push(`för många ord eller tecken (${words} ord, ${namn.length} tecken)`);
@@ -289,7 +321,7 @@ function problems({ namn, syftar }, payload) {
   if (/[!?]|\p{Extended_Pictographic}/u.test(namn)) why.push('utropstecken, frågetecken eller emojier');
   if (/kupong|omgång|tips/i.test(namn)) why.push('ett av de förbjudna orden');
   if (syftar && syftar.split(/\s+/).length > nc.maxHintWords * 1.5) why.push('en för lång förklaring');
-  const bad = syftar ? foreignNumbers(syftar, payload) : [];
+  const bad = syftar ? foreignNumbers(syftar, known) : [];
   if (bad.length) why.push(`tal i "syftar" som inte finns i underlaget (${bad.join(', ')})`);
   return why;
 }

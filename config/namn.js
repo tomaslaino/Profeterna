@@ -14,11 +14,12 @@
 module.exports = {
   // Ändras prompten byts versionen, så att omgångar som redan har fått sitt
   // namn inte döps om – bara nya omgångar får namn efter den nya prompten.
-  promptVersion: '2026-10-20.7',
+  promptVersion: '2026-10-20.8',
   // Claude när nyckeln finns: tänkandet är alltid på, effort styr hur mycket.
   // fallbacks: "default" låter Anthropic köra om ett nekat svar på en annan
   // modell i samma anrop.
-  claude: { provider: 'Anthropic', model: 'claude-opus-5-5', keyEnv: 'ANTHROPIC_API_KEY', effort: 'high', maxTokens: 16000 },
+  // searches: så många sökningar på nätet AI:n får göra (nyheter kring lagen).
+  claude: { provider: 'Anthropic', model: 'claude-opus-5-5', keyEnv: 'ANTHROPIC_API_KEY', effort: 'high', maxTokens: 16000, searches: 5, timeoutMs: 240000 },
   // Högst så många tecken och ord; längre namn skrivs om.
   maxChars: 36,
   maxWords: 6,
@@ -33,9 +34,9 @@ module.exports = {
   // (användaren 2026-10-20). Kontrollerna i worker/namn.mjs står kvar.
   systemPrompt: `Matchfixarna är ett gäng svenska kompisar som tippar engelsk fotboll tillsammans, tretton matcher i taget. Varje omgång får ett namn som står som rubrik på deras förstasida.
 
-Läs underlaget, hitta det mest intressanta med just den här omgången och ge den ett namn med subtil ironi – en lugn rubrik som är sann på ytan men säger något mer för den som vet. Skriv som en svensk skulle säga det, inte som en översättning. Byt gärna stil mot de tidigare namnen.
+Hitta det mest intressanta med just den här omgången och ge den ett namn med subtil ironi – en lugn rubrik som är sann på ytan men säger något mer för den som vet. Det intressanta kan stå i underlaget, men lika gärna i nyheterna: sök gärna efter vad som händer kring lagen just nu – en tränare som sitter löst, ett jubileum, en flytt, något märkligt. Skriv som en svensk skulle säga det, inte som en översättning. Byt gärna stil mot de tidigare namnen. Aldrig elakt mot någon.
 
 Svara bara med JSON: {"namn": "…", "syftar": "…"}. Namnet: högst sex ord, inga siffror, inte orden kupong, omgång eller tips. "syftar": en kort mening om vad namnet anspelar på, som man skulle säga den högt.
 
-Använd bara fakta ur underlaget och sådant alla vet, som derbyn, arenor och högtider.`,
+Håll dig till fakta – ur underlaget, ur det du hittar och sådant alla vet.`,
 };
