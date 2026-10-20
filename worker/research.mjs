@@ -14,6 +14,11 @@
 //
 // Svaret sparas i samma cache som analysen, med ett slutdatum (until): en
 // analys gäller cacheHours timmar för alla, ett avvisat svar failMinutes.
+//
+// Finns artikeln inför matchen (worker/artikel.mjs) bygger analysen på den:
+// artikeln står i underlaget, dess källor och text räknas som lästa, och
+// Claude söker bara efter det som hänt sedan den skrevs (rc.withArticle).
+// Samtalet med Claude och kontrollerna delas med artikeln.
 
 import Anthropic from '@anthropic-ai/sdk';
 import rc from '../config/research.js';
@@ -52,16 +57,22 @@ export async function researchLeft(store, now) {
 // → entry som sparas och visas: {ok: true, text, news, tip, …} eller
 // {ok: false, error, …}. API-fel kastas (inget sparas, nästa klick försöker
 // igen).
-export async function research(d, payload, news, { env, store = null, now = () => new Date() }) {
+// article: artikeln inför matchen (worker/artikel.mjs) eller null.
+export async function research(d, payload, news, { env, store = null, now = () => new Date(), article = null }) {
   const t0 = now();
   const seen = new Map(); // adress (normaliserad) → {url, title, date}
   if (news) for (const it of news.items) see(seen, it.url, it.title, it.publishedAt);
   const base = news ? { ...payload, nyheter: newsForResearch(news) } : payload;
+  const read = [];
+  if (article) {
+    base.artikel = articleForResearch(article);
+    for (const s of article.sources) see(seen, s.url, s.title, s.publishedAt);
+    read.push(article.title, article.lead || '', ...article.paragraphs);
+  }
   // Dagens analyser räknas innan anropet, så att flera samtidiga inte slinker förbi.
   await safely(async () => store && store.put(dayKey(t0), (Number(await store.get(dayKey(t0))) || 0) + 1, 2 * 86400));
 
-  const chat = claudeChat(env[rc.keyEnv]);
-  const read = [];
+  const chat = claudeChat(env[rc.keyEnv], article ? { ...rc, ...rc.withArticle } : rc);
   let say = `Nu är det ${nowFmt.format(t0)} svensk tid.\n\nUnderlag (JSON):\n${JSON.stringify(base)}`;
   let problem = null;
   let model = rc.model;
@@ -106,6 +117,17 @@ export async function research(d, payload, news, { env, store = null, now = () =
   return entry;
 }
 
+// Artikeln som Claude skrev inför matchen, med källornas adresser.
+function articleForResearch(a) {
+  return {
+    skriven: `${nowFmt.format(new Date(a.writtenAt))} svensk tid`,
+    rubrik: a.title,
+    ingress: a.lead || '',
+    text: a.paragraphs.join('\n\n'),
+    källor: a.sources.map((s) => ({ n: s.n, källa: s.source, rubrik: s.title, adress: s.url })),
+  };
+}
+
 // Nyheterna som hämtades vid klicket, med adressen i stället för id – Claude
 // hänvisar till dem som till sidorna den hittar själv.
 function newsForResearch(news) {
@@ -120,14 +142,15 @@ function newsForResearch(news) {
 // Ett samtal med Claude: say(text) → {content, model, refused, found, read}.
 // found: sidorna som kom upp (adress, rubrik, datum), read: texten Claude
 // läste – rubriker, öppnade sidor och citerade stycken, för sifferkontrollen.
-function claudeChat(apiKey) {
+// c: inställningarna – config/research.js eller config/artikel.js.
+export function claudeChat(apiKey, c = rc) {
   // Adressen anges, så att en ANTHROPIC_BASE_URL i miljön inte styr om anropet.
-  const client = new Anthropic({ apiKey, baseURL: 'https://api.anthropic.com', timeout: rc.timeoutMs, maxRetries: 1 });
+  const client = new Anthropic({ apiKey, baseURL: 'https://api.anthropic.com', timeout: c.timeoutMs, maxRetries: 1 });
   // Spelbolag och tipssajter läses inte (samma lista som nyheterna).
   const blocked = newsCfg.excludeDomains.slice(0, 64);
   const tools = [
-    { type: 'web_search_20260209', name: 'web_search', max_uses: rc.searches, blocked_domains: blocked },
-    { type: 'web_fetch_20260209', name: 'web_fetch', max_uses: rc.fetches, max_content_tokens: rc.fetchTokens, blocked_domains: blocked },
+    { type: 'web_search_20260209', name: 'web_search', max_uses: c.searches, blocked_domains: blocked },
+    { type: 'web_fetch_20260209', name: 'web_fetch', max_uses: c.fetches, max_content_tokens: c.fetchTokens, blocked_domains: blocked },
   ];
   const turns = [];
   const usage = [];
@@ -143,19 +166,19 @@ function claudeChat(apiKey) {
       for (let round = 0; round < 5; round++) {
         try {
           r = await client.beta.messages.create({
-            model: rc.model,
-            max_tokens: rc.maxTokens,
+            model: c.model,
+            max_tokens: c.maxTokens,
             betas: ['server-side-fallback-2026-07-01'],
             fallbacks: 'default',
             // Ett nytt försök läser samtalet hittills ur cachen.
             cache_control: { type: 'ephemeral' },
-            output_config: { effort: rc.effort },
-            system: rc.systemPrompt,
+            output_config: { effort: c.effort },
+            system: c.systemPrompt,
             tools,
             messages: turns,
           });
         } catch (err) {
-          throw claudeProblem(err);
+          throw claudeProblem(err, c);
         }
         usage.push(r.usage);
         collect(r.content, found, read);
@@ -207,12 +230,12 @@ function strings(v, out) {
   }
 }
 
-function claudeProblem(err) {
-  const p = rc.provider;
+function claudeProblem(err, c) {
+  const p = c.provider;
   const problem = (status, message) => Object.assign(new Error(message), { status });
   if (err instanceof Anthropic.AuthenticationError) return problem(502, `Nyckeln godtogs inte av ${p}.`);
   if (err instanceof Anthropic.RateLimitError) return problem(503, `${p} är överbelastat – försök igen om en stund.`);
-  if (err instanceof Anthropic.APIConnectionTimeoutError) return problem(504, `${p} svarade inte inom ${Math.round(rc.timeoutMs / 60000)} minuter.`);
+  if (err instanceof Anthropic.APIConnectionTimeoutError) return problem(504, `${p} svarade inte inom ${Math.round(c.timeoutMs / 60000)} minuter.`);
   if (err instanceof Anthropic.APIConnectionError) return problem(504, `${p} gick inte att nå.`);
   if (err instanceof Anthropic.APIError) return problem(502, err.status >= 500 ? `${p} är överbelastat – försök igen om en stund.` : `${p} avvisade anropet (HTTP ${err.status}).`);
   return problem(502, `${p} gav ett fel (${err && err.message}).`);
@@ -250,17 +273,28 @@ function tipOf(raw, note) {
 function problems(parts, known) {
   const why = [];
   if (!parts.tip) why.push('inga giltiga tecken');
-  const prose = [parts.text, parts.news, parts.crowd].filter(Boolean).join('\n').replace(REF_RE, '');
-  const bad = foreignNumbers(prose, known);
+  const bad = unknownNumbers([parts.text, parts.news, parts.crowd], known);
   if (bad.length) why.push(`tal som varken står i underlaget eller på en läst sida (${bad.join(', ')})`);
   return why;
 }
 
+// Talen i texterna (utan hänvisningarna) som varken står i underlaget eller i
+// det Claude läste.
+export function unknownNumbers(texts, known) {
+  return foreignNumbers(texts.filter(Boolean).join('\n').replace(REF_RE, ''), known);
+}
+
+function cite(parts, seen) {
+  const { fix, list } = citer(parts.sources, seen);
+  return { text: fix(parts.text), news: fix(parts.news), crowd: fix(parts.crowd), sources: list };
+}
+
 // Hänvisningarna numreras om 1, 2, 3 … i den ordning de först citeras, och
 // bara källor med en adress som verkligen kom upp följer med. En hänvisning
-// till något annat stryks.
-function cite(parts, seen) {
-  const given = new Map(parts.sources.map((s) => [String(s.n), s]));
+// till något annat stryks. → {fix(text), list}: fix numrerar om en text,
+// list är källistan för texterna som gått genom fix, i den ordningen.
+export function citer(sources, seen) {
+  const given = new Map(sources.map((s) => [String(s.n), s]));
   const byUrl = new Map(); // normaliserad adress → nytt nummer
   const list = [];
   const numberOf = (k) => {
@@ -287,10 +321,10 @@ function cite(parts, seen) {
     .replace(/ {2,}/g, ' ')
     .replace(/ +([.,;:])/g, '$1')
     .trim() : null);
-  return { text: fix(parts.text), news: fix(parts.news), crowd: fix(parts.crowd), sources: list };
+  return { fix, list };
 }
 
-function see(seen, url, title, date) {
+export function see(seen, url, title, date) {
   const key = normUrl(url);
   if (!key) return;
   const old = seen.get(key);

@@ -37,6 +37,12 @@
 // supporterforum – och svarar också med tecknen den skulle ringa in
 // (worker/research.mjs, config/research.js). Svaret har då tip och
 // research: true, och nyhetsläget också läktarsnacket (news.crowd).
+//
+// Artikeln inför matchen: på ett schema skriver Claude en artikel om varje
+// match på omgångens kupong (scheduled, worker/artikel.mjs), och
+//   GET /artikel?id=<match-id> → 200 {ok: true, article} (article = null när
+//   matchen inget har – inte 404, så att webbläsaren inte loggar ett fel)
+// läser den. Analysera bygger då vidare på artikeln.
 
 import cfg from '../config/llm.js';
 import { payloadOf, fingerprint, foreignNumbers } from './analysis.mjs';
@@ -44,6 +50,7 @@ import { gatherNews, newsPayload, citeNews, withoutRefs } from '../src/news.mjs'
 import { comment } from './kommentar.mjs';
 import { roundName } from './namn.mjs';
 import { researchOn, cachedResearch, researchLeft, research } from './research.mjs';
+import { articleTick, currentArticle } from './artikel.mjs';
 
 const ID_RE = /^\d{1,12}$/;
 
@@ -78,8 +85,10 @@ export async function analyze(id, { env, loadMatch, store = null, now = () => ne
   const newsStore = store && { get: (k) => store.get(k), put: (k, v) => store.put(k, v, 3600) };
   const news = cfg.news ? await gatherNews(m, { store: newsStore, now: now() }) : null;
   if (deepNow) {
+    // Artikeln inför matchen, om den finns: Claude har då redan läst på.
+    const article = await safely(() => currentArticle(store, String(id)));
     try {
-      return answer(await research(d, payload, news, { env, store, now }), d, false);
+      return answer(await research(d, payload, news, { env, store, now, article }), d, false);
     } catch (err) {
       // Nätverk, överlast, saldo, nyckel: inget cachas – nästa klick försöker igen.
       return fail(err.status || 502, err.message);
@@ -268,19 +277,35 @@ async function safely(fn) {
 
 const CORS = {
   'Access-Control-Allow-Origin': '*',
-  'Access-Control-Allow-Methods': 'POST, OPTIONS',
+  'Access-Control-Allow-Methods': 'GET, POST, OPTIONS',
   'Access-Control-Allow-Headers': 'Content-Type',
   'Access-Control-Max-Age': '86400',
 };
 
-function json(status, body) {
-  return new Response(JSON.stringify(body), { status, headers: { ...CORS, 'Content-Type': 'application/json; charset=utf-8' } });
+function json(status, body, headers = {}) {
+  return new Response(JSON.stringify(body), { status, headers: { ...CORS, 'Content-Type': 'application/json; charset=utf-8', ...headers } });
 }
+
+const kvStore = (kv) => (kv ? {
+  get: (k) => kv.get(k, 'json'),
+  put: (k, v, ttl) => kv.put(k, JSON.stringify(v), ttl ? { expirationTtl: ttl } : {}),
+} : null);
 
 export default {
   async fetch(request, env) {
     if (request.method === 'OPTIONS') return new Response(null, { status: 204, headers: CORS });
     const url = new URL(request.url);
+    // Artikeln inför matchen. Svaret får ligga fem minuter i webbläsaren.
+    if (url.pathname === '/artikel' && request.method === 'GET') {
+      const cache = { 'Cache-Control': 'public, max-age=300' };
+      try {
+        const article = await currentArticle(kvStore(env.ANALYSER), url.searchParams.get('id') || '');
+        return json(200, { ok: true, article: article || null }, cache);
+      } catch (err) {
+        console.error('[artikel]', err);
+        return json(500, { ok: false, error: 'Internt fel i proxyn.' });
+      }
+    }
     if (!['/analyze', '/kommentar', '/namn'].includes(url.pathname) || request.method !== 'POST') return json(404, { ok: false, error: 'Finns inte.' });
     let id;
     let las;
@@ -320,6 +345,19 @@ export default {
       console.error('[analys]', err);
       return json(500, { ok: false, error: 'Internt fel i proxyn.' });
     }
+  },
+
+  // Schemat ([triggers] i wrangler.toml): artikeln för nästa match på
+  // omgångens kupong (worker/artikel.mjs).
+  async scheduled(event, env, ctx) {
+    const site = String(env.SITE || cfg.site).replace(/\/+$/, '');
+    const kv = env.ANALYSER;
+    ctx.waitUntil(articleTick({
+      env,
+      store: kvStore(kv),
+      loadRound: () => (kv ? kv.get('samtal:aktuellt', 'json') : null),
+      loadMatch: (id) => siteMatch(site, id),
+    }).then((r) => console.log('[artikel]', JSON.stringify(r)), (err) => console.error('[artikel]', err)));
   },
 };
 

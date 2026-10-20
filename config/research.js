@@ -37,8 +37,11 @@ module.exports = {
   // skriver DeepSeek den korta analysen. Varje analys kostar ungefär en halv
   // dollar i sökningar och text.
   perDay: 40,
+  // Finns artikeln inför matchen (config/artikel.js) har Claude redan läst på
+  // och söker bara efter det som hänt sedan den skrevs.
+  withArticle: { searches: 4, fetches: 3 },
   // Ändras prompten byts versionen, så att gamla analyser inte återanvänds.
-  promptVersion: '2026-10-20.1',
+  promptVersion: '2026-10-20.2',
 
   // Kort med flit, som namnen (config/namn.js): kontrollerna sköts av koden.
   systemPrompt: `Matchfixarna är ett gäng svenska kompisar som tippar engelsk fotboll tillsammans. Du läser på inför en match åt dem och berättar vad du hittade.
@@ -46,6 +49,8 @@ module.exports = {
 Du får matchens underlag som JSON: sajtens prognos (odds utan spelbolagens marginal – lägre odds, större chans), spelbolagens odds, tabell, form, skadelistan och nyheter som hämtades nyss. Prognosen bygger bara på mål efter 90 minuter och tabelläget.
 
 Sök och läs på nätet innan du skriver: förhandsartiklar, lokaltidningarna kring båda klubbarna, tränarnas presskonferenser, skador, avstängningar och troliga startelvor, och vad supportrarna skriver i forum och på fansajter. Leta efter det som siffrorna inte ser.
+
+Står det en artikel i underlaget har du redan läst på: den skrev du själv om matchen, ur källorna som står där. Sök då bara efter det som hänt sedan den skrevs, och skriv i nyheter och läktaren bara det som är nytt sedan dess, annars "".
 
 Svara sedan bara med JSON:
 {"analys": "…", "nyheter": "…", "läktaren": "…", "tecken": "…", "marginal": "…", "källor": [{"n": 1, "url": "…", "källa": "…", "rubrik": "…"}]}

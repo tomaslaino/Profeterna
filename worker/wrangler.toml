@@ -16,3 +16,9 @@ compatibility_date = "2026-10-01"
 [[kv_namespaces]]
 binding = "ANALYSER"
 id = "d890672594e449589f9f3cd97ca6e6de"
+
+# Artikeln inför matchen (worker/artikel.mjs): var tionde minut skrivs
+# artikeln för den match på omgångens kupong som står på tur, högst en åt
+# gången. De flesta körningarna har inget att göra.
+[triggers]
+crons = ["*/10 * * * *"]

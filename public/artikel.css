@@ -1,0 +1,28 @@
+/* Artikeln inför matchen (fliken Inför i matchbladet, articlePane i app.js):
+   rubrik i Fraunces, ingress i fetstil och brödtext som på en tidningssida,
+   med upphöjda hänvisningar till källistan under. Laddas efter matchblad.css. */
+
+.artikel { max-width: 46rem; }
+.artikel .art-title {
+  margin: 0 0 12px;
+  font-family: var(--display);
+  font-size: 27px;
+  font-weight: 700;
+  line-height: 1.15;
+  letter-spacing: -0.01em;
+  text-wrap: balance;
+}
+.artikel .art-lead { margin: 0 0 14px; font-size: 16px; font-weight: 650; line-height: 1.5; }
+.artikel .analysis-text { font-size: 15px; line-height: 1.62; }
+.artikel .analysis-text + .analysis-text { margin-top: 12px; }
+.artikel sup.ref { font-size: 0.68em; line-height: 0; margin-left: 0.1em; }
+.artikel sup.ref a { text-decoration: none; font-weight: 600; }
+.artikel .news-sources { margin-top: 20px; padding-top: 12px; border-top: 1px solid var(--hair); }
+
+dialog.mr-modal .artikel .art-title { color: var(--pp-ink); }
+dialog.mr-modal .artikel sup.ref a { color: var(--pp-pen); }
+
+@media (max-width: 640px) {
+  .artikel .art-title { font-size: 23px; }
+  .artikel .art-lead { font-size: 15px; }
+}

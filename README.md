@@ -857,6 +857,33 @@ skriver Claude (`claude-opus-5-5`) analysen i stället för DeepSeek
   $0,20, $10 per 1 000 sökningar): en provkörning (Cardiff–Birmingham, 10 sökningar, 2
   sidor) kostade ungefär $0,40 och tog 91 s.
 
+**Artikeln inför matchen (2026-10-20, som Redaktionens analys på gravergrav.se):** inför
+varje match på omgångens kupong läser Claude på av sig självt och skriver en artikel –
+rubrik, ingress, fyra–fem stycken (300–400 ord) och källor – som står i matchrutans flik
+*Inför*, efter Startelvor ([worker/artikel.mjs](worker/artikel.mjs), prompten och
+gränserna i [config/artikel.js](config/artikel.js)). Artikeln ger inga tips; tecknen ringas
+fortfarande bara in efter Analysera.
+
+- Proxyn kör ett schema var tionde minut (`[triggers]` i
+  [worker/wrangler.toml](worker/wrangler.toml)) och skriver högst en artikel per körning:
+  den match på omgångens kupong (`samtal:aktuellt`) som står på tur, tidigast avspark
+  först. En match står på tur när den hamnar på kupongen (avspark inom 7 dagar), igen när
+  det är 48 och 20 timmar kvar (efter torsdagens och fredagens presskonferenser inför en
+  lördagsmatch) och när prompten har bytts – inte den sista timmen, högst 4 försök per
+  match och 30 artiklar per dygn.
+- Samma sökverktyg och kontroller som Analysera: källorna ska ha kommit upp i sökningen,
+  talen ska stå i underlaget eller i det Claude läste, och ett tipsord (spik, gardering)
+  ger en omskrivning. Underlaget är analysens utan prognosen och oddsen. Klarar svaret
+  inte kontrollen står den förra artikeln kvar, och ett nytt försök görs efter en timme.
+- `GET …/artikel?id=<match-id>` lämnar ut artikeln (KV-nyckeln `artikel:<id>`, sparad 4
+  dagar efter avspark); matchrutan hämtar den samtidigt som matchen.
+- **Analysera bygger på artikeln** när den finns: den står i underlaget, dess källor och
+  text räknas som lästa, och Claude söker bara efter det som hänt sedan den skrevs (högst 4
+  sökningar och 3 sidor) och skriver i *Nyhetsläget* och *Läktarsnacket* bara det nya.
+- **Kostnad:** ungefär $0,40–0,60 per artikel, alltså högst omkring $20 i veckan för en
+  kupong med 13 matcher (tre artiklar per match). Provskrivs lokalt utan att sparas:
+  `node src/artikel-cli.mjs <match-id>`.
+
 - **Underlaget** ([worker/analysis.mjs](worker/analysis.mjs)) är det matchvyn visar, med
   sidans precision: prognosen som odds (1X2, osäkerhet, över 2,5, båda gör mål, troligaste
   resultat, gå vidare – 58 % blir 1,72, som på sidan), förväntade mål med en decimal,

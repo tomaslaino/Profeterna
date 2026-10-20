@@ -394,7 +394,8 @@ async function openMatch(id) {
     document.documentElement.classList.add('mr-open');
   }
   try {
-    const d = await getJSON(`data/match/${encodeURIComponent(id)}.json`);
+    // Artikeln inför matchen hämtas samtidigt, så att fliken finns från början.
+    const [d] = await Promise.all([getJSON(`data/match/${encodeURIComponent(id)}.json`), loadArticle(id)]);
     if (location.hash !== `#match/${id}`) return;
     const fresh = !state.detail || state.detail.match.id !== id;
     state.detail = d;
@@ -471,7 +472,8 @@ function selectMatchTab(id, focus) {
 // Flikarna i matchbladets ordning: Startelvor först – planen, avbytarna, vilka
 // som saknas och domaren, som i ett matchprogram – och Matchen efter den när
 // matchen har börjat. Startelvor och Matchen fylls av matchruta.js, Tabellen
-// av tableFill().
+// av tableFill(). Inför står efter dem när Claude har skrivit en artikel om
+// matchen (articlePane).
 function matchPanes(d) {
   const m = d.match;
   const started = m.completed || (Date.parse(m.kickoff) <= Date.now() && !/POSTPONED|CANCEL/.test(m.status || ''));
@@ -479,6 +481,8 @@ function matchPanes(d) {
   const panes = [];
   panes.push(['startelvor', 'Startelvor', (R ? R.lineupPane(m, absentees(d)) : squadCard(d)) + refereeCard(d)]);
   if (started && R) panes.push(['matchen', 'Matchen', R.eventsPane(m)]);
+  const article = articles.get(m.id);
+  if (article) panes.push(['infor', 'Inför', articlePane(article)]);
   panes.push(['prognos', 'Prognos', prognosPane(d)]);
   const table = tableDivs(d).length > 0;
   panes.push(['form', 'Form', formCard(d) + sideCard(d, table)]);
@@ -1082,6 +1086,39 @@ async function tableFill(root, d) {
     html = `<p class="unknown">Kunde inte läsa tabellen: ${esc(err.message)}</p>`;
   }
   if (state.detail === d && root.contains(el)) el.innerHTML = html;
+}
+
+// ---------- artikeln inför matchen ----------
+
+// Inför varje match på omgångens kupong läser Claude på och skriver en
+// artikel (worker/artikel.mjs). Proxyn lämnar ut den bredvid analysen
+// (…/analyze → …/artikel). Per match: artikeln eller null.
+const articles = new Map();
+
+async function loadArticle(id) {
+  const a = state.meta && state.meta.analysis;
+  if (!a || !a.endpoint || articles.has(id)) return;
+  try {
+    // Matchbladet väntar inte längre än så på artikeln.
+    const res = await fetch(`${a.endpoint.replace(/analyze$/, 'artikel')}?id=${encodeURIComponent(id)}`, { signal: AbortSignal.timeout(2500) });
+    const j = res.ok ? await res.json() : null;
+    articles.set(id, j && j.ok && j.article ? j.article : null);
+  } catch {
+    // Ingen artikel den här gången – nästa öppning försöker igen.
+  }
+}
+
+// Rubrik, ingress och stycken med hänvisningar till källistan, som
+// Redaktionens analys på gravergrav.se.
+function articlePane(a) {
+  const refs = refLinks(a.sources);
+  const para = (t, cls) => `<p class="${cls}">${refs(esc(t)).replace(/(\d) %/g, '$1&nbsp;%')}</p>`;
+  const at = a.writtenAt ? fDateTime.format(new Date(a.writtenAt)) : 'okänt';
+  return `<article class="card artikel"><h4 title="${esc(`Skriven av ${a.model} efter sökningar på nätet · rapporterat i media, inte kontrollerat av Matchfixarna och inte med i prognosen`)}">Skriven ${esc(at)}</h4>` +
+    `<h3 class="art-title">${esc(a.title)}</h3>` +
+    (a.lead ? para(a.lead, 'art-lead') : '') +
+    a.paragraphs.map((t) => para(t, 'analysis-text')).join('') +
+    sourceList(a.sources) + '</article>';
 }
 
 // ---------- matchanalys (fas 5, valfri) ----------
