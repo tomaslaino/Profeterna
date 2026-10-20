@@ -862,7 +862,7 @@ function sideCard(d) {
 }
 
 // Skadorna i korthet: namnen per status på en rad. FPL:s egen text (på
-// engelska) och chansen att spela syns med detaljerna.
+// svenska, src/skadetext.js) och chansen att spela syns med detaljerna.
 const SQUAD_GROUPS = [
   ['skadad', 'Skadade'],
   ['avstängd', 'Avstängda'],

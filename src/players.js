@@ -19,6 +19,7 @@ const fs = require('fs');
 const path = require('path');
 const { CACHE_DIR } = require('./store');
 const { keyOf, espnKey, norm } = require('./teams');
+const { newsSv } = require('./skadetext');
 
 const LEAGUES = COMPETITIONS.filter((c) => c.type === 'league');
 const SEASON_YEAR = Number(SEASON.label.slice(0, 4));
@@ -425,7 +426,7 @@ function availability(compId, teamName) {
     players: fc.data.players
       .filter((p) => p.teamId === team.id && STATUS[p.status])
       .sort((x, y) => (y.minutes || 0) - (x.minutes || 0))
-      .map((p) => ({ name: p.name, pos: p.pos, status: STATUS[p.status], chance: p.chanceNext, news: p.news, minutes: p.minutes })),
+      .map((p) => ({ name: p.name, pos: p.pos, status: STATUS[p.status], chance: p.chanceNext, news: newsSv(p.news), minutes: p.minutes })),
   };
 }
 

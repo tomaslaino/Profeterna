@@ -15,6 +15,7 @@ const { COMPETITIONS, NATIONAL_LEAGUE, EUROPE, competition } = require('../confi
 const { readCache, CACHE_DIR } = require('./store');
 const { SOURCES, ODDS_WINDOW_DAYS } = require('./sources');
 const { keyOf, espnKey } = require('./teams');
+const { newsSv } = require('./skadetext');
 
 const FORM_N = 5;
 
@@ -804,7 +805,7 @@ function squadInfo(D, k, league) {
       pos: p.pos,
       status: STATUS[p.status],
       chance: p.chanceNext,
-      news: p.news,
+      news: newsSv(p.news),
       since: p.newsAdded ? p.newsAdded.slice(0, 10) : null,
       minutes: p.minutes,
     }));

@@ -133,7 +133,7 @@ function cell(v, { d = 0, strong = false } = {}) {
 
 const ZONES = [
   { test: (n) => /relegation/i.test(n), cls: 'z-down', label: 'Nedflyttning' },
-  { test: (n) => /playoff/i.test(n), cls: 'z-po', label: 'Kval till uppflyttning (playoff)' },
+  { test: (n) => /playoff/i.test(n), cls: 'z-po', label: 'Kval till uppflyttning' },
   { test: (n) => /champions league/i.test(n), cls: 'z-up', label: 'Champions League' },
   { test: (n) => /europa|conference/i.test(n), cls: 'z-eu', label: 'Europa- eller Conference League' },
   { test: (n) => /promotion/i.test(n), cls: 'z-up', label: 'Direkt uppflyttning' },
@@ -302,7 +302,6 @@ function fixturesCard(F) {
     `<td class="num pts">${t.next.xp == null ? '–' : num(t.next.xp, 2)}</td></tr>`).join('');
   return card('Programmet framåt', {
     hint: `de närmaste ${F.teams[0].next.n} ligamatcherna`,
-    key: 'Odds på seger · H hemma, B borta · grönt lätt, rött svårt',
     body: `<div class="table-wrap dv-tw"><table class="dv-league dv-fxtable"><thead><tr><th>Lag</th><th>Matcherna</th><th class="num" title="Förväntade poäng per match de närmaste matcherna">Poäng/match</th></tr></thead><tbody>${rows}</tbody></table></div>`,
     src: 'Prognosmotorn · samma sannolikheter som under Matcher',
     cls: 'dv-tablecard',
@@ -551,9 +550,8 @@ function openTop(key) {
   const rows = t.list.slice(0, 20).map((p, i) => `<li><button type="button" class="dv-lrow" data-pid="${esc(p.id)}">` +
     `<span class="dv-lrank">${i + 1}</span><span class="dv-lname">${esc(p.name)}<small>${esc(p.team)}</small></span>` +
     `<span class="dv-lval">${t.value(p)}</span></button></li>`).join('');
-  showModal(`<div class="dv-mhead"><div><h3>${esc(t.title)}</h3>` +
-    `<p>${esc(state.data.divisions.find((x) => x.id === state.div).name)} · topp ${Math.min(20, t.list.length)}</p></div></div>` +
-    `<ol class="dv-toplist">${rows}</ol>${t.note ? `<p class="dv-mnote">${t.note}</p>` : ''}`);
+  showModal(mhead(null, t.title, [`${esc(divName())} · topp ${Math.min(20, t.list.length)}`]) +
+    `<ol class="dv-toplist">${rows}</ol>` + mfoot(t.note ? [t.note] : []));
 }
 
 function playersView(dv, P) {
@@ -836,6 +834,11 @@ function teamsView(dv, P, T) {
 
 // ---------- spelarkort och lagkort (dialog) ----------
 
+// Alla statistikrutor byggs av samma delar, så att de ser likadana ut:
+// huvudet (märke, namn, underrad), nyckeltalen i en list, avsnitt med en
+// rubrik och siffror i jämna kolumner, mätare för andelar och chanser, och
+// sist knappar. Källraderna syns bara med Visa detaljer, som på sidan.
+
 function dialog() {
   let d = document.getElementById('dv-modal');
   if (!d) {
@@ -861,6 +864,59 @@ function showModal(html) {
   if (box) box.scrollTop = 0;
 }
 
+const divName = () => state.data.divisions.find((x) => x.id === state.div).name;
+
+// Huvudet: märket (tröjnummer eller lagets två första bokstäver), namnet och
+// underrader som redan är escapade.
+function mhead(badge, title, subs, cls = '') {
+  return '<div class="dv-mhead">' + (badge ? `<div class="dv-avatar${cls}">${esc(badge)}</div>` : '') +
+    `<div><h3>${esc(title)}</h3>${subs.filter(Boolean).map((s) => `<p>${s}</p>`).join('')}</div></div>`;
+}
+
+// Nyckeltalen: högst fyra, [värde (html), etikett, förklaring].
+function kpis(list) {
+  const xs = list.filter(Boolean);
+  return `<div class="dv-kpis" style="--n:${xs.length}">${xs.map(([v, label, tip]) =>
+    `<div${tip ? ` title="${esc(tip)}"` : ''}><b>${v}</b><span>${esc(label)}</span></div>`).join('')}</div>`;
+}
+
+// Siffrorna i ett avsnitt: [värde (html), etikett, förklaring].
+function facts(list) {
+  return `<dl class="dv-mfacts">${list.filter(Boolean).map(([v, label, tip]) =>
+    `<div${tip ? ` title="${esc(tip)}"` : ''}><dt>${esc(label)}</dt><dd>${v}</dd></div>`).join('')}</dl>`;
+}
+
+// Mätare för andelar och chanser (0–1). label och sub är html; med pid går
+// raden att klicka till spelarkortet.
+function meters(list) {
+  return `<ul class="dv-meters">${list.map((m) => {
+    // en liten men verklig chans syns som en strimma, noll som ingenting
+    const w = !(m.v > 0) ? 0 : Math.max(1, Math.min(1, m.v) * 100);
+    const inner = `<span class="dv-meter-label">${m.label}${m.sub ? `<small>${m.sub}</small>` : ''}</span>` +
+      `<span class="dv-meter"${m.color ? ` style="--c:${m.color}"` : ''}><i style="width:${w.toFixed(1)}%"></i></span>` +
+      `<b>${m.text}</b>`;
+    return `<li>${m.pid ? `<button type="button" class="dv-meter-row" data-pid="${esc(m.pid)}">${inner}</button>`
+      : `<div class="dv-meter-row">${inner}</div>`}</li>`;
+  }).join('')}</ul>`;
+}
+
+// Ett avsnitt: rubrik med valfri länk till höger, innehåll och källrad.
+function msec(title, body, { link, src } = {}) {
+  return `<section class="dv-msec"><h5 class="dv-h5"><span>${esc(title)}</span>` +
+    (link ? `<a class="dv-mlink" href="${esc(link[0])}">${esc(link[1])}</a>` : '') + `</h5>${body}` +
+    (src && showSources() ? `<p class="dv-msrc">${src}</p>` : '') + '</section>';
+}
+
+// Sist i rutan: källraderna (med Visa detaljer) och knapparna.
+function mfoot(srcs, buttons = '') {
+  const s = showSources() ? srcs.filter(Boolean) : [];
+  if (!s.length && !buttons) return '';
+  return `<div class="dv-mfoot">${s.map((x) => `<p class="dv-msrc">${x}</p>`).join('')}${buttons}</div>`;
+}
+
+const unsure = (v, why) => `<span class="dv-unq" title="${esc(why)}">${v}</span>`;
+const ZONE_COLOR = { title: 'var(--gold)', cl: 'var(--fresh)', promo: 'var(--fresh)', playoff: 'var(--stale)', down: 'var(--down)' };
+
 function playerById(id) {
   const P = state.players.get(state.div);
   return P && !P.unknown ? P.players.find((p) => p.id === id) : null;
@@ -872,65 +928,83 @@ function openPlayer(id) {
   const P = state.players.get(state.div);
   const team = P.teams.find((t) => t.espnId === p.teamId);
   const avail = P.availability && !P.availability.unknown ? P.availability[p.teamId] : null;
+  const mv = p.pos === 'MV';
   const initials = p.jersey || p.name.split(/\s+/).map((x) => x[0]).slice(0, 2).join('');
-  const sub = [p.team, p.jersey ? `#${p.jersey}` : null, POS[p.pos] || null].filter(Boolean).map(esc).join(' · ');
-  let html = `<div class="dv-mhead"><div class="dv-avatar">${esc(initials)}</div><div><h3>${esc(p.name)}</h3><p>${sub}</p></div></div>`;
-  if (p.noStats) {
-    html += `<div class="dv-mtiles">${mtile(p.age == null ? '–' : p.age, 'Ålder')}${mtile(natSv(p.nat) || '–', 'Nation')}</div>` +
-      `<p class="dv-calm">${unknown('Ingen statistik hos ESPN i år')}</p>`;
-  } else {
-    html += '<div class="dv-mtiles">' + mtile(p.age == null ? '–' : p.age, 'Ålder') + mtile(p.app, 'Matcher') +
-      (p.min != null ? mtile(int(p.min), 'Minuter') : '') +
-      (p.pos === 'MV' ? mtile(p.savePct == null ? '–' : pct(p.savePct), 'Räddningar') + mtile(p.gc, 'Insläppta')
-        : mtile(p.g, 'Mål') + mtile(p.a, 'Assist')) + '</div>';
-    const rows = [
-      ['Nationalitet', esc(natSv(p.nat) || 'okänt')],
-      ['Från start / inhopp', `${p.starts ?? '–'} / ${p.app != null && p.starts != null ? p.app - p.starts : '–'}`],
-    ];
-    if (p.min != null && p.app) rows.push(['Speltid per match', `${int(p.min / p.app)} min`]);
-    if (p.pos === 'MV') {
-      rows.push(['Räddningar', `${p.sv ?? '–'} av ${p.sv != null && p.gc != null ? p.sv + p.gc : '–'} skott på mål`]);
-      rows.push(['Insläppta per match', p.gc != null && p.app ? num(p.gc / p.app, 1) : '–']);
-    } else {
-      rows.push(['Mål per match', p.app ? num(p.g / p.app, 2) : '–']);
-      rows.push(['Skott / på mål', `${p.sh ?? '–'} / ${p.sot ?? '–'}`]);
-      rows.push(['Mål per skott', p.sh ? `${pct(p.g / p.sh)} <span class="muted">(${p.g} av ${p.sh})</span>` : '–']);
-      if (p.xg != null) {
-        rows.push(['xG / xA', `${num(p.xg, 2)} / ${num(p.xa, 2)}`]);
-        rows.push(['Mål mot xG', `${delta(dxgOf(p), { d: 1 })} <span class="muted">(${p.fg} mål på ${num(p.xg, 1)} xG)</span>`]);
-        if (p.min >= TH.min) rows.push(['Per 90 minuter', `${num(per90(p.fg, p), 2)} mål · ${num(per90(p.xg, p), 2)} xG`]);
-      } else if (p.min >= TH.min) {
-        rows.push(['Per 90 minuter', `${num(per90(p.g, p), 2)} mål · ${num(per90(ga90Of(p), p), 2)} mål + assist`]);
-      }
-    }
-    rows.push(['Kort', p.yc || p.rc ? `${p.yc ? `<i class="dv-card-y"></i>${p.yc} gula` : ''}${p.rc ? ` <i class="dv-card-r"></i>${p.rc} röda` : ''}` : 'inga']);
-    if (team && team.goals && p.g) rows.push([`Andel av ${esc(team.name)}s mål`, `${pct(p.g / team.goals)} <span class="muted">(${p.g} av ${team.goals})</span>`]);
-    html += `<dl class="dv-mrows">${rows.map(([k, v]) => `<dt>${k}</dt><dd>${v}</dd>`).join('')}</dl>`;
-  }
-  if (p.cost != null) {
-    const f = [
-      ['Pris', `£${num(p.cost, 1)}m`],
-      ['Vald av', p.sel == null ? '–' : `${num(p.sel, 1)} % av lagen`],
-      ['Poäng', `${p.fpts ?? '–'}${p.bonus ? ` <span class="muted">(${p.bonus} bonuspoäng)</span>` : ''}`],
-    ];
-    if ((p.pos === 'MV' || p.pos === 'B') && p.cs != null) f.push(['Hållna nollor', p.cs]);
-    if (p.pen === 1 || p.pen === 2) f.push(['Straffskytt', p.pen === 1 ? 'förstaval' : 'andraval']);
-    html += `<h5 class="dv-h5">Fantasy Premier League</h5><dl class="dv-mrows">${f.map(([k, v]) => `<dt>${k}</dt><dd>${v}</dd>`).join('')}</dl>`;
-  }
+  let html = mhead(initials, p.name, [
+    [p.team, POS[p.pos]].filter(Boolean).map(esc).join(' · '),
+    [natSv(p.nat), p.age != null ? `${p.age} år` : null].filter(Boolean).map(esc).join(' · '),
+  ]);
+
+  // Skadad, avstängd eller tveksam: överst, i FPL:s ord (på svenska).
   if (avail && !avail.unknown) {
     const last = p.name.split(/\s+/).pop().toLowerCase();
     const hit = avail.players.find((x) => x.name.toLowerCase().includes(last));
-    if (hit) html += `<p class="dv-avail">⚠ ${esc(hit.status)}${hit.chance != null ? ` (${hit.chance} % chans att spela)` : ''}${hit.news ? ` – ${esc(hit.news)}` : ''}</p>`;
+    if (hit) {
+      const what = hit.news || `${hit.status}${hit.chance != null ? ` · ${hit.chance} % chans att spela` : ''}`;
+      html += `<p class="dv-avail${hit.status === 'tveksam' ? '' : ' out'}">${esc(what.charAt(0).toUpperCase() + what.slice(1))}</p>`;
+    }
   }
-  html += `<p class="dv-mnote">ESPN · ligamatcher ${esc(state.data.season)} · hämtat ${when(P.source.fetchedAt)}` +
-    `${p.min != null && P.fpl ? ` · speltid, xG och FPL: Fantasy Premier League, hämtat ${when(P.fpl.fetchedAt)}` : ''}` +
-    `${p.min != null && !P.fpl && P.minutes ? ` · speltid: ESPN:s matchrapporter, hämtat ${when(P.minutes.fetchedAt)}` : ''}</p>` +
-    `<p class="dv-mback"><button type="button" class="dv-linkbtn" data-team-open="${esc(p.teamId)}">← ${esc(p.team)}: hela truppen</button></p>`;
-  showModal(html);
-}
 
-function mtile(v, label) {
-  return `<div class="dv-mtile"><b>${esc(String(v))}</b><span>${esc(label)}</span></div>`;
+  if (p.noStats) {
+    html += `<p class="dv-calm">${unknown('Ingen statistik hos ESPN i år')}</p>`;
+  } else {
+    const full = p.min >= TH.min;
+    html += kpis([
+      [cell(p.app), 'Matcher'],
+      p.min != null ? [cell(p.min), 'Minuter'] : [cell(p.starts), 'Från start'],
+      mv ? [p.savePct == null ? '–' : pct(p.savePct), 'Räddnings­procent', 'Räddningar delat med skotten på mål som målvakten mött']
+        : [cell(p.g, { strong: true }), 'Mål'],
+      mv ? [cell(p.gc), 'Insläppta'] : [cell(p.a), 'Assist'],
+    ]);
+    html += msec('Matcherna', facts([
+      p.min != null ? [cell(p.starts), 'Från start'] : null,
+      [p.app != null && p.starts != null ? cell(p.app - p.starts) : cell(null), 'Inhopp'],
+      p.min != null && p.app ? [`${int(p.min / p.app)} min`, 'Speltid per match'] : null,
+      [p.yc || p.rc ? cardsVal(p) : cell(p.yc == null ? null : 0), 'Kort'],
+    ]));
+    if (mv) {
+      html += msec('I målet', facts([
+        [cell(p.sv), 'Räddningar'],
+        [p.sv != null && p.gc != null ? cell(p.sv + p.gc) : cell(null), 'Skott på mål'],
+        [p.gc != null && p.app ? num(p.gc / p.app, 1) : '–', 'Insläppta per match'],
+        p.cs != null ? [cell(p.cs), 'Hållna nollor'] : null,
+      ]));
+    } else {
+      const conv = p.sh ? pct(p.g / p.sh) : '–';
+      html += msec('Mål och skott', facts([
+        full ? [num(per90(goals90(p), p), 2), 'Mål per 90 min'] : [p.app ? num(p.g / p.app, 2) : '–', 'Mål per match'],
+        [cell(p.sh), 'Skott'],
+        [cell(p.sot), 'Skott på mål'],
+        [p.sh && p.sh < TH.shots ? unsure(conv, 'Osäker siffra: färre än tio skott') : conv, 'Mål per skott'],
+      ]) + (team && team.goals && p.g
+        ? meters([{ label: 'Andel av lagets mål', sub: `${p.g} av ${team.goals}`, v: p.g / team.goals, text: pct(p.g / team.goals) }])
+        : ''));
+      if (p.xg != null) {
+        html += msec('Chanserna', facts([
+          [num(p.xg, 1), 'xG', 'Förväntade mål: hur många mål spelarens skott brukar ge'],
+          [delta(dxgOf(p), { d: 1 }), 'Mål mot xG', 'Gjorda mål minus xG – plus är fler mål än chanserna brukar ge'],
+          [num(p.xa, 1), 'xA', 'Förväntade assist: hur många mål passningarna före lagkamraternas skott brukar ge'],
+          full ? [num(per90(p.xg, p), 2), 'xG per 90 min'] : null,
+        ]));
+      }
+    }
+  }
+  if (p.cost != null) {
+    html += msec('Fantasy Premier League', facts([
+      [`£${num(p.cost, 1)}m`, 'Pris'],
+      [p.sel == null ? '–' : `${num(p.sel, p.sel < 10 ? 1 : 0)} %`, 'Vald av', 'Andel av alla lag i Fantasy Premier League som har med spelaren'],
+      [cell(p.fpts), 'Poäng'],
+      [cell(p.bonus), 'Bonuspoäng'],
+      p.pos === 'B' && p.cs != null ? [cell(p.cs), 'Hållna nollor'] : null,
+      p.pen === 1 || p.pen === 2 ? [p.pen === 1 ? 'Förstaval' : 'Andraval', 'Straffskytt'] : null,
+    ]));
+  }
+  html += mfoot([
+    `ESPN · ligamatcher ${esc(state.data.season)} · hämtat ${when(P.source.fetchedAt)}`,
+    p.min != null && P.fpl ? `Speltid, xG och FPL: Fantasy Premier League · hämtat ${when(P.fpl.fetchedAt)}` : null,
+    p.min != null && !P.fpl && P.minutes ? `Speltid: ESPN:s matchrapporter · hämtat ${when(P.minutes.fetchedAt)}` : null,
+  ], `<button type="button" class="dv-mbtn" data-team-open="${esc(p.teamId)}">Truppen i ${esc(p.team)}</button>`);
+  showModal(html);
 }
 
 async function openTeam(id) {
@@ -943,49 +1017,62 @@ async function openTeam(id) {
   const squad = P.players.filter((p) => p.teamId === id)
     .sort((a, b) => (POS_ORDER[a.pos] ?? 9) - (POS_ORDER[b.pos] ?? 9) || (b.app || 0) - (a.app || 0) || a.name.localeCompare(b.name, 'sv'));
   const z = r && zoneOf(r.note);
-  let html = `<div class="dv-mhead"><div class="dv-avatar team">${esc(t.name.slice(0, 2).toUpperCase())}</div><div><h3>${esc(t.name)}</h3>` +
-    `<p>${esc(state.data.divisions.find((x) => x.id === state.div).name)}${r ? ` · ${ordinal(r.rank)} plats` : ''}${z ? ` · ${esc(z.label)}` : ''}</p></div></div>`;
-  html += '<div class="dv-mtiles">' +
-    (r ? mtile(r.points, 'Poäng') + mtile(`${r.gf}–${r.ga}`, 'Mål') : '') +
-    mtile(t.avgAge == null ? '–' : num(t.avgAge, 1), 'Snittålder') + mtile(t.used, 'Använda spelare') + '</div>';
-  if (t.topScorer && t.topScorer.g) {
-    html += `<p class="dv-calm">Bäste målskytt <b>${esc(t.topScorer.name)}</b> · ${t.topScorer.g} av ${t.goals} mål (${pct(t.topScorerShare)})</p>`;
+  let html = mhead(t.name.slice(0, 2).toUpperCase(), t.name,
+    [[divName(), r ? `${ordinal(r.rank)} plats` : null, z ? z.label : null].filter(Boolean).map(esc).join(' · ')], ' team');
+  html += kpis([
+    r ? [cell(r.points, { strong: true }), 'Poäng'] : null,
+    r ? [`${r.gf}–${r.ga}`, 'Mål'] : null,
+    [t.avgAge == null ? '–' : num(t.avgAge, 1), 'Snittålder', 'Varje spelare räknas en gång per match den spelat'],
+    [cell(t.used), 'Använda spelare'],
+  ]);
+  if (t.topScorer && t.topScorer.g && t.goals) {
+    const ts = squad.find((p) => p.name === t.topScorer.name);
+    html += meters([{ label: `<b>${esc(t.topScorer.name)}</b>`, sub: `Bäste målskytt · ${t.topScorer.g} av ${t.goals} mål`,
+      v: t.topScorerShare, text: pct(t.topScorerShare), pid: ts && ts.id }]);
   }
+
   const tt = T && !T.unknown ? T.teams.find((x) => x.espnId === id) : null;
   if (tt && tt.fd && (tt.fd.xg || tt.fd.mkt)) {
     const x = tt.fd.xg;
     const m = tt.fd.mkt;
-    html += '<h5 class="dv-h5">Spelet hittills</h5><div class="dv-mtiles">' +
-      (x ? mtile(num(x.f / x.n, 2), 'xG per match') + mtile(num(x.a / x.n, 2), 'xG mot per match') : '') +
-      (m ? mtile(signed(m.pts - m.xp, 1), 'Poäng mot oddsen') + mtile(signedPct((m.ret - m.n) / m.n), 'Avkastning') : '') + '</div>' +
-      `<p class="dv-mnote">football-data.co.uk · ${tt.fd.n} matcher t.o.m. ${esc(dateLabel(T.source.stats.last))} · <a href="${esc(viewHref(state.div, 'lag'))}">Alla lag</a></p>`;
+    html += msec('Spelet hittills', facts([
+      x ? [num(x.f / x.n, 2), 'xG per match', 'Förväntade mål per match – hur bra chanser laget skapar'] : null,
+      x ? [num(x.a / x.n, 2), 'xG mot per match', 'Motståndarnas förväntade mål per match'] : null,
+      m ? [delta(m.pts - m.xp, { d: 1 }), 'Poäng mot oddsen', `${m.pts} poäng, ${num(m.xp, 1)} väntade enligt oddsen vid avspark`] : null,
+      m ? [delta((m.ret - m.n) / m.n, { fmt: signedPct, dead: 0.005 }), 'Spel på seger', 'Samma insats på seger i varje match, till oddset vid avspark'] : null,
+    ]), { link: [viewHref(state.div, 'lag'), 'Alla lag'], src: `football-data.co.uk · ${tt.fd.n} matcher t.o.m. ${esc(dateLabel(T.source.stats.last))}` });
   }
+
   const F = seasonOf(state.div);
   const ft = F && F.teams ? F.teams.find((x) => x.espnId === id) : null;
   if (ft) {
-    html += '<h5 class="dv-h5">Säsongsprognosen</h5><div class="dv-mtiles">' +
-      mtile(`${int(ft.points.mean)}`, `Förv. poäng (${ft.points.lo}–${ft.points.hi})`) +
-      mtile(num(ft.meanPos, 1), 'Förv. placering') +
-      F.zones.filter((z) => z.key !== 'title' || ft.p.title > 0).map((z) => mtile(`${chanceText(ft.p[z.key])} %`, z.label)).join('') + '</div>';
-    if (ft.next && ft.next.list.length) {
-      html += `<p class="dv-calm">De närmaste ligamatcherna – hemma (H) eller borta (B) och oddset på seger:</p><div class="dv-fxs dv-fxs-wide">${ft.next.list.map(fxChip).join('')}</div>`;
-    }
-    html += `<p class="dv-mnote">Prognosmotorn · ${int(state.season.sims)} simuleringar · <a href="${esc(viewHref(state.div, 'prognos'))}">Hela prognosen</a></p>`;
+    html += msec('Säsongsprognosen', facts([
+      [`${int(ft.points.mean)}<small>${ft.points.lo}–${ft.points.hi}</small>`, 'Förväntade poäng',
+        `Snittet i simuleringarna; 80 % av dem hamnar mellan ${ft.points.lo} och ${ft.points.hi} poäng`],
+      [num(ft.meanPos, 1), 'Förväntad placering'],
+    ]) + meters(F.zones.filter((zz) => zz.key !== 'title' || ft.p.title > 0).map((zz) => ({
+      label: esc(zz.label), v: ft.p[zz.key], text: `${chanceText(ft.p[zz.key])} %`, color: ZONE_COLOR[zz.key],
+    }))) + (ft.next && ft.next.list.length
+      ? `<div class="dv-mnext"><span>Närmaste matcherna</span><div class="dv-fxs dv-fxs-wide">${ft.next.list.map(fxChip).join('')}</div></div>` : ''),
+    { link: [viewHref(state.div, 'prognos'), 'Hela prognosen'], src: `Prognosmotorn · ${int(state.season.sims)} simuleringar` });
   }
+
   const av = P.availability && !P.availability.unknown ? P.availability[id] : null;
   if (av && !av.unknown) {
-    html += '<h5 class="dv-h5">Skador och avstängningar</h5>' + (av.players.length
-      ? `<ul class="dv-avlist">${av.players.map((x) => `<li><b>${esc(x.name)}</b> <span class="muted">${esc(x.pos || '')}</span> – ${esc(x.status)}${x.chance != null ? ` (${x.chance} %)` : ''}${x.news ? `<small>${esc(x.news)}</small>` : ''}</li>`).join('')}</ul>`
-      : '<p class="dv-calm">Inga rapporterade.</p>') + `<p class="dv-mnote">Fantasy Premier League · hämtat ${when(av.source.fetchedAt)}</p>`;
+    html += msec('Skador och avstängningar', av.players.length
+      ? `<ul class="dv-inj">${av.players.map((x) => `<li class="${x.status === 'tveksam' ? 'doubt' : 'out'}">` +
+        `<span><b>${esc(x.name)}</b> <small>${esc(x.pos || '')}</small></span><span class="dv-inj-st">${esc(x.status.charAt(0).toUpperCase() + x.status.slice(1))}</span>` +
+        `${x.news ? `<span class="dv-inj-what">${esc(x.news)}</span>` : ''}</li>`).join('')}</ul>`
+      : '<p class="dv-calm">Inga rapporterade.</p>', { src: `Fantasy Premier League · hämtat ${when(av.source.fetchedAt)}` });
   }
-  html += '<h5 class="dv-h5">Truppen</h5><div class="table-wrap dv-tw"><table class="dv-squad"><thead><tr><th class="c">Pos</th><th class="c">#</th><th>Spelare</th>' +
+
+  const cov = t.coverage;
+  html += msec('Truppen', '<div class="table-wrap dv-tw"><table class="dv-squad"><thead><tr><th class="c">Pos</th><th class="c">#</th><th>Spelare</th>' +
     '<th class="num hide-xs">Ålder</th><th class="num">M</th><th class="num">Mål</th><th class="num">Ass</th><th class="num">Gul</th><th class="num">Röd</th></tr></thead><tbody>' +
     squad.map((p) => `<tr class="dv-prow${p.app ? '' : ' idle'}" data-pid="${esc(p.id)}" tabindex="0"><td class="c">${esc(p.pos || '–')}</td><td class="c muted">${esc(p.jersey || '')}</td>` +
       `<td>${esc(p.name)}<small class="dv-natline">${esc(natSv(p.nat) || '')}</small></td><td class="num hide-xs">${p.age ?? '–'}</td>` +
       `<td class="num">${cell(p.app)}</td><td class="num">${cell(p.g, { strong: true })}</td><td class="num">${cell(p.a)}</td><td class="num">${cell(p.yc)}</td><td class="num">${cell(p.rc)}</td></tr>`).join('') +
-    '</tbody></table></div>';
-  const cov = t.coverage;
-  html += `<p class="dv-mnote">ESPN · hämtat ${when(P.source.fetchedAt)}${cov.behind ? ` · ${cov.covered} av ${cov.matches} matcher införda` : ''}</p>`;
+    '</tbody></table></div>', { src: `ESPN · hämtat ${when(P.source.fetchedAt)}${cov.behind ? ` · ${cov.covered} av ${cov.matches} matcher införda` : ''}` });
   showModal(html);
 }
 
