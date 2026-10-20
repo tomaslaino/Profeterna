@@ -702,10 +702,12 @@
     const mine = d ? d.tecken : (cols.find((c) => c.g.id === v && c.st !== 'hidden') || {}).t;
     const signs = mine ? s.matcher.map((x) => mine[x.id]).filter(Boolean) : [];
     const gard = signs.filter((x) => x.length > 1).length;
+    const odds = mine && signs.length ? radOdds(s, mine) : null;
     $('#sm-fields').innerHTML = !mine ? '' : [
       ['Tippat', `${signs.length}/${s.matcher.length}`],
       gard ? ['Garderingar', gard] : null,
       ['Rader', rader(signs), 'Antal rader med garderingarna'],
+      odds ? ['Odds', odds >= 100 ? Math.round(odds).toLocaleString('sv-SE') : fmtOdds(odds), 'Oddset för att alla dina tecken går in – matchernas odds gånger varandra'] : null,
     ].filter(Boolean).map(([label, val, title]) =>
       `<span class="pp-field"${title ? ` title="${esc(title)}"` : ''}><span>${label}</span><b>${val}</b></span>`).join('');
     const go = d ? `<button type="button" class="kp-btn primary" id="sm-send">${SM.edit ? 'Spara ändringarna' : 'Lämna in och se de andras'}</button>`
@@ -717,6 +719,23 @@
     }
     // Alla tecken på plats: de röda rutorna försvinner.
     if (!s.matcher.some((x) => d && !d.tecken[x.id])) $('#sm-sheet').classList.remove('need');
+  }
+
+  // Oddset för hela din rad: matchernas odds gånger varandra, där en
+  // gardering har oddset för sina tecken tillsammans. Prognosen före avspark
+  // som på resten av kupongen. null om en tippad match saknar prognos.
+  function radOdds(s, mine) {
+    let o = 1;
+    for (const x of s.matcher) {
+      const t = mine[x.id];
+      if (!t) continue;
+      const m = matchById(x.id);
+      const pr = m && (m.j && m.j.p ? m.j.p : m.f ? m.f.p : null);
+      const p = pr ? t.split('').reduce((a, sg) => a + pr[SIGNS.indexOf(sg)], 0) : 0;
+      if (!p) return null;
+      o *= 100 / p;
+    }
+    return o;
   }
 
   // Lyssnar på hela papperet: initialerna (vem du är), rutorna, motiveringen

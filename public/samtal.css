@@ -313,6 +313,10 @@ button.sm-who:focus-visible { outline: 2px solid var(--ink); outline-offset: 1px
   border-radius: 5px;
 }
 .sm-foot .kp-btn.sm-again:hover { color: var(--pp-paper); background: var(--pp-print); }
+/* smalt med fyra fält (med garderingar och odds): två och två, lika breda */
+@media (max-width: 480px) {
+  .sm-foot .pb-fields:has(> :nth-child(4)) .pp-field { flex: 1 1 calc(50% - 4px); }
+}
 
 /* smalt: lagen överst, rutorna i tre lika breda kolumner under; överst bara
    porträtten (tecknen står i rutorna) */
