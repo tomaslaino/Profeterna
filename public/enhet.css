@@ -1,6 +1,6 @@
 /* Matchfixarna – gemensam form. Laddas sist på varje sida och håller ihop det
    som annars glider isär mellan stilmallarna: de små etiketterna i versaler,
-   knapparnas form, filterknapparna med divisionsfärg och sidhuvudenas luft.
+   menyerna och knapparna, och korten.
    Färger och typsnitt kommer från theme.css; här bestäms bara att samma sak
    ser likadan ut överallt. */
 
@@ -33,48 +33,186 @@ html { scrollbar-gutter: stable; }
   letter-spacing: var(--eyebrow-track);
 }
 
-/* ---------- knapparna ---------- */
+/* ---------- menyerna och knapparna ---------- */
 
-/* Alla knappar som står för sig själva är pillerformade, som segmentet,
-   filterknapparna och kupongens knappar – inga rundade rutor emellan.
-   (Tabeller och Statistik har i stället flikar och knappar som ord – se
-   divisioner.css.) */
-.earlier,
-.src-toggle,
-button.analyze {
-  display: inline-flex;
-  align-items: center;
-  gap: 4px;
-  min-height: 36px;
-  padding: 7px 16px;
-  font-size: 13.5px;
-  font-weight: 600;
-  line-height: 1.2;
-  border-radius: 999px;
+/* Ett formspråk på hela sajten, som toppbaren: inga piller. Menyer är ord
+   med ett streck under det valda – guld, eller divisionens färg i
+   tävlingsfiltret (--c, theme.css). Knappar är ord: huvudknappen i guld med
+   samma streck under, de andra i länkfärg, Ta bort i rött. Papperskupongen
+   (.pp, .sm-act) behåller sina tryckta knappar, och runda ikonknappar (spela,
+   stäng, lägg till) är kvar. Divisionsflikarna och Spelare | Lag på Tabeller
+   och Statistik står i divisioner.css. */
+
+/* menyerna: tävlingarna i Matcher och Välj matcher, sorteringen i historiken */
+.chips,
+.seg {
+  display: flex;
+  flex-wrap: nowrap;
+  gap: 22px;
+  max-width: 100%;
+  margin-left: -3px;
+  margin-right: -3px;
+  padding: 3px 3px 0;
+  overflow-x: auto;
+  scrollbar-width: none;
+  background: none;
+  border: 0;
+  border-radius: 0;
+  box-shadow: inset 0 -1px 0 var(--border);
 }
-
-/* ---------- filterknapparna ---------- */
-
-/* Matcher och Välj matcher: en färgprick per division, och den valda
-   divisionen tonas i sin egen färg. (Tabeller och Statistik har flikar med
-   samma färg som streck under – se divisioner.css.) */
-.chips button {
-  display: inline-flex;
-  align-items: center;
-  gap: 7px;
-  padding: 6px 14px;
-  font-size: 13px;
-  font-weight: 700;
-  letter-spacing: 0.01em;
-}
-.chips button[data-comp]:not([data-comp="all"])::before {
-  content: "";
+.chips::-webkit-scrollbar,
+.seg::-webkit-scrollbar { display: none; }
+.toolbar > .chips,
+.toolbar > .seg { flex: 1 1 auto; }
+.chips button,
+.seg button {
+  position: relative;
   flex: none;
-  width: 8px;
-  height: 8px;
-  border-radius: 50%;
-  background: var(--c);
+  display: inline-flex;
+  align-items: baseline;
+  gap: 4px;
+  margin: 0;
+  padding: 2px 0 11px;
+  font: inherit;
+  font-size: 14px;
+  font-weight: 600;
+  letter-spacing: 0.01em;
+  line-height: 1.2;
+  white-space: nowrap;
+  color: color-mix(in srgb, var(--muted) 55%, var(--ink-soft));
+  background: none;
+  border: 0;
+  border-radius: 0;
+  box-shadow: none;
+  cursor: pointer;
+  transition: color 0.15s ease;
 }
+.seg button { --c: var(--gold); }
+.chips button::after,
+.seg button::after {
+  content: "";
+  position: absolute;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  height: 2px;
+  border-radius: 2px 2px 0 0;
+  background: var(--c);
+  transform: scaleX(0);
+  transition: transform 0.2s ease;
+}
+.chips button:hover,
+.seg button:hover { color: var(--fg); background: none; }
+.chips button[aria-pressed="true"],
+.seg button[aria-pressed="true"] {
+  color: var(--bone);
+  font-weight: 600;
+  background: none;
+  border: 0;
+  box-shadow: none;
+}
+.chips button[aria-pressed="true"]::after,
+.seg button[aria-pressed="true"]::after { transform: scaleX(1); }
+.chips button:focus-visible,
+.seg button:focus-visible { outline-offset: 3px; border-radius: 3px; }
+
+/* knapparna: ord i länkfärg, med plats under för huvudknappens streck så
+   att orden står på samma linje */
+.earlier:not(.pp *),
+.src-toggle,
+.back a,
+.kp-btn:not(.pp *, .sm-act *),
+button.analyze,
+.hl-btn,
+.sp-show,
+.dv-linkbtn,
+.dv-more,
+.dv-mbtn {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  min-height: 0;
+  padding: 4px 0 8px;
+  font: inherit;
+  font-size: 14px;
+  font-weight: 600;
+  line-height: 1.3;
+  text-decoration: none;
+  color: var(--accent-deep);
+  background: none;
+  border: 0;
+  border-radius: 0;
+  box-shadow: none;
+  filter: none;
+  cursor: pointer;
+  transition: color 0.15s ease;
+}
+.earlier:not(.pp *):hover,
+.src-toggle:hover,
+.back a:hover,
+.kp-btn:not(.pp *, .sm-act *):hover,
+.dv-linkbtn:hover,
+.dv-more:hover,
+.dv-mbtn:hover { color: var(--fg); background: none; }
+.src-toggle[aria-pressed="true"] { color: var(--ink-soft); }
+.earlier .n,
+.dv-more small { font-size: 13px; font-weight: 500; color: var(--muted); }
+.kp-btn:not(.pp *, .sm-act *):disabled { opacity: 0.45; cursor: default; }
+
+/* huvudknappen: guld, med strecket under som det valda i menyerna */
+.kp-btn.primary:not(.pp *, .sm-act *),
+button.analyze,
+.hl-btn,
+.sp-show {
+  position: relative;
+  font-weight: 700;
+  color: var(--gold-hi);
+}
+.kp-btn.primary:not(.pp *, .sm-act *)::after,
+button.analyze::after,
+.hl-btn::after,
+.sp-show::after {
+  content: "";
+  position: absolute;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  height: 2px;
+  border-radius: 2px 2px 0 0;
+  background: var(--gold);
+}
+.kp-btn.primary:not(.pp *, .sm-act *):hover,
+button.analyze:hover,
+.hl-btn:hover,
+.sp-show:hover { color: var(--bone); background: none; filter: none; }
+.hl-btn .hl-len { font-weight: 500; opacity: 1; color: var(--gold); }
+/* fler klipp än det första: guld utan streck */
+.hl-btn.alt { color: var(--gold); box-shadow: none; }
+.hl-btn.alt::after { content: none; }
+.hl-btn.alt:hover { color: var(--bone); background: none; }
+
+/* Ta bort */
+.kp-btn.kp-danger:not(.pp *, .sm-act *) { color: var(--down); background: none; border: 0; }
+.kp-btn.kp-danger:not(.pp *, .sm-act *):hover { color: #ff9b8f; background: none; }
+
+/* knappar bredvid varandra får samma luft som orden i menyerna */
+.kp-actions,
+.kp-empty-go,
+.kp-nasta-go,
+.kp-teaser-go { column-gap: 22px; }
+/* förstasidans kupongruta: orden i sin egen bredd, inte utdragna över raden
+   – annars blir guldstrecket en avdelare */
+.kp-empty-go > .kp-btn,
+.kp-nasta-go > .kp-btn,
+.kp-teaser-go > .kp-btn { flex: none; }
+.kp-teaser-go { align-items: flex-start; }
+/* Välj matcher: tävlingarnas linje i jämnhöjd med sökrutans underkant */
+.kp-tools { align-items: flex-end; }
+
+/* ögat i toppbaren: ingen ring, som orden bredvid */
+.sp-btn,
+.sp-btn.is-on { padding: 0 4px; border: 0; background: none; }
+.sp-btn.is-on { color: var(--bone); }
 
 /* ---------- kort ---------- */
 
@@ -86,17 +224,18 @@ button.analyze {
    sträcks ut till samma höjd som det långa */
 .mr-body .grid2 { align-items: start; }
 
-/* På mobilen ligger filterknapparna på en rad som går att svepa, ut till
-   skärmkanten – som divisionerna på Tabeller och Statistik. */
+/* På mobilen går tävlingsfiltret ut till skärmkanten och sveps i sidled –
+   som divisionerna på Tabeller och Statistik. */
 @media (max-width: 720px) {
   .chips {
-    flex-wrap: nowrap;
-    overflow-x: auto;
-    scrollbar-width: none;
+    max-width: none;
     margin-left: calc(-1 * var(--gutter));
     margin-right: calc(-1 * var(--gutter));
-    padding: 0 var(--gutter);
+    padding: 3px var(--gutter) 0;
   }
-  .chips::-webkit-scrollbar { display: none; }
-  .chips button { flex: none; }
+  .chips,
+  .seg { gap: 18px; }
+}
+@media (max-width: 760px) {
+  .hk-tools .seg button { padding: 2px 0 11px; font-size: 13.5px; }
 }
