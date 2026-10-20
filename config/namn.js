@@ -14,7 +14,7 @@
 module.exports = {
   // Ändras prompten byts versionen, så att omgångar som redan har fått sitt
   // namn inte döps om – bara nya omgångar får namn efter den nya prompten.
-  promptVersion: '2026-10-20.5',
+  promptVersion: '2026-10-20.6',
   // Claude när nyckeln finns: tänkandet är alltid på, effort styr hur mycket.
   // fallbacks: "default" låter Anthropic köra om ett nekat svar på en annan
   // modell i samma anrop.
@@ -40,19 +40,21 @@ Så gör du:
 1. Hitta det mest intressanta med just den här omgången – något en svensk fotbollsvän begriper direkt och tycker är kul eller anmärkningsvärt: ett derby, ett lag som spelar två gånger, en lång svit i de tidigare mötena, botten mot topp, en storfavorit i usel form, ett lag som aldrig vinner borta, en helgdag mitt i allt. Hellre något alla förstår än statistik som måste förklaras.
 2. Skriv tio förslag på namn, gärna om olika saker i omgången.
 3. Granska förslagen hårt, som en erfaren svensk rubriksättare, och stryk varje förslag som
-   - inte är ironiskt (se nedan) – ett namn som bara beskriver, förklarar eller skämtar rakt ut ska bort,
+   - inte är subtilt ironiskt (se nedan) – ett namn som bara beskriver, eller som säger rakt ut motsatsen, ska bort,
    - låter översatt från engelska eller som ingen svensk skulle säga – läs det tyst för dig själv,
    - är krystat eller bygger på en ordlek som inte fungerar på svenska.
 4. Välj det bästa som finns kvar.
 
-Ironin är det viktigaste. Namnet ska säga något med fullt allvar som underlaget motsäger – motsatsen till det som är sant, eller en överdrivet självsäker, naiv eller högtidlig version av det. Den som ser fakta förstår att det är tvärtom; "syftar" avslöjar sanningen. Namnet får inte själv peka ut skämtet. Till exempel:
-- Storfavoriten har aldrig slagit motståndaren → "En säker spik på Villa Park". Inte "Storfavorit med kort minne", som bara säger rakt ut vad som är fel.
-- Laget har inte vunnit en enda hemmamatch i år → "Fästningen Carrow Road"
-- De två sämsta lagen möts → "Toppmöte i Oldham"
-- Lagen har spelat lika i alla de senaste mötena → "Nu avgörs det i Hull"
-- Chansen till alla rätt är en på tiotusentals → "Bara att hämta ut pengarna"
-- Ett lag har vunnit alla sina matcher och möter ett bottenlag → "En jämn match väntar på Anfield"
-Exemplen är påhittade och får inte återanvändas – hitta din egen iakttagelse och din egen formulering.
+Ironin ska vara subtil – det är det viktigaste. Namnet ska kunna läsas som en helt vanlig, lugn rubrik, men ha en andra innebörd för den som känner till fakta. Verktygen är underdriften och dubbeltydigheten: säg lite mindre än det som är sant, eller något som är sant på ytan men betyder något annat. Den som vet drar på munnen; den som inte vet märker inget konstigt. "syftar" avslöjar vad det handlar om.
+Inte sarkasm: säg inte rakt ut motsatsen till det som är sant, och inga förstärkningsord som "ju", "säker", "given", "formalitet", "så gott som", "guld".
+
+Påhittade exempel som visar tonen – återanvänd dem inte, hitta din egen iakttagelse och formulering:
+- Laget har inte vunnit en enda hemmamatch i år → "Norwich är goda värdar"
+- De två sämsta lagen möts → "Ett viktigt möte i Oldham"
+- Bortalaget har vunnit alla tidigare möten där → "Leeds hittar till Hull"
+- Lagen har spelat lika i alla de senaste mötena → "Stoke och Hull kommer överens"
+- Ett lag spelar tre matcher på en vecka → "Brentford har en del att göra"
+- Chansen till alla rätt är en på tiotusentals → "Någon har börjat titta på båtar"
 
 Namnet:
 - 2–6 ord och högst 36 tecken, med stor bokstav bara först och i egennamn. Lag, arenor och städer får heta som på engelska, men i övrigt inga engelska ord och inga anglicismer.
@@ -61,9 +63,10 @@ Namnet:
 - Namnen ska skifta. Står det tidigare namn i underlaget: gör inte likadant, varken i form, mönster eller ordval.
 
 Dåliga namn, så att du vet vad du ska undvika:
-- "Wigan skjuter för motionens skull" – krystat, och bygger på statistik som måste förklaras.
+- "Bolton brukar ju slå Boro" och "Guldstrid mellan Preston och Derby" – sarkasm: säger rakt ut motsatsen, för tydligt.
+- "Storfavorit med kort minne" – säger rakt ut vad som är fel.
 - "Allhelgona på Stamford Bridge" – beskriver bara.
-- "Storfavorit med kort minne" – säger rakt ut vad som är fel i stället för att låtsas motsatsen.
+- "Wigan skjuter för motionens skull" – krystat, och bygger på statistik som måste förklaras.
 
 "syftar": en mening på enkel svenska, högst 20 ord, som säger vilken iakttagelse i underlaget namnet bygger på, med talen som de står där. Den visas när man pekar på namnet.
 
