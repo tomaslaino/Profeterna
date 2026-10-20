@@ -1,6 +1,6 @@
 /* Höjdpunkterna (hojdpunkter.js): spelikonen på matchraden, knapparna i
-   matchrutans rubrik och spelaren nere i hörnet. Guldet som i resten av
-   detaljerna. */
+   matchrutans rubrik och spelaren som fälls ut under dem. Guldet som i
+   resten av detaljerna. */
 
 .hl-play {
   display: inline-grid;
@@ -54,53 +54,53 @@
 .hl-btn.alt .hl-len { opacity: 1; }
 .hl-btn.alt:hover { color: var(--bg); background: var(--gold); filter: none; }
 
-/* ---------- spelaren ----------
-   Liten nere till höger, förstorad mitt på sidan. Samma ruta i båda lägena,
-   så att klippet spelar vidare när storleken ändras. */
+/* Spelar klippet: ikonen fylld, som när man håller över den. */
+.hl-play.on { color: var(--bg); background: var(--gold); }
 
-.hlp {
+/* ---------- spelaren ----------
+   Utfälld under knappen den startades från, med knapparna under klippet:
+   under matchraden från lagnamnens kolumn till högerkanten, i matchrutans
+   rubrik mitt under knappen. Skrollad ur bild (.away) eller utan plats
+   (.loose) ligger den nere till höger, förstorad (.big) mitt på sidan. Samma
+   ruta i alla lägen, så att klippet spelar vidare när läget ändras. */
+
+.hlp-dim {
   position: fixed;
   inset: 0;
-  z-index: 1000;
-  pointer-events: none;
-}
-.hlp-dim {
-  position: absolute;
-  inset: 0;
+  z-index: 999;
   background: rgba(8, 7, 5, 0.72);
   opacity: 0;
+  pointer-events: none;
   transition: opacity 0.25s ease;
 }
 .hlp.big .hlp-dim { opacity: 1; pointer-events: auto; }
 
 .hlp-box {
-  position: absolute;
-  right: 18px;
-  bottom: 18px;
-  width: 400px;
-  overflow: hidden;
-  pointer-events: auto;
-  background: var(--card);
-  border: 1px solid var(--pill-line);
-  border-radius: 14px;
-  box-shadow: 0 28px 60px -18px rgba(0, 0, 0, 0.95);
-  transition: width 0.28s ease, right 0.28s ease, bottom 0.28s ease, transform 0.28s ease;
+  display: flex;
+  flex-direction: column;
+  max-width: calc((100vh - 200px) * 16 / 9);
+  max-width: calc((100svh - 200px) * 16 / 9);
 }
-.hlp.big .hlp-box {
-  right: 50%;
-  bottom: 50%;
-  width: min(1100px, calc(100vw - 48px), calc((100vh - 120px) * 16 / 9));
-  transform: translate(50%, 50%);
+.mlist > .hlp {
+  padding: 2px 20px 8px calc(20px + 6.5rem + 28px);
+  background: color-mix(in srgb, var(--fg) 2.5%, transparent);
+  border-bottom: 1px solid var(--hair);
 }
+.mlist > .hlp:last-child { border-bottom: 0; }
+.mlist > .mrow:has(+ .hlp) {
+  background: color-mix(in srgb, var(--fg) 2.5%, transparent);
+  border-bottom-color: transparent;
+}
+.mhead > .hlp { width: min(100%, 560px, calc(36vh * 16 / 9)); margin: 12px auto -6px; }
+.mhead > .hlp .hlp-box { max-width: none; }
 
 .hlp-bar {
   display: flex;
   align-items: center;
   gap: 2px;
+  order: 1;
   height: 38px;
-  padding: 0 4px 0 14px;
-  background: var(--glass-hi);
-  border-bottom: 1px solid var(--border);
+  margin-right: -6px;
 }
 .hlp-name {
   flex: 1;
@@ -111,6 +111,7 @@
   color: var(--ink-soft);
   white-space: nowrap;
   text-overflow: ellipsis;
+  visibility: hidden;
 }
 .hlp-ic {
   display: grid;
@@ -132,8 +133,46 @@
 .hlp-frame {
   position: relative;
   aspect-ratio: 16 / 9;
+  overflow: hidden;
   background: #000;
+  border-radius: 10px;
 }
+
+/* i hörnet och förstorad: ett eget kort ovanpå sidan, namnet överst */
+.hlp:is(.away, .loose, .big) .hlp-box {
+  position: fixed;
+  z-index: 1000;
+  right: 18px;
+  bottom: 18px;
+  width: 400px;
+  max-width: none;
+  overflow: hidden;
+  background: var(--card);
+  border: 1px solid var(--pill-line);
+  border-radius: 14px;
+  box-shadow: 0 28px 60px -18px rgba(0, 0, 0, 0.95);
+  animation: hlp-in 0.2s ease;
+  transition: width 0.28s ease, right 0.28s ease, bottom 0.28s ease, transform 0.28s ease;
+}
+.hlp:is(.away, .loose, .big) .hlp-bar {
+  order: 0;
+  margin: 0;
+  padding: 0 4px 0 14px;
+  background: var(--glass-hi);
+  border-bottom: 1px solid var(--border);
+}
+.hlp:is(.away, .loose, .big) .hlp-name { visibility: visible; }
+.hlp:is(.away, .loose, .big) .hlp-frame { border-radius: 0; }
+.hlp.away:not(.big) .hlp-name { cursor: pointer; }
+.hlp.away:not(.big) .hlp-name:hover { color: var(--gold); }
+.hlp.big .hlp-box {
+  right: 50%;
+  bottom: 50%;
+  width: min(1100px, calc(100vw - 48px), calc((100vh - 120px) * 16 / 9));
+  transform: translate(50%, 50%);
+}
+@keyframes hlp-in { from { opacity: 0; } }
+
 .hlp-video, .hlp-video iframe {
   position: absolute;
   inset: 0;
@@ -162,16 +201,22 @@
 .hlp-out[hidden] { display: none; }
 .hlp-out p { margin: 0; }
 
+/* raden har smalare kolumner: klippet från kant till kant i kortet */
+@media (max-width: 760px) {
+  .mlist > .hlp { padding: 0 14px 6px; }
+}
+
 @media (max-width: 640px) {
   .hl-links { margin-top: 10px; }
-  .hlp-box {
+  .hlp:is(.away, .loose) .hlp-box {
     right: 8px;
     bottom: calc(8px + env(safe-area-inset-bottom));
-    width: calc(100vw - 16px);
+    width: min(300px, calc(100vw - 16px));
   }
   .hlp.big .hlp-box { width: calc(100vw - 16px); }
 }
 
 @media (prefers-reduced-motion: reduce) {
   .hlp-box, .hlp-dim { transition: none; }
+  .hlp:is(.away, .loose, .big) .hlp-box { animation: none; }
 }

@@ -5,9 +5,13 @@
 // d.youtube i matchrutan) och Viaplays gratis sammandrag (m.v, d.highlights).
 // app.js ritar spelikonen på matchraden och knappen i matchrutans rubrik.
 //
-// YouTube-klippen spelas i en liten spelare nere i hörnet, ovanpå sidan, som
-// går att förstora och som ligger kvar medan man bläddrar. Nästa klipp tar
-// samma spelare. Klipp som är spärrade i Sverige sorterar bygget bort. Går
+// YouTube-klippen fälls ut under knappen man klickade på: under matchraden i
+// listan, under knappen i matchrutans rubrik. Skrollar man förbi flyttar
+// klippet ut i hörnet och spelar vidare där, tills platsen syns igen. Öppnas
+// matchrutan för samma match följer klippet med upp i rubriken, annars
+// ligger det i hörnet ovanpå rutan. Det går att förstora mitt på sidan, och
+// ett klick till på knappen stänger. Nästa klipp tar samma spelare – en i
+// taget. Klipp som är spärrade i Sverige sorterar bygget bort. Går
 // ett klipp ändå inte att spela här (spärrat i landet, borttaget) provas
 // nästa i listan, och klippet hoppas över nästa gång. När inget går visas
 // Viaplays sammandrag i stället, om det finns.
@@ -36,7 +40,7 @@
 
   // Det som spelaren behöver, som data-attribut på ikonen eller knappen.
   function attrs(m, ids, via) {
-    return ` data-yt="${esc(ids.join(' '))}" data-name="${esc(`${m.home} – ${m.away}`)}"` +
+    return ` data-yt="${esc(ids.join(' '))}" data-mid="${esc(m.id)}" data-name="${esc(`${m.home} – ${m.away}`)}"` +
       (via ? ` data-via="${esc(via)}"` : '') + (hidden(m) ? ' data-hide="1"' : '');
   }
 
@@ -116,7 +120,14 @@
   // 100 borttaget/privat, 101 och 150 får inte visas här (oftast spärrat i landet).
   const GONE = new Set([100, 101, 150]);
 
-  const P = { root: null, frame: null, ready: false, ping: null, list: [], i: 0, via: null, t: 0, seq: 0, watch: null };
+  // open: ett klipp är igång, mid: dess match. seen: platsen under knappen
+  // syns. hold: tills dess stannar spelaren på sin plats medan sidan skrollar
+  // fram den.
+  const P = {
+    root: null, frame: null, ready: false, ping: null, list: [], i: 0, via: null, t: 0, seq: 0,
+    open: false, mid: null, watch: null, io: null, seen: true, hold: 0,
+  };
+  const smooth = () => (window.matchMedia('(prefers-reduced-motion: reduce)').matches ? 'auto' : 'smooth');
 
   function build() {
     const root = document.createElement('div');
@@ -131,16 +142,35 @@
     root.querySelector('.hlp-size').addEventListener('click', () => setBig(!root.classList.contains('big')));
     root.querySelector('.hlp-x').addEventListener('click', close);
     root.querySelector('.hlp-dim').addEventListener('click', () => setBig(false));
+    // I hörnet tar matchens namn en tillbaka till platsen i listan.
+    root.querySelector('.hlp-name').addEventListener('click', () => {
+      if (root.classList.contains('away') && !root.classList.contains('big')) {
+        root.scrollIntoView({ block: 'center', behavior: smooth() });
+      }
+    });
     root.querySelector('.hlp-out').addEventListener('click', (e) => {
       const b = e.target.closest('[data-via-open]');
       if (b) openViaplay(P.via);
     });
+    P.io = new IntersectionObserver((list) => {
+      P.seen = list[list.length - 1].isIntersecting;
+      float();
+    });
     return root;
+  }
+
+  // Platsen under knappen behåller sin höjd medan klippet ligger i hörnet
+  // eller är förstorat, så att det som står under inte hoppar.
+  function keep(on) {
+    const root = P.root;
+    if (!on) root.style.height = '';
+    else if (!root.style.height && !root.classList.contains('loose')) root.style.height = `${root.offsetHeight}px`;
   }
 
   function setBig(on) {
     const root = P.root;
     if (!root) return;
+    keep(on || root.classList.contains('away'));
     root.classList.toggle('big', on);
     const b = root.querySelector('.hlp-size');
     b.innerHTML = on ? SHRINK : GROW;
@@ -148,8 +178,19 @@
     b.title = on ? 'Förminska' : 'Förstora';
   }
 
-  // Spelaren ligger i den öppna rutan (en modal ruta gör allt utanför den
-  // oklickbart), annars direkt i sidan.
+  // Ut i hörnet när platsen under knappen skrollats ur bild, tillbaka när
+  // den syns igen.
+  function float() {
+    const root = P.root;
+    if (!P.open) return;
+    const away = !root.classList.contains('loose') && !P.seen && Date.now() >= P.hold;
+    if (away === root.classList.contains('away')) return;
+    keep(away || root.classList.contains('big'));
+    root.classList.toggle('away', away);
+  }
+
+  // Den översta öppna rutan (en modal ruta gör allt utanför den oklickbart),
+  // annars sidan.
   function host() {
     const open = [...document.querySelectorAll('dialog[open]')].filter((d) => {
       try {
@@ -161,23 +202,60 @@
     return open.length ? open[open.length - 1] : document.body;
   }
 
-  // Flytta spelaren när en ruta öppnas eller stängs. moveBefore behåller
-  // klippet där det var; annars laddas det om från samma ställe.
-  function rehost() {
+  // Knappen klippet startades från, i den öppna rutan eller på sidan – om den
+  // syns, alltså inte i en dold flik eller en stängd ruta.
+  function trigger(h) {
+    for (const el of (h === document.body ? document : h).querySelectorAll('[data-yt]')) {
+      if (el.dataset.mid === P.mid && el.getClientRects().length) return el;
+    }
+    return null;
+  }
+
+  // Spelaren läggs under knappen klippet startades från – matchraden eller
+  // knapparna i matchrutans rubrik – och i hörnet när den knappen inte syns.
+  // Körs när sidan ritas om, en ruta öppnas eller stängs och en flik byts.
+  function place() {
     const root = P.root;
-    if (!root || !root.isConnected) return;
+    if (!P.open) return;
     const h = host();
-    if (root.parentNode === h) return;
-    if (h.moveBefore) {
+    const btn = trigger(h);
+    for (const el of document.querySelectorAll('[data-yt].on')) {
+      if (el !== btn) el.classList.remove('on');
+    }
+    if (!btn) {
+      if (root.parentNode !== h || !root.classList.contains('loose')) move(h, null, true);
+      return;
+    }
+    btn.classList.add('on');
+    const mask = root.querySelector('.hlp-mask');
+    if (mask.hidden !== !btn.dataset.hide) mask.hidden = !btn.dataset.hide;
+    const a = btn.closest('.mrow, .hl-links') || btn;
+    if (a.nextSibling !== root) move(a.parentNode, a.nextSibling, false);
+  }
+
+  // moveBefore behåller klippet där det var; annars laddas det om från
+  // samma ställe.
+  function move(parent, before, loose) {
+    const root = P.root;
+    root.classList.remove('away');
+    root.classList.toggle('loose', loose);
+    root.style.height = '';
+    let kept = false;
+    if (root.isConnected && parent.moveBefore) {
       try {
-        h.moveBefore(root, null);
-        return;
+        parent.moveBefore(root, before);
+        kept = true;
       } catch {
         // flyttas nedan
       }
     }
-    h.appendChild(root);
-    if (P.i < P.list.length) load(P.t);
+    if (!kept) {
+      parent.insertBefore(root, before);
+      if (P.frame) load(P.t);
+    }
+    // Bevakningen börjar om och svarar genast om platsen syns.
+    P.io.unobserve(root);
+    P.io.observe(root);
   }
 
   function listen(f, id) {
@@ -264,37 +342,59 @@
     el.hidden = false;
   }
 
+  // Ett klick till på samma match stänger.
   function play(el) {
-    const all = el.dataset.yt.split(' ').filter(Boolean);
+    if (P.open && el.dataset.mid === P.mid) {
+      close();
+      return;
+    }
     const skip = new Set(bad());
-    const list = all.filter((id) => !skip.has(id));
+    const list = el.dataset.yt.split(' ').filter((id) => id && !skip.has(id));
     if (!P.root) P.root = build();
     const root = P.root;
+    stopPlayer();
+    root.querySelector('.hlp-video').innerHTML = '';
     root.querySelector('.hlp-name').textContent = el.dataset.name || 'Höjdpunkter';
     root.querySelector('.hlp-mask').hidden = !el.dataset.hide;
+    setBig(false);
     P.list = list;
     P.i = 0;
     P.t = 0;
     P.via = el.dataset.via || null;
-    if (!root.isConnected) host().appendChild(root);
-    else rehost();
+    P.mid = el.dataset.mid;
+    P.open = true;
+    P.hold = Date.now() + 900;
+    setTimeout(float, 950);
+    place();
     if (!P.watch) {
-      P.watch = new MutationObserver(rehost);
-      P.watch.observe(document.body, { attributes: true, attributeFilter: ['open'], subtree: true });
+      P.watch = new MutationObserver(place);
+      P.watch.observe(document.body, {
+        childList: true, subtree: true, attributes: true, attributeFilter: ['open', 'hidden'],
+      });
     }
     if (list.length) load(0);
     else out();
+    // Hela spelaren fram i bild, under den klistrade toppbaren.
+    if (!root.classList.contains('loose') && host() === document.body) {
+      root.scrollIntoView({ block: 'nearest', behavior: smooth() });
+    }
   }
 
   function close() {
+    P.open = false;
     P.seq++;
     stopPlayer();
     if (P.watch) P.watch.disconnect();
     P.watch = null;
-    if (P.root) {
+    for (const el of document.querySelectorAll('[data-yt].on')) el.classList.remove('on');
+    const root = P.root;
+    if (root) {
       setBig(false);
-      P.root.remove();
-      P.root.querySelector('.hlp-video').innerHTML = '';
+      P.io.unobserve(root);
+      root.classList.remove('away', 'loose');
+      root.style.height = '';
+      root.remove();
+      root.querySelector('.hlp-video').innerHTML = '';
     }
   }
 
