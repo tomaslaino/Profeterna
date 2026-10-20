@@ -1230,13 +1230,14 @@
       nameBlock(s, 'ruta') +
       // Porträtten: ring i egen färg och bock = inne, grått = inte inne,
       // tårtbit = så mycket som är tippat när kupongen inte är färdig,
-      // guldring = du.
+      // guldring = du. Lagerkrans och fjäder i övre hörnet = regerande
+      // orakel och Ikaros (kronan.js).
       '<div class="sm-faces">' + s.gang.map((g) => {
         const st = g.inne || open ? lage(s, g) : 'lämnade inte in';
         const n = tally(s, g);
         const badge = g.inne ? (n < all ? pie(n, all, true) : CHECK) : open && n ? pie(n, all) : '';
         return `<span class="sm-face sm-p${pnum(g.id)}${person(g.id).bild ? ' bild' : ''}${g.inne ? ' inne' : ''}${g.id === v ? ' du' : ''}" title="${esc(`${g.namn} · ${st}`)}">` +
-          `${photo(g.id)}${badge}</span>`;
+          `${photo(g.id)}${window.Kronan ? Kronan.mark(g.id) : ''}${badge}</span>`;
       }).join('') + '</div>' +
       '<a class="kp-btn primary" href="#kupong">' + go + '</a></div>';
   }

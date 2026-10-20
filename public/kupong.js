@@ -443,6 +443,17 @@ function emptyCard() {
     (window.Systembild ? Systembild.button('kp-btn', true) : '') + '</div></div>';
 }
 
+// Förstasidan när ingen omgång pågår: nästa omgång i samma form som
+// omgångens ruta (samtal.js), med samma två vägar in. Förra omgången står
+// under (kronan.js).
+function nextCard() {
+  const href = newCouponHref();
+  return '<div class="card sm-teaser kp-nasta"><div><p class="kp-eyebrow">Nästa omgång</p>' +
+    `<h2 class="page-title"><a href="${href}">Matcherna väljer inte sig själva</a></h2></div>` +
+    '<div class="kp-nasta-go">' + (window.Systembild ? Systembild.button('kp-btn', true) : '') +
+    `<a class="kp-btn primary" href="${href}">Välj matcher</a></div></div>`;
+}
+
 // Utan id omgångens kupong, annars en viss kupong.
 function renderCouponShow(id) {
   const el = $('#coupon');
@@ -540,7 +551,9 @@ function renderHome() {
   const samtal = samtalTeaser();
   if (samtal) Samtal.watch();
   const g = c && gradeCoupon(c);
-  $('#home').innerHTML = samtal + (c && !(samtal && g.done) ? teaser(c, g) : samtal ? '' : emptyCard());
+  // Är kupongen färdigspelad står nästa omgång överst – den gamla nås från
+  // förra omgångens ruta under (kronan.js) och i Historik.
+  $('#home').innerHTML = samtal + (c && !g.done ? teaser(c, g) : samtal ? '' : nextCard());
 }
 
 // Kupongens namn: det som sparades med den, annars omgångens namn om den
@@ -553,10 +566,8 @@ function teaser(c, g) {
   const name = couponName(c);
   // Innan matcherna startar går systemet ni spelade att ladda upp direkt
   // härifrån – är det samma matcher ändras kupongen (systembild.js).
-  const go = g.done
-    ? `<a class="kp-btn primary" href="${newCouponHref()}">+ Ny kupong</a><a class="kp-btn" href="#kupong">Se kupongen</a>`
-    : `<a class="kp-btn primary" href="#kupong">${g.started ? 'Följ kupongen' : 'Till kupongen'}</a>` +
-      (!g.started && window.Systembild ? Systembild.button('kp-btn', true) : '');
+  const go = `<a class="kp-btn primary" href="#kupong">${g.started ? 'Följ kupongen' : 'Till kupongen'}</a>` +
+    (!g.started && window.Systembild ? Systembild.button('kp-btn', true) : '');
   return `<div class="card kp-teaser${g.live ? ' is-live' : ''}">` +
     // Namnet som rubrik och datumen ovanför; utan namn som förut.
     `<div class="kp-teaser-txt"><p class="kp-eyebrow">${esc(name ? dateRange(g.first, g.last) : 'Omgångens kupong')}</p>` +

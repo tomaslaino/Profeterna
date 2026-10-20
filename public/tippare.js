@@ -200,8 +200,12 @@ function tpCard(now = Date.now()) {
   let rank = 0;
   const list = tpPlaced(s.ranked, s.model).map((p) => tpRow(p, p.model ? 0 : ++rank, s));
   const none = s.people.filter((p) => p.none);
-  return '<div class="card tp-card">' +
-    `<p class="kp-eyebrow">${tpLiveName() ? `${esc(tpLiveName())} · ` : 'Omgången '}${kicks.length ? esc(dateRange(Math.min(...kicks), Math.max(...kicks))) : ''}</p>` +
+  // Avgjord är det förra omgången, med namnet och vägen till kupongen
+  // (kronan.js) – nästa står överst.
+  const head = s.done && window.Kronan && kicks.length
+    ? Kronan.head({ name: tpLiveName(), from: Math.min(...kicks), to: Math.max(...kicks), ids: round.matcher.map((x) => x.id) })
+    : `<p class="kp-eyebrow">${tpLiveName() ? `${esc(tpLiveName())} · ` : 'Omgången '}${kicks.length ? esc(dateRange(Math.min(...kicks), Math.max(...kicks))) : ''}</p>`;
+  return '<div class="card tp-card">' + head +
     // Orakel och Ikaros som bild (kronan.js), och när omgången är klar
     // utmärkelserna efter hur var och en tippade (utmarkelser.js).
     (window.Kronan ? Kronan.html(s, tpPts) : '') +
@@ -292,6 +296,9 @@ function tpRender() {
   if (!el) return;
   // Utan pågående omgång står den senaste kröningen kvar (kronan.js).
   const seen = ((TP.season && TP.season.rounds) || []).filter((r) => !tpRoundHidden(r));
+  // De som regerar har ett märke på porträttet i omgångens ruta – ritas om
+  // när de byts (kupong.js).
+  if (window.Kronan && TP.season && Kronan.setRounds(seen) && typeof redraw === 'function') redraw();
   const html = (tpCard() || (window.Kronan ? Kronan.reigning(seen, tpPts, window.Utmarkelser && Utmarkelser.frozen) : '')) + tpSeasonCard();
   if (html === TP.html) return;
   TP.html = html;

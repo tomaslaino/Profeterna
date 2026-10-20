@@ -13,6 +13,8 @@
   margin: 0;
   position: relative;
   display: grid;
+  /* texten börjar direkt under scenen i båda, också när den ena bryts */
+  grid-template-rows: auto 1fr;
   border: 1px solid var(--border);
   border-radius: var(--radius);
   overflow: hidden;
@@ -292,6 +294,7 @@
   position: relative;
   z-index: 4;
   display: grid;
+  align-content: start;
   gap: 1px;
   padding: 10px 12px 12px;
   text-align: center;
@@ -318,6 +321,41 @@
 .kr-stat { font-size: 13px; font-weight: 600; font-variant-numeric: tabular-nums; color: var(--ink-soft); }
 .kr-stat.pos { color: var(--kp-ok, var(--fresh)); }
 .kr-stat.neg { color: var(--kp-no, var(--down)); }
+
+/* ---------- de regerande ---------- */
+
+/* rubriken: Förra omgången och datumen, namnet och vägen till kupongen */
+.kr-head { display: flex; flex-wrap: wrap; justify-content: space-between; align-items: flex-end; gap: 6px 16px; }
+.kr-head > div { min-width: 0; }
+.kr-head .kp-eyebrow { margin: 0; }
+.kr-round {
+  margin: 6px 0 0;
+  font-size: clamp(19px, 2.4vw, 23px);
+  line-height: 1.2;
+  color: var(--ink-soft);
+  text-wrap: balance;
+}
+.kr-coupon { font-size: 13.5px; color: var(--muted); text-decoration: none; white-space: nowrap; }
+.kr-coupon b { color: var(--ink-soft); font-weight: 650; font-variant-numeric: tabular-nums; }
+.kr-coupon:hover, .kr-coupon:hover b { color: #fff; }
+.kr-reign .kr-stat { text-wrap: balance; }
+
+/* märket på porträttet i omgångens ruta: lagerkrans för oraklet, en tappad
+   fjäder för Ikaros */
+.kr-mark {
+  position: absolute;
+  left: -5px;
+  top: -5px;
+  z-index: 2;
+  width: 19px;
+  height: 19px;
+  border-radius: 50%;
+  background: #1d1a15;
+  box-shadow: 0 0 0 1.5px var(--kr-mc);
+}
+.kr-mark svg { display: block; width: 100%; height: 100%; }
+.kr-mark.lager { --kr-mc: var(--gold); }
+.kr-mark.fjader { --kr-mc: #e98a5e; }
 
 /* ---------- rörelse ---------- */
 
@@ -407,4 +445,5 @@
   .kr-title { font-size: 9.5px; letter-spacing: 0.06em; }
   .kr-name { font-size: 18px; }
   .kr-panel figcaption { padding: 8px 8px 10px; }
+  .kr-stat { font-size: 12px; }
 }

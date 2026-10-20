@@ -11,8 +11,11 @@
 // utmärkelse bredvid varandra.
 //
 // Utan pågående omgång (Kronan.reigning) står den senaste avslutade
-// omgångens orakel och Ikaros kvar i en egen ruta. Före första omgången är
-// det KRONAN_START.
+// omgångens orakel och Ikaros kvar i en egen ruta: Förra omgången med
+// omgångens namn, en väg till kupongen den gällde, och titlarna som gäller
+// tills nästa omgång är avgjord – Regerande orakel och Regerande Ikaros.
+// Samma två har ett litet märke på porträttet i omgångens ruta överst
+// (Kronan.mark, samtal.js). Före första omgången är det KRONAN_START.
 //
 // Kropparna är urklippta foton (public/profeterna/kropp-*.png). hx är
 // huvudets mitt i procent av bildens bredd och sy axlarnas höjd i procent av
@@ -132,11 +135,15 @@ window.Kronan = (() => {
       `<img src="${k.bild}" alt="" draggable="false">${extra}</div>`;
   }
 
-  function panel(kind, people, done, pts) {
+  // line: titlarna som regerar (Kronan.reigning) – raden under namnet i
+  // stället för poängen.
+  function panel(kind, people, done, pts, line) {
     const orakel = kind === 'orakel';
-    const title = orakel ? (done ? 'Omgångens orakel' : 'Leder just nu') : (done ? 'Omgångens Ikaros' : 'Sist just nu');
+    const title = line ? (orakel ? 'Regerande orakel' : 'Regerande Ikaros')
+      : orakel ? (done ? 'Omgångens orakel' : 'Leder just nu') : (done ? 'Omgångens Ikaros' : 'Sist just nu');
     const p0 = people[0];
-    const stat = p0.pts != null ? `<span class="kr-stat ${tone(p0.pts)}">${pts(p0.pts)} · ${p0.ok}/${p0.n} rätt</span>` : '';
+    const stat = line ? `<span class="kr-stat">${esc2(line)}</span>`
+      : p0.pts != null ? `<span class="kr-stat ${tone(p0.pts)}">${pts(p0.pts)} · ${p0.ok}/${p0.n} rätt</span>` : '';
     const figs = people.map((p) => fig(p, orakel ? '' : WINGS)).join('');
     const scene = orakel
       ? `<div class="kr-rays"></div>${LAUREL}<div class="kr-figs n${people.length}">${figs}</div><div class="kr-plinth"></div>`
@@ -157,8 +164,9 @@ window.Kronan = (() => {
   // s = omgångens poäng (tpScore i tippare.js): ranked med award best/worst.
   const fmt0 = (x) => String(Math.round(x * 10) / 10);
 
-  function stage(best, worst, done, pts) {
-    return `<div class="kr-stage">${panel('orakel', best, done, pts || fmt0)}${panel('ikaros', worst, done, pts || fmt0)}</div>`;
+  function stage(best, worst, done, pts, lines) {
+    const [a, b] = lines || [];
+    return `<div class="kr-stage">${panel('orakel', best, done, pts || fmt0, a)}${panel('ikaros', worst, done, pts || fmt0, b)}</div>`;
   }
 
   // s = omgångens poäng (tpScore i tippare.js): ranked med award best/worst.
@@ -170,29 +178,114 @@ window.Kronan = (() => {
     return stage(best, worst, s.done, pts);
   }
 
-  // Egen ruta när ingen omgång pågår: den senaste avslutade omgången med både
-  // orakel och Ikaros (säsongens omgångar, data/tippare.json), annars
-  // KRONAN_START utan poäng. extra(omgången) ger det som står under bilden
-  // (utmärkelserna, utmarkelser.js).
-  function reigning(rounds, pts, extra) {
-    const has = (r, a) => (r.people || []).some((p) => p.award === a);
+  // ---------- de regerande ----------
+
+  // Titlarna gäller tills nästa omgång är avgjord: den senaste avslutade
+  // omgången med både orakel och Ikaros (säsongens omgångar,
+  // data/tippare.json), annars KRONAN_START.
+  const has = (r, a) => (r.people || []).some((p) => p.award === a);
+  const who = (id) => ({ id, name: (KRONAN_KROPPAR[id] && KRONAN_KROPPAR[id].namn) || id });
+  function holders(rounds) {
     const last = (rounds || []).filter((r) => has(r, 'best') && has(r, 'worst'))
       .sort((a, b) => String(b.to || b.from).localeCompare(String(a.to || a.from)))[0];
-    let best;
-    let worst;
-    let when = '';
-    if (last) {
-      best = last.people.filter((p) => p.award === 'best');
-      worst = last.people.filter((p) => p.award === 'worst');
-      if (typeof dateRange === 'function' && last.from) when = esc2(dateRange(last.from, last.to || last.from));
-    } else {
-      const who = (id) => ({ id, name: (KRONAN_KROPPAR[id] && KRONAN_KROPPAR[id].namn) || id });
-      best = KRONAN_START.orakel.map(who);
-      worst = KRONAN_START.ikaros.map(who);
-    }
-    return `<div class="card tp-card kr-reign"><p class="kp-eyebrow">${last ? `Omgången${when ? ` ${when}` : ''}` : 'Före första omgången'}</p>` +
-      `${stage(best, worst, true, pts)}${last && extra ? extra(last) : ''}</div>`;
+    if (!last) return { last: null, best: KRONAN_START.orakel.map(who), worst: KRONAN_START.ikaros.map(who) };
+    return { last, best: last.people.filter((p) => p.award === 'best'), worst: last.people.filter((p) => p.award === 'worst') };
   }
 
-  return { html, reigning };
+  // Märkena på porträtten i omgångens ruta (Kronan.mark i samtal.js), i
+  // övre vänstra hörnet – bocken sitter i det nedre högra. Lagerkransen är
+  // två grenar som i den stora, fjädern en av dem som lossnat.
+  const MARK_LAGER = (() => {
+    const R = 5.2;
+    let stems = '';
+    let leaves = '';
+    for (const side of [-1, 1]) {
+      const pt = (t) => [10 + side * R * Math.sin(t), 10.4 + R * Math.cos(t)];
+      const [x0, y0] = pt(0.3);
+      const [x1, y1] = pt(2.6);
+      stems += `<path d="M${r1(x0)} ${r1(y0)}A${R} ${R} 0 0 ${side < 0 ? 1 : 0} ${r1(x1)} ${r1(y1)}"/>`;
+      for (const t of [0.7, 1.3, 1.9, 2.5]) {
+        const [x, y] = pt(t);
+        const a = Math.atan2(-Math.sin(t), side * Math.cos(t)) + side * 0.45;
+        const cx = r1(x + Math.cos(a) * 1.7);
+        const cy = r1(y + Math.sin(a) * 1.7);
+        leaves += `<ellipse cx="${cx}" cy="${cy}" rx="2" ry=".95" transform="rotate(${r1(a * 180 / Math.PI)} ${cx} ${cy})"/>`;
+      }
+    }
+    return '<svg viewBox="0 0 20 20" aria-hidden="true">' +
+      `<g fill="none" stroke="#c9973f" stroke-width=".7">${stems}</g><g fill="#f0d699">${leaves}</g></svg>`;
+  })();
+  const MARK_FJADER = '<svg viewBox="0 0 20 20" aria-hidden="true"><g transform="rotate(35 10 10)">' +
+    '<path d="M10 3.5C12.6 6.5 12.6 12 10 16.5C7.4 12 7.4 6.5 10 3.5z" fill="#f3ead9"/>' +
+    '<path d="M10 5V17.5" stroke="#9c8a68" stroke-width=".8"/></g></svg>';
+
+  // Vilka som regerar: sätts av tippare.js när säsongen är läst. true om
+  // det ändrades, så att omgångens ruta kan ritas om med märkena.
+  let reign = null;
+  function setRounds(rounds) {
+    const h = holders(rounds);
+    const next = { best: h.best.map((p) => p.id), worst: h.worst.map((p) => p.id) };
+    const changed = JSON.stringify(next) !== JSON.stringify(reign);
+    reign = next;
+    return changed;
+  }
+  function mark(id) {
+    if (!reign) return '';
+    if (reign.best.includes(id)) return `<span class="kr-mark lager" title="Regerande orakel">${MARK_LAGER}</span>`;
+    if (reign.worst.includes(id)) return `<span class="kr-mark fjader" title="Regerande Ikaros">${MARK_FJADER}</span>`;
+    return '';
+  }
+
+  // Gängets kupong ur omgången: den med flest av omgångens matcher
+  // (kupong.js), eller null.
+  function couponOf(ids) {
+    if (typeof allCoupons !== 'function') return null;
+    const want = new Set(ids.map(String));
+    let best = null;
+    let most = 0;
+    for (const c of allCoupons()) {
+      const n = (c.matches || []).filter((x) => want.has(String(x.id))).length;
+      if (n > most) {
+        best = c;
+        most = n;
+      }
+    }
+    return best;
+  }
+
+  // Rubriken för en avgjord omgång: Förra omgången och datumen, namnet och
+  // vägen till kupongen den gällde. r = {name, hint, from, to, ids
+  // (matcherna)}; namnet är omgångens (data/tippare.json, samtal.js), annars
+  // det som sparades med kupongen. Utan namn står datumen som rubrik.
+  function head(r) {
+    const when = typeof dateRange === 'function' && r.from ? dateRange(r.from, r.to || r.from) : '';
+    const c = couponOf(r.ids || []);
+    const g = c && typeof gradeCoupon === 'function' ? gradeCoupon(c) : null;
+    const n = r.name ? { namn: r.name, syftar: r.hint || null } : c && c.name ? { namn: c.name } : null;
+    const eyebrow = n && when ? `Förra omgången · ${when}` : 'Förra omgången';
+    const title = n ? n.namn : when;
+    // Kupongen själv (kupong.js) – därifrån når man betyget i Historik när
+    // bygget har hunnit med den.
+    const link = c
+      ? `<a class="kr-coupon" href="#kupong/${esc2(c.id)}">` +
+        `${g && g.done && !g.hidden ? `Kupongen gav <b>${g.ok} av ${g.n}</b>` : 'Kupongen'} <span aria-hidden="true">→</span></a>`
+      : '';
+    return `<div class="kr-head"><div><p class="kp-eyebrow">${esc2(eyebrow)}</p>` +
+      (title ? `<h3 class="kr-round"${n && n.syftar ? ` title="${esc2(n.syftar)}"` : ''}>${esc2(title)}</h3>` : '') +
+      `</div>${link}</div>`;
+  }
+
+  // Egen ruta när ingen omgång pågår: förra omgången och de som regerar
+  // sedan dess. extra(omgången) ger det som står under bilden
+  // (utmärkelserna, utmarkelser.js).
+  function reigning(rounds, pts, extra) {
+    const { last, best, worst } = holders(rounds);
+    const top = last
+      ? head({ name: last.name, hint: last.hint, from: last.from, to: last.to, ids: (last.matches || []).map((m) => m.id) })
+      : '<div class="kr-head"><div><p class="kp-eyebrow">Före första omgången</p><h3 class="kr-round">Utnämnda på förhand</h3></div></div>';
+    const lines = [last ? 'Försvarar titeln' : 'Saknar meriter', 'Har inget att förlora'];
+    return `<div class="card tp-card kr-reign">${top}${stage(best, worst, true, pts, lines)}${last && extra ? extra(last) : ''}</div>`;
+  }
+
+  return { html, reigning, head, setRounds, mark };
 })();
