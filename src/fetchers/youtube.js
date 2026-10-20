@@ -74,8 +74,11 @@ function entries(xml) {
 
 const isHighlights = (title) => HIGHLIGHTS.test(title) && !NOT_MATCH.test(title);
 
-// Går klippet att spela på sajten i Sverige? Okänt räknas som ja.
-const playable = (v) => v.embed !== false && v.se !== false;
+// Går klippet att spela på sajten? Okänt räknas som ja. Landskontrollen (se)
+// räknas inte än: från GitHubs servrar svarade YouTube 2026-10-20 med
+// länder som inte stämde (Wolves klipp "spärrade" i Sverige), så den körs
+// bara och loggas tills det är utrett.
+const playable = (v) => v.embed !== false;
 
 // Länderna där klippet får visas ("GB", "SE" …), eller null om svaret inte
 // har någon lista.
