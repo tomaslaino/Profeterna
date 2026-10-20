@@ -14,6 +14,8 @@
 // att varje kryss ser handritat ut men ser likadant ut varje gång sidan ritas.
 //
 // Längst ner kupongen som växer fram medan man väljer matcher (builder, slip).
+// Kryssen och ringarna (cross, ring) ritar också omgångens kupong med en
+// kolumn per person i samtal.js.
 //
 // Läses efter kupong.js och använder dess hjälpare (SIGNS, NOTE_MAX, rowClass,
 // teamsOf, scoreText, kpNum, dateRange, liveLine, fWeekdayTime) och app.js
@@ -218,14 +220,6 @@
       head(c, g) + '<div class="pp-band" aria-hidden="true"></div>' + rows(g) + foot(c, g) + '</article></div>';
   }
 
-  // Tomma kupongen som fylls i (Din kupong): papperet runt listan med id,
-  // som ritas av samtal.js.
-  function fill(id) {
-    return '<div class="pp-wrap"><div class="pp pp-fill">' +
-      '<p class="pp-brand"><img src="logo.svg" alt="" width="20" height="20">Matchfixarna<span>Kupong</span></p>' +
-      `<div class="pp-band" aria-hidden="true"></div><div id="${id}"></div></div></div>`;
-  }
-
   // ---------- kupongen som växer fram ----------
   //
   // Ny kupong, Ändra och Välj matcher i omgången: programmet – matcherna att
@@ -403,5 +397,5 @@
     count.classList.add('pb-bump');
   }
 
-  window.Papper = { RADER, coupon, fill, builder, reveal, program, slip, bump };
+  window.Papper = { RADER, coupon, builder, reveal, program, slip, bump, cross, ring };
 }());

@@ -373,50 +373,12 @@ a.pp-row:focus-visible { outline: 2px solid var(--pp-pen); outline-offset: -2px;
 .pp-top { display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 12px; }
 .pp-top .kp-actions { margin: clamp(18px, 3vw, 34px) 0 0; }
 
-/* ---------- ifyllningen: Din kupong, och rutorna på kupongen som växer fram ----------
-   Samma papper runt listan med matcherna (#sm-tips-list); ett tryck på en
-   ruta ritar ett kryss. */
+/* ---------- ifyllningen: rutorna på kupongen som växer fram ----------
+   Ett tryck på en ruta ritar ett kryss. Omgångens kupong med en kolumn per
+   person (samtal.css) använder samma papper och fältet för anteckningen. */
 
 .pp-fill { --pp-hole: 5px; padding-top: 26px; }
 .pp-fill .pp-band { margin: 12px 0 4px; }
-.pp-fill .day { margin: 0; }
-.pp-fill .day-head {
-  margin: 10px 0 0;
-  padding: 6px 8px 5px;
-  font-family: var(--sans);
-  font-size: 10.5px;
-  font-style: normal;
-  font-weight: 800;
-  letter-spacing: 0.16em;
-  text-transform: uppercase;
-  color: var(--pp-print);
-  border-bottom: 1.5px solid var(--pp-print);
-}
-.pp-fill .mlist { overflow: visible; border: 0; border-radius: 0; background: none; box-shadow: none; }
-.pp-fill .kp-pick {
-  position: relative;
-  row-gap: 0;
-  padding: 8px 4px 7px 8px;
-  color: var(--pp-ink);
-  border-bottom: 1px solid var(--pp-print-line);
-}
-.pp-fill .kp-pick:nth-child(even) { background: var(--pp-print-tint); }
-.pp-fill .kp-pick.on { box-shadow: none; }
-.pp-fill .kp-pick:not(:nth-child(even)).on { background: none; }
-.pp-fill .kp-pick::before {
-  content: "";
-  position: absolute;
-  top: 50%;
-  left: -40px;
-  width: 17px;
-  height: 7px;
-  margin-top: -3.5px;
-  background: var(--pp-ink);
-}
-.pp-fill .mtime { font-size: 12px; font-weight: 600; color: var(--pp-ink-soft); }
-.pp-fill .ctag { padding: 0; font-size: 11px; font-weight: 700; color: var(--pp-ink-soft); background: none; box-shadow: none; }
-.pp-fill .mteams { font-size: 15px; font-weight: 650; color: var(--pp-ink); }
-.pp-fill .mteams .vs { color: var(--pp-ink-soft); }
 
 /* rutan med tecknet, oddset under */
 .pp-fill .kp-tg { gap: 6px; }
@@ -522,8 +484,7 @@ a.pp-row:focus-visible { outline: 2px solid var(--pp-pen); outline-offset: -2px;
   .pp-stop b { font-size: 17px; }
   .pp-cols, .pp-row { grid-template-columns: minmax(0, 1fr) auto 2.6rem 18px; column-gap: 8px; padding-inline: 4px 0; }
   .pp-nr, .pp-cols > :first-child { display: none; }
-  .pp-row::before, .pp-fill .kp-pick::before { left: -24px; width: 12px; height: 6px; margin-top: -3px; }
-  .pp-fill .kp-pick { padding-inline: 4px 0; }
+  .pp-row::before { left: -24px; width: 12px; height: 6px; margin-top: -3px; }
   .pp-fill .kp-tg { gap: 3px; }
   .pp-fill .kp-tg button { width: 34px; }
   .pp-tm { font-size: 13.5px; line-height: 1.25; }

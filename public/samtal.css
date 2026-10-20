@@ -1,7 +1,8 @@
-/* Inför samtalet (samtal.js): vem som lämnat in, dina tips och underlaget
-   där allas tips står i rutorna 1, X och 2. Laddas efter kupong.css och
-   använder dess knappar och listor. Färgspråket: varje person har en egen
-   färg på initialerna (fylld = enda tecknet, streckad = del av en
+/* Inför samtalet (samtal.js): kupongen med en kolumn per person och
+   underlaget där allas tips står i rutorna 1, X och 2. Laddas efter
+   kupong.css och papper.css och använder deras knappar, listor och papper.
+   Färgspråket: varje person har en egen färg (blått, grönt, lila) på
+   initialerna och i sin kolumn (fylld = enda tecknet, streckad = del av en
    gardering), guld = gängets tecken, grön ram = så slutade matchen. */
 
 .sm-ch {
@@ -20,7 +21,7 @@
 }
 .sm-p0 { color: #b3cffb; background: rgba(77, 143, 240, 0.2); }
 .sm-p1 { color: #97e0bd; background: rgba(61, 179, 124, 0.2); }
-.sm-p2 { color: #f5bb96; background: rgba(224, 122, 69, 0.22); }
+.sm-p2 { color: #d6bcf7; background: rgba(160, 105, 230, 0.22); }
 .sm-ch.g { background: transparent; border: 1px dashed currentColor; }
 
 /* ---------- vem som lämnat in ---------- */
@@ -41,11 +42,11 @@
 .sm-person.ute { padding-right: 10px; }
 .sm-person b { color: var(--fg); }
 .sm-folk-board { margin-bottom: 14px; }
-/* förstasidan: bara bock eller prickar, som Vem är du */
+/* förstasidan: bara bock eller prickar, som överst på kupongen */
 .sm-teaser .sm-person { padding-right: 10px; }
 .sm-person.du { color: var(--fg); border-color: var(--gold); background: rgba(216, 176, 106, 0.1); }
 /* bara initialerna: lika mycket luft runt om */
-.sm-person:not(:has(> :nth-child(2))), .sm-vem button:not(:has(> :nth-child(2))) { padding-right: 5px; }
+.sm-person:not(:has(> :nth-child(2))) { padding-right: 5px; }
 
 /* bock = inne, tre prickar = fyller i – lika breda, så att pillren blir det */
 .sm-ok { width: 18px; height: 15px; fill: none; stroke: var(--fresh); stroke-width: 2.2; stroke-linecap: round; stroke-linejoin: round; }
@@ -56,42 +57,6 @@
 @keyframes sm-dot { 0%, 60%, 100% { opacity: 0.25; } 30% { opacity: 1; } }
 @media (prefers-reduced-motion: reduce) { .sm-dots i { animation: none; opacity: 0.6; } }
 .ute > .sm-ch { opacity: 0.6; }
-
-.sm-wait { display: grid; gap: 16px; max-width: 760px; margin-bottom: 26px; }
-.sm-wait .kp-actions { margin-bottom: 0; }
-
-.sm-vem { display: flex; flex-wrap: wrap; align-items: center; gap: 8px; }
-.sm-vem-q { margin-right: 4px; font-size: 13px; font-weight: 600; color: var(--ink-soft); }
-.sm-vem button {
-  display: inline-flex;
-  align-items: center;
-  gap: 8px;
-  padding: 4px 10px 4px 5px;
-  font: inherit;
-  font-size: 13px;
-  color: var(--ink-soft);
-  border: 1px solid var(--pill-line);
-  border-radius: 999px;
-  background: var(--pill);
-  cursor: pointer;
-}
-.sm-vem button:hover { color: #fff; border-color: var(--pill-line-hi); }
-.sm-vem button[aria-pressed="true"] { color: var(--fg); border-color: var(--gold); background: rgba(216, 176, 106, 0.1); }
-
-/* omgångens matcher innan tipsen visas */
-.sm-li {
-  display: grid;
-  grid-template-columns: 6.4rem 3.3rem minmax(0, 1fr) auto;
-  align-items: center;
-  gap: 14px;
-  padding: 11px 20px;
-  border-bottom: 1px solid var(--hair);
-  font-size: 14.5px;
-}
-.sm-li:last-child { border-bottom: 0; }
-.sm-li .mtime { white-space: nowrap; }
-.sm-mine { font-family: var(--display); font-weight: 800; color: var(--gold-hi); }
-.sm-mine-lab { margin-right: 6px; font-family: var(--sans); font-size: 11px; font-weight: 600; color: var(--muted); }
 
 /* ---------- underlaget ---------- */
 
@@ -169,11 +134,195 @@
 .sm-bar-msg { flex-basis: 100%; font-size: 13.5px; }
 .sm-bar-msg:empty { display: none; }
 
-/* ---------- ändra din kupong: startade matcher står kvar ---------- */
+/* ---------- kupongen: en kolumn per person ----------
+   Papperet från papper.css (.pp) med en kolumn per person i gängets ordning,
+   var och en med sitt bläck (--ink) och en svag ton i kolumnen. Din kolumn
+   har knapparna och initialerna inringade; de andras är täckta med
+   skrapfolie (inne) eller tomma (fyller i) tills du själv har lämnat in.
+   Raden med initialerna står kvar överst när man bläddrar. */
 
-.sm-locked { opacity: 0.55; }
-.sm-locked .kp-tg button { cursor: default; }
-.pp-fill .sm-locked .kp-tg button:hover::before { background: var(--pp-box); }
+.pp-wrap.sm-wrap { max-width: 860px; margin-top: 6px; }
+.sm-sheet { --col: 112px; --box: 30px; --sm-top: 62px; }
+.sm-sheet-head { display: flex; align-items: center; justify-content: space-between; gap: 16px; }
+.sm-sheet .pp-stop { padding: 7px 14px 8px; }
+.sm-sheet .pp-stop b { font-size: 19px; white-space: nowrap; }
+.sm-sheet .pp-band { margin: 14px 0 0; }
+
+/* samma ordning som initialerna i underlaget: blått, grönt, lila */
+.sm-k0 { --ink: #2146a6; }
+.sm-k1 { --ink: #16784b; }
+.sm-k2 { --ink: #6d3aa8; }
+.sm-k3 { --ink: #8a6a0c; }
+.sm-k4 { --ink: #a0306a; }
+
+.sm-r {
+  position: relative;
+  display: grid;
+  grid-template-columns: 24px minmax(0, 1fr) repeat(var(--n), var(--col));
+  column-gap: 6px;
+  align-items: stretch;
+  padding-left: 6px;
+  border-bottom: 1px solid var(--pp-print-line);
+}
+.sm-r.alt { background: var(--pp-print-tint); }
+/* synkmarkeringen i vänsterkanten, en per rad */
+.sm-r:not(.sm-hd)::before {
+  content: "";
+  position: absolute;
+  top: 50%;
+  left: -40px;
+  width: 17px;
+  height: 7px;
+  margin-top: -3.5px;
+  background: var(--pp-ink);
+}
+.sm-r > .pp-nr { align-self: center; }
+.sm-m { align-self: center; min-width: 0; padding: 9px 10px 8px 8px; }
+
+/* en persons kolumn */
+.sm-k {
+  --pp-pen: var(--ink);
+  position: relative;
+  display: flex;
+  justify-content: center;
+  align-items: flex-start;
+  gap: 5px;
+  padding: 10px 0 8px;
+  background: color-mix(in srgb, var(--ink) 7%, transparent);
+}
+.sm-k.du { background: color-mix(in srgb, var(--ink) 12%, transparent); }
+.sm-r .pp-box { width: var(--box); height: var(--box); }
+/* fyller i: tomma, lite blekare rutor */
+.sm-k.blank .pp-box { opacity: 0.5; }
+/* inne men dolt tills du har lämnat in: skrapfolie över rutorna */
+.sm-foil {
+  position: absolute;
+  inset: 7px 5px;
+  border-radius: 5px;
+  background:
+    repeating-linear-gradient(115deg, rgba(255, 255, 255, 0.25) 0 1px, transparent 1px 4px),
+    linear-gradient(135deg, #b4b4b4, #ebebeb 40%, #c9c9c9 60%, #a2a2a2);
+  box-shadow: inset 0 0 0 1px rgba(0, 0, 0, 0.12), 0 1px 1.5px rgba(0, 0, 0, 0.2);
+}
+
+/* din kolumn: rutan med oddset under */
+.sm-k button {
+  display: grid;
+  justify-items: center;
+  gap: 3px;
+  min-height: 0;
+  padding: 0;
+  font: inherit;
+  color: inherit;
+  background: none;
+  border: 0;
+  border-radius: 0;
+  box-shadow: none;
+  cursor: pointer;
+}
+.sm-k button small { font-size: 10.5px; line-height: 1; color: var(--pp-ink-soft); font-variant-numeric: tabular-nums; }
+.sm-k button[aria-pressed="true"] small { font-weight: 800; color: var(--pp-ink); }
+.sm-k button .pp-box { transition: background-color 0.12s ease; }
+.sm-k button:hover .pp-box { background: #f3e6cc; }
+.sm-k button:focus-visible { outline: none; }
+.sm-k button:focus-visible .pp-box { box-shadow: 0 0 0 2px var(--ink); }
+/* Lämna in utan alla tecken: rutorna som saknar kryss blir röda */
+.sm-sheet.need .unsigned .sm-k.du .pp-box { border-color: var(--pp-no); box-shadow: 0 0 0 1px var(--pp-no); }
+/* ändra din kupong: startade matcher står kvar */
+.sm-r.sm-locked { opacity: 0.55; }
+
+.sm-r .kp-note-in { grid-column: 2 / -1; margin: -2px 6px 7px 8px; }
+
+/* initialerna överst */
+.sm-hd {
+  position: sticky;
+  top: var(--sm-top);
+  z-index: 3;
+  border-bottom: 1.5px solid var(--pp-print);
+  background: var(--pp-grain), var(--pp-paper);
+}
+.sm-hd-nr, .sm-hd .sm-m {
+  align-self: end;
+  padding-bottom: 9px;
+  font-size: 10px;
+  font-weight: 800;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+  color: var(--pp-print);
+}
+.sm-hd .sm-k { align-items: center; gap: 7px; padding: 12px 0 9px; }
+.sm-hd .sm-k.du { gap: 15px; }
+button.sm-k { font: inherit; color: inherit; border: 0; border-radius: 0; box-shadow: none; cursor: pointer; }
+button.sm-k:hover { background: color-mix(in srgb, var(--ink) 17%, transparent); }
+button.sm-k:focus-visible { outline: 2px solid var(--ink); outline-offset: -2px; }
+.sm-who { position: relative; font-family: var(--display); font-size: 18px; font-weight: 800; line-height: 1; letter-spacing: 0.02em; color: var(--ink); }
+.sm-du-ring {
+  position: absolute;
+  inset: -9px -12px;
+  width: calc(100% + 24px);
+  height: calc(100% + 18px);
+  overflow: visible;
+  fill: none;
+  stroke: var(--ink);
+  stroke-width: 2;
+  stroke-linecap: round;
+  pointer-events: none;
+}
+.sm-du-ring path { vector-effect: non-scaling-stroke; }
+.sm-sheet .sm-ok { width: 16px; height: 14px; stroke: var(--pp-ok); }
+.sm-sheet .sm-dots i { background: var(--pp-ink-soft); }
+.sm-q { font-size: 11px; letter-spacing: 0.16em; }
+.sm-q::after { content: " →"; letter-spacing: 0; }
+
+/* foten: hur långt du har kommit och knappen */
+.sm-foot { margin-top: 18px; }
+#sm-go { display: contents; }
+.sm-m .vs { margin: 0 0.35em; }
+.sm-foot .kp-btn.sm-again {
+  margin-left: auto;
+  padding: 9px 16px;
+  color: var(--pp-print);
+  background: var(--pp-box);
+  border: 1.5px solid var(--pp-print);
+  border-radius: 5px;
+}
+.sm-foot .kp-btn.sm-again:hover { color: var(--pp-paper); background: var(--pp-print); }
+
+/* smalt: lagen överst, kolumnerna sida vid sida under */
+@media (max-width: 720px) {
+  .sm-sheet { --box: 26px; }
+  .sm-r { grid-template-columns: repeat(var(--n), minmax(0, 1fr)); column-gap: 5px; padding-left: 0; }
+  .sm-r > .pp-nr, .sm-hd-nr, .sm-hd .sm-m { display: none; }
+  .sm-r .sm-m { grid-column: 1 / -1; padding: 9px 4px 6px; }
+  .sm-hd .sm-m:has(.sm-q) { display: block; padding: 10px 0 0; text-align: center; }
+  .sm-q::after { content: " ↓"; }
+  .sm-k { gap: 3px; padding: 7px 0; }
+  .sm-hd .sm-k { padding: 11px 0 9px; }
+  .sm-r .kp-note-in { grid-column: 1 / -1; margin: 2px 4px 8px; }
+  .sm-r:not(.sm-hd)::before { top: 17px; margin-top: 0; }
+  /* lagen på en rad så långt det går */
+  .sm-m .pp-tm .vs { display: inline; height: auto; }
+  .sm-sheet-head { gap: 10px; }
+  .sm-sheet .pp-stop { padding: 5px 9px 6px; }
+  .sm-sheet .pp-stop span { font-size: 8.5px; letter-spacing: 0.14em; }
+  .sm-sheet .pp-stop b { font-size: 15px; }
+  .sm-sheet .pp-band { margin-top: 10px; }
+}
+/* i mobilen rullar loggraden undan och menyraden blir kvar */
+@media (max-width: 760px) { .sm-sheet { --sm-top: 58px; } }
+@media (max-width: 640px) {
+  .sm-r:not(.sm-hd)::before { left: -24px; width: 12px; height: 6px; }
+}
+@media (max-width: 440px) {
+  .sm-sheet-head .pp-brand { gap: 6px; font-size: 0; }
+  .sm-sheet-head .pp-brand img { width: 16px; height: 16px; }
+  .sm-sheet-head .pp-brand span { padding-left: 0; font-size: 9.5px; letter-spacing: 0.16em; border-left: 0; }
+}
+@media (max-width: 380px) {
+  .sm-sheet { --box: 23px; }
+  .sm-k { gap: 2px; }
+  .sm-k button small { font-size: 9.5px; }
+}
 
 /* ---------- förstasidan ---------- */
 
@@ -197,9 +346,6 @@
 /* ---------- mobil ---------- */
 
 @media (max-width: 760px) {
-  .sm-li { grid-template-columns: 4.6rem minmax(0, 1fr) auto; gap: 10px; padding: 10px 14px; font-size: 14px; }
-  .sm-li .ctag { display: none; }
-  .sm-li .mtime { font-size: 12.5px; }
   /* lagen överst, rutorna i tre lika breda kolumner under */
   .sm-row { grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 6px; padding: 12px 14px; }
   .sm-tm { grid-column: 1 / -1; margin-bottom: 4px; }

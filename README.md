@@ -1048,17 +1048,25 @@ under omgången.
    *Dags för uppgörelsen* (och vem som inte lämnade in) utan någon tid; när gängets kupong
    är gjord tar den över rutan. En färdigspelad kupong visas inte bredvid medan en ny
    omgång fylls i – den står under Historik.
-2. **Fyll i kupongen** (`#kupong/samtal/tips`): man väljer vem man är (DL, DT, DJ – sparas
-   på enheten), tippar varje match och kan skriva en kort motivering (högst 140 tecken).
-   Nederst står hur många rader tipsen blir. *Lämna in och se de andras* kräver tecken i
-   alla matcher. Har matcherna ändrats sedan sidan öppnades säger tjänsten till, och sidan
-   visar de nya matcherna med ens tecken kvar där matchen fortfarande är med.
-   *Ändra din kupong* (på omgångens sida) öppnar de inlämnade tipsen igen – också efter att
-   allas tips visas, tills matcherna startar. Matcher som har startat står kvar som de var,
-   och knappen heter *Spara ändringarna*. Det går bara på enheten där man lämnade in (med
-   nyckeln, se Tjänsten).
-3. **De andras tips** (`#kupong`): den som inte har lämnat in ser bara vem som har
-   gjort det och när. Den som har lämnat in ser allas inlämnade tips – så fort minst en
+2. **Fyll i kupongen** (direkt under Omgången, `#kupong`): kupongen står på papper med en
+   kolumn per person – DL, DT och DJ i gängets ordning, var och en i sin färg (blått,
+   grönt, lila) – och spelstoppet (första avsparken) i hörnet. Överst i varje kolumn
+   initialerna med en bock (inne) eller tre prickar (fyller i). Man trycker på sina
+   initialer (*Vem är du?* – sparas på enheten, de ringas in), kryssar i sin kolumn med
+   modellens odds under rutorna och kan skriva en kort motivering under matchen man just
+   tippade (högst 140 tecken). Raden med initialerna står kvar överst när man bläddrar.
+   Nederst hur många matcher som är tippade, garderingar och rader. *Lämna in och se de
+   andras* kräver tecken i alla matcher – annars blir rutorna som saknar kryss röda. Har
+   matcherna ändrats sedan sidan öppnades säger tjänsten till, och sidan visar de nya
+   matcherna med ens tecken kvar där matchen fortfarande är med.
+   *Ändra din kupong* (nederst på kupongen, eller på omgångens sida när allas tips visas,
+   `#kupong/samtal/tips`) öppnar ens kolumn igen – också efter att allas tips visas, tills
+   matcherna startar. Matcher som har startat står kvar som de var, och knappen heter
+   *Spara ändringarna*. Det går bara på enheten där man lämnade in (med nyckeln, se
+   Tjänsten).
+3. **De andras tips** (`#kupong`): den som inte har lämnat in ser de andras kolumner
+   täckta med skrapfolie (inne) eller tomma (fyller i). Den som har lämnat in ser allas
+   inlämnade tips – så fort minst en
    till är inne – och vilka som fortfarande fyller i. Sidan frågar tjänsten var 20:e sekund
    och visar nya tips av sig själv – också förstasidans ruta, medan tipsen lämnas in.
 4. **Underlaget** – för alla när alla har lämnat in, eller senast när första matchen
