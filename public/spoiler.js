@@ -1,6 +1,6 @@
 'use strict';
 
-// Spoilerskyddet, som på gravergrav.se: skölden i toppbaren döljer resultaten
+// Spoilerskyddet, som på gravergrav.se: ögat i toppbaren döljer resultaten
 // från matcher som startat det senaste dygnet – eller från en vald dag – så
 // att man kan se matchen först. Matchlistan, matchvyn, kupongen,
 // utvärderingen, historiken och divisionerna frågar window.Spoiler om en match
@@ -15,8 +15,10 @@
   const KEY = 'profeterna.spoiler';
   const DAY = 86400000;
   const PICK_DAYS = 14; // så långt bakåt kan brytpunkten väljas
-  const SHIELD = '<svg class="sp-ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false">' +
-    '<path d="M12 3l7 3v5c0 4.5-3 8.4-7 9.6C8 19.4 5 15.5 5 11V6z"/><path d="M9.2 12.1l1.9 1.9 3.8-4"/></svg>';
+  // Ögat: öppet när allt visas, överstruket när något döljs.
+  const icon = (paths) => '<svg class="sp-ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false">' + paths + '</svg>';
+  const EYE = icon('<path d="M2.5 12S6 5.5 12 5.5 21.5 12 21.5 12 18 18.5 12 18.5 2.5 12 2.5 12z"/><circle cx="12" cy="12" r="3"/>');
+  const EYE_OFF = icon('<path d="M10.6 5.6c.5-.1.9-.1 1.4-.1 6 0 9.5 6.5 9.5 6.5a16 16 0 0 1-2.6 3.4M6.6 6.6C3.9 8.4 2.5 12 2.5 12S6 18.5 12 18.5c1.8 0 3.4-.6 4.8-1.4"/><path d="M9.9 9.9a3 3 0 0 0 4.2 4.2"/><path d="M3 3l18 18"/>');
 
   const esc = (s) => String(s == null ? '' : s).replace(/[&<>"']/g, (c) => ({
     '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;',
@@ -115,11 +117,11 @@
   // ---------- byggstenar för sidorna ----------
 
   function chip(text = 'dolt') {
-    return `<span class="sp-chip" title="Dolt – du har valt att dölja resultat">${SHIELD}${esc(text)}</span>`;
+    return `<span class="sp-chip" title="Dolt – du har valt att dölja resultat">${EYE_OFF}${esc(text)}</span>`;
   }
   // Kort med knappen som visar det dolda: keys är matchid eller egna nycklar.
   function card({ title, text, keys, button = 'Visa ändå' }) {
-    return `<div class="sp-card">${SHIELD}<div class="sp-msg"><strong>${esc(title)}</strong>` +
+    return `<div class="sp-card">${EYE_OFF}<div class="sp-msg"><strong>${esc(title)}</strong>` +
       `${text ? `<span>${esc(text)}</span>` : ''}</div>` +
       `<button type="button" class="sp-show" data-sp-show="${esc(keys.join(' '))}">${esc(button)}</button></div>`;
   }
@@ -168,7 +170,7 @@
     const box = document.createElement('div');
     box.className = 'sp-ctl';
     box.innerHTML = '<button type="button" class="sp-btn" aria-haspopup="dialog" aria-expanded="false" aria-controls="sp-panel">' +
-      `${SHIELD}<span class="sp-state"></span></button>` +
+      `${EYE}<span class="sp-state"></span></button>` +
       '<div class="sp-panel" id="sp-panel" role="dialog" aria-labelledby="sp-title" hidden></div>';
     bar.appendChild(box);
     btn = box.querySelector('.sp-btn');
@@ -213,8 +215,10 @@
 
   function sync() {
     if (!btn) return;
-    const label = S.mode === 'off' ? 'Av' : S.mode === 'auto' ? '24 h' : `fr. ${shortDay(from())}`;
-    btn.classList.toggle('is-on', S.mode !== 'off');
+    const on = S.mode !== 'off';
+    const label = !on ? '' : S.mode === 'auto' ? '24 h' : `fr. ${shortDay(from())}`;
+    btn.classList.toggle('is-on', on);
+    btn.querySelector('.sp-ic').outerHTML = on ? EYE_OFF : EYE;
     btn.querySelector('.sp-state').textContent = label;
     btn.title = `Dölj resultat: ${S.mode === 'off' ? 'av' : S.mode === 'auto' ? 'det senaste dygnet' : `från ${dayLabel(from()).toLowerCase()}`}`;
     btn.setAttribute('aria-label', btn.title);

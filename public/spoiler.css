@@ -1,4 +1,4 @@
-/* Spoilerskyddet (spoiler.js): skölden i toppbaren, panelen och allt som
+/* Spoilerskyddet (spoiler.js): ögat i toppbaren, panelen och allt som
    visas i stället för ett dolt resultat. Laddas efter theme.css och använder
    dess färger. */
 
@@ -22,7 +22,10 @@
   transition: color 0.15s ease, border-color 0.15s ease, background 0.15s ease;
 }
 .sp-btn:hover { color: var(--fg); border-color: var(--pill-line-hi); }
-.sp-btn .sp-ic { width: 15px; height: 15px; }
+.sp-btn .sp-ic { width: 17px; height: 17px; }
+/* avstängt: bara ögat i en rund knapp */
+.sp-btn:not(.is-on) { width: 32px; padding: 0; justify-content: center; }
+.sp-state:empty { display: none; }
 .sp-btn.is-on {
   color: var(--bone);
   border-color: color-mix(in srgb, var(--terra) 70%, transparent);
@@ -181,6 +184,7 @@
 
 @media (max-width: 760px) {
   .sp-btn { height: 30px; padding: 0 9px 0 8px; font-size: 12px; }
+  .sp-btn:not(.is-on) { width: 30px; padding: 0; }
   .sp-card { flex-wrap: wrap; }
   .sp-show { margin-left: 40px; }
 }

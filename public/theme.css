@@ -98,9 +98,8 @@ main { padding-top: 8px; padding-bottom: 48px; }
 
 /* ---------- toppbar ---------- */
 
-/* Loggan till vänster, menyn i mitten och skölden till höger. När man
-   skrollar ner bleknar loggan och skölden bort och bara menyn står kvar
-   (toppbar.js sätter is-scrolled). */
+/* Loggan till vänster, menyn direkt efter (bara ord, ikonerna visas på
+   telefonen) och ögat för Dölj resultat längst till höger. */
 .topbar {
   position: sticky;
   top: 0;
@@ -118,15 +117,14 @@ main { padding-top: 8px; padding-bottom: 48px; }
   min-height: 62px;
   margin: 0 auto;
   padding: 0 var(--gutter);
-  display: grid;
-  grid-template-columns: minmax(max-content, 1fr) auto minmax(max-content, 1fr);
+  display: flex;
   align-items: stretch;
-  column-gap: 20px;
 }
 
 .brand {
   align-self: center;
   justify-self: start;
+  flex: none;
   display: flex;
   align-items: center;
   gap: 12px;
@@ -152,16 +150,10 @@ main { padding-top: 8px; padding-bottom: 48px; }
   color: var(--bone);
   white-space: nowrap;
 }
-.topbar .sp-ctl { justify-self: end; }
-.brand,
-.topbar .sp-ctl { transition: opacity 0.2s ease, visibility 0.2s; }
-.topbar.is-scrolled .brand,
-.topbar.is-scrolled .sp-ctl { opacity: 0; visibility: hidden; }
-/* skölden står kvar så länge dess panel är öppen */
-.topbar.is-scrolled .sp-ctl:has([aria-expanded="true"]) { opacity: 1; visibility: visible; }
+.topbar .sp-ctl { margin-left: auto; padding-left: 16px; }
 
-/* Flikarna: ikonen över ordet, och en guldlinje under den valda i
-   toppbarens nederkant. */
+/* Flikarna: ord med en guldlinje under den valda i toppbarens nederkant,
+   och ett tunt streck mot loggan. */
 .topbar .tabs {
   position: static;
   align-self: stretch;
@@ -170,13 +162,21 @@ main { padding-top: 8px; padding-bottom: 48px; }
   gap: 2px;
   min-width: 0;
   max-width: none;
-  margin: 0;
+  margin: 0 0 0 20px;
   padding: 0;
   background: none;
   border: 0;
   border-radius: 0;
   -webkit-backdrop-filter: none;
   backdrop-filter: none;
+}
+.topbar .tabs::before {
+  content: "";
+  align-self: center;
+  width: 1px;
+  height: 22px;
+  margin-right: 10px;
+  background: var(--pill-line);
 }
 .tabs .tablist { display: flex; align-items: stretch; gap: 2px; }
 
@@ -188,35 +188,25 @@ main { padding-top: 8px; padding-bottom: 48px; }
   align-items: center;
   justify-content: center;
   gap: 3px;
-  padding: 0 12px;
+  padding: 0 10px;
   border: 0;
   border-radius: 0;
   background: none;
   box-shadow: none;
-  color: var(--muted);
-  font-size: 12px;
-  font-weight: 600;
+  color: color-mix(in srgb, var(--muted) 55%, var(--ink-soft));
+  font-size: 14px;
+  font-weight: 500;
   line-height: 1.2;
-  letter-spacing: 0.01em;
   white-space: nowrap;
   text-decoration: none;
   transition: color 0.15s ease;
-}
-.tabs [role="tab"]::before,
-.tabs a.tab-link::before {
-  content: "";
-  width: 22px;
-  height: 22px;
-  background: currentColor;
-  -webkit-mask: var(--ico) center / contain no-repeat;
-  mask: var(--ico) center / contain no-repeat;
 }
 .tabs [role="tab"]::after,
 .tabs a.tab-link::after {
   content: "";
   position: absolute;
-  left: 12px;
-  right: 12px;
+  left: 10px;
+  right: 10px;
   bottom: 0;
   height: 2px;
   border-radius: 2px 2px 0 0;
@@ -841,11 +831,14 @@ footer .foot-links a[aria-current="page"] { color: var(--fg); }
   .brand-txt b { font-size: 21px; }
   .brand .logo { width: 32px; height: 32px; border-radius: 10px; }
 
-  .topbar-inner { min-height: 58px; column-gap: 12px; }
+  .topbar-inner { min-height: 58px; }
+  .topbar .tabs { margin-left: 14px; gap: 0; }
+  .topbar .tabs::before { margin-right: 6px; }
+  .tabs .tablist { gap: 0; }
   .tabs [role="tab"],
-  .tabs a.tab-link { padding: 0 9px; font-size: 11.5px; }
+  .tabs a.tab-link { padding: 0 8px; font-size: 13px; }
   .tabs [role="tab"]::after,
-  .tabs a.tab-link::after { left: 9px; right: 9px; }
+  .tabs a.tab-link::after { left: 8px; right: 8px; }
 
   /* tävlingsmärket syns ned till 640px (style.css) och behöver sin kolumn */
   .mrow { grid-template-columns: 2.9rem auto 1fr auto; gap: 10px; padding: 13px 14px; }
@@ -856,27 +849,27 @@ footer .foot-links a[aria-current="page"] { color: var(--fg); }
   h3 { font-size: 22px; margin-top: 32px; }
 }
 
-/* Telefon: allt ryms inte på en rad. Loggan och skölden ligger överst och
-   skrollar undan; under dem fem lika breda flikar från kant till kant, som
-   stannar kvar högst upp i fönstret. */
+/* Telefon: allt ryms inte på en rad. Loggan och ögat ligger överst och
+   skrollar undan; under dem fem lika breda flikar från kant till kant, med
+   ikonen över ordet, som stannar kvar högst upp i fönstret. */
 @media (max-width: 680px) {
   html { scroll-padding-top: 74px; }
   .topbar { top: -52px; }
   .topbar-inner {
+    display: grid;
     grid-template-columns: auto minmax(0, 1fr) auto;
     grid-template-rows: 52px 58px;
     min-height: 0;
   }
   .brand { grid-area: 1 / 1; }
-  .topbar .sp-ctl { grid-area: 1 / 3; }
-  .topbar.is-scrolled .brand,
-  .topbar.is-scrolled .sp-ctl { opacity: 1; visibility: visible; }
+  .topbar .sp-ctl { grid-area: 1 / 3; padding-left: 0; }
   .topbar .tabs {
     grid-area: 2 / 1 / 3 / -1;
     gap: 0;
     margin: 0 calc(var(--gutter) * -1);
     box-shadow: inset 0 1px 0 var(--hair);
   }
+  .topbar .tabs::before { content: none; }
   .tabs .tablist { flex: 3 1 0; gap: 0; }
   .tabs [role="tab"],
   .tabs a.tab-link {
@@ -884,10 +877,19 @@ footer .foot-links a[aria-current="page"] { color: var(--fg); }
     min-width: 0;
     gap: 4px;
     padding: 0;
+    color: var(--muted);
     font-size: 11px;
+    font-weight: 600;
   }
   .tabs [role="tab"]::before,
-  .tabs a.tab-link::before { width: 24px; height: 24px; }
+  .tabs a.tab-link::before {
+    content: "";
+    width: 24px;
+    height: 24px;
+    background: currentColor;
+    -webkit-mask: var(--ico) center / contain no-repeat;
+    mask: var(--ico) center / contain no-repeat;
+  }
   .tabs [role="tab"]::after,
   .tabs a.tab-link::after { left: calc(50% - 14px); right: calc(50% - 14px); }
 }
