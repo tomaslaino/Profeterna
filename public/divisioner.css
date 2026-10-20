@@ -314,6 +314,33 @@ table.dv-players th button, table.dv-teams th button {
   white-space: nowrap;
 }
 table.dv-players th.on, table.dv-teams th.on { color: var(--fg); }
+/* Alla rubriker har en underrad (tom om den saknas), så att de står på samma
+   rad och rubrikraden är lika hög i alla flikar. */
+table.dv-players thead th, table.dv-teams thead th { vertical-align: top; }
+/* Sorteringspilen står i mellanrummet mellan kolumnerna – framför talen,
+   efter orden – så att kolumnen inte blir bredare när man sorterar på den. */
+table.dv-players .dv-lab, table.dv-teams .dv-lab { position: relative; }
+table.dv-players .dv-dir, table.dv-teams .dv-dir {
+  position: absolute;
+  top: 50%;
+  left: 100%;
+  margin-left: 3px;
+  font-size: 8px;
+  letter-spacing: 0;
+  transform: translateY(-50%);
+}
+table.dv-players th.num .dv-dir, table.dv-teams th.num .dv-dir { left: auto; right: 100%; margin: 0 3px 0 0; }
+/* Osynlig rad med alla kolumnernas värden (sizerRow i divisioner.js): den
+   håller bredderna men tar ingen höjd. */
+table tfoot.dv-sizer td {
+  height: 0;
+  padding-top: 0;
+  padding-bottom: 0;
+  border: 0;
+  line-height: 0;
+  visibility: hidden;
+}
+table tfoot.dv-sizer td * { margin-top: 0; margin-bottom: 0; }
 /* Rubrikens underrad, t.ex. "poäng enligt oddsen" */
 table.dv-players th small, table.dv-teams th small {
   display: block;
@@ -342,6 +369,10 @@ table.dv-players th small, table.dv-teams th small {
 .dv-tip b { display: block; margin-bottom: 3px; color: var(--fg); font-weight: 700; }
 table.dv-players .pname { font-weight: 600; white-space: nowrap; }
 table.dv-players .pname small, .dv-natline { display: block; font-size: 12px; font-weight: 400; color: var(--muted); }
+/* ESPN skriver ibland hela det juridiska namnet (Hugo Charles March Phillipps
+   De Lisle): det kortas med … så att kolumnen, som är lika bred som det
+   längsta namnet i divisionen, inte blir bredare än ett vanligt långt namn. */
+table.dv-players .dv-pn { display: block; max-width: 12rem; overflow: hidden; text-overflow: ellipsis; }
 table.dv-players .pname small.show-sm { display: none; }
 table.dv-players td.pteam, table.dv-players td.pnat { color: var(--ink-soft, var(--fg)); font-size: 13.5px; white-space: nowrap; }
 table.dv-squad tr.idle td { color: var(--muted); }

@@ -77,7 +77,10 @@
 /* ---------- sortering ---------- */
 
 .hk-tools { display: flex; }
-.hk-dir { margin-left: 6px; color: var(--accent-deep); }
+/* Pilen står i mellanrummet efter ordet, så att knapparna bredvid inte
+   flyttar sig när man byter sortering. Den sista knappen har plats för den. */
+.hk-dir { position: absolute; top: 2px; left: 100%; margin-left: 4px; color: var(--accent-deep); }
+.hk-tools .seg button:last-child { margin-right: 16px; }
 
 /* ---------- kupongkorten ---------- */
 

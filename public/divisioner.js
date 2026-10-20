@@ -214,14 +214,42 @@ function sortBy(list, col, dir, tiebreak) {
 
 // Rubriken kan ha en kort underrad (sub); förklaringen (title, med name som
 // rubrik) visas i förklaringsrutan när man pekar på kolumnen – se tips().
+// Pilen står i mellanrummet bredvid rubriken (framför talen, efter orden)
+// och tar ingen plats, och underraden finns alltid: rubrikerna står på samma
+// rad, och tabellen flyttar sig inte när man sorterar eller byter flik.
 function sortHead(cols, f, attr, lead = '') {
   return `<thead><tr>${lead}` + cols.map((c) => {
     const on = c.key === f.sort;
     const tip = c.title ? ` data-tip="${esc(c.title)}" data-tip-head="${esc(c.name || c.label)}"` : '';
+    const dir = on ? `<span class="dv-dir" aria-hidden="true">${f.dir > 0 ? '▲' : '▼'}</span>` : '';
     return `<th class="${c.cls}${on ? ' on' : ''}" aria-sort="${on ? (f.dir > 0 ? 'ascending' : 'descending') : 'none'}"${tip}>` +
-      `<button type="button" ${attr}="${c.key}">${esc(c.label)}${on ? (f.dir > 0 ? ' ▲' : ' ▼') : ''}` +
-      `${c.sub ? `<small>${esc(c.sub)}</small>` : ''}</button></th>`;
+      `<button type="button" ${attr}="${c.key}"><span class="dv-lab">${esc(c.label)}${dir}</span>` +
+      `<small>${c.sub ? esc(c.sub) : '&nbsp;'}</small></button></th>`;
   }).join('') + '</tr></thead>';
+}
+
+// En osynlig rad under tabellen med alla olika värden i varje kolumn, ett per
+// rad: kolumnen blir lika bred som det bredaste värdet bland alla raderna,
+// inte bara bland dem som visas (och i telefonen, där namnen bryts, som det
+// bredaste ordet). Då ändrar kolumnerna inte bredd när man sorterar,
+// filtrerar eller visar fler.
+const sizers = new WeakMap();
+function sizerRow(all, cols, lead = '') {
+  const key = cols.map((c) => c.key).join();
+  const cache = sizers.get(all) || new Map();
+  sizers.set(all, cache);
+  if (!cache.has(key)) {
+    const tds = cols.map((c) => `<td class="${c.cls}">${[...new Set(all.map((x) => colValue(c, x)))].join('<br>')}</td>`);
+    cache.set(key, `<tfoot class="dv-sizer" aria-hidden="true"><tr>${lead}${tds.join('')}</tr></tfoot>`);
+  }
+  return cache.get(key);
+}
+
+// Sorteringen ritar om tabellen; rullningen i sidled ska stå kvar.
+function keepScroll(el, draw) {
+  const at = [...el.querySelectorAll('.table-wrap')].map((w) => w.scrollLeft);
+  draw();
+  el.querySelectorAll('.table-wrap').forEach((w, i) => { if (at[i]) w.scrollLeft = at[i]; });
 }
 
 // Förklaringsrutan: syns direkt när musen pekar på något med data-tip (eller
@@ -270,13 +298,17 @@ function tips(root) {
   window.addEventListener('scroll', hide, { passive: true, capture: true });
 }
 
-function colCell(c, x) {
+function colValue(c, x) {
   let v;
   if (c.show) v = c.show(x);
   else if (c.pct) v = c.get(x) == null ? cell(null) : pct(c.get(x));
   else v = cell(c.get(x), { d: c.d || 0, strong: c.strong });
   if (c.ok && c.get(x) != null && !c.ok(x)) v = `<span class="dv-unq" title="${esc(c.okWhy || 'för litet underlag')}">${v}</span>`;
-  return `<td class="${c.cls}">${v}</td>`;
+  return v;
+}
+
+function colCell(c, x) {
+  return `<td class="${c.cls}">${colValue(c, x)}</td>`;
 }
 
 // Plus/minus med färg: grönt bra, rött dåligt (invert för insläppta), inget
@@ -332,7 +364,7 @@ const PA = P_GROUPS.map((g) => g.id);
 const MIN_IN = ['oversikt', 'avslut', 'forsvar', 'regelbrott'];
 const PCOLS = [
   { key: 'name', label: 'Spelare', get: (p) => p.name, text: true, cls: 'pname dv-stick', in: PA,
-    show: (p) => `${esc(p.name)}<small class="show-sm">${esc(p.team)}</small>` },
+    show: (p) => `<span class="dv-pn">${esc(p.name)}</span><small class="show-sm">${esc(p.team)}</small>` },
   { key: 'team', label: 'Lag', get: (p) => p.team, text: true, cls: 'pteam hide-sm', in: PA, show: (p) => esc(p.team) },
   { key: 'pos', label: 'Pos', name: 'Position', title: 'MV = målvakt, B = back, MF = mittfältare, A = anfallare.',
     get: (p) => POS_ORDER[p.pos], show: (p) => esc(p.pos || '–'), cls: 'c', in: PA },
@@ -478,7 +510,8 @@ function playerTableHtml(P) {
   const rows = list.slice(0, f.limit).map((p, i) => `<tr class="dv-prow" data-pid="${esc(p.id)}" tabindex="0">` +
     `<td class="c rank hide-xs">${i + 1}</td>${cols.map((c) => colCell(c, p)).join('')}</tr>`).join('');
   const rest = list.length - Math.min(list.length, f.limit);
-  return `<div class="table-wrap dv-tw"><table class="dv-players">${head}<tbody>${rows}</tbody></table></div>` +
+  const sizer = sizerRow(P.players, cols, `<td class="c rank hide-xs">${P.players.length}</td>`);
+  return `<div class="table-wrap dv-tw"><table class="dv-players">${head}<tbody>${rows}</tbody>${sizer}</table></div>` +
     '<div class="dv-tfoot">' +
     (rest > 0 ? `<button type="button" class="dv-more" data-more="1">Visa ${Math.min(rest, 100)} till ↓<small>${rest} kvar</small></button>` : '') +
     `<p class="dv-count" id="dv-count">${list.length} spelare${f.played ? ' som spelat' : ''}${f.team || f.pos || f.q ? ' med filtret' : ''}</p></div>`;
@@ -1297,9 +1330,16 @@ async function renderView() {
   // Användaren kan ha bytt vy medan spelarfilen laddades.
   if (dv.id !== state.div) return;
   el.classList.remove('sp-veiled');
-  if (state.view === 'tabell') el.innerHTML = tableView(dv, P);
-  else if (state.view === 'lag') el.innerHTML = teamsView(dv, P, T);
-  else el.innerHTML = playersView(dv, P);
+  const draw = () => {
+    if (state.view === 'tabell') el.innerHTML = tableView(dv, P);
+    else if (state.view === 'lag') el.innerHTML = teamsView(dv, P, T);
+    else el.innerHTML = playersView(dv, P);
+  };
+  // Samma vy igen (sorteringen i Lag): rullningen i sidled står kvar.
+  const drawn = `${dv.id}/${state.view}`;
+  if (el.dataset.drawn === drawn) keepScroll(el, draw);
+  else draw();
+  el.dataset.drawn = drawn;
   veil(dv, state.view);
 }
 
@@ -1327,7 +1367,7 @@ async function veil(dv, view) {
 function updatePlayerTable() {
   const P = state.players.get(state.div);
   const box = $('#dv-ptable');
-  if (P && box) box.innerHTML = playerTableHtml(P);
+  if (P && box) keepScroll(box, () => { box.innerHTML = playerTableHtml(P); });
 }
 
 // Händelser via delegering: allt i #divisions renderas om ofta.
