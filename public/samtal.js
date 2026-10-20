@@ -44,7 +44,6 @@
     comp: 'all',
     allDays: false, // välj matcher: alla dagar, inte bara närmaste omgången
     draft: null, // dina tips: {id, vem, tecken, kommentarer, inne, nyckel}
-    noteRow: null, // matchen du senast tippade: där står fältet för motiveringen
     edit: false, // draft är en ändring av dina inlämnade tips
     again: false, // Spara gängets kupong trots matcher utan tecken
     names: new Map(), // omgång och matcher → {namn, syftar} | null (inget namn) | 'loading'
@@ -228,7 +227,6 @@
   // loaded: omgången har just hämtats (kupong.js, under Omgången).
   async function show(sub, loaded = false) {
     KP.view = { mode: 'samtal', sub };
-    SM.noteRow = null;
     const el = $('#coupon');
     if (!info()) {
       el.innerHTML = viewNav('omgang') + '<p class="empty">Att tippa var för sig är inte påslaget på den här sajten.</p>';
@@ -305,6 +303,7 @@
   const CHECK = '<svg class="sm-ok" viewBox="0 0 16 16" aria-hidden="true"><path d="M3.5 8.5l3 3 6-7"/></svg>';
   const DOTS = '<span class="sm-dots" aria-hidden="true"><i></i><i></i><i></i></span>';
   const mark = (s, g) => (g.inne ? CHECK : s.visas ? '' : DOTS);
+  const PEN = '<svg class="sm-pen" viewBox="0 0 16 16" aria-hidden="true"><path d="M10.6 2.9l2.5 2.5-7.6 7.6-3.2.7.7-3.2z"/><path d="M9 4.5l2.5 2.5"/></svg>';
   const lage = (s, g) => (g.inne ? 'inne' : s.visas ? 'lämnade inte in' : 'fyller i');
 
   // Ritar om utan att tappa var man var: fältet eller rutan som hade fokus
@@ -725,7 +724,12 @@
       html += `<div class="sm-r${i % 2 ? ' alt' : ''}${locked ? ' sm-locked' : ''}${d && !sign ? ' unsigned' : ''}" data-id="${esc(x.id)}">` +
         `<span class="pp-nr">${i + 1}</span>` +
         `<span class="sm-m"><span class="pp-tm">${teamsHtml(x, m)}</span>` +
-        `<span class="pp-small">${esc(fTime.format(new Date(x.avspark)))}${comp ? ` · <abbr title="${esc(comp.name)}">${esc(comp.short)}</abbr>` : ''}</span>` +
+        `<span class="sm-meta"><span class="pp-small">${esc(fTime.format(new Date(x.avspark)))}${comp ? ` · <abbr title="${esc(comp.name)}">${esc(comp.short)}</abbr>` : ''}</span>` +
+        // Motiveringen: en penna efter tiden när du har tippat matchen. Man
+        // skriver på samma rad, så att ingenting flyttar sig.
+        (own && (sign || d.kommentarer[x.id]) ? `<label class="sm-note-w sm-k${pnum(v)}" title="Motivering">${PEN}` +
+          `<input type="text" class="sm-note-in" data-note="${esc(x.id)}" maxlength="${NOTE_MAX}" autocomplete="off" placeholder=" "` +
+          ` aria-label="Motivering för ${esc(label)}" value="${esc(d.kommentarer[x.id] || '')}"></label>` : '') + '</span>' +
         (sr.length ? `<span class="pp-sr">${esc(sr.join(', '))}</span>` : '') + '</span>' +
         SIGNS.map((sg, j) => {
           const who = cols.filter((c) => (c.t[x.id] || '').includes(sg)).map((c) => c.g.id);
@@ -733,11 +737,7 @@
             ? `<button type="button" class="sm-c sm-k${pnum(v)}" data-s="${sg}" aria-pressed="${sign.includes(sg)}" aria-label="${sg} för ${esc(label)}">` +
               `${box(sg, who, ids)}<small>${p ? pctOdds(p[j]) : '–'}</small></button>`
             : `<span class="sm-c" aria-hidden="true">${box(sg, who, ids)}</span>`;
-        }).join('') +
-        // Motiveringen under matchen du just tippade, och där du har skrivit en.
-        (sign && !locked && (SM.noteRow === x.id || d.kommentarer[x.id]) ? `<input type="text" class="kp-note-in" data-note="${esc(x.id)}" maxlength="${NOTE_MAX}" autocomplete="off"` +
-          ` placeholder="Motivering (valfritt)" aria-label="Motivering för ${esc(label)}" value="${esc(d.kommentarer[x.id] || '')}">` : '') +
-        '</div>';
+        }).join('') + '</div>';
     });
     keepFocus(() => { $('#sm-rows').innerHTML = html; });
     // Foten: hur långt du har kommit och knappen.
@@ -805,7 +805,6 @@
       const next = SIGNS.filter((x) => (x === b.dataset.s ? !cur.includes(x) : cur.includes(x))).join('');
       if (next) SM.draft.tecken[id] = next;
       else delete SM.draft.tecken[id];
-      SM.noteRow = id;
       keep();
       $('#sm-msg').innerHTML = '';
       sheetList();
