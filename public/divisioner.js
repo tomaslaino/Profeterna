@@ -18,8 +18,8 @@ const PAGES = {
     { id: 'tabell', label: 'Tabell' },
   ],
   statistik: [
-    { id: 'spelare', label: 'Spelare' },
-    { id: 'lag', label: 'Lag' },
+    { id: 'spelare', label: 'Spelarna' },
+    { id: 'lag', label: 'Lagen' },
   ],
 };
 const PAGE = document.body.dataset.page === 'statistik' ? 'statistik' : 'tabeller';
@@ -560,7 +560,7 @@ function playersView(dv, P) {
   const t = P.totals;
   const f = state.pf;
   const teams = [...P.teams].sort((a, b) => a.name.localeCompare(b.name, 'sv'));
-  let html = sectionHead('Spelarstatistik', `Ligamatcher ${esc(state.data.season)}`);
+  let html = `<p class="dv-viewsub">Ligamatcher ${esc(state.data.season)}</p>`;
   // Tre topplistor, samma i alla divisioner. Resten (xG, kort, skott) går
   // att sortera fram i tabellen Alla spelare. Betygen ersätter målvakterna
   // när de finns (målvakterna finns kvar under Försvar i tabellen).
@@ -860,8 +860,7 @@ function teamsView(dv, P, T) {
     teamTop('Förtjänar mindre', all, vsXg, { get: xpd, note: 'Fler poäng än chanserna (xG) var värda' }) +
     teamTop('Slår oddsen', all, (t) => `<b>${delta(vsOdds(t), { d: 1 })}</b><small>${t.fd.mkt.pts} p · ${num(t.fd.mkt.xp, 1)} väntat</small>`, { get: vsOdds, note: 'Poäng mot vad oddsen vid avspark väntade sig' });
 
-  return sectionHead('Lagen') +
-    '<div class="dv-leaders">' + leaders + '</div>' +
+  return '<div class="dv-leaders">' + leaders + '</div>' +
     card('Alla lag', {
       body: segHtml(groups, f.cols, 'data-tcols') +
         `<div class="table-wrap dv-tw"><table class="dv-teams dv-league">${head}<tbody>${body}</tbody></table></div>`,
@@ -1262,16 +1261,16 @@ function frame() {
   return '<div class="dv-head">' +
     `<div class="dv-divs" id="dv-divs" role="group" aria-label="Division">${d.divisions.map((x) =>
       `<button type="button" data-div="${x.id}" aria-pressed="${x.id === state.div}" style="--c:${color(x.id)}">${esc(x.name)}</button>`).join('')}</div>` +
-    '</div><div id="dv-view" class="dv-view"></div>' +
+    '</div>' + viewTabs() + '<div id="dv-view" class="dv-view"></div>' +
     '<p class="detail-foot"><button type="button" class="src-toggle" aria-pressed="false">Visa detaljer</button></p>' + glossary();
 }
 
-// Spelare | Lag står mellan sidrubriken och divisionsflikarna.
+// Statistik: Spelarna | Lagen är rubriken under divisionsflikarna, där
+// Tabeller har sin tabellrubrik.
 function viewTabs() {
-  const h = document.querySelector('main > .page-title');
-  if (VIEWS.length < 2 || !h) return;
-  h.insertAdjacentHTML('afterend', `<nav class="dv-views" id="dv-views" aria-label="Vy">${VIEWS.map((v) =>
-    `<a href="#${state.div}/${v.id}" data-view="${v.id}"${v.id === state.view ? ' aria-current="page"' : ''}>${esc(v.label)}</a>`).join('')}</nav>`);
+  if (VIEWS.length < 2) return '';
+  return `<nav class="dv-views" id="dv-views" aria-label="Vy">${VIEWS.map((v) =>
+    `<a href="#${state.div}/${v.id}" data-view="${v.id}"${v.id === state.view ? ' aria-current="page"' : ''}>${esc(v.label)}</a>`).join('')}</nav>`;
 }
 
 // Källraderna, förklaringarna och ordlistan (.src-line, .src-only m.fl.) är
@@ -1509,7 +1508,6 @@ window.addEventListener('hashchange', () => { if (state.data && !state.data.erro
   const { div, view } = parseHash();
   if (div && state.data.divisions.some((x) => x.id === div)) state.div = div;
   if (view && VIEWS.some((v) => v.id === view)) state.view = view;
-  viewTabs();
   $('#divisions').innerHTML = frame();
   setShowSources(showSources());
   wire();
