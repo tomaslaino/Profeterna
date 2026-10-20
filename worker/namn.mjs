@@ -184,14 +184,15 @@ export async function roundName(id, { env, loadRound, loadSite, complete, store 
       // Hann någon annan före gäller dess namn, så att alla ser samma.
       const first = await safely(() => store && store.get(key));
       if (first && first.ok) return answer(first, true);
-      const entry = { ok: true, namn: parts.namn, syftar: parts.syftar, model: r.model, generatedAt: now().toISOString() };
+      // Förslagen sparas med, så att det går att se vad AI:n valde mellan.
+      const entry = { ok: true, namn: parts.namn, syftar: parts.syftar, forslag: parts.forslag, model: r.model, generatedAt: now().toISOString() };
       await safely(() => store && store.put(key, entry));
       // De senaste namnen, så att nästa omgång inte går i samma mönster.
       await safely(() => store && store.put(RECENT, [{ id, namn: entry.namn }, ...recent.filter((x) => x.id !== id)].slice(0, RECENT_MAX)));
       return answer(entry, false);
     }
     problem = `Namnet hade ${why.join(' och ')}.`;
-    say = `Svaret hade ${why.join(' och ')}. Hitta på ett nytt och följ reglerna: högst ${nc.maxWords} ord och ${nc.maxChars} tecken i namnet, inga siffror där, och i "syftar" bara tal som står i underlaget. Svara med JSON: {"namn": "<namnet>", "syftar": "<vad det anspelar på>"}`;
+    say = `Svaret hade ${why.join(' och ')}. Välj ett annat förslag eller hitta på ett nytt och följ reglerna: högst ${nc.maxWords} ord och ${nc.maxChars} tecken i namnet, inga siffror där, och i "syftar" bara tal som står i underlaget. Svara med JSON: {"förslag": [...], "namn": "<namnet>", "syftar": "<vad det anspelar på>"}`;
   }
   // Ett avvisat svar sparas en timme, så att varje sidvisning inte kostar ett
   // nytt anrop. Därefter försöker nästa besök igen.
@@ -266,7 +267,8 @@ function partsOf(content) {
     const j = JSON.parse(text.slice(text.indexOf('{'), text.lastIndexOf('}') + 1));
     const namn = j && typeof j.namn === 'string' ? unquote(j.namn) : '';
     const syftar = j && typeof j.syftar === 'string' ? j.syftar.trim() : '';
-    return namn ? { namn, syftar: syftar || null } : null;
+    const forslag = j && Array.isArray(j['förslag']) ? j['förslag'].filter((x) => typeof x === 'string').map(unquote).slice(0, 12) : [];
+    return namn ? { namn, syftar: syftar || null, forslag } : null;
   } catch {
     return null;
   }
@@ -287,7 +289,7 @@ function problems({ namn, syftar }, payload) {
 
 function answer(entry, cached) {
   if (!entry.ok) return { status: 422, body: { ok: false, error: entry.error, cached } };
-  return { status: 200, body: { ok: true, namn: entry.namn, syftar: entry.syftar || null, model: entry.model || null, generatedAt: entry.generatedAt || null, cached } };
+  return { status: 200, body: { ok: true, namn: entry.namn, syftar: entry.syftar || null, forslag: entry.forslag || [], model: entry.model || null, generatedAt: entry.generatedAt || null, cached } };
 }
 
 function fail(status, error) {

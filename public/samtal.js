@@ -142,27 +142,32 @@
     if (!s || !url) return null;
     const k = nameKey(s);
     if (!SM.names.has(k)) {
+      // Ett namn som sparats på enheten visas direkt, men tjänsten frågas ändå
+      // en gång per besök – omgången kan ha fått ett nytt namn.
       const saved = kpLoad(NAMN);
-      if (saved && saved.key === k && saved.namn) SM.names.set(k, saved);
-      else {
-        SM.names.set(k, 'loading');
-        fetchName(url, s.id, k);
-      }
+      SM.names.set(k, saved && saved.key === k && saved.namn ? saved : 'loading');
+      fetchName(url, s.id, k);
     }
     const n = SM.names.get(k);
     return n && n !== 'loading' ? n : null;
   }
 
   async function fetchName(url, id, k) {
+    const before = SM.names.get(k);
     let n = null;
     try {
       const res = await fetch(url, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ id }) });
       const j = await res.json().catch(() => ({}));
       if (res.ok && j.ok && j.namn) n = { key: k, namn: j.namn, syftar: j.syftar || null };
     } catch { /* inget namn den här gången */ }
+    // Utan svar står ett sparat namn kvar.
+    if (!n) {
+      if (before === 'loading') SM.names.set(k, null);
+      return;
+    }
     SM.names.set(k, n);
-    if (!n) return;
     kpStore(NAMN, n);
+    if (before && before !== 'loading' && before.namn === n.namn && before.syftar === n.syftar) return;
     if (!SM.data || nameKey(SM.data) !== k) return;
     // Byt bara rubriken, så att inget annat på sidan ritas om.
     for (const el of document.querySelectorAll(`[data-sm-namn="${CSS.escape(k)}"]`)) el.outerHTML = nameBlock(SM.data, el.dataset.smDel, 'fram');
