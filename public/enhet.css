@@ -54,10 +54,10 @@ button.analyze,
 
 /* ---------- filterknapparna ---------- */
 
-/* Matcher och Välj matcher får samma färgprick som Tabeller och Statistik,
-   och den valda divisionen tonas i sin egen färg på alla fyra ställena. */
-.chips button,
-.dv-divs button {
+/* Matcher och Välj matcher: en färgprick per division, och den valda
+   divisionen tonas i sin egen färg. (Tabeller och Statistik har flikar med
+   samma färg som streck under – se divisioner.css.) */
+.chips button {
   display: inline-flex;
   align-items: center;
   gap: 7px;
@@ -73,12 +73,6 @@ button.analyze,
   height: 8px;
   border-radius: 50%;
   background: var(--c);
-}
-.dv-divs .dv-key.dot { width: 8px; height: 8px; margin: 0; }
-.dv-divs button[aria-pressed="true"] {
-  color: #fff;
-  background: color-mix(in srgb, var(--c, var(--accent)) 30%, rgba(14, 13, 11, 0.6));
-  border-color: color-mix(in srgb, var(--c, var(--accent)) 70%, transparent);
 }
 
 /* ---------- kort ---------- */
