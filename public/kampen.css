@@ -1,10 +1,13 @@
 /* Olympen (kampen.js): gängets inbördes kamp om tipsen. Laddas efter
-   kupong.css och tippare.css och använder deras tokens (--kp-ok, --kp-no),
-   .kp-eyebrow/.kp-line och tabellen .tp-table. Varje tippare har en färg
-   (--km-c) vid porträttet, i kurvan och i inbördes möten. */
+   kupong.css, tippare.css och kronan.css och använder deras tokens (--kp-ok,
+   --kp-no), .kp-eyebrow/.kp-line, märkena .tp-badge och tabellen .tp-table.
+   Varje tippare har en färg (--km-c) vid porträttet, i kurvan och i inbördes
+   möten – samma som på kupongen. Ställningen är en prispall med kropparna
+   från kröningen; betyget har egen stil (betyg.css). */
 
 #kampen { display: grid; gap: 16px; }
 #kampen > * { min-width: 0; margin: 0; }
+#kampen > .bg-wrap { justify-self: center; }
 #kampen .page-title { margin: clamp(18px, 3vw, 34px) 0 -8px; }
 
 .km-card { display: grid; gap: 12px; padding: 22px 24px; }
@@ -38,42 +41,168 @@
 .km-face-txt { font-family: var(--display); font-size: 14px; font-weight: 650; color: var(--bone); }
 .km-face-model { box-shadow: 0 0 0 1px var(--pill-line); background: none; color: var(--muted); }
 
-/* ställningen */
-.km-list, .km-pairs, .km-kassa { list-style: none; margin: 0; padding: 0; }
-.km-row {
-  display: grid;
-  grid-template-columns: 1.4em 40px minmax(0, 1fr) auto 5.2em;
-  align-items: center;
-  gap: 4px 14px;
-  padding: 12px 0;
-  border-top: 1px solid var(--hair);
+/* ställningen: prispallen uppe på Olympen. --sh är himlens höjd, --fh
+   kropparnas och sockelns höjd växer med placeringen. */
+.km-pall {
+  --sh: 252px;
+  --fh: 150px;
+  position: relative;
+  overflow: hidden;
+  isolation: isolate;
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  background: rgba(10, 9, 7, 0.45);
 }
-.km-row:first-child { border-top: 0; padding-top: 4px; }
-.km-rank { font-family: var(--display); font-size: 22px; color: var(--muted); text-align: center; }
-.km-row.is-lead .km-rank { color: var(--gold-hi); }
-.km-row.is-lead .km-face { box-shadow: 0 0 0 2px var(--bg), 0 0 0 3.5px var(--km-c), 0 0 22px -4px var(--gold); }
-.km-who { display: grid; gap: 5px; min-width: 0; }
-.km-who b { font-size: 17px; font-weight: 650; color: var(--fg); overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
-.km-who .sub { font-size: 12.5px; }
-.km-badges { display: flex; flex-wrap: wrap; gap: 4px 6px; align-items: center; }
-.km-badges:empty { display: none; }
-.km-now { font-size: 12px; font-weight: 650; font-variant-numeric: tabular-nums; color: var(--muted); }
-.km-ok { font-variant-numeric: tabular-nums; font-size: 15px; font-weight: 650; color: var(--ink-soft); }
-.km-ok span { color: var(--muted); font-weight: 500; }
-.km-pts {
+.km-sky {
+  position: absolute;
+  z-index: -1;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: var(--sh);
+  overflow: hidden;
+  border-bottom: 1px solid var(--hair);
+  background:
+    radial-gradient(70% 90% at 50% 30%, rgba(240, 214, 153, 0.16), rgba(216, 176, 106, 0.04) 50%, transparent 75%),
+    linear-gradient(180deg, #221c13, #15120d);
+}
+.km-berg { position: absolute; left: 0; right: 0; bottom: 0; width: 100%; height: 62%; }
+.km-berg .b { fill: #3a3128; opacity: 0.7; }
+.km-berg .f { fill: #241e17; }
+.km-berg .s { fill: #efe6d3; opacity: 0.55; }
+/* molnen runt foten: man står ovanför dem */
+.km-moln { position: absolute; left: -10%; right: -10%; bottom: -14px; height: 70px; animation: km-drift 60s ease-in-out infinite alternate; }
+.km-moln i { position: absolute; bottom: 0; width: 34%; height: 46px; border-radius: 50%; background: radial-gradient(closest-side, rgba(243, 234, 217, 0.15), transparent); }
+.km-moln i:nth-child(1) { left: -4%; height: 40px; }
+.km-moln i:nth-child(2) { left: 20%; bottom: 10px; width: 30%; }
+.km-moln i:nth-child(3) { left: 40%; height: 52px; }
+.km-moln i:nth-child(4) { left: 60%; bottom: 8px; width: 28%; }
+.km-moln i:nth-child(5) { left: 74%; height: 42px; }
+
+.km-steps { list-style: none; display: grid; grid-auto-columns: minmax(0, 1fr); grid-auto-flow: column; max-width: 660px; margin: 0 auto; padding: 0 12px; }
+.km-step { display: grid; grid-template-rows: var(--sh) auto; min-width: 0; }
+.km-stand { position: relative; display: flex; flex-direction: column; align-items: center; justify-content: flex-end; min-width: 0; }
+.km-fig { position: relative; z-index: 1; height: var(--fh); }
+.km-fig img {
+  display: block;
+  height: 100%;
+  width: auto;
+  user-select: none;
+  -webkit-user-select: none;
+  filter: drop-shadow(0 8px 12px rgba(0, 0, 0, 0.55));
+}
+.km-fig-txt { display: grid; place-items: end center; padding-bottom: 14px; }
+.km-face-lg { width: 76px; height: 76px; }
+.km-face-lg.km-face-txt { font-size: 24px; }
+.is-lead .km-fig img { filter: drop-shadow(0 8px 12px rgba(0, 0, 0, 0.55)) drop-shadow(0 0 16px rgba(240, 214, 153, 0.3)); }
+.km-rays {
+  position: absolute;
+  z-index: 0;
+  left: 50%;
+  bottom: 40%;
+  width: 520px;
+  height: 520px;
+  margin: 0 0 -260px -260px;
+  background: repeating-conic-gradient(from 0deg, rgba(240, 214, 153, 0.15) 0deg 5deg, transparent 5deg 15deg);
+  -webkit-mask-image: radial-gradient(circle, #000 0, #000 10%, transparent 52%);
+  mask-image: radial-gradient(circle, #000 0, #000 10%, transparent 52%);
+  animation: km-spin 90s linear infinite;
+}
+
+/* marmorsockeln, högre ju bättre placering, med siffran inhuggen */
+.km-plinth {
+  position: relative;
+  z-index: 1;
   display: grid;
-  justify-items: end;
+  place-items: center;
+  width: 100%;
+  height: var(--ph, 28px);
+  padding-top: 14px;
+  box-sizing: border-box;
+  background: linear-gradient(180deg, #efe6d3, #c8b99d);
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.5), inset 0 -8px 14px -10px rgba(80, 60, 30, 0.5);
+}
+.km-plinth::before {
+  content: "";
+  position: absolute;
+  left: -3px;
+  right: -3px;
+  top: -6px;
+  height: 6px;
+  border-radius: 2px 2px 0 0;
+  background: linear-gradient(180deg, #f7f0e2, #dccfb6);
+}
+.km-step + .km-step .km-plinth { border-left: 1px solid rgba(80, 60, 30, 0.28); }
+.km-plinth::after {
+  content: "";
+  position: absolute;
+  left: 10px;
+  right: 10px;
+  top: 6px;
+  height: 8px;
+  background: var(--meander) repeat-x center / 8px 8px;
+  opacity: 0.75;
+}
+.km-plinth span {
   font-family: var(--display);
-  font-size: 28px;
+  font-size: var(--pn, 17px);
+  font-weight: 700;
+  line-height: 1;
+  color: #8a7655;
+  text-shadow: 0 1px 0 rgba(255, 255, 255, 0.6), 0 -1px 0 rgba(80, 60, 30, 0.35);
+}
+.km-r1 { --ph: 66px; --pn: 34px; }
+.km-r2 { --ph: 46px; --pn: 26px; }
+.km-r3 { --ph: 34px; --pn: 18px; }
+.km-r1.is-lead .km-plinth { box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.5), inset 0 -8px 14px -10px rgba(80, 60, 30, 0.5), 0 -10px 24px -8px rgba(240, 214, 153, 0.35); }
+
+/* under pallen: namnet, poängen och rätt */
+.km-cap { display: grid; justify-items: center; align-content: start; gap: 2px; padding: 12px 6px 16px; text-align: center; min-width: 0; }
+.km-name {
+  max-width: 100%;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  font-family: var(--display);
+  font-size: 20px;
+  font-weight: 600;
+  line-height: 1.2;
+  color: var(--fg);
+}
+.km-name::before { content: ""; display: inline-block; width: 8px; height: 8px; margin: 0 7px 2px 0; border-radius: 50%; background: var(--km-c); vertical-align: middle; }
+.km-pts {
+  font-family: var(--display);
+  font-size: 30px;
   font-weight: 650;
-  line-height: 1.05;
+  line-height: 1.1;
   font-variant-numeric: tabular-nums;
   color: var(--ink-soft);
 }
-.km-gap { font-family: var(--sans); font-size: 12px; font-weight: 600; color: var(--muted); }
+.km-badges { display: flex; flex-wrap: wrap; justify-content: center; gap: 4px 6px; margin-top: 6px; }
+.km-now { font-size: 12px; font-weight: 650; font-variant-numeric: tabular-nums; color: var(--muted); }
+.km-ok { font-variant-numeric: tabular-nums; font-size: 14px; font-weight: 650; color: var(--ink-soft); }
+.km-ok span { color: var(--muted); font-weight: 500; }
+.km-pall-model {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+  font-size: 14px;
+  color: var(--muted);
+}
+.km-pall-model .km-face { width: 28px; height: 28px; font-size: 12px; }
+.km-pall-model b { font-family: var(--display); font-size: 19px; font-weight: 650; font-variant-numeric: tabular-nums; }
+.km-who { display: grid; gap: 5px; min-width: 0; }
+.km-who b { font-size: 17px; font-weight: 650; color: var(--fg); overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.km-who .sub { font-size: 12.5px; }
 .km-model { opacity: 0.75; }
 .km-model .km-who b { font-weight: 500; color: var(--ink-soft); }
-.km-model .km-pts { font-size: 20px; }
+
+@keyframes km-spin { to { transform: rotate(360deg); } }
+@keyframes km-drift { from { transform: translateX(-3%); } to { transform: translateX(3%); } }
+@media (prefers-reduced-motion: reduce) {
+  .km-rays, .km-moln { animation: none; }
+}
 
 /* kurvan */
 .km-curve { display: block; width: 100%; height: auto; overflow: visible; }
@@ -83,6 +212,7 @@
 .km-lines path { fill: none; stroke-width: 2.4; stroke-linejoin: round; stroke-linecap: round; }
 .km-lines path.km-prel { stroke-dasharray: 2 4; }
 .km-end { font-size: 11.5px; font-weight: 750; }
+.km-endface image { filter: saturate(0.95); }
 .km-keys { display: flex; flex-wrap: wrap; gap: 6px 16px; font-size: 12.5px; color: var(--ink-soft); }
 .km-key { display: inline-flex; align-items: center; gap: 7px; }
 .km-key::before { content: ""; width: 16px; height: 3px; border-radius: 2px; background: var(--km-c); }
@@ -90,6 +220,7 @@
 .km-key-model { color: var(--muted); }
 
 /* inbördes och spelkassan bredvid varandra på breda skärmar */
+.km-pairs, .km-kassa { list-style: none; margin: 0; padding: 0; }
 .km-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(320px, 1fr)); gap: 16px; }
 .km-grid > .km-card { align-content: start; }
 
@@ -164,13 +295,14 @@
 .km-dot { display: inline-block; width: 8px; height: 8px; margin-right: 6px; border-radius: 50%; background: var(--km-c); }
 
 .km-live th, .km-live td { color: var(--muted); }
+/* omgångarna: porträtten över kolumnerna */
+.tp-rounds thead .km-th-face { padding-top: 8px; padding-bottom: 8px; }
+.km-th-face .km-face-sm { width: 24px; height: 24px; font-size: 11px; }
 
-/* tom: före första omgången */
-.km-empty { justify-items: center; text-align: center; padding: 30px 24px; }
-.km-faces { display: flex; gap: 18px; }
-.km-faces .km-face { width: 64px; height: 64px; }
+/* tom: före första omgången står alla på noll */
+.km-empty { justify-items: center; text-align: center; }
+.km-empty .km-pall { width: 100%; }
 .km-empty-title { font-family: var(--display); font-size: 24px; font-weight: 650; color: var(--bone); }
-.km-empty .legend { max-width: 44ch; }
 
 .km-help { margin: 0; }
 .km-help p { max-width: 62ch; }
@@ -183,13 +315,24 @@
 
 @media (max-width: 520px) {
   .km-card { padding: 18px 16px; }
-  .km-row { grid-template-columns: 1.1em 34px minmax(0, 1fr) auto 4.4em; gap: 4px 10px; }
+  .km-pall { --sh: 192px; --fh: 108px; }
+  .km-steps { padding: 0 2px; }
+  .km-r1 { --ph: 48px; --pn: 26px; }
+  .km-r2 { --ph: 36px; --pn: 20px; }
+  .km-r3 { --ph: 27px; --pn: 14px; }
+  .km-plinth { padding-top: 11px; }
+  .km-plinth::after { top: 5px; height: 6px; background-size: 6px 6px; left: 6px; right: 6px; }
+  .km-rays { width: 380px; height: 380px; margin: 0 0 -190px -190px; }
+  .km-face-lg { width: 58px; height: 58px; }
+  .km-cap { padding: 10px 2px 12px; }
+  .km-name { font-size: 16px; }
+  .km-name::before { width: 6px; height: 6px; margin-right: 5px; }
+  .km-pts { font-size: 24px; }
+  .km-ok { font-size: 13px; }
+  .km-badges .tp-badge { padding: 1px 7px; font-size: 9.5px; letter-spacing: 0.05em; }
   .km-face { width: 34px; height: 34px; }
   .km-face-sm { width: 26px; height: 26px; }
-  .km-rank { font-size: 19px; }
   .km-who b { font-size: 15.5px; }
-  .km-pts { font-size: 23px; }
-  .km-ok { font-size: 14px; }
   .km-krow { grid-template-columns: 34px minmax(0, 1fr) auto; gap: 4px 10px; }
   .km-kr { font-size: 20px; }
   .km-score { font-size: 22px; }

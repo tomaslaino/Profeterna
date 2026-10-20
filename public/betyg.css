@@ -1,0 +1,183 @@
+/* Betyget (betyg.js): gängets betyg för säsongen på samma papper som
+   kupongen (papper.css: .pp, .pp-head, .pp-band, .pp-stamp och tokens som
+   --pp-print och --pp-hand). Betygen i rödpenna som kupongens antal rätt, A
+   inringat; omdömet och underskriften för hand. Laddas efter papper.css. */
+
+.bg-wrap { width: 100%; max-width: 760px; margin: 0 auto; }
+.pp.bg { padding: 30px 34px 26px; }
+.bg .pp-head { padding-bottom: 14px; }
+
+/* ---------- ämnena ---------- */
+
+.bg-scroll { overflow-x: auto; scrollbar-width: none; }
+.bg-scroll::-webkit-scrollbar { display: none; }
+.bg-table { width: 100%; border-collapse: collapse; table-layout: fixed; }
+.bg-table th, .bg-table td { padding: 0; border: 0; background: none; }
+.bg-table thead th {
+  padding: 16px 4px 10px;
+  font-size: 10px;
+  font-weight: 800;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+  text-align: center;
+  vertical-align: bottom;
+  color: var(--pp-print);
+}
+.bg-table thead th:first-child { width: 34%; text-align: left; padding-left: 8px; }
+.bg-table thead th > span:last-child { display: block; margin-top: 8px; letter-spacing: 0.1em; }
+
+.bg-face {
+  --bg-c: var(--pp-print);
+  display: inline-grid;
+  place-items: center;
+  width: 36px;
+  height: 36px;
+  overflow: hidden;
+  border-radius: 50%;
+  box-shadow: 0 0 0 2px var(--pp-paper), 0 0 0 3.5px var(--bg-c);
+  background: var(--pp-box);
+}
+.bg-face img { display: block; width: 100%; height: 100%; object-fit: cover; }
+.bg-face-txt { font-size: 12px; font-weight: 800; letter-spacing: 0.04em; color: var(--bg-c); }
+
+.bg-table tbody tr { border-bottom: 1px solid var(--pp-print-line); }
+.bg-table tbody tr:first-child { border-top: 1.5px solid var(--pp-print); }
+.bg-table tbody tr:nth-child(even) { background: var(--pp-print-tint); }
+.bg-table tbody th {
+  padding: 10px 8px 9px;
+  font-size: 15px;
+  font-weight: 650;
+  letter-spacing: 0;
+  text-transform: none;
+  text-align: left;
+  color: var(--pp-ink);
+}
+.bg-table td { padding: 7px 4px 8px; text-align: center; }
+.bg-table td small {
+  display: block;
+  margin-top: 3px;
+  font-size: 11px;
+  line-height: 1.2;
+  white-space: nowrap;
+  font-variant-numeric: tabular-nums;
+  color: var(--pp-ink-soft);
+}
+.bg-table td.bg-none { color: var(--pp-ink-soft); }
+
+/* betyget, skrivet för hand i rött */
+.bg-grade {
+  position: relative;
+  display: inline-block;
+  min-width: 1em;
+  font-family: var(--pp-hand);
+  font-size: 38px;
+  font-weight: 700;
+  line-height: 0.85;
+  color: var(--pp-no);
+  transform: rotate(-5deg);
+}
+.bg-ring {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  width: 46px;
+  height: 42px;
+  margin: -22px 0 0 -23px;
+  overflow: visible;
+  fill: none;
+  stroke: var(--pp-no);
+  stroke-width: 2.2;
+  stroke-linecap: round;
+  pointer-events: none;
+}
+.bg-ring path { vector-effect: non-scaling-stroke; }
+
+/* meritvärdet */
+.bg-table tfoot tr { border-top: 1.5px solid var(--pp-print); border-bottom: 1.5px solid var(--pp-print); }
+.bg-table tfoot th {
+  padding: 12px 8px;
+  font-size: 10.5px;
+  font-weight: 800;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+  text-align: left;
+  color: var(--pp-print);
+}
+.bg-table tfoot td { padding: 8px 4px; text-align: center; }
+.bg-merit {
+  position: relative;
+  display: inline-block;
+  font-family: var(--display);
+  font-size: 24px;
+  font-weight: 700;
+  font-variant-numeric: tabular-nums;
+  color: var(--pp-ink);
+}
+.bg-ring-merit { width: 74px; height: 46px; margin: -24px 0 0 -37px; }
+
+/* ---------- omdömet ---------- */
+
+.bg-label {
+  margin: 20px 0 0;
+  padding: 0 8px 6px;
+  font-size: 10.5px;
+  font-weight: 800;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+  color: var(--pp-print);
+  border-bottom: 1.5px solid var(--pp-print);
+}
+.bg-notes { list-style: none; margin: 0; padding: 0; }
+.bg-notes li {
+  display: grid;
+  grid-template-columns: 28px 6.5rem minmax(0, 1fr);
+  align-items: center;
+  column-gap: 12px;
+  padding: 9px 8px;
+  border-bottom: 1px solid var(--pp-print-line);
+}
+.bg-notes .bg-face { width: 26px; height: 26px; box-shadow: 0 0 0 1.5px var(--pp-paper), 0 0 0 2.8px var(--bg-c); }
+.bg-who { font-size: 14px; font-weight: 650; }
+.bg-note {
+  font-family: var(--pp-hand);
+  font-size: 23px;
+  font-weight: 600;
+  line-height: 1.05;
+  color: var(--pp-pen);
+}
+
+/* ---------- ort, datum och underskrift ---------- */
+
+.bg-fine { display: flex; justify-content: space-between; gap: 24px; margin-top: 26px; padding: 0 8px; }
+.bg-field { display: flex; flex-direction: column-reverse; gap: 4px; flex: 0 1 15rem; min-width: 0; }
+.bg-field > span { font-size: 9.5px; font-weight: 800; letter-spacing: 0.16em; text-transform: uppercase; color: var(--pp-print); }
+.bg-field b {
+  padding: 0 4px 2px;
+  font-family: var(--pp-hand);
+  font-size: 23px;
+  font-weight: 600;
+  line-height: 1.1;
+  white-space: nowrap;
+  color: var(--pp-pen);
+  border-bottom: 1.5px solid var(--pp-print-line);
+}
+.bg-sign { text-align: right; }
+.bg-sig { font-size: 30px !important; font-weight: 700 !important; color: var(--pp-ink) !important; transform: rotate(-3deg); transform-origin: right bottom; }
+
+@media (max-width: 560px) {
+  .pp.bg { padding: 24px 16px 20px; }
+  .bg-table thead th:first-child { width: 31%; }
+  .bg-table thead th > span:last-child { font-size: 9px; letter-spacing: 0.06em; }
+  .bg-face { width: 30px; height: 30px; }
+  .bg-table tbody th { padding: 9px 4px 8px 6px; font-size: 13px; }
+  .bg-grade { font-size: 33px; }
+  .bg-table td small { font-size: 10px; }
+  .bg-merit { font-size: 20px; }
+  .bg-ring-merit { width: 62px; margin-left: -31px; }
+  .bg-notes li { grid-template-columns: 26px minmax(0, 1fr); row-gap: 2px; padding: 9px 4px; }
+  .bg-notes .bg-face { grid-row: span 2; }
+  .bg-note { font-size: 21px; }
+  .bg-fine { gap: 14px; padding: 0 4px; }
+  .bg-field b { font-size: 20px; }
+  .bg-sig { font-size: 26px !important; }
+}

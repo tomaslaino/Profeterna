@@ -14,29 +14,32 @@
 // minuter, aktuell ställning, Dölj resultat). En avslutad omgång med en match
 // som Dölj resultat döljer räknas bort, som på förstasidan.
 //
-// Sidan: ställningen, kurvan omgång för omgång, inbördes möten (vem som fick
-// mest poäng i omgångarna som båda tippade), spelkassan (10 kr per match på
-// sitt tips till modellens odds), höjdpunkterna, var och ens sätt att tippa
-// och omgångarna.
+// Sidan: ställningen som en prispall, betyget (betyg.js), kurvan omgång för
+// omgång, inbördes möten (vem som fick mest poäng i omgångarna som båda
+// tippade), spelkassan (10 kr per match på sitt tips till modellens odds),
+// höjdpunkterna, var och ens sätt att tippa och omgångarna.
 //
 // Läses efter tippare.js och använder dess data och hjälpare (TP, tpLoad,
-// tpLoadSeason, tpScore, tpRoundHidden, tpPlaced, tpPts, tpTone, tpNameHtml,
-// tpAwards) och kupong.js (KP, teamsOf, dateRange, kpNum, whenMatches,
-// loadCoupons).
+// tpLoadSeason, tpScore, tpRoundHidden, tpPts, tpTone, tpAwards, tpLiveName,
+// tpRoundHead), kupong.js (KP, teamsOf, dateRange, kpNum, whenMatches,
+// loadCoupons), kronan.js (KRONAN_KROPPAR) och betyg.js (Betyg) när den finns.
 
 const KAMP = { html: null, width: 0 };
 // Spelkassan: så mycket på varje match.
 const KAMP_INSATS = 10;
 const KAMP_BILD = { DL: 'profeterna/laino.jpg', DT: 'profeterna/teijder.jpg', DJ: 'profeterna/johansson.jpg' };
-// En färg per tippare i kurvan och vid porträtten, i gängets ordning.
-const KAMP_FARG = ['#d8b06a', '#4d8ff0', '#e07a45', '#3db37c', '#b58ae8'];
+// En färg per tippare i kurvan och vid porträtten, i gängets ordning – samma
+// som på kupongen (.sm-p0–2 i samtal.css): blått, grönt och lila. Den mörkare
+// tonen är för papperet (betyg.js).
+const KAMP_FARG = ['#b3cffb', '#97e0bd', '#d6bcf7', '#f0d699', '#f2b8a0'];
+const KAMP_DJUP = ['#4d8ff0', '#3db37c', '#a069e6', '#c9973f', '#c8643a'];
 const KAMP_MODELL = '#9d9383';
 
 // ---------- omgångarna ----------
 
 // Gänget i tjänstens ordning, och den som bara finns i en gammal omgång sist.
 function kampGang(rounds) {
-  const list = (((KP.data && KP.data.samtal && KP.data.samtal.gang) || [])).map((g) => ({ id: g.id, name: g.namn || g.id }));
+  const list = (((KP.data && KP.data.samtal && KP.data.samtal.gang) || [])).map((g) => ({ id: g.id, name: g.namn || g.id, bild: g.bild }));
   for (const r of rounds) {
     for (const p of r.people || []) if (!list.some((g) => g.id === p.id)) list.push({ id: p.id, name: p.name || p.id });
   }
@@ -44,7 +47,7 @@ function kampGang(rounds) {
   if (!list.length && typeof KRONAN_KROPPAR !== 'undefined') {
     for (const [id, k] of Object.entries(KRONAN_KROPPAR)) list.push({ id, name: k.namn || id });
   }
-  return list.map((g, i) => ({ ...g, color: KAMP_FARG[i % KAMP_FARG.length], img: KAMP_BILD[g.id] || null }));
+  return list.map(({ bild, ...g }, i) => ({ ...g, color: KAMP_FARG[i % KAMP_FARG.length], deep: KAMP_DJUP[i % KAMP_DJUP.length], img: bild || KAMP_BILD[g.id] || null }));
 }
 
 // Omgången som pågår, i samma form som de avslutade – eller null.
@@ -153,31 +156,68 @@ function kampFace(g, size = '') {
 
 // ---------- ställningen ----------
 
+// Ställningen som en prispall uppe på Olympen: kropparna från kröningen
+// (KRONAN_KROPPAR i kronan.js) på marmorsocklar, ettan i mitten med strålar
+// bakom sig. Lika placering står lika högt. Modellen står nedanför.
+
+// Berget bakom pallen: en dimmig kam längst bak, Olympen framför med snö på
+// topparna.
+const KAMP_BERG = '<svg class="km-berg" viewBox="0 0 400 120" preserveAspectRatio="xMidYMax slice" aria-hidden="true">' +
+  '<path class="b" d="M0 120V76l38-12 30 8 42-20 38 14 36-9 30 12 36-19 40 12 40-14 38 15 32-6v59z"/>' +
+  '<path class="f" d="M0 120V97l48-12 40 4 40-27 30-17 26-15 16-9 14 10 18-7 24 23 30 15 34 12 40 8 40 8v28z"/>' +
+  '<path class="s" d="M166 45l18-15 16-9 14 10 18-7 11 11-9-1-10 7-10-5-10 7-10-6-12 8z"/></svg>';
+const KAMP_MOLN = '<div class="km-moln" aria-hidden="true"><i></i><i></i><i></i><i></i><i></i></div>';
+
+// Tvåan till vänster, ettan i mitten, trean till höger – resten efter.
+const kampPallOrder = (list) => (list.length >= 3 ? [list[1], list[0], list[2], ...list.slice(3)] : list);
+
+function kampFig(g) {
+  const k = typeof KRONAN_KROPPAR !== 'undefined' ? KRONAN_KROPPAR[g.id] : null;
+  return k
+    ? `<div class="km-fig"><img src="${esc(k.bild)}" alt="" draggable="false"></div>`
+    : `<div class="km-fig km-fig-txt">${kampFace(g, ' km-face-lg')}</div>`;
+}
+
+// cols: [{g, rank, cap}] i placeringsordning. flat: alla lika högt i gängets
+// ordning, med 0 på sockeln.
+function kampPall(cols, flat = false) {
+  const steps = (flat ? cols : kampPallOrder(cols)).map(({ g, rank, cap }) => {
+    const r = flat ? 3 : Math.min(rank, 3);
+    return `<li class="km-step km-r${r}${!flat && rank === 1 ? ' is-lead' : ''}" style="--km-c:${g.color}">` +
+      `<div class="km-stand">${!flat && rank === 1 ? '<div class="km-rays"></div>' : ''}${kampFig(g)}` +
+      `<div class="km-plinth"><span>${flat ? 0 : rank}</span></div></div>` +
+      `<div class="km-cap">${cap}</div></li>`;
+  }).join('');
+  return `<div class="km-pall n${cols.length}"><div class="km-sky">${KAMP_BERG}${KAMP_MOLN}</div><ol class="km-steps">${steps}</ol></div>`;
+}
+
 function kampStanding(rounds, live, gang) {
   const s = Tippoang.season(rounds);
   const byId = new Map(gang.map((g) => [g.id, g]));
-  const lead = s.people.length ? s.people[0].pts : 0;
+  const lead = s.people[0];
   let rank = 0;
-  const rows = tpPlaced(s.people, s.model).map((p) => {
-    if (p.model) {
-      return '<li class="km-row km-model">' +
-        `<span class="km-rank"></span><span class="km-face km-face-txt km-face-model" aria-hidden="true">M</span>` +
-        `<span class="km-who"><b>Modellen</b></span>` +
-        `<span class="km-ok" title="Antal rätt av spelade matcher">${p.ok}<span>/${p.n}</span></span>` +
-        `<span class="km-pts ${tpTone(p.pts)}">${tpPts(p.pts)}</span></li>`;
-    }
-    rank += 1;
+  let prev = null;
+  const cols = s.people.map((p, i) => {
+    const key = Tippoang.key(p);
+    if (key !== prev) { rank = i + 1; prev = key; }
     const g = byId.get(p.id) || { id: p.id, name: p.name, color: KAMP_MODELL };
     const now = live && live.people.find((x) => x.id === p.id);
-    const gap = rank === 1 ? '' : `<span class="km-gap">${tpPts(p.pts - lead)}</span>`;
-    return `<li class="km-row${rank === 1 ? ' is-lead' : ''}">` +
-      `<span class="km-rank">${rank}</span>${kampFace(g)}` +
-      `<span class="km-who"><b title="${esc(p.name)}">${tpNameHtml(p.name)}</b><span class="km-badges">${tpAwards(p)}` +
-      (kampTook(now) ? `<span class="km-now ${tpTone(now.pts)}" title="Preliminärt, i omgången som pågår">${tpPts(now.pts)} i omgången</span>` : '') +
-      '</span></span>' +
+    const behind = Math.round((lead.pts - p.pts) * 10) / 10;
+    const gap = rank > 1 && behind > 0 ? ` title="${kpNum(behind)} efter ${esc(kampSurname(lead.name))}"` : '';
+    const badges = tpAwards(p) +
+      (kampTook(now) ? `<span class="km-now ${tpTone(now.pts)}" title="Preliminärt, i omgången som pågår">${tpPts(now.pts)} i omgången</span>` : '');
+    const cap = `<b class="km-name" title="${esc(p.name)}">${esc(kampSurname(p.name))}</b>` +
+      `<span class="km-pts ${tpTone(p.pts)}"${gap}>${tpPts(p.pts)}</span>` +
       `<span class="km-ok" title="Antal rätt av spelade matcher">${p.ok}<span>/${p.n}</span></span>` +
-      `<span class="km-pts ${tpTone(p.pts)}">${tpPts(p.pts)}${gap}</span></li>`;
-  }).join('');
+      (badges ? `<span class="km-badges">${badges}</span>` : '');
+    return { g, rank, cap };
+  });
+  const m = s.model;
+  const model = m.n
+    ? '<p class="km-pall-model"><span class="km-face km-face-txt km-face-model" aria-hidden="true">M</span>' +
+      `<span>Modellen</span><b class="${tpTone(m.pts)}">${tpPts(m.pts)}</b>` +
+      `<span class="km-ok" title="Antal rätt av spelade matcher">${m.ok}<span>/${m.n}</span></span></p>`
+    : '';
   const done = rounds.filter((r) => r.done).length;
   const status = live
     ? `<p class="kp-line km-status">${live.done ? 'Omgången är färdigspelad' : `Preliminärt · omgången pågår, ${live.n} av ${live.total} matcher spelade`}` +
@@ -185,7 +225,7 @@ function kampStanding(rounds, live, gang) {
     : '';
   return '<div class="card km-card">' +
     `<p class="kp-eyebrow">${done ? `Ställningen efter ${done} ${done === 1 ? 'omgång' : 'omgångar'}` : 'Ställningen'}</p>` +
-    `<ol class="km-list">${rows}</ol>${status}</div>`;
+    `${kampPall(cols)}${model}${status}</div>`;
 }
 
 // ---------- kurvan ----------
@@ -248,11 +288,19 @@ function kampCurve(rounds, gang, width) {
       `<circle cx="${r1(x(i + 1))}" cy="${r1(y(v))}" r="3" fill="${sx.color}"><title>${esc(kampSurname(sx.name))} efter ${esc(kampRoundText(rounds[i]))}: ${tpPts(v)}</title></circle>`).join('');
     return d + dots;
   }).join('');
-  // Initialerna vid linjernas slut, isärflyttade om de hamnar för nära.
-  const ends = series.map((sx) => ({ sx, y: y(sx.pts[sx.pts.length - 1]) })).sort((a, b) => a.y - b.y);
-  for (let i = 1; i < ends.length; i++) if (ends[i].y - ends[i - 1].y < 12) ends[i].y = ends[i - 1].y + 12;
-  const labels = ends.map(({ sx, y: yy }) =>
-    `<text class="km-end" x="${r1(x(rounds.length) + 7)}" y="${r1(yy) + 4}" fill="${sx.color}">${sx.model ? 'M' : esc(sx.id)}</text>`).join('');
+  // Porträtten vid linjernas slut, i ring i tipparens färg – isärflyttade om
+  // de hamnar för nära. Modellen och den som saknar bild får bokstäver.
+  const ends = series.map((sx) => ({ sx, face: !sx.model && sx.img, y: y(sx.pts[sx.pts.length - 1]) })).sort((a, b) => a.y - b.y);
+  for (let i = 1; i < ends.length; i++) {
+    const gap = ends[i].face || ends[i - 1].face ? 20 : 12;
+    if (ends[i].y - ends[i - 1].y < gap) ends[i].y = ends[i - 1].y + gap;
+  }
+  const ex = x(rounds.length);
+  const labels = ends.map(({ sx, face, y: yy }) => (face
+    ? `<g class="km-endface"><clipPath id="km-end-${esc(sx.id)}"><circle cx="${r1(ex + 16)}" cy="${r1(yy)}" r="9"/></clipPath>` +
+      `<image href="${esc(sx.img)}" x="${r1(ex + 7)}" y="${r1(yy - 9)}" width="18" height="18" preserveAspectRatio="xMidYMid slice" clip-path="url(#km-end-${esc(sx.id)})"/>` +
+      `<circle cx="${r1(ex + 16)}" cy="${r1(yy)}" r="9.8" fill="none" stroke="${sx.color}" stroke-width="1.6"/><title>${esc(sx.name)}</title></g>`
+    : `<text class="km-end" x="${r1(ex + 7)}" y="${r1(yy) + 4}" fill="${sx.color}">${sx.model ? 'M' : esc(sx.id)}</text>`)).join('');
   const legend = series.map((sx) => `<span class="km-key${sx.model ? ' km-key-model' : ''}" style="--km-c:${sx.color}">${esc(sx.model ? 'Modellen' : kampSurname(sx.name))}</span>`).join('');
   return '<div class="card km-card">' +
     '<p class="kp-eyebrow">Omgång för omgång</p>' +
@@ -416,7 +464,8 @@ function kampStyle(rounds, t, gang) {
 function kampRoundsCard(rounds, gang) {
   if (!rounds.length) return '';
   const cols = [...gang.filter((g) => rounds.some((r) => kampTook((r.people || []).find((p) => p.id === g.id)))), { id: 'modellen', model: true }];
-  const head = cols.map((c) => `<th scope="col" title="${esc(c.model ? 'Modellen' : c.name)}">${c.model ? 'M' : esc(c.id)}</th>`).join('');
+  const head = cols.map((c) => `<th scope="col" class="km-th-face" title="${esc(c.model ? 'Modellen' : c.name)}">` +
+    `${c.model ? '<span class="km-face km-face-sm km-face-txt km-face-model">M</span>' : kampFace(c, ' km-face-sm')}</th>`).join('');
   const body = rounds.slice().reverse().map((r) => {
     const cells = cols.map((c) => {
       const p = c.model ? r.model : (r.people || []).find((x) => x.id === c.id);
@@ -452,9 +501,8 @@ const KAMP_HJALP = '<details class="help km-help"><summary>Så räknas poängen<
   'Bäst i omgången blir Omgångens orakel och sämst Omgångens Ikaros.</p></details>';
 
 function kampEmpty(gang) {
-  const faces = gang.map((g) => kampFace(g)).join('');
-  return '<div class="card km-card km-empty">' +
-    `<div class="km-faces">${faces}</div>` +
+  const cols = gang.map((g) => ({ g, rank: 1, cap: `<b class="km-name" title="${esc(g.name)}">${esc(kampSurname(g.name))}</b>` }));
+  return '<div class="card km-card km-empty">' + kampPall(cols, true) +
     '<p class="km-empty-title">Alla står på noll.</p>' +
     '<p><a class="kp-btn" href="#kupong">Till omgången</a></p></div>';
 }
@@ -472,6 +520,7 @@ function kampHtml(width) {
   const pair = [kampPairsCard(list, gang), kampKassaCard(t, gang)].filter(Boolean);
   return head + hid +
     kampStanding(list, live, gang) +
+    (window.Betyg ? Betyg.html(list, gang) : '') +
     kampCurve(list, gang, width) +
     (pair.length ? `<div class="km-grid">${pair.join('')}</div>` : '') +
     kampHighlights(list, t, gang) +
