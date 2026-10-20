@@ -842,10 +842,12 @@ async function saveCoupon() {
     renderPickList();
     return;
   }
-  // En vald match utan kryss: rutorna blir röda och raden rullas fram.
+  // En vald match utan kryss: rutorna blir röda och raden rullas fram – i
+  // telefonen dras papperet fram först.
   const blank = draftMatches().filter((x) => !x.sign).length;
   if (blank) {
     $('#kp-build').classList.add('need');
+    Papper.open('kp-build');
     Papper.reveal('kp-build', '.pb-row.unsigned');
     $('#kp-pick-msg').innerHTML = `<span class="note">Kryssa i alla matcher – ${blank === 1 ? 'en saknar' : `${blank} saknar`} tecken.</span>`;
     return;

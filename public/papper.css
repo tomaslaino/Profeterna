@@ -372,6 +372,19 @@ a.pp-row:focus-visible { outline: 2px solid var(--pp-pen); outline-offset: -2px;
 /* knapparna ovanför kupongen */
 .pp-top { display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 12px; }
 .pp-top .kp-actions { margin: clamp(18px, 3vw, 34px) 0 0; }
+/* telefonen: knapparna på en rad som går att dra i sidled, ut till kanterna */
+@media (max-width: 640px) {
+  .pp-top .kp-actions {
+    flex-wrap: nowrap;
+    width: calc(100% + 2 * var(--gutter));
+    margin: 14px calc(var(--gutter) * -1) 0;
+    padding: 0 var(--gutter) 2px;
+    overflow-x: auto;
+    scrollbar-width: none;
+  }
+  .pp-top .kp-actions::-webkit-scrollbar { display: none; }
+  .pp-top .kp-actions > * { flex: none; padding: 8px 15px; font-size: 13.5px; }
+}
 
 /* ---------- ifyllningen: rutorna på kupongen som växer fram ----------
    Ett tryck på en ruta ritar ett kryss. Omgångens kupong med en kolumn per
@@ -748,49 +761,184 @@ a.pp-row:focus-visible { outline: 2px solid var(--pp-pen); outline-offset: -2px;
 }
 /* toppraden är 58 px här; i mobilen rullar loggraden undan och menyraden blir kvar */
 @media (max-width: 760px) { .pb { --pb-top: 68px; } }
-/* telefonen: två lika smala spalter */
-@media (max-width: 560px) {
-  .pb { grid-template-columns: minmax(0, 1.05fr) minmax(0, 1fr); column-gap: 8px; }
-  .pp.pb-slip { --pp-hole: 3px; padding: 14px 8px 12px 20px; }
-  .pb-head .pp-brand { gap: 6px; font-size: 0; }
-  .pb-head .pp-brand img { width: 16px; height: 16px; }
-  .pb-head .pp-brand span { padding-left: 0; font-size: 9.5px; letter-spacing: 0.16em; border-left: 0; }
-  .pb-title { font-size: 21px; }
-  .pb-head .pp-meta { font-size: 12px; }
-  .pb-stop { display: none; }
-  .pb-name { font-size: 19px; }
-  .pb-rows { margin-left: -20px; padding-left: 20px; margin-right: -4px; padding-right: 4px; }
-  .pb-row::before { left: -15px; width: 8px; height: 4px; top: 15px; }
-  .pb-row { grid-template-columns: auto minmax(0, 1fr) 20px; column-gap: 6px; padding-left: 0; }
-  .pb-row .pp-nr { width: 18px; height: 18px; font-size: 10px; }
-  .pb-signs .pb-row .pp-nr { margin-top: 4.5px; }
-  .pb-rows .pp-day { margin-top: 8px; padding: 4px 2px 3px; font-size: 9px; letter-spacing: 0.1em; }
-  .pb-row .pp-tm { font-size: 12.5px; }
-  .pb-drop { width: 20px; height: 20px; }
-  .pb-drop svg { width: 12px; height: 12px; }
-  /* rutorna smalare, oddset kvar under */
-  .pb-row .kp-tg { gap: 3px; }
-  .pp-fill .pb-row .kp-tg button { width: 30px; grid-template-rows: 28px auto; }
-  .pp-fill .pb-row .kp-tg button::before { width: 27px; height: 27px; margin-left: -13.5px; }
-  .pp-fill .pb-row .kp-tg button[aria-pressed="true"]::after { width: 31px; height: 31px; margin-left: -15.5px; }
-  .pp-fill .pb-row .kp-tg button small { margin-top: 2px; font-size: 9px; }
-  .pb-row .pp-signs { gap: 4px; }
-  .pb-row .pp-box { width: 21px; height: 21px; }
-  .pb-row .pp-box i { font-size: 11px; }
-  .pb-signs .pb-blank .pp-signs { gap: 3px; }
-  .pb-signs .pb-blank .pp-cell { width: 30px; }
-  .pb-signs .pb-blank .pp-box { width: 27px; height: 27px; }
-  .pb-signs .pb-blank .pp-cell::after { height: 11px; }
-  .pb-foot .kp-btn.primary { padding: 9px 8px; font-size: 13px; }
-  .pb-fields .pp-field { padding: 2px 5px 3px; }
-  .pb-fields .pp-field b { font-size: 14px; }
-  .pb-msg { font-size: 11.5px; }
-  .pb-pick { padding: 9px 6px 9px 10px; gap: 6px; }
-  .pb-pick .mteams { font-size: 12.5px; }
-  .pb-tick { width: 26px; height: 26px; font-size: 13px; }
+
+/* ---------- telefonen: programmet över hela bredden, kupongen nederst ----------
+   Kupongen sticker upp ur nederkanten som en remsa papper: antalet, en
+   liten ruta per rad (med tecknet i, när kupongen har tecken) och knappen.
+   Ett tryck på remsan drar fram hela papperet över programmet (.pb.open);
+   ett tryck på det mörka fältet ovanför lägger undan det igen. */
+
+.pb-peek { display: none; }
+
+@media (max-width: 640px) {
+  .pb { display: block; }
   .pb-tools .kp-search { flex-basis: 100%; }
+  /* luft under programmet, så att sista matchen inte hamnar under remsan */
+  .pb-prog { padding-bottom: calc(96px + env(safe-area-inset-bottom)); }
+
+  /* programmet: tiden och tävlingen till vänster, lagen på var sin rad */
+  .pb-pick {
+    grid-template-columns: 3rem minmax(0, 1fr) auto;
+    grid-template-areas: "t m k" "c m k";
+    column-gap: 12px;
+    row-gap: 4px;
+    padding: 10px 12px 10px 14px;
+  }
+  .kp-pick.pb-pick .mtime { display: block; grid-area: t; align-self: end; font-size: 13px; }
+  .kp-pick.pb-pick .ctag { display: block; grid-area: c; align-self: start; justify-self: start; padding: 2px 7px; font-size: 10px; }
+  .pb-pick .mteams { grid-area: m; font-size: 14.5px; line-height: 1.3; }
+  .pb-pick .pb-tick { grid-area: k; width: 34px; height: 34px; font-size: 16px; }
+
+  /* remsan */
+  /* över toppraden (z-index 40), så att framdraget papper aldrig hamnar under den */
+  .pb-side {
+    position: fixed;
+    left: 8px;
+    right: 8px;
+    bottom: 0;
+    top: auto;
+    z-index: 45;
+  }
+  .pp-wrap.pb-wrap { filter: drop-shadow(0 -6px 18px rgba(0, 0, 0, 0.55)); }
+  .pp.pb-slip {
+    --pp-hole: 4px;
+    flex-flow: row wrap;
+    align-items: center;
+    gap: 8px 12px;
+    max-height: none;
+    padding: 14px 12px calc(12px + env(safe-area-inset-bottom)) 14px;
+    /* bara perforeringen upptill – nedtill fortsätter papperet ur bild */
+    -webkit-mask: radial-gradient(circle at 50% 0, transparent var(--pp-hole), #000 calc(var(--pp-hole) + 0.5px)) 0 0 / 15px 100% repeat-x;
+    mask: radial-gradient(circle at 50% 0, transparent var(--pp-hole), #000 calc(var(--pp-hole) + 0.5px)) 0 0 / 15px 100% repeat-x;
+  }
+  .pb:not(.open) .pb-head,
+  .pb:not(.open) .pb-slip > .pp-band,
+  .pb:not(.open) .pb-rows,
+  .pb:not(.open) .pb-fields { display: none; }
+  .pb:not(.open) .pb-foot { display: contents; }
+  .pb-peek {
+    flex: 1 1 0;
+    min-width: 0;
+    display: grid;
+    grid-template-columns: 18px minmax(0, 1fr);
+    grid-template-areas: "c n" "c p";
+    align-items: center;
+    gap: 5px 8px;
+    padding: 2px 0;
+    font: inherit;
+    text-align: left;
+    color: var(--pp-ink);
+    background: none;
+    border: 0;
+    border-radius: 0;
+    box-shadow: none;
+    cursor: pointer;
+  }
+  .pb-peek:focus-visible { outline: 2px solid var(--pp-pen); outline-offset: 3px; }
+  .pb-chev { grid-area: c; width: 18px; height: 18px; fill: none; stroke: var(--pp-print); stroke-width: 2.4; stroke-linecap: round; stroke-linejoin: round; transition: transform 0.2s ease; }
+  .pb-peek-n { grid-area: n; justify-self: start; font-size: 14px; font-weight: 750; white-space: nowrap; }
+  .pb-peek-n.pb-bump { animation: pb-bump 0.45s ease; }
+  /* en ruta per rad, så lång som remsan räcker */
+  .pb-pips { grid-area: p; display: flex; gap: 3px; min-width: 0; overflow: hidden; }
+  .pb-pips:empty { display: none; }
+  .pb-pips i {
+    flex: 0 1 18px;
+    min-width: 0;
+    height: 18px;
+    display: grid;
+    place-items: center;
+    font-family: var(--display);
+    font-size: 10.5px;
+    font-style: normal;
+    font-weight: 800;
+    line-height: 1;
+    color: var(--pp-paper);
+    border: 1.5px solid var(--pp-print-line);
+    border-radius: 2px;
+    box-sizing: border-box;
+  }
+  .pb-pips i.on { border-color: var(--pp-print); background: var(--pp-print); }
+  .pb-pips i.need { border-color: var(--pp-no); background: var(--pp-box); }
+  .pb-pips i.locked { opacity: 0.55; }
+  .pb-signs .pb-pips i { flex-basis: 22px; min-width: 15px; }
+  .pb:not(.open) .pb-foot .kp-btn.primary { flex: none; margin: 0; padding: 11px 16px; font-size: 14px; }
+  .pb:not(.open) .pb-msg { order: 3; flex-basis: 100%; font-size: 12.5px; }
+
+  /* hela papperet framdraget, med det mörka fältet över programmet */
+  .pb.open .pb-side::before {
+    content: "";
+    position: fixed;
+    inset: 0;
+    z-index: -1;
+    background: rgba(8, 7, 5, 0.6);
+    animation: pb-fade 0.2s ease;
+  }
+  .pb.open .pp.pb-slip {
+    flex-flow: column nowrap;
+    align-items: stretch;
+    gap: 0;
+    max-height: calc(100vh - 64px);
+    max-height: calc(100dvh - 64px);
+    padding: 8px 12px calc(14px + env(safe-area-inset-bottom)) 30px;
+    animation: pb-up 0.25s ease-out;
+  }
+  /* pilen ner i hörnet lägger undan papperet */
+  .pb.open .pb-peek {
+    position: absolute;
+    top: 6px;
+    right: 4px;
+    z-index: 1;
+    display: grid;
+    place-items: center;
+    width: 44px;
+    height: 44px;
+    padding: 0;
+  }
+  .pb.open .pb-peek-n, .pb.open .pb-pips { display: none; }
+  .pb.open .pb-chev { width: 24px; height: 24px; transform: rotate(180deg); }
+  .pb.open .pp.pb-slip { padding-top: 16px; }
+  .pb-head { padding-right: 36px; }
+  .pb-head .pp-brand { font-size: 10px; letter-spacing: 0.16em; }
+  .pb-title { min-height: 0; margin-top: 4px; font-size: 23px; }
+  .pb-head .pp-meta { margin-top: 2px; }
+  .pb-stop { display: none; }
+  .pb-slip .pp-band { height: 13px; margin: 8px 0 2px; background-size: 10px 10px; }
+  /* raderna och väntat bredvid knappen */
+  .pb.open .pb-foot { flex-wrap: wrap; }
+  .pb.open .pp-fields.pb-fields { flex: none; }
+  .pb.open .pb-fields .pp-field { flex: none; min-width: 62px; }
+  .pb.open .pb-foot .kp-btn.primary { flex: 1 1 150px; }
+  .pb-rows { margin: 0 -6px 0 -30px; padding: 0 6px 0 30px; }
+
+  /* raderna som på en tryckt kupong: nummer, matchen, rutorna, bort */
+  .pb-row {
+    grid-template-columns: 20px minmax(0, 1fr) auto 28px;
+    grid-template-areas: "n m s d";
+    column-gap: 8px;
+    row-gap: 0;
+    min-height: 54px;
+    padding: 6px 0 6px 2px;
+  }
+  .pb-row .pp-nr, .pb-signs .pb-row .pp-nr { align-self: center; margin-top: 0; }
+  .pb-row::before { top: 50%; left: -23px; width: 11px; height: 5px; margin-top: -2.5px; }
+  .pb-row .pp-tm { font-size: 13.5px; }
+  .pb-row .kp-tg, .pb-row .pp-signs { justify-self: end; }
+  .pb-drop { align-self: center; width: 28px; height: 28px; }
+  .pb-row .kp-note-in, .pb-row .pp-note { grid-column: 2 / -1; }
+  .pb-row .kp-note-in { margin: 2px 0 2px; }
+  .pb-line { align-self: center; }
+  .pb-row .kp-tg { gap: 4px; }
+  .pb-row .pp-box { width: 26px; height: 26px; }
+  .pb-row .pp-box i { font-size: 13px; }
+  .pb-foot .kp-btn.primary { padding: 12px; font-size: 15px; }
 }
+@media (max-width: 360px) {
+  .pb:not(.open) .pb-foot .kp-btn.primary { padding: 10px 12px; font-size: 13px; }
+  .pp.pb-slip { column-gap: 10px; }
+}
+@keyframes pb-up { from { transform: translateY(30%); opacity: 0.4; } }
+@keyframes pb-fade { from { opacity: 0; } }
 
 @media (prefers-reduced-motion: reduce) {
-  .pb-new, .pb-count.pb-bump { animation: none; }
+  .pb-new, .pb-count.pb-bump, .pb-peek-n.pb-bump, .pb.open .pp.pb-slip, .pb.open .pb-side::before { animation: none; }
 }

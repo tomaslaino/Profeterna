@@ -236,35 +236,70 @@
   // Papperet har tretton tryckta rader som en tipskupong; de valda matcherna
   // fylls i uppifrån och resten står tomma. Omgångens kupong ska ha precis
   // så många matcher (samtal.js).
+  //
+  // I telefonen får programmet hela bredden och kupongen sticker upp nederst
+  // i fönstret: antalet, en liten ruta per rad och knappen. Ett tryck på den
+  // (pb-peek) drar fram hela papperet; ett tryck utanför eller Esc lägger
+  // undan det.
 
   const RADER = 13;
   const B = { ids: null }; // raderna som stod på papperet förra gången, för att se vilken som är ny
+  const phone = window.matchMedia('(max-width: 640px)');
 
   function builder({ id, list, tools = '', head = '', foot = '' }) {
     B.ids = null;
     return `<div class="pb" id="${id}"><div class="pb-tools">${tools}</div><div class="pb-prog"><div id="${list}"></div></div>` +
       '<aside class="pb-side" aria-label="Kupongen"><div class="pp-wrap pb-wrap"><div class="pp pp-fill pb-slip">' +
+      `<button type="button" class="pb-peek" aria-expanded="false" aria-controls="${id}-rows">` +
+      '<svg class="pb-chev" viewBox="0 0 20 20" aria-hidden="true"><path d="M5 12.5l5-5 5 5"/></svg>' +
+      '<span class="pb-peek-n"></span><span class="pb-pips" aria-hidden="true"></span></button>' +
       '<div class="pb-head">' +
       '<p class="pp-brand"><img src="logo.svg" alt="" width="20" height="20">Matchfixarna<span>Kupong</span></p>' +
       '<h2 class="pp-title pb-title"></h2>' +
       `<p class="pp-meta"><span class="pb-count"></span>${head}</p>` +
       '<div class="pp-stop pb-stop"><span>Spelstopp</span><b></b></div></div>' +
       '<div class="pp-band" aria-hidden="true"></div>' +
-      '<div class="pb-rows"></div>' +
+      `<div class="pb-rows" id="${id}-rows"></div>` +
       `<div class="pb-foot"><div class="pp-fields pb-fields"></div>${foot}</div>` +
       '</div></div></aside></div>';
   }
 
   // Papperet räcker ner till fönstrets nederkant, också innan det har fastnat
-  // under toppraden, så att knappen längst ner alltid syns.
+  // under toppraden, så att knappen längst ner alltid syns. I telefonen
+  // sköter CSS:en höjden.
   function fit() {
     const slip = document.querySelector('.pb-slip');
     if (!slip) return;
+    if (phone.matches) {
+      slip.style.maxHeight = '';
+      return;
+    }
     const top = parseFloat(getComputedStyle(slip.closest('.pb')).getPropertyValue('--pb-top')) || 0;
     slip.style.maxHeight = `${Math.max(320, window.innerHeight - Math.max(top, slip.getBoundingClientRect().top) - 18)}px`;
   }
   window.addEventListener('scroll', fit, { passive: true });
   window.addEventListener('resize', fit);
+
+  // Telefonen: hela papperet fram (on) eller undan.
+  function pull(id, on = true) {
+    const root = document.getElementById(id);
+    if (!root) return;
+    root.classList.toggle('open', on);
+    const peek = root.querySelector('.pb-peek');
+    if (peek) peek.setAttribute('aria-expanded', String(on));
+  }
+  document.addEventListener('click', (e) => {
+    const peek = e.target.closest('.pb-peek');
+    // Utanför papperet är det mörka fältet över programmet (.pb-side::before).
+    const root = peek ? peek.closest('.pb') : e.target.matches('.pb.open > .pb-side') ? e.target.parentElement : null;
+    if (root) pull(root.id, !root.classList.contains('open'));
+  });
+  document.addEventListener('keydown', (e) => {
+    const root = e.key === 'Escape' && document.querySelector('.pb.open');
+    if (!root) return;
+    pull(root.id, false);
+    root.querySelector('.pb-peek').focus();
+  });
 
   // Rullar papperet (inte sidan) så att raden syns.
   function reveal(id, sel) {
@@ -357,7 +392,15 @@
     const open = list.filter((r) => r.m && !r.locked).map((r) => Date.parse(r.m.kickoff));
     const n = list.length;
     root.querySelector('.pb-title').innerHTML = kicks.length ? esc(dateRange(Math.min(...kicks), Math.max(...kicks))) : '<span class="pb-blankline"></span>';
-    root.querySelector('.pb-count').textContent = max ? `${n} av ${max} matcher` : `${n} ${n === 1 ? 'match' : 'matcher'}`;
+    const count = max ? `${n} av ${max} matcher` : `${n} ${n === 1 ? 'match' : 'matcher'}`;
+    root.querySelector('.pb-count').textContent = count;
+    // Kupongen nederst i telefonen: antalet och en ruta per rad – med
+    // tecknet i, eller röd kant om det saknas – och de tomma raderna.
+    root.querySelector('.pb-peek-n').textContent = max ? `${n} av ${max}` : count;
+    root.querySelector('.pb-pips').innerHTML = list.map((r) => {
+      const s = r.sign || '';
+      return `<i class="${signs && !s ? 'need' : 'on'}${r.locked ? ' locked' : ''}">${signs ? esc(s) : ''}</i>`;
+    }).join('') + '<i></i>'.repeat(Math.max(0, max - n));
     root.querySelector('.pb-stop b').innerHTML = open.length ? esc(fWeekdayTime.format(new Date(Math.min(...open)))) : '<span class="pb-blankline"></span>';
     let html = '';
     let day = null;
@@ -388,14 +431,14 @@
     fit();
   }
 
-  // Antalet matcher studsar.
+  // Antalet matcher studsar – på papperet och nederst i telefonen.
   function bump(id) {
-    const count = document.querySelector(`#${id} .pb-count`);
-    if (!count) return;
-    count.classList.remove('pb-bump');
-    void count.offsetWidth;
-    count.classList.add('pb-bump');
+    for (const count of document.querySelectorAll(`#${id} .pb-count, #${id} .pb-peek-n`)) {
+      count.classList.remove('pb-bump');
+      void count.offsetWidth;
+      count.classList.add('pb-bump');
+    }
   }
 
-  window.Papper = { RADER, coupon, builder, reveal, program, slip, bump, cross, ring };
+  window.Papper = { RADER, coupon, builder, reveal, program, slip, bump, open: pull, cross, ring };
 }());

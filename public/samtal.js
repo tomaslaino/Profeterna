@@ -396,19 +396,25 @@
     const same = made && savedAsIs(made, rows, val);
     const label = direct ? (same ? 'Sparad' : made ? 'Spara ändringen' : 'Spara gängets kupong')
       : made ? 'Ändra gängets kupong' : 'Gör gängets kupong';
-    html += '<div class="kp-bar sm-bar">' +
+    // I telefonen står de mindre valen bakom ⋯, så att raden tar lite plats.
+    html += `<div class="kp-bar sm-bar${barMore ? ' more' : ''}">` +
       `<span class="kp-bar-txt"><b>Gängets kupong</b> · ${done.length} av ${rows.length} klara` +
       `${gard ? ` · ${plural(gard, 'gardering', 'garderingar')}` : ''} · <b>${rader(done)}</b> ${rader(done) === 1 ? 'rad' : 'rader'}` +
       `${same ? ' · <a href="#kupong">sparad</a>' : ''}</span>` +
       '<span class="sm-slots" aria-hidden="true">' + chosen.map((x) => `<i${x ? ' class="set"' : ''}>${x || '?'}</i>`).join('') + '</span>' +
+      `<button type="button" class="sm-more" id="sm-more" aria-expanded="${barMore}" aria-controls="sm-bar-more" aria-label="Fler val">` +
+      '<svg viewBox="0 0 20 20" aria-hidden="true"><circle cx="4.5" cy="10" r="1.7"/><circle cx="10" cy="10" r="1.7"/><circle cx="15.5" cy="10" r="1.7"/></svg></button>' +
+      '<span class="sm-bar-more" id="sm-bar-more">' +
       '<button type="button" class="kp-linkbtn" id="sm-reset" title="Gängets tecken som de flesta tippade">Börja om</button>' +
       (direct ? '<button type="button" class="kp-linkbtn" id="sm-adjust" title="Öppna kupongen med tecknen ifyllda – för namn, anteckningar eller fler matcher">Justera först</button>' : '') +
       // Systemet ni spelade, som skärmbild: tecknen därifrån (systembild.js).
-      (window.Systembild ? Systembild.button('kp-linkbtn') : '') +
+      (window.Systembild ? Systembild.button('kp-linkbtn') : '') + '</span>' +
       `<button type="button" class="kp-btn primary" id="sm-make"${same && direct ? ' disabled' : ''}>${label}</button>` +
       '<span class="sm-bar-msg" id="sm-msg" role="status"></span></div>';
     return html;
   }
+  // ⋯ i raden längst ner är öppnad – står kvar när underlaget ritas om.
+  let barMore = false;
 
   // Gängets kupong har redan tecknen som är valda här, i varje match som
   // inte har startat.
@@ -582,6 +588,11 @@
       renderRound();
     });
     $('#sm-make').addEventListener('click', () => makeCoupon(s));
+    $('#sm-more').addEventListener('click', (e) => {
+      barMore = !barMore;
+      e.currentTarget.setAttribute('aria-expanded', String(barMore));
+      e.currentTarget.closest('.sm-bar').classList.toggle('more', barMore);
+    });
     const adjust = $('#sm-adjust');
     if (adjust) adjust.addEventListener('click', () => makeCoupon(s, { adjust: true }));
   }
