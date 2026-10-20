@@ -814,23 +814,53 @@
     return c.matches.some((x) => ids.has(x.id));
   };
 
-  // Rutan på förstasidan.
+  // Tiden kvar att lämna in, grovt: minuter, timmar, sedan dagar.
+  const HOUR = 3600000;
+  function left(ms) {
+    const min = Math.max(1, Math.ceil(ms / 60000));
+    if (min < 60) return `${min} min`;
+    const h = Math.floor(min / 60);
+    if (h < 24) return h < 10 && min % 60 ? `${h} tim ${min % 60} min` : `${h} tim`;
+    const d = Math.floor(h / 24);
+    return d < 3 && h % 24 ? `${plural(d, 'dag', 'dagar')} ${h % 24} tim` : plural(d, 'dag', 'dagar');
+  }
+
+  // Rutan på förstasidan: hur många som har lämnat in och hur länge till det
+  // går – till första avsparken. När allas tips visas är det dags för
+  // uppgörelsen, och när gängets kupong är gjord tar den över (kupong.js).
   function teaser() {
     const s = SM.data;
     if (!active()) return '';
     const v = me();
     const inne = s.gang.filter((g) => g.inne).length;
     const done = submitted(s, v);
-    const go = s.visas ? 'Se allas tips' : done ? 'Se de andras tips' : 'Fyll i kupongen';
-    const href = s.visas || done || !v ? '#kupong' : '#kupong/samtal/tips';
-    const title = s.visas ? (s.orsak === 'alla' ? 'Alla har lämnat in' : 'Allas tips visas')
-      : done ? 'Du har lämnat in' : `${inne} av ${s.gang.length} har lämnat in`;
+    const stop = Math.min(...kicks(s));
+    const open = !s.visas && Date.now() < stop;
+    const ute = s.gang.filter((g) => !g.inne).map((g) => g.id);
+    const go = !open ? 'Till uppgörelsen' : done ? 'Se de andras tips' : 'Fyll i kupongen';
+    const href = !open || done || !v ? '#kupong' : '#kupong/samtal/tips';
+    const title = !open ? 'Dags för uppgörelsen' : done ? 'Du har lämnat in' : `${inne} av ${s.gang.length} har lämnat in`;
+    const ms = stop - Date.now();
+    const line = open
+      ? `<span class="kp-line sm-kvar${ms < HOUR ? ' snart' : ''}"><b data-kvar="${stop}">${left(ms)}</b> kvar att lämna in · <span>senast ${esc(fWeekdayTime.format(new Date(stop)))}</span></span>`
+      : ute.length ? `<span class="kp-line sm-kvar">${esc(ute.join(' och '))} lämnade inte in</span>` : '';
     return '<div class="card sm-teaser">' +
       '<div><p class="kp-eyebrow">Omgångens kupong</p>' +
-      `<h2 class="page-title"><a href="#kupong">${esc(title)}</a></h2></div>` +
-      '<div class="sm-folk">' + s.gang.map((g) => `<span class="sm-person${g.inne ? ' inne' : ''}">${chip(g.id)}<span>${g.inne ? '✓' : '…'}</span></span>`).join('') + '</div>' +
+      `<h2 class="page-title"><a href="#kupong">${esc(title)}</a></h2>${line}</div>` +
+      '<div class="sm-folk">' + s.gang.map((g) => `<span class="sm-person${g.inne ? ' inne' : ''}">${chip(g.id)}<span>${g.inne ? '✓' : open ? '…' : '–'}</span></span>`).join('') + '</div>' +
       `<a class="kp-btn primary" href="${href}">${go}</a></div>`;
   }
+
+  // Nedräkningen i rutan går av sig själv. När tiden är ute ritas rutan om.
+  setInterval(() => {
+    const el = document.querySelector('[data-kvar]');
+    if (!el || document.hidden) return;
+    const ms = Number(el.dataset.kvar) - Date.now();
+    if (ms > 0) {
+      el.textContent = left(ms);
+      el.parentElement.classList.toggle('snart', ms < HOUR);
+    } else if (onHome()) redraw();
+  }, 30000);
 
   // Omgången hämtas en gång när sidan laddas, så att förstasidan kan visa den.
   (async function init() {

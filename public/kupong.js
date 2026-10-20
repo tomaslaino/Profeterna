@@ -532,9 +532,11 @@ function renderHome() {
   const c = currentCoupon();
   // Pågår en omgång inför samtalet står den överst (samtal.js), och rutan
   // ritas om när någon lämnar in.
+  // En färdigspelad kupong står då bara i Historik.
   const samtal = samtalTeaser();
   if (samtal) Samtal.watch();
-  $('#home').innerHTML = samtal + (c ? teaser(c, gradeCoupon(c)) : samtal ? '' : emptyCard());
+  const g = c && gradeCoupon(c);
+  $('#home').innerHTML = samtal + (c && !(samtal && g.done) ? teaser(c, g) : samtal ? '' : emptyCard());
 }
 
 // Omgångens kupong i korthet: siffran, en prick per match och vägen in.

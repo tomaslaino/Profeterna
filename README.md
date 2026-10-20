@@ -997,6 +997,12 @@ under omgången.
    först *Ersätt den*. *Ändra matcherna* går tills någon har lämnat in. Den gamla vägen –
    gängets kupong direkt – finns kvar under länken *Eller gör gängets kupong direkt*.
    Medan kupongen fylls i står den överst på förstasidan och under Kupong → Omgången.
+   Förstasidans ruta visar hur många som har lämnat in och hur lång tid som är kvar –
+   till första avsparken, då inlämningen stänger (nedräkningen går av sig själv och blir
+   bärnstensfärgad den sista timmen). När alla har lämnat in, eller tiden är ute, står det
+   *Dags för uppgörelsen* (och vem som inte lämnade in) utan någon tid; när gängets kupong
+   är gjord tar den över rutan. En färdigspelad kupong visas inte bredvid medan en ny
+   omgång fylls i – den står under Historik.
 2. **Fyll i kupongen** (`#kupong/samtal/tips`): man väljer vem man är (DL, DT, DJ – sparas
    på enheten), tippar varje match och kan skriva en kort motivering (högst 140 tecken).
    Nederst står hur många rader tipsen blir. *Lämna in och se de andras* kräver tecken i
