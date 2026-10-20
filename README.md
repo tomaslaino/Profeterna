@@ -1154,7 +1154,13 @@ ovanför) och på omgångens sida (datumen ovanför). Det skrivs när någon fö
 efter att matcherna valts (några sekunder med Claude; så länge står *Omgångens kupong* kvar,
 sedan tonar namnet fram) och syns sedan likadant för alla. Ändras matcherna får omgången ett
 nytt namn. Gängets kupong får omgångens namn när den sparas (`namn` i kupongfilen, så också i
-Historik och som rubrik i förstasidans ruta), om den inte redan har ett. Namnet skrivs i samma
+Historik och som rubrik i förstasidans ruta), om den inte redan har ett; saknas det när kupongen
+fryses in i kuponghistoriken tar bygget namnet från omgången med flest av kupongens matcher
+(minst hälften). Bygget (`--journal`) fryser också in namnet och vad det syftar på i
+tipparhistoriken (`namn`, `syftar` per omgång; `tippare.json` har `name` och `hint`), med
+`POST /namn {"id", "las": true}` – läsläget ger namnet omgången senast fick och skriver inget
+nytt. Namnet syns då i Olympens omgångar, höjdpunkter och kurva, i *Poäng per omgång* och i
+rutan för förra omgången på förstasidan, med datumen under. Namnet skrivs i samma
 proxy som matchanalysen och kommentaren (`POST /namn {"id": "<omgångens id>"}`,
 [worker/namn.mjs](worker/namn.mjs), prompten och modellen i [config/namn.js](config/namn.js))
 – av Claude (`claude-opus-5-5`, med Anthropics officiella SDK och `fallbacks: "default"`) när
