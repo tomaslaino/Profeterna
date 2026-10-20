@@ -1127,22 +1127,29 @@ Lokalt: med `KUPONG_LOKALT=1` i `.env` finns
 `/api/samtal`, som sparar i `data/cache/samtal/` (eller `SAMTAL_DIR`).
 
 **Omgångens namn** (2026-10-20): i stället för *Omgångens kupong* får varje omgång ett eget
-namn av AI:n – kort, svenskt och lågmält ironiskt, efter det som utmärker just den omgången
-(ett derby, ett lag som spelar två gånger, en helgdag, botten mot topp …), t.ex. *En Chelsea
-för mycket*. Vad namnet syftar på står när man pekar på det. Namnet skrivs när någon först
-öppnar omgången efter att matcherna valts (det tar ungefär en minut, och så länge står
-*Omgångens kupong* kvar) och syns sedan likadant för alla: på förstasidan, under Omgången och
-när matcherna ändras. Ändras matcherna får omgången ett nytt namn. Gängets kupong får
-omgångens namn när den sparas (`namn` i kupongfilen, så också i Historik), om den inte redan
-har ett. Namnet skrivs i samma proxy som matchanalysen och kommentaren (`POST /namn
-{"id": "<omgångens id>"}`, [worker/namn.mjs](worker/namn.mjs), prompten och modellen i
-[config/namn.js](config/namn.js)) – av Claude (`claude-opus-5-5`, med Anthropics officiella
-SDK och `fallbacks: "default"`) när hemligheten `ANTHROPIC_API_KEY` finns, annars av
-DeepSeek som analysen. Proxyn läser omgången ur samma KV-namnrymd som tipsen och
-lagen, tabelläget och modellens odds ur den publicerade sajten, och sparar namnet för alltid
-per omgång och matcher (`namn:<promptversion>:<omgång>:<matcherna>`). Bygget skriver
-adressen i `data/kuponger.json` under `samtal.namn`. Lokalt `/api/namn` (med en av
-nycklarna i `.env` och `KUPONG_LOKALT=1`). Claudes nyckel läggs in en gång:
+namn av AI:n – det mest intressanta med just den omgången, sagt med lågmäld ironi, t.ex.
+*Bournemouth trivs på Old Trafford* (Bournemouth har inte vunnit borta i år men vann 0–3 två
+gånger där) eller *Man delar notan på Ewood Park* (de senaste mötena slutade oavgjort). Vad
+namnet syftar på står när man pekar på det. Ungefär var femte omgång får namnet gärna också
+blinka åt drömmen om storkovan. Namnet är rubrik i förstasidans ruta (tiden kvar står
+ovanför) och på omgångens sida (datumen ovanför). Det skrivs när någon först öppnar omgången
+efter att matcherna valts (några sekunder med Claude; så länge står *Omgångens kupong* kvar,
+sedan tonar namnet fram) och syns sedan likadant för alla. Ändras matcherna får omgången ett
+nytt namn. Gängets kupong får omgångens namn när den sparas (`namn` i kupongfilen, så också i
+Historik och som rubrik i förstasidans ruta), om den inte redan har ett. Namnet skrivs i samma
+proxy som matchanalysen och kommentaren (`POST /namn {"id": "<omgångens id>"}`,
+[worker/namn.mjs](worker/namn.mjs), prompten och modellen i [config/namn.js](config/namn.js))
+– av Claude (`claude-opus-5-5`, med Anthropics officiella SDK och `fallbacks: "default"`) när
+hemligheten `ANTHROPIC_API_KEY` finns, annars av DeepSeek som analysen. Proxyn läser omgången
+ur samma KV-namnrymd som tipsen och matchernas underlag ur den publicerade sajten
+(`data/match/<id>.json`: arena, odds, tabell, hemma- och bortafacit, form, mål mot xG, vila,
+tidigare möten), räknar fram en sammanfattning (lag som spelar flera gånger, största favorit,
+jämnaste match, chansen till alla rätt med modellens troligaste tecken) och tar med gängets
+senaste kupong och de tolv senaste namnen (`namn:senaste`), så att namnen skiftar. Tal i
+förklaringen måste finnas i underlaget. Namnet sparas för alltid per omgång och matcher
+(`namn:<promptversion>:<omgång>:<matcherna>`). Bygget skriver adressen i
+`data/kuponger.json` under `samtal.namn`. Lokalt `/api/namn` (med en av nycklarna i `.env`
+och `KUPONG_LOKALT=1`). Claudes nyckel läggs in en gång:
 
     npx wrangler@4.147.0 secret put ANTHROPIC_API_KEY --config worker/wrangler.toml
 

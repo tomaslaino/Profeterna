@@ -550,12 +550,14 @@ const couponName = (c) => c.name || (hasSamtal() && Samtal.covers(c) && Samtal.n
 // Omgångens kupong i korthet: siffran, en prick per match och vägen in.
 // Resten (väntat, modellens tips, GitHub) står på kupongsidan.
 function teaser(c, g) {
+  const name = couponName(c);
   const go = g.done
     ? `<a class="kp-btn primary" href="${newCouponHref()}">+ Ny kupong</a><a class="kp-btn" href="#kupong">Se kupongen</a>`
     : `<a class="kp-btn primary" href="#kupong">${g.started ? 'Följ kupongen' : 'Till kupongen'}</a>`;
   return `<div class="card kp-teaser${g.live ? ' is-live' : ''}">` +
-    `<div class="kp-teaser-txt"><p class="kp-eyebrow">${esc(couponName(c) || 'Omgångens kupong')}</p>` +
-    `<h2 class="page-title"><a href="#kupong">${esc(dateRange(g.first, g.last))}</a></h2>` +
+    // Namnet som rubrik och datumen ovanför; utan namn som förut.
+    `<div class="kp-teaser-txt"><p class="kp-eyebrow">${esc(name ? dateRange(g.first, g.last) : 'Omgångens kupong')}</p>` +
+    `<h2 class="page-title"><a href="#kupong">${esc(name || dateRange(g.first, g.last))}</a></h2>` +
     (g.started ? '' : `<span class="kp-line">Startar ${esc(fWeekdayTime.format(new Date(g.first)))}</span>`) + '</div>' +
     `<a class="kp-teaser-num" href="#kupong" aria-label="Till kupongen">${bigNumber(g)}</a>` +
     pearls(g.rows) +

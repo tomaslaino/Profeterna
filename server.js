@@ -84,11 +84,11 @@ function commentRoute(siteDir = OUT, store = fileStore(path.join(CACHE_DIR, 'kom
 }
 
 // POST /api/namn {id} – AI:ns namn på omgången som gänget tippar, ur
-// omgången i samtalets lagring och matcherna och tabellerna i siteDir.
+// omgången i samtalets lagring och matchernas underlag i siteDir.
 function nameRoute(siteDir = OUT, samtal = samtalFileStore(), store = fileStore(path.join(CACHE_DIR, 'namn'))) {
   return async (req, res) => {
     try {
-      const { nameRound, teamRanks } = await import('./worker/index.mjs');
+      const { nameRound } = await import('./worker/index.mjs');
       const read = (p) => {
         const f = path.join(siteDir, 'data', p);
         return fs.existsSync(f) ? JSON.parse(fs.readFileSync(f, 'utf8')) : null;
@@ -100,9 +100,9 @@ function nameRoute(siteDir = OUT, samtal = samtalFileStore(), store = fileStore(
           const cur = await samtal.get('samtal:aktuellt');
           return cur && cur.id === id ? cur : samtal.get(`samtal:${id}`);
         },
-        loadSite: async () => ({
-          matches: (read('matches.json') || {}).matches || [],
-          teams: teamRanks(['pl', 'ch', 'l1', 'l2'].map((c) => read(`teams/${c}.json`))),
+        loadSite: async (round) => ({
+          details: Object.fromEntries(round.matcher.map((x) => [String(x.id), /^\d{1,12}$/.test(x.id) ? read(`match/${x.id}.json`) : null]).filter(([, d]) => d)),
+          history: read('historik.json'),
         }),
       });
       res.status(r.status).json(r.body);

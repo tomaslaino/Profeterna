@@ -166,19 +166,43 @@
     kpStore(NAMN, n);
     if (!SM.data || nameKey(SM.data) !== k) return;
     // Byt bara rubriken, så att inget annat på sidan ritas om.
-    for (const el of document.querySelectorAll(`[data-sm-namn="${CSS.escape(k)}"]`)) el.outerHTML = eyebrow(SM.data, 'fram');
+    for (const el of document.querySelectorAll(`[data-sm-namn="${CSS.escape(k)}"]`)) el.outerHTML = nameBlock(SM.data, el.dataset.smDel, 'fram');
   }
 
   const nameOf = (s) => { const n = named(s); return n ? n.namn : null; };
 
-  // Namnet ovanför rubriken; vad det syftar på när man pekar på det.
-  function eyebrow(s, cls = '') {
+  // Namnet med vad det syftar på när man pekar på det. kind: 'ruta' =
+  // förstasidans ruta (tiden kvar ovanför, namnet som rubrik), 'sida' =
+  // omgångens sida (datumen ovanför, namnet som rubrik), 'rad' = bara raden
+  // ovanför rubriken. Tills namnet finns står "Omgångens kupong" där.
+  function nameBlock(s, kind, cls = '') {
     const n = named(s);
-    const key = s && info() && info().namn ? ` data-sm-namn="${esc(nameKey(s))}"` : '';
-    return n
-      ? `<p class="kp-eyebrow sm-namn ${cls}"${key}${n.syftar ? ` title="${esc(n.syftar)}"` : ''}>${esc(n.namn)}</p>`
-      : `<p class="kp-eyebrow"${key}>Omgångens kupong</p>`;
+    const key = info() && info().namn ? ` data-sm-namn="${esc(nameKey(s))}" data-sm-del="${kind}"` : '';
+    const hint = n && n.syftar ? ` title="${esc(n.syftar)}"` : '';
+    const name = n ? esc(n.namn) : 'Omgångens kupong';
+    const nameCls = n ? ` sm-namn ${cls}` : '';
+    if (kind === 'ruta') {
+      return `<div${key}>${countdown(s)}<h2 class="page-title${nameCls}"><a href="#kupong"${hint}>${name}</a></h2></div>`;
+    }
+    if (kind === 'sida') {
+      const k = kicks(s);
+      const range = esc(dateRange(Math.min(...k), Math.max(...k)));
+      return n
+        ? `<div${key}><p class="kp-eyebrow">${range}</p><h2 class="page-title${nameCls}"${hint}>${name}</h2></div>`
+        : `<div${key}><p class="kp-eyebrow">Omgångens kupong</p><h2 class="page-title">${range}</h2></div>`;
+    }
+    return `<p class="kp-eyebrow${nameCls}"${key}${hint}>${name}</p>`;
   }
+
+  // Tiden kvar att lämna in (till första avsparken; klockslaget när man
+  // pekar), eller att det är dags för uppgörelsen.
+  function countdown(s) {
+    const stop = Math.min(...kicks(s));
+    const ms = stop - Date.now();
+    if (s.visas || ms <= 0) return '<p class="kp-eyebrow">Dags för uppgörelsen</p>';
+    return `<p class="kp-eyebrow sm-kvar${ms < HOUR ? ' snart' : ''}" title="${esc(`Senast ${fWeekdayTime.format(new Date(stop))}`)}"><span data-kvar="${stop}">${left(ms)}</span> kvar</p>`;
+  }
+
 
   // Frågar tjänsten var 20:e sekund och ritar om när omgången ändrats, t.ex.
   // när någon lämnat in – under Omgången, och på förstasidan medan tipsen
@@ -226,11 +250,12 @@
   // ---------- omgången ----------
 
   // eyebrow: texten ovanför rubriken, annars omgångens namn.
+  // label: texten ovanför rubriken – utan den omgångens namn som rubrik.
   function head(s, label, actions = '') {
     const k = s ? kicks(s) : [];
-    return '<div class="kp-head"><div>' +
-      (label ? `<p class="kp-eyebrow">${esc(label)}</p>` : eyebrow(s)) +
-      `<h2 class="page-title">${s ? esc(dateRange(Math.min(...k), Math.max(...k))) : 'Omgångens kupong'}</h2></div>` +
+    return '<div class="kp-head">' + (s && !label ? nameBlock(s, 'sida') : '<div>' +
+      `<p class="kp-eyebrow">${esc(label || 'Omgångens kupong')}</p>` +
+      `<h2 class="page-title">${s ? esc(dateRange(Math.min(...k), Math.max(...k))) : 'Omgångens kupong'}</h2></div>`) +
       `<div class="kp-actions">${actions}</div></div>`;
   }
 
@@ -930,7 +955,7 @@
       '<div class="chips" id="sm-comps" role="group" aria-label="Tävling">' + comps.map((c) =>
         `<button type="button" data-comp="${c.id}" title="${esc(c.name)}" aria-pressed="${c.id === SM.comp}">${esc(c.short)}</button>`).join('') + '</div></div>';
     $('#coupon').innerHTML = viewNav('omgang') + roundSteps(1) +
-      '<div class="kp-head"><div>' + (edit ? eyebrow(s) : '<p class="kp-eyebrow">Omgångens kupong</p>') +
+      '<div class="kp-head"><div>' + (edit ? nameBlock(s, 'rad') : '<p class="kp-eyebrow">Omgångens kupong</p>') +
       `<h2 class="page-title">${edit ? 'Ändra matcherna' : 'Välj matcher'}</h2></div>` +
       '<div class="kp-actions"><a class="kp-btn" href="#kupong">Avbryt</a></div></div>' +
       Papper.builder({
@@ -1054,8 +1079,8 @@
     return d < 3 && h % 24 ? `${plural(d, 'dag', 'dagar')} ${h % 24} tim` : plural(d, 'dag', 'dagar');
   }
 
-  // Rutan på förstasidan, med så lite som möjligt: tiden kvar att lämna in
-  // (till första avsparken; klockslaget när man pekar), vilka som är inne och
+  // Rutan på förstasidan, med så lite som möjligt: omgångens namn som rubrik
+  // (som AI:n gav den), tiden kvar att lämna in ovanför, vilka som är inne och
   // en knapp. När allas tips visas är det dags för uppgörelsen, och när
   // gängets kupong är gjord tar den över (kupong.js).
   function teaser() {
@@ -1063,15 +1088,10 @@
     if (!active()) return '';
     const v = me();
     const done = submitted(s, v);
-    const stop = Math.min(...kicks(s));
-    const open = !s.visas && Date.now() < stop;
+    const open = !s.visas && Date.now() < Math.min(...kicks(s));
     const go = !open ? 'Till uppgörelsen' : done ? 'Se de andras tips' : 'Fyll i kupongen';
-    const ms = stop - Date.now();
-    const title = open
-      ? `<a href="#kupong" class="sm-kvar${ms < HOUR ? ' snart' : ''}" title="${esc(`Senast ${fWeekdayTime.format(new Date(stop))}`)}"><span data-kvar="${stop}">${left(ms)}</span> kvar</a>`
-      : '<a href="#kupong">Dags för uppgörelsen</a>';
     return '<div class="card sm-teaser">' +
-      `<div>${eyebrow(s)}<h2 class="page-title">${title}</h2></div>` +
+      nameBlock(s, 'ruta') +
       // Porträtten: ring i egen färg och bock = inne, grått = inte inne,
       // guldring = du.
       '<div class="sm-faces">' + s.gang.map((g) => {

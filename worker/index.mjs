@@ -278,7 +278,7 @@ export default {
           get: (k) => kv.get(k, 'json'),
           put: (k, v, ttl) => kv.put(k, JSON.stringify(v), ttl ? { expirationTtl: ttl } : {}),
         } : null;
-        const r = await nameRound(id, { env, store, loadRound: (rid) => kvRound(kv, rid), loadSite: () => siteRound(site) });
+        const r = await nameRound(id, { env, store, loadRound: (rid) => kvRound(kv, rid), loadSite: (round) => siteRound(site, round) });
         return json(r.status, r.body);
       }
       const store = kv ? {
@@ -303,21 +303,18 @@ async function kvRound(kv, id) {
   return kv.get(`samtal:${id}`, 'json');
 }
 
-// Matcherna (modellens odds) och tabellerna ur den publicerade sajten.
-async function siteRound(site) {
+// Underlaget för omgångens matcher (data/match/<id>.json) och gängets
+// kuponghistorik ur den publicerade sajten. En match utan underlag får bara
+// lagen och avsparken.
+async function siteRound(site, round) {
   const get = async (p) => {
     const res = await fetch(`${site}/data/${p}?t=${Date.now()}`);
     if (!res.ok) throw new Error(`HTTP ${res.status}`);
     return res.json();
   };
-  const [m, ...tables] = await Promise.all([get('matches.json'), ...['pl', 'ch', 'l1', 'l2'].map((c) => get(`teams/${c}.json`).catch(() => null))]);
-  return { matches: m.matches || [], teams: teamRanks(tables) };
-}
-
-// Tabellplaceringen per lag: [{name, comp, rank, of}].
-export function teamRanks(tables) {
-  return tables.filter((t) => t && Array.isArray(t.teams))
-    .flatMap((t) => t.teams.map((x) => ({ name: x.name, comp: t.comp, rank: x.rank, of: t.teams.length })));
+  const ids = round.matcher.map((x) => String(x.id)).filter((x) => /^\d{1,12}$/.test(x));
+  const [history, ...list] = await Promise.all([get('historik.json').catch(() => null), ...ids.map((x) => get(`match/${x}.json`).catch(() => null))]);
+  return { details: Object.fromEntries(ids.map((x, i) => [x, list[i]]).filter(([, d]) => d)), history };
 }
 
 async function siteHistory(site) {
