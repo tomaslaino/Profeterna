@@ -39,6 +39,7 @@ const state = {
   view: VIEWS[0].id,
   pf: { q: '', team: '', pos: '', played: true, sort: 'g', dir: -1, limit: 60, cols: 'oversikt' },
   tf: { cols: 'tabell', sort: 'rank', dir: 1 },
+  mtab: { team: null, player: null }, // senast valda flik i lag- och spelarrutan
 };
 
 function esc(s) {
@@ -840,9 +841,10 @@ function teamsView(dv, P, T) {
 // ---------- spelarkort och lagkort (dialog) ----------
 
 // Alla statistikrutor byggs av samma delar, så att de ser likadana ut:
-// huvudet (märke, namn, underrad), nyckeltalen i en list, avsnitt med en
-// rubrik och siffror i jämna kolumner, mätare för andelar och chanser, och
-// sist knappar. Källraderna syns bara med Visa detaljer, som på sidan.
+// huvudet (märke, namn, underrad), nyckeltalen i en list, flikar, avsnitt
+// med en rubrik och siffror i jämna kolumner, mätare för andelar och
+// chanser, och sist knappar. Källraderna syns bara med Visa detaljer, som
+// på sidan.
 
 function dialog() {
   let d = document.getElementById('dv-modal');
@@ -852,8 +854,20 @@ function dialog() {
     d.className = 'dv-modal';
     d.addEventListener('click', (e) => {
       if (e.target === d || e.target.closest('[data-close]')) d.close();
+      const t = e.target.closest('[data-mtab]');
+      if (t) { selectMtab(t.dataset.mtab); return; }
       const p = e.target.closest('[data-pid]');
       if (p && d.contains(p)) openPlayer(p.dataset.pid);
+    });
+    // Piltangenterna mellan flikarna.
+    d.addEventListener('keydown', (e) => {
+      const t = e.target.closest('[data-mtab]');
+      if (!t || !['ArrowLeft', 'ArrowRight', 'Home', 'End'].includes(e.key)) return;
+      const all = [...t.parentElement.children];
+      const i = all.indexOf(t);
+      const j = e.key === 'Home' ? 0 : e.key === 'End' ? all.length - 1 : (i + (e.key === 'ArrowRight' ? 1 : -1) + all.length) % all.length;
+      e.preventDefault();
+      selectMtab(all[j].dataset.mtab, true);
     });
     document.body.appendChild(d);
   }
@@ -866,7 +880,51 @@ function showModal(html) {
   if (!d.open) d.showModal();
   d.scrollTop = 0;
   const box = d.querySelector('.dv-mbox');
-  if (box) box.scrollTop = 0;
+  if (!box) return;
+  box.scrollTop = 0;
+  // Flikarna fastnar överst när man rullar; först då får de bakgrund.
+  const tabs = box.querySelector('.dv-mtabs');
+  if (tabs) box.addEventListener('scroll', () => tabs.classList.toggle('stuck', box.scrollTop > tabsTop(box)), { passive: true });
+}
+
+// Var flikarna står när rutan inte är rullad: ovanför den synliga fliken.
+function tabsTop(box) {
+  const pane = box.querySelector('.dv-mpane:not([hidden])');
+  return pane ? pane.offsetTop - box.querySelector('.dv-mtabs').offsetHeight - parseFloat(getComputedStyle(box).paddingTop) : 0;
+}
+
+// Flikarna: [id, etikett (html), innehåll (html), rubrik om fliken står
+// ensam]. Tomma flikar faller bort, och blir bara en kvar står den som ett
+// vanligt avsnitt. Fliken man senast valde väljs igen (per sorts ruta), så
+// att man kan gå från lag till lag och stanna i Truppen; pick väljer en
+// bestämd flik utan att komma ihåg den.
+function mtabs(kind, label, panes, pick) {
+  const xs = panes.filter((x) => x && x[2]);
+  if (xs.length < 2) return xs.map(([, name, html, title]) => msec(title || name, html)).join('');
+  const want = pick || state.mtab[kind];
+  const cur = xs.some(([id]) => id === want) ? want : xs[0][0];
+  return `<div class="dv-mtabs" role="tablist" aria-label="${esc(label)}" data-kind="${kind}">${xs.map(([id, name]) =>
+    `<button type="button" role="tab" id="dv-mtab-${id}" data-mtab="${id}" aria-controls="dv-mpane-${id}" aria-selected="${id === cur}"${id === cur ? '' : ' tabindex="-1"'}>${name}</button>`).join('')}</div>` +
+    xs.map(([id, , html]) => `<div class="dv-mpane" id="dv-mpane-${id}" role="tabpanel" aria-labelledby="dv-mtab-${id}"${id === cur ? '' : ' hidden'}>${html}</div>`).join('');
+}
+
+function selectMtab(id, focus) {
+  const box = dialog().querySelector('.dv-mbox');
+  const list = box && box.querySelector('.dv-mtabs');
+  if (!list) return;
+  state.mtab[list.dataset.kind] = id;
+  // Har man rullat förbi flikarna börjar den nya fliken överst.
+  const top = tabsTop(box);
+  const past = box.scrollTop > top;
+  for (const b of list.children) {
+    const on = b.dataset.mtab === id;
+    b.setAttribute('aria-selected', String(on));
+    b.tabIndex = on ? 0 : -1;
+    if (on && focus) b.focus({ preventScroll: true });
+    if (on) b.scrollIntoView({ block: 'nearest', inline: 'nearest' });
+  }
+  for (const p of box.querySelectorAll('.dv-mpane')) p.hidden = p.id !== `dv-mpane-${id}`;
+  if (past) box.scrollTop = top;
 }
 
 const divName = () => state.data.divisions.find((x) => x.id === state.div).name;
@@ -905,10 +963,11 @@ function meters(list) {
   }).join('')}</ul>`;
 }
 
-// Ett avsnitt: rubrik med valfri länk till höger, innehåll och källrad.
+// Ett avsnitt: rubrik med valfri länk till höger, innehåll och källrad. Utan
+// rubrik när fliken redan säger vad det är.
 function msec(title, body, { link, src } = {}) {
-  return `<section class="dv-msec"><h5 class="dv-h5"><span>${esc(title)}</span>` +
-    (link ? `<a class="dv-mlink" href="${esc(link[0])}">${esc(link[1])}</a>` : '') + `</h5>${body}` +
+  return '<section class="dv-msec">' + (title ? `<h5 class="dv-h5"><span>${esc(title)}</span>` +
+    (link ? `<a class="dv-mlink" href="${esc(link[0])}">${esc(link[1])}</a>` : '') + '</h5>' : '') + body +
     (src && showSources() ? `<p class="dv-msrc">${src}</p>` : '') + '</section>';
 }
 
@@ -950,6 +1009,9 @@ function openPlayer(id) {
     }
   }
 
+  // Flikarna: Matcherna, sedan Anfall och Försvar (målvakten: I målet) och
+  // sist Fantasy. Nyckeltalen står ovanför och följer med.
+  const panes = [];
   if (p.noStats) {
     html += `<p class="dv-calm">${unknown('Ingen statistik hos ESPN i år')}</p>`;
   } else {
@@ -961,7 +1023,7 @@ function openPlayer(id) {
         : [cell(p.g, { strong: true }), 'Mål'],
       mv ? [cell(p.gc), 'Insläppta'] : [cell(p.a), 'Assist'],
     ]);
-    html += msec('Matcherna', facts([
+    panes.push(['matcher', 'Matcherna', msec(null, facts([
       p.rt != null ? [p.rn < TH.rated ? unsure(num(p.rt, 1), 'Osäker siffra: färre än tre matcher med betyg') : `<b>${num(p.rt, 1)}</b>`,
         `Betyg i ${p.rn} ${p.rn === 1 ? 'match' : 'matcher'}`, 'Snittet av spelarens betyg från 365Scores, 1–10. En vanlig insats ger runt 6,7'] : null,
       p.rt != null && p.rb ? [cell(p.rb), 'Bäst på plan', 'Matcher där spelaren fick högst betyg av alla på planen'] : null,
@@ -971,17 +1033,17 @@ function openPlayer(id) {
       [p.yc || p.rc ? cardsVal(p) : cell(p.yc == null ? null : 0), 'Kort'],
       [cell(p.fs), 'Fälld', 'Gånger spelaren har blivit fälld eller utsatt för en annan förseelse som domaren blåst för'],
       [cell(p.fc), 'Regelbrott', 'Regelbrott spelaren har begått som domaren blåst för'],
-    ]));
+    ]))]);
     if (mv) {
-      html += msec('I målet', facts([
+      panes.push(['malet', 'I målet', msec(null, facts([
         [cell(p.sv), 'Räddningar'],
         [p.sv != null && p.gc != null ? cell(p.sv + p.gc) : cell(null), 'Skott på mål'],
         [p.gc != null && p.app ? num(p.gc / p.app, 1) : '–', 'Insläppta per match'],
         p.cs != null ? [cell(p.cs), 'Hållna nollor'] : null,
-      ]));
+      ]))]);
     } else {
       const conv = p.sh ? pct(p.g / p.sh) : '–';
-      html += msec('Mål och skott', facts([
+      let att = msec('Mål och skott', facts([
         full ? [num(per90(goals90(p), p), 2), 'Mål per 90 min'] : [p.app ? num(p.g / p.app, 2) : '–', 'Mål per match'],
         [cell(p.sh), 'Skott'],
         [cell(p.sot), 'Skott på mål'],
@@ -992,7 +1054,7 @@ function openPlayer(id) {
       // Målens betydelse och sort ur matchrapporterna – sorten bara där den finns.
       if (p.g && p.gw != null) {
         const pens = (p.gpen || 0) + (p.pmiss || 0);
-        html += msec('Målen', facts([
+        att += msec('Målen', facts([
           [cell(p.gw, { strong: true }), 'Segermål', 'Mål som avgjorde en vunnen match: målet som gav laget den ledning det sedan aldrig tappade'],
           [cell(p.gpts), 'Poäng åt laget', 'Poängen laget hade tappat utan spelarens mål'],
           [cell(p.g1), 'Matchens första'],
@@ -1004,35 +1066,37 @@ function openPlayer(id) {
           p.gsub ? [cell(p.gsub), 'Som inhoppare'] : null,
         ]));
       } else if (p.pmiss) {
-        html += msec('Målen', facts([['0 av ' + p.pmiss, 'Straffar', 'Straffmål av slagna straffar']]));
-      }
-      if (p.tk != null) {
-        html += msec('Försvar', facts([
-          [cell(p.tk), 'Tacklingar'],
-          [cell(p.cbi), 'Rensningar m.m.', 'Rensningar, täckningar och brytningar'],
-          [cell(p.rec), 'Bollvinster', 'Lösa bollar spelaren har tagit hand om åt laget'],
-          p.min >= TH.min && p.cbi != null ? [num(per90(p.tk + p.cbi, p), 1), 'Insatser per 90 min', 'Tacklingar, rensningar, täckningar och brytningar per 90 minuters speltid'] : null,
-        ]));
+        att += msec('Målen', facts([['0 av ' + p.pmiss, 'Straffar', 'Straffmål av slagna straffar']]));
       }
       if (p.xg != null) {
-        html += msec('Chanserna', facts([
+        att += msec('Chanserna', facts([
           [num(p.xg, 1), 'xG', 'Förväntade mål: hur många mål spelarens skott brukar ge'],
           [delta(dxgOf(p), { d: 1 }), 'Mål mot xG', 'Gjorda mål minus xG – plus är fler mål än chanserna brukar ge'],
           [num(p.xa, 1), 'xA', 'Förväntade assist: hur många mål passningarna före lagkamraternas skott brukar ge'],
           full ? [num(per90(p.xg, p), 2), 'xG per 90 min'] : null,
         ]));
       }
+      panes.push(['anfall', 'Anfall', att]);
+      if (p.tk != null) {
+        panes.push(['forsvar', 'Försvar', msec(null, facts([
+          [cell(p.tk), 'Tacklingar'],
+          [cell(p.cbi), 'Rensningar m.m.', 'Rensningar, täckningar och brytningar'],
+          [cell(p.rec), 'Bollvinster', 'Lösa bollar spelaren har tagit hand om åt laget'],
+          p.min >= TH.min && p.cbi != null ? [num(per90(p.tk + p.cbi, p), 1), 'Insatser per 90 min', 'Tacklingar, rensningar, täckningar och brytningar per 90 minuters speltid'] : null,
+        ]))]);
+      }
     }
   }
   if (p.cost != null) {
-    html += msec('Fantasy Premier League', facts([
+    panes.push(['fantasy', 'Fantasy', msec(null, facts([
       [p.sel == null ? '–' : `${num(p.sel, p.sel < 10 ? 1 : 0)} %`, 'Vald av', 'Andel av alla lag i Fantasy Premier League som har med spelaren'],
       [cell(p.fpts), 'Poäng'],
       [cell(p.bonus), 'Bonuspoäng'],
       p.pos === 'B' && p.cs != null ? [cell(p.cs), 'Hållna nollor'] : null,
       p.pen === 1 || p.pen === 2 ? [p.pen === 1 ? 'Förstaval' : 'Andraval', 'Straffskytt'] : null,
-    ]));
+    ])), 'Fantasy Premier League']);
   }
+  html += mtabs('player', 'Om spelaren', panes);
   html += mfoot([
     `ESPN · ligamatcher ${esc(state.data.season)} · hämtat ${when(P.source.fetchedAt)}`,
     p.min != null && P.fpl ? `Speltid, xG och FPL: Fantasy Premier League · hämtat ${when(P.fpl.fetchedAt)}` : null,
@@ -1042,7 +1106,7 @@ function openPlayer(id) {
   showModal(html);
 }
 
-async function openTeam(id) {
+async function openTeam(id, pick) {
   const P = state.players.get(state.div);
   if (!P || P.unknown) return;
   const T = await loadTeams(state.div);
@@ -1060,42 +1124,58 @@ async function openTeam(id) {
     [t.avgAge == null ? '–' : num(t.avgAge, 1), 'Snittålder', 'Varje spelare räknas en gång per match den spelat'],
     [cell(t.used), 'Använda spelare'],
   ]);
-  if (t.topScorer && t.topScorer.g && t.goals) {
-    const ts = squad.find((p) => p.name === t.topScorer.name);
-    html += meters([{ label: `<b>${esc(t.topScorer.name)}</b>`, sub: `Bäste målskytt · ${t.topScorer.g} av ${t.goals} mål`,
-      v: t.topScorerShare, text: pct(t.topScorerShare), pid: ts && ts.id }]);
-  }
-
+  // Flikarna: Spelet, Truppen och Frånvaro. Poängen, målen och truppens
+  // storlek står ovanför och följer med.
   const tt = T && !T.unknown ? T.teams.find((x) => x.espnId === id) : null;
+  let game = '';
   if (tt && tt.fd && (tt.fd.xg || tt.fd.mkt)) {
     const x = tt.fd.xg;
     const m = tt.fd.mkt;
-    html += msec('Spelet hittills', facts([
-      tt.str != null ? [delta(tt.str, { d: 2, dead: 0.005 }), 'Styrka enligt modellen', 'Väntad målskillnad per match mot ett snittlag i divisionen, med motståndet inräknat'] : null,
-      x ? [num(x.f / x.n, 2), 'xG per match', 'Förväntade mål per match – hur bra chanser laget skapar'] : null,
-      x ? [num(x.a / x.n, 2), 'xG mot per match', 'Motståndarnas förväntade mål per match'] : null,
-      x ? [delta(x.pts - x.xp, { d: 1 }), 'Poäng mot chanserna', `${x.pts} poäng, ${num(x.xp, 1)} enligt chanserna (xG)`] : null,
-      x ? [pct(x.xd / x.n), 'Kryss enligt chanserna', `${x.d} kryss på ${x.n} matcher`] : null,
-      m ? [delta(m.pts - m.xp, { d: 1 }), 'Poäng mot oddsen', `${m.pts} poäng, ${num(m.xp, 1)} väntade enligt oddsen vid avspark`] : null,
-    ]), { link: [viewHref(state.div, 'lag'), 'Alla lag'], src: `football-data.co.uk · ${tt.fd.n} matcher t.o.m. ${esc(dateLabel(T.source.stats.last))}` });
+    const link = [viewHref(state.div, 'lag'), 'Alla lag'];
+    const src = `football-data.co.uk · ${tt.fd.n} matcher t.o.m. ${esc(dateLabel(T.source.stats.last))}`;
+    const judged = tt.str != null || m;
+    if (x) {
+      game += msec('Chanserna', facts([
+        [num(x.f / x.n, 2), 'xG per match', 'Förväntade mål per match – hur bra chanser laget skapar'],
+        [num(x.a / x.n, 2), 'xG mot per match', 'Motståndarnas förväntade mål per match'],
+        [delta(x.pts - x.xp, { d: 1 }), 'Poäng mot chanserna', `${x.pts} poäng, ${num(x.xp, 1)} enligt chanserna (xG)`],
+        [pct(x.xd / x.n), 'Kryss enligt chanserna', `${x.d} kryss på ${x.n} matcher`],
+      ]), { link, src: judged ? null : src });
+    }
+    if (judged) {
+      game += msec(tt.str != null && m ? 'Modellen och oddsen' : m ? 'Oddsen' : 'Modellen', facts([
+        tt.str != null ? [delta(tt.str, { d: 2, dead: 0.005 }), 'Styrka enligt modellen', 'Väntad målskillnad per match mot ett snittlag i divisionen, med motståndet inräknat'] : null,
+        m ? [delta(m.pts - m.xp, { d: 1 }), 'Poäng mot oddsen', `${m.pts} poäng, ${num(m.xp, 1)} väntade enligt oddsen vid avspark`] : null,
+      ]), { link: x ? null : link, src });
+    }
   }
 
-  const av = P.availability && !P.availability.unknown ? P.availability[id] : null;
-  if (av && !av.unknown) {
-    html += msec('Skador och avstängningar', av.players.length
-      ? `<ul class="dv-inj">${av.players.map((x) => `<li class="${x.status === 'tveksam' ? 'doubt' : 'out'}">` +
-        `<span><b>${esc(x.name)}</b> <small>${esc(x.pos || '')}</small></span><span class="dv-inj-st">${esc(x.status.charAt(0).toUpperCase() + x.status.slice(1))}</span>` +
-        `${x.news ? `<span class="dv-inj-what">${esc(x.news)}</span>` : ''}</li>`).join('')}</ul>`
-      : '<p class="dv-calm">Inga rapporterade.</p>', { src: `Fantasy Premier League · hämtat ${when(av.source.fetchedAt)}` });
+  let scorer = '';
+  if (t.topScorer && t.topScorer.g && t.goals) {
+    const ts = squad.find((p) => p.name === t.topScorer.name);
+    scorer = meters([{ label: `<b>${esc(t.topScorer.name)}</b>`, sub: `Bäste målskytt · ${t.topScorer.g} av ${t.goals} mål`,
+      v: t.topScorerShare, text: pct(t.topScorerShare), pid: ts && ts.id }]);
   }
-
   const cov = t.coverage;
-  html += msec('Truppen', '<div class="table-wrap dv-tw"><table class="dv-squad"><thead><tr><th class="c">Pos</th><th class="c">#</th><th>Spelare</th>' +
+  const squadHtml = msec(null, scorer + '<div class="table-wrap dv-tw"><table class="dv-squad"><thead><tr><th class="c">Pos</th><th class="c">#</th><th>Spelare</th>' +
     '<th class="num hide-xs">Ålder</th><th class="num">M</th><th class="num">Mål</th><th class="num">Ass</th><th class="num">Gul</th><th class="num">Röd</th></tr></thead><tbody>' +
     squad.map((p) => `<tr class="dv-prow${p.app ? '' : ' idle'}" data-pid="${esc(p.id)}" tabindex="0"><td class="c">${esc(p.pos || '–')}</td><td class="c muted">${esc(p.jersey || '')}</td>` +
       `<td>${esc(p.name)}<small class="dv-natline">${esc(natSv(p.nat) || '')}</small></td><td class="num hide-xs">${p.age ?? '–'}</td>` +
       `<td class="num">${cell(p.app)}</td><td class="num">${cell(p.g, { strong: true })}</td><td class="num">${cell(p.a)}</td><td class="num">${cell(p.yc)}</td><td class="num">${cell(p.rc)}</td></tr>`).join('') +
     '</tbody></table></div>', { src: `ESPN · hämtat ${when(P.source.fetchedAt)}${cov.behind ? ` · ${cov.covered} av ${cov.matches} matcher införda` : ''}` });
+
+  const av = P.availability && !P.availability.unknown ? P.availability[id] : null;
+  const away = av && !av.unknown ? msec(null, av.players.length
+    ? `<ul class="dv-inj">${av.players.map((x) => `<li class="${x.status === 'tveksam' ? 'doubt' : 'out'}">` +
+      `<span><b>${esc(x.name)}</b> <small>${esc(x.pos || '')}</small></span><span class="dv-inj-st">${esc(x.status.charAt(0).toUpperCase() + x.status.slice(1))}</span>` +
+      `${x.news ? `<span class="dv-inj-what">${esc(x.news)}</span>` : ''}</li>`).join('')}</ul>`
+    : '<p class="dv-calm">Inga rapporterade.</p>', { src: `Fantasy Premier League · hämtat ${when(av.source.fetchedAt)}` }) : '';
+
+  html += mtabs('team', 'Om laget', [
+    ['spelet', 'Spelet', game, 'Spelet hittills'],
+    ['trupp', 'Truppen', squadHtml],
+    ['franvaro', `Frånvaro${away && av.players.length ? ` <small>${av.players.length}</small>` : ''}`, away, 'Skador och avstängningar'],
+  ], pick);
   showModal(html);
 }
 
@@ -1329,7 +1409,7 @@ function wire() {
   // Från spelarkortet till lagets trupp.
   document.addEventListener('click', (e) => {
     const b = e.target.closest('[data-team-open]');
-    if (b) openTeam(b.dataset.teamOpen);
+    if (b) openTeam(b.dataset.teamOpen, 'trupp');
   });
 }
 

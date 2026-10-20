@@ -86,8 +86,9 @@
 .page-title:has(+ .dv-views) { margin-bottom: 16px; }
 /* Menyerna är flikar, inga piller: ord med ett streck under det valda, som i
    toppbaren. Divisionerna stryks under i sin egen färg (--c sätts på knappen),
-   Spelare | Lag och kolumngrupperna i guld. Divisionerna och kolumngrupperna
-   står på en hårlinje; Spelare | Lag står fritt under sidrubriken. */
+   Spelare | Lag, kolumngrupperna och flikarna i lag- och spelarrutan i guld.
+   Divisionerna, kolumngrupperna och rutans flikar står på en hårlinje;
+   Spelare | Lag står fritt under sidrubriken. */
 .dv-divs,
 .dv-seg {
   display: flex;
@@ -105,7 +106,8 @@
 .dv-seg::-webkit-scrollbar { display: none; }
 .dv-divs button,
 .dv-views a,
-.dv-seg button {
+.dv-seg button,
+.dv-mtabs button {
   --c: var(--gold, var(--accent));
   position: relative;
   flex: none;
@@ -128,7 +130,8 @@
 .dv-seg button { padding-bottom: 10px; font-size: 13.5px; }
 .dv-divs button::after,
 .dv-views a::after,
-.dv-seg button::after {
+.dv-seg button::after,
+.dv-mtabs button::after {
   content: "";
   position: absolute;
   left: 0;
@@ -142,16 +145,20 @@
 }
 .dv-divs button:hover,
 .dv-views a:hover,
-.dv-seg button:hover { color: var(--fg); background: none; }
+.dv-seg button:hover,
+.dv-mtabs button:hover { color: var(--fg); background: none; }
 .dv-divs button[aria-pressed="true"],
 .dv-views a[aria-current="page"],
-.dv-seg button[aria-pressed="true"] { color: var(--bone, var(--fg)); }
+.dv-seg button[aria-pressed="true"],
+.dv-mtabs button[aria-selected="true"] { color: var(--bone, var(--fg)); }
 .dv-divs button[aria-pressed="true"]::after,
 .dv-views a[aria-current="page"]::after,
-.dv-seg button[aria-pressed="true"]::after { transform: scaleX(1); }
+.dv-seg button[aria-pressed="true"]::after,
+.dv-mtabs button[aria-selected="true"]::after { transform: scaleX(1); }
 .dv-divs button:focus-visible,
 .dv-views a:focus-visible,
-.dv-seg button:focus-visible { outline-offset: 3px; border-radius: 3px; }
+.dv-seg button:focus-visible,
+.dv-mtabs button:focus-visible { outline-offset: 3px; border-radius: 3px; }
 
 .dv-view { min-height: 40vh; }
 .dv-sechead { margin: 26px 0 12px; }
@@ -264,7 +271,7 @@ table.dv-league td, table.dv-league th,
 table.dv-players td, table.dv-players th,
 table.dv-teams td, table.dv-teams th,
 table.dv-squad td, table.dv-squad th { padding: 8px 9px; vertical-align: middle; }
-table.dv-players td, table.dv-players th { padding-left: 7px; padding-right: 7px; }
+table.dv-players td, table.dv-players th { padding-left: 6px; padding-right: 6px; }
 .dv-view > .src-line { font-size: 12px; color: var(--muted); margin: -4px 2px 16px; }
 table.dv-league .num, table.dv-players .num, table.dv-teams .num, table.dv-squad .num { text-align: right; font-variant-numeric: tabular-nums; }
 table.dv-league .c, table.dv-players .c, table.dv-squad .c { text-align: center; }
@@ -406,9 +413,13 @@ table.dv-teams .team { font-weight: 600; white-space: nowrap; }
    knapparna sist. divisioner.js bygger dem (mhead, kpis, msec, facts,
    meters, mfoot). */
 
+/* Rutan står en bit ned från överkanten i stället för mitt på skärmen: när
+   man byter flik eller går från lag till spelare står huvudet och flikarna
+   kvar, och bara nederkanten flyttar sig. */
 dialog.dv-modal {
   width: min(640px, calc(100vw - 24px));
   max-height: min(88vh, 920px);
+  margin: max(12px, 6vh) auto auto;
   padding: 0;
   border: 1px solid var(--pill-line, var(--border));
   border-radius: 20px;
@@ -511,8 +522,38 @@ dialog.dv-modal::backdrop { background: rgba(4, 9, 18, 0.62); backdrop-filter: b
 }
 .dv-kpis .dv-zero, .dv-kpis .dv-nil { color: var(--muted); opacity: 1; }
 
+/* flikarna: under nyckeltalen, över hela rutans bredd. De fastnar överst när
+   man rullar och får bakgrund först då (.stuck) – annars syns de som ett
+   band mot rutans toning. Bakgrunden är toningens översta bit. */
+.dv-mtabs {
+  position: sticky;
+  top: -26px;
+  z-index: 2;
+  display: flex;
+  gap: 26px;
+  margin: 18px -28px 0;
+  padding: 0 28px;
+  overflow-x: auto;
+  scrollbar-width: none;
+  box-shadow: inset 0 -1px 0 var(--border);
+}
+.dv-mtabs::-webkit-scrollbar { display: none; }
+.dv-mtabs.stuck { background: var(--glass-hi, var(--card)) 0 0 / 100% min(88vh, 920px) no-repeat; }
+.dv-mtabs button { padding-top: 14px; }
+/* antalet i fliken, t.ex. Frånvaro 3 */
+.dv-mtabs button small {
+  margin-left: 5px;
+  font-size: 12.5px;
+  font-weight: 650;
+  color: var(--muted);
+  font-variant-numeric: tabular-nums;
+}
+.dv-mpane > .dv-msec:first-child { margin-top: 22px; }
+.dv-mpane > .dv-msec:first-child > .dv-meters:first-child { margin-top: 0; }
+
 /* avsnitten: rubriken med en linje ut till en valfri länk */
 .dv-msec { margin-top: 24px; }
+.dv-h5 + .dv-msec { margin-top: 0; }
 .dv-msec > .dv-h5 { display: flex; align-items: center; gap: 12px; margin: 0 0 12px; }
 .dv-msec > .dv-h5::after { content: ""; order: 1; flex: 1; height: 1px; background: var(--border); }
 .dv-mlink {
@@ -590,6 +631,8 @@ button.dv-meter-row:hover { background: var(--hair); }
 
 @media (max-width: 520px) {
   .dv-mbox { padding: 20px 16px 18px; }
+  .dv-mtabs { top: -20px; gap: 22px; margin: 14px -16px 0; padding: 0 16px; }
+  .dv-mtabs button { padding-top: 12px; font-size: 14.5px; }
   .dv-mclose { top: 14px; right: 14px; }
   .dv-mhead { gap: 13px; margin-right: 42px; margin-bottom: 18px; }
   .dv-mhead h3 { font-size: 21px; }
