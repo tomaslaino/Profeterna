@@ -2,8 +2,9 @@
 
 // Spelardata per division och per lag, ur ESPN-trupperna (src/playersources.js),
 // FPL (bara Premier League: skadelistan och speltid, xG/xA, försvarsspel, pris
-// och poäng per spelare) och ESPN:s matchrapporter (målen i alla fyra ligor,
-// speltiden i Championship, League One och League Two). Allt räknas ur cachen vid bygget; inget här styr prognoserna.
+// och poäng per spelare), ESPN:s matchrapporter (målen i alla fyra ligor,
+// speltiden i Championship, League One och League Two) och 365Scores (betygen
+// per match). Allt räknas ur cachen vid bygget; inget här styr prognoserna.
 //
 // Principer som i resten av appen: spelare utan statistik är okända, inte
 // nollor, och topplistor med kvoter (mål per skott, räddningsprocent) kräver
@@ -28,6 +29,8 @@ const TOP = 20;
 const MIN_SHOTS_CONVERSION = 10; // mål per skott: minst så många skott
 const MIN_SHARE_KEEPER = 0.5; // målvakter: minst halva lagets matcher
 const MIN_MINUTES_P90 = 270; // per 90 minuter: minst tre hela matcher
+const MIN_RATED = 3; // snittbetyg: minst så många betygsatta matcher
+const MIN_SHARE_RATED = 0.5; // topplistan: betyg i minst halva lagets betygsatta matcher
 const HOME_NATION = 'England';
 
 // Bygget frågar efter trupperna en gång per matchsida – cachefilerna läses
@@ -241,6 +244,88 @@ function minutesIndex(compId, teams) {
   return { map: out, matched: out.size, of, matches: Object.keys(c.data.matches).length, fetchedAt: c.fetchedAt };
 }
 
+// Betygen ur 365Scores (s365_ratings_<liga>): snittet av spelarens betyg i
+// ligans matcher i år (rt) och hur många matcher det bygger på (rn), plus hur
+// ofta spelaren fick matchens högsta betyg (rb, delat räknas). Gäller alla
+// matcher 365Scores har betyg för, inte bara de ESPN-truppen hunnit föra in.
+// Spelarna kopplas till ESPN-truppen inom laget på hela namnet, annars
+// efternamn och förnamnets initial, annars tröjnummer och ett gemensamt namn
+// eller samma början på efternamnet – och bara när träffen är entydig. Den som inte går att koppla får inget
+// betyg (okänt, inte gissat).
+const pname = (s) => norm(String(s || '').replace(/-/g, ' '));
+function ratingsIndex(compId, teams) {
+  const c = readCache(`s365_ratings_${compId}`);
+  if (!c || !c.data || !c.data.matches) return null;
+  // Spelarna hålls isär på namnet inom laget: 365Scores id för samma spelare
+  // kan skifta mellan matcherna (Jack Currie, Oxford, 2026-08-15).
+  const pools = new Map(); // ESPN-lag → namn → { name, jersey, r: [betyg], best }
+  const rated = new Map(); // ESPN-lag → betygsatta matcher
+  let games = 0;
+  for (const m of Object.values(c.data.matches)) {
+    if (!m.t) continue;
+    games++;
+    const top = Math.max(...Object.values(m.t).flat().map((x) => x[3]));
+    for (const [teamId, ps] of Object.entries(m.t)) {
+      rated.set(teamId, (rated.get(teamId) || 0) + 1);
+      if (!pools.has(teamId)) pools.set(teamId, new Map());
+      const pool = pools.get(teamId);
+      for (const [aid, name, jersey, r] of ps) {
+        const k = pname(name) || aid;
+        const e = pool.get(k) || { name, jersey, r: [], best: 0 };
+        e.r.push(r);
+        if (r === top) e.best++;
+        pool.set(k, e);
+      }
+    }
+  }
+  const out = new Map();
+  let of = 0;
+  for (const t of teams) {
+    const pool = [...(pools.get(t.espnId) || new Map()).values()];
+    const used = new Set();
+    const pick = (test) => {
+      const free = pool.filter((x) => !used.has(x) && test(x));
+      return free.length === 1 ? free[0] : null;
+    };
+    // Två steg: först de entydiga namnen för hela truppen, sedan resten.
+    const left = [];
+    const take = (p, hit) => {
+      used.add(hit);
+      const avg = hit.r.reduce((s, x) => s + x, 0) / hit.r.length;
+      out.set(p.id, { rt: Math.round(avg * 100) / 100, rn: hit.r.length, rb: hit.best, rq: hit.r.length / (rated.get(t.espnId) || 1) });
+    };
+    for (const p of t.players) {
+      if (played(p)) of++;
+      const full = pname(p.name);
+      const hit = pick((x) => pname(x.name) === full);
+      if (hit) take(p, hit); else left.push(p);
+    }
+    for (const p of left) {
+      const parts = pname(p.name).split(' ');
+      const last = parts[parts.length - 1];
+      const hit = pick((x) => {
+        const q = pname(x.name).split(' ');
+        return q[q.length - 1] === last && q[0][0] === parts[0][0];
+      }) || (p.jersey && pick((x) => {
+        // Samma tröja och ett gemensamt namn, eller samma början på
+        // efternamnet (Yarmoliuk–Yarmolyuk, Sávio–Savinho).
+        const q = pname(x.name).split(' ');
+        return String(x.jersey) === String(p.jersey) &&
+          (q.some((w) => w.length > 2 && parts.includes(w)) || q[q.length - 1].slice(0, 2) === last.slice(0, 2));
+      }));
+      if (hit) take(p, hit);
+    }
+  }
+  return {
+    map: out,
+    matched: [...out.keys()].filter((id) => teams.some((t) => t.players.some((p) => p.id === id && played(p)))).length,
+    of,
+    games,
+    played: c.data.played,
+    fetchedAt: c.fetchedAt,
+  };
+}
+
 // Målen ur matchrapporterna (espn_minutes_<liga>, alla fyra ligor): sorten,
 // när de kom och vad de betydde för resultatet. Som speltiden räknas de för
 // spelarens första `app` matcher i laget – samma matcher som målen i truppen –
@@ -391,14 +476,19 @@ function divisionPlayers(compId) {
   const fx = fpl ? fpl.map : mins ? mins.map : null;
   const emin = (p) => (fpl && mins && mins.map.has(p.id) ? { emin: mins.map.get(p.id).min } : null);
   const goalTypes = goalTypesFor(compId);
+  const ratings = ratingsIndex(compId, d.teams);
+  const rat = (p) => {
+    const r = ratings && ratings.map.get(p.id);
+    return r ? { rt: r.rt, rn: r.rn, rb: r.rb } : null;
+  };
   const rows = [];
   const all = [];
   for (const t of d.teams) {
     for (const p of t.players) {
-      if (played(p)) rows.push(row(p, t, fx));
+      if (played(p)) rows.push({ ...row(p, t, fx), ...rat(p) });
       all.push(p.stats
-        ? { ...row(p, t, fx), ...emin(p), ...gk(p), ...(goalTypes && goalTypes.map.get(p.id)) }
-        : { ...bare(p, t), ...(fx && fx.get(p.id)) });
+        ? { ...row(p, t, fx), ...emin(p), ...gk(p), ...(goalTypes && goalTypes.map.get(p.id)), ...rat(p) }
+        : { ...bare(p, t), ...(fx && fx.get(p.id)), ...rat(p) });
     }
   }
 
@@ -460,6 +550,12 @@ function divisionPlayers(compId) {
       yellow: top(rows, (r) => r.yc, { n: 10, tiebreak: (a, b) => a.app - b.app }),
       red: top(rows, (r) => r.rc, { n: 20 }),
       keepers: keepers(d.teams, standings),
+      // Snittbetyget från 365Scores, bland spelare med betyg i minst halva
+      // lagets betygsatta matcher (och minst MIN_RATED).
+      rating: ratings
+        ? top(rows.filter((r) => r.rn >= MIN_RATED && ratings.map.get(r.id).rq >= MIN_SHARE_RATED), (r) => r.rt,
+          { tiebreak: (a, b) => b.rn - a.rn })
+        : null,
       // Bara med FPL (Premier League): mål över och under xG.
       overXg: fpl ? top(rows, overXg, { min: 0.01 }).map((r) => ({ ...r, dxg: overXg(r) })) : null,
       underXg: fpl ? top(rows, (r) => (overXg(r) == null ? null : -overXg(r)), { min: 0.01 }).map((r) => ({ ...r, dxg: overXg(r) })) : null,
@@ -483,7 +579,15 @@ function divisionPlayers(compId) {
     // matched av of = spelare med statistik vars mål går att följa.
     goalTypes: goalTypes ? { provider: 'ESPN', fetchedAt: goalTypes.fetchedAt, matched: goalTypes.matched, of: goalTypes.of, kinds: goalTypes.kinds } : null,
     leagueGoals: leagueGoals(compId),
-    thresholds: { minShotsConversion: MIN_SHOTS_CONVERSION, minShareKeeper: MIN_SHARE_KEEPER, minMinutesP90: MIN_MINUTES_P90, top: TOP },
+    // Betygen från 365Scores. matched av of = spelare med statistik som har
+    // betyg; games av played = ligamatcher med betyg.
+    ratings: ratings
+      ? { provider: '365Scores', fetchedAt: ratings.fetchedAt, matched: ratings.matched, of: ratings.of, games: ratings.games, played: ratings.played }
+      : null,
+    thresholds: {
+      minShotsConversion: MIN_SHOTS_CONVERSION, minShareKeeper: MIN_SHARE_KEEPER, minMinutesP90: MIN_MINUTES_P90,
+      minRated: MIN_RATED, minShareRated: MIN_SHARE_RATED, top: TOP,
+    },
   };
 }
 

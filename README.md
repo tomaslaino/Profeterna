@@ -106,6 +106,14 @@ ingen falsk precision · sidan kraschar aldrig av en död källa · endast fria 
 - [x] **Ladda upp system (2026-10-20):** en skärmbild av systemet ni spelat (Svenska Spels
   app) blir gängets kupong med matcher och tecken. Bilden läses i webbläsaren och lämnar
   aldrig telefonen (se [Ladda upp system](#ladda-upp-system))
+- [x] **Spelarbetyg (2026-10-20):** Statistik → Spelare visar spelarnas snittbetyg från
+  365Scores, som sätter ett betyg från 1 till 10 efter varje match: topplistan *Högst betyg*
+  i stället för Målvakter (som finns kvar under Försvar), kolumnen Betyg under Översikt
+  och i spelarkortet betyget och hur ofta spelaren fått högst betyg på planen. Betygen
+  hämtas en gång per spelad ligamatch och kopplas till ESPN-truppen inom laget på namn
+  och tröjnummer – 421 av 443 som spelat i Premier League 2026-10-20, de övriga har bara
+  hoppat in några minuter. League Two har betyg först från 12 september. Styr inte
+  prognoserna ([src/fetchers/s365ratings.js](src/fetchers/s365ratings.js))
 
 ## Publicering
 
@@ -205,6 +213,7 @@ Utan nyckel ingen knapp.
 | Europacuperna (för vila och form) | ESPN (`uefa.champions`, `uefa.europa`, `uefa.europa.conf`, kvalomgångarna i `*_qual` juli–augusti) | PL och cuperna – bara underlag | 3 h | Verifierat 2026-10-18: 234/224/366 matcher 2026/27 med kvalet, nio engelska lag (Brighton i Conference Leagues playoffomgång i augusti). Kopplas på ESPN:s lag-id, samma i alla ESPN:s turneringar. Ingen prognos för matcherna och inte med i prognosmotorns underlag. |
 | Domare, kommande ligamatcher | football-data.co.uk (`fixtures.csv`, kolumnen `Referee`) | ligorna | 6 h | Verifierat 2026-10-18: namnet finns för alla 46 kommande matcher i filen (läggs ut med oddsen fre/tis). Domarens historik ur samma statistikfiler som sidan Statistik. |
 | Startelvor och frånvaro | 365Scores öppna webb-API (`webws.365scores.com/web/games/` och `/web/game/?gameId=`), hämtas **i webbläsaren** | alla sex | när matchrutan öppnas, varje minut medan matchen pågår | Verifierat 2026-10-19: ingen nyckel, `Access-Control-Allow-Origin: *`. Trolig elva (`NotConfirmed`) dagar före matchen i Premier League och Championship (inte i League One, League Two och EFL-cupen), bekräftad (`Confirmed`) ungefär en timme före avspark, efter matchen elvorna med mål, kort och byten. Spelarnas plats som linje och sida, så planen ritas utan positionstolkning. Vilka som saknas (skada med orsak och väntad återkomst, avstängning) även utanför Premier League. ESPN:s matchid finns inte där: matchen hittas på tävling (PL 7, CH 1, L1 2, L2 3, FA-cupen 8, EFL-cupen 9), avspark inom tre timmar och lagnamn – 505 av 505 matcher 1/9–8/11 2026 hittades (MK Dons heter så där). Samma källa som Gräver Gravs startelvor. Styr inte prognosen. |
+| Spelarbetyg | 365Scores öppna webb-API (`/web/games/results/?competitions=<id>` bakåt via `paging.previousPage`, sedan `/web/game/?gameId=`) | ligorna | 6 h, bara nya matcher | Verifierat 2026-10-20: betyg 1–10 med en decimal (`ranking`) för alla i startelvan och för inhoppare som spelat en stund (några minuter ger -1, inget betyg). 365Scores räknar betyget ur spelarens statistik i matchen; metoden är odokumenterad. Snittet är 6,6–6,8 per liga och vart tionde betyg är över 7,5. Alla 70, 131 och 114 spelade matcher i PL, CH och L1 hade betyg; i League Two 66 av 126 – matcherna före 12 september saknar betyg och sparas som utan. Säsongens matcher listas ~20 per sida tills förra säsongens (`seasonNum`) börjar. Matchen hittas på avspark inom tre timmar och lagnamn som i matchrutan (alla 441 hittades). Samma spelare kan ha olika id i olika matcher, så spelarna hålls isär på namnet inom laget. Kopplas till ESPN-truppen inom laget på hela namnet, efternamn med förnamnets initial och sist tröjnummer med lika början på efternamnet (Yarmoliuk–Yarmolyuk, Sávio–Savinho), bara vid entydig träff. En match är ~135 kB men sparas kompakt (~70–140 kB per liga). Styr inte prognosen. |
 | Matchhändelser och lagstatistik | ESPN matchsammanfattning (`summary?event=<id>`, samma som oddsen), hämtas **i webbläsaren** | alla sex | när matchrutan öppnas för en påbörjad match, varje minut medan den pågår | Verifierat 2026-10-19: `Access-Control-Allow-Origin: *`. Mål med assist, självmål och straff, kort, byten, halvtid, lagstatistik (bollinnehav, skott, hörnor, passningar m.m.) och publik. Passningsandelen räknas ur antalen (ESPN avrundar den till en decimal). ~400 kB per match. Styr inte prognosen. |
 | Liveställning | ESPN scoreboard (`site.api.espn.com/…/<liga>/scoreboard?dates=YYYYMMDD`), hämtas **i webbläsaren** | kupongens matcher | 1 min medan en kupongmatch pågår | Verifierat 2026-10-18: svarar med `Access-Control-Allow-Origin: *`, så sidan kan hämta direkt. Samma matchid som spelprogrammet. Status, matchminut och ställning; används bara av kupongen, inte av prognosen eller bygget. |
 | Målminuter och publik, tidigare säsonger | ESPN (`eng.1`–`eng.4`, månad för månad) | ligorna – bara sidan Statistik | 30 d | Verifierat 2026-10-18. 2021/22–2025/26; grundserien räknas, play-off filtreras bort. Målhändelserna går ihop med slutresultatet i 99,9 % av matcherna, publik finns i 98–100 % per liga och säsong. Kompakt format (`parseCrowd`): målminut med sida och publiksiffra. Årets publik saknas (spelprogrammets format ändras inte). |
@@ -228,6 +237,8 @@ Utan nyckel ingen knapp.
   first round till finalen, inklusive non-league-lag; kvalomgångarna saknas.
 - Att ESPN:s inofficiella API fortsätter att fungera.
 - När football-data.co.uk samlar in öppningsodds (notes.txt: fredag och tisdag eftermiddag).
+- Att 365Scores svarar även från GitHub Actions (USA) – spelarbetygen hämtas där vid
+  bygget. Svarar den inte visas topplistan Målvakter som förut.
 - När 365Scores publicerar de bekräftade startelvorna (antaget: ungefär en timme före
   avspark, när klubbarna lämnar dem). Troliga elvor fanns 2026-10-19 för 14 av 23
   kommande matcher i Premier League och Championship upp till fem dagar fram (ingen sex

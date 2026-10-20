@@ -1,12 +1,14 @@
 'use strict';
 
 // Källorna för spelardatan (trupp och spelarstatistik per liga, speltiden
-// utanför Premier League och målen ur matchrapporterna i alla fyra ligor). Egen fil så att registret i src/sources.js bara
+// utanför Premier League och målen ur matchrapporterna i alla fyra ligor, och
+// spelarnas betyg från 365Scores). Egen fil så att registret i src/sources.js bara
 // behöver en rad för att ta med dem.
 
 const { COMPETITIONS } = require('../config/competitions');
 const espnPlayers = require('./fetchers/espnplayers');
 const espnMinutes = require('./fetchers/espnminutes');
+const s365Ratings = require('./fetchers/s365ratings');
 const { readCache } = require('./store');
 
 const LEAGUES = COMPETITIONS.filter((c) => c.type === 'league');
@@ -61,6 +63,44 @@ for (const c of LEAGUES) {
         n,
         detail: `${n} av ${d.played} spelade matcher${d.missing ? `, ${d.missing} hämtas nästa gång` : ''}`,
         latestData: n ? Object.values(d.matches).map((m) => m.k).sort().pop().slice(0, 10) : null,
+      };
+    },
+  });
+}
+
+// Spelarnas betyg per match från 365Scores. Ligorna hos 365Scores
+// (verifierat 2026-10-19, samma som i public/matchruta.js). Läser
+// spelprogrammet ur cachen och hämtar bara matcher som inte redan är sparade.
+const COMP365 = { pl: 7, ch: 1, l1: 2, l2: 3 };
+for (const c of LEAGUES) {
+  const id = `s365_ratings_${c.id}`;
+  PLAYER_SOURCES.push({
+    id,
+    provider: '365Scores',
+    short: '365Scores',
+    label: `Spelarnas betyg per match – ${c.name}`,
+    comps: [c.id],
+    kinds: ['players'],
+    maxAgeHours: 6,
+    staleAfterHours: 72,
+    verified: '2026-10-20',
+    stage: 2,
+    fetch: () => {
+      const fx = readCache(`espn_fixtures_${c.id}`);
+      if (!fx || !fx.data) throw new Error('inget spelprogram i cachen än');
+      const played = fx.data.matches.filter((m) => m.completed && m.score)
+        .map((m) => ({ id: m.id, kickoff: m.kickoff, home: m.home, away: m.away }));
+      const prev = readCache(id);
+      return s365Ratings.fetchRatings(COMP365[c.id], played, prev && prev.data);
+    },
+    summarize: (d) => {
+      const all = Object.values(d.matches);
+      const n = all.filter((m) => m.t).length;
+      return {
+        n,
+        detail: `${n} av ${d.played} spelade matcher med betyg` +
+          (d.missing ? `, ${d.missing} saknas${d.unmatched ? ` (${d.unmatched} hittades inte hos 365Scores)` : ''}` : ''),
+        latestData: n ? all.filter((m) => m.t).map((m) => m.k).sort().pop().slice(0, 10) : null,
       };
     },
   });

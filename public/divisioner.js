@@ -297,7 +297,7 @@ function segHtml(groups, cur, attr) {
 // ---------- spelarna ----------
 
 // Gränserna för kvoter, ur spelarfilen (thresholds).
-const TH = { shots: 10, min: 270 };
+const TH = { shots: 10, min: 270, rated: 3 };
 const per90 = (x, p) => (x == null || !p.min ? null : (x / p.min) * 90);
 // Mål och assist till per 90: FPL:s egna i Premier League (samma matcher som
 // FPL-minuterna), annars truppens – speltiden räknas för samma matcher.
@@ -369,6 +369,10 @@ const PCOLS = [
     get: (p) => p.a, cls: 'num', in: ['oversikt'] },
   { key: 'ga', label: 'M+A', name: 'Mål plus assist', title: 'Mål och assist tillsammans: hur många av lagets mål spelaren har varit direkt inblandad i.',
     get: (p) => (p.noStats ? null : (p.g || 0) + (p.a || 0)), cls: 'num hide-xs', in: ['oversikt'] },
+  { key: 'rt', label: 'Betyg', name: 'Snittbetyg',
+    title: 'Snittet av spelarens betyg från 365Scores, 1–10, i ligans matcher i år. En vanlig insats ger runt 6,7. Dämpade siffror: färre än tre matcher med betyg.',
+    get: (p) => p.rt, d: 1, cls: 'num', rt: true, in: ['oversikt'],
+    ok: (p) => p.rn >= TH.rated, okWhy: 'Osäker siffra: färre än tre matcher med betyg' },
   { key: 'fs', label: 'Fälld', name: 'Fälld', title: 'Gånger spelaren har blivit fälld eller utsatt för en annan förseelse som domaren blåst för.',
     get: (p) => p.fs, cls: 'num', strong: true, in: ['regelbrott'] },
   { key: 'fs90', label: 'Fälld', sub: 'per 90 min', name: 'Fälld per 90 minuter', title: 'Gånger spelaren har blivit fälld per 90 minuters speltid. Dämpade siffror: mindre än tre hela matchers speltid.',
@@ -435,7 +439,7 @@ const PCOLS = [
 ];
 
 // fpl = xG, försvarsspel och pris (bara Premier League), mins = speltiden
-// (alla ligor där den är känd), kinds = målens sort.
+// (alla ligor där den är känd), kinds = målens sort, rt = betygen.
 function playerGroups(P) {
   return P_GROUPS.filter((g) => g.needs !== 'goals' || P.goalTypes);
 }
@@ -449,8 +453,9 @@ function playerCols(P) {
   const fpl = !!P.fpl;
   const mins = !!(P.minutes || P.fpl);
   const kinds = !!(P.goalTypes && P.goalTypes.kinds);
+  const rt = !!P.ratings;
   const g = playerGroup(P).id;
-  return PCOLS.filter((c) => c.in.includes(g) && (!c.fpl || fpl) && (!c.mins || mins) && (!c.nomins || !mins) && (!c.kinds || kinds));
+  return PCOLS.filter((c) => c.in.includes(g) && (!c.fpl || fpl) && (!c.mins || mins) && (!c.nomins || !mins) && (!c.kinds || kinds) && (!c.rt || rt));
 }
 
 // Gruppens förvalda sortering: den första av dess kolumner som finns.
@@ -517,6 +522,7 @@ function playersView(dv, P) {
   }
   TH.shots = P.thresholds.minShotsConversion;
   TH.min = P.thresholds.minMinutesP90 || 270;
+  TH.rated = P.thresholds.minRated || 3;
   teamGoals.clear();
   for (const t of P.teams) teamGoals.set(t.espnId, t.goals);
   tops.clear();
@@ -526,12 +532,16 @@ function playersView(dv, P) {
   const teams = [...P.teams].sort((a, b) => a.name.localeCompare(b.name, 'sv'));
   let html = sectionHead('Spelarstatistik', `Ligamatcher ${esc(state.data.season)}`);
   // Tre topplistor, samma i alla divisioner. Resten (xG, kort, skott) går
-  // att sortera fram i tabellen Alla spelare.
+  // att sortera fram i tabellen Alla spelare. Betygen ersätter målvakterna
+  // när de finns (målvakterna finns kvar under Försvar i tabellen).
   html += '<div class="dv-leaders">' +
     topCard('goals', 'Skytteliga', L.goals, (p) => `<b>${p.g}</b>`) +
     topCard('assists', 'Flest assist', L.assists, (p) => `<b>${p.a}</b>`) +
-    topCard('keepers', 'Målvakter', L.keepers, (p) => `<b>${pct(p.savePct)}</b>`,
-      { note: 'Andel räddade skott på mål · minst halva lagets matcher', empty: 'okänt' }) +
+    (P.ratings && L.rating
+      ? topCard('rating', 'Högst betyg', L.rating, (p) => `<b>${num(p.rt, 1)}</b>`,
+        { note: 'Snittbetyg från 365Scores · minst halva lagets matcher', empty: 'okänt' })
+      : topCard('keepers', 'Målvakter', L.keepers, (p) => `<b>${pct(p.savePct)}</b>`,
+        { note: 'Andel räddade skott på mål · minst halva lagets matcher', empty: 'okänt' })) +
     '</div>';
 
   html += card('Alla spelare', {
@@ -545,7 +555,9 @@ function playersView(dv, P) {
       (t.teamsBehind ? ` · släpar en omgång för ${t.teamsBehind} lag` : '') +
       (P.fpl ? ` · speltid, xG, försvarsspel och pris: Fantasy Premier League, hämtat ${when(P.fpl.fetchedAt)}` : '') +
       (!P.fpl && P.minutes ? ` · speltid${P.goalTypes ? ' och målen' : ''}: ESPN:s matchrapporter, hämtat ${when(P.minutes.fetchedAt)}` : '') +
-      (P.fpl && P.goalTypes ? ` · målen: ESPN:s matchrapporter, hämtat ${when(P.goalTypes.fetchedAt)}` : ''),
+      (P.fpl && P.goalTypes ? ` · målen: ESPN:s matchrapporter, hämtat ${when(P.goalTypes.fetchedAt)}` : '') +
+      (P.ratings ? ` · betyg: 365Scores, hämtat ${when(P.ratings.fetchedAt)}` +
+        (P.ratings.games < P.ratings.played ? ` (${int(P.ratings.games)} av ${int(P.ratings.played)} matcher har betyg)` : '') : ''),
     cls: 'dv-wide',
   });
 
@@ -897,6 +909,7 @@ function mfoot(srcs, buttons = '') {
 }
 
 const unsure = (v, why) => `<span class="dv-unq" title="${esc(why)}">${v}</span>`;
+const cardsVal = (p) => `${p.yc ? `<i class="dv-card-y" aria-label="gula"></i>${p.yc}` : ''}${p.rc ? ` <i class="dv-card-r" aria-label="röda"></i>${p.rc}` : ''}`;
 
 function playerById(id) {
   const P = state.players.get(state.div);
@@ -938,6 +951,9 @@ function openPlayer(id) {
       mv ? [cell(p.gc), 'Insläppta'] : [cell(p.a), 'Assist'],
     ]);
     html += msec('Matcherna', facts([
+      p.rt != null ? [p.rn < TH.rated ? unsure(num(p.rt, 1), 'Osäker siffra: färre än tre matcher med betyg') : `<b>${num(p.rt, 1)}</b>`,
+        `Betyg i ${p.rn} ${p.rn === 1 ? 'match' : 'matcher'}`, 'Snittet av spelarens betyg från 365Scores, 1–10. En vanlig insats ger runt 6,7'] : null,
+      p.rt != null && p.rb ? [cell(p.rb), 'Bäst på plan', 'Matcher där spelaren fick högst betyg av alla på planen'] : null,
       p.min != null ? [cell(p.starts), 'Från start'] : null,
       [p.app != null && p.starts != null ? cell(p.app - p.starts) : cell(null), 'Inhopp'],
       p.min != null && p.app ? [`${int(p.min / p.app)} min`, 'Speltid per match'] : null,
@@ -1095,6 +1111,7 @@ const GLOSSARY = [
   ['Assist', 'Passningen (eller skottet som räddas och slås in) som leder direkt till ett mål, enligt ESPN.', 'statistik'],
   ['Skott på mål', 'Skott som skulle ha gått in om målvakten inte räddat. Skott utanför och i stolpen räknas inte.', 'statistik'],
   ['Räddningsprocent', 'Räddningar delat med skotten på mål som målvakten mött (räddningar + insläppta).', 'statistik'],
+  ['Betyg', 'Snittet av spelarens betyg i ligans matcher, från 365Scores. Betyget sätts efter varje match, från 1 till 10, ur spelarens statistik i matchen. En vanlig insats ger runt 6,7 och bara vart tionde betyg är över 7,5. Inhoppare som bara spelat några minuter får inget betyg.', 'statistik'],
   ['xG', 'Förväntade mål: varje skott får ett värde efter hur ofta ett sådant skott brukar bli mål – en straff runt 0,8, ett långskott några hundradelar. Summan visar hur många mål chanserna brukar ge, oavsett om de gick in.', 'statistik'],
   ['xG mot, xA', 'xG mot: motståndarnas förväntade mål, alltså hur bra chanser laget släpper till. xA: förväntade assist, ur passningarna före lagkamraternas skott.', 'statistik'],
   ['Mål mot xG', 'Gjorda mål minus xG (och insläppta mål minus xG mot). Stora avvikelser är ofta tur eller otur och brukar jämna ut sig under en säsong.', 'statistik'],
