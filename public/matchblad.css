@@ -1,9 +1,9 @@
 /* Matchbladet: matchrutan (matchruta.css) tryckt på samma papper som kupongen
    (papper.css) – krämvitt med perforerade kanter, tryck i terrakotta, lagen
-   och siffrorna i Fraunces. Prognosen står i kupongens rutor 1 X 2, modellens
-   tecken inringade med kulspetspenna och en rad för hand i marginalen, och
-   efter matchen är utfallet inringat i grönt eller rött med ställningen
-   skriven för hand och en stämpel, som på kupongen.
+   och siffrorna i Fraunces. Prognosen står i kupongens rutor 1 X 2. Efter
+   Analysera ringar AI:n in sina tecken med kulspetspenna och skriver en rad
+   för hand i marginalen, och efter matchen är utfallet inringat med samma
+   penna som ställningen, och en stämpel, som på kupongen.
 
    Sajtens tokens (theme.css) skrivs om till tryck inuti rutan, så att korten,
    tabellerna, formen och flikarna följer med av sig själva. Här står papperet,
@@ -267,15 +267,23 @@ dialog.mr-modal .fc-pen {
   stroke-width: 2.4;
   opacity: 0.92;
 }
+/* när analysen just har kommit dras ringarna och raden skrivs */
+dialog.mr-modal .fc-fresh .fc-pen path { stroke-dasharray: 600; animation: fc-draw 0.9s ease-out both; }
+dialog.mr-modal .fc-fresh .fc-note { animation: fc-write 0.7s ease-out 0.4s both; }
+@keyframes fc-draw { from { stroke-dashoffset: 600; } to { stroke-dashoffset: 0; } }
+@keyframes fc-write { from { clip-path: inset(0 100% 0 0); } to { clip-path: inset(0 0 0 0); } }
+@media (prefers-reduced-motion: reduce) {
+  dialog.mr-modal .fc-fresh .fc-pen path,
+  dialog.mr-modal .fc-fresh .fc-note { animation: none; }
+}
 dialog.mr-modal .fc-ring {
   top: -10px;
   left: -11px;
   width: calc(100% + 22px);
   height: calc(100% + 20px);
-  stroke: var(--pp-no);
+  stroke: var(--pp-pen);
   stroke-width: 2.6;
 }
-dialog.mr-modal .s-ok .fc-ring { stroke: var(--pp-ok); }
 
 /* målen som en prislista och de troligaste resultaten i rutor */
 dialog.mr-modal .fc-two {
@@ -313,7 +321,7 @@ dialog.mr-modal .fc-tbox {
 dialog.mr-modal .fc-tbox b { font-family: var(--display); font-size: 22px; font-weight: 700; line-height: 1.1; }
 dialog.mr-modal .fc-tbox span { font-size: 12px; color: var(--pp-ink-soft); font-variant-numeric: tabular-nums; }
 
-/* efter matchen: ställningen för hand och rättarens bock eller kryss */
+/* efter matchen: ställningen för hand och stämpeln */
 dialog.mr-modal .fc-graded { display: flex; align-items: center; gap: 12px; }
 dialog.mr-modal .fc-hand {
   font-family: var(--pp-hand);
@@ -322,7 +330,6 @@ dialog.mr-modal .fc-hand {
   line-height: 0.9;
   color: var(--pp-pen);
 }
-dialog.mr-modal .fc-graded .pp-tick { width: 34px; height: 34px; }
 dialog.mr-modal .fc-two .unknown { margin: 0; }
 
 dialog.mr-modal .fc-adv { margin-top: 16px; }
@@ -335,11 +342,20 @@ dialog.mr-modal table.sgrid td {
 dialog.mr-modal table.sgrid th { color: var(--pp-ink-soft); }
 
 /* Alla resultat och stämpeln I journalen på samma rad; Rättad står efter
-   bocken eller krysset */
+   ställningen */
 dialog.mr-modal .fc-foot { display: flex; align-items: flex-start; justify-content: space-between; gap: 18px; }
 dialog.mr-modal .fc-foot .fc-stamp { flex: none; margin: 16px 6px 0 auto; }
 dialog.mr-modal .fc-graded .fc-stamp { margin-left: 10px; }
 dialog.mr-modal .fc .note { margin: 14px 0 0; font-size: 13px; }
+
+/* analysens avsnitt (Nyhetsläget, Läktarsnacket) med samma rubriker som korten */
+dialog.mr-modal .analysis-news { border-top-color: var(--pp-print-line); }
+dialog.mr-modal .analysis-news h5 {
+  font-size: var(--eyebrow-size);
+  font-weight: var(--eyebrow-weight);
+  letter-spacing: var(--eyebrow-track);
+  color: var(--pp-print);
+}
 
 /* spelbolagen: modellen överst, bolagens odds under */
 dialog.mr-modal table.cmp td:first-child { white-space: nowrap; }

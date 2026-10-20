@@ -572,35 +572,35 @@ function forecastCard(d) {
     `${adv}${notes}<div class="fc-foot">${scoreGrid(p, m)}${stamp}</div></div>`;
 }
 
-// 1 · X · 2 som kupongens rutor: tecknet och oddset. Modellen ringar in sina
-// tecken med kulspetspenna och skriver en rad i marginalen (penMarks). Efter
-// matchen ringas utfallet (outcome) in som på kupongen: grönt om modellen hade
-// det inringat, annars rött. key gör pennstrecken likadana varje gång
-// (papper.js).
+// 1 · X · 2 som kupongens rutor: tecknet och oddset. Inget ringas in av sig
+// självt – först när någon har tryckt på Analysera ringar AI:n in sina tecken
+// med kulspetspenna och skriver en rad i marginalen (penMarks). Efter matchen
+// ringas utfallet (outcome) in med samma penna som ställningen. key gör
+// pennstrecken likadana varje gång (papper.js).
 function fcMain(p, labels, key, outcome) {
   const w = pct3(p);
-  const pen = penMarks(p);
+  const pen = outcome == null ? penMarks(key) : null;
   const P = window.Papper;
   const cols = w.map((x, i) => {
-    const mine = pen.signs.includes(i);
-    const res = outcome === i ? (mine ? ' s-ok' : ' s-no') : '';
-    return `<div class="fc-col${i === 1 ? ' draw' : ''}${res}"><div class="fc-label"><span>${esc(labels[i])}</span>` +
-      (i === pen.at ? `<em class="fc-note">${pen.note}</em>` : '') + '</div>' +
+    const mine = Boolean(pen) && pen.signs.includes(i);
+    const res = outcome === i;
+    return `<div class="fc-col${i === 1 ? ' draw' : ''}${res ? ' s-out' : ''}"><div class="fc-label"><span>${esc(labels[i])}</span>` +
+      (pen && i === pen.at ? `<em class="fc-note">${esc(pen.note)}</em>` : '') + '</div>' +
       `<div class="fc-box" title="${x} %"><i>${'1X2'[i]}</i><div class="fc-num">${pctOdds(x)}${mine && P ? P.ring(`penna${key}${i}`, 'fc-pen', 23) : ''}</div>` +
       `${res && P ? P.ring(`utfall${key}`, 'fc-ring', 27) : ''}</div></div>`;
   }).join('');
   return `<div class="fc-main">${cols}</div>`;
 }
 
-// Tecknen modellen skulle ringa in på kupongen och raden i marginalen: en spik
-// när favoriten har minst 65 %, nästan en spik från 52 %, halvgardering när
-// det minst troliga har högst 27 %, annars helgardering utan något inringat.
-function penMarks(p) {
-  const o = [0, 1, 2].sort((a, b) => p[b] - p[a]);
-  if (p[o[0]] >= 0.65) return { signs: [o[0]], at: o[0], note: 'spik' };
-  if (p[o[0]] >= 0.52) return { signs: [o[0]], at: o[0], note: 'spik, nästan' };
-  if (p[o[2]] <= 0.27) return { signs: [o[0], o[1]], at: Math.min(o[0], o[1]), note: 'halvgardera' };
-  return { signs: [], at: 1, note: 'helgardera' };
+// Tecknen analysen ringade in och raden i marginalen, ovanför det första
+// inringade tecknet. En helgardering ringar inte in något; raden står över
+// krysset. null = ingen analys ännu.
+function penMarks(id) {
+  const r = analyses.get(id);
+  const t = r && r.ok && r.tip;
+  if (!t || !t.signs || !t.signs.length) return null;
+  const all = t.signs.length === 3;
+  return { signs: all ? [] : t.signs, at: all ? 1 : Math.min(...t.signs), note: t.note };
 }
 
 // Målen som en prislista: namnet, prickar fram till oddset.
@@ -638,13 +638,12 @@ function journalCard(d) {
         `${j.advanced ? `<span class="sub">${esc(j.advanced === 'home' ? m.home : m.away)} gick vidare</span>` : ''}</p>`
       : '<p class="fc-adv">Går vidare: <span class="unknown">okänt</span></p>';
   }
-  // Ställningen skriven för hand bredvid målen, med rättarens bock om
-  // modellen hade utfallet inringat och kryss annars, som på kupongen.
+  // Ställningen skriven för hand bredvid målen. Modellen ringade inte in
+  // något före matchen, så det finns ingen bock eller något kryss att sätta.
   const out = m.score90 && j.outcome != null ? j.outcome : null;
-  const ok = out != null && penMarks(r.p).signs.includes(out);
   const graded = out == null ? '<p class="unknown">okänt</p>'
-    : `<div class="fc-graded ${ok ? 's-ok' : 's-no'}"><span class="fc-hand">${m.score90.home}–${m.score90.away}</span>` +
-      `${window.Papper ? Papper.tick(`journal${m.id}`, ok) : ''}<span class="pp-stamp fc-stamp" title="Loggad ${when(r.loggedAt)}">Rättad</span></div>`;
+    : `<div class="fc-graded"><span class="fc-hand">${m.score90.home}–${m.score90.away}</span>` +
+      `<span class="pp-stamp fc-stamp" title="Loggad ${when(r.loggedAt)}">Rättad</span></div>`;
   return '<div class="card fc"><h4>Prognos före avspark</h4>' +
     fcMain(r.p, [m.home, 'Oavgjort', m.away], m.id, out) +
     `<div class="fc-two"><div><h5>Målen</h5>${stats}</div><div><h5>Efter 90 minuter</h5>${graded}</div></div>` +
@@ -1103,6 +1102,7 @@ function analysisCard(d) {
   if (!analysisOn(d)) return '';
   const a = state.meta.analysis;
   const r = analyses.get(d.match.id);
+  if (r && r.ok && r.research) return researchCard(r);
   if (r && r.ok) {
     const other = r.builtAt && d.builtAt && r.builtAt !== d.builtAt;
     return `<div class="card analysis" id="analysis-card"><h4 title="${esc(`Skriven av ${r.model} ${when(r.generatedAt)} ur underlaget från uppdateringen ${when(r.builtAt)} · alla tal i texten finns i underlaget`)}">Analys</h4>` +
@@ -1110,44 +1110,75 @@ function analysisCard(d) {
       (r.news ? newsSection(r.news) : '') +
       (other ? '<p class="note">Sidan och texten bygger på olika uppdateringar – ladda om sidan.</p>' : '') + '</div>';
   }
-  // retry: false = svaret klarade inte kontrollen; samma underlag ger samma svar.
+  // retry: false = svaret klarade inte kontrollen; samma underlag ger samma
+  // svar, eller (again) samma svar en stund.
   const final = r && r.retry === false;
   return `<div class="card analysis" id="analysis-card"><h4>Analys</h4>` +
-    (r ? `<p class="unknown">Ingen analys: ${esc(r.error || 'okänt fel')}${final ? ' En ny text kan skrivas när underlaget ändrats.' : ''}</p>` : '') +
+    (r ? `<p class="unknown">Ingen analys: ${esc(r.error || 'okänt fel')}${final ? esc(r.again || ' En ny text kan skrivas när underlaget ändrats.') : ''}</p>` : '') +
     (final ? '' : `<button type="button" class="analyze" data-id="${esc(d.match.id)}" title="${a.news
-      ? 'En språkmodell skriver ur underlaget på sidan och nyheter som hämtas från nätet – en text med ett tal som inte finns där visas inte'
+      ? 'AI:n läser tidningar, presskonferenser och supporterforum på nätet och ringar in sina tecken'
       : 'En språkmodell skriver bara ur underlaget på sidan – en text med ett tal som inte finns där visas inte'}">${r ? 'Försök igen' : 'Analysera'}</button>`) + '</div>';
+}
+
+// Analysen med research: texten, nyhetsläget och läktarsnacket med
+// hänvisningar till en gemensam källista. Tecknen ringas in i rutorna ovanför
+// (penMarks).
+function researchCard(r) {
+  const n = r.news || { sources: [] };
+  const paras = (t) => (t || '').split(/\n\s*\n/).filter((p) => p.trim())
+    .map((p) => `<p class="analysis-text">${refLinks(n.sources)(esc(p.trim())).replace(/(\d) %/g, '$1&nbsp;%')}</p>`).join('');
+  const at = r.generatedAt ? fDateTime.format(new Date(r.generatedAt)) : 'okänt';
+  return `<div class="card analysis" id="analysis-card"><h4 title="${esc(`Skriven av ${r.model} ${at} efter sökningar på nätet · rapporterat i media, inte kontrollerat av Matchfixarna och inte med i prognosen`)}">Analys</h4>` +
+    paras(r.text) +
+    (n.text ? `<div class="analysis-news"><h5>Nyhetsläget</h5>${paras(n.text)}</div>` : '') +
+    (n.crowd ? `<div class="analysis-news"><h5>Läktarsnacket</h5>${paras(n.crowd)}</div>` : '') +
+    sourceList(n.sources) + '</div>';
+}
+
+// Upphöjda hänvisningar [1], [2] … som länkar direkt till artikeln (ett
+// #-ankare skulle byta vy, sidan navigerar med #match/…).
+const safeHref = (u) => (/^https?:\/\//i.test(u || '') ? esc(u) : null);
+function refLinks(sources) {
+  const src = new Map(sources.map((s) => [String(s.n), s]));
+  const link = (k) => {
+    const s = src.get(k);
+    const u = s && safeHref(s.url);
+    return u ? `<a href="${u}" target="_blank" rel="noopener" title="${esc(`${s.source}: ${s.title}`)}">${k}</a>` : k;
+  };
+  return (t) => t.replace(/\[(\d+(?:, \d+)*)\]/g, (m, ks) => `<sup class="ref">${ks.split(', ').map(link).join(',')}</sup>`);
+}
+
+// Den numrerade källistan, med bara de citerade artiklarna.
+function sourceList(sources) {
+  if (!sources.length) return '';
+  return '<ol class="news-sources">' + sources.map((s) => {
+    const u = safeHref(s.url);
+    const title = u ? `<a href="${u}" target="_blank" rel="noopener">${esc(s.title)}</a>` : esc(s.title);
+    return `<li value="${s.n}">${title} <span class="muted">${esc(s.source)}${s.publishedAt ? ` · ${dateOnly(s.publishedAt)}` : ''}</span></li>`;
+  }).join('') + '</ol>';
 }
 
 // Nyhetsläget: eget avsnitt under analysen, som Redaktionens analys på
 // gravergrav.se – upphöjda hänvisningar [1], [2] … och en numrerad källista
-// med bara de citerade artiklarna. Hänvisningen länkar direkt till artikeln
-// (ett #-ankare skulle byta vy, sidan navigerar med #match/…).
+// med bara de citerade artiklarna.
 function newsSection(n) {
-  const src = new Map(n.sources.map((s) => [String(s.n), s]));
-  const href = (u) => (/^https?:\/\//i.test(u || '') ? esc(u) : null);
-  const link = (k) => {
-    const s = src.get(k);
-    const u = s && href(s.url);
-    return u ? `<a href="${u}" target="_blank" rel="noopener" title="${esc(`${s.source}: ${s.title}`)}">${k}</a>` : k;
-  };
-  const refs = (t) => t.replace(/\[(\d+(?:, \d+)*)\]/g, (m, ks) => `<sup class="ref">${ks.split(', ').map(link).join(',')}</sup>`);
+  const refs = refLinks(n.sources);
   const paras = n.text.split(/\n\s*\n/).filter((p) => p.trim())
     .map((p) => `<p class="analysis-text">${refs(esc(p.trim())).replace(/(\d) %/g, '$1&nbsp;%')}</p>`).join('');
-  const list = n.sources.length
-    ? '<ol class="news-sources">' + n.sources.map((s) => {
-      const u = href(s.url);
-      const title = u ? `<a href="${u}" target="_blank" rel="noopener">${esc(s.title)}</a>` : esc(s.title);
-      return `<li value="${s.n}">${title} <span class="muted">${esc(s.source)} · ${dateOnly(s.publishedAt)}</span></li>`;
-    }).join('') + '</ol>'
-    : '';
   const lead = n.gatheredAt ? `Ur nyheter hämtade ${when(n.gatheredAt)} – rapporterat` : 'Rapporterat';
-  return `<div class="analysis-news"><h5 title="${esc(`${lead} i media, inte kontrollerat av Matchfixarna och inte med i prognosen`)}">Nyhetsläget</h5>${paras}${list}</div>`;
+  return `<div class="analysis-news"><h5 title="${esc(`${lead} i media, inte kontrollerat av Matchfixarna och inte med i prognosen`)}">Nyhetsläget</h5>${paras}${sourceList(n.sources)}</div>`;
 }
 
 async function runAnalysis(id, btn) {
   btn.disabled = true;
-  btn.textContent = 'Skriver …';
+  // AI:n läser på en dryg minut – tiden tickar, så att det syns att något händer.
+  const t0 = Date.now();
+  const tick = () => {
+    const s = Math.round((Date.now() - t0) / 1000);
+    btn.textContent = s < 5 ? 'Läser på …' : `Läser på … ${Math.floor(s / 60)}:${String(s % 60).padStart(2, '0')}`;
+  };
+  tick();
+  const timer = setInterval(tick, 1000);
   let r;
   try {
     const res = await fetch(state.meta.analysis.endpoint, {
@@ -1159,6 +1190,7 @@ async function runAnalysis(id, btn) {
   } catch {
     r = { ok: false, error: 'analysen gick inte att nå.' };
   }
+  clearInterval(timer);
   analyses.set(id, r);
   const d = state.detail;
   if (!d || d.match.id !== id || location.hash !== `#match/${id}`) return;
@@ -1178,6 +1210,11 @@ async function runAnalysis(id, btn) {
   }
   const card = $('#analysis-card');
   if (card) card.outerHTML = analysisCard(d);
+  // Tecknen AI:n ringade in ritas med pennan i rutorna ovanför.
+  const main = $('#match-detail-view .fc-main');
+  if (main && penMarks(id)) {
+    main.outerHTML = fcMain(d.prediction.p, [d.match.home, 'Oavgjort', d.match.away], id).replace('class="fc-main"', 'class="fc-main fc-fresh"');
+  }
 }
 
 $('#match-detail-view').addEventListener('click', (e) => {

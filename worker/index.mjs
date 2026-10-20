@@ -31,12 +31,19 @@
 // också nyhetsläget, ett eget avsnitt med hänvisningar till artiklarna.
 // Nyhetsunderlaget cachas en stund per match (config/news.js), så att flera
 // klick i rad ger samma underlag och samma cachade text.
+//
+// Med Claudes nyckel (ANTHROPIC_API_KEY) läser Claude i stället på själv –
+// söker och läser förhandsartiklar, lokaltidningar, presskonferenser och
+// supporterforum – och svarar också med tecknen den skulle ringa in
+// (worker/research.mjs, config/research.js). Svaret har då tip och
+// research: true, och nyhetsläget också läktarsnacket (news.crowd).
 
 import cfg from '../config/llm.js';
 import { payloadOf, fingerprint, foreignNumbers } from './analysis.mjs';
 import { gatherNews, newsPayload, citeNews, withoutRefs } from '../src/news.mjs';
 import { comment } from './kommentar.mjs';
 import { roundName } from './namn.mjs';
+import { researchOn, cachedResearch, researchLeft, research } from './research.mjs';
 
 const ID_RE = /^\d{1,12}$/;
 
@@ -58,10 +65,26 @@ export async function analyze(id, { env, loadMatch, store = null, now = () => ne
   }
 
   const payload = payloadOf(d);
+  // Med Claudes nyckel läser AI:n på själv (worker/research.mjs). En analys
+  // gäller några timmar för alla; är dagens slut skriver DeepSeek som förut.
+  const deep = researchOn(env);
+  if (deep) {
+    const hit = await safely(() => cachedResearch(String(id), store, now()));
+    if (hit) return answer(hit, d, true);
+  }
+  const deepNow = deep && (await safely(() => researchLeft(store, now()))) !== false;
   // Hämtningen kastar aldrig – det som inte gick att nå står som okänt.
   // Nyheterna (med artikeltext) sparas bara en timme i cachen.
   const newsStore = store && { get: (k) => store.get(k), put: (k, v) => store.put(k, v, 3600) };
   const news = cfg.news ? await gatherNews(m, { store: newsStore, now: now() }) : null;
+  if (deepNow) {
+    try {
+      return answer(await research(d, payload, news, { env, store, now }), d, false);
+    } catch (err) {
+      // Nätverk, överlast, saldo, nyckel: inget cachas – nästa klick försöker igen.
+      return fail(err.status || 502, err.message);
+    }
+  }
   if (news) payload.nyheter = newsPayload(news);
   const newsDown = Boolean(news) && !news.sources.some((s) => s.ok && s.name !== 'Open-Meteo');
   // Avtrycket räknas utan nyheternas hämttider, så att samma artiklar ger
@@ -209,12 +232,17 @@ function partsOf(content) {
 
 function answer(entry, d, cached) {
   // Ett avvisat svar gäller tills underlaget ändras – ett nytt klick ger samma.
-  if (!entry.ok) return { status: 422, body: { ok: false, error: entry.error, retry: false, cached } };
+  // again: när ett nytt försök går att göra (analysen med research).
+  if (!entry.ok) return { status: 422, body: { ok: false, error: entry.error, retry: false, again: entry.again || null, cached } };
   // builtAt är bygget som underlaget lästes ur just nu – ett cachat svar gäller
-  // varje bygge med samma underlag.
+  // varje bygge med samma underlag (analysen med research: varje bygge tills
+  // den gått ut). tip: tecknen AI:n ringar in, bara med research.
   return {
     status: 200,
-    body: { ok: true, text: entry.text, news: entry.news || null, model: entry.model, generatedAt: entry.generatedAt, builtAt: d.builtAt || null, cached },
+    body: {
+      ok: true, text: entry.text, news: entry.news || null, tip: entry.tip || null, research: Boolean(entry.research),
+      model: entry.model, generatedAt: entry.generatedAt, builtAt: d.builtAt || null, cached,
+    },
   };
 }
 

@@ -374,6 +374,12 @@ Utan nyckel ingen knapp.
   påstående och en källista med länkar. Analysen själv bygger fortfarande bara på sidans
   underlag. Nyheterna är rapporterat i media, inte en källa till prognosen, och ändrar
   inga siffror. Kostnaden per text blir ungefär tre gånger högre (större underlag).
+- **Inga tecken av sig självt – Claude läser på (2026-10-20, användarens önskan):**
+  matchbladet ringar inte längre in modellens tecken automatiskt. Analysera låter i stället
+  Claude söka och läsa förhandsartiklar, lokaltidningar, presskonferenser, skade- och
+  truppnyheter och supporterforum på nätet och ringa in sina tecken med kulspetspenna i
+  rutorna 1 X 2 (se Matchanalysen, *Med research*). Efter matchen ringas utfallet in med
+  samma penna som ställningen, utan bock eller kryss – det fanns inget tips att rätta.
 - **En text med ett främmande tal visas inte (2026-10-18):** strängare än Gräva gulds
   flaggning. Varje tal i texten måste finnas i underlaget; annars ett nytt försök med
   talen utpekade, och klarar inte heller det kontrollen visas ingen text alls.
@@ -819,6 +825,36 @@ knappen  →  proxyn (Cloudflare Worker, nyckeln som hemlighet)  →  DeepSeek
               ↑ hämtar <sajten>/data/match/<id>.json själv
               ↑ hämtar nyheterna (Bing News, ESPN, BBC Sport, Open-Meteo)
 ```
+
+**Med research (Claude, 2026-10-20):** när proxyn har hemligheten `ANTHROPIC_API_KEY`
+skriver Claude (`claude-opus-5-5`) analysen i stället för DeepSeek
+([worker/research.mjs](worker/research.mjs), prompten och gränserna i
+[config/research.js](config/research.js)):
+
+- Claude får samma underlag och nyheterna ovan (med adresser i stället för id), och söker
+  och läser sedan själv på nätet med Anthropics sök- och läsverktyg (högst 10 sökningar
+  och 6 öppnade sidor; spelbolag och tipssajter spärrade): förhandsartiklar,
+  lokaltidningar, presskonferenser, skador och troliga startelvor, supporterforum och
+  fansajter. Svaret är JSON med `analys`, `nyheter`, `läktaren`, `tecken`, `marginal`
+  och `källor` (adress, tidning, rubrik).
+- Matchrutan visar *Analys*, *Nyhetsläget* och *Läktarsnacket* med hänvisningar till en
+  gemensam källista, och ringar in tecknen i rutorna 1 X 2 med raden i marginalen
+  (Claudes egen, högst tre ord utan siffror – annars spik, halvgardera eller
+  helgardera). Knappen visar *Läser på …* med tiden; en analys tar en och en halv
+  minut.
+- **Kontroller:** en källa följer bara med om adressen verkligen kom upp i en sökning,
+  en läst sida eller bland nyheterna – annars stryks hänvisningen. Varje tal i texterna
+  ska stå i underlaget eller i det Claude läste (rubriker, öppnade sidor, citerade
+  stycken); tecknen ska vara ett till tre av 1, X och 2. Annars ett nytt försök i samma
+  samtal (ur cachen), och därefter ingen text.
+- **Cache per match, inte per underlag:** en analys gäller 3 timmar för alla som klickar
+  (även om sajten uppdateras under tiden), en avvisad 30 minuter. Lokalt sparas den i
+  `data/cache/analysis/` med samma slutdatum.
+- **Högst 40 analyser per dygn** (svensk tid, räknas i KV); därefter skriver DeepSeek
+  den korta analysen som förut, utan tecken.
+- **Kostnad** (Anthropics prislista 2026-10: $4 / $20 per miljon tokens in/ut, cacheläsning
+  $0,20, $10 per 1 000 sökningar): en provkörning (Cardiff–Birmingham, 10 sökningar, 2
+  sidor) kostade ungefär $0,40 och tog 91 s.
 
 - **Underlaget** ([worker/analysis.mjs](worker/analysis.mjs)) är det matchvyn visar, med
   sidans precision: prognosen som odds (1X2, osäkerhet, över 2,5, båda gör mål, troligaste
@@ -1622,6 +1658,11 @@ schemaintervall gammalt.
   nya texter (analysen fungerar, men nästa klick kostar igen).
 - Texten finns bara för kommande matcher och bara i den webbläsare som klickat (och i
   proxyns cache) – den sparas inte i journalen och visas inte efter avspark.
+- **Med research:** svaret från Claude med alla sökträffar är stort, och att tolka det
+  tar processortid. Med Cloudflares gratisnivå (10 ms per anrop) är det inte mätt i den
+  driftsatta Workern – slår det i taket visar kortet ett fel. Claudes tecken sparas inte
+  i journalen och rättas inte; sajter som är spärrade på utvecklingsdatorn (t.ex. Reddit)
+  kan stå i källistan, och länkarna öppnas då inte där.
 - Prompten och kontrollen är provade mot ett simulerat API, inte mot riktiga svar från
   deepseek-v4-pro (ingen nyckel 2026-10-18).
 - **Nyhetsläget:** Cloudflares gratisnivå ger 10 ms processortid per anrop. Att tolka
