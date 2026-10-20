@@ -191,8 +191,10 @@ function tpCard(now = Date.now()) {
   const none = s.people.filter((p) => p.none);
   return '<div class="card tp-card">' +
     `<p class="kp-eyebrow">Omgången${kicks.length ? ` ${esc(dateRange(Math.min(...kicks), Math.max(...kicks)))}` : ''}</p>` +
-    // Orakel och Ikaros som bild (kronan.js).
+    // Orakel och Ikaros som bild (kronan.js), och när omgången är klar
+    // utmärkelserna efter hur var och en tippade (utmarkelser.js).
     (window.Kronan ? Kronan.html(s, tpPts) : '') +
+    (window.Utmarkelser ? Utmarkelser.live(round, s) : '') +
     `<ol class="tp-list">${list.join('')}</ol>` +
     (none.length ? `<p class="legend tp-missing">Tippade inte: ${none.map((p) => esc(p.name)).join(', ')}</p>` : '') +
     `<p class="kp-line tp-status">${tpStatus(s)}</p>` +
@@ -279,7 +281,7 @@ function tpRender() {
   if (!el) return;
   // Utan pågående omgång står den senaste kröningen kvar (kronan.js).
   const seen = ((TP.season && TP.season.rounds) || []).filter((r) => !tpRoundHidden(r));
-  const html = (tpCard() || (window.Kronan ? Kronan.reigning(seen, tpPts) : '')) + tpSeasonCard();
+  const html = (tpCard() || (window.Kronan ? Kronan.reigning(seen, tpPts, window.Utmarkelser && Utmarkelser.frozen) : '')) + tpSeasonCard();
   if (html === TP.html) return;
   TP.html = html;
   el.innerHTML = html;

@@ -1,0 +1,849 @@
+/* Utmärkelserna (utmarkelser.js): en bild per utmärkelse under Omgångens
+   orakel och Ikaros, i samma form som kröningen (kronan.css). --fh är
+   kroppens höjd; saker på kroppen (.ut-on) placeras i procent av bildens
+   bredd (--hx, huvudets mitt) och kroppens höjd (huvudet är ungefär de
+   översta 13 %). */
+
+.ut-row {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 12px;
+}
+.ut-row.n1 { grid-template-columns: minmax(0, 1fr); }
+.ut-row.n2 { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+
+.ut-panel {
+  margin: 0;
+  position: relative;
+  display: grid;
+  grid-template-rows: auto 1fr;
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  overflow: hidden;
+  isolation: isolate;
+  background: #14110d;
+}
+.ut-pos { border-color: rgba(216, 176, 106, 0.32); }
+.ut-neg { border-color: rgba(200, 100, 58, 0.32); }
+
+.ut-scene {
+  --sh: 196px;
+  --fh: 146px;
+  --floor: 12px;
+  position: relative;
+  height: var(--sh);
+  overflow: hidden;
+}
+
+.ut-figs {
+  position: absolute;
+  z-index: 2;
+  left: 0;
+  right: 0;
+  bottom: var(--floor);
+  display: flex;
+  justify-content: center;
+  align-items: flex-end;
+}
+.ut-figs.n2, .ut-figs.n3 { --fh: 118px; }
+.ut-figs > .ut-fig + .ut-fig { margin-left: -12px; }
+
+.ut-fig {
+  position: relative;
+  flex: none;
+  height: var(--fh);
+}
+.ut-fig img {
+  position: relative;
+  z-index: 1;
+  display: block;
+  height: 100%;
+  width: auto;
+  user-select: none;
+  -webkit-user-select: none;
+  filter: drop-shadow(0 6px 10px rgba(0, 0, 0, 0.5));
+}
+.ut-noimg { display: grid; place-items: end center; width: calc(var(--fh) * 0.55); }
+.ut-ini {
+  position: relative;
+  z-index: 1;
+  display: grid;
+  place-items: center;
+  width: 100%;
+  aspect-ratio: 1;
+  margin-bottom: 20%;
+  border-radius: 50%;
+  font-family: var(--display);
+  font-size: calc(var(--fh) * 0.2);
+  font-weight: 600;
+  color: #2a2116;
+  background: linear-gradient(180deg, #f3ead9, #cdbfa6);
+}
+
+/* Det som sitter på kroppen. */
+.ut-on {
+  position: absolute;
+  z-index: 2;
+  left: var(--hx);
+  display: block;
+  transform: translateX(-50%);
+  pointer-events: none;
+}
+
+/* Golv av marmor. */
+.ut-floor {
+  position: absolute;
+  z-index: 3;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  height: var(--floor);
+  background: linear-gradient(180deg, #e9dfcb, #bfae90);
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.45);
+}
+.ut-grass {
+  position: absolute;
+  z-index: 3;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  height: var(--floor);
+  background: linear-gradient(180deg, #4f7a3c, #2f4d24);
+}
+.ut-sun {
+  position: absolute;
+  top: 14px;
+  right: 14%;
+  width: 34px;
+  height: 34px;
+  border-radius: 50%;
+  background: radial-gradient(circle at 42% 40%, #fff6cf, #f7c35f 55%, #e8923f);
+  box-shadow: 0 0 22px 8px rgba(246, 190, 90, 0.4);
+}
+.ut-glow {
+  position: absolute;
+  left: 50%;
+  top: 46%;
+  width: 260px;
+  height: 260px;
+  margin: -130px 0 0 -130px;
+  border-radius: 50%;
+}
+
+/* ---------- Den oumbärlige: bär templets tak som en karyatid ---------- */
+
+.ut-oumbarlig .ut-scene {
+  background:
+    radial-gradient(90% 60% at 50% 100%, rgba(240, 214, 153, 0.22), transparent 70%),
+    linear-gradient(180deg, #24364a 0%, #50677e 55%, #a18f72 100%);
+}
+.ut-col {
+  position: absolute;
+  bottom: var(--floor);
+  width: calc(var(--fh) * 0.15);
+  height: var(--fh);
+  background:
+    repeating-linear-gradient(90deg, rgba(0, 0, 0, 0.13) 0 2px, transparent 2px 6px),
+    linear-gradient(90deg, #b9aa8c, #f1e8d6 40%, #d6c8ad);
+}
+.ut-col::before {
+  content: "";
+  position: absolute;
+  left: -18%;
+  right: -18%;
+  top: 0;
+  height: 8px;
+  border-radius: 2px;
+  background: linear-gradient(180deg, #f6efe2, #cdbfa3);
+}
+.ut-col.l { left: 9%; }
+.ut-col.r { right: 9%; }
+.ut-beam {
+  position: absolute;
+  z-index: 3;
+  left: 3%;
+  right: 3%;
+  bottom: calc(var(--floor) + var(--fh));
+  height: 15px;
+  background: linear-gradient(180deg, #f3ebdb, #cbbd9f);
+  box-shadow: 0 6px 10px -4px rgba(0, 0, 0, 0.5);
+}
+.ut-beam::before {
+  content: "";
+  position: absolute;
+  left: 4%;
+  right: 4%;
+  bottom: 100%;
+  height: 26px;
+  background: linear-gradient(180deg, #eee4d1, #cdbfa3);
+  clip-path: polygon(0 100%, 50% 0, 100% 100%);
+}
+.ut-beam::after {
+  content: "";
+  position: absolute;
+  left: 8px;
+  right: 8px;
+  top: 4px;
+  height: 7px;
+  background: var(--meander) repeat-x center / 7px 7px;
+  opacity: 0.8;
+}
+.ut-dust i {
+  position: absolute;
+  z-index: 3;
+  left: calc(50% + (var(--i) - 3) * 9px);
+  bottom: calc(var(--floor) + var(--fh) - 2px);
+  width: 3px;
+  height: 3px;
+  border-radius: 50%;
+  background: #e9dfcb;
+  opacity: 0;
+  animation: ut-dust 3.2s ease-in infinite;
+  animation-delay: calc(var(--i) * 0.47s);
+}
+.ut-dust i:nth-child(1) { --i: 1; }
+.ut-dust i:nth-child(2) { --i: 2; }
+.ut-dust i:nth-child(3) { --i: 3; }
+.ut-dust i:nth-child(4) { --i: 4; }
+.ut-dust i:nth-child(5) { --i: 5; }
+.ut-dust i:nth-child(6) { --i: 6; }
+
+/* ---------- Den missförstådde: ensam i strålkastarljuset ---------- */
+
+.ut-missforstadd .ut-scene { background: linear-gradient(180deg, #121010, #0b0a09); }
+.ut-cone {
+  position: absolute;
+  left: 50%;
+  top: 0;
+  bottom: 4px;
+  width: 78%;
+  transform: translateX(-50%);
+  background: linear-gradient(180deg, rgba(255, 238, 196, 0.32), rgba(255, 238, 196, 0.07));
+  clip-path: polygon(44% 0, 56% 0, 100% 100%, 0 100%);
+  animation: ut-flicker 5s infinite;
+}
+.ut-pool {
+  position: absolute;
+  left: 50%;
+  bottom: 2px;
+  width: 74%;
+  height: 22px;
+  transform: translateX(-50%);
+  border-radius: 50%;
+  background: radial-gradient(closest-side, rgba(255, 238, 196, 0.34), transparent);
+}
+.ut-bubble {
+  left: calc(var(--hx) + var(--fh) * 0.2);
+  top: -8%;
+  display: grid;
+  place-items: center;
+  width: calc(var(--fh) * 0.2);
+  height: calc(var(--fh) * 0.2);
+  border-radius: 50%;
+  font-family: var(--display);
+  font-size: calc(var(--fh) * 0.12);
+  font-weight: 700;
+  line-height: 1;
+  color: #1a1408;
+  background: #f3ead9;
+  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.45);
+  transform-origin: 0 100%;
+  animation: ut-unheard 5s infinite;
+}
+.ut-bubble::after {
+  content: "";
+  position: absolute;
+  left: 4%;
+  bottom: -2px;
+  width: 9px;
+  height: 9px;
+  background: #f3ead9;
+  clip-path: polygon(0 100%, 100% 0, 30% 0);
+}
+
+/* ---------- Finansgeniet: mynt som regnar ---------- */
+
+.ut-finansgeni .ut-scene { background: linear-gradient(180deg, #123425, #0a1912); }
+.ut-finansgeni .ut-glow { background: radial-gradient(closest-side, rgba(240, 214, 153, 0.3), transparent); }
+.ut-stack {
+  position: absolute;
+  z-index: 3;
+  left: 68%;
+  bottom: 6px;
+  width: 30px;
+  height: 9px;
+  border-radius: 50%;
+  background: linear-gradient(180deg, #f6dc98, #b98a37);
+  box-shadow:
+    0 -5px 0 -0.5px #d7ad5a, 0 -10px 0 -0.5px #e9c678, 0 -15px 0 -0.5px #d7ad5a,
+    0 -20px 0 -0.5px #e9c678, 0 -25px 0 -0.5px #d7ad5a, -16px 1px 0 -1px #c9973f, -16px -4px 0 -1px #e9c678;
+}
+.ut-coins i {
+  position: absolute;
+  z-index: 3;
+  top: -24px;
+  left: var(--x);
+  width: 15px;
+  height: 15px;
+  border-radius: 50%;
+  border: 1px solid #8a6626;
+  background: radial-gradient(circle at 35% 30%, #fff1c2, #e6bd63 50%, #b4862f);
+  animation: ut-fall 2.6s linear infinite;
+  animation-delay: var(--d);
+}
+.ut-coins i:nth-child(1) { --x: 12%; --d: 0s; }
+.ut-coins i:nth-child(2) { --x: 30%; --d: 1.1s; }
+.ut-coins i:nth-child(3) { --x: 47%; --d: 0.5s; }
+.ut-coins i:nth-child(4) { --x: 62%; --d: 1.7s; }
+.ut-coins i:nth-child(5) { --x: 78%; --d: 0.8s; }
+.ut-coins i:nth-child(6) { --x: 88%; --d: 2.1s; }
+.ut-coins i:nth-child(7) { --x: 22%; --d: 2.3s; }
+.ut-coins i:nth-child(8) { --x: 70%; --d: 0.3s; }
+
+/* ---------- Den våghalsige: hjälm på i forsen ---------- */
+
+.ut-vaghalsig .ut-scene { background: linear-gradient(180deg, #6c7880 0%, #9aa3a5 38%, #77857a 60%); }
+.ut-hills { position: absolute; left: 0; right: 0; bottom: 22px; width: 100%; height: 58%; }
+.ut-helmet { top: -2.5%; width: calc(var(--fh) * 0.165); }
+.ut-river {
+  position: absolute;
+  z-index: 3;
+  left: 0;
+  bottom: 0;
+  width: 200%;
+  height: 46px;
+  animation: ut-flow 5s linear infinite;
+}
+.ut-river .a { fill: #9b8361; }
+.ut-river .b { fill: #7d6748; stroke: rgba(246, 239, 226, 0.7); stroke-width: 1.4; vector-effect: non-scaling-stroke; }
+.ut-spray i {
+  position: absolute;
+  z-index: 3;
+  bottom: 26px;
+  left: var(--x);
+  width: 4px;
+  height: 4px;
+  border-radius: 50%;
+  background: #f6efe2;
+  opacity: 0;
+  animation: ut-spray 1.6s ease-out infinite;
+  animation-delay: var(--d);
+}
+.ut-spray i:nth-child(1) { --x: 30%; --d: 0s; }
+.ut-spray i:nth-child(2) { --x: 38%; --d: 0.5s; }
+.ut-spray i:nth-child(3) { --x: 46%; --d: 1.1s; }
+.ut-spray i:nth-child(4) { --x: 55%; --d: 0.3s; }
+.ut-spray i:nth-child(5) { --x: 63%; --d: 0.9s; }
+.ut-spray i:nth-child(6) { --x: 70%; --d: 1.3s; }
+
+/* ---------- Den diplomatiske: vit flagg ---------- */
+
+.ut-diplomat .ut-scene {
+  background:
+    radial-gradient(80% 60% at 50% 30%, rgba(169, 200, 251, 0.18), transparent 70%),
+    linear-gradient(180deg, #1c2a39, #121a23);
+}
+/* Flaggstången i handen. */
+.ut-flag { left: var(--lx); top: calc(var(--ly) - 40%); width: calc(var(--fh) * 0.3); height: 48%; transform: none; }
+.ut-pole {
+  position: absolute;
+  left: 0;
+  top: 0;
+  bottom: 0;
+  width: 2px;
+  border-radius: 1px;
+  background: linear-gradient(180deg, #e9dfcb, #9d9383);
+}
+.ut-cloth {
+  position: absolute;
+  left: 2px;
+  top: 2px;
+  width: 100%;
+  transform-origin: 0 50%;
+  animation: ut-wave 1.2s ease-in-out infinite alternate;
+}
+.ut-dove {
+  position: absolute;
+  top: 18%;
+  left: -12%;
+  width: 22px;
+  animation: ut-dove 9s linear infinite;
+}
+
+/* ---------- Den självständige: marionett med modellen i trådarna ---------- */
+
+.ut-sjalvstandig .ut-scene { background: radial-gradient(70% 70% at 50% 40%, #3a2219, #1a0f0b 80%); }
+.ut-curtain {
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  width: 17%;
+  background: repeating-linear-gradient(90deg, #8f3f1f 0 7px, #b4532c 7px 12px, #7a3318 12px 16px);
+  box-shadow: 0 0 18px rgba(0, 0, 0, 0.6);
+}
+.ut-curtain.l { left: 0; border-bottom-right-radius: 70% 28%; }
+.ut-curtain.r { right: 0; border-bottom-left-radius: 70% 28%; }
+.ut-boards {
+  position: absolute;
+  z-index: 3;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  height: var(--floor);
+  background: repeating-linear-gradient(90deg, #5a3a22 0 22px, #4a2f1b 22px 23px);
+}
+.ut-sjalvstandig .ut-fig {
+  transform-origin: var(--hx) calc(var(--fh) * -0.2);
+  animation: ut-dangle 3.4s ease-in-out infinite alternate;
+}
+.ut-ctrl {
+  top: calc(var(--fh) * -0.2 - 6px);
+  width: calc(var(--fh) * 0.36);
+  height: 12px;
+}
+.ut-bar, .ut-stick {
+  position: absolute;
+  border-radius: 2px;
+  background: linear-gradient(180deg, #a8794a, #6b4626);
+}
+.ut-bar { left: 0; right: 0; top: 4px; height: 5px; }
+.ut-stick { left: 50%; top: -10px; width: 5px; height: 26px; margin-left: -2.5px; }
+.ut-ctrl b {
+  position: absolute;
+  left: 50%;
+  top: -16px;
+  display: grid;
+  place-items: center;
+  width: 16px;
+  height: 16px;
+  margin-left: -8px;
+  border-radius: 50%;
+  font-size: 9px;
+  font-weight: 800;
+  color: #1a1408;
+  background: var(--gold-grad);
+}
+.ut-str {
+  position: absolute;
+  z-index: 2;
+  top: calc(var(--fh) * -0.2);
+  width: 1px;
+  background: rgba(243, 237, 227, 0.6);
+}
+.ut-str.c { left: var(--hx); height: calc(var(--fh) * 0.2); }
+.ut-str.l { left: calc(var(--hx) - var(--fh) * 0.17); height: calc(var(--fh) * 0.2 + var(--sy)); }
+.ut-str.r { left: calc(var(--hx) + var(--fh) * 0.17); height: calc(var(--fh) * 0.2 + var(--sy)); }
+
+/* ---------- Den konflikträdde: tittar fram bakom en låda med kryss ---------- */
+
+.ut-konfliktradd .ut-scene {
+  background:
+    radial-gradient(70% 60% at 50% 35%, rgba(224, 122, 69, 0.18), transparent 70%),
+    linear-gradient(180deg, #2a221b, #17130f);
+}
+.ut-konfliktradd .ut-figs { bottom: 0; animation: ut-peek 4.5s ease-in-out infinite; }
+.ut-crate {
+  position: absolute;
+  z-index: 3;
+  left: 50%;
+  bottom: 0;
+  width: calc(var(--fh) * 0.78);
+  height: calc(var(--fh) * 0.56);
+  transform: translateX(-50%);
+  overflow: hidden;
+  border-radius: 3px;
+  background:
+    repeating-linear-gradient(180deg, transparent 0 calc(25% - 1px), rgba(40, 24, 12, 0.55) calc(25% - 1px) 25%),
+    linear-gradient(90deg, #9a5a2f, #c27a45 50%, #9a5a2f);
+  box-shadow: inset 0 0 0 5px #7a4220, 0 8px 18px rgba(0, 0, 0, 0.55);
+}
+.ut-crate i {
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  width: 12px;
+  height: 140%;
+  margin: -70% 0 0 -6px;
+  border-radius: 2px;
+  background:
+    radial-gradient(circle at 50% 18%, #3a2a1c 0 1.8px, transparent 2.3px),
+    radial-gradient(circle at 50% 82%, #3a2a1c 0 1.8px, transparent 2.3px),
+    linear-gradient(90deg, #8a4a24, #b06736 50%, #8a4a24);
+  box-shadow: 0 0 4px rgba(0, 0, 0, 0.45);
+}
+.ut-crate i:first-child { transform: rotate(54deg); }
+.ut-crate i:last-child { transform: rotate(-54deg); }
+
+/* ---------- Den konsekvente: ett monument över nollan ---------- */
+
+.ut-konsekvent .ut-scene {
+  background:
+    radial-gradient(70% 60% at 50% 45%, rgba(240, 214, 153, 0.16), transparent 70%),
+    linear-gradient(180deg, #1f1a12, #110e0a);
+}
+.ut-zero {
+  position: absolute;
+  z-index: 1;
+  left: 50%;
+  bottom: calc(var(--floor) - var(--fh) * 0.06);
+  transform: translateX(-50%);
+  font-family: var(--display);
+  font-size: calc(var(--fh) * 1.32);
+  font-weight: 700;
+  line-height: 1;
+  color: transparent;
+  background: linear-gradient(110deg, #b4862f 0%, #f4dfaa 30%, #fff7dc 38%, #e6c27a 46%, #9c7430 100%);
+  background-size: 250% 100%;
+  -webkit-background-clip: text;
+  background-clip: text;
+  opacity: 0.85;
+  animation: ut-shine 5s ease-in-out infinite;
+}
+
+/* ---------- Den upptagne: bakom en dörr med Stör ej ---------- */
+
+.ut-upptagen .ut-scene { background: repeating-linear-gradient(90deg, #2b251e 0 18px, #29231c 18px 36px); }
+.ut-upptagen .ut-fig { --dw: calc(var(--fh) * 0.56); }
+.ut-upptagen .ut-fig img { filter: grayscale(1) brightness(0.75); }
+/* Dörrbladet med ett hål för glaset (76 % × 46 %, 12 % från sidorna och 7 % från toppen). */
+.ut-door {
+  top: -9%;
+  bottom: 0;
+  width: var(--dw);
+  border-radius: 4px 4px 0 0;
+  background: linear-gradient(90deg, #5e3e24, #8a5d37 22%, #7a5130 78%, #5e3e24);
+  -webkit-mask: linear-gradient(#000 0 0) 50% 13% / 76% 46% no-repeat, linear-gradient(#000 0 0);
+  -webkit-mask-composite: xor;
+  mask: linear-gradient(#000 0 0) 50% 13% / 76% 46% no-repeat exclude, linear-gradient(#000 0 0);
+}
+.ut-glass {
+  top: -1.4%;
+  height: 50.1%;
+  width: calc(var(--dw) * 0.76);
+  background: rgba(230, 222, 205, 0.16);
+  -webkit-backdrop-filter: blur(3.5px);
+  backdrop-filter: blur(3.5px);
+  box-shadow: inset 0 0 0 1.5px rgba(62, 42, 25, 0.9);
+}
+.ut-plo {
+  top: 62%;
+  height: 26%;
+  width: calc(var(--dw) * 0.66);
+  border-radius: 2px;
+  box-shadow: inset 0 0 0 2px rgba(50, 32, 18, 0.75), inset 0 0 0 4px rgba(150, 105, 66, 0.35);
+}
+.ut-knob {
+  left: calc(var(--hx) + var(--dw) * 0.36);
+  top: 56%;
+  width: 7px;
+  height: 7px;
+  border-radius: 50%;
+  background: radial-gradient(circle at 35% 35%, #fbe9b8, #b4862f);
+}
+.ut-hang {
+  z-index: 3;
+  left: calc(var(--hx) + var(--dw) * 0.36);
+  top: calc(56% + 3px);
+  padding: 9px 4px 4px;
+  font-size: 8px;
+  font-weight: 800;
+  letter-spacing: 0.04em;
+  line-height: 1;
+  white-space: nowrap;
+  text-transform: uppercase;
+  color: #1a1408;
+  background: radial-gradient(circle at 50% 4px, transparent 3px, #f3ead9 3.5px);
+  border-radius: 3px;
+  transform-origin: 50% 3px;
+  box-shadow: 0 3px 6px rgba(0, 0, 0, 0.45);
+  animation: ut-swing 2.4s ease-in-out infinite alternate;
+}
+
+/* ---------- Den storsinte: kransen flyger sin väg ---------- */
+
+.ut-storsint .ut-scene { background: linear-gradient(180deg, #221c12, #120f0b); }
+.ut-storsint .ut-glow { background: radial-gradient(closest-side, rgba(240, 214, 153, 0.16), transparent); }
+.ut-wreath {
+  top: -5%;
+  width: calc(var(--fh) * 0.2);
+  filter: drop-shadow(0 0 4px rgba(240, 214, 153, 0.6));
+  animation: ut-away 5.5s ease-in infinite;
+}
+
+/* ---------- Den självsäkre: solglasögon på, marken spricker ---------- */
+
+.ut-sjalvsaker .ut-scene {
+  background:
+    radial-gradient(70% 60% at 86% 10%, rgba(247, 195, 95, 0.32), transparent 70%),
+    linear-gradient(180deg, #3b2d18, #1a140d);
+}
+.ut-ground {
+  position: absolute;
+  z-index: 3;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  height: var(--floor);
+  background: linear-gradient(180deg, #b49c74, #7d6849);
+}
+.ut-shades { top: calc(var(--ey) - 2%); width: calc(var(--fh) * 0.12); }
+.ut-gleam { animation: ut-gleam 3.5s ease-in-out infinite; }
+.ut-crack {
+  position: absolute;
+  z-index: 4;
+  left: 20%;
+  bottom: 2px;
+  width: 60%;
+  height: 9px;
+}
+.ut-crack path {
+  fill: none;
+  stroke: #1d150d;
+  stroke-width: 1.6;
+  vector-effect: non-scaling-stroke;
+  stroke-dasharray: 130;
+  stroke-dashoffset: 130;
+  animation: ut-crack 4s ease-out infinite;
+}
+
+/* ---------- Otursfågeln: regn bara på en, och en kråka ---------- */
+
+.ut-oturs .ut-scene { background: linear-gradient(180deg, #2c5b86, #6c9cc2 80%); }
+.ut-cloud {
+  top: -23%;
+  width: calc(var(--fh) * 0.44);
+  height: calc(var(--fh) * 1.27);
+}
+.ut-cloud svg { position: relative; z-index: 1; display: block; width: 100%; }
+.ut-drops i {
+  position: absolute;
+  top: calc(var(--fh) * 0.18);
+  left: var(--x);
+  width: 1.5px;
+  height: 9px;
+  border-radius: 1px;
+  background: rgba(214, 231, 245, 0.85);
+  animation: ut-rain 0.8s linear infinite;
+  animation-delay: var(--d);
+}
+.ut-drops i:nth-child(1) { --x: 18%; --d: 0s; }
+.ut-drops i:nth-child(2) { --x: 32%; --d: 0.4s; }
+.ut-drops i:nth-child(3) { --x: 46%; --d: 0.15s; }
+.ut-drops i:nth-child(4) { --x: 60%; --d: 0.55s; }
+.ut-drops i:nth-child(5) { --x: 72%; --d: 0.25s; }
+.ut-drops i:nth-child(6) { --x: 84%; --d: 0.65s; }
+.ut-orbit {
+  top: -4%;
+  width: 0;
+  height: 0;
+  transform: none;
+  animation: ut-circle 5s linear infinite;
+}
+.ut-crow {
+  position: absolute;
+  left: -10px;
+  top: -5px;
+  width: 20px;
+  animation: ut-flap 0.35s ease-in-out infinite alternate;
+}
+
+/* ---------- Den optimistiske: ballongerna spricker en efter en ---------- */
+
+.ut-optimist .ut-scene { background: linear-gradient(180deg, #4a7fae, #a7cbe4 85%); }
+.ut-puff {
+  position: absolute;
+  height: 14px;
+  border-radius: 999px;
+  background: rgba(255, 255, 255, 0.55);
+  box-shadow: 12px -6px 0 2px rgba(255, 255, 255, 0.5);
+}
+.ut-puff.a { left: 10%; top: 16%; width: 44px; }
+.ut-puff.b { right: 14%; top: 34%; width: 34px; }
+/* Snörena samlas i handen (6, 88 i bildens 44 × 90). */
+.ut-balloons {
+  left: calc(var(--lx) - var(--fh) * 0.0436);
+  top: calc(var(--ly) - var(--fh) * 0.626);
+  width: calc(var(--fh) * 0.32);
+  transform: none;
+}
+.ut-b { transform-box: fill-box; transform-origin: 50% 20%; animation: ut-pop 7.5s infinite; }
+.ut-pop { opacity: 0; transform-box: fill-box; transform-origin: center; animation: ut-burst 7.5s infinite; }
+.ut-b.b2, .ut-pop.b2 { animation-delay: 1.4s; }
+.ut-b.b3, .ut-pop.b3 { animation-delay: 2.8s; }
+
+/* ---------- Den förutseende: paraply och livboj – regnet kommer från sidan ---------- */
+
+.ut-forutseende .ut-scene { background: linear-gradient(180deg, #1c2630, #2c3a46); }
+/* Paraplyet över huvudet, livbojen runt midjan. */
+.ut-umbrella { top: -22%; width: calc(var(--fh) * 0.44); }
+.ut-buoy { top: calc(var(--wy) - var(--fh) * 0.16); width: calc(var(--fh) * 0.32); }
+.ut-slant {
+  position: absolute;
+  z-index: 3;
+  inset: -20% -30%;
+  transform: rotate(28deg);
+  pointer-events: none;
+}
+.ut-slant i {
+  position: absolute;
+  top: 0;
+  left: calc(var(--i) * 8%);
+  width: 1.5px;
+  height: 12px;
+  border-radius: 1px;
+  background: rgba(205, 225, 240, 0.7);
+  animation: ut-sheet 0.7s linear infinite;
+  animation-delay: calc(var(--i) * -0.13s);
+}
+.ut-slant i:nth-child(1) { --i: 1; }
+.ut-slant i:nth-child(2) { --i: 2; }
+.ut-slant i:nth-child(3) { --i: 3; }
+.ut-slant i:nth-child(4) { --i: 4; }
+.ut-slant i:nth-child(5) { --i: 5; }
+.ut-slant i:nth-child(6) { --i: 6; }
+.ut-slant i:nth-child(7) { --i: 7; }
+.ut-slant i:nth-child(8) { --i: 8; }
+.ut-slant i:nth-child(9) { --i: 9; }
+.ut-slant i:nth-child(10) { --i: 10; }
+.ut-slant i:nth-child(11) { --i: 11; }
+.ut-slant i:nth-child(12) { --i: 12; }
+
+/* ---------- texten ---------- */
+
+.ut-panel figcaption {
+  position: relative;
+  z-index: 4;
+  display: grid;
+  align-content: start;
+  gap: 1px;
+  padding: 10px 10px 12px;
+  text-align: center;
+  border-top: 1px solid var(--hair);
+  background: rgba(10, 9, 7, 0.55);
+}
+.ut-title {
+  font-size: 10.5px;
+  font-weight: 800;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+}
+.ut-pos .ut-title { color: var(--gold-hi); }
+.ut-neg .ut-title { color: #ef9a6d; }
+.ut-name {
+  font-family: var(--display);
+  font-size: 19px;
+  font-weight: 600;
+  line-height: 1.2;
+  color: var(--fg);
+  overflow-wrap: anywhere;
+}
+.ut-amp { color: var(--muted); font-weight: 400; }
+.ut-line {
+  font-size: 12.5px;
+  font-weight: 600;
+  line-height: 1.35;
+  font-variant-numeric: tabular-nums;
+  color: var(--ink-soft);
+}
+
+/* ---------- rörelse ---------- */
+
+@keyframes ut-dust {
+  0% { transform: translateY(0); opacity: 0; }
+  10% { opacity: 0.9; }
+  100% { transform: translateY(46px); opacity: 0; }
+}
+@keyframes ut-flicker { 0%, 100% { opacity: 1; } 47% { opacity: 1; } 49% { opacity: 0.55; } 51% { opacity: 1; } 53% { opacity: 0.7; } 55% { opacity: 1; } }
+/* Bubblan växer fram, står en stund – och krymper ihop när ingen lyssnar. */
+@keyframes ut-unheard {
+  0% { transform: translateX(-50%) scale(0); opacity: 0; }
+  7% { transform: translateX(-50%) scale(1.08); opacity: 1; }
+  10%, 76% { transform: translateX(-50%) scale(1); opacity: 1; }
+  88%, 100% { transform: translateX(-50%) scale(0.2); opacity: 0; }
+}
+@keyframes ut-fall {
+  0% { transform: translateY(0) rotateY(0deg); opacity: 0; }
+  10% { opacity: 1; }
+  85% { opacity: 1; }
+  100% { transform: translateY(calc(var(--sh) + 10px)) rotateY(720deg); opacity: 0; }
+}
+@keyframes ut-flow { to { transform: translateX(-25%); } }
+@keyframes ut-spray {
+  0% { transform: translate(0, 0); opacity: 0; }
+  20% { opacity: 0.9; }
+  100% { transform: translate(8px, -22px); opacity: 0; }
+}
+@keyframes ut-wave { from { transform: skewY(-5deg) scaleX(0.94); } to { transform: skewY(4deg) scaleX(1.03); } }
+@keyframes ut-dove {
+  0% { transform: translate(0, 0); }
+  50% { transform: translate(70cqw, -10px); }
+  100% { transform: translate(140cqw, 4px); }
+}
+@keyframes ut-dangle { from { transform: rotate(-2.5deg); } to { transform: rotate(2.5deg); } }
+/* Tittar fram bakom lådan, ducker till, gömmer sig – och tittar fram igen. */
+@keyframes ut-peek {
+  0%, 38% { transform: translateY(14%); }
+  43% { transform: translateY(26%); }
+  48% { transform: translateY(14%); }
+  60%, 84% { transform: translateY(58%); }
+  100% { transform: translateY(14%); }
+}
+@keyframes ut-shine { 0%, 100% { background-position: 100% 0; } 50% { background-position: 0 0; } }
+@keyframes ut-swing { from { transform: translateX(-50%) rotate(-9deg); } to { transform: translateX(-50%) rotate(7deg); } }
+@keyframes ut-away {
+  0%, 30% { transform: translateX(-50%) translate(0, 0) rotate(0deg); opacity: 1; }
+  80% { transform: translateX(-50%) translate(calc(var(--fh) * 0.9), calc(var(--fh) * -0.32)) rotate(28deg); opacity: 0; }
+  100% { transform: translateX(-50%) translate(calc(var(--fh) * 0.9), calc(var(--fh) * -0.32)) rotate(28deg); opacity: 0; }
+}
+@keyframes ut-gleam { 0%, 55% { transform: rotate(25deg) translateX(0); } 85%, 100% { transform: rotate(25deg) translateX(60px); } }
+@keyframes ut-crack { 0%, 25% { stroke-dashoffset: 130; } 45%, 85% { stroke-dashoffset: 0; } 100% { stroke-dashoffset: 0; opacity: 0; } }
+@keyframes ut-rain {
+  from { transform: translateY(0); opacity: 0.9; }
+  to { transform: translateY(calc(var(--fh) * 0.95)); opacity: 0.3; }
+}
+/* Kråkan cirklar runt huvudet: framför när den är nere, bakom när den är uppe. */
+@keyframes ut-circle {
+  0% { transform: translate(calc(var(--fh) * -0.28), 0) scaleX(1); z-index: 2; }
+  24% { transform: translate(0, calc(var(--fh) * 0.08)) scale(1.15); z-index: 2; }
+  49% { transform: translate(calc(var(--fh) * 0.28), 0) scaleX(1); z-index: 2; }
+  51% { transform: translate(calc(var(--fh) * 0.28), 0) scaleX(-1); z-index: 0; }
+  75% { transform: translate(0, calc(var(--fh) * -0.1)) scale(-0.8, 0.8); z-index: 0; }
+  99% { transform: translate(calc(var(--fh) * -0.28), 0) scaleX(-1); z-index: 0; }
+  100% { transform: translate(calc(var(--fh) * -0.28), 0) scaleX(1); z-index: 2; }
+}
+@keyframes ut-flap { from { transform: scaleY(1); } to { transform: scaleY(0.4); } }
+@keyframes ut-pop {
+  0%, 46% { transform: scale(1); opacity: 1; }
+  50% { transform: scale(1.25); opacity: 1; }
+  52%, 92% { transform: scale(0); opacity: 0; }
+  100% { transform: scale(1); opacity: 1; }
+}
+@keyframes ut-burst {
+  0%, 50% { transform: scale(0.4); opacity: 0; }
+  52% { transform: scale(1); opacity: 1; }
+  58%, 100% { transform: scale(1.5); opacity: 0; }
+}
+@keyframes ut-sheet {
+  from { transform: translateY(-20px); }
+  to { transform: translateY(calc(var(--sh) * 1.5)); }
+}
+
+.ut-diplomat .ut-scene { container-type: inline-size; }
+
+@media (prefers-reduced-motion: reduce) {
+  .ut-row *, .ut-row *::before, .ut-row *::after { animation: none !important; }
+  .ut-coins, .ut-dust, .ut-spray, .ut-pop { display: none; }
+  .ut-crack path { stroke-dashoffset: 0; }
+}
+
+@media (max-width: 560px) {
+  .ut-row, .ut-row.n2 { grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 10px; }
+  .ut-row.n1 { grid-template-columns: minmax(0, 1fr); }
+  .ut-row > .ut-panel:nth-child(3):last-child { grid-column: 1 / -1; }
+  .ut-scene { --sh: 176px; --fh: 128px; }
+  .ut-figs.n2, .ut-figs.n3 { --fh: 104px; }
+  .ut-title { font-size: 9.5px; letter-spacing: 0.06em; }
+  .ut-name { font-size: 17px; }
+  .ut-line { font-size: 12px; }
+  .ut-panel figcaption { padding: 8px 8px 10px; }
+}

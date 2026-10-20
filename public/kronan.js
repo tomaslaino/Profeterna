@@ -172,8 +172,9 @@ window.Kronan = (() => {
 
   // Egen ruta när ingen omgång pågår: den senaste avslutade omgången med både
   // orakel och Ikaros (säsongens omgångar, data/tippare.json), annars
-  // KRONAN_START utan poäng.
-  function reigning(rounds, pts) {
+  // KRONAN_START utan poäng. extra(omgången) ger det som står under bilden
+  // (utmärkelserna, utmarkelser.js).
+  function reigning(rounds, pts, extra) {
     const has = (r, a) => (r.people || []).some((p) => p.award === a);
     const last = (rounds || []).filter((r) => has(r, 'best') && has(r, 'worst'))
       .sort((a, b) => String(b.to || b.from).localeCompare(String(a.to || a.from)))[0];
@@ -190,7 +191,7 @@ window.Kronan = (() => {
       worst = KRONAN_START.ikaros.map(who);
     }
     return `<div class="card tp-card kr-reign"><p class="kp-eyebrow">${last ? `Omgången${when ? ` ${when}` : ''}` : 'Före första omgången'}</p>` +
-      `${stage(best, worst, true, pts)}</div>`;
+      `${stage(best, worst, true, pts)}${last && extra ? extra(last) : ''}</div>`;
   }
 
   return { html, reigning };

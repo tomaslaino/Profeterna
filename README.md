@@ -65,6 +65,10 @@ ingen falsk precision · sidan kraschar aldrig av en död källa · endast fria 
   säsongen för gängets egna tips – poäng, omgångar, rätt och antal gånger som omgångens
   bästa och sämsta, med modellen som jämförelse. Varje omgång sparas i
   `data/tippar-historik.json` (se [Säsongens tippare](#säsongens-tippare))
+- [x] **Utmärkelserna (2026-10-20):** när omgången är färdigspelad delas utmärkelser ut
+  efter hur var och en tippade – titlar som låter som dygder (*Den diplomatiske*) med en
+  rad om hur det gick (*Tog inte ställning i 3 matcher*), och en bild var under orakel och
+  Ikaros (se [Utmärkelserna](#utmärkelserna))
 - [x] **Olympen (2026-10-19):** en egen flik (`#olympen`) för gängets inbördes kamp om
   tipsen – ställningen med den pågående omgången, en kurva omgång för omgång, inbördes
   möten, spelkassan (10 kr per match till modellens odds), höjdpunkter och hur var och en
@@ -423,7 +427,9 @@ server:
   rutorna på förstasidan ritas av [public/tippare.js](public/tippare.js) med
   [public/tippare.css](public/tippare.css). Poängen räknas av
   [public/tippoang.js](public/tippoang.js), som både bygget och sidan använder. Se
-  [Omgångens tippare](#omgångens-tippare).
+  [Omgångens tippare](#omgångens-tippare). Utmärkelserna räknas och ritas av
+  [public/utmarkelser.js](public/utmarkelser.js) med
+  [public/utmarkelser.css](public/utmarkelser.css), se [Utmärkelserna](#utmärkelserna).
 - **Frontend:** ren HTML/CSS/JS i `public/`, flikarna Matcher, Kupong, Källor och
   Modell (regelversion, backtest, kandidatlogg och sist Utvärdering; `#utvardering`
   leder dit); matchen öppnas i matchrutan (`#match/<id>`, en `<dialog>` ovanpå sidan man
@@ -1233,6 +1239,47 @@ helgardering alltid ger 0). Poängen läggs ihop för omgången.
 
 Bara den pågående omgången finns i `GET …/samtal`. När nästa omgång startas försvinner
 rutan – men omgången finns kvar i säsongen nedan.
+
+### Utmärkelserna
+
+När omgången är färdigspelad delas utmärkelser ut efter hur var och en tippade, som en rad
+bilder under orakel och Ikaros ([public/utmarkelser.js](public/utmarkelser.js),
+`utmarkelser.css`). De står kvar i rutan med den senaste omgången tills nästa omgång är
+igång. Titeln låter som en dygd; raden under säger hur det gick. Allt räknas i webbläsaren
+ur tipsen, resultaten efter 90 minuter, modellens prognos före avspark och gängets kupong
+– samma underlag för den pågående omgången (`GET …/samtal`) och de avslutade
+(`data/tippare.json`), så inget nytt sparas.
+
+| Utmärkelse | Går till | Raden | Bilden |
+|---|---|---|---|
+| Den oumbärlige | gav laget flest rätt (minst 2) | *7 av lagets 8 rätt* | bär templets tak |
+| Den missförstådde | ensam om rätt | *Ensam om rätt i Leeds – Man Utd* | i strålkastarljuset, pratbubblan krymper |
+| Finansgeniet | största skrällen som satt (odds över 3,00) | *10 kr blev 42 kr* | mynt som regnar |
+| Den våghalsige | högst snittodds (minst 2,60, minst 3 matcher) | *Snittodds 3,80 · 1 rätt* | hjälm på i forsen |
+| Den diplomatiske | flest helgarderingar | *Tog inte ställning i 3 matcher* | vit flagg |
+| Den självständige | som modellens troligaste i minst 75 % | *Som modellen i alla 8* | marionett med M i trådarna |
+| Den konflikträdde | flest kryss (minst 2 och en tredjedel) | *Kryss i 5 av 8* | tittar fram bakom en låda |
+| Den konsekvente | 0 rätt (minst 3 matcher) | *0 av 8* | ett monument över nollan |
+| Den upptagne | lämnade inte in | *Tippade inte* | bakom en dörr med Stör ej |
+| Den storsinte | ledde ensam inför de sista matcherna men slutade inte överst | *Ledde till sista matchen* | kransen flyger sin väg |
+| Den självsäkre | fel på sitt säkraste tips (minst 60 %) | *Fel på Leicester City · odds 1,35* | solglasögon, marken spricker |
+| Otursfågeln | flest tips ett mål från rätt (minst 2) | *Ett mål ifrån i 3 matcher* | regnmoln bara över en, och en kråka |
+| Den optimistiske | minst 2 skrällar, ingen satt | *4 skrällar, ingen satt* | ballongerna spricker |
+| Den förutseende | garderade och hade fel ändå (minst 2) | *Garderade 3, fel i alla 3* | paraply och livboj, regnet från sidan |
+
+- Var och en får högst en utmärkelse per omgång, och varje utmärkelse kräver en ensam
+  vinnare – bara Den konsekvente och Den upptagne kan delas. Alla delas inte ut varje gång.
+- **Den som gav laget fler rätt än de andra** får bara en positiv utmärkelse (de sju
+  första i tabellen, och Den oumbärlige först). Att ge laget en rätt = ha rätt tecken i en
+  match där gängets kupong satt. Gängets kupong är den sparade kupongen med flest av
+  omgångens matcher (minst hälften); utan kupong räknas ens egna rätt.
+- Annars får man den första man vann i ordningen *Den upptagne, Den oumbärlige, Den
+  konsekvente, Den storsinte, Finansgeniet, Den förutseende, Den optimistiske, Den
+  missförstådde, Den konflikträdde, Den våghalsige, Den diplomatiske, Den självsäkre,
+  Otursfågeln, Den självständige* – de ovanligaste först.
+- Bilderna använder kröningens kroppar (`KRONAN_KROPPAR`); var vänstra handen, ögonen och
+  midjan sitter och vem som redan har hjälm står i `KROPP` i utmarkelser.js. Utan rörelse
+  (prefers-reduced-motion) står allt stilla.
 
 ### Säsongens tippare
 
