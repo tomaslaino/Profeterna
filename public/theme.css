@@ -836,8 +836,8 @@ footer .foot-links a[aria-current="page"] { color: var(--fg); }
   .tabs [role="tab"]::after,
   .tabs a.tab-link::after { left: 9px; right: 9px; }
 
-  /* tre i bredd, porträttet ovanför namnet */
-  .mrow { grid-template-columns: 2.9rem 1fr auto; gap: 10px; padding: 13px 14px; }
+  /* tävlingsmärket syns ned till 640px (style.css) och behöver sin kolumn */
+  .mrow { grid-template-columns: 2.9rem auto 1fr auto; gap: 10px; padding: 13px 14px; }
   .card { padding: 16px; }
   .mhead-teams { gap: 10px; }
   .fc-main { gap: 6px; }
@@ -883,7 +883,7 @@ footer .foot-links a[aria-current="page"] { color: var(--fg); }
 
 /* smal mobil: oddsen på en egen rad under lagen, så att namnen får plats */
 @media (max-width: 640px) {
-  .mrow { row-gap: 5px; }
+  .mrow { grid-template-columns: 2.9rem 1fr auto; row-gap: 5px; }
   .mside-odds { grid-column: 2 / -1; text-align: left; }
   .mside-odds .pbar { max-width: 150px; }
   /* prognosens procent på en rad även i smala kolumner */

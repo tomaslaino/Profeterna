@@ -73,7 +73,10 @@ async function fetchClips(prev, since) {
   return { clips, sourceUrl: 'https://viaplay.se/sportklipp' };
 }
 
-// Klippets sida hos Viaplay (Börja titta spelar det utan konto).
-const clipUrl = (guid) => `https://viaplay.se/sport/${guid}`;
+// Viaplays spelare för klippet: startar direkt, utan konto och utan
+// klippsidans Börja titta (verifierat 2026-10-20). Viaplay tillåter inte att
+// sidorna visas inuti andra sajter (X-Frame-Options: DENY), så klippet går
+// inte att bädda in – det öppnas i ett eget fönster (public/hojdpunkter.js).
+const clipUrl = (guid) => `https://viaplay.se/player/default/sport/${guid}`;
 
 module.exports = { fetchClips, clipUrl, PAGES };
