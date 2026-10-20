@@ -1,0 +1,107 @@
+/* Matchfixarna – gemensam form. Laddas sist på varje sida och håller ihop det
+   som annars glider isär mellan stilmallarna: de små etiketterna i versaler,
+   knapparnas form, filterknapparna med divisionsfärg och sidhuvudenas luft.
+   Färger och typsnitt kommer från theme.css; här bestäms bara att samma sak
+   ser likadan ut överallt. */
+
+:root {
+  --eyebrow-size: 11px;
+  --eyebrow-weight: 750;
+  --eyebrow-track: 0.15em;
+}
+
+/* menyn står still när man byter mellan korta och långa sidor */
+html { scrollbar-gutter: stable; }
+
+/* ---------- etiketterna ---------- */
+
+/* En storlek, en tjocklek och ett spärrat avstånd för alla rubriketiketter:
+   korten, kupongen, statistikens topplistor, dagarna i matchlistan och
+   matchrutan. (Orakel- och Ikaros-rutornas namnskylt är tätare med flit, så
+   att den får plats på en rad på mobilen.) */
+.kp-eyebrow,
+.card h4,
+.dv-leader h4,
+.dv-h5,
+.dv-tile-label,
+.day-key,
+.mhead-meta,
+.mr-ht span,
+.hk-ai-who {
+  font-size: var(--eyebrow-size);
+  font-weight: var(--eyebrow-weight);
+  letter-spacing: var(--eyebrow-track);
+}
+
+/* ---------- knapparna ---------- */
+
+/* Alla knappar som står för sig själva är pillerformade, som segmentet,
+   filterknapparna och kupongens knappar – inga rundade rutor emellan. */
+.earlier,
+.src-toggle,
+button.analyze,
+.dv-more {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  min-height: 36px;
+  padding: 7px 16px;
+  font-size: 13.5px;
+  font-weight: 600;
+  line-height: 1.2;
+  border-radius: 999px;
+}
+
+/* ---------- filterknapparna ---------- */
+
+/* Matcher och Välj matcher får samma färgprick som Tabeller och Statistik,
+   och den valda divisionen tonas i sin egen färg på alla fyra ställena. */
+.chips button,
+.dv-divs button {
+  display: inline-flex;
+  align-items: center;
+  gap: 7px;
+  padding: 6px 14px;
+  font-size: 13px;
+  font-weight: 700;
+  letter-spacing: 0.01em;
+}
+.chips button[data-comp]:not([data-comp="all"])::before {
+  content: "";
+  flex: none;
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background: var(--c);
+}
+.dv-divs .dv-key.dot { width: 8px; height: 8px; margin: 0; }
+.dv-divs button[aria-pressed="true"] {
+  color: #fff;
+  background: color-mix(in srgb, var(--c, var(--accent)) 30%, rgba(14, 13, 11, 0.6));
+  border-color: color-mix(in srgb, var(--c, var(--accent)) 70%, transparent);
+}
+
+/* ---------- kort ---------- */
+
+/* samma hörn på matchrutans prognoskort som på alla andra kort */
+.card.fc,
+.mhead { border-radius: var(--radius); }
+
+/* i matchrutan står korten i paret upptill, i stället för att det korta
+   sträcks ut till samma höjd som det långa */
+.mr-body .grid2 { align-items: start; }
+
+/* På mobilen ligger filterknapparna på en rad som går att svepa, ut till
+   skärmkanten – som divisionerna på Tabeller och Statistik. */
+@media (max-width: 720px) {
+  .chips {
+    flex-wrap: nowrap;
+    overflow-x: auto;
+    scrollbar-width: none;
+    margin-left: calc(-1 * var(--gutter));
+    margin-right: calc(-1 * var(--gutter));
+    padding: 0 var(--gutter);
+  }
+  .chips::-webkit-scrollbar { display: none; }
+  .chips button { flex: none; }
+}

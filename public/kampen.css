@@ -5,7 +5,7 @@
 
 #kampen { display: grid; gap: 16px; }
 #kampen > * { min-width: 0; margin: 0; }
-#kampen .page-title { margin-bottom: -8px; }
+#kampen .page-title { margin: clamp(18px, 3vw, 34px) 0 -8px; }
 
 .km-card { display: grid; gap: 12px; padding: 22px 24px; }
 .km-card > * { min-width: 0; margin: 0; }

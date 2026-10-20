@@ -515,6 +515,12 @@ table.cmp tr.model td:last-child { border-radius: 0 8px 8px 0; }
 .tug-sides .k { display: inline-block; width: 8px; height: 8px; border-radius: 2px; vertical-align: 0; margin: 0 0.35rem; }
 .tug-sides .k.h { background: var(--o-home); margin-left: 0; }
 .tug-sides .k.a { background: var(--o-away); margin-right: 0; }
+.card.tug { container-type: inline-size; }
+@container (max-width: 560px) {
+  .tug-row { grid-template-columns: minmax(0, 1fr) 2.6rem; }
+  .tug-row .tug-lab { grid-column: 1 / -1; margin-bottom: 0.35rem; }
+  .tug-row.tug-axis .tug-lab, .tug-row.tug-names .tug-lab, .tug-row.tug-end .tug-lab:empty { display: none; }
+}
 .mside b { color: var(--fg); }
 h3.underlag { margin-top: 1.6rem; }
 
@@ -564,9 +570,6 @@ dl.facts dd { margin: 0; }
   .fc-num { font-size: 1.5rem; }
   .fc-col.draw .fc-num { font-size: 1.15rem; }
   dl.facts { grid-template-columns: 1fr; gap: 0.1rem; }
-  .tug-row { grid-template-columns: minmax(0, 1fr) 2.6rem; }
-  .tug-row .tug-lab { grid-column: 1 / -1; margin-bottom: 0.35rem; }
-  .tug-row.tug-axis .tug-lab, .tug-row.tug-names .tug-lab, .tug-row.tug-end .tug-lab:empty { display: none; }
   table.odds td, table.odds th { padding-left: 0.3rem; padding-right: 0.3rem; }
   dl.facts dd { margin-bottom: 0.5rem; }
 }

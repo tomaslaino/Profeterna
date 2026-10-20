@@ -523,13 +523,13 @@ function playerTableHtml(P) {
     `<p class="dv-count" id="dv-count">${list.length} spelare${f.played ? ' som spelat' : ''}${f.team || f.pos || f.q ? ' med filtret' : ''}</p>`;
 }
 
-function leaderCard(title, icon, list, value, { empty = 'inga än', note, top } = {}) {
+function leaderCard(title, list, value, { empty = 'inga än', note, top } = {}) {
   const rows = list.length
     ? list.map((p, i) => `<li><button type="button" class="dv-lrow" data-pid="${esc(p.id)}">` +
       `<span class="dv-lrank">${i + 1}</span><span class="dv-lname">${esc(p.name)}<small>${esc(p.team)}</small></span>` +
       `<span class="dv-lval">${value(p)}</span></button></li>`).join('')
     : `<li class="dv-lempty">${esc(empty)}</li>`;
-  return `<section class="dv-leader"><h4><span class="dv-licon" aria-hidden="true">${icon}</span>${esc(title)}</h4><ol>${rows}</ol>` +
+  return `<section class="dv-leader"><h4>${esc(title)}</h4><ol>${rows}</ol>` +
     (note ? `<p class="dv-lnote">${note}</p>` : '') +
     (top ? `<button type="button" class="dv-lmore dv-linkbtn" data-top="${esc(top)}">Topp 20 →</button>` : '') + '</section>';
 }
@@ -540,9 +540,9 @@ const byCards = (list) => [...list].sort((a, b) => (b.rc * 3 + b.yc) - (a.rc * 3
 // Topplistorna: fem på kortet, upp till 20 i en dialog. Listan sparas per
 // vy så att knappen Topp 20 kan öppna den.
 const tops = new Map();
-function topCard(key, title, icon, list, value, opts = {}) {
-  tops.set(key, { title, icon, list, value, note: opts.note });
-  return leaderCard(title, icon, list.slice(0, 5), value, { ...opts, top: list.length > 5 ? key : null });
+function topCard(key, title, list, value, opts = {}) {
+  tops.set(key, { title, list, value, note: opts.note });
+  return leaderCard(title, list.slice(0, 5), value, { ...opts, top: list.length > 5 ? key : null });
 }
 
 function openTop(key) {
@@ -551,7 +551,7 @@ function openTop(key) {
   const rows = t.list.slice(0, 20).map((p, i) => `<li><button type="button" class="dv-lrow" data-pid="${esc(p.id)}">` +
     `<span class="dv-lrank">${i + 1}</span><span class="dv-lname">${esc(p.name)}<small>${esc(p.team)}</small></span>` +
     `<span class="dv-lval">${t.value(p)}</span></button></li>`).join('');
-  showModal(`<div class="dv-mhead"><div class="dv-avatar">${t.icon}</div><div><h3>${esc(t.title)}</h3>` +
+  showModal(`<div class="dv-mhead"><div><h3>${esc(t.title)}</h3>` +
     `<p>${esc(state.data.divisions.find((x) => x.id === state.div).name)} · topp ${Math.min(20, t.list.length)}</p></div></div>` +
     `<ol class="dv-toplist">${rows}</ol>${t.note ? `<p class="dv-mnote">${t.note}</p>` : ''}`);
 }
@@ -571,16 +571,16 @@ function playersView(dv, P) {
   let html = sectionHead('Spelarstatistik', `Ligamatcher ${esc(state.data.season)}`);
   const xgVal = (p) => `<b>${delta(p.dxg, { d: 1 })}</b><small>${p.fg} mål · ${num(p.xg, 1)} xG</small>`;
   html += '<div class="dv-leaders">' +
-    topCard('goals', 'Skytteliga', '⚽', L.goals, (p) => `<b>${p.g}</b><small>${p.app} matcher</small>`) +
-    topCard('assists', 'Flest assist', '🎯', L.assists, (p) => `<b>${p.a}</b><small>${p.app} matcher</small>`) +
+    topCard('goals', 'Skytteliga', L.goals, (p) => `<b>${p.g}</b><small>${p.app} matcher</small>`) +
+    topCard('assists', 'Flest assist', L.assists, (p) => `<b>${p.a}</b><small>${p.app} matcher</small>`) +
     (xg
-      ? topCard('overxg', 'Över xG', '📈', L.overXg, xgVal, { note: 'Fler mål än chanserna brukar ge (mål minus xG)' }) +
-        topCard('underxg', 'Under xG', '📉', L.underXg, xgVal, { note: 'Färre mål än chanserna brukar ge (mål minus xG)' })
-      : topCard('involvement', 'Mål + assist', '✨', L.involvement, (p) => `<b>${p.ga}</b><small>${p.g}+${p.a}</small>`) +
-        topCard('conversion', 'Effektivast', '🔥', L.conversion, (p) => `<b>${pct(p.conv)}</b><small>${p.g}/${p.sh}</small>`,
+      ? topCard('overxg', 'Över xG', L.overXg, xgVal, { note: 'Fler mål än chanserna brukar ge (mål minus xG)' }) +
+        topCard('underxg', 'Under xG', L.underXg, xgVal, { note: 'Färre mål än chanserna brukar ge (mål minus xG)' })
+      : topCard('involvement', 'Mål + assist', L.involvement, (p) => `<b>${p.ga}</b><small>${p.g}+${p.a}</small>`) +
+        topCard('conversion', 'Effektivast', L.conversion, (p) => `<b>${pct(p.conv)}</b><small>${p.g}/${p.sh}</small>`,
           { note: `Mål per skott · minst ${P.thresholds.minShotsConversion} skott`, empty: 'ingen har tillräckligt många skott än' })) +
-    topCard('cards', 'Flest kort', '🟨', byCards(L.yellow.concat(L.red.filter((r) => !L.yellow.some((y) => y.id === r.id)))), cardsVal) +
-    topCard('keepers', 'Målvakter', '🧤', L.keepers, (p) => `<b>${pct(p.savePct)}</b><small>${p.gc} insläppta</small>`,
+    topCard('cards', 'Flest kort', byCards(L.yellow.concat(L.red.filter((r) => !L.yellow.some((y) => y.id === r.id)))), cardsVal) +
+    topCard('keepers', 'Målvakter', L.keepers, (p) => `<b>${pct(p.savePct)}</b><small>${p.gc} insläppta</small>`,
       { note: 'Andel räddade skott på mål · minst halva lagets matcher', empty: 'okänt' }) +
     '</div>';
 
@@ -780,13 +780,13 @@ function teamRows(T, P) {
 }
 
 // Lagen som topplistor: kortets rader öppnar lagkortet när det finns.
-function teamTop(title, icon, list, value, { note, asc = false, get } = {}) {
+function teamTop(title, list, value, { note, asc = false, get } = {}) {
   const rows = list.filter((t) => get(t) != null)
     .sort((a, b) => (asc ? get(a) - get(b) : get(b) - get(a)) || a.name.localeCompare(b.name, 'sv')).slice(0, 5);
   const li = rows.map((t, i) => `<li><button type="button" class="dv-lrow"${t.espnId ? ` data-team="${esc(t.espnId)}"` : ' disabled'}>` +
     `<span class="dv-lrank">${i + 1}</span><span class="dv-lname">${esc(t.name)}<small>${ordinal(t.rank)} i tabellen</small></span>` +
     `<span class="dv-lval">${value(t)}</span></button></li>`).join('');
-  return `<section class="dv-leader"><h4><span class="dv-licon" aria-hidden="true">${icon}</span>${esc(title)}</h4>` +
+  return `<section class="dv-leader"><h4>${esc(title)}</h4>` +
     `<ol>${li || '<li class="dv-lempty">okänt</li>'}</ol>${note ? `<p class="dv-lnote">${note}</p>` : ''}</section>`;
 }
 
@@ -814,17 +814,17 @@ function teamsView(dv, P, T) {
   }[f.cols];
 
   const leaders = T.hasXg
-    ? teamTop('Skapar mest', '⚡', all, (t) => `<b>${num(per(t.fd.xg, 'f'), 2)}</b><small>xG per match</small>`,
+    ? teamTop('Skapar mest', all, (t) => `<b>${num(per(t.fd.xg, 'f'), 2)}</b><small>xG per match</small>`,
       { get: (t) => per(fdOf(t, 'xg'), 'f'), note: 'Förväntade mål (xG) per match – hur bra chanser laget skapar' }) +
-      teamTop('Släpper till minst', '🛡️', all, (t) => `<b>${num(per(t.fd.xg, 'a'), 2)}</b><small>xG mot per match</small>`,
+      teamTop('Släpper till minst', all, (t) => `<b>${num(per(t.fd.xg, 'a'), 2)}</b><small>xG mot per match</small>`,
         { get: (t) => per(fdOf(t, 'xg'), 'a'), asc: true, note: 'Motståndarnas förväntade mål (xG) per match' })
-    : teamTop('Skjuter mest', '⚡', all, (t) => `<b>${num(per(t.fd.sh, 'f'), 1)}</b><small>skott per match</small>`, { get: (t) => per(fdOf(t, 'sh'), 'f') }) +
-      teamTop('Släpper till minst', '🛡️', all, (t) => `<b>${num(per(t.fd.sh, 'a'), 1)}</b><small>skott mot per match</small>`, { get: (t) => per(fdOf(t, 'sh'), 'a'), asc: true });
+    : teamTop('Skjuter mest', all, (t) => `<b>${num(per(t.fd.sh, 'f'), 1)}</b><small>skott per match</small>`, { get: (t) => per(fdOf(t, 'sh'), 'f') }) +
+      teamTop('Släpper till minst', all, (t) => `<b>${num(per(t.fd.sh, 'a'), 1)}</b><small>skott mot per match</small>`, { get: (t) => per(fdOf(t, 'sh'), 'a'), asc: true });
 
   return sectionHead('Lagen') +
     '<div class="dv-leaders dv-leaders4">' + leaders +
-    teamTop('Slår oddsen', '📈', all, (t) => `<b>${delta(vsOdds(t), { d: 1 })}</b><small>${t.fd.mkt.pts} p · ${num(t.fd.mkt.xp, 1)} väntat</small>`, { get: vsOdds, note: 'Poäng mot vad oddsen vid avspark väntade sig' }) +
-    teamTop('Bäst att spela på', '💰', all, (t) => `<b>${delta(roi(t), { fmt: signedPct })}</b><small>${t.fd.mkt.n} matcher</small>`, { get: roi, note: 'Samma insats på seger i varje match' }) +
+    teamTop('Slår oddsen', all, (t) => `<b>${delta(vsOdds(t), { d: 1 })}</b><small>${t.fd.mkt.pts} p · ${num(t.fd.mkt.xp, 1)} väntat</small>`, { get: vsOdds, note: 'Poäng mot vad oddsen vid avspark väntade sig' }) +
+    teamTop('Bäst att spela på', all, (t) => `<b>${delta(roi(t), { fmt: signedPct })}</b><small>${t.fd.mkt.n} matcher</small>`, { get: roi, note: 'Samma insats på seger i varje match' }) +
     '</div>' +
     card('Alla lag', {
       body: segHtml(groups, f.cols, 'data-tcols') +
@@ -1033,7 +1033,7 @@ function frame() {
   const d = state.data;
   return '<div class="dv-head">' +
     `<div class="dv-divs" id="dv-divs" role="group" aria-label="Division">${d.divisions.map((x) =>
-      `<button type="button" data-div="${x.id}" aria-pressed="${x.id === state.div}" title="${esc(x.name)}"><i class="dv-key dot" style="--c:${color(x.id)}"></i>${esc(x.name)}</button>`).join('')}</div>` +
+      `<button type="button" data-div="${x.id}" aria-pressed="${x.id === state.div}" title="${esc(x.name)}" style="--c:${color(x.id)}"><i class="dv-key dot"></i>${esc(x.name)}</button>`).join('')}</div>` +
     `<nav class="dv-views" id="dv-views" aria-label="Vy">${VIEWS.map((v) =>
       `<a href="#${state.div}/${v.id}" data-view="${v.id}"${v.id === state.view ? ' aria-current="page"' : ''}>${esc(v.label)}</a>`).join('')}</nav>` +
     '</div><div id="dv-view" class="dv-view"></div>' +
