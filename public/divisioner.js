@@ -288,7 +288,7 @@ function delta(v, { d = 1, dead = 0.05, invert = false, fmt } = {}) {
 }
 const signedPct = (x) => (Math.round(x * 100) === 0 ? '±0 %' : x > 0 ? `+${num(x * 100, 0)} %` : `−${num(-x * 100, 0)} %`);
 
-// Kolumngrupperna som ett segment ovanför tabellen.
+// Kolumngrupperna som flikar ovanför tabellen.
 function segHtml(groups, cur, attr) {
   return `<div class="dv-seg" role="group" aria-label="Kolumner">${groups.map((g) =>
     `<button type="button" ${attr}="${g.id}" aria-pressed="${g.id === cur}">${esc(g.label)}</button>`).join('')}</div>`;
@@ -477,8 +477,9 @@ function playerTableHtml(P) {
     `<td class="c rank hide-xs">${i + 1}</td>${cols.map((c) => colCell(c, p)).join('')}</tr>`).join('');
   const rest = list.length - Math.min(list.length, f.limit);
   return `<div class="table-wrap dv-tw"><table class="dv-players">${head}<tbody>${rows}</tbody></table></div>` +
-    (rest > 0 ? `<button type="button" class="dv-more" data-more="1">Visa ${Math.min(rest, 100)} till (${rest} kvar)</button>` : '') +
-    `<p class="dv-count" id="dv-count">${list.length} spelare${f.played ? ' som spelat' : ''}${f.team || f.pos || f.q ? ' med filtret' : ''}</p>`;
+    '<div class="dv-tfoot">' +
+    (rest > 0 ? `<button type="button" class="dv-more" data-more="1">Visa ${Math.min(rest, 100)} till ↓<small>${rest} kvar</small></button>` : '') +
+    `<p class="dv-count" id="dv-count">${list.length} spelare${f.played ? ' som spelat' : ''}${f.team || f.pos || f.q ? ' med filtret' : ''}</p></div>`;
 }
 
 function leaderCard(title, list, value, { empty = 'inga än', note, top, tip } = {}) {
@@ -1011,7 +1012,7 @@ function openPlayer(id) {
     p.min != null && P.fpl ? `Speltid, xG och FPL: Fantasy Premier League · hämtat ${when(P.fpl.fetchedAt)}` : null,
     p.min != null && !P.fpl && P.minutes ? `Speltid: ESPN:s matchrapporter · hämtat ${when(P.minutes.fetchedAt)}` : null,
     p.gw != null && P.goalTypes ? `Målen: ESPN:s matchrapporter · hämtat ${when(P.goalTypes.fetchedAt)}` : null,
-  ], `<button type="button" class="dv-mbtn" data-team-open="${esc(p.teamId)}">Truppen i ${esc(p.team)}</button>`);
+  ], `<button type="button" class="dv-mbtn" data-team-open="${esc(p.teamId)}">Truppen i ${esc(p.team)} →</button>`);
   showModal(html);
 }
 
@@ -1116,9 +1117,8 @@ function glossary() {
 function frame() {
   const d = state.data;
   return '<div class="dv-head">' +
-    `<div class="dv-divs" id="dv-divs" role="group" aria-label="Division">${d.divisions.map((x, i) =>
-      `<button type="button" data-div="${x.id}" aria-pressed="${x.id === state.div}" style="--c:${color(x.id)}">` +
-      `<span class="dv-tier" title="Nivå ${x.tier || i + 1}">${x.tier || i + 1}</span>${esc(x.name)}</button>`).join('')}</div>` +
+    `<div class="dv-divs" id="dv-divs" role="group" aria-label="Division">${d.divisions.map((x) =>
+      `<button type="button" data-div="${x.id}" aria-pressed="${x.id === state.div}" style="--c:${color(x.id)}">${esc(x.name)}</button>`).join('')}</div>` +
     '</div><div id="dv-view" class="dv-view"></div>' +
     '<p class="detail-foot"><button type="button" class="src-toggle" aria-pressed="false">Visa detaljer</button></p>' + glossary();
 }

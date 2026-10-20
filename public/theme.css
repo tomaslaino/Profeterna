@@ -423,10 +423,7 @@ button:hover { border-color: var(--pill-line-hi); color: #fff; }
   border-color: color-mix(in srgb, var(--c) 70%, transparent);
 }
 
-/* undermenyn på Divisioner som segmentet på förstasidan */
-.dv-views { border-radius: 999px; }
-.dv-views a { border-radius: 999px; }
-.dv-views a[aria-current="page"] { color: var(--bg); background: var(--bone); box-shadow: none; }
+/* Tabeller och Statistik (flikarna och knapparna står i divisioner.css) */
 .dv-sechead h3 { font-weight: 650; letter-spacing: -0.01em; }
 .dv-tile-num { font-weight: 650; }
 

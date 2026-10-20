@@ -36,11 +36,12 @@ html { scrollbar-gutter: stable; }
 /* ---------- knapparna ---------- */
 
 /* Alla knappar som står för sig själva är pillerformade, som segmentet,
-   filterknapparna och kupongens knappar – inga rundade rutor emellan. */
+   filterknapparna och kupongens knappar – inga rundade rutor emellan.
+   (Tabeller och Statistik har i stället flikar och knappar som ord – se
+   divisioner.css.) */
 .earlier,
 .src-toggle,
-button.analyze,
-.dv-more {
+button.analyze {
   display: inline-flex;
   align-items: center;
   gap: 4px;
