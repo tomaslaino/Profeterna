@@ -14,8 +14,9 @@
 // att varje kryss ser handritat ut men ser likadant ut varje gång sidan ritas.
 //
 // Längst ner kupongen som växer fram medan man väljer matcher (builder, slip).
-// Kryssen och ringarna (cross, ring) ritar också omgångens kupong med en
-// kolumn per person i samtal.js.
+// Kryssen, ringarna, bockarna, betyget, ställningen och foten (cross, ring,
+// tick, grade, result, foot) ritar också omgångens kupong med allas
+// porträtt i rutorna i samtal.js.
 //
 // Läses efter kupong.js och använder dess hjälpare (SIGNS, NOTE_MAX, rowClass,
 // teamsOf, scoreText, kpNum, dateRange, liveLine, fWeekdayTime) och app.js
@@ -440,5 +441,5 @@
     }
   }
 
-  window.Papper = { RADER, coupon, builder, reveal, program, slip, bump, open: pull, cross, ring };
+  window.Papper = { RADER, coupon, builder, reveal, program, slip, bump, open: pull, cross, ring, tick, grade, result, foot };
 }());

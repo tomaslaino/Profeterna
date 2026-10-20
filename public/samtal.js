@@ -1,6 +1,6 @@
 'use strict';
 
-// Omgångens kupong inför uppgörelsen (Kupong → Omgången, steg 1–3): någon skapar kupongen
+// Omgångens kupong inför uppgörelsen (Kupong → Omgången, steg 1–4): någon skapar kupongen
 // – väljer matcherna – och var och en fyller i den för sig, ett tecken eller
 // en gardering per match. Kupongen står på papper med en kolumn per person,
 // och man fyller i sin kolumn direkt. Den som har lämnat in ser de andras
@@ -8,15 +8,17 @@
 // lämnat in ser de andras kolumner täckta. En kupong som inte är färdig går
 // att spara utan att lämna in: de andra ser då hur långt man har kommit (en
 // tårtbit vid porträttet i stället för tre prickar). När alla har lämnat in
-// (senast när första matchen startar) ser alla allt. Sidan blir underlaget för
-// uppgörelsen i telefon: matcherna sorteras
-// efter hur oeniga vi är, och gängets kupong växer fram när man trycker på
-// rutorna. Den sparas direkt därifrån (postCoupon i
-// kupong.js, samma som Ny kupong → Spara) – eller öppnas i Ny
-// kupong med tecknen ifyllda, för namn, anteckningar eller fler matcher.
+// (senast när första matchen startar) ser alla allt. Samma papper blir
+// underlaget för uppgörelsen i telefon (steg 3): matcherna sorteras efter hur
+// oeniga vi är, och gängets kupong kryssas i rutorna, med förslaget ikryssat
+// från början. Den sparas direkt därifrån (postCoupon i kupong.js, samma som
+// Ny kupong → Spara) – eller öppnas i Ny kupong med tecknen ifyllda, för
+// namn, anteckningar eller fler matcher. Gängets kupong (steg 4) står sedan
+// på samma papper med allas porträtt kvar och utfallen inringade
+// (Samtal.paper, ritas av kupong.js).
 //
 //   #kupong                  omgången medan den fylls i och tills gängets kupong är gjord
-//   #kupong/samtal           samma vy, också efteråt (Allas tips)
+//   #kupong/samtal           samma vy, också efteråt (uppgörelsen)
 //   #kupong/samtal/tips      ändra kupongen du har lämnat in
 //   #kupong/samtal/ny        skapa omgångens kupong: välj matcherna
 //   #kupong/samtal/matcher   ändra matcherna, tills någon har lämnat in
@@ -68,16 +70,12 @@
   const here = (sub) => Boolean(KP.view && KP.view.mode === 'samtal' && KP.view.sub === sub && !$('#coupon-section').hidden);
   // Var och en med sitt porträtt (bild i config/kupong.js) i en ring i sin
   // färg – alla heter D-något, så initialerna skiljer dåligt. Initialerna om
-  // bilden saknas; streckad ring = del av en gardering.
+  // bilden saknas.
   const pnum = (id) => Math.max(0, gang().findIndex((g) => g.id === id));
   const person = (id) => gang().find((g) => g.id === id) || { id, namn: id };
   const photo = (id) => {
     const g = person(id);
     return g.bild ? `<img src="${esc(g.bild)}" alt="${esc(g.id)}" width="40" height="40" decoding="async" draggable="false">` : esc(g.id);
-  };
-  const chip = (id, hedge = false) => {
-    const g = person(id);
-    return `<span class="sm-ch sm-p${pnum(id)}${g.bild ? ' bild' : ''}${hedge ? ' g' : ''}" title="${esc(`${g.namn}${hedge ? ' · del av en gardering' : ''}`)}">${photo(id)}</span>`;
   };
   const rader = (signs) => signs.reduce((a, s) => a * Math.max(1, s.length), 1);
   const plural = (n, one, many) => `${n} ${n === 1 ? one : many}`;
@@ -269,11 +267,18 @@
 
   // Var omgången står, i stegen under flikarna (roundSteps i kupong.js): 2
   // medan alla tippar, 3 när allas tips visas och 4 när gängets kupong är
-  // gjord eller alla matcher har startat.
-  function steps(s) {
+  // gjord eller alla matcher har startat. Stegen man kan gå tillbaka till är
+  // länkar: matcherna tills någon har lämnat in, uppgörelsen och gängets
+  // kupong när de finns. board: uppgörelsen visas (steg 3, också när
+  // omgången har kommit längre).
+  function steps(s, board = false) {
     const now = (s.visas && existing(s)) || over(s) ? 4 : s.visas ? 3 : 2;
     const inne = s.gang.filter((g) => g.inne).length;
-    return roundSteps(now, { 2: now === 2 ? `${inne} av ${s.gang.length} har lämnat in` : '' });
+    const go = {};
+    if (!s.visas && !inne) go[1] = '#kupong/samtal/matcher';
+    if (s.visas) go[3] = '#kupong/samtal';
+    if (s.visas && existing(s)) go[4] = '#kupong';
+    return roundSteps(now, { 2: now === 2 ? `${inne} av ${s.gang.length} har lämnat in` : '' }, go, board && now > 3 ? 3 : now);
   }
 
   function renderRound() {
@@ -288,23 +293,15 @@
       el.innerHTML = html + roundSteps(1) + emptyCard();
       return;
     }
-    const anyIn = s.gang.some((g) => g.inne);
-    // Allas tips så snart du ser fler än dina egna, annars kupongen.
+    // Allas tips så snart du ser fler än dina egna, annars kupongen. Knapparna
+    // står i raden längst ner på papperet, i båda.
     const all = Boolean(s.tips && Object.keys(s.tips).length >= (s.visas ? 1 : 2));
-    // Över kupongen står knapparna i raden längst ner på papperet (actions).
-    const actions = !all ? '' : (s.visas || anyIn ? '' : '<a class="kp-btn" href="#kupong/samtal/matcher">Ändra matcherna</a>') +
-      (all && canEdit(s) ? '<a class="kp-btn" href="#kupong/samtal/tips">Ändra din kupong</a>' : '') +
-      (s.visas ? '' : '<button type="button" class="kp-btn" data-sm-remove>Ta bort</button>') +
-      (s.visas && existing(s) ? '<a class="kp-btn" href="#kupong">Gängets kupong</a>' : '') +
-      (s.visas || over(s) ? '<a class="kp-btn" href="#kupong/samtal/ny">+ Ny kupong</a>' : '');
-    html += steps(s) + head(s, null, actions);
+    html += steps(s, all) + head(s, null);
     html += all ? board(s) : sheet(s, false);
     // Gängets kuponger som spelas under tiden, t.ex. veckans matcher.
     html += openCoupons();
     keepFocus(() => {
       el.innerHTML = html;
-      const bort = el.querySelector('.kp-head [data-sm-remove]');
-      if (bort) bort.addEventListener('click', confirmRemove);
       if (all) wire(s);
       else wireSheet();
     });
@@ -414,68 +411,76 @@
       : proposal(rows);
   }
 
+  // Uppgörelsen (steg 3): samma papper som när alla tippar, med allas
+  // porträtt i rutorna. Matcherna står efter hur oeniga vi är, under en
+  // tryckt rubrik med en rad i blyerts, men med sina nummer från kupongen.
+  // Gängets tecken är kryss: förslaget – det som fler än hälften har med –
+  // står ikryssat från början, och ett tryck på en ruta kryssar i eller ur.
+  // Gängets kupong går att göra så fort du ser de andras tips.
   function board(s) {
     const rows = analyse(s);
-    // Gängets kupong går att göra så fort du ser de andras tips.
     const val = decisions(s, rows);
-    const ordered = [0, 1, 2, 3, 4, 5].flatMap((k) => rows.filter((r) => r.kind === k));
+    const ids = s.gang.filter((g) => s.tips && s.tips[g.id]).map((g) => g.id);
+    const nr = new Map(s.matcher.map((x, i) => [x.id, i + 1]));
     const missing = s.gang.filter((g) => !(s.tips && s.tips[g.id]));
-    let html = '<div class="sm-folk sm-folk-board">' + s.gang.map((g) => {
-      const tip = s.tips && s.tips[g.id];
-      if (!tip) return `<span class="sm-person ute" title="${esc(`${g.namn} · ${lage(s, g)}`)}">${chip(g.id)}${mark(s, g)}</span>`;
-      const signs = s.matcher.map((x) => tip.tecken[x.id] || '');
-      const hel = signs.filter((x) => x.length === 3).length;
-      const halv = signs.filter((x) => x.length === 2).length;
-      // Antal rätt i de matcher som är klara.
-      const done = rows.filter((r) => r.g.res != null && tip.tecken[r.x.id]);
-      const ok = done.filter((r) => tip.tecken[r.x.id].includes(SIGNS[r.g.res])).length;
-      const parts = [hel ? `${hel} helg.` : null, halv ? `${halv} halvg.` : null, plural(rader(signs), 'rad', 'rader'),
-        done.length ? `<b>${ok}</b> rätt av ${done.length}` : null].filter(Boolean);
-      const n = tally(s, g);
-      return `<span class="sm-person inne" title="${esc(`${g.namn} · ${lage(s, g)}`)}">${chip(g.id)}` +
-        `${n < s.matcher.length ? pie(n, s.matcher.length, true) : ''}<span>${parts.join(' · ')}</span></span>`;
-    }).join('') + '</div>';
-    const names = esc(missing.map((g) => g.id).join(' och '));
+    let html = '';
     if (missing.length && s.visas) {
-      html += `<p class="legend"><span class="note">${names} hann inte lämna in` +
+      html += `<p class="legend"><span class="note">${esc(missing.map((g) => g.id).join(' och '))} hann inte lämna in` +
         `${s.orsak === 'avspark' ? ' innan första matchen startade' : ''}.</span></p>`;
     }
+    html += paperTop(stopBox(s), ' sm-up') + upHead(s, ids, rows.filter((r) => r.g.res != null).map((r) => [r.x.id, r.g.res]));
+    let n = 0;
     for (let k = 0; k <= 5; k++) {
       const list = rows.filter((r) => r.kind === k);
       if (!list.length) continue;
-      html += `<div class="sm-group"><h3>${esc(groupName(k, s))} <span class="sm-count">${list.length}</span></h3>${GROUPS[k][1] ? `<span>${esc(GROUPS[k][1])}</span>` : ''}</div>`;
-      html += '<div class="mlist sm-board">' + list.map((r) => boardRow(r, val[r.x.id] || '')).join('') + '</div>';
+      html += `<p class="pp-day sm-grp">${esc(groupName(k, s))}${GROUPS[k][1] ? `<span>${esc(GROUPS[k][1])}</span>` : ''}</p>`;
+      for (const r of list) {
+        html += upRow({
+          id: r.x.id, m: r.m, label: r.m ? `${r.m.home} – ${r.m.away}` : r.x.match, g: r.g, nr: nr.get(r.x.id),
+          who: r.cov, sign: val[r.x.id] || '', notes: r.notes, ids, alt: n++ % 2, pick: true, open: r.open,
+        });
+      }
     }
-    // Gängets kupong: rutorna i samma ordning som matcherna ovan.
-    const chosen = ordered.map((r) => val[r.x.id] || '');
-    const done = chosen.filter(Boolean);
-    const gard = done.filter((x) => x.length > 1).length;
-    // Med tjänsten sparas gängets kupong direkt härifrån; Justera först
-    // öppnar den i Ny kupong (eller Ändra) med tecknen ifyllda.
+    const chosen = s.matcher.map((x) => val[x.id] || '').filter(Boolean);
+    const gard = chosen.filter((x) => x.length > 1).length;
+    const odds = chosen.length ? radOdds(s, val) : null;
+    html += '<div class="pb-foot sm-foot">' + fieldList([
+      ['Tippat', `${chosen.length}/${rows.length}`],
+      gard ? ['Garderingar', gard] : null,
+      ['Rader', rader(chosen), 'Antal rader med garderingarna'],
+      odds ? ['Odds', oddsText(odds), 'Oddset för att alla gängets tecken går in – matchernas odds gånger varandra'] : null,
+    ]) + '</div>';
+    const act = boardActions(s, rows, val);
+    return html + `<div class="sm-act${actMore ? ' more' : ''}" id="sm-act"${act ? '' : ' hidden'}><div class="sm-act-in" id="sm-act-in">${act}</div>` +
+      '<p class="pb-msg" id="sm-msg" role="status"></p></div></div></div>';
+  }
+
+  // Raden längst ner på papperet, som när alla tippar: till höger Spara
+  // gängets kupong, till vänster det mer sällsynta – i telefonen bakom ⋯.
+  // Börja om står bara där när gängets tecken skiljer sig från förslaget.
+  // Med tjänsten sparas gängets kupong direkt härifrån; Justera först öppnar
+  // den i Ny kupong (eller Ändra) med tecknen ifyllda.
+  function boardActions(s, rows, val) {
+    const key = (o) => Object.keys(o).sort().map((k) => `${k}:${o[k]}`).join(',');
+    const open = rows.some((r) => r.open);
     const direct = Boolean(KP.data && KP.data.save);
     const made = existing(s);
     const same = made && savedAsIs(made, rows, val);
-    const label = direct ? (same ? 'Sparad' : made ? 'Spara ändringen' : 'Spara gängets kupong')
-      : made ? 'Ändra gängets kupong' : 'Gör gängets kupong';
-    // I telefonen står de mindre valen bakom ⋯, så att raden tar lite plats.
-    html += `<div class="kp-bar sm-bar${barMore ? ' more' : ''}">` +
-      `<span class="kp-bar-txt"><b>Gängets kupong</b> · ${done.length} av ${rows.length} klara` +
-      `${gard ? ` · ${plural(gard, 'gardering', 'garderingar')}` : ''} · <b>${rader(done)}</b> ${rader(done) === 1 ? 'rad' : 'rader'}` +
-      `${same ? ' · <a href="#kupong">sparad</a>' : ''}</span>` +
-      '<span class="sm-slots" aria-hidden="true">' + chosen.map((x) => `<i${x ? ' class="set"' : ''}>${x || '?'}</i>`).join('') + '</span>' +
-      `<button type="button" class="sm-more" id="sm-more" aria-expanded="${barMore}" aria-controls="sm-bar-more" aria-label="Fler val">` +
-      '<svg viewBox="0 0 20 20" aria-hidden="true"><circle cx="4.5" cy="10" r="1.7"/><circle cx="10" cy="10" r="1.7"/><circle cx="15.5" cy="10" r="1.7"/></svg></button>' +
-      '<span class="sm-bar-more" id="sm-bar-more">' +
-      '<button type="button" class="kp-linkbtn" id="sm-reset" title="Gängets tecken som de flesta tippade">Börja om</button>' +
-      (direct ? '<button type="button" class="kp-linkbtn" id="sm-adjust" title="Öppna kupongen med tecknen ifyllda – för namn, anteckningar eller fler matcher">Justera först</button>' : '') +
+    const more = [
+      canEdit(s) ? '<a class="sm-act-l" href="#kupong/samtal/tips">Ändra din kupong</a>' : '',
+      open && key(val) !== key(proposal(rows)) ? '<button type="button" class="sm-act-l" id="sm-reset" title="Det som fler än hälften har med">Börja om</button>' : '',
+      open && direct ? '<button type="button" class="sm-act-l" id="sm-adjust" title="Med namn, anteckningar eller fler matcher">Justera först</button>' : '',
       // Systemet ni spelade, som skärmbild: tecknen därifrån (systembild.js).
-      (window.Systembild ? Systembild.button('kp-linkbtn') : '') + '</span>' +
-      `<button type="button" class="kp-btn primary" id="sm-make"${same && direct ? ' disabled' : ''}>${label}</button>` +
-      '<span class="sm-bar-msg" id="sm-msg" role="status"></span></div>';
-    return html;
+      open && window.Systembild ? Systembild.button('sm-act-l') : '',
+      s.visas ? '' : '<button type="button" class="sm-act-l" data-sm-remove>Ta bort</button>',
+      s.visas || over(s) ? '<a class="sm-act-l" href="#kupong/samtal/ny">+ Ny kupong</a>' : '',
+    ].filter(Boolean);
+    const label = direct ? (same ? `${CHECK}Sparad` : made ? 'Spara ändringen' : 'Spara gängets kupong')
+      : made ? 'Ändra gängets kupong' : 'Gör gängets kupong';
+    const go = open ? `<button type="button" class="kp-btn primary${same && direct ? ' kept' : ''}" id="sm-make"${same && direct ? ' disabled' : ''}>${label}</button>` : '';
+    return (more.length ? `<button type="button" class="sm-act-more" aria-expanded="${actMore}" aria-controls="sm-act-ls" aria-label="Fler val">${DOTS3}</button>` +
+      `<span class="sm-act-ls" id="sm-act-ls">${more.join('')}</span>` : '') + (go ? `<span class="sm-act-go">${go}</span>` : '');
   }
-  // ⋯ i raden längst ner är öppnad – står kvar när underlaget ritas om.
-  let barMore = false;
 
   // Gängets kupong har redan tecknen som är valda här, i varje match som
   // inte har startat.
@@ -485,27 +490,133 @@
     return rows.filter((r) => isOpen(r.m, now)).every((r) => (val[r.x.id] || '') === (on.get(r.x.id) || ''));
   }
 
-  function boardRow(r, chosen) {
-    const { x, m, g } = r;
+  // ---------- allas tips på papperet: uppgörelsen och gängets kupong ----------
+
+  // Papperet: märket, i hörnet spelstoppet eller betyget och stämpeln
+  // emellan, och bården under. cls: fler klasser på papperet.
+  const paperTop = (corner, cls = '', stamp = '') => `<div class="pp-wrap sm-wrap"><div class="pp pp-fill sm-sheet${cls}" id="sm-sheet">` +
+    '<div class="sm-sheet-head"><p class="pp-brand"><img src="logo.svg" alt="" width="20" height="20">Matchfixarna<span>Kupong</span></p>' +
+    `${stamp}${corner}</div><div class="pp-band" aria-hidden="true"></div>`;
+  const stopBox = (s) => `<div class="pp-stop"><span>Spelstopp</span><b>${esc(fWeekdayTime.format(new Date(Math.min(...kicks(s)))))}</b></div>`;
+  // Fälten i foten: [[etikett, värde, title]].
+  const fieldList = (list, id = '') => `<div class="pp-fields pb-fields"${id ? ` id="${id}"` : ''}>` + list.filter(Boolean).map(([label, val, title]) =>
+    `<span class="pp-field"${title ? ` title="${esc(title)}"` : ''}><span>${label}</span><b>${val}</b></span>`).join('') + '</div>';
+  const oddsText = (o) => (o >= 100 ? Math.round(o).toLocaleString('sv-SE') : fmtOdds(o));
+  const DOTS3 = '<svg viewBox="0 0 20 20" aria-hidden="true"><circle cx="4.5" cy="10" r="1.7"/><circle cx="10" cy="10" r="1.7"/><circle cx="15.5" cy="10" r="1.7"/></svg>';
+
+  // Hur det går för var och en: rätt i matcherna som har ett utfall (också
+  // ställningen just nu), garderingarna och raderna. null = inga tips.
+  // res: [[matchens id, utfallet 0–2]].
+  function score(s, id, res) {
+    const tip = s.tips && s.tips[id];
+    if (!tip) return null;
+    const signs = s.matcher.map((x) => tip.tecken[x.id] || '');
+    const hel = signs.filter((x) => x.length === 3).length;
+    const halv = signs.filter((x) => x.length === 2).length;
+    const done = res.filter(([mid]) => tip.tecken[mid]);
+    const ok = done.filter(([mid, i]) => tip.tecken[mid].includes(SIGNS[i])).length;
+    return {
+      ok: done.length ? ok : null,
+      text: [done.length ? `${ok} rätt av ${done.length}` : null, hel ? plural(hel, 'helgardering', 'helgarderingar') : null,
+        halv ? plural(halv, 'halvgardering', 'halvgarderingar') : null, plural(rader(signs), 'rad', 'rader')].filter(Boolean).join(' · '),
+    };
+  }
+
+  // Porträtten och 1 X 2 överst, som när alla tippar. När matcherna börjar
+  // ge utfall står antalet rätt för hand i var och ens bläck i stället för
+  // bocken; den som inte lämnade in är grå.
+  function upHead(s, ids, res) {
+    const v = me();
+    return '<div class="sm-r sm-hd"><span class="sm-hd-nr" aria-hidden="true">Nr</span>' +
+      '<span class="sm-m"><span class="sm-hd-l" aria-hidden="true">Match</span><span class="sm-folk-pp">' + s.gang.map((g) => {
+        const du = g.id === v;
+        const sc = score(s, g.id, res);
+        const sign = !sc ? mark(s, g) : sc.ok != null ? `<b class="sm-score">${sc.ok}</b>` : CHECK;
+        return `<span class="sm-who sm-k${pnum(g.id)}${du ? ' du' : ''}${!sc && s.visas ? ' ute' : ''}" ` +
+          `title="${esc(`${g.namn} · ${du ? 'du · ' : ''}${sc ? sc.text : lage(s, g)}`)}"><span class="sm-fw">${face(g.id, false)}` +
+          `${du ? Papper.ring(`du${s.id}${g.id}`, 'sm-du-ring', 25) : ''}</span>${sign}</span>`;
+      }).join('') + '</span></span>' +
+      SIGNS.map((sg) => `<span class="sm-hd-s" aria-hidden="true">${box(sg, [], ids)}</span>`).join('') + '</div>';
+  }
+
+  // En match på papperet med allas porträtt i rutorna. sign: gängets tecken,
+  // ett kryss med kulspetspenna över tecknet. Utfallet är en ring runt rutan
+  // – grön när gängets tecken gick in, annars röd, streckad i blyerts medan
+  // matchen pågår – och ställningen står för hand med rättarens bock eller
+  // kryss bredvid. who: vilka som har med 1, X och 2. pick: rutorna är
+  // knappar för gängets tecken (uppgörelsen), open: matchen har inte
+  // startat. day: matcherna står under sin dag, så klockslaget räcker. out:
+  // matchen kom inte med på gängets kupong.
+  function upRow({ id, m, label, g, nr, who, sign, notes = [], note = '', ids, alt, pick = false, open = false, day = false, out = false }) {
+    const hit = g.res != null && sign ? sign.includes(SIGNS[g.res]) : null;
+    const cls = rowClass({ ...g, hit });
     const comp = m ? compOf(m.comp) : null;
-    const when = g.state === 'final' || g.state === 'live' ? `${esc(scoreText(g))}${g.state === 'live' ? ` · ${esc(g.clock || 'live')}` : ''}`
-      : g.state === 'hidden' ? 'dolt' : g.state === 'off' ? esc(g.off) : esc(fWeekdayTime.format(new Date(x.avspark)));
-    const label = m ? `${m.home} – ${m.away}` : x.match;
-    return `<div class="sm-row" data-id="${esc(x.id)}">` +
-      `<div class="sm-tm"><a class="sm-teams" href="#match/${esc(x.id)}">${teamsHtml(x, m)}</a>` +
-      `<span class="sm-meta">${comp ? `<span class="ctag" title="${esc(comp.name)}">${esc(comp.short)}</span>` : ''}${when}</span>` +
-      r.notes.map((o) => `<span class="sm-note">${chip(o.k)}<span>”${esc(o.text)}”</span></span>`).join('') + '</div>' +
+    const when = m ? `${esc((day ? fTime : fWeekdayTime).format(new Date(m.kickoff)))}${comp ? ` · <abbr title="${esc(comp.name)}">${esc(comp.short)}</abbr>` : ''}` : '';
+    const teams = m ? `${esc(m.home)}<span class="vs">–</span>${esc(m.away)}` : esc(label);
+    const tick = cls === 'ok' || cls === 'no' ? Papper.tick(id, cls === 'ok') : '';
+    const res = g.state === 'upcoming' || g.state === 'missing' ? ''
+      : `<span class="sm-res"><span class="sm-res-s">${Papper.result(g)}</span>${tick}</span>`;
+    const sr = `${sign ? `Gängets tecken ${sign}${hit === true ? ', rätt' : hit === false ? ', fel' : ''}` : 'Inget tecken'}. ` +
+      ids.map((k) => `${k}: ${SIGNS.filter((sg, i) => who[i].includes(k)).join('') || 'inget'}`).join(', ');
+    return `<div class="sm-r${alt ? ' alt' : ''} s-${cls.replace(' ', ' s-')}${pick && open && !sign ? ' unsigned' : ''}${out ? ' sm-out' : ''}" data-id="${esc(id)}">` +
+      `<span class="pp-nr">${nr}</span>` +
+      '<span class="sm-m"><span class="sm-mt">' +
+      `<span class="pp-tm">${m ? `<a class="pp-t" href="#match/${esc(id)}">${teams}</a>` : `<span class="pp-t">${teams}</span>`}</span>` +
+      (when ? `<span class="sm-meta"><span class="pp-small">${when}</span></span>` : '') +
+      (note ? `<span class="pp-note">${esc(note)}</span>` : '') +
+      notes.map((o) => `<span class="sm-said sm-k${pnum(o.k)}">${face(o.k)}<span>${esc(o.text)}</span></span>`).join('') +
+      `<span class="pp-sr">${esc(sr)}</span></span>${res}</span>` +
       SIGNS.map((sg, i) => {
-        const who = r.cov[i];
-        const on = chosen.includes(sg);
-        const cls = ['sm-cell', on ? 'on' : '', g.res === i ? 'res' : ''].filter(Boolean).join(' ');
+        const on = sign.includes(sg);
+        const b = box(sg, who[i], ids, on ? `${id}${sg}` : null, g.res === i ? `${id}${sg}` : null);
+        const odds = `<small${on ? ' class="on"' : ''}>${g.pr ? pctOdds(g.pr[i]) : '–'}</small>`;
+        if (!pick) return `<span class="sm-c" aria-hidden="true">${b}${odds}</span>`;
         // Gängets tecken väljs bara i matcher som inte har startat.
-        return `<button type="button" class="${cls}" data-s="${sg}" aria-pressed="${on}"${r.open ? '' : ' disabled'}` +
-          ` aria-label="${esc(`${label}, ${sg}: ${who.length ? who.join(', ') : 'ingen'}${r.pr ? `, modellens odds ${pctOdds(r.pr[i])}` : ''}`)}">` +
-          `<span class="sm-s"><b>${sg}</b>${who.length ? `<small>${who.length}/${r.n}</small>` : ''}</span>` +
-          `<span class="sm-chips">${who.map((k) => chip(k, r.t[k].length > 1)).join('')}</span>` +
-          `<span class="sm-pc${r.fav === i ? ' fav' : ''}" title="Modellens odds">${r.pr ? pctOdds(r.pr[i]) : '–'}</span></button>`;
+        return `<button type="button" class="sm-c" data-s="${sg}" aria-pressed="${on}"${open ? '' : ' disabled'}` +
+          ` aria-label="${esc(`${label}, ${sg}: ${who[i].length ? who[i].join(', ') : 'ingen'}`)}">${b}${odds}</button>`;
       }).join('') + '</div>';
+  }
+
+  // Gängets kupong ur omgången (steg 4, kupong.js): samma papper med allas
+  // porträtt i rutorna, gängets kryss, utfallet inringat och betyget i
+  // hörnet. Matcherna har sina nummer från kupongen som alla tippade, under
+  // sin dag; en match som lagts till på gängets kupong efteråt får nästa
+  // nummer, och en som gänget inte gav något tecken står kvar nedtonad.
+  function paper(c, g) {
+    const s = SM.data;
+    const ids = s.gang.filter((p) => s.tips && s.tips[p.id]).map((p) => p.id);
+    const nr = new Map(s.matcher.map((x, i) => [x.id, i + 1]));
+    for (const r of g.rows) if (!nr.has(r.id)) nr.set(r.id, nr.size + 1);
+    const on = new Set(g.rows.map((r) => r.id));
+    const now = Date.now();
+    const rows = [...g.rows, ...s.matcher.filter((x) => !on.has(x.id)).map((x) => ({ ...gradeRow({ id: x.id, sign: '', label: x.match }, now), out: true }))]
+      .sort((a, b) => nr.get(a.id) - nr.get(b.id));
+    const stamp = c.pending ? '<span class="pp-stamp wait">Väntar på GitHub</span>' : g.done && !g.hidden ? '<span class="pp-stamp">Rättad</span>' : '';
+    let html = paperTop(Papper.grade(c, g), ' sm-up', stamp) + upHead(s, ids, rows.filter((r) => r.res != null).map((r) => [r.id, r.res]));
+    let day = null;
+    rows.forEach((r, i) => {
+      const k = r.m ? dayKey.format(new Date(r.m.kickoff)) : 'okänd';
+      if (k !== day) {
+        day = k;
+        html += `<p class="pp-day">${esc(r.m ? cap(fDay.format(new Date(r.m.kickoff))) : 'Okänt datum')}</p>`;
+      }
+      const tip = (p) => s.tips[p].tecken[r.id] || '';
+      html += upRow({
+        id: r.id, m: r.m, label: teamsOf(r), g: r, nr: nr.get(r.id), who: SIGNS.map((sg) => ids.filter((p) => tip(p).includes(sg))),
+        sign: r.sign, note: r.note, notes: ids.map((p) => ({ k: p, text: (s.tips[p].kommentarer || {})[r.id] })).filter((o) => o.text),
+        ids, alt: i % 2, day: true, out: r.out,
+      });
+    });
+    return html + Papper.foot(c, g) + '</div></div>';
+  }
+
+  // Rubriken över gängets kupong (steg 4): omgångens namn, som i stegen
+  // före – eller kupongens eget, om den har fått ett annat.
+  function title(c) {
+    const s = SM.data;
+    if (!c.name || c.name === nameOf(s)) return nameBlock(s, 'sida');
+    const k = kicks(s);
+    return `<div><p class="kp-eyebrow">${esc(dateRange(Math.min(...k), Math.max(...k)))}</p><h2 class="page-title">${esc(c.name)}</h2></div>`;
   }
 
   // Gängets kupong för omgångens matcher – den som har flest av dem – om den
@@ -573,6 +684,8 @@
     }
     if (!adjust && undecided && !SM.again) {
       SM.again = true;
+      // Rutorna i matcherna utan tecken blir röda, som när alla tippar.
+      $('#sm-sheet').classList.add('need');
       msg(`<span class="note">${undecided === 1 ? 'En match saknar' : `${undecided} matcher saknar`} tecken och kommer inte med. Tryck igen för att spara ändå.</span>`);
       return;
     }
@@ -624,38 +737,50 @@
     $('#sm-via').addEventListener('click', () => makeCoupon(s, { adjust: true }));
   }
 
+  // Lyssnar på hela papperet i uppgörelsen: rutorna (gängets tecken) och
+  // raden längst ner.
   function wire(s) {
-    if (!$('#sm-make')) return;
-    const board = document.querySelectorAll('.sm-board');
-    for (const list of board) {
-      list.addEventListener('click', (e) => {
-        const b = e.target.closest('button[data-s]');
-        if (!b || b.disabled) return;
-        const id = b.closest('[data-id]').dataset.id;
-        const saved = { id: s.id, val: { ...decisions(s, analyse(s)) }, own: true };
-        const cur = saved.val[id] || '';
-        const next = SIGNS.filter((x) => (x === b.dataset.s ? !cur.includes(x) : cur.includes(x))).join('');
-        if (next) saved.val[id] = next;
-        else delete saved.val[id];
-        kpStore(DECIDE, saved);
+    const el = $('#sm-sheet');
+    if (!el) return;
+    el.addEventListener('click', (e) => {
+      if (e.target.closest('#sm-make')) {
+        makeCoupon(s);
+        return;
+      }
+      if (e.target.closest('#sm-adjust')) {
+        makeCoupon(s, { adjust: true });
+        return;
+      }
+      // Börja om: tecknen som fler än hälften har med.
+      if (e.target.closest('#sm-reset')) {
+        kpStore(DECIDE, { id: s.id, val: proposal(analyse(s)), own: true });
         SM.again = false;
         renderRound();
-      });
-    }
-    // Börja om: tecknen som fler än hälften har med.
-    $('#sm-reset').addEventListener('click', () => {
-      kpStore(DECIDE, { id: s.id, val: proposal(analyse(s)), own: true });
+        return;
+      }
+      if (e.target.closest('[data-sm-remove]')) {
+        confirmRemove();
+        return;
+      }
+      const more = e.target.closest('.sm-act-more');
+      if (more) {
+        actMore = !actMore;
+        more.setAttribute('aria-expanded', String(actMore));
+        $('#sm-act').classList.toggle('more', actMore);
+        return;
+      }
+      const b = e.target.closest('button[data-s]');
+      if (!b || b.disabled) return;
+      const id = b.closest('[data-id]').dataset.id;
+      const saved = { id: s.id, val: { ...decisions(s, analyse(s)) }, own: true };
+      const cur = saved.val[id] || '';
+      const next = SIGNS.filter((x) => (x === b.dataset.s ? !cur.includes(x) : cur.includes(x))).join('');
+      if (next) saved.val[id] = next;
+      else delete saved.val[id];
+      kpStore(DECIDE, saved);
       SM.again = false;
       renderRound();
     });
-    $('#sm-make').addEventListener('click', () => makeCoupon(s));
-    $('#sm-more').addEventListener('click', (e) => {
-      barMore = !barMore;
-      e.currentTarget.setAttribute('aria-expanded', String(barMore));
-      e.currentTarget.closest('.sm-bar').classList.toggle('more', barMore);
-    });
-    const adjust = $('#sm-adjust');
-    if (adjust) adjust.addEventListener('click', () => makeCoupon(s, { adjust: true }));
   }
 
   // ---------- kupongen ----------
@@ -672,12 +797,7 @@
     const fill = Boolean(v && (edit || (!submitted(s, v) && !s.visas)));
     SM.edit = edit;
     SM.draft = fill ? draftFor(s, v, edit) : null;
-    const stop = Math.min(...kicks(s));
-    return '<div class="pp-wrap sm-wrap"><div class="pp pp-fill sm-sheet" id="sm-sheet">' +
-      '<div class="sm-sheet-head"><p class="pp-brand"><img src="logo.svg" alt="" width="20" height="20">Matchfixarna<span>Kupong</span></p>' +
-      `<div class="pp-stop"><span>Spelstopp</span><b>${esc(fWeekdayTime.format(new Date(stop)))}</b></div></div>` +
-      '<div class="pp-band" aria-hidden="true"></div>' +
-      '<div id="sm-rows"></div>' +
+    return paperTop(stopBox(s)) + '<div id="sm-rows"></div>' +
       '<div class="pb-foot sm-foot"><div class="pp-fields pb-fields" id="sm-fields"></div></div>' +
       '<div class="sm-act" id="sm-act"><div class="sm-act-in" id="sm-act-in"></div>' +
       '<p class="pb-msg" id="sm-msg" role="status"></p></div></div></div>';
@@ -715,9 +835,12 @@
     `<span class="sm-fc sm-k${pnum(id)}"${tip ? ` title="${esc(person(id).namn)}"` : ''}>${photo(id)}</span>`;
   // Rutan för ett tecken med porträtten för dem som har valt det. Var och en
   // har sin plats i rutan, i samma ordning som överst, så att tecknet och
-  // porträtten står på samma ställe i varje rad.
-  const box = (sg, who, ids) => `<span class="pp-box sm-bx${who.length ? ' on' : ''}"><i>${sg}</i><span class="sm-seats">` +
-    ids.map((id) => (who.includes(id) ? face(id) : '<span class="sm-seat"></span>')).join('') + '</span></span>';
+  // porträtten står på samma ställe i varje rad. cross: nyckeln till gängets
+  // kryss över tecknet, ring: till ringen runt rutan (utfallet).
+  const box = (sg, who, ids, cross = null, ring = null) =>
+    `<span class="pp-box sm-bx${who.length ? ' on' : ''}"><i>${sg}${cross ? Papper.cross(cross) : ''}</i><span class="sm-seats">` +
+    ids.map((id) => (who.includes(id) ? face(id) : '<span class="sm-seat"></span>')).join('') + '</span>' +
+    `${ring ? Papper.ring(ring, 'pp-ring sm-ring', 27) : ''}</span>`;
 
   function sheetList() {
     const s = SM.data;
@@ -783,13 +906,12 @@
     const signs = mine ? s.matcher.map((x) => mine[x.id]).filter(Boolean) : [];
     const gard = signs.filter((x) => x.length > 1).length;
     const odds = mine && signs.length ? radOdds(s, mine) : null;
-    $('#sm-fields').innerHTML = !mine ? '' : [
+    $('#sm-fields').outerHTML = !mine ? '<div class="pp-fields pb-fields" id="sm-fields"></div>' : fieldList([
       ['Tippat', `${signs.length}/${s.matcher.length}`],
       gard ? ['Garderingar', gard] : null,
       ['Rader', rader(signs), 'Antal rader med garderingarna'],
-      odds ? ['Odds', odds >= 100 ? Math.round(odds).toLocaleString('sv-SE') : fmtOdds(odds), 'Oddset för att alla dina tecken går in – matchernas odds gånger varandra'] : null,
-    ].filter(Boolean).map(([label, val, title]) =>
-      `<span class="pp-field"${title ? ` title="${esc(title)}"` : ''}><span>${label}</span><b>${val}</b></span>`).join('');
+      odds ? ['Odds', oddsText(odds), 'Oddset för att alla dina tecken går in – matchernas odds gånger varandra'] : null,
+    ], 'sm-fields');
     actionRow();
     // Alla tecken på plats: de röda rutorna försvinner.
     if (!s.matcher.some((x) => d && !d.tecken[x.id])) $('#sm-sheet').classList.remove('need');
@@ -825,8 +947,7 @@
     } else if (canEdit(s)) {
       go = '<a class="kp-btn" href="#kupong/samtal/tips">Ändra din kupong</a>';
     }
-    const dots = '<svg viewBox="0 0 20 20" aria-hidden="true"><circle cx="4.5" cy="10" r="1.7"/><circle cx="10" cy="10" r="1.7"/><circle cx="15.5" cy="10" r="1.7"/></svg>';
-    return (more.length ? `<button type="button" class="sm-act-more" aria-expanded="${actMore}" aria-controls="sm-act-ls" aria-label="Fler val">${dots}</button>` +
+    return (more.length ? `<button type="button" class="sm-act-more" aria-expanded="${actMore}" aria-controls="sm-act-ls" aria-label="Fler val">${DOTS3}</button>` +
       `<span class="sm-act-ls" id="sm-act-ls">${more.join('')}</span>` : '') + (go ? `<span class="sm-act-go">${go}</span>` : '');
   }
   // ⋯ i raden längst ner är öppnad – står kvar när papperet ritas om.
@@ -1269,5 +1390,5 @@
   const made = () => (SM.data && SM.data.visas ? existing(SM.data) : null);
   const watch = () => { if (active() && !SM.data.visas) poll(); };
 
-  window.Samtal = { show, load, active, covers, teaser, ids, visible, made, watch, name: () => nameOf(SM.data), redraw: () => { if (here('')) renderRound(); } };
+  window.Samtal = { show, load, active, covers, teaser, ids, visible, made, watch, paper, title, name: () => nameOf(SM.data), redraw: () => { if (here('')) renderRound(); } };
 })();

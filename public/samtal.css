@@ -1,65 +1,16 @@
-/* Inför samtalet (samtal.js): kupongen med en kolumn per person och
-   underlaget där allas tips står i rutorna 1, X och 2. Laddas efter
-   kupong.css och papper.css och använder deras knappar, listor och papper.
-   Färgspråket: varje person har en egen färg (blått, grönt, lila) på
-   initialerna och i sin kolumn (fylld = enda tecknet, streckad = del av en
-   gardering), guld = gängets tecken, grön ram = så slutade matchen. */
+/* Omgångens kupong (samtal.js): papperet där var och en står med sitt
+   porträtt i rutorna 1, X och 2 – när alla tippar, i uppgörelsen och på
+   gängets kupong. Laddas efter kupong.css och papper.css och använder deras
+   knappar och papper. Färgspråket: varje person har ett eget bläck (blått,
+   grönt, lila) runt sitt porträtt; gängets tecken är ett kryss med
+   kulspetspenna, utfallet en ring runt rutan. */
 
-.sm-ch {
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  min-width: 26px;
-  height: 21px;
-  padding: 0 5px;
-  box-sizing: border-box;
-  font-size: 11px;
-  font-weight: 750;
-  letter-spacing: 0.03em;
-  border: 1px solid transparent;
-  border-radius: 6px;
-}
 .sm-p0 { color: #b3cffb; background: rgba(77, 143, 240, 0.2); }
 .sm-p1 { color: #97e0bd; background: rgba(61, 179, 124, 0.2); }
 .sm-p2 { color: #d6bcf7; background: rgba(160, 105, 230, 0.22); }
-.sm-ch.g { background: transparent; border: 1px dashed currentColor; }
-/* porträttet i en ring i personens färg; streckad = del av en gardering */
-.sm-ch.bild {
-  width: 26px;
-  min-width: 0;
-  height: 26px;
-  padding: 0;
-  border: 0;
-  border-radius: 50%;
-  background: none;
-  box-shadow: 0 0 0 2px currentColor;
-}
-.sm-ch.bild.g { padding: 2px; border: 1.5px dashed currentColor; box-shadow: none; }
-.sm-ch img, .sm-face img { display: block; width: 100%; height: 100%; border-radius: 50%; object-fit: cover; }
+.sm-face img { display: block; width: 100%; height: 100%; border-radius: 50%; object-fit: cover; }
 
-/* ---------- vem som lämnat in ---------- */
-
-.sm-folk { display: flex; flex-wrap: wrap; gap: 8px; }
-.sm-person {
-  display: inline-flex;
-  align-items: center;
-  gap: 8px;
-  padding: 4px 12px 4px 5px;
-  font-size: 13px;
-  color: var(--muted);
-  border: 1px solid var(--pill-line);
-  border-radius: 999px;
-  background: var(--pill);
-}
-.sm-person.inne { color: var(--ink-soft); }
-.sm-person.ute { padding-right: 10px; }
-.sm-person b { color: var(--fg); }
-.sm-folk-board { margin-bottom: 14px; }
-.sm-person.du { color: var(--fg); border-color: var(--gold); background: rgba(216, 176, 106, 0.1); }
-/* bara initialerna: lika mycket luft runt om */
-.sm-person:not(:has(> :nth-child(2))) { padding-right: 5px; }
-
-/* bock = inne, tre prickar = fyller i – lika breda, så att pillren blir det */
+/* bock = inne, tre prickar = fyller i */
 .sm-ok { width: 18px; height: 15px; fill: none; stroke: var(--fresh); stroke-width: 2.2; stroke-linecap: round; stroke-linejoin: round; }
 .sm-dots { display: inline-flex; gap: 3px; }
 .sm-dots i { width: 4px; height: 4px; border-radius: 50%; background: var(--muted); animation: sm-dot 1.4s ease-in-out infinite; }
@@ -79,85 +30,6 @@
 .sm-namn.fram { animation: sm-fram 0.9s ease both; }
 @keyframes sm-fram { from { opacity: 0; } to { opacity: 1; } }
 @media (prefers-reduced-motion: reduce) { .sm-namn.fram { animation: none; } }
-.ute > .sm-ch { opacity: 0.6; }
-
-/* ---------- underlaget ---------- */
-
-.sm-group { display: flex; flex-wrap: wrap; align-items: baseline; gap: 4px 12px; margin: 28px 0 10px 4px; }
-.sm-group h3 { margin: 0; font-family: var(--display); font-style: italic; font-weight: 500; font-size: 19px; color: var(--bone); }
-.sm-count { margin-left: 4px; font-family: var(--sans); font-style: normal; font-size: 12px; font-weight: 700; color: var(--eyebrow); }
-.sm-group > span { font-size: 13px; color: var(--muted); }
-
-.sm-row {
-  display: grid;
-  grid-template-columns: minmax(0, 1fr) repeat(3, 96px);
-  align-items: stretch;
-  gap: 8px;
-  padding: 12px 16px 12px 20px;
-  border-bottom: 1px solid var(--hair);
-}
-.sm-row:last-child { border-bottom: 0; }
-.sm-tm { display: flex; flex-direction: column; justify-content: center; gap: 5px; min-width: 0; }
-.sm-teams { font-weight: 600; color: var(--fg); text-decoration: none; }
-.sm-teams:hover { color: #fff; text-decoration: underline; text-underline-offset: 3px; }
-.sm-teams .vs { margin: 0 0.4rem; font-weight: 400; color: var(--muted); }
-.sm-meta { display: flex; align-items: center; gap: 8px; font-size: 12.5px; color: var(--muted); }
-.sm-note { display: flex; align-items: baseline; gap: 7px; font-size: 13px; line-height: 1.4; color: var(--ink-soft); }
-.sm-note .sm-ch { flex: none; height: 18px; min-width: 24px; font-size: 10px; }
-.sm-note .sm-ch.bild { width: 20px; height: 20px; align-self: center; }
-
-.sm-cell {
-  display: flex;
-  flex-direction: column;
-  gap: 5px;
-  min-height: 70px;
-  padding: 6px 7px;
-  font: inherit;
-  text-align: left;
-  color: var(--ink-soft);
-  border: 1px solid var(--pill-line);
-  border-radius: 10px;
-  background: var(--pill);
-  cursor: pointer;
-  transition: border-color 0.15s ease, background-color 0.15s ease;
-}
-.sm-cell:hover { border-color: var(--pill-line-hi); }
-.sm-cell:disabled { cursor: default; }
-.sm-cell:disabled:hover { border-color: var(--pill-line); }
-.sm-s { display: flex; justify-content: space-between; align-items: baseline; }
-.sm-s b { font-family: var(--display); font-size: 17px; font-weight: 800; line-height: 1; color: var(--ink-soft); }
-.sm-s small { font-size: 11px; font-weight: 600; color: var(--muted); }
-.sm-chips { display: flex; flex-wrap: wrap; align-content: flex-start; gap: 3px; flex: 1; }
-.sm-chips:has(.bild) { gap: 7px; padding: 2px; }
-.sm-pc { font-size: 11px; color: var(--muted); }
-.sm-pc.fav { font-weight: 700; color: var(--fg); }
-/* gängets tecken */
-.sm-cell.on { border-color: transparent; background: rgba(216, 176, 106, 0.13); box-shadow: inset 0 0 0 2px var(--gold); }
-.sm-cell.on .sm-s b { color: var(--gold-hi); }
-/* så slutade matchen */
-.sm-cell.res { border-color: var(--fresh); }
-.sm-cell.res.on { box-shadow: inset 0 0 0 2px var(--gold), 0 0 0 1px var(--fresh); }
-
-/* gängets kupong i nederkant */
-.sm-slots { display: flex; flex-wrap: wrap; gap: 4px; }
-.sm-slots i {
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  min-width: 26px;
-  height: 24px;
-  padding: 0 4px;
-  box-sizing: border-box;
-  font-style: normal;
-  font-size: 12px;
-  font-weight: 700;
-  color: var(--muted);
-  border: 1px solid var(--pill-line);
-  border-radius: 6px;
-}
-.sm-slots i.set { color: #1d1509; border-color: transparent; background: var(--gold-grad); }
-.sm-bar-msg { flex-basis: 100%; font-size: 13.5px; }
-.sm-bar-msg:empty { display: none; }
 
 /* ---------- kupongen: en ruta per tecken ----------
    Papperet från papper.css (.pp) med rutorna 1, X och 2 i varje match. Var
@@ -520,6 +392,84 @@ button.sm-who:focus-visible { outline: 2px solid var(--ink); outline-offset: 1px
   button.sm-c small { font-size: 9.5px; }
 }
 
+/* ---------- uppgörelsen och matcherna: allas tips på papperet ----------
+   Samma papper som när alla tippar (.sm-up). Gängets tecken är ett kryss
+   med kulspetspenna över tecknet i rutan, utfallet en ring runt rutan –
+   grön när gängets tecken gick in, annars röd, streckad i blyerts medan
+   matchen pågår – och porträtten i ringen är de som hade rätt. Överst vid
+   porträtten antalet rätt, för hand i var och ens bläck. */
+
+.sm-up .sm-r:not(.sm-hd) { min-height: 58px; }
+.sm-up .sm-m { display: flex; align-items: center; gap: 12px; }
+.sm-mt { flex: 1 1 auto; min-width: 0; }
+.sm-up a.pp-t { color: inherit; text-decoration: none; }
+.sm-up a.pp-t:hover { text-decoration: underline; text-decoration-thickness: 1px; text-underline-offset: 3px; }
+.sm-up .s-off .pp-t { text-decoration: line-through 2px var(--pp-pen); color: var(--pp-ink-soft); }
+/* gängets kupong: en match som gänget inte gav något tecken */
+.sm-r.sm-out > :not(.pp-nr) { opacity: 0.5; }
+
+/* rubrikerna: hur oeniga vi är, tryckt – och en rad i blyerts bredvid */
+.sm-grp { display: flex; flex-wrap: wrap; align-items: baseline; gap: 0 12px; }
+.sm-grp span {
+  font-family: var(--pp-hand);
+  font-size: 19px;
+  font-weight: 600;
+  line-height: 1;
+  letter-spacing: 0;
+  text-transform: none;
+  color: var(--pp-pencil);
+}
+
+/* gängets kryss över tecknet */
+.sm-bx i { position: relative; }
+.sm-bx i .pp-x { inset: auto; top: 50%; left: 50%; width: 30px; height: 30px; margin: -15px 0 0 -15px; }
+/* utfallet: en ring runt hela rutan */
+.sm-bx .sm-ring { top: -6px; left: -8px; width: calc(100% + 16px); height: calc(100% + 12px); margin: 0; }
+.s-unk .sm-ring { stroke: var(--pp-pencil); }
+
+/* oddset under varje ruta – fetstil där gängets kryss står */
+.sm-up .sm-c small { font-size: 10.5px; line-height: 1; text-align: center; color: var(--pp-ink-soft); font-variant-numeric: tabular-nums; }
+.sm-up .sm-c small.on { font-weight: 800; color: var(--pp-ink); }
+.sm-up button.sm-c { --ink: var(--pp-pen); }
+.sm-up button.sm-c:disabled { cursor: default; }
+.sm-up button.sm-c:disabled:hover .sm-bx { background: var(--pp-box); }
+
+/* motiveringarna: för hand i var och ens bläck, med porträttet */
+.sm-said {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  margin-top: 3px;
+  font-family: var(--pp-hand);
+  font-size: 18px;
+  font-weight: 600;
+  line-height: 1.05;
+  color: var(--ink);
+}
+.sm-said .sm-fc { --fc: 18px; box-shadow: 0 0 0 1.5px var(--ink); }
+.sm-up .pp-note { margin-top: 3px; }
+
+/* ställningen, skriven för hand, och rättarens bock */
+.sm-res { flex: none; display: flex; align-items: center; gap: 2px; }
+.sm-res-s { display: flex; flex-direction: column; align-items: center; min-width: 46px; text-align: center; }
+.sm-res .pp-tick { width: 26px; height: 26px; }
+
+/* överst: antalet rätt i stället för bocken; grått = lämnade inte in */
+.sm-score { min-width: 12px; font-family: var(--pp-hand); font-size: 27px; font-weight: 700; line-height: 0.8; color: var(--ink); }
+.sm-who.ute .sm-fc img { filter: grayscale(1); opacity: 0.5; }
+
+/* stämpeln (Väntar på GitHub, Rättad) mellan märket och betyget */
+.sm-sheet-head .pp-stamp { white-space: nowrap; }
+
+@media (max-width: 440px) {
+  .sm-sheet-head .pp-stamp { padding: 2px 6px 1px; font-size: 9px; letter-spacing: 0.1em; border-width: 2px; }
+}
+@media (max-width: 720px) {
+  .sm-up .sm-m { padding-right: 2px; }
+  .sm-res .pp-hand { font-size: 25px; }
+  .sm-res .pp-tick { width: 22px; height: 22px; }
+}
+
 /* ---------- förstasidan ---------- */
 
 .sm-teaser {
@@ -585,53 +535,7 @@ button.sm-who:focus-visible { outline: 2px solid var(--ink); outline-offset: 1px
 /* ---------- mobil ---------- */
 
 @media (max-width: 760px) {
-  /* lagen överst, rutorna i tre lika breda kolumner under */
-  .sm-row { grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 6px; padding: 12px 14px; }
-  .sm-tm { grid-column: 1 / -1; margin-bottom: 4px; }
-  .sm-cell { min-height: 64px; }
   /* tiden överst, initialerna och knappen på en rad under */
   .sm-teaser { grid-template-columns: minmax(0, 1fr) auto; }
   .sm-teaser > :first-child { grid-column: 1 / -1; }
-}
-
-/* ---------- mobil: underlaget och raden längst ner ----------
-   Raden med gängets kupong tar lite plats i telefonen: antalet överst med
-   ⋯ bredvid, gängets tecken i en rad och knappen under. Börja om, Justera
-   först och Ladda upp system står bakom ⋯ (.sm-bar.more). */
-
-.sm-more { display: none; }
-.sm-bar-more { display: contents; }
-
-@media (max-width: 640px) {
-  .sm-bar {
-    display: grid;
-    grid-template-columns: minmax(0, 1fr) auto;
-    align-items: center;
-    gap: 8px 10px;
-    padding: 10px 10px 10px 14px;
-  }
-  .sm-bar .kp-bar-txt { grid-column: 1; font-size: 13px; line-height: 1.35; }
-  .sm-more {
-    grid-column: 2;
-    grid-row: 1;
-    display: grid;
-    place-items: center;
-    width: 36px;
-    height: 32px;
-    padding: 0;
-    color: var(--ink-soft);
-    border: 1px solid var(--pill-line);
-    border-radius: 999px;
-    background: var(--pill);
-    cursor: pointer;
-  }
-  .sm-more svg { width: 18px; height: 18px; fill: currentColor; }
-  .sm-more[aria-expanded="true"] { color: var(--fg); border-color: var(--pill-line-hi); }
-  /* gängets tecken: en rad, lika breda rutor */
-  .sm-bar .sm-slots { grid-column: 1 / -1; flex-wrap: nowrap; gap: 3px; }
-  .sm-bar .sm-slots i { flex: 1 1 0; min-width: 0; height: 24px; padding: 0; font-size: 11.5px; letter-spacing: -0.02em; }
-  .sm-bar-more { grid-column: 1 / -1; display: none; flex-wrap: wrap; gap: 6px 18px; padding: 2px 0; font-size: 14px; }
-  .sm-bar.more .sm-bar-more { display: flex; }
-  .sm-bar #sm-make { grid-column: 1 / -1; justify-content: center; padding: 11px 16px; }
-  .sm-bar .sm-bar-msg { grid-column: 1 / -1; font-size: 13px; }
 }

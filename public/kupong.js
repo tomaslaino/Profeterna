@@ -414,15 +414,20 @@ function viewNav(on) {
 
 // Omgångens gång i fyra steg under flikarna, när gänget tippar var för sig
 // först (samtal.js). now: steget som pågår (5 = klar). info: en rad om läget
-// i stället för förklaringen under ett steg.
+// i stället för förklaringen under ett steg. go: adressen till steg man kan
+// gå till härifrån. here: steget som visas, om det inte är det som pågår –
+// strecket ovanför står där man är, den fyllda siffran hur långt omgången
+// har kommit.
 const STEPS = ['Välj matcher', 'Alla tippar', 'Uppgörelsen', 'Matcherna'];
-function roundSteps(now, info = {}) {
+function roundSteps(now, info = {}, go = {}, here = now) {
   if (!hasSamtal()) return '';
   return '<ol class="kp-steps" aria-label="Omgångens gång">' + STEPS.map((name, i) => {
     const n = i + 1;
-    return `<li class="${n < now ? 'done' : n === now ? 'now' : ''}"${n === now ? ' aria-current="step"' : ''}>` +
+    const cls = [n < now ? 'done' : n === now ? 'now' : '', n === here ? 'here' : ''].filter(Boolean).join(' ');
+    const label = go[n] && n !== here ? `<a href="${go[n]}">${name}</a>` : name;
+    return `<li class="${cls}"${n === here ? ' aria-current="step"' : ''}>` +
       `<span class="kp-step-n" aria-hidden="true">${n < now ? '✓' : n}</span>` +
-      `<span class="kp-step-t"><b>${name}</b>${info[n] ? `<span>${esc(info[n])}</span>` : ''}</span></li>`;
+      `<span class="kp-step-t"><b>${label}</b>${info[n] ? `<span>${esc(info[n])}</span>` : ''}</span></li>`;
   }).join('') + '</ol>';
 }
 
@@ -475,24 +480,30 @@ function renderCouponShow(id) {
   // Är omgångens kupong färdigspelad görs nästa med den stora knappen under.
   const round = !id;
   const canEdit = g.rows.some((r) => r.state === 'upcoming');
-  // Gängets kupong ur omgången som alla tippade: sista steget, och allas tips
-  // finns kvar att titta på.
-  const fromTips = round && hasSamtal() && Samtal.covers(c);
+  // Gängets kupong ur omgången som alla tippade: sista steget, på samma
+  // papper som när alla tippade, med allas porträtt i rutorna (samtal.js).
+  const fromTips = round && hasSamtal() && Samtal.covers(c) && Boolean(Samtal.paper);
   // Allas tips går att se så länge omgången finns – också om gängets kupong
-  // inte gjordes ur den.
+  // inte gjordes ur den. Ur omgången står de på papperet, och uppgörelsen
+  // är ett steg bakåt.
   const tipsLink = round && hasSamtal() && Samtal.visible();
   // En kupong i taget: nästa görs först när den här är färdigspelad, med den
   // stora knappen under kupongen.
-  let html = '<div class="pp-top">' + viewNav(round ? 'omgang' : null) + '<div class="kp-actions">' +
-    (tipsLink ? '<a class="kp-btn" href="#kupong/samtal">Allas tips</a>' : '') +
+  const actions = '<div class="kp-actions">' +
+    (tipsLink && !fromTips ? '<a class="kp-btn" href="#kupong/samtal">Allas tips</a>' : '') +
     (canEdit ? `<a class="kp-btn" href="#kupong/andra/${esc(c.id)}">Ändra</a>` : '') +
     // En färdigspelad står kvar i historiken och tas inte bort.
     (g.done ? '' : `<a class="kp-btn" href="#kupong/bort/${esc(c.id)}">Ta bort</a>`) +
     (g.done && !c.pending ? `<a class="kp-btn" href="#kupong/historik/${esc(c.id)}">Betyg och kommentar</a>` : '') +
     // En skärmbild av systemet: ändrar den här kupongen om det är samma
     // matcher, annars blir det en ny (systembild.js).
-    (round && window.Systembild ? Systembild.button() : '') +
-    '</div></div>' + (fromTips ? roundSteps(g.done ? 5 : 4) : '');
+    (round && window.Systembild ? Systembild.button() : '') + '</div>';
+  // Ur omgången: stegen, och rubriken med knapparna bredvid som i stegen
+  // före.
+  let html = fromTips
+    ? viewNav('omgang') + roundSteps(g.done ? 5 : 4, {}, tipsLink ? { 3: '#kupong/samtal' } : {}, 4) +
+      `<div class="kp-head">${Samtal.title(c)}${actions}</div>`
+    : `<div class="pp-top">${viewNav(round ? 'omgang' : null)}${actions}</div>`;
 
   if (KP.flash) {
     html += `<p class="legend kp-flash" role="status">${esc(KP.flash)}</p>`;
@@ -507,7 +518,7 @@ function renderCouponShow(id) {
       button: 'Visa resultaten',
     });
   }
-  html += Papper.coupon(c.name ? c : { ...c, name: couponName(c) }, g);
+  html += fromTips ? Samtal.paper(c, g) : Papper.coupon(c.name ? c : { ...c, name: couponName(c) }, g);
   // Färdigspelad även om spoilerskyddet döljer resultaten (g.done).
   if (round && g.done) html += `<a class="kp-next" href="${newCouponHref()}"><span aria-hidden="true">+</span> Skapa ny kupong</a>`;
   html += moreSection(graded.filter((x) => x !== cur && !x.g.done));
