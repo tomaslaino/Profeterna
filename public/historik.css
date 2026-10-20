@@ -1,6 +1,8 @@
-/* Kupong → Historik (historik.js). Laddas efter theme.css och kupong.css och
-   lånar deras tokens, prickar, teckenrutor och stora siffror. Betygets färg:
-   5 grön, 4 ljusblå, 3 blå, 2 gul, 1 röd – samma i stjärnorna och staplarna. */
+/* Olympen → Grupparbetena (historik.js, kampen.js). Laddas efter theme.css,
+   kupong.css och kampen.css och lånar deras tokens, prickar, teckenrutor,
+   stora siffror och Olympens rutor och kort. Betygets färg: 5 grön, 4
+   ljusblå, 3 blå, 2 gul, 1 röd – samma i stjärnorna, staplarna och tabellen
+   Omgångarna. */
 
 :root {
   --hk-5: var(--fresh);
@@ -10,36 +12,43 @@
   --hk-1: var(--down);
 }
 
-/* ---------- sammanfattningen ---------- */
+/* ---------- delen i Olympen ---------- */
 
-.hk-tiles {
-  display: grid;
-  grid-template-columns: repeat(3, minmax(0, 1fr));
-  gap: 12px;
-  margin-bottom: 14px;
-}
-.hk-tile {
-  display: flex;
-  flex-direction: column;
-  gap: 6px;
-  padding: 16px 18px;
-  background: var(--glass);
-  border: 1px solid var(--border);
-  border-radius: var(--radius);
-  box-shadow: var(--shadow-card);
-}
-.hk-tile b {
-  font-family: var(--display);
-  font-weight: 800;
-  font-size: clamp(34px, 4.4vw, 46px);
-  line-height: 0.9;
-  color: var(--bone);
-  letter-spacing: 0.01em;
-}
-.hk-tile b small { font-size: 0.55em; margin-left: 4px; color: var(--hk-2); vertical-align: 0.35em; }
-.hk-tile .sub { font-size: 12.5px; }
+/* Samma luft mellan rutorna som i resten av Olympen (#kampen i kampen.css). */
+.km-kuponger { display: grid; gap: 16px; min-width: 0; }
+.km-kuponger > * { min-width: 0; margin: 0; }
+.km-kuponger .hk-head { margin-top: 18px; }
+.km-kuponger .hk-tools { margin: 0; }
+.hk-tile .dv-tile-num small { font-size: 0.55em; margin-left: 4px; color: var(--hk-2); vertical-align: 0.35em; }
 
-.hk-chart { position: relative; padding: 18px 20px 42px; margin-bottom: 26px; }
+/* Gängets kupong i tabellen Omgångarna: kupongen ur menyn (theme.css) i
+   en ring som Modellens, och rätt i betygets färg. */
+.km-face-kup::before {
+  content: "";
+  width: 62%;
+  height: 62%;
+  background: currentColor;
+  -webkit-mask: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%23000' stroke-width='1.7' stroke-linejoin='round'%3E%3Cpath d='M3 6.5h18V10a2 2 0 0 0 0 4v3.5H3V14a2 2 0 0 0 0-4z'/%3E%3Cpath d='M15 7v10' stroke-dasharray='1.6 2'/%3E%3C/svg%3E") center / contain no-repeat;
+  mask: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%23000' stroke-width='1.7' stroke-linejoin='round'%3E%3Cpath d='M3 6.5h18V10a2 2 0 0 0 0 4v3.5H3V14a2 2 0 0 0 0-4z'/%3E%3Cpath d='M15 7v10' stroke-dasharray='1.6 2'/%3E%3C/svg%3E") center / contain no-repeat;
+}
+.km-kup { font-weight: 700; color: var(--hk-3); text-decoration: none; }
+.km-kup span { font-weight: 500; color: var(--muted); }
+.km-kup.g5 { color: var(--hk-5); }
+.km-kup.g4 { color: var(--hk-4); }
+.km-kup.g2 { color: var(--hk-2); }
+.km-kup.g1 { color: var(--hk-1); }
+.km-kup:hover { text-decoration: underline; text-underline-offset: 3px; }
+/* i telefonen en rad under omgångens namn i stället för en kolumn, så att
+   tabellen inte blir bredare än skärmen (brytpunkten i tippare.css) */
+.km-kup-sm { display: none; margin-top: 2px; font-size: 12px; color: var(--muted); }
+@media (max-width: 520px) {
+  .tp-rounds .km-col-kup { display: none; }
+  .tp-rounds .km-kup-sm { display: block; }
+}
+
+/* ---------- kupong för kupong ---------- */
+
+.hk-chart { position: relative; padding-bottom: 42px; }
 .hk-cols { display: flex; align-items: flex-end; gap: 10px; height: 150px; }
 .hk-col {
   flex: 1 1 0;
@@ -67,13 +76,13 @@
 
 /* ---------- sortering ---------- */
 
-.hk-tools { display: flex; margin-bottom: 16px; }
+.hk-tools { display: flex; }
 .hk-dir { margin-left: 6px; color: var(--accent-deep); }
 
 /* ---------- kupongkorten ---------- */
 
 .hk-list { display: flex; flex-direction: column; gap: 14px; }
-.hk-card { padding: 20px 22px; scroll-margin-top: 84px; }
+.hk-card { padding: 20px 22px; }
 .hk-card:target { border-color: var(--pill-line-hi); }
 .hk-top { display: flex; justify-content: space-between; align-items: flex-start; gap: 16px; }
 .hk-title h4 {
@@ -148,9 +157,6 @@
 .hk-row .kp-p.unknown { justify-content: center; }
 
 @media (max-width: 760px) {
-  .hk-tiles { gap: 8px; }
-  .hk-tile { padding: 12px 10px; }
-  .hk-chart { padding: 14px 12px 42px; }
   .hk-cols { gap: 5px; height: 120px; }
   .hk-lab { font-size: 10px; }
   .hk-key { right: 12px; }

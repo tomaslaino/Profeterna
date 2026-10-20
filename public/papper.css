@@ -369,8 +369,8 @@ a.pp-row:focus-visible { outline: 2px solid var(--pp-pen); outline-offset: -2px;
 .pp-code > span { font-family: ui-monospace, "SF Mono", Menlo, monospace; font-size: 10.5px; letter-spacing: 0.18em; color: var(--pp-ink-soft); }
 .pp-bars { width: 150px; height: 30px; fill: var(--pp-ink); }
 
-/* knapparna ovanför kupongen */
-.pp-top { display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 12px; }
+/* knapparna mitt ovanför kupongen */
+.pp-top { display: flex; flex-wrap: wrap; align-items: center; justify-content: center; gap: 12px; }
 .pp-top .kp-actions { margin: clamp(18px, 3vw, 34px) 0 0; }
 /* telefonen: knapparna på en rad som går att dra i sidled, ut till kanterna */
 @media (max-width: 640px) {

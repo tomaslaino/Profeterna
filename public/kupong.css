@@ -66,36 +66,7 @@
 .kp-line b { color: var(--fg); }
 .kp-livetxt { color: var(--accent-deep); font-weight: 600; }
 
-/* ---------- kupongsidan: Omgången | Historik ---------- */
-
-.kp-views {
-  display: inline-flex;
-  gap: 2px;
-  margin-top: clamp(18px, 3vw, 34px);
-  padding: 3px;
-  background: var(--pill);
-  border: 1px solid var(--pill-line);
-  border-radius: 999px;
-}
-.kp-views a {
-  padding: 6px 16px;
-  font-size: 14px;
-  font-weight: 600;
-  text-decoration: none;
-  color: var(--ink-soft);
-  border-radius: 999px;
-}
-.kp-views a:hover { color: #fff; background: rgba(243, 237, 227, 0.05); }
-.kp-views a[aria-current="page"] {
-  color: var(--bg);
-  font-weight: 650;
-  background: var(--bone);
-  box-shadow: 0 4px 14px -6px rgba(0, 0, 0, 0.7);
-}
-.kp-views + .kp-head { margin-top: 14px; }
-.kp-views + .kp-empty { margin-top: 22px; }
-
-/* omgångens gång: fyra steg under flikarna (roundSteps) */
+/* omgångens gång: fyra steg överst på kupongsidan (roundSteps) */
 .kp-steps {
   display: grid;
   grid-template-columns: repeat(4, minmax(0, 1fr));
@@ -141,6 +112,8 @@
 .kp-step-t a:focus-visible { outline: none; }
 .kp-steps li:has(a:focus-visible) { outline: 2px solid var(--gold); outline-offset: 2px; border-radius: 2px; }
 .kp-step-t span { font-size: 12.5px; line-height: 1.35; }
+/* överst på sidan: lika långt under menyn som sidrubrikerna på de andra */
+#coupon > .kp-steps:first-child { margin-top: clamp(18px, 3vw, 34px); }
 .kp-steps + .kp-head { margin-top: 26px; }
 .kp-steps + .kp-empty { margin-top: 24px; }
 @media (max-width: 760px) {

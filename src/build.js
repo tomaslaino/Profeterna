@@ -217,7 +217,7 @@ function writeSite(outDir = OUT, { journal = false, analysisEndpoint, couponEndp
   }
   write('kuponger.json', { repo: REPO, branch: BRANCH, dir: 'data/kuponger', save: couponSaveInfo(couponEndpoint), samtal: samtalInfo(couponEndpoint, analysisEndpoint), ...coupons });
 
-  // Kuponghistoriken (sidan Historik): färdiga kuponger med facit och betyg.
+  // Kuponghistoriken (Grupparbetena i Olympen): färdiga kuponger med facit och betyg.
   // Med --journal fryses nya färdiga kuponger in i data/kupong-historik.json.
   let history;
   try {

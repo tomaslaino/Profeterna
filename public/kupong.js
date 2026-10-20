@@ -376,12 +376,15 @@ function statusLine(g) {
 
 // ---------- kupongvyn ----------
 
-// Kupong: #kupong (omgången), #kupong/historik och
-// #kupong/historik/<id> (historik.js), #kupong/samtal… (samtal.js),
-// #kupong/<id>, #kupong/ny, #kupong/andra/<id> och #kupong/bort/<id>.
+// Kupong: #kupong (omgången), #kupong/samtal… (samtal.js), #kupong/<id>,
+// #kupong/ny, #kupong/andra/<id> och #kupong/bort/<id>. De färdigspelade
+// ligger i Olympen (historik.js), dit gamla länkar till Historik leds.
 async function showCoupon(arg) {
   const [mode, id] = (arg || '').split('/');
-  if (mode === 'historik') return renderHistory(id || null);
+  if (mode === 'historik') {
+    location.replace(`#olympen/kuponger${id ? `/${id}` : ''}`);
+    return;
+  }
   const el = $('#coupon');
   el.innerHTML = '<p class="empty">Laddar …</p>';
   await Promise.all([whenMatches(), loadCoupons()]);
@@ -404,15 +407,7 @@ async function showCoupon(arg) {
   window.scrollTo(0, 0);
 }
 
-// Kupongsidans två lägen: omgången – från att matcherna väljs tills gängets
-// kupong är färdigspelad – och de färdigspelade.
-function viewNav(on) {
-  const link = (key, href, label) => `<a href="${href}"${on === key ? ' aria-current="page"' : ''}>${label}</a>`;
-  return '<nav class="kp-views" aria-label="Kupong">' +
-    link('omgang', '#kupong', 'Omgången') + link('historik', '#kupong/historik', 'Historik') + '</nav>';
-}
-
-// Omgångens gång i fyra steg under flikarna, när gänget tippar var för sig
+// Omgångens gång i fyra steg överst på sidan, när gänget tippar var för sig
 // först (samtal.js). now: steget som pågår (5 = klar). info: en rad om läget
 // i stället för förklaringen under ett steg. go: adressen till steg man kan
 // gå till härifrån. here: steget som visas, om det inte är det som pågår –
@@ -466,14 +461,14 @@ function renderCouponShow(id) {
   const graded = all.map((c) => ({ c, g: gradeCoupon(c) })).sort((a, b) => (b.g.first || 0) - (a.g.first || 0));
   if (!graded.length) {
     // Omgångens tips finns kvar att titta på, också utan gängets kupong.
-    el.innerHTML = viewNav('omgang') + roundSteps(1) + emptyCard() +
+    el.innerHTML = roundSteps(1) + emptyCard() +
       (!id && hasSamtal() && Samtal.visible() ? '<p class="legend"><a href="#kupong/samtal">Förra omgångens tips</a></p>' : '') + couponErrors();
     return;
   }
   const curId = id || (currentCoupon() || {}).id;
   const cur = graded.find((x) => x.c.id === curId) || (id ? null : graded[0]);
   if (!cur) {
-    el.innerHTML = viewNav(null) + `<p class="empty">Kupongen ${esc(id)} finns inte. <a href="#kupong">Till kupongen</a></p>`;
+    el.innerHTML = `<p class="empty">Kupongen ${esc(id)} finns inte. <a href="#kupong">Till kupongen</a></p>`;
     return;
   }
   const { c, g } = cur;
@@ -492,18 +487,19 @@ function renderCouponShow(id) {
   const actions = '<div class="kp-actions">' +
     (tipsLink && !fromTips ? '<a class="kp-btn" href="#kupong/samtal">Allas tips</a>' : '') +
     (canEdit ? `<a class="kp-btn" href="#kupong/andra/${esc(c.id)}">Ändra</a>` : '') +
-    // En färdigspelad står kvar i historiken och tas inte bort.
+    // En färdigspelad står kvar bland Grupparbetena i Olympen och tas inte
+    // bort.
     (g.done ? '' : `<a class="kp-btn" href="#kupong/bort/${esc(c.id)}">Ta bort</a>`) +
-    (g.done && !c.pending ? `<a class="kp-btn" href="#kupong/historik/${esc(c.id)}">Betyg och kommentar</a>` : '') +
+    (g.done && !c.pending && window.Historik ? `<a class="kp-btn" href="${esc(Historik.href(c.id))}">Betyg och kommentar</a>` : '') +
     // En skärmbild av systemet: ändrar den här kupongen om det är samma
     // matcher, annars blir det en ny (systembild.js).
     (round && window.Systembild ? Systembild.button() : '') + '</div>';
   // Ur omgången: stegen, och rubriken med knapparna bredvid som i stegen
   // före.
   let html = fromTips
-    ? viewNav('omgang') + roundSteps(g.done ? 5 : 4, {}, tipsLink ? { 3: '#kupong/samtal' } : {}, 4) +
+    ? roundSteps(g.done ? 5 : 4, {}, tipsLink ? { 3: '#kupong/samtal' } : {}, 4) +
       `<div class="kp-head">${Samtal.title(c)}${actions}</div>`
-    : `<div class="pp-top">${viewNav(round ? 'omgang' : null)}${actions}</div>`;
+    : `<div class="pp-top">${actions}</div>`;
 
   if (KP.flash) {
     html += `<p class="legend kp-flash" role="status">${esc(KP.flash)}</p>`;
@@ -529,17 +525,6 @@ function renderCouponShow(id) {
   if (window.Rattning) Rattning.after(el, c, g);
 }
 
-// Kupong → Historik: de färdigspelade kupongerna med betyg och AI:ns
-// kommentar (historik.js).
-function renderHistory(id) {
-  KP.view = { mode: 'history', id };
-  $('#coupon').innerHTML = viewNav('historik') +
-    '<div class="kp-head"><div><p class="kp-eyebrow">Färdigspelade kuponger</p><h2 class="page-title">Historik</h2></div></div>' +
-    '<div id="history"><p class="empty">Laddar …</p></div>';
-  window.scrollTo(0, 0);
-  Historik.show($('#history'), id);
-}
-
 // ---------- förstasidan ----------
 
 // Förstasidan: hjälten och omgångens kupong i korthet (hela finns under
@@ -561,12 +546,12 @@ function renderHome() {
   const c = currentCoupon();
   // Pågår en omgång inför samtalet står den överst (samtal.js), och rutan
   // ritas om när någon lämnar in.
-  // En färdigspelad kupong står då bara i Historik.
+  // En färdigspelad kupong står då bara bland Grupparbetena i Olympen.
   const samtal = samtalTeaser();
   if (samtal) Samtal.watch();
   const g = c && gradeCoupon(c);
   // Är kupongen färdigspelad står nästa omgång överst – den gamla nås från
-  // förra omgångens ruta under (kronan.js) och i Historik.
+  // förra omgångens ruta under (kronan.js) och i Olympen.
   $('#home').innerHTML = samtal + (c && !g.done ? teaser(c, g) : samtal ? '' : nextCard());
 }
 
@@ -608,7 +593,7 @@ function liveLine(g) {
 }
 
 // Fler kuponger som inte är färdigspelade, t.ex. nästa omgångs medan den
-// här pågår. De färdiga finns under Historik.
+// här pågår. De färdiga finns i Olympen.
 const openCoupons = () => moreSection(allCoupons().map((c) => ({ c, g: gradeCoupon(c) }))
   .filter((x) => x.g.first && !x.g.done).sort((a, b) => b.g.first - a.g.first));
 function moreSection(list) {
@@ -1092,14 +1077,14 @@ function renderRemove(id) {
   KP.view = { mode: 'remove', id };
   window.scrollTo(0, 0);
   if (!c) {
-    el.innerHTML = viewNav(null) + `<p class="empty">Kupongen ${esc(id)} finns inte. <a href="#kupong">Till kupongen</a></p>`;
+    el.innerHTML = `<p class="empty">Kupongen ${esc(id)} finns inte. <a href="#kupong">Till kupongen</a></p>`;
     return;
   }
   const g = gradeCoupon(c);
   const ctx = { c, range: dateRange(g.first, g.last) };
   if (g.done) {
     el.innerHTML = savedHead('Ta bort kupongen', ctx) +
-      '<div class="card kp-saved"><p>Kupongen är färdigspelad och står kvar i historiken.</p>' +
+      '<div class="card kp-saved"><p>Kupongen är färdigspelad och står kvar i Olympen.</p>' +
       `<div class="kp-actions"><a class="kp-btn" href="#kupong/${esc(id)}">Tillbaka</a></div></div>`;
     return;
   }

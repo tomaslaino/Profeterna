@@ -1,6 +1,6 @@
 'use strict';
 
-// Kuponghistoriken (sidan Historik): gängets färdigspelade kuponger med facit,
+// Kuponghistoriken (Grupparbetena i Olympen): gängets färdigspelade kuponger med facit,
 // ett betyg och AI:ns kommentar. Historiken är en fil i repot som bara växer:
 //
 //   data/kupong-historik.json

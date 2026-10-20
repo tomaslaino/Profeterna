@@ -529,9 +529,6 @@ button.sm-who:focus-visible { outline: 2px solid var(--ink); outline-offset: 1px
   background: var(--card);
   box-shadow: 0 0 0 2px var(--card);
 }
-/* under Kupong → Omgången, direkt under Omgången | Samtalet | Historik */
-.kp-views + .sm-teaser { margin-top: 22px; }
-
 /* ---------- mobil ---------- */
 
 @media (max-width: 760px) {

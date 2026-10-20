@@ -1,14 +1,16 @@
 'use strict';
 
-// Kuponghistoriken (Kupong → Historik): gängets färdigspelade kuponger,
-// sorterbara efter hur det gick, med betyget mot modellen och AI:ns
-// kommentar. Data: data/historik.json (src/history.js) – kupongerna i
-// data/kupong-historik.json plus sidans färdiga kuponger som inte frysts in
-// där än. Kommentaren som saknas i filen hämtas från proxyn
+// Kuponghistoriken (Olympen → Grupparbetena, #olympen/kuponger/<id>):
+// gängets färdigspelade kuponger, sorterbara efter hur det gick, med betyget
+// mot modellen och AI:ns kommentar. Data: data/historik.json (src/history.js)
+// – kupongerna i data/kupong-historik.json plus sidans färdiga kuponger som
+// inte frysts in där än. Kommentaren som saknas i filen hämtas från proxyn
 // (worker/kommentar.mjs), en i taget.
 //
-// kupong.js ritar vyn med Historik.show(el, id). Allt ligger i en funktion,
-// som spoiler.js, så att inget krockar med app.js och kupong.js.
+// kampen.js ritar delen med Historik.show(el, id), längst ner i Olympen, och
+// läser kupongerna med Historik.coupons() till tabellen Omgångarna. Allt
+// ligger i en funktion, som spoiler.js, så att inget krockar med app.js och
+// kupong.js.
 
 (function () {
   const SIGNS = ['1', 'X', '2'];
@@ -51,6 +53,8 @@
   const num = (x, d = 1) => x.toLocaleString('sv-SE', { minimumFractionDigits: d, maximumFractionDigits: d });
   const rate = (c) => (c.n ? c.ok / c.n : 0);
   const vsModel = (c) => (c.modelN ? c.ok - c.modelOk : null);
+  // Kupongen i Olympen.
+  const href = (id) => `#olympen/kuponger/${encodeURIComponent(id)}`;
 
   // ---------- datum ----------
 
@@ -111,10 +115,11 @@
     const ok = done.reduce((a, c) => a + c.ok, 0);
     const n = done.reduce((a, c) => a + c.n, 0);
     const avg = done.reduce((a, c) => a + c.grade, 0) / done.length;
+    // Samma rutor som höjdpunkterna ovanför (kampen.js).
     const tile = (label, value, sub) =>
-      `<div class="hk-tile"><span class="kp-eyebrow">${label}</span><b>${value}</b><span class="sub">${sub}</span></div>`;
+      `<div class="dv-tile km-tile hk-tile"><div class="dv-tile-label">${label}</div><div class="dv-tile-num">${value}</div><div class="dv-tile-sub">${sub}</div></div>`;
     // Tre rutor: betyget jämför redan rätt med det väntade, som också syns i staplarna.
-    return '<div class="hk-tiles">' +
+    return '<div class="km-tiles">' +
       tile('Kuponger', done.length, `${n} matcher`) +
       tile('Rätt', `${Math.round((100 * ok) / n)} %`, `${ok} av ${n}`) +
       tile('Betyg', `${num(avg)}<small>★</small>`, 'i snitt av 5') +
@@ -125,11 +130,13 @@
   function chart(done) {
     if (done.length < 2) return '';
     const cols = done.slice().sort((a, b) => a.date.localeCompare(b.date) || a.id.localeCompare(b.id)).slice(-24);
-    return '<div class="card hk-chart" role="img" aria-label="Andel rätt per kupong jämfört med det väntade">' +
+    // Som kurvan Omgång för omgång ovanför (kampen.js).
+    return '<div class="card km-card hk-chart" role="img" aria-label="Andel rätt per kupong jämfört med det väntade">' +
+      '<p class="kp-eyebrow">Kupong för kupong</p>' +
       '<div class="hk-cols">' + cols.map((c) => {
         const a = Math.round(100 * rate(c));
         const e = Math.round((100 * c.exp) / c.n);
-        return `<a class="hk-col" href="#kupong/historik/${esc(encodeURIComponent(c.id))}" title="${esc(`${c.name || dateRange(c.date, c.till)}: ${c.ok} av ${c.n} rätt · väntat ${num(c.exp)} · ${c.grade} ★`)}">` +
+        return `<a class="hk-col" href="${esc(href(c.id))}" title="${esc(`${c.name || dateRange(c.date, c.till)}: ${c.ok} av ${c.n} rätt · väntat ${num(c.exp)} · ${c.grade} ★`)}">` +
           `<span class="hk-bar"><i class="g${c.grade}" style="height:${a}%"></i><b style="bottom:${e}%"></b></span>` +
           `<span class="hk-lab">${esc(dateRange(c.date))}</span></a>`;
       }).join('') + '</div>' +
@@ -220,12 +227,14 @@
     // siffrorna eller sorteringen avslöjar hur det gick.
     const hidden = all.filter(isHidden);
     const list = all.filter((c) => !hidden.includes(c));
+    // Utan färdiga kuponger syns delen inte alls.
+    el.hidden = !all.length && !errors();
     if (!all.length) {
-      el.innerHTML = '<div class="card kp-empty"><p class="intro">Inga färdiga kuponger än.</p>' +
-        '<a class="kp-btn primary" href="#kupong">Till kupongen</a></div>' + errors();
+      el.innerHTML = errors();
       return;
     }
-    el.innerHTML = overview(list) +
+    el.innerHTML = '<div class="dv-sechead hk-head"><h3 title="Gängets gemensamma kuponger">Grupparbetena</h3></div>' +
+      overview(list) +
       '<div class="toolbar hk-tools"><div class="seg" role="group" aria-label="Sortera">' +
       SORTS.map((s) => {
         const on = s.id === H.sort;
@@ -330,6 +339,17 @@
     focus(id);
   }
 
+  // De färdigspelade kupongerna (till tabellen Omgångarna i kampen.js), med
+  // matchernas id i rows. Tom lista om historiken inte går att läsa.
+  async function coupons() {
+    try {
+      await load();
+    } catch {
+      return [];
+    }
+    return H.data.coupons || [];
+  }
+
   // Kupongens betyg och kommentar till rättningen på papperet
   // (rattning.js): { label, text, model }, eller null om kupongen inte finns
   // i historiken än.
@@ -342,5 +362,5 @@
     return { label: c.label || null, text: (a && a.text) || null, model: (a && a.model) || null };
   }
 
-  window.Historik = { show, focus, entry };
+  window.Historik = { show, focus, entry, coupons, hidden: isHidden, href };
 })();

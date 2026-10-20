@@ -237,10 +237,10 @@
     KP.view = { mode: 'samtal', sub };
     const el = $('#coupon');
     if (!info()) {
-      el.innerHTML = viewNav('omgang') + '<p class="empty">Att tippa var för sig är inte påslaget på den här sajten.</p>';
+      el.innerHTML = '<p class="empty">Att tippa var för sig är inte påslaget på den här sajten.</p>';
       return;
     }
-    if (SM.data === undefined) el.innerHTML = viewNav('omgang') + '<p class="empty">Laddar …</p>';
+    if (SM.data === undefined) el.innerHTML = '<p class="empty">Laddar …</p>';
     if (!loaded) await load();
     if (!here(sub)) return;
     if (sub === 'ny') renderStart(false);
@@ -265,7 +265,7 @@
       `<div class="kp-actions">${actions}</div></div>`;
   }
 
-  // Var omgången står, i stegen under flikarna (roundSteps i kupong.js): 2
+  // Var omgången står, i stegen överst (roundSteps i kupong.js): 2
   // medan alla tippar, 3 när allas tips visas och 4 när gängets kupong är
   // gjord eller alla matcher har startat. Stegen man kan gå tillbaka till är
   // länkar: matcherna tills någon har lämnat in, uppgörelsen och gängets
@@ -284,7 +284,7 @@
   function renderRound() {
     const el = $('#coupon');
     const s = SM.data;
-    let html = viewNav('omgang');
+    let html = '';
     if (s === undefined || (SM.error && !s)) {
       el.innerHTML = html + `<p class="empty">Kunde inte läsa omgången (${esc(SM.error || 'okänt fel')}).</p>`;
       return;
@@ -1048,7 +1048,7 @@
       location.hash = 'kupong';
       return;
     }
-    $('#coupon').innerHTML = viewNav('omgang') + steps(s) +
+    $('#coupon').innerHTML = steps(s) +
       head(s, 'Ändra din kupong') + sheet(s, true);
     wireSheet();
   }
@@ -1209,7 +1209,7 @@
       `<input type="search" id="sm-q" class="kp-search" placeholder="Sök lag" autocomplete="off" value="${esc(SM.q)}">` +
       '<div class="chips" id="sm-comps" role="group" aria-label="Tävling">' + comps.map((c) =>
         `<button type="button" data-comp="${c.id}" title="${esc(c.name)}" aria-pressed="${c.id === SM.comp}">${esc(c.short)}</button>`).join('') + '</div></div>';
-    $('#coupon').innerHTML = viewNav('omgang') + roundSteps(1) +
+    $('#coupon').innerHTML = roundSteps(1) +
       '<div class="kp-head"><div>' + (edit ? nameBlock(s, 'rad') : '<p class="kp-eyebrow">Omgångens kupong</p>') +
       `<h2 class="page-title">${edit ? 'Ändra matcherna' : 'Välj matcher'}</h2></div>` +
       '<div class="kp-actions"><a class="kp-btn" href="#kupong">Avbryt</a></div></div>' +

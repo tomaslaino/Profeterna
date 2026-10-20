@@ -17,14 +17,20 @@
 // Sidan: ställningen som en prispall, betyget (betyg.js), kurvan omgång för
 // omgång, inbördes möten (vem som fick mest poäng i omgångarna som båda
 // tippade), spelkassan (10 kr per match på sitt tips till modellens odds),
-// höjdpunkterna, var och ens sätt att tippa och omgångarna.
+// höjdpunkterna, var och ens sätt att tippa och omgångarna – med gängets
+// kupong ur varje omgång – och sist Grupparbetena: de färdigspelade
+// kupongerna (historik.js, #olympen/kuponger/<id>).
 //
 // Läses efter tippare.js och använder dess data och hjälpare (TP, tpLoad,
 // tpLoadSeason, tpScore, tpRoundHidden, tpPts, tpTone, tpAwards, tpLiveName,
 // tpRoundHead), kupong.js (KP, teamsOf, dateRange, kpNum, whenMatches,
-// loadCoupons), kronan.js (KRONAN_KROPPAR) och betyg.js (Betyg) när den finns.
+// loadCoupons), kronan.js (KRONAN_KROPPAR), betyg.js (Betyg) och historik.js
+// (Historik) när de finns.
 
-const KAMP = { html: null, width: 0 };
+// hk: rutan som Grupparbetena ritas i. Den ligger kvar när resten av sidan
+// ritas om, så att sorteringen och AI:ns kommentarer står kvar.
+// coupons: de färdigspelade kupongerna, när historiken är läst (wait).
+const KAMP = { html: null, width: 0, hk: null, coupons: null, wait: null };
 // Spelkassan: så mycket på varje match.
 const KAMP_INSATS = 10;
 const KAMP_BILD = { DL: 'profeterna/laino.jpg', DT: 'profeterna/teijder.jpg', DJ: 'profeterna/johansson.jpg' };
@@ -461,11 +467,40 @@ function kampStyle(rounds, t, gang) {
 
 // ---------- omgångarna ----------
 
+// Gängets kupong ur omgången: den färdigspelade kupongen med flest av
+// omgångens matcher, minst hälften av kupongens (som namnet i
+// src/history.js) – eller null.
+function kampCoupon(r) {
+  const ids = new Set((r.matches || []).map((m) => String(m.id)));
+  let best = null;
+  let most = 0;
+  for (const c of KAMP.coupons || []) {
+    const n = c.rows.filter((x) => x.id && ids.has(x.id)).length;
+    if (n > most) {
+      most = n;
+      best = c;
+    }
+  }
+  return best && most * 2 >= best.rows.length ? best : null;
+}
+
+// Kupongens rätt, i betygets färg, med länk ner till den i Grupparbetena.
+function kampCouponLink(c) {
+  const href = esc(Historik.href(c.id));
+  if (Historik.hidden(c)) return `<a class="km-kup" href="${href}" title="Resultatet är dolt">?</a>`;
+  return `<a class="km-kup g${c.grade}" href="${href}" title="${esc(`${c.ok} av ${c.n} rätt · ${c.label}`)}">` +
+    `${c.ok}<span>/${c.n}</span></a>`;
+}
+
 function kampRoundsCard(rounds, gang) {
   if (!rounds.length) return '';
   const cols = [...gang.filter((g) => rounds.some((r) => kampTook((r.people || []).find((p) => p.id === g.id)))), { id: 'modellen', model: true }];
+  // Kolumnen Kupongen när någon omgång har en färdigspelad kupong.
+  const kup = rounds.some(kampCoupon);
   const head = cols.map((c) => `<th scope="col" class="km-th-face" title="${esc(c.model ? 'Modellen' : c.name)}">` +
-    `${c.model ? '<span class="km-face km-face-sm km-face-txt km-face-model">M</span>' : kampFace(c, ' km-face-sm')}</th>`).join('');
+    `${c.model ? '<span class="km-face km-face-sm km-face-txt km-face-model">M</span>' : kampFace(c, ' km-face-sm')}</th>`).join('') +
+    (kup ? '<th scope="col" class="km-th-face km-col-kup" title="Gängets kupong">' +
+      '<span class="km-face km-face-sm km-face-model km-face-kup" aria-hidden="true"></span><span class="tp-vh">Kupongen</span></th>' : '');
   const body = rounds.slice().reverse().map((r) => {
     const cells = cols.map((c) => {
       const p = c.model ? r.model : (r.people || []).find((x) => x.id === c.id);
@@ -474,8 +509,14 @@ function kampRoundsCard(rounds, gang) {
       const title = p.award === 'best' ? 'Omgångens orakel' : p.award === 'worst' ? 'Omgångens Ikaros' : '';
       return `<td><span class="${(tpTone(p.pts) + aw).trim()}"${title ? ` title="${title}"` : ''}>${tpPts(p.pts)}</span></td>`;
     }).join('');
+    // Gängets kupong: en egen kolumn, och i telefonen en rad under omgången
+    // (historik.css).
+    const k = kup && kampCoupon(r);
+    const link = k && k.n ? kampCouponLink(k) : '';
+    const kcell = kup ? (link ? `<td class="km-col-kup">${link}</td>` : '<td class="km-col-kup tp-none">–</td>') : '';
+    const kline = link ? `<span class="km-kup-sm">Kupongen ${link}</span>` : '';
     const n = r.live ? `${r.n} av ${r.total} matcher` : `${r.n} ${r.n === 1 ? 'match' : 'matcher'}`;
-    return `<tr${r.live && !r.done ? ' class="km-live"' : ''}><th scope="row">${tpRoundHead(r, `${r.live && !r.done ? 'pågår · ' : ''}${n}`)}</th>${cells}</tr>`;
+    return `<tr${r.live && !r.done ? ' class="km-live"' : ''}><th scope="row">${tpRoundHead(r, `${r.live && !r.done ? 'pågår · ' : ''}${n}`)}${kline}</th>${cells}${kcell}</tr>`;
   }).join('');
   return '<div class="card km-card tp-card tp-rounds">' +
     '<p class="kp-eyebrow">Omgångarna</p>' +
@@ -515,7 +556,9 @@ function kampHtml(width) {
       `<button type="button" class="tp-show" data-sp-show="${esc(hidden.flatMap((r) => r.matches.map((m) => m.id)).join(' '))}">Visa ändå</button></p>`
     : '';
   const head = '<h2 class="page-title">Olympen</h2>';
-  if (!list.length) return head + kampEmpty(gang) + hid;
+  // Platsen för Grupparbetena (KAMP.hk), som kampRender sätter in.
+  const kup = window.Historik ? '<div data-km-kuponger></div>' : '';
+  if (!list.length) return head + kampEmpty(gang) + hid + kup;
   const t = kampTips(list);
   const pair = [kampPairsCard(list, gang), kampKassaCard(t, gang)].filter(Boolean);
   return head + hid +
@@ -526,21 +569,66 @@ function kampHtml(width) {
     kampHighlights(list, t, gang) +
     kampStyle(list, t, gang) +
     kampRoundsCard(list, gang) +
+    kup +
     KAMP_HJALP;
 }
 
-function kampRender() {
+// #olympen/kuponger/<id>: kupongen i Grupparbetena (null utan id), eller
+// undefined om adressen inte pekar dit.
+function kampTarget() {
+  const m = /^(?:olympen|kampen)\/kuponger(?:\/(.+))?$/.exec(location.hash.replace(/^#/, ''));
+  if (!m) return undefined;
+  try {
+    return m[1] ? decodeURIComponent(m[1]) : null;
+  } catch {
+    return null;
+  }
+}
+
+// Grupparbetena i sin ruta, som ligger kvar mellan omritningarna. Första
+// gången och när adressen byts dit ritas de, och sidan bläddras fram till
+// kupongen (eller delen).
+function kampKuponger(el, go) {
+  const fresh = !KAMP.hk;
+  if (fresh) {
+    KAMP.hk = document.createElement('section');
+    KAMP.hk.className = 'km-kuponger';
+    KAMP.hk.setAttribute('aria-label', 'Gängets kuponger');
+  }
+  const slot = el.querySelector('[data-km-kuponger]');
+  if (slot) slot.replaceWith(KAMP.hk);
+  if (!KAMP.hk.isConnected) return;
+  const target = kampTarget();
+  if (!fresh && !(go && target !== undefined)) return;
+  // Efter att tabellen Omgångarna har fått kolumnen Kupongen, så att inget
+  // ovanför flyttar sig när sidan har bläddrats fram.
+  KAMP.wait.then(() => Historik.show(KAMP.hk, target || null)).then(() => {
+    if (target === null) KAMP.hk.scrollIntoView();
+  });
+}
+
+function kampRender(e) {
   const el = $('#kampen');
   if (!el || $('#battle-section').hidden) return;
+  // Kupongerna läses första gången sidan visas, till tabellen Omgångarna
+  // (historik.js).
+  if (window.Historik && !KAMP.wait) {
+    KAMP.wait = Historik.coupons().then((list) => {
+      KAMP.coupons = list;
+      kampRender();
+    });
+  }
   // Kurvan ritas i kortets bredd: sidans bredd minus kortets luft.
   const width = el.clientWidth - (el.clientWidth < 560 ? 34 : 42);
   const open = el.querySelector('.km-help') && el.querySelector('.km-help').open;
   const html = kampHtml(width);
-  if (html === KAMP.html) return;
-  KAMP.html = html;
-  KAMP.width = el.clientWidth;
-  el.innerHTML = html;
-  if (open) el.querySelector('.km-help').open = true;
+  if (html !== KAMP.html) {
+    KAMP.html = html;
+    KAMP.width = el.clientWidth;
+    el.innerHTML = html;
+    if (open) el.querySelector('.km-help').open = true;
+  }
+  if (window.Historik) kampKuponger(el, Boolean(e && e.type === 'hashchange'));
 }
 
 // ---------- start ----------

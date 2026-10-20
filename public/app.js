@@ -160,12 +160,18 @@ function route(e) {
     // Tillbaka till sidan under rutan: den syns redan, inget ritas om.
     if (back) return;
   }
-  // Kupongen (kupong.js): #kupong, #kupong/historik, #kupong/<id>,
-  // #kupong/ny, #kupong/andra/<id>.
+  // Kupongen (kupong.js): #kupong, #kupong/<id>, #kupong/ny,
+  // #kupong/andra/<id> – och #kupong/historik, som leds till Olympen.
   const k = /^kupong(?:\/(.+))?$/.exec(h);
   if (k) {
     showTab('coupon-section');
     showCoupon(k[1] || '');
+    return;
+  }
+  // Olympen med Grupparbetena (kampen.js, historik.js): #olympen/kuponger
+  // och #olympen/kuponger/<id> – kampen.js bläddrar fram till kupongen.
+  if (/^(olympen|kampen)\//.test(h)) {
+    showTab('battle-section');
     return;
   }
   // Förstasidan: utan eller med okänd adress.

@@ -7,7 +7,7 @@
 // Matchanalysen (fas 5): finns DEEPSEEK_API_KEY i .env visas knappen
 // Analysera, och servern gör analysen själv (POST /api/analyze) med samma kod
 // som proxyn på Cloudflare (worker/index.mjs). Utan nyckel ingen knapp.
-// Samma nyckel ger AI:ns kommentarer på sidan Historik (POST /api/kommentar)
+// Samma nyckel ger AI:ns kommentarer i Olympen (POST /api/kommentar)
 // och, med KUPONG_LOKALT, omgångens namn (POST /api/namn).
 //
 // Kupongen: med KUPONG_LOKALT=1 i .env sparar knappen Spara kupongen direkt
@@ -62,7 +62,7 @@ function analysisRoute(siteDir = OUT, store = fileStore()) {
 }
 
 // POST /api/kommentar {id} – AI:ns kommentar till en färdig kupong, ur den
-// byggda historiken i siteDir (sidan Historik).
+// byggda historiken i siteDir (Grupparbetena i Olympen).
 function commentRoute(siteDir = OUT, store = fileStore(path.join(CACHE_DIR, 'kommentarer'))) {
   return async (req, res) => {
     try {
