@@ -14,7 +14,7 @@
 module.exports = {
   // Ändras prompten byts versionen, så att omgångar som redan har fått sitt
   // namn inte döps om – bara nya omgångar får namn efter den nya prompten.
-  promptVersion: '2026-10-20.4',
+  promptVersion: '2026-10-20.5',
   // Claude när nyckeln finns: tänkandet är alltid på, effort styr hur mycket.
   // fallbacks: "default" låter Anthropic köra om ett nekat svar på en annan
   // modell i samma anrop.
@@ -38,14 +38,21 @@ Svara med ett JSON-objekt och inget annat:
 
 Så gör du:
 1. Hitta det mest intressanta med just den här omgången – något en svensk fotbollsvän begriper direkt och tycker är kul eller anmärkningsvärt: ett derby, ett lag som spelar två gånger, en lång svit i de tidigare mötena, botten mot topp, en storfavorit i usel form, ett lag som aldrig vinner borta, en helgdag mitt i allt. Hellre något alla förstår än statistik som måste förklaras.
-2. Skriv tio förslag på namn, gärna om olika saker i omgången och med olika slags vändningar.
+2. Skriv tio förslag på namn, gärna om olika saker i omgången.
 3. Granska förslagen hårt, som en erfaren svensk rubriksättare, och stryk varje förslag som
+   - inte är ironiskt (se nedan) – ett namn som bara beskriver, förklarar eller skämtar rakt ut ska bort,
    - låter översatt från engelska eller som ingen svensk skulle säga – läs det tyst för dig själv,
-   - är krystat, kräver förklaring eller bara beskriver utan udd,
-   - bygger på en ordlek som inte fungerar på svenska.
-4. Välj det bästa som finns kvar: naturlig, levande svenska, begripligt direkt och lågmält ironiskt.
+   - är krystat eller bygger på en ordlek som inte fungerar på svenska.
+4. Välj det bästa som finns kvar.
 
-Ironin kan vara en underdrift, en falsk högtidlighet eller en torr kommentar som säger mer än den låter. Ett välkänt svenskt talesätt, ordspråk eller en filmtitel som vrids lite så att det passar fungerar ofta bäst – men bara när det blir naturligt.
+Ironin är det viktigaste. Namnet ska säga något med fullt allvar som underlaget motsäger – motsatsen till det som är sant, eller en överdrivet självsäker, naiv eller högtidlig version av det. Den som ser fakta förstår att det är tvärtom; "syftar" avslöjar sanningen. Namnet får inte själv peka ut skämtet. Till exempel:
+- Storfavoriten har aldrig slagit motståndaren → "En säker spik på Villa Park". Inte "Storfavorit med kort minne", som bara säger rakt ut vad som är fel.
+- Laget har inte vunnit en enda hemmamatch i år → "Fästningen Carrow Road"
+- De två sämsta lagen möts → "Toppmöte i Oldham"
+- Lagen har spelat lika i alla de senaste mötena → "Nu avgörs det i Hull"
+- Chansen till alla rätt är en på tiotusentals → "Bara att hämta ut pengarna"
+- Ett lag har vunnit alla sina matcher och möter ett bottenlag → "En jämn match väntar på Anfield"
+Exemplen är påhittade och får inte återanvändas – hitta din egen iakttagelse och din egen formulering.
 
 Namnet:
 - 2–6 ord och högst 36 tecken, med stor bokstav bara först och i egennamn. Lag, arenor och städer får heta som på engelska, men i övrigt inga engelska ord och inga anglicismer.
@@ -53,12 +60,10 @@ Namnet:
 - Inga utropstecken, frågetecken, emojier, citattecken eller siffror. Inte orden "kupong", "omgång" eller "tips".
 - Namnen ska skifta. Står det tidigare namn i underlaget: gör inte likadant, varken i form, mönster eller ordval.
 
-Nivån, med påhittade exempel som du inte får återanvända:
-- De två sämsta lagen möts på annandagen → "Mellandagsrea på Deepdale". Bra: en svensk företeelse som passar precis.
-- Modellen ger nästan alla matcher jämna odds → "Modellen vet inte heller". Bra: enkelt och torrt.
-- Ett lag har vunnit alla sina matcher → "Någon måste ju bryta sviten". Bra: vardagligt, med glimten i ögat.
-- "Wigan skjuter för motionens skull" – dåligt: krystat, och bygger på statistik som måste förklaras.
-- "Allhelgona på Stamford Bridge" – dåligt: beskriver bara, ingen udd.
+Dåliga namn, så att du vet vad du ska undvika:
+- "Wigan skjuter för motionens skull" – krystat, och bygger på statistik som måste förklaras.
+- "Allhelgona på Stamford Bridge" – beskriver bara.
+- "Storfavorit med kort minne" – säger rakt ut vad som är fel i stället för att låtsas motsatsen.
 
 "syftar": en mening på enkel svenska, högst 20 ord, som säger vilken iakttagelse i underlaget namnet bygger på, med talen som de står där. Den visas när man pekar på namnet.
 
