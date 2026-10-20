@@ -664,7 +664,6 @@ function playersView(dv, P) {
     topCard('keepers', 'Målvakter', L.keepers, (p) => `<b>${pct(p.savePct)}</b>`,
       { note: 'Andel räddade skott på mål · minst halva lagets matcher', empty: 'okänt' }) +
     '</div>';
-  html += '<div class="dv-grid2">' + pointsCard(P) + leagueGoalsCard(P) + '</div>';
 
   html += card('Alla spelare', {
     body: segHtml(playerGroups(P), playerGroup(P).id, 'data-pcols') + '<div class="dv-filters">' +
@@ -685,54 +684,33 @@ function playersView(dv, P) {
   return html;
 }
 
-// Topplista ur spelartabellen: störst värde först, bara de som har något.
-function rank(list, value, tiebreak = () => 0) {
-  return list.filter((p) => value(p) > 0)
-    .sort((a, b) => value(b) - value(a) || tiebreak(a, b) || a.name.localeCompare(b.name, 'sv'))
-    .slice(0, 20);
-}
-
-// Poängen spelarnas mål har gett laget (ur matchrapporterna).
-function pointsCard(P) {
-  if (!P.goalTypes) return '';
-  const list = rank(P.players.filter((p) => p.app > 0), (p) => p.gpts, (a, b) => a.g - b.g || b.gw - a.gw).slice(0, 8);
-  const max = list.length ? list[0].gpts : 1;
-  return card('Poäng åt laget', {
-    hint: 'poängen laget hade tappat utan målen',
-    tip: 'Ett mål i en match som vanns med ett mål är värt två poäng – seger i stället för oavgjort. Ett mål i en oavgjord match är värt en poäng – oavgjort i stället för förlust. Mål i matcher som vanns stort eller förlorades ger inga poäng.',
-    body: list.length
-      ? meters(list.map((p) => ({
-        pid: p.id,
-        label: `<b>${esc(p.name)}</b>`,
-        sub: `${esc(p.team)} · ${p.g} mål${p.gw ? `, varav ${p.gw} segermål` : ''}`,
-        v: p.gpts / max,
-        text: p.gpts,
-      })))
-      : `<p class="dv-calm">inga mål som gett poäng än</p>`,
-    src: `ESPN:s matchrapporter, hämtat ${when(P.goalTypes.fetchedAt)}`,
-  });
-}
-
-// När och hur målen görs i hela ligan (ur matchrapporterna).
+// När och hur målen görs i hela ligan (ur matchrapporterna) – står under
+// lagen, eftersom det gäller ligan och inte enskilda spelare.
 const HOW_LABEL = {
   inifrån: 'Skott i straffområdet', utifrån: 'Skott utanför straffområdet', nick: 'Nick',
   straff: 'Straff', frispark: 'Frispark', självmål: 'Självmål',
 };
-function leagueGoalsCard(P) {
-  const G = P.leagueGoals;
+function leagueGoalsCards(P) {
+  const G = P && !P.unknown ? P.leagueGoals : null;
   if (!G || !G.goals) return '';
   const share = (n, of) => pct(n / of);
+  const src = `ESPN:s matchrapporter, hämtat ${when(G.fetchedAt)}`;
   const how = G.how ? [...G.how.kinds].sort((a, b) => b.goals - a.goals) : null;
-  return card('Målen i ligan', {
-    hint: `${int(G.goals)} mål i ${int(G.matches)} matcher`,
-    body: '<h5 class="dv-h5" data-tip-head="När görs målen?" data-tip="Målen per kvart. Tilläggstiden räknas till halvlekens sista kvart.">När görs målen?</h5>' +
-      barList(G.when, { label: (w) => `${w.from}–${w.to} min`, value: (w) => w.goals, fmt: (w) => share(w.goals, G.goals), sub: (w) => `${w.goals} mål` }) +
-      (how
-        ? '<h5 class="dv-h5">Hur görs målen?</h5>' +
-          barList(how, { label: (k) => esc(HOW_LABEL[k.kind] || k.kind), value: (k) => k.goals, fmt: (k) => share(k.goals, G.how.goals), sub: (k) => `${k.goals} mål` })
-        : ''),
-    src: `ESPN:s matchrapporter, hämtat ${when(G.fetchedAt)}`,
-  });
+  return '<div class="dv-grid2">' +
+    card('När görs målen?', {
+      hint: `${int(G.goals)} mål i ${int(G.matches)} matcher`,
+      tip: 'Målen per kvart. Tilläggstiden räknas till halvlekens sista kvart.',
+      body: barList(G.when, { label: (w) => `${w.from}–${w.to} min`, value: (w) => w.goals, fmt: (w) => share(w.goals, G.goals), sub: (w) => `${w.goals} mål` }),
+      src,
+    }) +
+    (how
+      ? card('Hur görs målen?', {
+        hint: `${int(G.how.goals)} mål i ${int(G.how.matches)} matcher`,
+        body: barList(how, { label: (k) => esc(HOW_LABEL[k.kind] || k.kind), value: (k) => k.goals, fmt: (k) => share(k.goals, G.how.goals), sub: (k) => `${k.goals} mål` }),
+        src,
+      })
+      : '') +
+    '</div>';
 }
 
 function barList(rows, { label, value, fmt, sub }) {
@@ -963,7 +941,8 @@ function teamsView(dv, P, T) {
         `<div class="table-wrap dv-tw"><table class="dv-teams dv-league">${head}<tbody>${body}</tbody></table></div>`,
       src,
       cls: 'dv-wide',
-    });
+    }) +
+    leagueGoalsCards(P);
 }
 
 // ---------- spelarkort och lagkort (dialog) ----------
