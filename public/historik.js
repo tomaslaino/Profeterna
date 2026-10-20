@@ -48,7 +48,6 @@
   }
 
   const num = (x, d = 1) => x.toLocaleString('sv-SE', { minimumFractionDigits: d, maximumFractionDigits: d });
-  const signed = (x, d = 1) => (Math.abs(x) < 0.05 ? '±0' : `${x > 0 ? '+' : '−'}${num(Math.abs(x), d)}`);
   const rate = (c) => (c.n ? c.ok / c.n : 0);
   const vsModel = (c) => (c.modelN ? c.ok - c.modelOk : null);
 
@@ -110,15 +109,14 @@
     if (!done.length) return '';
     const ok = done.reduce((a, c) => a + c.ok, 0);
     const n = done.reduce((a, c) => a + c.n, 0);
-    const exp = done.reduce((a, c) => a + c.exp, 0);
     const avg = done.reduce((a, c) => a + c.grade, 0) / done.length;
-    const tile = (label, value, sub, title = '') =>
-      `<div class="hk-tile"${title ? ` title="${esc(title)}"` : ''}><span class="kp-eyebrow">${label}</span><b>${value}</b><span class="sub">${sub}</span></div>`;
+    const tile = (label, value, sub) =>
+      `<div class="hk-tile"><span class="kp-eyebrow">${label}</span><b>${value}</b><span class="sub">${sub}</span></div>`;
+    // Tre rutor: betyget jämför redan rätt med det väntade, som också syns i staplarna.
     return '<div class="hk-tiles">' +
       tile('Kuponger', done.length, `${n} matcher`) +
       tile('Rätt', `${Math.round((100 * ok) / n)} %`, `${ok} av ${n}`) +
-      tile('Snittbetyg', `${num(avg)}<small>★</small>`, 'av 5') +
-      tile('Mot väntat', signed(ok - exp), 'rätt', 'Antal rätt jämfört med det väntade enligt modellen, alla kuponger') +
+      tile('Betyg', `${num(avg)}<small>★</small>`, 'i snitt av 5') +
       '</div>' + chart(done);
   }
 

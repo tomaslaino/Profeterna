@@ -624,9 +624,6 @@ function leaderCard(title, list, value, { empty = 'inga än', note, top, tip } =
     (top ? `<button type="button" class="dv-lmore dv-linkbtn" data-top="${esc(top)}">Topp 20 →</button>` : '') + '</section>';
 }
 
-const cardsVal = (p) => `${p.yc ? `<i class="dv-card-y" aria-label="gula"></i>${p.yc}` : ''}${p.rc ? ` <i class="dv-card-r" aria-label="röda"></i>${p.rc}` : ''}`;
-const byCards = (list) => [...list].sort((a, b) => (b.rc * 3 + b.yc) - (a.rc * 3 + a.yc) || a.app - b.app);
-
 // Topplistorna: fem på kortet, upp till 20 i en dialog. Listan sparas per
 // vy så att knappen Topp 20 kan öppna den.
 const tops = new Map();
@@ -657,20 +654,13 @@ function playersView(dv, P) {
   const L = P.leaders;
   const t = P.totals;
   const f = state.pf;
-  const xg = !!(P.fpl && L.overXg);
   const teams = [...P.teams].sort((a, b) => a.name.localeCompare(b.name, 'sv'));
   let html = sectionHead('Spelarstatistik', `Ligamatcher ${esc(state.data.season)}`);
-  const xgVal = (p) => `<b>${delta(p.dxg, { d: 1 })}</b><small>${p.fg} mål · ${num(p.xg, 1)} xG</small>`;
+  // Tre topplistor, samma i alla divisioner. Resten (xG, kort, skott) går
+  // att sortera fram i tabellen Alla spelare.
   html += '<div class="dv-leaders">' +
     topCard('goals', 'Skytteliga', L.goals, (p) => `<b>${p.g}</b>`) +
     topCard('assists', 'Flest assist', L.assists, (p) => `<b>${p.a}</b>`) +
-    (xg
-      ? topCard('overxg', 'Över xG', L.overXg, xgVal, { note: 'Fler mål än chanserna brukar ge (mål minus xG)' }) +
-        topCard('underxg', 'Under xG', L.underXg, xgVal, { note: 'Färre mål än chanserna brukar ge (mål minus xG)' })
-      : topCard('involvement', 'Mål + assist', L.involvement, (p) => `<b>${p.ga}</b><small>${p.g}+${p.a}</small>`) +
-        topCard('conversion', 'Effektivast', L.conversion, (p) => `<b>${pct(p.conv)}</b><small>${p.g}/${p.sh}</small>`,
-          { note: `Mål per skott · minst ${P.thresholds.minShotsConversion} skott`, empty: 'ingen har tillräckligt många skott än' })) +
-    topCard('cards', 'Flest kort', byCards(L.yellow.concat(L.red.filter((r) => !L.yellow.some((y) => y.id === r.id)))), cardsVal) +
     topCard('keepers', 'Målvakter', L.keepers, (p) => `<b>${pct(p.savePct)}</b>`,
       { note: 'Andel räddade skott på mål · minst halva lagets matcher', empty: 'okänt' }) +
     '</div>';
@@ -965,9 +955,8 @@ function teamsView(dv, P, T) {
       teamTop('Släpper till minst', all, (t) => `<b>${num(per(t.fd.sh, 'a'), 1)}</b><small>skott mot per match</small>`, { get: (t) => per(fdOf(t, 'sh'), 'a'), asc: true });
 
   return sectionHead('Lagen') +
-    '<div class="dv-leaders dv-leaders4">' + leaders +
+    '<div class="dv-leaders">' + leaders +
     teamTop('Slår oddsen', all, (t) => `<b>${delta(vsOdds(t), { d: 1 })}</b><small>${t.fd.mkt.pts} p · ${num(t.fd.mkt.xp, 1)} väntat</small>`, { get: vsOdds, note: 'Poäng mot vad oddsen vid avspark väntade sig' }) +
-    teamTop('Bäst att spela på', all, (t) => `<b>${delta(roi(t), { fmt: signedPct })}</b>`, { get: roi, note: 'Samma insats på seger i varje match' }) +
     '</div>' +
     card('Alla lag', {
       body: segHtml(groups, f.cols, 'data-tcols') +
