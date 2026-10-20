@@ -384,10 +384,6 @@ const PCOLS = [
   { key: 'yc', label: 'Gul', name: 'Gula kort', title: 'Gula kort i ligan i år.', get: (p) => p.yc, cls: 'num', in: ['oversikt', 'regelbrott'] },
   { key: 'rc', label: 'Röd', name: 'Röda kort', title: 'Röda kort i ligan i år.', get: (p) => p.rc, cls: 'num', in: ['oversikt', 'regelbrott'] },
   { key: 'off', label: 'Offside', title: 'Gånger spelaren har blivit avblåst för offside.', get: (p) => p.off, cls: 'num', in: ['regelbrott'] },
-  { key: 'cost', label: 'Pris', name: 'Pris i Fantasy Premier League',
-    title: 'Spelarens pris i managerspelet Fantasy Premier League, i miljoner pund. Priset stiger när många köper spelaren, så det speglar form och popularitet – inte lön eller övergångssumma.',
-    get: (p) => p.cost, cls: 'num', fpl: true, in: ['oversikt'],
-    show: (p) => (p.cost == null ? cell(null) : `<span class="dv-price">£${num(p.cost, 1)}m</span>`) },
   { key: 'sh', label: 'Skott', title: 'Alla avslut – även de som går utanför eller blockeras.', get: (p) => p.sh, cls: 'num', in: ['avslut'] },
   { key: 'sot', label: 'På mål', name: 'Skott på mål', title: 'Skott som hade gått in om målvakten inte räddat. Skott utanför och i stolpen räknas inte.',
     get: (p) => p.sot, cls: 'num', in: ['avslut'] },
@@ -438,7 +434,7 @@ const PCOLS = [
   { key: 'og', label: 'Självmål', title: 'Självmål i ligan i år.', get: (p) => p.og, cls: 'num hide-xs', in: ['forsvar'] },
 ];
 
-// fpl = xG, försvarsspel och pris (bara Premier League), mins = speltiden
+// fpl = xG och försvarsspel (bara Premier League), mins = speltiden
 // (alla ligor där den är känd), kinds = målens sort, rt = betygen.
 function playerGroups(P) {
   return P_GROUPS.filter((g) => g.needs !== 'goals' || P.goalTypes);
@@ -538,10 +534,8 @@ function playersView(dv, P) {
     topCard('goals', 'Skytteliga', L.goals, (p) => `<b>${p.g}</b>`) +
     topCard('assists', 'Flest assist', L.assists, (p) => `<b>${p.a}</b>`) +
     (P.ratings && L.rating
-      ? topCard('rating', 'Högst betyg', L.rating, (p) => `<b>${num(p.rt, 1)}</b>`,
-        { note: 'Snittbetyg från 365Scores · minst halva lagets matcher', empty: 'okänt' })
-      : topCard('keepers', 'Målvakter', L.keepers, (p) => `<b>${pct(p.savePct)}</b>`,
-        { note: 'Andel räddade skott på mål · minst halva lagets matcher', empty: 'okänt' })) +
+      ? topCard('rating', 'Högst betyg', L.rating, (p) => `<b>${num(p.rt, 1)}</b>`, { empty: 'okänt' })
+      : topCard('keepers', 'Målvakter', L.keepers, (p) => `<b>${pct(p.savePct)}</b>`, { empty: 'okänt' })) +
     '</div>';
 
   html += card('Alla spelare', {
@@ -553,7 +547,7 @@ function playersView(dv, P) {
       '</div><div id="dv-ptable">' + playerTableHtml(P) + '</div>',
     src: `ESPN, hämtat ${when(P.source.fetchedAt)} · ${int(t.used)} av ${int(t.players)} har spelat` +
       (t.teamsBehind ? ` · släpar en omgång för ${t.teamsBehind} lag` : '') +
-      (P.fpl ? ` · speltid, xG, försvarsspel och pris: Fantasy Premier League, hämtat ${when(P.fpl.fetchedAt)}` : '') +
+      (P.fpl ? ` · speltid, xG och försvarsspel: Fantasy Premier League, hämtat ${when(P.fpl.fetchedAt)}` : '') +
       (!P.fpl && P.minutes ? ` · speltid${P.goalTypes ? ' och målen' : ''}: ESPN:s matchrapporter, hämtat ${when(P.minutes.fetchedAt)}` : '') +
       (P.fpl && P.goalTypes ? ` · målen: ESPN:s matchrapporter, hämtat ${when(P.goalTypes.fetchedAt)}` : '') +
       (P.ratings ? ` · betyg: 365Scores, hämtat ${when(P.ratings.fetchedAt)}` +
@@ -1032,7 +1026,6 @@ function openPlayer(id) {
   }
   if (p.cost != null) {
     html += msec('Fantasy Premier League', facts([
-      [`£${num(p.cost, 1)}m`, 'Pris'],
       [p.sel == null ? '–' : `${num(p.sel, p.sel < 10 ? 1 : 0)} %`, 'Vald av', 'Andel av alla lag i Fantasy Premier League som har med spelaren'],
       [cell(p.fpts), 'Poäng'],
       [cell(p.bonus), 'Bonuspoäng'],
@@ -1114,9 +1107,8 @@ const GLOSSARY = [
   ['Zonerna', 'Färgen till vänster i tabellen: vad placeringen ger i slutet av säsongen enligt ESPN – uppflyttning, kval (playoff), Europa eller nedflyttning.', 'tabeller'],
   ['M, Start, Min, Ass, M+A', 'Spelartabellen: matcher (från start och inhopp), matcher från start, spelade minuter, assist och mål plus assist.', 'statistik'],
   ['– och grå 0', 'Streck = okänt (ESPN har ingen statistik för spelaren), grå 0 = noll.'],
-  ['Spelarstatistiken', 'Bara ligamatcher i år, ur ESPN:s trupper. Den släpar ofta en omgång efter tabellen; självmål och spelare som lämnat klubben saknas. I Premier League kommer speltid, xG, försvarsspel och pris från Fantasy Premier League, i övriga ligor räknas speltiden ur ESPN:s matchrapporter (byten och röda kort, utan tilläggstid). Målens sort och betydelse kommer från matchrapporterna i alla fyra ligor.', 'statistik'],
+  ['Spelarstatistiken', 'Bara ligamatcher i år, ur ESPN:s trupper. Den släpar ofta en omgång efter tabellen; självmål och spelare som lämnat klubben saknas. I Premier League kommer speltid, xG, försvarsspel från Fantasy Premier League, i övriga ligor räknas speltiden ur ESPN:s matchrapporter (byten och röda kort, utan tilläggstid). Målens sort och betydelse kommer från matchrapporterna i alla fyra ligor.', 'statistik'],
   ['Per 90', 'Per 90 spelade minuter – som om spelaren spelat hela matcher. Visas för spelare med minst tre hela matchers speltid; dämpade siffror har för litet underlag.', 'statistik'],
-  ['Pris', 'Spelarens pris i Fantasy Premier League, i miljoner pund – spelets värdering, som stiger när många köper spelaren.', 'statistik'],
   ['Lagstatistiken', 'Tabellen är ESPN:s. xG, skott, hörnor, kort och odds kommer från football-data.co.uk, som ofta ligger en omgång efter – därför visas de per match eller som skillnad inom samma matcher.', 'statistik'],
   ['Snittålder', 'Varje spelare räknas en gång per match den spelat, så ordinarie spelare väger tyngre än de som bara hoppat in någon gång.', 'statistik'],
   ['Beroende', 'Hur stor del av lagets mål den bäste målskytten gjort.', 'statistik'],

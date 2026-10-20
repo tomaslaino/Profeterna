@@ -343,7 +343,6 @@ table.dv-squad tr.idle td { color: var(--muted); }
 .dv-neg { color: var(--down); font-weight: 700; }
 .dv-even { color: var(--ink-soft, var(--fg)); }
 .dv-unq { opacity: 0.45; }
-.dv-price { color: var(--gold, var(--fg)); font-weight: 650; }
 /* lagnamnet och spelarnamnet står kvar när tabellen rullas i sidled */
 table.dv-players td.dv-stick, table.dv-teams td.dv-stick,
 table.dv-players th.dv-stick, table.dv-teams th.dv-stick { position: sticky; left: 0; z-index: 1; background: var(--card); }
