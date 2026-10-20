@@ -39,6 +39,11 @@
   --o-away: #e07a45;
   --c-b: #4d8ff0;
   --c-c: #e07a45;
+  /* gänget i sin ordning (DL, DT, DJ): samma blått, grönt och lila på
+     kupongen (.sm-p0–2), i Olympen (kampen.js) och på Om oss */
+  --gang-0: #4d8ff0;
+  --gang-1: #3db37c;
+  --gang-2: #a069e6;
   /* divisionsfärgerna från divisioner.css, mörka varianten */
   --dv-pl: #3987e5;
   --dv-ch: #d95926;

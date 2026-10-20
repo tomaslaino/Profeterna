@@ -436,11 +436,12 @@ const samtalTeaser = () => (hasSamtal() ? Samtal.teaser() : '');
 
 // En kupong per omgång: den som är först väljer matcherna, sedan fyller alla
 // i samma kupong. Systemet ni spelade går också att ladda upp som
-// skärmbild, på förstasidan och på kupongsidan (systembild.js).
+// skärmbild, på förstasidan och på kupongsidan (systembild.js). Samma ord och
+// samma ordning på knapparna som i förstasidans ruta (nextCard).
 function emptyCard() {
-  return '<div class="kp-empty card"><p class="kp-eyebrow">Kupong</p><h2 class="page-title">Omgångens kupong</h2>' +
-    `<div class="kp-empty-go"><a class="kp-btn primary" href="${newCouponHref()}">Välj matcher</a>` +
-    (window.Systembild ? Systembild.button('kp-btn', true) : '') + '</div></div>';
+  return '<div class="kp-empty card"><p class="kp-eyebrow">Nästa omgång</p><h2 class="page-title">Matcherna väljer inte sig själva</h2>' +
+    '<div class="kp-empty-go">' + (window.Systembild ? Systembild.button('kp-btn', true) : '') +
+    `<a class="kp-btn primary" href="${newCouponHref()}">Välj matcher</a></div></div>`;
 }
 
 // Förstasidan när ingen omgång pågår: nästa omgång i samma form som

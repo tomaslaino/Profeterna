@@ -640,6 +640,10 @@ button.dv-meter-row:hover { background: var(--hair); }
   .dv-tiles { grid-template-columns: repeat(2, 1fr); gap: 8px; }
   .dv-tile { padding: 12px; }
   table.dv-players td, table.dv-players th { padding-left: 5px; padding-right: 5px; }
-  .card.dv-card.dv-wide { padding-left: 10px; padding-right: 10px; }
+  /* tabellen ryms med poängen i telefonen, utan att man behöver svepa – och
+     kortet har samma smala kant som spelartabellens */
+  table.dv-league td, table.dv-league th { padding-left: 3px; padding-right: 3px; }
+  .card.dv-card.dv-wide,
+  .card.dv-card.dv-tablecard { padding-left: 10px; padding-right: 10px; }
   .dv-filters .dv-select { flex: 1 1 45%; }
 }

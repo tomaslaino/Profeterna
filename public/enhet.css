@@ -224,6 +224,44 @@ button.analyze:hover,
    sträcks ut till samma höjd som det långa */
 .mr-body .grid2 { align-items: start; }
 
+/* Korten under varandra på förstasidan – nästa omgång, omgången som pågår
+   och de regerande – är en familj: samma luft i kanten som tipparnas kort och
+   samma rubrik. Nästa omgång har guldkanten också på kupongsidan. */
+.sm-teaser { padding: 22px 24px; }
+.sm-teaser .page-title,
+.kr-round {
+  font-size: clamp(22px, 3vw, 28px);
+  font-weight: 650;
+  line-height: 1.12;
+  letter-spacing: -0.015em;
+  color: var(--bone);
+}
+.kp-empty { border-color: rgba(216, 176, 106, 0.3); }
+.kp-empty .page-title { text-wrap: balance; }
+
+/* ---------- sidorna ---------- */
+
+/* Lika långt från menyn till rubriken, och från rubriken till det första
+   under den, på alla sidor: Olympens kort står 24 px under rubriken som
+   flikarna på Matcher, Tabeller och Statistik (8 px + rutnätets 16 px). */
+#kampen .page-title { margin-bottom: 8px; }
+#coupon > .kp-empty:first-child { margin-top: clamp(18px, 3vw, 34px); }
+
+@media (max-width: 760px) {
+  /* knapparna under rubriken börjar där texten börjar */
+  .kp-nasta-go { grid-column: 1 / -1; justify-content: flex-start; }
+}
+@media (max-width: 520px) {
+  .sm-teaser,
+  .kp-empty { padding: 18px 16px; }
+}
+
+/* sidfoten i telefonen: länkarna på en egen rad, i linje med namnet ovanför
+   (loggan 20 px och mellanrummet 10 px) i stället för utskjutna åt höger */
+@media (max-width: 560px) {
+  footer .foot-links { flex-basis: 100%; margin-left: 30px; }
+}
+
 /* På mobilen går tävlingsfiltret ut till skärmkanten och sveps i sidled –
    som divisionerna på Tabeller och Statistik. */
 @media (max-width: 720px) {
