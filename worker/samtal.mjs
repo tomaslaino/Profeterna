@@ -19,7 +19,12 @@
 //                 nyckel}: samtal med de andras inlämnade tips; nyckel = ens
 //                 bevis för att få se dem igen. Med nyckeln går tipsen att
 //                 ändra tills matcherna startar – i en match som har startat
-//                 står de kvar som de var.
+//                 står de kvar som de var. En ändring får lämna matcher tomma.
+//   POST /samtal {gor: "spara", id, vem, matcher: [id], tippat}   spara en
+//                 kupong som inte är färdig, utan att lämna in: tjänsten får
+//                 bara veta hur många matcher som är tippade (tipsen stannar
+//                 på enheten tills de lämnas in), så att de andra ser hur
+//                 långt man har kommit. → {ok, samtal}
 //   POST /samtal {gor: "se", id, vem, nyckel} → {ok, samtal}   samtal med
 //                 allas inlämnade tips, för den som har lämnat in
 //   POST /samtal {gor: "bort", id} → {ok, samtal: null}   ta bort omgången
@@ -33,7 +38,8 @@
 //          en omgång pågår ({finns: true, samtal})
 //   → 503 inte påslaget (lagringen saknas) eller matcherna kan inte läsas
 //
-// Tipsen är dolda: GET ger bara vem som har lämnat in. Den som lämnar in får
+// Tipsen är dolda: GET ger bara vem som har lämnat in och hur många matcher
+// var och en har tippat (gang[].tippat). Den som lämnar in får
 // en nyckel (sparad på enheten) och ser med den allas inlämnade tips. När
 // alla har lämnat in eller första matchen har startat visas tipsen för alla,
 // och sedan kan den som inte har lämnat in inte göra det. Den som har lämnat
@@ -47,6 +53,8 @@
 // KUPONG, lokalt filer (server.js).
 //   samtal:aktuellt                  omgången {id, skapad, matcher: [{id, match, avspark}]}
 //   samtal:<id>:tips:<vem>           {inne, ändrad, tecken, kommentarer, nyckel}
+//   samtal:<id>:utkast:<vem>         {sparad, tippat, matcher} – en sparad kupong som
+//                                    inte är inlämnad: bara antalet tippade
 //   samtal:<id>                      en tidigare omgång, sparad när nästa startades
 //                                    eller när den togs bort (borttagen)
 //   samtal:forra                     omgången före den aktuella, om dess tips
@@ -64,6 +72,7 @@ const OFF = /POSTPONED|CANCEL|ABANDON|SUSPEND/;
 const CURRENT = 'samtal:aktuellt';
 const PREVIOUS = 'samtal:forra';
 const tipsKey = (id, vem) => `samtal:${id}:tips:${vem}`;
+const draftKey = (id, vem) => `samtal:${id}:utkast:${vem}`;
 
 const text = (s, max) => String(s == null ? '' : s).replace(/\s+/g, ' ').trim().slice(0, max);
 const fail = (status, error, extra = {}) => ({ status, body: { ok: false, error, ...extra } });
@@ -80,6 +89,15 @@ async function loadTips(store, round, gang) {
   return Object.fromEntries(gang.map((g, i) => [g.id, list[i]]).filter(([, t]) => t && t.tecken));
 }
 
+// Sparade kuponger som inte är inlämnade. Bara de som sparades för
+// omgångens matcher som de är nu – ändras matcherna gäller de inte längre.
+const matchKey = (round) => round.matcher.map((m) => m.id).sort().join(',');
+async function loadDrafts(store, round, gang) {
+  const list = await Promise.all(gang.map((g) => store.get(draftKey(round.id, g.id))));
+  const key = matchKey(round);
+  return Object.fromEntries(gang.map((g, i) => [g.id, list[i]]).filter(([, d]) => d && d.matcher === key));
+}
+
 // Visas tipsen, och varför: alla har lämnat in eller första matchen har
 // startat.
 function shown(round, tips, gang, now) {
@@ -89,11 +107,14 @@ function shown(round, tips, gang, now) {
 }
 
 // Omgången som alla får se. Tipsen bara om de visas – för alla, eller för
-// den som själv har lämnat in (own) – och bara för omgångens matcher.
-export function publicView(round, tips, gang, now, own = false) {
+// den som själv har lämnat in (own) – och bara för omgångens matcher. Hur
+// många matcher var och en har tippat syns alltid: ur de inlämnade tipsen,
+// annars ur en sparad kupong (drafts), annars null.
+export function publicView(round, tips, gang, now, own = false, drafts = {}) {
   const why = shown(round, tips, gang, now);
   const ids = new Set(round.matcher.map((m) => m.id));
   const only = (o) => Object.fromEntries(Object.entries(o || {}).filter(([k]) => ids.has(k)));
+  const tippat = (id) => (tips[id] ? Object.keys(only(tips[id].tecken)).length : drafts[id] ? drafts[id].tippat : null);
   return {
     id: round.id,
     skapad: round.skapad,
@@ -101,7 +122,7 @@ export function publicView(round, tips, gang, now, own = false) {
     matcher: round.matcher,
     visas: Boolean(why),
     orsak: why,
-    gang: gang.map((g) => ({ id: g.id, namn: g.namn, inne: tips[g.id] ? tips[g.id].inne : null })),
+    gang: gang.map((g) => ({ id: g.id, namn: g.namn, inne: tips[g.id] ? tips[g.id].inne : null, tippat: tippat(g.id) })),
     tips: why || own ? Object.fromEntries(Object.entries(tips).map(([k, t]) => [k, { inne: t.inne, tecken: only(t.tecken), kommentarer: only(t.kommentarer) }])) : null,
   };
 }
@@ -135,8 +156,9 @@ export async function getRound({ store, gang, now = () => new Date() }) {
   if (!store) return fail(503, 'Att tippa var för sig är inte påslaget.');
   const ms = now().getTime();
   const [round, prev] = await Promise.all([store.get(CURRENT), store.get(PREVIOUS)]);
-  const view = async (r) => (r ? publicView(r, await loadTips(store, r, gang), gang, ms) : null);
-  const [samtal, forra] = await Promise.all([view(round), view(prev)]);
+  const view = async (r, sparade = false) => (r ? publicView(r, await loadTips(store, r, gang), gang, ms, false,
+    sparade ? await loadDrafts(store, r, gang) : {}) : null);
+  const [samtal, forra] = await Promise.all([view(round, true), view(prev)]);
   // Den förra omgången bara om dess tips visas (de visades redan när den
   // ersattes, så det gör de fortfarande).
   return { status: 200, body: { ok: true, samtal, forra: forra && forra.visas ? forra : null } };
@@ -148,8 +170,8 @@ export async function postRound(body, { store, gang, loadMatches, now = () => ne
   const t = now();
   const ms = t.getTime();
   const round = await store.get(CURRENT);
-  const tips = round ? await loadTips(store, round, gang) : {};
-  const view = () => publicView(round, tips, gang, ms);
+  const [tips, drafts] = round ? await Promise.all([loadTips(store, round, gang), loadDrafts(store, round, gang)]) : [{}, {}];
+  const view = () => publicView(round, tips, gang, ms, false, drafts);
   const ok = (extra = {}) => ({ status: 200, body: { ok: true, ...extra } });
 
   if (b.gor === 'starta') {
@@ -202,7 +224,7 @@ export async function postRound(body, { store, gang, loadMatches, now = () => ne
     if (!own || !own.nyckel || !b.nyckel || !(await sameSecret(b.nyckel, own.nyckel))) {
       return fail(409, 'Du ser de andras tips när du själv har lämnat in.', { samtal: view() });
     }
-    return ok({ samtal: publicView(round, tips, gang, ms, true) });
+    return ok({ samtal: publicView(round, tips, gang, ms, true, drafts) });
   }
 
   if (b.gor === 'matcher') {
@@ -215,7 +237,28 @@ export async function postRound(body, { store, gang, loadMatches, now = () => ne
     if (v.errors.length) return fail(400, `Omgången har fel: ${v.errors.join(', ')}.`);
     const next = { ...round, 'ändrad': t.toISOString(), matcher: v.rows };
     await store.put(CURRENT, next);
-    return ok({ samtal: publicView(next, tips, gang, ms) });
+    return ok({ samtal: publicView(next, tips, gang, ms, false, drafts) });
+  }
+
+  // Matcherna har ändrats sedan sidan visade dem: sidan visar de nya.
+  const changed = () => {
+    if (!Array.isArray(b.matcher)) return false;
+    const seen = new Set(b.matcher.map(String));
+    return seen.size !== round.matcher.length || round.matcher.some((m) => !seen.has(m.id));
+  };
+
+  // En kupong som inte är färdig sparas utan att lämnas in. Tjänsten får
+  // bara antalet tippade matcher – tipsen stannar på enheten – så det
+  // behövs ingen nyckel: ingen kan se något mer än hur långt man har kommit.
+  if (b.gor === 'spara') {
+    if (!vem) return fail(400, 'Okänd person.');
+    if (tips[vem.id]) return fail(409, 'Du har redan lämnat in – ändra kupongen där du lämnade in den.', { samtal: view() });
+    if (shown(round, tips, gang, ms)) return fail(409, 'Allas tips visas redan, så det går inte att spara nu.', { samtal: view() });
+    if (changed()) return fail(409, 'Matcherna har ändrats sedan du öppnade kupongen – tippa de nya och spara igen.', { samtal: view(), andrade: true });
+    const n = Math.floor(Number(b.tippat));
+    const mine = { sparad: t.toISOString(), tippat: Number.isFinite(n) ? Math.max(0, Math.min(round.matcher.length, n)) : 0, matcher: matchKey(round) };
+    await store.put(draftKey(round.id, vem.id), mine);
+    return ok({ samtal: publicView(round, tips, gang, ms, false, { ...drafts, [vem.id]: mine }) });
   }
 
   if (b.gor === 'tips') {
@@ -228,13 +271,7 @@ export async function postRound(body, { store, gang, loadMatches, now = () => ne
     }
     if (!old && shown(round, tips, gang, ms)) return fail(409, 'Allas tips visas redan, så det går inte att lämna in nu.', { samtal: view() });
     if (old && ms >= lastKick(round)) return fail(409, 'Alla matcher har startat, så tipsen går inte att ändra.', { samtal: view() });
-    // Matcherna har ändrats sedan sidan visade dem: sidan visar de nya.
-    if (Array.isArray(b.matcher)) {
-      const seen = new Set(b.matcher.map(String));
-      if (seen.size !== round.matcher.length || round.matcher.some((m) => !seen.has(m.id))) {
-        return fail(409, 'Matcherna har ändrats sedan du öppnade kupongen – tippa de nya och lämna in igen.', { samtal: view(), andrade: true });
-      }
-    }
+    if (changed()) return fail(409, 'Matcherna har ändrats sedan du öppnade kupongen – tippa de nya och lämna in igen.', { samtal: view(), andrade: true });
     const raw = b.tecken && typeof b.tecken === 'object' ? b.tecken : {};
     const notes = b.kommentarer && typeof b.kommentarer === 'object' ? b.kommentarer : {};
     const tecken = {};
@@ -253,12 +290,14 @@ export async function postRound(body, { store, gang, loadMatches, now = () => ne
       const n = text(notes[m.id], NOTE_MAX);
       if (n) kommentarer[m.id] = n;
     }
-    if (missing.length) return fail(400, `Tippa alla matcher – det saknas tecken i ${missing.join(', ')}.`);
+    // Första gången krävs alla matcher; en ändring får lämna några tomma
+    // (de andra ser att kupongen inte är färdig).
+    if (missing.length && !old) return fail(400, `Tippa alla matcher – det saknas tecken i ${missing.join(', ')}.`);
     const mine = old
       ? { inne: old.inne, 'ändrad': t.toISOString(), tecken, kommentarer, nyckel: old.nyckel }
       : { inne: t.toISOString(), tecken, kommentarer, nyckel: newId(24) };
     await store.put(tipsKey(round.id, vem.id), mine);
-    return ok({ samtal: publicView(round, { ...tips, [vem.id]: mine }, gang, ms, true), nyckel: mine.nyckel });
+    return ok({ samtal: publicView(round, { ...tips, [vem.id]: mine }, gang, ms, true, drafts), nyckel: mine.nyckel });
   }
 
   return fail(400, 'Okänd åtgärd.');

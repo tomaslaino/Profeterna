@@ -1052,24 +1052,36 @@ under omgången.
    till första avsparken, då inlämningen stänger (nedräkningen går av sig själv och blir
    bärnstensfärgad den sista timmen). När alla har lämnat in, eller tiden är ute, står det
    *Dags för uppgörelsen* (och vem som inte lämnade in) utan någon tid; när gängets kupong
-   är gjord tar den över rutan. En färdigspelad kupong visas inte bredvid medan en ny
-   omgång fylls i – den står under Historik.
+   är gjord tar den över rutan. Porträtten där har samma märken som på kupongen (bock eller
+   tårtbit, se punkt 2), och har man börjat på sin kupong heter knappen *Fyll i resten*. En
+   färdigspelad kupong visas inte bredvid medan en ny omgång fylls i – den står under
+   Historik.
 2. **Fyll i kupongen** (direkt under Omgången, `#kupong`): kupongen står på papper med en
    kolumn per person – DL, DT och DJ i gängets ordning, var och en i sin färg (blått,
    grönt, lila) – och spelstoppet (första avsparken) i hörnet. Överst i varje kolumn
-   initialerna med en bock (inne) eller tre prickar (fyller i). Man trycker på sina
+   initialerna med en bock (inne), en tårtbit (så stor del av kupongen som är tippad när
+   den inte är färdig – bärnsten medan den fylls i, grön om den är inlämnad med tomma
+   matcher; antalet när man pekar) eller tre prickar (fyller i). Ens egen tårtbit följer
+   kupongen medan man kryssar, de andras syns när de har sparat. Man trycker på sina
    initialer (*Vem är du?* – sparas på enheten, de ringas in), kryssar i sin kolumn med
    modellens odds under rutorna och kan skriva en kort motivering under matchen man just
    tippade (högst 140 tecken). Raden med initialerna står kvar överst när man bläddrar.
-   Nederst hur många matcher som är tippade, garderingar och rader. *Lämna in och se de
-   andras* kräver tecken i alla matcher – annars blir rutorna som saknar kryss röda. Har
+   Nederst hur många matcher som är tippade, garderingar och rader, och under dem raden
+   med allt man gör med kupongen, som står kvar nederst medan man bläddrar (som raden med
+   initialerna överst): till höger *Spara* och *Lämna in och se de andras*, till vänster
+   *Ändra matcherna* och *Ta bort* i finstil (i telefonen bakom ⋯). *Spara* sparar en
+   kupong som inte är färdig utan att lämna in – tipsen stannar på enheten, tjänsten får
+   bara antalet tippade, så att de andra ser tårtbiten – och blir *Sparad* tills man
+   ändrar något. *Lämna in och se de andras* kräver tecken i alla matcher – annars blir
+   rutorna som saknar kryss röda. Har
    matcherna ändrats sedan sidan öppnades säger tjänsten till, och sidan visar de nya
    matcherna med ens tecken kvar där matchen fortfarande är med.
-   *Ändra din kupong* (nederst på kupongen, eller på omgångens sida när allas tips visas,
-   `#kupong/samtal/tips`) öppnar ens kolumn igen – också efter att allas tips visas, tills
-   matcherna startar. Matcher som har startat står kvar som de var, och knappen heter
-   *Spara ändringarna*. Det går bara på enheten där man lämnade in (med nyckeln, se
-   Tjänsten).
+   *Ändra din kupong* (i raden längst ner på kupongen, eller på omgångens sida när allas
+   tips visas, `#kupong/samtal/tips`) öppnar ens kolumn igen – också efter att allas tips
+   visas, tills matcherna startar. Matcher som har startat står kvar som de var, och i
+   raden längst ner står *Avbryt* och *Spara ändringarna*. En ändring får lämna matcher
+   tomma; då blir ens bock en grön tårtbit tills de är tippade. Det går bara på enheten där
+   man lämnade in (med nyckeln, se Tjänsten).
 3. **De andras tips** (`#kupong`): den som inte har lämnat in ser de andras kolumner
    täckta med skrapfolie (inne) eller tomma (fyller i). Den som har lämnat in ser allas
    inlämnade tips – så fort minst en
@@ -1113,14 +1125,20 @@ under omgången.
 den i `data/kuponger.json` under `samtal`, med `gang` – vilka som tippar). Tipsen ligger i
 KV-bindningen `KUPONG`, inte på GitHub: `samtal:aktuellt` (omgången),
 `samtal:<id>:tips:<vem>` (en nyckel per person, så att två som lämnar in samtidigt inte
-skriver över varandra) och `samtal:<id>` (en tidigare omgång, sparad när nästa startas).
-`GET /samtal` ger omgången och vem som lämnat in – tipsen bara när de visas för alla – och
+skriver över varandra), `samtal:<id>:utkast:<vem>` (en sparad kupong som inte är inlämnad:
+bara antalet tippade, för omgångens matcher som de var då) och `samtal:<id>` (en tidigare
+omgång, sparad när nästa startas).
+`GET /samtal` ger omgången, vem som lämnat in och hur många matcher var och en har tippat
+(`gang[].tippat`, ur de inlämnade tipsen eller en sparad kupong) – tipsen bara när de visas
+för alla – och
 `forra`, omgången före, om dess tips visades när den ersattes (`samtal:forra`; så att
 bygget hinner spara den i tipparhistoriken). `POST /samtal`: `starta`,
-`matcher`, `tips` och `se`. `tips` skickar med omgångens matcher som sidan visade dem
+`matcher`, `spara`, `tips` och `se`. `spara` tar antalet tippade (`tippat`) för den som inte
+har lämnat in. `tips` skickar med omgångens matcher som sidan visade dem
 (ändrade matcher → 409 med `andrade`) och svarar med en slumpad nyckel som sidan sparar på
 enheten; med den ger `se` allas inlämnade tips, och `tips` med nyckeln ändrar ens tips (i
-matcher som inte har startat; `ändrad` sparas bredvid `inne`). Tjänsten lämnar aldrig ut
+matcher som inte har startat, gärna med tomma matcher; `ändrad` sparas bredvid `inne`).
+Tjänsten lämnar aldrig ut
 någons tips med bara namnet – nyckeln är det som hindrar att man tittar innan man själv har
 lämnat in, eller ändrar någon annans.
 Lokalt: med `KUPONG_LOKALT=1` i `.env` finns

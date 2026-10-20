@@ -5,8 +5,10 @@
 // en gardering per match. Kupongen står på papper med en kolumn per person,
 // och man fyller i sin kolumn direkt. Den som har lämnat in ser de andras
 // inlämnade tips och kan ändra sina tills matcherna startar; den som inte har
-// lämnat in ser de andras kolumner täckta. När alla har lämnat in (senast när
-// första matchen startar) ser alla allt. Sidan blir underlaget för
+// lämnat in ser de andras kolumner täckta. En kupong som inte är färdig går
+// att spara utan att lämna in: de andra ser då hur långt man har kommit (en
+// tårtbit vid porträttet i stället för tre prickar). När alla har lämnat in
+// (senast när första matchen startar) ser alla allt. Sidan blir underlaget för
 // uppgörelsen i telefon: matcherna sorteras
 // efter hur oeniga vi är, och gängets kupong växer fram när man trycker på
 // rutorna. Den sparas direkt därifrån (postCoupon i
@@ -19,7 +21,10 @@
 //   #kupong/samtal/ny        skapa omgångens kupong: välj matcherna
 //   #kupong/samtal/matcher   ändra matcherna, tills någon har lämnat in
 //
-// Ta bort (tills allas tips visas) frågar i en ruta ovanpå omgången.
+// Allt man gör med kupongen – spara, lämna in, avbryta, ändra matcherna, ta
+// bort – står på ett ställe: raden längst ner på papperet, som står kvar
+// nederst medan man bläddrar. Ta bort (tills allas tips visas) frågar i en
+// ruta ovanpå omgången.
 //
 // Omgången får ett namn av AI:n när matcherna är valda (worker/namn.mjs, i
 // samma proxy som matchanalysen) – samma för alla, och det följer med när
@@ -286,7 +291,8 @@
     const anyIn = s.gang.some((g) => g.inne);
     // Allas tips så snart du ser fler än dina egna, annars kupongen.
     const all = Boolean(s.tips && Object.keys(s.tips).length >= (s.visas ? 1 : 2));
-    const actions = (s.visas || anyIn ? '' : '<a class="kp-btn" href="#kupong/samtal/matcher">Ändra matcherna</a>') +
+    // Över kupongen står knapparna i raden längst ner på papperet (actions).
+    const actions = !all ? '' : (s.visas || anyIn ? '' : '<a class="kp-btn" href="#kupong/samtal/matcher">Ändra matcherna</a>') +
       (all && canEdit(s) ? '<a class="kp-btn" href="#kupong/samtal/tips">Ändra din kupong</a>' : '') +
       (s.visas ? '' : '<button type="button" class="kp-btn" data-sm-remove>Ta bort</button>') +
       (s.visas && existing(s) ? '<a class="kp-btn" href="#kupong">Gängets kupong</a>' : '') +
@@ -297,19 +303,43 @@
     html += openCoupons();
     keepFocus(() => {
       el.innerHTML = html;
-      const bort = el.querySelector('[data-sm-remove]');
+      const bort = el.querySelector('.kp-head [data-sm-remove]');
       if (bort) bort.addEventListener('click', confirmRemove);
       if (all) wire(s);
       else wireSheet();
     });
   }
 
-  // Bock = tipsen är inne, tre prickar = fyller i.
+  // Bock = tipsen är inne, tårtbit = så stor del av kupongen som är tippad
+  // (grön när den är inlämnad men inte färdig), tre prickar = fyller i.
   const CHECK = '<svg class="sm-ok" viewBox="0 0 16 16" aria-hidden="true"><path d="M3.5 8.5l3 3 6-7"/></svg>';
   const DOTS = '<span class="sm-dots" aria-hidden="true"><i></i><i></i><i></i></span>';
-  const mark = (s, g) => (g.inne ? CHECK : s.visas ? '' : DOTS);
+  const PIE_C = 2 * Math.PI * 2.6;
+  const pie = (n, all, inne = false) => `<svg class="sm-pie${inne ? ' inne' : ''}" viewBox="0 0 16 16" aria-hidden="true">` +
+    '<circle cx="8" cy="8" r="6.6"/><circle class="f" cx="8" cy="8" r="2.6" transform="rotate(-90 8 8)"' +
+    ` stroke-dasharray="${(PIE_C * Math.min(1, n / all)).toFixed(2)} ${PIE_C.toFixed(2)}"/></svg>`;
   const PEN = '<svg class="sm-pen" viewBox="0 0 16 16" aria-hidden="true"><path d="M10.6 2.9l2.5 2.5-7.6 7.6-3.2.7.7-3.2z"/><path d="M9 4.5l2.5 2.5"/></svg>';
-  const lage = (s, g) => (g.inne ? 'inne' : s.visas ? 'lämnade inte in' : 'fyller i');
+
+  // Hur många matcher någon har tippat. Dina egna räknas ur kupongen på
+  // enheten tills du lämnar in – live: också medan du fyller i eller ändrar
+  // på papperet – de andras ur det de har sparat eller lämnat in.
+  function tally(s, g, live = false) {
+    const d = g.id !== me() ? null : live && SM.draft ? SM.draft : g.inne ? null : kpLoad(TIPS);
+    if (d && d.id === s.id && d.vem === g.id && (live || !d.nyckel)) return s.matcher.filter((x) => d.tecken[x.id]).length;
+    return g.tippat != null ? g.tippat : g.inne ? s.matcher.length : 0;
+  }
+  function mark(s, g, live = false) {
+    const n = tally(s, g, live);
+    const all = s.matcher.length;
+    if (g.inne) return n < all ? pie(n, all, true) : CHECK;
+    return s.visas ? '' : n ? pie(n, all) : DOTS;
+  }
+  function lage(s, g, live = false) {
+    const n = tally(s, g, live);
+    const all = s.matcher.length;
+    if (g.inne) return n < all ? `inne · ${n} av ${all} tippade` : 'inne';
+    return s.visas ? 'lämnade inte in' : n ? `${n} av ${all} tippade` : 'fyller i';
+  }
 
   // Ritar om utan att tappa var man var: fältet eller rutan som hade fokus
   // får det igen.
@@ -401,7 +431,9 @@
       const ok = done.filter((r) => tip.tecken[r.x.id].includes(SIGNS[r.g.res])).length;
       const parts = [hel ? `${hel} helg.` : null, halv ? `${halv} halvg.` : null, plural(rader(signs), 'rad', 'rader'),
         done.length ? `<b>${ok}</b> rätt av ${done.length}` : null].filter(Boolean);
-      return `<span class="sm-person inne">${chip(g.id)}<span>${parts.join(' · ')}</span></span>`;
+      const n = tally(s, g);
+      return `<span class="sm-person inne" title="${esc(`${g.namn} · ${lage(s, g)}`)}">${chip(g.id)}` +
+        `${n < s.matcher.length ? pie(n, s.matcher.length, true) : ''}<span>${parts.join(' · ')}</span></span>`;
     }).join('') + '</div>';
     const names = esc(missing.map((g) => g.id).join(' och '));
     if (missing.length && s.visas) {
@@ -646,7 +678,8 @@
       `<div class="pp-stop"><span>Spelstopp</span><b>${esc(fWeekdayTime.format(new Date(stop)))}</b></div></div>` +
       '<div class="pp-band" aria-hidden="true"></div>' +
       '<div id="sm-rows"></div>' +
-      '<div class="pb-foot sm-foot"><div class="pp-fields pb-fields" id="sm-fields"></div><span id="sm-go"></span>' +
+      '<div class="pb-foot sm-foot"><div class="pp-fields pb-fields" id="sm-fields"></div></div>' +
+      '<div class="sm-act" id="sm-act"><div class="sm-act-in" id="sm-act-in"></div>' +
       '<p class="pb-msg" id="sm-msg" role="status"></p></div></div></div>';
   }
 
@@ -702,8 +735,8 @@
         const du = g.id === v;
         const tag = choose ? 'button' : 'span';
         return `<${tag}${choose ? ` type="button" aria-pressed="${du}"` : ''} class="sm-who sm-k${pnum(g.id)}${du ? ' du' : ''}" data-vem="${esc(g.id)}" ` +
-          `title="${esc(`${g.namn} · ${du ? 'du · ' : ''}${lage(s, g)}`)}"><span class="sm-fw">${face(g.id, false)}` +
-          `${du ? Papper.ring(`du${s.id}${g.id}`, 'sm-du-ring', 25) : ''}</span>${mark(s, g)}</${tag}>`;
+          `title="${esc(`${g.namn} · ${du ? 'du · ' : ''}${lage(s, g, true)}`)}"><span class="sm-fw">${face(g.id, false)}` +
+          `${du ? Papper.ring(`du${s.id}${g.id}`, 'sm-du-ring', 25) : ''}</span>${mark(s, g, true)}</${tag}>`;
       }).join('') + '</span></span>' +
       // 1 X 2 som en tom ruta utan kant, så att tecknen står rakt över rutornas.
       SIGNS.map((sg) => `<span class="sm-hd-s" aria-hidden="true">${box(sg, [], ids)}</span>`).join('') + '</div>';
@@ -757,15 +790,58 @@
       odds ? ['Odds', odds >= 100 ? Math.round(odds).toLocaleString('sv-SE') : fmtOdds(odds), 'Oddset för att alla dina tecken går in – matchernas odds gånger varandra'] : null,
     ].filter(Boolean).map(([label, val, title]) =>
       `<span class="pp-field"${title ? ` title="${esc(title)}"` : ''}><span>${label}</span><b>${val}</b></span>`).join('');
-    const go = d ? `<button type="button" class="kp-btn primary" id="sm-send">${SM.edit ? 'Spara ändringarna' : 'Lämna in och se de andras'}</button>`
-      : canEdit(s) ? '<a class="kp-btn sm-again" href="#kupong/samtal/tips">Ändra din kupong</a>' : '';
-    // Knappen ritas bara om när den ändras, så att den behåller fokus.
-    if ($('#sm-go').dataset.html !== go) {
-      $('#sm-go').innerHTML = go;
-      $('#sm-go').dataset.html = go;
-    }
+    actionRow();
     // Alla tecken på plats: de röda rutorna försvinner.
     if (!s.matcher.some((x) => d && !d.tecken[x.id])) $('#sm-sheet').classList.remove('need');
+  }
+
+  // Det du har tippat och skrivit, för att se om kupongen är sparad som den är.
+  const sig = (s, d) => s.matcher.map((x) => `${d.tecken[x.id] || ''}:${(d.kommentarer[x.id] || '').trim()}`).join('|');
+
+  // Allt man gör med kupongen, på ett ställe: raden längst ner på papperet.
+  // Till höger det du gör med din kupong, huvudknappen längst ut; till
+  // vänster omgångens mer sällsynta val, i telefonen bakom ⋯. Spara = en
+  // kupong som inte är färdig, utan att lämna in; Sparad när den är sparad
+  // som den står.
+  function actions(s) {
+    const d = SM.draft;
+    const anyIn = s.gang.some((g) => g.inne);
+    const more = SM.edit ? [] : [
+      s.visas || anyIn ? '' : '<a class="sm-act-l" href="#kupong/samtal/matcher">Ändra matcherna</a>',
+      s.visas ? '' : '<button type="button" class="sm-act-l" data-sm-remove>Ta bort</button>',
+      s.visas || over(s) ? '<a class="sm-act-l" href="#kupong/samtal/ny">+ Ny kupong</a>' : '',
+    ].filter(Boolean);
+    const handIn = (attr = ' id="sm-send"') => `<button type="button" class="kp-btn primary"${attr}><span>Lämna in<span class="sm-lang"> och se de andras</span></span></button>`;
+    let go = '';
+    if (SM.edit) {
+      go = '<a class="kp-btn" href="#kupong">Avbryt</a><button type="button" class="kp-btn primary" id="sm-send">Spara ändringarna</button>';
+    } else if (d) {
+      const kept = Boolean(d.sparad) && d.sparad === sig(s, d);
+      const blank = !d.sparad && !sig(s, d).replace(/[:|]/g, '');
+      go = `<button type="button" class="kp-btn${kept ? ' kept' : ''}" id="sm-save"${kept || blank ? ' disabled' : ''}>${kept ? `${CHECK}Sparad` : 'Spara'}</button>` + handIn();
+    } else if (!me() && !s.visas) {
+      // Först Vem är du? – knapparna står ändå där de brukar.
+      go = '<button type="button" class="kp-btn" disabled>Spara</button>' + handIn(' disabled');
+    } else if (canEdit(s)) {
+      go = '<a class="kp-btn" href="#kupong/samtal/tips">Ändra din kupong</a>';
+    }
+    const dots = '<svg viewBox="0 0 20 20" aria-hidden="true"><circle cx="4.5" cy="10" r="1.7"/><circle cx="10" cy="10" r="1.7"/><circle cx="15.5" cy="10" r="1.7"/></svg>';
+    return (more.length ? `<button type="button" class="sm-act-more" aria-expanded="${actMore}" aria-controls="sm-act-ls" aria-label="Fler val">${dots}</button>` +
+      `<span class="sm-act-ls" id="sm-act-ls">${more.join('')}</span>` : '') + (go ? `<span class="sm-act-go">${go}</span>` : '');
+  }
+  // ⋯ i raden längst ner är öppnad – står kvar när papperet ritas om.
+  let actMore = false;
+
+  // Raden ritas bara om när den ändras, så att knapparna behåller fokus.
+  function actionRow() {
+    const el = $('#sm-act-in');
+    if (!el || !SM.data) return;
+    const html = actions(SM.data);
+    if (el.dataset.html === html) return;
+    el.innerHTML = html;
+    el.dataset.html = html;
+    $('#sm-act').classList.toggle('more', actMore);
+    $('#sm-act').hidden = !html;
   }
 
   // Oddset för hela din rad: matchernas odds gånger varandra, där en
@@ -803,6 +879,21 @@
         submitTips();
         return;
       }
+      if (e.target.closest('#sm-save')) {
+        saveDraft();
+        return;
+      }
+      if (e.target.closest('[data-sm-remove]')) {
+        confirmRemove();
+        return;
+      }
+      const more = e.target.closest('.sm-act-more');
+      if (more) {
+        actMore = !actMore;
+        more.setAttribute('aria-expanded', String(actMore));
+        $('#sm-act').classList.toggle('more', actMore);
+        return;
+      }
       const b = e.target.closest('button[data-s]');
       if (!b || !SM.draft) return;
       const id = b.closest('[data-id]').dataset.id;
@@ -823,6 +914,7 @@
       if (text.trim()) SM.draft.kommentarer[f.dataset.note] = text;
       else delete SM.draft.kommentarer[f.dataset.note];
       keep();
+      actionRow();
     });
     sheetList();
   }
@@ -836,7 +928,7 @@
       return;
     }
     $('#coupon').innerHTML = viewNav('omgang') + steps(s) +
-      head(s, 'Ändra din kupong', '<a class="kp-btn" href="#kupong">Avbryt</a>') + sheet(s, true);
+      head(s, 'Ändra din kupong') + sheet(s, true);
     wireSheet();
   }
 
@@ -845,8 +937,10 @@
     const d = SM.draft;
     const sub = KP.view.sub;
     const msg = (h) => { $('#sm-msg').innerHTML = h; };
+    // Första gången krävs alla matcher (annars Spara); en ändring får lämna
+    // några tomma – din bock blir en tårtbit tills de är tippade.
     const left = s.matcher.filter((x) => !d.tecken[x.id]);
-    if (left.length) {
+    if (left.length && !SM.edit) {
       // Rutorna som saknar kryss blir röda, och den första rullas fram.
       $('#sm-sheet').classList.add('need');
       const row = document.querySelector(`.sm-r[data-id="${CSS.escape(left[0].id)}"]`);
@@ -883,6 +977,42 @@
       $('#sm-msg').innerHTML = `<span class="note">${esc(out.error)}</span>`;
       return;
     }
+    msg(`<span class="note">${esc(out.error)}</span>` + (out.status === 409 ? ' <a href="#kupong">Till omgången</a>' : ''));
+  }
+
+  // Spara en kupong som inte är färdig, utan att lämna in. Tipsen stannar på
+  // enheten; tjänsten får bara veta hur många matcher som är tippade, så att
+  // de andra ser hur långt du har kommit.
+  async function saveDraft() {
+    const s = SM.data;
+    const d = SM.draft;
+    const msg = (h) => { $('#sm-msg').innerHTML = h; };
+    const btn = $('#sm-save');
+    btn.disabled = true;
+    msg('Sparar …');
+    const out = await send({
+      gor: 'spara',
+      id: s.id,
+      vem: d.vem,
+      matcher: s.matcher.map((x) => x.id),
+      tippat: s.matcher.filter((x) => d.tecken[x.id]).length,
+    });
+    if (!here('')) return;
+    if (out.ok) {
+      d.sparad = sig(s, d);
+      kpStore(TIPS, d);
+      msg('');
+      $('#sm-sheet').classList.remove('need');
+      sheetList();
+      return;
+    }
+    // Matcherna har ändrats: de nya visas, med dina tecken kvar där de går.
+    if (out.andrade && SM.data && SM.data.id === s.id) {
+      renderRound();
+      $('#sm-msg').innerHTML = `<span class="note">${esc(out.error)}</span>`;
+      return;
+    }
+    btn.disabled = false;
     msg(`<span class="note">${esc(out.error)}</span>` + (out.status === 409 ? ' <a href="#kupong">Till omgången</a>' : ''));
   }
 
@@ -1093,15 +1223,20 @@
     const v = me();
     const done = submitted(s, v);
     const open = !s.visas && Date.now() < Math.min(...kicks(s));
-    const go = !open ? 'Till uppgörelsen' : done ? 'Se de andras tips' : 'Fyll i kupongen';
+    const du = v && s.gang.find((g) => g.id === v);
+    const go = !open ? 'Till uppgörelsen' : done ? 'Se de andras tips' : du && tally(s, du) ? 'Fyll i resten' : 'Fyll i kupongen';
+    const all = s.matcher.length;
     return '<div class="card sm-teaser">' +
       nameBlock(s, 'ruta') +
       // Porträtten: ring i egen färg och bock = inne, grått = inte inne,
+      // tårtbit = så mycket som är tippat när kupongen inte är färdig,
       // guldring = du.
       '<div class="sm-faces">' + s.gang.map((g) => {
-        const st = g.inne ? 'inne' : open ? 'fyller i' : 'lämnade inte in';
+        const st = g.inne || open ? lage(s, g) : 'lämnade inte in';
+        const n = tally(s, g);
+        const badge = g.inne ? (n < all ? pie(n, all, true) : CHECK) : open && n ? pie(n, all) : '';
         return `<span class="sm-face sm-p${pnum(g.id)}${person(g.id).bild ? ' bild' : ''}${g.inne ? ' inne' : ''}${g.id === v ? ' du' : ''}" title="${esc(`${g.namn} · ${st}`)}">` +
-          `${photo(g.id)}${g.inne ? CHECK : ''}</span>`;
+          `${photo(g.id)}${badge}</span>`;
       }).join('') + '</div>' +
       '<a class="kp-btn primary" href="#kupong">' + go + '</a></div>';
   }

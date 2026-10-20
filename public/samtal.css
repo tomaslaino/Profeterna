@@ -67,6 +67,12 @@
 .sm-dots i:nth-child(3) { animation-delay: 0.4s; }
 @keyframes sm-dot { 0%, 60%, 100% { opacity: 0.25; } 30% { opacity: 1; } }
 @media (prefers-reduced-motion: reduce) { .sm-dots i { animation: none; opacity: 0.6; } }
+/* tårtbit = så stor del av kupongen som är tippad, när den inte är färdig:
+   bärnsten medan den fylls i, grön när den är inlämnad med tomma matcher */
+.sm-pie { flex: none; width: 16px; height: 16px; overflow: visible; fill: none; stroke: var(--stale); }
+.sm-pie circle { stroke-width: 1.4; }
+.sm-pie circle.f { stroke-width: 5.2; }
+.sm-pie.inne { stroke: var(--fresh); }
 
 /* Omgångens namn (AI:n) tonar fram när det kommer. */
 .sm-namn[title] { cursor: help; }
@@ -370,24 +376,110 @@ button.sm-who:focus-visible { outline: 2px solid var(--ink); outline-offset: 1px
 .sm-du-ring path { vector-effect: non-scaling-stroke; }
 .sm-sheet .sm-ok { width: 16px; height: 14px; stroke: var(--pp-ok); }
 .sm-sheet .sm-dots i { background: var(--pp-ink-soft); }
+.sm-sheet .sm-pie { stroke: var(--pp-ink-soft); }
+.sm-sheet .sm-pie.inne { stroke: var(--pp-ok); }
 
-/* foten: hur långt du har kommit och knappen */
+/* foten: hur långt du har kommit */
 .sm-foot { margin-top: 18px; }
-#sm-go { display: contents; }
 .sm-m .vs { margin: 0 0.35em; }
-.sm-foot .kp-btn.sm-again {
-  margin-left: auto;
+
+/* Allt man gör med kupongen står på ett ställe: raden längst ner på
+   papperet, som står kvar nederst medan man bläddrar – som raden med
+   porträtten överst. Till höger det du gör med din kupong, huvudknappen
+   längst ut; till vänster omgångens val i finstil, i telefonen bakom ⋯. */
+.sm-act {
+  position: sticky;
+  bottom: 0;
+  z-index: 3;
+  margin-top: 16px;
+  padding: 12px 6px calc(12px + env(safe-area-inset-bottom));
+  border-top: 1.5px solid var(--pp-print);
+  background: var(--pp-grain), var(--pp-paper);
+}
+/* papper också i marginalen, så att radernas synkmarkeringar inte syns
+   bredvid raderna som står kvar när man bläddrar */
+.sm-hd, .sm-act { box-shadow: -54px 0 0 var(--pp-paper); }
+.sm-act[hidden] { display: none; }
+.sm-act-in { display: flex; flex-wrap: wrap; align-items: center; gap: 8px 22px; }
+.sm-act-in:empty { display: none; }
+.sm-act-ls { display: flex; flex-wrap: wrap; align-items: center; gap: 4px 22px; }
+.sm-act-l {
+  padding: 6px 0;
+  font: inherit;
+  font-size: 10px;
+  font-weight: 800;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+  text-decoration: none;
+  background: none;
+  border: 0;
+  cursor: pointer;
+}
+.sm-act .sm-act-l { color: var(--pp-print); }
+.sm-act .sm-act-l:hover { color: var(--pp-ink); text-decoration: underline; text-underline-offset: 3px; }
+.sm-act .sm-act-l[data-sm-remove]:hover { color: var(--pp-no); }
+.sm-act-go { display: flex; flex-wrap: wrap; gap: 8px; margin-left: auto; }
+.sm-act .kp-btn {
+  justify-content: center;
+  gap: 6px;
   padding: 9px 16px;
   color: var(--pp-print);
   background: var(--pp-box);
   border: 1.5px solid var(--pp-print);
   border-radius: 5px;
+  box-shadow: none;
 }
-.sm-foot .kp-btn.sm-again:hover { color: var(--pp-paper); background: var(--pp-print); }
+.sm-act .kp-btn:hover { color: var(--pp-paper); background: var(--pp-print); }
+/* huvudknappen tryckt i kupongens färg, som i Ny kupong */
+.sm-act .kp-btn.primary {
+  color: var(--pp-paper);
+  background: var(--pp-print);
+  box-shadow: 0 1px 0 rgba(0, 0, 0, 0.18), inset 0 1px 0 rgba(255, 255, 255, 0.18);
+}
+.sm-act .kp-btn.primary:hover { background: #8f3a24; border-color: #8f3a24; }
+.sm-act .kp-btn:disabled { opacity: 0.5; cursor: default; }
+.sm-act .kp-btn:disabled:hover { color: var(--pp-print); background: var(--pp-box); border-color: var(--pp-print); }
+.sm-act .kp-btn.primary:disabled:hover { color: var(--pp-paper); background: var(--pp-print); }
+/* sparad som den står: en grön bock, inte gråad */
+.sm-act .kp-btn.kept, .sm-act .kp-btn.kept:hover {
+  opacity: 1;
+  color: var(--pp-ok);
+  background: var(--pp-box);
+  border-color: color-mix(in srgb, var(--pp-ok) 45%, transparent);
+}
+.sm-act .kp-btn.kept .sm-ok { width: 14px; height: 12px; stroke: currentColor; }
+.sm-act .pb-msg { margin-top: 8px; }
+.sm-act-more { display: none; }
 /* smalt med fyra fält (med garderingar och odds): två och två, lika breda */
 @media (max-width: 480px) {
   .sm-foot .pb-fields:has(> :nth-child(4)) .pp-field { flex: 1 1 calc(50% - 4px); }
 }
+/* telefonen: ⋯ och knapparna på en rad; omgångens val fälls upp ovanför */
+@media (max-width: 640px) {
+  .sm-act { padding-top: 10px; }
+  .sm-act-in { flex-wrap: wrap; gap: 8px; }
+  .sm-act-more {
+    display: grid;
+    place-items: center;
+    flex: none;
+    width: 40px;
+    height: 40px;
+    padding: 0;
+    color: var(--pp-print);
+    background: var(--pp-box);
+    border: 1.5px solid var(--pp-print);
+    border-radius: 5px;
+    cursor: pointer;
+  }
+  .sm-act-more svg { width: 18px; height: 18px; fill: currentColor; }
+  .sm-act-more[aria-expanded="true"] { color: var(--pp-paper); background: var(--pp-print); }
+  .sm-act-ls { display: none; order: -1; flex-basis: 100%; padding: 0 2px 2px; }
+  .sm-act.more .sm-act-ls { display: flex; }
+  .sm-act-go { flex: 1 1 0; flex-wrap: nowrap; min-width: 0; }
+  .sm-act-go .kp-btn { flex: 1 1 auto; min-height: 40px; padding: 9px 12px; white-space: nowrap; }
+  .sm-act-go .kp-btn.primary { flex-grow: 2; }
+}
+@media (max-width: 440px) { .sm-lang { display: none; } }
 
 /* smalt: lagen överst, rutorna i tre lika breda kolumner under; överst bara
    porträtten (tecknen står i rutorna) */
@@ -396,6 +488,7 @@ button.sm-who:focus-visible { outline: 2px solid var(--ink); outline-offset: 1px
   .sm-r { grid-template-columns: repeat(3, minmax(0, 1fr)); column-gap: 6px; padding: 0; }
   .sm-r > .pp-nr, .sm-hd-nr, .sm-hd-l, .sm-hd-s { display: none; }
   .sm-r .sm-m { grid-column: 1 / -1; padding: 9px 4px 0; }
+  .sm-act { padding-inline: 0; }
   .sm-hd .sm-m { justify-content: center; padding: 9px 4px; }
   .sm-hd .sm-folk-pp { margin-left: 0; }
   .sm-c { padding: 6px 0 8px; }
@@ -472,6 +565,18 @@ button.sm-who:focus-visible { outline: 2px solid var(--ink); outline-offset: 1px
   background: var(--fresh);
   stroke: var(--card);
   stroke-width: 2.6;
+  box-shadow: 0 0 0 2px var(--card);
+}
+.sm-face .sm-pie {
+  position: absolute;
+  right: -4px;
+  bottom: -4px;
+  width: 16px;
+  height: 16px;
+  padding: 1px;
+  box-sizing: border-box;
+  border-radius: 50%;
+  background: var(--card);
   box-shadow: 0 0 0 2px var(--card);
 }
 /* under Kupong → Omgången, direkt under Omgången | Samtalet | Historik */
