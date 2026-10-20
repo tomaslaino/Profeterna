@@ -12,11 +12,13 @@
 //   - se: får klippet visas i Sverige? YouTubes spelare (samma fråga som den
 //     inbäddade spelaren ställer) svarar med länderna där klippet får visas.
 //     Sky Sports klipp får för det mesta bara visas i Storbritannien och
-//     Irland (2026-10-20: 5 av 258 klipp spärrade, alla Skys).
+//     Irland (2026-10-20: 5 av 258 klipp spärrade, alla Skys). Från GitHubs
+//     servrar kommer länderna bara för klipp som är spärrade i USA – som
+//     Skys; för andra ber YouTube om inloggning ("not a bot"). Utan svar
+//     efter tre försök förblir klippet okänt och räknas som spelbart.
 // Klipp som inte går behålls i cachen, så att de inte kontrolleras igen, men
-// knyts inte till någon match (src/hojdpunkter.js). Går en kontroll inte
-// igenom görs den om nästa körning, och spelaren tar ändå nästa klipp om ett
-// inte går att spela (public/hojdpunkter.js).
+// knyts inte till någon match (src/hojdpunkter.js). Spelaren tar ändå nästa
+// klipp om ett inte går att spela (public/hojdpunkter.js).
 //
 // Varje körning läser alla flöden, så att inget hinner falla ur de 15
 // senaste. Klipp från förra hämtningen behålls hela säsongen.
@@ -33,6 +35,7 @@ const CHANNEL_ID = /^UC[\w-]{22}$/;
 // Så många nya klipp kontrolleras per körning; resten nästa gång.
 const OEMBED_PER_RUN = 80;
 const COUNTRIES_PER_RUN = 200;
+const COUNTRY_TRIES = 3;
 
 // Sammandrag, inte allt annat klubbarna lägger ut. Damlag, ungdomslag,
 // träningsmatcher, EFL Trophy, halvlekar och gamla matcher hör inte till
@@ -74,14 +77,11 @@ function entries(xml) {
 
 const isHighlights = (title) => HIGHLIGHTS.test(title) && !NOT_MATCH.test(title);
 
-// Går klippet att spela på sajten? Okänt räknas som ja. Landskontrollen (se)
-// räknas inte än: från GitHubs servrar svarade YouTube 2026-10-20 med
-// länder som inte stämde (Wolves klipp "spärrade" i Sverige), så den körs
-// bara och loggas tills det är utrett.
-const playable = (v) => v.embed !== false;
+// Går klippet att spela på sajten i Sverige? Okänt räknas som ja.
+const playable = (v) => v.embed !== false && v.se !== false;
 
 // Länderna där klippet får visas ("GB", "SE" …), eller null om svaret inte
-// har någon lista.
+// har någon lista. Kastar fel om YouTube inte svarade alls.
 async function countries(id) {
   const res = await fetch(PLAYER, {
     method: 'POST',
@@ -92,7 +92,7 @@ async function countries(id) {
     }),
     signal: AbortSignal.timeout(20000),
   });
-  if (!res.ok) return null;
+  if (!res.ok) throw new Error(`HTTP ${res.status}`);
   const d = await res.json();
   const list = d && d.microformat && d.microformat.playerMicroformatRenderer
     && d.microformat.playerMicroformatRenderer.availableCountries;
@@ -148,9 +148,7 @@ async function fetchVideos(prev, since) {
       for (const e of entries(text)) {
         if (e.short || e.pub < since || !isHighlights(e.title)) continue;
         const have = byId.get(e.id);
-        byId.set(e.id, {
-          id: e.id, ch: c.key, title: e.title, pub: e.pub, embed: have ? have.embed : null, se: have ? have.se : null,
-        });
+        byId.set(e.id, { embed: null, se: null, ...have, id: e.id, ch: c.key, title: e.title, pub: e.pub });
       }
     } catch (err) {
       failed.push(`${c.name}: ${String(err.message || err)}`);
@@ -174,23 +172,26 @@ async function fetchVideos(prev, since) {
     }
   });
 
-  // Får klippet visas i Sverige? Nyast först.
-  const unplaced = [...byId.values()].filter((v) => v.embed !== false && v.se == null)
+  // Får klippet visas i Sverige? Nyast först. seTries = svar utan länder.
+  const unplaced = [...byId.values()]
+    .filter((v) => v.embed !== false && v.se == null && (v.seTries || 0) < COUNTRY_TRIES)
     .sort((a, b) => b.pub.localeCompare(a.pub)).slice(0, COUNTRIES_PER_RUN);
   await mapLimit(unplaced, 6, async (v) => {
     try {
       const list = await countries(v.id);
       if (list) v.se = list.includes(COUNTRY);
+      else v.seTries = (v.seTries || 0) + 1;
     } catch {
       // nästa körning
     }
   });
 
   const videos = [...byId.values()].sort((a, b) => b.pub.localeCompare(a.pub));
-  const blocked = videos.filter((v) => v.se === false).length;
-  const unknown = unplaced.filter((v) => v.se == null).length;
-  console.log(`[youtube] ${blocked} klipp spärrade i Sverige` +
-    (unknown ? `; ${unknown} av ${unplaced.length} gick inte att kontrollera` : ''));
+  if (unplaced.length) {
+    const answered = unplaced.filter((v) => v.se != null).length;
+    console.log(`[youtube] länder: ${answered} av ${unplaced.length} klipp fick svar; ` +
+      `${videos.filter((v) => v.se === false).length} klipp spärrade i Sverige`);
+  }
   return { videos, ids, channels: channels.length, failed, sourceUrl: 'https://www.youtube.com' };
 }
 
