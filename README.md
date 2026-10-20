@@ -122,6 +122,14 @@ ingen falsk precision · sidan kraschar aldrig av en död källa · endast fria 
   och tröjnummer – 421 av 443 som spelat i Premier League 2026-10-20, de övriga har bara
   hoppat in några minuter. League Two har betyg först från 12 september. Styr inte
   prognoserna ([src/fetchers/s365ratings.js](src/fetchers/s365ratings.js))
+- [x] **Lagen inför 1X2 (2026-10-20):** topplistorna överst i Statistik → Lag visar det
+  som säger mest inför ett 1X2-tips i stället för xG för och emot: *Starkast* och
+  *Svagast* (modellens styrka – väntad målskillnad per match mot divisionens snittlag, med
+  motståndet inräknat), *Kryssar gärna* (oavgjortchansen i lagets matcher ur båda lagens
+  xG), *Förtjänar mer* och *Förtjänar mindre* (tagna poäng mot vad chanserna var värda,
+  3 × vinstchansen + oavgjortchansen ur matchens xG med oberoende Poisson – tur som
+  brukar jämna ut sig, och där tabellen lurar) och *Slår oddsen*. xG-fliken och lagkortet
+  har samma tre nya siffror ([src/teamstats.js](src/teamstats.js))
 
 ## Publicering
 

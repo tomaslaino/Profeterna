@@ -638,6 +638,8 @@ const per = (o, k) => (o && o.n ? o[k] / o.n : null);
 const fdOf = (t, k) => (t.fd ? t.fd[k] : null);
 const share = (t, k) => (t.fd && t.fd.n ? t.fd[k] / t.fd.n : null);
 const xgd = (t) => { const x = fdOf(t, 'xg'); return x ? (x.f - x.a) / x.n : null; };
+const xpd = (t) => { const x = fdOf(t, 'xg'); return x ? x.pts - x.xp : null; };
+const xdraw = (t) => { const x = fdOf(t, 'xg'); return x ? x.xd / x.n : null; };
 const vsOdds = (t) => { const m = fdOf(t, 'mkt'); return m ? m.pts - m.xp : null; };
 const roi = (t) => { const m = fdOf(t, 'mkt'); return m ? (m.ret - m.n) / m.n : null; };
 const sqOf = (t, k) => (t.sq ? t.sq[k] : null);
@@ -673,7 +675,8 @@ const TCOLS = [
     get: (t) => share(t, 'cs'), pct: true, cls: 'num hide-xs', in: ['tabell'] },
 
   // xG-fliken läses från vänster: chanserna laget skapar och släpper till,
-  // skillnaden, hur målen stämt med chanserna och hur svårt programmet varit.
+  // skillnaden, hur målen och poängen stämt med chanserna, hur ofta matcherna
+  // legat nära kryss, hur svårt programmet varit och vad modellen gör av allt.
   { key: 'xgf', label: 'Skapar', sub: 'xG per match', name: 'Skapade chanser',
     title: 'Förväntade mål (xG) per match: hur många mål lagets chanser brukar ge. Varje skott får ett värde efter hur ofta ett sådant skott blir mål – en straff runt 0,8, ett långskott några hundradelar. Högre är bättre.',
     get: (t) => per(fdOf(t, 'xg'), 'f'), d: 2, cls: 'num', in: ['xg'] },
@@ -691,10 +694,19 @@ const TCOLS = [
     title: 'Insläppta mål minus motståndarnas xG under säsongen. Minus (grönt) = färre insläppta än chanserna brukar ge – bra målvakt eller tur. Plus (rött) = fler än väntat.',
     get: (t) => { const x = fdOf(t, 'xg'); return x ? x.ga - x.a : null; }, cls: 'num', asc: true, in: ['xg'],
     show: (t) => { const x = fdOf(t, 'xg'); return delta(x ? x.ga - x.a : null, { d: 1, invert: true }); } },
+  { key: 'xpd', label: 'Poäng', sub: 'mot chanserna', name: 'Poäng mot chanserna',
+    title: 'Tagna poäng minus de poäng lagets chanser brukar ge. Varje match räknas om till chanser att vinna och spela oavgjort ur båda lagens xG, och ger 3 × vinstchansen + oavgjortchansen. Plus (grönt) = fler poäng än chanserna var värda – oftast tur, som brukar jämna ut sig. Minus (rött) = färre.',
+    get: xpd, cls: 'num', in: ['xg'], show: (t) => delta(xpd(t), { d: 1 }) },
+  { key: 'xdr', label: 'Kryss', sub: 'enligt chanserna', name: 'Krysschans',
+    title: 'Chansen att lagets matcher skulle sluta oavgjort, i snitt, räknat ur båda lagens xG. Högt = jämna matcher med få chanser, där krysset ligger nära.',
+    get: xdraw, pct: true, cls: 'num hide-xs', in: ['xg'] },
   { key: 'opp', label: 'Motstånd', sub: 'hittills', name: 'Motståndets styrka hittills',
     title: 'Hur starka motståndarna har varit jämfört med ett normalt spelschema i divisionen, i mål per match enligt prognosmodellen. Plus = svårare motstånd än snittet, minus = lättare. Bra att ha med när xG-siffrorna jämförs.',
     get: (t) => fdOf(t, 'opp'), cls: 'num hide-xs', in: ['xg'],
     show: (t) => (fdOf(t, 'opp') == null ? cell(null) : `<span class="dv-even">${signed(fdOf(t, 'opp'), 2)}</span>`) },
+  { key: 'str', label: 'Styrka', sub: 'enligt modellen', name: 'Modellens styrka',
+    title: 'Prognosmodellens bedömning: väntad målskillnad per match mot ett snittlag i divisionen på neutral plan. Tar hänsyn till motståndet och till tidigare säsonger med mindre vikt, och är samma styrka som ger prognoserna.',
+    get: (t) => t.str, cls: 'num', in: ['xg'], show: (t) => delta(t.str, { d: 2, dead: 0.005 }) },
 
   { key: 'shf', label: 'Skott', sub: 'per match', name: 'Skott per match', title: 'Lagets avslut per match – även de som går utanför eller blockeras.',
     get: (t) => per(fdOf(t, 'sh'), 'f'), d: 1, cls: 'num', in: ['spelet'] },
@@ -805,18 +817,23 @@ function teamsView(dv, P, T) {
     truppen: P && !P.unknown ? `ESPN-trupperna, hämtat ${when(P.source.fetchedAt)}` : '',
   }[f.cols];
 
-  const leaders = T.hasXg
-    ? teamTop('Skapar mest', all, (t) => `<b>${num(per(t.fd.xg, 'f'), 2)}</b><small>xG per match</small>`,
-      { get: (t) => per(fdOf(t, 'xg'), 'f'), note: 'Förväntade mål (xG) per match – hur bra chanser laget skapar' }) +
-      teamTop('Släpper till minst', all, (t) => `<b>${num(per(t.fd.xg, 'a'), 2)}</b><small>xG mot per match</small>`,
-        { get: (t) => per(fdOf(t, 'xg'), 'a'), asc: true, note: 'Motståndarnas förväntade mål (xG) per match' })
-    : teamTop('Skjuter mest', all, (t) => `<b>${num(per(t.fd.sh, 'f'), 1)}</b><small>skott per match</small>`, { get: (t) => per(fdOf(t, 'sh'), 'f') }) +
-      teamTop('Släpper till minst', all, (t) => `<b>${num(per(t.fd.sh, 'a'), 1)}</b><small>skott mot per match</small>`, { get: (t) => per(fdOf(t, 'sh'), 'a'), asc: true });
+  // Det som säger mest inför 1X2: hur bra lagen är (modellens styrka, med
+  // motståndet inräknat), vilka som tabellen gör för bra eller för dåliga
+  // (poäng mot chanserna, som brukar jämna ut sig), var krysset ligger nära
+  // och vilka marknaden har missat.
+  const strength = (t) => `<b>${delta(t.str, { d: 2, dead: 0.005 })}</b><small>mot snittlaget</small>`;
+  const vsXg = (t) => `<b>${delta(xpd(t), { d: 1 })}</b><small>${t.fd.xg.pts} p · värda ${num(t.fd.xg.xp, 1)}</small>`;
+  const leaders =
+    teamTop('Starkast', all, strength, { get: (t) => t.str, note: 'Modellens väntade målskillnad per match mot ett snittlag i divisionen, med motståndet inräknat' }) +
+    teamTop('Svagast', all, strength, { get: (t) => t.str, asc: true, note: 'Modellens väntade målskillnad per match mot ett snittlag i divisionen, med motståndet inräknat' }) +
+    teamTop('Kryssar gärna', all, (t) => `<b>${pct(xdraw(t))}</b><small>${t.fd.xg.d} kryss på ${t.fd.xg.n}</small>`,
+      { get: xdraw, note: 'Chansen till oavgjort i lagets matcher, i snitt, räknat ur båda lagens xG' }) +
+    teamTop('Förtjänar mer', all, vsXg, { get: xpd, asc: true, note: 'Färre poäng än chanserna (xG) var värda' }) +
+    teamTop('Förtjänar mindre', all, vsXg, { get: xpd, note: 'Fler poäng än chanserna (xG) var värda' }) +
+    teamTop('Slår oddsen', all, (t) => `<b>${delta(vsOdds(t), { d: 1 })}</b><small>${t.fd.mkt.pts} p · ${num(t.fd.mkt.xp, 1)} väntat</small>`, { get: vsOdds, note: 'Poäng mot vad oddsen vid avspark väntade sig' });
 
   return sectionHead('Lagen') +
-    '<div class="dv-leaders">' + leaders +
-    teamTop('Slår oddsen', all, (t) => `<b>${delta(vsOdds(t), { d: 1 })}</b><small>${t.fd.mkt.pts} p · ${num(t.fd.mkt.xp, 1)} väntat</small>`, { get: vsOdds, note: 'Poäng mot vad oddsen vid avspark väntade sig' }) +
-    '</div>' +
+    '<div class="dv-leaders">' + leaders + '</div>' +
     card('Alla lag', {
       body: segHtml(groups, f.cols, 'data-tcols') +
         `<div class="table-wrap dv-tw"><table class="dv-teams dv-league">${head}<tbody>${body}</tbody></table></div>`,
@@ -1061,10 +1078,12 @@ async function openTeam(id) {
     const x = tt.fd.xg;
     const m = tt.fd.mkt;
     html += msec('Spelet hittills', facts([
+      tt.str != null ? [delta(tt.str, { d: 2, dead: 0.005 }), 'Styrka enligt modellen', 'Väntad målskillnad per match mot ett snittlag i divisionen, med motståndet inräknat'] : null,
       x ? [num(x.f / x.n, 2), 'xG per match', 'Förväntade mål per match – hur bra chanser laget skapar'] : null,
       x ? [num(x.a / x.n, 2), 'xG mot per match', 'Motståndarnas förväntade mål per match'] : null,
+      x ? [delta(x.pts - x.xp, { d: 1 }), 'Poäng mot chanserna', `${x.pts} poäng, ${num(x.xp, 1)} enligt chanserna (xG)`] : null,
+      x ? [pct(x.xd / x.n), 'Kryss enligt chanserna', `${x.d} kryss på ${x.n} matcher`] : null,
       m ? [delta(m.pts - m.xp, { d: 1 }), 'Poäng mot oddsen', `${m.pts} poäng, ${num(m.xp, 1)} väntade enligt oddsen vid avspark`] : null,
-      m ? [delta((m.ret - m.n) / m.n, { fmt: signedPct, dead: 0.005 }), 'Spel på seger', 'Samma insats på seger i varje match, till oddset vid avspark'] : null,
     ]), { link: [viewHref(state.div, 'lag'), 'Alla lag'], src: `football-data.co.uk · ${tt.fd.n} matcher t.o.m. ${esc(dateLabel(T.source.stats.last))}` });
   }
 
@@ -1116,6 +1135,8 @@ const GLOSSARY = [
   ['xG mot, xA', 'xG mot: motståndarnas förväntade mål, alltså hur bra chanser laget släpper till. xA: förväntade assist, ur passningarna före lagkamraternas skott.', 'statistik'],
   ['Mål mot xG', 'Gjorda mål minus xG (och insläppta mål minus xG mot). Stora avvikelser är ofta tur eller otur och brukar jämna ut sig under en säsong.', 'statistik'],
   ['Motstånd', 'Motståndets styrka hittills enligt prognosmodellen, i mål per match, mot vad ett lag i divisionen möter i snitt. Plus = svårare program än snittet.', 'statistik'],
+  ['Poäng och kryss mot chanserna', 'Varje match räknas om till chanser att vinna, spela oavgjort och förlora ur båda lagens xG. Poäng mot chanserna: tagna poäng minus 3 × vinstchansen plus oavgjortchansen, match för match – plus är oftast tur, som brukar jämna ut sig. Kryss enligt chanserna: oavgjortchansen i snitt.', 'statistik'],
+  ['Styrka', 'Prognosmodellens bedömning av laget: väntad målskillnad per match mot ett snittlag i divisionen på neutral plan, med motståndet inräknat och tidigare säsonger med mindre vikt.', 'statistik'],
   ['Nollor, Över 2,5 mål, Båda gör mål', 'Andel av lagets matcher utan insläppt mål, med tre mål eller fler, och där båda lagen gjort mål.', 'statistik'],
   ['Väntat, Tog, Mot oddsen', 'Poängen oddsen vid avspark väntade sig – 3 × vinstchansen plus oavgjortchansen, match för match – poängen laget tog i samma matcher, och skillnaden. Plus = bättre än oddsen trodde.', 'statistik'],
   ['Spel på seger', 'Vinst eller förlust i procent av insatserna om man satsat lika mycket på att laget vinner varje match, till oddset vid avspark. Spelbolagens marginal är inräknad.', 'statistik'],

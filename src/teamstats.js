@@ -3,7 +3,8 @@
 // Lagstatistik per division (fliken Lag på sidan Statistik): tabellen ur
 // ESPN och, ur årets football-data.co.uk-fil, xG, skott, hörnor, kort och
 // marknaden – stängningsoddsens förväntade poäng och vad ett spel på laget
-// hade gett. Motståndets styrka hittills kommer ur prognosmotorn.
+// hade gett. Poängen och krysschansen enligt chanserna räknas ur matchens
+// xG (oberoende Poisson). Motståndet och lagets styrka kommer ur prognosmotorn.
 // Beskrivande; inget här styr prognoserna.
 //
 // football-data.co.uk släpar ofta efter tabellen med en omgång. Tabellens
@@ -16,6 +17,7 @@
 const { COMPETITIONS, SEASON } = require('../config/competitions');
 const { readCache } = require('./store');
 const { keyOf, espnKey } = require('./teams');
+const { scoreMatrix, outcomes } = require('./model');
 
 const DIVS = COMPETITIONS.filter((c) => c.fdcouk);
 
@@ -39,7 +41,7 @@ function blank(name) {
   return {
     name,
     n: 0, w: 0, d: 0, l: 0, gf: 0, ga: 0, cs: 0, fts: 0, o25: 0, btts: 0,
-    xg: { n: 0, f: 0, a: 0, gf: 0, ga: 0 },
+    xg: { n: 0, f: 0, a: 0, gf: 0, ga: 0, xp: 0, xd: 0, pts: 0, d: 0 },
     sh: { n: 0, f: 0, a: 0, of: 0, oa: 0 },
     cor: { n: 0, f: 0, a: 0 },
     fouls: { n: 0, f: 0, a: 0 },
@@ -70,6 +72,12 @@ function add(e, r, s, strengthOf, oppKey) {
     e.xg.a += opp('HxG', 'AxG');
     e.xg.gf += gf;
     e.xg.ga += ga;
+    // Vad matchens chanser brukar ge: väntade poäng och chansen till kryss.
+    const [p1, px] = outcomes(scoreMatrix(Math.max(own('HxG', 'AxG'), 0.01), Math.max(opp('HxG', 'AxG'), 0.01), 0, 10)).x12;
+    e.xg.xp += 3 * p1 + px;
+    e.xg.xd += px;
+    e.xg.pts += gf > ga ? 3 : gf === ga ? 1 : 0;
+    if (gf === ga) e.xg.d++;
   }
   if (fin(r.HS) && fin(r.AS) && fin(r.HST) && fin(r.AST)) {
     e.sh.n++;
@@ -165,7 +173,8 @@ function divisionTeams(div, strengthAll) {
   }
 
   // Motståndets styrka hittills, mot vad ett lag i divisionen möter i snitt
-  // (alla andra lag en gång): + = tuffare program än snittet.
+  // (alla andra lag en gång): + = tuffare program än snittet. Lagets egen
+  // styrka visas mot divisionens snittlag.
   const ratings = teams.map((t) => strengthOf(t.key));
   const known = ratings.filter((x) => x != null);
   const total = known.reduce((s, x) => s + x, 0);
@@ -179,10 +188,11 @@ function divisionTeams(div, strengthAll) {
       name: t.name,
       espnId: t.espnId,
       ...t.table,
+      str: own != null && known.length ? r2(own - total / known.length) : null,
       fd: e ? {
         n: e.n, w: e.w, d: e.d, l: e.l, gf: e.gf, ga: e.ga,
         cs: e.cs, fts: e.fts, o25: e.o25, btts: e.btts,
-        xg: e.xg.n ? { n: e.xg.n, f: r2(e.xg.f), a: r2(e.xg.a), gf: e.xg.gf, ga: e.xg.ga } : null,
+        xg: e.xg.n ? { n: e.xg.n, f: r2(e.xg.f), a: r2(e.xg.a), gf: e.xg.gf, ga: e.xg.ga, xp: r2(e.xg.xp), pts: e.xg.pts, xd: r2(e.xg.xd), d: e.xg.d } : null,
         sh: e.sh.n ? e.sh : null,
         cor: e.cor.n ? e.cor : null,
         fouls: e.fouls.n ? e.fouls : null,
