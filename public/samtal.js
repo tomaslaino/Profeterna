@@ -651,8 +651,11 @@
   // Porträttet på papperet, i en ring i personens bläck.
   const face = (id, tip = true) =>
     `<span class="sm-fc sm-k${pnum(id)}"${tip ? ` title="${esc(person(id).namn)}"` : ''}>${photo(id)}</span>`;
-  // Rutan för ett tecken med porträtten för dem som har valt det.
-  const box = (sg, who) => `<span class="pp-box sm-bx${who.length ? ' on' : ''}"><i>${sg}</i>${who.map((id) => face(id)).join('')}</span>`;
+  // Rutan för ett tecken med porträtten för dem som har valt det. Var och en
+  // har sin plats i rutan, i samma ordning som överst, så att tecknet och
+  // porträtten står på samma ställe i varje rad.
+  const box = (sg, who, ids) => `<span class="pp-box sm-bx${who.length ? ' on' : ''}"><i>${sg}</i><span class="sm-seats">` +
+    ids.map((id) => (who.includes(id) ? face(id) : '<span class="sm-seat"></span>')).join('') + '</span></span>';
 
   function sheetList() {
     const s = SM.data;
@@ -660,6 +663,8 @@
     const d = SM.draft;
     const now = Date.now();
     const cols = s.gang.map((g) => ({ g, ...column(s, g, v) }));
+    // En plats i rutorna för var och en vars tips syns på papperet.
+    const ids = cols.filter((c) => c.st !== 'hidden' && c.st !== 'blank').map((c) => c.g.id);
     // Vem du är går att välja tills du har lämnat in.
     const choose = !submitted(s, v);
     let html = '<div class="sm-r sm-hd"><span class="sm-hd-nr" aria-hidden="true">Nr</span>' +
@@ -671,7 +676,8 @@
           `title="${esc(`${g.namn} · ${du ? 'du · ' : ''}${lage(s, g)}`)}"><span class="sm-fw">${face(g.id, false)}` +
           `${du ? Papper.ring(`du${s.id}${g.id}`, 'sm-du-ring', 25) : ''}</span>${mark(s, g)}</${tag}>`;
       }).join('') + '</span></span>' +
-      SIGNS.map((sg) => `<b class="sm-hd-s" aria-hidden="true">${sg}</b>`).join('') + '</div>';
+      // 1 X 2 som en tom ruta utan kant, så att tecknen står rakt över rutornas.
+      SIGNS.map((sg) => `<span class="sm-hd-s" aria-hidden="true">${box(sg, [], ids)}</span>`).join('') + '</div>';
     let day = null;
     s.matcher.forEach((x, i) => {
       const k = dayKey.format(new Date(x.avspark));
@@ -700,8 +706,8 @@
           const who = cols.filter((c) => (c.t[x.id] || '').includes(sg)).map((c) => c.g.id);
           return own
             ? `<button type="button" class="sm-c sm-k${pnum(v)}" data-s="${sg}" aria-pressed="${sign.includes(sg)}" aria-label="${sg} för ${esc(label)}">` +
-              `${box(sg, who)}<small>${p ? pctOdds(p[j]) : '–'}</small></button>`
-            : `<span class="sm-c" aria-hidden="true">${box(sg, who)}</span>`;
+              `${box(sg, who, ids)}<small>${p ? pctOdds(p[j]) : '–'}</small></button>`
+            : `<span class="sm-c" aria-hidden="true">${box(sg, who, ids)}</span>`;
         }).join('') +
         // Motiveringen under matchen du just tippade, och där du har skrivit en.
         (sign && !locked && (SM.noteRow === x.id || d.kommentarer[x.id]) ? `<input type="text" class="kp-note-in" data-note="${esc(x.id)}" maxlength="${NOTE_MAX}" autocomplete="off"` +

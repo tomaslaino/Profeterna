@@ -208,7 +208,9 @@
 }
 .sm-fc img { display: block; width: 100%; height: 100%; border-radius: 50%; object-fit: cover; }
 
-/* rutan för ett tecken, med porträtten för dem som valt det */
+/* rutan för ett tecken, med porträtten för dem som valt det: tecknet och en
+   plats per person, lika i alla rutor, så att tecknen och var och ens
+   porträtt står i raka led uppifrån och ner */
 .sm-c { display: grid; gap: 3px; padding: 8px 0; }
 .sm-r .sm-bx {
   display: flex;
@@ -219,8 +221,20 @@
   height: 40px;
   padding: 0 6px;
 }
+.sm-bx i { flex: none; width: 0.8em; text-align: center; }
 .sm-bx.on i { opacity: 0.85; }
-.sm-bx .sm-fc + .sm-fc { margin-left: -9px; }
+.sm-seats { display: flex; }
+/* en tom plats är en svag tryckt ring, lite mindre än porträttet så att
+   ringarna inte går in i varandra */
+.sm-seat { flex: none; width: var(--fc); height: var(--fc); }
+.sm-seat::before {
+  content: "";
+  display: block;
+  height: calc(100% - 6px);
+  margin: 3px;
+  border-radius: 50%;
+  box-shadow: inset 0 0 0 1.5px color-mix(in srgb, var(--pp-print) 22%, transparent);
+}
 
 /* dina rutor: knappar med oddset under */
 button.sm-c {
@@ -262,7 +276,11 @@ button.sm-c:focus-visible .sm-bx { box-shadow: 0 0 0 2px var(--ink); }
   text-transform: uppercase;
   color: var(--pp-print);
 }
-.sm-hd-s { text-align: center; font-family: var(--display); font-size: 15px; font-weight: 700; color: var(--pp-print); }
+/* 1 X 2 i en ruta utan kant, rakt över tecknen i rutorna */
+.sm-hd-s { display: grid; }
+.sm-hd-s .sm-bx { height: auto; background: none; border-color: transparent; }
+.sm-hd-s .sm-bx i { opacity: 1; }
+.sm-hd-s .sm-seat::before { content: none; }
 .sm-q::after { content: " →"; letter-spacing: 0; }
 .sm-folk-pp { display: flex; align-items: center; gap: 16px; margin-left: auto; }
 .sm-who {
@@ -348,12 +366,12 @@ button.sm-who:focus-visible { outline: 2px solid var(--ink); outline-offset: 1px
   .sm-sheet-head .pp-brand img { width: 16px; height: 16px; }
   .sm-sheet-head .pp-brand span { padding-left: 0; font-size: 9.5px; letter-spacing: 0.16em; border-left: 0; }
   .sm-sheet { --fc: 22px; }
+  .sm-r .sm-bx { padding: 0 4px; }
   .sm-folk-pp { gap: 12px; }
 }
 @media (max-width: 380px) {
   .sm-sheet { --fc: 20px; }
-  .sm-r .sm-bx { gap: 5px; padding: 0 4px; }
-  .sm-bx .sm-fc + .sm-fc { margin-left: -8px; }
+  .sm-r .sm-bx { gap: 5px; }
   button.sm-c small { font-size: 9.5px; }
 }
 
