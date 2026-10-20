@@ -55,7 +55,7 @@ ingen falsk precision · sidan kraschar aldrig av en död källa · endast fria 
   sökning. Matcherna har en egen flik. Sparas som fil i `data/kuponger/` med en commit på GitHub (se [Kupongen](#kupongen))
 - [x] **Inför uppgörelsen:** någon skapar omgångens kupong (väljer matcherna) och var och en
   fyller i den för sig (gärna med garderingar). Man ser de andras tips först när man själv
-  har lämnat in, och då är ens egna låsta. Allas tips blir ett underlag sorterat
+  har lämnat in, och ens egna går att ändra tills matcherna startar. Allas tips blir ett underlag sorterat
   efter hur oeniga vi är, där gängets kupong växer fram (se [Inför uppgörelsen](#inför-uppgörelsen))
 - [x] **Kuponghistoriken:** Kupong → Historik med varje färdigspelad kupong – antal rätt,
   betyg 1–5 mot modellens väntade antal rätt, sortering efter hur det gick och en kort
@@ -984,7 +984,7 @@ gängets kupong bestäms.
 
 Allt ligger under *Kupong → Omgången* (bredvid *Historik*). Överst visar fyra steg var
 omgången står: *Välj matcher*, *Alla tippar* (med hur många som har lämnat in), *Uppgörelsen*
-(med tiden, om den är satt) och *Matcherna*. Medan kupongen fylls i och tipsen jämförs visar
+och *Matcherna*. Medan kupongen fylls i och tipsen jämförs visar
 `#kupong` omgången; när gängets kupong är gjord visar den gängets kupong, med knappen
 *Allas tips* tillbaka till underlaget (`#kupong/samtal`). Kuponger som spelas under tiden står
 under omgången.
@@ -992,23 +992,26 @@ under omgången.
 **Gången**
 
 1. **Skapa kupong** (*Kupong → Skapa kupong* eller *+ Ny kupong*, `#kupong/samtal/ny`):
-   någon väljer matcherna (samma sökning och tävlingsfilter som Ny kupong) och, valfritt,
-   när uppgörelsen börjar. En åt gången; fylls en i (någon match har inte startat) frågar sidan
+   någon väljer matcherna (samma sökning och tävlingsfilter som Ny kupong). Ingen tid för
+   uppgörelsen behövs – tipsen visas av sig själva (punkt 4). En åt gången; fylls en i (någon match har inte startat) frågar sidan
    först *Ersätt den*. *Ändra matcherna* går tills någon har lämnat in. Den gamla vägen –
    gängets kupong direkt – finns kvar under länken *Eller gör gängets kupong direkt*.
    Medan kupongen fylls i står den överst på förstasidan och under Kupong → Omgången.
 2. **Fyll i kupongen** (`#kupong/samtal/tips`): man väljer vem man är (DL, DT, DJ – sparas
    på enheten), tippar varje match och kan skriva en kort motivering (högst 140 tecken).
    Nederst står hur många rader tipsen blir. *Lämna in och se de andras* kräver tecken i
-   alla matcher. Inlämnade tips går inte att ändra. Har matcherna
-   ändrats sedan sidan öppnades säger tjänsten till, och sidan visar de nya matcherna med
-   ens tecken kvar där matchen fortfarande är med.
+   alla matcher. Har matcherna ändrats sedan sidan öppnades säger tjänsten till, och sidan
+   visar de nya matcherna med ens tecken kvar där matchen fortfarande är med.
+   *Ändra din kupong* (på omgångens sida) öppnar de inlämnade tipsen igen – också efter att
+   allas tips visas, tills matcherna startar. Matcher som har startat står kvar som de var,
+   och knappen heter *Spara ändringarna*. Det går bara på enheten där man lämnade in (med
+   nyckeln, se Tjänsten).
 3. **De andras tips** (`#kupong`): den som inte har lämnat in ser bara vem som har
    gjort det och när. Den som har lämnat in ser allas inlämnade tips – så fort minst en
    till är inne – och vilka som fortfarande fyller i. Sidan frågar tjänsten var 20:e sekund
    och visar nya tips av sig själv – också förstasidans ruta, medan tipsen lämnas in.
-4. **Underlaget** – för alla när alla har lämnat in, när uppgörelsen börjar eller senast när
-   första matchen startar; sedan går ingenting att lämna in eller ändra. Överst allas
+4. **Underlaget** – för alla när alla har lämnat in, eller senast när första matchen
+   startar; sedan kan den som inte har lämnat in inte göra det. Överst allas
    garderingar, rader och (när matcher spelats) antal rätt. Varje match har rutorna
    1, X och 2 med initialerna på dem som tippat tecknet (streckad ram = del av en
    gardering), hur många av gänget som har med det och modellens chans. Motiveringarna står
@@ -1018,7 +1021,8 @@ under omgången.
    - *Samma grund, olika säkerhet* – alla har med samma tecken, men någon har garderat
    - *Eniga mot modellen* – alla har samma tecken, och modellens troligaste är inte med
    - *Eniga* – klubbas utan snack
-5. **Gängets kupong** (när alla tips är inne): man trycker på rutorna (två rutor =
+5. **Gängets kupong** (så fort man ser de andras tips, också om någon inte har lämnat in):
+   man trycker på rutorna (två rutor =
    gardering). Den börjar som förslaget – tecknen som fler än hälften har med; *Alla olika*
    lämnas tomma – och sparas bara på enheten, så en håller i pennan under uppgörelsen (*Börja
    om* går tillbaka till förslaget). Nederst syns kupongen som rutor med antal rader.
@@ -1050,8 +1054,10 @@ skriver över varandra) och `samtal:<id>` (en tidigare omgång, sparad när näs
 bygget hinner spara den i tipparhistoriken). `POST /samtal`: `starta`,
 `matcher`, `tips` och `se`. `tips` skickar med omgångens matcher som sidan visade dem
 (ändrade matcher → 409 med `andrade`) och svarar med en slumpad nyckel som sidan sparar på
-enheten; med den ger `se` allas inlämnade tips. Tjänsten lämnar aldrig ut någons tips med
-bara namnet – nyckeln är det som hindrar att man tittar innan man själv har lämnat in.
+enheten; med den ger `se` allas inlämnade tips, och `tips` med nyckeln ändrar ens tips (i
+matcher som inte har startat; `ändrad` sparas bredvid `inne`). Tjänsten lämnar aldrig ut
+någons tips med bara namnet – nyckeln är det som hindrar att man tittar innan man själv har
+lämnat in, eller ändrar någon annans.
 Lokalt: med `KUPONG_LOKALT=1` i `.env` finns
 `/api/samtal`, som sparar i `data/cache/samtal/` (eller `SAMTAL_DIR`).
 
@@ -1180,8 +1186,9 @@ omgång med orakel och Ikaros inramade i guld och rött. Döljer spoilerskyddet 
 en omgång räknas hela omgången bort, med *Visa ändå*.
 
 **Filen** `data/tippar-historik.json` committas och växer bara. Bygget på GitHub Actions
-(`--journal`) hämtar `GET …/samtal` och skriver in omgången **när tipsen visas för alla**
-– då kan de inte längre ändras – med matcherna och var och ens tecken. När varje match är
+(`--journal`) hämtar `GET …/samtal` och skriver in omgången **när tipsen visas för alla**,
+med matcherna och var och ens tecken. Tipsen går att ändra tills matcherna startar, så
+omgången skrivs om när tjänsten visar andra tips, tills den är klar. När varje match är
 avgjord fylls resultatet efter 90 minuter och modellens prognos före avspark i, och
 omgången får `klar`. Sedan ändras den aldrig. Eftersom tipsen sparas redan när de visas
 finns omgången kvar även om nästa omgång startas innan sista matchen är spelad –

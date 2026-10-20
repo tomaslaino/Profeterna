@@ -164,12 +164,13 @@
 .sm-bar-msg { flex-basis: 100%; font-size: 13.5px; }
 .sm-bar-msg:empty { display: none; }
 
-/* ---------- ny omgång ---------- */
+/* ---------- ändra din kupong: startade matcher står kvar ---------- */
 
-.sm-when { display: flex; flex-wrap: wrap; align-items: center; gap: 8px 12px; margin: 0 0 20px; }
-.sm-when label { font-size: 13px; font-weight: 600; color: var(--ink-soft); }
-.sm-when .kp-name { flex: 0 1 230px; color-scheme: dark; }
-.sm-when .legend { margin: 0; }
+.sm-locked { opacity: 0.55; }
+.sm-locked .kp-tg button { cursor: default; }
+.pp-fill .sm-locked .kp-tg button:hover::before { background: var(--pp-box); }
+
+/* ---------- ny omgång ---------- */
 
 .sm-pick {
   width: 100%;

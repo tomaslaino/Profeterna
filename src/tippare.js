@@ -21,8 +21,9 @@
 //     ]
 //   }
 //
-// Omgången skrivs in när tipsen visas för alla – då kan de inte längre
-// ändras – med matcherna och var och ens tecken. GET …/samtal ger också den
+// Omgången skrivs in när tipsen visas för alla, med matcherna och var och ens
+// tecken. Tipsen går att ändra tills matcherna startar, så tills omgången är
+// klar skrivs den om när tjänsten visar andra tips. GET …/samtal ger också den
 // förra omgången (forra) om dess tips visades, så att en omgång som ersätts
 // av nästa innan ett bygge hunnit se den ändå kommer med. När varje match är
 // avgjord fylls resultatet efter 90 minuter och modellens prognos före avspark (1 · X ·
@@ -233,18 +234,31 @@ function buildTippare({ samtal = null, matches = [], freeze = false, file = FILE
   const h = readRounds(file);
   const byId = new Map(matches.map((m) => [String(m.id), m]));
   const known = new Set(h.raw.map((r) => r && String(r.id || '')));
+  const fresh = new Map();
   const added = [];
   for (const s of [].concat(samtal || [])) {
-    const fresh = entryFromSamtal(s);
-    if (fresh && !known.has(fresh.id)) {
-      known.add(fresh.id);
-      added.push(fresh);
+    const f = entryFromSamtal(s);
+    if (!f) continue;
+    fresh.set(f.id, f);
+    if (!known.has(f.id)) {
+      known.add(f.id);
+      added.push(f);
     }
   }
-  // Omgångar som väntar på resultat fylls i när alla matcher är avgjorda.
+  // Tipsen går att ändra tills matcherna startar, så en omgång som inte är
+  // klar följer tjänsten så länge den finns där.
   const valid = new Set([...h.rounds, ...added]);
+  const changed = [];
+  const raw = h.raw.map((r) => {
+    const f = valid.has(r) && !r.klar ? fresh.get(String(r.id)) : null;
+    if (!f || JSON.stringify(f) === JSON.stringify(r)) return r;
+    valid.add(f);
+    changed.push(f.id);
+    return f;
+  });
+  // Omgångar som väntar på resultat fylls i när alla matcher är avgjorda.
   const done = [];
-  const list = [...h.raw, ...added].map((r) => {
+  const list = [...raw, ...added].map((r) => {
     if (!valid.has(r) || r.klar) return r;
     const f = finish(r, byId, now);
     if (!f) return r;
@@ -252,7 +266,7 @@ function buildTippare({ samtal = null, matches = [], freeze = false, file = FILE
     return f;
   });
   let written = false;
-  if (freeze && (added.length || done.length) && !h.broken) {
+  if (freeze && (added.length || changed.length || done.length) && !h.broken) {
     writeRounds(list, file);
     written = true;
   }
@@ -264,6 +278,7 @@ function buildTippare({ samtal = null, matches = [], freeze = false, file = FILE
     rounds,
     errors: h.errors,
     added: written ? added.map((r) => r.id) : [],
+    changed: written ? changed : [],
     frozen: written ? done : [],
     waiting: list.filter((r) => r && !r.klar).length,
   };
