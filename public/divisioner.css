@@ -82,6 +82,16 @@
   gap: 14px;
   margin: 0 0 22px;
 }
+/* Statistik: Spelare | Lag till höger om sidrubriken */
+.dv-titlerow {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px 20px;
+  margin: clamp(18px, 3vw, 34px) 0 24px;
+}
+.dv-titlerow .page-title { margin: 0; }
 /* Divisionerna som flikar: nivån som siffra framför namnet, och divisionens
    färg som streck under den valda. */
 .dv-divs {

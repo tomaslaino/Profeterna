@@ -1119,10 +1119,20 @@ function frame() {
     `<div class="dv-divs" id="dv-divs" role="group" aria-label="Division">${d.divisions.map((x, i) =>
       `<button type="button" data-div="${x.id}" aria-pressed="${x.id === state.div}" style="--c:${color(x.id)}">` +
       `<span class="dv-tier" title="Nivå ${x.tier || i + 1}">${x.tier || i + 1}</span>${esc(x.name)}</button>`).join('')}</div>` +
-    (VIEWS.length > 1 ? `<nav class="dv-views" id="dv-views" aria-label="Vy">${VIEWS.map((v) =>
-      `<a href="#${state.div}/${v.id}" data-view="${v.id}"${v.id === state.view ? ' aria-current="page"' : ''}>${esc(v.label)}</a>`).join('')}</nav>` : '') +
     '</div><div id="dv-view" class="dv-view"></div>' +
     '<p class="detail-foot"><button type="button" class="src-toggle" aria-pressed="false">Visa detaljer</button></p>' + glossary();
+}
+
+// Spelare | Lag står till höger om sidrubriken, divisionsflikarna under den.
+function titleRow() {
+  const h = document.querySelector('main > .page-title');
+  if (VIEWS.length < 2 || !h) return;
+  const row = document.createElement('div');
+  row.className = 'dv-titlerow';
+  h.replaceWith(row);
+  row.append(h);
+  row.insertAdjacentHTML('beforeend', `<nav class="dv-views" id="dv-views" aria-label="Vy">${VIEWS.map((v) =>
+    `<a href="#${state.div}/${v.id}" data-view="${v.id}"${v.id === state.view ? ' aria-current="page"' : ''}>${esc(v.label)}</a>`).join('')}</nav>`);
 }
 
 // Källraderna, förklaringarna och ordlistan (.src-line, .src-only m.fl.) är
@@ -1160,6 +1170,14 @@ async function renderView() {
   const d = state.data;
   const dv = d.divisions.find((x) => x.id === state.div) || d.divisions[0];
   for (const b of document.querySelectorAll('#dv-divs button')) b.setAttribute('aria-pressed', String(b.dataset.div === dv.id));
+  // Smal skärm: rulla flikraden så att den valda divisionen syns hel.
+  const tabs = $('#dv-divs');
+  const on = tabs && tabs.querySelector('[aria-pressed="true"]');
+  if (on) {
+    const box = tabs.getBoundingClientRect();
+    const r = on.getBoundingClientRect();
+    if (r.left < box.left || r.right > box.right) tabs.scrollLeft += r.left - box.left - 16;
+  }
   for (const a of document.querySelectorAll('#dv-views a')) {
     a.href = `#${dv.id}/${a.dataset.view}`;
     if (a.dataset.view === state.view) a.setAttribute('aria-current', 'page');
@@ -1345,6 +1363,7 @@ window.addEventListener('hashchange', () => { if (state.data && !state.data.erro
   const { div, view } = parseHash();
   if (div && state.data.divisions.some((x) => x.id === div)) state.div = div;
   if (view && VIEWS.some((v) => v.id === view)) state.view = view;
+  titleRow();
   $('#divisions').innerHTML = frame();
   setShowSources(showSources());
   wire();
