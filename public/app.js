@@ -791,17 +791,86 @@ function oddsCard(o, m) {
   return `<div class="card"><h4>Odds</h4>${body}${src.length ? `<p class="src-line">${src.join('. ')}.</p>` : ''}</div>`;
 }
 
+// Förklaringarna i Form-fliken. Visas i förklaringsrutan (forklaring.js) när
+// man pekar på en rubrik eller rad. En funktion får siffrorna i hemmalagets
+// värde (bortalagets om hemmalagets saknas) och lagets namn, så att formatet
+// förklaras med det som står på raden.
+const tipNums = (v) => (v ? v.match(/[−+±]?\d+(?:,\d+)?/g) : null);
+const tipNum = (s) => Number(s.replace('−', '-').replace('±', '').replace(',', '.'));
+const tipPl = (n, one, many) => `${n} ${tipNum(n) === 1 ? one : many}`;
+const tipOf = (base) => (n) => base + (n && n.length === 2 ? ` ”${n[0]} av ${n[1]}” betyder att det hänt i ${n[0]} av lagets ${n[1]} ligamatcher.` : '');
+const tipXg = (base, say) => (n) => {
+  if (!n) return base;
+  const x = Math.abs(tipNum(n[0]));
+  return base + ` ”${n[0]}” betyder ${x ? say(dec(x), n[0][0] === '+' ? 'fler' : 'färre') : 'precis så många mål som väntat'}.`;
+};
+const SIDE_TIPS = {
+  'Lagen sida vid sida': 'Hemmalaget till vänster, bortalaget till höger. Där två siffror står ihop, som 15–10, kommer lagets egna först och motståndarnas sedan. Peka på en rad så förklaras den.',
+  'Tabell just nu': 'Ligatabellen som den ser ut i dag. För en match som redan spelats visar den alltså läget efteråt, inte före.',
+  Schemat: 'Hur tätt laget spelar runt den här matchen, i alla tävlingar. Många matcher på kort tid kan ge trötta ben – eller att tränaren vilar några av de bästa.',
+  'Ligan hittills': 'Lagets ligamatcher den här säsongen, fram till den här matchen. Cuper och Europaspel räknas inte.',
+  'Målprofil i ligan': 'Hur lagets ligamatcher brukar sluta. ”6 av 10” betyder att det hänt i sex av lagets tio ligamatcher.',
+  'Skott och xG per match': 'Snitt per ligamatch. Första siffran gäller laget, den andra motståndarna.',
+  'Spelar i': 'Ligan laget spelar i. Nivån visar var den ligger i det engelska seriesystemet: 1 är Premier League, 2 Championship, 3 League One, 4 League Two och 5 National League.',
+  Placering: 'Lagets plats i ligatabellen just nu och hur många lag ligan har. Ettan är bäst.',
+  Poäng: (n, t) => 'Poäng i tabellen och antal spelade ligamatcher. Vinst ger tre poäng och oavgjort en.' +
+    (n && n.length === 2 && tipNum(n[1]) ? ` ”${n[0]} på ${n[1]}” betyder att ${t} har ${n[0]} poäng efter ${n[1]} matcher, i snitt ${dec(tipNum(n[0]) / tipNum(n[1]))} per match.` : ''),
+  Målskillnad: 'Gjorda mål minus insläppta i ligan. Plus betyder att laget gjort fler mål än det släppt in. Har två lag lika många poäng avgör målskillnaden vilket som ligger högst.',
+  Poängavdrag: 'Poäng som ligan dragit av som straff, oftast för brott mot de ekonomiska reglerna. Avdraget är redan räknat i poängen ovan.',
+  'Dagar sedan förra matchen': 'Dagar sedan lagets förra match, i alla tävlingar – inom parentes vilken tävling den gällde. Dagarna räknas mellan matchdagarna: torsdag till söndag blir tre. Kort vila kan ge trötta ben.',
+  'Matcher senaste': 'Antal matcher i alla tävlingar under perioden före den här matchen. Inom parentes: hur många av dem som var i Europacuperna – ofta med långa resor mitt i veckan. Ett tätt schema sliter på truppen.',
+  'Dagar till nästa match': 'Dagar från den här matchen till lagets nästa, i alla tävlingar – inom parentes vilken tävling den gäller. Väntar en viktig match strax efter kan tränaren spara spelare. ”Ingen inlagd” betyder att nästa match inte är bestämd än.',
+  Matcher: 'Antal ligamatcher laget spelat den här säsongen, före den här matchen.',
+  'V–O–F': (n) => 'Vinster, oavgjorda och förluster i ligan.' +
+    (n && n.length === 3 ? ` ”${n.join('–')}” betyder ${tipPl(n[0], 'vinst', 'vinster')}, ${tipPl(n[1], 'oavgjord', 'oavgjorda')} och ${tipPl(n[2], 'förlust', 'förluster')}.` : ''),
+  Mål: (n) => 'Gjorda och insläppta mål i ligan.' + (n && n.length === 2 ? ` ”${n[0]}–${n[1]}” betyder att laget gjort ${n[0]} mål och släppt in ${n[1]}.` : ''),
+  'Hemma V–O–F': 'Vinster, oavgjorda och förluster i lagets hemmamatcher i ligan. Många lag är klart bättre på hemmaplan.',
+  'Borta V–O–F': 'Vinster, oavgjorda och förluster i lagets bortamatcher i ligan.',
+  'Mål per match': (n) => 'Gjorda och insläppta mål i snitt per ligamatch.' + (n && n.length === 2 ? ` ”${n[0]}–${n[1]}” betyder att laget i snitt gör ${n[0]} mål per match och släpper in ${n[1]}.` : ''),
+  'Över 2,5 mål': tipOf('Matcher med minst tre mål sammanlagt, oavsett vilket lag som gjorde dem. Halva mål finns inte, så 2,5 är gränsen mellan två och tre mål – samma gräns som hos spelbolagen.'),
+  'Båda lagen gör mål': tipOf('Matcher där båda lagen gjort minst ett mål var.'),
+  'Hållit nollan': tipOf('Matcher där laget inte släppt in något mål.'),
+  'Inte gjort mål': tipOf('Matcher där laget inte gjort något mål.'),
+  Skott: (n) => 'Avslut per match i snitt, alla sorter – även de som går utanför eller blockeras.' + (n && n.length === 2 ? ` ”${n[0]}–${n[1]}” betyder att laget skjuter ${n[0]} gånger per match och motståndarna ${n[1]}.` : ''),
+  'Skott på mål': (n) => 'Skott som hade gått in om inte målvakten räddat – alltså mål plus räddningar.' + (n && n.length === 2 ? ` ”${n[0]}–${n[1]}” betyder ${n[0]} per match för laget och ${n[1]} för motståndarna.` : ''),
+  xG: (n) => 'Förväntade mål (expected goals): hur många mål chanserna brukar ge, utifrån var och hur skotten kommer. En straff är värd ungefär 0,8 xG, ett skott från 25 meter kanske 0,03. xG säger ofta mer om hur bra ett lag är än målen gör, eftersom det inte påverkas av om skotten råkar gå in.' +
+    (n && n.length === 2 ? ` ”${n[0]}–${n[1]}” betyder att lagets chanser i snitt är värda ${n[0]} mål per match och motståndarnas ${n[1]}.` : ''),
+  'Gjorda mål mot xG': tipXg('Lagets mål minus dess xG, summerat över säsongen. Plus betyder fler mål än chanserna brukar ge – vassa avslut eller tur. Sådant brukar jämna ut sig, så ett stort plus kan betyda att målen tryter framöver.', (x, d) => `${x} mål ${d} än väntat`),
+  'Insläppta mål mot xG': tipXg('Insläppta mål minus motståndarnas xG, summerat över säsongen. Här är minus bra: laget har släppt in färre mål än motståndarnas chanser brukar ge – en målvakt i storform eller tur. Även det brukar jämna ut sig.', (x, d) => `${x} ${d} insläppta mål än väntat`),
+};
+
+// data-tip-attributen för en rubrik eller rad; tomt om förklaring saknas.
+function sideTip(label, values = [], names = []) {
+  let t = SIDE_TIPS[label] || (label.startsWith('Matcher senaste') ? SIDE_TIPS['Matcher senaste'] : null);
+  if (typeof t === 'function') {
+    const i = values[0] != null ? 0 : 1;
+    t = t(tipNums(values[i]), names[i]);
+  }
+  return t ? ` data-tip-head="${esc(label)}" data-tip="${esc(t)}"` : '';
+}
+
+const FORM_TIP = 'Lagets fem senaste matcher i alla tävlingar, nyast till vänster. V = vinst, O = oavgjort, F = förlust. ' +
+  'Det är ställningen efter 90 minuter som gäller, så en match som avgjorts i förlängning eller på straffar räknas som oavgjord. ' +
+  'Peka på en ruta för att se vilken match det var.';
+const FORM_RESULT = { V: 'Vinst', O: 'Oavgjort', F: 'Förlust' };
+
 function formCard(d) {
+  const chip = (x) => {
+    const where = `${x.home ? 'hemma' : 'borta'}${x.opponent ? ` mot ${x.opponent}` : ''}`;
+    const score = x.gf == null ? '' : ` · ${x.gf}–${x.ga}${x.decided ? ` efter 90 minuter, avgjord ${x.decided === 'straffar' ? 'på straffar' : 'i förlängning'}` : ''}`;
+    return `<span class="${x.result || ''}" data-tip-head="${FORM_RESULT[x.result] || 'Resultat saknas'}" ` +
+      `data-tip="${esc(`${dateOnly(x.date)} · ${x.comp} · ${where}${score}`)}">${x.result || '?'}</span>`;
+  };
   const row = (name, p) => {
     const f = p.form || [];
     const chips = f.length
       ? f.map((x) => (window.Spoiler && Spoiler.hidesDay(x.date)
-        ? '<span class="sp-form" title="Dold – du har valt att dölja resultat">?</span>'
-        : `<span class="${x.result || ''}" title="${esc(`${x.date} ${x.comp} ${x.home ? 'hemma' : 'borta'}${x.opponent ? ` mot ${x.opponent}` : ''}: ${x.gf}–${x.ga}${x.decided ? ` (${x.decided})` : ''}`)}">${x.result || '?'}</span>`)).join('')
+        ? '<span class="sp-form" data-tip-head="Dold" data-tip="Du har valt att dölja resultat.">?</span>'
+        : chip(x))).join('')
       : '<span class="muted" style="width:auto;background:none;font-weight:400">inga tidigare matcher</span>';
     return `<div class="form-row"><span class="t">${esc(name)}</span><span class="form">${chips}</span></div>`;
   };
-  let html = `<div class="card"><h4>Form, senaste ${5} <span class="hint">nyast först</span></h4>` +
+  let html = `<div class="card"><h4><span data-tip-head="Form, senaste 5" data-tip="${esc(FORM_TIP)}">Form, senaste ${5}</span> <span class="hint">nyast först</span></h4>` +
     row(d.match.home, d.teams.home) + row(d.match.away, d.teams.away);
   if (d.meetings.length) {
     html += '<h4 style="margin-top:0.9rem">Möten i år</h4><ul class="plain">' +
@@ -846,13 +915,13 @@ function sideCard(d) {
         }
       }
     }
-    rows += `<tr class="group"><td colspan="3">${esc(g.title)}${srcTxt ? `<span class="sub src-sub">${srcTxt}</span>` : ''}</td></tr>`;
+    rows += `<tr class="group"${sideTip(g.title)}><td colspan="3">${esc(g.title)}${srcTxt ? `<span class="sub src-sub">${srcTxt}</span>` : ''}</td></tr>`;
     for (const r of oneXg(g.rows)) {
-      rows += `<tr><td class="h">${val(r.values[0])}</td><td class="mid">${esc(r.label)}</td><td class="a">${val(r.values[1])}</td></tr>`;
+      rows += `<tr${sideTip(r.label, r.values, [d.match.home, d.match.away])}><td class="h">${val(r.values[0])}</td><td class="mid">${esc(r.label)}</td><td class="a">${val(r.values[1])}</td></tr>`;
     }
     if (g.note) notes.push(g.note);
   }
-  return '<div class="card"><h4>Lagen sida vid sida <span class="hint">tabell, schema och xG</span></h4>' +
+  return `<div class="card"><h4><span${sideTip('Lagen sida vid sida')}>Lagen sida vid sida</span> <span class="hint">tabell, schema och xG</span></h4>` +
     `<div class="table-wrap" style="margin:0"><table class="side"><thead><tr>` +
     `<th style="text-align:right">${esc(d.match.home)}</th><th class="mid"></th><th>${esc(d.match.away)}</th></tr></thead>` +
     `<tbody>${rows}</tbody></table></div>` +
