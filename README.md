@@ -1135,12 +1135,16 @@ för mycket*. Vad namnet syftar på står när man pekar på det. Namnet skrivs 
 när matcherna ändras. Ändras matcherna får omgången ett nytt namn. Gängets kupong får
 omgångens namn när den sparas (`namn` i kupongfilen, så också i Historik), om den inte redan
 har ett. Namnet skrivs i samma proxy som matchanalysen och kommentaren (`POST /namn
-{"id": "<omgångens id>"}`, [worker/namn.mjs](worker/namn.mjs), prompten i
-[config/namn.js](config/namn.js)): proxyn läser omgången ur samma KV-namnrymd som tipsen och
+{"id": "<omgångens id>"}`, [worker/namn.mjs](worker/namn.mjs), prompten och modellen i
+[config/namn.js](config/namn.js)) – av Claude (`claude-opus-5-5`, med Anthropics officiella
+SDK och `fallbacks: "default"`) när hemligheten `ANTHROPIC_API_KEY` finns, annars av
+DeepSeek som analysen. Proxyn läser omgången ur samma KV-namnrymd som tipsen och
 lagen, tabelläget och modellens odds ur den publicerade sajten, och sparar namnet för alltid
 per omgång och matcher (`namn:<promptversion>:<omgång>:<matcherna>`). Bygget skriver
-adressen i `data/kuponger.json` under `samtal.namn`. Lokalt `/api/namn` (med nyckeln och
-`KUPONG_LOKALT=1`).
+adressen i `data/kuponger.json` under `samtal.namn`. Lokalt `/api/namn` (med en av
+nycklarna i `.env` och `KUPONG_LOKALT=1`). Claudes nyckel läggs in en gång:
+
+    npx wrangler@4.147.0 secret put ANTHROPIC_API_KEY --config worker/wrangler.toml
 
 ## Kuponghistoriken
 

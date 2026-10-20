@@ -1,6 +1,7 @@
 // Omgångens namn (Kupong → Omgången och förstasidan), i samma proxy som
-// matchanalysen och kommentaren (worker/index.mjs) och med samma språkmodell
-// (config/llm.js). Prompten och gränserna står i config/namn.js.
+// matchanalysen och kommentaren (worker/index.mjs). Claude skriver namnet när
+// nyckeln finns (ANTHROPIC_API_KEY), annars samma DeepSeek som analysen
+// (config/llm.js). Prompten, modellen och gränserna står i config/namn.js.
 //
 //   POST /namn  {"id": "<omgångens id>"}
 //   → 200 {ok: true, namn, syftar, model, generatedAt, cached}
@@ -13,6 +14,7 @@
 // sparas för alltid per omgång och matcher: alla ser samma namn, och den som
 // kommer först får det skrivet. Ändras matcherna får omgången ett nytt namn.
 
+import Anthropic from '@anthropic-ai/sdk';
 import cfg from '../config/llm.js';
 import nc from '../config/namn.js';
 import { fingerprint, pctOdds } from './analysis.mjs';
@@ -64,26 +66,25 @@ export async function roundName(id, { env, loadRound, loadSite, complete, store 
   const hit = await safely(() => store && store.get(key));
   if (hit) return answer(hit, true);
 
-  const apiKey = env[cfg.keyEnv];
-  if (!apiKey) return fail(503, 'Namnen är inte påslagna (nyckel saknas).');
+  const chat = env[nc.claude.keyEnv] ? claudeChat(env[nc.claude.keyEnv])
+    : env[cfg.keyEnv] ? deepseekChat(env[cfg.keyEnv], env, complete) : null;
+  if (!chat) return fail(503, 'Namnen är inte påslagna (nyckel saknas).');
 
   // Utan sajtens underlag får modellen bara lagen och avsparkerna.
   let site = {};
   try { site = (await loadSite()) || {}; } catch { /* lagen räcker */ }
   const payload = roundPayload(round, site);
-  const messages = [
-    { role: 'system', content: nc.systemPrompt },
-    { role: 'user', content: `Omgången (JSON):\n${JSON.stringify(payload)}` },
-  ];
+  let say = `Omgången (JSON):\n${JSON.stringify(payload)}`;
   let problem = null;
   for (let attempt = 1; attempt <= cfg.attempts; attempt++) {
     let r;
     try {
-      r = await complete(messages, apiKey, env);
+      r = await chat.say(say);
     } catch (err) {
       // Nätverk, överlast, saldo, nyckel: inget sparas – nästa besök försöker igen.
       return fail(err.status || 502, err.message);
     }
+    if (r.refused) { problem = `${chat.provider} avböjde att döpa omgången.`; break; }
     const parts = partsOf(r.content);
     const why = parts ? problems(parts) : ['inget svar i rätt form'];
     if (!why.length) {
@@ -95,10 +96,7 @@ export async function roundName(id, { env, loadRound, loadSite, complete, store 
       return answer(entry, false);
     }
     problem = `Namnet hade ${why.join(' och ')}.`;
-    messages.push(
-      { role: 'assistant', content: r.content },
-      { role: 'user', content: `Namnet hade ${why.join(' och ')}. Hitta på ett nytt och följ reglerna: högst ${nc.maxWords} ord och ${nc.maxChars} tecken, inga siffror. Svara med JSON: {"namn": "<namnet>", "syftar": "<vad det anspelar på>"}` },
-    );
+    say = `Namnet hade ${why.join(' och ')}. Hitta på ett nytt och följ reglerna: högst ${nc.maxWords} ord och ${nc.maxChars} tecken, inga siffror. Svara med JSON: {"namn": "<namnet>", "syftar": "<vad det anspelar på>"}`;
   }
   // Ett avvisat svar sparas en timme, så att varje sidvisning inte kostar ett
   // nytt anrop. Därefter försöker nästa besök igen.
@@ -107,11 +105,70 @@ export async function roundName(id, { env, loadRound, loadSite, complete, store 
   return answer(entry, false);
 }
 
+// Ett samtal med språkmodellen: say(text) → {content, model, refused}. Varje
+// svar läggs till i samtalet som det kom, så att ett nytt försök bygger på det.
+function claudeChat(apiKey) {
+  // Adressen anges, så att en ANTHROPIC_BASE_URL i miljön inte styr om anropet.
+  const client = new Anthropic({ apiKey, baseURL: 'https://api.anthropic.com', timeout: cfg.timeoutMs, maxRetries: 1 });
+  const turns = [];
+  return {
+    provider: nc.claude.provider,
+    async say(text) {
+      turns.push({ role: 'user', content: text });
+      let r;
+      try {
+        r = await client.beta.messages.create({
+          model: nc.claude.model,
+          max_tokens: nc.claude.maxTokens,
+          betas: ['server-side-fallback-2026-07-01'],
+          fallbacks: 'default',
+          output_config: { effort: nc.claude.effort },
+          system: nc.systemPrompt,
+          messages: turns,
+        });
+      } catch (err) {
+        throw claudeProblem(err);
+      }
+      turns.push({ role: 'assistant', content: r.content });
+      // Nekade också reservmodellen finns ingen text att läsa.
+      if (r.stop_reason === 'refusal') return { content: '', model: r.model, refused: true };
+      const content = r.content.filter((b) => b.type === 'text').map((b) => b.text).join('');
+      return { content, model: r.model, refused: false };
+    },
+  };
+}
+
+function claudeProblem(err) {
+  const p = nc.claude.provider;
+  const problem = (status, message) => Object.assign(new Error(message), { status });
+  if (err instanceof Anthropic.AuthenticationError) return problem(502, `Nyckeln godtogs inte av ${p}.`);
+  if (err instanceof Anthropic.RateLimitError) return problem(503, `${p} är överbelastat – försök igen om en stund.`);
+  if (err instanceof Anthropic.APIConnectionTimeoutError) return problem(504, `${p} svarade inte inom ${Math.round(cfg.timeoutMs / 1000)} sekunder.`);
+  if (err instanceof Anthropic.APIConnectionError) return problem(504, `${p} gick inte att nå.`);
+  if (err instanceof Anthropic.APIError) return problem(502, err.status >= 500 ? `${p} är överbelastat – försök igen om en stund.` : `${p} avvisade anropet (HTTP ${err.status}).`);
+  return problem(502, `${p} gav ett fel (${err && err.message}).`);
+}
+
+function deepseekChat(apiKey, env, complete) {
+  const messages = [{ role: 'system', content: nc.systemPrompt }];
+  return {
+    provider: cfg.provider,
+    async say(text) {
+      messages.push({ role: 'user', content: text });
+      const r = await complete(messages, apiKey, env);
+      messages.push({ role: 'assistant', content: r.content });
+      return { content: r.content, model: r.model, refused: r.finish === 'content_filter' };
+    },
+  };
+}
+
 const unquote = (s) => String(s).trim().replace(/^["'”“«»‘’]+|["'”“«»‘’.]+$/g, '').trim();
 
+// JSON-objektet i svaret, också om det står inom ```json … ```.
 function partsOf(content) {
   try {
-    const j = JSON.parse(content);
+    const text = String(content || '');
+    const j = JSON.parse(text.slice(text.indexOf('{'), text.lastIndexOf('}') + 1));
     const namn = j && typeof j.namn === 'string' ? unquote(j.namn) : '';
     const syftar = j && typeof j.syftar === 'string' ? j.syftar.trim() : '';
     return namn ? { namn, syftar: syftar || null } : null;

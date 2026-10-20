@@ -4,16 +4,21 @@
 // Omgångens namn. När någon har valt omgångens matcher (Kupong → Omgången)
 // läser språkmodellen omgången – lagen, tabelläget, avsparkerna och modellens
 // odds – och ger kupongen ett eget namn i stället för "Omgångens kupong".
-// Samma språkmodell och proxy som matchanalysen och kommentaren
-// (config/llm.js, worker/namn.mjs). Namnet sparas för alltid per omgång och
-// matcher, så att alla i gänget ser samma namn, och följer med när gängets
-// kupong sparas (namn i kupongfilen).
+// Samma proxy som matchanalysen och kommentaren (worker/namn.mjs). Claude
+// (Anthropic) skriver namnet när nyckeln ANTHROPIC_API_KEY finns – bättre
+// svenska och snabbare – annars DeepSeek som analysen (config/llm.js).
+// Namnet sparas för alltid per omgång och matcher, så att alla i gänget ser
+// samma namn, och följer med när gängets kupong sparas (namn i kupongfilen).
 // ============================================================================
 
 module.exports = {
   // Ändras prompten byts versionen, så att omgångar som redan har fått sitt
   // namn inte döps om – bara nya omgångar får namn efter den nya prompten.
-  promptVersion: '2026-10-20.1',
+  promptVersion: '2026-10-20.2',
+  // Claude när nyckeln finns: tänkandet är alltid på, effort styr hur mycket.
+  // fallbacks: "default" låter Anthropic köra om ett nekat svar på en annan
+  // modell i samma anrop.
+  claude: { provider: 'Anthropic', model: 'claude-opus-5-5', keyEnv: 'ANTHROPIC_API_KEY', effort: 'medium', maxTokens: 16000 },
   // Högst så många tecken och ord; längre namn skrivs om.
   maxChars: 36,
   maxWords: 6,
