@@ -363,7 +363,7 @@ function bigNumber(g) {
 
 function statusLine(g) {
   if (!g.started) {
-    return `Startar ${esc(fWeekdayTime.format(new Date(g.first)))} · modellen väntar sig <b>${kpNum(g.expected)}</b> rätt`;
+    return `Startar ${esc(fWeekdayTime.format(new Date(g.first)))} · väntat <b>${kpNum(g.expected)}</b> rätt`;
   }
   if (g.done && g.hidden) return `Klar · ${Spoiler.chip(`${g.hidden} ${g.hidden === 1 ? 'dold' : 'dolda'}`)}`;
   if (g.done) return `Klar · modellens tips gav <b>${g.modelOk}</b> rätt`;
@@ -807,14 +807,14 @@ function updateBar() {
   const sel = draftMatches();
   const n = sel.length + KP.draft.locked.length;
   if (!n) {
-    t.innerHTML = 'Tryck på 1, X eller 2';
+    t.innerHTML = '<b>0</b> matcher';
     return;
   }
   // Startade matcher (vid ändring) räknas som de gått, eller med prognosen.
   const now = Date.now();
   const exp = sel.reduce((a, x) => a + (x.m.f ? x.sign.split('').reduce((b, s) => b + x.m.f.p[SIGNS.indexOf(s)], 0) / 100 : 0), 0) +
     KP.draft.locked.map((x) => gradeRow(x, now)).reduce((a, r) => a + (r.state === 'final' && r.hit != null ? (r.hit ? 1 : 0) : (r.p || 0) / 100), 0);
-  t.innerHTML = `<b>${n}</b> ${n === 1 ? 'match' : 'matcher'}` + (sel.length ? ` · modellen väntar sig <b>${kpNum(exp)}</b> rätt` : '');
+  t.innerHTML = `<b>${n}</b> ${n === 1 ? 'match' : 'matcher'}` + (sel.length ? ` · väntat <b>${kpNum(exp)}</b> rätt` : '');
 }
 
 // Filen med en match per rad, så att den går att läsa och ändra på GitHub.
@@ -962,7 +962,7 @@ async function sendDirect(ctx) {
     kpStore(KP_DRAFT, null);
     KP.view = { mode: 'saved', id: r.coupon.id };
     $('#coupon').innerHTML = savedHead('Sparad', ctx) +
-      '<div class="card kp-saved"><p>Kupongen är sparad. Den syns för alla när sajten har uppdaterats, om några minuter.</p>' +
+      '<div class="card kp-saved"><p>Syns för alla om några minuter.</p>' +
       `<div class="kp-actions"><a class="kp-btn primary" href="#kupong/${esc(r.coupon.id)}">Visa kupongen</a>` +
       (r.commit ? `<a class="kp-btn" href="${esc(r.commit)}" target="_blank" rel="noopener">Ändringen på GitHub</a>` : '') + '</div></div>';
     return;
@@ -1008,7 +1008,7 @@ function renderViaGitHub(ctx) {
     '<div class="card kp-saved">' +
     (exists
       ? '<p>Öppna filen på GitHub, markera allt, klistra in och tryck <b>Commit changes</b>. Innehållet kopieras när du trycker på knappen.</p>'
-      : '<p>Tryck <b>Commit changes</b> på GitHub. Kupongen syns för alla när sajten har uppdaterats, om några minuter.</p>') +
+      : '<p>Tryck <b>Commit changes</b> på GitHub.</p>') +
     `<div class="kp-actions"><a class="kp-btn primary" id="kp-gh" href="${esc(url)}" target="_blank" rel="noopener">Spara på GitHub</a>` +
     '<button type="button" class="kp-btn" id="kp-copy">Kopiera</button>' +
     `<a class="kp-btn" href="#kupong/${esc(ctx.id)}">Visa kupongen</a></div>` +
@@ -1051,7 +1051,7 @@ function renderRemove(id) {
   }
   const gh = esc(removeOnGitHub(id));
   const what = `<p>Hela kupongen${c.name ? ` ${esc(c.name)}` : ''} tas bort för alla, ${g.n === 1 ? 'med sin match' : `med alla ${g.n} matcher`}` +
-    `${g.started ? ' – också de som redan har spelats' : ''}. Den försvinner när sajten har uppdaterats, om några minuter.</p>`;
+    `${g.started ? ' – också de som redan har spelats' : ''}.</p>`;
   if (!KP.data.save) {
     el.innerHTML = savedHead('Ta bort kupongen', ctx) + `<div class="card kp-saved">${what}` +
       '<p>Tryck <b>Commit changes</b> på GitHub.</p>' +
@@ -1093,7 +1093,7 @@ async function sendRemove(ctx) {
     if (d && d.edit === c.id) kpStore(KP_DRAFT, null);
     KP.view = { mode: 'removed', id: c.id };
     $('#coupon').innerHTML = savedHead('Borttagen', ctx) +
-      '<div class="card kp-saved"><p>Kupongen är borttagen. Den försvinner för alla när sajten har uppdaterats, om några minuter.</p>' +
+      '<div class="card kp-saved"><p>Försvinner för alla om några minuter.</p>' +
       '<div class="kp-actions"><a class="kp-btn primary" href="#kupong">Till kupongen</a>' +
       (body.commit ? `<a class="kp-btn" href="${esc(body.commit)}" target="_blank" rel="noopener">Ändringen på GitHub</a>` : '') + '</div></div>';
     return;

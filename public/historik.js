@@ -234,7 +234,6 @@
         return `<button type="button" data-sort="${s.id}" aria-pressed="${on}" title="${esc(on ? 'Tryck igen för omvänd ordning' : s.title)}">${s.label}${arrow}</button>`;
       }).join('') + '</div></div>' +
       `<div class="hk-list">${hidden.map(hiddenCard).join('')}${sorted(list).map(card).join('')}</div>` +
-      (list.some((c) => c.basis !== 'modell') ? '<p class="legend">* Väntat delvis enligt schablon.</p>' : '') +
       errors();
     for (const b of el.querySelectorAll('[data-sort]')) {
       b.addEventListener('click', () => {

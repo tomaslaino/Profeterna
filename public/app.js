@@ -762,8 +762,7 @@ function stepsCard(d) {
     `<span><i class="k h"></i>← hjälper ${esc(m.home)}</span><span>hjälper ${esc(m.away)} →<i class="k a"></i></span></div><div></div></div>`;
   const end = `<div class="tug-row tug-end"><div class="tug-lab">Slutprognos</div>${stack(st[st.length - 1].p)}<div></div></div>` +
     `<div class="tug-row tug-names"><div class="tug-lab"></div><div class="tug-sides"><span>${esc(m.home)}</span><span>${esc(m.away)}</span></div><div></div></div>`;
-  return `<div class="card tug"><h4>Vad drog åt vilket håll</h4>` +
-    `<p class="tug-note">Staplarna visar hur många procentenheter varje del flyttar segerchansen. Siffran längst till höger är oddset på att ${esc(fav)} vinner efter varje steg – lägre odds betyder större chans.</p>` +
+  return `<div class="card tug"><h4 title="${esc(`Procentenheter som varje del flyttar segerchansen · längst till höger oddset på att ${fav} vinner efter varje steg`)}">Vad drog åt vilket håll</h4>` +
     rows[0] + axis + rows.slice(1).join('') + end + '</div>';
 }
 
@@ -1048,7 +1047,7 @@ function newsSection(n) {
 
 async function runAnalysis(id, btn) {
   btn.disabled = true;
-  btn.textContent = 'Skriver … (kan ta en minut)';
+  btn.textContent = 'Skriver …';
   let r;
   try {
     const res = await fetch(state.meta.analysis.endpoint, {

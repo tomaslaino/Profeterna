@@ -244,14 +244,11 @@
   // Raden längst ned: hur mycket som döljs just nu.
   async function status() {
     const el = panel.querySelector('.sp-status');
-    if (S.mode === 'off') { el.textContent = 'Alla resultat visas.'; return; }
+    if (S.mode === 'off') { el.textContent = ''; return; }
     const ms = await matches();
     const n = ms.filter((m) => hidden(m)).length;
     if (!panel.contains(el)) return; // panelen har ritats om under tiden
-    const what = `${n} ${n === 1 ? 'match' : 'matcher'}`;
-    el.textContent = S.mode === 'auto'
-      ? (n ? `Döljer ${what} från det senaste dygnet.` : 'Inget att dölja från det senaste dygnet.')
-      : (n ? `Döljer ${what} från ${dayLabel(from()).toLowerCase()} och framåt.` : `Inget att dölja från ${dayLabel(from()).toLowerCase()}.`);
+    el.textContent = !n ? 'Inget att dölja' : n === 1 ? '1 match dold' : `${n} matcher dolda`;
   }
 
   window.Spoiler = {

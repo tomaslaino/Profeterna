@@ -293,20 +293,17 @@
     away.placedBoth = both;
     const confirmed = (t) => /^confirmed$/i.test(t.status);
     const any = home.starters.length || away.starters.length;
+    // När elvorna brukar komma står i chipets tooltip.
     let chip = '';
-    if (!any) chip = '<span class="mr-chip none">Ingen startelva än</span>';
+    if (!any) {
+      chip = `<span class="mr-chip none" title="${PROBABLE.has(m.comp)
+        ? 'Trolig elva några dagar före, bekräftad ungefär en timme före avspark'
+        : 'Bekräftad ungefär en timme före avspark'}">Ingen startelva än</span>`;
+    }
     else if (L.played || m.completed) chip = '';
     else if (confirmed(home) && confirmed(away)) chip = '<span class="mr-chip ok">Bekräftad startelva</span>';
-    else chip = '<span class="mr-chip prob">Trolig startelva</span>';
-    let note = '';
-    if (!any) {
-      note = PROBABLE.has(m.comp)
-        ? 'Den troliga elvan brukar finnas några dagar före matchen, den bekräftade ungefär en timme före avspark.'
-        : 'Här har 365Scores ingen trolig startelva – den bekräftade visas när den kommer, ungefär en timme före avspark.';
-    }
-    else if (!L.played && !m.completed && !(confirmed(home) && confirmed(away))) note = 'Bedömd av 365Scores – den bekräftade kommer ungefär en timme före avspark.';
+    else chip = '<span class="mr-chip prob" title="Bedömd av 365Scores · bekräftad ungefär en timme före avspark">Trolig startelva</span>';
     let h = `<div class="mr-lu-head">${chip}<span class="mr-src">365Scores, hämtat ${esc(fClock.format(new Date(r.at)))}</span></div>`;
-    if (note) h += `<p class="mr-lu-note">${note}</p>`;
     if (both) {
       // Lagens rader står ovanför planen på breda skärmar och vid var sin
       // planhalva på mobilen (bortalaget överst).

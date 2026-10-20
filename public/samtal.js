@@ -52,7 +52,7 @@
   const here = (sub) => Boolean(KP.view && KP.view.mode === 'samtal' && KP.view.sub === sub && !$('#coupon-section').hidden);
   // Initialerna i en egen färg per person; streckad = del av en gardering.
   const chip = (id, hedge = false) =>
-    `<span class="sm-ch sm-p${Math.max(0, gang().findIndex((g) => g.id === id))}${hedge ? ' g' : ''}">${esc(id)}</span>`;
+    `<span class="sm-ch sm-p${Math.max(0, gang().findIndex((g) => g.id === id))}${hedge ? ' g' : ''}"${hedge ? ' title="Del av en gardering"' : ''}>${esc(id)}</span>`;
   const rader = (signs) => signs.reduce((a, s) => a * Math.max(1, s.length), 1);
   const plural = (n, one, many) => `${n} ${n === 1 ? one : many}`;
   const kicks = (s) => s.matcher.map((x) => Date.parse(x.avspark)).filter(Number.isFinite);
@@ -215,11 +215,11 @@
     // Du har lämnat in men ser inte de andra: ingen annan är klar, eller du
     // lämnade in på en annan enhet.
     const text = !done
-      ? `<b>${inne} av ${s.gang.length}</b> har lämnat in. Du ser de andras tips när du själv har lämnat in.`
+      ? `<b>${inne} av ${s.gang.length}</b> har lämnat in`
       : local && local.vem === v
-        ? 'Du har lämnat in. De andras tips syns här när de har lämnat in.'
-        : 'Du har lämnat in på en annan enhet. De andras tips syns där – och här när alla har lämnat in' +
-          `${s.tid ? ` eller uppgörelsen börjar ${esc(fWeekdayTime.format(new Date(s.tid)))}` : ''}.`;
+        ? 'Du har lämnat in'
+        : 'Du har lämnat in på en annan enhet' +
+          `${s.tid ? ` · uppgörelsen ${esc(fWeekdayTime.format(new Date(s.tid)))}` : ''}`;
     let html = '<div class="card sm-wait">' +
       '<div class="sm-folk">' + s.gang.map((g) => `<span class="sm-person${g.inne ? ' inne' : ''}">${chip(g.id)}` +
         `<span>${g.inne ? `inne ${esc(fWeekdayTime.format(new Date(g.inne)))}` : 'fyller i'}${g.id === v ? ' · du' : ''}</span></span>`).join('') + '</div>' +
@@ -272,12 +272,12 @@
   }
 
   const GROUPS = [
-    ['Alla olika', 'Ta dem först – kanske en gardering?'],
+    ['Alla olika', 'Kanske en gardering?'],
     [null, 'Den som avviker förklarar.'],
     ['Samma grund, olika säkerhet', 'Räcker det, eller ska vi gardera?'],
     ['Eniga mot modellen', 'Stämmer det verkligen?'],
     ['Eniga', 'Klubbas utan snack.'],
-    ['Saknar tips', 'Alla har inte tippat de här.'],
+    ['Saknar tips', ''],
   ];
   const groupName = (k, s) => GROUPS[k][0] || (s.gang.length === 3 ? 'Två mot en' : 'Delade meningar');
 
@@ -321,13 +321,10 @@
       html += `<p class="legend"><span class="note">${names} hann inte lämna in` +
         `${s.orsak === 'samtalet' ? ' innan uppgörelsen började' : s.orsak === 'avspark' ? ' innan första matchen startade' : ''}.</span></p>`;
     }
-    html += '<p class="legend sm-legend">' +
-      `<span>${chip(s.gang[0].id)} enda tecknet</span><span>${chip(s.gang[0].id, true)} del av en gardering</span>` +
-      '<span>siffran är modellens chans</span></p>';
     for (let k = 0; k <= 5; k++) {
       const list = rows.filter((r) => r.kind === k);
       if (!list.length) continue;
-      html += `<div class="sm-group"><h3>${esc(groupName(k, s))} <span class="sm-count">${list.length}</span></h3><span>${esc(GROUPS[k][1])}</span></div>`;
+      html += `<div class="sm-group"><h3>${esc(groupName(k, s))} <span class="sm-count">${list.length}</span></h3>${GROUPS[k][1] ? `<span>${esc(GROUPS[k][1])}</span>` : ''}</div>`;
       html += '<div class="mlist sm-board">' + list.map((r) => boardRow(r, s.visas ? val[r.x.id] || '' : '', s)).join('') + '</div>';
     }
     // Gängets kupong när alla har lämnat in: rutorna i samma ordning som
@@ -382,7 +379,7 @@
           ` aria-label="${esc(`${label}, ${sg}: ${who.length ? who.join(', ') : 'ingen'}${r.pr ? `, modellens odds ${pctOdds(r.pr[i])}` : ''}`)}">` +
           `<span class="sm-s"><b>${sg}</b>${who.length ? `<small>${who.length}/${r.n}</small>` : ''}</span>` +
           `<span class="sm-chips">${who.map((k) => chip(k, r.t[k].length > 1)).join('')}</span>` +
-          `<span class="sm-pc${r.fav === i ? ' fav' : ''}">${r.pr ? pctOdds(r.pr[i]) : '–'}</span></button>`;
+          `<span class="sm-pc${r.fav === i ? ' fav' : ''}" title="Modellens odds">${r.pr ? pctOdds(r.pr[i]) : '–'}</span></button>`;
       }).join('') + '</div>';
   }
 
@@ -424,7 +421,7 @@
     return { d, c, open, undecided: open.filter((r) => !val[r.x.id]).length };
   }
 
-  const SAVED = 'Gängets kupong är sparad. Den syns för alla när sajten har uppdaterats, om några minuter.';
+  const SAVED = 'Gängets kupong är sparad · syns för alla om några minuter.';
   // Efter sparat visar Omgången gängets kupong.
   function toCoupon() {
     KP.flash = SAVED;
@@ -548,7 +545,7 @@
     const v = me();
     if (!v) {
       el.innerHTML = viewNav('omgang') + steps(s) + head(s, 'Din kupong') +
-        `<div class="card sm-wait"><p class="sm-wait-txt">Vem är du? Kupongen sparas i ditt namn.</p>${whoAmI()}</div>`;
+        `<div class="card sm-wait"><p class="sm-wait-txt">Vem är du?</p>${whoAmI()}</div>`;
       for (const b of document.querySelectorAll('.sm-vem button')) {
         b.addEventListener('click', () => {
           kpStore(VEM, b.dataset.vem);

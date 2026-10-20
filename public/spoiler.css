@@ -113,6 +113,7 @@
 }
 
 .sp-status { margin: 12px 0 0; font-size: 12.5px; line-height: 1.45; color: var(--muted); min-height: 1.45em; }
+.sp-status:empty { display: none; }
 
 /* ---------- dolt resultat ---------- */
 
