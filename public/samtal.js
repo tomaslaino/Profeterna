@@ -750,7 +750,6 @@
         foot: `<button type="button" class="kp-btn primary" id="sm-start">${edit ? 'Spara matcherna' : 'Skapa kupongen'}</button>` +
           '<p class="pb-msg" id="sm-msg" role="status"></p>',
       });
-    Papper.wireBuilder('sm-build');
 
     $('#sm-q').addEventListener('input', (e) => { SM.q = e.target.value; pickList(); });
     for (const b of document.querySelectorAll('#sm-comps button')) {

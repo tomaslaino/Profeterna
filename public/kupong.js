@@ -682,7 +682,6 @@ function renderCreate(editId) {
       head: `<input type="text" id="kp-name" class="pb-name" maxlength="40" placeholder="Namn (valfritt)" aria-label="Kupongens namn" value="${esc(KP.draft.name)}">`,
       foot: '<button type="button" id="kp-save" class="kp-btn primary">Spara kupong</button><p class="pb-msg" id="kp-pick-msg" role="status"></p>',
     });
-  Papper.wireBuilder('kp-build');
 
   $('#kp-q').addEventListener('input', (e) => { KP.q = e.target.value; renderPickList(); });
   for (const b of document.querySelectorAll('#kp-comps button')) {
@@ -838,11 +837,11 @@ async function saveCoupon() {
     renderPickList();
     return;
   }
-  // En vald match utan kryss: rutorna blir röda, och remsan fälls upp.
+  // En vald match utan kryss: rutorna blir röda och raden rullas fram.
   const blank = draftMatches().filter((x) => !x.sign).length;
   if (blank) {
     $('#kp-build').classList.add('need');
-    Papper.openSlip('kp-build');
+    Papper.reveal('kp-build', '.pb-row.unsigned');
     $('#kp-pick-msg').innerHTML = `<span class="note">Kryssa i alla matcher – ${blank === 1 ? 'en saknar' : `${blank} saknar`} tecken.</span>`;
     return;
   }
