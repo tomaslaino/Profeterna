@@ -435,10 +435,12 @@ const newCouponHref = () => (hasSamtal() ? '#kupong/samtal/ny' : '#kupong/ny');
 const samtalTeaser = () => (hasSamtal() ? Samtal.teaser() : '');
 
 // En kupong per omgång: den som är först väljer matcherna, sedan fyller alla
-// i samma kupong.
-function emptyCard() {
+// i samma kupong. På kupongsidan går systemet ni spelade också att ladda upp
+// som skärmbild (systembild.js).
+function emptyCard(upload = false) {
   return '<div class="kp-empty card"><p class="kp-eyebrow">Kupong</p><h2 class="page-title">Omgångens kupong</h2>' +
-    `<a class="kp-btn primary" href="${newCouponHref()}">Välj matcher</a></div>`;
+    `<div class="kp-empty-go"><a class="kp-btn primary" href="${newCouponHref()}">Välj matcher</a>` +
+    (upload && window.Systembild ? Systembild.button('kp-btn', true) : '') + '</div></div>';
 }
 
 // Utan id omgångens kupong, annars en viss kupong.
@@ -448,8 +450,7 @@ function renderCouponShow(id) {
   const graded = all.map((c) => ({ c, g: gradeCoupon(c) })).sort((a, b) => (b.g.first || 0) - (a.g.first || 0));
   if (!graded.length) {
     // Omgångens tips finns kvar att titta på, också utan gängets kupong.
-    el.innerHTML = viewNav('omgang') + roundSteps(1) + emptyCard() +
-      (window.Systembild ? `<p class="legend">${Systembild.button('kp-linkbtn')}</p>` : '') +
+    el.innerHTML = viewNav('omgang') + roundSteps(1) + emptyCard(true) +
       (!id && hasSamtal() && Samtal.visible() ? '<p class="legend"><a href="#kupong/samtal">Förra omgångens tips</a></p>' : '') + couponErrors();
     return;
   }

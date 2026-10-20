@@ -36,6 +36,11 @@ window.Systembild = (() => {
     input: null,
     toast: null,
     note: null, // raden överst i Ny kupong efter inläsningen (html)
+    // Textläsaren hämtas när knappen trycks, medan man letar upp bilden
+    // (i mobilen tar det några sekunder första gången).
+    reader: null,
+    idle: 0,
+    progress: () => {},
   };
 
   // ---------- text → matcher ----------
@@ -310,14 +315,32 @@ window.Systembild = (() => {
     });
   }
 
-  async function ocrWorker(progress) {
+  // Lägesraden visas först när en bild läses (S.progress), inte medan
+  // textläsaren hämtas i förväg.
+  async function ocrWorker() {
     if (!window.Tesseract) await loadScript(TESSERACT);
     return Tesseract.createWorker('eng', 1, {
       logger: (m) => {
-        if (m.status === 'recognizing text') progress(`Läser bilden … ${Math.round((m.progress || 0) * 100)} %`);
-        else if (/loading|initializ/.test(m.status || '')) progress('Hämtar textläsaren …');
+        if (m.status === 'recognizing text') S.progress(`Läser bilden … ${Math.round((m.progress || 0) * 100)} %`);
+        else if (/loading|initializ/.test(m.status || '')) S.progress('Hämtar textläsaren …');
       },
     });
+  }
+
+  // Textläsaren börjar hämtas när knappen trycks. Väljs ingen bild stängs
+  // den efter några minuter.
+  function warm() {
+    clearTimeout(S.idle);
+    if (!S.reader) {
+      const p = ocrWorker();
+      p.catch(() => { if (S.reader === p) S.reader = null; });
+      S.reader = p;
+    }
+    S.idle = setTimeout(() => {
+      const p = S.reader;
+      S.reader = null;
+      if (p) p.then((w) => w.terminate()).catch(() => {});
+    }, 3 * 60000);
   }
 
   async function toCanvas(file) {
@@ -409,6 +432,9 @@ window.Systembild = (() => {
     const hash = editId ? `#kupong/andra/${editId}` : '#kupong/ny';
     if (location.hash === hash) renderCreate(editId);
     else location.hash = hash;
+    // Raden om vad som kom med står överst – också när knappen satt längre
+    // ned (gängets kupong i omgången).
+    window.scrollTo(0, 0);
   }
 
   // ---------- knappen ----------
@@ -430,13 +456,17 @@ window.Systembild = (() => {
   async function run(files) {
     if (S.busy || !files.length) return;
     S.busy = true;
-    toast('Hämtar textläsaren …', { stay: true });
-    let worker = null;
+    clearTimeout(S.idle);
+    const reader = S.reader || ocrWorker();
+    reader.catch(() => {});
+    S.reader = null;
+    S.progress = (t) => toast(t, { stay: true });
+    toast('Läser bilden …', { stay: true });
     try {
       await Promise.all([whenMatches(), loadCoupons()]);
       if (!state.all) throw new Error('matcher');
       const cands = candidates(Date.now());
-      worker = await ocrWorker((t) => toast(t, { stay: true }));
+      const worker = await reader;
       const all = { found: [], missing: [], info: {} };
       const seen = new Map();
       for (const f of files) {
@@ -464,7 +494,8 @@ window.Systembild = (() => {
     } catch (e) {
       toast(e && e.message === 'script' ? 'Textläsaren gick inte att hämta. Försök igen.' : 'Bilden gick inte att läsa.', { error: true });
     } finally {
-      if (worker) worker.terminate().catch(() => {});
+      reader.then((w) => w.terminate()).catch(() => {});
+      S.progress = () => {};
       S.busy = false;
     }
   }
@@ -484,15 +515,20 @@ window.Systembild = (() => {
       document.body.appendChild(S.input);
     }
     S.input.click();
+    warm();
   }
 
   document.addEventListener('click', (e) => {
     if (e.target.closest('[data-systembild]')) picker();
   });
 
+  // En bild, på knappen där den står för sig själv (omgångens tomma kupong).
+  const ICON = '<svg class="sb-ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false">' +
+    '<rect x="3" y="4" width="18" height="16" rx="3"/><circle cx="8.5" cy="9.5" r="1.6"/><path d="M21 15.5l-5-5L5.5 20"/></svg>';
+
   return {
     // Knappen, var den än står på sidan.
-    button: (cls = 'kp-btn') => `<button type="button" class="${cls}" data-systembild title="En skärmbild av systemet – matcherna och tecknen fylls i">Ladda upp system</button>`,
+    button: (cls = 'kp-btn', icon = false) => `<button type="button" class="${cls}${icon ? ' sb-btn' : ''}" data-systembild title="En skärmbild av systemet – matcherna och tecknen fylls i">${icon ? ICON : ''}Ladda upp system</button>`,
     // Raden överst i Ny kupong efter inläsningen – en gång.
     note() {
       const n = S.note;
