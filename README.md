@@ -92,6 +92,16 @@ ingen falsk precision · sidan kraschar aldrig av en död källa · endast fria 
   ([public/matchruta.js](public/matchruta.js)). Efter matchen står varje spelares betyg
   från 365Scores (1–10) på planen och i listorna, matchens högsta i guld; inhoppare som
   bara spelat några minuter har inget (2026-10-20)
+- [x] **Matchbladets flikar (2026-10-20):** Startelvor står först, sedan Matchen (påbörjad
+  match), Prognos, Form, Tabellen och Trupperna. Under startelvorna står vilka som saknas –
+  365Scores lista för matchen, och Fantasy Premier Leagues när 365Scores inte har något än –
+  och domaren med fyra tal mot divisionens snitt, som i ett matchprogram; Lagen och Domaren
+  är borta som egna flikar. Tabellen är ny: divisionens tabell med matchens lag markerade
+  (i cupen lagens placering i var sin division), bakom samma ridå som Tabeller när resultat
+  är dolda. Trolig och bekräftad elva är en stämpel, och utan elva står planen tom med
+  stämpeln Ingen startelva än. Prognosens rutor har bara tecknet och oddset (chansen i
+  procent i rutans title), spelbolagens odds står i en tabell under modellens, och knappen
+  Visa detaljer är borta med källraderna, osäkerhetsspannet och de enkla baslinjerna
 - [x] **Höjdpunkter (2026-10-20):** spelade matcher länkar till Viaplays sammandrag, som
   repriserna på gravergrav.se – en spelikon på matchraden och *Höjdpunkter* med längden
   i matchrutans rubrik. Klippet startar direkt i ett litet eget fönster ovanpå sidan. Klippen är gratis med reklam och kräver
@@ -491,8 +501,8 @@ server:
   sidorna Källor och Modell i sidfoten ([public/kallor.js](public/kallor.js),
   [public/modell.js](public/modell.js); `#utvardering` leder till *I skarpt läge* på
   Modell); matchen öppnas i matchrutan (`#match/<id>`, en `<dialog>` ovanpå sidan man
-  var på – stängs den går man tillbaka dit) med flikarna Matchen, Prognos, Startelvor,
-  Form, Lagen och Domaren och, i Prognos, kortet Analys när matchanalysen är påslagen;
+  var på – stängs den går man tillbaka dit) med flikarna Startelvor (med domaren), Matchen,
+  Prognos, Form, Tabellen och Trupperna och, i Prognos, kortet Analys när matchanalysen är påslagen;
   Startelvor och Matchen hämtas av [public/matchruta.js](public/matchruta.js). Sidorna Tabeller och Statistik
   ([public/tabeller.html](public/tabeller.html), [public/statistik.html](public/statistik.html),
   båda med [public/divisioner.js](public/divisioner.js)). Läser JSON-filerna ovan. Urvalet av kommande/spelade matcher och källornas status

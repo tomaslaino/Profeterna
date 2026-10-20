@@ -118,23 +118,16 @@ dialog.mr-modal::backdrop {
 
 /* ---------- startelvorna ---------- */
 
-.mr-lu-head { display: flex; flex-wrap: wrap; align-items: center; gap: 6px 12px; margin-bottom: 14px; }
-.mr-chip {
-  display: inline-flex;
-  padding: 4px 11px;
-  font-size: 12px;
-  font-weight: 700;
-  letter-spacing: 0.03em;
-  color: var(--ink-soft);
-  background: var(--pill);
-  border: 1px solid var(--pill-line);
-  border-radius: 999px;
-}
-.mr-chip.prob { color: var(--gold-hi); background: rgba(216, 176, 106, 0.1); border-color: rgba(216, 176, 106, 0.45); }
-.mr-chip.ok { color: #8fe0b4; background: var(--up-soft); border-color: rgba(61, 179, 124, 0.45); }
-.mr-src { font-size: 12px; color: var(--muted); }
+.mr-lu-head { margin-bottom: 14px; }
+
+/* Stämpeln (papper.css .pp-stamp): trolig eller bekräftad elva mitt mellan
+   lagens rader, över planens kant; ingen elva än mitt på den tomma planen. */
+.mr-stamp { position: absolute; z-index: 3; top: -2px; left: 50%; transform: translateX(-50%) rotate(-7deg); cursor: default; }
+.mr-stamp.inline { position: static; transform: rotate(-4deg); }
+.mr-pitch.empty .mr-stamp { top: 50%; right: auto; left: 50%; padding: 7px 16px 6px; font-size: 15px; transform: translate(-50%, -50%) rotate(-7deg); }
 
 .mr-pitch-wrap {
+  position: relative;
   display: grid;
   grid-template-columns: 1fr 1fr;
   grid-template-areas: "h a" "p p";
@@ -364,6 +357,7 @@ dialog.mr-modal::backdrop {
     justify-content: center;
   }
   .mr-leg.a { flex-direction: row; }
+  .mr-stamp { left: auto; right: 0; transform: rotate(-7deg); }
   .mr-leg.a .mr-key { margin: 0 7px 0 0; }
   .mr-lines.wide { display: none; }
   .mr-lines.tall { display: block; }

@@ -43,6 +43,7 @@
   const games = new Map(); // matchid → Promise med 365Scores-id (eller null)
   const lineups = new Map();
   const summaries = new Map();
+  const absent = new Map(); // matchid → frånvaron från app.js (FPL) { home, away }
   let current = null; // { root, m, espn }
   let timer = null;
 
@@ -278,58 +279,76 @@
   }
 
   function outList(t) {
-    const row = (x) => `<li${x.raw ? ` title="${esc(x.raw)}"` : ''}>${esc(x.name)} <span class="muted">${esc([x.why, x.back].filter(Boolean).join(' · '))}</span></li>`;
+    const row = (x) => `<li${x.raw ? ` title="${esc(x.raw)}"` : ''}><span class="n">${esc(x.name)}</span> <span class="muted">${esc([x.why, x.back].filter(Boolean).join(' · '))}</span></li>`;
     const gone = t.out.filter((x) => !x.doubtful);
     const unsure = t.out.filter((x) => x.doubtful);
     let h = '';
     if (gone.length) h += `<h5>Saknas</h5><ul class="mr-out">${gone.map(row).join('')}</ul>`;
     if (unsure.length) h += `<h5>Osäkra</h5><ul class="mr-out">${unsure.map(row).join('')}</ul>`;
+    // Frånvaron är känd (FPL) men tom.
+    if (!h && t.outKnown) h = '<h5>Saknas</h5><p class="muted">ingen</p>';
     return h;
   }
 
   function teamBlock(name, t, played, cls, top) {
-    let h = `<div class="mr-team ${cls}"><h4><i class="mr-key"></i>${esc(name)}${t.formation ? ` <span class="hint">${esc(t.formation)}</span>` : ''}</h4>`;
+    let h = `<div class="mr-team ${cls}"><h4><i class="mr-key"></i>${esc(name)}${t.formation && !t.placedBoth ? ` <span class="hint">${esc(t.formation)}</span>` : ''}</h4>`;
     if (t.coach) h += `<p class="mr-coach"><span class="muted">Tränare</span> ${esc(t.coach)}</p>`;
     if (t.starters.length && !t.placedBoth) h += `<h5>Startelva</h5>${playerList(t.starters, played, top)}`;
     if (t.bench.length) h += `<h5>Avbytare</h5>${playerList(t.bench, played, top)}`;
     h += outList(t);
-    if (!t.starters.length && !t.bench.length && !t.out.length) h += '<p class="muted">Inget från 365Scores än.</p>';
     return h + '</div>';
   }
 
-  function renderLineups(m, r) {
+  // Stämpeln på planen: trolig eller bekräftad elva, eller ingen än (då står
+  // planen tom). Källan och tiden står i stämpelns title.
+  function stamp(text, cls, title) {
+    return `<span class="pp-stamp mr-stamp ${cls}" title="${esc(title)}">${text}</span>`;
+  }
+
+  // Lagens rader står ovanför planen på breda skärmar och vid var sin
+  // planhalva på mobilen (bortalaget överst). Stämpeln sitter mellan lagens
+  // rader, över planens kant – på en tom plan mitt på den.
+  function pitch(m, home, away, inner, mark) {
+    const leg = (name, t, cls) => `<div class="mr-leg ${cls}"><i class="mr-key"></i><span class="n">${esc(name)}</span>` +
+      `${t && t.formation ? `<b>${esc(t.formation)}</b>` : ''}</div>`;
+    return `<div class="mr-pitch-wrap">${leg(m.home, home, 'h')}${leg(m.away, away, 'a')}${inner ? mark : ''}` +
+      `<div class="mr-pitch${inner ? '' : ' empty'}">${LINES_WIDE}${LINES_TALL}${inner}${inner ? '' : mark}</div></div>`;
+  }
+
+  function renderLineups(m, r, alt) {
     if (!r) return '<p class="mr-wait">Hämtar startelvorna …</p>';
-    if (r.error) return `<p class="unknown">Kunde inte hämta startelvorna från 365Scores just nu (${esc(r.error)}).</p>`;
-    if (r.none) return '<p class="unknown">Hittade inte matchen hos 365Scores.</p>';
-    const L = r.data;
-    const { home, away } = L;
+    const L = r.data || null;
+    const blank = { status: '', formation: null, starters: [], placed: false, bench: [], coach: null, out: [] };
+    // Kopior: placedBoth och frånvaron sätts här och ska inte följa med i cachen.
+    const home = { ...(L ? L.home : blank) };
+    const away = { ...(L ? L.away : blank) };
+    // 365Scores lista över vilka som saknas gäller just den här matchen. Har
+    // 365Scores ingenting om matchen än står FPL:s lista där (Premier League).
+    const has = (t) => t.starters.length || t.bench.length || t.out.length;
+    if (alt && !has(home) && !has(away)) {
+      for (const [t, a] of [[home, alt.home], [away, alt.away]]) if (a) { t.out = a; t.outKnown = true; }
+    }
     const both = home.placed && away.placed;
     home.placedBoth = both;
     away.placedBoth = both;
+    const played = Boolean(L && L.played) || m.completed;
+    const top = played && L ? L.top : null;
+    const at = `365Scores, hämtat ${fClock.format(new Date(r.at))}`;
     const confirmed = (t) => /^confirmed$/i.test(t.status);
     const any = home.starters.length || away.starters.length;
-    // När elvorna brukar komma står i chipets tooltip.
-    let chip = '';
-    if (!any) {
-      chip = `<span class="mr-chip none" title="${PROBABLE.has(m.comp)
-        ? 'Trolig elva några dagar före, bekräftad ungefär en timme före avspark'
-        : 'Bekräftad ungefär en timme före avspark'}">Ingen startelva än</span>`;
-    }
-    else if (L.played || m.completed) chip = '';
-    else if (confirmed(home) && confirmed(away)) chip = '<span class="mr-chip ok">Bekräftad startelva</span>';
-    else chip = '<span class="mr-chip prob" title="Bedömd av 365Scores · bekräftad ungefär en timme före avspark">Trolig startelva</span>';
-    let h = `<div class="mr-lu-head">${chip}<span class="mr-src">365Scores, hämtat ${esc(fClock.format(new Date(r.at)))}</span></div>`;
-    const played = L.played || m.completed;
-    const top = played ? L.top : null;
+    let h = '';
     if (both) {
-      // Lagens rader står ovanför planen på breda skärmar och vid var sin
-      // planhalva på mobilen (bortalaget överst).
-      const leg = (name, t, cls) => `<div class="mr-leg ${cls}"><i class="mr-key"></i><span class="n">${esc(name)}</span>` +
-        `${t.formation ? `<b>${esc(t.formation)}</b>` : ''}</div>`;
-      h += `<div class="mr-pitch-wrap">${leg(m.home, home, 'h')}${leg(m.away, away, 'a')}` +
-        `<div class="mr-pitch">${LINES_WIDE}${LINES_TALL}${spots(home, 'h', top)}${spots(away, 'a', top)}</div></div>`;
+      const mark = played ? ''
+        : confirmed(home) && confirmed(away) ? stamp('Bekräftad', 'ok', at)
+          : stamp('Trolig elva', 'prob', `Bedömd av 365Scores · bekräftad ungefär en timme före avspark · ${at}`);
+      h += pitch(m, home, away, spots(home, 'h', top) + spots(away, 'a', top), mark);
+    } else if (!any) {
+      const when = PROBABLE.has(m.comp) ? 'Trolig elva några dagar före, bekräftad ungefär en timme före avspark' : 'Bekräftad ungefär en timme före avspark';
+      h += pitch(m, null, null, '', stamp('Ingen startelva än', 'none', r.error ? `Kunde inte hämta från 365Scores (${r.error})` : when));
+    } else if (!played) {
+      h += `<div class="mr-lu-head">${stamp(confirmed(home) && confirmed(away) ? 'Bekräftad' : 'Trolig elva', 'inline', at)}</div>`;
     }
-    const some = (t) => t.starters.length || t.bench.length || t.out.length || t.coach;
+    const some = (t) => has(t) || t.coach || t.outKnown;
     if (some(home) || some(away)) h += `<div class="mr-teams">${teamBlock(m.home, home, played, 'h', top)}${teamBlock(m.away, away, played, 'a', top)}</div>`;
     return h;
   }
@@ -427,7 +446,7 @@
         body = `<span class="mr-in">${esc(ps[0] || '')}</span><span class="sub">ut ${esc(ps[1] || '')}</span>`;
       }
       const cell = `<div class="mr-evx">${ic}<div>${body}</div></div>`;
-      return `<div class="mr-ev${/substitution/.test(t) ? ' subst' : ''}">${home ? cell : '<div></div>'}<span class="mr-min">${min}</span>${home ? '<div></div>' : cell}</div>`;
+      return `<div class="mr-ev${/substitution/.test(t) ? ' subst' : e.scoringPlay ? ' goal' : ''}">${home ? cell : '<div></div>'}<span class="mr-min">${min}</span>${home ? '<div></div>' : cell}</div>`;
     }).join('');
     return `<div class="card mr-events"><h4>Händelser</h4>${rows}</div>`;
   }
@@ -444,8 +463,7 @@
     let h = '';
     if (st.state === 'pre') return '<p class="muted">Matchen har inte börjat än.</p>';
     if (st.state === 'in') {
-      h += `<p class="mr-live"><i></i>Pågår · ${esc(st.shortDetail || st.detail || '')} · <b>${esc(hc.score)}–${esc(ac.score)}</b>` +
-        ` <span class="muted">uppdateras varje minut</span></p>`;
+      h += `<p class="mr-live"><i></i>Pågår · ${esc(st.shortDetail || st.detail || '')} · <b>${esc(hc.score)}–${esc(ac.score)}</b></p>`;
     } else if (!m.score && hc.score != null) {
       h += `<p class="mr-live done">Slut · <b>${esc(hc.score)}–${esc(ac.score)}</b></p>`;
     }
@@ -453,7 +471,6 @@
     h += statsBlock(d.boxscore, homeId);
     const gi = d.gameInfo || {};
     if (gi.attendance) h += `<p class="mr-facts">Publik <b>${Number(gi.attendance).toLocaleString('sv-SE')}</b></p>`;
-    h += `<p class="src-line">ESPN, hämtat ${esc(fClock.format(new Date(r.at)))}.</p>`;
     return h;
   }
 
@@ -464,7 +481,7 @@
     const { root, m } = current;
     if (kind === 'lineups') {
       const el = root.querySelector('[data-mr-lineups]');
-      if (el && el.dataset.mrLineups === m.id) el.innerHTML = renderLineups(m, lineups.get(m.id));
+      if (el && el.dataset.mrLineups === m.id) el.innerHTML = renderLineups(m, lineups.get(m.id), absent.get(m.id));
     } else {
       const el = root.querySelector('[data-mr-events]');
       if (el && el.dataset.mrEvents === m.id) el.innerHTML = renderEvents(m, summaries.get(m.id));
@@ -490,7 +507,11 @@
 
   // app.js ritar platshållarna och lämnar sedan över rutan.
   window.Matchruta = {
-    lineupPane: (m) => `<div class="mr-lineups" data-mr-lineups="${esc(m.id)}"><p class="mr-wait">Hämtar startelvorna …</p></div>`,
+    // alt = frånvaron från Fantasy Premier League { home, away } (null = okänd).
+    lineupPane: (m, alt) => {
+      absent.set(m.id, alt || null);
+      return `<div class="mr-lineups" data-mr-lineups="${esc(m.id)}"><p class="mr-wait">Hämtar startelvorna …</p></div>`;
+    },
     eventsPane: (m) => `<div class="mr-matchen" data-mr-events="${esc(m.id)}"><p class="mr-wait">Hämtar matchen …</p></div>`,
     hydrate(root, d, espn) {
       const same = current && current.m.id === d.match.id;

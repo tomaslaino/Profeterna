@@ -134,7 +134,7 @@ dialog.mr-modal .mr-tabs {
   padding: 0;
   border-bottom: 1.5px solid var(--pp-print);
 }
-dialog.mr-modal .mr-tabs button { padding: 13px 0 11px; color: var(--pp-ink-soft); }
+dialog.mr-modal .mr-tabs button { padding: 13px 0 11px; font-size: 15px; color: var(--pp-ink-soft); }
 dialog.mr-modal .mr-tabs button:hover,
 dialog.mr-modal .mr-tabs button[aria-selected="true"] { color: var(--pp-ink); }
 dialog.mr-modal .mr-tabs button[aria-selected="true"]::after {
@@ -162,6 +162,10 @@ dialog.mr-modal .mr-team {
 }
 dialog.mr-modal .mr-pane > .card:first-child,
 dialog.mr-modal .mr-pane > :first-child > .card:first-child { padding-top: 0; border-top: 0; }
+/* två lag sida vid sida överst (Trupperna): båda utan linje ovanför */
+@media (min-width: 641px) {
+  dialog.mr-modal .mr-pane > .mr-teams:first-child > .card { padding-top: 0; border-top: 0; }
+}
 dialog.mr-modal .mr-body .grid2 { gap: 0 32px; }
 dialog.mr-modal .mr-teams { gap: 0 32px; }
 dialog.mr-modal .card .table-wrap,
@@ -174,11 +178,14 @@ dialog.mr-modal table.side tr.group td { color: var(--pp-print); background: var
 dialog.mr-modal table.cmp tr.model td { color: var(--pp-ink); background: var(--pp-print-tint); }
 dialog.mr-modal .tug-stack { border-radius: 2px; }
 
-dialog.mr-modal .detail-foot a { color: var(--pp-ink-soft); }
+/* hemmalaget blått, bortalaget terrakotta: pricken framför lagets namn */
+dialog.mr-modal .a .mr-key,
+dialog.mr-modal .mr-key.a { background: var(--o-away); }
+dialog.mr-modal .card h4 .mr-key { width: 8px; height: 8px; margin-right: 8px; }
 
 /* ---------- prognosen: kupongens rutor ---------- */
 
-dialog.mr-modal .card.fc { overflow: visible; padding-bottom: 14px; }
+dialog.mr-modal .card.fc { position: relative; overflow: visible; padding-bottom: 14px; }
 dialog.mr-modal .fc-main {
   grid-template-columns: repeat(3, minmax(0, 1fr));
   gap: 14px;
@@ -215,7 +222,7 @@ dialog.mr-modal .fc-note {
 }
 dialog.mr-modal .fc-box {
   position: relative;
-  padding: 10px 8px 9px;
+  padding: 10px 8px 14px;
   background: var(--pp-box);
   border: 1.5px solid var(--pp-print);
   border-radius: 3px;
@@ -239,15 +246,6 @@ dialog.mr-modal .fc-col.draw .fc-num {
   font-weight: 700;
   line-height: 1.08;
   color: var(--pp-ink);
-}
-dialog.mr-modal .fc-range { margin-top: 2px; font-size: 12px; color: var(--pp-ink-soft); }
-dialog.mr-modal .fc-pct {
-  margin-top: 8px;
-  font-size: 11px;
-  font-weight: 800;
-  letter-spacing: 0.12em;
-  color: var(--pp-print);
-  font-variant-numeric: tabular-nums;
 }
 /* modellens ring runt oddset och utfallets ring runt rutan (papper.js) */
 dialog.mr-modal .fc-pen,
@@ -328,7 +326,7 @@ dialog.mr-modal .fc-graded .pp-tick { width: 34px; height: 34px; }
 dialog.mr-modal .fc-two .unknown { margin: 0; }
 
 dialog.mr-modal .fc-adv { margin-top: 16px; }
-dialog.mr-modal .fc-scores { margin-top: 18px; font-size: 14px; }
+dialog.mr-modal .fc-scores { flex: 1; min-width: 0; margin-top: 18px; font-size: 14px; }
 dialog.mr-modal .fc-scores summary { color: var(--pp-pen); }
 dialog.mr-modal table.sgrid td {
   background: color-mix(in srgb, var(--pp-print) calc(var(--a) * 0.45), var(--pp-box));
@@ -336,16 +334,132 @@ dialog.mr-modal table.sgrid td {
 }
 dialog.mr-modal table.sgrid th { color: var(--pp-ink-soft); }
 
-/* det finstilta och stämpeln längst ner */
-dialog.mr-modal .fc-fine {
-  display: flex;
-  align-items: flex-end;
-  justify-content: space-between;
-  gap: 18px;
-  margin-top: 18px;
+/* Alla resultat och stämpeln I journalen på samma rad; Rättad står efter
+   bocken eller krysset */
+dialog.mr-modal .fc-foot { display: flex; align-items: flex-start; justify-content: space-between; gap: 18px; }
+dialog.mr-modal .fc-foot .fc-stamp { flex: none; margin: 16px 6px 0 auto; }
+dialog.mr-modal .fc-graded .fc-stamp { margin-left: 10px; }
+dialog.mr-modal .fc .note { margin: 14px 0 0; font-size: 13px; }
+
+/* spelbolagen: modellen överst, bolagens odds under */
+dialog.mr-modal table.cmp td:first-child { white-space: nowrap; }
+dialog.mr-modal table.cmp tr.model td { font-weight: 700; }
+dialog.mr-modal table.facit { margin-top: 18px; }
+dialog.mr-modal table.facit td.hit { box-shadow: inset 0 -2px 0 var(--pp-pen); }
+
+/* vad drog åt vilket håll */
+dialog.mr-modal .tug-more { margin: 16px 0 0; font-size: 13px; text-align: right; }
+dialog.mr-modal .tug-more a { color: var(--pp-pen); }
+
+/* ---------- Form ---------- */
+
+dialog.mr-modal .form-row { margin: 0; padding: 9px 0; border-bottom: 1px solid var(--hair); }
+dialog.mr-modal .form-row:last-child { border-bottom: 0; }
+dialog.mr-modal .form-row .t { display: flex; align-items: center; min-width: 0; font-size: 15px; font-weight: 650; }
+dialog.mr-modal .form { gap: 5px; flex-wrap: nowrap; }
+/* formen som stämplade rutor: grön vinst, grå oavgjort, röd förlust */
+dialog.mr-modal .form span {
+  width: 27px;
+  height: 27px;
+  font-family: var(--display);
+  font-size: 13px;
+  color: var(--pp-pencil);
+  background: var(--pp-box);
+  border: 1.5px solid currentColor;
+  border-radius: 3px;
 }
-dialog.mr-modal .fc-fine .src-line { margin: 0; font-size: 11px; line-height: 1.5; color: var(--pp-ink-soft); }
-dialog.mr-modal .fc-stamp { flex: none; margin: 0 6px 4px auto; text-align: center; line-height: 1.35; }
+dialog.mr-modal .form .V { color: var(--pp-ok); background: var(--pp-box); }
+dialog.mr-modal .form .F { color: var(--pp-no); background: var(--pp-box); }
+dialog.mr-modal .form .O { color: var(--pp-pencil); background: var(--pp-box); }
+
+/* inbördes möten: hemmalaget, ställningen och bortalaget i linje */
+dialog.mr-modal .mf-meet ul { margin: 0; padding: 0; list-style: none; }
+dialog.mr-modal .mf-meet li {
+  display: grid;
+  grid-template-columns: 9.5rem minmax(0, 1fr) 3.6rem minmax(0, 1fr);
+  align-items: baseline;
+  gap: 0 10px;
+  padding: 7px 0;
+  font-size: 14px;
+  border-bottom: 1px solid var(--hair);
+}
+dialog.mr-modal .mf-meet li:last-child { border-bottom: 0; }
+dialog.mr-modal .mf-meet .w { font-size: 12px; color: var(--muted); font-variant-numeric: tabular-nums; white-space: nowrap; }
+dialog.mr-modal .mf-meet .h { text-align: right; }
+dialog.mr-modal .mf-meet .h,
+dialog.mr-modal .mf-meet .a { min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+dialog.mr-modal .mf-meet b { font-family: var(--display); font-size: 17px; font-weight: 700; text-align: center; white-space: nowrap; }
+dialog.mr-modal table.side th .mr-key { margin: 0 8px 0 0; }
+dialog.mr-modal table.side th .mr-key.a { margin: 0 0 0 8px; }
+
+/* ---------- Tabellen ---------- */
+
+/* fasta kolumner, så att två tabeller under varandra (cupen) linjerar */
+dialog.mr-modal table.mt-table { table-layout: fixed; }
+dialog.mr-modal table.mt-table th,
+dialog.mr-modal table.mt-table td { padding: 7px 8px; }
+dialog.mr-modal table.mt-table th.num { width: 3rem; }
+dialog.mr-modal table.mt-table th.num:nth-child(7) { width: 4.6rem; }
+dialog.mr-modal table.mt-table .c { width: 2.6rem; text-align: center; }
+dialog.mr-modal table.mt-table td.team { overflow: hidden; text-overflow: ellipsis; }
+dialog.mr-modal table.mt-table td.rank { color: var(--pp-ink-soft); font-variant-numeric: tabular-nums; }
+dialog.mr-modal table.mt-table td.team { white-space: nowrap; }
+dialog.mr-modal table.mt-table td.pts { font-weight: 700; }
+dialog.mr-modal table.mt-table tr.mine td { font-weight: 700; color: var(--pp-ink); background: rgba(47, 111, 214, 0.09); }
+dialog.mr-modal table.mt-table tr.mine.a td { background: rgba(208, 100, 44, 0.1); }
+dialog.mr-modal table.mt-table tr.gap td { padding: 2px; text-align: center; color: var(--muted); }
+dialog.mr-modal table.mt-table tr.z-up td.rank { color: var(--pp-ok); box-shadow: inset 3px 0 0 var(--pp-ok); }
+dialog.mr-modal table.mt-table tr.z-eu td.rank { color: var(--pp-pen); box-shadow: inset 3px 0 0 var(--pp-pen); }
+dialog.mr-modal table.mt-table tr.z-po td.rank { color: var(--stale); box-shadow: inset 3px 0 0 var(--stale); }
+dialog.mr-modal table.mt-table tr.z-down td.rank { color: var(--pp-no); box-shadow: inset 3px 0 0 var(--pp-no); }
+dialog.mr-modal .mt-zones { display: flex; flex-wrap: wrap; gap: 6px 18px; margin: 14px 0 0; font-size: 12px; color: var(--muted); }
+dialog.mr-modal .mt-zones i { display: inline-block; width: 10px; height: 10px; margin-right: 6px; vertical-align: -1px; border-radius: 2px; }
+dialog.mr-modal .mt-zones .z-up i { background: var(--pp-ok); }
+dialog.mr-modal .mt-zones .z-eu i { background: var(--pp-pen); }
+dialog.mr-modal .mt-zones .z-po i { background: var(--stale); }
+dialog.mr-modal .mt-zones .z-down i { background: var(--pp-no); }
+
+/* ---------- Trupperna ---------- */
+
+dialog.mr-modal .mv-squad h4,
+dialog.mr-modal .mr-team h4 {
+  display: flex;
+  align-items: center;
+  margin: 0 0 6px;
+  font-family: var(--display);
+  font-size: 20px;
+  font-weight: 700;
+  letter-spacing: 0;
+  text-transform: none;
+  color: var(--pp-ink);
+}
+dialog.mr-modal .mv-squad h4 .mr-key,
+dialog.mr-modal .mr-team h4 .mr-key { width: 9px; height: 9px; margin-right: 9px; }
+dialog.mr-modal .mv-facts { color: var(--pp-ink-soft); }
+dialog.mr-modal .mv-full { margin-top: 14px; font-size: 14px; }
+dialog.mr-modal .mv-full summary { color: var(--pp-pen); }
+
+/* ---------- domaren under startelvorna, som i ett matchprogram ---------- */
+
+dialog.mr-modal .card.ref { margin-top: 10px; }
+dialog.mr-modal .ref-name { display: flex; flex-wrap: wrap; align-items: baseline; gap: 2px 12px; margin: 0 0 14px; }
+dialog.mr-modal .ref-name b { font-family: var(--display); font-size: 20px; font-weight: 700; }
+dialog.mr-modal .ref-name .muted { font-size: 13px; }
+dialog.mr-modal .ref-figs { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 12px; }
+dialog.mr-modal .ref-figs > div {
+  display: grid;
+  justify-items: center;
+  gap: 3px;
+  padding: 11px 6px 10px;
+  text-align: center;
+  background: var(--pp-box);
+  border: 1.5px solid var(--pp-print);
+  border-radius: 3px;
+}
+dialog.mr-modal .ref-figs b { font-family: var(--display); font-size: 26px; font-weight: 700; line-height: 1.05; white-space: nowrap; }
+dialog.mr-modal .ref-figs span { font-size: 10.5px; font-weight: 800; letter-spacing: 0.14em; text-transform: uppercase; color: var(--pp-print); }
+dialog.mr-modal .ref-figs small { font-size: 12px; color: var(--pp-ink-soft); }
+dialog.mr-modal .ref-flag { margin-left: 3px; font-size: 12px; color: var(--pp-no); vertical-align: 4px; }
 
 /* ---------- startelvorna: planen tryckt på papperet ---------- */
 
@@ -363,8 +477,17 @@ dialog.mr-modal .mr-nm { color: var(--pp-ink); text-shadow: 0 0 3px var(--pp-box
 dialog.mr-modal .mr-dot .mr-rt { color: var(--pp-paper); background: var(--pp-ink); box-shadow: none; }
 dialog.mr-modal .mr-dot .mr-rt.top { color: #f0d699; box-shadow: 0 0 0 1px #d8b06a; }
 dialog.mr-modal .mr-names .mr-rt.top { color: var(--pp-print); }
-dialog.mr-modal .mr-chip.ok { color: var(--pp-ok); }
+/* stämpeln: trolig elva i pennans blå, bekräftad i grönt, ingen än i tryckets färg */
+dialog.mr-modal .mr-stamp.prob { --pp-stamp: var(--pp-pen); }
+dialog.mr-modal .mr-stamp.ok { --pp-stamp: var(--pp-ok); }
+dialog.mr-modal .mr-stamp.none { --pp-stamp: var(--pp-print); }
+dialog.mr-modal .mr-pitch.empty .mr-pl { display: none; }
+dialog.mr-modal .mr-coach { margin: 0 0 4px; }
+dialog.mr-modal .mr-out .n { font-weight: 600; }
 dialog.mr-modal .mr-off { color: var(--pp-no); }
+/* målen i händelserna: ställningen i tryckets siffror på en tonad rad */
+dialog.mr-modal .mr-ev.goal { background: var(--pp-print-tint); }
+dialog.mr-modal .mr-ev.goal .mr-score { font-size: 18px; color: var(--pp-ink); }
 dialog.mr-modal .mr-on { color: var(--pp-ok); }
 
 @media (max-width: 760px) {
@@ -388,7 +511,8 @@ dialog.mr-modal .mr-on { color: var(--pp-ok); }
   dialog.mr-modal .mr-head .mhead-meta { font-size: 12px; }
   dialog.mr-modal .mr-close { top: 18px; right: 14px; }
   dialog.mr-modal .mr-band { margin: 14px 16px 0; }
-  dialog.mr-modal .mr-tabs { gap: 18px; margin: 0 16px; }
+  /* flikarna fyller raden från kant till kant; får de inte plats rullar de */
+  dialog.mr-modal .mr-tabs { gap: 12px; justify-content: space-between; margin: 0 16px; }
   dialog.mr-modal .mr-tabs button { padding: 11px 0 10px; }
   dialog.mr-modal .mr-body { padding: 20px 16px 30px; }
   dialog.mr-modal .mr-teams { gap: 0; }
@@ -397,8 +521,16 @@ dialog.mr-modal .mr-on { color: var(--pp-ok); }
   dialog.mr-modal .fc-box { padding: 8px 4px 7px; }
   dialog.mr-modal .fc-num,
   dialog.mr-modal .fc-col.draw .fc-num { font-size: 28px; }
-  dialog.mr-modal .fc-range { font-size: 11px; }
   dialog.mr-modal .fc-note { top: -24px; font-size: 20px; }
   dialog.mr-modal .fc-pen { top: -18%; height: 138%; }
   dialog.mr-modal .fc-two { grid-template-columns: 1fr; gap: 22px; }
+  dialog.mr-modal .mr-tabs button { font-size: 14px; }
+  dialog.mr-modal .mf-meet li { grid-template-columns: minmax(0, 1fr) 3.2rem minmax(0, 1fr); }
+  dialog.mr-modal .mf-meet .w { grid-column: 1 / -1; text-align: center; }
+  dialog.mr-modal .form span { width: 24px; height: 24px; font-size: 12px; }
+  dialog.mr-modal .form { gap: 4px; }
+  dialog.mr-modal .ref-figs { grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 8px; }
+  dialog.mr-modal table.mt-table .hide-sm { display: none; }
+  dialog.mr-modal table.mt-table th,
+  dialog.mr-modal table.mt-table td { padding: 7px 6px; }
 }
