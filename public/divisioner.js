@@ -514,11 +514,20 @@ function playerTableHtml(P) {
     `<p class="dv-count" id="dv-count">${list.length} spelare${f.played ? ' som spelat' : ''}${f.team || f.pos || f.q ? ' med filtret' : ''}</p></div>`;
 }
 
-function leaderCard(title, list, value, { empty = 'inga än', note, top, tip } = {}) {
+// En rad i en topplista: spelaren med laget under namnet, eller laget med
+// placeringen i tabellen under – lika höga rader under Spelarna och Lagen.
+const playerRow = (p) => ({ attr: `data-pid="${esc(p.id)}"`, name: p.name, sub: p.team });
+const teamRow = (t) => ({ attr: t.espnId ? `data-team="${esc(t.espnId)}"` : 'disabled', name: t.name, sub: `${ordinal(t.rank)} plats` });
+const leaderLi = (x, i, value, who) => {
+  const r = who(x);
+  return `<li><button type="button" class="dv-lrow" ${r.attr}>` +
+    `<span class="dv-lrank">${i + 1}</span><span class="dv-lname">${esc(r.name)}<small>${esc(r.sub)}</small></span>` +
+    `<span class="dv-lval">${value(x)}</span></button></li>`;
+};
+
+function leaderCard(title, list, value, { empty = 'inga än', note, top, tip, who = playerRow } = {}) {
   const rows = list.length
-    ? list.map((p, i) => `<li><button type="button" class="dv-lrow" data-pid="${esc(p.id)}">` +
-      `<span class="dv-lrank">${i + 1}</span><span class="dv-lname">${esc(p.name)}<small>${esc(p.team)}</small></span>` +
-      `<span class="dv-lval">${value(p)}</span></button></li>`).join('')
+    ? list.map((x, i) => leaderLi(x, i, value, who)).join('')
     : `<li class="dv-lempty">${esc(empty)}</li>`;
   return `<section class="dv-leader"><h4${tipAttr(title, tip)}>${esc(title)}</h4><ol>${rows}</ol>` +
     (note ? `<p class="dv-lnote">${note}</p>` : '') +
@@ -529,16 +538,14 @@ function leaderCard(title, list, value, { empty = 'inga än', note, top, tip } =
 // vy så att knappen Topp 20 kan öppna den.
 const tops = new Map();
 function topCard(key, title, list, value, opts = {}) {
-  tops.set(key, { title, list, value, note: opts.note });
+  tops.set(key, { title, list, value, note: opts.note, who: opts.who || playerRow });
   return leaderCard(title, list.slice(0, 5), value, { ...opts, top: list.length > 5 ? key : null });
 }
 
 function openTop(key) {
   const t = tops.get(key);
   if (!t) return;
-  const rows = t.list.slice(0, 20).map((p, i) => `<li><button type="button" class="dv-lrow" data-pid="${esc(p.id)}">` +
-    `<span class="dv-lrank">${i + 1}</span><span class="dv-lname">${esc(p.name)}<small>${esc(p.team)}</small></span>` +
-    `<span class="dv-lval">${t.value(p)}</span></button></li>`).join('');
+  const rows = t.list.slice(0, 20).map((x, i) => leaderLi(x, i, t.value, t.who)).join('');
   showModal(mhead(null, t.title, [`${esc(divName())} · topp ${Math.min(20, t.list.length)}`]) +
     `<ol class="dv-toplist">${rows}</ol>` + mfoot(t.note ? [t.note] : []));
 }
@@ -557,7 +564,7 @@ function playersView(dv, P) {
   const t = P.totals;
   const f = state.pf;
   const teams = [...P.teams].sort((a, b) => a.name.localeCompare(b.name, 'sv'));
-  let html = `<p class="dv-viewsub">Ligamatcher ${esc(state.data.season)}</p>`;
+  let html = '';
   // Tre topplistor, samma i alla divisioner. Resten (xG, kort, skott) går
   // att sortera fram i tabellen Alla spelare. Betygen ersätter målvakterna
   // när de finns (målvakterna finns kvar under Försvar i tabellen).
@@ -779,16 +786,13 @@ function teamRows(T, P) {
   return T.teams.map((t) => ({ ...t, sq: t.espnId ? sq.get(t.espnId) || null : null }));
 }
 
-// Lagen som topplistor: en rad per lag, bara namnet och talet – vad talet
-// betyder står i rubrikens förklaring. Raderna öppnar lagkortet när det finns.
-function teamTop(title, list, value, { tip, asc = false, get } = {}) {
+// Lagen som topplistor, byggda som spelarnas: placeringen under namnet och
+// Topp 20 under listan – vad talet betyder står i rubrikens förklaring.
+// Raderna öppnar lagkortet när det finns.
+function teamTop(key, title, list, value, { tip, asc = false, get } = {}) {
   const rows = list.filter((t) => get(t) != null)
-    .sort((a, b) => (asc ? get(a) - get(b) : get(b) - get(a)) || a.name.localeCompare(b.name, 'sv')).slice(0, 5);
-  const li = rows.map((t, i) => `<li><button type="button" class="dv-lrow"${t.espnId ? ` data-team="${esc(t.espnId)}"` : ' disabled'}>` +
-    `<span class="dv-lrank">${i + 1}</span><span class="dv-lname">${esc(t.name)}</span>` +
-    `<span class="dv-lval">${value(t)}</span></button></li>`).join('');
-  return `<section class="dv-leader"><h4${tipAttr(title, tip)}>${esc(title)}</h4>` +
-    `<ol>${li || '<li class="dv-lempty">okänt</li>'}</ol></section>`;
+    .sort((a, b) => (asc ? get(a) - get(b) : get(b) - get(a)) || a.name.localeCompare(b.name, 'sv'));
+  return topCard(key, title, rows, value, { tip, empty: 'okänt', who: teamRow });
 }
 
 function teamsView(dv, P, T) {
@@ -819,10 +823,11 @@ function teamsView(dv, P, T) {
   // oddsen står i tabellen Alla lag.
   const strength = (t) => `<b>${delta(t.str, { d: 2, dead: 0.005 })}</b>`;
   const strTip = 'Modellens väntade målskillnad per match mot ett snittlag i divisionen, med motståndet inräknat.';
+  tops.clear();
   const leaders =
-    teamTop('Starkast', all, strength, { get: (t) => t.str, tip: strTip }) +
-    teamTop('Svagast', all, strength, { get: (t) => t.str, asc: true, tip: strTip }) +
-    teamTop('Kryssar gärna', all, (t) => `<b>${pct(xdraw(t))}</b>`,
+    teamTop('strong', 'Starkast', all, strength, { get: (t) => t.str, tip: strTip }) +
+    teamTop('weak', 'Svagast', all, strength, { get: (t) => t.str, asc: true, tip: strTip }) +
+    teamTop('draws', 'Kryssar gärna', all, (t) => `<b>${pct(xdraw(t))}</b>`,
       { get: xdraw, tip: 'Chansen till oavgjort i lagets matcher, i snitt, räknat ur båda lagens xG.' });
 
   return '<div class="dv-leaders">' + leaders + '</div>' +
@@ -853,7 +858,9 @@ function dialog() {
       const t = e.target.closest('[data-mtab]');
       if (t) { selectMtab(t.dataset.mtab); return; }
       const p = e.target.closest('[data-pid]');
-      if (p && d.contains(p)) openPlayer(p.dataset.pid);
+      if (p && d.contains(p)) { openPlayer(p.dataset.pid); return; }
+      const tm = e.target.closest('[data-team]');
+      if (tm && d.contains(tm)) openTeam(tm.dataset.team);
     });
     // Piltangenterna mellan flikarna.
     d.addEventListener('keydown', (e) => {

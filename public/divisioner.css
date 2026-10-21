@@ -185,7 +185,6 @@
 .dv-views a[aria-current="page"] { color: var(--bone, var(--fg)); }
 .dv-views a[aria-current="page"]::after { transform: scaleX(1); }
 .dv-views a:focus-visible { outline-offset: 3px; border-radius: 3px; }
-.dv-viewsub { margin: 0 0 12px; color: var(--muted); font-size: 14px; }
 
 .dv-view { min-height: 40vh; }
 .dv-sechead { margin: 26px 0 12px; }
