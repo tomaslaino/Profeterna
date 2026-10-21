@@ -1,6 +1,6 @@
 /* Slitaget på papperet (slitage.js): två bilder över papperet – den första
-   multipliceras med trycket (gulning, veck, fläckar, kaffe), den andra
-   lägger det ljusa överst (nött tryck i vecken, hundörat).
+   multipliceras med trycket (gulning, skrynkel, fläckar), den andra
+   lägger det ljusa överst (skrynklets ljusa sidor, hundörat).
    Över allt på papperet, också raderna som står kvar när man bläddrar
    (z-index 3), så att de inte blir ljusa remsor i det gulnade, och utan att
    ta emot klick. */
@@ -21,7 +21,7 @@
 dialog.mr-modal #match-detail-view[data-sl] { position: relative; }
 
 /* Där innehållet rullar i papperet (matchbladets flikar, raderna på kupongen
-   som växer fram) ligger vecken, fläckarna och kaffet i rutan och följer med
+   som växer fram) ligger skrynklet och fläckarna i rutan och följer med
    innehållet; --sl-h är hur långt innehållet räcker. */
 [data-sl-roll] { position: relative; }
 [data-sl-roll]::before,
