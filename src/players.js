@@ -470,41 +470,6 @@ function goalTypesFor(compId) {
   return v;
 }
 
-// Målen i hela ligan ur matchrapporterna (alla matcher, inte bara de
-// trupperna hunnit föra in): när de görs, per kvart – tilläggstiden räknas
-// till halvlekens sista kvart – och hur, där rapporterna beskriver målen.
-const QUARTERS = [[1, 15], [16, 30], [31, 45], [46, 60], [61, 75], [76, 90]];
-const HOW = [
-  ['nick', (x) => x.s === 'n'],
-  ['straff', (x) => x.s === 's'],
-  ['frispark', (x) => x.s === 'f'],
-  ['utifrån', (x) => x.u],
-  ['självmål', (x) => x.o],
-  ['inifrån', () => true],
-];
-function leagueGoals(compId) {
-  const c = readCache(`espn_minutes_${compId}`);
-  if (!c || !c.data || !c.data.matches) return null;
-  const matches = Object.values(c.data.matches).filter((m) => Array.isArray(m.g));
-  if (!matches.length) return null;
-  const goals = matches.flatMap((m) => m.g);
-  const when = QUARTERS.map(([from, to]) => ({ from, to, goals: 0 }));
-  for (const x of goals) {
-    const q = when.find((w) => x.m >= w.from && x.m <= w.to) || (x.m > 90 ? when[when.length - 1] : null);
-    if (q) q.goals++;
-  }
-  const detailed = matches.filter((m) => m.d === 1);
-  const plain = matches.filter((m) => m.d === 0).length;
-  let how = null;
-  if (detailed.length > plain) {
-    const counts = new Map(HOW.map(([k]) => [k, 0]));
-    const dg = detailed.flatMap((m) => m.g);
-    for (const x of dg) { const k = HOW.find(([, test]) => test(x))[0]; counts.set(k, counts.get(k) + 1); }
-    how = { matches: detailed.length, goals: dg.length, kinds: [...counts].map(([kind, n]) => ({ kind, goals: n })) };
-  }
-  return { fetchedAt: c.fetchedAt, matches: matches.length, goals: goals.length, when, how };
-}
-
 // Mål minus xG (FPL:s egna mål, så att båda gäller samma matcher).
 const overXg = (r) => (r.xg != null && r.fg != null ? Math.round((r.fg - r.xg) * 100) / 100 : null);
 
@@ -625,7 +590,6 @@ function divisionPlayers(compId) {
     // Målens sort och betydelse ur matchrapporterna (alla fyra ligor).
     // matched av of = spelare med statistik vars mål går att följa.
     goalTypes: goalTypes ? { provider: 'ESPN', fetchedAt: goalTypes.fetchedAt, matched: goalTypes.matched, of: goalTypes.of, kinds: goalTypes.kinds } : null,
-    leagueGoals: leagueGoals(compId),
     // Betygen från 365Scores. matched av of = spelare med statistik som har
     // betyg; games av played = ligamatcher med betyg.
     ratings: ratings

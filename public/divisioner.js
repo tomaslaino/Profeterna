@@ -593,35 +593,6 @@ function playersView(dv, P) {
   return html;
 }
 
-// När och hur målen görs i hela ligan (ur matchrapporterna) – står under
-// lagen, eftersom det gäller ligan och inte enskilda spelare.
-const HOW_LABEL = {
-  inifrån: 'Skott i straffområdet', utifrån: 'Skott utanför straffområdet', nick: 'Nick',
-  straff: 'Straff', frispark: 'Frispark', självmål: 'Självmål',
-};
-function leagueGoalsCards(P) {
-  const G = P && !P.unknown ? P.leagueGoals : null;
-  if (!G || !G.goals) return '';
-  const share = (n, of) => pct(n / of);
-  const src = `ESPN:s matchrapporter, hämtat ${when(G.fetchedAt)}`;
-  const how = G.how ? [...G.how.kinds].sort((a, b) => b.goals - a.goals) : null;
-  return '<div class="dv-grid2">' +
-    card('När görs målen?', {
-      hint: `${int(G.goals)} mål i ${int(G.matches)} matcher`,
-      tip: 'Målen per kvart. Tilläggstiden räknas till halvlekens sista kvart.',
-      body: barList(G.when, { label: (w) => `${w.from}–${w.to} min`, value: (w) => w.goals, fmt: (w) => share(w.goals, G.goals), sub: (w) => `${w.goals} mål` }),
-      src,
-    }) +
-    (how
-      ? card('Hur görs målen?', {
-        hint: `${int(G.how.goals)} mål i ${int(G.how.matches)} matcher`,
-        body: barList(how, { label: (k) => esc(HOW_LABEL[k.kind] || k.kind), value: (k) => k.goals, fmt: (k) => share(k.goals, G.how.goals), sub: (k) => `${k.goals} mål` }),
-        src,
-      })
-      : '') +
-    '</div>';
-}
-
 function barList(rows, { label, value, fmt, sub }) {
   const max = Math.max(...rows.map(value)) || 1;
   return '<ul class="dv-barlist">' + rows.map((r) => `<li><span class="bl-l">${label(r)}</span>` +
@@ -863,8 +834,7 @@ function teamsView(dv, P, T) {
         `<div class="table-wrap dv-tw"><table class="dv-teams dv-league">${head}<tbody>${body}</tbody></table></div>`,
       src,
       cls: 'dv-wide',
-    }) +
-    leagueGoalsCards(P);
+    });
 }
 
 // ---------- spelarkort och lagkort (dialog) ----------
