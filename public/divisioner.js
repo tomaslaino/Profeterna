@@ -970,12 +970,11 @@ function meters(list) {
   }).join('')}</ul>`;
 }
 
-// Ett avsnitt: rubrik med valfri länk till höger, innehåll och källrad. Utan
+// Ett avsnitt: rubrik med valfri länk till höger och innehåll. Utan
 // rubrik när fliken redan säger vad det är.
-function msec(title, body, { link, src } = {}) {
+function msec(title, body, { link } = {}) {
   return '<section class="dv-msec">' + (title ? `<h5 class="dv-h5"><span>${esc(title)}</span>` +
-    (link ? `<a class="dv-mlink" href="${esc(link[0])}">${esc(link[1])}</a>` : '') + '</h5>' : '') + body +
-    (src && showSources() ? `<p class="dv-msrc">${src}</p>` : '') + '</section>';
+    (link ? `<a class="dv-mlink" href="${esc(link[0])}">${esc(link[1])}</a>` : '') + '</h5>' : '') + body + '</section>';
 }
 
 // Sist i rutan: källraderna (med Visa detaljer) och knapparna.
@@ -1134,7 +1133,6 @@ async function openTeam(id, pick) {
     const x = tt.fd.xg;
     const m = tt.fd.mkt;
     const link = [viewHref(state.div, 'lag'), 'Alla lag'];
-    const src = `football-data.co.uk · ${tt.fd.n} matcher t.o.m. ${esc(dateLabel(T.source.stats.last))}`;
     const judged = tt.str != null || m;
     if (x) {
       game += msec('Chanserna', facts([
@@ -1142,13 +1140,13 @@ async function openTeam(id, pick) {
         [num(x.a / x.n, 2), 'xG mot per match', 'Motståndarnas förväntade mål per match'],
         [delta(x.pts - x.xp, { d: 1 }), 'Poäng mot chanserna', `${x.pts} poäng, ${num(x.xp, 1)} enligt chanserna (xG)`],
         [pct(x.xd / x.n), 'Kryss enligt chanserna', `${x.d} kryss på ${x.n} matcher`],
-      ]), { link, src: judged ? null : src });
+      ]), { link });
     }
     if (judged) {
       game += msec(tt.str != null && m ? 'Modellen och oddsen' : m ? 'Oddsen' : 'Modellen', facts([
         tt.str != null ? [delta(tt.str, { d: 2, dead: 0.005 }), 'Styrka enligt modellen', 'Väntad målskillnad per match mot ett snittlag i divisionen, med motståndet inräknat'] : null,
         m ? [delta(m.pts - m.xp, { d: 1 }), 'Poäng mot oddsen', `${m.pts} poäng, ${num(m.xp, 1)} väntade enligt oddsen vid avspark`] : null,
-      ]), { link: x ? null : link, src });
+      ]), { link: x ? null : link });
     }
   }
 
@@ -1158,20 +1156,19 @@ async function openTeam(id, pick) {
     scorer = meters([{ label: `<b>${esc(t.topScorer.name)}</b>`, sub: `Bäste målskytt · ${t.topScorer.g} av ${t.goals} mål`,
       v: t.topScorerShare, text: pct(t.topScorerShare), pid: ts && ts.id }]);
   }
-  const cov = t.coverage;
   const squadHtml = msec(null, scorer + '<div class="table-wrap dv-tw"><table class="dv-squad"><thead><tr><th class="c">Pos</th><th class="c">#</th><th>Spelare</th>' +
     '<th class="num hide-xs">Ålder</th><th class="num">M</th><th class="num">Mål</th><th class="num">Ass</th><th class="num">Gul</th><th class="num">Röd</th></tr></thead><tbody>' +
     squad.map((p) => `<tr class="dv-prow${p.app ? '' : ' idle'}" data-pid="${esc(p.id)}" tabindex="0"><td class="c">${esc(p.pos || '–')}</td><td class="c muted">${esc(p.jersey || '')}</td>` +
       `<td>${esc(p.name)}<small class="dv-natline">${esc(natSv(p.nat) || '')}</small></td><td class="num hide-xs">${p.age ?? '–'}</td>` +
       `<td class="num">${cell(p.app)}</td><td class="num">${cell(p.g, { strong: true })}</td><td class="num">${cell(p.a)}</td><td class="num">${cell(p.yc)}</td><td class="num">${cell(p.rc)}</td></tr>`).join('') +
-    '</tbody></table></div>', { src: `ESPN · hämtat ${when(P.source.fetchedAt)}${cov.behind ? ` · ${cov.covered} av ${cov.matches} matcher införda` : ''}` });
+    '</tbody></table></div>');
 
   const av = P.availability && !P.availability.unknown ? P.availability[id] : null;
   const away = av && !av.unknown ? msec(null, av.players.length
     ? `<ul class="dv-inj">${av.players.map((x) => `<li class="${x.status === 'tveksam' ? 'doubt' : 'out'}">` +
       `<span><b>${esc(x.name)}</b> <small>${esc(x.pos || '')}</small></span><span class="dv-inj-st">${esc(x.status.charAt(0).toUpperCase() + x.status.slice(1))}</span>` +
       `${x.news ? `<span class="dv-inj-what">${esc(x.news)}</span>` : ''}</li>`).join('')}</ul>`
-    : '<p class="dv-calm">Inga rapporterade.</p>', { src: `Fantasy Premier League · hämtat ${when(av.source.fetchedAt)}` }) : '';
+    : '<p class="dv-calm">Inga rapporterade.</p>') : '';
 
   html += mtabs('team', 'Om laget', [
     ['spelet', 'Spelet', game, 'Spelet hittills'],
