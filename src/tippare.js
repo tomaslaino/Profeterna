@@ -17,7 +17,10 @@
 //         "klar": "2026-10-20T22:37:00.000Z", när omgången frystes; saknas = väntar på resultat
 //         "matcher": [
 //           { "id": "401878771", "match": "Everton – Chelsea", "avspark": "2026-10-18T11:30:00.000Z",
-//             "tips": { "DL": "2", "DT": "1X", "DJ": "X" }, "resultat": "1–2", "modell": [27, 24, 49] }
+//             "tips": { "DL": "2", "DT": "1X", "DJ": "X" },
+//             "motivering": { "DT": "Chelsea vinner alltid där" },   (valfritt)
+//             "efter": { "DL": "Där satt den" },                     (valfritt)
+//             "resultat": "1–2", "modell": [27, 24, 49] }
 //         ]
 //       }
 //     ]
@@ -30,7 +33,10 @@
 // av nästa innan ett bygge hunnit se den ändå kommer med. När varje match är
 // avgjord fylls resultatet efter 90 minuter och modellens prognos före avspark (1 · X ·
 // 2 i hela procent, journalen om den finns, annars sajtens prognos) i, och
-// omgången får "klar". Sedan ändras den aldrig. Så finns omgången kvar även om
+// omgången får "klar". Sedan ändras den aldrig – utom motiveringarna och
+// kommentarerna i efterhand (motivering, efter: text per person), som följer
+// tjänsten så länge den visar omgången, så att det som skrivs efter sista
+// matchen också kommer med (Grupparbetena, src/history.js). Så finns omgången kvar även om
 // nästa startas innan sista matchen är spelad. "slut" visar förlängning och
 // straffar, "struken": true en match som inte spelades (räknas inte); saknas
 // ställningen efter 90 minuter tre dagar efter avspark fryses raden utan
@@ -50,6 +56,7 @@ const FILE = process.env.TIPPAR_HISTORIK
 
 const { SIGNS } = Tippoang;
 const DAY = 86400000;
+const NOTE_MAX = 140; // som motiveringarna och kommentarerna i tjänsten (worker/samtal.mjs)
 const OFF = /POSTPONED|CANCEL|ABANDON|SUSPEND/;
 const dayOf = (iso) => new Intl.DateTimeFormat('sv-SE', { timeZone: 'Europe/Stockholm' }).format(new Date(iso));
 const signIdx = (s) => (s.home > s.away ? 0 : s.home === s.away ? 1 : 2);
@@ -124,6 +131,9 @@ function writeRounds(list, file = FILE) {
 function entryFromSamtal(s, prev = null) {
   if (!s || !s.visas || !s.tips || !s.id || !Array.isArray(s.matcher) || !s.matcher.length) return null;
   const gang = (s.gang || []).filter((g) => g && g.id).map((g) => ({ id: String(g.id), namn: String(g.namn || g.id) }));
+  // Text per person, utan tomma.
+  const said = (get) => Object.fromEntries(gang.map((g) => [g.id, get(g.id)])
+    .filter(([, t]) => typeof t === 'string' && t.trim()).map(([k, t]) => [k, t.replace(/\s+/g, ' ').trim().slice(0, NOTE_MAX)]));
   const matcher = s.matcher.slice().sort((a, b) => String(a.avspark).localeCompare(String(b.avspark))).map((m) => {
     const tips = {};
     for (const g of gang) {
@@ -131,7 +141,13 @@ function entryFromSamtal(s, prev = null) {
       const sign = Tippoang.sign(t && t[m.id]);
       if (sign) tips[g.id] = sign;
     }
-    return { id: String(m.id), match: String(m.match || ''), avspark: m.avspark, tips };
+    const motivering = said((k) => s.tips[k] && s.tips[k].kommentarer && s.tips[k].kommentarer[m.id]);
+    const efter = said((k) => s.efter && s.efter[k] && s.efter[k][m.id] && s.efter[k][m.id].text);
+    return {
+      id: String(m.id), match: String(m.match || ''), avspark: m.avspark, tips,
+      ...(Object.keys(motivering).length ? { motivering } : {}),
+      ...(Object.keys(efter).length ? { efter } : {}),
+    };
   });
   const first = dayOf(matcher[0].avspark);
   const last = dayOf(matcher[matcher.length - 1].avspark);
@@ -143,6 +159,29 @@ function entryFromSamtal(s, prev = null) {
     ...(last !== first ? { till: last } : {}),
     gang,
     matcher,
+  };
+}
+
+// En klar omgång (r) med motiveringarna och kommentarerna i efterhand som
+// tjänsten visar dem nu (f, entryFromSamtal) – resten står kvar. De står
+// efter tipsen på raden, som när omgången skrevs in.
+const NOTES = ['motivering', 'efter'];
+function withNotes(r, f) {
+  const by = new Map(f.matcher.map((x) => [String(x.id), x]));
+  return {
+    ...r,
+    matcher: r.matcher.map((row) => {
+      const x = by.get(String(row.id));
+      if (!x) return row;
+      const notes = Object.fromEntries(NOTES.filter((k) => x[k]).map((k) => [k, x[k]]));
+      const out = {};
+      for (const [k, v] of Object.entries(row)) {
+        if (NOTES.includes(k)) continue;
+        out[k] = v;
+        if (k === 'tips') Object.assign(out, notes);
+      }
+      return 'tips' in row ? out : { ...out, ...notes };
+    }),
   };
 }
 
@@ -261,15 +300,17 @@ function buildTippare({ samtal = null, matches = [], freeze = false, file = FILE
     }
   }
   // Tipsen går att ändra tills matcherna startar, så en omgång som inte är
-  // klar följer tjänsten så länge den finns där.
+  // klar följer tjänsten så länge den finns där. En klar omgång får bara
+  // motiveringarna och kommentarerna i efterhand därifrån.
   const valid = new Set([...h.rounds, ...added]);
   const changed = [];
   const raw = h.raw.map((r) => {
-    const f = valid.has(r) && !r.klar ? fresh.get(String(r.id)) : null;
-    if (!f || JSON.stringify(f) === JSON.stringify(r)) return r;
-    valid.add(f);
-    changed.push(f.id);
-    return f;
+    const f = valid.has(r) ? fresh.get(String(r.id)) : null;
+    const next = f && (r.klar ? withNotes(r, f) : f);
+    if (!next || JSON.stringify(next) === JSON.stringify(r)) return r;
+    valid.add(next);
+    changed.push(next.id);
+    return next;
   });
   // Omgångar som väntar på resultat fylls i när alla matcher är avgjorda.
   const done = [];
@@ -347,4 +388,27 @@ function roundNames({ samtal = null, file = FILE } = {}) {
   return out;
 }
 
-module.exports = { FILE, readRounds, writeRounds, serialize, entryFromSamtal, finish, summarize, buildTippare, fetchSamtal, roundNames };
+// Motiveringarna och kommentarerna i efterhand per omgång – ur filen och ur
+// tjänsten (samtal, som är nyare än filen) – så att gängets kupong i
+// historiken kan visa dem under matcherna (src/history.js). → [{ids, notes}]
+// där notes: matchens id → [{k, text, efter}], först motiveringarna, sedan
+// kommentarerna i efterhand, i gängets ordning.
+function roundNotes({ samtal = null, file = FILE } = {}) {
+  const byId = new Map(readRounds(file).rounds.map((r) => [String(r.id), r]));
+  for (const s of [].concat(samtal || [])) {
+    const f = entryFromSamtal(s);
+    if (f) byId.set(f.id, f);
+  }
+  return [...byId.values()].map((r) => {
+    const notes = new Map();
+    for (const row of r.matcher) {
+      const list = NOTES.flatMap((k) => r.gang.map((g) => [g.id, row[k] && row[k][g.id]])
+        .filter(([, t]) => typeof t === 'string' && t.trim())
+        .map(([id, t]) => ({ k: id, text: t.trim(), ...(k === 'efter' ? { efter: true } : {}) })));
+      if (list.length) notes.set(String(row.id), list);
+    }
+    return { ids: new Set(r.matcher.map((m) => String(m.id))), notes };
+  });
+}
+
+module.exports = { FILE, readRounds, writeRounds, serialize, entryFromSamtal, finish, summarize, buildTippare, fetchSamtal, roundNames, roundNotes };

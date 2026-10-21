@@ -172,6 +172,9 @@
   function card(c) {
     const vm = vsModel(c);
     const notes = c.rows.filter((r) => r.note).length;
+    const said = c.rows.reduce((a, r) => a + (r.said ? r.said.length : 0), 0);
+    const count = [notes ? `${notes} ${notes === 1 ? 'anteckning' : 'anteckningar'}` : '', said ? `${said} ${said === 1 ? 'kommentar' : 'kommentarer'}` : '']
+      .filter(Boolean).join(' · ');
     return `<article class="card hk-card" id="${esc(c.id)}">` +
       '<div class="hk-top">' + title(c) +
       `<div class="hk-grade" title="${esc(`Betyget jämför ${c.ok} rätt med väntat ${num(c.exp)}`)}">${stars(c)}<span>${esc(c.label || 'Ej rättad')}</span></div>` +
@@ -183,7 +186,7 @@
       (vm != null ? ` · modellens tips <b>${c.modelOk}</b>${vm ? ` <span class="${vm > 0 ? 'up' : 'down'}">${vm > 0 ? `ni +${vm}` : `ni −${-vm}`}</span>` : ''}` : '') +
       '</span></div></div>' +
       `<div class="hk-ai-slot" data-ai="${esc(c.id)}">${aiBlock(c)}</div>` +
-      `<details class="hk-rows"><summary>Matcherna${notes ? ` <span class="hk-count">· ${notes} ${notes === 1 ? 'anteckning' : 'anteckningar'}</span>` : ''}</summary>` +
+      `<details class="hk-rows"><summary>Matcherna${count ? ` <span class="hk-count">· ${count}</span>` : ''}</summary>` +
       '<div class="mlist">' + c.rows.map(rowHtml).join('') + '</div></details>' +
       '</article>';
   }
@@ -195,10 +198,22 @@
     return `<span class="mteam${home ? ' home' : ''}">${home ? n + skold : skold + n}</span>`;
   }
 
+  // Porträttet i en ring i personens färg (gängets ordning, theme.css
+  // --gang-0/1/2), som på kupongen. Initialerna om bilden saknas.
+  function face(k) {
+    const gang = (H.data && H.data.gang) || [];
+    const i = gang.findIndex((g) => g.id === k);
+    const g = gang[i] || { id: k };
+    return `<span class="hk-fc hk-k${Math.max(0, i)}" title="${esc(g.namn || k)}">` +
+      (g.bild ? `<img src="${esc(g.bild)}" alt="${esc(k)}" width="18" height="18" decoding="async">` : esc(k)) + '</span>';
+  }
+
   // Raden som matchlistans tavla: lagen speglade kring resultatet, tecknen
   // och modellens odds till höger (historik.css .hk-row). En match som
   // skrivits in för hand utan mellanslag kring strecket står hel till vänster
   // om resultatet. Förlängning och straffar står på var sin rad under det.
+  // Under gängets anteckning allas motiveringar och kommentarer i efterhand,
+  // med porträttet (said, ur omgången som kupongen gjordes ur).
   function rowHtml(r) {
     const cls = dotClass(r);
     const res = r.off ? '<span class="sub">struken</span>'
@@ -210,6 +225,8 @@
       : `<span class="hk-whole">${esc(r.match)}</span><span class="mmid">${res}</span>`;
     return `<div class="hk-row s-${cls}">${teams}` +
       (r.note ? `<span class="hk-note">${esc(r.note)}</span>` : '') +
+      (r.said && r.said.length ? '<span class="hk-said">' +
+        r.said.map((o) => `<span class="hk-s">${face(o.k)}<span class="hk-st">${esc(o.text)}</span></span>`).join('') + '</span>' : '') +
       '<span class="hk-pick">' +
       `<span class="kp-dot ${cls}" aria-hidden="true">${cls === 'ok' ? '✓' : cls === 'no' ? '✕' : ''}</span>` +
       signBoxes(r) +

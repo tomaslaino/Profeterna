@@ -55,7 +55,7 @@ const { playerFiles, teamSquad } = require('./players');
 const { teamFiles } = require('./teamstats');
 const { readCoupons, REPO, BRANCH } = require('./coupons');
 const { buildHistory, writeComments } = require('./history');
-const { buildTippare, fetchSamtal, roundNames } = require('./tippare');
+const { buildTippare, fetchSamtal, roundNames, roundNotes } = require('./tippare');
 const { highlightsByMatch, youtubeByMatch } = require('./hojdpunkter');
 const { wholePercent } = require('./model');
 const rules = require('../config/forecast-rules');
@@ -242,13 +242,17 @@ function writeSite(outDir = OUT, { journal = false, analysisEndpoint, couponEndp
   // Med --journal fryses nya färdiga kuponger in i data/kupong-historik.json.
   let history;
   try {
-    // Gängets kupong utan eget namn får omgångens namn (AI:ns, src/tippare.js).
-    history = buildHistory({ coupons: coupons.coupons, matches: list.matches, freeze: journal, roundNames: roundNames({ samtal }) });
+    // Gängets kupong utan eget namn får omgångens namn (AI:ns, src/tippare.js),
+    // och matcherna allas motiveringar och kommentarer i efterhand därifrån.
+    history = buildHistory({ coupons: coupons.coupons, matches: list.matches, freeze: journal,
+      roundNames: roundNames({ samtal }), roundNotes: roundNotes({ samtal }) });
   } catch (err) {
     console.error('[build] kuponghistoriken:', err);
     history = { coupons: [], errors: [String(err.message || err)], frozen: [] };
   }
-  write('historik.json', { comment: commentInfo(analysisEndpoint), coupons: history.coupons, errors: history.errors });
+  // gang: porträtten till motiveringarna och kommentarerna, i gängets ordning.
+  write('historik.json', { comment: commentInfo(analysisEndpoint), gang: (kupongCfg.gang || []).map(({ id, namn, bild }) => ({ id, namn, bild })),
+    coupons: history.coupons, errors: history.errors });
 
   // Säsongens tippare: gängets egna tips, omgång för omgång. Med --journal
   // skrivs omgången ur samtalet och färdiga resultat in i

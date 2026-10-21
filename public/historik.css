@@ -161,7 +161,34 @@
 .hk-note { grid-area: 2 / 2 / 3 / 5; font-size: 12.5px; font-weight: 400; font-style: italic; text-align: center; color: var(--eyebrow); }
 .hk-note::before { content: "”"; margin-right: 2px; }
 .hk-note::after { content: "”"; margin-left: 1px; }
-.hk-row.s-no :is(.mteam, .hk-whole, .hk-note, .kp-p) { opacity: 0.7; }
+/* allas motiveringar och kommentarer i efterhand: under anteckningen, en rad
+   var med porträttet i personens färg, som på kupongen */
+.hk-said { grid-area: 2 / 2 / 3 / 5; display: flex; flex-direction: column; align-items: center; gap: 3px; }
+.hk-note + .hk-said { grid-row: 3; margin-top: 2px; }
+.hk-s { display: flex; align-items: center; gap: 6px; max-width: 100%; font-size: 12.5px; font-style: italic; color: var(--eyebrow); }
+.hk-st { min-width: 0; }
+.hk-st::before { content: "”"; margin-right: 2px; }
+.hk-st::after { content: "”"; margin-left: 1px; }
+.hk-k0 { --ink: var(--gang-0); }
+.hk-k1 { --ink: var(--gang-1); }
+.hk-k2 { --ink: var(--gang-2); }
+.hk-fc {
+  flex: none;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 18px;
+  height: 18px;
+  overflow: hidden;
+  font-size: 8px;
+  font-style: normal;
+  font-weight: 700;
+  color: var(--ink);
+  border-radius: 50%;
+  box-shadow: 0 0 0 1.5px var(--ink);
+}
+.hk-fc img { width: 100%; height: 100%; object-fit: cover; }
+.hk-row.s-no :is(.mteam, .hk-whole, .hk-note, .hk-said, .kp-p) { opacity: 0.7; }
 .hk-row .kp-p.unknown { justify-content: center; }
 
 @media (max-width: 760px) {
@@ -188,7 +215,7 @@
   .hk-row .kp-dot, .hk-row .kp-sg { grid-area: auto; }
   .hk-row > .mmid { grid-column: 2; }
   .hk-whole { grid-column: 1; }
-  .hk-note { grid-column: 1 / -1; }
+  .hk-note, .hk-said { grid-column: 1 / -1; }
 }
 
 @media (prefers-reduced-motion: reduce) {

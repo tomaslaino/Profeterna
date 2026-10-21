@@ -211,7 +211,13 @@ function entryFromCoupon(c, byId, now = Date.now(), rounds = []) {
 // src/tippare.js roundNames): den som har flest av kupongens matcher, minst
 // hälften.
 function roundNameFor(c, rounds = []) {
-  const ids = (c.matches || []).map((x) => String(x.id));
+  const r = roundOf((c.matches || []).map((x) => String(x.id)), rounds);
+  return r ? r.namn : null;
+}
+
+// Omgången bland rounds ({ids}) som har flest av matcherna ids, minst
+// hälften – eller null.
+function roundOf(ids, rounds = []) {
   let best = null;
   let most = 0;
   for (const r of rounds) {
@@ -221,7 +227,17 @@ function roundNameFor(c, rounds = []) {
       best = r;
     }
   }
-  return best && ids.length && most * 2 >= ids.length ? best.namn : null;
+  return best && ids.length && most * 2 >= ids.length ? best : null;
+}
+
+// Motiveringarna och kommentarerna i efterhand ur omgången som kupongen
+// gjordes ur (src/tippare.js roundNotes) under matcherna: said = [{k, text,
+// efter}]. De fryses inte in i kupongen utan läses ur tipparhistoriken vid
+// varje bygge.
+function withSaid(c, rounds = []) {
+  const r = roundOf(c.rows.map((x) => x.id).filter(Boolean), rounds);
+  if (!r) return c;
+  return { ...c, rows: c.rows.map((x) => (x.id && r.notes.has(x.id) ? { ...x, said: r.notes.get(x.id) } : x)) };
 }
 
 function finishedFromCoupons(coupons, matches, now = Date.now(), rounds = []) {
@@ -287,7 +303,8 @@ function summarize(e) {
 // Historiken som sidan visar: filen plus sidans färdiga kuponger som inte
 // frysts in än. Med freeze (bygget på GitHub Actions) skrivs de in i filen.
 // roundNames: omgångarnas namn (src/tippare.js), för kuponger utan eget namn.
-function buildHistory({ coupons, matches, freeze = false, file = HISTORY_FILE, now = Date.now(), roundNames = [] }) {
+// roundNotes: omgångarnas motiveringar och kommentarer (withSaid).
+function buildHistory({ coupons, matches, freeze = false, file = HISTORY_FILE, now = Date.now(), roundNames = [], roundNotes = [] }) {
   const h = readHistory(file);
   const known = new Set(h.raw.map((e) => e && String(e.id || '').trim()));
   const fresh = finishedFromCoupons(coupons, matches, now, roundNames).filter((e) => !known.has(e.id));
@@ -297,7 +314,7 @@ function buildHistory({ coupons, matches, freeze = false, file = HISTORY_FILE, n
     frozen = fresh.map((e) => e.id);
   }
   const all = [...h.entries.map((e) => ({ ...e, frozen: true })), ...fresh.map((e) => ({ ...e, frozen: frozen.includes(e.id) }))];
-  const list = all.map(summarize).sort((a, b) => b.date.localeCompare(a.date) || b.id.localeCompare(a.id));
+  const list = all.map((e) => withSaid(summarize(e), roundNotes)).sort((a, b) => b.date.localeCompare(a.date) || b.id.localeCompare(a.id));
   return { coupons: list, errors: h.errors, frozen };
 }
 

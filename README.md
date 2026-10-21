@@ -1269,7 +1269,8 @@ under omgången.
    försök. De andras kommentarer står under motiveringarna, med porträttet. Det går så fort
    man ser de andras tips – också före avspark för den som har lämnat in – och efter att
    matchen är spelad, så länge omgången finns. En per person och match; en tom tar bort den.
-   De följer inte med till historiken.
+   Motiveringarna och kommentarerna sparas i tipparhistoriken och står sedan under matcherna
+   i Grupparbetena (se [Kuponghistoriken](#kuponghistoriken)).
 
 **Tjänsten** är samma som sparar kupongen (*profeterna-kupong*, adressen i
 [config/kupong.js](config/kupong.js) med `/samtal` i stället för `/kupong`; bygget skriver
@@ -1360,7 +1361,11 @@ och `KUPONG_LOKALT=1`). Claudes nyckel läggs in en gång:
 `#olympen/kuponger/<id>`; gamla länkar till `#kupong/historik/<id>` och
 `historik.html#<id>` leds dit, [public/historik.js](public/historik.js)) visar varje
 färdigspelad kupong: antal rätt, en prick per match, betyget, AI:ns kommentar och – under *Matcherna* –
-varje match med tecken, resultat, modellens chans och gängets anteckning. Överst antal
+varje match med tecken, resultat, modellens chans och gängets anteckning – och under den
+allas motiveringar och kommentarer i efterhand, en rad var med porträttet i personens färg,
+ur omgången som kupongen gjordes ur (den i tipparhistoriken med flest av kupongens matcher,
+minst hälften; bygget läser dem därifrån varje gång, de fryses inte in i kupongen).
+*Matcherna* säger hur många anteckningar och kommentarer kupongen har. Överst antal
 kuponger, andel rätt, snittbetyg och antal rätt mot det väntade, och en stapel per kupong
 (andel rätt, strecket = väntat). Sorteras efter *Senaste*, *Betyg*, *Andel rätt* eller
 *Mot modellen* (rätt jämfört med modellens tips); ett tryck till vänder ordningen.
@@ -1533,7 +1538,10 @@ en omgång räknas hela omgången bort, med *Visa ändå*.
 med matcherna och var och ens tecken. Tipsen går att ändra tills matcherna startar, så
 omgången skrivs om när tjänsten visar andra tips, tills den är klar. När varje match är
 avgjord fylls resultatet efter 90 minuter och modellens prognos före avspark i, och
-omgången får `klar`. Sedan ändras den aldrig. Eftersom tipsen sparas redan när de visas
+omgången får `klar`. Sedan ändras den aldrig – utom motiveringarna (`motivering`) och
+kommentarerna i efterhand (`efter`), text per person och match, som följer tjänsten så länge
+den visar omgången (som omgången eller `forra`), så att det som skrivs efter sista matchen
+också kommer med. Eftersom tipsen sparas redan när de visas
 finns omgången kvar även om nästa omgång startas innan sista matchen är spelad –
 resultaten tas ur sajtens egna matcher, inte ur tjänsten. Startas nästa omgång innan något
 bygge hunnit se tipsen ger `GET …/samtal` den ändå, som `forra`, tills omgången därefter
@@ -1553,7 +1561,7 @@ startas. En omgång som ersattes innan tipsen visades räknas inte.
       ],
       "klar": "2026-10-18T18:07:00.000Z",
       "matcher": [
-        { "id": "401878771", "match": "Everton – Chelsea", "avspark": "2026-10-17T11:30:00.000Z", "tips": { "DL": "2", "DT": "X", "DJ": "1X" }, "resultat": "0–2", "modell": [35, 26, 39] }
+        { "id": "401878771", "match": "Everton – Chelsea", "avspark": "2026-10-17T11:30:00.000Z", "tips": { "DL": "2", "DT": "X", "DJ": "1X" }, "motivering": { "DL": "Chelsea vinner alltid där" }, "efter": { "DT": "Typiskt" }, "resultat": "0–2", "modell": [35, 26, 39] }
       ]
     }
   ]
