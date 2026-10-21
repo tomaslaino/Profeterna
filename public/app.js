@@ -423,9 +423,30 @@ function drawDetail() {
   const d = state.detail;
   $('#match-modal').setAttribute('aria-label', `${d.match.home}–${d.match.away}`);
   el.innerHTML = renderDetail(d);
+  // Där rullningslisten alltid syns tar den plats i innehållets högra kant;
+  // luften där minskas lika mycket (matchblad.css), så att innehållet står i
+  // linje med rubriken och bården.
+  const body = el.querySelector('.mr-body');
+  el.style.setProperty('--mr-sb', `${body.offsetWidth - body.clientWidth}px`);
+  fitTeams();
+  document.fonts.ready.then(fitTeams);
   if (window.Matchruta) Matchruta.hydrate(el, d, compOf(d.match.comp).espn);
   tableFill(el, d);
 }
+
+// Ett långt ord i ett lagnamn (Middlesbrough i telefonen) får inte gå in i
+// mittspalten: båda namnen krymps lika mycket, tills det längsta ryms.
+function fitTeams() {
+  const teams = [...document.querySelectorAll('#match-detail-view .mhead-team')];
+  if (!teams.length) return;
+  for (const t of teams) t.style.fontSize = '';
+  const fit = Math.min(1, ...teams.map((t) => t.clientWidth / (t.lastElementChild.getBoundingClientRect().width || 1)));
+  if (fit < 1) {
+    const px = Math.floor(parseFloat(getComputedStyle(teams[0]).fontSize) * fit);
+    for (const t of teams) t.style.fontSize = `${px}px`;
+  }
+}
+addEventListener('resize', fitTeams);
 
 // Stänger rutan utan att röra adressen (route sköter den).
 function hideMatch() {
@@ -515,6 +536,7 @@ function prognosPane(d) {
 function renderDetail(d) {
   const m = d.match;
   const hide = m.completed && isHidden(m);
+  const kickoff = new Date(m.kickoff);
   let mid;
   let midSub = '';
   if (hide) {
@@ -526,19 +548,23 @@ function renderDetail(d) {
     if (s90 && (s90.home !== m.score.home || s90.away !== m.score.away)) extra.push(`efter 90 min ${s90.home}–${s90.away}`);
     if (m.shootout) extra.push(`straffar ${m.shootout.home}–${m.shootout.away}`);
     if (extra.length) midSub = extra.join(' · ');
-  } else {
+  } else if (m.status === 'STATUS_POSTPONED') {
     mid = '–';
-    if (m.status === 'STATUS_POSTPONED') midSub = 'uppskjuten';
+    midSub = 'uppskjuten';
+  } else {
+    mid = m.completed ? '–' : fTime.format(kickoff);
   }
-  const meta = [m.compName, m.round, cap(fDay.format(new Date(m.kickoff))) + ' ' + fTime.format(new Date(m.kickoff)), m.venue]
-    .filter(Boolean).map(esc).join(' · ');
+  const comp = [m.compName, m.round].filter(Boolean).map(esc).join(' · ');
 
   // Matchrutan är ett tryckt matchblad (matchblad.css): märket som på
-  // kupongen överst och meanderbården mellan rubriken och flikarna.
+  // kupongen överst, lagen som på en biljett – i två lika breda spalter med
+  // tävlingen, avsparken (resultatet när matchen är spelad), dagen och arenan
+  // mellan sig – och meanderbården mellan rubriken och flikarna.
   const head = '<div class="mhead mr-head"><p class="pp-brand"><img src="logo.svg" alt="" width="20" height="20">Matchfixarna<span>Matchblad</span></p>' +
-    `<div class="mhead-meta"${m.tierNote ? ` title="${esc(m.tierNote)}"` : ''}>${meta}</div>` +
     `<div class="mhead-teams"><div class="mhead-team">${crest(m.home)}<span>${esc(m.home)}</span></div>` +
-    `<div class="mhead-mid">${hide ? Spoiler.chip() : esc(mid)}${midSub ? `<span class="sub">${esc(midSub)}</span>` : ''}</div>` +
+    `<div class="mhead-mid"><span class="mhead-meta"${m.tierNote ? ` title="${esc(m.tierNote)}"` : ''}>${comp}</span>` +
+    `<span class="mhead-score">${hide ? Spoiler.chip() : esc(mid)}</span>${midSub ? `<span class="sub">${esc(midSub)}</span>` : ''}` +
+    `<span class="mhead-meta">${esc(cap(fDay.format(kickoff)))}</span>${m.venue ? `<span class="mhead-meta">${esc(m.venue)}</span>` : ''}</div>` +
     `<div class="mhead-team away">${crest(m.away)}<span>${esc(m.away)}</span></div></div>` +
     (window.Hojdpunkter ? Hojdpunkter.head(d) : '') +
     '</div><div class="pp-band mr-band" aria-hidden="true"></div>';

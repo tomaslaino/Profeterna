@@ -101,20 +101,47 @@ dialog.mr-modal .dv-tip {
 /* ---------- rubriken ---------- */
 
 dialog.mr-modal .mr-top { background: none; border-bottom: 0; }
-dialog.mr-modal .mhead.mr-head { padding: 30px 72px 0 30px; }
+dialog.mr-modal .mhead.mr-head { padding: 30px 30px 0; }
 dialog.mr-modal .mhead::before { content: none; }
-dialog.mr-modal .mr-head .pp-brand { margin: 0 0 14px; }
+dialog.mr-modal .mr-head .pp-brand { margin: 0; }
+/* lagen som på en biljett: namnen mitt i två lika breda spalter, och mellan
+   dem tävlingen, avsparken (resultatet), dagen och arenan */
+dialog.mr-modal .mr-head .mhead-teams {
+  grid-template-columns: minmax(0, 1fr) auto minmax(0, 1fr);
+  gap: 24px;
+  margin: 8px 0 0;
+}
+dialog.mr-modal .mhead-team {
+  font-size: clamp(21px, 2.8vw, 28px);
+  font-weight: 700;
+  line-height: 1.15;
+  text-align: center;
+  text-wrap: balance;
+  color: var(--pp-ink);
+}
+dialog.mr-modal .mhead-mid {
+  display: grid;
+  justify-items: center;
+  max-width: 15rem;
+  font-size: 13px;
+  line-height: 1.45;
+}
 dialog.mr-modal .mr-head .mhead-meta {
+  font-family: var(--sans);
   font-size: 13px;
   font-weight: 500;
   letter-spacing: 0;
   text-transform: none;
   color: var(--pp-ink-soft);
 }
-dialog.mr-modal .mr-head .mhead-teams { margin: 6px 0 0; }
-dialog.mr-modal .mhead-team,
-dialog.mr-modal .mhead-mid { font-weight: 700; color: var(--pp-ink); }
-dialog.mr-modal .mhead-mid .sub { color: var(--pp-ink-soft); }
+dialog.mr-modal .mhead-score {
+  margin: 2px 0 3px;
+  font-size: clamp(28px, 3.6vw, 36px);
+  font-weight: 700;
+  line-height: 1.1;
+  color: var(--pp-ink);
+}
+dialog.mr-modal .mhead-mid .sub { margin: -2px 0 3px; color: var(--pp-ink-soft); }
 /* lagskölden som en stor, blek stämpel i gråbrunt bläck, lite snett i
    rubrikens ytterkant med hälften utanför pappret – det vita i den blir
    papper. Den står mot rubrikens nederkant (inte namnets, så att båda lagens
@@ -140,9 +167,10 @@ dialog.mr-modal .mhead-team .skold img {
   mix-blend-mode: multiply;
 }
 
+/* krysset på märkets rad, i samma kantluft */
 dialog.mr-modal .mr-close {
-  top: 24px;
-  right: 24px;
+  top: 22px;
+  right: 30px;
   color: var(--pp-print);
   background: var(--pp-box);
   border: 1.5px solid var(--pp-print-line);
@@ -171,8 +199,11 @@ dialog.mr-modal .mr-tabs button[aria-selected="true"]::after {
 
 /* ---------- korten blir tryckta avsnitt ---------- */
 
+/* --mr-sb är rullningslistens bredd där den alltid syns (app.js): den står i
+   den högra kantluften, så att innehållet linjerar med bården */
 dialog.mr-modal .mr-body {
-  padding: 24px 30px 34px;
+  padding: 24px max(0px, 30px - var(--mr-sb, 0px)) 34px 30px;
+  scrollbar-gutter: stable;
   scrollbar-color: rgba(169, 69, 43, 0.4) transparent;
 }
 dialog.mr-modal .card,
@@ -568,16 +599,19 @@ dialog.mr-modal .mr-on { color: var(--pp-ok); }
     -webkit-mask: radial-gradient(circle at 50% 0, transparent var(--pp-hole), #000 calc(var(--pp-hole) + 0.5px)) 0 0 / 15px 100% repeat-x;
     mask: radial-gradient(circle at 50% 0, transparent var(--pp-hole), #000 calc(var(--pp-hole) + 0.5px)) 0 0 / 15px 100% repeat-x;
   }
-  dialog.mr-modal .mhead.mr-head { padding: 24px 60px 0 16px; }
-  dialog.mr-modal .mr-head .pp-brand { margin-bottom: 10px; }
-  dialog.mr-modal .mr-head .mhead-meta { font-size: 12px; }
+  dialog.mr-modal .mhead.mr-head { padding: 24px 16px 0; }
+  dialog.mr-modal .mr-head .mhead-teams { gap: 10px; margin-top: 10px; }
+  dialog.mr-modal .mhead-team { font-size: 17px; }
+  dialog.mr-modal .mhead-mid { max-width: 7.5rem; }
+  dialog.mr-modal .mr-head .mhead-meta { font-size: 11.5px; }
+  dialog.mr-modal .mhead-score { font-size: 24px; }
   dialog.mr-modal .mhead-team .skold { --s: 160px; --ner: 73px; }
-  dialog.mr-modal .mr-close { top: 18px; right: 14px; }
+  dialog.mr-modal .mr-close { top: 16px; right: 16px; }
   dialog.mr-modal .mr-band { margin: 14px 16px 0; }
   /* flikarna fyller raden från kant till kant; får de inte plats rullar de */
   dialog.mr-modal .mr-tabs { gap: 12px; justify-content: space-between; margin: 0 16px; }
   dialog.mr-modal .mr-tabs button { padding: 11px 0 10px; }
-  dialog.mr-modal .mr-body { padding: 20px 16px 30px; }
+  dialog.mr-modal .mr-body { padding: 20px max(0px, 16px - var(--mr-sb, 0px)) 30px 16px; }
   dialog.mr-modal .mr-teams { gap: 0; }
   dialog.mr-modal .fc-main { gap: 8px; }
   dialog.mr-modal .fc-label { letter-spacing: 0.12em; }
