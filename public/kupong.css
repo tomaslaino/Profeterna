@@ -334,18 +334,23 @@
 .kp-search:focus { outline: none; border-color: var(--gold); box-shadow: 0 0 0 3px rgba(216, 176, 106, 0.16); }
 .kp-search::placeholder { color: var(--muted); }
 
+/* Programmet i Välj matcher (papper.js program) som matchlistans tavla:
+   tävlingen och plustecknet i lika breda ytterspalter, lagen speglade kring
+   avsparken (theme.css .mteam, .mmid). */
 .kp-pick {
   display: grid;
-  grid-template-columns: 3.2rem 3.3rem minmax(0, 1fr) auto;
+  grid-template-columns: 2.8rem minmax(0, 1fr) 3.8rem minmax(0, 1fr) 2.8rem;
   align-items: center;
-  gap: 14px;
-  padding: 10px 20px;
+  gap: 12px;
+  padding: 10px 16px;
   border-bottom: 1px solid var(--hair);
   transition: background-color 0.15s ease;
 }
 .kp-pick:last-child { border-bottom: 0; }
 .kp-pick.on { background: rgba(216, 176, 106, 0.06); box-shadow: inset 3px 0 0 var(--gold); }
-.kp-pick .mteams { min-width: 0; }
+.kp-pick .mteam { font-size: 14.5px; }
+.kp-pick .mmid .kick { font-size: 17px; }
+.kp-pick .pb-tick { justify-self: end; }
 .kp-note-in {
   grid-column: 3 / -1;
   margin: -2px 0 2px;
@@ -430,9 +435,6 @@ dialog.kp-confirm::backdrop {
 
 @media (max-width: 760px) {
   .kp-sg i { width: 23px; height: 23px; font-size: 14px; }
-  .kp-pick { grid-template-columns: minmax(0, 1fr) auto; gap: 10px; padding: 10px 14px; }
-  .kp-pick .mtime, .kp-pick .ctag { display: none; }
-  .kp-pick .mteams { font-size: 14px; }
   .kp-note-in { grid-column: 1 / -1; }
   .kp-tg button { width: 44px; }
   .kp-past { grid-template-columns: 1fr auto; padding: 12px 14px; }

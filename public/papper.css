@@ -538,7 +538,8 @@ a.pp-row:focus-visible { outline: 2px solid var(--pp-pen); outline-offset: -2px;
   align-items: start;
 }
 .pb-tools { grid-area: tools; min-width: 0; }
-.pb-prog { grid-area: prog; min-width: 0; }
+/* programmets rader följer spaltens bredd, inte skärmens (nedan) */
+.pb-prog { grid-area: prog; min-width: 0; container-type: inline-size; }
 .pb-side { grid-area: side; position: sticky; top: var(--pb-top); z-index: 5; min-width: 0; }
 .pp-wrap.pb-wrap { max-width: none; margin: 0; }
 .pp.pb-slip {
@@ -710,6 +711,18 @@ a.pp-row:focus-visible { outline: 2px solid var(--pp-pen); outline-offset: -2px;
 .pb-pick[aria-disabled="true"]:hover { background: transparent; }
 .pb-pick[aria-disabled="true"] .pb-tick { color: var(--muted); border-color: var(--pill-line); opacity: 0.35; }
 
+/* Smal spalt (bredvid papperet på mindre skärmar, och i telefonen): bara
+   lagen och avsparken på raden, så att namnen får plats – plustecknet mitt
+   under och tävlingen dold, som i matchlistans telefonläge. */
+@container (max-width: 480px) {
+  .pb-pick { grid-template-columns: minmax(0, 1fr) 3.6rem minmax(0, 1fr); gap: 6px 8px; padding: 9px 10px; }
+  .kp-pick.pb-pick .ctag { display: none; }
+  .pb-pick .mteam { gap: 6px; font-size: 14px; }
+  .pb-pick .mteam .skold { width: 18px; height: 18px; }
+  .pb-pick .mmid .kick { font-size: 16px; }
+  .pb-pick .pb-tick { grid-column: 1 / -1; justify-self: center; }
+}
+
 /* smalare skärmar: rutorna under lagen */
 @media (max-width: 899px) {
   .pb { grid-template-areas: "tools tools" "prog side"; column-gap: 14px; }
@@ -753,10 +766,6 @@ a.pp-row:focus-visible { outline: 2px solid var(--pp-pen); outline-offset: -2px;
   .pb-fields .pp-field b { font-size: 16px; }
   .pb-foot .kp-btn.primary { flex: 1 1 100%; justify-content: center; margin-left: 0; padding: 10px 12px; }
   .pb-drop { opacity: 0.75; }
-  /* programmet: hemmalaget och bortalaget på var sin rad */
-  .pb-pick { padding: 9px 10px 9px 12px; gap: 8px; }
-  .pb-pick .mteams { font-size: 13.5px; line-height: 1.3; }
-  .pb-pick .mteams .vs { display: block; height: 0; overflow: hidden; }
   .pb-tick { width: 28px; height: 28px; }
 }
 /* toppraden är 58 px här; i mobilen rullar loggraden undan och menyraden blir kvar */
@@ -776,18 +785,7 @@ a.pp-row:focus-visible { outline: 2px solid var(--pp-pen); outline-offset: -2px;
   /* luft under programmet, så att sista matchen inte hamnar under remsan */
   .pb-prog { padding-bottom: calc(96px + env(safe-area-inset-bottom)); }
 
-  /* programmet: tiden och tävlingen till vänster, lagen på var sin rad */
-  .pb-pick {
-    grid-template-columns: 3rem minmax(0, 1fr) auto;
-    grid-template-areas: "t m k" "c m k";
-    column-gap: 12px;
-    row-gap: 4px;
-    padding: 10px 12px 10px 14px;
-  }
-  .kp-pick.pb-pick .mtime { display: block; grid-area: t; align-self: end; font-size: 13px; }
-  .kp-pick.pb-pick .ctag { display: block; grid-area: c; align-self: start; justify-self: start; padding: 2px 7px; font-size: 10px; }
-  .pb-pick .mteams { grid-area: m; font-size: 14.5px; line-height: 1.3; }
-  .pb-pick .pb-tick { grid-area: k; width: 34px; height: 34px; font-size: 16px; }
+  .pb-pick .pb-tick { width: 32px; height: 32px; font-size: 16px; }
 
   /* remsan */
   /* över toppraden (z-index 40), så att framdraget papper aldrig hamnar under den */

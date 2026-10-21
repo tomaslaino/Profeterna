@@ -352,6 +352,52 @@ function listTeam(name, home) {
   return `<span class="mteam${home ? ' home' : ''}">${home ? n + skold : skold + n}</span>`;
 }
 
+// Ett ord som är bredare än sin spalt (Wolverhampton i telefonen) får inte gå
+// in i mitten: båda namnen på raden krymps lika mycket, som i matchbladets
+// huvud (fitTeams). Listorna med speglade lag (matchlistan, Välj matcher,
+// Grupparbetena) passas in när de ritas och när de byter bredd – också när
+// de syns första gången efter att ha ritats i en dold flik.
+function fitNames(list) {
+  const names = [...list.querySelectorAll('.mname')];
+  for (const n of names) n.style.fontSize = '';
+  const rows = new Map();
+  for (const n of names) {
+    if (!n.clientWidth || n.scrollWidth <= n.clientWidth) continue;
+    const row = n.parentElement.parentElement;
+    rows.set(row, Math.min(rows.get(row) || 1, n.clientWidth / n.scrollWidth));
+  }
+  // Bredden växer inte exakt med storleken: en pixel till när det inte räckte.
+  const over = (ns) => ns.some((n) => n.scrollWidth > n.clientWidth);
+  for (const [row, fit] of rows) {
+    const ns = [...row.querySelectorAll('.mname')];
+    let px = Math.floor(parseFloat(getComputedStyle(ns[0]).fontSize) * fit);
+    do {
+      for (const n of ns) n.style.fontSize = `${px}px`;
+    } while (over(ns) && --px >= 9);
+  }
+}
+const fitWidths = new WeakMap();
+const fitObs = new ResizeObserver((es) => {
+  for (const e of es) {
+    if (fitWidths.get(e.target) === e.contentRect.width) continue;
+    fitWidths.set(e.target, e.contentRect.width);
+    fitNames(e.target);
+  }
+});
+new MutationObserver((rs) => {
+  const lists = new Set();
+  for (const r of rs) {
+    const own = r.target.closest && r.target.closest('.mlist');
+    if (own) lists.add(own);
+    for (const n of r.addedNodes) if (n.querySelectorAll) for (const l of n.querySelectorAll('.mlist')) lists.add(l);
+  }
+  for (const l of lists) {
+    if (!l.querySelector('.mname')) continue;
+    fitObs.observe(l);
+    fitNames(l);
+  }
+}).observe(document.body, { childList: true, subtree: true });
+
 // Matchraden som en liten biljett, som matchbladets huvud: hemmalaget till
 // höger om mitten, bortalaget till vänster om den och avsparken – resultatet
 // när matchen är spelad – mellan dem. Ytterst står tävlingen (och omgången i

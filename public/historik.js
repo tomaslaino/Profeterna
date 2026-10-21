@@ -185,19 +185,35 @@
       '</article>';
   }
 
+  // Laget med skölden in mot mitten, som i matchlistan (theme.css .mteam).
+  function team(name, home) {
+    const skold = window.Skoldar ? Skoldar.img(name, { dark: true }) : '';
+    const n = `<span class="mname">${esc(name)}</span>`;
+    return `<span class="mteam${home ? ' home' : ''}">${home ? n + skold : skold + n}</span>`;
+  }
+
+  // Raden som matchlistans tavla: lagen speglade kring resultatet, tecknen
+  // och modellens odds till höger (historik.css .hk-row). En match som
+  // skrivits in för hand utan mellanslag kring strecket står hel till vänster
+  // om resultatet. Förlängning och straffar står på var sin rad under det.
   function rowHtml(r) {
     const cls = dotClass(r);
     const res = r.off ? '<span class="sub">struken</span>'
-      : r.score ? `<span class="score">${esc(r.score)}</span>${r.end ? `<span class="sub">${esc(r.end)}</span>` : ''}`
+      : r.score ? `<span class="score">${esc(r.score)}</span>${r.end ? `<span class="sub">${r.end.split(', ').map(esc).join('<br>')}</span>` : ''}`
         : r.res != null ? `<span class="score">${SIGNS[r.res]}</span>` : '<span class="sub">okänt</span>';
-    return `<div class="hk-row s-${cls}">` +
+    const sides = r.match.split(/\s[–-]\s/);
+    const teams = sides.length === 2
+      ? `${team(sides[0], true)}<span class="mmid">${res}</span>${team(sides[1], false)}`
+      : `<span class="hk-whole">${esc(r.match)}</span><span class="mmid">${res}</span>`;
+    return `<div class="hk-row s-${cls}">${teams}` +
+      (r.note ? `<span class="hk-note">${esc(r.note)}</span>` : '') +
+      '<span class="hk-pick">' +
       `<span class="kp-dot ${cls}" aria-hidden="true">${cls === 'ok' ? '✓' : cls === 'no' ? '✕' : ''}</span>` +
-      `<span class="hk-match">${esc(r.match)}${r.note ? `<span class="hk-note">${esc(r.note)}</span>` : ''}</span>` +
       signBoxes(r) +
       (r.p != null
         ? `<span class="kp-p" title="Modellens odds för ert tecken, före avspark (${r.p} % chans)"><span class="kp-pbar"><i style="width:${Math.min(100, r.p)}%"></i></span>${pctOdds(r.p)}</span>`
         : '<span class="kp-p unknown" title="Modellens chans är okänd för matchen">–</span>') +
-      `<span class="hk-res">${res}</span></div>`;
+      '</span></div>';
   }
 
   // ---------- spoilerskyddet ----------
@@ -305,10 +321,12 @@
     if (H.loading) return H.loading;
     const saved = loadKey(SORT_KEY);
     if (saved && SORTS.some((s) => s.id === saved.sort)) { H.sort = saved.sort; H.dir = saved.dir === -1 ? -1 : 1; }
-    // Med spoilerskyddet på behövs matchernas avsparkstider först.
+    // Med spoilerskyddet på behövs matchernas avsparkstider först, och
+    // sköldarnas index till raderna.
     H.loading = Promise.all([
       getJSON('data/historik.json'),
       window.Spoiler && Spoiler.on() ? Spoiler.matches() : null,
+      window.Skoldar && Skoldar.ready,
     ]).then(([data]) => {
       H.data = data;
       if (window.Spoiler) Spoiler.onChange(async () => { await Spoiler.matches(); if (visible()) render(); });

@@ -633,7 +633,9 @@ table.cmp tr.model td { background: var(--accent-soft); color: #fff; }
   letter-spacing: -0.005em;
 }
 .mteam.home { justify-content: flex-end; text-align: right; }
-.mname { text-wrap: balance; }
+/* ett ord som är bredare än spalten (Wolverhampton i telefonen) krymper
+   raden i stället för att gå in i mitten (app.js fitNames) */
+.mname { min-width: 0; text-wrap: balance; }
 /* Mitten är lika hög med resultatet, avsparken och resultatet dolt
    (spoiler.css .sp-chip). Prognosen före avspark står i resultatets
    tooltip. */
@@ -908,7 +910,7 @@ footer .foot-links a[aria-current="page"] { color: var(--fg); }
 @media (max-width: 640px) {
   .mrow { grid-template-columns: minmax(0, 1fr) 3.9rem minmax(0, 1fr); row-gap: 6px; }
   .mcomp { display: none; }
-  .mteam { font-size: 14px; }
+  .mteam { gap: 6px; font-size: 14px; }
   .mteam .skold { width: 18px; height: 18px; }
   .mside { grid-column: 1 / -1; justify-self: center; }
   .mside:empty { display: none; }

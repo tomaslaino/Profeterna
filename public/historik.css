@@ -140,23 +140,28 @@
 .hk-rows > summary { font-size: 13.5px; font-weight: 600; color: var(--ink-soft); }
 .hk-count { font-weight: 500; color: var(--muted); }
 .hk-rows .mlist { margin-top: 10px; }
+/* Raden som matchlistans tavla (historik.js rowHtml): bocken ytterst till
+   vänster, lagen speglade kring resultatet (theme.css .mteam, .mmid) och
+   tecknen och modellens odds till höger. Anteckningen står under lagen. */
 .hk-row {
   display: grid;
-  grid-template-columns: 24px minmax(0, 1fr) auto 7.5rem 5.5rem;
+  grid-template-columns: 24px minmax(0, 1fr) 4.6rem minmax(0, 1fr) auto 7.5rem;
   align-items: center;
-  gap: 14px;
+  gap: 2px 14px;
   padding: 10px 16px;
   border-bottom: 1px solid var(--hair);
 }
 .hk-row:last-child { border-bottom: 0; }
-.hk-match { font-weight: 600; font-size: 14.5px; min-width: 0; }
-.hk-note { display: block; margin-top: 2px; font-size: 12.5px; font-weight: 400; font-style: italic; color: var(--eyebrow); }
+.hk-pick { display: contents; }
+.hk-row .kp-dot { grid-area: 1 / 1; }
+.hk-row > .mmid { grid-column: 3; }
+.hk-row .kp-sg { grid-column: 5; }
+.hk-row .kp-p { grid-column: 6; }
+.hk-whole { grid-column: 2; min-width: 0; font-size: 15px; font-weight: 600; text-align: right; }
+.hk-note { grid-area: 2 / 2 / 3 / 5; font-size: 12.5px; font-weight: 400; font-style: italic; text-align: center; color: var(--eyebrow); }
 .hk-note::before { content: "”"; margin-right: 2px; }
 .hk-note::after { content: "”"; margin-left: 1px; }
-.hk-res { text-align: right; display: flex; flex-direction: column; align-items: flex-end; }
-.hk-res .score { font-family: var(--display); font-weight: 800; font-size: 19px; color: var(--bone); letter-spacing: 0.02em; }
-.hk-res .sub { font-size: 11.5px; }
-.hk-row.s-no .hk-match, .hk-row.s-no .kp-p { opacity: 0.7; }
+.hk-row.s-no :is(.mteam, .hk-whole, .hk-note, .kp-p) { opacity: 0.7; }
 .hk-row .kp-p.unknown { justify-content: center; }
 
 @media (max-width: 760px) {
@@ -168,9 +173,22 @@
   .hk-card { padding: 16px; }
   .hk-title h4 { font-size: 22px; }
   .hk-mid { grid-template-columns: 1fr; gap: 10px; }
-  .hk-row { grid-template-columns: 22px minmax(0, 1fr) auto auto; gap: 10px; padding: 10px 12px; }
+  .hk-row { grid-template-columns: 22px minmax(0, 1fr) 4.2rem minmax(0, 1fr) auto; column-gap: 10px; padding: 10px 12px; }
   .hk-row .kp-p { display: none; }
   .hk-row .kp-sg i { width: 23px; height: 23px; font-size: 14px; }
+}
+
+/* telefon: bara lagen och resultatet på raden, bocken och tecknen mitt under
+   (anteckningen mellan dem) */
+@media (max-width: 640px) {
+  /* kortet har egen kantluft: tätare rad, så att namnen får plats */
+  .hk-row { grid-template-columns: minmax(0, 1fr) 3.4rem minmax(0, 1fr); gap: 6px; padding: 10px 8px; }
+  .hk-row .mteam .skold { width: 16px; height: 16px; }
+  .hk-pick { display: flex; grid-column: 1 / -1; justify-content: center; align-items: center; gap: 10px; }
+  .hk-row .kp-dot, .hk-row .kp-sg { grid-area: auto; }
+  .hk-row > .mmid { grid-column: 2; }
+  .hk-whole { grid-column: 1; }
+  .hk-note { grid-column: 1 / -1; }
 }
 
 @media (prefers-reduced-motion: reduce) {

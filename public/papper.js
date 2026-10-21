@@ -20,7 +20,7 @@
 //
 // Läses efter kupong.js och använder dess hjälpare (SIGNS, NOTE_MAX, rowClass,
 // teamsOf, scoreText, kpNum, dateRange, liveLine, fWeekdayTime) och app.js
-// (esc, fTime, fDay, dayKey, cap, compOf, pctOdds).
+// (esc, fTime, fDay, dayKey, cap, compOf, pctOdds, listTeam).
 
 (function () {
   // Slumptal ur en nyckel (mulberry32 med FNV-hash som frö).
@@ -316,8 +316,10 @@
     }
   }
 
-  // Programmet: de valbara matcherna per dag, en knapp per match. full: alla
-  // rader på papperet är ifyllda, så plustecknen tonas ner.
+  // Programmet: de valbara matcherna per dag, en knapp per match, som
+  // matchlistans tavla – tävlingen och plustecknet ytterst, lagen speglade
+  // kring avsparken (app.js listTeam). full: alla rader på papperet är
+  // ifyllda, så plustecknen tonas ner.
   function program(matches, isOn, full = false) {
     const days = new Map();
     for (const m of matches) {
@@ -332,9 +334,8 @@
         const on = isOn(m.id);
         const comp = compOf(m.comp);
         html += `<button type="button" class="kp-pick pb-pick${on ? ' on' : ''}" data-add="${esc(m.id)}" aria-pressed="${on}"${full && !on ? ' aria-disabled="true"' : ''}>` +
-          `<span class="mtime">${esc(fTime.format(new Date(m.kickoff)))}</span>` +
           `<span class="ctag" title="${esc(comp.name)}">${esc(comp.short)}</span>` +
-          `<span class="mteams">${esc(m.home)}<span class="vs">–</span>${esc(m.away)}</span>` +
+          `${listTeam(m.home, true)}<span class="mmid"><span class="kick">${esc(fTime.format(new Date(m.kickoff)))}</span></span>${listTeam(m.away, false)}` +
           `<span class="pb-tick" aria-hidden="true">${on ? '✓' : '+'}</span></button>`;
       }
       html += '</div></div>';
