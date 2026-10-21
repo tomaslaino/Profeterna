@@ -1324,7 +1324,9 @@ hemligheten `ANTHROPIC_API_KEY` finns, annars av DeepSeek som analysen. Claude f
 nätet efter nyheter kring lagen (Anthropics sökverktyg, högst fem sökningar), så att det mest
 intressanta kan vara en nyhet och inte bara statistik – t.ex. *Mästarbesök i Bromley*
 (Leicester, mästare för tio år sedan, borta mot en klubb som var utanför ligasystemet 2024).
-Instruktionen är medvetet kort; långa regler gjorde namnen stela. Proxyn läser omgången
+Instruktionen är medvetet kort; långa regler gjorde namnen stela. I stället visar den tre namn
+som blev bra och ett som bara konstaterar något, och ber om en handfull förslag där det
+roligaste vinner (förslagen sparas med namnet). Proxyn läser omgången
 ur samma KV-namnrymd som tipsen och matchernas underlag ur den publicerade sajten
 (`data/match/<id>.json`: arena, odds, tabell, hemma- och bortafacit, form, mål mot xG, vila,
 tidigare möten), räknar fram en sammanfattning (lag som spelar flera gånger, största favorit,

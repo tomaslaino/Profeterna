@@ -14,7 +14,7 @@
 module.exports = {
   // Ändras prompten byts versionen, så att omgångar som redan har fått sitt
   // namn inte döps om – bara nya omgångar får namn efter den nya prompten.
-  promptVersion: '2026-10-20.8',
+  promptVersion: '2026-10-21.1',
   // Claude när nyckeln finns: tänkandet är alltid på, effort styr hur mycket.
   // fallbacks: "default" låter Anthropic köra om ett nekat svar på en annan
   // modell i samma anrop.
@@ -32,11 +32,20 @@ module.exports = {
 
   // Kort med flit: de långa instruktionerna gjorde namnen stela
   // (användaren 2026-10-20). Kontrollerna i worker/namn.mjs står kvar.
+  // Exemplen på nivån kom till 2026-10-21, när "Gott om fint folk i
+  // Championship" bara konstaterade något och användaren saknade skämtet.
   systemPrompt: `Matchfixarna är ett gäng svenska kompisar som tippar engelsk fotboll tillsammans, tretton matcher i taget. Varje omgång får ett namn som står som rubrik på deras förstasida.
 
-Hitta det mest intressanta med just den här omgången och ge den ett namn med subtil ironi – en lugn rubrik som är sann på ytan men säger något mer för den som vet. Det intressanta kan stå i underlaget, men lika gärna i nyheterna: sök gärna efter vad som händer kring lagen just nu – en tränare som sitter löst, ett jubileum, en flytt, något märkligt. Skriv som en svensk skulle säga det, inte som en översättning. Byt gärna stil mot de tidigare namnen. Aldrig elakt mot någon.
+Namnet ska få dem att dra på munnen. Hitta det mest intressanta med omgången – i underlaget eller i nyheterna kring lagen just nu – och säg det med en underdrift eller en dubbel botten: lugnt och sant på ytan, kul för den som vet. Skämtet ska sitta i själva namnet. Ett namn som bara konstaterar något, som "Allhelgona på Stamford Bridge", säger ingenting.
 
-Svara bara med JSON: {"namn": "…", "syftar": "…"}. Namnet: högst sex ord, inga siffror, inte orden kupong, omgång eller tips. "syftar": en kort mening om vad namnet anspelar på, som man skulle säga den högt.
+Så har det låtit när det blev bra:
+- Lincoln har godis framme – halloween, och Lincoln vinner aldrig hemma.
+- Bournemouth trivs på Old Trafford – Bournemouth vinner aldrig borta, utom där.
+- Grannen hälsar på i Preston – sist mot näst sist.
+
+Skriv en handfull förslag och välj det roligaste. Skriv som en svensk skulle säga det, byt stil mot de tidigare namnen och var aldrig elak mot någon.
+
+Svara bara med JSON: {"förslag": ["…"], "namn": "…", "syftar": "…"}. Namnet: högst sex ord, inga siffror, inte orden kupong, omgång eller tips. "syftar": en kort mening om vad namnet anspelar på, som man skulle säga den högt.
 
 Håll dig till fakta – ur underlaget, ur det du hittar och sådant alla vet.`,
 };
