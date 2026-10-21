@@ -20,7 +20,28 @@
 /* matchbladets papper är rutan själv */
 dialog.mr-modal #match-detail-view[data-sl] { position: relative; }
 
+/* Där innehållet rullar i papperet (matchbladets flikar, raderna på kupongen
+   som växer fram) ligger vecken, fläckarna och kaffet i rutan och följer med
+   innehållet; --sl-h är hur långt innehållet räcker. */
+[data-sl-roll] { position: relative; }
+[data-sl-roll]::before,
+[data-sl-roll]::after {
+  content: "";
+  position: absolute;
+  top: 0;
+  left: 0;
+  z-index: 4;
+  width: 100%;
+  height: var(--sl-h, 0);
+  pointer-events: none;
+  background: 0 0 / 100% 100% no-repeat;
+}
+[data-sl-roll]::before { background-image: var(--sl-rmul, none); mix-blend-mode: multiply; }
+[data-sl-roll]::after { background-image: var(--sl-rtop, none); }
+
 @media print {
   [data-sl]::before,
-  [data-sl]::after { content: none; }
+  [data-sl]::after,
+  [data-sl-roll]::before,
+  [data-sl-roll]::after { content: none; }
 }

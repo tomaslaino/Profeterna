@@ -213,10 +213,10 @@
 
   // Ett hörn som vikts in och slätats ut igen: ett snett veck tvärs över
   // hörnet. Hörnet låg med trycket mot papperet och gulnade mindre, liksom
-  // det ställe det låg på. Inte nedtill på ett papper som växer, och inte i
-  // hörnet med hundörat.
-  function corner(r, a, grows, ear) {
-    const all = (grows ? ['tl', 'tr'] : ['tl', 'tr', 'bl', 'br']).filter((c) => c !== ear);
+  // det ställe det låg på. Inte nedtill på ett papper som växer eller där
+  // innehållet rullar (low), och inte i hörnet med hundörat.
+  function corner(r, a, low, ear) {
+    const all = (low ? ['tl', 'tr'] : ['tl', 'tr', 'bl', 'br']).filter((c) => c !== ear);
     const s = span(r, 26, 80);
     return {
       corner: all[int(r, 0, all.length - 1)],
@@ -277,10 +277,16 @@
 
   // ---------- bilderna ----------
 
-  function draw(p, W, H) {
+  // roll: rutan där innehållet rullar (rolling). Gulningen och hörnen sitter
+  // på bladet (bmul, btop) och resten på det som står på det (mul, top), som
+  // där följer med innehållet. Y: hur långt ner det räcker.
+  function draw(p, W, H, roll) {
+    const Y = roll ? Math.max(H, roll.y + roll.d) : H;
     const md = ['<filter id="b" x="-1" y="-1" width="3" height="3"><feGaussianBlur stdDeviation="2.2"/></filter>',
       '<filter id="b4" x="-1" y="-1" width="3" height="3"><feGaussianBlur stdDeviation="4"/></filter>'];
     const td = ['<filter id="b3" x="-1" y="-1" width="3" height="3"><feGaussianBlur stdDeviation="3"/></filter>'];
+    const bmul = [];
+    const btop = [];
     const mul = [];
     const top = [];
 
@@ -291,12 +297,12 @@
         `<filter id="t" filterUnits="userSpaceOnUse" x="0" y="0" width="${f(W)}" height="${f(H)}">` +
         `<feTurbulence type="fractalNoise" baseFrequency="${g.freq.toFixed(4)}" numOctaves="2" seed="${g.seed}"/>` +
         `<feColorMatrix values="0 0 0 0 .66 0 0 0 0 .52 0 0 0 0 .32 0 0 0 ${(0.3 * g.blotch).toFixed(3)} ${(-0.14 * g.blotch).toFixed(3)}"/></filter>`);
-      mul.push('<rect width="100%" height="100%" fill="url(#v)"/><rect width="100%" height="100%" filter="url(#t)"/>');
+      bmul.push('<rect width="100%" height="100%" fill="url(#v)"/><rect width="100%" height="100%" filter="url(#t)"/>');
       if (g.side) {
         const [x1, y1, x2, y2] = g.side;
         md.push(`<linearGradient id="s" x1="${x1}" y1="${y1}" x2="${x2}" y2="${y2}"><stop offset="0" stop-color="#c9a46a" stop-opacity="${g.sun.toFixed(2)}"/>` +
           '<stop offset=".4" stop-color="#c9a46a" stop-opacity="0"/></linearGradient>');
-        mul.push('<rect width="100%" height="100%" fill="url(#s)"/>');
+        bmul.push('<rect width="100%" height="100%" fill="url(#s)"/>');
       }
     }
 
@@ -322,7 +328,7 @@
       };
       let prev = null;
       // raderna står olika tätt, så att nätet inte blir ett rutnät
-      for (let y = -k.c; y < H + 2 * k.c; y += k.c * span(q, 0.65, 1.35)) {
+      for (let y = -k.c; y < Y + 2 * k.c; y += k.c * span(q, 0.65, 1.35)) {
         const row = [];
         for (let i = -1; i <= k.cols + 1; i++) row.push([((i + jit(q, 0.45)) / k.cols) * W, y + jit(q, 0.4) * k.c]);
         if (prev) {
@@ -374,7 +380,7 @@
       creases.forEach((c, i) => {
         const h = c.dir === 'h';
         // där vecket korsar dem som viktes före det vänder det
-        const end = (h ? W : H) + 10;
+        const end = (h ? W : Y) + 10;
         const cuts = creases.filter((o) => o.dir !== c.dir && o.order < c.order && !o.twin)
           .map((o) => (h ? at(o, c.at, 0)[0] : at(o, c.at * W, 0)[1]))
           .filter((u) => u > -10 && u < end)
@@ -457,12 +463,12 @@
       // hörnet och dess spegelbild i vecket, där det låg
       const t = ((C[0] - P[0]) * dx + (C[1] - P[1]) * dy) / (L * L);
       const C2 = [2 * (P[0] + t * dx) - C[0], 2 * (P[1] + t * dy) - C[1]];
-      if (c.light) top.push(`<path d="${line([P, C, Q, C2])}Z" fill="#fffaf0" fill-opacity="${c.light.toFixed(2)}" filter="url(#b3)"/>`);
+      if (c.light) btop.push(`<path d="${line([P, C, Q, C2])}Z" fill="#fffaf0" fill-opacity="${c.light.toFixed(2)}" filter="url(#b3)"/>`);
       const d = line([[P[0] - dx * 0.06, P[1] - dy * 0.06], [Q[0] + dx * 0.06, Q[1] + dy * 0.06]]);
       const [nx, ny] = [(-dy / L) * c.side, (dx / L) * c.side];
-      mul.push(`<path d="${d}" transform="translate(${f(nx * 2.5)} ${f(ny * 2.5)})" fill="none" stroke="#b8996a" stroke-opacity=".3" stroke-width="4" filter="url(#b)"/>`);
-      mul.push(`<path d="${d}" fill="none" stroke="#6b4c2a" stroke-opacity="${c.dark.toFixed(2)}" stroke-width="1"/>`);
-      top.push(`<path d="${d}" transform="translate(${f(-nx * 1.2)} ${f(-ny * 1.2)})" fill="none" stroke="#fffaf0" stroke-opacity=".7" stroke-width="1.2" stroke-dasharray="${c.worn}"/>`);
+      bmul.push(`<path d="${d}" transform="translate(${f(nx * 2.5)} ${f(ny * 2.5)})" fill="none" stroke="#b8996a" stroke-opacity=".3" stroke-width="4" filter="url(#b)"/>`);
+      bmul.push(`<path d="${d}" fill="none" stroke="#6b4c2a" stroke-opacity="${c.dark.toFixed(2)}" stroke-width="1"/>`);
+      btop.push(`<path d="${d}" transform="translate(${f(-nx * 1.2)} ${f(-ny * 1.2)})" fill="none" stroke="#fffaf0" stroke-opacity=".7" stroke-width="1.2" stroke-dasharray="${c.worn}"/>`);
     }
 
     if (p.ora) {
@@ -473,14 +479,27 @@
         br: [[[W, H - s], [W - s, H]], [[W, H - s], [W - s, H], [W - s, H - s]], [-1.5, -1.5]],
       }[p.ora.corner];
       const mid = [(fold[0][0] + fold[1][0]) / 2, (fold[0][1] + fold[1][1]) / 2];
-      mul.push(`<path d="${line(flap)}Z" transform="translate(${sh[0]} ${sh[1]})" fill="#000" fill-opacity=".28" filter="url(#b)"/>`);
+      bmul.push(`<path d="${line(flap)}Z" transform="translate(${sh[0]} ${sh[1]})" fill="#000" fill-opacity=".28" filter="url(#b)"/>`);
       td.push(`<linearGradient id="e" gradientUnits="userSpaceOnUse" x1="${f(mid[0])}" y1="${f(mid[1])}" x2="${f(flap[2][0])}" y2="${f(flap[2][1])}">` +
         '<stop offset="0" stop-color="#ebdfc6"/><stop offset="1" stop-color="#d8c6a2"/></linearGradient>');
-      top.push(`<path d="${line(flap)}Z" fill="url(#e)"/><path d="${line(fold)}" stroke="#fff8ea" stroke-opacity=".85" stroke-width="1"/>`);
+      btop.push(`<path d="${line(flap)}Z" fill="url(#e)"/><path d="${line(fold)}" stroke="#fff8ea" stroke-opacity=".85" stroke-width="1"/>`);
     }
 
-    const svg = (defs, body) => `<svg xmlns="http://www.w3.org/2000/svg" width="${f(W)}" height="${f(H)}" viewBox="0 0 ${f(W)} ${f(H)}"><defs>${defs.join('')}</defs>${body.join('')}</svg>`;
-    return { mul: svg(md, mul), top: svg(td, top) };
+    const svg = (w, h, defs, body) => `<svg xmlns="http://www.w3.org/2000/svg" width="${f(w)}" height="${f(h)}" viewBox="0 0 ${f(w)} ${f(h)}"><defs>${defs.join('')}</defs>${body.join('')}</svg>`;
+    if (!roll) return { mul: svg(W, H, md, [...bmul, ...mul]), top: svg(W, H, td, [...top, ...btop]) };
+    // i rutan ritas det som står på papperet i en egen bild som rullar med
+    // innehållet (rmul, rtop), och på bladet bara ovanför och nedanför rutan
+    const out = `<clipPath id="o"><rect width="${f(W)}" height="${f(roll.y)}"/>` +
+      `<rect y="${f(roll.y + roll.h)}" width="${f(W)}" height="${f(Math.max(0, H - roll.y - roll.h))}"/></clipPath>`;
+    const g = (attr, body) => `<g ${attr}>${body.join('')}</g>`;
+    const cut = 'clip-path="url(#o)"';
+    const move = `transform="translate(${f(-roll.x)} ${f(-roll.y)})"`;
+    return {
+      mul: svg(W, H, [...md, out], [...bmul, g(cut, mul)]),
+      top: svg(W, H, [...td, out], [g(cut, top), ...btop]),
+      rmul: svg(roll.w, roll.d, md, [g(move, mul)]),
+      rtop: svg(roll.w, roll.d, td, [g(move, top)]),
+    };
   }
 
   // Det avvikta hörnet klipps bort ur papperet.
@@ -517,8 +536,30 @@
     return `${kind}:${id ? id.textContent.trim().slice(0, 80) : ''}`;
   }
 
-  const known = new WeakMap(); // papperet → { key, plan, w, h }
+  const known = new WeakMap(); // papperet → { key, plan, size, box }
   const url = (s) => `url("data:image/svg+xml,${encodeURIComponent(s)}")`;
+
+  // Rutan i papperet där innehållet rullar (KINDS rolls): var den sitter på
+  // papperet, hur stor den är och hur långt innehållet räcker (d). Slitaget i
+  // rutan (data-sl-roll, --sl-h) fälls ihop medan den mäts, så att det inte
+  // självt håller ut rutan när innehållet krymper. Innehållet kan växa och
+  // krympa utan att rutan gör det, så det bevakas också.
+  const rolled = new WeakSet();
+  function rolling(el, sel) {
+    const s = sel && el.querySelector(sel);
+    if (!s || !s.clientHeight || s.offsetParent !== el) return null;
+    if (!s.hasAttribute('data-sl-roll')) s.setAttribute('data-sl-roll', '');
+    for (const n of [s, ...s.children]) {
+      if (rolled.has(n)) continue;
+      rolled.add(n);
+      sizes.observe(n);
+    }
+    const box = { el: s, x: s.offsetLeft + s.clientLeft, y: s.offsetTop + s.clientTop, w: s.clientWidth, h: s.clientHeight };
+    s.style.setProperty('--sl-h', '0px');
+    box.d = s.scrollHeight;
+    s.style.setProperty('--sl-h', `${box.d}px`);
+    return box;
+  }
 
   function apply(el) {
     const kind = kindOf(el);
@@ -526,7 +567,7 @@
     let st = known.get(el);
     if (!st || st.key !== key) {
       const match = kind === 'match';
-      st = { key, plan: plan(kind, key), w: 0, h: 0 };
+      st = { key, plan: plan(kind, key), size: '' };
       known.set(el, st);
       if (!el.hasAttribute('data-sl')) {
         el.setAttribute('data-sl', '');
@@ -546,12 +587,19 @@
     }
     const w = el.clientWidth;
     const h = el.clientHeight;
-    if (!w || !h || (w === st.w && h === st.h)) return;
-    st.w = w;
-    st.h = h;
-    const img = draw(st.plan, w, h);
+    const roll = w && h ? rolling(el, KINDS[kind].rolls) : null;
+    const size = [w, h, roll ? [roll.x, roll.y, roll.w, roll.h, roll.d] : ''].join();
+    const box = roll && roll.el;
+    if (!w || !h || (size === st.size && box === st.box)) return;
+    st.size = size;
+    st.box = box;
+    const img = draw(st.plan, w, h, roll);
     el.style.setProperty('--sl-mul', url(img.mul));
     el.style.setProperty('--sl-top', url(img.top));
+    if (box) {
+      box.style.setProperty('--sl-rmul', url(img.rmul));
+      box.style.setProperty('--sl-rtop', url(img.rtop));
+    }
   }
 
   let queued = false;

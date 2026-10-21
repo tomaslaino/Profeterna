@@ -580,13 +580,14 @@ a.pp-row:focus-visible { outline: 2px solid var(--pp-pen); outline-offset: -2px;
 .pb-name::placeholder { font-family: var(--sans); font-size: 12.5px; font-weight: 500; color: var(--pp-ink-soft); opacity: 0.8; }
 .pb-name:focus { outline: none; border-bottom: 1.5px solid var(--pp-pen); }
 
-/* raderna: rullar inuti papperet; synkmarkeringarna i marginalen följer med */
+/* raderna: rullar inuti papperet, från kant till kant, så att slitaget i dem
+   (slitage.js) når kanten; synkmarkeringarna i marginalen följer med */
 .pb-rows {
   position: relative;
   flex: 1 1 auto;
   min-height: 0;
-  margin: 0 -10px 0 -40px;
-  padding: 0 10px 0 40px;
+  margin: 0 -20px 0 -40px;
+  padding: 0 20px 0 40px;
   overflow-y: auto;
   overscroll-behavior: contain;
   scrollbar-width: thin;
@@ -736,7 +737,7 @@ a.pp-row:focus-visible { outline: 2px solid var(--pp-pen); outline-offset: -2px;
   .pb-stop b { min-height: 20px; font-size: 15px; }
   .pb-stop .pb-blankline { width: 54px; height: 18px; }
   .pb-name { flex-basis: 100%; max-width: none; font-size: 21px; }
-  .pb-rows { margin: 0 -6px 0 -28px; padding: 0 6px 0 28px; }
+  .pb-rows { margin: 0 -12px 0 -28px; padding: 0 12px 0 28px; }
   /* lagen överst, numret och rutorna under */
   .pb-row {
     grid-template-columns: auto minmax(0, 1fr) 24px;
@@ -906,7 +907,7 @@ a.pp-row:focus-visible { outline: 2px solid var(--pp-pen); outline-offset: -2px;
   .pb.open .pp-fields.pb-fields { flex: none; }
   .pb.open .pb-fields .pp-field { flex: none; min-width: 62px; }
   .pb.open .pb-foot .kp-btn.primary { flex: 1 1 150px; }
-  .pb-rows { margin: 0 -6px 0 -30px; padding: 0 6px 0 30px; }
+  .pb-rows { margin: 0 -12px 0 -30px; padding: 0 12px 0 30px; }
 
   /* raderna som på en tryckt kupong: nummer, matchen, rutorna, bort */
   .pb-row {
