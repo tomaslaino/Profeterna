@@ -449,7 +449,7 @@
     html += '<div class="pb-foot sm-foot">' + fieldList([
       ['Tippat', `${chosen.length}/${rows.length}`],
       gard ? ['Garderingar', gard] : null,
-      ['Rader', rader(chosen), 'Antal rader med garderingarna'],
+      ['Kombinationer', rader(chosen), 'Så många kombinationer av tecken kupongen täcker – antalet tecken i varje match gånger varandra'],
       odds ? ['Odds', oddsText(odds), 'Oddset för att alla gängets tecken går in – matchernas odds gånger varandra'] : null,
       folkField(),
     ]) + '</div>';
@@ -928,7 +928,7 @@
     $('#sm-fields').outerHTML = !mine ? '<div class="pp-fields pb-fields" id="sm-fields"></div>' : fieldList([
       ['Tippat', `${signs.length}/${s.matcher.length}`],
       gard ? ['Garderingar', gard] : null,
-      ['Rader', rader(signs), 'Antal rader med garderingarna'],
+      ['Kombinationer', rader(signs), 'Så många kombinationer av tecken kupongen täcker – antalet tecken i varje match gånger varandra'],
       odds ? ['Odds', oddsText(odds), 'Oddset för att alla dina tecken går in – matchernas odds gånger varandra'] : null,
       folkField(),
     ], 'sm-fields');

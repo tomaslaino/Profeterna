@@ -151,4 +151,4 @@ function parseGame(g, e, id) {
   return rated ? { k: e.kickoff, g: id, t } : null;
 }
 
-module.exports = { fetchRatings };
+module.exports = { fetchRatings, teamSim };

@@ -2,13 +2,14 @@
 
 // Källorna för spelardatan (trupp och spelarstatistik per liga, speltiden
 // utanför Premier League och målen ur matchrapporterna i alla fyra ligor, och
-// spelarnas betyg från 365Scores). Egen fil så att registret i src/sources.js bara
+// spelarnas betyg och bilder från 365Scores). Egen fil så att registret i src/sources.js bara
 // behöver en rad för att ta med dem.
 
 const { COMPETITIONS } = require('../config/competitions');
 const espnPlayers = require('./fetchers/espnplayers');
 const espnMinutes = require('./fetchers/espnminutes');
 const s365Ratings = require('./fetchers/s365ratings');
+const s365Squads = require('./fetchers/s365squads');
 const { readCache } = require('./store');
 
 const LEAGUES = COMPETITIONS.filter((c) => c.type === 'league');
@@ -101,6 +102,38 @@ for (const c of LEAGUES) {
         detail: `${n} av ${d.played} spelade matcher med betyg` +
           (d.missing ? `, ${d.missing} saknas${d.unmatched ? ` (${d.unmatched} hittades inte hos 365Scores)` : ''}` : ''),
         latestData: n ? all.filter((m) => m.t).map((m) => m.k).sort().pop().slice(0, 10) : null,
+      };
+    },
+  });
+}
+
+// Trupperna hos 365Scores, för spelarnas bilder i spelarkortet. Läser
+// ESPN-trupperna ur cachen för att para ihop lagen. En gång per dygn räcker:
+// trupper och bilder ändras sällan.
+for (const c of LEAGUES) {
+  PLAYER_SOURCES.push({
+    id: `s365_squads_${c.id}`,
+    provider: '365Scores',
+    short: '365Scores',
+    label: `Spelarnas bilder – ${c.name}`,
+    comps: [c.id],
+    kinds: ['players'],
+    maxAgeHours: 24,
+    staleAfterHours: 24 * 7,
+    verified: '2026-10-20',
+    stage: 2,
+    fetch: () => {
+      const ep = readCache(`espn_players_${c.id}`);
+      if (!ep || !ep.data) throw new Error('inga ESPN-trupper i cachen än');
+      return s365Squads.fetchSquads(COMP365[c.id], ep.data.teams.map((t) => ({ espnId: t.espnId, name: t.name })));
+    },
+    summarize: (d) => {
+      const all = Object.values(d.teams).flatMap((t) => t.a);
+      const n = all.filter((a) => a[4] > 1).length;
+      return {
+        n,
+        detail: `${Object.keys(d.teams).length} lag, ${n} av ${all.length} spelare med bild` +
+          (d.unmatched.length ? `, hittade inte ${d.unmatched.join(', ')}` : ''),
       };
     },
   });

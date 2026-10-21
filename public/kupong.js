@@ -857,7 +857,7 @@ function drawSlip() {
     const rows = [...signed, ...locked].reduce((a, x) => a * Math.max(1, x.sign.length), 1);
     const exp = signed.reduce((a, x) => a + (x.m.f ? x.sign.split('').reduce((b, s) => b + x.m.f.p[SIGNS.indexOf(s)], 0) / 100 : 0), 0) +
       KP.draft.locked.map((x) => gradeRow(x, now)).reduce((a, r) => a + (r.state === 'final' && r.hit != null ? (r.hit ? 1 : 0) : (r.p || 0) / 100), 0);
-    fields.push(['Rader', rows, 'Antal rader med garderingarna'], ['Väntat', kpNum(exp), 'Väntat antal rätt enligt modellen']);
+    fields.push(['Kombinationer', rows, 'Så många kombinationer av tecken kupongen täcker – antalet tecken i varje match gånger varandra'], ['Väntat', kpNum(exp), 'Väntat antal rätt enligt modellen']);
   }
   Papper.slip('kp-build', {
     rows: draftSort(KP.draft, [...sel.map((x) => ({ ...x, note: KP.draft.notes[x.id] || '' })), ...locked], (x) => (x.m ? x.m.kickoff : '')),
