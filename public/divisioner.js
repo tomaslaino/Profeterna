@@ -1104,12 +1104,7 @@ function openPlayer(id) {
     ])), 'Fantasy Premier League']);
   }
   html += mtabs('player', 'Om spelaren', panes);
-  html += mfoot([
-    `ESPN · ligamatcher ${esc(state.data.season)} · hämtat ${when(P.source.fetchedAt)}`,
-    p.min != null && P.fpl ? `Speltid, xG och FPL: Fantasy Premier League · hämtat ${when(P.fpl.fetchedAt)}` : null,
-    p.min != null && !P.fpl && P.minutes ? `Speltid: ESPN:s matchrapporter · hämtat ${when(P.minutes.fetchedAt)}` : null,
-    p.gw != null && P.goalTypes ? `Målen: ESPN:s matchrapporter · hämtat ${when(P.goalTypes.fetchedAt)}` : null,
-  ], `<button type="button" class="dv-mbtn" data-team-open="${esc(p.teamId)}">Truppen i ${esc(p.team)} →</button>`);
+  html += mfoot([], `<button type="button" class="dv-mbtn" data-team-open="${esc(p.teamId)}">Truppen i ${esc(p.team)} →</button>`);
   showModal(html);
 }
 
