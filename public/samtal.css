@@ -354,7 +354,6 @@ button.sm-who:focus-visible { outline: 2px solid var(--ink); outline-offset: 1px
   .sm-act-go .kp-btn { flex: 1 1 auto; min-height: 40px; padding: 9px 12px; white-space: nowrap; }
   .sm-act-go .kp-btn.primary { flex-grow: 2; }
 }
-@media (max-width: 440px) { .sm-lang { display: none; } }
 
 /* smalt: lagen överst, rutorna i tre lika breda kolumner under; överst bara
    porträtten (tecknen står i rutorna) */

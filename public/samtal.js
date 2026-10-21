@@ -953,7 +953,7 @@
       s.visas ? '' : '<button type="button" class="sm-act-l" data-sm-remove>Ta bort</button>',
       s.visas || over(s) ? '<a class="sm-act-l" href="#kupong/samtal/ny">+ Ny kupong</a>' : '',
     ].filter(Boolean);
-    const handIn = (attr = ' id="sm-send"') => `<button type="button" class="kp-btn primary"${attr}><span>Lämna in<span class="sm-lang"> och se de andras</span></span></button>`;
+    const handIn = (attr = ' id="sm-send"') => `<button type="button" class="kp-btn primary"${attr}>Lämna in</button>`;
     let go = '';
     if (SM.edit) {
       go = '<a class="kp-btn" href="#kupong">Avbryt</a><button type="button" class="kp-btn primary" id="sm-send">Spara ändringarna</button>';

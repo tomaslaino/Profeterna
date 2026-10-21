@@ -1205,11 +1205,11 @@ under omgången.
    I telefonen står matchens nummer före lagen. Raden med initialerna står kvar överst när man bläddrar.
    Nederst hur många matcher som är tippade, garderingar och rader, och under dem raden
    med allt man gör med kupongen, som står kvar nederst medan man bläddrar (som raden med
-   initialerna överst): till höger *Spara* och *Lämna in och se de andras*, till vänster
+   initialerna överst): till höger *Spara* och *Lämna in*, till vänster
    *Ändra matcherna* och *Ta bort* i finstil (i telefonen bakom ⋯). *Spara* sparar en
    kupong som inte är färdig utan att lämna in – tipsen stannar på enheten, tjänsten får
    bara antalet tippade, så att de andra ser tårtbiten – och blir *Sparad* tills man
-   ändrar något. *Lämna in och se de andras* kräver tecken i alla matcher – annars blir
+   ändrar något. *Lämna in* kräver tecken i alla matcher – annars blir
    rutorna som saknar kryss röda. Har
    matcherna ändrats sedan sidan öppnades säger tjänsten till, och sidan visar de nya
    matcherna med ens tecken kvar där matchen fortfarande är med.
