@@ -119,6 +119,12 @@ dialog.mr-modal .mhead-mid .sub { color: var(--pp-ink-soft); }
 dialog.mr-modal .mhead-team { display: flex; align-items: center; gap: 14px; }
 dialog.mr-modal .mhead-team.away { flex-direction: row-reverse; }
 dialog.mr-modal .mhead-team .skold { width: 44px; height: 44px; }
+/* skölden tryckt i bläck på pappret: gråbrun i stället för lagets färger, och
+   det vita i den blir papper */
+dialog.mr-modal .mhead-team .skold img {
+  filter: grayscale(1) sepia(0.45) contrast(1.15) brightness(0.82);
+  mix-blend-mode: multiply;
+}
 
 dialog.mr-modal .mr-close {
   top: 24px;
