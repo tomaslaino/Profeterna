@@ -1103,10 +1103,17 @@ function openPlayer(id) {
   showModal(html);
 }
 
+// Alla matcher, även cuperna (data/matches.json): spoilerskyddet har dem
+// redan eller hämtar dem.
+function allMatches() {
+  if (window.Spoiler) return Spoiler.matches();
+  return getJSON('data/matches.json').then((d) => d.matches, () => []);
+}
+
 async function openTeam(id, pick) {
   const P = state.players.get(state.div);
   if (!P || P.unknown) return;
-  const T = await loadTeams(state.div);
+  const [T, all] = await Promise.all([loadTeams(state.div), allMatches(), window.Skoldar && Skoldar.ready]);
   const t = P.teams.find((x) => x.espnId === id);
   if (!t) return;
   const r = P.table ? P.table.rows.find((x) => x.espnId === id) : null;
@@ -1121,7 +1128,7 @@ async function openTeam(id, pick) {
     [t.avgAge == null ? '–' : num(t.avgAge, 1), 'Snittålder', 'Varje spelare räknas en gång per match den spelat'],
     [cell(t.used), 'Använda spelare'],
   ]);
-  // Flikarna: Spelet, Truppen och Frånvaro. Poängen, målen och truppens
+  // Flikarna: Spelet, Truppen, Frånvaro och Höjdpunkter. Poängen, målen och truppens
   // storlek står ovanför och följer med.
   const tt = T && !T.unknown ? T.teams.find((x) => x.espnId === id) : null;
   let game = '';
@@ -1166,10 +1173,14 @@ async function openTeam(id, pick) {
       `${x.news ? `<span class="dv-inj-what">${esc(x.news)}</span>` : ''}</li>`).join('')}</ul>`
     : '<p class="dv-calm">Inga rapporterade.</p>') : '';
 
+  // Höjdpunkterna i alla tävlingar (hojdpunkter.js).
+  const hl = window.Hojdpunkter && Hojdpunkter.team ? Hojdpunkter.team(t.name, all) : null;
+
   html += mtabs('team', 'Om laget', [
     ['spelet', 'Spelet', game, 'Spelet hittills'],
     ['trupp', 'Truppen', squadHtml],
     ['franvaro', `Frånvaro${away && av.players.length ? ` <small>${av.players.length}</small>` : ''}`, away, 'Skador och avstängningar'],
+    ['hojdpunkter', `Höjdpunkter${hl && hl.n ? ` <small>${hl.n}</small>` : ''}`, hl && hl.html, 'Höjdpunkter'],
   ], pick);
   showModal(html);
 }

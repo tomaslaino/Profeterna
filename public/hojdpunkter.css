@@ -251,3 +251,123 @@
   .hlp-box, .hlp-dim { transition: none; }
   .hlp:is(.away, .loose, .big) .hlp-box { animation: none; }
 }
+
+/* ---------- lagrutan: fliken Höjdpunkter ----------
+   Säsongen: en ruta per match, månad för månad med månaden under. Färgen är
+   resultatet sett från laget (ofärgad när det är dolt), tävlingens färg
+   längst ned för cupmatcher; rutor utan klipp är bleka. Senaste: datum,
+   hemma/borta, motståndaren, resultatet och spelknappen i kolumner som står i
+   linje rad för rad, även när en rad saknar klipp. Spelaren fälls ut under
+   säsongen eller under raden. */
+
+.hlt-queue {
+  order: 2;
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 0;
+  font: inherit;
+  font-size: 12.5px;
+  font-weight: 600;
+  letter-spacing: 0;
+  text-transform: none;
+  white-space: nowrap;
+  color: var(--accent-deep);
+  background: none;
+  border: 0;
+  border-radius: 0;
+  cursor: pointer;
+}
+.hlt-queue svg { width: 10px; height: 10px; }
+.hlt-queue:hover { color: var(--fg); background: none; }
+.hlt-queue.on { color: var(--gold-hi); }
+.hlt-queue:focus-visible { outline: 2px solid var(--gold); outline-offset: 3px; }
+
+.hlt-strip { display: flex; flex-wrap: wrap; gap: 12px 16px; }
+.hlt-mon { display: flex; flex-direction: column; gap: 6px; }
+.hlt-mon > div { display: flex; gap: 4px; }
+.hlt-mon > span { font-size: 12px; line-height: 1; color: var(--muted); }
+
+.hlt-sq {
+  position: relative;
+  display: grid;
+  place-items: center;
+  flex: none;
+  width: 30px;
+  height: 30px;
+  padding: 0;
+  overflow: hidden;
+  font: inherit;
+  color: var(--bg);
+  background: var(--c, var(--hair));
+  border: 0;
+  border-radius: 6px;
+  box-shadow: none;
+}
+.hlt-sq.v { --c: var(--fresh); }
+.hlt-sq.o { --c: var(--o-draw); color: var(--fg); }
+.hlt-sq.f { --c: var(--down); }
+.hlt-sq.hid { --c: var(--hair); color: var(--gold); box-shadow: inset 0 0 0 1px var(--border); }
+span.hlt-sq:not(.next) { opacity: 0.38; }
+.hlt-sq.cup::after { content: ""; position: absolute; inset: auto 0 0; height: 4px; background: var(--dv-lc); }
+.hlt-sq.cup.fac::after { background: var(--dv-fac); }
+.hlt-sq.next { background: none; border: 1px dashed var(--pill-line-hi); }
+.hlt-sq.next .skold { width: 18px; height: 18px; color: var(--muted); }
+.hlt-sq svg { width: 12px; height: 12px; margin-left: 1px; }
+button.hlt-sq { cursor: pointer; transition: filter 0.15s ease, box-shadow 0.15s ease; }
+button.hlt-sq:hover { color: var(--bg); background: var(--c, var(--hair)); border: 0; filter: brightness(1.18); }
+button.hlt-sq.o:hover { color: var(--fg); }
+button.hlt-sq.hid:hover { color: var(--gold-hi); }
+button.hlt-sq:focus-visible { outline: 2px solid var(--gold); outline-offset: 2px; }
+/* spelar: en guldring runt rutan */
+.hlt-sq.on, button.hlt-sq.on:hover { box-shadow: 0 0 0 2px var(--card), 0 0 0 4px var(--gold); }
+
+.hlt-list { display: flex; flex-direction: column; }
+.hlt-row {
+  display: grid;
+  grid-template-columns: 5.4rem 1rem minmax(0, 1fr) 4.4rem 26px;
+  align-items: center;
+  gap: 12px;
+  width: 100%;
+  min-height: 48px;
+  padding: 8px 0;
+  font: inherit;
+  font-size: 14px;
+  font-weight: 400;
+  line-height: 1.3;
+  text-align: left;
+  color: inherit;
+  background: none;
+  border: 0;
+  border-top: 1px solid var(--hair);
+  border-radius: 0;
+  box-shadow: none;
+}
+.hlt-list > .hlt-row:first-child { border-top: 0; }
+button.hlt-row { cursor: pointer; }
+button.hlt-row:hover { color: inherit; background: none; border-color: var(--hair); }
+button.hlt-row:hover .hl-play, .hlt-row.on .hl-play { color: var(--bg); background: var(--gold); }
+button.hlt-row:focus-visible { outline: 2px solid var(--gold); outline-offset: -2px; border-radius: 6px; }
+.hlt-day { font-size: 13px; color: var(--muted); white-space: nowrap; }
+.hlt-ha { font-size: 12.5px; font-weight: 650; color: var(--muted); text-align: center; }
+.hlt-opp { display: flex; align-items: center; gap: 9px; min-width: 0; }
+.hlt-opp > span:not(.skold) { min-width: 0; overflow: hidden; font-weight: 600; text-overflow: ellipsis; white-space: nowrap; }
+.hlt-opp small { flex: none; font-size: 12px; color: var(--muted); }
+.hlt-res { font-size: 15px; font-weight: 650; text-align: right; font-variant-numeric: tabular-nums; white-space: nowrap; }
+.hlt-row.v .hlt-res { color: var(--fresh); }
+.hlt-row.f .hlt-res { color: var(--down); }
+.hlt-res[title] { cursor: help; }
+
+.hlt-season + .hlp { margin-top: 18px; }
+.hlt-list > .hlp { padding: 0 0 12px; }
+
+@media (max-width: 520px) {
+  .hlt-strip { gap: 12px 12px; }
+  .hlt-sq { width: 26px; height: 26px; border-radius: 5px; }
+  /* utan veckodag, och långa namn på två rader */
+  .hlt-row { grid-template-columns: 3rem 0.7rem minmax(0, 1fr) 3.6rem 26px; gap: 10px; }
+  .hlt-day { font-size: 12.5px; }
+  .hlt-wd { display: none; }
+  .hlt-opp > span:not(.skold) { white-space: normal; }
+  .hlt-opp small { display: none; }
+}

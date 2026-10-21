@@ -3,7 +3,8 @@
 // Höjdpunkterna. Bygget knyter klippen till matcherna (src/hojdpunkter.js):
 // YouTube-klipp ur klubbarnas och sändarnas kanaler (m.y på matchraden,
 // d.youtube i matchrutan) och Viaplays gratis sammandrag (m.v, d.highlights).
-// app.js ritar spelikonen på matchraden och knappen i matchrutans rubrik.
+// app.js ritar spelikonen på matchraden och knappen i matchrutans rubrik,
+// divisioner.js lagrutans flik Höjdpunkter (team, längre ned).
 //
 // YouTube-klippen fälls ut under knappen man klickade på: under matchraden i
 // listan, under knappen i matchrutans rubrik. Skrollar man förbi flyttar
@@ -68,6 +69,99 @@
       `${i ? '' : `${PLAY}<span>Höjdpunkter</span>`}<span class="hl-len">${mins(h.sec)}</span></a>`).join('') + '</div>';
   }
 
+  // ---------- lagrutan ----------
+
+  // Fliken Höjdpunkter i lagrutan (divisioner.js): lagets matcher i alla
+  // tävlingar ur matches.json. Säsongen är en ruta per spelad match, månad
+  // för månad – grön vinst, grå oavgjort, röd förlust, ofärgad när
+  // resultatet är dolt, med tävlingens färg längst ned för cupmatcher – och
+  // en streckad ruta med nästa motståndares sköld. En ruta med klipp spelar
+  // det under säsongen. Senaste är de fem senaste matcherna sett från laget;
+  // en rad med klipp spelar det under raden. Spela i rad tar lagets
+  // YouTube-klipp efter varandra, senaste först.
+
+  const TZ = 'Europe/Stockholm';
+  const fDay = new Intl.DateTimeFormat('sv-SE', { timeZone: TZ, weekday: 'short', day: 'numeric', month: 'short' });
+  const fMonth = new Intl.DateTimeFormat('sv-SE', { timeZone: TZ, month: 'short' });
+  const fMonthKey = new Intl.DateTimeFormat('sv-SE', { timeZone: TZ, year: 'numeric', month: '2-digit' });
+  const day = (iso) => fDay.format(new Date(iso)).replace(/\./g, '');
+  const CUP = { fac: 'FA-cupen', lc: 'EFL-cupen' };
+  const OFF = /POSTPONED|CANCEL|ABANDON|SUSPEND/;
+  const skold = (name) => (window.Skoldar ? Skoldar.img(name, { dark: true }) : '');
+
+  // Matchen sett från laget: hemma, gjorda, insläppta och v/o/f.
+  function side(m, team) {
+    const home = m.home === team;
+    const us = home ? m.score.home : m.score.away;
+    const them = home ? m.score.away : m.score.home;
+    return { home, us, them, r: us > them ? 'v' : us < them ? 'f' : 'o' };
+  }
+
+  function tip(m) {
+    const shown = m.score && !hidden(m);
+    const score = shown ? ` ${m.score.home}–${m.score.away}` : '';
+    const pens = shown && m.shootout ? `, straffar ${m.shootout.home}–${m.shootout.away}` : '';
+    return [CUP[m.comp], day(m.kickoff), `${m.home} – ${m.away}${score}${pens}`].filter(Boolean).join(' · ');
+  }
+
+  // Det som startar matchens klipp: YouTube, annars Viaplays sammandrag.
+  function clip(m) {
+    if (m.y && m.y.length) return attrs(m, m.y, m.v && m.v.u);
+    return m.v && m.v.u ? ` data-hl="${esc(m.v.u)}"` : '';
+  }
+
+  function square(m, team) {
+    const cls = `hlt-sq ${hidden(m) ? 'hid' : side(m, team).r}${CUP[m.comp] ? ` cup ${m.comp}` : ''}`;
+    const a = clip(m);
+    return a ? `<button type="button" class="${cls}"${a} title="${esc(tip(m))}">${PLAY}</button>`
+      : `<span class="${cls}" title="${esc(tip(m))}"></span>`;
+  }
+
+  function nextSquare(m, team) {
+    return `<span class="hlt-sq next" title="${esc(tip(m))}">${skold(m.home === team ? m.away : m.home)}</span>`;
+  }
+
+  function latest(m, team) {
+    const s = side(m, team);
+    const hide = hidden(m);
+    const opp = s.home ? m.away : m.home;
+    const a = clip(m);
+    const pens = !hide && m.shootout ? ` title="Straffar ${s.home ? m.shootout.home : m.shootout.away}–${s.home ? m.shootout.away : m.shootout.home}"` : '';
+    const [wd, ...date] = day(m.kickoff).split(' ');
+    const inner = `<span class="hlt-day"><span class="hlt-wd">${esc(wd)} </span>${esc(date.join(' '))}</span>` +
+      `<span class="hlt-ha" title="${s.home ? 'Hemma' : 'Borta'}">${s.home ? 'H' : 'B'}</span>` +
+      `<span class="hlt-opp">${skold(opp)}<span>${esc(opp)}</span>${CUP[m.comp] ? `<small>${CUP[m.comp]}</small>` : ''}</span>` +
+      `<span class="hlt-res"${pens}>${hide ? (window.Spoiler ? Spoiler.chip() : '') : `${s.us}–${s.them}`}</span>` +
+      `<span${a ? ` class="hl-play" aria-hidden="true">${PLAY}` : '>'}</span>`;
+    const cls = `hlt-row ${hide ? 'hid' : s.r}`;
+    return a ? `<button type="button" class="${cls}"${a}>${inner}</button>` : `<div class="${cls}">${inner}</div>`;
+  }
+
+  // Laget (ESPN-namnet) och alla matcher → { html, n: matcher med klipp },
+  // eller null innan laget spelat.
+  function team(name, matches) {
+    const all = (matches || []).filter((m) => m.home === name || m.away === name)
+      .sort((a, b) => a.kickoff.localeCompare(b.kickoff));
+    const played = all.filter((m) => m.completed && m.score);
+    if (!played.length) return null;
+    const next = all.find((m) => !m.completed && !OFF.test(m.status || ''));
+    const months = [];
+    for (const m of next ? [...played, next] : played) {
+      const d = new Date(m.kickoff);
+      const k = fMonthKey.format(d);
+      if (!months.length || months[months.length - 1].k !== k) months.push({ k, name: fMonth.format(d).replace('.', ''), html: '' });
+      months[months.length - 1].html += m === next ? nextSquare(m, name) : square(m, name);
+    }
+    const queue = played.filter((m) => m.y && m.y.length).reverse().map((m) => m.id);
+    const season = '<section class="dv-msec hlt-season"><h5 class="dv-h5"><span>Säsongen</span>' +
+      (queue.length > 1 ? `<button type="button" class="hlt-queue" data-hl-queue="${esc(queue.join(' '))}">${PLAY}<span>Spela i rad</span></button>` : '') +
+      '</h5><div class="hlt-strip">' +
+      months.map((x) => `<div class="hlt-mon"><div>${x.html}</div><span>${esc(x.name)}</span></div>`).join('') + '</div></section>';
+    const recent = '<section class="dv-msec"><h5 class="dv-h5"><span>Senaste</span></h5><div class="hlt-list">' +
+      played.slice(-5).reverse().map((m) => latest(m, name)).join('') + '</div></section>';
+    return { html: season + recent, n: played.filter(clip).length };
+  }
+
   // Viaplay: ett 16:9-fönster mitt över sidan på datorn, annars en ny flik.
   function openViaplay(url) {
     const small = window.matchMedia('(pointer: coarse), (max-width: 760px)').matches;
@@ -120,12 +214,13 @@
   // 100 borttaget/privat, 101 och 150 får inte visas här (oftast spärrat i landet).
   const GONE = new Set([100, 101, 150]);
 
-  // open: ett klipp är igång, mid: dess match. seen: platsen under knappen
-  // syns. hold: tills dess stannar spelaren på sin plats medan sidan skrollar
-  // fram den.
+  // open: ett klipp är igång, mid: dess match, el: knappen det startades
+  // från. seen: platsen under knappen syns. hold: tills dess stannar spelaren
+  // på sin plats medan sidan skrollar fram den. queue: Spela i rad i
+  // lagrutan ({ key, items, i }).
   const P = {
     root: null, frame: null, ready: false, ping: null, list: [], i: 0, via: null, t: 0, seq: 0,
-    open: false, mid: null, watch: null, io: null, seen: true, hold: 0,
+    open: false, mid: null, el: null, watch: null, io: null, seen: true, hold: 0, queue: null,
   };
   const smooth = () => (window.matchMedia('(prefers-reduced-motion: reduce)').matches ? 'auto' : 'smooth');
 
@@ -203,8 +298,11 @@
   }
 
   // Knappen klippet startades från, i den öppna rutan eller på sidan – om den
-  // syns, alltså inte i en dold flik eller en stängd ruta.
+  // syns, alltså inte i en dold flik eller en stängd ruta. Annars matchens
+  // första knapp där (lagrutan har både en ruta och en rad per match).
   function trigger(h) {
+    const own = P.el;
+    if (own && own.dataset.mid === P.mid && own.isConnected && h.contains(own) && own.getClientRects().length) return own;
     for (const el of (h === document.body ? document : h).querySelectorAll('[data-yt]')) {
       if (el.dataset.mid === P.mid && el.getClientRects().length) return el;
     }
@@ -222,6 +320,9 @@
     for (const el of document.querySelectorAll('[data-yt].on')) {
       if (el !== btn) el.classList.remove('on');
     }
+    for (const el of document.querySelectorAll('[data-hl-queue]')) {
+      el.classList.toggle('on', Boolean(P.queue && P.queue.key === el.dataset.hlQueue));
+    }
     if (!btn) {
       if (root.parentNode !== h || !root.classList.contains('loose')) move(h, null, true);
       return;
@@ -229,7 +330,7 @@
     btn.classList.add('on');
     const mask = root.querySelector('.hlp-mask');
     if (mask.hidden !== !btn.dataset.hide) mask.hidden = !btn.dataset.hide;
-    const a = btn.closest('.mrow, .hl-links') || btn;
+    const a = btn.closest('.mrow, .hl-links, .hlt-row, .hlt-season') || btn;
     if (a.nextSibling !== root) move(a.parentNode, a.nextSibling, false);
   }
 
@@ -300,7 +401,8 @@
   }
 
   // Spelarens meddelanden: ett fel tar nästa klipp, tiden behövs om spelaren
-  // måste laddas om när den flyttas.
+  // måste laddas om när den flyttas. Ett klipp som spelats klart (läge 0)
+  // tar nästa match i Spela i rad.
   window.addEventListener('message', (e) => {
     const f = P.frame;
     if (!f || e.source !== f.contentWindow || e.origin !== HOST || typeof e.data !== 'string') return;
@@ -319,8 +421,9 @@
     if (d.event === 'onError') {
       if (GONE.has(d.info)) markBad(P.list[P.i]);
       next();
-    } else if (d.event === 'infoDelivery' && d.info && typeof d.info.currentTime === 'number') {
-      P.t = d.info.currentTime;
+    } else if (d.event === 'infoDelivery' && d.info) {
+      if (typeof d.info.currentTime === 'number') P.t = d.info.currentTime;
+      if (d.info.playerState === 0) queueNext();
     }
   });
 
@@ -330,8 +433,9 @@
     else out();
   }
 
-  // Inget av klippen går att spela här.
+  // Inget av klippen går att spela här – i Spela i rad blir det nästa match.
   function out() {
+    if (queueNext()) return;
     stopPlayer();
     const root = P.root;
     root.querySelector('.hlp-video').innerHTML = '';
@@ -342,29 +446,72 @@
     el.hidden = false;
   }
 
+  // Matchen som en knapp startar, ur dess data-attribut.
+  const item = (el) => ({
+    mid: el.dataset.mid, yt: el.dataset.yt, name: el.dataset.name, hide: Boolean(el.dataset.hide), via: el.dataset.via || null,
+  });
+
   // Ett klick till på samma match stänger.
   function play(el) {
     if (P.open && el.dataset.mid === P.mid) {
       close();
       return;
     }
+    P.queue = null;
+    P.el = el;
+    start(item(el), false);
+  }
+
+  // Spela i rad: matcherna i knappens data-hl-queue, med klippen ur
+  // säsongens rutor. Ett klick till stänger.
+  function playQueue(btn) {
+    const key = btn.dataset.hlQueue;
+    if (P.open && P.queue && P.queue.key === key) {
+      close();
+      return;
+    }
+    const box = btn.closest('.hlt-season');
+    const items = key.split(' ')
+      .map((mid) => box && box.querySelector(`[data-yt][data-mid="${CSS.escape(mid)}"]`))
+      .filter(Boolean)
+      .map(item);
+    if (!items.length) return;
+    P.queue = { key, items, i: 0 };
+    P.el = null;
+    start(items[0], false);
+  }
+
+  // Nästa match i Spela i rad, i samma spelare och samma storlek. false när
+  // det inte finns någon.
+  function queueNext() {
+    const q = P.queue;
+    if (!P.open || !q || q.i + 1 >= q.items.length) return false;
+    q.i++;
+    start(q.items[q.i], true);
+    return true;
+  }
+
+  // cont: nästa match i Spela i rad – spelaren står kvar där den är.
+  function start(it, cont) {
     const skip = new Set(bad());
-    const list = el.dataset.yt.split(' ').filter((id) => id && !skip.has(id));
+    const list = it.yt.split(' ').filter((id) => id && !skip.has(id));
     if (!P.root) P.root = build();
     const root = P.root;
     stopPlayer();
     root.querySelector('.hlp-video').innerHTML = '';
-    root.querySelector('.hlp-name').textContent = el.dataset.name || 'Höjdpunkter';
-    root.querySelector('.hlp-mask').hidden = !el.dataset.hide;
-    setBig(false);
+    root.querySelector('.hlp-name').textContent = it.name || 'Höjdpunkter';
+    root.querySelector('.hlp-mask').hidden = !it.hide;
     P.list = list;
     P.i = 0;
     P.t = 0;
-    P.via = el.dataset.via || null;
-    P.mid = el.dataset.mid;
+    P.via = it.via;
+    P.mid = it.mid;
     P.open = true;
-    P.hold = Date.now() + 900;
-    setTimeout(float, 950);
+    if (!cont) {
+      setBig(false);
+      P.hold = Date.now() + 900;
+      setTimeout(float, 950);
+    }
     place();
     if (!P.watch) {
       P.watch = new MutationObserver(place);
@@ -375,7 +522,7 @@
     if (list.length) load(0);
     else out();
     // Hela spelaren fram i bild, under den klistrade toppbaren.
-    if (!root.classList.contains('loose') && host() === document.body) {
+    if (!cont && !root.classList.contains('loose') && host() === document.body) {
       root.scrollIntoView({ block: 'nearest', behavior: smooth() });
     }
   }
@@ -383,10 +530,12 @@
   function close() {
     P.open = false;
     P.seq++;
+    P.queue = null;
+    P.el = null;
     stopPlayer();
     if (P.watch) P.watch.disconnect();
     P.watch = null;
-    for (const el of document.querySelectorAll('[data-yt].on')) el.classList.remove('on');
+    for (const el of document.querySelectorAll('[data-yt].on, [data-hl-queue].on')) el.classList.remove('on');
     const root = P.root;
     if (root) {
       setBig(false);
@@ -416,6 +565,13 @@
       play(yt);
       return;
     }
+    const q = e.target.closest && e.target.closest('[data-hl-queue]');
+    if (q) {
+      e.preventDefault();
+      e.stopPropagation();
+      playQueue(q);
+      return;
+    }
     const el = e.target.closest && e.target.closest('[data-hl]');
     if (!el) return;
     if (el.tagName === 'A' && (e.metaKey || e.ctrlKey || e.shiftKey || e.button)) return;
@@ -424,5 +580,5 @@
     openViaplay(el.dataset.hl);
   }, true);
 
-  window.Hojdpunkter = { row, head };
+  window.Hojdpunkter = { row, head, team };
 }());
