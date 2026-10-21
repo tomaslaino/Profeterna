@@ -8,7 +8,7 @@
 // Kvirk: scoreboard tar inte datumintervall (HTTP 400) – månadsformatet
 // dates=YYYYMM fungerar, så säsongen hämtas månad för månad.
 
-const { getJson, mapLimit } = require('./http');
+const { getJson, getBytes, mapLimit } = require('./http');
 
 const SITE = 'https://site.api.espn.com/apis/site/v2/sports/soccer';
 const STANDINGS = 'https://site.api.espn.com/apis/v2/sports/soccer';
@@ -169,4 +169,21 @@ function decimal(american) {
   return Math.round(d * 1000) / 1000;
 }
 
-module.exports = { fetchFixtures, fetchHistory, fetchStandings, fetchOdds, seasonMonths, decimal };
+// Lagsköldarna, 96 × 96 px ur ESPN:s bildtjänst: den vanliga och, när laget
+// har en, den för mörk botten (Tottenhams tupp vit i stället för marinblå).
+// Verifierat 2026-10-21: alla 92 ligalag har sköld, de flesta i National
+// League också, lag längre ner oftast inte (HTTP 404).
+const CREST = (variant, id) => `https://a.espncdn.com/combiner/i?img=/i/teamlogos/soccer/${variant}/${id}.png&h=96&w=96`;
+
+async function fetchCrests(teams) {
+  const orNull = (p) => p.catch((err) => {
+    if (/HTTP 404/.test(err.message)) return null;
+    throw err;
+  });
+  return mapLimit(teams, 6, async (t) => {
+    const [light, dark] = await Promise.all([orNull(getBytes(CREST('500', t.espnId))), orNull(getBytes(CREST('500-dark', t.espnId)))]);
+    return { ...t, light, dark: light && dark };
+  });
+}
+
+module.exports = { fetchFixtures, fetchHistory, fetchStandings, fetchOdds, fetchCrests, seasonMonths, decimal };

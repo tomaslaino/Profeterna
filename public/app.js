@@ -381,6 +381,9 @@ function matchRow(m) {
 // Matchen öppnas i en ruta ovanpå sidan, med flikar som på gravergrav.se.
 // Startelvor och Matchen hämtas i webbläsaren av matchruta.js.
 const CLOSE_BTN = '<button type="button" class="mr-close" data-close aria-label="Stäng">×</button>';
+// Lagskölden ytterst bredvid namnet i rubriken (skoldar.js). Matchbladet är
+// tryckt på ljust papper, så den vanliga skölden.
+const crest = (name) => (window.Skoldar ? Skoldar.img(name) : '');
 
 async function openMatch(id) {
   const dlg = $('#match-modal');
@@ -395,8 +398,9 @@ async function openMatch(id) {
     document.documentElement.classList.add('mr-open');
   }
   try {
-    // Artikeln inför matchen hämtas samtidigt, så att fliken finns från början.
-    const [d] = await Promise.all([getJSON(`data/match/${encodeURIComponent(id)}.json`), loadArticle(id)]);
+    // Artikeln inför matchen hämtas samtidigt, så att fliken finns från början,
+    // och sköldarnas index, så att rubriken ritas med dem.
+    const [d] = await Promise.all([getJSON(`data/match/${encodeURIComponent(id)}.json`), loadArticle(id), window.Skoldar && Skoldar.ready]);
     if (location.hash !== `#match/${id}`) return;
     const fresh = !state.detail || state.detail.match.id !== id;
     state.detail = d;
@@ -527,9 +531,9 @@ function renderDetail(d) {
   // kupongen överst och meanderbården mellan rubriken och flikarna.
   const head = '<div class="mhead mr-head"><p class="pp-brand"><img src="logo.svg" alt="" width="20" height="20">Matchfixarna<span>Matchblad</span></p>' +
     `<div class="mhead-meta"${m.tierNote ? ` title="${esc(m.tierNote)}"` : ''}>${meta}</div>` +
-    `<div class="mhead-teams"><div class="mhead-team">${esc(m.home)}</div>` +
+    `<div class="mhead-teams"><div class="mhead-team">${crest(m.home)}<span>${esc(m.home)}</span></div>` +
     `<div class="mhead-mid">${hide ? Spoiler.chip() : esc(mid)}${midSub ? `<span class="sub">${esc(midSub)}</span>` : ''}</div>` +
-    `<div class="mhead-team away">${esc(m.away)}</div></div>` +
+    `<div class="mhead-team away">${crest(m.away)}<span>${esc(m.away)}</span></div></div>` +
     (window.Hojdpunkter ? Hojdpunkter.head(d) : '') +
     '</div><div class="pp-band mr-band" aria-hidden="true"></div>';
 

@@ -16,6 +16,8 @@
 //   data/evaluation.json   journalen och utvärderingen mot facit (sist på
 //                          Modell-sidan)
 //   data/divisions.json    statistik per division (sidan Statistik)
+//   data/skoldar.json      lagnamn → lagsköld i skoldar/ (Tabeller och
+//                          matchbladet, public/skoldar.js)
 //   data/kuponger.json     gängets kuponger ur data/kuponger/ (fliken Kupong)
 //                          och vart egna tips inför samtalet skickas
 //   data/historik.json     färdiga kuponger med facit, betyg och AI:ns
@@ -40,6 +42,7 @@
 const fs = require('fs');
 const path = require('path');
 const { refreshAll } = require('./refresh');
+const { readCache, CACHE_DIR } = require('./store');
 const { allMatches, matchIds, matchDetail } = require('./matches');
 const { sourceReport } = require('./sourcetable');
 const { forecastAll } = require('./forecast');
@@ -96,6 +99,24 @@ function writeSite(outDir = OUT, { journal = false, analysisEndpoint, couponEndp
   });
   const sources = sourceReport();
   write('sources.json', sources);
+
+  // Lagsköldarna (public/skoldar.js): bilderna ur källcachen till skoldar/ och
+  // indexet lagnamn → [ESPN-id, mörk finns]. Fallerar det står lagen utan
+  // sköld.
+  try {
+    const c = readCache('espn_skoldar');
+    const lag = (c && c.data && c.data.teams) || {};
+    fs.mkdirSync(path.join(tmp, 'skoldar'));
+    for (const [id, dark] of Object.values(lag)) {
+      for (const f of dark ? [`${id}.png`, `${id}-m.png`] : [`${id}.png`]) {
+        fs.copyFileSync(path.join(CACHE_DIR, 'skoldar', f), path.join(tmp, 'skoldar', f));
+      }
+    }
+    write('skoldar.json', { lag });
+  } catch (err) {
+    console.error('[build] sköldarna:', err);
+    write('skoldar.json', { lag: {} });
+  }
 
   // Prognosmotorn. Fallerar den byggs sajten ändå, utan prognoser och med
   // felet synligt under fliken Modell.

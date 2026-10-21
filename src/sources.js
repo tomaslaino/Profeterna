@@ -12,7 +12,9 @@ const understat = require('./fetchers/understat');
 const fpl = require('./fetchers/fpl');
 const viaplay = require('./fetchers/viaplay');
 const youtube = require('./fetchers/youtube');
-const { readCache } = require('./store');
+const fs = require('fs');
+const path = require('path');
+const { readCache, CACHE_DIR } = require('./store');
 
 const VERIFIED = '2026-10-17';
 const ODDS_WINDOW_DAYS = 7;
@@ -322,6 +324,49 @@ SOURCES.push({
       detail: `${n} klipp ur ${d.channels - d.failed.length} kanaler` +
         (d.failed.length ? ` (${d.failed.length} svarade inte)` : ''),
     };
+  },
+});
+
+// Lagsköldarna (Tabeller och matchbladet): bilderna sparas som filer i
+// data/cache/skoldar/ (<id>.png och <id>-m.png för mörk botten) och kopieras
+// till sajten av bygget; datan är indexet lagnamn → [ESPN-id, mörk finns].
+// Lagen tas ur spelprogrammen, så att cupmotståndet också kommer med. En gång
+// i veckan räcker: sköldar byts sällan.
+SOURCES.push({
+  id: 'espn_skoldar',
+  provider: 'ESPN',
+  short: 'ESPN',
+  label: 'Lagsköldar',
+  comps: COMPETITIONS.map((c) => c.id),
+  kinds: ['crests'],
+  maxAgeHours: 24 * 7,
+  staleAfterHours: 24 * 30,
+  verified: '2026-10-21',
+  stage: 2,
+  fetch: async () => {
+    const byId = new Map();
+    for (const c of COMPETITIONS) {
+      const cache = readCache(`espn_fixtures_${c.id}`);
+      for (const m of (cache && cache.data && cache.data.matches) || []) {
+        for (const t of [m.home, m.away]) if (t && t.espnId) byId.set(t.espnId, { espnId: t.espnId, name: t.name });
+      }
+    }
+    if (!byId.size) throw new Error('inget spelprogram i cachen än');
+    const dir = path.join(CACHE_DIR, 'skoldar');
+    fs.mkdirSync(dir, { recursive: true });
+    const teams = {};
+    const missing = [];
+    for (const t of await espn.fetchCrests([...byId.values()])) {
+      if (!t.light) { missing.push(t.name); continue; }
+      fs.writeFileSync(path.join(dir, `${t.espnId}.png`), t.light);
+      if (t.dark) fs.writeFileSync(path.join(dir, `${t.espnId}-m.png`), t.dark);
+      teams[t.name] = [t.espnId, t.dark ? 1 : 0];
+    }
+    return { teams, missing: missing.sort(), sourceUrl: 'https://www.espn.com/soccer/teams/_/league/eng.1' };
+  },
+  summarize: (d) => {
+    const n = Object.keys(d.teams).length;
+    return { n, detail: `${n} lag` + (d.missing.length ? `, ingen sköld för ${d.missing.join(', ')}` : '') };
   },
 });
 

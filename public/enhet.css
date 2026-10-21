@@ -284,3 +284,19 @@ button.analyze:hover,
 @media (max-width: 760px) {
   .hk-tools .seg button { padding: 2px 0 11px; font-size: 13.5px; }
 }
+
+/* ---------- lagsköldarna (skoldar.js) ---------- */
+
+/* Skölden står i en ruta av fast storlek, så att lagnamnen linjerar; lag utan
+   sköld hos ESPN får en tom sköld i samma ruta. Storleken sätts där skölden
+   används (divisioner.css, matchblad.css). */
+.skold { display: inline-flex; flex: none; align-items: center; justify-content: center; width: 20px; height: 20px; }
+.skold img { display: block; width: 100%; height: 100%; object-fit: contain; }
+.skold:empty::before {
+  content: "";
+  width: 72%;
+  height: 84%;
+  border: 1.5px solid currentColor;
+  border-radius: 2px 2px 50% 50% / 2px 2px 62% 62%;
+  opacity: 0.3;
+}
