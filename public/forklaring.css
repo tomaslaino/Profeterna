@@ -1,12 +1,5 @@
-/* Det som har en förklaring (forklaring.js): en prickad linje under ordet
-   och frågemarkören. Själva rutan är .dv-tip i divisioner.css. */
+/* Det som har en förklaring (forklaring.js) får frågemarkören, ingen linje
+   under ordet. Själva rutan är .dv-tip i divisioner.css. */
 [data-tip] { cursor: help; }
-.card h4 > span[data-tip],
-table.side tr[data-tip] td.mid {
-  text-decoration: underline dotted;
-  text-decoration-color: var(--pill-line-hi);
-  text-decoration-thickness: 1px;
-  text-underline-offset: 4px;
-}
 table.side tr.group[data-tip]:hover td { color: var(--fg); }
 #fk-tip { max-width: min(340px, calc(100vw - 16px)); }

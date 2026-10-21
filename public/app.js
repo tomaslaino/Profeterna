@@ -325,14 +325,6 @@ function isHidden(m) {
   return Boolean(window.Spoiler && Spoiler.hidden(m));
 }
 
-// 1 · X · 2 som en tunn stapel i hemma-, oavgjort- och bortafärg, det
-// troligaste utfallet starkast (theme.css .pbar). Används också av kupong.js.
-function probBar(p) {
-  const max = Math.max(...p);
-  return '<span class="pbar" aria-hidden="true">' +
-    p.map((x) => `<i style="--w:${x}"${x === max ? ' class="max"' : ''}></i>`).join('') + '</span>';
-}
-
 // Slog prognosens troligaste utfall in? Rättas mot ställningen efter 90
 // minuter, som utvärderingen; okänd ställning ger null.
 function tipHit(m) {
@@ -373,7 +365,6 @@ function matchRow(m) {
   } else {
     side = listForecast(m.f);
     if (m.status === 'STATUS_POSTPONED') side += '<span class="sub">uppskjuten</span>';
-    else if (m.f) side += probBar(m.f.p);
   }
   return `<button type="button" class="mrow" data-id="${esc(m.id)}">` +
     `<span class="mtime">${esc(fTime.format(new Date(m.kickoff)))}</span>` +
@@ -604,13 +595,10 @@ function forecastCard(d) {
         `<span class="sub">${esc(p.advance.rule)}${p.advance.firstLeg ? ` · första mötet ${esc(p.advance.firstLeg.home)} ${p.advance.firstLeg.score.home}–${p.advance.firstLeg.score.away} ${esc(p.advance.firstLeg.away)}` : ''}</span></p>`;
   }
   const notes = (p.notes || []).map((n) => `<p class="note">${esc(n)}</p>`).join('');
-  // Stämpeln: prognosen står i journalen och räknas när matchen är spelad.
-  const j = d.journal;
-  const stamp = !m.completed && j && j.latestAt ? `<span class="pp-stamp fc-stamp" title="Loggad ${when(j.latestAt)}">I journalen</span>` : '';
   return `<div class="card fc"><h4>${m.completed ? 'Prognos i efterhand' : 'Prognos efter 90 minuter'}</h4>` +
     fcMain(p.p, [m.home, 'Oavgjort', m.away], m.id) +
     `<div class="fc-two"><div><h5>Målen</h5>${stats}</div><div><h5>Troligast</h5>${topScores(p)}</div></div>` +
-    `${adv}${notes}<div class="fc-foot">${scoreGrid(p, m)}${stamp}</div></div>`;
+    `${adv}${notes}<div class="fc-foot">${scoreGrid(p, m)}</div></div>`;
 }
 
 // 1 · X · 2 som kupongens rutor: tecknet och oddset. Inget ringas in av sig
@@ -744,13 +732,11 @@ function marketCard(d) {
 
 // Steg för steg som en dragkamp: startläget överst, sedan en stapel per del
 // av modellen åt det lag den hjälper (procentenheter på segerchansen), och
-// sist slutprognosen. Kolumnen till höger är favoritens odds efter varje steg.
+// sist slutprognosen.
 function stepsCard(d) {
   const st = d.prediction.steps;
   if (!st) return '';
   const m = d.match;
-  const fi = st[st.length - 1].p[0] >= st[st.length - 1].p[2] ? 0 : 2;
-  const fav = fi === 0 ? m.home : m.away;
   const pulls = st.map((x, i) => {
     if (!i) return null;
     const d1 = x.p[0] - st[i - 1].p[0];
@@ -763,18 +749,13 @@ function stepsCard(d) {
   // (odds över 9) får siffran inte plats.
   const stack = (p) => '<div class="tug-stack">' + pct3(p).map((v, i) =>
     `<span class="s${i}" style="flex:${v} 1 0">${v >= 11 ? pctOdds(v) : ''}</span>`).join('') + '</div>';
-  const run = (x) => `<div class="tug-run">${pctOdds(pct3(x.p)[fi])}</div>`;
-  const lab = (label, sub) => `<div class="tug-lab">${label}${sub ? `<span class="sub">${esc(sub)}</span>` : ''}</div>`;
+  const lab = (label) => `<div class="tug-lab">${label}</div>`;
 
   const rows = st.map((x, i) => {
-    if (!i) {
-      const sub = x.label.charAt(0).toLowerCase() + x.label.slice(1);
-      return `<div class="tug-row tug-start">${lab('Startpunkt', sub)}${stack(x.p)}${run(x)}</div>`;
-    }
+    if (!i) return `<div class="tug-row tug-start">${lab('Startpunkt')}${stack(x.p)}</div>`;
     let label = esc(x.label);
     if (x.label === 'Hemmaplan') label = `${esc(m.home)} spelar hemma`;
     else if (x.label === m.home || x.label === m.away) label = `${esc(gen(x.label))} anfall och försvar`;
-    const sub = x.label === 'Hemmaplan' || !x.sub ? null : x.sub.replace(/ – mot nivåns snitt$/, '');
     const p = pulls[i];
     let track = '<i class="tug-mid"></i>';
     if (p.v >= 1) {
@@ -785,14 +766,14 @@ function stepsCard(d) {
     } else {
       track += '<span class="tug-none">±0</span>';
     }
-    return `<div class="tug-row${p.v >= 1 ? '' : ' none'}">${lab(label, sub)}<div class="tug-track">${track}</div>${run(x)}</div>`;
+    return `<div class="tug-row${p.v >= 1 ? '' : ' none'}">${lab(label)}<div class="tug-track">${track}</div></div>`;
   });
 
   const axis = `<div class="tug-row tug-axis"><div class="tug-lab"></div><div class="tug-sides">` +
-    `<span><i class="k h"></i>← hjälper ${esc(m.home)}</span><span>hjälper ${esc(m.away)} →<i class="k a"></i></span></div><div></div></div>`;
-  const end = `<div class="tug-row tug-end"><div class="tug-lab">Slutprognos</div>${stack(st[st.length - 1].p)}<div></div></div>` +
-    `<div class="tug-row tug-names"><div class="tug-lab"></div><div class="tug-sides"><span>${esc(m.home)}</span><span>${esc(m.away)}</span></div><div></div></div>`;
-  return `<div class="card tug"><h4 title="${esc(`Procentenheter som varje del flyttar segerchansen · längst till höger oddset på att ${fav} vinner efter varje steg`)}">Vad drog åt vilket håll</h4>` +
+    `<span><i class="k h"></i>← hjälper ${esc(m.home)}</span><span>hjälper ${esc(m.away)} →<i class="k a"></i></span></div></div>`;
+  const end = `<div class="tug-row tug-end"><div class="tug-lab">Slutprognos</div>${stack(st[st.length - 1].p)}</div>` +
+    `<div class="tug-row tug-names"><div class="tug-lab"></div><div class="tug-sides"><span>${esc(m.home)}</span><span>${esc(m.away)}</span></div></div>`;
+  return '<div class="card tug"><h4 title="Procentenheter som varje del flyttar segerchansen">Vad drog åt vilket håll</h4>' +
     rows[0] + axis + rows.slice(1).join('') + end + '<p class="tug-more"><a href="#modell">Så fungerar modellen</a></p></div>';
 }
 
@@ -889,7 +870,7 @@ function formCard(d) {
         ? `<span class="sp-form"${oppBar(x)} data-tip-head="Dold" data-tip="Du har valt att dölja resultat.">?</span>`
         : chip(x))).join('')
       : '<span class="muted" style="width:auto;background:none;font-weight:400">inga tidigare matcher</span>';
-    return `<div class="form-row ${cls}"><span class="t"><i class="mr-key"></i>${esc(name)}</span><span class="form">${chips}</span></div>`;
+    return `<div class="form-row ${cls}"><span class="t">${esc(name)}</span><span class="form">${chips}</span></div>`;
   };
   let html = `<div class="card mf-form"><h4><span data-tip-head="Form" data-tip="${esc(FORM_TIP)}">Form</span></h4>` +
     row(d.match.home, d.teams.home, 'h') + row(d.match.away, d.teams.away, 'a') + '</div>';
@@ -930,7 +911,7 @@ function sideCard(d, table) {
   rows += squadRows(d);
   return `<div class="card"><h4><span${sideTip('Lagen sida vid sida')}>Lagen sida vid sida</span></h4>` +
     `<div class="table-wrap" style="margin:0"><table class="side"><thead><tr>` +
-    `<th style="text-align:right"><i class="mr-key"></i>${esc(d.match.home)}</th><th class="mid"></th><th>${esc(d.match.away)}<i class="mr-key a"></i></th></tr></thead>` +
+    `<th style="text-align:right">${esc(d.match.home)}</th><th class="mid"></th><th>${esc(d.match.away)}</th></tr></thead>` +
     `<tbody>${rows}</tbody></table></div></div>`;
 }
 
@@ -1096,7 +1077,7 @@ function leagueTable(T, keys, cut) {
     const k = mine(r);
     const gd = r.gd > 0 ? `+${r.gd}` : r.gd < 0 ? `−${-r.gd}` : '0';
     return `<tr class="${[z ? z[1] : '', k === 0 ? 'mine h' : k === 1 ? 'mine a' : ''].join(' ').trim()}"${z ? ` title="${esc(z[2])}"` : ''}>` +
-      `<td class="c rank">${r.rank}</td><td class="team">${k >= 0 ? '<i class="mr-key"></i>' : ''}${esc(r.name)}</td>` +
+      `<td class="c rank">${r.rank}</td><td class="team">${esc(r.name)}</td>` +
       `<td class="num">${r.m}</td><td class="num hide-sm">${r.w}</td><td class="num hide-sm">${r.d}</td><td class="num hide-sm">${r.l}</td>` +
       `<td class="num hide-sm">${r.gf}–${r.ga}</td><td class="num">${gd}</td>` +
       `<td class="num pts">${r.pts}${r.ded ? `<sup title="${r.ded} poängs avdrag">*</sup>` : ''}</td></tr>`;

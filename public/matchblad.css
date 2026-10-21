@@ -229,11 +229,6 @@ dialog.mr-modal table.side tr.group td { color: var(--pp-print); background: var
 dialog.mr-modal table.cmp tr.model td { color: var(--pp-ink); background: var(--pp-print-tint); }
 dialog.mr-modal .tug-stack { border-radius: 2px; }
 
-/* hemmalaget blått, bortalaget terrakotta: pricken framför lagets namn */
-dialog.mr-modal .a .mr-key,
-dialog.mr-modal .mr-key.a { background: var(--o-away); }
-dialog.mr-modal .card h4 .mr-key { width: 8px; height: 8px; margin-right: 8px; }
-
 /* ---------- prognosen: kupongens rutor ---------- */
 
 dialog.mr-modal .card.fc { position: relative; overflow: visible; padding-bottom: 14px; }
@@ -392,10 +387,8 @@ dialog.mr-modal table.sgrid td {
 }
 dialog.mr-modal table.sgrid th { color: var(--pp-ink-soft); }
 
-/* Alla resultat och stämpeln I journalen på samma rad; Rättad står efter
-   ställningen */
+/* stämpeln Rättad står efter ställningen */
 dialog.mr-modal .fc-foot { display: flex; align-items: flex-start; justify-content: space-between; gap: 18px; }
-dialog.mr-modal .fc-foot .fc-stamp { flex: none; margin: 16px 6px 0 auto; }
 dialog.mr-modal .fc-graded .fc-stamp { margin-left: 10px; }
 dialog.mr-modal .fc .note { margin: 14px 0 0; font-size: 13px; }
 
@@ -474,8 +467,6 @@ dialog.mr-modal .mf-meet b { font-family: var(--display); font-size: 17px; font-
 /* lagens spalter lika breda, hur långa namnen än är */
 dialog.mr-modal table.side { table-layout: fixed; }
 dialog.mr-modal table.side th:not(.mid) { width: 38%; }
-dialog.mr-modal table.side th .mr-key { margin: 0 8px 0 0; }
-dialog.mr-modal table.side th .mr-key.a { margin: 0 0 0 8px; }
 /* spelarna sist i tabellen: namnet i vanlig stil, talet halvfett som
    tabellens övriga tal, och hela truppen som ett ord i pennans blått */
 dialog.mr-modal table.side .mr-who { display: inline-block; max-width: 100%; font-weight: 400; }
@@ -530,7 +521,6 @@ dialog.mr-modal .mr-team h4 {
   text-transform: none;
   color: var(--pp-ink);
 }
-dialog.mr-modal .mr-team h4 .mr-key { width: 9px; height: 9px; margin-right: 9px; }
 
 /* ---------- domaren under startelvorna, som i ett matchprogram ---------- */
 

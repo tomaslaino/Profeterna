@@ -301,15 +301,11 @@ table.dv-teams td, table.dv-teams th,
 table.dv-squad td, table.dv-squad th { padding: 8px 9px; vertical-align: middle; }
 table.dv-players td, table.dv-players th { padding-left: 6px; padding-right: 6px; }
 /* Kolumnerna är precis så breda som sitt innehåll, med samma luft emellan.
-   Det som blir över av kortets bredd går till en enda kolumn – lagnamnet,
-   eller i spelartabellen den sista före siffrorna (laget, i Översikt
-   nationen) – så att talen står samlade i stället för att glesas ut över
-   hela kortet. Utan nowrap skulle de andra kolumnerna krympa till sitt
+   Det som blir över av kortets bredd går till en enda kolumn – lagnamnet –
+   så att talen står samlade i stället för att glesas ut över hela kortet. Utan nowrap skulle de andra kolumnerna krympa till sitt
    bredaste ord. */
 :where(table.dv-league, table.dv-players, table.dv-squad) :where(td, th) { white-space: nowrap; }
 table.dv-league td.team, table.dv-players td.pteam, table.dv-squad td:nth-child(3) { width: 100%; }
-table.dv-players:has(td.pnat) td.pteam { width: auto; }
-table.dv-players td.pnat { width: 100%; }
 table.dv-squad td:nth-child(3) { white-space: normal; }
 .dv-view > .src-line { font-size: 12px; color: var(--muted); margin: -4px 2px 16px; }
 table.dv-league .num, table.dv-players .num, table.dv-teams .num, table.dv-squad .num { text-align: right; font-variant-numeric: tabular-nums; }
@@ -319,8 +315,6 @@ table.dv-league .team { font-weight: 600; white-space: normal; }
 /* skölden till vänster, ett långt namn bryts bredvid den i telefonen */
 .dv-tname { display: flex; align-items: center; gap: 10px; }
 table.dv-league .pts { font-weight: 800; }
-/* korten står efter poängen som en extrauppgift, lite nedtonade */
-table.dv-league .dv-cards { white-space: nowrap; padding-left: 28px; font-size: 13px; color: var(--muted); }
 table.dv-league tr.dv-gap td { text-align: center; color: var(--muted); padding: 2px; letter-spacing: 0.3em; }
 tr.dv-trow, tr.dv-prow { cursor: pointer; }
 tr.dv-trow:focus-visible, tr.dv-prow:focus-visible { outline: 2px solid var(--accent); outline-offset: -2px; }
@@ -415,7 +409,7 @@ table.dv-players .pname small, .dv-natline { display: block; font-size: 12px; fo
    längsta namnet i divisionen, inte blir bredare än ett vanligt långt namn. */
 table.dv-players .dv-pn { display: block; max-width: 12rem; overflow: hidden; text-overflow: ellipsis; }
 table.dv-players .pname small.show-sm { display: none; }
-table.dv-players td.pteam, table.dv-players td.pnat { color: var(--ink-soft, var(--fg)); font-size: 13.5px; white-space: nowrap; }
+table.dv-players td.pteam { color: var(--ink-soft, var(--fg)); font-size: 13.5px; white-space: nowrap; }
 table.dv-squad tr.idle td { color: var(--muted); }
 /* plus/minus och för litet underlag */
 .dv-pos { color: var(--fresh); font-weight: 700; }

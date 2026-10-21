@@ -346,7 +346,7 @@
   }
 
   function teamBlock(name, t, played, cls, top, ix) {
-    let h = `<div class="mr-team ${cls}"><h4><i class="mr-key"></i>${esc(name)}${t.formation && !t.placedBoth ? ` <span class="hint">${esc(t.formation)}</span>` : ''}</h4>`;
+    let h = `<div class="mr-team ${cls}"><h4>${esc(name)}${t.formation && !t.placedBoth ? ` <span class="hint">${esc(t.formation)}</span>` : ''}</h4>`;
     if (t.coach) h += `<p class="mr-coach"><span class="muted">Tränare</span> ${esc(t.coach)}</p>`;
     if (t.starters.length && !t.placedBoth) h += `<h5>Startelva</h5>${playerList(t.starters, played, top, ix, cls)}`;
     if (t.bench.length) h += `<h5>Avbytare</h5>${playerList(t.bench, played, top, ix, cls)}`;
@@ -364,7 +364,7 @@
   // planhalva på mobilen (bortalaget överst). Stämpeln sitter mellan lagens
   // rader, över planens kant – på en tom plan mitt på den.
   function pitch(m, home, away, inner, mark) {
-    const leg = (name, t, cls) => `<div class="mr-leg ${cls}"><i class="mr-key"></i><span class="n">${esc(name)}</span>` +
+    const leg = (name, t, cls) => `<div class="mr-leg ${cls}"><span class="n">${esc(name)}</span>` +
       `${t && t.formation ? `<b>${esc(t.formation)}</b>` : ''}</div>`;
     return `<div class="mr-pitch-wrap">${leg(m.home, home, 'h')}${leg(m.away, away, 'a')}${inner ? mark : ''}` +
       `<div class="mr-pitch${inner ? '' : ' empty'}">${LINES_WIDE}${LINES_TALL}${inner}${inner ? '' : mark}</div></div>`;

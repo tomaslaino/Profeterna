@@ -29,7 +29,7 @@ async function loadSources() {
     const d = await getJSON('data/sources.json');
     for (const s of d.sources) s.status = statusOf(s);
     if (el) el.innerHTML = renderSources(d);
-    topline(d);
+    topline();
   } catch (err) {
     if (el) el.innerHTML = `<p class="empty">Kunde inte läsa källorna: ${esc(err.message)}</p>`;
   }
@@ -145,13 +145,9 @@ function providerCard(p, list) {
   return `<div class="card src-card"><div class="src-head"><h4><a href="${esc(p.url)}" target="_blank" rel="noopener">${esc(p.name)}</a></h4>${badge}</div>${body}</div>`;
 }
 
-// När datan uppdaterades – källorna nämns först när något är fel.
-function topline(d) {
-  const count = (st) => d.sources.filter((s) => s.status === st).length;
-  const issues = [
-    count('fel') ? `${count('fel')} ${count('fel') === 1 ? 'källa' : 'källor'} med fel` : null,
-    count('gammal') ? `${count('gammal')} ${count('gammal') === 1 ? 'gammal källa' : 'gamla källor'}` : null,
-  ].filter(Boolean).join(', ');
+// Sidfoten säger något bara när sajtens data är gammal; när den uppdaterades
+// och vilka källor som har fel står under Källor.
+function topline() {
   const meta = state.meta;
   const ageMin = meta ? (Date.now() - new Date(meta.generatedAt).getTime()) / 60000 : null;
   const late = ageMin != null && ageMin > meta.updateEveryMinutes * 4;
@@ -163,15 +159,8 @@ function topline(d) {
       ? `<span class="err" style="display:inline">Senaste uppdateringen ${when(meta.generatedAt)} – ovanligt länge sedan (sker normalt var ${meta.updateEveryMinutes}:e minut). Den schemalagda hämtningen kan ha stannat.</span>`
       : '';
   }
-  // Står i sidfoten, inte mitt på sidan.
-  const parts = [
-    meta
-      ? `<span title="Säsong ${esc(meta.season)} · uppdateras var ${meta.updateEveryMinutes}:e minut">Uppdaterad ${when(meta.generatedAt)}</span>`
-      : 'Kunde inte läsa sajtens data.',
-    issues ? `<a href="#kallor">${esc(issues)}</a>` : null,
-    late ? '<span class="err" style="display:inline">datan är gammal</span>' : null,
-  ].filter(Boolean);
   const tl = $('#topline');
-  tl.innerHTML = parts.join(' · ');
-  tl.hidden = false;
+  tl.innerHTML = !meta ? 'Kunde inte läsa sajtens data.'
+    : late ? `<a href="#kallor" class="err" style="display:inline">Datan är gammal – uppdaterad ${when(meta.generatedAt)}</a>` : '';
+  tl.hidden = !tl.innerHTML;
 }

@@ -147,18 +147,6 @@ dialog.mr-modal::backdrop {
 .mr-leg.a { grid-area: a; flex-direction: row-reverse; }
 .mr-leg .n { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
 .mr-leg b { flex: none; margin: 0 8px; color: var(--bone); font-variant-numeric: tabular-nums; }
-.mr-key {
-  display: inline-block;
-  flex: none;
-  width: 9px;
-  height: 9px;
-  margin-right: 7px;
-  border-radius: 50%;
-  background: var(--o-home);
-  vertical-align: 1px;
-}
-.mr-leg.a .mr-key { margin: 0 0 0 7px; }
-.mr-leg.a .mr-key, .mr-team.a .mr-key { background: var(--o-away); }
 
 /* Planen: liggande, hemmalaget anfaller åt höger. --l är linjen (0 = egna
    målet, 100 = längst fram), --s sidan (0 = lagets vänsterkant). */
@@ -374,7 +362,6 @@ button.mr-pl:focus-visible, .mr-card:focus-visible { outline: 2px solid var(--ac
   }
   .mr-leg.a { flex-direction: row; }
   .mr-stamp { left: auto; right: 0; transform: rotate(-7deg); }
-  .mr-leg.a .mr-key { margin: 0 7px 0 0; }
   .mr-lines.wide { display: none; }
   .mr-lines.tall { display: block; }
   .mr-pl.h { left: calc(10% + var(--s) * 0.8%); top: calc(93% - var(--l) * 0.37%); }

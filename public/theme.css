@@ -630,15 +630,6 @@ table.cmp tr.model td { background: var(--accent-soft); color: #fff; }
 }
 .empty { color: var(--muted); }
 
-/* Sannolikhetsstapeln 1 · X · 2 i hemma-, oavgjort- och bortafärg, det
-   troligaste utfallet starkast. Under oddsen i matchlistan. */
-.pbar { display: flex; gap: 3px; width: 100%; height: 4px; }
-.pbar i { flex: var(--w) 1 0; min-width: 3px; border-radius: 999px; background: var(--o-home); opacity: 0.4; }
-.pbar i:nth-child(2) { background: #8a8073; }
-.pbar i:nth-child(3) { background: var(--o-away); }
-.pbar i.max { opacity: 1; }
-.mside-odds .pbar { min-width: 112px; margin-top: 7px; }
-
 /* Spelad match: spelikonen (hojdpunkter.css) och resultatet i var sin fast
    kolumn, så att båda står i rak linje rad för rad – också där klipp saknas.
    Prognosen före avspark står i resultatets tooltip. Raden är lika hög med
@@ -907,7 +898,6 @@ footer .foot-links a[aria-current="page"] { color: var(--fg); }
   .mteams .sub { display: block; margin: 2px 0 0; }
   .mteams .skold { width: 18px; height: 18px; }
   .mside-odds { grid-column: 2 / -1; text-align: left; }
-  .mside-odds .pbar { max-width: 150px; }
   .mside-res { grid-template-columns: 24px 3.2rem; column-gap: 8px; }
   .mside-res .hl-play { width: 24px; height: 24px; }
   /* prognosens procent på en rad även i smala kolumner */

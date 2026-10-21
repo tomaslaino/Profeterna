@@ -138,24 +138,21 @@ const ZONES = [
 ];
 const zoneOf = (note) => (note ? ZONES.find((z) => z.test(note)) || null : null);
 
-// Som en vanlig tabell: S V O F, målen och poängen; korten efter poängen
-// eftersom de inte påverkar placeringen.
-function leagueTable(rows, { compact = false } = {}) {
+// Som en vanlig tabell: S V O F, målen och poängen.
+function leagueTable(rows) {
   const head = '<thead><tr><th class="c">#</th><th>Lag</th><th class="num" title="Spelade matcher">S</th>' +
     '<th class="num" title="Vunna">V</th><th class="num" title="Oavgjorda">O</th><th class="num" title="Förlorade">F</th>' +
     '<th class="num" title="Gjorda–insläppta mål">Mål</th><th class="num" title="Målskillnad">+/−</th>' +
-    '<th class="num" title="Poäng: 3 för vinst, 1 för oavgjort">P</th>' +
-    (compact ? '' : '<th class="num hide-sm" title="Gula och röda kort (spelarnas, ur trupperna)">Kort</th>') + '</tr></thead>';
+    '<th class="num" title="Poäng: 3 för vinst, 1 för oavgjort">P</th></tr></thead>';
   const body = rows.map((r) => {
-    if (!r) return `<tr class="dv-gap"><td colspan="${compact ? 9 : 10}">⋯</td></tr>`;
+    if (!r) return `<tr class="dv-gap"><td colspan="9">⋯</td></tr>`;
     const z = zoneOf(r.note);
     const gd = r.gd > 0 ? `+${r.gd}` : r.gd < 0 ? `−${-r.gd}` : '0';
     return `<tr class="dv-trow ${z ? z.cls : ''}" data-team="${esc(r.espnId)}" tabindex="0" title="${z ? esc(z.label) : ''}">` +
       `<td class="c rank">${r.rank}</td><td class="team"><span class="dv-tname">${window.Skoldar ? Skoldar.img(r.name, { dark: true }) : ''}<span>${esc(r.name)}</span></span></td><td class="num">${r.played}</td>` +
       `<td class="num">${r.won}</td><td class="num">${r.drawn}</td><td class="num">${r.lost}</td>` +
       `<td class="num">${r.gf}–${r.ga}</td><td class="num">${gd}</td>` +
-      `<td class="num pts">${r.points}${r.deductions ? `<sup title="${r.deductions} poängs avdrag">*</sup>` : ''}</td>` +
-      (compact ? '' : `<td class="num hide-sm dv-cards">${r.yc == null ? '–' : `<i class="dv-card-y"></i>${r.yc}${r.rc ? ` <i class="dv-card-r"></i>${r.rc}` : ''}`}</td>`) + '</tr>';
+      `<td class="num pts">${r.points}${r.deductions ? `<sup title="${r.deductions} poängs avdrag">*</sup>` : ''}</td></tr>`;
   }).join('');
   return `<div class="table-wrap dv-tw"><table class="dv-league">${head}<tbody>${body}</tbody></table></div>`;
 }
@@ -176,7 +173,7 @@ function tableView(P) {
     body: leagueTable(rows) +
       `<div class="dv-zones">${zones.map((z) => `<span class="${z.cls}"><i></i>${esc(z.label)}</span>`).join('')}</div>` +
       (ded.length ? `<p class="dv-note">* Poängavdrag: ${ded.map((r) => `${esc(r.name)} −${r.deductions}`).join(', ')}.</p>` : ''),
-    src: `Tabell: ESPN, hämtat ${when(P.table.fetchedAt)} · kort: ESPN-trupperna, hämtat ${when(P.source.fetchedAt)}`,
+    src: `Tabell: ESPN, hämtat ${when(P.table.fetchedAt)}`,
     cls: 'dv-tablecard',
   });
 }
@@ -365,9 +362,6 @@ const PCOLS = [
   { key: 'team', label: 'Lag', get: (p) => p.team, text: true, cls: 'pteam hide-sm', in: PA, show: (p) => esc(p.team) },
   { key: 'pos', label: 'Pos', name: 'Position', title: 'MV = målvakt, B = back, MF = mittfältare, A = anfallare.',
     get: (p) => POS_ORDER[p.pos], show: (p) => esc(p.pos || '–'), cls: 'c', in: PA },
-  { key: 'age', label: 'Ålder', title: 'Spelarens ålder i dag.', get: (p) => p.age, cls: 'num hide-xs', in: ['oversikt'] },
-  { key: 'nat', label: 'Nation', name: 'Nationalitet', title: 'Landet spelaren är registrerad för hos ESPN.',
-    get: (p) => natSv(p.nat), text: true, cls: 'pnat hide-sm', in: ['oversikt'], show: (p) => esc(natSv(p.nat) || '–') },
   { key: 'app', label: 'M', name: 'Matcher', title: 'Ligamatcher i år – både från start och som inhoppare.', get: (p) => p.app, cls: 'num', in: PA },
   { key: 'starts', label: 'Start', name: 'Från start', title: 'Ligamatcher där spelaren fanns med i startelvan.', get: (p) => p.starts, cls: 'num hide-md hide-sm', in: ['oversikt'] },
   { key: 'min', label: 'Min', name: 'Speltid', title: 'Spelade minuter i ligan i år.', get: (p) => p.min, cls: 'num hide-xs', mins: true, in: MIN_IN },
@@ -397,8 +391,6 @@ const PCOLS = [
   { key: 'gsub', label: 'Inhopp', sub: 'mål', name: 'Mål som inhoppare', title: 'Mål gjorda efter att spelaren bytts in.', get: (p) => p.gsub, cls: 'num hide-sm', in: ['malen'] },
   { key: 'a', label: 'Ass', name: 'Assist', title: 'Sista passningen före ett mål – eller ett skott som räddas och slås in av en lagkamrat. Enligt ESPN.',
     get: (p) => p.a, cls: 'num', in: ['oversikt'] },
-  { key: 'ga', label: 'M+A', name: 'Mål plus assist', title: 'Mål och assist tillsammans: hur många av lagets mål spelaren har varit direkt inblandad i.',
-    get: (p) => (p.noStats ? null : (p.g || 0) + (p.a || 0)), cls: 'num hide-xs', in: ['oversikt'] },
   { key: 'rt', label: 'Betyg', name: 'Snittbetyg',
     title: 'Snittet av spelarens betyg från 365Scores, 1–10, i ligans matcher i år. En vanlig insats ger runt 6,7. Dämpade siffror: färre än tre matcher med betyg.',
     get: (p) => p.rt, d: 1, cls: 'num', rt: true, in: ['oversikt'],
@@ -411,8 +403,8 @@ const PCOLS = [
     get: (p) => p.fc, cls: 'num', in: ['regelbrott'] },
   { key: 'fc90', label: 'Fäller', sub: 'per 90 min', name: 'Begångna regelbrott per 90 minuter', title: 'Begångna regelbrott per 90 minuters speltid. Dämpade siffror: mindre än tre hela matchers speltid.',
     get: (p) => per90e(p.fc, p), d: 1, cls: 'num hide-xs', mins: true, in: ['regelbrott'], ...qMinE },
-  { key: 'yc', label: 'Gul', name: 'Gula kort', title: 'Gula kort i ligan i år.', get: (p) => p.yc, cls: 'num', in: ['oversikt', 'regelbrott'] },
-  { key: 'rc', label: 'Röd', name: 'Röda kort', title: 'Röda kort i ligan i år.', get: (p) => p.rc, cls: 'num', in: ['oversikt', 'regelbrott'] },
+  { key: 'yc', label: 'Gul', name: 'Gula kort', title: 'Gula kort i ligan i år.', get: (p) => p.yc, cls: 'num', in: ['regelbrott'] },
+  { key: 'rc', label: 'Röd', name: 'Röda kort', title: 'Röda kort i ligan i år.', get: (p) => p.rc, cls: 'num', in: ['regelbrott'] },
   { key: 'off', label: 'Offside', title: 'Gånger spelaren har blivit avblåst för offside.', get: (p) => p.off, cls: 'num', in: ['regelbrott'] },
   { key: 'sh', label: 'Skott', title: 'Alla avslut – även de som går utanför eller blockeras.', get: (p) => p.sh, cls: 'num', in: ['avslut'] },
   { key: 'sot', label: 'På mål', name: 'Skott på mål', title: 'Skott som hade gått in om målvakten inte räddat. Skott utanför och i stolpen räknas inte.',
