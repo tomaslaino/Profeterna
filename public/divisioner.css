@@ -151,8 +151,8 @@
 .dv-seg button:focus-visible,
 .dv-mtabs button:focus-visible { outline-offset: 3px; border-radius: 3px; }
 
-/* Spelarna | Lagen: två rubriker i samma stil och höjd som tabellrubriken på
-   Tabeller (.dv-sechead h3). Den valda är ljus med ett kort guldstreck under,
+/* Spelarna | Lagen: två rubriker i samma stil och höjd som avsnittsrubrikerna
+   (.dv-sechead h3). Den valda är ljus med ett kort guldstreck under,
    den andra dämpad. */
 .dv-views { display: flex; gap: 26px; margin: 4px 0 12px; }
 .dv-views a {

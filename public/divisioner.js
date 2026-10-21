@@ -113,13 +113,10 @@ const natSv = (n) => (n ? NAT[n] || n : null);
 const tipAttr = (head, tip) => (tip ? ` data-tip="${esc(tip)}" data-tip-head="${esc(head)}"` : '');
 
 function card(title, { hint, key, body, src, cls = '', tip }) {
-  return `<section class="card dv-card ${cls}"><h4${tipAttr(title, tip)}>${esc(title)}${hint ? ` <span class="hint">${esc(hint)}</span>` : ''}</h4>` +
+  return `<section class="card dv-card ${cls}">` +
+    (title ? `<h4${tipAttr(title, tip)}>${esc(title)}${hint ? ` <span class="hint">${esc(hint)}</span>` : ''}</h4>` : '') +
     (key ? `<p class="dv-key-line">${key}</p>` : '') + body +
     (src ? `<p class="src-line">${src}</p>` : '') + '</section>';
-}
-
-function sectionHead(title, sub) {
-  return `<div class="dv-sechead"><h3>${esc(title)}</h3>${sub ? `<p>${sub}</p>` : ''}</div>`;
 }
 
 // Värde i en tabellcell: 0 dämpat, okänt som streck med förklaring.
@@ -163,7 +160,7 @@ function leagueTable(rows, { compact = false } = {}) {
   return `<div class="table-wrap dv-tw"><table class="dv-league">${head}<tbody>${body}</tbody></table></div>`;
 }
 
-function tableView(dv, P) {
+function tableView(P) {
   if (!P || P.unknown || !P.table) {
     return `<p class="empty">${unknown('okänt – ingen tabell hämtad för divisionen')}</p>`;
   }
@@ -174,14 +171,14 @@ function tableView(dv, P) {
     if (z && !zones.some((x) => x.cls === z.cls && x.label === z.label)) zones.push(z);
   }
   const ded = rows.filter((r) => r.deductions);
-  return sectionHead(`Tabell – ${dv.name}`, `${esc(state.data.season)} · ${Math.max(...rows.map((r) => r.played))} omgångar`) +
-    card('Tabellen', {
-      body: leagueTable(rows) +
-        `<div class="dv-zones">${zones.map((z) => `<span class="${z.cls}"><i></i>${esc(z.label)}</span>`).join('')}</div>` +
-        (ded.length ? `<p class="dv-note">* Poängavdrag: ${ded.map((r) => `${esc(r.name)} −${r.deductions}`).join(', ')}.</p>` : ''),
-      src: `Tabell: ESPN, hämtat ${when(P.table.fetchedAt)} · kort: ESPN-trupperna, hämtat ${when(P.source.fetchedAt)}`,
-      cls: 'dv-tablecard',
-    });
+  // Utan rubrik: sidan heter Tabeller och divisionen står i flikarna ovanför.
+  return card('', {
+    body: leagueTable(rows) +
+      `<div class="dv-zones">${zones.map((z) => `<span class="${z.cls}"><i></i>${esc(z.label)}</span>`).join('')}</div>` +
+      (ded.length ? `<p class="dv-note">* Poängavdrag: ${ded.map((r) => `${esc(r.name)} −${r.deductions}`).join(', ')}.</p>` : ''),
+    src: `Tabell: ESPN, hämtat ${when(P.table.fetchedAt)} · kort: ESPN-trupperna, hämtat ${when(P.source.fetchedAt)}`,
+    cls: 'dv-tablecard',
+  });
 }
 
 const signed = (x, d = 2) => (Math.abs(x) < 0.5 * 10 ** -d ? `±${num(0, d)}` : x > 0 ? `+${num(x, d)}` : `−${num(-x, d)}`);
@@ -1297,7 +1294,7 @@ async function renderView() {
   if (dv.id !== state.div) return;
   el.classList.remove('sp-veiled');
   const draw = () => {
-    if (state.view === 'tabell') el.innerHTML = tableView(dv, P);
+    if (state.view === 'tabell') el.innerHTML = tableView(P);
     else if (state.view === 'lag') el.innerHTML = teamsView(dv, P, T);
     else el.innerHTML = playersView(dv, P);
   };
