@@ -817,7 +817,8 @@ en ny regelversion ger en ny post per kandidat med datum.
 ## Matchanalysen (fas 5)
 
 Valfri och **avstängd som standard**. När den är påslagen har matchvyn för en kommande
-match med prognos ett kort *Analys* med knappen **Analysera**. Ett klick ger en kort text
+match med prognos avsnittet *Tipset* med knappen **Analysera**, under artikeln i fliken
+*Inför* (sedan 2026-10-21; förut i *Prognos*, som nu inte ringar in något). Ett klick ger en kort text
 (3–5 meningar) som DeepSeek skriver ur matchens underlag och, under rubriken
 *Nyhetsläget*, 4–8 meningar ur nyheter som hämtas online just då, med hänvisningar och en
 källista med länkar. Allt är märkt *genererad text* med modell, när den skrevs, vilket
@@ -842,10 +843,10 @@ skriver Claude (`claude-opus-5-5`) analysen i stället för DeepSeek
   lokaltidningar, presskonferenser, skador och troliga startelvor, supporterforum och
   fansajter. Svaret är JSON med `analys`, `nyheter`, `läktaren`, `tecken`, `marginal`
   och `källor` (adress, tidning, rubrik).
-- Matchrutan visar *Analys*, *Nyhetsläget* och *Läktarsnacket* med hänvisningar till en
-  gemensam källista, och ringar in tecknen i rutorna 1 X 2 med raden i marginalen
-  (Claudes egen, högst tre ord utan siffror – annars spik, halvgardera eller
-  helgardera). Knappen visar *Läser på …* med tiden; en analys tar en och en halv
+- *Tipset* visar kupongens rutor 1 X 2 med tecknen inringade och raden i marginalen, och
+  under dem analysen, *Nyhetsläget* och *Läktarsnacket* med hänvisningar till en
+  gemensam källista. Raden i marginalen är Claudes egen, högst tre ord utan siffror
+  (annars spik, halvgardera eller helgardera). Knappen visar *Läser på …* med tiden; en analys tar en och en halv
   minut.
 - **Kontroller:** en källa följer bara med om adressen verkligen kom upp i en sökning,
   en läst sida eller bland nyheterna – annars stryks hänvisningen. Varje tal i texterna

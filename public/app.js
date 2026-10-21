@@ -537,7 +537,7 @@ function selectMatchTab(id, focus) {
 // som saknas och domaren, som i ett matchprogram – och Matchen efter den när
 // matchen har börjat. Startelvor och Matchen fylls av matchruta.js, Tabellen
 // av tableFill(). Inför står efter dem när Claude har skrivit en artikel om
-// matchen (articlePane), och före avspark med knappen Läs på (articleAsk).
+// matchen, och före avspark med knappen Läs på (inforPane).
 function matchPanes(d) {
   const m = d.match;
   const started = m.completed || (Date.parse(m.kickoff) <= Date.now() && !/POSTPONED|CANCEL/.test(m.status || ''));
@@ -545,8 +545,7 @@ function matchPanes(d) {
   const panes = [];
   panes.push(['startelvor', 'Startelvor', (R ? R.lineupPane(m, absentees(d)) : squadCard(d)) + refereeCard(d)]);
   if (started && R) panes.push(['matchen', 'Matchen', R.eventsPane(m)]);
-  const article = articles.get(m.id);
-  if (article || articleOn(d)) panes.push(['infor', 'Inför', article ? articlePane(article) : articleAsk(m.id)]);
+  if (articles.get(m.id) || articleOn(d)) panes.push(['infor', 'Inför', inforPane(d)]);
   panes.push(['prognos', 'Prognos', prognosPane(d)]);
   const table = tableDivs(d).length > 0;
   panes.push(['form', 'Form', formCard(d) + sideCard(d, table)]);
@@ -561,7 +560,7 @@ function prognosPane(d) {
   const m = d.match;
   const ok = d.prediction && d.prediction.status === 'ok';
   if (m.completed && d.journal && d.journal.counted) return journalCard(d) + (ok ? stepsCard(d) : '');
-  return forecastCard(d) + analysisCard(d) + marketCard(d) + (ok ? stepsCard(d) : '');
+  return forecastCard(d) + marketCard(d) + (ok ? stepsCard(d) : '');
 }
 
 function renderDetail(d) {
@@ -642,13 +641,12 @@ function forecastCard(d) {
 }
 
 // 1 · X · 2 som kupongens rutor: tecknet och oddset. Inget ringas in av sig
-// självt – först när någon har tryckt på Analysera ringar AI:n in sina tecken
-// med kulspetspenna och skriver en rad i marginalen (penMarks). Efter matchen
-// ringas utfallet (outcome) in med samma penna som ställningen. key gör
-// pennstrecken likadana varje gång (papper.js).
-function fcMain(p, labels, key, outcome) {
+// självt – prognosen står ren, och bara tipset under artikeln i Inför ritar
+// AI:ns tecken med kulspetspenna och en rad i marginalen (pen, penMarks).
+// Efter matchen ringas utfallet (outcome) in med samma penna som ställningen.
+// key gör pennstrecken likadana varje gång (papper.js).
+function fcMain(p, labels, key, outcome, pen = null) {
   const w = pct3(p);
-  const pen = outcome == null ? penMarks(key) : null;
   const P = window.Papper;
   const cols = w.map((x, i) => {
     const mine = Boolean(pen) && pen.signs.includes(i);
@@ -1196,6 +1194,13 @@ function articleOn(d) {
   return Boolean(a && a.endpoint && !m.completed && m.status === 'STATUS_SCHEDULED' && left > 0 && left <= ARTICLE_DAYS * 86400000);
 }
 
+// Inför: först bara Läs på, sedan artikeln med tipset under (analysisCard) –
+// Analysera bygger på artikeln och kommer därför efter den.
+function inforPane(d) {
+  const a = articles.get(d.match.id);
+  return a ? articlePane(a) + analysisCard(d) : articleAsk(d.match.id);
+}
+
 // Utan artikel: bara knappen, och felet om förra försöket inte gav någon.
 function articleAsk(id) {
   const r = articleFails.get(id);
@@ -1234,7 +1239,7 @@ async function runArticle(id, btn) {
   const d = state.detail;
   if (!d || d.match.id !== id || location.hash !== `#match/${id}`) return;
   const pane = $('#mr-pane-infor');
-  if (pane) pane.innerHTML = r.ok && r.article ? articlePane(r.article) : articleAsk(id);
+  if (pane) pane.innerHTML = inforPane(d);
 }
 
 // Rubrik, ingress och stycken med hänvisningar till källistan, som
@@ -1264,38 +1269,46 @@ function analysisOn(d) {
     Date.parse(m.kickoff) > Date.now() && d.prediction && d.prediction.status === 'ok');
 }
 
+// Tipset under artikeln i Inför: knappen Analysera, och efter den kupongens
+// rutor med AI:ns tecken inringade (penRow) och texten under.
 function analysisCard(d) {
   if (!analysisOn(d)) return '';
   const a = state.meta.analysis;
   const r = analyses.get(d.match.id);
-  if (r && r.ok && r.research) return researchCard(r);
+  if (r && r.ok && r.research) return researchCard(r, d);
   if (r && r.ok) {
     const other = r.builtAt && d.builtAt && r.builtAt !== d.builtAt;
-    return `<div class="card analysis" id="analysis-card"><h4 title="${esc(`Skriven av ${r.model} ${when(r.generatedAt)} ur underlaget från uppdateringen ${when(r.builtAt)} · alla tal i texten finns i underlaget`)}">Analys</h4>` +
-      `<p class="analysis-text">${esc(r.text).replace(/(\d) %/g, '$1&nbsp;%')}</p>` +
+    return `<div class="card analysis" id="analysis-card"><h4 title="${esc(`Skriven av ${r.model} ${when(r.generatedAt)} ur underlaget från uppdateringen ${when(r.builtAt)} · alla tal i texten finns i underlaget`)}">Tipset</h4>` +
+      penRow(d) + `<p class="analysis-text">${esc(r.text).replace(/(\d) %/g, '$1&nbsp;%')}</p>` +
       (r.news ? newsSection(r.news) : '') +
       (other ? '<p class="note">Sidan och texten bygger på olika uppdateringar – ladda om sidan.</p>' : '') + '</div>';
   }
   // retry: false = svaret klarade inte kontrollen; samma underlag ger samma
   // svar, eller (again) samma svar en stund.
   const final = r && r.retry === false;
-  return `<div class="card analysis" id="analysis-card"><h4>Analys</h4>` +
-    (r ? `<p class="unknown">Ingen analys: ${esc(r.error || 'okänt fel')}${final ? esc(r.again || ' En ny text kan skrivas när underlaget ändrats.') : ''}</p>` : '') +
+  return `<div class="card analysis" id="analysis-card"><h4>Tipset</h4>` +
+    (r ? `<p class="unknown">Inget tips: ${esc(r.error || 'okänt fel')}${final ? esc(r.again || ' En ny text kan skrivas när underlaget ändrats.') : ''}</p>` : '') +
     (final ? '' : `<button type="button" class="analyze" data-id="${esc(d.match.id)}" title="${a.news
       ? 'AI:n läser tidningar, presskonferenser och supporterforum på nätet och ringar in sina tecken'
       : 'En språkmodell skriver bara ur underlaget på sidan – en text med ett tal som inte finns där visas inte'}">${r ? 'Försök igen' : 'Analysera'}</button>`) + '</div>';
 }
 
-// Analysen med research: texten, nyhetsläget och läktarsnacket med
-// hänvisningar till en gemensam källista. Tecknen ringas in i rutorna ovanför
-// (penMarks).
-function researchCard(r) {
+// Tecknen AI:n ringade in, med pennan i kupongens rutor – samma rutor som
+// prognosen, där inget ringas in.
+function penRow(d) {
+  const pen = penMarks(d.match.id);
+  return pen ? fcMain(d.prediction.p, [d.match.home, 'Oavgjort', d.match.away], d.match.id, null, pen) : '';
+}
+
+// Analysen med research: rutorna med tecknen (penRow), texten, nyhetsläget
+// och läktarsnacket med hänvisningar till en gemensam källista.
+function researchCard(r, d) {
   const n = r.news || { sources: [] };
   const paras = (t) => (t || '').split(/\n\s*\n/).filter((p) => p.trim())
     .map((p) => `<p class="analysis-text">${refLinks(n.sources)(esc(p.trim())).replace(/(\d) %/g, '$1&nbsp;%')}</p>`).join('');
   const at = r.generatedAt ? fDateTime.format(new Date(r.generatedAt)) : 'okänt';
-  return `<div class="card analysis" id="analysis-card"><h4 title="${esc(`Skriven av ${r.model} ${at} efter sökningar på nätet · rapporterat i media, inte kontrollerat av Matchfixarna och inte med i prognosen`)}">Analys</h4>` +
-    paras(r.text) +
+  return `<div class="card analysis" id="analysis-card"><h4 title="${esc(`Skriven av ${r.model} ${at} efter sökningar på nätet · rapporterat i media, inte kontrollerat av Matchfixarna och inte med i prognosen`)}">Tipset</h4>` +
+    penRow(d) + paras(r.text) +
     (n.text ? `<div class="analysis-news"><h5>Nyhetsläget</h5>${paras(n.text)}</div>` : '') +
     (n.crowd ? `<div class="analysis-news"><h5>Läktarsnacket</h5>${paras(n.crowd)}</div>` : '') +
     sourceList(n.sources) + '</div>';
@@ -1380,13 +1393,9 @@ async function runAnalysis(id, btn) {
       // Visa texten ändå – kortet säger att sidan visar ett annat bygge.
     }
   }
+  // Tecknen AI:n ringade in ritas med pennan medan man tittar (fc-fresh).
   const card = $('#analysis-card');
-  if (card) card.outerHTML = analysisCard(d);
-  // Tecknen AI:n ringade in ritas med pennan i rutorna ovanför.
-  const main = $('#match-detail-view .fc-main');
-  if (main && penMarks(id)) {
-    main.outerHTML = fcMain(d.prediction.p, [d.match.home, 'Oavgjort', d.match.away], id).replace('class="fc-main"', 'class="fc-main fc-fresh"');
-  }
+  if (card) card.outerHTML = analysisCard(d).replace('class="fc-main"', 'class="fc-main fc-fresh"');
 }
 
 $('#match-detail-view').addEventListener('click', (e) => {
