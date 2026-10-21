@@ -1304,8 +1304,8 @@ tjänsten med samma regler när den startar omgången (`linkDraw`). Lokalt
 namn av AI:n – det mest intressanta med just den omgången, sagt med lågmäld ironi, t.ex.
 *Bournemouth trivs på Old Trafford* (Bournemouth har inte vunnit borta i år men vann 0–3 två
 gånger där) eller *Man delar notan på Ewood Park* (de senaste mötena slutade oavgjort). Vad
-namnet syftar på står när man pekar på det. Ungefär var femte omgång får namnet gärna också
-blinka åt drömmen om storkovan. Namnet är rubrik i förstasidans ruta (tiden kvar står
+namnet syftar på står när man pekar på det. Ungefär var tredje omgång får namnet gärna handla
+om pengarna – drömmen om storkovan. Namnet är rubrik i förstasidans ruta (tiden kvar står
 ovanför) och på omgångens sida (datumen ovanför). Det skrivs när någon först öppnar omgången
 efter att matcherna valts (några sekunder med Claude; så länge står *Omgångens kupong* kvar,
 sedan tonar namnet fram) och syns sedan likadant för alla. Ändras matcherna får omgången ett
@@ -1324,9 +1324,10 @@ hemligheten `ANTHROPIC_API_KEY` finns, annars av DeepSeek som analysen. Claude f
 nätet efter nyheter kring lagen (Anthropics sökverktyg, högst fem sökningar), så att det mest
 intressanta kan vara en nyhet och inte bara statistik – t.ex. *Mästarbesök i Bromley*
 (Leicester, mästare för tio år sedan, borta mot en klubb som var utanför ligasystemet 2024).
-Instruktionen är medvetet kort; långa regler gjorde namnen stela. I stället visar den tre namn
-som blev bra och ett som bara konstaterar något, och ber om en handfull förslag där det
-roligaste vinner (förslagen sparas med namnet). Proxyn läser omgången
+Instruktionen är medvetet kort; långa regler gjorde namnen stela. I stället visar den åtta namn
+som gänget har valt ut bland ett fyrtiotal förslag (t.ex. *Arsenal ligger där de brukar*, *Spurs
+har alltid trivts på Bron*), säger att de visar tonen och inte vad namnet ska handla om, och ber
+om en handfull förslag där det roligaste vinner (förslagen sparas med namnet). Proxyn läser omgången
 ur samma KV-namnrymd som tipsen och matchernas underlag ur den publicerade sajten
 (`data/match/<id>.json`: arena, odds, tabell, hemma- och bortafacit, form, mål mot xG, vila,
 tidigare möten), räknar fram en sammanfattning (lag som spelar flera gånger, största favorit,
