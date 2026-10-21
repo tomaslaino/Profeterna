@@ -297,7 +297,6 @@
     // Allas tips så snart du ser fler än dina egna, annars kupongen. Knapparna
     // står i raden längst ner på papperet, i båda.
     const all = Boolean(s.tips && Object.keys(s.tips).length >= (s.visas ? 1 : 2));
-    if (window.Folket) Folket.watch(s);
     html += steps(s, all) + head(s, null);
     html += all ? board(s) : sheet(s, false);
     // Gängets kuponger som spelas under tiden, t.ex. veckans matcher.
@@ -451,7 +450,6 @@
       gard ? ['Garderingar', gard] : null,
       ['Kombinationer', rader(chosen)],
       odds ? ['Odds', oddsText(odds), 'Oddset för att alla gängets tecken går in – matchernas odds gånger varandra'] : null,
-      folkField(),
     ]) + '</div>';
     const act = boardActions(s, rows, val);
     return html + `<div class="sm-act${actMore ? ' more' : ''}" id="sm-act"${act ? '' : ' hidden'}><div class="sm-act-in" id="sm-act-in">${act}</div>` +
@@ -501,14 +499,9 @@
     '<div class="sm-sheet-head"><p class="pp-brand"><img src="logo.svg" alt="" width="20" height="20">Matchfixarna<span>Kupong</span></p>' +
     `${stamp}${corner}</div><div class="pp-band" aria-hidden="true"></div>`;
   const stopBox = (s) => `<div class="pp-stop"><span>Spelstopp</span><b>${esc(fWeekdayTime.format(new Date(Math.min(...kicks(s)))))}</b></div>`;
-  // Fälten i foten: [[etikett, värde, title]] – eller ett färdigt fält
-  // (Svenska folket, folket.js).
-  const fieldList = (list, id = '') => `<div class="pp-fields pb-fields"${id ? ` id="${id}"` : ''}>` + list.filter(Boolean).map((x) => (typeof x === 'string' ? x
-    : `<span class="pp-field"${x[2] ? ` title="${esc(x[2])}"` : ''}><span>${x[0]}</span><b>${x[1]}</b></span>`)).join('') + '</div>';
-  // Svenska folket under rutorna och i foten, när kupongen har matcher från
-  // Stryktipset (folket.js).
-  const folk = (id, i, p) => (window.Folket ? Folket.cell(id, i, p) : '');
-  const folkField = () => (window.Folket ? Folket.field() : null);
+  // Fälten i foten: [[etikett, värde, title]].
+  const fieldList = (list, id = '') => `<div class="pp-fields pb-fields"${id ? ` id="${id}"` : ''}>` + list.filter(Boolean).map((x) =>
+    `<span class="pp-field"${x[2] ? ` title="${esc(x[2])}"` : ''}><span>${x[0]}</span><b>${x[1]}</b></span>`).join('') + '</div>';
   const oddsText = (o) => (o >= 100 ? Math.round(o).toLocaleString('sv-SE') : fmtOdds(o));
   const DOTS3 = '<svg viewBox="0 0 20 20" aria-hidden="true"><circle cx="4.5" cy="10" r="1.7"/><circle cx="10" cy="10" r="1.7"/><circle cx="15.5" cy="10" r="1.7"/></svg>';
 
@@ -577,7 +570,7 @@
       SIGNS.map((sg, i) => {
         const on = sign.includes(sg);
         const b = box(sg, who[i], ids, on ? `${id}${sg}` : null, g.res === i ? `${id}${sg}` : null);
-        const odds = `<small${on ? ' class="on"' : ''}>${g.pr ? pctOdds(g.pr[i]) : '–'}</small>${folk(id, i, g.pr ? g.pr[i] : null)}`;
+        const odds = `<small${on ? ' class="on"' : ''}>${g.pr ? pctOdds(g.pr[i]) : '–'}</small>`;
         if (!pick) return `<span class="sm-c" aria-hidden="true">${b}${odds}</span>`;
         // Gängets tecken väljs bara i matcher som inte har startat.
         return `<button type="button" class="sm-c" data-s="${sg}" aria-pressed="${on}"${open ? '' : ' disabled'}` +
@@ -600,7 +593,6 @@
     const rows = [...g.rows, ...s.matcher.filter((x) => !on.has(x.id)).map((x) => ({ ...gradeRow({ id: x.id, sign: '', label: x.match }, now), out: true }))]
       .sort((a, b) => nr.get(a.id) - nr.get(b.id));
     const stamp = c.pending ? '<span class="pp-stamp wait">Väntar på GitHub</span>' : g.done && !g.hidden ? '<span class="pp-stamp">Rättad</span>' : '';
-    if (window.Folket) Folket.watch(s);
     let html = paperTop(Papper.grade(c, g), ' sm-up', stamp) + upHead(s, ids, rows.filter((r) => r.res != null).map((r) => [r.id, r.res]));
     const days = Papper.inDayOrder(rows, (r) => r.m && r.m.kickoff);
     let day = null;
@@ -915,8 +907,8 @@
           const who = cols.filter((c) => (c.t[x.id] || '').includes(sg)).map((c) => c.g.id);
           return own
             ? `<button type="button" class="sm-c sm-k${pnum(v)}" data-s="${sg}" aria-pressed="${sign.includes(sg)}" aria-label="${sg} för ${esc(label)}">` +
-              `${box(sg, who, ids)}<small>${p ? pctOdds(p[j]) : '–'}</small>${folk(x.id, j, p ? p[j] : null)}</button>`
-            : `<span class="sm-c" aria-hidden="true">${box(sg, who, ids)}${folk(x.id, j, p ? p[j] : null)}</span>`;
+              `${box(sg, who, ids)}<small>${p ? pctOdds(p[j]) : '–'}</small></button>`
+            : `<span class="sm-c" aria-hidden="true">${box(sg, who, ids)}</span>`;
         }).join('') + '</div>';
     });
     keepFocus(() => { $('#sm-rows').innerHTML = html; });
@@ -930,7 +922,6 @@
       gard ? ['Garderingar', gard] : null,
       ['Kombinationer', rader(signs)],
       odds ? ['Odds', oddsText(odds), 'Oddset för att alla dina tecken går in – matchernas odds gånger varandra'] : null,
-      folkField(),
     ], 'sm-fields');
     actionRow();
     // Alla tecken på plats: de röda rutorna försvinner.
@@ -1068,7 +1059,6 @@
       location.hash = 'kupong';
       return;
     }
-    if (window.Folket) Folket.watch(s);
     $('#coupon').innerHTML = steps(s) +
       head(s, 'Ändra din kupong') + sheet(s, true);
     wireSheet();
@@ -1351,8 +1341,7 @@
     const btn = $('#sm-start');
     btn.disabled = true;
     msg('Sparar …');
-    // Hämtades matcherna från Stryktipset följer omgångens nummer med, så att
-    // kupongen visar Svenska folket för just den.
+    // Hämtades matcherna från Stryktipset följer omgångens nummer med.
     const spel = SM.pick.spel;
     const out = edit
       ? await send({ gor: 'matcher', id: SM.data.id, matcher: ids, spel })
