@@ -185,6 +185,20 @@
 .kp-next:hover { color: #fff; border-color: var(--accent); }
 .kp-next span { font-size: 22px; line-height: 1; }
 
+/* ---------- Kupong 1 och namnet bredvid ----------
+   Numret är rubriken och omgångens namn en bikommentar i kursiv efter det,
+   mindre och dovare. Får namnet inte plats bredvid står det helt på raden
+   under. I listorna och tabellerna står det i radens storlek. */
+.kp-bi {
+  font-family: var(--display);
+  font-style: italic;
+  font-weight: 400;
+  letter-spacing: 0;
+  color: var(--ink-soft);
+}
+.kp-titel { display: flex; flex-wrap: wrap; align-items: baseline; column-gap: 0.35em; }
+.kp-titel .kp-bi { font-size: max(15px, 0.6em); line-height: 1.2; }
+
 /* ---------- knappar ---------- */
 
 .kp-head { display: flex; justify-content: space-between; align-items: flex-end; gap: 16px; flex-wrap: wrap; margin-top: clamp(18px, 3vw, 34px); }

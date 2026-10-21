@@ -28,9 +28,10 @@
 // nederst medan man bläddrar. Ta bort (tills allas tips visas) frågar i en
 // ruta ovanpå omgången.
 //
-// Omgången får ett namn av AI:n när matcherna är valda (worker/namn.mjs, i
-// samma proxy som matchanalysen) – samma för alla, och det följer med när
-// gängets kupong sparas. Tills namnet finns heter den "Omgångens kupong".
+// Omgången heter Kupong 1, Kupong 2 … (couponNumber i kupong.js) och får
+// ett namn av AI:n när matcherna är valda (worker/namn.mjs, i samma proxy som
+// matchanalysen) – samma för alla, och det följer med när gängets kupong
+// sparas. Namnet står bredvid numret, som en bikommentar.
 //
 // Omgången och tipsen ligger i tjänsten profeterna-kupong (worker/samtal.mjs,
 // GET/POST …/samtal; lokalt /api/samtal), som håller tipsen dolda. Den som
@@ -139,7 +140,7 @@
 
   // Namnet hämtas en gång per omgång och matcher (ändras matcherna får
   // omgången ett nytt) och sparas på enheten. Första gången skriver AI:n det,
-  // vilket kan ta en minut – då står "Omgångens kupong" kvar så länge.
+  // vilket kan ta en minut – då står numret ensamt så länge.
   const nameKey = (s) => `${s.id}:${s.matcher.map((x) => x.id).sort().join(',')}`;
   function named(s) {
     const url = info() && info().namn;
@@ -174,32 +175,25 @@
     if (before && before !== 'loading' && before.namn === n.namn && before.syftar === n.syftar) return;
     if (!SM.data || nameKey(SM.data) !== k) return;
     // Byt bara rubriken, så att inget annat på sidan ritas om.
-    for (const el of document.querySelectorAll(`[data-sm-namn="${CSS.escape(k)}"]`)) el.outerHTML = nameBlock(SM.data, el.dataset.smDel, 'fram');
+    for (const el of document.querySelectorAll(`[data-sm-namn="${CSS.escape(k)}"]`)) el.outerHTML = nameBlock(SM.data, el.dataset.smDel, 'fram', el.dataset.smLabel);
   }
 
   const nameOf = (s) => { const n = named(s); return n ? n.namn : null; };
 
-  // Namnet med vad det syftar på när man pekar på det. kind: 'ruta' =
-  // förstasidans ruta (tiden kvar ovanför, namnet som rubrik), 'sida' =
-  // omgångens sida (datumen ovanför, namnet som rubrik), 'rad' = bara raden
-  // ovanför rubriken. Tills namnet finns står "Omgångens kupong" där.
-  function nameBlock(s, kind, cls = '') {
+  // Rubriken Kupong 1 med omgångens namn bredvid, och vad namnet syftar på
+  // när man pekar på det. kind: 'ruta' = förstasidans ruta (tiden kvar
+  // ovanför), 'sida' = omgångens sida (datumen ovanför, eller label), 'rad' =
+  // bara raden ovanför en annan rubrik. Tills namnet finns står numret ensamt.
+  function nameBlock(s, kind, cls = '', label = '') {
     const n = named(s);
+    const nr = couponNumber(s.matcher.map((x) => x.id));
+    if (kind === 'rad') return `<p class="kp-eyebrow">Kupong ${nr}</p>`;
     const key = info() && info().namn ? ` data-sm-namn="${esc(nameKey(s))}" data-sm-del="${kind}"` : '';
-    const hint = n && n.syftar ? ` title="${esc(n.syftar)}"` : '';
-    const name = n ? esc(n.namn) : 'Omgångens kupong';
-    const nameCls = n ? ` sm-namn ${cls}` : '';
-    if (kind === 'ruta') {
-      return `<div${key}>${countdown(s)}<h2 class="page-title${nameCls}"><a href="#kupong"${hint}>${name}</a></h2></div>`;
-    }
-    if (kind === 'sida') {
-      const k = kicks(s);
-      const range = esc(dateRange(Math.min(...k), Math.max(...k)));
-      return n
-        ? `<div${key}><p class="kp-eyebrow">${range}</p><h2 class="page-title${nameCls}"${hint}>${name}</h2></div>`
-        : `<div${key}><p class="kp-eyebrow">Omgångens kupong</p><h2 class="page-title">${range}</h2></div>`;
-    }
-    return `<p class="kp-eyebrow${nameCls}"${key}${hint}>${name}</p>`;
+    const opts = { hint: n && n.syftar ? n.syftar : '', nameCls: `sm-namn ${cls}`.trim() };
+    if (kind === 'ruta') return `<div${key}>${countdown(s)}${couponTitle(nr, n && n.namn, { ...opts, href: '#kupong' })}</div>`;
+    const k = kicks(s);
+    const eyebrow = label || dateRange(Math.min(...k), Math.max(...k));
+    return `<div${key}${label ? ` data-sm-label="${esc(label)}"` : ''}><p class="kp-eyebrow">${esc(eyebrow)}</p>${couponTitle(nr, n && n.namn, opts)}</div>`;
   }
 
   // Tiden kvar att lämna in (till första avsparken; klockslaget när man
@@ -256,13 +250,10 @@
 
   // ---------- omgången ----------
 
-  // eyebrow: texten ovanför rubriken, annars omgångens namn.
-  // label: texten ovanför rubriken – utan den omgångens namn som rubrik.
+  // label: texten ovanför rubriken i stället för datumen.
   function head(s, label, actions = '') {
-    const k = s ? kicks(s) : [];
-    return '<div class="kp-head">' + (s && !label ? nameBlock(s, 'sida') : '<div>' +
-      `<p class="kp-eyebrow">${esc(label || 'Omgångens kupong')}</p>` +
-      `<h2 class="page-title">${s ? esc(dateRange(Math.min(...k), Math.max(...k))) : 'Omgångens kupong'}</h2></div>`) +
+    return '<div class="kp-head">' + (s ? nameBlock(s, 'sida', '', label || '') :
+      `<div><p class="kp-eyebrow">${esc(label || 'Omgångens kupong')}</p><h2 class="page-title">Omgångens kupong</h2></div>`) +
       `<div class="kp-actions">${actions}</div></div>`;
   }
 
@@ -493,11 +484,12 @@
 
   // ---------- allas tips på papperet: uppgörelsen och gängets kupong ----------
 
-  // Papperet: märket, i hörnet spelstoppet eller betyget och stämpeln
-  // emellan, och bården under. cls: fler klasser på papperet. Omgångens id
-  // ger papperet samma slitage när man fyller i och efteråt (slitage.js).
+  // Papperet: märket med kupongens nummer, i hörnet spelstoppet eller betyget
+  // och stämpeln emellan, och bården under. cls: fler klasser på papperet.
+  // Omgångens id ger papperet samma slitage när man fyller i och efteråt
+  // (slitage.js).
   const paperTop = (corner, cls = '', stamp = '') => `<div class="pp-wrap sm-wrap"><div class="pp pp-fill sm-sheet${cls}" id="sm-sheet"${SM.data ? ` data-slitage="omg:${esc(SM.data.id)}"` : ''}>` +
-    '<div class="sm-sheet-head"><p class="pp-brand"><img src="logo.svg" alt="" width="20" height="20">Matchfixarna<span>Kupong</span></p>' +
+    `<div class="sm-sheet-head"><p class="pp-brand"><img src="logo.svg" alt="" width="20" height="20">Matchfixarna<span>Kupong${SM.data ? ` ${couponNumber(SM.data.matcher.map((x) => x.id))}` : ''}</span></p>` +
     `${stamp}${corner}</div><div class="pp-band" aria-hidden="true"></div>`;
   const stopBox = (s) => `<div class="pp-stop"><span>Spelstopp</span><b>${esc(fWeekdayTime.format(new Date(Math.min(...kicks(s)))))}</b></div>`;
   // Fälten i foten: [[etikett, värde, title]].
@@ -613,13 +605,13 @@
     return html + Papper.foot(c, g) + '</div></div>';
   }
 
-  // Rubriken över gängets kupong (steg 4): omgångens namn, som i stegen
-  // före – eller kupongens eget, om den har fått ett annat.
+  // Rubriken över gängets kupong (steg 4): Kupong 1 med omgångens namn, som
+  // i stegen före – eller kupongens eget, om den har fått ett annat.
   function title(c) {
     const s = SM.data;
     if (!c.name || c.name === nameOf(s)) return nameBlock(s, 'sida');
     const k = kicks(s);
-    return `<div><p class="kp-eyebrow">${esc(dateRange(Math.min(...k), Math.max(...k)))}</p><h2 class="page-title">${esc(c.name)}</h2></div>`;
+    return `<div><p class="kp-eyebrow">${esc(dateRange(Math.min(...k), Math.max(...k)))}</p>${couponTitle(couponNumber(c.matches.map((x) => x.id)), c.name)}</div>`;
   }
 
   // Gängets kupong för omgångens matcher – den som har flest av dem – om den

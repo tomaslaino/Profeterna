@@ -128,6 +128,49 @@ function allCoupons() {
   return list;
 }
 
+// ---------- kupongernas nummer ----------
+
+// Kupongerna heter Kupong 1, Kupong 2 … i den ordning de spelas (första
+// avsparken). Omgången som gänget tippar (samtal.js) har sitt nummer redan
+// innan gängets kupong ur den finns: de har matcher gemensamma och räknas som
+// en. ids = matcherna på kupongen eller i omgången → numret.
+function couponNumber(ids) {
+  const kick = (id) => { const m = matchById(String(id)); return m ? Date.parse(m.kickoff) : NaN; };
+  const groups = [];
+  const add = (list, made) => {
+    const set = new Set(list.map(String));
+    if (!set.size) return;
+    // Utan matcherna i spelprogrammet: när kupongen gjordes.
+    const kicks = [...set].map(kick).filter(Number.isFinite);
+    const g = { set, first: kicks.length ? Math.min(...kicks) : made || Infinity };
+    for (const o of groups.filter((x) => [...x.set].some((id) => set.has(id)))) {
+      for (const id of o.set) g.set.add(id);
+      g.first = Math.min(g.first, o.first);
+      groups.splice(groups.indexOf(o), 1);
+    }
+    groups.push(g);
+  };
+  for (const c of allCoupons()) add(c.matches.map((x) => x.id), Date.parse(c.created) || null);
+  if (hasSamtal()) add(Samtal.ids());
+  groups.sort((a, b) => a.first - b.first);
+  const want = ids.map(String);
+  const i = groups.findIndex((g) => want.some((id) => g.set.has(id)));
+  if (i >= 0) return i + 1;
+  const kicks = want.map(kick).filter(Number.isFinite);
+  const first = kicks.length ? Math.min(...kicks) : Infinity;
+  return groups.filter((g) => g.first < first).length + 1;
+}
+
+// Rubriken: Kupong 1 och omgångens namn bredvid, som en bikommentar i
+// kursiv. href gör numret till en länk, hint är vad namnet syftar på (när man
+// pekar på det) och nameCls namnets egna klasser (sm-namn, fram i samtal.js).
+function couponTitle(n, name, { tag = 'h2', cls = 'page-title', href = '', hint = '', nameCls = '' } = {}) {
+  const nr = `Kupong ${n}`;
+  return `<${tag} class="${[cls, 'kp-titel'].filter(Boolean).join(' ')}">${href ? `<a href="${esc(href)}">${nr}</a>` : nr}` +
+    (name ? ` <span class="kp-bi${nameCls ? ` ${nameCls}` : ''}"${hint ? ` title="${esc(hint)}"` : ''}>${esc(name)}</span>` : '') +
+    `</${tag}>`;
+}
+
 // En kupong som tjänsten svarat med (filens format) → sidans format.
 function fromStored(k) {
   if (!k || !Array.isArray(k.matcher)) return null;
@@ -573,9 +616,9 @@ function teaser(c, g) {
   const go = `<a class="kp-btn primary" href="#kupong">${g.started ? 'Följ kupongen' : 'Till kupongen'}</a>` +
     (!g.started && window.Systembild ? Systembild.button('kp-btn', true) : '');
   return `<div class="card kp-teaser${g.live ? ' is-live' : ''}">` +
-    // Namnet som rubrik och datumen ovanför; utan namn som förut.
-    `<div class="kp-teaser-txt"><p class="kp-eyebrow">${esc(name ? dateRange(g.first, g.last) : 'Omgångens kupong')}</p>` +
-    `<h2 class="page-title"><a href="#kupong">${esc(name || dateRange(g.first, g.last))}</a></h2>` +
+    // Kupong 1 som rubrik med namnet bredvid, och datumen ovanför.
+    `<div class="kp-teaser-txt"><p class="kp-eyebrow">${esc(dateRange(g.first, g.last))}</p>` +
+    couponTitle(couponNumber(c.matches.map((x) => x.id)), name, { href: '#kupong' }) +
     (g.started ? '' : `<span class="kp-line">Startar ${esc(fWeekdayTime.format(new Date(g.first)))}</span>`) + '</div>' +
     `<a class="kp-teaser-num" href="#kupong" aria-label="Till kupongen">${bigNumber(g)}</a>` +
     pearls(g.rows) +
@@ -604,8 +647,8 @@ const openCoupons = () => moreSection(allCoupons().map((c) => ({ c, g: gradeCoup
 function moreSection(list) {
   if (!list.length) return '';
   return '<h3 class="kp-h">Fler kuponger</h3><div class="mlist">' + list.map(({ c, g }) =>
-    `<a class="kp-past" href="#kupong/${esc(c.id)}"><span class="kp-past-date">${esc(dateRange(g.first, g.last))}` +
-    `${c.name ? `<span class="sub">${esc(c.name)}</span>` : ''}</span>${pearls(g.rows, 'sm')}` +
+    `<a class="kp-past" href="#kupong/${esc(c.id)}"><span class="kp-past-date">Kupong ${couponNumber(c.matches.map((x) => x.id))}` +
+    `${c.name ? ` <span class="kp-bi">${esc(c.name)}</span>` : ''}<span class="sub">${esc(dateRange(g.first, g.last))}</span></span>${pearls(g.rows, 'sm')}` +
     `<span class="kp-past-num"><b>${g.hidden ? '?' : g.ok}</b>/${g.n}</span></a>`).join('') + '</div>';
 }
 

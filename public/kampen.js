@@ -146,12 +146,12 @@ const kampKr = (x) => {
 };
 const kampOdds = (prob) => (prob > 0 ? fmtOdds(1 / prob) : '–');
 const kampSurname = (name) => { const i = name.indexOf(' '); return i > 0 ? name.slice(i + 1) : name; };
-// Omgångens namn, med datumen och vad det syftar på när man pekar – annars
-// datumen.
-const kampRound = (r) => (r.name
-  ? `<span title="${esc([dateRange(r.from, r.to), r.hint].filter(Boolean).join(' · '))}">${esc(r.name)}</span>`
-  : esc(dateRange(r.from, r.to)));
-const kampRoundText = (r) => (r.name ? `${r.name} (${dateRange(r.from, r.to)})` : dateRange(r.from, r.to));
+// Kupong 1 med omgångens namn bredvid, och datumen och vad namnet syftar på
+// när man pekar.
+const kampRoundNr = (r) => couponNumber((r.matches || []).map((m) => m.id));
+const kampRound = (r) => `<span title="${esc([dateRange(r.from, r.to), r.hint].filter(Boolean).join(' · '))}">Kupong ${kampRoundNr(r)}` +
+  `${r.name ? ` <span class="kp-bi">${esc(r.name)}</span>` : ''}</span>`;
+const kampRoundText = (r) => `Kupong ${kampRoundNr(r)} (${r.name || dateRange(r.from, r.to)})`;
 
 function kampFace(g, size = '') {
   const style = `style="--km-c:${g.color}"`;

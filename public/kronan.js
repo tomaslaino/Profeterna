@@ -12,8 +12,9 @@
 //
 // Utan pågående omgång (Kronan.reigning) står den senaste avslutade
 // omgångens orakel och Ikaros kvar i en egen ruta: Förra omgången med
-// omgångens namn, en väg till kupongen den gällde, och titlarna – Omgångens
-// orakel och Omgångens Ikaros – som gäller tills nästa omgång är avgjord.
+// kupongens nummer och namn, en väg till kupongen den gällde, och titlarna –
+// Omgångens orakel och Omgångens Ikaros – som gäller tills nästa omgång är
+// avgjord.
 // Samma två har ett litet märke på porträttet i omgångens ruta överst
 // (Kronan.mark, samtal.js), Förra omgångens orakel och Ikaros. Före första
 // omgången är det KRONAN_START, och titlarna är bara Orakel och Ikaros.
@@ -255,26 +256,26 @@ window.Kronan = (() => {
     return best;
   }
 
-  // Rubriken för en avgjord omgång: Förra omgången och datumen, namnet och
-  // vägen till kupongen den gällde. r = {name, hint, from, to, ids
-  // (matcherna)}; namnet är omgångens (data/tippare.json, samtal.js), annars
-  // det som sparades med kupongen. Utan namn står datumen som rubrik.
+  // Rubriken för en avgjord omgång: Förra omgången och datumen, Kupong 1 med
+  // namnet bredvid och vägen till kupongen den gällde. r = {name, hint, from,
+  // to, ids (matcherna)}; namnet är omgångens (data/tippare.json, samtal.js),
+  // annars det som sparades med kupongen.
   function head(r) {
     const when = typeof dateRange === 'function' && r.from ? dateRange(r.from, r.to || r.from) : '';
     const c = couponOf(r.ids || []);
     const g = c && typeof gradeCoupon === 'function' ? gradeCoupon(c) : null;
     const n = r.name ? { namn: r.name, syftar: r.hint || null } : c && c.name ? { namn: c.name } : null;
-    const eyebrow = n && when ? `Förra omgången · ${when}` : 'Förra omgången';
-    const title = n ? n.namn : when;
+    const eyebrow = when ? `Förra omgången · ${when}` : 'Förra omgången';
+    const title = typeof couponTitle === 'function' && (r.ids || []).length
+      ? couponTitle(couponNumber(r.ids), n && n.namn, { tag: 'h3', cls: 'kr-round', hint: (n && n.syftar) || '' })
+      : n ? `<h3 class="kr-round"${n.syftar ? ` title="${esc2(n.syftar)}"` : ''}>${esc2(n.namn)}</h3>` : '';
     // Kupongen själv (kupong.js) – därifrån når man betyget i Historik när
     // bygget har hunnit med den.
     const link = c
       ? `<a class="kr-coupon" href="#kupong/${esc2(c.id)}">` +
         `${g && g.done && !g.hidden ? `Kupongen gav <b>${g.ok} av ${g.n}</b>` : 'Kupongen'} <span aria-hidden="true">→</span></a>`
       : '';
-    return `<div class="kr-head"><div><p class="kp-eyebrow">${esc2(eyebrow)}</p>` +
-      (title ? `<h3 class="kr-round"${n && n.syftar ? ` title="${esc2(n.syftar)}"` : ''}>${esc2(title)}</h3>` : '') +
-      `</div>${link}</div>`;
+    return `<div class="kr-head"><div><p class="kp-eyebrow">${esc2(eyebrow)}</p>${title}</div>${link}</div>`;
   }
 
   // Egen ruta när ingen omgång pågår: förra omgången och de som regerar
@@ -284,7 +285,7 @@ window.Kronan = (() => {
     const { last, best, worst } = holders(rounds);
     const top = last
       ? head({ name: last.name, hint: last.hint, from: last.from, to: last.to, ids: (last.matches || []).map((m) => m.id) })
-      : '<div class="kr-head"><div><p class="kp-eyebrow">Före första omgången</p><h3 class="kr-round">Utnämnda på förhand</h3></div></div>';
+      : '<div class="kr-head"><div><p class="kp-eyebrow">Före första kupongen</p><h3 class="kr-round">Utnämnda på förhand</h3></div></div>';
     const lines = [last ? 'Försvarar titeln' : 'Saknar meriter', 'Har inget att förlora'];
     return `<div class="card tp-card kr-reign">${top}${stage(best, worst, true, pts, lines, !last)}${last && extra ? extra(last) : ''}</div>`;
   }

@@ -126,8 +126,10 @@
 
   function head(c, g) {
     const stamp = c.pending ? 'Väntar på GitHub' : g.done && !g.hidden ? 'Rättad' : '';
+    // Kupongens nummer (kupong.js) i märket: Kupong 1, Kupong 2 …
+    const nr = typeof couponNumber === 'function' ? ` ${couponNumber(c.matches.map((x) => x.id))}` : '';
     return '<div class="pp-head">' +
-      '<p class="pp-brand"><img src="logo.svg" alt="" width="20" height="20">Matchfixarna<span>Kupong</span></p>' +
+      `<p class="pp-brand"><img src="logo.svg" alt="" width="20" height="20">Matchfixarna<span>Kupong${nr}</span></p>` +
       `<h2 class="pp-title">${esc(dateRange(g.first, g.last))}</h2>` +
       '<p class="pp-meta">' +
       (c.name ? `<span class="pp-name">${esc(c.name)}</span>` : '') +

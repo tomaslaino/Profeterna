@@ -136,7 +136,7 @@
       '<div class="hk-cols">' + cols.map((c) => {
         const a = Math.round(100 * rate(c));
         const e = Math.round((100 * c.exp) / c.n);
-        return `<a class="hk-col" href="${esc(href(c.id))}" title="${esc(`${c.name || dateRange(c.date, c.till)}: ${c.ok} av ${c.n} rätt · väntat ${num(c.exp)} · ${c.grade} ★`)}">` +
+        return `<a class="hk-col" href="${esc(href(c.id))}" title="${esc(`Kupong ${nr(c)} (${c.name || dateRange(c.date, c.till)}): ${c.ok} av ${c.n} rätt · väntat ${num(c.exp)} · ${c.grade} ★`)}">` +
           `<span class="hk-bar"><i class="g${c.grade}" style="height:${a}%"></i><b style="bottom:${e}%"></b></span>` +
           `<span class="hk-lab">${esc(dateRange(c.date))}</span></a>`;
       }).join('') + '</div>' +
@@ -163,14 +163,17 @@
     return `<div class="hk-ai"><span class="hk-ai-who"${a.model ? ` title="${esc(a.model)}"` : ''}>AI-kommentar</span><p>${esc(a.text)}</p></div>`;
   }
 
+  // Kupongens nummer (kupong.js), och rubriken: datumen och spelet ovanför,
+  // Kupong 1 med namnet bredvid.
+  const nr = (c) => couponNumber(c.rows.map((r) => r.id).filter(Boolean));
+  const title = (c) => `<div class="hk-title"><p class="kp-eyebrow">${esc([dateRange(c.date, c.till), c.game].filter(Boolean).join(' · '))}</p>` +
+    `${couponTitle(nr(c), c.name, { tag: 'h4', cls: '' })}</div>`;
+
   function card(c) {
-    const title = c.name || dateRange(c.date, c.till);
-    const eyebrow = [c.name ? dateRange(c.date, c.till) : null, c.game].filter(Boolean).join(' · ') || 'Kupong';
     const vm = vsModel(c);
     const notes = c.rows.filter((r) => r.note).length;
     return `<article class="card hk-card" id="${esc(c.id)}">` +
-      '<div class="hk-top">' +
-      `<div class="hk-title"><p class="kp-eyebrow">${esc(eyebrow)}</p><h4>${esc(title)}</h4></div>` +
+      '<div class="hk-top">' + title(c) +
       `<div class="hk-grade" title="${esc(`Betyget jämför ${c.ok} rätt med väntat ${num(c.exp)}`)}">${stars(c)}<span>${esc(c.label || 'Ej rättad')}</span></div>` +
       '</div>' +
       '<div class="hk-mid">' +
@@ -230,8 +233,7 @@
   function hiddenCard(c) {
     const keys = [`kupong:${c.id}`, ...c.rows.map((r) => r.id).filter(Boolean)];
     return `<article class="card hk-card" id="${esc(c.id)}">` +
-      `<div class="hk-top"><div class="hk-title"><p class="kp-eyebrow">${esc(c.name ? dateRange(c.date, c.till) : c.game || 'Kupong')}</p>` +
-      `<h4>${esc(c.name || dateRange(c.date, c.till))}</h4></div></div>` +
+      `<div class="hk-top">${title(c)}</div>` +
       Spoiler.card({ title: 'Resultatet är dolt', text: 'Du har valt att dölja resultat.', keys, button: 'Visa resultatet' }) +
       '</article>';
   }

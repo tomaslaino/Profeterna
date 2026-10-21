@@ -179,15 +179,15 @@ function tpTable(s) {
     `<tbody>${body}</tbody><tfoot><tr><th scope="row">Summa</th>${foot}</tr></tfoot></table></div></details>`;
 }
 
-// Omgångens namn (som AI:n gav den, src/tippare.js och samtal.js): i
-// tabellerna som radrubrik med datumen under, och vad det syftar på när man
-// pekar. Utan namn bara datumen, som förut.
+// Omgångens namn (som AI:n gav den, src/tippare.js och samtal.js). I
+// tabellerna står Kupong 1 som radrubrik med namnet bredvid (vad det syftar
+// på när man pekar) och datumen under.
 const tpLiveName = () => (window.Samtal && Samtal.name ? Samtal.name() : null);
 function tpRoundHead(r, sub) {
   const when = esc(dateRange(r.from, r.to));
-  return r.name
-    ? `<span class="tp-rname"${r.hint ? ` title="${esc(r.hint)}"` : ''}>${esc(r.name)}</span><span class="sub"><span class="tp-nw">${when}</span> · <span class="tp-nw">${sub}</span></span>`
-    : `${when}<span class="sub">${sub}</span>`;
+  const name = r.name ? ` <span class="kp-bi"${r.hint ? ` title="${esc(r.hint)}"` : ''}>${esc(r.name)}</span>` : '';
+  return `<span class="tp-rname">Kupong ${couponNumber((r.matches || []).map((m) => m.id))}${name}</span>` +
+    `<span class="sub"><span class="tp-nw">${when}</span> · <span class="tp-nw">${sub}</span></span>`;
 }
 
 function tpCard(now = Date.now()) {
@@ -204,7 +204,7 @@ function tpCard(now = Date.now()) {
   // (kronan.js) – nästa står överst.
   const head = s.done && window.Kronan && kicks.length
     ? Kronan.head({ name: tpLiveName(), from: Math.min(...kicks), to: Math.max(...kicks), ids: round.matcher.map((x) => x.id) })
-    : `<p class="kp-eyebrow">${tpLiveName() ? `${esc(tpLiveName())} · ` : 'Omgången '}${kicks.length ? esc(dateRange(Math.min(...kicks), Math.max(...kicks))) : ''}</p>`;
+    : `<p class="kp-eyebrow">Kupong ${couponNumber(round.matcher.map((x) => x.id))}${kicks.length ? ` · ${esc(dateRange(Math.min(...kicks), Math.max(...kicks)))}` : ''}</p>`;
   return '<div class="card tp-card">' + head +
     // Orakel och Ikaros som bild (kronan.js), och när omgången är klar
     // utmärkelserna efter hur var och en tippade (utmarkelser.js).
