@@ -118,7 +118,7 @@ export async function writeArticle(d, { env, now = () => new Date() }) {
   const seen = new Map();
   const read = [];
   const chat = claudeChat(env[ac.keyEnv], ac);
-  let say = `Nu är det ${nowFmt.format(t0)} svensk tid.\n\nUnderlag (JSON):\n${JSON.stringify(base)}`;
+  let say = `Nu är det ${nowFmt.format(t0)} svensk tid.\n\nMatchens siffror (JSON):\n${JSON.stringify(base)}`;
   let problem = null;
   let model = ac.model;
   for (let attempt = 1; attempt <= 2; attempt++) {
@@ -149,7 +149,7 @@ export async function writeArticle(d, { env, now = () => new Date() }) {
       };
     }
     problem = `Artikeln hade ${why.join(' och ')}.`;
-    say = `Svaret hade ${why.join(' och ')}. Skriv om det – tal bara som de står i underlaget eller på en sida du har öppnat, inga tips – och svara bara med samma JSON.`;
+    say = `Svaret hade ${why.join(' och ')}. Skriv om det – tal bara som de står i matchens siffror eller på en sida du har öppnat, inga tips – och svara bara med samma JSON.`;
   }
   return { ok: false, error: problem, usage: chat.usage };
 }
@@ -188,7 +188,7 @@ function problems(parts, known) {
   const why = [];
   const texts = [parts.title, parts.lead, ...parts.paragraphs];
   const words = parts.paragraphs.join(' ').split(/\s+/).filter(Boolean).length;
-  if (words < 200 || words > 550) why.push(`${words} ord i styckena i stället för 300–400`);
+  if (words < 120 || words > 330) why.push(`${words} ord i styckena i stället för 180–240`);
   if (parts.title.split(/\s+/).length > 12) why.push('en för lång rubrik');
   const tip = texts.join(' ').match(TIP_RE);
   if (tip) why.push(`tips ("${tip[0]}")`);

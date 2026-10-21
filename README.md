@@ -860,7 +860,7 @@ skriver Claude (`claude-opus-5-5`) analysen i stället för DeepSeek
 
 **Artikeln inför matchen (2026-10-20, som Redaktionens analys på gravergrav.se):** inför
 varje match på omgångens kupong läser Claude på av sig självt och skriver en artikel –
-rubrik, ingress, fyra–fem stycken (300–400 ord) och källor – som står i matchrutans flik
+rubrik, ingress, två–tre stycken (180–240 ord) och källor – som står i matchrutans flik
 *Inför*, efter Startelvor ([worker/artikel.mjs](worker/artikel.mjs), prompten och
 gränserna i [config/artikel.js](config/artikel.js)). Artikeln ger inga tips; tecknen ringas
 fortfarande bara in efter Analysera.
