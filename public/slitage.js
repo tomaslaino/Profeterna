@@ -78,9 +78,12 @@
   // inget hundöra – rutans skugga följer inte ett avvikt hörn. reach: hur
   // långt ner (px) slitagen sitter, så att de hamnar på papperet också när
   // det är som kortast – kupongen som växer fram börjar med sju tomma rader.
+  // mid: matchbladet står still och innehållet rullar i det, så vecken sitter
+  // mitt på bladet – tvärs över och ibland på längden – och står still med
+  // bården och kanthålen.
   const KINDS = {
     bygge: { lives: [['ny', 0.5], ['kok', 1.5], ['bord', 1.5]], age: 0.35, reach: 520 },
-    match: { lives: [['ny', 0.5], ['kok', 1], ['bord', 1], ['ficka', 0.8]], age: 0.5, ear: false },
+    match: { lives: [['ny', 0.5], ['kok', 1], ['bord', 1], ['ficka', 0.8]], age: 0.5, ear: false, reach: 640, mid: true },
     omg: { lives: [['planbok', 1], ['ficka', 1], ['kok', 1.2], ['bord', 0.8]], age: 0.75 },
     kupong: { lives: [['planbok', 1], ['ficka', 1], ['kok', 1.2], ['bord', 0.8]], age: 0.8 },
     betyg: { lives: [['planbok', 2], ['ficka', 2], ['kok', 1]], age: 1 },
@@ -98,7 +101,7 @@
     const a = 0.55 + 0.45 * k.age;
     const reach = k.reach || 900;
     p.gul = aged(r, k.age);
-    if (on.has('vikt')) p.vikt = folds(r, life.fold, reach);
+    if (on.has('vikt')) p.vikt = folds(r, life.fold, reach, k.mid);
     if (on.has('flack')) p.flack = spots(r, a, reach);
     if (on.has('kaffe')) p.kaffe = coffee(r, a, reach);
     if (on.has('ora')) p.ora = { corner: ['tl', 'tr', 'br'][int(r, 0, 2)], s: int(r, 16, 28) };
@@ -123,12 +126,15 @@
   }
 
   // Vikt: på mitten, på längden, i fyra eller i tre som ett brev. Vecket är
-  // en mörk linje med skugga på ena sidan och nött tryck på den andra.
-  function folds(r, kinds, reach) {
+  // en mörk linje med skugga på ena sidan och nött tryck på den andra. Mitt
+  // på bladet (mid) sitter vecket tvärs över i en andel av höjden, och ett
+  // papper som skulle vikas i tre viks på mitten i stället.
+  function folds(r, kinds, reach, mid) {
     const s = reach / 900;
-    const kind = kinds[int(r, 0, kinds.length - 1)];
+    let kind = kinds[int(r, 0, kinds.length - 1)];
+    if (mid && kind === 'hh') kind = 'h';
     const crease = (dir, at) => ({
-      dir, at,
+      dir, at, mid,
       tilt: jit(r, 4),
       side: r() < 0.5 ? 1 : -1,
       dark: span(r, 0.26, 0.42),
@@ -141,8 +147,8 @@
     if (kind === 'hh') {
       const y = span(r, 220 * s, 320 * s);
       out.push(crease('h', y), crease('h', y + span(r, 260 * s, 340 * s)));
-    } else if (kind.includes('h')) out.push(crease('h', span(r, 300 * s, 560 * s)));
-    if (kind.includes('v')) out.push(crease('v', span(r, 0.38, 0.62)));
+    } else if (kind.includes('h')) out.push(crease('h', mid ? span(r, 0.47, 0.53) : span(r, 300 * s, 560 * s)));
+    if (kind.includes('v')) out.push(crease('v', mid ? span(r, 0.47, 0.53) : span(r, 0.38, 0.62)));
     return out;
   }
 
@@ -248,7 +254,9 @@
     }
 
     if (p.vikt) {
-      p.vikt.forEach((c, i) => {
+      // vecket tvärs över mitt på bladet sitter i en andel av höjden
+      const creases = p.vikt.map((c) => (c.dir === 'h' && c.mid ? { ...c, at: c.at * H } : c));
+      creases.forEach((c, i) => {
         const h = c.dir === 'h';
         const d = line(c.wob.map((w, j) => {
           const t = j / 14;
@@ -268,8 +276,8 @@
         top.push(`<path d="${d}" transform="translate(${h ? `0 ${o}` : `${o} 0`})" fill="none" stroke="#fffaf0" stroke-opacity=".75" stroke-width="1.3" stroke-dasharray="${c.worn}"/>`);
       });
       // där vecken korsar varandra är papperet mest nött
-      const hs = p.vikt.filter((c) => c.dir === 'h');
-      const v = p.vikt.find((c) => c.dir === 'v');
+      const hs = creases.filter((c) => c.dir === 'h');
+      const v = creases.find((c) => c.dir === 'v');
       if (v) {
         for (const c of hs) {
           const x = v.at * W;
