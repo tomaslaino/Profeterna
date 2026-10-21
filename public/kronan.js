@@ -12,10 +12,11 @@
 //
 // Utan pågående omgång (Kronan.reigning) står den senaste avslutade
 // omgångens orakel och Ikaros kvar i en egen ruta: Förra omgången med
-// omgångens namn, en väg till kupongen den gällde, och titlarna som gäller
-// tills nästa omgång är avgjord – Regerande orakel och Regerande Ikaros.
+// omgångens namn, en väg till kupongen den gällde, och titlarna – Omgångens
+// orakel och Omgångens Ikaros – som gäller tills nästa omgång är avgjord.
 // Samma två har ett litet märke på porträttet i omgångens ruta överst
-// (Kronan.mark, samtal.js). Före första omgången är det KRONAN_START.
+// (Kronan.mark, samtal.js), Förra omgångens orakel och Ikaros. Före första
+// omgången är det KRONAN_START, och titlarna är bara Orakel och Ikaros.
 //
 // Kropparna är urklippta foton (public/profeterna/kropp-*.png). hx är
 // huvudets mitt i procent av bildens bredd och sy axlarnas höjd i procent av
@@ -136,10 +137,10 @@ window.Kronan = (() => {
   }
 
   // line: titlarna som regerar (Kronan.reigning) – raden under namnet i
-  // stället för poängen.
-  function panel(kind, people, done, pts, line) {
+  // stället för poängen. start: före första omgången.
+  function panel(kind, people, done, pts, line, start) {
     const orakel = kind === 'orakel';
-    const title = line ? (orakel ? 'Regerande orakel' : 'Regerande Ikaros')
+    const title = start ? (orakel ? 'Orakel' : 'Ikaros')
       : orakel ? (done ? 'Omgångens orakel' : 'Leder just nu') : (done ? 'Omgångens Ikaros' : 'Sist just nu');
     const p0 = people[0];
     const stat = line ? `<span class="kr-stat">${esc2(line)}</span>`
@@ -164,9 +165,9 @@ window.Kronan = (() => {
   // s = omgångens poäng (tpScore i tippare.js): ranked med award best/worst.
   const fmt0 = (x) => String(Math.round(x * 10) / 10);
 
-  function stage(best, worst, done, pts, lines) {
+  function stage(best, worst, done, pts, lines, start) {
     const [a, b] = lines || [];
-    return `<div class="kr-stage">${panel('orakel', best, done, pts || fmt0, a)}${panel('ikaros', worst, done, pts || fmt0, b)}</div>`;
+    return `<div class="kr-stage">${panel('orakel', best, done, pts || fmt0, a, start)}${panel('ikaros', worst, done, pts || fmt0, b, start)}</div>`;
   }
 
   // s = omgångens poäng (tpScore i tippare.js): ranked med award best/worst.
@@ -224,15 +225,16 @@ window.Kronan = (() => {
   let reign = null;
   function setRounds(rounds) {
     const h = holders(rounds);
-    const next = { best: h.best.map((p) => p.id), worst: h.worst.map((p) => p.id) };
+    const next = { best: h.best.map((p) => p.id), worst: h.worst.map((p) => p.id), start: !h.last };
     const changed = JSON.stringify(next) !== JSON.stringify(reign);
     reign = next;
     return changed;
   }
   function mark(id) {
     if (!reign) return '';
-    if (reign.best.includes(id)) return `<span class="kr-mark lager" title="Regerande orakel">${MARK_LAGER}</span>`;
-    if (reign.worst.includes(id)) return `<span class="kr-mark fjader" title="Regerande Ikaros">${MARK_FJADER}</span>`;
+    const of = (t) => (reign.start ? `${t[0].toUpperCase()}${t.slice(1)} på förhand` : `Förra omgångens ${t}`);
+    if (reign.best.includes(id)) return `<span class="kr-mark lager" title="${of('orakel')}">${MARK_LAGER}</span>`;
+    if (reign.worst.includes(id)) return `<span class="kr-mark fjader" title="${of('Ikaros')}">${MARK_FJADER}</span>`;
     return '';
   }
 
@@ -284,7 +286,7 @@ window.Kronan = (() => {
       ? head({ name: last.name, hint: last.hint, from: last.from, to: last.to, ids: (last.matches || []).map((m) => m.id) })
       : '<div class="kr-head"><div><p class="kp-eyebrow">Före första omgången</p><h3 class="kr-round">Utnämnda på förhand</h3></div></div>';
     const lines = [last ? 'Försvarar titeln' : 'Saknar meriter', 'Har inget att förlora'];
-    return `<div class="card tp-card kr-reign">${top}${stage(best, worst, true, pts, lines)}${last && extra ? extra(last) : ''}</div>`;
+    return `<div class="card tp-card kr-reign">${top}${stage(best, worst, true, pts, lines, !last)}${last && extra ? extra(last) : ''}</div>`;
   }
 
   return { html, reigning, head, setRounds, mark };
