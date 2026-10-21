@@ -67,6 +67,7 @@ module.exports = {
     'racingpost.com', 'oddschecker.com', 'freesupertips.com', 'bettingexpert.com',
     'covers.com', 'sportsgambler.com', 'betfair.com', 'bet365.com', 'paddypower.com',
     'skybet.com', 'williamhill.com', 'ladbrokes.com', 'coral.co.uk', 'betway.com',
+    'betfanatics.com',
   ],
 
   // Sajter vars artikeltext inte hämtas – rubrik och ingress från sökningen

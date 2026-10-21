@@ -1,25 +1,24 @@
 // Artikeln inför matchen (config/artikel.js), som Redaktionens analys på
-// gravergrav.se: inför varje match på omgångens kupong läser Claude på av sig
-// självt och skriver en artikel med rubrik, ingress, stycken och källor.
-// Matchbladet visar den i fliken Inför (public/artikel.js), och Analysera
+// gravergrav.se: när någon trycker på Läs på i matchbladets flik Inför
+// (public/app.js) läser Claude på och skriver en artikel med rubrik, ingress,
+// stycken och källor. Den sparas och visas sedan för alla, och Analysera
 // bygger vidare på den (worker/research.mjs). Artikeln ger inga tips.
 //
-// Proxyn kör articleTick() på ett schema ([triggers] i worker/wrangler.toml):
-// varje gång skrivs högst en artikel – den match på omgångens kupong
-// (samtal:aktuellt, worker/samtal.mjs) som står på tur. En match står på tur
-// när den hamnar på kupongen och igen när det är rewriteAtHours timmar kvar
-// till avspark, högst perMatch gånger och högst perDay artiklar per dygn.
+// Proxyn kör requestArticle() för POST /artikel (worker/index.mjs): finns
+// artikeln lämnas den ut, skriver någon annan den just nu svarar proxyn
+// pending, och annars skrivs den – högst perMatch försök per match och
+// perDay artiklar per dygn. Ingenting skrivs på schema, och en skriven
+// artikel skrivs inte om.
 //
 // Samma kontroller som analysen: varje källa ska ha kommit upp i sökningen
 // eller i en läst sida, och varje tal ska stå i underlaget eller i det Claude
-// läste. Klarar svaret inte det får Claude skriva om en gång; annars står den
-// förra artikeln kvar.
+// läste. Klarar svaret inte det får Claude skriva om en gång.
 //
 // Lagringen (samma KV-namnrymd som analysen):
-//   artikel:<match-id>     {article, tries: [{at, ok, error}]} – article är
-//                          den senaste artikeln som klarade kontrollen:
-//                          {title, lead, paragraphs, sources, model, version,
-//                          writtenAt}
+//   artikel:<match-id>     {article, tries: [{at, ok, error, cost}]} – article
+//                          är artikeln som klarade kontrollen: {title, lead,
+//                          paragraphs, sources, model, version, writtenAt,
+//                          attempts}; cost vad försöket kostade (costOf)
 //   artikel:dag:<datum>    antalet artiklar det dygnet
 
 import ac from '../config/artikel.js';
@@ -49,69 +48,75 @@ export async function currentArticle(store, id) {
   return (s && s.article) || null;
 }
 
-// En körning på schemat: skriver artikeln för den match som står på tur.
-// store: {get(k), put(k, v, ttlSekunder)}, loadRound() → samtal:aktuellt,
-// loadMatch(id) → data/match/<id>.json ur den publicerade sajten, write: den
-// som skriver (writeArticle, utbytbar i prov).
-// → {id, ok, error} för matchen som skrevs, eller {skipped: varför}.
-export async function articleTick({ env, store, loadRound, loadMatch, now = () => new Date(), write = writeArticle }) {
-  if (!articlesOn(env) || !store) return { skipped: 'av' };
-  const round = await loadRound();
-  const list = round && Array.isArray(round.matcher) ? round.matcher.filter((m) => m && ID_RE.test(String(m.id))) : [];
-  if (!list.length) return { skipped: 'ingen omgång' };
+// Läs på: artikeln för matchen, skriven nu om den saknas. store: {get(k),
+// put(k, v, ttlSekunder)}, loadMatch(id) → data/match/<id>.json ur den
+// publicerade sajten, write: den som skriver (writeArticle, utbytbar i prov).
+// → {status, body}: body är {ok: true, article} när artikeln finns,
+// {ok: true, article: null, pending: true} medan någon annan skriver den och
+// annars {ok: false, error} – med retry: false när ett nytt klick inte hjälper.
+export async function requestArticle(id, { env, store, loadMatch, now = () => new Date(), write = writeArticle }) {
+  const fail = (status, error, final = false) => ({ status, body: { ok: false, error, ...(final ? { retry: false } : {}) } });
+  if (!ID_RE.test(String(id == null ? '' : id))) return fail(400, 'Okänt match-id.', true);
+  if (!articlesOn(env) || !store) return fail(503, 'Artiklarna är avstängda.', true);
+  const s = (await store.get(key(id))) || { article: null, tries: [] };
+  if (s.article) return { status: 200, body: { ok: true, article: s.article } };
   const t0 = now();
+  const last = s.tries[s.tries.length - 1];
+  // Ett försök som inte har sparat något svar pågår – eller avbröts, och då
+  // får nästa klick skriva när det borde ha varit klart.
+  if (last && last.error === 'pågår' && t0.getTime() - Date.parse(last.at) < ac.timeoutMs + 60000) {
+    return { status: 200, body: { ok: true, article: null, pending: true } };
+  }
+  if (s.tries.length >= ac.perMatch) return fail(429, 'Artikeln gick inte att skriva.', true);
   const today = Number(await store.get(dayKey(t0))) || 0;
-  if (today >= ac.perDay) return { skipped: 'dagens artiklar är slut' };
+  if (today >= ac.perDay) return fail(429, 'Dagens artiklar är slut – försök igen i morgon.', true);
+  const d = await loadMatch(String(id));
+  if (!d) return fail(404, 'Matchen finns inte på sajten.', true);
+  const kick = Date.parse(d.match.kickoff);
+  if (d.match.completed || !(kick > t0.getTime())) return fail(409, 'Matchen har redan börjat.', true);
+  if (kick - t0.getTime() > ac.aheadDays * 24 * H) return fail(409, `Artikeln kan skrivas tidigast ${ac.aheadDays} dagar före avspark.`, true);
 
-  const states = await Promise.all(list.map((m) => store.get(key(m.id))));
-  const next = list
-    .map((m, i) => ({ m, s: states[i] || { article: null, tries: [] }, kick: Date.parse(m.avspark) }))
-    .filter((x) => due(x.kick, x.s, t0))
-    .sort((a, b) => a.kick - b.kick)[0];
-  if (!next) return { skipped: 'inget på tur' };
-
-  const { m, s } = next;
-  const ttl = Math.max(3600, Math.round((next.kick + ac.keepDays * 86400000 - t0.getTime()) / 1000));
-  // Försöket och dygnets räkning sparas innan Claude anropas, så att nästa
-  // körning inte tar samma match medan den här fortfarande läser.
+  const ttl = Math.max(3600, Math.round((kick + ac.keepDays * 86400000 - t0.getTime()) / 1000));
+  // Försöket och dygnets räkning sparas innan Claude anropas, så att ett klick
+  // till på samma match väntar in den här i stället för att betala en till.
   const tries = [...s.tries, { at: t0.toISOString(), ok: false, error: 'pågår' }];
-  await store.put(key(m.id), { ...s, tries }, ttl);
+  await store.put(key(id), { article: null, tries }, ttl);
   await store.put(dayKey(t0), today + 1, 2 * 86400);
 
   let r;
   try {
-    const d = await loadMatch(String(m.id));
-    if (!d) r = { ok: false, error: 'matchen finns inte på sajten' };
-    else if (d.match.completed || Date.parse(d.match.kickoff) <= t0.getTime()) r = { ok: false, error: 'matchen har börjat' };
-    else r = await write(d, { env, now });
+    r = await write(d, { env, now });
   } catch (err) {
     r = { ok: false, error: (err && err.message) || 'okänt fel' };
   }
-  tries[tries.length - 1] = { at: t0.toISOString(), ok: r.ok, ...(r.ok ? {} : { error: r.error }) };
-  await store.put(key(m.id), { article: r.ok ? r.article : s.article, tries }, ttl);
-  return { id: m.id, match: m.match, ok: r.ok, error: r.ok ? null : r.error, usage: r.usage };
+  const cost = costOf(r.usage);
+  tries[tries.length - 1] = { at: t0.toISOString(), ok: r.ok, ...(r.ok ? {} : { error: r.error }), ...(cost ? { cost } : {}) };
+  await store.put(key(id), { article: r.ok ? r.article : null, tries }, ttl);
+  console.log('[artikel]', JSON.stringify({ id: String(id), match: `${d.match.home} – ${d.match.away}`, ok: r.ok, error: r.ok ? undefined : r.error, cost }));
+  return r.ok ? { status: 200, body: { ok: true, article: r.article } } : fail(r.status || 502, r.error);
 }
 
-// Står matchen på tur? Första gången när den är på kupongen (inom aheadDays),
-// sedan när en omskrivningstid (rewriteAtHours före avspark) har passerats
-// efter att artikeln skrevs, och när prompten har bytts. Ett misslyckat
-// försök görs om efter retryMinutes.
-export function due(kick, s, now) {
-  const t = now.getTime();
-  if (!Number.isFinite(kick) || kick - t <= ac.lastHours * H || kick - t > ac.aheadDays * 24 * H) return false;
-  const tries = (s && s.tries) || [];
-  if (tries.length >= ac.perMatch) return false;
-  const last = tries[tries.length - 1];
-  if (last && !last.ok) return t - Date.parse(last.at) >= ac.retryMinutes * 60000;
-  const a = s && s.article;
-  if (!a) return true;
-  if (a.version !== ac.promptVersion) return true;
-  const written = Date.parse(a.writtenAt);
-  return ac.rewriteAtHours.some((h) => kick - h * H <= t && written < kick - h * H);
+// Vad ett försök kostade, ur förbrukningen i varje anrop (usage) och
+// priserna i config/artikel.js: text in (ny, skriven till cachen och läst ur
+// den), text ut med tänkandet, och sökningarna. → {dollars, input, cacheWrite,
+// cacheRead, output, searches, fetches}, eller null utan förbrukning.
+export function costOf(usage, p = ac.prices) {
+  if (!Array.isArray(usage) || !usage.length) return null;
+  const sum = (f) => usage.reduce((a, u) => a + (Number(u && f(u)) || 0), 0);
+  const t = {
+    input: sum((u) => u.input_tokens),
+    cacheWrite: sum((u) => u.cache_creation_input_tokens),
+    cacheRead: sum((u) => u.cache_read_input_tokens),
+    output: sum((u) => u.output_tokens),
+    searches: sum((u) => u.server_tool_use && u.server_tool_use.web_search_requests),
+    fetches: sum((u) => u.server_tool_use && u.server_tool_use.web_fetch_requests),
+  };
+  const dollars = (t.input * p.input + t.cacheWrite * p.cacheWrite + t.cacheRead * p.cacheRead + t.output * p.output) / 1e6 + t.searches * p.search;
+  return { dollars: Math.round(dollars * 1000) / 1000, ...t };
 }
 
 // Claude läser på och skriver artikeln. → {ok: true, article, usage} eller
-// {ok: false, error, usage}. API-fel kastas.
+// {ok: false, error, usage} – vid ett API-fel också status.
 export async function writeArticle(d, { env, now = () => new Date() }) {
   const t0 = now();
   const base = underlag(d);
@@ -122,7 +127,12 @@ export async function writeArticle(d, { env, now = () => new Date() }) {
   let problem = null;
   let model = ac.model;
   for (let attempt = 1; attempt <= 2; attempt++) {
-    const r = await chat.say(say);
+    let r;
+    try {
+      r = await chat.say(say);
+    } catch (err) {
+      return { ok: false, error: err.message, status: err.status, usage: chat.usage };
+    }
     model = r.model || model;
     for (const f of r.found) see(seen, f.url, f.title, f.date);
     read.push(...r.read);

@@ -6,7 +6,8 @@
 //
 // Matchanalysen (fas 5): finns DEEPSEEK_API_KEY i .env visas knappen
 // Analysera, och servern gör analysen själv (POST /api/analyze) med samma kod
-// som proxyn på Cloudflare (worker/index.mjs). Utan nyckel ingen knapp.
+// som proxyn på Cloudflare (worker/index.mjs), och Läs på skriver artikeln
+// inför matchen (GET/POST /api/artikel). Utan nyckel ingen knapp.
 // Samma nyckel ger AI:ns kommentarer i Olympen (POST /api/kommentar)
 // och, med KUPONG_LOKALT, omgångens namn (POST /api/namn).
 //
@@ -56,6 +57,30 @@ function analysisRoute(siteDir = OUT, store = fileStore()) {
       res.status(r.status).json(r.body);
     } catch (err) {
       console.error('[analys]', err);
+      res.status(500).json({ ok: false, error: 'Internt fel i servern.' });
+    }
+  };
+}
+
+// GET /api/artikel?id= och POST /api/artikel {id} – artikeln inför matchen
+// (Läs på), med samma kod som proxyn (worker/artikel.mjs). Den sparas bredvid
+// analyserna, så att Analysera bygger vidare på den som i proxyn.
+function articleRoute(siteDir = OUT, store = fileStore()) {
+  return async (req, res) => {
+    try {
+      const { requestArticle, currentArticle } = await import('./worker/artikel.mjs');
+      if (req.method === 'GET') return res.json({ ok: true, article: (await currentArticle(store, req.query.id || '')) || null });
+      const r = await requestArticle(req.body && req.body.id, {
+        env: process.env,
+        store,
+        loadMatch: async (id) => {
+          const f = path.join(siteDir, 'data', 'match', `${id}.json`);
+          return fs.existsSync(f) ? JSON.parse(fs.readFileSync(f, 'utf8')) : null;
+        },
+      });
+      res.status(r.status).json(r.body);
+    } catch (err) {
+      console.error('[artikel]', err);
       res.status(500).json({ ok: false, error: 'Internt fel i servern.' });
     }
   };
@@ -226,6 +251,7 @@ if (require.main === module) {
 
   const app = express();
   if (analysisEndpoint) app.post('/api/analyze', express.json(), analysisRoute());
+  if (analysisEndpoint) app.all('/api/artikel', express.json(), articleRoute());
   if (analysisEndpoint) app.post('/api/kommentar', express.json(), commentRoute());
   if (couponEndpoint) app.post('/api/kupong', express.json({ limit: '20kb' }), couponSaveRoute());
   if (couponEndpoint) app.all('/api/samtal', express.json({ limit: '20kb' }), samtalRoute());
@@ -244,4 +270,4 @@ if (require.main === module) {
   });
 }
 
-module.exports = { analysisRoute, commentRoute, nameRoute, couponSaveRoute, couponFileWriter, samtalRoute, samtalFileStore, stryktipsetRoute, siteMatches, fileStore };
+module.exports = { analysisRoute, articleRoute, commentRoute, nameRoute, couponSaveRoute, couponFileWriter, samtalRoute, samtalFileStore, stryktipsetRoute, siteMatches, fileStore };

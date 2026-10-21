@@ -861,32 +861,38 @@ skriver Claude (`claude-opus-5-5`) analysen i stället för DeepSeek
   $0,20, $10 per 1 000 sökningar): en provkörning (Cardiff–Birmingham, 10 sökningar, 2
   sidor) kostade ungefär $0,40 och tog 91 s.
 
-**Artikeln inför matchen (2026-10-20, som Redaktionens analys på gravergrav.se):** inför
-varje match på omgångens kupong läser Claude på av sig självt och skriver en artikel –
-rubrik, ingress, två–tre stycken (180–240 ord) och källor – som står i matchrutans flik
-*Inför*, efter Startelvor ([worker/artikel.mjs](worker/artikel.mjs), prompten och
-gränserna i [config/artikel.js](config/artikel.js)). Artikeln ger inga tips; tecknen ringas
-fortfarande bara in efter Analysera.
+**Artikeln inför matchen (2026-10-20, som Redaktionens analys på gravergrav.se):** när
+någon trycker på *Läs på* i matchrutans flik *Inför* läser Claude på och skriver en artikel –
+rubrik, ingress, två–tre stycken (180–240 ord) och källor – som sedan står där för alla
+([worker/artikel.mjs](worker/artikel.mjs), prompten och gränserna i
+[config/artikel.js](config/artikel.js), knappen i [public/app.js](public/app.js)). Artikeln
+byggs kring det som gör matchen annorlunda eller spännande; tabellen, formen och
+skadelistan står redan på matchbladet. Den ger inga tips; tecknen ringas fortfarande bara
+in efter Analysera.
 
-- Proxyn kör ett schema var tionde minut (`[triggers]` i
-  [worker/wrangler.toml](worker/wrangler.toml)) och skriver högst en artikel per körning:
-  den match på omgångens kupong (`samtal:aktuellt`) som står på tur, tidigast avspark
-  först. En match står på tur när den hamnar på kupongen (avspark inom 7 dagar), igen när
-  det är 48 och 20 timmar kvar (efter torsdagens och fredagens presskonferenser inför en
-  lördagsmatch) och när prompten har bytts – inte den sista timmen, högst 4 försök per
-  match och 30 artiklar per dygn.
+- **Vid behov, inte på schema (sedan 2026-10-21):** förut skrevs varje match på kupongen
+  tre gånger (när den kom med, 48 och 20 timmar före avspark), ungefär $20 i veckan även
+  för matcher ingen läste. Nu skrivs artikeln bara när någon ber om den, och en skriven
+  artikel skrivs inte om – det nya fram till avspark hämtar Analysera.
+- `POST …/artikel {"id": "<match-id>"}` lämnar ut artikeln om den finns och skriver den
+  annars (ett par minuter). Medan någon annan skriver den svarar proxyn `pending: true`,
+  och knappen frågar igen var 15:e sekund. Tidigast 7 dagar före avspark, högst 3 försök
+  per match och 15 artiklar per dygn. Fliken *Inför* finns för kommande matcher inom 7
+  dagar; utan artikel står bara knappen där. Lokalt samma sak via `/api/artikel`
+  (server.js), sparat bredvid analyserna i `data/cache/analysis/`.
 - Samma sökverktyg och kontroller som Analysera: källorna ska ha kommit upp i sökningen,
   talen ska stå i underlaget eller i det Claude läste, och ett tipsord (spik, gardering)
-  ger en omskrivning. Underlaget är analysens utan prognosen och oddsen. Klarar svaret
-  inte kontrollen står den förra artikeln kvar, och ett nytt försök görs efter en timme.
+  ger en omskrivning. Underlaget är analysens utan prognosen och oddsen.
 - `GET …/artikel?id=<match-id>` lämnar ut artikeln (KV-nyckeln `artikel:<id>`, sparad 4
   dagar efter avspark); matchrutan hämtar den samtidigt som matchen.
 - **Analysera bygger på artikeln** när den finns: den står i underlaget, dess källor och
   text räknas som lästa, och Claude söker bara efter det som hänt sedan den skrevs (högst 4
   sökningar och 3 sidor) och skriver i *Nyhetsläget* och *Läktarsnacket* bara det nya.
-- **Kostnad:** ungefär $0,40–0,60 per artikel, alltså högst omkring $20 i veckan för en
-  kupong med 13 matcher (tre artiklar per match). Provskrivs lokalt utan att sparas:
-  `node src/artikel-cli.mjs <match-id>`.
+- **Kostnad:** varje försök sparas med vad det kostade (`cost` i `tries`, räknat ur
+  förbrukningen och prislistan i konfigen). Prov 2026-10-21 på Chelsea–Tottenham med 6
+  sökningar, 4 sidor à högst 4 000 tokens: effort `low` $0,23 (en sida läst), `medium`
+  $0,52 (fyra sidor, rikare text). `low` gäller. Provskrivs lokalt utan att sparas, med
+  kostnaden utskriven: `node src/artikel-cli.mjs <match-id>`.
 
 - **Underlaget** ([worker/analysis.mjs](worker/analysis.mjs)) är det matchvyn visar, med
   sidans precision: prognosen som odds (1X2, osäkerhet, över 2,5, båda gör mål, troligaste

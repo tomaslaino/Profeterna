@@ -38,11 +38,14 @@
 // (worker/research.mjs, config/research.js). Svaret har då tip och
 // research: true, och nyhetsläget också läktarsnacket (news.crowd).
 //
-// Artikeln inför matchen: på ett schema skriver Claude en artikel om varje
-// match på omgångens kupong (scheduled, worker/artikel.mjs), och
+// Artikeln inför matchen (worker/artikel.mjs): Claude skriver den när någon
+// trycker på Läs på, och sedan finns den för alla.
 //   GET /artikel?id=<match-id> → 200 {ok: true, article} (article = null när
 //   matchen inget har – inte 404, så att webbläsaren inte loggar ett fel)
-// läser den. Analysera bygger då vidare på artikeln.
+//   POST /artikel {"id": "<match-id>"} → 200 {ok: true, article}, efter ett
+//   par minuter om den skrevs nu; {ok: true, article: null, pending: true}
+//   medan någon annan skriver den; annars 4xx/5xx {ok: false, error}
+// Analysera bygger vidare på artikeln när den finns.
 
 import cfg from '../config/llm.js';
 import { payloadOf, fingerprint, foreignNumbers } from './analysis.mjs';
@@ -50,7 +53,7 @@ import { gatherNews, newsPayload, citeNews, withoutRefs } from '../src/news.mjs'
 import { comment } from './kommentar.mjs';
 import { roundName } from './namn.mjs';
 import { researchOn, cachedResearch, researchLeft, research } from './research.mjs';
-import { articleTick, currentArticle } from './artikel.mjs';
+import { requestArticle, currentArticle } from './artikel.mjs';
 
 const ID_RE = /^\d{1,12}$/;
 
@@ -306,6 +309,23 @@ export default {
         return json(500, { ok: false, error: 'Internt fel i proxyn.' });
       }
     }
+    // Läs på: artikeln skrivs nu om den saknas. Det tar ett par minuter.
+    if (url.pathname === '/artikel' && request.method === 'POST') {
+      let id;
+      try {
+        ({ id } = await request.json());
+      } catch {
+        return json(400, { ok: false, error: 'Ogiltig förfrågan.' });
+      }
+      try {
+        const site = String(env.SITE || cfg.site).replace(/\/+$/, '');
+        const r = await requestArticle(id, { env, store: kvStore(env.ANALYSER), loadMatch: (mid) => siteMatch(site, mid) });
+        return json(r.status, r.body);
+      } catch (err) {
+        console.error('[artikel]', err);
+        return json(500, { ok: false, error: 'Internt fel i proxyn.' });
+      }
+    }
     if (!['/analyze', '/kommentar', '/namn'].includes(url.pathname) || request.method !== 'POST') return json(404, { ok: false, error: 'Finns inte.' });
     let id;
     let las;
@@ -345,19 +365,6 @@ export default {
       console.error('[analys]', err);
       return json(500, { ok: false, error: 'Internt fel i proxyn.' });
     }
-  },
-
-  // Schemat ([triggers] i wrangler.toml): artikeln för nästa match på
-  // omgångens kupong (worker/artikel.mjs).
-  async scheduled(event, env, ctx) {
-    const site = String(env.SITE || cfg.site).replace(/\/+$/, '');
-    const kv = env.ANALYSER;
-    ctx.waitUntil(articleTick({
-      env,
-      store: kvStore(kv),
-      loadRound: () => (kv ? kv.get('samtal:aktuellt', 'json') : null),
-      loadMatch: (id) => siteMatch(site, id),
-    }).then((r) => console.log('[artikel]', JSON.stringify(r)), (err) => console.error('[artikel]', err)));
   },
 };
 

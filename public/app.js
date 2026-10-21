@@ -504,7 +504,7 @@ function selectMatchTab(id, focus) {
 // som saknas och domaren, som i ett matchprogram – och Matchen efter den när
 // matchen har börjat. Startelvor och Matchen fylls av matchruta.js, Tabellen
 // av tableFill(). Inför står efter dem när Claude har skrivit en artikel om
-// matchen (articlePane).
+// matchen (articlePane), och före avspark med knappen Läs på (articleAsk).
 function matchPanes(d) {
   const m = d.match;
   const started = m.completed || (Date.parse(m.kickoff) <= Date.now() && !/POSTPONED|CANCEL/.test(m.status || ''));
@@ -513,7 +513,7 @@ function matchPanes(d) {
   panes.push(['startelvor', 'Startelvor', (R ? R.lineupPane(m, absentees(d)) : squadCard(d)) + refereeCard(d)]);
   if (started && R) panes.push(['matchen', 'Matchen', R.eventsPane(m)]);
   const article = articles.get(m.id);
-  if (article) panes.push(['infor', 'Inför', articlePane(article)]);
+  if (article || articleOn(d)) panes.push(['infor', 'Inför', article ? articlePane(article) : articleAsk(m.id)]);
   panes.push(['prognos', 'Prognos', prognosPane(d)]);
   const table = tableDivs(d).length > 0;
   panes.push(['form', 'Form', formCard(d) + sideCard(d, table)]);
@@ -1133,10 +1133,14 @@ async function tableFill(root, d) {
 
 // ---------- artikeln inför matchen ----------
 
-// Inför varje match på omgångens kupong läser Claude på och skriver en
-// artikel (worker/artikel.mjs). Proxyn lämnar ut den bredvid analysen
-// (…/analyze → …/artikel). Per match: artikeln eller null.
+// När någon trycker på Läs på läser Claude på och skriver en artikel om
+// matchen (worker/artikel.mjs), som sedan finns för alla. Proxyn lämnar ut den
+// bredvid analysen (…/analyze → …/artikel). Per match: artikeln eller null,
+// och det senaste felet när Läs på inte gav någon.
 const articles = new Map();
+const articleFails = new Map();
+// Så långt före avspark kan artikeln skrivas (aheadDays i config/artikel.js).
+const ARTICLE_DAYS = 7;
 
 async function loadArticle(id) {
   const a = state.meta && state.meta.analysis;
@@ -1149,6 +1153,55 @@ async function loadArticle(id) {
   } catch {
     // Ingen artikel den här gången – nästa öppning försöker igen.
   }
+}
+
+// Läs på finns för en kommande match när bygget pekat ut proxyn.
+function articleOn(d) {
+  const a = state.meta && state.meta.analysis;
+  const m = d.match;
+  const left = Date.parse(m.kickoff) - Date.now();
+  return Boolean(a && a.endpoint && !m.completed && m.status === 'STATUS_SCHEDULED' && left > 0 && left <= ARTICLE_DAYS * 86400000);
+}
+
+// Utan artikel: bara knappen, och felet om förra försöket inte gav någon.
+function articleAsk(id) {
+  const r = articleFails.get(id);
+  const final = r && r.retry === false;
+  return '<article class="card artikel" id="artikel-card">' +
+    (r ? `<p class="unknown">Ingen artikel: ${esc(r.error || 'okänt fel')}</p>` : '') +
+    (final ? '' : `<button type="button" class="analyze" data-artikel="${esc(id)}" title="AI:n läser tidningar, presskonferenser och supporterforum på nätet och skriver en artikel utan tips">${r ? 'Försök igen' : 'Läs på'}</button>`) +
+    '</article>';
+}
+
+// Läs på: proxyn skriver artikeln, ett par minuter. Skriver någon annan den
+// just nu (pending) frågar knappen igen en stund senare.
+async function runArticle(id, btn) {
+  btn.disabled = true;
+  const stop = readingClock(btn);
+  const t0 = Date.now();
+  const url = state.meta.analysis.endpoint.replace(/analyze$/, 'artikel');
+  let r;
+  for (;;) {
+    try {
+      const res = await fetch(url, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ id }) });
+      r = await res.json().catch(() => ({ ok: false, error: `HTTP ${res.status}` }));
+    } catch {
+      r = { ok: false, error: 'artikeln gick inte att nå.' };
+    }
+    if (!(r.ok && r.pending) || Date.now() - t0 > 10 * 60000) break;
+    await new Promise((ok) => setTimeout(ok, 15000));
+  }
+  stop();
+  if (r.ok && r.article) {
+    articles.set(id, r.article);
+    articleFails.delete(id);
+  } else {
+    articleFails.set(id, r.ok ? { error: 'artikeln blev inte klar.' } : r);
+  }
+  const d = state.detail;
+  if (!d || d.match.id !== id || location.hash !== `#match/${id}`) return;
+  const pane = $('#mr-pane-infor');
+  if (pane) pane.innerHTML = r.ok && r.article ? articlePane(r.article) : articleAsk(id);
 }
 
 // Rubrik, ingress och stycken med hänvisningar till källistan, som
@@ -1249,9 +1302,9 @@ function newsSection(n) {
   return `<div class="analysis-news"><h5 title="${esc(`${lead} i media, inte kontrollerat av Matchfixarna och inte med i prognosen`)}">Nyhetsläget</h5>${paras}${sourceList(n.sources)}</div>`;
 }
 
-async function runAnalysis(id, btn) {
-  btn.disabled = true;
-  // AI:n läser på en dryg minut – tiden tickar, så att det syns att något händer.
+// AI:n läser på en dryg minut – tiden tickar i knappen, så att det syns att
+// något händer. → stop().
+function readingClock(btn) {
   const t0 = Date.now();
   const tick = () => {
     const s = Math.round((Date.now() - t0) / 1000);
@@ -1259,6 +1312,12 @@ async function runAnalysis(id, btn) {
   };
   tick();
   const timer = setInterval(tick, 1000);
+  return () => clearInterval(timer);
+}
+
+async function runAnalysis(id, btn) {
+  btn.disabled = true;
+  const stop = readingClock(btn);
   let r;
   try {
     const res = await fetch(state.meta.analysis.endpoint, {
@@ -1270,7 +1329,7 @@ async function runAnalysis(id, btn) {
   } catch {
     r = { ok: false, error: 'analysen gick inte att nå.' };
   }
-  clearInterval(timer);
+  stop();
   analyses.set(id, r);
   const d = state.detail;
   if (!d || d.match.id !== id || location.hash !== `#match/${id}`) return;
@@ -1299,7 +1358,10 @@ async function runAnalysis(id, btn) {
 
 $('#match-detail-view').addEventListener('click', (e) => {
   const b = e.target.closest('button.analyze');
-  if (b && !b.disabled) runAnalysis(b.dataset.id, b);
+  if (b && !b.disabled) {
+    if (b.dataset.artikel) runArticle(b.dataset.artikel, b);
+    else runAnalysis(b.dataset.id, b);
+  }
   if (e.target.closest('[data-close]')) closeMatch();
   const t = e.target.closest('[data-mtab]');
   if (t) selectMatchTab(t.dataset.mtab);

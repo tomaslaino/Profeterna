@@ -1,6 +1,6 @@
 // Provskriv artikeln inför en match (worker/artikel.mjs) lokalt, med
-// ANTHROPIC_API_KEY ur .env. Kostar som en riktig artikel, ungefär en halv
-// dollar. Sparar ingenting.
+// ANTHROPIC_API_KEY ur .env. Kostar som en riktig artikel och skriver ut vad
+// den kostade. Sparar ingenting.
 //
 //   node src/artikel-cli.mjs <match-id>          läsbar artikel
 //   node src/artikel-cli.mjs <match-id> --json   artikeln som den sparas
@@ -9,7 +9,7 @@
 
 import { createRequire } from 'node:module';
 import llm from '../config/llm.js';
-import { writeArticle } from '../worker/artikel.mjs';
+import { writeArticle, costOf } from '../worker/artikel.mjs';
 
 createRequire(import.meta.url)('./env.js').loadEnv();
 const [id, flag] = process.argv.slice(2);
@@ -32,6 +32,8 @@ if (flag === '--json') {
   console.log(JSON.stringify(r, null, 2));
 } else {
   console.log(`${d.match.home} – ${d.match.away}, ${secs} s, ${tools.s} sökningar, ${tools.f} lästa sidor`);
+  const c = costOf(r.usage);
+  if (c) console.log(`${c.dollars} dollar: ${c.input} tokens in, ${c.cacheWrite} till cachen, ${c.cacheRead} ur cachen, ${c.output} ut`);
   if (!r.ok) {
     console.log(`Ingen artikel: ${r.error}`);
   } else {
