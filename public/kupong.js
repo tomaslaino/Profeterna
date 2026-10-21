@@ -567,7 +567,10 @@ function renderCouponShow(id) {
   if (round && g.done) html += `<a class="kp-next" href="${newCouponHref()}"><span aria-hidden="true">+</span> Skapa ny kupong</a>`;
   html += moreSection(graded.filter((x) => x !== cur && !x.g.done));
   html += couponErrors();
-  el.innerHTML = html;
+  // Ur omgången: en kommentar som skrivs behåller fokus när liveställningen
+  // ritar om.
+  if (fromTips) Samtal.keep(() => { el.innerHTML = html; });
+  else el.innerHTML = html;
   // Färdigspelad: rättas inför ögonen första gången, och klassföreståndaren
   // skriver betyget under raderna (rattning.js).
   if (window.Rattning) Rattning.after(el, c, g);

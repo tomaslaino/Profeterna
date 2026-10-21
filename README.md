@@ -1261,6 +1261,14 @@ under omgången.
    - Gängets kupong räknas som gjord också när alla dess matcher har startat, så att
      underlaget inte ber om den igen medan omgångens sista matcher återstår. *Allas tips*
      under Omgången leder tillbaka till underlaget så länge omgången finns.
+6. **Kommentarer i efterhand** (2026-10-21): i underlaget och på gängets kupong ur omgången
+   har varje match en penna i ens bläck efter tiden – samma som motiveringen när man tippar,
+   och man skriver på samma rad (högst 140 tecken). Kommentaren sparas när man lämnar fältet
+   eller trycker Enter (Esc ångrar); går det inte blir den röd och står kvar tills nästa
+   försök. De andras kommentarer står under motiveringarna, med porträttet. Det går så fort
+   man ser de andras tips – också före avspark för den som har lämnat in – och efter att
+   matchen är spelad, så länge omgången finns. En per person och match; en tom tar bort den.
+   De följer inte med till historiken.
 
 **Tjänsten** är samma som sparar kupongen (*profeterna-kupong*, adressen i
 [config/kupong.js](config/kupong.js) med `/samtal` i stället för `/kupong`; bygget skriver
@@ -1268,7 +1276,8 @@ den i `data/kuponger.json` under `samtal`, med `gang` – vilka som tippar). Tip
 KV-bindningen `KUPONG`, inte på GitHub: `samtal:aktuellt` (omgången),
 `samtal:<id>:tips:<vem>` (en nyckel per person, så att två som lämnar in samtidigt inte
 skriver över varandra), `samtal:<id>:utkast:<vem>` (en sparad kupong som inte är inlämnad:
-bara antalet tippade, för omgångens matcher som de var då) och `samtal:<id>` (en tidigare
+bara antalet tippade, för omgångens matcher som de var då), `samtal:<id>:efter:<vem>`
+(kommentarerna i efterhand, `{<matchid>: {text, skriven}}`) och `samtal:<id>` (en tidigare
 omgång, sparad när nästa startas). En omgång som skapades med *Hämta Stryktipset* – eller
 av sig själv – har
 `spel: {"namn": "Stryktipset", "nr": <Svenska Spels omgång>}` (`starta` och `matcher` tar
@@ -1282,7 +1291,11 @@ efter en timme). Svarar inte Svenska Spel eller sajten visas omgången som den �
 för alla – och
 `forra`, omgången före, om dess tips visades när den ersattes (`samtal:forra`; så att
 bygget hinner spara den i tipparhistoriken). `POST /samtal`: `starta`,
-`matcher`, `spara`, `tips` och `se`. `spara` tar antalet tippade (`tippat`) för den som inte
+`matcher`, `spara`, `tips`, `se` och `efter`. `efter` (`id`, `vem`, `match`, `text`) sparar en
+kommentar i efterhand när tipsen visas för alla, före det bara med ens nyckel; GET, `se` och
+svaren ger dem under `efter` på samma villkor som tipsen. Vem man är väljer man själv, som
+när man tippar, så en kommentar kräver ingen nyckel när tipsen visas – den är inte hemlig.
+`spara` tar antalet tippade (`tippat`) för den som inte
 har lämnat in. `tips` skickar med omgångens matcher som sidan visade dem
 (ändrade matcher → 409 med `andrade`) och svarar med en slumpad nyckel som sidan sparar på
 enheten; med den ger `se` allas inlämnade tips, och `tips` med nyckeln ändrar ens tips (i
@@ -1759,4 +1772,5 @@ Open-Meteo) och skickar inget om besökaren dit; artikeltexten går bara till De
 Inför uppgörelsen: tipsen är dolda av tjänsten, inte av sidan – `GET /samtal` skickar dem inte
 förrän de visas för alla, och `se` bara mot nyckeln som den som lämnade in fick. Vem man är
 väljer man själv på enheten, så det är nyckeln som hindrar att någon tittar på de andras
-tips innan den själv har lämnat in.
+tips innan den själv har lämnat in. Kommentarerna i efterhand döljs på samma sätt, men när
+tipsen visas kan vem som helst skriva en i någons namn.

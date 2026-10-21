@@ -55,6 +55,9 @@
     edit: false, // draft är en ändring av dina inlämnade tips
     again: false, // Spara gängets kupong trots matcher utan tecken
     names: new Map(), // omgång och matcher → {namn, syftar} | null (inget namn) | 'loading'
+    writing: {}, // din kommentar i efterhand som inte är sparad än: matchens id → texten
+    failed: {}, // matchens id → varför kommentaren inte gick att spara
+    sending: new Set(), // matcher vars kommentar sparas just nu
   };
   const VEM = 'profeterna.samtal.vem';
   const TIPS = 'profeterna.samtal.tips';
@@ -98,6 +101,13 @@
     return Boolean(d && d.vem === me() && submitted(s, d.vem) && !over(s));
   };
   const started = (x, now = Date.now()) => !(Date.parse(x.avspark) > now);
+  // Kommentarer i efterhand skriver du när allas tips visas – eller när du
+  // har lämnat in här och redan ser dem (med nyckeln). → du, eller null.
+  const writer = (s) => {
+    const v = me();
+    const d = handedIn(s);
+    return v && s && s.tips && (s.visas || (d && d.vem === v)) ? v : null;
+  };
 
   // ---------- tjänsten ----------
 
@@ -337,6 +347,7 @@
     const row = a && a.closest && a.closest('#coupon [data-id]');
     const sel = !row ? null
       : a.matches('input[data-note]') ? `input[data-note="${CSS.escape(a.dataset.note)}"]`
+        : a.matches('input[data-efter]') ? `input[data-efter="${CSS.escape(a.dataset.efter)}"]`
         : a.matches('button[data-s]') ? `[data-id="${CSS.escape(row.dataset.id)}"] button[data-s="${a.dataset.s}"]` : null;
     const caret = sel && a.matches('input') ? a.selectionStart : null;
     draw();
@@ -421,6 +432,7 @@
         `${s.orsak === 'avspark' ? ' innan första matchen startade' : ''}.</span></p>`;
     }
     html += paperTop(stopBox(s), ' sm-up') + upHead(s, ids, rows.filter((r) => r.g.res != null).map((r) => [r.x.id, r.g.res]));
+    const w = writer(s);
     let n = 0;
     for (let k = 0; k <= 5; k++) {
       const list = rows.filter((r) => r.kind === k);
@@ -429,7 +441,8 @@
       for (const r of list) {
         html += upRow({
           id: r.x.id, m: r.m, label: r.m ? `${r.m.home} – ${r.m.away}` : r.x.match, g: r.g, nr: nr.get(r.x.id),
-          who: r.cov, sign: val[r.x.id] || '', notes: r.notes, ids, alt: n++ % 2, pick: true, open: r.open,
+          who: r.cov, sign: val[r.x.id] || '', notes: r.notes, after: afterOf(s, r.x.id, w), pen: penOf(s, r.x.id, w),
+          ids, alt: n++ % 2, pick: true, open: r.open,
         });
       }
     }
@@ -533,6 +546,17 @@
       SIGNS.map((sg) => `<span class="sm-hd-s" aria-hidden="true">${box(sg, [], ids)}</span>`).join('') + '</div>';
   }
 
+  // Kommentarerna i efterhand till en match – de andras (och dina, om du inte
+  // kan skriva här) under motiveringarna. Din egen skriver du efter tiden,
+  // som motiveringen när man tippar: penOf ger fältet, eller null.
+  const afterOf = (s, id, w) => s.gang.filter((g) => g.id !== w && s.efter && s.efter[g.id] && s.efter[g.id][id])
+    .map((g) => ({ k: g.id, text: s.efter[g.id][id].text }));
+  const penOf = (s, id, w) => (!w || !s.matcher.some((x) => x.id === id) ? null : {
+    k: w,
+    text: id in SM.writing ? SM.writing[id] : ((s.efter && s.efter[w] && s.efter[w][id]) || {}).text || '',
+    fel: SM.failed[id] || '',
+  });
+
   // En match på papperet med allas porträtt i rutorna. sign: gängets tecken,
   // ett kryss med kulspetspenna över tecknet. Utfallet är en ring runt rutan
   // – grön när gängets tecken gick in, annars röd, streckad i blyerts medan
@@ -540,8 +564,9 @@
   // kryss bredvid. who: vilka som har med 1, X och 2. pick: rutorna är
   // knappar för gängets tecken (uppgörelsen), open: matchen har inte
   // startat. day: matcherna står under sin dag, så klockslaget räcker. out:
-  // matchen kom inte med på gängets kupong.
-  function upRow({ id, m, label, g, nr, who, sign, notes = [], note = '', ids, alt, pick = false, open = false, day = false, out = false }) {
+  // matchen kom inte med på gängets kupong. after, pen: kommentarerna i
+  // efterhand (afterOf, penOf).
+  function upRow({ id, m, label, g, nr, who, sign, notes = [], note = '', after = [], pen = null, ids, alt, pick = false, open = false, day = false, out = false }) {
     const hit = g.res != null && sign ? sign.includes(SIGNS[g.res]) : null;
     const cls = rowClass({ ...g, hit });
     const comp = m ? compOf(m.comp) : null;
@@ -556,9 +581,14 @@
       `<span class="pp-nr">${nr}</span>` +
       '<span class="sm-m"><span class="sm-mt">' +
       `<span class="pp-tm">${m ? `<a class="pp-t" href="#match/${esc(id)}">${teams}</a>` : `<span class="pp-t">${teams}</span>`}</span>` +
-      (when ? `<span class="sm-meta"><span class="pp-small">${when}</span></span>` : '') +
+      (when || pen ? `<span class="sm-meta">${when ? `<span class="pp-small">${when}</span>` : ''}` +
+        // Din kommentar i efterhand: en penna i ditt bläck efter tiden, och
+        // man skriver på samma rad, så att ingenting flyttar sig.
+        (pen ? `<label class="sm-note-w sm-k${pnum(pen.k)}${pen.fel ? ' fel' : ''}"${pen.fel ? ` title="${esc(pen.fel)}"` : ''}>${PEN}` +
+          `<input type="text" class="sm-note-in" data-efter="${esc(id)}" maxlength="${NOTE_MAX}" autocomplete="off" enterkeyhint="done" placeholder=" "` +
+          ` aria-label="Kommentar till ${esc(label)}"${pen.fel ? ' aria-invalid="true"' : ''} value="${esc(pen.text)}"></label>` : '') + '</span>' : '') +
       (note ? `<span class="pp-note">${esc(note)}</span>` : '') +
-      notes.map((o) => `<span class="sm-said sm-k${pnum(o.k)}">${face(o.k)}<span>${esc(o.text)}</span></span>`).join('') +
+      [...notes, ...after].map((o) => `<span class="sm-said sm-k${pnum(o.k)}">${face(o.k)}<span>${esc(o.text)}</span></span>`).join('') +
       `<span class="pp-sr">${esc(sr)}</span></span>${res}</span>` +
       SIGNS.map((sg, i) => {
         const on = sign.includes(sg);
@@ -588,6 +618,7 @@
     const stamp = c.pending ? '<span class="pp-stamp wait">Väntar på GitHub</span>' : g.done && !g.hidden ? '<span class="pp-stamp">Rättad</span>' : '';
     let html = paperTop(Papper.grade(c, g), ' sm-up', stamp) + upHead(s, ids, rows.filter((r) => r.res != null).map((r) => [r.id, r.res]));
     const days = Papper.inDayOrder(rows, (r) => r.m && r.m.kickoff);
+    const w = writer(s);
     let day = null;
     rows.forEach((r, i) => {
       const k = r.m ? dayKey.format(new Date(r.m.kickoff)) : 'okänd';
@@ -599,7 +630,7 @@
       html += upRow({
         id: r.id, m: r.m, label: teamsOf(r), g: r, nr: nr.get(r.id), who: SIGNS.map((sg) => ids.filter((p) => tip(p).includes(sg))),
         sign: r.sign, note: r.note, notes: ids.map((p) => ({ k: p, text: (s.tips[p].kommentarer || {})[r.id] })).filter((o) => o.text),
-        ids, alt: i % 2, day: days, out: r.out,
+        after: afterOf(s, r.id, w), pen: penOf(s, r.id, w), ids, alt: i % 2, day: days, out: r.out,
       });
     });
     return html + Papper.foot(c, g) + '</div></div>';
@@ -1433,6 +1464,63 @@
     if (KP.view && KP.view.mode === 'home') redraw();
   })();
 
+  // ---------- kommentarerna i efterhand ----------
+
+  // Din kommentar sparas i tjänsten när du lämnar fältet (Enter gör det
+  // också; Esc ångrar). Det du skriver står kvar när papperet ritas om under
+  // tiden – i uppgörelsen och på gängets kupong.
+  const afterField = (e) => (e.target.closest ? e.target.closest('#coupon input[data-efter]') : null);
+  async function saveAfter(id) {
+    const s = SM.data;
+    const v = s && writer(s);
+    if (!v || !(id in SM.writing) || SM.sending.has(id)) return;
+    const raw = SM.writing[id];
+    const text = raw.replace(/\s+/g, ' ').trim();
+    if (text === ((((s.efter && s.efter[v]) || {})[id] || {}).text || '')) {
+      delete SM.writing[id];
+      delete SM.failed[id];
+      return;
+    }
+    SM.sending.add(id);
+    const d = handedIn(s);
+    const out = await send({ gor: 'efter', id: s.id, vem: v, match: id, text, ...(d && d.vem === v ? { nyckel: d.nyckel } : {}) });
+    SM.sending.delete(id);
+    if (out.ok) {
+      delete SM.failed[id];
+      if (SM.writing[id] === raw) delete SM.writing[id];
+    } else {
+      SM.failed[id] = out.error;
+    }
+    redraw();
+    // Skrev du vidare medan den sparades, och har lämnat fältet: spara igen.
+    const f = document.activeElement;
+    if (out.ok && id in SM.writing && !(f && f.dataset && f.dataset.efter === id)) saveAfter(id);
+  }
+  document.addEventListener('input', (e) => {
+    const f = afterField(e);
+    if (f) SM.writing[f.dataset.efter] = f.value.slice(0, NOTE_MAX);
+  });
+  document.addEventListener('focusout', (e) => {
+    const f = afterField(e);
+    if (f) saveAfter(f.dataset.efter);
+  });
+  document.addEventListener('keydown', (e) => {
+    const f = afterField(e);
+    if (!f || (e.key !== 'Enter' && e.key !== 'Escape')) return;
+    e.preventDefault();
+    if (e.key === 'Escape') {
+      delete SM.writing[f.dataset.efter];
+      delete SM.failed[f.dataset.efter];
+      const v = SM.data && writer(SM.data);
+      f.value = ((v && SM.data.efter && SM.data.efter[v] && SM.data.efter[v][f.dataset.efter]) || {}).text || '';
+    }
+    f.blur();
+  });
+  // Går du från sidan sparas det du har skrivit.
+  document.addEventListener('visibilitychange', () => {
+    if (document.hidden) for (const id of Object.keys(SM.writing)) saveAfter(id);
+  });
+
   // Omgångens matcher (liveställningen i kupong.js hämtar dem också), om
   // allas tips visas, gängets kupong ur omgången och bevakningen av
   // förstasidans ruta.
@@ -1441,5 +1529,5 @@
   const made = () => (SM.data && SM.data.visas ? existing(SM.data) : null);
   const watch = () => { if (active() && !SM.data.visas) poll(); };
 
-  window.Samtal = { show, load, active, covers, teaser, ids, visible, made, watch, paper, title, name: () => nameOf(SM.data), redraw: () => { if (here('')) renderRound(); } };
+  window.Samtal = { show, load, active, covers, teaser, ids, visible, made, watch, paper, title, keep: keepFocus, name: () => nameOf(SM.data), redraw: () => { if (here('')) renderRound(); } };
 })();

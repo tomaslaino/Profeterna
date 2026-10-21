@@ -34,6 +34,11 @@
 //                 långt man har kommit. → {ok, samtal}
 //   POST /samtal {gor: "se", id, vem, nyckel} → {ok, samtal}   samtal med
 //                 allas inlämnade tips, för den som har lämnat in
+//   POST /samtal {gor: "efter", id, vem, match, text, nyckel} → {ok, samtal}
+//                 en kommentar i efterhand till en av omgångens matcher – när
+//                 allas tips visas, eller med nyckeln (den som har lämnat in
+//                 ser redan tipsen), också när matchen är spelad. En per
+//                 person och match; text "" tar bort den
 //   POST /samtal {gor: "bort", id} → {ok, samtal: null}   ta bort omgången
 //                 för alla, med de inlämnade tipsen – tills allas tips visas
 //                 (då hör den till tipparhistoriken)
@@ -62,6 +67,8 @@
 //   samtal:<id>:tips:<vem>           {inne, ändrad, tecken, kommentarer, nyckel}
 //   samtal:<id>:utkast:<vem>         {sparad, tippat, matcher} – en sparad kupong som
 //                                    inte är inlämnad: bara antalet tippade
+//   samtal:<id>:efter:<vem>          {<matchid>: {text, skriven}} – kommentarerna i
+//                                    efterhand, som tipsen bara när de visas
 //   samtal:<id>                      en tidigare omgång, sparad när nästa startades
 //                                    eller när den togs bort (borttagen)
 //   samtal:forra                     omgången före den aktuella, om dess tips
@@ -91,6 +98,7 @@ const AUTO_AFTER_MS = 3 * 3600000;
 const AUTO_RETRY_MS = 3600000;
 const tipsKey = (id, vem) => `samtal:${id}:tips:${vem}`;
 const draftKey = (id, vem) => `samtal:${id}:utkast:${vem}`;
+const afterKey = (id, vem) => `samtal:${id}:efter:${vem}`;
 
 const text = (s, max) => String(s == null ? '' : s).replace(/\s+/g, ' ').trim().slice(0, max);
 const fail = (status, error, extra = {}) => ({ status, body: { ok: false, error, ...extra } });
@@ -123,6 +131,12 @@ async function loadDrafts(store, round, gang) {
   return Object.fromEntries(gang.map((g, i) => [g.id, list[i]]).filter(([, d]) => d && d.matcher === key));
 }
 
+// Kommentarerna i efterhand, per person.
+async function loadAfter(store, round, gang) {
+  const list = await Promise.all(gang.map((g) => store.get(afterKey(round.id, g.id))));
+  return Object.fromEntries(gang.map((g, i) => [g.id, list[i]]).filter(([, o]) => o && typeof o === 'object'));
+}
+
 // Visas tipsen, och varför: alla har lämnat in eller första matchen har
 // startat.
 function shown(round, tips, gang, now) {
@@ -134,12 +148,14 @@ function shown(round, tips, gang, now) {
 // Omgången som alla får se. Tipsen bara om de visas – för alla, eller för
 // den som själv har lämnat in (own) – och bara för omgångens matcher. Hur
 // många matcher var och en har tippat syns alltid: ur de inlämnade tipsen,
-// annars ur en sparad kupong (drafts), annars null.
-export function publicView(round, tips, gang, now, own = false, drafts = {}) {
+// annars ur en sparad kupong (drafts), annars null. Kommentarerna i
+// efterhand (efter) syns som tipsen.
+export function publicView(round, tips, gang, now, own = false, drafts = {}, efter = {}) {
   const why = shown(round, tips, gang, now);
   const ids = new Set(round.matcher.map((m) => m.id));
   const only = (o) => Object.fromEntries(Object.entries(o || {}).filter(([k]) => ids.has(k)));
   const tippat = (id) => (tips[id] ? Object.keys(only(tips[id].tecken)).length : drafts[id] ? drafts[id].tippat : null);
+  const after = Object.entries(efter).map(([k, o]) => [k, only(o)]).filter(([, o]) => Object.keys(o).length);
   return {
     id: round.id,
     skapad: round.skapad,
@@ -150,6 +166,7 @@ export function publicView(round, tips, gang, now, own = false, drafts = {}) {
     orsak: why,
     gang: gang.map((g) => ({ id: g.id, namn: g.namn, inne: tips[g.id] ? tips[g.id].inne : null, tippat: tippat(g.id) })),
     tips: why || own ? Object.fromEntries(Object.entries(tips).map(([k, t]) => [k, { inne: t.inne, tecken: only(t.tecken), kommentarer: only(t.kommentarer) }])) : null,
+    efter: why || own ? Object.fromEntries(after) : null,
   };
 }
 
@@ -249,8 +266,15 @@ export async function getRound({ store, gang, auto = null, now = () => new Date(
       if (got.prev !== undefined) prev = got.prev;
     }
   }
-  const view = async (r, sparade = false) => (r ? publicView(r, await loadTips(store, r, gang), gang, ms, false,
-    sparade ? await loadDrafts(store, r, gang) : {}) : null);
+  // Kommentarerna i efterhand hämtas bara när tipsen visas – före det syns
+  // de inte.
+  const view = async (r, sparade = false) => {
+    if (!r) return null;
+    const tips = await loadTips(store, r, gang);
+    const [drafts, efter] = await Promise.all([sparade ? loadDrafts(store, r, gang) : {},
+      shown(r, tips, gang, ms) ? loadAfter(store, r, gang) : {}]);
+    return publicView(r, tips, gang, ms, false, drafts, efter);
+  };
   const [samtal, forra] = await Promise.all([view(round, true), view(prev)]);
   // Den förra omgången bara om dess tips visas (de visades redan när den
   // ersattes, så det gör de fortfarande).
@@ -263,8 +287,9 @@ export async function postRound(body, { store, gang, loadMatches, now = () => ne
   const t = now();
   const ms = t.getTime();
   const round = await store.get(CURRENT);
-  const [tips, drafts] = round ? await Promise.all([loadTips(store, round, gang), loadDrafts(store, round, gang)]) : [{}, {}];
-  const view = () => publicView(round, tips, gang, ms, false, drafts);
+  const [tips, drafts, efter] = round
+    ? await Promise.all([loadTips(store, round, gang), loadDrafts(store, round, gang), loadAfter(store, round, gang)]) : [{}, {}, {}];
+  const view = () => publicView(round, tips, gang, ms, false, drafts, efter);
   const ok = (extra = {}) => ({ status: 200, body: { ok: true, ...extra } });
 
   if (b.gor === 'starta') {
@@ -310,7 +335,25 @@ export async function postRound(body, { store, gang, loadMatches, now = () => ne
     if (!own || !own.nyckel || !b.nyckel || !(await sameSecret(b.nyckel, own.nyckel))) {
       return fail(409, 'Du ser de andras tips när du själv har lämnat in.', { samtal: view() });
     }
-    return ok({ samtal: publicView(round, tips, gang, ms, true, drafts) });
+    return ok({ samtal: publicView(round, tips, gang, ms, true, drafts, efter) });
+  }
+
+  // En kommentar i efterhand: för alla när tipsen visas, före det för den
+  // som har lämnat in (med nyckeln). Vem man är väljer man själv, som när
+  // man tippar – kommentarerna är inte hemliga när de syns.
+  if (b.gor === 'efter') {
+    if (!vem) return fail(400, 'Okänd person.');
+    const own = tips[vem.id];
+    const key = Boolean(own && own.nyckel && b.nyckel && (await sameSecret(b.nyckel, own.nyckel)));
+    if (!key && !shown(round, tips, gang, ms)) return fail(409, 'Du kan kommentera när allas tips visas.', { samtal: view() });
+    const m = round.matcher.find((x) => x.id === String(b.match == null ? '' : b.match));
+    if (!m) return fail(400, 'Matchen finns inte på kupongen.');
+    const mine = { ...(efter[vem.id] || {}) };
+    const n = text(b.text, NOTE_MAX);
+    if (!n) delete mine[m.id];
+    else if (!mine[m.id] || mine[m.id].text !== n) mine[m.id] = { text: n, skriven: t.toISOString() };
+    await store.put(afterKey(round.id, vem.id), mine);
+    return ok({ samtal: publicView(round, tips, gang, ms, key, drafts, { ...efter, [vem.id]: mine }) });
   }
 
   if (b.gor === 'matcher') {
@@ -325,7 +368,7 @@ export async function postRound(body, { store, gang, loadMatches, now = () => ne
     const spel = b.spel === undefined ? gameOf(was) : gameOf(b.spel);
     const next = { ...rest, 'ändrad': t.toISOString(), matcher: v.rows, ...(spel ? { spel } : {}) };
     await store.put(CURRENT, next);
-    return ok({ samtal: publicView(next, tips, gang, ms, false, drafts) });
+    return ok({ samtal: publicView(next, tips, gang, ms, false, drafts, efter) });
   }
 
   // Matcherna har ändrats sedan sidan visade dem: sidan visar de nya.
@@ -346,7 +389,7 @@ export async function postRound(body, { store, gang, loadMatches, now = () => ne
     const n = Math.floor(Number(b.tippat));
     const mine = { sparad: t.toISOString(), tippat: Number.isFinite(n) ? Math.max(0, Math.min(round.matcher.length, n)) : 0, matcher: matchKey(round) };
     await store.put(draftKey(round.id, vem.id), mine);
-    return ok({ samtal: publicView(round, tips, gang, ms, false, { ...drafts, [vem.id]: mine }) });
+    return ok({ samtal: publicView(round, tips, gang, ms, false, { ...drafts, [vem.id]: mine }, efter) });
   }
 
   if (b.gor === 'tips') {
@@ -385,7 +428,7 @@ export async function postRound(body, { store, gang, loadMatches, now = () => ne
       ? { inne: old.inne, 'ändrad': t.toISOString(), tecken, kommentarer, nyckel: old.nyckel }
       : { inne: t.toISOString(), tecken, kommentarer, nyckel: newId(24) };
     await store.put(tipsKey(round.id, vem.id), mine);
-    return ok({ samtal: publicView(round, { ...tips, [vem.id]: mine }, gang, ms, true, drafts), nyckel: mine.nyckel });
+    return ok({ samtal: publicView(round, { ...tips, [vem.id]: mine }, gang, ms, true, drafts, efter), nyckel: mine.nyckel });
   }
 
   return fail(400, 'Okänd åtgärd.');

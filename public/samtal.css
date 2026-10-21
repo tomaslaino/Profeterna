@@ -186,6 +186,10 @@ button.sm-c:focus-visible .sm-bx { box-shadow: 0 0 0 2px var(--ink); }
 }
 .sm-note-w:focus-within .sm-note-in, .sm-note-in:not(:placeholder-shown) { flex: 1 1 auto; }
 .sm-note-in:focus { outline: none; border-bottom-color: var(--pp-print-line); }
+/* en kommentar i efterhand som inte gick att spara: rött tills den går */
+.sm-note-w.fel { color: var(--pp-no); }
+.sm-note-w.fel .sm-pen { opacity: 1; }
+.sm-note-w.fel .sm-note-in { border-bottom-color: var(--pp-no); }
 /* med fingret: större yta runt pennan, utan att raden växer */
 @media (pointer: coarse) {
   .sm-note-w { height: 34px; margin: -10px 0 -10px -10px; padding: 0 10px; }
