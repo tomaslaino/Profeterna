@@ -262,10 +262,6 @@ function showEarlier() {
   if (first) first.focus({ preventScroll: true });
 }
 
-// Kolumnens nyckel står i första kommande dagens rubrik i stället för en
-// förklaring. Spelade matcher visar bara resultatet och behöver ingen.
-const KEY_UPCOMING = '<span class="day-key" style="float:right;margin-right:20px" title="Matchfixarnas odds för hemmaseger · oavgjort · bortaseger efter 90 minuter – rättvisa odds, utan spelbolagens marginal">Odds 1 · X · 2</span>';
-
 function renderList(d) {
   if (!d.played.length && !d.upcoming.length) {
     return `<p class="empty">Inga matcher de senaste eller närmaste ${d.days} dagarna.</p>`;
@@ -274,16 +270,16 @@ function renderList(d) {
   if (d.more) {
     html += `<button type="button" class="earlier"><span aria-hidden="true">↑</span> Tidigare matcher <span class="n">${d.more}</span></button>`;
   }
-  html += renderDays(d.played, '');
+  html += renderDays(d.played);
   if (d.played.length) html += '<div class="now-line" role="separator"><span>Nu</span></div>';
   html += d.upcoming.length
-    ? renderDays(d.upcoming, KEY_UPCOMING)
+    ? renderDays(d.upcoming)
     : `<p class="empty">Inga kommande matcher de närmaste ${d.days} dagarna.</p>`;
   return html;
 }
 
 // En rubrik per dag. Dagens datum kan stå på båda sidor om nu-linjen.
-function renderDays(ms, key) {
+function renderDays(ms) {
   const days = new Map();
   for (const m of ms) {
     const k = dayKey.format(new Date(m.kickoff));
@@ -294,8 +290,7 @@ function renderDays(ms, key) {
   let html = '';
   for (const [k, list] of days) {
     const name = fDay.format(new Date(list[0].kickoff));
-    html += `<div class="day" data-day="${esc(k)}"><div class="day-head">${esc(k === today ? `I dag, ${name}` : cap(name))}${key}</div><div class="mlist">`;
-    key = '';
+    html += `<div class="day" data-day="${esc(k)}"><div class="day-head">${esc(k === today ? `I dag, ${name}` : cap(name))}</div><div class="mlist">`;
     for (const m of list) html += matchRow(m);
     html += '</div></div>';
   }
@@ -309,15 +304,6 @@ function compOf(id) {
 // Prognosen 1 · X · 2 i hela procent som odds (se odds ovan).
 function listOdds(p) {
   return p.map(pctOdds);
-}
-
-// Kompakt prognos: 1 · X · 2 som odds, det troligaste utfallet i fetstil.
-function listForecast(f) {
-  if (!f) return '<span class="unknown">okänt</span>';
-  const max = Math.max(...f.p);
-  const o = listOdds(f.p);
-  return f.p.map((x, i) => (x === max ? `<b>${o[i]}</b>` : o[i])).join(' · ') +
-    (f.lower ? ' <span title="Ett lag saknar egen lagdata">*</span>' : '');
 }
 
 // Spoilerskyddet (spoiler.js): ska matchens resultat döljas just nu?
@@ -403,9 +389,11 @@ new MutationObserver((rs) => {
 // när matchen är spelad – mellan dem. Ytterst står tävlingen (och omgången i
 // cuperna) och oddsen eller spelikonen, i lika breda spalter (theme.css
 // .mrow), så att mitten står mitt i raden och rakt under nu-linjen.
+// Kommande matcher har inga odds på raden; högerspalten står tom, så att
+// lagen och avsparken står kvar mitt i raden.
 function matchRow(m) {
   let mid;
-  let side;
+  let side = '';
   if (m.completed && m.score) {
     side = window.Hojdpunkter ? Hojdpunkter.row(m) : '';
     if (isHidden(m)) mid = Spoiler.chip();
@@ -417,7 +405,6 @@ function matchRow(m) {
   } else {
     mid = `<span class="kick">${esc(fTime.format(new Date(m.kickoff)))}</span>`;
     if (m.status === 'STATUS_POSTPONED') mid += '<span class="sub">uppskjuten</span>';
-    side = listForecast(m.f);
   }
   const comp = compOf(m.comp);
   return `<button type="button" class="mrow" data-id="${esc(m.id)}">` +

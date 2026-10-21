@@ -577,17 +577,7 @@ table.cmp tr.model td { background: var(--accent-soft); color: #fff; }
   text-transform: none;
   color: var(--bone);
 }
-.day-key {
-  font-family: var(--sans);
-  font-style: normal;
-  font-size: 10.5px;
-  font-weight: 700;
-  letter-spacing: 0.16em;
-  text-transform: uppercase;
-  line-height: 2.1;
-  color: var(--eyebrow);
-}
-/* Raden som en liten biljett (app.js matchRow): tävlingen och oddsen ytterst
+/* Raden som en liten biljett (app.js matchRow): tävlingen och höjdpunkterna ytterst
    i lika breda spalter (--edge), lagen speglade kring mitten, där avsparken
    eller resultatet står – mitt i raden och rakt under nu-linjen. */
 .mlist { overflow: hidden; --edge: 8.4rem; }
@@ -906,7 +896,7 @@ footer .foot-links a[aria-current="page"] { color: var(--fg); }
 }
 
 /* smal mobil: bara lagen och mitten på raden, så att namnen får plats –
-   oddsen eller spelikonen mitt under (tävlingsmärket är dolt, style.css) */
+   spelikonen mitt under (tävlingsmärket är dolt, style.css) */
 @media (max-width: 640px) {
   .mrow { grid-template-columns: minmax(0, 1fr) 3.9rem minmax(0, 1fr); row-gap: 6px; }
   .mcomp { display: none; }
