@@ -2,10 +2,11 @@
 
 // ---------- slitaget på papperet ----------
 //
-// Papperet (papper.css, matchblad.css) ser använt ut: gulnat, vikt, med en
-// kaffering, fläckar, ett hundöra eller ett suddat ställe. Varje papper har
-// haft ett liv – i plånboken, i fickan, på köksbordet, på skrivbordet eller
-// knappt något alls – och slitagen hör ihop med det (LIVES). Vilket liv,
+// Papperet (papper.css, matchblad.css) ser använt ut: alltid gulnat, och
+// oftast vikt, med en kaffering, fläckar, ett hundöra eller ett suddat
+// ställe. Varje papper har haft ett liv – i plånboken, i fickan, på
+// köksbordet, på skrivbordet eller (sällan) knappt något alls – och
+// slitagen hör ihop med det (LIVES). Vilket liv,
 // var slitagen sitter och hur de ser ut slumpas ur papperets nyckel –
 // omgångens id för gängets kupong, kupongens id, matchens id för
 // matchbladet – så att samma papper ser likadant ut varje gång det ritas,
@@ -62,22 +63,26 @@
 
   // Slitaget är inte hur som helst: papperet har haft ett liv, och slitagen
   // hör ihop med det. has: alltid, may: ibland, fold: hur det har vikts.
+  // Gulnat är alla papper.
   const LIVES = {
-    planbok: { has: ['gul', 'vikt'], may: [['flack', 0.6], ['ora', 0.3]], fold: ['hv'] },
-    ficka: { has: ['vikt', 'ora'], may: [['gul', 0.6], ['flack', 0.3]], fold: ['h', 'hh'] },
-    kok: { has: ['kaffe'], may: [['gul', 0.7], ['flack', 0.5], ['vikt', 0.2]], fold: ['h', 'v'] },
-    bord: { has: ['sudd'], may: [['gul', 0.6], ['kaffe', 0.35], ['flack', 0.3]], fold: ['h'] },
-    ny: { has: ['gul'], may: [['flack', 0.4], ['ora', 0.25]], fold: ['h'] },
+    planbok: { has: ['vikt'], may: [['flack', 0.7], ['ora', 0.4], ['kaffe', 0.2]], fold: ['hv'] },
+    ficka: { has: ['vikt', 'ora'], may: [['flack', 0.5], ['kaffe', 0.2]], fold: ['h', 'hh'] },
+    kok: { has: ['kaffe'], may: [['flack', 0.6], ['vikt', 0.4], ['sudd', 0.2]], fold: ['h', 'v'] },
+    bord: { has: ['sudd'], may: [['kaffe', 0.8], ['vikt', 0.5], ['flack', 0.4]], fold: ['h'] },
+    ny: { has: [], may: [['flack', 0.5], ['ora', 0.3]], fold: ['h'] },
   };
   // Vilka liv papperet kan ha haft och hur slitet det är (0–1): kupongen
-  // som växer fram är nästan ny, omgångens kupong har legat framme hela
-  // helgen och säsongens betyg har burits med sedan augusti. Matchbladet
-  // får inget hundöra – rutans skugga följer inte ett avvikt hörn.
+  // som växer fram är minst sliten, omgångens kupong har legat framme hela
+  // helgen och säsongens betyg har burits med sedan augusti. Bara kupongen
+  // som växer fram och matchbladet kan vara nästan nya. Matchbladet får
+  // inget hundöra – rutans skugga följer inte ett avvikt hörn. reach: hur
+  // långt ner (px) slitagen sitter, så att de hamnar på papperet också när
+  // det är som kortast – kupongen som växer fram börjar med sju tomma rader.
   const KINDS = {
-    bygge: { lives: [['ny', 3], ['kok', 1], ['bord', 1]], age: 0.35 },
-    match: { lives: [['ny', 2], ['kok', 1], ['bord', 1], ['ficka', 0.5]], age: 0.5, ear: false },
-    omg: { lives: [['planbok', 1], ['ficka', 1], ['kok', 1.2], ['bord', 0.8], ['ny', 0.6]], age: 0.75 },
-    kupong: { lives: [['planbok', 1], ['ficka', 1], ['kok', 1.2], ['bord', 0.8], ['ny', 0.6]], age: 0.8 },
+    bygge: { lives: [['ny', 0.5], ['kok', 1.5], ['bord', 1.5]], age: 0.35, reach: 520 },
+    match: { lives: [['ny', 0.5], ['kok', 1], ['bord', 1], ['ficka', 0.8]], age: 0.5, ear: false },
+    omg: { lives: [['planbok', 1], ['ficka', 1], ['kok', 1.2], ['bord', 0.8]], age: 0.75 },
+    kupong: { lives: [['planbok', 1], ['ficka', 1], ['kok', 1.2], ['bord', 0.8]], age: 0.8 },
     betyg: { lives: [['planbok', 2], ['ficka', 2], ['kok', 1]], age: 1 },
   };
 
@@ -86,26 +91,28 @@
     const k = KINDS[kind];
     const life = LIVES[weighted(r, k.lives)];
     const on = new Set(life.has);
-    for (const [x, odds] of life.may) if (r() < odds && on.size < 4) on.add(x);
+    for (const [x, odds] of life.may) if (r() < odds && on.size < 3) on.add(x);
     if (k.ear === false) on.delete('ora');
     const p = {};
     // de bleka slitagen syns mer ju äldre papperet är
     const a = 0.55 + 0.45 * k.age;
-    if (on.has('gul')) p.gul = aged(r, k.age);
-    if (on.has('vikt')) p.vikt = folds(r, life.fold);
-    if (on.has('flack')) p.flack = spots(r, a);
-    if (on.has('kaffe')) p.kaffe = coffee(r, a);
+    const reach = k.reach || 900;
+    p.gul = aged(r, k.age);
+    if (on.has('vikt')) p.vikt = folds(r, life.fold, reach);
+    if (on.has('flack')) p.flack = spots(r, a, reach);
+    if (on.has('kaffe')) p.kaffe = coffee(r, a, reach);
     if (on.has('ora')) p.ora = { corner: ['tl', 'tr', 'br'][int(r, 0, 2)], s: int(r, 16, 28) };
-    if (on.has('sudd')) p.sudd = erased(r);
+    if (on.has('sudd')) p.sudd = erased(r, reach);
     return p;
   }
 
   // Gulnat: papperets färg, mörkare kanter, fläckvis toning och ibland en
-  // sida som legat i solen – mer ju äldre papperet är.
+  // sida som legat i solen – mer ju äldre papperet är, men synligt också på
+  // det nyaste.
   function aged(r, age) {
     const sides = [[0, 0, 1, 0], [1, 0, 0, 0], [0, 0, 0, 1], [0, 1, 0, 0]];
     return {
-      tone: span(r, 0.25, 0.75) * age,
+      tone: span(r, 0.35, 0.8) * (0.4 + 0.6 * age),
       edge: span(r, 0.28, 0.55) * (0.5 + 0.5 * age),
       blotch: span(r, 0.6, 1.05) * (0.6 + 0.4 * age),
       freq: span(r, 0.006, 0.014),
@@ -117,7 +124,8 @@
 
   // Vikt: på mitten, på längden, i fyra eller i tre som ett brev. Vecket är
   // en mörk linje med skugga på ena sidan och nött tryck på den andra.
-  function folds(r, kinds) {
+  function folds(r, kinds, reach) {
+    const s = reach / 900;
     const kind = kinds[int(r, 0, kinds.length - 1)];
     const crease = (dir, at) => ({
       dir, at,
@@ -131,32 +139,34 @@
     });
     const out = [];
     if (kind === 'hh') {
-      const y = span(r, 220, 320);
-      out.push(crease('h', y), crease('h', y + span(r, 260, 340)));
-    } else if (kind.includes('h')) out.push(crease('h', span(r, 300, 560)));
+      const y = span(r, 220 * s, 320 * s);
+      out.push(crease('h', y), crease('h', y + span(r, 260 * s, 340 * s)));
+    } else if (kind.includes('h')) out.push(crease('h', span(r, 300 * s, 560 * s)));
     if (kind.includes('v')) out.push(crease('v', span(r, 0.38, 0.62)));
     return out;
   }
 
   // Fläckar: rost i små klungor och ibland ett fingeravtryck av grafit.
-  function spots(r, a) {
+  function spots(r, a, reach) {
+    const s = reach / 900;
     const dots = [];
     for (let c = int(r, 1, 3); c > 0; c--) {
       const x = span(r, 0.05, 0.95);
-      const y = span(r, 30, 900);
+      const y = span(r, 30 * s, 900 * s);
       const sig = span(r, 25, 90);
       for (let n = int(r, 4, 12); n > 0; n--) {
         dots.push({ x, dx: (r() + r() + r() - 1.5) * sig, y: y + (r() + r() + r() - 1.5) * sig, rad: span(r, 0.5, 2.6), op: span(r, 0.1, 0.32) * a, halo: r() < 0.25 });
       }
     }
-    const smudge = r() < 0.45 ? { x: span(r, 0.06, 0.94), y: span(r, 60, 900), rx: span(r, 12, 18), ry: span(r, 16, 24), rot: jit(r, 40), op: span(r, 0.05, 0.09) * a } : null;
+    const smudge = r() < 0.45 ? { x: span(r, 0.06, 0.94), y: span(r, 60 * s, 900 * s), rx: span(r, 12, 18), ry: span(r, 16, 24), rot: jit(r, 40), op: span(r, 0.05, 0.09) * a } : null;
     return { dots, smudge };
   }
 
   // Kaffe: en ring, ibland två – samma kopp nedställd en gång till eller en
   // annan – hel eller bruten, med en mörk kant, en blek sjö och ibland stänk.
   const RIMS = ['', '72 5 19 4', '60 14 26', '86 14', '38 7 44 11'];
-  function coffee(r, a) {
+  function coffee(r, a, reach) {
+    const s = reach / 900;
     const one = () => ({
       rx: span(r, 30, 58),
       round: span(r, 0.9, 1),
@@ -170,21 +180,22 @@
       seed: int(r, 1, 999),
       drops: r() < 0.4 ? Array.from({ length: int(r, 2, 6) }, () => ({ a: r() * 6.283, d: span(r, 1.1, 1.8), rx: span(r, 1.2, 4.2), ry: span(r, 0.6, 1) })) : [],
     });
-    const first = { ...one(), x: span(r, 0.08, 0.92), y: span(r, 70, 880), dx: 0 };
+    const first = { ...one(), x: span(r, 0.08, 0.92), y: span(r, 70 * s, 880 * s), dx: 0 };
     const out = [first];
     if (r() < 0.3) {
       if (r() < 0.6) {
         const t = r() * 6.283;
         const d = first.rx * span(r, 0.35, 0.8);
         out.push({ ...one(), rx: first.rx * span(r, 0.97, 1.03), x: first.x, dx: Math.cos(t) * d, y: first.y + Math.sin(t) * d });
-      } else out.push({ ...one(), x: span(r, 0.08, 0.92), y: span(r, 70, 880), dx: 0 });
+      } else out.push({ ...one(), x: span(r, 0.08, 0.92), y: span(r, 70 * s, 880 * s), dx: 0 });
     }
     return out;
   }
 
   // Suddat: något skrivet med blyerts – streck att räkna med, ett klotter
   // eller en pil – nästan bortsuddat, med smulor runt om.
-  function erased(r) {
+  function erased(r, reach) {
+    const s = reach / 900;
     const kind = int(r, 0, 2);
     let d = '';
     if (kind === 0) {
@@ -202,7 +213,7 @@
     }
     return {
       x: span(r, 0.15, 0.85),
-      y: span(r, 80, 800),
+      y: span(r, 80 * s, 800 * s),
       rx: span(r, 22, 38),
       ry: span(r, 9, 15),
       rot: jit(r, 20),
