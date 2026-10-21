@@ -195,9 +195,10 @@ window.addEventListener('hashchange', route);
 // ---------- matchlista ----------
 
 function renderChips() {
-  const all = [{ id: 'all', short: 'Alla', name: 'Alla tävlingar' }, ...state.comps.values()];
+  // hela namnen, som divisionerna på Tabeller och Statistik
+  const all = [{ id: 'all', name: 'Alla' }, ...state.comps.values()];
   $('#comp-chips').innerHTML = all.map((c) =>
-    `<button type="button" data-comp="${c.id}" title="${esc(c.name)}" aria-pressed="${c.id === state.comp}">${esc(c.short)}</button>`).join('');
+    `<button type="button" data-comp="${c.id}" aria-pressed="${c.id === state.comp}">${esc(c.name)}</button>`).join('');
   for (const b of document.querySelectorAll('#comp-chips button')) {
     b.addEventListener('click', () => { state.comp = b.dataset.comp; renderChips(); renderMatchList(); });
   }

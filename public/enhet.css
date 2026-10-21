@@ -116,6 +116,12 @@ html { scrollbar-gutter: stable; }
 .chips button:focus-visible,
 .seg button:focus-visible { outline-offset: 3px; border-radius: 3px; }
 
+/* Matcher: tävlingarna med hela namn, i samma storlek och luft som
+   divisionerna på Tabeller och Statistik (.dv-divs) och med strecket på samma
+   höjd – luften för fokusringen står ovanför menyn i stället för i den */
+#comp-chips { gap: 28px; margin-top: -3px; }
+#comp-chips button { padding-bottom: 12px; font-size: 15px; letter-spacing: normal; }
+
 /* knapparna: ord i länkfärg, med plats under för huvudknappens streck så
    att orden står på samma linje */
 .earlier:not(.pp *),
@@ -273,6 +279,7 @@ button.analyze:hover,
   }
   .chips,
   .seg { gap: 18px; }
+  #comp-chips { gap: 24px; margin-top: 0; }
 }
 @media (max-width: 760px) {
   .hk-tools .seg button { padding: 2px 0 11px; font-size: 13.5px; }
