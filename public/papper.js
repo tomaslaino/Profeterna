@@ -206,7 +206,7 @@
   function foot(c, g) {
     const fields = [
       !g.started ? ['Matcher', g.n] : null,
-      ['Kombinationer', rader(c), 'Så många kombinationer av tecken kupongen täcker – antalet tecken i varje match gånger varandra'],
+      ['Kombinationer', rader(c)],
       !g.done ? ['Väntat', kpNum(g.expected), 'Väntat antal rätt enligt modellen'] : null,
       g.started && !g.done ? ['Kvar', g.left + g.live + g.hidden] : null,
       g.started && !g.done && !g.hidden ? ['Möjliga', g.max, 'Högst så många rätt kan det bli'] : null,
