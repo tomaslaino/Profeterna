@@ -1,6 +1,6 @@
 /* Slitaget på papperet (slitage.js): två bilder över papperet – den första
-   multipliceras med trycket (gulning, veck, fläckar, kaffe, blyerts), den
-   andra lägger det ljusa överst (nött tryck i vecken, suddet, hundörat).
+   multipliceras med trycket (gulning, veck, fläckar, kaffe), den andra
+   lägger det ljusa överst (nött tryck i vecken, hundörat).
    Över allt på papperet, också raderna som står kvar när man bläddrar
    (z-index 3), så att de inte blir ljusa remsor i det gulnade, och utan att
    ta emot klick. */

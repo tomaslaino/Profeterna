@@ -5,7 +5,7 @@
 // Papperet (papper.css, matchblad.css) ser använt ut: alltid gulnat, och
 // oftast vikt – på mitten, i tre, i fyra eller i åtta, ibland snett eller
 // två gånger nästan på samma ställe – eller skrynklat, med en kaffering,
-// fläckar, ett hundöra, ett hörn som vikts in eller ett suddat ställe.
+// fläckar, ett hundöra eller ett hörn som vikts in.
 // Varje papper har haft ett liv – i plånboken, i fickan, på köksbordet, på
 // skrivbordet, nästan i papperskorgen eller (sällan) knappt något alls – och
 // slitagen hör ihop med det (LIVES). Vilket liv,
@@ -15,10 +15,10 @@
 // men inga två papper är slitna på samma sätt.
 //
 // Slitaget är två bilder (svg) över papperet: ::before multipliceras med
-// trycket (gulningen, vecken, fläckarna, ringarna, blyertsen) och ::after
-// lägger det ljusa överst (vecken som nött bort trycket, suddet, hundörats
-// baksida). Båda ligger över allt på papperet, också raderna som står kvar
-// när man bläddrar. Höjden räknas i bildpunkter från överkanten och bredden
+// trycket (gulningen, vecken, fläckarna, ringarna) och ::after lägger det
+// ljusa överst (vecken som nött bort trycket, hundörats baksida). Båda
+// ligger över allt på papperet, också raderna som står kvar när man
+// bläddrar. Höjden räknas i bildpunkter från överkanten och bredden
 // i andelar, så att inget flyttar sig när papperet växer eller byter flik –
 // papperet visar bara mer av samma ark. Gulningen tonar också själva
 // papperets färg (--pp-paper) och rutornas (--pp-box).
@@ -70,8 +70,8 @@
   const LIVES = {
     planbok: { has: ['vikt'], may: [['flack', 0.7], ['ora', 0.4], ['kaffe', 0.2], ['horn', 0.15]], fold: [['hv', 2], ['hhv', 1], ['hvv', 1]], slarv: 0.15 },
     ficka: { has: ['vikt', 'ora'], may: [['skrynkel', 0.3], ['flack', 0.5], ['kaffe', 0.2], ['horn', 0.2]], fold: [['h', 1], ['hh', 1], ['hhh', 1], ['hv', 0.6]], slarv: 0.5 },
-    kok: { has: ['kaffe'], may: [['flack', 0.6], ['vikt', 0.4], ['sudd', 0.2], ['horn', 0.25]], fold: [['h', 1.5], ['v', 1], ['hh', 0.5]], slarv: 0.5 },
-    bord: { has: ['sudd'], may: [['kaffe', 0.8], ['vikt', 0.5], ['horn', 0.35], ['flack', 0.4]], fold: [['h', 1], ['v', 0.4]], slarv: 0.3 },
+    kok: { has: ['kaffe'], may: [['flack', 0.6], ['vikt', 0.4], ['horn', 0.25]], fold: [['h', 1.5], ['v', 1], ['hh', 0.5]], slarv: 0.5 },
+    bord: { has: [], may: [['kaffe', 0.8], ['vikt', 0.5], ['horn', 0.35], ['flack', 0.4]], fold: [['h', 1], ['v', 0.4]], slarv: 0.3 },
     // nästan slängd: skrynklad till en boll och utslätad igen
     korg: { has: ['skrynkel'], may: [['kaffe', 0.4], ['flack', 0.5], ['vikt', 0.2]], fold: [['h', 1]], slarv: 0.6 },
     ny: { has: [], may: [['flack', 0.5], ['ora', 0.3], ['horn', 0.2]], fold: [['h', 1]], slarv: 0.2 },
@@ -83,13 +83,16 @@
   // inget hundöra – rutans skugga följer inte ett avvikt hörn. reach: hur
   // långt ner (px) slitagen sitter, så att de hamnar på papperet också när
   // det är som kortast – kupongen som växer fram börjar med sju tomma rader.
-  // mid: matchbladet står still och innehållet rullar i det, så vecken sitter
-  // mitt på bladet – tvärs över och ibland på längden – och står still med
-  // bården och kanthålen. grows: papperet växer, så ett hörn som vikts in
-  // sitter inte nedtill, där det skulle flytta sig.
+  // mid: vecket tvärs över sitter mitt på matchbladet när det öppnas. rolls:
+  // rutan där innehållet rullar i papperet (matchbladets flikar, raderna på
+  // kupongen som växer fram). Vecken, fläckarna, kaffet och skrynklet där
+  // sitter i innehållet och följer med när det rullar; gulningen, hundörat
+  // och hörnen står still med kanten. grows: papperet växer. Ett hörn som
+  // vikts in sitter inte nedtill när papperet växer eller innehållet rullar
+  // – där skulle det flytta sig.
   const KINDS = {
-    bygge: { lives: [['ny', 0.5], ['kok', 1.5], ['bord', 1.5]], age: 0.35, reach: 520, grows: true },
-    match: { lives: [['ny', 0.5], ['kok', 1], ['bord', 1], ['ficka', 0.8]], age: 0.5, ear: false, reach: 640, mid: true },
+    bygge: { lives: [['ny', 0.5], ['kok', 1.5], ['bord', 1.5]], age: 0.35, reach: 520, grows: true, rolls: '.pb-rows' },
+    match: { lives: [['ny', 0.5], ['kok', 1], ['bord', 1], ['ficka', 0.8]], age: 0.5, ear: false, reach: 640, mid: true, rolls: '.mr-body' },
     omg: { lives: [['planbok', 1], ['ficka', 1], ['kok', 1.2], ['bord', 0.8], ['korg', 0.3]], age: 0.75 },
     kupong: { lives: [['planbok', 1], ['ficka', 1], ['kok', 1.2], ['bord', 0.8], ['korg', 0.4]], age: 0.8 },
     betyg: { lives: [['planbok', 2], ['ficka', 2], ['kok', 1], ['korg', 0.5]], age: 1 },
@@ -112,8 +115,7 @@
     if (on.has('flack')) p.flack = spots(r, a, reach);
     if (on.has('kaffe')) p.kaffe = coffee(r, a, reach);
     if (on.has('ora')) p.ora = { corner: ['tl', 'tr', 'br'][int(r, 0, 2)], s: int(r, 16, 28) };
-    if (on.has('horn')) p.horn = corner(r, a, k.grows, p.ora && p.ora.corner);
-    if (on.has('sudd')) p.sudd = erased(r, reach);
+    if (on.has('horn')) p.horn = corner(r, a, k.grows || !!k.rolls, p.ora && p.ora.corner);
     return p;
   }
 
@@ -271,36 +273,6 @@
       } else out.push({ ...one(), x: span(r, 0.08, 0.92), y: span(r, 70 * s, 880 * s), dx: 0 });
     }
     return out;
-  }
-
-  // Suddat: något skrivet med blyerts – streck att räkna med, ett klotter
-  // eller en pil – nästan bortsuddat, med smulor runt om.
-  function erased(r, reach) {
-    const s = reach / 900;
-    const kind = int(r, 0, 2);
-    let d = '';
-    if (kind === 0) {
-      for (let i = 0; i < 4; i++) {
-        const x = -9 + i * 5;
-        d += `M${f(x + jit(r, 0.8))} ${f(-7 + jit(r, 1))}L${f(x + jit(r, 0.8))} ${f(7 + jit(r, 1))}`;
-      }
-      d += `M-12 ${f(5 + jit(r, 1))}L10 ${f(-5 + jit(r, 1))}`;
-    } else if (kind === 1) {
-      const p = [];
-      for (let x = -20, i = 0; x < 22; x += span(r, 3, 6), i++) p.push([x, (i % 2 ? 5 : -5) + jit(r, 2)]);
-      d = line(p);
-    } else {
-      d = `M-18 ${f(6 + jit(r, 2))}Q-4 ${f(-10 + jit(r, 3))} 16 -2M16 -2L9 -6M16 -2L11 4`;
-    }
-    return {
-      x: span(r, 0.15, 0.85),
-      y: span(r, 80 * s, 800 * s),
-      rx: span(r, 22, 38),
-      ry: span(r, 9, 15),
-      rot: jit(r, 20),
-      d,
-      crumbs: Array.from({ length: int(r, 3, 7) }, () => [jit(r, 34), jit(r, 16), span(r, 0.8, 2)]),
-    };
   }
 
   // ---------- bilderna ----------
@@ -470,16 +442,6 @@
           `<ellipse cx=".7" rx="${f(c.rx + 0.6)}" ry="${f(ry - 0.5)}" fill="none" stroke="#7c4316" stroke-opacity="${(c.op * 0.55).toFixed(3)}" stroke-width="${f(c.w * 0.45)}"${dash}/>` +
           drops + '</g></g>');
       });
-    }
-
-    if (p.sudd) {
-      const e = p.sudd;
-      const x = e.x * W;
-      const crumbs = e.crumbs.map(([cx, cy, s]) => `<ellipse cx="${f(cx)}" cy="${f(cy)}" rx="${f(s)}" ry="${f(s * 0.6)}" fill="#a08670" fill-opacity=".35"/>`).join('');
-      mul.push(`<g transform="translate(${f(x)} ${f(e.y)}) rotate(${f(e.rot * 0.5)})">` +
-        `<ellipse rx="${f(e.rx * 1.15)}" ry="${f(e.ry * 1.3)}" fill="#6f6c69" fill-opacity=".05" filter="url(#b4)"/>` +
-        `<path d="${e.d}" fill="none" stroke="#6f6c69" stroke-opacity=".22" stroke-width="1.3" stroke-linecap="round"/>${crumbs}</g>`);
-      top.push(`<ellipse transform="translate(${f(x)} ${f(e.y)}) rotate(${f(e.rot)})" rx="${f(e.rx)}" ry="${f(e.ry)}" fill="#f8f2e4" fill-opacity=".34" filter="url(#b3)"/>`);
     }
 
     if (p.horn) {
