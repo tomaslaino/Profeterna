@@ -115,22 +115,26 @@ dialog.mr-modal .mr-head .mhead-teams { margin: 6px 0 0; }
 dialog.mr-modal .mhead-team,
 dialog.mr-modal .mhead-mid { font-weight: 700; color: var(--pp-ink); }
 dialog.mr-modal .mhead-mid .sub { color: var(--pp-ink-soft); }
-/* lagskölden som en blek stämpel bakom namnet, ytterst och lite snett, tryckt i
-   gråbrunt bläck – det vita i den blir papper. Rubriken klipper nertill
-   (.mhead har overflow: hidden), så skölden står på namnets nederkant och
-   sticker upp mot raden ovanför. */
-dialog.mr-modal .mhead-team { position: relative; }
+/* lagskölden som en stor, blek stämpel i gråbrunt bläck, lite snett i
+   rubrikens ytterkant med hälften utanför pappret – det vita i den blir
+   papper. Den står mot rubrikens nederkant (inte namnets, så att båda lagens
+   slutar lika även när bara det ena namnet bryts) och går ner bakom bården
+   till flikarnas linje, --ner under rubriken. Rubriken klipper inte; bladet
+   gör det vid kanterna. */
+dialog.mr-modal .mhead.mr-head { overflow: visible; }
 dialog.mr-modal .mhead-team .skold {
+  --s: 230px;
+  --ner: 82px;
   position: absolute;
   z-index: -1;
-  bottom: 2px;
-  left: -14px;
-  width: 84px;
-  height: 84px;
-  opacity: 0.2;
-  transform: rotate(-7deg);
+  bottom: calc(var(--ner) * -1);
+  left: calc(var(--s) / -2);
+  width: var(--s);
+  height: var(--s);
+  opacity: 0.1;
+  transform: rotate(-8deg);
 }
-dialog.mr-modal .mhead-team.away .skold { left: auto; right: -14px; transform: rotate(7deg); }
+dialog.mr-modal .mhead-team.away .skold { left: auto; right: calc(var(--s) / -2); transform: rotate(8deg); }
 dialog.mr-modal .mhead-team .skold img {
   filter: grayscale(1) sepia(0.45) contrast(1.15) brightness(0.82);
   mix-blend-mode: multiply;
@@ -560,8 +564,7 @@ dialog.mr-modal .mr-on { color: var(--pp-ok); }
   dialog.mr-modal .mhead.mr-head { padding: 24px 60px 0 16px; }
   dialog.mr-modal .mr-head .pp-brand { margin-bottom: 10px; }
   dialog.mr-modal .mr-head .mhead-meta { font-size: 12px; }
-  dialog.mr-modal .mhead-team .skold { left: -8px; width: 60px; height: 60px; }
-  dialog.mr-modal .mhead-team.away .skold { right: -8px; }
+  dialog.mr-modal .mhead-team .skold { --s: 160px; --ner: 73px; }
   dialog.mr-modal .mr-close { top: 18px; right: 14px; }
   dialog.mr-modal .mr-band { margin: 14px 16px 0; }
   /* flikarna fyller raden från kant till kant; får de inte plats rullar de */
