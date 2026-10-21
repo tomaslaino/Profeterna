@@ -268,6 +268,10 @@ li:first-child .dv-lrank { color: var(--stale); }
 .dv-lname { font-size: 15px; font-weight: 500; line-height: 1.25; min-width: 0; overflow: hidden; white-space: nowrap; text-overflow: ellipsis; }
 .dv-lname small { display: block; font-size: 12px; font-weight: 400; color: var(--muted); overflow: hidden; text-overflow: ellipsis; }
 li:first-child .dv-lname { font-weight: 650; }
+/* lagen i topplistorna: skölden framför namnet och placeringen, som i Tabeller */
+.dv-lname.dv-lteam { display: flex; align-items: center; gap: 10px; }
+.dv-lteam > span:last-child { min-width: 0; overflow: hidden; text-overflow: ellipsis; }
+.dv-lteam .skold { width: 22px; height: 22px; }
 .dv-lval { text-align: right; font-variant-numeric: tabular-nums; white-space: nowrap; }
 .dv-lval b { font-size: 15px; font-weight: 600; }
 .dv-lval small { display: block; font-size: 11px; color: var(--muted); }
@@ -540,6 +544,9 @@ dialog.dv-modal::backdrop { background: rgba(4, 9, 18, 0.62); backdrop-filter: b
   font-variant-numeric: lining-nums;
 }
 .dv-avatar.team { border-radius: 16px; font-size: 19px; }
+/* lagets sköld i stället för initialerna: fri, utan ring, som i tabellen */
+.dv-avatar.crest { border: 0; border-radius: 0; background: none; }
+.dv-avatar.crest .skold { width: 100%; height: 100%; }
 /* Spelarens bild (365Scores, ljus bakgrund) i samma guldring, något större än
    märket; tröjnumret i hörnet. Utan bild står märket som förut. */
 .dv-avatar.photo { position: relative; width: 76px; height: 76px; background: var(--bone, #f3ead9); }

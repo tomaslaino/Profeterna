@@ -229,6 +229,19 @@ button.analyze:hover,
    sträcks ut till samma höjd som det långa */
 .mr-body .grid2 { align-items: start; }
 
+/* Tabeller och Statistik: korten har samma luft i kanten som korten på
+   förstasidan, i Olympen och på Källor (22/24 px, 18/16 px i telefonen) */
+.card.dv-card { padding: 22px 24px; }
+/* topplistorna likaså: rubriken och placeringarna 24 px in, och radernas
+   markering när man pekar går 4 px utanför dem */
+.dv-leader { padding: 22px 20px 14px; }
+.dv-leader h4,
+.dv-leader .dv-lmore { margin-left: 4px; }
+@media (max-width: 520px) {
+  .card.dv-card { padding: 18px 16px; }
+  .dv-leader { padding: 18px 12px 10px; }
+}
+
 /* Korten under varandra på förstasidan – nästa omgång, omgången som pågår
    och de regerande – är en familj: samma luft i kanten som tipparnas kort och
    samma rubrik. Nästa omgång har guldkanten också på kupongsidan. */

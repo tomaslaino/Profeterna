@@ -22,5 +22,8 @@
     return `<span class="skold" aria-hidden="true">${src ? `<img src="${src}" alt="" decoding="async">` : ''}</span>`;
   }
 
-  window.Skoldar = { ready, img };
+  // finns en sköld för laget? (lagrutan visar annars initialerna)
+  const has = (name) => !!lag[name];
+
+  window.Skoldar = { ready, img, has };
 })();

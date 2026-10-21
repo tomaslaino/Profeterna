@@ -5,7 +5,7 @@
   display: grid;
   justify-items: center;
   gap: clamp(28px, 4vw, 44px);
-  padding-top: clamp(16px, 3vw, 40px);
+  padding-top: 8px;
   padding-bottom: clamp(48px, 7vw, 88px);
   text-align: center;
 }
@@ -30,7 +30,9 @@
   background: var(--meander) repeat-x 50% 50% / 14px 14px;
   opacity: 0.6;
 }
-.about-intro .page-title { margin: 0 0 20px; }
+/* rubriken står lika långt under menyn, och har lika mycket luft under sig,
+   som på de andra sidorna (theme.css) */
+.about-intro .page-title { margin: clamp(18px, 3vw, 34px) 0 24px; }
 .about-lede {
   margin: 0;
   max-width: 32ch;

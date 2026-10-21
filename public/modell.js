@@ -27,9 +27,18 @@ function sgn(x, d = 3) {
   return Math.round(Math.abs(x) * 10 ** d) === 0 ? `±${v}` : x > 0 ? `+${v}` : `−${v}`;
 }
 
+// Måttstockarnas namn i klarspråk. (Stod förr i app.js för matchrutan, som
+// inte visar dem längre.)
+const BASE = {
+  market: 'Spelbolagen',
+  closing: 'Spelbolagen vid avspark',
+  season: 'Bara årets mål',
+  naive: 'Ligasnittet',
+};
+
 // Måttstockarna i ordning från den enklaste till den svåraste, med
 // efterhandstestets nycklar (ss, nv, mk, cl) och journalens (season, naive,
-// market, closing). Namnen är matchrutans (BASE i app.js).
+// market, closing).
 const MEASURES = [
   { bt: 'nv', ev: 'naive', name: () => BASE.naive, short: 'Ligasnittet' },
   { bt: 'ss', ev: 'season', name: () => BASE.season, short: 'Årets mål' },

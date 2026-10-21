@@ -48,6 +48,11 @@ function esc(s) {
   }[c]));
 }
 
+// Lagets sköld för mörk botten (skoldar.js), och namnet med skölden framför
+// – samma i Tabeller, Statistik och lagrutan.
+const teamCrest = (name) => (window.Skoldar ? Skoldar.img(name, { dark: true }) : '');
+const teamName = (name) => `<span class="dv-tname">${teamCrest(name)}<span>${esc(name)}</span></span>`;
+
 async function getJSON(path) {
   const res = await fetch(path, { cache: 'no-cache' });
   if (!res.ok) throw new Error(res.status === 404 ? 'finns inte' : `HTTP ${res.status}`);
@@ -149,7 +154,7 @@ function leagueTable(rows) {
     const z = zoneOf(r.note);
     const gd = r.gd > 0 ? `+${r.gd}` : r.gd < 0 ? `−${-r.gd}` : '0';
     return `<tr class="dv-trow ${z ? z.cls : ''}" data-team="${esc(r.espnId)}" tabindex="0" title="${z ? esc(z.label) : ''}">` +
-      `<td class="c rank">${r.rank}</td><td class="team"><span class="dv-tname">${window.Skoldar ? Skoldar.img(r.name, { dark: true }) : ''}<span>${esc(r.name)}</span></span></td><td class="num">${r.played}</td>` +
+      `<td class="c rank">${r.rank}</td><td class="team">${teamName(r.name)}</td><td class="num">${r.played}</td>` +
       `<td class="num">${r.won}</td><td class="num">${r.drawn}</td><td class="num">${r.lost}</td>` +
       `<td class="num">${r.gf}–${r.ga}</td><td class="num">${gd}</td>` +
       `<td class="num pts">${r.points}${r.deductions ? `<sup title="${r.deductions} poängs avdrag">*</sup>` : ''}</td></tr>`;
@@ -509,11 +514,14 @@ function playerTableHtml(P) {
 // En rad i en topplista: spelaren med laget under namnet, eller laget med
 // placeringen i tabellen under – lika höga rader under Spelarna och Lagen.
 const playerRow = (p) => ({ attr: `data-pid="${esc(p.id)}"`, name: p.name, sub: p.team });
-const teamRow = (t) => ({ attr: t.espnId ? `data-team="${esc(t.espnId)}"` : 'disabled', name: t.name, sub: `${ordinal(t.rank)} plats` });
+// Laget har sin sköld framför namnet, som i Tabeller.
+const teamRow = (t) => ({ attr: t.espnId ? `data-team="${esc(t.espnId)}"` : 'disabled', name: t.name, sub: `${ordinal(t.rank)} plats`, crest: true });
 const leaderLi = (x, i, value, who) => {
   const r = who(x);
+  const name = `${esc(r.name)}<small>${esc(r.sub)}</small>`;
   return `<li><button type="button" class="dv-lrow" ${r.attr}>` +
-    `<span class="dv-lrank">${i + 1}</span><span class="dv-lname">${esc(r.name)}<small>${esc(r.sub)}</small></span>` +
+    `<span class="dv-lrank">${i + 1}</span>` +
+    (r.crest ? `<span class="dv-lname dv-lteam">${teamCrest(r.name)}<span>${name}</span></span>` : `<span class="dv-lname">${name}</span>`) +
     `<span class="dv-lval">${value(x)}</span></button></li>`;
 };
 
@@ -650,7 +658,7 @@ const T_GROUPS = [
 const TA = T_GROUPS.map((g) => g.id);
 const TCOLS = [
   { key: 'rank', label: '#', name: 'Placering', title: 'Lagets placering i tabellen just nu.', get: (t) => t.rank, cls: 'c rank', asc: true, in: ['tabell'], show: (t) => t.rank },
-  { key: 'name', label: 'Lag', get: (t) => t.name, text: true, cls: 'team dv-stick', in: TA, show: (t) => esc(t.name) },
+  { key: 'name', label: 'Lag', get: (t) => t.name, text: true, cls: 'team dv-stick', in: TA, show: (t) => teamName(t.name) },
   { key: 'm', label: 'S', name: 'Spelade matcher', title: 'Antal spelade ligamatcher.', get: (t) => t.m, cls: 'num', in: ['tabell'] },
   { key: 'w', label: 'V', name: 'Vunna', title: 'Vunna matcher – ger 3 poäng var.', get: (t) => t.w, cls: 'num', in: ['tabell'] },
   { key: 'd', label: 'O', name: 'Oavgjorda', title: 'Oavgjorda matcher – ger 1 poäng var.', get: (t) => t.d, cls: 'num', in: ['tabell'] },
@@ -927,9 +935,12 @@ const divName = () => state.data.divisions.find((x) => x.id === state.div).name;
 // Huvudet: märket (tröjnummer eller lagets två första bokstäver), namnet och
 // underrader som redan är escapade. Med photo står spelarens bild i ringen och
 // tröjnumret i hörnet; går bilden inte att ladda blir det märket som förut.
-function mhead(badge, title, subs, cls = '', photo = '') {
+// Med shield (lagets sköld) står skölden i stället för märket.
+function mhead(badge, title, subs, cls = '', photo = '', shield = '') {
   const shirt = /^\d+$/.test(badge || '') ? ' class="dv-shirt"' : '';
-  const av = photo
+  const av = shield
+    ? `<div class="dv-avatar${cls} crest">${shield}</div>`
+    : photo
     ? `<div class="dv-avatar photo${cls}"><img src="${esc(photo)}" alt="" onerror="this.parentNode.classList.remove('photo');this.remove()"><span${shirt}>${esc(badge)}</span></div>`
     : badge ? `<div class="dv-avatar${cls}">${esc(badge)}</div>` : '';
   return '<div class="dv-mhead">' + av +
@@ -1120,8 +1131,10 @@ async function openTeam(id, pick) {
   const squad = P.players.filter((p) => p.teamId === id)
     .sort((a, b) => (POS_ORDER[a.pos] ?? 9) - (POS_ORDER[b.pos] ?? 9) || (b.app || 0) - (a.app || 0) || a.name.localeCompare(b.name, 'sv'));
   const z = r && zoneOf(r.note);
+  // skölden som i tabellen, initialerna bara när laget saknar sköld
   let html = mhead(t.name.slice(0, 2).toUpperCase(), t.name,
-    [[divName(), r ? `${ordinal(r.rank)} plats` : null, z ? z.label : null].filter(Boolean).map(esc).join(' · ')], ' team');
+    [[divName(), r ? `${ordinal(r.rank)} plats` : null, z ? z.label : null].filter(Boolean).map(esc).join(' · ')], ' team',
+    '', window.Skoldar && Skoldar.has(t.name) ? teamCrest(t.name) : '');
   html += kpis([
     r ? [cell(r.points, { strong: true }), 'Poäng'] : null,
     r ? [`${r.gf}–${r.ga}`, 'Mål'] : null,
