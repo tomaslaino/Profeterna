@@ -239,19 +239,21 @@ dl.facts.dv-facts dd { font-variant-numeric: tabular-nums; }
   border: 1px solid var(--border);
   border-radius: var(--radius, 16px);
   box-shadow: var(--shadow-card);
-  padding: 14px 16px 12px;
+  padding: 18px 18px 10px;
   overflow: hidden;
 }
-.dv-leader h4 { margin: 0 0 8px; font-size: 11.5px; font-weight: 800; letter-spacing: 0.12em; text-transform: uppercase; color: var(--eyebrow, var(--muted)); }
+.dv-leader h4 { margin: 0 0 6px; font-size: 11.5px; font-weight: 800; letter-spacing: 0.12em; text-transform: uppercase; color: var(--eyebrow, var(--muted)); }
 .dv-leader ol { list-style: none; margin: 0; padding: 0; }
-.dv-leader li + li { border-top: 1px solid var(--hair); }
+/* Strecken mellan raderna börjar vid namnet, inte vid siffran. */
+.dv-leader li { position: relative; }
+.dv-leader li + li::before { content: ""; position: absolute; top: 0; left: calc(4px + 1rem + 14px); right: 0; border-top: 1px solid var(--hair); }
 .dv-lrow {
   display: grid;
-  grid-template-columns: 1.4rem 1fr auto;
+  grid-template-columns: 1rem 1fr auto;
   align-items: center;
-  gap: 8px;
+  gap: 14px;
   width: 100%;
-  padding: 7px 2px;
+  padding: 11px 4px;
   font: inherit;
   text-align: left;
   color: inherit;
@@ -262,13 +264,13 @@ dl.facts.dv-facts dd { font-variant-numeric: tabular-nums; }
   cursor: pointer;
 }
 .dv-lrow:hover { background: var(--hair); }
-.dv-lrank { font-size: 12px; font-weight: 700; color: var(--muted); text-align: center; }
+.dv-lrank { font-size: 13px; font-weight: 600; color: var(--muted); text-align: center; font-variant-numeric: tabular-nums; }
 li:first-child .dv-lrank { color: var(--stale); }
-.dv-lname { font-size: 14px; font-weight: 600; line-height: 1.25; min-width: 0; overflow: hidden; text-overflow: ellipsis; }
-.dv-lname small { display: block; font-size: 12px; font-weight: 400; color: var(--muted); }
-li:first-child .dv-lname { font-weight: 750; }
+.dv-lname { font-size: 15px; font-weight: 500; line-height: 1.25; min-width: 0; overflow: hidden; white-space: nowrap; text-overflow: ellipsis; }
+.dv-lname small { display: block; font-size: 12px; font-weight: 400; color: var(--muted); overflow: hidden; text-overflow: ellipsis; }
+li:first-child .dv-lname { font-weight: 650; }
 .dv-lval { text-align: right; font-variant-numeric: tabular-nums; white-space: nowrap; }
-.dv-lval b { font-size: 15px; }
+.dv-lval b { font-size: 15px; font-weight: 600; }
 .dv-lval small { display: block; font-size: 11px; color: var(--muted); }
 .dv-lempty { padding: 8px 2px; color: var(--muted); font-size: 13px; }
 .dv-lnote { margin: 8px 0 0; font-size: 12px; color: var(--muted); }
@@ -304,6 +306,8 @@ table.dv-league .num, table.dv-players .num, table.dv-teams .num, table.dv-squad
 table.dv-league .c, table.dv-players .c, table.dv-squad .c { text-align: center; }
 table.dv-league .rank, table.dv-players .rank { color: var(--muted); font-weight: 700; width: 2.2rem; }
 table.dv-league .team { font-weight: 600; }
+/* skölden till vänster, ett långt namn bryts bredvid den i telefonen */
+.dv-tname { display: flex; align-items: center; gap: 10px; }
 table.dv-league .pts { font-weight: 800; }
 /* korten står efter poängen som en extrauppgift, lite nedtonade */
 table.dv-league .dv-cards { white-space: nowrap; padding-left: 28px; font-size: 13px; color: var(--muted); }
@@ -757,6 +761,8 @@ button.dv-meter-row:hover { background: var(--hair); }
   /* tabellen ryms med poängen i telefonen, utan att man behöver svepa – och
      kortet har samma smala kant som spelartabellens */
   table.dv-league td, table.dv-league th { padding-left: 3px; padding-right: 3px; }
+  .dv-tname { gap: 7px; }
+  .dv-tname .skold { width: 16px; height: 16px; }
   .card.dv-card.dv-wide,
   .card.dv-card.dv-tablecard { padding-left: 10px; padding-right: 10px; }
   .dv-filters .dv-select { flex: 1 1 45%; }

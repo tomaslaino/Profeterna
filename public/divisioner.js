@@ -154,7 +154,7 @@ function leagueTable(rows, { compact = false } = {}) {
     const z = zoneOf(r.note);
     const gd = r.gd > 0 ? `+${r.gd}` : r.gd < 0 ? `−${-r.gd}` : '0';
     return `<tr class="dv-trow ${z ? z.cls : ''}" data-team="${esc(r.espnId)}" tabindex="0" title="${z ? esc(z.label) : ''}">` +
-      `<td class="c rank">${r.rank}</td><td class="team">${esc(r.name)}</td><td class="num">${r.played}</td>` +
+      `<td class="c rank">${r.rank}</td><td class="team"><span class="dv-tname">${window.Skoldar ? Skoldar.img(r.name, { dark: true }) : ''}<span>${esc(r.name)}</span></span></td><td class="num">${r.played}</td>` +
       `<td class="num">${r.won}</td><td class="num">${r.drawn}</td><td class="num">${r.lost}</td>` +
       `<td class="num">${r.gf}–${r.ga}</td><td class="num">${gd}</td>` +
       `<td class="num pts">${r.points}${r.deductions ? `<sup title="${r.deductions} poängs avdrag">*</sup>` : ''}</td>` +
@@ -811,15 +811,16 @@ function teamRows(T, P) {
   return T.teams.map((t) => ({ ...t, sq: t.espnId ? sq.get(t.espnId) || null : null }));
 }
 
-// Lagen som topplistor: kortets rader öppnar lagkortet när det finns.
-function teamTop(title, list, value, { note, asc = false, get } = {}) {
+// Lagen som topplistor: en rad per lag, bara namnet och talet – vad talet
+// betyder står i rubrikens förklaring. Raderna öppnar lagkortet när det finns.
+function teamTop(title, list, value, { tip, asc = false, get } = {}) {
   const rows = list.filter((t) => get(t) != null)
     .sort((a, b) => (asc ? get(a) - get(b) : get(b) - get(a)) || a.name.localeCompare(b.name, 'sv')).slice(0, 5);
   const li = rows.map((t, i) => `<li><button type="button" class="dv-lrow"${t.espnId ? ` data-team="${esc(t.espnId)}"` : ' disabled'}>` +
-    `<span class="dv-lrank">${i + 1}</span><span class="dv-lname">${esc(t.name)}<small>${ordinal(t.rank)} i tabellen</small></span>` +
+    `<span class="dv-lrank">${i + 1}</span><span class="dv-lname">${esc(t.name)}</span>` +
     `<span class="dv-lval">${value(t)}</span></button></li>`).join('');
-  return `<section class="dv-leader"><h4>${esc(title)}</h4>` +
-    `<ol>${li || '<li class="dv-lempty">okänt</li>'}</ol>${note ? `<p class="dv-lnote">${note}</p>` : ''}</section>`;
+  return `<section class="dv-leader"><h4${tipAttr(title, tip)}>${esc(title)}</h4>` +
+    `<ol>${li || '<li class="dv-lempty">okänt</li>'}</ol></section>`;
 }
 
 function teamsView(dv, P, T) {
@@ -845,20 +846,16 @@ function teamsView(dv, P, T) {
     truppen: P && !P.unknown ? `ESPN-trupperna, hämtat ${when(P.source.fetchedAt)}` : '',
   }[f.cols];
 
-  // Det som säger mest inför 1X2: hur bra lagen är (modellens styrka, med
-  // motståndet inräknat), vilka som tabellen gör för bra eller för dåliga
-  // (poäng mot chanserna, som brukar jämna ut sig), var krysset ligger nära
-  // och vilka marknaden har missat.
-  const strength = (t) => `<b>${delta(t.str, { d: 2, dead: 0.005 })}</b><small>mot snittlaget</small>`;
-  const vsXg = (t) => `<b>${delta(xpd(t), { d: 1 })}</b><small>${t.fd.xg.pts} p · värda ${num(t.fd.xg.xp, 1)}</small>`;
+  // Tre topplistor, en för varje tecken: vilka som vinner (1), vilka som
+  // förlorar (2) och vilka som spelar lika (X). Poäng mot chanserna och mot
+  // oddsen står i tabellen Alla lag.
+  const strength = (t) => `<b>${delta(t.str, { d: 2, dead: 0.005 })}</b>`;
+  const strTip = 'Modellens väntade målskillnad per match mot ett snittlag i divisionen, med motståndet inräknat.';
   const leaders =
-    teamTop('Starkast', all, strength, { get: (t) => t.str, note: 'Modellens väntade målskillnad per match mot ett snittlag i divisionen, med motståndet inräknat' }) +
-    teamTop('Svagast', all, strength, { get: (t) => t.str, asc: true, note: 'Modellens väntade målskillnad per match mot ett snittlag i divisionen, med motståndet inräknat' }) +
-    teamTop('Kryssar gärna', all, (t) => `<b>${pct(xdraw(t))}</b><small>${t.fd.xg.d} kryss på ${t.fd.xg.n}</small>`,
-      { get: xdraw, note: 'Chansen till oavgjort i lagets matcher, i snitt, räknat ur båda lagens xG' }) +
-    teamTop('Förtjänar mer', all, vsXg, { get: xpd, asc: true, note: 'Färre poäng än chanserna (xG) var värda' }) +
-    teamTop('Förtjänar mindre', all, vsXg, { get: xpd, note: 'Fler poäng än chanserna (xG) var värda' }) +
-    teamTop('Slår oddsen', all, (t) => `<b>${delta(vsOdds(t), { d: 1 })}</b><small>${t.fd.mkt.pts} p · ${num(t.fd.mkt.xp, 1)} väntat</small>`, { get: vsOdds, note: 'Poäng mot vad oddsen vid avspark väntade sig' });
+    teamTop('Starkast', all, strength, { get: (t) => t.str, tip: strTip }) +
+    teamTop('Svagast', all, strength, { get: (t) => t.str, asc: true, tip: strTip }) +
+    teamTop('Kryssar gärna', all, (t) => `<b>${pct(xdraw(t))}</b>`,
+      { get: xdraw, tip: 'Chansen till oavgjort i lagets matcher, i snitt, räknat ur båda lagens xG.' });
 
   return '<div class="dv-leaders">' + leaders + '</div>' +
     card('Alla lag', {
@@ -1504,7 +1501,8 @@ window.addEventListener('hashchange', () => { if (state.data && !state.data.erro
     if (tl) tl.textContent = '';
   }
   try {
-    state.data = await getJSON('data/divisions.json');
+    // Sköldarnas index hämtas redan av skoldar.js; tabellen väntar in det.
+    [state.data] = await Promise.all([getJSON('data/divisions.json'), window.Skoldar && Skoldar.ready]);
   } catch (err) {
     $('#divisions').innerHTML = `<p class="empty">Kunde inte läsa divisionsstatistiken: ${esc(err.message)}</p>`;
     return;
