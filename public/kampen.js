@@ -164,7 +164,8 @@ function kampFace(g, size = '') {
 
 // Ställningen som en prispall uppe på Olympen: kropparna från kröningen
 // (KRONAN_KROPPAR i kronan.js) på marmorsocklar, ettan i mitten med strålar
-// bakom sig. Lika placering står lika högt. Modellen står nedanför.
+// bakom sig. Lika placering står lika högt. Modellen står nedanför. Före
+// första omgången står de utnämnda på förhand där (kampEmpty).
 
 // Berget bakom pallen: en dimmig kam längst bak, Olympen framför med snö på
 // topparna.
@@ -541,9 +542,19 @@ const KAMP_HJALP = '<details class="help km-help"><summary>Så räknas poängen<
   'Plus betyder att du fick fler rätt än modellen trodde, minus färre. ' +
   'Bäst i omgången blir Omgångens orakel och sämst Omgångens Ikaros.</p></details>';
 
+// Före första omgången står de som utnämndes på förhand (KRONAN_START i
+// kronan.js) på pallen: oraklet högst i mitten, Ikaros lägst och resten
+// emellan. Utan kröningen står alla lika högt.
 function kampEmpty(gang) {
-  const cols = gang.map((g) => ({ g, rank: 1, cap: `<b class="km-name" title="${esc(g.name)}">${esc(kampSurname(g.name))}</b>` }));
-  return '<div class="card km-card km-empty">' + kampPall(cols, true) +
+  const start = typeof KRONAN_START !== 'undefined' ? KRONAN_START : null;
+  const step = (g) => (!start ? 0 : start.orakel.includes(g.id) ? 0 : start.ikaros.includes(g.id) ? 2 : 1);
+  const n = [0, 1].map((s) => gang.filter((g) => step(g) === s).length);
+  const cols = [...gang].sort((a, b) => step(a) - step(b)).map((g) => ({
+    g,
+    rank: [1, 1 + n[0], 1 + n[0] + n[1]][step(g)],
+    cap: `<b class="km-name" title="${esc(g.name)}">${esc(kampSurname(g.name))}</b>`,
+  }));
+  return '<div class="card km-card km-empty">' + kampPall(cols, !start) +
     '<p class="km-empty-title">Alla står på noll.</p>' +
     '<p><a class="kp-btn" href="#kupong">Till omgången</a></p></div>';
 }
