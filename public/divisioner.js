@@ -1416,12 +1416,13 @@ function wire() {
     state.pf.limit = 60;
     updatePlayerTable();
   });
-  // Från spelarkortet till lagets trupp.
-  document.addEventListener('click', (e) => {
-    const b = e.target.closest('[data-team-open]');
-    if (b) openTeam(b.dataset.teamOpen, 'trupp');
-  });
 }
+
+// Från spelarkortet till lagets trupp (även i matchbladet).
+document.addEventListener('click', (e) => {
+  const b = e.target.closest('[data-team-open]');
+  if (b) openTeam(b.dataset.teamOpen, 'trupp');
+});
 
 // Adressen #pl/spelare väljer division och vy (länkbart). Äldre länkar
 // #pl (bara division) fungerar också.
@@ -1452,9 +1453,57 @@ function apply() {
   if (view) window.scrollTo({ top: Math.min(window.scrollY, ($('#divisions').offsetTop || 0) - 8) });
 }
 
-window.addEventListener('hashchange', () => { if (state.data && !state.data.error) apply(); });
+// ---------- spelarkortet i matchbladet ----------
+
+// Förstasidan har ingen #divisions: där läser matchbladet (matchruta.js) in
+// filen med import() bara för spelarkorten, och sidan ritas inte.
+// Spelarfilerna har 365Scores id för bilden (ph), samma id som startelvorna.
+const EMBEDDED = !document.getElementById('divisions');
+let embedLoad = null;
+function embedData() {
+  if (!embedLoad) {
+    embedLoad = getJSON('data/divisions.json')
+      .catch(() => ({ divisions: [] }))
+      .then((d) => { state.data = d; });
+  }
+  return embedLoad;
+}
+if (EMBEDDED) {
+  window.Spelarkort = {
+    // 365Scores athleteId → spelarens id i divisionens spelarfil.
+    async index(div) {
+      await embedData();
+      const P = await loadPlayers(div);
+      return new Map(P.unknown ? [] : P.players.filter((p) => p.ph).map((p) => [p.ph[0], p.id]));
+    },
+    async open(div, id) {
+      await embedData();
+      if ((await loadPlayers(div)).unknown) return;
+      state.div = div;
+      openPlayer(id);
+    },
+    // Lagkortet på fliken Truppen (ESPN:s lag-id).
+    async team(div, espnId) {
+      await embedData();
+      if ((await loadPlayers(div)).unknown) return;
+      state.div = div;
+      openTeam(espnId, 'trupp');
+    },
+  };
+}
+
+window.addEventListener('hashchange', () => {
+  // Matchbladet stängs eller byter match: kortet går med.
+  if (EMBEDDED) {
+    const m = document.getElementById('dv-modal');
+    if (m && m.open) m.close();
+    return;
+  }
+  if (state.data && !state.data.error) apply();
+});
 
 (async function init() {
+  if (EMBEDDED) return;
   // Smal skärm: rulla fliklistan så att den aktiva länken syns.
   const cur = document.querySelector('.tabs [aria-current="page"]');
   if (cur) cur.parentElement.scrollLeft = cur.offsetLeft - 16;
