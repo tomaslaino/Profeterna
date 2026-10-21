@@ -494,8 +494,9 @@
   // ---------- allas tips på papperet: uppgörelsen och gängets kupong ----------
 
   // Papperet: märket, i hörnet spelstoppet eller betyget och stämpeln
-  // emellan, och bården under. cls: fler klasser på papperet.
-  const paperTop = (corner, cls = '', stamp = '') => `<div class="pp-wrap sm-wrap"><div class="pp pp-fill sm-sheet${cls}" id="sm-sheet">` +
+  // emellan, och bården under. cls: fler klasser på papperet. Omgångens id
+  // ger papperet samma slitage när man fyller i och efteråt (slitage.js).
+  const paperTop = (corner, cls = '', stamp = '') => `<div class="pp-wrap sm-wrap"><div class="pp pp-fill sm-sheet${cls}" id="sm-sheet"${SM.data ? ` data-slitage="omg:${esc(SM.data.id)}"` : ''}>` +
     '<div class="sm-sheet-head"><p class="pp-brand"><img src="logo.svg" alt="" width="20" height="20">Matchfixarna<span>Kupong</span></p>' +
     `${stamp}${corner}</div><div class="pp-band" aria-hidden="true"></div>`;
   const stopBox = (s) => `<div class="pp-stop"><span>Spelstopp</span><b>${esc(fWeekdayTime.format(new Date(Math.min(...kicks(s)))))}</b></div>`;

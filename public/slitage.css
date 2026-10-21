@@ -1,0 +1,26 @@
+/* Slitaget på papperet (slitage.js): två bilder över papperet – den första
+   multipliceras med trycket (gulning, veck, fläckar, kaffe, blyerts), den
+   andra lägger det ljusa överst (nött tryck i vecken, suddet, hundörat).
+   Över allt på papperet, också raderna som står kvar när man bläddrar
+   (z-index 3), så att de inte blir ljusa remsor i det gulnade, och utan att
+   ta emot klick. */
+
+[data-sl]::before,
+[data-sl]::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  z-index: 4;
+  pointer-events: none;
+  background: 0 0 / 100% 100% no-repeat;
+}
+[data-sl]::before { background-image: var(--sl-mul, none); mix-blend-mode: multiply; }
+[data-sl]::after { background-image: var(--sl-top, none); }
+
+/* matchbladets papper är rutan själv */
+dialog.mr-modal #match-detail-view[data-sl] { position: relative; }
+
+@media print {
+  [data-sl]::before,
+  [data-sl]::after { content: none; }
+}
