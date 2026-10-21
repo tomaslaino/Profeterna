@@ -4,15 +4,14 @@
 //
 // Papperet (papper.css, matchblad.css) ser använt ut: alltid gulnat, och
 // oftast vikt – på mitten, i tre, i fyra eller i åtta, ibland snett eller
-// två gånger nästan på samma ställe – eller skrynklat, med en kaffering,
-// fläckar, ett hundöra eller ett hörn som vikts in.
+// två gånger nästan på samma ställe – med en kaffering, fläckar, ett
+// hundöra eller ett hörn som vikts in.
 // Varje papper har haft ett liv – i plånboken, i fickan, på köksbordet, på
-// skrivbordet, nästan i papperskorgen eller (sällan) knappt något alls – och
-// slitagen hör ihop med det (LIVES). Vilket liv,
-// var slitagen sitter och hur de ser ut slumpas ur papperets nyckel –
-// omgångens id för gängets kupong, kupongens id, matchens id för
-// matchbladet – så att samma papper ser likadant ut varje gång det ritas,
-// men inga två papper är slitna på samma sätt.
+// skrivbordet eller (sällan) knappt något alls – och slitagen hör ihop med
+// det (LIVES). Vilket liv, var slitagen sitter och hur de ser ut slumpas ur
+// papperets nyckel – omgångens id för gängets kupong, kupongens id, matchens
+// id för matchbladet – så att samma papper ser likadant ut varje gång det
+// ritas, men inga två papper är slitna på samma sätt.
 //
 // Slitaget är två bilder (svg) över papperet: ::before multipliceras med
 // trycket (gulningen, vecken, fläckarna, ringarna) och ::after lägger det
@@ -69,11 +68,9 @@
   // alla papper.
   const LIVES = {
     planbok: { has: ['vikt'], may: [['flack', 0.7], ['ora', 0.4], ['kaffe', 0.2], ['horn', 0.15]], fold: [['hv', 2], ['hhv', 1], ['hvv', 1]], slarv: 0.15 },
-    ficka: { has: ['vikt', 'ora'], may: [['skrynkel', 0.3], ['flack', 0.5], ['kaffe', 0.2], ['horn', 0.2]], fold: [['h', 1], ['hh', 1], ['hhh', 1], ['hv', 0.6]], slarv: 0.5 },
+    ficka: { has: ['vikt', 'ora'], may: [['flack', 0.5], ['kaffe', 0.2], ['horn', 0.2]], fold: [['h', 1], ['hh', 1], ['hhh', 1], ['hv', 0.6]], slarv: 0.5 },
     kok: { has: ['kaffe'], may: [['flack', 0.6], ['vikt', 0.4], ['horn', 0.25]], fold: [['h', 1.5], ['v', 1], ['hh', 0.5]], slarv: 0.5 },
     bord: { has: [], may: [['kaffe', 0.8], ['vikt', 0.5], ['horn', 0.35], ['flack', 0.4]], fold: [['h', 1], ['v', 0.4]], slarv: 0.3 },
-    // nästan slängd: skrynklad till en boll och utslätad igen
-    korg: { has: ['skrynkel'], may: [['kaffe', 0.4], ['flack', 0.5], ['vikt', 0.2]], fold: [['h', 1]], slarv: 0.6 },
     ny: { has: [], may: [['flack', 0.5], ['ora', 0.3], ['horn', 0.2]], fold: [['h', 1]], slarv: 0.2 },
   };
   // Vilka liv papperet kan ha haft och hur slitet det är (0–1): kupongen
@@ -85,7 +82,7 @@
   // det är som kortast – kupongen som växer fram börjar med sju tomma rader.
   // mid: vecket tvärs över sitter mitt på matchbladet när det öppnas. rolls:
   // rutan där innehållet rullar i papperet (matchbladets flikar, raderna på
-  // kupongen som växer fram). Vecken, fläckarna, kaffet och skrynklet där
+  // kupongen som växer fram). Vecken, fläckarna och kaffet där
   // sitter i innehållet och följer med när det rullar; gulningen, hundörat
   // och hörnen står still med kanten. grows: papperet växer. Ett hörn som
   // vikts in sitter inte nedtill när papperet växer eller innehållet rullar
@@ -93,9 +90,9 @@
   const KINDS = {
     bygge: { lives: [['ny', 0.5], ['kok', 1.5], ['bord', 1.5]], age: 0.35, reach: 520, grows: true, rolls: '.pb-rows' },
     match: { lives: [['ny', 0.5], ['kok', 1], ['bord', 1], ['ficka', 0.8]], age: 0.5, ear: false, reach: 640, mid: true, rolls: '.mr-body' },
-    omg: { lives: [['planbok', 1], ['ficka', 1], ['kok', 1.2], ['bord', 0.8], ['korg', 0.3]], age: 0.75 },
-    kupong: { lives: [['planbok', 1], ['ficka', 1], ['kok', 1.2], ['bord', 0.8], ['korg', 0.4]], age: 0.8 },
-    betyg: { lives: [['planbok', 2], ['ficka', 2], ['kok', 1], ['korg', 0.5]], age: 1 },
+    omg: { lives: [['planbok', 1], ['ficka', 1], ['kok', 1.2], ['bord', 0.8]], age: 0.75 },
+    kupong: { lives: [['planbok', 1], ['ficka', 1], ['kok', 1.2], ['bord', 0.8]], age: 0.8 },
+    betyg: { lives: [['planbok', 2], ['ficka', 2], ['kok', 1]], age: 1 },
   };
 
   function plan(kind, key) {
@@ -111,7 +108,6 @@
     const reach = k.reach || 900;
     p.gul = aged(r, k.age);
     if (on.has('vikt')) p.vikt = folds(r, life.fold, reach, r() < life.slarv, k.mid);
-    if (on.has('skrynkel')) p.skrynkel = crumpled(r, a);
     if (on.has('flack')) p.flack = spots(r, a, reach);
     if (on.has('kaffe')) p.kaffe = coffee(r, a, reach);
     if (on.has('ora')) p.ora = { corner: ['tl', 'tr', 'br'][int(r, 0, 2)], s: int(r, 16, 28) };
@@ -195,20 +191,6 @@
       }
     }
     return out;
-  }
-
-  // Skrynklat: knycklat till en boll och utslätat igen, så att hela papperet
-  // är fullt av korta veck. Vecken slumpas när de ritas, ur ett eget frö.
-  function crumpled(r, a) {
-    const c = span(r, 55, 85);
-    return {
-      seed: `skrynkel:${int(r, 1, 1e9)}`,
-      c,
-      cols: Math.max(5, Math.round(860 / c)),
-      dens: span(r, 0.5, 0.7),
-      op: span(r, 0.14, 0.22) * a,
-      face: span(r, 0.02, 0.04) * a,
-    };
   }
 
   // Ett hörn som vikts in och slätats ut igen: ett snett veck tvärs över
@@ -304,64 +286,6 @@
           '<stop offset=".4" stop-color="#c9a46a" stop-opacity="0"/></linearGradient>');
         bmul.push('<rect width="100%" height="100%" fill="url(#s)"/>');
       }
-    }
-
-    // Skrynklat: ett nät av korta veck med några långa tvärs igenom, och
-    // ytorna mellan vecken fångar ljuset olika. Nätet slumpas rad för rad
-    // uppifrån, så att ett papper som växer bara får fler rader.
-    if (p.skrynkel) {
-      const k = p.skrynkel;
-      const q = rng(k.seed);
-      const dark = [[], [], []];
-      const lite = [[], []];
-      const face = [[], [], [], []]; // mörk, mörkare, ljus, ljusare
-      const seg = (A, B) => `M${f(A[0])} ${f(A[1])}L${f(B[0])} ${f(B[1])}`;
-      const edge = (A, B, odds = k.dens) => {
-        if (q() > odds) return;
-        const s = q();
-        dark[s < 0.5 ? 0 : s < 0.85 ? 1 : 2].push(seg(A, B));
-        if (s > 0.3) lite[q() < 0.5 ? 0 : 1].push(seg(A, B));
-      };
-      const tri = (A, B, C) => {
-        const v = jit(q, 1);
-        if (Math.abs(v) > 0.35) face[(v < 0 ? 0 : 2) + (Math.abs(v) > 0.75 ? 1 : 0)].push(`${line([A, B, C])}Z`);
-      };
-      let prev = null;
-      // raderna står olika tätt, så att nätet inte blir ett rutnät
-      for (let y = -k.c; y < Y + 2 * k.c; y += k.c * span(q, 0.65, 1.35)) {
-        const row = [];
-        for (let i = -1; i <= k.cols + 1; i++) row.push([((i + jit(q, 0.45)) / k.cols) * W, y + jit(q, 0.4) * k.c]);
-        if (prev) {
-          for (let i = 0; i + 1 < row.length; i++) {
-            const [A, B, C, D] = [prev[i], prev[i + 1], row[i], row[i + 1]];
-            edge(A, B);
-            edge(A, C);
-            if (q() < 0.5) {
-              edge(A, D, 0.9);
-              tri(A, B, D);
-              tri(A, D, C);
-            } else {
-              edge(B, C, 0.9);
-              tri(A, B, C);
-              tri(B, D, C);
-            }
-          }
-          // ett långt veck tvärs igenom, där bollen knycklades först
-          if (q() < 0.22) {
-            const t = q() * Math.PI;
-            const [x, L] = [q() * W, span(q, 160, 420)];
-            const [ux, uy] = [(Math.cos(t) * L) / 2, (Math.sin(t) * L) / 2];
-            dark[2].push(seg([x - ux, y - uy], [x + ux, y + uy]));
-            lite[q() < 0.5 ? 0 : 1].push(seg([x - ux, y - uy], [x + ux, y + uy]));
-          }
-        }
-        prev = row;
-      }
-      const fill = (d, c, o) => (d.length ? `<path d="${d.join('')}" fill="${c}" fill-opacity="${o.toFixed(3)}"/>` : '');
-      mul.push(fill(face[0], '#9c7a4c', k.face * 0.6), fill(face[1], '#9c7a4c', k.face));
-      top.push(fill(face[2], '#fffaf0', k.face * 1.4), fill(face[3], '#fffaf0', k.face * 2.4));
-      dark.forEach((d, n) => d.length && mul.push(`<path d="${d.join('')}" fill="none" stroke="#6b4c2a" stroke-opacity="${(k.op * [0.4, 0.7, 1][n]).toFixed(3)}" stroke-width=".8"/>`));
-      lite.forEach((d, n) => d.length && top.push(`<path d="${d.join('')}" transform="translate(${n ? '.7 .5' : '-.7 -.5'})" fill="none" stroke="#fffaf0" stroke-opacity=".45" stroke-width=".9"/>`));
     }
 
     if (p.vikt) {
