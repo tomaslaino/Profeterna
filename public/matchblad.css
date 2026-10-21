@@ -115,12 +115,22 @@ dialog.mr-modal .mr-head .mhead-teams { margin: 6px 0 0; }
 dialog.mr-modal .mhead-team,
 dialog.mr-modal .mhead-mid { font-weight: 700; color: var(--pp-ink); }
 dialog.mr-modal .mhead-mid .sub { color: var(--pp-ink-soft); }
-/* lagskölden ytterst, namnet in mot ställningen */
-dialog.mr-modal .mhead-team { display: flex; align-items: center; gap: 14px; }
-dialog.mr-modal .mhead-team.away { flex-direction: row-reverse; }
-dialog.mr-modal .mhead-team .skold { width: 44px; height: 44px; }
-/* skölden tryckt i bläck på pappret: gråbrun i stället för lagets färger, och
-   det vita i den blir papper */
+/* lagskölden som en blek stämpel bakom namnet, ytterst och lite snett, tryckt i
+   gråbrunt bläck – det vita i den blir papper. Rubriken klipper nertill
+   (.mhead har overflow: hidden), så skölden står på namnets nederkant och
+   sticker upp mot raden ovanför. */
+dialog.mr-modal .mhead-team { position: relative; }
+dialog.mr-modal .mhead-team .skold {
+  position: absolute;
+  z-index: -1;
+  bottom: 2px;
+  left: -14px;
+  width: 84px;
+  height: 84px;
+  opacity: 0.2;
+  transform: rotate(-7deg);
+}
+dialog.mr-modal .mhead-team.away .skold { left: auto; right: -14px; transform: rotate(7deg); }
 dialog.mr-modal .mhead-team .skold img {
   filter: grayscale(1) sepia(0.45) contrast(1.15) brightness(0.82);
   mix-blend-mode: multiply;
@@ -550,14 +560,8 @@ dialog.mr-modal .mr-on { color: var(--pp-ok); }
   dialog.mr-modal .mhead.mr-head { padding: 24px 60px 0 16px; }
   dialog.mr-modal .mr-head .pp-brand { margin-bottom: 10px; }
   dialog.mr-modal .mr-head .mhead-meta { font-size: 12px; }
-  /* i telefonen står skölden ovanför namnet, så att namnen får hela bredden */
-  dialog.mr-modal .mhead-team { flex-direction: column; align-items: flex-start; gap: 6px; }
-  dialog.mr-modal .mhead-team.away { flex-direction: column; align-items: flex-end; }
-  dialog.mr-modal .mhead-team .skold { width: 30px; height: 30px; }
-  /* sköldarna på samma linje även när namnen har olika många rader, och
-     ställningen i höjd med namnens första rad */
-  dialog.mr-modal .mr-head .mhead-teams { align-items: start; }
-  dialog.mr-modal .mhead-mid { white-space: nowrap; padding-top: 33px; }
+  dialog.mr-modal .mhead-team .skold { left: -8px; width: 60px; height: 60px; }
+  dialog.mr-modal .mhead-team.away .skold { right: -8px; }
   dialog.mr-modal .mr-close { top: 18px; right: 14px; }
   dialog.mr-modal .mr-band { margin: 14px 16px 0; }
   /* flikarna fyller raden från kant till kant; får de inte plats rullar de */
