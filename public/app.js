@@ -208,7 +208,8 @@ async function loadMatches() {
   const el = $('#match-list');
   el.innerHTML = '<p class="empty">Laddar …</p>';
   try {
-    state.all = await getJSON('data/matches.json');
+    // Sköldarnas index hämtas samtidigt, så att listan ritas med dem.
+    [state.all] = await Promise.all([getJSON('data/matches.json'), window.Skoldar && Skoldar.ready]);
     if (window.Spoiler) Spoiler.useMatches(state.all.matches);
     renderMatchList();
   } catch (err) {
@@ -351,6 +352,12 @@ function tipTitle(m) {
   return m.f ? `Prognosen i efterhand ${listOdds(m.f.p).join(' · ')}` : '';
 }
 
+// Lagnamnet i listan med skölden framför (skoldar.js), i varianten för mörk
+// botten som i Tabeller. Skölden och namnet hålls ihop när raden bryts.
+function listTeam(name) {
+  return `<span class="mteam">${window.Skoldar ? Skoldar.img(name, { dark: true }) : ''}<span>${esc(name)}</span></span>`;
+}
+
 // Spelad match: spelikonen och resultatet i var sin fast kolumn (theme.css
 // .mside-res), så att båda står i rak linje rad för rad.
 function matchRow(m) {
@@ -371,7 +378,7 @@ function matchRow(m) {
   return `<button type="button" class="mrow" data-id="${esc(m.id)}">` +
     `<span class="mtime">${esc(fTime.format(new Date(m.kickoff)))}</span>` +
     `<span class="ctag" title="${esc(compOf(m.comp).name)}">${esc(compOf(m.comp).short)}</span>` +
-    `<span class="mteams">${esc(m.home)}<span class="vs">–</span>${esc(m.away)}` +
+    `<span class="mteams">${listTeam(m.home)}<span class="vs">–</span>${listTeam(m.away)}` +
     `${m.round ? `<span class="sub">${esc(m.round)}</span>` : ''}</span>` +
     `<span class="mside${m.completed && m.score ? ' mside-res' : ' mside-odds'}">${side}</span></button>`;
 }

@@ -616,6 +616,8 @@ table.cmp tr.model td { background: var(--accent-soft); color: #fff; }
 }
 .mteams { font-size: 15px; font-weight: 600; letter-spacing: -0.005em; }
 .mteams .vs { color: var(--muted); margin: 0 0.4rem; }
+/* lagskölden framför namnet (app.js listTeam) */
+.mteams .mteam { display: inline-flex; align-items: center; gap: 8px; vertical-align: middle; }
 .mside { font-size: 14px; color: var(--muted); font-variant-numeric: tabular-nums; }
 .mside b { color: var(--fg); font-weight: 750; }
 .mside .score {
@@ -897,6 +899,13 @@ footer .foot-links a[aria-current="page"] { color: var(--fg); }
 /* smal mobil: oddsen på en egen rad under lagen, så att namnen får plats */
 @media (max-width: 640px) {
   .mrow { grid-template-columns: 2.9rem 1fr auto; row-gap: 5px; }
+  /* lagen under varandra, sköldarna i rak linje; strecket finns kvar för
+     skärmläsare */
+  .mteams .mteam { display: flex; gap: 8px; }
+  .mteams .mteam + .vs { display: block; height: 0; overflow: hidden; }
+  .mteams .mteam + .vs + .mteam { margin-top: 4px; }
+  .mteams .sub { display: block; margin: 2px 0 0; }
+  .mteams .skold { width: 18px; height: 18px; }
   .mside-odds { grid-column: 2 / -1; text-align: left; }
   .mside-odds .pbar { max-width: 150px; }
   .mside-res { grid-template-columns: 24px 3.2rem; column-gap: 8px; }
