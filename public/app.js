@@ -344,34 +344,41 @@ function tipTitle(m) {
   return m.f ? `Prognosen i efterhand ${listOdds(m.f.p).join(' · ')}` : '';
 }
 
-// Lagnamnet i listan med skölden framför (skoldar.js), i varianten för mörk
-// botten som i Tabeller. Skölden och namnet hålls ihop när raden bryts.
-function listTeam(name) {
-  return `<span class="mteam">${window.Skoldar ? Skoldar.img(name, { dark: true }) : ''}<span>${esc(name)}</span></span>`;
+// Lagnamnet i listan med skölden in mot mitten (skoldar.js), i varianten för
+// mörk botten som i Tabeller: hemmalagets efter namnet, bortalagets före.
+function listTeam(name, home) {
+  const skold = window.Skoldar ? Skoldar.img(name, { dark: true }) : '';
+  const n = `<span class="mname">${esc(name)}</span>`;
+  return `<span class="mteam${home ? ' home' : ''}">${home ? n + skold : skold + n}</span>`;
 }
 
-// Spelad match: spelikonen och resultatet i var sin fast kolumn (theme.css
-// .mside-res), så att båda står i rak linje rad för rad.
+// Matchraden som en liten biljett, som matchbladets huvud: hemmalaget till
+// höger om mitten, bortalaget till vänster om den och avsparken – resultatet
+// när matchen är spelad – mellan dem. Ytterst står tävlingen (och omgången i
+// cuperna) och oddsen eller spelikonen, i lika breda spalter (theme.css
+// .mrow), så att mitten står mitt i raden och rakt under nu-linjen.
 function matchRow(m) {
+  let mid;
   let side;
   if (m.completed && m.score) {
-    side = `<span class="mres-hl">${window.Hojdpunkter ? Hojdpunkter.row(m) : ''}</span>`;
-    if (isHidden(m)) side += Spoiler.chip();
+    side = window.Hojdpunkter ? Hojdpunkter.row(m) : '';
+    if (isHidden(m)) mid = Spoiler.chip();
     else {
       const t = tipTitle(m);
-      side += `<span class="score"${t ? ` title="${esc(t)}"` : ''}>${m.score.home}–${m.score.away}</span>`;
-      if (m.shootout) side += `<span class="sub">str. ${m.shootout.home}–${m.shootout.away}</span>`;
+      mid = `<span class="score"${t ? ` title="${esc(t)}"` : ''}>${m.score.home}–${m.score.away}</span>`;
+      if (m.shootout) mid += `<span class="sub">str. ${m.shootout.home}–${m.shootout.away}</span>`;
     }
   } else {
+    mid = `<span class="kick">${esc(fTime.format(new Date(m.kickoff)))}</span>`;
+    if (m.status === 'STATUS_POSTPONED') mid += '<span class="sub">uppskjuten</span>';
     side = listForecast(m.f);
-    if (m.status === 'STATUS_POSTPONED') side += '<span class="sub">uppskjuten</span>';
   }
+  const comp = compOf(m.comp);
   return `<button type="button" class="mrow" data-id="${esc(m.id)}">` +
-    `<span class="mtime">${esc(fTime.format(new Date(m.kickoff)))}</span>` +
-    `<span class="ctag" title="${esc(compOf(m.comp).name)}">${esc(compOf(m.comp).short)}</span>` +
-    `<span class="mteams">${listTeam(m.home)}<span class="vs">–</span>${listTeam(m.away)}` +
+    `<span class="mcomp"><span class="ctag" title="${esc(comp.name)}">${esc(comp.short)}</span>` +
     `${m.round ? `<span class="sub">${esc(m.round)}</span>` : ''}</span>` +
-    `<span class="mside${m.completed && m.score ? ' mside-res' : ' mside-odds'}">${side}</span></button>`;
+    `${listTeam(m.home, true)}<span class="mmid">${mid}</span>${listTeam(m.away, false)}` +
+    `<span class="mside">${side}</span></button>`;
 }
 
 // ---------- matchrutan ----------

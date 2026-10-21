@@ -587,9 +587,12 @@ table.cmp tr.model td { background: var(--accent-soft); color: #fff; }
   line-height: 2.1;
   color: var(--eyebrow);
 }
-.mlist { overflow: hidden; }
+/* Raden som en liten biljett (app.js matchRow): tävlingen och oddsen ytterst
+   i lika breda spalter (--edge), lagen speglade kring mitten, där avsparken
+   eller resultatet står – mitt i raden och rakt under nu-linjen. */
+.mlist { overflow: hidden; --edge: 8.4rem; }
 .mrow {
-  grid-template-columns: 3.2rem 3.3rem 1fr auto;
+  grid-template-columns: var(--edge) minmax(0, 1fr) 4.6rem minmax(0, 1fr) var(--edge);
   gap: 14px;
   padding: 14px 20px;
   border: 0;
@@ -616,35 +619,46 @@ table.cmp tr.model td { background: var(--accent-soft); color: #fff; }
 }
 .mteams { font-size: 15px; font-weight: 600; letter-spacing: -0.005em; }
 .mteams .vs { color: var(--muted); margin: 0 0.4rem; }
-/* lagskölden framför namnet (app.js listTeam) */
-.mteams .mteam { display: inline-flex; align-items: center; gap: 8px; vertical-align: middle; }
-.mside { font-size: 14px; color: var(--muted); font-variant-numeric: tabular-nums; }
-.mside b { color: var(--fg); font-weight: 750; }
-.mside .score {
+.mcomp { display: flex; flex-wrap: wrap; align-items: center; gap: 3px 8px; }
+.mcomp .sub { font-size: 11.5px; line-height: 1.25; }
+/* lagskölden in mot mitten (app.js listTeam); långa namn bryts mot den */
+.mteam {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  min-width: 0;
+  font-size: 15px;
+  font-weight: 600;
+  line-height: 1.25;
+  letter-spacing: -0.005em;
+}
+.mteam.home { justify-content: flex-end; text-align: right; }
+.mname { text-wrap: balance; }
+/* Mitten är lika hög med resultatet, avsparken och resultatet dolt
+   (spoiler.css .sp-chip). Prognosen före avspark står i resultatets
+   tooltip. */
+.mmid {
+  display: grid;
+  justify-items: center;
+  align-content: center;
+  min-height: 33px;
+  text-align: center;
+}
+.mmid .score,
+.mmid .kick {
   font-family: var(--display);
   font-size: 22px;
   font-weight: 650;
   font-variant-numeric: lining-nums tabular-nums;
   letter-spacing: 0;
+  line-height: 1.2;
   color: var(--bone);
 }
+.mmid .kick { font-size: 18px; font-weight: 550; color: var(--ink-soft); }
+.mmid .sub { margin-top: 2px; font-size: 11.5px; }
+.mside { justify-self: end; font-size: 14px; color: var(--muted); font-variant-numeric: tabular-nums; white-space: nowrap; }
+.mside b { color: var(--fg); font-weight: 750; }
 .empty { color: var(--muted); }
-
-/* Spelad match: spelikonen (hojdpunkter.css) och resultatet i var sin fast
-   kolumn, så att båda står i rak linje rad för rad – också där klipp saknas.
-   Prognosen före avspark står i resultatets tooltip. Raden är lika hög med
-   resultatet dolt (spoiler.css .sp-chip). */
-.mside-res {
-  display: grid;
-  grid-template-columns: 26px 3.2rem;
-  grid-template-rows: minmax(33px, auto);
-  column-gap: 12px;
-  align-items: center;
-  justify-items: center;
-}
-.mside-res > :not(.mres-hl) { grid-column: 2; }
-.mres-hl { display: grid; }
-.mside-res .sub { margin-top: 2px; font-size: 11.5px; }
 
 /* Nu-linjen i matchlistan: spelat ovanför, kommande under. Guldet som i
    resten av detaljerna. */
@@ -834,7 +848,9 @@ footer .foot-links a[aria-current="page"] { color: var(--fg); }
   .tabs a.tab-link::after { left: 8px; right: 8px; }
 
   /* tävlingsmärket syns ned till 640px (style.css) och behöver sin kolumn */
-  .mrow { grid-template-columns: 2.9rem auto 1fr auto; gap: 10px; padding: 13px 14px; }
+  .mlist { --edge: 7.6rem; }
+  .mrow { gap: 10px; padding: 13px 14px; }
+  .mside { font-size: 13px; }
   .card { padding: 16px; }
   .mhead-teams { gap: 10px; }
   .fc-main { gap: 6px; }
@@ -887,19 +903,16 @@ footer .foot-links a[aria-current="page"] { color: var(--fg); }
   .tabs a.tab-link::after { left: calc(50% - 14px); right: calc(50% - 14px); }
 }
 
-/* smal mobil: oddsen på en egen rad under lagen, så att namnen får plats */
+/* smal mobil: bara lagen och mitten på raden, så att namnen får plats –
+   oddsen eller spelikonen mitt under (tävlingsmärket är dolt, style.css) */
 @media (max-width: 640px) {
-  .mrow { grid-template-columns: 2.9rem 1fr auto; row-gap: 5px; }
-  /* lagen under varandra, sköldarna i rak linje; strecket finns kvar för
-     skärmläsare */
-  .mteams .mteam { display: flex; gap: 8px; }
-  .mteams .mteam + .vs { display: block; height: 0; overflow: hidden; }
-  .mteams .mteam + .vs + .mteam { margin-top: 4px; }
-  .mteams .sub { display: block; margin: 2px 0 0; }
-  .mteams .skold { width: 18px; height: 18px; }
-  .mside-odds { grid-column: 2 / -1; text-align: left; }
-  .mside-res { grid-template-columns: 24px 3.2rem; column-gap: 8px; }
-  .mside-res .hl-play { width: 24px; height: 24px; }
+  .mrow { grid-template-columns: minmax(0, 1fr) 3.9rem minmax(0, 1fr); row-gap: 6px; }
+  .mcomp { display: none; }
+  .mteam { font-size: 14px; }
+  .mteam .skold { width: 18px; height: 18px; }
+  .mside { grid-column: 1 / -1; justify-self: center; }
+  .mside:empty { display: none; }
+  .mside .hl-play { width: 24px; height: 24px; }
   /* prognosens procent på en rad även i smala kolumner */
   .fc-num { font-size: 38px; }
   .fc-col.draw .fc-num { font-size: 28px; }

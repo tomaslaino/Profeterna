@@ -59,7 +59,7 @@
 
 /* ---------- spelaren ----------
    Utfälld under knappen den startades från, med knapparna under klippet:
-   under matchraden från lagnamnens kolumn till högerkanten, i matchrutans
+   under matchraden mellan ytterspalterna (theme.css --edge), i matchrutans
    rubrik mitt under knappen. Skrollad ur bild (.away) eller utan plats
    (.loose) ligger den nere till höger, förstorad (.big) mitt på sidan. Samma
    ruta i alla lägen, så att klippet spelar vidare när läget ändras. */
@@ -82,7 +82,7 @@
   max-width: calc((100svh - 200px) * 16 / 9);
 }
 .mlist > .hlp {
-  padding: 2px 20px 8px calc(20px + 6.5rem + 28px);
+  padding: 2px calc(20px + var(--edge) + 14px) 8px;
   background: color-mix(in srgb, var(--fg) 2.5%, transparent);
   border-bottom: 1px solid var(--hair);
 }
