@@ -363,7 +363,9 @@ function roundLabel(m, c) {
 
 // ---------- matchunderlag ----------
 
-function matchDetail(id) {
+// strength: modellens styrka för alla lag (src/strength.js) – motståndet i
+// formen. Utan den saknar formen bara motståndets styrka.
+function matchDetail(id, { strength = null } = {}) {
   const D = load();
   const m = D.byId.get(String(id));
   if (!m) return null;
@@ -372,8 +374,9 @@ function matchDetail(id) {
   const ak = m.ak;
   const unknowns = [];
 
-  const home = teamProfile(D, hk, m.kickoff);
-  const away = teamProfile(D, ak, m.kickoff);
+  const S = strengthIndex(D, strength);
+  const home = teamProfile(D, hk, m.kickoff, S);
+  const away = teamProfile(D, ak, m.kickoff, S);
   for (const [t, p] of [[m.home.name, home], [m.away.name, away]]) {
     if (!p.league) unknowns.push(`${t}: spelar inte i någon liga som källorna täcker – lagets styrka är okänd.`);
   }
@@ -421,7 +424,7 @@ function matchDetail(id) {
 }
 
 // Lagets säsong fram till (men inte med) avspark `before`.
-function teamProfile(D, k, before) {
+function teamProfile(D, k, before, S = null) {
   const leagueId = D.teamLeague.get(k) || (inNationalLeague(D, k) ? 'nl' : null);
   const league = leagueId ? competition(leagueId) : null;
   const p = { key: k, league: league ? { id: league.id, name: league.name, tier: league.tier } : null };
@@ -519,6 +522,8 @@ function teamProfile(D, k, before) {
 
   // Form: senaste matcherna i alla tävlingar före avspark (även Europa),
   // avgjorda på 90 minuter (straffavgjorda cupmatcher räknas som oavgjorda).
+  // Motståndets styrka är modellens senaste skattning, inte den vid matchen
+  // (som tabellen en ögonblicksbild).
   const cal = calendar(D, k);
   const form = cal.filter((x) => x.completed && x.kickoff < before).map((x) => {
     const s = x.score90 || (x.status === 'STATUS_FULL_TIME' ? x.score : null);
@@ -532,6 +537,7 @@ function teamProfile(D, k, before) {
       gf, ga,
       result: gf == null ? null : gf > ga ? 'V' : gf < ga ? 'F' : 'O',
       decided: x.shootout ? 'straffar' : x.status === 'STATUS_FINAL_AET' ? 'förlängning' : null,
+      opp: opponentStrength(D, S, leagueId, x.oppKey),
     };
   });
   p.schedule = schedule(D, cal, before, leagueId);
@@ -553,6 +559,7 @@ function calendar(D, k) {
     out.push({
       kickoff: m.kickoff, comp: m.comp, europe, home,
       opponent: home ? m.away.name : m.home.name,
+      oppKey: home ? m.ak : m.hk,
       completed: m.completed, status: m.status, score: m.score, score90: m.score90, shootout: m.shootout,
     });
   };
@@ -564,7 +571,7 @@ function calendar(D, k) {
       const home = r.hk === k;
       const score = { home: r.FTHG, away: r.FTAG };
       out.push({
-        kickoff: `${r.date}T15:00Z`, comp: 'nl', europe: false, home, opponent: home ? r.AwayTeam : r.HomeTeam,
+        kickoff: `${r.date}T15:00Z`, comp: 'nl', europe: false, home, opponent: home ? r.AwayTeam : r.HomeTeam, oppKey: home ? r.ak : r.hk,
         completed: true, status: 'STATUS_FULL_TIME', score, score90: score, shootout: null,
       });
     }
@@ -600,6 +607,40 @@ function schedule(D, cal, before, leagueId) {
     recentEurope: recent.filter((x) => x.europe).length,
     windowDays: SCHEDULE_DAYS,
     source: { provider: 'ESPN, alla tävlingar inklusive Europacuperna', fetchedAt: fetched[0] || null },
+  };
+}
+
+// Modellens styrka per lag och, per liga, ligans styrkor starkast först.
+function strengthIndex(D, strength) {
+  if (!strength || !strength.list || !strength.list.length) return null;
+  const rating = new Map(strength.list.map((t) => [t.key, t.rating]));
+  const byLeague = new Map();
+  for (const [k, r] of rating) {
+    const l = D.teamLeague.get(k);
+    if (!l) continue;
+    if (!byLeague.has(l)) byLeague.set(l, []);
+    byLeague.get(l).push(r);
+  }
+  for (const rs of byLeague.values()) rs.sort((a, b) => b - a);
+  return { rating, byLeague };
+}
+
+// Motståndet i en formmatch: level 0–1 från den egna ligans svagaste lag till
+// dess starkaste (lag från andra divisioner hamnar i ändarna), och platsen i
+// sin egen liga efter modellens styrka (rank av of). null när styrkan är
+// okänd (lag utanför de fyra ligorna, t.ex. i Europacuperna).
+function opponentStrength(D, S, leagueId, oppKey) {
+  const r = S && oppKey ? S.rating.get(oppKey) : null;
+  if (r == null) return null;
+  const own = S.byLeague.get(leagueId);
+  const theirs = S.byLeague.get(D.teamLeague.get(oppKey));
+  const top = own && own[0];
+  const bottom = own && own[own.length - 1];
+  return {
+    level: own && top > bottom ? Math.round(100 * Math.min(1, Math.max(0, (r - bottom) / (top - bottom)))) / 100 : null,
+    rank: theirs ? theirs.indexOf(r) + 1 : null,
+    of: theirs ? theirs.length : null,
+    league: theirs ? competition(D.teamLeague.get(oppKey)).name : null,
   };
 }
 

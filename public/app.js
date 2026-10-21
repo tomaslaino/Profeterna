@@ -819,21 +819,29 @@ function sideTip(label, values = [], names = []) {
 
 const FORM_TIP = 'Lagets fem senaste matcher i alla tävlingar, nyast till vänster. V = vinst, O = oavgjort, F = förlust. ' +
   'Det är ställningen efter 90 minuter som gäller, så en match som avgjorts i förlängning eller på straffar räknas som oavgjord. ' +
-  'Peka på en ruta för att se vilken match det var.';
+  'Strecket under rutan är motståndets styrka enligt modellen, från den egna divisionens svagaste lag (kort streck) till dess starkaste (helt streck). ' +
+  'Utan streck är styrkan okänd, som för lag utanför England. Peka på en ruta för att se vilken match det var.';
 const FORM_RESULT = { V: 'Vinst', O: 'Oavgjort', F: 'Förlust' };
+const formOrdinal = (n) => `${n}:${n % 10 >= 1 && n % 10 <= 2 && (n % 100 < 11 || n % 100 > 12) ? 'a' : 'e'}`;
+
+// Motståndets styrka som ett streck under rutan (matchblad.css).
+function oppBar(x) {
+  return x.opp && x.opp.level != null ? ` style="--opp:${Math.round(8 + 92 * x.opp.level)}%"` : '';
+}
 
 function formCard(d) {
   const chip = (x) => {
     const where = `${x.home ? 'hemma' : 'borta'}${x.opponent ? ` mot ${x.opponent}` : ''}`;
     const score = x.gf == null ? '' : ` · ${x.gf}–${x.ga}${x.decided ? ` efter 90 minuter, avgjord ${x.decided === 'straffar' ? 'på straffar' : 'i förlängning'}` : ''}`;
-    return `<span class="${x.result || ''}" data-tip-head="${FORM_RESULT[x.result] || 'Resultat saknas'}" ` +
-      `data-tip="${esc(`${dateOnly(x.date)} · ${x.comp} · ${where}${score}`)}">${x.result || '?'}</span>`;
+    const opp = x.opp && x.opp.rank ? `. ${x.opponent} är ${formOrdinal(x.opp.rank)} av ${x.opp.of} i ${x.opp.league} enligt modellen.` : '';
+    return `<span class="${x.result || ''}"${oppBar(x)} data-tip-head="${FORM_RESULT[x.result] || 'Resultat saknas'}" ` +
+      `data-tip="${esc(`${dateOnly(x.date)} · ${x.comp} · ${where}${score}${opp}`)}">${x.result || '?'}</span>`;
   };
   const row = (name, p, cls) => {
     const f = p.form || [];
     const chips = f.length
       ? f.map((x) => (window.Spoiler && Spoiler.hidesDay(x.date)
-        ? '<span class="sp-form" data-tip-head="Dold" data-tip="Du har valt att dölja resultat.">?</span>'
+        ? `<span class="sp-form"${oppBar(x)} data-tip-head="Dold" data-tip="Du har valt att dölja resultat.">?</span>`
         : chip(x))).join('')
       : '<span class="muted" style="width:auto;background:none;font-weight:400">inga tidigare matcher</span>';
     return `<div class="form-row ${cls}"><span class="t"><i class="mr-key"></i>${esc(name)}</span><span class="form">${chips}</span></div>`;

@@ -387,6 +387,21 @@ dialog.mr-modal .form span {
 dialog.mr-modal .form .V { color: var(--pp-ok); background: var(--pp-box); }
 dialog.mr-modal .form .F { color: var(--pp-no); background: var(--pp-box); }
 dialog.mr-modal .form .O { color: var(--pp-pencil); background: var(--pp-box); }
+/* motståndets styrka: ett streck under rutan, helt = den egna divisionens
+   starkaste lag (app.js sätter --opp); raden har plats för strecket även
+   när det saknas */
+dialog.mr-modal .form-row { padding-bottom: 17px; }
+dialog.mr-modal .form span { position: relative; }
+dialog.mr-modal .form span[style*="--opp"]::after {
+  content: "";
+  position: absolute;
+  top: calc(100% + 5px);
+  left: -1.5px;
+  right: -1.5px;
+  height: 3px;
+  border-radius: 1px;
+  background: linear-gradient(to right, var(--pp-ink-soft) var(--opp), color-mix(in srgb, var(--pp-ink) 12%, transparent) var(--opp));
+}
 
 /* inbördes möten: hemmalaget, ställningen och bortalaget i linje */
 dialog.mr-modal .mf-meet ul { margin: 0; padding: 0; list-style: none; }

@@ -246,7 +246,7 @@ function writeSite(outDir = OUT, { journal = false, analysisEndpoint, couponEndp
   let pages = 0;
   for (const id of matchIds()) {
     try {
-      const d = matchDetail(id);
+      const d = matchDetail(id, { strength: forecast.strength });
       d.prediction = forecast.predictions.get(id) || null;
       d.journal = ev.perMatch.get(id) || null;
       // Trupperna (ESPN) visas i matchvyn men ingår inte i analysens underlag.
