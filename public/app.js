@@ -499,7 +499,6 @@ function matchPanes(d) {
   const table = tableDivs(d).length > 0;
   panes.push(['form', 'Form', formCard(d) + sideCard(d, table)]);
   if (table) panes.push(['tabellen', 'Tabellen', `<div class="mt-wrap" data-mr-table="${esc(m.id)}"><p class="mr-wait">Hämtar tabellen …</p></div>`]);
-  if (d.squads) panes.push(['trupperna', 'Trupperna', squadsSection(d)]);
   return panes;
 }
 
@@ -816,6 +815,14 @@ const SIDE_TIPS = {
   xG: (n) => 'Förväntade mål (expected goals): hur många mål chanserna brukar ge, utifrån var och hur skotten kommer. En straff är värd ungefär 0,8 xG, ett skott från 25 meter kanske 0,03. xG säger ofta mer om hur bra ett lag är än målen gör, eftersom det inte påverkas av om skotten råkar gå in.' +
     (n && n.length === 2 ? ` ”${n[0]}–${n[1]}” betyder att lagets chanser i snitt är värda ${n[0]} mål per match och motståndarnas ${n[1]}.` : ''),
   'Gjorda mål mot xG': tipXg('Lagets mål minus dess xG, summerat över säsongen. Plus betyder fler mål än chanserna brukar ge – vassa avslut eller tur. Sådant brukar jämna ut sig, så ett stort plus kan betyda att målen tryter framöver.', (x, d) => `${x} mål ${d} än väntat`),
+  'Spelarna i ligan': 'Lagets spelare i ligamatcherna den här säsongen, enligt ESPN. Cuper och Europaspel räknas inte, och siffrorna släpar ibland en omgång efter tabellen.',
+  Snittålder: 'Spelarnas snittålder, där varje spelare räknas en gång per ligamatch den spelat – de som spelar mest väger tyngst.',
+  'Använda spelare': 'Hur många spelare laget har använt i ligan, från start eller inhopp.',
+  'Flest mål': 'Lagets bästa målskytt i ligan.',
+  'Flest assist': 'Flest framspelningar till mål i ligan.',
+  'Flest segermål': 'Målet som gav laget den ledning det sedan aldrig tappade. Vid 3–1 är lagets andra mål segermålet.',
+  'Flest gula kort': 'Flest gula kort i ligan.',
+  'Hela truppen': 'Alla spelare i truppen med matcher, mål, assist och kort, i lagkortet från Statistik.',
   'Insläppta mål mot xG': tipXg('Insläppta mål minus motståndarnas xG, summerat över säsongen. Här är minus bra: laget har släppt in färre mål än motståndarnas chanser brukar ge – en målvakt i storform eller tur. Även det brukar jämna ut sig.', (x, d) => `${x} ${d} insläppta mål än väntat`),
 };
 
@@ -882,7 +889,8 @@ function oneXg(rows) {
 }
 
 // Lagen sida vid sida. Ligan står bara med när lagen spelar i olika ligor, och
-// tabelläget bara när det inte finns en flik med tabellen.
+// tabelläget bara när det inte finns en flik med tabellen. Spelarna står sist
+// (squadRows).
 function sideCard(d, table) {
   let rows = '';
   for (const g of d.rows) {
@@ -893,6 +901,7 @@ function sideCard(d, table) {
       rows += `<tr${sideTip(r.label, r.values, [d.match.home, d.match.away])}><td class="h">${val(r.values[0])}</td><td class="mid">${esc(r.label)}</td><td class="a">${val(r.values[1])}</td></tr>`;
     }
   }
+  rows += squadRows(d);
   return `<div class="card"><h4><span${sideTip('Lagen sida vid sida')}>Lagen sida vid sida</span></h4>` +
     `<div class="table-wrap" style="margin:0"><table class="side"><thead><tr>` +
     `<th style="text-align:right"><i class="mr-key"></i>${esc(d.match.home)}</th><th class="mid"></th><th>${esc(d.match.away)}<i class="mr-key a"></i></th></tr></thead>` +
@@ -962,58 +971,58 @@ function refereeCard(d) {
   return `<div class="card ref" title="Per match, båda lagen tillsammans · domaren styr inte prognosen"><h4>Domare</h4>${html}</div>`;
 }
 
-// ---------- trupperna (ESPN, ligamatcher i år) ----------
+// ---------- spelarna (ESPN-trupperna, ligamatcher i år) ----------
 
-const POS_NAME = { MV: 'Målvakter', B: 'Backar', MF: 'Mittfältare', A: 'Anfallare' };
-
-function squadsSection(d) {
+// Spelarna sist i Lagen sida vid sida: snittåldern, hur många som spelat och
+// vem som gjort flest mål, assist och segermål (korten där segermålen
+// saknas). Hela truppen står i lagkortet från Statistik, som öppnas ovanpå
+// matchbladet (openSquad).
+function squadRows(d) {
   const s = d.squads;
-  if (!s) return '';
-  return `<div class="mr-teams">${teamSquadCard(d.match.home, s.home, 'h')}${teamSquadCard(d.match.away, s.away, 'a')}</div>`;
+  const t = s ? [s.home, s.away].map((x) => (x && !x.unknown ? x : null)) : [];
+  if (!t.some(Boolean)) return '';
+  const each = (fn) => t.map((x) => (x ? fn(x) : val(null)));
+  const row = (label, [h, a]) => `<tr${sideTip(label)}><td class="h">${h}</td><td class="mid">${esc(label)}</td><td class="a">${a}</td></tr>`;
+  const winners = t.some((x) => x && x.key.winners);
+  return `<tr class="group"${sideTip('Spelarna i ligan')}><td colspan="3">Spelarna i ligan</td></tr>` +
+    row('Snittålder', each((x) => (x.summary.avgAge == null ? val(null) : `${dec(x.summary.avgAge)} år`))) +
+    row('Använda spelare', each((x) => String(x.summary.used))) +
+    row('Flest mål', each((x) => leader(x.players, (p) => p.g))) +
+    row('Flest assist', each((x) => leader(x.players, (p) => p.a))) +
+    (winners
+      ? row('Flest segermål', each((x) => (x.key.winners ? leader(x.key.winners, (p) => p.gw) : val(null))))
+      : row('Flest gula kort', each((x) => leader(x.players, (p) => p.yc)))) +
+    row('Hela truppen', each((x) => `<button type="button" class="mr-squad" data-squad="${esc(x.comp)}/${esc(x.summary.espnId)}">${x.players.length} spelare</button>`));
 }
 
-// tip = förklaringen när man pekar på rubriken (forklaring.js).
-function keyList(title, list, value, empty, tip) {
-  const head = tip ? ` data-tip="${esc(tip)}" data-tip-head="${esc(title)}"` : '';
-  return `<div class="mv-key"><h5${head}>${esc(title)}</h5>` + (list.length
-    ? `<ol>${list.map((p) => `<li><span class="n">${esc(p.name)}</span><span class="v">${value(p)}</span></li>`).join('')}</ol>`
-    : `<p class="muted">${esc(empty)}</p>`) + '</div>';
+// Den som leder laget och talet. Delar två på förstaplatsen står båda, är de
+// fler den första och m.fl. – som i topplistorna går den med färst matcher
+// först. Namnen bryts inte, och talet följer med det sista.
+function leader(list, value) {
+  const xs = list.filter((p) => value(p) > 0);
+  if (!xs.length) return '<span class="muted">ingen</span>';
+  const top = Math.max(...xs.map(value));
+  const ps = xs.filter((p) => value(p) === top).sort((a, b) => (a.app || 0) - (b.app || 0) || a.name.localeCompare(b.name, 'sv'));
+  const names = ps.length > 2 ? [`${ps[0].name} m.fl.`] : ps.map((p) => p.name);
+  return names.map((n, i) => `<span class="mr-who">${esc(n)}${i === names.length - 1 ? `&nbsp;<b>${top}</b>` : ','}</span>`).join(' ');
 }
 
-function teamSquadCard(name, s, cls) {
-  const h4 = `<h4><i class="mr-key"></i>${esc(name)}</h4>`;
-  if (!s || s.unknown) {
-    return `<div class="card mv-squad ${cls}">${h4}<p class="unknown">okänt – ${esc(s ? s.reason : 'ingen spelardata')}</p></div>`;
-  }
-  const t = s.summary;
-  const facts = [
-    t.avgAge != null ? `snittålder <b>${dec(t.avgAge)}</b> år` : null,
-    `<b>${t.used}</b> spelare har spelat`,
-    t.topScorer && t.topScorer.g ? `${esc(t.topScorer.name)} <b>${pct(t.topScorerShare)} %</b> av målen` : null,
-  ].filter(Boolean).join(' · ');
-  const yc = (p) => `<i class="mv-yc"></i>${p.yc}${p.rc ? ` <i class="mv-rc"></i>${p.rc}` : ''}`;
-  const byPos = {};
-  for (const p of s.players) (byPos[p.pos || '?'] = byPos[p.pos || '?'] || []).push(p);
-  const v = (x, strong) => (x == null ? '<span class="muted">–</span>' : x === 0 ? '<span class="muted">0</span>' : strong ? `<b>${x}</b>` : x);
-  const rows = ['MV', 'B', 'MF', 'A', '?'].filter((k) => byPos[k]).map((k) =>
-    `<tr class="group"><td colspan="6">${esc(POS_NAME[k] || 'Okänd position')}</td></tr>` +
-    byPos[k].map((p) => `<tr${p.app ? '' : ' class="idle"'}><td>${p.jersey ? `<span class="muted">${esc(p.jersey)}</span> ` : ''}${esc(p.name)}</td>` +
-      `<td class="num">${v(p.app)}</td><td class="num">${v(p.g, true)}</td><td class="num">${v(p.a)}</td><td class="num">${v(p.yc)}</td><td class="num">${v(p.rc)}</td></tr>`).join('')).join('');
-  return `<div class="card mv-squad ${cls}">${h4}<p class="mv-facts">${facts}</p>` +
-    '<div class="mv-keys">' +
-    keyList('Målskyttar', s.key.scorers.filter((p) => p.g > 0), (p) => `<b>${p.g}</b>`, 'inga mål än') +
-    keyList('Assist', s.key.creators.filter((p) => p.a > 0), (p) => `<b>${p.a}</b>`, 'inga assist än') +
-    // Högst tre listor: segermålen i stället för korten där de finns (korten
-    // står kvar i hela truppen).
-    (s.key.winners
-      ? keyList('Segermål', s.key.winners.filter((p) => p.gw > 0), (p) => `<b>${p.gw}</b>`, 'inga segermål än',
-        'Målet som gav laget den ledning det sedan aldrig tappade. Vid 3–1 är lagets andra mål segermålet.')
-      : keyList('Flest gula kort', s.key.cards, yc, 'ingen med 3 eller fler')) +
-    '</div>' +
-    `<details class="mv-full"><summary>Hela truppen (${s.players.length})</summary><div class="table-wrap"><table class="odds mv-table">` +
-    '<thead><tr><th>Spelare</th><th class="num" title="Matcher">M</th><th class="num">Mål</th><th class="num" title="Assist">Ass</th><th class="num" title="Gula kort">Gul</th><th class="num" title="Röda kort">Röd</th></tr></thead>' +
-    `<tbody>${rows}</tbody></table></div></details></div>`;
+// Lagkortet från Statistik på fliken Truppen (divisioner.js, inläst med
+// import() som spelarkorten i matchruta.js). Utan kortet: lagen på Statistik.
+async function openSquad(div, id) {
+  try {
+    await import('./divisioner.js');
+    if (window.Spelarkort && Spelarkort.team) return void Spelarkort.team(div, id);
+  } catch { /* som utan kortet */ }
+  location.href = `statistik.html#${div}/lag`;
 }
+
+document.addEventListener('click', (e) => {
+  const b = e.target.closest('[data-squad]');
+  if (!b) return;
+  const [div, id] = b.dataset.squad.split('/');
+  openSquad(div, id);
+});
 
 // ---------- tabellen (ESPN, data/teams/<division>.json) ----------
 
