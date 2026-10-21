@@ -80,16 +80,29 @@
   flex-direction: column;
   max-width: calc((100vh - 200px) * 16 / 9);
   max-width: calc((100svh - 200px) * 16 / 9);
+  margin-inline: auto;
 }
+/* Raden och klippet under den är en biljett: samma bakgrund, och lika mycket
+   luft under klippet som mellan lagen och klippet. */
 .mlist > .hlp {
-  padding: 2px calc(20px + var(--edge) + 14px) 8px;
+  position: relative;
+  padding: 3px calc(20px + var(--edge) + 14px) 17px;
   background: color-mix(in srgb, var(--fg) 2.5%, transparent);
   border-bottom: 1px solid var(--hair);
 }
 .mlist > .hlp:last-child { border-bottom: 0; }
 .mlist > .mrow:has(+ .hlp) {
   background: color-mix(in srgb, var(--fg) 2.5%, transparent);
-  border-bottom-color: transparent;
+  border-bottom: 0; /* blir klippets luft ovanför, så att inget flyttar sig */
+}
+/* Markeringen (efter Esc i matchrutan, med tangentbordet) runt raden och
+   klippet tillsammans. */
+.mlist > .mrow:focus-visible:has(+ .hlp) {
+  outline: 0;
+  box-shadow: inset 0 2px var(--gold), inset 2px 0 var(--gold), inset -2px 0 var(--gold);
+}
+.mlist > .mrow:focus-visible + .hlp {
+  box-shadow: inset 0 -2px var(--gold), inset 2px 0 var(--gold), inset -2px 0 var(--gold);
 }
 .mhead > .hlp { width: min(100%, 560px, calc(36vh * 16 / 9)); margin: 12px auto -6px; }
 .mhead > .hlp .hlp-box { max-width: none; }
@@ -136,6 +149,24 @@
   overflow: hidden;
   background: #000;
   border-radius: 10px;
+}
+/* på sin plats: en skärm insatt i kortet, med kortens kant och skugga */
+.hlp:not(.away, .loose, .big) .hlp-frame {
+  box-shadow: 0 0 0 1px var(--pill-line), 0 22px 44px -26px rgba(0, 0, 0, 0.95);
+}
+
+/* Under matchraden står knapparna i högerspalten, rakt under spelikonen
+   (radens 20px + halva ikonen − halva knappen), uppifrån i klippets höjd. */
+@media (min-width: 761px) {
+  .mlist > .hlp:not(.away, .loose, .big) .hlp-bar {
+    position: absolute;
+    top: 3px;
+    right: calc(20px + 13px - 16px);
+    flex-direction: column;
+    height: auto;
+    margin: 0;
+  }
+  .mlist > .hlp:not(.away, .loose, .big) .hlp-name { display: none; }
 }
 
 /* i hörnet och förstorad: ett eget kort ovanpå sidan, namnet överst */
@@ -203,7 +234,7 @@
 
 /* raden har smalare kolumner: klippet från kant till kant i kortet */
 @media (max-width: 760px) {
-  .mlist > .hlp { padding: 0 14px 6px; }
+  .mlist > .hlp { padding: 1px 14px 6px; }
 }
 
 @media (max-width: 640px) {
