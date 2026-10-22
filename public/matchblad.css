@@ -331,6 +331,15 @@ dialog.mr-modal .fc-ring {
   stroke: var(--pp-pen);
   stroke-width: 2.6;
 }
+/* spelbolagets odds på en rad under rutorna */
+dialog.mr-modal .fc-book {
+  margin: 8px 0 0;
+  font-size: 13px;
+  line-height: 1.35;
+  text-align: center;
+  color: var(--pp-ink-soft);
+}
+dialog.mr-modal .fc-book b { font-weight: 700; color: var(--pp-ink); white-space: nowrap; }
 
 /* målen som en prislista och de troligaste resultaten i rutor */
 dialog.mr-modal .fc-two {
@@ -393,16 +402,7 @@ dialog.mr-modal .fc-foot { display: flex; align-items: flex-start; justify-conte
 dialog.mr-modal .fc-graded .fc-stamp { margin-left: 10px; }
 dialog.mr-modal .fc .note { margin: 14px 0 0; font-size: 13px; }
 
-/* analysens avsnitt (Nyhetsläget, Läktarsnacket) med samma rubriker som korten */
-dialog.mr-modal .analysis-news { border-top-color: var(--pp-print-line); }
-dialog.mr-modal .analysis-news h5 {
-  font-size: var(--eyebrow-size);
-  font-weight: var(--eyebrow-weight);
-  letter-spacing: var(--eyebrow-track);
-  color: var(--pp-print);
-}
-
-/* spelbolagen: modellen överst, bolagens odds under */
+/* rättningen efter matchen: modellen överst, spelbolagen under */
 dialog.mr-modal table.cmp td:first-child { white-space: nowrap; }
 dialog.mr-modal table.cmp tr.model td { font-weight: 700; }
 dialog.mr-modal table.facit { margin-top: 18px; }
@@ -529,7 +529,7 @@ dialog.mr-modal .card.ref { margin-top: 10px; }
 dialog.mr-modal .ref-name { display: flex; flex-wrap: wrap; align-items: baseline; gap: 2px 12px; margin: 0 0 14px; }
 dialog.mr-modal .ref-name b { font-family: var(--display); font-size: 20px; font-weight: 700; }
 dialog.mr-modal .ref-name .muted { font-size: 13px; }
-dialog.mr-modal .ref-figs { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 12px; }
+dialog.mr-modal .ref-figs { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 12px; }
 dialog.mr-modal .ref-figs > div {
   display: grid;
   justify-items: center;
@@ -607,6 +607,7 @@ dialog.mr-modal .mr-on { color: var(--pp-ok); }
   dialog.mr-modal .fc-main { gap: 8px; }
   dialog.mr-modal .fc-label { letter-spacing: 0.12em; }
   dialog.mr-modal .fc-box { padding: 8px 4px 7px; }
+  dialog.mr-modal .fc-book { font-size: 12px; }
   dialog.mr-modal .fc-num,
   dialog.mr-modal .fc-col.draw .fc-num { font-size: 28px; }
   dialog.mr-modal .fc-note { top: -24px; font-size: 20px; }
@@ -617,7 +618,7 @@ dialog.mr-modal .mr-on { color: var(--pp-ok); }
   dialog.mr-modal .mf-meet .w { grid-column: 1 / -1; text-align: center; }
   dialog.mr-modal .form span { width: 24px; height: 24px; font-size: 12px; }
   dialog.mr-modal .form { gap: 4px; }
-  dialog.mr-modal .ref-figs { grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 8px; }
+  dialog.mr-modal .ref-figs { gap: 8px; }
   dialog.mr-modal table.mt-table .hide-sm { display: none; }
   dialog.mr-modal table.mt-table th,
   dialog.mr-modal table.mt-table td { padding: 7px 6px; }

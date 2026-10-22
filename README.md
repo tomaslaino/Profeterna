@@ -102,6 +102,15 @@ ingen falsk precision · sidan kraschar aldrig av en död källa · endast fria 
   stämpeln Ingen startelva än. Prognosens rutor har bara tecknet och oddset (chansen i
   procent i rutans title), spelbolagens odds står i en tabell under modellens, och knappen
   Visa detaljer är borta med källraderna, osäkerhetsspannet och de enkla baslinjerna
+- [x] **Färre dubbletter i matchbladet (2026-10-21, användarens beslut):** varje tal står
+  på ett ställe. Spelbolagets odds står på en rad under prognosens rutor (snittet vid
+  avspark för en spelad match, annars snittet när oddsen öppnade, annars ESPN:s bolag),
+  och kortet Spelbolagen med raden Modellen är borta, liksom Slutprognos sist i *Vad drog
+  åt vilket håll*. I *Lagen sida vid sida* står Matcher, V–O–F, Mål och Mål per match bara
+  när matchen saknar fliken Tabellen; Skott, Snittålder och Använda spelare är borta.
+  Domaren har tre tal, utan röda kort. *Tipset* under artikeln i Inför har bara rutorna
+  och texten – *Nyhetsläget*, *Läktarsnacket* och den egna källistan visas inte, eftersom
+  artikeln ovanför redan har läst på
 - [x] **Höjdpunkter (2026-10-20):** spelade matcher länkar till Viaplays sammandrag, som
   repriserna på gravergrav.se – en spelikon på matchraden och *Höjdpunkter* med längden
   i matchrutans rubrik. Klippet startar direkt i ett litet eget fönster ovanpå sidan. Klippen är gratis med reklam och kräver
@@ -844,8 +853,9 @@ skriver Claude (`claude-opus-5-5`) analysen i stället för DeepSeek
   fansajter. Svaret är JSON med `analys`, `nyheter`, `läktaren`, `tecken`, `marginal`
   och `källor` (adress, tidning, rubrik).
 - *Tipset* visar kupongens rutor 1 X 2 med tecknen inringade och raden i marginalen, och
-  under dem analysen, *Nyhetsläget* och *Läktarsnacket* med hänvisningar till en
-  gemensam källista. Raden i marginalen är Claudes egen, högst tre ord utan siffror
+  under dem analysen med hänvisningar som länkar direkt till sidorna, numrerade i den
+  ordning de kommer. *Nyhetsläget* och *Läktarsnacket* skrivs fortfarande och sparas, men
+  visas inte (2026-10-21). Raden i marginalen är Claudes egen, högst tre ord utan siffror
   (annars spik, halvgardera eller helgardera). Knappen visar *Läser på …* med tiden; en analys tar en och en halv
   minut.
 - **Kontroller:** en källa följer bara med om adressen verkligen kom upp i en sökning,

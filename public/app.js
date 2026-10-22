@@ -554,13 +554,13 @@ function matchPanes(d) {
 }
 
 // Spelad match med prognos före avspark: den rättade prognosen ensam (den
-// återskapade upprepar samma sak). Annars prognosen, spelbolagen bredvid
-// modellen och vad som drog åt vilket håll.
+// återskapade upprepar samma sak). Annars prognosen, med spelbolagens odds
+// under rutorna, och vad som drog åt vilket håll.
 function prognosPane(d) {
   const m = d.match;
   const ok = d.prediction && d.prediction.status === 'ok';
   if (m.completed && d.journal && d.journal.counted) return journalCard(d) + (ok ? stepsCard(d) : '');
-  return forecastCard(d) + marketCard(d) + (ok ? stepsCard(d) : '');
+  return forecastCard(d) + (ok ? stepsCard(d) : '');
 }
 
 function renderDetail(d) {
@@ -635,7 +635,7 @@ function forecastCard(d) {
   }
   const notes = (p.notes || []).map((n) => `<p class="note">${esc(n)}</p>`).join('');
   return `<div class="card fc"><h4>${m.completed ? 'Prognos i efterhand' : 'Prognos efter 90 minuter'}</h4>` +
-    fcMain(p.p, [m.home, 'Oavgjort', m.away], m.id) +
+    fcMain(p.p, [m.home, 'Oavgjort', m.away], m.id, null, null, bookOdds(d)) +
     `<div class="fc-two"><div><h5>Målen</h5>${stats}</div><div><h5>Troligast</h5>${topScores(p)}</div></div>` +
     `${adv}${notes}<div class="fc-foot">${scoreGrid(p, m)}</div></div>`;
 }
@@ -644,8 +644,9 @@ function forecastCard(d) {
 // självt – prognosen står ren, och bara tipset under artikeln i Inför ritar
 // AI:ns tecken med kulspetspenna och en rad i marginalen (pen, penMarks).
 // Efter matchen ringas utfallet (outcome) in med samma penna som ställningen.
-// key gör pennstrecken likadana varje gång (papper.js).
-function fcMain(p, labels, key, outcome, pen = null) {
+// key gör pennstrecken likadana varje gång (papper.js). book: spelbolagets
+// odds på en rad under rutorna (bookOdds).
+function fcMain(p, labels, key, outcome, pen = null, book = null) {
   const w = pct3(p);
   const P = window.Papper;
   const cols = w.map((x, i) => {
@@ -654,9 +655,21 @@ function fcMain(p, labels, key, outcome, pen = null) {
     return `<div class="fc-col${i === 1 ? ' draw' : ''}${res ? ' s-out' : ''}"><div class="fc-label"><span>${esc(labels[i])}</span>` +
       (pen && i === pen.at ? `<em class="fc-note">${esc(pen.note)}</em>` : '') + '</div>' +
       `<div class="fc-box" title="${x} %"><i>${'1X2'[i]}</i><div class="fc-num">${pctOdds(x)}${mine && P ? P.ring(`penna${key}${i}`, 'fc-pen', 23) : ''}</div>` +
-      `${res && P ? P.ring(`utfall${key}`, 'fc-ring', 27) : ''}</div></div>`;
+      `${res && P ? P.ring(`utfall${key}`, 'fc-ring', 27) : ''}</div>` +
+      (book ? `<p class="fc-book"${book.title ? ` title="${esc(book.title)}"` : ''}>${esc(book.name)} <b>${odds(book.x[i])}</b></p>` : '') + '</div>';
   }).join('');
   return `<div class="fc-main">${cols}</div>`;
+}
+
+// Ett spelbolags odds med marginalen kvar, som de står hos bolaget: snittet
+// vid avspark för en spelad match, annars snittet när oddsen öppnade, annars
+// ESPN:s bolag. Inga odds: ingen rad.
+function bookOdds(d) {
+  const o = d.odds || {};
+  if (o.fdClose && o.fdClose.avg) return { name: 'Spelbolagen', title: 'Spelbolagens snitt vid avspark', x: o.fdClose.avg };
+  if (o.fdOpen && o.fdOpen.avg) return { name: 'Spelbolagen', title: 'Spelbolagens snitt när oddsen öppnade', x: o.fdOpen.avg };
+  if (o.espn) return { name: o.espn.provider, x: o.espn.x12 };
+  return null;
 }
 
 // Tecknen analysen ringade in och raden i marginalen, ovanför det första
@@ -747,30 +760,9 @@ function scoreGrid(p, m) {
     `<p class="muted">5 mål eller fler för ett lag: ${p.scores.other > 0.005 ? fmtOdds(1 / p.scores.other) : '200+'}</p></div></details>`;
 }
 
-// Modellens odds överst och spelbolagens under, som de står hos bolagen:
-// 1 X 2 och över 2,5 mål. Utan några odds hos bolagen ritas inget – modellen
-// står redan i rutorna ovanför.
-function marketCard(d) {
-  const o = d.odds || {};
-  const p = d.prediction && d.prediction.status === 'ok' ? d.prediction : null;
-  const over = (t) => (t && t.line === 2.5 && t.over != null ? odds(t.over) : '–');
-  const rows = [];
-  if (o.espn) rows.push([esc(o.espn.provider), o.espn.x12.map(odds), over(o.espn.total)]);
-  if (o.fdOpen && o.fdOpen.avg) rows.push(['Spelbolagens snitt', o.fdOpen.avg.map(odds), over(o.fdOpen.total25 && { line: 2.5, ...o.fdOpen.total25 })]);
-  if (o.fdOpen && o.fdOpen.betfair) rows.push(['Betfair', o.fdOpen.betfair.map(odds), '–']);
-  if (o.fdClose && o.fdClose.avg) rows.push(['Snitt vid avspark', o.fdClose.avg.map(odds), over(o.fdClose.total25 && { line: 2.5, ...o.fdClose.total25 })]);
-  if (o.fdClose && o.fdClose.betfair) rows.push(['Betfair vid avspark', o.fdClose.betfair.map(odds), '–']);
-  if (!rows.length) return '';
-  if (p) rows.unshift(['Modellen', listOdds(pct3(p.p)), oddsP(p.over25), 'model']);
-  return '<div class="card mk"><h4>Spelbolagen</h4><table class="odds cmp"><thead><tr><th></th><th class="num">1</th><th class="num">X</th><th class="num">2</th>' +
-    '<th class="num">Över 2,5</th></tr></thead><tbody>' +
-    rows.map(([label, x, ov, cls]) => `<tr${cls ? ` class="${cls}"` : ''}><td>${label}</td>${x.map((v) => `<td class="num">${v}</td>`).join('')}<td class="num">${ov}</td></tr>`).join('') +
-    '</tbody></table></div>';
-}
-
-// Steg för steg som en dragkamp: startläget överst, sedan en stapel per del
-// av modellen åt det lag den hjälper (procentenheter på segerchansen), och
-// sist slutprognosen.
+// Steg för steg som en dragkamp: startläget överst och sedan en stapel per
+// del av modellen åt det lag den hjälper (procentenheter på segerchansen).
+// Slutprognosen står redan i rutorna överst.
 function stepsCard(d) {
   const st = d.prediction.steps;
   if (!st) return '';
@@ -809,10 +801,8 @@ function stepsCard(d) {
 
   const axis = `<div class="tug-row tug-axis"><div class="tug-lab"></div><div class="tug-sides">` +
     `<span><i class="k h"></i>← hjälper ${esc(m.home)}</span><span>hjälper ${esc(m.away)} →<i class="k a"></i></span></div></div>`;
-  const end = `<div class="tug-row tug-end"><div class="tug-lab">Slutprognos</div>${stack(st[st.length - 1].p)}</div>` +
-    `<div class="tug-row tug-names"><div class="tug-lab"></div><div class="tug-sides"><span>${esc(m.home)}</span><span>${esc(m.away)}</span></div></div>`;
   return '<div class="card tug"><h4 title="Procentenheter som varje del flyttar segerchansen">Vad drog åt vilket håll</h4>' +
-    rows[0] + axis + rows.slice(1).join('') + end + '<p class="tug-more"><a href="#modell">Så fungerar modellen</a></p></div>';
+    rows[0] + axis + rows.slice(1).join('') + '<p class="tug-more"><a href="#modell">Så fungerar modellen</a></p></div>';
 }
 
 // Förklaringarna i Form-fliken. Visas i förklaringsrutan (forklaring.js) när
@@ -855,14 +845,11 @@ const SIDE_TIPS = {
   'Båda lagen gör mål': tipOf('Matcher där båda lagen gjort minst ett mål var.'),
   'Hållit nollan': tipOf('Matcher där laget inte släppt in något mål.'),
   'Inte gjort mål': tipOf('Matcher där laget inte gjort något mål.'),
-  Skott: (n) => 'Avslut per match i snitt, alla sorter – även de som går utanför eller blockeras.' + (n && n.length === 2 ? ` ”${n[0]}–${n[1]}” betyder att laget skjuter ${n[0]} gånger per match och motståndarna ${n[1]}.` : ''),
   'Skott på mål': (n) => 'Skott som hade gått in om inte målvakten räddat – alltså mål plus räddningar.' + (n && n.length === 2 ? ` ”${n[0]}–${n[1]}” betyder ${n[0]} per match för laget och ${n[1]} för motståndarna.` : ''),
   xG: (n) => 'Förväntade mål (expected goals): hur många mål chanserna brukar ge, utifrån var och hur skotten kommer. En straff är värd ungefär 0,8 xG, ett skott från 25 meter kanske 0,03. xG säger ofta mer om hur bra ett lag är än målen gör, eftersom det inte påverkas av om skotten råkar gå in.' +
     (n && n.length === 2 ? ` ”${n[0]}–${n[1]}” betyder att lagets chanser i snitt är värda ${n[0]} mål per match och motståndarnas ${n[1]}.` : ''),
   'Gjorda mål mot xG': tipXg('Lagets mål minus dess xG, summerat över säsongen. Plus betyder fler mål än chanserna brukar ge – vassa avslut eller tur. Sådant brukar jämna ut sig, så ett stort plus kan betyda att målen tryter framöver.', (x, d) => `${x} mål ${d} än väntat`),
   'Spelarna i ligan': 'Lagets spelare i ligamatcherna den här säsongen, enligt ESPN. Cuper och Europaspel räknas inte, och siffrorna släpar ibland en omgång efter tabellen.',
-  Snittålder: 'Spelarnas snittålder, där varje spelare räknas en gång per ligamatch den spelat – de som spelar mest väger tyngst.',
-  'Använda spelare': 'Hur många spelare laget har använt i ligan, från start eller inhopp.',
   'Flest mål': 'Lagets bästa målskytt i ligan.',
   'Flest assist': 'Flest framspelningar till mål i ligan.',
   'Flest segermål': 'Målet som gav laget den ledning det sedan aldrig tappade. Vid 3–1 är lagets andra mål segermålet.',
@@ -933,9 +920,14 @@ function oneXg(rows) {
   return rows.filter((r) => !xg.includes(r) || r === keep).map((r) => (r === keep ? { ...r, label: 'xG' } : r));
 }
 
+// Raderna ur Ligan hittills som står i fliken Tabellen (S, V, O, F, Mål), och
+// Skott, som xG säger mer om.
+const IN_TABLE = new Set(['Matcher', 'V–O–F', 'Mål', 'Mål per match']);
+const SIDE_SKIP = new Set(['Skott']);
+
 // Lagen sida vid sida. Ligan står bara med när lagen spelar i olika ligor, och
-// tabelläget bara när det inte finns en flik med tabellen. Spelarna står sist
-// (squadRows).
+// tabelläget och det tabellen redan visar bara när det inte finns en flik med
+// tabellen. Spelarna står sist (squadRows).
 function sideCard(d, table) {
   let rows = '';
   for (const g of d.rows) {
@@ -943,6 +935,7 @@ function sideCard(d, table) {
     if (g.title === 'Liga' && g.rows.every((r) => r.values[0] === r.values[1])) continue;
     rows += `<tr class="group"${sideTip(g.title)}><td colspan="3">${esc(g.title)}</td></tr>`;
     for (const r of oneXg(g.rows)) {
+      if (SIDE_SKIP.has(r.label) || (table && g.title === 'Ligan hittills' && IN_TABLE.has(r.label))) continue;
       rows += `<tr${sideTip(r.label, r.values, [d.match.home, d.match.away])}><td class="h">${val(r.values[0])}</td><td class="mid">${esc(r.label)}</td><td class="a">${val(r.values[1])}</td></tr>`;
     }
   }
@@ -989,7 +982,7 @@ function squadCard(d) {
   return html ? `<div class="card inj"><h4>Skador och avstängningar</h4>${html}</div>` : '';
 }
 
-// Domaren (football-data.co.uk) som i ett matchprogram: namnet och fyra tal
+// Domaren (football-data.co.uk) som i ett matchprogram: namnet och tre tal
 // från hans eller hennes ligamatcher före matchdagen, med divisionens snitt
 // under samma period under varje tal. Inte utsedd än: ingenting.
 function refereeCard(d) {
@@ -1005,7 +998,6 @@ function refereeCard(d) {
       : f === 'less' ? '<span class="ref-flag" title="Klart under snittet">▼</span>' : '');
     const figs = [
       ['Gula kort', dec(s.yellow, 1) + flag(r.flags.yellow), a && dec(a.yellow, 1)],
-      ['Röda kort', dec(s.red, 2), a && dec(a.red, 2)],
       ['Frisparkar', s.fouls == null ? '–' : dec(s.fouls, 1), a && a.fouls != null ? dec(a.fouls, 1) : null],
       ['Hemmaseger', `${pct(s.home)} %` + flag(r.flags.home), a && `${pct(a.home)} %`],
     ];
@@ -1018,10 +1010,9 @@ function refereeCard(d) {
 
 // ---------- spelarna (ESPN-trupperna, ligamatcher i år) ----------
 
-// Spelarna sist i Lagen sida vid sida: snittåldern, hur många som spelat och
-// vem som gjort flest mål, assist och segermål (korten där segermålen
-// saknas). Hela truppen står i lagkortet från Statistik, som öppnas ovanpå
-// matchbladet (openSquad).
+// Spelarna sist i Lagen sida vid sida: vem som gjort flest mål, assist och
+// segermål (korten där segermålen saknas). Hela truppen står i lagkortet från
+// Statistik, som öppnas ovanpå matchbladet (openSquad).
 function squadRows(d) {
   const s = d.squads;
   const t = s ? [s.home, s.away].map((x) => (x && !x.unknown ? x : null)) : [];
@@ -1030,8 +1021,6 @@ function squadRows(d) {
   const row = (label, [h, a]) => `<tr${sideTip(label)}><td class="h">${h}</td><td class="mid">${esc(label)}</td><td class="a">${a}</td></tr>`;
   const winners = t.some((x) => x && x.key.winners);
   return `<tr class="group"${sideTip('Spelarna i ligan')}><td colspan="3">Spelarna i ligan</td></tr>` +
-    row('Snittålder', each((x) => (x.summary.avgAge == null ? val(null) : `${dec(x.summary.avgAge)} år`))) +
-    row('Använda spelare', each((x) => String(x.summary.used))) +
     row('Flest mål', each((x) => leader(x.players, (p) => p.g))) +
     row('Flest assist', each((x) => leader(x.players, (p) => p.a))) +
     (winners
@@ -1280,7 +1269,6 @@ function analysisCard(d) {
     const other = r.builtAt && d.builtAt && r.builtAt !== d.builtAt;
     return `<div class="card analysis" id="analysis-card"><h4 title="${esc(`Skriven av ${r.model} ${when(r.generatedAt)} ur underlaget från uppdateringen ${when(r.builtAt)} · alla tal i texten finns i underlaget`)}">Tipset</h4>` +
       penRow(d) + `<p class="analysis-text">${esc(r.text).replace(/(\d) %/g, '$1&nbsp;%')}</p>` +
-      (r.news ? newsSection(r.news) : '') +
       (other ? '<p class="note">Sidan och texten bygger på olika uppdateringar – ladda om sidan.</p>' : '') + '</div>';
   }
   // retry: false = svaret klarade inte kontrollen; samma underlag ger samma
@@ -1300,18 +1288,23 @@ function penRow(d) {
   return pen ? fcMain(d.prediction.p, [d.match.home, 'Oavgjort', d.match.away], d.match.id, null, pen) : '';
 }
 
-// Analysen med research: rutorna med tecknen (penRow), texten, nyhetsläget
-// och läktarsnacket med hänvisningar till en gemensam källista.
+// Analysen med research: rutorna med tecknen (penRow) och texten. Nyhetsläget
+// och läktarsnacket står inte med – artikeln ovanför har redan läst på – och
+// inte heller någon egen källista: hänvisningarna i texten länkar direkt till
+// sidorna, numrerade om i den ordning de kommer.
+const REF_RE = /\[(\d+(?:, \d+)*)\]/g;
 function researchCard(r, d) {
   const n = r.news || { sources: [] };
-  const paras = (t) => (t || '').split(/\n\s*\n/).filter((p) => p.trim())
-    .map((p) => `<p class="analysis-text">${refLinks(n.sources)(esc(p.trim())).replace(/(\d) %/g, '$1&nbsp;%')}</p>`).join('');
+  const text = r.text || '';
+  const order = [...new Set([...text.matchAll(REF_RE)].flatMap((x) => x[1].split(', ')))];
+  const num = new Map(order.map((k, i) => [k, String(i + 1)]));
+  const sources = n.sources.filter((s) => num.has(String(s.n))).map((s) => ({ ...s, n: num.get(String(s.n)) }));
+  const renumbered = text.replace(REF_RE, (m, ks) => `[${ks.split(', ').map((k) => Number(num.get(k))).sort((a, b) => a - b).join(', ')}]`);
+  const paras = renumbered.split(/\n\s*\n/).filter((p) => p.trim())
+    .map((p) => `<p class="analysis-text">${refLinks(sources)(esc(p.trim())).replace(/(\d) %/g, '$1&nbsp;%')}</p>`).join('');
   const at = r.generatedAt ? fDateTime.format(new Date(r.generatedAt)) : 'okänt';
   return `<div class="card analysis" id="analysis-card"><h4 title="${esc(`Skriven av ${r.model} ${at} efter sökningar på nätet · rapporterat i media, inte kontrollerat av Matchfixarna och inte med i prognosen`)}">Tipset</h4>` +
-    penRow(d) + paras(r.text) +
-    (n.text ? `<div class="analysis-news"><h5>Nyhetsläget</h5>${paras(n.text)}</div>` : '') +
-    (n.crowd ? `<div class="analysis-news"><h5>Läktarsnacket</h5>${paras(n.crowd)}</div>` : '') +
-    sourceList(n.sources) + '</div>';
+    penRow(d) + paras + '</div>';
 }
 
 // Upphöjda hänvisningar [1], [2] … som länkar direkt till artikeln (ett
@@ -1324,7 +1317,7 @@ function refLinks(sources) {
     const u = s && safeHref(s.url);
     return u ? `<a href="${u}" target="_blank" rel="noopener" title="${esc(`${s.source}: ${s.title}`)}">${k}</a>` : k;
   };
-  return (t) => t.replace(/\[(\d+(?:, \d+)*)\]/g, (m, ks) => `<sup class="ref">${ks.split(', ').map(link).join(',')}</sup>`);
+  return (t) => t.replace(REF_RE, (m, ks) => `<sup class="ref">${ks.split(', ').map(link).join(',')}</sup>`);
 }
 
 // Den numrerade källistan, med bara de citerade artiklarna.
@@ -1335,17 +1328,6 @@ function sourceList(sources) {
     const title = u ? `<a href="${u}" target="_blank" rel="noopener">${esc(s.title)}</a>` : esc(s.title);
     return `<li value="${s.n}">${title} <span class="muted">${esc(s.source)}${s.publishedAt ? ` · ${dateOnly(s.publishedAt)}` : ''}</span></li>`;
   }).join('') + '</ol>';
-}
-
-// Nyhetsläget: eget avsnitt under analysen, som Redaktionens analys på
-// gravergrav.se – upphöjda hänvisningar [1], [2] … och en numrerad källista
-// med bara de citerade artiklarna.
-function newsSection(n) {
-  const refs = refLinks(n.sources);
-  const paras = n.text.split(/\n\s*\n/).filter((p) => p.trim())
-    .map((p) => `<p class="analysis-text">${refs(esc(p.trim())).replace(/(\d) %/g, '$1&nbsp;%')}</p>`).join('');
-  const lead = n.gatheredAt ? `Ur nyheter hämtade ${when(n.gatheredAt)} – rapporterat` : 'Rapporterat';
-  return `<div class="analysis-news"><h5 title="${esc(`${lead} i media, inte kontrollerat av Matchfixarna och inte med i prognosen`)}">Nyhetsläget</h5>${paras}${sourceList(n.sources)}</div>`;
 }
 
 // AI:n läser på en dryg minut – tiden tickar i knappen, så att det syns att
