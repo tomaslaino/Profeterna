@@ -172,6 +172,15 @@ ingen falsk precision · sidan kraschar aldrig av en död källa · endast fria 
   hämtar bara domare och kort för de tre senaste säsongerna – resten användes bara av
   divisionsstatistiken som togs bort ur Statistik; `data/divisions.json` har bara
   divisionernas namn
+- [x] **Spela hos Svenska Spel och pris i kronor (2026-10-22):** gängets kupong för
+  Stryktipset har knappen *Spela hos Svenska Spel* (huvudknappen på kupongsidan och i
+  förstasidans ruta) fram till spelstoppet. Den öppner veckans Stryktips med gängets tecken
+  ifyllda (`spela.svenskaspel.se/stryktipset?product=1&draw=<nr>&signs=1:1,2:1X,…&share=valid`),
+  med Svenska Spels nummer på matcherna ur omgången där (samma hämtning som *Hämta
+  Stryktipset*, högst var femte minut), och står bara när varje match utom strukna har ett
+  tecken. På en kupong för Stryktipset står *Pris* i foten i stället för *Kombinationer* –
+  en krona per rad, och på gängets kupong vad det blir per person
+  ([public/spela.js](public/spela.js))
 
 ## Publicering
 

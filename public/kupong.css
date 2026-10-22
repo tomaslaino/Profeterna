@@ -204,6 +204,9 @@
 .kp-head { display: flex; justify-content: space-between; align-items: flex-end; gap: 16px; flex-wrap: wrap; margin-top: clamp(18px, 3vw, 34px); }
 .kp-head .page-title { margin: 6px 0 22px; }
 .kp-actions { display: flex; gap: 8px; flex-wrap: wrap; margin-bottom: 22px; }
+/* Spela hos Svenska Spel (spela.js) är huvudknappen: sist i raden bredvid
+   rubriken, först när raden står under rubriken i telefonen */
+@media (max-width: 640px) { .kp-actions > .kp-spela { order: -1; } }
 .kp-btn {
   display: inline-flex;
   align-items: center;

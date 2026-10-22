@@ -362,6 +362,8 @@ a.pp-row:focus-visible { outline: 2px solid var(--pp-pen); outline-offset: -2px;
 }
 .pp-field > span { display: block; font-size: 9.5px; font-weight: 800; letter-spacing: 0.16em; text-transform: uppercase; color: var(--pp-print); }
 .pp-field b { font-family: var(--display); font-size: 21px; font-weight: 700; font-variant-numeric: tabular-nums; }
+/* vad gängets kupong kostar per person, bredvid priset (spela.js) */
+.pp-field b small { margin-left: 6px; font-family: var(--sans); font-size: 11px; font-weight: 700; letter-spacing: 0.02em; color: var(--pp-ink-soft); white-space: nowrap; }
 .pp-fine { display: flex; align-items: flex-end; justify-content: space-between; gap: 18px; margin-top: 18px; }
 .pp .kp-src { margin: 0; font-size: 11px; color: var(--pp-ink-soft); }
 .pp .kp-src .note { color: var(--pp-no); }
@@ -515,6 +517,7 @@ a.pp-row:focus-visible { outline: 2px solid var(--pp-pen); outline-offset: -2px;
   .pp-tick { width: 20px; height: 20px; stroke-width: 3.2; }
   .pp-field { min-width: 0; flex: 1 1 70px; padding: 4px 8px 5px; }
   .pp-field b { font-size: 18px; }
+  .pp-field b small { display: block; margin: 1px 0 0; font-size: 10.5px; }
   .pp-fine { flex-direction: column; align-items: stretch; }
   .pp-code { justify-items: start; }
 }

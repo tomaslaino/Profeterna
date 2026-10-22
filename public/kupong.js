@@ -541,7 +541,9 @@ function renderCouponShow(id) {
     (g.done && !c.pending && window.Historik ? `<a class="kp-btn" href="${esc(Historik.href(c.id))}">Betyg och kommentar</a>` : '') +
     // En skärmbild av systemet: ändrar den här kupongen om det är samma
     // matcher, annars blir det en ny (systembild.js).
-    (round && window.Systembild ? Systembild.button() : '') + '</div>';
+    (round && window.Systembild ? Systembild.button() : '') +
+    // Innan spelstoppet: gängets tecken ifyllda hos Svenska Spel (spela.js).
+    (window.Spela ? Spela.button(c) : '') + '</div>';
   // Ur omgången: stegen, och rubriken med knapparna bredvid som i stegen
   // före.
   let html = fromTips
@@ -616,7 +618,10 @@ function teaser(c, g) {
   const name = couponName(c);
   // Innan matcherna startar går systemet ni spelade att ladda upp direkt
   // härifrån – är det samma matcher ändras kupongen (systembild.js).
-  const go = `<a class="kp-btn primary" href="#kupong">${g.started ? 'Följ kupongen' : 'Till kupongen'}</a>` +
+  // Innan spelstoppet är huvudknappen Spela hos Svenska Spel (spela.js) –
+  // rubriken och siffran leder fortfarande till kupongen.
+  const spela = !g.started && window.Spela ? Spela.button(c) : '';
+  const go = (spela || `<a class="kp-btn primary" href="#kupong">${g.started ? 'Följ kupongen' : 'Till kupongen'}</a>`) +
     (!g.started && window.Systembild ? Systembild.button('kp-btn', true) : '');
   return `<div class="card kp-teaser${g.live ? ' is-live' : ''}">` +
     // Kupong 1 som rubrik med namnet bredvid, och datumen ovanför.
@@ -903,7 +908,7 @@ function drawSlip() {
     const rows = [...signed, ...locked].reduce((a, x) => a * Math.max(1, x.sign.length), 1);
     const exp = signed.reduce((a, x) => a + (x.m.f ? x.sign.split('').reduce((b, s) => b + x.m.f.p[SIGNS.indexOf(s)], 0) / 100 : 0), 0) +
       KP.draft.locked.map((x) => gradeRow(x, now)).reduce((a, r) => a + (r.state === 'final' && r.hit != null ? (r.hit ? 1 : 0) : (r.p || 0) / 100), 0);
-    fields.push(['Kombinationer', rows], ['Väntat', kpNum(exp), 'Väntat antal rätt enligt modellen']);
+    fields.push(window.Spela ? Spela.field(rows, KP.draft.spel, Spela.folk()) : ['Kombinationer', rows], ['Väntat', kpNum(exp), 'Väntat antal rätt enligt modellen']);
   }
   Papper.slip('kp-build', {
     rows: draftSort(KP.draft, [...sel.map((x) => ({ ...x, note: KP.draft.notes[x.id] || '' })), ...locked], (x) => (x.m ? x.m.kickoff : '')),
