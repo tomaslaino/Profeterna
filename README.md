@@ -458,6 +458,12 @@ Utan nyckel ingen knapp.
   oraklet och Ikaros som polaroider bredvid omgången, och raden *Väntar på Teijder* i
   stället för porträtten. Omgångens tippare med utmärkelserna flyttar upp överst i
   Olympen, och Säsongens tippare försvinner – Olympens ställning visar samma sak.
+- **Tobaksaffären blir förstasidan på stora skärmar (2026-10-22, användarens önskemål):**
+  utan adress står ett rum i stället för den vanliga förstasidan – en sliten tobaksaffär vid
+  spelpulten där gänget sitter som leksaksfigurer på fönsterbänken, och föremålen i rummet
+  leder till sajtens delar, som i rummet på felixrieseberg.com. Den vanliga förstasidan finns
+  kvar som *Vanlig sida* (`#hem`) och står alltid i telefonen och i smala fönster. Se
+  [Tobaksaffären](#tobaksaffären).
 - **Säsongsprognosen tas bort (2026-10-20, användarens beslut):** vyn under Tabeller och
   simuleringen i bygget (`src/season.js`, `data/season.json`) försvinner, liksom
   programmet framåt och prognosdelen i lagkortet. Tabeller visar bara tabellen, med
@@ -546,6 +552,9 @@ server:
   [Omgångens tippare](#omgångens-tippare). Utmärkelserna räknas och ritas av
   [public/utmarkelser.js](public/utmarkelser.js) med
   [public/utmarkelser.css](public/utmarkelser.css), se [Utmärkelserna](#utmärkelserna).
+- **Tobaksaffären:** förstasidan på stora skärmar, [public/rum.js](public/rum.js) med
+  [public/rum.css](public/rum.css) och gänget i three.js i [public/rum-3d.js](public/rum-3d.js)
+  (ansiktena i `public/rum/`). Se [Tobaksaffären](#tobaksaffären).
 - **Frontend:** ren HTML/CSS/JS i `public/`, flikarna Matcher, Kupong och Olympen och
   sidorna Källor och Modell i sidfoten ([public/kallor.js](public/kallor.js),
   [public/modell.js](public/modell.js); `#utvardering` leder till *I skarpt läge* på
@@ -1038,7 +1047,8 @@ ställningen efter 90 minuter (samma utfall som prognosen).
 
 **Var den syns**
 
-- **Förstasidan** (utan adress, ingen flik – dit leder namnet): till vänster oraklet och
+- **Förstasidan** (utan adress på stora skärmar [Tobaksaffären](#tobaksaffären), annars och
+  med `#hem` den vanliga – ingen flik, dit leder namnet): till vänster oraklet och
   Ikaros som två polaroider med mottot under (se [Omgångens tippare](#omgångens-tippare)),
   till höger omgången utan kort runt sig – i telefonen bilderna överst och omgången
   centrerad under. Omgångens kupong är gängets kupong ur omgången som alla tippade (se
@@ -1676,6 +1686,69 @@ för tipset före avspark ([public/tippoang.js](public/tippoang.js)).
 
 Före första omgången står alla på noll med en länk till Kupong. Säsongens
 tippare på förstasidan länkar hit (*Till Olympen*).
+
+## Tobaksaffären
+
+Förstasidan på stora skärmar (utan adress, bredare än 900 px och inte på högkant):
+tobaksaffären vid spelpulten. Scenen ritas i 1600 × 1000 och skalas så att den täcker
+fönstret; lagren ligger på olika djup (CSS 3D) och vrids lite när musen rör sig. Menyn
+(Kupong, Olympen, Matcher, Tabeller, Statistik) och foten (*K kupongen · T tv:n*, *Vanlig
+sida*) ligger utanför scenen i fönstrets hörn. [public/rum.js](public/rum.js) ritar rummet
+och fyller det med sajtens data, [public/rum.css](public/rum.css) ger det utseendet och
+rörelserna, och [public/rum-3d.js](public/rum-3d.js) ritar gänget i three.js 0.160.0 (från
+jsdelivr, importmap i `index.html`), som hämtas först när rummet visas – utan WebGL eller
+utan nätet står rummet kvar utan gänget.
+
+**Föremålen** – pekar man på ett lyser ordet i menyn som det leder till, och klickar man
+går kameran fram mot det innan sidan byts:
+
+- **Fällbladstavlan** (bakväggen till höger om fönstret) → Matcher. Före spelstoppet visar
+  den omgångens matcher (lagens tre bokstäver) med oddsen för 1, X och 2 och spelstoppet i
+  rubriken; därefter resultaten med det rätta tecknet tänt. Sju rader i taget; den bläddrar
+  var nionde sekund och klaprar när något ändras.
+- **Omgångens tippare** (ramen under tavlan, som Månadens anställd) → Olympen: oraklet som
+  regerar (`Kronan.holders`), med porträttet renderat ur figuren (fotot tills figurerna är
+  ritade).
+- **Pokalhyllan** (högra väggen) → Olympen: en liten pokal per vunnen omgång i vinnarens
+  färg (delat = en var), ur `data/tippare.json`.
+- **Pärmarna** (hyllan under) → Statistik: en per säsong, de tolv senaste.
+- **Krittavlan** (under tv:n) → Tabeller: Premier Leagues topp som dagens meny, ur
+  `data/teams/pl.json`.
+- **Korktavlan** (längst till höger) → gängets kuponger i Olympen (`#olympen/kuponger`):
+  de färdigspelade kupongerna (`Historik.coupons`) rättade med röd penna, en med kaffering.
+  Tom tills den första är färdigspelad.
+- **Förstoringsglaset** på en hög FACIT (pulten, nere till vänster) → Analysera för nästa
+  match i omgången som inte har börjat (`#match/<id>/analysera`; adressen blir
+  `#match/<id>` och matchbladet öppnas på fliken).
+- **Kupongen, kvittot och terminalen** → Kupong. Kupongen visar omgångens matcher med
+  kryss där gängets kupong har tecken, kvittot när var och en lämnade in och terminalen hur
+  många som är inne och vem som väntas. Guldordet bredvid heter *Fyll i kupongen* (*Följ
+  kupongen* när matcherna har börjat).
+- **Tv:n** med text-tv (sida 331, omgångens matcher på två undersidor) zoomas in med ett
+  klick eller T; färgknapparna leder till Kupong, Olympen, Tabeller och Statistik, Esc
+  zoomar ut.
+
+**Gänget** sitter på fönsterbänken med benen hängande: DL dricker ur en flaska, DT röker
+och skrattar, DJ har en burk i ena handen och pratar med cigaretten i den andra. Var och en
+har sin loop (12–21 s) – flaskan och burken till munnen med huvudet bakåt, ett bloss med
+glöden som tänds och röken som blåses ut, benen som dinglar – och huvudena nickar efter
+musen. Röken från glöden räknas för varje bloss ur var glöden var när det föddes, så att
+samma tid alltid ger samma bild. Inga riktiga märken: flaskan säger PILSNER, burken ÖL.
+
+**Rummet rör sig också:** regnet faller utanför rutan och dörren, droppar rinner på glaset,
+neonen glappar ibland, röken ligger under lysröret, damm syns i ljuset och ett hörn på en
+löpsedel har släppt och fladdrar. Stället är slitet: nikotingula väggar och tak, fläckar,
+avflagnad färg, en spricka, skuggan efter en tavla som flyttats, nötta kanter på disken och
+pulten, kafferingar och brännmärken. Med `prefers-reduced-motion` står allt still (en bild,
+ingen kamera efter musen, inget klapper).
+
+**Data:** omgången ur `GET …/samtal` (`TP.round`, tippare.js), annars omgångens kupong;
+ställningen och resultaten rättas med `gradeRow` (kupong.js), också med Dölj resultat.
+Rummet läser om datan varje minut medan det står öppet.
+
+**Bilder:** `?rum-t=<sekunder>` fryser klockan (figurerna, röken, tavlans klapper och
+CSS-animationerna står på samma tid) och `?rum-mx=&rum-my=` (−1…1) kamerans läge; sidan
+sätter `data-rum-klar` på `body` när allt är ritat.
 
 ## Statusmärkning
 

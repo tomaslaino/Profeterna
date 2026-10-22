@@ -1,0 +1,1082 @@
+'use strict';
+
+// ---------- rummet ----------
+//
+// Förstasidan på stora skärmar: tobaksaffären vid spelpulten, ritad i lager
+// på olika djup (CSS 3D) som vrids lite när musen rör sig. Gänget – DL, DT
+// och DJ – sitter som leksaksfigurer (three.js, rum-3d.js) på fönsterbänken,
+// dricker öl, röker och pratar. Föremålen leder vidare, som i ett rum hos
+// Felix Rieseberg:
+//   fällbladstavlan → Matcher        förstoringsglaset → Analysera (nästa match)
+//   korktavlan → gängets kuponger     pokalhyllan, Omgångens tippare → Olympen
+//   krittavlan → Tabeller             pärmarna → Statistik
+//   kupongen, kvittot, terminalen → Kupong, tv:n zoomas in (T) med text-tv:ns
+//   färgknappar.
+// Pekar man på ett föremål lyser ordet i menyn som det leder till.
+//
+// Vanlig sida (#hem) är den vanliga förstasidan. I telefonen och i smala
+// fönster står den alltid där i stället för rummet (Rum.fits). Rörelserna
+// stängs av med prefers-reduced-motion. För bilder: ?rum-t=<sekunder> fryser
+// klockan, ?rum-mx=&rum-my= kamerans läge (−1…1).
+//
+// Läses efter kupong.js, samtal.js, tippare.js och kronan.js och använder
+// deras hjälpare (state, KP, TP, gradeRow, couponNumber, currentCoupon,
+// Kronan.holders, Historik.coupons …). rum-3d.js hämtas först när rummet
+// visas, med three.js från jsdelivr (importmap i index.html); utan WebGL står
+// rummet kvar utan gänget.
+
+window.Rum = (() => {
+  const W = 1600;
+  const H = 1000;
+  const PERSP = 1400;
+  const PIVOT = -330;
+  // Högra väggen: vågräta linjer går mot flyktpunkten VP; at(x, yb) är
+  // höjden yb (mätt i hörnet x = 1140) längre in mot betraktaren.
+  const VP = [760, 400];
+  const at = (x, yb) => VP[1] + (yb - VP[1]) * (x - VP[0]) / (1140 - VP[0]);
+  const sc = (x) => (x - VP[0]) / (1140 - VP[0]);
+  const r1 = (x) => Math.round(x * 10) / 10;
+  const GANG = { DL: '#4d8ff0', DT: '#3db37c', DJ: '#a069e6' };
+
+  const R = { built: false, on: false, el: null, q: new URLSearchParams(location.search), t0: performance.now(), frozen: null,
+    mx: 0.5, my: -0.25, tx: 0.5, ty: -0.25, raf: 0, fig: null, page: 0, pageAt: 0, zoom: null, last: 0 };
+  const still = () => R.frozen != null;
+  const calm = () => still() || matchMedia('(prefers-reduced-motion: reduce)').matches;
+  const now = () => (still() ? R.frozen : (performance.now() - R.t0) / 1000);
+
+  function rng(a) {
+    return () => {
+      a |= 0; a = a + 0x6D2B79F5 | 0;
+      let t = Math.imul(a ^ a >>> 15, 1 | a);
+      t = t + Math.imul(t ^ t >>> 7, 61 | t) ^ t;
+      return ((t ^ t >>> 14) >>> 0) / 4294967296;
+    };
+  }
+
+  // ---------- scenen ----------
+
+  function plane(z, inner, extra = 1, cls = '') {
+    const k = (PERSP - z) / PERSP * extra;
+    return `<div class="rum-pl${cls ? ` ${cls}` : ''}" style="transform: translateZ(${z}px) scale(${k.toFixed(4)})">${inner}</div>`;
+  }
+  const svg = (inner, cls = '') => `<svg class="rum-layer${cls ? ` ${cls}` : ''}" viewBox="0 0 ${W} ${H}" aria-hidden="true">${inner}</svg>`;
+
+  const DEFS = `<defs>
+    <linearGradient id="rum-night" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#0a0f19"/><stop offset=".55" stop-color="#121826"/><stop offset="1" stop-color="#1c1d24"/></linearGradient>
+    <linearGradient id="rum-wall" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#857552"/><stop offset=".45" stop-color="#6c5f43"/><stop offset="1" stop-color="#3e3527"/></linearGradient>
+    <linearGradient id="rum-nik" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#5a3c0c" stop-opacity=".55"/><stop offset=".35" stop-color="#5a3c0c" stop-opacity="0"/></linearGradient>
+    <linearGradient id="rum-rwall" gradientUnits="userSpaceOnUse" x1="1140" y1="0" x2="1600" y2="0"><stop offset="0" stop-color="#5a4e39"/><stop offset="1" stop-color="#2f2920"/></linearGradient>
+    <linearGradient id="rum-ceil" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#2b2519"/><stop offset="1" stop-color="#55492f"/></linearGradient>
+    <linearGradient id="rum-pult" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#6e4a30"/><stop offset=".5" stop-color="#5a3b26"/><stop offset="1" stop-color="#3b2619"/></linearGradient>
+    <linearGradient id="rum-alu" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#9a9a96"/><stop offset=".5" stop-color="#5e5e5b"/><stop offset="1" stop-color="#2e2e2c"/></linearGradient>
+    <linearGradient id="rum-counter" x1="0" y1="0" x2="1" y2="0"><stop offset="0" stop-color="#4a3a2c"/><stop offset="1" stop-color="#2a2019"/></linearGradient>
+    <linearGradient id="rum-countertop" x1="0" y1="0" x2="1" y2="0"><stop offset="0" stop-color="#8b8577"/><stop offset="1" stop-color="#5b564c"/></linearGradient>
+    <linearGradient id="rum-sill" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#7a7262"/><stop offset="1" stop-color="#958b78"/></linearGradient>
+    <radialGradient id="rum-sodium" cx=".5" cy=".5" r=".5"><stop offset="0" stop-color="#ffb35c" stop-opacity=".9"/><stop offset="1" stop-color="#ffb35c" stop-opacity="0"/></radialGradient>
+    <radialGradient id="rum-tube" cx=".5" cy=".5" r=".5"><stop offset="0" stop-color="#eef6ff" stop-opacity=".55"/><stop offset="1" stop-color="#eef6ff" stop-opacity="0"/></radialGradient>
+    <linearGradient id="rum-streak" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#ffb35c" stop-opacity=".5"/><stop offset="1" stop-color="#ffb35c" stop-opacity="0"/></linearGradient>
+    <linearGradient id="rum-streakred" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#ff3b30" stop-opacity=".55"/><stop offset="1" stop-color="#ff3b30" stop-opacity="0"/></linearGradient>
+    <linearGradient id="rum-cupg" x1="0" y1="0" x2="1" y2="0"><stop offset="0" stop-color="#fff" stop-opacity=".55"/><stop offset=".35" stop-color="#fff" stop-opacity="0"/><stop offset="1" stop-color="#000" stop-opacity=".45"/></linearGradient>
+    <clipPath id="rum-win"><rect x="272" y="132" width="676" height="426"/></clipPath>
+    <clipPath id="rum-doorglass"><rect x="50" y="136" width="172" height="560"/></clipPath>
+    <filter id="rum-b1" x="-10%" y="-10%" width="120%" height="120%"><feGaussianBlur stdDeviation="1.3"/></filter>
+    <filter id="rum-b4" x="-50%" y="-50%" width="200%" height="200%"><feGaussianBlur stdDeviation="4"/></filter>
+    <filter id="rum-b10" x="-50%" y="-50%" width="200%" height="200%"><feGaussianBlur stdDeviation="10"/></filter>
+    <filter id="rum-b24" x="-50%" y="-50%" width="200%" height="200%"><feGaussianBlur stdDeviation="24"/></filter>
+    <filter id="rum-b40" x="-50%" y="-50%" width="200%" height="200%"><feGaussianBlur stdDeviation="40"/></filter>
+    <filter id="rum-grainwood" x="0" y="0" width="100%" height="100%"><feTurbulence type="fractalNoise" baseFrequency="0.003 0.07" numOctaves="3" seed="5"/><feColorMatrix values="0 0 0 0 .1  0 0 0 0 .06  0 0 0 0 .03  1.5 0 0 0 -.5"/></filter>
+    <filter id="rum-flack" x="0" y="0" width="100%" height="100%"><feTurbulence type="fractalNoise" baseFrequency=".011 .016" numOctaves="4" seed="8"/><feColorMatrix values="0 0 0 0 .2  0 0 0 0 .13  0 0 0 0 .03  0 0 0 -2.2 1.25"/></filter>
+    <filter id="rum-prick" x="0" y="0" width="100%" height="100%"><feTurbulence type="fractalNoise" baseFrequency=".5" numOctaves="1" seed="2"/><feColorMatrix values="0 0 0 0 .18  0 0 0 0 .12  0 0 0 0 .05  0 0 0 -9 6.4"/></filter>
+    <filter id="rum-grime" x="0" y="0" width="100%" height="100%"><feTurbulence type="fractalNoise" baseFrequency=".02 .006" numOctaves="3" seed="4"/><feColorMatrix values="0 0 0 0 .55  0 0 0 0 .52  0 0 0 0 .45  0 0 0 -2 1.1"/></filter>
+  </defs>`;
+
+  // Fasaden mittemot, gatlyktorna, bilen och dropparna på rutan.
+  function outside(R0) {
+    const warm = ['#ffd58a', '#ffc56b', '#f6e7c1', '#ffcf7a', '#a9c4ff'];
+    let s = '';
+    for (const [hx, hw, hc] of [[0, 190, '#0e1119'], [190, 260, '#12141c'], [450, 330, '#0d1017'], [780, 220, '#111520']]) {
+      s += `<rect x="${hx}" y="100" width="${hw}" height="300" fill="${hc}"/>`;
+      for (let wy = 116; wy < 280; wy += 30) {
+        for (let wx = hx + 14; wx < hx + hw - 18; wx += 30) {
+          const lit = R0() < 0.3;
+          s += `<rect x="${wx}" y="${wy}" width="14" height="17" fill="${lit ? warm[(R0() * 5) | 0] : '#fff'}" opacity="${lit ? r1(0.28 + R0() * 0.4) : 0.025}"/>`;
+        }
+      }
+    }
+    s += `<rect x="560" y="312" width="210" height="88" fill="#1a1410"/><rect x="566" y="330" width="198" height="64" fill="#ffcf8a" opacity=".32"/>
+      <rect x="566" y="330" width="198" height="64" fill="#3a2414" opacity=".25"/>
+      <g fill="#1a1410"><rect x="630" y="330" width="4" height="64"/><rect x="698" y="330" width="4" height="64"/>
+        <rect x="584" y="372" width="30" height="4"/><rect x="588" y="376" width="3" height="18"/><rect x="608" y="376" width="3" height="18"/>
+        <rect x="716" y="370" width="34" height="4"/><rect x="722" y="374" width="3" height="20"/><rect x="744" y="374" width="3" height="20"/></g>
+      <rect x="650" y="350" width="34" height="8" rx="4" fill="#fff4d8" opacity=".5"/><rect x="580" y="292" width="170" height="26" fill="#0e1a12"/>
+      <text x="665" y="312" text-anchor="middle" font-family="Fraunces" font-style="italic" font-weight="700" font-size="21" fill="#9bf5b5">Pizzeria</text>
+      <text x="665" y="312" text-anchor="middle" font-family="Fraunces" font-style="italic" font-weight="700" font-size="21" fill="#4fe08a" filter="url(#rum-b4)">Pizzeria</text>
+      <rect x="0" y="400" width="1000" height="14" fill="#2a2b30"/><rect x="0" y="414" width="1000" height="310" fill="#121318"/>`;
+    for (const [sx, k] of [[330, 1], [520, 0.8], [880, 1], [120, 0.9]]) {
+      s += `<rect x="${sx - 2}" y="250" width="4" height="165" fill="#1a1c22"/><circle cx="${sx}" cy="250" r="${60 * k}" fill="url(#rum-sodium)" opacity=".7"/>` +
+        `<circle cx="${sx}" cy="250" r="4" fill="#ffe2b0"/><rect x="${sx - 7}" y="418" width="14" height="140" fill="url(#rum-streak)" filter="url(#rum-b4)"/>`;
+    }
+    for (const cx of [700, 736]) {
+      s += `<circle cx="${cx}" cy="470" r="5" fill="#ff4a3a"/><circle cx="${cx}" cy="470" r="16" fill="#ff3b30" opacity=".45" filter="url(#rum-b4)"/>` +
+        `<rect x="${cx - 4}" y="478" width="8" height="80" fill="url(#rum-streakred)" filter="url(#rum-b4)"/>`;
+    }
+    s += '<rect x="680" y="440" width="76" height="36" rx="8" fill="#08090c"/><rect x="560" y="420" width="210" height="90" fill="#ffcf8a" opacity=".07" filter="url(#rum-b10)"/>';
+    return s;
+  }
+
+  // Droppar som sitter kvar på rutan (regnet som faller ritas i rain()).
+  function drops(R0, x0, w, y0, h, m) {
+    let s = '';
+    for (let i = 0; i < m; i++) {
+      const dx = x0 + R0() * w;
+      const dy = y0 + R0() * h;
+      const r = 1 + R0() * 3;
+      if (R0() < 0.3) s += `<line x1="${r1(dx)}" y1="${r1(dy)}" x2="${r1(dx + (R0() - 0.5) * 4)}" y2="${r1(dy - 10 - R0() * 40)}" stroke="#dfe8ff" stroke-opacity=".08" stroke-width="${r1(r * 0.8)}"/>`;
+      s += `<circle cx="${r1(dx)}" cy="${r1(dy)}" r="${r1(r)}" fill="#dfe8ff" opacity="${r1(0.1 + R0() * 0.12)}"/><circle cx="${r1(dx - r * 0.3)}" cy="${r1(dy - r * 0.3)}" r="${r1(r * 0.35)}" fill="#fff" opacity=".35"/>`;
+    }
+    return s;
+  }
+
+  // Cigarettpaketen på hyllorna längs högra väggen (påhittade färger, inga märken).
+  function packs(R0, yb, x0, x1) {
+    const cols = ['#c8643a', '#2a52a0', '#e7e1d2', '#3db37c', '#d8b06a', '#8b2e2a', '#1f6f6a', '#f0d699', '#5a5f8a'];
+    let s = shelf(yb, x0, x1);
+    let x = x0 + 4;
+    while (x < x1) {
+      const k = sc(x);
+      const c = cols[(R0() * cols.length) | 0];
+      const n = 3 + ((R0() * 5) | 0);
+      for (let i = 0; i < n && x < x1; i++) {
+        const w = 13 * k;
+        for (let r = 0; r < 3; r++) {
+          const h = 9 * k;
+          const y1 = at(x, yb) - r * (h + 1);
+          const y2 = at(x + w, yb) - r * (h + 1) * ((x + w - VP[0]) / (x - VP[0]));
+          s += `<polygon points="${r1(x)},${r1(y1)} ${r1(x + w)},${r1(y2)} ${r1(x + w)},${r1(y2 - h * 1.03)} ${r1(x)},${r1(y1 - h)}" fill="${c}" opacity=".8"/>` +
+            `<polygon points="${r1(x)},${r1(y1 - h)} ${r1(x + w)},${r1(y2 - h * 1.03)} ${r1(x + w)},${r1(y2 - h * 1.03 + 2 * k)} ${r1(x)},${r1(y1 - h + 2 * k)}" fill="#fff" opacity=".12"/>`;
+        }
+        x += w + k;
+      }
+      x += 4 * k;
+    }
+    return s;
+  }
+  function shelf(yb, x0, x1) {
+    return `<polygon points="${x0},${r1(at(x0, yb))} ${x1},${r1(at(x1, yb))} ${x1},${r1(at(x1, yb) + 8 * sc(x1))} ${x0},${r1(at(x0, yb) + 8 * sc(x0))}" fill="#241d15"/>` +
+      `<polygon points="${x0},${r1(at(x0, yb))} ${x1},${r1(at(x1, yb))} ${x1},${r1(at(x1, yb) + 1.4 * sc(x1))} ${x0},${r1(at(x0, yb) + 1.4 * sc(x0))}" fill="#c9bfa5" opacity=".18"/>`;
+  }
+
+  // Bakgrunden: tak, lysrör, väggarna (nikotingula, fläckiga, flagnande),
+  // dörren, skyltfönstret, disken med terminalen och godisburken.
+  function bg() {
+    const R0 = rng(17);
+    const out = outside(R0);
+    const win = drops(R0, 272, 676, 132, 426, 120);
+    const door = drops(R0, 50, 172, 136, 560, 40);
+    let candy = '';
+    for (let i = 0; i < 36; i++) candy += `<circle cx="${r1(1414 + R0() * 52)}" cy="${r1(518 + R0() * 38)}" r="${r1(4 + R0() * 3)}" fill="${['#e04a3a', '#f0c23a', '#3db37c', '#f3ead9', '#a069e6'][(R0() * 5) | 0]}" opacity=".85"/>`;
+    const R1 = rng(23);
+    const top = packs(R1, 175, 1140, 1600) + packs(R1, 225, 1140, 1600);
+    return svg(`${DEFS}
+  <polygon points="0,0 1250,0 1140,90 0,90" fill="url(#rum-ceil)"/>
+  <rect x="0" y="0" width="1250" height="90" filter="url(#rum-prick)" opacity=".5"/>
+  <ellipse cx="650" cy="44" rx="470" ry="52" fill="#3a2a0e" opacity=".42" filter="url(#rum-b24)"/>
+  <path d="M1010 8 q22 -6 40 6 q18 14 -2 26 q-20 10 -40 -2 q-16 -14 2 -30 z" fill="#5a4418" opacity=".28" filter="url(#rum-b4)"/>
+  <path d="M1010 8 q22 -6 40 6 q18 14 -2 26 q-20 10 -40 -2 q-16 -14 2 -30 z" fill="none" stroke="#2a1e08" stroke-opacity=".35" stroke-width="1.6"/>
+  <g stroke="#000" stroke-opacity=".18" stroke-width="1.2"><line x1="0" y1="45" x2="1194" y2="45"/><line x1="200" y1="0" x2="200" y2="90"/><line x1="560" y1="0" x2="560" y2="90"/><line x1="920" y1="0" x2="920" y2="90"/></g>
+  <rect x="380" y="30" width="540" height="22" rx="3" fill="#d6d2c2"/>
+  <rect x="392" y="35" width="516" height="6" rx="3" fill="#ffffff"/>
+  <rect x="392" y="44" width="516" height="5" rx="2.5" fill="#f2f8ff"/>
+  <rect x="384" y="30" width="62" height="22" fill="#3a2e18" opacity=".25"/>
+  <ellipse cx="650" cy="62" rx="420" ry="70" fill="url(#rum-tube)" filter="url(#rum-b24)" class="rum-tubeglow"/>
+
+  <rect x="0" y="90" width="1140" height="640" fill="url(#rum-wall)"/>
+  <rect x="0" y="90" width="1140" height="640" fill="url(#rum-nik)"/>
+  <rect x="0" y="90" width="1140" height="640" filter="url(#rum-flack)" opacity=".75"/>
+  <rect x="0" y="90" width="1140" height="640" filter="url(#rum-prick)" opacity=".55"/>
+  <rect x="0" y="90" width="1140" height="6" fill="#000" opacity=".3"/>
+  <path d="M640 92 q30 26 18 60 q-6 22 10 40" fill="none" stroke="#3b2a12" stroke-opacity=".28" stroke-width="7" filter="url(#rum-b4)"/>
+  <ellipse cx="760" cy="104" rx="58" ry="16" fill="none" stroke="#4a3412" stroke-opacity=".3" stroke-width="3" filter="url(#rum-b1)"/>
+  <ellipse cx="768" cy="106" rx="40" ry="10" fill="#4a3412" opacity=".12" filter="url(#rum-b4)"/>
+  <rect x="986" y="286" width="132" height="196" fill="#b5a47a" opacity=".16"/>
+  <rect x="986" y="286" width="132" height="196" fill="none" stroke="#2a2010" stroke-opacity=".18" stroke-width="2" filter="url(#rum-b1)"/>
+  <path d="M958 122 l9 -9 l-2 -7 l11 -9 l6 -6" fill="none" stroke="#1e160a" stroke-opacity=".55" stroke-width="1.2"/>
+  <path d="M700 90 L700 104 Q700 112 690 114 L360 120 Q352 121 352 130" fill="none" stroke="#2c2a26" stroke-width="2.2" opacity=".85"/>
+  <g fill="#cbbf9e" opacity=".5"><rect x="512" y="114" width="5" height="3" rx="1"/><rect x="420" y="117" width="5" height="3" rx="1"/></g>
+  <path d="M0 470 q30 -10 60 4 l-4 18 q-30 -8 -56 2 z" fill="#2a1e0c" opacity=".14" filter="url(#rum-b4)"/>
+  <path d="M262 590 q14 8 40 6 q30 -4 46 10 l-2 30 l-84 0 z" fill="#9b8c68" opacity=".35"/>
+  <path d="M262 590 q14 8 40 6 q30 -4 46 10" fill="none" stroke="#241c10" stroke-opacity=".4" stroke-width="1.2"/>
+
+  <polygon points="1140,90 1250,0 1600,0 1600,1000 1140,730" fill="url(#rum-rwall)"/>
+  <polygon points="1140,90 1250,0 1600,0 1600,1000 1140,730" filter="url(#rum-flack)" opacity=".55"/>
+  <line x1="1140" y1="90" x2="1140" y2="730" stroke="#000" stroke-opacity=".35" stroke-width="3"/>
+  ${top}
+  <polygon points="1140,90 1600,0 1600,1000 1140,730" fill="#000" opacity=".2"/>
+
+  <rect x="36" y="122" width="200" height="610" fill="#3b3b3d"/>
+  <g clip-path="url(#rum-doorglass)"><g transform="translate(-260 0)" filter="url(#rum-b1)">${out}</g>${door}
+    <rect x="50" y="136" width="172" height="560" filter="url(#rum-grime)" opacity=".5"/></g>
+  <rect x="50" y="136" width="172" height="560" fill="#fff" opacity=".03"/>
+  <rect x="44" y="420" width="184" height="16" rx="3" fill="url(#rum-alu)"/>
+  <path d="M36 122 h200 v610 h-200 z M50 136 v560 h172 v-560 z" fill="#1e1e20" fill-rule="evenodd" opacity=".001"/>
+  <path d="M136 122 v12" stroke="#7a6a4a" stroke-width="2"/>
+  <path d="M126 148 Q136 128 146 148 Z" fill="#c9a252"/><circle cx="136" cy="150" r="2.5" fill="#8a6a2a"/>
+  <path d="M118 176 L136 158 L154 176" fill="none" stroke="#2a2420" stroke-width="1.2"/>
+  <rect x="96" y="176" width="80" height="30" rx="3" fill="#ece0c4"/>
+  <rect x="96" y="176" width="80" height="30" rx="3" fill="none" stroke="#b3261e" stroke-width="2"/>
+  <text x="136" y="197" text-anchor="middle" font-family="Fraunces" font-weight="800" font-size="15" letter-spacing="1.5" fill="#b3261e">STÄNGT</text>
+  <!-- flagnad färg vid dörrkarmen -->
+  <path d="M236 300 l14 6 l-3 18 l9 12 l-6 22 l4 16 l-18 4 z" fill="#9b8c68" opacity=".55"/>
+  <path d="M236 300 l14 6 l-3 18 l9 12 l-6 22 l4 16" fill="none" stroke="#241c10" stroke-opacity=".45" stroke-width="1.4"/>
+  <path d="M250 306 l7 -3 l-2 9 z" fill="#b8a77d" opacity=".7"/>
+  <path d="M0 560 l22 -8 l6 20 l-10 18 l8 26 l-26 6 z" fill="#9b8c68" opacity=".5"/>
+
+  <rect x="262" y="122" width="696" height="446" fill="#3a3a3c"/>
+  <g clip-path="url(#rum-win)">
+    <g filter="url(#rum-b1)">${out}</g>${win}
+    <rect x="272" y="132" width="676" height="426" fill="#fff" opacity=".03"/>
+    <rect x="420" y="150" width="420" height="5" rx="2" fill="#fff" opacity=".12" filter="url(#rum-b1)"/>
+    <rect x="272" y="132" width="676" height="426" filter="url(#rum-grime)" opacity=".45"/>
+    <rect x="272" y="520" width="676" height="38" fill="#2a2418" opacity=".35" filter="url(#rum-b4)"/>
+  </g>
+  <rect x="604" y="132" width="12" height="426" fill="#3a3a3c"/>
+  <rect x="262" y="558" width="696" height="12" fill="#2c2c2e"/>
+  <path d="M940 122 l18 0 l0 30 l-9 -6 l-4 10 l-5 -12 z" fill="#8e8064" opacity=".5"/>
+  <ellipse cx="440" cy="236" rx="320" ry="200" fill="#ff4a30" opacity=".08" filter="url(#rum-b40)" class="rum-neonglow"/>
+
+  <polygon points="1060,490 1140,490 1600,599 1600,652" fill="url(#rum-countertop)"/>
+  <polygon points="1060,490 1600,652 1600,1000 1060,1000" fill="url(#rum-counter)"/>
+  <line x1="1060" y1="490" x2="1600" y2="652" stroke="#c9c2b2" stroke-opacity=".35" stroke-width="2"/>
+  <g stroke="#d9c7a1" stroke-opacity=".5" stroke-width="2.4" stroke-linecap="round">
+    <line x1="1092" y1="500" x2="1130" y2="511"/><line x1="1236" y1="543" x2="1250" y2="547"/><line x1="1318" y1="567" x2="1372" y2="583"/><line x1="1490" y1="619" x2="1512" y2="626"/>
+  </g>
+  <polygon points="1060,492 1600,654 1600,700 1060,540" fill="#000" opacity=".12"/>
+  <ellipse cx="1205" cy="470" rx="110" ry="50" fill="#5fe0d0" opacity=".16" filter="url(#rum-b24)"/>
+  <polygon points="1150,418 1258,430 1256,500 1150,494" fill="#1c1c1e"/>
+  <polygon points="1158,426 1250,436 1248,492 1158,488" fill="#123a3a"/>
+  <polygon points="1158,426 1250,436 1248,492 1158,488" fill="#5ff0dc" opacity=".35"/>
+  <g font-family="VT323, monospace" font-size="11" fill="#c8fff4" opacity=".88" id="rum-term">
+    <text x="1166" y="446" transform="rotate(5 1166 446)"></text>
+    <text x="1166" y="460" transform="rotate(5 1166 460)"></text>
+    <text x="1166" y="474" transform="rotate(5 1166 474)"></text>
+  </g>
+  <polygon points="1196,494 1214,494 1222,520 1190,518" fill="#141414"/>
+  <polygon points="1262,486 1340,500 1340,530 1262,514" fill="#232325"/>
+  <polygon points="1278,488 1322,496 1320,470 1280,463" fill="#f1efe8"/>
+  <ellipse cx="1440" cy="560" rx="34" ry="8" fill="#000" opacity=".35" filter="url(#rum-b4)"/>
+  <rect x="1408" y="490" width="64" height="70" rx="12" fill="#d9e6ea" opacity=".2"/>
+  ${candy}
+  <rect x="1404" y="482" width="72" height="12" rx="4" fill="#c8643a"/>
+  <rect x="1410" y="494" width="60" height="62" rx="10" fill="#cfc4a3" opacity=".12"/>
+
+  <g stroke="#1f1f20" stroke-width="7" fill="none"><path d="M22 650 V306 H324 V650"/></g>
+  <rect x="18" y="300" width="310" height="8" fill="url(#rum-alu)"/>
+  <rect x="18" y="298" width="310" height="3" fill="#cfc6b0" opacity=".25"/>`);
+  }
+
+  // Regnet som faller utanför: två band per ruta som glider nedåt (bara
+  // transform, så att det blir billigt).
+  function rain() {
+    const R0 = rng(5);
+    const band = (w, h, n, o) => {
+      let s = '';
+      for (let i = 0; i < n; i++) {
+        const x = R0() * w;
+        const y = R0() * h;
+        const len = 16 + R0() * 34;
+        const line = `<line x1="${r1(x)}" y1="${r1(y)}" x2="${r1(x - len * 0.12)}" y2="${r1(y + len)}" stroke="#c8d6f0" stroke-opacity="${r1(o + R0() * 0.14)}" stroke-width="${r1(0.7 + R0() * 0.6)}"/>`;
+        s += line + line.replace(/y1="([\d.]+)" x2="([\d.]+)" y2="([\d.]+)"/, (_, a, b, c) => `y1="${r1(+a + h)}" x2="${b}" y2="${r1(+c + h)}"`);
+      }
+      return `<svg viewBox="0 0 ${w} ${2 * h}" width="${w}" height="${2 * h}">${s}</svg>`;
+    };
+    const pane = (x, y, w, h, n) => `<div class="rum-regn" style="left:${x}px; top:${y}px; width:${w}px; height:${h}px">` +
+      `<div class="rum-regn-b fjarr" style="height:${2 * h}px">${band(w, h, Math.round(n * 0.6), 0.03)}</div>` +
+      `<div class="rum-regn-b" style="height:${2 * h}px">${band(w, h, n, 0.05)}</div>` +
+      `<i class="rum-droppe" style="left:${Math.round(w * 0.3)}px"></i><i class="rum-droppe d2" style="left:${Math.round(w * 0.72)}px"></i></div>`;
+    return pane(272, 132, 676, 426, 220) + pane(50, 136, 172, 560, 70);
+  }
+
+  // Neonskylten, spegelvänd inifrån; ett av o:na glappar ibland.
+  function neon() {
+    const word = (y, cls = '') => `<g class="rum-neon${cls}" transform="translate(880 0) scale(-1 1)" font-family="Fraunces" font-style="italic" font-weight="600" text-anchor="middle">` +
+      `<text x="440" y="${y}" font-size="68" fill="#ff2d1f" filter="url(#rum-b10)" opacity=".9">Tobak</text>` +
+      `<text x="440" y="${y}" font-size="68" fill="none" stroke="#ff3a2a" stroke-width="6" filter="url(#rum-b4)">Tobak</text>` +
+      `<text x="440" y="${y}" font-size="68" fill="none" stroke="#ffd6cf" stroke-width="1.8">Tobak</text></g>`;
+    return svg(`<line x1="350" y1="132" x2="356" y2="140" stroke="#555" stroke-width="1"/><line x1="530" y1="132" x2="524" y2="140" stroke="#555" stroke-width="1"/>
+      <ellipse cx="440" cy="168" rx="160" ry="58" fill="#ff3a2a" opacity=".28" filter="url(#rum-b24)" class="rum-neonhalo"/>
+      ${word(190)}<rect x="420" y="200" width="40" height="10" rx="2" fill="#1d1b1a"/>`);
+  }
+
+  // Löpsedlarna i stället, den vänstra med ett hörn som släppt.
+  function lop() {
+    return '<div class="rum-lop" style="left:28px; top:318px"><span class="mast">Facit</span><div class="kick">Experterna:</div><div class="head">Bollen är rund</div><i class="tejp" style="left:6px"></i></div>' +
+      '<div class="rum-lop slapp" style="left:178px; top:318px"><span class="mast">Facit</span><div class="kick">Lördag:</div><div class="head">DJ tror på kryss</div>' +
+      '<i class="tejp" style="left:8px"></i><i class="horn"></i></div>';
+  }
+
+  // ---------- de sju sakerna ----------
+
+  // 1. Fällbladstavlan: omgångens matcher med odds före spelstoppet, sedan
+  // resultaten med det rätta tecknet tänt. Sju rader i taget; den bläddrar
+  // och klaprar.
+  const COLS = 19;
+  const ROWS = 7;
+  function boardHtml() {
+    const row = (cls) => `<div class="rum-fb-r${cls}">${'<b> </b>'.repeat(COLS)}</div>`;
+    return `<a class="rum-fb rum-sak" href="#matcher" data-nav="matcher" aria-label="Matcher">` +
+      `<span class="rum-fb-skruv"></span><span class="rum-fb-skruv h"></span>${row(' rum-fb-hd')}${Array.from({ length: ROWS }, () => row('')).join('')}</a>`;
+  }
+
+  // 5. Omgångens tippare: som Månadens anställd, med vinnarfigurens porträtt.
+  function frameHtml() {
+    return '<a class="rum-ram rum-sak" href="#olympen" data-nav="olympen" aria-label="Olympen">' +
+      '<span class="rum-ram-bild"><img alt="" id="rum-ram-img"></span>' +
+      '<span class="rum-ram-skylt"><small>Omgångens tippare</small><b id="rum-ram-namn"></b></span></a>';
+  }
+
+  // Högra väggen i perspektiv: ett element med väggens mått (z = djupet in
+  // från hörnet, y = höjden i hörnet) vrids in mot väggen. P = 1000 px.
+  const wz = (x) => 1000 * (1 - (1140 - VP[0]) / (x - VP[0]));
+  function onWall(x0, x1, yb0, yb1, cls, inner, attrs) {
+    const z0 = wz(x0);
+    return `<a class="${cls} rum-sak" ${attrs} style="top:${yb0}px; height:${yb1 - yb0}px; width:${r1(wz(x1) - z0)}px; transform: rotateY(-90deg) translateX(${r1(z0)}px)">${inner}</a>`;
+  }
+
+  // 3. Korktavlan med gängets gamla kuponger, rättade med röd penna.
+  // 6. Krittavlan med ligatabellen som dagens meny.
+  function rightWall() {
+    return '<div class="rum-hv">' +
+      onWall(1330, 1478, 352, 458, 'rum-krita', '<span class="rum-krita-in" id="rum-krita"></span>', 'href="tabeller.html" data-nav="tabeller" aria-label="Tabeller"') +
+      onWall(1496, 1700, 330, 478, 'rum-kork', '<span class="rum-kork-in" id="rum-kork"></span>', 'href="#olympen/kuponger" data-nav="olympen" aria-label="Gängets kuponger"') +
+      '</div>';
+  }
+
+  // 4. Pokalhyllan och 7. pärmarna: ritas på väggen (shelves()).
+  const POKAL = { yb: 288, x0: 1146, x1: 1312 };
+  const PARM = { yb: 402, x0: 1146, x1: 1322 };
+  function trophy(x, yb, col, i) {
+    const k = sc(x) * 0.95;
+    const y = at(x, yb);
+    const id = `rum-pk${i}`;
+    return `<g transform="translate(${r1(x)} ${r1(y)}) scale(${k.toFixed(3)})">` +
+      `<defs><linearGradient id="${id}" x1="0" y1="0" x2="1" y2="0"><stop offset="0" stop-color="${col}"/><stop offset=".3" stop-color="#fff" stop-opacity=".9"/>` +
+      `<stop offset=".45" stop-color="${col}"/><stop offset="1" stop-color="#111"/></linearGradient></defs>` +
+      '<rect x="-7" y="-7" width="14" height="7" fill="#2a1f16"/><rect x="-4.5" y="-5" width="9" height="2.4" fill="#c9a24c"/>' +
+      `<path d="M-1.6 -7 L1.6 -7 L1 -14 L-1 -14 Z" fill="url(#${id})"/><ellipse cx="0" cy="-14" rx="3.4" ry="1.2" fill="url(#${id})"/>` +
+      `<path d="M-7.5 -30 Q-7 -17 0 -15 Q7 -17 7.5 -30 Z" fill="url(#${id})"/><ellipse cx="0" cy="-30" rx="7.5" ry="1.6" fill="#000" opacity=".35"/>` +
+      `<path d="M-7 -28 q-5 0 -5 5 q0 4 6 5" fill="none" stroke="${col}" stroke-width="1.6"/><path d="M7 -28 q5 0 5 5 q0 4 -6 5" fill="none" stroke="#000" stroke-opacity=".5" stroke-width="1.6"/>` +
+      '<rect x="-7" y="-31" width="14" height="1" fill="#e8e2d2" opacity=".35"/></g>';
+  }
+  function binder(x, w, i, label) {
+    const cols = ['#3b3f45', '#7b2a26', '#2c4a6b', '#4a5a3a', '#6d6658', '#262626', '#8a6d3b'];
+    const c = cols[i % cols.length];
+    const top = PARM.yb - 50 + (i % 3 === 1 ? 3 : 0);
+    const pt = (xx, yb) => `${r1(xx)},${r1(at(xx, yb))}`;
+    const xm = x + w / 2;
+    const k = sc(xm);
+    const slope = (top + 12 - VP[1]) / (1140 - VP[0]);
+    return `<polygon points="${pt(x, PARM.yb)} ${pt(x + w, PARM.yb)} ${pt(x + w, top)} ${pt(x, top)}" fill="${c}"/>` +
+      `<polygon points="${pt(x, PARM.yb)} ${pt(x + w * 0.18, PARM.yb)} ${pt(x + w * 0.18, top)} ${pt(x, top)}" fill="#fff" opacity=".08"/>` +
+      `<polygon points="${pt(x + w * 0.2, top + 6)} ${pt(x + w * 0.8, top + 6)} ${pt(x + w * 0.8, top + 18)} ${pt(x + w * 0.2, top + 18)}" fill="#e9e2cf" opacity=".9"/>` +
+      `<text transform="translate(${r1(xm)} ${r1(at(xm, top + 14.5))}) skewY(${(Math.atan(slope) * 180 / Math.PI).toFixed(1)}) scale(${(k * 0.5).toFixed(2)})" text-anchor="middle" font-family="Caveat" font-weight="700" font-size="11" fill="#2a241c">${label}</text>` +
+      `<ellipse cx="${r1(xm)}" cy="${r1(at(xm, PARM.yb - 12))}" rx="${r1(2.6 * k)}" ry="${r1(4 * k)}" fill="#111" opacity=".55"/>`;
+  }
+  function shelves(trophies, seasons) {
+    let s = shelf(POKAL.yb, POKAL.x0, POKAL.x1);
+    // en pokal per vunnen omgång, i vinnarens färg; ett dammfritt märke där
+    // nästa ska stå
+    let x = POKAL.x0 + 10;
+    trophies.forEach((col, i) => {
+      if (x > POKAL.x1 - 8) return;
+      s += trophy(x, POKAL.yb, col, i);
+      x += 17 * sc(x);
+    });
+    if (x < POKAL.x1 - 8) s += `<ellipse cx="${r1(x)}" cy="${r1(at(x, POKAL.yb) - 1)}" rx="${r1(6 * sc(x))}" ry="${r1(1.6 * sc(x))}" fill="#000" opacity=".25"/>`;
+    s += shelf(PARM.yb, PARM.x0, PARM.x1);
+    let bx = PARM.x0 + 4;
+    seasons.forEach((label, i) => {
+      const w = 10.5 * sc(bx);
+      if (bx + w > PARM.x1) return;
+      s += binder(bx, w, i, label);
+      bx += w + 0.6 * sc(bx);
+    });
+    // damm på hyllkanterna
+    s += `<polygon points="${POKAL.x0},${r1(at(POKAL.x0, POKAL.yb) - 0.6)} ${POKAL.x1},${r1(at(POKAL.x1, POKAL.yb) - 0.8)} ${POKAL.x1},${r1(at(POKAL.x1, POKAL.yb) + 0.6)} ${POKAL.x0},${r1(at(POKAL.x0, POKAL.yb) + 0.5)}" fill="#d9d2c0" opacity=".3"/>`;
+    // ytorna man klickar på
+    const hit = (x0, x1, y0, y1, nav, href, label) => `<a href="${href}" data-nav="${nav}" class="rum-sak rum-yta" aria-label="${label}">` +
+      `<polygon points="${x0},${r1(at(x0, y1))} ${x1},${r1(at(x1, y1))} ${x1},${r1(at(x1, y0))} ${x0},${r1(at(x0, y0))}" fill="#fff" opacity="0"/></a>`;
+    s += hit(POKAL.x0, POKAL.x1, POKAL.yb - 36, POKAL.yb + 6, 'olympen', '#olympen', 'Olympen');
+    s += hit(PARM.x0, PARM.x1, PARM.yb - 52, PARM.yb + 6, 'statistik', 'statistik.html', 'Statistik');
+    return s;
+  }
+
+  // 2. Förstoringsglaset på en hög FACIT på pulten.
+  function facit() {
+    const paper = (x, y, a, c) => `<g transform="translate(${x} ${y}) rotate(${a})"><rect x="-96" y="-58" width="192" height="116" fill="${c}"/>` +
+      '<rect x="-96" y="-58" width="192" height="116" fill="url(#rum-cupg)" opacity=".18"/></g>';
+    const top = `<g transform="translate(156 842) rotate(-2)">
+        <rect x="-96" y="-58" width="192" height="116" fill="#f2d93a"/>
+        <rect x="-86" y="-50" width="44" height="15" fill="#d42a1e"/>
+        <text x="-64" y="-38.5" text-anchor="middle" font-family="Anton, Impact, sans-serif" font-size="12" letter-spacing="1" fill="#fff">FACIT</text>
+        <text x="-86" y="-14" font-family="Anton, Impact, sans-serif" font-size="9" fill="#111">SÖNDAG:</text>
+        <text x="-86" y="10" font-family="Anton, Impact, sans-serif" font-size="22" fill="#111">ALLT OM</text>
+        <text x="-86" y="34" font-family="Anton, Impact, sans-serif" font-size="22" fill="#111">OMGÅNGEN</text>
+        <rect x="30" y="-48" width="56" height="40" fill="#1e1e1e" opacity=".8"/>
+        <g fill="#111" opacity=".55"><rect x="30" y="0" width="56" height="2"/><rect x="30" y="6" width="50" height="2"/><rect x="30" y="12" width="54" height="2"/><rect x="30" y="18" width="40" height="2"/></g>
+        <ellipse cx="44" cy="40" rx="24" ry="9" fill="none" stroke="#7a4a1c" stroke-opacity=".35" stroke-width="3"/>
+        <path d="M96 -58 l-26 0 l26 22 z" fill="#c9b240"/><path d="M70 -58 l26 22 l-30 -6 z" fill="#fff4a8" opacity=".9"/>
+      </g>`;
+    return `<a class="rum-sak rum-lupp" href="#matcher" data-nav="matcher" aria-label="Analysera" id="rum-lupp">
+      <ellipse cx="160" cy="884" rx="150" ry="40" fill="#000" opacity=".4" filter="url(#rum-b10)"/>
+      ${paper(158, 866, -4, '#d9c08a')}${paper(162, 858, 3, '#e6cf5a')}${paper(156, 850, -2, '#ecd64a')}
+      ${top}
+      <clipPath id="rum-lins"><circle cx="128" cy="848" r="42"/></clipPath>
+      <g clip-path="url(#rum-lins)"><rect x="80" y="800" width="100" height="100" fill="#f2d93a"/><g transform="translate(128 848) scale(1.5) translate(-128 -848)">${top}</g>
+        <circle cx="128" cy="848" r="42" fill="#fff8d0" opacity=".08"/></g>
+      <g transform="translate(128 848) rotate(-34)" class="rum-lupp-g">
+        <rect x="46" y="-7" width="86" height="14" rx="7" fill="#2a1a10"/><rect x="48" y="-5" width="82" height="4" rx="2" fill="#6a4a30" opacity=".7"/>
+        <rect x="38" y="-9" width="14" height="18" rx="3" fill="#b8b2a2"/>
+        <circle r="44" fill="#cfe2f0" opacity=".06"/>
+        <circle r="44" fill="none" stroke="#c9c3b2" stroke-width="7"/><circle r="44" fill="none" stroke="#5e5a52" stroke-width="2" opacity=".6"/>
+        <path d="M-28 -26 A38 38 0 0 1 10 -38" fill="none" stroke="#fff" stroke-opacity=".6" stroke-width="4" stroke-linecap="round"/>
+        <ellipse cx="-12" cy="10" rx="22" ry="12" fill="#fff" opacity=".05"/>
+      </g>
+    </a>`;
+  }
+
+  // ---------- lagren ----------
+
+  function table() {
+    return svg(`<rect x="-10" y="650" width="1620" height="360" fill="url(#rum-pult)"/>
+  <rect x="-10" y="650" width="1620" height="360" filter="url(#rum-grainwood)"/>
+  <rect x="-10" y="650" width="1620" height="360" filter="url(#rum-flack)" opacity=".35"/>
+  <rect x="-10" y="647" width="1620" height="6" fill="url(#rum-alu)"/>
+  <g stroke="#e8e0cc" stroke-opacity=".35" stroke-width="1.2"><line x1="210" y1="649" x2="268" y2="649"/><line x1="720" y1="650" x2="742" y2="650"/><line x1="1302" y1="649" x2="1380" y2="649"/></g>
+  <ellipse cx="800" cy="840" rx="580" ry="160" fill="#ffd9a6" opacity=".10" filter="url(#rum-b40)"/>
+  <ellipse cx="460" cy="700" rx="320" ry="50" fill="#ff4a30" opacity=".10" filter="url(#rum-b40)"/>
+  <ellipse cx="1340" cy="930" rx="34" ry="12" fill="none" stroke="#2a160a" stroke-opacity=".35" stroke-width="3"/>
+  <ellipse cx="1120" cy="700" rx="30" ry="10" fill="none" stroke="#2a160a" stroke-opacity=".25" stroke-width="2.5"/>
+  <g fill="#1a0e06" opacity=".55"><ellipse cx="372" cy="760" rx="7" ry="3"/><ellipse cx="1452" cy="742" rx="6" ry="2.4"/><ellipse cx="1480" cy="870" rx="5" ry="2"/></g>
+  <g><rect x="118" y="612" width="62" height="74" rx="5" fill="#2b2a2a"/>
+    <g stroke-width="7" stroke-linecap="round"><line x1="136" y1="616" x2="128" y2="586" stroke="#d9d7d0"/><line x1="150" y1="616" x2="154" y2="582" stroke="#e3a92b"/><line x1="162" y1="616" x2="172" y2="590" stroke="#d9d7d0"/></g>
+    <rect x="118" y="612" width="62" height="74" rx="5" fill="#fff" opacity=".05"/></g>
+  <circle cx="1150" cy="790" r="7" fill="none" stroke="#a9a9a4" stroke-width="3"/><circle cx="1150" cy="790" r="2.5" fill="#55554f"/>
+  <rect x="-10" y="984" width="1620" height="20" fill="url(#rum-alu)"/>
+  ${facit()}`);
+  }
+
+  function cups() {
+    return svg(`<defs>
+    <linearGradient id="rum-cupc" x1="0" y1="0" x2="1" y2="0"><stop offset="0" stop-color="#3f73c2"/><stop offset=".35" stop-color="#2f5fa8"/><stop offset="1" stop-color="#132a52"/></linearGradient>
+    <pattern id="rum-meander" width="16" height="12" patternUnits="userSpaceOnUse"><path d="M1 11 V1 H13 V9 H5 V5 H9" fill="none" stroke="#f3ead9" stroke-width="1.6"/></pattern>
+    <clipPath id="rum-cupclip"><path d="M-58 6 L58 6 L47 120 Q0 128 -47 120 Z"/></clipPath>
+    <g id="rum-cup"><ellipse cx="0" cy="124" rx="62" ry="10" fill="#000" opacity=".45" filter="url(#rum-b4)"/>
+      <g clip-path="url(#rum-cupclip)"><rect x="-62" y="0" width="124" height="130" fill="url(#rum-cupc)"/>
+        <rect x="-62" y="16" width="124" height="13" fill="url(#rum-meander)"/><rect x="-62" y="98" width="124" height="13" fill="url(#rum-meander)"/>
+        <text x="0" y="56" text-anchor="middle" font-family="Fraunces" font-weight="800" font-size="12" letter-spacing=".6" fill="#f3ead9">VI ÄR GLADA</text>
+        <text x="0" y="75" text-anchor="middle" font-family="Fraunces" font-weight="800" font-size="12" letter-spacing=".6" fill="#f3ead9">ATT TJÄNA ER</text>
+        <rect x="-62" y="0" width="124" height="130" fill="url(#rum-cupg)" opacity=".5"/>
+        <path d="M-58 6 L-50 40 L-56 70" fill="none" stroke="#e9e2d4" stroke-opacity=".5" stroke-width="2"/></g>
+      <ellipse cx="0" cy="6" rx="58" ry="10" fill="#e9e2d4"/><ellipse cx="0" cy="7" rx="53" ry="8" fill="#2a160c"/>
+      <path d="M-30 8 q-8 10 -4 24" fill="none" stroke="#5a3a1a" stroke-opacity=".5" stroke-width="3"/></g></defs>
+  <use href="#rum-cup" transform="translate(1262 590) scale(.62)"/>
+  <use href="#rum-cup" transform="translate(300 600) scale(.7)"/>`);
+  }
+
+  function props() {
+    return svg(`<rect x="1384" y="538" width="5" height="112" fill="url(#rum-alu)"/><rect x="1447" y="538" width="5" height="112" fill="url(#rum-alu)"/>
+  <rect x="1378" y="530" width="80" height="18" rx="8" fill="#7d2925"/>
+  <path d="M1398 534 q10 -3 22 1" stroke="#c9b18a" stroke-opacity=".6" stroke-width="3" fill="none"/>
+  <rect x="1414" y="604" width="7" height="46" fill="url(#rum-alu)"/>
+  <ellipse cx="1418" cy="606" rx="46" ry="9" fill="#5a1f1b"/><ellipse cx="1418" cy="602" rx="44" ry="8" fill="#8b2e2a" stroke="#b9b9b2" stroke-width="2"/>
+  <path d="M1384 601 q14 -4 26 -1" stroke="#e0c99a" stroke-opacity=".5" stroke-width="2" fill="none"/>`);
+  }
+
+  function sill() {
+    const S = 568;
+    return svg(`<polygon points="262,${S - 14} 958,${S - 14} 984,${S + 10} 236,${S + 10}" fill="url(#rum-sill)"/>
+  <polygon points="262,${S - 14} 958,${S - 14} 984,${S + 10} 236,${S + 10}" filter="url(#rum-prick)" opacity=".6"/>
+  <rect x="236" y="${S + 10}" width="748" height="12" fill="#4a453c"/>
+  <g stroke="#cfc6b0" stroke-opacity=".45" stroke-width="1.6"><line x1="300" y1="${S + 10}" x2="342" y2="${S + 10}"/><line x1="610" y1="${S + 10}" x2="628" y2="${S + 10}"/><line x1="880" y1="${S + 10}" x2="930" y2="${S + 10}"/></g>
+  <rect x="236" y="${S + 22}" width="748" height="6" fill="#000" opacity=".3" filter="url(#rum-b4)"/>
+  <ellipse cx="560" cy="${S - 150}" rx="360" ry="150" fill="#ff3a2a" opacity=".05" filter="url(#rum-b40)"/>`) +
+      '<canvas id="rum-3d" class="rum-3d" width="1280" height="560"></canvas>';
+  }
+
+  function tv() {
+    return svg(`<rect x="1352" y="0" width="7" height="122" fill="#1a1a1a"/>
+  <polygon points="1316,112 1556,104 1556,300 1316,292" fill="#1b1a19"/>
+  <polygon points="1316,112 1556,104 1556,300 1316,292" fill="none" stroke="#fff" stroke-opacity=".06"/>
+  <polygon points="1318,112 1556,104 1556,108 1318,116" fill="#d6cfbd" opacity=".22"/>`) +
+      '<a class="rum-tv rum-sak" href="#matcher" data-nav="tv" aria-label="Text-tv" id="rum-tv"><span class="ttx" id="rum-ttx"></span><span class="scan"></span><span class="glass"></span></a>';
+  }
+
+  function paper() {
+    return '<a id="rum-kvitto" class="rum-flat rum-sak" href="#kupong" data-nav="kupong" aria-label="Kupong"></a>' +
+      '<a id="rum-kupong" class="rum-flat rum-sak" href="#kupong" data-nav="kupong" aria-label="Kupong"></a>' +
+      svg('<path d="M846 930 C 960 980, 1110 920, 1150 796" fill="none" stroke="#b9b9b2" stroke-width="5" stroke-linecap="round" stroke-dasharray="0.1 7"/>' +
+        '<path d="M846 930 C 960 980, 1110 920, 1150 796" fill="none" stroke="#000" stroke-opacity=".25" stroke-width="3" transform="translate(3 6)" stroke-dasharray="0.1 7" stroke-linecap="round"/>') +
+      '<a class="rum-tag" href="#kupong" data-nav="kupong" id="rum-tag">Fyll i kupongen</a>';
+  }
+
+  // Röken som lagt sig under lysröret, och dammet som syns i ljuset.
+  function haze() {
+    return '<div class="rum-rok"><i class="r1"></i><i class="r2"></i><i class="r3"></i><i class="r4"></i></div>' +
+      '<canvas class="rum-damm" id="rum-damm" width="800" height="500"></canvas>';
+  }
+
+  function build() {
+    const el = document.createElement('section');
+    el.id = 'rum-section';
+    el.className = 'rum';
+    el.hidden = true;
+    el.setAttribute('aria-label', 'Tobaksaffären');
+    el.innerHTML = `<div class="rum-stage" id="rum-stage"><div class="rum-kamera" id="rum-kamera"><div class="rum-world" id="rum-world">
+${plane(-600, `${bg()}${rain()}${rightWall()}${svg('<g id="rum-hyllor"></g>')}${neon()}${lop()}${boardHtml()}${frameHtml()}`, 1.035)}
+${plane(-470, `${props()}${tv()}`, 1.02)}
+${plane(-330, `${sill()}${haze()}`)}
+${plane(-60, `${table()}${cups()}`, 1.05)}
+${plane(0, paper())}
+</div></div>
+<div class="rum-layer rum-warm"></div><div class="rum-layer rum-vign"></div><div class="rum-layer rum-grain"></div>
+</div>
+<div class="rum-hdr"><a class="rum-brand" href="#">Matchfixarna</a>
+  <nav aria-label="Sektioner"><a href="#kupong" data-to="kupong">Kupong</a><a href="#olympen" data-to="olympen">Olympen</a><a href="#matcher" data-to="matcher">Matcher</a><a href="tabeller.html" data-to="tabeller">Tabeller</a><a href="statistik.html" data-to="statistik">Statistik</a></nav></div>
+<div class="rum-ft"><span class="keys"><b>K</b> kupongen · <b>T</b> tv:n</span><a href="#hem">Vanlig sida</a></div>`;
+    document.querySelector('main').prepend(el);
+    R.el = el;
+    R.built = true;
+    wire();
+  }
+
+  // ---------- datan ----------
+
+  const CODES = {
+    'Arsenal': 'ARS', 'Aston Villa': 'AVL', 'AFC Bournemouth': 'BOU', 'Brentford': 'BRE', 'Brighton & Hove Albion': 'BHA', 'Burnley': 'BUR',
+    'Chelsea': 'CHE', 'Crystal Palace': 'CRY', 'Everton': 'EVE', 'Fulham': 'FUL', 'Leeds United': 'LEE', 'Liverpool': 'LIV', 'Manchester City': 'MCI',
+    'Manchester United': 'MUN', 'Newcastle United': 'NEW', 'Nottingham Forest': 'NFO', 'Sunderland': 'SUN', 'Tottenham Hotspur': 'TOT',
+    'West Ham United': 'WHU', 'Wolverhampton Wanderers': 'WOL', 'Coventry City': 'COV', 'Hull City': 'HUL', 'Ipswich Town': 'IPS',
+    'Blackburn Rovers': 'BLB', 'Bolton Wanderers': 'BOL', 'Birmingham City': 'BIR', 'Bristol City': 'BRC', 'Bristol Rovers': 'BRR', 'Cardiff City': 'CAR',
+    'Derby County': 'DER', 'Leicester City': 'LEI', 'Middlesbrough': 'MID', 'Millwall': 'MIL', 'Norwich City': 'NOR', 'Oxford United': 'OXF',
+    'Portsmouth': 'POR', 'Preston North End': 'PNE', 'Queens Park Rangers': 'QPR', 'Sheffield United': 'SHU', 'Sheffield Wednesday': 'SHW',
+    'Southampton': 'SOU', 'Stoke City': 'STK', 'Swansea City': 'SWA', 'Watford': 'WAT', 'West Bromwich Albion': 'WBA', 'Wrexham': 'WRX',
+    'Charlton Athletic': 'CHA', 'Lincoln City': 'LIN', 'Cambridge United': 'CAM', 'Plymouth Argyle': 'PLY', 'Bradford City': 'BRA',
+    'Luton Town': 'LUT', 'Huddersfield Town': 'HUD', 'Barnsley': 'BAR', 'Reading': 'REA', 'Wigan Athletic': 'WIG', 'Leyton Orient': 'LEY',
+    'Peterborough United': 'PET', 'Rotherham United': 'ROT', 'Stockport County': 'STO', 'Wycombe Wanderers': 'WYC', 'Exeter City': 'EXE',
+    'Mansfield Town': 'MAN', 'Northampton Town': 'NTH', 'Burton Albion': 'BRT', 'Doncaster Rovers': 'DON', 'Port Vale': 'PVA',
+  };
+  const code = (name) => CODES[name] || String(name || '?').replace(/^(AFC|FC)\s+/, '').normalize('NFD').replace(/[^A-Za-z]/g, '').slice(0, 3).toUpperCase();
+  // Kortare lagnamn på papperet och krittavlan.
+  const SHORT = { 'Manchester City': 'Man City', 'Manchester United': 'Man Utd', 'Tottenham Hotspur': 'Tottenham', 'Brighton & Hove Albion': 'Brighton',
+    'Wolverhampton Wanderers': 'Wolves', 'West Bromwich Albion': 'West Brom', 'Queens Park Rangers': 'QPR', 'Nottingham Forest': "Nott'm Forest",
+    'AFC Bournemouth': 'Bournemouth', 'Preston North End': 'Preston', 'Sheffield Wednesday': 'Sheff Wed', 'Sheffield United': 'Sheff Utd' };
+  const short = (name) => SHORT[name] || String(name || '').replace(/\s+(United|City|Town|Rovers|Athletic|County|Wanderers|Albion|Argyle|Hotspur)$/, '');
+
+  const fOdds = (x) => (x == null ? ' - ' : x >= 10 ? String(Math.round(x)).padStart(3, ' ') : x.toFixed(1).replace('.', ','));
+  const fWd = new Intl.DateTimeFormat('sv-SE', { timeZone: 'Europe/Stockholm', weekday: 'short' });
+  const fHm = new Intl.DateTimeFormat('sv-SE', { timeZone: 'Europe/Stockholm', hour: '2-digit', minute: '2-digit' });
+  const wd = (d) => fWd.format(d).replace('.', '').slice(0, 3);
+  const hm = (d) => fHm.format(d).replace(':', '.');
+
+  // Omgången som gänget tippar (TP.round ur GET …/samtal), annars
+  // omgångens kupong (kupong.js): matcherna efter avspark.
+  function round() {
+    const r = typeof TP !== 'undefined' ? TP.round : null;
+    if (r && r.matcher && r.matcher.length) {
+      return { ids: r.matcher.map((x) => String(x.id)), gang: r.gang || [], name: r.namn || (window.Samtal && Samtal.name ? Samtal.name() : null) };
+    }
+    const c = typeof currentCoupon === 'function' ? currentCoupon() : null;
+    if (c) return { ids: c.matches.map((x) => String(x.id)), gang: [], name: c.name || null, coupon: c };
+    // mellan omgångarna: de närmaste matcherna i Premier League och Championship
+    const t = Date.now();
+    const next = ((state.all && state.all.matches) || []).filter((m) => (m.comp === 'pl' || m.comp === 'ch') && !m.completed && Date.parse(m.kickoff) > t)
+      .sort((a, b) => Date.parse(a.kickoff) - Date.parse(b.kickoff)).slice(0, 13);
+    return next.length ? { ids: next.map((m) => String(m.id)), gang: [], name: null, next: true } : null;
+  }
+
+  function roundRows(rd, t = Date.now()) {
+    const signs = {};
+    const c = rd.coupon || (typeof currentCoupon === 'function' ? currentCoupon() : null);
+    if (c) for (const x of c.matches) signs[String(x.id)] = x.sign;
+    return rd.ids.map((id) => {
+      const g = gradeRow({ id, sign: signs[id] || '', label: '' }, t);
+      return { id, m: g.m, g, sign: signs[id] || '' };
+    }).filter((x) => x.m).sort((a, b) => Date.parse(a.m.kickoff) - Date.parse(b.m.kickoff) || a.m.home.localeCompare(b.m.home));
+  }
+
+  // Fällbladstavlans rader som text, 19 tecken var.
+  function boardLines(rows, t = Date.now(), next = false) {
+    const pad = (s, n) => String(s).slice(0, n).padEnd(n, ' ');
+    if (!rows.length) return { head: pad('INGA MATCHER', COLS), rows: [], lit: [] };
+    const first = Math.min(...rows.map((x) => Date.parse(x.m.kickoff)));
+    const started = first <= t;
+    const head = started ? `${pad('RESULTAT', 15)}    ` : pad(`${next ? 'NÄSTA' : 'SPELSTOPP'} ${wd(new Date(first)).toUpperCase()} ${hm(new Date(first))}`, COLS);
+    const lit = [];
+    const out = rows.map((x, i) => {
+      const left = `${pad(code(x.m.home), 3)} ${pad(code(x.m.away), 3)} `;
+      if (!started) {
+        const o = x.m.odds || [];
+        return left + `${pad(fOdds(o[0]), 3)} ${pad(fOdds(o[1]), 3)} ${pad(fOdds(o[2]), 3)}`;
+      }
+      const g = x.g;
+      if (g.state === 'hidden') return left + pad('DOLT', 11);
+      if (g.state === 'off') return left + pad(g.off ? g.off.toUpperCase() : 'STRUKEN', 11);
+      if (g.score && (g.state === 'final' || g.state === 'live')) {
+        if (g.res != null && g.state === 'final') lit.push([i, 12 + g.res * 2]);
+        return left + `${pad(`${g.score.home}-${g.score.away}`, 3)} 1 X 2  `;
+      }
+      return left + pad(hm(new Date(x.m.kickoff)), 11);
+    });
+    return { head, rows: out, lit };
+  }
+
+  function boardText(lines, pageIx) {
+    const pages = Math.max(1, Math.ceil(lines.rows.length / ROWS));
+    const p = pageIx % pages;
+    const text = [/^RESULTAT/.test(lines.head) ? lines.head.slice(0, COLS - 4) + (pages > 1 ? `${p + 1}/${pages}`.padStart(4, ' ') : '    ') : lines.head];
+    for (let i = 0; i < ROWS; i++) text.push((lines.rows[p * ROWS + i] || '').padEnd(COLS, ' '));
+    const lit = (ri, ci) => ri > 0 && lines.lit.some(([li, col]) => li === p * ROWS + ri - 1 && col === ci);
+    return { text, lit };
+  }
+
+  function setBoard(lines, pageIx, animate) {
+    const el = R.el && R.el.querySelector('.rum-fb');
+    if (!el) return;
+    const { text, lit } = boardText(lines, pageIx);
+    [...el.querySelectorAll('.rum-fb-r')].forEach((r, ri) => {
+      for (let ci = 0; ci < COLS; ci++) flap(r.children[ci], text[ri][ci] || ' ', lit(ri, ci), animate ? 40 + ci * 18 + ri * 30 : 0);
+    });
+  }
+
+  // Samma klapper räknat ur klockan, för stillbilderna: u sekunder efter
+  // bläddringen visar varje blad ännu ett mellantecken.
+  function boardAt(lines, pageIx, u) {
+    const el = R.el && R.el.querySelector('.rum-fb');
+    if (!el) return;
+    const { text, lit } = boardText(lines, pageIx);
+    const prev = pageIx > 0 ? boardText(lines, pageIx - 1).text : null;
+    const h = (a) => { const x = Math.sin(a * 91.17 + 7.3) * 43758.55; return x - Math.floor(x); };
+    [...el.querySelectorAll('.rum-fb-r')].forEach((r, ri) => {
+      for (let ci = 0; ci < COLS; ci++) {
+        const cell = r.children[ci];
+        const ch = text[ri][ci] || ' ';
+        const changed = !prev || prev[ri][ci] !== ch;
+        const d = (40 + ci * 18 + ri * 30) / 1000;
+        const steps = 3 + Math.floor(h(ri * 31 + ci + pageIx * 7) * 6);
+        const n = Math.floor((u - d) / 0.055);
+        const show = changed && n >= 0 && n < steps ? FLAPS[Math.floor(h(ri * 131 + ci * 17 + n) * FLAPS.length)] : !changed || n >= steps ? ch : prev[ri][ci];
+        cell.textContent = show;
+        cell.dataset.c = show;
+        cell.classList.toggle('lit', lit(ri, ci) && show === ch);
+        cell.classList.toggle('f', changed && n >= 0 && n < steps && (u - d) % 0.055 < 0.03);
+      }
+    });
+  }
+
+  // Ett fällblad: bläddrar fram genom några tecken innan det stannar.
+  const FLAPS = ' ABCDEFGHIJKLMNOPQRSTUVWXYZÅÄÖ0123456789-,./';
+  function flap(cell, ch, lit, delay) {
+    cell.classList.toggle('lit', lit);
+    if (cell.dataset.c === ch) return;
+    cell.dataset.c = ch;
+    if (!delay || calm()) {
+      cell.textContent = ch;
+      return;
+    }
+    const steps = 3 + ((Math.random() * 6) | 0);
+    let n = 0;
+    clearInterval(cell._t);
+    setTimeout(() => {
+      cell._t = setInterval(() => {
+        n++;
+        cell.classList.remove('f');
+        void cell.offsetWidth;
+        cell.classList.add('f');
+        cell.textContent = n >= steps ? ch : FLAPS[(Math.random() * FLAPS.length) | 0];
+        if (n >= steps) clearInterval(cell._t);
+      }, 55);
+    }, delay);
+  }
+
+  // Text-tv: sida 331 med omgångens matcher, två undersidor.
+  function ttx(rows, t, sub) {
+    const pad = (s, n) => String(s).slice(0, n);
+    const clock = hm(new Date(t)).replace('.', ':');
+    const list = rows.slice(sub * 6, sub * 6 + 6);
+    const subs = Math.max(1, Math.ceil(rows.length / 6));
+    return `<span class="r"><span>331 Matchfix-Text</span><span>${clock}</span></span>` +
+      `<span class="band"><b>MATCHER</b><i>${subs > 1 ? `${sub + 1}/${subs}` : ''}</i></span>` +
+      list.map((x) => {
+        const g = x.g;
+        const right = g.score && (g.state === 'final' || g.state === 'live') ? `<em>${g.score.home}-${g.score.away}</em>` : '';
+        return `<span class="m"><span class="t">${wd(new Date(x.m.kickoff))} ${hm(new Date(x.m.kickoff))}</span><span>${esc(pad(`${short(x.m.home)}-${short(x.m.away)}`, 24))}</span>${right}</span>`;
+      }).join('') +
+      '<span class="fast"><a class="red" href="#kupong" data-to="kupong">Kupong</a><a class="grn" href="#olympen" data-to="olympen">Olympen</a>' +
+      '<a class="yel" href="tabeller.html" data-to="tabeller">Tabell</a><a class="cya" href="statistik.html" data-to="statistik">Statistik</a></span>';
+  }
+
+  // Kupongen på pulten: omgångens matcher, kryss där gängets kupong har
+  // tecken (annars tom att fylla i).
+  function couponHtml(rd, rows) {
+    const nr = rd && !rd.next && typeof couponNumber === 'function' && rd.ids.length ? couponNumber(rd.ids) : null;
+    const first = rows.length ? Math.min(...rows.map((x) => Date.parse(x.m.kickoff))) : null;
+    const box = (x, s) => `<span class="box${x.sign.includes(s) ? ' x' : ''}">${s}</span>`;
+    const list = rows.map((x, i) => `<div class="row"><span class="nr">${i + 1}</span><span>${esc(short(x.m.home))} – ${esc(short(x.m.away))}</span>${box(x, '1')}${box(x, 'X')}${box(x, '2')}</div>`).join('');
+    const who = rd && rd.gang && rd.gang.length ? rd.gang.filter((g) => g.inne).length : null;
+    return '<span class="marks"></span>' +
+      `<span class="band"><small>MATCHFIXARNA · TIPSKUPONG</small><b>${nr ? `Kupong ${nr}` : 'Kupong'}</b></span>` +
+      `<span class="sub"><i>${esc((rd && rd.name) || '')}</i><span>${rows.length} matcher</span></span>` +
+      `<span class="grid"><span><span class="hd"><span></span><span>MATCH</span><span>1</span><span>X</span><span>2</span></span>${list}</span>` +
+      `<span class="side"><span><span>Spelstopp</span><b>${first ? `${wd(new Date(first))} ${hm(new Date(first))}` : '–'}</b></span>` +
+      `<span><span>Insats</span><b>äran</b></span>${who != null ? `<span><span>Inlämnade</span><b>${who} av ${rd.gang.length}</b></span>` : ''}</span></span>` +
+      '<span class="code"></span><span class="fine"><span>Kupongen gäller först när den är inlämnad.</span><span>Ej giltig som kvitto</span></span><span class="pencil"></span>';
+  }
+
+  function receiptHtml(rd, nr) {
+    const gang = (rd && rd.gang) || [];
+    const fDt = new Intl.DateTimeFormat('sv-SE', { timeZone: 'Europe/Stockholm', weekday: 'short', hour: '2-digit', minute: '2-digit' });
+    const lines = gang.map((g) => `<span class="r"><span>${esc(g.id)}</span><span>${g.inne ? esc(fDt.format(new Date(g.inne)).replace('.', '').replace(':', '.')) : '–'}</span></span>`).join('');
+    return '<span class="c">MATCHFIXARNAS<br>TOBAK &amp; SPEL</span><hr>' +
+      `<span class="r"><span>${nr ? `KUPONG ${nr}` : 'KUPONG'}</span><span>INNE</span></span>${lines}<hr>` +
+      '<span class="r"><span>Insats</span><span>äran</span></span><span class="bar"></span><span class="c">Spara kvittot</span>';
+  }
+
+  function chalkHtml(T) {
+    const rows = ((T && T.teams) || []).slice().sort((a, b) => a.rank - b.rank).slice(0, 9);
+    if (!rows.length) return '<b class="h">Dagens tabell</b><span class="tom">Kommer</span>';
+    return `<b class="h">${esc((T && T.name) || 'Tabellen')}</b>` +
+      rows.map((x) => `<span class="rad"><span>${x.rank}. ${esc(short(x.name))}</span><i></i><span>${x.pts}</span></span>`).join('');
+  }
+
+  function corkHtml(list) {
+    const pin = (c) => `<i class="nal" style="background:${c}"></i>`;
+    if (!list.length) {
+      return `<span class="rest" style="left:22%; top:18%">${pin('#d42a1e')}</span><span class="rest r2" style="left:58%; top:52%">${pin('#e6c43a')}</span>` +
+        `<span class="lapp" style="left:12%; top:46%; transform: rotate(-4deg)">${pin('#3d7bd9')}<span class="kv">Dartkväll<br>tor 19.00</span></span>`;
+    }
+    return list.slice(0, 4).map((c, i) => {
+      const pos = [[6, 6, -5], [46, 12, 4], [10, 52, 3], [52, 56, -3]][i];
+      const ticks = (c.rows || []).slice(0, 13).map((r) => `<i class="${r.hit ? 'ok' : 'no'}"></i>`).join('');
+      return `<span class="kup${i === 1 ? ' kaffe' : ''}" style="left:${pos[0]}%; top:${pos[1]}%; transform: rotate(${pos[2]}deg)">${pin(['#d42a1e', '#3d7bd9', '#e6c43a', '#3db37c'][i])}` +
+        `<span class="kt">${esc(c.name || 'Kupong')}</span><span class="tk">${ticks}</span><span class="rr">${c.ok} rätt</span></span>`;
+    }).join('');
+  }
+
+  function seasonLabels(season) {
+    const y = Number(String(season || '').slice(0, 4)) || new Date().getFullYear();
+    const out = [];
+    for (let s = y - 11; s <= y; s++) out.push(`${String(s).slice(2)}/${String(s + 1).slice(2)}`);
+    return out;
+  }
+
+  // Allt som hämtas: omgången, tabellen, säsongens omgångar och kupongerna.
+  async function load() {
+    await Promise.all([whenMatches(), loadCoupons()]);
+    await Promise.all([
+      typeof tpLoad === 'function' ? tpLoad() : null,
+      typeof tpLoadSeason === 'function' && !TP.season ? tpLoadSeason() : null,
+      R.table ? null : getJSON('data/teams/pl.json').then((d) => { R.table = d; }).catch(() => { R.table = null; }),
+      window.Historik ? Historik.coupons().then((l) => { R.old = l; }) : null,
+    ]);
+    fill();
+  }
+
+  function fill() {
+    if (!R.el) return;
+    const t = Date.now();
+    const rd = round();
+    const rows = rd ? roundRows(rd, t) : [];
+    R.rows = rows;
+    R.lines = boardLines(rows, t, Boolean(rd && rd.next));
+    setBoard(R.lines, R.page, !calm());
+    const nr = rd && !rd.next && rd.ids.length && typeof couponNumber === 'function' ? couponNumber(rd.ids) : null;
+    const set = (id, html) => { const e = document.getElementById(id); if (e && e.innerHTML !== html) e.innerHTML = html; };
+    set('rum-ttx', ttx(rows, t, R.sub || 0));
+    set('rum-kupong', couponHtml(rd, rows));
+    set('rum-kvitto', receiptHtml(rd, nr));
+    const term = R.el.querySelectorAll('#rum-term text');
+    const gang = (rd && rd.gang) || [];
+    const waiting = gang.filter((g) => !g.inne).map((g) => g.id);
+    const lines = [nr ? `KUPONG ${nr}` : 'KUPONG', gang.length ? `INLÄMNADE ${gang.length - waiting.length}/${gang.length}` : '',
+      gang.length ? (waiting.length ? `VÄNTAR: ${waiting.join(' ')}` : 'ALLA INNE') : ''];
+    term.forEach((e, i) => { e.textContent = lines[i]; });
+    const started = rows.length && Math.min(...rows.map((x) => Date.parse(x.m.kickoff))) <= t;
+    const tag = document.getElementById('rum-tag');
+    if (tag) tag.textContent = started ? 'Följ kupongen' : 'Fyll i kupongen';
+    // förstoringsglaset: nästa match som inte har börjat
+    const next = rows.find((x) => Date.parse(x.m.kickoff) > t);
+    const lupp = document.getElementById('rum-lupp');
+    if (lupp) lupp.setAttribute('href', next ? `#match/${next.id}/analysera` : '#matcher');
+    set('rum-krita', chalkHtml(R.table));
+    const seen = ((TP.season && TP.season.rounds) || []).filter((r) => typeof tpRoundHidden !== 'function' || !tpRoundHidden(r));
+    set('rum-kork', corkHtml((R.old || []).filter((c) => c.n && !(window.Historik && Historik.hidden(c)))));
+    const cups = seen.slice().sort((a, b) => String(a.from).localeCompare(String(b.from)))
+      .flatMap((r) => (r.people || []).filter((p) => p.award === 'best').map((p) => GANG[p.id] || '#d8b06a'));
+    const hy = document.getElementById('rum-hyllor');
+    const hs = shelves(cups, seasonLabels(state.meta && state.meta.season));
+    if (hy && R.hy !== hs) { hy.innerHTML = hs; R.hy = hs; }
+    const best = window.Kronan && Kronan.holders ? Kronan.holders(seen).best : [{ id: 'DL', name: 'Daniel Laino' }];
+    R.best = best.map((p) => p.id);
+    set('rum-ram-namn', esc(best.map((p) => p.id).join(' & ')));
+    portrait();
+  }
+
+  // Porträttet i ramen: vinnarfiguren ur three.js när den finns, annars fotot.
+  function portrait() {
+    const img = document.getElementById('rum-ram-img');
+    if (!img || !R.best) return;
+    const id = R.best[0];
+    const src = R.fig && R.fig.portrait ? R.fig.portrait(id.toLowerCase()) : null;
+    const want = src || `profeterna/${{ DL: 'laino', DT: 'teijder', DJ: 'johansson' }[id] || 'laino'}.jpg`;
+    if (img.getAttribute('src') !== want) img.setAttribute('src', want);
+    img.classList.toggle('foto', !src);
+  }
+
+  // ---------- rörelsen ----------
+
+  function setCam(mx, my) {
+    const w = document.getElementById('rum-world');
+    if (!w) return;
+    w.style.setProperty('--ry', `${(mx * 4.5).toFixed(3)}deg`);
+    w.style.setProperty('--rx', `${(-my * 2.6).toFixed(3)}deg`);
+  }
+
+  // Neonen glappar ibland: tider ur klockan, så att stillbilderna blir samma.
+  function neonOn(t) {
+    const p = t % 23;
+    if (p > 6.2 && p < 7.1) return Math.sin(p * 61) > -0.2;
+    if (p > 15.0 && p < 15.35) return Math.sin(p * 97) > 0.3;
+    return true;
+  }
+
+  function dust(t) {
+    const c = document.getElementById('rum-damm');
+    if (!c) return;
+    const g = c.getContext('2d');
+    g.clearRect(0, 0, c.width, c.height);
+    const R0 = rng(9);
+    for (let i = 0; i < 46; i++) {
+      const x0 = R0() * 800;
+      const y0 = R0() * 500;
+      const sp = 3 + R0() * 6;
+      const x = (x0 + Math.sin(t * 0.13 + i) * 14 + t * sp * 0.6) % 800;
+      const y = (y0 + Math.sin(t * 0.21 + i * 2.1) * 10 + t * sp * 0.25) % 500;
+      const light = Math.max(0, 1 - Math.hypot(x - 330, (y - 30) * 1.5) / 420);
+      g.globalAlpha = (0.15 + R0() * 0.35) * light;
+      g.fillStyle = '#fff5e0';
+      g.beginPath();
+      g.arc(x, y, 0.6 + R0() * 1.1, 0, 7);
+      g.fill();
+    }
+  }
+
+  function frame() {
+    const t = now();
+    if (!still()) {
+      R.mx += (R.tx - R.mx) * 0.06;
+      R.my += (R.ty - R.my) * 0.06;
+    }
+    setCam(R.mx, R.my);
+    const on = neonOn(t);
+    if (on !== R.neon) {
+      R.neon = on;
+      R.el.classList.toggle('neon-av', !on);
+    }
+    // tavlan bläddrar var nionde sekund, text-tv:n var tolfte
+    const page = Math.floor(t / 9);
+    if (still() && R.lines) boardAt(R.lines, page, t - page * 9);
+    else if (page !== R.pageAt && R.lines) {
+      R.pageAt = page;
+      R.page = page;
+      setBoard(R.lines, page, !calm());
+    }
+    const sub = Math.floor(t / 12) % 2;
+    if (sub !== R.sub && R.rows) {
+      R.sub = sub;
+      const e = document.getElementById('rum-ttx');
+      if (e) e.innerHTML = ttx(R.rows, Date.now(), R.rows.length > 6 ? sub : 0);
+    }
+    if (!calm() || still()) dust(t);
+    if (R.fig) R.fig.draw(t, R.mx, R.my);
+  }
+
+  function loop() {
+    cancelAnimationFrame(R.raf);
+    const tick = (ms) => {
+      if (!R.on) return;
+      // 30 bilder i sekunden räcker
+      if (ms - R.last > 30) {
+        R.last = ms;
+        frame();
+      }
+      R.raf = requestAnimationFrame(tick);
+    };
+    R.raf = requestAnimationFrame(tick);
+  }
+
+  // CSS-animationerna (regnet, röken, hörnet) står still på samma tid som klockan.
+  function freezeCss(t) {
+    for (const a of R.el.getAnimations({ subtree: true })) {
+      a.pause();
+      a.currentTime = t * 1000;
+    }
+  }
+
+  // ---------- figurerna ----------
+
+  async function three() {
+    if (R.fig || R.loading) return;
+    R.loading = true;
+    try {
+      const mod = await import('./rum-3d.js');
+      R.fig = await mod.figurer(document.getElementById('rum-3d'), { calm: calm() });
+      portrait();
+      frame();
+    } catch (err) {
+      // utan WebGL eller utan nätet står rummet kvar utan gänget
+      console.warn('Rummet: figurerna kunde inte ritas', err);
+    }
+  }
+
+  // ---------- klicken ----------
+
+  function hot(nav) {
+    for (const a of R.el.querySelectorAll('.rum-hdr nav a')) a.classList.toggle('hot', nav === a.dataset.to);
+  }
+
+  // Föremålets mitt i scenens koordinater.
+  function centerOf(a) {
+    const r = a.getBoundingClientRect();
+    const st = R.el.querySelector('.rum-stage').getBoundingClientRect();
+    return [((r.left + r.width / 2 - st.left) / st.width) * W, ((r.top + r.height / 2 - st.top) / st.height) * H];
+  }
+
+  // Kameran går fram: punkten p hamnar på to med förstoringen z.
+  function aim(p, z, to, cls) {
+    const w = document.getElementById('rum-kamera');
+    w.classList.remove('glid', 'dyk');
+    if (cls) w.classList.add(cls);
+    w.style.setProperty('--z', z);
+    w.style.setProperty('--dx', `${r1(to[0] - 800 - z * (p[0] - 800))}px`);
+    w.style.setProperty('--dy', `${r1(to[1] - 500 - z * (p[1] - 500))}px`);
+  }
+
+  // Ett föremål: kameran går fram mot det en kort stund innan sidan byts.
+  function go(a, e) {
+    const href = a.getAttribute('href');
+    if (!href) return;
+    if (a.dataset.nav === 'tv') {
+      e.preventDefault();
+      zoomTv(!R.zoom);
+      return;
+    }
+    if (calm()) return;
+    e.preventDefault();
+    const p = centerOf(a);
+    aim(p, 1.35, [p[0] + (800 - p[0]) * 0.4, p[1] + (500 - p[1]) * 0.4], 'dyk');
+    R.el.classList.add('dyker');
+    setTimeout(() => {
+      if (/^#/.test(href)) location.hash = href.slice(1);
+      else location.href = href;
+      // tillbaka i rummet (matchrutan ligger ovanpå det, och bakåt-knappen)
+      setTimeout(() => {
+        R.el.classList.remove('dyker');
+        aim([800, 500], 1, [800, 500]);
+      }, 60);
+    }, 420);
+  }
+
+  // T: tv:n nära, så att text-tv:n går att läsa och färgknapparna att trycka på.
+  function zoomTv(on) {
+    R.zoom = on;
+    R.el.classList.toggle('tv-nara', on);
+    const tvEl = document.getElementById('rum-tv');
+    if (on && tvEl) aim(centerOf(tvEl), 2.5, [800, 470], calm() ? null : 'glid');
+    else aim([800, 500], 1, [800, 500], calm() ? null : 'glid');
+  }
+
+  function wire() {
+    const el = R.el;
+    el.addEventListener('mousemove', (e) => {
+      R.tx = (e.clientX / innerWidth) * 2 - 1;
+      R.ty = (e.clientY / innerHeight) * 2 - 1;
+    });
+    el.addEventListener('mouseover', (e) => {
+      const a = e.target.closest('.rum-sak, .rum-tag');
+      hot(a ? a.dataset.nav : null);
+    });
+    el.addEventListener('click', (e) => {
+      const ttxLink = e.target.closest('.ttx .fast a');
+      if (ttxLink) return;
+      const a = e.target.closest('.rum-sak');
+      if (a && el.contains(a)) go(a, e);
+      else if (R.zoom && !e.target.closest('.rum-hdr, .rum-ft')) zoomTv(false);
+    });
+    document.addEventListener('keydown', (e) => {
+      if (!R.on || e.metaKey || e.ctrlKey || e.altKey || /input|textarea|select/i.test(e.target.tagName) || document.querySelector('dialog[open]')) return;
+      const k = e.key.toLowerCase();
+      if (k === 'k') location.hash = 'kupong';
+      else if (k === 't') zoomTv(!R.zoom);
+      else if (k === 'escape' && R.zoom) zoomTv(false);
+    });
+    addEventListener('resize', fit);
+    if (window.Spoiler && Spoiler.onChange) Spoiler.onChange(() => { if (R.on) fill(); });
+  }
+
+  // Scenen täcker fönstret (1600 × 1000, beskuren i kanterna).
+  function fit() {
+    if (!R.el || R.el.hidden) return;
+    // för smalt för rummet: den vanliga förstasidan (route i app.js)
+    if (!fits()) {
+      dispatchEvent(new HashChangeEvent('hashchange'));
+      return;
+    }
+    const s = Math.max(innerWidth / W, innerHeight / H);
+    const st = R.el.querySelector('.rum-stage');
+    st.style.transform = `translate(${((innerWidth - W * s) / 2).toFixed(1)}px, ${((innerHeight - H * s) / 2).toFixed(1)}px) scale(${s.toFixed(4)})`;
+  }
+
+  // ---------- in och ut ----------
+
+  const fits = () => R.q.has('rum-t') || matchMedia('(min-width: 900px) and (min-aspect-ratio: 6/5)').matches;
+
+  function show() {
+    if (!R.built) build();
+    const q = R.q;
+    if (q.has('rum-t')) R.frozen = parseFloat(q.get('rum-t')) || 0;
+    if (q.has('rum-mx')) R.mx = R.tx = parseFloat(q.get('rum-mx'));
+    if (q.has('rum-my')) R.my = R.ty = parseFloat(q.get('rum-my'));
+    R.el.hidden = false;
+    document.documentElement.classList.add('i-rummet');
+    R.on = true;
+    fit();
+    zoomTv(false);
+    hot(null);
+    const ready = Promise.all([load(), three()]);
+    if (still()) {
+      // en fast bild: allt på samma tid, och klar när datan och gänget är ritade
+      ready.then(() => {
+        freezeCss(R.frozen);
+        frame();
+        document.body.dataset.rumKlar = '1';
+      });
+    } else if (calm()) {
+      // utan rörelser: en bild, och en ny när datan ändras
+      ready.then(frame);
+    } else loop();
+    clearInterval(R.poll);
+    // omgången och liveställningen kan ändras medan rummet står öppet
+    R.poll = setInterval(() => { if (R.on) load(); }, 60000);
+  }
+
+  function hide() {
+    if (!R.on) return;
+    R.on = false;
+    cancelAnimationFrame(R.raf);
+    clearInterval(R.poll);
+    R.el.hidden = true;
+    document.documentElement.classList.remove('i-rummet');
+  }
+
+  return { fits, show, hide, redraw: () => { if (R.on) fill(); } };
+})();

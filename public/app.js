@@ -117,6 +117,7 @@ const TABS = {
 function showTab(sectionId) {
   // Samma sida som förut (till exempel när matchrutan stängs): ingen skroll till toppen.
   const same = !$(`#${sectionId}`).hidden;
+  if (window.Rum && sectionId !== 'rum-section') Rum.hide();
   for (const sec of document.querySelectorAll('main > section')) sec.hidden = sec.id !== sectionId;
   for (const btn of document.querySelectorAll('.tablist [role="tab"]')) {
     btn.setAttribute('aria-selected', String(btn.dataset.tab === sectionId));
@@ -134,6 +135,13 @@ const modal = { active: false, under: null, depth: 0, closing: false };
 let routed = false;
 
 function route(e) {
+  // #match/<id>/<flik> öppnar matchen på fliken (förstoringsglaset i rummet
+  // leder till Analysera); adressen blir #match/<id>.
+  const tab = /^#match\/(\d+)\/([a-z]+)$/.exec(location.hash);
+  if (tab) {
+    state.wantTab = tab[2];
+    history.replaceState(history.state, '', `#match/${tab[1]}`);
+  }
   const h = location.hash.replace(/^#/, '');
   const old = e && e.oldURL ? new URL(e.oldURL).hash.replace(/^#/, '') : null;
   const m = /^match\/(\d+)$/.exec(h);
@@ -174,8 +182,14 @@ function route(e) {
     showTab('battle-section');
     return;
   }
-  // Förstasidan: utan eller med okänd adress.
+  // Förstasidan: utan eller med okänd adress. Utan adress står
+  // tobaksaffären på stora skärmar (rum.js); #hem är den vanliga förstasidan.
   if (!TABS[h]) {
+    if (!h && window.Rum && Rum.fits()) {
+      Rum.show();
+      showTab('rum-section');
+      return;
+    }
     showTab('home-section');
     showHome();
     return;
@@ -429,6 +443,10 @@ async function openMatch(id) {
   if (!state.detail || state.detail.match.id !== id) {
     state.mtab = null;
     el.innerHTML = `<div class="mr-top">${CLOSE_BTN}</div><div class="mr-body"><p class="empty">Laddar …</p></div>`;
+  }
+  if (state.wantTab) {
+    state.mtab = state.wantTab;
+    state.wantTab = null;
   }
   modal.active = true;
   if (!dlg.open) {

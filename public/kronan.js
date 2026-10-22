@@ -273,5 +273,5 @@ window.Kronan = (() => {
     return `<div class="card tp-card kr-reign">${top}${stage(best, worst, true, pts, lines, !last)}${last && extra ? extra(last) : ''}</div>`;
   }
 
-  return { html, reigning, head, polaroids, crowned };
+  return { html, reigning, head, polaroids, crowned, holders };
 })();
