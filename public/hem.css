@@ -1,0 +1,149 @@
+/* Förstasidan (#home-section i index.html): oraklet och Ikaros som två
+   polaroider (kronan.js, ritas av tippare.js) med mottot under, och omgången
+   bredvid – rutorna ur samtal.js och kupong.js utan kort runt sig. I
+   telefonen står bilderna överst och omgången centrerad under. Laddas efter
+   enhet.css och kronan.css. */
+
+.hem-vh {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  overflow: hidden;
+  clip: rect(0 0 0 0);
+  white-space: nowrap;
+}
+
+.hem {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  align-items: center;
+  gap: clamp(32px, 6vw, 80px);
+  min-height: clamp(440px, 64vh, 580px);
+  padding: clamp(28px, 5vw, 56px) 0;
+}
+
+/* ---------- polaroiderna ---------- */
+
+.hem-bild { display: flex; flex-direction: column; align-items: center; }
+/* platsen hålls medan säsongen läses, så att inget flyttar sig */
+.hem-kronan {
+  --pol-w: clamp(150px, 15vw, 192px);
+  --pol-h: calc(var(--pol-w) * 1.12);
+  display: flex;
+  justify-content: center;
+  min-height: calc(var(--pol-h) + 92px);
+}
+.kr-pol {
+  position: relative;
+  flex: none;
+  width: var(--pol-w);
+  height: fit-content;
+  padding: 9px 9px 0;
+  background: #f1e9db;
+  border-radius: 3px;
+  box-shadow: 0 34px 60px -26px rgba(0, 0, 0, 0.95), 0 2px 6px rgba(0, 0, 0, 0.4);
+  text-decoration: none;
+  transform: rotate(-4deg);
+}
+.kr-pol.ikaros { margin: 26px 0 0 -12px; transform: rotate(4deg); }
+.kr-pol .kr-scene { display: block; --sh: var(--pol-h); --fh: calc(var(--pol-h) * 0.74); }
+.kr-pol .kr-scene.kr-ikaros { --fh: calc(var(--pol-h) * 0.56); }
+.kr-pol .kr-figs.n2, .kr-pol .kr-figs.n3 { --fh: calc(var(--pol-h) * 0.6); }
+.kr-pol-text { display: grid; gap: 2px; padding: 10px 4px 13px; text-align: center; }
+.kr-pol .kr-title { font-size: 10px; letter-spacing: 0.14em; color: #8a6122; }
+.kr-pol.ikaros .kr-title { color: #a5532c; }
+.kr-pol .kr-name { font-size: 18px; font-style: italic; font-weight: 500; color: #3a3128; }
+.kr-pol .kr-amp { color: #7a6c5a; }
+
+/* Stillbilder tills man pekar på dem: som när rörelsen är avstängd
+   (kronan.css), mitt i fallet. */
+.kr-pol:not(:hover) .kr-scene *,
+.kr-pol:not(:hover) .kr-scene *::before,
+.kr-pol:not(:hover) .kr-scene *::after { animation: none !important; }
+.kr-pol:not(:hover) .kr-feathers { display: none; }
+@media (prefers-reduced-motion: reduce) {
+  .kr-pol .kr-scene *,
+  .kr-pol .kr-scene *::before,
+  .kr-pol .kr-scene *::after { animation: none !important; }
+  .kr-pol .kr-feathers { display: none; }
+}
+
+.hem-motto {
+  margin: 30px 0 0;
+  font-family: var(--display);
+  font-size: 17px;
+  font-style: italic;
+  font-weight: 500;
+  color: var(--gold-hi);
+  text-align: center;
+}
+
+/* ---------- omgången ---------- */
+
+.hem-omg { min-width: 0; }
+#home .card {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 0;
+  margin: 0;
+  padding: 0;
+  overflow: visible;
+  background: none;
+  border: 0;
+  box-shadow: none;
+}
+#home .card + .card { margin-top: 48px; }
+#home .card::after { content: none; }
+#home .kp-eyebrow { margin: 0; }
+#home .page-title {
+  margin: 10px 0 0;
+  font-size: clamp(32px, 3.6vw, 44px);
+  line-height: 1.08;
+  text-wrap: balance;
+}
+/* omgångens namn på en egen rad under numret */
+#home .page-title .kp-bi { flex-basis: 100%; margin-top: 8px; font-size: 0.6em; line-height: 1.2; }
+#home .kp-line { margin: 12px 0 0; }
+.sm-raden {
+  margin: 18px 0 0;
+  font-family: var(--display);
+  font-size: 18px;
+  font-style: italic;
+  color: var(--ink-soft);
+}
+.sm-raden.inne { color: var(--fresh); }
+#home .kp-teaser-num { margin-top: 18px; }
+#home .kp-pearls { margin-top: 14px; }
+/* knapparna: huvudknappen först, där texten börjar (i nästa omgång står den
+   sist i koden, för kupongsidans högerställda rad) */
+#home .card > .kp-btn,
+#home .kp-teaser-go,
+#home .kp-nasta-go { margin-top: 30px; }
+#home .kp-teaser-go,
+#home .kp-nasta-go {
+  display: flex;
+  flex-direction: row;
+  justify-content: flex-start;
+  align-items: baseline;
+  margin-right: 0;
+}
+#home .kp-nasta-go { flex-direction: row-reverse; justify-content: flex-end; }
+#home .kp-teaser-go > .kp-btn,
+#home .kp-nasta-go > .kp-btn { flex: none; padding: 0 0 3px; font-size: 15px; }
+
+/* ---------- telefonen ---------- */
+
+@media (max-width: 760px) {
+  .hem { grid-template-columns: minmax(0, 1fr); gap: 34px; min-height: 0; padding: 26px 0 34px; }
+  .hem-kronan { --pol-w: 138px; min-height: calc(var(--pol-h) + 84px); }
+  .kr-pol .kr-name { font-size: 16px; }
+  .hem-motto { margin-top: 24px; font-size: 15px; }
+  #home .card { align-items: center; text-align: center; }
+  #home .page-title { justify-content: center; font-size: 30px; }
+  /* alla tretton pärlor på en rad */
+  #home .kp-pearls { flex-wrap: nowrap; justify-content: center; gap: 4px; }
+  #home .kp-dot { width: 22px; height: 22px; font-size: 11px; }
+  #home .kp-teaser-go,
+  #home .kp-nasta-go { justify-content: center; }
+}

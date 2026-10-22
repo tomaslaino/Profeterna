@@ -2,7 +2,7 @@
 
 // ---------- kröningen ----------
 //
-// Förstasidan: Omgångens orakel och Omgångens Ikaros som bild överst i
+// Olympen: Omgångens orakel och Omgångens Ikaros som bild överst i
 // omgångens ruta (tippare.js anropar Kronan.html med omgångens poäng).
 // Oraklet står på en marmorsockel med lagerkrans och solstrålar bakom sig;
 // Ikaros flyger kaxigt upp mot solen, vingarna smälter och han störtar i
@@ -15,9 +15,10 @@
 // kupongens nummer och namn, en väg till kupongen den gällde, och titlarna –
 // Omgångens orakel och Omgångens Ikaros – som gäller tills nästa omgång är
 // avgjord.
-// Samma två har ett litet märke på porträttet i omgångens ruta överst
-// (Kronan.mark, samtal.js), Förra omgångens orakel och Ikaros. Före första
-// omgången är det KRONAN_START, och titlarna är bara Orakel och Ikaros.
+// Samma två står på förstasidan som två polaroider bredvid omgången
+// (Kronan.polaroids): stillbilder ur scenerna, som spelas när man pekar på
+// dem. Före första omgången är det KRONAN_START, och titlarna är bara Orakel
+// och Ikaros.
 //
 // Kropparna är urklippta foton (public/profeterna/kropp-*.png). hx är
 // huvudets mitt i procent av bildens bredd och sy axlarnas höjd i procent av
@@ -137,17 +138,12 @@ window.Kronan = (() => {
       `<img src="${k.bild}" alt="" draggable="false">${extra}</div>`;
   }
 
-  // line: titlarna som regerar (Kronan.reigning) – raden under namnet i
-  // stället för poängen. start: före första omgången.
-  function panel(kind, people, done, pts, line, start) {
+  // Scenen: oraklet på sockeln i solstrålarna, Ikaros på väg upp mot solen
+  // och ner i havet.
+  function scene(kind, people) {
     const orakel = kind === 'orakel';
-    const title = start ? (orakel ? 'Orakel' : 'Ikaros')
-      : orakel ? (done ? 'Omgångens orakel' : 'Leder just nu') : (done ? 'Omgångens Ikaros' : 'Sist just nu');
-    const p0 = people[0];
-    const stat = line ? `<span class="kr-stat">${esc2(line)}</span>`
-      : p0.pts != null ? `<span class="kr-stat ${tone(p0.pts)}">${pts(p0.pts)} · ${p0.ok}/${p0.n} rätt</span>` : '';
     const figs = people.map((p) => fig(p, orakel ? '' : WINGS)).join('');
-    const scene = orakel
+    return orakel
       ? `<div class="kr-rays"></div>${LAUREL}<div class="kr-figs n${people.length}">${figs}</div><div class="kr-plinth"></div>`
       : '<div class="kr-sun"></div>' +
         '<div class="kr-speed"><i></i><i></i><i></i><i></i><i></i><i></i></div>' +
@@ -157,10 +153,22 @@ window.Kronan = (() => {
         '<svg class="kr-sea" viewBox="0 0 400 40" preserveAspectRatio="none" aria-hidden="true">' +
         '<path class="kr-wave b" d="M0 14q25-10 50 0t50 0 50 0 50 0 50 0 50 0 50 0 50 0V40H0z"/>' +
         '<path class="kr-wave f" d="M0 22q25-9 50 0t50 0 50 0 50 0 50 0 50 0 50 0 50 0V40H0z"/></svg>';
-    const names = people.map(name).join('<span class="kr-amp"> &amp; </span>');
+  }
+
+  const names = (people) => people.map(name).join('<span class="kr-amp"> &amp; </span>');
+
+  // line: titlarna som regerar (Kronan.reigning) – raden under namnet i
+  // stället för poängen. start: före första omgången.
+  function panel(kind, people, done, pts, line, start) {
+    const orakel = kind === 'orakel';
+    const title = start ? (orakel ? 'Orakel' : 'Ikaros')
+      : orakel ? (done ? 'Omgångens orakel' : 'Leder just nu') : (done ? 'Omgångens Ikaros' : 'Sist just nu');
+    const p0 = people[0];
+    const stat = line ? `<span class="kr-stat">${esc2(line)}</span>`
+      : p0.pts != null ? `<span class="kr-stat ${tone(p0.pts)}">${pts(p0.pts)} · ${p0.ok}/${p0.n} rätt</span>` : '';
     return `<figure class="kr-panel kr-${kind}${done ? '' : ' is-prel'}" aria-label="${esc2(title)}: ${esc2(people.map((p) => p.name).join(' och '))}">` +
-      `<div class="kr-scene">${scene}</div>` +
-      `<figcaption><span class="kr-title">${title}</span><b class="kr-name">${names}</b>${stat}</figcaption></figure>`;
+      `<div class="kr-scene">${scene(kind, people)}</div>` +
+      `<figcaption><span class="kr-title">${title}</span><b class="kr-name">${names(people)}</b>${stat}</figcaption></figure>`;
   }
 
   // s = omgångens poäng (tpScore i tippare.js): ranked med award best/worst.
@@ -194,50 +202,25 @@ window.Kronan = (() => {
     return { last, best: last.people.filter((p) => p.award === 'best'), worst: last.people.filter((p) => p.award === 'worst') };
   }
 
-  // Märkena på porträtten i omgångens ruta (Kronan.mark i samtal.js), i
-  // övre vänstra hörnet – bocken sitter i det nedre högra. Lagerkransen är
-  // två grenar som i den stora, fjädern en av dem som lossnat.
-  const MARK_LAGER = (() => {
-    const R = 5.2;
-    let stems = '';
-    let leaves = '';
-    for (const side of [-1, 1]) {
-      const pt = (t) => [10 + side * R * Math.sin(t), 10.4 + R * Math.cos(t)];
-      const [x0, y0] = pt(0.3);
-      const [x1, y1] = pt(2.6);
-      stems += `<path d="M${r1(x0)} ${r1(y0)}A${R} ${R} 0 0 ${side < 0 ? 1 : 0} ${r1(x1)} ${r1(y1)}"/>`;
-      for (const t of [0.7, 1.3, 1.9, 2.5]) {
-        const [x, y] = pt(t);
-        const a = Math.atan2(-Math.sin(t), side * Math.cos(t)) + side * 0.45;
-        const cx = r1(x + Math.cos(a) * 1.7);
-        const cy = r1(y + Math.sin(a) * 1.7);
-        leaves += `<ellipse cx="${cx}" cy="${cy}" rx="2" ry=".95" transform="rotate(${r1(a * 180 / Math.PI)} ${cx} ${cy})"/>`;
-      }
-    }
-    return '<svg viewBox="0 0 20 20" aria-hidden="true">' +
-      `<g fill="none" stroke="#c9973f" stroke-width=".7">${stems}</g><g fill="#f0d699">${leaves}</g></svg>`;
-  })();
-  const MARK_FJADER = '<svg viewBox="0 0 20 20" aria-hidden="true"><g transform="rotate(35 10 10)">' +
-    '<path d="M10 3.5C12.6 6.5 12.6 12 10 16.5C7.4 12 7.4 6.5 10 3.5z" fill="#f3ead9"/>' +
-    '<path d="M10 5V17.5" stroke="#9c8a68" stroke-width=".8"/></g></svg>';
+  // Förstasidan: de som regerar som två polaroider – stillbilder ur
+  // scenerna, som spelas när man pekar på dem – med titeln och namnet i
+  // kanten. Vägen in till Olympen. Färgövergångarna får egna id:n, så att
+  // bilderna inte hämtar dem ur Olympens ruta när den är dold.
+  // rounds = säsongens omgångar som syns (tippare.js).
+  function polaroids(rounds) {
+    const { last, best, worst } = holders(rounds);
+    const one = (kind, people, title) => {
+      const tip = last ? `Förra omgångens ${title === 'Orakel' ? 'orakel' : title}` : `${title} på förhand`;
+      return `<a class="kr-pol ${kind}" href="#olympen" title="${esc2(tip)}">` +
+        `<span class="kr-scene kr-${kind}">${scene(kind, people).replace(/kr-(gold|wax)/g, 'kr-$1-pol')}</span>` +
+        `<span class="kr-pol-text"><span class="kr-title">${title}</span><b class="kr-name">${names(people)}</b></span></a>`;
+    };
+    return one('orakel', best, 'Orakel') + one('ikaros', worst, 'Ikaros');
+  }
 
-  // Vilka som regerar: sätts av tippare.js när säsongen är läst. true om
-  // det ändrades, så att omgångens ruta kan ritas om med märkena.
-  let reign = null;
-  function setRounds(rounds) {
-    const h = holders(rounds);
-    const next = { best: h.best.map((p) => p.id), worst: h.worst.map((p) => p.id), start: !h.last };
-    const changed = JSON.stringify(next) !== JSON.stringify(reign);
-    reign = next;
-    return changed;
-  }
-  function mark(id) {
-    if (!reign) return '';
-    const of = (t) => (reign.start ? `${t[0].toUpperCase()}${t.slice(1)} på förhand` : `Förra omgångens ${t}`);
-    if (reign.best.includes(id)) return `<span class="kr-mark lager" title="${of('orakel')}">${MARK_LAGER}</span>`;
-    if (reign.worst.includes(id)) return `<span class="kr-mark fjader" title="${of('Ikaros')}">${MARK_FJADER}</span>`;
-    return '';
-  }
+  // Finns en avgjord omgång med orakel och Ikaros? Före den står de som
+  // utnämndes på förhand bara på förstasidan och på Olympens pall.
+  const crowned = (rounds) => Boolean(holders(rounds).last);
 
   // Gängets kupong ur omgången: den med flest av omgångens matcher
   // (kupong.js), eller null.
@@ -290,5 +273,5 @@ window.Kronan = (() => {
     return `<div class="card tp-card kr-reign">${top}${stage(best, worst, true, pts, lines, !last)}${last && extra ? extra(last) : ''}</div>`;
   }
 
-  return { html, reigning, head, setRounds, mark };
+  return { html, reigning, head, polaroids, crowned };
 })();

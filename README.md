@@ -62,9 +62,9 @@ ingen falsk precision · sidan kraschar aldrig av en död källa · endast fria 
   betyg 1–5 mot modellens väntade antal rätt, sortering efter hur det gick och en kort
   AI-kommentar som läser gängets anteckningar. Fryses in i `data/kupong-historik.json`
   (se [Kuponghistoriken](#kuponghistoriken))
-- [x] **Säsongens tippare:** förstasidan visar under omgångens ruta en topplista över
-  säsongen för gängets egna tips – poäng, omgångar, rätt och antal gånger som omgångens
-  bästa och sämsta, med modellen som jämförelse. Varje omgång sparas i
+- [x] **Säsongens tippare:** Olympen visar ställningen över säsongen för gängets egna
+  tips – poäng, rätt och antal gånger som omgångens bästa och sämsta, med modellen som
+  jämförelse. Varje omgång sparas i
   `data/tippar-historik.json` (se [Säsongens tippare](#säsongens-tippare))
 - [x] **Utmärkelserna (2026-10-20):** när omgången är färdigspelad delas utmärkelser ut
   efter hur var och en tippade – titlar som låter som dygder (*Den diplomatiske*) med en
@@ -452,6 +452,12 @@ Utan nyckel ingen knapp.
   Omgången (hela kupongen) och Historik (förut en egen sida, länkad i sidfoten på alla
   sidor). Länken Kuponghistorik i sidfoten tas bort; `historik.html` leder till
   `#kupong/historik`.
+- **Lugnare förstasida (2026-10-22, användarens önskemål):** förstasidan visar det
+  väsentliga – omgången och vad man ska göra – med mycket luft. Jätterubriken
+  *Matchfixarna* (namnet står redan i toppbaren) och lagbilden är borta; i stället står
+  oraklet och Ikaros som polaroider bredvid omgången, och raden *Väntar på Teijder* i
+  stället för porträtten. Omgångens tippare med utmärkelserna flyttar upp överst i
+  Olympen, och Säsongens tippare försvinner – Olympens ställning visar samma sak.
 - **Säsongsprognosen tas bort (2026-10-20, användarens beslut):** vyn under Tabeller och
   simuleringen i bygget (`src/season.js`, `data/season.json`) försvinner, liksom
   programmet framåt och prognosdelen i lagkortet. Tabeller visar bara tabellen, med
@@ -533,7 +539,8 @@ server:
   [config/kommentar.js](config/kommentar.js). Se [Kuponghistoriken](#kuponghistoriken).
 - **Omgångens och säsongens tippare:** [src/tippare.js](src/tippare.js) sparar varje
   omgång av gängets egna tips i `data/tippar-historik.json` och skriver `data/tippare.json`;
-  rutorna på förstasidan ritas av [public/tippare.js](public/tippare.js) med
+  rutan överst i Olympen och polaroiderna på förstasidan ritas av
+  [public/tippare.js](public/tippare.js) med
   [public/tippare.css](public/tippare.css). Poängen räknas av
   [public/tippoang.js](public/tippoang.js), som både bygget och sidan använder. Se
   [Omgångens tippare](#omgångens-tippare). Utmärkelserna räknas och ritas av
@@ -1031,12 +1038,14 @@ ställningen efter 90 minuter (samma utfall som prognosen).
 
 **Var den syns**
 
-- **Förstasidan** (utan adress, ingen flik – dit leder namnet): rubriken, omgångens kupong
-  i korthet och Säkraste spelen. Omgångens kupong är gängets kupong ur omgången som alla
-  tippade (se [Inför uppgörelsen](#inför-uppgörelsen)) tills den är färdigspelad, annars den som
-  pågår, annars nästa, annars den som spelades färdigt senast; rutan visar antal rätt
-  (eller antal matcher), läget, en prick per match och knappen in till kupongen – och
-  *+ Ny kupong* när den är färdigspelad.
+- **Förstasidan** (utan adress, ingen flik – dit leder namnet): till vänster oraklet och
+  Ikaros som två polaroider med mottot under (se [Omgångens tippare](#omgångens-tippare)),
+  till höger omgången utan kort runt sig – i telefonen bilderna överst och omgången
+  centrerad under. Omgångens kupong är gängets kupong ur omgången som alla tippade (se
+  [Inför uppgörelsen](#inför-uppgörelsen)) tills den är färdigspelad; den visar datumen,
+  Kupong 1 med namnet under, *Startar lör 16:00* före första avsparken och därefter antal
+  rätt och en prick per match, och knappen in till kupongen. Är den färdigspelad står
+  nästa omgång där (*Matcherna väljer inte sig själva* med *Välj matcher*).
 - **Fliken Kupong** (`#kupong`) handlar bara om nästa kupong – de färdigspelade står i
   Olympen. Den är hela omgångens kupong: antal rätt, en skala med
   rätt, möjliga och modellens väntade antal rätt, och varje match med vårt tecken som tre
@@ -1220,12 +1229,14 @@ under omgången.
    först *Ersätt den*. *Ändra matcherna* går tills någon har lämnat in. Den gamla vägen –
    gängets kupong direkt – finns kvar under länken *Eller gör gängets kupong direkt*.
    Medan kupongen fylls i står den överst på förstasidan och under Kupong.
-   Förstasidans ruta visar hur många som har lämnat in och hur lång tid som är kvar –
-   till första avsparken, då inlämningen stänger (nedräkningen går av sig själv och blir
-   bärnstensfärgad den sista timmen). När alla har lämnat in, eller tiden är ute, står det
-   *Dags för uppgörelsen* (och vem som inte lämnade in) utan någon tid; när gängets kupong
-   är gjord tar den över rutan. Porträtten där har samma märken som på kupongen (bock eller
-   tårtbit, grått tills man är inne, se punkt 2), och har man börjat på sin kupong heter knappen *Fyll i resten*. En
+   Förstasidan visar hur lång tid som är kvar – till första avsparken, då inlämningen
+   stänger (nedräkningen går av sig själv och blir bärnstensfärgad den sista timmen) – och
+   en rad som säger samma sak som stämpeln på papperet, med efternamnen: *Väntar på
+   Teijder*, *Väntar på dig och Teijder*, *Väntar på alla* (vilka som är inne när man
+   pekar), och grönt *Alla inne*. När tiden är ute står det *Dags för uppgörelsen* och vem
+   som inte lämnade in; när gängets kupong är gjord tar den över. Porträtt står inte där –
+   gänget syns redan på polaroiderna (2026-10-22). Har man börjat på sin kupong heter
+   knappen *Fyll i resten*. En
    färdigspelad kupong visas inte bredvid medan en ny omgång fylls i – den står bland
    Grupparbetena i Olympen.
 2. **Fyll i kupongen** (direkt under Omgången, `#kupong`): kupongen står på papper med en
@@ -1477,8 +1488,8 @@ Lokalt med egna filer: `KUPONG_DIR=/tmp/kuponger KUPONG_HISTORIK=/tmp/historik.j
 
 ## Omgångens tippare
 
-Förstasidan har under kupongen en ruta som visar vem i gänget som tippade bäst och sämst i
-omgången. Underlaget är var och ens egna tips inför samtalet (`GET …/samtal`,
+Olympen har överst en ruta som visar vem i gänget som tippade bäst och sämst i omgången
+(fram till 2026-10-22 stod den under kupongen på förstasidan). Underlaget är var och ens egna tips inför samtalet (`GET …/samtal`,
 [worker/samtal.mjs](worker/samtal.mjs)). Rutan syns när tipsen visas för alla och första
 matchen är spelad. Poängen räknas i webbläsaren ([public/tippare.js](public/tippare.js))
 med samma rättning som kupongen: ställningen efter 90 minuter, liveställningen och
@@ -1517,15 +1528,20 @@ helgardering alltid ger 0). Poängen läggs ihop för omgången.
   Vision); `KRONAN_KROPPAR` i kronan.js säger var huvudet och axlarna sitter i varje bild
   så att vingarna fäster rätt. Delat vid lika står alla med samma utmärkelse ihop.
 - Pågår ingen omgång (eller är inget spelat än) står den senaste avslutade omgångens
-  orakel och Ikaros kvar i en egen ruta med den omgångens datum. Före första omgången
-  heter rutan *Före första omgången* och det är `KRONAN_START` i kronan.js: Daniel Laino
-  som orakel och Daniel Johansson som Ikaros.
+  orakel och Ikaros kvar i en egen ruta med den omgångens datum. Före första omgången är
+  det `KRONAN_START` i kronan.js – Daniel Laino som orakel och Daniel Johansson som Ikaros
+  – och då står ingen ruta i Olympen; de syns på polaroiderna och på pallen.
+- **Polaroiderna på förstasidan** (`Kronan.polaroids`, `hem.css`): de som regerar – samma
+  två som i rutan – i varsin polaroid med titeln och namnet i kanten. Det är stillbilder
+  ur scenerna (som utan rörelse: Ikaros mitt i fallet), som spelas när man pekar på dem,
+  och de leder till Olympen. Färgövergångarna i dem har egna id:n, så att de inte hämtas
+  ur Olympens ruta när den är dold.
 - Saknas modellen för en match används kuponghistorikens schablon: 45 % för ett tecken,
   75 % för två. Uppskjutna och inställda matcher räknas inte.
 - *Poäng per match* (utfällbar) visar varje tips med poängen.
 
 Bara den pågående omgången finns i `GET …/samtal`. När nästa omgång startas försvinner
-rutan – men omgången finns kvar i säsongen nedan.
+rutan – men omgången finns kvar i säsongen nedan och i Olympens ställning.
 
 ### Utmärkelserna
 
@@ -1570,13 +1586,14 @@ ur tipsen, resultaten efter 90 minuter, modellens prognos före avspark och gän
 
 ### Säsongens tippare
 
-Under omgångens ruta står en topplista över säsongen: summan av omgångarnas poäng, antal
-omgångar, antal rätt av de spelade matcherna och antal gånger som *Omgångens orakel*
-(bäst) och *Omgångens Ikaros* (sämst), som märken under namnet. Modellen står med som
-jämförelse, utan placering. Placering efter summan med en decimal, sedan antal rätt. En
-omgång räknas för den som tippade i den. *Poäng per omgång* (utfällbar) visar varje
-omgång med orakel och Ikaros inramade i guld och rött. Döljer spoilerskyddet någon match i
-en omgång räknas hela omgången bort, med *Visa ändå*.
+Säsongen står i Olympen ([public/kampen.js](public/kampen.js)): ställningen som en
+prispall med summan av omgångarnas poäng, antal rätt av de spelade matcherna och antal
+gånger som *Omgångens orakel* (bäst) och *Omgångens Ikaros* (sämst), som märken under
+namnet, och modellen som jämförelse, utan placering. Placering efter summan med en
+decimal, sedan antal rätt. En omgång räknas för den som tippade i den. Tabellen
+*Omgångarna* visar varje omgång med orakel och Ikaros inramade i guld och rött. Döljer
+spoilerskyddet någon match i en omgång räknas hela omgången bort, med *Visa ändå*. (Fram
+till 2026-10-22 stod samma topplista också under omgångens ruta på förstasidan.)
 
 **Filen** `data/tippar-historik.json` committas och växer bara. Bygget på GitHub Actions
 (`--journal`) hämtar `GET …/samtal` och skriver in omgången **när tipsen visas för alla**,

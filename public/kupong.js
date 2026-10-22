@@ -628,8 +628,8 @@ function teaser(c, g) {
     `<div class="kp-teaser-txt"><p class="kp-eyebrow">${esc(dateRange(g.first, g.last))}</p>` +
     couponTitle(couponNumber(c.matches.map((x) => x.id)), name, { href: '#kupong' }) +
     (g.started ? '' : `<span class="kp-line">Startar ${esc(fWeekdayTime.format(new Date(g.first)))}</span>`) + '</div>' +
-    `<a class="kp-teaser-num" href="#kupong" aria-label="Till kupongen">${bigNumber(g)}</a>` +
-    pearls(g.rows) +
+    // Siffran och pärlorna när matcherna har börjat.
+    (g.started ? `<a class="kp-teaser-num" href="#kupong" aria-label="Till kupongen">${bigNumber(g)}</a>${pearls(g.rows)}` : '') +
     `<div class="kp-teaser-go">${go}</div></div>`;
 }
 

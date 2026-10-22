@@ -29,6 +29,7 @@
   <link rel="stylesheet" href="artikel.css">
   <link rel="stylesheet" href="hojdpunkter.css">
   <link rel="stylesheet" href="enhet.css">
+  <link rel="stylesheet" href="hem.css">
   <link rel="stylesheet" href="systembild.css">
   <link rel="stylesheet" href="forklaring.css">
   <link rel="stylesheet" href="kallor.css">
@@ -58,30 +59,17 @@
   </header>
 
   <main>
-    <!-- förstasidan: hjälten och omgångens kupong i korthet -->
+    <!-- förstasidan: oraklet och Ikaros som polaroider (kronan.js, ritas av
+         tippare.js) och omgången bredvid (kupong.js, samtal.js) -->
     <section id="home-section" aria-label="Förstasidan">
-      <div id="hero" class="hero">
-        <div class="hero-main">
-          <h1 class="hero-title">Matchfixarna</h1>
-          <div class="hero-lede">
-            <!-- lagbilden står här på mobilen och till höger på breda skärmar -->
-            <figure class="team-photo team-photo-sm">
-              <a href="om-oss.html"><img src="profeterna/lag.jpg" alt="Daniel Johansson, Daniel Laino och Daniel Teijder under en grekisk flagga" width="640" height="800"></a>
-            </figure>
-            <p class="hero-motto">Engelsk fotboll, grekisk bokföring.</p>
-          </div>
+      <h1 class="hem-vh">Matchfixarna</h1>
+      <div class="hem">
+        <div class="hem-bild">
+          <div id="hem-kronan" class="hem-kronan"></div>
+          <p class="hem-motto">Engelsk fotboll, grekisk bokföring.</p>
         </div>
-        <!-- stora lagbilden visas bara på breda skärmar -->
-        <div class="hero-aside">
-          <figure class="team-photo team-photo-lg">
-            <a href="om-oss.html"><img src="profeterna/lag.jpg" alt="Daniel Johansson, Daniel Laino och Daniel Teijder under en grekisk flagga"
-              width="640" height="800" loading="lazy"></a>
-          </figure>
-        </div>
+        <div id="home" class="hem-omg"></div>
       </div>
-      <div id="home"></div>
-      <!-- omgångens och säsongens tippare ur gängets egna tips (tippare.js) -->
-      <div id="tippare"></div>
     </section>
 
     <!-- kupongen: omgångens kupong och samtalet (kupong.js, samtal.js) -->
@@ -93,6 +81,9 @@
          färdigspelade kupongerna (kampen.js, historik.js) -->
     <section id="battle-section" role="tabpanel" aria-labelledby="tab-battle" hidden>
       <div id="kampen"></div>
+      <!-- omgångens tippare ur gängets egna tips (tippare.js), flyttas upp
+           under rubriken av kampen.js -->
+      <div id="tippare"></div>
     </section>
 
     <section id="matches-section" role="tabpanel" aria-labelledby="tab-matches" hidden>

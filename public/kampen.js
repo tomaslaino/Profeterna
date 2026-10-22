@@ -4,9 +4,9 @@
 //
 // Fliken Olympen (#olympen, först Kampen – filerna heter kampen): gängets
 // inbördes kamp om tipsen, säsongen igenom.
-// Samma tips och poäng som Omgångens och Säsongens tippare på förstasidan
-// (tippare.js, tippoang.js): 1 för rätt minus modellens chans för tipset före
-// avspark – plus är bättre än modellen, minus sämre.
+// Samma tips och poäng som Omgångens tippare överst (tippare.js, tippoang.js):
+// 1 för rätt minus modellens chans för tipset före avspark – plus är bättre än
+// modellen, minus sämre.
 //
 // Omgångarna är de avslutade ur data/tippare.json (src/tippare.js, med
 // matcherna och allas tecken) och – medan den pågår – omgången ur
@@ -14,7 +14,8 @@
 // minuter, aktuell ställning, Dölj resultat). En avslutad omgång med en match
 // som Dölj resultat döljer räknas bort, som på förstasidan.
 //
-// Sidan: ställningen som en prispall, betyget (betyg.js), kurvan omgång för
+// Sidan: omgångens tippare eller förra omgångens kröning (tippare.js,
+// #tippare), ställningen som en prispall, betyget (betyg.js), kurvan omgång för
 // omgång, inbördes möten (vem som fick mest poäng i omgångarna som båda
 // tippade), spelkassan (10 kr per match på sitt tips till modellens odds),
 // höjdpunkterna, var och ens sätt att tippa och omgångarna – med gängets
@@ -566,7 +567,8 @@ function kampHtml(width) {
     ? `<p class="kp-line km-status">${Spoiler.chip(`${hidden.length} ${hidden.length === 1 ? 'omgång dold' : 'omgångar dolda'}`)}` +
       `<button type="button" class="tp-show" data-sp-show="${esc(hidden.flatMap((r) => r.matches.map((m) => m.id)).join(' '))}">Visa ändå</button></p>`
     : '';
-  const head = '<h2 class="page-title">Olympen</h2>';
+  // Platsen för omgångens tippare (#tippare), som kampRender sätter in.
+  const head = '<h2 class="page-title">Olympen</h2><div data-km-omgang></div>';
   // Platsen för Grupparbetena (KAMP.hk), som kampRender sätter in.
   const kup = window.Historik ? '<div data-km-kuponger></div>' : '';
   if (!list.length) return head + kampEmpty(gang) + hid + kup;
@@ -639,6 +641,9 @@ function kampRender(e) {
     el.innerHTML = html;
     if (open) el.querySelector('.km-help').open = true;
   }
+  // Omgångens tippare ritas av tippare.js och ligger kvar mellan omritningarna.
+  const slot = el.querySelector('[data-km-omgang]');
+  if (slot && $('#tippare')) slot.replaceWith($('#tippare'));
   if (window.Historik) kampKuponger(el, Boolean(e && e.type === 'hashchange'));
 }
 

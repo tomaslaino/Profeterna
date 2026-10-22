@@ -1,7 +1,7 @@
-/* Omgångens och säsongens tippare (tippare.js): rutorna under kupongen på
-   förstasidan. Laddas efter kupong.css och använder dess tokens (--kp-ok,
-   --kp-no) och .kp-eyebrow/.kp-line. Plus = bättre än modellen (grönt),
-   minus = sämre (rött). */
+/* Omgångens tippare (tippare.js): rutan överst i Olympen, och tabellerna som
+   Olympen lånar (kampen.js). Laddas efter kupong.css och använder dess tokens
+   (--kp-ok, --kp-no) och .kp-eyebrow/.kp-line. Plus = bättre än modellen
+   (grönt), minus = sämre (rött). */
 
 #tippare:empty { display: none; }
 #tippare { margin-top: 16px; }
@@ -97,37 +97,9 @@
 .tp-sign.no { border-color: var(--kp-no); color: var(--kp-no); }
 .tp-none { color: var(--muted); }
 
-/* ---------- säsongens tippare ---------- */
+/* ---------- tabellerna ---------- */
 
 .tp-card + .tp-card { margin-top: 16px; }
-.tp-swrap { overflow-x: auto; }
-.tp-stable { width: 100%; border-collapse: collapse; font-size: 14px; }
-.tp-stable th, .tp-stable td {
-  padding: 11px 0 11px 14px;
-  border-bottom: 0;
-  border-top: 1px solid var(--hair);
-  vertical-align: middle;
-  white-space: nowrap;
-  font-variant-numeric: tabular-nums;
-}
-.tp-stable thead th { padding-top: 0; padding-bottom: 8px; border-top: 0; border-bottom: 1px solid var(--border); }
-.tp-stable tbody tr:first-child > * { border-top: 0; }
-.tp-stable tr > :first-child { padding-left: 0; }
-.tp-stable .tp-c, .tp-stable .tp-ok, .tp-stable .tp-pts { text-align: right; }
-.tp-stable .tp-rank { width: 1.6em; font-size: 20px; }
-.tp-stable .tp-who {
-  width: 100%;
-  font-size: 14px;
-  font-weight: 500;
-  letter-spacing: 0;
-  text-transform: none;
-  white-space: normal;
-}
-.tp-stable td.tp-c { font-size: 15px; font-weight: 650; color: var(--ink-soft); }
-.tp-srow.is-lead .tp-rank { color: var(--gold-hi); }
-.tp-stable .tp-model .tp-name b { font-weight: 500; color: var(--ink-soft); }
-.tp-stable .tp-model .tp-pts { font-size: 19px; }
-.tp-stable .tp-model { opacity: 0.8; }
 .tp-vh {
   position: absolute;
   width: 1px;
@@ -159,9 +131,6 @@
 
 @media (max-width: 520px) {
   .tp-card { padding: 18px 16px; }
-  .tp-given { display: none; }
-  .tp-stable th, .tp-stable td { padding-left: 10px; }
-  .tp-stable .tp-rank { width: 1.3em; font-size: 18px; }
   .tp-rounds .tp-table tbody th, .tp-rounds .tp-table tfoot th { min-width: 5.5em; }
   .tp-rounds .tp-table tbody th .tp-rname { min-width: 5.5em; max-width: 6.5em; }
   .tp-rounds .tp-table tbody th .tp-rname + .sub { white-space: normal; }

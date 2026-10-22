@@ -1458,10 +1458,24 @@
     return d < 3 && h % 24 ? `${plural(d, 'dag', 'dagar')} ${h % 24} tim` : plural(d, 'dag', 'dagar');
   }
 
+  // Raden på förstasidan: samma besked som stämpeln på papperet, med
+  // efternamnen – vem omgången väntar på, du först, eller Alla inne – och
+  // vilka som är inne när man pekar. När tipsen visas: vem som inte hann.
+  const surname = (g) => { const n = String(g.namn || g.id); const i = n.indexOf(' '); return i > 0 ? n.slice(i + 1) : n; };
+  function raden(s) {
+    const v = me();
+    const ute = s.gang.filter((g) => !g.inne).sort((a, b) => (b.id === v) - (a.id === v));
+    if (!ute.length) return '<p class="sm-raden inne">Alla inne</p>';
+    if (s.visas) return `<p class="sm-raden">${esc(cap(andList(ute.map((g) => (g.id === v ? 'du' : surname(g))))))} lämnade inte in</p>`;
+    const inne = s.gang.filter((g) => g.inne).sort((a, b) => (b.id === v) - (a.id === v)).map((g) => (g.id === v ? 'du' : surname(g)));
+    const who = ute.length === s.gang.length ? 'alla' : andList(ute.map((g) => (g.id === v ? 'dig' : surname(g))));
+    return `<p class="sm-raden" title="${esc(inne.length ? `${cap(andList(inne))} har lämnat in` : 'Ingen har lämnat in än')}">Väntar på ${esc(who)}</p>`;
+  }
+
   // Rutan på förstasidan, med så lite som möjligt: omgångens namn som rubrik
-  // (som AI:n gav den), tiden kvar att lämna in ovanför, vilka som är inne och
-  // en knapp. När allas tips visas är det dags för uppgörelsen, och när
-  // gängets kupong är gjord tar den över (kupong.js).
+  // (som AI:n gav den), tiden kvar att lämna in ovanför, raden om vem den
+  // väntar på och en knapp. När allas tips visas är det dags för
+  // uppgörelsen, och när gängets kupong är gjord tar den över (kupong.js).
   function teaser() {
     const s = SM.data;
     if (!active()) return '';
@@ -1471,20 +1485,7 @@
     const du = v && s.gang.find((g) => g.id === v);
     const go = !open ? 'Till uppgörelsen' : done ? 'Se de andras tips'
       : du && tally(s, du) ? 'Fyll i resten' : 'Fyll i kupongen';
-    const all = s.matcher.length;
-    return '<div class="card sm-teaser">' +
-      nameBlock(s, 'ruta') +
-      // Porträtten: ring i egen färg och bock = inne, grått = inte inne,
-      // tårtbit = så mycket som är tippat när kupongen inte är färdig,
-      // guldring = du. Lagerkrans och fjäder i övre hörnet = regerande
-      // orakel och Ikaros (kronan.js).
-      '<div class="sm-faces">' + s.gang.map((g) => {
-        const st = g.inne || open ? lage(s, g) : 'lämnade inte in';
-        const n = tally(s, g);
-        const badge = g.inne ? (n < all ? pie(n, all, true) : CHECK) : open && n ? pie(n, all) : '';
-        return `<span class="sm-face sm-p${pnum(g.id)}${person(g.id).bild ? ' bild' : ''}${g.inne ? ' inne' : ''}${g.id === v ? ' du' : ''}" title="${esc(`${g.namn} · ${st}`)}">` +
-          `${photo(g.id)}${window.Kronan ? Kronan.mark(g.id) : ''}${badge}</span>`;
-      }).join('') + '</div>' +
+    return '<div class="card sm-teaser">' + nameBlock(s, 'ruta') + raden(s) +
       '<a class="kp-btn primary" href="#kupong">' + go + '</a></div>';
   }
 

@@ -1,10 +1,13 @@
 'use strict';
 
-// ---------- omgångens och säsongens tippare ----------
+// ---------- omgångens tippare ----------
 //
-// Förstasidan: vem i gänget som tippade bäst och sämst i omgången, och under
-// den säsongen hittills. Tipsen är var och ens egna inför samtalet
-// (worker/samtal.mjs, GET …/samtal) och syns här först när de visas för alla.
+// Olympen, överst: vem i gänget som tippar bäst och sämst i omgången som
+// spelas, annars förra omgångens kröning och utmärkelser. Förstasidan: de som
+// regerar, som två polaroider bredvid omgången (kronan.js). Säsongen hittills
+// står i Olympens ställning (kampen.js). Tipsen är var och ens egna inför
+// samtalet (worker/samtal.mjs, GET …/samtal) och syns här först när de visas
+// för alla.
 // Omgångens poäng räknas i webbläsaren med samma rättning som kupongen
 // (gradeRow i kupong.js: ställningen efter 90 minuter, liveställningen och
 // spoilerskyddet).
@@ -17,8 +20,8 @@
 // står med som jämförelse.
 //
 // Säsongen är de avslutade omgångarna som bygget har frusit in
-// (src/tippare.js → data/tippare.json), med poängen per person redan räknad.
-// Här läggs de ihop – utan omgångar som spoilerskyddet döljer.
+// (src/tippare.js → data/tippare.json), med poängen per person redan räknad –
+// här bara för vilka som regerar, utan omgångar som spoilerskyddet döljer.
 //
 // Läses efter kupong.js och tippoang.js och använder deras hjälpare (KP,
 // gradeRow, matchById, teamsOf, scoreText, dateRange, loadCoupons,
@@ -30,8 +33,8 @@ const TP = {
   busy: null,
   open: false, // Poäng per match utfälld
   season: null, // data/tippare.json
-  seasonOpen: false, // Poäng per omgång utfälld
   html: null,
+  pol: null, // polaroiderna på förstasidan
 };
 const TP_EVERY_MS = 5 * 60000;
 
@@ -224,71 +227,10 @@ function tpRoundHidden(r) {
   return (r.matches || []).some((m) => Spoiler.hidden({ id: m.id, kickoff: m.kickoff, status: m.off ? 'POSTPONED' : '' }));
 }
 
-// Förnamnet döljs på smala skärmar – alla i gänget heter Daniel.
-function tpNameHtml(name) {
-  const i = name.indexOf(' ');
-  return i > 0 ? `<span class="tp-given">${esc(name.slice(0, i))} </span>${esc(name.slice(i + 1))}` : esc(name);
-}
-
 // Antal gånger som Omgångens orakel och Ikaros står som märken under namnet.
 function tpAwards(p) {
   const one = (x, cls, what) => (x ? `<span class="tp-badge ${cls}" title="Omgångens ${what} ${x} ${x === 1 ? 'gång' : 'gånger'}">${x} × ${what}</span>` : '');
   return one(p.best, 'best', 'orakel') + one(p.worst, 'worst', 'Ikaros');
-}
-
-function tpSeasonRow(p, rank) {
-  const cls = ['tp-srow', p.model ? 'tp-model' : '', rank === 1 ? 'is-lead' : ''].filter(Boolean).join(' ');
-  return `<tr class="${cls}">` +
-    `<td class="tp-rank">${p.model ? '' : rank}</td>` +
-    `<th scope="row" class="tp-who"><span class="tp-name"><b title="${esc(p.name)}">${p.model ? 'Modellen' : tpNameHtml(p.name)}</b>` +
-    `${p.model ? '<span class="sub">troligaste utfallet</span>' : tpAwards(p)}</span></th>` +
-    `<td class="tp-c">${p.rounds}</td>` +
-    `<td class="tp-ok">${p.ok}<span>/${p.n}</span></td>` +
-    `<td class="tp-pts ${tpTone(p.pts)}">${tpPts(p.pts)}</td></tr>`;
-}
-
-// Poäng per omgång: en rad per omgång (nyast först), en kolumn per tippare
-// och modellen. Omgångens orakel och Ikaros är inramade.
-function tpRoundsTable(rounds, s) {
-  const cols = [...s.people, s.model];
-  const head = cols.map((p) => `<th scope="col" title="${esc(p.model ? 'Modellens troligaste utfall' : p.name)}">${esc(tpInitials(p))}</th>`).join('');
-  const body = rounds.map((r) => {
-    const cells = cols.map((c) => {
-      const p = c.model ? r.model : (r.people || []).find((x) => x.id === c.id);
-      if (!p || p.none || !p.n) return '<td class="tp-none">–</td>';
-      const aw = p.award ? ` tp-aw ${p.award}` : '';
-      const title = p.award === 'best' ? 'Omgångens orakel' : p.award === 'worst' ? 'Omgångens Ikaros' : '';
-      return `<td><span class="${(tpTone(p.pts) + aw).trim()}"${title ? ` title="${title}"` : ''}>${tpPts(p.pts)}</span></td>`;
-    }).join('');
-    return `<tr><th scope="row">${tpRoundHead(r, `${r.n} ${r.n === 1 ? 'match' : 'matcher'}`)}</th>${cells}</tr>`;
-  }).join('');
-  const foot = cols.map((p) => `<td class="${tpTone(p.pts)}">${tpPts(p.pts)}</td>`).join('');
-  return `<details class="tp-more tp-rounds"${TP.seasonOpen ? ' open' : ''}><summary>Poäng per omgång</summary>` +
-    `<div class="table-wrap"><table class="tp-table"><thead><tr><th scope="col">Omgång</th>${head}</tr></thead>` +
-    `<tbody>${body}</tbody><tfoot><tr><th scope="row">Summa</th>${foot}</tr></tfoot></table></div></details>`;
-}
-
-function tpSeasonCard() {
-  const all = (TP.season && TP.season.rounds) || [];
-  if (!all.length) return '';
-  const hidden = all.filter(tpRoundHidden);
-  const rounds = all.filter((r) => !hidden.includes(r));
-  const s = Tippoang.season(rounds);
-  const hid = hidden.length
-    ? `<p class="kp-line tp-status">${Spoiler.chip(`${hidden.length} ${hidden.length === 1 ? 'omgång dold' : 'omgångar dolda'}`)}` +
-      `<button type="button" class="tp-show" data-sp-show="${esc(hidden.flatMap((r) => r.matches.map((m) => m.id)).join(' '))}">Visa ändå</button></p>`
-    : '';
-  const head = `<p class="kp-eyebrow">Säsongens tippare${rounds.length ? ` · ${rounds.length} ${rounds.length === 1 ? 'omgång' : 'omgångar'}` : ''}</p>`;
-  if (!s.people.length) return `<div class="card tp-card tp-season">${head}${hid}</div>`;
-  let rank = 0;
-  const rows = tpPlaced(s.people, s.model).map((p) => tpSeasonRow(p, p.model ? 0 : ++rank)).join('');
-  return '<div class="card tp-card tp-season">' + head +
-    '<div class="tp-swrap"><table class="tp-stable"><thead><tr><th scope="col"><span class="tp-vh">Placering</span></th><th scope="col">Tippare</th>' +
-    '<th scope="col" class="tp-c" title="Omgångar">Omg.</th><th scope="col" class="tp-c" title="Rätt av de spelade matcherna">Rätt</th>' +
-    '<th scope="col" class="tp-c" title="Summan av omgångarnas poäng">Poäng</th></tr></thead>' +
-    `<tbody>${rows}</tbody></table></div>` + hid + tpRoundsTable(rounds, s) +
-    // Fliken Olympen (kampen.js): inbördes, kurvan och spelkassan.
-    '<p class="kp-line"><a class="km-link" href="#olympen">Till Olympen →</a></p></div>';
 }
 
 function tpRender() {
@@ -296,10 +238,17 @@ function tpRender() {
   if (!el) return;
   // Utan pågående omgång står den senaste kröningen kvar (kronan.js).
   const seen = ((TP.season && TP.season.rounds) || []).filter((r) => !tpRoundHidden(r));
-  // De som regerar har ett märke på porträttet i omgångens ruta – ritas om
-  // när de byts (kupong.js).
-  if (window.Kronan && TP.season && Kronan.setRounds(seen) && typeof redraw === 'function') redraw();
-  const html = (tpCard() || (window.Kronan ? Kronan.reigning(seen, tpPts, window.Utmarkelser && Utmarkelser.frozen) : '')) + tpSeasonCard();
+  const pol = $('#hem-kronan');
+  if (pol && window.Kronan) {
+    const p = Kronan.polaroids(seen);
+    if (p !== TP.pol) {
+      TP.pol = p;
+      pol.innerHTML = p;
+    }
+  }
+  // Före första avgjorda omgången står de utnämnda på förstasidan och på
+  // Olympens pall, så här står ingenting.
+  const html = tpCard() || (window.Kronan && Kronan.crowned(seen) ? Kronan.reigning(seen, tpPts, window.Utmarkelser && Utmarkelser.frozen) : '');
   if (html === TP.html) return;
   TP.html = html;
   el.innerHTML = html;
@@ -315,8 +264,7 @@ function tpRender() {
   tpRender();
   // Utfälld eller inte överlever omritningarna (toggle bubblar inte).
   el.addEventListener('toggle', (e) => {
-    if (e.target.matches('.tp-rounds')) TP.seasonOpen = e.target.open;
-    else if (e.target.matches('.tp-more')) TP.open = e.target.open;
+    if (e.target.matches('.tp-more')) TP.open = e.target.open;
   }, true);
   if (window.Spoiler) Spoiler.onChange(tpRender);
   // Kupongens ruta ritas om vid liveställningen och spoilerskyddet – då
