@@ -1233,8 +1233,7 @@ under omgången.
    Den som har lämnat in ser allas inlämnade tips – så fort minst en
    till är inne – och vilka som fortfarande fyller i. Ett tryck på någons porträtt överst
    lyfter fram den personens tips: de andras porträtt i rutorna och deras motiveringar tonas
-   ner, så att hens kupong står som en egen kolumn (ett tryck till visar allas igen; raden
-   längst ner påminner om det medan de andra lämnar in). Samma sak i uppgörelsen och på
+   ner, så att hens kupong står som en egen kolumn (ett tryck till visar allas igen). Samma sak i uppgörelsen och på
    gängets kupong. **Alla ens enheter** (2026-10-22): de andras tips och *Ändra din kupong*
    finns på varje enhet där man är sig själv, inte bara på den där man lämnade in (förut
    krävdes en nyckel som bara fanns där). På en ny enhet trycker man på sitt porträtt

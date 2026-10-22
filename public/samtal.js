@@ -480,9 +480,7 @@
       odds ? ['Odds', oddsText(odds), 'Oddset för att alla gängets tecken går in – matchernas odds gånger varandra'] : null,
     ]) + '</div>';
     const act = boardActions(s, rows, val);
-    // Medan de andra lämnar in: att porträtten överst går att trycka på.
-    const note = !s.visas && ids.length > 1 ? '<p class="sm-act-note">Tryck på ett porträtt överst, så ser du bara den personens tips.</p>' : '';
-    return html + `<div class="sm-act${actMore ? ' more' : ''}" id="sm-act"${act || note ? '' : ' hidden'}><div class="sm-act-in" id="sm-act-in">${note}${act}</div>` +
+    return html + `<div class="sm-act${actMore ? ' more' : ''}" id="sm-act"${act ? '' : ' hidden'}><div class="sm-act-in" id="sm-act-in">${act}</div>` +
       '<p class="pb-msg" id="sm-msg" role="status"></p></div></div></div>';
   }
 
