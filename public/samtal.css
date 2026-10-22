@@ -250,6 +250,24 @@ button.sm-who:focus-visible { outline: 2px solid var(--ink); outline-offset: 1px
   pointer-events: none;
 }
 .sm-du-ring path { vector-effect: non-scaling-stroke; }
+/* inne: i färg med en grön bock på porträttet, som på förstasidan; grått
+   tills kupongen är inlämnad */
+.sm-who .sm-fw > .sm-ok {
+  position: absolute;
+  right: -5px;
+  bottom: -5px;
+  z-index: 1;
+  width: 17px;
+  height: 17px;
+  padding: 3px;
+  box-sizing: border-box;
+  border-radius: 50%;
+  background: var(--pp-ok);
+  stroke: var(--pp-box);
+  stroke-width: 2.8;
+  box-shadow: 0 0 0 2px var(--pp-paper);
+}
+.sm-who:not(.inne) .sm-fc img { filter: grayscale(1); opacity: 0.5; }
 .sm-sheet .sm-ok { width: 16px; height: 14px; stroke: var(--pp-ok); }
 .sm-sheet .sm-dots i { background: var(--pp-ink-soft); }
 .sm-sheet .sm-pie { stroke: var(--pp-ink-soft); }
@@ -327,6 +345,10 @@ button.sm-who:focus-visible { outline: 2px solid var(--ink); outline-offset: 1px
   border-color: color-mix(in srgb, var(--pp-ok) 45%, transparent);
 }
 .sm-act .kp-btn.kept .sm-ok { width: 14px; height: 12px; stroke: currentColor; }
+/* Inlämnad: ingen knapp, bara läget */
+.sm-act .sm-inne { cursor: default; }
+/* när du får se de andras tips, på en egen rad överst */
+.sm-act-note { flex: 1 1 100%; order: -2; margin: 0; font-size: 13px; line-height: 1.35; color: var(--pp-ink-soft); }
 .sm-act .pb-msg { margin-top: 8px; }
 .sm-act-more { display: none; }
 /* smalt med fyra fält (med garderingar och odds): två och två, lika breda */
@@ -464,10 +486,23 @@ button.sm-who:focus-visible { outline: 2px solid var(--ink); outline-offset: 1px
 
 /* överst: antalet rätt i stället för bocken; grått = lämnade inte in */
 .sm-score { min-width: 12px; font-family: var(--pp-hand); font-size: 27px; font-weight: 700; line-height: 0.8; color: var(--ink); }
-.sm-who.ute .sm-fc img { filter: grayscale(1); opacity: 0.5; }
 
-/* stämpeln (Väntar på GitHub, Rättad) mellan märket och betyget */
+/* Ett tryck på ett porträtt överst lyfter fram den personens tips: de andras
+   porträtt i rutorna och deras motiveringar tonas ner, så att hens kupong
+   står som en egen kolumn. Samma ordning på bläcken som .sm-k0–4. */
+.sm-hd[data-lyft] .sm-who[aria-pressed="false"] { opacity: 0.45; }
+button.sm-who[data-lyft][aria-pressed="true"] .sm-fc { box-shadow: 0 0 0 2px var(--ink), 0 0 0 6px color-mix(in srgb, var(--ink) 22%, transparent); }
+.sm-r .sm-bx .sm-fc, .sm-said { transition: opacity 0.15s ease; }
+.sm-hd[data-lyft] ~ .sm-r :is(.sm-bx .sm-fc, .sm-said) { opacity: 0.15; }
+.sm-hd[data-lyft="0"] ~ .sm-r :is(.sm-bx .sm-k0, .sm-said.sm-k0),
+.sm-hd[data-lyft="1"] ~ .sm-r :is(.sm-bx .sm-k1, .sm-said.sm-k1),
+.sm-hd[data-lyft="2"] ~ .sm-r :is(.sm-bx .sm-k2, .sm-said.sm-k2),
+.sm-hd[data-lyft="3"] ~ .sm-r :is(.sm-bx .sm-k3, .sm-said.sm-k3),
+.sm-hd[data-lyft="4"] ~ .sm-r :is(.sm-bx .sm-k4, .sm-said.sm-k4) { opacity: 1; }
+
+/* stämpeln (Väntar på GitHub, Rättad, Inlämnad) mellan märket och betyget */
 .sm-sheet-head .pp-stamp { white-space: nowrap; }
+.pp-stamp.inne { --pp-stamp: var(--pp-ok); }
 
 @media (max-width: 440px) {
   .sm-sheet-head .pp-stamp { padding: 2px 6px 1px; font-size: 9px; letter-spacing: 0.1em; border-width: 2px; }

@@ -1196,15 +1196,18 @@ under omgången.
    bärnstensfärgad den sista timmen). När alla har lämnat in, eller tiden är ute, står det
    *Dags för uppgörelsen* (och vem som inte lämnade in) utan någon tid; när gängets kupong
    är gjord tar den över rutan. Porträtten där har samma märken som på kupongen (bock eller
-   tårtbit, se punkt 2), och har man börjat på sin kupong heter knappen *Fyll i resten*. En
+   tårtbit, grått tills man är inne, se punkt 2), och har man börjat på sin kupong heter knappen *Fyll i resten*. En
    färdigspelad kupong visas inte bredvid medan en ny omgång fylls i – den står bland
    Grupparbetena i Olympen.
 2. **Fyll i kupongen** (direkt under Omgången, `#kupong`): kupongen står på papper med en
    kolumn per person – DL, DT och DJ i gängets ordning, var och en i sin färg (blått,
    grönt, lila) – och spelstoppet (första avsparken) i hörnet. Överst i varje kolumn
-   initialerna med en bock (inne), en tårtbit (så stor del av kupongen som är tippad när
-   den inte är färdig – bärnsten medan den fylls i, grön om den är inlämnad med tomma
-   matcher; antalet när man pekar) eller tre prickar (fyller i). Ens egen tårtbit följer
+   porträttet: i färg med en grön bock på porträttet när kupongen är inne (som på
+   förstasidan), grått tills dess, med en tårtbit (så stor del av kupongen som är tippad
+   när den inte är färdig – bärnsten medan den fylls i, grön om den är inlämnad med tomma
+   matcher; antalet när man pekar) eller tre prickar (fyller i) bredvid. Har man lämnat in
+   är papperet stämplat *Inlämnad*, och i raden längst ner står en grön bock *Inlämnad* där
+   *Lämna in* stod (med *Ändra din kupong* bredvid). Ens egen tårtbit följer
    kupongen medan man kryssar, de andras syns när de har sparat. Man trycker på sina
    initialer (*Vem är du?* – sparas på enheten, de ringas in), kryssar i sin kolumn med
    modellens odds under rutorna och kan skriva en kort motivering under matchen man just
@@ -1225,10 +1228,17 @@ under omgången.
    raden längst ner står *Avbryt* och *Spara ändringarna*. En ändring får lämna matcher
    tomma; då blir ens bock en grön tårtbit tills de är tippade. Det går bara på enheten där
    man lämnade in (med nyckeln, se Tjänsten).
-3. **De andras tips** (`#kupong`): den som inte har lämnat in ser de andras kolumner
-   täckta med skrapfolie (inne) eller tomma (fyller i). Den som har lämnat in ser allas
-   inlämnade tips – så fort minst en
-   till är inne – och vilka som fortfarande fyller i. Sidan frågar tjänsten var 20:e sekund
+3. **De andras tips** (`#kupong`): den som inte har lämnat in ser bara sina egna kryss, och
+   raden längst ner säger *Lämna in, så ser du hur DL och DJ har tippat* när någon är inne.
+   Den som har lämnat in ser allas inlämnade tips – så fort minst en
+   till är inne – och vilka som fortfarande fyller i. Ett tryck på någons porträtt överst
+   lyfter fram den personens tips: de andras porträtt i rutorna och deras motiveringar tonas
+   ner, så att hens kupong står som en egen kolumn (ett tryck till visar allas igen; raden
+   längst ner påminner om det medan de andra lämnar in). Samma sak i uppgörelsen och på
+   gängets kupong. Har man lämnat in på en annan enhet finns nyckeln inte här: papperet är
+   stämplat *Inlämnad* men tomt, raden längst ner säger att de andras tips syns på enheten
+   där man lämnade in, och förstasidans knapp heter *Till kupongen* i stället för *Se de
+   andras tips*. Sidan frågar tjänsten var 20:e sekund
    och visar nya tips av sig själv – också förstasidans ruta, medan tipsen lämnas in.
 4. **Underlaget** – för alla när alla har lämnat in, eller senast när första matchen
    startar; sedan kan den som inte har lämnat in inte göra det. Överst allas

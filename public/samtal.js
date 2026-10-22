@@ -58,6 +58,7 @@
     writing: {}, // din kommentar i efterhand som inte är sparad än: matchens id → texten
     failed: {}, // matchens id → varför kommentaren inte gick att spara
     sending: new Set(), // matcher vars kommentar sparas just nu
+    lyft: null, // vems tips som lyfts fram på papperet (ett tryck på porträttet överst)
   };
   const VEM = 'profeterna.samtal.vem';
   const TIPS = 'profeterna.samtal.tips';
@@ -312,6 +313,8 @@
   // Bock = tipsen är inne, tårtbit = så stor del av kupongen som är tippad
   // (grön när den är inlämnad men inte färdig), tre prickar = fyller i.
   const CHECK = '<svg class="sm-ok" viewBox="0 0 16 16" aria-hidden="true"><path d="M3.5 8.5l3 3 6-7"/></svg>';
+  // Stämpeln på papperet när du har lämnat in.
+  const STAMP = '<span class="pp-stamp inne">Inlämnad</span>';
   const DOTS = '<span class="sm-dots" aria-hidden="true"><i></i><i></i><i></i></span>';
   const PIE_C = 2 * Math.PI * 2.6;
   const pie = (n, all, inne = false) => `<svg class="sm-pie${inne ? ' inne' : ''}" viewBox="0 0 16 16" aria-hidden="true">` +
@@ -327,17 +330,32 @@
     if (d && d.id === s.id && d.vem === g.id && (live || !d.nyckel)) return s.matcher.filter((x) => d.tecken[x.id]).length;
     return g.tippat != null ? g.tippat : g.inne ? s.matcher.length : 0;
   }
+  // Märket vid porträttet: on = bocken på porträttet (inne), side = det som
+  // står bredvid (tårtbiten eller tre prickar).
   function mark(s, g, live = false) {
     const n = tally(s, g, live);
     const all = s.matcher.length;
-    if (g.inne) return n < all ? pie(n, all, true) : CHECK;
-    return s.visas ? '' : n ? pie(n, all) : DOTS;
+    if (g.inne) return n < all ? { side: pie(n, all, true) } : { on: CHECK };
+    return { side: s.visas ? '' : n ? pie(n, all) : DOTS };
   }
   function lage(s, g, live = false) {
     const n = tally(s, g, live);
     const all = s.matcher.length;
     if (g.inne) return n < all ? `inne · ${n} av ${all} tippade` : 'inne';
     return s.visas ? 'lämnade inte in' : n ? `${n} av ${all} tippade` : 'fyller i';
+  }
+
+  // Ett porträtt överst på papperet: i färg med en grön bock när kupongen är
+  // inne, grått tills dess. Ditt är inringat. attrs gör det till en knapp
+  // (Vem är du?, eller en persons tips), side ersätter märket bredvid och
+  // text läget när man pekar.
+  function topFace(s, g, { live = false, attrs = '', side = null, text = null } = {}) {
+    const du = g.id === me();
+    const mk = side == null ? mark(s, g, live) : { side };
+    const tag = attrs ? 'button' : 'span';
+    return `<${tag}${attrs} class="sm-who sm-k${pnum(g.id)}${du ? ' du' : ''}${g.inne ? ' inne' : ''}" ` +
+      `title="${esc(`${g.namn} · ${du ? 'du · ' : ''}${text || lage(s, g, live)}`)}"><span class="sm-fw">${face(g.id, false)}` +
+      `${du ? Papper.ring(`du${s.id}${g.id}`, 'sm-du-ring', 25) : ''}${mk.on || ''}</span>${mk.side || ''}</${tag}>`;
   }
 
   // Ritar om utan att tappa var man var: fältet eller rutan som hade fokus
@@ -431,7 +449,8 @@
       html += `<p class="legend"><span class="note">${esc(missing.map((g) => g.id).join(' och '))} hann inte lämna in` +
         `${s.orsak === 'avspark' ? ' innan första matchen startade' : ''}.</span></p>`;
     }
-    html += paperTop(stopBox(s), ' sm-up') + upHead(s, ids, rows.filter((r) => r.g.res != null).map((r) => [r.x.id, r.g.res]));
+    html += paperTop(stopBox(s), ' sm-up', !s.visas && submitted(s, me()) ? STAMP : '') +
+      upHead(s, ids, rows.filter((r) => r.g.res != null).map((r) => [r.x.id, r.g.res]));
     const w = writer(s);
     let n = 0;
     for (let k = 0; k <= 5; k++) {
@@ -456,7 +475,9 @@
       odds ? ['Odds', oddsText(odds), 'Oddset för att alla gängets tecken går in – matchernas odds gånger varandra'] : null,
     ]) + '</div>';
     const act = boardActions(s, rows, val);
-    return html + `<div class="sm-act${actMore ? ' more' : ''}" id="sm-act"${act ? '' : ' hidden'}><div class="sm-act-in" id="sm-act-in">${act}</div>` +
+    // Medan de andra lämnar in: att porträtten överst går att trycka på.
+    const note = !s.visas && ids.length > 1 ? '<p class="sm-act-note">Tryck på ett porträtt överst, så ser du bara den personens tips.</p>' : '';
+    return html + `<div class="sm-act${actMore ? ' more' : ''}" id="sm-act"${act || note ? '' : ' hidden'}><div class="sm-act-in" id="sm-act-in">${note}${act}</div>` +
       '<p class="pb-msg" id="sm-msg" role="status"></p></div></div></div>';
   }
 
@@ -531,17 +552,20 @@
 
   // Porträtten och 1 X 2 överst, som när alla tippar. När matcherna börjar
   // ge utfall står antalet rätt för hand i var och ens bläck i stället för
-  // bocken; den som inte lämnade in är grå.
+  // bocken; den som inte lämnade in är grå. Ett tryck på ett porträtt lyfter
+  // fram den personens tips (SM.lyft): de andras porträtt i rutorna tonas
+  // ner, så att hens kupong står som en egen kolumn.
   function upHead(s, ids, res) {
-    const v = me();
-    return '<div class="sm-r sm-hd"><span class="sm-hd-nr" aria-hidden="true">Nr</span>' +
+    const lyft = ids.includes(SM.lyft) ? SM.lyft : null;
+    return `<div class="sm-r sm-hd"${lyft ? ` data-lyft="${pnum(lyft)}"` : ''}><span class="sm-hd-nr" aria-hidden="true">Nr</span>` +
       '<span class="sm-m"><span class="sm-hd-l" aria-hidden="true">Match</span><span class="sm-folk-pp">' + s.gang.map((g) => {
-        const du = g.id === v;
         const sc = score(s, g.id, res);
-        const sign = !sc ? mark(s, g) : sc.ok != null ? `<b class="sm-score">${sc.ok}</b>` : CHECK;
-        return `<span class="sm-who sm-k${pnum(g.id)}${du ? ' du' : ''}${!sc && s.visas ? ' ute' : ''}" ` +
-          `title="${esc(`${g.namn} · ${du ? 'du · ' : ''}${sc ? sc.text : lage(s, g)}`)}"><span class="sm-fw">${face(g.id, false)}` +
-          `${du ? Papper.ring(`du${s.id}${g.id}`, 'sm-du-ring', 25) : ''}</span>${sign}</span>`;
+        const attrs = ids.includes(g.id) ? ` type="button" data-lyft="${esc(g.id)}" aria-pressed="${g.id === lyft}" aria-label="${esc(`Visa bara ${g.id}:s tips`)}"` : '';
+        return topFace(s, g, {
+          attrs,
+          side: sc && sc.ok != null ? `<b class="sm-score">${sc.ok}</b>` : null,
+          text: sc ? `${sc.text}${attrs ? ` · tryck för att se bara ${g.id}:s tips` : ''}` : null,
+        });
       }).join('') + '</span></span>' +
       SIGNS.map((sg) => `<span class="sm-hd-s" aria-hidden="true">${box(sg, [], ids)}</span>`).join('') + '</div>';
   }
@@ -822,14 +846,14 @@
   // tippat vad och var ni är eniga. Dina rutor trycker du på direkt; de
   // andras porträtt syns först när du själv har lämnat in. Överst porträtten
   // med bock eller tre prickar, ditt inringat. Har du inte valt vem du är
-  // trycker du på ditt porträtt.
+  // trycker du på ditt porträtt. Har du lämnat in är papperet stämplat.
   //   edit: du ändrar dina inlämnade tips (#kupong/samtal/tips)
   function sheet(s, edit) {
     const v = me();
     const fill = Boolean(v && (edit || (!submitted(s, v) && !s.visas)));
     SM.edit = edit;
     SM.draft = fill ? draftFor(s, v, edit) : null;
-    return paperTop(stopBox(s)) + '<div id="sm-rows"></div>' +
+    return paperTop(stopBox(s), '', !edit && !s.visas && submitted(s, v) ? STAMP : '') + '<div id="sm-rows"></div>' +
       '<div class="pb-foot sm-foot"><div class="pp-fields pb-fields" id="sm-fields"></div></div>' +
       '<div class="sm-act" id="sm-act"><div class="sm-act-in" id="sm-act-in"></div>' +
       '<p class="pb-msg" id="sm-msg" role="status"></p></div></div></div>';
@@ -886,13 +910,8 @@
     const choose = !submitted(s, v);
     let html = '<div class="sm-r sm-hd"><span class="sm-hd-nr" aria-hidden="true">Nr</span>' +
       `<span class="sm-m">${v ? '<span class="sm-hd-l" aria-hidden="true">Match</span>' : '<span class="sm-q">Vem är du?</span>'}` +
-      '<span class="sm-folk-pp">' + cols.map(({ g }) => {
-        const du = g.id === v;
-        const tag = choose ? 'button' : 'span';
-        return `<${tag}${choose ? ` type="button" aria-pressed="${du}"` : ''} class="sm-who sm-k${pnum(g.id)}${du ? ' du' : ''}" data-vem="${esc(g.id)}" ` +
-          `title="${esc(`${g.namn} · ${du ? 'du · ' : ''}${lage(s, g, true)}`)}"><span class="sm-fw">${face(g.id, false)}` +
-          `${du ? Papper.ring(`du${s.id}${g.id}`, 'sm-du-ring', 25) : ''}</span>${mark(s, g, true)}</${tag}>`;
-      }).join('') + '</span></span>' +
+      '<span class="sm-folk-pp">' + cols.map(({ g }) =>
+        topFace(s, g, { live: true, attrs: choose ? ` type="button" aria-pressed="${g.id === v}" data-vem="${esc(g.id)}"` : '' })).join('') + '</span></span>' +
       // 1 X 2 som en tom ruta utan kant, så att tecknen står rakt över rutornas.
       SIGNS.map((sg) => `<span class="sm-hd-s" aria-hidden="true">${box(sg, [], ids)}</span>`).join('') + '</div>';
     // Under sin dag när matcherna kommer i datumordning, annars med veckodagen
@@ -959,10 +978,18 @@
   // Till höger det du gör med din kupong, huvudknappen längst ut; till
   // vänster omgångens mer sällsynta val, i telefonen bakom ⋯. Spara = en
   // kupong som inte är färdig, utan att lämna in; Sparad när den är sparad
-  // som den står.
+  // som den står. Inlämnad (en grön bock) när du har lämnat in. Överst en
+  // rad om när du får se de andras tips.
   function actions(s) {
     const d = SM.draft;
+    const v = me();
     const anyIn = s.gang.some((g) => g.inne);
+    const others = s.gang.filter((g) => g.inne && g.id !== v).map((g) => g.id);
+    const mine = handedIn(s);
+    const note = SM.edit || s.visas ? ''
+      // Inlämnad någon annanstans: nyckeln som visar de andras tips finns där.
+      : submitted(s, v) && !(mine && mine.vem === v) ? 'Du lämnade in på en annan enhet. Där ser du de andras tips och kan ändra din kupong.'
+        : d && others.length ? `Lämna in, så ser du hur ${others.length > 1 ? `${others.slice(0, -1).join(', ')} och ${others[others.length - 1]}` : others[0]} har tippat.` : '';
     const more = SM.edit ? [] : [
       s.visas || anyIn ? '' : '<a class="sm-act-l" href="#kupong/samtal/matcher">Ändra matcherna</a>',
       s.visas ? '' : '<button type="button" class="sm-act-l" data-sm-remove>Ta bort</button>',
@@ -979,10 +1006,12 @@
     } else if (!me() && !s.visas) {
       // Först Vem är du? – knapparna står ändå där de brukar.
       go = '<button type="button" class="kp-btn" disabled>Spara</button>' + handIn(' disabled');
-    } else if (canEdit(s)) {
-      go = '<a class="kp-btn" href="#kupong/samtal/tips">Ändra din kupong</a>';
+    } else if (submitted(s, v)) {
+      go = (canEdit(s) ? '<a class="kp-btn" href="#kupong/samtal/tips">Ändra din kupong</a>' : '') +
+        `<span class="kp-btn kept sm-inne">${CHECK}Inlämnad</span>`;
     }
-    return (more.length ? `<button type="button" class="sm-act-more" aria-expanded="${actMore}" aria-controls="sm-act-ls" aria-label="Fler val">${DOTS3}</button>` +
+    return (note ? `<p class="sm-act-note">${esc(note)}</p>` : '') +
+      (more.length ? `<button type="button" class="sm-act-more" aria-expanded="${actMore}" aria-controls="sm-act-ls" aria-label="Fler val">${DOTS3}</button>` +
       `<span class="sm-act-ls" id="sm-act-ls">${more.join('')}</span>` : '') + (go ? `<span class="sm-act-go">${go}</span>` : '');
   }
   // ⋯ i raden längst ner är öppnad – står kvar när papperet ritas om.
@@ -1427,7 +1456,10 @@
     const done = submitted(s, v);
     const open = !s.visas && Date.now() < Math.min(...kicks(s));
     const du = v && s.gang.find((g) => g.id === v);
-    const go = !open ? 'Till uppgörelsen' : done ? 'Se de andras tips' : du && tally(s, du) ? 'Fyll i resten' : 'Fyll i kupongen';
+    // De andras tips syns bara på enheten där du lämnade in.
+    const mine = handedIn(s);
+    const go = !open ? 'Till uppgörelsen' : done ? (mine && mine.vem === v ? 'Se de andras tips' : 'Till kupongen')
+      : du && tally(s, du) ? 'Fyll i resten' : 'Fyll i kupongen';
     const all = s.matcher.length;
     return '<div class="card sm-teaser">' +
       nameBlock(s, 'ruta') +
@@ -1519,6 +1551,20 @@
   // Går du från sidan sparas det du har skrivit.
   document.addEventListener('visibilitychange', () => {
     if (document.hidden) for (const id of Object.keys(SM.writing)) saveAfter(id);
+  });
+
+  // Ett tryck på någons porträtt överst – i uppgörelsen och på gängets
+  // kupong – lyfter fram hens tips; ett tryck till visar allas igen. Papperet
+  // ritas inte om: raden överst får data-lyft, och samtal.css tonar ner de
+  // andras porträtt i rutorna.
+  document.addEventListener('click', (e) => {
+    const b = e.target.closest ? e.target.closest('#coupon button[data-lyft]') : null;
+    if (!b) return;
+    SM.lyft = SM.lyft === b.dataset.lyft ? null : b.dataset.lyft;
+    const hd = b.closest('.sm-hd');
+    if (SM.lyft) hd.dataset.lyft = pnum(SM.lyft);
+    else delete hd.dataset.lyft;
+    for (const x of hd.querySelectorAll('button[data-lyft]')) x.setAttribute('aria-pressed', String(x.dataset.lyft === SM.lyft));
   });
 
   // Omgångens matcher (liveställningen i kupong.js hämtar dem också), om
