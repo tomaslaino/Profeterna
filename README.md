@@ -1187,8 +1187,9 @@ först när man själv har lämnat in. Allas tips blir underlaget för uppgörel
 gängets kupong bestäms.
 
 Allt ligger under *Kupong*. Överst visar fyra steg var
-omgången står: *Välj matcher*, *Alla tippar* (med hur många som har lämnat in), *Uppgörelsen*
-och *Matcherna*. Medan kupongen fylls i och tipsen jämförs visar
+omgången står: *Välj matcher*, *Alla tippar*, *Uppgörelsen* och *Matcherna* (hur många
+som har lämnat in stod förut under *Alla tippar*; sedan 2026-10-22 säger stämpeln på
+papperet det). Medan kupongen fylls i och tipsen jämförs visar
 `#kupong` omgången; när gängets kupong är gjord visar den gängets kupong, med knappen
 *Allas tips* tillbaka till underlaget (`#kupong/samtal`). Kuponger som spelas under tiden står
 under omgången.
@@ -1240,7 +1241,8 @@ under omgången.
    Nederst hur många matcher som är tippade, garderingar och rader, och under dem raden
    med allt man gör med kupongen, som står kvar nederst medan man bläddrar (som raden med
    initialerna överst): till höger *Spara* och *Lämna in*, till vänster
-   *Ändra matcherna* och *Ta bort* i finstil (i telefonen bakom ⋯). *Spara* sparar en
+   *Ändra matcherna* och *Ta bort* i finstil (i telefonen bakom ⋯). *Ta bort* tar med de
+   andras inlämnade tips, så den finns bara tills någon annan har lämnat in (2026-10-22). *Spara* sparar en
    kupong som inte är färdig utan att lämna in – tipsen stannar på enheten, tjänsten får
    bara antalet tippade, så att de andra ser tårtbiten – och blir *Sparad* tills man
    ändrar något. *Lämna in* kräver tecken i alla matcher – annars blir
@@ -1254,8 +1256,9 @@ under omgången.
    grön tårtbit tills de är tippade. Det går på vilken av ens enheter som helst. Förut
    öppnade knappen *Ändra din kupong* (`#kupong/samtal/tips`) kolumnen på en egen sida,
    också efter att man sett de andras tips; den är borta.
-3. **De andras tips** (`#kupong`): den som inte har lämnat in ser bara sina egna kryss, och
-   raden längst ner säger *Lämna in, så ser du hur DL och DJ har tippat* när någon är inne.
+3. **De andras tips** (`#kupong`): den som inte har lämnat in ser bara sina egna kryss
+   (raden *Lämna in, så ser du hur DL och DJ har tippat* är borta sedan 2026-10-22 –
+   stämpeln säger *Väntar på dig*).
    Den som har lämnat in ser allas inlämnade tips – så fort minst en
    till är inne – och vilka som fortfarande fyller i. Ett tryck på någons porträtt överst
    lyfter fram den personens tips: de andras porträtt i rutorna och deras motiveringar tonas
@@ -1269,8 +1272,8 @@ under omgången.
 4. **Underlaget** – för alla när alla har lämnat in, eller senast när första matchen
    startar; sedan kan den som inte har lämnat in inte göra det. Överst allas
    garderingar, rader och (när matcher spelats) antal rätt. Varje match har rutorna
-   1, X och 2 med initialerna på dem som tippat tecknet (streckad ram = del av en
-   gardering), hur många av gänget som har med det och modellens chans. Motiveringarna står
+   1, X och 2 med porträtten på dem som tippat tecknet – utan tomma ringar för de andra
+   (2026-10-22) – (streckad ram = del av en gardering), hur många av gänget som har med det och modellens chans. Motiveringarna står
    under lagen. Matcherna sorteras efter hur oeniga vi är:
    - *Alla olika* – inget tecken har mer än en
    - *Två mot en* – den som avviker förklarar
@@ -1287,9 +1290,9 @@ under omgången.
      frågar först. Därefter står gängets kupong under Omgången, med en rad om att den är
      sparad och syns för alla efter bygget.
    - Utan tjänsten heter knappen *Gör gängets kupong* och öppnar Ny kupong (eller *Ändra*)
-     med tecknen ifyllda. Raden längst ner har bara *Börja om*, *Ta bort* och *+ Ny
-     kupong* bredvid (2026-10-22: *Ändra din kupong*, *Justera först* och *Ladda upp
-     system* är borta därifrån).
+     med tecknen ifyllda. Raden längst ner har bara *Börja om* bredvid, och *+ Ny kupong*
+     när gängets kupong är gjord eller alla matcher har startat (2026-10-22: *Ändra din
+     kupong*, *Justera först*, *Ladda upp system* och *Ta bort* är borta därifrån).
    - Finns gängets kupong redan blir knappen *Spara ändringen* (kupongen ändras, ingen ny
      görs), och står rutorna som den sparade kupongen visas *Sparad*. Har man inte själv
      tryckt på rutorna följer de den sparade kupongen – så den som öppnar underlaget på en
@@ -1300,12 +1303,13 @@ under omgången.
      underlaget inte ber om den igen medan omgångens sista matcher återstår. *Allas tips*
      under Omgången leder tillbaka till underlaget så länge omgången finns.
 6. **Kommentarer i efterhand** (2026-10-21): i underlaget och på gängets kupong ur omgången
-   har varje match en penna i ens bläck efter tiden – samma som motiveringen när man tippar,
-   och man skriver på samma rad (högst 140 tecken). Kommentaren sparas när man lämnar fältet
+   har varje match som har startat en penna i ens bläck efter tiden – samma som motiveringen
+   när man tippar, och man skriver på samma rad (högst 140 tecken). Före avspark syns pennan
+   bara om man redan har skrivit något (2026-10-22). Kommentaren sparas när man lämnar fältet
    eller trycker Enter (Esc ångrar); går det inte blir den röd och står kvar tills nästa
    försök. De andras kommentarer står under motiveringarna, med porträttet. Det går så fort
-   man ser de andras tips – också före avspark för den som har lämnat in – och efter att
-   matchen är spelad, så länge omgången finns. En per person och match; en tom tar bort den.
+   matchen har startat för den som ser de andras tips, och efter att matchen är spelad, så
+   länge omgången finns. En per person och match; en tom tar bort den.
    Motiveringarna och kommentarerna sparas i tipparhistoriken och står sedan under matcherna
    i Grupparbetena (se [Kuponghistoriken](#kuponghistoriken)).
 

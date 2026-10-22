@@ -25,7 +25,7 @@
 //
 // Allt man gör med kupongen – spara, lämna in, ångra, ändra matcherna, ta
 // bort – står på ett ställe: raden längst ner på papperet, som står kvar
-// nederst medan man bläddrar. Ta bort (tills allas tips visas) frågar i en
+// nederst medan man bläddrar. Ta bort (tills någon annan har lämnat in) frågar i en
 // ruta ovanpå omgången.
 //
 // Omgången heter Kupong 1, Kupong 2 … (couponNumber i kupong.js) och får
@@ -288,7 +288,8 @@
     if (!s.visas && !inne) go[1] = '#kupong/samtal/matcher';
     if (s.visas) go[3] = '#kupong/samtal';
     if (s.visas && existing(s)) go[4] = '#kupong';
-    return roundSteps(now, { 2: now === 2 ? `${inne} av ${s.gang.length} har lämnat in` : '' }, go, board && now > 3 ? 3 : now);
+    // Vilka som har lämnat in står på stämpeln, inte här.
+    return roundSteps(now, {}, go, board && now > 3 ? 3 : now);
   }
 
   function renderRound() {
@@ -500,9 +501,11 @@
 
   // Raden längst ner på papperet, som när alla tippar: till höger Spara
   // gängets kupong, till vänster det mer sällsynta – i telefonen bakom ⋯.
-  // Börja om står bara där när gängets tecken skiljer sig från förslaget.
-  // Med tjänsten sparas gängets kupong direkt härifrån, annars i Ny kupong
-  // (eller Ändra) med tecknen ifyllda.
+  // Börja om står bara där när gängets tecken skiljer sig från förslaget, och
+  // + Ny kupong först när gängets kupong är gjord (eller alla matcher har
+  // startat). Ta bort finns inte här: någon annan har redan lämnat in. Med
+  // tjänsten sparas gängets kupong direkt härifrån, annars i Ny kupong (eller
+  // Ändra) med tecknen ifyllda.
   function boardActions(s, rows, val) {
     const key = (o) => Object.keys(o).sort().map((k) => `${k}:${o[k]}`).join(',');
     const open = rows.some((r) => r.open);
@@ -511,8 +514,7 @@
     const same = made && savedAsIs(made, rows, val);
     const more = [
       open && key(val) !== key(proposal(rows)) ? '<button type="button" class="sm-act-l" id="sm-reset" title="Det som fler än hälften har med">Börja om</button>' : '',
-      s.visas ? '' : '<button type="button" class="sm-act-l" data-sm-remove>Ta bort</button>',
-      s.visas || over(s) ? '<a class="sm-act-l" href="#kupong/samtal/ny">+ Ny kupong</a>' : '',
+      made || over(s) ? '<a class="sm-act-l" href="#kupong/samtal/ny">+ Ny kupong</a>' : '',
     ].filter(Boolean);
     const label = direct ? (same ? `${CHECK}Sparad` : made ? 'Spara ändringen' : 'Spara gängets kupong')
       : made ? 'Ändra gängets kupong' : 'Gör gängets kupong';
@@ -585,14 +587,16 @@
 
   // Kommentarerna i efterhand till en match – de andras (och dina, om du inte
   // kan skriva här) under motiveringarna. Din egen skriver du efter tiden,
-  // som motiveringen när man tippar: penOf ger fältet, eller null.
+  // som motiveringen när man tippar: penOf ger fältet, eller null. Pennan
+  // kommer när matchen har startat – innan dess bara om du redan har skrivit.
   const afterOf = (s, id, w) => s.gang.filter((g) => g.id !== w && s.efter && s.efter[g.id] && s.efter[g.id][id])
     .map((g) => ({ k: g.id, text: s.efter[g.id][id].text }));
-  const penOf = (s, id, w) => (!w || !s.matcher.some((x) => x.id === id) ? null : {
-    k: w,
-    text: id in SM.writing ? SM.writing[id] : ((s.efter && s.efter[w] && s.efter[w][id]) || {}).text || '',
-    fel: SM.failed[id] || '',
-  });
+  const penOf = (s, id, w) => {
+    const x = w && s.matcher.find((m) => m.id === id);
+    if (!x) return null;
+    const text = id in SM.writing ? SM.writing[id] : ((s.efter && s.efter[w] && s.efter[w][id]) || {}).text || '';
+    return started(x) || text ? { k: w, text, fel: SM.failed[id] || '' } : null;
+  };
 
   // En match på papperet med allas porträtt i rutorna. sign: gängets tecken,
   // ett kryss med kulspetspenna över tecknet. Utfallet är en ring runt rutan
@@ -823,10 +827,6 @@
         renderRound();
         return;
       }
-      if (e.target.closest('[data-sm-remove]')) {
-        confirmRemove();
-        return;
-      }
       const more = e.target.closest('.sm-act-more');
       if (more) {
         actMore = !actMore;
@@ -993,18 +993,16 @@
   // vänster omgångens mer sällsynta val, i telefonen bakom ⋯. Spara = en
   // kupong som inte är färdig, utan att lämna in; Sparad när den är sparad
   // som den står. Inlämnad (en grön bock) när du har lämnat in – tills du
-  // ändrar något, då Ångra och Lämna in ändringen. Överst en rad om när du
-  // får se de andras tips.
+  // ändrar något, då Ångra och Lämna in ändringen. Ta bort tar med de
+  // andras tips, så den finns bara tills någon annan har lämnat in.
   function actions(s) {
     const d = SM.draft;
     const v = me();
     const anyIn = s.gang.some((g) => g.inne);
-    const others = s.gang.filter((g) => g.inne && g.id !== v).map((g) => g.id);
-    const note = SM.edit || s.visas ? ''
-      : d && others.length ? `Lämna in, så ser du hur ${andList(others)} har tippat.` : '';
+    const othersIn = s.gang.some((g) => g.inne && g.id !== v);
     const more = [
       s.visas || anyIn ? '' : '<a class="sm-act-l" href="#kupong/samtal/matcher">Ändra matcherna</a>',
-      s.visas ? '' : '<button type="button" class="sm-act-l" data-sm-remove>Ta bort</button>',
+      s.visas || othersIn ? '' : '<button type="button" class="sm-act-l" data-sm-remove>Ta bort</button>',
       s.visas || over(s) ? '<a class="sm-act-l" href="#kupong/samtal/ny">+ Ny kupong</a>' : '',
     ].filter(Boolean);
     const handIn = (attr = ' id="sm-send"') => `<button type="button" class="kp-btn primary"${attr}>Lämna in</button>`;
@@ -1024,8 +1022,7 @@
     } else if (submitted(s, v)) {
       go = inne;
     }
-    return (note ? `<p class="sm-act-note">${esc(note)}</p>` : '') +
-      (more.length ? `<button type="button" class="sm-act-more" aria-expanded="${actMore}" aria-controls="sm-act-ls" aria-label="Fler val">${DOTS3}</button>` +
+    return (more.length ? `<button type="button" class="sm-act-more" aria-expanded="${actMore}" aria-controls="sm-act-ls" aria-label="Fler val">${DOTS3}</button>` +
       `<span class="sm-act-ls" id="sm-act-ls">${more.join('')}</span>` : '') + (go ? `<span class="sm-act-go">${go}</span>` : '');
   }
   // ⋯ i raden längst ner är öppnad – står kvar när papperet ritas om.

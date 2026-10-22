@@ -103,7 +103,9 @@
 .sm-bx.on i { opacity: 0.85; }
 .sm-seats { display: flex; }
 /* en tom plats är en svag tryckt ring, lite mindre än porträttet så att
-   ringarna inte går in i varandra */
+   ringarna inte går in i varandra – där man fyller i sin kolumn. I
+   uppgörelsen och på gängets kupong är platsen tom, så att bara de som har
+   tippat tecknet syns */
 .sm-seat { flex: none; width: var(--fc); height: var(--fc); }
 .sm-seat::before {
   content: "";
@@ -215,7 +217,7 @@ button.sm-c:focus-visible .sm-bx { box-shadow: 0 0 0 2px var(--ink); }
 .sm-hd-s { display: grid; }
 .sm-hd-s .sm-bx { height: auto; background: none; border-color: transparent; }
 .sm-hd-s .sm-bx i { opacity: 1; }
-.sm-hd-s .sm-seat::before { content: none; }
+.sm-hd-s .sm-seat::before, .sm-up .sm-seat::before { content: none; }
 .sm-q::after { content: " →"; letter-spacing: 0; }
 .sm-folk-pp { display: flex; align-items: center; gap: 16px; margin-left: auto; }
 .sm-who {
@@ -347,8 +349,6 @@ button.sm-who:focus-visible { outline: 2px solid var(--ink); outline-offset: 1px
 .sm-act .kp-btn.kept .sm-ok { width: 14px; height: 12px; stroke: currentColor; }
 /* Inlämnad: ingen knapp, bara läget */
 .sm-act .sm-inne { cursor: default; }
-/* när du får se de andras tips, på en egen rad överst */
-.sm-act-note { flex: 1 1 100%; order: -2; margin: 0; font-size: 13px; line-height: 1.35; color: var(--pp-ink-soft); }
 .sm-act .pb-msg { margin-top: 8px; }
 .sm-act-more { display: none; }
 /* smalt med fyra fält (med garderingar och odds): två och två, lika breda */
