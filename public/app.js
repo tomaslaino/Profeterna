@@ -536,8 +536,8 @@ function selectMatchTab(id, focus) {
 // Flikarna i matchbladets ordning: Startelvor först – planen, avbytarna, vilka
 // som saknas och domaren, som i ett matchprogram – och Matchen efter den när
 // matchen har börjat. Startelvor och Matchen fylls av matchruta.js, Tabellen
-// av tableFill(). Inför står efter dem när Claude har skrivit en artikel om
-// matchen, och före avspark med knappen Läs på (inforPane).
+// av tableFill(). Analysera står efter dem när Claude har skrivit en artikel
+// om matchen, och före avspark med knappen Analysera (analysPane).
 function matchPanes(d) {
   const m = d.match;
   const started = m.completed || (Date.parse(m.kickoff) <= Date.now() && !/POSTPONED|CANCEL/.test(m.status || ''));
@@ -545,7 +545,7 @@ function matchPanes(d) {
   const panes = [];
   panes.push(['startelvor', 'Startelvor', (R ? R.lineupPane(m, absentees(d)) : squadCard(d)) + refereeCard(d)]);
   if (started && R) panes.push(['matchen', 'Matchen', R.eventsPane(m)]);
-  if (articles.get(m.id) || articleOn(d)) panes.push(['infor', 'Inför', inforPane(d)]);
+  if (articles.get(m.id) || articleOn(d)) panes.push(['analysera', 'Analysera', analysPane(d)]);
   panes.push(['prognos', 'Prognos', prognosPane(d)]);
   const table = tableDivs(d).length > 0;
   panes.push(['form', 'Form', formCard(d) + sideCard(d, table)]);
@@ -649,7 +649,7 @@ function forecastCard(d) {
 }
 
 // 1 · X · 2 som kupongens rutor: tecknet och oddset. Inget ringas in av sig
-// självt – prognosen står ren, och bara tipset under artikeln i Inför ritar
+// självt – prognosen står ren, och bara tipset under artikeln i Analysera ritar
 // AI:ns tecken med kulspetspenna och en rad i marginalen (pen, penMarks).
 // Efter matchen ringas utfallet (outcome) in med samma penna som ställningen.
 // key gör pennstrecken likadana varje gång (papper.js). book: spelbolagets
@@ -680,12 +680,12 @@ function bookOdds(d) {
   return null;
 }
 
-// Tecknen analysen ringade in och raden i marginalen, ovanför det första
+// Tecknen tipset ringade in och raden i marginalen, ovanför det första
 // inringade tecknet. En helgardering ringar inte in något; raden står över
-// krysset. null = ingen analys ännu.
+// krysset. null = inget tips ännu.
 function penMarks(id) {
-  const r = analyses.get(id);
-  const t = r && r.ok && r.tip;
+  const a = articles.get(id);
+  const t = a && a.tip;
   if (!t || !t.signs || !t.signs.length) return null;
   const all = t.signs.length === 3;
   return { signs: all ? [] : t.signs, at: all ? 1 : Math.min(...t.signs), note: t.note };
@@ -1165,16 +1165,19 @@ async function tableFill(root, d) {
   if (state.detail === d && root.contains(el)) el.innerHTML = html;
 }
 
-// ---------- artikeln inför matchen ----------
+// ---------- Analysera ----------
 
-// När någon trycker på Läs på läser Claude på och skriver en artikel om
-// matchen (worker/artikel.mjs), som sedan finns för alla. Proxyn lämnar ut den
-// bredvid analysen (…/analyze → …/artikel). Per match: artikeln eller null,
-// och det senaste felet när Läs på inte gav någon.
+// När någon trycker på Analysera läser Claude på och skriver en artikel om
+// matchen och tipset under den (worker/artikel.mjs), som sedan finns för
+// alla. Proxyn lämnar ut dem bredvid DeepSeeks analys (…/analyze →
+// …/artikel). Per match: artikeln (med tipset) eller null, och det senaste
+// felet när Analysera inte gav någon artikel eller något tips.
 const articles = new Map();
 const articleFails = new Map();
-// Så långt före avspark kan artikeln skrivas (aheadDays i config/artikel.js).
+// Så långt före avspark kan artikeln skrivas (aheadDays i config/artikel.js),
+// och så gammalt får tipset bli innan det kan skrivas om (tip.refreshHours).
 const ARTICLE_DAYS = 7;
+const TIP_HOURS = 24;
 
 async function loadArticle(id) {
   const a = state.meta && state.meta.analysis;
@@ -1189,7 +1192,7 @@ async function loadArticle(id) {
   }
 }
 
-// Läs på finns för en kommande match när bygget pekat ut proxyn.
+// Analysera finns för en kommande match när bygget pekat ut proxyn.
 function articleOn(d) {
   const a = state.meta && state.meta.analysis;
   const m = d.match;
@@ -1197,11 +1200,10 @@ function articleOn(d) {
   return Boolean(a && a.endpoint && !m.completed && m.status === 'STATUS_SCHEDULED' && left > 0 && left <= ARTICLE_DAYS * 86400000);
 }
 
-// Inför: först bara Läs på, sedan artikeln med tipset under (analysisCard) –
-// Analysera bygger på artikeln och kommer därför efter den.
-function inforPane(d) {
+// Fliken Analysera: först bara knappen, sedan artikeln med tipset under.
+function analysPane(d) {
   const a = articles.get(d.match.id);
-  return a ? articlePane(a) + analysisCard(d) : articleAsk(d.match.id);
+  return a ? articlePane(a) + tipCard(d, a) : articleAsk(d.match.id);
 }
 
 // Utan artikel: bara knappen, och felet om förra försöket inte gav någon.
@@ -1209,25 +1211,27 @@ function articleAsk(id) {
   const r = articleFails.get(id);
   const final = r && r.retry === false;
   return '<article class="card artikel" id="artikel-card">' +
-    (r ? `<p class="unknown">Ingen artikel: ${esc(r.error || 'okänt fel')}</p>` : '') +
-    (final ? '' : `<button type="button" class="analyze" data-artikel="${esc(id)}" title="AI:n läser tidningar, presskonferenser och supporterforum på nätet och skriver en artikel utan tips">${r ? 'Försök igen' : 'Läs på'}</button>`) +
+    (r ? `<p class="unknown">Ingen analys: ${esc(r.error || 'okänt fel')}</p>` : '') +
+    (final ? '' : `<button type="button" class="analyze" data-artikel="${esc(id)}" title="AI:n läser tidningar, presskonferenser och supporterforum på nätet, skriver en artikel och ringar in sina tecken">${r ? 'Försök igen' : 'Analysera'}</button>`) +
     '</article>';
 }
 
-// Läs på: proxyn skriver artikeln, ett par minuter. Skriver någon annan den
-// just nu (pending) frågar knappen igen en stund senare.
+// Analysera: proxyn skriver artikeln och tipset, ett par minuter – eller bara
+// tipset om artikeln redan finns. Skriver någon annan dem just nu (pending)
+// frågar knappen igen en stund senare.
 async function runArticle(id, btn) {
   btn.disabled = true;
   const stop = readingClock(btn);
   const t0 = Date.now();
   const url = state.meta.analysis.endpoint.replace(/analyze$/, 'artikel');
+  const before = articles.get(id);
   let r;
   for (;;) {
     try {
       const res = await fetch(url, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ id }) });
       r = await res.json().catch(() => ({ ok: false, error: `HTTP ${res.status}` }));
     } catch {
-      r = { ok: false, error: 'artikeln gick inte att nå.' };
+      r = { ok: false, error: 'analysen gick inte att nå.' };
     }
     if (!(r.ok && r.pending) || Date.now() - t0 > 10 * 60000) break;
     await new Promise((ok) => setTimeout(ok, 15000));
@@ -1235,14 +1239,20 @@ async function runArticle(id, btn) {
   stop();
   if (r.ok && r.article) {
     articles.set(id, r.article);
-    articleFails.delete(id);
+    if (r.tipError) articleFails.set(id, { error: r.tipError });
+    else articleFails.delete(id);
   } else {
-    articleFails.set(id, r.ok ? { error: 'artikeln blev inte klar.' } : r);
+    articleFails.set(id, r.ok ? { error: 'analysen blev inte klar.' } : r);
   }
   const d = state.detail;
   if (!d || d.match.id !== id || location.hash !== `#match/${id}`) return;
-  const pane = $('#mr-pane-infor');
-  if (pane) pane.innerHTML = inforPane(d);
+  const pane = $('#mr-pane-analysera');
+  if (!pane) return;
+  // Ett nytt tips ritas med pennan medan man tittar (fc-fresh).
+  const tip = r.ok && r.article && r.article.tip;
+  const fresh = tip && !(before && before.tip && before.tip.writtenAt === tip.writtenAt);
+  const html = analysPane(d);
+  pane.innerHTML = fresh ? html.replace('class="fc-main"', 'class="fc-main fc-fresh"') : html;
 }
 
 // Rubrik, ingress och stycken med hänvisningar till källistan, som
@@ -1258,13 +1268,10 @@ function articlePane(a) {
     sourceList(a.sources) + '</article>';
 }
 
-// ---------- matchanalys (fas 5, valfri) ----------
+// ---------- tipset ----------
 
-// Senaste svaret från analysen per match (text eller fel).
-const analyses = new Map();
-
-// Knappen finns bara när bygget pekat ut en analys (meta.analysis) och matchen
-// är kommande med en prognos – annars renderas inget alls.
+// Tipset finns bara för en kommande match med prognos – annars renderas
+// inget alls.
 function analysisOn(d) {
   const a = state.meta && state.meta.analysis;
   const m = d.match;
@@ -1272,27 +1279,26 @@ function analysisOn(d) {
     Date.parse(m.kickoff) > Date.now() && d.prediction && d.prediction.status === 'ok');
 }
 
-// Tipset under artikeln i Inför: knappen Analysera, och efter den kupongens
-// rutor med AI:ns tecken inringade (penRow) och texten under.
-function analysisCard(d) {
+// Tipset under artikeln: kupongens rutor med AI:ns tecken inringade (penRow)
+// och texten, med hänvisningar som länkar direkt till sidorna. Saknas tipset
+// eller är det äldre än TIP_HOURS står knappen Analysera (igen) – tipset
+// skrivs då om ur artikeln och det senaste nyhetsläget, utan att AI:n söker
+// på nätet.
+function tipCard(d, a) {
   if (!analysisOn(d)) return '';
-  const a = state.meta.analysis;
-  const r = analyses.get(d.match.id);
-  if (r && r.ok && r.research) return researchCard(r, d);
-  if (r && r.ok) {
-    const other = r.builtAt && d.builtAt && r.builtAt !== d.builtAt;
-    return `<div class="card analysis" id="analysis-card"><h4 title="${esc(`Skriven av ${r.model} ${when(r.generatedAt)} ur underlaget från uppdateringen ${when(r.builtAt)} · alla tal i texten finns i underlaget`)}">Tipset</h4>` +
-      penRow(d) + `<p class="analysis-text">${esc(r.text).replace(/(\d) %/g, '$1&nbsp;%')}</p>` +
-      (other ? '<p class="note">Sidan och texten bygger på olika uppdateringar – ladda om sidan.</p>' : '') + '</div>';
-  }
-  // retry: false = svaret klarade inte kontrollen; samma underlag ger samma
-  // svar, eller (again) samma svar en stund.
+  const t = a.tip;
+  const r = articleFails.get(d.match.id);
   const final = r && r.retry === false;
-  return `<div class="card analysis" id="analysis-card"><h4>Tipset</h4>` +
-    (r ? `<p class="unknown">Inget tips: ${esc(r.error || 'okänt fel')}${final ? esc(r.again || ' En ny text kan skrivas när underlaget ändrats.') : ''}</p>` : '') +
-    (final ? '' : `<button type="button" class="analyze" data-id="${esc(d.match.id)}" title="${a.news
-      ? 'AI:n läser tidningar, presskonferenser och supporterforum på nätet och ringar in sina tecken'
-      : 'En språkmodell skriver bara ur underlaget på sidan – en text med ett tal som inte finns där visas inte'}">${r ? 'Försök igen' : 'Analysera'}</button>`) + '</div>';
+  const old = !t || Date.now() - Date.parse(t.writtenAt) > TIP_HOURS * 3600000;
+  const at = t && t.writtenAt ? fDateTime.format(new Date(t.writtenAt)) : 'okänt';
+  const paras = t ? t.text.split(/\n\s*\n/).filter((p) => p.trim())
+    .map((p) => `<p class="analysis-text">${refLinks(t.sources)(esc(p.trim())).replace(/(\d) %/g, '$1&nbsp;%')}</p>`).join('') : '';
+  return '<div class="card analysis" id="analysis-card">' +
+    (t ? `<h4 title="${esc(`Skriven av ${t.model} ${at} · rapporterat i media, inte kontrollerat av Matchfixarna och inte med i prognosen`)}">Tipset</h4>` + penRow(d) + paras : '<h4>Tipset</h4>') +
+    (r ? `<p class="unknown">${t ? 'Ingen ny analys' : 'Inget tips'}: ${esc(r.error || 'okänt fel')}</p>` : '') +
+    (old && !final ? `<button type="button" class="analyze" data-artikel="${esc(d.match.id)}" title="${t
+      ? `Tipset skrevs ${esc(at)}. AI:n väger in det senaste nyhetsläget och ringar in sina tecken på nytt, utan att söka på nätet`
+      : 'AI:n väger prognosen mot artikeln och det senaste nyhetsläget och ringar in sina tecken'}">${r ? 'Försök igen' : t ? 'Analysera igen' : 'Analysera'}</button>` : '') + '</div>';
 }
 
 // Tecknen AI:n ringade in, med pennan i kupongens rutor – samma rutor som
@@ -1302,27 +1308,9 @@ function penRow(d) {
   return pen ? fcMain(d.prediction.p, [d.match.home, 'Oavgjort', d.match.away], d.match.id, null, pen) : '';
 }
 
-// Analysen med research: rutorna med tecknen (penRow) och texten. Nyhetsläget
-// och läktarsnacket står inte med – artikeln ovanför har redan läst på – och
-// inte heller någon egen källista: hänvisningarna i texten länkar direkt till
-// sidorna, numrerade om i den ordning de kommer.
-const REF_RE = /\[(\d+(?:, \d+)*)\]/g;
-function researchCard(r, d) {
-  const n = r.news || { sources: [] };
-  const text = r.text || '';
-  const order = [...new Set([...text.matchAll(REF_RE)].flatMap((x) => x[1].split(', ')))];
-  const num = new Map(order.map((k, i) => [k, String(i + 1)]));
-  const sources = n.sources.filter((s) => num.has(String(s.n))).map((s) => ({ ...s, n: num.get(String(s.n)) }));
-  const renumbered = text.replace(REF_RE, (m, ks) => `[${ks.split(', ').map((k) => Number(num.get(k))).sort((a, b) => a - b).join(', ')}]`);
-  const paras = renumbered.split(/\n\s*\n/).filter((p) => p.trim())
-    .map((p) => `<p class="analysis-text">${refLinks(sources)(esc(p.trim())).replace(/(\d) %/g, '$1&nbsp;%')}</p>`).join('');
-  const at = r.generatedAt ? fDateTime.format(new Date(r.generatedAt)) : 'okänt';
-  return `<div class="card analysis" id="analysis-card"><h4 title="${esc(`Skriven av ${r.model} ${at} efter sökningar på nätet · rapporterat i media, inte kontrollerat av Matchfixarna och inte med i prognosen`)}">Tipset</h4>` +
-    penRow(d) + paras + '</div>';
-}
-
 // Upphöjda hänvisningar [1], [2] … som länkar direkt till artikeln (ett
 // #-ankare skulle byta vy, sidan navigerar med #match/…).
+const REF_RE = /\[(\d+(?:, \d+)*)\]/g;
 const safeHref = (u) => (/^https?:\/\//i.test(u || '') ? esc(u) : null);
 function refLinks(sources) {
   const src = new Map(sources.map((s) => [String(s.n), s]));
@@ -1344,62 +1332,22 @@ function sourceList(sources) {
   }).join('') + '</ol>';
 }
 
-// AI:n läser på en dryg minut – tiden tickar i knappen, så att det syns att
-// något händer. → stop().
+// AI:n analyserar ett par minuter – tiden tickar i knappen, så att det syns
+// att något händer. → stop().
 function readingClock(btn) {
   const t0 = Date.now();
   const tick = () => {
     const s = Math.round((Date.now() - t0) / 1000);
-    btn.textContent = s < 5 ? 'Läser på …' : `Läser på … ${Math.floor(s / 60)}:${String(s % 60).padStart(2, '0')}`;
+    btn.textContent = s < 5 ? 'Analyserar …' : `Analyserar … ${Math.floor(s / 60)}:${String(s % 60).padStart(2, '0')}`;
   };
   tick();
   const timer = setInterval(tick, 1000);
   return () => clearInterval(timer);
 }
 
-async function runAnalysis(id, btn) {
-  btn.disabled = true;
-  const stop = readingClock(btn);
-  let r;
-  try {
-    const res = await fetch(state.meta.analysis.endpoint, {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ id }),
-    });
-    r = await res.json().catch(() => ({ ok: false, error: `HTTP ${res.status}` }));
-  } catch {
-    r = { ok: false, error: 'analysen gick inte att nå.' };
-  }
-  stop();
-  analyses.set(id, r);
-  const d = state.detail;
-  if (!d || d.match.id !== id || location.hash !== `#match/${id}`) return;
-  // Texten och sidan ska bygga på samma underlag: är sidan från ett annat bygge
-  // än det analysen läste ur laddas matchen om (förbi CDN-cachen).
-  if (r.ok && r.builtAt && r.builtAt !== d.builtAt) {
-    try {
-      const fresh = await getJSON(`data/match/${encodeURIComponent(id)}.json?b=${encodeURIComponent(r.builtAt)}`);
-      if (location.hash === `#match/${id}`) {
-        state.detail = fresh;
-        drawDetail();
-      }
-      return;
-    } catch {
-      // Visa texten ändå – kortet säger att sidan visar ett annat bygge.
-    }
-  }
-  // Tecknen AI:n ringade in ritas med pennan medan man tittar (fc-fresh).
-  const card = $('#analysis-card');
-  if (card) card.outerHTML = analysisCard(d).replace('class="fc-main"', 'class="fc-main fc-fresh"');
-}
-
 $('#match-detail-view').addEventListener('click', (e) => {
   const b = e.target.closest('button.analyze');
-  if (b && !b.disabled) {
-    if (b.dataset.artikel) runArticle(b.dataset.artikel, b);
-    else runAnalysis(b.dataset.id, b);
-  }
+  if (b && !b.disabled) runArticle(b.dataset.artikel, b);
   if (e.target.closest('[data-close]')) closeMatch();
   const t = e.target.closest('[data-mtab]');
   if (t) selectMatchTab(t.dataset.mtab);

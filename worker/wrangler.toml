@@ -17,8 +17,8 @@ compatibility_date = "2026-10-01"
 binding = "ANALYSER"
 id = "d890672594e449589f9f3cd97ca6e6de"
 
-# Inget schema: artikeln inför matchen skrivs sedan 2026-10-21 bara när någon
-# trycker på Läs på (POST /artikel, worker/artikel.mjs). En tom lista tar
+# Inget schema: artikeln och tipset skrivs sedan 2026-10-21 bara när någon
+# trycker på Analysera (POST /artikel, worker/artikel.mjs). En tom lista tar
 # bort det gamla schemat (var tionde minut) vid deploy.
 [triggers]
 crons = []

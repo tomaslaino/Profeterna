@@ -1,7 +1,7 @@
-/* Artikeln inför matchen (fliken Inför i matchbladet, articlePane i app.js):
-   rubrik i Fraunces, ingress i fetstil och brödtext som på en tidningssida,
-   med upphöjda hänvisningar till källistan under. Tipset under artikeln
-   (analysisCard) står i samma spalt med samma brödtext och hänvisningar,
+/* Artikeln inför matchen (fliken Analysera i matchbladet, articlePane i
+   app.js): rubrik i Fraunces, ingress i fetstil och brödtext som på en
+   tidningssida, med upphöjda hänvisningar till källistan under. Tipset under
+   artikeln (tipCard) står i samma spalt med samma brödtext och hänvisningar,
    och kupongens rutor med AI:ns tecken inringade överst. Laddas efter matchblad.css. */
 
 .artikel,
@@ -25,6 +25,9 @@
 .artikel sup.ref a,
 .artikel + .analysis sup.ref a { text-decoration: none; font-weight: 600; }
 .artikel .news-sources { margin-top: 20px; padding-top: 12px; border-top: 1px solid var(--hair); }
+/* Analysera igen under ett gammalt tips, med luft från texten. */
+.artikel + .analysis .analysis-text ~ button.analyze,
+.artikel + .analysis .unknown + button.analyze { margin-top: 10px; }
 
 dialog.mr-modal .artikel .art-title { color: var(--pp-ink); }
 dialog.mr-modal .artikel sup.ref a,

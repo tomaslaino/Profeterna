@@ -5,9 +5,11 @@
 // _site/ serveras precis som GitHub Pages gör.
 //
 // Matchanalysen (fas 5): finns DEEPSEEK_API_KEY i .env visas knappen
-// Analysera, och servern gör analysen själv (POST /api/analyze) med samma kod
-// som proxyn på Cloudflare (worker/index.mjs), och Läs på skriver artikeln
-// inför matchen (GET/POST /api/artikel). Utan nyckel ingen knapp.
+// Analysera, som skriver artikeln och tipset (GET/POST /api/artikel, med
+// ANTHROPIC_API_KEY) med samma kod som proxyn på Cloudflare
+// (worker/artikel.mjs). DeepSeeks korta analys (POST /api/analyze,
+// worker/index.mjs) finns kvar men anropas inte av matchbladet. Utan nyckel
+// ingen knapp.
 // Samma nyckel ger AI:ns kommentarer i Olympen (POST /api/kommentar)
 // och, med KUPONG_LOKALT, omgångens namn (POST /api/namn).
 //
@@ -62,9 +64,9 @@ function analysisRoute(siteDir = OUT, store = fileStore()) {
   };
 }
 
-// GET /api/artikel?id= och POST /api/artikel {id} – artikeln inför matchen
-// (Läs på), med samma kod som proxyn (worker/artikel.mjs). Den sparas bredvid
-// analyserna, så att Analysera bygger vidare på den som i proxyn.
+// GET /api/artikel?id= och POST /api/artikel {id} – artikeln och tipset
+// (Analysera), med samma kod som proxyn (worker/artikel.mjs). De sparas bredvid
+// analyserna.
 function articleRoute(siteDir = OUT, store = fileStore()) {
   return async (req, res) => {
     try {

@@ -181,6 +181,12 @@ ingen falsk precision · sidan kraschar aldrig av en död källa · endast fria 
   tecken. På en kupong för Stryktipset står *Pris* i foten i stället för *Kombinationer* –
   en krona per rad, och på gängets kupong vad det blir per person
   ([public/spela.js](public/spela.js))
+- [x] **Allt heter Analysera (2026-10-22, användarens önskan):** matchbladets flik *Inför*
+  heter *Analysera*, och knappen där heter också *Analysera* (förut *Läs på*). Ett klick
+  låter Claude läsa på och skriva artikeln och sedan, i samma samtal och utan att söka
+  igen, tipset under den – förut två knappar, två väntetider och två sökpass. Är tipset
+  äldre än ett dygn står *Analysera igen* under det: tipset skrivs om ur artikeln och
+  nyheterna som hämtas just då, utan sökningar (se Matchanalysen, *Analysera*)
 
 ## Publicering
 
@@ -401,8 +407,15 @@ Utan nyckel ingen knapp.
   matchbladet ringar inte längre in modellens tecken automatiskt. Analysera låter i stället
   Claude söka och läsa förhandsartiklar, lokaltidningar, presskonferenser, skade- och
   truppnyheter och supporterforum på nätet och ringa in sina tecken med kulspetspenna i
-  rutorna 1 X 2 (se Matchanalysen, *Med research*). Efter matchen ringas utfallet in med
+  rutorna 1 X 2 (se Matchanalysen, *Analysera*). Efter matchen ringas utfallet in med
   samma penna som ställningen, utan bock eller kryss – det fanns inget tips att rätta.
+- **Artikeln och tipset ihopslagna (2026-10-22, användarens önskan):** *Läs på* och
+  *Analysera* sökte båda på nätet, och det andra sökpasset hittade mest det som artikeln
+  redan hade läst. Nu läser Claude på en gång: artikeln skrivs först, utan prognosen och
+  oddsen, och tipset i samma samtal när de kommer, med det lästa ur cachen. Eftersom
+  artikeln kan skrivas 7 dagar före avspark och aldrig skrivs om kan tipset bli gammalt;
+  därför *Analysera igen* efter ett dygn, utan sökningar men med nyheterna som hämtas
+  gratis. Flik och knappar heter alla Analysera.
 - **En text med ett främmande tal visas inte (2026-10-18):** strängare än Gräva gulds
   flaggning. Varje tal i texten måste finnas i underlaget; annars ett nytt försök med
   talen utpekade, och klarar inte heller det kontrollen visas ingen text alls.
@@ -834,85 +847,77 @@ en ny regelversion ger en ny post per kandidat med datum.
 
 ## Matchanalysen (fas 5)
 
-Valfri och **avstängd som standard**. När den är påslagen har matchvyn för en kommande
-match med prognos avsnittet *Tipset* med knappen **Analysera**, under artikeln i fliken
-*Inför* (sedan 2026-10-21; förut i *Prognos*, som nu inte ringar in något). Ett klick ger en kort text
-(3–5 meningar) som DeepSeek skriver ur matchens underlag och, under rubriken
-*Nyhetsläget*, 4–8 meningar ur nyheter som hämtas online just då, med hänvisningar och en
-källista med länkar. Allt är märkt *genererad text* med modell, när den skrevs, vilket
-bygge underlaget kommer ur och när nyheterna hämtades. Är modulen avstängd, saknar
-proxyn nyckel eller fallerar API:t ser sidan ut som annars – kortet säger bara varför det
-inte blev någon text.
+Valfri och **avstängd som standard**. När den är påslagen har matchbladet för en kommande
+match inom 7 dagar fliken **Analysera** med knappen **Analysera**: Claude läser på och
+skriver en artikel om matchen och tipset under den (se *Analysera* nedan). Är modulen
+avstängd, saknar proxyn nyckel eller fallerar API:t ser sidan ut som annars – kortet säger
+bara varför det inte blev någon text.
 
 ```
-knappen  →  proxyn (Cloudflare Worker, nyckeln som hemlighet)  →  DeepSeek
+knappen  →  proxyn (Cloudflare Worker, nycklarna som hemligheter)  →  Claude (söker och läser)
               ↑ hämtar <sajten>/data/match/<id>.json själv
-              ↑ hämtar nyheterna (Bing News, ESPN, BBC Sport, Open-Meteo)
+              ↑ hämtar nyheterna (Bing News, ESPN, BBC Sport, Open-Meteo) till Analysera igen
 ```
 
-**Med research (Claude, 2026-10-20):** när proxyn har hemligheten `ANTHROPIC_API_KEY`
-skriver Claude (`claude-opus-5-5`) analysen i stället för DeepSeek
-([worker/research.mjs](worker/research.mjs), prompten och gränserna i
-[config/research.js](config/research.js)):
+**Analysera (Claude, 2026-10-20; artikeln och tipset ihopslagna 2026-10-22):** knappen
+anropar `POST …/artikel` ([worker/artikel.mjs](worker/artikel.mjs), prompten och gränserna
+i [config/artikel.js](config/artikel.js), samtalet och kontrollerna i
+[worker/research.mjs](worker/research.mjs), fliken i [public/app.js](public/app.js)).
 
-- Claude får samma underlag och nyheterna ovan (med adresser i stället för id), och söker
-  och läser sedan själv på nätet med Anthropics sök- och läsverktyg (högst 10 sökningar
-  och 6 öppnade sidor; spelbolag och tipssajter spärrade): förhandsartiklar,
-  lokaltidningar, presskonferenser, skador och troliga startelvor, supporterforum och
-  fansajter. Svaret är JSON med `analys`, `nyheter`, `läktaren`, `tecken`, `marginal`
-  och `källor` (adress, tidning, rubrik).
-- *Tipset* visar kupongens rutor 1 X 2 med tecknen inringade och raden i marginalen, och
-  under dem analysen med hänvisningar som länkar direkt till sidorna, numrerade i den
-  ordning de kommer. *Nyhetsläget* och *Läktarsnacket* skrivs fortfarande och sparas, men
-  visas inte (2026-10-21). Raden i marginalen är Claudes egen, högst tre ord utan siffror
-  (annars spik, halvgardera eller helgardera). Knappen visar *Läser på …* med tiden; en analys tar en och en halv
-  minut.
-- **Kontroller:** en källa följer bara med om adressen verkligen kom upp i en sökning,
-  en läst sida eller bland nyheterna – annars stryks hänvisningen. Varje tal i texterna
-  ska stå i underlaget eller i det Claude läste (rubriker, öppnade sidor, citerade
-  stycken); tecknen ska vara ett till tre av 1, X och 2. Annars ett nytt försök i samma
-  samtal (ur cachen), och därefter ingen text.
-- **Cache per match, inte per underlag:** en analys gäller 3 timmar för alla som klickar
-  (även om sajten uppdateras under tiden), en avvisad 30 minuter. Lokalt sparas den i
-  `data/cache/analysis/` med samma slutdatum.
-- **Högst 40 analyser per dygn** (svensk tid, räknas i KV); därefter skriver DeepSeek
-  den korta analysen som förut, utan tecken.
-- **Kostnad** (Anthropics prislista 2026-10: $4 / $20 per miljon tokens in/ut, cacheläsning
-  $0,20, $10 per 1 000 sökningar): en provkörning (Cardiff–Birmingham, 10 sökningar, 2
-  sidor) kostade ungefär $0,40 och tog 91 s.
-
-**Artikeln inför matchen (2026-10-20, som Redaktionens analys på gravergrav.se):** när
-någon trycker på *Läs på* i matchrutans flik *Inför* läser Claude på och skriver en artikel –
-rubrik, ingress, två–tre stycken (180–240 ord) och källor – som sedan står där för alla
-([worker/artikel.mjs](worker/artikel.mjs), prompten och gränserna i
-[config/artikel.js](config/artikel.js), knappen i [public/app.js](public/app.js)). Artikeln
-byggs kring det som gör matchen annorlunda eller spännande; tabellen, formen och
-skadelistan står redan på matchbladet. Den ger inga tips; tecknen ringas fortfarande bara
-in efter Analysera.
-
+- **Artikeln:** Claude (`claude-opus-5-5`, effort `low`) söker och läser på nätet med
+  Anthropics sök- och läsverktyg (högst 6 sökningar och 4 öppnade sidor à högst 4 000
+  tokens; spelbolag och tipssajter spärrade) – lokaltidningar, förhandsartiklar,
+  presskonferenser, skador och troliga startelvor, supporterforum och fansajter – och
+  skriver rubrik, ingress, två–tre stycken (180–240 ord) och källor, byggd kring det som
+  gör matchen annorlunda eller spännande. Underlaget är DeepSeek-analysens (nedan) utan
+  prognosen och oddsen, och artikeln ger inga tips: ett tipsord (spik, gardering) ger en
+  omskrivning.
+- **Tipset, i samma samtal:** när artikeln har klarat kontrollen får Claude prognosen,
+  *Vad drog åt vilket håll*, baslinjerna och spelbolagens odds och skriver tipset utan att
+  söka igen – `analys` (högst 120 ord), `tecken` (1, X, 2, två av dem eller 1X2),
+  `marginal` (högst tre ord, utan siffror) och `källor`. Allt Claude har läst ligger kvar i
+  cachen. *Tipset* under artikeln visar kupongens rutor 1 X 2 med tecknen inringade med
+  kulspetspenna och raden i marginalen (annars spik, halvgardera eller helgardera), och
+  texten med hänvisningar som länkar direkt till sidorna. Blir tipset inte av sparas
+  artikeln ändå; kortet säger varför och har knappen *Analysera*. Utan prognos inget tips.
+- **Analysera igen:** är tipset äldre än ett dygn (`tip.refreshHours`) står knappen under
+  det. Claude skriver då om bara tipset ur artikeln, sajtens underlag och nyheterna som
+  hämtas just då (*Nyhetsläget* nedan), utan sökverktyg. Klarar det nya tipset inte
+  kontrollen står det gamla kvar, och nästa försök går att göra efter 30 minuter (efter
+  ett API-fel direkt). Högst 40 omskrivna tips per dygn.
+- **Kontroller:** en källa följer bara med om adressen verkligen kom upp i en sökning, en
+  läst sida, artikelns källor eller bland nyheterna – annars stryks hänvisningen. Varje tal
+  i texterna ska stå i underlaget eller i det Claude läste (rubriker, öppnade sidor,
+  citerade stycken); tecknen ska vara ett till tre av 1, X och 2. Annars ett nytt försök i
+  samma samtal (ur cachen), och därefter ingen text.
 - **Vid behov, inte på schema (sedan 2026-10-21):** förut skrevs varje match på kupongen
   tre gånger (när den kom med, 48 och 20 timmar före avspark), ungefär $20 i veckan även
   för matcher ingen läste. Nu skrivs artikeln bara när någon ber om den, och en skriven
-  artikel skrivs inte om – det nya fram till avspark hämtar Analysera.
-- `POST …/artikel {"id": "<match-id>"}` lämnar ut artikeln om den finns och skriver den
-  annars (ett par minuter). Medan någon annan skriver den svarar proxyn `pending: true`,
-  och knappen frågar igen var 15:e sekund. Tidigast 7 dagar före avspark, högst 3 försök
-  per match och 15 artiklar per dygn. Fliken *Inför* finns för kommande matcher inom 7
-  dagar; utan artikel står bara knappen där. Lokalt samma sak via `/api/artikel`
-  (server.js), sparat bredvid analyserna i `data/cache/analysis/`.
-- Samma sökverktyg och kontroller som Analysera: källorna ska ha kommit upp i sökningen,
-  talen ska stå i underlaget eller i det Claude läste, och ett tipsord (spik, gardering)
-  ger en omskrivning. Underlaget är analysens utan prognosen och oddsen.
-- `GET …/artikel?id=<match-id>` lämnar ut artikeln (KV-nyckeln `artikel:<id>`, sparad 4
-  dagar efter avspark); matchrutan hämtar den samtidigt som matchen.
-- **Analysera bygger på artikeln** när den finns: den står i underlaget, dess källor och
-  text räknas som lästa, och Claude söker bara efter det som hänt sedan den skrevs (högst 4
-  sökningar och 3 sidor) och skriver i *Nyhetsläget* och *Läktarsnacket* bara det nya.
-- **Kostnad:** varje försök sparas med vad det kostade (`cost` i `tries`, räknat ur
-  förbrukningen och prislistan i konfigen). Prov 2026-10-21 på Chelsea–Tottenham med 6
-  sökningar, 4 sidor à högst 4 000 tokens: effort `low` $0,23 (en sida läst), `medium`
-  $0,52 (fyra sidor, rikare text). `low` gäller. Provskrivs lokalt utan att sparas, med
-  kostnaden utskriven: `node src/artikel-cli.mjs <match-id>`.
+  artikel skrivs inte om – det nya fram till avspark kommer med *Analysera igen*.
+- `POST …/artikel {"id": "<match-id>"}` lämnar ut artikeln om den finns, skriver den
+  annars (en till ett par minuter) och skriver om ett gammalt tips. Medan någon annan
+  skriver svarar proxyn `pending: true`, och knappen frågar igen var 15:e sekund; den visar
+  *Analyserar …* med tiden. Tidigast 7 dagar före avspark, högst 3 försök per match och 15
+  artiklar per dygn. Lokalt samma sak via `/api/artikel` (server.js), sparat bredvid
+  analyserna i `data/cache/analysis/`.
+- `GET …/artikel?id=<match-id>` lämnar ut artikeln med tipset (KV-nyckeln `artikel:<id>`,
+  sparad 4 dagar efter avspark); matchbladet hämtar den samtidigt som matchen.
+- **Kostnad:** varje försök sparas med vad det kostade (`cost` i `tries` och `tipTries`,
+  räknat ur förbrukningen och prislistan i konfigen). Prov 2026-10-22 på Ipswich–Forest:
+  artikeln och tipset 63 s och $0,23 (4 sökningar och 4 sidor; tipset ur cachen ungefär
+  $0,05, med ett nytt försök), *Analysera igen* 15 s och $0,10. Förut kom Analysera med ett
+  eget sökpass ovanpå artikeln (provet 2026-10-20: $0,40). Provskrivs lokalt utan att
+  sparas, med förbrukningen per anrop utskriven: `node src/artikel-cli.mjs <match-id>`
+  (`--igen` skriver också om tipset).
+- **2026-10-20–22** sökte Analysera på nytt efter det som hänt sedan artikeln skrevs, i ett
+  eget samtal, och skrev också *Nyhetsläget* och *Läktarsnacket*, som inte visades
+  (`config/research.js`, borttagen).
+
+**DeepSeeks analys** (`POST …/analyze`, [worker/index.mjs](worker/index.mjs)) stod förut
+under knappen Analysera och anropas inte längre av matchbladet (2026-10-22). Den ger en kort
+text (3–5 meningar) som DeepSeek skriver ur matchens underlag och, under rubriken
+*Nyhetsläget*, 4–8 meningar ur nyheter som hämtas online just då, med hänvisningar och en
+källista med länkar.
 
 - **Underlaget** ([worker/analysis.mjs](worker/analysis.mjs)) är det matchvyn visar, med
   sidans precision: prognosen som odds (1X2, osäkerhet, över 2,5, båda gör mål, troligaste
@@ -1754,7 +1759,7 @@ schemaintervall gammalt.
   nya texter (analysen fungerar, men nästa klick kostar igen).
 - Texten finns bara för kommande matcher och bara i den webbläsare som klickat (och i
   proxyns cache) – den sparas inte i journalen och visas inte efter avspark.
-- **Med research:** svaret från Claude med alla sökträffar är stort, och att tolka det
+- **Analysera (Claude):** svaret från Claude med alla sökträffar är stort, och att tolka det
   tar processortid. Med Cloudflares gratisnivå (10 ms per anrop) är det inte mätt i den
   driftsatta Workern – slår det i taket visar kortet ett fel. Claudes tecken sparas inte
   i journalen och rättas inte; sajter som är spärrade på utvecklingsdatorn (t.ex. Reddit)
