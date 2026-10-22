@@ -72,13 +72,6 @@
 .src-facts dd { margin: 0; color: var(--ink-soft); }
 .src-card .err { margin-top: 10px; font-size: 12.5px; }
 
-details.src-runs { margin-top: 14px; font-size: 13px; }
-details.src-runs > summary { cursor: pointer; color: var(--accent-deep); }
-details.src-runs[open] > summary { margin-bottom: 10px; }
-details.src-runs .table-wrap { margin: 0; }
-details.src-runs table { font-size: 13px; }
-details.src-runs td .dot { margin-right: 6px; }
-
 .src-unmapped { margin-top: 24px; }
 
 @media (max-width: 860px) {

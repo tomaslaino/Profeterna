@@ -397,12 +397,9 @@ const PCOLS = [
     get: (p) => p.gpts, cls: 'num', in: ['malen'] },
   { key: 'g1', label: 'Första', sub: 'målet i matchen', name: 'Matchens första mål', title: 'Mål som var matchens första – det som gav laget ledningen med 1–0.',
     get: (p) => p.g1, cls: 'num hide-sm', in: ['malen'] },
-  { key: 'ghd', label: 'Nick', name: 'Nickmål', title: 'Mål gjorda med huvudet.', get: (p) => p.ghd, cls: 'num', kinds: true, in: ['malen'] },
   { key: 'gpen', label: 'Straff', name: 'Straffar', title: 'Straffmål av slagna straffar i ligan – räddade, missade och i ramen räknas som slagna. Straffläggningar räknas inte.',
     get: (p) => p.gpen, cls: 'num', kinds: true, in: ['malen'],
     show: (p) => (p.gpen == null ? cell(null) : p.gpen + (p.pmiss || 0) ? `${p.gpen} <span class="muted">av ${p.gpen + (p.pmiss || 0)}</span>` : cell(0)) },
-  { key: 'gfk', label: 'Frispark', name: 'Frisparksmål', title: 'Mål direkt på frispark.', get: (p) => p.gfk, cls: 'num hide-xs', kinds: true, in: ['malen'] },
-  { key: 'gout', label: 'Utifrån', name: 'Mål utanför straffområdet', title: 'Mål på skott utanför straffområdet.', get: (p) => p.gout, cls: 'num hide-xs', kinds: true, in: ['malen'] },
   { key: 'glate', label: 'Sena', sub: 'från 80:e min', name: 'Sena mål', title: 'Mål från den 80:e minuten och framåt, tilläggstiden inräknad.',
     get: (p) => p.glate, cls: 'num hide-sm', in: ['malen'] },
   { key: 'gsub', label: 'Inhopp', sub: 'mål', name: 'Mål som inhoppare', title: 'Mål gjorda efter att spelaren bytts in.', get: (p) => p.gsub, cls: 'num hide-sm', in: ['malen'] },
@@ -422,7 +419,6 @@ const PCOLS = [
     get: (p) => per90e(p.fc, p), d: 1, cls: 'num hide-xs', mins: true, in: ['regelbrott'], ...qMinE },
   { key: 'yc', label: 'Gul', name: 'Gula kort', title: 'Gula kort i ligan i år.', get: (p) => p.yc, cls: 'num', in: ['regelbrott'] },
   { key: 'rc', label: 'Röd', name: 'Röda kort', title: 'Röda kort i ligan i år.', get: (p) => p.rc, cls: 'num', in: ['regelbrott'] },
-  { key: 'off', label: 'Offside', title: 'Gånger spelaren har blivit avblåst för offside.', get: (p) => p.off, cls: 'num', in: ['regelbrott'] },
   { key: 'sh', label: 'Skott', title: 'Alla avslut – även de som går utanför eller blockeras.', get: (p) => p.sh, cls: 'num', in: ['avslut'] },
   { key: 'sot', label: 'På mål', name: 'Skott på mål', title: 'Skott som hade gått in om målvakten inte räddat. Skott utanför och i stolpen räknas inte.',
     get: (p) => p.sot, cls: 'num', in: ['avslut'] },
@@ -616,7 +612,7 @@ function playersView(dv, P) {
     cls: 'dv-wide',
   });
 
-  html += '<div class="dv-grid2">' + squadFacts(P, dv) + '</div>';
+  html += '<div class="dv-grid2">' + goalsByPos(P) + '</div>';
   return html;
 }
 
@@ -627,17 +623,9 @@ function barList(rows, { label, value, fmt, sub }) {
     `<span class="bl-v">${fmt(r)}${sub ? `<small>${sub(r)}</small>` : ''}</span></li>`).join('') + '</ul>';
 }
 
-function squadFacts(P, dv) {
-  const t = P.totals;
+function goalsByPos(P) {
   const posName = { A: 'Anfallare', MF: 'Mittfältare', B: 'Backar', MV: 'Målvakter', okänd: 'Okänd position' };
-  return card('Spelarna i siffror', {
-    body: '<dl class="facts dv-facts">' +
-      '<dt data-tip-head="Snittålder" data-tip="Varje spelare räknas en gång per match den spelat, så ordinarie spelare väger tyngre än de som bara hoppat in någon gång.">Snittålder</dt>' +
-      `<dd><b>${num(t.avgAge, 1)} år</b></dd>` +
-      '<dt data-tip-head="Mål utan målskytt" data-tip="Mål som inte går att knyta till någon i truppen: självmål, mål av spelare som har lämnat klubben och omgångar som ESPN inte har fört in än.">Mål utan målskytt</dt>' +
-      `<dd>${t.unattributed == null ? 'okänt' : `<b>${int(t.unattributed)}</b> <span class="muted">av ${int(t.goalsFor)}</span>`}</dd></dl>`,
-    src: `ESPN-trupperna, hämtat ${when(P.source.fetchedAt)}`,
-  }) + card('Vem gör målen?', {
+  return card('Vem gör målen?', {
     body: barList(P.goalsByPos, { label: (r) => esc(posName[r.pos] || r.pos), value: (r) => r.goals, fmt: (r) => pct(r.share), sub: (r) => `${r.goals} mål` }),
     src: `ESPN-trupperna, hämtat ${when(P.source.fetchedAt)}`,
   });
@@ -728,17 +716,8 @@ const TCOLS = [
     get: (t) => per(fdOf(t, 'sh'), 'a'), d: 1, cls: 'num', asc: true, in: ['spelet'] },
   { key: 'sotf', label: 'På mål', sub: 'per match', name: 'Skott på mål per match', title: 'Lagets skott per match som hade gått in om målvakten inte räddat.',
     get: (t) => per(fdOf(t, 'sh'), 'of'), d: 1, cls: 'num hide-xs', in: ['spelet'] },
-  { key: 'corf', label: 'Hörnor', sub: 'per match', name: 'Hörnor per match', title: 'Lagets hörnor per match – ett tecken på hur mycket laget anfaller.',
-    get: (t) => per(fdOf(t, 'cor'), 'f'), d: 1, cls: 'num hide-xs', in: ['spelet'] },
   { key: 'ycm', label: 'Gula', sub: 'per match', name: 'Gula kort per match', title: 'Lagets gula kort per match. Den som visas ut efter två gula kort har fått två gula och ett rött.',
     get: (t) => per(fdOf(t, 'cards'), 'y'), d: 2, cls: 'num', in: ['spelet'] },
-  { key: 'rcs', label: 'Röda', sub: 'totalt', name: 'Röda kort', title: 'Lagets röda kort hittills i år.',
-    get: (t) => (fdOf(t, 'cards') ? fdOf(t, 'cards').r : null), cls: 'num hide-xs', in: ['spelet'] },
-  { key: 'o25', label: 'Över 2,5 mål', sub: 'andel matcher', name: 'Över 2,5 mål',
-    title: 'Andel av lagets matcher med tre mål eller fler, båda lagens mål sammanräknade. Uttrycket kommer från spelbolagen.',
-    get: (t) => share(t, 'o25'), pct: true, cls: 'num', in: ['spelet'] },
-  { key: 'btts', label: 'Båda gör mål', sub: 'andel matcher', name: 'Båda lagen gör mål', title: 'Andel av lagets matcher där båda lagen har gjort minst ett mål.',
-    get: (t) => share(t, 'btts'), pct: true, cls: 'num', in: ['spelet'] },
 
   // Oddsen läses från vänster: hur ofta laget var favorit, vad oddsen
   // väntade sig, vad laget tog, skillnaden och vad ett spel på laget gav.
@@ -758,11 +737,6 @@ const TCOLS = [
     title: 'Om man satsat lika mycket på att laget vinner varje match, till oddset före avspark: så mycket hade man vunnit (+) eller förlorat (−) av det man satsat. +50 % = varje hundralapp hade blivit 150 kr. Spelbolagens påslag är inräknat.',
     get: roi, cls: 'num', in: ['marknaden'], show: (t) => delta(roi(t), { dead: 0.005, fmt: signedPct }) },
 
-  { key: 'used', label: 'Spelare', name: 'Använda spelare', title: 'Hur många spelare som har spelat minst en ligamatch i år.',
-    get: (t) => sqOf(t, 'used'), cls: 'num', in: ['truppen'] },
-  { key: 'avgAge', label: 'Ålder', sub: 'snitt', name: 'Snittålder',
-    title: 'Lagets snittålder, där varje spelare räknas en gång per match den spelat. Ordinarie spelare väger alltså tyngre än de som bara hoppat in någon gång.',
-    get: (t) => sqOf(t, 'avgAge'), cls: 'num', d: 1, in: ['truppen'] },
   { key: 'goals', label: 'Mål', name: 'Mål av lagets spelare',
     title: 'Mål som ESPN har skrivit på lagets spelare. Självmål räknas inte, så summan kan vara lägre än i tabellen.',
     get: (t) => sqOf(t, 'goals'), cls: 'num', in: ['truppen'] },
@@ -1028,8 +1002,8 @@ function openPlayer(id) {
     }
   }
 
-  // Flikarna: Matcherna, sedan Anfall och Försvar (målvakten: I målet) och
-  // sist Fantasy. Nyckeltalen står ovanför och följer med.
+  // Flikarna: Matcherna, sedan Anfall och Försvar (målvakten: I målet).
+  // Nyckeltalen står ovanför och följer med.
   const panes = [];
   if (p.noStats) {
     html += `<p class="dv-calm">${unknown('Ingen statistik hos ESPN i år')}</p>`;
@@ -1078,10 +1052,7 @@ function openPlayer(id) {
           [cell(p.gpts), 'Poäng åt laget', 'Poängen laget hade tappat utan spelarens mål'],
           [cell(p.g1), 'Matchens första'],
           [cell(p.glate), 'Från 80:e minuten'],
-          p.ghd != null ? [cell(p.ghd), 'Nick'] : null,
           p.gpen != null && pens ? [`${p.gpen} av ${pens}`, 'Straffar', 'Straffmål av slagna straffar'] : null,
-          p.gout ? [cell(p.gout), 'Utanför straffområdet'] : null,
-          p.gfk ? [cell(p.gfk), 'Frispark'] : null,
           p.gsub ? [cell(p.gsub), 'Som inhoppare'] : null,
         ]));
       } else if (p.pmiss) {
@@ -1105,15 +1076,6 @@ function openPlayer(id) {
         ]))]);
       }
     }
-  }
-  if (p.cost != null) {
-    panes.push(['fantasy', 'Fantasy', msec(null, facts([
-      [p.sel == null ? '–' : `${num(p.sel, p.sel < 10 ? 1 : 0)} %`, 'Vald av', 'Andel av alla lag i Fantasy Premier League som har med spelaren'],
-      [cell(p.fpts), 'Poäng'],
-      [cell(p.bonus), 'Bonuspoäng'],
-      p.pos === 'B' && p.cs != null ? [cell(p.cs), 'Hållna nollor'] : null,
-      p.pen === 1 || p.pen === 2 ? [p.pen === 1 ? 'Förstaval' : 'Andraval', 'Straffskytt'] : null,
-    ])), 'Fantasy Premier League']);
   }
   html += mtabs('player', 'Om spelaren', panes);
   html += mfoot([], `<button type="button" class="dv-mbtn" data-team-open="${esc(p.teamId)}">Truppen i ${esc(p.team)} →</button>`);
@@ -1144,11 +1106,9 @@ async function openTeam(id, pick) {
   html += kpis([
     r ? [cell(r.points, { strong: true }), 'Poäng'] : null,
     r ? [`${r.gf}–${r.ga}`, 'Mål'] : null,
-    [t.avgAge == null ? '–' : num(t.avgAge, 1), 'Snittålder', 'Varje spelare räknas en gång per match den spelat'],
-    [cell(t.used), 'Använda spelare'],
   ]);
-  // Flikarna: Spelet, Truppen, Frånvaro och Höjdpunkter. Poängen, målen och truppens
-  // storlek står ovanför och följer med.
+  // Flikarna: Spelet, Truppen, Frånvaro och Höjdpunkter. Poängen och målen
+  // står ovanför och följer med.
   const tt = T && !T.unknown ? T.teams.find((x) => x.espnId === id) : null;
   let game = '';
   if (tt && tt.fd && (tt.fd.xg || tt.fd.mkt)) {
@@ -1214,14 +1174,13 @@ const GLOSSARY = [
   ['– och grå 0', 'Streck = okänt (ESPN har ingen statistik för spelaren), grå 0 = noll.'],
   ['Spelarstatistiken', 'Bara ligamatcher i år, ur ESPN:s trupper. Den släpar ofta en omgång efter tabellen; självmål och spelare som lämnat klubben saknas. I Premier League kommer speltid, xG, försvarsspel från Fantasy Premier League, i övriga ligor räknas speltiden ur ESPN:s matchrapporter (byten och röda kort, utan tilläggstid). Målens sort och betydelse kommer från matchrapporterna i alla fyra ligor.', 'statistik'],
   ['Per 90', 'Per 90 spelade minuter – som om spelaren spelat hela matcher. Visas för spelare med minst tre hela matchers speltid; dämpade siffror har för litet underlag.', 'statistik'],
-  ['Lagstatistiken', 'Tabellen är ESPN:s. xG, skott, hörnor, kort och odds kommer från football-data.co.uk, som ofta ligger en omgång efter – därför visas de per match eller som skillnad inom samma matcher.', 'statistik'],
-  ['Snittålder', 'Varje spelare räknas en gång per match den spelat, så ordinarie spelare väger tyngre än de som bara hoppat in någon gång.', 'statistik'],
+  ['Lagstatistiken', 'Tabellen är ESPN:s. xG, skott, kort och odds kommer från football-data.co.uk, som ofta ligger en omgång efter – därför visas de per match eller som skillnad inom samma matcher.', 'statistik'],
   ['Beroende', 'Hur stor del av lagets mål den bäste målskytten gjort.', 'statistik'],
   ['Effektivast', 'Mål per skott, bland spelare med minst tio skott.', 'statistik'],
   ['Segermål', 'Målet som gav laget den ledning det sedan aldrig tappade. Vid 3–1 är lagets andra mål segermålet, vid 1–0 det enda.', 'statistik'],
   ['Poäng åt laget', 'Poängen laget hade tappat utan spelarens mål. Ett mål i en match som vanns med ett mål är värt två poäng (seger i stället för oavgjort), ett mål i en oavgjord match en poäng (oavgjort i stället för förlust). Mål i matcher som vanns stort eller förlorades ger inga poäng.', 'statistik'],
   ['Inblandad i lagets mål', 'Mål och assist delat med lagets mål: hur stor del av lagets mål spelaren har gjort eller lagt sista passningen till.', 'statistik'],
-  ['Målen', 'Segermål, poäng åt laget, matchens första mål, sena mål (från 80:e minuten, tilläggstiden inräknad) och mål som inhoppare finns för alla fyra ligor. Nick, straff, frispark och mål utanför straffområdet bara för Premier League och Championship – i League One och League Two anger matchrapporterna bara minut och målskytt.', 'statistik'],
+  ['Målen', 'Segermål, poäng åt laget, matchens första mål, sena mål (från 80:e minuten, tilläggstiden inräknad) och mål som inhoppare finns för alla fyra ligor. Straffarna bara för Premier League och Championship – i League One och League Two anger matchrapporterna bara minut och målskytt.', 'statistik'],
   ['Fälld, Fäller', 'Gånger spelaren har blivit fälld, och gånger spelaren själv har begått ett regelbrott som domaren blåst för.', 'statistik'],
   ['Försvarsinsatser', 'Tacklingar, rensningar, täckningar och brytningar. Bara Premier League, från Fantasy Premier League.', 'statistik'],
   ['Assist', 'Passningen (eller skottet som räddas och slås in) som leder direkt till ett mål, enligt ESPN.', 'statistik'],
@@ -1234,7 +1193,7 @@ const GLOSSARY = [
   ['Motstånd', 'Motståndets styrka hittills enligt prognosmodellen, i mål per match, mot vad ett lag i divisionen möter i snitt. Plus = svårare program än snittet.', 'statistik'],
   ['Poäng och kryss mot chanserna', 'Varje match räknas om till chanser att vinna, spela oavgjort och förlora ur båda lagens xG. Poäng mot chanserna: tagna poäng minus 3 × vinstchansen plus oavgjortchansen, match för match – plus är oftast tur, som brukar jämna ut sig. Kryss enligt chanserna: oavgjortchansen i snitt.', 'statistik'],
   ['Styrka', 'Prognosmodellens bedömning av laget: väntad målskillnad per match mot ett snittlag i divisionen på neutral plan, med motståndet inräknat och tidigare säsonger med mindre vikt.', 'statistik'],
-  ['Nollor, Över 2,5 mål, Båda gör mål', 'Andel av lagets matcher utan insläppt mål, med tre mål eller fler, och där båda lagen gjort mål.', 'statistik'],
+  ['Nollor', 'Andel av lagets matcher utan insläppt mål.', 'statistik'],
   ['Väntat, Tog, Mot oddsen', 'Poängen oddsen vid avspark väntade sig – 3 × vinstchansen plus oavgjortchansen, match för match – poängen laget tog i samma matcher, och skillnaden. Plus = bättre än oddsen trodde.', 'statistik'],
   ['Spel på seger', 'Vinst eller förlust i procent av insatserna om man satsat lika mycket på att laget vinner varje match, till oddset vid avspark. Spelbolagens marginal är inräknad.', 'statistik'],
   ['Marginal', 'Spelbolagens påslag: hur mycket summan av 1/odds överstiger 100 %.', 'statistik'],

@@ -633,7 +633,7 @@ function forecastCard(d) {
     return `<div class="card fc"><h4>Prognos</h4><p class="unknown">okänt</p><ul class="bullets">` +
       (p.reasons || []).map((r) => `<li>${esc(r)}</li>`).join('') + '</ul></div>';
   }
-  const stats = goalLines(p.goals, p.over25, p.btts);
+  const stats = goalLines(p.goals);
   let adv = '';
   if (p.advance) {
     adv = p.advance.home == null
@@ -691,12 +691,10 @@ function penMarks(id) {
   return { signs: all ? [] : t.signs, at: all ? 1 : Math.min(...t.signs), note: t.note };
 }
 
-// Målen som en prislista: namnet, prickar fram till oddset.
-function goalLines(goals, over25, btts) {
+// Målen som en prislista: namnet, prickar fram till värdet.
+function goalLines(goals) {
   const rows = [
     ['Förväntade mål', `${dec(goals[0])}–${dec(goals[1])}`],
-    ['Över 2,5 mål', oddsP(over25)],
-    ['Båda lagen gör mål', oddsP(btts)],
   ];
   return '<ul class="fc-lead">' + rows.map(([label, v]) => `<li><span>${label}</span><i></i><b>${v}</b></li>`).join('') + '</ul>';
 }
@@ -717,7 +715,7 @@ function journalCard(d) {
     return '<div class="card fc"><h4>Prognos före avspark</h4><p class="unknown">okänt</p><ul class="bullets">' +
       (r.reasons || []).map((x) => `<li>${esc(x)}</li>`).join('') + '</ul></div>';
   }
-  const stats = goalLines(r.goals, r.over25, r.btts);
+  const stats = goalLines(r.goals);
   let adv = '';
   if (r.advance !== undefined) {
     const a = r.advance && pct3(r.advance);
@@ -849,8 +847,6 @@ const SIDE_TIPS = {
   'Hemma V–O–F': 'Vinster, oavgjorda och förluster i lagets hemmamatcher i ligan. Många lag är klart bättre på hemmaplan.',
   'Borta V–O–F': 'Vinster, oavgjorda och förluster i lagets bortamatcher i ligan.',
   'Mål per match': (n) => 'Gjorda och insläppta mål i snitt per ligamatch.' + (n && n.length === 2 ? ` ”${n[0]}–${n[1]}” betyder att laget i snitt gör ${n[0]} mål per match och släpper in ${n[1]}.` : ''),
-  'Över 2,5 mål': tipOf('Matcher med minst tre mål sammanlagt, oavsett vilket lag som gjorde dem. Halva mål finns inte, så 2,5 är gränsen mellan två och tre mål – samma gräns som hos spelbolagen.'),
-  'Båda lagen gör mål': tipOf('Matcher där båda lagen gjort minst ett mål var.'),
   'Hållit nollan': tipOf('Matcher där laget inte släppt in något mål.'),
   'Inte gjort mål': tipOf('Matcher där laget inte gjort något mål.'),
   'Skott på mål': (n) => 'Skott som hade gått in om inte målvakten räddat – alltså mål plus räddningar.' + (n && n.length === 2 ? ` ”${n[0]}–${n[1]}” betyder ${n[0]} per match för laget och ${n[1]} för motståndarna.` : ''),

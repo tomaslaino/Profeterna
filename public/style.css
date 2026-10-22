@@ -513,7 +513,6 @@ table.facit td.hit { font-weight: 750; box-shadow: inset 0 -2px 0 var(--accent);
 svg.cal { display: block; width: 100%; max-width: 380px; height: auto; margin: 0 auto; }
 svg.cal .grid { stroke: var(--hair); stroke-width: 1; }
 svg.cal .diag { stroke: var(--unknown); stroke-width: 1; stroke-dasharray: 4 4; }
-svg.cal .ci { stroke: var(--accent); stroke-width: 1.5; opacity: 0.55; }
 svg.cal .pt { fill: var(--accent); }
 svg.cal .tick { fill: var(--muted); font-size: 10px; }
 svg.cal .axis { fill: var(--muted); font-size: 11px; font-weight: 600; }
@@ -531,9 +530,6 @@ svg.bt { display: block; overflow: visible; }
 svg.bt .grid { stroke: var(--hair); stroke-width: 1; }
 svg.bt .zero { stroke: var(--border); stroke-width: 1.5; }
 svg.bt .tick { fill: var(--muted); font-size: 10px; font-variant-numeric: tabular-nums; }
-svg.bt .ci { stroke-width: 2; stroke-linecap: round; opacity: 0.45; }
-svg.bt .ci.s-b { stroke: var(--c-b); }
-svg.bt .ci.s-c { stroke: var(--c-c); }
 svg.bt .pt { stroke: var(--card); stroke-width: 2; }
 svg.bt .hit { fill: transparent; }
 svg.bt .hit:hover { fill: var(--hair); fill-opacity: 0.5; }

@@ -12,7 +12,7 @@
 //                          säsong för säsong, division för division, cuperna
 //   I skarpt läge          prognosjournalen rättad mot facit (#utvardering)
 //   Prövat och förkastat   kandidatjakten
-//   Detaljer               parametrarna, tabellerna med intervall och metoden
+//   Detaljer               parametrarna, måttstockarna och efterhandstestet
 //
 // Data: data/model.json och data/evaluation.json. Läses före app.js och
 // använder dess hjälpare ($, esc, getJSON, dec, pct, pct3, listOdds, when,
@@ -51,19 +51,18 @@ const mlMeasure = (key) => MEASURES.find((m) => m.bt === key || m.ev === key);
 const mlLow = (s) => s.charAt(0).toLowerCase() + s.slice(1);
 
 // Modellen mot en måttstock: bättre, sämre eller går inte att skilja åt
-// (intervallet når över noll).
+// (intervallet når över noll). Intervallet avgör bara färgen och syns inte.
 function verdictOf(c) {
   if (!c || !c.n || c.diff == null || !c.ci) return null;
   return c.ci[1] < 0 ? 'better' : c.ci[0] > 0 ? 'worse' : 'even';
 }
-// En skillnad som cell: tecknet och färgen, intervallet i title.
+// En skillnad som cell: tecknet och färgen, antalet matcher i title.
 function diffTd(c, { strong = false } = {}) {
   if (!c || !c.n) return '<td class="num muted">–</td>';
   if (c.diff == null) return `<td class="num muted">för få<span class="sub">${n0(c.n)} matcher</span></td>`;
   const v = verdictOf(c);
-  const t = `${sgn(c.ci[0])} till ${sgn(c.ci[1])} · ${n0(c.n)} matcher`;
   const txt = strong ? `<strong>${sgn(c.diff)}</strong>` : sgn(c.diff);
-  return `<td class="num ml-${v}" title="${esc(t)}">${txt}</td>`;
+  return `<td class="num ml-${v}" title="${n0(c.n)} matcher">${txt}</td>`;
 }
 
 async function loadModel() {
@@ -237,10 +236,10 @@ function qualitySection(bt, version, x) {
 
   if (b.cups.length) {
     html += '<h4 class="sub-h">Cuperna <span class="hint">log-poäng, lägre är bättre</span></h4><div class="table-wrap"><table><thead><tr><th>Cup</th><th class="num">Säsonger</th>' +
-      `<th class="num">Matcher</th><th class="num">Modellen</th><th class="num">${esc(BASE.naive)}</th><th class="num" title="Chansen att gå vidare, förlängning och straffar inräknade">Gå vidare</th><th class="num">Slantsingling</th></tr></thead><tbody>` +
+      `<th class="num">Matcher</th><th class="num">Modellen</th><th class="num">${esc(BASE.naive)}</th><th class="num" title="Chansen att gå vidare, förlängning och straffar inräknade">Gå vidare</th></tr></thead><tbody>` +
       b.cups.map((c) => `<tr><td>${esc(c.name)}</td><td class="num">${esc(c.seasons[0])}${c.seasons[1] !== c.seasons[0] ? `–${esc(c.seasons[1])}` : ''}</td>` +
         `<td class="num">${n0(c.vsNaive.n)}</td><td class="num"><strong>${f3(c.vsNaive.logLoss[0])}</strong></td><td class="num">${f3(c.vsNaive.logLoss[1])}</td>` +
-        (c.advance ? `<td class="num"><strong>${f3(c.advance.logLoss)}</strong></td><td class="num">${f3(c.advance.coin)}</td>` : '<td class="num muted">–</td><td class="num muted">–</td>') +
+        (c.advance ? `<td class="num"><strong>${f3(c.advance.logLoss)}</strong></td>` : '<td class="num muted">–</td>') +
         '</tr>').join('') + '</tbody></table></div>';
   }
   return html;
@@ -274,8 +273,7 @@ function mlLadder(b, model) {
     `<h4>Log-poäng <span class="hint">lägre är bättre · ligamatcherna</span></h4>${body}${axis}</div>`;
 }
 
-// Skillnaden mot bara årets mål och spelbolagen per avslutad säsong, med
-// 95 %-intervall.
+// Skillnaden mot bara årets mål och spelbolagen per avslutad säsong.
 function drawSeasonChart() {
   const el = document.getElementById('season-chart');
   const b = state.backtest;
@@ -292,7 +290,7 @@ function drawSeasonChart() {
   const R = 12;
   const T = 12;
   const B = 26;
-  const vals = rows.flatMap((x) => series.flatMap((s) => (at(x, s).n ? at(x, s).ci : [])));
+  const vals = rows.flatMap((x) => series.flatMap((s) => (at(x, s).n ? [at(x, s).diff] : [])));
   const step = 0.02;
   const lo = Math.floor(Math.min(0, ...vals) / step) * step;
   const hi = Math.ceil(Math.max(0, ...vals) / step) * step;
@@ -315,13 +313,12 @@ function drawSeasonChart() {
       const c = at(r, s);
       if (!c.n) return;
       const cx = (x(i) + (k ? off : -off)).toFixed(1);
-      svg += `<line class="ci s-${s.cls}" x1="${cx}" x2="${cx}" y1="${y(c.ci[0]).toFixed(1)}" y2="${y(c.ci[1]).toFixed(1)}"/>` +
-        `<circle class="pt s-${s.cls}" cx="${cx}" cy="${y(c.diff).toFixed(1)}" r="4"/>`;
+      svg += `<circle class="pt s-${s.cls}" cx="${cx}" cy="${y(c.diff).toFixed(1)}" r="4"/>`;
     });
   });
   // Träffytor: hela säsongens kolumn, med båda värdena.
   rows.forEach((r, i) => {
-    const t = series.map((s) => { const c = at(r, s); return c.n ? `${s.label}: ${sgn(c.diff)} (${sgn(c.ci[0])} till ${sgn(c.ci[1])}, ${c.n} matcher)` : `${s.label}: –`; }).join('\n');
+    const t = series.map((s) => { const c = at(r, s); return c.n ? `${s.label}: ${sgn(c.diff)} (${c.n} matcher)` : `${s.label}: –`; }).join('\n');
     svg += `<rect class="hit" x="${(x(i) - band / 2).toFixed(1)}" y="${T}" width="${band.toFixed(1)}" height="${H - T - B}"><title>${esc(r.label)}\n${esc(t)}</title></rect>`;
   });
   svg += '</svg>';
@@ -358,23 +355,25 @@ function candidatesSection(L, promoted = new Map()) {
   ];
   const all = [...latest.values()];
   const inUse = all.filter((e) => groupOf(e) === 0).length;
+  // De underkända står bara i loggen.
+  const rejected = all.filter((e) => groupOf(e) === 2).length;
   let html = `<h3>Prövat och förkastat <span class="hint">${all.length} idéer · ${inUse === 1 ? 'en' : inUse} styr prognosen</span></h3>` +
     '<p class="legend">En idé får styra prognosen först när den bevisligen gjort den bättre i efterhandstestet – annars syns den bara som underlag i matchrutan. ' +
-    `Senast prövade ${dateOnly(run.ranAt)} på säsongerna ${esc(run.seasons[0])}–${esc(run.seasons[1])} · <a href="${log}" target="_blank" rel="noopener">hela loggen</a></p>`;
+    `Senast prövade ${dateOnly(run.ranAt)} på säsongerna ${esc(run.seasons[0])}–${esc(run.seasons[1])} · ${rejected ? `de ${rejected} underkända står i ` : ''}<a href="${log}" target="_blank" rel="noopener">hela loggen</a></p>`;
 
   const row = (e) => {
     const earlier = count.get(e.id) - 1;
     const why = promoted.has(e.id) ? `sedan regelversion\u00a0${promoted.get(e.id).replace(/-/g, '\u2011')}`
-      : e.verdict === 'godkänd' ? 'hela intervallet under noll' : e.why;
-    const diff = e.n ? `<td class="num" title="${esc(`${sgn(e.ci[0], 4)} till ${sgn(e.ci[1], 4)} · ${n0(e.n)} matcher ${e.seasons[0]}–${e.seasons[1]}`)}">${sgn(e.diff, 4)}</td>` : '<td class="num muted">–</td>';
-    const out = `${esc(why)}${earlier ? ` · prövad ${earlier} gång${earlier === 1 ? '' : 'er'} tidigare` : ''}`;
+      : e.verdict === 'godkänd' ? '' : e.why;
+    const diff = e.n ? `<td class="num" title="${esc(`${n0(e.n)} matcher ${e.seasons[0]}–${e.seasons[1]}`)}">${sgn(e.diff, 4)}</td>` : '<td class="num muted">–</td>';
+    const out = [esc(why), earlier ? `prövad ${earlier} gång${earlier === 1 ? '' : 'er'} tidigare` : ''].filter(Boolean).join(' · ');
     // I telefonen står utfallet under idén i stället för i en egen kolumn.
     return `<tr><td>${esc(e.label)}<span class="sub">${esc(e.motive)}</span>${e.paramText ? `<span class="sub">Skattat: ${esc(e.paramText)}</span>` : ''}` +
       `<span class="sub ml-why ml-why-sm">${out}</span></td>${diff}<td class="ml-why-col"><span class="sub ml-why">${out}</span></td></tr>`;
   };
   const body = GROUPS.map(([title, cls], g) => {
     const list = all.filter((e) => groupOf(e) === g);
-    if (!list.length) return '';
+    if (!list.length || g === 2) return '';
     return `<tbody><tr class="ml-group"><th colspan="3" class="${cls}">${esc(title)} <span class="muted">${list.length}</span></th></tr>${list.map(row).join('')}</tbody>`;
   }).join('');
   html += '<div class="table-wrap ml-cands"><table><thead><tr><th>Idé</th>' +
@@ -384,8 +383,7 @@ function candidatesSection(L, promoted = new Map()) {
   html += method('Så prövas en idé', [
     ['Kravet', `Skrevs ${dateOnly(crit.registered)}, före första körningen, och ändras inte:` +
       `<ul class="bullets">${crit.text.map((t) => `<li>${esc(t)}</li>`).join('')}</ul>`],
-    ['Skillnad', 'Idén − grundmodellen i log-poäng på samma matcher. Under noll = idén bättre. Intervallet visas när du håller muspekaren över siffran.'],
-    ['Intervall', `${dec(run.level * 100, 2)} % – strängare än vanligt, eftersom ${run.candidates} idéer prövas samtidigt och någon annars skulle klara kravet av ren tur.`],
+    ['Skillnad', 'Idén − grundmodellen i log-poäng på samma matcher. Under noll = idén bättre.'],
     ['Beslut', 'En idé som klarat kravet blir en ny regelversion först efter beslut.'],
     ['Loggen', 'Allt som prövats sparas med utfall och datum, även det som inte fungerade, så att samma idé inte prövas igen utan nya belägg.'],
     L.untestable && L.untestable.length && ['Kan inte prövas än', '<ul class="plain">' +
@@ -405,7 +403,6 @@ function detailsSection(d, x, factors) {
     table && ['Tabelläget', `${table.effect >= 0 ? '+' : '−'}${dec(Math.abs(table.effect) * 100, 1)} % mål per poäng per match bättre än motståndaren i årets liga, räknat ur resultaten (utan poängavdrag). ` +
       `Bara ligamatcher där båda lagen spelat minst ${table.minMatches} ligamatcher i år. Vikten skattad i efterhandstestet; infört i regelversion ${esc(table.since)}.`],
     ['Under National League', `Ingen egen lagdata. Lagen skattas som ett gemensamt nivåsnitt ur ${x.lowerMatches} FA-cupmatcher sedan ${esc(x.lowerSince)} och märks i matchrutan.`],
-    ['Osäkerhet', `Spannet i matchrutan är de mittersta ${pct(x.interval)} % när modellen skattas om ${x.samples} gånger med slumpvikter på matcherna (Bayesiansk bootstrap) – osäkerheten i lagens styrka, inte i själva modellen.`],
     ['Cuperna', 'Prognosen gäller 90 minuter. Chansen att gå vidare räknas ur samma modell: förlängning med samma målfrekvens, straffar 50/50. ' +
       'FA-cupen: förlängning och straffar. EFL-cupen: straffar direkt, utom i semifinalerna (två möten) och finalen.'],
   ]);
@@ -420,12 +417,12 @@ function detailsSection(d, x, factors) {
   if (b) {
     html += `<h4 class="sub-h">Efterhandstestet <span class="hint">ligorna ${esc(b.first)}–${esc(b.last)}</span></h4>` +
       '<div class="table-wrap"><table><thead><tr><th>Modellen mot</th><th class="num">Matcher</th><th class="num">Modellen</th><th class="num">Måttstocken</th>' +
-      '<th class="num" title="Modellen − måttstocken i log-poäng, 95 % bootstrap-intervall. Under noll = modellen bättre.">Skillnad</th><th class="num">Brier</th></tr></thead><tbody>' +
+      '<th class="num" title="Modellen − måttstocken i log-poäng. Under noll = modellen bättre.">Skillnad</th></tr></thead><tbody>' +
       MEASURES.map((m) => {
         const r = b.leagues.vs.find((c) => c.key === m.bt);
         if (!r || !r.n) return '';
         return `<tr><td>${esc(m.name())}</td><td class="num">${n0(r.n)}</td><td class="num">${f3(r.logLoss[0])}</td><td class="num">${f3(r.logLoss[1])}</td>` +
-          `${diffTd(r, { strong: true }).replace('</td>', `<span class="sub">${sgn(r.ci[0])} till ${sgn(r.ci[1])}</span></td>`)}<td class="num">${f3(r.brier[0])} / ${f3(r.brier[1])}</td></tr>`;
+          `${diffTd(r, { strong: true })}</tr>`;
       }).join('') + '</tbody></table></div>';
     if (d.backtest.versions.length > 1) {
       const vsOf = (v, key) => v.leagues.vs.find((c) => c.key === key);
@@ -437,8 +434,7 @@ function detailsSection(d, x, factors) {
     }
     html += defs([
       ['Steg för steg', `Varje match ${esc(b.first)}–${esc(b.last)} fick en prognos skattad bara på matcherna före matchdagen, med samma kod och regler som i dag.`],
-      ['Skillnad', 'Modellen − måttstocken i log-poäng; under noll = modellen bättre, med 95 % bootstrap-intervall där hela matchdagar dras om. Varje rad jämför på de matcher där båda finns.'],
-      ['Brier', 'Ett annat mått på hur väl sannolikheterna träffade, också det lägre är bättre.'],
+      ['Skillnad', 'Modellen − måttstocken i log-poäng; under noll = modellen bättre. Varje rad jämför på de matcher där båda finns.'],
       b.factors && ['Tabelläget', 'Vikten skattas säsong för säsong enbart på tidigare säsonger (den första säsongen utan tabelläge), inte med värdet i regelfilen.'],
       ['Täckning', `${n0(b.modelKnown)} av ${n0(b.matches)} matcher fick en modellprognos; de övriga hade för lite underlag för ett lag.`],
       ['Körning', `För hand när regelversionen ändras, inte vid varje uppdatering. Senast ${when(b.ranAt)}, regelversion ${esc(b.rulesVersion)}.`],
@@ -501,12 +497,12 @@ function renderEvaluation(d) {
   more += '<h4 class="sub-h">Så räknas det</h4>' + defs([
     ['Journalen', 'Ny rad när prognosen ändrats så mycket att det syns på sidan, eller när spelbolagens odds ändrats.'],
     ['Facit', 'Den sista raden före avspark räknas, mot ställningen efter 90 minuter.'],
-    ['Log-poäng, Brier', 'Hur väl sannolikheterna träffade. Lägre är bättre.'],
-    ['Skillnad', 'Modellen − måttstocken i log-poäng med 95 % bootstrap-intervall; under noll = modellen bättre. Varje rad jämför på de matcher där båda fanns.'],
+    ['Log-poäng', 'Hur väl sannolikheterna träffade. Lägre är bättre.'],
+    ['Skillnad', 'Modellen − måttstocken i log-poäng; under noll = modellen bättre. Varje rad jämför på de matcher där båda fanns.'],
     ['Minsta underlag', `Snitt och skillnader visas från ${min} matcher – före dess är underlaget för litet för att säga något.`],
     ['Stämmer procenten?', 'Varje match ger tre prognoser – hemmaseger, oavgjort och bortaseger – som sorteras i korgar om tio procentenheter. ' +
-      `Prickarna ska ligga nära diagonalen: av allt modellen gav 40 % ska ungefär 40 % ha hänt. Strecket är ett 95 %-intervall${d.minBin ? `; korgar med färre än ${d.minBin} prognoser visas inte` : ''}.`],
-    ['Att gå vidare', 'Modellens chans att gå vidare mot vem som gick vidare (förlängning och straffar inräknade), jämfört med slantsingling. Dubbelmöten (EFL-cupens semifinaler) utvärderas inte än.'],
+      `Prickarna ska ligga nära diagonalen: av allt modellen gav 40 % ska ungefär 40 % ha hänt.${d.minBin ? ` Korgar med färre än ${d.minBin} prognoser visas inte.` : ''}`],
+    ['Att gå vidare', 'Modellens chans att gå vidare mot vem som gick vidare (förlängning och straffar inräknade). Dubbelmöten (EFL-cupens semifinaler) utvärderas inte än.'],
     ['Värdespel', 'Teoretiskt: 1 kr på varje utfall där modellens chans gånger spelbolagens odds i journalraden är större än 1, vinst eller förlust per 100 kr' +
       `${d.minBets ? ` (visas från ${d.minBets} spel)` : ''}. Ligorna mot spelbolagens snitt, cuperna mot DraftKings. Inte ett mått på hur bra prognoserna är.`],
   ]);
@@ -515,17 +511,16 @@ function renderEvaluation(d) {
 }
 
 function overallTable(g, min) {
-  const head = `<p class="legend">Modellen: log-poäng <strong>${f3(g.model.logLoss)}</strong> · Brier <strong>${f3(g.model.brier)}</strong> · ${g.n} matcher</p>`;
+  const head = `<p class="legend">Modellen: log-poäng <strong>${f3(g.model.logLoss)}</strong> · ${g.n} matcher</p>`;
   const order = MEASURES.map((m) => g.vs.find((v) => v.key === m.ev)).filter(Boolean);
   const rows = order.map((v) => {
     const name = esc(mlMeasure(v.key).name());
-    if (!v.logLoss) return `<tr><td>${name}</td><td class="num">${v.n}</td><td colspan="3" class="muted">för få matcher (minst ${min})</td></tr>`;
+    if (!v.logLoss) return `<tr><td>${name}</td><td class="num">${v.n}</td><td colspan="2" class="muted">för få matcher (minst ${min})</td></tr>`;
     return `<tr><td>${name}</td><td class="num">${v.n}</td><td class="num">${f3(v.logLoss[0])} / ${f3(v.logLoss[1])}</td>` +
-      `${diffTd(v, { strong: true }).replace('</td>', `<span class="sub">${sgn(v.ci[0])} till ${sgn(v.ci[1])}</span></td>`)}` +
-      `<td class="num">${f3(v.brier[0])} / ${f3(v.brier[1])}</td></tr>`;
+      `${diffTd(v, { strong: true })}</tr>`;
   }).join('');
   return head + '<div class="table-wrap"><table><thead><tr><th>Modellen mot</th><th class="num">Matcher</th>' +
-    '<th class="num">Log-poäng</th><th class="num" title="Modellen − måttstocken, 95 % bootstrap-intervall. Under noll = modellen bättre.">Skillnad</th><th class="num">Brier</th></tr></thead>' +
+    '<th class="num">Log-poäng</th><th class="num" title="Modellen − måttstocken. Under noll = modellen bättre.">Skillnad</th></tr></thead>' +
     `<tbody>${rows}</tbody></table></div>`;
 }
 
@@ -540,17 +535,18 @@ function breakdownTable(groups, min) {
     return diffTd(v);
   };
   const rows = groups.map((g) => `<tr><td>${g.label}</td><td class="num">${g.n}</td>` +
-    (g.model ? `<td class="num">${f3(g.model.logLoss)}</td><td class="num">${f3(g.model.brier)}</td>`
-      : g.n ? `<td class="num muted" colspan="2">för få<span class="sub">${g.n} av ${min}</span></td>` : '<td class="num muted" colspan="2">–</td>') +
+    (g.model ? `<td class="num">${f3(g.model.logLoss)}</td>`
+      : g.n ? `<td class="num muted">för få<span class="sub">${g.n} av ${min}</span></td>` : '<td class="num muted">–</td>') +
     keys.map((k) => cell(g, k)).join('') + '</tr>').join('');
-  return '<div class="table-wrap"><table><thead><tr><th></th><th class="num">Matcher</th><th class="num">Log-poäng</th><th class="num">Brier</th>' +
+  return '<div class="table-wrap"><table><thead><tr><th></th><th class="num">Matcher</th><th class="num">Log-poäng</th>' +
     keys.map((k) => vsTh(mlMeasure(k))).join('') + '</tr></thead>' +
     `<tbody>${rows}</tbody></table></div>`;
 }
 
 // Stämmer procenten: modellens chans mot hur ofta det blev så, per korg om
-// tio procentenheter, med 95 %-intervall.
+// tio procentenheter. Bara korgar med tillräckligt många prognoser står med.
 function calibrationBlock(cal) {
+  const bins = cal.bins.filter((b) => b.freq != null);
   const W = 310;
   const H = 280;
   const L = 50;
@@ -568,17 +564,14 @@ function calibrationBlock(cal) {
     }
   }
   svg += `<line class="diag" x1="${x(0)}" y1="${y(0)}" x2="${x(1)}" y2="${y(1)}"/>`;
-  for (const b of cal.bins) {
-    if (b.freq == null) continue;
-    svg += `<line class="ci" x1="${x(b.meanP)}" x2="${x(b.meanP)}" y1="${y(b.ci[0])}" y2="${y(b.ci[1])}"/>` +
-      `<circle class="pt" cx="${x(b.meanP)}" cy="${y(b.freq)}" r="4"><title>${pct(b.lo)}–${pct(b.hi)} %: modellen sa ${pct(b.meanP)} %, det blev ${pct(b.freq)} % (${b.n} prognoser)</title></circle>`;
+  for (const b of bins) {
+    svg += `<circle class="pt" cx="${x(b.meanP)}" cy="${y(b.freq)}" r="4"><title>${pct(b.lo)}–${pct(b.hi)} %: modellen sa ${pct(b.meanP)} %, det blev ${pct(b.freq)} % (${b.n} prognoser)</title></circle>`;
   }
   svg += `<text class="axis" x="${(L + W - R) / 2}" y="${H - 4}" text-anchor="middle">Modellen sa</text>` +
     `<text class="axis" x="12" y="${(T + H - B) / 2}" text-anchor="middle" transform="rotate(-90 12 ${(T + H - B) / 2})">Det blev</text></svg>`;
 
-  const rows = cal.bins.map((b) => `<tr><td class="num">${pct(b.lo)}–${pct(b.hi)} %</td><td class="num">${b.n}</td>` +
-    `<td class="num">${b.n ? `${pct(b.meanP)} %` : '–'}</td>` +
-    `<td class="num">${b.freq != null ? `${pct(b.freq)} %<span class="sub">${pct(b.ci[0])}–${pct(b.ci[1])} %</span>` : b.n ? '<span class="muted">för få</span>' : '–'}</td></tr>`).join('');
+  const rows = bins.map((b) => `<tr><td class="num">${pct(b.lo)}–${pct(b.hi)} %</td><td class="num">${b.n}</td>` +
+    `<td class="num">${pct(b.meanP)} %</td><td class="num">${pct(b.freq)} %</td></tr>`).join('');
   return `<div class="grid2"><div class="card">${svg}</div><div class="table-wrap" style="margin:0"><table class="odds"><thead><tr><th class="num">Modellen sa</th><th class="num">Prognoser</th>` +
     `<th class="num">Snitt</th><th class="num">Det blev</th></tr></thead><tbody>${rows}</tbody></table></div></div>`;
 }
@@ -588,10 +581,10 @@ function advanceTable(a, min) {
   if (!a.all.n) return '<p class="legend">Inga avgjorda cupmatcher i journalen än.</p>';
   const rows = groups.map((g) => `<tr><td>${esc(g.name)}</td><td class="num">${g.n}</td>` +
     (g.logLoss != null
-      ? `<td class="num">${f3(g.logLoss)} / ${f3(g.coin.logLoss)}</td><td class="num">${f3(g.brier)} / ${f3(g.coin.brier)}</td>`
-      : `<td class="num muted" colspan="2">${g.n ? `för få matcher (minst ${min})` : '–'}</td>`) + '</tr>').join('');
-  return '<div class="table-wrap"><table><thead><tr><th></th><th class="num">Matcher</th><th class="num">Log-poäng modellen / slant</th>' +
-    `<th class="num">Brier modellen / slant</th></tr></thead><tbody>${rows}</tbody></table></div>`;
+      ? `<td class="num">${f3(g.logLoss)}</td>`
+      : `<td class="num muted">${g.n ? `för få matcher (minst ${min})` : '–'}</td>`) + '</tr>').join('');
+  return '<div class="table-wrap"><table><thead><tr><th></th><th class="num">Matcher</th><th class="num">Log-poäng</th>' +
+    `</tr></thead><tbody>${rows}</tbody></table></div>`;
 }
 
 function valueTable(d, minBets) {
@@ -616,7 +609,7 @@ function recentTable(all) {
   const rows = list.map((r) => {
     const w = listOdds(pct3(r.p)).map((v, k) => (k === r.o ? `<b>${v}</b>` : v)).join(' · ');
     return `<tr><td><a href="#match/${esc(r.id)}">${esc(r.home)}–${esc(r.away)}</a><span class="sub">${esc(compOf(r.comp).short)} · ${dateOnly(r.kickoff)}</span></td>` +
-      `<td class="num">${w}<span class="sub">loggad ${when(r.loggedAt)}</span></td><td class="num">${r.score90.home}–${r.score90.away}</td>` +
+      `<td class="num">${w}</td><td class="num">${r.score90.home}–${r.score90.away}</td>` +
       `<td class="num">${dec(r.logLoss, 2)} / ${r.market != null ? dec(r.market, 2) : '–'}</td></tr>`;
   }).join('');
   return '<div class="table-wrap"><table><thead><tr><th>Match</th><th class="num" title="1 · X · 2 som odds, utfallet i fetstil">Före avspark</th><th class="num">Efter 90</th>' +

@@ -456,13 +456,9 @@ function teamProfile(D, k, before, S = null) {
     through: results.length ? results[results.length - 1].date : null,
     source: resultsSource,
   };
-  // Målprofilen i ligan: hur ofta lagets matcher gett över 2,5 mål, mål av
-  // båda lagen, hållen nolla och inget eget mål – samma mått som prognosens
-  // "över 2,5" och "båda lagen gör mål".
+  // Målprofilen i ligan: hur ofta laget hållit nollan och inte gjort mål.
   p.goalProfile = {
     n: results.length,
-    over25: results.filter((r) => r.gf + r.ga > 2.5).length,
-    btts: results.filter((r) => r.gf > 0 && r.ga > 0).length,
     cleanSheets: results.filter((r) => r.ga === 0).length,
     blanks: results.filter((r) => r.gf === 0).length,
   };
@@ -727,8 +723,6 @@ function sideBySide(h, a) {
     sources: [src(h, 'record'), src(a, 'record')],
     through: [h.record && h.record.through, a.record && a.record.through],
     rows: [
-      { label: 'Över 2,5 mål', values: both((p) => gp(p, 'over25')) },
-      { label: 'Båda lagen gör mål', values: both((p) => gp(p, 'btts')) },
       { label: 'Hållit nollan', values: both((p) => gp(p, 'cleanSheets')) },
       { label: 'Inte gjort mål', values: both((p) => gp(p, 'blanks')) },
     ],

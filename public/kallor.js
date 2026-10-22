@@ -69,15 +69,16 @@ function renderSources(d) {
     byShort.get(s.short).push(s);
   }
   const providers = (d.providers || []).filter((p) => byShort.has(p.id) || p.live);
-  const n = (st) => d.sources.filter((s) => s.status === st).length;
+  // Källor där minst en hämtning har fel eller är gammal (felet räknas först).
+  const n = (st) => providers.filter((p) => (byShort.get(p.id) || []).length && srcWorst(byShort.get(p.id)) === st).length;
   const problems = n('fel') + n('gammal');
   const meta = state.meta;
 
   let html = '<div class="src-page">';
   html += tiles([
-    ['Hämtningar', String(d.sources.length),
-      `${providers.length} fria källor · ${problems ? [n('fel') && `${n('fel')} med fel`, n('gammal') && `${n('gammal')} gamla`].filter(Boolean).join(' · ') : 'alla fungerar'}`,
-      'Sajten hämtar själv från källorna. Startelvorna, matchhändelserna och Stryktipset hämtas i stället när du tittar på dem.'],
+    ['Källorna', String(providers.length),
+      problems ? [n('fel') && `${n('fel')} med fel`, n('gammal') && `${n('gammal')} gamla`].filter(Boolean).join(' · ') : 'alla fungerar',
+      'Fria källor. Startelvorna, matchhändelserna och Stryktipset hämtas när du tittar på dem.'],
     ['Uppdaterad', meta ? esc(fTime.format(new Date(meta.generatedAt))) : '–', meta ? `${srcAgo(meta.generatedAt).replace(/ \d\d:\d\d$/, '')}, var ${meta.updateEveryMinutes}:e minut` : '',
       meta ? `Sajten uppdaterades ${fDateTime.format(new Date(meta.generatedAt))}. Varje källa hämtas när dess intervall gått ut.` : null],
   ]);
@@ -132,15 +133,6 @@ function providerCard(p, list) {
   let body = `<dl class="src-facts">${facts.map(([k, v]) => `<dt>${k}</dt><dd>${v}</dd>`).join('')}</dl>`;
   if (bad.length) {
     body += bad.map((s) => `<p class="err">${esc(s.label)}: ${s.lastError ? `${esc(s.lastError)} (${when(s.lastAttempt)})` : `senast hämtad ${when(s.fetchedAt)}`}</p>`).join('');
-  }
-  if (list.length) {
-    body += `<details class="src-runs"><summary>${list.length === 1 ? 'Hämtningen' : `Alla ${list.length} hämtningar`}</summary>` +
-      '<div class="table-wrap"><table><thead><tr><th>Vad</th><th class="num">Senast</th><th class="num">Data t.o.m.</th><th>Innehåll</th></tr></thead><tbody>' +
-      list.map((s) => `<tr><td>${srcDot(s.status)}${s.url ? `<a href="${esc(s.url)}" target="_blank" rel="noopener">${esc(s.label)}</a>` : esc(s.label)}</td>` +
-        `<td class="num">${srcAgo(s.fetchedAt)}<span class="sub">${esc(srcCadence(s.cadenceHours))}</span></td>` +
-        `<td class="num">${s.latestData ? dateOnly(s.latestData) : '–'}</td>` +
-        `<td>${s.detail ? esc(s.detail) : '<span class="unknown">okänt</span>'}<span class="sub">kontrollerad ${dateOnly(s.verified)}</span></td></tr>`).join('') +
-      '</tbody></table></div></details>';
   }
   return `<div class="card src-card"><div class="src-head"><h4><a href="${esc(p.url)}" target="_blank" rel="noopener">${esc(p.name)}</a></h4>${badge}</div>${body}</div>`;
 }

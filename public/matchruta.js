@@ -432,8 +432,6 @@
     ['shotsOnTarget', 'Skott på mål'],
     ['wonCorners', 'Hörnor'],
     ['saves', 'Räddningar'],
-    ['totalPasses', 'Passningar'],
-    ['passPct', 'Lyckade passningar', (v) => `${Math.round(v * 100)} %`],
     ['foulsCommitted', 'Regelbrott'],
     ['offsides', 'Offside'],
     ['yellowCards', 'Gula kort'],
@@ -450,20 +448,16 @@
       const v = s ? Number(s.displayValue) : NaN;
       return Number.isFinite(v) ? v : null;
     };
-    // ESPN avrundar passningsandelen till en decimal (0,9) – räknas här ur antalen.
-    const get = (t, k) => (k === 'passPct'
-      ? (val(t, 'totalPasses') ? val(t, 'accuratePasses') / val(t, 'totalPasses') : null)
-      : val(t, k));
     const rows = STATS.map(([k, label, f]) => {
-      const x = get(h, k);
-      const y = get(a, k);
+      const x = val(h, k);
+      const y = val(a, k);
       if (x == null || y == null) return '';
       const fmt = f || ((v) => String(v));
-      const sum = k === 'passPct' ? 0 : x + y;
+      const sum = x + y;
       const w = sum > 0 ? (x / sum) * 100 : 50;
       const lead = x > y ? ' h' : y > x ? ' a' : '';
       return `<div class="mr-stat${lead}"><b>${fmt(x)}</b><span>${label}</span><b>${fmt(y)}</b>` +
-        (k === 'passPct' ? '' : `<div class="mr-bar"><i style="width:${w.toFixed(1)}%"></i><i style="width:${(100 - w).toFixed(1)}%"></i></div>`) + '</div>';
+        `<div class="mr-bar"><i style="width:${w.toFixed(1)}%"></i><i style="width:${(100 - w).toFixed(1)}%"></i></div></div>`;
     }).join('');
     return rows ? `<div class="card mr-stats"><h4>Statistik</h4>${rows}</div>` : '';
   }
