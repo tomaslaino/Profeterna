@@ -143,21 +143,37 @@ const ZONES = [
 ];
 const zoneOf = (note) => (note ? ZONES.find((z) => z.test(note)) || null : null);
 
+// Zonstrecket med zonens namn där zonen slutar: under de övre zonerna, ovanför
+// nedflyttningen – aldrig i tabellens kant. rows kan ha luckor (null).
+function zoneLine(rows, i, cols) {
+  const line = (z) => `<tr class="dv-zline ${z.cls}" aria-hidden="true"><td colspan="${cols}"><div><span>${esc(z.label)}</span></div></td></tr>`;
+  const z = rows[i] && zoneOf(rows[i].note);
+  if (!z) return { before: '', after: '' };
+  const prev = i > 0 ? rows[i - 1] : undefined;
+  const next = i < rows.length - 1 ? rows[i + 1] : undefined;
+  const other = (r) => !r || (zoneOf(r.note) || {}).label !== z.label;
+  return {
+    before: z.cls === 'z-down' && prev !== undefined && other(prev) ? line(z) : '',
+    after: z.cls !== 'z-down' && next !== undefined && other(next) ? line(z) : '',
+  };
+}
+
 // Som en vanlig tabell: S V O F, målen och poängen.
 function leagueTable(rows) {
   const head = '<thead><tr><th class="c">#</th><th>Lag</th><th class="num" title="Spelade matcher">S</th>' +
     '<th class="num" title="Vunna">V</th><th class="num" title="Oavgjorda">O</th><th class="num" title="Förlorade">F</th>' +
     '<th class="num" title="Gjorda–insläppta mål">Mål</th><th class="num" title="Målskillnad">+/−</th>' +
     '<th class="num" title="Poäng: 3 för vinst, 1 för oavgjort">P</th></tr></thead>';
-  const body = rows.map((r) => {
+  const body = rows.map((r, i) => {
     if (!r) return `<tr class="dv-gap"><td colspan="9">⋯</td></tr>`;
     const z = zoneOf(r.note);
+    const zl = zoneLine(rows, i, 9);
     const gd = r.gd > 0 ? `+${r.gd}` : r.gd < 0 ? `−${-r.gd}` : '0';
-    return `<tr class="dv-trow ${z ? z.cls : ''}" data-team="${esc(r.espnId)}" tabindex="0" title="${z ? esc(z.label) : ''}">` +
+    return zl.before + `<tr class="dv-trow ${z ? z.cls : ''}" data-team="${esc(r.espnId)}" tabindex="0" title="${z ? esc(z.label) : ''}">` +
       `<td class="c rank">${r.rank}</td><td class="team">${teamName(r.name)}</td><td class="num">${r.played}</td>` +
       `<td class="num">${r.won}</td><td class="num">${r.drawn}</td><td class="num">${r.lost}</td>` +
       `<td class="num">${r.gf}–${r.ga}</td><td class="num">${gd}</td>` +
-      `<td class="num pts">${r.points}${r.deductions ? `<sup title="${r.deductions} poängs avdrag">*</sup>` : ''}</td></tr>`;
+      `<td class="num pts">${r.points}${r.deductions ? `<sup title="${r.deductions} poängs avdrag">*</sup>` : ''}</td></tr>` + zl.after;
   }).join('');
   return `<div class="table-wrap dv-tw"><table class="dv-league">${head}<tbody>${body}</tbody></table></div>`;
 }
@@ -167,16 +183,11 @@ function tableView(P) {
     return `<p class="empty">${unknown('okänt – ingen tabell hämtad för divisionen')}</p>`;
   }
   const rows = P.table.rows;
-  const zones = [];
-  for (const r of rows) {
-    const z = zoneOf(r.note);
-    if (z && !zones.some((x) => x.cls === z.cls && x.label === z.label)) zones.push(z);
-  }
   const ded = rows.filter((r) => r.deductions);
   // Utan rubrik: sidan heter Tabeller och divisionen står i flikarna ovanför.
+  // Zonerna förklarar sig själva med strecken i tabellen.
   return card('', {
     body: leagueTable(rows) +
-      `<div class="dv-zones">${zones.map((z) => `<span class="${z.cls}"><i></i>${esc(z.label)}</span>`).join('')}</div>` +
       (ded.length ? `<p class="dv-note">* Poängavdrag: ${ded.map((r) => `${esc(r.name)} −${r.deductions}`).join(', ')}.</p>` : ''),
     src: `Tabell: ESPN, hämtat ${when(P.table.fetchedAt)}`,
     cls: 'dv-tablecard',
@@ -1197,7 +1208,7 @@ async function openTeam(id, pick) {
 // [term, förklaring, sidan den hör till – utan sida på båda]
 const GLOSSARY = [
   ['S V O F P', 'Tabellen: spelade, vunna, oavgjorda, förlorade och poäng (3 för vinst, 1 för oavgjort). Lika poäng skiljs åt på målskillnad (+/−) och sedan gjorda mål.', 'tabeller'],
-  ['Zonerna', 'Färgen till vänster i tabellen: vad placeringen ger i slutet av säsongen enligt ESPN – uppflyttning, kval (playoff), Europa eller nedflyttning.', 'tabeller'],
+  ['Zonerna', 'De färgade raderna och strecken i tabellen: vad placeringen ger i slutet av säsongen enligt ESPN – uppflyttning, kval (playoff), Europa eller nedflyttning.', 'tabeller'],
   ['M, Start, Min, Ass, M+A', 'Spelartabellen: matcher (från start och inhopp), matcher från start, spelade minuter, assist och mål plus assist.', 'statistik'],
   ['– och grå 0', 'Streck = okänt (ESPN har ingen statistik för spelaren), grå 0 = noll.'],
   ['Spelarstatistiken', 'Bara ligamatcher i år, ur ESPN:s trupper. Den släpar ofta en omgång efter tabellen; självmål och spelare som lämnat klubben saknas. I Premier League kommer speltid, xG, försvarsspel från Fantasy Premier League, i övriga ligor räknas speltiden ur ESPN:s matchrapporter (byten och röda kort, utan tilläggstid). Målens sort och betydelse kommer från matchrapporterna i alla fyra ligor.', 'statistik'],
@@ -1478,29 +1489,46 @@ function embedData() {
   }
   return embedLoad;
 }
-if (EMBEDDED) {
-  window.Spelarkort = {
-    // 365Scores athleteId → spelarens id i divisionens spelarfil.
-    async index(div) {
-      await embedData();
-      const P = await loadPlayers(div);
-      return new Map(P.unknown ? [] : P.players.filter((p) => p.ph).map((p) => [p.ph[0], p.id]));
-    },
-    async open(div, id) {
-      await embedData();
-      if ((await loadPlayers(div)).unknown) return;
-      state.div = div;
-      openPlayer(id);
-    },
-    // Lagkortet (ESPN:s lag-id), på fliken pick eller den senast valda.
-    async team(div, espnId, pick) {
-      await embedData();
-      if ((await loadPlayers(div)).unknown) return;
-      state.div = div;
-      openTeam(espnId, pick);
-    },
-  };
+// Tabeller och Statistik: klart när sidan ritats första gången (init).
+let pageDone;
+const pageReady = new Promise((res) => { pageDone = res; });
+
+// Divisionen för ett kort utifrån (matchbladet, sökningen i sok.js). På
+// Tabeller och Statistik följer sidan med till divisionen innan kortet
+// öppnas, så att kortet och sidan under det handlar om samma division.
+async function cardDiv(div) {
+  if (EMBEDDED) {
+    await embedData();
+    if ((await loadPlayers(div)).unknown) return false;
+    state.div = div;
+    return true;
+  }
+  await pageReady;
+  if (!state.data || state.data.error || !state.data.divisions.some((x) => x.id === div)) return false;
+  if (state.div !== div) {
+    const h = `#${div}/${state.view}`;
+    if (location.hash === h) apply();
+    else await new Promise((res) => { window.addEventListener('hashchange', res, { once: true }); location.hash = h; });
+  }
+  return !(await loadPlayers(div)).unknown;
 }
+
+window.Spelarkort = {
+  // 365Scores athleteId → spelarens id i divisionens spelarfil.
+  async index(div) {
+    if (EMBEDDED) await embedData();
+    else await pageReady;
+    const P = await loadPlayers(div);
+    return new Map(P.unknown ? [] : P.players.filter((p) => p.ph).map((p) => [p.ph[0], p.id]));
+  },
+  async open(div, id) {
+    if (await cardDiv(div)) openPlayer(id);
+  },
+  // Lagkortet (ESPN:s lag-id), på fliken pick eller den senast valda.
+  async team(div, espnId, pick) {
+    if (await cardDiv(div)) openTeam(espnId, pick);
+  },
+};
 
 window.addEventListener('hashchange', () => {
   // Matchbladet stängs eller byter match: kortet går med.
@@ -1544,4 +1572,4 @@ window.addEventListener('hashchange', () => {
   wire();
   renderView();
   if (window.Spoiler) Spoiler.onChange(renderView);
-})();
+})().finally(pageDone);

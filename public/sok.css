@@ -1,0 +1,153 @@
+/* Sökningen i toppbaren (sok.js): förstoringsglaset bredvid ögat, rutan som
+   läggs ovanpå toppbaren och träffarna under den. Inget i toppbaren flyttar
+   sig när rutan öppnas – den lägger sig över det som står där. Laddas efter
+   theme.css och använder dess färger. */
+
+/* ---------- knappen ---------- */
+
+.topbar .sk-ctl { position: relative; align-self: center; flex: none; margin-left: auto; padding-left: 16px; }
+.topbar .sk-ctl + .sp-ctl { margin-left: 0; padding-left: 4px; }
+/* som ögat bredvid: bara ikonen, ingen ring */
+.sk-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 32px;
+  height: 32px;
+  padding: 0;
+  border: 0;
+  background: none;
+  color: var(--muted);
+  cursor: pointer;
+  transition: color 0.15s ease;
+}
+.sk-btn:hover,
+.sk-btn[aria-expanded="true"] { color: var(--fg); }
+.sk-ic { display: block; flex: none; width: 17px; height: 17px; }
+
+/* ---------- rutan ---------- */
+
+/* Högerkanten i jämnhöjd med förstoringsglaset; den växer åt vänster över
+   den tomma delen av toppbaren. */
+.sk-box {
+  position: absolute;
+  z-index: 50;
+  top: 50%;
+  right: -2px;
+  width: 360px;
+  max-width: calc(100vw - 2 * var(--gutter));
+  transform: translateY(-50%);
+}
+.sk-box[hidden] { display: none; }
+.sk-field {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  height: 42px;
+  padding: 0 2px 0 10px;
+  background: var(--bg);
+  box-shadow: inset 0 -1px 0 var(--gold), -24px 0 24px -12px var(--bg);
+}
+.sk-field .sk-ic { color: var(--gold); }
+.sk-field input {
+  flex: 1;
+  min-width: 0;
+  height: 100%;
+  padding: 0;
+  border: 0;
+  border-radius: 0;
+  background: none;
+  color: var(--fg);
+  font: 400 15px/1 var(--sans);
+  outline: none;
+  -webkit-appearance: none;
+  appearance: none;
+}
+.sk-field input::placeholder { color: var(--muted); }
+.sk-field input::-webkit-search-cancel-button { display: none; }
+.sk-x {
+  flex: none;
+  width: 30px;
+  height: 30px;
+  padding: 0;
+  border: 0;
+  border-radius: 50%;
+  background: none;
+  color: var(--muted);
+  font: 400 22px/1 var(--sans);
+  cursor: pointer;
+}
+.sk-x:hover { color: var(--fg); }
+
+/* ---------- träffarna ---------- */
+
+.sk-list {
+  position: absolute;
+  top: calc(100% + 10px);
+  left: 0;
+  right: 0;
+  max-height: min(520px, calc(100vh - 110px));
+  overflow-y: auto;
+  overscroll-behavior: contain;
+  padding: 6px 0;
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  background: var(--glass-hi);
+  box-shadow: 0 24px 48px -20px rgba(0, 0, 0, 0.9);
+}
+.sk-list[hidden] { display: none; }
+.sk-grp {
+  margin: 0;
+  padding: 10px 16px 4px;
+  font-size: 10.5px;
+  font-weight: 700;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: var(--eyebrow);
+}
+.sk-it {
+  display: grid;
+  grid-template-columns: 20px minmax(0, 1fr);
+  align-items: center;
+  gap: 12px;
+  padding: 8px 16px;
+  cursor: pointer;
+}
+.sk-it[aria-selected="true"] { background: rgba(243, 237, 227, 0.055); }
+.sk-t { min-width: 0; }
+.sk-t b,
+.sk-t small { display: block; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.sk-t b { font-size: 14px; font-weight: 600; color: var(--fg); }
+.sk-t small { margin-top: 2px; font-size: 12px; color: var(--muted); }
+.sk-msg { margin: 0; padding: 12px 16px; font-size: 13px; color: var(--muted); }
+
+/* Telefon: förstoringsglaset står bredvid ögat på loggans rad, och rutan
+   täcker hela den raden; träffarna går från kant till kant under den. */
+@media (max-width: 680px) {
+  .topbar-inner { position: relative; }
+  .topbar .sk-ctl { grid-area: 1 / 2; justify-self: end; position: static; margin-left: 0; padding-left: 0; }
+  .topbar .sk-ctl + .sp-ctl { padding-left: 2px; }
+  .sk-btn { width: 30px; height: 30px; }
+  .sk-box {
+    top: 0;
+    left: var(--gutter);
+    right: var(--gutter);
+    width: auto;
+    max-width: none;
+    height: 52px;
+    display: flex;
+    align-items: center;
+    transform: none;
+  }
+  .sk-box[hidden] { display: none; }
+  .sk-field { flex: 1; box-shadow: inset 0 -1px 0 var(--gold); }
+  .sk-field input { font-size: 16px; } /* 16 px: iPhone zoomar inte in */
+  .sk-list {
+    top: 52px;
+    left: calc(var(--gutter) * -1);
+    right: calc(var(--gutter) * -1);
+    max-height: calc(100vh - 52px);
+    border-width: 0 0 1px;
+    border-radius: 0;
+  }
+}

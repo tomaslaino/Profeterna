@@ -564,10 +564,21 @@ table.cmp tr.model td { background: var(--accent-soft); color: #fff; }
 /* ---------- matchlistan ---------- */
 
 .day { margin: 0 0 28px; }
-/* dagen som en rad i en almanacka: kursiv serif, nyckeln i små versaler */
+/* Dagen i kursiv serif mitt mellan två streck, som nu-linjen. Den står kvar
+   under toppbaren medan man rullar genom dagens matcher, tills nästa dag
+   knuffar undan den. */
 .day-head {
-  display: flow-root; /* nyckeln till höger trycker aldrig in i listan under */
-  margin: 0 0 10px 4px;
+  position: sticky;
+  top: 62px;
+  z-index: 5;
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  margin: 0 0 6px;
+  padding: 8px 0;
+  background: color-mix(in srgb, var(--bg) 84%, transparent);
+  -webkit-backdrop-filter: blur(14px) saturate(120%);
+  backdrop-filter: blur(14px) saturate(120%);
   font-family: var(--display);
   font-style: italic;
   font-weight: 500;
@@ -577,6 +588,8 @@ table.cmp tr.model td { background: var(--accent-soft); color: #fff; }
   text-transform: none;
   color: var(--bone);
 }
+.day-head::before,
+.day-head::after { content: ""; flex: 1; height: 1px; background: color-mix(in srgb, var(--gold) 32%, transparent); }
 /* Raden som en liten biljett (app.js matchRow): tävlingen och höjdpunkterna ytterst
    i lika breda spalter (--edge), lagen speglade kring mitten, där avsparken
    eller resultatet står – mitt i raden och rakt under nu-linjen. */
@@ -831,6 +844,7 @@ footer .foot-links a[aria-current="page"] { color: var(--fg); }
   .brand .logo { width: 32px; height: 32px; border-radius: 10px; }
 
   .topbar-inner { min-height: 58px; }
+  .day-head { top: 58px; } /* på telefonen står bara ikonraden (58 px) kvar */
   .topbar .tabs { margin-left: 14px; gap: 0; }
   .topbar .tabs::before { margin-right: 6px; }
   .tabs .tablist { gap: 0; }

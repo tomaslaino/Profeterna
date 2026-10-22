@@ -1084,6 +1084,19 @@ const ZONES = [
 ];
 const zoneOf = (note) => (note ? ZONES.find(([re]) => re.test(note)) || null : null);
 
+// Zonstrecket som på Tabeller: zonens namn där zonen slutar, under de övre
+// zonerna och ovanför nedflyttningen – aldrig i tabellens kant.
+function zoneLine(rows, i) {
+  const line = (z) => `<tr class="mt-zline ${z[1]}" aria-hidden="true"><td colspan="9"><div><span>${esc(z[2])}</span></div></td></tr>`;
+  const z = zoneOf(rows[i].note);
+  if (!z) return { before: '', after: '' };
+  const other = (r) => (zoneOf(r.note) || [])[2] !== z[2];
+  return {
+    before: z[1] === 'z-down' && i > 0 && other(rows[i - 1]) ? line(z) : '',
+    after: z[1] !== 'z-down' && i < rows.length - 1 && other(rows[i + 1]) ? line(z) : '',
+  };
+}
+
 function tableDivs(d) {
   const ids = [d.teams.home, d.teams.away].map((t) => t && t.league && t.league.id).filter((id) => TABLE_DIVS.has(id));
   return [...new Set(ids)];
@@ -1109,26 +1122,21 @@ function leagueTable(T, keys, cut) {
     show = rows.slice(Math.max(0, at - 3), at + 4);
   }
   const gap = '<tr class="gap"><td colspan="9">⋯</td></tr>';
-  const body = show.map((r) => {
+  const body = show.map((r, i) => {
     const z = zoneOf(r.note);
+    const zl = zoneLine(show, i);
     const k = mine(r);
     const gd = r.gd > 0 ? `+${r.gd}` : r.gd < 0 ? `−${-r.gd}` : '0';
-    return `<tr class="${[z ? z[1] : '', k === 0 ? 'mine h' : k === 1 ? 'mine a' : ''].join(' ').trim()}"${z ? ` title="${esc(z[2])}"` : ''}>` +
+    return zl.before + `<tr class="${[z ? z[1] : '', k === 0 ? 'mine h' : k === 1 ? 'mine a' : ''].join(' ').trim()}"${z ? ` title="${esc(z[2])}"` : ''}>` +
       `<td class="c rank">${r.rank}</td><td class="team">${esc(r.name)}</td>` +
       `<td class="num">${r.m}</td><td class="num hide-sm">${r.w}</td><td class="num hide-sm">${r.d}</td><td class="num hide-sm">${r.l}</td>` +
       `<td class="num hide-sm">${r.gf}–${r.ga}</td><td class="num">${gd}</td>` +
-      `<td class="num pts">${r.pts}${r.ded ? `<sup title="${r.ded} poängs avdrag">*</sup>` : ''}</td></tr>`;
+      `<td class="num pts">${r.pts}${r.ded ? `<sup title="${r.ded} poängs avdrag">*</sup>` : ''}</td></tr>` + zl.after;
   }).join('');
-  const zones = [];
-  for (const r of rows) {
-    const z = zoneOf(r.note);
-    if (z && !zones.some((x) => x[2] === z[2])) zones.push(z);
-  }
   return '<div class="table-wrap"><table class="odds mt-table"><thead><tr><th class="c">#</th><th>Lag</th>' +
     '<th class="num" title="Spelade">S</th><th class="num hide-sm" title="Vunna">V</th><th class="num hide-sm" title="Oavgjorda">O</th><th class="num hide-sm" title="Förlorade">F</th>' +
     '<th class="num hide-sm">Mål</th><th class="num" title="Målskillnad">+/−</th><th class="num" title="Poäng">P</th></tr></thead>' +
-    `<tbody>${cut && show[0] !== rows[0] ? gap : ''}${body}${cut && show[show.length - 1] !== rows[rows.length - 1] ? gap : ''}</tbody></table></div>` +
-    (cut ? '' : `<p class="mt-zones">${zones.map(([, cls, label]) => `<span class="${cls}"><i></i>${esc(label)}</span>`).join('')}</p>`);
+    `<tbody>${cut && show[0] !== rows[0] ? gap : ''}${body}${cut && show[show.length - 1] !== rows[rows.length - 1] ? gap : ''}</tbody></table></div>`;
 }
 
 // Fyller fliken Tabellen när filerna kommit. Har divisionen matcher som döljs

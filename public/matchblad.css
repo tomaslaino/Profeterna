@@ -513,19 +513,22 @@ dialog.mr-modal table.mt-table td.team { overflow: hidden; text-overflow: ellips
 dialog.mr-modal table.mt-table td.rank { color: var(--pp-ink-soft); font-variant-numeric: tabular-nums; }
 dialog.mr-modal table.mt-table td.team { white-space: nowrap; }
 dialog.mr-modal table.mt-table td.pts { font-weight: 700; }
+/* zonerna som på Tabeller: raden tonad, strecket med namnet där zonen slutar
+   (app.js zoneLine); matchens lag behåller sin egen färg */
+dialog.mr-modal table.mt-table tr { --zc: transparent; }
+dialog.mr-modal table.mt-table tr.z-up { --zc: var(--pp-ok); }
+dialog.mr-modal table.mt-table tr.z-eu { --zc: var(--pp-pen); }
+dialog.mr-modal table.mt-table tr.z-po { --zc: var(--stale); }
+dialog.mr-modal table.mt-table tr.z-down { --zc: var(--pp-no); }
+dialog.mr-modal table.mt-table tr:is(.z-up, .z-eu, .z-po, .z-down) td { background: color-mix(in srgb, var(--zc) 10%, transparent); }
+dialog.mr-modal table.mt-table tr:is(.z-up, .z-eu, .z-po, .z-down) td.rank { color: var(--zc); }
+dialog.mr-modal table.mt-table tr.mt-zline > td { padding: 0; border: 0; background: none; }
+dialog.mr-modal .mt-zline div { display: flex; align-items: center; gap: 10px; height: 18px; font-size: 10.5px; font-weight: 700; letter-spacing: 0.14em; text-transform: uppercase; color: var(--zc); }
+dialog.mr-modal .mt-zline div::before { content: ""; flex: 1; height: 1px; background: color-mix(in srgb, var(--zc) 60%, transparent); }
+dialog.mr-modal .mt-zline span { flex: none; padding-right: 2px; }
 dialog.mr-modal table.mt-table tr.mine td { font-weight: 700; color: var(--pp-ink); background: rgba(47, 111, 214, 0.09); }
 dialog.mr-modal table.mt-table tr.mine.a td { background: rgba(208, 100, 44, 0.1); }
 dialog.mr-modal table.mt-table tr.gap td { padding: 2px; text-align: center; color: var(--muted); }
-dialog.mr-modal table.mt-table tr.z-up td.rank { color: var(--pp-ok); box-shadow: inset 3px 0 0 var(--pp-ok); }
-dialog.mr-modal table.mt-table tr.z-eu td.rank { color: var(--pp-pen); box-shadow: inset 3px 0 0 var(--pp-pen); }
-dialog.mr-modal table.mt-table tr.z-po td.rank { color: var(--stale); box-shadow: inset 3px 0 0 var(--stale); }
-dialog.mr-modal table.mt-table tr.z-down td.rank { color: var(--pp-no); box-shadow: inset 3px 0 0 var(--pp-no); }
-dialog.mr-modal .mt-zones { display: flex; flex-wrap: wrap; gap: 6px 18px; margin: 14px 0 0; font-size: 12px; color: var(--muted); }
-dialog.mr-modal .mt-zones i { display: inline-block; width: 10px; height: 10px; margin-right: 6px; vertical-align: -1px; border-radius: 2px; }
-dialog.mr-modal .mt-zones .z-up i { background: var(--pp-ok); }
-dialog.mr-modal .mt-zones .z-eu i { background: var(--pp-pen); }
-dialog.mr-modal .mt-zones .z-po i { background: var(--stale); }
-dialog.mr-modal .mt-zones .z-down i { background: var(--pp-no); }
 
 /* ---------- lagen i Startelvor ---------- */
 

@@ -322,22 +322,34 @@ table.dv-league .pts { font-weight: 800; }
 table.dv-league tr.dv-gap td { text-align: center; color: var(--muted); padding: 2px; letter-spacing: 0.3em; }
 tr.dv-trow, tr.dv-prow { cursor: pointer; }
 tr.dv-trow:focus-visible, tr.dv-prow:focus-visible { outline: 2px solid var(--accent); outline-offset: -2px; }
-table.dv-league tr td:first-child { box-shadow: inset 3px 0 0 transparent; }
-table.dv-league tr.z-up td:first-child { box-shadow: inset 3px 0 0 var(--fresh); }
+/* Zonerna: hela raden tonad i zonens färg, och ett streck med zonens namn där
+   zonen slutar (divisioner.js zoneLine) – ingen teckenförklaring under. */
+table.dv-league tr { --zc: transparent; }
+table.dv-league tr.z-up { --zc: var(--fresh); }
+table.dv-league tr.z-eu { --zc: var(--accent); }
+table.dv-league tr.z-po { --zc: var(--stale); }
+table.dv-league tr.z-down { --zc: var(--down); }
+table.dv-league tr.dv-trow:is(.z-up, .z-eu, .z-po, .z-down) > td { background: color-mix(in srgb, var(--zc) 8%, transparent); }
+table.dv-league tr.dv-trow:is(.z-up, .z-eu, .z-po, .z-down):hover > td { background: color-mix(in srgb, var(--zc) 13%, transparent); }
 table.dv-league tr.z-up td.rank { color: var(--fresh); }
-table.dv-league tr.z-eu td:first-child { box-shadow: inset 3px 0 0 var(--accent); }
 table.dv-league tr.z-eu td.rank { color: var(--accent-deep); }
-table.dv-league tr.z-po td:first-child { box-shadow: inset 3px 0 0 var(--stale); }
 table.dv-league tr.z-po td.rank { color: var(--stale); }
-table.dv-league tr.z-down td:first-child { box-shadow: inset 3px 0 0 var(--down); }
 table.dv-league tr.z-down td.rank { color: var(--down); }
-
-.dv-zones { display: flex; flex-wrap: wrap; gap: 6px 16px; margin: 12px 2px 0; font-size: 12.5px; color: var(--muted); }
-.dv-zones i { display: inline-block; width: 10px; height: 10px; border-radius: 3px; margin-right: 6px; vertical-align: -1px; }
-.dv-zones .z-up i { background: var(--fresh); }
-.dv-zones .z-eu i { background: var(--accent); }
-.dv-zones .z-po i { background: var(--stale); }
-.dv-zones .z-down i { background: var(--down); }
+table.dv-league tr.dv-zline > td { padding: 0; border: 0; background: none; }
+table.dv-league tr.dv-zline:hover > td { background: none; }
+.dv-zline div {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  height: 18px;
+  font-size: 10.5px;
+  font-weight: 700;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: var(--zc);
+}
+.dv-zline div::before { content: ""; flex: 1; height: 1px; background: color-mix(in srgb, var(--zc) 60%, transparent); }
+.dv-zline span { flex: none; padding-right: 2px; }
 
 table.dv-players th button, table.dv-teams th button {
   font: inherit;
