@@ -120,6 +120,24 @@ dialog.mr-modal .mhead-team {
   text-wrap: balance;
   color: var(--pp-ink);
 }
+/* namnet öppnar lagkortet: tryckt som förut, i pennans blått med streck
+   under när man pekar på det */
+dialog.mr-modal .mhead-name {
+  padding: 0;
+  font: inherit;
+  letter-spacing: inherit;
+  text-align: inherit;
+  text-wrap: inherit;
+  color: inherit;
+  background: none;
+  border: 0;
+  cursor: pointer;
+  text-decoration: underline 2px transparent;
+  text-underline-offset: 0.16em;
+  transition: color 0.15s, text-decoration-color 0.15s;
+}
+dialog.mr-modal .mhead-name:hover { color: var(--pp-pen); text-decoration-color: currentColor; }
+dialog.mr-modal .mhead-name:focus-visible { outline: 2px solid var(--pp-pen); outline-offset: 3px; border-radius: 2px; }
 dialog.mr-modal .mhead-mid {
   display: grid;
   justify-items: center;

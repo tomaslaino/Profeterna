@@ -1498,12 +1498,12 @@ if (EMBEDDED) {
       state.div = div;
       openPlayer(id);
     },
-    // Lagkortet på fliken Truppen (ESPN:s lag-id).
-    async team(div, espnId) {
+    // Lagkortet (ESPN:s lag-id), på fliken pick eller den senast valda.
+    async team(div, espnId, pick) {
       await embedData();
       if ((await loadPlayers(div)).unknown) return;
       state.div = div;
-      openTeam(espnId, 'trupp');
+      openTeam(espnId, pick);
     },
   };
 }

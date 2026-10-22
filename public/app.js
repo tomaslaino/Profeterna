@@ -585,17 +585,25 @@ function renderDetail(d) {
     mid = m.completed ? '–' : fTime.format(kickoff);
   }
   const comp = [m.compName, m.round].filter(Boolean).map(esc).join(' · ');
+  // Namnet öppnar lagkortet från Statistik (openSquad) när laget har en
+  // trupp – inte när resultatet är dolt, eftersom kortets tabell avslöjar det.
+  const name = (side) => {
+    const s = d.squads && d.squads[side];
+    return !hide && s && !s.unknown && s.summary && s.summary.espnId
+      ? `<button type="button" class="mhead-name" data-squad="${esc(s.comp)}/${esc(s.summary.espnId)}">${esc(m[side])}</button>`
+      : `<span>${esc(m[side])}</span>`;
+  };
 
   // Matchrutan är ett tryckt matchblad (matchblad.css): märket som på
   // kupongen överst, lagen som på en biljett – i två lika breda spalter med
   // tävlingen, avsparken (resultatet när matchen är spelad), dagen och arenan
   // mellan sig – och meanderbården mellan rubriken och flikarna.
   const head = '<div class="mhead mr-head"><p class="pp-brand"><img src="logo.svg" alt="" width="20" height="20">Matchfixarna<span>Matchblad</span></p>' +
-    `<div class="mhead-teams"><div class="mhead-team">${crest(m.home)}<span>${esc(m.home)}</span></div>` +
+    `<div class="mhead-teams"><div class="mhead-team">${crest(m.home)}${name('home')}</div>` +
     `<div class="mhead-mid"><span class="mhead-meta"${m.tierNote ? ` title="${esc(m.tierNote)}"` : ''}>${comp}</span>` +
     `<span class="mhead-score">${hide ? Spoiler.chip() : esc(mid)}</span>${midSub ? `<span class="sub">${esc(midSub)}</span>` : ''}` +
     `<span class="mhead-meta">${esc(cap(fDay.format(kickoff)))}</span>${m.venue ? `<span class="mhead-meta">${esc(m.venue)}</span>` : ''}</div>` +
-    `<div class="mhead-team away">${crest(m.away)}<span>${esc(m.away)}</span></div></div>` +
+    `<div class="mhead-team away">${crest(m.away)}${name('away')}</div></div>` +
     (window.Hojdpunkter ? Hojdpunkter.head(d) : '') +
     '</div><div class="pp-band mr-band" aria-hidden="true"></div>';
 
@@ -1026,7 +1034,7 @@ function squadRows(d) {
     (winners
       ? row('Flest segermål', each((x) => (x.key.winners ? leader(x.key.winners, (p) => p.gw) : val(null))))
       : row('Flest gula kort', each((x) => leader(x.players, (p) => p.yc)))) +
-    row('Hela truppen', each((x) => `<button type="button" class="mr-squad" data-squad="${esc(x.comp)}/${esc(x.summary.espnId)}">${x.players.length} spelare</button>`));
+    row('Hela truppen', each((x) => `<button type="button" class="mr-squad" data-squad="${esc(x.comp)}/${esc(x.summary.espnId)}/trupp">${x.players.length} spelare</button>`));
 }
 
 // Den som leder laget och talet. Delar två på förstaplatsen står båda, är de
@@ -1041,12 +1049,14 @@ function leader(list, value) {
   return names.map((n, i) => `<span class="mr-who">${esc(n)}${i === names.length - 1 ? `&nbsp;<b>${top}</b>` : ','}</span>`).join(' ');
 }
 
-// Lagkortet från Statistik på fliken Truppen (divisioner.js, inläst med
-// import() som spelarkorten i matchruta.js). Utan kortet: lagen på Statistik.
-async function openSquad(div, id) {
+// Lagkortet från Statistik (divisioner.js, inläst med import() som
+// spelarkorten i matchruta.js): från lagnamnet i rubriken på den flik man
+// senast valde, från Hela truppen på fliken Truppen. Utan kortet: lagen på
+// Statistik.
+async function openSquad(div, id, pick) {
   try {
     await import('./divisioner.js');
-    if (window.Spelarkort && Spelarkort.team) return void Spelarkort.team(div, id);
+    if (window.Spelarkort && Spelarkort.team) return void Spelarkort.team(div, id, pick);
   } catch { /* som utan kortet */ }
   location.href = `statistik.html#${div}/lag`;
 }
@@ -1054,8 +1064,8 @@ async function openSquad(div, id) {
 document.addEventListener('click', (e) => {
   const b = e.target.closest('[data-squad]');
   if (!b) return;
-  const [div, id] = b.dataset.squad.split('/');
-  openSquad(div, id);
+  const [div, id, pick] = b.dataset.squad.split('/');
+  openSquad(div, id, pick);
 });
 
 // ---------- tabellen (ESPN, data/teams/<division>.json) ----------
