@@ -329,7 +329,7 @@ function segHtml(groups, cur, attr) {
 // ---------- spelarna ----------
 
 // Gränserna för kvoter, ur spelarfilen (thresholds).
-const TH = { shots: 10, min: 270, rated: 3 };
+const TH = { shots: 10, min: 270, rated: 3, shareRated: 0.5 };
 const per90 = (x, p) => (x == null || !p.min ? null : (x / p.min) * 90);
 // Mål och assist till per 90: FPL:s egna i Premier League (samma matcher som
 // FPL-minuterna), annars truppens – speltiden räknas för samma matcher.
@@ -397,9 +397,9 @@ const PCOLS = [
   { key: 'a', label: 'Ass', name: 'Assist', title: 'Sista passningen före ett mål – eller ett skott som räddas och slås in av en lagkamrat. Enligt ESPN.',
     get: (p) => p.a, cls: 'num', in: ['oversikt'] },
   { key: 'rt', label: 'Betyg', name: 'Snittbetyg',
-    title: 'Snittet av spelarens betyg från 365Scores, 1–10, i ligans matcher i år. En vanlig insats ger runt 6,7. Dämpade siffror: färre än tre matcher med betyg.',
+    title: 'Snittet av spelarens betyg från 365Scores, 1–10, i ligans matcher i år. En vanlig insats ger runt 6,7. Dämpade siffror: betyg i färre än tre matcher eller i färre än hälften av lagets.',
     get: (p) => p.rt, d: 1, cls: 'num', rt: true, in: ['oversikt'],
-    ok: (p) => p.rn >= TH.rated, okWhy: 'Osäker siffra: färre än tre matcher med betyg' },
+    ok: (p) => p.rn >= TH.rated && p.rq >= TH.shareRated, okWhy: 'Osäker siffra: betyg i färre än tre matcher eller i färre än hälften av lagets' },
   { key: 'fs', label: 'Fälld', name: 'Fälld', title: 'Gånger spelaren har blivit fälld eller utsatt för en annan förseelse som domaren blåst för.',
     get: (p) => p.fs, cls: 'num', strong: true, in: ['regelbrott'] },
   { key: 'fs90', label: 'Fälld', sub: 'per 90 min', name: 'Fälld per 90 minuter', title: 'Gånger spelaren har blivit fälld per 90 minuters speltid. Dämpade siffror: mindre än tre hela matchers speltid.',
@@ -486,14 +486,24 @@ function groupSort(P, cols) {
   return playerGroup(P).sort.map((k) => cols.find((c) => c.key === k)).find(Boolean) || cols.find((c) => !c.text);
 }
 
+// Lika tal: den som har spelat färre matcher först – samma tal på kortare
+// tid – och sedan namnet. Både tabellen och topplistorna sorterar så.
+const fewerApps = (a, b) => (a.app || 0) - (b.app || 0) || a.name.localeCompare(b.name, 'sv');
+
 function filteredPlayers(P, cols) {
   const f = state.pf;
   const q = f.q.trim().toLowerCase();
   const col = cols.find((c) => c.key === f.sort) || groupSort(P, cols);
   const list = P.players.filter((p) => (!f.played || (p.app > 0)) && (!f.team || p.teamId === f.team) && (!f.pos || p.pos === f.pos) &&
     (!q || p.name.toLowerCase().includes(q) || p.team.toLowerCase().includes(q) || (natSv(p.nat) || '').toLowerCase().includes(q)));
-  return sortBy(list, col, col.key === f.sort ? f.dir : -1,
-    (a, b) => (b.app || 0) - (a.app || 0) || a.name.localeCompare(b.name, 'sv'));
+  return sortBy(list, col, col.key === f.sort ? f.dir : -1, fewerApps);
+}
+
+// En topplista är tabellens första rader sorterad på kolumnen: samma ordning
+// på båda ställena. Betygen räknas bara när de är säkra nog (ok).
+function leaders(P, key) {
+  const col = PCOLS.find((c) => c.key === key);
+  return sortBy(P.players.filter((p) => col.get(p) > 0 && (!col.ok || col.ok(p))), col, -1, fewerApps);
 }
 
 function playerTableHtml(P) {
@@ -557,6 +567,7 @@ function playersView(dv, P) {
   TH.shots = P.thresholds.minShotsConversion;
   TH.min = P.thresholds.minMinutesP90 || 270;
   TH.rated = P.thresholds.minRated || 3;
+  TH.shareRated = P.thresholds.minShareRated || 0.5;
   teamGoals.clear();
   for (const t of P.teams) teamGoals.set(t.espnId, t.goals);
   tops.clear();
@@ -569,10 +580,10 @@ function playersView(dv, P) {
   // att sortera fram i tabellen Alla spelare. Betygen ersätter målvakterna
   // när de finns (målvakterna finns kvar under Försvar i tabellen).
   html += '<div class="dv-leaders">' +
-    topCard('goals', 'Skytteliga', L.goals, (p) => `<b>${p.g}</b>`) +
-    topCard('assists', 'Flest assist', L.assists, (p) => `<b>${p.a}</b>`) +
-    (P.ratings && L.rating
-      ? topCard('rating', 'Högst betyg', L.rating, (p) => `<b>${num(p.rt, 1)}</b>`, { empty: 'okänt' })
+    topCard('goals', 'Skytteliga', leaders(P, 'g'), (p) => `<b>${p.g}</b>`) +
+    topCard('assists', 'Flest assist', leaders(P, 'a'), (p) => `<b>${p.a}</b>`) +
+    (P.ratings
+      ? topCard('rating', 'Högst betyg', leaders(P, 'rt'), (p) => `<b>${num(p.rt, 1)}</b>`, { empty: 'okänt' })
       : topCard('keepers', 'Målvakter', L.keepers, (p) => `<b>${pct(p.savePct)}</b>`, { empty: 'okänt' })) +
     '</div>';
 
@@ -593,7 +604,7 @@ function playersView(dv, P) {
     cls: 'dv-wide',
   });
 
-  html += '<div class="dv-grid2">' + squadFacts(P, dv) + nationsCard(P) + '</div>';
+  html += '<div class="dv-grid2">' + squadFacts(P, dv) + '</div>';
   return html;
 }
 
@@ -611,24 +622,12 @@ function squadFacts(P, dv) {
     body: '<dl class="facts dv-facts">' +
       '<dt data-tip-head="Snittålder" data-tip="Varje spelare räknas en gång per match den spelat, så ordinarie spelare väger tyngre än de som bara hoppat in någon gång.">Snittålder</dt>' +
       `<dd><b>${num(t.avgAge, 1)} år</b></dd>` +
-      '<dt data-tip-head="Engelska spelare" data-tip="Andel av spelarna i divisionens matcher som varit engelska – varje spelare räknas en gång per match den spelat.">Engelska spelare</dt>' +
-      `<dd><b>${pct(t.homeShare)}</b></dd>` +
-      '<dt data-tip-head="Nationer" data-tip="Hur många olika länder spelarna i divisionen kommer från.">Nationer</dt>' +
-      `<dd><b>${int(t.nations)}</b></dd>` +
       '<dt data-tip-head="Mål utan målskytt" data-tip="Mål som inte går att knyta till någon i truppen: självmål, mål av spelare som har lämnat klubben och omgångar som ESPN inte har fört in än.">Mål utan målskytt</dt>' +
-      `<dd>${t.unattributed == null ? 'okänt' : `<b>${int(t.unattributed)}</b> <span class="muted">av ${int(t.goalsFor)}</span>`}</dd></dl>` +
-      '<h5 class="dv-h5">Vem gör målen?</h5>' +
-      barList(P.goalsByPos, { label: (r) => esc(posName[r.pos] || r.pos), value: (r) => r.goals, fmt: (r) => pct(r.share), sub: (r) => `${r.goals} mål` }),
+      `<dd>${t.unattributed == null ? 'okänt' : `<b>${int(t.unattributed)}</b> <span class="muted">av ${int(t.goalsFor)}</span>`}</dd></dl>`,
     src: `ESPN-trupperna, hämtat ${when(P.source.fetchedAt)}`,
-  });
-}
-
-function nationsCard(P) {
-  const list = P.nations.filter((n) => n.nat !== 'okänd').slice(0, 10);
-  return card('Nationaliteter', {
-    hint: 'andel av matcherna',
-    body: barList(list, { label: (n) => esc(natSv(n.nat)), value: (n) => n.apps, fmt: (n) => pct(n.appShare), sub: (n) => `${n.players} spelare` }),
-    src: 'ESPN · nationalitet enligt spelarens registrering',
+  }) + card('Vem gör målen?', {
+    body: barList(P.goalsByPos, { label: (r) => esc(posName[r.pos] || r.pos), value: (r) => r.goals, fmt: (r) => pct(r.share), sub: (r) => `${r.goals} mål` }),
+    src: `ESPN-trupperna, hämtat ${when(P.source.fetchedAt)}`,
   });
 }
 
@@ -719,7 +718,7 @@ const TCOLS = [
     get: (t) => per(fdOf(t, 'sh'), 'of'), d: 1, cls: 'num hide-xs', in: ['spelet'] },
   { key: 'corf', label: 'Hörnor', sub: 'per match', name: 'Hörnor per match', title: 'Lagets hörnor per match – ett tecken på hur mycket laget anfaller.',
     get: (t) => per(fdOf(t, 'cor'), 'f'), d: 1, cls: 'num hide-xs', in: ['spelet'] },
-  { key: 'ycm', label: 'Gula', sub: 'per match', name: 'Gula kort per match', title: 'Lagets gula kort per match.',
+  { key: 'ycm', label: 'Gula', sub: 'per match', name: 'Gula kort per match', title: 'Lagets gula kort per match. Den som visas ut efter två gula kort har fått två gula och ett rött.',
     get: (t) => per(fdOf(t, 'cards'), 'y'), d: 2, cls: 'num', in: ['spelet'] },
   { key: 'rcs', label: 'Röda', sub: 'totalt', name: 'Röda kort', title: 'Lagets röda kort hittills i år.',
     get: (t) => (fdOf(t, 'cards') ? fdOf(t, 'cards').r : null), cls: 'num hide-xs', in: ['spelet'] },
@@ -752,9 +751,6 @@ const TCOLS = [
   { key: 'avgAge', label: 'Ålder', sub: 'snitt', name: 'Snittålder',
     title: 'Lagets snittålder, där varje spelare räknas en gång per match den spelat. Ordinarie spelare väger alltså tyngre än de som bara hoppat in någon gång.',
     get: (t) => sqOf(t, 'avgAge'), cls: 'num', d: 1, in: ['truppen'] },
-  { key: 'homeShare', label: 'Engelska', sub: 'andel', name: 'Engelska spelare',
-    title: 'Hur stor andel av spelarna i lagets matcher som varit engelska – varje spelare räknas en gång per match den spelat.',
-    get: (t) => sqOf(t, 'homeShare'), cls: 'num', pct: true, in: ['truppen'] },
   { key: 'goals', label: 'Mål', name: 'Mål av lagets spelare',
     title: 'Mål som ESPN har skrivit på lagets spelare. Självmål räknas inte, så summan kan vara lägre än i tabellen.',
     get: (t) => sqOf(t, 'goals'), cls: 'num', in: ['truppen'] },
@@ -764,8 +760,6 @@ const TCOLS = [
   { key: 'topScorerShare', label: 'Beroende', sub: 'andel av målen', name: 'Beroende av bäste målskytten',
     title: 'Hur stor del av lagets mål den bäste målskytten har gjort. Högt värde = laget hänger mycket på en enda spelare.',
     get: (t) => sqOf(t, 'topScorerShare'), cls: 'num', pct: true, in: ['truppen'] },
-  { key: 'yc', label: 'Gula', name: 'Gula kort', title: 'Gula kort för lagets spelare i ligan i år.', get: (t) => sqOf(t, 'yc'), cls: 'num', in: ['truppen'] },
-  { key: 'rc', label: 'Röda', name: 'Röda kort', title: 'Röda kort för lagets spelare i ligan i år.', get: (t) => sqOf(t, 'rc'), cls: 'num', in: ['truppen'] },
 ];
 
 const teamsLoad = new Map(); // division → löfte om lagfilen
@@ -791,7 +785,7 @@ function teamRows(T, P) {
 // Raderna öppnar lagkortet när det finns.
 function teamTop(key, title, list, value, { tip, asc = false, get } = {}) {
   const rows = list.filter((t) => get(t) != null)
-    .sort((a, b) => (asc ? get(a) - get(b) : get(b) - get(a)) || a.name.localeCompare(b.name, 'sv'));
+    .sort((a, b) => (asc ? get(a) - get(b) : get(b) - get(a)) || a.rank - b.rank);
   return topCard(key, title, rows, value, { tip, empty: 'okänt', who: teamRow });
 }
 

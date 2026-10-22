@@ -31,8 +31,7 @@ const MIN_SHOTS_CONVERSION = 10; // mål per skott: minst så många skott
 const MIN_SHARE_KEEPER = 0.5; // målvakter: minst halva lagets matcher
 const MIN_MINUTES_P90 = 270; // per 90 minuter: minst tre hela matcher
 const MIN_RATED = 3; // snittbetyg: minst så många betygsatta matcher
-const MIN_SHARE_RATED = 0.5; // topplistan: betyg i minst halva lagets betygsatta matcher
-const HOME_NATION = 'England';
+const MIN_SHARE_RATED = 0.5; // snittbetyg: i minst halva lagets betygsatta matcher
 
 // Bygget frågar efter trupperna en gång per matchsida – cachefilerna läses
 // därför en gång och läses om först när filen ändrats.
@@ -110,12 +109,10 @@ function coverageOf(t, standing) {
 
 function teamSummary(t, standing) {
   const used = t.players.filter(played);
-  const apps = used.reduce((s, p) => s + p.stats.app, 0);
   const aged = used.filter((p) => p.age != null);
   const agedApps = aged.reduce((s, p) => s + p.stats.app, 0);
   const goals = used.reduce((s, p) => s + (p.stats.g || 0), 0);
   const scorer = top(used, (p) => p.stats.g, { n: 1 })[0] || null;
-  const home = used.filter((p) => p.nat === HOME_NATION).reduce((s, p) => s + p.stats.app, 0);
   return {
     espnId: t.espnId,
     name: t.name,
@@ -123,13 +120,10 @@ function teamSummary(t, standing) {
     noStats: t.players.filter((p) => !p.stats).length,
     used: used.length,
     avgAge: agedApps ? round1(aged.reduce((s, p) => s + p.age * p.stats.app, 0) / agedApps) : null,
-    homeShare: share(home, apps),
     goals,
     goalsFor: standing ? standing.gf : null,
     topScorer: scorer ? { name: scorer.name, g: scorer.stats.g } : null,
     topScorerShare: scorer ? share(scorer.stats.g, goals) : null,
-    yc: used.reduce((s, p) => s + (p.stats.yc || 0), 0),
-    rc: used.reduce((s, p) => s + (p.stats.rc || 0), 0),
     coverage: coverageOf(t, standing),
   };
 }
@@ -293,7 +287,7 @@ function ratingsIndex(compId, teams) {
     const take = (p, hit) => {
       used.add(hit);
       const avg = hit.r.reduce((s, x) => s + x, 0) / hit.r.length;
-      out.set(p.id, { rt: Math.round(avg * 100) / 100, rn: hit.r.length, rb: hit.best, rq: hit.r.length / (rated.get(t.espnId) || 1) });
+      out.set(p.id, { rt: Math.round(avg * 100) / 100, rn: hit.r.length, rb: hit.best, rq: share(hit.r.length, rated.get(t.espnId) || 1) });
     };
     for (const p of t.players) {
       if (played(p)) of++;
@@ -489,7 +483,7 @@ function divisionPlayers(compId) {
   const ratings = ratingsIndex(compId, d.teams);
   const rat = (p) => {
     const r = ratings && ratings.map.get(p.id);
-    return r ? { rt: r.rt, rn: r.rn, rb: r.rb } : null;
+    return r ? { rt: r.rt, rn: r.rn, rb: r.rb, rq: r.rq } : null;
   };
   const photos = photosIndex(compId, d.teams);
   const ph = (p) => (photos && photos.map.has(p.id) ? { ph: photos.map.get(p.id) } : null);
@@ -507,18 +501,6 @@ function divisionPlayers(compId) {
   const posGoals = { A: 0, MF: 0, B: 0, MV: 0, okänd: 0 };
   for (const r of rows) posGoals[r.pos || 'okänd'] += r.g || 0;
   const goals = rows.reduce((s, r) => s + (r.g || 0), 0);
-  const apps = rows.reduce((s, r) => s + r.app, 0);
-
-  const nats = new Map();
-  for (const r of rows) {
-    const k = r.nat || 'okänd';
-    const e = nats.get(k) || { nat: k, players: 0, apps: 0 };
-    e.players++;
-    e.apps += r.app;
-    nats.set(k, e);
-  }
-  const natList = [...nats.values()].sort((a, b) => b.apps - a.apps)
-    .map((e) => ({ ...e, appShare: share(e.apps, apps) }));
 
   const teams = d.teams.map((t) => teamSummary(t, standings.get(t.espnId)))
     .sort((a, b) => a.name.localeCompare(b.name));
@@ -545,16 +527,13 @@ function divisionPlayers(compId) {
       // spelare som lämnat klubben och omgången som ännu inte förts in.
       unattributed: goalsFor ? goalsFor - goals : null,
       avgAge: agedApps ? round1(aged.reduce((s, r) => s + r.age * r.app, 0) / agedApps) : null,
-      homeShare: share(natList.filter((n) => n.nat === HOME_NATION).reduce((s, n) => s + n.apps, 0), apps),
-      nations: natList.filter((n) => n.nat !== 'okänd').length,
       teamsBehind: behind,
     },
     goalsByPos: Object.entries(posGoals).filter(([, g]) => g > 0)
       .map(([pos, g]) => ({ pos, goals: g, share: share(g, goals) })),
-    nations: natList.slice(0, 10),
+    // Skytteligan, assisten och betygen räknar sidan själv ur players, med
+    // samma sortering som tabellen Alla spelare (divisioner.js).
     leaders: {
-      goals: top(rows, (r) => r.g, { tiebreak: (a, b) => a.app - b.app }),
-      assists: top(rows, (r) => r.a, { tiebreak: (a, b) => a.app - b.app }),
       involvement: top(rows, (r) => (r.g || 0) + (r.a || 0), { tiebreak: (a, b) => a.app - b.app })
         .map((r) => ({ ...r, ga: (r.g || 0) + (r.a || 0) })),
       conversion: top(rows.filter((r) => r.sh >= MIN_SHOTS_CONVERSION), (r) => r.g / r.sh, { min: 1e-9, n: 10 })
@@ -562,12 +541,6 @@ function divisionPlayers(compId) {
       yellow: top(rows, (r) => r.yc, { n: 10, tiebreak: (a, b) => a.app - b.app }),
       red: top(rows, (r) => r.rc, { n: 20 }),
       keepers: keepers(d.teams, standings),
-      // Snittbetyget från 365Scores, bland spelare med betyg i minst halva
-      // lagets betygsatta matcher (och minst MIN_RATED).
-      rating: ratings
-        ? top(rows.filter((r) => r.rn >= MIN_RATED && ratings.map.get(r.id).rq >= MIN_SHARE_RATED), (r) => r.rt,
-          { tiebreak: (a, b) => b.rn - a.rn })
-        : null,
       // Bara med FPL (Premier League): mål över och under xG.
       overXg: fpl ? top(rows, overXg, { min: 0.01 }).map((r) => ({ ...r, dxg: overXg(r) })) : null,
       underXg: fpl ? top(rows, (r) => (overXg(r) == null ? null : -overXg(r)), { min: 0.01 }).map((r) => ({ ...r, dxg: overXg(r) })) : null,
