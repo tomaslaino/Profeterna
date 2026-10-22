@@ -1,6 +1,7 @@
 # Tjänsten som sparar kupongen direkt från sidan (worker/kupong-proxy.mjs) på
 # Cloudflare Workers – egen tjänst, skild från proxyn för matchanalysen
-# (wrangler.toml). Driftsätts för hand, inte av GitHub Actions – se README,
+# (wrangler.toml). Driftsätts för hand – från en dator eller med Actions →
+# Driftsätt kupongtjänsten (.github/workflows/kupongtjansten.yml) – se README,
 # avsnittet Kupongen:
 #
 #   npx wrangler@4.147.0 deploy --config worker/kupong.toml

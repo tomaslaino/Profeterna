@@ -1101,6 +1101,11 @@ Matcher utanför sajtens tävlingar (t.ex. Allsvenskan eller Serie A) kan inte k
 **Spara direkt – inställningar (en gång):** en egen tjänst, skild från proxyn för
 matchanalysen, så att GitHub-nyckeln bara finns där. Driftsätts med
 `npx wrangler@4.147.0 deploy --config worker/kupong.toml` och behöver en hemlighet.
+Utan dator: *Actions → Driftsätt kupongtjänsten → Run workflow*
+([.github/workflows/kupongtjansten.yml](.github/workflows/kupongtjansten.yml), sedan
+2026-10-22). Den kräver hemligheten `CLOUDFLARE_API_TOKEN` i repot (*Settings → Secrets
+and variables → Actions*): en nyckel från Cloudflare, *My Profile → API Tokens → Create
+Token*, mallen *Edit Cloudflare Workers*.
 
 - `GITHUB_TOKEN`: på GitHub, *Settings → Developer settings → Personal access tokens →
   Fine-grained tokens → Generate new token*. *Repository access: Only select repositories*
