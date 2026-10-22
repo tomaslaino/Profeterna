@@ -1079,8 +1079,7 @@ ställningen efter 90 minuter (samma utfall som prognosen).
 
 ### Ladda upp system
 
-Knappen *Ladda upp system* (i Ny kupong och Ändra, under omgångens kupong och i
-underlagets rad för gängets kupong) tar en eller flera skärmbilder av ett spelat system –
+Knappen *Ladda upp system* (i Ny kupong och Ändra och under omgångens kupong) tar en eller flera skärmbilder av ett spelat system –
 som raderna i Svenska Spels app, med lagen och rutorna 1, X och 2 där de valda är
 färgade – och fyller i kupongen. Allt sker i webbläsaren
 ([public/systembild.js](public/systembild.js)); ingen tjänst och ingen nyckel behövs:
@@ -1220,9 +1219,11 @@ under omgången.
    porträttet: i färg med en grön bock på porträttet när kupongen är inne (som på
    förstasidan), grått tills dess, med en tårtbit (så stor del av kupongen som är tippad
    när den inte är färdig – bärnsten medan den fylls i, grön om den är inlämnad med tomma
-   matcher; antalet när man pekar) eller tre prickar (fyller i) bredvid. Har man lämnat in
-   är papperet stämplat *Inlämnad*, och i raden längst ner står en grön bock *Inlämnad* där
-   *Lämna in* stod (med *Ändra din kupong* bredvid). Ens egen tårtbit följer
+   matcher; antalet när man pekar) eller tre prickar (fyller i) bredvid. Stämpeln på
+   papperet säger vem omgången väntar på – *Väntar på DL*, *Väntar på dig och DJ*, *Väntar på
+   alla* (vilka som är inne när man pekar) – och blir grön *Alla inne* när alla har lämnat in
+   (2026-10-22; förut stod *Inlämnad* där när man själv var inne, och det sa inte vem). Har
+   man lämnat in står en grön bock *Inlämnad* där *Lämna in* stod. Ens egen tårtbit följer
    kupongen medan man kryssar, de andras syns när de har sparat. Man trycker på sina
    initialer (*Vem är du?* – sparas på enheten, de ringas in), kryssar i sin kolumn med
    modellens odds under rutorna och kan skriva en kort motivering under matchen man just
@@ -1237,19 +1238,20 @@ under omgången.
    rutorna som saknar kryss röda. Har
    matcherna ändrats sedan sidan öppnades säger tjänsten till, och sidan visar de nya
    matcherna med ens tecken kvar där matchen fortfarande är med.
-   *Ändra din kupong* (i raden längst ner på kupongen, eller på omgångens sida när allas
-   tips visas, `#kupong/samtal/tips`) öppnar ens kolumn igen – också efter att allas tips
-   visas, tills matcherna startar. Matcher som har startat står kvar som de var, och i
-   raden längst ner står *Avbryt* och *Spara ändringarna*. En ändring får lämna matcher
-   tomma; då blir ens bock en grön tårtbit tills de är tippade. Det går på vilken av ens
-   enheter som helst.
+   **Ändra sin kupong** (2026-10-22): har man lämnat in går ens kolumn fortfarande att
+   kryssa i direkt på papperet, tills man ser någon annans tips – då står ens tips fast.
+   Ändrar man något blir *Inlämnad* till *Ångra* och *Lämna in ändringen*; matcher som har
+   startat står kvar som de var. En ändring får lämna matcher tomma; då blir ens bock en
+   grön tårtbit tills de är tippade. Det går på vilken av ens enheter som helst. Förut
+   öppnade knappen *Ändra din kupong* (`#kupong/samtal/tips`) kolumnen på en egen sida,
+   också efter att man sett de andras tips; den är borta.
 3. **De andras tips** (`#kupong`): den som inte har lämnat in ser bara sina egna kryss, och
    raden längst ner säger *Lämna in, så ser du hur DL och DJ har tippat* när någon är inne.
    Den som har lämnat in ser allas inlämnade tips – så fort minst en
    till är inne – och vilka som fortfarande fyller i. Ett tryck på någons porträtt överst
    lyfter fram den personens tips: de andras porträtt i rutorna och deras motiveringar tonas
    ner, så att hens kupong står som en egen kolumn (ett tryck till visar allas igen). Samma sak i uppgörelsen och på
-   gängets kupong. **Alla ens enheter** (2026-10-22): de andras tips och *Ändra din kupong*
+   gängets kupong. **Alla ens enheter** (2026-10-22): de andras tips och ens egen kolumn
    finns på varje enhet där man är sig själv, inte bara på den där man lämnade in (förut
    krävdes en nyckel som bara fanns där). På en ny enhet trycker man på sitt porträtt
    (*Vem är du?*). En enhet som redan är någon som inte har lämnat in kan inte byta till
@@ -1275,9 +1277,10 @@ under omgången.
      under Ny kupong (se [Kupongen](#kupongen)). Matcher utan tecken kommer inte med; sidan
      frågar först. Därefter står gängets kupong under Omgången, med en rad om att den är
      sparad och syns för alla efter bygget.
-   - *Justera först* öppnar i stället Ny kupong (eller *Ändra*) med tecknen ifyllda – för
-     namn, anteckningar eller fler matcher. Utan tjänsten heter knappen *Gör gängets
-     kupong* och gör samma sak.
+   - Utan tjänsten heter knappen *Gör gängets kupong* och öppnar Ny kupong (eller *Ändra*)
+     med tecknen ifyllda. Raden längst ner har bara *Börja om*, *Ta bort* och *+ Ny
+     kupong* bredvid (2026-10-22: *Ändra din kupong*, *Justera först* och *Ladda upp
+     system* är borta därifrån).
    - Finns gängets kupong redan blir knappen *Spara ändringen* (kupongen ändras, ingen ny
      görs), och står rutorna som den sparade kupongen visas *Sparad*. Har man inte själv
      tryckt på rutorna följer de den sparade kupongen – så den som öppnar underlaget på en

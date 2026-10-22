@@ -500,12 +500,12 @@ button.sm-who[data-lyft][aria-pressed="true"] .sm-fc { box-shadow: 0 0 0 2px var
 .sm-hd[data-lyft="3"] ~ .sm-r :is(.sm-bx .sm-k3, .sm-said.sm-k3),
 .sm-hd[data-lyft="4"] ~ .sm-r :is(.sm-bx .sm-k4, .sm-said.sm-k4) { opacity: 1; }
 
-/* stämpeln (Väntar på GitHub, Rättad, Inlämnad) mellan märket och betyget */
+/* stämpeln (Väntar på GitHub, Rättad, Väntar på DL, Alla inne) mellan märket och betyget */
 .sm-sheet-head .pp-stamp { white-space: nowrap; }
 .pp-stamp.inne { --pp-stamp: var(--pp-ok); }
 
 @media (max-width: 440px) {
-  .sm-sheet-head .pp-stamp { padding: 2px 6px 1px; font-size: 9px; letter-spacing: 0.1em; border-width: 2px; }
+  .sm-sheet-head .pp-stamp { padding: 2px 6px 1px; font-size: 9px; letter-spacing: 0.1em; border-width: 2px; white-space: normal; text-align: center; line-height: 1.35; }
 }
 @media (max-width: 720px) {
   .sm-up .sm-m { padding-right: 2px; }

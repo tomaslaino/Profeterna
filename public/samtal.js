@@ -3,27 +3,27 @@
 // Omgångens kupong inför uppgörelsen (Kupong → Omgången, steg 1–4): någon skapar kupongen
 // – väljer matcherna – och var och en fyller i den för sig, ett tecken eller
 // en gardering per match. Kupongen står på papper med en kolumn per person,
-// och man fyller i sin kolumn direkt. Den som har lämnat in ser de andras
-// inlämnade tips och kan ändra sina tills matcherna startar; den som inte har
-// lämnat in ser de andras kolumner täckta. En kupong som inte är färdig går
-// att spara utan att lämna in: de andra ser då hur långt man har kommit (en
-// tårtbit vid porträttet i stället för tre prickar). När alla har lämnat in
-// (senast när första matchen startar) ser alla allt. Samma papper blir
-// underlaget för uppgörelsen i telefon (steg 3): matcherna sorteras efter hur
-// oeniga vi är, och gängets kupong kryssas i rutorna, med förslaget ikryssat
-// från början. Den sparas direkt därifrån (postCoupon i kupong.js, samma som
-// Ny kupong → Spara) – eller öppnas i Ny kupong med tecknen ifyllda, för
-// namn, anteckningar eller fler matcher. Gängets kupong (steg 4) står sedan
-// på samma papper med allas porträtt kvar och utfallen inringade
-// (Samtal.paper, ritas av kupong.js).
+// och man fyller i sin kolumn direkt. Den som har lämnat in kan ändra sin
+// kolumn på samma papper tills hen ser någon annans tips – då står de fast –
+// och ser de andras inlämnade tips; den som inte har lämnat in ser de andras
+// kolumner täckta. Stämpeln på papperet säger vem omgången väntar på. En
+// kupong som inte är färdig går att spara utan att lämna in: de andra ser då
+// hur långt man har kommit (en tårtbit vid porträttet i stället för tre
+// prickar). När alla har lämnat in (senast när första matchen startar) ser
+// alla allt. Samma papper blir underlaget för uppgörelsen i telefon (steg 3):
+// matcherna sorteras efter hur oeniga vi är, och gängets kupong kryssas i
+// rutorna, med förslaget ikryssat från början. Den sparas direkt därifrån
+// (postCoupon i kupong.js, samma som Ny kupong → Spara) – utan tjänsten i Ny
+// kupong med tecknen ifyllda. Gängets kupong (steg 4) står sedan på samma
+// papper med allas porträtt kvar och utfallen inringade (Samtal.paper, ritas
+// av kupong.js).
 //
 //   #kupong                  omgången medan den fylls i och tills gängets kupong är gjord
 //   #kupong/samtal           samma vy, också efteråt (uppgörelsen)
-//   #kupong/samtal/tips      ändra kupongen du har lämnat in
 //   #kupong/samtal/ny        skapa omgångens kupong: välj matcherna
 //   #kupong/samtal/matcher   ändra matcherna, tills någon har lämnat in
 //
-// Allt man gör med kupongen – spara, lämna in, avbryta, ändra matcherna, ta
+// Allt man gör med kupongen – spara, lämna in, ångra, ändra matcherna, ta
 // bort – står på ett ställe: raden längst ner på papperet, som står kvar
 // nederst medan man bläddrar. Ta bort (tills allas tips visas) frågar i en
 // ruta ovanpå omgången.
@@ -101,11 +101,14 @@
     return d && d.nyckel ? { nyckel: d.nyckel } : {};
   };
   const submitted = (s, v) => Boolean(s && v && s.gang.some((g) => g.id === v && g.inne));
+  // Dina inlämnade tips, var du än lämnade in: från tjänsten, annars som de
+  // sparades här.
+  const mineIn = (s, v) => (s.tips && s.tips[v]) || handedIn(s);
   // Dina inlämnade tips går att ändra tills matcherna startar, på vilken av
-  // dina enheter som helst.
+  // dina enheter som helst – på papperet, så länge det bara visar dina.
   const canEdit = (s) => {
     const v = me();
-    return Boolean(submitted(s, v) && !over(s) && ((s.tips && s.tips[v]) || handedIn(s)));
+    return Boolean(submitted(s, v) && !over(s) && mineIn(s, v));
   };
   const started = (x, now = Date.now()) => !(Date.parse(x.avspark) > now);
   // Kommentarer i efterhand skriver du när allas tips visas – eller när du
@@ -256,7 +259,6 @@
     if (!here(sub)) return;
     if (sub === 'ny') renderStart(false);
     else if (sub === 'matcher') renderStart(true);
-    else if (sub === 'tips') await renderTips();
     else {
       renderRound();
       poll();
@@ -305,7 +307,7 @@
     // står i raden längst ner på papperet, i båda.
     const all = Boolean(s.tips && Object.keys(s.tips).length >= (s.visas ? 1 : 2));
     html += steps(s, all) + head(s, null);
-    html += all ? board(s) : sheet(s, false);
+    html += all ? board(s) : sheet(s);
     // Gängets kuponger som spelas under tiden, t.ex. veckans matcher.
     html += openCoupons();
     keepFocus(() => {
@@ -318,8 +320,20 @@
   // Bock = tipsen är inne, tårtbit = så stor del av kupongen som är tippad
   // (grön när den är inlämnad men inte färdig), tre prickar = fyller i.
   const CHECK = '<svg class="sm-ok" viewBox="0 0 16 16" aria-hidden="true"><path d="M3.5 8.5l3 3 6-7"/></svg>';
-  // Stämpeln på papperet när du har lämnat in.
-  const STAMP = '<span class="pp-stamp inne">Inlämnad</span>';
+  // Stämpeln på papperet: vem omgången väntar på – du först – tills alla har
+  // lämnat in, och då Alla inne. Den som inte hann lämna in står i raden över
+  // papperet i stället. Vilka som är inne när man pekar. I telefonen bryts
+  // den bara före namnen.
+  const andList = (a) => (a.length > 1 ? `${a.slice(0, -1).join(', ')} och ${a[a.length - 1]}` : a[0] || '');
+  function stamp(s) {
+    const v = me();
+    const ute = s.gang.filter((g) => !g.inne).sort((a, b) => (b.id === v) - (a.id === v));
+    if (!ute.length) return '<span class="pp-stamp inne">Alla inne</span>';
+    if (s.visas) return '';
+    const inne = s.gang.filter((g) => g.inne).sort((a, b) => (b.id === v) - (a.id === v)).map((g) => (g.id === v ? 'du' : g.id));
+    const who = ute.length === s.gang.length ? 'alla' : andList(ute.map((g) => (g.id === v ? 'dig' : g.id)));
+    return `<span class="pp-stamp wait" title="${esc(inne.length ? `${cap(andList(inne))} har lämnat in` : 'Ingen har lämnat in än')}">Väntar&nbsp;på ${esc(who).replace(/ /g, '&nbsp;')}</span>`;
+  }
   const DOTS = '<span class="sm-dots" aria-hidden="true"><i></i><i></i><i></i></span>';
   const PIE_C = 2 * Math.PI * 2.6;
   const pie = (n, all, inne = false) => `<svg class="sm-pie${inne ? ' inne' : ''}" viewBox="0 0 16 16" aria-hidden="true">` +
@@ -454,7 +468,7 @@
       html += `<p class="legend"><span class="note">${esc(missing.map((g) => g.id).join(' och '))} hann inte lämna in` +
         `${s.orsak === 'avspark' ? ' innan första matchen startade' : ''}.</span></p>`;
     }
-    html += paperTop(stopBox(s), ' sm-up', !s.visas && submitted(s, me()) ? STAMP : '') +
+    html += paperTop(stopBox(s), ' sm-up', stamp(s)) +
       upHead(s, ids, rows.filter((r) => r.g.res != null).map((r) => [r.x.id, r.g.res]));
     const w = writer(s);
     let n = 0;
@@ -487,8 +501,8 @@
   // Raden längst ner på papperet, som när alla tippar: till höger Spara
   // gängets kupong, till vänster det mer sällsynta – i telefonen bakom ⋯.
   // Börja om står bara där när gängets tecken skiljer sig från förslaget.
-  // Med tjänsten sparas gängets kupong direkt härifrån; Justera först öppnar
-  // den i Ny kupong (eller Ändra) med tecknen ifyllda.
+  // Med tjänsten sparas gängets kupong direkt härifrån, annars i Ny kupong
+  // (eller Ändra) med tecknen ifyllda.
   function boardActions(s, rows, val) {
     const key = (o) => Object.keys(o).sort().map((k) => `${k}:${o[k]}`).join(',');
     const open = rows.some((r) => r.open);
@@ -496,11 +510,7 @@
     const made = existing(s);
     const same = made && savedAsIs(made, rows, val);
     const more = [
-      canEdit(s) ? '<a class="sm-act-l" href="#kupong/samtal/tips">Ändra din kupong</a>' : '',
       open && key(val) !== key(proposal(rows)) ? '<button type="button" class="sm-act-l" id="sm-reset" title="Det som fler än hälften har med">Börja om</button>' : '',
-      open && direct ? '<button type="button" class="sm-act-l" id="sm-adjust" title="Med namn, anteckningar eller fler matcher">Justera först</button>' : '',
-      // Systemet ni spelade, som skärmbild: tecknen därifrån (systembild.js).
-      open && window.Systembild ? Systembild.button('sm-act-l') : '',
       s.visas ? '' : '<button type="button" class="sm-act-l" data-sm-remove>Ta bort</button>',
       s.visas || over(s) ? '<a class="sm-act-l" href="#kupong/samtal/ny">+ Ny kupong</a>' : '',
     ].filter(Boolean);
@@ -726,9 +736,9 @@
     else location.hash = 'kupong';
   }
 
-  // Spara gängets kupong. Med tjänsten direkt härifrån. Utan tjänsten – eller med
-  // Justera först (adjust) – öppnas Ny kupong (eller Ändra) med tecknen
-  // ifyllda, och kupongen sparas där.
+  // Spara gängets kupong. Med tjänsten direkt härifrån. Utan tjänsten – eller
+  // när den inte kan spara just nu (adjust) – öppnas Ny kupong (eller Ändra)
+  // med tecknen ifyllda, och kupongen sparas där.
   async function makeCoupon(s, { adjust = false } = {}) {
     const msg = (h) => { $('#sm-msg').innerHTML = h; };
     const { d, c, open, undecided } = gangDraft(s);
@@ -806,10 +816,6 @@
         makeCoupon(s);
         return;
       }
-      if (e.target.closest('#sm-adjust')) {
-        makeCoupon(s, { adjust: true });
-        return;
-      }
       // Börja om: tecknen som fler än hälften har med.
       if (e.target.closest('#sm-reset')) {
         kpStore(DECIDE, { id: s.id, val: proposal(analyse(s)), own: true });
@@ -846,29 +852,31 @@
 
   // Omgångens kupong på papper: en ruta per tecken i varje match, och var och
   // en står med sitt porträtt i rutorna hen har valt – så syns direkt vem som
-  // tippat vad och var ni är eniga. Dina rutor trycker du på direkt; de
-  // andras porträtt syns först när du själv har lämnat in. Överst porträtten
-  // med bock eller tre prickar, ditt inringat. Har du inte valt vem du är
-  // trycker du på ditt porträtt. Har du lämnat in är papperet stämplat.
-  //   edit: du ändrar dina inlämnade tips (#kupong/samtal/tips)
-  function sheet(s, edit) {
+  // tippat vad och var ni är eniga. Dina rutor trycker du på direkt – också
+  // när du har lämnat in, så ändrar du dina inlämnade tips (edit); de andras
+  // porträtt syns först när du själv har lämnat in. Överst porträtten med
+  // bock eller tre prickar, ditt inringat. Har du inte valt vem du är trycker
+  // du på ditt porträtt. Stämpeln säger vem omgången väntar på.
+  function sheet(s) {
     const v = me();
+    const edit = canEdit(s);
     const fill = Boolean(v && (edit || (!submitted(s, v) && !s.visas)));
-    SM.edit = edit;
     SM.draft = fill ? draftFor(s, v, edit) : null;
-    return paperTop(stopBox(s), '', !edit && !s.visas && submitted(s, v) ? STAMP : '') + '<div id="sm-rows"></div>' +
+    SM.edit = edit;
+    return paperTop(stopBox(s), '', stamp(s)) + '<div id="sm-rows"></div>' +
       '<div class="pb-foot sm-foot"><div class="pp-fields pb-fields" id="sm-fields"></div></div>' +
       '<div class="sm-act" id="sm-act"><div class="sm-act-in" id="sm-act-in"></div>' +
       '<p class="pb-msg" id="sm-msg" role="status"></p></div></div></div>';
   }
 
   // Ditt utkast sparas på enheten medan du fyller i. En ändring utgår från
-  // dina inlämnade tips och sparas först när du lämnar in den.
+  // dina inlämnade tips och sparas först när du lämnar in den; till dess står
+  // den kvar när papperet ritas om.
   function draftFor(s, v, edit) {
     let d = kpLoad(TIPS);
     if (edit) {
-      // Var du än lämnade in.
-      const t = (s.tips && s.tips[v]) || handedIn(s);
+      if (SM.edit && SM.draft && SM.draft.id === s.id && SM.draft.vem === v) return SM.draft;
+      const t = mineIn(s, v);
       return { ...handedIn(s), id: s.id, vem: v, inne: t.inne, tecken: { ...t.tecken }, kommentarer: { ...(t.kommentarer || {}) } };
     }
     if (!d || d.id !== s.id || d.vem !== v || d.inne) {
@@ -984,24 +992,28 @@
   // Till höger det du gör med din kupong, huvudknappen längst ut; till
   // vänster omgångens mer sällsynta val, i telefonen bakom ⋯. Spara = en
   // kupong som inte är färdig, utan att lämna in; Sparad när den är sparad
-  // som den står. Inlämnad (en grön bock) när du har lämnat in. Överst en
-  // rad om när du får se de andras tips.
+  // som den står. Inlämnad (en grön bock) när du har lämnat in – tills du
+  // ändrar något, då Ångra och Lämna in ändringen. Överst en rad om när du
+  // får se de andras tips.
   function actions(s) {
     const d = SM.draft;
     const v = me();
     const anyIn = s.gang.some((g) => g.inne);
     const others = s.gang.filter((g) => g.inne && g.id !== v).map((g) => g.id);
     const note = SM.edit || s.visas ? ''
-      : d && others.length ? `Lämna in, så ser du hur ${others.length > 1 ? `${others.slice(0, -1).join(', ')} och ${others[others.length - 1]}` : others[0]} har tippat.` : '';
-    const more = SM.edit ? [] : [
+      : d && others.length ? `Lämna in, så ser du hur ${andList(others)} har tippat.` : '';
+    const more = [
       s.visas || anyIn ? '' : '<a class="sm-act-l" href="#kupong/samtal/matcher">Ändra matcherna</a>',
       s.visas ? '' : '<button type="button" class="sm-act-l" data-sm-remove>Ta bort</button>',
       s.visas || over(s) ? '<a class="sm-act-l" href="#kupong/samtal/ny">+ Ny kupong</a>' : '',
     ].filter(Boolean);
     const handIn = (attr = ' id="sm-send"') => `<button type="button" class="kp-btn primary"${attr}>Lämna in</button>`;
+    const inne = `<span class="kp-btn kept sm-inne">${CHECK}Inlämnad</span>`;
     let go = '';
     if (SM.edit) {
-      go = '<a class="kp-btn" href="#kupong">Avbryt</a><button type="button" class="kp-btn primary" id="sm-send">Spara ändringarna</button>';
+      const t = mineIn(s, v);
+      go = sig(s, d) === sig(s, { tecken: t.tecken, kommentarer: t.kommentarer || {} }) ? inne
+        : '<button type="button" class="kp-btn" id="sm-undo">Ångra</button><button type="button" class="kp-btn primary" id="sm-send">Lämna in ändringen</button>';
     } else if (d) {
       const kept = Boolean(d.sparad) && d.sparad === sig(s, d);
       const blank = !d.sparad && !sig(s, d).replace(/[:|]/g, '');
@@ -1010,8 +1022,7 @@
       // Först Vem är du? – knapparna står ändå där de brukar.
       go = '<button type="button" class="kp-btn" disabled>Spara</button>' + handIn(' disabled');
     } else if (submitted(s, v)) {
-      go = (canEdit(s) ? '<a class="kp-btn" href="#kupong/samtal/tips">Ändra din kupong</a>' : '') +
-        `<span class="kp-btn kept sm-inne">${CHECK}Inlämnad</span>`;
+      go = inne;
     }
     return (note ? `<p class="sm-act-note">${esc(note)}</p>` : '') +
       (more.length ? `<button type="button" class="sm-act-more" aria-expanded="${actMore}" aria-controls="sm-act-ls" aria-label="Fler val">${DOTS3}</button>` +
@@ -1073,6 +1084,12 @@
         saveDraft();
         return;
       }
+      // Ångra: dina inlämnade tips igen.
+      if (e.target.closest('#sm-undo')) {
+        SM.draft = null;
+        renderRound();
+        return;
+      }
       if (e.target.closest('[data-sm-remove]')) {
         confirmRemove();
         return;
@@ -1109,19 +1126,6 @@
     sheetList();
   }
 
-  // Ändra dina inlämnade tips, tills matcherna startar. Kupongen ser ut som
-  // under Omgången, med din kolumn öppen igen.
-  async function renderTips() {
-    const s = SM.data;
-    if (!s || !canEdit(s)) {
-      location.hash = 'kupong';
-      return;
-    }
-    $('#coupon').innerHTML = steps(s) +
-      head(s, 'Ändra din kupong') + sheet(s, true);
-    wireSheet();
-  }
-
   async function submitTips() {
     const s = SM.data;
     const d = SM.draft;
@@ -1140,7 +1144,7 @@
     }
     const btn = $('#sm-send');
     btn.disabled = true;
-    msg(SM.edit ? 'Sparar …' : 'Lämnar in …');
+    msg('Lämnar in …');
     const out = await send({
       gor: 'tips',
       id: s.id,
@@ -1154,16 +1158,23 @@
     btn.disabled = false;
     if (out.ok) {
       kpStore(TIPS, { ...d, inne: d.inne || new Date().toISOString(), nyckel: out.nyckel });
-      // Omgången igen, med de andras tips om de är inne.
-      if (sub === '') show('');
-      else location.hash = 'kupong';
+      const edit = SM.edit;
+      SM.draft = null;
+      // Omgången igen, med de andras tips om de är inne – efter en ändring på
+      // samma ställe, utan att papperet rullar upp.
+      if (!edit) {
+        if (sub === '') show('');
+        else location.hash = 'kupong';
+        return;
+      }
+      await load();
+      if (here(sub)) renderRound();
       return;
     }
     // Matcherna har ändrats sedan sidan visade dem: de nya visas, med dina
     // tecken kvar i matcherna som fortfarande är med.
     if (out.andrade && SM.data && SM.data.id === s.id) {
-      if (sub === '') renderRound();
-      else await renderTips();
+      renderRound();
       $('#sm-msg').innerHTML = `<span class="note">${esc(out.error)}</span>`;
       return;
     }
