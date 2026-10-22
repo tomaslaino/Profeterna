@@ -350,18 +350,6 @@ button.sm-who:focus-visible { outline: 2px solid var(--ink); outline-offset: 1px
 /* när du får se de andras tips, på en egen rad överst */
 .sm-act-note { flex: 1 1 100%; order: -2; margin: 0; font-size: 13px; line-height: 1.35; color: var(--pp-ink-soft); }
 .sm-act .pb-msg { margin-top: 8px; }
-/* länken till en annan enhet, när den inte gick att kopiera: att markera själv */
-.sm-link {
-  display: block;
-  width: 100%;
-  margin-top: 6px;
-  padding: 6px 8px;
-  font: 12px/1.3 ui-monospace, SFMono-Regular, Menlo, monospace;
-  color: var(--pp-ink);
-  background: var(--pp-box);
-  border: 1px solid var(--pp-print-line);
-  border-radius: 4px;
-}
 .sm-act-more { display: none; }
 /* smalt med fyra fält (med garderingar och odds): två och två, lika breda */
 @media (max-width: 480px) {

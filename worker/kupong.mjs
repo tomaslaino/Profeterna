@@ -122,18 +122,6 @@ export function couponJSON(file) {
   return ['{', ...lines, '  "matcher": [', ...rows, '  ]', '}', ''].join('\n');
 }
 
-// Jämför nyckeln till de egna tipsen (worker/samtal.mjs) utan att
-// svarstiden avslöjar hur mycket som stämde.
-export async function sameSecret(a, b) {
-  const enc = new TextEncoder();
-  const [x, y] = await Promise.all([a, b].map((s) => crypto.subtle.digest('SHA-256', enc.encode(String(s)))));
-  const u = new Uint8Array(x);
-  const v = new Uint8Array(y);
-  let d = 0;
-  for (let i = 0; i < u.length; i++) d |= u[i] ^ v[i];
-  return d === 0;
-}
-
 function fail(status, error) {
   return { status, body: { ok: false, error } };
 }

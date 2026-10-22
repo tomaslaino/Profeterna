@@ -20,51 +20,52 @@
 //   POST /samtal {gor: "matcher", id, matcher: [id], spel}   ändra omgångens
 //                 matcher – bara tills någon har lämnat in. Utan spel står
 //                 omgångens kvar; spel: null tar bort det
-//   POST /samtal {gor: "tips", id, vem, matcher: [id], tecken: {<matchid>: "1X"}, kommentarer: {<matchid>: "…"}, nyckel}
+//   POST /samtal {gor: "tips", id, vem, matcher: [id], tecken: {<matchid>: "1X"}, kommentarer: {<matchid>: "…"}}
 //                 lämna in sina tips – ett tecken i varje match. matcher =
-//                 omgångens matcher som sidan visade dem. → {ok, samtal,
-//                 nyckel}: samtal med de andras inlämnade tips; nyckel = ens
-//                 bevis för att få se dem igen. Med nyckeln går tipsen att
-//                 ändra tills matcherna startar – i en match som har startat
-//                 står de kvar som de var. En ändring får lämna matcher tomma.
+//                 omgångens matcher som sidan visade dem. → {ok, samtal}:
+//                 samtal med de andras inlämnade tips. Den som har lämnat in
+//                 ändrar sina tips på samma sätt tills matcherna startar – i
+//                 en match som har startat står de kvar som de var. En
+//                 ändring får lämna matcher tomma.
 //   POST /samtal {gor: "spara", id, vem, matcher: [id], tippat}   spara en
 //                 kupong som inte är färdig, utan att lämna in: tjänsten får
 //                 bara veta hur många matcher som är tippade (tipsen stannar
 //                 på enheten tills de lämnas in), så att de andra ser hur
 //                 långt man har kommit. → {ok, samtal}
-//   POST /samtal {gor: "se", id, vem, nyckel} → {ok, samtal}   samtal med
-//                 allas inlämnade tips, för den som har lämnat in
-//   POST /samtal {gor: "efter", id, vem, match, text, nyckel} → {ok, samtal}
+//   POST /samtal {gor: "se", id, vem} → {ok, samtal}   samtal med allas
+//                 inlämnade tips, för den som har lämnat in
+//   POST /samtal {gor: "efter", id, vem, match, text} → {ok, samtal}
 //                 en kommentar i efterhand till en av omgångens matcher – när
-//                 allas tips visas, eller med nyckeln (den som har lämnat in
-//                 ser redan tipsen), också när matchen är spelad. En per
+//                 allas tips visas, eller när man själv har lämnat in (då ser
+//                 man redan tipsen), också när matchen är spelad. En per
 //                 person och match; text "" tar bort den
 //   POST /samtal {gor: "bort", id} → {ok, samtal: null}   ta bort omgången
 //                 för alla, med de inlämnade tipsen – tills allas tips visas
 //                 (då hör den till tipparhistoriken)
 //   → 400 fel i förfrågan
 //   → 409 omgången har bytts ({samtal}), matcherna har ändrats sedan sidan
-//          visade dem ({samtal, andrade: true}), man har redan lämnat in och
-//          saknar nyckeln, se utan rätt nyckel, tipsen visas redan för alla
-//          (för den som inte har lämnat in), alla matcher har startat, eller
-//          en omgång pågår ({finns: true, samtal})
+//          visade dem ({samtal, andrade: true}), se för den som inte har
+//          lämnat in, tipsen visas redan för alla (för den som inte har
+//          lämnat in), alla matcher har startat, eller en omgång pågår
+//          ({finns: true, samtal})
 //   → 503 inte påslaget (lagringen saknas) eller matcherna kan inte läsas
 //
 // Tipsen är dolda: GET ger bara vem som har lämnat in och hur många matcher
-// var och en har tippat (gang[].tippat). Den som lämnar in får
-// en nyckel (sparad på enheten) och ser med den allas inlämnade tips. När
-// alla har lämnat in eller första matchen har startat visas tipsen för alla,
-// och sedan kan den som inte har lämnat in inte göra det. Den som har lämnat
-// in kan ändra sina tips tills matcherna startar. Vem man är väljer man
-// själv, så nyckeln är det som hindrar att någon tittar på de andras tips
-// innan den själv har lämnat in, eller ändrar någon annans. Därför lämnar
-// tjänsten aldrig ut en persons tips med bara namnet.
+// var och en har tippat (gang[].tippat). Den som har lämnat in ser allas
+// inlämnade tips (se), på vilken enhet som helst. När alla har lämnat in
+// eller första matchen har startat visas tipsen för alla, och sedan kan den
+// som inte har lämnat in inte göra det. Den som har lämnat in kan ändra sina
+// tips tills matcherna startar. Vem man är väljer man själv, så tjänsten
+// litar på gänget: den som inte har lämnat in skulle kunna säga att hen är
+// någon som har det. Sidan låter därför inte en enhet byta till någon som
+// redan har lämnat in, så att ingen ser tipsen av misstag (public/samtal.js).
 //
 // Lagringen är en nyckel per omgång och en per person (så att två som lämnar
 // in samtidigt inte skriver över varandra): på Cloudflare KV-bindningen
 // KUPONG, lokalt filer (server.js).
 //   samtal:aktuellt                  omgången {id, skapad, matcher: [{id, match, avspark}], spel}
-//   samtal:<id>:tips:<vem>           {inne, ändrad, tecken, kommentarer, nyckel}
+//   samtal:<id>:tips:<vem>           {inne, ändrad, tecken, kommentarer} (nyckel i
+//                                    tips från före 2026-10-22 används inte)
 //   samtal:<id>:utkast:<vem>         {sparad, tippat, matcher} – en sparad kupong som
 //                                    inte är inlämnad: bara antalet tippade
 //   samtal:<id>:efter:<vem>          {<matchid>: {text, skriven}} – kommentarerna i
@@ -77,7 +78,7 @@
 //                                    själv {nr, startad, id} – eller prövades
 //                                    utan att alla matcherna fanns {nr, provad}
 
-import { normSign, sameSecret } from './kupong.mjs';
+import { normSign } from './kupong.mjs';
 import { linkDraw } from './stryktipset.mjs';
 
 const MATCHES_MAX = 40;
@@ -328,24 +329,20 @@ export async function postRound(body, { store, gang, loadMatches, now = () => ne
 
   const vem = gang.find((g) => g.id === b.vem);
 
-  // Allas inlämnade tips, för den som själv har lämnat in (med nyckeln från
-  // inlämningen).
+  // Allas inlämnade tips, för den som själv har lämnat in.
   if (b.gor === 'se') {
-    const own = vem && tips[vem.id];
-    if (!own || !own.nyckel || !b.nyckel || !(await sameSecret(b.nyckel, own.nyckel))) {
+    if (!vem || !tips[vem.id]) {
       return fail(409, 'Du ser de andras tips när du själv har lämnat in.', { samtal: view() });
     }
     return ok({ samtal: publicView(round, tips, gang, ms, true, drafts, efter) });
   }
 
   // En kommentar i efterhand: för alla när tipsen visas, före det för den
-  // som har lämnat in (med nyckeln). Vem man är väljer man själv, som när
-  // man tippar – kommentarerna är inte hemliga när de syns.
+  // som har lämnat in. Vem man är väljer man själv, som när man tippar.
   if (b.gor === 'efter') {
     if (!vem) return fail(400, 'Okänd person.');
-    const own = tips[vem.id];
-    const key = Boolean(own && own.nyckel && b.nyckel && (await sameSecret(b.nyckel, own.nyckel)));
-    if (!key && !shown(round, tips, gang, ms)) return fail(409, 'Du kan kommentera när allas tips visas.', { samtal: view() });
+    const inne = Boolean(tips[vem.id]);
+    if (!inne && !shown(round, tips, gang, ms)) return fail(409, 'Du kan kommentera när allas tips visas.', { samtal: view() });
     const m = round.matcher.find((x) => x.id === String(b.match == null ? '' : b.match));
     if (!m) return fail(400, 'Matchen finns inte på kupongen.');
     const mine = { ...(efter[vem.id] || {}) };
@@ -353,7 +350,7 @@ export async function postRound(body, { store, gang, loadMatches, now = () => ne
     if (!n) delete mine[m.id];
     else if (!mine[m.id] || mine[m.id].text !== n) mine[m.id] = { text: n, skriven: t.toISOString() };
     await store.put(afterKey(round.id, vem.id), mine);
-    return ok({ samtal: publicView(round, tips, gang, ms, key, drafts, { ...efter, [vem.id]: mine }) });
+    return ok({ samtal: publicView(round, tips, gang, ms, inne, drafts, { ...efter, [vem.id]: mine }) });
   }
 
   if (b.gor === 'matcher') {
@@ -379,11 +376,11 @@ export async function postRound(body, { store, gang, loadMatches, now = () => ne
   };
 
   // En kupong som inte är färdig sparas utan att lämnas in. Tjänsten får
-  // bara antalet tippade matcher – tipsen stannar på enheten – så det
-  // behövs ingen nyckel: ingen kan se något mer än hur långt man har kommit.
+  // bara antalet tippade matcher – tipsen stannar på enheten – så ingen kan
+  // se något mer än hur långt man har kommit.
   if (b.gor === 'spara') {
     if (!vem) return fail(400, 'Okänd person.');
-    if (tips[vem.id]) return fail(409, 'Du har redan lämnat in – ändra kupongen där du lämnade in den.', { samtal: view() });
+    if (tips[vem.id]) return fail(409, 'Du har redan lämnat in.', { samtal: view() });
     if (shown(round, tips, gang, ms)) return fail(409, 'Allas tips visas redan, så det går inte att spara nu.', { samtal: view() });
     if (changed()) return fail(409, 'Matcherna har ändrats sedan du öppnade kupongen – tippa de nya och spara igen.', { samtal: view(), andrade: true });
     const n = Math.floor(Number(b.tippat));
@@ -394,12 +391,9 @@ export async function postRound(body, { store, gang, loadMatches, now = () => ne
 
   if (b.gor === 'tips') {
     if (!vem) return fail(400, 'Okänd person.');
-    // Den som har lämnat in ändrar med nyckeln från inlämningen. Den som inte
-    // har det kan inte lämna in när allas tips redan visas.
+    // Den som har lämnat in ändrar sina tips. Den som inte har det kan inte
+    // lämna in när allas tips redan visas.
     const old = tips[vem.id];
-    if (old && (!old.nyckel || !b.nyckel || !(await sameSecret(b.nyckel, old.nyckel)))) {
-      return fail(409, 'Du har redan lämnat in – ändra kupongen där du lämnade in den.', { samtal: view() });
-    }
     if (!old && shown(round, tips, gang, ms)) return fail(409, 'Allas tips visas redan, så det går inte att lämna in nu.', { samtal: view() });
     if (old && ms >= lastKick(round)) return fail(409, 'Alla matcher har startat, så tipsen går inte att ändra.', { samtal: view() });
     if (changed()) return fail(409, 'Matcherna har ändrats sedan du öppnade kupongen – tippa de nya och lämna in igen.', { samtal: view(), andrade: true });
@@ -425,10 +419,10 @@ export async function postRound(body, { store, gang, loadMatches, now = () => ne
     // (de andra ser att kupongen inte är färdig).
     if (missing.length && !old) return fail(400, `Tippa alla matcher – det saknas tecken i ${missing.join(', ')}.`);
     const mine = old
-      ? { inne: old.inne, 'ändrad': t.toISOString(), tecken, kommentarer, nyckel: old.nyckel }
-      : { inne: t.toISOString(), tecken, kommentarer, nyckel: newId(24) };
+      ? { inne: old.inne, 'ändrad': t.toISOString(), tecken, kommentarer }
+      : { inne: t.toISOString(), tecken, kommentarer };
     await store.put(tipsKey(round.id, vem.id), mine);
-    return ok({ samtal: publicView(round, { ...tips, [vem.id]: mine }, gang, ms, true, drafts, efter), nyckel: mine.nyckel });
+    return ok({ samtal: publicView(round, { ...tips, [vem.id]: mine }, gang, ms, true, drafts, efter) });
   }
 
   return fail(400, 'Okänd åtgärd.');

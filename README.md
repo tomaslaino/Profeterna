@@ -1226,9 +1226,8 @@ under omgången.
    tips visas, `#kupong/samtal/tips`) öppnar ens kolumn igen – också efter att allas tips
    visas, tills matcherna startar. Matcher som har startat står kvar som de var, och i
    raden längst ner står *Avbryt* och *Spara ändringarna*. En ändring får lämna matcher
-   tomma; då blir ens bock en grön tårtbit tills de är tippade. Det går bara på enheten där
-   man lämnade in (med nyckeln, se Tjänsten) – eller på en enhet man har öppnat kupongen på
-   med *Öppna på en annan enhet* (punkt 3).
+   tomma; då blir ens bock en grön tårtbit tills de är tippade. Det går på vilken av ens
+   enheter som helst.
 3. **De andras tips** (`#kupong`): den som inte har lämnat in ser bara sina egna kryss, och
    raden längst ner säger *Lämna in, så ser du hur DL och DJ har tippat* när någon är inne.
    Den som har lämnat in ser allas inlämnade tips – så fort minst en
@@ -1236,19 +1235,11 @@ under omgången.
    lyfter fram den personens tips: de andras porträtt i rutorna och deras motiveringar tonas
    ner, så att hens kupong står som en egen kolumn (ett tryck till visar allas igen; raden
    längst ner påminner om det medan de andra lämnar in). Samma sak i uppgörelsen och på
-   gängets kupong. Har man lämnat in på en annan enhet finns nyckeln inte här: papperet är
-   stämplat *Inlämnad* men tomt, raden längst ner säger hur man tar hit nyckeln, och
-   förstasidans knapp heter *Till kupongen* i stället för *Se de andras tips*.
-   **Öppna på en annan enhet** (2026-10-22, i raden längst ner – i telefonen bakom ⋯ – på
-   enheten där man lämnade in, så länge kupongen går att ändra) ger en länk med nyckeln,
-   `#kupong/samtal/nyckel/<omgång>/<vem>/<nyckel>`: i telefonen delas den (till exempel till
-   sig själv), på datorn kopieras den, och går inte det står den att markera. Öppnas länken
-   kontrollerar tjänsten nyckeln (`se`), och den sparas på den enheten som om man hade lämnat
-   in där – med samma tips, de andras tips, *Ändra din kupong* och kommentarerna. Länken
-   byts mot `#kupong` direkt, så den ligger inte kvar bakåt i webbläsaren, och en rad över
-   papperet säger hur det gick (fel nyckel eller en omgång som är slut sparar ingenting).
-   Länken är som ett lösenord – med den ser man allas inlämnade tips och kan ändra ens
-   egna – så den ska bara skickas till en själv. Sidan frågar tjänsten var 20:e sekund
+   gängets kupong. **Alla ens enheter** (2026-10-22): de andras tips och *Ändra din kupong*
+   finns på varje enhet där man är sig själv, inte bara på den där man lämnade in (förut
+   krävdes en nyckel som bara fanns där). På en ny enhet trycker man på sitt porträtt
+   (*Vem är du?*). En enhet som redan är någon som inte har lämnat in kan inte byta till
+   någon som har det – så ser ingen de andras tips av misstag. Sidan frågar tjänsten var 20:e sekund
    och visar nya tips av sig själv – också förstasidans ruta, medan tipsen lämnas in.
 4. **Underlaget** – för alla när alla har lämnat in, eller senast när första matchen
    startar; sedan kan den som inte har lämnat in inte göra det. Överst allas
@@ -1314,17 +1305,16 @@ för alla – och
 `forra`, omgången före, om dess tips visades när den ersattes (`samtal:forra`; så att
 bygget hinner spara den i tipparhistoriken). `POST /samtal`: `starta`,
 `matcher`, `spara`, `tips`, `se` och `efter`. `efter` (`id`, `vem`, `match`, `text`) sparar en
-kommentar i efterhand när tipsen visas för alla, före det bara med ens nyckel; GET, `se` och
-svaren ger dem under `efter` på samma villkor som tipsen. Vem man är väljer man själv, som
-när man tippar, så en kommentar kräver ingen nyckel när tipsen visas – den är inte hemlig.
+kommentar i efterhand när tipsen visas för alla, före det för den som har lämnat in; GET, `se` och
+svaren ger dem under `efter` på samma villkor som tipsen.
 `spara` tar antalet tippade (`tippat`) för den som inte
 har lämnat in. `tips` skickar med omgångens matcher som sidan visade dem
-(ändrade matcher → 409 med `andrade`) och svarar med en slumpad nyckel som sidan sparar på
-enheten; med den ger `se` allas inlämnade tips, och `tips` med nyckeln ändrar ens tips (i
+(ändrade matcher → 409 med `andrade`); för den som redan har lämnat in ändrar det tipsen (i
 matcher som inte har startat, gärna med tomma matcher; `ändrad` sparas bredvid `inne`).
-Tjänsten lämnar aldrig ut
-någons tips med bara namnet – nyckeln är det som hindrar att man tittar innan man själv har
-lämnat in, eller ändrar någon annans.
+`se` ger allas inlämnade tips till den som själv har lämnat in. Vem man är väljer man själv,
+så tjänsten litar på gänget (se [Säkerhet](#säkerhet)). Fram till 2026-10-22 fick den som
+lämnade in en nyckel som `se`, `efter` och ändringar krävde; sidan skickar den fortfarande
+med om enheten har den, så att den fungerar mot en tjänst som inte har driftsatts om.
 Lokalt: med `KUPONG_LOKALT=1` i `.env` finns
 `/api/samtal`, som sparar i `data/cache/samtal/` (eller `SAMTAL_DIR`).
 
@@ -1770,7 +1760,8 @@ schemaintervall gammalt.
   provat fram till inloggningen 2026-10-18, inte hela vägen till en commit. Spara direkt
   är provat lokalt och mot ett låtsas-GitHub. Det finns inget kodord (borttaget
   2026-10-20): den som hittar tjänstens adress kan lägga, ändra och ta bort kuponger och
-  lämna in tips i någons namn. Märkningen
+  lämna in tips i någons namn – och, sedan 2026-10-22, se och ändra de inlämnade tipsen
+  (se [Säkerhet](#säkerhet)). Märkningen
   *väntar på GitHub* finns bara i webbläsaren där kupongen skapades. Liveställningen bygger
   på ESPN:s inofficiella API, som resten av sajten.
 - Låset för startade matcher och versionskontrollen (2026-10-18) är provade lokalt och mot
@@ -1799,7 +1790,9 @@ Open-Meteo) och skickar inget om besökaren dit; artikeltexten går bara till De
 `.dev.vars` och `.wrangler/` (wranglers lokala hemligheter och tillstånd) är gitignorerade.
 
 Inför uppgörelsen: tipsen är dolda av tjänsten, inte av sidan – `GET /samtal` skickar dem inte
-förrän de visas för alla, och `se` bara mot nyckeln som den som lämnade in fick. Vem man är
-väljer man själv på enheten, så det är nyckeln som hindrar att någon tittar på de andras
-tips innan den själv har lämnat in. Kommentarerna i efterhand döljs på samma sätt, men när
-tipsen visas kan vem som helst skriva en i någons namn.
+förrän de visas för alla, och `se` bara till den som har lämnat in. Vem man är väljer man
+själv på enheten, så tjänsten litar på gänget (sedan 2026-10-22, så att de andras tips syns
+på alla ens enheter): den som inte har lämnat in kan se tipsen genom att säga att hen är
+någon som har det, eller ändra någon annans tips. Sidan hindrar bara att det sker av
+misstag – en enhet byter inte till någon som redan har lämnat in. Kommentarerna i
+efterhand döljs som tipsen, och vem som helst kan skriva en i någons namn.
