@@ -158,11 +158,12 @@ function zoneLine(rows, i, cols) {
   };
 }
 
-// Som en vanlig tabell: S V O F, målen och poängen.
+// Som en vanlig tabell: S V O F, målen och poängen. I telefonen ryms inte
+// målen bredvid långa lagnamn (Wolverhampton) – där räcker +/−.
 function leagueTable(rows) {
   const head = '<thead><tr><th class="c">#</th><th>Lag</th><th class="num" title="Spelade matcher">S</th>' +
     '<th class="num" title="Vunna">V</th><th class="num" title="Oavgjorda">O</th><th class="num" title="Förlorade">F</th>' +
-    '<th class="num" title="Gjorda–insläppta mål">Mål</th><th class="num" title="Målskillnad">+/−</th>' +
+    '<th class="num hide-xs" title="Gjorda–insläppta mål">Mål</th><th class="num" title="Målskillnad">+/−</th>' +
     '<th class="num" title="Poäng: 3 för vinst, 1 för oavgjort">P</th></tr></thead>';
   const body = rows.map((r, i) => {
     if (!r) return `<tr class="dv-gap"><td colspan="9">⋯</td></tr>`;
@@ -172,7 +173,7 @@ function leagueTable(rows) {
     return zl.before + `<tr class="dv-trow ${z ? z.cls : ''}" data-team="${esc(r.espnId)}" tabindex="0" title="${z ? esc(z.label) : ''}">` +
       `<td class="c rank">${r.rank}</td><td class="team">${teamName(r.name)}</td><td class="num">${r.played}</td>` +
       `<td class="num">${r.won}</td><td class="num">${r.drawn}</td><td class="num">${r.lost}</td>` +
-      `<td class="num">${r.gf}–${r.ga}</td><td class="num">${gd}</td>` +
+      `<td class="num hide-xs">${r.gf}–${r.ga}</td><td class="num">${gd}</td>` +
       `<td class="num pts">${r.points}${r.deductions ? `<sup title="${r.deductions} poängs avdrag">*</sup>` : ''}</td></tr>` + zl.after;
   }).join('');
   return `<div class="table-wrap dv-tw"><table class="dv-league">${head}<tbody>${body}</tbody></table></div>`;
