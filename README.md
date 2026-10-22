@@ -1227,7 +1227,8 @@ under omgången.
    visas, tills matcherna startar. Matcher som har startat står kvar som de var, och i
    raden längst ner står *Avbryt* och *Spara ändringarna*. En ändring får lämna matcher
    tomma; då blir ens bock en grön tårtbit tills de är tippade. Det går bara på enheten där
-   man lämnade in (med nyckeln, se Tjänsten).
+   man lämnade in (med nyckeln, se Tjänsten) – eller på en enhet man har öppnat kupongen på
+   med *Öppna på en annan enhet* (punkt 3).
 3. **De andras tips** (`#kupong`): den som inte har lämnat in ser bara sina egna kryss, och
    raden längst ner säger *Lämna in, så ser du hur DL och DJ har tippat* när någon är inne.
    Den som har lämnat in ser allas inlämnade tips – så fort minst en
@@ -1236,9 +1237,18 @@ under omgången.
    ner, så att hens kupong står som en egen kolumn (ett tryck till visar allas igen; raden
    längst ner påminner om det medan de andra lämnar in). Samma sak i uppgörelsen och på
    gängets kupong. Har man lämnat in på en annan enhet finns nyckeln inte här: papperet är
-   stämplat *Inlämnad* men tomt, raden längst ner säger att de andras tips syns på enheten
-   där man lämnade in, och förstasidans knapp heter *Till kupongen* i stället för *Se de
-   andras tips*. Sidan frågar tjänsten var 20:e sekund
+   stämplat *Inlämnad* men tomt, raden längst ner säger hur man tar hit nyckeln, och
+   förstasidans knapp heter *Till kupongen* i stället för *Se de andras tips*.
+   **Öppna på en annan enhet** (2026-10-22, i raden längst ner – i telefonen bakom ⋯ – på
+   enheten där man lämnade in, så länge kupongen går att ändra) ger en länk med nyckeln,
+   `#kupong/samtal/nyckel/<omgång>/<vem>/<nyckel>`: i telefonen delas den (till exempel till
+   sig själv), på datorn kopieras den, och går inte det står den att markera. Öppnas länken
+   kontrollerar tjänsten nyckeln (`se`), och den sparas på den enheten som om man hade lämnat
+   in där – med samma tips, de andras tips, *Ändra din kupong* och kommentarerna. Länken
+   byts mot `#kupong` direkt, så den ligger inte kvar bakåt i webbläsaren, och en rad över
+   papperet säger hur det gick (fel nyckel eller en omgång som är slut sparar ingenting).
+   Länken är som ett lösenord – med den ser man allas inlämnade tips och kan ändra ens
+   egna – så den ska bara skickas till en själv. Sidan frågar tjänsten var 20:e sekund
    och visar nya tips av sig själv – också förstasidans ruta, medan tipsen lämnas in.
 4. **Underlaget** – för alla när alla har lämnat in, eller senast när första matchen
    startar; sedan kan den som inte har lämnat in inte göra det. Överst allas

@@ -439,7 +439,8 @@ async function showCoupon(arg) {
     el.innerHTML = '<p class="empty">Kunde inte läsa matcherna.</p>';
     return;
   }
-  if (mode === 'samtal' && window.Samtal) return Samtal.show(id || '');
+  // Allt efter samtal/, också länken med nyckeln (#kupong/samtal/nyckel/…).
+  if (mode === 'samtal' && window.Samtal) return Samtal.show(arg.split('/').slice(1).join('/'));
   // Medan omgångens kupong fylls i eller tipsen jämförs är det omgången
   // (samtal.js).
   if (!mode && hasSamtal()) {
