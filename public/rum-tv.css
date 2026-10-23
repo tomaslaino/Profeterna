@@ -1,8 +1,10 @@
 /* Tv:n i tobaksaffären (rum-tv.js): en låda i CSS 3D i planet -470 i
    rum.js, som därför bevarar djupet (rum-pl3d). Fronten är 292 × 196, lådan
-   105 djup och bildrörets kåpa 22 till, så att den inte går in i väggen
-   (planet -600). Lite vriden mot pulten, så att vänstersidan och
-   undersidan syns; nära (.nara) vrids den rakt fram mot betraktaren.
+   105 djup och bildrörets kåpa 22 till. Den står på en hylla på en arm från
+   högra väggen och vrids kring armens led mitt bak (146, 98, -132), ut mot
+   rummet men mest mot pulten, och lite nedåt; ledens plats är så långt
+   fram att inget hörn går in i väggen (planet -600, här -130). Nära
+   (.nara) vrids den rakt fram mot betraktaren.
 
    Lådan ritas i tre gånger storleken (zoom: 3) och förminskas igen
    (scale3d): Chrome ritar inte om lager i perspektiv när kameran går fram,
@@ -11,7 +13,7 @@
 
 .rum-pl3d { transform-style: preserve-3d; }
 
-.rum-tvpos { position: absolute; left: 1286px; top: 126px; width: 292px; height: 196px; transform-style: preserve-3d; }
+.rum-tvpos { position: absolute; left: 1216px; top: 110px; width: 292px; height: 196px; transform-style: preserve-3d; }
 .rum-tv3 {
   --tra: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='320' height='160'%3E%3Cfilter id='w' x='0' y='0' width='100%25' height='100%25'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.0035 .11' numOctaves='4' seed='11' stitchTiles='stitch'/%3E%3CfeColorMatrix values='0 0 0 0 .15  0 0 0 0 .08  0 0 0 0 .03  0 0 0 -2.4 1.32'/%3E%3C/filter%3E%3Crect width='320' height='160' filter='url(%23w)'/%3E%3C/svg%3E") 0 0 / 320px 160px, linear-gradient(180deg, #6e4a2c, #523520);
   position: absolute;
@@ -22,12 +24,12 @@
   zoom: 3;
   transform-style: preserve-3d;
   transform-origin: 0 0;
-  transform: scale3d(0.3333, 0.3333, 0.3333) translate3d(0, 98px, -60px) rotateY(-10deg) translate3d(0, -98px, 60px);
+  transform: scale3d(0.3333, 0.3333, 0.3333) translate3d(146px, 98px, -20px) rotateY(-44deg) rotateX(-5deg) translate3d(-146px, -98px, 132px);
   transition: transform 0.6s cubic-bezier(0.3, 0, 0.2, 1);
 }
 /* nära: rakt fram, parallell med bilden – då blir rutan en rak rektangel
    (vriden mot ögat blir den sned, eftersom den sitter högt upp till höger) */
-.rum-tv3.nara { transform: scale3d(0.3333, 0.3333, 0.3333) translate3d(0, 98px, -60px) rotateY(0deg) translate3d(0, -98px, 60px); }
+.rum-tv3.nara { transform: scale3d(0.3333, 0.3333, 0.3333) translate3d(146px, 98px, -20px) rotateY(0deg) rotateX(0deg) translate3d(-146px, -98px, 132px); }
 .rum-tv3.mat { transition: none; }
 .rum-tv3 i, .rum-tv3 b, .rum-tv3 em { display: block; font-style: normal; }
 
@@ -46,26 +48,38 @@
 .k-hoger { left: 252px; top: 24px; width: 22px; height: 148px; transform: translateZ(-105px) rotateY(90deg); }
 .k-bak { left: 40px; top: 24px; width: 212px; height: 148px; transform: translateZ(-127px); }
 
-/* stången från taket och sladden som hänger ner bakom */
-.tv-stang {
-  position: absolute;
-  left: 214px;
-  top: -440px;
-  width: 9px;
-  height: 442px;
-  transform: translateZ(-58px);
-  background: linear-gradient(90deg, #0b0b0b, #474542 38%, #1b1a19 70%, #090909);
+/* hyllan som tv:n står på: svartlackerat stål med en låg kant runt om */
+.tv-hylla { position: absolute; transform-origin: 0 0; background: linear-gradient(180deg, #2b2a28, #121110); }
+.h-botten { left: -5px; top: 200px; width: 302px; height: 116px; transform: translateZ(5px) rotateX(-90deg); background: linear-gradient(180deg, #232220, #0c0c0b); }
+.h-fram { left: -5px; top: 191px; width: 302px; height: 9px; transform: translateZ(5px); box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.16); }
+.h-vanster { left: -5px; top: 191px; width: 116px; height: 9px; transform: translateZ(5px) rotateY(90deg); filter: brightness(0.7); }
+.h-hoger { left: 297px; top: 191px; width: 116px; height: 9px; transform: translateZ(5px) rotateY(90deg); filter: brightness(0.85); }
+
+/* armen: en fyrkantsprofil från leden bakom tv:n till väggplattan ovanför
+   korktavlan, och sladden som går ner i springan mellan tavlan
+   under tv:n och korktavlan till uttaget. Står still när tv:n vrids, och ritas i tre
+   gånger storleken som lådan. */
+.tv-fot { position: absolute; left: 0; top: 0; width: 292px; height: 196px; zoom: 3; transform-style: preserve-3d; transform-origin: 0 0; transform: scale3d(0.3333, 0.3333, 0.3333); pointer-events: none; }
+.tv-fot i { position: absolute; display: block; transform-origin: 0 0; }
+.tv-arm { left: 146px; top: 94px; width: 0; height: 0; transform-style: preserve-3d; transform: translateZ(-20px) rotateY(23.6deg) rotateZ(-3.3deg); }
+.a-fram { left: 0; top: 0; width: 260px; height: 8px; transform: translateZ(4px); background: linear-gradient(180deg, #3a3936, #191817 60%, #0d0d0c); }
+.a-under { left: 0; top: 8px; width: 260px; height: 8px; transform: translateZ(4px) rotateX(-90deg); background: #0b0b0a; }
+/* väggplattan, i högra väggens perspektiv */
+.tv-platta { left: 374px; top: 56px; width: 20px; height: 54px; transform: translateZ(-124px) skewY(-12deg); border-radius: 1.5px; background: linear-gradient(90deg, #4a4945, #1d1c1a 30%, #121110); box-shadow: -2px 0 0 #050505, 0 3px 6px rgba(0, 0, 0, 0.5); }
+.tv-platta::before, .tv-platta::after { content: ""; position: absolute; left: 7px; width: 5px; height: 5px; border-radius: 50%; background: radial-gradient(circle at 35% 30%, #a19e95, #3a3935 70%); }
+.tv-platta::before { top: 5px; }
+.tv-platta::after { bottom: 5px; }
+.tv-sladd {
+  left: 310px;
+  top: 86px;
+  width: 24px;
+  height: 240px;
+  transform: translateZ(-110px);
+  background: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='24' height='240'%3E%3Cpath d='M12 2 C 15 70, 8 150, 12 236' fill='none' stroke='%23111' stroke-width='3.4' stroke-linecap='round'/%3E%3Cpath d='M12 2 C 15 70, 8 150, 12 236' fill='none' stroke='%23666' stroke-opacity='.45' stroke-width='1' transform='translate(-.8 0)'/%3E%3C/svg%3E") no-repeat;
 }
-.tv-stang::after { content: ""; position: absolute; left: -6px; bottom: 0; width: 21px; height: 7px; border-radius: 2px; background: linear-gradient(90deg, #121212, #4a4844 40%, #141414); }
-.tv-kabel {
-  position: absolute;
-  left: 236px;
-  top: 150px;
-  width: 120px;
-  height: 260px;
-  transform: translateZ(-112px);
-  background: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='120' height='260'%3E%3Cpath d='M8 30 C 20 150, 70 110, 112 255' fill='none' stroke='%23111' stroke-width='4' stroke-linecap='round'/%3E%3Cpath d='M8 30 C 20 150, 70 110, 112 255' fill='none' stroke='%23555' stroke-opacity='.5' stroke-width='1' transform='translate(-1 -1)'/%3E%3C/svg%3E") no-repeat;
-}
+/* uttaget: en krämvit dosa med stickproppen i */
+.tv-uttag { left: 322px; top: 318px; width: 11px; height: 17px; transform: translateZ(-124px) skewY(-10deg); border-radius: 2px; background: linear-gradient(90deg, #f3ecda, #d3c9b0 60%, #a39a83); box-shadow: -1px 0 0 #8a816c, 0 1px 3px rgba(0, 0, 0, 0.55); }
+.tv-uttag::after { content: ""; position: absolute; left: 2px; top: 4px; width: 7px; height: 9px; border-radius: 50%; background: radial-gradient(circle at 40% 35%, #4a4643, #141312 70%); }
 
 /* kaninöronen på taket, det ena med en bit folie */
 .tv-antenn {

@@ -1,11 +1,13 @@
 // Tv:n i tobaksaffären (rum.js): en tjock-tv i träfaner från början av
-// åttiotalet som hänger i en stång från taket i hörnet, vriden mot pulten.
-// Lådan är byggd i CSS 3D (rum-tv.css) i samma värld som resten av rummet,
-// så att sidan och undersidan syns och följer musen, och bakom den sticker
-// bildrörets kåpa ut. På taket står kaninöronen, det ena med en bit folie
-// för bättre bild. Till höger om rutan sitter panelen: färgmärket, den
-// röda sifferdisplayen med sidnumret, sidknapparna ▲ ▼, högtalargallret och
-// strömbrytaren. När man går fram till tv:n (T) vrids den mot en.
+// åttiotalet som står på en hylla på en arm från högra väggen, vriden ut mot
+// rummet men mest mot pulten. Lådan är byggd i CSS 3D (rum-tv.css) i samma
+// värld som resten av rummet, så att högersidan och hyllan under syns och
+// följer musen, och bakom den sticker bildrörets kåpa ut. Armen går till en
+// platta på väggen, och sladden hänger från den ner till uttaget. På taket
+// står kaninöronen, det ena med en bit folie för bättre bild. Till höger om
+// rutan sitter panelen: färgmärket, den röda sifferdisplayen med sidnumret,
+// sidknapparna ▲ ▼, högtalargallret och strömbrytaren. När man går fram till
+// tv:n (T) vrids den mot en.
 //
 // Text-tv som SVT:s: 40 × 25 tecken, rubrikraden med sidnumret, datumet och
 // klockan som tickar, ett blått band med rubriken i mosaikgrafik, text i sju
@@ -220,8 +222,10 @@ window.RumTv = (() => {
 
   function html() {
     return '<i class="tv-sken" id="rum-tvsken"></i>' +
-      '<div class="rum-tvpos"><div class="rum-tv3" id="rum-tv3">' +
-      '<i class="tv-stang"></i><i class="tv-kabel"></i><i class="tv-antenn"><b class="folie"></b><b></b></i>' +
+      '<div class="rum-tvpos"><div class="tv-fot"><i class="tv-platta"></i><i class="tv-arm"><i class="a-fram"></i><i class="a-under"></i></i><i class="tv-sladd"></i><i class="tv-uttag"></i></div>' +
+      '<div class="rum-tv3" id="rum-tv3">' +
+      '<i class="tv-antenn"><b class="folie"></b><b></b></i>' +
+      '<i class="tv-hylla h-botten"></i><i class="tv-hylla h-fram"></i><i class="tv-hylla h-vanster"></i><i class="tv-hylla h-hoger"></i>' +
       '<i class="tv-f tv-kapa k-topp"></i><i class="tv-f tv-kapa k-botten"></i><i class="tv-f tv-kapa k-vanster"></i><i class="tv-f tv-kapa k-hoger"></i><i class="tv-f tv-kapa k-bak"></i>' +
       '<i class="tv-f tv-topp"></i><i class="tv-f tv-botten"></i><i class="tv-f tv-vanster"></i><i class="tv-f tv-hoger"></i>' +
       '<div class="tv-front" id="rum-tvfront" inert>' +
