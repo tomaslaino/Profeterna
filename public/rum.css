@@ -695,6 +695,21 @@ a.rum-fb-r:hover b:not(.lit) { color: #fff; background: linear-gradient(180deg, 
 }
 .rum-tag:hover { color: #fff1c8; }
 
+/* Till uppgörelsen: pingklockan i stället för guldordet. Den lyser som de
+   andra sakerna när man pekar på den och plingar när gängets kupong tas i
+   handen (pling i rum.js). */
+.rum-tag.rum-klocka { left: 248px; top: 650px; line-height: 0; text-decoration: none; text-shadow: none; transition: filter 0.25s ease; }
+.rum-klocka svg { display: block; overflow: visible; }
+.rum-klocka:hover, .rum-klocka:focus-visible { filter: brightness(1.15) drop-shadow(0 0 10px rgba(240, 214, 153, 0.35)); outline: none; }
+.rum-klocka .kupa { transform-origin: 52px 63px; }
+.rum-klocka .pl { opacity: 0; transform-origin: 52px 12px; }
+.rum-klocka.pling .kn { animation: rum-kl-kn 0.32s ease-out; }
+.rum-klocka.pling .kupa { animation: rum-kl-kupa 0.6s ease-out; }
+.rum-klocka.pling .pl { animation: rum-kl-pl 0.8s ease-out; }
+@keyframes rum-kl-kn { 30% { transform: translateY(4px); } }
+@keyframes rum-kl-kupa { 20% { transform: rotate(1.6deg); } 45% { transform: rotate(-1.2deg); } 70% { transform: rotate(0.6deg); } }
+@keyframes rum-kl-pl { 0% { opacity: 0; transform: scale(0.7); } 25% { opacity: 0.9; } 100% { opacity: 0; transform: scale(1.35); } }
+
 .rum-3d { position: absolute; left: 160px; top: 120px; width: 1280px; height: 560px; pointer-events: none; }
 
 /* ---------- röken under taket och dammet i ljuset ---------- */

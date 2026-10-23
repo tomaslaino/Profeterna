@@ -1764,8 +1764,9 @@ sidan byts:
   gör med kupongen tas i handen, utan att man lämnar rummet (se
   [Kupongen i handen](#kupongen-i-handen)). Guldordet bredvid säger vad som väntar: *Fyll i
   kupongen*, *Fyll i resten*, inget alls när du har lämnat in och bara ser dina egna tips
-  (din kupong i högen tas i handen med ett klick), *Till uppgörelsen* när du ser de andras
-  tips och *Följ kupongen* när matcherna har börjat.
+  (din kupong i högen tas i handen med ett klick) och *Följ kupongen* när matcherna har
+  börjat. När du ser de andras tips står en pingklocka i mässing där i stället för ordet:
+  man ringer in gänget till uppgörelsen.
 - **Högen** till vänster om kupongen: de som har lämnat in har lagt sin kupong där med
   baksidan upp, i den ordning de lämnade in (den senaste överst) – porträttet under ett gem,
   initialerna i personens bläck (samma som på papperet under Kupong) och stämpeln
@@ -1980,12 +1981,13 @@ kommentarer i efterhand, hens porträtt inringat och stämpeln *Inlämnad*, men 
 ändra – bara *Lägg tillbaka*. Innan dess går den inte att vända (se Högen ovan).
 
 **Uppgörelsen.** När du ser de andras tips (som när papperet visar underlaget) ligger gängets
-kupong på pulten, och guldordet *Till uppgörelsen* (eller *Följ kupongen* när matcherna har
-börjat), kupongen eller K tar den i handen. I varje ruta står porträtten för dem som har
-med tecknet, var och en på sin plats som överst, och deras motivering syns när man pekar på
-porträttet. Gängets kryss dras med en blå kulspetspenna i stället för blyertspennan:
-förslaget – det som fler än hälften har med – står ikryssat från början, eller gängets
-kupong om den redan är sparad, och ett tryck kryssar i eller ur (`Samtal.pult.besluta`,
+kupong på pulten, och pingklockan där guldordet annars står (eller *Följ kupongen* när
+matcherna har börjat), kupongen eller K tar den i handen – klockan lyser när man pekar på
+den och plingar när kupongen tas upp (`bell` och `pling` i rum.js). I varje ruta står
+porträtten för dem som har med tecknet, var och en på sin plats som överst, och deras
+motivering syns när man pekar på porträttet. Gängets kryss dras med en blå kulspetspenna i
+stället för blyertspennan: förslaget – det som fler än hälften har med – står ikryssat från
+början, eller gängets kupong om den redan är sparad, och ett tryck kryssar i eller ur (`Samtal.pult.besluta`,
 sparat på enheten som på papperet). *Börja om* i finstil går tillbaka till förslaget, och
 guldordet *Spara gängets kupong* (*Spara ändringen* när den finns, *Sparad* när den står som
 den sparade) sparar den direkt med samma tjänst som papperet (`Samtal.pult.sparaGang`,

@@ -557,6 +557,35 @@ window.Rum = (() => {
   // Tv:n i hörnet (rum-tv.js).
   const tv = () => (window.RumTv ? RumTv.html() : '');
 
+  // Pingklockan på pulten, där guldordet annars står: till uppgörelsen ringer
+  // man in gänget. Kupan i mässing speglar lysröret och lite av neonskylten.
+  const bell = () => `<svg width="104" height="88" viewBox="0 0 104 88" aria-hidden="true"><defs>
+    <radialGradient id="rum-kl-kupa" cx=".34" cy=".28" r=".85"><stop offset="0" stop-color="#fff7dc"/><stop offset=".16" stop-color="#f3d488"/><stop offset=".45" stop-color="#c8963a"/><stop offset=".78" stop-color="#7a5216"/><stop offset="1" stop-color="#3c2706"/></radialGradient>
+    <linearGradient id="rum-kl-fot" x1="0" y1="0" x2="1" y2="0"><stop offset="0" stop-color="#140d0a"/><stop offset=".3" stop-color="#5a3e2f"/><stop offset=".55" stop-color="#2c1e17"/><stop offset="1" stop-color="#0e0907"/></linearGradient>
+    <linearGradient id="rum-kl-krom" x1="0" y1="0" x2="1" y2="0"><stop offset="0" stop-color="#5d5a55"/><stop offset=".3" stop-color="#f4f1ea"/><stop offset=".55" stop-color="#9a958b"/><stop offset="1" stop-color="#3b3935"/></linearGradient>
+    <filter id="rum-kl-b3" x="-50%" y="-50%" width="200%" height="200%"><feGaussianBlur stdDeviation="3"/></filter></defs>
+  <ellipse cx="54" cy="76" rx="48" ry="9" fill="#000" opacity=".6" filter="url(#rum-kl-b3)"/>
+  <path d="M8 64 L8 72 A44 10 0 0 0 96 72 L96 64 Z" fill="url(#rum-kl-fot)"/>
+  <ellipse cx="52" cy="64" rx="44" ry="10" fill="#4a3226" stroke="#7d5a44" stroke-width=".8"/>
+  <g class="kupa"><path d="M15 63 C15 35 30 23 52 23 C74 23 89 35 89 63 A37 7.5 0 0 1 15 63 Z" fill="url(#rum-kl-kupa)"/>
+    <path d="M15 63 A37 7.5 0 0 0 89 63" fill="none" stroke="#2c1c05" stroke-width="1.2" opacity=".6"/>
+    <g fill="none" stroke-linecap="round"><path d="M24 54 C22 40 30 31 42 27" stroke="#fffbe8" stroke-width="3.2" opacity=".75"/>
+    <path d="M30 58 C30 50 32 45 35 41" stroke="#fffbe8" stroke-width="1.6" opacity=".4"/>
+    <path d="M68 30 C76 35 81 43 82 52" stroke="#ff5a3c" stroke-width="2.2" opacity=".4"/></g></g>
+  <g class="kn"><rect x="49.5" y="12" width="5" height="12" fill="url(#rum-kl-krom)"/>
+    <ellipse cx="52" cy="13" rx="10" ry="4" fill="#2a2724"/><ellipse cx="52" cy="11.5" rx="10" ry="4" fill="url(#rum-kl-krom)"/>
+    <ellipse cx="49" cy="10.6" rx="4" ry="1.2" fill="#fff" opacity=".7"/></g>
+  <g class="pl" fill="none" stroke="#f0d699" stroke-width="1.6" stroke-linecap="round"><path d="M28 10 q-6 -4 -8 -10"/><path d="M76 10 q6 -4 8 -10"/><path d="M18 20 q-8 -2 -12 -6"/><path d="M86 20 q8 -2 12 -6"/></g></svg>`;
+
+  // Pingklockan plingar när gängets kupong tas i handen.
+  function pling() {
+    const b = document.querySelector('#rum-tag.rum-klocka');
+    if (!b || calm()) return;
+    b.classList.remove('pling');
+    void b.offsetWidth;
+    b.classList.add('pling');
+  }
+
   function paper() {
     return '<a id="rum-kvitto" class="rum-flat rum-sak" href="#kupong" data-nav="kupong" aria-label="Kupong"></a>' +
       '<span id="rum-hogen"></span>' +
@@ -1045,8 +1074,23 @@ ${closeHtml()}
     const started = rows.length && Math.min(...rows.map((x) => Date.parse(x.m.kickoff))) <= t;
     const tag = document.getElementById('rum-tag');
     if (tag) {
-      tag.textContent = p ? p.go : started ? 'Följ kupongen' : 'Fyll i kupongen';
-      tag.hidden = !tag.textContent;
+      const go = p ? p.go : started ? 'Följ kupongen' : 'Fyll i kupongen';
+      // till uppgörelsen står pingklockan där i stället för guldordet
+      if (tag.dataset.go !== go) {
+        const klocka = go === 'Till uppgörelsen';
+        tag.dataset.go = go;
+        tag.className = klocka ? 'rum-tag rum-klocka' : 'rum-tag';
+        if (klocka) {
+          tag.innerHTML = bell();
+          tag.setAttribute('aria-label', go);
+          tag.title = go;
+        } else {
+          tag.textContent = go;
+          tag.removeAttribute('aria-label');
+          tag.removeAttribute('title');
+        }
+      }
+      tag.hidden = !go;
     }
     set('rum-skar', skarHtml(R.table));
     const seen = ((TP.season && TP.season.rounds) || []).filter((r) => typeof tpRoundHidden !== 'function' || !tpRoundHidden(r));
@@ -1453,6 +1497,7 @@ ${closeHtml()}
     }
     const v = slag && view(p, slag, from ? from.dataset.vem : null);
     if (!v || (slag !== 'fyll' && slag !== 'gang' && !from)) return false;
+    if (slag === 'gang') pling();
     zoomTv(false);
     if (R.nara) closeUp(false);
     const desk = document.getElementById('rum-kupong');
