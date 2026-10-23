@@ -1806,12 +1806,11 @@ gänget ([public/rum-saker.js](public/rum-saker.js), med en egen duk i pultens p
 askkopp i bärnstensfärgat glas med tre spår, aska och fimpar, där en cigarett ligger i ett
 spår och ryker; en öppen dosa lössnus med locket bredvid, lutat mot dosan eller upp och ner;
 och en gulnad bordsfläkt med blå propeller, galler och en remsa av en gammal kupong som
-fladdrar. Fläkten går bara när det är varmt i Stockholm: när det känns som 21° eller mer,
-samma gräns som gängets tunnaste kläder (vädret från vader.js, läst var tionde sekund). Då
-svänger den fram och tillbaka, och när den pekar mot askkoppen blåser röken åt sidan (draget
-räknas för varje puff under dess liv, så att samma tid ger samma bild). Annars står den
-avstängd: huvudet och bladen står still där de stannade, knapparna är uppe och remsan hänger
-slak ner framför gallret. Inga riktiga märken: locket säger SNUS N:o 1, dosan PRIMA
+fladdrar. Fläkten står där bara när det är varmt i Stockholm: när det känns som 21° eller
+mer, samma gräns som gängets tunnaste kläder (vädret från vader.js, läst var tionde
+sekund); annars är den borta från pulten. Den svänger fram och tillbaka, och när den pekar
+mot askkoppen blåser röken åt sidan (draget räknas för varje puff under dess liv, så att
+samma tid ger samma bild). Inga riktiga märken: locket säger SNUS N:o 1, dosan PRIMA
 LÖSSNUS. **VM 94-affischen** är tejpad
 på insidan av skyltfönstret, i vänstra rutan under neonskylten: ett riktigt foto från
 landslagets hemkomst (Henrik Larsson och Pontus Kåmark med bronsmedaljerna, Norr
@@ -1828,7 +1827,7 @@ pixlar hit eller dit), locket och prisen läggs där det finns plats, och affisc
 till vänster eller till höger under neonskylten. Slitaget följer tippningen: andelen fel
 bland omgångens avgjorda matcher, annars i den senaste färdigspelade kupongen, och utan
 rättning ett mellanläge. Går det dåligt fylls askkoppen (1–11 fimpar), askan hamnar
-bredvid, snuset spills, fläkten går på trean när den är igång, affischen bleks och ett hörn
+bredvid, snuset spills, fläkten (om den står där) går på trean, affischen bleks och ett hörn
 släpper; går det riktigt illa ryker två cigaretter, en använd pris ligger på pulten och
 affischen hänger i en tejpbit. Dolda resultat räknas inte (gradeRow rättar dem inte). Utan
 WebGL står affischen kvar men inte sakerna på pulten.
