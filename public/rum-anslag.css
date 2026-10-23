@@ -1,0 +1,276 @@
+@import url("https://fonts.googleapis.com/css2?family=Special+Elite&display=swap");
+
+/* Anslagstavlan i tobaksaffären (rum-anslag.js): juteväv i en ram av
+   lackad ek, 1000 × 568 och 18 djup, på högra väggen under tv:n (förminskad
+   till väggelementet, --s) och i närbilden (rum-ansn), där den flyger fram
+   och lutar efter musen. Lapparna ritas i samma mått på båda ställena. */
+
+/* ---------- på väggen ---------- */
+
+.rum-ans { position: absolute; left: 1140px; display: block; transform-origin: 0 0; transform-style: preserve-3d; --s: 0.317; --dj: 18px; }
+/* ljuset när man pekar: bara på ytan, så att ramens djup inte plattas till */
+.rum-ans.rum-sak:hover, .rum-ans.rum-sak:focus-visible { filter: none; }
+.rum-ans:hover .ans-yta, .rum-ans:focus-visible .ans-yta { filter: brightness(1.18) drop-shadow(0 0 10px rgba(240, 214, 153, 0.35)); }
+.rum-ans > .ans-tavla { position: absolute; left: 0; top: 0; transform-origin: 0 0; transform: scale3d(var(--s), var(--s), var(--s)) translateZ(var(--dj)); }
+.rum-ans > i { display: block; }
+.rum-ans .ans-skugga { position: absolute; left: 1.5%; top: 4%; width: 100%; height: 100%; background: rgba(8, 5, 2, 0.55); filter: blur(5px); }
+/* där tavlan hänger är väggen ljusare, och två skruvar sitter kvar */
+.rum-ans .ans-flack { position: absolute; inset: -1px; visibility: hidden; background: rgba(255, 236, 200, 0.07); box-shadow: inset 0 0 6px rgba(0, 0, 0, 0.25); }
+.rum-ans .ans-flack::before, .rum-ans .ans-flack::after { content: ""; position: absolute; top: 12%; width: 2.2px; height: 2.2px; border-radius: 50%; background: radial-gradient(circle at 35% 30%, #b8b2a2, #34302a 70%); }
+.rum-ans .ans-flack::before { left: 14%; }
+.rum-ans .ans-flack::after { right: 14%; }
+.rum-ans.borta .ans-tavla, .rum-ans.borta .ans-skugga { visibility: hidden; }
+.rum-ans.borta .ans-flack { visibility: visible; }
+.rum-ans .ans-hj { position: absolute; width: 1px; height: 1px; transform: translateZ(calc(var(--dj) * var(--s))); }
+.rum-ans .ans-hj[data-hj="0"] { left: 0; top: 0; }
+.rum-ans .ans-hj[data-hj="1"] { left: calc(100% - 1px); top: 0; }
+.rum-ans .ans-hj[data-hj="2"] { left: calc(100% - 1px); top: calc(100% - 1px); }
+.rum-ans .ans-hj[data-hj="3"] { left: 0; top: calc(100% - 1px); }
+
+/* ---------- tavlan ---------- */
+
+.ans-tavla {
+  --ek: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='320' height='160'%3E%3Cfilter id='w' x='0' y='0' width='100%25' height='100%25'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.004 .09' numOctaves='4' seed='4' stitchTiles='stitch'/%3E%3CfeColorMatrix values='0 0 0 0 .2  0 0 0 0 .1  0 0 0 0 .03  0 0 0 -2.2 1.25'/%3E%3C/filter%3E%3Crect width='320' height='160' filter='url(%23w)'/%3E%3C/svg%3E") 0 0 / 320px 160px, linear-gradient(180deg, #8a5a2e, #5e3a1c);
+  position: absolute;
+  left: 0;
+  top: 0;
+  width: 1000px;
+  height: 568px;
+  transform-style: preserve-3d;
+  color: #2b2419;
+  font-family: "Special Elite", "American Typewriter", "Courier New", monospace;
+}
+.ans-f, .ans-glans, .ans-hal, .ans-rest, .ans-blek, .ans-nal, .ans-stift, .ans-lapp .d { display: block; }
+.ans-lapp i, .ans-lapp em { font-style: normal; }
+/* ramens fyra sidor, från framsidan in mot väggen */
+.ans-f { position: absolute; transform-origin: 0 0; background: var(--ek); }
+.ans-topp { left: 0; top: 0; width: 1000px; height: 18px; transform: rotateX(-90deg); background: linear-gradient(rgba(255, 228, 180, 0.22), rgba(255, 228, 180, 0.22)), var(--ek); }
+.ans-botten { left: 0; top: 568px; width: 1000px; height: 18px; transform: rotateX(-90deg); background: linear-gradient(rgba(10, 5, 2, 0.6), rgba(10, 5, 2, 0.6)), var(--ek); }
+.ans-vanster { left: 0; top: 0; width: 18px; height: 568px; transform: rotateY(90deg); background: linear-gradient(90deg, rgba(10, 5, 2, 0.15), rgba(10, 5, 2, 0.5)), var(--ek); }
+.ans-hoger { left: 1000px; top: 0; width: 18px; height: 568px; transform: rotateY(90deg); background: linear-gradient(90deg, rgba(255, 228, 180, 0.1), rgba(10, 5, 2, 0.35)), var(--ek); }
+/* framsidan: ramen (24 px lackad ek med en fasad innerkant) och juten */
+.ans-yta {
+  position: absolute;
+  inset: 0;
+  padding: 24px;
+  box-sizing: border-box;
+  background: linear-gradient(180deg, rgba(255, 228, 180, 0.2), rgba(255, 228, 180, 0) 30%, rgba(0, 0, 0, 0) 70%, rgba(0, 0, 0, 0.3)), var(--ek);
+  box-shadow: inset 0 1.5px 0 rgba(255, 230, 190, 0.35), inset 0 -2px 0 rgba(0, 0, 0, 0.45), inset 1.5px 0 0 rgba(255, 230, 190, 0.18), inset -2px 0 0 rgba(0, 0, 0, 0.35);
+}
+.ans-jute {
+  position: absolute;
+  inset: 24px;
+  background:
+    linear-gradient(180deg, rgba(70, 40, 8, 0.42), rgba(70, 40, 8, 0.08) 38%, rgba(0, 0, 0, 0.05) 70%, rgba(0, 0, 0, 0.3)),
+    url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='120' height='120'%3E%3Cfilter id='j'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.012 .02' numOctaves='3' seed='9' stitchTiles='stitch'/%3E%3CfeColorMatrix values='0 0 0 0 .2  0 0 0 0 .13  0 0 0 0 .04  0 0 0 -1.8 1.05'/%3E%3C/filter%3E%3Crect width='120' height='120' filter='url(%23j)'/%3E%3C/svg%3E") 0 0 / 240px 240px,
+    repeating-linear-gradient(0deg, rgba(40, 26, 8, 0.22) 0 1.2px, rgba(255, 238, 200, 0.06) 1.2px 2.4px, rgba(40, 26, 8, 0) 2.4px 3.6px),
+    repeating-linear-gradient(90deg, rgba(40, 26, 8, 0.24) 0 1.4px, rgba(255, 238, 200, 0.07) 1.4px 2.6px, rgba(40, 26, 8, 0) 2.6px 3.8px),
+    #a48b58;
+  box-shadow: inset 0 3px 8px rgba(0, 0, 0, 0.6), inset 0 0 26px rgba(30, 18, 4, 0.45);
+}
+/* lysröret i taket speglar sig i lacken och i papperet */
+.ans-glans { position: absolute; inset: 0; pointer-events: none; background: linear-gradient(172deg, rgba(255, 246, 225, 0.13), rgba(255, 246, 225, 0) 42%); }
+
+/* slitaget: nålhål, hörn av rivna lappar och en blekare yta */
+.ans-hal { position: absolute; width: 2.6px; height: 2.6px; border-radius: 50%; background: rgba(20, 12, 2, 0.7); box-shadow: 0.5px 0.5px 0 rgba(255, 238, 200, 0.15); }
+.ans-rest { position: absolute; width: 22px; height: 15px; clip-path: polygon(0 0, 100% 8%, 76% 52%, 88% 100%, 34% 70%, 10% 96%); opacity: 0.9; box-shadow: 1px 1px 2px rgba(0, 0, 0, 0.4); }
+.ans-rest .ans-nal { left: 7px; top: 4px; }
+.ans-blek { position: absolute; width: 250px; height: 170px; background: rgba(255, 246, 222, 0.09); filter: blur(3px); }
+
+/* nålarna: kartnålar med runt huvud, och ett häftstift i mässing */
+.ans-nal, .ans-stift { position: absolute; margin: -6px 0 0 -6px; width: 12px; height: 12px; border-radius: 50%; z-index: 3; }
+.ans-nal { box-shadow: 2px 3px 2.5px rgba(0, 0, 0, 0.5), inset -2px -2px 2px rgba(0, 0, 0, 0.35), inset 1.5px 1.5px 1.5px rgba(255, 255, 255, 0.55); }
+.ans-stift { margin: -7px 0 0 -7px; width: 14px; height: 14px; background: radial-gradient(circle at 40% 35%, #fff4c4, #d6b25a 35%, #8a6a24 70%, #5a4416); box-shadow: 1.5px 2px 2px rgba(0, 0, 0, 0.55), inset 0 0 0 2px rgba(120, 90, 30, 0.6); }
+
+/* ---------- lapparna ---------- */
+
+.ans-lapp {
+  position: absolute;
+  display: block;
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+  border: 0;
+  border-radius: 1px;
+  text-align: left;
+  color: #2b2419;
+  font: 11px/1.3 "Special Elite", "American Typewriter", "Courier New", monospace;
+  appearance: none;
+  -webkit-appearance: none;
+  transform-origin: 50% 4%;
+  transform: rotate(var(--rot, 0deg));
+  box-shadow: 1px 3px 4px rgba(0, 0, 0, 0.45), 0 0 1px rgba(0, 0, 0, 0.35);
+}
+.ans-in { position: absolute; inset: 0; display: block; padding: 14px 16px 10px; overflow: hidden; }
+.ans-lapp h4 { margin: 0 0 6px; font-weight: 400; }
+.ans-lapp .r { display: flex; justify-content: space-between; gap: 8px; white-space: nowrap; }
+.ans-lapp .r > span:first-child { overflow: hidden; text-overflow: ellipsis; }
+.ans-lapp .d { margin-top: 5px; }
+.ans-lapp .inget { margin: 8px 0 0; opacity: 0.7; }
+.ans-lapp .tom { display: block; height: 1px; margin: 11px 0 0; background: rgba(43, 36, 25, 0.18); }
+.ans-lapp .q { opacity: 0.6; }
+.ans-lapp .dolt { margin: 18px 0 0; text-align: center; font-size: 60px; line-height: 1; opacity: 0.45; }
+
+/* registerkortet: rött streck under rubriken, blå linjer, maskinskrivet */
+.p-kort {
+  background:
+    linear-gradient(180deg, rgba(0, 0, 0, 0) 33px, rgba(200, 44, 40, 0.6) 33px 34.4px, rgba(0, 0, 0, 0) 34.4px),
+    repeating-linear-gradient(180deg, rgba(0, 0, 0, 0) 0 12.4px, rgba(70, 120, 190, 0.26) 12.4px 13.2px) 0 36px / 100% calc(100% - 36px) no-repeat,
+    #fbf8ef;
+  font-size: 11px;
+}
+.p-kort h4 { font-size: 15px; letter-spacing: 3px; text-transform: uppercase; line-height: 19px; }
+.p-kort .ans-in { padding-top: 12px; }
+.ans-g5 { display: grid; grid-template-columns: 1fr auto auto auto 1fr; column-gap: 6px; line-height: 13.2px; }
+.ans-g5 .h { text-align: right; overflow: hidden; white-space: nowrap; }
+.ans-g5 .a { overflow: hidden; white-space: nowrap; }
+.ans-g5 .f i, .ans-g4 .f i { display: inline-block; width: 0.78em; text-align: center; }
+.ans-g5 .s { opacity: 0.6; }
+
+/* genomslaget: tunt papper, blålila karbontext som flyter lite */
+.p-genomslag {
+  background: linear-gradient(180deg, rgba(255, 255, 255, 0.4), rgba(0, 0, 0, 0) 40%), #f1ebdb;
+  color: #3d3a86;
+  font-size: 10.5px;
+  line-height: 13px;
+  text-shadow: 0 0 0.7px rgba(50, 46, 140, 0.85), 0.4px 0 0 rgba(50, 46, 140, 0.25);
+}
+.p-genomslag h4 { font-size: 14px; letter-spacing: 2px; text-transform: uppercase; border-bottom: 1px dashed rgba(61, 58, 134, 0.6); padding-bottom: 3px; margin-bottom: 6px; }
+.p-genomslag .r { display: block; white-space: normal; margin-bottom: 3px; }
+.p-genomslag .r b { font-weight: 400; text-decoration: underline; text-decoration-color: rgba(61, 58, 134, 0.5); }
+.p-genomslag .r em { font-style: normal; opacity: 0.7; }
+
+/* polaroiden: fotot med skölden, texten för hand; baksidan med listorna */
+.p-polaroid { background: #f4f1e8; }
+.p-polaroid .ans-in { padding: 0; overflow: visible; perspective: 700px; }
+.ans-vand { position: absolute; inset: 0; transform-style: preserve-3d; transition: transform 0.7s cubic-bezier(0.3, 0, 0.2, 1); }
+.ans-vand.vand { transform: rotateY(180deg); }
+.ans-vand .fram, .ans-vand .bak { position: absolute; inset: 0; backface-visibility: hidden; -webkit-backface-visibility: hidden; }
+.ans-vand .bak { transform: rotateY(180deg); padding: 12px 13px; background: #ece6d6; color: #2c3a7a; font: 600 15px/16px Caveat, cursive; box-shadow: inset 0 0 0 1px rgba(0, 0, 0, 0.06); }
+.ans-vand .bak h4 { font: 700 20px/1 Caveat, cursive; margin: 0 0 3px; }
+.ans-vand .bak h4 + .r { margin-top: 1px; }
+.ans-vand .bak .r + h4 { margin-top: 9px; }
+.ans-vand .bak small { font-size: 11px; letter-spacing: 1px; opacity: 0.7; }
+.ans-foto {
+  position: absolute;
+  left: 10px;
+  right: 10px;
+  top: 10px;
+  height: 158px;
+  display: grid;
+  place-items: center;
+  overflow: hidden;
+  background: radial-gradient(ellipse at 50% 42%, rgba(255, 236, 190, 0.35), rgba(0, 0, 0, 0) 60%), linear-gradient(170deg, #4e6b88, #263d2c 58%, #15241a);
+  box-shadow: inset 0 0 22px rgba(0, 0, 0, 0.65);
+}
+.ans-foto .skold { display: block; width: 100px; height: 100px; }
+.ans-foto .skold img { width: 100%; height: 100%; object-fit: contain; filter: saturate(0.82) contrast(1.06) sepia(0.12) drop-shadow(0 3px 6px rgba(0, 0, 0, 0.5)); }
+.ans-foto .q { color: #f4f1e8; font: 700 64px/1 Caveat, cursive; }
+.ans-foto::after { content: ""; position: absolute; inset: 0; background: linear-gradient(125deg, rgba(255, 255, 255, 0.22), rgba(255, 255, 255, 0) 38%), repeating-linear-gradient(0deg, rgba(255, 255, 255, 0.025) 0 1px, rgba(0, 0, 0, 0) 1px 2px); }
+.ans-under { position: absolute; left: 6px; right: 6px; bottom: 9px; text-align: center; font: 700 19px/1 Caveat, cursive; color: #1d2a63; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+
+/* den gula lappen: tuschpenna, böjer sig lite nertill */
+.p-postit { background: linear-gradient(180deg, #f6ea95, #efdd73 86%, #e3cd5e); font: 700 18px/19px Caveat, cursive; color: #26221a; box-shadow: 1px 4px 5px rgba(0, 0, 0, 0.42), inset 0 -10px 12px -8px rgba(120, 90, 0, 0.25); }
+.p-postit h4 { font: 700 24px/1 Caveat, cursive; margin-bottom: 6px; text-decoration: underline; text-decoration-thickness: 1.5px; text-underline-offset: 3px; }
+
+/* rutat papper ur ett spiralblock: blyerts, och staplar runt noll */
+.p-rutat {
+  background:
+    radial-gradient(circle at 9px 50%, rgba(40, 30, 16, 0.85) 0 3.4px, rgba(0, 0, 0, 0) 3.8px) 0 6px / 18px 16px repeat-y,
+    repeating-linear-gradient(0deg, rgba(80, 130, 190, 0.22) 0 0.8px, rgba(0, 0, 0, 0) 0.8px 9px),
+    repeating-linear-gradient(90deg, rgba(80, 130, 190, 0.22) 0 0.8px, rgba(0, 0, 0, 0) 0.8px 9px),
+    #f5f3ea;
+  color: #46464a;
+  font: 600 15.5px/17px Caveat, cursive;
+}
+.p-rutat .ans-in { padding-left: 26px; }
+.p-rutat h4 { font: 700 22px/1 Caveat, cursive; margin-bottom: 2px; }
+.p-rutat .d { font: 700 15px/1 Caveat, cursive; margin-top: 6px; text-decoration: underline; }
+.p-rutat .r { display: grid; grid-template-columns: 1fr auto 34px; align-items: center; gap: 6px; }
+.p-rutat .r > span:last-child { text-align: right; }
+.p-rutat .bar { height: 8px; border: 1px solid rgba(60, 60, 64, 0.75); background: repeating-linear-gradient(45deg, rgba(60, 60, 64, 0.6) 0 1px, rgba(0, 0, 0, 0) 1px 3px); justify-self: end; }
+.p-rutat .bar.neg { background: repeating-linear-gradient(-45deg, rgba(60, 60, 64, 0.6) 0 1px, rgba(0, 0, 0, 0) 1px 3px); }
+
+/* tidningsurklippet: tryckt rubrik och tabell på grått tidningspapper */
+.p-tidning {
+  background: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='80' height='80'%3E%3Cfilter id='p'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.8' numOctaves='2' seed='3' stitchTiles='stitch'/%3E%3CfeColorMatrix values='0 0 0 0 .3  0 0 0 0 .27  0 0 0 0 .2  0 0 0 -1.4 .9'/%3E%3C/filter%3E%3Crect width='80' height='80' filter='url(%23p)'/%3E%3C/svg%3E") 0 0 / 80px 80px, #dcd4bf;
+  color: #1e1b16;
+  font: 12px/14.5px Georgia, "Times New Roman", serif;
+}
+.p-tidning h4 { font: 400 27px/1 Anton, Impact, sans-serif; letter-spacing: 0.5px; text-transform: uppercase; border-bottom: 2px solid #1e1b16; padding-bottom: 4px; margin-bottom: 6px; }
+.p-tidning .d { font: 400 15px/1 Anton, Impact, sans-serif; text-transform: uppercase; letter-spacing: 0.6px; margin: 7px 0 3px; border-top: 1px solid rgba(30, 27, 22, 0.5); padding-top: 4px; }
+.p-tidning .r { border-bottom: 0.6px dotted rgba(30, 27, 22, 0.35); }
+.p-tidning .r > span:last-child { font-weight: 700; font-variant-numeric: tabular-nums; }
+
+/* almanacksbladet: dagen överst, vilan för hand med blå kulspets */
+.p-almanacka {
+  background: linear-gradient(180deg, rgba(0, 0, 0, 0) 0, rgba(0, 0, 0, 0) 100%), #fbfaf4;
+  color: #1f3f8f;
+  font: 600 13.5px/14.2px Caveat, cursive;
+}
+.p-almanacka .ans-in { padding: 0 10px 8px; }
+.p-almanacka::before { content: ""; position: absolute; left: 0; right: 0; top: 0; height: 5px; background: repeating-linear-gradient(90deg, rgba(0, 0, 0, 0.18) 0 3px, rgba(0, 0, 0, 0) 3px 7px); }
+.ans-blad { display: flex; justify-content: center; align-items: center; gap: 9px; margin: 0 -10px 5px; padding: 9px 0 4px; border-bottom: 1px solid rgba(194, 39, 28, 0.5); color: #1d1a16; font-family: Fraunces, Georgia, serif; }
+.ans-blad > span { display: grid; gap: 3px; }
+.ans-blad small { font-size: 10px; line-height: 1; letter-spacing: 2.2px; text-transform: uppercase; }
+.ans-blad b { font-size: 38px; font-weight: 800; line-height: 1; color: #c2271c; }
+.ans-g3 { display: grid; grid-template-columns: 1fr auto auto 1fr; column-gap: 5px; }
+.ans-g3 .h { text-align: right; overflow: hidden; white-space: nowrap; }
+.ans-g3 .a { overflow: hidden; white-space: nowrap; }
+.ans-g3 .n { text-align: center; padding: 0 3px; }
+.ans-g3 .trott { box-shadow: 0 0 0 1.4px #c2271c; border-radius: 50%; }
+
+/* anteckningsblocket: blå linjer, röd marginal, riven upptill */
+.p-linjerat {
+  background:
+    linear-gradient(90deg, rgba(0, 0, 0, 0) 20px, rgba(200, 50, 50, 0.45) 20px 21.4px, rgba(0, 0, 0, 0) 21.4px),
+    repeating-linear-gradient(180deg, rgba(0, 0, 0, 0) 0 14.4px, rgba(70, 120, 190, 0.32) 14.4px 15.2px) 0 40px / 100% calc(100% - 40px) no-repeat,
+    #fdfcf6;
+  color: #23409a;
+  font: 600 14px/15.2px Caveat, cursive;
+}
+.p-linjerat::before { content: ""; position: absolute; left: 0; right: 0; top: 0; height: 6px; background: radial-gradient(circle at 50% 0, rgba(0, 0, 0, 0.22) 0 2px, rgba(0, 0, 0, 0) 2.4px) 0 0 / 8px 6px repeat-x; }
+.p-linjerat .ans-in { padding: 12px 10px 8px 26px; }
+.p-linjerat h4 { font: 700 21px/1 Caveat, cursive; margin-bottom: 4px; height: 24px; }
+.ans-g4 { display: grid; grid-template-columns: auto auto 1fr auto; column-gap: 4px; }
+.ans-g4 .h { text-align: right; overflow: hidden; white-space: nowrap; }
+.ans-g4 .a { overflow: hidden; white-space: nowrap; }
+.ans-g4 .f { text-align: right; letter-spacing: 1px; }
+
+/* ---------- närbilden ---------- */
+
+.rum-ansn { position: absolute; inset: 0; z-index: 1; visibility: hidden; pointer-events: none; }
+.rum-ansn.on { visibility: visible; pointer-events: auto; }
+.ans-bak { position: absolute; inset: 0; opacity: 0; background: radial-gradient(ellipse 75% 75% at 50% 48%, rgba(10, 8, 6, 0.55), rgba(10, 8, 6, 0.88)); transition: opacity 0.45s ease; }
+.rum-ansn.on .ans-bak { opacity: 1; }
+.rum-ansn.ute .ans-bak { opacity: 0; transition-duration: 0.5s; }
+.ans-flyg { position: absolute; left: 0; top: 0; width: 1000px; height: 568px; transform-origin: 0 0; perspective: 2400px; }
+.ans-luta { position: absolute; inset: 0; transform-style: preserve-3d; transform: rotateX(var(--rx, 0deg)) rotateY(var(--ry, 0deg)); transition: transform 0.4s ease-out; }
+.ans-tavla.stor .ans-yta { box-shadow: 0 34px 70px rgba(0, 0, 0, 0.6), inset 0 1.5px 0 rgba(255, 230, 190, 0.35), inset 0 -2px 0 rgba(0, 0, 0, 0.45), inset 1.5px 0 0 rgba(255, 230, 190, 0.18), inset -2px 0 0 rgba(0, 0, 0, 0.35); }
+.ans-tavla.stor:focus { outline: none; }
+.rum-ansn.framme .ans-tavla.stor .ans-yta, .rum-ansn.framme .ans-tavla.stor .ans-jute { transform-style: preserve-3d; }
+.ans-tavla.stor .ans-lapp { cursor: pointer; transition: transform 0.25s ease, box-shadow 0.25s ease; }
+.ans-tavla.stor .ans-nal, .ans-tavla.stor .ans-stift { transform: translateZ(3px); }
+/* lappen lyfter i nederkanten när man pekar på den (nålen håller upptill) */
+.rum-ansn.framme .ans-tavla.stor .ans-lapp:hover, .ans-tavla.stor .ans-lapp:focus-visible { transform: rotate(var(--rot, 0deg)) rotateX(14deg) translateZ(2px); box-shadow: 2px 12px 14px rgba(0, 0, 0, 0.45), 0 0 1px rgba(0, 0, 0, 0.35); }
+.ans-tavla.stor .ans-lapp:focus-visible { outline: 2px solid #f0d699; outline-offset: 3px; }
+.ans-lapp.borta { visibility: hidden; }
+.ans-fot { position: absolute; display: flex; justify-content: flex-end; opacity: 0; transition: opacity 0.3s ease; }
+.rum-ansn.framme .ans-fot { opacity: 1; }
+.rum-ansn.lyft .ans-fot { opacity: 0; pointer-events: none; }
+
+/* en lapp i handen, mitt i fönstret */
+.ans-lyft { position: absolute; inset: 0; pointer-events: none; }
+.ans-lyft::before { content: ""; position: absolute; inset: 0; background: rgba(10, 8, 6, 0.6); opacity: 0; transition: opacity 0.3s ease; }
+.rum-ansn.lyft .ans-lyft::before { opacity: 1; }
+.ans-lyft > .ans-lapp { left: 0; top: 0; transform-origin: 50% 50%; pointer-events: auto; cursor: default; box-shadow: 0 20px 40px rgba(0, 0, 0, 0.55), 0 0 1px rgba(0, 0, 0, 0.4); }
+.ans-lyft > .p-polaroid { cursor: pointer; }
+.ans-rad { position: absolute; left: 0; right: 0; display: flex; justify-content: center; align-items: center; gap: 28px; opacity: 0; pointer-events: none; transition: opacity 0.3s ease; }
+.rum-ansn.lyft .ans-rad { opacity: 1; pointer-events: auto; }
+.ans-rad .sp-card { margin: 0; }
+.ans-tbx { border: 0; padding: 0; background: none; cursor: pointer; font-family: Fraunces, Georgia, serif; font-size: 18px; color: #a9c8fb; text-decoration: underline; text-underline-offset: 4px; text-decoration-thickness: 1px; text-shadow: 0 1px 8px #000; }
+.ans-tbx:hover { color: #d2e3ff; }
+
+@media (prefers-reduced-motion: reduce) {
+  .ans-bak, .ans-luta, .ans-vand, .ans-fot, .ans-rad, .ans-lyft::before, .ans-tavla.stor .ans-lapp { transition: none; }
+}

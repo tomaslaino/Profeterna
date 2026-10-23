@@ -8,7 +8,7 @@
 // dricker öl, röker och pratar. Föremålen leder vidare, som i ett rum hos
 // Felix Rieseberg:
 //   korktavlan → gängets kuponger     pokalhyllan, Omgångens orakel → Olympen
-//   skårtavlan → Tabeller             pärmarna → Statistik
+//   skårtavlan → Tabeller             anslagstavlan: lapparna (A, rum-anslag.js)
 //   namnet på dörren → Om oss
 //   kvittot → Kupong, tv:n zoomas in (T): text-tv med en sida per match och
 //   kupongens matcher live på 377 (rum-tv.js)
@@ -22,12 +22,14 @@
 // fönster står den alltid där i stället för rummet (Rum.fits). Rörelserna
 // stängs av med prefers-reduced-motion. För bilder: ?rum-t=<sekunder> fryser
 // klockan, ?rum-mx=&rum-my= kamerans läge (−1…1), ?rum-vantar=DL,DT låter
-// dem sitta med kupongen som om de inte hade lämnat in.
+// dem sitta med kupongen som om de inte hade lämnat in. ?rum-anslag visar anslagstavlan
+// framme (=form, =skador … med den lappen i handen).
 //
 // Läses efter kupong.js, samtal.js, tippare.js och kronan.js och använder
 // deras hjälpare (state, KP, TP, gradeRow, couponNumber, currentCoupon,
 // Kronan.holders, Kronan.scene, Historik.coupons …) och tv:n i rum-tv.js
-// (RumTv, läses före den här). rum-3d.js hämtas först
+// (RumTv, läses före den här) och anslagstavlan i rum-anslag.js (RumAnslag,
+// också före). rum-3d.js hämtas först
 // när rummet visas, med three.js från jsdelivr (importmap i index.html); utan
 // WebGL står rummet kvar utan gänget.
 
@@ -382,16 +384,17 @@ window.Rum = (() => {
 
   // 3. Korktavlan med gängets gamla kuponger, rättade med röd penna.
   // 6. Skårtavlan med ligatabellen i vita plastbokstäver.
+  // 7. Anslagstavlan under tv:n (rum-anslag.js), fri från tv:ns hylla och disken.
   function rightWall() {
     return '<div class="rum-hv">' +
+      (window.RumAnslag ? onWall(1144, 1300, 316, 478, 'rum-ans', RumAnslag.wall(), 'href="statistik.html" data-nav="statistik" aria-label="Anslagstavlan" id="rum-ans"') : '') +
       onWall(1330, 1478, 352, 458, 'rum-skar', '<span class="rum-skar-in" id="rum-skar"></span>', 'href="tabeller.html" data-nav="tabeller" aria-label="Tabeller"') +
       onWall(1496, 1700, 330, 478, 'rum-kork', '<span class="rum-kork-in" id="rum-kork"></span>', 'href="#olympen/kuponger" data-nav="olympen" aria-label="Gängets kuponger"') +
       '</div>';
   }
 
-  // 4. Pokalhyllan och 7. pärmarna: ritas på väggen (shelves()).
+  // 4. Pokalhyllan: ritas på väggen (shelves()).
   const POKAL = { yb: 288, x0: 1146, x1: 1312 };
-  const PARM = { yb: 402, x0: 1146, x1: 1322 };
   function trophy(x, yb, col, i) {
     const k = sc(x) * 0.95;
     const y = at(x, yb);
@@ -405,21 +408,7 @@ window.Rum = (() => {
       `<path d="M-7 -28 q-5 0 -5 5 q0 4 6 5" fill="none" stroke="${col}" stroke-width="1.6"/><path d="M7 -28 q5 0 5 5 q0 4 -6 5" fill="none" stroke="#000" stroke-opacity=".5" stroke-width="1.6"/>` +
       '<rect x="-7" y="-31" width="14" height="1" fill="#e8e2d2" opacity=".35"/></g>';
   }
-  function binder(x, w, i, label) {
-    const cols = ['#3b3f45', '#7b2a26', '#2c4a6b', '#4a5a3a', '#6d6658', '#262626', '#8a6d3b'];
-    const c = cols[i % cols.length];
-    const top = PARM.yb - 50 + (i % 3 === 1 ? 3 : 0);
-    const pt = (xx, yb) => `${r1(xx)},${r1(at(xx, yb))}`;
-    const xm = x + w / 2;
-    const k = sc(xm);
-    const slope = (top + 12 - VP[1]) / (1140 - VP[0]);
-    return `<polygon points="${pt(x, PARM.yb)} ${pt(x + w, PARM.yb)} ${pt(x + w, top)} ${pt(x, top)}" fill="${c}"/>` +
-      `<polygon points="${pt(x, PARM.yb)} ${pt(x + w * 0.18, PARM.yb)} ${pt(x + w * 0.18, top)} ${pt(x, top)}" fill="#fff" opacity=".08"/>` +
-      `<polygon points="${pt(x + w * 0.2, top + 6)} ${pt(x + w * 0.8, top + 6)} ${pt(x + w * 0.8, top + 18)} ${pt(x + w * 0.2, top + 18)}" fill="#e9e2cf" opacity=".9"/>` +
-      `<text transform="translate(${r1(xm)} ${r1(at(xm, top + 14.5))}) skewY(${(Math.atan(slope) * 180 / Math.PI).toFixed(1)}) scale(${(k * 0.5).toFixed(2)})" text-anchor="middle" font-family="Caveat" font-weight="700" font-size="11" fill="#2a241c">${label}</text>` +
-      `<ellipse cx="${r1(xm)}" cy="${r1(at(xm, PARM.yb - 12))}" rx="${r1(2.6 * k)}" ry="${r1(4 * k)}" fill="#111" opacity=".55"/>`;
-  }
-  function shelves(trophies, seasons) {
+  function shelves(trophies) {
     // en pokal per vunnen omgång, i vinnarens färg; ett dammfritt märke där
     // nästa ska stå
     let cups = '';
@@ -430,23 +419,14 @@ window.Rum = (() => {
       x += 17 * sc(x);
     });
     if (x < POKAL.x1 - 8) cups += `<ellipse cx="${r1(x)}" cy="${r1(at(x, POKAL.yb) - 1)}" rx="${r1(6 * sc(x))}" ry="${r1(1.6 * sc(x))}" fill="#000" opacity=".25"/>`;
-    let binders = '';
-    let bx = PARM.x0 + 4;
-    seasons.forEach((label, i) => {
-      const w = 10.5 * sc(bx);
-      if (bx + w > PARM.x1) return;
-      binders += binder(bx, w, i, label);
-      bx += w + 0.6 * sc(bx);
-    });
-    // pokalerna och pärmarna ligger i länkarna, med ytan man klickar på, så
-    // att de lyser som de andra föremålen när man pekar på dem
+    // pokalerna ligger i länken, med ytan man klickar på, så att de lyser
+    // som de andra föremålen när man pekar på dem
     const hit = (x0, x1, y0, y1, nav, href, label, inner) => `<a href="${href}" data-nav="${nav}" class="rum-sak" aria-label="${label}">${inner}` +
       `<polygon points="${x0},${r1(at(x0, y1))} ${x1},${r1(at(x1, y1))} ${x1},${r1(at(x1, y0))} ${x0},${r1(at(x0, y0))}" fill="#fff" opacity="0"/></a>`;
-    return shelf(POKAL.yb, POKAL.x0, POKAL.x1) + shelf(PARM.yb, PARM.x0, PARM.x1) +
+    return shelf(POKAL.yb, POKAL.x0, POKAL.x1) +
       // damm på hyllkanterna
       `<polygon points="${POKAL.x0},${r1(at(POKAL.x0, POKAL.yb) - 0.6)} ${POKAL.x1},${r1(at(POKAL.x1, POKAL.yb) - 0.8)} ${POKAL.x1},${r1(at(POKAL.x1, POKAL.yb) + 0.6)} ${POKAL.x0},${r1(at(POKAL.x0, POKAL.yb) + 0.5)}" fill="#d9d2c0" opacity=".3"/>` +
-      hit(POKAL.x0, POKAL.x1, POKAL.yb - 36, POKAL.yb + 6, 'olympen', '#olympen', 'Olympen', cups) +
-      hit(PARM.x0, PARM.x1, PARM.yb - 52, PARM.yb + 6, 'statistik', 'statistik.html', 'Statistik', binders);
+      hit(POKAL.x0, POKAL.x1, POKAL.yb - 36, POKAL.yb + 6, 'olympen', '#olympen', 'Olympen', cups);
   }
 
   // Kupongstället vid fönstret: blanka kuponger i ett fack av plexiglas,
@@ -587,14 +567,16 @@ ${plane(0, paper())}
 </div></div>
 <div class="rum-layer rum-warm"></div><div class="rum-layer rum-dagsljus" id="rum-dagsljus"></div><div class="rum-layer rum-vign"></div><div class="rum-layer rum-grain"></div>
 </div>
+${window.RumAnslag ? RumAnslag.nara() : ''}
 <div class="rum-hdr"><a class="rum-brand" href="#">Matchfixarna</a></div>
-<div class="rum-ft"><span class="keys"><b>K</b> kupongen · <b>T</b> tv:n</span><a href="#hem">Vanlig sida</a></div>`;
+<div class="rum-ft"><span class="keys"><b>K</b> kupongen · <b>T</b> tv:n · <b>A</b> anslagstavlan</span><a href="#hem">Vanlig sida</a></div>`;
     document.querySelector('main').prepend(el);
     R.el = el;
     R.built = true;
     wire();
     // kort: högst elva tecken
     R.tv = window.RumTv ? RumTv.mount(el, { calm, short, kort: (n) => BOARD[n] || short(n), wd, hm, matches: () => (state.all && state.all.matches) || [] }) : null;
+    R.ans = window.RumAnslag ? RumAnslag.mount(el, { calm, kort: (n) => BOARD[n] || short(n), close: () => board(false) }) : null;
     paintUte();
   }
 
@@ -887,13 +869,6 @@ ${plane(0, paper())}
     }).join('');
   }
 
-  function seasonLabels(season) {
-    const y = Number(String(season || '').slice(0, 4)) || new Date().getFullYear();
-    const out = [];
-    for (let s = y - 11; s <= y; s++) out.push(`${String(s).slice(2)}/${String(s + 1).slice(2)}`);
-    return out;
-  }
-
   // Allt som hämtas: omgången, tabellen, säsongens omgångar och kupongerna.
   async function load() {
     await Promise.all([whenMatches(), loadCoupons()]);
@@ -919,6 +894,7 @@ ${plane(0, paper())}
     // tv:n: Stryktipsets ordning (spel) om omgången är Stryktipset, och next
     // mellan omgångarna, när raderna bara är de närmaste matcherna
     if (R.tv) R.tv.fill(rows, { spel: rd && rd.spel ? rd.ids : null, next: Boolean(rd && rd.next) });
+    if (R.ans) R.ans.fill(rows.map((x) => x.m), (state.all && state.all.matches) || []);
     const p = pult(rd);
     // har du lämnat in ligger din kupong i högen, och på pulten en ny – eller
     // gängets kupong, när du ser de andras tips (uppgörelsen)
@@ -955,7 +931,7 @@ ${plane(0, paper())}
     const cups = seen.slice().sort((a, b) => String(a.from).localeCompare(String(b.from)))
       .flatMap((r) => (r.people || []).filter((p) => p.award === 'best').map((p) => GANG[p.id] || '#d8b06a'));
     const hy = document.getElementById('rum-hyllor');
-    const hs = shelves(cups, seasonLabels(state.meta && state.meta.season));
+    const hs = shelves(cups);
     if (hy && R.hy !== hs) { hy.innerHTML = hs; R.hy = hs; }
     // oraklet som regerar, med hela efternamnet på skylten; scenen ritas om
     // bara när oraklet byts, så att strålarna inte börjar om
@@ -1134,6 +1110,11 @@ ${plane(0, paper())}
       zoomTv(!R.zoom);
       return;
     }
+    if (a.id === 'rum-ans') {
+      e.preventDefault();
+      board(true);
+      return;
+    }
     if ((a.id === 'rum-kupong' || a.dataset.ta != null) && openCoupon(a.id === 'rum-kupong' ? null : a)) {
       e.preventDefault();
       return;
@@ -1189,6 +1170,29 @@ ${plane(0, paper())}
     setCam(R.mx, R.my);
     if (on && r) aim(centerOf(r), 3.6, [800, 480], calm() ? null : 'glid');
     else aim([800, 500], 1, [800, 500], calm() ? null : 'glid');
+  }
+
+  // A: anslagstavlan lossnar från väggen och flyger fram (rum-anslag.js),
+  // och kameran går lite mot hörnet medan den flyger. Tillbaka flyger den
+  // till hörnen där den hänger när kameran har gått tillbaka – de mäts med
+  // kameran där en kort stund, innan den glider dit.
+  function board(on) {
+    if (!R.ans || on === R.ans.on()) return;
+    if (on) {
+      if (R.zoom) zoomTv(false);
+      R.ans.open(true, R.ans.quad());
+      const p = centerOf(document.getElementById('rum-ans'));
+      aim(p, 1.25, [p[0] + (800 - p[0]) * 0.5, p[1] + (500 - p[1]) * 0.5], calm() ? null : 'glid');
+      return;
+    }
+    const w = document.getElementById('rum-kamera');
+    const cam = w.style.cssText;
+    aim([800, 500], 1, [800, 500]);
+    const q = R.ans.quad();
+    w.style.cssText = cam;
+    void w.offsetWidth;
+    aim([800, 500], 1, [800, 500], calm() ? null : 'glid');
+    R.ans.open(false, q);
   }
 
   // ---------- kupongen i handen ----------
@@ -2004,7 +2008,7 @@ ${plane(0, paper())}
   function wire() {
     const el = R.el;
     el.addEventListener('mousemove', (e) => {
-      if (R.kup || R.zoom) return;
+      if (R.kup || R.zoom || (R.ans && R.ans.on())) return;
       R.tx = (e.clientX / innerWidth) * 2 - 1;
       R.ty = (e.clientY / innerHeight) * 2 - 1;
     });
@@ -2020,6 +2024,8 @@ ${plane(0, paper())}
         closeCoupon();
         return;
       }
+      // anslagstavlan sköter sina lappar själv (rum-anslag.js)
+      if (R.ans && R.ans.on()) return;
       // nära tv:n sköter den sina knappar och länkar själv (rum-tv.js)
       if (R.zoom && e.target.closest('#rum-tv3')) return;
       if (e.target.closest('.rum-tag') && openCoupon()) {
@@ -2035,10 +2041,14 @@ ${plane(0, paper())}
       const k = e.key.toLowerCase();
       if (R.kup) {
         if (k === 'k' || k === 'escape') closeCoupon();
+      } else if (R.ans && R.ans.on()) {
+        if (R.ans.key(e.key)) e.preventDefault();
+        else if (k === 'a' || k === 'escape') board(false);
       } else if (k === 'k') {
         if (!openCoupon()) location.hash = 'kupong';
       } else if (R.zoom && R.tv && R.tv.key(e.key)) e.preventDefault();
       else if (k === 't') zoomTv(!R.zoom);
+      else if (k === 'a') board(true);
       else if (k === 'escape' && R.zoom) zoomTv(false);
     });
     addEventListener('resize', fit);
@@ -2093,6 +2103,10 @@ ${plane(0, paper())}
       // en fast bild: allt på samma tid, och klar när datan och gänget är ritade
       ready.then(() => {
         freezeCss(R.frozen);
+        if (q.has('rum-anslag')) {
+          board(true);
+          if (q.get('rum-anslag')) setTimeout(() => R.ans && R.ans.lift(q.get('rum-anslag')), 50);
+        }
         frame();
         document.body.dataset.rumKlar = '1';
       });
@@ -2108,6 +2122,7 @@ ${plane(0, paper())}
   function hide() {
     if (!R.on) return;
     closeCoupon(true);
+    board(false);
     R.on = false;
     cancelAnimationFrame(R.raf);
     clearInterval(R.poll);

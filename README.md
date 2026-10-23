@@ -1708,15 +1708,16 @@ tippare på förstasidan länkar hit (*Till Olympen*).
 Förstasidan på stora skärmar (utan adress, bredare än 900 px och inte på högkant):
 tobaksaffären vid spelpulten. Scenen ritas i 1600 × 1000 och skalas så att den täcker
 fönstret; lagren ligger på olika djup (CSS 3D) och vrids lite när musen rör sig. Namnet
-och foten (*K kupongen · T tv:n*, *Vanlig sida*) ligger utanför scenen i fönstrets hörn;
+och foten (*K kupongen · T tv:n · A anslagstavlan*, *Vanlig sida*) ligger utanför scenen i fönstrets hörn;
 någon meny finns inte, det är föremålen som leder vidare. [public/rum.js](public/rum.js)
 ritar rummet och fyller det med sajtens data, [public/rum.css](public/rum.css) ger det utseendet och
 rörelserna, [public/rum-tv.js](public/rum-tv.js) och [public/rum-tv.css](public/rum-tv.css)
-bygger tv:n (se [Tv:n](#tvn)), och [public/rum-3d.js](public/rum-3d.js) ritar gänget i
+bygger tv:n (se [Tv:n](#tvn)), [public/rum-anslag.js](public/rum-anslag.js) och
+[public/rum-anslag.css](public/rum-anslag.css) anslagstavlan (se [Anslagstavlan](#anslagstavlan)), och [public/rum-3d.js](public/rum-3d.js) ritar gänget i
 three.js 0.160.0 (från jsdelivr, importmap i `index.html`), som hämtas först när rummet
 visas – utan WebGL eller utan nätet står rummet kvar utan gänget.
 
-**Föremålen** – pekar man på ett lyser det (pokalerna och pärmarna också), och snabbvalet
+**Föremålen** – pekar man på ett lyser det (pokalerna också), och snabbvalet
 på text-tv:n med samma ämne tänds, som när man pekar på snabbvalet med tv:n nära
 (skårtavlan Tabeller, pärmarna Skyttar). Klickar man går kameran fram mot föremålet innan
 sidan byts:
@@ -1730,7 +1731,8 @@ sidan byts:
   Ramen, palmetten och skylten ryms mellan tavlan och disken.
 - **Pokalhyllan** (högra väggen) → Olympen: en liten pokal per vunnen omgång i vinnarens
   färg (delat = en var), ur `data/tippare.json`.
-- **Pärmarna** (hyllan under) → Statistik: en per säsong, de tolv senaste.
+- **Anslagstavlan** (under tv:n, i hörnet) → lapparna om omgångens lag, och därifrån
+  Statistik (se [Anslagstavlan](#anslagstavlan)).
 - **Skårtavlan** (under tv:n) → Tabeller: Premier Leagues topp ur `data/teams/pl.json`
   med vita plastbokstäver i spåren på svart filt, i en aluminiumram. Varje bokstav sitter
   lite snett för sig (samma frö varje gång, så att inget flyttar sig), och lådan har bara
@@ -2068,6 +2070,50 @@ text-tv:n suddig på nära håll. Tv:n sköter sig själv: rum.js bygger den (`R
 kopplar in den (`RumTv.mount`), ger den omgångens rader vid varje `fill` (med Stryktipsets
 ordning när omgången är Stryktipset, och om raderna bara är de närmaste matcherna) och skickar
 siffror och pilar dit när den är nära.
+
+### Anslagstavlan
+
+Under tv:n, i hörnet på högra väggen där pärmarna stod, hänger en anslagstavla: juteväv i
+en ram av lackad ek, byggd i CSS 3D på väggen bredvid skårtavlan
+([public/rum-anslag.js](public/rum-anslag.js), [public/rum-anslag.css](public/rum-anslag.css)).
+Lapparna har det på sajten som rummet annars inte visar, om lagen i omgången (samma omgång
+som kupongen och fällbladstavlan):
+
+- **Formen** – ett registerkort, maskinskrivet: de fem senaste matcherna för båda lagen före
+  avspark (alla tävlingar, den senaste först), V, O eller F efter 90 minuter.
+- **Skadelistan** – ett genomslag: de skadade, avstängda och osäkra (?) per lag ur matchens
+  fil (Fantasy Premier League) – de tre som har spelat mest, och resten som +n.
+- **Starkast** – en polaroid med skölden för omgångens starkaste lag i den högsta
+  divisionen; på baksidan modellens starkaste och svagaste lag i omgången per division
+  (styrkan ur `data/teams/<division>.json`, som på Statistik).
+- **Kryssar gärna** – en gul lapp: chansen till oavgjort i lagets matcher, ur xG.
+- **Tur & otur** – rutat papper ur ett spiralblock: poäng mot chanserna (xG), med staplar i
+  blyerts.
+- **Slår oddsen** – ett tidningsurklipp: poäng mot vad oddsen väntade sig, och *Sviker*.
+- **Vilan** – ett almanacksblad med omgångens första dag: dagar sedan förra matchen för båda
+  lagen; skiljer det två dagar eller mer ringas det tröttare lagets siffra in.
+- **Inbördes** – ett anteckningsblock: de tre senaste mötena (de senaste fem åren) som V, O
+  eller F för hemmalaget.
+
+Ett klick eller A: tavlan lossnar från väggen och flyger fram – en projektiv avbildning
+(`matrix3d`) från hörnen på väggen till rakt fram, så att den vrids ut ur väggens vinkel –
+medan kameran går lite mot hörnet och rummet mörknar bakom; där den hängde är väggen
+ljusare. Framme lutar den lite efter musen, så att ramens djup syns, och lapparna lyfter i
+nederkanten när man pekar på dem. Ett klick på en lapp tar den från nålen och fram i läsbar
+storlek (polaroiden vänds på vägen), och pilarna bläddrar mellan lapparna. Esc, ett klick
+utanför eller *Häng tillbaka* sätter tillbaka lappen; Esc, A eller ett klick utanför tavlan
+hänger tillbaka tavlan – den flyger till hörnen där den hänger när kameran har gått
+tillbaka (rum.js mäter dem med kameran där en kort stund). Guldordet *Statistik* under
+tavlan leder till Statistik, och pekar man på tavlan i rummet tänds snabbvalet Statistik på
+text-tv:n. Med `prefers-reduced-motion` står tavlan framme direkt.
+
+Dolda resultat: formen och inbördes får ? för de dolda matcherna, och lapparna som räknar
+med resultaten (styrkan, krysset, turen och oddsen) visar bara rubriken och ett
+frågetecken när en match i lagens divisioner är dold – den lyfta lappen har då *Visa ändå*.
+Lagfilerna hämtas med rummet (om igen efter en kvart), matchernas filer när tavlan tas fram.
+Slitaget skiftar med dagen: lapparnas vinklar, nålhålen och hörnen av rivna lappar.
+`?rum-anslag` visar tavlan framme i en fast bild, och `?rum-anslag=<lapp>` (form, skador,
+styrka, kryss, tur, odds, vila, inbordes) med den lappen i handen.
 
 ## Statusmärkning
 
