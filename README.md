@@ -1762,13 +1762,16 @@ har sin loop (12–21 s) – flaskan och burken till munnen med huvudet bakåt, 
 glöden som tänds och röken som blåses ut, benen som dinglar – och huvudena nickar efter
 musen. Röken från glöden räknas för varje bloss ur var glöden var när det föddes, så att
 samma tid alltid ger samma bild. Inga riktiga märken: flaskan säger PILSNER, burken ÖL.
-Var och en bär sitt lag, med färgerna och smeknamnen men utan klubbmärken (`LAG` i
-rum-3d.js): DL en stickad halsduk i Nacionals vitt, blått och rött med BOLSO på den främre
-änden och fransar längst ner, DT ett lejonhuvud i gammal stil i kungsblått med bandet
-BLUES på underarmen som håller cigaretten (Chelsea; ett lejon, inte klubbens), och DJ en
-blåvitt randig mössa med tofs och BLÅVITT på uppviket, med solglasögonen uppskjutna på den
-(IFK Göteborg). Halsduken följer bålen, tatueringen vrids med handen och mössan följer
-huvudet; håret trycks ner under mössan och sticker ut under kanten.
+Var och en bär sitt lag (`LAG` i rum-3d.js): DL en stickad halsduk i Nacionals vitt, blått
+och rött med BOLSO på den ena änden, Nacionals sköld på den andra och fransar längst ner,
+DT ett lejonhuvud i gammal stil i kungsblått med bandet BLUES på underarmen som håller
+cigaretten (Chelsea; ett lejon, inte klubbens), och DJ en blåvitt randig mössa med tofs och
+IFK Göteborgs sköld isydd mitt fram på uppviket, med guldkant och BLÅ och VITT på var sin
+sida, och solglasögonen uppskjutna på den. Sköldarna är ESPN:s bilder i
+`public/rum/skold-nacional.png` och `skold-ifk.png` (256 px; den genomskinliga kanten skärs
+bort när de laddas, och saknas en blir det bara text). Halsduken följer bålen, tatueringen
+vrids med handen och mössan följer huvudet; håret trycks ner under mössan och sticker ut
+under kanten.
 
 **Rummet rör sig också:** regnet faller utanför rutan och dörren, droppar rinner på glaset,
 neonen glappar ibland, röken ligger under lysröret, damm syns i ljuset och ett hörn på en

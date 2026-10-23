@@ -41,19 +41,20 @@ const CHARS = {
   dj: { skin: '#e9b593', skin2: '#cd8f70', blush: '#d9765e', hair: '#4a3021', hair2: '#7a5236', hair3: '#2a1a11', tee: '#1c1c1e', tee2: '#0f0f10', pants: 'shorts', trou: '#e6dcc6', trou2: '#cfc4ab', sock: '#e8e4dc', shoe: '#3b3e44', sole: '#e26a4f', sole2: '#f1ece2', lace: '#2a2b2f' },
 };
 
-// Lagen, utan märken – bara färgerna, ränderna och smeknamnen: DL håller på
-// Nacional (vitt, blått och rött, Bolso), DT på Chelsea (kungsblått, lejonet)
-// och DJ på IFK Göteborg (blåvitt).
+// Lagen: färgerna, ränderna och smeknamnen, och på halsduken och mössan
+// sköldarna (ESPN:s bilder, rum/skold-*.png). DL håller på Nacional (vitt,
+// blått och rött, Bolso), DT på Chelsea (kungsblått; lejonet är inte
+// klubbens) och DJ på IFK Göteborg (blåvitt).
 const LAG = {
-  dl: { vit: '#f3eee3', bla: '#1d3683', rod: '#c4202e' },
+  dl: { vit: '#f3eee3', bla: '#1d3683', rod: '#c4202e', skold: 'rum/skold-nacional.png' },
   dt: { bla: '#2456b8', mork: '#121c3a', vit: '#f1ede4' },
-  dj: { bla: '#1a5cab', vit: '#f3f0e8' },
+  dj: { bla: '#1a5cab', vit: '#f3f0e8', guld: '#d9b14e', skold: 'rum/skold-ifk.png' },
 };
 
 // Måtten ur v2 (alt7.py) och vad var och en gör: arm 0 är figurens högra
 // (betraktarens vänstra) och arm 1 den vänstra. a/b = över- och underarm.
 // Attiraljerna: DL en stickad halsduk, DT ett lejon på underarmen och DJ en
-// randig mössa med tofs (solglasögonen uppskjutna på den).
+// randig mössa med tofs och märke (solglasögonen uppskjutna på den).
 const FIGS = [
   { key: 'dl', x: -400, turn: 22, tilt: -4, legs: 74, torso: 86, w: 50, depth: 30, neck: 12, neckR: 17, arm: 8.5, leg: 9, a: 42, b: 36,
     head: { rx: 56.7, ry: 70.65, rz: 54, hw: 63, hh: 78.5, cy: -5.5, taper: 0.06, noseY: 19, nose: [8, 7.6, 7.2], cheek: 0.08, ear: [0.15, 0.21, 0.16, 0.5] }, glasses: 0,
@@ -66,7 +67,7 @@ const FIGS = [
   { key: 'dj', x: 36, turn: -20, tilt: -2, legs: 104, torso: 100, w: 42, depth: 24, neck: 18, neckR: 13, arm: 7, leg: 8, a: 48, b: 44,
     head: { rx: 49, ry: 75, rz: 50, hw: 54, hh: 84, cy: -6, taper: 0.22, noseY: 18, nose: [5.8, 9, 7.2], noseRot: -0.3 }, glasses: 36,
     hair: { style: 'svep', sw: 28, f: 50, s: 82, b: 140, temple: 5, vol: 0.1, lift: 7, back: 2, n: 18, fine: 4, fineW: 0.3, g: 0.075, dark: 0.4, wob: 0.4, tip: 6, tipAt: 'bak', edge: 0.7, sideCut: 0.45, quiff: { dir: [-0.3, 0.62, 0.72], h: 0.13, w: 0.42 }, gr: 1.07 },
-    mossa: { f: 56, s: 76, b: 104, text: 'BLÅVITT' }, beard: [1.024, -2], does: ['burk', 'prat'] },
+    mossa: { f: 56, s: 76, b: 104, text: ['BLÅ', 'VITT'] }, beard: [1.024, -2], does: ['burk', 'prat'] },
 ];
 
 export async function figurer(canvas, opt = {}) {
@@ -392,12 +393,23 @@ export async function figurer(canvas, opt = {}) {
     return g;
   }
   // halsdukens färger längs bandet: segs = [[u0, u1, färg]] på botten
-  // (färgen bg), text = [u0, u1, ord, färg]; ppu bildpunkter per enhet
-  function scarfTex(L, w, bg, segs, text) {
+  // (färgen bg), text = [u0, u1, ord, färg], skold = [u0, u1, bild] (upprätt
+  // på en hängande ände); ppu bildpunkter per enhet
+  function scarfTex(L, w, bg, segs, text, skold) {
     const ppu = 16; const H = 128;
     return canvasTex(Math.ceil(L * ppu), H, (g, W) => {
       g.fillStyle = bg; g.fillRect(0, 0, W, H);
       for (const [a, b, col] of segs) { g.fillStyle = col; g.fillRect(a * ppu, 0, (b - a) * ppu, H); }
+      if (skold && skold[2]) {
+        const [a, b, img] = skold;
+        const s = Math.min((b - a) / img.height, w * 0.82 / img.width) * (H / w);
+        g.save();
+        g.translate((a + b) / 2 * ppu, H / 2);
+        g.scale(ppu / (H / w), 1);
+        g.rotate(-Math.PI / 2);
+        g.drawImage(img, -img.width * s / 2, -img.height * s / 2, img.width * s, img.height * s);
+        g.restore();
+      }
       if (text) {
         const [a, b, str, col] = text;
         g.save();
@@ -414,7 +426,8 @@ export async function figurer(canvas, opt = {}) {
   }
 
   // DL:s halsduk i Nacionals trikolor: ett varv runt halsen och båda ändarna
-  // fram på ena sidan, den främre längre med BOLSO, fransar längst ner.
+  // fram på ena sidan, den längre med BOLSO, den kortare med skölden, fransar
+  // längst ner.
   // Byggd i bröstets axlar så att den följer bålen.
   function halsduk(F, prof, parent) {
     const C = LAG[F.key];
@@ -467,15 +480,15 @@ export async function figurer(canvas, opt = {}) {
     const rt = scarfTex(34, 13, C.vit, at(20));
     rt.wrapS = THREE.RepeatWrapping; rt.repeat.x = 1 / 34;
     mesh(band(ring, rn, 13, 8.5, 28), wool(rt), parent);
-    // ändarna: A fram (längre, med texten) och B bakom den
-    const A = end([[-7, T + 1], [-8, T - 6], [-9, T - 16], [-10, T - 30], [-11, T - 44], [-12, T - 56]], TH * 1.4);
-    const Bn = end([[-17, T + 1], [-19, T - 6], [-21, T - 15], [-23, T - 27], [-24.5, T - 38]], TH / 2);
+    // ändarna: A (längre, med texten) och B (kortare, med skölden) ovanpå den
+    const A = end([[-7, T + 1], [-8, T - 6], [-9, T - 16], [-10, T - 30], [-11, T - 44], [-12, T - 56]], TH / 2);
+    const Bn = end([[-17, T + 1], [-21, T - 6], [-25, T - 15], [-29, T - 27], [-32, T - 38]], TH * 1.4);
     for (const [e, len] of [[A, 'A'], [Bn, 'B']]) {
       const g = band(e.pts, e.nrm, W, TH);
       const L = g.userData.len;
       const tx = len === 'A'
         ? scarfTex(L, W, C.vit, [...at(L - 10.5), ...at(L - 53)], [L - 40.5, L - 13, F.halsduk.text, C.bla])
-        : scarfTex(L, W, C.vit, [...at(L - 10.5), ...at(L - 34.5)]);
+        : scarfTex(L, W, C.vit, [...at(L - 10.5), ...at(L - 37)], null, [L - 26, L - 10.5, skold[F.key]]);
       tx.repeat.x = 1 / L;
       mesh(g, wool(tx), parent);
       fringe(e, [C.rod, C.vit, C.bla]);
@@ -574,9 +587,10 @@ export async function figurer(canvas, opt = {}) {
     return x;
   }
 
-  // DJ:s mössa i blåvitt: lodräta ränder (som tröjan), uppvik med BLÅVITT
-  // och en tofs. Följer huvudet; kanten (f/s/b = grader från hjässan fram,
-  // på sidan och bak) bestämmer också var håret trycks ner.
+  // DJ:s mössa i blåvitt: lodräta ränder (som tröjan), uppvik med skölden
+  // som märke mellan BLÅ och VITT, och en tofs. Följer huvudet; kanten
+  // (f/s/b = grader från hjässan fram, på sidan och bak) bestämmer också var
+  // håret trycks ner.
   function mossa(F, P, parent) {
     const C = LAG[F.key];
     const m = F.mossa;
@@ -637,22 +651,66 @@ export async function figurer(canvas, opt = {}) {
     cg.setAttribute('uv', new THREE.Float32BufferAttribute(cu, 2));
     cg.setIndex(ci);
     cg.computeVertexNormals();
+    const img = skold[F.key];
+    const PH = ch * 0.96; // märkets höjd och halva bredd i enheter
+    const PW = img ? (PH - 1) * img.width / img.height / 2 + 0.5 : 0;
     const circ = 2 * Math.PI * P.rx * 1.12;
+    const circF = 2 * Math.PI * Math.sin(lim(0)) * P.rx * 1.11; // omkretsen fram
     const cuffTex = canvasTex(2048, 128, (c, w, h) => {
       c.fillStyle = C.bla; c.fillRect(0, 0, w, h);
       c.fillStyle = C.vit; c.fillRect(0, 10, w, 7); c.fillRect(0, h - 17, w, 7);
       c.save();
       c.translate(w / 2, h / 2 + 3);
-      c.scale((w / circ) / (h / ch), 1);
+      const sx = (w / circ) / (h / ch);
+      c.scale(sx, 1);
       c.font = '900 64px "Arial Black", "Helvetica Neue", Arial, sans-serif';
-      c.textAlign = 'center'; c.textBaseline = 'middle';
-      c.fillText(m.text, 0, 0);
+      c.textBaseline = 'middle';
+      // BLÅ och VITT på var sin sida om märket
+      const gap = img ? (PW + 1.6) * w / circF / sx : 0;
+      if (img) { c.textAlign = 'right'; c.fillText(m.text[0], -gap, 0); c.textAlign = 'left'; c.fillText(m.text[1], gap, 0); }
+      else { c.textAlign = 'center'; c.fillText(m.text.join(''), 0, 0); }
       c.restore();
     });
     cuffTex.wrapS = THREE.RepeatWrapping;
     const rib = ribTex.clone();
     rib.repeat.set(140, 1);
     mesh(cg, mat('#ffffff', { map: cuffTex, ...wool, bumpMap: rib, bumpScale: 1.2 }), parent);
+    // märket: skölden isydd mitt fram på uppviket, med en kant av guldtråd
+    if (img) {
+      const badge = canvasTex(256, Math.round(256 * PH / (2 * PW)), (c, w, h) => {
+        const e = 256 * 0.5 / (2 * PW); // kanten (en halv enhet)
+        const iw = w - 2 * e; const ih = h - 2 * e;
+        const sil = document.createElement('canvas');
+        sil.width = w; sil.height = h;
+        const sc = sil.getContext('2d');
+        sc.drawImage(img, e, e, iw, ih);
+        sc.globalCompositeOperation = 'source-in';
+        sc.fillStyle = C.guld; sc.fillRect(0, 0, w, h);
+        for (let i = 0; i < 16; i++) { const a = i / 16 * 2 * Math.PI; c.drawImage(sil, Math.cos(a) * e * 0.9, Math.sin(a) * e * 0.9); }
+        c.drawImage(img, e, e, iw, ih);
+      });
+      const bp = []; const bu = []; const bi = [];
+      const NI = 24;
+      const da = PW / (Math.sin(lim(0)) * P.rx * 1.11);
+      for (let i = 0; i <= NI; i++) {
+        const a = (i / NI * 2 - 1) * da;
+        const L = lim(a);
+        const hth = hAt(a, L);
+        for (let j = 0; j <= NI; j++) {
+          const f = 0.02 + 0.96 * j / NI;
+          const p = at(L + 0.012 - f * hth, a, 1.083 + 0.062 * f);
+          bp.push(p.x, p.y, p.z);
+          bu.push(i / NI, j / NI);
+        }
+      }
+      for (let i = 0; i < NI; i++) for (let j = 0; j < NI; j++) { const a = i * (NI + 1) + j; const b = a + NI + 1; bi.push(a, b, a + 1, a + 1, b, b + 1); }
+      const bg = new THREE.BufferGeometry();
+      bg.setAttribute('position', new THREE.Float32BufferAttribute(bp, 3));
+      bg.setAttribute('uv', new THREE.Float32BufferAttribute(bu, 2));
+      bg.setIndex(bi);
+      bg.computeVertexNormals();
+      mesh(bg, mat('#ffffff', { map: badge, alphaTest: 0.5, bumpMap: badge, bumpScale: 0.8, roughness: 0.45, clearcoat: 0.5, clearcoatRoughness: 0.2, polygonOffset: true, polygonOffsetFactor: -2 }), parent);
+    }
     // tofsen: en lurvig boll av garn i båda färgerna
     const pg = new THREE.SphereGeometry(1, 64, 48);
     const pp = pg.attributes.position;
@@ -764,10 +822,26 @@ export async function figurer(canvas, opt = {}) {
   // ---------- figurerna ----------
 
   const tex = {};
+  const skold = {}; // lagsköldarna, utan den genomskinliga kanten; saknas en blir det text i stället
+  const loadImg = (src) => new Promise((res, rej) => { const i = new Image(); i.onload = () => res(i); i.onerror = rej; i.src = src; });
+  function trim(img) {
+    const c = document.createElement('canvas');
+    c.width = img.width; c.height = img.height;
+    const g = c.getContext('2d');
+    g.drawImage(img, 0, 0);
+    const d = g.getImageData(0, 0, c.width, c.height).data;
+    let x0 = c.width; let y0 = c.height; let x1 = 0; let y1 = 0;
+    for (let y = 0; y < c.height; y++) for (let x = 0; x < c.width; x++) if (d[(y * c.width + x) * 4 + 3] > 16) { x0 = Math.min(x0, x); x1 = Math.max(x1, x); y0 = Math.min(y0, y); y1 = Math.max(y1, y); }
+    const o = document.createElement('canvas');
+    o.width = x1 - x0 + 1; o.height = y1 - y0 + 1;
+    o.getContext('2d').drawImage(c, -x0, -y0);
+    return o;
+  }
   await document.fonts.ready;
   await Promise.all([
     ...['dl', 'dt', 'dj'].map(async (k) => { tex[k] = await imgTex(`rum/ansikte-${k}.svg`); }),
     imgTex('rum/skagg-dj.svg').then((t) => { tex.dj_skagg = t; }),
+    ...Object.entries(LAG).filter(([, c]) => c.skold).map(([k, c]) => loadImg(c.skold).then((i) => { skold[k] = trim(i); }, () => {})),
   ]);
   labelTex.needsUpdate = true;
   canTex.needsUpdate = true;
