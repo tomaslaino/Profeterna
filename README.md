@@ -471,6 +471,13 @@ Utan nyckel ingen knapp.
   *Inlämnad*. Samma kväll också för den som redan har lämnat in: kupongen lyfts med dina kryss
   och stämpeln, och tipsen går att ändra tills du ser någon annans eller första matchen
   startar, som på papperet. Se [Kupongen i handen](#kupongen-i-handen).
+- **Kupongen i rummet ser ut som papperet (2026-10-23, användarens önskemål):** kupongen på
+  pulten och i handen hade en egen form (sidokolumn med Spelstopp, Insats, Inlämnade och
+  Tippare-rutor, finstil). Papperet under Kupong fick vara förlagan, eftersom det måste
+  fungera i telefonen och i alla steg, och kupongen i rummet ritas nu med samma delar i
+  sitt fasta mått: stämpeln och spelstoppet under bandet, porträtten i stället för
+  initialerna, en synkmarkering per rad och fälten och streckkoden i foten. Papperet fick
+  streckkoden i foten. Se [Kupongen i handen](#kupongen-i-handen).
 - **Säsongsprognosen tas bort (2026-10-20, användarens beslut):** vyn under Tabeller och
   simuleringen i bygget (`src/season.js`, `data/season.json`) försvinner, liksom
   programmet framåt och prognosdelen i lagkortet. Tabeller visar bara tabellen, med
@@ -1271,7 +1278,8 @@ under omgången.
    initialer (*Vem är du?* – sparas på enheten, de ringas in), kryssar i sin kolumn med
    modellens odds under rutorna och kan skriva en kort motivering under matchen man just
    tippade (högst 140 tecken). I telefonen står matchens nummer före lagen. Raden med initialerna står kvar överst när man bläddrar.
-   Nederst hur många matcher som är tippade, garderingar och rader, och under dem raden
+   Nederst hur många matcher som är tippade, garderingar och rader, med streckkoden och
+   omgångens id till höger (som på kupongen på pulten i tobaksaffären), och under dem raden
    med allt man gör med kupongen, som står kvar nederst medan man bläddrar (som raden med
    initialerna överst): till höger *Spara* och *Lämna in*, till vänster
    *Ändra matcherna* och *Ta bort* i finstil (i telefonen bakom ⋯). *Ta bort* tar med de
@@ -1735,9 +1743,14 @@ går kameran fram mot det innan sidan byts:
 - **Korktavlan** (längst till höger) → gängets kuponger i Olympen (`#olympen/kuponger`):
   de färdigspelade kupongerna (`Historik.coupons`) rättade med röd penna, en med kaffering.
   Tom tills den första är färdigspelad.
-- **Kupongen och kvittot** → Kupong. Kupongen visar omgångens matcher i
-  kupongens ordning med kryss där gängets kupong har tecken – innan den finns dina egna, med
-  ditt namn kryssat under *Tippare*; har du lämnat in ligger din i högen bredvid och på
+- **Kupongen och kvittot** → Kupong. Kupongen är samma kupong som papperet under Kupong, i
+  kupongens mått (660 × 470): bandet, under det stämpeln (vem omgången väntar på) och
+  spelstoppet, porträtten med bock, tårtbit eller prickar och 1 X 2 överst, en rad per
+  match i kupongens ordning med synkmarkeringen i kanten och dag, tid och serie efter lagen
+  (dagens rubrik får inte plats), och i foten fälten *Tippat*, *Garderingar*,
+  *Kombinationer* (eller *Pris*) och *Odds* och streckkoden med omgångens id (`Samtal.pult.top`
+  och `fields`, `Papper.code`). Kryss där gängets kupong har tecken – innan den finns dina
+  egna, med ditt porträtt inringat; har du lämnat in ligger din i högen bredvid och på
   pulten en ny – kvittot när var och en lämnade in. Tills alla har lämnat in eller första
   matchen startar tas kupongen (din ur högen, när du har lämnat in) i handen i stället (se
   nedan). Guldordet bredvid säger vad som väntar: *Fyll i kupongen*, *Fyll i resten*,
@@ -1760,6 +1773,12 @@ kuponger med samma terrakottaband som kupongen på pulten i ett fack av plexigla
 pennor (samma som kupongens) i ett rör bredvid och en lapp på plexit: *Pennorna är
 räknade*.
 
+**Stationsuret** sitter på bakväggen ovanför fällbladstavlan och leder ingenstans: vit
+tavla med svarta streck och visare och en röd sekundvisare som hoppar varje sekund, med en
+mörk kant och tavlan gulnad av röken. Det går efter Stockholms tid, med samma klocka som
+utsikten (`Vader.nu()` i vader.js, annars datorns klocka). Med `?rum-t` står det på den
+tid det visade först, och med `prefers-reduced-motion` syns inte sekundvisaren.
+
 **Gänget** sitter på fönsterbänken med benen hängande: DL dricker ur en flaska, DT röker
 och skrattar, DJ har en burk i ena handen och pratar med cigaretten i den andra. Var och en
 har sin loop (12–21 s) – flaskan och burken till munnen med huvudet bakåt, ett bloss med
@@ -1778,8 +1797,8 @@ vrids med handen och mössan följer huvudet; håret trycks ner under mössan oc
 under kanten.
 
 **Rummet rör sig också:** regnet faller utanför rutan och dörren, droppar rinner på glaset,
-neonen glappar ibland, röken ligger under lysröret, damm syns i ljuset och ett hörn på en
-löpsedel har släppt och fladdrar. Stället är slitet: nikotingula väggar och tak, fläckar,
+neonen glappar ibland, röken ligger under lysröret, damm syns i ljuset och stationsurets
+sekundvisare hoppar fram. Stället är slitet: nikotingula väggar och tak, fläckar,
 avflagnad färg, en spricka, skuggan efter en tavla som flyttats, nötta kanter på disken och
 pulten, kafferingar och brännmärken. Med `prefers-reduced-motion` står allt still (en bild,
 ingen kamera efter musen, inget klapper).
@@ -1801,15 +1820,17 @@ eller K. Kupongen lossnar från pulten,
 lyfter, vänds upp mot betraktaren och förstoras till mitten av fönstret (så stor som får
 plats mellan menyn och orden under den), svänger en aning förbi och stannar; rummet mörknar
 bakom, kameran ställer sig rakt framför, och pennan följer med och rullar undan till
-sidokolumnen. Samma kupong som på pulten, men rutorna är knappar: ett tryck kryssar i eller
+foten, mellan fälten och streckkoden. Samma kupong som på pulten, men rutorna är knappar: ett tryck kryssar i eller
 ur (två eller tre tecken = gardering), och pennan går dit, drar det ena strecket, lyfter
 och drar det andra – ett kryss med blyerts som ser likadant ut varje gång (samma
 slumpfrö för matchen och tecknet). Står pennan still en stund lägger den sig vid sidan
-igen. Ett kryss som tas bort suddas ut. Under *Tippare* kryssar man för vem man är (DL, DT,
-DJ; de andra som redan har lämnat in står bleka), och *Tippat 4/13* räknar.
+igen. Ett kryss som tas bort suddas ut. Vem man är väljer man bland porträtten överst, som
+på papperet (*Vem är du?*; den som redan har lämnat in går inte att välja): pennan ringar in
+ditt porträtt, och stämpeln säger vem omgången väntar på med dig först. Fälten i foten
+räknas om för varje kryss.
 
 Under kupongen står *Lägg tillbaka* och guldordet *Lämna in*. Utan namn står *Vem är du?*
-och Tippare-rutorna blir röda; saknas tecken blir rutorna i de matcherna röda och raden
+och porträtten får en röd ring; saknas tecken blir rutorna i de matcherna röda och raden
 säger hur många, som på papperet under Kupong. Annars lämnas tipsen in med samma kod
 (`Samtal.pult` och `handIn` i [public/samtal.js](public/samtal.js), `POST …/samtal {gor:
 "tips"}`), stämpeln *Inlämnad* slår i och kupongen vänds och läggs överst i högen; på
@@ -1820,8 +1841,8 @@ pulten och där; ett utkast utan namn blir ditt när du säger vem du är.
 
 Har du redan lämnat in tas din kupong ur högen i stället – med ett klick på den, på
 kupongen på pulten, på guldordet eller K: den lyfts, vänds över långsidan på vägen upp
-(innehållet byts när den står på kant) och stannar i handen med dina kryss, ditt namn och
-stämpeln. *Lägg tillbaka* och inlämningen vänder den tillbaka ner i högen.
+(innehållet byts när den står på kant) och stannar i handen med dina kryss, ditt porträtt
+inringat och stämpeln *Inlämnad* bredvid stämpeln om vem omgången väntar på. *Lägg tillbaka* och inlämningen vänder den tillbaka ner i högen.
 Har ingen annans tips visats för dig än är rutorna knappar som förut, och guldordet heter
 *Lämna in ändringen* – släckt tills något är ändrat. Ändringen stannar i handen tills den
 lämnas in (som på papperet, där en ändring får lämna matcher tomma), och då slår stämpeln i

@@ -16,7 +16,8 @@
 // Längst ner kupongen som växer fram medan man väljer matcher (builder, slip).
 // Kryssen, ringarna, bockarna, betyget, ställningen och foten (cross, ring,
 // tick, grade, result, foot) ritar också omgångens kupong med allas
-// porträtt i rutorna i samtal.js.
+// porträtt i rutorna i samtal.js, och streckkoden (code) står också på
+// kupongen på pulten i tobaksaffären (rum.js).
 //
 // Läses efter kupong.js och använder dess hjälpare (SIGNS, NOTE_MAX, rowClass,
 // teamsOf, scoreText, kpNum, dateRange, liveLine, fWeekdayTime) och app.js
@@ -108,6 +109,9 @@
     }
     return `<svg class="pp-bars" viewBox="0 0 ${x} 30" preserveAspectRatio="none" aria-hidden="true"><path d="${d}"/></svg>`;
   }
+  // Streckkoden med id:t under, längst ner till höger – på kupongerna, på
+  // papperet när alla tippar och på kupongen på pulten i rummet (rum.js).
+  const code = (id) => `<span class="pp-code">${barcode(id)}<span>${esc(id)}</span></span>`;
 
   const rader = (c) => c.matches.reduce((a, x) => a * Math.max(1, x.sign.length), 1);
 
@@ -223,7 +227,7 @@
     return '<div class="pp-foot"><div class="pp-fields">' +
       fields.map(([label, v, title]) => `<span class="pp-field"${title ? ` title="${esc(title)}"` : ''}><span>${label}</span><b>${v}</b></span>`).join('') +
       '</div><div class="pp-fine">' + liveLine(g) +
-      `<span class="pp-code">${barcode(c.id)}<span>${esc(c.id)}</span></span></div></div>`;
+      `${code(c.id)}</div></div>`;
   }
 
   // Hela kupongen.
@@ -462,5 +466,5 @@
     }
   }
 
-  window.Papper = { RADER, coupon, builder, reveal, program, slip, bump, open: pull, banner, cross, ring, tick, grade, result, foot, inDayOrder };
+  window.Papper = { RADER, coupon, builder, reveal, program, slip, bump, open: pull, banner, cross, ring, tick, grade, result, foot, code, inDayOrder };
 }());

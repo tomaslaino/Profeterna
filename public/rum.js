@@ -275,11 +275,7 @@ window.Rum = (() => {
   <rect x="1408" y="490" width="64" height="70" rx="12" fill="#d9e6ea" opacity=".2"/>
   ${candy}
   <rect x="1404" y="482" width="72" height="12" rx="4" fill="#c8643a"/>
-  <rect x="1410" y="494" width="60" height="62" rx="10" fill="#cfc4a3" opacity=".12"/>
-
-  <g stroke="#1f1f20" stroke-width="7" fill="none"><path d="M22 650 V306 H324 V650"/></g>
-  <rect x="18" y="300" width="310" height="8" fill="url(#rum-alu)"/>
-  <rect x="18" y="298" width="310" height="3" fill="#cfc6b0" opacity=".25"/>`);
+  <rect x="1410" y="494" width="60" height="62" rx="10" fill="#cfc4a3" opacity=".12"/>`);
   }
 
   // Regnet som faller utanför: två band per ruta som glider nedåt (bara
@@ -315,11 +311,52 @@ window.Rum = (() => {
       ${word(190)}<rect x="420" y="200" width="40" height="10" rx="2" fill="#1d1b1a"/>`);
   }
 
-  // Löpsedlarna i stället, den vänstra med ett hörn som släppt.
-  function lop() {
-    return '<div class="rum-lop" style="left:28px; top:318px"><span class="mast">Facit</span><div class="kick">Experterna:</div><div class="head">Bollen är rund</div><i class="tejp" style="left:6px"></i></div>' +
-      '<div class="rum-lop slapp" style="left:178px; top:318px"><span class="mast">Facit</span><div class="kick">Lördag:</div><div class="head">DJ tror på kryss</div>' +
-      '<i class="tejp" style="left:8px"></i><i class="horn"></i></div>';
+  // Stationsuret ovanför fällbladstavlan: vit tavla med svarta streck och en
+  // röd sekundvisare, gulnad av röken. Visarna ställs i hands().
+  const UR = { x: 1050, y: 152, r: 46 };
+  function clock() {
+    const { x, y, r } = UR;
+    let ticks = '';
+    for (let i = 0; i < 60; i++) {
+      const big = i % 5 === 0;
+      ticks += `<rect x="${r1(big ? -r * 0.036 : -r * 0.01)}" y="${r1(-r * 0.93)}" width="${r1(big ? r * 0.072 : r * 0.02)}" height="${r1(big ? r * 0.23 : r * 0.075)}" transform="rotate(${i * 6})"/>`;
+    }
+    // visaren pekar uppåt: från baken (b) under navet till spetsen (l)
+    const hand = (id, l, b, w0, w1) => `<polygon id="${id}" points="${r1(-w0 / 2)},${r1(b)} ${r1(w0 / 2)},${r1(b)} ${r1(w1 / 2)},${r1(-l)} ${r1(-w1 / 2)},${r1(-l)}"/>`;
+    return svg(`<defs>
+    <radialGradient id="rum-ur-tavla" cx=".44" cy=".4" r=".62"><stop offset="0" stop-color="#f7f0dc"/><stop offset=".72" stop-color="#e9dfc3"/><stop offset="1" stop-color="#c9ba92"/></radialGradient>
+    <radialGradient id="rum-ur-nik" cx=".5" cy=".5" r=".5"><stop offset=".55" stop-color="#7a5410" stop-opacity="0"/><stop offset="1" stop-color="#6a4608" stop-opacity=".28"/></radialGradient>
+    <linearGradient id="rum-ur-kant" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#8d887c"/><stop offset=".35" stop-color="#3a3833"/><stop offset="1" stop-color="#0f0e0d"/></linearGradient>
+  </defs>
+  <circle cx="${x + 4}" cy="${y + 10}" r="${r + 6}" fill="#000" opacity=".5" filter="url(#rum-b10)"/>
+  <g transform="translate(${x} ${y})">
+    <circle r="${r + 6}" fill="url(#rum-ur-kant)"/><circle r="${r + 1.6}" fill="#0e0d0c"/><circle r="${r}" fill="url(#rum-ur-tavla)"/>
+    <g fill="#161512">${ticks}${hand('rum-ur-t', r * 0.56, r * 0.16, r * 0.11, r * 0.08)}${hand('rum-ur-m', r * 0.86, r * 0.16, r * 0.085, r * 0.055)}</g>
+    <g id="rum-ur-s" fill="#c4281c"><rect x="${r1(-r * 0.013)}" y="${r1(-r * 0.8)}" width="${r1(r * 0.026)}" height="${r1(r * 1.04)}"/><circle cy="${r1(r * 0.2)}" r="${r1(r * 0.05)}"/></g>
+    <circle r="${r1(r * 0.045)}" fill="#c4281c"/><circle r="${r1(r * 0.018)}" fill="#3a0a06"/>
+    <circle r="${r}" fill="url(#rum-ur-nik)"/>
+    <path d="M${r1(-r * 0.78)} ${r1(-r * 0.38)} A${r1(r * 0.87)} ${r1(r * 0.87)} 0 0 1 ${r1(r * 0.18)} ${r1(-r * 0.85)}" stroke="#fff" stroke-opacity=".28" stroke-width="${r1(r * 0.05)}" fill="none" stroke-linecap="round"/>
+    <ellipse cx="${r1(-r * 0.22)}" cy="${r1(-r * 0.42)}" rx="${r1(r * 0.55)}" ry="${r1(r * 0.28)}" fill="#fff" opacity=".07" transform="rotate(-30)"/>
+  </g>`);
+  }
+
+  // Visarna efter Stockholms tid, en gång i sekunden: Vader.nu() (vader.js)
+  // går efter ?rum-klocka, annars datorns klocka. Med ?rum-t står uret på den
+  // tid det visade först.
+  const fUr = new Intl.DateTimeFormat('sv-SE', { timeZone: 'Europe/Stockholm', hour: 'numeric', minute: 'numeric', second: 'numeric', hourCycle: 'h23' });
+  function hands() {
+    if (still() && R.urS != null) return;
+    if (R.urOff == null) R.urOff = window.Vader ? Vader.nu().t - Date.now() : 0;
+    const ms = Date.now() + R.urOff;
+    const s = Math.floor(ms / 1000);
+    if (s === R.urS) return;
+    R.urS = s;
+    const p = {};
+    for (const x of fUr.formatToParts(new Date(ms))) p[x.type] = +x.value;
+    const turn = (id, a) => document.getElementById(id).setAttribute('transform', `rotate(${r1(a)})`);
+    turn('rum-ur-t', ((p.hour % 12) + p.minute / 60) * 30);
+    turn('rum-ur-m', (p.minute + p.second / 60) * 6);
+    turn('rum-ur-s', p.second * 6);
   }
 
   // ---------- de sju sakerna ----------
@@ -595,7 +632,7 @@ window.Rum = (() => {
     el.hidden = true;
     el.setAttribute('aria-label', 'Tobaksaffären');
     el.innerHTML = `<div class="rum-stage" id="rum-stage"><div class="rum-kamera" id="rum-kamera"><div class="rum-world" id="rum-world">
-${plane(-600, `${bg()}${rain()}${rightWall()}${svg('<g id="rum-hyllor"></g>')}${neon()}${lop()}${boardHtml()}${frameHtml()}`, 1.035)}
+${plane(-600, `${bg()}${rain()}${rightWall()}${svg('<g id="rum-hyllor"></g>')}${neon()}${clock()}${boardHtml()}${frameHtml()}`, 1.035)}
 ${plane(-470, `${props()}${tv()}`, 1.02)}
 ${plane(-330, `${sill()}${haze()}`)}
 ${plane(-60, table(), 1.05)}
@@ -812,40 +849,43 @@ ${closeHtml()}
     };
   }
   const PEN_PULT = { x: 276.4, y: 340.6, a: -11 };
-  const PEN_VILA = { x: 506, y: 384, a: -7 };
+  const PEN_VILA = { x: 362, y: 440, a: -6 };
   const PEN_SKRIV = -38;
   const penStyle = (p) => { const s = penAt(p); return `transform: ${s.transform}; filter: ${s.filter}`; };
 
-  // Kupongen på pulten: omgångens matcher i kupongens ordning, med kryss där
+  // Kupongen på pulten: samma kupong som papperet under Kupong (samtal.js),
+  // i kupongens mått. Bandet, under det stämpeln (vem omgången väntar på)
+  // och spelstoppet, porträtten och 1 X 2 överst, en rad per match med
+  // synkmarkeringen i kanten och fälten och streckkoden i foten. Kryss där
   // gängets kupong har tecken – innan den finns dina egna (p =
-  // Samtal.pult.state()), med ditt namn kryssat under Tippare och stämpeln
-  // när du har lämnat in. hand: kupongen i handen, där rutorna är knappar.
+  // Samtal.pult.state()), med ditt porträtt inringat och stämpeln Inlämnad
+  // när du har lämnat in. hand: kupongen i handen, där rutorna och
+  // porträtten för dem du kan vara är knappar.
   function couponHtml(rd, rows, p = null, hand = false) {
     const nr = rd && !rd.next && typeof couponNumber === 'function' && rd.ids.length ? couponNumber(rd.ids) : null;
     const first = rows.length ? Math.min(...rows.map((x) => Date.parse(x.m.kickoff))) : null;
     const order = rd ? rd.ids.map((id) => rows.find((x) => x.id === id)).filter(Boolean) : rows;
     const gang = order.some((x) => x.sign);
     const own = Boolean(p) && !gang;
-    const mine = own ? p.tecken : {};
+    const signs = Object.fromEntries(order.map((x) => [x.id, (own ? p.tecken[x.id] : x.sign) || '']));
     const box = (key, label, on, attrs, cls = '') => (hand && attrs != null
       ? `<button type="button" class="box${on ? ' x' : ''}${cls}"${attrs} aria-pressed="${on}">`
       : `<span class="box${on ? ' x' : ''}${cls}">`) + `<i>${label}</i>${on ? crossSvg(key) : ''}${hand && attrs != null ? '</button>' : '</span>'}`;
     const list = order.map((x, i) => {
-      const sign = own ? mine[x.id] || '' : x.sign;
-      return `<div class="row${sign ? '' : ' tom'}" data-id="${esc(x.id)}"><span class="nr">${i + 1}</span><span>${esc(short(x.m.home))} – ${esc(short(x.m.away))}</span>` +
-        ['1', 'X', '2'].map((s) => box(`${x.id}${s}`, s, sign.includes(s), ` data-s="${s}" aria-label="${esc(`${x.m.home} – ${x.m.away}: ${s}`)}"`)).join('') + '</div>';
+      const sign = signs[x.id];
+      const comp = compOf(x.m.comp);
+      return `<div class="row${sign ? '' : ' tom'}" data-id="${esc(x.id)}"><span class="pp-nr">${i + 1}</span>` +
+        `<span class="m"><span class="pp-tm">${esc(x.m.home)}<span class="vs"> – </span>${esc(x.m.away)}</span>` +
+        `<span class="pp-small">${esc(fWeekdayTime.format(new Date(x.m.kickoff)))}${comp ? ` · ${esc(comp.short)}` : ''}</span></span>` +
+        SIGNS.map((s) => box(`${x.id}${s}`, s, sign.includes(s), ` data-s="${s}" aria-label="${esc(`${x.m.home} – ${x.m.away}: ${s}`)}"`)).join('') + '</div>';
     }).join('');
-    const who = rd && rd.gang && rd.gang.length ? rd.gang.filter((g) => g.inne).length : null;
-    const vem = own ? '<span class="vem"><span>Tippare</span><span>' + p.s.gang.map((g) => box(`vem${g.id}`, esc(g.id), g.id === p.vem,
-      p.val.includes(g.id) ? ` data-vem="${esc(g.id)}" aria-label="${esc(g.namn || g.id)}"` : null, g.inne && g.id !== p.vem ? ' inne' : '')).join('') + '</span></span>' : '';
-    return '<span class="marks"></span>' +
-      `<span class="band"><small>MATCHFIXARNA · TIPSKUPONG</small><b>${nr ? `Kupong ${nr}` : 'Kupong'}</b></span>` +
-      `<span class="sub"><i>${esc((rd && rd.name) || '')}</i><span>${rows.length} matcher</span></span>` +
-      `<span class="grid"><span><span class="hd"><span></span><span>MATCH</span><span>1</span><span>X</span><span>2</span></span>${list}</span>` +
-      `<span class="side"><span><span>Spelstopp</span><b>${first ? `${wd(new Date(first))} ${hm(new Date(first))}` : '–'}</b></span>` +
-      `<span><span>Insats</span><b>äran</b></span>${who != null ? `<span><span>Inlämnade</span><b>${who} av ${rd.gang.length}</b></span>` : ''}` +
-      (own ? `<span><span>Tippat</span><b data-tippat>${order.filter((x) => mine[x.id]).length}/${order.length}</b></span>${vem}` : '') + '</span></span>' +
-      '<span class="code"></span><span class="fine"><span>Kupongen gäller först när den är inlämnad.</span><span>Ej giltig som kvitto</span></span>' +
+    const top = p ? Samtal.pult.top(hand && p.fyll) : null;
+    const id = rd && !rd.next ? rd.id || (rd.coupon && rd.coupon.id) : null;
+    return `<span class="band"><small>MATCHFIXARNA · TIPSKUPONG</small><b>${nr ? `Kupong ${nr}` : 'Kupong'}</b></span>` +
+      `<span class="topp">${top ? top.stamp : ''}<span class="pp-stop"><span>Spelstopp</span><b>${first ? esc(fWeekdayTime.format(new Date(first))) : '–'}</b></span></span>` +
+      `<span class="hd"><span>Nr</span><span class="m">${top && top.vem ? '<span class="sm-q">Vem är du?</span>' : '<span>Match</span>'}` +
+      `${top ? `<span class="sm-folk-pp">${top.faces}</span>` : ''}</span><span>1</span><span>X</span><span>2</span></span>${list}` +
+      `<span class="fot">${p ? Samtal.pult.fields(signs) : ''}${id ? Papper.code(id) : ''}</span>` +
       (own && p.inne ? '<span class="stampel">Inlämnad</span>' : '') + `<span class="pencil" style="${penStyle(PEN_PULT)}"><i></i></span>`;
   }
 
@@ -1062,6 +1102,7 @@ ${closeHtml()}
       R.neon = on;
       R.el.classList.toggle('neon-av', !on);
     }
+    hands();
     // tavlan bläddrar var nionde sekund, text-tv:n var tolfte
     const page = Math.floor(t / 9);
     if (still() && R.lines) {
@@ -1386,7 +1427,7 @@ ${closeHtml()}
     }
     el.focus({ preventScroll: true });
     el.addEventListener('click', (e) => {
-      const b = e.target.closest('button.box');
+      const b = e.target.closest('button.box, button[data-vem]');
       if (!b || k.closing) return;
       if (b.dataset.vem) choose(b);
       else tick(b);
@@ -1520,9 +1561,42 @@ ${closeHtml()}
     }, 1800);
   }
 
-  // Ett kryss som tas bort suddas ut.
+  // Pennan ringar in ditt porträtt, ett drygt varv som på papperet: den
+  // följer ringen som ritas (Papper.ring) och lyfter.
+  function drawRing(fw, key) {
+    const k = R.kup;
+    fw.querySelector('.sm-fc').insertAdjacentHTML('afterend', Papper.ring(key, 'sm-du-ring', 25));
+    const svg = fw.querySelector('.sm-du-ring');
+    const path = svg.querySelector('path');
+    if (calm()) return;
+    // ringen står 6 px utanför porträttet runt om (rum.css), i 60 × 60
+    const o = spot(fw);
+    const w = fw.offsetWidth + 12;
+    const h = fw.offsetHeight + 12;
+    const len = path.getTotalLength();
+    const n = 16;
+    const pts = Array.from({ length: n + 1 }, (_, i) => path.getPointAtLength((len * i) / n))
+      .map((q) => [o.x - 6 + (q.x / 60) * w, o.y - 6 + (q.y / 60) * h]);
+    path.setAttribute('pathLength', '1');
+    path.style.strokeDasharray = '1 2';
+    const at = (pt, l, t, e) => ({ x: pt[0], y: pt[1], a: PEN_SKRIV, l, t, e });
+    const travel = Math.round(Math.min(340, Math.max(150, Math.hypot(pts[0][0] - k.at.x, pts[0][1] - k.at.y) * 0.9)));
+    const step = 26;
+    penGo([
+      at(pts[0], 0.7, travel, 'cubic-bezier(0.4, 0, 0.2, 1)'), at(pts[0], 0, 50, 'ease-in'),
+      ...pts.slice(1).map((pt) => at(pt, 0, step, 'linear')),
+      at([pts[n][0] + 12, pts[n][1] + 10], 0.8, 220, 'ease-out'),
+    ]);
+    path.animate([{ strokeDashoffset: 1.05 }, { strokeDashoffset: 0 }], { duration: step * n, delay: travel + 50, easing: 'linear', fill: 'backwards' });
+    clearTimeout(k.idle);
+    k.idle = setTimeout(() => {
+      if (R.kup === k && !k.closing) penGo([{ ...PEN_VILA, l: 0.4, t: 480, e: 'cubic-bezier(0.4, 0, 0.3, 1)' }, { ...PEN_VILA, t: 160, e: 'ease-in' }]);
+    }, 1800);
+  }
+
+  // Ett kryss eller en ring som tas bort suddas ut.
   function eraseCross(box) {
-    for (const svg of box.querySelectorAll('.kryss:not(.ut)')) {
+    for (const svg of box.querySelectorAll('.kryss:not(.ut), .sm-du-ring:not(.ut)')) {
       svg.classList.add('ut');
       if (calm()) svg.remove();
       else svg.animate([{ opacity: 1 }, { opacity: 0, filter: 'blur(1.5px)' }], { duration: 240, easing: 'ease-out', fill: 'forwards' }).finished.then(() => svg.remove(), () => {});
@@ -1546,26 +1620,29 @@ ${closeHtml()}
       else delete k.tecken[row.dataset.id];
       k.go.disabled = Object.keys({ ...k.orig, ...k.tecken }).every((id) => (k.orig[id] || '') === (k.tecken[id] || ''));
     } else Samtal.pult.tippa(row.dataset.id, sign);
-    const rows = [...k.el.querySelectorAll('.row')];
-    const n = rows.filter((r) => !r.classList.contains('tom')).length;
-    const f = k.el.querySelector('[data-tippat]');
-    if (f) f.textContent = `${n}/${rows.length}`;
-    if (n === rows.length) k.el.classList.remove('need');
+    // fälten i foten räknas om, som på papperet
+    const f = k.el.querySelector('.fot .pp-fields');
+    if (f) f.outerHTML = Samtal.pult.fields(k.andra ? k.tecken : Samtal.pult.state().tecken);
+    if (!k.el.querySelector('.row.tom')) k.el.classList.remove('need');
     k.msg.textContent = '';
   }
 
-  // Tippare: du kryssar för vem du är.
+  // Vem är du: pennan ringar in ditt porträtt, och stämpeln säger vem
+  // omgången väntar på med dig först, som på papperet.
   function choose(b) {
     const k = R.kup;
     if (b.getAttribute('aria-pressed') === 'true' || !Samtal.pult.vem(b.dataset.vem)) return;
     for (const o of k.el.querySelectorAll('button[data-vem][aria-pressed="true"]')) {
       o.setAttribute('aria-pressed', 'false');
-      o.classList.remove('x');
       eraseCross(o);
     }
     b.setAttribute('aria-pressed', 'true');
-    b.classList.add('x');
-    drawCross(b, `vem${b.dataset.vem}`);
+    drawRing(b.querySelector('.sm-fw'), `du${Samtal.pult.state().s.id}${b.dataset.vem}`);
+    const top = Samtal.pult.top();
+    const st = k.el.querySelector('.topp .pp-stamp');
+    if (st && top.stamp) st.outerHTML = top.stamp;
+    const q = k.el.querySelector('.hd .sm-q');
+    if (q) q.outerHTML = '<span>Match</span>';
     k.el.classList.remove('need-vem');
     k.msg.textContent = '';
   }
