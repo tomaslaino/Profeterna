@@ -11,7 +11,7 @@
 //   korktavlan → gängets kuponger     pokalhyllan, Omgångens orakel → Olympen
 //   krittavlan → Tabeller             pärmarna → Statistik
 //   namnet på dörren → Om oss
-//   kvittot, terminalen → Kupong, tv:n zoomas in (T) med text-tv:ns färgknappar
+//   kvittot → Kupong, tv:n zoomas in (T) med text-tv:ns färgknappar
 //   kupongen tas i handen och fylls i (K), eller → Kupong när man har lämnat in.
 // Pekar man på ett föremål lyser ordet i menyn som det leder till.
 //
@@ -172,7 +172,7 @@ window.Rum = (() => {
   }
 
   // Bakgrunden: tak, lysrör, väggarna (nikotingula, fläckiga, flagnande),
-  // dörren, skyltfönstret, disken med terminalen och godisburken.
+  // dörren, skyltfönstret, disken med godisburken.
   function bg() {
     const R0 = rng(17);
     const out = outside(R0);
@@ -267,16 +267,6 @@ window.Rum = (() => {
     <line x1="1092" y1="500" x2="1130" y2="511"/><line x1="1236" y1="543" x2="1250" y2="547"/><line x1="1318" y1="567" x2="1372" y2="583"/><line x1="1490" y1="619" x2="1512" y2="626"/>
   </g>
   <polygon points="1060,492 1600,654 1600,700 1060,540" fill="#000" opacity=".12"/>
-  <ellipse cx="1205" cy="470" rx="110" ry="50" fill="#5fe0d0" opacity=".16" filter="url(#rum-b24)"/>
-  <polygon points="1150,418 1258,430 1256,500 1150,494" fill="#1c1c1e"/>
-  <polygon points="1158,426 1250,436 1248,492 1158,488" fill="#123a3a"/>
-  <polygon points="1158,426 1250,436 1248,492 1158,488" fill="#5ff0dc" opacity=".35"/>
-  <g font-family="VT323, monospace" font-size="11" fill="#c8fff4" opacity=".88" id="rum-term">
-    <text x="1166" y="446" transform="rotate(5 1166 446)"></text>
-    <text x="1166" y="460" transform="rotate(5 1166 460)"></text>
-    <text x="1166" y="474" transform="rotate(5 1166 474)"></text>
-  </g>
-  <polygon points="1196,494 1214,494 1222,520 1190,518" fill="#141414"/>
   <polygon points="1262,486 1340,500 1340,530 1262,514" fill="#232325"/>
   <polygon points="1278,488 1322,496 1320,470 1280,463" fill="#f1efe8"/>
   <ellipse cx="1440" cy="560" rx="34" ry="8" fill="#000" opacity=".35" filter="url(#rum-b4)"/>
@@ -956,12 +946,6 @@ ${closeHtml()}
     const p = pult(rd);
     set('rum-kupong', couponHtml(rd, rows, p));
     set('rum-kvitto', receiptHtml(rd, nr));
-    const term = R.el.querySelectorAll('#rum-term text');
-    const gang = (rd && rd.gang) || [];
-    const waiting = gang.filter((g) => !g.inne).map((g) => g.id);
-    const lines = [nr ? `KUPONG ${nr}` : 'KUPONG', gang.length ? `INLÄMNADE ${gang.length - waiting.length}/${gang.length}` : '',
-      gang.length ? (waiting.length ? `VÄNTAR: ${waiting.join(' ')}` : 'ALLA INNE') : ''];
-    term.forEach((e, i) => { e.textContent = lines[i]; });
     // gänget på fönsterbänken: den som inte har lämnat in sitter med kupongen
     R.vem = vemInne(rd, rows, t, p);
     if (R.fig && R.fig.inne) R.fig.inne(R.vem, now());
@@ -1495,7 +1479,7 @@ ${closeHtml()}
         { transform: 'rotate(-8deg) scale(1)', opacity: 0.82 },
       ], { duration: 260, easing: 'cubic-bezier(0.5, 0, 0.9, 0.5)' });
     }
-    // kvittot och terminalen visar att du är inne
+    // kvittot visar att du är inne
     if (typeof tpLoad === 'function') tpLoad(true).then(() => { if (R.on) fill(); });
     setTimeout(() => { if (R.kup === k) closeCoupon(); }, calm() ? 700 : 1100);
   }
