@@ -15,7 +15,8 @@
 //   kupongen tas i handen (K) – fylls i eller ändras – eller → Kupong.
 //   högen bredvid: de inlämnade kupongerna med baksidan upp; din egen tas i
 //   handen därifrån när du har lämnat in, de andras → Kupong.
-// Pekar man på ett föremål lyser ordet i menyn som det leder till.
+// Det finns ingen meny: pekar man på ett föremål lyser det, och snabbvalet på
+// text-tv:n som det leder till tänds.
 //
 // Vanlig sida (#hem) är den vanliga förstasidan. I telefonen och i smala
 // fönster står den alltid där i stället för rummet (Rum.fits). Rörelserna
@@ -433,32 +434,33 @@ window.Rum = (() => {
       `<ellipse cx="${r1(xm)}" cy="${r1(at(xm, PARM.yb - 12))}" rx="${r1(2.6 * k)}" ry="${r1(4 * k)}" fill="#111" opacity=".55"/>`;
   }
   function shelves(trophies, seasons) {
-    let s = shelf(POKAL.yb, POKAL.x0, POKAL.x1);
     // en pokal per vunnen omgång, i vinnarens färg; ett dammfritt märke där
     // nästa ska stå
+    let cups = '';
     let x = POKAL.x0 + 10;
     trophies.forEach((col, i) => {
       if (x > POKAL.x1 - 8) return;
-      s += trophy(x, POKAL.yb, col, i);
+      cups += trophy(x, POKAL.yb, col, i);
       x += 17 * sc(x);
     });
-    if (x < POKAL.x1 - 8) s += `<ellipse cx="${r1(x)}" cy="${r1(at(x, POKAL.yb) - 1)}" rx="${r1(6 * sc(x))}" ry="${r1(1.6 * sc(x))}" fill="#000" opacity=".25"/>`;
-    s += shelf(PARM.yb, PARM.x0, PARM.x1);
+    if (x < POKAL.x1 - 8) cups += `<ellipse cx="${r1(x)}" cy="${r1(at(x, POKAL.yb) - 1)}" rx="${r1(6 * sc(x))}" ry="${r1(1.6 * sc(x))}" fill="#000" opacity=".25"/>`;
+    let binders = '';
     let bx = PARM.x0 + 4;
     seasons.forEach((label, i) => {
       const w = 10.5 * sc(bx);
       if (bx + w > PARM.x1) return;
-      s += binder(bx, w, i, label);
+      binders += binder(bx, w, i, label);
       bx += w + 0.6 * sc(bx);
     });
-    // damm på hyllkanterna
-    s += `<polygon points="${POKAL.x0},${r1(at(POKAL.x0, POKAL.yb) - 0.6)} ${POKAL.x1},${r1(at(POKAL.x1, POKAL.yb) - 0.8)} ${POKAL.x1},${r1(at(POKAL.x1, POKAL.yb) + 0.6)} ${POKAL.x0},${r1(at(POKAL.x0, POKAL.yb) + 0.5)}" fill="#d9d2c0" opacity=".3"/>`;
-    // ytorna man klickar på
-    const hit = (x0, x1, y0, y1, nav, href, label) => `<a href="${href}" data-nav="${nav}" class="rum-sak rum-yta" aria-label="${label}">` +
+    // pokalerna och pärmarna ligger i länkarna, med ytan man klickar på, så
+    // att de lyser som de andra föremålen när man pekar på dem
+    const hit = (x0, x1, y0, y1, nav, href, label, inner) => `<a href="${href}" data-nav="${nav}" class="rum-sak" aria-label="${label}">${inner}` +
       `<polygon points="${x0},${r1(at(x0, y1))} ${x1},${r1(at(x1, y1))} ${x1},${r1(at(x1, y0))} ${x0},${r1(at(x0, y0))}" fill="#fff" opacity="0"/></a>`;
-    s += hit(POKAL.x0, POKAL.x1, POKAL.yb - 36, POKAL.yb + 6, 'olympen', '#olympen', 'Olympen');
-    s += hit(PARM.x0, PARM.x1, PARM.yb - 52, PARM.yb + 6, 'statistik', 'statistik.html', 'Statistik');
-    return s;
+    return shelf(POKAL.yb, POKAL.x0, POKAL.x1) + shelf(PARM.yb, PARM.x0, PARM.x1) +
+      // damm på hyllkanterna
+      `<polygon points="${POKAL.x0},${r1(at(POKAL.x0, POKAL.yb) - 0.6)} ${POKAL.x1},${r1(at(POKAL.x1, POKAL.yb) - 0.8)} ${POKAL.x1},${r1(at(POKAL.x1, POKAL.yb) + 0.6)} ${POKAL.x0},${r1(at(POKAL.x0, POKAL.yb) + 0.5)}" fill="#d9d2c0" opacity=".3"/>` +
+      hit(POKAL.x0, POKAL.x1, POKAL.yb - 36, POKAL.yb + 6, 'olympen', '#olympen', 'Olympen', cups) +
+      hit(PARM.x0, PARM.x1, PARM.yb - 52, PARM.yb + 6, 'statistik', 'statistik.html', 'Statistik', binders);
   }
 
   // Kupongstället vid fönstret: blanka kuponger i ett fack av plexiglas,
@@ -576,8 +578,7 @@ ${plane(0, paper())}
 <div class="rum-layer rum-warm"></div><div class="rum-layer rum-dagsljus" id="rum-dagsljus"></div><div class="rum-layer rum-vign"></div><div class="rum-layer rum-grain"></div>
 </div>
 ${closeHtml()}
-<div class="rum-hdr"><a class="rum-brand" href="#">Matchfixarna</a>
-  <nav aria-label="Sektioner"><a href="#kupong" data-to="kupong">Kupong</a><a href="#olympen" data-to="olympen">Olympen</a><a href="#matcher" data-to="matcher">Matcher</a><a href="tabeller.html" data-to="tabeller">Tabeller</a><a href="statistik.html" data-to="statistik">Statistik</a></nav></div>
+<div class="rum-hdr"><a class="rum-brand" href="#">Matchfixarna</a></div>
 <div class="rum-ft"><span class="keys"><b>K</b> kupongen · <b>T</b> tv:n</span><a href="#hem">Vanlig sida</a></div>`;
     document.querySelector('main').prepend(el);
     R.el = el;
@@ -1128,8 +1129,9 @@ ${closeHtml()}
 
   // ---------- klicken ----------
 
+  // snabbvalet på text-tv:n som föremålet leder till
   function hot(nav) {
-    for (const a of R.el.querySelectorAll('.rum-hdr nav a')) a.classList.toggle('hot', nav === a.dataset.to);
+    for (const a of R.el.querySelectorAll('a[data-to]')) a.classList.toggle('hot', nav === a.dataset.to);
   }
 
   // Föremålets mitt i scenens koordinater.
@@ -1253,7 +1255,7 @@ ${closeHtml()}
   }
 
   // Var kupongen hamnar i handen: mitt i fönstret, så stor som får plats
-  // mellan menyn och orden under den. → förskjutningen från pulten och
+  // mellan namnet och orden under den. → förskjutningen från pulten och
   // förstoringen i scenens mått, och rutan i fönstret.
   function held() {
     const k = R.k || 1;
@@ -1736,7 +1738,7 @@ ${closeHtml()}
     R.oy = (innerHeight - H * s) / 2;
     const st = R.el.querySelector('.rum-stage');
     st.style.transform = `translate(${R.ox.toFixed(1)}px, ${R.oy.toFixed(1)}px) scale(${s.toFixed(4)})`;
-    // närbilden av tavlan ryms mellan menyn och foten
+    // närbilden av tavlan ryms mellan namnet och foten
     const n = document.getElementById('rum-fbn');
     if (n && n.offsetWidth) n.style.setProperty('--k', Math.min((innerWidth - 120) / n.offsetWidth, (innerHeight - 190) / n.offsetHeight, 1.3).toFixed(3));
     // kupongen i handen står kvar mitt i fönstret

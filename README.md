@@ -1707,19 +1707,21 @@ tippare på förstasidan länkar hit (*Till Olympen*).
 
 Förstasidan på stora skärmar (utan adress, bredare än 900 px och inte på högkant):
 tobaksaffären vid spelpulten. Scenen ritas i 1600 × 1000 och skalas så att den täcker
-fönstret; lagren ligger på olika djup (CSS 3D) och vrids lite när musen rör sig. Menyn
-(Kupong, Olympen, Matcher, Tabeller, Statistik) och foten (*K kupongen · T tv:n*, *Vanlig
-sida*) ligger utanför scenen i fönstrets hörn. [public/rum.js](public/rum.js) ritar rummet
-och fyller det med sajtens data, [public/rum.css](public/rum.css) ger det utseendet och
+fönstret; lagren ligger på olika djup (CSS 3D) och vrids lite när musen rör sig. Namnet
+och foten (*K kupongen · T tv:n*, *Vanlig sida*) ligger utanför scenen i fönstrets hörn;
+någon meny finns inte, det är föremålen som leder vidare. [public/rum.js](public/rum.js)
+ritar rummet och fyller det med sajtens data, [public/rum.css](public/rum.css) ger det utseendet och
 rörelserna, och [public/rum-3d.js](public/rum-3d.js) ritar gänget i three.js 0.160.0 (från
 jsdelivr, importmap i `index.html`), som hämtas först när rummet visas – utan WebGL eller
 utan nätet står rummet kvar utan gänget.
 
-**Föremålen** – pekar man på ett lyser ordet i menyn som det leder till, och klickar man
-går kameran fram mot det innan sidan byts:
+**Föremålen** – pekar man på ett lyser det (pokalerna och pärmarna också), och snabbvalet
+på text-tv:n som det leder till tänds, som när man pekar på snabbvalet med tv:n nära
+(Kupong, Olympen, Tabell eller Statistik). Klickar man går kameran fram mot föremålet innan
+sidan byts:
 
-- **Fällbladstavlan** sitter på bakväggen till höger om fönstret, så lågt att menyn inte
-  når den i breda fönster. Varje rad har hemmalaget, ställningen och bortalaget (korta namn
+- **Fällbladstavlan** sitter på bakväggen till höger om fönstret. Varje rad har
+  hemmalaget, ställningen och bortalaget (korta namn
   på högst elva tecken, som WOLVES och MIDDLESBRO) och oddsen för 1, X och 2 under siffror
   som är målade på ramen, med lister mellan kolumnerna; rubriken visar spelstoppet och
   sidan (1/4). När en match har börjat står ställningen i mitten, och efter slutsignalen
@@ -1902,7 +1904,7 @@ Tills alla har lämnat in eller första matchen startar tas kupongen på pulten 
 i rummet – för att fylla i den eller ändra den: ett klick på kupongen, på guldordet
 eller K. Kupongen lossnar från pulten,
 lyfter, vänds upp mot betraktaren och förstoras till mitten av fönstret (så stor som får
-plats mellan menyn och orden under den), svänger en aning förbi och stannar; rummet mörknar
+plats mellan namnet och orden under den), svänger en aning förbi och stannar; rummet mörknar
 bakom, kameran ställer sig rakt framför, och pennan följer med och rullar undan till
 foten, mellan fälten och streckkoden. Samma kupong som på pulten, men rutorna är knappar: ett tryck kryssar i eller
 ur (två eller tre tecken = gardering), och pennan går dit, drar det ena strecket, lyfter
