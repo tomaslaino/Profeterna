@@ -587,24 +587,6 @@ window.Rum = (() => {
   ${facit()}`);
   }
 
-  function cups() {
-    return svg(`<defs>
-    <linearGradient id="rum-cupc" x1="0" y1="0" x2="1" y2="0"><stop offset="0" stop-color="#3f73c2"/><stop offset=".35" stop-color="#2f5fa8"/><stop offset="1" stop-color="#132a52"/></linearGradient>
-    <pattern id="rum-meander" width="16" height="12" patternUnits="userSpaceOnUse"><path d="M1 11 V1 H13 V9 H5 V5 H9" fill="none" stroke="#f3ead9" stroke-width="1.6"/></pattern>
-    <clipPath id="rum-cupclip"><path d="M-58 6 L58 6 L47 120 Q0 128 -47 120 Z"/></clipPath>
-    <g id="rum-cup"><ellipse cx="0" cy="124" rx="62" ry="10" fill="#000" opacity=".45" filter="url(#rum-b4)"/>
-      <g clip-path="url(#rum-cupclip)"><rect x="-62" y="0" width="124" height="130" fill="url(#rum-cupc)"/>
-        <rect x="-62" y="16" width="124" height="13" fill="url(#rum-meander)"/><rect x="-62" y="98" width="124" height="13" fill="url(#rum-meander)"/>
-        <text x="0" y="56" text-anchor="middle" font-family="Fraunces" font-weight="800" font-size="12" letter-spacing=".6" fill="#f3ead9">VI ÄR GLADA</text>
-        <text x="0" y="75" text-anchor="middle" font-family="Fraunces" font-weight="800" font-size="12" letter-spacing=".6" fill="#f3ead9">ATT TJÄNA ER</text>
-        <rect x="-62" y="0" width="124" height="130" fill="url(#rum-cupg)" opacity=".5"/>
-        <path d="M-58 6 L-50 40 L-56 70" fill="none" stroke="#e9e2d4" stroke-opacity=".5" stroke-width="2"/></g>
-      <ellipse cx="0" cy="6" rx="58" ry="10" fill="#e9e2d4"/><ellipse cx="0" cy="7" rx="53" ry="8" fill="#2a160c"/>
-      <path d="M-30 8 q-8 10 -4 24" fill="none" stroke="#5a3a1a" stroke-opacity=".5" stroke-width="3"/></g></defs>
-  <use href="#rum-cup" transform="translate(1262 590) scale(.62)"/>
-  <use href="#rum-cup" transform="translate(300 600) scale(.7)"/>`);
-  }
-
   function props() {
     return svg(`<rect x="1384" y="538" width="5" height="112" fill="url(#rum-alu)"/><rect x="1447" y="538" width="5" height="112" fill="url(#rum-alu)"/>
   <rect x="1378" y="530" width="80" height="18" rx="8" fill="#7d2925"/>
@@ -657,7 +639,7 @@ window.Rum = (() => {
 ${plane(-600, `${bg()}${rain()}${rightWall()}${svg('<g id="rum-hyllor"></g>')}${neon()}${lop()}${boardHtml()}${frameHtml()}`, 1.035)}
 ${plane(-470, `${props()}${tv()}`, 1.02)}
 ${plane(-330, `${sill()}${haze()}`)}
-${plane(-60, `${table()}${cups()}`, 1.05)}
+${plane(-60, table(), 1.05)}
 ${plane(0, paper())}
 </div></div>
 <div class="rum-layer rum-warm"></div><div class="rum-layer rum-vign"></div><div class="rum-layer rum-grain"></div>
