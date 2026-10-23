@@ -12,7 +12,7 @@
 //   krittavlan → Tabeller             pärmarna → Statistik
 //   namnet på dörren → Om oss
 //   kvittot → Kupong, tv:n zoomas in (T) med text-tv:ns färgknappar
-//   kupongen tas i handen (K) – fylls i, ändras eller visas – eller → Kupong.
+//   kupongen tas i handen (K) – fylls i eller ändras – eller → Kupong.
 //   högen bredvid: de inlämnade kupongerna med baksidan upp; din egen tas i
 //   handen därifrån när du har lämnat in, de andras → Kupong.
 // Pekar man på ett föremål lyser ordet i menyn som det leder till.
@@ -874,10 +874,12 @@ ${closeHtml()}
     const list = order.map((x, i) => {
       const sign = signs[x.id];
       const comp = compOf(x.m.comp);
-      return `<div class="row${sign ? '' : ' tom'}" data-id="${esc(x.id)}"><span class="pp-nr">${i + 1}</span>` +
+      // i handen står matcher som har startat kvar som de var, som på papperet
+      const locked = hand && !(Date.parse(x.m.kickoff) > Date.now());
+      return `<div class="row${sign ? '' : ' tom'}${locked ? ' locked' : ''}" data-id="${esc(x.id)}"><span class="pp-nr">${i + 1}</span>` +
         `<span class="m"><span class="pp-tm">${esc(x.m.home)}<span class="vs"> – </span>${esc(x.m.away)}</span>` +
-        `<span class="pp-small">${esc(fWeekdayTime.format(new Date(x.m.kickoff)))}${comp ? ` · ${esc(comp.short)}` : ''}</span></span>` +
-        SIGNS.map((s) => box(`${x.id}${s}`, s, sign.includes(s), ` data-s="${s}" aria-label="${esc(`${x.m.home} – ${x.m.away}: ${s}`)}"`)).join('') + '</div>';
+        `<span class="pp-small">${esc(fWeekdayTime.format(new Date(x.m.kickoff)))}${comp ? ` · ${esc(comp.short)}` : ''}${locked ? ' · har startat' : ''}</span></span>` +
+        SIGNS.map((s) => box(`${x.id}${s}`, s, sign.includes(s), locked ? null : ` data-s="${s}" aria-label="${esc(`${x.m.home} – ${x.m.away}: ${s}`)}"`)).join('') + '</div>';
     }).join('');
     const top = p ? Samtal.pult.top(hand && p.fyll) : null;
     const id = rd && !rd.next ? rd.id || (rd.coupon && rd.coupon.id) : null;
@@ -1278,11 +1280,12 @@ ${closeHtml()}
   // Esc, K, Lägg tillbaka eller ett klick utanför lägger tillbaka den samma
   // väg baklänges. Inlämnad vänds kupongen och läggs i högen (se ovan), och
   // på pulten ligger en ny. Därifrån lyfts den, vänds på vägen upp och står
-  // i handen med ens kryss och stämpeln: går tipsen att ändra (Samtal.pult:
-  // andra) heter guldordet Lämna in ändringen, annars leder Se de andras
-  // tips till Kupong. Lägg tillbaka och inlämningen lägger den i högen igen.
-  // När alla har lämnat in, eller matcherna har börjat, leder kupongen och
-  // högen till Kupong.
+  // i handen med ens kryss och stämpeln, och guldordet heter Lämna in
+  // ändringen (Samtal.pult: andra) – tills matcherna startar, också när de
+  // andras tips visas; startade matcher står fast. Lägg tillbaka och
+  // inlämningen lägger den i högen igen. När alla har lämnat in, eller
+  // matcherna har börjat, leder kupongen på pulten till Kupong, och din tas
+  // bara ur högen.
 
   // Läget för kupongen på pulten, om det är omgången som rummet visar.
   function pult(rd) {
@@ -1361,6 +1364,9 @@ ${closeHtml()}
     if (R.kup) return true;
     const p = pult();
     if (!p || !p.hand || !R.el) return false;
+    // när allas tips visas eller matcherna har börjat leder guldordet,
+    // kupongen på pulten och K till Kupong – din tas bara ur högen
+    if (p.inne && !p.open && !from) return false;
     if (p.inne) from = document.querySelector(`#rum-hogen [data-vem="${CSS.escape(p.vem)}"]`);
     if (p.inne && !from) return false;
     zoomTv(false);
@@ -1368,15 +1374,13 @@ ${closeHtml()}
     const desk = document.getElementById('rum-kupong');
     const rd = { id: p.s.id, ids: p.s.matcher.map((x) => String(x.id)), gang: p.s.gang, name: (window.Samtal && Samtal.name()) || null };
     const nr = typeof couponNumber === 'function' ? couponNumber(rd.ids) : null;
-    const fram = couponHtml(rd, roundRows(rd), p, p.fyll || p.andra);
+    const fram = couponHtml(rd, roundRows(rd), p, true);
     desk.parentElement.insertAdjacentHTML('beforeend', '<div class="rum-dimma" id="rum-dimma"></div>' +
       `<div class="rum-flat ${from ? 'rum-bak' : 'rum-kup'} rum-handen" id="rum-handen" role="dialog" aria-modal="true" aria-label="${nr ? `Kupong ${nr}` : 'Kupong'}" tabindex="-1">` +
       `${from ? from.innerHTML : fram}</div>`);
-    // guldordet: Lämna in, Lämna in ändringen (när något är ändrat) eller,
-    // när dina tips står fast, de andras tips under Kupong
+    // guldordet: Lämna in, eller Lämna in ändringen (när något är ändrat)
     const go = p.fyll ? '<button type="button" class="guld" data-lamna>Lämna in</button>'
-      : p.andra ? '<button type="button" class="guld" data-lamna disabled>Lämna in ändringen</button>'
-        : '<a class="guld" href="#kupong">Se de andras tips</a>';
+      : '<button type="button" class="guld" data-lamna disabled>Lämna in ändringen</button>';
     R.el.insertAdjacentHTML('beforeend', '<div class="rum-hand" id="rum-hand"><button type="button" class="bla" data-tillbaka>Lägg tillbaka</button>' +
       `<p class="msg" role="status"></p>${go}</div>`);
     const el = document.getElementById('rum-handen');

@@ -554,6 +554,8 @@ a.rum-fb-r:hover b:not(.lit) { color: #fff; background: linear-gradient(180deg, 
 .rum-handen button.box:hover { background: rgba(200, 100, 58, 0.1); }
 .rum-handen button.box:focus-visible { outline: 2px solid #2146a6; outline-offset: 2px; }
 .rum-handen.need .row.tom .box { border-color: #cf2a20; box-shadow: 0 0 0 1px #cf2a20; }
+/* startade matcher står kvar som de var (som .sm-locked på papperet) */
+.rum-handen .row.locked .m, .rum-handen .row.locked .box { opacity: 0.55; }
 .rum-handen.need-vem button[data-vem] .sm-fc { box-shadow: 0 0 0 2px #cf2a20, 0 0 0 3.5px var(--pp-box); }
 .rum-dimma {
   position: absolute;

@@ -1603,14 +1603,15 @@
   // Tobaksaffären (rum.js) fyller i samma kupong på pulten: samma utkast på
   // enheten och samma inlämning som papperet här, och samma stämpel,
   // porträtt och fält i foten (top, fields). state() → null utan
-  // omgång, annars {s, vem, tecken, inne, fyll, andra, hand, val, go}:
+  // omgång, annars {s, vem, tecken, inne, open, fyll, andra, hand, val, go}:
   // tecken = dina (utkastet eller de inlämnade), inne = du har lämnat in,
-  // fyll = du kan fylla i den (du har inte lämnat in och första matchen har
-  // inte startat), andra = du har lämnat in och kan ändra, som på papperet
-  // här: tills du ser någon annans tips eller första matchen startar, hand =
-  // kupongen kan tas i handen (att fylla i, ändra eller se), val = vilka du
-  // kan kryssa för att du är – de som inte har lämnat in – och go = guldordet
-  // bredvid ('' när dina tips står fast).
+  // open = allas tips visas inte än och första matchen har inte startat,
+  // fyll = du kan fylla i den (du har inte lämnat in och omgången är öppen),
+  // andra = du har lämnat in och kan ändra, som på papperet här: tills
+  // matcherna startar, också när du ser de andras tips (startade matcher
+  // står kvar), hand = kupongen kan tas i handen (att fylla i eller ändra),
+  // val = vilka du kan kryssa för att du är – de som inte har lämnat in – och
+  // go = guldordet bredvid ('' när dina tips inte finns här).
   const draftOf = (s, v) => {
     const d = kpLoad(TIPS);
     return d && d.id === s.id && !d.inne && (!d.vem || d.vem === v) ? d : null;
@@ -1621,16 +1622,17 @@
       if (!info() || !s) return null;
       const v = me();
       const inne = submitted(s, v);
-      const open = !s.visas && Date.now() < Math.min(...kicks(s));
+      const before = Date.now() < Math.min(...kicks(s));
+      const open = !s.visas && before;
       const mine = inne ? mineIn(s, v) : draftOf(s, v);
       const du = v && s.gang.find((g) => g.id === v);
       const n = du ? tally(s, du) : mine ? s.matcher.filter((x) => mine.tecken[x.id]).length : 0;
-      const andra = Boolean(inne && open && mine && !(s.tips && Object.keys(s.tips).some((k) => k !== v)));
-      const hand = open && (!inne || Boolean(mine));
+      const andra = canEdit(s);
+      const hand = (open && !inne) || andra;
       return {
-        s, vem: v, inne, fyll: open && !inne, andra, hand, tecken: { ...((mine && mine.tecken) || {}) },
+        s, vem: v, inne, open, fyll: open && !inne, andra, hand, tecken: { ...((mine && mine.tecken) || {}) },
         val: inne ? [] : s.gang.filter((g) => !g.inne).map((g) => g.id),
-        go: !open ? (s.visas && Date.now() < Math.min(...kicks(s)) ? 'Till uppgörelsen' : 'Följ kupongen')
+        go: !open ? (s.visas && before ? 'Till uppgörelsen' : 'Följ kupongen')
           : inne ? (andra ? 'Ändra kupongen' : '') : n ? 'Fyll i resten' : 'Fyll i kupongen',
       };
     },
