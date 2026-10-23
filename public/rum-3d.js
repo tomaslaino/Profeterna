@@ -21,7 +21,8 @@
 // fönsterbänken och handen tar flaskan, burken eller cigaretten – först ett
 // bloss eller en lång klunk, sedan de vanliga looparna.
 //
-// figurer(canvas, { calm }) → { draw(t, mx, my), inne(vem, t) }.
+// figurer(canvas, { calm, vader }) → { draw(t, mx, my), inne(vem, t), ute(vader) }:
+// ute klär om gänget efter vädret (dress) och sätter ljuset från fönstret.
 import * as THREE from 'three';
 import { RoomEnvironment } from 'three/addons/environments/RoomEnvironment.js';
 import { RoundedBoxGeometry } from 'three/addons/geometries/RoundedBoxGeometry.js';
@@ -87,6 +88,39 @@ const FIGS = [
     vanta: { penna: 1, kupong: 0, sak: [-1.38, 0.3], cigg: [1.18, 0.62], lagg: [-1.22, 0.62, 0.3], blick: -1, fot: 0, ordning: [4, 2, 0, 3, 1], fas: 5 } },
 ];
 
+// Kläderna efter vädret i Stockholm (v = Vader.nu(), via rum.js): känns-
+// temperaturen avgör lagren – 0 hett (21° och mer), 1 varmt (15–21), 2 svalt
+// (8–15), 3 kallt (1–8), 4 vinter (under 1) – regn ger regnjackor, sol
+// solglasögonen på näsan och snöfall snö på axlarna. DT kavlar alltid upp
+// ärmen på armen med lejonet.
+//   ben: kort|lang, byxa: [färg, mörkare], troja: { farg, farg2, luva, ficka },
+//   jacka: { typ: oppen|stangd, tyg: bomull|skinn|dun|parka|regn|flanell,
+//            farg, farg2, luva: slat|pals, krage, tjock, tunn, upp: 0|1|'bada' }
+function dress(key, v) {
+  const k = v ? v.kanns : 17;
+  const n = k >= 21 ? 0 : k >= 15 ? 1 : k >= 8 ? 2 : k >= 1 ? 3 : 4;
+  const regn = !!v && (v.fall === 'regn' || v.fall === 'blandat') && n >= 1 && n <= 3;
+  const d = { n, ben: n <= 1 ? 'kort' : 'lang', glas: !!v && !v.fall && v.sol > 8 && v.moln < 45, sno: !!v && v.fall === 'sno' && n >= 3 };
+  if (key === 'dl') {
+    if (n >= 2) { d.byxa = ['#c9bb98', '#b1a27d']; d.troja = { farg: '#2a3658', farg2: '#1c2642' }; }
+    if (n === 3) d.jacka = { typ: 'oppen', tyg: 'bomull', farg: '#5d6142', farg2: '#43472f', krage: true };
+    if (n === 4) d.jacka = { typ: 'stangd', tyg: 'parka', farg: '#24323f', farg2: '#172230', luva: 'slat', tjock: 1.6 };
+    if (regn) d.jacka = { typ: n === 3 ? 'stangd' : 'oppen', tyg: 'regn', farg: '#e9b724', farg2: '#c99a12', luva: 'slat' };
+  } else if (key === 'dt') {
+    d.ben = n === 0 ? 'kort' : 'lang';
+    if (n === 2) d.jacka = { typ: 'oppen', tyg: 'flanell', farg: '#8c2a24', farg2: '#1e1a1a', krage: true, tunn: true, upp: 'bada' };
+    if (n === 3) d.jacka = { typ: 'oppen', tyg: 'skinn', farg: '#4a2e1e', farg2: '#2e1c12', krage: true, upp: 0 };
+    if (n === 4) d.jacka = { typ: 'stangd', tyg: 'dun', farg: '#2f3e33', farg2: '#1f2a22', krage: true, tjock: 1.8, upp: 0 };
+    if (regn) d.jacka = { typ: 'oppen', tyg: 'regn', farg: '#4f5a3a', farg2: '#39422a', luva: 'slat', upp: 0 };
+  } else if (key === 'dj') {
+    if (n >= 2) { d.byxa = ['#b8b4ab', '#a29d93']; d.troja = { farg: '#1d1d20', farg2: '#111113', luva: true, ficka: true }; }
+    if (n === 3) d.jacka = { typ: 'stangd', tyg: 'dun', farg: '#161618', farg2: '#0b0b0c', krage: true, tjock: 1.5 };
+    if (n === 4) d.jacka = { typ: 'stangd', tyg: 'dun', farg: '#161618', farg2: '#0b0b0c', krage: true, tjock: 2.2, luva: 'pals' };
+    if (regn) d.jacka = { typ: 'stangd', tyg: 'regn', farg: '#18191c', farg2: '#0e0f11', luva: 'slat' };
+  }
+  return d;
+}
+
 export async function figurer(canvas, opt = {}) {
   const W = canvas.clientWidth || 1280;
   const H = canvas.clientHeight || 560;
@@ -104,7 +138,8 @@ export async function figurer(canvas, opt = {}) {
   cam.lookAt(0, 0, 0);
 
   // ljuset: lysröret framifrån ovan, neonen bakom till vänster, terminalen till höger
-  scene.add(new THREE.HemisphereLight('#d8d0b8', '#3a2a20', 0.42));
+  const hemi = new THREE.HemisphereLight('#d8d0b8', '#3a2a20', 0.42);
+  scene.add(hemi);
   const key = new THREE.DirectionalLight('#fff0d6', 2.0);
   key.position.set(120, 520, 520);
   key.castShadow = true;
@@ -123,6 +158,11 @@ export async function figurer(canvas, opt = {}) {
   const fill = new THREE.DirectionalLight('#ffd9b0', 0.5);
   fill.position.set(-300, -50, 400);
   scene.add(fill);
+  // fönstret bakom gänget: gatlyktorna på natten, dagsljuset på dagen (ute)
+  const win = new THREE.DirectionalLight('#ffb35c', 0.35);
+  win.position.set(-150, 320, -700);
+  win.target.position.set(-150, -40, 0);
+  scene.add(win, win.target);
 
   const pivot = new THREE.Group();
   pivot.position.y = -100;
@@ -893,6 +933,95 @@ export async function figurer(canvas, opt = {}) {
     return g;
   }
 
+  // ---------- kläderna efter vädret ----------
+
+  // flanellens rutor: mörka band över tygets färg (map gånger färgen)
+  const plaidTex = canvasTex(128, 128, (g) => {
+    g.fillStyle = '#ffffff'; g.fillRect(0, 0, 128, 128);
+    g.fillStyle = 'rgba(24,18,18,.62)'; g.fillRect(0, 44, 128, 40); g.fillRect(44, 0, 40, 128);
+    g.fillStyle = 'rgba(24,18,18,.35)'; g.fillRect(0, 104, 128, 6); g.fillRect(104, 0, 6, 128);
+    g.fillStyle = 'rgba(255,236,210,.3)'; g.fillRect(0, 20, 128, 3); g.fillRect(20, 0, 3, 128);
+  });
+  plaidTex.colorSpace = THREE.NoColorSpace;
+  const plaid = (rx, ry) => { const t = plaidTex.clone(); t.wrapS = t.wrapT = THREE.RepeatWrapping; t.repeat.set(rx, ry); t.needsUpdate = true; return t; };
+  // jackans tyg: matt bomull och parkas, blankt skinn, glänsande nylon (dun, regn), rutig flanell
+  function jackMat(J, extra = {}) {
+    const o = {
+      bomull: { roughness: 0.62, clearcoat: 0.3, bumpMap: denim, bumpScale: 0.5 },
+      parka: { roughness: 0.72, clearcoat: 0.25, bumpMap: knit, bumpScale: 0.4 },
+      skinn: { roughness: 0.32, clearcoat: 0.75, clearcoatRoughness: 0.28, bumpMap: knit, bumpScale: 0.25 },
+      dun: { roughness: 0.3, clearcoat: 0.85, clearcoatRoughness: 0.16 },
+      regn: { roughness: 0.16, clearcoat: 1, clearcoatRoughness: 0.05 },
+      flanell: { roughness: 0.82, clearcoat: 0.12, sheen: 0.5, sheenRoughness: 0.7, map: plaid(5, 3) },
+    }[J.tyg] || {};
+    return mat(J.farg, { side: J.typ === 'oppen' ? THREE.DoubleSide : THREE.FrontSide, ...o, ...extra });
+  }
+  const edgeMat = (J) => mat(J.farg2, { roughness: J.tyg === 'regn' || J.tyg === 'dun' || J.tyg === 'skinn' ? 0.28 : 0.62, clearcoat: 0.5 });
+  const snowMat = mat('#f4f7fa', { roughness: 0.9, clearcoat: 0, sheen: 0.6, sheenRoughness: 0.8, sheenColor: new THREE.Color('#ffffff') });
+
+  // Jackan: ett skal utanpå tröjan (bålens profil, lite vidare och längre),
+  // öppen fram med kanterna markerade eller stängd med dragkedja; dunjackan
+  // har kanaler. Krage, luva och pälskant efter J. Ger profilen tillbaka, så
+  // att halsduken kan ligga utanpå.
+  function jacka(F, J, chest) {
+    const Wd = F.w; const T = F.torso; const sz = F.depth / Wd;
+    const tk = J.tunn ? 0.4 : J.tjock || 1;
+    const base = [[0.86, -0.04], [0.89, 0.1], [0.93, 0.45], [1, 0.75], [1.03, 0.86], [0.95, 0.96], [0.64, 1.02], [0.38, 1.05]];
+    const rAt = (h) => { for (let i = 1; i < base.length; i++) if (h <= base[i][1]) { const [a0, b0] = base[i - 1]; const [a1, b1] = base[i]; return a0 + (a1 - a0) * (h - b0) / (b1 - b0); } return base[base.length - 1][0]; };
+    const pts = [];
+    const N = 60;
+    for (let i = 0; i <= N; i++) {
+      const h = base[0][1] + (base[base.length - 1][1] - base[0][1]) * i / N;
+      let r = rAt(h) * Wd + 2.6 + 1.6 * tk;
+      if (J.tyg === 'dun') r += 1.6 * Math.sqrt(tk) * Math.pow(0.5 + 0.5 * Math.cos(2 * Math.PI * (h + 0.04) / 0.17), 0.6) * (h < 0.97 ? 1 : 0.3);
+      pts.push(new THREE.Vector2(r, h * T));
+    }
+    const open = J.typ === 'oppen';
+    const gap = open ? 0.34 : 0;
+    const m = jackMat(J);
+    const edge = edgeMat(J);
+    mesh(new THREE.LatheGeometry(pts, 120, gap, 2 * Math.PI - 2 * gap), m, chest).scale.z = sz;
+    // en tub längs skalet: lodrätt vid vinkeln phi, eller vågrätt runt på höjden y
+    const at = (phi, r, y) => new THREE.Vector3(Math.sin(phi) * r, y, Math.cos(phi) * r * sz);
+    const tube = (list, rad, mt) => mesh(new THREE.TubeGeometry(new THREE.CatmullRomCurve3(list), Math.max(24, list.length * 3), rad, 8, false), mt, chest);
+    const around = (i, off, rad, mt) => tube(Array.from({ length: 41 }, (_, j) => at(gap + (2 * Math.PI - 2 * gap) * j / 40, pts[i].x + off, pts[i].y)), rad, mt);
+    if (open) for (const s of [-1, 1]) tube(pts.filter((_, i) => i % 3 === 0).map((p) => at(s * gap, p.x + 0.4, p.y)), 1.7, edge);
+    else {
+      tube(pts.filter((_, i) => i % 3 === 0).map((p) => at(0, p.x + 0.5, p.y)), 0.8, mat('#1a1a1c', { roughness: 0.4, metalness: 0.4 }));
+      const pull = mesh(new RoundedBoxGeometry(2.6, 4.2, 1.2, 2, 0.5), mat('#9a9a96', { metalness: 0.8, roughness: 0.3 }), chest);
+      pull.position.copy(at(0, pts[N - 4].x + 1.6, pts[N - 4].y - 3));
+    }
+    around(0, 0.4, 1.6 + 0.3 * tk, edge);
+    // kragen: nedvikt på den öppna, en hög krage på den stängda
+    const top = pts[N];
+    if (J.krage) {
+      const cp = open ? [new THREE.Vector2(top.x - 1, top.y), new THREE.Vector2(top.x + 5, top.y + 4)] : [new THREE.Vector2(top.x - 0.5, top.y - 1), new THREE.Vector2(F.neckR + 5, top.y + 9)];
+      mesh(new THREE.LatheGeometry(cp, 64, gap * 0.8, 2 * Math.PI - 1.6 * gap), mat(J.tyg === 'flanell' ? J.farg : J.farg2, { side: THREE.DoubleSide, roughness: 0.55, clearcoat: 0.4 }), chest).scale.z = sz;
+    } else around(N, 0.3, 1.5, edge);
+    // luvan nedfälld på ryggen, och pälskanten runt halsen
+    if (J.luva) ellipsoid([0, T * 1.0, -(F.depth * 0.62 + 4)], [Wd * 0.48, 10, 9], m, chest);
+    if (J.luva === 'pals') {
+      const fg = new THREE.TorusGeometry(F.neckR + 7.5, 5, 14, 64);
+      const fp = fg.attributes.position;
+      for (let i = 0; i < fp.count; i++) { const x = fp.getX(i); const y = fp.getY(i); const z = fp.getZ(i); const k = 1 + 0.08 * Math.sin(x * 1.7 + y * 2.3) * Math.sin(z * 3.1 + x); fp.setXYZ(i, x * k, y * k, z * k); }
+      fg.computeVertexNormals();
+      const fur = mesh(fg, mat('#8d7c64', { roughness: 1, clearcoat: 0, sheen: 1, sheenRoughness: 0.9, sheenColor: new THREE.Color('#e8dcc8'), bumpMap: knit, bumpScale: 3 }), chest);
+      fur.rotation.x = Math.PI / 2;
+      fur.position.y = T * 1.04;
+      fur.scale.y = sz * 1.15;
+    }
+    // fickor på bomullsjackan och parkasen
+    if (J.tyg === 'bomull' || J.tyg === 'parka') {
+      for (const s of [-1, 1]) {
+        const y = T * 0.26; const x = s * Wd * 0.52; const r = rAt(0.26) * Wd + 2.6 + 1.6 * tk;
+        const flap = mesh(new RoundedBoxGeometry(Wd * 0.42, 5, 1.6, 2, 0.6), edge, chest);
+        flap.position.set(x, y, Math.sqrt(Math.max(0, r * r - x * x)) * sz + 0.6);
+        flap.rotation.y = Math.atan2(x, Math.sqrt(Math.max(0, r * r - x * x)) * sz) * 0.9;
+      }
+    }
+    return pts;
+  }
+
   // ---------- figurerna ----------
 
   const tex = {};
@@ -923,9 +1052,10 @@ export async function figurer(canvas, opt = {}) {
   kupTex.bak = canvasTex(260, 180, (g, w, h) => drawCoupon(g, w, h, true));
 
   const figs = [];
-  for (const F of FIGS) figs.push(build(F));
+  for (const F of FIGS) figs.push(build(F, dress(F.key, opt.vader)));
 
-  function build(F) {
+  // D: kläderna (dress)
+  function build(F, D) {
     const c = CHARS[F.key];
     const L = F.legs;
     const T = F.torso;
@@ -939,11 +1069,13 @@ export async function figurer(canvas, opt = {}) {
     root.add(fig);
     const skin = mat(c.skin, { sheenColor: new THREE.Color(c.blush), sheen: 0.3 }, 'hud');
     const fab = (col, extra = {}) => mat(col, extra, 'tyg');
-    const tee = fab(c.tee, { bumpMap: knit, bumpScale: 0.6 });
+    const tee = fab(D.troja ? D.troja.farg : c.tee, { bumpMap: knit, bumpScale: 0.6 });
+    // DT har jeans (jeansshorts när det är hett), DL och DJ shorts eller långbyxor
     const jeans = c.pants === 'jeans';
-    const trou = fab(c.trou, { bumpMap: jeans ? denim : knit, bumpScale: jeans ? 0.9 : 0.5 });
-    const tee2 = fab(c.tee2);
-    const trou2 = fab(c.trou2);
+    const lang = D.ben === 'lang';
+    const trou = fab(lang && D.byxa ? D.byxa[0] : c.trou, { bumpMap: jeans ? denim : knit, bumpScale: jeans ? 0.9 : 0.5 });
+    const tee2 = fab(D.troja ? D.troja.farg2 : c.tee2);
+    const trou2 = fab(lang && D.byxa ? D.byxa[1] : c.trou2);
     const shoe = mat(c.shoe, {}, 'sko');
     const sole = mat(c.sole, { roughness: 0.6 });
     const hipY = 11;
@@ -957,15 +1089,15 @@ export async function figurer(canvas, opt = {}) {
       const hip = new THREE.Vector3(fx, hipY, 0);
       const kn = new THREE.Vector3(fx + s * 7, hipY - 7, thigh);
       const along = kn.clone().sub(hip).normalize();
-      if (jeans) {
+      if (lang) {
         capsule(hip.toArray(), kn.toArray(), F.leg * 1.25, trou, fig);
       } else {
         capsule(hip.clone().lerp(kn, 0.5).toArray(), kn.toArray(), F.leg * 1.05, skin, fig);
-        // shortsen: ett rör tätt om låret med uppvik ytterst
-        const sh = mesh(new THREE.CylinderGeometry(F.leg * 1.32, F.leg * 1.45, thigh * 0.74, 32, 1, true), fab(c.trou, { bumpMap: knit, bumpScale: 0.5, side: THREE.DoubleSide }), fig);
+        // shortsen: ett rör tätt om låret med uppvik ytterst (DT:s jeansshorts med ljus kant)
+        const sh = mesh(new THREE.CylinderGeometry(F.leg * 1.32, F.leg * 1.45, thigh * 0.74, 32, 1, true), fab(c.trou, { bumpMap: jeans ? denim : knit, bumpScale: jeans ? 0.9 : 0.5, side: THREE.DoubleSide }), fig);
         sh.position.copy(hip.clone().lerp(kn, 0.33));
         sh.quaternion.setFromUnitVectors(UP, along);
-        ring(hip.clone().lerp(kn, 0.68).toArray(), along.toArray(), F.leg * 1.3, 2.2, trou2, fig);
+        ring(hip.clone().lerp(kn, 0.68).toArray(), along.toArray(), F.leg * 1.3, 2.2, jeans ? fab(c.cuff, { bumpMap: denim, bumpScale: 0.6 }) : trou2, fig);
         const inner = mesh(new THREE.CircleGeometry(F.leg * 1.3, 24), mat('#3a3128', { roughness: 1 }), fig);
         inner.position.copy(hip.clone().lerp(kn, 0.66));
         inner.quaternion.setFromUnitVectors(new THREE.Vector3(0, 0, 1), along);
@@ -973,11 +1105,15 @@ export async function figurer(canvas, opt = {}) {
       const knee = new THREE.Group();
       knee.position.copy(kn);
       fig.add(knee);
-      if (jeans) {
+      if (lang && jeans) {
         capsule([0, 0, 0], [0, -shin, 0], F.leg * 1.25, trou, knee);
         const cuff = mesh(new THREE.CylinderGeometry(F.leg * 1.42, F.leg * 1.45, 7, 32), fab(c.cuff, { bumpMap: denim, bumpScale: 0.6 }), knee);
         cuff.position.y = -shin + 4;
         capsule([s * F.leg * 1.22, -shin + 8, 0], [s * F.leg * 1.22, -2, 0], 0.55, mat('#c08a42', { roughness: 0.8 }), knee);
+      } else if (lang) {
+        // chinos: raka ben med en fåll vid vristen
+        capsule([0, 0, 0], [0, -shin + 2, 0], F.leg * 1.25, trou, knee);
+        mesh(new THREE.CylinderGeometry(F.leg * 1.33, F.leg * 1.36, 4, 32), trou2, knee).position.y = -shin + 2.5;
       } else {
         capsule([0, 0, 0], [0, -shin, 0], F.leg, skin, knee);
         mesh(new THREE.CylinderGeometry(F.leg * 1.08, F.leg * 1.08, 9, 24), mat(c.sock, { roughness: 0.9 }), knee).position.y = -shin + 2;
@@ -999,7 +1135,7 @@ export async function figurer(canvas, opt = {}) {
     const torso = new THREE.Group();
     torso.position.set(0, hipY + 3, 0);
     fig.add(torso);
-    const hipPts = jeans ? [[Wd * 0.74, -6], [Wd * 0.82, 6], [Wd * 0.86, 14]] : [[Wd * 0.7, -12], [Wd * 0.82, 0], [Wd * 0.86, 14]];
+    const hipPts = lang ? [[Wd * 0.74, -6], [Wd * 0.82, 6], [Wd * 0.86, 14]] : [[Wd * 0.7, -12], [Wd * 0.82, 0], [Wd * 0.86, 14]];
     const hips = mesh(new THREE.LatheGeometry([new THREE.Vector2(0, hipPts[0][1]), ...hipPts.map(([a, b]) => new THREE.Vector2(a, b)), new THREE.Vector2(0, 14)], 48), trou, torso);
     hips.scale.z = F.depth / Wd;
     const prof = [[0, -0.02], [0.84, -0.02], [0.86, 0.1], [0.9, 0.45], [0.97, 0.75], [1, 0.86], [0.92, 0.96], [0.6, 1.02], [0.25, 1.04], [0, 1.04]].map(([a, b]) => new THREE.Vector2(a * Wd, b * T));
@@ -1020,7 +1156,21 @@ export async function figurer(canvas, opt = {}) {
     ring([0, -T * 0.015, 0], [0, 1, 0], Wd * 0.86, 2.2, tee2, chest).scale.y = F.depth / Wd;
     ring([0, T * 1.03, 0], [0, 1, 0], F.neckR + 2.6, 2.3, tee2, chest);
     mesh(new THREE.CylinderGeometry(F.neckR, F.neckR * 1.1, F.neck + 26, 24), skin, torso).position.y = T + F.neck / 2 - 2;
-    if (F.halsduk) halsduk(F, prof, chest);
+    // luvtröjans luva på ryggen och snörena fram
+    if (D.troja && D.troja.luva) {
+      ellipsoid([0, T * 0.99, -(F.depth * 0.6 + 2)], [Wd * 0.46, 9, 8], tee, chest);
+      for (const s of [-1, 1]) capsule([s * 4, T * 0.99, F.depth * 0.62 + 1], [s * 4.6, T * 0.8, F.depth * 0.98 + 1.2], 0.8, mat('#d8d4cc', { roughness: 0.8 }), chest);
+    }
+    // jackan utanpå, och halsduken utanpå jackan
+    const outer = D.jacka ? jacka(F, D.jacka, chest) : prof;
+    if (F.halsduk) halsduk(F, outer, chest);
+    // snö på axlarna när det snöar
+    if (D.sno) {
+      for (const s of [-1, 1]) {
+        ellipsoid([s * Wd * 0.56, T * 1.02 + 2, -1], [11, 2.6, 8], snowMat, chest, [0.1, 0, s * 0.3]);
+        for (let j = 0; j < 4; j++) ellipsoid([s * Wd * (0.3 + 0.15 * j), T * (1.0 - 0.06 * j) + 3, 4 + 3 * hash(j + F.x)], [2.2, 1.2, 2], snowMat, chest);
+      }
+    }
 
     const P = F.head;
     const hg = new THREE.Group();
@@ -1047,26 +1197,48 @@ export async function figurer(canvas, opt = {}) {
     const onCap = F.mossa ? mossa(F, P, hc) : null;
     if (F.glasses) {
       const gl = glasses(P, hc, F.glasses, F.hair.gr || 1);
-      // uppskjutna på mössan
-      if (onCap) { gl.position.copy(onCap); gl.rotation.x = -35 * DEG; }
+      if (D.glas) {
+        // solen skiner: glasögonen på näsan (ögonen i ansiktsbilden y ≈ −3)
+        const ey = -(-3 - P.cy) * P.ry / P.hh;
+        gl.position.set(0, ey, Math.sqrt(Math.max(0, 1 - (ey / P.ry) ** 2)) * P.rz + 3);
+        gl.rotation.x = 0;
+      } else if (onCap) {
+        // uppskjutna på mössan
+        gl.position.copy(onCap); gl.rotation.x = -35 * DEG;
+      }
     }
+    if (D.sno) ellipsoid([0, P.ry * (F.mossa ? 1.13 : 1.05), -P.rz * 0.1], [P.rx * 0.42, 3, P.rz * 0.38], snowMat, hc);
     // munnen i huvudets axlar (ansiktsbildens y ≈ 42)
     const my = -(42 - P.cy) * P.ry / P.hh;
     const mouth = new THREE.Vector3(0, my, Math.sqrt(Math.max(0, 1 - (my / P.ry) ** 2)) * P.rz * 0.98 + 2);
 
     // armarna: kapslar med fast längd som IK placerar varje bild
+    // ärmarna: korta på t-tröjan, långa på tröjan och jackan, eller
+    // uppkavlade till armbågen (DT:s arm med lejonet)
+    const J = D.jacka;
     const arms = [0, 1].map((i) => {
       const s = i === 0 ? -1 : 1;
       const kind = F.does[i];
+      const sleeve = J ? (J.upp === 'bada' || J.upp === i ? 'upp' : 'jacka') : D.troja ? 'lang' : 'kort';
+      const sm = J ? jackMat(J, { side: THREE.FrontSide, ...(J.tyg === 'flanell' ? { map: plaid(2, 2) } : {}) }) : tee;
+      const tk = J ? (J.tunn ? 0.3 : J.tjock || 1) : 0;
+      const rU = F.arm * (sleeve === 'kort' ? 1.45 : 1.22 + 0.12 * tk);
+      const rL = F.arm * (1.1 + 0.1 * tk);
       const A = {
         s,
         kind,
+        sleeveKind: sleeve,
         S: new THREE.Vector3(s * Wd * 0.88, T - 10, 0),
         up: rod(F.a, F.arm, skin, fig),
         lo: rod(F.b, F.arm * 0.92, skin, fig),
-        sleeve: rod(F.a * 0.48, F.arm * 1.45, tee, fig),
-        cuff: ring([0, 0, 0], [0, 1, 0], F.arm * 1.45, 1.3, tee2, fig),
+        sleeve: rod(sleeve === 'kort' ? F.a * 0.48 : F.a, rU, sm, fig),
+        cuff: sleeve === 'kort' ? ring([0, 0, 0], [0, 1, 0], F.arm * 1.45, 1.3, tee2, fig)
+          : sleeve === 'upp' ? ring([0, 0, 0], [0, 1, 0], rU * 1.02, 3 + 0.4 * tk, sm, fig)
+            : ring([0, 0, 0], [0, 1, 0], rL * 1.02, J ? 1.5 + 0.3 * tk : 1.9, J ? edgeMat(J) : tee2, fig),
       };
+      if (sleeve === 'lang' || sleeve === 'jacka') A.loS = rod(Math.max(1, F.b * 0.84 - 2 * rL), rL, sm, fig);
+      // dunjackans kanaler runt ärmarna
+      if (J && J.tyg === 'dun' && sleeve !== 'kort') A.quilt = [[0, 0.38, rU], [0, 0.72, rU], ...(A.loS ? [[1, 0.32, rL], [1, 0.62, rL]] : [])].map(([seg, f, r]) => ({ seg, f, x: ring([0, 0, 0], [0, 1, 0], r * 0.98, 1.2 + 0.2 * tk, sm, fig) }));
       const q = F.arm;
       if (kind === 'flaska' || kind === 'burk') {
         A.hand = hand('grepp', q, skin, fig, kind === 'burk' ? 7.4 : 7.6);
@@ -1154,7 +1326,7 @@ export async function figurer(canvas, opt = {}) {
     earPen.updateMatrix();
     kupBench.updateMatrix();
 
-    return { F, fig, torso, chest, hg, hc, knees, feet, arms, mouth, thigh, hipY, T, phase: hash(F.x) * 20, pen, kp, earPen, kupBench, inneAt: -1e9 };
+    return { F, fig, torso, chest, hg, hc, knees, feet, arms, mouth, thigh, hipY, T, phase: hash(F.x) * 20, pen, kp, earPen, kupBench, inneAt: -1e9, key: JSON.stringify(D) };
   }
 
   // Ett föremåls matris i c med x-axeln X och y-axeln Y (rätas upp).
@@ -1465,9 +1637,29 @@ export async function figurer(canvas, opt = {}) {
         const z = new THREE.Vector3(0, 0, 1).applyQuaternion(A.hand.quaternion).applyQuaternion(A.lo.quaternion.clone().invert());
         A.tat.rotation.y = Math.atan2(z.x, z.z) + o.F.tatuering.rot * DEG;
       }
-      place(A.sleeve, S, sl);
-      A.cuff.position.copy(sl);
-      A.cuff.quaternion.setFromUnitVectors(new THREE.Vector3(0, 0, 1), du);
+      const Z = new THREE.Vector3(0, 0, 1);
+      if (A.sleeveKind === 'kort') {
+        place(A.sleeve, S, sl);
+        A.cuff.position.copy(sl);
+        A.cuff.quaternion.setFromUnitVectors(Z, du);
+      } else {
+        // långa ärmar till strax före handleden, uppkavlade till armbågen
+        place(A.sleeve, S, E);
+        const dl = Wr.clone().sub(E).normalize();
+        const end = E.clone().addScaledVector(dl, o.F.b * 0.84);
+        if (A.loS) {
+          place(A.loS, E, end);
+          A.cuff.position.copy(end).addScaledVector(dl, -1);
+          A.cuff.quaternion.setFromUnitVectors(Z, dl);
+        } else {
+          A.cuff.position.copy(E).addScaledVector(du, -2);
+          A.cuff.quaternion.setFromUnitVectors(Z, du);
+        }
+        if (A.quilt) for (const q of A.quilt) {
+          q.x.position.copy(q.seg ? E.clone().addScaledVector(dl, o.F.b * q.f) : S.clone().addScaledVector(du, o.F.a * q.f));
+          q.x.quaternion.setFromUnitVectors(Z, q.seg ? dl : du);
+        }
+      }
       if (A.cig) {
         const g = glowAt(o, t);
         const tip = A.cig.userData.tip;
@@ -1574,6 +1766,33 @@ export async function figurer(canvas, opt = {}) {
     r.render(scene, cam);
   }
 
+  // ---------- vädret ----------
+
+  // Ljuset från fönstret efter dagsljuset ute (rum-ute.js), och kläderna:
+  // den vars kläder (dress) har ändrats byggs om, och röken följer med.
+  function ute(v) {
+    const L = v && window.RumUte ? window.RumUte.light(v) : null;
+    const dag = L ? L.dag : 0;
+    win.color.set('#ffb35c').lerp(new THREE.Color(L ? L.sky[2] : '#ffb35c'), dag);
+    win.intensity = 0.35 + 1.7 * dag;
+    hemi.intensity = 0.42 + 0.2 * dag;
+    figs.forEach((o, i) => {
+      const D = dress(o.F.key, v);
+      if (JSON.stringify(D) === o.key) return;
+      root.remove(o.fig);
+      o.fig.traverse((x) => { if (x.geometry) x.geometry.dispose(); });
+      figs[i] = Object.assign(build(o.F, D), { inneAt: o.inneAt });
+    });
+    for (const sk of smokers) {
+      const o = figs.find((x) => x.F === sk.o.F);
+      if (o === sk.o) continue;
+      sk.A = o.arms[sk.o.arms.indexOf(sk.A)];
+      sk.o = o;
+    }
+    for (const p of puffs) p.born.clear();
+  }
+  ute(opt.vader);
+
   // Vem som har lämnat in ({ dl: true, dt: false, … }; den som saknas är
   // inne) och klockan t. Första gången sitter var och en som det är; den som
   // blir inne sedan lägger ifrån sig kupongen och tar ölen eller cigaretten.
@@ -1588,5 +1807,5 @@ export async function figurer(canvas, opt = {}) {
     told = true;
   }
 
-  return { draw, inne };
+  return { draw, inne, ute };
 }

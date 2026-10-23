@@ -1796,7 +1796,7 @@ sida, och solglasögonen uppskjutna på den. Sköldarna är ESPN:s bilder i
 `public/rum/skold-nacional.png` och `skold-ifk.png` (256 px; den genomskinliga kanten skärs
 bort när de laddas, och saknas en blir det bara text). Halsduken följer bålen, tatueringen
 vrids med handen och mössan följer huvudet; håret trycks ner under mössan och sticker ut
-under kanten.
+under kanten. Kläderna följer vädret utanför (se *Utsikten och vädret* nedan).
 
 **Askkoppen, snusdosan och fläkten** står på pulten till höger om kvittot, i three.js som
 gänget ([public/rum-saker.js](public/rum-saker.js), med en egen duk i pultens plan): en
@@ -1826,8 +1826,8 @@ riktigt illa ryker två cigaretter, en använd pris ligger på pulten och affisc
 tejpbit. Dolda resultat räknas inte (gradeRow rättar dem inte). Utan WebGL står affischen
 kvar men inte sakerna på pulten.
 
-**Rummet rör sig också:** regnet faller utanför rutan och dörren, droppar rinner på glaset,
-neonen glappar ibland, röken ligger under lysröret, damm syns i ljuset och stationsurets
+**Rummet rör sig också:** utanför rutan och dörren är det Stockholms tid och väder (se
+nedan), neonen glappar ibland, röken ligger under lysröret, damm syns i ljuset och stationsurets
 sekundvisare hoppar fram. Stället är slitet: nikotingula väggar och tak, fläckar,
 avflagnad färg, en spricka, skuggan efter en tavla som flyttats, nötta kanter på disken och
 pulten, kafferingar och brännmärken. Med `prefers-reduced-motion` står allt still (en bild,
@@ -1841,7 +1841,60 @@ Rummet läser om datan varje minut medan det står öppet.
 CSS-animationerna står på samma tid), `?rum-mx=&rum-my=` (−1…1) kamerans läge och
 `?rum-tavla` visar fällbladstavlan på nära håll (klappret räknas från tiden 0),
 `?rum-slit=0…1` slitaget och `?rum-dag=<tal>` dagen för sakerna och affischen; sidan
-sätter `data-rum-klar` på `body` när allt är ritat.
+sätter `data-rum-klar` på `body` när allt är ritat. Vädret och klockan utanför:
+`?rum-klocka=2026-12-13T16:00` (eller bara `16:00`, Stockholms tid), `?rum-vader=klart`,
+`halvklart`, `mulet`, `dimma`, `dugg`, `regn`, `skurar`, `snoblandat`, `sno` eller `aska`,
+`?rum-grader=<°C>`, `?rum-vind=<m/s>` och `?rum-snodjup=<cm>` (med både vädret och graderna
+hämtas inget).
+
+### Utsikten och vädret
+
+Tobaksaffären ligger i Stockholm, och genom skyltfönstret och dörren syns gatan som den är
+där just nu. [public/vader.js](public/vader.js) räknar solens höjd och månens fas ur
+klockan och hämtar vädret från Open-Meteo (fritt, utan nyckel, en gång i kvarten; sparas
+på enheten), och [public/rum-ute.js](public/rum-ute.js) ritar gatan med
+[public/rum-ute.css](public/rum-ute.css) för det som rör sig. Utan nätet är det mulet och
+månadens vanliga temperatur.
+
+- **Ljuset:** himlen över de lägre taken går från natt via blå timme och solnedgång till
+  dag, grå när det är mulet. Fasaderna mittemot (gul, terrakotta och ljus puts) är nästan
+  svarta på natten, blåaktiga i skymningen och varma i låg sol, med skuggan från huset vi
+  sitter i nertill; bakom syns ett kyrktorn med ärgad spira och en byggkran med en röd lampa.
+  Fönstren tänds efter klockan (många på kvällen, nästan inga mitt i natten),
+  gatlyktorna när det skymmer, pizzerian är öppen 11–23 (till 1 fredag och lördag) och
+  konditoriet 7–19 utom på söndagar. På klara nätter syns stjärnorna och månen när den är
+  uppe. Dagsljuset faller in i rummet och på gänget bakifrån, på natten gatlyktornas sken.
+- **Vädret:** moln som driver, regn och duggregn som lutar i vinden, snö som driver i
+  sidled, blöt gata med lyktornas spegling, dimma, blixtar vid åska (som också lyser upp
+  rummet). Droppar sitter på glaset efter regn, snö samlas i rutornas nederkant och frosten
+  kryper in från hörnen när det är kallare än −3°. Snötäcke ger vita tak, fönsterbleck,
+  trottoarer och plogvallar.
+- **Folk och trafik:** på trottoaren mittemot går folk förbi (fler på dagen och kvällen,
+  nästan ingen mitt i natten), klädda efter vädret och med paraply när det regnar – i
+  hård vind vänder det sig ut och in – med hund, på cykel eller med pulka när det ligger
+  snö. Bilar och taxi kör åt var sitt håll med strålkastarna tända när det är mörkt, och
+  blåbussen kommer var fjärde minut.
+- **Årstiderna:** löv som blåser förbi och ligger på trottoaren på hösten, plogbilen när
+  det snöar, adventsstjärnor och ljusstakar i fönstren från första advent till
+  tjugondag Knut, en gran som bärs hem i december och fyrverkerier på nyårsnatten (och
+  lite här och var på nyårsafton). Måsar och kråkor på dagen, tornseglare på
+  sommarkvällarna, räven som springer förbi mitt i natten och flaggan på flaggdagarna
+  (påsk, pingst, midsommar och valdagen räknas ut) från morgonen till solnedgången.
+- **Kläderna:** gänget klär sig efter hur kallt det känns ute (`dress` i
+  [public/rum-3d.js](public/rum-3d.js)). Över 21° t-tröja och shorts – DT i jeansshorts –
+  och solglasögonen på näsan när solen skiner; 15–21° som förut; 8–15° långärmat och
+  långbyxor (DL sweatshirt och chinos, DT öppen flanellskjorta med uppkavlade ärmar, DJ
+  luvtröja); 1–8° jackor (DL fältjacka, DT skinnjacka, DJ dunjacka) och under 1° vinter (DL
+  parkas, DT och DJ dunjackor, DJ med pälskant). När det regnar har de regnjackor (DL gul,
+  DT olivgrön, DJ svart), och när det snöar ligger snö på axlarna och huvudet. DT kavlar
+  alltid upp ärmen på armen med lejonet, och halsduken ligger utanpå jackan. Ändras vädret
+  medan rummet står öppet byter den som behöver om.
+
+Utsikten ligger bakom väggen i det bakersta planet och syns genom hålen i den (masken
+`rum-hal` och måtten `WIN` och `DORR` i rum.js), i scenens koordinater, så att den som går
+förbi syns först i dörren och sedan i fönstret. Bara de lager vars ljus eller väder har
+ändrats ritas om (`RumUte.paint`), och det som rör sig har bara transform och opacity.
+Med `prefers-reduced-motion` står gatan still och ingen går förbi.
 
 ### Kupongen i handen
 

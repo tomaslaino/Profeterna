@@ -42,6 +42,12 @@ window.Rum = (() => {
   const sc = (x) => (x - VP[0]) / (1140 - VP[0]);
   const r1 = (x) => Math.round(x * 10) / 10;
   const GANG = { DL: '#4d8ff0', DT: '#3db37c', DJ: '#a069e6' };
+  // Skyltfönstrets och dörrens glas: där har väggen hål (masken rum-hal) och
+  // utsikten bakom (rum-ute.js) syns.
+  const WIN = { x: 272, y: 132, w: 676, h: 426 };
+  const DORR = { x: 50, y: 136, w: 172, h: 560 };
+  const box = (p) => `x="${p.x}" y="${p.y}" width="${p.w}" height="${p.h}"`;
+
 
   const R = { built: false, on: false, el: null, q: new URLSearchParams(location.search), t0: performance.now(), frozen: null,
     mx: 0.5, my: -0.25, tx: 0.5, ty: -0.25, raf: 0, fig: null, page: 0, pageAt: 0, zoom: null, last: 0 };
@@ -84,8 +90,9 @@ window.Rum = (() => {
     <linearGradient id="rum-cupg" x1="0" y1="0" x2="1" y2="0"><stop offset="0" stop-color="#fff" stop-opacity=".55"/><stop offset=".35" stop-color="#fff" stop-opacity="0"/><stop offset="1" stop-color="#000" stop-opacity=".45"/></linearGradient>
     <linearGradient id="rum-guld" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#f7e3a8"/><stop offset=".55" stop-color="#d4a650"/><stop offset="1" stop-color="#9c7230"/></linearGradient>
     <path id="rum-dorrbage" d="M66 252 Q136 232 206 252"/>
-    <clipPath id="rum-win"><rect x="272" y="132" width="676" height="426"/></clipPath>
-    <clipPath id="rum-doorglass"><rect x="50" y="136" width="172" height="560"/></clipPath>
+    <clipPath id="rum-win"><rect ${box(WIN)}/></clipPath>
+    <clipPath id="rum-doorglass"><rect ${box(DORR)}/></clipPath>
+    <mask id="rum-hal" maskUnits="userSpaceOnUse" x="0" y="0" width="${W}" height="${H}"><rect width="${W}" height="${H}" fill="#fff"/><rect ${box(WIN)} fill="#000"/><rect ${box(DORR)} fill="#000"/></mask>
     <filter id="rum-b1" x="-10%" y="-10%" width="120%" height="120%"><feGaussianBlur stdDeviation="1.3"/></filter>
     <filter id="rum-b4" x="-50%" y="-50%" width="200%" height="200%"><feGaussianBlur stdDeviation="4"/></filter>
     <filter id="rum-b10" x="-50%" y="-50%" width="200%" height="200%"><feGaussianBlur stdDeviation="10"/></filter>
@@ -96,53 +103,6 @@ window.Rum = (() => {
     <filter id="rum-prick" x="0" y="0" width="100%" height="100%"><feTurbulence type="fractalNoise" baseFrequency=".5" numOctaves="1" seed="2"/><feColorMatrix values="0 0 0 0 .18  0 0 0 0 .12  0 0 0 0 .05  0 0 0 -9 6.4"/></filter>
     <filter id="rum-grime" x="0" y="0" width="100%" height="100%"><feTurbulence type="fractalNoise" baseFrequency=".02 .006" numOctaves="3" seed="4"/><feColorMatrix values="0 0 0 0 .55  0 0 0 0 .52  0 0 0 0 .45  0 0 0 -2 1.1"/></filter>
   </defs>`;
-
-  // Fasaden mittemot, gatlyktorna, bilen och dropparna på rutan.
-  function outside(R0) {
-    const warm = ['#ffd58a', '#ffc56b', '#f6e7c1', '#ffcf7a', '#a9c4ff'];
-    let s = '';
-    for (const [hx, hw, hc] of [[0, 190, '#0e1119'], [190, 260, '#12141c'], [450, 330, '#0d1017'], [780, 220, '#111520']]) {
-      s += `<rect x="${hx}" y="100" width="${hw}" height="300" fill="${hc}"/>`;
-      for (let wy = 116; wy < 280; wy += 30) {
-        for (let wx = hx + 14; wx < hx + hw - 18; wx += 30) {
-          const lit = R0() < 0.3;
-          s += `<rect x="${wx}" y="${wy}" width="14" height="17" fill="${lit ? warm[(R0() * 5) | 0] : '#fff'}" opacity="${lit ? r1(0.28 + R0() * 0.4) : 0.025}"/>`;
-        }
-      }
-    }
-    s += `<rect x="560" y="312" width="210" height="88" fill="#1a1410"/><rect x="566" y="330" width="198" height="64" fill="#ffcf8a" opacity=".32"/>
-      <rect x="566" y="330" width="198" height="64" fill="#3a2414" opacity=".25"/>
-      <g fill="#1a1410"><rect x="630" y="330" width="4" height="64"/><rect x="698" y="330" width="4" height="64"/>
-        <rect x="584" y="372" width="30" height="4"/><rect x="588" y="376" width="3" height="18"/><rect x="608" y="376" width="3" height="18"/>
-        <rect x="716" y="370" width="34" height="4"/><rect x="722" y="374" width="3" height="20"/><rect x="744" y="374" width="3" height="20"/></g>
-      <rect x="650" y="350" width="34" height="8" rx="4" fill="#fff4d8" opacity=".5"/><rect x="580" y="292" width="170" height="26" fill="#0e1a12"/>
-      <text x="665" y="312" text-anchor="middle" font-family="Fraunces" font-style="italic" font-weight="700" font-size="21" fill="#9bf5b5">Pizzeria</text>
-      <text x="665" y="312" text-anchor="middle" font-family="Fraunces" font-style="italic" font-weight="700" font-size="21" fill="#4fe08a" filter="url(#rum-b4)">Pizzeria</text>
-      <rect x="0" y="400" width="1000" height="14" fill="#2a2b30"/><rect x="0" y="414" width="1000" height="310" fill="#121318"/>`;
-    for (const [sx, k] of [[330, 1], [520, 0.8], [880, 1], [120, 0.9]]) {
-      s += `<rect x="${sx - 2}" y="250" width="4" height="165" fill="#1a1c22"/><circle cx="${sx}" cy="250" r="${60 * k}" fill="url(#rum-sodium)" opacity=".7"/>` +
-        `<circle cx="${sx}" cy="250" r="4" fill="#ffe2b0"/><rect x="${sx - 7}" y="418" width="14" height="140" fill="url(#rum-streak)" filter="url(#rum-b4)"/>`;
-    }
-    for (const cx of [700, 736]) {
-      s += `<circle cx="${cx}" cy="470" r="5" fill="#ff4a3a"/><circle cx="${cx}" cy="470" r="16" fill="#ff3b30" opacity=".45" filter="url(#rum-b4)"/>` +
-        `<rect x="${cx - 4}" y="478" width="8" height="80" fill="url(#rum-streakred)" filter="url(#rum-b4)"/>`;
-    }
-    s += '<rect x="680" y="440" width="76" height="36" rx="8" fill="#08090c"/><rect x="560" y="420" width="210" height="90" fill="#ffcf8a" opacity=".07" filter="url(#rum-b10)"/>';
-    return s;
-  }
-
-  // Droppar som sitter kvar på rutan (regnet som faller ritas i rain()).
-  function drops(R0, x0, w, y0, h, m) {
-    let s = '';
-    for (let i = 0; i < m; i++) {
-      const dx = x0 + R0() * w;
-      const dy = y0 + R0() * h;
-      const r = 1 + R0() * 3;
-      if (R0() < 0.3) s += `<line x1="${r1(dx)}" y1="${r1(dy)}" x2="${r1(dx + (R0() - 0.5) * 4)}" y2="${r1(dy - 10 - R0() * 40)}" stroke="#dfe8ff" stroke-opacity=".08" stroke-width="${r1(r * 0.8)}"/>`;
-      s += `<circle cx="${r1(dx)}" cy="${r1(dy)}" r="${r1(r)}" fill="#dfe8ff" opacity="${r1(0.1 + R0() * 0.12)}"/><circle cx="${r1(dx - r * 0.3)}" cy="${r1(dy - r * 0.3)}" r="${r1(r * 0.35)}" fill="#fff" opacity=".35"/>`;
-    }
-    return s;
-  }
 
   // Cigarettpaketen på hyllorna längs högra väggen (påhittade färger, inga märken).
   function packs(R0, yb, x0, x1) {
@@ -177,9 +137,6 @@ window.Rum = (() => {
   // dörren, skyltfönstret, disken med godisburken.
   function bg() {
     const R0 = rng(17);
-    const out = outside(R0);
-    const win = drops(R0, 272, 676, 132, 426, 120);
-    const door = drops(R0, 50, 172, 136, 560, 40);
     let candy = '';
     for (let i = 0; i < 36; i++) candy += `<circle cx="${r1(1414 + R0() * 52)}" cy="${r1(518 + R0() * 38)}" r="${r1(4 + R0() * 3)}" fill="${['#e04a3a', '#f0c23a', '#3db37c', '#f3ead9', '#a069e6'][(R0() * 5) | 0]}" opacity=".85"/>`;
     const R1 = rng(23);
@@ -197,12 +154,14 @@ window.Rum = (() => {
   <rect x="384" y="30" width="62" height="22" fill="#3a2e18" opacity=".25"/>
   <ellipse cx="650" cy="62" rx="420" ry="70" fill="url(#rum-tube)" filter="url(#rum-b24)" class="rum-tubeglow"/>
 
+  <g mask="url(#rum-hal)">
   <rect x="0" y="90" width="1140" height="640" fill="url(#rum-wall)"/>
   <rect x="0" y="90" width="1140" height="640" fill="url(#rum-nik)"/>
   <rect x="0" y="90" width="1140" height="640" filter="url(#rum-flack)" opacity=".75"/>
   <rect x="0" y="90" width="1140" height="640" filter="url(#rum-prick)" opacity=".55"/>
   <rect x="0" y="90" width="1140" height="6" fill="#000" opacity=".3"/>
   <path d="M640 92 q30 26 18 60 q-6 22 10 40" fill="none" stroke="#3b2a12" stroke-opacity=".28" stroke-width="7" filter="url(#rum-b4)"/>
+  </g>
   <ellipse cx="760" cy="104" rx="58" ry="16" fill="none" stroke="#4a3412" stroke-opacity=".3" stroke-width="3" filter="url(#rum-b1)"/>
   <ellipse cx="768" cy="106" rx="40" ry="10" fill="#4a3412" opacity=".12" filter="url(#rum-b4)"/>
   <rect x="986" y="286" width="132" height="196" fill="#b5a47a" opacity=".16"/>
@@ -220,9 +179,8 @@ window.Rum = (() => {
   ${top}
   <polygon points="1140,90 1600,0 1600,1000 1140,730" fill="#000" opacity=".2"/>
 
-  <rect x="36" y="122" width="200" height="610" fill="#3b3b3d"/>
-  <g clip-path="url(#rum-doorglass)"><g transform="translate(-260 0)" filter="url(#rum-b1)">${out}</g>${door}
-    <rect x="50" y="136" width="172" height="560" filter="url(#rum-grime)" opacity=".5"/></g>
+  <rect x="36" y="122" width="200" height="610" fill="#3b3b3d" mask="url(#rum-hal)"/>
+  <g clip-path="url(#rum-doorglass)"><rect x="50" y="136" width="172" height="560" filter="url(#rum-grime)" opacity=".5"/></g>
   <rect x="50" y="136" width="172" height="560" fill="#fff" opacity=".03"/>
   <rect x="44" y="420" width="184" height="16" rx="3" fill="url(#rum-alu)"/>
   <path d="M36 122 h200 v610 h-200 z M50 136 v560 h172 v-560 z" fill="#1e1e20" fill-rule="evenodd" opacity=".001"/>
@@ -249,9 +207,8 @@ window.Rum = (() => {
   <path d="M250 306 l7 -3 l-2 9 z" fill="#b8a77d" opacity=".7"/>
   <path d="M0 560 l22 -8 l6 20 l-10 18 l8 26 l-26 6 z" fill="#9b8c68" opacity=".5"/>
 
-  <rect x="262" y="122" width="696" height="446" fill="#3a3a3c"/>
+  <rect x="262" y="122" width="696" height="446" fill="#3a3a3c" mask="url(#rum-hal)"/>
   <g clip-path="url(#rum-win)">
-    <g filter="url(#rum-b1)">${out}</g>${win}
     <rect x="272" y="132" width="676" height="426" fill="#fff" opacity=".03"/>
     <rect x="420" y="150" width="420" height="5" rx="2" fill="#fff" opacity=".12" filter="url(#rum-b1)"/>
     <rect x="272" y="132" width="676" height="426" filter="url(#rum-grime)" opacity=".45"/>
@@ -276,28 +233,6 @@ window.Rum = (() => {
   ${candy}
   <rect x="1404" y="482" width="72" height="12" rx="4" fill="#c8643a"/>
   <rect x="1410" y="494" width="60" height="62" rx="10" fill="#cfc4a3" opacity=".12"/>`);
-  }
-
-  // Regnet som faller utanför: två band per ruta som glider nedåt (bara
-  // transform, så att det blir billigt).
-  function rain() {
-    const R0 = rng(5);
-    const band = (w, h, n, o) => {
-      let s = '';
-      for (let i = 0; i < n; i++) {
-        const x = R0() * w;
-        const y = R0() * h;
-        const len = 16 + R0() * 34;
-        const line = `<line x1="${r1(x)}" y1="${r1(y)}" x2="${r1(x - len * 0.12)}" y2="${r1(y + len)}" stroke="#c8d6f0" stroke-opacity="${r1(o + R0() * 0.14)}" stroke-width="${r1(0.7 + R0() * 0.6)}"/>`;
-        s += line + line.replace(/y1="([\d.]+)" x2="([\d.]+)" y2="([\d.]+)"/, (_, a, b, c) => `y1="${r1(+a + h)}" x2="${b}" y2="${r1(+c + h)}"`);
-      }
-      return `<svg viewBox="0 0 ${w} ${2 * h}" width="${w}" height="${2 * h}">${s}</svg>`;
-    };
-    const pane = (x, y, w, h, n) => `<div class="rum-regn" style="left:${x}px; top:${y}px; width:${w}px; height:${h}px">` +
-      `<div class="rum-regn-b fjarr" style="height:${2 * h}px">${band(w, h, Math.round(n * 0.6), 0.03)}</div>` +
-      `<div class="rum-regn-b" style="height:${2 * h}px">${band(w, h, n, 0.05)}</div>` +
-      `<i class="rum-droppe" style="left:${Math.round(w * 0.3)}px"></i><i class="rum-droppe d2" style="left:${Math.round(w * 0.72)}px"></i></div>`;
-    return pane(272, 132, 676, 426, 220) + pane(50, 136, 172, 560, 70);
   }
 
   // Neonskylten, spegelvänd inifrån; ett av o:na glappar ibland.
@@ -632,13 +567,13 @@ window.Rum = (() => {
     el.hidden = true;
     el.setAttribute('aria-label', 'Tobaksaffären');
     el.innerHTML = `<div class="rum-stage" id="rum-stage"><div class="rum-kamera" id="rum-kamera"><div class="rum-world" id="rum-world">
-${plane(-600, `${bg()}${rain()}${rightWall()}${svg('<g id="rum-hyllor"></g>')}${neon()}${clock()}${boardHtml()}${frameHtml()}`, 1.035)}
+${plane(-600, `<div class="rum-ute" id="rum-ute"></div>${bg()}${rightWall()}${svg('<g id="rum-hyllor"></g>')}${neon()}${clock()}${boardHtml()}${frameHtml()}`, 1.035)}
 ${plane(-470, `${props()}${tv()}`, 1.02)}
 ${plane(-330, `${sill()}${haze()}`)}
 ${plane(-60, table(), 1.05)}
 ${plane(0, paper())}
 </div></div>
-<div class="rum-layer rum-warm"></div><div class="rum-layer rum-vign"></div><div class="rum-layer rum-grain"></div>
+<div class="rum-layer rum-warm"></div><div class="rum-layer rum-dagsljus" id="rum-dagsljus"></div><div class="rum-layer rum-vign"></div><div class="rum-layer rum-grain"></div>
 </div>
 ${closeHtml()}
 <div class="rum-hdr"><a class="rum-brand" href="#">Matchfixarna</a>
@@ -648,6 +583,7 @@ ${closeHtml()}
     R.el = el;
     R.built = true;
     wire();
+    paintUte();
   }
 
   // ---------- datan ----------
@@ -1148,6 +1084,29 @@ ${closeHtml()}
     }
   }
 
+  // ---------- utsikten ----------
+
+  // Stockholms klocka och väder (vader.js) i utsikten bakom glaset
+  // (rum-ute.js), i dagsljuset som faller in och i gängets kläder (rum-3d.js).
+  function paintUte(v) {
+    if (!window.Vader || !window.RumUte || !R.el) return;
+    v = v || Vader.nu();
+    R.vader = v;
+    RumUte.paint(document.getElementById('rum-ute'), v, [WIN, DORR]);
+    const L = RumUte.light(v);
+    const d = document.getElementById('rum-dagsljus');
+    d.style.setProperty('--dagsljus', r1(L.dag * 0.9));
+    d.style.setProperty('--dag-farg', L.sky[2]);
+    R.el.classList.toggle('aska', v.slag === 'aska');
+    if (R.fig && R.fig.ute) {
+      R.fig.ute(v);
+      if (calm() && !still()) frame();
+    }
+  }
+  async function ute() {
+    if (window.Vader) paintUte(await Vader.hamta());
+  }
+
   // ---------- figurerna ----------
 
   async function three() {
@@ -1158,7 +1117,7 @@ ${closeHtml()}
       .catch((err) => console.warn('Rummet: sakerna kunde inte ritas', err));
     try {
       const mod = await import('./rum-3d.js');
-      R.fig = await mod.figurer(document.getElementById('rum-3d'), { calm: calm() });
+      R.fig = await mod.figurer(document.getElementById('rum-3d'), { calm: calm(), vader: R.vader });
       if (R.vem) R.fig.inne(R.vem, now());
       frame();
     } catch (err) {
@@ -1809,7 +1768,8 @@ ${closeHtml()}
     zoomTv(false);
     if (R.nara) closeUp(false);
     hot(null);
-    const ready = Promise.all([load(), three()]);
+    // gänget klär sig efter vädret: vänta lite på det (i en fast bild tills det är hämtat)
+    const ready = Promise.all([load(), Promise.race([ute(), new Promise((r) => setTimeout(r, still() ? 9000 : 1500))]).then(three)]);
     if (still()) {
       // en fast bild: allt på samma tid, och klar när datan och gänget är ritade
       ready.then(() => {
@@ -1824,7 +1784,7 @@ ${closeHtml()}
     } else loop();
     clearInterval(R.poll);
     // omgången och liveställningen kan ändras medan rummet står öppet
-    R.poll = setInterval(() => { if (R.on) load(); }, 60000);
+    R.poll = setInterval(() => { if (R.on) { load(); ute(); } }, 60000);
   }
 
   function hide() {

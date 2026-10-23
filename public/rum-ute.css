@@ -1,0 +1,95 @@
+/* Utsikten i tobaksaffären (rum-ute.js): gatan bakom väggen, synlig genom
+   fönstret och dörren. Allt som rör sig har bara transform och opacity, och
+   står still med prefers-reduced-motion och ?rum-t (rum.js fryser klockan). */
+
+.rum-ute { position: absolute; left: 0; top: 0; width: 1600px; height: 1000px; pointer-events: none; }
+.rum-ute-himmel, .rum-ute-gata { filter: blur(1.3px); }
+
+/* de som går, cyklar och åker förbi: gatans x i --fran … --till */
+.rum-gar, .rum-moln, .rum-fagel { position: absolute; left: 0; animation: rum-gar linear infinite; will-change: transform; }
+.rum-gar { filter: blur(1.1px); }
+.rum-gar.fordon { filter: blur(1.4px); }
+.rum-moln { filter: blur(7px); }
+.rum-fagel { filter: blur(0.7px); }
+@keyframes rum-gar { from { transform: translateX(var(--fran)); } to { transform: translateX(var(--till)); } }
+.rum-gar .gung { animation: rum-gung calc(var(--steg, 0.9s) / 2) ease-in-out infinite alternate; }
+@keyframes rum-gung { from { transform: translateY(0); } to { transform: translateY(-0.8px); } }
+.rum-gar .ben { animation: rum-ben var(--steg, 0.9s) ease-in-out infinite alternate; }
+.rum-gar .ben.b2 { animation-delay: calc(var(--steg, 0.9s) * -1); }
+.rum-gar .ben.fort { animation-duration: calc(var(--steg, 0.9s) * 0.6); }
+.rum-gar .ben.fort.b2 { animation-delay: calc(var(--steg, 0.9s) * -0.6); }
+@keyframes rum-ben { from { transform: rotate(24deg); } to { transform: rotate(-24deg); } }
+.rum-gar .arm { animation: rum-arm var(--steg, 0.9s) ease-in-out infinite alternate; animation-delay: calc(var(--steg, 0.9s) * -1); }
+@keyframes rum-arm { from { transform: rotate(-18deg); } to { transform: rotate(18deg); } }
+.rum-gar .hjul { animation: rum-hjul 0.5s linear infinite; }
+@keyframes rum-hjul { to { transform: rotate(360deg); } }
+.rum-gar .blink { animation: rum-blink 0.9s steps(2, jump-none) infinite; }
+@keyframes rum-blink { from { opacity: 1; } to { opacity: 0.1; } }
+
+/* löven som blåser förbi och snurrar */
+.rum-lov { position: absolute; left: 0; top: 0; animation: rum-lov linear infinite; filter: blur(0.8px); will-change: transform; }
+@keyframes rum-lov { from { transform: translate(-40px, var(--y0)); } to { transform: translate(var(--x1), var(--y1)); } }
+.rum-lov .snurr { transform-box: fill-box; transform-origin: center; animation: rum-hjul 1.4s linear infinite; }
+
+/* fåglarna, tornseglarna och fyrverkerierna */
+.rum-fagel .vinge { transform-box: fill-box; transform-origin: center; animation: rum-vinge 0.6s ease-in-out infinite alternate; }
+@keyframes rum-vinge { from { transform: scaleY(1); } to { transform: scaleY(-0.5); } }
+.rum-seglare { position: absolute; left: 0; animation: rum-seglare linear infinite; }
+@keyframes rum-seglare {
+  0% { transform: translate(-40px, 0) rotate(0); }
+  25% { transform: translate(260px, var(--dy)) rotate(-12deg); }
+  55% { transform: translate(560px, calc(var(--dy) * -0.6)) rotate(10deg); }
+  80% { transform: translate(820px, calc(var(--dy) * 0.4)) rotate(-6deg); }
+  100% { transform: translate(1060px, 0) rotate(0); }
+}
+.rum-pang { position: absolute; opacity: 0; animation: rum-pang ease-out infinite; }
+@keyframes rum-pang {
+  0% { opacity: 0; transform: scale(0.15); }
+  3% { opacity: 1; }
+  28% { opacity: 0.9; transform: scale(1); }
+  48% { opacity: 0; transform: scale(1.08) translateY(5px); }
+  100% { opacity: 0; transform: scale(1.08) translateY(5px); }
+}
+
+/* flaggan vajar */
+.rum-flagga { position: absolute; filter: blur(1.1px); }
+.rum-flagga .vaj { transform-box: fill-box; transform-origin: 0 50%; animation: rum-vaj 2.6s ease-in-out infinite alternate; }
+@keyframes rum-vaj { from { transform: skewY(-5deg) scaleX(0.92); } to { transform: skewY(4deg) scaleX(1); } }
+
+/* snön driver i sidled medan den faller */
+.rum-sno-v { position: absolute; left: -60px; top: 0; width: calc(100% + 120px); height: 100%; animation: rum-sway ease-in-out infinite alternate; }
+@keyframes rum-sway { from { transform: translateX(calc(var(--sway, 20px) * -0.5)); } to { transform: translateX(calc(var(--sway, 20px) * 0.5)); } }
+.rum-rinner { position: absolute; overflow: hidden; }
+
+/* blixten */
+.rum-blixt i { position: absolute; inset: 0; background: #eef3ff; opacity: 0; animation: rum-blixt 17s linear infinite; }
+.rum-blixt i.b2 { animation-duration: 29s; animation-delay: -11s; }
+@keyframes rum-blixt {
+  0%, 90% { opacity: 0; }
+  90.6% { opacity: 0.85; }
+  91.2% { opacity: 0.08; }
+  92% { opacity: 0.6; }
+  94% { opacity: 0; }
+  100% { opacity: 0; }
+}
+.rum.aska .rum-dagsljus { animation: rum-blixt-rum 17s linear infinite; }
+@keyframes rum-blixt-rum {
+  0%, 90% { opacity: var(--dagsljus, 0); }
+  90.6% { opacity: 0.9; }
+  91.2% { opacity: var(--dagsljus, 0); }
+  92% { opacity: 0.7; }
+  94%, 100% { opacity: var(--dagsljus, 0); }
+}
+
+/* dagsljuset som faller in genom fönstret */
+.rum-dagsljus {
+  background: radial-gradient(760px 520px at 610px 360px, var(--dag-farg, #c4daec), rgba(196, 218, 236, 0) 72%);
+  mix-blend-mode: soft-light;
+  opacity: var(--dagsljus, 0);
+  transition: opacity 0.6s;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .rum-ute *, .rum-ute *::before, .rum-ute *::after { animation: none; }
+  .rum-gar, .rum-lov, .rum-seglare, .rum-pang, .rum-blixt { display: none; }
+}
