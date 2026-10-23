@@ -143,30 +143,46 @@ a.rum-sak, a.rum-sak:hover { color: inherit; text-decoration: none; }
 
 /* Bladen är --w × --h stora med --g mellan sig, ett fält är --n blad brett;
    rubriken har större blad. Listerna skiljer lagen från oddsen och oddsen
-   åt, och siffrorna 1, X och 2 är målade på ramen. */
+   åt, och siffrorna 1, X och 2 är målade på ramen. Måtten nedan är tavlan
+   på väggen; närbilden (.rum-fb-stor) är samma tavla i större mått. */
 .rum-fb {
-  --w: 9px;
-  --h: 16px;
-  --g: 1px;
+  --w: 3.9px;
+  --h: 8px;
+  --g: 0.5px;
+  --rg: 2px;
+  --fg: 2px;
+  --lg: 3px;
+  --og: 2px;
+  --sg: 1px;
+  --lw: 1px;
+  --lh: 5px;
   display: flex;
   flex-direction: column;
-  gap: 3px;
-  padding: 9px 10px 8px;
+  gap: var(--rg);
+  padding: 6px 4px;
   background: linear-gradient(180deg, #272725, #141413 30%, #121211);
   border: 1px solid #302f2b;
   border-radius: 3px;
-  box-shadow: 0 18px 30px rgba(0, 0, 0, 0.55), inset 0 1px 0 rgba(255, 255, 255, 0.08), inset 0 -1px 0 rgba(0, 0, 0, 0.6);
+  box-shadow: 0 10px 18px rgba(0, 0, 0, 0.55), inset 0 1px 0 rgba(255, 255, 255, 0.08), inset 0 -1px 0 rgba(0, 0, 0, 0.6), 0 -2px 0 rgba(217, 210, 192, 0.2);
 }
-.rum-fb-r { display: flex; gap: 4px; }
+.rum-fb-r { display: flex; gap: var(--fg); }
 .rum-fb .fl { position: relative; display: flex; gap: var(--g); width: calc(var(--n) * var(--w) + (var(--n) - 1) * var(--g)); }
-.rum-fb .f3 { margin-left: 10px; }
-.rum-fb .f4, .rum-fb .f5 { margin-left: 5px; }
-.rum-fb .f1 { margin: 0 3px; }
-.rum-fb .f3::before, .rum-fb .f4::before, .rum-fb .f5::before { content: ""; position: absolute; top: -2px; bottom: -2px; left: -5px; width: 1px; background: #403e39; }
-.rum-fb .f3::before { left: -8px; width: 2px; background: linear-gradient(90deg, #4c4a44, #24231f); }
-.rum-fb-hd { --w: 14.5px; --h: 20px; --g: 1.5px; justify-content: space-between; margin-bottom: 1px; }
-.rum-fb-lb { height: 11px; }
-.rum-fb-lb i { display: block; width: 100%; font: 400 11px/11px Anton, Impact, sans-serif; font-style: normal; text-align: center; color: #d9d0b6; opacity: 0.85; }
+.rum-fb .f1 { margin: 0 var(--sg); }
+.rum-fb .f3 { margin-left: var(--lg); }
+.rum-fb .f4, .rum-fb .f5 { margin-left: var(--og); }
+.rum-fb .f3::before, .rum-fb .f4::before, .rum-fb .f5::before {
+  content: "";
+  position: absolute;
+  top: calc(var(--rg) / -2 - 1px);
+  bottom: calc(var(--rg) / -2 - 1px);
+  left: calc((var(--fg) + var(--og)) / -2 - var(--lw) / 4);
+  width: calc(var(--lw) / 2);
+  background: #403e39;
+}
+.rum-fb .f3::before { left: calc((var(--fg) + var(--lg)) / -2 - var(--lw) / 2); width: var(--lw); background: linear-gradient(90deg, #4c4a44, #24231f); }
+.rum-fb-hd { --w: 6px; --h: 11px; --g: 1px; justify-content: space-between; margin-bottom: 1px; }
+.rum-fb-lb { height: var(--lh); }
+.rum-fb-lb i { display: block; width: 100%; font: 400 var(--lh) / var(--lh) Anton, Impact, sans-serif; font-style: normal; text-align: center; color: #d9d0b6; opacity: 0.85; }
 .rum-fb-r b {
   position: relative;
   flex: none;
@@ -183,19 +199,16 @@ a.rum-sak, a.rum-sak:hover { color: inherit; text-decoration: none; }
 .rum-fb-r b.lit { color: #ffb347; text-shadow: 0 0 5px rgba(255, 170, 60, 0.85); background: linear-gradient(180deg, #3a2a14 0 48%, #120a02 48% 53%, #2d200f 53%); }
 .rum-fb-r b.f { animation: rum-flap 0.055s linear; }
 @keyframes rum-flap { 0% { transform: scaleY(1); } 50% { transform: scaleY(0.15); } 100% { transform: scaleY(1); } }
-.rum-fb-skruv { position: absolute; left: 4px; top: 3px; width: 3px; height: 3px; border-radius: 50%; background: #5a5852; }
-.rum-fb-skruv.h { left: auto; right: 4px; }
-.rum-fb-skruv.n { top: auto; bottom: 3px; }
+.rum-fb-skruv { position: absolute; left: 2px; top: 2px; width: 2px; height: 2px; border-radius: 50%; background: #5a5852; }
+.rum-fb-skruv.h { left: auto; right: 2px; }
+.rum-fb-skruv.n { top: auto; bottom: 2px; }
 
-/* i rummet: hänger i två stänger från taket framför fönstret */
-#rum-fb { position: absolute; left: 553px; top: 141px; }
-.rum-fb-stag { position: absolute; left: 52px; bottom: 100%; width: 3px; height: 123px; background: linear-gradient(90deg, #78756d, #3a3833 60%, #22211e); }
-.rum-fb-stag.h { left: auto; right: 52px; }
-.rum-fb-stag::before { content: ""; position: absolute; left: -5px; top: 0; width: 13px; height: 4px; border-radius: 1px; background: #2c2a25; }
-.rum-fb-stag::after { content: ""; position: absolute; left: -3px; bottom: -1px; width: 9px; height: 6px; border-radius: 1px; background: #3b3934; }
+/* på bakväggen till höger om fönstret, över Omgångens tippare och så lågt
+   att menyn inte når den i breda fönster */
+#rum-fb { position: absolute; left: 962px; top: 214px; }
 
-/* närbilden: samma tavla på nära håll, med alla matcher; raderna leder till
-   matcherna och guldordet till Matcher */
+/* närbilden: samma tavla på nära håll, med alla matcher; den växer fram ur
+   tavlan på väggen, raderna leder till matcherna och guldordet till Matcher */
 .rum-nara {
   position: absolute;
   inset: 0;
@@ -207,33 +220,31 @@ a.rum-sak, a.rum-sak:hover { color: inherit; text-decoration: none; }
   opacity: 0;
   transition: opacity 0.3s ease, visibility 0s linear 0.3s;
 }
-.rum.fb-nara .rum-nara { visibility: visible; opacity: 1; transition: opacity 0.35s ease 0.1s; }
+.rum.fb-nara .rum-nara { visibility: visible; opacity: 1; transition: opacity 0.25s ease; }
 .rum-nara-bak { position: absolute; inset: 0; background: radial-gradient(ellipse 75% 75% at 50% 48%, rgba(10, 8, 6, 0.62), rgba(10, 8, 6, 0.9)); }
 .rum-fb.rum-fb-stor {
   --w: 21px;
   --h: 33px;
   --g: 2px;
+  --rg: 6px;
+  --fg: 9px;
+  --lg: 22px;
+  --og: 11px;
+  --sg: 6px;
+  --lw: 4px;
+  --lh: 22px;
   position: relative;
-  gap: 6px;
   padding: 22px 24px 16px;
   border-radius: 6px;
   transform: scale(var(--k, 1));
   box-shadow: 0 30px 80px rgba(0, 0, 0, 0.7), inset 0 1px 0 rgba(255, 255, 255, 0.08), inset 0 -1px 0 rgba(0, 0, 0, 0.6);
 }
-.rum-fb-stor .rum-fb-r { gap: 9px; }
-.rum-fb-stor .f3 { margin-left: 22px; }
-.rum-fb-stor .f4, .rum-fb-stor .f5 { margin-left: 11px; }
-.rum-fb-stor .f1 { margin: 0 6px; }
-.rum-fb-stor .f3::before { left: -17px; width: 4px; top: -4px; bottom: -4px; }
-.rum-fb-stor .f4::before, .rum-fb-stor .f5::before { left: -11px; width: 2px; top: -4px; bottom: -4px; }
 .rum-fb-stor .rum-fb-hd { --w: 31px; --h: 46px; --g: 3px; margin-bottom: 4px; }
-.rum-fb-stor .rum-fb-lb { height: 22px; }
-.rum-fb-stor .rum-fb-lb i { font-size: 22px; line-height: 22px; }
 .rum-fb-stor .rum-fb-skruv { left: 9px; top: 8px; width: 6px; height: 6px; }
 .rum-fb-stor .rum-fb-skruv.h { left: auto; right: 9px; }
 .rum-fb-stor .rum-fb-skruv.n { top: auto; bottom: 8px; }
 #rum-fbn:focus { outline: none; }
-.rum-fbn-rader { display: flex; flex-direction: column; gap: 6px; }
+.rum-fbn-rader { display: flex; flex-direction: column; gap: var(--rg); }
 a.rum-fb-r { color: inherit; text-decoration: none; cursor: pointer; }
 a.rum-fb-r:hover b:not(.lit) { color: #fff; background: linear-gradient(180deg, #363634 0 48%, #0b0b0b 48% 53%, #2b2b29 53%); }
 .rum-fbn-fot { display: flex; justify-content: flex-end; padding-top: 8px; }

@@ -317,10 +317,10 @@ window.Rum = (() => {
 
   // ---------- de sju sakerna ----------
 
-  // 1. Fällbladstavlan: hänger från taket framför fönstret. Omgångens
+  // 1. Fällbladstavlan: på bakväggen till höger om fönstret. Omgångens
   // matcher med oddsen före avspark, sedan ställningen och det rätta tecknet
-  // tänt. Fyra matcher i taget; den bläddrar och klaprar. Klickar man går man
-  // fram till den och ser alla matcher på en gång (närbilden); där leder
+  // tänt. Fyra matcher i taget; den bläddrar och klaprar. Klickar man zoomar
+  // man in på den och ser alla matcher på en gång (närbilden); där leder
   // raderna till matcherna och guldordet till Matcher.
   // En rad är fält av blad: hemmalaget, ställningen, bortalaget och oddsen
   // för 1, X och 2 – siffrorna 1, X och 2 är målade på ramen ovanför.
@@ -337,7 +337,7 @@ window.Rum = (() => {
     `${fbRow(HEAD, ' rum-fb-hd')}<span class="rum-fb-r rum-fb-lb">${FIELDS.map((n, i) => fbField(n, i, i > 2 ? `<i>${'1X2'[i - 3]}</i>` : '')).join('')}</span>`;
   function boardHtml() {
     return '<a class="rum-fb rum-sak" href="#matcher" data-nav="matcher" aria-label="Omgångens matcher" id="rum-fb">' +
-      `<span class="rum-fb-stag"></span><span class="rum-fb-stag h"></span>${fbFrame()}${Array.from({ length: ROWS }, () => fbRow(FIELDS)).join('')}</a>`;
+      `${fbFrame()}${Array.from({ length: ROWS }, () => fbRow(FIELDS)).join('')}</a>`;
   }
   function closeHtml() {
     return '<div class="rum-nara" id="rum-nara"><div class="rum-nara-bak"></div>' +
@@ -550,8 +550,8 @@ window.Rum = (() => {
     el.hidden = true;
     el.setAttribute('aria-label', 'Tobaksaffären');
     el.innerHTML = `<div class="rum-stage" id="rum-stage"><div class="rum-kamera" id="rum-kamera"><div class="rum-world" id="rum-world">
-${plane(-600, `${bg()}${rain()}${rightWall()}${svg('<g id="rum-hyllor"></g>')}${neon()}${lop()}${frameHtml()}`, 1.035)}
-${plane(-470, `${props()}${tv()}${boardHtml()}`, 1.02)}
+${plane(-600, `${bg()}${rain()}${rightWall()}${svg('<g id="rum-hyllor"></g>')}${neon()}${lop()}${boardHtml()}${frameHtml()}`, 1.035)}
+${plane(-470, `${props()}${tv()}`, 1.02)}
 ${plane(-330, `${sill()}${haze()}`)}
 ${plane(-60, `${table()}${cups()}`, 1.05)}
 ${plane(0, paper())}
@@ -1019,15 +1019,26 @@ ${closeHtml()}
     }, 420);
   }
 
-  // Närbilden av fällbladstavlan: kameran går fram mot den och alla matcher
-  // klaprar fram på en gång. Esc eller ett klick utanför tar en tillbaka.
+  // Närbilden av fällbladstavlan: kameran går fram mot den, närbilden växer
+  // fram ur tavlan på väggen och alla matcher klaprar fram på en gång. Esc
+  // eller ett klick utanför tar en tillbaka.
   function closeUp(on) {
     if (on && R.zoom) zoomTv(false);
     R.nara = on;
     R.el.classList.toggle('fb-nara', on);
     const el = document.getElementById('rum-fbn');
+    const fb = document.getElementById('rum-fb');
     if (on && el) {
       fit();
+      if (!calm()) {
+        const a = fb.getBoundingClientRect();
+        const b = el.getBoundingClientRect();
+        const k = parseFloat(el.style.getPropertyValue('--k')) || 1;
+        el.animate([
+          { transform: `translate(${r1(a.left + a.width / 2 - b.left - b.width / 2)}px, ${r1(a.top + a.height / 2 - b.top - b.height / 2)}px) scale(${(k * a.width / b.width).toFixed(3)})` },
+          { transform: `scale(${k})` },
+        ], { duration: 520, easing: 'cubic-bezier(0.3, 0, 0.2, 1)' });
+      }
       for (const b of el.querySelectorAll('.rum-fb-r b')) {
         clearInterval(b._t);
         clearTimeout(b._d);
@@ -1037,8 +1048,8 @@ ${closeHtml()}
       }
       setBoard(el, R.lines, 0, !calm());
       if (!still()) el.focus({ preventScroll: true });
-    } else if (el && el.contains(document.activeElement)) document.getElementById('rum-fb').focus({ preventScroll: true });
-    if (on) aim(centerOf(document.getElementById('rum-fb')), 1.3, [800, 420], calm() ? null : 'glid');
+    } else if (el && el.contains(document.activeElement)) fb.focus({ preventScroll: true });
+    if (on) aim(centerOf(fb), 1.6, [800, 440], calm() ? null : 'glid');
     else aim([800, 500], 1, [800, 500], calm() ? null : 'glid');
   }
 

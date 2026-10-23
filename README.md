@@ -1702,20 +1702,20 @@ utan nätet står rummet kvar utan gänget.
 **Föremålen** – pekar man på ett lyser ordet i menyn som det leder till, och klickar man
 går kameran fram mot det innan sidan byts:
 
-- **Fällbladstavlan** hänger i två stänger från taket framför fönstret, där menyn aldrig
-  ligger över den. Varje rad har hemmalaget, ställningen och bortalaget (korta namn
+- **Fällbladstavlan** sitter på bakväggen till höger om fönstret, så lågt att menyn inte
+  når den i breda fönster. Varje rad har hemmalaget, ställningen och bortalaget (korta namn
   på högst elva tecken, som WOLVES och MIDDLESBRO) och oddsen för 1, X och 2 under siffror
   som är målade på ramen, med lister mellan kolumnerna; rubriken visar spelstoppet och
   sidan (1/4). När en match har börjat står ställningen i mitten, och efter slutsignalen
   slår oddsen om till det rätta tecknet, tänt under sin siffra; en struken match säger
   STRUKEN och ett dolt resultat ett frågetecken. Fyra matcher i taget; den bläddrar var
-  nionde sekund och klaprar när något ändras. Ett klick går fram till tavlan och visar alla
-  matcher på en gång (närbilden), där de klaprar fram; raderna leder till matcherna
-  (`#match/<id>`), guldordet *Alla matcher* till Matcher, och Esc eller ett klick utanför
-  tar en tillbaka.
-- **Omgångens tippare** (ramen till höger om fönstret, som Månadens anställd) → Olympen:
-  oraklet som regerar (`Kronan.holders`), med porträttet renderat ur figuren (fotot tills
-  figurerna är ritade).
+  nionde sekund och klaprar när något ändras. Ett klick zoomar in på tavlan: kameran går
+  fram och närbilden växer fram ur tavlan med alla matcher på en gång, som klaprar fram;
+  raderna leder till matcherna (`#match/<id>`), guldordet *Alla matcher* till Matcher, och
+  Esc eller ett klick utanför tar en tillbaka.
+- **Omgångens tippare** (ramen under tavlan, som Månadens anställd) → Olympen: oraklet som
+  regerar (`Kronan.holders`), med porträttet renderat ur figuren (fotot tills figurerna är
+  ritade).
 - **Pokalhyllan** (högra väggen) → Olympen: en liten pokal per vunnen omgång i vinnarens
   färg (delat = en var), ur `data/tippare.json`.
 - **Pärmarna** (hyllan under) → Statistik: en per säsong, de tolv senaste.
