@@ -41,21 +41,32 @@ const CHARS = {
   dj: { skin: '#e9b593', skin2: '#cd8f70', blush: '#d9765e', hair: '#4a3021', hair2: '#7a5236', hair3: '#2a1a11', tee: '#1c1c1e', tee2: '#0f0f10', pants: 'shorts', trou: '#e6dcc6', trou2: '#cfc4ab', sock: '#e8e4dc', shoe: '#3b3e44', sole: '#e26a4f', sole2: '#f1ece2', lace: '#2a2b2f' },
 };
 
+// Lagen, utan märken – bara färgerna, ränderna och smeknamnen: DL håller på
+// Nacional (vitt, blått och rött, Bolso), DT på Chelsea (kungsblått, lejonet)
+// och DJ på IFK Göteborg (blåvitt).
+const LAG = {
+  dl: { vit: '#f3eee3', bla: '#1d3683', rod: '#c4202e' },
+  dt: { bla: '#2456b8', mork: '#121c3a', vit: '#f1ede4' },
+  dj: { bla: '#1a5cab', vit: '#f3f0e8' },
+};
+
 // Måtten ur v2 (alt7.py) och vad var och en gör: arm 0 är figurens högra
 // (betraktarens vänstra) och arm 1 den vänstra. a/b = över- och underarm.
+// Attiraljerna: DL en stickad halsduk, DT ett lejon på underarmen och DJ en
+// randig mössa med tofs (solglasögonen uppskjutna på den).
 const FIGS = [
   { key: 'dl', x: -400, turn: 22, tilt: -4, legs: 74, torso: 86, w: 50, depth: 30, neck: 12, neckR: 17, arm: 8.5, leg: 9, a: 42, b: 36,
     head: { rx: 56.7, ry: 70.65, rz: 54, hw: 63, hh: 78.5, cy: -5.5, taper: 0.06, noseY: 19, nose: [8, 7.6, 7.2], cheek: 0.08, ear: [0.15, 0.21, 0.16, 0.5] }, glasses: 0,
     hair: { style: 'krona', f: 41, s: 80, b: 135, temple: 17, templeW: 0.2, vol: 0.06, lift: 3, back: 0, n: 22, fine: 3, fineW: 0.32, g: 0.08, dark: 0.42, wob: 0.8, tip: 3, tipAt: 'fram', edge: 0.7, sideCut: 0.6, quiff: { dir: [0, 0.62, 0.78], h: 0.1, w: 0.3 } },
-    does: ['vila', 'flaska'] },
+    halsduk: { text: 'BOLSO' }, does: ['vila', 'flaska'] },
   { key: 'dt', x: -186, turn: 8, tilt: 3, legs: 60, torso: 78, w: 45, depth: 28, neck: 11, neckR: 15, arm: 8, leg: 9.5, a: 39, b: 35,
     head: { rx: 50.16, ry: 75.33, rz: 52, hw: 57, hh: 81, cy: -5, taper: 0.25, noseY: 17, nose: [6, 10, 7], cheek: 0.03, noseRot: -0.35 }, glasses: 36,
     hair: { style: 'bakat', f: 44, s: 96, b: 156, temple: 6, vol: 0.12, lift: 6, back: 12, n: 20, fine: 4, fineW: 0.35, g: 0.06, dark: 0.36, wob: 0.3, slat: 0.55, tip: 7, tipAt: 'bak', edge: 0.7, sideCut: 0.3, quiff: { dir: [0, 0.72, 0.69], h: 0.08, w: 0.5 }, gr: 1.05 },
-    does: ['cigg', 'vila'] },
+    tatuering: { arm: 0, text: 'BLUES', rot: -50 }, does: ['cigg', 'vila'] },
   { key: 'dj', x: 36, turn: -20, tilt: -2, legs: 104, torso: 100, w: 42, depth: 24, neck: 18, neckR: 13, arm: 7, leg: 8, a: 48, b: 44,
     head: { rx: 49, ry: 75, rz: 50, hw: 54, hh: 84, cy: -6, taper: 0.22, noseY: 18, nose: [5.8, 9, 7.2], noseRot: -0.3 }, glasses: 36,
     hair: { style: 'svep', sw: 28, f: 50, s: 82, b: 140, temple: 5, vol: 0.1, lift: 7, back: 2, n: 18, fine: 4, fineW: 0.3, g: 0.075, dark: 0.4, wob: 0.4, tip: 6, tipAt: 'bak', edge: 0.7, sideCut: 0.45, quiff: { dir: [-0.3, 0.62, 0.72], h: 0.13, w: 0.42 }, gr: 1.07 },
-    beard: [1.024, -2], does: ['burk', 'prat'] },
+    mossa: { f: 56, s: 76, b: 104, text: 'BLÅVITT' }, beard: [1.024, -2], does: ['burk', 'prat'] },
 ];
 
 export async function figurer(canvas, opt = {}) {
@@ -244,6 +255,7 @@ export async function figurer(canvas, opt = {}) {
     const rnd = () => (s0 = (s0 * 16807) % 2147483647) / 2147483647;
     const ph = Array.from({ length: 6 }, () => rnd() * 6.283);
     const sw = (h.sw || 0) * DEG;
+    const cap = h.cap; // mössan: håret under den trycks ner, under kanten sticker det ut
     const Q = h.quiff ? v3(h.quiff.dir).normalize() : null;
     const wob = h.wob ?? 1;
     const S = THREE.MathUtils.smoothstep;
@@ -280,7 +292,9 @@ export async function figurer(canvas, opt = {}) {
         const side = 1 - (h.sideCut || 0) * ws * (1 - Math.max(0, dy)) * (ca > -0.3);
         let k = 1.012 + h.vol * fall * side * (0.55 + 0.45 * dy) + h.g * (rid - 0.5) * fall2 * fade * smooth;
         if (Q) { const dd = 1 - (dx * Q.x + dy * Q.y + dz * Q.z); k += h.quiff.h * Math.exp(-dd * dd / (h.quiff.w ** 2)) * fall; }
-        pos.push(dx * k * P.rx, dy * k * P.ry + (h.lift || 0) * fall * dy, dz * k * P.rz - (h.back || 0) * fall * dy);
+        const sq = cap ? 0.12 + 0.88 * S(th, (cap.f * wf + cap.s * ws + cap.b * wb) * DEG - 0.06, (cap.f * wf + cap.s * ws + cap.b * wb) * DEG + 0.05) : 1;
+        k = 1 + (k - 1) * sq;
+        pos.push(dx * k * P.rx, dy * k * P.ry + (h.lift || 0) * fall * dy * sq, dz * k * P.rz - (h.back || 0) * fall * dy * sq);
         const sh = (1 - h.dark * (1 - rid) * fade * smooth) * (1 - 0.25 * (1 - fall2));
         col.push(sh, sh, sh);
         uv.push(phase / 6.283 / 5, 1 - t);
@@ -305,6 +319,361 @@ export async function figurer(canvas, opt = {}) {
     const th = at * DEG;
     g.position.set(0, Math.cos(th) * P.ry * 1.1 * rr, Math.sin(th) * P.rz * 1.18 * rr + 2);
     g.rotation.x = 8 * DEG;
+    return g;
+  }
+
+  // ---------- attiraljerna: halsduken, tatueringen och mössan ----------
+
+  // stickningen som bumpkarta: rätmaskor (V) i rader längs u (along) eller v
+  function knitTex(along, cols, rows) {
+    const c = document.createElement('canvas');
+    c.width = c.height = 128;
+    const g = c.getContext('2d');
+    g.fillStyle = '#3a3a3a';
+    g.fillRect(0, 0, 128, 128);
+    if (along === 'v') { g.translate(128, 0); g.rotate(Math.PI / 2); }
+    g.filter = 'blur(1.2px)';
+    g.fillStyle = '#d0d0d0';
+    const cw = 128 / cols; const rh = 128 / rows;
+    for (let i = 0; i < cols; i++) {
+      for (let j = 0; j < rows; j++) {
+        for (const s of [-1, 1]) {
+          g.save();
+          g.translate((i + 0.5) * cw, (j + 0.5 + s * 0.22) * rh);
+          g.rotate(s * 0.5);
+          g.beginPath(); g.ellipse(0, 0, cw * 0.36, rh * 0.2, 0, 0, 2 * Math.PI); g.fill();
+          g.restore();
+        }
+      }
+    }
+    const t = new THREE.CanvasTexture(c);
+    t.wrapS = t.wrapT = THREE.RepeatWrapping;
+    return t;
+  }
+  // resåren i mössans uppvik: upphöjda ränder tvärs över
+  const ribTex = canvasTex(64, 8, (g) => { for (let x = 0; x < 64; x += 8) { const gr = g.createLinearGradient(x, 0, x + 8, 0); gr.addColorStop(0, '#303030'); gr.addColorStop(0.5, '#d8d8d8'); gr.addColorStop(1, '#303030'); g.fillStyle = gr; g.fillRect(x, 0, 8, 8); } });
+  ribTex.colorSpace = THREE.NoColorSpace;
+  ribTex.wrapS = ribTex.wrapT = THREE.RepeatWrapping;
+
+  // Ett stickat band längs mittlinjen pts med normalerna nrm (tjockleken åt
+  // det hållet): tvärsnittet är en rundad rektangel w × th och ändarna är
+  // slutna. u = längden i enheter, v = tvärs över.
+  function band(pts, nrm, w, th, n = 24) {
+    const pos = []; const uv = []; const idx = [];
+    const M = pts.length;
+    const rows = [];
+    let len = 0;
+    for (let i = 0; i < M; i++) {
+      if (i) len += pts[i].distanceTo(pts[i - 1]);
+      const tg = pts[Math.min(i + 1, M - 1)].clone().sub(pts[Math.max(i - 1, 0)]).normalize();
+      const B = new THREE.Vector3().crossVectors(tg, nrm[i]).normalize();
+      const N = new THREE.Vector3().crossVectors(B, tg);
+      rows.push({ c: pts[i], N, B, k: 1, u: len });
+    }
+    rows.unshift({ ...rows[0], k: 0 });
+    rows.push({ ...rows[rows.length - 1], k: 0 });
+    for (const r of rows) {
+      for (let j = 0; j <= n; j++) {
+        const a = j / n * 2 * Math.PI;
+        const ca = Math.cos(a); const sa = Math.sin(a);
+        const bx = Math.sign(ca) * Math.abs(ca) ** 0.35 * w / 2 * r.k;
+        const ny = Math.sign(sa) * Math.abs(sa) ** 0.35 * th / 2 * r.k;
+        pos.push(r.c.x + r.B.x * bx + r.N.x * ny, r.c.y + r.B.y * bx + r.N.y * ny, r.c.z + r.B.z * bx + r.N.z * ny);
+        uv.push(r.u, (1 - ca) / 2);
+      }
+    }
+    for (let i = 0; i < rows.length - 1; i++) for (let j = 0; j < n; j++) { const a = i * (n + 1) + j; const b = a + n + 1; idx.push(a, b, a + 1, a + 1, b, b + 1); }
+    const g = new THREE.BufferGeometry();
+    g.setAttribute('position', new THREE.Float32BufferAttribute(pos, 3));
+    g.setAttribute('uv', new THREE.Float32BufferAttribute(uv, 2));
+    g.setIndex(idx);
+    g.computeVertexNormals();
+    g.userData.len = len;
+    return g;
+  }
+  // halsdukens färger längs bandet: segs = [[u0, u1, färg]] på botten
+  // (färgen bg), text = [u0, u1, ord, färg]; ppu bildpunkter per enhet
+  function scarfTex(L, w, bg, segs, text) {
+    const ppu = 16; const H = 128;
+    return canvasTex(Math.ceil(L * ppu), H, (g, W) => {
+      g.fillStyle = bg; g.fillRect(0, 0, W, H);
+      for (const [a, b, col] of segs) { g.fillStyle = col; g.fillRect(a * ppu, 0, (b - a) * ppu, H); }
+      if (text) {
+        const [a, b, str, col] = text;
+        g.save();
+        g.translate((a + b) / 2 * ppu, H / 2 + 4);
+        g.scale(ppu / (H / w), 1);
+        g.font = '900 84px "Arial Black", "Helvetica Neue", Arial, sans-serif';
+        g.textAlign = 'center'; g.textBaseline = 'middle';
+        const fit = Math.min(1, (b - a) * (H / w) / g.measureText(str).width);
+        g.scale(fit, 1);
+        g.fillStyle = col; g.fillText(str, 0, 0);
+        g.restore();
+      }
+    });
+  }
+
+  // DL:s halsduk i Nacionals trikolor: ett varv runt halsen och båda ändarna
+  // fram på ena sidan, den främre längre med BOLSO, fransar längst ner.
+  // Byggd i bröstets axlar så att den följer bålen.
+  function halsduk(F, prof, parent) {
+    const C = LAG[F.key];
+    const T = F.torso; const sz = F.depth / F.w;
+    const rAt = (y) => { if (y <= prof[0].y) return prof[0].x; for (let i = 1; i < prof.length; i++) { const a = prof[i - 1]; const b = prof[i]; if (y <= b.y) return b.y > a.y ? a.x + (b.x - a.x) * (y - a.y) / (b.y - a.y) : b.x; } return 0; };
+    const zAt = (x, y) => Math.sqrt(Math.max(0, rAt(y) ** 2 - x * x)) * sz + 1.8;
+    const W = 16; const TH = 5;
+    const knit = knitTex('u', 1, 7);
+    knit.repeat.set(1 / 1.6, 1);
+    const wool = (map) => mat('#ffffff', { map, bumpMap: knit, bumpScale: 1.4, roughness: 0.62, clearcoat: 0.35, clearcoatRoughness: 0.3, sheen: 0.5, sheenRoughness: 0.6, sheenColor: new THREE.Color('#ffffff') });
+    const grp = [[0, 4, C.bla], [4, 6.5, C.rod], [6.5, 10.5, C.bla]];
+    const at = (u0) => grp.map(([a, b, col]) => [u0 + a, u0 + b, col]);
+    // en ände: kontrollpunkter (x, y) längs bröstet; under bysten hänger den
+    // fritt och lite framåt (bålen lutar fram)
+    function end(ctrl, off) {
+      const cur = new THREE.CatmullRomCurve3(ctrl.map(([x, y]) => new THREE.Vector3(x, y, 0)));
+      const pts = []; const nrm = [];
+      let zMax = -1e9; let yPrev = 0;
+      for (const q of cur.getSpacedPoints(48)) {
+        let z = zAt(q.x, q.y);
+        const e = 0.5;
+        const n = new THREE.Vector3(-(zAt(q.x + e, q.y) - zAt(q.x - e, q.y)) / (2 * e), -(zAt(q.x, q.y + e) - zAt(q.x, q.y - e)) / (2 * e), 1).normalize();
+        if (z < zMax) { z = zMax + 0.12 * (yPrev - q.y); n.set(0, 0.12, 1).normalize(); }
+        zMax = z; yPrev = q.y;
+        pts.push(new THREE.Vector3(q.x, q.y, z).addScaledVector(n, off));
+        nrm.push(n);
+      }
+      return { pts, nrm };
+    }
+    function fringe(e, cols) {
+      const P = e.pts[e.pts.length - 1];
+      const tg = P.clone().sub(e.pts[e.pts.length - 3]).normalize();
+      const B = new THREE.Vector3().crossVectors(tg, e.nrm[e.nrm.length - 1]).normalize();
+      const down = new THREE.Vector3(0, -1, 0.1).normalize();
+      for (let i = 0; i < 8; i++) {
+        const x = (i / 7 - 0.5) * (W - 2.6);
+        const a = P.clone().addScaledVector(B, x).addScaledVector(tg, -0.6);
+        const b = a.clone().addScaledVector(down.clone().lerp(tg, 0.4).normalize(), 5.5 + 2.2 * hash(i + F.x)).add(new THREE.Vector3(0.6 * Math.sin(i * 2.3), 0, 0.5 * Math.cos(i * 1.7)));
+        capsule(a.toArray(), b.toArray(), 0.85, mat(cols[i % cols.length], { roughness: 0.7, sheen: 0.5 }), parent);
+      }
+    }
+    // varvet runt halsen, lite lägre fram
+    const ring = []; const rn = [];
+    const R = F.neckR * 1.1 + 5.5;
+    for (let i = 0; i <= 64; i++) {
+      const a = i / 64 * 2 * Math.PI;
+      ring.push(new THREE.Vector3(R * Math.sin(a), T + 5.5 - 2.2 * Math.cos(a), R * Math.cos(a)));
+      rn.push(new THREE.Vector3(Math.sin(a), 0.25, Math.cos(a)).normalize());
+    }
+    const rt = scarfTex(34, 13, C.vit, at(20));
+    rt.wrapS = THREE.RepeatWrapping; rt.repeat.x = 1 / 34;
+    mesh(band(ring, rn, 13, 8.5, 28), wool(rt), parent);
+    // ändarna: A fram (längre, med texten) och B bakom den
+    const A = end([[-7, T + 1], [-8, T - 6], [-9, T - 16], [-10, T - 30], [-11, T - 44], [-12, T - 56]], TH * 1.4);
+    const Bn = end([[-17, T + 1], [-19, T - 6], [-21, T - 15], [-23, T - 27], [-24.5, T - 38]], TH / 2);
+    for (const [e, len] of [[A, 'A'], [Bn, 'B']]) {
+      const g = band(e.pts, e.nrm, W, TH);
+      const L = g.userData.len;
+      const tx = len === 'A'
+        ? scarfTex(L, W, C.vit, [...at(L - 10.5), ...at(L - 53)], [L - 40.5, L - 13, F.halsduk.text, C.bla])
+        : scarfTex(L, W, C.vit, [...at(L - 10.5), ...at(L - 34.5)]);
+      tx.repeat.x = 1 / L;
+      mesh(g, wool(tx), parent);
+      fringe(e, [C.rod, C.vit, C.bla]);
+    }
+  }
+
+  // DT:s tatuering: ett lejonhuvud i gammal stil (manen kungsblå, konturerna
+  // mörkblå, ansiktet i hudens färg) med ett band under; målad på ett skal
+  // runt underarmen. Lejonet är inget klubbmärke.
+  function tatTex(text) {
+    const C = LAG.dt;
+    return canvasTex(512, 600, (g) => {
+      // upp och ner: lejonet står upprätt när armen hänger (huvudet mot armbågen)
+      g.translate(512, 600); g.rotate(Math.PI);
+      g.lineJoin = 'round'; g.lineCap = 'round';
+      const cx = 256; const cy = 222;
+      // manen: lockar i två lager runt huvudet, svängda åt samma håll
+      const locks = (n, r0, r1, w, fill, off) => {
+        for (let i = 0; i < n; i++) {
+          const a = ((i + off) / n) * 2 * Math.PI;
+          const L = r1 + [0, 22, 8, 30, 14][i % 5];
+          const tip = [cx + Math.cos(a + 0.34) * L, cy + Math.sin(a + 0.34) * L * 1.06];
+          g.beginPath();
+          g.moveTo(cx + Math.cos(a - w) * r0, cy + Math.sin(a - w) * r0 * 1.06);
+          g.quadraticCurveTo(cx + Math.cos(a - w * 0.4) * (r0 + L) / 2 * 1.1, cy + Math.sin(a - w * 0.4) * (r0 + L) / 2 * 1.16, ...tip);
+          g.quadraticCurveTo(cx + Math.cos(a + w * 0.9) * (r0 + L) / 2, cy + Math.sin(a + w * 0.9) * (r0 + L) / 2 * 1.06, cx + Math.cos(a + w) * r0, cy + Math.sin(a + w) * r0 * 1.06);
+          g.closePath();
+          g.fillStyle = fill; g.fill(); g.lineWidth = 9; g.strokeStyle = C.mork; g.stroke();
+        }
+      };
+      locks(20, 120, 205, 0.24, C.bla, 0);
+      locks(16, 105, 165, 0.27, '#4d84de', 0.5);
+      // öronen, halvt i manen
+      for (const s of [-1, 1]) {
+        g.beginPath(); g.moveTo(cx + s * 52, cy - 84); g.quadraticCurveTo(cx + s * 92, cy - 132, cx + s * 104, cy - 70); g.closePath();
+        g.save(); g.globalCompositeOperation = 'destination-out'; g.fill(); g.restore();
+        g.lineWidth = 10; g.stroke();
+        g.beginPath(); g.moveTo(cx + s * 66, cy - 86); g.quadraticCurveTo(cx + s * 88, cy - 112, cx + s * 94, cy - 78); g.closePath(); g.fillStyle = C.mork; g.fill();
+      }
+      // ansiktet: brett över ögonen, smalare mot nosen; huden syns
+      const face = new Path2D();
+      face.moveTo(cx, cy - 98);
+      face.bezierCurveTo(cx + 70, cy - 98, cx + 100, cy - 62, cx + 98, cy - 8);
+      face.bezierCurveTo(cx + 96, cy + 46, cx + 66, cy + 100, cx, cy + 112);
+      face.bezierCurveTo(cx - 66, cy + 100, cx - 96, cy + 46, cx - 98, cy - 8);
+      face.bezierCurveTo(cx - 100, cy - 62, cx - 70, cy - 98, cx, cy - 98);
+      g.save(); g.globalCompositeOperation = 'destination-out'; g.fill(face); g.restore();
+      g.strokeStyle = C.mork; g.lineWidth = 12; g.stroke(face);
+      // pannan och nosryggen: bryn som sänks mot mitten, ryggen ner mot nosen
+      g.lineWidth = 10;
+      for (const s of [-1, 1]) {
+        g.beginPath(); g.moveTo(cx + s * 14, cy - 30); g.quadraticCurveTo(cx + s * 40, cy - 52, cx + s * 78, cy - 40); g.stroke();
+        g.beginPath(); g.moveTo(cx + s * 16, cy - 26); g.quadraticCurveTo(cx + s * 10, cy + 6, cx + s * 22, cy + 30); g.stroke();
+        // ögat: smalt och snett, med en ljus glimt
+        g.beginPath(); g.moveTo(cx + s * 26, cy - 18); g.quadraticCurveTo(cx + s * 50, cy - 34, cx + s * 74, cy - 24); g.quadraticCurveTo(cx + s * 52, cy - 6, cx + s * 26, cy - 18); g.closePath();
+        g.fillStyle = C.mork; g.fill();
+        g.beginPath(); g.ellipse(cx + s * 50, cy - 21, 8, 6, 0, 0, 2 * Math.PI); g.fillStyle = '#6f9fe8'; g.fill();
+        g.beginPath(); g.arc(cx + s * 50, cy - 21, 3, 0, 2 * Math.PI); g.fillStyle = C.mork; g.fill();
+        // morrhårsdynorna med prickar
+        g.beginPath(); g.arc(cx + s * 24, cy + 60, 26, s > 0 ? -0.3 : Math.PI + 0.3, s > 0 ? 2.1 : Math.PI - 2.1, s < 0); g.lineWidth = 9; g.stroke();
+        g.fillStyle = C.mork;
+        for (const [dx, dy] of [[22, 56], [36, 50], [36, 66]]) { g.beginPath(); g.arc(cx + s * dx, cy + dy, 4.5, 0, 2 * Math.PI); g.fill(); }
+      }
+      // nosen: bred och mörk
+      g.beginPath(); g.moveTo(cx - 34, cy + 28); g.quadraticCurveTo(cx, cy + 16, cx + 34, cy + 28); g.quadraticCurveTo(cx + 26, cy + 48, cx, cy + 56); g.quadraticCurveTo(cx - 26, cy + 48, cx - 34, cy + 28); g.closePath();
+      g.fillStyle = C.mork; g.fill();
+      g.beginPath(); g.ellipse(cx - 10, cy + 30, 8, 4, -0.2, 0, 2 * Math.PI); g.fillStyle = '#6f9fe8'; g.fill();
+      // munnen, lite öppen
+      g.beginPath(); g.moveTo(cx - 24, cy + 86); g.quadraticCurveTo(cx, cy + 78, cx + 24, cy + 86); g.quadraticCurveTo(cx, cy + 104, cx - 24, cy + 86); g.closePath();
+      g.fillStyle = C.mork; g.fill();
+      g.beginPath(); g.moveTo(cx, cy + 56); g.lineTo(cx, cy + 80); g.lineWidth = 8; g.stroke();
+      // bandet med texten
+      const by = 492; const bw = 132; const bh = 50;
+      for (const s of [-1, 1]) {
+        g.beginPath(); g.moveTo(cx + s * (bw - 16), by - bh / 2 + 16); g.lineTo(cx + s * (bw + 44), by - bh / 2 + 16); g.lineTo(cx + s * (bw + 26), by + 14); g.lineTo(cx + s * (bw + 44), by + bh / 2 + 16); g.lineTo(cx + s * (bw - 16), by + bh / 2 + 16); g.closePath();
+        g.fillStyle = C.mork; g.fill(); g.lineWidth = 9; g.stroke();
+      }
+      g.beginPath();
+      g.moveTo(cx - bw, by - bh / 2); g.quadraticCurveTo(cx, by - bh / 2 - 22, cx + bw, by - bh / 2);
+      g.lineTo(cx + bw, by + bh / 2); g.quadraticCurveTo(cx, by + bh / 2 - 22, cx - bw, by + bh / 2); g.closePath();
+      g.fillStyle = C.bla; g.fill(); g.lineWidth = 10; g.stroke();
+      g.font = '900 52px "Arial Black", "Helvetica Neue", Arial, sans-serif';
+      g.textAlign = 'center'; g.textBaseline = 'middle';
+      g.fillStyle = C.vit; g.fillText(text, cx, by - 6);
+    });
+  }
+  function tatuering(F, A) {
+    const r = F.arm * 0.92 + 0.22;
+    const h = F.b * 0.76;
+    const L = (h * 512 / 600) / r;
+    const m = mat('#ffffff', { map: tatTex(F.tatuering.text), transparent: true, opacity: 0.94, alphaTest: 0.04, polygonOffset: true, polygonOffsetFactor: -2, depthWrite: false }, 'hud');
+    const x = new THREE.Mesh(new THREE.CylinderGeometry(r, r, h, 48, 1, true, -L / 2, L), m);
+    x.receiveShadow = true;
+    x.position.y = -F.b * 0.1;
+    A.lo.add(x);
+    return x;
+  }
+
+  // DJ:s mössa i blåvitt: lodräta ränder (som tröjan), uppvik med BLÅVITT
+  // och en tofs. Följer huvudet; kanten (f/s/b = grader från hjässan fram,
+  // på sidan och bak) bestämmer också var håret trycks ner.
+  function mossa(F, P, parent) {
+    const C = LAG[F.key];
+    const m = F.mossa;
+    const lim = (a) => { const ca = Math.cos(a); const sa = Math.sin(a); return (m.f * Math.max(0, ca) ** 2 + m.s * sa * sa + m.b * Math.max(0, -ca) ** 2) * DEG; };
+    const dir = (th, a) => new THREE.Vector3(Math.sin(th) * Math.sin(a), Math.cos(th), Math.sin(th) * Math.cos(a));
+    const at = (th, a, k) => dir(th, a).multiply(new THREE.Vector3(P.rx, P.ry, P.rz)).multiplyScalar(k);
+    const N = 160; const M = 48;
+    const NS = 18; // ränderna
+    const ch = 12.5; // uppvikets höjd i enheter
+    const hAt = (a, L) => ch / at(L, a, 1.1).length();
+    // själva mössan: ett skal över hjässan, lite kupigt, tätt mot huvudet under uppviket
+    const pos = []; const uv = []; const idx = [];
+    for (let i = 0; i <= N; i++) {
+      const a = i / N * 2 * Math.PI;
+      const L = lim(a);
+      const hth = hAt(a, L);
+      for (let j = 0; j <= M; j++) {
+        const t = j / M;
+        const k = 1.085 + 0.035 * (1 - t) ** 1.5 + 0.012 * Math.sin(t * Math.PI) - 0.065 * (1 - THREE.MathUtils.smoothstep(L - t * L, 0.02, hth * 0.8));
+        const p = at(t * L, a, k);
+        pos.push(p.x, p.y, p.z);
+        uv.push(i / N + 0.5 / NS, 1 - t);
+      }
+    }
+    for (let i = 0; i < N; i++) for (let j = 0; j < M; j++) { const a = i * (M + 1) + j; const b = a + M + 1; idx.push(a, a + 1, b, a + 1, b + 1, b); }
+    const g = new THREE.BufferGeometry();
+    g.setAttribute('position', new THREE.Float32BufferAttribute(pos, 3));
+    g.setAttribute('uv', new THREE.Float32BufferAttribute(uv, 2));
+    g.setIndex(idx);
+    g.computeVertexNormals();
+    const stripes = canvasTex(NS * 32, 8, (c, w) => { for (let i = 0; i < NS; i++) { c.fillStyle = i % 2 ? C.bla : C.vit; c.fillRect(i * 32, 0, 32, 8); } });
+    stripes.wrapS = THREE.RepeatWrapping;
+    const kn = knitTex('v', 2, 2);
+    kn.repeat.set(48, 14);
+    const wool = { bumpMap: kn, bumpScale: 1.1, roughness: 0.6, clearcoat: 0.3, clearcoatRoughness: 0.3, sheen: 0.5, sheenRoughness: 0.6, sheenColor: new THREE.Color('#ffffff') };
+    mesh(g, mat('#ffffff', { map: stripes, ...wool }), parent);
+    // uppviket: ett rundat band längs kanten, nertill tätt mot pannan, med texten fram
+    const cp = []; const cu = []; const ci = [];
+    const n = 24;
+    for (let i = 0; i <= N; i++) {
+      const a = i / N * 2 * Math.PI;
+      const L = lim(a);
+      const hth = hAt(a, L);
+      for (let j = 0; j <= n; j++) {
+        const q = j / n * 2 * Math.PI;
+        const cq = Math.cos(q); const sq = Math.sin(q);
+        const f = 0.5 - Math.sign(cq) * Math.abs(cq) ** 0.4 / 2; // 0 nertill, 1 upptill
+        const th = L + 0.012 - f * hth;
+        const k = 1.014 + 0.062 * f + 0.031 + Math.sign(sq) * Math.abs(sq) ** 0.4 * 0.031;
+        const p = at(th, a, k);
+        cp.push(p.x, p.y, p.z);
+        cu.push(i / N + 0.5, (1 - cq) / 2);
+      }
+    }
+    for (let i = 0; i < N; i++) for (let j = 0; j < n; j++) { const a = i * (n + 1) + j; const b = a + n + 1; ci.push(a, b, a + 1, a + 1, b, b + 1); }
+    const cg = new THREE.BufferGeometry();
+    cg.setAttribute('position', new THREE.Float32BufferAttribute(cp, 3));
+    cg.setAttribute('uv', new THREE.Float32BufferAttribute(cu, 2));
+    cg.setIndex(ci);
+    cg.computeVertexNormals();
+    const circ = 2 * Math.PI * P.rx * 1.12;
+    const cuffTex = canvasTex(2048, 128, (c, w, h) => {
+      c.fillStyle = C.bla; c.fillRect(0, 0, w, h);
+      c.fillStyle = C.vit; c.fillRect(0, 10, w, 7); c.fillRect(0, h - 17, w, 7);
+      c.save();
+      c.translate(w / 2, h / 2 + 3);
+      c.scale((w / circ) / (h / ch), 1);
+      c.font = '900 64px "Arial Black", "Helvetica Neue", Arial, sans-serif';
+      c.textAlign = 'center'; c.textBaseline = 'middle';
+      c.fillText(m.text, 0, 0);
+      c.restore();
+    });
+    cuffTex.wrapS = THREE.RepeatWrapping;
+    const rib = ribTex.clone();
+    rib.repeat.set(140, 1);
+    mesh(cg, mat('#ffffff', { map: cuffTex, ...wool, bumpMap: rib, bumpScale: 1.2 }), parent);
+    // tofsen: en lurvig boll av garn i båda färgerna
+    const pg = new THREE.SphereGeometry(1, 64, 48);
+    const pp = pg.attributes.position;
+    const pc = [];
+    const blue = new THREE.Color(C.bla); const white = new THREE.Color(C.vit);
+    for (let i = 0; i < pp.count; i++) {
+      const d = new THREE.Vector3(pp.getX(i), pp.getY(i), pp.getZ(i));
+      const lump = 0.1 * Math.sin(d.x * 9 + 1) * Math.sin(d.y * 8 + 2) * Math.sin(d.z * 10) + 0.06 * Math.sin(d.x * 23 + d.y * 19 - d.z * 17) + 0.04 * Math.sin(d.x * 41 - d.z * 37 + d.y * 29);
+      d.multiplyScalar(13 * (1 + lump));
+      pp.setXYZ(i, d.x, d.y, d.z);
+      const w = Math.sin(d.x * 0.9 + 0.4) * Math.sin(d.y * 1.1) * Math.sin(d.z * 0.8 + 1) > 0 ? white : blue;
+      pc.push(w.r, w.g, w.b);
+    }
+    pg.setAttribute('color', new THREE.Float32BufferAttribute(pc, 3));
+    pg.computeVertexNormals();
+    const yarn = knitTex('v', 6, 1);
+    yarn.repeat.set(6, 4);
+    const pom = mesh(pg, mat('#ffffff', { vertexColors: true, bumpMap: yarn, bumpScale: 2, roughness: 0.75, sheen: 0.8, sheenRoughness: 0.5, sheenColor: new THREE.Color('#ffffff') }), parent);
+    pom.position.copy(at(0.1, Math.PI, 1.135)).add(new THREE.Vector3(0, 9, 0));
+    // solglasögonens plats: precis ovanför uppviket fram
+    return at(m.f * DEG - ch / (P.ry * 0.9) - 0.12, 0, 1.14);
   }
 
   // ---------- sakerna: flaskan, burken, cigaretten, askkoppen ----------
@@ -499,6 +868,7 @@ export async function figurer(canvas, opt = {}) {
     ring([0, -T * 0.015, 0], [0, 1, 0], Wd * 0.86, 2.2, tee2, chest).scale.y = F.depth / Wd;
     ring([0, T * 1.03, 0], [0, 1, 0], F.neckR + 2.6, 2.3, tee2, chest);
     mesh(new THREE.CylinderGeometry(F.neckR, F.neckR * 1.1, F.neck + 26, 24), skin, torso).position.y = T + F.neck / 2 - 2;
+    if (F.halsduk) halsduk(F, prof, chest);
 
     const P = F.head;
     const hg = new THREE.Group();
@@ -521,8 +891,13 @@ export async function figurer(canvas, opt = {}) {
     const ear = P.ear || [0.13, 0.19, 0.15, 0.35];
     for (const s of [-1, 1]) ellipsoid([s * P.rx * 0.95, -P.ry * 0.04, -P.rz * 0.08], [P.rx * ear[0], P.ry * ear[1], P.rz * ear[2]], mat(c.skin2, { roughness: 0.55 }), hc, [0, s * ear[3], 0]);
     const ht = hairTex(c.hair, c.hair2, c.hair3, F.key.charCodeAt(1));
-    mesh(hairGeo(P, F.hair, F.key.charCodeAt(1) * 131), mat('#ffffff', { map: ht, vertexColors: true, bumpMap: ht, bumpScale: 1.5 }, 'har'), hc);
-    if (F.glasses) glasses(P, hc, F.glasses, F.hair.gr || 1);
+    mesh(hairGeo(P, F.mossa ? { ...F.hair, cap: F.mossa } : F.hair, F.key.charCodeAt(1) * 131), mat('#ffffff', { map: ht, vertexColors: true, bumpMap: ht, bumpScale: 1.5 }, 'har'), hc);
+    const onCap = F.mossa ? mossa(F, P, hc) : null;
+    if (F.glasses) {
+      const gl = glasses(P, hc, F.glasses, F.hair.gr || 1);
+      // uppskjutna på mössan
+      if (onCap) { gl.position.copy(onCap); gl.rotation.x = -35 * DEG; }
+    }
     // munnen i huvudets axlar (ansiktsbildens y ≈ 42)
     const my = -(42 - P.cy) * P.ry / P.hh;
     const mouth = new THREE.Vector3(0, my, Math.sqrt(Math.max(0, 1 - (my / P.ry) ** 2)) * P.rz * 0.98 + 2);
@@ -551,6 +926,7 @@ export async function figurer(canvas, opt = {}) {
       } else {
         A.hand = hand('vila', q, skin, fig);
       }
+      if (F.tatuering && F.tatuering.arm === i) A.tat = tatuering(F, A);
       return A;
     });
     // en flaska till på fönsterbänken bredvid DT och askkoppen
@@ -694,6 +1070,11 @@ export async function figurer(canvas, opt = {}) {
       const sl = S.clone().add(du.clone().multiplyScalar(o.F.a * 0.48));
       place(A.up, S, E);
       place(A.lo, E, Wr);
+      if (A.tat) {
+        // tatueringen sitter på handryggens sida av underarmen och vrids med handen
+        const z = new THREE.Vector3(0, 0, 1).applyQuaternion(A.hand.quaternion).applyQuaternion(A.lo.quaternion.clone().invert());
+        A.tat.rotation.y = Math.atan2(z.x, z.z) + o.F.tatuering.rot * DEG;
+      }
       place(A.sleeve, S, sl);
       A.cuff.position.copy(sl);
       A.cuff.quaternion.setFromUnitVectors(new THREE.Vector3(0, 0, 1), du);
@@ -795,8 +1176,10 @@ export async function figurer(canvas, opt = {}) {
     const c = new THREE.Vector3();
     o.hc.getWorldPosition(c);
     const pc = new THREE.PerspectiveCamera(24, 0.92, 10, 5000);
-    pc.position.copy(c).add(new THREE.Vector3(30, 20, 420));
-    pc.lookAt(c.clone().add(new THREE.Vector3(0, -18, 0)));
+    // med mössan lite längre bort och högre, så att tofsen kommer med
+    const up = o.F.mossa ? 21 : 0;
+    pc.position.copy(c).add(new THREE.Vector3(30, 20 + up, 420 + up * 4.6));
+    pc.lookAt(c.clone().add(new THREE.Vector3(0, -18 + up, 0)));
     const w = 368;
     const h = 400;
     const rt = new THREE.WebGLRenderTarget(w, h, { samples: 4, colorSpace: THREE.SRGBColorSpace });

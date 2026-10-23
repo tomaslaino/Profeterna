@@ -1734,6 +1734,14 @@ har sin loop (12–21 s) – flaskan och burken till munnen med huvudet bakåt, 
 glöden som tänds och röken som blåses ut, benen som dinglar – och huvudena nickar efter
 musen. Röken från glöden räknas för varje bloss ur var glöden var när det föddes, så att
 samma tid alltid ger samma bild. Inga riktiga märken: flaskan säger PILSNER, burken ÖL.
+Var och en bär sitt lag, med färgerna och smeknamnen men utan klubbmärken (`LAG` i
+rum-3d.js): DL en stickad halsduk i Nacionals vitt, blått och rött med BOLSO på den främre
+änden och fransar längst ner, DT ett lejonhuvud i gammal stil i kungsblått med bandet
+BLUES på underarmen som håller cigaretten (Chelsea; ett lejon, inte klubbens), och DJ en
+blåvitt randig mössa med tofs och BLÅVITT på uppviket, med solglasögonen uppskjutna på den
+(IFK Göteborg). Halsduken följer bålen, tatueringen vrids med handen och mössan följer
+huvudet; håret trycks ner under mössan och sticker ut under kanten. Porträttet i ramen tar
+med attiraljerna (DJ:s lite längre bort, så att tofsen kommer med).
 
 **Rummet rör sig också:** regnet faller utanför rutan och dörren, droppar rinner på glaset,
 neonen glappar ibland, röken ligger under lysröret, damm syns i ljuset och ett hörn på en
