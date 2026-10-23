@@ -462,6 +462,44 @@ window.Rum = (() => {
     </a>`;
   }
 
+  // Kupongstället vid fönstret: blanka kuponger i ett fack av plexiglas,
+  // butikens pennor (samma som kupongens) i ett rör bredvid och en lapp.
+  function stall() {
+    const sheet = (x, y, a, rows) => {
+      let s = `<g transform="translate(${x} ${y}) rotate(${a})"><rect width="100" height="128" fill="#e9dfc6"/><rect width="100" height="15" fill="#c8643a"/>` +
+        '<text x="5" y="9.4" font-family="Fraunces" font-weight="700" font-size="4" letter-spacing=".8" fill="#f6ecd9">MATCHFIXARNA</text>' +
+        '<text x="95" y="11" text-anchor="end" font-family="Fraunces" font-weight="800" font-size="9" fill="#f6ecd9">Kupong</text>';
+      for (let i = 0; i < rows; i++) {
+        const ry = 22 + i * 12;
+        s += `<line x1="6" y1="${ry + 7}" x2="48" y2="${ry + 7}" stroke="#8a6a4a" stroke-opacity=".45"/>` +
+          [56, 70, 84].map((bx) => `<rect x="${bx}" y="${ry}" width="11" height="8" fill="none" stroke="#a87650" stroke-width=".8"/>`).join('');
+      }
+      return `${s}<rect width="100" height="128" fill="url(#rum-cupg)" opacity=".25"/></g>`;
+    };
+    // spetsen uppåt: kroppen i tre ljus, trät och blyertsen
+    const pen = (x, a, l) => `<g transform="translate(${x} 0) rotate(${a})"><rect x="-2.5" y="${-l}" width="5" height="${l}" fill="url(#rum-penna)"/>` +
+      `<path d="M-2.5 ${-l}L0 ${-l - 9}L2.5 ${-l}Z" fill="#e2c08c"/><path d="M-.85 ${-l - 6}L0 ${-l - 9}L.85 ${-l - 6}Z" fill="#2a2a2a"/></g>`;
+    const glas = (x, y, w, h) => `<rect x="${x}" y="${y}" width="${w}" height="${h}" fill="#cfe2f0" opacity=".1"/>` +
+      `<rect x="${x}" y="${y - 1}" width="${w}" height="2" fill="#fff" opacity=".6"/>` +
+      `<g fill="#fff" opacity=".3"><rect x="${x}" y="${y}" width="1.5" height="${h}"/><rect x="${x + w - 1.5}" y="${y}" width="1.5" height="${h}"/></g>` +
+      `<polygon points="${x + w * 0.55},${y} ${x + w * 0.75},${y} ${x + w * 0.45},${y + h} ${x + w * 0.25},${y + h}" fill="#fff" opacity=".06"/>`;
+    return `<g transform="translate(150 688) scale(.85)"><defs>
+      <linearGradient id="rum-penna" x1="0" y1="0" x2="1" y2="0"><stop offset=".3" stop-color="#f0f0ec"/><stop offset=".3" stop-color="#d9d7d0"/><stop offset=".7" stop-color="#d9d7d0"/><stop offset=".7" stop-color="#b8b5ac"/></linearGradient>
+      <linearGradient id="rum-stallfack" x1="0" y1="0" x2="0" y2="1"><stop offset=".3" stop-color="#1a0f06" stop-opacity="0"/><stop offset="1" stop-color="#1a0f06" stop-opacity=".5"/></linearGradient>
+      <clipPath id="rum-stallet"><rect x="-90" y="-170" width="180" height="164"/></clipPath></defs>
+      <ellipse cx="2" cy="1" rx="90" ry="9" fill="#000" opacity=".5" filter="url(#rum-b4)"/>
+      <g clip-path="url(#rum-stallet)">${sheet(-73, -124, -3, 2)}${sheet(-67, -131, 2, 2)}${sheet(-70, -126, 0, 9)}
+        <rect x="-80" y="-140" width="122" height="134" fill="url(#rum-stallfack)"/><rect x="46" y="-50" width="26" height="44" fill="#000" opacity=".18"/>
+        ${pen(53, -9, 54)}${pen(58, -2, 62)}${pen(63, 6, 52)}${pen(67, 12, 48)}</g>
+      ${glas(-76, -68, 116, 62)}${glas(46, -50, 26, 44)}
+      <rect x="49" y="-47" width="2.5" height="39" fill="#fff" opacity=".3"/><ellipse cx="59" cy="-50" rx="13" ry="3" fill="none" stroke="#fff" stroke-opacity=".6" stroke-width="1.2"/>
+      <rect x="-80" y="-6" width="158" height="6" rx="1.5" fill="url(#rum-alu)"/><rect x="-80" y="-6" width="158" height="1" fill="#e8e6de" opacity=".5"/>
+      <g transform="translate(-18 -36) rotate(-4)"><rect x="-44" y="-10" width="88" height="15" fill="#f6f1a8"/>
+        <rect x="-8" y="-13" width="16" height="6" fill="#e8e2c8" opacity=".75"/>
+        <text y="1.5" text-anchor="middle" font-family="Caveat" font-weight="700" font-size="11" fill="#2a241c">Pennorna är räknade</text></g>
+    </g>`;
+  }
+
   // ---------- lagren ----------
 
   function table() {
@@ -475,9 +513,7 @@ window.Rum = (() => {
   <ellipse cx="1340" cy="930" rx="34" ry="12" fill="none" stroke="#2a160a" stroke-opacity=".35" stroke-width="3"/>
   <ellipse cx="1120" cy="700" rx="30" ry="10" fill="none" stroke="#2a160a" stroke-opacity=".25" stroke-width="2.5"/>
   <g fill="#1a0e06" opacity=".55"><ellipse cx="372" cy="760" rx="7" ry="3"/><ellipse cx="1452" cy="742" rx="6" ry="2.4"/><ellipse cx="1480" cy="870" rx="5" ry="2"/></g>
-  <g><rect x="118" y="612" width="62" height="74" rx="5" fill="#2b2a2a"/>
-    <g stroke-width="7" stroke-linecap="round"><line x1="136" y1="616" x2="128" y2="586" stroke="#d9d7d0"/><line x1="150" y1="616" x2="154" y2="582" stroke="#e3a92b"/><line x1="162" y1="616" x2="172" y2="590" stroke="#d9d7d0"/></g>
-    <rect x="118" y="612" width="62" height="74" rx="5" fill="#fff" opacity=".05"/></g>
+  ${stall()}
   <circle cx="1150" cy="790" r="7" fill="none" stroke="#a9a9a4" stroke-width="3"/><circle cx="1150" cy="790" r="2.5" fill="#55554f"/>
   <rect x="-10" y="984" width="1620" height="20" fill="url(#rum-alu)"/>
   ${facit()}`);
