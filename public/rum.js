@@ -8,7 +8,7 @@
 // dricker öl, röker och pratar. Föremålen leder vidare, som i ett rum hos
 // Felix Rieseberg:
 //   fällbladstavlan → närbilden → Matcher  förstoringsglaset → Analysera (nästa match)
-//   korktavlan → gängets kuponger     pokalhyllan, Omgångens tippare → Olympen
+//   korktavlan → gängets kuponger     pokalhyllan, Omgångens orakel → Olympen
 //   krittavlan → Tabeller             pärmarna → Statistik
 //   kvittot, terminalen → Kupong, tv:n zoomas in (T) med text-tv:ns färgknappar
 //   kupongen tas i handen och fylls i (K), eller → Kupong när man har lämnat in.
@@ -22,9 +22,9 @@
 //
 // Läses efter kupong.js, samtal.js, tippare.js och kronan.js och använder
 // deras hjälpare (state, KP, TP, gradeRow, couponNumber, currentCoupon,
-// Kronan.holders, Historik.coupons …). rum-3d.js hämtas först när rummet
-// visas, med three.js från jsdelivr (importmap i index.html); utan WebGL står
-// rummet kvar utan gänget.
+// Kronan.holders, Kronan.scene, Historik.coupons …). rum-3d.js hämtas först
+// när rummet visas, med three.js från jsdelivr (importmap i index.html); utan
+// WebGL står rummet kvar utan gänget.
 
 window.Rum = (() => {
   const W = 1600;
@@ -345,11 +345,65 @@ window.Rum = (() => {
       '<span class="rum-fbn-fot"><a class="rum-guld" href="#matcher" data-nav="matcher">Alla matcher</a></span></div></div>';
   }
 
-  // 5. Omgångens tippare: som Månadens anställd, med vinnarfigurens porträtt.
+  // 5. Omgångens orakel: oraklet ur Olympen (Kronan.scene, fotona på
+  // sockeln) i en förgylld ram under fällbladstavlan, med mässingsskylten
+  // under. Ett skimmer drar då och då över guldet och glaset.
+  const RAM = { w: 126, h: 152, b: 13, f: 5.5 };
+  function gilt() {
+    const { w, h, b, f } = RAM;
+    // listen i genomskärning, utifrån och in: kanten, rundstaven, hålkälen,
+    // frisen (f till f + 4 px, med meandern), pärlstaven och falsen mot bilden
+    const prof = [[0, '#3a2408'], [0.08, '#e9c878'], [0.16, '#a87a2e'], [0.25, '#f7e3a1'], [0.34, '#b8862f'],
+      [0.39, '#6e4a16'], [0.43, '#8f6526'], [0.73, '#a57a32'], [0.8, '#f0d48a'], [0.88, '#8a5f20'], [0.94, '#2c1a06'], [1, '#160d03']]
+      .map(([o, c]) => `<stop offset="${o}" stop-color="${c}"/>`).join('');
+    // varje sida med sin genomskärning (utifrån och in) och sitt ljus: ljuset
+    // faller uppifrån och från vänster
+    const sides = [
+      [`0,0 ${w},0 ${w - b},${b} ${b},${b}`, '0 0 0 1', '#fff', 0.16],
+      [`0,0 ${b},${b} ${b},${h - b} 0,${h}`, '0 0 1 0', '#fff', 0.06],
+      [`${w},0 ${w},${h} ${w - b},${h - b} ${w - b},${b}`, '1 0 0 0', '#000', 0.22],
+      [`0,${h} ${b},${h - b} ${w - b},${h - b} ${w},${h}`, '0 1 0 0', '#000', 0.34],
+    ];
+    const grads = sides.map(([, v], i) => {
+      const [x1, y1, x2, y2] = v.split(' ');
+      return `<linearGradient id="rum-ram-p${i}" x1="${x1}" y1="${y1}" x2="${x2}" y2="${y2}">${prof}</linearGradient>`;
+    }).join('');
+    // meandern, 4 px hög, börjar jämnt i varje sida (de stående är vridna:
+    // mönstrets y blir −x)
+    const band = [['t', 0, f], ['b', 0, h - f - 4], ['l', 1, f], ['r', 1, w - f - 4]];
+    const keys = band.map(([k, rot, at]) => `<pattern id="rum-ram-m${k}" width="4" height="4" patternUnits="userSpaceOnUse" ` +
+      `${rot ? `y="${-at - 4}" patternTransform="rotate(90)"` : `y="${at}"`}><g transform="scale(.3333)" fill="none" stroke-width="1.6">` +
+      '<path d="M0 10H2V2H10V6H6V10H12" stroke="#f6dfa0" opacity=".55" transform="translate(.8 .8)"/>' +
+      '<path d="M0 10H2V2H10V6H6V10H12" stroke="#4a300c"/></g></pattern>').join('');
+    const frieze = band.map(([k, rot, at]) => (rot
+      ? `<rect x="${at}" y="${f}" width="4" height="${h - 2 * f}" fill="url(#rum-ram-m${k})"/>`
+      : `<rect x="${f}" y="${at}" width="${w - 2 * f}" height="4" fill="url(#rum-ram-m${k})"/>`)).join('');
+    const c = f + 2;
+    const roses = [[c, c], [w - c, c], [c, h - c], [w - c, h - c]]
+      .map(([x, y]) => `<circle cx="${x}" cy="${y}" r="2.6" fill="url(#rum-ram-ros)" stroke="#4a300c" stroke-width=".5"/><circle cx="${x}" cy="${y}" r=".8" fill="#6e4a16"/>`).join('');
+    // palmetten överst: sju blad i solfjäder ur två voluter
+    const cx = w / 2;
+    const leaves = [-66, -44, -22, 0, 22, 44, 66].map((a, i) => {
+      const len = [6.5, 8.5, 10.5, 12, 10.5, 8.5, 6.5][i];
+      const r = a * Math.PI / 180;
+      const x = cx + Math.sin(r) * (len / 2 + 1.5);
+      const y = -1 - Math.cos(r) * (len / 2 + 1.5);
+      return `<ellipse cx="${r1(x)}" cy="${r1(y)}" rx="1.8" ry="${len / 2}" transform="rotate(${a} ${r1(x)} ${r1(y)})"/>`;
+    }).join('');
+    const crest = `<g transform="translate(${cx} 0) scale(.75) translate(${-cx} 0)" fill="url(#rum-ram-kron)" stroke="#5a3c10" stroke-width=".5">${leaves}` +
+      `<path d="M${cx - 12} 0.5Q${cx - 13} -5 ${cx - 9} -4.5Q${cx - 6} -4 ${cx - 8} -2M${cx + 12} 0.5Q${cx + 13} -5 ${cx + 9} -4.5Q${cx + 6} -4 ${cx + 8} -2" fill="none" stroke-width="1.6" stroke="#b8862f"/>` +
+      `<ellipse cx="${cx}" cy="-1" rx="4" ry="2.4"/></g>`;
+    return `<svg viewBox="0 -12 ${w} ${h + 12}" aria-hidden="true"><defs>${grads}${keys}` +
+      '<radialGradient id="rum-ram-ros" cx=".38" cy=".35" r=".7"><stop offset="0" stop-color="#fbeec0"/><stop offset=".55" stop-color="#b8862f"/><stop offset="1" stop-color="#5a3c10"/></radialGradient>' +
+      '<linearGradient id="rum-ram-kron" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#f7e3a1"/><stop offset="1" stop-color="#9a6d26"/></linearGradient></defs>' +
+      sides.map(([pts], i) => `<polygon points="${pts}" fill="url(#rum-ram-p${i})"/>`).join('') + frieze + roses +
+      sides.map(([pts, , col, o]) => `<polygon points="${pts}" fill="${col}" opacity="${o}"/>`).join('') +
+      `<rect x=".3" y=".3" width="${w - 0.6}" height="${h - 0.6}" fill="none" stroke="#2a1a06" stroke-width=".6"/>${crest}</svg>`;
+  }
   function frameHtml() {
     return '<a class="rum-ram rum-sak" href="#olympen" data-nav="olympen" aria-label="Olympen">' +
-      '<span class="rum-ram-bild"><img alt="" id="rum-ram-img"></span>' +
-      '<span class="rum-ram-skylt"><small>Omgångens tippare</small><b id="rum-ram-namn"></b></span></a>';
+      `<span class="rum-ram-list">${gilt()}<span class="kr-scene kr-orakel" id="rum-ram-bild"></span><span class="rum-ram-glans"></span></span>` +
+      '<span class="rum-ram-skylt"><small>Omgångens orakel</small><b id="rum-ram-namn"></b></span></a>';
   }
 
   // Högra väggen i perspektiv: ett element med väggens mått (z = djupet in
@@ -890,21 +944,14 @@ ${closeHtml()}
     const hy = document.getElementById('rum-hyllor');
     const hs = shelves(cups, seasonLabels(state.meta && state.meta.season));
     if (hy && R.hy !== hs) { hy.innerHTML = hs; R.hy = hs; }
-    const best = window.Kronan && Kronan.holders ? Kronan.holders(seen).best : [{ id: 'DL', name: 'Daniel Laino' }];
-    R.best = best.map((p) => p.id);
-    set('rum-ram-namn', esc(best.map((p) => p.id).join(' & ')));
-    portrait();
-  }
-
-  // Porträttet i ramen: vinnarfiguren ur three.js när den finns, annars fotot.
-  function portrait() {
-    const img = document.getElementById('rum-ram-img');
-    if (!img || !R.best) return;
-    const id = R.best[0];
-    const src = R.fig && R.fig.portrait ? R.fig.portrait(id.toLowerCase()) : null;
-    const want = src || `profeterna/${{ DL: 'laino', DT: 'teijder', DJ: 'johansson' }[id] || 'laino'}.jpg`;
-    if (img.getAttribute('src') !== want) img.setAttribute('src', want);
-    img.classList.toggle('foto', !src);
+    // oraklet som regerar, med hela efternamnet på skylten; scenen ritas om
+    // bara när oraklet byts, så att strålarna inte börjar om
+    const { best } = Kronan.holders(seen);
+    const scene = Kronan.scene('orakel', best, 'ram');
+    const bild = document.getElementById('rum-ram-bild');
+    if (bild && R.ram !== scene) { bild.innerHTML = scene; R.ram = scene; }
+    set('rum-ram-namn', Kronan.names(best));
+    R.el.querySelector('.rum-ram').classList.toggle('flera', best.length > 1);
   }
 
   // ---------- rörelsen ----------
@@ -1008,7 +1055,6 @@ ${closeHtml()}
     try {
       const mod = await import('./rum-3d.js');
       R.fig = await mod.figurer(document.getElementById('rum-3d'), { calm: calm() });
-      portrait();
       frame();
     } catch (err) {
       // utan WebGL eller utan nätet står rummet kvar utan gänget

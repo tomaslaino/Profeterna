@@ -12,7 +12,7 @@
 // också röken, som räknas fram för varje rökbloss ur var glöden var när det
 // föddes.
 //
-// figurer(canvas, { calm }) → { draw(t, mx, my), portrait(key) }.
+// figurer(canvas, { calm }) → { draw(t, mx, my) }.
 import * as THREE from 'three';
 import { RoomEnvironment } from 'three/addons/environments/RoomEnvironment.js';
 import { RoundedBoxGeometry } from 'three/addons/geometries/RoundedBoxGeometry.js';
@@ -1160,49 +1160,6 @@ export async function figurer(canvas, opt = {}) {
     }
   }
 
-  // ---------- porträttet i ramen ----------
-
-  const shots = {};
-  function portrait(k) {
-    if (shots[k]) return shots[k];
-    const o = figs.find((x) => x.F.key === k);
-    if (!o) return null;
-    pose(o, 2);
-    for (const x of figs) x.fig.visible = x === o;
-    for (const p of puffs) for (const sp of p.list) sp.visible = false;
-    catcher.visible = false;
-    pivot.rotation.set(0, 0, 0);
-    scene.updateMatrixWorld(true);
-    const c = new THREE.Vector3();
-    o.hc.getWorldPosition(c);
-    const pc = new THREE.PerspectiveCamera(24, 0.92, 10, 5000);
-    // med mössan lite längre bort och högre, så att tofsen kommer med
-    const up = o.F.mossa ? 21 : 0;
-    pc.position.copy(c).add(new THREE.Vector3(30, 20 + up, 420 + up * 4.6));
-    pc.lookAt(c.clone().add(new THREE.Vector3(0, -18 + up, 0)));
-    const w = 368;
-    const h = 400;
-    const rt = new THREE.WebGLRenderTarget(w, h, { samples: 4, colorSpace: THREE.SRGBColorSpace });
-    r.setRenderTarget(rt);
-    r.setClearColor(0x000000, 0);
-    r.clear();
-    r.render(scene, pc);
-    const buf = new Uint8Array(w * h * 4);
-    r.readRenderTargetPixels(rt, 0, 0, w, h, buf);
-    r.setRenderTarget(null);
-    rt.dispose();
-    for (const x of figs) x.fig.visible = true;
-    catcher.visible = true;
-    const cv = document.createElement('canvas');
-    cv.width = w;
-    cv.height = h;
-    const img = cv.getContext('2d').createImageData(w, h);
-    for (let y = 0; y < h; y++) img.data.set(buf.subarray((h - 1 - y) * w * 4, (h - y) * w * 4), y * w * 4);
-    cv.getContext('2d').putImageData(img, 0, 0);
-    shots[k] = cv.toDataURL('image/png');
-    return shots[k];
-  }
-
   // ---------- en bild ----------
 
   let headA = 0;
@@ -1226,5 +1183,5 @@ export async function figurer(canvas, opt = {}) {
     r.render(scene, cam);
   }
 
-  return { draw, portrait };
+  return { draw };
 }

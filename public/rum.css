@@ -259,34 +259,124 @@ a.rum-fb-r:hover b:not(.lit) { color: #fff; background: linear-gradient(180deg, 
 }
 .rum-guld:hover { color: #fff1c8; }
 
-/* ---------- Omgångens tippare ---------- */
+/* ---------- Omgångens orakel ---------- */
 
+/* Den förgyllda ramen (rum.js, gilt) under fällbladstavlan, med oraklet ur
+   Olympen (kronan.css) i mindre skala: fotot på sockeln, strålarna och
+   lagerkransen. Ramen, palmetten och skylten ryms mellan tavlan och disken. */
 .rum-ram {
   position: absolute;
-  left: 996px;
+  left: 987px;
   top: 302px;
-  width: 98px;
-  padding: 7px;
+  width: 126px;
   display: block;
-  background: linear-gradient(135deg, #6b4a26, #3d2814 55%, #5e4020);
-  box-shadow: 0 8px 16px rgba(0, 0, 0, 0.55), inset 0 0 0 1px rgba(240, 214, 153, 0.25);
 }
-.rum-ram-bild { display: block; height: 104px; overflow: hidden; background: radial-gradient(circle at 50% 35%, #4b6a8e, #1a2433 75%); box-shadow: inset 0 0 0 2px #c9a24c; }
-.rum-ram-bild img { display: block; width: 100%; height: 100%; object-fit: cover; }
-.rum-ram-bild img.foto { filter: sepia(0.35) saturate(0.8) brightness(0.9); }
-.rum-ram-bild img:not([src]) { visibility: hidden; }
-.rum-ram-skylt {
+.rum-ram-list { position: relative; display: block; height: 152px; }
+.rum-ram-list > svg {
+  position: absolute;
+  left: 0;
+  top: -12px;
+  width: 126px;
+  height: 164px;
+  overflow: visible;
+  filter: drop-shadow(0 8px 8px rgba(0, 0, 0, 0.6)) drop-shadow(0 2px 2px rgba(0, 0, 0, 0.45));
+}
+.rum-ram .kr-scene {
+  --sh: 126px;
+  --fh: 108px;
+  position: absolute;
+  left: 13px;
+  top: 13px;
+  width: 100px;
   display: block;
-  margin-top: 6px;
-  padding: 2px 0 3px;
-  background: linear-gradient(180deg, #e2c47a, #b48a36);
-  color: #2a1f0e;
+}
+.rum-ram .kr-figs.n2 { --fh: 72px; }
+.rum-ram .kr-figs.n3 { --fh: 58px; }
+.rum-ram .kr-figs > .kr-fig + .kr-fig { margin-left: -8px; }
+.rum-ram .kr-orakel .kr-figs { bottom: 12px; }
+.rum-ram .kr-orakel .kr-fig img { filter: drop-shadow(0 4px 6px rgba(0, 0, 0, 0.55)) drop-shadow(0 0 8px rgba(240, 214, 153, 0.2)); }
+.rum-ram .kr-rays { width: 300px; height: 300px; margin: -150px 0 0 -150px; }
+.rum-ram .kr-laurel { bottom: calc(12px + var(--fh) * 0.16); width: calc(var(--fh) * 0.9); }
+.rum-ram .kr-plinth { height: 12px; }
+.rum-ram .kr-plinth::before { top: -3px; height: 3px; }
+.rum-ram .kr-plinth::after { left: 5px; right: 5px; top: 3px; height: 5px; background-size: 5px 5px; }
+/* skuggan från listen in över bilden */
+.rum-ram .kr-scene::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  z-index: 5;
+  box-shadow: inset 0 0 9px rgba(0, 0, 0, 0.7), inset 0 0 0 1px rgba(0, 0, 0, 0.6);
+}
+
+/* Glaset speglar lysröret, och ett skimmer drar snett över guldet och glaset
+   var elfte sekund. */
+.rum-ram-glans {
+  position: absolute;
+  inset: 0;
+  overflow: hidden;
+  pointer-events: none;
+}
+.rum-ram-glans::before {
+  content: "";
+  position: absolute;
+  left: 13px;
+  top: 13px;
+  width: 100px;
+  height: 126px;
+  background: linear-gradient(160deg, rgba(255, 255, 255, 0.13), rgba(255, 255, 255, 0.03) 34%, transparent 55%);
+}
+.rum-ram-glans::after {
+  content: "";
+  position: absolute;
+  left: -56px;
+  top: -34px;
+  width: 30px;
+  height: 220px;
+  background: linear-gradient(90deg, transparent, rgba(255, 246, 214, 0.32) 45%, rgba(255, 255, 255, 0.5) 50%, rgba(255, 246, 214, 0.32) 55%, transparent);
+  transform: translateX(0) rotate(22deg);
+  animation: rum-glans 11s ease-in-out infinite;
+}
+@keyframes rum-glans {
+  0%, 72% { transform: translateX(0) rotate(22deg); }
+  92%, 100% { transform: translateX(250px) rotate(22deg); }
+}
+
+/* Mässingsskylten under, med två skruvar. */
+.rum-ram-skylt {
+  position: relative;
+  display: block;
+  left: 50%;
+  width: fit-content;
+  min-width: 96px;
+  margin-top: 5px;
+  transform: translateX(-50%);
+  padding: 2px 11px 3px;
+  box-sizing: border-box;
+  background: linear-gradient(180deg, #ecd28a, #c9a24c 45%, #a37c2e);
+  color: #2a1d0b;
   text-align: center;
   line-height: 1.05;
-  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.5);
+  white-space: nowrap;
+  box-shadow: 0 2px 3px rgba(0, 0, 0, 0.55), inset 0 1px 0 rgba(255, 246, 214, 0.6), inset 0 -1px 0 rgba(70, 45, 10, 0.5);
+  text-shadow: 0 1px 0 rgba(255, 240, 200, 0.45);
 }
-.rum-ram-skylt small { display: block; font-size: 7.5px; letter-spacing: 0.9px; text-transform: uppercase; font-weight: 700; }
-.rum-ram-skylt b { display: block; font-size: 12px; font-weight: 800; }
+.rum-ram-skylt::before, .rum-ram-skylt::after {
+  content: "";
+  position: absolute;
+  top: 50%;
+  width: 3px;
+  height: 3px;
+  margin-top: -1.5px;
+  border-radius: 50%;
+  background: radial-gradient(circle at 35% 35%, #f6e7b8, #6e5220);
+}
+.rum-ram-skylt::before { left: 4px; }
+.rum-ram-skylt::after { right: 4px; }
+.rum-ram-skylt small { display: block; font-size: 6px; letter-spacing: 1px; text-transform: uppercase; font-weight: 700; }
+.rum-ram-skylt b { display: block; font-family: Fraunces, Georgia, serif; font-size: 12.5px; font-weight: 600; letter-spacing: 0.2px; }
+.rum-ram-skylt .kr-amp { color: inherit; font-weight: 400; }
+.rum-ram.flera .rum-ram-skylt b { font-size: 10px; }
 
 /* ---------- högra väggen: krittavlan och korktavlan ---------- */
 
@@ -610,6 +700,7 @@ a.rum-fb-r:hover b:not(.lit) { color: #fff; background: linear-gradient(180deg, 
 .rum-ft a { font-family: Fraunces, Georgia, serif; font-size: 16px; color: #a9c8fb; text-decoration: underline; text-underline-offset: 4px; text-decoration-thickness: 1px; text-shadow: 0 1px 8px #000; }
 
 @media (prefers-reduced-motion: reduce) {
-  .rum-regn-b, .rum-droppe, .rum-rok i, .rum-lop .horn, .rum-fb-r b.f { animation: none; }
+  .rum-regn-b, .rum-droppe, .rum-rok i, .rum-lop .horn, .rum-fb-r b.f, .rum-ram-glans::after,
+  .rum-ram .kr-scene *, .rum-ram .kr-scene *::before, .rum-ram .kr-scene *::after { animation: none; }
   .rum-stage, .rum-kamera.glid, .rum-kamera.dyk, .rum-nara, .rum.fb-nara .rum-nara { transition: none; }
 }

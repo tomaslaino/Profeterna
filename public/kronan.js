@@ -18,7 +18,8 @@
 // Samma två står på förstasidan som två polaroider bredvid omgången
 // (Kronan.polaroids): stillbilder ur scenerna, som spelas när man pekar på
 // dem. Före första omgången är det KRONAN_START, och titlarna är bara Orakel
-// och Ikaros.
+// och Ikaros. Oraklet står också i den förgyllda ramen i tobaksaffären
+// (rum.js, Kronan.scene).
 //
 // Kropparna är urklippta foton (public/profeterna/kropp-*.png). hx är
 // huvudets mitt i procent av bildens bredd och sy axlarnas höjd i procent av
@@ -155,6 +156,11 @@ window.Kronan = (() => {
         '<path class="kr-wave f" d="M0 22q25-9 50 0t50 0 50 0 50 0 50 0 50 0 50 0 50 0V40H0z"/></svg>';
   }
 
+  // Scenen utanför Olympen (polaroiderna, ramen i rummet): färgövergångarna
+  // får egna id:n, så att bilden inte hämtar dem ur Olympens ruta när den är
+  // dold.
+  const own = (kind, people, tag) => scene(kind, people).replace(/kr-(gold|wax)/g, `kr-$1-${tag}`);
+
   const names = (people) => people.map(name).join('<span class="kr-amp"> &amp; </span>');
 
   // line: titlarna som regerar (Kronan.reigning) – raden under namnet i
@@ -204,15 +210,14 @@ window.Kronan = (() => {
 
   // Förstasidan: de som regerar som två polaroider – stillbilder ur
   // scenerna, som spelas när man pekar på dem – med titeln och namnet i
-  // kanten. Vägen in till Olympen. Färgövergångarna får egna id:n, så att
-  // bilderna inte hämtar dem ur Olympens ruta när den är dold.
+  // kanten. Vägen in till Olympen.
   // rounds = säsongens omgångar som syns (tippare.js).
   function polaroids(rounds) {
     const { last, best, worst } = holders(rounds);
     const one = (kind, people, title) => {
       const tip = last ? `Förra omgångens ${title === 'Orakel' ? 'orakel' : title}` : `${title} på förhand`;
       return `<a class="kr-pol ${kind}" href="#olympen" title="${esc2(tip)}">` +
-        `<span class="kr-scene kr-${kind}">${scene(kind, people).replace(/kr-(gold|wax)/g, 'kr-$1-pol')}</span>` +
+        `<span class="kr-scene kr-${kind}">${own(kind, people, 'pol')}</span>` +
         `<span class="kr-pol-text"><span class="kr-title">${title}</span><b class="kr-name">${names(people)}</b></span></a>`;
     };
     return one('orakel', best, 'Orakel') + one('ikaros', worst, 'Ikaros');
@@ -273,5 +278,5 @@ window.Kronan = (() => {
     return `<div class="card tp-card kr-reign">${top}${stage(best, worst, true, pts, lines, !last)}${last && extra ? extra(last) : ''}</div>`;
   }
 
-  return { html, reigning, head, polaroids, crowned, holders };
+  return { html, reigning, head, polaroids, crowned, holders, scene: own, names };
 })();
