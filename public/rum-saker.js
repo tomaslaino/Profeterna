@@ -1,8 +1,9 @@
 // Sakerna i tobaksaffären (rum.js): på pulten till höger om kvittot, i
 // three.js som gänget (rum-3d.js), en askkopp i bärnstensfärgat glas med
 // fimpar och en cigarett som ryker i ett av spåren, en öppen snusdosa med
-// locket bredvid och en gulnad bordsfläkt som svänger fram och tillbaka och
-// blåser röken åt sidan när den pekar mot askkoppen. På insidan av dörrens
+// locket bredvid och en gulnad bordsfläkt som, när det är varmt i Stockholm,
+// svänger fram och tillbaka och blåser röken åt sidan när den pekar mot
+// askkoppen; annars står den avstängd. På insidan av dörrens
 // glas sitter en VM 94-affisch: ett foto från landslagets hemkomst den 18 juli
 // 1994 (Sniper Zeta, CC BY-SA 4.0, Wikimedia Commons).
 //
@@ -116,6 +117,23 @@ export async function saker(el, opt = {}) {
   const pult = planes.find((p) => /translateZ\(-60px\)/.test(p.style.transform));
   const wearPoster = back ? poster(back) : () => {};
 
+  // Fläkten går bara när det känns som VARMT grader eller mer i Stockholm,
+  // samma gräns som gängets tunnaste kläder (dress i rum-3d.js). Vädret
+  // (vader.js) läses om var tionde sekund.
+  const VARMT = 21;
+  let varmt = null;
+  let vAt = -Infinity;
+  function vader() {
+    const ms = performance.now();
+    if (ms - vAt < 10e3) return false;
+    vAt = ms;
+    const v = window.Vader ? Vader.nu() : null;
+    const w = !!v && v.kanns >= VARMT;
+    if (w === varmt) return false;
+    varmt = w;
+    return true;
+  }
+
   let seed = daySeed();
   let key = null;
   let wear = 0.45;
@@ -142,6 +160,7 @@ export async function saker(el, opt = {}) {
   return {
     draw(t, mx, my, rows, old) {
       if (update(rows, old) && three) three.wear(wear, seed);
+      if (three && vader()) three.power(varmt);
       if (three) three.draw(t, mx, my);
     },
   };
@@ -553,9 +572,11 @@ async function props(pult, opt) {
   // ---------- fläkten ----------
   // Gulnad plast med blå propeller, svänger ±38° kring φC; huvudet pekar åt
   // (cos φ, 0, sin φ). Knappen som är nedtryckt är farten: ettan när det går
-  // bra, trean när det går dåligt.
+  // bra, trean när det går dåligt. Avstängd (power(false)) står huvudet och
+  // propellern still på dagens ställe, alla knappar är uppe och remsan hänger
+  // ner mot gallret.
 
-  const FAN = { x: 0, z: 0, R: 36, phiC: 160 * DEG, amp: 40 * DEG, period: 15 };
+  const FAN = { x: 0, z: 0, R: 36, phiC: 160 * DEG, amp: 40 * DEG, period: 15, rest: 160 * DEG, spin: 0 };
   let phiAsh = 0;
   const plast = mat('#dccf9f', { roughness: 0.42, clearcoat: 0.35, clearcoatRoughness: 0.4 });
   const plast2 = mat('#cdbf8c', { roughness: 0.5 });
@@ -680,15 +701,21 @@ async function props(pult, opt) {
   strip.castShadow = true;
   strip.position.set(0, R + 1, domeF(R) + 2);
   head.add(strip);
-  // sladden ut åt höger
-  const cord = new THREE.CatmullRomCurve3([[20, 3, -18], [44, 1.4, -30], [90, 1.4, -6], [150, 1.4, -44], [230, 1.4, -20]].map((p) => new THREE.Vector3(...p)));
-  const cordM = mesh(new THREE.TubeGeometry(cord, 48, 1.5, 8), mat('#e6decb', { roughness: 0.5 }), foot);
-  cordM.castShadow = false;
+  // avstängd hänger remsan rakt ner och buktar ut där gallret välver sig
+  // (y och z från fästet, en per rad)
+  const limp = [[0, 0]];
+  for (let v = 1, dl = STRIP.l / STRIP.n; v <= STRIP.n; v++) {
+    const [y, z] = limp[v - 1];
+    const rho = Math.min(R, Math.abs(R + 1 + y - dl));
+    const nz = Math.max(z, domeF(rho) + 1.2 - (domeF(R) + 2));
+    limp.push([y - Math.sqrt(Math.max(0, dl * dl - (nz - z) ** 2)), nz]);
+  }
 
   let speed = 1;
-  const phiAt = (t) => FAN.phiC + FAN.amp * Math.sin((t / FAN.period) * Math.PI * 2);
+  let on = true;
+  const phiAt = (t) => (on ? FAN.phiC + FAN.amp * Math.sin((t / FAN.period) * Math.PI * 2) : FAN.rest);
   // draget vid askkoppen: hur rakt fläkten pekar mot den
-  const windAt = (t) => (6 + speed * 7) * Math.max(0, Math.cos(phiAt(t) - phiAsh)) ** 6;
+  const windAt = (t) => (on ? (6 + speed * 7) * Math.max(0, Math.cos(phiAt(t) - phiAsh)) ** 6 : 0);
 
   // dagens platser, med några px hit eller dit
   function arrange(s) {
@@ -700,6 +727,9 @@ async function props(pult, opt) {
     Object.assign(ASH, { x: a.x, z: a.z });
     Object.assign(SN, { x: n.x, z: n.z });
     Object.assign(FAN, { x: f.x, z: f.z, phiC: (L.fan[2] + (hash(s + 57) - 0.5) * 16) * DEG });
+    // där huvudet och bladen stannade när den stängdes av
+    FAN.rest = FAN.phiC + FAN.amp * (hash(s + 59) * 1.6 - 0.8);
+    FAN.spin = hash(s + 60) * Math.PI * 2;
     tray.position.set(a.x, 0.3, a.z);
     dosa.position.set(n.x, 0, n.z);
     dosa.rotation.y = hash(s + 58) * 6;
@@ -716,7 +746,7 @@ async function props(pult, opt) {
     placeLid(w, s);
     placeSnus(w, s);
     speed = w > 0.66 ? 3 : w > 0.33 ? 2 : 1;
-    keys.forEach((k, i) => { k.position.y = i === speed ? 9.6 : 11.5; });
+    power(on);
     const dust = 0.25 + 0.45 * w;
     wire.color.set('#e2d6ac').lerp(new THREE.Color('#8f8566'), dust * 0.5);
     soot.material.opacity = 0.15 + 0.4 * w;
@@ -725,6 +755,11 @@ async function props(pult, opt) {
     cigs[1].g.visible = cigs[1].on;
     cigs[0].on = true;
     tray.rotation.y = hash(s + 41) * Math.PI * 2 / 3 - Math.PI / 3;
+  }
+
+  function power(o) {
+    on = !!o;
+    keys.forEach((k, i) => { k.position.y = on && i === speed ? 9.6 : 11.5; });
   }
 
   // ---------- en bild ----------
@@ -793,22 +828,23 @@ async function props(pult, opt) {
     // fläkten: huvudet svänger, propellern snurrar, remsan fladdrar
     const ph = phiAt(t);
     swivel.rotation.y = Math.PI / 2 - ph;
-    const spin = calm ? 0.4 : t * (5.4 + speed * 1.7) * Math.PI * 2;
+    const still = calm || !on;
+    const spin = !on ? FAN.spin : calm ? 0.4 : t * (5.4 + speed * 1.7) * Math.PI * 2;
     ghosts.forEach((set, i) => {
       set.rotation.z = -spin + i * 11 * DEG;
-      set.visible = !calm || i === 0;
+      set.visible = !still || i === 0;
     });
-    blur.material.opacity = calm ? 0 : 0.08 + speed * 0.025;
+    blur.material.opacity = still ? 0 : 0.08 + speed * 0.025;
     const p = stripGeo.attributes.position;
     const blow = calm ? 0.3 : 0.55 + speed * 0.15;
     for (let i = 0; i < p.count; i++) {
       const v = Math.floor(i / 2);
       const s = v / STRIP.n;
       const along = s * STRIP.l;
-      const wave = calm ? 0 : Math.sin(s * 9 - t * (16 + speed * 4)) * s * (1.5 + speed * 0.8);
+      const wave = still ? 0 : Math.sin(s * 9 - t * (16 + speed * 4)) * s * (1.5 + speed * 0.8);
       // remsan hänger i gallrets överkant och blåser ut framåt
-      p.setY(i, -along * (1 - blow) * 0.9 + wave * 0.3);
-      p.setZ(i, along * blow + wave);
+      p.setY(i, on ? -along * (1 - blow) * 0.9 + wave * 0.3 : limp[v][0]);
+      p.setZ(i, on ? along * blow + wave : limp[v][1]);
       p.setX(i, (i % 2 ? 0.5 : -0.5) * STRIP.w + wave * 0.25);
     }
     p.needsUpdate = true;
@@ -816,5 +852,5 @@ async function props(pult, opt) {
     r.render(scene, cam);
   }
 
-  return { wear, draw };
+  return { wear, power, draw };
 }
