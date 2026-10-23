@@ -40,7 +40,8 @@
 //
 // Läses efter app.js och kupong.js och använder deras hjälpare (KP, SIGNS,
 // matchById, isOpen, pickable, gradeRow, roundSteps …). kupong.js ritar vyerna
-// med Samtal.show(sub) och förstasidans ruta med Samtal.teaser().
+// med Samtal.show(sub) och förstasidans ruta med Samtal.teaser(), och
+// tobaksaffären (rum.js) fyller i kupongen på pulten med Samtal.pult.
 
 (function () {
   const SM = {
@@ -879,6 +880,12 @@
       const t = mineIn(s, v);
       return { ...handedIn(s), id: s.id, vem: v, inne: t.inne, tecken: { ...t.tecken }, kommentarer: { ...(t.kommentarer || {}) } };
     }
+    // Ett utkast utan namn – ifyllt på pulten i tobaksaffären innan du sa vem
+    // du är – blir ditt.
+    if (d && d.id === s.id && !d.vem && !d.inne) {
+      d = { ...d, vem: v, kommentarer: d.kommentarer || {} };
+      kpStore(TIPS, d);
+    }
     if (!d || d.id !== s.id || d.vem !== v || d.inne) {
       d = { id: s.id, vem: v, tecken: {}, kommentarer: {} };
       kpStore(TIPS, d);
@@ -1123,6 +1130,23 @@
     sheetList();
   }
 
+  // Lämnar in dina tips d – från papperet här och från kupongen på pulten i
+  // tobaksaffären (Samtal.pult) – och minns på enheten att du har lämnat in.
+  async function handIn(s, d) {
+    const notes = d.kommentarer || {};
+    const out = await send({
+      gor: 'tips',
+      id: s.id,
+      vem: d.vem,
+      matcher: s.matcher.map((x) => x.id),
+      tecken: Object.fromEntries(s.matcher.map((x) => [x.id, d.tecken[x.id]])),
+      kommentarer: Object.fromEntries(s.matcher.filter((x) => (notes[x.id] || '').trim()).map((x) => [x.id, notes[x.id].trim()])),
+      nyckel: d.nyckel,
+    });
+    if (out.ok) kpStore(TIPS, { ...d, inne: d.inne || new Date().toISOString(), nyckel: out.nyckel });
+    return out;
+  }
+
   async function submitTips() {
     const s = SM.data;
     const d = SM.draft;
@@ -1142,19 +1166,10 @@
     const btn = $('#sm-send');
     btn.disabled = true;
     msg('Lämnar in …');
-    const out = await send({
-      gor: 'tips',
-      id: s.id,
-      vem: d.vem,
-      matcher: s.matcher.map((x) => x.id),
-      tecken: Object.fromEntries(s.matcher.map((x) => [x.id, d.tecken[x.id]])),
-      kommentarer: Object.fromEntries(s.matcher.filter((x) => (d.kommentarer[x.id] || '').trim()).map((x) => [x.id, d.kommentarer[x.id].trim()])),
-      nyckel: d.nyckel,
-    });
+    const out = await handIn(s, d);
     if (!here(sub)) return;
     btn.disabled = false;
     if (out.ok) {
-      kpStore(TIPS, { ...d, inne: d.inne || new Date().toISOString(), nyckel: out.nyckel });
       const edit = SM.edit;
       SM.draft = null;
       // Omgången igen, med de andras tips om de är inne – efter en ändring på
@@ -1578,6 +1593,61 @@
     for (const x of hd.querySelectorAll('button[data-lyft]')) x.setAttribute('aria-pressed', String(x.dataset.lyft === SM.lyft));
   });
 
+  // ---------- kupongen på pulten ----------
+
+  // Tobaksaffären (rum.js) fyller i samma kupong på pulten: samma utkast på
+  // enheten och samma inlämning som papperet här. state() → null utan
+  // omgång, annars {s, vem, tecken, inne, fyll, val}: tecken = dina (utkastet
+  // eller de inlämnade), inne = du har lämnat in, fyll = du kan fylla i den
+  // (du har inte lämnat in och första matchen har inte startat), val = vilka
+  // du kan kryssa för att du är – de som inte har lämnat in – och go =
+  // guldordet bredvid, som knappen i förstasidans ruta.
+  const draftOf = (s, v) => {
+    const d = kpLoad(TIPS);
+    return d && d.id === s.id && !d.inne && (!d.vem || d.vem === v) ? d : null;
+  };
+  const pult = {
+    state() {
+      const s = SM.data;
+      if (!info() || !s) return null;
+      const v = me();
+      const inne = submitted(s, v);
+      const open = !s.visas && Date.now() < Math.min(...kicks(s));
+      const mine = inne ? mineIn(s, v) : draftOf(s, v);
+      const du = v && s.gang.find((g) => g.id === v);
+      const n = du ? tally(s, du) : mine ? s.matcher.filter((x) => mine.tecken[x.id]).length : 0;
+      return {
+        s, vem: v, inne, fyll: open && !inne, tecken: { ...((mine && mine.tecken) || {}) }, val: s.gang.filter((g) => !g.inne).map((g) => g.id),
+        go: !open ? 'Följ kupongen' : inne ? 'Se de andras tips' : n ? 'Fyll i resten' : 'Fyll i kupongen',
+      };
+    },
+    // Du kryssar för vem du är; kryssen på kupongen följer med.
+    vem(id) {
+      const s = SM.data;
+      if (!s || submitted(s, me()) || !s.gang.some((g) => g.id === id && !g.inne)) return false;
+      const d = draftOf(s, me());
+      kpStore(VEM, id);
+      if (d) kpStore(TIPS, { id: s.id, vem: id, tecken: d.tecken, kommentarer: d.kommentarer || {} });
+      return true;
+    },
+    // Ett tecken eller en gardering i en match ('' = inget).
+    tippa(id, tecken) {
+      const s = SM.data;
+      if (!s) return;
+      const d = draftOf(s, me()) || { id: s.id, vem: me(), tecken: {}, kommentarer: {} };
+      if (tecken) d.tecken[id] = tecken;
+      else delete d.tecken[id];
+      kpStore(TIPS, d);
+    },
+    // → svaret från tjänsten, som för papperet här.
+    async lamnaIn() {
+      const s = SM.data;
+      const d = s && draftOf(s, me());
+      if (!d || !me()) return { ok: false, error: 'Vem är du?' };
+      return handIn(s, { ...d, vem: me() });
+    },
+  };
+
   // Omgångens matcher (liveställningen i kupong.js hämtar dem också), om
   // allas tips visas, gängets kupong ur omgången och bevakningen av
   // förstasidans ruta.
@@ -1586,5 +1656,5 @@
   const made = () => (SM.data && SM.data.visas ? existing(SM.data) : null);
   const watch = () => { if (active() && !SM.data.visas) poll(); };
 
-  window.Samtal = { show, load, active, covers, teaser, ids, visible, made, watch, paper, title, keep: keepFocus, name: () => nameOf(SM.data), redraw: () => { if (here('')) renderRound(); } };
+  window.Samtal = { show, load, active, covers, teaser, ids, visible, made, watch, paper, title, pult, keep: keepFocus, name: () => nameOf(SM.data), redraw: () => { if (here('')) renderRound(); } };
 })();
