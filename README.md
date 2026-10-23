@@ -1757,9 +1757,9 @@ sidan byts:
   pulten en ny – kvittot när var och en lämnade in. Tills alla har lämnat in eller första
   matchen startar tas kupongen (din ur högen, när du har lämnat in) i handen i stället, och
   din kupong i högen tas i handen tills matcherna har startat (se nedan). Guldordet bredvid
-  säger vad som väntar: *Fyll i kupongen*, *Fyll i resten*, *Ändra kupongen*, inget alls
-  när dina tips inte finns på enheten, *Till uppgörelsen* när alla har lämnat in och *Följ
-  kupongen* när matcherna har börjat.
+  säger vad som väntar: *Fyll i kupongen*, *Fyll i resten*, inget alls när du har lämnat
+  in (din kupong i högen tas i handen med ett klick), *Till uppgörelsen* när alla har
+  lämnat in och *Följ kupongen* när matcherna har börjat.
 - **Högen** till vänster om kupongen: de som har lämnat in har lagt sin kupong där med
   baksidan upp, i den ordning de lämnade in (den senaste överst) – porträttet under ett gem,
   initialerna i personens bläck (samma som på papperet under Kupong) och stämpeln

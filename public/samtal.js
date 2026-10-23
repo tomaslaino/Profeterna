@@ -1611,7 +1611,8 @@
   // matcherna startar, också när du ser de andras tips (startade matcher
   // står kvar), hand = kupongen kan tas i handen (att fylla i eller ändra),
   // val = vilka du kan kryssa för att du är – de som inte har lämnat in – och
-  // go = guldordet bredvid ('' när dina tips inte finns här).
+  // go = guldordet bredvid ('' när du har lämnat in och matcherna inte har
+  // startat – din kupong i högen tas i handen med ett klick).
   const draftOf = (s, v) => {
     const d = kpLoad(TIPS);
     return d && d.id === s.id && !d.inne && (!d.vem || d.vem === v) ? d : null;
@@ -1633,7 +1634,7 @@
         s, vem: v, inne, open, fyll: open && !inne, andra, hand, tecken: { ...((mine && mine.tecken) || {}) },
         val: inne ? [] : s.gang.filter((g) => !g.inne).map((g) => g.id),
         go: !open ? (s.visas && before ? 'Till uppgörelsen' : 'Följ kupongen')
-          : inne ? (andra ? 'Ändra kupongen' : '') : n ? 'Fyll i resten' : 'Fyll i kupongen',
+          : inne ? '' : n ? 'Fyll i resten' : 'Fyll i kupongen',
       };
     },
     // Du kryssar för vem du är; kryssen på kupongen följer med.
