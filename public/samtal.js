@@ -40,7 +40,8 @@
 //
 // Läses efter app.js och kupong.js och använder deras hjälpare (KP, SIGNS,
 // matchById, isOpen, pickable, gradeRow, roundSteps …). kupong.js ritar vyerna
-// med Samtal.show(sub) och förstasidans ruta med Samtal.teaser().
+// med Samtal.show(sub) och förstasidans ruta med Samtal.teaser(), och
+// tobaksaffären (rum.js) fyller i kupongen på pulten med Samtal.pult.
 
 (function () {
   const SM = {
@@ -472,7 +473,6 @@
     html += paperTop(stopBox(s), ' sm-up', stamp(s)) +
       upHead(s, ids, rows.filter((r) => r.g.res != null).map((r) => [r.x.id, r.g.res]));
     const w = writer(s);
-    let n = 0;
     for (let k = 0; k <= 5; k++) {
       const list = rows.filter((r) => r.kind === k);
       if (!list.length) continue;
@@ -481,7 +481,7 @@
         html += upRow({
           id: r.x.id, m: r.m, label: r.m ? `${r.m.home} – ${r.m.away}` : r.x.match, g: r.g, nr: nr.get(r.x.id),
           who: r.cov, sign: val[r.x.id] || '', notes: r.notes, after: afterOf(s, r.x.id, w), pen: penOf(s, r.x.id, w),
-          ids, alt: n++ % 2, pick: true, open: r.open,
+          ids, pick: true, open: r.open,
         });
       }
     }
@@ -533,13 +533,12 @@
 
   // ---------- allas tips på papperet: uppgörelsen och gängets kupong ----------
 
-  // Papperet: märket med kupongens nummer, i hörnet spelstoppet eller betyget
-  // och stämpeln emellan, och bården under. cls: fler klasser på papperet.
-  // Omgångens id ger papperet samma slitage när man fyller i och efteråt
-  // (slitage.js).
-  const paperTop = (corner, cls = '', stamp = '') => `<div class="pp-wrap sm-wrap"><div class="pp pp-fill sm-sheet${cls}" id="sm-sheet"${SM.data ? ` data-slitage="omg:${esc(SM.data.id)}"` : ''}>` +
-    `<div class="sm-sheet-head"><p class="pp-brand"><img src="logo.svg" alt="" width="20" height="20">Matchfixarna<span>Kupong${SM.data ? ` ${couponNumber(SM.data.matcher.map((x) => x.id))}` : ''}</span></p>` +
-    `${stamp}${corner}</div><div class="pp-band" aria-hidden="true"></div>`;
+  // Papperet: bandet med kupongens nummer (Papper.banner) och under det
+  // stämpeln och, i hörnet, spelstoppet eller betyget. cls: fler klasser på
+  // papperet. Omgångens id ger papperet samma slitage när man fyller i och
+  // efteråt (slitage.js).
+  const paperTop = (corner, cls = '', stamp = '') => `<div class="pp-wrap sm-wrap"><div class="pp pp-kup pp-fill sm-sheet${cls}" id="sm-sheet"${SM.data ? ` data-slitage="omg:${esc(SM.data.id)}"` : ''}>` +
+    Papper.banner(SM.data ? ` ${couponNumber(SM.data.matcher.map((x) => x.id))}` : '') + `<div class="sm-sheet-head">${stamp}${corner}</div>`;
   const stopBox = (s) => `<div class="pp-stop"><span>Spelstopp</span><b>${esc(fWeekdayTime.format(new Date(Math.min(...kicks(s)))))}</b></div>`;
   // Fälten i foten: [[etikett, värde, title]].
   const fieldList = (list, id = '') => `<div class="pp-fields pb-fields"${id ? ` id="${id}"` : ''}>` + list.filter(Boolean).map((x) =>
@@ -607,7 +606,7 @@
   // startat. day: matcherna står under sin dag, så klockslaget räcker. out:
   // matchen kom inte med på gängets kupong. after, pen: kommentarerna i
   // efterhand (afterOf, penOf).
-  function upRow({ id, m, label, g, nr, who, sign, notes = [], note = '', after = [], pen = null, ids, alt, pick = false, open = false, day = false, out = false }) {
+  function upRow({ id, m, label, g, nr, who, sign, notes = [], note = '', after = [], pen = null, ids, pick = false, open = false, day = false, out = false }) {
     const hit = g.res != null && sign ? sign.includes(SIGNS[g.res]) : null;
     const cls = rowClass({ ...g, hit });
     const comp = m ? compOf(m.comp) : null;
@@ -618,7 +617,7 @@
       : `<span class="sm-res"><span class="sm-res-s">${Papper.result(g)}</span>${tick}</span>`;
     const sr = `${sign ? `Gängets tecken ${sign}${hit === true ? ', rätt' : hit === false ? ', fel' : ''}` : 'Inget tecken'}. ` +
       ids.map((k) => `${k}: ${SIGNS.filter((sg, i) => who[i].includes(k)).join('') || 'inget'}`).join(', ');
-    return `<div class="sm-r${alt ? ' alt' : ''} s-${cls.replace(' ', ' s-')}${pick && open && !sign ? ' unsigned' : ''}${out ? ' sm-out' : ''}" data-id="${esc(id)}">` +
+    return `<div class="sm-r s-${cls.replace(' ', ' s-')}${pick && open && !sign ? ' unsigned' : ''}${out ? ' sm-out' : ''}" data-id="${esc(id)}">` +
       `<span class="pp-nr">${nr}</span>` +
       '<span class="sm-m"><span class="sm-mt">' +
       `<span class="pp-tm">${m ? `<a class="pp-t" href="#match/${esc(id)}">${teams}</a>` : `<span class="pp-t">${teams}</span>`}</span>` +
@@ -671,7 +670,7 @@
       html += upRow({
         id: r.id, m: r.m, label: teamsOf(r), g: r, nr: nr.get(r.id), who: SIGNS.map((sg) => ids.filter((p) => tip(p).includes(sg))),
         sign: r.sign, note: r.note, notes: ids.map((p) => ({ k: p, text: (s.tips[p].kommentarer || {})[r.id] })).filter((o) => o.text),
-        after: afterOf(s, r.id, w), pen: penOf(s, r.id, w), ids, alt: i % 2, day: days, out: r.out,
+        after: afterOf(s, r.id, w), pen: penOf(s, r.id, w), ids, day: days, out: r.out,
       });
     });
     return html + Papper.foot(c, g) + '</div></div>';
@@ -879,6 +878,12 @@
       const t = mineIn(s, v);
       return { ...handedIn(s), id: s.id, vem: v, inne: t.inne, tecken: { ...t.tecken }, kommentarer: { ...(t.kommentarer || {}) } };
     }
+    // Ett utkast utan namn – ifyllt på pulten i tobaksaffären innan du sa vem
+    // du är – blir ditt.
+    if (d && d.id === s.id && !d.vem && !d.inne) {
+      d = { ...d, vem: v, kommentarer: d.kommentarer || {} };
+      kpStore(TIPS, d);
+    }
     if (!d || d.id !== s.id || d.vem !== v || d.inne) {
       d = { id: s.id, vem: v, tecken: {}, kommentarer: {} };
       kpStore(TIPS, d);
@@ -950,7 +955,7 @@
       const own = Boolean(d) && !locked;
       const sr = cols.filter((c) => !(own && c.st === 'fill')).map((c) =>
         `${c.g.id}: ${c.st === 'hidden' ? 'dolt' : c.st === 'blank' ? 'inget ännu' : c.t[x.id] || 'inget'}`);
-      html += `<div class="sm-r${i % 2 ? ' alt' : ''}${locked ? ' sm-locked' : ''}${d && !sign ? ' unsigned' : ''}" data-id="${esc(x.id)}">` +
+      html += `<div class="sm-r${locked ? ' sm-locked' : ''}${d && !sign ? ' unsigned' : ''}" data-id="${esc(x.id)}">` +
         `<span class="pp-nr">${i + 1}</span>` +
         `<span class="sm-m"><span class="pp-tm">${teamsHtml(x, m)}</span>` +
         `<span class="sm-meta"><span class="pp-small">${esc((days ? fTime : fWeekdayTime).format(new Date(x.avspark)))}${comp ? ` · <abbr title="${esc(comp.name)}">${esc(comp.short)}</abbr>` : ''}</span>` +
@@ -1123,6 +1128,23 @@
     sheetList();
   }
 
+  // Lämnar in dina tips d – från papperet här och från kupongen på pulten i
+  // tobaksaffären (Samtal.pult) – och minns på enheten att du har lämnat in.
+  async function handIn(s, d) {
+    const notes = d.kommentarer || {};
+    const out = await send({
+      gor: 'tips',
+      id: s.id,
+      vem: d.vem,
+      matcher: s.matcher.map((x) => x.id),
+      tecken: Object.fromEntries(s.matcher.map((x) => [x.id, d.tecken[x.id]])),
+      kommentarer: Object.fromEntries(s.matcher.filter((x) => (notes[x.id] || '').trim()).map((x) => [x.id, notes[x.id].trim()])),
+      nyckel: d.nyckel,
+    });
+    if (out.ok) kpStore(TIPS, { ...d, inne: d.inne || new Date().toISOString(), nyckel: out.nyckel });
+    return out;
+  }
+
   async function submitTips() {
     const s = SM.data;
     const d = SM.draft;
@@ -1142,19 +1164,10 @@
     const btn = $('#sm-send');
     btn.disabled = true;
     msg('Lämnar in …');
-    const out = await send({
-      gor: 'tips',
-      id: s.id,
-      vem: d.vem,
-      matcher: s.matcher.map((x) => x.id),
-      tecken: Object.fromEntries(s.matcher.map((x) => [x.id, d.tecken[x.id]])),
-      kommentarer: Object.fromEntries(s.matcher.filter((x) => (d.kommentarer[x.id] || '').trim()).map((x) => [x.id, d.kommentarer[x.id].trim()])),
-      nyckel: d.nyckel,
-    });
+    const out = await handIn(s, d);
     if (!here(sub)) return;
     btn.disabled = false;
     if (out.ok) {
-      kpStore(TIPS, { ...d, inne: d.inne || new Date().toISOString(), nyckel: out.nyckel });
       const edit = SM.edit;
       SM.draft = null;
       // Omgången igen, med de andras tips om de är inne – efter en ändring på
@@ -1578,6 +1591,61 @@
     for (const x of hd.querySelectorAll('button[data-lyft]')) x.setAttribute('aria-pressed', String(x.dataset.lyft === SM.lyft));
   });
 
+  // ---------- kupongen på pulten ----------
+
+  // Tobaksaffären (rum.js) fyller i samma kupong på pulten: samma utkast på
+  // enheten och samma inlämning som papperet här. state() → null utan
+  // omgång, annars {s, vem, tecken, inne, fyll, val}: tecken = dina (utkastet
+  // eller de inlämnade), inne = du har lämnat in, fyll = du kan fylla i den
+  // (du har inte lämnat in och första matchen har inte startat), val = vilka
+  // du kan kryssa för att du är – de som inte har lämnat in – och go =
+  // guldordet bredvid, som knappen i förstasidans ruta.
+  const draftOf = (s, v) => {
+    const d = kpLoad(TIPS);
+    return d && d.id === s.id && !d.inne && (!d.vem || d.vem === v) ? d : null;
+  };
+  const pult = {
+    state() {
+      const s = SM.data;
+      if (!info() || !s) return null;
+      const v = me();
+      const inne = submitted(s, v);
+      const open = !s.visas && Date.now() < Math.min(...kicks(s));
+      const mine = inne ? mineIn(s, v) : draftOf(s, v);
+      const du = v && s.gang.find((g) => g.id === v);
+      const n = du ? tally(s, du) : mine ? s.matcher.filter((x) => mine.tecken[x.id]).length : 0;
+      return {
+        s, vem: v, inne, fyll: open && !inne, tecken: { ...((mine && mine.tecken) || {}) }, val: s.gang.filter((g) => !g.inne).map((g) => g.id),
+        go: !open ? 'Följ kupongen' : inne ? 'Se de andras tips' : n ? 'Fyll i resten' : 'Fyll i kupongen',
+      };
+    },
+    // Du kryssar för vem du är; kryssen på kupongen följer med.
+    vem(id) {
+      const s = SM.data;
+      if (!s || submitted(s, me()) || !s.gang.some((g) => g.id === id && !g.inne)) return false;
+      const d = draftOf(s, me());
+      kpStore(VEM, id);
+      if (d) kpStore(TIPS, { id: s.id, vem: id, tecken: d.tecken, kommentarer: d.kommentarer || {} });
+      return true;
+    },
+    // Ett tecken eller en gardering i en match ('' = inget).
+    tippa(id, tecken) {
+      const s = SM.data;
+      if (!s) return;
+      const d = draftOf(s, me()) || { id: s.id, vem: me(), tecken: {}, kommentarer: {} };
+      if (tecken) d.tecken[id] = tecken;
+      else delete d.tecken[id];
+      kpStore(TIPS, d);
+    },
+    // → svaret från tjänsten, som för papperet här.
+    async lamnaIn() {
+      const s = SM.data;
+      const d = s && draftOf(s, me());
+      if (!d || !me()) return { ok: false, error: 'Vem är du?' };
+      return handIn(s, { ...d, vem: me() });
+    },
+  };
+
   // Omgångens matcher (liveställningen i kupong.js hämtar dem också), om
   // allas tips visas, gängets kupong ur omgången och bevakningen av
   // förstasidans ruta.
@@ -1586,5 +1654,5 @@
   const made = () => (SM.data && SM.data.visas ? existing(SM.data) : null);
   const watch = () => { if (active() && !SM.data.visas) poll(); };
 
-  window.Samtal = { show, load, active, covers, teaser, ids, visible, made, watch, paper, title, keep: keepFocus, name: () => nameOf(SM.data), redraw: () => { if (here('')) renderRound(); } };
+  window.Samtal = { show, load, active, covers, teaser, ids, visible, made, watch, paper, title, pult, keep: keepFocus, name: () => nameOf(SM.data), redraw: () => { if (here('')) renderRound(); } };
 })();

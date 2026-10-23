@@ -10,8 +10,8 @@
 //   fällbladstavlan → närbilden → Matcher  förstoringsglaset → Analysera (nästa match)
 //   korktavlan → gängets kuponger     pokalhyllan, Omgångens tippare → Olympen
 //   krittavlan → Tabeller             pärmarna → Statistik
-//   kupongen, kvittot, terminalen → Kupong, tv:n zoomas in (T) med text-tv:ns
-//   färgknappar.
+//   kvittot, terminalen → Kupong, tv:n zoomas in (T) med text-tv:ns färgknappar
+//   kupongen tas i handen och fylls i (K), eller → Kupong när man har lämnat in.
 // Pekar man på ett föremål lyser ordet i menyn som det leder till.
 //
 // Vanlig sida (#hem) är den vanliga förstasidan. I telefonen och i smala
@@ -531,7 +531,7 @@ window.Rum = (() => {
 
   function paper() {
     return '<a id="rum-kvitto" class="rum-flat rum-sak" href="#kupong" data-nav="kupong" aria-label="Kupong"></a>' +
-      '<a id="rum-kupong" class="rum-flat rum-sak" href="#kupong" data-nav="kupong" aria-label="Kupong"></a>' +
+      '<a id="rum-kupong" class="rum-flat rum-kup rum-sak" href="#kupong" data-nav="kupong" aria-label="Kupong"></a>' +
       svg('<path d="M846 930 C 960 980, 1110 920, 1150 796" fill="none" stroke="#b9b9b2" stroke-width="5" stroke-linecap="round" stroke-dasharray="0.1 7"/>' +
         '<path d="M846 930 C 960 980, 1110 920, 1150 796" fill="none" stroke="#000" stroke-opacity=".25" stroke-width="3" transform="translate(3 6)" stroke-dasharray="0.1 7" stroke-linecap="round"/>') +
       '<a class="rum-tag" href="#kupong" data-nav="kupong" id="rum-tag">Fyll i kupongen</a>';
@@ -592,7 +592,7 @@ ${closeHtml()}
   function round() {
     const r = typeof TP !== 'undefined' ? TP.round : null;
     if (r && r.matcher && r.matcher.length) {
-      return { ids: r.matcher.map((x) => String(x.id)), gang: r.gang || [], name: r.namn || (window.Samtal && Samtal.name ? Samtal.name() : null) };
+      return { id: r.id, ids: r.matcher.map((x) => String(x.id)), gang: r.gang || [], name: r.namn || (window.Samtal && Samtal.name ? Samtal.name() : null) };
     }
     const c = typeof currentCoupon === 'function' ? currentCoupon() : null;
     if (c) return { ids: c.matches.map((x) => String(x.id)), gang: [], name: c.name || null, coupon: c };
@@ -739,21 +739,69 @@ ${closeHtml()}
       '<a class="yel" href="tabeller.html" data-to="tabeller">Tabell</a><a class="cya" href="statistik.html" data-to="statistik">Statistik</a></span>';
   }
 
-  // Kupongen på pulten: omgångens matcher, kryss där gängets kupong har
-  // tecken (annars tom att fylla i).
-  function couponHtml(rd, rows) {
+  // Kryssets två streck med blyerts i en ruta (40 × 19): lite sneda och
+  // böjda, men samma för samma match och tecken – på pulten och i handen.
+  const seed = (s) => [...String(s)].reduce((a, c) => (Math.imul(a, 31) + c.charCodeAt(0)) | 0, 7);
+  function strokes(key) {
+    const R0 = rng(seed(key));
+    const j = (n) => (R0() - 0.5) * 2 * n;
+    return [[7, 3, 33, 16], [32, 3, 8, 16.5]].map(([x1, y1, x2, y2]) => {
+      const a = [x1 + j(1.6), y1 + j(1)];
+      const b = [x2 + j(1.6), y2 + j(1)];
+      const c = [(a[0] + b[0]) / 2 + j(1.8), (a[1] + b[1]) / 2 + j(1.4)];
+      return { a, b, d: `M${r1(a[0])} ${r1(a[1])}Q${r1(c[0])} ${r1(c[1])} ${r1(b[0])} ${r1(b[1])}` };
+    });
+  }
+  const crossSvg = (key) => `<svg class="kryss" viewBox="0 0 40 19" preserveAspectRatio="none" aria-hidden="true">${strokes(key).map((s) => `<path d="${s.d}" pathLength="1"/>`).join('')}</svg>`;
+
+  // Pennan: spetsen i (x, y) på kupongen, vriden a grader och lyft l (0 =
+  // mot papperet, 1 = i luften). Skuggan faller nedåt på papperet hur pennan
+  // än är vriden.
+  function penAt({ x, y, a, l = 0 }) {
+    const v = (-a * Math.PI) / 180;
+    const dx = 1.5 + 5 * l;
+    const dy = 4 + 9 * l;
+    return {
+      transform: `translate(${r1(x)}px, ${r1(y)}px) rotate(${r1(a)}deg) scale(${(1 + 0.06 * l).toFixed(3)})`,
+      filter: `drop-shadow(${r1(dx * Math.cos(v) - dy * Math.sin(v))}px ${r1(dx * Math.sin(v) + dy * Math.cos(v))}px ${r1(2 + 3 * l)}px rgba(0, 0, 0, ${(0.38 - 0.12 * l).toFixed(2)}))`,
+    };
+  }
+  const PEN_PULT = { x: 276.4, y: 340.6, a: -11 };
+  const PEN_VILA = { x: 506, y: 384, a: -7 };
+  const PEN_SKRIV = -38;
+  const penStyle = (p) => { const s = penAt(p); return `transform: ${s.transform}; filter: ${s.filter}`; };
+
+  // Kupongen på pulten: omgångens matcher i kupongens ordning, med kryss där
+  // gängets kupong har tecken – innan den finns dina egna (p =
+  // Samtal.pult.state()), med ditt namn kryssat under Tippare och stämpeln
+  // när du har lämnat in. hand: kupongen i handen, där rutorna är knappar.
+  function couponHtml(rd, rows, p = null, hand = false) {
     const nr = rd && !rd.next && typeof couponNumber === 'function' && rd.ids.length ? couponNumber(rd.ids) : null;
     const first = rows.length ? Math.min(...rows.map((x) => Date.parse(x.m.kickoff))) : null;
-    const box = (x, s) => `<span class="box${x.sign.includes(s) ? ' x' : ''}">${s}</span>`;
-    const list = rows.map((x, i) => `<div class="row"><span class="nr">${i + 1}</span><span>${esc(short(x.m.home))} – ${esc(short(x.m.away))}</span>${box(x, '1')}${box(x, 'X')}${box(x, '2')}</div>`).join('');
+    const order = rd ? rd.ids.map((id) => rows.find((x) => x.id === id)).filter(Boolean) : rows;
+    const gang = order.some((x) => x.sign);
+    const own = Boolean(p) && !gang;
+    const mine = own ? p.tecken : {};
+    const box = (key, label, on, attrs, cls = '') => (hand && attrs != null
+      ? `<button type="button" class="box${on ? ' x' : ''}${cls}"${attrs} aria-pressed="${on}">`
+      : `<span class="box${on ? ' x' : ''}${cls}">`) + `<i>${label}</i>${on ? crossSvg(key) : ''}${hand && attrs != null ? '</button>' : '</span>'}`;
+    const list = order.map((x, i) => {
+      const sign = own ? mine[x.id] || '' : x.sign;
+      return `<div class="row${sign ? '' : ' tom'}" data-id="${esc(x.id)}"><span class="nr">${i + 1}</span><span>${esc(short(x.m.home))} – ${esc(short(x.m.away))}</span>` +
+        ['1', 'X', '2'].map((s) => box(`${x.id}${s}`, s, sign.includes(s), ` data-s="${s}" aria-label="${esc(`${x.m.home} – ${x.m.away}: ${s}`)}"`)).join('') + '</div>';
+    }).join('');
     const who = rd && rd.gang && rd.gang.length ? rd.gang.filter((g) => g.inne).length : null;
+    const vem = own ? '<span class="vem"><span>Tippare</span><span>' + p.s.gang.map((g) => box(`vem${g.id}`, esc(g.id), g.id === p.vem,
+      p.val.includes(g.id) ? ` data-vem="${esc(g.id)}" aria-label="${esc(g.namn || g.id)}"` : null, g.inne ? ' inne' : '')).join('') + '</span></span>' : '';
     return '<span class="marks"></span>' +
       `<span class="band"><small>MATCHFIXARNA · TIPSKUPONG</small><b>${nr ? `Kupong ${nr}` : 'Kupong'}</b></span>` +
       `<span class="sub"><i>${esc((rd && rd.name) || '')}</i><span>${rows.length} matcher</span></span>` +
       `<span class="grid"><span><span class="hd"><span></span><span>MATCH</span><span>1</span><span>X</span><span>2</span></span>${list}</span>` +
       `<span class="side"><span><span>Spelstopp</span><b>${first ? `${wd(new Date(first))} ${hm(new Date(first))}` : '–'}</b></span>` +
-      `<span><span>Insats</span><b>äran</b></span>${who != null ? `<span><span>Inlämnade</span><b>${who} av ${rd.gang.length}</b></span>` : ''}</span></span>` +
-      '<span class="code"></span><span class="fine"><span>Kupongen gäller först när den är inlämnad.</span><span>Ej giltig som kvitto</span></span><span class="pencil"></span>';
+      `<span><span>Insats</span><b>äran</b></span>${who != null ? `<span><span>Inlämnade</span><b>${who} av ${rd.gang.length}</b></span>` : ''}` +
+      (own ? `<span><span>Tippat</span><b data-tippat>${order.filter((x) => mine[x.id]).length}/${order.length}</b></span>${vem}` : '') + '</span></span>' +
+      '<span class="code"></span><span class="fine"><span>Kupongen gäller först när den är inlämnad.</span><span>Ej giltig som kvitto</span></span>' +
+      (own && p.inne ? '<span class="stampel">Inlämnad</span>' : '') + `<span class="pencil" style="${penStyle(PEN_PULT)}"><i></i></span>`;
   }
 
   function receiptHtml(rd, nr) {
@@ -818,7 +866,8 @@ ${closeHtml()}
     const nr = rd && !rd.next && rd.ids.length && typeof couponNumber === 'function' ? couponNumber(rd.ids) : null;
     const set = (id, html) => { const e = document.getElementById(id); if (e && e.innerHTML !== html) e.innerHTML = html; };
     set('rum-ttx', ttx(rows, t, R.sub || 0));
-    set('rum-kupong', couponHtml(rd, rows));
+    const p = pult(rd);
+    set('rum-kupong', couponHtml(rd, rows, p));
     set('rum-kvitto', receiptHtml(rd, nr));
     const term = R.el.querySelectorAll('#rum-term text');
     const gang = (rd && rd.gang) || [];
@@ -828,7 +877,7 @@ ${closeHtml()}
     term.forEach((e, i) => { e.textContent = lines[i]; });
     const started = rows.length && Math.min(...rows.map((x) => Date.parse(x.m.kickoff))) <= t;
     const tag = document.getElementById('rum-tag');
-    if (tag) tag.textContent = started ? 'Följ kupongen' : 'Fyll i kupongen';
+    if (tag) tag.textContent = p ? p.go : started ? 'Följ kupongen' : 'Fyll i kupongen';
     // förstoringsglaset: nästa match som inte har börjat
     const next = rows.find((x) => Date.parse(x.m.kickoff) > t);
     const lupp = document.getElementById('rum-lupp');
@@ -899,8 +948,9 @@ ${closeHtml()}
   function frame() {
     const t = now();
     if (!still()) {
-      R.mx += (R.tx - R.mx) * 0.06;
-      R.my += (R.ty - R.my) * 0.06;
+      const f = R.kup ? 0.12 : 0.06;
+      R.mx += (R.tx - R.mx) * f;
+      R.my += (R.ty - R.my) * f;
     }
     setCam(R.mx, R.my);
     const on = neonOn(t);
@@ -990,6 +1040,7 @@ ${closeHtml()}
   }
 
   // Ett föremål: kameran går fram mot det en kort stund innan sidan byts.
+  // Kupongen tas i handen om den går att fylla i.
   function go(a, e) {
     const href = a.getAttribute('href');
     if (!href) return;
@@ -1001,6 +1052,10 @@ ${closeHtml()}
     if (a.id === 'rum-fb') {
       e.preventDefault();
       closeUp(true);
+      return;
+    }
+    if (a.id === 'rum-kupong' && openCoupon()) {
+      e.preventDefault();
       return;
     }
     if (calm()) return;
@@ -1063,22 +1118,322 @@ ${closeHtml()}
     else aim([800, 500], 1, [800, 500], calm() ? null : 'glid');
   }
 
+  // ---------- kupongen i handen ----------
+  //
+  // Den som inte har lämnat in fyller i kupongen på pulten här: den lyfter,
+  // vänds upp mot en och förstoras till mitten, rummet mörknar bakom och
+  // pennan följer med. Rutorna är knappar, och pennan drar krysset. Under
+  // kupongen står Lägg tillbaka och guldordet Lämna in. Samma utkast och
+  // samma inlämning som papperet under Kupong (Samtal.pult i samtal.js).
+  // Esc, K, Lägg tillbaka eller ett klick utanför lägger tillbaka den samma
+  // väg baklänges. Har man lämnat in, eller har matcherna börjat, leder
+  // kupongen till Kupong som förut.
+
+  // Läget för kupongen på pulten, om det är omgången som rummet visar.
+  function pult(rd) {
+    const p = window.Samtal && Samtal.pult ? Samtal.pult.state() : null;
+    return p && (!rd || rd.id === p.s.id) ? p : null;
+  }
+
+  // Var kupongen hamnar i handen: mitt i fönstret, så stor som får plats
+  // mellan menyn och orden under den. → förskjutningen från pulten och
+  // förstoringen i scenens mått, och rutan i fönstret.
+  function held() {
+    const k = R.k || 1;
+    const top = 84;
+    const foot = 78;
+    const z = Math.min(2.2, (innerHeight - top - foot) / (470 * k), (innerWidth * 0.8) / (660 * k));
+    const cx = innerWidth / 2;
+    const cy = top + (innerHeight - top - foot) / 2;
+    return {
+      dx: (cx - (R.ox || 0)) / k - 760, dy: (cy - (R.oy || 0)) / k - 853, z,
+      box: { left: cx - 330 * z * k, top: cy - 235 * z * k, width: 660 * z * k, height: 470 * z * k },
+    };
+  }
+
+  // Vägen från pulten till handen: kupongen lossnar och lyfter, vänds upp
+  // mot betraktaren, svänger en aning förbi och stannar.
+  function handFrames(h) {
+    const T = (dx, dy, z, rx, rz, s) => `translate(${r1(dx)}px, ${r1(dy)}px) perspective(1300px) translateZ(${z}px) rotateX(${rx}deg) rotateZ(${rz}deg) scale(${s.toFixed(4)})`;
+    const glow = (a, drop) => `0 0 0 3px rgba(240, 214, 153, ${a}), 0 0 80px rgba(240, 214, 153, ${(0.45 * a).toFixed(2)}), ${drop}`;
+    return [
+      { offset: 0, transform: T(0, 0, 0, 44, -2, 1), boxShadow: glow(1, '0 26px 34px rgba(0, 0, 0, 0.55)'), easing: 'cubic-bezier(0.3, 0, 0.5, 1)' },
+      { offset: 0.24, transform: T(-10, -80, 70, 38, -5.5, 1.03), boxShadow: glow(0.4, '0 70px 60px rgba(0, 0, 0, 0.45)'), easing: 'cubic-bezier(0.25, 0.55, 0.3, 1)' },
+      { offset: 0.84, transform: T(h.dx, h.dy + 4, 0, -4, 1, h.z * 1.006), boxShadow: glow(0, '0 40px 90px rgba(0, 0, 0, 0.6)'), easing: 'ease-in-out' },
+      { offset: 1, transform: T(h.dx, h.dy, 0, 0, 0, h.z), boxShadow: glow(0, '0 34px 80px rgba(0, 0, 0, 0.6)') },
+    ];
+  }
+
+  // Kupongen i handen utan rörelser.
+  function inHand(el, h) {
+    const { transform, boxShadow } = handFrames(h)[3];
+    Object.assign(el.style, { transform, boxShadow });
+  }
+
+  // Orden under kupongen, i fönstrets mått.
+  function placeRow(h) {
+    const s = R.kup.rad.style;
+    s.left = `${r1(h.box.left)}px`;
+    s.width = `${r1(h.box.width)}px`;
+    s.top = `${r1(h.box.top + h.box.height + 20)}px`;
+  }
+
+  function openCoupon() {
+    if (R.kup) return true;
+    const p = pult();
+    if (!p || !p.fyll || !R.el) return false;
+    zoomTv(false);
+    if (R.nara) closeUp(false);
+    const desk = document.getElementById('rum-kupong');
+    const rd = { id: p.s.id, ids: p.s.matcher.map((x) => String(x.id)), gang: p.s.gang, name: (window.Samtal && Samtal.name()) || null };
+    const nr = typeof couponNumber === 'function' ? couponNumber(rd.ids) : null;
+    desk.parentElement.insertAdjacentHTML('beforeend', '<div class="rum-dimma" id="rum-dimma"></div>' +
+      `<div class="rum-flat rum-kup rum-handen" id="rum-handen" role="dialog" aria-modal="true" aria-label="${nr ? `Kupong ${nr}` : 'Kupong'}" tabindex="-1">` +
+      `${couponHtml(rd, roundRows(rd), p, true)}</div>`);
+    R.el.insertAdjacentHTML('beforeend', '<div class="rum-hand" id="rum-hand"><button type="button" class="bla" data-tillbaka>Lägg tillbaka</button>' +
+      '<p class="msg" role="status"></p><button type="button" class="guld" data-lamna>Lämna in</button></div>');
+    const el = document.getElementById('rum-handen');
+    const k = R.kup = { el, dim: document.getElementById('rum-dimma'), rad: document.getElementById('rum-hand'), pen: el.querySelector('.pencil'), at: PEN_PULT, desk };
+    k.msg = k.rad.querySelector('.msg');
+    k.go = k.rad.querySelector('[data-lamna]');
+    desk.style.visibility = 'hidden';
+    R.el.classList.add('i-handen');
+    // kameran ställer sig rakt framför, så att kupongen står rakt i handen
+    R.tx = 0;
+    R.ty = 0;
+    const h = held();
+    placeRow(h);
+    if (calm()) {
+      setCam(0, 0);
+      inHand(el, h);
+      Object.assign(k.pen.style, penAt(PEN_VILA));
+      k.at = PEN_VILA;
+    } else {
+      k.anim = el.animate(handFrames(h), { duration: 950, fill: 'both' });
+      k.fade = k.dim.animate([{ opacity: 0 }, { opacity: 1 }], { duration: 800, easing: 'ease', fill: 'both' });
+      k.show = k.rad.animate([{ opacity: 0, transform: 'translateY(8px)' }, { opacity: 1, transform: 'none' }], { duration: 320, delay: 780, easing: 'ease-out', fill: 'both' });
+      // pennan följer med upp och rullar sedan undan till sidan
+      penGo([{ ...PEN_PULT, l: 0.15, t: 420, e: 'ease-in' }, { ...PEN_VILA, l: 0.5, t: 380, e: 'cubic-bezier(0.3, 0, 0.3, 1)' }, { ...PEN_VILA, t: 160, e: 'ease-in' }]);
+    }
+    el.focus({ preventScroll: true });
+    el.addEventListener('click', (e) => {
+      const b = e.target.closest('button.box');
+      if (!b || k.closing) return;
+      if (b.dataset.vem) choose(b);
+      else tick(b);
+    });
+    k.rad.addEventListener('click', (e) => {
+      if (e.target.closest('[data-tillbaka]')) closeCoupon();
+      else if (e.target.closest('[data-lamna]')) handIn();
+    });
+    return true;
+  }
+
+  function closeCoupon(now = false) {
+    const k = R.kup;
+    if (!k || k.closing) return;
+    k.closing = true;
+    clearTimeout(k.idle);
+    R.el.classList.remove('i-handen');
+    const done = () => {
+      if (R.kup !== k) return;
+      R.kup = null;
+      // kupongen på pulten ritas med det som fylldes i innan den syns igen
+      if (R.on) fill();
+      k.desk.style.visibility = '';
+      k.el.remove();
+      k.dim.remove();
+      k.rad.remove();
+      if (calm()) setCam(R.mx, R.my);
+    };
+    if (now || calm() || !k.anim) {
+      done();
+      return;
+    }
+    penGo([{ ...PEN_VILA, l: 0.4, t: 240, e: 'ease-out' }, { ...PEN_PULT, l: 0.15, t: 380, e: 'cubic-bezier(0.4, 0, 0.6, 1)' }, { ...PEN_PULT, t: 200, e: 'ease-in' }]);
+    k.anim.reverse();
+    k.anim.updatePlaybackRate(-1.15);
+    k.fade.reverse();
+    k.show.reverse();
+    k.anim.finished.then(done, done);
+  }
+
+  // Pennan går genom punkterna – t = millisekunder dit, e = takten – från
+  // där den är just nu.
+  function penGo(path) {
+    const k = R.kup;
+    for (const a of k.pen.getAnimations()) {
+      a.commitStyles();
+      a.cancel();
+    }
+    const total = path.reduce((s, p) => s + p.t, 0);
+    let acc = 0;
+    const frames = [{ offset: 0, transform: k.pen.style.transform, filter: k.pen.style.filter, easing: path[0].e || 'ease-in-out' }];
+    path.forEach((p, i) => {
+      acc += p.t;
+      frames.push({ offset: acc / total, ...penAt(p), easing: (path[i + 1] && path[i + 1].e) || 'linear' });
+    });
+    k.at = path[path.length - 1];
+    return k.pen.animate(frames, { duration: total, fill: 'forwards' });
+  }
+
+  // Rutans läge på kupongen, i kupongens egna mått.
+  function spot(el) {
+    let x = 0;
+    let y = 0;
+    for (let e = el; e && e !== R.kup.el; e = e.offsetParent) {
+      x += e.offsetLeft;
+      y += e.offsetTop;
+    }
+    return { x, y };
+  }
+
+  // Pennan drar krysset i rutan: ner, ett streck, upp och över, ett streck
+  // till, och lyfter. Står den still en stund lägger den sig vid sidan igen.
+  function drawCross(box, key) {
+    const k = R.kup;
+    box.insertAdjacentHTML('beforeend', crossSvg(key));
+    if (calm()) return;
+    const svg = box.lastElementChild;
+    const o = spot(box);
+    const [s1, s2] = strokes(key);
+    const at = (pt, l, t, e) => ({ x: o.x + pt[0], y: o.y + pt[1], a: PEN_SKRIV, l, t, e });
+    const travel = Math.round(Math.min(340, Math.max(150, Math.hypot(o.x - k.at.x, o.y - k.at.y) * 0.9)));
+    penGo([
+      at(s1.a, 0.7, travel, 'cubic-bezier(0.4, 0, 0.2, 1)'), at(s1.a, 0, 50, 'ease-in'), at(s1.b, 0, 120, 'cubic-bezier(0.3, 0, 0.6, 1)'),
+      at(s1.b, 0.45, 50, 'ease-out'), at(s2.a, 0.45, 90, 'ease-in-out'), at(s2.a, 0, 45, 'ease-in'), at(s2.b, 0, 120, 'cubic-bezier(0.3, 0, 0.6, 1)'),
+      at([s2.b[0] + 12, s2.b[1] + 10], 0.8, 220, 'ease-out'),
+    ]);
+    const [p1, p2] = svg.querySelectorAll('path');
+    const line = (p, delay) => p.animate([{ strokeDashoffset: 1.05 }, { strokeDashoffset: 0 }], { duration: 120, delay, easing: 'cubic-bezier(0.3, 0, 0.6, 1)', fill: 'backwards' });
+    line(p1, travel + 50);
+    line(p2, travel + 50 + 120 + 50 + 90 + 45);
+    clearTimeout(k.idle);
+    k.idle = setTimeout(() => {
+      if (R.kup === k && !k.closing) penGo([{ ...PEN_VILA, l: 0.4, t: 480, e: 'cubic-bezier(0.4, 0, 0.3, 1)' }, { ...PEN_VILA, t: 160, e: 'ease-in' }]);
+    }, 1800);
+  }
+
+  // Ett kryss som tas bort suddas ut.
+  function eraseCross(box) {
+    for (const svg of box.querySelectorAll('.kryss:not(.ut)')) {
+      svg.classList.add('ut');
+      if (calm()) svg.remove();
+      else svg.animate([{ opacity: 1 }, { opacity: 0, filter: 'blur(1.5px)' }], { duration: 240, easing: 'ease-out', fill: 'forwards' }).finished.then(() => svg.remove(), () => {});
+    }
+  }
+
+  // En ruta för ett tecken: kryssas i eller ur, och utkastet sparas.
+  function tick(b) {
+    const k = R.kup;
+    const row = b.closest('.row');
+    const on = b.getAttribute('aria-pressed') !== 'true';
+    b.setAttribute('aria-pressed', String(on));
+    b.classList.toggle('x', on);
+    if (on) drawCross(b, `${row.dataset.id}${b.dataset.s}`);
+    else eraseCross(b);
+    const sign = SIGNS.filter((s) => row.querySelector(`[data-s="${s}"]`).getAttribute('aria-pressed') === 'true').join('');
+    row.classList.toggle('tom', !sign);
+    Samtal.pult.tippa(row.dataset.id, sign);
+    const rows = [...k.el.querySelectorAll('.row')];
+    const n = rows.filter((r) => !r.classList.contains('tom')).length;
+    const f = k.el.querySelector('[data-tippat]');
+    if (f) f.textContent = `${n}/${rows.length}`;
+    if (n === rows.length) k.el.classList.remove('need');
+    k.msg.textContent = '';
+  }
+
+  // Tippare: du kryssar för vem du är.
+  function choose(b) {
+    const k = R.kup;
+    if (b.getAttribute('aria-pressed') === 'true' || !Samtal.pult.vem(b.dataset.vem)) return;
+    for (const o of k.el.querySelectorAll('button[data-vem][aria-pressed="true"]')) {
+      o.setAttribute('aria-pressed', 'false');
+      o.classList.remove('x');
+      eraseCross(o);
+    }
+    b.setAttribute('aria-pressed', 'true');
+    b.classList.add('x');
+    drawCross(b, `vem${b.dataset.vem}`);
+    k.el.classList.remove('need-vem');
+    k.msg.textContent = '';
+  }
+
+  // Lämna in: som på papperet under Kupong. Stämpeln slår i, och kupongen
+  // läggs tillbaka på pulten.
+  async function handIn() {
+    const k = R.kup;
+    if (!k || k.busy || k.closing) return;
+    const p = pult();
+    if (!p || !p.fyll) {
+      k.msg.textContent = 'Kupongen går inte att lämna in längre.';
+      return;
+    }
+    if (!p.vem) {
+      k.el.classList.add('need-vem');
+      k.msg.textContent = 'Vem är du?';
+      return;
+    }
+    const left = p.s.matcher.filter((x) => !p.tecken[x.id]).length;
+    if (left) {
+      k.el.classList.add('need');
+      k.msg.textContent = `${left === 1 ? 'En match saknar' : `${left} matcher saknar`} tecken.`;
+      return;
+    }
+    k.busy = true;
+    k.go.disabled = true;
+    k.msg.textContent = 'Lämnar in …';
+    const out = await Samtal.pult.lamnaIn();
+    if (R.kup !== k) return;
+    k.busy = false;
+    k.go.disabled = false;
+    if (!out.ok) {
+      k.msg.textContent = out.error || 'Ingen kontakt med servern.';
+      return;
+    }
+    k.msg.textContent = '';
+    k.go.disabled = true;
+    k.pen.insertAdjacentHTML('beforebegin', '<span class="stampel">Inlämnad</span>');
+    if (!calm()) {
+      k.pen.previousElementSibling.animate([
+        { transform: 'rotate(-8deg) scale(1.9)', opacity: 0 },
+        { transform: 'rotate(-8deg) scale(0.95)', opacity: 0.9, offset: 0.75 },
+        { transform: 'rotate(-8deg) scale(1)', opacity: 0.82 },
+      ], { duration: 260, easing: 'cubic-bezier(0.5, 0, 0.9, 0.5)' });
+    }
+    // kvittot och terminalen visar att du är inne
+    if (typeof tpLoad === 'function') tpLoad(true).then(() => { if (R.on) fill(); });
+    setTimeout(() => { if (R.kup === k) closeCoupon(); }, calm() ? 700 : 1100);
+  }
+
   function wire() {
     const el = R.el;
     el.addEventListener('mousemove', (e) => {
+      if (R.kup) return;
       R.tx = (e.clientX / innerWidth) * 2 - 1;
       R.ty = (e.clientY / innerHeight) * 2 - 1;
     });
     el.addEventListener('mouseover', (e) => {
-      const a = e.target.closest('.rum-sak, .rum-tag, .rum-guld');
+      const a = !R.kup && e.target.closest('.rum-sak, .rum-tag, .rum-guld');
       hot(a ? a.dataset.nav : null);
     });
     el.addEventListener('click', (e) => {
+      // kupongen i handen: ett klick utanför den lägger tillbaka den
+      if (R.kup) {
+        if (e.target.closest('#rum-handen, #rum-hand, .rum-hdr')) return;
+        e.preventDefault();
+        closeCoupon();
+        return;
+      }
       const ttxLink = e.target.closest('.ttx .fast a');
       if (ttxLink) return;
       if (R.nara) {
         // i närbilden leder raderna och guldordet vidare; utanför tavlan tillbaka
         if (!e.target.closest('#rum-fbn, .rum-hdr, .rum-ft')) closeUp(false);
+        return;
+      }
+      if (e.target.closest('.rum-tag') && openCoupon()) {
+        e.preventDefault();
         return;
       }
       const a = e.target.closest('.rum-sak');
@@ -1088,8 +1443,11 @@ ${closeHtml()}
     document.addEventListener('keydown', (e) => {
       if (!R.on || e.metaKey || e.ctrlKey || e.altKey || /input|textarea|select/i.test(e.target.tagName) || document.querySelector('dialog[open]')) return;
       const k = e.key.toLowerCase();
-      if (k === 'k') location.hash = 'kupong';
-      else if (k === 't') zoomTv(!R.zoom);
+      if (R.kup) {
+        if (k === 'k' || k === 'escape') closeCoupon();
+      } else if (k === 'k') {
+        if (!openCoupon()) location.hash = 'kupong';
+      } else if (k === 't') zoomTv(!R.zoom);
       else if (k === 'escape' && R.nara) closeUp(false);
       else if (k === 'escape' && R.zoom) zoomTv(false);
     });
@@ -1106,11 +1464,21 @@ ${closeHtml()}
       return;
     }
     const s = Math.max(innerWidth / W, innerHeight / H);
+    R.k = s;
+    R.ox = (innerWidth - W * s) / 2;
+    R.oy = (innerHeight - H * s) / 2;
     const st = R.el.querySelector('.rum-stage');
-    st.style.transform = `translate(${((innerWidth - W * s) / 2).toFixed(1)}px, ${((innerHeight - H * s) / 2).toFixed(1)}px) scale(${s.toFixed(4)})`;
+    st.style.transform = `translate(${R.ox.toFixed(1)}px, ${R.oy.toFixed(1)}px) scale(${s.toFixed(4)})`;
     // närbilden av tavlan ryms mellan menyn och foten
     const n = document.getElementById('rum-fbn');
     if (n && n.offsetWidth) n.style.setProperty('--k', Math.min((innerWidth - 120) / n.offsetWidth, (innerHeight - 190) / n.offsetHeight, 1.3).toFixed(3));
+    // kupongen i handen står kvar mitt i fönstret
+    if (R.kup && !R.kup.closing) {
+      const h = held();
+      placeRow(h);
+      if (R.kup.anim) R.kup.anim.effect.setKeyframes(handFrames(h));
+      else inHand(R.kup.el, h);
+    }
   }
 
   // ---------- in och ut ----------
@@ -1150,6 +1518,7 @@ ${closeHtml()}
 
   function hide() {
     if (!R.on) return;
+    closeCoupon(true);
     R.on = false;
     cancelAnimationFrame(R.raf);
     clearInterval(R.poll);

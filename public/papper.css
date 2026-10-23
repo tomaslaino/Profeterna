@@ -1,8 +1,11 @@
 /* Papperskupongen (papper.js): omgångens kupong som en ifylld tipskupong.
-   Krämvitt papper med perforerade kanter och synkmarkeringar längs vänster
-   kant, tryck i terrakotta, kryss med blå kulspetspenna, utfallet inringat
-   med grönt (rätt) eller rött (fel), betyget i rött och det som pågår i
-   blyerts med märkpenna över. Laddas efter kupong.css. */
+   Krämvitt papper med synkmarkeringar längs vänster kant och ett band i
+   terrakotta överst, som kupongen på pulten i rummet (rum.css .rum-kup):
+   tunna linjer, smala rutor, lagen i antikva och fälten som rader med
+   prickad linje. Kryss med blå kulspetspenna, utfallet inringat med grönt
+   (rätt) eller rött (fel), betyget i rött och det som pågår i blyerts med
+   märkpenna över. Kupongerna har klassen .pp-kup och raka kanter; betyget
+   (betyg.js) har kvar perforeringen och bården. Laddas efter kupong.css. */
 
 @import url("https://fonts.googleapis.com/css2?family=Caveat:wght@500..700&display=swap");
 
@@ -14,6 +17,12 @@
   --pp-print-line: rgba(169, 69, 43, 0.28);
   --pp-print-tint: rgba(169, 69, 43, 0.055);
   --pp-box: #fbf7ec;
+  /* kupongens band, rutornas kant, numren och linjerna mellan raderna */
+  --pp-band: #c35f36;
+  --pp-rule: #9a876a;
+  --pp-faint: #a08f74;
+  --pp-line: rgba(90, 70, 40, 0.22);
+  --pp-dots: rgba(90, 70, 40, 0.4);
   --pp-pen: #2146a6;
   --pp-ok: #17824a;
   --pp-no: #cf2a20;
@@ -38,6 +47,9 @@
     radial-gradient(circle at 50% 0, transparent var(--pp-hole), #000 calc(var(--pp-hole) + 0.5px)) 0 0 / 15px 51% repeat-x,
     radial-gradient(circle at 50% 100%, transparent var(--pp-hole), #000 calc(var(--pp-hole) + 0.5px)) 0 100% / 15px 51% repeat-x;
 }
+/* kupongerna: raka kanter, och det som når utanför papperet klipps som av
+   perforeringen */
+.pp.pp-kup { -webkit-mask: none; mask: none; overflow: clip; }
 /* skuggan följer de perforerade kanterna */
 .pp-wrap {
   max-width: 800px;
@@ -57,6 +69,24 @@
 
 /* ---------- huvudet ---------- */
 
+/* bandet överst (Papper.banner), från kant till kant: marginalerna tar
+   bort papperets luft runt det, i varje storlek nedan */
+.pp-banner {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+  min-height: 54px;
+  margin: -30px -30px 0 -54px;
+  padding: 0 30px 0 54px;
+  color: var(--pp-paper);
+  background: var(--pp-grain), var(--pp-band);
+}
+.pp-banner span { font-size: 12px; font-weight: 700; letter-spacing: 0.3em; text-transform: uppercase; }
+.pp-banner i { font-style: normal; }
+.pp-banner b { font-family: var(--display); font-size: 30px; font-weight: 800; line-height: 1; letter-spacing: -0.01em; white-space: nowrap; }
+.pp-fill > .pp-banner { margin-top: -26px; }
+
 .pp-head {
   display: grid;
   grid-template-columns: minmax(0, 1fr) auto;
@@ -64,6 +94,8 @@
   align-items: center;
   padding-bottom: 16px;
 }
+.pp-kup .pp-head { padding: 18px 0 14px; }
+.pp-kup .pp-head .pp-title { margin-top: 0; font-size: clamp(28px, 4.5vw, 36px); font-weight: 600; }
 .pp-head > p, .pp-head > h2 { grid-column: 1; }
 .pp-brand {
   display: flex;
@@ -146,17 +178,21 @@
   stroke-linecap: round;
 }
 .pp-gring path { vector-effect: non-scaling-stroke; }
-.pp-stop {
-  display: grid;
-  gap: 2px;
-  padding: 9px 16px 10px;
-  text-align: center;
-  border: 1.5px solid var(--pp-print);
-  border-radius: 4px;
-  background: var(--pp-box);
+/* spelstoppet och fälten i foten: en rad med prickad linje, som i
+   blankettens marginal */
+.pp-stop, .pp-field {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 18px;
+  padding: 3px 0 2px;
+  font-size: 13px;
+  line-height: 1.5;
+  color: var(--pp-ink-soft);
+  border-bottom: 1px dotted var(--pp-dots);
 }
-.pp-stop span { font-size: 10px; font-weight: 800; letter-spacing: 0.18em; text-transform: uppercase; color: var(--pp-print); }
-.pp-stop b { font-family: var(--display); font-size: 21px; font-weight: 700; }
+.pp-stop { min-width: 200px; }
+.pp-stop b, .pp-field b { font-family: var(--display); font-size: 16px; font-weight: 700; color: var(--pp-ink); font-variant-numeric: tabular-nums; white-space: nowrap; }
 
 /* meanderbården under huvudet */
 .pp-band {
@@ -175,39 +211,40 @@
   align-items: center;
   padding-inline: 8px 4px;
 }
+/* rubrikerna över raderna, i svagt tryck */
 .pp-cols {
-  padding-block: 10px 4px;
-  font-size: 10px;
-  font-weight: 800;
+  padding-block: 4px;
+  font-size: 10.5px;
+  font-weight: 700;
   letter-spacing: 0.16em;
   text-transform: uppercase;
-  color: var(--pp-print);
+  color: var(--pp-faint);
+  border-bottom: 1px solid var(--pp-line);
 }
 .pp-cols > :nth-child(4) { text-align: center; }
 .pp-cols-s { display: flex; gap: 8px; }
-.pp-cols-s b { width: 30px; text-align: center; font-family: var(--display); font-size: 15px; letter-spacing: 0; }
+.pp-cols-s b { width: 40px; text-align: center; font-family: var(--display); font-size: 15px; font-weight: 600; letter-spacing: 0; }
 
 .pp-day {
-  margin: 10px 0 0;
-  padding: 6px 8px 5px;
+  margin: 12px 0 0;
+  padding: 4px 8px 3px;
   font-size: 10.5px;
-  font-weight: 800;
+  font-weight: 700;
   letter-spacing: 0.16em;
   text-transform: uppercase;
-  color: var(--pp-print);
-  border-bottom: 1.5px solid var(--pp-print);
+  color: var(--pp-faint);
+  border-bottom: 1px solid var(--pp-line);
 }
 
 .pp-row {
   position: relative;
-  min-height: 58px;
-  padding-block: 8px 7px;
+  min-height: 54px;
+  padding-block: 7px 6px;
   color: var(--pp-ink);
   text-decoration: none;
-  border-bottom: 1px solid var(--pp-print-line);
+  border-bottom: 1px solid var(--pp-line);
 }
-.pp-row.alt { background: var(--pp-print-tint); }
-a.pp-row:hover { color: var(--pp-ink); background: rgba(169, 69, 43, 0.11); }
+a.pp-row:hover { color: var(--pp-ink); background: rgba(90, 70, 40, 0.06); }
 a.pp-row:focus-visible { outline: 2px solid var(--pp-pen); outline-offset: -2px; }
 /* synkmarkeringen i vänsterkanten, en per rad */
 .pp-row::before {
@@ -221,21 +258,22 @@ a.pp-row:focus-visible { outline: 2px solid var(--pp-pen); outline-offset: -2px;
   background: var(--pp-ink);
 }
 
+/* numret, tryckt svagt som på rummets kupong */
 .pp-nr {
   display: grid;
   place-items: center;
   width: 24px;
   height: 24px;
-  font-size: 12px;
+  font-family: var(--display);
+  font-size: 15px;
   font-weight: 800;
   font-variant-numeric: tabular-nums;
-  color: var(--pp-paper);
-  background: var(--pp-print);
-  border-radius: 3px;
+  color: var(--pp-faint);
 }
 .pp-match { min-width: 0; }
-.pp-tm { display: block; font-size: 15px; font-weight: 650; line-height: 1.3; }
-.pp-tm .vs { color: var(--pp-ink-soft); font-weight: 400; }
+/* lagen i antikva */
+.pp-tm { display: block; font-family: var(--display); font-size: 16.5px; font-weight: 500; line-height: 1.25; }
+.pp-tm .vs { color: var(--pp-faint); font-weight: 400; }
 .pp-small { display: block; margin-top: 1px; font-size: 11.5px; color: var(--pp-ink-soft); font-variant-numeric: tabular-nums; }
 .pp-note {
   display: block;
@@ -252,23 +290,25 @@ a.pp-row:focus-visible { outline: 2px solid var(--pp-pen); outline-offset: -2px;
 .pp-cell { display: flex; flex-direction: column; align-items: center; gap: 3px; }
 .pp-cell small { font-size: 10.5px; line-height: 1; color: var(--pp-ink-soft); font-variant-numeric: tabular-nums; }
 .pp-cell small.fav { font-weight: 800; color: var(--pp-ink); }
+/* rutan: bredare än hög, med tunn kant och tecknet svagt i */
 .pp-box {
   position: relative;
   display: grid;
   place-items: center;
-  width: 30px;
-  height: 30px;
-  border: 1.5px solid var(--pp-print);
-  border-radius: 3px;
-  background: var(--pp-box);
+  width: 40px;
+  height: 26px;
+  box-sizing: border-box;
+  border: 1.4px solid var(--pp-rule);
+  border-radius: 4px;
+  background: color-mix(in srgb, var(--pp-box) 45%, transparent);
 }
 .pp-box i {
   font-family: var(--display);
-  font-size: 15px;
+  font-size: 13px;
   font-style: normal;
-  font-weight: 700;
-  color: var(--pp-print);
-  opacity: 0.45;
+  font-weight: 600;
+  color: var(--pp-faint);
+  opacity: 0.75;
 }
 .pp-x {
   position: absolute;
@@ -287,9 +327,9 @@ a.pp-row:focus-visible { outline: 2px solid var(--pp-pen); outline-offset: -2px;
   top: 50%;
   left: 50%;
   z-index: 1;
-  width: 52px;
-  height: 50px;
-  margin: -25px 0 0 -26px;
+  width: 60px;
+  height: 44px;
+  margin: -22px 0 0 -30px;
   overflow: visible;
   fill: none;
   stroke: var(--pp-no);
@@ -352,16 +392,8 @@ a.pp-row:focus-visible { outline: 2px solid var(--pp-pen); outline-offset: -2px;
 /* ---------- foten ---------- */
 
 .pp-foot { margin-top: 18px; }
-.pp-fields { display: flex; flex-wrap: wrap; gap: 10px; }
-.pp-field {
-  min-width: 86px;
-  padding: 5px 12px 6px;
-  border: 1.5px solid var(--pp-print);
-  border-radius: 3px;
-  background: var(--pp-box);
-}
-.pp-field > span { display: block; font-size: 9.5px; font-weight: 800; letter-spacing: 0.16em; text-transform: uppercase; color: var(--pp-print); }
-.pp-field b { font-family: var(--display); font-size: 21px; font-weight: 700; font-variant-numeric: tabular-nums; }
+/* fälten (.pp-field ovan) i lika breda spalter */
+.pp-fields { display: grid; grid-template-columns: repeat(auto-fill, minmax(170px, 1fr)); gap: 2px 28px; }
 /* vad gängets kupong kostar per person, bredvid priset (spela.js) */
 .pp-field b small { margin-left: 6px; font-family: var(--sans); font-size: 11px; font-weight: 700; letter-spacing: 0.02em; color: var(--pp-ink-soft); white-space: nowrap; }
 .pp-fine { display: flex; align-items: flex-end; justify-content: space-between; gap: 18px; margin-top: 18px; }
@@ -369,7 +401,7 @@ a.pp-row:focus-visible { outline: 2px solid var(--pp-pen); outline-offset: -2px;
 .pp .kp-src .note { color: var(--pp-no); }
 .pp-code { display: grid; justify-items: center; gap: 3px; flex: none; }
 .pp-code > span { font-family: ui-monospace, "SF Mono", Menlo, monospace; font-size: 10.5px; letter-spacing: 0.18em; color: var(--pp-ink-soft); }
-.pp-bars { width: 150px; height: 30px; fill: var(--pp-ink); }
+.pp-bars { width: 150px; height: 26px; fill: var(--pp-ink); opacity: 0.8; }
 
 /* knapparna mitt ovanför kupongen */
 .pp-top { display: flex; flex-wrap: wrap; align-items: center; justify-content: center; gap: 12px; }
@@ -393,23 +425,22 @@ a.pp-row:focus-visible { outline: 2px solid var(--pp-pen); outline-offset: -2px;
    person (samtal.css) använder samma papper och fältet för anteckningen. */
 
 .pp-fill { --pp-hole: 5px; padding-top: 26px; }
-.pp-fill .pp-band { margin: 12px 0 4px; }
 
 /* rutan med tecknet, oddset under */
 .pp-fill .kp-tg { gap: 6px; }
 .pp-fill .kp-tg button {
   position: relative;
   display: grid;
-  grid-template-rows: 32px auto;
+  grid-template-rows: 26px auto;
   align-items: center;
   justify-items: center;
-  width: 36px;
+  width: 42px;
   padding: 0;
   font-family: var(--display);
-  font-size: 15px;
-  font-weight: 700;
+  font-size: 13px;
+  font-weight: 600;
   line-height: 1;
-  color: rgba(169, 69, 43, 0.5);
+  color: var(--pp-faint);
   background: none;
   border: 0;
   border-radius: 0;
@@ -421,17 +452,17 @@ a.pp-row:focus-visible { outline: 2px solid var(--pp-pen); outline-offset: -2px;
   top: 0;
   left: 50%;
   z-index: -1;
-  width: 32px;
-  height: 32px;
-  margin-left: -16px;
-  border: 1.5px solid var(--pp-print);
-  border-radius: 3px;
-  background: var(--pp-box);
+  width: 40px;
+  height: 26px;
+  margin-left: -20px;
+  border: 1.4px solid var(--pp-rule);
+  border-radius: 4px;
+  background: color-mix(in srgb, var(--pp-box) 45%, transparent);
   box-sizing: border-box;
   transition: background-color 0.12s ease;
 }
 .pp-fill .kp-tg { position: relative; z-index: 0; }
-.pp-fill .kp-tg button:hover::before { background: #f3e6cc; }
+.pp-fill .kp-tg button:hover::before { background: var(--pp-box); }
 .pp-fill .kp-tg button:focus-visible { outline: none; }
 .pp-fill .kp-tg button:focus-visible::before { box-shadow: 0 0 0 2px var(--pp-pen); }
 .pp-fill .kp-tg button small {
@@ -442,13 +473,13 @@ a.pp-row:focus-visible { outline: 2px solid var(--pp-pen); outline-offset: -2px;
   color: var(--pp-ink-soft);
   font-variant-numeric: tabular-nums;
 }
-.pp-fill .kp-tg button[aria-pressed="true"] { color: rgba(169, 69, 43, 0.5); background: none; }
+.pp-fill .kp-tg button[aria-pressed="true"] { color: var(--pp-faint); background: none; }
 .pp-fill .kp-tg button[aria-pressed="true"] small { color: var(--pp-ink); font-weight: 700; }
 /* krysset, i tre handstilar */
 .pp-fill .kp-tg button[aria-pressed="true"]::after {
   content: "";
   position: absolute;
-  top: -2px;
+  top: -5px;
   left: 50%;
   width: 36px;
   height: 36px;
@@ -487,39 +518,49 @@ a.pp-row:focus-visible { outline: 2px solid var(--pp-pen); outline-offset: -2px;
 
 @media (max-width: 640px) {
   .pp { --pp-hole: 4px; padding: 22px 12px 20px 30px; }
+  .pp-banner, .pp-fill > .pp-banner { min-height: 44px; margin: -22px -12px 0 -30px; padding: 0 12px 0 30px; }
+  .pp-banner span { font-size: 9px; letter-spacing: 0.14em; }
+  .pp-banner b { font-size: 22px; }
   .pp-wrap { margin-top: 18px; }
   .pp-head { column-gap: 10px; }
+  .pp-kup .pp-head { padding-top: 14px; }
   .pp-brand { font-size: 10px; letter-spacing: 0.16em; }
   .pp-grade { margin-right: 0; }
   .pp-gnum { padding: 10px 10px 8px 8px; }
   .pp-gnum b { font-size: 62px; }
   .pp-gnum > span { font-size: 28px; }
   .pp-grade em { font-size: 24px; }
-  .pp-stop { padding: 7px 10px 8px; }
-  .pp-stop b { font-size: 17px; }
+  .pp-stop { min-width: 0; gap: 10px; }
+  .pp-stop b { font-size: 15px; }
   .pp-cols, .pp-row { grid-template-columns: minmax(0, 1fr) auto 2.6rem 18px; column-gap: 8px; padding-inline: 4px 0; }
   .pp-nr, .pp-cols > :first-child { display: none; }
   .pp-row::before { left: -24px; width: 12px; height: 6px; margin-top: -3px; }
   .pp-fill .kp-tg { gap: 3px; }
-  .pp-fill .kp-tg button { width: 34px; }
-  .pp-tm { font-size: 13.5px; line-height: 1.25; }
+  .pp-fill .kp-tg button { width: 36px; }
+  .pp-fill .kp-tg button::before { width: 34px; margin-left: -17px; }
+  .pp-tm { font-size: 14px; line-height: 1.2; }
   /* hemmalaget och bortalaget på var sin rad */
   .pp-tm .vs { display: block; height: 0; overflow: hidden; }
   .pp-note { font-size: 17px; }
   .pp-signs, .pp-cols-s { gap: 5px; }
-  .pp-box { width: 26px; height: 26px; }
-  .pp-cols-s b { width: 26px; }
-  .pp-box i { font-size: 13px; }
+  .pp-box { width: 30px; height: 22px; }
+  .pp-cols-s b { width: 30px; }
+  .pp-box i { font-size: 12px; }
   .pp-cell small { font-size: 9.5px; }
-  .pp-ring { width: 46px; height: 44px; margin: -22px 0 0 -23px; }
+  .pp-ring { width: 50px; height: 40px; margin: -20px 0 0 -25px; }
   .pp-hand { font-size: 24px; }
   .pp-off { font-size: 16px; }
   .pp-tick { width: 20px; height: 20px; stroke-width: 3.2; }
-  .pp-field { min-width: 0; flex: 1 1 70px; padding: 4px 8px 5px; }
-  .pp-field b { font-size: 18px; }
+  .pp-fields { grid-template-columns: repeat(auto-fill, minmax(130px, 1fr)); column-gap: 18px; }
+  .pp-field { gap: 10px; }
+  .pp-field b { text-align: right; }
   .pp-field b small { display: block; margin: 1px 0 0; font-size: 10.5px; }
   .pp-fine { flex-direction: column; align-items: stretch; }
   .pp-code { justify-items: start; }
+}
+
+@media (max-width: 359px) {
+  .pp-banner i { display: none; }
 }
 
 @media (prefers-reduced-motion: reduce) {
@@ -551,16 +592,15 @@ a.pp-row:focus-visible { outline: 2px solid var(--pp-pen); outline-offset: -2px;
   max-height: calc(100vh - var(--pb-top) - 18px);
   padding: 24px 20px 20px 40px;
 }
-.pb-slip .pp-band { flex: none; margin: 12px 0 2px; }
+.pb-slip > .pp-banner { flex: none; margin: -24px -20px 0 -40px; padding: 0 20px 0 40px; }
 /* huvudet som på den färdiga kupongen: spelstoppet i hörnet */
-.pb-head { position: relative; flex: none; display: grid; grid-template-columns: minmax(0, 1fr) auto; column-gap: 14px; align-items: center; }
+.pb-head { position: relative; flex: none; display: grid; grid-template-columns: minmax(0, 1fr) auto; column-gap: 14px; align-items: center; padding: 14px 0 10px; border-bottom: 1px solid var(--pp-line); }
 .pb-head > * { grid-column: 1; }
-.pb-head > .pp-brand { grid-column: 1 / -1; }
-.pb-stop { grid-column: 2; grid-row: 2 / span 2; margin-top: 8px; padding: 7px 12px 8px; }
-.pb-stop b { min-height: 26px; font-size: 19px; white-space: nowrap; }
-.pb-stop .pb-blankline { width: 70px; height: 22px; }
-.pb-title { min-height: 34px; margin-top: 8px; font-size: 34px; }
-.pb-blankline { display: inline-block; width: 62%; height: 30px; border-bottom: 1.5px dotted var(--pp-print-line); vertical-align: bottom; }
+.pb-stop { grid-column: 2; grid-row: 1 / span 2; min-width: 170px; }
+.pb-stop b { min-height: 24px; }
+.pb-stop .pb-blankline { width: 64px; height: 18px; }
+.pb-title { min-height: 32px; margin-top: 0; font-size: 30px; font-weight: 600; }
+.pb-blankline { display: inline-block; width: 62%; height: 28px; border-bottom: 1px dotted var(--pp-dots); vertical-align: bottom; }
 .pb-count { display: inline-block; font-weight: 700; color: var(--pp-ink); }
 .pb-count.pb-bump { animation: pb-bump 0.45s ease; }
 @keyframes pb-bump { 35% { transform: scale(1.22); color: var(--pp-print); } }
@@ -576,7 +616,7 @@ a.pp-row:focus-visible { outline: 2px solid var(--pp-pen); outline-offset: -2px;
   line-height: 1.1;
   color: var(--pp-pen);
   border: 0;
-  border-bottom: 1.5px dotted var(--pp-print-line);
+  border-bottom: 1px dotted var(--pp-dots);
   border-radius: 0;
   background: transparent;
 }
@@ -594,7 +634,7 @@ a.pp-row:focus-visible { outline: 2px solid var(--pp-pen); outline-offset: -2px;
   overflow-y: auto;
   overscroll-behavior: contain;
   scrollbar-width: thin;
-  scrollbar-color: var(--pp-print-line) transparent;
+  scrollbar-color: var(--pp-dots) transparent;
 }
 .pb-rows > .pp-day:first-child { margin-top: 4px; }
 .pb-row {
@@ -605,9 +645,8 @@ a.pp-row:focus-visible { outline: 2px solid var(--pp-pen); outline-offset: -2px;
   align-items: center;
   min-height: 50px;
   padding: 6px 0 5px 6px;
-  border-bottom: 1px solid var(--pp-print-line);
+  border-bottom: 1px solid var(--pp-line);
 }
-.pb-row.alt { background: var(--pp-print-tint); }
 .pb-row::before {
   content: "";
   position: absolute;
@@ -619,7 +658,10 @@ a.pp-row:focus-visible { outline: 2px solid var(--pp-pen); outline-offset: -2px;
   background: var(--pp-ink);
 }
 .pb-match { min-width: 0; }
-.pb-row .pp-tm { font-size: 14px; line-height: 1.25; }
+.pb-row .pp-tm { font-size: 15.5px; line-height: 1.2; }
+/* spalten bredvid programmet är smal: hemmalaget och bortalaget på var sin
+   rad i stället för att namnen bryts var som helst */
+.pb-row .pp-tm .vs { display: block; height: 0; overflow: hidden; }
 .pb-row .pp-small { margin-top: 2px; }
 .pb-row .kp-tg { gap: 5px; }
 .pb-row .kp-note-in, .pb-row .pp-note { grid-column: 2 / -1; }
@@ -652,30 +694,27 @@ a.pp-row:focus-visible { outline: 2px solid var(--pp-pen); outline-offset: -2px;
 }
 /* tomma rader: en linje att skriva matchen på och tomma rutor, i samma
    spalter som de ifyllda */
-.pb-line { height: 22px; border-bottom: 1.5px dotted var(--pp-print-line); }
+.pb-line { height: 22px; border-bottom: 1px dotted var(--pp-dots); }
 /* med tecken: rutorna lika stora som knapparna, med plats för oddset under */
 .pb-signs .pb-blank .pp-signs { gap: 5px; }
-.pb-signs .pb-blank .pp-cell { width: 36px; }
-.pb-signs .pb-blank .pp-box { width: 32px; height: 32px; }
+.pb-signs .pb-blank .pp-cell { width: 42px; }
 .pb-signs .pb-blank .pp-cell::after { content: ""; height: 13px; }
 
 .pb-foot { flex: none; display: flex; flex-wrap: wrap; align-items: center; gap: 10px; margin-top: 14px; }
-.pp-fields.pb-fields { flex: 1 1 auto; gap: 8px; }
+.pp-fields.pb-fields { flex: 1 1 auto; grid-template-columns: repeat(auto-fill, minmax(120px, 1fr)); column-gap: 20px; }
 .pb-fields:empty { display: none; }
-.pb-fields .pp-field { min-width: 0; padding: 4px 10px 5px; }
-.pb-fields .pp-field b { font-size: 18px; }
-/* huvudknappen tryckt i kupongens färg */
+/* huvudknappen tryckt i bandets färg */
 .pb-foot .kp-btn.primary {
   margin-left: auto;
   padding: 10px 18px;
   color: var(--pp-paper);
-  background: var(--pp-print);
+  background: var(--pp-band);
   border-radius: 5px;
   box-shadow: 0 1px 0 rgba(0, 0, 0, 0.18), inset 0 1px 0 rgba(255, 255, 255, 0.18);
 }
 /* utan fält i foten: knappen över hela bredden */
 .pb-fields:empty + .kp-btn.primary { flex: 1 1 100%; justify-content: center; margin-left: 0; }
-.pb-foot .kp-btn.primary:hover { color: var(--pp-paper); background: #8f3a24; }
+.pb-foot .kp-btn.primary:hover { color: var(--pp-paper); background: var(--pp-print); }
 .pb-foot .kp-btn.primary:disabled { opacity: 0.55; cursor: default; }
 .pb-msg { flex: 1 1 100%; margin: 0; font-size: 12.5px; color: var(--pp-ink-soft); }
 .pb-msg:empty { display: none; }
@@ -731,14 +770,16 @@ a.pp-row:focus-visible { outline: 2px solid var(--pp-pen); outline-offset: -2px;
 @media (max-width: 899px) {
   .pb { grid-template-areas: "tools tools" "prog side"; column-gap: 14px; }
   .pp.pb-slip { --pp-hole: 4px; padding: 18px 12px 16px 28px; }
-  .pb-slip .pp-band { height: 14px; margin: 10px 0 2px; background-size: 11px 11px; }
-  .pb-title { min-height: 0; margin-top: 6px; font-size: 26px; }
+  .pb-slip > .pp-banner { min-height: 42px; margin: -18px -12px 0 -28px; padding: 0 12px 0 28px; }
+  .pb-slip > .pp-banner span { font-size: 9px; letter-spacing: 0.18em; }
+  .pb-slip > .pp-banner b { font-size: 21px; }
+  .pb-head { padding-top: 10px; }
+  .pb-title { min-height: 0; font-size: 25px; }
   .pb-blankline { height: 22px; }
   .pb-head .pp-meta { gap: 4px 10px; margin-top: 6px; }
-  .pb-stop { margin-top: 6px; padding: 5px 9px 6px; }
-  .pb-stop span { font-size: 8.5px; letter-spacing: 0.14em; }
-  .pb-stop b { min-height: 20px; font-size: 15px; }
-  .pb-stop .pb-blankline { width: 54px; height: 18px; }
+  .pb-stop { min-width: 0; gap: 10px; font-size: 12px; }
+  .pb-stop b { min-height: 20px; font-size: 14.5px; }
+  .pb-stop .pb-blankline { width: 54px; height: 16px; }
   .pb-name { flex-basis: 100%; max-width: none; font-size: 21px; }
   .pb-rows { margin: 0 -12px 0 -28px; padding: 0 12px 0 28px; }
   /* lagen överst, numret och rutorna under */
@@ -752,22 +793,19 @@ a.pp-row:focus-visible { outline: 2px solid var(--pp-pen); outline-offset: -2px;
   }
   .pb-row::before { top: 16px; left: -21px; width: 11px; height: 5px; margin-top: 0; }
   .pb-match, .pb-line { grid-area: m; }
-  .pb-row .pp-nr { grid-area: n; display: grid; width: 20px; height: 20px; font-size: 11px; }
+  .pb-row .pp-nr { grid-area: n; display: grid; width: 20px; height: 20px; font-size: 13px; }
   .pb-signs .pb-row .pp-nr { align-self: start; margin-top: 6px; }
-  .pb-row .pp-tm { font-size: 13px; }
-  /* hemmalaget och bortalaget på var sin rad */
-  .pb-row .pp-tm .vs { display: block; height: 0; overflow: hidden; }
+  .pb-row .pp-tm { font-size: 14.5px; }
   .pb-row .pp-small { font-size: 10.5px; }
   .pb-drop { grid-area: d; align-self: start; }
   .pb-row .kp-tg, .pb-row .pp-signs { grid-area: s; justify-self: start; }
   .pb-row .kp-note-in, .pb-row .pp-note { grid-column: 1 / -1; }
   .pb-row .kp-note-in { margin-top: 0; font-size: 18px; }
-  .pb-row .pp-box { width: 24px; height: 24px; }
+  .pb-row .pp-box { width: 32px; height: 22px; }
   .pb-row .pp-box i { font-size: 12px; }
   .pb-foot { gap: 8px; margin-top: 12px; }
-  .pb-fields .pp-field { flex: 1 1 0; padding: 3px 7px 4px; }
-  .pb-fields .pp-field > span { font-size: 8.5px; letter-spacing: 0.12em; }
-  .pb-fields .pp-field b { font-size: 16px; }
+  .pb-fields .pp-field { gap: 8px; font-size: 12px; }
+  .pb-fields .pp-field b { font-size: 14.5px; }
   .pb-foot .kp-btn.primary { flex: 1 1 100%; justify-content: center; margin-left: 0; padding: 10px 12px; }
   .pb-drop { opacity: 0.75; }
   .pb-tick { width: 28px; height: 28px; }
@@ -814,7 +852,7 @@ a.pp-row:focus-visible { outline: 2px solid var(--pp-pen); outline-offset: -2px;
     mask: radial-gradient(circle at 50% 0, transparent var(--pp-hole), #000 calc(var(--pp-hole) + 0.5px)) 0 0 / 15px 100% repeat-x;
   }
   .pb:not(.open) .pb-head,
-  .pb:not(.open) .pb-slip > .pp-band,
+  .pb:not(.open) .pb-slip > .pp-banner,
   .pb:not(.open) .pb-rows,
   .pb:not(.open) .pb-fields { display: none; }
   .pb:not(.open) .pb-foot { display: contents; }
@@ -859,7 +897,7 @@ a.pp-row:focus-visible { outline: 2px solid var(--pp-pen); outline-offset: -2px;
     border-radius: 2px;
     box-sizing: border-box;
   }
-  .pb-pips i.on { border-color: var(--pp-print); background: var(--pp-print); }
+  .pb-pips i.on { border-color: var(--pp-band); background: var(--pp-band); }
   .pb-pips i.need { border-color: var(--pp-no); background: var(--pp-box); }
   .pb-pips i.locked { opacity: 0.55; }
   .pb-signs .pb-pips i { flex-basis: 22px; min-width: 15px; }
@@ -898,13 +936,14 @@ a.pp-row:focus-visible { outline: 2px solid var(--pp-pen); outline-offset: -2px;
   }
   .pb.open .pb-peek-n, .pb.open .pb-pips { display: none; }
   .pb.open .pb-chev { width: 24px; height: 24px; transform: rotate(180deg); }
-  .pb.open .pp.pb-slip { padding-top: 16px; }
-  .pb-head { padding-right: 36px; }
-  .pb-head .pp-brand { font-size: 10px; letter-spacing: 0.16em; }
-  .pb-title { min-height: 0; margin-top: 4px; font-size: 23px; }
+  .pb.open .pp.pb-slip { padding-top: 16px; -webkit-mask: none; mask: none; }
+  /* bandet under pilen */
+  .pb.open .pb-slip > .pp-banner { min-height: 48px; margin: -16px -12px 0 -30px; padding: 0 58px 0 30px; }
+  .pb.open .pb-slip > .pp-banner i { display: none; }
+  .pb.open .pb-chev { stroke: var(--pp-paper); }
+  .pb-title { min-height: 0; font-size: 23px; }
   .pb-head .pp-meta { margin-top: 2px; }
   .pb-stop { display: none; }
-  .pb-slip .pp-band { height: 13px; margin: 8px 0 2px; background-size: 10px 10px; }
   /* raderna och väntat bredvid knappen */
   .pb.open .pb-foot { flex-wrap: wrap; }
   .pb.open .pp-fields.pb-fields { flex: none; }
@@ -923,15 +962,15 @@ a.pp-row:focus-visible { outline: 2px solid var(--pp-pen); outline-offset: -2px;
   }
   .pb-row .pp-nr, .pb-signs .pb-row .pp-nr { align-self: center; margin-top: 0; }
   .pb-row::before { top: 50%; left: -23px; width: 11px; height: 5px; margin-top: -2.5px; }
-  .pb-row .pp-tm { font-size: 13.5px; }
+  .pb-row .pp-tm { font-size: 14.5px; }
   .pb-row .kp-tg, .pb-row .pp-signs { justify-self: end; }
   .pb-drop { align-self: center; width: 28px; height: 28px; }
   .pb-row .kp-note-in, .pb-row .pp-note { grid-column: 2 / -1; }
   .pb-row .kp-note-in { margin: 2px 0 2px; }
   .pb-line { align-self: center; }
   .pb-row .kp-tg { gap: 4px; }
-  .pb-row .pp-box { width: 26px; height: 26px; }
-  .pb-row .pp-box i { font-size: 13px; }
+  .pb-row .pp-box { width: 32px; height: 24px; }
+  .pb-row .pp-box i { font-size: 12px; }
   .pb-foot .kp-btn.primary { padding: 12px; font-size: 15px; }
 }
 @media (max-width: 360px) {

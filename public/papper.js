@@ -113,6 +113,13 @@
 
   // ---------- huvudet ----------
 
+  // Bandet överst, tryckt i terrakotta som på rummets kupong (rum.js), med
+  // kupongens nummer till höger. nr: ' 1', ' 2' … eller tomt. I de smalaste
+  // telefonerna står bara Matchfixarna.
+  function banner(nr = '') {
+    return `<p class="pp-banner"><span>Matchfixarna<i> · Tipskupong</i></span><b>Kupong${nr}</b></p>`;
+  }
+
   function grade(c, g) {
     if (!g.started) {
       return `<div class="pp-stop"><span>Spelstopp</span><b>${esc(fWeekdayTime.format(new Date(g.first)))}</b></div>`;
@@ -128,8 +135,7 @@
     const stamp = c.pending ? 'Väntar på GitHub' : g.done && !g.hidden ? 'Rättad' : '';
     // Kupongens nummer (kupong.js) i märket: Kupong 1, Kupong 2 …
     const nr = typeof couponNumber === 'function' ? ` ${couponNumber(c.matches.map((x) => x.id))}` : '';
-    return '<div class="pp-head">' +
-      `<p class="pp-brand"><img src="logo.svg" alt="" width="20" height="20">Matchfixarna<span>Kupong${nr}</span></p>` +
+    return banner(nr) + '<div class="pp-head">' +
       `<h2 class="pp-title">${esc(dateRange(g.first, g.last))}</h2>` +
       '<p class="pp-meta">' +
       (c.name ? `<span class="pp-name">${esc(c.name)}</span>` : '') +
@@ -174,7 +180,7 @@
     const small = r.m ? `${esc((weekday ? fWeekdayTime : fTime).format(new Date(r.m.kickoff)))}${comp ? ` · <abbr title="${esc(comp.name)}">${esc(comp.short)}</abbr>` : ''}` : '';
     const tag = r.m ? 'a' : 'div';
     const mark = cls === 'ok' || cls === 'no' ? tick(r.id, cls === 'ok') : '';
-    return `<${tag} class="pp-row s-${cls.replace(' ', ' s-')}${i % 2 ? ' alt' : ''}"${r.m ? ` href="#match/${esc(r.id)}"` : ''}>` +
+    return `<${tag} class="pp-row s-${cls.replace(' ', ' s-')}"${r.m ? ` href="#match/${esc(r.id)}"` : ''}>` +
       `<span class="pp-nr">${i + 1}</span>` +
       '<span class="pp-match"><span class="pp-tm"><span class="pp-t">' +
       (r.m ? `${esc(r.m.home)}<span class="vs"> – </span>${esc(r.m.away)}` : esc(teamsOf(r))) + '</span></span>' +
@@ -222,8 +228,8 @@
 
   // Hela kupongen.
   function coupon(c, g) {
-    return `<div class="pp-wrap"><article class="pp${g.live ? ' is-live' : ''}" aria-label="Kupongen ${esc(dateRange(g.first, g.last))}">` +
-      head(c, g) + '<div class="pp-band" aria-hidden="true"></div>' + rows(g) + foot(c, g) + '</article></div>';
+    return `<div class="pp-wrap"><article class="pp pp-kup${g.live ? ' is-live' : ''}" aria-label="Kupongen ${esc(dateRange(g.first, g.last))}">` +
+      head(c, g) + rows(g) + foot(c, g) + '</article></div>';
   }
 
   // ---------- kupongen som växer fram ----------
@@ -255,16 +261,14 @@
   function builder({ id, list, tools = '', head = '', foot = '' }) {
     B.ids = null;
     return `<div class="pb" id="${id}"><div class="pb-tools">${tools}</div><div class="pb-prog"><div id="${list}"></div></div>` +
-      '<aside class="pb-side" aria-label="Kupongen"><div class="pp-wrap pb-wrap"><div class="pp pp-fill pb-slip">' +
+      '<aside class="pb-side" aria-label="Kupongen"><div class="pp-wrap pb-wrap"><div class="pp pp-kup pp-fill pb-slip">' +
       `<button type="button" class="pb-peek" aria-expanded="false" aria-controls="${id}-rows">` +
       '<svg class="pb-chev" viewBox="0 0 20 20" aria-hidden="true"><path d="M5 12.5l5-5 5 5"/></svg>' +
       '<span class="pb-peek-n"></span><span class="pb-pips" aria-hidden="true"></span></button>' +
-      '<div class="pb-head">' +
-      '<p class="pp-brand"><img src="logo.svg" alt="" width="20" height="20">Matchfixarna<span>Kupong</span></p>' +
+      banner() + '<div class="pb-head">' +
       '<h2 class="pp-title pb-title"></h2>' +
       `<p class="pp-meta"><span class="pb-count"></span>${head}</p>` +
       '<div class="pp-stop pb-stop"><span>Spelstopp</span><b></b></div></div>' +
-      '<div class="pp-band" aria-hidden="true"></div>' +
       `<div class="pb-rows" id="${id}-rows"></div>` +
       `<div class="pb-foot"><div class="pp-fields pb-fields"></div>${foot}</div>` +
       '</div></div></aside></div>';
@@ -374,7 +378,7 @@
       ? `<input type="text" class="kp-note-in" data-note="${esc(r.id)}" maxlength="${NOTE_MAX}" autocomplete="off"` +
         ` placeholder="Anteckning (valfritt)" aria-label="Anteckning om ${esc(label)}" value="${esc(r.note || '')}">`
       : r.note ? `<span class="pp-note">${esc(r.note)}</span>` : '';
-    return `<div class="pb-row${i % 2 ? ' alt' : ''}${r.locked ? ' locked' : ''}${fresh ? ' pb-new' : ''}${signs && !r.locked && !sign ? ' unsigned' : ''}" data-id="${esc(r.id)}">` +
+    return `<div class="pb-row${r.locked ? ' locked' : ''}${fresh ? ' pb-new' : ''}${signs && !r.locked && !sign ? ' unsigned' : ''}" data-id="${esc(r.id)}">` +
       `<span class="pp-nr">${i + 1}</span>` +
       `<span class="pb-match"><span class="pp-tm">${m ? `${esc(m.home)}<span class="vs"> – </span>${esc(m.away)}` : esc(label)}</span>` +
       `${small ? `<span class="pp-small">${small}${r.locked ? ' · har startat' : ''}</span>` : ''}</span>` +
@@ -386,7 +390,7 @@
 
   // En tom rad: numret, en linje att skriva matchen på och tomma rutor.
   function blankRow(i) {
-    return `<div class="pb-row pb-blank${i % 2 ? ' alt' : ''}" aria-hidden="true">` +
+    return `<div class="pb-row pb-blank" aria-hidden="true">` +
       `<span class="pp-nr">${i + 1}</span><span class="pb-line"></span><span class="pp-signs">` +
       SIGNS.map((s) => `<span class="pp-cell"><span class="pp-box"><i>${s}</i></span></span>`).join('') + '</span><span></span></div>';
   }
@@ -458,5 +462,5 @@
     }
   }
 
-  window.Papper = { RADER, coupon, builder, reveal, program, slip, bump, open: pull, cross, ring, tick, grade, result, foot, inDayOrder };
+  window.Papper = { RADER, coupon, builder, reveal, program, slip, bump, open: pull, banner, cross, ring, tick, grade, result, foot, inDayOrder };
 }());

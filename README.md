@@ -464,6 +464,11 @@ Utan nyckel ingen knapp.
   leder till sajtens delar, som i rummet på felixrieseberg.com. Den vanliga förstasidan finns
   kvar som *Vanlig sida* (`#hem`) och står alltid i telefonen och i smala fönster. Se
   [Tobaksaffären](#tobaksaffären).
+- **Kupongen fylls i på pulten (2026-10-23, användarens önskemål):** den som inte har lämnat
+  in tar kupongen på pulten i handen – den lyfter, vänds upp och förstoras medan rummet
+  mörknar bakom – och kryssar i rutorna med pennan, som drar varje kryss. *Lämna in* under
+  kupongen lämnar in som papperet under Kupong, och kupongen läggs tillbaka med stämpeln
+  *Inlämnad*. Se [Kupongen i handen](#kupongen-i-handen).
 - **Säsongsprognosen tas bort (2026-10-20, användarens beslut):** vyn under Tabeller och
   simuleringen i bygget (`src/season.js`, `data/season.json`) försvinner, liksom
   programmet framåt och prognosdelen i lagkortet. Tabeller visar bara tabellen, med
@@ -1727,10 +1732,13 @@ går kameran fram mot det innan sidan byts:
 - **Förstoringsglaset** på en hög FACIT (pulten, nere till vänster) → Analysera för nästa
   match i omgången som inte har börjat (`#match/<id>/analysera`; adressen blir
   `#match/<id>` och matchbladet öppnas på fliken).
-- **Kupongen, kvittot och terminalen** → Kupong. Kupongen visar omgångens matcher med
-  kryss där gängets kupong har tecken, kvittot när var och en lämnade in och terminalen hur
-  många som är inne och vem som väntas. Guldordet bredvid heter *Fyll i kupongen* (*Följ
-  kupongen* när matcherna har börjat).
+- **Kupongen, kvittot och terminalen** → Kupong. Kupongen visar omgångens matcher i
+  kupongens ordning med kryss där gängets kupong har tecken – innan den finns dina egna, med
+  ditt namn kryssat under *Tippare* och stämpeln *Inlämnad* när du har lämnat in – kvittot
+  när var och en lämnade in och terminalen hur många som är inne och vem som väntas. Har du
+  inte lämnat in tas kupongen i handen i stället (se nedan). Guldordet bredvid säger samma
+  sak som knappen i förstasidans ruta: *Fyll i kupongen*, *Fyll i resten*, *Se de andras
+  tips* eller *Följ kupongen* när matcherna har börjat.
 - **Tv:n** med text-tv (sida 331, omgångens matcher på två undersidor) zoomas in med ett
   klick eller T; färgknapparna leder till Kupong, Olympen, Tabeller och Statistik, Esc
   zoomar ut.
@@ -1741,6 +1749,14 @@ har sin loop (12–21 s) – flaskan och burken till munnen med huvudet bakåt, 
 glöden som tänds och röken som blåses ut, benen som dinglar – och huvudena nickar efter
 musen. Röken från glöden räknas för varje bloss ur var glöden var när det föddes, så att
 samma tid alltid ger samma bild. Inga riktiga märken: flaskan säger PILSNER, burken ÖL.
+Var och en bär sitt lag, med färgerna och smeknamnen men utan klubbmärken (`LAG` i
+rum-3d.js): DL en stickad halsduk i Nacionals vitt, blått och rött med BOLSO på den främre
+änden och fransar längst ner, DT ett lejonhuvud i gammal stil i kungsblått med bandet
+BLUES på underarmen som håller cigaretten (Chelsea; ett lejon, inte klubbens), och DJ en
+blåvitt randig mössa med tofs och BLÅVITT på uppviket, med solglasögonen uppskjutna på den
+(IFK Göteborg). Halsduken följer bålen, tatueringen vrids med handen och mössan följer
+huvudet; håret trycks ner under mössan och sticker ut under kanten. Porträttet i ramen tar
+med attiraljerna (DJ:s lite längre bort, så att tofsen kommer med).
 
 **Rummet rör sig också:** regnet faller utanför rutan och dörren, droppar rinner på glaset,
 neonen glappar ibland, röken ligger under lysröret, damm syns i ljuset och ett hörn på en
@@ -1757,6 +1773,34 @@ Rummet läser om datan varje minut medan det står öppet.
 CSS-animationerna står på samma tid), `?rum-mx=&rum-my=` (−1…1) kamerans läge och
 `?rum-tavla` visar fällbladstavlan på nära håll (klappret räknas från tiden 0); sidan
 sätter `data-rum-klar` på `body` när allt är ritat.
+
+### Kupongen i handen
+
+Den som inte har lämnat in (och innan första matchen startar) fyller i kupongen på pulten
+direkt i rummet: ett klick på kupongen, på guldordet eller K. Kupongen lossnar från pulten,
+lyfter, vänds upp mot betraktaren och förstoras till mitten av fönstret (så stor som får
+plats mellan menyn och orden under den), svänger en aning förbi och stannar; rummet mörknar
+bakom, kameran ställer sig rakt framför, och pennan följer med och rullar undan till
+sidokolumnen. Samma kupong som på pulten, men rutorna är knappar: ett tryck kryssar i eller
+ur (två eller tre tecken = gardering), och pennan går dit, drar det ena strecket, lyfter
+och drar det andra – ett kryss med blyerts som ser likadant ut varje gång (samma
+slumpfrö för matchen och tecknet). Står pennan still en stund lägger den sig vid sidan
+igen. Ett kryss som tas bort suddas ut. Under *Tippare* kryssar man för vem man är (DL, DT,
+DJ; den som redan har lämnat in står blekt), och *Tippat 4/13* räknar.
+
+Under kupongen står *Lägg tillbaka* och guldordet *Lämna in*. Utan namn står *Vem är du?*
+och Tippare-rutorna blir röda; saknas tecken blir rutorna i de matcherna röda och raden
+säger hur många, som på papperet under Kupong. Annars lämnas tipsen in med samma kod
+(`Samtal.pult` och `handIn` i [public/samtal.js](public/samtal.js), `POST …/samtal {gor:
+"tips"}`), stämpeln *Inlämnad* slår i och kupongen läggs tillbaka på pulten. Esc, K, *Lägg
+tillbaka* eller ett klick utanför lägger tillbaka den samma väg baklänges. Utkastet är
+detsamma som på papperet under Kupong (på enheten), så det man har kryssat står kvar på
+pulten och där; ett utkast utan namn blir ditt när du säger vem du är. Har man lämnat in,
+eller har matcherna börjat, leder kupongen till Kupong som förut. Med
+`prefers-reduced-motion` (och med `?rum-t=`) står kupongen direkt i handen och kryssen
+direkt på papperet. Rörelserna är Web Animations (`openCoupon`, `drawCross` och `penGo` i
+[public/rum.js](public/rum.js)); kupongen ligger i samma lager som pulten, så den börjar
+exakt där den låg.
 
 ## Statusmärkning
 

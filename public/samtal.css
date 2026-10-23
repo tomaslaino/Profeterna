@@ -38,10 +38,9 @@
 
 .pp-wrap.sm-wrap { max-width: 860px; margin-top: 6px; }
 .sm-sheet { --col: 114px; --fc: 26px; --sm-top: 62px; }
-.sm-sheet-head { display: flex; align-items: center; justify-content: space-between; gap: 16px; }
-.sm-sheet .pp-stop { padding: 7px 14px 8px; }
-.sm-sheet .pp-stop b { font-size: 19px; white-space: nowrap; }
-.sm-sheet .pp-band { margin: 14px 0 0; }
+/* under bandet: stämpeln till vänster, spelstoppet eller betyget i hörnet */
+.sm-sheet-head { display: flex; align-items: center; justify-content: space-between; gap: 16px; padding: 16px 0 12px; }
+.sm-sheet-head > :last-child { margin-left: auto; }
 
 /* samma ordning som i underlaget: blått, grönt, lila */
 .sm-k0 { --ink: #2146a6; }
@@ -57,9 +56,8 @@
   column-gap: 8px;
   align-items: center;
   padding: 0 6px;
-  border-bottom: 1px solid var(--pp-print-line);
+  border-bottom: 1px solid var(--pp-line);
 }
-.sm-r.alt { background: var(--pp-print-tint); }
 /* synkmarkeringen i vänsterkanten, en per rad */
 .sm-r:not(.sm-hd)::before {
   content: "";
@@ -95,7 +93,7 @@
   justify-content: center;
   gap: 7px;
   width: auto;
-  height: 40px;
+  height: 38px;
   padding: 0 6px;
 }
 .sm-bx i { flex: none; width: 0.8em; text-align: center; }
@@ -112,7 +110,7 @@
   height: calc(100% - 6px);
   margin: 3px;
   border-radius: 50%;
-  box-shadow: inset 0 0 0 1.5px color-mix(in srgb, var(--pp-print) 22%, transparent);
+  box-shadow: inset 0 0 0 1.5px color-mix(in srgb, var(--pp-rule) 40%, transparent);
 }
 
 /* dina rutor: knappar med oddset under */
@@ -201,17 +199,18 @@ button.sm-c:focus-visible .sm-bx { box-shadow: 0 0 0 2px var(--ink); }
   position: sticky;
   top: var(--sm-top);
   z-index: 3;
-  border-bottom: 1.5px solid var(--pp-print);
+  border-bottom: 1px solid var(--pp-dots);
   background: var(--pp-grain), var(--pp-paper);
 }
 .sm-hd .sm-m { display: flex; align-items: center; justify-content: space-between; gap: 12px; padding-block: 9px; }
 .sm-hd-nr, .sm-hd-l, .sm-q {
-  font-size: 10px;
-  font-weight: 800;
+  font-size: 10.5px;
+  font-weight: 700;
   letter-spacing: 0.16em;
   text-transform: uppercase;
-  color: var(--pp-print);
+  color: var(--pp-faint);
 }
+.sm-q { color: var(--pp-band); }
 /* 1 X 2 i en ruta utan kant, rakt över tecknen i rutorna */
 .sm-hd-s { display: grid; }
 .sm-hd-s .sm-bx { height: auto; background: none; border-color: transparent; }
@@ -291,7 +290,7 @@ button.sm-who:focus-visible { outline: 2px solid var(--ink); outline-offset: 1px
   z-index: 3;
   margin-top: 16px;
   padding: 12px 6px calc(12px + env(safe-area-inset-bottom));
-  border-top: 1.5px solid var(--pp-print);
+  border-top: 1px solid var(--pp-dots);
   background: var(--pp-grain), var(--pp-paper);
 }
 /* papper också i marginalen, så att radernas synkmarkeringar inte syns
@@ -313,7 +312,7 @@ button.sm-who:focus-visible { outline: 2px solid var(--ink); outline-offset: 1px
   border: 0;
   cursor: pointer;
 }
-.sm-act .sm-act-l { color: var(--pp-print); }
+.sm-act .sm-act-l { color: var(--pp-band); }
 .sm-act .sm-act-l:hover { color: var(--pp-ink); text-decoration: underline; text-underline-offset: 3px; }
 .sm-act .sm-act-l[data-sm-remove]:hover { color: var(--pp-no); }
 .sm-act-go { display: flex; flex-wrap: wrap; gap: 8px; margin-left: auto; }
@@ -321,23 +320,23 @@ button.sm-who:focus-visible { outline: 2px solid var(--ink); outline-offset: 1px
   justify-content: center;
   gap: 6px;
   padding: 9px 16px;
-  color: var(--pp-print);
+  color: var(--pp-band);
   background: var(--pp-box);
-  border: 1.5px solid var(--pp-print);
+  border: 1.5px solid var(--pp-band);
   border-radius: 5px;
   box-shadow: none;
 }
-.sm-act .kp-btn:hover { color: var(--pp-paper); background: var(--pp-print); }
-/* huvudknappen tryckt i kupongens färg, som i Ny kupong */
+.sm-act .kp-btn:hover { color: var(--pp-paper); background: var(--pp-band); }
+/* huvudknappen tryckt i bandets färg, som i Ny kupong */
 .sm-act .kp-btn.primary {
   color: var(--pp-paper);
-  background: var(--pp-print);
+  background: var(--pp-band);
   box-shadow: 0 1px 0 rgba(0, 0, 0, 0.18), inset 0 1px 0 rgba(255, 255, 255, 0.18);
 }
-.sm-act .kp-btn.primary:hover { background: #8f3a24; border-color: #8f3a24; }
+.sm-act .kp-btn.primary:hover { background: var(--pp-print); border-color: var(--pp-print); }
 .sm-act .kp-btn:disabled { opacity: 0.5; cursor: default; }
-.sm-act .kp-btn:disabled:hover { color: var(--pp-print); background: var(--pp-box); border-color: var(--pp-print); }
-.sm-act .kp-btn.primary:disabled:hover { color: var(--pp-paper); background: var(--pp-print); }
+.sm-act .kp-btn:disabled:hover { color: var(--pp-band); background: var(--pp-box); border-color: var(--pp-band); }
+.sm-act .kp-btn.primary:disabled:hover { color: var(--pp-paper); background: var(--pp-band); }
 /* sparad som den står: en grön bock, inte gråad */
 .sm-act .kp-btn.kept, .sm-act .kp-btn.kept:hover {
   opacity: 1;
@@ -350,10 +349,6 @@ button.sm-who:focus-visible { outline: 2px solid var(--ink); outline-offset: 1px
 .sm-act .sm-inne { cursor: default; }
 .sm-act .pb-msg { margin-top: 8px; }
 .sm-act-more { display: none; }
-/* smalt med fyra fält (med garderingar och odds): två och två, lika breda */
-@media (max-width: 480px) {
-  .sm-foot .pb-fields:has(> :nth-child(4)) .pp-field { flex: 1 1 calc(50% - 4px); }
-}
 /* telefonen: ⋯ och knapparna på en rad; omgångens val fälls upp ovanför */
 @media (max-width: 640px) {
   .sm-act { padding-top: 10px; }
@@ -365,14 +360,14 @@ button.sm-who:focus-visible { outline: 2px solid var(--ink); outline-offset: 1px
     width: 40px;
     height: 40px;
     padding: 0;
-    color: var(--pp-print);
+    color: var(--pp-band);
     background: var(--pp-box);
-    border: 1.5px solid var(--pp-print);
+    border: 1.5px solid var(--pp-band);
     border-radius: 5px;
     cursor: pointer;
   }
   .sm-act-more svg { width: 18px; height: 18px; fill: currentColor; }
-  .sm-act-more[aria-expanded="true"] { color: var(--pp-paper); background: var(--pp-print); }
+  .sm-act-more[aria-expanded="true"] { color: var(--pp-paper); background: var(--pp-band); }
   .sm-act-ls { display: none; order: -1; flex-basis: 100%; padding: 0 2px 2px; }
   .sm-act.more .sm-act-ls { display: flex; }
   .sm-act-go { flex: 1 1 0; flex-wrap: nowrap; min-width: 0; }
@@ -394,14 +389,16 @@ button.sm-who:focus-visible { outline: 2px solid var(--ink); outline-offset: 1px
   .sm-r:not(.sm-hd)::before { top: 17px; margin-top: 0; }
   /* lagen på en rad så långt det går */
   .sm-m .pp-tm .vs { display: inline; height: auto; }
-  .sm-sheet-head { gap: 10px; }
-  .sm-sheet .pp-stop { padding: 5px 9px 6px; }
-  .sm-sheet .pp-stop span { font-size: 8.5px; letter-spacing: 0.14em; }
-  .sm-sheet .pp-stop b { font-size: 15px; }
-  .sm-sheet .pp-band { margin-top: 10px; }
+  .sm-sheet-head { gap: 10px; padding-top: 14px; }
   /* numret – som på Stryktipset – i hörnet före lagen */
-  .sm-r:not(.sm-hd) > .pp-nr { position: absolute; top: 9px; left: 4px; display: grid; width: 20px; height: 20px; font-size: 11px; }
+  .sm-r:not(.sm-hd) > .pp-nr { position: absolute; top: 9px; left: 4px; display: grid; width: 20px; height: 20px; font-size: 14px; }
   .sm-r:not(.sm-hd) .sm-m { padding-left: 30px; }
+}
+/* surfplattan: lagen bredvid tre rutkolumner har inte plats på en rad, så
+   hemmalaget och bortalaget står på var sin rad i stället för att namnen
+   bryts var som helst */
+@media (min-width: 721px) and (max-width: 899px) {
+  .sm-m .pp-tm .vs { display: block; height: 0; overflow: hidden; }
 }
 /* i mobilen rullar loggraden undan och menyraden blir kvar */
 @media (max-width: 760px) { .sm-sheet { --sm-top: 58px; } }
@@ -409,9 +406,6 @@ button.sm-who:focus-visible { outline: 2px solid var(--ink); outline-offset: 1px
   .sm-r:not(.sm-hd)::before { left: -24px; width: 12px; height: 6px; }
 }
 @media (max-width: 440px) {
-  .sm-sheet-head .pp-brand { gap: 6px; font-size: 0; }
-  .sm-sheet-head .pp-brand img { width: 16px; height: 16px; }
-  .sm-sheet-head .pp-brand span { padding-left: 0; font-size: 9.5px; letter-spacing: 0.16em; border-left: 0; }
   .sm-sheet { --fc: 22px; }
   .sm-r .sm-bx { padding: 0 4px; }
   .sm-folk-pp { gap: 12px; }
