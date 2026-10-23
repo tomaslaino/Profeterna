@@ -1747,6 +1747,11 @@ går kameran fram mot det innan sidan byts:
   klick eller T; färgknapparna leder till Kupong, Olympen, Tabeller och Statistik, Esc
   zoomar ut.
 
+**Kupongstället** står på pulten vid fönstret (till vänster) och leder ingenstans: blanka
+kuponger med samma terrakottaband som kupongen på pulten i ett fack av plexiglas, butikens
+pennor (samma som kupongens) i ett rör bredvid och en lapp på plexit: *Pennorna är
+räknade*.
+
 **Gänget** sitter på fönsterbänken med benen hängande: DL dricker ur en flaska, DT röker
 och skrattar, DJ har en burk i ena handen och pratar med cigaretten i den andra. Var och en
 har sin loop (12–21 s) – flaskan och burken till munnen med huvudet bakåt, ett bloss med
