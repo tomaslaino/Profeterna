@@ -661,7 +661,7 @@ export async function figurer(canvas, opt = {}) {
     for (let i = 0; i < pp.count; i++) {
       const d = new THREE.Vector3(pp.getX(i), pp.getY(i), pp.getZ(i));
       const lump = 0.1 * Math.sin(d.x * 9 + 1) * Math.sin(d.y * 8 + 2) * Math.sin(d.z * 10) + 0.06 * Math.sin(d.x * 23 + d.y * 19 - d.z * 17) + 0.04 * Math.sin(d.x * 41 - d.z * 37 + d.y * 29);
-      d.multiplyScalar(13 * (1 + lump));
+      d.multiplyScalar(12 * (1 + lump));
       pp.setXYZ(i, d.x, d.y, d.z);
       const w = Math.sin(d.x * 0.9 + 0.4) * Math.sin(d.y * 1.1) * Math.sin(d.z * 0.8 + 1) > 0 ? white : blue;
       pc.push(w.r, w.g, w.b);
@@ -671,7 +671,7 @@ export async function figurer(canvas, opt = {}) {
     const yarn = knitTex('v', 6, 1);
     yarn.repeat.set(6, 4);
     const pom = mesh(pg, mat('#ffffff', { vertexColors: true, bumpMap: yarn, bumpScale: 2, roughness: 0.75, sheen: 0.8, sheenRoughness: 0.5, sheenColor: new THREE.Color('#ffffff') }), parent);
-    pom.position.copy(at(0.1, Math.PI, 1.135)).add(new THREE.Vector3(0, 9, 0));
+    pom.position.copy(at(0.1, Math.PI, 1.135)).add(new THREE.Vector3(0, 6, 0));
     // solglasögonens plats: precis ovanför uppviket fram
     return at(m.f * DEG - ch / (P.ry * 0.9) - 0.12, 0, 1.14);
   }
