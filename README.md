@@ -1713,9 +1713,10 @@ någon meny finns inte, det är föremålen som leder vidare. [public/rum.js](pu
 ritar rummet och fyller det med sajtens data, [public/rum.css](public/rum.css) ger det utseendet och
 rörelserna, [public/rum-tv.js](public/rum-tv.js) och [public/rum-tv.css](public/rum-tv.css)
 bygger tv:n (se [Tv:n](#tvn)), [public/rum-anslag.js](public/rum-anslag.js) och
-[public/rum-anslag.css](public/rum-anslag.css) anslagstavlan (se [Anslagstavlan](#anslagstavlan)), och [public/rum-3d.js](public/rum-3d.js) ritar gänget i
+[public/rum-anslag.css](public/rum-anslag.css) anslagstavlan (se [Anslagstavlan](#anslagstavlan)), och [public/rum-3d.js](public/rum-3d.js) ritar gänget och
+[public/rum-inredning.js](public/rum-inredning.js) inredningen (se *Inredningen i 3D* nedan) i
 three.js 0.160.0 (från jsdelivr, importmap i `index.html`), som hämtas först när rummet
-visas – utan WebGL eller utan nätet står rummet kvar utan gänget.
+visas – utan WebGL eller utan nätet står rummet kvar utan dem.
 
 **Föremålen** – pekar man på ett lyser det (pokalerna också), och snabbvalet
 på text-tv:n med samma ämne tänds, som när man pekar på snabbvalet med tv:n nära
@@ -1725,20 +1726,21 @@ sidan byts:
 - **Omgångens orakel** (tavlan under stationsuret) → Olympen: oraklet som regerar
   (`Kronan.holders`) som i Olympen och på förstasidans polaroid (`Kronan.scene`) – det
   urklippta fotot på marmorsockeln med lagerkransen som glimmar och strålarna som vrider
-  sig – i en förgylld ram med meanderband, rosetter i hörnen och en palmett överst. Ett
-  skimmer drar snett över guldet och glaset var elfte sekund. Mässingsskylten under säger
-  *Omgångens orakel* och hela efternamnet (delat: *Laino & Johansson*, i mindre stil).
-  Ramen, palmetten och skylten ryms mellan tavlan och disken.
+  sig – bakom glaset i en förgylld ram i 3D med pärlstav, rosetter i hörnen och en palmett
+  överst. Ett skimmer drar snett över glaset var elfte sekund. Mässingsskylten under säger
+  *Omgångens orakel* och hela efternamnet (delat: *Laino & Johansson*, i mindre stil), och
+  ramen och skylten lyser med när man pekar på dem.
 - **Pokalhyllan** (högra väggen) → Olympen: en liten pokal per vunnen omgång i vinnarens
   färg (delat = en var), ur `data/tippare.json`.
 - **Anslagstavlan** (under tv:n, i hörnet) → lapparna om omgångens lag, och därifrån
   Statistik (se [Anslagstavlan](#anslagstavlan)).
 - **Skårtavlan** (under tv:n) → Tabeller: Premier Leagues topp ur `data/teams/pl.json`
-  med vita plastbokstäver i spåren på svart filt, i en aluminiumram. Varje bokstav sitter
+  med vita plastbokstäver i spåren på svart filt, i en aluminiumram som sticker ut från
+  väggen (3D). Varje bokstav sitter
   lite snett för sig (samma frö varje gång, så att inget flyttar sig), och lådan har bara
   fyra O – sedan blir det nollor.
-- **Korktavlan** (längst till höger) → gängets kuponger i Olympen (`#olympen/kuponger`):
-  de färdigspelade kupongerna (`Historik.coupons`) rättade med röd penna, en med kaffering.
+- **Korktavlan** (längst till höger, i en träram i 3D) → gängets kuponger i Olympen
+  (`#olympen/kuponger`): de färdigspelade kupongerna (`Historik.coupons`) rättade med röd penna, en med kaffering.
   Tom tills den första är färdigspelad.
 - **Kupongen och kvittot** → Kupong. Kupongen är samma kupong som papperet under Kupong, i
   kupongens mått (660 × 470): bandet, under det stämpeln (vem omgången väntar på) och
@@ -1772,16 +1774,32 @@ sidan byts:
   till spelstoppet* under. I fönster som är minst 8:5 syns hela dörren, och där står namnet
   inte i menyns hörn; i smalare fönster skärs dörren av och namnet står kvar i hörnet.
 
-**Kupongstället** står på pulten vid fönstret (till vänster) och leder ingenstans: blanka
-kuponger med samma terrakottaband som kupongen på pulten i ett fack av plexiglas, butikens
-pennor (samma som kupongens) i ett rör bredvid och en lapp på plexit: *Pennorna är
-räknade*.
+**Kupongstället** står på pulten vid fönstret (till vänster) och leder ingenstans: ett
+fack av plexiglas, lågt fram och högt bak, med blanka kuponger (samma terrakottaband som
+kupongen på pulten) som lutar bakåt, butikens pennor i ett rör bredvid och en lapp på
+plexit: *Pennorna är räknade*.
 
-**Stationsuret** sitter på bakväggen till höger om fönstret och leder ingenstans: vit
-tavla med svarta streck och visare och en röd sekundvisare som hoppar varje sekund, med en
-mörk kant och tavlan gulnad av röken. Det går efter Stockholms tid, med samma klocka som
+**Stationsuret** sitter på bakväggen till höger om fönstret och leder ingenstans: ett
+svarvat hölje i mörk metall från väggen fram till ett glas som buktar lite, vit tavla med
+svarta streck, gulnad av röken, och visarna i var sitt lager – den röda sekundvisaren
+hoppar varje sekund. Det går efter Stockholms tid, med samma klocka som
 utsikten (`Vader.nu()` i vader.js, annars datorns klocka). Med `?rum-t` står det på den
 tid det visade först, och med `prefers-reduced-motion` syns inte sekundvisaren.
+
+**Inredningen i 3D** ([public/rum-inredning.js](public/rum-inredning.js)): lysröret i taket
+(en armatur med två rör och gavlar), neonskylten, Stängt-skylten, stationsuret,
+orakelramen med mässingsskylten, cigarettpaketen uppe på högra väggen (två hyllor med
+paket i rader om tre till sju; påhittade färger, inga märken), ramarna kring skårtavlan
+och korktavlan, barstolen framför disken (krom och röd vinyl med söm, fotring och ett lågt
+ryggstöd) och kupongstället är byggda i three.js som gänget. Neonskylten är glasrör med en
+ljus kärna som följer bokstäverna i *Tobak*, spegelvänd inifrån: texten i Fraunces kursiv
+tunnas ut till en linje och seriferna tas bort. Den hänger i kedjor från fönsterkarmen med
+en svart list och transformatorn under, och glappar som förut. Stängt-skylten hänger lite
+snett i ett snöre från en sugpropp på dörrens glas. Sakerna har framsidan där de platta
+satt och kroppen tillbaka till väggen, så att sidorna syns och skuggorna faller på väggen
+(inte på glaset och inte över anslagstavlan). Allt ritas med en och samma WebGL-duk, som
+kopieras till en vanlig duk per sak i det plan där saken står (orakelramen i länken, så
+att den lyser med); bara uret ritas om, en gång i sekunden.
 
 **Gänget** sitter på fönsterbänken med benen hängande: DL dricker ur en flaska, DT röker
 och skrattar, DJ har en burk i ena handen och pratar med cigaretten i den andra. Var och en
