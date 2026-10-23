@@ -624,7 +624,7 @@ ${closeHtml()}
     R.built = true;
     wire();
     // kort: högst elva tecken, som på fällbladstavlan
-    R.tv = window.RumTv ? RumTv.mount(el, { calm, short, kort: (n) => BOARD[n] || short(n), wd, hm }) : null;
+    R.tv = window.RumTv ? RumTv.mount(el, { calm, short, kort: (n) => BOARD[n] || short(n), wd, hm, matches: () => (state.all && state.all.matches) || [] }) : null;
     paintUte();
   }
 
@@ -1256,7 +1256,7 @@ ${closeHtml()}
 
   // snabbvalet på text-tv:n som föremålet leder till
   function hot(nav) {
-    for (const a of R.el.querySelectorAll('a[data-to]')) a.classList.toggle('hot', nav === a.dataset.to);
+    for (const a of R.el.querySelectorAll('[data-to]')) a.classList.toggle('hot', nav === a.dataset.to);
   }
 
   // Föremålets (eller måttens) mitt i scenens koordinater.

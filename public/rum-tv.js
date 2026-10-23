@@ -12,40 +12,68 @@
 // Text-tv som SVT:s: 40 × 25 tecken, rubrikraden med sidnumret, datumet och
 // klockan som tickar, ett blått band med rubriken i mosaikgrafik, text i sju
 // färger, dubbelhöga rader och snabbvalen i rött, grönt, gult och cyanblått
-// längst ner. Sida 331 har omgångens matcher (en rad per match, som leder
-// till matchens sida) och 332 och framåt en sida per match: ligan, avsparken
-// eller ställningen, oddsen och lagens rader i tabellen ur matchens fil
-// (data/match/<id>.json, hämtas när sidan visas). Byter man sida söker tv:n
-// som förr: sidnumret i rubrikraden rullar fram tills sidan kommer, och den
-// ritas uppifrån och ner. Dolda resultat (Spoiler) står som ?.
+// längst ner – samma fyra på alla sidor: Matcher (331), Tabeller (371),
+// Skyttar (381) och Innehåll (300).
 //
-// Sidbyten när tv:n är nära: sidknapparna, snabbvalen, raderna på 331,
-// piltangenterna eller tre siffror (som på fjärrkontrollen).
+//   300       innehållet: alla sidor med sina nummer
+//   331       omgångens matcher, en rad per match som leder till matchens sida
+//   332–369   en sida per match: avsparken eller ställningen, oddsen,
+//             prognosen som en stapel, lagen sida vid sida (tabelläget, formen,
+//             hemma- och bortaraden, xG, vilan) och skadorna, ur matchens fil
+//             (data/match/<id>.json)
+//   371–374   tabellerna (data/teams/<division>.json) med formen i ligan ur
+//             matcherna; 24 lag = två undersidor
+//   381–384   skytteligorna (data/players/<division>.json)
+//
+// Filerna hämtas när sidan visas första gången. Byter man sida söker tv:n som
+// förr: sidnumret i rubrikraden rullar fram tills sidan kommer, och den ritas
+// uppifrån och ner. Dolda resultat (Spoiler) står som ?, och har en division
+// dolda matcher visar tabellen och skytteligan bara det, med Visa ändå.
+//
+// Sidbyten när tv:n är nära: sidknapparna och piltangenterna (nästa sida i
+// nummerordning, undersidorna först), snabbvalen, raderna som leder vidare,
+// divisionerna i bandet eller tre siffror (som på fjärrkontrollen). På håll
+// bläddrar undersidorna själva var tolfte sekund.
 //
 // RumTv.html() → tv:n (i planet -470 i rum.js)
-// RumTv.mount(el, { calm, short, kort, wd, hm }) → { fill(rows), zoom(on) → rutans mått, key(k) }
+// RumTv.mount(el, { calm, short, kort, wd, hm, matches }) → { fill(rows), zoom(on) → rutans mått, key(k) }
 
 window.RumTv = (() => {
   const COLS = 40;
+  const INDEX = 300;
   const FIRST = 331;
-  // matcher per undersida på 331 (raderna 5–21)
+  const TAB = 371;
+  const SKY = 381;
+  // matcher per undersida på 331 (raderna 5–21), och högst så många
+  // matchsidor att de inte når tabellerna
   const PER = 17;
+  const MAXM = TAB - FIRST - 2;
+  const DIVS = [
+    { id: 'pl', short: 'PL', name: 'Premier League', size: 20 },
+    { id: 'ch', short: 'CH', name: 'Championship', size: 24 },
+    { id: 'l1', short: 'L1', name: 'League One', size: 24 },
+    { id: 'l2', short: 'L2', name: 'League Two', size: 24 },
+  ];
+  // lag per undersida: hela Premier League på en, 24 lag i två halvor
+  const perTable = (n) => (n > 20 ? Math.ceil(n / 2) : 20);
   const TZ = 'Europe/Stockholm';
 
   // ---------- text-tv ----------
 
-  // En rad: bitar [text, färg, bakgrund] efter varandra, fylld till 40 tecken.
-  // Färgerna: w vit, y gul, c cyan, g grön, r röd, m magenta, b blå.
+  // En rad: bitar [text, färg, bakgrund, sida] efter varandra, fylld till 40
+  // tecken; en bit med sida är en knapp. Färgerna: w vit, y gul, c cyan,
+  // g grön, r röd, m magenta, b blå.
   function line(...bits) {
     let n = 0;
     let html = '';
     for (const b of bits) {
       if (b == null || b === '') continue;
-      const [text, fg = 'w', bg = ''] = Array.isArray(b) ? b : [b];
+      const [text, fg = 'w', bg = '', sida] = Array.isArray(b) ? b : [b];
       const t = String(text).slice(0, COLS - n);
       if (!t) continue;
       n += t.length;
-      html += `<span class="${fg}${bg ? ` b${bg}` : ''}">${esc(t)}</span>`;
+      const cls = `${fg}${bg ? ` b${bg}` : ''}`;
+      html += sida ? `<button type="button" class="ln ${cls}" data-sida="${sida}">${esc(t)}</button>` : `<span class="${cls}">${esc(t)}</span>`;
     }
     return html + ' '.repeat(COLS - n);
   }
@@ -56,16 +84,22 @@ window.RumTv = (() => {
   // tre höga per tecken, så att en bokstav tar tre tecken i bredd.
   const GLYPH = {
     A: '.###.|#...#|#...#|#####|#...#|#...#|#...#',
+    Å: '..#..|.....|.###.|#...#|#####|#...#|#...#',
     B: '####.|#...#|#...#|####.|#...#|#...#|####.',
     C: '.###.|#...#|#....|#....|#....|#...#|.###.',
     E: '#####|#....|#....|####.|#....|#....|#####',
     F: '#####|#....|#....|####.|#....|#....|#....',
     H: '#...#|#...#|#...#|#####|#...#|#...#|#...#',
+    I: '.###.|..#..|..#..|..#..|..#..|..#..|.###.',
+    K: '#...#|#..#.|#.#..|##...|#.#..|#..#.|#...#',
     L: '#....|#....|#....|#....|#....|#....|#####',
     M: '#...#|##.##|#.#.#|#.#.#|#...#|#...#|#...#',
+    N: '#...#|##..#|#.#.#|#.#.#|#..##|#...#|#...#',
     O: '.###.|#...#|#...#|#...#|#...#|#...#|.###.',
     R: '####.|#...#|#...#|####.|#.#..|#..#.|#...#',
+    S: '.####|#....|#....|.###.|....#|....#|####.',
     T: '#####|..#..|..#..|..#..|..#..|..#..|..#..',
+    Y: '#...#|#...#|.#.#.|..#..|..#..|..#..|..#..',
   };
   function mosaic(word) {
     let s = '';
@@ -77,15 +111,29 @@ window.RumTv = (() => {
     return `<svg class="mos" viewBox="0 0 80 9" preserveAspectRatio="none" shape-rendering="crispEdges" aria-hidden="true">${s}</svg>`;
   }
 
-  // Bandet: raderna 1–3 i blått, rubriken i gula klossar och två korta rader
-  // till höger.
-  function band(title, r1 = '', r2 = '') {
-    const row = (t) => `<div class="tr">${line([' '.repeat(COLS - 1 - t.length), 'w', 'b'], [t, 'w', 'b'], [' ', 'w', 'b'])}</div>`;
-    return `<div class="band"><span class="sr">${esc(title)}</span>${row(r1)}${row(r2)}${row('')}${mosaic(title)}</div>`;
+  // Bandet: raderna 1–3 i blått med rubriken i gula klossar till vänster. En
+  // rad är en text eller bitar [text, färg, sida] som står till höger, eller
+  // { cols } – text i kolumnerna under (rubrikerna i en tabell).
+  function band(title, ...rows) {
+    const row = (r) => {
+      if (r && r.cols) return line([r.cols, 'w', 'b']);
+      const bits = Array.isArray(r) ? r : [[String(r || '')]];
+      const n = bits.reduce((a, b) => a + b[0].length, 0);
+      return line([' '.repeat(Math.max(0, COLS - 1 - n)), 'w', 'b'], ...bits.map(([t, fg = 'w', sida]) => [t, fg, 'b', sida]), [' ', 'w', 'b']);
+    };
+    return `<div class="band"><span class="sr">${esc(title)}</span>${[0, 1, 2].map((i) => `<div class="tr">${row(rows[i])}</div>`).join('')}${mosaic(title)}</div>`;
   }
+  // Text i bestämda kolumner: [[kolumn, text], …].
+  function cols(spec) {
+    const a = Array(COLS).fill(' ');
+    for (const [c, t] of spec) [...t].forEach((ch, j) => { a[c + j] = ch; });
+    return { cols: a.join('') };
+  }
+  // Divisionerna i bandet: den som visas i gult, de andra leder dit.
+  const chooser = (base, k) => DIVS.map((d, i) => [` ${d.short} `, i === k ? 'y' : 'w', i === k ? null : base + i]);
 
   const fHead = new Intl.DateTimeFormat('sv-SE', { timeZone: TZ, weekday: 'short', day: '2-digit', month: 'short', hour: '2-digit', minute: '2-digit', second: '2-digit', hourCycle: 'h23' });
-  const fWhen = new Intl.DateTimeFormat('sv-SE', { timeZone: TZ, weekday: 'long', day: 'numeric', month: 'long', hour: '2-digit', minute: '2-digit' });
+  const fWhen = new Intl.DateTimeFormat('sv-SE', { timeZone: TZ, weekday: 'short', day: 'numeric', month: 'short', hour: '2-digit', minute: '2-digit' });
   const partsOf = (f, d) => Object.fromEntries(f.formatToParts(d).map((x) => [x.type, x.value.replace('.', '')]));
 
   // Rubrikraden: sidnumret (grönt medan det rullar), namnet, datumet och klockan.
@@ -94,33 +142,31 @@ window.RumTv = (() => {
     return line(' ', [String(nr), rolling ? 'g' : 'w'], ' Matchfix Text  ', pad(`${p.weekday} ${p.day} ${p.month}`, 10), ' ', [`${p.hour}:${p.minute}:${p.second}`, 'y']);
   }
 
-  // Snabbvalen längst ner: fyra fält om tio tecken. sida = en sida på tv:n,
-  // annars en länk vidare.
-  function fast(keys) {
-    return '<div class="tr fast">' + keys.map(([label, fg, to]) => {
-      const t = esc(pad(` ${label}`, 10));
-      return typeof to === 'number' ? `<button type="button" class="${fg}" data-sida="${to}">${t}</button>` : `<a class="${fg}" ${to}>${t}</a>`;
-    }).join('') + '</div>';
+  // Snabbvalen längst ner, samma på alla sidor: fyra fält om tio tecken.
+  // data-to = föremålet i rummet som tänder snabbvalet (rum.js hot).
+  const KEYS = [['Matcher', 'r', FIRST, 'matcher'], ['Tabeller', 'g', TAB, 'tabeller'], ['Skyttar', 'y', SKY, 'statistik'], ['Innehåll', 'c', INDEX]];
+  function fast() {
+    return '<div class="tr fast">' + KEYS.map(([label, fg, to, nav]) =>
+      `<button type="button" class="${fg}" data-sida="${to}"${nav ? ` data-to="${nav}"` : ''}>${esc(pad(` ${label}`, 10))}</button>`).join('') + '</div>';
   }
 
-  // Raderna 4–23: en sträng per rad, { html, dh } för en dubbelhög (tar två),
-  // { html, sida } för en rad som leder till en sida, null för en tom.
+  // Raderna 4–23: en sträng per rad, null för en tom, eller { html } med
+  // dh (dubbelhög, tar två), sida (leder till en sida), href (en länk ut ur
+  // rummet) eller visa (visar dolda resultat).
   function body(rows) {
     let out = '';
     let n = 0;
     for (const r of rows) {
       if (n >= 20) break;
+      const o = r && typeof r === 'object' ? r : {};
       const html = r == null ? ' '.repeat(COLS) : typeof r === 'string' ? r : r.html;
-      if (r && r.dh) {
-        out += `<div class="tr dh" style="--i: ${n}"><span class="in">${html}</span></div>`;
-        n += 2;
-      } else if (r && r.sida) {
-        out += `<button type="button" class="tr" style="--i: ${n}" data-sida="${r.sida}">${html}</button>`;
-        n++;
-      } else {
-        out += `<div class="tr" style="--i: ${n}">${html}</div>`;
-        n++;
-      }
+      const cls = `tr${o.dh ? ' dh' : ''}`;
+      const inner = o.dh ? `<span class="in">${html}</span>` : html;
+      const at = `style="--i: ${n}"`;
+      if (o.href) out += `<a class="${cls}" ${at} href="${esc(o.href)}">${inner}</a>`;
+      else if (o.sida || o.visa) out += `<button type="button" class="${cls}" ${at} ${o.sida ? `data-sida="${o.sida}"` : `data-visa="${esc(o.visa)}"`}>${inner}</button>`;
+      else out += `<div class="${cls}" ${at}>${inner}</div>`;
+      n += o.dh ? 2 : 1;
     }
     for (; n < 20; n++) out += `<div class="tr">${' '.repeat(COLS)}</div>`;
     return out;
@@ -130,9 +176,11 @@ window.RumTv = (() => {
 
   const done = (g) => g.state === 'final' || g.state === 'live';
   const ord = (n) => `${n}:${/1[12]$/.test(n) || !/[12]$/.test(n) ? 'e' : 'a'}`;
-  const odds = (x) => (x == null ? '-' : x.toFixed(2).replace('.', ','));
+  const dec = (x, d = 2) => (x == null || !Number.isFinite(x) ? '-' : x.toFixed(d).replace('.', ','));
+  const signed = (n) => (n > 0 ? `+${n}` : String(n));
   const COMP = { pl: 'Premier League', ch: 'Championship', l1: 'League One', l2: 'League Two', fac: 'FA-cupen', lc: 'Ligacupen' };
   const LIGA = { pl: 'PL', ch: 'CH', l1: 'L1', l2: 'L2' };
+  const RES = { V: 'g', O: 'y', F: 'r' };
 
   // Läget i en kort ruta (331) och i en mening (matchens sida).
   function status(g, long = false) {
@@ -152,6 +200,32 @@ window.RumTv = (() => {
     const s = `${T.short(m.home)}-${T.short(m.away)}`;
     return s.length <= n ? s : `${T.kort(m.home)}-${T.kort(m.away)}`;
   }
+  // Ett lag på högst n tecken: det korta namnet, fällbladstavlans eller första ordet.
+  const team = (T, name, n) => [T.short(name), T.kort(name), String(name).split(' ')[0]].find((x) => x.length <= n) || String(name).slice(0, n);
+
+  // Har divisionen matcher som döljs just nu räknar tabellen och skytteligan
+  // redan med dem – samma nyckel som Tabeller och Statistik (divisioner.js),
+  // så att Visa ändå gäller där också.
+  function veil(T, dv) {
+    const S = window.Spoiler;
+    if (!S || !S.on()) return null;
+    const recent = T.matches().filter((m) => m.comp === dv.id && S.hides(m.kickoff));
+    const n = recent.filter(S.hidden).length;
+    if (!n) return null;
+    const key = `div:${dv.id}:${recent.map((m) => m.id).sort().join(',')}`;
+    return S.isShown(key) ? null : { n, key };
+  }
+  const veilRows = (v, dv) => [null, line(' ', `${v.n} ${v.n === 1 ? 'match' : 'matcher'} i ${dv.name} är dolda`), null,
+    { visa: v.key, html: line(' ', ['Visa ändå', 'c']) }];
+
+  function indexPage() {
+    const item = (label, nr, indent = 1) => ({ sida: nr, html: line(' '.repeat(indent), pad(label, 36 - indent), [String(nr), 'y']) });
+    const rows = [null, item('Omgångens matcher', FIRST), null, line(' ', ['Tabeller', 'c'])];
+    DIVS.forEach((d, k) => rows.push(item(d.name, TAB + k, 3)));
+    rows.push(null, line(' ', ['Skytteligor', 'c']));
+    DIVS.forEach((d, k) => rows.push(item(d.name, SKY + k, 3)));
+    return band('INNEHÅLL') + body(rows) + fast();
+  }
 
   function listPage(T, sub) {
     const subs = Math.max(1, Math.ceil(T.rows.length / PER));
@@ -161,47 +235,159 @@ window.RumTv = (() => {
       if (!list.includes(x)) return;
       const k = new Date(x.m.kickoff);
       const [st, fg] = status(x.g) || [`${T.wd(k)} ${T.hm(k)}`, 'c'];
-      rows.push({ sida: FIRST + 1 + i, html: line(' ', pad(teams(T, x.m, 23), 23), ' ', [pad(st, 10), fg], ' ', [String(FIRST + 1 + i), 'y']) });
+      const nr = i < MAXM ? FIRST + 1 + i : null;
+      rows.push({ sida: nr, html: line(' ', pad(teams(T, x.m, 23), 23), ' ', [pad(st, 10), fg], ' ', [nr ? String(nr) : '', 'y']) });
     });
     if (!T.rows.length) rows.push(null, line(' Inga matcher just nu.'));
-    return band('MATCHER', subs > 1 ? `${sub + 1}/${subs}` : '', T.rows.length ? `${T.rows.length} matcher` : '') + body(rows) +
-      fast([['Kupong', 'r', 'href="#kupong" data-to="kupong"'], ['Olympen', 'g', 'href="#olympen" data-to="olympen"'],
-        ['Tabell', 'y', 'href="tabeller.html" data-to="tabeller"'], ['Statistik', 'c', 'href="statistik.html" data-to="statistik"']]);
+    return band('MATCHER', subs > 1 ? `${sub + 1}/${subs}` : '', T.rows.length ? `${T.rows.length} matcher` : '') + body(rows) + fast();
+  }
+
+  // Prognosen som en stapel i mosaik: 1, X och 2 i sina färger (som siffrorna
+  // ovanför), lika långa som sannolikheterna och med ett tecken emellan.
+  function bar(p) {
+    const W = COLS - 4;
+    const raw = p.map((x) => x * W);
+    const w = raw.map(Math.floor);
+    let left = W - w.reduce((a, b) => a + b, 0);
+    raw.map((x, i) => [x - w[i], i]).sort((a, b) => b[0] - a[0]).forEach(([, i]) => { if (left-- > 0) w[i]++; });
+    return line(' ', [' '.repeat(w[0]), 'g bar'], ' ', [' '.repeat(w[1]), 'y bar'], ' ', [' '.repeat(w[2]), 'c bar']);
+  }
+
+  // Bitarna i en ruta om 13 tecken, högerställda.
+  const cell = (bits) => [' '.repeat(Math.max(0, 13 - bits.reduce((a, b) => a + b[0].length, 0))), ...bits];
+  // Formen: de fem senaste, den senaste först (som på matchbladet).
+  const formBits = (list) => (list.length ? list.slice(0, 5).map((x) => (window.Spoiler && Spoiler.hidesDay(x.date) ? ['?', 'w'] : [x.result || '?', RES[x.result] || 'w'])) : [['-']]);
+  // Skadade och avstängda, de som spelat mest först; osäkra i gult.
+  function absent(s, n) {
+    if (!s || s.unknown) return [['-']];
+    if (!s.players.length) return [['Inga']];
+    const list = s.players.slice().sort((a, b) => (b.minutes || 0) - (a.minutes || 0));
+    const out = [];
+    let used = 0;
+    for (let i = 0; i < list.length; i++) {
+      const name = `${i ? ', ' : ''}${list[i].name}`;
+      const more = list.length - i - 1;
+      if (used + name.length + (more ? 4 : 0) > n) {
+        out.push([` +${list.length - i}`, 'w']);
+        break;
+      }
+      out.push([name, list[i].status === 'tveksam' ? 'y' : 'w']);
+      used += name.length;
+    }
+    return out;
   }
 
   function matchPage(T, i) {
     const { m, g } = T.rows[i];
-    const nr = FIRST + 1 + i;
-    const d = T.json.get(m.id);
+    const d = T.json.get(m.id) || null;
     const st = status(g, true);
-    const k = new Date(m.kickoff);
-    const p = partsOf(fWhen, k);
+    const p = partsOf(fWhen, new Date(m.kickoff));
     const score = g.state === 'hidden' ? '?' : done(g) && g.score ? `${g.score.home}-${g.score.away}` : '';
-    const rows = [null, { dh: true, html: line(' ', pad(teams(T, m, 32), 32), [rpad(score, 6), 'y']) },
-      st ? line(' ', [st[0], st[1]]) : line(' ', [`${p.weekday[0].toUpperCase()}${p.weekday.slice(1)} ${p.day} ${p.month} ${p.hour}.${p.minute}`, 'c']),
-      d && d.match && d.match.venue ? line(' ', d.match.venue) : null, null];
+    // i bandet: tävlingen och avsparken eller läget (grönt medan matchen pågår)
+    const when = st ? [st[0], st[1] === 'g' ? 'g' : 'w'] : [`${p.weekday} ${p.day} ${p.month} ${p.hour}.${p.minute}`, 'w'];
+    const rows = [null, { dh: true, href: `#match/${m.id}`, html: line(' ', pad(teams(T, m, 32), 32), [rpad(score, 6), 'y']) }, null];
     const o = m.odds || [];
-    if (o.length === 3) rows.push(line(' '.repeat(12), [['1', 'X', '2'].map((s) => rpad(s, 8)).join(''), 'c']), line(' Odds', ' '.repeat(7), [o.map((x) => rpad(odds(x), 8)).join(''), 'y']), null);
-    else rows.push(null, null, null);
-    // lagens rader i tabellen – inte när resultatet är dolt (tabellen kan ha det)
+    const pr = d && d.prediction && d.prediction.status === 'ok' && d.prediction.p && d.prediction.p.length === 3 ? d.prediction.p : null;
+    if (o.length === 3 || pr) {
+      rows.push(line(' '.repeat(12), [rpad('1', 8), 'g'], [rpad('X', 8), 'y'], [rpad('2', 8), 'c']));
+      if (o.length === 3) rows.push(line(' Odds', ' '.repeat(7), [o.map((x) => rpad(dec(x), 8)).join(''), 'y']));
+      if (pr) rows.push(line(' Prognos', ' '.repeat(4), pr.map((x) => rpad(`${Math.round(x * 100)} %`, 8)).join('')), bar(pr));
+      rows.push(null);
+    }
+    // lagen sida vid sida – inte när resultatet är dolt (tabellen kan ha det)
     const t = d && d.teams;
     if (t && t.home && t.away && g.state !== 'hidden') {
-      const both = (label, f) => {
-        const a = f(t.home, 'home');
-        const b = f(t.away, 'away');
-        return a == null && b == null ? null : line(' ', pad(label, 11), [rpad(a == null ? '-' : a, 13) + rpad(b == null ? '-' : b, 13), 'w']);
-      };
-      const rec = (r) => (r ? `${r.w}-${r.d}-${r.l}` : null);
-      rows.push(line(' '.repeat(12), [rpad(T.kort(m.home), 13) + rpad(T.kort(m.away), 13), 'c']),
-        both('Tabell', (x) => (x.table ? ord(x.table.rank) + (x.league && x.league.id !== m.comp && LIGA[x.league.id] ? ` ${LIGA[x.league.id]}` : '') : null)),
-        both('Poäng', (x) => (x.table ? x.table.points : null)),
-        both('V-O-F', (x) => rec(x.record && x.record.all)),
-        both('Mål', (x) => (x.record && x.record.all ? `${x.record.all.gf}-${x.record.all.ga}` : null)),
-        both('Hemma/borta', (x, side) => rec(x.record && x.record[side])));
+      const pair = (label, f) => line(' ', pad(label, 12), ...cell(f(t.home, 'home')), ...cell(f(t.away, 'away')));
+      const xg = (x) => (x.understat && x.understat.n ? x.understat : x.stats && x.stats.xgN ? x.stats : null);
+      rows.push(line(' '.repeat(13), [rpad(T.kort(m.home), 13) + rpad(T.kort(m.away), 13), 'c']),
+        pair('Tabell', (x) => [[x.table ? `${ord(x.table.rank)}${x.league && x.league.id !== m.comp && LIGA[x.league.id] ? ` ${LIGA[x.league.id]}` : ''} ${x.table.points} p` : '-']]),
+        pair('Form', (x) => formBits(x.form || [])),
+        pair('Hemma/borta', (x, side) => { const r = x.record && x.record[side]; return [[r ? `${r.w}-${r.d}-${r.l}` : '-']]; }),
+        pair('xG per match', (x) => { const s = xg(x); return [[s ? `${dec(s.xgFor, 1)}-${dec(s.xgAgainst, 1)}` : '-']]; }),
+        pair('Vila', (x) => { const l = x.schedule && x.schedule.last; return [[l && l.days != null ? `${l.days} ${l.days === 1 ? 'dag' : 'dagar'}` : '-']]; }));
     }
-    const last = FIRST + T.rows.length;
-    return band('FOTBOLL', '', (d && d.match && d.match.compName) || COMP[m.comp] || '') + body(rows) +
-      fast([['Föreg', 'r', nr - 1], ['Nästa', 'g', nr === last ? FIRST : nr + 1], ['Omgången', 'y', FIRST], ['Matchen', 'c', `href="#match/${esc(m.id)}"`]]);
+    const sq = d && d.squad;
+    if (sq && sq.home && sq.away && (!sq.home.unknown || !sq.away.unknown)) {
+      rows.push(null, line(' ', ['Skador och avstängningar', 'c']));
+      for (const side of ['home', 'away']) rows.push(line(' ', pad(T.kort(m[side]), 12), ...absent(sq[side], COLS - 14)));
+    }
+    return band('FOTBOLL', (d && d.match && d.match.compName) || COMP[m.comp] || '', [when]) + body(rows) + fast();
+  }
+
+  // Formen i ligan ur matcherna: de fem senaste, den senaste först. Dolda
+  // resultat syns inte här: då står ridån för hela tabellen (veil).
+  function leagueForm(T, comp, name) {
+    if (!T.forms.has(comp)) {
+      const by = new Map();
+      const ms = T.matches().filter((m) => m.comp === comp && m.completed && m.score).sort((a, b) => Date.parse(b.kickoff) - Date.parse(a.kickoff));
+      for (const m of ms) {
+        for (const side of ['home', 'away']) {
+          const l = by.get(m[side]) || [];
+          if (l.length >= 5) continue;
+          const [f, a] = side === 'home' ? [m.score.home, m.score.away] : [m.score.away, m.score.home];
+          l.push(f > a ? ['V', 'g'] : f < a ? ['F', 'r'] : ['O', 'y']);
+          by.set(m[side], l);
+        }
+      }
+      T.forms.set(comp, by);
+    }
+    return T.forms.get(comp).get(name) || [];
+  }
+
+  // Färgen på placeringen: uppåt grön, kval och Europa cyan, nedflyttning röd.
+  function zone(note) {
+    if (/relegation/i.test(note)) return 'r';
+    if (/playoff|europa|conference/i.test(note)) return 'c';
+    if (/champions league|promotion/i.test(note)) return 'g';
+    return 'w';
+  }
+
+  function tableSubs(T, dv) {
+    const d = T.teams.get(dv.id);
+    const n = (d && d.teams && d.teams.length) || dv.size;
+    return veil(T, dv) ? 1 : Math.ceil(n / perTable(n));
+  }
+
+  function tablePage(T, k, sub) {
+    const dv = DIVS[k];
+    const d = T.teams.get(dv.id);
+    const v = veil(T, dv);
+    const list = d && d.teams ? d.teams.slice().sort((a, b) => a.rank - b.rank) : [];
+    const per = perTable(list.length || dv.size);
+    const subs = v ? 1 : Math.max(1, Math.ceil((list.length || dv.size) / per));
+    let rows = [];
+    if (v) rows = veilRows(v, dv);
+    else if (d === false || (d && !list.length)) rows = [null, line(' Tabellen saknas just nu.')];
+    else {
+      rows = list.slice(sub * per, sub * per + per).map((x) => line(' ', [rpad(x.rank, 2), zone(x.note)], ' ', pad(team(T, x.name, 16), 16),
+        rpad(x.m, 3), rpad(signed(x.gd), 4), [rpad(x.pts, 4), 'y'], '  ', ...leagueForm(T, dv.id, x.name)));
+    }
+    return band('TABELL', chooser(TAB, k), `${dv.name}${subs > 1 ? `  ${sub + 1}/${subs}` : ''}`,
+      v || !list.length ? '' : cols([[22, 'S'], [24, '+/-'], [30, 'P'], [33, 'Form']])) + body(rows) + fast();
+  }
+
+  // För långa namn: förnamnets initial, eller bara efternamnet.
+  function person(name, n) {
+    if (name.length <= n) return name;
+    const [first, ...rest] = name.split(' ');
+    const s = `${first[0]}. ${rest.join(' ')}`;
+    return s.length <= n ? s : rest[rest.length - 1] || name;
+  }
+
+  function scorerPage(T, k) {
+    const dv = DIVS[k];
+    const d = T.players.get(dv.id);
+    const v = veil(T, dv);
+    const list = d && d.players ? d.players.filter((p) => p.g > 0).sort((a, b) => b.g - a.g || (b.a || 0) - (a.a || 0) || a.name.localeCompare(b.name, 'sv')) : [];
+    let rows = [];
+    if (v) rows = veilRows(v, dv);
+    else if (d === false || (d && !list.length)) rows = [null, line(' Skytteligan saknas just nu.')];
+    else {
+      // delad placering: numret bara på den första
+      rows = list.slice(0, 19).map((p, i) => line(' ', rpad(i && list[i - 1].g === p.g ? '' : list.findIndex((x) => x.g === p.g) + 1, 2), ' ',
+        pad(person(p.name, 18), 18), ' ', [pad(team(T, p.team, 13), 13), 'c'], [rpad(p.g, 3), 'y']));
+    }
+    return band('SKYTTAR', chooser(SKY, k), dv.name, v || !list.length ? '' : cols([[36, 'Mål']])) + body(rows) + fast();
   }
 
   // ---------- sifferdisplayen ----------
@@ -245,7 +431,10 @@ window.RumTv = (() => {
   // ---------- i rummet ----------
 
   function mount(root, o) {
-    const T = { rows: [], nr: FIRST, sub: 0, json: new Map(), typed: '', on: true, near: false, short: o.short, kort: o.kort || o.short, wd: o.wd, hm: o.hm };
+    const T = {
+      rows: [], nr: FIRST, sub: 0, json: new Map(), teams: new Map(), players: new Map(), forms: new Map(), typed: '', on: true, near: false,
+      short: o.short, kort: o.kort || o.short, wd: o.wd, hm: o.hm, matches: o.matches || (() => []),
+    };
     const box = root.querySelector('#rum-tv3');
     const front = root.querySelector('#rum-tvfront');
     const glas = root.querySelector('#rum-ttx');
@@ -253,14 +442,49 @@ window.RumTv = (() => {
     const tb = glas.querySelector('.tb');
     const ledEl = root.querySelector('#rum-tvled');
     const sken = root.querySelector('#rum-tvsken');
-    const exists = (nr) => nr === FIRST || (nr > FIRST && nr <= FIRST + T.rows.length);
     const showLed = (txt) => { if (ledEl.dataset.v !== txt) { ledEl.dataset.v = txt; ledEl.innerHTML = led(txt); } };
+
+    // Sidorna i nummerordning, och hur många undersidor en sida har.
+    function pages() {
+      const out = [INDEX, FIRST];
+      for (let i = 0; i < Math.min(T.rows.length, MAXM); i++) out.push(FIRST + 1 + i);
+      DIVS.forEach((d, k) => out.push(TAB + k));
+      DIVS.forEach((d, k) => out.push(SKY + k));
+      return out;
+    }
+    const exists = (nr) => pages().includes(nr);
+    function subsOf(nr) {
+      if (nr === FIRST) return Math.max(1, Math.ceil(T.rows.length / PER));
+      if (nr >= TAB && nr < TAB + DIVS.length) return tableSubs(T, DIVS[nr - TAB]);
+      return 1;
+    }
+
+    // Filerna hämtas när sidan visas första gången.
+    function load(map, id, path) {
+      if (map.has(id)) return;
+      map.set(id, null);
+      getJSON(path).then((d) => { map.set(id, d); }, () => { map.set(id, false); }).then(() => { if (!T.roll) draw(false); });
+    }
+    function need(nr) {
+      const x = T.rows[nr - FIRST - 1];
+      if (nr > FIRST && nr < TAB && x) load(T.json, x.m.id, `data/match/${encodeURIComponent(x.m.id)}.json`);
+      const dv = DIVS[nr - TAB] || DIVS[nr - SKY];
+      if (nr >= TAB && nr < TAB + DIVS.length) load(T.teams, dv.id, `data/teams/${dv.id}.json`);
+      if (nr >= SKY && nr < SKY + DIVS.length) load(T.players, dv.id, `data/players/${dv.id}.json`);
+    }
+    function page(nr, sub) {
+      if (nr === INDEX) return indexPage();
+      if (nr === FIRST) return listPage(T, sub);
+      if (nr > FIRST && nr < TAB) return matchPage(T, nr - FIRST - 1);
+      if (nr >= TAB && nr < TAB + DIVS.length) return tablePage(T, nr - TAB, sub);
+      return scorerPage(T, nr - SKY);
+    }
 
     // Sidan: ritas om bara när den har ändrats; ny = uppifrån och ner.
     function draw(ny) {
-      const i = T.nr - FIRST - 1;
-      if (i >= 0 && !T.json.has(T.rows[i].m.id)) fetchMatch(T.rows[i].m.id);
-      const h = T.nr === FIRST ? listPage(T, T.sub) : matchPage(T, i);
+      need(T.nr);
+      T.sub = Math.min(T.sub, subsOf(T.nr) - 1);
+      const h = page(T.nr, T.sub);
       if (h !== tb.dataset.h) {
         tb.innerHTML = h;
         tb.dataset.h = h;
@@ -279,40 +503,42 @@ window.RumTv = (() => {
         hd.innerHTML = h;
         hd.dataset.h = h;
       }
-      // fler än 17 matcher: 331 bläddrar mellan undersidorna var tolfte sekund
-      const subs = Math.ceil(T.rows.length / PER);
-      const sub = subs > 1 ? Math.floor(Date.now() / 12000) % subs : 0;
-      if (T.nr === FIRST && !T.roll && sub !== T.sub) {
-        T.sub = sub;
-        draw(true);
+      // på håll bläddrar undersidorna själva var tolfte sekund
+      const subs = subsOf(T.nr);
+      if (!T.near && !T.roll && subs > 1) {
+        const sub = Math.floor(Date.now() / 12000) % subs;
+        if (sub !== T.sub) {
+          T.sub = sub;
+          draw(true);
+        }
       }
     }
     setInterval(tick, 250);
 
-    function fetchMatch(id) {
-      T.json.set(id, null);
-      getJSON(`data/match/${encodeURIComponent(id)}.json`).then((d) => {
-        T.json.set(id, d);
-        if (T.rows[T.nr - FIRST - 1] && T.rows[T.nr - FIRST - 1].m.id === id && !T.roll) draw(false);
-      }).catch(() => {});
-    }
-
     // Sök sidan: numret i rubrikraden rullar fram (som när tv:n väntade på
     // att sidan skulle sändas), och finns den inte går tv:n tillbaka.
-    function go(nr) {
+    function go(nr, sub = 0) {
       if (!T.on) return;
       clearTimeout(T.timer);
       T.typed = '';
       showLed(String(nr));
+      const found = exists(nr);
+      const land = () => {
+        T.roll = 0;
+        T.nr = nr;
+        T.sub = sub;
+        T.forms.clear();
+        draw(!o.calm());
+        tick();
+      };
       if (o.calm()) {
-        if (exists(nr)) T.nr = nr;
+        if (found) land();
         T.roll = 0;
         showLed(String(T.nr));
         draw(false);
         tick();
         return;
       }
-      const found = exists(nr);
       let at = found ? nr - 12 : T.roll || T.nr;
       let left = 30;
       const next = () => {
@@ -320,12 +546,8 @@ window.RumTv = (() => {
         T.roll = at;
         left--;
         tick();
-        if (found && at === nr) {
-          T.roll = 0;
-          T.nr = nr;
-          draw(true);
-          tick();
-        } else if (left <= 0) {
+        if (found && at === nr) land();
+        else if (left <= 0) {
           T.roll = 0;
           showLed(String(T.nr));
           tick();
@@ -333,9 +555,19 @@ window.RumTv = (() => {
       };
       next();
     }
+    // ▲ ▼: undersidorna först, sedan nästa sida i nummerordning (runt).
     function step(d) {
-      const last = FIRST + T.rows.length;
-      go(T.nr + d > last ? FIRST : T.nr + d < FIRST ? last : T.nr + d);
+      if (!T.on) return;
+      const sub = T.sub + d;
+      if (!T.roll && sub >= 0 && sub < subsOf(T.nr)) {
+        T.sub = sub;
+        draw(true);
+        return;
+      }
+      const list = pages();
+      const ix = Math.max(0, list.indexOf(T.nr));
+      const nr = list[(ix + d + list.length) % list.length];
+      go(nr, d < 0 ? subsOf(nr) - 1 : 0);
     }
     function power() {
       T.on = !T.on;
@@ -360,18 +592,26 @@ window.RumTv = (() => {
 
     box.addEventListener('click', (e) => {
       if (!T.near) return;
-      const b = e.target.closest('[data-tv], [data-sida]');
+      const b = e.target.closest('[data-tv], [data-sida], [data-visa]');
       if (!b) return;
+      // sidan kan ritas om direkt, och då finns knappen inte kvar när rummet
+      // får klicket – det skulle zooma ut
       e.preventDefault();
+      e.stopPropagation();
       if (b.dataset.tv === 'pa') power();
       else if (b.dataset.tv) step(b.dataset.tv === 'upp' ? 1 : -1);
+      else if (b.dataset.visa) { if (window.Spoiler) Spoiler.show(b.dataset.visa.split(' ')); }
       else go(Number(b.dataset.sida));
     });
 
     return {
       fill(rows) {
         T.rows = rows;
-        if (!exists(T.nr)) T.nr = FIRST;
+        T.forms.clear();
+        if (!exists(T.nr)) {
+          T.nr = FIRST;
+          T.sub = 0;
+        }
         if (!T.roll) draw(false);
         tick();
       },

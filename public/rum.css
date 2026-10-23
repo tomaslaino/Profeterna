@@ -751,7 +751,7 @@ a.rum-fb-r:hover b:not(.lit) { color: #fff; background: linear-gradient(180deg, 
 @media (min-aspect-ratio: 8/5) { .rum-brand { visibility: hidden; } }
 /* pekar man på ett föremål tänds snabbvalet på text-tv:n som det leder till:
    rutan i snabbvalets färg och texten svart */
-.rum a[data-to].hot { background: currentColor; -webkit-text-fill-color: #050505; text-shadow: none; }
+.rum [data-to].hot { background: currentColor; -webkit-text-fill-color: #050505; text-shadow: none; }
 .rum-ft { position: absolute; right: 44px; bottom: 22px; display: flex; gap: 30px; align-items: baseline; z-index: 2; }
 .rum-ft .keys { font-family: -apple-system, "Helvetica Neue", sans-serif; font-size: 12px; letter-spacing: 1.2px; text-transform: uppercase; opacity: 0.8; text-shadow: 0 1px 8px #000; }
 .rum-ft .keys b { color: #f0d699; font-weight: 600; }

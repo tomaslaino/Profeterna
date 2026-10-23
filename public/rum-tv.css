@@ -222,11 +222,14 @@
 .tv-glas .m { --c: #ff4ef2; color: var(--c); }
 .tv-glas .bb { background: #1428e0; }
 .tv-glas .band { position: relative; }
-.tv-glas .mos { position: absolute; left: 0; top: 0; width: 288px; height: 43.2px; fill: #fff23c; filter: drop-shadow(0 0 1.5px rgba(255, 242, 60, 0.6)); }
+.tv-glas .mos { position: absolute; left: 0; top: 0; width: 288px; height: 43.2px; fill: #fff23c; filter: drop-shadow(0 0 1.5px rgba(255, 242, 60, 0.6)); pointer-events: none; }
 .tv-glas .sr { position: absolute; width: 1px; height: 1px; overflow: hidden; clip-path: inset(50%); }
-/* raderna som leder till en sida lyser blått, snabbvalen i sin färg med svart text */
-.rum-tv3.nara .tv-glas button.tr:hover, .rum-tv3.nara .tv-glas button.tr:focus-visible { background: #1428e0; outline: none; }
-.rum-tv3.nara .tv-glas .fast > :hover, .rum-tv3.nara .tv-glas .fast > :focus-visible { background: var(--c); color: #050505; text-shadow: none; outline: none; }
+/* prognosen som en stapel i mosaik: klossar två tredjedelar så höga som raden */
+.tv-glas .bar { background: linear-gradient(var(--c), var(--c)) 0 50% / 100% 9.6px no-repeat; filter: drop-shadow(0 0 1.5px var(--c)); }
+/* raderna som leder vidare lyser blått, snabbvalen och divisionerna i bandet
+   i sin färg med svart text */
+.rum-tv3.nara .tv-glas .tr:is(button, a):is(:hover, :focus-visible) { background: #1428e0; outline: none; }
+.rum-tv3.nara .tv-glas :is(.fast > *, .ln):is(:hover, :focus-visible) { background: var(--c); color: #050505; text-shadow: none; outline: none; }
 
 /* en ny sida ritas uppifrån och ner */
 .tv-glas.ny .band { animation: tv-rad 1ms both; }

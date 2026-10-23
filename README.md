@@ -1717,8 +1717,8 @@ three.js 0.160.0 (från jsdelivr, importmap i `index.html`), som hämtas först 
 visas – utan WebGL eller utan nätet står rummet kvar utan gänget.
 
 **Föremålen** – pekar man på ett lyser det (pokalerna och pärmarna också), och snabbvalet
-på text-tv:n som det leder till tänds, som när man pekar på snabbvalet med tv:n nära
-(Kupong, Olympen, Tabell eller Statistik). Klickar man går kameran fram mot föremålet innan
+på text-tv:n med samma ämne tänds, som när man pekar på snabbvalet med tv:n nära
+(skårtavlan Tabeller, pärmarna Skyttar). Klickar man går kameran fram mot föremålet innan
 sidan byts:
 
 - **Fällbladstavlan** sitter på bakväggen till höger om fönstret. Varje rad har
@@ -1773,8 +1773,8 @@ sidan byts:
   *Inlämnad*, men inga tecken. Din egen tas i handen, och de andras när du ser deras tips
   (se nedan). Innan dess lyfts en annans kupong bara lite i ena kanten och faller tillbaka.
 - **Tv:n** uppe i hörnet till höger, en tjock-tv i träfaner med text-tv på en arm från väggen, zoomas in med ett
-  klick eller T och vrids då mot en; där bläddrar man mellan omgångens matcher med knapparna
-  på tv:n (se [Tv:n](#tvn)). Esc eller ett klick utanför zoomar ut.
+  klick eller T och vrids då mot en; där finns omgångens matcher, tabellerna och
+  skytteligorna (se [Tv:n](#tvn)). Esc eller ett klick utanför zoomar ut.
 - **Namnet på dörren** (längst till vänster, under Stängt-skylten) → Om oss: *Matchfixarna*
   i bladguld på glaset, spegelvänt inifrån som neonskylten, med TOBAK & SPEL och *Öppet
   till spelstoppet* under. I fönster som är minst 8:5 syns hela dörren, och där står namnet
@@ -2024,25 +2024,43 @@ sidnumret, sidknapparna ▲ ▼, högtalargallret och strömbrytaren med lampan.
 **Text-tv som SVT:s:** 40 × 25 tecken (VT323, utan ligaturer), rubrikraden med sidnumret,
 *Matchfix Text*, datumet och klockan som tickar, ett blått band med rubriken i mosaikgrafik
 (gula klossar), sju färger, dubbelhöga rader och snabbvalen i rött, grönt, gult och
-cyanblått längst ner.
+cyanblått längst ner – samma fyra på alla sidor: *Matcher* (331), *Tabeller* (371),
+*Skyttar* (381) och *Innehåll* (300). Det som ett föremål har för ämne tänds när man pekar på
+föremålet (`data-to`). Filerna hämtas när sidan visas första gången.
 
+- **300 Innehåll:** alla sidor med sina nummer; raderna leder dit.
 - **331 Matcher:** omgångens matcher i avsparksordning – lagen, avsparken eller ställningen
   (grön med minuten medan matchen pågår, `paus` i halvtid, `?` när resultatet är dolt,
-  `struken`) och matchens sida. Fler än 17 matcher bläddrar mellan undersidorna var tolfte
-  sekund. Snabbvalen leder till Kupong, Olympen, Tabeller och Statistik, och det som ett
-  föremål leder till tänds när man pekar på föremålet.
-- **332 och framåt, en sida per match:** lagen dubbelhöga med ställningen, ligan i bandet,
-  avsparken eller läget, arenan, oddsen (1, X, 2) och lagens rader ur tabellen – placering,
-  poäng, V-O-F, mål och hemma- respektive bortaraden – ur matchens fil
-  (`data/match/<id>.json`, hämtas när sidan visas första gången). När resultatet är dolt
-  visas inga tabellrader. Snabbvalen: *Föreg*, *Nästa*, *Omgången* (331) och *Matchen*
-  (`#match/<id>`).
+  `struken`) och matchens sida. Fler än 17 matcher ger undersidor.
+- **332–369, en sida per match**, ur matchens fil (`data/match/<id>.json`): lagen dubbelhöga
+  med ställningen (leder till matchbladet, `#match/<id>`), tävlingen och avsparken eller
+  läget i bandet, oddsen och prognosen för 1, X och 2 – prognosen också som en stapel i
+  mosaik, med 1 i grönt, X i gult och 2 i cyan som siffrorna ovanför – och lagen sida vid
+  sida: placering och poäng, formen (de fem senaste i alla tävlingar, den senaste först, V
+  grön, O gul, F röd), hemmalagets hemmarad och bortalagets bortarad (V-O-F), xG per match
+  (gjorda–insläppta, Understat där den finns) och vilan (dagar sedan förra matchen). Sist
+  skador och avstängningar (Fantasy Premier League, alltså bara Premier League), de som spelat
+  mest först och osäkra i gult. När resultatet är dolt visas inte lagen sida vid sida.
+- **371–374 Tabeller** (Premier League, Championship, League One, League Two, ur
+  `data/teams/<division>.json`): placering i färg efter zonen (uppflyttning och Champions
+  League grön, kval och Europa cyan, nedflyttning röd), lag, spelade, målskillnad, poäng och
+  formen i ligan (de fem senaste ur `data/matches.json`). Hela Premier League ryms på en sida;
+  24 lag delas i två undersidor (1–12, 13–24). Divisionerna står i bandet och leder till
+  varandra.
+- **381–384 Skyttar:** skytteligorna ur `data/players/<division>.json` – de 19 med flest
+  ligamål, delad placering med numret bara på den första.
+
+Har en division matcher som döljs just nu (Dölj resultat) visar tabellen och skytteligan bara
+hur många som är dolda och *Visa ändå* – samma nyckel som på Tabeller och Statistik, så att
+det gäller där också.
 
 **Nära** (klick eller T) vrids tv:n rakt fram och kameran ställer sig rakt framför (musen
 vrider inte rummet medan tv:n är nära), så att rutan blir en rak rektangel – vriden mot
 ögat blir den sned, eftersom den sitter högt upp till höger. Man byter sida med ▲ ▼ på
-panelen (runt från sista sidan till 331), snabbvalen, raderna på 331, piltangenterna eller
-tre siffror som på fjärrkontrollen; displayen visar siffrorna medan man slår dem. Tv:n söker
+panelen eller piltangenterna (undersidorna först, sedan nästa sida i nummerordning, runt
+från 384 till 300), snabbvalen, raderna som leder vidare, divisionerna i bandet eller tre
+siffror som på fjärrkontrollen; displayen visar siffrorna medan man slår dem. På håll
+bläddrar undersidorna själva var tolfte sekund. Tv:n söker
 som förr: sidnumret i rubrikraden rullar fram i grönt tills sidan kommer, och sidan ritas
 uppifrån och ner – finns den inte går tv:n tillbaka. Strömbrytaren stänger av: bilden dras
 ihop till ett streck och en prick, lampan blir röd och skenet på väggen slocknar; ett tryck
