@@ -8,7 +8,7 @@
 // dricker öl, röker och pratar. Föremålen leder vidare, som i ett rum hos
 // Felix Rieseberg:
 //   fällbladstavlan → närbilden → Matcher  förstoringsglaset → Analysera (nästa match)
-//   korktavlan → gängets kuponger     pokalhyllan, Omgångens tippare → Olympen
+//   korktavlan → gängets kuponger     pokalhyllan, Omgångens orakel → Olympen
 //   krittavlan → Tabeller             pärmarna → Statistik
 //   kvittot, terminalen → Kupong, tv:n zoomas in (T) med text-tv:ns färgknappar
 //   kupongen tas i handen och fylls i (K), eller → Kupong när man har lämnat in.
@@ -23,9 +23,9 @@
 //
 // Läses efter kupong.js, samtal.js, tippare.js och kronan.js och använder
 // deras hjälpare (state, KP, TP, gradeRow, couponNumber, currentCoupon,
-// Kronan.holders, Historik.coupons …). rum-3d.js hämtas först när rummet
-// visas, med three.js från jsdelivr (importmap i index.html); utan WebGL står
-// rummet kvar utan gänget.
+// Kronan.holders, Kronan.scene, Historik.coupons …). rum-3d.js hämtas först
+// när rummet visas, med three.js från jsdelivr (importmap i index.html); utan
+// WebGL står rummet kvar utan gänget.
 
 window.Rum = (() => {
   const W = 1600;
@@ -346,11 +346,65 @@ window.Rum = (() => {
       '<span class="rum-fbn-fot"><a class="rum-guld" href="#matcher" data-nav="matcher">Alla matcher</a></span></div></div>';
   }
 
-  // 5. Omgångens tippare: som Månadens anställd, med vinnarfigurens porträtt.
+  // 5. Omgångens orakel: oraklet ur Olympen (Kronan.scene, fotona på
+  // sockeln) i en förgylld ram under fällbladstavlan, med mässingsskylten
+  // under. Ett skimmer drar då och då över guldet och glaset.
+  const RAM = { w: 126, h: 152, b: 13, f: 5.5 };
+  function gilt() {
+    const { w, h, b, f } = RAM;
+    // listen i genomskärning, utifrån och in: kanten, rundstaven, hålkälen,
+    // frisen (f till f + 4 px, med meandern), pärlstaven och falsen mot bilden
+    const prof = [[0, '#3a2408'], [0.08, '#e9c878'], [0.16, '#a87a2e'], [0.25, '#f7e3a1'], [0.34, '#b8862f'],
+      [0.39, '#6e4a16'], [0.43, '#8f6526'], [0.73, '#a57a32'], [0.8, '#f0d48a'], [0.88, '#8a5f20'], [0.94, '#2c1a06'], [1, '#160d03']]
+      .map(([o, c]) => `<stop offset="${o}" stop-color="${c}"/>`).join('');
+    // varje sida med sin genomskärning (utifrån och in) och sitt ljus: ljuset
+    // faller uppifrån och från vänster
+    const sides = [
+      [`0,0 ${w},0 ${w - b},${b} ${b},${b}`, '0 0 0 1', '#fff', 0.16],
+      [`0,0 ${b},${b} ${b},${h - b} 0,${h}`, '0 0 1 0', '#fff', 0.06],
+      [`${w},0 ${w},${h} ${w - b},${h - b} ${w - b},${b}`, '1 0 0 0', '#000', 0.22],
+      [`0,${h} ${b},${h - b} ${w - b},${h - b} ${w},${h}`, '0 1 0 0', '#000', 0.34],
+    ];
+    const grads = sides.map(([, v], i) => {
+      const [x1, y1, x2, y2] = v.split(' ');
+      return `<linearGradient id="rum-ram-p${i}" x1="${x1}" y1="${y1}" x2="${x2}" y2="${y2}">${prof}</linearGradient>`;
+    }).join('');
+    // meandern, 4 px hög, börjar jämnt i varje sida (de stående är vridna:
+    // mönstrets y blir −x)
+    const band = [['t', 0, f], ['b', 0, h - f - 4], ['l', 1, f], ['r', 1, w - f - 4]];
+    const keys = band.map(([k, rot, at]) => `<pattern id="rum-ram-m${k}" width="4" height="4" patternUnits="userSpaceOnUse" ` +
+      `${rot ? `y="${-at - 4}" patternTransform="rotate(90)"` : `y="${at}"`}><g transform="scale(.3333)" fill="none" stroke-width="1.6">` +
+      '<path d="M0 10H2V2H10V6H6V10H12" stroke="#f6dfa0" opacity=".55" transform="translate(.8 .8)"/>' +
+      '<path d="M0 10H2V2H10V6H6V10H12" stroke="#4a300c"/></g></pattern>').join('');
+    const frieze = band.map(([k, rot, at]) => (rot
+      ? `<rect x="${at}" y="${f}" width="4" height="${h - 2 * f}" fill="url(#rum-ram-m${k})"/>`
+      : `<rect x="${f}" y="${at}" width="${w - 2 * f}" height="4" fill="url(#rum-ram-m${k})"/>`)).join('');
+    const c = f + 2;
+    const roses = [[c, c], [w - c, c], [c, h - c], [w - c, h - c]]
+      .map(([x, y]) => `<circle cx="${x}" cy="${y}" r="2.6" fill="url(#rum-ram-ros)" stroke="#4a300c" stroke-width=".5"/><circle cx="${x}" cy="${y}" r=".8" fill="#6e4a16"/>`).join('');
+    // palmetten överst: sju blad i solfjäder ur två voluter
+    const cx = w / 2;
+    const leaves = [-66, -44, -22, 0, 22, 44, 66].map((a, i) => {
+      const len = [6.5, 8.5, 10.5, 12, 10.5, 8.5, 6.5][i];
+      const r = a * Math.PI / 180;
+      const x = cx + Math.sin(r) * (len / 2 + 1.5);
+      const y = -1 - Math.cos(r) * (len / 2 + 1.5);
+      return `<ellipse cx="${r1(x)}" cy="${r1(y)}" rx="1.8" ry="${len / 2}" transform="rotate(${a} ${r1(x)} ${r1(y)})"/>`;
+    }).join('');
+    const crest = `<g transform="translate(${cx} 0) scale(.75) translate(${-cx} 0)" fill="url(#rum-ram-kron)" stroke="#5a3c10" stroke-width=".5">${leaves}` +
+      `<path d="M${cx - 12} 0.5Q${cx - 13} -5 ${cx - 9} -4.5Q${cx - 6} -4 ${cx - 8} -2M${cx + 12} 0.5Q${cx + 13} -5 ${cx + 9} -4.5Q${cx + 6} -4 ${cx + 8} -2" fill="none" stroke-width="1.6" stroke="#b8862f"/>` +
+      `<ellipse cx="${cx}" cy="-1" rx="4" ry="2.4"/></g>`;
+    return `<svg viewBox="0 -12 ${w} ${h + 12}" aria-hidden="true"><defs>${grads}${keys}` +
+      '<radialGradient id="rum-ram-ros" cx=".38" cy=".35" r=".7"><stop offset="0" stop-color="#fbeec0"/><stop offset=".55" stop-color="#b8862f"/><stop offset="1" stop-color="#5a3c10"/></radialGradient>' +
+      '<linearGradient id="rum-ram-kron" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#f7e3a1"/><stop offset="1" stop-color="#9a6d26"/></linearGradient></defs>' +
+      sides.map(([pts], i) => `<polygon points="${pts}" fill="url(#rum-ram-p${i})"/>`).join('') + frieze + roses +
+      sides.map(([pts, , col, o]) => `<polygon points="${pts}" fill="${col}" opacity="${o}"/>`).join('') +
+      `<rect x=".3" y=".3" width="${w - 0.6}" height="${h - 0.6}" fill="none" stroke="#2a1a06" stroke-width=".6"/>${crest}</svg>`;
+  }
   function frameHtml() {
     return '<a class="rum-ram rum-sak" href="#olympen" data-nav="olympen" aria-label="Olympen">' +
-      '<span class="rum-ram-bild"><img alt="" id="rum-ram-img"></span>' +
-      '<span class="rum-ram-skylt"><small>Omgångens tippare</small><b id="rum-ram-namn"></b></span></a>';
+      `<span class="rum-ram-list">${gilt()}<span class="kr-scene kr-orakel" id="rum-ram-bild"></span><span class="rum-ram-glans"></span></span>` +
+      '<span class="rum-ram-skylt"><small>Omgångens orakel</small><b id="rum-ram-namn"></b></span></a>';
   }
 
   // Högra väggen i perspektiv: ett element med väggens mått (z = djupet in
@@ -463,6 +517,44 @@ window.Rum = (() => {
     </a>`;
   }
 
+  // Kupongstället vid fönstret: blanka kuponger i ett fack av plexiglas,
+  // butikens pennor (samma som kupongens) i ett rör bredvid och en lapp.
+  function stall() {
+    const sheet = (x, y, a, rows) => {
+      let s = `<g transform="translate(${x} ${y}) rotate(${a})"><rect width="100" height="128" fill="#e9dfc6"/><rect width="100" height="15" fill="#c8643a"/>` +
+        '<text x="5" y="9.4" font-family="Fraunces" font-weight="700" font-size="4" letter-spacing=".8" fill="#f6ecd9">MATCHFIXARNA</text>' +
+        '<text x="95" y="11" text-anchor="end" font-family="Fraunces" font-weight="800" font-size="9" fill="#f6ecd9">Kupong</text>';
+      for (let i = 0; i < rows; i++) {
+        const ry = 22 + i * 12;
+        s += `<line x1="6" y1="${ry + 7}" x2="48" y2="${ry + 7}" stroke="#8a6a4a" stroke-opacity=".45"/>` +
+          [56, 70, 84].map((bx) => `<rect x="${bx}" y="${ry}" width="11" height="8" fill="none" stroke="#a87650" stroke-width=".8"/>`).join('');
+      }
+      return `${s}<rect width="100" height="128" fill="url(#rum-cupg)" opacity=".25"/></g>`;
+    };
+    // spetsen uppåt: kroppen i tre ljus, trät och blyertsen
+    const pen = (x, a, l) => `<g transform="translate(${x} 0) rotate(${a})"><rect x="-2.5" y="${-l}" width="5" height="${l}" fill="url(#rum-penna)"/>` +
+      `<path d="M-2.5 ${-l}L0 ${-l - 9}L2.5 ${-l}Z" fill="#e2c08c"/><path d="M-.85 ${-l - 6}L0 ${-l - 9}L.85 ${-l - 6}Z" fill="#2a2a2a"/></g>`;
+    const glas = (x, y, w, h) => `<rect x="${x}" y="${y}" width="${w}" height="${h}" fill="#cfe2f0" opacity=".1"/>` +
+      `<rect x="${x}" y="${y - 1}" width="${w}" height="2" fill="#fff" opacity=".6"/>` +
+      `<g fill="#fff" opacity=".3"><rect x="${x}" y="${y}" width="1.5" height="${h}"/><rect x="${x + w - 1.5}" y="${y}" width="1.5" height="${h}"/></g>` +
+      `<polygon points="${x + w * 0.55},${y} ${x + w * 0.75},${y} ${x + w * 0.45},${y + h} ${x + w * 0.25},${y + h}" fill="#fff" opacity=".06"/>`;
+    return `<g transform="translate(150 688) scale(.85)"><defs>
+      <linearGradient id="rum-penna" x1="0" y1="0" x2="1" y2="0"><stop offset=".3" stop-color="#f0f0ec"/><stop offset=".3" stop-color="#d9d7d0"/><stop offset=".7" stop-color="#d9d7d0"/><stop offset=".7" stop-color="#b8b5ac"/></linearGradient>
+      <linearGradient id="rum-stallfack" x1="0" y1="0" x2="0" y2="1"><stop offset=".3" stop-color="#1a0f06" stop-opacity="0"/><stop offset="1" stop-color="#1a0f06" stop-opacity=".5"/></linearGradient>
+      <clipPath id="rum-stallet"><rect x="-90" y="-170" width="180" height="164"/></clipPath></defs>
+      <ellipse cx="2" cy="1" rx="90" ry="9" fill="#000" opacity=".5" filter="url(#rum-b4)"/>
+      <g clip-path="url(#rum-stallet)">${sheet(-73, -124, -3, 2)}${sheet(-67, -131, 2, 2)}${sheet(-70, -126, 0, 9)}
+        <rect x="-80" y="-140" width="122" height="134" fill="url(#rum-stallfack)"/><rect x="46" y="-50" width="26" height="44" fill="#000" opacity=".18"/>
+        ${pen(53, -9, 54)}${pen(58, -2, 62)}${pen(63, 6, 52)}${pen(67, 12, 48)}</g>
+      ${glas(-76, -68, 116, 62)}${glas(46, -50, 26, 44)}
+      <rect x="49" y="-47" width="2.5" height="39" fill="#fff" opacity=".3"/><ellipse cx="59" cy="-50" rx="13" ry="3" fill="none" stroke="#fff" stroke-opacity=".6" stroke-width="1.2"/>
+      <rect x="-80" y="-6" width="158" height="6" rx="1.5" fill="url(#rum-alu)"/><rect x="-80" y="-6" width="158" height="1" fill="#e8e6de" opacity=".5"/>
+      <g transform="translate(-18 -36) rotate(-4)"><rect x="-44" y="-10" width="88" height="15" fill="#f6f1a8"/>
+        <rect x="-8" y="-13" width="16" height="6" fill="#e8e2c8" opacity=".75"/>
+        <text y="1.5" text-anchor="middle" font-family="Caveat" font-weight="700" font-size="11" fill="#2a241c">Pennorna är räknade</text></g>
+    </g>`;
+  }
+
   // ---------- lagren ----------
 
   function table() {
@@ -476,9 +568,7 @@ window.Rum = (() => {
   <ellipse cx="1340" cy="930" rx="34" ry="12" fill="none" stroke="#2a160a" stroke-opacity=".35" stroke-width="3"/>
   <ellipse cx="1120" cy="700" rx="30" ry="10" fill="none" stroke="#2a160a" stroke-opacity=".25" stroke-width="2.5"/>
   <g fill="#1a0e06" opacity=".55"><ellipse cx="372" cy="760" rx="7" ry="3"/><ellipse cx="1452" cy="742" rx="6" ry="2.4"/><ellipse cx="1480" cy="870" rx="5" ry="2"/></g>
-  <g><rect x="118" y="612" width="62" height="74" rx="5" fill="#2b2a2a"/>
-    <g stroke-width="7" stroke-linecap="round"><line x1="136" y1="616" x2="128" y2="586" stroke="#d9d7d0"/><line x1="150" y1="616" x2="154" y2="582" stroke="#e3a92b"/><line x1="162" y1="616" x2="172" y2="590" stroke="#d9d7d0"/></g>
-    <rect x="118" y="612" width="62" height="74" rx="5" fill="#fff" opacity=".05"/></g>
+  ${stall()}
   <circle cx="1150" cy="790" r="7" fill="none" stroke="#a9a9a4" stroke-width="3"/><circle cx="1150" cy="790" r="2.5" fill="#55554f"/>
   <rect x="-10" y="984" width="1620" height="20" fill="url(#rum-alu)"/>
   ${facit()}`);
@@ -894,10 +984,14 @@ ${closeHtml()}
     const hy = document.getElementById('rum-hyllor');
     const hs = shelves(cups, seasonLabels(state.meta && state.meta.season));
     if (hy && R.hy !== hs) { hy.innerHTML = hs; R.hy = hs; }
-    const best = window.Kronan && Kronan.holders ? Kronan.holders(seen).best : [{ id: 'DL', name: 'Daniel Laino' }];
-    R.best = best.map((p) => p.id);
-    set('rum-ram-namn', esc(best.map((p) => p.id).join(' & ')));
-    portrait();
+    // oraklet som regerar, med hela efternamnet på skylten; scenen ritas om
+    // bara när oraklet byts, så att strålarna inte börjar om
+    const { best } = Kronan.holders(seen);
+    const scene = Kronan.scene('orakel', best, 'ram');
+    const bild = document.getElementById('rum-ram-bild');
+    if (bild && R.ram !== scene) { bild.innerHTML = scene; R.ram = scene; }
+    set('rum-ram-namn', Kronan.names(best));
+    R.el.querySelector('.rum-ram').classList.toggle('flera', best.length > 1);
   }
 
   // Vem som har lämnat in, för figurerna (rum-3d.js): bara en omgång som inte
@@ -909,17 +1003,6 @@ ${closeHtml()}
     for (const g of (rd && rd.gang) || []) vem[g.id.toLowerCase()] = !open || Boolean(g.inne) || Boolean(p && p.inne && p.vem === g.id);
     for (const id of (R.q.get('rum-vantar') || '').split(',')) if (id.trim()) vem[id.trim().toLowerCase()] = false;
     return vem;
-  }
-
-  // Porträttet i ramen: vinnarfiguren ur three.js när den finns, annars fotot.
-  function portrait() {
-    const img = document.getElementById('rum-ram-img');
-    if (!img || !R.best) return;
-    const id = R.best[0];
-    const src = R.fig && R.fig.portrait ? R.fig.portrait(id.toLowerCase()) : null;
-    const want = src || `profeterna/${{ DL: 'laino', DT: 'teijder', DJ: 'johansson' }[id] || 'laino'}.jpg`;
-    if (img.getAttribute('src') !== want) img.setAttribute('src', want);
-    img.classList.toggle('foto', !src);
   }
 
   // ---------- rörelsen ----------
@@ -1024,7 +1107,6 @@ ${closeHtml()}
       const mod = await import('./rum-3d.js');
       R.fig = await mod.figurer(document.getElementById('rum-3d'), { calm: calm() });
       if (R.vem) R.fig.inne(R.vem, now());
-      portrait();
       frame();
     } catch (err) {
       // utan WebGL eller utan nätet står rummet kvar utan gänget

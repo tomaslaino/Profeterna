@@ -1718,9 +1718,13 @@ går kameran fram mot det innan sidan byts:
   fram och närbilden växer fram ur tavlan med alla matcher på en gång, som klaprar fram;
   raderna leder till matcherna (`#match/<id>`), guldordet *Alla matcher* till Matcher, och
   Esc eller ett klick utanför tar en tillbaka.
-- **Omgångens tippare** (ramen under tavlan, som Månadens anställd) → Olympen: oraklet som
-  regerar (`Kronan.holders`), med porträttet renderat ur figuren (fotot tills figurerna är
-  ritade).
+- **Omgångens orakel** (tavlan under fällbladstavlan) → Olympen: oraklet som regerar
+  (`Kronan.holders`) som i Olympen och på förstasidans polaroid (`Kronan.scene`) – det
+  urklippta fotot på marmorsockeln med lagerkransen som glimmar och strålarna som vrider
+  sig – i en förgylld ram med meanderband, rosetter i hörnen och en palmett överst. Ett
+  skimmer drar snett över guldet och glaset var elfte sekund. Mässingsskylten under säger
+  *Omgångens orakel* och hela efternamnet (delat: *Laino & Johansson*, i mindre stil).
+  Ramen, palmetten och skylten ryms mellan tavlan och disken.
 - **Pokalhyllan** (högra väggen) → Olympen: en liten pokal per vunnen omgång i vinnarens
   färg (delat = en var), ur `data/tippare.json`.
 - **Pärmarna** (hyllan under) → Statistik: en per säsong, de tolv senaste.
@@ -1743,6 +1747,11 @@ går kameran fram mot det innan sidan byts:
   klick eller T; färgknapparna leder till Kupong, Olympen, Tabeller och Statistik, Esc
   zoomar ut.
 
+**Kupongstället** står på pulten vid fönstret (till vänster) och leder ingenstans: blanka
+kuponger med samma terrakottaband som kupongen på pulten i ett fack av plexiglas, butikens
+pennor (samma som kupongens) i ett rör bredvid och en lapp på plexit: *Pennorna är
+räknade*.
+
 **Gänget** sitter på fönsterbänken med benen hängande: DL dricker ur en flaska, DT röker
 och skrattar, DJ har en burk i ena handen och pratar med cigaretten i den andra. Var och en
 har sin loop (12–21 s) – flaskan och burken till munnen med huvudet bakåt, ett bloss med
@@ -1755,8 +1764,7 @@ rum-3d.js): DL en stickad halsduk i Nacionals vitt, blått och rött med BOLSO p
 BLUES på underarmen som håller cigaretten (Chelsea; ett lejon, inte klubbens), och DJ en
 blåvitt randig mössa med tofs och BLÅVITT på uppviket, med solglasögonen uppskjutna på den
 (IFK Göteborg). Halsduken följer bålen, tatueringen vrids med handen och mössan följer
-huvudet; håret trycks ner under mössan och sticker ut under kanten. Porträttet i ramen tar
-med attiraljerna (DJ:s lite längre bort, så att tofsen kommer med).
+huvudet; håret trycks ner under mössan och sticker ut under kanten.
 
 **Rummet rör sig också:** regnet faller utanför rutan och dörren, droppar rinner på glaset,
 neonen glappar ibland, röken ligger under lysröret, damm syns i ljuset och ett hörn på en
