@@ -13,6 +13,8 @@
 //   namnet på dörren → Om oss
 //   kvittot → Kupong, tv:n zoomas in (T) med text-tv:ns färgknappar
 //   kupongen tas i handen (K) – fylls i, ändras eller visas – eller → Kupong.
+//   högen bredvid: de inlämnade kupongerna med baksidan upp; din egen tas i
+//   handen därifrån när du har lämnat in, de andras → Kupong.
 // Pekar man på ett föremål lyser ordet i menyn som det leder till.
 //
 // Vanlig sida (#hem) är den vanliga förstasidan. I telefonen och i smala
@@ -608,6 +610,7 @@ window.Rum = (() => {
 
   function paper() {
     return '<a id="rum-kvitto" class="rum-flat rum-sak" href="#kupong" data-nav="kupong" aria-label="Kupong"></a>' +
+      '<span id="rum-hogen"></span>' +
       '<a id="rum-kupong" class="rum-flat rum-kup rum-sak" href="#kupong" data-nav="kupong" aria-label="Kupong"></a>' +
       svg('<path d="M846 930 C 960 980, 1110 920, 1150 796" fill="none" stroke="#b9b9b2" stroke-width="5" stroke-linecap="round" stroke-dasharray="0.1 7"/>' +
         '<path d="M846 930 C 960 980, 1110 920, 1150 796" fill="none" stroke="#000" stroke-opacity=".25" stroke-width="3" transform="translate(3 6)" stroke-dasharray="0.1 7" stroke-linecap="round"/>') +
@@ -881,6 +884,63 @@ ${closeHtml()}
       (own && p.inne ? '<span class="stampel">Inlämnad</span>' : '') + `<span class="pencil" style="${penStyle(PEN_PULT)}"><i></i></span>`;
   }
 
+  // ---------- högen ----------
+  //
+  // De som har lämnat in har lagt sin kupong med baksidan upp till vänster
+  // om kupongen på pulten, i den ordning de lämnade in (den senaste överst):
+  // porträttet under ett gem, namnet i personens bläck (samma som på
+  // papperet under Kupong) och stämpeln – men inga tecken. Din egen tas i
+  // handen därifrån (p.hand), de andras leder till Kupong. Kupongerna har
+  // samma mått som kupongen på pulten, förminskade, så att den som tas i
+  // handen landar exakt i högen.
+
+  const T = (dx, dy, z, rx, rz, s, ry = 0) => `translate(${r1(dx)}px, ${r1(dy)}px) perspective(1300px) translateZ(${z}px) rotateX(${rx}deg) rotateY(${ry}deg) rotateZ(${rz}deg) scale(${s.toFixed(4)})`;
+  const glow = (a, drop) => `0 0 0 3px rgba(240, 214, 153, ${a}), 0 0 80px rgba(240, 214, 153, ${(0.45 * a).toFixed(2)}), ${drop}`;
+  // mitten (x, y) och vridningen för den första, andra och tredje i högen
+  const HOG = { s: 0.3, at: [[338, 790, -5], [348, 836, 4], [336, 882, -2]], skugga: '0 22px 30px rgba(0, 0, 0, 0.55)' };
+  const INK = ['#2146a6', '#16784b', '#6d3aa8', '#8a6a0c', '#a0306a'];
+  function slot(i) {
+    const [x, y, a] = HOG.at[i % HOG.at.length];
+    const n = Math.floor(i / HOG.at.length);
+    return { dx: x + 14 * n - 760, dy: y + 10 * n - 853, a };
+  }
+  const restAt = (sl) => T(sl.dx, sl.dy, 0, 44, sl.a, HOG.s);
+
+  function photoOf(id) {
+    const g = ((KP.data && KP.data.samtal && KP.data.samtal.gang) || []).find((x) => x.id === id);
+    return g && g.bild ? g.bild : null;
+  }
+
+  // Baksidan: bandet och markeringarna lyser svagt igenom, spegelvända.
+  function backHtml(id, ix) {
+    const src = photoOf(id);
+    return '<span class="genom"></span>' +
+      (src ? `<span class="foto"><img src="${esc(src)}" alt="" draggable="false"></span>` +
+        '<svg class="gem" viewBox="0 0 30 92" aria-hidden="true"><path d="M8 84V14a8 8 0 0 1 16 0v62a5 5 0 0 1-10 0V24"/></svg>' : '') +
+      `<b class="namn" style="color: ${INK[ix] || INK[0]}">${esc(id)}</b><span class="stampel">Inlämnad</span>` +
+      '<span class="regler"><small>Spelregler</small></span>';
+  }
+
+  // p = Samtal.pult.state() (färskast efter en inlämning), annars omgången.
+  // Den som är i handen just nu står inte i högen.
+  function pile(rd, p) {
+    const el = document.getElementById('rum-hogen');
+    if (!el) return;
+    const gang = (p ? p.s.gang : rd && rd.gang) || [];
+    const inne = gang.filter((g) => g.inne).sort((a, b) => String(a.inne).localeCompare(String(b.inne)));
+    const html = inne.map((g, i) => {
+      const ta = Boolean(p && p.vem === g.id && p.hand);
+      const label = ta ? `Din kupong (${g.id}), inlämnad – ${p.andra ? 'ändra' : 'visa'}` : `${g.id}:s kupong, inlämnad`;
+      return `<a class="rum-flat rum-bak rum-sak" href="#kupong" data-nav="kupong" data-vem="${esc(g.id)}" data-i="${i}"${ta ? ' data-ta' : ''}` +
+        ` style="transform: ${restAt(slot(i))}" aria-label="${esc(label)}">${backHtml(g.id, gang.findIndex((x) => x.id === g.id))}</a>`;
+    }).join('');
+    if (el.dataset.html !== html) {
+      el.innerHTML = html;
+      el.dataset.html = html;
+    }
+    for (const a of el.children) a.style.visibility = R.kup && R.kup.vem === a.dataset.vem ? 'hidden' : '';
+  }
+
   function receiptHtml(rd, nr) {
     const gang = (rd && rd.gang) || [];
     const fDt = new Intl.DateTimeFormat('sv-SE', { timeZone: 'Europe/Stockholm', weekday: 'short', hour: '2-digit', minute: '2-digit' });
@@ -944,7 +1004,9 @@ ${closeHtml()}
     const set = (id, html) => { const e = document.getElementById(id); if (e && e.innerHTML !== html) e.innerHTML = html; };
     set('rum-ttx', ttx(rows, t, R.sub || 0));
     const p = pult(rd);
-    set('rum-kupong', couponHtml(rd, rows, p));
+    // har du lämnat in ligger din kupong i högen, och på pulten en ny
+    set('rum-kupong', couponHtml(rd, rows, p && !p.inne ? p : null));
+    pile(rd, p);
     set('rum-kvitto', receiptHtml(rd, nr));
     // gänget på fönsterbänken: den som inte har lämnat in sitter med kupongen
     R.vem = vemInne(rd, rows, t, p);
@@ -1118,7 +1180,8 @@ ${closeHtml()}
   }
 
   // Ett föremål: kameran går fram mot det en kort stund innan sidan byts.
-  // Kupongen tas i handen om den går att fylla i.
+  // Kupongen tas i handen om den går att fylla i, och din i högen om den
+  // går att ändra eller visa.
   function go(a, e) {
     const href = a.getAttribute('href');
     if (!href) return;
@@ -1132,7 +1195,7 @@ ${closeHtml()}
       closeUp(true);
       return;
     }
-    if (a.id === 'rum-kupong' && openCoupon()) {
+    if ((a.id === 'rum-kupong' || a.dataset.ta != null) && openCoupon(a.id === 'rum-kupong' ? null : a)) {
       e.preventDefault();
       return;
     }
@@ -1204,10 +1267,13 @@ ${closeHtml()}
   // kupongen står Lägg tillbaka och guldordet Lämna in. Samma utkast och
   // samma inlämning som papperet under Kupong (Samtal.pult i samtal.js).
   // Esc, K, Lägg tillbaka eller ett klick utanför lägger tillbaka den samma
-  // väg baklänges. Har man lämnat in lyfts den med ens kryss och stämpeln:
-  // går tipsen att ändra (Samtal.pult: andra) heter guldordet Lämna in
-  // ändringen, annars leder Se de andras tips till Kupong. När alla har
-  // lämnat in, eller matcherna har börjat, leder kupongen till Kupong.
+  // väg baklänges. Inlämnad vänds kupongen och läggs i högen (se ovan), och
+  // på pulten ligger en ny. Därifrån lyfts den, vänds på vägen upp och står
+  // i handen med ens kryss och stämpeln: går tipsen att ändra (Samtal.pult:
+  // andra) heter guldordet Lämna in ändringen, annars leder Se de andras
+  // tips till Kupong. Lägg tillbaka och inlämningen lägger den i högen igen.
+  // När alla har lämnat in, eller matcherna har börjat, leder kupongen och
+  // högen till Kupong.
 
   // Läget för kupongen på pulten, om det är omgången som rummet visar.
   function pult(rd) {
@@ -1234,8 +1300,6 @@ ${closeHtml()}
   // Vägen från pulten till handen: kupongen lossnar och lyfter, vänds upp
   // mot betraktaren, svänger en aning förbi och stannar.
   function handFrames(h) {
-    const T = (dx, dy, z, rx, rz, s) => `translate(${r1(dx)}px, ${r1(dy)}px) perspective(1300px) translateZ(${z}px) rotateX(${rx}deg) rotateZ(${rz}deg) scale(${s.toFixed(4)})`;
-    const glow = (a, drop) => `0 0 0 3px rgba(240, 214, 153, ${a}), 0 0 80px rgba(240, 214, 153, ${(0.45 * a).toFixed(2)}), ${drop}`;
     return [
       { offset: 0, transform: T(0, 0, 0, 44, -2, 1), boxShadow: glow(1, '0 26px 34px rgba(0, 0, 0, 0.55)'), easing: 'cubic-bezier(0.3, 0, 0.5, 1)' },
       { offset: 0.24, transform: T(-10, -80, 70, 38, -5.5, 1.03), boxShadow: glow(0.4, '0 70px 60px rgba(0, 0, 0, 0.45)'), easing: 'cubic-bezier(0.25, 0.55, 0.3, 1)' },
@@ -1250,6 +1314,31 @@ ${closeHtml()}
     Object.assign(el.style, { transform, boxShadow });
   }
 
+  // Mellan högen och handen: kupongen lyfts, vänds över långsidan och
+  // förstoras till mitten. → två delar, upp till kanten och därifrån till
+  // handen; innehållet byts när den står på kant (turn).
+  function flipFrames(sl, h) {
+    const f = 0.4;
+    const mid = (ry) => T(sl.dx + (h.dx - sl.dx) * f, sl.dy + (h.dy - sl.dy) * f - 70, 60, 22, sl.a / 2, HOG.s + (h.z - HOG.s) * f, ry);
+    const lyft = glow(0, '0 60px 60px rgba(0, 0, 0, 0.4)');
+    return [
+      [{ transform: restAt(sl), boxShadow: glow(0, HOG.skugga), easing: 'cubic-bezier(0.4, 0, 0.7, 1)' }, { transform: mid(90), boxShadow: lyft }],
+      [
+        { offset: 0, transform: mid(-90), boxShadow: lyft, easing: 'cubic-bezier(0.2, 0.6, 0.35, 1)' },
+        { offset: 0.8, transform: T(h.dx, h.dy + 4, 0, -4, 1, h.z * 1.006), boxShadow: glow(0, '0 40px 90px rgba(0, 0, 0, 0.6)'), easing: 'ease-in-out' },
+        { offset: 1, transform: T(h.dx, h.dy, 0, 0, 0, h.z), boxShadow: glow(0, '0 34px 80px rgba(0, 0, 0, 0.6)') },
+      ],
+    ];
+  }
+
+  // Kupongen vänds: framsidan med tipsen eller baksidan med namnet.
+  function turn(k, front) {
+    k.el.classList.toggle('rum-kup', front);
+    k.el.classList.toggle('rum-bak', !front);
+    k.el.innerHTML = front ? k.fram : k.bak;
+    k.pen = k.el.querySelector('.pencil');
+  }
+
   // Orden under kupongen, i fönstrets mått.
   function placeRow(h) {
     const s = R.kup.rad.style;
@@ -1258,18 +1347,22 @@ ${closeHtml()}
     s.top = `${r1(h.box.top + h.box.height + 20)}px`;
   }
 
-  function openCoupon() {
+  // Har du lämnat in tas din kupong ur högen (from), var du än klickar.
+  function openCoupon(from = null) {
     if (R.kup) return true;
     const p = pult();
     if (!p || !p.hand || !R.el) return false;
+    if (p.inne) from = document.querySelector(`#rum-hogen [data-vem="${CSS.escape(p.vem)}"]`);
+    if (p.inne && !from) return false;
     zoomTv(false);
     if (R.nara) closeUp(false);
     const desk = document.getElementById('rum-kupong');
     const rd = { id: p.s.id, ids: p.s.matcher.map((x) => String(x.id)), gang: p.s.gang, name: (window.Samtal && Samtal.name()) || null };
     const nr = typeof couponNumber === 'function' ? couponNumber(rd.ids) : null;
+    const fram = couponHtml(rd, roundRows(rd), p, p.fyll || p.andra);
     desk.parentElement.insertAdjacentHTML('beforeend', '<div class="rum-dimma" id="rum-dimma"></div>' +
-      `<div class="rum-flat rum-kup rum-handen" id="rum-handen" role="dialog" aria-modal="true" aria-label="${nr ? `Kupong ${nr}` : 'Kupong'}" tabindex="-1">` +
-      `${couponHtml(rd, roundRows(rd), p, p.fyll || p.andra)}</div>`);
+      `<div class="rum-flat ${from ? 'rum-bak' : 'rum-kup'} rum-handen" id="rum-handen" role="dialog" aria-modal="true" aria-label="${nr ? `Kupong ${nr}` : 'Kupong'}" tabindex="-1">` +
+      `${from ? from.innerHTML : fram}</div>`);
     // guldordet: Lämna in, Lämna in ändringen (när något är ändrat) eller,
     // när dina tips står fast, de andras tips under Kupong
     const go = p.fyll ? '<button type="button" class="guld" data-lamna>Lämna in</button>'
@@ -1279,10 +1372,15 @@ ${closeHtml()}
       `<p class="msg" role="status"></p>${go}</div>`);
     const el = document.getElementById('rum-handen');
     const k = R.kup = { el, dim: document.getElementById('rum-dimma'), rad: document.getElementById('rum-hand'), pen: el.querySelector('.pencil'), at: PEN_PULT, desk,
-      andra: p.andra, orig: p.tecken, tecken: { ...p.tecken } };
+      andra: p.andra, orig: p.tecken, tecken: { ...p.tecken }, fram };
     k.msg = k.rad.querySelector('.msg');
     k.go = k.rad.querySelector('[data-lamna]');
-    desk.style.visibility = 'hidden';
+    if (from) {
+      // ur högen: vem och var den låg, och baksidan att vända tillbaka till
+      Object.assign(k, { vem: p.vem, slot: slot(Number(from.dataset.i)), bak: from.innerHTML });
+      from.style.visibility = 'hidden';
+      el.style.transform = restAt(k.slot);
+    } else desk.style.visibility = 'hidden';
     R.el.classList.add('i-handen');
     // kameran ställer sig rakt framför, så att kupongen står rakt i handen
     R.tx = 0;
@@ -1291,9 +1389,30 @@ ${closeHtml()}
     placeRow(h);
     if (calm()) {
       setCam(0, 0);
+      if (from) turn(k, true);
       inHand(el, h);
       Object.assign(k.pen.style, penAt(PEN_VILA));
       k.at = PEN_VILA;
+    } else if (from) {
+      // lyfts ur högen och vänds på vägen upp; pennan ligger redan bredvid
+      const [a, b] = flipFrames(k.slot, h);
+      k.opening = true;
+      k.fade = k.dim.animate([{ opacity: 0 }, { opacity: 1 }], { duration: 800, easing: 'ease', fill: 'both' });
+      k.show = k.rad.animate([{ opacity: 0, transform: 'translateY(8px)' }, { opacity: 1, transform: 'none' }], { duration: 320, delay: 860, easing: 'ease-out', fill: 'both' });
+      const up = el.animate(a, { duration: 380, fill: 'both' });
+      up.finished.then(() => {
+        if (R.kup !== k) return null;
+        turn(k, true);
+        Object.assign(k.pen.style, penAt(PEN_VILA));
+        k.at = PEN_VILA;
+        k.pen.animate([{ opacity: 0 }, { opacity: 1 }], { duration: 300, delay: 420, fill: 'backwards' });
+        k.anim = el.animate(b, { duration: 640, fill: 'both' });
+        up.cancel();
+        return k.anim.finished;
+      }).then(() => {
+        k.opening = false;
+        if (k.later) closeCoupon();
+      }, () => {});
     } else {
       k.anim = el.animate(handFrames(h), { duration: 950, fill: 'both' });
       k.fade = k.dim.animate([{ opacity: 0 }, { opacity: 1 }], { duration: 800, easing: 'ease', fill: 'both' });
@@ -1318,13 +1437,18 @@ ${closeHtml()}
   function closeCoupon(now = false) {
     const k = R.kup;
     if (!k || k.closing) return;
+    // på väg upp ur högen: läggs tillbaka när den är framme
+    if (k.opening && !now) {
+      k.later = true;
+      return;
+    }
     k.closing = true;
     clearTimeout(k.idle);
     R.el.classList.remove('i-handen');
     const done = () => {
       if (R.kup !== k) return;
       R.kup = null;
-      // kupongen på pulten ritas med det som fylldes i innan den syns igen
+      // kupongen på pulten (och högen) ritas med det som fylldes i innan den syns igen
       if (R.on) fill();
       k.desk.style.visibility = '';
       k.el.remove();
@@ -1332,8 +1456,20 @@ ${closeHtml()}
       k.rad.remove();
       if (calm()) setCam(R.mx, R.my);
     };
-    if (now || calm() || !k.anim) {
+    // Inlämnad (k.vem): till högen, och på pulten ligger en ny. Din plats i
+    // högen finns när tjänsten har svarat; den står tom tills kupongen landar.
+    if (k.vem && R.on) {
+      fill();
+      k.desk.style.visibility = '';
+      const a = document.querySelector(`#rum-hogen [data-vem="${CSS.escape(k.vem)}"]`);
+      if (a) k.slot = slot(Number(a.dataset.i));
+    }
+    if (now || calm() || !k.anim || (k.vem && !k.slot)) {
       done();
+      return;
+    }
+    if (k.vem) {
+      toPile(k, done);
       return;
     }
     penGo([{ ...PEN_VILA, l: 0.4, t: 240, e: 'ease-out' }, { ...PEN_PULT, l: 0.15, t: 380, e: 'cubic-bezier(0.4, 0, 0.6, 1)' }, { ...PEN_PULT, t: 200, e: 'ease-in' }]);
@@ -1342,6 +1478,26 @@ ${closeHtml()}
     k.fade.reverse();
     k.show.reverse();
     k.anim.finished.then(done, done);
+  }
+
+  // Tillbaka till högen: samma väg som upp ur den, baklänges – kupongen
+  // vänds på vägen ner och landar på sin plats.
+  function toPile(k, done) {
+    const [a, b] = flipFrames(k.slot, held());
+    if (k.pen) k.pen.animate([{ opacity: 1 }, { opacity: 0 }], { duration: 160, fill: 'forwards' });
+    const down = k.el.animate(b, { duration: 560, fill: 'both' });
+    down.reverse();
+    k.anim.cancel();
+    k.fade.reverse();
+    k.show.reverse();
+    down.finished.then(() => {
+      if (R.kup !== k) return null;
+      turn(k, false);
+      const land = k.el.animate(a, { duration: 420, fill: 'both' });
+      land.reverse();
+      down.cancel();
+      return land.finished;
+    }).then(done, done);
   }
 
   // Pennan går genom punkterna – t = millisekunder dit, e = takten – från
@@ -1451,10 +1607,10 @@ ${closeHtml()}
   }
 
   // Lämna in: som på papperet under Kupong. Stämpeln slår i, och kupongen
-  // läggs tillbaka på pulten.
+  // vänds och läggs i högen.
   async function handIn() {
     const k = R.kup;
-    if (!k || k.busy || k.closing) return;
+    if (!k || k.busy || k.closing || k.opening) return;
     const p = pult();
     if (!p || !(k.andra ? p.andra : p.fyll)) {
       k.msg.textContent = 'Kupongen går inte att lämna in längre.';
@@ -1498,6 +1654,11 @@ ${closeHtml()}
         { transform: 'rotate(-8deg) scale(0.95)', opacity: 0.9, offset: 0.75 },
         { transform: 'rotate(-8deg) scale(1)', opacity: 0.82 },
       ], { duration: 260, easing: 'cubic-bezier(0.5, 0, 0.9, 0.5)' });
+    }
+    // baksidan med ditt namn, som kupongen visar i högen
+    if (!k.vem) {
+      k.vem = p.vem;
+      k.bak = backHtml(p.vem, p.s.gang.findIndex((g) => g.id === p.vem));
     }
     // kvittot visar att du är inne
     if (typeof tpLoad === 'function') tpLoad(true).then(() => { if (R.on) fill(); });
@@ -1571,11 +1732,14 @@ ${closeHtml()}
     const n = document.getElementById('rum-fbn');
     if (n && n.offsetWidth) n.style.setProperty('--k', Math.min((innerWidth - 120) / n.offsetWidth, (innerHeight - 190) / n.offsetHeight, 1.3).toFixed(3));
     // kupongen i handen står kvar mitt i fönstret
-    if (R.kup && !R.kup.closing) {
+    if (R.kup && !R.kup.closing && !R.kup.opening) {
       const h = held();
       placeRow(h);
-      if (R.kup.anim) R.kup.anim.effect.setKeyframes(handFrames(h));
-      else inHand(R.kup.el, h);
+      if (R.kup.anim && !R.kup.slot) R.kup.anim.effect.setKeyframes(handFrames(h));
+      else {
+        inHand(R.kup.el, h);
+        if (R.kup.anim) R.kup.anim.effect.setKeyframes(flipFrames(R.kup.slot, h)[1]);
+      }
     }
   }
 
