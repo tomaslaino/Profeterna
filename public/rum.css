@@ -54,7 +54,7 @@ html.i-rummet body > footer { display: none; }
 
 .rum-pl { position: absolute; left: 0; top: 0; width: 1600px; height: 1000px; transform-origin: 800px 500px; pointer-events: none; }
 .rum-layer { position: absolute; left: 0; top: 0; width: 1600px; height: 1000px; pointer-events: none; }
-.rum-sak, .rum-tag, .rum-tv .fast a { pointer-events: auto; cursor: pointer; }
+.rum-sak, .rum-tag { pointer-events: auto; cursor: pointer; }
 a.rum-sak, a.rum-sak:hover { color: inherit; text-decoration: none; }
 
 /* föremålen lyser lite när man pekar på dem */
@@ -402,38 +402,7 @@ a.rum-fb-r:hover b:not(.lit) { color: #fff; background: linear-gradient(180deg, 
 .rum-kork .rest { position: absolute; width: 8px; height: 6px; background: #efe5cc; clip-path: polygon(0 0, 100% 10%, 80% 100%, 20% 70%); }
 .rum-kork .lapp { width: 40%; background: #f6f1a8; font-family: Caveat, cursive; font-size: 7px; }
 
-/* ---------- tv:n ---------- */
-
-.rum-tv {
-  position: absolute;
-  left: 1328px;
-  top: 122px;
-  width: 214px;
-  height: 158px;
-  display: block;
-  overflow: hidden;
-  border-radius: 14px / 16px;
-  background: #040506;
-  transform: perspective(900px) rotateY(-22deg);
-  transform-origin: 100% 50%;
-  box-shadow: 0 0 34px rgba(90, 130, 255, 0.25);
-}
-.rum-tv .ttx { position: absolute; inset: 0; padding: 8px 11px 0; font-family: VT323, monospace; font-size: 12.5px; line-height: 12.2px; color: #f2f2f2; text-shadow: 0 0 3px currentColor; }
-.rum-tv .ttx > span { display: block; }
-.rum-tv .r { display: flex !important; justify-content: space-between; white-space: nowrap; }
-.rum-tv .band { margin: 2px -11px 3px; padding: 0 11px; height: 19px; background: #0b2fd6; display: flex !important; align-items: center; justify-content: space-between; }
-.rum-tv .band b { color: #ffef3a; font-weight: 400; font-size: 21px; }
-.rum-tv .band i { color: #7ff6ff; font-style: normal; }
-.rum-tv .m { display: grid !important; grid-template-columns: 52px 1fr auto; white-space: nowrap; overflow: hidden; }
-.rum-tv .m .t { color: #6ff3ff; }
-.rum-tv .m em { font-style: normal; color: #ffef3a; padding-left: 4px; }
-.rum-tv .fast { position: absolute; left: 0; right: 0; bottom: 7px; padding: 0 11px; display: flex !important; justify-content: space-between; }
-.rum-tv .fast a { text-decoration: none; }
-.rum-tv .red { color: #ff4e44; } .rum-tv .grn { color: #55ff6a; } .rum-tv .yel { color: #ffef3a; } .rum-tv .cya { color: #63f0ff; }
-.rum-tv .scan { position: absolute; inset: 0; pointer-events: none; background: repeating-linear-gradient(180deg, rgba(0, 0, 0, 0) 0 2px, rgba(0, 0, 0, 0.3) 2px 3px); }
-.rum-tv .glass { position: absolute; inset: 0; pointer-events: none; background: radial-gradient(120% 90% at 30% 15%, rgba(255, 255, 255, 0.1), rgba(255, 255, 255, 0) 45%), radial-gradient(100% 100% at 50% 50%, rgba(0, 0, 0, 0) 60%, rgba(0, 0, 0, 0.7) 100%); box-shadow: inset 0 0 20px rgba(0, 0, 0, 0.85); }
-.rum-tv:hover { filter: brightness(1.12); }
-.rum.tv-nara .rum-tv .fast a:hover { text-decoration: underline; }
+/* ---------- tv:n: rum-tv.css ---------- */
 
 /* ---------- pulten: kupongen och kvittot ---------- */
 

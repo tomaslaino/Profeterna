@@ -1,0 +1,330 @@
+/* Tv:n i tobaksaffären (rum-tv.js): en låda i CSS 3D i planet -470 i
+   rum.js, som därför bevarar djupet (rum-pl3d). Fronten är 292 × 196, lådan
+   105 djup och bildrörets kåpa 22 till, så att den inte går in i väggen
+   (planet -600). Lite vriden mot pulten, så att vänstersidan och
+   undersidan syns; nära (.nara) vrids den rakt fram mot betraktaren.
+
+   Lådan ritas i tre gånger storleken (zoom: 3) och förminskas igen
+   (scale3d): Chrome ritar inte om lager i perspektiv när kameran går fram,
+   så text-tv:n måste ha skärpan i reserv för att vara skarp på nära håll.
+   Alla mått nedan är i lådans egna 292 × 196. */
+
+.rum-pl3d { transform-style: preserve-3d; }
+
+.rum-tvpos { position: absolute; left: 1286px; top: 126px; width: 292px; height: 196px; transform-style: preserve-3d; }
+.rum-tv3 {
+  --tra: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='320' height='160'%3E%3Cfilter id='w' x='0' y='0' width='100%25' height='100%25'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.0035 .11' numOctaves='4' seed='11' stitchTiles='stitch'/%3E%3CfeColorMatrix values='0 0 0 0 .15  0 0 0 0 .08  0 0 0 0 .03  0 0 0 -2.4 1.32'/%3E%3C/filter%3E%3Crect width='320' height='160' filter='url(%23w)'/%3E%3C/svg%3E") 0 0 / 320px 160px, linear-gradient(180deg, #6e4a2c, #523520);
+  position: absolute;
+  left: 0;
+  top: 0;
+  width: 292px;
+  height: 196px;
+  zoom: 3;
+  transform-style: preserve-3d;
+  transform-origin: 0 0;
+  transform: scale3d(0.3333, 0.3333, 0.3333) translate3d(0, 98px, -60px) rotateY(-10deg) translate3d(0, -98px, 60px);
+  transition: transform 0.6s cubic-bezier(0.3, 0, 0.2, 1);
+}
+/* nära: rakt fram, parallell med bilden – då blir rutan en rak rektangel
+   (vriden mot ögat blir den sned, eftersom den sitter högt upp till höger) */
+.rum-tv3.nara { transform: scale3d(0.3333, 0.3333, 0.3333) translate3d(0, 98px, -60px) rotateY(0deg) translate3d(0, -98px, 60px); }
+.rum-tv3.mat { transition: none; }
+.rum-tv3 i, .rum-tv3 b, .rum-tv3 em { display: block; font-style: normal; }
+
+/* ---------- lådan ---------- */
+
+.tv-f { position: absolute; transform-origin: 0 0; background: var(--tra); }
+.tv-topp { left: 0; top: 0; width: 292px; height: 105px; transform: rotateX(-90deg); background: linear-gradient(rgba(255, 236, 200, 0.12), rgba(255, 236, 200, 0.12)), var(--tra); }
+.tv-botten { left: 0; top: 196px; width: 292px; height: 105px; transform: rotateX(-90deg); background: linear-gradient(180deg, rgba(10, 5, 2, 0.55), rgba(10, 5, 2, 0.8)), var(--tra); }
+.tv-vanster { left: 0; top: 0; width: 105px; height: 196px; transform: rotateY(90deg); background: linear-gradient(90deg, rgba(10, 5, 2, 0.28), rgba(10, 5, 2, 0.6)), var(--tra); }
+.tv-hoger { left: 292px; top: 0; width: 105px; height: 196px; transform: rotateY(90deg); background: linear-gradient(rgba(10, 5, 2, 0.5), rgba(10, 5, 2, 0.5)), var(--tra); }
+/* bildrörets kåpa: brun plast med luftspringor */
+.tv-kapa { background: repeating-linear-gradient(90deg, rgba(0, 0, 0, 0) 0 9px, rgba(0, 0, 0, 0.55) 9px 11px), linear-gradient(180deg, #2a2119, #18130e); }
+.k-topp { left: 40px; top: 24px; width: 212px; height: 22px; transform: translateZ(-105px) rotateX(-90deg); }
+.k-botten { left: 40px; top: 172px; width: 212px; height: 22px; transform: translateZ(-105px) rotateX(-90deg); filter: brightness(0.55); }
+.k-vanster { left: 40px; top: 24px; width: 22px; height: 148px; transform: translateZ(-105px) rotateY(90deg); filter: brightness(0.75); }
+.k-hoger { left: 252px; top: 24px; width: 22px; height: 148px; transform: translateZ(-105px) rotateY(90deg); }
+.k-bak { left: 40px; top: 24px; width: 212px; height: 148px; transform: translateZ(-127px); }
+
+/* stången från taket och sladden som hänger ner bakom */
+.tv-stang {
+  position: absolute;
+  left: 214px;
+  top: -440px;
+  width: 9px;
+  height: 442px;
+  transform: translateZ(-58px);
+  background: linear-gradient(90deg, #0b0b0b, #474542 38%, #1b1a19 70%, #090909);
+}
+.tv-stang::after { content: ""; position: absolute; left: -6px; bottom: 0; width: 21px; height: 7px; border-radius: 2px; background: linear-gradient(90deg, #121212, #4a4844 40%, #141414); }
+.tv-kabel {
+  position: absolute;
+  left: 236px;
+  top: 150px;
+  width: 120px;
+  height: 260px;
+  transform: translateZ(-112px);
+  background: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='120' height='260'%3E%3Cpath d='M8 30 C 20 150, 70 110, 112 255' fill='none' stroke='%23111' stroke-width='4' stroke-linecap='round'/%3E%3Cpath d='M8 30 C 20 150, 70 110, 112 255' fill='none' stroke='%23555' stroke-opacity='.5' stroke-width='1' transform='translate(-1 -1)'/%3E%3C/svg%3E") no-repeat;
+}
+
+/* kaninöronen på taket, det ena med en bit folie */
+.tv-antenn {
+  position: absolute;
+  left: 46px;
+  top: -11px;
+  width: 30px;
+  height: 11px;
+  transform: translateZ(-46px);
+  border-radius: 15px 15px 2px 2px / 11px 11px 2px 2px;
+  background: radial-gradient(circle at 40% 30%, #4d4743, #141210 70%);
+}
+.tv-antenn b { position: absolute; left: 14px; bottom: 8px; width: 2px; height: 56px; transform-origin: 50% 100%; transform: rotate(36deg); border-radius: 1px; background: linear-gradient(90deg, #5c5a55, #f2f0ea 45%, #77746d); }
+.tv-antenn b::after { content: ""; position: absolute; left: -1.5px; top: -3px; width: 5px; height: 5px; border-radius: 50%; background: radial-gradient(circle at 35% 30%, #fff, #8d8a83 70%); }
+.tv-antenn .folie { height: 74px; transform: rotate(-52deg); }
+.tv-antenn .folie::after {
+  left: -6px;
+  top: -7px;
+  width: 14px;
+  height: 11px;
+  border-radius: 0;
+  background: linear-gradient(125deg, #f8f8f3, #a3a39b 30%, #ecece5 46%, #85857e 64%, #dcdcd4 80%, #9d9d96);
+  clip-path: polygon(8% 30%, 30% 4%, 52% 16%, 78% 0, 100% 34%, 88% 62%, 98% 88%, 64% 100%, 40% 84%, 12% 96%, 0 66%);
+}
+
+/* skenet från rutan på väggen och i taket */
+.tv-sken {
+  position: absolute;
+  left: 1140px;
+  top: 10px;
+  width: 620px;
+  height: 480px;
+  pointer-events: none;
+  background: radial-gradient(closest-side, rgba(120, 150, 255, 0.15), rgba(120, 150, 255, 0.05) 55%, rgba(120, 150, 255, 0));
+  transition: opacity 0.5s;
+}
+.tv-sken.av { opacity: 0; }
+
+/* ---------- fronten ---------- */
+
+.tv-front {
+  position: absolute;
+  left: 0;
+  top: 0;
+  width: 292px;
+  height: 196px;
+  border-radius: 5px;
+  background: linear-gradient(180deg, rgba(255, 238, 205, 0.13), rgba(255, 238, 205, 0) 22%, rgba(0, 0, 0, 0) 70%, rgba(0, 0, 0, 0.28)), var(--tra);
+  box-shadow: inset 0 1px 0 rgba(255, 236, 200, 0.25), inset 0 -2px 0 rgba(0, 0, 0, 0.35);
+}
+.tv-front > * { position: absolute; }
+
+/* ramen kring rutan: mörk plast med en krom list */
+.tv-ram {
+  left: 12px;
+  top: 12px;
+  width: 214px;
+  height: 166px;
+  border-radius: 12px;
+  background: radial-gradient(120% 120% at 40% 30%, #2a241d, #120f0b);
+  box-shadow: 0 0 0 1.5px #8d8a82, 0 0 0 3px #22180f, inset 0 1px 1px rgba(255, 255, 255, 0.12), inset 0 0 8px rgba(0, 0, 0, 0.8);
+}
+
+/* bildröret: buktigt glas med rundade hörn */
+.tv-glas {
+  position: absolute;
+  left: 11px;
+  top: 11px;
+  width: 192px;
+  height: 144px;
+  overflow: hidden;
+  border-radius: 20px / 24px;
+  background: radial-gradient(90% 90% at 50% 46%, #161a18, #0b0d0c 70%, #050606);
+  box-shadow: 0 0 0 1px #050505, 0 1px 1px rgba(255, 255, 255, 0.1);
+  transition: filter 0.25s ease;
+}
+.tv-scan {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  background: repeating-linear-gradient(180deg, rgba(0, 0, 0, 0) 0 0.62px, rgba(0, 0, 0, 0.38) 0.62px 1.152px);
+  opacity: 0.35;
+  transition: opacity 0.6s;
+}
+.rum-tv3.nara .tv-scan { opacity: 0.85; }
+.tv-glans {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  border-radius: inherit;
+  background:
+    radial-gradient(70% 55% at 27% 15%, rgba(255, 255, 255, 0.14), rgba(255, 255, 255, 0) 60%),
+    linear-gradient(166deg, rgba(255, 255, 255, 0) 9%, rgba(255, 250, 235, 0.07) 13%, rgba(255, 255, 255, 0) 22%),
+    radial-gradient(100% 100% at 50% 50%, rgba(0, 0, 0, 0) 55%, rgba(0, 0, 0, 0.62) 100%);
+  box-shadow: inset 0 0 14px rgba(0, 0, 0, 0.9), inset 0 0 3px #000;
+}
+/* ett svagt ljusband som rullar nedför rutan, som när strömmen inte riktigt höll takten */
+.tv-glas::after {
+  content: "";
+  position: absolute;
+  left: 0;
+  right: 0;
+  top: -40%;
+  height: 34%;
+  pointer-events: none;
+  background: linear-gradient(180deg, rgba(255, 255, 255, 0), rgba(220, 230, 255, 0.035), rgba(255, 255, 255, 0));
+  animation: tv-rull 9s linear infinite;
+}
+@keyframes tv-rull { to { transform: translateY(420%); } }
+
+/* ---------- text-tv: 40 × 25 tecken i 288 × 360, förminskat till rutan med
+   kant runt om, som på en riktig bildskärm ---------- */
+
+.tv-glas .tt {
+  position: absolute;
+  left: -48px;
+  top: -108px;
+  width: 288px;
+  height: 360px;
+  transform: scale(0.6111, 0.3667);
+  font: 18px/14.4px VT323, monospace;
+  font-variant-ligatures: none;
+  font-kerning: none;
+  color: #f4f3ec;
+  text-shadow: 0 0 2.5px currentColor;
+}
+.tv-glas .tr { position: relative; display: block; height: 14.4px; white-space: pre; }
+.tv-glas .tr > *, .tv-glas .tr .in > * { display: inline-block; height: 14.4px; vertical-align: top; }
+.tv-glas button { margin: 0; padding: 0; border: 0; border-radius: 0; background: none; font: inherit; color: inherit; text-align: left; text-shadow: inherit; white-space: pre; cursor: pointer; }
+.tv-glas a { color: inherit; text-decoration: none; }
+.tv-glas button.tr { width: 100%; }
+.tv-glas .tr.dh { height: 28.8px; }
+.tv-glas .tr.dh .in { display: block; height: 14.4px; transform: scaleY(2); transform-origin: 0 0; }
+.tv-glas .w { --c: #f4f3ec; color: var(--c); }
+.tv-glas .y { --c: #fff23c; color: var(--c); }
+.tv-glas .c { --c: #45f1ff; color: var(--c); }
+.tv-glas .g { --c: #48ff64; color: var(--c); }
+.tv-glas .r { --c: #ff4034; color: var(--c); }
+.tv-glas .m { --c: #ff4ef2; color: var(--c); }
+.tv-glas .bb { background: #1428e0; }
+.tv-glas .band { position: relative; }
+.tv-glas .mos { position: absolute; left: 0; top: 0; width: 288px; height: 43.2px; fill: #fff23c; filter: drop-shadow(0 0 1.5px rgba(255, 242, 60, 0.6)); }
+.tv-glas .sr { position: absolute; width: 1px; height: 1px; overflow: hidden; clip-path: inset(50%); }
+/* raderna som leder till en sida lyser blått, snabbvalen i sin färg med svart text */
+.rum-tv3.nara .tv-glas button.tr:hover, .rum-tv3.nara .tv-glas button.tr:focus-visible { background: #1428e0; outline: none; }
+.rum-tv3.nara .tv-glas .fast > :hover, .rum-tv3.nara .tv-glas .fast > :focus-visible { background: var(--c); color: #050505; text-shadow: none; outline: none; }
+
+/* en ny sida ritas uppifrån och ner */
+.tv-glas.ny .band { animation: tv-rad 1ms both; }
+.tv-glas.ny .tb > .tr { animation: tv-rad 1ms calc(20ms + var(--i, 20) * 16ms) both; }
+@keyframes tv-rad { from { visibility: hidden; } }
+
+/* av och på: bilden dras ihop till ett streck och en prick, och tänds igen */
+.rum-tv3.av .tt, .rum-tv3.av .tv-glas::after { visibility: hidden; }
+.tv-glas.slocknar .tt { animation: tv-slocknar 0.42s ease-in both; }
+.tv-glas.slocknar::before {
+  content: "";
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  width: 6px;
+  height: 6px;
+  margin: -3px;
+  border-radius: 50%;
+  background: #fff;
+  box-shadow: 0 0 8px 3px rgba(200, 220, 255, 0.8);
+  animation: tv-prick 1.1s 0.36s ease-out both;
+}
+.tv-glas.tands .tt { animation: tv-tands 0.55s ease-out; }
+@keyframes tv-slocknar {
+  0% { visibility: visible; transform: scale(0.6111, 0.3667); filter: none; }
+  45% { visibility: visible; transform: scale(0.6111, 0.006); filter: brightness(5); }
+  99% { visibility: visible; transform: scale(0, 0.006); filter: brightness(5); }
+  100% { transform: scale(0, 0.006); }
+}
+@keyframes tv-prick { from { opacity: 1; transform: scale(1); } to { opacity: 0; transform: scale(0.25); } }
+@keyframes tv-tands {
+  0% { transform: scale(0.6111, 0.006); filter: brightness(4); }
+  45% { transform: scale(0.6111, 0.3667); filter: brightness(1.8); }
+  100% { transform: scale(0.6111, 0.3667); filter: none; }
+}
+
+/* ---------- panelen: gulnat borstat aluminium ---------- */
+
+.tv-panel {
+  left: 234px;
+  top: 12px;
+  width: 46px;
+  height: 166px;
+  border-radius: 3px;
+  background:
+    repeating-linear-gradient(0deg, rgba(255, 255, 255, 0.05) 0 1px, rgba(0, 0, 0, 0.04) 1px 2px),
+    linear-gradient(90deg, #8c8778, #c9c2ab 38%, #a39d88 70%, #807b6c);
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.45), inset 0 -1px 0 rgba(0, 0, 0, 0.35), 0 0 0 1px rgba(0, 0, 0, 0.5);
+}
+.tv-panel > * { position: absolute; }
+/* färgmärket med regnbågen */
+.tv-farg { left: 5px; top: 6px; width: 36px; height: 13px; display: flex !important; align-items: center; gap: 1px; padding: 0 3px; box-sizing: border-box; border-radius: 2px; background: #15130f; box-shadow: inset 0 0 0 1px #6e6a5e; }
+.tv-farg b { width: 2px; height: 9px; transform: skewX(-18deg); }
+.tv-farg b:nth-child(1) { background: #e63a2e; } .tv-farg b:nth-child(2) { background: #f39a2b; } .tv-farg b:nth-child(3) { background: #f3d93a; }
+.tv-farg b:nth-child(4) { background: #4cb34a; } .tv-farg b:nth-child(5) { background: #3a6fd6; }
+.tv-farg em { margin-left: 2px; font: italic 600 7.5px/1 Fraunces, Georgia, serif; color: #d9d6cc; }
+/* sifferdisplayen bakom rött glas */
+.tv-led { left: 5px; top: 25px; width: 36px; height: 20px; padding: 3px 3px 2px; box-sizing: border-box; border-radius: 2px; background: linear-gradient(180deg, #2a0705, #160302); box-shadow: inset 0 1px 3px #000, 0 1px 0 rgba(255, 255, 255, 0.35); }
+.tv-led svg { display: block; width: 100%; height: 100%; overflow: visible; }
+.tv-led rect { fill: #3d0b07; }
+.tv-led rect.on { fill: #ff4a2e; filter: drop-shadow(0 0 1.2px #ff3010); }
+/* sidknapparna: krämvit plast */
+.tv-k {
+  left: 8px;
+  width: 30px;
+  height: 18px;
+  margin: 0;
+  padding: 0;
+  border: 0;
+  border-radius: 2.5px;
+  background: linear-gradient(180deg, #f1e9d4, #d3c7a8);
+  box-shadow: 0 1.5px 0 #857a60, 0 3px 3px rgba(0, 0, 0, 0.45), inset 0 1px 0 rgba(255, 255, 255, 0.8);
+  color: #3b352b;
+  font: 8px/18px sans-serif;
+  cursor: pointer;
+  transition: transform 0.06s, box-shadow 0.06s;
+}
+.tv-k[data-tv="upp"] { top: 52px; }
+.tv-k[data-tv="ner"] { top: 76px; }
+.tv-k:active { transform: translateY(1.2px); box-shadow: 0 0.3px 0 #857a60, 0 1px 1px rgba(0, 0, 0, 0.45), inset 0 1px 2px rgba(0, 0, 0, 0.2); }
+.rum-tv3.nara .tv-k:hover { background: linear-gradient(180deg, #fff7e2, #ddd2b4); }
+.tv-k:focus-visible, .tv-pa:focus-visible { outline: 1.5px solid #f0d699; outline-offset: 1.5px; }
+/* högtalargallret */
+.tv-galler { left: 6px; top: 102px; width: 34px; height: 38px; border-radius: 2px; background: radial-gradient(circle, #1a1712 0.85px, rgba(0, 0, 0, 0) 1.15px) 0 0 / 3.4px 3.4px, rgba(0, 0, 0, 0.12); box-shadow: inset 0 1px 1px rgba(0, 0, 0, 0.35); }
+/* strömbrytaren och lampan (grön på, röd av) */
+.tv-pa { left: 8px; top: 148px; width: 13px; height: 13px; margin: 0; padding: 0; border: 0; border-radius: 50%; background: radial-gradient(circle at 40% 35%, #f4f2ec, #9b978c 60%, #5e5b53); box-shadow: 0 1px 2px rgba(0, 0, 0, 0.6), inset 0 -1px 1px rgba(0, 0, 0, 0.3); cursor: pointer; }
+.tv-pa:active { transform: scale(0.92); }
+.tv-lampa { left: 28px; top: 152px; width: 5px; height: 5px; border-radius: 50%; background: #5dff7a; box-shadow: 0 0 4px 1px rgba(80, 255, 120, 0.7); }
+.rum-tv3.av .tv-lampa { background: #ff3a2a; box-shadow: 0 0 4px 1px rgba(255, 60, 40, 0.6); }
+
+/* krombokstäverna under rutan */
+.tv-namn {
+  left: 22px;
+  top: 182px;
+  font: 700 6.5px/1 Fraunces, Georgia, serif;
+  letter-spacing: 1.6px;
+  background: linear-gradient(180deg, #f6f4ee, #8f8b80 55%, #d6d3ca);
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
+}
+
+/* ---------- klicket ---------- */
+
+/* på avstånd går ett klick var som helst på tv:n fram till den (rum.js) */
+.rum-tv { position: absolute; left: 0; top: 0; width: 292px; height: 196px; display: block; border-radius: 5px; transform: translateZ(2px); }
+.rum-tv:hover, .rum-tv:focus-visible { filter: none; }
+.rum-tv:focus-visible { outline: 2px solid rgba(240, 214, 153, 0.8); outline-offset: 3px; }
+.rum.tv-nara .rum-tv { pointer-events: none; }
+.rum-tv3.nara .tv-front button, .rum-tv3.nara .tv-front a { pointer-events: auto; }
+.rum-tv3:has(> .rum-tv:hover) .tv-glas { filter: brightness(1.3) saturate(1.15); }
+
+@media (prefers-reduced-motion: reduce) {
+  .rum-tv3, .tv-scan, .tv-glas { transition: none; }
+  .tv-glas::after { animation: none; display: none; }
+}

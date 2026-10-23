@@ -11,7 +11,7 @@
 //   korktavlan → gängets kuponger     pokalhyllan, Omgångens orakel → Olympen
 //   krittavlan → Tabeller             pärmarna → Statistik
 //   namnet på dörren → Om oss
-//   kvittot → Kupong, tv:n zoomas in (T) med text-tv:ns färgknappar
+//   kvittot → Kupong, tv:n zoomas in (T): text-tv med en sida per match (rum-tv.js)
 //   kupongen tas i handen (K) – fylls i eller ändras – eller → Kupong.
 //   högen bredvid: de inlämnade kupongerna med baksidan upp; din egen tas i
 //   handen därifrån när du har lämnat in, de andras → Kupong.
@@ -27,7 +27,8 @@
 //
 // Läses efter kupong.js, samtal.js, tippare.js och kronan.js och använder
 // deras hjälpare (state, KP, TP, gradeRow, couponNumber, currentCoupon,
-// Kronan.holders, Kronan.scene, Historik.coupons …). rum-3d.js hämtas först
+// Kronan.holders, Kronan.scene, Historik.coupons …) och tv:n i rum-tv.js
+// (RumTv, läses före den här). rum-3d.js hämtas först
 // när rummet visas, med three.js från jsdelivr (importmap i index.html); utan
 // WebGL står rummet kvar utan gänget.
 
@@ -539,13 +540,8 @@ window.Rum = (() => {
       '<canvas id="rum-3d" class="rum-3d" width="1280" height="560"></canvas>';
   }
 
-  function tv() {
-    return svg(`<rect x="1352" y="0" width="7" height="122" fill="#1a1a1a"/>
-  <polygon points="1316,112 1556,104 1556,300 1316,292" fill="#1b1a19"/>
-  <polygon points="1316,112 1556,104 1556,300 1316,292" fill="none" stroke="#fff" stroke-opacity=".06"/>
-  <polygon points="1318,112 1556,104 1556,108 1318,116" fill="#d6cfbd" opacity=".22"/>`) +
-      '<a class="rum-tv rum-sak" href="#matcher" data-nav="tv" aria-label="Text-tv" id="rum-tv"><span class="ttx" id="rum-ttx"></span><span class="scan"></span><span class="glass"></span></a>';
-  }
+  // Tv:n i hörnet (rum-tv.js).
+  const tv = () => (window.RumTv ? RumTv.html() : '');
 
   function paper() {
     return '<a id="rum-kvitto" class="rum-flat rum-sak" href="#kupong" data-nav="kupong" aria-label="Kupong"></a>' +
@@ -570,7 +566,7 @@ window.Rum = (() => {
     el.setAttribute('aria-label', 'Tobaksaffären');
     el.innerHTML = `<div class="rum-stage" id="rum-stage"><div class="rum-kamera" id="rum-kamera"><div class="rum-world" id="rum-world">
 ${plane(-600, `<div class="rum-ute" id="rum-ute"></div>${bg()}${rightWall()}${svg('<g id="rum-hyllor"></g>')}${neon()}${clock()}${boardHtml()}${frameHtml()}`, 1.035)}
-${plane(-470, `${props()}${tv()}`, 1.02)}
+${plane(-470, `${props()}${tv()}`, 1.02, 'rum-pl3d')}
 ${plane(-330, `${sill()}${haze()}`)}
 ${plane(-60, table(), 1.05)}
 ${plane(0, paper())}
@@ -584,6 +580,8 @@ ${closeHtml()}
     R.el = el;
     R.built = true;
     wire();
+    // kort: högst elva tecken, som på fällbladstavlan
+    R.tv = window.RumTv ? RumTv.mount(el, { calm, short, kort: (n) => BOARD[n] || short(n), wd, hm }) : null;
     paintUte();
   }
 
@@ -739,23 +737,6 @@ ${closeHtml()}
     if (!box || box.dataset.ids === ids) return;
     box.dataset.ids = ids;
     box.innerHTML = rows.length ? rows.map((x) => fbRow(FIELDS, '', `#match/${x.id}`)).join('') : fbRow(FIELDS);
-  }
-
-  // Text-tv: sida 331 med omgångens matcher, två undersidor.
-  function ttx(rows, t, sub) {
-    const pad = (s, n) => String(s).slice(0, n);
-    const clock = hm(new Date(t)).replace('.', ':');
-    const list = rows.slice(sub * 6, sub * 6 + 6);
-    const subs = Math.max(1, Math.ceil(rows.length / 6));
-    return `<span class="r"><span>331 Matchfix-Text</span><span>${clock}</span></span>` +
-      `<span class="band"><b>MATCHER</b><i>${subs > 1 ? `${sub + 1}/${subs}` : ''}</i></span>` +
-      list.map((x) => {
-        const g = x.g;
-        const right = g.score && (g.state === 'final' || g.state === 'live') ? `<em>${g.score.home}-${g.score.away}</em>` : '';
-        return `<span class="m"><span class="t">${wd(new Date(x.m.kickoff))} ${hm(new Date(x.m.kickoff))}</span><span>${esc(pad(`${short(x.m.home)}-${short(x.m.away)}`, 24))}</span>${right}</span>`;
-      }).join('') +
-      '<span class="fast"><a class="red" href="#kupong" data-to="kupong">Kupong</a><a class="grn" href="#olympen" data-to="olympen">Olympen</a>' +
-      '<a class="yel" href="tabeller.html" data-to="tabeller">Tabell</a><a class="cya" href="statistik.html" data-to="statistik">Statistik</a></span>';
   }
 
   // Kryssets två streck med blyerts i en ruta (40 × 19): lite sneda och
@@ -946,7 +927,7 @@ ${closeHtml()}
     if (R.nara) setBoard(document.getElementById('rum-fbn'), R.lines, 0, !calm());
     const nr = rd && !rd.next && rd.ids.length && typeof couponNumber === 'function' ? couponNumber(rd.ids) : null;
     const set = (id, html) => { const e = document.getElementById(id); if (e && e.innerHTML !== html) e.innerHTML = html; };
-    set('rum-ttx', ttx(rows, t, R.sub || 0));
+    if (R.tv) R.tv.fill(rows);
     const p = pult(rd);
     // har du lämnat in ligger din kupong i högen, och på pulten en ny
     set('rum-kupong', couponHtml(rd, rows, p && !p.inne ? p : null));
@@ -1042,7 +1023,7 @@ ${closeHtml()}
       R.el.classList.toggle('neon-av', !on);
     }
     hands();
-    // tavlan bläddrar var nionde sekund, text-tv:n var tolfte
+    // tavlan bläddrar var nionde sekund (text-tv:n sköter sig själv i rum-tv.js)
     const page = Math.floor(t / 9);
     if (still() && R.lines) {
       boardAt(document.getElementById('rum-fb'), R.lines, page, t - page * 9);
@@ -1051,12 +1032,6 @@ ${closeHtml()}
       R.pageAt = page;
       R.page = page;
       setBoard(document.getElementById('rum-fb'), R.lines, page, !calm());
-    }
-    const sub = Math.floor(t / 12) % 2;
-    if (sub !== R.sub && R.rows) {
-      R.sub = sub;
-      const e = document.getElementById('rum-ttx');
-      if (e) e.innerHTML = ttx(R.rows, Date.now(), R.rows.length > 6 ? sub : 0);
     }
     if (!calm() || still()) dust(t);
     if (R.fig) R.fig.draw(t, R.mx, R.my);
@@ -1134,9 +1109,9 @@ ${closeHtml()}
     for (const a of R.el.querySelectorAll('a[data-to]')) a.classList.toggle('hot', nav === a.dataset.to);
   }
 
-  // Föremålets mitt i scenens koordinater.
+  // Föremålets (eller måttens) mitt i scenens koordinater.
   function centerOf(a) {
-    const r = a.getBoundingClientRect();
+    const r = a.getBoundingClientRect ? a.getBoundingClientRect() : a;
     const st = R.el.querySelector('.rum-stage').getBoundingClientRect();
     return [((r.left + r.width / 2 - st.left) / st.width) * W, ((r.top + r.height / 2 - st.top) / st.height) * H];
   }
@@ -1221,13 +1196,22 @@ ${closeHtml()}
     else aim([800, 500], 1, [800, 500], calm() ? null : 'glid');
   }
 
-  // T: tv:n nära, så att text-tv:n går att läsa och färgknapparna att trycka på.
+  // T: tv:n nära, vriden mot en, så att text-tv:n går att läsa och knapparna
+  // att trycka på. Kameran siktar på rutan där den hamnar när tv:n har vridits.
   function zoomTv(on) {
     if (on && R.nara) closeUp(false);
     R.zoom = on;
     R.el.classList.toggle('tv-nara', on);
-    const tvEl = document.getElementById('rum-tv');
-    if (on && tvEl) aim(centerOf(tvEl), 2.5, [800, 470], calm() ? null : 'glid');
+    // kameran ställer sig rakt framför, så att tv:n står rak (som med kupongen i handen)
+    if (on) {
+      R.tx = 0;
+      R.ty = 0;
+      if (calm()) R.mx = R.my = 0;
+      setCam(0, 0);
+    }
+    const r = R.tv && R.tv.zoom(on);
+    setCam(R.mx, R.my);
+    if (on && r) aim(centerOf(r), 3, [800, 480], calm() ? null : 'glid');
     else aim([800, 500], 1, [800, 500], calm() ? null : 'glid');
   }
 
@@ -1678,7 +1662,7 @@ ${closeHtml()}
   function wire() {
     const el = R.el;
     el.addEventListener('mousemove', (e) => {
-      if (R.kup) return;
+      if (R.kup || R.zoom) return;
       R.tx = (e.clientX / innerWidth) * 2 - 1;
       R.ty = (e.clientY / innerHeight) * 2 - 1;
     });
@@ -1694,8 +1678,8 @@ ${closeHtml()}
         closeCoupon();
         return;
       }
-      const ttxLink = e.target.closest('.ttx .fast a');
-      if (ttxLink) return;
+      // nära tv:n sköter den sina knappar och länkar själv (rum-tv.js)
+      if (R.zoom && e.target.closest('#rum-tv3')) return;
       if (R.nara) {
         // i närbilden leder raderna och guldordet vidare; utanför tavlan tillbaka
         if (!e.target.closest('#rum-fbn, .rum-hdr, .rum-ft')) closeUp(false);
@@ -1716,7 +1700,8 @@ ${closeHtml()}
         if (k === 'k' || k === 'escape') closeCoupon();
       } else if (k === 'k') {
         if (!openCoupon()) location.hash = 'kupong';
-      } else if (k === 't') zoomTv(!R.zoom);
+      } else if (R.zoom && R.tv && R.tv.key(e.key)) e.preventDefault();
+      else if (k === 't') zoomTv(!R.zoom);
       else if (k === 'escape' && R.nara) closeUp(false);
       else if (k === 'escape' && R.zoom) zoomTv(false);
     });

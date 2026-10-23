@@ -1711,9 +1711,10 @@ fönstret; lagren ligger på olika djup (CSS 3D) och vrids lite när musen rör 
 och foten (*K kupongen · T tv:n*, *Vanlig sida*) ligger utanför scenen i fönstrets hörn;
 någon meny finns inte, det är föremålen som leder vidare. [public/rum.js](public/rum.js)
 ritar rummet och fyller det med sajtens data, [public/rum.css](public/rum.css) ger det utseendet och
-rörelserna, och [public/rum-3d.js](public/rum-3d.js) ritar gänget i three.js 0.160.0 (från
-jsdelivr, importmap i `index.html`), som hämtas först när rummet visas – utan WebGL eller
-utan nätet står rummet kvar utan gänget.
+rörelserna, [public/rum-tv.js](public/rum-tv.js) och [public/rum-tv.css](public/rum-tv.css)
+bygger tv:n (se [Tv:n](#tvn)), och [public/rum-3d.js](public/rum-3d.js) ritar gänget i
+three.js 0.160.0 (från jsdelivr, importmap i `index.html`), som hämtas först när rummet
+visas – utan WebGL eller utan nätet står rummet kvar utan gänget.
 
 **Föremålen** – pekar man på ett lyser det (pokalerna och pärmarna också), och snabbvalet
 på text-tv:n som det leder till tänds, som när man pekar på snabbvalet med tv:n nära
@@ -1764,9 +1765,9 @@ sidan byts:
   baksidan upp, i den ordning de lämnade in (den senaste överst) – porträttet under ett gem,
   initialerna i personens bläck (samma som på papperet under Kupong) och stämpeln
   *Inlämnad*, men inga tecken. Din egen tas i handen (se nedan); de andras leder till Kupong.
-- **Tv:n** med text-tv (sida 331, omgångens matcher på två undersidor) zoomas in med ett
-  klick eller T; färgknapparna leder till Kupong, Olympen, Tabeller och Statistik, Esc
-  zoomar ut.
+- **Tv:n** i hörnet uppe till höger, en tjock-tv i träfaner med text-tv, zoomas in med ett
+  klick eller T och vrids då mot en; där bläddrar man mellan omgångens matcher med knapparna
+  på tv:n (se [Tv:n](#tvn)). Esc eller ett klick utanför zoomar ut.
 - **Namnet på dörren** (längst till vänster, under Stängt-skylten) → Om oss: *Matchfixarna*
   i bladguld på glaset, spegelvänt inifrån som neonskylten, med TOBAK & SPEL och *Öppet
   till spelstoppet* under. I fönster som är minst 8:5 syns hela dörren, och där står namnet
@@ -1946,6 +1947,52 @@ direkt på papperet. Rörelserna är Web Animations (`openCoupon`, `flipFrames`,
 och `penGo` i [public/rum.js](public/rum.js)); kupongen och högen ligger i samma lager som
 pulten, och kupongerna i högen har kupongens mått, förminskade, så att kupongen börjar
 exakt där den låg och landar exakt på sin plats i högen.
+
+### Tv:n
+
+En tjock-tv från början av åttiotalet hänger i en stång från taket i hörnet, lite vriden
+mot pulten ([public/rum-tv.js](public/rum-tv.js), [public/rum-tv.css](public/rum-tv.css)).
+Lådan är byggd i CSS 3D i samma värld som resten av rummet (planet -470, som därför bevarar
+djupet): träfaner, vänstersidan och undersidan som syns och följer musen, bildrörets kåpa med
+luftspringor bakom, sladden som hänger ner och kaninöronen på taket med en bit folie på det
+ena. Rutan är buktig med rundade hörn, svepljus och ett svagt ljusband som rullar nedför
+glaset, och den lyser blått på väggen. Till höger sitter panelen i gulnat aluminium:
+färgmärket med regnbågen, en röd sifferdisplay med sidnumret, sidknapparna ▲ ▼,
+högtalargallret och strömbrytaren med lampan.
+
+**Text-tv som SVT:s:** 40 × 25 tecken (VT323, utan ligaturer), rubrikraden med sidnumret,
+*Matchfix Text*, datumet och klockan som tickar, ett blått band med rubriken i mosaikgrafik
+(gula klossar), sju färger, dubbelhöga rader och snabbvalen i rött, grönt, gult och
+cyanblått längst ner.
+
+- **331 Matcher:** omgångens matcher i avsparksordning – lagen, avsparken eller ställningen
+  (grön med minuten medan matchen pågår, `paus` i halvtid, `?` när resultatet är dolt,
+  `struken`) och matchens sida. Fler än 17 matcher bläddrar mellan undersidorna var tolfte
+  sekund. Snabbvalen leder till Kupong, Olympen, Tabeller och Statistik, och det som ett
+  föremål leder till tänds när man pekar på föremålet.
+- **332 och framåt, en sida per match:** lagen dubbelhöga med ställningen, ligan i bandet,
+  avsparken eller läget, arenan, oddsen (1, X, 2) och lagens rader ur tabellen – placering,
+  poäng, V-O-F, mål och hemma- respektive bortaraden – ur matchens fil
+  (`data/match/<id>.json`, hämtas när sidan visas första gången). När resultatet är dolt
+  visas inga tabellrader. Snabbvalen: *Föreg*, *Nästa*, *Omgången* (331) och *Matchen*
+  (`#match/<id>`).
+
+**Nära** (klick eller T) vrids tv:n rakt fram och kameran ställer sig rakt framför (musen
+vrider inte rummet medan tv:n är nära), så att rutan blir en rak rektangel – vriden mot
+ögat blir den sned, eftersom den sitter högt upp till höger. Man byter sida med ▲ ▼ på
+panelen (runt från sista sidan till 331), snabbvalen, raderna på 331, piltangenterna eller
+tre siffror som på fjärrkontrollen; displayen visar siffrorna medan man slår dem. Tv:n söker
+som förr: sidnumret i rubrikraden rullar fram i grönt tills sidan kommer, och sidan ritas
+uppifrån och ner – finns den inte går tv:n tillbaka. Strömbrytaren stänger av: bilden dras
+ihop till ett streck och en prick, lampan blir röd och skenet på väggen slocknar; ett tryck
+till tänder den. Esc, T eller ett klick utanför zoomar ut. Med `prefers-reduced-motion`
+byts sidan direkt och tv:n står still.
+
+Lådan ritas i tre gånger storleken (`zoom: 3`) och förminskas igen (`scale3d`): Chrome
+ritar inte om lager i perspektiv när kameran går fram, så utan skärpan i reserv blir
+text-tv:n suddig på nära håll. Tv:n sköter sig själv: rum.js bygger den (`RumTv.html`),
+kopplar in den (`RumTv.mount`), ger den omgångens rader vid varje `fill` och skickar
+siffror och pilar dit när den är nära.
 
 ## Statusmärkning
 
