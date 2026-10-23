@@ -10,6 +10,7 @@
 //   fällbladstavlan → närbilden → Matcher  förstoringsglaset → Analysera (nästa match)
 //   korktavlan → gängets kuponger     pokalhyllan, Omgångens orakel → Olympen
 //   krittavlan → Tabeller             pärmarna → Statistik
+//   namnet på dörren → Om oss
 //   kvittot, terminalen → Kupong, tv:n zoomas in (T) med text-tv:ns färgknappar
 //   kupongen tas i handen och fylls i (K), eller → Kupong när man har lämnat in.
 // Pekar man på ett föremål lyser ordet i menyn som det leder till.
@@ -79,6 +80,8 @@ window.Rum = (() => {
     <linearGradient id="rum-streak" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#ffb35c" stop-opacity=".5"/><stop offset="1" stop-color="#ffb35c" stop-opacity="0"/></linearGradient>
     <linearGradient id="rum-streakred" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#ff3b30" stop-opacity=".55"/><stop offset="1" stop-color="#ff3b30" stop-opacity="0"/></linearGradient>
     <linearGradient id="rum-cupg" x1="0" y1="0" x2="1" y2="0"><stop offset="0" stop-color="#fff" stop-opacity=".55"/><stop offset=".35" stop-color="#fff" stop-opacity="0"/><stop offset="1" stop-color="#000" stop-opacity=".45"/></linearGradient>
+    <linearGradient id="rum-guld" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#f7e3a8"/><stop offset=".55" stop-color="#d4a650"/><stop offset="1" stop-color="#9c7230"/></linearGradient>
+    <path id="rum-dorrbage" d="M66 252 Q136 232 206 252"/>
     <clipPath id="rum-win"><rect x="272" y="132" width="676" height="426"/></clipPath>
     <clipPath id="rum-doorglass"><rect x="50" y="136" width="172" height="560"/></clipPath>
     <filter id="rum-b1" x="-10%" y="-10%" width="120%" height="120%"><feGaussianBlur stdDeviation="1.3"/></filter>
@@ -227,6 +230,17 @@ window.Rum = (() => {
   <rect x="96" y="176" width="80" height="30" rx="3" fill="#ece0c4"/>
   <rect x="96" y="176" width="80" height="30" rx="3" fill="none" stroke="#b3261e" stroke-width="2"/>
   <text x="136" y="197" text-anchor="middle" font-family="Fraunces" font-weight="800" font-size="15" letter-spacing="1.5" fill="#b3261e">STÄNGT</text>
+  <!-- namnet i bladguld på glaset, spegelvänt inifrån som neonskylten -->
+  <a class="rum-sak" href="om-oss.html" aria-label="Om oss" id="rum-dorrnamn">
+    <rect x="60" y="226" width="152" height="72" fill="#000" opacity=".001"/>
+    <g transform="translate(272 0) scale(-1 1)" font-family="Fraunces" text-anchor="middle">
+      <text font-style="italic" font-weight="700" font-size="21" fill="#1a1208" opacity=".55" transform="translate(1.5 2)"><textPath href="#rum-dorrbage" startOffset="50%">Matchfixarna</textPath></text>
+      <text font-style="italic" font-weight="700" font-size="21" fill="url(#rum-guld)" stroke="#3a2808" stroke-width=".8" paint-order="stroke"><textPath href="#rum-dorrbage" startOffset="50%">Matchfixarna</textPath></text>
+      <line x1="92" y1="262" x2="180" y2="262" stroke="url(#rum-guld)" stroke-width="1.2"/>
+      <text x="136" y="277" font-weight="700" font-size="10.5" letter-spacing="2.4" fill="url(#rum-guld)" stroke="#3a2808" stroke-width=".4" paint-order="stroke">TOBAK &amp; SPEL</text>
+      <text x="136" y="292" font-style="italic" font-size="9.5" fill="#d8b46a" opacity=".9">Öppet till spelstoppet</text>
+    </g>
+  </a>
   <!-- flagnad färg vid dörrkarmen -->
   <path d="M236 300 l14 6 l-3 18 l9 12 l-6 22 l4 16 l-18 4 z" fill="#9b8c68" opacity=".55"/>
   <path d="M236 300 l14 6 l-3 18 l9 12 l-6 22 l4 16" fill="none" stroke="#241c10" stroke-opacity=".45" stroke-width="1.4"/>
@@ -574,24 +588,6 @@ window.Rum = (() => {
   ${facit()}`);
   }
 
-  function cups() {
-    return svg(`<defs>
-    <linearGradient id="rum-cupc" x1="0" y1="0" x2="1" y2="0"><stop offset="0" stop-color="#3f73c2"/><stop offset=".35" stop-color="#2f5fa8"/><stop offset="1" stop-color="#132a52"/></linearGradient>
-    <pattern id="rum-meander" width="16" height="12" patternUnits="userSpaceOnUse"><path d="M1 11 V1 H13 V9 H5 V5 H9" fill="none" stroke="#f3ead9" stroke-width="1.6"/></pattern>
-    <clipPath id="rum-cupclip"><path d="M-58 6 L58 6 L47 120 Q0 128 -47 120 Z"/></clipPath>
-    <g id="rum-cup"><ellipse cx="0" cy="124" rx="62" ry="10" fill="#000" opacity=".45" filter="url(#rum-b4)"/>
-      <g clip-path="url(#rum-cupclip)"><rect x="-62" y="0" width="124" height="130" fill="url(#rum-cupc)"/>
-        <rect x="-62" y="16" width="124" height="13" fill="url(#rum-meander)"/><rect x="-62" y="98" width="124" height="13" fill="url(#rum-meander)"/>
-        <text x="0" y="56" text-anchor="middle" font-family="Fraunces" font-weight="800" font-size="12" letter-spacing=".6" fill="#f3ead9">VI ÄR GLADA</text>
-        <text x="0" y="75" text-anchor="middle" font-family="Fraunces" font-weight="800" font-size="12" letter-spacing=".6" fill="#f3ead9">ATT TJÄNA ER</text>
-        <rect x="-62" y="0" width="124" height="130" fill="url(#rum-cupg)" opacity=".5"/>
-        <path d="M-58 6 L-50 40 L-56 70" fill="none" stroke="#e9e2d4" stroke-opacity=".5" stroke-width="2"/></g>
-      <ellipse cx="0" cy="6" rx="58" ry="10" fill="#e9e2d4"/><ellipse cx="0" cy="7" rx="53" ry="8" fill="#2a160c"/>
-      <path d="M-30 8 q-8 10 -4 24" fill="none" stroke="#5a3a1a" stroke-opacity=".5" stroke-width="3"/></g></defs>
-  <use href="#rum-cup" transform="translate(1262 590) scale(.62)"/>
-  <use href="#rum-cup" transform="translate(300 600) scale(.7)"/>`);
-  }
-
   function props() {
     return svg(`<rect x="1384" y="538" width="5" height="112" fill="url(#rum-alu)"/><rect x="1447" y="538" width="5" height="112" fill="url(#rum-alu)"/>
   <rect x="1378" y="530" width="80" height="18" rx="8" fill="#7d2925"/>
@@ -644,7 +640,7 @@ window.Rum = (() => {
 ${plane(-600, `${bg()}${rain()}${rightWall()}${svg('<g id="rum-hyllor"></g>')}${neon()}${lop()}${boardHtml()}${frameHtml()}`, 1.035)}
 ${plane(-470, `${props()}${tv()}`, 1.02)}
 ${plane(-330, `${sill()}${haze()}`)}
-${plane(-60, `${table()}${cups()}`, 1.05)}
+${plane(-60, table(), 1.05)}
 ${plane(0, paper())}
 </div></div>
 <div class="rum-layer rum-warm"></div><div class="rum-layer rum-vign"></div><div class="rum-layer rum-grain"></div>

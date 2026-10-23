@@ -1746,6 +1746,10 @@ går kameran fram mot det innan sidan byts:
 - **Tv:n** med text-tv (sida 331, omgångens matcher på två undersidor) zoomas in med ett
   klick eller T; färgknapparna leder till Kupong, Olympen, Tabeller och Statistik, Esc
   zoomar ut.
+- **Namnet på dörren** (längst till vänster, under Stängt-skylten) → Om oss: *Matchfixarna*
+  i bladguld på glaset, spegelvänt inifrån som neonskylten, med TOBAK & SPEL och *Öppet
+  till spelstoppet* under. I fönster som är minst 8:5 syns hela dörren, och där står namnet
+  inte i menyns hörn; i smalare fönster skärs dörren av och namnet står kvar i hörnet.
 
 **Kupongstället** står på pulten vid fönstret (till vänster) och leder ingenstans: blanka
 kuponger med samma terrakottaband som kupongen på pulten i ett fack av plexiglas, butikens
