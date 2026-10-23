@@ -12,6 +12,8 @@
 //   namnet på dörren → Om oss
 //   kvittot → Kupong, tv:n zoomas in (T): text-tv med en sida per match och
 //   kupongens matcher live på 377 (rum-tv.js)
+//   videon på disken zoomas in (V): repriserna på VHS, på tv:n och i lådan
+//   bredvid, som spelas i rutan (rum-video.js)
 //   kupongen tas i handen (K) – fylls i eller ändras – eller → Kupong.
 //   högen bredvid: de inlämnade kupongerna med baksidan upp; din egen tas i
 //   handen därifrån när du har lämnat in, de andras → Kupong.
@@ -26,7 +28,7 @@
 // framme (=form, =skador … med den lappen i handen). ?rum-stopp=<timmar> som
 // om det var så långt kvar till spelstoppet, ?rum-tittar som om matcherna
 // pågick och ?rum-mal=dl:1,dt:-1,dj:0 som om det blev mål (rätt, fel, ingen
-// skillnad).
+// skillnad), ?rum-video videon nära.
 //
 // Läses efter kupong.js, samtal.js, tippare.js och kronan.js och använder
 // deras hjälpare (state, KP, TP, gradeRow, couponNumber, currentCoupon,
@@ -310,6 +312,8 @@ window.Rum = (() => {
 
   // Tv:n i hörnet (rum-tv.js).
   const tv = () => (window.RumTv ? RumTv.html() : '');
+  // Videon på disken, och väggen, disken och pulten till höger om bilden (rum-video.js).
+  const vid = (part) => (window.RumVideo ? RumVideo.html(part) : '');
 
   // Pingklockan på pulten, där guldordet annars står: till uppgörelsen ringer
   // man in gänget. Kupan i mässing speglar lysröret och lite av neonskylten.
@@ -360,10 +364,11 @@ window.Rum = (() => {
     el.hidden = true;
     el.setAttribute('aria-label', 'Tobaksaffären');
     el.innerHTML = `<div class="rum-stage" id="rum-stage"><div class="rum-kamera" id="rum-kamera"><div class="rum-world" id="rum-world">
-${plane(-600, `<div class="rum-ute" id="rum-ute"></div>${bg()}${rightWall()}${svg('<g id="rum-hyllor"></g>')}${neon()}${frameHtml()}`, 1.035)}
+${plane(-600, `<div class="rum-ute" id="rum-ute"></div>${bg()}${vid('vagg')}${rightWall()}${svg('<g id="rum-hyllor"></g>')}${neon()}${frameHtml()}`, 1.035)}
+${plane(-598, vid('horn'), 1.035, 'rum-pl3d')}
 ${plane(-470, `${tv()}`, 1.02, 'rum-pl3d')}
 ${plane(-330, `${sill()}${haze()}`)}
-${plane(-60, table(), 1.05)}
+${plane(-60, `${table()}${vid('pult')}`, 1.05)}
 ${plane(0, paper())}
 </div></div>
 <div class="rum-layer rum-mork" id="rum-mork"><i class="a"></i><i class="b"></i></div>
@@ -371,7 +376,7 @@ ${plane(0, paper())}
 </div>
 ${window.RumAnslag ? RumAnslag.nara() : ''}
 <div class="rum-hdr"><a class="rum-brand" href="#">Matchfixarna</a></div>
-<div class="rum-ft"><span class="keys"><b>K</b> kupongen · <b>T</b> tv:n · <b>A</b> anslagstavlan</span><a href="#hem">Vanlig sida</a></div>`;
+<div class="rum-ft"><span class="keys"><b>K</b> kupongen · <b>T</b> tv:n · <b>A</b> anslagstavlan · <b>V</b> videon</span><a href="#hem">Vanlig sida</a></div>`;
     document.querySelector('main').prepend(el);
     R.el = el;
     R.built = true;
@@ -379,6 +384,7 @@ ${window.RumAnslag ? RumAnslag.nara() : ''}
     // kort: högst elva tecken
     R.tv = window.RumTv ? RumTv.mount(el, { calm, short, kort: (n) => BOARD[n] || short(n), wd, hm, matches: () => (state.all && state.all.matches) || [] }) : null;
     R.ans = window.RumAnslag ? RumAnslag.mount(el, { calm, kort: (n) => BOARD[n] || short(n), close: () => board(false) }) : null;
+    R.video = window.RumVideo ? RumVideo.mount(el, { calm, short, kort: (n) => BOARD[n] || short(n) }) : null;
     paintUte();
   }
 
@@ -697,6 +703,7 @@ ${window.RumAnslag ? RumAnslag.nara() : ''}
     // mellan omgångarna, när raderna bara är de närmaste matcherna
     if (R.tv) R.tv.fill(rows, { spel: rd && rd.spel ? rd.ids : null, next: Boolean(rd && rd.next) });
     if (R.ans) R.ans.fill(rows.map((x) => x.m), (state.all && state.all.matches) || []);
+    if (R.video) R.video.fill((state.all && state.all.matches) || [], rd && !rd.next ? rd.ids : []);
     const p = pult(rd);
     // har du lämnat in ligger din kupong i högen, och på pulten en ny – eller
     // gängets kupong, när du ser de andras tips (uppgörelsen)
@@ -971,6 +978,11 @@ ${window.RumAnslag ? RumAnslag.nara() : ''}
       zoomTv(!R.zoom);
       return;
     }
+    if (a.dataset.nav === 'video') {
+      e.preventDefault();
+      zoomVideo(!R.vnara);
+      return;
+    }
     if (a.id === 'rum-ans') {
       e.preventDefault();
       board(true);
@@ -1018,6 +1030,7 @@ ${window.RumAnslag ? RumAnslag.nara() : ''}
   // T: tv:n nära, vriden mot en, så att text-tv:n går att läsa och knapparna
   // att trycka på. Kameran siktar på rutan där den hamnar när tv:n har vridits.
   function zoomTv(on) {
+    if (on && R.vnara) zoomVideo(false);
     R.zoom = on;
     R.el.classList.toggle('tv-nara', on);
     // kameran ställer sig rakt framför, så att tv:n står rak (som med kupongen i handen)
@@ -1033,6 +1046,36 @@ ${window.RumAnslag ? RumAnslag.nara() : ''}
     else aim([800, 500], 1, [800, 500], calm() ? null : 'glid');
   }
 
+  // V: videon nära. Kameran går fram till hörnet på disken – tv:n, högen
+  // på den och lådan bredvid, som annars står utanför bilden – rakt
+  // framifrån, och förstorar så mycket som ryms mellan namnet och foten.
+  function zoomVideo(on) {
+    if (!R.video || (!on && !R.vnara)) return;
+    if (on && R.zoom) zoomTv(false);
+    if (on && R.ans && R.ans.on()) board(false);
+    R.vnara = on;
+    R.el.classList.toggle('vid-nara', on);
+    if (on) {
+      R.tx = 0;
+      R.ty = 0;
+      if (calm()) R.mx = R.my = 0;
+      setCam(R.mx, R.my);
+    }
+    R.vf = R.video.zoom(on);
+    if (on) aimVideo(calm() ? null : 'glid');
+    else aim([800, 500], 1, [800, 500], calm() ? null : 'glid');
+  }
+  function aimVideo(cls) {
+    // hörnet i planet -598 (1,035 gånger), och det som syns av scenen
+    const f = R.vf;
+    const [x0, x1] = [f.x0, f.x1].map((x) => 800 + (x - 800) * 1.035);
+    const [y0, y1] = [f.y0, f.y1].map((y) => 500 + (y - 500) * 1.035);
+    const [vx0, vx1] = [-R.ox / R.k, (innerWidth - R.ox) / R.k];
+    const [vy0, vy1] = [(64 - R.oy) / R.k, (innerHeight - 56 - R.oy) / R.k];
+    const z = Math.min(6, ((vx1 - vx0) * 0.92) / (x1 - x0), ((vy1 - vy0) * 0.92) / (y1 - y0));
+    aim([(x0 + x1) / 2, (y0 + y1) / 2], z, [(vx0 + vx1) / 2, (vy0 + vy1) / 2], cls);
+  }
+
   // A: anslagstavlan lossnar från väggen och flyger fram (rum-anslag.js),
   // och kameran går lite mot hörnet medan den flyger. Tillbaka flyger den
   // till hörnen där den hänger när kameran har gått tillbaka – de mäts med
@@ -1041,6 +1084,7 @@ ${window.RumAnslag ? RumAnslag.nara() : ''}
     if (!R.ans || on === R.ans.on()) return;
     if (on) {
       if (R.zoom) zoomTv(false);
+      if (R.vnara) zoomVideo(false);
       R.ans.open(true, R.ans.quad());
       const p = centerOf(document.getElementById('rum-ans'));
       aim(p, 1.25, [p[0] + (800 - p[0]) * 0.5, p[1] + (500 - p[1]) * 0.5], calm() ? null : 'glid');
@@ -1171,6 +1215,7 @@ ${window.RumAnslag ? RumAnslag.nara() : ''}
     if (!v || (slag !== 'fyll' && slag !== 'gang' && !from)) return false;
     if (slag === 'gang') pling();
     zoomTv(false);
+    zoomVideo(false);
     const desk = document.getElementById('rum-kupong');
     const rd = { id: p.s.id, ids: p.s.matcher.map((x) => String(x.id)), gang: p.s.gang, name: (window.Samtal && Samtal.name()) || null };
     const nr = typeof couponNumber === 'function' ? couponNumber(rd.ids) : null;
@@ -1869,7 +1914,7 @@ ${window.RumAnslag ? RumAnslag.nara() : ''}
   function wire() {
     const el = R.el;
     el.addEventListener('mousemove', (e) => {
-      if (R.kup || R.zoom || (R.ans && R.ans.on())) return;
+      if (R.kup || R.zoom || R.vnara || (R.ans && R.ans.on())) return;
       R.tx = (e.clientX / innerWidth) * 2 - 1;
       R.ty = (e.clientY / innerHeight) * 2 - 1;
     });
@@ -1889,6 +1934,15 @@ ${window.RumAnslag ? RumAnslag.nara() : ''}
       if (R.ans && R.ans.on()) return;
       // nära tv:n sköter den sina knappar och länkar själv (rum-tv.js)
       if (R.zoom && e.target.closest('#rum-tv3')) return;
+      // nära videon sköter den kassetterna och knapparna själv (rum-video.js);
+      // ett klick utanför hörnet går tillbaka
+      if (R.vnara) {
+        if (!e.target.closest('#rum-vhs, .rum-hdr, .rum-ft')) {
+          e.preventDefault();
+          zoomVideo(false);
+        }
+        return;
+      }
       if (e.target.closest('.rum-tag') && openCoupon()) {
         e.preventDefault();
         return;
@@ -1908,9 +1962,12 @@ ${window.RumAnslag ? RumAnslag.nara() : ''}
       } else if (k === 'k') {
         if (!openCoupon()) location.hash = 'kupong';
       } else if (R.zoom && R.tv && R.tv.key(e.key)) e.preventDefault();
+      else if (R.vnara && R.video.key(e.key)) e.preventDefault();
       else if (k === 't') zoomTv(!R.zoom);
       else if (k === 'a') board(true);
+      else if (k === 'v') zoomVideo(!R.vnara);
       else if (k === 'escape' && R.zoom) zoomTv(false);
+      else if (k === 'escape' && R.vnara) zoomVideo(false);
     });
     addEventListener('resize', fit);
     if (window.Spoiler && Spoiler.onChange) Spoiler.onChange(() => { if (R.on) fill(); });
@@ -1930,6 +1987,8 @@ ${window.RumAnslag ? RumAnslag.nara() : ''}
     R.oy = (innerHeight - H * s) / 2;
     const st = R.el.querySelector('.rum-stage');
     st.style.transform = `translate(${R.ox.toFixed(1)}px, ${R.oy.toFixed(1)}px) scale(${s.toFixed(4)})`;
+    // videon nära: hörnet ryms i det nya fönstret
+    if (R.vnara) aimVideo(null);
     // kupongen i handen står kvar mitt i fönstret
     if (R.kup && !R.kup.closing && !R.kup.opening) {
       const h = held();
@@ -1972,6 +2031,7 @@ ${window.RumAnslag ? RumAnslag.nara() : ''}
     R.on = true;
     fit();
     zoomTv(false);
+    zoomVideo(false);
     hot(null);
     // gänget klär sig efter vädret: vänta lite på det (i en fast bild tills det är hämtat)
     const ready = Promise.all([load(), Promise.race([ute(), new Promise((r) => setTimeout(r, still() ? 9000 : 1500))]).then(three)]);
@@ -1984,6 +2044,7 @@ ${window.RumAnslag ? RumAnslag.nara() : ''}
           board(true);
           if (q.get('rum-anslag')) setTimeout(() => R.ans && R.ans.lift(q.get('rum-anslag')), 50);
         }
+        if (q.has('rum-video')) zoomVideo(true);
         frame();
         document.body.dataset.rumKlar = '1';
       });
@@ -2000,6 +2061,8 @@ ${window.RumAnslag ? RumAnslag.nara() : ''}
     if (!R.on) return;
     closeCoupon(true);
     board(false);
+    if (R.video) R.video.stop();
+    zoomVideo(false);
     R.on = false;
     cancelAnimationFrame(R.raf);
     clearInterval(R.poll);

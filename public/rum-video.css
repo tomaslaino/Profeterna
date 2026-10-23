@@ -1,0 +1,177 @@
+/* Videon i tobaksaffären (rum-video.js): en liten färg-tv med inbyggd video
+   på disken, kassetterna på tv:n och i lådan bredvid. Hörnet är 240 × 130 i
+   scenen (planet -598 i rum.js) men ritas i sex gånger storleken och
+   förminskas (scale3d), så att det är skarpt när kameran går fram – samma
+   knep som tv:n i rum-tv.css. Alla mått nedan är i de stora måtten. */
+
+.rum-vhs { position: absolute; width: 240px; height: 130px; transform-style: preserve-3d; pointer-events: none; }
+.vhs-in { position: absolute; left: 0; top: 0; width: 1440px; height: 780px; transform-origin: 0 0; transform: scale3d(0.166667, 0.166667, 0.166667); }
+.vhs-in > *, .vhs-styr > * { position: absolute; }
+.vhs-styr { position: absolute; inset: 0; }
+.vhs-ritning { left: 0; top: 0; overflow: visible; pointer-events: none; }
+.rum.vid-nara .vhs-ritning .massiv { pointer-events: auto; }
+/* lådan står utskjuten till höger om bilden och glider in längs disken när
+   man går fram, med en liten studs när den tar i */
+.vhs-lada { left: 0; top: 0; width: 100%; height: 100%; transform: translateX(var(--ut)); transition: transform 0.55s cubic-bezier(0.5, 0, 0.75, 0); }
+.rum.vid-nara .vhs-lada { transform: none; transition: transform 0.8s cubic-bezier(0.2, 0.9, 0.3, 1.08) 0.15s; }
+.rum .lugn .vhs-lada { transition: none; }
+
+/* väggen, disken och pulten till höger om bilden (planen -600 och -60) */
+.vhs-vagg { position: absolute; left: 1599.5px; top: 300px; width: 500.5px; height: 720px; }
+.vhs-pult { position: absolute; left: 1599.5px; top: 640px; width: 540.5px; height: 380px; }
+
+/* skenet från rutan */
+.vhs-sken {
+  left: 120px;
+  top: 150px;
+  width: 640px;
+  height: 520px;
+  pointer-events: none;
+  background: radial-gradient(closest-side, rgba(110, 140, 255, 0.16), rgba(110, 140, 255, 0.05) 60%, rgba(110, 140, 255, 0));
+  transition: opacity 0.6s;
+}
+.rum-vhs:is([data-lage="spelar"], [data-lage="laddar"]) .vhs-sken { opacity: 0.55; }
+.vhs-pol { transition: opacity 0.6s; }
+.rum-vhs:is([data-lage="spelar"], [data-lage="laddar"]) .vhs-pol { opacity: 0.45; }
+
+/* ---------- rutan ---------- */
+
+.vhs-skarm { overflow: hidden; border-radius: 30px / 34px; background: #050607; pointer-events: none; }
+.rum.vid-nara .vhs-skarm { pointer-events: auto; }
+.vhs-skarm > * { position: absolute; display: block; }
+/* videons blå bild när ingen kassett spelar */
+.vhs-bla { inset: 0; background: radial-gradient(ellipse 80% 75% at 50% 45%, #2f52e0, #2441c4 60%, #1a2f96); }
+.vhs-osd {
+  left: 36px;
+  top: 26px;
+  font: 400 40px/1 VT323, monospace;
+  letter-spacing: 1px;
+  color: #f4f6ff;
+  text-shadow: 3px 3px 0 #0c1660;
+  pointer-events: none;
+}
+.vhs-bild { left: 0; width: 100%; background: #000; }
+.vhs-bild iframe { position: absolute; inset: 0; width: 100%; height: 100%; border: 0; }
+/* rubriken på klippet kan ha resultatet: täcks när resultatet är dolt */
+.vhs-mask { left: 0; width: 100%; height: 50px; background: linear-gradient(180deg, #000 70%, transparent); pointer-events: none; }
+.vhs-mask[hidden] { display: none; }
+/* myrornas krig, när inget av klippen går att spela */
+.vhs-brus {
+  inset: -40px;
+  background: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='160' height='120'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.9' numOctaves='2' seed='3' stitchTiles='stitch'/%3E%3CfeColorMatrix values='0 0 0 .9 0  0 0 0 .9 0  0 0 0 .9 0  0 0 0 0 1'/%3E%3C/filter%3E%3Crect width='160' height='120' filter='url(%23n)'/%3E%3C/svg%3E") 0 0 / 160px 120px;
+  animation: vhs-brus 0.24s steps(4) infinite;
+}
+@keyframes vhs-brus { 0% { transform: translate(0, 0); } 25% { transform: translate(-37px, 13px); } 50% { transform: translate(-11px, -29px); } 75% { transform: translate(-29px, 23px); } 100% { transform: translate(0, 0); } }
+.vhs-bla, .vhs-brus, .vhs-bild, .vhs-osd { visibility: hidden; }
+.rum-vhs[data-lage="tom"] :is(.vhs-bla, .vhs-osd),
+.rum-vhs[data-lage="laddar"] :is(.vhs-bild, .vhs-osd),
+.rum-vhs[data-lage="spelar"] .vhs-bild,
+.rum-vhs[data-lage="brus"] .vhs-brus { visibility: visible; }
+/* glaset: buktigt, med lysröret i och mörkare hörn, och svaga linjer */
+.vhs-glas {
+  inset: 0;
+  pointer-events: none;
+  border-radius: inherit;
+  background:
+    radial-gradient(ellipse 70% 32% at 34% 10%, rgba(255, 255, 255, 0.16), rgba(255, 255, 255, 0) 70%),
+    radial-gradient(ellipse 120% 110% at 50% 50%, rgba(0, 0, 0, 0) 58%, rgba(0, 0, 0, 0.55)),
+    repeating-linear-gradient(180deg, rgba(0, 0, 0, 0) 0 3px, rgba(0, 0, 0, 0.09) 3px 4px);
+  box-shadow: inset 0 0 18px rgba(0, 0, 0, 0.8), inset 0 0 2px rgba(255, 255, 255, 0.15);
+}
+
+/* ---------- displayen och knapparna ---------- */
+
+.vhs-vfd {
+  display: block;
+  font: 400 31px/31px VT323, monospace;
+  text-align: center;
+  color: #7dffd9;
+  text-shadow: 0 0 6px rgba(80, 255, 200, 0.75);
+  white-space: nowrap;
+  pointer-events: none;
+}
+.vhs-vfd.blink { animation: vhs-blink 1s steps(1) infinite; }
+@keyframes vhs-blink { 50% { opacity: 0.12; } }
+.vhs-k {
+  display: grid;
+  place-items: center;
+  padding: 0;
+  border: 0;
+  border-radius: 4px;
+  background: linear-gradient(180deg, #5d5a54, #36342f 55%, #25231f);
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.22), 0 2px 0 #050505;
+  color: #ddd7c9;
+  font: 700 12px/1 system-ui, sans-serif;
+  letter-spacing: -2px;
+  pointer-events: none;
+  cursor: pointer;
+}
+.rum.vid-nara .vhs-k { pointer-events: auto; }
+.rum.vid-nara .vhs-k:is(:hover, :focus-visible) { background: linear-gradient(180deg, #77736b, #47443e 55%, #2d2b27); color: #fff; outline: none; }
+.vhs-k:active { transform: translateY(2px); box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.15); }
+.vhs-led { fill: #e2311f; filter: drop-shadow(0 0 0.6px #ff4a30); }
+.rum-vhs:is([data-lage="spelar"], [data-lage="laddar"], [data-lage="brus"]) .vhs-led { fill: #45ff74; filter: drop-shadow(0 0 0.6px #45ff74); }
+.vhs-lucka { transform-box: fill-box; transform-origin: 50% 0; transition: transform 0.18s ease; }
+.vhs-lucka.matar { transform: scaleY(0.25); }
+
+/* ---------- kassetterna ---------- */
+
+/* Ryggen på en VHS-kassett, 41 × 5,67 i scenen: kassetten själv eller ett
+   pappfodral, och en etikett skriven för hand. */
+.vhs-kas {
+  --blk: #1b2030;
+  display: block;
+  width: 246px;
+  height: 34px;
+  padding: 0;
+  border: 0;
+  border-radius: 2px;
+  transform: rotate(var(--r, 0deg));
+  transition: top 0.35s cubic-bezier(0.3, 0, 0.2, 1), filter 0.2s ease;
+  background: linear-gradient(180deg, #232323, #0c0c0c);
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.14), inset 0 -2px 0 rgba(0, 0, 0, 0.5), 0 3px 2px rgba(0, 0, 0, 0.45);
+  pointer-events: none;
+  cursor: pointer;
+}
+.vhs-kas[hidden], .vhs-kas.inne { visibility: hidden; }
+.vhs-kas.flyger { z-index: 3; }
+.rum.vid-nara .vhs-kas { pointer-events: auto; }
+.rum.vid-nara .vhs-kas:is(:hover, :focus-visible) { transform: rotate(var(--r, 0deg)) translateY(5px) scale(1.04); filter: brightness(1.14); z-index: 2; outline: none; }
+.vhs-kas .lapp {
+  position: absolute;
+  left: 9%;
+  right: 5%;
+  top: 4px;
+  bottom: 4px;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  padding: 0 7px;
+  overflow: hidden;
+  border-radius: 1px;
+  background: linear-gradient(180deg, #f6f1e4, #e9e1cd);
+  color: var(--blk);
+  transform: rotate(var(--lr, 0deg));
+}
+.vhs-kas .lapp b { flex: 1 1 auto; min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; text-align: left; font: 700 var(--fs, 20px)/26px Caveat, cursive; }
+.vhs-kas .lapp i { flex: none; font: 600 15px/26px Caveat, cursive; font-style: normal; opacity: 0.8; }
+/* fodralen: vitt med rött, blått med silver, svart med gult, grått med orange */
+.vhs-kas.v1 { background: linear-gradient(90deg, #b8322a 0 11%, #ece8de 11%); }
+.vhs-kas.v2 { background: linear-gradient(90deg, #1e4c98 0 86%, #c9ccd2 86% 88%, #1e4c98 88%); }
+.vhs-kas.v3 { background: linear-gradient(90deg, #f0c23a 0 10%, #141414 10%); }
+.vhs-kas.v4 { background: linear-gradient(90deg, #b9b6ae 0 82%, #e0782f 82% 86%, #b9b6ae 86%); }
+.vhs-kas.v2 .lapp, .vhs-kas.v4 .lapp { left: 4%; right: 16%; }
+.vhs-kas.v1 .lapp, .vhs-kas.v3 .lapp { left: 12%; }
+.vhs-kas.v1 .lapp { background: none; }
+
+/* på håll: tv:n och högen leder fram till videon, och lyser när man pekar */
+.vhs-hit { display: block; border-radius: 12px; }
+.vhs-hit:hover, .vhs-hit:focus-visible { filter: none; }
+.vhs-hit:focus-visible { outline: 6px solid rgba(240, 214, 153, 0.8); outline-offset: 10px; }
+.rum.vid-nara .vhs-hit { pointer-events: none; }
+.rum-vhs:has(.vhs-hit:hover) :is(.vhs-ritning, .vhs-skarm, .vhs-kas) { filter: brightness(1.16); }
+
+@media (prefers-reduced-motion: reduce) {
+  .vhs-brus, .vhs-vfd.blink { animation: none; }
+  .vhs-kas, .vhs-lucka, .vhs-sken, .vhs-pol, .vhs-lada, .rum.vid-nara .vhs-lada { transition: none; }
+}

@@ -1708,12 +1708,14 @@ tippare på förstasidan länkar hit (*Till Olympen*).
 Förstasidan på stora skärmar (utan adress, bredare än 900 px och inte på högkant):
 tobaksaffären vid spelpulten. Scenen ritas i 1600 × 1000 och skalas så att den täcker
 fönstret; lagren ligger på olika djup (CSS 3D) och vrids lite när musen rör sig. Namnet
-och foten (*K kupongen · T tv:n · A anslagstavlan*, *Vanlig sida*) ligger utanför scenen i fönstrets hörn;
+och foten (*K kupongen · T tv:n · A anslagstavlan · V videon*, *Vanlig sida*) ligger utanför scenen i fönstrets hörn;
 någon meny finns inte, det är föremålen som leder vidare. [public/rum.js](public/rum.js)
 ritar rummet och fyller det med sajtens data, [public/rum.css](public/rum.css) ger det utseendet och
 rörelserna, [public/rum-tv.js](public/rum-tv.js) och [public/rum-tv.css](public/rum-tv.css)
 bygger tv:n (se [Tv:n](#tvn)), [public/rum-anslag.js](public/rum-anslag.js) och
-[public/rum-anslag.css](public/rum-anslag.css) anslagstavlan (se [Anslagstavlan](#anslagstavlan)), och [public/rum-3d.js](public/rum-3d.js) ritar gänget och
+[public/rum-anslag.css](public/rum-anslag.css) anslagstavlan (se [Anslagstavlan](#anslagstavlan)),
+[public/rum-video.js](public/rum-video.js) och [public/rum-video.css](public/rum-video.css) videon
+på disken (se [Videon](#videon)), och [public/rum-3d.js](public/rum-3d.js) ritar gänget och
 [public/rum-inredning.js](public/rum-inredning.js) inredningen (se *Inredningen i 3D* nedan) i
 three.js 0.160.0 (från jsdelivr, importmap i `index.html`), som hämtas först när rummet
 visas – utan WebGL eller utan nätet står rummet kvar utan dem.
@@ -1769,6 +1771,10 @@ sidan byts:
   klick eller T och vrids då mot en; den står på kupongens matcher live (377), och där finns
   också omgångens matcher, tabellerna och skytteligorna (se [Tv:n](#tvn)). Esc eller ett
   klick utanför zoomar ut.
+- **Videon** nere i hörnet till höger, en liten tv med inbyggd video på disken med de senaste
+  repriserna på VHS i en hög ovanpå, zoomas in med ett klick eller V; då glider fruktlådan
+  med resten av kassetterna in bredvid, och en kassett spelar matchens höjdpunkter i rutan
+  (se [Videon](#videon)). Esc, V eller ett klick utanför zoomar ut.
 - **Namnet på dörren** (längst till vänster, under Stängt-skylten) → Om oss: *Matchfixarna*
   i bladguld på glaset, spegelvänt inifrån som neonskylten, med TOBAK & SPEL och *Öppet
   till spelstoppet* under. I fönster som är minst 8:5 syns hela dörren, och där står namnet
@@ -2175,6 +2181,41 @@ Lagfilerna hämtas med rummet (om igen efter en kvart), matchernas filer när ta
 Slitaget skiftar med dagen: lapparnas vinklar, nålhålen och hörnen av rivna lappar.
 `?rum-anslag` visar tavlan framme i en fast bild, och `?rum-anslag=<lapp>` (form, skador,
 styrka, kryss, tur, odds, vila, inbordes) med den lappen i handen.
+
+### Videon
+
+En liten färg-tv med inbyggd video står på disken nere i hörnet till höger, i svart plast
+med blå bild när ingen kassett spelar, *STOPP* i hörnet och klockan på displayen som blinkar
+på 12:00, som den alltid gjort ([public/rum-video.js](public/rum-video.js),
+[public/rum-video.css](public/rum-video.css)). Under rutan sitter kassettfacket, displayen
+och knapparna ◀◀ ▶ ▶▶ ⏏. Ovanpå ligger de fyra senaste repriserna på VHS i en hög, och
+resten (21 till) står i en fruktlåda i furu – *Arkivet* på en tejpbit, ÄPPLEN · KLASS I på
+brädan – som är utskjuten till höger om bilden och glider in längs disken när man går fram.
+
+**Kassetterna** är matcher med YouTube-klipp (samma klipp som spelaren på sajten,
+[public/hojdpunkter.js](public/hojdpunkter.js)): omgångens matcher först, sedan de senaste dag för dag, Premier
+League före Championship och så vidare samma dag. Ryggen är kassetten själv eller ett
+pappfodral (vitt med rött, blått, svart med gult, grått med orange, samma för samma match)
+med en handskriven etikett: lagen, resultatet och dagen. Långa namn skrivs mindre, och med
+Dolda resultat står inget resultat på etiketten och klippets rubrik täcks i rutan.
+
+**Nära** (klick eller V) går kameran fram rakt framifrån, så nära att tv:n, högen och lådan
+ryms mellan namnet och foten (högst sex gånger), och kassetterna lyfter lite när man pekar
+på dem. Ett klick på en kassett: den lyfts, ställs framför facket och skjuts in, luckan
+fälls upp, och de ovanför sjunker ner i luckan i högen. Rutan blir svart med *▶ SPELA* tills
+bilden kommer, och klippet spelas i YouTubes spelare (`youtube-nocookie.com`, i 16:9 med
+svarta kanter i den 4:3-stora rutan) med displayen som räknar tiden. ▶ spelar eller
+pausar, ◀◀ och ▶▶ (och piltangenterna) byter till en nyare eller äldre kassett, och ⏏ matar
+ut – kassetten åker tillbaka till sin plats. När klippet är slut matas den ut av sig själv.
+Går inget av matchens klipp att spela här blir det myrornas krig, och klippen hoppas över
+nästa gång (samma lista som spelaren på sajten). Går man därifrån pausar videon, och den
+frusna bilden står kvar i rutan; tillbaka och den spelar vidare. Rummet stängs och videon
+stannar. Med `prefers-reduced-motion` åker kassetterna direkt och lådan står på plats.
+
+Hörnet ritas i sex gånger storleken och förminskas, som tv:n, så att det är skarpt på nära
+håll och YouTubes spelare får sin vanliga storlek. Väggen, disken och pulten fortsätter till
+höger om bilden (`vagg` och `pult` i rum-video.js, i samma plan och med samma toner som i
+rum.js), så att lådan står på något. `?rum-video` visar videon nära i en fast bild.
 
 ## Statusmärkning
 
