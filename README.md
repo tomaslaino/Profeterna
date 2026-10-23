@@ -1806,7 +1806,9 @@ och skrattar, DJ har en burk i ena handen och pratar med cigaretten i den andra.
 har sin loop (12–21 s) – flaskan och burken till munnen med huvudet bakåt, ett bloss med
 glöden som tänds och röken som blåses ut, benen som dinglar – och huvudena nickar efter
 musen. Röken från glöden räknas för varje bloss ur var glöden var när det föddes, så att
-samma tid alltid ger samma bild. Inga riktiga märken: flaskan säger PILSNER, burken ÖL.
+samma tid alltid ger samma bild. Inga riktiga märken: flaskan säger PILSNER, burken ÖL –
+från första advent till tjugondag Knut JULÖL (grön etikett, röd burk) och i påskveckan
+PÅSKÖL (gul etikett, grön burk; `ol` i [public/rum-fika.js](public/rum-fika.js)).
 Var och en bär sitt lag (`LAG` i rum-3d.js): DL en stickad halsduk i Nacionals vitt, blått
 och rött med BOLSO på den ena änden, Nacionals sköld på den andra och fransar längst ner,
 DT ett lejonhuvud i gammal stil i kungsblått med bandet BLUES på underarmen som håller
@@ -1817,6 +1819,23 @@ sida, och solglasögonen uppskjutna på den. Sköldarna är ESPN:s bilder i
 bort när de laddas, och saknas en blir det bara text). Halsduken följer bålen, tatueringen
 vrids med handen och mössan följer huvudet; håret trycks ner under mössan och sticker ut
 under kanten. Kläderna följer vädret utanför (se *Utsikten och vädret* nedan).
+
+**Gänget följer omgången** (rum-3d.js, med läget från `gangTv` i rum.js):
+
+- **Den som inte har lämnat in** en öppen omgång sitter med kupongen och pennan i stället
+  för flaskan, burken och cigaretten, tuggar på pennan, sneglar på ölen och vänder på
+  kupongen. Från ett dygn före spelstoppet tittar de som har lämnat in på hen en stund i
+  taget, oftare ju närmare spelstoppet det är. Den sista timmen vänder de sig mot hen
+  samtidigt, och då tittar hen upp från kupongen.
+- **När matcherna pågår** (någon match live, också med dolda resultat) vänder de sig mot
+  tv:n: huvudet så långt nacken räcker och resten med bålen. Då och då tittar var och en
+  bort en stund (DJ pratar med DT).
+- **Vid ett mål** – när ställningen i en match har ändrats sedan rummet läste datan förra
+  gången – reagerar var och en efter sitt eget tips (allas tips när de visas, annars
+  gängets kupong). Den som fick rätt lyfter flaskan (DL), näven (DT) eller burken (DJ)
+  snett uppåt, lutar sig bakåt och studsar lite. Den som tappade raden sjunker ihop med
+  handen över ögonen (DL, DT) eller burken mot pannan (DJ). Den som inte påverkades nickar.
+  Dolda resultat ger inga reaktioner, och när rummet öppnas räknas inga gamla mål.
 
 **Askkoppen, snusdosan och fläkten** står på pulten till höger om kvittot, i three.js som
 gänget ([public/rum-saker.js](public/rum-saker.js), med en egen duk i pultens plan): en
@@ -1837,6 +1856,19 @@ Mälarstrand 18 juli 1994; foto Sniper Zeta,
 beskuret i `public/rum/vm94.jpg` och med fotografen i affischens title. Uppe till höger i
 fönstret syns himlen (rum-ute.js), så där hänger den inte.
 
+**Fikat** står på pulten vissa dagar, i three.js som sakerna
+([public/rum-fika.js](public/rum-fika.js)): två semlor i pappersform med mandelmassa,
+grädde och lock med florsocker på fettisdagen, två pepparkakshjärtan och en gubbe med vit
+glasyr på en servett i december, två lussekatter med russin på luciadagen, två
+kanelbullar med pärlsocker i pappersform den 4 oktober, chokladägg i röd, blå, grön och
+guldfolie i påskveckan (skärtorsdagen till annandag påsk) och tre chokladbollar på en
+servett den 11 maj. Det står bakom kvittot om det får plats där, annars till höger, fritt
+från askkoppen, dosan, locket, prisen och fläkten. Dagen är Stockholms (`Vader.nu()`,
+läst var tionde sekund som vädret). Går det dåligt med tippningen har någon redan tagit
+för sig: locket ligger bredvid den ena semlan och det är en grop i grädden, gubben saknar
+huvudet (tandmärken), en lussekatt, en kanelbulle och ett par ägg är borta och ett ägg är
+skalat med folien tillplattad bredvid, och det är fler smulor och mer florsocker.
+
 **Platserna och slitaget skiftar från dag till dag** (dagen i Stockholm som frö): sakerna
 på pulten står i en av fyra uppställningar (`LAYOUTS` – fläkten längst bak till höger, i
 mitten eller bakom kvittot och då vänd åt höger, askkoppen och dosan om vartannat, några
@@ -1848,6 +1880,12 @@ bredvid, snuset spills, fläkten (om den står där) går på trean, affischen b
 släpper; går det riktigt illa ryker två cigaretter, en använd pris ligger på pulten och
 affischen hänger i en tejpbit. Dolda resultat räknas inte (gradeRow rättar dem inte). Utan
 WebGL står affischen kvar men inte sakerna på pulten.
+
+**Lysröret tänds när man kommer in** (`tand` i rum.js, `.rum-mork` i rum.css): medan
+gänget laddas är rummet mörkt, utom gatan genom skyltfönstret och dörren och tv:n som
+lyser igenom, och startarna glöder rosa i rörets ändar. Efter minst 0,7 och högst 2,6
+sekunder blinkar det igång (1,2 s). En gång per sidvisning, och inte med
+`prefers-reduced-motion` eller `?rum-t`.
 
 **Rummet rör sig också:** utanför rutan och dörren är det Stockholms tid och väder (se
 nedan), neonen glappar ibland, röken ligger under lysröret, damm syns i ljuset och stationsurets
@@ -1863,7 +1901,12 @@ Rummet läser om datan varje minut medan det står öppet.
 
 **Bilder:** `?rum-t=<sekunder>` fryser klockan (figurerna, röken och CSS-animationerna
 står på samma tid), `?rum-mx=&rum-my=` (−1…1) kamerans läge,
-`?rum-slit=0…1` slitaget och `?rum-dag=<tal>` dagen för sakerna och affischen; sidan
+`?rum-slit=0…1` slitaget och `?rum-dag=<tal>` dagen för sakerna och affischen,
+`?rum-fika=semlor` (`pepparkakor`, `lussekatter`, `kanelbullar`, `paskagg`,
+`chokladbollar`) fikat och `?rum-ol=jul` (`pask`) ölen. Gänget: `?rum-vantar=DL,DT` som
+om de inte hade lämnat in, `?rum-stopp=<timmar>` som om det var så långt kvar till
+spelstoppet, `?rum-tittar` som om matcherna pågick och `?rum-mal=dl:1,dt:-1,dj:0` ett mål
+(rätt, fel, ingen skillnad; vid tiden 0 med `?rum-t`, annars var femtonde sekund). Sidan
 sätter `data-rum-klar` på `body` när allt är ritat. Vädret och klockan utanför:
 `?rum-klocka=2026-12-13T16:00` (eller bara `16:00`, Stockholms tid), `?rum-vader=klart`,
 `halvklart`, `mulet`, `dimma`, `dugg`, `regn`, `skurar`, `snoblandat`, `sno` eller `aska`,

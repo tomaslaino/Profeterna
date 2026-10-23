@@ -18,7 +18,12 @@
 // betraktaren. Allt rör sig efter klockan t: samma t ger samma bild, också
 // röken. ?rum-slit=0…1 bestämmer slitaget (för bilder).
 //
+// Fikat på vissa dagar – semlor, pepparkakor, lussekatter och annat från
+// konditoriet – står bakom kvittot eller där det får plats (rum-fika.js).
+//
 // saker(el, { calm }) → { draw(t, mx, my, rows, old) }
+
+import { dagens, bord } from './rum-fika.js';
 
 const DEG = Math.PI / 180;
 const D = 1400;
@@ -120,8 +125,10 @@ export async function saker(el, opt = {}) {
   // Fläkten står där bara när det känns som VARMT grader eller mer i Stockholm,
   // samma gräns som gängets tunnaste kläder (dress i rum-3d.js). Vädret
   // (vader.js) läses om var tionde sekund.
+  // Dagens fika (rum-fika.js) läses samtidigt.
   const VARMT = 21;
   let varmt = null;
+  let fika;
   let vAt = -Infinity;
   function vader() {
     const ms = performance.now();
@@ -129,8 +136,10 @@ export async function saker(el, opt = {}) {
     vAt = ms;
     const v = window.Vader ? Vader.nu() : null;
     const w = !!v && v.kanns >= VARMT;
-    if (w === varmt) return false;
+    const f = dagens(v);
+    if (w === varmt && f === fika) return false;
     varmt = w;
+    fika = f;
     return true;
   }
 
@@ -160,7 +169,7 @@ export async function saker(el, opt = {}) {
   return {
     draw(t, mx, my, rows, old) {
       if (update(rows, old) && three) three.wear(wear, seed);
-      if (three && vader()) three.power(varmt);
+      if (three && vader()) three.power(varmt, fika);
       if (three) three.draw(t, mx, my);
     },
   };
@@ -723,6 +732,25 @@ async function props(pult, opt) {
     phiAsh = Math.atan2(ASH.z - FAN.z, ASH.x - FAN.x);
   }
 
+  // ---------- fikat ----------
+  // Dagens fika (rum-fika.js): bakom kvittot om det får plats där, annars
+  // till höger, fritt från askkoppen, dosan, locket, prisen och fläkten.
+
+  const FK = bord(THREE, { world, mat, mesh, canvasTex, specks, heap, hash });
+  let fikat = null;
+  let last = [0.45, 0];
+  function placeFika(w, s) {
+    if (!fikat) { FK.visa(null); return; }
+    const r = FK.r(fikat);
+    const busy = [[ASH.x, ASH.z, ASH.R], [SN.x, SN.z, 21], [LID.x, LID.z, 22]];
+    if (fan.visible) busy.push([FAN.x, FAN.z, FAN.R]);
+    if (pris.visible) busy.push([pris.position.x, pris.position.z, 8]);
+    const cand = [[1250, 682], [1200, 682], [1300, 682]];
+    for (let y = 700; y <= 836; y += 12) for (let x = 1370; x <= 1510; x += 14) cand.push([x, y]);
+    const ok = cand.find((c) => { const p = onDesk(...c); return free(c) && busy.every(([bx, bz, br]) => Math.hypot(p.x - bx, p.z - bz) > br + r * 0.8); });
+    FK.visa(fikat, onDesk(...(ok || cand[0])), w, s);
+  }
+
   function wear(w, s) {
     arrange(s);
     ashFill(w, s);
@@ -730,6 +758,8 @@ async function props(pult, opt) {
     placeFlakes(w, s);
     placeLid(w, s);
     placeSnus(w, s);
+    last = [w, s];
+    placeFika(w, s);
     speed = w > 0.66 ? 3 : w > 0.33 ? 2 : 1;
     keys.forEach((k, i) => { k.position.y = i === speed ? 9.6 : 11.5; });
     const dust = 0.25 + 0.45 * w;
@@ -742,8 +772,11 @@ async function props(pult, opt) {
     tray.rotation.y = hash(s + 41) * Math.PI * 2 / 3 - Math.PI / 3;
   }
 
-  function power(o) {
+  // fläkten när det är varmt, och dagens fika
+  function power(o, f) {
     fan.visible = !!o;
+    fikat = f || null;
+    placeFika(...last);
   }
 
   // ---------- en bild ----------

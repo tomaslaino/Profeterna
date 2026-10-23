@@ -23,7 +23,10 @@
 // stängs av med prefers-reduced-motion. För bilder: ?rum-t=<sekunder> fryser
 // klockan, ?rum-mx=&rum-my= kamerans läge (−1…1), ?rum-vantar=DL,DT låter
 // dem sitta med kupongen som om de inte hade lämnat in. ?rum-anslag visar anslagstavlan
-// framme (=form, =skador … med den lappen i handen).
+// framme (=form, =skador … med den lappen i handen). ?rum-stopp=<timmar> som
+// om det var så långt kvar till spelstoppet, ?rum-tittar som om matcherna
+// pågick och ?rum-mal=dl:1,dt:-1,dj:0 som om det blev mål (rätt, fel, ingen
+// skillnad).
 //
 // Läses efter kupong.js, samtal.js, tippare.js och kronan.js och använder
 // deras hjälpare (state, KP, TP, gradeRow, couponNumber, currentCoupon,
@@ -363,6 +366,7 @@ ${plane(-330, `${sill()}${haze()}`)}
 ${plane(-60, table(), 1.05)}
 ${plane(0, paper())}
 </div></div>
+<div class="rum-layer rum-mork" id="rum-mork"><i class="a"></i><i class="b"></i></div>
 <div class="rum-layer rum-warm"></div><div class="rum-layer rum-dagsljus" id="rum-dagsljus"></div><div class="rum-layer rum-vign"></div><div class="rum-layer rum-grain"></div>
 </div>
 ${window.RumAnslag ? RumAnslag.nara() : ''}
@@ -702,6 +706,7 @@ ${window.RumAnslag ? RumAnslag.nara() : ''}
     // gänget på fönsterbänken: den som inte har lämnat in sitter med kupongen
     R.vem = vemInne(rd, rows, t, p);
     if (R.fig && R.fig.inne) R.fig.inne(R.vem, now());
+    gangTv(rd, rows, t, p);
     const started = rows.length && Math.min(...rows.map((x) => Date.parse(x.m.kickoff))) <= t;
     const tag = document.getElementById('rum-tag');
     if (tag) {
@@ -744,13 +749,65 @@ ${window.RumAnslag ? RumAnslag.nara() : ''}
 
   // Vem som har lämnat in, för figurerna (rum-3d.js): bara en omgång som inte
   // har börjat väntar på någon, och din egen inlämning på pulten räknas
-  // direkt. ?rum-vantar=DL,DT låter dem vänta ändå.
+  // direkt. ?rum-vantar=DL,DT låter dem vänta ändå (och ?rum-tittar inte).
   function vemInne(rd, rows, t, p) {
-    const open = rd && !rd.next && rows.length && Math.min(...rows.map((x) => Date.parse(x.m.kickoff))) > t;
+    const open = !R.q.has('rum-tittar') && rd && !rd.next && rows.length && Math.min(...rows.map((x) => Date.parse(x.m.kickoff))) > t;
     const vem = {};
     for (const g of (rd && rd.gang) || []) vem[g.id.toLowerCase()] = !open || Boolean(g.inne) || Boolean(p && p.inne && p.vem === g.id);
     for (const id of (R.q.get('rum-vantar') || '').split(',')) if (id.trim()) vem[id.trim().toLowerCase()] = false;
     return vem;
+  }
+
+  // Gänget och matcherna (rum-3d.js): tv:n när någon match pågår (också med
+  // dolda resultat), nag när omgången väntar på någon – från ett dygn före
+  // spelstoppet och 1 den sista timmen – och ett mål när ställningen ändras
+  // medan rummet står öppet: för var och en 1 när tipset blev rätt, −1 när det
+  // blev fel och 0 annars, efter ens eget tips när det syns (annars gängets
+  // kupong). Dolda resultat ger inga mål.
+  function gangTv(rd, rows, t, p) {
+    const q = R.q;
+    const soon = (x) => t - x.g.kick < 2.5 * 3600000;
+    const tv = q.has('rum-tittar') || rows.some((x) => x.g.state === 'live' || ((x.g.state === 'started' || (x.g.state === 'hidden' && !x.g.over)) && soon(x)));
+    const first = rows.length ? Math.min(...rows.map((x) => Date.parse(x.m.kickoff))) : 0;
+    const h = q.has('rum-stopp') ? parseFloat(q.get('rum-stopp')) : (first - t) / 3600000;
+    const nag = !rd || rd.next || !(h > 0) || h > 24 ? 0 : h <= 1 ? 1 : 0.25 + (0.6 * (24 - h)) / 23;
+    R.lage = { tv, nag };
+    if (R.fig && R.fig.lage) R.fig.lage(R.lage, now());
+    // målen: ställningen mot förra gången (första gången inga)
+    const s = p && p.s;
+    const res = (sc) => SIGNS[signIdx(sc)];
+    const gang = rd && rd.gang && rd.gang.length ? rd.gang : ['DL', 'DT', 'DJ'].map((id) => ({ id }));
+    const was = R.ss || {};
+    const sum = {};
+    R.ss = {};
+    for (const x of rows) {
+      if (x.g.state !== 'live' || !x.g.score) continue;
+      const sc = x.g.score;
+      R.ss[x.id] = sc;
+      const w = was[x.id];
+      if (!w || (w.home === sc.home && w.away === sc.away)) continue;
+      for (const g of gang) {
+        const own = s && s.tips && s.tips[g.id] ? s.tips[g.id].tecken[x.id] : p && p.inne && p.vem === g.id ? p.tecken[x.id] : null;
+        const sign = own || x.sign || '';
+        sum[g.id] = (sum[g.id] || 0) + (sign ? Number(sign.includes(res(sc))) - Number(sign.includes(res(w))) : 0);
+      }
+    }
+    if (Object.keys(sum).length && R.fig && R.fig.mal) R.fig.mal(sum, now());
+  }
+
+  // ?rum-mal=dl:1,dt:-1,dj:0: ett mål för bilder – vid tiden 0 med ?rum-t,
+  // annars genast och sedan var femtonde sekund.
+  function provMal() {
+    const v = R.q.get('rum-mal');
+    if (!v || !R.fig || !R.fig.mal) return;
+    const m = {};
+    for (const x of v.split(',')) {
+      const r = /^(\w+):(-?1|0)$/.exec(x.trim());
+      if (r) m[r[1]] = Number(r[2]);
+    }
+    const go = () => R.fig.mal(m, still() ? 0 : now());
+    go();
+    if (!still()) setInterval(() => { if (R.on) go(); }, 15000);
   }
 
   // ---------- rörelsen ----------
@@ -870,6 +927,8 @@ ${window.RumAnslag ? RumAnslag.nara() : ''}
       const mod = await import('./rum-3d.js');
       R.fig = await mod.figurer(document.getElementById('rum-3d'), { calm: calm(), vader: R.vader });
       if (R.vem) R.fig.inne(R.vem, now());
+      if (R.lage) R.fig.lage(R.lage, now());
+      provMal();
       frame();
     } catch (err) {
       // utan WebGL eller utan nätet står rummet kvar utan gänget
@@ -1885,6 +1944,21 @@ ${window.RumAnslag ? RumAnslag.nara() : ''}
 
   // ---------- in och ut ----------
 
+  // Lysröret tänds när man kommer in (en gång per sidvisning, inte utan
+  // rörelser): mörkt medan gänget laddas, minst 0,7 och högst 2,6 sekunder,
+  // och sedan blinkar det igång (.rum-mork i rum.css).
+  function tand(ready) {
+    const m = document.getElementById('rum-mork');
+    if (!m || R.tant || calm()) return;
+    R.tant = true;
+    const t0 = performance.now();
+    m.classList.add('start');
+    const tands = () => { m.classList.remove('start'); m.classList.add('tands'); };
+    Promise.race([ready, new Promise((r) => setTimeout(r, 2600))])
+      .then(() => setTimeout(tands, Math.max(0, 700 - (performance.now() - t0))));
+    m.addEventListener('animationend', (e) => { if (e.animationName === 'rum-tands') m.classList.remove('tands'); });
+  }
+
   const fits = () => R.q.has('rum-t') || matchMedia('(min-width: 900px) and (min-aspect-ratio: 6/5)').matches;
 
   function show() {
@@ -1901,6 +1975,7 @@ ${window.RumAnslag ? RumAnslag.nara() : ''}
     hot(null);
     // gänget klär sig efter vädret: vänta lite på det (i en fast bild tills det är hämtat)
     const ready = Promise.all([load(), Promise.race([ute(), new Promise((r) => setTimeout(r, still() ? 9000 : 1500))]).then(three)]);
+    tand(ready);
     if (still()) {
       // en fast bild: allt på samma tid, och klar när datan och gänget är ritade
       ready.then(() => {
