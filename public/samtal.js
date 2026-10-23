@@ -863,7 +863,7 @@
     SM.draft = fill ? draftFor(s, v, edit) : null;
     SM.edit = edit;
     return paperTop(stopBox(s), '', stamp(s)) + '<div id="sm-rows"></div>' +
-      '<div class="pb-foot sm-foot"><div class="pp-fields pb-fields" id="sm-fields"></div></div>' +
+      `<div class="pb-foot sm-foot"><div class="pp-fields pb-fields" id="sm-fields"></div>${Papper.code(s.id)}</div>` +
       '<div class="sm-act" id="sm-act"><div class="sm-act-in" id="sm-act-in"></div>' +
       '<p class="pb-msg" id="sm-msg" role="status"></p></div></div></div>';
   }
@@ -976,15 +976,7 @@
     keepFocus(() => { $('#sm-rows').innerHTML = html; });
     // Foten: hur långt du har kommit och knappen.
     const mine = d ? d.tecken : (cols.find((c) => c.g.id === v && c.st !== 'hidden') || {}).t;
-    const signs = mine ? s.matcher.map((x) => mine[x.id]).filter(Boolean) : [];
-    const gard = signs.filter((x) => x.length > 1).length;
-    const odds = mine && signs.length ? radOdds(s, mine) : null;
-    $('#sm-fields').outerHTML = !mine ? '<div class="pp-fields pb-fields" id="sm-fields"></div>' : fieldList([
-      ['Tippat', `${signs.length}/${s.matcher.length}`],
-      gard ? ['Garderingar', gard] : null,
-      window.Spela ? Spela.field(rader(signs), s.spel) : ['Kombinationer', rader(signs)],
-      odds ? ['Odds', oddsText(odds), 'Oddset för att alla dina tecken går in – matchernas odds gånger varandra'] : null,
-    ], 'sm-fields');
+    $('#sm-fields').outerHTML = fieldList(mine ? footFields(s, mine) : [], 'sm-fields');
     actionRow();
     // Alla tecken på plats: de röda rutorna försvinner.
     if (!s.matcher.some((x) => d && !d.tecken[x.id])) $('#sm-sheet').classList.remove('need');
@@ -1043,6 +1035,21 @@
     el.dataset.html = html;
     $('#sm-act').classList.toggle('more', actMore);
     $('#sm-act').hidden = !html;
+  }
+
+  // Fälten i foten för tecknen i mine ({matchens id: tecken}): hur många
+  // som är tippade, garderingarna, kombinationerna (priset på Stryktipset)
+  // och oddset för hela raden – på papperet och på kupongen på pulten.
+  function footFields(s, mine) {
+    const signs = s.matcher.map((x) => mine[x.id]).filter(Boolean);
+    const gard = signs.filter((x) => x.length > 1).length;
+    const odds = signs.length ? radOdds(s, mine) : null;
+    return [
+      ['Tippat', `${signs.length}/${s.matcher.length}`],
+      gard ? ['Garderingar', gard] : null,
+      window.Spela ? Spela.field(rader(signs), s.spel) : ['Kombinationer', rader(signs)],
+      odds ? ['Odds', oddsText(odds), 'Oddset för att alla dina tecken går in – matchernas odds gånger varandra'] : null,
+    ];
   }
 
   // Oddset för hela din rad: matchernas odds gånger varandra, där en
@@ -1594,7 +1601,8 @@
   // ---------- kupongen på pulten ----------
 
   // Tobaksaffären (rum.js) fyller i samma kupong på pulten: samma utkast på
-  // enheten och samma inlämning som papperet här. state() → null utan
+  // enheten och samma inlämning som papperet här, och samma stämpel,
+  // porträtt och fält i foten (top, fields). state() → null utan
   // omgång, annars {s, vem, tecken, inne, fyll, andra, hand, val, go}:
   // tecken = dina (utkastet eller de inlämnade), inne = du har lämnat in,
   // fyll = du kan fylla i den (du har inte lämnat in och första matchen har
@@ -1634,6 +1642,28 @@
       kpStore(VEM, id);
       if (d) kpStore(TIPS, { id: s.id, vem: id, tecken: d.tecken, kommentarer: d.kommentarer || {} });
       return true;
+    },
+    // Det som står överst på papperet, till kupongen på pulten: stämpeln
+    // (vem omgången väntar på) och porträtten med bock, tårtbit eller
+    // prickar, ditt inringat. vem: porträtten för dem du kan vara är knappar
+    // (data-vem), som Vem är du? på papperet. → {stamp, faces, vem: du har
+    // inte sagt vem du är}, eller null utan omgång.
+    top(vem = false) {
+      const s = SM.data;
+      if (!s) return null;
+      const v = me();
+      const choose = (g) => vem && !submitted(s, v) && !g.inne;
+      return {
+        stamp: stamp(s),
+        faces: s.gang.map((g) => topFace(s, g, {
+          attrs: choose(g) ? ` type="button" aria-pressed="${g.id === v}" data-vem="${esc(g.id)}" aria-label="${esc(g.namn || g.id)}"` : '',
+        })).join(''),
+        vem: !v,
+      };
+    },
+    // Fälten i papperets fot för tecknen ({matchens id: tecken}).
+    fields(tecken) {
+      return SM.data ? fieldList(footFields(SM.data, tecken)) : '';
     },
     // Ett tecken eller en gardering i en match ('' = inget).
     tippa(id, tecken) {

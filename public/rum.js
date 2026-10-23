@@ -812,40 +812,43 @@ ${closeHtml()}
     };
   }
   const PEN_PULT = { x: 276.4, y: 340.6, a: -11 };
-  const PEN_VILA = { x: 506, y: 384, a: -7 };
+  const PEN_VILA = { x: 362, y: 440, a: -6 };
   const PEN_SKRIV = -38;
   const penStyle = (p) => { const s = penAt(p); return `transform: ${s.transform}; filter: ${s.filter}`; };
 
-  // Kupongen på pulten: omgångens matcher i kupongens ordning, med kryss där
+  // Kupongen på pulten: samma kupong som papperet under Kupong (samtal.js),
+  // i kupongens mått. Bandet, under det stämpeln (vem omgången väntar på)
+  // och spelstoppet, porträtten och 1 X 2 överst, en rad per match med
+  // synkmarkeringen i kanten och fälten och streckkoden i foten. Kryss där
   // gängets kupong har tecken – innan den finns dina egna (p =
-  // Samtal.pult.state()), med ditt namn kryssat under Tippare och stämpeln
-  // när du har lämnat in. hand: kupongen i handen, där rutorna är knappar.
+  // Samtal.pult.state()), med ditt porträtt inringat och stämpeln Inlämnad
+  // när du har lämnat in. hand: kupongen i handen, där rutorna och
+  // porträtten för dem du kan vara är knappar.
   function couponHtml(rd, rows, p = null, hand = false) {
     const nr = rd && !rd.next && typeof couponNumber === 'function' && rd.ids.length ? couponNumber(rd.ids) : null;
     const first = rows.length ? Math.min(...rows.map((x) => Date.parse(x.m.kickoff))) : null;
     const order = rd ? rd.ids.map((id) => rows.find((x) => x.id === id)).filter(Boolean) : rows;
     const gang = order.some((x) => x.sign);
     const own = Boolean(p) && !gang;
-    const mine = own ? p.tecken : {};
+    const signs = Object.fromEntries(order.map((x) => [x.id, (own ? p.tecken[x.id] : x.sign) || '']));
     const box = (key, label, on, attrs, cls = '') => (hand && attrs != null
       ? `<button type="button" class="box${on ? ' x' : ''}${cls}"${attrs} aria-pressed="${on}">`
       : `<span class="box${on ? ' x' : ''}${cls}">`) + `<i>${label}</i>${on ? crossSvg(key) : ''}${hand && attrs != null ? '</button>' : '</span>'}`;
     const list = order.map((x, i) => {
-      const sign = own ? mine[x.id] || '' : x.sign;
-      return `<div class="row${sign ? '' : ' tom'}" data-id="${esc(x.id)}"><span class="nr">${i + 1}</span><span>${esc(short(x.m.home))} – ${esc(short(x.m.away))}</span>` +
-        ['1', 'X', '2'].map((s) => box(`${x.id}${s}`, s, sign.includes(s), ` data-s="${s}" aria-label="${esc(`${x.m.home} – ${x.m.away}: ${s}`)}"`)).join('') + '</div>';
+      const sign = signs[x.id];
+      const comp = compOf(x.m.comp);
+      return `<div class="row${sign ? '' : ' tom'}" data-id="${esc(x.id)}"><span class="pp-nr">${i + 1}</span>` +
+        `<span class="m"><span class="pp-tm">${esc(x.m.home)}<span class="vs"> – </span>${esc(x.m.away)}</span>` +
+        `<span class="pp-small">${esc(fWeekdayTime.format(new Date(x.m.kickoff)))}${comp ? ` · ${esc(comp.short)}` : ''}</span></span>` +
+        SIGNS.map((s) => box(`${x.id}${s}`, s, sign.includes(s), ` data-s="${s}" aria-label="${esc(`${x.m.home} – ${x.m.away}: ${s}`)}"`)).join('') + '</div>';
     }).join('');
-    const who = rd && rd.gang && rd.gang.length ? rd.gang.filter((g) => g.inne).length : null;
-    const vem = own ? '<span class="vem"><span>Tippare</span><span>' + p.s.gang.map((g) => box(`vem${g.id}`, esc(g.id), g.id === p.vem,
-      p.val.includes(g.id) ? ` data-vem="${esc(g.id)}" aria-label="${esc(g.namn || g.id)}"` : null, g.inne && g.id !== p.vem ? ' inne' : '')).join('') + '</span></span>' : '';
-    return '<span class="marks"></span>' +
-      `<span class="band"><small>MATCHFIXARNA · TIPSKUPONG</small><b>${nr ? `Kupong ${nr}` : 'Kupong'}</b></span>` +
-      `<span class="sub"><i>${esc((rd && rd.name) || '')}</i><span>${rows.length} matcher</span></span>` +
-      `<span class="grid"><span><span class="hd"><span></span><span>MATCH</span><span>1</span><span>X</span><span>2</span></span>${list}</span>` +
-      `<span class="side"><span><span>Spelstopp</span><b>${first ? `${wd(new Date(first))} ${hm(new Date(first))}` : '–'}</b></span>` +
-      `<span><span>Insats</span><b>äran</b></span>${who != null ? `<span><span>Inlämnade</span><b>${who} av ${rd.gang.length}</b></span>` : ''}` +
-      (own ? `<span><span>Tippat</span><b data-tippat>${order.filter((x) => mine[x.id]).length}/${order.length}</b></span>${vem}` : '') + '</span></span>' +
-      '<span class="code"></span><span class="fine"><span>Kupongen gäller först när den är inlämnad.</span><span>Ej giltig som kvitto</span></span>' +
+    const top = p ? Samtal.pult.top(hand && p.fyll) : null;
+    const id = rd && !rd.next ? rd.id || (rd.coupon && rd.coupon.id) : null;
+    return `<span class="band"><small>MATCHFIXARNA · TIPSKUPONG</small><b>${nr ? `Kupong ${nr}` : 'Kupong'}</b></span>` +
+      `<span class="topp">${top ? top.stamp : ''}<span class="pp-stop"><span>Spelstopp</span><b>${first ? esc(fWeekdayTime.format(new Date(first))) : '–'}</b></span></span>` +
+      `<span class="hd"><span>Nr</span><span class="m">${top && top.vem ? '<span class="sm-q">Vem är du?</span>' : '<span>Match</span>'}` +
+      `${top ? `<span class="sm-folk-pp">${top.faces}</span>` : ''}</span><span>1</span><span>X</span><span>2</span></span>${list}` +
+      `<span class="fot">${p ? Samtal.pult.fields(signs) : ''}${id ? Papper.code(id) : ''}</span>` +
       (own && p.inne ? '<span class="stampel">Inlämnad</span>' : '') + `<span class="pencil" style="${penStyle(PEN_PULT)}"><i></i></span>`;
   }
 
@@ -1386,7 +1389,7 @@ ${closeHtml()}
     }
     el.focus({ preventScroll: true });
     el.addEventListener('click', (e) => {
-      const b = e.target.closest('button.box');
+      const b = e.target.closest('button.box, button[data-vem]');
       if (!b || k.closing) return;
       if (b.dataset.vem) choose(b);
       else tick(b);
@@ -1520,9 +1523,42 @@ ${closeHtml()}
     }, 1800);
   }
 
-  // Ett kryss som tas bort suddas ut.
+  // Pennan ringar in ditt porträtt, ett drygt varv som på papperet: den
+  // följer ringen som ritas (Papper.ring) och lyfter.
+  function drawRing(fw, key) {
+    const k = R.kup;
+    fw.querySelector('.sm-fc').insertAdjacentHTML('afterend', Papper.ring(key, 'sm-du-ring', 25));
+    const svg = fw.querySelector('.sm-du-ring');
+    const path = svg.querySelector('path');
+    if (calm()) return;
+    // ringen står 6 px utanför porträttet runt om (rum.css), i 60 × 60
+    const o = spot(fw);
+    const w = fw.offsetWidth + 12;
+    const h = fw.offsetHeight + 12;
+    const len = path.getTotalLength();
+    const n = 16;
+    const pts = Array.from({ length: n + 1 }, (_, i) => path.getPointAtLength((len * i) / n))
+      .map((q) => [o.x - 6 + (q.x / 60) * w, o.y - 6 + (q.y / 60) * h]);
+    path.setAttribute('pathLength', '1');
+    path.style.strokeDasharray = '1 2';
+    const at = (pt, l, t, e) => ({ x: pt[0], y: pt[1], a: PEN_SKRIV, l, t, e });
+    const travel = Math.round(Math.min(340, Math.max(150, Math.hypot(pts[0][0] - k.at.x, pts[0][1] - k.at.y) * 0.9)));
+    const step = 26;
+    penGo([
+      at(pts[0], 0.7, travel, 'cubic-bezier(0.4, 0, 0.2, 1)'), at(pts[0], 0, 50, 'ease-in'),
+      ...pts.slice(1).map((pt) => at(pt, 0, step, 'linear')),
+      at([pts[n][0] + 12, pts[n][1] + 10], 0.8, 220, 'ease-out'),
+    ]);
+    path.animate([{ strokeDashoffset: 1.05 }, { strokeDashoffset: 0 }], { duration: step * n, delay: travel + 50, easing: 'linear', fill: 'backwards' });
+    clearTimeout(k.idle);
+    k.idle = setTimeout(() => {
+      if (R.kup === k && !k.closing) penGo([{ ...PEN_VILA, l: 0.4, t: 480, e: 'cubic-bezier(0.4, 0, 0.3, 1)' }, { ...PEN_VILA, t: 160, e: 'ease-in' }]);
+    }, 1800);
+  }
+
+  // Ett kryss eller en ring som tas bort suddas ut.
   function eraseCross(box) {
-    for (const svg of box.querySelectorAll('.kryss:not(.ut)')) {
+    for (const svg of box.querySelectorAll('.kryss:not(.ut), .sm-du-ring:not(.ut)')) {
       svg.classList.add('ut');
       if (calm()) svg.remove();
       else svg.animate([{ opacity: 1 }, { opacity: 0, filter: 'blur(1.5px)' }], { duration: 240, easing: 'ease-out', fill: 'forwards' }).finished.then(() => svg.remove(), () => {});
@@ -1546,26 +1582,29 @@ ${closeHtml()}
       else delete k.tecken[row.dataset.id];
       k.go.disabled = Object.keys({ ...k.orig, ...k.tecken }).every((id) => (k.orig[id] || '') === (k.tecken[id] || ''));
     } else Samtal.pult.tippa(row.dataset.id, sign);
-    const rows = [...k.el.querySelectorAll('.row')];
-    const n = rows.filter((r) => !r.classList.contains('tom')).length;
-    const f = k.el.querySelector('[data-tippat]');
-    if (f) f.textContent = `${n}/${rows.length}`;
-    if (n === rows.length) k.el.classList.remove('need');
+    // fälten i foten räknas om, som på papperet
+    const f = k.el.querySelector('.fot .pp-fields');
+    if (f) f.outerHTML = Samtal.pult.fields(k.andra ? k.tecken : Samtal.pult.state().tecken);
+    if (!k.el.querySelector('.row.tom')) k.el.classList.remove('need');
     k.msg.textContent = '';
   }
 
-  // Tippare: du kryssar för vem du är.
+  // Vem är du: pennan ringar in ditt porträtt, och stämpeln säger vem
+  // omgången väntar på med dig först, som på papperet.
   function choose(b) {
     const k = R.kup;
     if (b.getAttribute('aria-pressed') === 'true' || !Samtal.pult.vem(b.dataset.vem)) return;
     for (const o of k.el.querySelectorAll('button[data-vem][aria-pressed="true"]')) {
       o.setAttribute('aria-pressed', 'false');
-      o.classList.remove('x');
       eraseCross(o);
     }
     b.setAttribute('aria-pressed', 'true');
-    b.classList.add('x');
-    drawCross(b, `vem${b.dataset.vem}`);
+    drawRing(b.querySelector('.sm-fw'), `du${Samtal.pult.state().s.id}${b.dataset.vem}`);
+    const top = Samtal.pult.top();
+    const st = k.el.querySelector('.topp .pp-stamp');
+    if (st && top.stamp) st.outerHTML = top.stamp;
+    const q = k.el.querySelector('.hd .sm-q');
+    if (q) q.outerHTML = '<span>Match</span>';
     k.el.classList.remove('need-vem');
     k.msg.textContent = '';
   }
