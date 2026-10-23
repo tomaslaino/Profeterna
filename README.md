@@ -1773,6 +1773,12 @@ kuponger med samma terrakottaband som kupongen på pulten i ett fack av plexigla
 pennor (samma som kupongens) i ett rör bredvid och en lapp på plexit: *Pennorna är
 räknade*.
 
+**Stationsuret** sitter på bakväggen ovanför fällbladstavlan och leder ingenstans: vit
+tavla med svarta streck och visare och en röd sekundvisare som hoppar varje sekund, med en
+mörk kant och tavlan gulnad av röken. Det går efter Stockholms tid, med samma klocka som
+utsikten (`Vader.nu()` i vader.js, annars datorns klocka). Med `?rum-t` står det på den
+tid det visade först, och med `prefers-reduced-motion` syns inte sekundvisaren.
+
 **Gänget** sitter på fönsterbänken med benen hängande: DL dricker ur en flaska, DT röker
 och skrattar, DJ har en burk i ena handen och pratar med cigaretten i den andra. Var och en
 har sin loop (12–21 s) – flaskan och burken till munnen med huvudet bakåt, ett bloss med
@@ -1788,8 +1794,8 @@ blåvitt randig mössa med tofs och BLÅVITT på uppviket, med solglasögonen up
 huvudet; håret trycks ner under mössan och sticker ut under kanten.
 
 **Rummet rör sig också:** regnet faller utanför rutan och dörren, droppar rinner på glaset,
-neonen glappar ibland, röken ligger under lysröret, damm syns i ljuset och ett hörn på en
-löpsedel har släppt och fladdrar. Stället är slitet: nikotingula väggar och tak, fläckar,
+neonen glappar ibland, röken ligger under lysröret, damm syns i ljuset och stationsurets
+sekundvisare hoppar fram. Stället är slitet: nikotingula väggar och tak, fläckar,
 avflagnad färg, en spricka, skuggan efter en tavla som flyttats, nötta kanter på disken och
 pulten, kafferingar och brännmärken. Med `prefers-reduced-motion` står allt still (en bild,
 ingen kamera efter musen, inget klapper).

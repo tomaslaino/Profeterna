@@ -90,55 +90,6 @@ a.rum-sak, a.rum-sak:hover { color: inherit; text-decoration: none; }
 .rum.neon-av .rum-neon { opacity: 0.32; }
 .rum.neon-av .rum-neonhalo, .rum.neon-av .rum-neonglow { opacity: 0.04; }
 
-/* ---------- löpsedlarna ---------- */
-
-.rum-lop {
-  position: absolute;
-  width: 140px;
-  height: 196px;
-  box-sizing: border-box;
-  padding: 8px 9px;
-  background: #ecc81c linear-gradient(170deg, rgba(255, 250, 220, 0.18), rgba(120, 80, 0, 0.1));
-  color: #111;
-  font-family: Anton, Impact, sans-serif;
-  text-transform: uppercase;
-  box-shadow: 0 6px 14px rgba(0, 0, 0, 0.45), inset 0 0 30px rgba(120, 80, 0, 0.22);
-}
-.rum-lop .mast { display: inline-block; background: #c9281c; color: #fff; font-size: 17px; letter-spacing: 1px; padding: 1px 6px 0; line-height: 20px; }
-.rum-lop .kick { font-size: 15px; line-height: 16px; margin-top: 16px; }
-.rum-lop .head { font-size: 37px; line-height: 43px; margin-top: 4px; letter-spacing: -0.3px; }
-.rum-lop .tejp { position: absolute; top: -5px; width: 34px; height: 12px; background: rgba(240, 235, 215, 0.5); transform: rotate(-3deg); }
-/* hörnet som släppt: papperet klipps och fliken viker sig ut och tillbaka */
-.rum-lop.slapp { clip-path: polygon(0 0, calc(100% - 36px) 0, 100% 36px, 100% 100%, 0 100%); }
-.rum-lop .horn {
-  position: absolute;
-  right: 0;
-  top: 0;
-  width: 36px;
-  height: 36px;
-  background: linear-gradient(135deg, #d7bd5a, #f1dc86 60%, #c9ad42);
-  clip-path: polygon(0 0, 100% 100%, 0 100%);
-  transform-origin: 0 0;
-  animation: rum-horn 13s ease-in-out infinite;
-}
-.rum-lop.slapp::after {
-  content: "";
-  position: absolute;
-  right: 4px;
-  top: 30px;
-  width: 30px;
-  height: 14px;
-  background: radial-gradient(closest-side, rgba(0, 0, 0, 0.28), rgba(0, 0, 0, 0));
-  transform: rotate(45deg);
-}
-@keyframes rum-horn {
-  0%, 60%, 100% { transform: rotate3d(1, 1, 0, 0deg); }
-  66% { transform: rotate3d(1, 1, 0, 34deg); }
-  72% { transform: rotate3d(1, 1, 0, 12deg); }
-  78% { transform: rotate3d(1, 1, 0, 26deg); }
-  86% { transform: rotate3d(1, 1, 0, 4deg); }
-}
-
 /* ---------- fällbladstavlan ---------- */
 
 /* Bladen är --w × --h stora med --g mellan sig, ett fält är --n blad brett;
@@ -764,7 +715,9 @@ a.rum-fb-r:hover b:not(.lit) { color: #fff; background: linear-gradient(180deg, 
 .rum-ft a { font-family: Fraunces, Georgia, serif; font-size: 16px; color: #a9c8fb; text-decoration: underline; text-underline-offset: 4px; text-decoration-thickness: 1px; text-shadow: 0 1px 8px #000; }
 
 @media (prefers-reduced-motion: reduce) {
-  .rum-regn-b, .rum-droppe, .rum-rok i, .rum-lop .horn, .rum-fb-r b.f, .rum-ram-glans::after,
+  .rum-regn-b, .rum-droppe, .rum-rok i, .rum-fb-r b.f, .rum-ram-glans::after,
   .rum-ram .kr-scene *, .rum-ram .kr-scene *::before, .rum-ram .kr-scene *::after { animation: none; }
   .rum-stage, .rum-kamera.glid, .rum-kamera.dyk, .rum-nara, .rum.fb-nara .rum-nara { transition: none; }
+  /* stationsuret visar tiden men sekundvisaren hoppar inte */
+  #rum-ur-s { display: none; }
 }

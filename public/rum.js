@@ -275,11 +275,7 @@ window.Rum = (() => {
   <rect x="1408" y="490" width="64" height="70" rx="12" fill="#d9e6ea" opacity=".2"/>
   ${candy}
   <rect x="1404" y="482" width="72" height="12" rx="4" fill="#c8643a"/>
-  <rect x="1410" y="494" width="60" height="62" rx="10" fill="#cfc4a3" opacity=".12"/>
-
-  <g stroke="#1f1f20" stroke-width="7" fill="none"><path d="M22 650 V306 H324 V650"/></g>
-  <rect x="18" y="300" width="310" height="8" fill="url(#rum-alu)"/>
-  <rect x="18" y="298" width="310" height="3" fill="#cfc6b0" opacity=".25"/>`);
+  <rect x="1410" y="494" width="60" height="62" rx="10" fill="#cfc4a3" opacity=".12"/>`);
   }
 
   // Regnet som faller utanför: två band per ruta som glider nedåt (bara
@@ -315,11 +311,52 @@ window.Rum = (() => {
       ${word(190)}<rect x="420" y="200" width="40" height="10" rx="2" fill="#1d1b1a"/>`);
   }
 
-  // Löpsedlarna i stället, den vänstra med ett hörn som släppt.
-  function lop() {
-    return '<div class="rum-lop" style="left:28px; top:318px"><span class="mast">Facit</span><div class="kick">Experterna:</div><div class="head">Bollen är rund</div><i class="tejp" style="left:6px"></i></div>' +
-      '<div class="rum-lop slapp" style="left:178px; top:318px"><span class="mast">Facit</span><div class="kick">Lördag:</div><div class="head">DJ tror på kryss</div>' +
-      '<i class="tejp" style="left:8px"></i><i class="horn"></i></div>';
+  // Stationsuret ovanför fällbladstavlan: vit tavla med svarta streck och en
+  // röd sekundvisare, gulnad av röken. Visarna ställs i hands().
+  const UR = { x: 1050, y: 152, r: 46 };
+  function clock() {
+    const { x, y, r } = UR;
+    let ticks = '';
+    for (let i = 0; i < 60; i++) {
+      const big = i % 5 === 0;
+      ticks += `<rect x="${r1(big ? -r * 0.036 : -r * 0.01)}" y="${r1(-r * 0.93)}" width="${r1(big ? r * 0.072 : r * 0.02)}" height="${r1(big ? r * 0.23 : r * 0.075)}" transform="rotate(${i * 6})"/>`;
+    }
+    // visaren pekar uppåt: från baken (b) under navet till spetsen (l)
+    const hand = (id, l, b, w0, w1) => `<polygon id="${id}" points="${r1(-w0 / 2)},${r1(b)} ${r1(w0 / 2)},${r1(b)} ${r1(w1 / 2)},${r1(-l)} ${r1(-w1 / 2)},${r1(-l)}"/>`;
+    return svg(`<defs>
+    <radialGradient id="rum-ur-tavla" cx=".44" cy=".4" r=".62"><stop offset="0" stop-color="#f7f0dc"/><stop offset=".72" stop-color="#e9dfc3"/><stop offset="1" stop-color="#c9ba92"/></radialGradient>
+    <radialGradient id="rum-ur-nik" cx=".5" cy=".5" r=".5"><stop offset=".55" stop-color="#7a5410" stop-opacity="0"/><stop offset="1" stop-color="#6a4608" stop-opacity=".28"/></radialGradient>
+    <linearGradient id="rum-ur-kant" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#8d887c"/><stop offset=".35" stop-color="#3a3833"/><stop offset="1" stop-color="#0f0e0d"/></linearGradient>
+  </defs>
+  <circle cx="${x + 4}" cy="${y + 10}" r="${r + 6}" fill="#000" opacity=".5" filter="url(#rum-b10)"/>
+  <g transform="translate(${x} ${y})">
+    <circle r="${r + 6}" fill="url(#rum-ur-kant)"/><circle r="${r + 1.6}" fill="#0e0d0c"/><circle r="${r}" fill="url(#rum-ur-tavla)"/>
+    <g fill="#161512">${ticks}${hand('rum-ur-t', r * 0.56, r * 0.16, r * 0.11, r * 0.08)}${hand('rum-ur-m', r * 0.86, r * 0.16, r * 0.085, r * 0.055)}</g>
+    <g id="rum-ur-s" fill="#c4281c"><rect x="${r1(-r * 0.013)}" y="${r1(-r * 0.8)}" width="${r1(r * 0.026)}" height="${r1(r * 1.04)}"/><circle cy="${r1(r * 0.2)}" r="${r1(r * 0.05)}"/></g>
+    <circle r="${r1(r * 0.045)}" fill="#c4281c"/><circle r="${r1(r * 0.018)}" fill="#3a0a06"/>
+    <circle r="${r}" fill="url(#rum-ur-nik)"/>
+    <path d="M${r1(-r * 0.78)} ${r1(-r * 0.38)} A${r1(r * 0.87)} ${r1(r * 0.87)} 0 0 1 ${r1(r * 0.18)} ${r1(-r * 0.85)}" stroke="#fff" stroke-opacity=".28" stroke-width="${r1(r * 0.05)}" fill="none" stroke-linecap="round"/>
+    <ellipse cx="${r1(-r * 0.22)}" cy="${r1(-r * 0.42)}" rx="${r1(r * 0.55)}" ry="${r1(r * 0.28)}" fill="#fff" opacity=".07" transform="rotate(-30)"/>
+  </g>`);
+  }
+
+  // Visarna efter Stockholms tid, en gång i sekunden: Vader.nu() (vader.js)
+  // går efter ?rum-klocka, annars datorns klocka. Med ?rum-t står uret på den
+  // tid det visade först.
+  const fUr = new Intl.DateTimeFormat('sv-SE', { timeZone: 'Europe/Stockholm', hour: 'numeric', minute: 'numeric', second: 'numeric', hourCycle: 'h23' });
+  function hands() {
+    if (still() && R.urS != null) return;
+    if (R.urOff == null) R.urOff = window.Vader ? Vader.nu().t - Date.now() : 0;
+    const ms = Date.now() + R.urOff;
+    const s = Math.floor(ms / 1000);
+    if (s === R.urS) return;
+    R.urS = s;
+    const p = {};
+    for (const x of fUr.formatToParts(new Date(ms))) p[x.type] = +x.value;
+    const turn = (id, a) => document.getElementById(id).setAttribute('transform', `rotate(${r1(a)})`);
+    turn('rum-ur-t', ((p.hour % 12) + p.minute / 60) * 30);
+    turn('rum-ur-m', (p.minute + p.second / 60) * 6);
+    turn('rum-ur-s', p.second * 6);
   }
 
   // ---------- de sju sakerna ----------
@@ -595,7 +632,7 @@ window.Rum = (() => {
     el.hidden = true;
     el.setAttribute('aria-label', 'Tobaksaffären');
     el.innerHTML = `<div class="rum-stage" id="rum-stage"><div class="rum-kamera" id="rum-kamera"><div class="rum-world" id="rum-world">
-${plane(-600, `${bg()}${rain()}${rightWall()}${svg('<g id="rum-hyllor"></g>')}${neon()}${lop()}${boardHtml()}${frameHtml()}`, 1.035)}
+${plane(-600, `${bg()}${rain()}${rightWall()}${svg('<g id="rum-hyllor"></g>')}${neon()}${clock()}${boardHtml()}${frameHtml()}`, 1.035)}
 ${plane(-470, `${props()}${tv()}`, 1.02)}
 ${plane(-330, `${sill()}${haze()}`)}
 ${plane(-60, table(), 1.05)}
@@ -1065,6 +1102,7 @@ ${closeHtml()}
       R.neon = on;
       R.el.classList.toggle('neon-av', !on);
     }
+    hands();
     // tavlan bläddrar var nionde sekund, text-tv:n var tolfte
     const page = Math.floor(t / 9);
     if (still() && R.lines) {
