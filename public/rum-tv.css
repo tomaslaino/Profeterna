@@ -13,7 +13,9 @@
 
 .rum-pl3d { transform-style: preserve-3d; }
 
-.rum-tvpos { position: absolute; left: 1216px; top: 110px; width: 292px; height: 196px; transform-style: preserve-3d; }
+/* allt i tv:ns mått, förminskat mot väggen (z -130), så att den sitter uppe
+   i hörnet och inte sticker ut så långt i rummet */
+.rum-tvpos { position: absolute; left: 1206px; top: 100px; width: 292px; height: 196px; transform-style: preserve-3d; transform-origin: 0 0 -130px; transform: scale3d(0.78, 0.78, 0.78); }
 .rum-tv3 {
   --tra: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='320' height='160'%3E%3Cfilter id='w' x='0' y='0' width='100%25' height='100%25'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.0035 .11' numOctaves='4' seed='11' stitchTiles='stitch'/%3E%3CfeColorMatrix values='0 0 0 0 .15  0 0 0 0 .08  0 0 0 0 .03  0 0 0 -2.4 1.32'/%3E%3C/filter%3E%3Crect width='320' height='160' filter='url(%23w)'/%3E%3C/svg%3E") 0 0 / 320px 160px, linear-gradient(180deg, #6e4a2c, #523520);
   position: absolute;
@@ -55,10 +57,9 @@
 .h-vanster { left: -5px; top: 191px; width: 116px; height: 9px; transform: translateZ(5px) rotateY(90deg); filter: brightness(0.7); }
 .h-hoger { left: 297px; top: 191px; width: 116px; height: 9px; transform: translateZ(5px) rotateY(90deg); filter: brightness(0.85); }
 
-/* armen: en fyrkantsprofil från leden bakom tv:n till väggplattan ovanför
-   korktavlan, och sladden som går ner i springan mellan tavlan
-   under tv:n och korktavlan till uttaget. Står still när tv:n vrids, och ritas i tre
-   gånger storleken som lådan. */
+/* armen: en fyrkantsprofil från leden bakom tv:n till väggplattan, och
+   sladden som hänger från armen till uttaget under plattan. Står still när
+   tv:n vrids, och ritas i tre gånger storleken som lådan. */
 .tv-fot { position: absolute; left: 0; top: 0; width: 292px; height: 196px; zoom: 3; transform-style: preserve-3d; transform-origin: 0 0; transform: scale3d(0.3333, 0.3333, 0.3333); pointer-events: none; }
 .tv-fot i { position: absolute; display: block; transform-origin: 0 0; }
 .tv-arm { left: 146px; top: 94px; width: 0; height: 0; transform-style: preserve-3d; transform: translateZ(-20px) rotateY(23.6deg) rotateZ(-3.3deg); }
@@ -70,15 +71,15 @@
 .tv-platta::before { top: 5px; }
 .tv-platta::after { bottom: 5px; }
 .tv-sladd {
-  left: 310px;
+  left: 340px;
   top: 86px;
-  width: 24px;
-  height: 240px;
+  width: 60px;
+  height: 116px;
   transform: translateZ(-110px);
-  background: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='24' height='240'%3E%3Cpath d='M12 2 C 15 70, 8 150, 12 236' fill='none' stroke='%23111' stroke-width='3.4' stroke-linecap='round'/%3E%3Cpath d='M12 2 C 15 70, 8 150, 12 236' fill='none' stroke='%23666' stroke-opacity='.45' stroke-width='1' transform='translate(-.8 0)'/%3E%3C/svg%3E") no-repeat;
+  background: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='60' height='116'%3E%3Cpath d='M10 3 C 9 70, 30 108, 54 110' fill='none' stroke='%23111' stroke-width='3.4' stroke-linecap='round'/%3E%3Cpath d='M10 3 C 9 70, 30 108, 54 110' fill='none' stroke='%23666' stroke-opacity='.45' stroke-width='1' transform='translate(-.8 0)'/%3E%3C/svg%3E") no-repeat;
 }
 /* uttaget: en krämvit dosa med stickproppen i */
-.tv-uttag { left: 322px; top: 318px; width: 11px; height: 17px; transform: translateZ(-124px) skewY(-10deg); border-radius: 2px; background: linear-gradient(90deg, #f3ecda, #d3c9b0 60%, #a39a83); box-shadow: -1px 0 0 #8a816c, 0 1px 3px rgba(0, 0, 0, 0.55); }
+.tv-uttag { left: 396px; top: 186px; width: 11px; height: 17px; transform: translateZ(-124px) skewY(-10deg); border-radius: 2px; background: linear-gradient(90deg, #f3ecda, #d3c9b0 60%, #a39a83); box-shadow: -1px 0 0 #8a816c, 0 1px 3px rgba(0, 0, 0, 0.55); }
 .tv-uttag::after { content: ""; position: absolute; left: 2px; top: 4px; width: 7px; height: 9px; border-radius: 50%; background: radial-gradient(circle at 40% 35%, #4a4643, #141312 70%); }
 
 /* kaninöronen på taket, det ena med en bit folie */
@@ -108,8 +109,8 @@
 /* skenet från rutan på väggen och i taket */
 .tv-sken {
   position: absolute;
-  left: 1140px;
-  top: 10px;
+  left: 1000px;
+  top: -60px;
   width: 620px;
   height: 480px;
   pointer-events: none;

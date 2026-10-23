@@ -1336,7 +1336,7 @@ ${closeHtml()}
     }
     const r = R.tv && R.tv.zoom(on);
     setCam(R.mx, R.my);
-    if (on && r) aim(centerOf(r), 3, [800, 480], calm() ? null : 'glid');
+    if (on && r) aim(centerOf(r), 3.6, [800, 480], calm() ? null : 'glid');
     else aim([800, 500], 1, [800, 500], calm() ? null : 'glid');
   }
 

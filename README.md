@@ -1771,7 +1771,7 @@ sidan byts:
   initialerna i personens bläck (samma som på papperet under Kupong) och stämpeln
   *Inlämnad*, men inga tecken. Din egen tas i handen, och de andras när du ser deras tips
   (se nedan). Innan dess lyfts en annans kupong bara lite i ena kanten och faller tillbaka.
-- **Tv:n** uppe till höger, en tjock-tv i träfaner med text-tv på en arm från väggen, zoomas in med ett
+- **Tv:n** uppe i hörnet till höger, en tjock-tv i träfaner med text-tv på en arm från väggen, zoomas in med ett
   klick eller T och vrids då mot en; där bläddrar man mellan omgångens matcher med knapparna
   på tv:n (se [Tv:n](#tvn)). Esc eller ett klick utanför zoomar ut.
 - **Namnet på dörren** (längst till vänster, under Stängt-skylten) → Om oss: *Matchfixarna*
@@ -2006,17 +2006,18 @@ exakt där den låg och landar exakt på sin plats i högen.
 ### Tv:n
 
 En tjock-tv från början av åttiotalet står på en svartlackerad hylla på en arm från högra
-väggen, vriden ut mot rummet så att gänget vid fönstret också ser den, men mest mot pulten,
-och lite nedåt ([public/rum-tv.js](public/rum-tv.js), [public/rum-tv.css](public/rum-tv.css)).
-Lådan är byggd i CSS 3D i samma värld som resten av rummet (planet -470, som därför bevarar
-djupet): träfaner, högersidan och hyllan under som syns och följer musen, bildrörets kåpa med
-luftspringor bakom och kaninöronen på taket med en bit folie på det ena. Armen går från
-leden mitt bak till en väggplatta ovanför korktavlan, och sladden hänger från armen ner i
-springan mellan tavlan under tv:n och korktavlan till ett uttag; armen står still när tv:n
-vrids kring leden. Rutan är buktig med rundade hörn, svepljus och ett svagt ljusband som
-rullar nedför glaset, och den lyser blått på väggen. Till höger sitter panelen i gulnat
-aluminium: färgmärket med regnbågen, en röd sifferdisplay med sidnumret, sidknapparna ▲ ▼,
-högtalargallret och strömbrytaren med lampan.
+väggen uppe i hörnet, vriden ut mot rummet så att gänget vid fönstret också ser den, men
+mest mot pulten, och lite nedåt ([public/rum-tv.js](public/rum-tv.js),
+[public/rum-tv.css](public/rum-tv.css)). Lådan är byggd i CSS 3D i samma värld som resten av
+rummet (planet -470, som därför bevarar djupet): träfaner, högersidan och hyllan under som
+syns och följer musen, bildrörets kåpa med luftspringor bakom och kaninöronen på taket med
+en bit folie på det ena. Armen går från leden mitt bak till en väggplatta, och sladden
+hänger i en båge från armen till ett uttag under plattan; armen står still när tv:n vrids
+kring leden. Allt är förminskat mot väggen, så att tv:n inte sticker ut så långt i rummet,
+och nära zoomar kameran in lite mer (3,6). Rutan är buktig med rundade hörn, svepljus och
+ett svagt ljusband som rullar nedför glaset, och den lyser blått på väggen. Till höger
+sitter panelen i gulnat aluminium: färgmärket med regnbågen, en röd sifferdisplay med
+sidnumret, sidknapparna ▲ ▼, högtalargallret och strömbrytaren med lampan.
 
 **Text-tv som SVT:s:** 40 × 25 tecken (VT323, utan ligaturer), rubrikraden med sidnumret,
 *Matchfix Text*, datumet och klockan som tickar, ett blått band med rubriken i mosaikgrafik
