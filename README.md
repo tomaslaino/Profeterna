@@ -468,7 +468,9 @@ Utan nyckel ingen knapp.
   in tar kupongen på pulten i handen – den lyfter, vänds upp och förstoras medan rummet
   mörknar bakom – och kryssar i rutorna med pennan, som drar varje kryss. *Lämna in* under
   kupongen lämnar in som papperet under Kupong, och kupongen läggs tillbaka med stämpeln
-  *Inlämnad*. Se [Kupongen i handen](#kupongen-i-handen).
+  *Inlämnad*. Samma kväll också för den som redan har lämnat in: kupongen lyfts med dina kryss
+  och stämpeln, och tipsen går att ändra tills du ser någon annans eller första matchen
+  startar, som på papperet. Se [Kupongen i handen](#kupongen-i-handen).
 - **Säsongsprognosen tas bort (2026-10-20, användarens beslut):** vyn under Tabeller och
   simuleringen i bygget (`src/season.js`, `data/season.json`) försvinner, liksom
   programmet framåt och prognosdelen i lagkortet. Tabeller visar bara tabellen, med
@@ -1736,13 +1738,13 @@ går kameran fram mot det innan sidan byts:
 - **Förstoringsglaset** på en hög FACIT (pulten, nere till vänster) → Analysera för nästa
   match i omgången som inte har börjat (`#match/<id>/analysera`; adressen blir
   `#match/<id>` och matchbladet öppnas på fliken).
-- **Kupongen, kvittot och terminalen** → Kupong. Kupongen visar omgångens matcher i
+- **Kupongen och kvittot** → Kupong. Kupongen visar omgångens matcher i
   kupongens ordning med kryss där gängets kupong har tecken – innan den finns dina egna, med
   ditt namn kryssat under *Tippare* och stämpeln *Inlämnad* när du har lämnat in – kvittot
-  när var och en lämnade in och terminalen hur många som är inne och vem som väntas. Har du
-  inte lämnat in tas kupongen i handen i stället (se nedan). Guldordet bredvid säger samma
-  sak som knappen i förstasidans ruta: *Fyll i kupongen*, *Fyll i resten*, *Se de andras
-  tips* eller *Följ kupongen* när matcherna har börjat.
+  när var och en lämnade in. Tills alla har lämnat in eller första matchen startar tas
+  kupongen i handen i stället (se nedan). Guldordet bredvid säger vad som väntar: *Fyll i
+  kupongen*, *Fyll i resten*, *Ändra kupongen*, *Se kupongen* (när dina tips står fast),
+  *Till uppgörelsen* när alla har lämnat in och *Följ kupongen* när matcherna har börjat.
 - **Tv:n** med text-tv (sida 331, omgångens matcher på två undersidor) zoomas in med ett
   klick eller T; färgknapparna leder till Kupong, Olympen, Tabeller och Statistik, Esc
   zoomar ut.
@@ -1791,8 +1793,9 @@ sätter `data-rum-klar` på `body` när allt är ritat.
 
 ### Kupongen i handen
 
-Den som inte har lämnat in (och innan första matchen startar) fyller i kupongen på pulten
-direkt i rummet: ett klick på kupongen, på guldordet eller K. Kupongen lossnar från pulten,
+Tills alla har lämnat in eller första matchen startar tas kupongen på pulten i handen direkt
+i rummet – för att fylla i den, ändra den eller se den: ett klick på kupongen, på guldordet
+eller K. Kupongen lossnar från pulten,
 lyfter, vänds upp mot betraktaren och förstoras till mitten av fönstret (så stor som får
 plats mellan menyn och orden under den), svänger en aning förbi och stannar; rummet mörknar
 bakom, kameran ställer sig rakt framför, och pennan följer med och rullar undan till
@@ -1801,7 +1804,7 @@ ur (två eller tre tecken = gardering), och pennan går dit, drar det ena streck
 och drar det andra – ett kryss med blyerts som ser likadant ut varje gång (samma
 slumpfrö för matchen och tecknet). Står pennan still en stund lägger den sig vid sidan
 igen. Ett kryss som tas bort suddas ut. Under *Tippare* kryssar man för vem man är (DL, DT,
-DJ; den som redan har lämnat in står blekt), och *Tippat 4/13* räknar.
+DJ; de andra som redan har lämnat in står bleka), och *Tippat 4/13* räknar.
 
 Under kupongen står *Lägg tillbaka* och guldordet *Lämna in*. Utan namn står *Vem är du?*
 och Tippare-rutorna blir röda; saknas tecken blir rutorna i de matcherna röda och raden
@@ -1810,8 +1813,15 @@ säger hur många, som på papperet under Kupong. Annars lämnas tipsen in med s
 "tips"}`), stämpeln *Inlämnad* slår i och kupongen läggs tillbaka på pulten. Esc, K, *Lägg
 tillbaka* eller ett klick utanför lägger tillbaka den samma väg baklänges. Utkastet är
 detsamma som på papperet under Kupong (på enheten), så det man har kryssat står kvar på
-pulten och där; ett utkast utan namn blir ditt när du säger vem du är. Har man lämnat in,
-eller har matcherna börjat, leder kupongen till Kupong som förut. Med
+pulten och där; ett utkast utan namn blir ditt när du säger vem du är.
+
+Har du redan lämnat in lyfts kupongen på samma sätt, med dina kryss, ditt namn och stämpeln.
+Har ingen annans tips visats för dig än är rutorna knappar som förut, och guldordet heter
+*Lämna in ändringen* – släckt tills något är ändrat. Ändringen stannar i handen tills den
+lämnas in (som på papperet, där en ändring får lämna matcher tomma), och då slår stämpeln i
+igen. Har du sett någon annans tips står dina fast, som på papperet under Kupong: rutorna
+går inte att trycka på och guldordet *Se de andras tips* leder dit. När alla har lämnat in
+(uppgörelsen) eller matcherna har börjat leder kupongen till Kupong som förut. Med
 `prefers-reduced-motion` (och med `?rum-t=`) står kupongen direkt i handen och kryssen
 direkt på papperet. Rörelserna är Web Animations (`openCoupon`, `drawCross` och `penGo` i
 [public/rum.js](public/rum.js)); kupongen ligger i samma lager som pulten, så den börjar
