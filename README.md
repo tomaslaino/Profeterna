@@ -1741,7 +1741,7 @@ går kameran fram mot det innan sidan byts:
   pulten en ny – kvittot när var och en lämnade in. Tills alla har lämnat in eller första
   matchen startar tas kupongen (din ur högen, när du har lämnat in) i handen i stället (se
   nedan). Guldordet bredvid säger vad som väntar: *Fyll i kupongen*, *Fyll i resten*,
-  *Ändra kupongen*, *Se kupongen* (när dina tips står fast), *Till uppgörelsen* när alla har
+  *Ändra kupongen*, inget alls när dina tips står fast, *Till uppgörelsen* när alla har
   lämnat in och *Följ kupongen* när matcherna har börjat.
 - **Högen** till vänster om kupongen: de som har lämnat in har lagt sin kupong där med
   baksidan upp, i den ordning de lämnade in (den senaste överst) – porträttet under ett gem,

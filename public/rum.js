@@ -978,7 +978,10 @@ ${closeHtml()}
     if (R.fig && R.fig.inne) R.fig.inne(R.vem, now());
     const started = rows.length && Math.min(...rows.map((x) => Date.parse(x.m.kickoff))) <= t;
     const tag = document.getElementById('rum-tag');
-    if (tag) tag.textContent = p ? p.go : started ? 'Följ kupongen' : 'Fyll i kupongen';
+    if (tag) {
+      tag.textContent = p ? p.go : started ? 'Följ kupongen' : 'Fyll i kupongen';
+      tag.hidden = !tag.textContent;
+    }
     set('rum-krita', chalkHtml(R.table));
     const seen = ((TP.season && TP.season.rounds) || []).filter((r) => typeof tpRoundHidden !== 'function' || !tpRoundHidden(r));
     set('rum-kork', corkHtml((R.old || []).filter((c) => c.n && !(window.Historik && Historik.hidden(c)))));
