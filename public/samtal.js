@@ -473,7 +473,6 @@
     html += paperTop(stopBox(s), ' sm-up', stamp(s)) +
       upHead(s, ids, rows.filter((r) => r.g.res != null).map((r) => [r.x.id, r.g.res]));
     const w = writer(s);
-    let n = 0;
     for (let k = 0; k <= 5; k++) {
       const list = rows.filter((r) => r.kind === k);
       if (!list.length) continue;
@@ -482,7 +481,7 @@
         html += upRow({
           id: r.x.id, m: r.m, label: r.m ? `${r.m.home} – ${r.m.away}` : r.x.match, g: r.g, nr: nr.get(r.x.id),
           who: r.cov, sign: val[r.x.id] || '', notes: r.notes, after: afterOf(s, r.x.id, w), pen: penOf(s, r.x.id, w),
-          ids, alt: n++ % 2, pick: true, open: r.open,
+          ids, pick: true, open: r.open,
         });
       }
     }
@@ -534,13 +533,12 @@
 
   // ---------- allas tips på papperet: uppgörelsen och gängets kupong ----------
 
-  // Papperet: märket med kupongens nummer, i hörnet spelstoppet eller betyget
-  // och stämpeln emellan, och bården under. cls: fler klasser på papperet.
-  // Omgångens id ger papperet samma slitage när man fyller i och efteråt
-  // (slitage.js).
-  const paperTop = (corner, cls = '', stamp = '') => `<div class="pp-wrap sm-wrap"><div class="pp pp-fill sm-sheet${cls}" id="sm-sheet"${SM.data ? ` data-slitage="omg:${esc(SM.data.id)}"` : ''}>` +
-    `<div class="sm-sheet-head"><p class="pp-brand"><img src="logo.svg" alt="" width="20" height="20">Matchfixarna<span>Kupong${SM.data ? ` ${couponNumber(SM.data.matcher.map((x) => x.id))}` : ''}</span></p>` +
-    `${stamp}${corner}</div><div class="pp-band" aria-hidden="true"></div>`;
+  // Papperet: bandet med kupongens nummer (Papper.banner) och under det
+  // stämpeln och, i hörnet, spelstoppet eller betyget. cls: fler klasser på
+  // papperet. Omgångens id ger papperet samma slitage när man fyller i och
+  // efteråt (slitage.js).
+  const paperTop = (corner, cls = '', stamp = '') => `<div class="pp-wrap sm-wrap"><div class="pp pp-kup pp-fill sm-sheet${cls}" id="sm-sheet"${SM.data ? ` data-slitage="omg:${esc(SM.data.id)}"` : ''}>` +
+    Papper.banner(SM.data ? ` ${couponNumber(SM.data.matcher.map((x) => x.id))}` : '') + `<div class="sm-sheet-head">${stamp}${corner}</div>`;
   const stopBox = (s) => `<div class="pp-stop"><span>Spelstopp</span><b>${esc(fWeekdayTime.format(new Date(Math.min(...kicks(s)))))}</b></div>`;
   // Fälten i foten: [[etikett, värde, title]].
   const fieldList = (list, id = '') => `<div class="pp-fields pb-fields"${id ? ` id="${id}"` : ''}>` + list.filter(Boolean).map((x) =>
@@ -608,7 +606,7 @@
   // startat. day: matcherna står under sin dag, så klockslaget räcker. out:
   // matchen kom inte med på gängets kupong. after, pen: kommentarerna i
   // efterhand (afterOf, penOf).
-  function upRow({ id, m, label, g, nr, who, sign, notes = [], note = '', after = [], pen = null, ids, alt, pick = false, open = false, day = false, out = false }) {
+  function upRow({ id, m, label, g, nr, who, sign, notes = [], note = '', after = [], pen = null, ids, pick = false, open = false, day = false, out = false }) {
     const hit = g.res != null && sign ? sign.includes(SIGNS[g.res]) : null;
     const cls = rowClass({ ...g, hit });
     const comp = m ? compOf(m.comp) : null;
@@ -619,7 +617,7 @@
       : `<span class="sm-res"><span class="sm-res-s">${Papper.result(g)}</span>${tick}</span>`;
     const sr = `${sign ? `Gängets tecken ${sign}${hit === true ? ', rätt' : hit === false ? ', fel' : ''}` : 'Inget tecken'}. ` +
       ids.map((k) => `${k}: ${SIGNS.filter((sg, i) => who[i].includes(k)).join('') || 'inget'}`).join(', ');
-    return `<div class="sm-r${alt ? ' alt' : ''} s-${cls.replace(' ', ' s-')}${pick && open && !sign ? ' unsigned' : ''}${out ? ' sm-out' : ''}" data-id="${esc(id)}">` +
+    return `<div class="sm-r s-${cls.replace(' ', ' s-')}${pick && open && !sign ? ' unsigned' : ''}${out ? ' sm-out' : ''}" data-id="${esc(id)}">` +
       `<span class="pp-nr">${nr}</span>` +
       '<span class="sm-m"><span class="sm-mt">' +
       `<span class="pp-tm">${m ? `<a class="pp-t" href="#match/${esc(id)}">${teams}</a>` : `<span class="pp-t">${teams}</span>`}</span>` +
@@ -672,7 +670,7 @@
       html += upRow({
         id: r.id, m: r.m, label: teamsOf(r), g: r, nr: nr.get(r.id), who: SIGNS.map((sg) => ids.filter((p) => tip(p).includes(sg))),
         sign: r.sign, note: r.note, notes: ids.map((p) => ({ k: p, text: (s.tips[p].kommentarer || {})[r.id] })).filter((o) => o.text),
-        after: afterOf(s, r.id, w), pen: penOf(s, r.id, w), ids, alt: i % 2, day: days, out: r.out,
+        after: afterOf(s, r.id, w), pen: penOf(s, r.id, w), ids, day: days, out: r.out,
       });
     });
     return html + Papper.foot(c, g) + '</div></div>';
@@ -957,7 +955,7 @@
       const own = Boolean(d) && !locked;
       const sr = cols.filter((c) => !(own && c.st === 'fill')).map((c) =>
         `${c.g.id}: ${c.st === 'hidden' ? 'dolt' : c.st === 'blank' ? 'inget ännu' : c.t[x.id] || 'inget'}`);
-      html += `<div class="sm-r${i % 2 ? ' alt' : ''}${locked ? ' sm-locked' : ''}${d && !sign ? ' unsigned' : ''}" data-id="${esc(x.id)}">` +
+      html += `<div class="sm-r${locked ? ' sm-locked' : ''}${d && !sign ? ' unsigned' : ''}" data-id="${esc(x.id)}">` +
         `<span class="pp-nr">${i + 1}</span>` +
         `<span class="sm-m"><span class="pp-tm">${teamsHtml(x, m)}</span>` +
         `<span class="sm-meta"><span class="pp-small">${esc((days ? fTime : fWeekdayTime).format(new Date(x.avspark)))}${comp ? ` · <abbr title="${esc(comp.name)}">${esc(comp.short)}</abbr>` : ''}</span>` +
