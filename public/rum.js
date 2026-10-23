@@ -1121,6 +1121,7 @@ ${closeHtml()}
     }
     if (!calm() || still()) dust(t);
     if (R.fig) R.fig.draw(t, R.mx, R.my);
+    if (R.saker) R.saker.draw(t, R.mx, R.my, R.rows, R.old);
   }
 
   function loop() {
@@ -1150,6 +1151,9 @@ ${closeHtml()}
   async function three() {
     if (R.fig || R.loading) return;
     R.loading = true;
+    // askkoppen, snusdosan, fläkten och affischen (rum-saker.js)
+    import('./rum-saker.js').then((m) => m.saker(R.el, { calm: calm() })).then((x) => { R.saker = x; frame(); })
+      .catch((err) => console.warn('Rummet: sakerna kunde inte ritas', err));
     try {
       const mod = await import('./rum-3d.js');
       R.fig = await mod.figurer(document.getElementById('rum-3d'), { calm: calm() });

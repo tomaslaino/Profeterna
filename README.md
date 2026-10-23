@@ -1796,6 +1796,34 @@ bort när de laddas, och saknas en blir det bara text). Halsduken följer bålen
 vrids med handen och mössan följer huvudet; håret trycks ner under mössan och sticker ut
 under kanten.
 
+**Askkoppen, snusdosan och fläkten** står på pulten till höger om kvittot, i three.js som
+gänget ([public/rum-saker.js](public/rum-saker.js), med en egen duk i pultens plan): en
+askkopp i bärnstensfärgat glas med tre spår, aska och fimpar, där en cigarett ligger i ett
+spår och ryker; en öppen dosa lössnus med locket bredvid, lutat mot dosan eller upp och ner;
+och en gulnad bordsfläkt med blå propeller, galler och en remsa av en gammal kupong som
+fladdrar. Fläkten svänger fram och tillbaka, och när den pekar mot askkoppen blåser röken åt
+sidan (draget räknas för varje puff under dess liv, så att samma tid ger samma bild). Inga
+riktiga märken: locket säger SNUS N:o 1, dosan PRIMA LÖSSNUS. **VM 94-affischen** är tejpad
+på insidan av skyltfönstret, i vänstra rutan under neonskylten: ett riktigt foto från
+landslagets hemkomst (Henrik Larsson och Pontus Kåmark med bronsmedaljerna, Norr
+Mälarstrand 18 juli 1994; foto Sniper Zeta,
+[CC BY-SA 4.0](https://creativecommons.org/licenses/by-sa/4.0/),
+[Wikimedia Commons](https://commons.wikimedia.org/wiki/File:Football_players_Pontus_K%C3%A5mark_Henrik_Larsson,_July_18,_1994.jpg)),
+beskuret i `public/rum/vm94.jpg` och med fotografen i affischens title. Uppe till höger i
+fönstret syns himlen (rum-ute.js), så där hänger den inte.
+
+**Platserna och slitaget skiftar från dag till dag** (dagen i Stockholm som frö): sakerna
+på pulten står i en av fyra uppställningar (`LAYOUTS` – fläkten längst bak till höger, i
+mitten eller bakom kvittot och då vänd åt höger, askkoppen och dosan om vartannat, några
+pixlar hit eller dit), locket och prisen läggs där det finns plats, och affischen sitter
+till vänster eller till höger under neonskylten. Slitaget följer tippningen: andelen fel
+bland omgångens avgjorda matcher, annars i den senaste färdigspelade kupongen, och utan
+rättning ett mellanläge. Går det dåligt fylls askkoppen (1–11 fimpar), askan hamnar
+bredvid, snuset spills, fläkten går på trean, affischen bleks och ett hörn släpper; går det
+riktigt illa ryker två cigaretter, en använd pris ligger på pulten och affischen hänger i en
+tejpbit. Dolda resultat räknas inte (gradeRow rättar dem inte). Utan WebGL står affischen
+kvar men inte sakerna på pulten.
+
 **Rummet rör sig också:** regnet faller utanför rutan och dörren, droppar rinner på glaset,
 neonen glappar ibland, röken ligger under lysröret, damm syns i ljuset och stationsurets
 sekundvisare hoppar fram. Stället är slitet: nikotingula väggar och tak, fläckar,
@@ -1809,7 +1837,8 @@ Rummet läser om datan varje minut medan det står öppet.
 
 **Bilder:** `?rum-t=<sekunder>` fryser klockan (figurerna, röken, tavlans klapper och
 CSS-animationerna står på samma tid), `?rum-mx=&rum-my=` (−1…1) kamerans läge och
-`?rum-tavla` visar fällbladstavlan på nära håll (klappret räknas från tiden 0); sidan
+`?rum-tavla` visar fällbladstavlan på nära håll (klappret räknas från tiden 0),
+`?rum-slit=0…1` slitaget och `?rum-dag=<tal>` dagen för sakerna och affischen; sidan
 sätter `data-rum-klar` på `body` när allt är ritat.
 
 ### Kupongen i handen

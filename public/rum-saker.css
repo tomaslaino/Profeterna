@@ -1,0 +1,75 @@
+/* Sakerna i tobaksaffären (rum-saker.js): askkoppen, snusdosan och fläkten
+   på pulten i three.js, och VM 94-affischen på insidan av dörrens glas. */
+
+.rum-saker { position: absolute; pointer-events: none; }
+
+/* ---------- VM 94-affischen (platsen sätts efter dagen i rum-saker.js) ---------- */
+
+.rum-vm94 {
+  --rot: 0deg;
+  --curl: 0px;
+  position: absolute;
+  width: 120px;
+  transform: rotate(var(--rot));
+  transform-origin: 8px 4px;
+  filter: drop-shadow(0 3px 4px rgba(0, 0, 0, 0.5));
+  pointer-events: auto;
+}
+.rum-vm94 .ark {
+  position: relative;
+  display: block;
+  padding: 5px 5px 6px;
+  background: #ece2c8;
+  clip-path: polygon(0 0, 100% 0, 100% calc(100% - var(--curl)), calc(100% - var(--curl)) 100%, 0 100%);
+}
+.rum-vm94 .band {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  height: 15px;
+  margin-bottom: 3px;
+  padding: 0 5px;
+  background: #f0c22c;
+  font: 400 11px/15px Anton, Impact, sans-serif;
+  letter-spacing: 1.2px;
+  color: #1c4994;
+}
+.rum-vm94 .foto { position: relative; display: block; overflow: hidden; }
+.rum-vm94 img {
+  display: block;
+  width: 100%;
+  height: auto;
+  filter: sepia(var(--sep, 0.2)) saturate(var(--sat, 0.9)) contrast(0.92) brightness(0.96);
+}
+/* solen har blekt bilden snett uppifrån, och rastret syns på nära håll */
+.rum-vm94 .tryck {
+  position: absolute;
+  inset: 5px;
+  pointer-events: none;
+  background:
+    linear-gradient(118deg, rgba(255, 246, 222, var(--blek, 0.15)), rgba(255, 246, 222, 0) 62%),
+    radial-gradient(circle at 50% 50%, rgba(40, 24, 8, 0.14) 0 0.45px, rgba(0, 0, 0, 0) 0.6px) 0 0 / 2px 2px;
+  mix-blend-mode: multiply;
+}
+.rum-vm94 .tryck::after { content: ""; position: absolute; inset: 0; background: linear-gradient(118deg, rgba(255, 248, 230, var(--blek, 0.15)), rgba(255, 248, 230, 0) 55%); mix-blend-mode: screen; }
+/* hörnet som har släppt: baksidan av papperet viker sig fram */
+.rum-vm94 .hund {
+  position: absolute;
+  right: 0;
+  bottom: 0;
+  width: var(--curl);
+  height: var(--curl);
+  background: linear-gradient(315deg, rgba(0, 0, 0, 0) 50%, #e4dac0 50%, #c9bc9a 100%);
+  filter: drop-shadow(-1px -1px 1.5px rgba(0, 0, 0, 0.35));
+}
+.rum-vm94 .tejp {
+  position: absolute;
+  top: -5px;
+  width: 30px;
+  height: 11px;
+  background: rgba(232, 220, 160, 0.62);
+  box-shadow: inset 0 0 0 0.5px rgba(160, 140, 80, 0.4);
+}
+.rum-vm94 .tejp.a { left: -9px; transform: rotate(-33deg); }
+.rum-vm94 .tejp.b { right: -9px; transform: rotate(29deg); }
+.rum-vm94.slappt .tejp.b { display: none; }
