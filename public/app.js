@@ -135,8 +135,7 @@ const modal = { active: false, under: null, depth: 0, closing: false };
 let routed = false;
 
 function route(e) {
-  // #match/<id>/<flik> öppnar matchen på fliken (förstoringsglaset i rummet
-  // leder till Analysera); adressen blir #match/<id>.
+  // #match/<id>/<flik> öppnar matchen på fliken; adressen blir #match/<id>.
   const tab = /^#match\/(\d+)\/([a-z]+)$/.exec(location.hash);
   if (tab) {
     state.wantTab = tab[2];

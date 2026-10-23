@@ -487,7 +487,7 @@ a.rum-fb-r:hover b:not(.lit) { color: #fff; background: linear-gradient(180deg, 
 .rum-tv:hover { filter: brightness(1.12); }
 .rum.tv-nara .rum-tv .fast a:hover { text-decoration: underline; }
 
-/* ---------- pulten: kupongen, kvittot och förstoringsglaset ---------- */
+/* ---------- pulten: kupongen och kvittot ---------- */
 
 .rum-flat { position: absolute; display: block; transform-origin: 50% 50%; }
 /* kupongen på pulten och i handen (id:t går före a.rum-sak:hover, färgen) */

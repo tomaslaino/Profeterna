@@ -7,7 +7,7 @@
 // och DJ – sitter som leksaksfigurer (three.js, rum-3d.js) på fönsterbänken,
 // dricker öl, röker och pratar. Föremålen leder vidare, som i ett rum hos
 // Felix Rieseberg:
-//   fällbladstavlan → närbilden → Matcher  förstoringsglaset → Analysera (nästa match)
+//   fällbladstavlan → närbilden → Matcher
 //   korktavlan → gängets kuponger     pokalhyllan, Omgångens orakel → Olympen
 //   krittavlan → Tabeller             pärmarna → Statistik
 //   kvittot, terminalen → Kupong, tv:n zoomas in (T) med text-tv:ns färgknappar
@@ -482,40 +482,6 @@ window.Rum = (() => {
     return s;
   }
 
-  // 2. Förstoringsglaset på en hög FACIT på pulten.
-  function facit() {
-    const paper = (x, y, a, c) => `<g transform="translate(${x} ${y}) rotate(${a})"><rect x="-96" y="-58" width="192" height="116" fill="${c}"/>` +
-      '<rect x="-96" y="-58" width="192" height="116" fill="url(#rum-cupg)" opacity=".18"/></g>';
-    const top = `<g transform="translate(156 842) rotate(-2)">
-        <rect x="-96" y="-58" width="192" height="116" fill="#f2d93a"/>
-        <rect x="-86" y="-50" width="44" height="15" fill="#d42a1e"/>
-        <text x="-64" y="-38.5" text-anchor="middle" font-family="Anton, Impact, sans-serif" font-size="12" letter-spacing="1" fill="#fff">FACIT</text>
-        <text x="-86" y="-14" font-family="Anton, Impact, sans-serif" font-size="9" fill="#111">SÖNDAG:</text>
-        <text x="-86" y="10" font-family="Anton, Impact, sans-serif" font-size="22" fill="#111">ALLT OM</text>
-        <text x="-86" y="34" font-family="Anton, Impact, sans-serif" font-size="22" fill="#111">OMGÅNGEN</text>
-        <rect x="30" y="-48" width="56" height="40" fill="#1e1e1e" opacity=".8"/>
-        <g fill="#111" opacity=".55"><rect x="30" y="0" width="56" height="2"/><rect x="30" y="6" width="50" height="2"/><rect x="30" y="12" width="54" height="2"/><rect x="30" y="18" width="40" height="2"/></g>
-        <ellipse cx="44" cy="40" rx="24" ry="9" fill="none" stroke="#7a4a1c" stroke-opacity=".35" stroke-width="3"/>
-        <path d="M96 -58 l-26 0 l26 22 z" fill="#c9b240"/><path d="M70 -58 l26 22 l-30 -6 z" fill="#fff4a8" opacity=".9"/>
-      </g>`;
-    return `<a class="rum-sak rum-lupp" href="#matcher" data-nav="matcher" aria-label="Analysera" id="rum-lupp">
-      <ellipse cx="160" cy="884" rx="150" ry="40" fill="#000" opacity=".4" filter="url(#rum-b10)"/>
-      ${paper(158, 866, -4, '#d9c08a')}${paper(162, 858, 3, '#e6cf5a')}${paper(156, 850, -2, '#ecd64a')}
-      ${top}
-      <clipPath id="rum-lins"><circle cx="128" cy="848" r="42"/></clipPath>
-      <g clip-path="url(#rum-lins)"><rect x="80" y="800" width="100" height="100" fill="#f2d93a"/><g transform="translate(128 848) scale(1.5) translate(-128 -848)">${top}</g>
-        <circle cx="128" cy="848" r="42" fill="#fff8d0" opacity=".08"/></g>
-      <g transform="translate(128 848) rotate(-34)" class="rum-lupp-g">
-        <rect x="46" y="-7" width="86" height="14" rx="7" fill="#2a1a10"/><rect x="48" y="-5" width="82" height="4" rx="2" fill="#6a4a30" opacity=".7"/>
-        <rect x="38" y="-9" width="14" height="18" rx="3" fill="#b8b2a2"/>
-        <circle r="44" fill="#cfe2f0" opacity=".06"/>
-        <circle r="44" fill="none" stroke="#c9c3b2" stroke-width="7"/><circle r="44" fill="none" stroke="#5e5a52" stroke-width="2" opacity=".6"/>
-        <path d="M-28 -26 A38 38 0 0 1 10 -38" fill="none" stroke="#fff" stroke-opacity=".6" stroke-width="4" stroke-linecap="round"/>
-        <ellipse cx="-12" cy="10" rx="22" ry="12" fill="#fff" opacity=".05"/>
-      </g>
-    </a>`;
-  }
-
   // Kupongstället vid fönstret: blanka kuponger i ett fack av plexiglas,
   // butikens pennor (samma som kupongens) i ett rör bredvid och en lapp.
   function stall() {
@@ -569,8 +535,7 @@ window.Rum = (() => {
   <g fill="#1a0e06" opacity=".55"><ellipse cx="372" cy="760" rx="7" ry="3"/><ellipse cx="1452" cy="742" rx="6" ry="2.4"/><ellipse cx="1480" cy="870" rx="5" ry="2"/></g>
   ${stall()}
   <circle cx="1150" cy="790" r="7" fill="none" stroke="#a9a9a4" stroke-width="3"/><circle cx="1150" cy="790" r="2.5" fill="#55554f"/>
-  <rect x="-10" y="984" width="1620" height="20" fill="url(#rum-alu)"/>
-  ${facit()}`);
+  <rect x="-10" y="984" width="1620" height="20" fill="url(#rum-alu)"/>`);
   }
 
   function cups() {
@@ -968,10 +933,6 @@ ${closeHtml()}
     const started = rows.length && Math.min(...rows.map((x) => Date.parse(x.m.kickoff))) <= t;
     const tag = document.getElementById('rum-tag');
     if (tag) tag.textContent = p ? p.go : started ? 'Följ kupongen' : 'Fyll i kupongen';
-    // förstoringsglaset: nästa match som inte har börjat
-    const next = rows.find((x) => Date.parse(x.m.kickoff) > t);
-    const lupp = document.getElementById('rum-lupp');
-    if (lupp) lupp.setAttribute('href', next ? `#match/${next.id}/analysera` : '#matcher');
     set('rum-krita', chalkHtml(R.table));
     const seen = ((TP.season && TP.season.rounds) || []).filter((r) => typeof tpRoundHidden !== 'function' || !tpRoundHidden(r));
     set('rum-kork', corkHtml((R.old || []).filter((c) => c.n && !(window.Historik && Historik.hidden(c)))));

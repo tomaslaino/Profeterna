@@ -1733,9 +1733,6 @@ går kameran fram mot det innan sidan byts:
 - **Korktavlan** (längst till höger) → gängets kuponger i Olympen (`#olympen/kuponger`):
   de färdigspelade kupongerna (`Historik.coupons`) rättade med röd penna, en med kaffering.
   Tom tills den första är färdigspelad.
-- **Förstoringsglaset** på en hög FACIT (pulten, nere till vänster) → Analysera för nästa
-  match i omgången som inte har börjat (`#match/<id>/analysera`; adressen blir
-  `#match/<id>` och matchbladet öppnas på fliken).
 - **Kupongen, kvittot och terminalen** → Kupong. Kupongen visar omgångens matcher i
   kupongens ordning med kryss där gängets kupong har tecken – innan den finns dina egna, med
   ditt namn kryssat under *Tippare* och stämpeln *Inlämnad* när du har lämnat in – kvittot
