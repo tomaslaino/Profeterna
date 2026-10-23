@@ -1742,8 +1742,10 @@ sidan byts:
 - **Pokalhyllan** (högra väggen) → Olympen: en liten pokal per vunnen omgång i vinnarens
   färg (delat = en var), ur `data/tippare.json`.
 - **Pärmarna** (hyllan under) → Statistik: en per säsong, de tolv senaste.
-- **Krittavlan** (under tv:n) → Tabeller: Premier Leagues topp som dagens meny, ur
-  `data/teams/pl.json`.
+- **Skårtavlan** (under tv:n) → Tabeller: Premier Leagues topp ur `data/teams/pl.json`
+  med vita plastbokstäver i spåren på svart filt, i en aluminiumram. Varje bokstav sitter
+  lite snett för sig (samma frö varje gång, så att inget flyttar sig), och lådan har bara
+  fyra O – sedan blir det nollor.
 - **Korktavlan** (längst till höger) → gängets kuponger i Olympen (`#olympen/kuponger`):
   de färdigspelade kupongerna (`Historik.coupons`) rättade med röd penna, en med kaffering.
   Tom tills den första är färdigspelad.
@@ -1838,10 +1840,11 @@ WebGL står affischen kvar men inte sakerna på pulten.
 
 **Rummet rör sig också:** utanför rutan och dörren är det Stockholms tid och väder (se
 nedan), neonen glappar ibland, röken ligger under lysröret, damm syns i ljuset och stationsurets
-sekundvisare hoppar fram. Stället är slitet: nikotingula väggar och tak, fläckar,
-avflagnad färg, en spricka, skuggan efter en tavla som flyttats, nötta kanter på disken och
-pulten, kafferingar och brännmärken. Med `prefers-reduced-motion` står allt still (en bild,
-ingen kamera efter musen, inget klapper).
+sekundvisare hoppar fram. Bakväggen är klädd med lackad furupanel (`furu` i rum.js):
+bräder med kvistar och ådring, mörka av röken upptill och ljusare under lysröret och där en
+tavla har hängt runt ramen. Stället är slitet: nikotingul högervägg och tak, fläckar, nötta
+kanter på disken och pulten, kafferingar och brännmärken. Med `prefers-reduced-motion` står
+allt still (en bild, ingen kamera efter musen, inget klapper).
 
 **Data:** omgången ur `GET …/samtal` (`TP.round`, tippare.js), annars omgångens kupong;
 ställningen och resultaten rättas med `gradeRow` (kupong.js), också med Dölj resultat.

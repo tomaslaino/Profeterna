@@ -326,31 +326,38 @@ a.rum-fb-r:hover b:not(.lit) { color: #fff; background: linear-gradient(180deg, 
 .rum-ram-skylt .kr-amp { color: inherit; font-weight: 400; }
 .rum-ram.flera .rum-ram-skylt b { font-size: 10px; }
 
-/* ---------- högra väggen: krittavlan och korktavlan ---------- */
+/* ---------- högra väggen: skårtavlan och korktavlan ---------- */
 
 .rum-hv { position: absolute; left: 0; top: 0; width: 1600px; height: 1000px; perspective: 1000px; perspective-origin: 760px 400px; }
-.rum-krita, .rum-kork { position: absolute; left: 1140px; display: block; transform-origin: 0 0; box-sizing: border-box; }
-.rum-krita {
+.rum-skar, .rum-kork { position: absolute; left: 1140px; display: block; transform-origin: 0 0; box-sizing: border-box; }
+/* svart filt med spår var 9,6:e px i en aluminiumram; bokstäverna (b) står i spåren */
+.rum-skar {
   padding: 5px;
-  background: linear-gradient(135deg, #6a4a2a, #3f2a16);
-  box-shadow: 0 0 0 1px rgba(0, 0, 0, 0.4);
+  background: linear-gradient(135deg, #d9d6cc, #8d8a80 55%, #5e5b54);
+  box-shadow: 0 0 0 1px rgba(0, 0, 0, 0.5), inset 0 0 0 1px rgba(255, 255, 255, 0.2);
 }
-.rum-krita-in {
+.rum-skar-in {
   display: block;
   height: 100%;
   box-sizing: border-box;
-  padding: 3px 7px;
+  padding: 0 7px;
   overflow: hidden;
-  background: radial-gradient(120% 90% at 30% 20%, #2f3a33, #1b231e 70%);
-  box-shadow: inset 0 0 14px rgba(0, 0, 0, 0.6), inset 0 0 0 40px rgba(230, 230, 220, 0.03);
-  color: rgba(242, 240, 232, 0.88);
-  font-family: Caveat, cursive;
-  text-shadow: 0 0 1px rgba(255, 255, 255, 0.5);
+  background:
+    repeating-linear-gradient(180deg, rgba(0, 0, 0, 0) 0 8.2px, rgba(0, 0, 0, 0.8) 8.2px 9px, rgba(255, 255, 255, 0.05) 9px 9.6px),
+    radial-gradient(120% 90% at 30% 20%, #262626, #121212 70%);
+  box-shadow: inset 0 0 12px rgba(0, 0, 0, 0.8);
+  color: #f3f1ea;
+  font-family: "Helvetica Neue", Helvetica, Arial, sans-serif;
+  font-weight: 600;
+  line-height: 9.6px;
+  text-shadow: 0 0.6px 0 rgba(0, 0, 0, 0.9);
 }
-.rum-krita-in .h { display: block; font-size: 12.5px; line-height: 13px; font-weight: 700; text-align: center; color: #f5e9b8; border-bottom: 1px solid rgba(245, 233, 184, 0.35); margin-bottom: 1px; }
-.rum-krita-in .rad { display: flex; align-items: baseline; gap: 2px; font-size: 9.6px; line-height: 9.6px; white-space: nowrap; }
-.rum-krita-in .rad i { flex: 1; border-bottom: 1px dotted rgba(242, 240, 232, 0.4); transform: translateY(-2px); }
-.rum-krita-in .tom { display: block; margin-top: 18px; text-align: center; font-size: 14px; opacity: 0.6; }
+.rum-skar-in b { display: inline-block; font-weight: inherit; }
+.rum-skar-in .sp { width: 0.32em; }
+.rum-skar-in .h, .rum-skar-in .tom { display: block; height: 9.6px; text-align: center; font-size: 8.6px; font-weight: 700; letter-spacing: 0.14em; }
+.rum-skar-in .tom { margin-top: 19.2px; opacity: 0.8; }
+.rum-skar-in .rad { display: flex; justify-content: space-between; gap: 4px; height: 9.6px; font-size: 7.4px; letter-spacing: 0.06em; white-space: nowrap; }
+.rum-skar-in .rad > span:first-child { overflow: hidden; }
 
 .rum-kork {
   padding: 5px;

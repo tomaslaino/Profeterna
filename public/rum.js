@@ -9,7 +9,7 @@
 // Felix Rieseberg:
 //   fällbladstavlan → närbilden → Matcher
 //   korktavlan → gängets kuponger     pokalhyllan, Omgångens orakel → Olympen
-//   krittavlan → Tabeller             pärmarna → Statistik
+//   skårtavlan → Tabeller             pärmarna → Statistik
 //   namnet på dörren → Om oss
 //   kvittot → Kupong, tv:n zoomas in (T): text-tv med en sida per match (rum-tv.js)
 //   kupongen tas i handen (K) – fylls i eller ändras – eller → Kupong.
@@ -76,8 +76,9 @@ window.Rum = (() => {
 
   const DEFS = `<defs>
     <linearGradient id="rum-night" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#0a0f19"/><stop offset=".55" stop-color="#121826"/><stop offset="1" stop-color="#1c1d24"/></linearGradient>
-    <linearGradient id="rum-wall" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#857552"/><stop offset=".45" stop-color="#6c5f43"/><stop offset="1" stop-color="#3e3527"/></linearGradient>
-    <linearGradient id="rum-nik" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#5a3c0c" stop-opacity=".55"/><stop offset=".35" stop-color="#5a3c0c" stop-opacity="0"/></linearGradient>
+    <linearGradient id="rum-furu" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#2e1804" stop-opacity=".62"/><stop offset=".22" stop-color="#2e1804" stop-opacity=".12"/>
+      <stop offset=".5" stop-color="#000" stop-opacity=".05"/><stop offset="1" stop-color="#000" stop-opacity=".55"/></linearGradient>
+    <radialGradient id="rum-furu-lampa" cx=".5" cy="0" r=".7"><stop offset="0" stop-color="#fff2d6" stop-opacity=".22"/><stop offset="1" stop-color="#fff2d6" stop-opacity="0"/></radialGradient>
     <linearGradient id="rum-rwall" gradientUnits="userSpaceOnUse" x1="1140" y1="0" x2="1600" y2="0"><stop offset="0" stop-color="#5a4e39"/><stop offset="1" stop-color="#2f2920"/></linearGradient>
     <linearGradient id="rum-ceil" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#2b2519"/><stop offset="1" stop-color="#55492f"/></linearGradient>
     <linearGradient id="rum-pult" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#6e4a30"/><stop offset=".5" stop-color="#5a3b26"/><stop offset="1" stop-color="#3b2619"/></linearGradient>
@@ -101,6 +102,7 @@ window.Rum = (() => {
     <filter id="rum-b24" x="-50%" y="-50%" width="200%" height="200%"><feGaussianBlur stdDeviation="24"/></filter>
     <filter id="rum-b40" x="-50%" y="-50%" width="200%" height="200%"><feGaussianBlur stdDeviation="40"/></filter>
     <filter id="rum-grainwood" x="0" y="0" width="100%" height="100%"><feTurbulence type="fractalNoise" baseFrequency="0.003 0.07" numOctaves="3" seed="5"/><feColorMatrix values="0 0 0 0 .1  0 0 0 0 .06  0 0 0 0 .03  1.5 0 0 0 -.5"/></filter>
+    <filter id="rum-ved" x="0" y="0" width="100%" height="100%"><feTurbulence type="fractalNoise" baseFrequency="0.22 0.0045" numOctaves="3" seed="3"/><feColorMatrix values="0 0 0 0 .22  0 0 0 0 .11  0 0 0 0 .03  2.2 0 0 0 -.95"/></filter>
     <filter id="rum-flack" x="0" y="0" width="100%" height="100%"><feTurbulence type="fractalNoise" baseFrequency=".011 .016" numOctaves="4" seed="8"/><feColorMatrix values="0 0 0 0 .2  0 0 0 0 .13  0 0 0 0 .03  0 0 0 -2.2 1.25"/></filter>
     <filter id="rum-prick" x="0" y="0" width="100%" height="100%"><feTurbulence type="fractalNoise" baseFrequency=".5" numOctaves="1" seed="2"/><feColorMatrix values="0 0 0 0 .18  0 0 0 0 .12  0 0 0 0 .05  0 0 0 -9 6.4"/></filter>
     <filter id="rum-grime" x="0" y="0" width="100%" height="100%"><feTurbulence type="fractalNoise" baseFrequency=".02 .006" numOctaves="3" seed="4"/><feColorMatrix values="0 0 0 0 .55  0 0 0 0 .52  0 0 0 0 .45  0 0 0 -2 1.1"/></filter>
@@ -135,8 +137,34 @@ window.Rum = (() => {
       `<polygon points="${x0},${r1(at(x0, yb))} ${x1},${r1(at(x1, yb))} ${x1},${r1(at(x1, yb) + 1.4 * sc(x1))} ${x0},${r1(at(x0, yb) + 1.4 * sc(x0))}" fill="#c9bfa5" opacity=".18"/>`;
   }
 
-  // Bakgrunden: tak, lysrör, väggarna (nikotingula, fläckiga, flagnande),
-  // dörren, skyltfönstret, disken med godisburken.
+  // Furupanelen på bakväggen: lackade bräder med kvistar och ådring, mörka av
+  // röken upptill och ljusare under lysröret. Där en tavla har hängt (runt
+  // ramen) har furan inte mörknat lika mycket.
+  function furu() {
+    const R0 = rng(11);
+    const tones = ['#b47c43', '#a9713a', '#bb874c', '#a46c36', '#b78046', '#ad763e'];
+    let s = '';
+    for (let x = 0; x < 1140; x += 34) {
+      s += `<rect x="${x}" y="90" width="34" height="640" fill="${tones[(R0() * tones.length) | 0]}"/>` +
+        `<rect x="${x}" y="90" width="1.8" height="640" fill="#26150a" opacity=".75"/><rect x="${x + 1.8}" y="90" width="1.2" height="640" fill="#f0c48a" opacity=".3"/>`;
+    }
+    s += '<rect x="0" y="90" width="1140" height="640" filter="url(#rum-ved)" opacity=".55"/>';
+    for (let i = 0; i < 46; i++) {
+      const x = r1(R0() * 1140), y = r1(100 + R0() * 620), rx = 2.4 + R0() * 3.6, ry = rx * (0.55 + R0() * 0.3);
+      s += `<ellipse cx="${x}" cy="${y}" rx="${r1(rx * 2.6)}" ry="${r1(ry * 3.4)}" fill="#6a3c16" opacity=".28" filter="url(#rum-b1)"/>` +
+        `<ellipse cx="${x}" cy="${y}" rx="${r1(rx)}" ry="${r1(ry)}" fill="#5a3010" opacity=".9"/><ellipse cx="${r1(x - rx * 0.2)}" cy="${y}" rx="${r1(rx * 0.45)}" ry="${r1(ry * 0.45)}" fill="#2a1405"/>`;
+    }
+    return `${s}<rect x="980" y="282" width="150" height="212" fill="#e2ad6e" opacity=".22"/>
+  <rect x="0" y="90" width="1140" height="640" fill="#1c1006" opacity=".3"/>
+  <rect x="0" y="90" width="1140" height="640" fill="url(#rum-furu)"/>
+  <ellipse cx="650" cy="90" rx="620" ry="420" fill="url(#rum-furu-lampa)"/>
+  <rect x="0" y="90" width="1140" height="640" filter="url(#rum-flack)" opacity=".3"/>
+  <rect x="0" y="90" width="1140" height="640" filter="url(#rum-prick)" opacity=".35"/>
+  <rect x="0" y="90" width="1140" height="7" fill="#000" opacity=".35"/>`;
+  }
+
+  // Bakgrunden: tak, lysrör, väggarna (furupanelen och den nikotingula högra
+  // väggen), dörren, skyltfönstret, disken med godisburken.
   function bg() {
     const R0 = rng(17);
     let candy = '';
@@ -157,23 +185,14 @@ window.Rum = (() => {
   <ellipse cx="650" cy="62" rx="420" ry="70" fill="url(#rum-tube)" filter="url(#rum-b24)" class="rum-tubeglow"/>
 
   <g mask="url(#rum-hal)">
-  <rect x="0" y="90" width="1140" height="640" fill="url(#rum-wall)"/>
-  <rect x="0" y="90" width="1140" height="640" fill="url(#rum-nik)"/>
-  <rect x="0" y="90" width="1140" height="640" filter="url(#rum-flack)" opacity=".75"/>
-  <rect x="0" y="90" width="1140" height="640" filter="url(#rum-prick)" opacity=".55"/>
-  <rect x="0" y="90" width="1140" height="6" fill="#000" opacity=".3"/>
+  ${furu()}
   <path d="M640 92 q30 26 18 60 q-6 22 10 40" fill="none" stroke="#3b2a12" stroke-opacity=".28" stroke-width="7" filter="url(#rum-b4)"/>
   </g>
   <ellipse cx="760" cy="104" rx="58" ry="16" fill="none" stroke="#4a3412" stroke-opacity=".3" stroke-width="3" filter="url(#rum-b1)"/>
   <ellipse cx="768" cy="106" rx="40" ry="10" fill="#4a3412" opacity=".12" filter="url(#rum-b4)"/>
-  <rect x="986" y="286" width="132" height="196" fill="#b5a47a" opacity=".16"/>
-  <rect x="986" y="286" width="132" height="196" fill="none" stroke="#2a2010" stroke-opacity=".18" stroke-width="2" filter="url(#rum-b1)"/>
-  <path d="M958 122 l9 -9 l-2 -7 l11 -9 l6 -6" fill="none" stroke="#1e160a" stroke-opacity=".55" stroke-width="1.2"/>
   <path d="M700 90 L700 104 Q700 112 690 114 L360 120 Q352 121 352 130" fill="none" stroke="#2c2a26" stroke-width="2.2" opacity=".85"/>
   <g fill="#cbbf9e" opacity=".5"><rect x="512" y="114" width="5" height="3" rx="1"/><rect x="420" y="117" width="5" height="3" rx="1"/></g>
   <path d="M0 470 q30 -10 60 4 l-4 18 q-30 -8 -56 2 z" fill="#2a1e0c" opacity=".14" filter="url(#rum-b4)"/>
-  <path d="M262 590 q14 8 40 6 q30 -4 46 10 l-2 30 l-84 0 z" fill="#9b8c68" opacity=".35"/>
-  <path d="M262 590 q14 8 40 6 q30 -4 46 10" fill="none" stroke="#241c10" stroke-opacity=".4" stroke-width="1.2"/>
 
   <polygon points="1140,90 1250,0 1600,0 1600,1000 1140,730" fill="url(#rum-rwall)"/>
   <polygon points="1140,90 1250,0 1600,0 1600,1000 1140,730" filter="url(#rum-flack)" opacity=".55"/>
@@ -203,11 +222,6 @@ window.Rum = (() => {
       <text x="136" y="292" font-style="italic" font-size="9.5" fill="#d8b46a" opacity=".9">Öppet till spelstoppet</text>
     </g>
   </a>
-  <!-- flagnad färg vid dörrkarmen -->
-  <path d="M236 300 l14 6 l-3 18 l9 12 l-6 22 l4 16 l-18 4 z" fill="#9b8c68" opacity=".55"/>
-  <path d="M236 300 l14 6 l-3 18 l9 12 l-6 22 l4 16" fill="none" stroke="#241c10" stroke-opacity=".45" stroke-width="1.4"/>
-  <path d="M250 306 l7 -3 l-2 9 z" fill="#b8a77d" opacity=".7"/>
-  <path d="M0 560 l22 -8 l6 20 l-10 18 l8 26 l-26 6 z" fill="#9b8c68" opacity=".5"/>
 
   <rect x="262" y="122" width="696" height="446" fill="#3a3a3c" mask="url(#rum-hal)"/>
   <g clip-path="url(#rum-win)">
@@ -396,10 +410,10 @@ window.Rum = (() => {
   }
 
   // 3. Korktavlan med gängets gamla kuponger, rättade med röd penna.
-  // 6. Krittavlan med ligatabellen som dagens meny.
+  // 6. Skårtavlan med ligatabellen i vita plastbokstäver.
   function rightWall() {
     return '<div class="rum-hv">' +
-      onWall(1330, 1478, 352, 458, 'rum-krita', '<span class="rum-krita-in" id="rum-krita"></span>', 'href="tabeller.html" data-nav="tabeller" aria-label="Tabeller"') +
+      onWall(1330, 1478, 352, 458, 'rum-skar', '<span class="rum-skar-in" id="rum-skar"></span>', 'href="tabeller.html" data-nav="tabeller" aria-label="Tabeller"') +
       onWall(1496, 1700, 330, 478, 'rum-kork', '<span class="rum-kork-in" id="rum-kork"></span>', 'href="#olympen/kuponger" data-nav="olympen" aria-label="Gängets kuponger"') +
       '</div>';
   }
@@ -587,7 +601,7 @@ ${closeHtml()}
 
   // ---------- datan ----------
 
-  // Kortare lagnamn på papperet och krittavlan.
+  // Kortare lagnamn på papperet och skårtavlan.
   const SHORT = { 'Manchester City': 'Man City', 'Manchester United': 'Man Utd', 'Tottenham Hotspur': 'Tottenham', 'Brighton & Hove Albion': 'Brighton',
     'Wolverhampton Wanderers': 'Wolves', 'West Bromwich Albion': 'West Brom', 'Queens Park Rangers': 'QPR', 'Nottingham Forest': "Nott'm Forest",
     'AFC Bournemouth': 'Bournemouth', 'Preston North End': 'Preston', 'Sheffield Wednesday': 'Sheff Wed', 'Sheffield United': 'Sheff Utd' };
@@ -953,11 +967,22 @@ ${closeHtml()}
       '<span class="r"><span>Insats</span><span>äran</span></span><span class="bar"></span><span class="c">Spara kvittot</span>';
   }
 
-  function chalkHtml(T) {
+  // Skårtavlan: en plastbokstav per tecken, var och en lite sned i sitt
+  // spår (samma frö varje gång, så att inget flyttar sig när tavlan fylls
+  // om). Lådan har fyra O – sedan får det bli nollor.
+  function skarHtml(T) {
+    const R0 = rng(31);
+    let o = 4;
+    const ch = (c) => {
+      if (c === ' ') return '<b class="sp"></b>';
+      if (c === 'O' && o-- <= 0) c = '0';
+      return `<b style="transform: translateY(${r1((R0() - 0.5) * 0.9)}px) rotate(${r1((R0() - 0.5) * 7)}deg)">${esc(c)}</b>`;
+    };
+    const word = (t) => [...String(t).toUpperCase()].map(ch).join('');
     const rows = ((T && T.teams) || []).slice().sort((a, b) => a.rank - b.rank).slice(0, 9);
-    if (!rows.length) return '<b class="h">Dagens tabell</b><span class="tom">Kommer</span>';
-    return `<b class="h">${esc((T && T.name) || 'Tabellen')}</b>` +
-      rows.map((x) => `<span class="rad"><span>${x.rank}. ${esc(short(x.name))}</span><i></i><span>${x.pts}</span></span>`).join('');
+    if (!rows.length) return `<span class="h">${word('Dagens tabell')}</span><span class="tom">${word('Kommer')}</span>`;
+    return `<span class="h">${word((T && T.name) || 'Tabellen')}</span>` +
+      rows.map((x) => `<span class="rad"><span>${word(`${x.rank}. ${short(x.name)}`)}</span><span>${word(x.pts)}</span></span>`).join('');
   }
 
   function corkHtml(list) {
@@ -1023,7 +1048,7 @@ ${closeHtml()}
       tag.textContent = p ? p.go : started ? 'Följ kupongen' : 'Fyll i kupongen';
       tag.hidden = !tag.textContent;
     }
-    set('rum-krita', chalkHtml(R.table));
+    set('rum-skar', skarHtml(R.table));
     const seen = ((TP.season && TP.season.rounds) || []).filter((r) => typeof tpRoundHidden !== 'function' || !tpRoundHidden(r));
     set('rum-kork', corkHtml((R.old || []).filter((c) => c.n && !(window.Historik && Historik.hidden(c)))));
     const cups = seen.slice().sort((a, b) => String(a.from).localeCompare(String(b.from)))
