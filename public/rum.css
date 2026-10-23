@@ -88,114 +88,7 @@ a.rum-sak, a.rum-sak:hover { color: inherit; text-decoration: none; }
 .rum.neon-av .rum-neon { opacity: 0.32; }
 .rum.neon-av .rum-neonhalo, .rum.neon-av .rum-neonglow { opacity: 0.04; }
 
-/* ---------- fällbladstavlan ---------- */
-
-/* Bladen är --w × --h stora med --g mellan sig, ett fält är --n blad brett;
-   rubriken har större blad. Listerna skiljer lagen från oddsen och oddsen
-   åt, och siffrorna 1, X och 2 är målade på ramen. Måtten nedan är tavlan
-   på väggen; närbilden (.rum-fb-stor) är samma tavla i större mått. */
-.rum-fb {
-  --w: 3.9px;
-  --h: 8px;
-  --g: 0.5px;
-  --rg: 2px;
-  --fg: 2px;
-  --lg: 3px;
-  --og: 2px;
-  --sg: 1px;
-  --lw: 1px;
-  --lh: 5px;
-  display: flex;
-  flex-direction: column;
-  gap: var(--rg);
-  padding: 6px 4px;
-  background: linear-gradient(180deg, #272725, #141413 30%, #121211);
-  border: 1px solid #302f2b;
-  border-radius: 3px;
-  box-shadow: 0 10px 18px rgba(0, 0, 0, 0.55), inset 0 1px 0 rgba(255, 255, 255, 0.08), inset 0 -1px 0 rgba(0, 0, 0, 0.6), 0 -2px 0 rgba(217, 210, 192, 0.2);
-}
-.rum-fb-r { display: flex; gap: var(--fg); }
-.rum-fb .fl { position: relative; display: flex; gap: var(--g); width: calc(var(--n) * var(--w) + (var(--n) - 1) * var(--g)); }
-.rum-fb .f1 { margin: 0 var(--sg); }
-.rum-fb .f3 { margin-left: var(--lg); }
-.rum-fb .f4, .rum-fb .f5 { margin-left: var(--og); }
-.rum-fb .f3::before, .rum-fb .f4::before, .rum-fb .f5::before {
-  content: "";
-  position: absolute;
-  top: calc(var(--rg) / -2 - 1px);
-  bottom: calc(var(--rg) / -2 - 1px);
-  left: calc((var(--fg) + var(--og)) / -2 - var(--lw) / 4);
-  width: calc(var(--lw) / 2);
-  background: #403e39;
-}
-.rum-fb .f3::before { left: calc((var(--fg) + var(--lg)) / -2 - var(--lw) / 2); width: var(--lw); background: linear-gradient(90deg, #4c4a44, #24231f); }
-.rum-fb-hd { --w: 6px; --h: 11px; --g: 1px; justify-content: space-between; margin-bottom: 1px; }
-.rum-fb-lb { height: var(--lh); }
-.rum-fb-lb i { display: block; width: 100%; font: 400 var(--lh) / var(--lh) Anton, Impact, sans-serif; font-style: normal; text-align: center; color: #d9d0b6; opacity: 0.85; }
-.rum-fb-r b {
-  position: relative;
-  flex: none;
-  width: var(--w);
-  height: var(--h);
-  overflow: hidden;
-  background: linear-gradient(180deg, #2a2a29 0 48%, #070707 48% 53%, #1f1f1e 53%);
-  border-radius: 1px;
-  color: #eeeae0;
-  font: 400 calc(var(--h) * 0.76) / var(--h) Anton, Impact, sans-serif;
-  text-align: center;
-}
-.rum-fb-hd b { color: #f0c86a; background: linear-gradient(180deg, #232220 0 48%, #070707 48% 53%, #1a1918 53%); }
-.rum-fb-r b.lit { color: #ffb347; text-shadow: 0 0 5px rgba(255, 170, 60, 0.85); background: linear-gradient(180deg, #3a2a14 0 48%, #120a02 48% 53%, #2d200f 53%); }
-.rum-fb-r b.f { animation: rum-flap 0.055s linear; }
-@keyframes rum-flap { 0% { transform: scaleY(1); } 50% { transform: scaleY(0.15); } 100% { transform: scaleY(1); } }
-.rum-fb-skruv { position: absolute; left: 2px; top: 2px; width: 2px; height: 2px; border-radius: 50%; background: #5a5852; }
-.rum-fb-skruv.h { left: auto; right: 2px; }
-.rum-fb-skruv.n { top: auto; bottom: 2px; }
-
-/* på bakväggen till höger om fönstret, över Omgångens orakel */
-#rum-fb { position: absolute; left: 962px; top: 214px; }
-
-/* närbilden: samma tavla på nära håll, med alla matcher; den växer fram ur
-   tavlan på väggen, raderna leder till matcherna och guldordet till Matcher */
-.rum-nara {
-  position: absolute;
-  inset: 0;
-  z-index: 1;
-  display: grid;
-  place-items: center;
-  padding: 90px 60px 70px;
-  visibility: hidden;
-  opacity: 0;
-  transition: opacity 0.3s ease, visibility 0s linear 0.3s;
-}
-.rum.fb-nara .rum-nara { visibility: visible; opacity: 1; transition: opacity 0.25s ease; }
-.rum-nara-bak { position: absolute; inset: 0; background: radial-gradient(ellipse 75% 75% at 50% 48%, rgba(10, 8, 6, 0.62), rgba(10, 8, 6, 0.9)); }
-.rum-fb.rum-fb-stor {
-  --w: 21px;
-  --h: 33px;
-  --g: 2px;
-  --rg: 6px;
-  --fg: 9px;
-  --lg: 22px;
-  --og: 11px;
-  --sg: 6px;
-  --lw: 4px;
-  --lh: 22px;
-  position: relative;
-  padding: 22px 24px 16px;
-  border-radius: 6px;
-  transform: scale(var(--k, 1));
-  box-shadow: 0 30px 80px rgba(0, 0, 0, 0.7), inset 0 1px 0 rgba(255, 255, 255, 0.08), inset 0 -1px 0 rgba(0, 0, 0, 0.6);
-}
-.rum-fb-stor .rum-fb-hd { --w: 31px; --h: 46px; --g: 3px; margin-bottom: 4px; }
-.rum-fb-stor .rum-fb-skruv { left: 9px; top: 8px; width: 6px; height: 6px; }
-.rum-fb-stor .rum-fb-skruv.h { left: auto; right: 9px; }
-.rum-fb-stor .rum-fb-skruv.n { top: auto; bottom: 8px; }
-#rum-fbn:focus { outline: none; }
-.rum-fbn-rader { display: flex; flex-direction: column; gap: var(--rg); }
-a.rum-fb-r { color: inherit; text-decoration: none; cursor: pointer; }
-a.rum-fb-r:hover b:not(.lit) { color: #fff; background: linear-gradient(180deg, #363634 0 48%, #0b0b0b 48% 53%, #2b2b29 53%); }
-.rum-fbn-fot { display: flex; justify-content: flex-end; padding-top: 8px; }
+/* guldordet: en länk i guld */
 .rum-guld {
   font-family: Fraunces, Georgia, serif;
   font-size: 22px;
@@ -209,9 +102,9 @@ a.rum-fb-r:hover b:not(.lit) { color: #fff; background: linear-gradient(180deg, 
 
 /* ---------- Omgångens orakel ---------- */
 
-/* Den förgyllda ramen (rum.js, gilt) under fällbladstavlan, med oraklet ur
+/* Den förgyllda ramen (rum.js, gilt) under stationsuret, med oraklet ur
    Olympen (kronan.css) i mindre skala: fotot på sockeln, strålarna och
-   lagerkransen. Ramen, palmetten och skylten ryms mellan tavlan och disken. */
+   lagerkransen. Ramen, palmetten och skylten ryms mellan uret och disken. */
 .rum-ram {
   position: absolute;
   left: 987px;
@@ -758,9 +651,9 @@ a.rum-fb-r:hover b:not(.lit) { color: #fff; background: linear-gradient(180deg, 
 .rum-ft a { font-family: Fraunces, Georgia, serif; font-size: 16px; color: #a9c8fb; text-decoration: underline; text-underline-offset: 4px; text-decoration-thickness: 1px; text-shadow: 0 1px 8px #000; }
 
 @media (prefers-reduced-motion: reduce) {
-  .rum-regn-b, .rum-droppe, .rum-rok i, .rum-fb-r b.f, .rum-ram-glans::after,
+  .rum-regn-b, .rum-droppe, .rum-rok i, .rum-ram-glans::after,
   .rum-ram .kr-scene *, .rum-ram .kr-scene *::before, .rum-ram .kr-scene *::after { animation: none; }
-  .rum-stage, .rum-kamera.glid, .rum-kamera.dyk, .rum-nara, .rum.fb-nara .rum-nara { transition: none; }
+  .rum-stage, .rum-kamera.glid, .rum-kamera.dyk { transition: none; }
   /* stationsuret visar tiden men sekundvisaren hoppar inte */
   #rum-ur-s { display: none; }
 }

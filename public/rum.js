@@ -7,11 +7,11 @@
 // och DJ – sitter som leksaksfigurer (three.js, rum-3d.js) på fönsterbänken,
 // dricker öl, röker och pratar. Föremålen leder vidare, som i ett rum hos
 // Felix Rieseberg:
-//   fällbladstavlan → närbilden → Matcher
 //   korktavlan → gängets kuponger     pokalhyllan, Omgångens orakel → Olympen
 //   skårtavlan → Tabeller             pärmarna → Statistik
 //   namnet på dörren → Om oss
-//   kvittot → Kupong, tv:n zoomas in (T): text-tv med en sida per match (rum-tv.js)
+//   kvittot → Kupong, tv:n zoomas in (T): text-tv med en sida per match och
+//   kupongens matcher live på 377 (rum-tv.js)
 //   kupongen tas i handen (K) – fylls i eller ändras – eller → Kupong.
 //   högen bredvid: de inlämnade kupongerna med baksidan upp; din egen tas i
 //   handen därifrån när du har lämnat in, de andras → Kupong.
@@ -21,9 +21,8 @@
 // Vanlig sida (#hem) är den vanliga förstasidan. I telefonen och i smala
 // fönster står den alltid där i stället för rummet (Rum.fits). Rörelserna
 // stängs av med prefers-reduced-motion. För bilder: ?rum-t=<sekunder> fryser
-// klockan, ?rum-mx=&rum-my= kamerans läge (−1…1), ?rum-tavla visar
-// fällbladstavlan på nära håll, ?rum-vantar=DL,DT låter dem sitta med
-// kupongen som om de inte hade lämnat in.
+// klockan, ?rum-mx=&rum-my= kamerans läge (−1…1), ?rum-vantar=DL,DT låter
+// dem sitta med kupongen som om de inte hade lämnat in.
 //
 // Läses efter kupong.js, samtal.js, tippare.js och kronan.js och använder
 // deras hjälpare (state, KP, TP, gradeRow, couponNumber, currentCoupon,
@@ -52,7 +51,7 @@ window.Rum = (() => {
 
 
   const R = { built: false, on: false, el: null, q: new URLSearchParams(location.search), t0: performance.now(), frozen: null,
-    mx: 0.5, my: -0.25, tx: 0.5, ty: -0.25, raf: 0, fig: null, page: 0, pageAt: 0, zoom: null, last: 0 };
+    mx: 0.5, my: -0.25, tx: 0.5, ty: -0.25, raf: 0, fig: null, zoom: null, last: 0 };
   const still = () => R.frozen != null;
   const calm = () => still() || matchMedia('(prefers-reduced-motion: reduce)').matches;
   const now = () => (still() ? R.frozen : (performance.now() - R.t0) / 1000);
@@ -262,7 +261,7 @@ window.Rum = (() => {
       ${word(190)}<rect x="420" y="200" width="40" height="10" rx="2" fill="#1d1b1a"/>`);
   }
 
-  // Stationsuret ovanför fällbladstavlan: vit tavla med svarta streck och en
+  // Stationsuret till höger om fönstret: vit tavla med svarta streck och en
   // röd sekundvisare, gulnad av röken. Visarna ställs i hands().
   const UR = { x: 1050, y: 152, r: 46 };
   function clock() {
@@ -312,36 +311,8 @@ window.Rum = (() => {
 
   // ---------- de sju sakerna ----------
 
-  // 1. Fällbladstavlan: på bakväggen till höger om fönstret. Omgångens
-  // matcher med oddsen före avspark, sedan ställningen och det rätta tecknet
-  // tänt. Fyra matcher i taget; den bläddrar och klaprar. Klickar man zoomar
-  // man in på den och ser alla matcher på en gång (närbilden); där leder
-  // raderna till matcherna och guldordet till Matcher.
-  // En rad är fält av blad: hemmalaget, ställningen, bortalaget och oddsen
-  // för 1, X och 2 – siffrorna 1, X och 2 är målade på ramen ovanför.
-  const NAME = 11;
-  const FIELDS = [NAME, 3, NAME, 3, 3, 3];
-  const HEAD = [19, 3];
-  const ROWS = 4;
-  const fbField = (n, i, inner = '<b> </b>'.repeat(n)) => `<span class="fl f${i}" style="--n:${n}">${inner}</span>`;
-  const fbRow = (fields, cls = '', href = '') => {
-    const tag = href ? 'a' : 'span';
-    return `<${tag} class="rum-fb-r${cls}"${href ? ` href="${href}"` : ''}>${fields.map((n, i) => fbField(n, i)).join('')}</${tag}>`;
-  };
-  const fbFrame = () => '<span class="rum-fb-skruv"></span><span class="rum-fb-skruv h"></span><span class="rum-fb-skruv n"></span><span class="rum-fb-skruv n h"></span>' +
-    `${fbRow(HEAD, ' rum-fb-hd')}<span class="rum-fb-r rum-fb-lb">${FIELDS.map((n, i) => fbField(n, i, i > 2 ? `<i>${'1X2'[i - 3]}</i>` : '')).join('')}</span>`;
-  function boardHtml() {
-    return '<a class="rum-fb rum-sak" href="#matcher" data-nav="matcher" aria-label="Omgångens matcher" id="rum-fb">' +
-      `${fbFrame()}${Array.from({ length: ROWS }, () => fbRow(FIELDS)).join('')}</a>`;
-  }
-  function closeHtml() {
-    return '<div class="rum-nara" id="rum-nara"><div class="rum-nara-bak"></div>' +
-      `<div class="rum-fb rum-fb-stor" id="rum-fbn" role="dialog" aria-label="Omgångens matcher" tabindex="-1">${fbFrame()}<span class="rum-fbn-rader" id="rum-fbn-rader"></span>` +
-      '<span class="rum-fbn-fot"><a class="rum-guld" href="#matcher" data-nav="matcher">Alla matcher</a></span></div></div>';
-  }
-
   // 5. Omgångens orakel: oraklet ur Olympen (Kronan.scene, fotona på
-  // sockeln) i en förgylld ram under fällbladstavlan, med mässingsskylten
+  // sockeln) i en förgylld ram under stationsuret, med mässingsskylten
   // under. Ett skimmer drar då och då över guldet och glaset.
   const RAM = { w: 126, h: 152, b: 13, f: 5.5 };
   function gilt() {
@@ -608,7 +579,7 @@ window.Rum = (() => {
     el.hidden = true;
     el.setAttribute('aria-label', 'Tobaksaffären');
     el.innerHTML = `<div class="rum-stage" id="rum-stage"><div class="rum-kamera" id="rum-kamera"><div class="rum-world" id="rum-world">
-${plane(-600, `<div class="rum-ute" id="rum-ute"></div>${bg()}${rightWall()}${svg('<g id="rum-hyllor"></g>')}${neon()}${clock()}${boardHtml()}${frameHtml()}`, 1.035)}
+${plane(-600, `<div class="rum-ute" id="rum-ute"></div>${bg()}${rightWall()}${svg('<g id="rum-hyllor"></g>')}${neon()}${clock()}${frameHtml()}`, 1.035)}
 ${plane(-470, `${props()}${tv()}`, 1.02, 'rum-pl3d')}
 ${plane(-330, `${sill()}${haze()}`)}
 ${plane(-60, table(), 1.05)}
@@ -616,14 +587,13 @@ ${plane(0, paper())}
 </div></div>
 <div class="rum-layer rum-warm"></div><div class="rum-layer rum-dagsljus" id="rum-dagsljus"></div><div class="rum-layer rum-vign"></div><div class="rum-layer rum-grain"></div>
 </div>
-${closeHtml()}
 <div class="rum-hdr"><a class="rum-brand" href="#">Matchfixarna</a></div>
 <div class="rum-ft"><span class="keys"><b>K</b> kupongen · <b>T</b> tv:n</span><a href="#hem">Vanlig sida</a></div>`;
     document.querySelector('main').prepend(el);
     R.el = el;
     R.built = true;
     wire();
-    // kort: högst elva tecken, som på fällbladstavlan
+    // kort: högst elva tecken
     R.tv = window.RumTv ? RumTv.mount(el, { calm, short, kort: (n) => BOARD[n] || short(n), wd, hm, matches: () => (state.all && state.all.matches) || [] }) : null;
     paintUte();
   }
@@ -635,13 +605,11 @@ ${closeHtml()}
     'Wolverhampton Wanderers': 'Wolves', 'West Bromwich Albion': 'West Brom', 'Queens Park Rangers': 'QPR', 'Nottingham Forest': "Nott'm Forest",
     'AFC Bournemouth': 'Bournemouth', 'Preston North End': 'Preston', 'Sheffield Wednesday': 'Sheff Wed', 'Sheffield United': 'Sheff Utd' };
   const short = (name) => SHORT[name] || String(name || '').replace(/\s+(United|City|Town|Rovers|Athletic|County|Wanderers|Albion|Argyle|Hotspur)$/, '');
-  // På fällbladstavlan: högst elva tecken (NAME).
+  // På text-tv:n när lagen inte ryms: högst elva tecken.
   const BOARD = { 'Nottingham Forest': 'Nottingham', 'Middlesbrough': 'Middlesbro', 'Crystal Palace': 'Palace', 'Huddersfield Town': 'Huddersfld',
     'Peterborough United': "P'borough", 'Leyton Orient': 'Orient', 'Milton Keynes Dons': 'MK Dons', 'AFC Wimbledon': 'Wimbledon',
     'Bristol City': 'Bristol C', 'Bristol Rovers': 'Bristol R', 'Accrington Stanley': 'Accrington' };
-  const onBoard = (name) => (BOARD[name] || short(name)).toUpperCase();
 
-  const fOdds = (x) => (x == null ? ' - ' : x >= 10 ? String(Math.round(x)).padStart(3, ' ') : x.toFixed(1).replace('.', ','));
   const fWd = new Intl.DateTimeFormat('sv-SE', { timeZone: 'Europe/Stockholm', weekday: 'short' });
   const fHm = new Intl.DateTimeFormat('sv-SE', { timeZone: 'Europe/Stockholm', hour: '2-digit', minute: '2-digit' });
   const wd = (d) => fWd.format(d).replace('.', '').slice(0, 3);
@@ -654,10 +622,10 @@ ${closeHtml()}
     const p = window.Samtal && Samtal.pult ? Samtal.pult.state() : null;
     const r = p ? p.s : typeof TP !== 'undefined' ? TP.round : null;
     if (r && r.matcher && r.matcher.length) {
-      return { id: r.id, ids: r.matcher.map((x) => String(x.id)), gang: r.gang || [], name: r.namn || (window.Samtal && Samtal.name ? Samtal.name() : null) };
+      return { id: r.id, ids: r.matcher.map((x) => String(x.id)), gang: r.gang || [], name: r.namn || (window.Samtal && Samtal.name ? Samtal.name() : null), spel: Boolean(r.spel) };
     }
     const c = typeof currentCoupon === 'function' ? currentCoupon() : null;
-    if (c) return { ids: c.matches.map((x) => String(x.id)), gang: [], name: c.name || null, coupon: c };
+    if (c) return { ids: c.matches.map((x) => String(x.id)), gang: [], name: c.name || null, coupon: c, spel: Boolean(c.spel) };
     // mellan omgångarna: de närmaste matcherna i Premier League och Championship
     const t = Date.now();
     const next = ((state.all && state.all.matches) || []).filter((m) => (m.comp === 'pl' || m.comp === 'ch') && !m.completed && Date.parse(m.kickoff) > t)
@@ -673,115 +641,6 @@ ${closeHtml()}
       const g = gradeRow({ id, sign: signs[id] || '', label: '' }, t);
       return { id, m: g.m, g, sign: signs[id] || '' };
     }).filter((x) => x.m).sort((a, b) => Date.parse(a.m.kickoff) - Date.parse(b.m.kickoff) || a.m.home.localeCompare(b.m.home));
-  }
-
-  // Fällbladstavlans text: rubriken och en rad per match, fälten i FIELDS
-  // efter varandra; lit = de tända fälten [rad, fält]. Före avspark oddsen,
-  // sedan ställningen i mitten och efter slutsignalen det rätta tecknet tänt
-  // under sin siffra.
-  function boardLines(rows, t = Date.now(), next = false) {
-    const pad = (s, n) => String(s).slice(0, n).padEnd(n, ' ');
-    const mid = (s, n) => pad(' '.repeat(Math.max(0, Math.floor((n - String(s).length) / 2))) + s, n);
-    if (!rows.length) return { head: 'INGA MATCHER', rows: [], lit: [] };
-    const first = Math.min(...rows.map((x) => Date.parse(x.m.kickoff)));
-    const started = first <= t;
-    const head = started ? 'RESULTAT' : `${next ? 'NÄSTA' : 'SPELSTOPP'} ${wd(new Date(first)).toUpperCase()} ${hm(new Date(first))}`;
-    const lit = [];
-    const out = rows.map((x, i) => {
-      const g = x.g;
-      const o = x.m.odds || [];
-      const shown = g.score && (g.state === 'final' || g.state === 'live');
-      const score = g.state === 'hidden' ? '?' : shown ? `${g.score.home}-${g.score.away}` : '-';
-      let signs = [0, 1, 2].map((k) => mid(fOdds(o[k]), 3)).join('');
-      if (g.state === 'off') signs = mid('STRUKEN', 9);
-      else if (g.state === 'hidden') signs = ' '.repeat(9);
-      else if (g.state === 'final') {
-        signs = [0, 1, 2].map((k) => mid(k === g.res ? '1X2'[k] : '', 3)).join('');
-        if (g.res != null) lit.push([i, 3 + g.res]);
-      }
-      return pad(onBoard(x.m.home), NAME) + mid(score, 3) + pad(onBoard(x.m.away), NAME) + signs;
-    });
-    return { head, rows: out, lit };
-  }
-
-  // En sida av tavlan: per rader i taget, och sidnumret i rubrikens högra fält.
-  function boardText(lines, pageIx, per) {
-    const pages = Math.max(1, Math.ceil(lines.rows.length / per));
-    const p = pageIx % pages;
-    const text = [lines.head.slice(0, HEAD[0]).padEnd(HEAD[0], ' ') + (pages > 1 ? `${p + 1}/${pages}` : '').padStart(HEAD[1], ' ')];
-    for (let i = 0; i < per; i++) text.push((lines.rows[p * per + i] || '').padEnd(FIELDS.reduce((a, b) => a + b, 0), ' '));
-    const lit = (ri, fi) => ri > 0 && lines.lit.some(([li, f]) => li === p * per + ri - 1 && f === fi);
-    return { text, lit };
-  }
-
-  // Bladen rad för rad, med fältet de sitter i (de målade siffrorna räknas inte).
-  const cellsOf = (el) => [...el.querySelectorAll('.rum-fb-r:not(.rum-fb-lb)')]
-    .map((r) => [...r.querySelectorAll('.fl')].flatMap((f, fi) => [...f.children].map((cell) => ({ cell, fi }))));
-
-  function setBoard(el, lines, pageIx, animate) {
-    if (!el || !lines) return;
-    const rows = cellsOf(el);
-    const { text, lit } = boardText(lines, pageIx, rows.length - 1);
-    rows.forEach((r, ri) => r.forEach(({ cell, fi }, ci) => flap(cell, text[ri][ci] || ' ', lit(ri, fi), animate ? 40 + ci * 18 + ri * 30 : 0)));
-  }
-
-  // Samma klapper räknat ur klockan, för stillbilderna: u sekunder efter
-  // bläddringen visar varje blad ännu ett mellantecken.
-  function boardAt(el, lines, pageIx, u) {
-    if (!el || !lines) return;
-    const rows = cellsOf(el);
-    const per = rows.length - 1;
-    const { text, lit } = boardText(lines, pageIx, per);
-    const prev = pageIx > 0 ? boardText(lines, pageIx - 1, per).text : null;
-    const h = (a) => { const x = Math.sin(a * 91.17 + 7.3) * 43758.55; return x - Math.floor(x); };
-    rows.forEach((r, ri) => r.forEach(({ cell, fi }, ci) => {
-      const ch = text[ri][ci] || ' ';
-      const was = prev ? prev[ri][ci] || ' ' : ' ';
-      const changed = was !== ch;
-      const d = (40 + ci * 18 + ri * 30) / 1000;
-      const steps = 3 + Math.floor(h(ri * 31 + ci + pageIx * 7) * 6);
-      const n = Math.floor((u - d) / 0.055);
-      const show = changed && n >= 0 && n < steps ? FLAPS[Math.floor(h(ri * 131 + ci * 17 + n) * FLAPS.length)] : !changed || n >= steps ? ch : was;
-      cell.textContent = show;
-      cell.dataset.c = show;
-      cell.classList.toggle('lit', lit(ri, fi) && show === ch);
-      cell.classList.toggle('f', changed && n >= 0 && n < steps && (u - d) % 0.055 < 0.03);
-    }));
-  }
-
-  // Ett fällblad: bläddrar fram genom några tecken innan det stannar.
-  const FLAPS = ' ABCDEFGHIJKLMNOPQRSTUVWXYZÅÄÖ0123456789-,./';
-  function flap(cell, ch, lit, delay) {
-    cell.classList.toggle('lit', lit);
-    if (cell.dataset.c === ch) return;
-    cell.dataset.c = ch;
-    clearInterval(cell._t);
-    clearTimeout(cell._d);
-    if (!delay || calm()) {
-      cell.textContent = ch;
-      return;
-    }
-    const steps = 3 + ((Math.random() * 6) | 0);
-    let n = 0;
-    cell._d = setTimeout(() => {
-      cell._t = setInterval(() => {
-        n++;
-        cell.classList.remove('f');
-        void cell.offsetWidth;
-        cell.classList.add('f');
-        cell.textContent = n >= steps ? ch : FLAPS[(Math.random() * FLAPS.length) | 0];
-        if (n >= steps) clearInterval(cell._t);
-      }, 55);
-    }, delay);
-  }
-
-  // Närbildens rader: en länk per match, byggs om när omgången byts.
-  function closeRows(rows) {
-    const box = document.getElementById('rum-fbn-rader');
-    const ids = rows.map((x) => x.id).join();
-    if (!box || box.dataset.ids === ids) return;
-    box.dataset.ids = ids;
-    box.innerHTML = rows.length ? rows.map((x) => fbRow(FIELDS, '', `#match/${x.id}`)).join('') : fbRow(FIELDS);
   }
 
   // Kryssets två streck med blyerts i en ruta (40 × 19): lite sneda och
@@ -1055,13 +914,11 @@ ${closeHtml()}
     const rd = round();
     const rows = rd ? roundRows(rd, t) : [];
     R.rows = rows;
-    R.lines = boardLines(rows, t, Boolean(rd && rd.next));
-    setBoard(document.getElementById('rum-fb'), R.lines, R.page, !calm());
-    closeRows(rows);
-    if (R.nara) setBoard(document.getElementById('rum-fbn'), R.lines, 0, !calm());
     const nr = rd && !rd.next && rd.ids.length && typeof couponNumber === 'function' ? couponNumber(rd.ids) : null;
     const set = (id, html) => { const e = document.getElementById(id); if (e && e.innerHTML !== html) e.innerHTML = html; };
-    if (R.tv) R.tv.fill(rows);
+    // tv:n: Stryktipsets ordning (spel) om omgången är Stryktipset, och next
+    // mellan omgångarna, när raderna bara är de närmaste matcherna
+    if (R.tv) R.tv.fill(rows, { spel: rd && rd.spel ? rd.ids : null, next: Boolean(rd && rd.next) });
     const p = pult(rd);
     // har du lämnat in ligger din kupong i högen, och på pulten en ny – eller
     // gängets kupong, när du ser de andras tips (uppgörelsen)
@@ -1173,16 +1030,6 @@ ${closeHtml()}
       R.el.classList.toggle('neon-av', !on);
     }
     hands();
-    // tavlan bläddrar var nionde sekund (text-tv:n sköter sig själv i rum-tv.js)
-    const page = Math.floor(t / 9);
-    if (still() && R.lines) {
-      boardAt(document.getElementById('rum-fb'), R.lines, page, t - page * 9);
-      if (R.nara) boardAt(document.getElementById('rum-fbn'), R.lines, 0, t);
-    } else if (page !== R.pageAt && R.lines) {
-      R.pageAt = page;
-      R.page = page;
-      setBoard(document.getElementById('rum-fb'), R.lines, page, !calm());
-    }
     if (!calm() || still()) dust(t);
     if (R.fig) R.fig.draw(t, R.mx, R.my);
     if (R.saker) R.saker.draw(t, R.mx, R.my, R.rows, R.old);
@@ -1287,11 +1134,6 @@ ${closeHtml()}
       zoomTv(!R.zoom);
       return;
     }
-    if (a.id === 'rum-fb') {
-      e.preventDefault();
-      closeUp(true);
-      return;
-    }
     if ((a.id === 'rum-kupong' || a.dataset.ta != null) && openCoupon(a.id === 'rum-kupong' ? null : a)) {
       e.preventDefault();
       return;
@@ -1331,44 +1173,9 @@ ${closeHtml()}
     ], { duration: 560 });
   }
 
-  // Närbilden av fällbladstavlan: kameran går fram mot den, närbilden växer
-  // fram ur tavlan på väggen och alla matcher klaprar fram på en gång. Esc
-  // eller ett klick utanför tar en tillbaka.
-  function closeUp(on) {
-    if (on && R.zoom) zoomTv(false);
-    R.nara = on;
-    R.el.classList.toggle('fb-nara', on);
-    const el = document.getElementById('rum-fbn');
-    const fb = document.getElementById('rum-fb');
-    if (on && el) {
-      fit();
-      if (!calm()) {
-        const a = fb.getBoundingClientRect();
-        const b = el.getBoundingClientRect();
-        const k = parseFloat(el.style.getPropertyValue('--k')) || 1;
-        el.animate([
-          { transform: `translate(${r1(a.left + a.width / 2 - b.left - b.width / 2)}px, ${r1(a.top + a.height / 2 - b.top - b.height / 2)}px) scale(${(k * a.width / b.width).toFixed(3)})` },
-          { transform: `scale(${k})` },
-        ], { duration: 520, easing: 'cubic-bezier(0.3, 0, 0.2, 1)' });
-      }
-      for (const b of el.querySelectorAll('.rum-fb-r b')) {
-        clearInterval(b._t);
-        clearTimeout(b._d);
-        b.textContent = ' ';
-        b.dataset.c = ' ';
-        b.classList.remove('lit');
-      }
-      setBoard(el, R.lines, 0, !calm());
-      if (!still()) el.focus({ preventScroll: true });
-    } else if (el && el.contains(document.activeElement)) fb.focus({ preventScroll: true });
-    if (on) aim(centerOf(fb), 1.6, [800, 440], calm() ? null : 'glid');
-    else aim([800, 500], 1, [800, 500], calm() ? null : 'glid');
-  }
-
   // T: tv:n nära, vriden mot en, så att text-tv:n går att läsa och knapparna
   // att trycka på. Kameran siktar på rutan där den hamnar när tv:n har vridits.
   function zoomTv(on) {
-    if (on && R.nara) closeUp(false);
     R.zoom = on;
     R.el.classList.toggle('tv-nara', on);
     // kameran ställer sig rakt framför, så att tv:n står rak (som med kupongen i handen)
@@ -1499,7 +1306,6 @@ ${closeHtml()}
     if (!v || (slag !== 'fyll' && slag !== 'gang' && !from)) return false;
     if (slag === 'gang') pling();
     zoomTv(false);
-    if (R.nara) closeUp(false);
     const desk = document.getElementById('rum-kupong');
     const rd = { id: p.s.id, ids: p.s.matcher.map((x) => String(x.id)), gang: p.s.gang, name: (window.Samtal && Samtal.name()) || null };
     const nr = typeof couponNumber === 'function' ? couponNumber(rd.ids) : null;
@@ -2216,11 +2022,6 @@ ${closeHtml()}
       }
       // nära tv:n sköter den sina knappar och länkar själv (rum-tv.js)
       if (R.zoom && e.target.closest('#rum-tv3')) return;
-      if (R.nara) {
-        // i närbilden leder raderna och guldordet vidare; utanför tavlan tillbaka
-        if (!e.target.closest('#rum-fbn, .rum-hdr, .rum-ft')) closeUp(false);
-        return;
-      }
       if (e.target.closest('.rum-tag') && openCoupon()) {
         e.preventDefault();
         return;
@@ -2238,7 +2039,6 @@ ${closeHtml()}
         if (!openCoupon()) location.hash = 'kupong';
       } else if (R.zoom && R.tv && R.tv.key(e.key)) e.preventDefault();
       else if (k === 't') zoomTv(!R.zoom);
-      else if (k === 'escape' && R.nara) closeUp(false);
       else if (k === 'escape' && R.zoom) zoomTv(false);
     });
     addEventListener('resize', fit);
@@ -2259,9 +2059,6 @@ ${closeHtml()}
     R.oy = (innerHeight - H * s) / 2;
     const st = R.el.querySelector('.rum-stage');
     st.style.transform = `translate(${R.ox.toFixed(1)}px, ${R.oy.toFixed(1)}px) scale(${s.toFixed(4)})`;
-    // närbilden av tavlan ryms mellan namnet och foten
-    const n = document.getElementById('rum-fbn');
-    if (n && n.offsetWidth) n.style.setProperty('--k', Math.min((innerWidth - 120) / n.offsetWidth, (innerHeight - 190) / n.offsetHeight, 1.3).toFixed(3));
     // kupongen i handen står kvar mitt i fönstret
     if (R.kup && !R.kup.closing && !R.kup.opening) {
       const h = held();
@@ -2289,7 +2086,6 @@ ${closeHtml()}
     R.on = true;
     fit();
     zoomTv(false);
-    if (R.nara) closeUp(false);
     hot(null);
     // gänget klär sig efter vädret: vänta lite på det (i en fast bild tills det är hämtat)
     const ready = Promise.all([load(), Promise.race([ute(), new Promise((r) => setTimeout(r, still() ? 9000 : 1500))]).then(three)]);
@@ -2297,7 +2093,6 @@ ${closeHtml()}
       // en fast bild: allt på samma tid, och klar när datan och gänget är ritade
       ready.then(() => {
         freezeCss(R.frozen);
-        if (q.has('rum-tavla')) closeUp(true);
         frame();
         document.body.dataset.rumKlar = '1';
       });

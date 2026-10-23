@@ -23,6 +23,9 @@
 //             (data/match/<id>.json)
 //   371–374   tabellerna (data/teams/<division>.json) med formen i ligan ur
 //             matcherna; 24 lag = två undersidor
+//   377       Stryktipset matcher live: kupongens matcher med avspark eller
+//             ställning och tecknet, i Stryktipsets ordning när omgången är
+//             Stryktipset; tv:n står på den när man kommer in
 //   381–384   skytteligorna (data/players/<division>.json)
 //
 // Filerna hämtas när sidan visas första gången. Byter man sida söker tv:n som
@@ -36,18 +39,21 @@
 // bläddrar undersidorna själva var tolfte sekund.
 //
 // RumTv.html() → tv:n (i planet -470 i rum.js)
-// RumTv.mount(el, { calm, short, kort, wd, hm, matches }) → { fill(rows), zoom(on) → rutans mått, key(k) }
+// RumTv.mount(el, { calm, short, kort, wd, hm, matches }) → { fill(rows, { spel, next }), zoom(on) → rutans mått, key(k) }
 
 window.RumTv = (() => {
   const COLS = 40;
   const INDEX = 300;
   const FIRST = 331;
   const TAB = 371;
+  const LIVE = 377;
   const SKY = 381;
   // matcher per undersida på 331 (raderna 5–21), och högst så många
   // matchsidor att de inte når tabellerna
   const PER = 17;
   const MAXM = TAB - FIRST - 2;
+  // matcher per undersida på 377 (raderna 10–24)
+  const LPER = 15;
   const DIVS = [
     { id: 'pl', short: 'PL', name: 'Premier League', size: 20 },
     { id: 'ch', short: 'CH', name: 'Championship', size: 24 },
@@ -96,6 +102,7 @@ window.RumTv = (() => {
     M: '#...#|##.##|#.#.#|#.#.#|#...#|#...#|#...#',
     N: '#...#|##..#|#.#.#|#.#.#|#..##|#...#|#...#',
     O: '.###.|#...#|#...#|#...#|#...#|#...#|.###.',
+    P: '####.|#...#|#...#|####.|#....|#....|#....',
     R: '####.|#...#|#...#|####.|#.#..|#..#.|#...#',
     S: '.####|#....|#....|.###.|....#|....#|####.',
     T: '#####|..#..|..#..|..#..|..#..|..#..|..#..',
@@ -220,7 +227,7 @@ window.RumTv = (() => {
 
   function indexPage() {
     const item = (label, nr, indent = 1) => ({ sida: nr, html: line(' '.repeat(indent), pad(label, 36 - indent), [String(nr), 'y']) });
-    const rows = [null, item('Omgångens matcher', FIRST), null, line(' ', ['Tabeller', 'c'])];
+    const rows = [null, item('Omgångens matcher', FIRST), item('Stryktipset matcher live', LIVE), null, line(' ', ['Tabeller', 'c'])];
     DIVS.forEach((d, k) => rows.push(item(d.name, TAB + k, 3)));
     rows.push(null, line(' ', ['Skytteligor', 'c']));
     DIVS.forEach((d, k) => rows.push(item(d.name, SKY + k, 3)));
@@ -240,6 +247,31 @@ window.RumTv = (() => {
     });
     if (!T.rows.length) rows.push(null, line(' Inga matcher just nu.'));
     return band('MATCHER', subs > 1 ? `${sub + 1}/${subs}` : '', T.rows.length ? `${T.rows.length} matcher` : '') + body(rows) + fast();
+  }
+
+  // Stryktipset matcher live: kupongens matcher med numren – i Stryktipsets
+  // ordning om omgången är Stryktipset (spel), annars i avsparksordning –
+  // avsparken eller ställningen och tecknet, grönt medan matchen pågår och
+  // gult när den är slut. Mellan omgångarna de närmaste matcherna, utan nummer.
+  function livePage(T, sub) {
+    const { spel, next } = T.live;
+    const at = new Map((spel || []).map((id, i) => [String(id), i]));
+    const ix = (x) => (at.has(x.id) ? at.get(x.id) : at.size);
+    const all = spel ? T.rows.slice().sort((a, b) => ix(a) - ix(b)) : T.rows;
+    const subs = Math.max(1, Math.ceil(all.length / LPER));
+    const first = all.length ? new Date(Math.min(...all.map((x) => Date.parse(x.m.kickoff)))) : null;
+    const rows = [null, { dh: true, html: line(' ', [next ? 'Nästa matcher' : 'Matcher live', 'y']) },
+      first && !next ? line(' Spelstopp ', [`${T.wd(first)} ${T.hm(first)}`, 'c']) : null, null];
+    all.slice(sub * LPER, sub * LPER + LPER).forEach((x) => {
+      const i = T.rows.indexOf(x);
+      const k = new Date(x.m.kickoff);
+      const [st, fg] = status(x.g) || [`${T.wd(k)} ${T.hm(k)}`, 'c'];
+      const sign = done(x.g) && x.g.res != null ? ['1X2'[x.g.res], x.g.state === 'live' ? 'g' : 'y'] : null;
+      rows.push({ sida: i < MAXM ? FIRST + 1 + i : null,
+        html: line(rpad(next ? '' : all.indexOf(x) + 1, 3), ' ', pad(teams(T, x.m, 22), 22), ' ', [pad(st, 10), fg], ' ', sign) });
+    });
+    if (!all.length) rows.push(line(' Inga matcher just nu.'));
+    return band('STRYKTIPSET', subs > 1 ? `${sub + 1}/${subs}` : '') + body(rows) + fast();
   }
 
   // Prognosen som en stapel i mosaik: 1, X och 2 i sina färger (som siffrorna
@@ -418,7 +450,7 @@ window.RumTv = (() => {
       '<div class="tv-ram"><div class="tv-glas" id="rum-ttx"><div class="tt"><div class="tr hd"></div><div class="tb"></div></div>' +
       '<i class="tv-scan"></i><i class="tv-glans"></i></div></div>' +
       '<div class="tv-panel"><i class="tv-farg"><b></b><b></b><b></b><b></b><b></b><em>färg</em></i>' +
-      `<span class="tv-led" id="rum-tvled">${led(String(FIRST))}</span>` +
+      `<span class="tv-led" id="rum-tvled">${led(String(LIVE))}</span>` +
       '<button type="button" class="tv-k" data-tv="upp" aria-label="Nästa sida"><i>▲</i></button>' +
       '<button type="button" class="tv-k" data-tv="ner" aria-label="Föregående sida"><i>▼</i></button>' +
       '<i class="tv-galler"></i>' +
@@ -432,7 +464,7 @@ window.RumTv = (() => {
 
   function mount(root, o) {
     const T = {
-      rows: [], nr: FIRST, sub: 0, json: new Map(), teams: new Map(), players: new Map(), forms: new Map(), typed: '', on: true, near: false,
+      rows: [], live: { spel: null, next: false }, nr: LIVE, sub: 0, json: new Map(), teams: new Map(), players: new Map(), forms: new Map(), typed: '', on: true, near: false,
       short: o.short, kort: o.kort || o.short, wd: o.wd, hm: o.hm, matches: o.matches || (() => []),
     };
     const box = root.querySelector('#rum-tv3');
@@ -449,12 +481,14 @@ window.RumTv = (() => {
       const out = [INDEX, FIRST];
       for (let i = 0; i < Math.min(T.rows.length, MAXM); i++) out.push(FIRST + 1 + i);
       DIVS.forEach((d, k) => out.push(TAB + k));
+      out.push(LIVE);
       DIVS.forEach((d, k) => out.push(SKY + k));
       return out;
     }
     const exists = (nr) => pages().includes(nr);
     function subsOf(nr) {
       if (nr === FIRST) return Math.max(1, Math.ceil(T.rows.length / PER));
+      if (nr === LIVE) return Math.max(1, Math.ceil(T.rows.length / LPER));
       if (nr >= TAB && nr < TAB + DIVS.length) return tableSubs(T, DIVS[nr - TAB]);
       return 1;
     }
@@ -477,6 +511,7 @@ window.RumTv = (() => {
       if (nr === FIRST) return listPage(T, sub);
       if (nr > FIRST && nr < TAB) return matchPage(T, nr - FIRST - 1);
       if (nr >= TAB && nr < TAB + DIVS.length) return tablePage(T, nr - TAB, sub);
+      if (nr === LIVE) return livePage(T, sub);
       return scorerPage(T, nr - SKY);
     }
 
@@ -605,8 +640,9 @@ window.RumTv = (() => {
     });
 
     return {
-      fill(rows) {
+      fill(rows, { spel = null, next = false } = {}) {
         T.rows = rows;
+        T.live = { spel, next };
         T.forms.clear();
         if (!exists(T.nr)) {
           T.nr = FIRST;

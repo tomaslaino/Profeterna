@@ -1721,18 +1721,7 @@ på text-tv:n med samma ämne tänds, som när man pekar på snabbvalet med tv:n
 (skårtavlan Tabeller, pärmarna Skyttar). Klickar man går kameran fram mot föremålet innan
 sidan byts:
 
-- **Fällbladstavlan** sitter på bakväggen till höger om fönstret. Varje rad har
-  hemmalaget, ställningen och bortalaget (korta namn
-  på högst elva tecken, som WOLVES och MIDDLESBRO) och oddsen för 1, X och 2 under siffror
-  som är målade på ramen, med lister mellan kolumnerna; rubriken visar spelstoppet och
-  sidan (1/4). När en match har börjat står ställningen i mitten, och efter slutsignalen
-  slår oddsen om till det rätta tecknet, tänt under sin siffra; en struken match säger
-  STRUKEN och ett dolt resultat ett frågetecken. Fyra matcher i taget; den bläddrar var
-  nionde sekund och klaprar när något ändras. Ett klick zoomar in på tavlan: kameran går
-  fram och närbilden växer fram ur tavlan med alla matcher på en gång, som klaprar fram;
-  raderna leder till matcherna (`#match/<id>`), guldordet *Alla matcher* till Matcher, och
-  Esc eller ett klick utanför tar en tillbaka.
-- **Omgångens orakel** (tavlan under fällbladstavlan) → Olympen: oraklet som regerar
+- **Omgångens orakel** (tavlan under stationsuret) → Olympen: oraklet som regerar
   (`Kronan.holders`) som i Olympen och på förstasidans polaroid (`Kronan.scene`) – det
   urklippta fotot på marmorsockeln med lagerkransen som glimmar och strålarna som vrider
   sig – i en förgylld ram med meanderband, rosetter i hörnen och en palmett överst. Ett
@@ -1773,8 +1762,9 @@ sidan byts:
   *Inlämnad*, men inga tecken. Din egen tas i handen, och de andras när du ser deras tips
   (se nedan). Innan dess lyfts en annans kupong bara lite i ena kanten och faller tillbaka.
 - **Tv:n** uppe i hörnet till höger, en tjock-tv i träfaner med text-tv på en arm från väggen, zoomas in med ett
-  klick eller T och vrids då mot en; där finns omgångens matcher, tabellerna och
-  skytteligorna (se [Tv:n](#tvn)). Esc eller ett klick utanför zoomar ut.
+  klick eller T och vrids då mot en; den står på kupongens matcher live (377), och där finns
+  också omgångens matcher, tabellerna och skytteligorna (se [Tv:n](#tvn)). Esc eller ett
+  klick utanför zoomar ut.
 - **Namnet på dörren** (längst till vänster, under Stängt-skylten) → Om oss: *Matchfixarna*
   i bladguld på glaset, spegelvänt inifrån som neonskylten, med TOBAK & SPEL och *Öppet
   till spelstoppet* under. I fönster som är minst 8:5 syns hela dörren, och där står namnet
@@ -1785,7 +1775,7 @@ kuponger med samma terrakottaband som kupongen på pulten i ett fack av plexigla
 pennor (samma som kupongens) i ett rör bredvid och en lapp på plexit: *Pennorna är
 räknade*.
 
-**Stationsuret** sitter på bakväggen ovanför fällbladstavlan och leder ingenstans: vit
+**Stationsuret** sitter på bakväggen till höger om fönstret och leder ingenstans: vit
 tavla med svarta streck och visare och en röd sekundvisare som hoppar varje sekund, med en
 mörk kant och tavlan gulnad av röken. Det går efter Stockholms tid, med samma klocka som
 utsikten (`Vader.nu()` i vader.js, annars datorns klocka). Med `?rum-t` står det på den
@@ -1845,15 +1835,14 @@ sekundvisare hoppar fram. Bakväggen är klädd med lackad furupanel (`furu` i r
 bräder med kvistar och ådring, mörka av röken upptill och ljusare under lysröret och där en
 tavla har hängt runt ramen. Stället är slitet: nikotingul högervägg och tak, fläckar, nötta
 kanter på disken och pulten, kafferingar och brännmärken. Med `prefers-reduced-motion` står
-allt still (en bild, ingen kamera efter musen, inget klapper).
+allt still (en bild, ingen kamera efter musen).
 
 **Data:** omgången ur `GET …/samtal` (`TP.round`, tippare.js), annars omgångens kupong;
 ställningen och resultaten rättas med `gradeRow` (kupong.js), också med Dölj resultat.
 Rummet läser om datan varje minut medan det står öppet.
 
-**Bilder:** `?rum-t=<sekunder>` fryser klockan (figurerna, röken, tavlans klapper och
-CSS-animationerna står på samma tid), `?rum-mx=&rum-my=` (−1…1) kamerans läge och
-`?rum-tavla` visar fällbladstavlan på nära håll (klappret räknas från tiden 0),
+**Bilder:** `?rum-t=<sekunder>` fryser klockan (figurerna, röken och CSS-animationerna
+står på samma tid), `?rum-mx=&rum-my=` (−1…1) kamerans läge,
 `?rum-slit=0…1` slitaget och `?rum-dag=<tal>` dagen för sakerna och affischen; sidan
 sätter `data-rum-klar` på `body` när allt är ritat. Vädret och klockan utanför:
 `?rum-klocka=2026-12-13T16:00` (eller bara `16:00`, Stockholms tid), `?rum-vader=klart`,
@@ -2047,6 +2036,12 @@ föremålet (`data-to`). Filerna hämtas när sidan visas första gången.
   formen i ligan (de fem senaste ur `data/matches.json`). Hela Premier League ryms på en sida;
   24 lag delas i två undersidor (1–12, 13–24). Divisionerna står i bandet och leder till
   varandra.
+- **377 Stryktipset matcher live:** sidan tv:n står på när man kommer in, i stället för
+  fällbladstavlan som satt på bakväggen. Kupongens matcher numrerade – i Stryktipsets
+  ordning när omgången är Stryktipset, annars i avsparksordning – med spelstoppet överst,
+  avsparken eller ställningen (som på 331) och tecknet längst ut: grönt medan matchen pågår
+  (det som gäller i ordinarie tid just nu), gult när den är slut. Raderna leder till
+  matchernas sidor. Mellan omgångarna står de närmaste matcherna där, utan nummer.
 - **381–384 Skyttar:** skytteligorna ur `data/players/<division>.json` – de 19 med flest
   ligamål, delad placering med numret bara på den första.
 
@@ -2070,7 +2065,8 @@ byts sidan direkt och tv:n står still.
 Lådan ritas i tre gånger storleken (`zoom: 3`) och förminskas igen (`scale3d`): Chrome
 ritar inte om lager i perspektiv när kameran går fram, så utan skärpan i reserv blir
 text-tv:n suddig på nära håll. Tv:n sköter sig själv: rum.js bygger den (`RumTv.html`),
-kopplar in den (`RumTv.mount`), ger den omgångens rader vid varje `fill` och skickar
+kopplar in den (`RumTv.mount`), ger den omgångens rader vid varje `fill` (med Stryktipsets
+ordning när omgången är Stryktipset, och om raderna bara är de närmaste matcherna) och skickar
 siffror och pilar dit när den är nära.
 
 ## Statusmärkning
