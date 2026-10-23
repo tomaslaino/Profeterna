@@ -1735,16 +1735,18 @@ går kameran fram mot det innan sidan byts:
 - **Korktavlan** (längst till höger) → gängets kuponger i Olympen (`#olympen/kuponger`):
   de färdigspelade kupongerna (`Historik.coupons`) rättade med röd penna, en med kaffering.
   Tom tills den första är färdigspelad.
-- **Förstoringsglaset** på en hög FACIT (pulten, nere till vänster) → Analysera för nästa
-  match i omgången som inte har börjat (`#match/<id>/analysera`; adressen blir
-  `#match/<id>` och matchbladet öppnas på fliken).
 - **Kupongen och kvittot** → Kupong. Kupongen visar omgångens matcher i
   kupongens ordning med kryss där gängets kupong har tecken – innan den finns dina egna, med
-  ditt namn kryssat under *Tippare* och stämpeln *Inlämnad* när du har lämnat in – kvittot
-  när var och en lämnade in. Tills alla har lämnat in eller första matchen startar tas
-  kupongen i handen i stället (se nedan). Guldordet bredvid säger vad som väntar: *Fyll i
-  kupongen*, *Fyll i resten*, *Ändra kupongen*, *Se kupongen* (när dina tips står fast),
-  *Till uppgörelsen* när alla har lämnat in och *Följ kupongen* när matcherna har börjat.
+  ditt namn kryssat under *Tippare*; har du lämnat in ligger din i högen bredvid och på
+  pulten en ny – kvittot när var och en lämnade in. Tills alla har lämnat in eller första
+  matchen startar tas kupongen (din ur högen, när du har lämnat in) i handen i stället (se
+  nedan). Guldordet bredvid säger vad som väntar: *Fyll i kupongen*, *Fyll i resten*,
+  *Ändra kupongen*, inget alls när dina tips står fast, *Till uppgörelsen* när alla har
+  lämnat in och *Följ kupongen* när matcherna har börjat.
+- **Högen** till vänster om kupongen: de som har lämnat in har lagt sin kupong där med
+  baksidan upp, i den ordning de lämnade in (den senaste överst) – porträttet under ett gem,
+  initialerna i personens bläck (samma som på papperet under Kupong) och stämpeln
+  *Inlämnad*, men inga tecken. Din egen tas i handen (se nedan); de andras leder till Kupong.
 - **Tv:n** med text-tv (sida 331, omgångens matcher på två undersidor) zoomas in med ett
   klick eller T; färgknapparna leder till Kupong, Olympen, Tabeller och Statistik, Esc
   zoomar ut.
@@ -1810,22 +1812,27 @@ Under kupongen står *Lägg tillbaka* och guldordet *Lämna in*. Utan namn står
 och Tippare-rutorna blir röda; saknas tecken blir rutorna i de matcherna röda och raden
 säger hur många, som på papperet under Kupong. Annars lämnas tipsen in med samma kod
 (`Samtal.pult` och `handIn` i [public/samtal.js](public/samtal.js), `POST …/samtal {gor:
-"tips"}`), stämpeln *Inlämnad* slår i och kupongen läggs tillbaka på pulten. Esc, K, *Lägg
-tillbaka* eller ett klick utanför lägger tillbaka den samma väg baklänges. Utkastet är
+"tips"}`), stämpeln *Inlämnad* slår i och kupongen vänds och läggs överst i högen; på
+pulten ligger en ny. Esc, K, *Lägg tillbaka* eller ett klick utanför lägger tillbaka den
+samma väg baklänges. Utkastet är
 detsamma som på papperet under Kupong (på enheten), så det man har kryssat står kvar på
 pulten och där; ett utkast utan namn blir ditt när du säger vem du är.
 
-Har du redan lämnat in lyfts kupongen på samma sätt, med dina kryss, ditt namn och stämpeln.
+Har du redan lämnat in tas din kupong ur högen i stället – med ett klick på den, på
+kupongen på pulten, på guldordet eller K: den lyfts, vänds över långsidan på vägen upp
+(innehållet byts när den står på kant) och stannar i handen med dina kryss, ditt namn och
+stämpeln. *Lägg tillbaka* och inlämningen vänder den tillbaka ner i högen.
 Har ingen annans tips visats för dig än är rutorna knappar som förut, och guldordet heter
 *Lämna in ändringen* – släckt tills något är ändrat. Ändringen stannar i handen tills den
 lämnas in (som på papperet, där en ändring får lämna matcher tomma), och då slår stämpeln i
 igen. Har du sett någon annans tips står dina fast, som på papperet under Kupong: rutorna
 går inte att trycka på och guldordet *Se de andras tips* leder dit. När alla har lämnat in
-(uppgörelsen) eller matcherna har börjat leder kupongen till Kupong som förut. Med
+(uppgörelsen) eller matcherna har börjat leder kupongen och högen till Kupong som förut. Med
 `prefers-reduced-motion` (och med `?rum-t=`) står kupongen direkt i handen och kryssen
-direkt på papperet. Rörelserna är Web Animations (`openCoupon`, `drawCross` och `penGo` i
-[public/rum.js](public/rum.js)); kupongen ligger i samma lager som pulten, så den börjar
-exakt där den låg.
+direkt på papperet. Rörelserna är Web Animations (`openCoupon`, `flipFrames`, `drawCross`
+och `penGo` i [public/rum.js](public/rum.js)); kupongen och högen ligger i samma lager som
+pulten, och kupongerna i högen har kupongens mått, förminskade, så att kupongen börjar
+exakt där den låg och landar exakt på sin plats i högen.
 
 ## Statusmärkning
 
