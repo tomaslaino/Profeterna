@@ -18,7 +18,8 @@
 // fönster står den alltid där i stället för rummet (Rum.fits). Rörelserna
 // stängs av med prefers-reduced-motion. För bilder: ?rum-t=<sekunder> fryser
 // klockan, ?rum-mx=&rum-my= kamerans läge (−1…1), ?rum-tavla visar
-// fällbladstavlan på nära håll.
+// fällbladstavlan på nära håll, ?rum-vantar=DL,DT låter dem sitta med
+// kupongen som om de inte hade lämnat in.
 //
 // Läses efter kupong.js, samtal.js, tippare.js och kronan.js och använder
 // deras hjälpare (state, KP, TP, gradeRow, couponNumber, currentCoupon,
@@ -875,6 +876,9 @@ ${closeHtml()}
     const lines = [nr ? `KUPONG ${nr}` : 'KUPONG', gang.length ? `INLÄMNADE ${gang.length - waiting.length}/${gang.length}` : '',
       gang.length ? (waiting.length ? `VÄNTAR: ${waiting.join(' ')}` : 'ALLA INNE') : ''];
     term.forEach((e, i) => { e.textContent = lines[i]; });
+    // gänget på fönsterbänken: den som inte har lämnat in sitter med kupongen
+    R.vem = vemInne(rd, rows, t, p);
+    if (R.fig && R.fig.inne) R.fig.inne(R.vem, now());
     const started = rows.length && Math.min(...rows.map((x) => Date.parse(x.m.kickoff))) <= t;
     const tag = document.getElementById('rum-tag');
     if (tag) tag.textContent = p ? p.go : started ? 'Följ kupongen' : 'Fyll i kupongen';
@@ -894,6 +898,17 @@ ${closeHtml()}
     R.best = best.map((p) => p.id);
     set('rum-ram-namn', esc(best.map((p) => p.id).join(' & ')));
     portrait();
+  }
+
+  // Vem som har lämnat in, för figurerna (rum-3d.js): bara en omgång som inte
+  // har börjat väntar på någon, och din egen inlämning på pulten räknas
+  // direkt. ?rum-vantar=DL,DT låter dem vänta ändå.
+  function vemInne(rd, rows, t, p) {
+    const open = rd && !rd.next && rows.length && Math.min(...rows.map((x) => Date.parse(x.m.kickoff))) > t;
+    const vem = {};
+    for (const g of (rd && rd.gang) || []) vem[g.id.toLowerCase()] = !open || Boolean(g.inne) || Boolean(p && p.inne && p.vem === g.id);
+    for (const id of (R.q.get('rum-vantar') || '').split(',')) if (id.trim()) vem[id.trim().toLowerCase()] = false;
+    return vem;
   }
 
   // Porträttet i ramen: vinnarfiguren ur three.js när den finns, annars fotot.
@@ -1008,6 +1023,7 @@ ${closeHtml()}
     try {
       const mod = await import('./rum-3d.js');
       R.fig = await mod.figurer(document.getElementById('rum-3d'), { calm: calm() });
+      if (R.vem) R.fig.inne(R.vem, now());
       portrait();
       frame();
     } catch (err) {
