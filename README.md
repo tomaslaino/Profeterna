@@ -1753,18 +1753,22 @@ sidan byts:
   match i kupongens ordning med synkmarkeringen i kanten och dag, tid och serie efter lagen
   (dagens rubrik får inte plats), och i foten fälten *Tippat*, *Garderingar*,
   *Kombinationer* (eller *Pris*) och *Odds* och streckkoden med omgångens id (`Samtal.pult.top`
-  och `fields`, `Papper.code`). Kryss där gängets kupong har tecken – innan den finns dina
-  egna, med ditt porträtt inringat; har du lämnat in ligger din i högen bredvid och på
-  pulten en ny – kvittot när var och en lämnade in. Tills alla har lämnat in eller första
-  matchen startar tas kupongen (din ur högen, när du har lämnat in) i handen i stället, och
-  din kupong i högen tas i handen tills matcherna har startat (se nedan). Guldordet bredvid
-  säger vad som väntar: *Fyll i kupongen*, *Fyll i resten*, inget alls när du har lämnat
-  in (din kupong i högen tas i handen med ett klick), *Till uppgörelsen* när alla har
-  lämnat in och *Följ kupongen* när matcherna har börjat.
+  och `fields`, `Papper.code`). Efter tiden står motiveringen för hand med blyerts, och
+  utfallet ringas in (grönt när kupongen hade det, annars rött, streckat medan matchen
+  pågår). På pulten ligger ditt utkast med dina kryss och motiveringar och ditt porträtt
+  inringat; har du lämnat in ligger din i högen bredvid och på pulten en ny – och när du
+  ser de andras tips ligger gängets kupong där, med gängets kryss med kulspetspenna och
+  allas porträtt i rutorna (uppgörelsen). Kvittot visar när var och en lämnade in. Allt man
+  gör med kupongen tas i handen, utan att man lämnar rummet (se
+  [Kupongen i handen](#kupongen-i-handen)). Guldordet bredvid säger vad som väntar: *Fyll i
+  kupongen*, *Fyll i resten*, inget alls när du har lämnat in och bara ser dina egna tips
+  (din kupong i högen tas i handen med ett klick), *Till uppgörelsen* när du ser de andras
+  tips och *Följ kupongen* när matcherna har börjat.
 - **Högen** till vänster om kupongen: de som har lämnat in har lagt sin kupong där med
   baksidan upp, i den ordning de lämnade in (den senaste överst) – porträttet under ett gem,
   initialerna i personens bläck (samma som på papperet under Kupong) och stämpeln
-  *Inlämnad*, men inga tecken. Din egen tas i handen (se nedan); de andras leder till Kupong.
+  *Inlämnad*, men inga tecken. Din egen tas i handen, och de andras när du ser deras tips
+  (se nedan). Innan dess lyfts en annans kupong bara lite i ena kanten och faller tillbaka.
 - **Tv:n** i hörnet uppe till höger, en tjock-tv i träfaner med text-tv, zoomas in med ett
   klick eller T och vrids då mot en; där bläddrar man mellan omgångens matcher med knapparna
   på tv:n (se [Tv:n](#tvn)). Esc eller ett klick utanför zoomar ut.
@@ -1904,9 +1908,12 @@ Med `prefers-reduced-motion` står gatan still och ingen går förbi.
 
 ### Kupongen i handen
 
-Tills alla har lämnat in eller första matchen startar tas kupongen på pulten i handen direkt
-i rummet – för att fylla i den eller ändra den: ett klick på kupongen, på guldordet
-eller K. Kupongen lossnar från pulten,
+Allt man gör med kupongen på papperet under Kupong görs också i rummet, med kupongen i
+handen: fylla i, skriva motiveringar, spara, lämna in, ändra och ångra, läsa de andras
+kuponger, skriva kommentarer i efterhand, göra gängets kupong i uppgörelsen, ändra
+matcherna och ta bort omgången – med samma kod och samma tjänst som papperet
+(`Samtal.pult` i [public/samtal.js](public/samtal.js)). Kupongen på pulten tas i handen med
+ett klick på den, på guldordet eller K. Den lossnar från pulten,
 lyfter, vänds upp mot betraktaren och förstoras till mitten av fönstret (så stor som får
 plats mellan namnet och orden under den), svänger en aning förbi och stannar; rummet mörknar
 bakom, kameran ställer sig rakt framför, och pennan följer med och rullar undan till
@@ -1919,30 +1926,76 @@ på papperet (*Vem är du?*; den som redan har lämnat in går inte att välja):
 ditt porträtt, och stämpeln säger vem omgången väntar på med dig först. Fälten i foten
 räknas om för varje kryss.
 
-Under kupongen står *Lägg tillbaka* och guldordet *Lämna in*. Utan namn står *Vem är du?*
-och porträtten får en röd ring; saknas tecken blir rutorna i de matcherna röda och raden
-säger hur många, som på papperet under Kupong. Annars lämnas tipsen in med samma kod
-(`Samtal.pult` och `handIn` i [public/samtal.js](public/samtal.js), `POST …/samtal {gor:
-"tips"}`), stämpeln *Inlämnad* slår i och kupongen vänds och läggs överst i högen; på
-pulten ligger en ny. Esc, K, *Lägg tillbaka* eller ett klick utanför lägger tillbaka den
-samma väg baklänges. Utkastet är
-detsamma som på papperet under Kupong (på enheten), så det man har kryssat står kvar på
-pulten och där; ett utkast utan namn blir ditt när du säger vem du är.
+**Motiveringen** skrivs för hand efter tiden, som på papperet: när en match är tippad står
+en liten penna där, och ett klick var som helst efter tiden och man skriver på samma rad
+(högst 140 tecken), så att raden aldrig blir högre – platsen står kvar också innan pennan
+syns, så att ingenting flyttar sig. Pennan på kupongen går dit och följer texten medan man
+skriver: spetsen står där texten slutar och hoppar lite för varje tecken. Enter eller ett
+klick utanför och pennan lägger sig vid sidan igen. Motiveringen står i utkastet (samma
+som papperets), syns på kupongen på pulten och följer med när man lämnar in; den som inte
+får plats slutar med … och syns hel när man pekar på den.
 
-Har du redan lämnat in tas din kupong ur högen i stället – med ett klick på den, på
-kupongen på pulten, på guldordet eller K: den lyfts, vänds över långsidan på vägen upp
-(innehållet byts när den står på kant) och stannar i handen med dina kryss, ditt porträtt
-inringat och stämpeln *Inlämnad* bredvid stämpeln om vem omgången väntar på. *Lägg tillbaka* och inlämningen vänder den tillbaka ner i högen.
-Rutorna är knappar som förut, och guldordet heter *Lämna in ändringen* – släckt tills
-något är ändrat. Ändringen stannar i handen tills den lämnas in (som på papperet, där en
-ändring får lämna matcher tomma), och då slår stämpeln i igen. Det går tills matcherna
-startar, också när du ser de andras tips – samma regel som papperet under Kupong
-(`Samtal.pult.state().andra` är papperets `canEdit`). Matcher som har startat står kvar som
-de var: bleka, med *har startat* efter tiden, och rutorna är inga knappar. När alla har
-lämnat in (uppgörelsen) eller matcherna har börjat leder kupongen på pulten, guldordet och
-K till Kupong, och din tas bara ur högen med ett klick på den. Med
-`prefers-reduced-motion` (och med `?rum-t=`) står kupongen direkt i handen och kryssen
-direkt på papperet. Rörelserna är Web Animations (`openCoupon`, `flipFrames`, `drawCross`
+Under kupongen står till vänster *Lägg tillbaka* och, i finstil som på papperet, *Ändra
+matcherna* (tills någon har lämnat in; leder till Kupong) och *Ta bort* (tills någon annan
+har lämnat in), och till höger *Spara* och guldordet *Lämna in*. *Spara* sparar en kupong
+som inte är färdig utan att lämna in – de andra ser tårtbiten vid ditt porträtt – och blir
+*Sparad* (med en bock, släckt) tills något ändras. *Ta bort* frågar i samma ruta som på
+papperet; sedan faller kupongen ur handen, och på pulten ligger nästa omgångs matcher. Utan
+namn står *Vem är du?* och porträtten får en röd ring; saknas tecken blir rutorna i de
+matcherna röda och raden säger hur många, som på papperet under Kupong. Annars lämnas
+tipsen in med samma kod (`Samtal.pult` och `handIn`, `POST …/samtal {gor: "tips"}`),
+stämpeln *Inlämnad* slår i och kupongen vänds och läggs överst i högen; på pulten ligger
+en ny. Esc, K, *Lägg tillbaka* eller ett klick utanför lägger tillbaka den samma väg
+baklänges. Utkastet är detsamma som på papperet under Kupong (på enheten), så det man har
+kryssat och skrivit står kvar på pulten och där; ett utkast utan namn blir ditt när du
+säger vem du är.
+
+**Din kupong ur högen.** Har du redan lämnat in tas din kupong ur högen i stället – med ett
+klick på den, på kupongen på pulten, på guldordet eller K (så länge du bara ser dina egna
+tips): den lyfts, vänds över långsidan på vägen upp (innehållet byts när den står på kant)
+och stannar i handen med dina kryss och motiveringar, ditt porträtt inringat och stämpeln
+*Inlämnad* bredvid stämpeln om vem omgången väntar på. *Lägg tillbaka* och inlämningen
+vänder den tillbaka ner i högen. Rutorna och motiveringarna går att ändra, och till höger
+står *Ångra* och guldordet *Lämna in ändringen*, släckta tills något är ändrat. *Ångra*
+suddar ut det nya och drar de gamla kryssen igen, ett i taget. Ändringen stannar i handen
+tills den lämnas in (som på papperet, där en ändring får lämna matcher tomma), och då slår
+stämpeln i igen. Det går tills matcherna startar, också när du ser de andras tips –
+samma regel som papperet under Kupong (`Samtal.pult.state().andra` är papperets
+`canEdit`). Matcher som har startat står kvar som de var: bleka, med *har startat* efter
+tiden, och rutorna är inga knappar.
+
+**Kommentarer i efterhand.** När en match har startat står pennan för kommentaren i
+efterhand efter tiden på din kupong ur högen och på gängets kupong, i ditt bläck (före
+avspark bara om du redan har skrivit något) – samma kommentar som pennan på papperet
+(`POST …/samtal {gor: "efter"}`). Den sparas när du lämnar fältet eller trycker Enter; Esc
+ångrar, och går den inte att spara blir den röd tills nästa försök. Den står efter
+motiveringen, i bläck i stället för blyerts.
+
+**De andras kuponger.** När du ser någons tips – du har lämnat in och hen också, eller allas
+tips visas – tas hens kupong ur högen på samma sätt: hens kryss, motiveringar och
+kommentarer i efterhand, hens porträtt inringat och stämpeln *Inlämnad*, men inget att
+ändra – bara *Lägg tillbaka*. Innan dess går den inte att vända (se Högen ovan).
+
+**Uppgörelsen.** När du ser de andras tips (som när papperet visar underlaget) ligger gängets
+kupong på pulten, och guldordet *Till uppgörelsen* (eller *Följ kupongen* när matcherna har
+börjat), kupongen eller K tar den i handen. I varje ruta står porträtten för dem som har
+med tecknet, var och en på sin plats som överst, och deras motivering syns när man pekar på
+porträttet. Gängets kryss dras med en blå kulspetspenna i stället för blyertspennan:
+förslaget – det som fler än hälften har med – står ikryssat från början, eller gängets
+kupong om den redan är sparad, och ett tryck kryssar i eller ur (`Samtal.pult.besluta`,
+sparat på enheten som på papperet). *Börja om* i finstil går tillbaka till förslaget, och
+guldordet *Spara gängets kupong* (*Spara ändringen* när den finns, *Sparad* när den står som
+den sparade) sparar den direkt med samma tjänst som papperet (`Samtal.pult.sparaGang`,
+`postCoupon` i kupong.js). Saknar matcher tecken säger raden det och guldordet blir *Spara
+ändå*; har någon annan hunnit före blir det *Spara över den* (gängets kupong) eller *Spara
+ändå* (en kupong till samma dag), och kan tjänsten inte spara *Spara via Ny kupong*. Utan
+tjänsten öppnas Ny kupong (eller Ändra) med tecknen ifyllda. Matcher som har startat går
+inte att ändra; där står pennan för kommentaren i efterhand.
+
+Rummet läser om omgången från tjänsten varje minut (`Samtal.load`), så att högen, gängets
+kupong och de andras kuponger följer med när någon lämnar in. Med `prefers-reduced-motion`
+(och med `?rum-t=`) står kupongen direkt i handen, kryssen direkt på papperet och pennan
+stilla. Rörelserna är Web Animations (`openCoupon`, `flipFrames`, `drawCross`, `penTo`, `setSigns`
 och `penGo` i [public/rum.js](public/rum.js)); kupongen och högen ligger i samma lager som
 pulten, och kupongerna i högen har kupongens mått, förminskade, så att kupongen börjar
 exakt där den låg och landar exakt på sin plats i högen.

@@ -512,6 +512,62 @@ a.rum-fb-r:hover b:not(.lit) { color: #fff; background: linear-gradient(180deg, 
 .rum-kup .pencil i { position: absolute; left: 24px; top: -6px; width: 104px; height: 12px; background: linear-gradient(180deg, #f0f0ec 0 30%, #d9d7d0 30% 70%, #b8b5ac 70%); }
 .rum-kup .pencil i::before { content: ""; position: absolute; left: -24px; top: 0; width: 24px; height: 12px; background: linear-gradient(90deg, #2a2a2a 0 24%, #e2c08c 24%); clip-path: polygon(0 50%, 100% 0, 100% 100%); }
 .rum-kup .pencil i::after { content: ""; position: absolute; right: -5px; top: 3px; width: 7px; height: 6px; border: 2px solid #8a8780; border-radius: 50%; }
+/* gängets kupong: kulspetspennan och dess kryss i blått bläck */
+.rum-kup .pencil.kula i { top: -5px; width: 98px; height: 10px; border-radius: 0 4px 4px 0; background: linear-gradient(180deg, #4b78d8 0 28%, #2146a6 28% 72%, #15306f 72%); }
+.rum-kup .pencil.kula i::before { left: -20px; width: 20px; height: 10px; background: linear-gradient(90deg, #22262e 0 14%, #d6d6cf 14% 55%, #9c9c95 55%); }
+.rum-kup .pencil.kula i::after { right: 10px; top: -3px; width: 26px; height: 3px; border: 0; border-radius: 2px; background: #c9c9c2; }
+.rum-kup .kryss.kula path { stroke: #2146a6; stroke-width: 2.1; opacity: 0.92; }
+
+/* efter tiden: motiveringen för hand med blyerts och kommentaren i
+   efterhand i ens bläck (rum.js, notes), på samma rad så att raden aldrig
+   blir högre. I handen är de fält med en penna framför, som på papperet. */
+.rum-kup .row .not { flex: 1 1 0; display: flex; align-items: baseline; gap: 7px; min-width: 0; overflow: hidden; font: 600 15px/21px Caveat, cursive; color: #55524e; }
+.rum-kup .not:has(.pen) { min-width: 18px; }
+.rum-kup .not .mot, .rum-kup .not .eft { flex: 0 1 auto; min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.rum-kup .not .eft, .rum-kup .not .pen-eft { color: var(--ink); }
+/* hela platsen efter tiden är fältet: ett klick var som helst där och man skriver */
+.rum-kup .pen { flex: 1 1 auto; display: flex; align-items: center; gap: 3px; min-width: 0; height: 21px; cursor: text; }
+.rum-kup .pen.gom { visibility: hidden; }
+.rum-kup .pen .sm-pen { width: 12px; height: 12px; opacity: 0.5; }
+.rum-kup .pen:hover .sm-pen, .rum-kup .pen:focus-within .sm-pen { opacity: 1; }
+.rum-kup .pen-in {
+  flex: 0 1 auto;
+  width: 0;
+  min-width: 0;
+  height: 20px;
+  margin: 0;
+  padding: 0 1px;
+  font: inherit;
+  color: inherit;
+  text-overflow: ellipsis;
+  background: none;
+  border: 0;
+  border-bottom: 1px dotted transparent;
+  border-radius: 0;
+  box-shadow: none;
+  outline: none;
+  cursor: inherit;
+}
+.rum-kup .pen:focus-within .pen-in, .rum-kup .pen-in:not(:placeholder-shown) { flex: 1 1 auto; }
+.rum-kup .pen-in:focus { border-bottom-color: var(--pp-dots); }
+/* en kommentar som inte gick att spara: rött tills den går */
+.rum-kup .pen.fel { color: var(--pp-no); }
+.rum-kup .pen.fel .sm-pen { opacity: 1; }
+.rum-kup .pen.fel .pen-in { border-bottom-color: var(--pp-no); }
+.rum-kup .pen.skickar .pen-in { opacity: 0.6; }
+
+/* uppgörelsen: porträtten för dem som har med tecknet, var och en på sin
+   plats i rutan, som på papperet */
+.rum-kup .box:has(.sits) { display: flex; align-items: center; justify-content: center; gap: 2px; }
+.rum-kup .box .sits { display: flex; gap: 1px; }
+.rum-kup .sits b { flex: none; width: 8px; height: 8px; border-radius: 50%; }
+.rum-kup .sits b[class] { background: var(--pp-box); box-shadow: 0 0 0 1px var(--ink); }
+.rum-kup .sits img { display: block; width: 100%; height: 100%; border-radius: 50%; object-fit: cover; }
+/* utfallet: en ring runt rutan – grön när kupongen hade det, annars röd,
+   streckad i blyerts medan matchen pågår */
+.rum-kup .rum-ring { position: absolute; left: -7px; top: -5px; width: calc(100% + 14px); height: calc(100% + 10px); overflow: visible; fill: none; stroke: var(--pp-no); stroke-width: 2; stroke-linecap: round; pointer-events: none; }
+.rum-kup .rum-ring.ok { stroke: var(--pp-ok); }
+.rum-kup .rum-ring.live { stroke: #6f6c69; stroke-dasharray: 4 3; }
 
 /* ---------- kupongen i handen (rum.js, openCoupon) ---------- */
 
@@ -519,9 +575,10 @@ a.rum-fb-r:hover b:not(.lit) { color: #fff; background: linear-gradient(180deg, 
 .rum-handen button.box { margin: 0; padding: 0; font-family: var(--display); background: none; cursor: pointer; transition: background-color 0.15s; }
 .rum-handen button.box:hover { background: rgba(200, 100, 58, 0.1); }
 .rum-handen button.box:focus-visible { outline: 2px solid #2146a6; outline-offset: 2px; }
-.rum-handen.need .row.tom .box { border-color: #cf2a20; box-shadow: 0 0 0 1px #cf2a20; }
+.rum-handen.need .row.tom button.box { border-color: #cf2a20; box-shadow: 0 0 0 1px #cf2a20; }
 /* startade matcher står kvar som de var (som .sm-locked på papperet) */
-.rum-handen .row.locked .m, .rum-handen .row.locked .box { opacity: 0.55; }
+/* (pennan för kommentaren i efterhand är kvar som den är) */
+.rum-handen .row.locked :is(.pp-tm, .pp-small, .mot, .box) { opacity: 0.55; }
 .rum-handen.need-vem button[data-vem] .sm-fc { box-shadow: 0 0 0 2px #cf2a20, 0 0 0 3.5px var(--pp-box); }
 .rum-dimma {
   position: absolute;
@@ -552,6 +609,13 @@ a.rum-fb-r:hover b:not(.lit) { color: #fff; background: linear-gradient(180deg, 
 .rum-hand .guld { color: #f0d699; font-weight: 600; }
 .rum-hand .guld:hover { color: #fff1c8; }
 .rum-hand .guld:disabled { cursor: default; opacity: 0.55; }
+.rum-hand .bla:disabled { cursor: default; opacity: 0.45; }
+.rum-hand .sparad:disabled { opacity: 0.8; text-decoration: none; }
+.rum-hand .ok { width: 15px; height: 15px; margin-right: 5px; vertical-align: -1px; fill: none; stroke: currentColor; stroke-width: 2.2; stroke-linecap: round; stroke-linejoin: round; }
+/* till vänster Lägg tillbaka och finstilen, till höger guldordet längst ut */
+.rum-hand .vanster, .rum-hand .hoger { flex: none; display: flex; align-items: baseline; gap: 26px; }
+.rum-hand .fin { font-size: 15px; color: #a9c8fb; opacity: 0.75; text-decoration-thickness: 1px; }
+.rum-hand .fin:hover { opacity: 1; }
 .rum-hand .msg { flex: 1; margin: 0; text-align: center; font-size: 16px; color: #f3ede3; text-shadow: 0 2px 10px rgba(0, 0, 0, 0.95); }
 .rum-hdr, .rum-ft, .rum-warm, .rum-vign { transition: opacity 0.6s; }
 .rum.i-handen .rum-hdr { opacity: 0.35; }
