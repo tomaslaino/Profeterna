@@ -10,6 +10,7 @@
 //   fällbladstavlan → närbilden → Matcher  förstoringsglaset → Analysera (nästa match)
 //   korktavlan → gängets kuponger     pokalhyllan, Omgångens orakel → Olympen
 //   krittavlan → Tabeller             pärmarna → Statistik
+//   namnet på dörren → Om oss
 //   kvittot, terminalen → Kupong, tv:n zoomas in (T) med text-tv:ns färgknappar
 //   kupongen tas i handen och fylls i (K), eller → Kupong när man har lämnat in.
 // Pekar man på ett föremål lyser ordet i menyn som det leder till.
@@ -78,6 +79,8 @@ window.Rum = (() => {
     <linearGradient id="rum-streak" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#ffb35c" stop-opacity=".5"/><stop offset="1" stop-color="#ffb35c" stop-opacity="0"/></linearGradient>
     <linearGradient id="rum-streakred" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#ff3b30" stop-opacity=".55"/><stop offset="1" stop-color="#ff3b30" stop-opacity="0"/></linearGradient>
     <linearGradient id="rum-cupg" x1="0" y1="0" x2="1" y2="0"><stop offset="0" stop-color="#fff" stop-opacity=".55"/><stop offset=".35" stop-color="#fff" stop-opacity="0"/><stop offset="1" stop-color="#000" stop-opacity=".45"/></linearGradient>
+    <linearGradient id="rum-guld" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#f7e3a8"/><stop offset=".55" stop-color="#d4a650"/><stop offset="1" stop-color="#9c7230"/></linearGradient>
+    <path id="rum-dorrbage" d="M66 252 Q136 232 206 252"/>
     <clipPath id="rum-win"><rect x="272" y="132" width="676" height="426"/></clipPath>
     <clipPath id="rum-doorglass"><rect x="50" y="136" width="172" height="560"/></clipPath>
     <filter id="rum-b1" x="-10%" y="-10%" width="120%" height="120%"><feGaussianBlur stdDeviation="1.3"/></filter>
@@ -226,6 +229,17 @@ window.Rum = (() => {
   <rect x="96" y="176" width="80" height="30" rx="3" fill="#ece0c4"/>
   <rect x="96" y="176" width="80" height="30" rx="3" fill="none" stroke="#b3261e" stroke-width="2"/>
   <text x="136" y="197" text-anchor="middle" font-family="Fraunces" font-weight="800" font-size="15" letter-spacing="1.5" fill="#b3261e">STÄNGT</text>
+  <!-- namnet i bladguld på glaset, spegelvänt inifrån som neonskylten -->
+  <a class="rum-sak" href="om-oss.html" aria-label="Om oss" id="rum-dorrnamn">
+    <rect x="60" y="226" width="152" height="72" fill="#000" opacity=".001"/>
+    <g transform="translate(272 0) scale(-1 1)" font-family="Fraunces" text-anchor="middle">
+      <text font-style="italic" font-weight="700" font-size="21" fill="#1a1208" opacity=".55" transform="translate(1.5 2)"><textPath href="#rum-dorrbage" startOffset="50%">Matchfixarna</textPath></text>
+      <text font-style="italic" font-weight="700" font-size="21" fill="url(#rum-guld)" stroke="#3a2808" stroke-width=".8" paint-order="stroke"><textPath href="#rum-dorrbage" startOffset="50%">Matchfixarna</textPath></text>
+      <line x1="92" y1="262" x2="180" y2="262" stroke="url(#rum-guld)" stroke-width="1.2"/>
+      <text x="136" y="277" font-weight="700" font-size="10.5" letter-spacing="2.4" fill="url(#rum-guld)" stroke="#3a2808" stroke-width=".4" paint-order="stroke">TOBAK &amp; SPEL</text>
+      <text x="136" y="292" font-style="italic" font-size="9.5" fill="#d8b46a" opacity=".9">Öppet till spelstoppet</text>
+    </g>
+  </a>
   <!-- flagnad färg vid dörrkarmen -->
   <path d="M236 300 l14 6 l-3 18 l9 12 l-6 22 l4 16 l-18 4 z" fill="#9b8c68" opacity=".55"/>
   <path d="M236 300 l14 6 l-3 18 l9 12 l-6 22 l4 16" fill="none" stroke="#241c10" stroke-opacity=".45" stroke-width="1.4"/>
