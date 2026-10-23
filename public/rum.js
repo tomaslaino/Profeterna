@@ -7,7 +7,7 @@
 // och DJ – sitter som leksaksfigurer (three.js, rum-3d.js) på fönsterbänken,
 // dricker öl, röker och pratar. Föremålen leder vidare, som i ett rum hos
 // Felix Rieseberg:
-//   fällbladstavlan → Matcher        förstoringsglaset → Analysera (nästa match)
+//   fällbladstavlan → närbilden → Matcher  förstoringsglaset → Analysera (nästa match)
 //   korktavlan → gängets kuponger     pokalhyllan, Omgångens tippare → Olympen
 //   krittavlan → Tabeller             pärmarna → Statistik
 //   kupongen, kvittot, terminalen → Kupong, tv:n zoomas in (T) med text-tv:ns
@@ -17,7 +17,8 @@
 // Vanlig sida (#hem) är den vanliga förstasidan. I telefonen och i smala
 // fönster står den alltid där i stället för rummet (Rum.fits). Rörelserna
 // stängs av med prefers-reduced-motion. För bilder: ?rum-t=<sekunder> fryser
-// klockan, ?rum-mx=&rum-my= kamerans läge (−1…1).
+// klockan, ?rum-mx=&rum-my= kamerans läge (−1…1), ?rum-tavla visar
+// fällbladstavlan på nära håll.
 //
 // Läses efter kupong.js, samtal.js, tippare.js och kronan.js och använder
 // deras hjälpare (state, KP, TP, gradeRow, couponNumber, currentCoupon,
@@ -316,15 +317,32 @@ window.Rum = (() => {
 
   // ---------- de sju sakerna ----------
 
-  // 1. Fällbladstavlan: omgångens matcher med odds före spelstoppet, sedan
-  // resultaten med det rätta tecknet tänt. Sju rader i taget; den bläddrar
-  // och klaprar.
-  const COLS = 19;
-  const ROWS = 7;
+  // 1. Fällbladstavlan: hänger från taket framför fönstret. Omgångens
+  // matcher med oddsen före avspark, sedan ställningen och det rätta tecknet
+  // tänt. Fyra matcher i taget; den bläddrar och klaprar. Klickar man går man
+  // fram till den och ser alla matcher på en gång (närbilden); där leder
+  // raderna till matcherna och guldordet till Matcher.
+  // En rad är fält av blad: hemmalaget, ställningen, bortalaget och oddsen
+  // för 1, X och 2 – siffrorna 1, X och 2 är målade på ramen ovanför.
+  const NAME = 11;
+  const FIELDS = [NAME, 3, NAME, 3, 3, 3];
+  const HEAD = [19, 3];
+  const ROWS = 4;
+  const fbField = (n, i, inner = '<b> </b>'.repeat(n)) => `<span class="fl f${i}" style="--n:${n}">${inner}</span>`;
+  const fbRow = (fields, cls = '', href = '') => {
+    const tag = href ? 'a' : 'span';
+    return `<${tag} class="rum-fb-r${cls}"${href ? ` href="${href}"` : ''}>${fields.map((n, i) => fbField(n, i)).join('')}</${tag}>`;
+  };
+  const fbFrame = () => '<span class="rum-fb-skruv"></span><span class="rum-fb-skruv h"></span><span class="rum-fb-skruv n"></span><span class="rum-fb-skruv n h"></span>' +
+    `${fbRow(HEAD, ' rum-fb-hd')}<span class="rum-fb-r rum-fb-lb">${FIELDS.map((n, i) => fbField(n, i, i > 2 ? `<i>${'1X2'[i - 3]}</i>` : '')).join('')}</span>`;
   function boardHtml() {
-    const row = (cls) => `<div class="rum-fb-r${cls}">${'<b> </b>'.repeat(COLS)}</div>`;
-    return `<a class="rum-fb rum-sak" href="#matcher" data-nav="matcher" aria-label="Matcher">` +
-      `<span class="rum-fb-skruv"></span><span class="rum-fb-skruv h"></span>${row(' rum-fb-hd')}${Array.from({ length: ROWS }, () => row('')).join('')}</a>`;
+    return '<a class="rum-fb rum-sak" href="#matcher" data-nav="matcher" aria-label="Omgångens matcher" id="rum-fb">' +
+      `<span class="rum-fb-stag"></span><span class="rum-fb-stag h"></span>${fbFrame()}${Array.from({ length: ROWS }, () => fbRow(FIELDS)).join('')}</a>`;
+  }
+  function closeHtml() {
+    return '<div class="rum-nara" id="rum-nara"><div class="rum-nara-bak"></div>' +
+      `<div class="rum-fb rum-fb-stor" id="rum-fbn" role="dialog" aria-label="Omgångens matcher" tabindex="-1">${fbFrame()}<span class="rum-fbn-rader" id="rum-fbn-rader"></span>` +
+      '<span class="rum-fbn-fot"><a class="rum-guld" href="#matcher" data-nav="matcher">Alla matcher</a></span></div></div>';
   }
 
   // 5. Omgångens tippare: som Månadens anställd, med vinnarfigurens porträtt.
@@ -532,14 +550,15 @@ window.Rum = (() => {
     el.hidden = true;
     el.setAttribute('aria-label', 'Tobaksaffären');
     el.innerHTML = `<div class="rum-stage" id="rum-stage"><div class="rum-kamera" id="rum-kamera"><div class="rum-world" id="rum-world">
-${plane(-600, `${bg()}${rain()}${rightWall()}${svg('<g id="rum-hyllor"></g>')}${neon()}${lop()}${boardHtml()}${frameHtml()}`, 1.035)}
-${plane(-470, `${props()}${tv()}`, 1.02)}
+${plane(-600, `${bg()}${rain()}${rightWall()}${svg('<g id="rum-hyllor"></g>')}${neon()}${lop()}${frameHtml()}`, 1.035)}
+${plane(-470, `${props()}${tv()}${boardHtml()}`, 1.02)}
 ${plane(-330, `${sill()}${haze()}`)}
 ${plane(-60, `${table()}${cups()}`, 1.05)}
 ${plane(0, paper())}
 </div></div>
 <div class="rum-layer rum-warm"></div><div class="rum-layer rum-vign"></div><div class="rum-layer rum-grain"></div>
 </div>
+${closeHtml()}
 <div class="rum-hdr"><a class="rum-brand" href="#">Matchfixarna</a>
   <nav aria-label="Sektioner"><a href="#kupong" data-to="kupong">Kupong</a><a href="#olympen" data-to="olympen">Olympen</a><a href="#matcher" data-to="matcher">Matcher</a><a href="tabeller.html" data-to="tabeller">Tabeller</a><a href="statistik.html" data-to="statistik">Statistik</a></nav></div>
 <div class="rum-ft"><span class="keys"><b>K</b> kupongen · <b>T</b> tv:n</span><a href="#hem">Vanlig sida</a></div>`;
@@ -551,26 +570,16 @@ ${plane(0, paper())}
 
   // ---------- datan ----------
 
-  const CODES = {
-    'Arsenal': 'ARS', 'Aston Villa': 'AVL', 'AFC Bournemouth': 'BOU', 'Brentford': 'BRE', 'Brighton & Hove Albion': 'BHA', 'Burnley': 'BUR',
-    'Chelsea': 'CHE', 'Crystal Palace': 'CRY', 'Everton': 'EVE', 'Fulham': 'FUL', 'Leeds United': 'LEE', 'Liverpool': 'LIV', 'Manchester City': 'MCI',
-    'Manchester United': 'MUN', 'Newcastle United': 'NEW', 'Nottingham Forest': 'NFO', 'Sunderland': 'SUN', 'Tottenham Hotspur': 'TOT',
-    'West Ham United': 'WHU', 'Wolverhampton Wanderers': 'WOL', 'Coventry City': 'COV', 'Hull City': 'HUL', 'Ipswich Town': 'IPS',
-    'Blackburn Rovers': 'BLB', 'Bolton Wanderers': 'BOL', 'Birmingham City': 'BIR', 'Bristol City': 'BRC', 'Bristol Rovers': 'BRR', 'Cardiff City': 'CAR',
-    'Derby County': 'DER', 'Leicester City': 'LEI', 'Middlesbrough': 'MID', 'Millwall': 'MIL', 'Norwich City': 'NOR', 'Oxford United': 'OXF',
-    'Portsmouth': 'POR', 'Preston North End': 'PNE', 'Queens Park Rangers': 'QPR', 'Sheffield United': 'SHU', 'Sheffield Wednesday': 'SHW',
-    'Southampton': 'SOU', 'Stoke City': 'STK', 'Swansea City': 'SWA', 'Watford': 'WAT', 'West Bromwich Albion': 'WBA', 'Wrexham': 'WRX',
-    'Charlton Athletic': 'CHA', 'Lincoln City': 'LIN', 'Cambridge United': 'CAM', 'Plymouth Argyle': 'PLY', 'Bradford City': 'BRA',
-    'Luton Town': 'LUT', 'Huddersfield Town': 'HUD', 'Barnsley': 'BAR', 'Reading': 'REA', 'Wigan Athletic': 'WIG', 'Leyton Orient': 'LEY',
-    'Peterborough United': 'PET', 'Rotherham United': 'ROT', 'Stockport County': 'STO', 'Wycombe Wanderers': 'WYC', 'Exeter City': 'EXE',
-    'Mansfield Town': 'MAN', 'Northampton Town': 'NTH', 'Burton Albion': 'BRT', 'Doncaster Rovers': 'DON', 'Port Vale': 'PVA',
-  };
-  const code = (name) => CODES[name] || String(name || '?').replace(/^(AFC|FC)\s+/, '').normalize('NFD').replace(/[^A-Za-z]/g, '').slice(0, 3).toUpperCase();
   // Kortare lagnamn på papperet och krittavlan.
   const SHORT = { 'Manchester City': 'Man City', 'Manchester United': 'Man Utd', 'Tottenham Hotspur': 'Tottenham', 'Brighton & Hove Albion': 'Brighton',
     'Wolverhampton Wanderers': 'Wolves', 'West Bromwich Albion': 'West Brom', 'Queens Park Rangers': 'QPR', 'Nottingham Forest': "Nott'm Forest",
     'AFC Bournemouth': 'Bournemouth', 'Preston North End': 'Preston', 'Sheffield Wednesday': 'Sheff Wed', 'Sheffield United': 'Sheff Utd' };
   const short = (name) => SHORT[name] || String(name || '').replace(/\s+(United|City|Town|Rovers|Athletic|County|Wanderers|Albion|Argyle|Hotspur)$/, '');
+  // På fällbladstavlan: högst elva tecken (NAME).
+  const BOARD = { 'Nottingham Forest': 'Nottingham', 'Middlesbrough': 'Middlesbro', 'Crystal Palace': 'Palace', 'Huddersfield Town': 'Huddersfld',
+    'Peterborough United': "P'borough", 'Leyton Orient': 'Orient', 'Milton Keynes Dons': 'MK Dons', 'AFC Wimbledon': 'Wimbledon',
+    'Bristol City': 'Bristol C', 'Bristol Rovers': 'Bristol R', 'Accrington Stanley': 'Accrington' };
+  const onBoard = (name) => (BOARD[name] || short(name)).toUpperCase();
 
   const fOdds = (x) => (x == null ? ' - ' : x >= 10 ? String(Math.round(x)).padStart(3, ' ') : x.toFixed(1).replace('.', ','));
   const fWd = new Intl.DateTimeFormat('sv-SE', { timeZone: 'Europe/Stockholm', weekday: 'short' });
@@ -604,73 +613,78 @@ ${plane(0, paper())}
     }).filter((x) => x.m).sort((a, b) => Date.parse(a.m.kickoff) - Date.parse(b.m.kickoff) || a.m.home.localeCompare(b.m.home));
   }
 
-  // Fällbladstavlans rader som text, 19 tecken var.
+  // Fällbladstavlans text: rubriken och en rad per match, fälten i FIELDS
+  // efter varandra; lit = de tända fälten [rad, fält]. Före avspark oddsen,
+  // sedan ställningen i mitten och efter slutsignalen det rätta tecknet tänt
+  // under sin siffra.
   function boardLines(rows, t = Date.now(), next = false) {
     const pad = (s, n) => String(s).slice(0, n).padEnd(n, ' ');
-    if (!rows.length) return { head: pad('INGA MATCHER', COLS), rows: [], lit: [] };
+    const mid = (s, n) => pad(' '.repeat(Math.max(0, Math.floor((n - String(s).length) / 2))) + s, n);
+    if (!rows.length) return { head: 'INGA MATCHER', rows: [], lit: [] };
     const first = Math.min(...rows.map((x) => Date.parse(x.m.kickoff)));
     const started = first <= t;
-    const head = started ? `${pad('RESULTAT', 15)}    ` : pad(`${next ? 'NÄSTA' : 'SPELSTOPP'} ${wd(new Date(first)).toUpperCase()} ${hm(new Date(first))}`, COLS);
+    const head = started ? 'RESULTAT' : `${next ? 'NÄSTA' : 'SPELSTOPP'} ${wd(new Date(first)).toUpperCase()} ${hm(new Date(first))}`;
     const lit = [];
     const out = rows.map((x, i) => {
-      const left = `${pad(code(x.m.home), 3)} ${pad(code(x.m.away), 3)} `;
-      if (!started) {
-        const o = x.m.odds || [];
-        return left + `${pad(fOdds(o[0]), 3)} ${pad(fOdds(o[1]), 3)} ${pad(fOdds(o[2]), 3)}`;
-      }
       const g = x.g;
-      if (g.state === 'hidden') return left + pad('DOLT', 11);
-      if (g.state === 'off') return left + pad(g.off ? g.off.toUpperCase() : 'STRUKEN', 11);
-      if (g.score && (g.state === 'final' || g.state === 'live')) {
-        if (g.res != null && g.state === 'final') lit.push([i, 12 + g.res * 2]);
-        return left + `${pad(`${g.score.home}-${g.score.away}`, 3)} 1 X 2  `;
+      const o = x.m.odds || [];
+      const shown = g.score && (g.state === 'final' || g.state === 'live');
+      const score = g.state === 'hidden' ? '?' : shown ? `${g.score.home}-${g.score.away}` : '-';
+      let signs = [0, 1, 2].map((k) => mid(fOdds(o[k]), 3)).join('');
+      if (g.state === 'off') signs = mid('STRUKEN', 9);
+      else if (g.state === 'hidden') signs = ' '.repeat(9);
+      else if (g.state === 'final') {
+        signs = [0, 1, 2].map((k) => mid(k === g.res ? '1X2'[k] : '', 3)).join('');
+        if (g.res != null) lit.push([i, 3 + g.res]);
       }
-      return left + pad(hm(new Date(x.m.kickoff)), 11);
+      return pad(onBoard(x.m.home), NAME) + mid(score, 3) + pad(onBoard(x.m.away), NAME) + signs;
     });
     return { head, rows: out, lit };
   }
 
-  function boardText(lines, pageIx) {
-    const pages = Math.max(1, Math.ceil(lines.rows.length / ROWS));
+  // En sida av tavlan: per rader i taget, och sidnumret i rubrikens högra fält.
+  function boardText(lines, pageIx, per) {
+    const pages = Math.max(1, Math.ceil(lines.rows.length / per));
     const p = pageIx % pages;
-    const text = [/^RESULTAT/.test(lines.head) ? lines.head.slice(0, COLS - 4) + (pages > 1 ? `${p + 1}/${pages}`.padStart(4, ' ') : '    ') : lines.head];
-    for (let i = 0; i < ROWS; i++) text.push((lines.rows[p * ROWS + i] || '').padEnd(COLS, ' '));
-    const lit = (ri, ci) => ri > 0 && lines.lit.some(([li, col]) => li === p * ROWS + ri - 1 && col === ci);
+    const text = [lines.head.slice(0, HEAD[0]).padEnd(HEAD[0], ' ') + (pages > 1 ? `${p + 1}/${pages}` : '').padStart(HEAD[1], ' ')];
+    for (let i = 0; i < per; i++) text.push((lines.rows[p * per + i] || '').padEnd(FIELDS.reduce((a, b) => a + b, 0), ' '));
+    const lit = (ri, fi) => ri > 0 && lines.lit.some(([li, f]) => li === p * per + ri - 1 && f === fi);
     return { text, lit };
   }
 
-  function setBoard(lines, pageIx, animate) {
-    const el = R.el && R.el.querySelector('.rum-fb');
-    if (!el) return;
-    const { text, lit } = boardText(lines, pageIx);
-    [...el.querySelectorAll('.rum-fb-r')].forEach((r, ri) => {
-      for (let ci = 0; ci < COLS; ci++) flap(r.children[ci], text[ri][ci] || ' ', lit(ri, ci), animate ? 40 + ci * 18 + ri * 30 : 0);
-    });
+  // Bladen rad för rad, med fältet de sitter i (de målade siffrorna räknas inte).
+  const cellsOf = (el) => [...el.querySelectorAll('.rum-fb-r:not(.rum-fb-lb)')]
+    .map((r) => [...r.querySelectorAll('.fl')].flatMap((f, fi) => [...f.children].map((cell) => ({ cell, fi }))));
+
+  function setBoard(el, lines, pageIx, animate) {
+    if (!el || !lines) return;
+    const rows = cellsOf(el);
+    const { text, lit } = boardText(lines, pageIx, rows.length - 1);
+    rows.forEach((r, ri) => r.forEach(({ cell, fi }, ci) => flap(cell, text[ri][ci] || ' ', lit(ri, fi), animate ? 40 + ci * 18 + ri * 30 : 0)));
   }
 
   // Samma klapper räknat ur klockan, för stillbilderna: u sekunder efter
   // bläddringen visar varje blad ännu ett mellantecken.
-  function boardAt(lines, pageIx, u) {
-    const el = R.el && R.el.querySelector('.rum-fb');
-    if (!el) return;
-    const { text, lit } = boardText(lines, pageIx);
-    const prev = pageIx > 0 ? boardText(lines, pageIx - 1).text : null;
+  function boardAt(el, lines, pageIx, u) {
+    if (!el || !lines) return;
+    const rows = cellsOf(el);
+    const per = rows.length - 1;
+    const { text, lit } = boardText(lines, pageIx, per);
+    const prev = pageIx > 0 ? boardText(lines, pageIx - 1, per).text : null;
     const h = (a) => { const x = Math.sin(a * 91.17 + 7.3) * 43758.55; return x - Math.floor(x); };
-    [...el.querySelectorAll('.rum-fb-r')].forEach((r, ri) => {
-      for (let ci = 0; ci < COLS; ci++) {
-        const cell = r.children[ci];
-        const ch = text[ri][ci] || ' ';
-        const changed = !prev || prev[ri][ci] !== ch;
-        const d = (40 + ci * 18 + ri * 30) / 1000;
-        const steps = 3 + Math.floor(h(ri * 31 + ci + pageIx * 7) * 6);
-        const n = Math.floor((u - d) / 0.055);
-        const show = changed && n >= 0 && n < steps ? FLAPS[Math.floor(h(ri * 131 + ci * 17 + n) * FLAPS.length)] : !changed || n >= steps ? ch : prev[ri][ci];
-        cell.textContent = show;
-        cell.dataset.c = show;
-        cell.classList.toggle('lit', lit(ri, ci) && show === ch);
-        cell.classList.toggle('f', changed && n >= 0 && n < steps && (u - d) % 0.055 < 0.03);
-      }
-    });
+    rows.forEach((r, ri) => r.forEach(({ cell, fi }, ci) => {
+      const ch = text[ri][ci] || ' ';
+      const was = prev ? prev[ri][ci] || ' ' : ' ';
+      const changed = was !== ch;
+      const d = (40 + ci * 18 + ri * 30) / 1000;
+      const steps = 3 + Math.floor(h(ri * 31 + ci + pageIx * 7) * 6);
+      const n = Math.floor((u - d) / 0.055);
+      const show = changed && n >= 0 && n < steps ? FLAPS[Math.floor(h(ri * 131 + ci * 17 + n) * FLAPS.length)] : !changed || n >= steps ? ch : was;
+      cell.textContent = show;
+      cell.dataset.c = show;
+      cell.classList.toggle('lit', lit(ri, fi) && show === ch);
+      cell.classList.toggle('f', changed && n >= 0 && n < steps && (u - d) % 0.055 < 0.03);
+    }));
   }
 
   // Ett fällblad: bläddrar fram genom några tecken innan det stannar.
@@ -679,14 +693,15 @@ ${plane(0, paper())}
     cell.classList.toggle('lit', lit);
     if (cell.dataset.c === ch) return;
     cell.dataset.c = ch;
+    clearInterval(cell._t);
+    clearTimeout(cell._d);
     if (!delay || calm()) {
       cell.textContent = ch;
       return;
     }
     const steps = 3 + ((Math.random() * 6) | 0);
     let n = 0;
-    clearInterval(cell._t);
-    setTimeout(() => {
+    cell._d = setTimeout(() => {
       cell._t = setInterval(() => {
         n++;
         cell.classList.remove('f');
@@ -696,6 +711,15 @@ ${plane(0, paper())}
         if (n >= steps) clearInterval(cell._t);
       }, 55);
     }, delay);
+  }
+
+  // Närbildens rader: en länk per match, byggs om när omgången byts.
+  function closeRows(rows) {
+    const box = document.getElementById('rum-fbn-rader');
+    const ids = rows.map((x) => x.id).join();
+    if (!box || box.dataset.ids === ids) return;
+    box.dataset.ids = ids;
+    box.innerHTML = rows.length ? rows.map((x) => fbRow(FIELDS, '', `#match/${x.id}`)).join('') : fbRow(FIELDS);
   }
 
   // Text-tv: sida 331 med omgångens matcher, två undersidor.
@@ -788,7 +812,9 @@ ${plane(0, paper())}
     const rows = rd ? roundRows(rd, t) : [];
     R.rows = rows;
     R.lines = boardLines(rows, t, Boolean(rd && rd.next));
-    setBoard(R.lines, R.page, !calm());
+    setBoard(document.getElementById('rum-fb'), R.lines, R.page, !calm());
+    closeRows(rows);
+    if (R.nara) setBoard(document.getElementById('rum-fbn'), R.lines, 0, !calm());
     const nr = rd && !rd.next && rd.ids.length && typeof couponNumber === 'function' ? couponNumber(rd.ids) : null;
     const set = (id, html) => { const e = document.getElementById(id); if (e && e.innerHTML !== html) e.innerHTML = html; };
     set('rum-ttx', ttx(rows, t, R.sub || 0));
@@ -884,11 +910,13 @@ ${plane(0, paper())}
     }
     // tavlan bläddrar var nionde sekund, text-tv:n var tolfte
     const page = Math.floor(t / 9);
-    if (still() && R.lines) boardAt(R.lines, page, t - page * 9);
-    else if (page !== R.pageAt && R.lines) {
+    if (still() && R.lines) {
+      boardAt(document.getElementById('rum-fb'), R.lines, page, t - page * 9);
+      if (R.nara) boardAt(document.getElementById('rum-fbn'), R.lines, 0, t);
+    } else if (page !== R.pageAt && R.lines) {
       R.pageAt = page;
       R.page = page;
-      setBoard(R.lines, page, !calm());
+      setBoard(document.getElementById('rum-fb'), R.lines, page, !calm());
     }
     const sub = Math.floor(t / 12) % 2;
     if (sub !== R.sub && R.rows) {
@@ -970,6 +998,11 @@ ${plane(0, paper())}
       zoomTv(!R.zoom);
       return;
     }
+    if (a.id === 'rum-fb') {
+      e.preventDefault();
+      closeUp(true);
+      return;
+    }
     if (calm()) return;
     e.preventDefault();
     const p = centerOf(a);
@@ -986,8 +1019,32 @@ ${plane(0, paper())}
     }, 420);
   }
 
+  // Närbilden av fällbladstavlan: kameran går fram mot den och alla matcher
+  // klaprar fram på en gång. Esc eller ett klick utanför tar en tillbaka.
+  function closeUp(on) {
+    if (on && R.zoom) zoomTv(false);
+    R.nara = on;
+    R.el.classList.toggle('fb-nara', on);
+    const el = document.getElementById('rum-fbn');
+    if (on && el) {
+      fit();
+      for (const b of el.querySelectorAll('.rum-fb-r b')) {
+        clearInterval(b._t);
+        clearTimeout(b._d);
+        b.textContent = ' ';
+        b.dataset.c = ' ';
+        b.classList.remove('lit');
+      }
+      setBoard(el, R.lines, 0, !calm());
+      if (!still()) el.focus({ preventScroll: true });
+    } else if (el && el.contains(document.activeElement)) document.getElementById('rum-fb').focus({ preventScroll: true });
+    if (on) aim(centerOf(document.getElementById('rum-fb')), 1.3, [800, 420], calm() ? null : 'glid');
+    else aim([800, 500], 1, [800, 500], calm() ? null : 'glid');
+  }
+
   // T: tv:n nära, så att text-tv:n går att läsa och färgknapparna att trycka på.
   function zoomTv(on) {
+    if (on && R.nara) closeUp(false);
     R.zoom = on;
     R.el.classList.toggle('tv-nara', on);
     const tvEl = document.getElementById('rum-tv');
@@ -1002,12 +1059,17 @@ ${plane(0, paper())}
       R.ty = (e.clientY / innerHeight) * 2 - 1;
     });
     el.addEventListener('mouseover', (e) => {
-      const a = e.target.closest('.rum-sak, .rum-tag');
+      const a = e.target.closest('.rum-sak, .rum-tag, .rum-guld');
       hot(a ? a.dataset.nav : null);
     });
     el.addEventListener('click', (e) => {
       const ttxLink = e.target.closest('.ttx .fast a');
       if (ttxLink) return;
+      if (R.nara) {
+        // i närbilden leder raderna och guldordet vidare; utanför tavlan tillbaka
+        if (!e.target.closest('#rum-fbn, .rum-hdr, .rum-ft')) closeUp(false);
+        return;
+      }
       const a = e.target.closest('.rum-sak');
       if (a && el.contains(a)) go(a, e);
       else if (R.zoom && !e.target.closest('.rum-hdr, .rum-ft')) zoomTv(false);
@@ -1017,6 +1079,7 @@ ${plane(0, paper())}
       const k = e.key.toLowerCase();
       if (k === 'k') location.hash = 'kupong';
       else if (k === 't') zoomTv(!R.zoom);
+      else if (k === 'escape' && R.nara) closeUp(false);
       else if (k === 'escape' && R.zoom) zoomTv(false);
     });
     addEventListener('resize', fit);
@@ -1034,6 +1097,9 @@ ${plane(0, paper())}
     const s = Math.max(innerWidth / W, innerHeight / H);
     const st = R.el.querySelector('.rum-stage');
     st.style.transform = `translate(${((innerWidth - W * s) / 2).toFixed(1)}px, ${((innerHeight - H * s) / 2).toFixed(1)}px) scale(${s.toFixed(4)})`;
+    // närbilden av tavlan ryms mellan menyn och foten
+    const n = document.getElementById('rum-fbn');
+    if (n && n.offsetWidth) n.style.setProperty('--k', Math.min((innerWidth - 120) / n.offsetWidth, (innerHeight - 190) / n.offsetHeight, 1.3).toFixed(3));
   }
 
   // ---------- in och ut ----------
@@ -1051,12 +1117,14 @@ ${plane(0, paper())}
     R.on = true;
     fit();
     zoomTv(false);
+    if (R.nara) closeUp(false);
     hot(null);
     const ready = Promise.all([load(), three()]);
     if (still()) {
       // en fast bild: allt på samma tid, och klar när datan och gänget är ritade
       ready.then(() => {
         freezeCss(R.frozen);
+        if (q.has('rum-tavla')) closeUp(true);
         frame();
         document.body.dataset.rumKlar = '1';
       });
