@@ -533,7 +533,7 @@ a.rum-fb-r:hover b:not(.lit) { color: #fff; background: linear-gradient(180deg, 
 .rum-kup .side { border-left: 1px solid rgba(90, 70, 40, 0.25); padding-left: 16px; font-size: 13px; line-height: 21px; color: #4a4033; padding-top: 18px; }
 .rum-kup .side > span { display: flex; justify-content: space-between; border-bottom: 1px dotted rgba(90, 70, 40, 0.35); }
 .rum-kup .side b { font-weight: 700; color: #2b241b; }
-/* Tippare: rutor för DL, DT och DJ – den som har lämnat in står blekt */
+/* Tippare: rutor för DL, DT och DJ – de andra som har lämnat in står bleka */
 .rum-kup .side > .vem { flex-direction: column; border-bottom: 0; }
 .rum-kup .vem > span:last-child { display: flex; justify-content: space-between; margin-top: 3px; }
 .rum-kup .vem .box { width: 40px; font-size: 11px; font-weight: 700; letter-spacing: 0.5px; color: #8a7a62; }
@@ -582,7 +582,7 @@ a.rum-fb-r:hover b:not(.lit) { color: #fff; background: linear-gradient(180deg, 
   pointer-events: auto;
 }
 .rum-hand { position: absolute; z-index: 3; display: flex; justify-content: space-between; align-items: baseline; gap: 24px; font-family: Fraunces, Georgia, serif; }
-.rum-hand button {
+.rum-hand button, .rum-hand a {
   margin: 0;
   padding: 0;
   border: 0;

@@ -12,7 +12,7 @@
 //   krittavlan → Tabeller             pärmarna → Statistik
 //   namnet på dörren → Om oss
 //   kvittot → Kupong, tv:n zoomas in (T) med text-tv:ns färgknappar
-//   kupongen tas i handen och fylls i (K), eller → Kupong när man har lämnat in.
+//   kupongen tas i handen (K) – fylls i, ändras eller visas – eller → Kupong.
 // Pekar man på ett föremål lyser ordet i menyn som det leder till.
 //
 // Vanlig sida (#hem) är den vanliga förstasidan. I telefonen och i smala
@@ -869,7 +869,7 @@ ${closeHtml()}
     }).join('');
     const who = rd && rd.gang && rd.gang.length ? rd.gang.filter((g) => g.inne).length : null;
     const vem = own ? '<span class="vem"><span>Tippare</span><span>' + p.s.gang.map((g) => box(`vem${g.id}`, esc(g.id), g.id === p.vem,
-      p.val.includes(g.id) ? ` data-vem="${esc(g.id)}" aria-label="${esc(g.namn || g.id)}"` : null, g.inne ? ' inne' : '')).join('') + '</span></span>' : '';
+      p.val.includes(g.id) ? ` data-vem="${esc(g.id)}" aria-label="${esc(g.namn || g.id)}"` : null, g.inne && g.id !== p.vem ? ' inne' : '')).join('') + '</span></span>' : '';
     return '<span class="marks"></span>' +
       `<span class="band"><small>MATCHFIXARNA · TIPSKUPONG</small><b>${nr ? `Kupong ${nr}` : 'Kupong'}</b></span>` +
       `<span class="sub"><i>${esc((rd && rd.name) || '')}</i><span>${rows.length} matcher</span></span>` +
@@ -1204,8 +1204,10 @@ ${closeHtml()}
   // kupongen står Lägg tillbaka och guldordet Lämna in. Samma utkast och
   // samma inlämning som papperet under Kupong (Samtal.pult i samtal.js).
   // Esc, K, Lägg tillbaka eller ett klick utanför lägger tillbaka den samma
-  // väg baklänges. Har man lämnat in, eller har matcherna börjat, leder
-  // kupongen till Kupong som förut.
+  // väg baklänges. Har man lämnat in lyfts den med ens kryss och stämpeln:
+  // går tipsen att ändra (Samtal.pult: andra) heter guldordet Lämna in
+  // ändringen, annars leder Se de andras tips till Kupong. När alla har
+  // lämnat in, eller matcherna har börjat, leder kupongen till Kupong.
 
   // Läget för kupongen på pulten, om det är omgången som rummet visar.
   function pult(rd) {
@@ -1259,7 +1261,7 @@ ${closeHtml()}
   function openCoupon() {
     if (R.kup) return true;
     const p = pult();
-    if (!p || !p.fyll || !R.el) return false;
+    if (!p || !p.hand || !R.el) return false;
     zoomTv(false);
     if (R.nara) closeUp(false);
     const desk = document.getElementById('rum-kupong');
@@ -1267,11 +1269,17 @@ ${closeHtml()}
     const nr = typeof couponNumber === 'function' ? couponNumber(rd.ids) : null;
     desk.parentElement.insertAdjacentHTML('beforeend', '<div class="rum-dimma" id="rum-dimma"></div>' +
       `<div class="rum-flat rum-kup rum-handen" id="rum-handen" role="dialog" aria-modal="true" aria-label="${nr ? `Kupong ${nr}` : 'Kupong'}" tabindex="-1">` +
-      `${couponHtml(rd, roundRows(rd), p, true)}</div>`);
+      `${couponHtml(rd, roundRows(rd), p, p.fyll || p.andra)}</div>`);
+    // guldordet: Lämna in, Lämna in ändringen (när något är ändrat) eller,
+    // när dina tips står fast, de andras tips under Kupong
+    const go = p.fyll ? '<button type="button" class="guld" data-lamna>Lämna in</button>'
+      : p.andra ? '<button type="button" class="guld" data-lamna disabled>Lämna in ändringen</button>'
+        : '<a class="guld" href="#kupong">Se de andras tips</a>';
     R.el.insertAdjacentHTML('beforeend', '<div class="rum-hand" id="rum-hand"><button type="button" class="bla" data-tillbaka>Lägg tillbaka</button>' +
-      '<p class="msg" role="status"></p><button type="button" class="guld" data-lamna>Lämna in</button></div>');
+      `<p class="msg" role="status"></p>${go}</div>`);
     const el = document.getElementById('rum-handen');
-    const k = R.kup = { el, dim: document.getElementById('rum-dimma'), rad: document.getElementById('rum-hand'), pen: el.querySelector('.pencil'), at: PEN_PULT, desk };
+    const k = R.kup = { el, dim: document.getElementById('rum-dimma'), rad: document.getElementById('rum-hand'), pen: el.querySelector('.pencil'), at: PEN_PULT, desk,
+      andra: p.andra, orig: p.tecken, tecken: { ...p.tecken } };
     k.msg = k.rad.querySelector('.msg');
     k.go = k.rad.querySelector('[data-lamna]');
     desk.style.visibility = 'hidden';
@@ -1401,7 +1409,8 @@ ${closeHtml()}
     }
   }
 
-  // En ruta för ett tecken: kryssas i eller ur, och utkastet sparas.
+  // En ruta för ett tecken: kryssas i eller ur, och utkastet sparas – en
+  // ändring av dina inlämnade tips först när den lämnas in, som på papperet.
   function tick(b) {
     const k = R.kup;
     const row = b.closest('.row');
@@ -1412,7 +1421,11 @@ ${closeHtml()}
     else eraseCross(b);
     const sign = SIGNS.filter((s) => row.querySelector(`[data-s="${s}"]`).getAttribute('aria-pressed') === 'true').join('');
     row.classList.toggle('tom', !sign);
-    Samtal.pult.tippa(row.dataset.id, sign);
+    if (k.andra) {
+      if (sign) k.tecken[row.dataset.id] = sign;
+      else delete k.tecken[row.dataset.id];
+      k.go.disabled = Object.keys({ ...k.orig, ...k.tecken }).every((id) => (k.orig[id] || '') === (k.tecken[id] || ''));
+    } else Samtal.pult.tippa(row.dataset.id, sign);
     const rows = [...k.el.querySelectorAll('.row')];
     const n = rows.filter((r) => !r.classList.contains('tom')).length;
     const f = k.el.querySelector('[data-tippat]');
@@ -1443,16 +1456,19 @@ ${closeHtml()}
     const k = R.kup;
     if (!k || k.busy || k.closing) return;
     const p = pult();
-    if (!p || !p.fyll) {
+    if (!p || !(k.andra ? p.andra : p.fyll)) {
       k.msg.textContent = 'Kupongen går inte att lämna in längre.';
       return;
     }
-    if (!p.vem) {
+    if (k.andra) {
+      // en ändring får lämna matcher tomma, som på papperet
+      if (k.go.disabled) return;
+    } else if (!p.vem) {
       k.el.classList.add('need-vem');
       k.msg.textContent = 'Vem är du?';
       return;
     }
-    const left = p.s.matcher.filter((x) => !p.tecken[x.id]).length;
+    const left = k.andra ? 0 : p.s.matcher.filter((x) => !p.tecken[x.id]).length;
     if (left) {
       k.el.classList.add('need');
       k.msg.textContent = `${left === 1 ? 'En match saknar' : `${left} matcher saknar`} tecken.`;
@@ -1461,7 +1477,7 @@ ${closeHtml()}
     k.busy = true;
     k.go.disabled = true;
     k.msg.textContent = 'Lämnar in …';
-    const out = await Samtal.pult.lamnaIn();
+    const out = await Samtal.pult.lamnaIn(k.andra ? k.tecken : null);
     if (R.kup !== k) return;
     k.busy = false;
     k.go.disabled = false;
@@ -1471,9 +1487,13 @@ ${closeHtml()}
     }
     k.msg.textContent = '';
     k.go.disabled = true;
-    k.pen.insertAdjacentHTML('beforebegin', '<span class="stampel">Inlämnad</span>');
+    let st = k.el.querySelector('.stampel');
+    if (!st) {
+      k.pen.insertAdjacentHTML('beforebegin', '<span class="stampel">Inlämnad</span>');
+      st = k.pen.previousElementSibling;
+    }
     if (!calm()) {
-      k.pen.previousElementSibling.animate([
+      st.animate([
         { transform: 'rotate(-8deg) scale(1.9)', opacity: 0 },
         { transform: 'rotate(-8deg) scale(0.95)', opacity: 0.9, offset: 0.75 },
         { transform: 'rotate(-8deg) scale(1)', opacity: 0.82 },

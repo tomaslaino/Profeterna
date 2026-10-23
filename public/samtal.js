@@ -1595,11 +1595,14 @@
 
   // Tobaksaffären (rum.js) fyller i samma kupong på pulten: samma utkast på
   // enheten och samma inlämning som papperet här. state() → null utan
-  // omgång, annars {s, vem, tecken, inne, fyll, val}: tecken = dina (utkastet
-  // eller de inlämnade), inne = du har lämnat in, fyll = du kan fylla i den
-  // (du har inte lämnat in och första matchen har inte startat), val = vilka
-  // du kan kryssa för att du är – de som inte har lämnat in – och go =
-  // guldordet bredvid, som knappen i förstasidans ruta.
+  // omgång, annars {s, vem, tecken, inne, fyll, andra, hand, val, go}:
+  // tecken = dina (utkastet eller de inlämnade), inne = du har lämnat in,
+  // fyll = du kan fylla i den (du har inte lämnat in och första matchen har
+  // inte startat), andra = du har lämnat in och kan ändra, som på papperet
+  // här: tills du ser någon annans tips eller första matchen startar, hand =
+  // kupongen kan tas i handen (att fylla i, ändra eller se), val = vilka du
+  // kan kryssa för att du är – de som inte har lämnat in – och go = guldordet
+  // bredvid.
   const draftOf = (s, v) => {
     const d = kpLoad(TIPS);
     return d && d.id === s.id && !d.inne && (!d.vem || d.vem === v) ? d : null;
@@ -1614,9 +1617,13 @@
       const mine = inne ? mineIn(s, v) : draftOf(s, v);
       const du = v && s.gang.find((g) => g.id === v);
       const n = du ? tally(s, du) : mine ? s.matcher.filter((x) => mine.tecken[x.id]).length : 0;
+      const andra = Boolean(inne && open && mine && !(s.tips && Object.keys(s.tips).some((k) => k !== v)));
+      const hand = open && (!inne || Boolean(mine));
       return {
-        s, vem: v, inne, fyll: open && !inne, tecken: { ...((mine && mine.tecken) || {}) }, val: s.gang.filter((g) => !g.inne).map((g) => g.id),
-        go: !open ? 'Följ kupongen' : inne ? 'Se de andras tips' : n ? 'Fyll i resten' : 'Fyll i kupongen',
+        s, vem: v, inne, fyll: open && !inne, andra, hand, tecken: { ...((mine && mine.tecken) || {}) },
+        val: inne ? [] : s.gang.filter((g) => !g.inne).map((g) => g.id),
+        go: !open ? (s.visas && Date.now() < Math.min(...kicks(s)) ? 'Till uppgörelsen' : 'Följ kupongen')
+          : inne ? (andra ? 'Ändra kupongen' : 'Se kupongen') : n ? 'Fyll i resten' : 'Fyll i kupongen',
       };
     },
     // Du kryssar för vem du är; kryssen på kupongen följer med.
@@ -1637,12 +1644,18 @@
       else delete d.tecken[id];
       kpStore(TIPS, d);
     },
-    // → svaret från tjänsten, som för papperet här.
-    async lamnaIn() {
+    // → svaret från tjänsten, som för papperet här. tecken: en ändring av
+    // dina inlämnade tips, som sparas först när den lämnas in.
+    async lamnaIn(tecken = null) {
       const s = SM.data;
-      const d = s && draftOf(s, me());
-      if (!d || !me()) return { ok: false, error: 'Vem är du?' };
-      return handIn(s, { ...d, vem: me() });
+      const v = me();
+      if (s && tecken && submitted(s, v)) {
+        const t = mineIn(s, v);
+        return handIn(s, { ...handedIn(s), id: s.id, vem: v, inne: t.inne, tecken, kommentarer: { ...(t.kommentarer || {}) } });
+      }
+      const d = s && draftOf(s, v);
+      if (!d || !v) return { ok: false, error: 'Vem är du?' };
+      return handIn(s, { ...d, vem: v });
     },
   };
 
