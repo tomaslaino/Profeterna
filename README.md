@@ -1781,10 +1781,12 @@ sidan byts:
   klick eller T och vrids då mot en; den står på kupongens matcher live (377), och där finns
   också omgångens matcher, tabellerna och skytteligorna (se [Tv:n](#tvn)). Esc eller ett
   klick utanför zoomar ut.
-- **Videon** nere i hörnet till höger, en liten tv med inbyggd video på disken med de senaste
-  repriserna på VHS i en hög ovanpå, zoomas in med ett klick eller V; då glider fruktlådan
-  med resten av kassetterna in bredvid, och en kassett spelar matchens höjdpunkter i rutan
-  (se [Videon](#videon)). Esc, V eller ett klick utanför zoomar ut.
+- **Videon** nere i hörnet till höger, en liten tv med inbyggd video som står på disken med
+  ryggen mot väggen och rutan vänd mot rummet, med de senaste repriserna på VHS i en hög
+  ovanpå, zoomas in med ett klick eller V; då dras tv:n ut och vrids mot en, fruktlådan med
+  resten av kassetterna glider in bredvid, och en kassett spelar matchens höjdpunkter i rutan.
+  Ett klick på rutan går ännu närmare (se [Videon](#videon)). Esc, V eller ett klick utanför
+  zoomar ut.
 - **Namnet på dörren** (längst till vänster, under Stängt-skylten) → Om oss: *Matchfixarna*
   i bladguld på glaset, spegelvänt inifrån som neonskylten, med TOBAK & SPEL och *Öppet
   till spelstoppet* under. I fönster som är minst 8:5 syns hela dörren, och där står namnet
@@ -2280,13 +2282,18 @@ Statistiken om omgången är fördelad efter vad varje sak är bra på:
 
 ### Videon
 
-En liten färg-tv med inbyggd video står på disken nere i hörnet till höger, i svart plast
-med blå bild när ingen kassett spelar, *STOPP* i hörnet och klockan på displayen som blinkar
-på 12:00, som den alltid gjort ([public/rum-video.js](public/rum-video.js),
-[public/rum-video.css](public/rum-video.css)). Under rutan sitter kassettfacket, displayen
-och knapparna ◀◀ ▶ ▶▶ ⏏. Ovanpå ligger de fyra senaste repriserna på VHS i en hög, och
-resten (21 till) står i en fruktlåda i furu – *Arkivet* på en tejpbit, ÄPPLEN · KLASS I på
-brädan – som är utskjuten till höger om bilden och glider in längs disken när man går fram.
+En liten färg-tv med inbyggd video står på disken nere i hörnet till höger, med ryggen mot
+väggen och rutan vänd ut mot rummet och gänget, i svart plast med blå bild när ingen kassett
+spelar, *STOPP* i hörnet och klockan på displayen som blinkar på 12:00, som den alltid gjort
+([public/rum-video.js](public/rum-video.js), [public/rum-video.css](public/rum-video.css)).
+Den är en låda i CSS 3D – framsidan, sidorna med springor, taket och skuggan och skenet på
+disken – i rummets eget perspektiv (1000 bildpunkter från flyktpunkten 760, 400, som högra
+väggen), vriden 112 grader och så långt in längs väggen att den ryms i bilden; i det
+perspektivet ser en tv som bara är vriden lite ut att stå rakt mot en. Under rutan sitter
+kassettfacket, displayen och knapparna ◀◀ ▶ ▶▶ ⏏. Ovanpå ligger de fyra senaste repriserna
+på VHS i en hög, också de lådor (ryggen, taket och ändarna), och resten (21 till) står i en
+fruktlåda i furu – *Arkivet* på en tejpbit, ÄPPLEN · KLASS I på brädan – som är utskjuten
+till höger om bilden och glider in längs disken när man går fram.
 
 **Kassetterna** är matcher med YouTube-klipp (samma klipp som spelaren på sajten,
 [public/hojdpunkter.js](public/hojdpunkter.js)): omgångens matcher först, sedan de senaste dag för dag, Premier
@@ -2295,21 +2302,34 @@ pappfodral (vitt med rött, blått, svart med gult, grått med orange, samma fö
 med en handskriven etikett: lagen, resultatet och dagen. Långa namn skrivs mindre, och med
 Dolda resultat står inget resultat på etiketten och klippets rubrik täcks i rutan.
 
-**Nära** (klick eller V) går kameran fram rakt framifrån, så nära att tv:n, högen och lådan
-ryms mellan namnet och foten (högst sex gånger), och kassetterna lyfter lite när man pekar
-på dem. Ett klick på en kassett: den lyfts, ställs framför facket och skjuts in, luckan
-fälls upp, och de ovanför sjunker ner i luckan i högen. Rutan blir svart med *▶ SPELA* tills
-bilden kommer, och klippet spelas i YouTubes spelare (`youtube-nocookie.com`, i 16:9 med
-svarta kanter i den 4:3-stora rutan) med displayen som räknar tiden. ▶ spelar eller
-pausar, ◀◀ och ▶▶ (och piltangenterna) byter till en nyare eller äldre kassett, och ⏏ matar
+**Nära** (klick eller V) dras tv:n ut från väggen och vrids rakt fram medan kameran går
+fram, så nära att tv:n, högen och lådan ryms mellan namnet och foten (högst sex gånger), och
+kassetterna lyfter lite när man pekar på dem. Ett klick på rutan (eller hjulet framåt) går
+ännu närmare, så att rutan och knapparna fyller bilden (högst tolv gånger); ett klick till,
+hjulet bakåt eller Esc går tillbaka till tv:n och lådan. Ett klick på en kassett: den
+lyfts, ställs framför facket och skjuts in, luckan fälls upp, och de ovanför sjunker ner i
+luckan i högen. Rutan är blå med *▶ SPELA* tills bilden kommer, och klippet spelas i
+YouTubes spelare (`youtube-nocookie.com`, i 16:9 med svarta kanter i den 4:3-stora rutan)
+med displayen som räknar tiden. ▶ spelar eller pausar, ◀◀ och ▶▶ (och piltangenterna) byter till en nyare eller äldre kassett, och ⏏ matar
 ut – kassetten åker tillbaka till sin plats. När klippet är slut matas den ut av sig själv.
 Går inget av matchens klipp att spela här blir det myrornas krig, och klippen hoppas över
 nästa gång (samma lista som spelaren på sajten). Går man därifrån pausar videon, och den
 frusna bilden står kvar i rutan; tillbaka och den spelar vidare. Rummet stängs och videon
-stannar. Med `prefers-reduced-motion` åker kassetterna direkt och lådan står på plats.
+stannar. Med `prefers-reduced-motion` åker kassetterna direkt och tv:n och lådan står på
+plats.
 
-Hörnet ritas i sex gånger storleken och förminskas, som tv:n, så att det är skarpt på nära
-håll och YouTubes spelare får sin vanliga storlek. Väggen, disken och pulten fortsätter till
+**Att det är YouTube syns inte.** Spelaren har inga egna knappar (`controls=0`), får aldrig
+musen och textas inte (`hl=en` och `unloadModule('captions')`). Rubriken, kanalens bild,
+knappen i mitten och loggan syns ändå i drygt tre sekunder varje gång ett klipp börjar spela,
+spolas eller spelar vidare – men inte vid paus, och inte när ljudet slås av och på. Därför
+visar videon sin blå bild med *▶ SPELA*, utan ljud, tills klippet har spelat i 3,6 sekunder
+(`FORVARM`); när den spelar vidare efter en paus spolar den först tillbaka lika mycket, så
+att bilden fortsätter där den stannade. Slutet, och förslagen efter det, täcks direkt.
+
+Hörnet ritas i sex gånger storleken och dubbelt till (`zoom: 2`) och förminskas, som tv:n,
+så att det är skarpt också när man går närmare rutan; ritningarna är bara så stora som tv:n
+och lådan, så att lagren inte blir större än de behöver. Spelaren är dubbelt så stor som
+rutan och förminskas, så att klippet är skarpt nära. Väggen, disken och pulten fortsätter till
 höger om bilden (`vagg` och `pult` i rum-video.js, i samma plan och med samma toner som i
 rum.js), så att lådan står på något. `?rum-video` visar videon nära i en fast bild.
 

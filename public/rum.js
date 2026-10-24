@@ -396,7 +396,7 @@ ${window.RumRegister ? RumRegister.nara() : ''}
     // kort: högst elva tecken
     R.tv = window.RumTv ? RumTv.mount(el, { calm, short, kort: (n) => BOARD[n] || short(n), wd, hm, matches: () => (state.all && state.all.matches) || [] }) : null;
     R.ans = window.RumAnslag ? RumAnslag.mount(el, { calm, kort: (n) => BOARD[n] || short(n), close: () => board(false) }) : null;
-    R.video = window.RumVideo ? RumVideo.mount(el, { calm, short, kort: (n) => BOARD[n] || short(n) }) : null;
+    R.video = window.RumVideo ? RumVideo.mount(el, { calm, short, kort: (n) => BOARD[n] || short(n), aim: (f) => { R.vf = f; aimVideo(calm() ? null : 'glid'); } }) : null;
     R.reg = window.RumRegister ? RumRegister.mount(el, { calm, kort: (n) => BOARD[n] || short(n), close: () => register(false) }) : null;
     paintUte();
   }
@@ -1099,13 +1099,14 @@ ${window.RumRegister ? RumRegister.nara() : ''}
     else aim([800, 500], 1, [800, 500], calm() ? null : 'glid');
   }
   function aimVideo(cls) {
-    // hörnet i planet -598 (1,035 gånger), och det som syns av scenen
+    // hörnet i planet -598 (1,035 gånger), och det som syns av scenen;
+    // förstoringen högst f.z (rutan nära, rum-video.js), annars sex
     const f = R.vf;
     const [x0, x1] = [f.x0, f.x1].map((x) => 800 + (x - 800) * 1.035);
     const [y0, y1] = [f.y0, f.y1].map((y) => 500 + (y - 500) * 1.035);
     const [vx0, vx1] = [-R.ox / R.k, (innerWidth - R.ox) / R.k];
     const [vy0, vy1] = [(64 - R.oy) / R.k, (innerHeight - 56 - R.oy) / R.k];
-    const z = Math.min(6, ((vx1 - vx0) * 0.92) / (x1 - x0), ((vy1 - vy0) * 0.92) / (y1 - y0));
+    const z = Math.min(f.z || 6, ((vx1 - vx0) * 0.92) / (x1 - x0), ((vy1 - vy0) * 0.92) / (y1 - y0));
     aim([(x0 + x1) / 2, (y0 + y1) / 2], z, [(vx0 + vx1) / 2, (vy0 + vy1) / 2], cls);
   }
 
