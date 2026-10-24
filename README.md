@@ -2317,8 +2317,8 @@ väggen), vriden 112 grader och så långt in längs väggen att den ryms i bild
 perspektivet ser en tv som bara är vriden lite ut att stå rakt mot en. Under rutan sitter
 kassettfacket, displayen och knapparna ◀◀ ▶ ▶▶ ⏏. Ovanpå ligger de fyra senaste repriserna
 på VHS i en hög, också de lådor (ryggen, taket och ändarna), och resten (21 till) står i en
-fruktlåda i furu – *Arkivet* på en tejpbit, ÄPPLEN · KLASS I på brädan – som är utskjuten
-till höger om bilden och glider in längs disken när man går fram.
+fruktlåda i furu – *Arkivet* på en tejpbit, ÄPPLEN · KLASS I på brädan – som står still på
+disken till höger, precis utanför bilden också när rummet vrids efter musen.
 
 **Kassetterna** är matcher med YouTube-klipp (samma klipp som spelaren på sajten,
 [public/hojdpunkter.js](public/hojdpunkter.js)): omgångens matcher först, sedan de senaste dag för dag, Premier
@@ -2327,8 +2327,10 @@ pappfodral (vitt med rött, blått, svart med gult, grått med orange, samma fö
 med en handskriven etikett: lagen, resultatet och dagen. Långa namn skrivs mindre, och med
 Dolda resultat står inget resultat på etiketten och klippets rubrik täcks i rutan.
 
-**Nära** (klick eller V) dras tv:n ut från väggen och vrids rakt fram medan kameran går
-fram, så nära att tv:n, högen och lådan ryms mellan namnet och foten (högst sex gånger), och
+**Nära** (klick eller V) vrids tv:n på stället rakt fram medan kameran går fram – den står
+kvar mot väggen, och lådan kommer in i bilden där den står – så nära att tv:n, högen och
+lådan ryms mellan namnet och foten (högst sex gånger; tv:n står längre in än lådan, så
+kameran siktar dit rutan och facket syns, och kassetterna ur lådan blir mindre på vägen), och
 kassetterna lyfter lite när man pekar på dem. Ett klick på rutan (eller hjulet framåt) går
 ännu närmare, så att rutan fyller bilden (högst sexton gånger; i telefonen på höjden syns
 knapparna under den); ett klick till,
@@ -2345,8 +2347,7 @@ eller äldre kassett. När klippet är slut matas den ut av sig själv.
 Går inget av matchens klipp att spela här blir det myrornas krig, och klippen hoppas över
 nästa gång (samma lista som spelaren på sajten). Går man därifrån pausar videon, och den
 frusna bilden står kvar i rutan; tillbaka och den spelar vidare. Rummet stängs och videon
-stannar. Med `prefers-reduced-motion` åker kassetterna direkt och tv:n och lådan står på
-plats.
+stannar. Med `prefers-reduced-motion` åker kassetterna direkt och tv:n vrids direkt.
 
 **Att det är YouTube syns inte.** Spelaren har inga egna knappar (`controls=0`), får aldrig
 musen och textas inte (`hl=en` och `unloadModule('captions')`). Rubriken, kanalens bild,
