@@ -17,7 +17,8 @@
    i hörnet och inte sticker ut så långt i rummet */
 .rum-tvpos { position: absolute; left: 1206px; top: 100px; width: 292px; height: 196px; transform-style: preserve-3d; transform-origin: 0 0 -130px; transform: scale3d(0.78, 0.78, 0.78); }
 .rum-tv3 {
-  --tra: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='320' height='160'%3E%3Cfilter id='w' x='0' y='0' width='100%25' height='100%25'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.0035 .11' numOctaves='4' seed='11' stitchTiles='stitch'/%3E%3CfeColorMatrix values='0 0 0 0 .15  0 0 0 0 .08  0 0 0 0 .03  0 0 0 -2.4 1.32'/%3E%3C/filter%3E%3Crect width='320' height='160' filter='url(%23w)'/%3E%3C/svg%3E") 0 0 / 320px 160px, linear-gradient(180deg, #6e4a2c, #523520);
+  /* mörkgrå plast med ett fint korn */
+  --plast: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='120' height='120'%3E%3Cfilter id='k' x='0' y='0' width='100%25' height='100%25'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.9' numOctaves='2' seed='4' stitchTiles='stitch'/%3E%3CfeColorMatrix values='0 0 0 0 1  0 0 0 0 1  0 0 0 0 1  0 0 0 .07 0'/%3E%3C/filter%3E%3Crect width='120' height='120' filter='url(%23k)'/%3E%3C/svg%3E") 0 0 / 120px 120px, linear-gradient(180deg, #4a4b4f, #353639);
   position: absolute;
   left: 0;
   top: 0;
@@ -37,13 +38,13 @@
 
 /* ---------- lådan ---------- */
 
-.tv-f { position: absolute; transform-origin: 0 0; background: var(--tra); }
-.tv-topp { left: 0; top: 0; width: 292px; height: 105px; transform: rotateX(-90deg); background: linear-gradient(rgba(255, 236, 200, 0.12), rgba(255, 236, 200, 0.12)), var(--tra); }
-.tv-botten { left: 0; top: 196px; width: 292px; height: 105px; transform: rotateX(-90deg); background: linear-gradient(180deg, rgba(10, 5, 2, 0.55), rgba(10, 5, 2, 0.8)), var(--tra); }
-.tv-vanster { left: 0; top: 0; width: 105px; height: 196px; transform: rotateY(90deg); background: linear-gradient(90deg, rgba(10, 5, 2, 0.28), rgba(10, 5, 2, 0.6)), var(--tra); }
-.tv-hoger { left: 292px; top: 0; width: 105px; height: 196px; transform: rotateY(90deg); background: linear-gradient(rgba(10, 5, 2, 0.5), rgba(10, 5, 2, 0.5)), var(--tra); }
-/* bildrörets kåpa: brun plast med luftspringor */
-.tv-kapa { background: repeating-linear-gradient(90deg, rgba(0, 0, 0, 0) 0 9px, rgba(0, 0, 0, 0.55) 9px 11px), linear-gradient(180deg, #2a2119, #18130e); }
+.tv-f { position: absolute; transform-origin: 0 0; background: var(--plast); }
+.tv-topp { left: 0; top: 0; width: 292px; height: 105px; transform: rotateX(-90deg); background: linear-gradient(rgba(255, 255, 255, 0.1), rgba(255, 255, 255, 0.1)), var(--plast); }
+.tv-botten { left: 0; top: 196px; width: 292px; height: 105px; transform: rotateX(-90deg); background: linear-gradient(180deg, rgba(10, 5, 2, 0.55), rgba(10, 5, 2, 0.8)), var(--plast); }
+.tv-vanster { left: 0; top: 0; width: 105px; height: 196px; transform: rotateY(90deg); background: linear-gradient(90deg, rgba(10, 5, 2, 0.28), rgba(10, 5, 2, 0.6)), var(--plast); }
+.tv-hoger { left: 292px; top: 0; width: 105px; height: 196px; transform: rotateY(90deg); background: linear-gradient(rgba(10, 5, 2, 0.5), rgba(10, 5, 2, 0.5)), var(--plast); }
+/* bildrörets kåpa: grå plast med luftspringor */
+.tv-kapa { background: repeating-linear-gradient(90deg, rgba(0, 0, 0, 0) 0 9px, rgba(0, 0, 0, 0.6) 9px 11px), linear-gradient(180deg, #2e2f32, #1b1c1e); }
 .k-topp { left: 40px; top: 24px; width: 212px; height: 22px; transform: translateZ(-105px) rotateX(-90deg); }
 .k-botten { left: 40px; top: 172px; width: 212px; height: 22px; transform: translateZ(-105px) rotateX(-90deg); filter: brightness(0.55); }
 .k-vanster { left: 40px; top: 24px; width: 22px; height: 148px; transform: translateZ(-105px) rotateY(90deg); filter: brightness(0.75); }
@@ -127,24 +128,24 @@
   top: 0;
   width: 292px;
   height: 196px;
-  border-radius: 5px;
-  background: linear-gradient(180deg, rgba(255, 238, 205, 0.13), rgba(255, 238, 205, 0) 22%, rgba(0, 0, 0, 0) 70%, rgba(0, 0, 0, 0.28)), var(--tra);
-  box-shadow: inset 0 1px 0 rgba(255, 236, 200, 0.25), inset 0 -2px 0 rgba(0, 0, 0, 0.35);
+  border-radius: 6px;
+  background: linear-gradient(180deg, rgba(255, 255, 255, 0.1), rgba(255, 255, 255, 0) 30%, rgba(0, 0, 0, 0) 60%, rgba(0, 0, 0, 0.16)), var(--plast);
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.22), inset 0 -2px 0 rgba(0, 0, 0, 0.45);
 }
 .tv-front > * { position: absolute; }
 
-/* ramen kring rutan: mörk plast med en krom list */
+/* ramen kring rutan: svart plast med en silverlist */
 .tv-ram {
   left: 12px;
   top: 12px;
   width: 214px;
   height: 166px;
-  border-radius: 12px;
-  background: radial-gradient(120% 120% at 40% 30%, #2a241d, #120f0b);
-  box-shadow: 0 0 0 1.5px #8d8a82, 0 0 0 3px #22180f, inset 0 1px 1px rgba(255, 255, 255, 0.12), inset 0 0 8px rgba(0, 0, 0, 0.8);
+  border-radius: 9px;
+  background: radial-gradient(120% 120% at 40% 30%, #1d1e20, #111113);
+  box-shadow: 0 0 0 1px #6c6e73, 0 0 0 2.5px #1e1f22, inset 0 1px 1px rgba(255, 255, 255, 0.1), inset 0 0 7px rgba(0, 0, 0, 0.9);
 }
 
-/* bildröret: buktigt glas med rundade hörn */
+/* bildröret: lite buktigt glas med rundade hörn */
 .tv-glas {
   position: absolute;
   left: 11px;
@@ -152,7 +153,7 @@
   width: 192px;
   height: 144px;
   overflow: hidden;
-  border-radius: 20px / 24px;
+  border-radius: 14px / 17px;
   background: radial-gradient(90% 90% at 50% 46%, #161a18, #0b0d0c 70%, #050606);
   box-shadow: 0 0 0 1px #050505, 0 1px 1px rgba(255, 255, 255, 0.1);
   transition: filter 0.25s ease;
@@ -266,7 +267,7 @@
   100% { transform: scale(0.6111, 0.3667); filter: none; }
 }
 
-/* ---------- panelen: gulnat borstat aluminium ---------- */
+/* ---------- panelen: en svart nisch till höger om rutan ---------- */
 
 .tv-panel {
   left: 234px;
@@ -274,63 +275,50 @@
   width: 46px;
   height: 166px;
   border-radius: 3px;
-  background:
-    repeating-linear-gradient(0deg, rgba(255, 255, 255, 0.05) 0 1px, rgba(0, 0, 0, 0.04) 1px 2px),
-    linear-gradient(90deg, #8c8778, #c9c2ab 38%, #a39d88 70%, #807b6c);
-  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.45), inset 0 -1px 0 rgba(0, 0, 0, 0.35), 0 0 0 1px rgba(0, 0, 0, 0.5);
+  background: linear-gradient(180deg, #2a2b2e, #222326);
+  box-shadow: inset 0 1px 2px rgba(0, 0, 0, 0.7), 0 0 0 1px rgba(255, 255, 255, 0.08);
 }
 .tv-panel > * { position: absolute; }
-/* färgmärket med regnbågen */
-.tv-farg { left: 5px; top: 6px; width: 36px; height: 13px; display: flex !important; align-items: center; gap: 1px; padding: 0 3px; box-sizing: border-box; border-radius: 2px; background: #15130f; box-shadow: inset 0 0 0 1px #6e6a5e; }
-.tv-farg b { width: 2px; height: 9px; transform: skewX(-18deg); }
-.tv-farg b:nth-child(1) { background: #e63a2e; } .tv-farg b:nth-child(2) { background: #f39a2b; } .tv-farg b:nth-child(3) { background: #f3d93a; }
-.tv-farg b:nth-child(4) { background: #4cb34a; } .tv-farg b:nth-child(5) { background: #3a6fd6; }
-.tv-farg em { margin-left: 2px; font: italic 600 7.5px/1 Fraunces, Georgia, serif; color: #d9d6cc; }
-/* sifferdisplayen bakom rött glas */
-.tv-led { left: 5px; top: 25px; width: 36px; height: 20px; padding: 3px 3px 2px; box-sizing: border-box; border-radius: 2px; background: linear-gradient(180deg, #2a0705, #160302); box-shadow: inset 0 1px 3px #000, 0 1px 0 rgba(255, 255, 255, 0.35); }
+/* sifferdisplayen: grönt ljus bakom mörkt glas */
+.tv-led { left: 5px; top: 7px; width: 36px; height: 20px; padding: 3px 3px 2px; box-sizing: border-box; border-radius: 2px; background: linear-gradient(180deg, #06140e, #030a07); box-shadow: inset 0 1px 3px #000, 0 1px 0 rgba(255, 255, 255, 0.12); }
 .tv-led svg { display: block; width: 100%; height: 100%; overflow: visible; }
-.tv-led rect { fill: #3d0b07; }
-.tv-led rect.on { fill: #ff4a2e; filter: drop-shadow(0 0 1.2px #ff3010); }
-/* sidknapparna: krämvit plast */
+.tv-led rect { fill: #0c2a1c; }
+.tv-led rect.on { fill: #56ffb4; filter: drop-shadow(0 0 1.2px #2cffa0); }
+/* knappsatsen: runda grå knappar, 1–9 och ▼ 0 ▲ i ljusare grått */
+.tv-sats { left: 4px; top: 36px; width: 38px; display: grid !important; grid-template-columns: repeat(3, 11px); gap: 3px 2.5px; justify-content: center; }
 .tv-k {
-  left: 8px;
-  width: 30px;
-  height: 18px;
+  position: relative;
+  width: 11px;
+  height: 9.5px;
   margin: 0;
   padding: 0;
   border: 0;
-  border-radius: 2.5px;
-  background: linear-gradient(180deg, #f1e9d4, #d3c7a8);
-  box-shadow: 0 1.5px 0 #857a60, 0 3px 3px rgba(0, 0, 0, 0.45), inset 0 1px 0 rgba(255, 255, 255, 0.8);
-  color: #3b352b;
-  font: 8px/18px sans-serif;
+  border-radius: 4.75px;
+  background: radial-gradient(circle at 45% 35%, #8b8d92, #55575c 70%);
+  box-shadow: 0 0.8px 0 #0a0a0b, inset 0 0.5px 0 rgba(255, 255, 255, 0.3);
+  color: #f2f2f2;
+  font: 600 5px/9.5px "Helvetica Neue", Helvetica, Arial, sans-serif;
   cursor: pointer;
   transition: transform 0.06s, box-shadow 0.06s;
 }
-.tv-k[data-tv="upp"] { top: 52px; }
-.tv-k[data-tv="ner"] { top: 76px; }
-.tv-k:active { transform: translateY(1.2px); box-shadow: 0 0.3px 0 #857a60, 0 1px 1px rgba(0, 0, 0, 0.45), inset 0 1px 2px rgba(0, 0, 0, 0.2); }
-.rum-tv3.nara .tv-k:hover { background: linear-gradient(180deg, #fff7e2, #ddd2b4); }
-.tv-k:focus-visible, .tv-pa:focus-visible { outline: 1.5px solid #f0d699; outline-offset: 1.5px; }
-/* högtalargallret */
-.tv-galler { left: 6px; top: 102px; width: 34px; height: 38px; border-radius: 2px; background: radial-gradient(circle, #1a1712 0.85px, rgba(0, 0, 0, 0) 1.15px) 0 0 / 3.4px 3.4px, rgba(0, 0, 0, 0.12); box-shadow: inset 0 1px 1px rgba(0, 0, 0, 0.35); }
+.tv-k.pil { background: radial-gradient(circle at 45% 35%, #b9bbc0, #7d7f84 70%); color: #1d1d1f; font-size: 4.5px; }
+/* hela mellanrummet hör till närmaste knapp, så att de går att träffa med fingret */
+.tv-k::after { content: ""; position: absolute; inset: -1.5px -1.25px; }
+.tv-k:active { transform: translateY(0.6px); box-shadow: 0 0.2px 0 #0a0a0b, inset 0 1px 1px rgba(0, 0, 0, 0.3); }
+.rum-tv3.nara .tv-k:hover { background: radial-gradient(circle at 45% 35%, #a3a5aa, #64666b 70%); }
+.rum-tv3.nara .tv-k.pil:hover { background: radial-gradient(circle at 45% 35%, #d2d4d8, #8e9095 70%); }
+.tv-k:focus-visible, .tv-pa:focus-visible { outline: 1px solid #f0d699; outline-offset: 1px; }
+/* högtalargallret: springor */
+.tv-galler { left: 6px; top: 93px; width: 34px; height: 44px; border-radius: 2px; background: repeating-linear-gradient(180deg, #0d0d0e 0 1.4px, rgba(0, 0, 0, 0) 1.4px 3px), #3a3b3f; box-shadow: inset 0 1px 1px rgba(0, 0, 0, 0.35); }
 /* strömbrytaren och lampan (grön på, röd av) */
-.tv-pa { left: 8px; top: 148px; width: 13px; height: 13px; margin: 0; padding: 0; border: 0; border-radius: 50%; background: radial-gradient(circle at 40% 35%, #f4f2ec, #9b978c 60%, #5e5b53); box-shadow: 0 1px 2px rgba(0, 0, 0, 0.6), inset 0 -1px 1px rgba(0, 0, 0, 0.3); cursor: pointer; }
+.tv-pa { left: 8px; top: 147px; width: 13px; height: 13px; margin: 0; padding: 0; border: 0; border-radius: 50%; background: radial-gradient(circle at 40% 35%, #c8cace, #6f7176 60%, #3e4044); box-shadow: 0 1px 2px rgba(0, 0, 0, 0.6), inset 0 -1px 1px rgba(0, 0, 0, 0.3); cursor: pointer; }
 .tv-pa:active { transform: scale(0.92); }
-.tv-lampa { left: 28px; top: 152px; width: 5px; height: 5px; border-radius: 50%; background: #5dff7a; box-shadow: 0 0 4px 1px rgba(80, 255, 120, 0.7); }
+.tv-lampa { left: 28px; top: 151px; width: 5px; height: 5px; border-radius: 50%; background: #5dff7a; box-shadow: 0 0 4px 1px rgba(80, 255, 120, 0.7); }
 .rum-tv3.av .tv-lampa { background: #ff3a2a; box-shadow: 0 0 4px 1px rgba(255, 60, 40, 0.6); }
 
-/* krombokstäverna under rutan */
-.tv-namn {
-  left: 22px;
-  top: 182px;
-  font: 700 6.5px/1 Fraunces, Georgia, serif;
-  letter-spacing: 1.6px;
-  background: linear-gradient(180deg, #f6f4ee, #8f8b80 55%, #d6d3ca);
-  -webkit-background-clip: text;
-  background-clip: text;
-  color: transparent;
-}
+/* märket under rutan, och FASTEXT (snabbvalen i fyra färger) under panelen */
+.tv-namn { left: 12px; top: 182px; width: 214px; text-align: center; font: 700 8px/1 "Helvetica Neue", Helvetica, Arial, sans-serif; letter-spacing: -0.1px; color: #e9eaee; }
+.tv-fast { left: 234px; top: 183.5px; width: 46px; text-align: center; font: 600 4.3px/1 "Helvetica Neue", Helvetica, Arial, sans-serif; letter-spacing: 0.6px; color: #b9bbc0; }
 
 /* ---------- klicket ---------- */
 

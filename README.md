@@ -1782,7 +1782,7 @@ sidan byts; oraklet, skårtavlan, uret och VM 94-affischen tittar man först på
   initialerna i personens bläck (samma som på papperet under Kupong) och stämpeln
   *Inlämnad*, men inga tecken. Din egen tas i handen, och de andras när du ser deras tips
   (se nedan). Innan dess lyfts en annans kupong bara lite i ena kanten och faller tillbaka.
-- **Tv:n** uppe i hörnet till höger, en tjock-tv i träfaner med text-tv på en arm från väggen, zoomas in med ett
+- **Tv:n** uppe i hörnet till höger, en mörkgrå Panasonic från nittiotalet med text-tv på en arm från väggen, zoomas in med ett
   klick eller T och vrids då mot en; den står på kupongens matcher live (377), och där finns
   också omgångens matcher, tabellerna och skytteligorna (se [Tv:n](#tvn)). Esc eller ett
   klick utanför zoomar ut.
@@ -2115,19 +2115,21 @@ exakt där den låg och landar exakt på sin plats i högen.
 
 ### Tv:n
 
-En tjock-tv från början av åttiotalet står på en svartlackerad hylla på en arm från högra
+En mörkgrå Panasonic från nittiotalet står på en svartlackerad hylla på en arm från högra
 väggen uppe i hörnet, vriden ut mot rummet så att gänget vid fönstret också ser den, men
 mest mot pulten, och lite nedåt ([public/rum-tv.js](public/rum-tv.js),
 [public/rum-tv.css](public/rum-tv.css)). Lådan är byggd i CSS 3D i samma värld som resten av
-rummet (planet -470, som därför bevarar djupet): träfaner, högersidan och hyllan under som
+rummet (planet -470, som därför bevarar djupet): grå plast, högersidan och hyllan under som
 syns och följer musen, bildrörets kåpa med luftspringor bakom och kaninöronen på taket med
 en bit folie på det ena. Armen går från leden mitt bak till en väggplatta, och sladden
 hänger i en båge från armen till ett uttag under plattan; armen står still när tv:n vrids
 kring leden. Allt är förminskat mot väggen, så att tv:n inte sticker ut så långt i rummet,
-och nära zoomar kameran in lite mer (3,6). Rutan är buktig med rundade hörn, svepljus och
-ett svagt ljusband som rullar nedför glaset, och den lyser blått på väggen. Till höger
-sitter panelen i gulnat aluminium: färgmärket med regnbågen, en röd sifferdisplay med
-sidnumret, sidknapparna ▲ ▼, högtalargallret och strömbrytaren med lampan.
+och nära zoomar kameran in lite mer (3,6). Rutan är lite buktig med rundade hörn, svepljus
+och ett svagt ljusband som rullar nedför glaset, i en svart ram med en silverlist, och den
+lyser blått på väggen. Under rutan står Panasonic. Till höger sitter panelen i en svart
+nisch: en grön sifferdisplay med sidnumret, knappsatsen med runda grå knappar (1–9 och
+▼ 0 ▲ längst ner, pilarna ljusare), högtalargallret med springor och strömbrytaren med
+lampan, och under den FASTEXT – snabbvalen i fyra färger.
 
 **Text-tv som SVT:s:** 40 × 25 tecken (VT323, utan ligaturer), rubrikraden med sidnumret,
 *Matchfix Text*, datumet och klockan som tickar, ett blått band med rubriken i mosaikgrafik
@@ -2171,9 +2173,11 @@ det gäller där också.
 **Nära** (klick eller T) vrids tv:n rakt fram och kameran ställer sig rakt framför (musen
 vrider inte rummet medan tv:n är nära), så att rutan blir en rak rektangel – vriden mot
 ögat blir den sned, eftersom den sitter högt upp till höger. Man byter sida med ▲ ▼ på
-panelen eller piltangenterna (undersidorna först, sedan nästa sida i nummerordning, runt
+knappsatsen eller piltangenterna (undersidorna först, sedan nästa sida i nummerordning, runt
 från 384 till 300), snabbvalen, raderna som leder vidare, divisionerna i bandet eller tre
-siffror som på fjärrkontrollen; displayen visar siffrorna medan man slår dem. På håll
+siffror på knappsatsen eller tangentbordet; displayen och rubrikraden visar siffrorna medan
+man slår dem (*37-*), och den tredje söker sidan. Knapparna tar hela mellanrummet runt sig,
+så att de går att träffa med fingret i telefonen. På håll
 bläddrar undersidorna själva var tolfte sekund. Tv:n söker
 som förr: sidnumret i rubrikraden rullar fram i grönt tills sidan kommer, och sidan ritas
 uppifrån och ner – finns den inte går tv:n tillbaka. Strömbrytaren stänger av: bilden dras

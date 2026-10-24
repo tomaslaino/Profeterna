@@ -1,13 +1,13 @@
-// Tv:n i tobaksaffären (rum.js): en tjock-tv i träfaner från början av
-// åttiotalet som står på en hylla på en arm från högra väggen, vriden ut mot
-// rummet men mest mot pulten. Lådan är byggd i CSS 3D (rum-tv.css) i samma
-// värld som resten av rummet, så att högersidan och hyllan under syns och
-// följer musen, och bakom den sticker bildrörets kåpa ut. Armen går till en
-// platta på väggen, och sladden hänger från den ner till uttaget. På taket
-// står kaninöronen, det ena med en bit folie för bättre bild. Till höger om
-// rutan sitter panelen: färgmärket, den röda sifferdisplayen med sidnumret,
-// sidknapparna ▲ ▼, högtalargallret och strömbrytaren. När man går fram till
-// tv:n (T) vrids den mot en.
+// Tv:n i tobaksaffären (rum.js): en mörkgrå Panasonic från nittiotalet som
+// står på en hylla på en arm från högra väggen, vriden ut mot rummet men
+// mest mot pulten. Lådan är byggd i CSS 3D (rum-tv.css) i samma värld som
+// resten av rummet, så att högersidan och hyllan under syns och följer
+// musen, och bakom den sticker bildrörets kåpa ut. Armen går till en platta
+// på väggen, och sladden hänger från den ner till uttaget. På taket står
+// kaninöronen, det ena med en bit folie för bättre bild. Till höger om rutan
+// sitter panelen: den gröna displayen med sidnumret, knappsatsen (1–9, ▼ 0
+// ▲), högtalargallret och strömbrytaren. När man går fram till tv:n (T)
+// vrids den mot en.
 //
 // Text-tv som SVT:s: 40 × 25 tecken, rubrikraden med sidnumret, datumet och
 // klockan som tickar, ett blått band med rubriken i mosaikgrafik, text i sju
@@ -35,10 +35,10 @@
 // uppifrån och ner. Dolda resultat (Spoiler) står som ?, och har en division
 // dolda matcher visar tabellen och skytteligan bara det, med Visa ändå.
 //
-// Sidbyten när tv:n är nära: sidknapparna och piltangenterna (nästa sida i
+// Sidbyten när tv:n är nära: ▲ ▼ och piltangenterna (nästa sida i
 // nummerordning, undersidorna först), snabbvalen, raderna som leder vidare,
-// divisionerna i bandet eller tre siffror (som på fjärrkontrollen). På håll
-// bläddrar undersidorna själva var tolfte sekund.
+// divisionerna i bandet eller tre siffror på knappsatsen eller tangentbordet.
+// På håll bläddrar undersidorna själva var tolfte sekund.
 //
 // RumTv.html() → tv:n (i planet -470 i rum.js)
 // RumTv.mount(el, { calm, short, kort, wd, hm, matches }) → { fill(rows, { spel, next }), zoom(on) → rutans mått, key(k) }
@@ -413,6 +413,9 @@ window.RumTv = (() => {
 
   // ---------- lådan ----------
 
+  // Knappsatsen i panelen: 1–9 och ▼ 0 ▲ längst ner.
+  const SATS = [...'123456789'].map((d) => [d, d]).concat([['ner', '▼', 'Föregående sida'], ['0', '0'], ['upp', '▲', 'Nästa sida']]);
+
   function html() {
     return '<i class="tv-sken" id="rum-tvsken"></i>' +
       '<div class="rum-tvpos"><div class="tv-fot"><i class="tv-platta"></i><i class="tv-arm"><i class="a-fram"></i><i class="a-under"></i></i><i class="tv-sladd"></i><i class="tv-uttag"></i></div>' +
@@ -424,13 +427,11 @@ window.RumTv = (() => {
       '<div class="tv-front" id="rum-tvfront" inert>' +
       '<div class="tv-ram"><div class="tv-glas" id="rum-ttx"><div class="tt"><div class="tr hd"></div><div class="tb"></div></div>' +
       '<i class="tv-scan"></i><i class="tv-glans"></i></div></div>' +
-      '<div class="tv-panel"><i class="tv-farg"><b></b><b></b><b></b><b></b><b></b><em>färg</em></i>' +
-      `<span class="tv-led" id="rum-tvled">${led(String(LIVE))}</span>` +
-      '<button type="button" class="tv-k" data-tv="upp" aria-label="Nästa sida"><i>▲</i></button>' +
-      '<button type="button" class="tv-k" data-tv="ner" aria-label="Föregående sida"><i>▼</i></button>' +
+      `<div class="tv-panel"><span class="tv-led" id="rum-tvled">${led(String(LIVE))}</span>` +
+      `<div class="tv-sats">${SATS.map(([k, t, label]) => `<button type="button" class="tv-k${label ? ' pil' : ''}" data-tv="${k}"${label ? ` aria-label="${label}"` : ''}>${t}</button>`).join('')}</div>` +
       '<i class="tv-galler"></i>' +
       '<button type="button" class="tv-pa" data-tv="pa" aria-label="Stäng av tv:n" aria-pressed="true"></button><i class="tv-lampa"></i></div>' +
-      '<i class="tv-namn">TEXT-TV</i></div>' +
+      '<i class="tv-namn">Panasonic</i><i class="tv-fast">FASTEXT</i></div>' +
       '<a class="rum-tv rum-sak" href="#matcher" data-nav="tv" aria-label="Text-tv" id="rum-tv"></a>' +
       '</div></div>';
   }
@@ -508,7 +509,8 @@ window.RumTv = (() => {
     }
     function tick() {
       if (root.hidden || !T.on) return;
-      const h = head(T.roll || T.nr, Boolean(T.roll));
+      // medan man slår siffrorna står de där sidnumret står, som på riktig text-tv
+      const h = head(T.typed ? T.typed.padEnd(3, '-') : T.roll || T.nr, Boolean(T.roll));
       if (hd.dataset.h !== h) {
         hd.innerHTML = h;
         hd.dataset.h = h;
@@ -579,6 +581,16 @@ window.RumTv = (() => {
       const nr = list[(ix + d + list.length) % list.length];
       go(nr, d < 0 ? subsOf(nr) - 1 : 0);
     }
+    // En siffra från knappsatsen eller tangentbordet: tre siffror väljer sida,
+    // och displayen visar dem medan man slår dem.
+    function digit(d) {
+      if (!T.on) return false;
+      T.typed += d;
+      showLed(T.typed.padEnd(3, '-'));
+      if (T.typed.length === 3) go(Number(T.typed));
+      else tick();
+      return true;
+    }
     function power() {
       T.on = !T.on;
       clearTimeout(T.timer);
@@ -609,6 +621,7 @@ window.RumTv = (() => {
       e.preventDefault();
       e.stopPropagation();
       if (b.dataset.tv === 'pa') power();
+      else if (/^[0-9]$/.test(b.dataset.tv)) digit(b.dataset.tv);
       else if (b.dataset.tv) step(b.dataset.tv === 'upp' ? 1 : -1);
       else if (b.dataset.visa) { if (window.Spoiler) Spoiler.show(b.dataset.visa.split(' ')); }
       else go(Number(b.dataset.sida));
@@ -647,12 +660,7 @@ window.RumTv = (() => {
       },
       // Tangenterna när tv:n är nära: pilarna bläddrar, tre siffror väljer sida.
       key(k) {
-        if (/^[0-9]$/.test(k) && T.on) {
-          T.typed += k;
-          showLed(T.typed.padEnd(3, '-'));
-          if (T.typed.length === 3) go(Number(T.typed));
-          return true;
-        }
+        if (/^[0-9]$/.test(k)) return digit(k);
         if (/^Arrow(Up|Right)$/.test(k)) step(1);
         else if (/^Arrow(Down|Left)$/.test(k)) step(-1);
         else return false;
