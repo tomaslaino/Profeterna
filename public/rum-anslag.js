@@ -11,7 +11,9 @@
 //   Tur & otur     rutat papper: poäng mot chanserna (xG), med staplar
 //   Mot oddsen     tidningsurklipp: poäng mot vad oddsen väntade sig
 //   Vilan          almanacksblad: dagar sedan förra matchen
-//   Inbördes       anteckningsblock: de tre senaste mötena (matchens fil)
+//   Motståndet     anteckningsblock: de som har mött svårast och lättast
+//                  motstånd hittills (modellens styrka, som på Statistik)
+// Mötena och lagen ett och ett står i kortregistret på disken (rum-register.js).
 // Ett klick på tavlan: den lossnar från väggen och flyger fram, vriden från
 // väggens vinkel till rakt fram, rummet mörknar bakom och den lutar lite
 // efter musen. Ett klick på en lapp tar den från nålen och fram i läsbar
@@ -19,8 +21,8 @@
 // klick utanför eller Häng tillbaka sätter tillbaka lappen, och Esc igen
 // eller ett klick utanför tavlan hänger tavlan på väggen igen.
 //
-// Dolda resultat (Spoiler): formen och inbördes får ?, och lapparna som
-// räknar med resultaten (styrkan, krysset, turen, oddsen) står med ? och
+// Dolda resultat (Spoiler): formen får ?, och lapparna som räknar med
+// resultaten (styrkan, krysset, turen, oddsen, motståndet) står med ? och
 // Visa ändå när en match i lagens divisioner är dold.
 //
 // Slitaget: lapparnas vinklar, nålhålen och pappersresterna efter gamla
@@ -37,7 +39,6 @@ window.RumAnslag = (() => {
   const DAY = 86400000;
   const TZ = 'Europe/Stockholm';
   const DIVS = ['pl', 'ch', 'l1', 'l2'];
-  const PAST_YEARS = 5;
 
   const esc = (s) => String(s == null ? '' : s).replace(/[&<>"']/g, (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
   const r1 = (x) => Math.round(x * 10) / 10;
@@ -66,7 +67,7 @@ window.RumAnslag = (() => {
     { id: 'tur', paper: 'rutat', x: 50, y: 290, w: 222, h: 236, rot: 1.6, pin: '#d8b06a', name: 'Tur & otur' },
     { id: 'odds', paper: 'tidning', x: 294, y: 302, w: 236, h: 212, rot: -1.1, pin: '#c2271c', name: 'Mot oddsen' },
     { id: 'vila', paper: 'almanacka', x: 550, y: 282, w: 196, h: 248, rot: 2.1, pin: '#5a5f8a', name: 'Vilan' },
-    { id: 'inbordes', paper: 'linjerat', x: 766, y: 290, w: 196, h: 236, rot: -2, pin: '#e7e1d2', name: 'Inbördes' },
+    { id: 'motstand', paper: 'linjerat', x: 766, y: 290, w: 196, h: 236, rot: -2, pin: '#e7e1d2', name: 'Motståndet' },
   ];
 
   // ---------- datan ----------
@@ -232,29 +233,19 @@ window.RumAnslag = (() => {
     }).join('') + '</div>';
   }
 
-  function noteInbordes(D) {
-    if (!D.ms.length) return '<h4>Inbördes</h4><p class="inget">Ingen omgång</p>';
-    const since = Date.now() - PAST_YEARS * 365.25 * DAY;
-    let wait = false;
-    const rows = D.ms.map((m) => {
-      const d = D.match.get(m.id);
-      if (d === undefined) wait = true;
-      const list = !d ? [] : [
-        ...(d.meetings || []).filter((x) => x.score).map((x) => ({ t: Date.parse(x.kickoff), x, hide: window.Spoiler && Spoiler.hidesDay(x.kickoff) })),
-        ...((d.pastMeetings && d.pastMeetings.list) || []).filter((x) => x.score && Date.parse(x.date) >= since).map((x) => ({ t: Date.parse(x.date), x, hide: false })),
-      ].sort((a, b) => b.t - a.t).slice(0, 3);
-      const l = list.map(({ x, hide }) => {
-        if (hide) return '<i class="q">?</i>';
-        const r = letter(x, m.home);
-        return `<i>${r}</i>`;
-      }).join('');
-      return `<span class="h">${esc(D.kort(m.home))}</span><span class="s">–</span><span class="a">${esc(D.kort(m.away))}</span><span class="f">${d ? l || '–' : ''}</span>`;
-    });
-    return `<h4>Inbördes</h4><div class="ans-g4${wait ? ' vantar' : ''}">${rows.join('')}</div>`;
+  // Motståndet hittills: plus = svårare motstånd än ett normalt spelschema
+  // i divisionen, minus = lättare (fd.opp, mål per match enligt modellen).
+  const opp = (t) => fdOf(t, 'opp');
+  function noteMotstand(D) {
+    if (D.veil) return dolt('Motståndet');
+    const [up, down] = split(D, opp, 4);
+    const row = (x) => `<span class="r"><span>${esc(D.kort(x.name))}</span><span>${signed(x.v, 2)}</span></span>`;
+    if (!up.length && !down.length) return '<h4>Motståndet</h4><p class="inget">Okänt</p>';
+    return `<h4>Motståndet</h4><b class="d">Tufft hittills</b>${up.map(row).join('')}<b class="d">Lätt hittills</b>${down.map(row).join('')}`;
   }
 
-  const BUILD = { form: noteForm, skador: noteSkador, styrka: noteStyrka, kryss: noteKryss, tur: noteTur, odds: noteOdds, vila: noteVila, inbordes: noteInbordes };
-  const VEILED = new Set(['styrka', 'kryss', 'tur', 'odds']);
+  const BUILD = { form: noteForm, skador: noteSkador, styrka: noteStyrka, kryss: noteKryss, tur: noteTur, odds: noteOdds, vila: noteVila, motstand: noteMotstand };
+  const VEILED = new Set(['styrka', 'kryss', 'tur', 'odds', 'motstand']);
 
   // ---------- tavlan ----------
 

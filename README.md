@@ -1708,12 +1708,14 @@ tippare på förstasidan länkar hit (*Till Olympen*).
 Förstasidan på stora skärmar (utan adress, bredare än 900 px och inte på högkant):
 tobaksaffären vid spelpulten. Scenen ritas i 1600 × 1000 och skalas så att den täcker
 fönstret; lagren ligger på olika djup (CSS 3D) och vrids lite när musen rör sig. Namnet
-och foten (*K kupongen · T tv:n · A anslagstavlan · V videon*, *Vanlig sida*) ligger utanför scenen i fönstrets hörn;
+och foten (*K kupongen · T tv:n · A anslagstavlan · R kortregistret · V videon*, *Vanlig sida*) ligger utanför scenen i fönstrets hörn;
 någon meny finns inte, det är föremålen som leder vidare. [public/rum.js](public/rum.js)
 ritar rummet och fyller det med sajtens data, [public/rum.css](public/rum.css) ger det utseendet och
 rörelserna, [public/rum-tv.js](public/rum-tv.js) och [public/rum-tv.css](public/rum-tv.css)
 bygger tv:n (se [Tv:n](#tvn)), [public/rum-anslag.js](public/rum-anslag.js) och
 [public/rum-anslag.css](public/rum-anslag.css) anslagstavlan (se [Anslagstavlan](#anslagstavlan)),
+[public/rum-register.js](public/rum-register.js), [public/rum-register.css](public/rum-register.css)
+och [public/rum-kortlada.js](public/rum-kortlada.js) kortregistret (se [Kortregistret](#kortregistret)),
 [public/rum-video.js](public/rum-video.js) och [public/rum-video.css](public/rum-video.css) videon
 på disken (se [Videon](#videon)), och [public/rum-3d.js](public/rum-3d.js) ritar gänget och
 [public/rum-inredning.js](public/rum-inredning.js) inredningen (se *Inredningen i 3D* nedan) i
@@ -1736,6 +1738,8 @@ sidan byts:
   färg (delat = en var), ur `data/tippare.json`.
 - **Anslagstavlan** (under tv:n, i hörnet) → lapparna om omgångens lag, och därifrån
   Statistik (se [Anslagstavlan](#anslagstavlan)).
+- **Kortregistret** (på disken under anslagstavlan) → ett kort per lag och per möte i
+  omgången, och därifrån Lagen på Statistik (se [Kortregistret](#kortregistret)).
 - **Skårtavlan** (under tv:n) → Tabeller: Premier Leagues topp ur `data/teams/pl.json`
   med vita plastbokstäver i spåren på svart filt, i en aluminiumram som sticker ut från
   väggen (3D). Varje bokstav sitter
@@ -2095,10 +2099,10 @@ föremålet (`data-to`). Filerna hämtas när sidan visas första gången.
   läget i bandet, oddsen och prognosen för 1, X och 2 – prognosen också som en stapel i
   mosaik, med 1 i grönt, X i gult och 2 i cyan som siffrorna ovanför – och lagen sida vid
   sida: placering och poäng, formen (de fem senaste i alla tävlingar, den senaste först, V
-  grön, O gul, F röd), hemmalagets hemmarad och bortalagets bortarad (V-O-F), xG per match
-  (gjorda–insläppta, Understat där den finns) och vilan (dagar sedan förra matchen). Sist
-  skador och avstängningar (Fantasy Premier League, alltså bara Premier League), de som spelat
-  mest först och osäkra i gult. När resultatet är dolt visas inte lagen sida vid sida.
+  grön, O gul, F röd) och hemmalagets hemmarad och bortalagets bortarad (V-O-F). Vilan och
+  skadorna står på anslagstavlan och xG med resten om lagen i kortregistret (se
+  [Vad som står var](#vad-som-står-var)). När resultatet är dolt visas inte lagen sida vid
+  sida.
 - **371–374 Tabeller** (Premier League, Championship, League One, League Two, ur
   `data/teams/<division>.json`): placering i färg efter zonen (uppflyttning och Champions
   League grön, kval och Europa cyan, nedflyttning röd), lag, spelade, målskillnad, poäng och
@@ -2159,8 +2163,11 @@ som kupongen och fällbladstavlan):
 - **Slår oddsen** – ett tidningsurklipp: poäng mot vad oddsen väntade sig, och *Sviker*.
 - **Vilan** – ett almanacksblad med omgångens första dag: dagar sedan förra matchen för båda
   lagen; skiljer det två dagar eller mer ringas det tröttare lagets siffra in.
-- **Inbördes** – ett anteckningsblock: de tre senaste mötena (de senaste fem åren) som V, O
-  eller F för hemmalaget.
+- **Motståndet** – ett anteckningsblock: *Tufft hittills* och *Lätt hittills*, de lag i
+  omgången som har mött svårast och lättast motstånd jämfört med ett normalt spelschema i
+  divisionen (mål per match enligt modellen, som Motstånd på Statistik).
+
+Mötena, som tidigare stod här som Inbördes, står i kortregistret med resultaten.
 
 Ett klick eller A: tavlan lossnar från väggen och flyger fram – en projektiv avbildning
 (`matrix3d`) från hörnen på väggen till rakt fram, så att den vrids ut ur väggens vinkel –
@@ -2174,13 +2181,65 @@ tillbaka (rum.js mäter dem med kameran där en kort stund). Guldordet *Statisti
 tavlan leder till Statistik, och pekar man på tavlan i rummet tänds snabbvalet Statistik på
 text-tv:n. Med `prefers-reduced-motion` står tavlan framme direkt.
 
-Dolda resultat: formen och inbördes får ? för de dolda matcherna, och lapparna som räknar
-med resultaten (styrkan, krysset, turen och oddsen) visar bara rubriken och ett
+Dolda resultat: formen får ? för de dolda matcherna, och lapparna som räknar med
+resultaten (styrkan, krysset, turen, oddsen och motståndet) visar bara rubriken och ett
 frågetecken när en match i lagens divisioner är dold – den lyfta lappen har då *Visa ändå*.
 Lagfilerna hämtas med rummet (om igen efter en kvart), matchernas filer när tavlan tas fram.
 Slitaget skiftar med dagen: lapparnas vinklar, nålhålen och hörnen av rivna lappar.
 `?rum-anslag` visar tavlan framme i en fast bild, och `?rum-anslag=<lapp>` (form, skador,
-styrka, kryss, tur, odds, vila, inbordes) med den lappen i handen.
+styrka, kryss, tur, odds, vila, motstand) med den lappen i handen.
+
+### Kortregistret
+
+På disken under anslagstavlans högra hörn står en kortlåda i lackad teak, byggd i three.js
+som inredningen ([public/rum-kortlada.js](public/rum-kortlada.js)), med korten, datan och
+kortet i handen i [public/rum-register.js](public/rum-register.js) och
+[public/rum-register.css](public/rum-register.css). Fram på lådan sitter en mässingshållare
+med etiketten *KRITAN*, överstruket med kulspets och *Lagen* skrivet bredvid – lådan har
+haft ett annat jobb. I lådan står, framifrån:
+
+- **Lagen** – en grön avdelare av pressad kartong, och bakom den ett registerkort per lag i
+  omgången i bokstavsordning, med en flik av plast i divisionens färg (som på Tabeller) och
+  lagets namn på en papperslapp i den. Kortet är maskinskrivet: namnet, divisionen och
+  placeringen (inringad med rödpenna) och skölden urklippt i hörnet, och sedan *Ligan*
+  (V–O–F, mål och poäng), *Hemma* och *Borta* (V–O–F i ligan), *Formen* (de fem senaste i
+  alla tävlingar, den senaste först, förlusterna i rött), *xG* för och mot per match,
+  *Styrka* (modellens, med placeringen i divisionen), *Motstånd* (hittills, tufft eller
+  lätt), *Oddsen* (hur ofta laget har varit favorit och poäng mot oddsen), *Skytten* (bäste
+  målskytten och andelen av lagets mål) och *Nästa* (motståndet, hemma eller borta och om hur
+  många dagar, med cupen eller Europacupen när det inte är ligan). Ur
+  `data/teams/<division>.json`, matcherna och matchens fil.
+- **Mötena** – en röd avdelare, och bakom den ett blått kort per match: de senaste åtta
+  mötena med datum, tävling, lagen och resultatet, och hemmalagets V–O–F i dem med blyerts
+  längst ner.
+
+Flikarna sitter på fem platser (lagen) och tre (mötena), så att varje flik syns ovanför
+dem framför. Ett klick eller R: lådan lyfter från disken, vänder sig mot en och lutar så att
+man ser ner i den, medan bilden zoomar in och rummet mörknar bakom – närbilden är en egen
+duk över hela fönstret med samma perspektiv som rummet, så att lådan är skarp. Den lutar
+lite efter musen, och kortet under pekaren reser sig. Ett klick på ett kort (eller en
+avdelare: det första kortet bakom den): det reser sig ur lådan och tas i handen i läsbar
+storlek, och pilarna bläddrar mellan korten. Esc, ett klick utanför eller *Sätt tillbaka*
+sätter tillbaka kortet; Esc, R eller ett klick utanför lådan ställer den på disken igen.
+Guldordet *Lagen* under lådan leder till Lagen på Statistik, och pekar man på lådan tänds
+snabbvalet Statistik på text-tv:n. Med `prefers-reduced-motion` står lådan framme direkt.
+
+Dolda resultat: lagkorten visar bara namnet och ett frågetecken när en match i lagens
+divisioner är dold, med *Visa ändå* under kortet – samma nyckel som anslagstavlan, så att
+det gäller båda – och dolda möten står som ?. Slitaget skiftar med dagen: kortens lutning i
+lådan och vinkel i handen, hörn som har varit vikta och en kaffering. Utan WebGL står
+disken tom. `?rum-register` visar lådan framme i en fast bild, och `?rum-register=<lag>`
+(eller en del av kortets id, t.ex. `mote:<id>`) med det kortet i handen.
+
+#### Vad som står var
+
+Statistiken om omgången är fördelad efter vad varje sak är bra på:
+
+| | Vad | Innehåll |
+|---|---|---|
+| **Tv:n** | Matcherna och ligorna, nu | Stryktipset live (377), omgångens matcher (331), en sida per match med odds, prognos, tabelläget, formen och hemma/borta (332–369), tabellerna (371–374) och skytteligorna (381–384) |
+| **Anslagstavlan** | Omgången på ett bräde: vem som sticker ut | Formen, skadorna, vilan, starkast och svagast, kryssar gärna, tur och otur, mot oddsen och motståndet |
+| **Kortregistret** | Lagen ett och ett, och historiken | Ett lagkort per lag (ligan, hemma/borta, formen, xG, styrka, motstånd, oddsen, skytten, nästa match) och mötena med resultaten |
 
 ### Videon
 

@@ -18,9 +18,11 @@
 //   300       innehållet: alla sidor med sina nummer
 //   331       omgångens matcher, en rad per match som leder till matchens sida
 //   332–369   en sida per match: avsparken eller ställningen, oddsen,
-//             prognosen som en stapel, lagen sida vid sida (tabelläget, formen,
-//             hemma- och bortaraden, xG, vilan) och skadorna, ur matchens fil
-//             (data/match/<id>.json)
+//             prognosen som en stapel och lagen sida vid sida (tabelläget,
+//             formen, hemma- och bortaraden), ur matchens fil
+//             (data/match/<id>.json). Vilan och skadorna står på
+//             anslagstavlan (rum-anslag.js), xG och resten om lagen i
+//             kortregistret (rum-register.js).
 //   371–374   tabellerna (data/teams/<division>.json) med formen i ligan ur
 //             matcherna; 24 lag = två undersidor
 //   377       Stryktipset matcher live: kupongens matcher med avspark eller
@@ -289,25 +291,6 @@ window.RumTv = (() => {
   const cell = (bits) => [' '.repeat(Math.max(0, 13 - bits.reduce((a, b) => a + b[0].length, 0))), ...bits];
   // Formen: de fem senaste, den senaste först (som på matchbladet).
   const formBits = (list) => (list.length ? list.slice(0, 5).map((x) => (window.Spoiler && Spoiler.hidesDay(x.date) ? ['?', 'w'] : [x.result || '?', RES[x.result] || 'w'])) : [['-']]);
-  // Skadade och avstängda, de som spelat mest först; osäkra i gult.
-  function absent(s, n) {
-    if (!s || s.unknown) return [['-']];
-    if (!s.players.length) return [['Inga']];
-    const list = s.players.slice().sort((a, b) => (b.minutes || 0) - (a.minutes || 0));
-    const out = [];
-    let used = 0;
-    for (let i = 0; i < list.length; i++) {
-      const name = `${i ? ', ' : ''}${list[i].name}`;
-      const more = list.length - i - 1;
-      if (used + name.length + (more ? 4 : 0) > n) {
-        out.push([` +${list.length - i}`, 'w']);
-        break;
-      }
-      out.push([name, list[i].status === 'tveksam' ? 'y' : 'w']);
-      used += name.length;
-    }
-    return out;
-  }
 
   function matchPage(T, i) {
     const { m, g } = T.rows[i];
@@ -330,18 +313,10 @@ window.RumTv = (() => {
     const t = d && d.teams;
     if (t && t.home && t.away && g.state !== 'hidden') {
       const pair = (label, f) => line(' ', pad(label, 12), ...cell(f(t.home, 'home')), ...cell(f(t.away, 'away')));
-      const xg = (x) => (x.understat && x.understat.n ? x.understat : x.stats && x.stats.xgN ? x.stats : null);
       rows.push(line(' '.repeat(13), [rpad(T.kort(m.home), 13) + rpad(T.kort(m.away), 13), 'c']),
         pair('Tabell', (x) => [[x.table ? `${ord(x.table.rank)}${x.league && x.league.id !== m.comp && LIGA[x.league.id] ? ` ${LIGA[x.league.id]}` : ''} ${x.table.points} p` : '-']]),
         pair('Form', (x) => formBits(x.form || [])),
-        pair('Hemma/borta', (x, side) => { const r = x.record && x.record[side]; return [[r ? `${r.w}-${r.d}-${r.l}` : '-']]; }),
-        pair('xG per match', (x) => { const s = xg(x); return [[s ? `${dec(s.xgFor, 1)}-${dec(s.xgAgainst, 1)}` : '-']]; }),
-        pair('Vila', (x) => { const l = x.schedule && x.schedule.last; return [[l && l.days != null ? `${l.days} ${l.days === 1 ? 'dag' : 'dagar'}` : '-']]; }));
-    }
-    const sq = d && d.squad;
-    if (sq && sq.home && sq.away && (!sq.home.unknown || !sq.away.unknown)) {
-      rows.push(null, line(' ', ['Skador och avstängningar', 'c']));
-      for (const side of ['home', 'away']) rows.push(line(' ', pad(T.kort(m[side]), 12), ...absent(sq[side], COLS - 14)));
+        pair('Hemma/borta', (x, side) => { const r = x.record && x.record[side]; return [[r ? `${r.w}-${r.d}-${r.l}` : '-']]; }));
     }
     return band('FOTBOLL', (d && d.match && d.match.compName) || COMP[m.comp] || '', [when]) + body(rows) + fast();
   }

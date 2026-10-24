@@ -14,6 +14,8 @@
 //   kupongens matcher live på 377 (rum-tv.js)
 //   videon på disken zoomas in (V): repriserna på VHS, på tv:n och i lådan
 //   bredvid, som spelas i rutan (rum-video.js)
+//   kortregistret på disken lyfts fram (R): ett kort per lag och per möte
+//   (rum-register.js, lådan i three.js i rum-kortlada.js)
 //   kupongen tas i handen (K) – fylls i eller ändras – eller → Kupong.
 //   högen bredvid: de inlämnade kupongerna med baksidan upp; din egen tas i
 //   handen därifrån när du har lämnat in, de andras → Kupong.
@@ -25,7 +27,8 @@
 // stängs av med prefers-reduced-motion. För bilder: ?rum-t=<sekunder> fryser
 // klockan, ?rum-mx=&rum-my= kamerans läge (−1…1), ?rum-vantar=DL,DT låter
 // dem sitta med kupongen som om de inte hade lämnat in. ?rum-anslag visar anslagstavlan
-// framme (=form, =skador … med den lappen i handen). ?rum-stopp=<timmar> som
+// framme (=form, =skador … med den lappen i handen), ?rum-register
+// kortregistret (=Arsenal … med det kortet i handen). ?rum-stopp=<timmar> som
 // om det var så långt kvar till spelstoppet, ?rum-tittar som om matcherna
 // pågick och ?rum-mal=dl:1,dt:-1,dj:0 som om det blev mål (rätt, fel, ingen
 // skillnad), ?rum-video videon nära.
@@ -33,8 +36,8 @@
 // Läses efter kupong.js, samtal.js, tippare.js och kronan.js och använder
 // deras hjälpare (state, KP, TP, gradeRow, couponNumber, currentCoupon,
 // Kronan.holders, Kronan.scene, Historik.coupons …) och tv:n i rum-tv.js
-// (RumTv, läses före den här) och anslagstavlan i rum-anslag.js (RumAnslag,
-// också före). rum-3d.js (gänget), rum-saker.js och rum-inredning.js (lysröret,
+// (RumTv, läses före den här), anslagstavlan i rum-anslag.js (RumAnslag,
+// också före) och kortregistret i rum-register.js (RumRegister, också före). rum-3d.js (gänget), rum-saker.js och rum-inredning.js (lysröret,
 // neonskylten, uret, orakelramen, paketen, stolen, kupongstället …) hämtas
 // först när rummet visas, med three.js från jsdelivr (importmap i
 // index.html); utan WebGL står rummet kvar utan dem.
@@ -364,7 +367,7 @@ window.Rum = (() => {
     el.hidden = true;
     el.setAttribute('aria-label', 'Tobaksaffären');
     el.innerHTML = `<div class="rum-stage" id="rum-stage"><div class="rum-kamera" id="rum-kamera"><div class="rum-world" id="rum-world">
-${plane(-600, `<div class="rum-ute" id="rum-ute"></div>${bg()}${vid('vagg')}${rightWall()}${svg('<g id="rum-hyllor"></g>')}${neon()}${frameHtml()}`, 1.035)}
+${plane(-600, `<div class="rum-ute" id="rum-ute"></div>${bg()}${vid('vagg')}${rightWall()}${window.RumRegister ? RumRegister.html() : ''}${svg('<g id="rum-hyllor"></g>')}${neon()}${frameHtml()}`, 1.035)}
 ${plane(-598, vid('horn'), 1.035, 'rum-pl3d')}
 ${plane(-470, `${tv()}`, 1.02, 'rum-pl3d')}
 ${plane(-330, `${sill()}${haze()}`)}
@@ -375,8 +378,9 @@ ${plane(0, paper())}
 <div class="rum-layer rum-warm"></div><div class="rum-layer rum-dagsljus" id="rum-dagsljus"></div><div class="rum-layer rum-vign"></div><div class="rum-layer rum-grain"></div>
 </div>
 ${window.RumAnslag ? RumAnslag.nara() : ''}
+${window.RumRegister ? RumRegister.nara() : ''}
 <div class="rum-hdr"><a class="rum-brand" href="#">Matchfixarna</a></div>
-<div class="rum-ft"><span class="keys"><b>K</b> kupongen · <b>T</b> tv:n · <b>A</b> anslagstavlan · <b>V</b> videon</span><a href="#hem">Vanlig sida</a></div>`;
+<div class="rum-ft"><span class="keys"><b>K</b> kupongen · <b>T</b> tv:n · <b>A</b> anslagstavlan · <b>R</b> kortregistret · <b>V</b> videon</span><a href="#hem">Vanlig sida</a></div>`;
     document.querySelector('main').prepend(el);
     R.el = el;
     R.built = true;
@@ -385,6 +389,7 @@ ${window.RumAnslag ? RumAnslag.nara() : ''}
     R.tv = window.RumTv ? RumTv.mount(el, { calm, short, kort: (n) => BOARD[n] || short(n), wd, hm, matches: () => (state.all && state.all.matches) || [] }) : null;
     R.ans = window.RumAnslag ? RumAnslag.mount(el, { calm, kort: (n) => BOARD[n] || short(n), close: () => board(false) }) : null;
     R.video = window.RumVideo ? RumVideo.mount(el, { calm, short, kort: (n) => BOARD[n] || short(n) }) : null;
+    R.reg = window.RumRegister ? RumRegister.mount(el, { calm, kort: (n) => BOARD[n] || short(n), close: () => register(false) }) : null;
     paintUte();
   }
 
@@ -703,6 +708,7 @@ ${window.RumAnslag ? RumAnslag.nara() : ''}
     // mellan omgångarna, när raderna bara är de närmaste matcherna
     if (R.tv) R.tv.fill(rows, { spel: rd && rd.spel ? rd.ids : null, next: Boolean(rd && rd.next) });
     if (R.ans) R.ans.fill(rows.map((x) => x.m), (state.all && state.all.matches) || []);
+    if (R.reg) R.reg.fill(rows.map((x) => x.m), (state.all && state.all.matches) || []);
     if (R.video) R.video.fill((state.all && state.all.matches) || [], rd && !rd.next ? rd.ids : []);
     const p = pult(rd);
     // har du lämnat in ligger din kupong i högen, och på pulten en ny – eller
@@ -988,6 +994,11 @@ ${window.RumAnslag ? RumAnslag.nara() : ''}
       board(true);
       return;
     }
+    if (a.id === 'rum-reg') {
+      e.preventDefault();
+      register(true);
+      return;
+    }
     if ((a.id === 'rum-kupong' || a.dataset.ta != null) && openCoupon(a.id === 'rum-kupong' ? null : a)) {
       e.preventDefault();
       return;
@@ -1031,6 +1042,7 @@ ${window.RumAnslag ? RumAnslag.nara() : ''}
   // att trycka på. Kameran siktar på rutan där den hamnar när tv:n har vridits.
   function zoomTv(on) {
     if (on && R.vnara) zoomVideo(false);
+    if (on && R.reg && R.reg.on()) register(false);
     R.zoom = on;
     R.el.classList.toggle('tv-nara', on);
     // kameran ställer sig rakt framför, så att tv:n står rak (som med kupongen i handen)
@@ -1053,6 +1065,7 @@ ${window.RumAnslag ? RumAnslag.nara() : ''}
     if (!R.video || (!on && !R.vnara)) return;
     if (on && R.zoom) zoomTv(false);
     if (on && R.ans && R.ans.on()) board(false);
+    if (on && R.reg && R.reg.on()) register(false);
     R.vnara = on;
     R.el.classList.toggle('vid-nara', on);
     if (on) {
@@ -1085,6 +1098,7 @@ ${window.RumAnslag ? RumAnslag.nara() : ''}
     if (on) {
       if (R.zoom) zoomTv(false);
       if (R.vnara) zoomVideo(false);
+      if (R.reg && R.reg.on()) register(false);
       R.ans.open(true, R.ans.quad());
       const p = centerOf(document.getElementById('rum-ans'));
       aim(p, 1.25, [p[0] + (800 - p[0]) * 0.5, p[1] + (500 - p[1]) * 0.5], calm() ? null : 'glid');
@@ -1098,6 +1112,32 @@ ${window.RumAnslag ? RumAnslag.nara() : ''}
     void w.offsetWidth;
     aim([800, 500], 1, [800, 500], calm() ? null : 'glid');
     R.ans.open(false, q);
+  }
+
+  // R: kortregistret lyfter från disken, vänder sig mot en och kommer nära
+  // (rum-register.js, lådan i rum-kortlada.js), och kameran går lite mot
+  // disken medan det flyger. Tillbaka flyger det till lådans plats med
+  // kameran där den står när den har gått tillbaka, som anslagstavlan.
+  function register(on) {
+    if (!R.reg || !R.reg.ready() || on === R.reg.on()) return;
+    if (on) {
+      if (R.zoom) zoomTv(false);
+      if (R.vnara) zoomVideo(false);
+      if (R.ans && R.ans.on()) board(false);
+      const r = R.reg.at();
+      R.reg.open(true, r);
+      const p = centerOf(r);
+      aim(p, 1.25, [p[0] + (800 - p[0]) * 0.5, p[1] + (500 - p[1]) * 0.5], calm() ? null : 'glid');
+      return;
+    }
+    const w = document.getElementById('rum-kamera');
+    const cam = w.style.cssText;
+    aim([800, 500], 1, [800, 500]);
+    const r = R.reg.at();
+    w.style.cssText = cam;
+    void w.offsetWidth;
+    aim([800, 500], 1, [800, 500], calm() ? null : 'glid');
+    R.reg.open(false, r);
   }
 
   // ---------- kupongen i handen ----------
@@ -1914,7 +1954,7 @@ ${window.RumAnslag ? RumAnslag.nara() : ''}
   function wire() {
     const el = R.el;
     el.addEventListener('mousemove', (e) => {
-      if (R.kup || R.zoom || R.vnara || (R.ans && R.ans.on())) return;
+      if (R.kup || R.zoom || R.vnara || (R.ans && R.ans.on()) || (R.reg && R.reg.on())) return;
       R.tx = (e.clientX / innerWidth) * 2 - 1;
       R.ty = (e.clientY / innerHeight) * 2 - 1;
     });
@@ -1932,6 +1972,8 @@ ${window.RumAnslag ? RumAnslag.nara() : ''}
       }
       // anslagstavlan sköter sina lappar själv (rum-anslag.js)
       if (R.ans && R.ans.on()) return;
+      // kortregistret sköter sina kort själv (rum-register.js)
+      if (R.reg && R.reg.on()) return;
       // nära tv:n sköter den sina knappar och länkar själv (rum-tv.js)
       if (R.zoom && e.target.closest('#rum-tv3')) return;
       // nära videon sköter den kassetterna och knapparna själv (rum-video.js);
@@ -1959,12 +2001,16 @@ ${window.RumAnslag ? RumAnslag.nara() : ''}
       } else if (R.ans && R.ans.on()) {
         if (R.ans.key(e.key)) e.preventDefault();
         else if (k === 'a' || k === 'escape') board(false);
+      } else if (R.reg && R.reg.on()) {
+        if (R.reg.key(e.key)) e.preventDefault();
+        else if (k === 'r' || k === 'escape') register(false);
       } else if (k === 'k') {
         if (!openCoupon()) location.hash = 'kupong';
       } else if (R.zoom && R.tv && R.tv.key(e.key)) e.preventDefault();
       else if (R.vnara && R.video.key(e.key)) e.preventDefault();
       else if (k === 't') zoomTv(!R.zoom);
       else if (k === 'a') board(true);
+      else if (k === 'r') register(true);
       else if (k === 'v') zoomVideo(!R.vnara);
       else if (k === 'escape' && R.zoom) zoomTv(false);
       else if (k === 'escape' && R.vnara) zoomVideo(false);
@@ -2045,6 +2091,12 @@ ${window.RumAnslag ? RumAnslag.nara() : ''}
           if (q.get('rum-anslag')) setTimeout(() => R.ans && R.ans.lift(q.get('rum-anslag')), 50);
         }
         if (q.has('rum-video')) zoomVideo(true);
+        if (q.has('rum-register') && R.reg) {
+          R.reg.wait().then(() => {
+            register(true);
+            if (q.get('rum-register')) setTimeout(() => R.reg.lift(q.get('rum-register')), 50);
+          });
+        }
         frame();
         document.body.dataset.rumKlar = '1';
       });
@@ -2061,6 +2113,7 @@ ${window.RumAnslag ? RumAnslag.nara() : ''}
     if (!R.on) return;
     closeCoupon(true);
     board(false);
+    register(false);
     if (R.video) R.video.stop();
     zoomVideo(false);
     R.on = false;

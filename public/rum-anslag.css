@@ -124,7 +124,7 @@
 .ans-g5 { display: grid; grid-template-columns: 1fr auto auto auto 1fr; column-gap: 6px; line-height: 13.2px; }
 .ans-g5 .h { text-align: right; overflow: hidden; white-space: nowrap; }
 .ans-g5 .a { overflow: hidden; white-space: nowrap; }
-.ans-g5 .f i, .ans-g4 .f i { display: inline-block; width: 0.78em; text-align: center; }
+.ans-g5 .f i { display: inline-block; width: 0.78em; text-align: center; }
 .ans-g5 .s { opacity: 0.6; }
 
 /* genomslaget: tunt papper, blålila karbontext som flyter lite */
@@ -232,10 +232,8 @@
 .p-linjerat::before { content: ""; position: absolute; left: 0; right: 0; top: 0; height: 6px; background: radial-gradient(circle at 50% 0, rgba(0, 0, 0, 0.22) 0 2px, rgba(0, 0, 0, 0) 2.4px) 0 0 / 8px 6px repeat-x; }
 .p-linjerat .ans-in { padding: 12px 10px 8px 26px; }
 .p-linjerat h4 { font: 700 21px/1 Caveat, cursive; margin-bottom: 4px; height: 24px; }
-.ans-g4 { display: grid; grid-template-columns: auto auto 1fr auto; column-gap: 4px; }
-.ans-g4 .h { text-align: right; overflow: hidden; white-space: nowrap; }
-.ans-g4 .a { overflow: hidden; white-space: nowrap; }
-.ans-g4 .f { text-align: right; letter-spacing: 1px; }
+.p-linjerat .d { font: 700 16px/15.2px Caveat, cursive; text-decoration: underline; margin-top: 0; }
+.p-linjerat .r { line-height: 15.2px; }
 
 /* ---------- närbilden ---------- */
 
