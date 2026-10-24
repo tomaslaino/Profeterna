@@ -2027,6 +2027,11 @@ ${window.RumRegister ? RumRegister.nara() : ''}
       const dx = e.clientX - P.x;
       const dy = e.clientY - P.y;
       if (nara()) {
+        // anslagstavlan: ett svep uppåt eller neråt bläddrar bladen i lapparna
+        if (R.ans && R.ans.on() && Math.abs(dy) >= 40 && Math.abs(dy) > Math.abs(dx) * 1.5) {
+          R.ans.key(dy < 0 ? 'ArrowDown' : 'ArrowUp');
+          return;
+        }
         if (Math.abs(dx) < 40 || Math.abs(dx) < Math.abs(dy) * 1.5) return;
         const k = dx < 0 ? 'ArrowRight' : 'ArrowLeft';
         if (R.zoom && R.tv) R.tv.key(k);

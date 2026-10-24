@@ -6,7 +6,7 @@
 //   Formen         registerkort, maskinskrivet: de fem senaste före matchen
 //   Skadelistan    genomslag: skadade, avstängda och osäkra (matchens fil)
 //   Starkast       polaroid med skölden; på baksidan modellens starkaste och
-//                  svagaste i omgången per division (data/teams/<division>.json)
+//                  svagaste i omgången (data/teams/<division>.json)
 //   Kryssar gärna  gul lapp: chansen till oavgjort i lagets matcher (xG)
 //   Tur & otur     rutat papper: poäng mot chanserna (xG), med staplar
 //   Mot oddsen     tidningsurklipp: poäng mot vad oddsen väntade sig
@@ -14,19 +14,28 @@
 //   Motståndet     anteckningsblock: de som har mött svårast och lättast
 //                  motstånd hittills (modellens styrka, som på Statistik)
 // Mötena och lagen ett och ett står i kortregistret på disken (rum-register.js).
+//
+// Varje lapp är en bunt blad på samma nål, ett per division i omgången med
+// Premier League överst och cupmatcherna sist, och bladen under sticker
+// fram lite i kanten. På bladens högerkant sitter indexflikar av plast i
+// divisionens färg (som på Tabeller), i samma ordning uppifrån. Ett klick på
+// en flik, eller ↑/↓ (ett svep i telefonen), bläddrar alla lappar till den
+// divisionen: bladen ovanpå lyfts från nålen och läggs under bunten, lapp
+// för lapp över tavlan från vänster.
+//
 // Ett klick på tavlan: den lossnar från väggen och flyger fram, vriden från
 // väggens vinkel till rakt fram, rummet mörknar bakom och den lutar lite
 // efter musen. Ett klick på en lapp tar den från nålen och fram i läsbar
-// storlek (polaroiden vänds); pilarna bläddrar mellan lapparna. Esc, ett
-// klick utanför eller Häng tillbaka sätter tillbaka lappen, och Esc igen
-// eller ett klick utanför tavlan hänger tavlan på väggen igen.
+// storlek (polaroiden vänds); ←/→ bläddrar mellan lapparna och ↑/↓ mellan
+// bladen. Esc, ett klick utanför eller Häng tillbaka sätter tillbaka lappen,
+// och Esc igen eller ett klick utanför tavlan hänger tavlan på väggen igen.
 //
 // Dolda resultat (Spoiler): formen får ?, och lapparna som räknar med
 // resultaten (styrkan, krysset, turen, oddsen, motståndet) står med ? och
 // Visa ändå när en match i lagens divisioner är dold.
 //
-// Slitaget: lapparnas vinklar, nålhålen och pappersresterna efter gamla
-// lappar skiftar med dagen.
+// Slitaget: lapparnas och bladens vinklar, nålhålen och pappersresterna
+// efter gamla lappar skiftar med dagen.
 //
 // RumAnslag.wall() → tavlan (i onWall i rum.js, på högra väggen)
 // RumAnslag.nara() → närbilden
@@ -58,17 +67,36 @@ window.RumAnslag = (() => {
   }
   const getJSON = (path) => fetch(path, { cache: 'no-cache' }).then((r) => (r.ok ? r.json() : Promise.reject(new Error(String(r.status)))));
 
-  // Lapparna på tavlan: papperet, platsen, vinkeln och nålens färg.
+  // Lapparna på tavlan: papperet, platsen, vinkeln och nålens färg. Mellan
+  // lapparna är det plats för flikarna i högerkanten.
   const NOTES = [
-    { id: 'form', paper: 'kort', x: 46, y: 40, w: 318, h: 206, rot: -1.4, pin: '#c2271c', name: 'Formen' },
-    { id: 'skador', paper: 'genomslag', x: 384, y: 34, w: 200, h: 232, rot: 1.1, pin: '#2a52a0', name: 'Skadelistan' },
-    { id: 'styrka', paper: 'polaroid', x: 602, y: 44, w: 166, h: 214, rot: -3.2, pin: 'stift', name: 'Starkast' },
-    { id: 'kryss', paper: 'postit', x: 786, y: 42, w: 176, h: 176, rot: 3, pin: '#3db37c', name: 'Kryssar gärna' },
-    { id: 'tur', paper: 'rutat', x: 50, y: 290, w: 222, h: 236, rot: 1.6, pin: '#d8b06a', name: 'Tur & otur' },
-    { id: 'odds', paper: 'tidning', x: 294, y: 302, w: 236, h: 212, rot: -1.1, pin: '#c2271c', name: 'Mot oddsen' },
-    { id: 'vila', paper: 'almanacka', x: 550, y: 282, w: 196, h: 248, rot: 2.1, pin: '#5a5f8a', name: 'Vilan' },
-    { id: 'motstand', paper: 'linjerat', x: 766, y: 290, w: 196, h: 236, rot: -2, pin: '#e7e1d2', name: 'Motståndet' },
+    { id: 'form', paper: 'kort', x: 30, y: 38, w: 296, h: 206, rot: -1.4, pin: '#c2271c', name: 'Formen' },
+    { id: 'skador', paper: 'genomslag', x: 354, y: 32, w: 194, h: 226, rot: 1.1, pin: '#2a52a0', name: 'Skadelistan' },
+    { id: 'styrka', paper: 'polaroid', x: 576, y: 40, w: 162, h: 208, rot: -3.2, pin: 'stift', name: 'Starkast' },
+    { id: 'kryss', paper: 'postit', x: 766, y: 40, w: 166, h: 172, rot: 3, pin: '#3db37c', name: 'Kryssar gärna' },
+    { id: 'tur', paper: 'rutat', x: 30, y: 280, w: 210, h: 228, rot: 1.6, pin: '#d8b06a', name: 'Tur & otur' },
+    { id: 'odds', paper: 'tidning', x: 270, y: 292, w: 222, h: 206, rot: -1.1, pin: '#c2271c', name: 'Mot oddsen' },
+    { id: 'vila', paper: 'almanacka', x: 522, y: 264, w: 190, h: 248, rot: 2.1, pin: '#5a5f8a', name: 'Vilan' },
+    { id: 'motstand', paper: 'linjerat', x: 742, y: 278, w: 190, h: 230, rot: -2, pin: '#e7e1d2', name: 'Motståndet' },
   ];
+  // jutens mått (tavlan innanför ramen)
+  const JW = BW - 48;
+  const JH = BH - 48;
+
+  // Bladen i lapparna: ett per division i omgången, i den här ordningen, och
+  // flikarnas färger (som på Tabeller).
+  const ARK = {
+    pl: { name: 'Premier League', short: 'PL', col: '#2a78d6' },
+    ch: { name: 'Championship', short: 'CH', col: '#eb6834' },
+    l1: { name: 'League One', short: 'L1', col: '#1baf7a' },
+    l2: { name: 'League Two', short: 'L2', col: '#eda100' },
+    cup: { name: 'Cupen', short: 'Cup', col: '#b0475e' },
+  };
+  const arkOf = (m) => (DIVS.includes(m.comp) ? m.comp : 'cup');
+  // bladen under det översta sticker fram: vridna kring nålen och lite
+  // förskjutna, [grader, x, y] för det andra, tredje …
+  const FAN = [[0, 0, 0], [1.5, 1, 2], [-1.3, -1, 3], [2.2, 1.5, 4], [-2, -1.5, 5]];
+  const FLIK = (i) => 14 + i * 24;
 
   // ---------- datan ----------
 
@@ -202,6 +230,8 @@ window.RumAnslag = (() => {
     const all = teamList(D, get, 99);
     return [all.filter((x) => x.v > 0).slice(0, n), all.filter((x) => x.v < 0).reverse().slice(0, n)];
   }
+  // en lista som är tom i en liten division
+  const rows = (l, row) => (l.length ? l.map(row).join('') : '<span class="r q">Ingen</span>');
   function noteTur(D) {
     if (D.veil) return dolt('Tur &amp; otur');
     const [up, down] = split(D, xpd, 4);
@@ -209,14 +239,14 @@ window.RumAnslag = (() => {
     const row = (x) => `<span class="r"><span>${esc(D.kort(x.name))}</span><i class="bar${x.v < 0 ? ' neg' : ''}" style="width:${r1(4 + 52 * Math.abs(x.v) / max)}px"></i>` +
       `<span>${signed(x.v)}</span></span>`;
     if (!up.length && !down.length) return '<h4>Tur &amp; otur</h4><p class="inget">Okänt</p>';
-    return `<h4>Tur &amp; otur</h4><b class="d">Tur</b>${up.map(row).join('')}<b class="d">Otur</b>${down.map(row).join('')}`;
+    return `<h4>Tur &amp; otur</h4><b class="d">Tur</b>${rows(up, row)}<b class="d">Otur</b>${rows(down, row)}`;
   }
   function noteOdds(D) {
     if (D.veil) return dolt('Slår oddsen');
     const [up, down] = split(D, vsOdds, 4);
     const row = (x) => `<span class="r"><span>${esc(D.kort(x.name))}</span><span>${signed(x.v)}</span></span>`;
     if (!up.length && !down.length) return '<h4>Slår oddsen</h4><p class="inget">Okänt</p>';
-    return `<h4>Slår oddsen</h4>${up.map(row).join('')}<b class="d">Sviker</b>${down.map(row).join('')}`;
+    return `<h4>Slår oddsen</h4>${rows(up, row)}<b class="d">Sviker</b>${rows(down, row)}`;
   }
 
   function noteVila(D) {
@@ -241,7 +271,7 @@ window.RumAnslag = (() => {
     const [up, down] = split(D, opp, 4);
     const row = (x) => `<span class="r"><span>${esc(D.kort(x.name))}</span><span>${signed(x.v, 2)}</span></span>`;
     if (!up.length && !down.length) return '<h4>Motståndet</h4><p class="inget">Okänt</p>';
-    return `<h4>Motståndet</h4><b class="d">Tufft hittills</b>${up.map(row).join('')}<b class="d">Lätt hittills</b>${down.map(row).join('')}`;
+    return `<h4>Motståndet</h4><b class="d">Tufft hittills</b>${rows(up, row)}<b class="d">Lätt hittills</b>${rows(down, row)}`;
   }
 
   const BUILD = { form: noteForm, skador: noteSkador, styrka: noteStyrka, kryss: noteKryss, tur: noteTur, odds: noteOdds, vila: noteVila, motstand: noteMotstand };
@@ -253,7 +283,13 @@ window.RumAnslag = (() => {
   // och hörn av rivna lappar sitter där de sitter just den dagen.
   function wear(seed) {
     const R0 = rng(seed);
-    const notes = NOTES.map((n) => ({ ...n, rot: r1(n.rot + (R0() - 0.5) * 2.2), x: n.x + Math.round((R0() - 0.5) * 6), y: n.y + Math.round((R0() - 0.5) * 6) }));
+    const notes = NOTES.map((n) => ({
+      ...n,
+      rot: r1(n.rot + (R0() - 0.5) * 2.2),
+      x: n.x + Math.round((R0() - 0.5) * 6),
+      y: n.y + Math.round((R0() - 0.5) * 6),
+      fan: FAN.map(([a, x, y], i) => [i ? r1(a + (R0() - 0.5) * 0.8) : 0, x, y]),
+    }));
     let marks = '';
     for (let i = 0; i < 26; i++) marks += `<i class="ans-hal" style="left:${Math.round(40 + R0() * 920)}px; top:${Math.round(36 + R0() * 496)}px"></i>`;
     for (let i = 0; i < 4; i++) {
@@ -279,12 +315,28 @@ window.RumAnslag = (() => {
       ? `<b class="ans-stift" data-pin="${n.id}" style="left:${x}px; top:${y}px"></b>`
       : `<b class="ans-nal" data-pin="${n.id}" style="left:${x}px; top:${y}px; background:${n.pin}"></b>`;
   }
-  const noteHtml = (n, inner, wall) => `<${wall ? 'span' : 'button type="button"'} class="ans-lapp p-${n.paper}" data-lapp="${n.id}" ` +
-    `style="left:${n.x}px; top:${n.y}px; width:${n.w}px; height:${n.h}px; --rot:${n.rot}deg"${wall ? '' : ` aria-label="${esc(n.name)}"`}>` +
-    `<span class="ans-in">${inner}</span></${wall ? 'span' : 'button'}>`;
+  // Bladen i en lapp, med det valda (top) överst och resten i ordning under
+  // det: z-index och skuggan efter djupet (lag), och fliken i högerkanten.
+  const depth = (sheets, s, top) => (sheets.indexOf(s) - sheets.indexOf(top) + sheets.length) % sheets.length;
+  const arkPos = (n, i) => `translate(${n.fan[i][1]}px, ${n.fan[i][2]}px) rotate(${n.fan[i][0]}deg)`;
+  function sheetsHtml(n, inner, sheets, top) {
+    return sheets.map((s, i) => {
+      const a = ARK[s];
+      const lag = depth(sheets, s, top);
+      // flikarna med lika långt mellan sig fast bladen är vridna och förskjutna
+      const y = r1(FLIK(i) - n.fan[i][2] - (n.w / 2) * Math.sin((n.fan[i][0] * Math.PI) / 180));
+      const flik = a ? `<i class="ans-flik" data-flik="${s}" style="top:${y}px; --dv:${a.col}"><b>${a.short}</b></i>` : '';
+      return `<span class="ans-ark p-${n.paper}" data-ark="${s}" style="z-index:${sheets.length - lag}; --lag:${lag}; transform:${arkPos(n, i)}">` +
+        `<span class="ans-in">${inner[s]}</span>${flik}</span>`;
+    }).join('');
+  }
+  const label = (n, top) => esc(ARK[top] ? `${n.name} – ${ARK[top].name}` : n.name);
+  const noteHtml = (n, inner, sheets, top, wall) => `<${wall ? 'span' : 'button type="button"'} class="ans-lapp" data-lapp="${n.id}" ` +
+    `style="left:${n.x}px; top:${n.y}px; width:${n.w}px; height:${n.h}px; --rot:${n.rot}deg"${wall ? '' : ` aria-label="${label(n, top)}"`}>` +
+    `${sheetsHtml(n, inner, sheets, top)}</${wall ? 'span' : 'button'}>`;
 
-  function board(W, inner, wall) {
-    const notes = W.notes.map((n) => noteHtml(n, inner[n.id], wall)).join('');
+  function board(W, inner, sheets, top, wall) {
+    const notes = W.notes.map((n) => noteHtml(n, inner[n.id], sheets, top, wall)).join('');
     const pins = W.notes.map(pin).join('');
     return '<i class="ans-f ans-topp"></i><i class="ans-f ans-botten"></i><i class="ans-f ans-vanster"></i><i class="ans-f ans-hoger"></i>' +
       `<span class="ans-yta"><span class="ans-jute">${W.marks}${notes}${pins}</span><i class="ans-glans"></i></span>`;
@@ -326,7 +378,7 @@ window.RumAnslag = (() => {
   // ---------- i rummet ----------
 
   function mount(root, o) {
-    const A = { on: false, ms: [], all: [], teams: new Map(), match: new Map(), html: '', loaded: 0, lyft: null, raf: 0, seed: -1, W: null };
+    const A = { on: false, ms: [], all: [], teams: new Map(), match: new Map(), html: '', loaded: 0, lyft: null, raf: 0, seed: -1, W: null, sheets: ['alla'], top: 'alla', anims: [], flip: 0 };
     const vagg = root.querySelector('#ans-vagg');
     const wallEl = root.querySelector('#rum-ans');
     const ov = root.querySelector('#rum-ansn');
@@ -365,23 +417,28 @@ window.RumAnslag = (() => {
       }
     }
 
+    // Datan till bladen: omgångens matcher och lag per division (D.ark), och
+    // de dolda resultaten för hela omgången (samma nyckel som kortregistret).
     function data() {
-      const names = [];
-      for (const m of A.ms) names.push(m.home, m.away);
       const stats = A.stats || new Map();
-      const round = names.map((name) => ({ name, t: stats.get(name) || null }));
+      const roundOf = (ms) => ms.flatMap((m) => [m.home, m.away]).map((name) => ({ name, t: stats.get(name) || null }));
       // dolda resultat i lagens divisioner: lapparna som räknar med dem får ?
       let veil = false;
       let key = '';
       let n = 0;
       if (window.Spoiler && Spoiler.on()) {
-        const comps = new Set(round.filter((x) => x.t).map((x) => x.t.comp));
+        const comps = new Set(roundOf(A.ms).filter((x) => x.t).map((x) => x.t.comp));
         const recent = A.all.filter((m) => comps.has(m.comp) && Spoiler.hides(m.kickoff));
         n = recent.filter(Spoiler.hidden).length;
         key = `ans:${recent.map((m) => m.id).sort().join(',')}`;
         veil = n > 0 && !Spoiler.isShown(key);
       }
-      return { ms: A.ms, teams: A.byTeam, match: A.match, round, kort: o.kort, veil, key, n };
+      const ark = {};
+      for (const s of A.sheets) {
+        const ms = s === 'alla' ? A.ms : A.ms.filter((m) => arkOf(m) === s);
+        ark[s] = { ms, teams: A.byTeam, match: A.match, round: roundOf(ms), kort: o.kort, veil, key, n };
+      }
+      return { ark, veil, key, n };
     }
 
     function draw() {
@@ -391,22 +448,95 @@ window.RumAnslag = (() => {
       const seed = Math.floor(Date.now() / DAY);
       if (seed !== A.seed) { A.seed = seed; A.W = wear(seed * 7 + 3); }
       const inner = {};
-      for (const n of NOTES) inner[n.id] = BUILD[n.id](VEILED.has(n.id) ? D : { ...D, veil: false });
-      const h = JSON.stringify(inner);
+      for (const n of NOTES) {
+        inner[n.id] = {};
+        for (const s of A.sheets) inner[n.id][s] = BUILD[n.id](VEILED.has(n.id) ? D.ark[s] : { ...D.ark[s], veil: false });
+      }
+      const h = JSON.stringify([A.sheets, inner]);
       if (h === A.html) return;
       A.html = h;
       A.inner = inner;
-      vagg.innerHTML = board(A.W, inner, true);
-      stor.innerHTML = board(A.W, inner, false);
+      stopFlip();
+      vagg.innerHTML = board(A.W, inner, A.sheets, A.top, true);
+      stor.innerHTML = board(A.W, inner, A.sheets, A.top, false);
       if (A.lyft) {
         const n = A.W.notes.find((x) => x.id === A.lyft.id);
         stor.querySelector(`[data-lapp="${n.id}"]`).classList.add('borta');
-        const card = lyftEl.querySelector('.ans-in');
-        if (card) card.innerHTML = inner[n.id];
-        if (n.paper === 'polaroid' && A.lyft.vand) lyftEl.querySelector('.ans-vand').classList.add('vand');
+        const card = lyftEl.querySelector('.ans-lapp');
+        if (card) card.innerHTML = sheetsHtml(n, inner[n.id], A.sheets, A.top);
+        if (n.paper === 'polaroid' && A.lyft.vand) vand(true);
         spoilerRow(n);
       }
     }
+
+    // ---------- bladen ----------
+
+    // Lägger bladen i en lapp i ordning med top överst.
+    function stack(el, top) {
+      for (const a of el.querySelectorAll(':scope > .ans-ark')) {
+        const lag = depth(A.sheets, a.dataset.ark, top);
+        a.style.zIndex = A.sheets.length - lag;
+        a.style.setProperty('--lag', lag);
+      }
+    }
+    function stopFlip() {
+      A.flip++;
+      for (const x of A.anims) x.cancel();
+      A.anims = [];
+    }
+    const lapparna = () => [...vagg.querySelectorAll('.ans-lapp'), ...stor.querySelectorAll('.ans-lapp'), ...lyftEl.querySelectorAll('.ans-lapp')];
+
+    // Bläddrar alla lappar till bladet to: framåt lyfts bladen ovanpå från
+    // nålen ett i taget och läggs under bunten, bakåt tas de nedersta fram
+    // och läggs överst. Lapparna på tavlan följer efter varandra från vänster.
+    function flip(to, dir) {
+      const S = A.sheets;
+      const N = S.length;
+      if (N < 2 || !S.includes(to) || to === A.top) return;
+      stopFlip();
+      const me = A.flip;
+      const i0 = S.indexOf(A.top);
+      const d = (S.indexOf(to) - i0 + N) % N;
+      const fwd = dir ? dir > 0 : d <= N - d;
+      const steps = fwd ? d : N - d;
+      const from = A.top;
+      A.top = to;
+      for (const el of lapparna()) {
+        const n = A.W.notes.find((x) => x.id === el.dataset.lapp);
+        if (el.tagName === 'BUTTON') el.setAttribute('aria-label', label(n, to).replace(/&amp;/g, '&'));
+        if (o.calm() || !A.on || vagg.contains(el)) { stack(el, to); continue; }
+        stack(el, from);
+        const wait = lyftEl.contains(el) ? 0 : Math.round((n.x / JW) * 190 + (n.y / JH) * 40);
+        for (let k = 0; k < steps; k++) {
+          const at = wait + k * 120;
+          const s = fwd ? S[(i0 + k) % N] : S[(i0 - k - 1 + N) % N];
+          const a = el.querySelector(`:scope > .ans-ark[data-ark="${s}"]`);
+          // bladet vrids kring nålen (överkanten) mot en; i vila är det platt
+          const base = `${a.style.transform} perspective(700px) rotateX(0deg)`;
+          const up = `${a.style.transform} perspective(700px) rotateX(-76deg)`;
+          if (fwd) {
+            // lyfts från nålen, och läggs under de andra på vägen ner
+            const lift = a.animate([{ transform: base }, { transform: up }], { duration: 220, delay: at, easing: 'cubic-bezier(0.45, 0, 0.8, 0.5)' });
+            A.anims.push(lift);
+            lift.finished.then(() => {
+              if (A.flip !== me) return;
+              stack(el, S[(i0 + k + 1) % N]);
+              A.anims.push(a.animate([{ transform: up }, { transform: base }], { duration: 300, easing: 'cubic-bezier(0.2, 0.6, 0.35, 1)' }));
+            }, () => {});
+          } else {
+            // tas fram underifrån och läggs överst (i samma bildruta)
+            const vant = a.animate([{ opacity: 1 }, { opacity: 1 }], { duration: Math.max(1, at) });
+            A.anims.push(vant);
+            vant.finished.then(() => {
+              if (A.flip !== me) return;
+              stack(el, s);
+              A.anims.push(a.animate([{ transform: up }, { transform: base }], { duration: 340, easing: 'cubic-bezier(0.25, 0.4, 0.3, 1)' }));
+            }, () => {});
+          }
+        }
+      }
+    }
+    const flipBy = (d) => flip(A.sheets[(A.sheets.indexOf(A.top) + d + A.sheets.length) % A.sheets.length], d);
 
     // ---------- närbilden ----------
 
@@ -512,7 +642,9 @@ window.RumAnslag = (() => {
     // vid sidorna.
     function held(n) {
       const sm = innerWidth < 700;
-      const s = Math.min((innerHeight - (innerHeight < 500 ? 120 : 220)) / n.h, (innerWidth - (sm ? 32 : 160)) / n.w / (sm ? 1.04 : 1.2), 3.2);
+      // flikarna sticker ut i högerkanten: lika mycket luft på båda sidor
+      const w = n.w + (ARK[A.top] ? 36 : 0);
+      const s = Math.min((innerHeight - (innerHeight < 500 ? 120 : 220)) / n.h, (innerWidth - (sm ? 32 : 160)) / w / (sm ? 1.04 : 1.2), 3.2);
       return { x: innerWidth / 2, y: (innerHeight - 70) / 2, s };
     }
     function placeLyft(n, anim) {
@@ -540,21 +672,26 @@ window.RumAnslag = (() => {
         : '';
     }
 
+    // polaroiderna i handen: alla bladen vända åt samma håll
+    function vand(on) {
+      for (const v of lyftEl.querySelectorAll('.ans-vand')) v.classList.toggle('vand', on);
+    }
+
     function lift(id) {
       const n = A.W.notes.find((x) => x.id === id);
       if (!n || !A.inner) return;
       if (A.lyft) drop(true);
       A.lyft = { id, vand: n.paper === 'polaroid' };
       ov.classList.add('lyft');
-      lyftEl.innerHTML = `<div class="ans-lapp p-${n.paper} i-handen" style="width:${n.w}px; height:${n.h}px"><span class="ans-in">${A.inner[id]}</span></div>`;
+      lyftEl.innerHTML = `<div class="ans-lapp i-handen" data-lapp="${id}" style="width:${n.w}px; height:${n.h}px">${sheetsHtml(n, A.inner[id], A.sheets, A.top)}</div>`;
       stor.querySelector(`[data-lapp="${id}"]`).classList.add('borta');
       spoilerRow(n);
       const anim = placeLyft(n, !o.calm());
       // polaroiden vänds på vägen fram
       if (n.paper === 'polaroid') {
-        const v = lyftEl.querySelector('.ans-vand');
-        if (anim) setTimeout(() => v.classList.add('vand'), 120);
-        else v.classList.add('vand');
+        const me = A.lyft;
+        if (anim) setTimeout(() => { if (A.lyft === me && me.vand) vand(true); }, 120);
+        else vand(true);
       }
       rad.querySelector('button').focus({ preventScroll: true });
     }
@@ -571,8 +708,7 @@ window.RumAnslag = (() => {
       };
       ov.classList.remove('lyft');
       if (now || o.calm() || !card) { back(); return; }
-      const v = card.querySelector('.ans-vand');
-      if (v) v.classList.remove('vand');
+      vand(false);
       const r = stor.querySelector(`[data-lapp="${n.id}"]`).getBoundingClientRect();
       const to = `translate(${r1(r.left + r.width / 2 - n.w / 2)}px, ${r1(r.top + r.height / 2 - n.h / 2)}px) scale(${A.place.k.toFixed(3)}) rotate(${n.rot}deg)`;
       card.animate([{ transform: card.style.transform }, { transform: to }], { duration: 380, easing: 'cubic-bezier(0.4, 0, 0.6, 1)' }).finished.then(back, back);
@@ -590,9 +726,11 @@ window.RumAnslag = (() => {
       if (!A.on) return;
       if (e.target.closest('a[href], .sp-show')) return;
       if (e.target.closest('[data-ans="tillbaka"]')) { drop(); return; }
+      // en flik bläddrar alla lappar till sin division
+      const f = e.target.closest('[data-flik]');
+      if (f && !vagg.contains(f)) { flip(f.dataset.flik); return; }
       if (A.lyft) {
-        const v = e.target.closest('.i-handen') && lyftEl.querySelector('.ans-vand');
-        if (v) v.classList.toggle('vand');
+        if (e.target.closest('.i-handen') && lyftEl.querySelector('.ans-vand')) vand((A.lyft.vand = !A.lyft.vand));
         else if (!e.target.closest('.i-handen, .ans-rad')) drop();
         return;
       }
@@ -604,6 +742,10 @@ window.RumAnslag = (() => {
     return {
       fill(ms, all) {
         A.ms = (ms || []).slice();
+        // bladen: divisionerna i omgången, och det valda överst så länge det finns
+        const S = Object.keys(ARK).filter((s) => A.ms.some((m) => arkOf(m) === s));
+        A.sheets = S.length ? S : ['alla'];
+        if (!A.sheets.includes(A.top)) A.top = A.sheets[0];
         if (A.all !== all) {
           A.all = all || [];
           A.byTeam = byTeam(A.all);
@@ -620,12 +762,14 @@ window.RumAnslag = (() => {
       open,
       on: () => A.on,
       lift: (id) => { if (A.on) lift(id); },
-      // Esc sätter tillbaka lappen (sedan tavlan i rum.js); pilarna bläddrar
+      // Esc sätter tillbaka lappen (sedan tavlan i rum.js); ←/→ bläddrar
+      // mellan lapparna och ↑/↓ mellan bladen
       key(k) {
         if (!A.on) return false;
         if (k === 'Escape' && A.lyft) { drop(); return true; }
-        if (A.lyft && /^Arrow(Right|Down)$/.test(k)) { step(1); return true; }
-        if (A.lyft && /^Arrow(Left|Up)$/.test(k)) { step(-1); return true; }
+        if (/^Arrow(Up|Down)$/.test(k)) { flipBy(k === 'ArrowDown' ? 1 : -1); return true; }
+        if (A.lyft && k === 'ArrowRight') { step(1); return true; }
+        if (A.lyft && k === 'ArrowLeft') { step(-1); return true; }
         if (!A.lyft && /^Arrow/.test(k)) { lift(A.W.notes[0].id); return true; }
         return false;
       },

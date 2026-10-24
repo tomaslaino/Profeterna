@@ -84,6 +84,8 @@
 
 /* ---------- lapparna ---------- */
 
+/* lappen är en bunt blad på samma nål (ett per division), papperet sitter
+   på bladen */
 .ans-lapp {
   position: absolute;
   display: block;
@@ -91,7 +93,7 @@
   margin: 0;
   padding: 0;
   border: 0;
-  border-radius: 1px;
+  background: none;
   text-align: left;
   color: #2b2419;
   font: 11px/1.3 "Special Elite", "American Typewriter", "Courier New", monospace;
@@ -99,9 +101,32 @@
   -webkit-appearance: none;
   transform-origin: 50% 4%;
   transform: rotate(var(--rot, 0deg));
-  box-shadow: 1px 3px 4px rgba(0, 0, 0, 0.45), 0 0 1px rgba(0, 0, 0, 0.35);
 }
+/* bladet har egen färg på texten: knapparnas vita text vid pekning
+   (theme.css) ska inte slå igenom på papperet */
+.ans-ark { position: absolute; inset: 0; display: block; color: #2b2419; border-radius: 1px; transform-origin: 50% 9px; box-shadow: 1px 3px 4px rgba(0, 0, 0, 0.45), 0 0 1px rgba(0, 0, 0, 0.35); }
+/* bladen längre ner i bunten ligger i skuggan av dem ovanpå */
+.ans-ark::after { content: ""; position: absolute; inset: 0; pointer-events: none; border-radius: inherit; background: rgba(40, 26, 8, calc(var(--lag, 0) * 0.06)); }
 .ans-in { position: absolute; inset: 0; display: block; padding: 14px 16px 10px; overflow: hidden; }
+
+/* indexflikarna: genomskinlig plast på bladets högerkant, i divisionens
+   färg där den sticker ut, med förkortningen i tusch */
+.ans-flik {
+  position: absolute;
+  right: -18px;
+  width: 32px;
+  height: 18px;
+  display: block;
+  border-radius: 1px 3px 3px 1px;
+  background:
+    linear-gradient(180deg, rgba(255, 255, 255, 0.42), rgba(255, 255, 255, 0) 60%),
+    linear-gradient(90deg, color-mix(in srgb, var(--dv) 24%, transparent) 0 14px, color-mix(in srgb, var(--dv) 86%, #fff) 14px);
+  box-shadow: 0.6px 1.2px 1.6px rgba(0, 0, 0, 0.32);
+}
+.ans-flik b { position: absolute; right: 0; top: 0; width: 18px; text-align: center; font: 700 13px/18px Caveat, cursive; color: #1b1712; }
+.ans-flik[data-flik="cup"] b { font-size: 11px; }
+.rum-ansn .ans-flik { cursor: pointer; }
+.rum-ansn .ans-flik:hover { filter: brightness(1.12) saturate(1.1); }
 .ans-lapp h4 { margin: 0 0 6px; font-weight: 400; }
 .ans-lapp .r { display: flex; justify-content: space-between; gap: 8px; white-space: nowrap; }
 .ans-lapp .r > span:first-child { overflow: hidden; text-overflow: ellipsis; }
@@ -250,7 +275,8 @@
 .ans-tavla.stor .ans-lapp { cursor: pointer; transition: transform 0.25s ease, box-shadow 0.25s ease; }
 .ans-tavla.stor .ans-nal, .ans-tavla.stor .ans-stift { transform: translateZ(3px); }
 /* lappen lyfter i nederkanten när man pekar på den (nålen håller upptill) */
-.rum-ansn.framme .ans-tavla.stor .ans-lapp:hover, .ans-tavla.stor .ans-lapp:focus-visible { transform: rotate(var(--rot, 0deg)) rotateX(14deg) translateZ(2px); box-shadow: 2px 12px 14px rgba(0, 0, 0, 0.45), 0 0 1px rgba(0, 0, 0, 0.35); }
+.rum-ansn.framme .ans-tavla.stor .ans-lapp:hover, .ans-tavla.stor .ans-lapp:focus-visible { transform: rotate(var(--rot, 0deg)) rotateX(14deg) translateZ(2px); }
+.rum-ansn.framme .ans-tavla.stor .ans-lapp:hover > .ans-ark, .ans-tavla.stor .ans-lapp:focus-visible > .ans-ark { box-shadow: 2px 12px 14px rgba(0, 0, 0, 0.4), 0 0 1px rgba(0, 0, 0, 0.35); }
 .ans-tavla.stor .ans-lapp:focus-visible { outline: 2px solid #f0d699; outline-offset: 3px; }
 .ans-lapp.borta { visibility: hidden; }
 .ans-fot { position: absolute; display: flex; justify-content: flex-end; opacity: 0; transition: opacity 0.3s ease; }
@@ -261,8 +287,9 @@
 .ans-lyft { position: absolute; inset: 0; pointer-events: none; }
 .ans-lyft::before { content: ""; position: absolute; inset: 0; background: rgba(10, 8, 6, 0.6); opacity: 0; transition: opacity 0.3s ease; }
 .rum-ansn.lyft .ans-lyft::before { opacity: 1; }
-.ans-lyft > .ans-lapp { left: 0; top: 0; transform-origin: 50% 50%; pointer-events: auto; cursor: default; box-shadow: 0 20px 40px rgba(0, 0, 0, 0.55), 0 0 1px rgba(0, 0, 0, 0.4); }
-.ans-lyft > .p-polaroid { cursor: pointer; }
+.ans-lyft > .ans-lapp { left: 0; top: 0; transform-origin: 50% 50%; pointer-events: auto; cursor: default; }
+.ans-lyft > .ans-lapp > .ans-ark { box-shadow: 0 14px 30px rgba(0, 0, 0, 0.32), 0 0 1px rgba(0, 0, 0, 0.4); }
+.ans-lyft .p-polaroid { cursor: pointer; }
 .ans-rad { position: absolute; left: 0; right: 0; display: flex; justify-content: center; align-items: center; gap: 28px; opacity: 0; pointer-events: none; transition: opacity 0.3s ease; }
 .rum-ansn.lyft .ans-rad { opacity: 1; pointer-events: auto; }
 .ans-rad .sp-card { margin: 0; }

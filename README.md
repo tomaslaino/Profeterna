@@ -1946,7 +1946,8 @@ zoomar och rullar inte i rummet (`touch-action: none`).
 Närbilderna ryms i fönstret: tv:n går så nära att den fyller bredden (på datorn 3,6 gånger
 som förut), anslagstavlan och lapparna får smalare kanter, och nära tv:n, videon och med en
 lapp i handen bläddrar ett svep i sidled som pilarna – tv:n till nästa sida, videon till
-nästa kassett och anslagstavlan till nästa lapp.
+nästa kassett och anslagstavlan till nästa lapp. Vid anslagstavlan bläddrar ett svep uppåt
+eller neråt bladen i lapparna till nästa division.
 
 **Kupongen på höjden** (`.rum.smal`: smalare än 600 px och högre än bred): kupongen på
 pulten, i handen och i högen är smal och hög, 420 × 620 i stället för 660 × 470, som en
@@ -2192,9 +2193,9 @@ som kupongen och fällbladstavlan):
   avspark (alla tävlingar, den senaste först), V, O eller F efter 90 minuter.
 - **Skadelistan** – ett genomslag: de skadade, avstängda och osäkra (?) per lag ur matchens
   fil (Fantasy Premier League) – de tre som har spelat mest, och resten som +n.
-- **Starkast** – en polaroid med skölden för omgångens starkaste lag i den högsta
-  divisionen; på baksidan modellens starkaste och svagaste lag i omgången per division
-  (styrkan ur `data/teams/<division>.json`, som på Statistik).
+- **Starkast** – en polaroid med skölden för divisionens starkaste lag i omgången; på
+  baksidan modellens starkaste och svagaste lag i omgången (styrkan ur
+  `data/teams/<division>.json`, som på Statistik; cupbladet per division).
 - **Kryssar gärna** – en gul lapp: chansen till oavgjort i lagets matcher, ur xG.
 - **Tur & otur** – rutat papper ur ett spiralblock: poäng mot chanserna (xG), med staplar i
   blyerts.
@@ -2207,12 +2208,24 @@ som kupongen och fällbladstavlan):
 
 Mötena, som tidigare stod här som Inbördes, står i kortregistret med resultaten.
 
+Varje lapp är en bunt blad på samma nål, ett per division i omgången – Premier League
+överst, sedan Championship, League One, League Two och sist cupmatcherna – och bladen under
+sticker fram lite i kanten, vridna kring nålen. På bladens högerkant sitter indexflikar av
+genomskinlig plast i divisionens färg (som på Tabeller), med förkortningen i tusch: *PL*,
+*CH*, *L1*, *L2* och *Cup*, i samma ordning uppifrån och med lika långt mellan sig. Ett
+klick på en flik, ↑/↓ eller ett svep uppåt/neråt i telefonen bläddrar alla lappar till den
+divisionen: bladen ovanpå lyfts från nålen ett i taget och läggs under bunten (bakåt tas de
+nedersta fram och läggs överst), lapp för lapp över tavlan från vänster. Listorna räknas då
+bara på divisionens lag, så att styrkan och motståndet jämförs inom divisionen; en lista
+som blir tom står som *Ingen*. Det valda bladet ligger kvar överst tills sidan laddas om.
+
 Ett klick eller A: tavlan lossnar från väggen och flyger fram – en projektiv avbildning
 (`matrix3d`) från hörnen på väggen till rakt fram, så att den vrids ut ur väggens vinkel –
 medan kameran går lite mot hörnet och rummet mörknar bakom; där den hängde är väggen
 ljusare. Framme lutar den lite efter musen, så att ramens djup syns, och lapparna lyfter i
 nederkanten när man pekar på dem. Ett klick på en lapp tar den från nålen och fram i läsbar
-storlek (polaroiden vänds på vägen), och pilarna bläddrar mellan lapparna. Esc, ett klick
+storlek (polaroiden vänds på vägen) med bunten och flikarna, ←/→ bläddrar mellan lapparna
+och ↑/↓ mellan bladen. Esc, ett klick
 utanför eller *Häng tillbaka* sätter tillbaka lappen; Esc, A eller ett klick utanför tavlan
 hänger tillbaka tavlan – den flyger till hörnen där den hänger när kameran har gått
 tillbaka (rum.js mäter dem med kameran där en kort stund). Guldordet *Statistik* under
@@ -2223,7 +2236,8 @@ Dolda resultat: formen får ? för de dolda matcherna, och lapparna som räknar 
 resultaten (styrkan, krysset, turen, oddsen och motståndet) visar bara rubriken och ett
 frågetecken när en match i lagens divisioner är dold – den lyfta lappen har då *Visa ändå*.
 Lagfilerna hämtas med rummet (om igen efter en kvart), matchernas filer när tavlan tas fram.
-Slitaget skiftar med dagen: lapparnas vinklar, nålhålen och hörnen av rivna lappar.
+Slitaget skiftar med dagen: lapparnas och bladens vinklar, nålhålen och hörnen av rivna
+lappar.
 `?rum-anslag` visar tavlan framme i en fast bild, och `?rum-anslag=<lapp>` (form, skador,
 styrka, kryss, tur, odds, vila, motstand) med den lappen i handen.
 
