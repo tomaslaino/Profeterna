@@ -76,6 +76,8 @@ window.Rum = (() => {
   const nara = () => Boolean(R.kup || R.zoom || R.vnara || R.sak || (R.ans && R.ans.on()) || (R.reg && R.reg.on()));
   // punkten (fx, fy) i fönstret – mitten om inget annat sägs – i scenens mått
   const mid = (fx = 0.5, fy = 0.5) => [(innerWidth * fx - R.ox) / R.k, (innerHeight * fy - R.oy) / R.k];
+  // i telefonen (som i rum-3d.js och de andra): rummet sparar på minnet
+  const LATT = matchMedia('(max-width: 700px), (max-height: 500px)').matches;
 
   function rng(a) {
     return () => {
@@ -386,8 +388,266 @@ window.Rum = (() => {
   // (rum-ute.js) ritas om hela tiden och har egna filter. SVG:n som ritar en
   // bild hämtas från en blob som släpps efteråt: en data-URL låg kvar i
   // Safaris cache med filtrens mellanbilder, ungefär 350 MB för hela rummet.
+  // Bruset räknas ut här i stället (brus): samma brus som filtret, utan att
+  // gå via en bild av SVG:n – Safari höll ändå kvar fyra–fem kopior av varje
+  // bild, ungefär 350 MB för furun, väggen och pulten. Det blir också färre
+  // bildpunkter där bruset är mjukt (som ådringen på höjden).
   // → när allt är bakat
   const BAKA = { 'rum-b1': 2, 'rum-b4': 2, 'rum-b10': 0.6, 'rum-b24': 0.5, 'rum-b40': 0.35, 'rum-grainwood': 2, 'rum-ved': 2, 'rum-flack': 2, 'rum-prick': 2, 'rum-grime': 2 };
+
+  // feTurbulence som i SVG-specifikationen (samma slumptal, gitter och
+  // oktaver som i webbläsaren): fn(kanal, x, y) → 0…1.
+  function turbulens(seed, [fx, fy], oktaver, fraktal) {
+    const BS = 256;
+    const N = BS + BS + 2;
+    let s = Math.trunc(seed);
+    if (s <= 0) s = -(s % 2147483646) + 1;
+    if (s > 2147483646) s = 2147483646;
+    const rnd = () => {
+      s = 16807 * (s % 127773) - 2836 * Math.floor(s / 127773);
+      if (s <= 0) s += 2147483647;
+      return s;
+    };
+    const lat = new Int32Array(N);
+    const g = new Float64Array(4 * N * 2);
+    for (let k = 0; k < 4; k++) {
+      for (let i = 0; i < BS; i++) {
+        lat[i] = i;
+        const o = (k * N + i) * 2;
+        do {
+          g[o] = ((rnd() % (BS + BS)) - BS) / BS;
+          g[o + 1] = ((rnd() % (BS + BS)) - BS) / BS;
+        } while (!g[o] && !g[o + 1]);
+        const l = Math.hypot(g[o], g[o + 1]);
+        g[o] /= l;
+        g[o + 1] /= l;
+      }
+    }
+    for (let i = BS - 1; i > 0; i--) {
+      const k = lat[i];
+      const j = rnd() % BS;
+      lat[i] = lat[j];
+      lat[j] = k;
+    }
+    for (let i = 0; i < BS + 2; i++) {
+      lat[BS + i] = lat[i];
+      for (let k = 0; k < 4; k++) g.copyWithin((k * N + BS + i) * 2, (k * N + i) * 2, (k * N + i) * 2 + 2);
+    }
+    const kurva = (t) => t * t * (3 - 2 * t);
+    function noise(k, vx, vy) {
+      const tx = vx + 4096;
+      const ty = vy + 4096;
+      const bx = Math.trunc(tx);
+      const by = Math.trunc(ty);
+      const rx = tx - bx;
+      const ry = ty - by;
+      const i = lat[bx & 255];
+      const j = lat[(bx + 1) & 255];
+      const b0 = by & 255;
+      const b1 = (by + 1) & 255;
+      const q = (n, x, y) => { const o = (k * N + n) * 2; return x * g[o] + y * g[o + 1]; };
+      const sx = kurva(rx);
+      const u0 = q(lat[i + b0], rx, ry);
+      const a = u0 + sx * (q(lat[j + b0], rx - 1, ry) - u0);
+      const u1 = q(lat[i + b1], rx, ry - 1);
+      const b = u1 + sx * (q(lat[j + b1], rx - 1, ry - 1) - u1);
+      return a + kurva(ry) * (b - a);
+    }
+    return (k, x, y) => {
+      let sum = 0;
+      let vx = x * fx;
+      let vy = y * fy;
+      for (let o = 0, r = 1; o < oktaver; o++, r *= 2, vx *= 2, vy *= 2) {
+        const n = noise(k, vx, vy);
+        sum += (fraktal ? n : Math.abs(n)) / r;
+      }
+      return Math.min(1, Math.max(0, fraktal ? sum * 0.5 + 0.5 : sum));
+    };
+  }
+
+  // En PNG av bildpunkterna (RGBA, w × h) utan duk.
+  const CRC = new Uint32Array(256).map((_, n) => {
+    let c = n;
+    for (let k = 0; k < 8; k++) c = c & 1 ? 0xedb88320 ^ (c >>> 1) : c >>> 1;
+    return c;
+  });
+  async function png(w, h, px) {
+    const rad = w * 4 + 1;
+    const raw = new Uint8Array(rad * h);
+    for (let y = 0; y < h; y++) raw.set(px.subarray(y * w * 4, (y + 1) * w * 4), y * rad + 1);
+    const z = new Uint8Array(await new Response(new Blob([raw]).stream().pipeThrough(new CompressionStream('deflate'))).arrayBuffer());
+    const bit = (typ, data) => {
+      const b = new Uint8Array(12 + data.length);
+      const v = new DataView(b.buffer);
+      v.setUint32(0, data.length);
+      for (let i = 0; i < 4; i++) b[4 + i] = typ.charCodeAt(i);
+      b.set(data, 8);
+      let c = ~0;
+      for (let i = 4; i < 8 + data.length; i++) c = CRC[(c ^ b[i]) & 255] ^ (c >>> 8);
+      v.setUint32(8 + data.length, ~c >>> 0);
+      return b;
+    };
+    const hd = new Uint8Array(13);
+    new DataView(hd.buffer).setUint32(0, w);
+    new DataView(hd.buffer).setUint32(4, h);
+    hd.set([8, 6], 8);
+    return new Blob([new Uint8Array([137, 80, 78, 71, 13, 10, 26, 10]), bit('IHDR', hd), bit('IDAT', z), bit('IEND', new Uint8Array(0))], { type: 'image/png' });
+  }
+
+  // Ett brusfilter (feTurbulence och sedan feColorMatrix med fast färg och
+  // alfa ur bruset) i rutan (x, y, w, h) → en PNG, eller null för andra filter.
+  // Bildpunkterna räcker för brusets finaste oktav, högst 2 per px.
+  async function brus(f, x, y, w, h) {
+    const [t, m, ...rest] = f.children;
+    if (rest.length || !t || !m || t.localName !== 'feTurbulence' || m.localName !== 'feColorMatrix' || !window.CompressionStream) return null;
+    if ((m.getAttribute('type') || 'matrix') !== 'matrix' || t.getAttribute('stitchTiles') === 'stitch') return null;
+    const v = (m.getAttribute('values') || '').trim().split(/[\s,]+/).map(Number);
+    if (v.length !== 20 || [0, 1, 2, 3, 5, 6, 7, 8, 10, 11, 12, 13].some((i) => v[i])) return null;
+    const bf = (t.getAttribute('baseFrequency') || '0').trim().split(/[\s,]+/).map(Number);
+    const fq = [bf[0], bf.length > 1 ? bf[1] : bf[0]];
+    const okt = parseInt(t.getAttribute('numOctaves') || '1', 10);
+    const fn = turbulens(Number(t.getAttribute('seed') || 0), fq, okt, t.getAttribute('type') === 'fractalNoise');
+    const [sx, sy] = fq.map((q) => Math.min(2, Math.max(0.25, q * 2 ** (okt - 1) * 5)));
+    const cw = Math.max(1, Math.round(w * sx));
+    const ch = Math.max(1, Math.round(h * sy));
+    // färgen räknas i linearRGB om inget annat sägs, och visas i sRGB
+    const lin = f.getAttribute('color-interpolation-filters') !== 'sRGB';
+    const srgb = (c) => Math.round(255 * Math.min(1, Math.max(0, !lin ? c : c <= 0.0031308 ? 12.92 * c : 1.055 * c ** (1 / 2.4) - 0.055)));
+    const [r, gr, b] = [v[4], v[9], v[14]].map(srgb);
+    const ka = [0, 1, 2, 3].filter((k) => v[15 + k]);
+    const px = new Uint8Array(cw * ch * 4);
+    for (let j = 0, o = 0; j < ch; j++) {
+      const yy = y + ((j + 0.5) * h) / ch;
+      for (let i = 0; i < cw; i++, o += 4) {
+        const xx = x + ((i + 0.5) * w) / cw;
+        let a = v[19];
+        // som i filtret: bruset som 8 bitar
+        for (const k of ka) a += v[15 + k] * (Math.round(fn(k, xx, yy) * 255) / 255);
+        px[o] = r;
+        px[o + 1] = gr;
+        px[o + 2] = b;
+        px[o + 3] = Math.round(255 * Math.min(1, Math.max(0, a)));
+      }
+    }
+    return png(cw, ch, px);
+  }
+
+  // Oskärpan (ett feGaussianBlur) av en form i en enda färg: formen ritas
+  // på en duk och suddas med tre lådfilter som i specifikationen, i rutan
+  // (x, y, w, h) med s bildpunkter per px → en PNG, eller null.
+  async function oskarpa(f, e, x, y, w, h, s) {
+    const [g, ...rest] = f.children;
+    if (rest.length || !g || g.localName !== 'feGaussianBlur' || (g.getAttribute('in') || 'SourceGraphic') !== 'SourceGraphic' || !window.CompressionStream) return null;
+    const cs = getComputedStyle(e);
+    const farg = (p) => (p && p !== 'none' && /^rgba?\(/.test(p) ? p : null);
+    const fill = farg(cs.fill);
+    const stroke = farg(cs.stroke) && parseFloat(cs.strokeWidth) > 0 ? cs.stroke : null;
+    if ((cs.fill !== 'none' && !fill) || (cs.stroke !== 'none' && !farg(cs.stroke)) || (fill && stroke) || !(fill || stroke)) return null;
+    const num = (a) => parseFloat(e.getAttribute(a)) || 0;
+    const p = new Path2D();
+    switch (e.localName) {
+      case 'ellipse': p.ellipse(num('cx'), num('cy'), num('rx'), num('ry'), 0, 0, 2 * Math.PI); break;
+      case 'circle': p.arc(num('cx'), num('cy'), num('r'), 0, 2 * Math.PI); break;
+      case 'rect': if (p.roundRect && num('rx')) p.roundRect(num('x'), num('y'), num('width'), num('height'), num('rx')); else p.rect(num('x'), num('y'), num('width'), num('height')); break;
+      case 'path': p.addPath(new Path2D(e.getAttribute('d'))); break;
+      case 'line': p.moveTo(num('x1'), num('y1')); p.lineTo(num('x2'), num('y2')); break;
+      case 'polygon': case 'polyline': {
+        const v = (e.getAttribute('points') || '').trim().split(/[\s,]+/).map(Number);
+        for (let i = 0; i + 1 < v.length; i += 2) (i ? p.lineTo : p.moveTo).call(p, v[i], v[i + 1]);
+        if (e.localName === 'polygon') p.closePath();
+        break;
+      }
+      default: return null;
+    }
+    const cw = Math.max(1, Math.round(w * s));
+    const ch = Math.max(1, Math.round(h * s));
+    const c = document.createElement('canvas');
+    c.width = cw;
+    c.height = ch;
+    const k = c.getContext('2d', { willReadFrequently: true });
+    k.setTransform(cw / w, 0, 0, ch / h, (-x * cw) / w, (-y * ch) / h);
+    k.fillStyle = k.strokeStyle = '#fff';
+    if (fill) {
+      k.globalAlpha = parseFloat(cs.fillOpacity);
+      k.fill(p, cs.fillRule === 'evenodd' ? 'evenodd' : 'nonzero');
+    } else {
+      k.globalAlpha = parseFloat(cs.strokeOpacity);
+      k.lineWidth = parseFloat(cs.strokeWidth);
+      k.lineCap = cs.strokeLinecap;
+      k.lineJoin = cs.strokeLinejoin;
+      k.stroke(p);
+    }
+    const d = k.getImageData(0, 0, cw, ch).data;
+    c.width = c.height = 0;
+    let a = new Float32Array(cw * ch);
+    for (let i = 0; i < a.length; i++) a[i] = d[i * 4 + 3];
+    const sd = (g.getAttribute('stdDeviation') || '0').trim().split(/[\s,]+/).map(Number);
+    a = sudda(a, cw, ch, sd[0] * (cw / w), 1);
+    a = sudda(a, ch, cw, (sd.length > 1 ? sd[1] : sd[0]) * (ch / h), cw);
+    const [r, gr, b] = (fill || stroke).match(/[\d.]+/g).map(Number);
+    const px = new Uint8Array(cw * ch * 4);
+    for (let i = 0, o = 0; i < a.length; i++, o += 4) {
+      px[o] = r;
+      px[o + 1] = gr;
+      px[o + 2] = b;
+      px[o + 3] = Math.round(Math.min(255, a[i]));
+    }
+    return png(cw, ch, px);
+  }
+
+  // Gaussisk oskärpa längs en led (n punkter per rad, steg st mellan dem):
+  // tre lådfilter (d enligt specifikationen) eller, för små σ, en riktig kärna.
+  function sudda(a, n, rader, sigma, st) {
+    if (!(sigma > 0)) return a;
+    const ut = new Float32Array(a.length);
+    const rad = st === 1 ? (r) => r * n : (r) => r;
+    const steg = st === 1 ? 1 : st;
+    const buf = new Float32Array(n);
+    const tmp = new Float32Array(n);
+    // en låda av storleken d, med centrum förskjutet off (−1, 0 eller +1 halv)
+    const lada = (src, dst, dd, off) => {
+      const lo = Math.floor((dd - 1) / 2) + (off < 0 ? 1 : 0);
+      const v = dd - 1 - lo;
+      let sum = 0;
+      for (let i = -lo; i <= v; i++) if (i >= 0 && i < n) sum += src[i];
+      for (let i = 0; i < n; i++) {
+        dst[i] = sum / dd;
+        const ut0 = i - lo;
+        const in1 = i + v + 1;
+        if (ut0 >= 0 && ut0 < n) sum -= src[ut0];
+        if (in1 >= 0 && in1 < n) sum += src[in1];
+      }
+    };
+    let kern = null;
+    let dd = 0;
+    if (sigma < 2) {
+      const r = Math.ceil(sigma * 3);
+      kern = new Float32Array(r * 2 + 1);
+      let t = 0;
+      for (let i = -r; i <= r; i++) t += kern[i + r] = Math.exp(-(i * i) / (2 * sigma * sigma));
+      for (let i = 0; i < kern.length; i++) kern[i] /= t;
+    } else dd = Math.floor((sigma * 3 * Math.sqrt(2 * Math.PI)) / 4 + 0.5);
+    for (let r = 0; r < rader; r++) {
+      const b0 = rad(r);
+      for (let i = 0; i < n; i++) buf[i] = a[b0 + i * steg];
+      if (kern) {
+        const R2 = (kern.length - 1) / 2;
+        for (let i = 0; i < n; i++) {
+          let s = 0;
+          for (let j = -R2; j <= R2; j++) if (i + j >= 0 && i + j < n) s += buf[i + j] * kern[j + R2];
+          tmp[i] = s;
+        }
+        buf.set(tmp);
+      } else if (dd % 2) {
+        lada(buf, tmp, dd, 0); lada(tmp, buf, dd, 0); lada(buf, tmp, dd, 0); buf.set(tmp);
+      } else {
+        lada(buf, tmp, dd, -1); lada(tmp, buf, dd, 1); lada(buf, tmp, dd + 1, 0); buf.set(tmp);
+      }
+      for (let i = 0; i < n; i++) ut[b0 + i * steg] = buf[i];
+    }
+    return ut;
+  }
+
   function baka() {
     const ns = 'http://www.w3.org/2000/svg';
     const idOf = (e) => (/^url\(#([\w-]+)\)$/.exec(e.getAttribute('filter')) || [])[1];
@@ -399,6 +659,8 @@ window.Rum = (() => {
     mat.setAttribute('style', 'position: absolute; left: -9999px; top: 0; width: 10px; height: 10px; visibility: hidden');
     document.body.append(mat);
     const xs = new XMLSerializer();
+    // bilderna byts in på en gång, så att varje lager ritas om en gång
+    const byt = [];
     return (async () => {
       for (const e of els) {
         const id = idOf(e);
@@ -418,26 +680,29 @@ window.Rum = (() => {
           const y = b.y + del('y', -0.1) * b.height;
           const w = del('width', 1.2) * b.width;
           const h = del('height', 1.2) * b.height;
-          const cw = Math.max(1, Math.round(w * BAKA[id]));
-          const ch = Math.max(1, Math.round(h * BAKA[id]));
-          k.setAttribute('filter', `url(#${id})`);
-          src = URL.createObjectURL(new Blob([`<svg xmlns="${ns}" width="${cw}" height="${ch}" viewBox="${x} ${y} ${w} ${h}" preserveAspectRatio="none">${DEFS}${xs.serializeToString(k)}</svg>`], { type: 'image/svg+xml' }));
-          img.src = src;
-          await img.decode();
-          const c = document.createElement('canvas');
-          c.width = cw;
-          c.height = ch;
-          c.getContext('2d').drawImage(img, 0, 0, cw, ch);
-          img.src = '';
-          URL.revokeObjectURL(src);
-          src = '';
-          const blob = await new Promise((r) => c.toBlob(r, 'image/png'));
-          c.width = c.height = 0;
+          let blob = (await brus(f, x, y, w, h)) || (await oskarpa(f, e, x, y, w, h, BAKA[id]));
+          if (!blob) {
+            const cw = Math.max(1, Math.round(w * BAKA[id]));
+            const ch = Math.max(1, Math.round(h * BAKA[id]));
+            k.setAttribute('filter', `url(#${id})`);
+            src = URL.createObjectURL(new Blob([`<svg xmlns="${ns}" width="${cw}" height="${ch}" viewBox="${x} ${y} ${w} ${h}" preserveAspectRatio="none">${DEFS}${xs.serializeToString(k)}</svg>`], { type: 'image/svg+xml' }));
+            img.src = src;
+            await img.decode();
+            const c = document.createElement('canvas');
+            c.width = cw;
+            c.height = ch;
+            c.getContext('2d').drawImage(img, 0, 0, cw, ch);
+            img.src = '';
+            URL.revokeObjectURL(src);
+            src = '';
+            blob = await new Promise((r) => c.toBlob(r, 'image/png'));
+            c.width = c.height = 0;
+          }
           if (!blob) throw new Error('ingen bild');
           const im = document.createElementNS(ns, 'image');
           for (const [a, v] of [['href', URL.createObjectURL(blob)], ['x', x], ['y', y], ['width', w], ['height', h], ['preserveAspectRatio', 'none']]) im.setAttribute(a, v);
           for (const a of ['opacity', 'class', 'transform', 'clip-path', 'style']) if (e.hasAttribute(a)) im.setAttribute(a, e.getAttribute(a));
-          e.replaceWith(im);
+          byt.push([e, im]);
         } catch {
           // går det inte står filtret kvar som förut
           e.removeAttribute('visibility');
@@ -448,6 +713,7 @@ window.Rum = (() => {
         }
       }
       mat.remove();
+      for (const [e, im] of byt) e.replaceWith(im);
     })();
   }
 
@@ -480,7 +746,7 @@ ${window.RumRegister ? RumRegister.nara() : ''}
     R.tv = window.RumTv ? RumTv.mount(el, { calm, short, kort: (n) => BOARD[n] || short(n), wd, hm, matches: () => (state.all && state.all.matches) || [] }) : null;
     R.ans = window.RumAnslag ? RumAnslag.mount(el, { calm, kort: (n) => BOARD[n] || short(n), close: () => board(false) }) : null;
     R.video = window.RumVideo ? RumVideo.mount(el, { calm, short, kort: (n) => BOARD[n] || short(n), aim: (f) => { R.vf = f; aimVideo(calm() ? null : 'glid'); } }) : null;
-    R.reg = window.RumRegister ? RumRegister.mount(el, { calm, kort: (n) => BOARD[n] || short(n), close: () => register(false) }) : null;
+    R.reg = window.RumRegister ? RumRegister.mount(el, { calm, kort: (n) => BOARD[n] || short(n), close: () => register(false), tur: (fn) => tur(fn, 3) }) : null;
     paintUte();
     R.bakat = baka();
   }
@@ -1028,22 +1294,61 @@ ${window.RumRegister ? RumRegister.nara() : ''}
 
   // ---------- figurerna ----------
 
+  // I telefonen startar 3D-delarna (gänget, inredningen, sakerna och
+  // kortlådan) en i taget i ordning, och först när rummet syns: var och en
+  // tar ett par hundra MB medan den startar (shaders, texturer, ljuset), och
+  // alla på en gång medan rummet ritades var för mycket för en iPhone. På
+  // datorn startar de på en gång som förut.
+  // tur(fn, ordning) → fn():s löfte
+  const TUR = [];
+  function tur(fn, ordning = 0) {
+    if (!LATT) return fn();
+    return new Promise((res, rej) => {
+      TUR.push({ fn, ordning, res, rej });
+      TUR.sort((a, b) => a.ordning - b.ordning);
+      nasta();
+    });
+  }
+  // → när alla har startat (för en fast bild)
+  const TOM = [];
+  const turTom = () => (LATT && (R.turGar || TUR.length) ? new Promise((r) => TOM.push(r)) : Promise.resolve());
+  async function nasta() {
+    if (R.turGar || !R.turStart) return;
+    if (!TUR.length) {
+      TOM.splice(0).forEach((r) => r());
+      return;
+    }
+    R.turGar = true;
+    const t = TUR.shift();
+    try {
+      t.res(await t.fn());
+    } catch (err) {
+      t.rej(err);
+    }
+    // en stund emellan, så att det som startade hinner städa efter sig
+    await new Promise((r) => setTimeout(r, 300));
+    R.turGar = false;
+    nasta();
+  }
+
   async function three() {
     if (R.fig || R.loading) return;
     R.loading = true;
     // askkoppen, snusdosan, fläkten och affischen (rum-saker.js)
-    import('./rum-saker.js').then((m) => m.saker(R.el, { calm: calm() })).then((x) => { R.saker = x; frame(); })
+    tur(() => import('./rum-saker.js').then((m) => m.saker(R.el, { calm: calm() })).then((x) => { R.saker = x; frame(); }), 2)
       .catch((err) => console.warn('Rummet: sakerna kunde inte ritas', err));
     // lysröret, neonen, skyltarna, uret, ramarna, paketen, stolen och kupongstället (rum-inredning.js)
-    import('./rum-inredning.js').then((m) => m.inredning(R.el, { calm: calm(), still })).then((x) => { R.inr = x; x.namn(R.ramNamn); if (R.sak) sak(R.sak, null); frame(); })
+    tur(() => import('./rum-inredning.js').then((m) => m.inredning(R.el, { calm: calm(), still })).then((x) => { R.inr = x; x.namn(R.ramNamn); if (R.sak) sak(R.sak, null); frame(); }), 1)
       .catch((err) => console.warn('Rummet: inredningen kunde inte ritas', err));
     try {
-      const mod = await import('./rum-3d.js');
-      R.fig = await mod.figurer(document.getElementById('rum-3d'), { calm: calm(), vader: R.vader });
-      if (R.vem) R.fig.inne(R.vem, now());
-      if (R.lage) R.fig.lage(R.lage, now());
-      provMal();
-      frame();
+      await tur(async () => {
+        const mod = await import('./rum-3d.js');
+        R.fig = await mod.figurer(document.getElementById('rum-3d'), { calm: calm(), vader: R.vader });
+        if (R.vem) R.fig.inne(R.vem, now());
+        if (R.lage) R.fig.lage(R.lage, now());
+        provMal();
+        frame();
+      });
     } catch (err) {
       // utan WebGL eller utan nätet står rummet kvar utan gänget
       console.warn('Rummet: figurerna kunde inte ritas', err);
@@ -2421,12 +2726,31 @@ ${window.RumRegister ? RumRegister.nara() : ''}
     zoomTv(false);
     zoomVideo(false);
     hot(null);
+    const data = load();
+    // I telefonen syns världen först när filtren är bakade, datan ifylld och
+    // typsnitten laddade (rummet är mörkt så länge, tand): annars ritas allt
+    // en gång till medan det laddas, och minnet räckte inte.
+    if (LATT && !R.visad) {
+      R.visad = true;
+      R.el.classList.add('laddar');
+      Promise.race([Promise.all([R.bakat, data, document.fonts.ready]), new Promise((r) => setTimeout(r, 4000))])
+        .then(() => new Promise((r) => requestAnimationFrame(r)))
+        .then(() => {
+          R.el.classList.remove('laddar');
+          R.turStart = true;
+          nasta();
+        });
+    } else if (!R.turStart) {
+      R.turStart = true;
+      nasta();
+    }
     // gänget klär sig efter vädret: vänta lite på det (i en fast bild tills det är hämtat)
-    const ready = Promise.all([load(), Promise.race([ute(), new Promise((r) => setTimeout(r, still() ? 9000 : 1500))]).then(three), R.bakat]);
+    const ready = Promise.all([data, Promise.race([ute(), new Promise((r) => setTimeout(r, still() ? 9000 : 1500))]).then(three), R.bakat]);
     tand(ready);
     if (still()) {
-      // en fast bild: allt på samma tid, och klar när datan och gänget är ritade
-      ready.then(() => {
+      // en fast bild: allt på samma tid, och klar när datan och gänget är
+      // ritade (och i telefonen resten av 3D-delarna, tur)
+      ready.then(turTom).then(() => {
         freezeCss(R.frozen);
         if (q.has('rum-anslag')) {
           board(true);

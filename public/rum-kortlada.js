@@ -60,7 +60,9 @@ export async function kortlada(o) {
   gl.domElement.className = 'reg-gl';
   o.nara.append(gl.domElement);
   const scene = new THREE.Scene();
-  scene.environment = new THREE.PMREMGenerator(gl).fromScene(new RoomEnvironment(), 0.04).texture;
+  const pmrem = new THREE.PMREMGenerator(gl);
+  scene.environment = pmrem.fromScene(new RoomEnvironment(), 0.04).texture;
+  pmrem.dispose();
 
   // kameran som högra väggen; view(r) visar rektangeln r (scenens px)
   const cam = new THREE.PerspectiveCamera(2 * Math.atan(FH / 2 / E) / DEG, FW / FH, 5, 6000);

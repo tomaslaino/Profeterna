@@ -204,7 +204,9 @@ async function props(pult, opt) {
   r.shadowMap.enabled = true;
   r.shadowMap.type = THREE.PCFSoftShadowMap;
   const scene = new THREE.Scene();
-  scene.environment = new THREE.PMREMGenerator(r).fromScene(new RoomEnvironment(), 0.04).texture;
+  const pmrem = new THREE.PMREMGenerator(r);
+  scene.environment = pmrem.fromScene(new RoomEnvironment(), 0.04).texture;
+  pmrem.dispose();
   // kameran ser på O; duken är en bit av en bild som har O i mitten
   const full = { w: 2 * Math.max(O.x - BOX.x, BOX.x + BOX.w - O.x), h: 2 * Math.max(O.y - BOX.y, BOX.y + BOX.h - O.y) };
   const cam = new THREE.PerspectiveCamera(2 * Math.atan(full.h / 2 / D) / DEG, full.w / full.h, 50, 5000);

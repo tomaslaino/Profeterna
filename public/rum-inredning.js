@@ -62,7 +62,9 @@ export async function inredning(el, opt = {}) {
   gl.toneMapping = THREE.ACESFilmicToneMapping;
   gl.shadowMap.enabled = true;
   gl.shadowMap.type = THREE.PCFSoftShadowMap;
-  const env = new THREE.PMREMGenerator(gl).fromScene(new RoomEnvironment(), 0.04).texture;
+  const pmrem = new THREE.PMREMGenerator(gl);
+  const env = pmrem.fromScene(new RoomEnvironment(), 0.04).texture;
+  pmrem.dispose();
   const planes = [...el.querySelectorAll('.rum-world > .rum-pl')];
 
   const mat = (color, o = {}) => new THREE.MeshPhysicalMaterial(Object.assign({ color, roughness: 0.6, envMapIntensity: 0.5 }, o));

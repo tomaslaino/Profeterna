@@ -145,7 +145,7 @@ export async function figurer(canvas, opt = {}) {
   // så att minnet räcker
   const LATT = matchMedia('(max-width: 700px), (max-height: 500px)').matches;
   const SKUGGA = LATT ? 1024 : 2048;
-  const r = new THREE.WebGLRenderer({ canvas, alpha: true, antialias: !LATT, preserveDrawingBuffer: true });
+  const r = new THREE.WebGLRenderer({ canvas, alpha: true, antialias: !LATT, preserveDrawingBuffer: !LATT });
   r.setPixelRatio(LATT ? 1.5 : Math.min(window.devicePixelRatio || 1, 2));
   r.setSize(W, H, false);
   r.toneMapping = THREE.ACESFilmicToneMapping;
@@ -153,7 +153,9 @@ export async function figurer(canvas, opt = {}) {
   r.shadowMap.enabled = true;
   r.shadowMap.type = THREE.PCFSoftShadowMap;
   const scene = new THREE.Scene();
-  scene.environment = new THREE.PMREMGenerator(r).fromScene(new RoomEnvironment(), 0.04).texture;
+  const pmrem = new THREE.PMREMGenerator(r);
+  scene.environment = pmrem.fromScene(new RoomEnvironment(), 0.04).texture;
+  pmrem.dispose();
   const cam = new THREE.PerspectiveCamera(2 * Math.atan(H / 2 / D) / DEG, W / H, 50, 5000);
   cam.position.set(0, 0, D);
   cam.lookAt(0, 0, 0);
@@ -235,9 +237,10 @@ export async function figurer(canvas, opt = {}) {
     const img = new Image();
     img.onload = () => {
       const c = document.createElement('canvas');
-      c.width = 1024;
-      c.height = 1152;
-      c.getContext('2d').drawImage(img, 0, 0, 1024, 1152);
+      // i telefonen räcker hälften (ansiktena är små där)
+      c.width = LATT ? 512 : 1024;
+      c.height = LATT ? 576 : 1152;
+      c.getContext('2d').drawImage(img, 0, 0, c.width, c.height);
       const t = new THREE.CanvasTexture(c);
       t.colorSpace = THREE.SRGBColorSpace;
       t.anisotropy = 8;

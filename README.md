@@ -1981,9 +1981,28 @@ Därför:
   som ritade något fick en yta i hela scenens storlek också när det var litet – tv:ns sken
   gav tv:ns plan en, och pokalhyllan och neonskenet var lager i hela scenens storlek.
 - **Filtren bakas.** Brus- och oskärpefiltren i SVG:n ritas en gång till bilder (`baka` i
-  rum.js, på datorn också – de ser likadana ut). SVG:n som ritar bilden hämtas från en blob
-  som släpps efteråt; som data-URL låg den kvar i Safaris cache med filtrens mellanbilder,
-  ungefär 350 MB.
+  rum.js, på datorn också – de ser likadana ut). Bruset (feTurbulence och en färgmatris med
+  fast färg) räknas ut i rum.js med specifikationens algoritm och samma frö (`turbulens`,
+  `brus`), och oskärpan av en form i en färg med tre lådfilter som i specifikationen
+  (`oskarpa`, `sudda`); bilderna sparas som PNG utan duk (`png`). Bara det som inte går
+  så (skenet från lysröret, med en gradient) ritas som förut via en bild av SVG:n. Safari
+  höll kvar fyra–fem kopior av varje bild som gick via en SVG-bild och en duk, ungefär 350 MB
+  för furun, väggen och pulten (oavsett pixeltäthet), och bakningen tog flera sekunder. Bruset
+  får bara så många bildpunkter som dess finaste oktav behöver (högst 2 per px; ådringen
+  färre på höjden), och alla bilder byts in på en gång. I Chrome blev de bakade skenen tomma
+  förut (neonskenet, ljuset på pulten); nu syns de som i Safari.
+- **Rummet syns först när det är klart.** I telefonen är världen (`.rum-world`) dold
+  (`.laddar` i rum.css) tills filtren är bakade, datan ifylld och typsnitten laddade, högst
+  4 sekunder – under tiden är rummet mörkt som när lysröret tänds. Annars ritades varje lager
+  först utan och sedan med de bakade bilderna, och ett lager som ritas om hålls i två
+  buffertar en stund.
+- **3D-delarna startar en i taget** i telefonen (`tur` i rum.js): gänget, inredningen,
+  sakerna och sist kortlådan (`o.tur` i rum-register.js), var och en när den förra är klar
+  och rummet syns. Var och en tar några hundra MB medan den startar (shaders, texturer,
+  ljuset). En fast bild (`?rum-t`) väntar på alla. Hjälpbufferten till miljöljuset
+  (PMREMGenerator) släpps när ljuset är klart, i alla fyra.
+- **Den mörka starten** (`.rum-mork`, masken med oskärpa runt fönstret) ritas med en
+  fjärdedels bildpunkter i telefonen som ljuset – masken låg annars kvar i minnet efteråt.
 - **Det som ritas i större storlek för att vara skarpt nära** ritas mindre i telefonen: tv:n i
   1,5 gånger lådans mått i stället för 3 (se [Tv:n](#tvn)) och videohörnet i halva storleken på
   håll (se [Videon](#videon)). Anslagstavlans yta står före ramens sidor, så att den inte blir ett
@@ -1996,13 +2015,18 @@ Därför:
   flyttar det som inte står i 0,0.
 - **3D-delarna** (gänget, sakerna, inredningen och kortlådan) ritas i telefonen med 1,5
   bildpunkter per punkt, utan kantutjämning och med skuggkartor på 1024 i stället för 2048
-  (`LATT`).
+  (`LATT`). Gängets ansikten ritas där i halva storleken (512 × 576), och gänget sparar
+  ingen extra kopia av bilden (`preserveDrawingBuffer`).
 
 Mätt i Safaris motor (WKWebView, täthet 2) i 390 × 664 före planen, tv:n, videon och
 blobarna: från ungefär 1,9 GB till 1,1–1,3 GB. Med WebKits eget lagerträd (WebKitGTK, via
 inspektören) räknat som i en iPhone (täthet 3, rutor över 1280 punkter) tar lagren efter dem i
 390 × 664 ungefär 140 MB i stället för 260, längst åt höger 240 i stället för 570 och på
 bredden (844 × 390) 300 i stället för 690 – och bakningen håller inte längre kvar 350 MB.
+Med bruset och oskärpan i rum.js, den dolda världen och 3D-delarna en i taget, mätt i
+WKWebView i 390 × 664 när allt har startat: täthet 2 från 1,24 GB efter laddningen och 1,3–1,7
+GB i topp till ungefär 0,70 och 0,9–1,0 GB, täthet 3 (som en iPhone) från 1,4 och 1,6–1,9 GB
+till ungefär 0,94 och 1,4 GB.
 
 ### Utsikten och vädret
 
