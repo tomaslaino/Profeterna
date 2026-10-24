@@ -1,0 +1,30 @@
+{
+  "omgangar": [
+    {
+      "id": "2026-10-24-mk9c2t",
+      "namn": "Oxford och Cambridge i samma båt",
+      "syftar": "Rivalerna från det klassiska båtracet spelar båda hemma i League One samtidigt och ligger båda topp sju, så de sitter verkligen i samma båt.",
+      "datum": "2026-10-24",
+      "gang": [
+        { "id": "DL", "namn": "Daniel Laino" },
+        { "id": "DT", "namn": "Daniel Teijder" },
+        { "id": "DJ", "namn": "Daniel Johansson" }
+      ],
+      "matcher": [
+        { "id": "401878768", "match": "Arsenal – Everton", "avspark": "2026-10-24T14:00:00.000Z", "tips": { "DL": "X", "DT": "1", "DJ": "1X" } },
+        { "id": "401879255", "match": "Coventry City – Fulham", "avspark": "2026-10-24T14:00:00.000Z", "tips": { "DL": "1X", "DT": "2", "DJ": "1X2" }, "motivering": { "DJ": "Båda ser riktigt svaga ut" } },
+        { "id": "401880208", "match": "Blackburn Rovers – Wrexham", "avspark": "2026-10-24T14:00:00.000Z", "tips": { "DL": "1X", "DT": "1X2", "DJ": "2" } },
+        { "id": "401880206", "match": "Cardiff City – Birmingham City", "avspark": "2026-10-24T14:00:00.000Z", "tips": { "DL": "2", "DT": "1X2", "DJ": "2" } },
+        { "id": "401880204", "match": "Lincoln City – Burnley", "avspark": "2026-10-24T14:00:00.000Z", "tips": { "DL": "2", "DT": "2", "DJ": "1X" } },
+        { "id": "401880202", "match": "Preston North End – West Bromwich Albion", "avspark": "2026-10-24T14:00:00.000Z", "tips": { "DL": "X2", "DT": "2", "DJ": "2" } },
+        { "id": "401880201", "match": "Queens Park Rangers – Swansea City", "avspark": "2026-10-24T14:00:00.000Z", "tips": { "DL": "1", "DT": "12", "DJ": "2" } },
+        { "id": "401880199", "match": "Stoke City – Bristol City", "avspark": "2026-10-24T14:00:00.000Z", "tips": { "DL": "1", "DT": "X2", "DJ": "1X2" } },
+        { "id": "401880198", "match": "West Ham United – Southampton", "avspark": "2026-10-24T14:00:00.000Z", "tips": { "DL": "1X", "DT": "1X2", "DJ": "1X2" } },
+        { "id": "401880197", "match": "Wolverhampton Wanderers – Watford", "avspark": "2026-10-24T14:00:00.000Z", "tips": { "DL": "1", "DT": "1", "DJ": "1" } },
+        { "id": "401880774", "match": "Cambridge United – Plymouth Argyle", "avspark": "2026-10-24T14:00:00.000Z", "tips": { "DL": "12", "DT": "12", "DJ": "1" } },
+        { "id": "401880769", "match": "Oxford United – Bradford City", "avspark": "2026-10-24T14:00:00.000Z", "tips": { "DL": "1X", "DT": "1X2", "DJ": "1" } },
+        { "id": "401878767", "match": "Chelsea – Tottenham Hotspur", "avspark": "2026-10-24T16:30:00.000Z", "tips": { "DL": "X", "DT": "1", "DJ": "1" } }
+      ]
+    }
+  ]
+}
