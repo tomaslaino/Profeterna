@@ -1945,8 +1945,9 @@ hämtas inget).
 ### I telefonen
 
 Rummet står i alla fönster utom de allra minsta (`Rum.fits`: minst 280 × 260 px), i
-telefonen också. Scenen täcker fönstret som på datorn och fyller alltså höjden på en
-telefon på höjden. Det som inte ryms når man med fingret: scenen följer med när man drar,
+telefonen också. Scenen täcker fönstret som på datorn, men i telefonen på höjden syns lite
+mer av rummet: scenen fyller 80 % av höjden (`HOJD` i rum.js), med mörkt över och under.
+Det som inte ryms når man med fingret: scenen följer med när man drar,
 glider vidare en bit när man släpper den i farten, och kameran vrids efter var i rummet man
 står, som med musen (`swipe` och `pan` i rum.js; med musen nedtryckt går det likadant i ett
 smalt fönster). Ett tryck på ett föremål gör samma sak som ett klick, och ett tryck efter
@@ -2007,13 +2008,16 @@ Därför:
   (PMREMGenerator) släpps när ljuset är klart, i alla fyra.
 - **Den mörka starten** (`.rum-mork`, masken med oskärpa runt fönstret) ritas med en
   fjärdedels bildpunkter i telefonen som ljuset – masken låg annars kvar i minnet efteråt.
+- **Bakväggen och pulten** (SVG:erna utan text) ritas i telefonen med 2/3 av bildpunkterna –
+  lika många som syns där, där scenen visas förminskad – och neonens svaga sken över
+  fönsterbänken är ett eget lager med en fjärdedel (`z` i `svg` i rum.js).
 - **Det som ritas i större storlek för att vara skarpt nära** ritas mindre i telefonen: tv:n i
   1,5 gånger lådans mått i stället för 3 (se [Tv:n](#tvn)) och videohörnet i halva storleken på
   håll (se [Videon](#videon)). Anslagstavlans yta står före ramens sidor, så att den inte blir ett
   eget lager, och flaggan i utsikten är ett eget lager – annars ritades hela utsikten om hela
   tiden, och ett lager som ritas om hålls i två buffertar.
 - **Det suddiga ritas med färre bildpunkter.** Ljuset, vinjetten och kornet med en fjärdedel
-  respektive hälften och utsikten med 0,6 (CSS zoom, förstorat igen), tv:ns sken och
+  respektive hälften och utsikten med 0,4 (CSS zoom, förstorat igen), tv:ns sken och
   anslagstavlans glans en fjärdedel så stora och förstorade med transform. Zoom går inte på
   det som har text mellan 9 och 18 px (Safari gör text som blir mindre än 9 px större) och
   flyttar det som inte står i 0,0.

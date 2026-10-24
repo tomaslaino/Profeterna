@@ -98,8 +98,12 @@ window.Rum = (() => {
   // Safari ritar ett lager i full storlek gånger skärmens pixeltäthet: en
   // SVG får därför bara rutan (x, y, b, h) som det den ritar behöver, med
   // samma koordinater som scenen.
-  const svg = (inner, cls = '', [x, y, b, h] = [0, 0, W, H]) => `<svg class="rum-layer${cls ? ` ${cls}` : ''}" viewBox="${x} ${y} ${b} ${h}" ` +
-    `style="left:${x}px; top:${y}px; width:${b}px; height:${h}px" aria-hidden="true">${inner}</svg>`;
+  const svg = (inner, cls = '', [x, y, b, h] = [0, 0, W, H], z = 1) => `<svg class="rum-layer${cls ? ` ${cls}` : ''}" viewBox="${x} ${y} ${b} ${h}" ` +
+    `style="${zoom(x, y, z)}width:${b}px; height:${h}px" aria-hidden="true">${inner}</svg>`;
+  // I telefonen ritas en SVG utan text, som inte behöver vara skarpare nära,
+  // med z av bildpunkterna (CSS zoom och sedan förstorad igen, som ljuset i
+  // rum.css): 2/3 är så många som syns där, där scenen visas förminskad.
+  const zoom = (x, y, z) => (LATT && z !== 1 ? `zoom:${z}; transform:scale(${(1 / z).toFixed(4)}); transform-origin:0 0; left:${r1(x / z)}px; top:${r1(y / z)}px; ` : `left:${x}px; top:${y}px; `);
 
   const DEFS = `<defs>
     <linearGradient id="rum-night" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#0a0f19"/><stop offset=".55" stop-color="#121826"/><stop offset="1" stop-color="#1c1d24"/></linearGradient>
@@ -229,7 +233,7 @@ window.Rum = (() => {
   <g stroke="#d9c7a1" stroke-opacity=".5" stroke-width="2.4" stroke-linecap="round">
     <line x1="1092" y1="500" x2="1130" y2="511"/><line x1="1236" y1="543" x2="1250" y2="547"/><line x1="1318" y1="567" x2="1372" y2="583"/><line x1="1490" y1="619" x2="1512" y2="626"/>
   </g>
-  <polygon points="1060,492 1600,654 1600,700 1060,540" fill="#000" opacity=".12"/>`);
+  <polygon points="1060,492 1600,654 1600,700 1060,540" fill="#000" opacity=".12"/>`, '', undefined, 2 / 3);
   }
 
   // Neonskylten är i 3D (rum-inredning.js) och glappar ibland (neonOn); här
@@ -316,7 +320,7 @@ window.Rum = (() => {
   <ellipse cx="1340" cy="930" rx="34" ry="12" fill="none" stroke="#2a160a" stroke-opacity=".35" stroke-width="3"/>
   <ellipse cx="1120" cy="700" rx="30" ry="10" fill="none" stroke="#2a160a" stroke-opacity=".25" stroke-width="2.5"/>
   <g fill="#1a0e06" opacity=".55"><ellipse cx="372" cy="760" rx="7" ry="3"/><ellipse cx="1452" cy="742" rx="6" ry="2.4"/><ellipse cx="1480" cy="870" rx="5" ry="2"/></g>
-  <rect x="-10" y="984" width="1620" height="20" fill="url(#rum-alu)"/>`, '', [0, 510, W, H - 510]);
+  <rect x="-10" y="984" width="1620" height="20" fill="url(#rum-alu)"/>`, '', [0, 510, W, H - 510], 2 / 3);
   }
 
   function sill() {
@@ -325,8 +329,9 @@ window.Rum = (() => {
   <polygon points="262,${S - 14} 958,${S - 14} 984,${S + 10} 236,${S + 10}" filter="url(#rum-prick)" opacity=".6"/>
   <rect x="236" y="${S + 10}" width="748" height="12" fill="#4a453c"/>
   <g stroke="#cfc6b0" stroke-opacity=".45" stroke-width="1.6"><line x1="300" y1="${S + 10}" x2="342" y2="${S + 10}"/><line x1="610" y1="${S + 10}" x2="628" y2="${S + 10}"/><line x1="880" y1="${S + 10}" x2="930" y2="${S + 10}"/></g>
-  <rect x="236" y="${S + 22}" width="748" height="6" fill="#000" opacity=".3" filter="url(#rum-b4)"/>
-  <ellipse cx="560" cy="${S - 150}" rx="360" ry="150" fill="#ff3a2a" opacity=".05" filter="url(#rum-b40)"/>`, '', [0, 100, 1380, 630]) +
+  <rect x="236" y="${S + 22}" width="748" height="6" fill="#000" opacity=".3" filter="url(#rum-b4)"/>`, '', [220, 540, 780, 75]) +
+      // det svaga skenet från neonen för sig, med en fjärdedel av bildpunkterna i telefonen
+      svg(`<ellipse cx="560" cy="${S - 150}" rx="360" ry="150" fill="#ff3a2a" opacity=".05" filter="url(#rum-b40)"/>`, '', [40, 120, 1040, 600], 0.25) +
       '<canvas id="rum-3d" class="rum-3d" width="1280" height="560"></canvas>';
   }
 
@@ -2658,7 +2663,9 @@ ${window.RumRegister ? RumRegister.nara() : ''}
   }
 
   // Scenen täcker fönstret (1600 × 1000, beskuren i kanterna); det som inte
-  // ryms når man med fingret (pan).
+  // ryms når man med fingret (pan). I telefonen på höjden syns lite mer av
+  // rummet: scenen fyller 80 % av höjden, med mörkt över och under.
+  const HOJD = 0.8;
   function fit() {
     if (!R.el || R.el.hidden) return;
     // för litet för rummet: den vanliga förstasidan (route i app.js)
@@ -2666,7 +2673,7 @@ ${window.RumRegister ? RumRegister.nara() : ''}
       dispatchEvent(new HashChangeEvent('hashchange'));
       return;
     }
-    R.k = Math.max(innerWidth / W, innerHeight / H);
+    R.k = Math.max(innerWidth / W, (innerHeight / H) * (LATT ? HOJD : 1));
     pan(R.px, R.py);
     // i telefonen på höjden: den smala kupongen, och på bredden orden
     // bredvid kupongen i handen
