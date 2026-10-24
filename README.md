@@ -479,6 +479,12 @@ Utan nyckel ingen knapp.
   sitt fasta mått: stämpeln och spelstoppet under bandet, porträtten i stället för
   initialerna, en synkmarkering per rad och fälten och streckkoden i foten. Papperet fick
   streckkoden i foten. Se [Kupongen i handen](#kupongen-i-handen).
+- **Tobaksaffären också i telefonen (2026-10-24, användarens önskemål):** rummet står nu i
+  alla fönster utom de allra minsta, i telefonen också, och den vanliga förstasidan finns
+  kvar som *Vanlig sida*. Scenen fyller höjden, och man ser sig omkring med fingret – scenen
+  följer med och kameran vrids som med musen. På höjden är kupongen smal och hög som en
+  riktig stryktipskupong, så att den går att fylla i; på bredden står orden bredvid kupongen
+  i handen. Se [I telefonen](#i-telefonen).
 - **Säsongsprognosen tas bort (2026-10-20, användarens beslut):** vyn under Tabeller och
   simuleringen i bygget (`src/season.js`, `data/season.json`) försvinner, liksom
   programmet framåt och prognosdelen i lagkortet. Tabeller visar bara tabellen, med
@@ -567,7 +573,7 @@ server:
   [Omgångens tippare](#omgångens-tippare). Utmärkelserna räknas och ritas av
   [public/utmarkelser.js](public/utmarkelser.js) med
   [public/utmarkelser.css](public/utmarkelser.css), se [Utmärkelserna](#utmärkelserna).
-- **Tobaksaffären:** förstasidan på stora skärmar, [public/rum.js](public/rum.js) med
+- **Tobaksaffären:** förstasidan, [public/rum.js](public/rum.js) med
   [public/rum.css](public/rum.css) och gänget i three.js i [public/rum-3d.js](public/rum-3d.js)
   (ansiktena i `public/rum/`). Se [Tobaksaffären](#tobaksaffären).
 - **Frontend:** ren HTML/CSS/JS i `public/`, flikarna Matcher, Kupong och Olympen och
@@ -1062,8 +1068,8 @@ ställningen efter 90 minuter (samma utfall som prognosen).
 
 **Var den syns**
 
-- **Förstasidan** (utan adress på stora skärmar [Tobaksaffären](#tobaksaffären), annars och
-  med `#hem` den vanliga – ingen flik, dit leder namnet): till vänster oraklet och
+- **Förstasidan** (utan adress [Tobaksaffären](#tobaksaffären), med `#hem` den
+  vanliga – ingen flik, dit leder namnet): till vänster oraklet och
   Ikaros som två polaroider med mottot under (se [Omgångens tippare](#omgångens-tippare)),
   till höger omgången utan kort runt sig – i telefonen bilderna överst och omgången
   centrerad under. Omgångens kupong är gängets kupong ur omgången som alla tippade (se
@@ -1705,7 +1711,7 @@ tippare på förstasidan länkar hit (*Till Olympen*).
 
 ## Tobaksaffären
 
-Förstasidan på stora skärmar (utan adress, bredare än 900 px och inte på högkant):
+Förstasidan (utan adress), på datorn och i telefonen (se [I telefonen](#i-telefonen)):
 tobaksaffären vid spelpulten. Scenen ritas i 1600 × 1000 och skalas så att den täcker
 fönstret; lagren ligger på olika djup (CSS 3D) och vrids lite när musen rör sig. Namnet
 och foten (*K kupongen · T tv:n · A anslagstavlan · R kortregistret · V videon*, *Vanlig sida*) ligger utanför scenen i fönstrets hörn;
@@ -1922,6 +1928,36 @@ sätter `data-rum-klar` på `body` när allt är ritat. Vädret och klockan utan
 `halvklart`, `mulet`, `dimma`, `dugg`, `regn`, `skurar`, `snoblandat`, `sno` eller `aska`,
 `?rum-grader=<°C>`, `?rum-vind=<m/s>` och `?rum-snodjup=<cm>` (med både vädret och graderna
 hämtas inget).
+
+### I telefonen
+
+Rummet står i alla fönster utom de allra minsta (`Rum.fits`: minst 280 × 260 px), i
+telefonen också. Scenen täcker fönstret som på datorn och fyller alltså höjden på en
+telefon på höjden. Det som inte ryms når man med fingret: scenen följer med när man drar,
+glider vidare en bit när man släpper den i farten, och kameran vrids efter var i rummet man
+står, som med musen (`swipe` och `pan` i rum.js; med musen nedtryckt går det likadant i ett
+smalt fönster). Ett tryck på ett föremål gör samma sak som ett klick, och ett tryck efter
+ett drag öppnar ingenting. Föremålen lyser inte kvar efter ett tryck (`:hover` bara med
+mus), och foten har bara *Vanlig sida* – utan tangentbord står inga tangenter där. Sidan
+zoomar och rullar inte i rummet (`touch-action: none`).
+
+Närbilderna ryms i fönstret: tv:n går så nära att den fyller bredden (på datorn 3,6 gånger
+som förut), anslagstavlan och lapparna får smalare kanter, och nära tv:n, videon och med en
+lapp i handen bläddrar ett svep i sidled som pilarna – tv:n till nästa sida, videon till
+nästa kassett och anslagstavlan till nästa lapp.
+
+**Kupongen på höjden** (`.rum.smal`: smalare än 600 px och högre än bred): kupongen på
+pulten, i handen och i högen är smal och hög, 420 × 620 i stället för 660 × 470, som en
+riktig stryktipskupong, med samma mitt så att högen och handen ligger där de ligger (`KUP`
+i rum.js). Raderna har två våningar – lagen överst, dagen och motiveringen under – och
+rutorna är större (44 × 26). Fälten står över hela bredden i foten, streckkoden får inte
+plats och pennan vilar i kanten under fälten. I handen fyller kupongen bredden, orden under
+den får gå på två rader, och meddelandet (*2 matcher saknar tecken.*) står ovanför kupongen
+där namnet annars står. Papperets regler för telefonen i papper.css gäller inte kupongen i
+rummet.
+
+**På bredden i telefonen** (`.rum.lag`: lägre än 500 px): kupongen i handen fyller höjden,
+och orden står i en spalt bredvid den – *Lägg tillbaka* överst och guldordet längst ner.
 
 ### Utsikten och vädret
 

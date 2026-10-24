@@ -410,9 +410,10 @@ window.RumAnslag = (() => {
 
     // ---------- närbilden ----------
 
-    // Tavlans plats i fönstret: ryms mellan namnet och foten.
+    // Tavlans plats i fönstret: ryms mellan namnet och foten (i telefonen
+    // med smalare kanter).
     function place() {
-      const k = Math.min((innerWidth - 120) / BW, (innerHeight - 170) / BH, 1.35);
+      const k = Math.min((innerWidth - (innerWidth < 700 ? 24 : 120)) / BW, (innerHeight - (innerHeight < 500 ? 90 : 170)) / BH, 1.35);
       const L = (innerWidth - BW * k) / 2;
       const T = (innerHeight - BH * k) / 2 - 16;
       A.place = { k, L, T, q: [[L, T], [L + BW * k, T], [L + BW * k, T + BH * k], [L, T + BH * k]] };
@@ -506,9 +507,12 @@ window.RumAnslag = (() => {
 
     // ---------- en lapp i handen ----------
 
-    // Lappen i läsbar storlek mitt i fönstret: { x, y, s } för mitten.
+    // Lappen i läsbar storlek mitt i fönstret: { x, y, s } för mitten. I
+    // telefonen bläddrar man med ett svep (rum.js), så där behövs ingen plats
+    // vid sidorna.
     function held(n) {
-      const s = Math.min((innerHeight - 220) / n.h, (innerWidth - 160) / n.w / 1.2, 3.2);
+      const sm = innerWidth < 700;
+      const s = Math.min((innerHeight - (innerHeight < 500 ? 120 : 220)) / n.h, (innerWidth - (sm ? 32 : 160)) / n.w / (sm ? 1.04 : 1.2), 3.2);
       return { x: innerWidth / 2, y: (innerHeight - 70) / 2, s };
     }
     function placeLyft(n, anim) {

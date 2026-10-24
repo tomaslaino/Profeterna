@@ -1,4 +1,4 @@
-/* Tobaksaffären (rum.js): förstasidan på stora skärmar. Scenen ritas i
+/* Tobaksaffären (rum.js): förstasidan. Scenen ritas i
    1600 × 1000 och skalas så att den täcker fönstret; namnet och foten ligger
    utanför scenen i fönstrets hörn. Lagren ligger på olika djup och vrids med
    musen (--rx, --ry). */
@@ -59,7 +59,9 @@ a.rum-sak, a.rum-sak:hover { color: inherit; text-decoration: none; }
 
 /* föremålen lyser lite när man pekar på dem */
 .rum-sak { transition: filter 0.25s ease; }
-.rum-sak:hover, .rum-sak:focus-visible { filter: brightness(1.18) drop-shadow(0 0 10px rgba(240, 214, 153, 0.35)); outline: none; }
+.rum-sak:focus-visible { filter: brightness(1.18) drop-shadow(0 0 10px rgba(240, 214, 153, 0.35)); outline: none; }
+/* (med fingret blir :hover kvar efter ett tryck, så där lyser de inte) */
+@media (hover: hover) { .rum-sak:hover { filter: brightness(1.18) drop-shadow(0 0 10px rgba(240, 214, 153, 0.35)); outline: none; } }
 
 /* ---------- regnet och neonen ---------- */
 
@@ -633,6 +635,78 @@ a.rum-sak, a.rum-sak:hover { color: inherit; text-decoration: none; }
 .rum-ft .keys { font-family: -apple-system, "Helvetica Neue", sans-serif; font-size: 12px; letter-spacing: 1.2px; text-transform: uppercase; opacity: 0.8; text-shadow: 0 1px 8px #000; }
 .rum-ft .keys b { color: #f0d699; font-weight: 600; }
 .rum-ft a { font-family: Fraunces, Georgia, serif; font-size: 16px; color: #a9c8fb; text-decoration: underline; text-underline-offset: 4px; text-decoration-thickness: 1px; text-shadow: 0 1px 8px #000; }
+
+/* ---------- i telefonen ---------- */
+
+/* Fingret drar scenen (rum.js, swipe): sidan zoomar och rullar inte, och
+   ett långt tryck på ett föremål visar ingen länk. */
+.rum { touch-action: none; -webkit-tap-highlight-color: transparent; }
+.rum a, .rum img { -webkit-user-drag: none; -webkit-touch-callout: none; }
+/* utan tangentbord: inga tangenter i foten */
+@media (hover: none) { .rum-ft .keys { display: none; } }
+@media (max-width: 600px), (max-height: 500px) {
+  .rum-hdr { left: 20px; right: 20px; top: 16px; }
+  .rum-brand { font-size: 24px; }
+  .rum-ft { right: 20px; bottom: 14px; }
+}
+
+/* papperets regler för telefonen (papper.css) gäller inte kupongen i rummet */
+.rum-kup .row .pp-nr { display: grid; }
+.rum-kup .pp-tm .vs { display: inline; height: auto; overflow: visible; }
+.rum-kup .pp-field b { text-align: left; }
+.rum-kup .pp-field b small { display: inline; margin: 0 0 0 6px; font-size: 11px; }
+.rum-kup .pp-code { justify-items: center; }
+
+/* På höjden är kupongen smal och hög, som en riktig stryktipskupong, och
+   raderna har två våningar: lagen överst, dagen och motiveringen under.
+   Mitten är densamma som den breda kupongens (760, 853), så att högen och
+   handen ligger där de ligger (rum.js, KUP). */
+.rum.smal #rum-kupong, .rum.smal .rum-handen, .rum.smal .rum-bak { left: 550px; top: 543px; width: 420px; height: 620px; }
+.rum.smal #rum-kupong, .rum.smal .rum-handen { padding: 0 16px 0 36px; }
+.rum.smal .rum-kup .band { margin: 0 -16px 0 -36px; padding: 0 16px 0 36px; }
+.rum.smal .rum-kup .band small { letter-spacing: 0.18em; }
+.rum.smal .rum-kup .topp .pp-stop { min-width: 0; }
+.rum.smal .rum-kup .hd, .rum.smal .rum-kup .row { grid-template-columns: 22px minmax(0, 1fr) 44px 44px 44px; }
+.rum.smal .rum-kup .row { height: 34px; }
+.rum.smal .rum-kup .row::before { left: 10px; margin-top: 14px; }
+.rum.smal .rum-kup .row .m { flex-wrap: wrap; align-content: center; gap: 0 7px; }
+.rum.smal .rum-kup .row .pp-tm { flex: 0 0 100%; line-height: 16px; }
+.rum.smal .rum-kup .row .pp-small { line-height: 14px; }
+.rum.smal .rum-kup .row .not { line-height: 14px; }
+.rum.smal .rum-kup .pen { height: 15px; }
+.rum.smal .rum-kup .pen-in { height: 14px; }
+.rum.smal .rum-kup .box { height: 26px; font-size: 11px; line-height: 23px; }
+.rum.smal .rum-kup .kryss { width: 44px; height: 26px; }
+/* foten: fälten över hela bredden, och pennan vilar under dem i kanten
+   (streckkoden får inte plats) */
+.rum.smal .rum-kup .fot { left: 36px; right: 16px; bottom: 18px; }
+.rum.smal .rum-kup .fot .pp-fields { flex: 1; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 0 14px; }
+.rum.smal .rum-kup .fot .pp-code { display: none; }
+.rum.smal .rum-kup .stampel { left: 180px; }
+/* baksidan i högen */
+.rum.smal .rum-bak .foto { left: 40px; top: 70px; }
+.rum.smal .rum-bak .gem { left: 94px; top: 36px; }
+.rum.smal .rum-bak .namn { left: 252px; top: 60px; font-size: 130px; }
+.rum.smal .rum-bak .stampel { right: 40px; top: 330px; }
+.rum.smal .rum-bak .regler { left: 42px; right: 42px; top: 430px; }
+
+/* Orden under kupongen i handen får gå på två rader, och meddelandet står
+   ovanför kupongen, där namnet annars står (--upp i rum.js, placeRow). */
+.rum.smal .rum-hand { flex-wrap: wrap; row-gap: 14px; }
+.rum.smal .rum-hand .hoger { margin-left: auto; }
+.rum.smal .rum-hand .msg { position: absolute; left: 0; right: 0; bottom: calc(100% + var(--upp, 0px)); }
+.rum.smal.i-handen .rum-hdr { opacity: 0; }
+.rum.smal .rum-hand :is(button, a) { font-size: 17px; }
+.rum.smal .rum-hand .fin { font-size: 14px; }
+.rum.smal .rum-hand :is(.vanster, .hoger) { gap: 20px; }
+
+/* På bredden i telefonen står orden i en spalt bredvid kupongen: Lägg
+   tillbaka överst, guldordet längst ner. */
+.rum.lag .rum-hand { flex-direction: column; align-items: flex-start; justify-content: space-between; gap: 14px; }
+.rum.lag .rum-hand :is(.vanster, .hoger) { flex-direction: column; align-items: flex-start; gap: 14px; }
+.rum.lag .rum-hand .msg { flex: none; text-align: left; font-size: 14px; }
+.rum.lag .rum-hand :is(button, a) { font-size: 17px; }
+.rum.lag .rum-hand .fin { font-size: 14px; }
 
 @media (prefers-reduced-motion: reduce) {
   .rum-regn-b, .rum-droppe, .rum-rok i, .rum-ram-glans::after,

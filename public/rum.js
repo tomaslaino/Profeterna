@@ -2,7 +2,7 @@
 
 // ---------- rummet ----------
 //
-// Förstasidan på stora skärmar: tobaksaffären vid spelpulten, ritad i lager
+// Förstasidan: tobaksaffären vid spelpulten, ritad i lager
 // på olika djup (CSS 3D) som vrids lite när musen rör sig. Gänget – DL, DT
 // och DJ – sitter som leksaksfigurer (three.js, rum-3d.js) på fönsterbänken,
 // dricker öl, röker och pratar. Föremålen leder vidare, som i ett rum hos
@@ -22,9 +22,13 @@
 // Det finns ingen meny: pekar man på ett föremål lyser det, och snabbvalet på
 // text-tv:n som det leder till tänds.
 //
-// Vanlig sida (#hem) är den vanliga förstasidan. I telefonen och i smala
-// fönster står den alltid där i stället för rummet (Rum.fits). Rörelserna
-// stängs av med prefers-reduced-motion. För bilder: ?rum-t=<sekunder> fryser
+// Vanlig sida (#hem) är den vanliga förstasidan. I telefonen står rummet
+// också: scenen fyller höjden, och man ser sig omkring med fingret (pan) –
+// scenen följer med och kameran vrids som med musen. På höjden är kupongen
+// smal och hög (.rum.smal), som en riktig stryktipskupong, så att den går
+// att fylla i; på bredden i telefonen står orden bredvid kupongen i handen
+// (.rum.lag). Rörelserna stängs av med prefers-reduced-motion.
+// För bilder: ?rum-t=<sekunder> fryser
 // klockan, ?rum-mx=&rum-my= kamerans läge (−1…1), ?rum-vantar=DL,DT låter
 // dem sitta med kupongen som om de inte hade lämnat in. ?rum-anslag visar anslagstavlan
 // framme (=form, =skador … med den lappen i handen), ?rum-register
@@ -62,10 +66,14 @@ window.Rum = (() => {
 
 
   const R = { built: false, on: false, el: null, q: new URLSearchParams(location.search), t0: performance.now(), frozen: null,
-    mx: 0.5, my: -0.25, tx: 0.5, ty: -0.25, raf: 0, fig: null, zoom: null, last: 0 };
+    mx: 0.5, my: -0.25, tx: 0.5, ty: -0.25, raf: 0, fig: null, zoom: null, last: 0, px: 0.5, py: 0.5, pek: 'mouse' };
   const still = () => R.frozen != null;
   const calm = () => still() || matchMedia('(prefers-reduced-motion: reduce)').matches;
   const now = () => (still() ? R.frozen : (performance.now() - R.t0) / 1000);
+  // kupongen i handen, tv:n, videon, anslagstavlan eller kortregistret nära
+  const nara = () => Boolean(R.kup || R.zoom || R.vnara || (R.ans && R.ans.on()) || (R.reg && R.reg.on()));
+  // punkten (fx, fy) i fönstret – mitten om inget annat sägs – i scenens mått
+  const mid = (fx = 0.5, fy = 0.5) => [(innerWidth * fx - R.ox) / R.k, (innerHeight * fy - R.oy) / R.k];
 
   function rng(a) {
     return () => {
@@ -465,8 +473,12 @@ ${window.RumRegister ? RumRegister.nara() : ''}
       filter: `drop-shadow(${r1(dx * Math.cos(v) - dy * Math.sin(v))}px ${r1(dx * Math.sin(v) + dy * Math.cos(v))}px ${r1(2 + 3 * l)}px rgba(0, 0, 0, ${(0.38 - 0.12 * l).toFixed(2)}))`,
     };
   }
-  const PEN_PULT = { x: 276.4, y: 340.6, a: -11 };
-  const PEN_VILA = { x: 362, y: 440, a: -6 };
+  // kupongens mått (rum.css), bred och smal (.rum.smal, i telefonen på höjden),
+  // och pennan på pulten och i handen på dem (fit)
+  const KUP = { bred: [660, 470], smal: [420, 620] };
+  const PENNOR = { bred: [{ x: 276.4, y: 340.6, a: -11 }, { x: 362, y: 440, a: -6 }], smal: [{ x: 196, y: 420, a: -11 }, { x: 268, y: 612, a: -2 }] };
+  const PEN_PULT = { ...PENNOR.bred[0] };
+  const PEN_VILA = { ...PENNOR.bred[1] };
   const PEN_SKRIV = -38;
   const penStyle = (p) => { const s = penAt(p); return `transform: ${s.transform}; filter: ${s.filter}`; };
 
@@ -863,6 +875,11 @@ ${window.RumRegister ? RumRegister.nara() : ''}
 
   function frame() {
     const t = now();
+    // med fingret vrids kameran efter var i rummet man står (pan)
+    if (R.pek !== 'mouse' && !nara()) {
+      if (R.k * W - innerWidth > 1) R.tx = R.px * 2 - 1;
+      R.ty = R.k * H - innerHeight > 1 ? R.py * 2 - 1 : -0.25;
+    }
     if (!still()) {
       const f = R.kup ? 0.12 : 0.06;
       R.mx += (R.tx - R.mx) * f;
@@ -1011,7 +1028,8 @@ ${window.RumRegister ? RumRegister.nara() : ''}
     if (calm()) return;
     e.preventDefault();
     const p = centerOf(a);
-    aim(p, 1.35, [p[0] + (800 - p[0]) * 0.4, p[1] + (500 - p[1]) * 0.4], 'dyk');
+    const c = mid();
+    aim(p, 1.35, [p[0] + (c[0] - p[0]) * 0.4, p[1] + (c[1] - p[1]) * 0.4], 'dyk');
     R.el.classList.add('dyker');
     setTimeout(() => {
       if (/^#/.test(href)) location.hash = href.slice(1);
@@ -1054,7 +1072,9 @@ ${window.RumRegister ? RumRegister.nara() : ''}
     }
     const r = R.tv && R.tv.zoom(on);
     setCam(R.mx, R.my);
-    if (on && r) aim(centerOf(r), 3.6, [800, 480], calm() ? null : 'glid');
+    // så nära som ryms i fönstret (i telefonen fyller tv:n bredden)
+    const z = r && Math.min(3.6, (innerWidth - 24) / r.width, (innerHeight - 110) / r.height);
+    if (on && r) aim(centerOf(r), z, mid(0.5, 0.48), calm() ? null : 'glid');
     else aim([800, 500], 1, [800, 500], calm() ? null : 'glid');
   }
 
@@ -1101,7 +1121,8 @@ ${window.RumRegister ? RumRegister.nara() : ''}
       if (R.reg && R.reg.on()) register(false);
       R.ans.open(true, R.ans.quad());
       const p = centerOf(document.getElementById('rum-ans'));
-      aim(p, 1.25, [p[0] + (800 - p[0]) * 0.5, p[1] + (500 - p[1]) * 0.5], calm() ? null : 'glid');
+      const c = mid();
+      aim(p, 1.25, [p[0] + (c[0] - p[0]) * 0.5, p[1] + (c[1] - p[1]) * 0.5], calm() ? null : 'glid');
       return;
     }
     const w = document.getElementById('rum-kamera');
@@ -1127,7 +1148,8 @@ ${window.RumRegister ? RumRegister.nara() : ''}
       const r = R.reg.at();
       R.reg.open(true, r);
       const p = centerOf(r);
-      aim(p, 1.25, [p[0] + (800 - p[0]) * 0.5, p[1] + (500 - p[1]) * 0.5], calm() ? null : 'glid');
+      const c = mid();
+      aim(p, 1.25, [p[0] + (c[0] - p[0]) * 0.5, p[1] + (c[1] - p[1]) * 0.5], calm() ? null : 'glid');
       return;
     }
     const w = document.getElementById('rum-kamera');
@@ -1172,16 +1194,20 @@ ${window.RumRegister ? RumRegister.nara() : ''}
   // Var kupongen hamnar i handen: mitt i fönstret, så stor som får plats
   // mellan namnet och orden under den. → förskjutningen från pulten och
   // förstoringen i scenens mått, och rutan i fönstret.
+  // På bredden i telefonen (lag) står orden bredvid kupongen i stället.
   function held() {
     const k = R.k || 1;
-    const top = 84;
-    const foot = 78;
-    const z = Math.min(2.2, (innerHeight - top - foot) / (470 * k), (innerWidth * 0.8) / (660 * k));
-    const cx = innerWidth / 2;
+    const [w, h] = R.smal ? KUP.smal : KUP.bred;
+    const sida = R.lag ? 190 : 0;
+    const top = R.lag ? 14 : R.smal ? 58 : 84;
+    const foot = R.lag ? 14 : R.smal ? 96 : 78;
+    const bredd = R.lag ? innerWidth - sida - 48 : innerWidth * (R.smal ? 0.94 : 0.8);
+    const z = Math.min(2.2, (innerHeight - top - foot) / (h * k), bredd / (w * k));
+    const cx = (innerWidth - sida) / 2;
     const cy = top + (innerHeight - top - foot) / 2;
     return {
       dx: (cx - (R.ox || 0)) / k - 760, dy: (cy - (R.oy || 0)) / k - 853, z,
-      box: { left: cx - 330 * z * k, top: cy - 235 * z * k, width: 660 * z * k, height: 470 * z * k },
+      box: { left: cx - (w / 2) * z * k, top: cy - (h / 2) * z * k, width: w * z * k, height: h * z * k },
     };
   }
 
@@ -1230,9 +1256,19 @@ ${window.RumRegister ? RumRegister.nara() : ''}
   // Orden under kupongen, i fönstrets mått.
   function placeRow(h) {
     const s = R.kup.rad.style;
+    if (R.lag) {
+      s.left = `${r1(h.box.left + h.box.width + 28)}px`;
+      s.width = '162px';
+      s.top = `${r1(h.box.top)}px`;
+      s.height = `${r1(h.box.height)}px`;
+      return;
+    }
     s.left = `${r1(h.box.left)}px`;
     s.width = `${r1(h.box.width)}px`;
     s.top = `${r1(h.box.top + h.box.height + 20)}px`;
+    s.height = '';
+    // på höjden i telefonen står meddelandet ovanför kupongen (rum.css)
+    s.setProperty('--upp', `${r1(h.box.height + 30)}px`);
   }
 
   // Kupongen tas i handen: från pulten (from = null) eller ur högen (from =
@@ -1951,13 +1987,92 @@ ${window.RumRegister ? RumRegister.nara() : ''}
     setTimeout(() => { if (R.kup === k) closeCoupon(); }, calm() ? 700 : 1100);
   }
 
+  // Med fingret (eller musen nedtryckt) ser man sig omkring: scenen följer
+  // med där den är större än fönstret, och släpper man den i farten glider
+  // den vidare en bit. Nära tv:n, videon och med en lapp ur anslagstavlan i
+  // handen bläddrar ett svep i sidled i stället, som pilarna. Klicket efter
+  // ett drag öppnar ingenting.
+  function swipe(el) {
+    const P = { id: null };
+    const frac = (d, o) => (o > 1 ? d / o : 0);
+    el.addEventListener('pointerdown', (e) => {
+      R.pek = e.pointerType;
+      if (!e.isPrimary || e.button !== 0 || e.target.closest('#rum-vhs, input, .rum-hdr, .rum-ft')) return;
+      cancelAnimationFrame(P.raf);
+      Object.assign(P, { id: e.pointerId, x: e.clientX, y: e.clientY, px: R.px, py: R.py, drar: false, spar: [[e.timeStamp, e.clientX, e.clientY]] });
+    });
+    el.addEventListener('pointermove', (e) => {
+      R.pek = e.pointerType;
+      if (e.pointerType === 'mouse' && !nara()) {
+        R.tx = (e.clientX / innerWidth) * 2 - 1;
+        R.ty = (e.clientY / innerHeight) * 2 - 1;
+      }
+      if (e.pointerId !== P.id) return;
+      const dx = e.clientX - P.x;
+      const dy = e.clientY - P.y;
+      if (!P.drar && Math.hypot(dx, dy) < 8) return;
+      P.drar = true;
+      if (nara()) return;
+      P.spar.push([e.timeStamp, e.clientX, e.clientY]);
+      if (P.spar.length > 5) P.spar.shift();
+      pan(P.px - frac(dx, R.k * W - innerWidth), P.py - frac(dy, R.k * H - innerHeight));
+    });
+    el.addEventListener('pointerup', (e) => {
+      if (e.pointerId !== P.id) return;
+      P.id = null;
+      if (!P.drar) return;
+      P.tyst = e.timeStamp;
+      const dx = e.clientX - P.x;
+      const dy = e.clientY - P.y;
+      if (nara()) {
+        if (Math.abs(dx) < 40 || Math.abs(dx) < Math.abs(dy) * 1.5) return;
+        const k = dx < 0 ? 'ArrowRight' : 'ArrowLeft';
+        if (R.zoom && R.tv) R.tv.key(k);
+        else if (R.vnara && R.video) R.video.key(k);
+        else if (R.ans && R.ans.on() && el.querySelector('.rum-ansn.lyft')) R.ans.key(k);
+        return;
+      }
+      // farten de sista bildpunkterna, i bildpunkter per millisekund
+      const [t0, x0, y0] = P.spar[0];
+      const dt = Math.max(16, e.timeStamp - t0);
+      let vx = (e.clientX - x0) / dt;
+      let vy = (e.clientY - y0) / dt;
+      if (calm() || Math.hypot(vx, vy) < 0.2) return;
+      let last = performance.now();
+      const step = (t) => {
+        const ms = t - last;
+        last = t;
+        pan(R.px - frac(vx * ms, R.k * W - innerWidth), R.py - frac(vy * ms, R.k * H - innerHeight));
+        vx *= 0.995 ** ms;
+        vy *= 0.995 ** ms;
+        if (R.on && !nara() && Math.hypot(vx, vy) > 0.02) P.raf = requestAnimationFrame(step);
+      };
+      P.raf = requestAnimationFrame(step);
+    });
+    el.addEventListener('pointercancel', (e) => { if (e.pointerId === P.id) P.id = null; });
+    el.addEventListener('click', (e) => {
+      if (!P.tyst || e.timeStamp - P.tyst > 600) return;
+      P.tyst = 0;
+      e.preventDefault();
+      e.stopPropagation();
+    }, true);
+  }
+
+  // Scenen förskjuten i fönstret: px och py (0–1) säger var i det som inte
+  // ryms man står, i sidled och på höjden.
+  function pan(px, py) {
+    const ow = R.k * W - innerWidth;
+    const oh = R.k * H - innerHeight;
+    R.px = ow > 1 ? Math.min(1, Math.max(0, px)) : 0.5;
+    R.py = oh > 1 ? Math.min(1, Math.max(0, py)) : 0.5;
+    R.ox = -ow * R.px;
+    R.oy = -oh * R.py;
+    R.el.querySelector('.rum-stage').style.transform = `translate(${R.ox.toFixed(1)}px, ${R.oy.toFixed(1)}px) scale(${R.k.toFixed(4)})`;
+  }
+
   function wire() {
     const el = R.el;
-    el.addEventListener('mousemove', (e) => {
-      if (R.kup || R.zoom || R.vnara || (R.ans && R.ans.on()) || (R.reg && R.reg.on())) return;
-      R.tx = (e.clientX / innerWidth) * 2 - 1;
-      R.ty = (e.clientY / innerHeight) * 2 - 1;
-    });
+    swipe(el);
     el.addEventListener('mouseover', (e) => {
       const a = !R.kup && e.target.closest('.rum-sak, .rum-tag, .rum-guld');
       hot(a ? a.dataset.nav : null);
@@ -2019,20 +2134,30 @@ ${window.RumRegister ? RumRegister.nara() : ''}
     if (window.Spoiler && Spoiler.onChange) Spoiler.onChange(() => { if (R.on) fill(); });
   }
 
-  // Scenen täcker fönstret (1600 × 1000, beskuren i kanterna).
+  // Scenen täcker fönstret (1600 × 1000, beskuren i kanterna); det som inte
+  // ryms når man med fingret (pan).
   function fit() {
     if (!R.el || R.el.hidden) return;
-    // för smalt för rummet: den vanliga förstasidan (route i app.js)
+    // för litet för rummet: den vanliga förstasidan (route i app.js)
     if (!fits()) {
       dispatchEvent(new HashChangeEvent('hashchange'));
       return;
     }
-    const s = Math.max(innerWidth / W, innerHeight / H);
-    R.k = s;
-    R.ox = (innerWidth - W * s) / 2;
-    R.oy = (innerHeight - H * s) / 2;
-    const st = R.el.querySelector('.rum-stage');
-    st.style.transform = `translate(${R.ox.toFixed(1)}px, ${R.oy.toFixed(1)}px) scale(${s.toFixed(4)})`;
+    R.k = Math.max(innerWidth / W, innerHeight / H);
+    pan(R.px, R.py);
+    // i telefonen på höjden: den smala kupongen, och på bredden orden
+    // bredvid kupongen i handen
+    const smal = innerWidth < 600 && innerHeight > innerWidth;
+    R.lag = innerHeight < 500 && innerWidth > innerHeight;
+    R.el.classList.toggle('lag', R.lag);
+    if (smal !== Boolean(R.smal)) {
+      R.smal = smal;
+      R.el.classList.toggle('smal', smal);
+      const [pult, vila] = PENNOR[smal ? 'smal' : 'bred'];
+      Object.assign(PEN_PULT, pult);
+      Object.assign(PEN_VILA, vila);
+      if (R.on && !R.kup) fill();
+    }
     // videon nära: hörnet ryms i det nya fönstret
     if (R.vnara) aimVideo(null);
     // kupongen i handen står kvar mitt i fönstret
@@ -2064,7 +2189,8 @@ ${window.RumRegister ? RumRegister.nara() : ''}
     m.addEventListener('animationend', (e) => { if (e.animationName === 'rum-tands') m.classList.remove('tands'); });
   }
 
-  const fits = () => R.q.has('rum-t') || matchMedia('(min-width: 900px) and (min-aspect-ratio: 6/5)').matches;
+  // i alla fönster utom de allra minsta – i telefonen också
+  const fits = () => R.q.has('rum-t') || matchMedia('(min-width: 280px) and (min-height: 260px)').matches;
 
   function show() {
     if (!R.built) build();

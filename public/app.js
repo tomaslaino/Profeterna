@@ -182,7 +182,7 @@ function route(e) {
     return;
   }
   // Förstasidan: utan eller med okänd adress. Utan adress står
-  // tobaksaffären på stora skärmar (rum.js); #hem är den vanliga förstasidan.
+  // tobaksaffären (rum.js), i telefonen också; #hem är den vanliga förstasidan.
   if (!TABS[h]) {
     if (!h && window.Rum && Rum.fits()) {
       Rum.show();
