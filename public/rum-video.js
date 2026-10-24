@@ -83,9 +83,9 @@ window.RumVideo = (() => {
   ];
   const CAP = 25;
   // det kameran ska få med: högen, tv:n med sidan och lådan – och närmare
-  // bara rutan och knapparna under den – i scenens mått
+  // bara rutan – i scenens mått
   const FOCUS = { x0: O[0] + 2, y0: O[1] + 10, x1: O[0] + 238, y1: O[1] + 130 };
-  const TAT = { x0: O[0] + TV.x - 1, y0: O[1] + GLAS.y - 4, x1: O[0] + TV.x + TV.w + 1, y1: O[1] + KNAPP.y + KNAPP.h + 2, z: 12 };
+  const TAT = { x0: O[0] + GLAS.x, y0: O[1] + GLAS.y, x1: O[0] + GLAS.x + GLAS.w, y1: O[1] + GLAS.y + GLAS.h, z: 16 };
 
   const hash = (s) => {
     let a = 7;
@@ -649,7 +649,7 @@ window.RumVideo = (() => {
       insert(V.cur == null ? 0 : Math.min(n - 1, Math.max(0, V.cur + d)));
     }
 
-    // Närmare: rutan och knapparna fyller bilden; ett klick på rutan till
+    // Närmare: rutan fyller bilden; ett klick på rutan till
     // och man går tillbaka till tv:n och lådan.
     function tat(on) {
       if (!V.near || on === V.tat) return;

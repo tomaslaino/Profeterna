@@ -2330,7 +2330,8 @@ Dolda resultat står inget resultat på etiketten och klippets rubrik täcks i r
 **Nära** (klick eller V) dras tv:n ut från väggen och vrids rakt fram medan kameran går
 fram, så nära att tv:n, högen och lådan ryms mellan namnet och foten (högst sex gånger), och
 kassetterna lyfter lite när man pekar på dem. Ett klick på rutan (eller hjulet framåt) går
-ännu närmare, så att rutan och knapparna fyller bilden (högst tolv gånger); ett klick till,
+ännu närmare, så att rutan fyller bilden (högst sexton gånger; i telefonen på höjden syns
+knapparna under den); ett klick till,
 hjulet bakåt eller Esc går tillbaka till tv:n och lådan. Ett klick på en kassett: den
 lyfts, ställs framför facket och skjuts in, luckan fälls upp, och de ovanför sjunker ner i
 luckan i högen. Rutan är blå med *▶ SPELA* tills bilden kommer, och klippet spelas i
