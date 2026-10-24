@@ -1,0 +1,20 @@
+{
+  "namn": "Oxford och Cambridge i samma båt",
+  "spel": "Stryktipset",
+  "skapad": "2026-10-24T09:55:49.479Z",
+  "matcher": [
+    { "id": "401878767", "match": "Chelsea – Tottenham Hotspur", "tecken": "1" },
+    { "id": "401878768", "match": "Arsenal – Everton", "tecken": "1X" },
+    { "id": "401879255", "match": "Coventry City – Fulham", "tecken": "1X2" },
+    { "id": "401880208", "match": "Blackburn Rovers – Wrexham", "tecken": "1X2" },
+    { "id": "401880206", "match": "Cardiff City – Birmingham City", "tecken": "2" },
+    { "id": "401880204", "match": "Lincoln City – Burnley", "tecken": "2" },
+    { "id": "401880202", "match": "Preston North End – West Bromwich Albion", "tecken": "2" },
+    { "id": "401880201", "match": "Queens Park Rangers – Swansea City", "tecken": "12" },
+    { "id": "401880199", "match": "Stoke City – Bristol City", "tecken": "1X2" },
+    { "id": "401880198", "match": "West Ham United – Southampton", "tecken": "1X2" },
+    { "id": "401880197", "match": "Wolverhampton Wanderers – Watford", "tecken": "1" },
+    { "id": "401880774", "match": "Cambridge United – Plymouth Argyle", "tecken": "12" },
+    { "id": "401880769", "match": "Oxford United – Bradford City", "tecken": "1X" }
+  ]
+}
