@@ -485,6 +485,10 @@ Utan nyckel ingen knapp.
   följer med och kameran vrids som med musen. På höjden är kupongen smal och hög som en
   riktig stryktipskupong, så att den går att fylla i; på bredden står orden bredvid kupongen
   i handen. Se [I telefonen](#i-telefonen).
+- **Närbilder i tobaksaffären (2026-10-24, användarens önskemål):** uret, skårtavlan med
+  Premier League, Omgångens orakel och VM 94-affischen går att klicka på, och kameran går
+  fram till dem i stället för att sidan byts direkt. Skårtavlan och oraklet leder sedan vidare
+  till Tabeller och Olympen. Se [Närbilderna](#närbilderna).
 - **Säsongsprognosen tas bort (2026-10-20, användarens beslut):** vyn under Tabeller och
   simuleringen i bygget (`src/season.js`, `data/season.json`) försvinner, liksom
   programmet framåt och prognosdelen i lagkortet. Tabeller visar bara tabellen, med
@@ -1731,9 +1735,10 @@ visas – utan WebGL eller utan nätet står rummet kvar utan dem.
 **Föremålen** – pekar man på ett lyser det (pokalerna också), och snabbvalet
 på text-tv:n med samma ämne tänds, som när man pekar på snabbvalet med tv:n nära
 (skårtavlan Tabeller, pärmarna Skyttar). Klickar man går kameran fram mot föremålet innan
-sidan byts:
+sidan byts; oraklet, skårtavlan, uret och VM 94-affischen tittar man först på nära (se
+[Närbilderna](#närbilderna)):
 
-- **Omgångens orakel** (tavlan under stationsuret) → Olympen: oraklet som regerar
+- **Omgångens orakel** (tavlan under stationsuret) → närbild → Olympen: oraklet som regerar
   (`Kronan.holders`) som i Olympen och på förstasidans polaroid (`Kronan.scene`) – det
   urklippta fotot på marmorsockeln med lagerkransen som glimmar och strålarna som vrider
   sig – bakom glaset i en förgylld ram i 3D med pärlstav, rosetter i hörnen och en palmett
@@ -1746,7 +1751,7 @@ sidan byts:
   Statistik (se [Anslagstavlan](#anslagstavlan)).
 - **Kortregistret** (på disken under anslagstavlan) → ett kort per lag och per möte i
   omgången, och därifrån Lagen på Statistik (se [Kortregistret](#kortregistret)).
-- **Skårtavlan** (under tv:n) → Tabeller: Premier Leagues topp ur `data/teams/pl.json`
+- **Skårtavlan** (under tv:n) → närbild → Tabeller: Premier Leagues topp ur `data/teams/pl.json`
   med vita plastbokstäver i spåren på svart filt, i en aluminiumram som sticker ut från
   väggen (3D). Varje bokstav sitter
   lite snett för sig (samma frö varje gång, så att inget flyttar sig), och lådan har bara
@@ -1797,7 +1802,7 @@ fack av plexiglas, lågt fram och högt bak, med blanka kuponger (samma terrakot
 kupongen på pulten) som lutar bakåt, butikens pennor i ett rör bredvid och en lapp på
 plexit: *Pennorna är räknade*.
 
-**Stationsuret** sitter på bakväggen till höger om fönstret och leder ingenstans: ett
+**Stationsuret** sitter på bakväggen till höger om fönstret och leder bara till en närbild: ett
 svarvat hölje i mörk metall från väggen fram till ett glas som buktar lite, vit tavla med
 svarta streck, gulnad av röken, och visarna i var sitt lager – den röda sekundvisaren
 hoppar varje sekund. Det går efter Stockholms tid, med samma klocka som
@@ -1866,12 +1871,14 @@ sekund); annars är den borta från pulten. Den svänger fram och tillbaka, och 
 mot askkoppen blåser röken åt sidan (draget räknas för varje puff under dess liv, så att
 samma tid ger samma bild). Inga riktiga märken: locket säger SNUS N:o 1, dosan PRIMA
 LÖSSNUS. **VM 94-affischen** är tejpad
-på insidan av skyltfönstret, i vänstra rutan under neonskylten: ett riktigt foto från
+på insidan av skyltfönstret, i vänstra rutan under neonskyltens list (så att *VM 94* och
+*BRONS* syns): ett riktigt foto från
 landslagets hemkomst (Henrik Larsson och Pontus Kåmark med bronsmedaljerna, Norr
 Mälarstrand 18 juli 1994; foto Sniper Zeta,
 [CC BY-SA 4.0](https://creativecommons.org/licenses/by-sa/4.0/),
 [Wikimedia Commons](https://commons.wikimedia.org/wiki/File:Football_players_Pontus_K%C3%A5mark_Henrik_Larsson,_July_18,_1994.jpg)),
-beskuret i `public/rum/vm94.jpg` och med fotografen i affischens title. Uppe till höger i
+beskuret i `public/rum/vm94.jpg` och med fotografen i affischens title och under den i
+närbilden (se [Närbilderna](#närbilderna)). Uppe till höger i
 fönstret syns himlen (rum-ute.js), så där hänger den inte.
 
 **Fikat** står på pulten vissa dagar, i three.js som sakerna
@@ -2346,6 +2353,27 @@ och lådan, så att lagren inte blir större än de behöver. Spelaren är dubbe
 rutan och förminskas, så att klippet är skarpt nära. Väggen, disken och pulten fortsätter till
 höger om bilden (`vagg` och `pult` i rum-video.js, i samma plan och med samma toner som i
 rum.js), så att lådan står på något. `?rum-video` visar videon nära i en fast bild.
+
+### Närbilderna
+
+Uret, skårtavlan, Omgångens orakel och VM 94-affischen tittar man på nära med ett klick
+(`sak` i rum.js, `data-sak` på föremålen): kameran ställer sig rakt framför och går fram tills
+saken fyller det mesta av fönstret – högst 90 % av bredden och 74–94 % av höjden mellan
+namnet och foten – i telefonen också. Rummet vrids rakt medan kameran glider fram och står
+sedan still: så länge något vrids ritar webbläsaren lagren i den vanliga skalan och förstorar
+dem suddigt, och när det står still ritas de om skarpt. Det som står framför väggen – gänget
+på fönsterbänken, pulten och barstolen – tonar bort medan kameran går förbi. Uret,
+orakelramen och ramen kring skårtavlan är ritade i 3D och ritas om i närbildens skala när
+kameran är framme (`skarp` i rum-inredning.js, högst 2600 bildpunkter på längsta ledet);
+uret går som vanligt, med sekundvisaren.
+
+Under skårtavlan och oraklet står guldordet dit de leder (*Tabeller*, *Olympen*); det, eller
+ett klick till på saken, tonar bort rummet och byter sida. Under affischen står fotografen
+och licensen med en länk till fotot på Wikimedia Commons. Esc, ett klick någon annanstans
+eller ett klick till på uret eller affischen går tillbaka, och K, T, A, R och V går direkt
+till kupongen, tv:n, anslagstavlan, kortregistret och videon. Föremålen lyser inte när man
+pekar på dem på nära håll. Med `prefers-reduced-motion` går kameran direkt.
+`?rum-sak=ur|skar|ram|vm94` visar en närbild i en fast bild.
 
 ## Statusmärkning
 

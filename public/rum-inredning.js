@@ -17,7 +17,11 @@
 // Z = WZ, högra väggen X = WX). Kupongstället står på pulten med samma
 // kamera som sakerna i rum-saker.js.
 //
-// inredning(el, { calm, still }) → { draw(), namn(html) } (namnet som Kronan.names)
+// Uret ligger i en knapp (.rum-ur) och ramen i länken (.rum-ram): ett klick
+// går fram till dem (närbilderna i rum.js), och där ritas de, och ramen kring
+// skårtavlan, om skarpare (skarp).
+//
+// inredning(el, { calm, still }) → { draw(), namn(html), skarp(namn, px) } (namnet som Kronan.names)
 
 const DEG = Math.PI / 180;
 const WZ = -26;
@@ -25,18 +29,21 @@ const WX = 1156;
 // djupet in längs högra väggen där x (i hörnets plan) ligger, som onWall i rum.js
 const wz = (x) => 1000 * (1 - 380 / (x - 760));
 const hash = (n) => { const x = Math.sin(n * 127.1 + 311.7) * 43758.5453; return x - Math.floor(x); };
-// Sakerna och dukarna (plan: 0 = väggen, 1 = tv:ns plan, 3 = pulten)
+const UR = { x: 1050, y: 152, r: 46 };
+const RAM = { x: 987, y: 302, w: 126, h: 152, b: 12 };
+// Sakerna och dukarna (plan: 0 = väggen, 1 = tv:ns plan, 3 = pulten). Urets
+// och ramens dukar ligger i knappen och länken (i, med hörnet at).
 const BITAR = {
   tak: { plan: 0, box: { x: 0, y: 0, w: 960, h: 240 } },
   neon: { plan: 0, box: { x: 290, y: 104, w: 300, h: 130 } },
-  ur: { plan: 0, box: { x: 992, y: 94, w: 130, h: 142 } },
-  ram: { plan: 0, box: { x: 968, y: 280, w: 164, h: 232 } },
+  ur: { plan: 0, box: { x: 992, y: 94, w: 130, h: 142 }, i: '.rum-ur', at: { x: UR.x - 54, y: UR.y - 54 } },
+  ram: { plan: 0, box: { x: 968, y: 280, w: 164, h: 232 }, i: '.rum-ram', at: RAM },
   hogra: { plan: 0, box: { x: 1130, y: 0, w: 470, h: 520 } },
   stol: { plan: 1, box: { x: 1320, y: 470, w: 200, h: 200 } },
   stall: { plan: 3, box: { x: 30, y: 470, w: 260, h: 250 } },
 };
-const UR = { x: 1050, y: 152, r: 46 };
-const RAM = { x: 987, y: 302, w: 126, h: 152, b: 12 };
+// närbilden: högst så många bildpunkter på dukens längsta led
+const SKARP = 2600;
 
 export async function inredning(el, opt = {}) {
   const THREE = await import('three');
@@ -75,7 +82,8 @@ export async function inredning(el, opt = {}) {
     canvas.className = `rum-inr${namn === 'neon' ? ' rum-neon' : ''}`;
     canvas.width = Math.round(box.w * DPR);
     canvas.height = Math.round(box.h * DPR);
-    const at = parent ? RAM : { x: 0, y: 0 };
+    let pr = DPR;
+    const at = parent ? BITAR[namn].at : { x: 0, y: 0 };
     Object.assign(canvas.style, { position: 'absolute', pointerEvents: 'none', left: `${box.x - at.x}px`, top: `${box.y - at.y}px`, width: `${box.w}px`, height: `${box.h}px` });
     if (namn === 'neon') canvas.style.filter = 'drop-shadow(0 0 2px rgba(255,80,60,1)) drop-shadow(0 0 6px rgba(255,45,31,.9)) drop-shadow(0 0 16px rgba(255,45,31,.6))';
     (parent || planes[BITAR[namn].plan]).append(canvas);
@@ -87,11 +95,21 @@ export async function inredning(el, opt = {}) {
       scene, cam, mesh, occ, canvas,
       paint() {
         // samma storlek som förra gången: duken behöver inte göras om
+        if (gl.getPixelRatio() !== pr) gl.setPixelRatio(pr);
         if (gl.domElement.width !== canvas.width || gl.domElement.height !== canvas.height) gl.setSize(box.w, box.h, false);
         gl.render(scene, cam);
         const g = canvas.getContext('2d');
         g.clearRect(0, 0, canvas.width, canvas.height);
         g.drawImage(gl.domElement, 0, 0, canvas.width, canvas.height);
+      },
+      // px bildpunkter per px i planet (0: som vanligt)
+      skarp(px) {
+        const p = Math.max(DPR, Math.min(px, SKARP / Math.max(box.w, box.h)));
+        if (p === pr) return;
+        pr = p;
+        canvas.width = Math.floor(box.w * pr);
+        canvas.height = Math.floor(box.h * pr);
+        this.paint();
       },
     };
   }
@@ -748,11 +766,18 @@ export async function inredning(el, opt = {}) {
 
   // ---------- allt ----------
 
+  // knappen kring uret: ett klick går fram till det (närbilden i rum.js)
+  const knapp = document.createElement('button');
+  knapp.type = 'button';
+  knapp.className = 'rum-ur rum-sak';
+  knapp.dataset.sak = 'ur';
+  knapp.setAttribute('aria-label', 'Uret');
+  planes[0].append(knapp);
   const B = {};
-  for (const [k, { box }] of Object.entries(BITAR)) {
+  for (const [k, { box, i }] of Object.entries(BITAR)) {
     if (k === 'stall') { B[k] = bit(k, deskCam(box, { x: 160, y: 640 })); continue; }
-    // ramen ligger i länken (.rum-ram), så att den lyser när man pekar på den
-    B[k] = bit(k, wallCam(box), k === 'ram' ? el.querySelector('.rum-ram') : null);
+    // uret och ramen ligger i knappen och länken, så att de lyser när man pekar på dem
+    B[k] = bit(k, wallCam(box), i ? el.querySelector(i) : null);
     wallLights(B[k], box, !['tak', 'neon'].includes(k));
   }
   lysror(B.tak);
@@ -811,5 +836,5 @@ export async function inredning(el, opt = {}) {
   setNamn('');
   for (const k of ['tak', 'neon', 'hogra', 'stol', 'stall']) B[k].paint();
   tick();
-  return { draw: tick, namn: setNamn };
+  return { draw: tick, namn: setNamn, skarp: (k, px) => B[k] && B[k].skarp(px) };
 }

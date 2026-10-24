@@ -14,7 +14,17 @@
   transform-origin: 8px 4px;
   filter: drop-shadow(0 3px 4px rgba(0, 0, 0, 0.5));
   pointer-events: auto;
+  /* en knapp: ett klick går fram till affischen (rum.js) */
+  display: block;
+  padding: 0;
+  border: 0;
+  background: none;
+  font: inherit;
+  color: inherit;
+  text-align: left;
 }
+.rum-vm94.rum-sak:focus-visible { filter: drop-shadow(0 3px 4px rgba(0, 0, 0, 0.5)) brightness(1.18) drop-shadow(0 0 10px rgba(240, 214, 153, 0.35)); }
+@media (hover: hover) { .rum-vm94.rum-sak:hover { filter: drop-shadow(0 3px 4px rgba(0, 0, 0, 0.5)) brightness(1.18) drop-shadow(0 0 10px rgba(240, 214, 153, 0.35)); } }
 .rum-vm94 .ark {
   position: relative;
   display: block;

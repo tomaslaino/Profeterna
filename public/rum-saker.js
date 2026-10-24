@@ -47,13 +47,14 @@ const LAYOUTS = [
 const free = ([px, py]) => py >= 662 && py <= 846 && px <= 1522 && (px >= 1345 || (py <= 690 && px >= 1140));
 // Affischen på insidan av skyltfönstret, efter dagen: i vänstra rutan under
 // neonskylten, till vänster eller till höger (uppe till höger syns himlen,
-// rum-ute.js).
-const SPOTS = [{ x: 286, y: 190 }, { x: 474, y: 190 }];
+// rum-ute.js) – under neonens list, så att VM 94 och BRONS syns.
+const SPOTS = [{ x: 286, y: 220 }, { x: 474, y: 220 }];
 const hash = (n) => { const x = Math.sin(n * 127.1 + 311.7) * 43758.5453; return x - Math.floor(x); };
 const clamp = (x, a = 0, b = 1) => Math.min(b, Math.max(a, x));
 const sm = (a, b, x) => { const u = clamp((x - a) / (b - a)); return u * u * (3 - 2 * u); };
 
 const CREDIT = 'Henrik Larsson och Pontus Kåmark vid landslagets hemkomst efter VM, Norr Mälarstrand 18 juli 1994. Foto: Sniper Zeta, CC BY-SA 4.0 (Wikimedia Commons)';
+const KALLA = 'https://commons.wikimedia.org/wiki/File:Football_players_Pontus_K%C3%A5mark_Henrik_Larsson,_July_18,_1994.jpg';
 
 // Dagen i Stockholm som frö: sakerna ligger likadant hela dagen.
 const fDay = new Intl.DateTimeFormat('sv-SE', { timeZone: 'Europe/Stockholm', year: 'numeric', month: '2-digit', day: '2-digit' });
@@ -83,12 +84,15 @@ function wearOf(rows, old, seed) {
 
 // ---------- affischen ----------
 
+// Ett klick går fram till affischen (närbilden i rum.js), med fotografen under.
 function poster(back) {
-  const el = document.createElement('div');
-  el.className = 'rum-vm94';
+  const el = document.createElement('button');
+  el.type = 'button';
+  el.className = 'rum-vm94 rum-sak';
   el.id = 'rum-vm94';
+  el.dataset.sak = 'vm94';
+  el.dataset.kalla = KALLA;
   el.title = CREDIT;
-  el.setAttribute('role', 'img');
   el.setAttribute('aria-label', `Affisch: VM 94, brons. ${CREDIT}`);
   el.innerHTML = '<span class="ark"><span class="band"><b>VM 94</b><b>BRONS</b></span>' +
     '<span class="foto"><img src="rum/vm94.jpg" alt="" draggable="false"></span><span class="tryck"></span></span>' +

@@ -14,6 +14,8 @@
 //   kupongens matcher live på 377 (rum-tv.js)
 //   videon på disken zoomas in (V): repriserna på VHS, på tv:n och i lådan
 //   bredvid, som spelas i rutan (rum-video.js)
+//   uret, skårtavlan, oraklet och VM 94-affischen: kameran går fram till dem
+//   (närbilderna, sak); skårtavlan och oraklet leder sedan vidare
 //   kortregistret på disken lyfts fram (R): ett kort per lag och per möte
 //   (rum-register.js, lådan i three.js i rum-kortlada.js)
 //   kupongen tas i handen (K) – fylls i eller ändras – eller → Kupong.
@@ -35,7 +37,7 @@
 // kortregistret (=Arsenal … med det kortet i handen). ?rum-stopp=<timmar> som
 // om det var så långt kvar till spelstoppet, ?rum-tittar som om matcherna
 // pågick och ?rum-mal=dl:1,dt:-1,dj:0 som om det blev mål (rätt, fel, ingen
-// skillnad), ?rum-video videon nära.
+// skillnad), ?rum-video videon nära och ?rum-sak=ur|skar|ram|vm94 en närbild.
 //
 // Läses efter kupong.js, samtal.js, tippare.js och kronan.js och använder
 // deras hjälpare (state, KP, TP, gradeRow, couponNumber, currentCoupon,
@@ -70,8 +72,8 @@ window.Rum = (() => {
   const still = () => R.frozen != null;
   const calm = () => still() || matchMedia('(prefers-reduced-motion: reduce)').matches;
   const now = () => (still() ? R.frozen : (performance.now() - R.t0) / 1000);
-  // kupongen i handen, tv:n, videon, anslagstavlan eller kortregistret nära
-  const nara = () => Boolean(R.kup || R.zoom || R.vnara || (R.ans && R.ans.on()) || (R.reg && R.reg.on()));
+  // kupongen i handen, tv:n, videon, en närbild (sak), anslagstavlan eller kortregistret nära
+  const nara = () => Boolean(R.kup || R.zoom || R.vnara || R.sak || (R.ans && R.ans.on()) || (R.reg && R.reg.on()));
   // punkten (fx, fy) i fönstret – mitten om inget annat sägs – i scenens mått
   const mid = (fx = 0.5, fy = 0.5) => [(innerWidth * fx - R.ox) / R.k, (innerHeight * fy - R.oy) / R.k];
 
@@ -235,7 +237,7 @@ window.Rum = (() => {
   // sockeln) under stationsuret, i en förgylld ram med mässingsskylten under
   // (båda i 3D, rum-inredning.js). Ett skimmer drar då och då över glaset.
   function frameHtml() {
-    return '<a class="rum-ram rum-sak" href="#olympen" data-nav="olympen" aria-label="Olympen">' +
+    return '<a class="rum-ram rum-sak" href="#olympen" data-nav="olympen" data-sak="ram" aria-label="Olympen">' +
       '<span class="rum-ram-list"><span class="kr-scene kr-orakel" id="rum-ram-bild"></span><span class="rum-ram-glans"></span></span></a>';
   }
 
@@ -253,7 +255,7 @@ window.Rum = (() => {
   function rightWall() {
     return '<div class="rum-hv">' +
       (window.RumAnslag ? onWall(1144, 1300, 316, 478, 'rum-ans', RumAnslag.wall(), 'href="statistik.html" data-nav="statistik" aria-label="Anslagstavlan" id="rum-ans"') : '') +
-      onWall(1330, 1478, 352, 458, 'rum-skar', '<span class="rum-skar-in" id="rum-skar"></span>', 'href="tabeller.html" data-nav="tabeller" aria-label="Tabeller"') +
+      onWall(1330, 1478, 352, 458, 'rum-skar', '<span class="rum-skar-in" id="rum-skar"></span>', 'href="tabeller.html" data-nav="tabeller" data-sak="skar" aria-label="Tabeller"') +
       onWall(1496, 1700, 330, 478, 'rum-kork', '<span class="rum-kork-in" id="rum-kork"></span>', 'href="#olympen/kuponger" data-nav="olympen" aria-label="Gängets kuponger"') +
       '</div>';
   }
@@ -951,7 +953,7 @@ ${window.RumRegister ? RumRegister.nara() : ''}
     import('./rum-saker.js').then((m) => m.saker(R.el, { calm: calm() })).then((x) => { R.saker = x; frame(); })
       .catch((err) => console.warn('Rummet: sakerna kunde inte ritas', err));
     // lysröret, neonen, skyltarna, uret, ramarna, paketen, stolen och kupongstället (rum-inredning.js)
-    import('./rum-inredning.js').then((m) => m.inredning(R.el, { calm: calm(), still })).then((x) => { R.inr = x; x.namn(R.ramNamn); frame(); })
+    import('./rum-inredning.js').then((m) => m.inredning(R.el, { calm: calm(), still })).then((x) => { R.inr = x; x.namn(R.ramNamn); if (R.sak) sak(R.sak, null); frame(); })
       .catch((err) => console.warn('Rummet: inredningen kunde inte ritas', err));
     try {
       const mod = await import('./rum-3d.js');
@@ -994,6 +996,11 @@ ${window.RumRegister ? RumRegister.nara() : ''}
   // Kupongen tas i handen om den går att fylla i, och din i högen om den
   // går att ändra eller visa.
   function go(a, e) {
+    if (a.dataset.sak) {
+      e.preventDefault();
+      sak(a.dataset.sak);
+      return;
+    }
     const href = a.getAttribute('href');
     if (!href) return;
     if (a.dataset.nav === 'tv') {
@@ -1161,6 +1168,99 @@ ${window.RumRegister ? RumRegister.nara() : ''}
     void w.offsetWidth;
     aim([800, 500], 1, [800, 500], calm() ? null : 'glid');
     R.reg.open(false, r);
+  }
+
+  // ---------- närbilderna ----------
+  //
+  // Uret, skårtavlan, oraklet och VM 94-affischen (data-sak): kameran ställer
+  // sig rakt framför och går fram tills saken fyller det mesta av fönstret,
+  // och det som är ritat i 3D (rum-inredning.js) ritas om skarpare. Under
+  // skårtavlan och oraklet står guldordet dit de leder (dit leder också ett
+  // klick på dem), under affischen fotografen. Esc eller ett klick någon
+  // annanstans går tillbaka.
+  //   el saken, h hur mycket av höjden den får, duk duken i 3D, fot under den
+  const SAKER = {
+    ur: { el: '.rum-ur', h: 0.78, duk: 'ur' },
+    skar: { el: '.rum-skar', h: 0.82, duk: 'hogra', fot: () => '<a class="rum-guld" href="tabeller.html">Tabeller</a>' },
+    ram: { el: '.rum-ram', h: 0.94, duk: 'ram', fot: () => '<a class="rum-guld" href="#olympen">Olympen</a>' },
+    vm94: { el: '#rum-vm94', h: 0.74, fot: (a) => `<span class="foto">${esc(a.title).replace('Wikimedia Commons', (m) => (a.dataset.kalla ? `<a href="${esc(a.dataset.kalla)}" target="_blank" rel="noopener">${m}</a>` : m))}</span>` },
+  };
+  function sakFot() {
+    let f = document.getElementById('rum-sakfot');
+    if (!f) {
+      f = document.createElement('div');
+      f.className = 'rum-sakfot';
+      f.id = 'rum-sakfot';
+      R.el.append(f);
+    }
+    return f;
+  }
+  // namn = null: tillbaka (cls = null: genast)
+  function sak(namn, cls = calm() ? null : 'glid') {
+    const was = R.sak;
+    if (!namn && !was) return;
+    const fot = sakFot();
+    fot.classList.remove('on');
+    clearTimeout(R.skarp);
+    // den förra saken ritas som vanligt igen
+    const duk = was && SAKER[was] && SAKER[was].duk;
+    if (duk && was !== namn && R.inr) R.inr.skarp(duk, 0);
+    R.sak = namn || null;
+    if (!namn) {
+      R.el.classList.remove('sak-nara');
+      aim([800, 500], 1, [800, 500], cls);
+      return;
+    }
+    const S = SAKER[namn];
+    const a = S && R.el.querySelector(S.el);
+    // (uret finns först när inredningen är ritad, och då frågar three() igen)
+    if (!a) return;
+    if (R.zoom) zoomTv(false);
+    if (R.vnara) zoomVideo(false);
+    board(false);
+    // saken mätt med kameran i vila och rummet rakt
+    const w = document.getElementById('rum-kamera');
+    const cam = w.style.cssText;
+    aim([800, 500], 1, [800, 500]);
+    setCam(0, 0);
+    const r = a.getBoundingClientRect();
+    const p = centerOf(r);
+    setCam(R.mx, R.my);
+    w.style.cssText = cam;
+    void w.offsetWidth;
+    // Rummet vrids rakt medan kameran går fram (.sak-nara i rum.css) och står
+    // sedan still: så länge det rör sig ritar webbläsaren det suddigt.
+    R.el.classList.add('sak-nara');
+    R.tx = R.ty = R.mx = R.my = 0;
+    setCam(0, 0);
+    // gänget, pulten och barstolen går kameran förbi (de tonar bort)
+    for (const pl of R.el.querySelectorAll('.rum-world > .rum-pl:not(.rum-pl3d)')) {
+      const m = /translateZ\((-?[\d.]+)px\)/.exec(pl.style.transform);
+      pl.classList.toggle('forbi', Boolean(m) && Number(m[1]) > -560);
+    }
+    // så stor som ryms mellan namnet och foten, med guldordet under
+    const top = 64;
+    const h = innerHeight - top - (S.fot ? 112 : 64);
+    const z = Math.min((innerWidth * 0.9) / r.width, (h * S.h) / r.height);
+    const cy = top + h / 2;
+    fot.innerHTML = S.fot ? S.fot(a) : '';
+    fot.style.top = `${r1(cy + (r.height * z) / 2 + 14)}px`;
+    if (S.fot) fot.classList.add('on');
+    aim(p, z, [(innerWidth / 2 - R.ox) / R.k, (cy - R.oy) / R.k], cls);
+    // duken i 3D ritas skarpare när kameran är framme
+    if (S.duk) R.skarp = setTimeout(() => { if (R.sak === namn && R.inr) R.inr.skarp(S.duk, z * R.k * 1.035 * (devicePixelRatio || 1)); }, cls ? 620 : 0);
+  }
+  // Vidare från närbilden: rummet tonar bort och sidan byts.
+  function sakVidare(href) {
+    R.el.classList.add('dyker');
+    setTimeout(() => {
+      if (/^#/.test(href)) location.hash = href.slice(1);
+      else location.href = href;
+      setTimeout(() => {
+        R.el.classList.remove('dyker');
+        sak(null, null);
+      }, 60);
+    }, calm() ? 0 : 420);
   }
 
   // ---------- kupongen i handen ----------
@@ -2108,6 +2208,17 @@ ${window.RumRegister ? RumRegister.nara() : ''}
         }
         return;
       }
+      // nära en sak: guldordet, skårtavlan och oraklet leder vidare, och
+      // allt annat går tillbaka (utom namnet, foten och fotografens länk)
+      if (R.sak) {
+        if (e.target.closest('.rum-hdr, .rum-ft, .rum-sakfot .foto a')) return;
+        e.preventDefault();
+        const l = e.target.closest('.rum-sakfot a, .rum-sak');
+        const href = l && (l.closest('.rum-sakfot') || l.dataset.sak === R.sak) ? l.getAttribute('href') : null;
+        if (href) sakVidare(href);
+        else sak(null);
+        return;
+      }
       if (e.target.closest('.rum-tag') && openCoupon()) {
         e.preventDefault();
         return;
@@ -2119,6 +2230,14 @@ ${window.RumRegister ? RumRegister.nara() : ''}
     document.addEventListener('keydown', (e) => {
       if (!R.on || e.metaKey || e.ctrlKey || e.altKey || /input|textarea|select/i.test(e.target.tagName) || document.querySelector('dialog[open]')) return;
       const k = e.key.toLowerCase();
+      // nära en sak: Esc går tillbaka, och K, T, A, R och V går dit direkt
+      if (R.sak && !R.kup) {
+        if (k === 'escape') {
+          sak(null);
+          return;
+        }
+        if (/^[ktarv]$/.test(k)) sak(null, null);
+      }
       if (R.kup) {
         if (k === 'k' || k === 'escape') closeCoupon();
       } else if (R.ans && R.ans.on()) {
@@ -2168,6 +2287,8 @@ ${window.RumRegister ? RumRegister.nara() : ''}
     }
     // videon nära: hörnet ryms i det nya fönstret
     if (R.vnara) aimVideo(null);
+    // närbilden: saken ryms i det nya fönstret
+    if (R.sak) sak(R.sak, null);
     // kupongen i handen står kvar mitt i fönstret
     if (R.kup && !R.kup.closing && !R.kup.opening) {
       const h = held();
@@ -2225,6 +2346,7 @@ ${window.RumRegister ? RumRegister.nara() : ''}
           if (q.get('rum-anslag')) setTimeout(() => R.ans && R.ans.lift(q.get('rum-anslag')), 50);
         }
         if (q.has('rum-video')) zoomVideo(true);
+        if (q.has('rum-sak')) sak(q.get('rum-sak'), null);
         if (q.has('rum-register') && R.reg) {
           R.reg.wait().then(() => {
             register(true);
@@ -2250,6 +2372,7 @@ ${window.RumRegister ? RumRegister.nara() : ''}
     register(false);
     if (R.video) R.video.stop();
     zoomVideo(false);
+    sak(null, null);
     R.on = false;
     cancelAnimationFrame(R.raf);
     clearInterval(R.poll);
