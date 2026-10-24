@@ -61,6 +61,7 @@ export async function kortlada(o) {
   o.nara.append(gl.domElement);
   const scene = new THREE.Scene();
   const pmrem = new THREE.PMREMGenerator(gl);
+  if (LATT) pmrem._setSize = (n) => THREE.PMREMGenerator.prototype._setSize.call(pmrem, Math.min(n, 128));
   scene.environment = pmrem.fromScene(new RoomEnvironment(), 0.04).texture;
   pmrem.dispose();
 

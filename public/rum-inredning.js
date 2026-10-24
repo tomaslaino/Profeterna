@@ -63,6 +63,7 @@ export async function inredning(el, opt = {}) {
   gl.shadowMap.enabled = true;
   gl.shadowMap.type = THREE.PCFSoftShadowMap;
   const pmrem = new THREE.PMREMGenerator(gl);
+  if (LATT) pmrem._setSize = (n) => THREE.PMREMGenerator.prototype._setSize.call(pmrem, Math.min(n, 128));
   const env = pmrem.fromScene(new RoomEnvironment(), 0.04).texture;
   pmrem.dispose();
   const planes = [...el.querySelectorAll('.rum-world > .rum-pl')];
@@ -107,6 +108,16 @@ export async function inredning(el, opt = {}) {
         const g = canvas.getContext('2d');
         g.clearRect(0, 0, canvas.width, canvas.height);
         g.drawImage(gl.domElement, 0, 0, canvas.width, canvas.height);
+        // i telefonen behövs skuggkartan bara medan saken ritas – den ritas
+        // sällan om, utom uret varje sekund – och three gör en ny nästa gång
+        if (LATT && namn !== 'ur') {
+          scene.traverse((x) => {
+            if (x.isLight && x.shadow && x.shadow.map) {
+              x.shadow.map.dispose();
+              x.shadow.map = null;
+            }
+          });
+        }
       },
       // px bildpunkter per px i planet (0: som vanligt)
       skarp(px) {

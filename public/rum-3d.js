@@ -154,6 +154,7 @@ export async function figurer(canvas, opt = {}) {
   r.shadowMap.type = THREE.PCFSoftShadowMap;
   const scene = new THREE.Scene();
   const pmrem = new THREE.PMREMGenerator(r);
+  if (LATT) pmrem._setSize = (n) => THREE.PMREMGenerator.prototype._setSize.call(pmrem, Math.min(n, 128));
   scene.environment = pmrem.fromScene(new RoomEnvironment(), 0.04).texture;
   pmrem.dispose();
   const cam = new THREE.PerspectiveCamera(2 * Math.atan(H / 2 / D) / DEG, W / H, 50, 5000);

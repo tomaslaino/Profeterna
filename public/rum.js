@@ -225,7 +225,6 @@ window.Rum = (() => {
   <rect x="604" y="132" width="12" height="426" fill="#3a3a3c"/>
   <rect x="262" y="558" width="696" height="12" fill="#2c2c2e"/>
   <path d="M940 122 l18 0 l0 30 l-9 -6 l-4 10 l-5 -12 z" fill="#8e8064" opacity=".5"/>
-  <ellipse cx="440" cy="236" rx="320" ry="200" fill="#ff4a30" opacity=".08" filter="url(#rum-b40)" class="rum-neonglow"/>
 
   <polygon points="1060,490 1140,490 1600,599 1600,652" fill="url(#rum-countertop)"/>
   <polygon points="1060,490 1600,652 1600,1000 1060,1000" fill="url(#rum-counter)"/>
@@ -233,13 +232,17 @@ window.Rum = (() => {
   <g stroke="#d9c7a1" stroke-opacity=".5" stroke-width="2.4" stroke-linecap="round">
     <line x1="1092" y1="500" x2="1130" y2="511"/><line x1="1236" y1="543" x2="1250" y2="547"/><line x1="1318" y1="567" x2="1372" y2="583"/><line x1="1490" y1="619" x2="1512" y2="626"/>
   </g>
-  <polygon points="1060,492 1600,654 1600,700 1060,540" fill="#000" opacity=".12"/>`, '', undefined, 2 / 3);
+  <polygon points="1060,492 1600,654 1600,700 1060,540" fill="#000" opacity=".12"/>`, '', undefined, 2 / 3) +
+      // Neonens sken genom fönstret för sig: det blinkar med neonen
+      // (neonOn), och i väggens SVG ritades hela väggen om varje gång. Det
+      // står längre till vänster än disken, som ritas efter det i väggen.
+      svg('<ellipse cx="440" cy="236" rx="320" ry="200" fill="#ff4a30" opacity=".08" filter="url(#rum-b40)" class="rum-neonglow"/>', '', [0, 0, 900, 560], 0.25);
   }
 
   // Neonskylten är i 3D (rum-inredning.js) och glappar ibland (neonOn); här
   // är skenet runt den.
   function neon() {
-    return svg('<ellipse cx="440" cy="168" rx="160" ry="58" fill="#ff3a2a" opacity=".28" filter="url(#rum-b24)" class="rum-neonhalo"/>', '', [100, 40, 680, 260]);
+    return svg('<ellipse cx="440" cy="168" rx="160" ry="58" fill="#ff3a2a" opacity=".28" filter="url(#rum-b24)" class="rum-neonhalo"/>', '', [100, 40, 680, 260], 0.25);
   }
 
   // ---------- de sju sakerna ----------
@@ -1335,7 +1338,8 @@ ${window.RumRegister ? RumRegister.nara() : ''}
       t.rej(err);
     }
     // en stund emellan, så att det som startade hinner städa efter sig
-    await new Promise((r) => setTimeout(r, 300));
+    // (Safari släpper buffertar som inte används efter ungefär en sekund)
+    await new Promise((r) => setTimeout(r, 800));
     R.turGar = false;
     nasta();
   }
@@ -1490,10 +1494,10 @@ ${window.RumRegister ? RumRegister.nara() : ''}
     if (on && R.ans && R.ans.on()) board(false);
     if (on && R.reg && R.reg.on()) register(false);
     R.vnara = on;
-    // i telefonen ritas hörnet skarpt bara nära (rum-video.css): innan tv:n
-    // vrids fram, och i halva storleken igen när den har vridits bort
+    // i telefonen ritas hörnet skarpt bara när rutan fyller bilden (tat i
+    // rum-video.js), och i halva storleken igen när tv:n har vridits bort
     clearTimeout(R.vskarp);
-    if (on) R.video.skarp(true);
+    if (on) R.video.skarp(false);
     else R.vskarp = setTimeout(() => { if (!R.vnara) R.video.skarp(false); }, 900);
     R.el.classList.toggle('vid-nara', on);
     if (on) {
@@ -2748,8 +2752,11 @@ ${window.RumRegister ? RumRegister.nara() : ''}
         .then(() => new Promise((r) => requestAnimationFrame(r)))
         .then(() => {
           R.el.classList.remove('laddar');
-          R.turStart = true;
-          nasta();
+          // 3D-delarna när rummet har ritats (och städat efter sig)
+          setTimeout(() => {
+            R.turStart = true;
+            nasta();
+          }, 800);
         });
     } else if (!R.turStart) {
       R.turStart = true;

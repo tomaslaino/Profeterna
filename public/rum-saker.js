@@ -205,6 +205,7 @@ async function props(pult, opt) {
   r.shadowMap.type = THREE.PCFSoftShadowMap;
   const scene = new THREE.Scene();
   const pmrem = new THREE.PMREMGenerator(r);
+  if (LATT) pmrem._setSize = (n) => THREE.PMREMGenerator.prototype._setSize.call(pmrem, Math.min(n, 128));
   scene.environment = pmrem.fromScene(new RoomEnvironment(), 0.04).texture;
   pmrem.dispose();
   // kameran ser på O; duken är en bit av en bild som har O i mitten

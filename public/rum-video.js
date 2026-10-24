@@ -704,9 +704,26 @@ window.RumVideo = (() => {
 
     // Närmare: rutan fyller bilden; ett klick på rutan till
     // och man går tillbaka till tv:n och lådan.
+    // I telefonen ritas hörnet i halva storleken, och i hela när rutan fyller
+    // bilden (.skarp, rum-video.css; tat). zoom ändrar också måtten i
+    // övergångarna, så det byts med övergångarna avstängda, när inget rör sig.
+    function skarp(on) {
+      if (inn.classList.contains('skarp') === on) return;
+      inn.classList.add('byt');
+      inn.classList.toggle('skarp', on);
+      void inn.offsetWidth;
+      inn.classList.remove('byt');
+    }
+
     function tat(on) {
       if (!V.near || on === V.tat) return;
       V.tat = on;
+      // i telefonen ritas hörnet skarpt bara här, där rutan fyller bilden:
+      // innan kameran går fram, och i halva storleken igen när den har gått
+      // tillbaka
+      clearTimeout(V.skarpT);
+      if (on) skarp(true);
+      else V.skarpT = setTimeout(() => { if (!V.tat) skarp(false); }, 900);
       box.classList.toggle('vhs-tat', on);
       if (o.aim) o.aim(on ? framme(TAT) : FOCUS);
     }
@@ -753,16 +770,7 @@ window.RumVideo = (() => {
         }
         layout();
       },
-      // I telefonen ritas hörnet i halva storleken på håll och i hela nära
-      // (.skarp, rum-video.css). zoom ändrar också måtten i övergångarna, så
-      // det byts med övergångarna avstängda, när inget rör sig.
-      skarp(on) {
-        if (inn.classList.contains('skarp') === on) return;
-        inn.classList.add('byt');
-        inn.classList.toggle('skarp', on);
-        void inn.offsetWidth;
-        inn.classList.remove('byt');
-      },
+      skarp,
       // Nära: tv:n vrids mot en, kassetterna och knapparna går att trycka
       // på, och videon spelar vidare om den gjorde det när man gick. Svarar
       // med hörnet i scenen.

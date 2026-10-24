@@ -2003,14 +2003,22 @@ Därför:
   buffertar en stund.
 - **3D-delarna startar en i taget** i telefonen (`tur` i rum.js): gänget, inredningen,
   sakerna och sist kortlådan (`o.tur` i rum-register.js), var och en när den förra är klar
-  och rummet syns. Var och en tar några hundra MB medan den startar (shaders, texturer,
-  ljuset). En fast bild (`?rum-t`) väntar på alla. Hjälpbufferten till miljöljuset
-  (PMREMGenerator) släpps när ljuset är klart, i alla fyra.
+  och rummet syns, med en paus på 0,8 sekunder före den första och mellan dem (Safari släpper
+  buffertar som inte används efter ungefär en sekund). Var och en tar några hundra MB medan
+  den startar (shaders, texturer, ljuset). En fast bild (`?rum-t`) väntar på alla.
+  Hjälpbufferten till miljöljuset (PMREMGenerator) släpps när ljuset är klart, i alla fyra,
+  och i telefonen räknas ljuset i 128 i stället för 256 (`_setSize`; glansen ser likadan ut).
+  Inredningens skuggkartor släpps i telefonen när saken är ritad, utom urets som ritas om
+  varje sekund – three gör en ny när saken ritas om.
 - **Den mörka starten** (`.rum-mork`, masken med oskärpa runt fönstret) ritas med en
-  fjärdedels bildpunkter i telefonen som ljuset – masken låg annars kvar i minnet efteråt.
+  fjärdedels bildpunkter i telefonen som ljuset – masken låg annars kvar i minnet efteråt –
+  och så gör toningen bakom kupongen i handen (`.rum-dimma`, 2400 × 1800), som annars tog
+  ungefär 80 MB i en iPhone.
 - **Bakväggen och pulten** (SVG:erna utan text) ritas i telefonen med 2/3 av bildpunkterna –
-  lika många som syns där, där scenen visas förminskad – och neonens svaga sken över
-  fönsterbänken är ett eget lager med en fjärdedel (`z` i `svg` i rum.js).
+  lika många som syns där, där scenen visas förminskad – och neonens sken genom fönstret,
+  runt skylten och över fönsterbänken är egna lager med en fjärdedel (`z` i `svg` i rum.js).
+  Skenet genom fönstret låg förut i väggens SVG, så att hela väggen ritades om när neonen
+  blinkade.
 - **Det som ritas i större storlek för att vara skarpt nära** ritas mindre i telefonen: tv:n i
   1,5 gånger lådans mått i stället för 3 (se [Tv:n](#tvn)) och videohörnet i halva storleken på
   håll (se [Videon](#videon)). Anslagstavlans yta står före ramens sidor, så att den inte blir ett
@@ -2034,7 +2042,11 @@ bredden (844 × 390) 300 i stället för 690 – och bakningen håller inte län
 Med bruset och oskärpan i rum.js, den dolda världen och 3D-delarna en i taget, mätt i
 WKWebView i 390 × 664 när allt har startat: täthet 2 från 1,24 GB efter laddningen och 1,3–1,7
 GB i topp till ungefär 0,70 och 0,9–1,0 GB, täthet 3 (som en iPhone) från 1,4 och 1,6–1,9 GB
-till ungefär 0,94 och 1,4 GB.
+till ungefär 0,94 och 1,4 GB. Med resten ovan (lägre upplösning för det utan text, videon,
+toningen, skuggkartorna, ljuset i 128 och pauserna): täthet 2 ungefär 0,59 GB efter
+laddningen och 0,75 GB i topp, täthet 3 ungefär 0,75–0,80 och 1,03–1,07 GB – och när man går
+fram till kupongen, tv:n, videon, uret, anslagstavlan och kortregistret högst ungefär 0,87
+respektive 1,19 GB (förut 1,4–1,6 GB i täthet 3).
 
 ### Utsikten och vädret
 
@@ -2430,11 +2442,13 @@ att bilden fortsätter där den stannade, och när man spolar med ◀◀ och ▶
 Hörnet ritas i sex gånger storleken och dubbelt till (`zoom: 2`) och förminskas, som tv:n,
 så att det är skarpt också när man går närmare rutan; ritningarna är bara så stora som tv:n
 och lådan, så att lagren inte blir större än de behöver. I telefonen (smalare än 700 eller
-lägre än 500 bildpunkter) ritas det inte dubbelt nära (`zoom: 1`, det räcker för hur nära
-kameran går där) och i halva storleken på håll (`zoom: 0.5`) – Safari ritar lagren i full
-storlek gånger pixeltätheten, och tobaksaffären fick slut på minne i iPhone. Storleken byts
-med övergångarna avstängda (`skarp` i rum-video.js, från `zoomVideo` i rum.js), innan tv:n
-vrids fram och när den har vridits bort, eftersom zoom också ändrar måtten i övergångarna. Spelaren är dubbelt så stor som
+lägre än 500 bildpunkter) ritas det inte dubbelt (`zoom: 1`, det räcker för hur nära
+kameran går där) och bara när rutan fyller bilden (det andra klicket); på håll och vid första
+närbilden räcker halva storleken (`zoom: 0.5`) – Safari ritar lagren i full storlek gånger
+pixeltätheten, och tobaksaffären fick slut på minne i iPhone. Storleken byts med övergångarna
+avstängda (`skarp` och `tat` i rum-video.js, `zoomVideo` i rum.js), innan kameran går
+fram till rutan och när den har gått tillbaka, eftersom zoom också ändrar måtten i
+övergångarna. Spelaren är dubbelt så stor som
 rutan och förminskas, så att klippet är skarpt nära. Väggen, disken och pulten fortsätter till
 höger om bilden (`vagg` och `pult` i rum-video.js, i samma plan och med samma toner som i
 rum.js), så att lådan står på något. `?rum-video` visar videon nära i en fast bild.
