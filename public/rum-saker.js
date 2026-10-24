@@ -192,8 +192,12 @@ async function props(pult, opt) {
   Object.assign(canvas.style, { left: `${BOX.x}px`, top: `${BOX.y}px`, width: `${BOX.w}px`, height: `${BOX.h}px` });
   pult.append(canvas);
 
-  const r = new THREE.WebGLRenderer({ canvas, alpha: true, antialias: true });
-  r.setPixelRatio(Math.min((window.devicePixelRatio || 1) * 1.25, 2.5));
+  // i telefonen färre bildpunkter, ingen kantutjämning och mindre skuggkartor,
+  // så att minnet räcker
+  const LATT = matchMedia('(max-width: 700px), (max-height: 500px)').matches;
+  const SKUGGA = LATT ? 1024 : 2048;
+  const r = new THREE.WebGLRenderer({ canvas, alpha: true, antialias: !LATT });
+  r.setPixelRatio(LATT ? 1.5 : Math.min((window.devicePixelRatio || 1) * 1.25, 2.5));
   r.setSize(BOX.w, BOX.h, false);
   r.toneMapping = THREE.ACESFilmicToneMapping;
   r.toneMappingExposure = 1.05;
@@ -223,7 +227,7 @@ async function props(pult, opt) {
   key.position.set(-420, 700, 300);
   key.target.position.set(0, 0, 80);
   key.castShadow = true;
-  key.shadow.mapSize.set(2048, 2048);
+  key.shadow.mapSize.set(SKUGGA, SKUGGA);
   key.shadow.radius = 8;
   key.shadow.bias = -0.0005;
   key.shadow.normalBias = 0.6;

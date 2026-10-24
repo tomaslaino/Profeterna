@@ -1969,6 +1969,18 @@ rummet.
 **På bredden i telefonen** (`.rum.lag`: lägre än 500 px): kupongen i handen fyller höjden,
 och orden står i en spalt bredvid den – *Lägg tillbaka* överst och guldordet längst ner.
 
+**Minnet:** Safari ritar varje lager i rummet i full storlek gånger skärmens pixeltäthet
+(3 i en iPhone), hur förminskat det än visas, och hela lagret även när bara en remsa syns –
+och en sida får använda ungefär 1,5 GB i de flesta iPhone (upp till 3 GB i nyare Pro-modeller).
+Rummet kraschade därför i telefonen (Det går inte att öppna den här sidan). Brus- och
+oskärpefiltren i SVG:n bakas en gång till bilder (`baka` i rum.js, på datorn också – de
+ser likadana ut), 3D-delarna (gänget, sakerna, inredningen och kortlådan) ritas i telefonen
+med 1,5 bildpunkter per punkt, utan kantutjämning och med skuggkartor på 1024 i stället för
+2048 (`LATT`), och ljuset, vinjetten och kornet ritas med en fjärdedel respektive hälften så
+många bildpunkter och utsikten med 0,6 (CSS zoom, förstorat igen). Zoom går inte på det som
+har text: Safari gör då text som blir mindre än 9 px större. Mätt i Safaris motor (WKWebView,
+täthet 2) i 390 × 664: från ungefär 1,9 GB till 1,1–1,3 GB.
+
 ### Utsikten och vädret
 
 Tobaksaffären ligger i Stockholm, och genom skyltfönstret och dörren syns gatan som den är

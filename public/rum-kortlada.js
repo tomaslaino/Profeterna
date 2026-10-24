@@ -48,8 +48,12 @@ export async function kortlada(o) {
   const { RoundedBoxGeometry: RB } = await import('three/addons/geometries/RoundedBoxGeometry.js');
   await Promise.all(['40px "Special Elite"', '700 40px Caveat'].map((f) => document.fonts.load(f).catch(() => null)));
 
-  const DPR = Math.min(2.5, Math.max(2, (window.devicePixelRatio || 1) * 1.25));
-  const gl = new THREE.WebGLRenderer({ alpha: true, antialias: true, preserveDrawingBuffer: true });
+  // i telefonen färre bildpunkter, ingen kantutjämning och mindre skuggkartor,
+  // så att minnet räcker
+  const LATT = matchMedia('(max-width: 700px), (max-height: 500px)').matches;
+  const SKUGGA = LATT ? 1024 : 2048;
+  const DPR = LATT ? 1.5 : Math.min(2.5, Math.max(2, (window.devicePixelRatio || 1) * 1.25));
+  const gl = new THREE.WebGLRenderer({ alpha: true, antialias: !LATT, preserveDrawingBuffer: true });
   gl.toneMapping = THREE.ACESFilmicToneMapping;
   gl.shadowMap.enabled = true;
   gl.shadowMap.type = THREE.PCFSoftShadowMap;
@@ -85,7 +89,7 @@ export async function kortlada(o) {
   key.position.set(POS.x - 340, POS.y + 680, POS.z + 900);
   key.target.position.set(POS.x, POS.y, POS.z);
   key.castShadow = true;
-  key.shadow.mapSize.set(2048, 2048);
+  key.shadow.mapSize.set(SKUGGA, SKUGGA);
   key.shadow.radius = 5;
   key.shadow.bias = -0.0004;
   key.shadow.normalBias = 0.2;
@@ -353,7 +357,7 @@ export async function kortlada(o) {
   }
 
   function size() {
-    gl.setPixelRatio(Math.min(2, window.devicePixelRatio || 1));
+    gl.setPixelRatio(Math.min(LATT ? 1.5 : 2, window.devicePixelRatio || 1));
     gl.setSize(innerWidth, innerHeight, false);
   }
 

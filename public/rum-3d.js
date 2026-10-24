@@ -141,8 +141,12 @@ function dress(key, v) {
 export async function figurer(canvas, opt = {}) {
   const W = canvas.clientWidth || 1280;
   const H = canvas.clientHeight || 560;
-  const r = new THREE.WebGLRenderer({ canvas, alpha: true, antialias: true, preserveDrawingBuffer: true });
-  r.setPixelRatio(Math.min(window.devicePixelRatio || 1, 2));
+  // i telefonen färre bildpunkter, ingen kantutjämning och mindre skuggkartor,
+  // så att minnet räcker
+  const LATT = matchMedia('(max-width: 700px), (max-height: 500px)').matches;
+  const SKUGGA = LATT ? 1024 : 2048;
+  const r = new THREE.WebGLRenderer({ canvas, alpha: true, antialias: !LATT, preserveDrawingBuffer: true });
+  r.setPixelRatio(LATT ? 1.5 : Math.min(window.devicePixelRatio || 1, 2));
   r.setSize(W, H, false);
   r.toneMapping = THREE.ACESFilmicToneMapping;
   r.toneMappingExposure = 1.05;
@@ -160,7 +164,7 @@ export async function figurer(canvas, opt = {}) {
   const key = new THREE.DirectionalLight('#fff0d6', 2.0);
   key.position.set(120, 520, 520);
   key.castShadow = true;
-  key.shadow.mapSize.set(2048, 2048);
+  key.shadow.mapSize.set(SKUGGA, SKUGGA);
   key.shadow.radius = 6;
   key.shadow.bias = -0.0004;
   Object.assign(key.shadow.camera, { left: -650, right: 350, top: 450, bottom: -450, near: 10, far: 2000 });

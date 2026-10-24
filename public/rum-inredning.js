@@ -52,8 +52,12 @@ export async function inredning(el, opt = {}) {
   await Promise.all(['italic 600 68px Fraunces', '700 40px Fraunces', '800 60px Fraunces', '700 40px Caveat']
     .map((f) => document.fonts.load(f).catch(() => null)));
 
-  const DPR = Math.min(2.5, Math.max(2, (window.devicePixelRatio || 1) * 1.25));
-  const gl = new THREE.WebGLRenderer({ alpha: true, antialias: true, preserveDrawingBuffer: true });
+  // i telefonen färre bildpunkter, ingen kantutjämning och mindre skuggkartor,
+  // så att minnet räcker
+  const LATT = matchMedia('(max-width: 700px), (max-height: 500px)').matches;
+  const SKUGGA = LATT ? 1024 : 2048;
+  const DPR = LATT ? 1.5 : Math.min(2.5, Math.max(2, (window.devicePixelRatio || 1) * 1.25));
+  const gl = new THREE.WebGLRenderer({ alpha: true, antialias: !LATT, preserveDrawingBuffer: true });
   gl.setPixelRatio(DPR);
   gl.toneMapping = THREE.ACESFilmicToneMapping;
   gl.shadowMap.enabled = true;
@@ -154,7 +158,7 @@ export async function inredning(el, opt = {}) {
     k.target.position.set(cx, cy, 0);
     if (skugga) {
       k.castShadow = true;
-      k.shadow.mapSize.set(2048, 2048);
+      k.shadow.mapSize.set(SKUGGA, SKUGGA);
       k.shadow.radius = 5;
       k.shadow.bias = -0.0004;
       k.shadow.normalBias = 0.4;
@@ -660,7 +664,7 @@ export async function inredning(el, opt = {}) {
     key.position.set(-420, 700, 300);
     key.target.position.set(0, 0, 80);
     key.castShadow = true;
-    key.shadow.mapSize.set(2048, 2048);
+    key.shadow.mapSize.set(SKUGGA, SKUGGA);
     key.shadow.radius = 6;
     key.shadow.bias = -0.0005;
     key.shadow.normalBias = 0.6;

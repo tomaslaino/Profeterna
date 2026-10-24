@@ -370,6 +370,71 @@ window.Rum = (() => {
       '<canvas class="rum-damm" id="rum-damm" width="800" height="500"></canvas>';
   }
 
+  // ---------- filtren ----------
+  //
+  // Bruset (furun, fläckarna, smutsen på glaset, träet i pulten) och
+  // oskärpan (skuggorna och skenet) räknas annars om i full upplösning,
+  // förstorade som planen de står i, och ligger kvar i minnet – över en
+  // gigabyte, så att sidan kraschade i telefonen. De ritas i stället en gång
+  // var till en bild på samma ställe (filtrets ruta och samma brus), och står
+  // dolda tills bilden är klar. Oskärpan behöver få bildpunkter. Utsikten
+  // (rum-ute.js) ritas om hela tiden och har egna filter.
+  // → när allt är bakat
+  const BAKA = { 'rum-b1': 2, 'rum-b4': 2, 'rum-b10': 0.6, 'rum-b24': 0.5, 'rum-b40': 0.35, 'rum-grainwood': 2, 'rum-ved': 2, 'rum-flack': 2, 'rum-prick': 2, 'rum-grime': 2 };
+  function baka() {
+    const ns = 'http://www.w3.org/2000/svg';
+    const idOf = (e) => (/^url\(#([\w-]+)\)$/.exec(e.getAttribute('filter')) || [])[1];
+    const els = [...R.el.querySelectorAll('svg [filter]')].filter((e) => BAKA[idOf(e)]);
+    if (!els.length) return Promise.resolve();
+    for (const e of els) e.setAttribute('visibility', 'hidden');
+    // elementens rutor mäts i en osynlig SVG utanför rummet (det är dolt än)
+    const mat = document.createElementNS(ns, 'svg');
+    mat.setAttribute('style', 'position: absolute; left: -9999px; top: 0; width: 10px; height: 10px; visibility: hidden');
+    document.body.append(mat);
+    const xs = new XMLSerializer();
+    return (async () => {
+      for (const e of els) {
+        const id = idOf(e);
+        const f = R.el.querySelector(`filter#${id}`);
+        const k = e.cloneNode(true);
+        for (const a of ['filter', 'transform', 'visibility', 'opacity', 'class', 'clip-path', 'style']) k.removeAttribute(a);
+        mat.append(k);
+        const b = k.getBBox();
+        k.remove();
+        try {
+          if (!f || !b.width || !b.height) throw new Error('ingen ruta');
+          // filtrets ruta i andelar av elementets (objectBoundingBox)
+          const del = (a, d) => { const v = f.getAttribute(a); return v == null ? d : parseFloat(v) / (v.endsWith('%') ? 100 : 1); };
+          const x = b.x + del('x', -0.1) * b.width;
+          const y = b.y + del('y', -0.1) * b.height;
+          const w = del('width', 1.2) * b.width;
+          const h = del('height', 1.2) * b.height;
+          const cw = Math.max(1, Math.round(w * BAKA[id]));
+          const ch = Math.max(1, Math.round(h * BAKA[id]));
+          k.setAttribute('filter', `url(#${id})`);
+          const img = new Image();
+          img.src = `data:image/svg+xml;charset=utf-8,${encodeURIComponent(`<svg xmlns="${ns}" width="${cw}" height="${ch}" viewBox="${x} ${y} ${w} ${h}" preserveAspectRatio="none">${DEFS}${xs.serializeToString(k)}</svg>`)}`;
+          await img.decode();
+          const c = document.createElement('canvas');
+          c.width = cw;
+          c.height = ch;
+          c.getContext('2d').drawImage(img, 0, 0, cw, ch);
+          const blob = await new Promise((r) => c.toBlob(r, 'image/png'));
+          c.width = c.height = 0;
+          if (!blob) throw new Error('ingen bild');
+          const im = document.createElementNS(ns, 'image');
+          for (const [a, v] of [['href', URL.createObjectURL(blob)], ['x', x], ['y', y], ['width', w], ['height', h], ['preserveAspectRatio', 'none']]) im.setAttribute(a, v);
+          for (const a of ['opacity', 'class', 'transform', 'clip-path', 'style']) if (e.hasAttribute(a)) im.setAttribute(a, e.getAttribute(a));
+          e.replaceWith(im);
+        } catch {
+          // går det inte står filtret kvar som förut
+          e.removeAttribute('visibility');
+        }
+      }
+      mat.remove();
+    })();
+  }
+
   function build() {
     const el = document.createElement('section');
     el.id = 'rum-section';
@@ -401,6 +466,7 @@ ${window.RumRegister ? RumRegister.nara() : ''}
     R.video = window.RumVideo ? RumVideo.mount(el, { calm, short, kort: (n) => BOARD[n] || short(n), aim: (f) => { R.vf = f; aimVideo(calm() ? null : 'glid'); } }) : null;
     R.reg = window.RumRegister ? RumRegister.mount(el, { calm, kort: (n) => BOARD[n] || short(n), close: () => register(false) }) : null;
     paintUte();
+    R.bakat = baka();
   }
 
   // ---------- datan ----------
@@ -2335,7 +2401,7 @@ ${window.RumRegister ? RumRegister.nara() : ''}
     zoomVideo(false);
     hot(null);
     // gänget klär sig efter vädret: vänta lite på det (i en fast bild tills det är hämtat)
-    const ready = Promise.all([load(), Promise.race([ute(), new Promise((r) => setTimeout(r, still() ? 9000 : 1500))]).then(three)]);
+    const ready = Promise.all([load(), Promise.race([ute(), new Promise((r) => setTimeout(r, still() ? 9000 : 1500))]).then(three), R.bakat]);
     tand(ready);
     if (still()) {
       // en fast bild: allt på samma tid, och klar när datan och gänget är ritade

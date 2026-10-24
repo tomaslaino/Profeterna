@@ -690,6 +690,16 @@ a.rum-sak, a.rum-sak:hover { color: inherit; text-decoration: none; }
   .rum-brand { font-size: 24px; }
   .rum-ft { right: 20px; bottom: 14px; }
 }
+/* Safari ritar varje lager i full storlek gånger skärmens pixeltäthet, hur
+   förminskat det än visas, och i telefonen tar minnet slut. Ljuset,
+   vinjetten, kornet och utsikten (som är suddig ändå) ritas därför med färre
+   bildpunkter där – zoom och sedan förstorade igen. Zoom går inte på det
+   som har text: Safari gör då text under 9 px större. */
+@media (max-width: 700px), (max-height: 500px) {
+  .rum-warm, .rum-dagsljus, .rum-vign { zoom: 0.25; transform: scale(4); transform-origin: 0 0; }
+  .rum-grain { zoom: 0.5; transform: scale(2); transform-origin: 0 0; }
+  .rum-ute { zoom: 0.6; transform: scale(1.6667); transform-origin: 0 0; }
+}
 
 /* papperets regler för telefonen (papper.css) gäller inte kupongen i rummet */
 .rum-kup .row .pp-nr { display: grid; }
