@@ -13,10 +13,16 @@
 .vhs-in { position: absolute; left: 0; top: 0; width: 1440px; height: 780px; zoom: 2; transform-origin: 0 0; transform: scale3d(0.083333, 0.083333, 0.083333); }
 /* i telefonen inte dubbelt: det räcker för hur nära kameran går där, och
    lagren blir en fjärdedel så stora – Safari ritar dem i full storlek gånger
-   pixeltätheten, och tobaksaffären fick slut på minne i iPhone */
+   pixeltätheten, och tobaksaffären fick slut på minne i iPhone. På håll
+   räcker halva det (en fjärdedel av minnet igen; skarp i rum-video.js och
+   zoomVideo i rum.js); knapparnas tecken och etiketterna blir då lite
+   större (Safari gör text under 9 px större), men de är för små för att
+   läsa där. */
 @media (max-width: 700px), (max-height: 500px) {
-  .vhs-in { zoom: 1; transform: scale3d(0.166667, 0.166667, 0.166667); }
+  .vhs-in { zoom: 0.5; transform: scale3d(0.333333, 0.333333, 0.333333); }
+  .vhs-in.skarp { zoom: 1; transform: scale3d(0.166667, 0.166667, 0.166667); }
 }
+.vhs-in.byt, .vhs-in.byt * { transition: none !important; }
 .vhs-in > *, .vhs-styr > * { position: absolute; }
 .vhs-styr { position: absolute; inset: 0; }
 .vhs-ritning { position: absolute; overflow: visible; pointer-events: none; }

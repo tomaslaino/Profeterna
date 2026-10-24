@@ -51,8 +51,9 @@
   100% { opacity: 0; transform: scale(1.08) translateY(5px); }
 }
 
-/* flaggan vajar */
-.rum-flagga { position: absolute; filter: blur(1.1px); }
+/* flaggan vajar, i ett eget lager: annars ritas hela utsikten om hela
+   tiden, och ett lager som ritas om hålls i två buffertar i Safari */
+.rum-flagga { position: absolute; filter: blur(1.1px); will-change: transform; }
 .rum-flagga .vaj { transform-box: fill-box; transform-origin: 0 50%; animation: rum-vaj 2.6s ease-in-out infinite alternate; }
 @keyframes rum-vaj { from { transform: skewY(-5deg) scaleX(0.92); } to { transform: skewY(4deg) scaleX(1); } }
 

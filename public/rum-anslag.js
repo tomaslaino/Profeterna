@@ -338,8 +338,11 @@ window.RumAnslag = (() => {
   function board(W, inner, sheets, top, wall) {
     const notes = W.notes.map((n) => noteHtml(n, inner[n.id], sheets, top, wall)).join('');
     const pins = W.notes.map(pin).join('');
-    return '<i class="ans-f ans-topp"></i><i class="ans-f ans-botten"></i><i class="ans-f ans-vanster"></i><i class="ans-f ans-hoger"></i>' +
-      `<span class="ans-yta"><span class="ans-jute">${W.marks}${notes}${pins}</span><i class="ans-glans"></i></span>`;
+    // ytan före ramens sidor: sidorna ritas efter djupet ändå (preserve-3d),
+    // och kom ytan efter dem blev den ett eget lager i tavlans fulla storlek
+    // (den överlappar dem), vilket Safari ritar gånger pixeltätheten
+    return `<span class="ans-yta"><span class="ans-jute">${W.marks}${notes}${pins}</span><i class="ans-glans"></i></span>` +
+      '<i class="ans-f ans-topp"></i><i class="ans-f ans-botten"></i><i class="ans-f ans-vanster"></i><i class="ans-f ans-hoger"></i>';
   }
 
   function wall() {

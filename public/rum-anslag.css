@@ -70,6 +70,14 @@
 }
 /* lysröret i taket speglar sig i lacken och i papperet */
 .ans-glans { position: absolute; inset: 0; pointer-events: none; background: linear-gradient(172deg, rgba(255, 246, 225, 0.13), rgba(255, 246, 225, 0) 42%); }
+/* Glansen är ett eget lager i tavlans fulla storlek (den ligger över
+   polaroiden, som är i 3D), och Safari ritar lager i full storlek gånger
+   skärmens pixeltäthet. I telefonen är den en fjärdedel så stor och
+   förstoras (Safari ritar lagret i dess egen storlek) – den är bara en svag
+   ljusning. */
+@media (max-width: 700px), (max-height: 500px) {
+  .ans-glans { inset: auto; left: 0; top: 0; width: 250px; height: 142px; transform: scale(4); transform-origin: 0 0; }
+}
 
 /* slitaget: nålhål, hörn av rivna lappar och en blekare yta */
 .ans-hal { position: absolute; width: 2.6px; height: 2.6px; border-radius: 50%; background: rgba(20, 12, 2, 0.7); box-shadow: 0.5px 0.5px 0 rgba(255, 238, 200, 0.15); }
