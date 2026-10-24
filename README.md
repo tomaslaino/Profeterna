@@ -1717,7 +1717,11 @@ tippare på förstasidan länkar hit (*Till Olympen*).
 
 Förstasidan (utan adress), på datorn och i telefonen (se [I telefonen](#i-telefonen)):
 tobaksaffären vid spelpulten. Scenen ritas i 1600 × 1000 och skalas så att den täcker
-fönstret; lagren ligger på olika djup (CSS 3D) och vrids lite när musen rör sig. Namnet
+fönstret; lagren ligger på olika djup (CSS 3D) och vrids lite när musen rör sig. Vridningen
+sätts som `transform` direkt på `.rum-world` (`setCam` i rum.js), inte som CSS-variabler:
+variabler ärvs av varje element i rummet, så Chrome räknade om stilen för hela rummet och
+målade om allt i varje bildruta medan musen rörde sig, hann inte rita det och visade bildrutor
+där väggen, fönsterbänken och pulten var svarta (flimmer). Namnet
 och foten (*K kupongen · T tv:n · A anslagstavlan · R kortregistret · V videon*, *Vanlig sida*) ligger utanför scenen i fönstrets hörn;
 någon meny finns inte, det är föremålen som leder vidare. [public/rum.js](public/rum.js)
 ritar rummet och fyller det med sajtens data, [public/rum.css](public/rum.css) ger det utseendet och

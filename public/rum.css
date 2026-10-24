@@ -1,7 +1,7 @@
 /* Tobaksaffären (rum.js): förstasidan. Scenen ritas i
    1600 × 1000 och skalas så att den täcker fönstret; namnet och foten ligger
    utanför scenen i fönstrets hörn. Lagren ligger på olika djup och vrids med
-   musen (--rx, --ry). */
+   musen (setCam i rum.js sätter transform på .rum-world). */
 @import url("https://fonts.googleapis.com/css2?family=VT323&family=Anton&display=swap");
 
 html.i-rummet { overflow: hidden; scrollbar-gutter: auto; }
@@ -48,7 +48,7 @@ html.i-rummet body > footer { display: none; }
   height: 1000px;
   transform-style: preserve-3d;
   transform-origin: 800px 500px;
-  transform: translateZ(-330px) rotateX(var(--rx, 0deg)) rotateY(var(--ry, 0deg)) translateZ(330px);
+  transform: translateZ(-330px) rotateX(0deg) rotateY(0deg) translateZ(330px);
   pointer-events: none;
 }
 

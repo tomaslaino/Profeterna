@@ -1187,11 +1187,15 @@ ${window.RumRegister ? RumRegister.nara() : ''}
 
   // ---------- rörelsen ----------
 
+  // Vridningen sätts som transform direkt på #rum-world, inte som
+  // CSS-variabler: variabler ärvs av varje element i rummet, så Chrome
+  // räknade om stilen för hela rummet och målade om allt i varje bildruta
+  // medan musen rörde sig – och hann inte rita det, så att väggen, bänken
+  // och pulten blinkade svart.
   function setCam(mx, my) {
     const w = document.getElementById('rum-world');
     if (!w) return;
-    w.style.setProperty('--ry', `${(mx * 4.5).toFixed(3)}deg`);
-    w.style.setProperty('--rx', `${(-my * 2.6).toFixed(3)}deg`);
+    w.style.transform = `translateZ(-330px) rotateX(${(-my * 2.6).toFixed(3)}deg) rotateY(${(mx * 4.5).toFixed(3)}deg) translateZ(330px)`;
   }
 
   // Neonen glappar ibland: tider ur klockan, så att stillbilderna blir samma.
