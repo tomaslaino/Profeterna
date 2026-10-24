@@ -1,0 +1,26 @@
+{
+  "kuponger": [
+    {
+      "id": "2026-10-24",
+      "namn": "Oxford och Cambridge i samma båt",
+      "spel": "Stryktipset",
+      "datum": "2026-10-24",
+      "källa": "sidan",
+      "matcher": [
+        { "match": "Chelsea – Tottenham Hotspur", "tecken": "12", "resultat": "0–2", "modell": [62, 19, 19], "id": "401878767" },
+        { "match": "Arsenal – Everton", "tecken": "1X", "resultat": "2–0", "modell": [67, 22, 11], "id": "401878768" },
+        { "match": "Coventry City – Fulham", "tecken": "X2", "resultat": "0–1", "modell": [32, 25, 43], "id": "401879255" },
+        { "match": "Blackburn Rovers – Wrexham", "tecken": "X2", "resultat": "2–0", "modell": [39, 28, 33], "id": "401880208" },
+        { "match": "Cardiff City – Birmingham City", "tecken": "2", "resultat": "1–0", "modell": [34, 25, 41], "id": "401880206" },
+        { "match": "Lincoln City – Burnley", "tecken": "12", "resultat": "4–1", "modell": [31, 27, 42], "id": "401880204" },
+        { "match": "Preston North End – West Bromwich Albion", "tecken": "2", "resultat": "1–1", "modell": [27, 27, 46], "id": "401880202" },
+        { "match": "Queens Park Rangers – Swansea City", "tecken": "1X2", "resultat": "5–0", "modell": [35, 28, 37], "id": "401880201" },
+        { "match": "Stoke City – Bristol City", "tecken": "12", "resultat": "0–0", "modell": [40, 29, 31], "id": "401880199" },
+        { "match": "West Ham United – Southampton", "tecken": "1X2", "resultat": "2–3", "modell": [57, 21, 22], "id": "401880198" },
+        { "match": "Wolverhampton Wanderers – Watford", "tecken": "1", "resultat": "1–0", "modell": [68, 20, 12], "id": "401880197" },
+        { "match": "Cambridge United – Plymouth Argyle", "tecken": "1", "resultat": "2–3", "modell": [35, 27, 38], "id": "401880774" },
+        { "match": "Oxford United – Bradford City", "tecken": "1X2", "resultat": "0–0", "modell": [43, 30, 27], "id": "401880769" }
+      ]
+    }
+  ]
+}
