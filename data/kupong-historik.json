@@ -20,7 +20,12 @@
         { "match": "Wolverhampton Wanderers – Watford", "tecken": "1", "resultat": "1–0", "modell": [68, 20, 12], "id": "401880197" },
         { "match": "Cambridge United – Plymouth Argyle", "tecken": "1", "resultat": "2–3", "modell": [35, 27, 38], "id": "401880774" },
         { "match": "Oxford United – Bradford City", "tecken": "1X2", "resultat": "0–0", "modell": [43, 30, 27], "id": "401880769" }
-      ]
+      ],
+      "ai": {
+        "text": "Med 8 rätt av 13 underpresterade ni mot ert väntade 9,3, även om ni slog modellens tips som bara fick 5 rätt. Avgörande missar kom i Blackburn (X2, odds 1,64), Cambridge (1, odds 2,86) och Cardiff (2, odds 2,44). Flera garderingar med låga odds satt, men räckte inte för att nå förväntad utdelning.",
+        "modell": "deepseek-v4-pro",
+        "skriven": "2026-10-24T19:00:55.868Z"
+      }
     }
   ]
 }
