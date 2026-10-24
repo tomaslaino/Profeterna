@@ -2360,7 +2360,10 @@ att bilden fortsätter där den stannade, och när man spolar med ◀◀ och ▶
 
 Hörnet ritas i sex gånger storleken och dubbelt till (`zoom: 2`) och förminskas, som tv:n,
 så att det är skarpt också när man går närmare rutan; ritningarna är bara så stora som tv:n
-och lådan, så att lagren inte blir större än de behöver. Spelaren är dubbelt så stor som
+och lådan, så att lagren inte blir större än de behöver. I telefonen (smalare än 700 eller
+lägre än 500 bildpunkter) ritas det inte dubbelt (`zoom: 1`): det räcker för hur nära
+kameran går där, och lagren blir en fjärdedel så stora – Safari ritar lagren i full storlek
+gånger pixeltätheten, och tobaksaffären fick slut på minne i iPhone. Spelaren är dubbelt så stor som
 rutan och förminskas, så att klippet är skarpt nära. Väggen, disken och pulten fortsätter till
 höger om bilden (`vagg` och `pult` i rum-video.js, i samma plan och med samma toner som i
 rum.js), så att lådan står på något. `?rum-video` visar videon nära i en fast bild.
