@@ -37,7 +37,7 @@
 // pult), så att lådan står på något när kameran går dit.
 //
 // RumVideo.html('horn' | 'vagg' | 'pult') → delarna (planen -598, -600 och -60 i rum.js)
-// RumVideo.mount(el, { calm, short, kort, aim }) → { fill(matches, ids), zoom(on) → hörnet i scenen, key(k), stop() }
+// RumVideo.mount(el, { calm, short, kort, aim }) → { fill(matches, ids), skarp(on), zoom(on) → hörnet i scenen, key(k), stop() }
 // aim(f) flyttar kameran till f (med f.z som största förstoring) när man går närmare tv:n.
 
 window.RumVideo = (() => {
@@ -355,6 +355,7 @@ window.RumVideo = (() => {
 
   function mount(root, o) {
     const box = root.querySelector('#rum-vhs');
+    const inn = box.querySelector('.vhs-in');
     const styr = [...box.querySelectorAll('.vhs-styr')];
     const bild = box.querySelector('.vhs-bild');
     const mask = box.querySelector('.vhs-mask');
@@ -751,6 +752,16 @@ window.RumVideo = (() => {
           if (m) mask.hidden = !hidden(m);
         }
         layout();
+      },
+      // I telefonen ritas hörnet i halva storleken på håll och i hela nära
+      // (.skarp, rum-video.css). zoom ändrar också måtten i övergångarna, så
+      // det byts med övergångarna avstängda, när inget rör sig.
+      skarp(on) {
+        if (inn.classList.contains('skarp') === on) return;
+        inn.classList.add('byt');
+        inn.classList.toggle('skarp', on);
+        void inn.offsetWidth;
+        inn.classList.remove('byt');
       },
       // Nära: tv:n vrids mot en, kassetterna och knapparna går att trycka
       // på, och videon spelar vidare om den gjorde det när man gick. Svarar

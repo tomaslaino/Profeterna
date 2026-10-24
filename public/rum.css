@@ -53,6 +53,10 @@ html.i-rummet body > footer { display: none; }
 }
 
 .rum-pl { position: absolute; left: 0; top: 0; width: 1600px; height: 1000px; transform-origin: 800px 500px; pointer-events: none; }
+/* Varje sak i ett plan är ett eget lager, så att planet inte ritar något
+   själv: ett plan som ritar får en yta i hela scenens storlek (Safari ritar
+   den gånger skärmens pixeltäthet) också när det som ritas är litet. */
+.rum-pl > * { will-change: transform; }
 .rum-layer { position: absolute; left: 0; top: 0; width: 1600px; height: 1000px; pointer-events: none; }
 .rum-sak, .rum-tag { pointer-events: auto; cursor: pointer; }
 a.rum-sak, a.rum-sak:hover { color: inherit; text-decoration: none; }

@@ -1969,17 +1969,40 @@ rummet.
 **På bredden i telefonen** (`.rum.lag`: lägre än 500 px): kupongen i handen fyller höjden,
 och orden står i en spalt bredvid den – *Lägg tillbaka* överst och guldordet längst ner.
 
-**Minnet:** Safari ritar varje lager i rummet i full storlek gånger skärmens pixeltäthet
-(3 i en iPhone), hur förminskat det än visas, och hela lagret även när bara en remsa syns –
-och en sida får använda ungefär 1,5 GB i de flesta iPhone (upp till 3 GB i nyare Pro-modeller).
-Rummet kraschade därför i telefonen (Det går inte att öppna den här sidan). Brus- och
-oskärpefiltren i SVG:n bakas en gång till bilder (`baka` i rum.js, på datorn också – de
-ser likadana ut), 3D-delarna (gänget, sakerna, inredningen och kortlådan) ritas i telefonen
-med 1,5 bildpunkter per punkt, utan kantutjämning och med skuggkartor på 1024 i stället för
-2048 (`LATT`), och ljuset, vinjetten och kornet ritas med en fjärdedel respektive hälften så
-många bildpunkter och utsikten med 0,6 (CSS zoom, förstorat igen). Zoom går inte på det som
-har text: Safari gör då text som blir mindre än 9 px större. Mätt i Safaris motor (WKWebView,
-täthet 2) i 390 × 664: från ungefär 1,9 GB till 1,1–1,3 GB.
+**Minnet:** Safari ritar varje lager i rummet i dess egen storlek gånger skärmens
+pixeltäthet (3 i en iPhone), hur förminskat eller förstorat det än visas – ett lager som är
+högst 1280 punkter brett och högt i sin helhet så fort en bit av det syns, ett större bara där
+det syns – och en sida får använda ungefär 1,5 GB i de flesta iPhone (upp till 3 GB i nyare
+Pro-modeller). Rummet kraschade därför i telefonen (Det går inte att öppna den här sidan).
+Därför:
+
+- **Planen ritar inget själva.** Varje sak i ett plan är ett eget lager (`.rum-pl > *` i
+  rum.css), och SVG:erna är bara så stora som det de ritar (rutan i `svg` i rum.js). Ett plan
+  som ritade något fick en yta i hela scenens storlek också när det var litet – tv:ns sken
+  gav tv:ns plan en, och pokalhyllan och neonskenet var lager i hela scenens storlek.
+- **Filtren bakas.** Brus- och oskärpefiltren i SVG:n ritas en gång till bilder (`baka` i
+  rum.js, på datorn också – de ser likadana ut). SVG:n som ritar bilden hämtas från en blob
+  som släpps efteråt; som data-URL låg den kvar i Safaris cache med filtrens mellanbilder,
+  ungefär 350 MB.
+- **Det som ritas i större storlek för att vara skarpt nära** ritas mindre i telefonen: tv:n i
+  1,5 gånger lådans mått i stället för 3 (se [Tv:n](#tvn)) och videohörnet i halva storleken på
+  håll (se [Videon](#videon)). Anslagstavlans yta står före ramens sidor, så att den inte blir ett
+  eget lager, och flaggan i utsikten är ett eget lager – annars ritades hela utsikten om hela
+  tiden, och ett lager som ritas om hålls i två buffertar.
+- **Det suddiga ritas med färre bildpunkter.** Ljuset, vinjetten och kornet med en fjärdedel
+  respektive hälften och utsikten med 0,6 (CSS zoom, förstorat igen), tv:ns sken och
+  anslagstavlans glans en fjärdedel så stora och förstorade med transform. Zoom går inte på
+  det som har text mellan 9 och 18 px (Safari gör text som blir mindre än 9 px större) och
+  flyttar det som inte står i 0,0.
+- **3D-delarna** (gänget, sakerna, inredningen och kortlådan) ritas i telefonen med 1,5
+  bildpunkter per punkt, utan kantutjämning och med skuggkartor på 1024 i stället för 2048
+  (`LATT`).
+
+Mätt i Safaris motor (WKWebView, täthet 2) i 390 × 664 före planen, tv:n, videon och
+blobarna: från ungefär 1,9 GB till 1,1–1,3 GB. Med WebKits eget lagerträd (WebKitGTK, via
+inspektören) räknat som i en iPhone (täthet 3, rutor över 1280 punkter) tar lagren efter dem i
+390 × 664 ungefär 140 MB i stället för 260, längst åt höger 240 i stället för 570 och på
+bredden (844 × 390) 300 i stället för 690 – och bakningen håller inte längre kvar 350 MB.
 
 ### Utsikten och vädret
 
@@ -2199,7 +2222,9 @@ byts sidan direkt och tv:n står still.
 
 Lådan ritas i tre gånger storleken (`zoom: 3`) och förminskas igen (`scale3d`): Chrome
 ritar inte om lager i perspektiv när kameran går fram, så utan skärpan i reserv blir
-text-tv:n suddig på nära håll. Tv:n sköter sig själv: rum.js bygger den (`RumTv.html`),
+text-tv:n suddig på nära håll. I telefonen räcker 1,5 gånger (`zoom: 1.5`): där går kameran
+högst så nära att tv:n fyller bredden eller höjden mellan namnet och foten, ungefär 1,4 gånger
+lådans mått, och lagren tar en fjärdedel så mycket minne (se [I telefonen](#i-telefonen)). Tv:n sköter sig själv: rum.js bygger den (`RumTv.html`),
 kopplar in den (`RumTv.mount`), ger den omgångens rader vid varje `fill` (med Stryktipsets
 ordning när omgången är Stryktipset, och om raderna bara är de närmaste matcherna) och skickar
 siffror och pilar dit när den är nära.
@@ -2373,9 +2398,11 @@ att bilden fortsätter där den stannade, och när man spolar med ◀◀ och ▶
 Hörnet ritas i sex gånger storleken och dubbelt till (`zoom: 2`) och förminskas, som tv:n,
 så att det är skarpt också när man går närmare rutan; ritningarna är bara så stora som tv:n
 och lådan, så att lagren inte blir större än de behöver. I telefonen (smalare än 700 eller
-lägre än 500 bildpunkter) ritas det inte dubbelt (`zoom: 1`): det räcker för hur nära
-kameran går där, och lagren blir en fjärdedel så stora – Safari ritar lagren i full storlek
-gånger pixeltätheten, och tobaksaffären fick slut på minne i iPhone. Spelaren är dubbelt så stor som
+lägre än 500 bildpunkter) ritas det inte dubbelt nära (`zoom: 1`, det räcker för hur nära
+kameran går där) och i halva storleken på håll (`zoom: 0.5`) – Safari ritar lagren i full
+storlek gånger pixeltätheten, och tobaksaffären fick slut på minne i iPhone. Storleken byts
+med övergångarna avstängda (`skarp` i rum-video.js, från `zoomVideo` i rum.js), innan tv:n
+vrids fram och när den har vridits bort, eftersom zoom också ändrar måtten i övergångarna. Spelaren är dubbelt så stor som
 rutan och förminskas, så att klippet är skarpt nära. Väggen, disken och pulten fortsätter till
 höger om bilden (`vagg` och `pult` i rum-video.js, i samma plan och med samma toner som i
 rum.js), så att lådan står på något. `?rum-video` visar videon nära i en fast bild.

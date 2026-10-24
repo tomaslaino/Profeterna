@@ -92,7 +92,12 @@ window.Rum = (() => {
     const k = (PERSP - z) / PERSP * extra;
     return `<div class="rum-pl${cls ? ` ${cls}` : ''}" style="transform: translateZ(${z}px) scale(${k.toFixed(4)})">${inner}</div>`;
   }
-  const svg = (inner, cls = '') => `<svg class="rum-layer${cls ? ` ${cls}` : ''}" viewBox="0 0 ${W} ${H}" aria-hidden="true">${inner}</svg>`;
+  // Varje sak i ett plan är ett eget lager (.rum-pl > * i rum.css), och
+  // Safari ritar ett lager i full storlek gånger skärmens pixeltäthet: en
+  // SVG får därför bara rutan (x, y, b, h) som det den ritar behöver, med
+  // samma koordinater som scenen.
+  const svg = (inner, cls = '', [x, y, b, h] = [0, 0, W, H]) => `<svg class="rum-layer${cls ? ` ${cls}` : ''}" viewBox="${x} ${y} ${b} ${h}" ` +
+    `style="left:${x}px; top:${y}px; width:${b}px; height:${h}px" aria-hidden="true">${inner}</svg>`;
 
   const DEFS = `<defs>
     <linearGradient id="rum-night" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#0a0f19"/><stop offset=".55" stop-color="#121826"/><stop offset="1" stop-color="#1c1d24"/></linearGradient>
@@ -228,7 +233,7 @@ window.Rum = (() => {
   // Neonskylten är i 3D (rum-inredning.js) och glappar ibland (neonOn); här
   // är skenet runt den.
   function neon() {
-    return svg('<ellipse cx="440" cy="168" rx="160" ry="58" fill="#ff3a2a" opacity=".28" filter="url(#rum-b24)" class="rum-neonhalo"/>');
+    return svg('<ellipse cx="440" cy="168" rx="160" ry="58" fill="#ff3a2a" opacity=".28" filter="url(#rum-b24)" class="rum-neonhalo"/>', '', [100, 40, 680, 260]);
   }
 
   // ---------- de sju sakerna ----------
@@ -309,7 +314,7 @@ window.Rum = (() => {
   <ellipse cx="1340" cy="930" rx="34" ry="12" fill="none" stroke="#2a160a" stroke-opacity=".35" stroke-width="3"/>
   <ellipse cx="1120" cy="700" rx="30" ry="10" fill="none" stroke="#2a160a" stroke-opacity=".25" stroke-width="2.5"/>
   <g fill="#1a0e06" opacity=".55"><ellipse cx="372" cy="760" rx="7" ry="3"/><ellipse cx="1452" cy="742" rx="6" ry="2.4"/><ellipse cx="1480" cy="870" rx="5" ry="2"/></g>
-  <rect x="-10" y="984" width="1620" height="20" fill="url(#rum-alu)"/>`);
+  <rect x="-10" y="984" width="1620" height="20" fill="url(#rum-alu)"/>`, '', [0, 510, W, H - 510]);
   }
 
   function sill() {
@@ -319,7 +324,7 @@ window.Rum = (() => {
   <rect x="236" y="${S + 10}" width="748" height="12" fill="#4a453c"/>
   <g stroke="#cfc6b0" stroke-opacity=".45" stroke-width="1.6"><line x1="300" y1="${S + 10}" x2="342" y2="${S + 10}"/><line x1="610" y1="${S + 10}" x2="628" y2="${S + 10}"/><line x1="880" y1="${S + 10}" x2="930" y2="${S + 10}"/></g>
   <rect x="236" y="${S + 22}" width="748" height="6" fill="#000" opacity=".3" filter="url(#rum-b4)"/>
-  <ellipse cx="560" cy="${S - 150}" rx="360" ry="150" fill="#ff3a2a" opacity=".05" filter="url(#rum-b40)"/>`) +
+  <ellipse cx="560" cy="${S - 150}" rx="360" ry="150" fill="#ff3a2a" opacity=".05" filter="url(#rum-b40)"/>`, '', [0, 100, 1380, 630]) +
       '<canvas id="rum-3d" class="rum-3d" width="1280" height="560"></canvas>';
   }
 
@@ -378,7 +383,9 @@ window.Rum = (() => {
   // gigabyte, så att sidan kraschade i telefonen. De ritas i stället en gång
   // var till en bild på samma ställe (filtrets ruta och samma brus), och står
   // dolda tills bilden är klar. Oskärpan behöver få bildpunkter. Utsikten
-  // (rum-ute.js) ritas om hela tiden och har egna filter.
+  // (rum-ute.js) ritas om hela tiden och har egna filter. SVG:n som ritar en
+  // bild hämtas från en blob som släpps efteråt: en data-URL låg kvar i
+  // Safaris cache med filtrens mellanbilder, ungefär 350 MB för hela rummet.
   // → när allt är bakat
   const BAKA = { 'rum-b1': 2, 'rum-b4': 2, 'rum-b10': 0.6, 'rum-b24': 0.5, 'rum-b40': 0.35, 'rum-grainwood': 2, 'rum-ved': 2, 'rum-flack': 2, 'rum-prick': 2, 'rum-grime': 2 };
   function baka() {
@@ -401,6 +408,8 @@ window.Rum = (() => {
         mat.append(k);
         const b = k.getBBox();
         k.remove();
+        let src = '';
+        const img = new Image();
         try {
           if (!f || !b.width || !b.height) throw new Error('ingen ruta');
           // filtrets ruta i andelar av elementets (objectBoundingBox)
@@ -412,13 +421,16 @@ window.Rum = (() => {
           const cw = Math.max(1, Math.round(w * BAKA[id]));
           const ch = Math.max(1, Math.round(h * BAKA[id]));
           k.setAttribute('filter', `url(#${id})`);
-          const img = new Image();
-          img.src = `data:image/svg+xml;charset=utf-8,${encodeURIComponent(`<svg xmlns="${ns}" width="${cw}" height="${ch}" viewBox="${x} ${y} ${w} ${h}" preserveAspectRatio="none">${DEFS}${xs.serializeToString(k)}</svg>`)}`;
+          src = URL.createObjectURL(new Blob([`<svg xmlns="${ns}" width="${cw}" height="${ch}" viewBox="${x} ${y} ${w} ${h}" preserveAspectRatio="none">${DEFS}${xs.serializeToString(k)}</svg>`], { type: 'image/svg+xml' }));
+          img.src = src;
           await img.decode();
           const c = document.createElement('canvas');
           c.width = cw;
           c.height = ch;
           c.getContext('2d').drawImage(img, 0, 0, cw, ch);
+          img.src = '';
+          URL.revokeObjectURL(src);
+          src = '';
           const blob = await new Promise((r) => c.toBlob(r, 'image/png'));
           c.width = c.height = 0;
           if (!blob) throw new Error('ingen bild');
@@ -429,6 +441,10 @@ window.Rum = (() => {
         } catch {
           // går det inte står filtret kvar som förut
           e.removeAttribute('visibility');
+          if (src) {
+            img.src = '';
+            URL.revokeObjectURL(src);
+          }
         }
       }
       mat.remove();
@@ -442,7 +458,7 @@ window.Rum = (() => {
     el.hidden = true;
     el.setAttribute('aria-label', 'Tobaksaffären');
     el.innerHTML = `<div class="rum-stage" id="rum-stage"><div class="rum-kamera" id="rum-kamera"><div class="rum-world" id="rum-world">
-${plane(-600, `<div class="rum-ute" id="rum-ute"></div>${bg()}${vid('vagg')}${rightWall()}${window.RumRegister ? RumRegister.html() : ''}${svg('<g id="rum-hyllor"></g>')}${neon()}${frameHtml()}`, 1.035)}
+${plane(-600, `<div class="rum-ute" id="rum-ute"></div>${bg()}${vid('vagg')}${rightWall()}${window.RumRegister ? RumRegister.html() : ''}${svg('<g id="rum-hyllor"></g>', '', [1130, 170, 200, 140])}${neon()}${frameHtml()}`, 1.035)}
 ${plane(-598, vid('horn'), 1.035, 'rum-pl3d')}
 ${plane(-470, `${tv()}`, 1.02, 'rum-pl3d')}
 ${plane(-330, `${sill()}${haze()}`)}
@@ -1160,6 +1176,11 @@ ${window.RumRegister ? RumRegister.nara() : ''}
     if (on && R.ans && R.ans.on()) board(false);
     if (on && R.reg && R.reg.on()) register(false);
     R.vnara = on;
+    // i telefonen ritas hörnet skarpt bara nära (rum-video.css): innan tv:n
+    // vrids fram, och i halva storleken igen när den har vridits bort
+    clearTimeout(R.vskarp);
+    if (on) R.video.skarp(true);
+    else R.vskarp = setTimeout(() => { if (!R.vnara) R.video.skarp(false); }, 900);
     R.el.classList.toggle('vid-nara', on);
     if (on) {
       R.tx = 0;

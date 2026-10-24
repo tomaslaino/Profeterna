@@ -62,6 +62,18 @@
    sladden som hänger från armen till uttaget under plattan. Står still när
    tv:n vrids, och ritas i tre gånger storleken som lådan. */
 .tv-fot { position: absolute; left: 0; top: 0; width: 292px; height: 196px; zoom: 3; transform-style: preserve-3d; transform-origin: 0 0; transform: scale3d(0.3333, 0.3333, 0.3333); pointer-events: none; }
+
+/* I telefonen i en och en halv gång storleken: där går kameran högst så nära
+   att tv:n fyller bredden (stående) eller höjden mellan namnet och foten
+   (liggande), ungefär 1,4 gånger lådans mått, och Safari ritar varje lager
+   i full storlek gånger skärmens pixeltäthet – i tre gånger storleken tog
+   tv:n nästan 90 MB i en iPhone. Texten påverkas inte (18 px blir 27 px). */
+@media (max-width: 700px), (max-height: 500px) {
+  .rum-tv3, .tv-fot { zoom: 1.5; }
+  .rum-tv3 { transform: scale3d(0.6667, 0.6667, 0.6667) translate3d(146px, 98px, -20px) rotateY(-44deg) rotateX(-5deg) translate3d(-146px, -98px, 132px); }
+  .rum-tv3.nara { transform: scale3d(0.6667, 0.6667, 0.6667) translate3d(146px, 98px, -20px) rotateY(0deg) rotateX(0deg) translate3d(-146px, -98px, 132px); }
+  .tv-fot { transform: scale3d(0.6667, 0.6667, 0.6667); }
+}
 .tv-fot i { position: absolute; display: block; transform-origin: 0 0; }
 .tv-arm { left: 146px; top: 94px; width: 0; height: 0; transform-style: preserve-3d; transform: translateZ(-20px) rotateY(23.6deg) rotateZ(-3.3deg); }
 .a-fram { left: 0; top: 0; width: 260px; height: 8px; transform: translateZ(4px); background: linear-gradient(180deg, #3a3936, #191817 60%, #0d0d0c); }
@@ -119,6 +131,12 @@
   transition: opacity 0.5s;
 }
 .tv-sken.av { opacity: 0; }
+/* i telefonen en fjärdedel så stort och förstorat: Safari ritar ett lager i
+   dess egen storlek (inte i den förstorade) gånger pixeltätheten, och
+   skenet är suddigt ändå */
+@media (max-width: 700px), (max-height: 500px) {
+  .tv-sken { width: 155px; height: 120px; transform: scale(4); transform-origin: 0 0; }
+}
 
 /* ---------- fronten ---------- */
 
