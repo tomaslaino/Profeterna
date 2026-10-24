@@ -1989,8 +1989,9 @@ ${window.RumRegister ? RumRegister.nara() : ''}
 
   // Med fingret (eller musen nedtryckt) ser man sig omkring: scenen följer
   // med där den är större än fönstret, och släpper man den i farten glider
-  // den vidare en bit. Nära tv:n, videon och med en lapp ur anslagstavlan i
-  // handen bläddrar ett svep i sidled i stället, som pilarna. Klicket efter
+  // den vidare en bit. Nära tv:n, videon och med en lapp ur anslagstavlan
+  // eller ett kort ur kortregistret i handen bläddrar ett svep i sidled i
+  // stället, som pilarna. Klicket efter
   // ett drag öppnar ingenting.
   function swipe(el) {
     const P = { id: null };
@@ -2030,6 +2031,7 @@ ${window.RumRegister ? RumRegister.nara() : ''}
         if (R.zoom && R.tv) R.tv.key(k);
         else if (R.vnara && R.video) R.video.key(k);
         else if (R.ans && R.ans.on() && el.querySelector('.rum-ansn.lyft')) R.ans.key(k);
+        else if (R.reg && R.reg.on() && el.querySelector('.rum-regn.lyft')) R.reg.key(k);
         return;
       }
       // farten de sista bildpunkterna, i bildpunkter per millisekund

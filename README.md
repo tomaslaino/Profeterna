@@ -2255,7 +2255,8 @@ man ser ner i den, medan bilden zoomar in och rummet mörknar bakom – närbild
 duk över hela fönstret med samma perspektiv som rummet, så att lådan är skarp. Den lutar
 lite efter musen, och kortet under pekaren reser sig. Ett klick på ett kort (eller en
 avdelare: det första kortet bakom den): det reser sig ur lådan och tas i handen i läsbar
-storlek, och pilarna bläddrar mellan korten. Esc, ett klick utanför eller *Sätt tillbaka*
+storlek, och pilarna (i telefonen ett svep i sidled) bläddrar mellan korten.
+Esc, ett klick utanför eller *Sätt tillbaka*
 sätter tillbaka kortet; Esc, R eller ett klick utanför lådan ställer den på disken igen.
 Guldordet *Lagen* under lådan leder till Lagen på Statistik, och pekar man på lådan tänds
 snabbvalet Statistik på text-tv:n. Med `prefers-reduced-motion` står lådan framme direkt.
