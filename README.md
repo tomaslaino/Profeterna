@@ -1952,9 +1952,9 @@ zoomar och rullar inte i rummet (`touch-action: none`).
 
 Närbilderna ryms i fönstret: tv:n går så nära att den fyller bredden (på datorn 3,6 gånger
 som förut), anslagstavlan och lapparna får smalare kanter, och nära tv:n, videon och med en
-lapp i handen bläddrar ett svep i sidled som pilarna – tv:n till nästa sida, videon till
-nästa kassett och anslagstavlan till nästa lapp. Vid anslagstavlan bläddrar ett svep uppåt
-eller neråt bladen i lapparna till nästa division.
+lapp i handen gör ett svep i sidled som pilarna – tv:n bläddrar till nästa sida, videon
+spolar tio sekunder och anslagstavlan går till nästa lapp. Vid anslagstavlan bläddrar ett
+svep uppåt eller neråt bladen i lapparna till nästa division.
 
 **Kupongen på höjden** (`.rum.smal`: smalare än 600 px och högre än bred): kupongen på
 pulten, i handen och i högen är smal och hög, 420 × 620 i stället för 660 × 470, som en
@@ -2336,8 +2336,12 @@ hjulet bakåt eller Esc går tillbaka till tv:n och lådan. Ett klick på en kas
 lyfts, ställs framför facket och skjuts in, luckan fälls upp, och de ovanför sjunker ner i
 luckan i högen. Rutan är blå med *▶ SPELA* tills bilden kommer, och klippet spelas i
 YouTubes spelare (`youtube-nocookie.com`, i 16:9 med svarta kanter i den 4:3-stora rutan)
-med displayen som räknar tiden. ▶ spelar eller pausar, ◀◀ och ▶▶ (och piltangenterna) byter till en nyare eller äldre kassett, och ⏏ matar
-ut – kassetten åker tillbaka till sin plats. När klippet är slut matas den ut av sig själv.
+med displayen som räknar tiden. ▶ spelar eller pausar, och ⏏ matar ut – kassetten åker
+tillbaka till sin plats. ◀◀ och ▶▶ (och ←/→, eller ett svep i sidled i telefonen) spolar tio
+sekunder per tryck: rutan blir blå med ◀◀ eller ▶▶ i hörnet och displayen visar dit den
+spolar, flera tryck i rad lägger ihop, och sedan spelar den därifrån (också om den stod på
+paus). En nedtryckt piltangent spolar ungefär en minut i sekunden. ↑/↓ byter till en nyare
+eller äldre kassett. När klippet är slut matas den ut av sig själv.
 Går inget av matchens klipp att spela här blir det myrornas krig, och klippen hoppas över
 nästa gång (samma lista som spelaren på sajten). Går man därifrån pausar videon, och den
 frusna bilden står kvar i rutan; tillbaka och den spelar vidare. Rummet stängs och videon
@@ -2350,7 +2354,8 @@ knappen i mitten och loggan syns ändå i drygt tre sekunder varje gång ett kli
 spolas eller spelar vidare – men inte vid paus, och inte när ljudet slås av och på. Därför
 visar videon sin blå bild med *▶ SPELA*, utan ljud, tills klippet har spelat i 3,6 sekunder
 (`FORVARM`); när den spelar vidare efter en paus spolar den först tillbaka lika mycket, så
-att bilden fortsätter där den stannade. Slutet, och förslagen efter det, täcks direkt.
+att bilden fortsätter där den stannade, och när man spolar med ◀◀ och ▶▶ hoppar den till
+3,6 sekunder före målet. Slutet, och förslagen efter det, täcks direkt.
 
 Hörnet ritas i sex gånger storleken och dubbelt till (`zoom: 2`) och förminskas, som tv:n,
 så att det är skarpt också när man går närmare rutan; ritningarna är bara så stora som tv:n

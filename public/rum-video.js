@@ -9,8 +9,8 @@
 // handskrivna etiketter med matchen, resultatet och dagen; ett klick på en
 // kassett och den åker in i videon, som spelar matchens höjdpunkter i
 // rutan (samma klipp som spelaren på sajten, hojdpunkter.js). Knapparna
-// under rutan: ◀◀ och ▶▶ byter kassett, ▶ spelar eller pausar och ⏏ matar
-// ut. Ett klick på rutan (eller hjulet) går ännu närmare, så att tv:n
+// under rutan: ◀◀ och ▶▶ spolar tio sekunder, ▶ spelar eller pausar och ⏏
+// matar ut. Ett klick på rutan (eller hjulet) går ännu närmare, så att tv:n
 // fyller bilden. Går man därifrån pausar videon, och den spelar vidare när
 // man kommer tillbaka. När inget spelar blinkar klockan på 12:00, som den
 // alltid gjort.
@@ -260,7 +260,7 @@ window.RumVideo = (() => {
   function html(part) {
     if (part === 'vagg') return vaggSvg();
     if (part === 'pult') return pultSvg();
-    const knappar = [['bak', '◀◀', 'Nyare kassett'], ['spela', '▶', 'Spela'], ['fram', '▶▶', 'Äldre kassett'], ['ut', '⏏', 'Mata ut']]
+    const knappar = [['bak', '◀◀', 'Spola tillbaka'], ['spela', '▶', 'Spela'], ['fram', '▶▶', 'Spola fram'], ['ut', '⏏', 'Mata ut']]
       .map(([k, t, l], i) => `<button type="button" class="vhs-k" data-vhs="${k}" aria-label="${l}" style="${at({ x: KNAPP.x + i * KNAPP.d, y: KNAPP.y, w: KNAPP.w, h: KNAPP.h })}">${t}</button>`).join('');
     // en kassett: ryggen med etiketten, och taket och ändarna bakåt
     const kas = (a, b) => Array.from({ length: b - a }, (_, i) => `<div class="vhs-band" data-i="${a + i}" hidden>` +
@@ -334,6 +334,11 @@ window.RumVideo = (() => {
   // så länge spelarens rubrik, knapp och logga syns efter att klippet har
   // börjat spela (eller spolats)
   const FORVARM = 3600;
+  // ◀◀ och ▶▶: sekunder per tryck, och minsta tiden mellan två med
+  // piltangenterna (så att en nedtryckt tangent spolar ungefär en minut i
+  // sekunden)
+  const SPOLA = 10;
+  const SPOLA_MS = 150;
 
   function mount(root, o) {
     const box = root.querySelector('#rum-vhs');
@@ -349,8 +354,10 @@ window.RumVideo = (() => {
     // när man kommer tillbaka
     const V = { tapes: [], key: '', cur: null, mid: null, near: false, tat: false, resume: false, lage: 'tom' };
     // spelaren: klippen, vilket, meddelandenas id, ramen, tiden och läget;
-    // dold: bilden täcks tills spelarens egna saker har tonat bort (varm)
-    const P = { list: [], i: 0, seq: 0, frame: null, ready: false, ping: null, t: 0, st: -1, timer: 0, dold: true, varm: 0 };
+    // dold: bilden täcks tills spelarens egna saker har tonat bort (varm);
+    // mal: dit den spolar (åt hållet dir), dur: klippets längd, pil: när en
+    // piltangent spolade senast
+    const P = { list: [], i: 0, seq: 0, frame: null, ready: false, ping: null, t: 0, st: -1, timer: 0, dold: true, varm: 0, mal: null, dir: 0, dur: 0, pil: 0 };
 
     function lage(l, text) {
       V.lage = l;
@@ -451,6 +458,8 @@ window.RumVideo = (() => {
       P.ready = false;
       P.st = -1;
       P.dold = true;
+      P.mal = null;
+      P.dur = 0;
       bild.replaceChildren();
     }
 
@@ -495,9 +504,11 @@ window.RumVideo = (() => {
         P.varm = 0;
         if (P.st !== 1) return;
         P.dold = false;
+        P.mal = null;
         cmd('unloadModule', ['captions']);
         cmd('unMute');
         lage('spelar');
+        tick();
       }, FORVARM);
     }
 
@@ -510,8 +521,28 @@ window.RumVideo = (() => {
       P.dold = true;
       lage('laddar', '▶ SPELA');
       cmd('mute');
-      cmd('seekTo', [Math.max(0, P.t - FORVARM / 1000), true]);
+      cmd('seekTo', [Math.max(0, (P.mal ?? P.t) - FORVARM / 1000), true]);
       cmd('playVideo');
+    }
+
+    // ◀◀ och ▶▶: tio sekunder åt gången, bakom den blå bilden med ◀◀ eller
+    // ▶▶ tills spelarens egna saker har tonat bort, och sedan spelar den
+    // därifrån (också efter en paus). Flera tryck i rad lägger ihop.
+    function spola(d) {
+      if (!P.frame || !P.ready || P.st === 0) return;
+      const mal = Math.max(0, (P.mal ?? P.t) + d * SPOLA);
+      P.mal = P.dur ? Math.min(mal, Math.max(0, P.dur - 1)) : mal;
+      P.dir = d;
+      clearTimeout(P.varm);
+      P.varm = 0;
+      P.dold = true;
+      lage('laddar', d > 0 ? '▶▶' : '◀◀');
+      cmd('mute');
+      cmd('seekTo', [Math.max(0, P.mal - FORVARM / 1000), true]);
+      cmd('playVideo');
+      // spelar den redan kommer inget nytt läge från spelaren
+      if (P.st === 1) varm();
+      tick();
     }
 
     function start(m) {
@@ -579,17 +610,20 @@ window.RumVideo = (() => {
       } else if (d.event === 'onStateChange' && typeof d.info === 'number') state(d.info);
       else if (d.event === 'infoDelivery' && d.info) {
         if (typeof d.info.currentTime === 'number') P.t = d.info.currentTime;
+        if (typeof d.info.duration === 'number') P.dur = d.info.duration;
         if (typeof d.info.playerState === 'number' && d.info.playerState !== P.st) state(d.info.playerState);
       }
     });
 
-    // Displayen: 12:00 som blinkar när ingen kassett är i, annars tiden.
+    // Displayen: 12:00 som blinkar när ingen kassett är i, annars tiden (dit
+    // den spolar medan den spolar).
     const clock = (s) => {
       const t = Math.max(0, Math.floor(s));
       return `${Math.floor(t / 3600)}:${String(Math.floor(t / 60) % 60).padStart(2, '0')}:${String(t % 60).padStart(2, '0')}`;
     };
     function tick() {
-      const txt = V.cur == null && V.mid == null ? '12:00' : `${P.st === 2 ? '❚❚' : '▶'} ${clock(P.t)}`;
+      const sym = P.st === 2 ? '❚❚' : P.mal == null ? '▶' : P.dir > 0 ? '▶▶' : '◀◀';
+      const txt = V.cur == null && V.mid == null ? '12:00' : `${sym} ${clock(P.mal ?? P.t)}`;
       if (vfd.textContent !== txt) vfd.textContent = txt;
       vfd.classList.toggle('blink', txt === '12:00');
     }
@@ -669,7 +703,7 @@ window.RumVideo = (() => {
       if (b.classList.contains('vhs-kas')) insert(Number(b.dataset.i));
       else if (b.dataset.vhs === 'spela') toggle();
       else if (b.dataset.vhs === 'ut') eject();
-      else step(b.dataset.vhs === 'fram' ? 1 : -1);
+      else spola(b.dataset.vhs === 'fram' ? 1 : -1);
     });
     // hjulet: framåt närmare, bakåt tillbaka till tv:n och lådan
     box.addEventListener('wheel', (e) => {
@@ -719,11 +753,16 @@ window.RumVideo = (() => {
         }
         return FOCUS;
       },
-      // Pilarna byter kassett när man är framme, och Esc går tillbaka från
-      // rutan till tv:n och lådan.
+      // ←/→ (och ett svep i telefonen) spolar som ◀◀ och ▶▶ och ↑/↓ byter
+      // kassett när man är framme, och Esc går tillbaka från rutan till
+      // tv:n och lådan.
       key(k) {
-        if (/^Arrow(Right|Down)$/.test(k)) step(1);
-        else if (/^Arrow(Left|Up)$/.test(k)) step(-1);
+        if (k === 'ArrowRight' || k === 'ArrowLeft') {
+          if (performance.now() - P.pil < SPOLA_MS) return true;
+          P.pil = performance.now();
+          spola(k === 'ArrowRight' ? 1 : -1);
+        } else if (k === 'ArrowDown') step(1);
+        else if (k === 'ArrowUp') step(-1);
         else if (k === 'Escape' && V.tat) tat(false);
         else return false;
         return true;
