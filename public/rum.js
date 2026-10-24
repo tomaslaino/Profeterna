@@ -1390,6 +1390,69 @@ ${window.RumRegister ? RumRegister.nara() : ''}
     w.style.setProperty('--z', z);
     w.style.setProperty('--dx', `${r1(to[0] - 800 - z * (p[0] - 800))}px`);
     w.style.setProperty('--dy', `${r1(to[1] - 500 - z * (p[1] - 500))}px`);
+    if (z > 1) R.fram = true;
+    // utan glidning är den tillbaka genast (med glidning: transitionend i wire)
+    else if (!cls) requestAnimationFrame(hemma);
+  }
+
+  // Kameran är tillbaka på håll efter en närbild. Chrome ritar ett lager i
+  // den förstoring det har när kameran glider, och minskar den bara när en
+  // animering som rör lagret tar slut och lagret inte har will-change:
+  // transform (sakerna i planen, .rum-pl > * i rum.css, och gatans figurer
+  // och löv) – och det som animeras utan slut (gatan, röken, tv:ns text)
+  // minskar aldrig. Efter en närbild låg rummet därför kvar i närbildens
+  // skärpa, med flera gånger fler bildpunkter än som syns, så att minnet tog
+  // slut och väggarna, fönstret och disken fattades – mer för varje närbild.
+  // När kameran och det som flög tillbaka står still får sakerna
+  // will-change: opacity i stället (egna lager ändå), det som rör sig utan
+  // slut står still där det är, och kameran börjar en animering på 0,01 px
+  // (en utan ändring når inte lagren) som avbryts några bildrutor senare. Då
+  // ritar Chrome om allt i den vanliga förstoringen, och sedan går allt
+  // vidare som förut. Bara i Chromium (navigator.userAgentData): Safari
+  // minskar själv.
+  function hemma() {
+    const w = document.getElementById('rum-kamera');
+    if (!R.fram || !w || w.style.getPropertyValue('--z') !== '1' || w.getAnimations().length) return;
+    const alla = R.el.getAnimations({ subtree: true });
+    const flyger = alla.filter((a) => a.playState === 'running' && a.effect && Number.isFinite(a.effect.getComputedTiming().endTime));
+    if (flyger.length) {
+      Promise.all(flyger.map((a) => a.finished.catch(() => {}))).then(hemma);
+      return;
+    }
+    R.fram = false;
+    if (!navigator.userAgentData) return;
+    const stilla = new Map();
+    for (const a of alla) {
+      const el = a.effect && a.effect.target;
+      if (!(a instanceof CSSAnimation) || !el || a.effect.pseudoElement || stilla.has(el)) continue;
+      const cs = getComputedStyle(el);
+      stilla.set(el, { transform: cs.transform, opacity: cs.opacity, t: el.getAnimations().map((b) => [b.animationName, b.currentTime, b.playState]) });
+    }
+    const hint = new Set(R.el.querySelectorAll('.rum-pl > *'));
+    for (const el of stilla.keys()) {
+      for (let p = el; p && p !== R.el; p = p.parentElement) if (getComputedStyle(p).willChange.includes('transform')) hint.add(p);
+    }
+    const t0 = performance.now();
+    for (const el of hint) el.style.willChange = 'opacity';
+    for (const [el, s] of stilla) Object.assign(el.style, { transform: s.transform, opacity: s.opacity, animationName: 'none' });
+    const t = getComputedStyle(w).transform;
+    const a = w.animate([{ transform: t }, { transform: `${t} translateX(0.01px)` }], 10000);
+    const bild = () => new Promise((r) => requestAnimationFrame(r));
+    a.ready.catch(() => {}).then(bild).then(bild).then(() => {
+      a.cancel();
+      return new Promise((r) => setTimeout(r, 150));
+    }).then(bild).then(() => {
+      const dt = performance.now() - t0;
+      for (const el of hint) el.style.willChange = '';
+      for (const [el, s] of stilla) {
+        Object.assign(el.style, { transform: '', opacity: '', animationName: '' });
+        if (!el.isConnected) continue;
+        for (const b of el.getAnimations()) {
+          const f = s.t.find(([n]) => n === b.animationName);
+          if (f && f[1] != null) b.currentTime = f[1] + (f[2] === 'running' ? dt : 0);
+        }
+      }
+    });
   }
 
   // Ett föremål: kameran går fram mot det en kort stund innan sidan byts.
@@ -2586,6 +2649,8 @@ ${window.RumRegister ? RumRegister.nara() : ''}
   function wire() {
     const el = R.el;
     swipe(el);
+    const kam = el.querySelector('#rum-kamera');
+    kam.addEventListener('transitionend', (e) => { if (e.target === kam && e.propertyName === 'transform') hemma(); });
     el.addEventListener('mouseover', (e) => {
       const a = !R.kup && e.target.closest('.rum-sak, .rum-tag, .rum-guld');
       hot(a ? a.dataset.nav : null);
