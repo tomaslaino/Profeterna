@@ -41,7 +41,7 @@
 // På håll bläddrar undersidorna själva var tolfte sekund.
 //
 // RumTv.html() → tv:n (i planet -470 i rum.js)
-// RumTv.mount(el, { calm, short, kort, wd, hm, matches }) → { fill(rows, { spel, next }), zoom(on) → rutans mått, key(k) }
+// RumTv.mount(el, { calm, short, kort, wd, hm, matches }) → { fill(rows, { spel, next }), zoom(on, rekt) → rutans mått, key(k) }
 
 window.RumTv = (() => {
   const COLS = 40;
@@ -640,8 +640,9 @@ window.RumTv = (() => {
         tick();
       },
       // Nära: tv:n vrids mot en och knapparna går att trycka på. Svarar med
-      // frontens mått i det läge den vrids till (för kameran i rum.js).
-      zoom(on) {
+      // frontens mått i det läge den vrids till (för kameran i rum.js), mätta
+      // med rekt (rum.js rättar Safaris mått i zoom).
+      zoom(on, rekt = (e) => e.getBoundingClientRect()) {
         T.near = on;
         front.inert = !on;
         if (!on && T.typed) {
@@ -650,7 +651,7 @@ window.RumTv = (() => {
         }
         box.classList.add('mat');
         box.classList.toggle('nara', on);
-        const r = front.getBoundingClientRect();
+        const r = rekt(front);
         box.classList.toggle('nara', !on);
         void box.offsetWidth;
         box.classList.remove('mat');

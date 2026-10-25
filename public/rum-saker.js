@@ -21,7 +21,7 @@
 // Fikat på vissa dagar – semlor, pepparkakor, lussekatter och annat från
 // konditoriet – står bakom kvittot eller där det får plats (rum-fika.js).
 //
-// saker(el, { calm }) → { draw(t, mx, my, rows, old) }
+// saker(el, { calm }) → { draw(t, mx, my, rows, old, syns) } (syns: pulten ritas, rum.js)
 
 import { dagens, bord } from './rum-fika.js';
 
@@ -171,10 +171,10 @@ export async function saker(el, opt = {}) {
     }
   }
   return {
-    draw(t, mx, my, rows, old) {
+    draw(t, mx, my, rows, old, syns = true) {
       if (update(rows, old) && three) three.wear(wear, seed);
       if (three && vader()) three.power(varmt, fika);
-      if (three) three.draw(t, mx, my);
+      if (three && syns) three.draw(t, mx, my);
     },
   };
 }

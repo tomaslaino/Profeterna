@@ -1958,9 +1958,9 @@ hämtas inget).
 ### I telefonen
 
 Rummet står i alla fönster utom de allra minsta (`Rum.fits`: minst 280 × 260 px), i
-telefonen också. Scenen täcker fönstret som på datorn, men i telefonen på höjden syns lite
-mer av rummet: scenen fyller 80 % av höjden (`HOJD` i rum.js), med mörkt över och under.
-Det som inte ryms når man med fingret: scenen följer med när man drar,
+telefonen också. Scenen täcker fönstret som på datorn, också på höjden i telefonen (en tid
+fyllde den 80 % av höjden, med svart över och under; det svarta ville vi inte ha, och mindre
+förstorad än så går inte utan det). Det som inte ryms når man med fingret: scenen följer med när man drar,
 glider vidare en bit när man släpper den i farten, och kameran vrids efter var i rummet man
 står, som med musen (`swipe` och `pan` i rum.js; med musen nedtryckt går det likadant i ett
 smalt fönster). Ett tryck på ett föremål gör samma sak som ett klick, och ett tryck efter
@@ -1969,7 +1969,9 @@ mus), och foten har bara *Vanlig sida* – utan tangentbord står inga tangenter
 zoomar och rullar inte i rummet (`touch-action: none`).
 
 Närbilderna ryms i fönstret: tv:n går så nära att den fyller bredden (på datorn 3,6 gånger
-som förut), anslagstavlan och lapparna får smalare kanter, och nära tv:n, videon och med en
+som förut; kameran siktar på frontens mått, och Safari i iPhone ger mått i något med CSS
+zoom delade med zoomen – utan GetBoundingClientRectZoomed – så att tv:n hamnade utanför
+bilden: `rekt` i rum.js förstorar dem tillbaka), anslagstavlan och lapparna får smalare kanter, och nära tv:n, videon och med en
 lapp i handen gör ett svep i sidled som pilarna – tv:n bläddrar till nästa sida, videon
 spolar tio sekunder och anslagstavlan går till nästa lapp. Vid anslagstavlan bläddrar ett
 svep uppåt eller neråt bladen i lapparna till nästa division.
@@ -2042,6 +2044,14 @@ Därför:
   anslagstavlans glans en fjärdedel så stora och förstorade med transform. Zoom går inte på
   det som har text mellan 9 och 18 px (Safari gör text som blir mindre än 9 px större) och
   flyttar det som inte står i 0,0.
+- **Det som inte syns ritas inte** (`sikt` i rum.js, IntersectionObserver): gänget,
+  sakerna på pulten och dammet ritas bara när de syns – de står kvar som de var – och gatan
+  utanför står still (`.vila`, rum-ute.css) när fönstret och dörren inte syns. Duken med
+  gänget och utsikten är större än det de visar, så där följs en osynlig ruta (`.rum-syn`,
+  först i planet så att den inte blir ett eget lager) över figurerna och röken respektive
+  fönstret och dörren. Nära tv:n, videon och anslagstavlan och när scenen är dragen åt
+  sidan slipper telefonen alltså rita gänget 30 gånger i sekunden (1920 × 840 bildpunkter
+  med mjuka skuggor). Utan rörelser och i en fast bild ritas allt som förut.
 - **3D-delarna** (gänget, sakerna, inredningen och kortlådan) ritas i telefonen med 1,5
   bildpunkter per punkt, utan kantutjämning och med skuggkartor på 1024 i stället för 2048
   (`LATT`). Gängets ansikten ritas där i halva storleken (512 × 576), och gänget sparar
@@ -2281,7 +2291,9 @@ Lådan ritas i tre gånger storleken (`zoom: 3`) och förminskas igen (`scale3d`
 ritar inte om lager i perspektiv när kameran går fram, så utan skärpan i reserv blir
 text-tv:n suddig på nära håll. I telefonen räcker 1,5 gånger (`zoom: 1.5`): där går kameran
 högst så nära att tv:n fyller bredden eller höjden mellan namnet och foten, ungefär 1,4 gånger
-lådans mått, och lagren tar en fjärdedel så mycket minne (se [I telefonen](#i-telefonen)). Tv:n sköter sig själv: rum.js bygger den (`RumTv.html`),
+lådans mått, och lagren tar en fjärdedel så mycket minne (se [I telefonen](#i-telefonen)).
+Kameran siktar på frontens mått med tv:n vriden (`zoom(on, rekt)`); Safari i iPhone delar
+måtten med zoomen, och rum.js rättar dem (`rekt`). Tv:n sköter sig själv: rum.js bygger den (`RumTv.html`),
 kopplar in den (`RumTv.mount`), ger den omgångens rader vid varje `fill` (med Stryktipsets
 ordning när omgången är Stryktipset, och om raderna bara är de närmaste matcherna) och skickar
 siffror och pilar dit när den är nära.
