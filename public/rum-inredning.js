@@ -2,8 +2,7 @@
 // sakerna på pulten (rum-saker.js): lysröret i taket, neonskylten i
 // skyltfönstret, Stängt-skylten på dörrens glas, stationsuret och orakelramen
 // med mässingsskylten på bakväggen, cigarettpaketen uppe på högra väggen och
-// ramarna kring skårtavlan och korktavlan, barstolen vid disken och
-// kupongstället på pulten.
+// ramarna kring skårtavlan och korktavlan och kupongstället på pulten.
 //
 // Allt ritas med en och samma WebGL-duk utanför sidan och kopieras till en
 // vanlig duk per sak, i det plan där den platta saken låg, så att den följer
@@ -31,7 +30,7 @@ const wz = (x) => 1000 * (1 - 380 / (x - 760));
 const hash = (n) => { const x = Math.sin(n * 127.1 + 311.7) * 43758.5453; return x - Math.floor(x); };
 const UR = { x: 1050, y: 152, r: 46 };
 const RAM = { x: 987, y: 302, w: 126, h: 152, b: 12 };
-// Sakerna och dukarna (plan: 0 = väggen, 1 = tv:ns plan, 3 = pulten). Urets
+// Sakerna och dukarna (plan: 0 = väggen, 3 = pulten). Urets
 // och ramens dukar ligger i knappen och länken (i, med hörnet at).
 const BITAR = {
   tak: { plan: 0, box: { x: 0, y: 0, w: 960, h: 240 } },
@@ -39,7 +38,6 @@ const BITAR = {
   ur: { plan: 0, box: { x: 992, y: 94, w: 130, h: 142 }, i: '.rum-ur', at: { x: UR.x - 54, y: UR.y - 54 } },
   ram: { plan: 0, box: { x: 968, y: 280, w: 164, h: 232 }, i: '.rum-ram', at: RAM },
   hogra: { plan: 0, box: { x: 1130, y: 0, w: 470, h: 520 } },
-  stol: { plan: 1, box: { x: 1320, y: 470, w: 200, h: 200 } },
   stall: { plan: 3, box: { x: 30, y: 470, w: 260, h: 250 } },
 };
 // närbilden: högst så många bildpunkter på dukens längsta led
@@ -629,44 +627,6 @@ export async function inredning(el, opt = {}) {
 
   // ---------- disken och pulten ----------
 
-  // Barstolen framför disken: krom och röd vinyl med söm, fotring och ett
-  // lågt ryggstöd på bortre sidan.
-  function stol(b) {
-    const { mesh } = b;
-    const g = new THREE.Group();
-    g.position.set(1079, -495, 515);
-    g.rotation.y = 8 * DEG;
-    b.scene.add(g);
-    const krom = mat('#d8d8d4', { metalness: 1, roughness: 0.18, envMapIntensity: 1.3 });
-    const vinyl = mat('#8b2e2a', { roughness: 0.38, clearcoat: 0.5, clearcoatRoughness: 0.3 });
-    const prof = [[0, 0], [19, 0], [22, 1.2], [23, 4], [22.2, 7], [19, 8.4], [0, 8.6]].map(([a, q]) => new THREE.Vector2(a, q));
-    mesh(new THREE.LatheGeometry(prof, 64), vinyl, g);
-    const som = mesh(new THREE.TorusGeometry(22.6, 0.35, 6, 64), mat('#c9b18a', { roughness: 0.8 }), g);
-    som.rotation.x = 90 * DEG;
-    som.position.y = 4;
-    const ring = mesh(new THREE.TorusGeometry(15, 1.3, 10, 48), krom, g);
-    ring.rotation.x = 90 * DEG;
-    ring.position.y = -1;
-    for (const a of [45, 135, 225, 315].map((x) => x * DEG)) {
-      const p0 = new THREE.Vector3(Math.cos(a) * 15, -1, Math.sin(a) * 15);
-      const p1 = new THREE.Vector3(Math.cos(a) * 21, -230, Math.sin(a) * 21);
-      const ben = mesh(new THREE.CylinderGeometry(1.6, 1.6, p0.distanceTo(p1), 16), krom, g);
-      ben.position.copy(p0).lerp(p1, 0.5);
-      ben.quaternion.setFromUnitVectors(new THREE.Vector3(0, 1, 0), p1.clone().sub(p0).normalize());
-    }
-    const fot = mesh(new THREE.TorusGeometry(18.5, 1.2, 10, 48), krom, g);
-    fot.rotation.x = 90 * DEG;
-    fot.position.y = -95;
-    for (const x of [-14, 14]) {
-      const st = mesh(new THREE.CylinderGeometry(1.3, 1.3, 34, 12), krom, g);
-      st.position.set(x, 18, -17);
-      st.rotation.x = -8 * DEG;
-    }
-    const rygg = mesh(new RB(44, 12, 5, 3, 2.4), vinyl, g);
-    rygg.position.set(0, 33, -19.5);
-    rygg.rotation.x = -8 * DEG;
-  }
-
   // Kupongstället vid fönstret: fack av plexiglas, lågt fram och högt bak,
   // med blanka kuponger som lutar bakåt, butikens pennor i ett rör och lappen
   // på plexit.
@@ -821,7 +781,6 @@ export async function inredning(el, opt = {}) {
   });
   wallRing(B.hogra, 1496, 1700, 330, 478, 5, mat('#fff', { map: ved, roughness: 0.55 }));
   rightWall(B.hogra);
-  stol(B.stol);
   stall(B.stall);
 
   // Uret går efter Stockholms tid, med samma klocka som utsikten (Vader.nu()
@@ -851,7 +810,7 @@ export async function inredning(el, opt = {}) {
     B.ram.paint();
   }
   setNamn('');
-  for (const k of ['tak', 'neon', 'hogra', 'stol', 'stall']) B[k].paint();
+  for (const k of ['tak', 'neon', 'hogra', 'stall']) B[k].paint();
   tick();
   return { draw: tick, namn: setNamn, skarp: (k, px) => B[k] && B[k].skarp(px) };
 }

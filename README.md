@@ -479,6 +479,10 @@ Utan nyckel ingen knapp.
   sitt fasta mått: stämpeln och spelstoppet under bandet, porträtten i stället för
   initialerna, en synkmarkering per rad och fälten och streckkoden i foten. Papperet fick
   streckkoden i foten. Se [Kupongen i handen](#kupongen-i-handen).
+- **Gänget vid ett barbord (2026-10-25, användarens önskemål):** gänget sitter på tre
+  barstolar i krom och röd vinyl runt ett runt barbord framför fönstret i stället för på
+  fönsterbänken – DL och DJ på sidorna, DT bakom – med ölen, askkoppen och kupongerna på
+  bordet. Barstolen vid disken är borta. Se [Tobaksaffären](#tobaksaffären).
 - **Tobaksaffären också i telefonen (2026-10-24, användarens önskemål):** rummet står nu i
   alla fönster utom de allra minsta, i telefonen också, och den vanliga förstasidan finns
   kvar som *Vanlig sida*. Scenen fyller höjden, och man ser sig omkring med fingret – scenen
@@ -1847,8 +1851,7 @@ tid det visade först, och med `prefers-reduced-motion` syns inte sekundvisaren.
 (en armatur med två rör och gavlar), neonskylten, Stängt-skylten, stationsuret,
 orakelramen med mässingsskylten, cigarettpaketen uppe på högra väggen (två hyllor med
 paket i rader om tre till sju; påhittade färger, inga märken), ramarna kring skårtavlan
-och korktavlan, barstolen framför disken (krom och röd vinyl med söm, fotring och ett lågt
-ryggstöd) och kupongstället är byggda i three.js som gänget. Neonskylten är glasrör med en
+och korktavlan och kupongstället är byggda i three.js som gänget. Neonskylten är glasrör med en
 ljus kärna som följer bokstäverna i *Tobak*, spegelvänd inifrån: texten i Fraunces kursiv
 tunnas ut till en linje och seriferna tas bort. Den hänger i kedjor från fönsterkarmen med
 en svart list och transformatorn under, och glappar som förut. Stängt-skylten hänger lite
@@ -1858,7 +1861,12 @@ satt och kroppen tillbaka till väggen, så att sidorna syns och skuggorna falle
 kopieras till en vanlig duk per sak i det plan där saken står (orakelramen i länken, så
 att den lyser med); bara uret ritas om, en gång i sekunden.
 
-**Gänget** sitter på fönsterbänken med benen hängande: DL dricker ur en flaska, DT röker
+**Gänget** sitter på barstolar runt ett runt barbord framför fönsterbänken, med benen
+hängande: DL och DJ på sidorna, vända in mot bordet, och DT bakom (`BORD` och `FIGS` i
+rum-3d.js). Bordet har en skiva av ljust laminat med ringar efter glasen, kromkant och en
+kromfot, och barstolarna röd vinyl med söm och en krom ställning med fotring. Ölen, DT:s
+askkopp och extraflaska och kupongerna står på bordet, och två tomflaskor står kvar på
+fönsterbänken bakom DJ. DL dricker ur en flaska, DT röker
 och skrattar, DJ har en burk i ena handen och pratar med cigaretten i den andra. Var och en
 har sin loop (12–21 s) – flaskan och burken till munnen med huvudet bakåt, ett bloss med
 glöden som tänds och röken som blåses ut, benen som dinglar – och huvudena nickar efter
@@ -2511,7 +2519,7 @@ saken fyller det mesta av fönstret – högst 90 % av bredden och 74–94 % av 
 namnet och foten – i telefonen också. Rummet vrids rakt medan kameran glider fram och står
 sedan still: så länge något vrids ritar webbläsaren lagren i den vanliga skalan och förstorar
 dem suddigt, och när det står still ritas de om skarpt. Det som står framför väggen – gänget
-på fönsterbänken, pulten och barstolen – tonar bort medan kameran går förbi. Uret,
+vid barbordet och pulten – tonar bort medan kameran går förbi. Uret,
 orakelramen och ramen kring skårtavlan är ritade i 3D och ritas om i närbildens skala när
 kameran är framme (`skarp` i rum-inredning.js, högst 2600 bildpunkter på längsta ledet);
 uret går som vanligt, med sekundvisaren.

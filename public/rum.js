@@ -4,7 +4,7 @@
 //
 // Förstasidan: tobaksaffären vid spelpulten, ritad i lager
 // på olika djup (CSS 3D) som vrids lite när musen rör sig. Gänget – DL, DT
-// och DJ – sitter som leksaksfigurer (three.js, rum-3d.js) på fönsterbänken,
+// och DJ – sitter som leksaksfigurer (three.js, rum-3d.js) vid ett barbord,
 // dricker öl, röker och pratar. Föremålen leder vidare, som i ett rum hos
 // Felix Rieseberg:
 //   korktavlan → gängets kuponger     pokalhyllan, Omgångens orakel → Olympen
@@ -44,7 +44,7 @@
 // Kronan.holders, Kronan.scene, Historik.coupons …) och tv:n i rum-tv.js
 // (RumTv, läses före den här), anslagstavlan i rum-anslag.js (RumAnslag,
 // också före) och kortregistret i rum-register.js (RumRegister, också före). rum-3d.js (gänget), rum-saker.js och rum-inredning.js (lysröret,
-// neonskylten, uret, orakelramen, paketen, stolen, kupongstället …) hämtas
+// neonskylten, uret, orakelramen, paketen, kupongstället …) hämtas
 // först när rummet visas, med three.js från jsdelivr (importmap i
 // index.html); utan WebGL står rummet kvar utan dem.
 
@@ -1125,7 +1125,7 @@ ${window.RumRegister ? RumRegister.nara() : ''}
     set('rum-kupong', couponHtml(rd, rows, p && p.gang ? view(p, 'gang') : p && !p.inne ? view(p, 'fyll') : null));
     pile(rd, p);
     set('rum-kvitto', receiptHtml(rd, nr));
-    // gänget på fönsterbänken: den som inte har lämnat in sitter med kupongen
+    // gänget vid barbordet: den som inte har lämnat in sitter med kupongen
     R.vem = vemInne(rd, rows, t, p);
     if (R.fig && R.fig.inne) R.fig.inne(R.vem, now());
     gangTv(rd, rows, t, p);
@@ -1389,7 +1389,7 @@ ${window.RumRegister ? RumRegister.nara() : ''}
     // askkoppen, snusdosan, fläkten och affischen (rum-saker.js)
     tur(() => import('./rum-saker.js').then((m) => m.saker(R.el, { calm: calm() })).then((x) => { R.saker = x; R.sakDuk = R.el.querySelector('canvas.rum-saker'); sikt(R.sakDuk); frame(); }), 2)
       .catch((err) => console.warn('Rummet: sakerna kunde inte ritas', err));
-    // lysröret, neonen, skyltarna, uret, ramarna, paketen, stolen och kupongstället (rum-inredning.js)
+    // lysröret, neonen, skyltarna, uret, ramarna, paketen och kupongstället (rum-inredning.js)
     tur(() => import('./rum-inredning.js').then((m) => m.inredning(R.el, { calm: calm(), still })).then((x) => { R.inr = x; x.namn(R.ramNamn); if (R.sak) sak(R.sak, null); frame(); }), 1)
       .catch((err) => console.warn('Rummet: inredningen kunde inte ritas', err));
     try {
@@ -1705,7 +1705,7 @@ ${window.RumRegister ? RumRegister.nara() : ''}
     R.el.classList.add('sak-nara');
     R.tx = R.ty = R.mx = R.my = 0;
     setCam(0, 0);
-    // gänget, pulten och barstolen går kameran förbi (de tonar bort)
+    // gänget och pulten går kameran förbi (de tonar bort)
     for (const pl of R.el.querySelectorAll('.rum-world > .rum-pl:not(.rum-pl3d)')) {
       const m = /translateZ\((-?[\d.]+)px\)/.exec(pl.style.transform);
       pl.classList.toggle('forbi', Boolean(m) && Number(m[1]) > -560);
