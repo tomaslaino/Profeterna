@@ -483,6 +483,9 @@ Utan nyckel ingen knapp.
   barstolar i krom och röd vinyl runt ett runt barbord framför fönstret i stället för på
   fönsterbänken – DL och DJ på sidorna, DT bakom – med ölen, askkoppen och kupongerna på
   bordet. Barstolen vid disken är borta. Se [Tobaksaffären](#tobaksaffären).
+- **Gänget byter plats vid bordet (2026-10-25, användarens önskemål):** var tredje dag
+  sitter de på en ny plats, så att var och en får sin tur bakom bordet och på var sida –
+  samma för alla som tittar, efter dagen i Stockholm. Se [Tobaksaffären](#tobaksaffären).
 - **Tobaksaffären också i telefonen (2026-10-24, användarens önskemål):** rummet står nu i
   alla fönster utom de allra minsta, i telefonen också, och den vanliga förstasidan finns
   kvar som *Vanlig sida*. Scenen fyller höjden, och man ser sig omkring med fingret – scenen
@@ -1910,6 +1913,21 @@ bort när de laddas, och saknas en blir det bara text). Halsduken följer bålen
 vrids med handen och mössan följer huvudet; håret trycks ner under mössan och sticker ut
 under kanten. Kläderna följer vädret utanför (se *Utsikten och vädret* nedan).
 
+**De byter plats var tredje dag** (`PLATSER` och `placering` i rum-3d.js): DL till
+vänster, DT bakom och DJ till höger den 25–27 oktober 2026, sedan DL bakom, DT till höger
+och DJ till vänster, sedan DL till höger, DT till vänster och DJ bakom, och så vidare.
+Dagen är Stockholms (`Vader.nu()`), så alla ser samma placering, och ingen byter plats
+medan sidan är öppen – den nya syns vid nästa laddning. Platserna är en tabell: var
+barstolen står och är vriden, vilken hand som är mot bordet och var sakerna står på
+bordet (ölen, askkoppen, cigaretten, kupongen, handen som vilar och DT:s extraflaska), och
+figuren tar sin del ur sidan (`sitt`). Den som hamnar på andra sidan byter hand: flaskan,
+burken och cigaretten är alltid i handen mot bordet, och kupongen, pennan, lejonet (med
+den uppkavlade ärmen), handen som lyfts vid ett mål och den mot pannan följer med, liksom
+blickarna åt sidan. Bakom bordet vilar båda händerna på bordet. Sakerna ligger minst 10
+innanför bordskanten och inom räckhåll för alla tre, och när någon kikar ner mot pulten
+eller sjunker ihop vid ett mål lutar hen sig utåt, så att huvudet inte hamnar framför den
+som sitter bakom bordet.
+
 **Gänget följer omgången** (rum-3d.js, med läget från `gangTv` i rum.js):
 
 - **Den som inte har lämnat in** en öppen omgång sitter med kupongen och pennan i stället
@@ -1995,9 +2013,10 @@ Rummet läser om datan varje minut medan det står öppet.
 står på samma tid), `?rum-mx=&rum-my=` (−1…1) kamerans läge,
 `?rum-slit=0…1` slitaget och `?rum-dag=<tal>` dagen för sakerna och affischen,
 `?rum-fika=semlor` (`pepparkakor`, `lussekatter`, `kanelbullar`, `paskagg`,
-`chokladbollar`) fikat och `?rum-ol=jul` (`pask`) ölen. Gänget: `?rum-vantar=DL,DT` som
-om de inte hade lämnat in, `?rum-stopp=<timmar>` som om det var så långt kvar till
-spelstoppet, `?rum-tittar` som om matcherna pågick och `?rum-mal=dl:1,dt:-1,dj:0` ett mål
+`chokladbollar`) fikat och `?rum-ol=jul` (`pask`) ölen. Gänget: `?rum-plats=0` (`1`, `2`)
+var de sitter vid bordet, `?rum-vantar=DL,DT` som om de inte hade lämnat in,
+`?rum-stopp=<timmar>` som om det var så långt kvar till spelstoppet, `?rum-tittar` som
+om matcherna pågick och `?rum-mal=dl:1,dt:-1,dj:0` ett mål
 (rätt, fel, ingen skillnad; vid tiden 0 med `?rum-t`, annars var femtonde sekund). Sidan
 sätter `data-rum-klar` på `body` när allt är ritat. Vädret och klockan utanför:
 `?rum-klocka=2026-12-13T16:00` (eller bara `16:00`, Stockholms tid), `?rum-vader=klart`,

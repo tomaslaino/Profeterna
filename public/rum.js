@@ -32,7 +32,8 @@
 // (.rum.lag). Rörelserna stängs av med prefers-reduced-motion.
 // För bilder: ?rum-t=<sekunder> fryser
 // klockan, ?rum-mx=&rum-my= kamerans läge (−1…1), ?rum-vantar=DL,DT låter
-// dem sitta med kupongen som om de inte hade lämnat in. ?rum-anslag visar anslagstavlan
+// dem sitta med kupongen som om de inte hade lämnat in, ?rum-plats=0|1|2 var
+// gänget sitter vid bordet (de byter var tredje dag). ?rum-anslag visar anslagstavlan
 // framme (=form, =skador … med den lappen i handen), ?rum-register
 // kortregistret (=Arsenal … med det kortet i handen). ?rum-stopp=<timmar> som
 // om det var så långt kvar till spelstoppet, ?rum-tittar som om matcherna

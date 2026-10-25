@@ -3,6 +3,11 @@
 // hängande, dricker öl ur en flaska och en burk utan märken (julöl och påsköl
 // i sin tid), röker (glöden och röken som stiger) och pratar med händerna, i
 // lugna loopar. Huvudena nickar efter musen.
+// De byter plats vid bordet var tredje dag (PLATSER, placering): var och en
+// får sin tur bakom bordet och på var sida, efter dagen i Stockholm, så att
+// alla ser samma sak och ingen flyttar sig medan sidan är öppen. Den som
+// hamnar på andra sidan byter hand (sitt): flaskan, burken och cigaretten är i
+// handen mot bordet, och kupongen, pennan, lejonet och målen följer med.
 // Figurerna är tobak-a7 v2: ansiktena (rum/ansikte-*.svg, ritade av
 // ansikten.py), skulpterat hår, riktiga händer, kläddetaljer och blank vinyl,
 // utan sockel.
@@ -46,6 +51,38 @@ const SILL = -168;
 // Barbordet: runt, framför fönsterbänken, med skivan y över sitsarna
 // (barstolarnas sitsar är i fönsterbänkens höjd, SILL).
 const BORD = { x: -186, z: 250, r: 118, y: 32 };
+// Platserna runt bordet – till vänster, bakom och till höger: var barstolen
+// står (x, z) och hur den är vriden in mot bordet (turn), armen mot bordet
+// (inre; bakom vilar båda på bordet, och arm 0 har flaskan, burken eller
+// cigaretten) och armen som håller kupongen medan man väntar (kupong; pennan
+// i den andra). På bordet, i stolens axlar (x åt figurens vänster, z framåt):
+// flaskan eller burken (sak), askkoppen (aska), cigaretten som ligger där
+// medan man väntar (cigg), kupongen när den är inne (lagg: x, z, vridning),
+// handen som vilar på bordet (vila) och DT:s extraflaska (flaska); tomma: DJ:s
+// tomflaskor på fönsterbänken (x och z i rummet och vinkeln, 0 = står) – bakom
+// honom på sidorna och längst till höger när han sitter bakom bordet, där de syns.
+const PLATSER = [
+  { x: -338, z: 194, turn: 46, inre: 1, kupong: 1, sak: [47, 46], aska: [50, 62], cigg: [8, 58], lagg: [27.5, 52, 1.25], flaska: [80, 72],
+    tomma: [[-412, 16, 0], [-442, 30, -1.45]] },
+  { x: -186, z: 106, turn: 2, inre: 0, kupong: 1, sak: [-27, 47], aska: [-29.7, 45], cigg: [4, 58], vila: [24.3, 48.3], lagg: [28.4, 47.4, -0.25], flaska: [54.5, 56.1],
+    tomma: [[40, 16, 0], [70, 30, 1.45]] },
+  { x: -38, z: 194, turn: -46, inre: 0, kupong: 0, sak: [-44.5, 43.2], aska: [-50, 62], cigg: [-2.1, 55.6], lagg: [-21, 52, 0.3], flaska: [-80, 72],
+    tomma: [[40, 16, 0], [70, 30, 1.45]] },
+];
+// Vem som sitter var: FIGS[i] sitter på PLATSER[(i + n) % 3]. De byter var
+// tredje dag (dagen i Stockholm ur Vader.nu(), räknat från den 25 oktober
+// 2026, då de satte sig vid bordet så som de står i FIGS);
+// ?rum-plats=0|1|2 för bilder.
+const fDag = new Intl.DateTimeFormat('sv-SE', { timeZone: 'Europe/Stockholm', year: 'numeric', month: '2-digit', day: '2-digit' });
+function placering(v) {
+  const q = new URLSearchParams(location.search).get('rum-plats');
+  let n = Number(q);
+  if (q == null || !Number.isFinite(n)) {
+    const [ar, man, dag] = v ? [v.ar, v.manad, v.dag] : fDag.format(Date.now()).split('-').map(Number);
+    n = (Date.UTC(ar, man - 1, dag) - Date.UTC(2026, 9, 25)) / 864e5 / 3;
+  }
+  return ((Math.floor(n) % 3) + 3) % 3;
+}
 const v3 = (a) => new THREE.Vector3(...a);
 const sm = (a, b, x) => THREE.MathUtils.smoothstep(x, a, b);
 // 0 → 1 → 0 över [a, d] med kanterna [a, b] och [c, d]
@@ -78,39 +115,53 @@ const LAG = {
 
 // Måtten ur v2 (alt7.py) och vad var och en gör: arm 0 är figurens högra
 // (betraktarens vänstra) och arm 1 den vänstra. a/b = över- och underarm.
-// Attiraljerna: DL en stickad halsduk, DT ett lejon på underarmen och DJ en
-// randig mössa med tofs och märke (solglasögonen uppskjutna på den).
-// x, z: var barstolen står och turn hur den är vriden in mot bordet (DT bakom
-// det, DL och DJ på sidorna). bord: händerna som vilar på bordet (x·bredd,
-// z·lår), annars på knät eller låret.
-// vanta: armen med pennan och armen med kupongen medan man väntar, var på
-// bordet flaskan/burken (sak: x·bredd, z·lår) och cigaretten (cigg; DT:s ligger
-// i askkoppen) står, var kupongen läggs (lagg: x·bredd, z·lår, vridning), åt
-// vilket håll och hur långt bort ölen står (blick), foten som trummar och i
-// vilken ordning de fem sakerna kommer (förskjutna med fas, så att ingen gör
-// samma sak som någon annan samtidigt).
-// mal: armen som lyfts vid ett mål (jubel) och den som tas mot pannan (panna;
-// DJ trycker burken mot pannan).
+// Attiraljerna: DL en stickad halsduk, DT ett lejon på underarmen som håller
+// cigaretten och DJ en randig mössa med tofs och märke (solglasögonen
+// uppskjutna på den). Var de sitter och vilken arm som gör vad står inte här
+// utan följer platsen (PLATSER, sitt): does är vad handen mot bordet och den
+// andra handen gör. Som FIGS står sitter de på PLATSER i tur och ordning: DL
+// till vänster, DT bakom bordet och DJ till höger.
+// vanta: foten som trummar medan man väntar och i vilken ordning de fem
+// sakerna kommer (förskjutna med fas, så att ingen gör samma sak som någon
+// annan samtidigt).
+// mal: handen som lyfts vid ett mål (jubel) och den som tas mot pannan (panna;
+// DJ trycker burken mot pannan), efter vad den gör.
 const FIGS = [
-  { key: 'dl', x: -338, z: 194, turn: 46, tilt: -4, legs: 74, torso: 86, w: 50, depth: 30, neck: 12, neckR: 17, arm: 8.5, leg: 9, a: 42, b: 36,
+  { key: 'dl', tilt: -4, legs: 74, torso: 86, w: 50, depth: 30, neck: 12, neckR: 17, arm: 8.5, leg: 9, a: 42, b: 36,
     head: { rx: 56.7, ry: 70.65, rz: 54, hw: 63, hh: 78.5, cy: -5.5, taper: 0.06, noseY: 19, nose: [8, 7.6, 7.2], cheek: 0.08, ear: [0.15, 0.21, 0.16, 0.5] }, glasses: 0,
     hair: { style: 'krona', f: 41, s: 80, b: 135, temple: 17, templeW: 0.2, vol: 0.06, lift: 3, back: 0, n: 22, fine: 3, fineW: 0.32, g: 0.08, dark: 0.42, wob: 0.8, tip: 3, tipAt: 'fram', edge: 0.7, sideCut: 0.6, quiff: { dir: [0, 0.62, 0.78], h: 0.1, w: 0.3 } },
-    halsduk: { text: 'BOLSO' }, does: ['vila', 'flaska'],
-    vanta: { penna: 0, kupong: 1, sak: [0.94, 1.24], lagg: [0.55, 1.4, 1.25], blick: 1.2, fot: 1, ordning: [0, 3, 1, 4, 2], fas: 0 },
-    mal: { jubel: 1, panna: 0 } },
-  { key: 'dt', x: -186, z: 106, turn: 2, tilt: 3, legs: 60, torso: 78, w: 45, depth: 28, neck: 11, neckR: 15, arm: 8, leg: 9.5, a: 39, b: 35,
+    halsduk: { text: 'BOLSO' }, does: ['flaska', 'vila'],
+    vanta: { fot: 1, ordning: [0, 3, 1, 4, 2], fas: 0 },
+    mal: { jubel: 'flaska', panna: 'vila' } },
+  { key: 'dt', tilt: 3, legs: 60, torso: 78, w: 45, depth: 28, neck: 11, neckR: 15, arm: 8, leg: 9.5, a: 39, b: 35,
     head: { rx: 50.16, ry: 75.33, rz: 52, hw: 57, hh: 81, cy: -5, taper: 0.25, noseY: 17, nose: [6, 10, 7], cheek: 0.03, noseRot: -0.35 }, glasses: 36,
     hair: { style: 'bakat', f: 44, s: 96, b: 156, temple: 6, vol: 0.12, lift: 6, back: 12, n: 20, fine: 4, fineW: 0.35, g: 0.06, dark: 0.36, wob: 0.3, slat: 0.55, tip: 7, tipAt: 'bak', edge: 0.7, sideCut: 0.3, quiff: { dir: [0, 0.72, 0.69], h: 0.08, w: 0.5 }, gr: 1.05 },
-    tatuering: { arm: 0, text: 'BLUES', rot: -50 }, does: ['cigg', 'vila'], bord: { cigg: [-0.48, 1.65], vila: [0.54, 1.61] },
-    vanta: { penna: 0, kupong: 1, lagg: [0.63, 1.58, -0.25], blick: -1, fot: 0, ordning: [1, 4, 2, 0, 3], fas: 2.5 },
-    mal: { jubel: 1, panna: 1 } },
-  { key: 'dj', x: -38, z: 194, turn: -46, tilt: -2, legs: 104, torso: 100, w: 42, depth: 24, neck: 18, neckR: 13, arm: 7, leg: 8, a: 48, b: 44,
+    tatuering: { text: 'BLUES', rot: -50 }, does: ['cigg', 'vila'],
+    vanta: { fot: 0, ordning: [1, 4, 2, 0, 3], fas: 2.5 },
+    mal: { jubel: 'vila', panna: 'vila' } },
+  { key: 'dj', tilt: -2, legs: 104, torso: 100, w: 42, depth: 24, neck: 18, neckR: 13, arm: 7, leg: 8, a: 48, b: 44,
     head: { rx: 49, ry: 75, rz: 50, hw: 54, hh: 84, cy: -6, taper: 0.22, noseY: 18, nose: [5.8, 9, 7.2], noseRot: -0.3 }, glasses: 36,
     hair: { style: 'svep', sw: 28, f: 50, s: 82, b: 140, temple: 5, vol: 0.1, lift: 7, back: 2, n: 18, fine: 4, fineW: 0.3, g: 0.075, dark: 0.4, wob: 0.4, tip: 6, tipAt: 'bak', edge: 0.7, sideCut: 0.45, quiff: { dir: [-0.3, 0.62, 0.72], h: 0.13, w: 0.42 }, gr: 1.07 },
     mossa: { f: 56, s: 76, b: 104, text: ['BLÅ', 'VITT'] }, beard: [1.024, -2], does: ['burk', 'prat'],
-    vanta: { penna: 1, kupong: 0, sak: [-1.06, 0.83], cigg: [-0.05, 1.07], lagg: [-0.5, 1.0, 0.3], blick: -1.2, fot: 0, ordning: [4, 2, 0, 3, 1], fas: 5 },
-    mal: { jubel: 0, panna: 0 } },
+    vanta: { fot: 0, ordning: [4, 2, 0, 3, 1], fas: 5 },
+    mal: { jubel: 'burk', panna: 'burk' } },
 ];
+
+// Figuren F på platsen P: armarna efter sidan (does, vanta.penna/kupong,
+// tatuering.arm och mal i armarnas ordning), sidan som bordet är åt (inn: 1
+// åt figurens vänster, −1 åt höger – blickarna åt sidan i body vänds med den)
+// och vridningen mot ölen som man sneglar på medan man väntar (vanta.blick;
+// DT:s är extraflaskan).
+function sitt(F, P) {
+  const does = P.inre ? [F.does[1], F.does[0]] : F.does;
+  const sak = F.key === 'dt' ? P.flaska : P.sak;
+  return {
+    ...F, x: P.x, z: P.z, turn: P.turn, plats: P, does, inn: P.inre ? 1 : -1,
+    tatuering: F.tatuering && { ...F.tatuering, arm: does.indexOf('cigg') },
+    vanta: { ...F.vanta, kupong: P.kupong, penna: 1 - P.kupong, blick: Math.atan2(sak[0], sak[1]) },
+    mal: { jubel: does.indexOf(F.mal.jubel), panna: does.indexOf(F.mal.panna) },
+  };
+}
 
 // Kläderna efter vädret i Stockholm (v = Vader.nu(), via rum.js): känns-
 // temperaturen avgör lagren – 0 hett (21° och mer), 1 varmt (15–21), 2 svalt
@@ -119,7 +170,7 @@ const FIGS = [
 // ärmen på armen med lejonet.
 //   ben: kort|lang, byxa: [färg, mörkare], troja: { farg, farg2, luva, ficka },
 //   jacka: { typ: oppen|stangd, tyg: bomull|skinn|dun|parka|regn|flanell,
-//            farg, farg2, luva: slat|pals, krage, tjock, tunn, upp: 0|1|'bada' }
+//            farg, farg2, luva: slat|pals, krage, tjock, tunn, upp: lejon|bada }
 function dress(key, v) {
   const k = v ? v.kanns : 17;
   const n = k >= 21 ? 0 : k >= 15 ? 1 : k >= 8 ? 2 : k >= 1 ? 3 : 4;
@@ -133,9 +184,9 @@ function dress(key, v) {
   } else if (key === 'dt') {
     d.ben = n === 0 ? 'kort' : 'lang';
     if (n === 2) d.jacka = { typ: 'oppen', tyg: 'flanell', farg: '#8c2a24', farg2: '#1e1a1a', krage: true, tunn: true, upp: 'bada' };
-    if (n === 3) d.jacka = { typ: 'oppen', tyg: 'skinn', farg: '#4a2e1e', farg2: '#2e1c12', krage: true, upp: 0 };
-    if (n === 4) d.jacka = { typ: 'stangd', tyg: 'dun', farg: '#2f3e33', farg2: '#1f2a22', krage: true, tjock: 1.8, upp: 0 };
-    if (regn) d.jacka = { typ: 'oppen', tyg: 'regn', farg: '#4f5a3a', farg2: '#39422a', luva: 'slat', upp: 0 };
+    if (n === 3) d.jacka = { typ: 'oppen', tyg: 'skinn', farg: '#4a2e1e', farg2: '#2e1c12', krage: true, upp: 'lejon' };
+    if (n === 4) d.jacka = { typ: 'stangd', tyg: 'dun', farg: '#2f3e33', farg2: '#1f2a22', krage: true, tjock: 1.8, upp: 'lejon' };
+    if (regn) d.jacka = { typ: 'oppen', tyg: 'regn', farg: '#4f5a3a', farg2: '#39422a', luva: 'slat', upp: 'lejon' };
   } else if (key === 'dj') {
     if (n >= 2) { d.byxa = ['#b8b4ab', '#a29d93']; d.troja = { farg: '#1d1d20', farg2: '#111113', luva: true, ficka: true }; }
     if (n === 3) d.jacka = { typ: 'stangd', tyg: 'dun', farg: '#161618', farg2: '#0b0b0c', krage: true, tjock: 1.5 };
@@ -1119,7 +1170,8 @@ export async function figurer(canvas, opt = {}) {
   mesh(new THREE.CylinderGeometry(4.5, 4.5, 320, 24), krom, bord).position.y = -170;
 
   const figs = [];
-  for (const F of FIGS) figs.push(build(F, dress(F.key, opt.vader)));
+  const n = placering(opt.vader || (window.Vader && window.Vader.nu()));
+  FIGS.forEach((F, i) => figs.push(build(sitt(F, PLATSER[(i + n) % 3]), dress(F.key, opt.vader))));
 
   // D: kläderna (dress)
   function build(F, D) {
@@ -1302,7 +1354,7 @@ export async function figurer(canvas, opt = {}) {
     const arms = [0, 1].map((i) => {
       const s = i === 0 ? -1 : 1;
       const kind = F.does[i];
-      const sleeve = J ? (J.upp === 'bada' || J.upp === i ? 'upp' : 'jacka') : D.troja ? 'lang' : 'kort';
+      const sleeve = J ? (J.upp === 'bada' || (J.upp === 'lejon' && F.tatuering.arm === i) ? 'upp' : 'jacka') : D.troja ? 'lang' : 'kort';
       const sm = J ? jackMat(J, { side: THREE.FrontSide, ...(J.tyg === 'flanell' ? { map: plaid(2, 2) } : {}) }) : tee;
       const tk = J ? (J.tunn ? 0.3 : J.tjock || 1) : 0;
       const rU = F.arm * (sleeve === 'kort' ? 1.45 : 1.22 + 0.12 * tk);
@@ -1342,11 +1394,12 @@ export async function figurer(canvas, opt = {}) {
       return A;
     });
     // en flaska till på bordet bredvid DT och askkoppen
+    const Pl = F.plats;
     if (F.key === 'dt') {
       const b2 = bottle(fig);
-      b2.position.set(Wd * 1.21, BORD.y + 24.4, thigh * 1.87);
+      b2.position.set(Pl.flaska[0], BORD.y + 24.4, Pl.flaska[1]);
       const tray = new THREE.Group();
-      tray.position.set(-Wd * 0.66, BORD.y, thigh * 1.5);
+      tray.position.set(Pl.aska[0], BORD.y, Pl.aska[1]);
       fig.add(tray);
       const tm = new THREE.MeshPhysicalMaterial({ color: '#9fb2b0', roughness: 0.1, transmission: 0, transparent: true, opacity: 0.75, clearcoat: 1 });
       mesh(new THREE.CylinderGeometry(15, 13, 5, 28), tm, tray).position.y = 2.5;
@@ -1356,9 +1409,9 @@ export async function figurer(canvas, opt = {}) {
         b.rotation.set(Math.PI / 2, 0, a); b.position.set(x, 5.4, z);
       }
     }
-    // två tomflaskor kvar på fönsterbänken bakom DJ (x och z i rummet)
+    // två tomflaskor kvar på fönsterbänken (tomma)
     if (F.key === 'dj') {
-      for (const [x, z, tilt] of [[40, 16, 0], [70, 30, 1.45]]) {
+      for (const [x, z, tilt] of Pl.tomma) {
         const e = bottle(fig);
         e.rotation.z = tilt;
         e.position.set(x - F.x, tilt ? 7.6 : 24.4, z - F.z).applyAxisAngle(UP, -F.turn * DEG);
@@ -1386,7 +1439,7 @@ export async function figurer(canvas, opt = {}) {
       }
       if (A.thing) {
         A.bench = A.kind === 'burk' ? can(fig) : bottle(fig);
-        A.bench.position.set(V.sak[0] * Wd, BORD.y + 0.4 - A.thing.userData.bottom, V.sak[1] * thigh);
+        A.bench.position.set(Pl.sak[0], BORD.y + 0.4 - A.thing.userData.bottom, Pl.sak[1]);
         // handryggen utåt när den tas
         A.bench.rotation.y = A.s * Math.PI / 4;
       }
@@ -1394,7 +1447,7 @@ export async function figurer(canvas, opt = {}) {
         A.bench = cigarette(fig);
         A.bench.userData.tip.visible = A.bench.userData.halo.visible = false;
         // där handen tar den: fingrarna framåt, handryggen upp, cigaretten vågrät
-        const at = F.key === 'dt' ? new THREE.Vector3(-Wd * 0.66, BORD.y + 6.4, thigh * 1.5) : new THREE.Vector3(V.cigg[0] * Wd, BORD.y + 1.3, V.cigg[1] * thigh);
+        const at = A.kind === 'cigg' ? new THREE.Vector3(Pl.aska[0], BORD.y + 6.4, Pl.aska[1]) : new THREE.Vector3(Pl.cigg[0], BORD.y + 1.3, Pl.cigg[1]);
         const y = new THREE.Vector3(0, -0.3, 1);
         const z = new THREE.Vector3(0, 1, 0.3);
         orient(vt, new THREE.Vector3(), y, z);
@@ -1410,8 +1463,8 @@ export async function figurer(canvas, opt = {}) {
     // utanför håret och mössan, snett framåt och nedåt, så att den syns framifrån
     frameOf(earPen, new THREE.Vector3(pen.s * P.rx * 1.15, P.ry * 0.16, -P.rz * 0.1), new THREE.Vector3(-pen.s * 0.1, -0.8, 0.6), new THREE.Vector3(0, 0.6, 0.8));
     const kupBench = coupon(fig);
-    const [lx, lz, lr] = V.lagg;
-    frameOf(kupBench, new THREE.Vector3(lx * Wd, BORD.y + 0.3, lz * thigh), new THREE.Vector3(Math.cos(lr), 0, -Math.sin(lr)), new THREE.Vector3(Math.sin(lr), 0, Math.cos(lr)));
+    const [lx, lz, lr] = Pl.lagg;
+    frameOf(kupBench, new THREE.Vector3(lx, BORD.y + 0.3, lz), new THREE.Vector3(Math.cos(lr), 0, -Math.sin(lr)), new THREE.Vector3(Math.sin(lr), 0, Math.cos(lr)));
     earPen.updateMatrix();
     kupBench.updateMatrix();
 
@@ -1465,15 +1518,19 @@ export async function figurer(canvas, opt = {}) {
     let breath = 1;
     let pitch = -0.05 + 0.03 * Math.sin(tt * 0.31);
     let yaw = 0;
-    if (k === 'dl') yaw = 0.18 * bump((t % 21), 12, 13.5, 17, 18.5) - 0.05;
-    if (k === 'dt') { pitch += 0.06 * Math.sin(t * 5.2) * bump(t % 13, 8.5, 9, 10.5, 11.5); yaw = -0.12 * bump(t % 17, 2, 3, 6, 7); }
-    if (k === 'dj') { yaw = -0.22 + 0.06 * Math.sin(t * 0.7); pitch += 0.04 * Math.sin(t * 2.1) * talkW(o, t); }
+    // blickarna åt sidan mot bordet (inn, sitt)
+    const inn = o.F.inn;
+    if (k === 'dl') yaw = inn * (0.18 * bump((t % 21), 12, 13.5, 17, 18.5) - 0.05);
+    if (k === 'dt') { pitch += 0.06 * Math.sin(t * 5.2) * bump(t % 13, 8.5, 9, 10.5, 11.5); yaw = inn * 0.12 * bump(t % 17, 2, 3, 6, 7); }
+    if (k === 'dj') { yaw = inn * (0.22 - 0.06 * Math.sin(t * 0.7)); pitch += 0.04 * Math.sin(t * 2.1) * talkW(o, t); }
     const knee = [0, 1].map((i) => 0.06 + 0.16 * Math.sin(t * (k === 'dj' ? 0.9 : 1.15) + o.phase + i * 2.4) * (k === 'dt' ? 0.6 : 1));
     const foot = [0.5, 0.5];
     // väntan: rätar på sig när kupongen är inne
     const vw = 1 - sm(0, 0.3, uOf(o, t));
+    let side = 0;
     if (vw > 0) {
       const w = waitBody(o, Math.min(t, o.inneAt));
+      side = w.side * vw;
       lean += (w.lean - lean) * vw;
       pitch += (w.pitch - pitch) * vw;
       yaw += (w.yaw - yaw) * vw;
@@ -1485,6 +1542,8 @@ export async function figurer(canvas, opt = {}) {
     // (den som just tappade raden sjunker ihop och tittar ner i stället)
     const up = cheerW(o, t);
     const sink = sinkW(o, t);
+    // på sidorna sjunker man ihop utåt, inte in framför den bakom bordet
+    side += sink * o.F.turn * DEG * 0.3;
     let twist = 0;
     let roll = 0;
     for (const [P, w0] of looks(o, t)) {
@@ -1504,13 +1563,14 @@ export async function figurer(canvas, opt = {}) {
     breath -= 0.05 * sink;
     pitch -= 0.38 * drink - 0.06 * drag;
     o.torso.rotation.y = twist;
+    o.torso.rotation.z += side;
     o.torso.position.y = o.hipY + 3 + (up > 0 ? 2.4 * up * Math.abs(Math.sin((t - M[k].at) * 7.5)) : 0);
     o.torso.rotation.x = lean;
     o.chest.scale.set(1 + 0.008 * Math.sin(tt * 1.6), (1 + 0.012 * Math.sin(tt * 1.6)) * breath, 1);
     o.hg.rotation.x = pitch;
     o.hg.rotation.y = yaw;
     // huvudena nickar efter musen (headA, draw)
-    o.hg.rotation.z = o.F.tilt * DEG + headA * (1 + figs.indexOf(o) * 0.15) + roll;
+    o.hg.rotation.z = o.F.tilt * DEG + headA * (1 + figs.indexOf(o) * 0.15) + roll - 0.7 * side;
     for (let i = 0; i < 2; i++) { o.knees[i].rotation.x = knee[i]; o.feet[i].rotation.x = foot[i]; }
   }
 
@@ -1592,7 +1652,9 @@ export async function figurer(canvas, opt = {}) {
     return {
       lean: 0.2 + 0.24 * kika + 0.08 * suck - 0.08 * vrid + 0.02 * Math.sin(t * 0.5 + o.phase),
       pitch: 0.26 + 0.3 * kika - 0.32 * vrid + 0.1 * suck + 0.1 * glance - chew * (0.22 + 0.03 * Math.sin(t * 9)) + 0.12 * scratch,
-      yaw: F.vanta.blick * 0.62 * glance - kika * F.turn * DEG * 0.8 + 0.04 * Math.sin(t * 0.37 + o.phase),
+      yaw: F.vanta.blick * glance - kika * F.turn * DEG * 0.8 + 0.04 * Math.sin(t * 0.37 + o.phase),
+      // och lutar sig ut åt sidan mot pulten, inte in framför den bakom bordet
+      side: kika * F.turn * DEG * 0.3,
       breath: 1 - 0.04 * suck,
       knee: [0, 1].map((i) => 0.06 + (1 - ben) * 0.16 * Math.sin(t * 1.15 + o.phase + i * 2.4) + ben * (0.3 * Math.sin(t * 2.9 + o.phase + i * 2.1) + 0.06 * Math.sin(t * 5.3 + i))),
       foot: [0, 1].map((i) => 0.5 - (i === F.vanta.fot ? ben * 0.34 * Math.max(0, Math.sin(t * 9.5)) ** 2 : 0)),
@@ -1778,9 +1840,9 @@ export async function figurer(canvas, opt = {}) {
     if (A.kind === 'cigg' || A.kind === 'prat') {
       // vilar på bordet (DT, vid askkoppen) med glöden framåt, gestikulerar
       // (DJ) och tar ett bloss
-      const bc = o.F.bord && o.F.bord.cigg;
+      const ak = o.F.plats.aska;
       const rest = A.kind === 'cigg'
-        ? { p: bc ? new THREE.Vector3(bc[0] * Wd, BORD.y + 7, bc[1] * th) : new THREE.Vector3(s * Wd * 0.98, y0 + 16, th * 0.72), y: new THREE.Vector3(s * 0.2, 0.6, 1), z: new THREE.Vector3(s * 0.9, 0.4, -0.2), pole: new THREE.Vector3(s, -0.4, -0.7) }
+        ? { p: new THREE.Vector3(ak[0] - s * 8.1, BORD.y + 7, ak[1] + 4.5), y: new THREE.Vector3(s * 0.2, 0.6, 1), z: new THREE.Vector3(s * 0.9, 0.4, -0.2), pole: new THREE.Vector3(s, -0.4, -0.7) }
         : { p: new THREE.Vector3(s * Wd * 0.4, y0 + 13, th * 0.78), y: new THREE.Vector3(-s * 0.15, 0.25, 1), z: new THREE.Vector3(s * 0.4, 1, -0.1), pole: new THREE.Vector3(s, -0.5, -0.5) };
       if (A.kind === 'prat') {
         const k = talkW(o, t);
@@ -1801,9 +1863,9 @@ export async function figurer(canvas, opt = {}) {
       const at = m.clone().sub(filt).add(new THREE.Vector3(0, -q * 0.2, 2));
       return { p: rest.p.clone().lerp(at, w), y: rest.y.clone().lerp(y, w), z: rest.z.clone().lerp(z, w), pole: new THREE.Vector3(s, -0.7, 0.1) };
     }
-    // vila: handflatan mot bordet (DT) eller på knät (DL)
-    const bv = o.F.bord && o.F.bord.vila;
-    if (bv) return { p: new THREE.Vector3(bv[0] * Wd, BORD.y + 3, bv[1] * th), y: new THREE.Vector3(-s * 0.1, -0.05, 1), z: new THREE.Vector3(0, 1, 0.05), pole: new THREE.Vector3(s, -0.3, -0.6) };
+    // vila: handflatan mot bordet bakom det, annars på knät
+    const bv = o.F.plats.vila;
+    if (bv) return { p: new THREE.Vector3(bv[0], BORD.y + 3, bv[1]), y: new THREE.Vector3(-s * 0.1, -0.05, 1), z: new THREE.Vector3(0, 1, 0.05), pole: new THREE.Vector3(s, -0.3, -0.6) };
     return { p: new THREE.Vector3(s * Wd * 0.36, y0 + 9, th * 0.92), y: new THREE.Vector3(-s * 0.1, -0.15, 1), z: new THREE.Vector3(0, 1, 0.1), pole: new THREE.Vector3(s, -0.3, -0.6) };
   }
 
@@ -1845,7 +1907,7 @@ export async function figurer(canvas, opt = {}) {
       if (A.tat) {
         // tatueringen sitter på handryggens sida av underarmen och vrids med handen
         const z = new THREE.Vector3(0, 0, 1).applyQuaternion(A.hand.quaternion).applyQuaternion(A.lo.quaternion.clone().invert());
-        A.tat.rotation.y = Math.atan2(z.x, z.z) + o.F.tatuering.rot * DEG;
+        A.tat.rotation.y = Math.atan2(z.x, z.z) - A.s * o.F.tatuering.rot * DEG;
       }
       const Z = new THREE.Vector3(0, 0, 1);
       if (A.sleeveKind === 'kort') {
