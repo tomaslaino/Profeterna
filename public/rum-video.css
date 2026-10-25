@@ -235,11 +235,11 @@
 /* på håll: tv:n och högen leder fram till videon, och lyser när man pekar */
 .rum-vhs .vhs-hit { display: block; position: absolute; left: 0; top: 0; width: 0; height: 0; transform-style: preserve-3d; pointer-events: none; }
 .vhs-hit > i { position: absolute; display: block; pointer-events: auto; border-radius: 12px; }
-.vhs-hit:hover, .vhs-hit:focus-visible { filter: none; }
+.vhs-hit:is(:hover, .magnet), .vhs-hit:focus-visible { filter: none; }
 .vhs-hit:focus-visible { outline: none; }
 .vhs-hit:focus-visible > i:first-child { outline: 6px solid rgba(240, 214, 153, 0.8); outline-offset: 10px; }
 .rum.vid-nara .vhs-hit > i { pointer-events: none; }
-.rum-vhs:has(.vhs-hit:hover) :is(.vhs-ritning, .vhs-skarm, .vhs-kas, .vhs-yta:not(.vhs-skugga, .vhs-pol), .vhs-band > i) { filter: brightness(1.16); }
+.rum-vhs:has(.vhs-hit:is(:hover, .magnet)) :is(.vhs-ritning, .vhs-skarm, .vhs-kas, .vhs-yta:not(.vhs-skugga, .vhs-pol), .vhs-band > i) { filter: brightness(1.16); }
 
 @media (prefers-reduced-motion: reduce) {
   .vhs-brus, .vhs-vfd.blink { animation: none; }

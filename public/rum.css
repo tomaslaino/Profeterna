@@ -83,8 +83,10 @@ a.rum-sak, a.rum-sak:hover { color: inherit; text-decoration: none; }
 /* föremålen lyser lite när man pekar på dem */
 .rum-sak { transition: filter 0.25s ease; }
 .rum-sak:focus-visible { filter: brightness(1.18) drop-shadow(0 0 10px rgba(240, 214, 153, 0.35)); outline: none; }
-/* (med fingret blir :hover kvar efter ett tryck, så där lyser de inte) */
-@media (hover: hover) { .rum-sak:hover { filter: brightness(1.18) drop-shadow(0 0 10px rgba(240, 214, 153, 0.35)); outline: none; } }
+/* (med fingret blir :hover kvar efter ett tryck, så där lyser de inte);
+   .magnet: musen står nära föremålet (magnet i rum.js) */
+@media (hover: hover) { .rum-sak:is(:hover, .magnet) { filter: brightness(1.18) drop-shadow(0 0 10px rgba(240, 214, 153, 0.35)); outline: none; } }
+.rum.magnet { cursor: pointer; }
 
 /* ---------- regnet och neonen ---------- */
 
@@ -305,7 +307,7 @@ a.rum-sak, a.rum-sak:hover { color: inherit; text-decoration: none; }
 .rum-pl.forbi, .rum-pl3d > .rum-inr { transition: opacity 0.5s; }
 .rum.sak-nara .rum-pl.forbi, .rum.sak-nara .rum-pl3d > .rum-inr { opacity: 0; transition-duration: 0.25s; }
 /* nära en sak lyser ingenting när man pekar på det */
-.rum.sak-nara .rum-sak:hover, .rum.sak-nara .rum-sak:focus-visible { filter: none; }
+.rum.sak-nara .rum-sak:is(:hover, .magnet), .rum.sak-nara .rum-sak:focus-visible { filter: none; }
 .rum.sak-nara #rum-vm94 { filter: drop-shadow(0 3px 4px rgba(0, 0, 0, 0.5)); }
 /* under saken: guldordet dit den leder, eller fotografen */
 .rum-sakfot {

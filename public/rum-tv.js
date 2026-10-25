@@ -432,7 +432,7 @@ window.RumTv = (() => {
       '<i class="tv-galler"></i>' +
       '<button type="button" class="tv-pa" data-tv="pa" aria-label="Stäng av tv:n" aria-pressed="true"></button><i class="tv-lampa"></i></div>' +
       '<i class="tv-namn">Panasonic</i><i class="tv-fast">FASTEXT</i></div>' +
-      '<a class="rum-tv rum-sak" href="#matcher" data-nav="tv" aria-label="Text-tv" id="rum-tv"></a>' +
+      '<a class="rum-tv rum-sak" href="#matcher" data-nav="tv" aria-label="Text-tv" id="rum-tv"><i class="y-topp"></i><i class="y-botten"></i><i class="y-vanster"></i><i class="y-hoger"></i><i class="y-hfram"></i><i class="y-hbotten"></i><i class="y-hhoger"></i></a>' +
       '</div></div>';
   }
 

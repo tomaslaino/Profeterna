@@ -1414,6 +1414,41 @@ ${window.RumRegister ? RumRegister.nara() : ''}
     for (const a of R.el.querySelectorAll('[data-to]')) a.classList.toggle('hot', nav === a.dataset.to);
   }
 
+  // Magneten: en miss nära ett föremål räknas som en träff. Pekar man på
+  // något som inte leder någonstans gäller det närmaste föremålet inom MAG
+  // (scenens px) – det lyser, pekaren blir en hand och klicket går dit.
+  // Föremålen söks med träffprov i ringar ut från punkten, så att magneten
+  // följer deras verkliga form och det som står framför; ett prov kostar
+  // (rummet är djupt), så med musen söks det först när den stannar
+  // (wire), och vid ett klick.
+  const MAG = 36;
+  const PEKBAR = '.rum-sak, .rum-tag';
+  function magnet(x, y, t = document.elementFromPoint(x, y)) {
+    if (!t || !R.el.contains(t)) return null;
+    const s = t.closest(PEKBAR);
+    if (s || t.closest('a, button, input, .rum-hdr, .rum-ft')) return s;
+    const r = MAG * R.k;
+    for (let i = 1; i <= 3; i++) {
+      for (let j = 0; j < 8; j++) {
+        const v = ((j + i / 2) * Math.PI) / 4;
+        const p = document.elementFromPoint(x + (Math.cos(v) * r * i) / 3, y + (Math.sin(v) * r * i) / 3);
+        const n = p && p.closest(PEKBAR);
+        if (n && R.el.contains(n)) return n;
+      }
+    }
+    return null;
+  }
+  // Föremålet magneten valt lyser som när man pekar på det (.magnet).
+  // direkt: musen är på ett föremål, och mouseover har redan tänt snabbvalet.
+  function peka(s, direkt) {
+    if (s === R.mag) return;
+    if (R.mag) R.mag.classList.remove('magnet');
+    R.mag = s;
+    if (s) s.classList.add('magnet');
+    R.el.classList.toggle('magnet', Boolean(s));
+    if (!direkt) hot(s ? s.dataset.nav : null);
+  }
+
   // Elementets mått i fönstret. WebKit utan GetBoundingClientRectZoomed
   // (Safari i iPhone) delar måtten för det som står i något med CSS zoom med
   // zoomen – tv:n ritas i zoom 1,5 eller 3 – så att kameran siktade på fel
@@ -1493,15 +1528,25 @@ ${window.RumRegister ? RumRegister.nara() : ''}
       nudge(a);
       return;
     }
-    if (calm()) return;
+    const folj = () => {
+      if (/^#/.test(href)) location.hash = href.slice(1);
+      else location.href = href;
+    };
+    if (calm()) {
+      // magneten: klicket föll bredvid länken
+      if (!a.contains(e.target)) {
+        e.preventDefault();
+        folj();
+      }
+      return;
+    }
     e.preventDefault();
     const p = centerOf(a);
     const c = mid();
     aim(p, 1.35, [p[0] + (c[0] - p[0]) * 0.4, p[1] + (c[1] - p[1]) * 0.4], 'dyk');
     R.el.classList.add('dyker');
     setTimeout(() => {
-      if (/^#/.test(href)) location.hash = href.slice(1);
-      else location.href = href;
+      folj();
       // tillbaka i rummet (matchrutan ligger ovanpå det, och bakåt-knappen)
       setTimeout(() => {
         R.el.classList.remove('dyker');
@@ -2648,10 +2693,32 @@ ${window.RumRegister ? RumRegister.nara() : ''}
     const el = R.el;
     swipe(el);
     el.addEventListener('mouseover', (e) => {
-      const a = !R.kup && e.target.closest('.rum-sak, .rum-tag, .rum-guld');
+      const a = !R.kup && (e.target.closest('.rum-sak, .rum-tag, .rum-guld') || R.mag);
       hot(a ? a.dataset.nav : null);
     });
+    // magneten söks när musen har stannat, och släpper när musen kommer
+    // till ett föremål eller går mer än MAG från där den söktes
+    const M = { t: 0, x: 0, y: 0 };
+    el.addEventListener('pointermove', (e) => {
+      if (e.pointerType !== 'mouse') return;
+      clearTimeout(M.t);
+      const direkt = Boolean(e.target.closest(PEKBAR));
+      if (direkt || nara() || Math.hypot(e.clientX - M.x, e.clientY - M.y) > MAG * R.k) peka(null, direkt);
+      if (direkt || nara()) return;
+      const { clientX: x, clientY: y } = e;
+      M.t = setTimeout(() => {
+        M.x = x;
+        M.y = y;
+        if (R.on && !nara()) peka(magnet(x, y));
+      }, 80);
+    });
+    el.addEventListener('pointerleave', () => {
+      clearTimeout(M.t);
+      peka(null);
+    });
     el.addEventListener('click', (e) => {
+      clearTimeout(M.t);
+      peka(null, true);
       // kupongen i handen: ett klick utanför den lägger tillbaka den
       if (R.kup) {
         if (e.target.closest('#rum-handen, #rum-hand, .rum-hdr')) return;
@@ -2685,16 +2752,19 @@ ${window.RumRegister ? RumRegister.nara() : ''}
         else sak(null);
         return;
       }
-      if (e.target.closest('.rum-tag') && openCoupon()) {
+      // en miss nära ett föremål räknas som en träff (inte med tangenterna,
+      // e.detail 0, och inte nära tv:n)
+      const a = e.target.closest(PEKBAR) || (!nara() && e.detail ? magnet(e.clientX, e.clientY, e.target) : null);
+      if (a && a.matches('.rum-tag') && openCoupon()) {
         e.preventDefault();
         return;
       }
-      const a = e.target.closest('.rum-sak');
       if (a && el.contains(a)) go(a, e);
       else if (R.zoom && !e.target.closest('.rum-hdr, .rum-ft')) zoomTv(false);
     });
     document.addEventListener('keydown', (e) => {
       if (!R.on || e.metaKey || e.ctrlKey || e.altKey || /input|textarea|select/i.test(e.target.tagName) || document.querySelector('dialog[open]')) return;
+      peka(null);
       const k = e.key.toLowerCase();
       // nära en sak: Esc går tillbaka, och K, T, A, R och V går dit direkt
       if (R.sak && !R.kup) {

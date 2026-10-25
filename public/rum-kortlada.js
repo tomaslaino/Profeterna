@@ -18,7 +18,7 @@
 // betraktaren, i högra väggens mått; ögat står i (760, 400) på avståndet
 // 1000, och disken är Y = −490 mellan X = 1060 och väggen i X = 1140.
 //
-// kortlada({ duk, nara, calm, box }) → { deck(cards, wear), paint(), open(on, från) → Promise,
+// kortlada({ duk, yta, nara, calm, box }) → { deck(cards, wear), paint(), open(on, från) → Promise,
 //   pick(x, y), hover(id), rise(id, up) → Promise, hide(id, on), rect(id), tilt(x, y), frame(), resize() }
 
 const DEG = Math.PI / 180;
@@ -378,6 +378,25 @@ export async function kortlada(o) {
     o.duk.height = Math.round(BOX.h * DPR);
     c.clearRect(0, 0, o.duk.width, o.duk.height);
     c.drawImage(gl.domElement, 0, 0, o.duk.width, o.duk.height);
+    if (o.yta) yta(c);
+  }
+
+  // Ytan i länken som tar emot musen: rutan kring det som är ritat i duken.
+  function yta(c) {
+    const { width: w, height: h } = o.duk;
+    const px = c.getImageData(0, 0, w, h).data;
+    let [x0, y0, x1, y1] = [w, h, -1, -1];
+    for (let y = 0; y < h; y++) {
+      for (let x = 0; x < w; x++) {
+        if (px[(y * w + x) * 4 + 3] < 64) continue;
+        x0 = Math.min(x0, x);
+        x1 = Math.max(x1, x);
+        y0 = Math.min(y0, y);
+        y1 = y;
+      }
+    }
+    const pc = (v, n) => `${((v / n) * 100).toFixed(2)}%`;
+    Object.assign(o.yta.style, x1 < 0 ? { width: '0' } : { left: pc(x0, w), top: pc(y0, h), width: pc(x1 + 1 - x0, w), height: pc(y1 + 1 - y0, h) });
   }
 
   // ---------- närbilden ----------

@@ -1754,9 +1754,17 @@ visas – utan WebGL eller utan nätet står rummet kvar utan dem.
 
 **Föremålen** – pekar man på ett lyser det (pokalerna också), och snabbvalet
 på text-tv:n med samma ämne tänds, som när man pekar på snabbvalet med tv:n nära
-(skårtavlan Tabeller, pärmarna Skyttar). Klickar man går kameran fram mot föremålet innan
-sidan byts; oraklet, skårtavlan, uret och VM 94-affischen tittar man först på nära (se
-[Närbilderna](#närbilderna)):
+(skårtavlan Tabeller, pärmarna Skyttar). Det man ser av ett föremål går att peka på: tv:ns
+sidor och hyllan hör till tv:n (osynliga ytor i länken, som videons), och kortregistret tar
+bara emot musen där lådan är ritad (`yta` i rum-kortlada.js) – duken runt den är större och
+räckte upp över anslagstavlans nedersta lappar. En miss nära ett föremål räknas som en
+träff (`magnet` i rum.js): står musen still över något som inte leder någonstans lyser det
+närmaste föremålet inom 36 px (scenens mått), pekaren blir en hand och klicket går dit; med
+fingret gäller det trycket. Magneten letar med träffprov i tre ringar ut från punkten, så att
+den följer föremålens verkliga form och det som står framför, och med musen först när den har
+stannat (80 ms), eftersom varje prov kostar i det djupa rummet. Klickar man går kameran fram
+mot föremålet innan sidan byts; oraklet, skårtavlan, uret och VM 94-affischen tittar man
+först på nära (se [Närbilderna](#närbilderna)):
 
 - **Omgångens orakel** (tavlan under stationsuret) → närbild → Olympen: oraklet som regerar
   (`Kronan.holders`) som i Olympen och på förstasidans polaroid (`Kronan.scene`) – det

@@ -214,7 +214,7 @@ window.RumRegister = (() => {
 
   function html() {
     return `<a class="rum-reg rum-sak" id="rum-reg" href="statistik.html#pl/lag" data-nav="statistik" aria-label="Kortregistret" ` +
-      `style="left:${BOX.x}px; top:${BOX.y}px; width:${BOX.w}px; height:${BOX.h}px"><canvas class="reg-duk" id="reg-duk"></canvas></a>`;
+      `style="left:${BOX.x}px; top:${BOX.y}px; width:${BOX.w}px; height:${BOX.h}px"><canvas class="reg-duk" id="reg-duk"></canvas><i class="reg-yta" id="reg-yta"></i></a>`;
   }
 
   function nara() {
@@ -241,7 +241,7 @@ window.RumRegister = (() => {
 
     // lådan i three.js (hämtas med rummet; utan WebGL står disken tom)
     // (i telefonen när det blir dess tur, o.tur i rum.js)
-    A.Lp = (o.tur || ((f) => f()))(() => import('./rum-kortlada.js').then((m) => m.kortlada({ duk, nara: root.querySelector('#reg-3d'), calm: o.calm, box: BOX }))
+    A.Lp = (o.tur || ((f) => f()))(() => import('./rum-kortlada.js').then((m) => m.kortlada({ duk, yta: root.querySelector('#reg-yta'), nara: root.querySelector('#reg-3d'), calm: o.calm, box: BOX }))
       .then((L) => { A.L = L; A.ids = ''; draw(); }))
       .catch((err) => console.warn('Rummet: kortlådan kunde inte ritas', err));
 

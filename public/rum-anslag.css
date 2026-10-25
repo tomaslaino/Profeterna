@@ -9,8 +9,8 @@
 
 .rum-ans { position: absolute; left: 1140px; display: block; transform-origin: 0 0; transform-style: preserve-3d; --s: 0.317; --dj: 18px; }
 /* ljuset när man pekar: bara på ytan, så att ramens djup inte plattas till */
-.rum-ans.rum-sak:hover, .rum-ans.rum-sak:focus-visible { filter: none; }
-.rum-ans:hover .ans-yta, .rum-ans:focus-visible .ans-yta { filter: brightness(1.18) drop-shadow(0 0 10px rgba(240, 214, 153, 0.35)); }
+.rum-ans.rum-sak:is(:hover, .magnet), .rum-ans.rum-sak:focus-visible { filter: none; }
+.rum-ans:is(:hover, .magnet) .ans-yta, .rum-ans:focus-visible .ans-yta { filter: brightness(1.18) drop-shadow(0 0 10px rgba(240, 214, 153, 0.35)); }
 .rum-ans > .ans-tavla { position: absolute; left: 0; top: 0; transform-origin: 0 0; transform: scale3d(var(--s), var(--s), var(--s)) translateZ(var(--dj)); }
 .rum-ans > i { display: block; }
 .rum-ans .ans-skugga { position: absolute; left: 1.5%; top: 4%; width: 100%; height: 100%; background: rgba(8, 5, 2, 0.55); filter: blur(5px); }

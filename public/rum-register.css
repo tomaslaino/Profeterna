@@ -10,6 +10,10 @@
 
 .rum-reg { position: absolute; display: block; z-index: 1; }
 .rum-reg .reg-duk { display: block; width: 100%; height: 100%; }
+/* duken är större än lådan och täckte anslagstavlans nedersta lappar: bara
+   där lådan är ritad tar länken emot musen (yta i rum-kortlada.js) */
+.rum-reg.rum-sak { pointer-events: none; }
+.rum-reg .reg-yta { position: absolute; display: block; width: 0; pointer-events: auto; }
 .rum-reg.borta { visibility: hidden; }
 
 /* ---------- närbilden ---------- */

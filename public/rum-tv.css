@@ -340,13 +340,22 @@
 
 /* ---------- klicket ---------- */
 
-/* på avstånd går ett klick var som helst på tv:n fram till den (rum.js) */
-.rum-tv { position: absolute; left: 0; top: 0; width: 292px; height: 196px; display: block; border-radius: 5px; transform: translateZ(2px); }
-.rum-tv:hover, .rum-tv:focus-visible { filter: none; }
+/* på avstånd går ett klick var som helst på tv:n fram till den (rum.js),
+   också på lådans sidor och hyllan (som .tv-f och .tv-hylla, osynliga) */
+.rum-tv { position: absolute; left: 0; top: 0; width: 292px; height: 196px; display: block; border-radius: 5px; transform: translateZ(2px); transform-style: preserve-3d; }
+.rum-tv > i { position: absolute; transform-origin: 0 0; }
+.rum-tv > .y-topp { left: 0; top: 0; width: 292px; height: 105px; transform: translateZ(-2px) rotateX(-90deg); }
+.rum-tv > .y-botten { left: 0; top: 196px; width: 292px; height: 105px; transform: translateZ(-2px) rotateX(-90deg); }
+.rum-tv > .y-vanster { left: 0; top: 0; width: 105px; height: 196px; transform: translateZ(-2px) rotateY(90deg); }
+.rum-tv > .y-hoger { left: 292px; top: 0; width: 105px; height: 196px; transform: translateZ(-2px) rotateY(90deg); }
+.rum-tv > .y-hfram { left: -5px; top: 191px; width: 302px; height: 9px; transform: translateZ(3px); }
+.rum-tv > .y-hbotten { left: -5px; top: 200px; width: 302px; height: 116px; transform: translateZ(3px) rotateX(-90deg); }
+.rum-tv > .y-hhoger { left: 297px; top: 191px; width: 116px; height: 9px; transform: translateZ(3px) rotateY(90deg); }
+.rum-tv:is(:hover, .magnet), .rum-tv:focus-visible { filter: none; }
 .rum-tv:focus-visible { outline: 2px solid rgba(240, 214, 153, 0.8); outline-offset: 3px; }
 .rum.tv-nara .rum-tv { pointer-events: none; }
 .rum-tv3.nara .tv-front button, .rum-tv3.nara .tv-front a { pointer-events: auto; }
-.rum-tv3:has(> .rum-tv:hover) .tv-glas { filter: brightness(1.3) saturate(1.15); }
+.rum-tv3:has(> .rum-tv:is(:hover, .magnet)) .tv-glas { filter: brightness(1.3) saturate(1.15); }
 
 @media (prefers-reduced-motion: reduce) {
   .rum-tv3, .tv-scan, .tv-glas { transition: none; }
