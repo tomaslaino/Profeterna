@@ -6,7 +6,8 @@
 
    Tv:n och fruktlådan bredvid är lådor i 3D i rummets perspektiv
    (perspective på .vhs-in). De står mot väggen, vända mot gänget mitt i
-   rummet, och står kvar så när kameran går fram. */
+   rummet, och står kvar så när kameran går fram och svänger runt dem
+   (.vhs-kam). */
 
 .rum-vhs { position: absolute; width: 240px; height: 130px; transform-style: preserve-3d; pointer-events: none; }
 /* Ännu en gång dubbelt (zoom) för att tv:n ska vara skarp när man går
@@ -40,9 +41,12 @@
 
 /* ---------- lådan i 3D ---------- */
 
-/* mot väggen och vriden mot gänget, med lådan bredvid (i tv:ns mått) */
-.vhs-tv, .vhs-front, .vhs-styr, .vhs-lada { left: 0; top: 0; width: 1440px; height: 780px; transform-style: preserve-3d; }
-.vhs-front, .vhs-lada { position: absolute; }
+/* mot väggen och vriden mot gänget, med lådan bredvid (i tv:ns mått); runt
+   dem kameran, som svänger runt tv:n nära (SVANG i rum-video.js) samtidigt
+   som rummet vrids (rum.js) */
+.vhs-kam, .vhs-tv, .vhs-front, .vhs-styr, .vhs-lada { left: 0; top: 0; width: 1440px; height: 780px; transform-style: preserve-3d; }
+.vhs-kam.glid { transition: transform 0.6s cubic-bezier(0.3, 0, 0.2, 1); }
+.vhs-tv, .vhs-front, .vhs-lada { position: absolute; }
 .vhs-yta { position: absolute; display: block; backface-visibility: hidden; pointer-events: none; }
 .rum.vid-nara .vhs-yta:not(.vhs-skugga, .vhs-pol) { pointer-events: auto; }
 /* sidorna i svart plast, med springor i bakre halvan */
@@ -254,9 +258,13 @@
 .vhs-hit > i { position: absolute; display: block; pointer-events: auto; border-radius: 12px; }
 .vhs-hit:hover, .vhs-hit:focus-visible { filter: none; outline: none; }
 .rum.vid-nara .vhs-hit > i { pointer-events: none; }
+/* nära tar bara hörnet emot klick (ett klick någon annanstans går tillbaka):
+   med kameran svängd räknar Chrome annars kortregistret på disken bakom som
+   närmast, där lådan står */
+.rum.vid-nara .rum-pl:not(:has(#rum-vhs)) * { pointer-events: none; }
 .rum:not(.vid-nara) .rum-vhs:has(.vhs-hit:is(:hover, :focus-visible)) :is(.vhs-ritning, .vhs-skarm, .vhs-kas, .vhs-yta:not(.vhs-skugga, .vhs-pol), .vhs-band > i) { filter: brightness(1.16); }
 
 @media (prefers-reduced-motion: reduce) {
   .vhs-brus, .vhs-vfd.blink { animation: none; }
-  .vhs-band, .vhs-lucka, .vhs-sken, .vhs-pol { transition: none; }
+  .vhs-band, .vhs-lucka, .vhs-sken, .vhs-pol, .vhs-kam.glid { transition: none; }
 }

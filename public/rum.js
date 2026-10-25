@@ -1576,12 +1576,44 @@ ${window.RumRegister ? RumRegister.nara() : ''}
     }
     R.vf = R.video.zoom(on);
     if (on) aimVideo(calm() ? null : 'glid');
-    else aim([800, 500], 1, [800, 500], calm() ? null : 'glid');
+    else {
+      sving(R.vf, 0, calm() ? null : 'glid');
+      aim([800, 500], 1, [800, 500], calm() ? null : 'glid');
+    }
+  }
+  // Kameran svänger runt videon: rummets plan vrids sv grader i 3D kring tv:n,
+  // som står i planet -598 där f.mitt ligger (scenens x), medan rum-video.js
+  // ritar hörnet från samma håll. Hörnets plan vrids inte – Chrome ritar det
+  // som lutar i perspektiv suddigt nära, och tv:n står ju där rummet vrids
+  // kring – utan står kvar vänt mot kameran, så långt framför väggen som den
+  // vrids fram bakom lådan (f.kant) och lika mycket mindre, så att det syns
+  // där det syntes. Första gången får planen samma form utan övergång, så att
+  // de vrids kring tv:n hela vägen.
+  const KV = ((PERSP + 598) / PERSP) * 1.035;
+  function sving(f, sv, cls) {
+    const pl = [...R.el.querySelectorAll('.rum-world > .rum-pl')];
+    const dx = r1((f.mitt - 800) * KV);
+    const dz = sv ? (f.mitt - f.kant) * KV * ((sv * Math.PI) / 180) + 8 : 0;
+    const satt = (v, z) => {
+      for (const p of pl) {
+        p.style.transform = p.querySelector('#rum-vhs')
+          ? `translate3d(0px, 0px, ${r1(z)}px) scale(${((PERSP + 598 - z) / (PERSP + 598)).toFixed(4)}) ${p.dataset.bas}`
+          : `translate3d(${dx}px, 0px, -598px) rotateY(${v}deg) translate3d(${-dx}px, 0px, 598px) ${p.dataset.bas}`;
+      }
+    };
+    if (!pl[0].dataset.bas) {
+      for (const p of pl) p.dataset.bas = p.style.transform;
+      satt(0, 0);
+      void pl[0].offsetWidth;
+    }
+    for (const p of pl) p.classList.toggle('glid', Boolean(cls));
+    satt(sv, dz);
   }
   function aimVideo(cls) {
     // hörnet i planet -598 (1,035 gånger), och det som syns av scenen;
     // förstoringen högst f.z (rutan nära, rum-video.js), annars sex
     const f = R.vf;
+    sving(f, f.sv, cls);
     const [x0, x1] = [f.x0, f.x1].map((x) => 800 + (x - 800) * 1.035);
     const [y0, y1] = [f.y0, f.y1].map((y) => 500 + (y - 500) * 1.035);
     const [vx0, vx1] = [-R.ox / R.k, (innerWidth - R.ox) / R.k];

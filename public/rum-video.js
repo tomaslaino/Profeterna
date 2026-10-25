@@ -5,7 +5,8 @@
 // rutan vänd mot gänget mitt i rummet. På tv:n ligger de senaste
 // repriserna på VHS i en hög, och i en fruktlåda bredvid resten (Arkivet),
 // med öppningen åt samma håll. När man går fram (klick eller V) står de
-// kvar som de står och syns från sidan, som på håll. Kassetterna har
+// kvar som de står, och kameran svänger runt tv:n så att man ser rutan
+// snett framifrån (SVANG) – närmare rutan nästan rakt. Kassetterna har
 // handskrivna etiketter med matchen, resultatet och dagen; ett klick på en
 // kassett och den åker in i videon, som spelar matchens höjdpunkter i
 // rutan (samma klipp som spelaren på sajten, hojdpunkter.js). Knapparna
@@ -77,20 +78,28 @@ window.RumVideo = (() => {
   // väggen. d är djupet.
   const LADA = { x: TV.x - 4 - 95, y: TV.y + TV.h - 77, w: 95, h: 77, t: 4.5, d: 27 };
   LADA.z = LADA.d - DJUP + (LADA.x - TV.x) / Math.tan(RAD);
+  // Kameran svänger runt tv:n när man går fram, så att man ser rutan nästan
+  // rakt framifrån – och lite till när man går närmare rutan: rummet vrids
+  // rum grader i 3D kring tv:n (rum.js), och här ritas hörnet horn grader
+  // längre runt (.vhs-kam, kring tv:ns mitt). Rummet är målat på platta plan,
+  // så vridningen i 3D visar bara mer av planen; det är hörnet som ses från
+  // det nya hållet. Tv:n och lådan står som de står.
+  const SVANG = { nara: { rum: 30, horn: 30 }, tat: { rum: 34, horn: 46 } };
   // Var en punkt på tv:n eller lådan (i tv:ns mått, z framåt från tv:ns
   // front) syns i hörnet: vriden kring MITT, flyttad till PLATS och i
-  // rummets perspektiv. ruta: det minsta i scenen som rymmer punkterna, med
-  // kanten k.
-  function syns([x, y, z]) {
+  // rummets perspektiv, med kameran v grader runt. ruta: det minsta i scenen
+  // som rymmer punkterna, med kanten k.
+  function syns([x, y, z], v = 0) {
+    const a = RAD - v * Math.PI / 180;
     const [dx, dz] = [x - MITT[0], z - MITT[2]];
-    const wx = MITT[0] + PLATS[0] + dx * Math.cos(RAD) - dz * Math.sin(RAD);
-    const wz = MITT[2] + PLATS[1] + dx * Math.sin(RAD) + dz * Math.cos(RAD);
+    const wx = MITT[0] + PLATS[0] + dx * Math.cos(a) - dz * Math.sin(a);
+    const wz = MITT[2] + PLATS[1] + dx * Math.sin(a) + dz * Math.cos(a);
     const f = 1000 / (1000 - wz);
     return [VP[0] + (wx - VP[0]) * f, VP[1] + (y - VP[1]) * f];
   }
   const horn = (x0, y0, x1, y1, z0, z1) => [x0, x1].flatMap((x) => [y0, y1].flatMap((y) => [z0, z1].map((z) => [x, y, z])));
-  function ruta(p, k) {
-    const s = p.map(syns);
+  function ruta(p, k, v) {
+    const s = p.map((q) => syns(q, v));
     const xs = s.map((q) => q[0]);
     const ys = s.map((q) => q[1]);
     return { x0: O[0] + Math.min(...xs) - k, y0: O[1] + Math.min(...ys) - k, x1: O[0] + Math.max(...xs) + k, y1: O[1] + Math.max(...ys) + k };
@@ -104,12 +113,16 @@ window.RumVideo = (() => {
   ];
   const CAP = 25;
   // det kameran ska få med: högen, tv:n och lådan – och närmare bara
-  // rutan – i scenens mått
-  const FOCUS = ruta([
+  // rutan – i scenens mått, med kameran svängd; sv: rummets vridning, mitt:
+  // där tv:n står i scenen (x), och kant: hörnets vänstra kant (lådan) hur
+  // kameran än står
+  const ALLT = [
     ...horn(TV.x, TV.y - 4 * KAS.h, TV.x + TV.w, TV.y + TV.h, 0, -DJUP),
     ...horn(LADA.x, LADA.y, LADA.x + LADA.w, LADA.y + LADA.h, LADA.z, LADA.z - LADA.d),
-  ], 6);
-  const TAT = { ...ruta(horn(GLAS.x, GLAS.y, GLAS.x + GLAS.w, GLAS.y + GLAS.h, 0, 0), 1), z: 16 };
+  ];
+  const HORN = { mitt: O[0] + syns(MITT)[0], kant: Math.min(...[0, SVANG.nara.horn, SVANG.tat.horn].map((v) => ruta(ALLT, 0, v).x0)) };
+  const FOCUS = { ...ruta(ALLT, 6, SVANG.nara.horn), ...HORN, sv: SVANG.nara.rum };
+  const TAT = { ...ruta(horn(GLAS.x, GLAS.y, GLAS.x + GLAS.w, GLAS.y + GLAS.h, 0, 0), 1, SVANG.tat.horn), z: 16, ...HORN, sv: SVANG.tat.rum };
 
   const hash = (s) => {
     let a = 7;
@@ -291,6 +304,8 @@ window.RumVideo = (() => {
     return `<div class="rum-vhs" id="rum-vhs" data-lage="tom" style="left:${O[0]}px; top:${O[1]}px">` +
       `<div class="vhs-in" style="perspective:${1000 * S}px; perspective-origin:${px(VP[0])} ${px(VP[1])}">` +
       '<i class="vhs-sken"></i>' +
+      // kameran runt tv:ns mitt (SVANG)
+      `<div class="vhs-kam" style="transform-origin:${px(MITT[0] + PLATS[0])} ${px(MITT[1])} ${px(MITT[2] + PLATS[1])}">` +
       `<div class="vhs-tv" style="transform:translate3d(${px(PLATS[0])}, 0px, ${px(PLATS[1])}) rotateY(${-VRID}deg); transform-origin:${px(MITT[0])} ${px(MITT[1])} ${px(MITT[2])}">${ytor()}` +
       `<div class="vhs-front">${tvRitning()}<div class="vhs-styr" inert>` +
       `<div class="vhs-skarm" style="${at(GLAS)}">` +
@@ -301,7 +316,7 @@ window.RumVideo = (() => {
       `<span class="vhs-vfd" style="${at(VFD)}">12:00</span>${knappar}${kas(0, 4)}</div></div>` +
       // lådan bredvid
       `<div class="vhs-lada" style="transform:translateZ(${px(LADA.z)})">${ladaYtor()}${ladaRitning()}<div class="vhs-styr" inert>${kas(4, CAP)}</div></div>` +
-      `<a class="vhs-hit rum-sak" href="#matcher" data-nav="video" aria-label="Videon">${hitYtor()}</a></div>` +
+      `<a class="vhs-hit rum-sak" href="#matcher" data-nav="video" aria-label="Videon">${hitYtor()}</a></div></div>` +
       '</div></div>';
   }
 
@@ -362,6 +377,7 @@ window.RumVideo = (() => {
   function mount(root, o) {
     const box = root.querySelector('#rum-vhs');
     const inn = box.querySelector('.vhs-in');
+    const kam = box.querySelector('.vhs-kam');
     const styr = [...box.querySelectorAll('.vhs-styr')];
     const bild = box.querySelector('.vhs-bild');
     const mask = box.querySelector('.vhs-mask');
@@ -720,6 +736,12 @@ window.RumVideo = (() => {
       inn.classList.remove('byt');
     }
 
+    // Kameran runt tv:n (SVANG s, null på håll), samtidigt som rummet vrids.
+    function sving(s) {
+      kam.classList.toggle('glid', !o.calm());
+      kam.style.transform = `rotateY(${s ? s.horn : 0}deg)`;
+    }
+
     function tat(on) {
       if (!V.near || on === V.tat) return;
       V.tat = on;
@@ -730,6 +752,7 @@ window.RumVideo = (() => {
       if (on) skarp(true);
       else V.skarpT = setTimeout(() => { if (!V.tat) skarp(false); }, 900);
       box.classList.toggle('vhs-tat', on);
+      sving(on ? SVANG.tat : SVANG.nara);
       if (o.aim) o.aim(on ? TAT : FOCUS);
     }
 
@@ -782,6 +805,7 @@ window.RumVideo = (() => {
         V.near = on;
         V.tat = false;
         box.classList.remove('vhs-tat');
+        sving(on ? SVANG.nara : null);
         for (const s of styr) s.inert = !on;
         if (!on && P.frame && P.st !== 2 && P.st !== 0) {
           cmd('pauseVideo');

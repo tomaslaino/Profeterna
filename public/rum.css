@@ -305,6 +305,8 @@ a.rum-sak, a.rum-sak:hover { color: inherit; text-decoration: none; }
 /* gänget och pulten går kameran förbi på vägen fram */
 .rum-pl.forbi, .rum-pl3d > .rum-inr { transition: opacity 0.5s; }
 .rum.sak-nara .rum-pl.forbi, .rum.sak-nara .rum-pl3d > .rum-inr { opacity: 0; transition-duration: 0.25s; }
+/* rummet vrids kring videon när kameran svänger runt den (sving i rum.js) */
+.rum-pl.glid { transition: transform 0.6s cubic-bezier(0.3, 0, 0.2, 1), opacity 0.5s; }
 /* nära en sak lyser ingenting när man pekar på det */
 .rum.sak-nara .rum-sak:hover, .rum.sak-nara .rum-sak:focus-visible { filter: none; }
 .rum.sak-nara #rum-vm94 { filter: drop-shadow(0 3px 4px rgba(0, 0, 0, 0.5)); }
@@ -324,7 +326,7 @@ a.rum-sak, a.rum-sak:hover { color: inherit; text-decoration: none; }
 .rum-sakfot .rum-guld { text-shadow: 0 1px 10px #000; }
 .rum-sakfot .foto { font: italic 400 14px/1.5 Fraunces, Georgia, serif; color: #e9dfc8; opacity: 0.85; text-shadow: 0 1px 8px #000; }
 .rum-sakfot .foto a { color: #a9c8fb; text-decoration: underline; text-underline-offset: 3px; text-decoration-thickness: 1px; }
-@media (prefers-reduced-motion: reduce) { .rum-sakfot, .rum-sakfot.on, .rum.sak-nara .rum-world, .rum-pl.forbi, .rum-pl3d > .rum-inr { transition: none; } }
+@media (prefers-reduced-motion: reduce) { .rum-sakfot, .rum-sakfot.on, .rum.sak-nara .rum-world, .rum-pl.forbi, .rum-pl.glid, .rum-pl3d > .rum-inr { transition: none; } }
 
 /* ---------- tv:n: rum-tv.css ---------- */
 

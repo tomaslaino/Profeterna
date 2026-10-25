@@ -2509,12 +2509,15 @@ med en handskriven etikett: lagen, resultatet och dagen. Långa namn skrivs mind
 Dolda resultat står inget resultat på etiketten och klippets rubrik täcks i rutan.
 
 **Nära** (klick eller V) går kameran fram tills tv:n, högen och lådan ryms mellan namnet och
-foten (högst sex gånger). Inget vrids eller flyttas: tv:n och lådan står kvar vända mot
-gänget, och man ser dem från sidan som på håll. Kassetterna glider ut en bit när man pekar
-på dem. Ett klick på rutan (eller hjulet framåt) går
-ännu närmare, så att rutan fyller bilden (högst sexton gånger; i telefonen på höjden syns
-knapparna under den); ett klick till,
-hjulet bakåt eller Esc går tillbaka till tv:n och lådan. Ett klick på en kassett: den
+foten (högst sex gånger), och svänger samtidigt runt tv:n in mot rummet, så att man ser
+rutan snett framifrån i stället för från sidan. Tv:n och lådan vrids inte och flyttas inte –
+de står kvar vända mot gänget – utan det är kameran som rör sig (se *Kamerans sväng* nedan).
+Kassetterna glider ut en bit när man pekar på dem. Ett klick på rutan (eller hjulet framåt)
+går ännu närmare, så att rutan fyller bilden (högst sexton gånger; i telefonen på höjden syns
+knapparna under den), och kameran svänger lite till, så att rutan syns nästan rakt
+framifrån; ett klick till, hjulet bakåt eller Esc går tillbaka till tv:n och lådan, och V,
+Esc eller ett klick utanför hörnet tillbaka till rummet, där kameran svänger tillbaka till
+där den stod. Ett klick på en kassett: den
 lyfts (ur lådan dras den först ut genom öppningen), ställs framför facket och skjuts in,
 luckan fälls upp, och de ovanför sjunker ner i
 luckan i högen. Rutan är blå med *▶ SPELA* tills bilden kommer, och klippet spelas i
@@ -2538,6 +2541,21 @@ visar videon sin blå bild med *▶ SPELA*, utan ljud, tills klippet har spelat 
 (`FORVARM`); när den spelar vidare efter en paus spolar den först tillbaka lika mycket, så
 att bilden fortsätter där den stannade, och när man spolar med ◀◀ och ▶▶ hoppar den till
 3,6 sekunder före målet. Slutet, och förslagen efter det, täcks direkt.
+
+**Kamerans sväng.** Rummet är målat på platta plan, så kameran kan inte gå runt i det på
+riktigt. Svängen är i stället två saker som sker samtidigt, på 0,6 sekunder som
+förstoringen: rummets plan vrids 30 grader i 3D kring tv:n (34 när rutan fyller bilden;
+`sving` i rum.js), och hörnet – tv:n, högen och lådan, som är lådor i 3D i rummets eget
+perspektiv – ritas från samma håll, 30 respektive 46 grader runt tv:ns mitt (`SVANG` och
+`.vhs-kam` i rum-video.js). Planen vrids som de är, och väggen, skårtavlan, korktavlan och
+disken följer med; tv:n och lådan ses från det nya hållet. Hörnets eget plan vrids inte: det
+står där rummet vrids kring, och Chrome ritar allt som lutar i perspektiv suddigt nära. Det
+flyttas i stället fram lika långt som väggen vrids fram bakom lådan och görs lika mycket
+mindre, så att det syns där det syntes. Större vinklar går inte: vid ungefär 40 grader glider
+fönsterbänken in över lådan och lådan ser ut att sväva över disken. Nära tar bara hörnet
+emot klick – med kameran svängd räknade Chrome annars kortregistret på disken bakom lådan
+som närmast, och kassetterna i lådan gick inte att klicka på. Med `prefers-reduced-motion`
+och i fasta bilder står kameran direkt i vinkeln. Lagren blir inte fler eller större.
 
 Hörnet ritas i sex gånger storleken och förminskas, som tv:n, och dubbelt till (`zoom: 2`)
 när rutan fyller bilden (det andra klicket), så att det är skarpt också där; ritningarna är
