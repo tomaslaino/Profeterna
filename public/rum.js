@@ -68,7 +68,7 @@ window.Rum = (() => {
 
 
   const R = { built: false, on: false, el: null, q: new URLSearchParams(location.search), t0: performance.now(), frozen: null,
-    mx: 0.5, my: -0.25, tx: 0.5, ty: -0.25, raf: 0, fig: null, zoom: null, last: 0, px: 0.5, py: 0.5, pek: 'mouse' };
+    mx: 0.5, my: -0.25, tx: 0.5, ty: -0.25, raf: 0, fig: null, zoom: null, last: 0, px: 0.5, py: 0.5, pek: 'mouse', dold: new Set() };
   const still = () => R.frozen != null;
   const calm = () => still() || matchMedia('(prefers-reduced-motion: reduce)').matches;
   const now = () => (still() ? R.frozen : (performance.now() - R.t0) / 1000);
@@ -757,7 +757,42 @@ ${window.RumRegister ? RumRegister.nara() : ''}
     R.reg = window.RumRegister ? RumRegister.mount(el, { calm, kort: (n) => BOARD[n] || short(n), close: () => register(false), tur: (fn) => tur(fn, 3) }) : null;
     paintUte();
     R.bakat = baka();
+    // gatan syns genom fönstret och dörren, och gänget och röken står i
+    // dukens vänstra del (utsikten och duken är större än det de visar)
+    const ute = syn(el.querySelector('#rum-ute'), DORR.x, WIN.y, WIN.x + WIN.w - DORR.x, DORR.y + DORR.h - WIN.y);
+    R.gang = syn(el.querySelector('#rum-3d').parentElement, 160, 120, 860, 560);
+    for (const x of [ute, R.gang, el.querySelector('#rum-damm')]) sikt(x);
   }
+
+  // en osynlig ruta som sikt följer i stället för något större (först, så
+  // att den inte blir ett eget lager)
+  function syn(i, x, y, b, h) {
+    const e = document.createElement('i');
+    e.className = 'rum-syn';
+    Object.assign(e.style, { left: `${x}px`, top: `${y}px`, width: `${b}px`, height: `${h}px` });
+    i.prepend(e);
+    return e;
+  }
+
+  // Det som inte syns – utanför fönstret, eller när kameran står nära något
+  // annat – ritas inte: gänget, sakerna och dammet ritas bara när deras duk
+  // syns (de står kvar som de var), och gatan utanför står still när
+  // fönstret och dörren inte syns (.vila i rum-ute.css).
+  function sikt(x) {
+    if (!x || !window.IntersectionObserver) return;
+    if (!R.sikt) {
+      R.sikt = new IntersectionObserver((list) => {
+        for (const e of list) {
+          if (e.isIntersecting) R.dold.delete(e.target);
+          else R.dold.add(e.target);
+          if (e.target.parentElement.id === 'rum-ute') e.target.parentElement.classList.toggle('vila', !e.isIntersecting && !still());
+        }
+      });
+    }
+    R.sikt.observe(x);
+  }
+  // (utan rörelser ritas bara en bild då och då, och den ska ha allt)
+  const syns = (x) => calm() || !R.dold.has(x);
 
   // ---------- datan ----------
 
@@ -1253,9 +1288,9 @@ ${window.RumRegister ? RumRegister.nara() : ''}
       R.neon = on;
       R.el.classList.toggle('neon-av', !on);
     }
-    if (!calm() || still()) dust(t);
-    if (R.fig) R.fig.draw(t, R.mx, R.my);
-    if (R.saker) R.saker.draw(t, R.mx, R.my, R.rows, R.old);
+    if ((!calm() || still()) && syns(document.getElementById('rum-damm'))) dust(t);
+    if (R.fig && syns(R.gang)) R.fig.draw(t, R.mx, R.my);
+    if (R.saker) R.saker.draw(t, R.mx, R.my, R.rows, R.old, syns(R.sakDuk));
     if (R.inr) R.inr.draw();
   }
 
@@ -1348,7 +1383,7 @@ ${window.RumRegister ? RumRegister.nara() : ''}
     if (R.fig || R.loading) return;
     R.loading = true;
     // askkoppen, snusdosan, fläkten och affischen (rum-saker.js)
-    tur(() => import('./rum-saker.js').then((m) => m.saker(R.el, { calm: calm() })).then((x) => { R.saker = x; frame(); }), 2)
+    tur(() => import('./rum-saker.js').then((m) => m.saker(R.el, { calm: calm() })).then((x) => { R.saker = x; R.sakDuk = R.el.querySelector('canvas.rum-saker'); sikt(R.sakDuk); frame(); }), 2)
       .catch((err) => console.warn('Rummet: sakerna kunde inte ritas', err));
     // lysröret, neonen, skyltarna, uret, ramarna, paketen, stolen och kupongstället (rum-inredning.js)
     tur(() => import('./rum-inredning.js').then((m) => m.inredning(R.el, { calm: calm(), still })).then((x) => { R.inr = x; x.namn(R.ramNamn); if (R.sak) sak(R.sak, null); frame(); }), 1)
@@ -1373,6 +1408,28 @@ ${window.RumRegister ? RumRegister.nara() : ''}
   // snabbvalet på text-tv:n som föremålet leder till
   function hot(nav) {
     for (const a of R.el.querySelectorAll('[data-to]')) a.classList.toggle('hot', nav === a.dataset.to);
+  }
+
+  // Elementets mått i fönstret. WebKit utan GetBoundingClientRectZoomed
+  // (Safari i iPhone) delar måtten för det som står i något med CSS zoom med
+  // zoomen – tv:n ritas i zoom 1,5 eller 3 – så att kameran siktade på fel
+  // ställe och tv:n hamnade utanför bilden. Där förstoras de tillbaka med
+  // zoomen på vägen upp.
+  let zoomDelar = null;
+  function rekt(el) {
+    const r = el.getBoundingClientRect();
+    if (zoomDelar == null) {
+      const a = document.createElement('div');
+      a.style.cssText = 'position:fixed; left:0; top:0; zoom:2; visibility:hidden';
+      a.innerHTML = '<div style="width:10px; height:10px"></div>';
+      document.body.append(a);
+      zoomDelar = a.firstChild.getBoundingClientRect().width < 15;
+      a.remove();
+    }
+    if (!zoomDelar) return r;
+    let z = 1;
+    for (let p = el; p; p = p.parentElement) z *= parseFloat(getComputedStyle(p).zoom) || 1;
+    return z === 1 ? r : new DOMRect(r.x * z, r.y * z, r.width * z, r.height * z);
   }
 
   // Föremålets (eller måttens) mitt i scenens koordinater.
@@ -1540,7 +1597,7 @@ ${window.RumRegister ? RumRegister.nara() : ''}
       if (calm()) R.mx = R.my = 0;
       setCam(0, 0);
     }
-    const r = R.tv && R.tv.zoom(on);
+    const r = R.tv && R.tv.zoom(on, rekt);
     setCam(R.mx, R.my);
     // så nära som ryms i fönstret (i telefonen fyller tv:n bredden)
     const z = r && Math.min(3.6, (innerWidth - 24) / r.width, (innerHeight - 110) / r.height);
@@ -2732,9 +2789,7 @@ ${window.RumRegister ? RumRegister.nara() : ''}
   }
 
   // Scenen täcker fönstret (1600 × 1000, beskuren i kanterna); det som inte
-  // ryms når man med fingret (pan). I telefonen på höjden syns lite mer av
-  // rummet: scenen fyller 80 % av höjden, med mörkt över och under.
-  const HOJD = 0.8;
+  // ryms når man med fingret (pan).
   function fit() {
     if (!R.el || R.el.hidden) return;
     // för litet för rummet: den vanliga förstasidan (route i app.js)
@@ -2742,7 +2797,7 @@ ${window.RumRegister ? RumRegister.nara() : ''}
       dispatchEvent(new HashChangeEvent('hashchange'));
       return;
     }
-    R.k = Math.max(innerWidth / W, (innerHeight / H) * (LATT ? HOJD : 1));
+    R.k = Math.max(innerWidth / W, innerHeight / H);
     pan(R.px, R.py);
     // i telefonen på höjden: den smala kupongen, och på bredden orden
     // bredvid kupongen i handen

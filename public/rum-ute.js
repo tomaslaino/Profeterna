@@ -672,7 +672,7 @@ window.RumUte = (() => {
   function paint(el, v, rects) {
     if (!el) return false;
     const L = light(v);
-    if (!el.firstChild) {
+    if (!el.querySelector('[data-lager]')) {
       for (const [k, tag, cls] of LAGER) {
         const x = tag === 'svg' ? document.createElementNS('http://www.w3.org/2000/svg', 'svg') : document.createElement('div');
         x.setAttribute('class', cls);

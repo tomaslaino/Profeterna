@@ -4,6 +4,8 @@
 
 .rum-ute { position: absolute; left: 0; top: 0; width: 1600px; height: 1000px; pointer-events: none; }
 .rum-ute-himmel, .rum-ute-gata { filter: blur(1.3px); }
+/* när fönstret och dörren inte syns står gatan still (sikt i rum.js) */
+.rum-ute.vila *, .rum-ute.vila *::before, .rum-ute.vila *::after { animation-play-state: paused; }
 
 /* de som går, cyklar och åker förbi: gatans x i --fran … --till */
 .rum-gar, .rum-moln, .rum-fagel { position: absolute; left: 0; animation: rum-gar linear infinite; will-change: transform; }

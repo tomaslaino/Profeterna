@@ -57,6 +57,9 @@ html.i-rummet body > footer { display: none; }
    själv: ett plan som ritar får en yta i hela scenens storlek (Safari ritar
    den gånger skärmens pixeltäthet) också när det som ritas är litet. */
 .rum-pl > * { will-change: transform; }
+/* det som sikt i rum.js följer i stället för något större: osynligt och utan eget lager */
+.rum-syn { position: absolute; visibility: hidden; pointer-events: none; }
+.rum-pl > .rum-syn { will-change: auto; }
 /* i telefonen syns världen först när den är klar (laddar i rum.js) */
 .rum.laddar .rum-world { visibility: hidden; }
 .rum-layer { position: absolute; left: 0; top: 0; width: 1600px; height: 1000px; pointer-events: none; }
