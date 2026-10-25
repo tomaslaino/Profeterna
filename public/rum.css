@@ -25,7 +25,8 @@ html.i-rummet body > footer { display: none; }
 }
 .rum.dyker .rum-stage { opacity: 0; }
 
-/* kameran: förstoringen när man går fram till något (2D, efter perspektivet) */
+/* kameran: förstoringen när man går fram till något (2D, efter perspektivet);
+   aim i rum.js sätter transformen direkt, inte som variabler */
 .rum-kamera {
   position: absolute;
   left: 0;
@@ -35,7 +36,7 @@ html.i-rummet body > footer { display: none; }
   perspective: 1400px;
   perspective-origin: 800px 500px;
   transform-origin: 800px 500px;
-  transform: translate(var(--dx, 0px), var(--dy, 0px)) scale(var(--z, 1));
+  transform: translate(0px, 0px) scale(1);
   pointer-events: none;
 }
 .rum-kamera.glid { transition: transform 0.6s cubic-bezier(0.3, 0, 0.2, 1); }
@@ -52,7 +53,7 @@ html.i-rummet body > footer { display: none; }
    för transform, så att Chromium ritar det som syns skarpt när kameran står
    still, nära och på håll (ett lager med will-change: transform behåller sin
    skärpa). */
-.rum.chromium .rum-kamera { transform: translate(var(--dx, 0px), var(--dy, 0px)) scale(var(--z, 1)) perspective(100000px); }
+.rum.chromium .rum-kamera { transform: translate(0px, 0px) scale(1) perspective(100000px); }
 .rum-world {
   position: absolute;
   left: 0;

@@ -444,6 +444,7 @@ window.RumTv = (() => {
       short: o.short, kort: o.kort || o.short, wd: o.wd, hm: o.hm, matches: o.matches || (() => []),
     };
     const box = root.querySelector('#rum-tv3');
+    const pos = box.parentElement;
     const front = root.querySelector('#rum-tvfront');
     const glas = root.querySelector('#rum-ttx');
     const hd = glas.querySelector('.hd');
@@ -649,7 +650,13 @@ window.RumTv = (() => {
           T.typed = '';
           showLed(T.on ? String(T.nr) : '   ');
         }
+        // Nära ritas tv:n i tre gånger storleken (.skarp, rum-tv.css) och på
+        // håll i sin egen. zoom ändrar också måtten i vridningen, så den byts
+        // med övergången avstängd: innan tv:n vrids fram, och när den har
+        // vridits tillbaka.
+        clearTimeout(T.skarp);
         box.classList.add('mat');
+        if (on) pos.classList.add('skarp');
         box.classList.toggle('nara', on);
         const r = rekt(front);
         box.classList.toggle('nara', !on);
@@ -657,6 +664,15 @@ window.RumTv = (() => {
         box.classList.remove('mat');
         void box.offsetWidth;
         box.classList.toggle('nara', on);
+        if (!on) {
+          T.skarp = setTimeout(() => {
+            if (T.near) return;
+            box.classList.add('mat');
+            pos.classList.remove('skarp');
+            void box.offsetWidth;
+            box.classList.remove('mat');
+          }, 900);
+        }
         return r;
       },
       // Tangenterna när tv:n är nära: pilarna bläddrar, tre siffror väljer sida.

@@ -593,8 +593,7 @@ window.RumAnslag = (() => {
         ov.classList.add('on');
         ov.classList.remove('ute');
         wallEl.classList.add('borta');
-        luta.style.setProperty('--rx', '0deg');
-        luta.style.setProperty('--ry', '0deg');
+        luta.style.transform = '';
         if (o.calm()) {
           rest();
           ov.classList.add('framme');
@@ -621,13 +620,15 @@ window.RumAnslag = (() => {
       return fly(A.place ? A.place.q : quad(), q || quad(), 560).then(end);
     }
 
-    // Lutar lite efter musen, så att ramens djup syns.
+    // Lutar lite efter musen, så att ramens djup syns. Vinkeln sätts som
+    // transform direkt, inte som CSS-variabler: de ärvs av allt på tavlan,
+    // och då räknade Chrome om stilen för alla lappar och målade om dem vid
+    // varje musrörelse.
     ov.addEventListener('mousemove', (e) => {
       if (!A.on || A.lyft || o.calm()) return;
       const x = (e.clientX / innerWidth) * 2 - 1;
       const y = (e.clientY / innerHeight) * 2 - 1;
-      luta.style.setProperty('--ry', `${r1(x * 5)}deg`);
-      luta.style.setProperty('--rx', `${r1(-y * 3.5)}deg`);
+      luta.style.transform = `rotateX(${r1(-y * 3.5)}deg) rotateY(${r1(x * 5)}deg)`;
     });
     addEventListener('resize', () => {
       fitWall();
