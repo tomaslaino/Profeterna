@@ -6,10 +6,14 @@
    fram att inget hörn går in i väggen (planet -600, här -130). Nära
    (.nara) vrids den rakt fram mot betraktaren.
 
-   Lådan ritas i tre gånger storleken (zoom: 3) och förminskas igen
+   Nära ritas lådan i tre gånger storleken (zoom: 3) och förminskas igen
    (scale3d): Chrome ritar inte om lager i perspektiv när kameran går fram,
    så text-tv:n måste ha skärpan i reserv för att vara skarp på nära håll.
-   Alla mått nedan är i lådans egna 292 × 196. */
+   På håll ritas den i sin egen storlek (.skarp på .rum-tvpos bara nära,
+   zoom i rum-tv.js): Chrome ritar lager i perspektiv minst i sin egen
+   storlek hur litet de än syns, så i tre gånger storleken tog tv:n
+   ungefär 60 MB grafikminne också på håll. Alla mått nedan är i lådans
+   egna 292 × 196. */
 
 .rum-pl3d { transform-style: preserve-3d; }
 
@@ -24,15 +28,16 @@
   top: 0;
   width: 292px;
   height: 196px;
-  zoom: 3;
   transform-style: preserve-3d;
   transform-origin: 0 0;
-  transform: scale3d(0.3333, 0.3333, 0.3333) translate3d(146px, 98px, -20px) rotateY(-44deg) rotateX(-5deg) translate3d(-146px, -98px, 132px);
+  transform: translate3d(146px, 98px, -20px) rotateY(-44deg) rotateX(-5deg) translate3d(-146px, -98px, 132px);
   transition: transform 0.6s cubic-bezier(0.3, 0, 0.2, 1);
 }
 /* nära: rakt fram, parallell med bilden – då blir rutan en rak rektangel
    (vriden mot ögat blir den sned, eftersom den sitter högt upp till höger) */
-.rum-tv3.nara { transform: scale3d(0.3333, 0.3333, 0.3333) translate3d(146px, 98px, -20px) rotateY(0deg) rotateX(0deg) translate3d(-146px, -98px, 132px); }
+.rum-tv3.nara { transform: translate3d(146px, 98px, -20px) rotateY(0deg) rotateX(0deg) translate3d(-146px, -98px, 132px); }
+.skarp > .rum-tv3 { zoom: 3; transform: scale3d(0.3333, 0.3333, 0.3333) translate3d(146px, 98px, -20px) rotateY(-44deg) rotateX(-5deg) translate3d(-146px, -98px, 132px); }
+.skarp > .rum-tv3.nara { transform: scale3d(0.3333, 0.3333, 0.3333) translate3d(146px, 98px, -20px) rotateY(0deg) rotateX(0deg) translate3d(-146px, -98px, 132px); }
 .rum-tv3.mat { transition: none; }
 .rum-tv3 i, .rum-tv3 b, .rum-tv3 em { display: block; font-style: normal; }
 
@@ -60,8 +65,9 @@
 
 /* armen: en fyrkantsprofil från leden bakom tv:n till väggplattan, och
    sladden som hänger från armen till uttaget under plattan. Står still när
-   tv:n vrids, och ritas i tre gånger storleken som lådan. */
-.tv-fot { position: absolute; left: 0; top: 0; width: 292px; height: 196px; zoom: 3; transform-style: preserve-3d; transform-origin: 0 0; transform: scale3d(0.3333, 0.3333, 0.3333); pointer-events: none; }
+   tv:n vrids, och ritas i samma storlek som lådan. */
+.tv-fot { position: absolute; left: 0; top: 0; width: 292px; height: 196px; transform-style: preserve-3d; transform-origin: 0 0; pointer-events: none; }
+.skarp > .tv-fot { zoom: 3; transform: scale3d(0.3333, 0.3333, 0.3333); }
 
 /* I telefonen i en och en halv gång storleken: där går kameran högst så nära
    att tv:n fyller bredden (stående) eller höjden mellan namnet och foten
@@ -69,10 +75,10 @@
    i full storlek gånger skärmens pixeltäthet – i tre gånger storleken tog
    tv:n nästan 90 MB i en iPhone. Texten påverkas inte (18 px blir 27 px). */
 @media (max-width: 700px), (max-height: 500px) {
-  .rum-tv3, .tv-fot { zoom: 1.5; }
-  .rum-tv3 { transform: scale3d(0.6667, 0.6667, 0.6667) translate3d(146px, 98px, -20px) rotateY(-44deg) rotateX(-5deg) translate3d(-146px, -98px, 132px); }
-  .rum-tv3.nara { transform: scale3d(0.6667, 0.6667, 0.6667) translate3d(146px, 98px, -20px) rotateY(0deg) rotateX(0deg) translate3d(-146px, -98px, 132px); }
-  .tv-fot { transform: scale3d(0.6667, 0.6667, 0.6667); }
+  .rum-tv3, .tv-fot, .skarp > .rum-tv3, .skarp > .tv-fot { zoom: 1.5; }
+  .rum-tv3, .skarp > .rum-tv3 { transform: scale3d(0.6667, 0.6667, 0.6667) translate3d(146px, 98px, -20px) rotateY(-44deg) rotateX(-5deg) translate3d(-146px, -98px, 132px); }
+  .rum-tv3.nara, .skarp > .rum-tv3.nara { transform: scale3d(0.6667, 0.6667, 0.6667) translate3d(146px, 98px, -20px) rotateY(0deg) rotateX(0deg) translate3d(-146px, -98px, 132px); }
+  .tv-fot, .skarp > .tv-fot { transform: scale3d(0.6667, 0.6667, 0.6667); }
 }
 .tv-fot i { position: absolute; display: block; transform-origin: 0 0; }
 .tv-arm { left: 146px; top: 94px; width: 0; height: 0; transform-style: preserve-3d; transform: translateZ(-20px) rotateY(23.6deg) rotateZ(-3.3deg); }

@@ -1443,14 +1443,20 @@ ${window.RumRegister ? RumRegister.nara() : ''}
     return [((r.left + r.width / 2 - st.left) / st.width) * W, ((r.top + r.height / 2 - st.top) / st.height) * H];
   }
 
-  // Kameran går fram: punkten p hamnar på to med förstoringen z.
+  // Kameran går fram: punkten p hamnar på to med förstoringen z. Det sätts
+  // som transform direkt, inte som CSS-variabler: de ärvs av allt i rummet,
+  // och Chrome målade då om allt som har en variabel i stilen – tv:ns och
+  // anslagstavlans sidor, videons ritningar och väggarna – varje gång
+  // kameran började gå fram eller tillbaka. Det ritades om medan kameran
+  // gick, minnet tog slut och rutor fattades (flimmer). I Chromium har
+  // transformen ett perspektiv som inte syns (.chromium i rum.css).
   function aim(p, z, to, cls) {
     const w = document.getElementById('rum-kamera');
     w.classList.remove('glid', 'dyk');
     if (cls) w.classList.add(cls);
-    w.style.setProperty('--z', z);
-    w.style.setProperty('--dx', `${r1(to[0] - 800 - z * (p[0] - 800))}px`);
-    w.style.setProperty('--dy', `${r1(to[1] - 500 - z * (p[1] - 500))}px`);
+    const dx = r1(to[0] - 800 - z * (p[0] - 800));
+    const dy = r1(to[1] - 500 - z * (p[1] - 500));
+    w.style.transform = `translate(${dx}px, ${dy}px) scale(${z})${R.el.classList.contains('chromium') ? ' perspective(100000px)' : ''}`;
   }
 
   // Ett föremål: kameran går fram mot det en kort stund innan sidan byts.
@@ -1555,8 +1561,8 @@ ${window.RumRegister ? RumRegister.nara() : ''}
     if (on && R.ans && R.ans.on()) board(false);
     if (on && R.reg && R.reg.on()) register(false);
     R.vnara = on;
-    // i telefonen ritas hörnet skarpt bara när rutan fyller bilden (tat i
-    // rum-video.js), och i halva storleken igen när tv:n har vridits bort
+    // hörnet ritas skarpt bara när rutan fyller bilden (tat i rum-video.js),
+    // och i halva storleken igen när tv:n har vridits bort
     clearTimeout(R.vskarp);
     if (on) R.video.skarp(false);
     else R.vskarp = setTimeout(() => { if (!R.vnara) R.video.skarp(false); }, 900);

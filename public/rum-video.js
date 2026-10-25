@@ -32,7 +32,8 @@
 // inte på etiketten, och klippets rubrik täcks som i spelaren på sajten.
 //
 // Allt ritas i sex gånger storleken och förminskas (som tv:n i rum-tv.js),
-// så att det är skarpt på nära håll – spelaren i dubbla storleken till.
+// så att det är skarpt på nära håll – i dubbla storleken till när rutan
+// fyller bilden, och spelaren i dubbla storleken till.
 // Väggen, disken och pulten fortsätter till höger om bilden (vagg och
 // pult), så att lådan står på något när kameran går dit.
 //
@@ -714,8 +715,8 @@ window.RumVideo = (() => {
 
     // Närmare: rutan fyller bilden; ett klick på rutan till
     // och man går tillbaka till tv:n och lådan.
-    // I telefonen ritas hörnet i halva storleken, och i hela när rutan fyller
-    // bilden (.skarp, rum-video.css; tat). zoom ändrar också måtten i
+    // Hörnet ritas i halva storleken, och i hela när rutan fyller bilden
+    // (.skarp, rum-video.css; tat). zoom ändrar också måtten i
     // övergångarna, så det byts med övergångarna avstängda, när inget rör sig.
     function skarp(on) {
       if (inn.classList.contains('skarp') === on) return;
@@ -728,8 +729,8 @@ window.RumVideo = (() => {
     function tat(on) {
       if (!V.near || on === V.tat) return;
       V.tat = on;
-      // i telefonen ritas hörnet skarpt bara här, där rutan fyller bilden:
-      // innan kameran går fram, och i halva storleken igen när den har gått
+      // hörnet ritas skarpt bara här, där rutan fyller bilden: innan
+      // kameran går fram, och i halva storleken igen när den har gått
       // tillbaka
       clearTimeout(V.skarpT);
       if (on) skarp(true);

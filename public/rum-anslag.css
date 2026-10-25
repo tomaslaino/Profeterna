@@ -276,7 +276,7 @@
 .rum-ansn.on .ans-bak { opacity: 1; }
 .rum-ansn.ute .ans-bak { opacity: 0; transition-duration: 0.5s; }
 .ans-flyg { position: absolute; left: 0; top: 0; width: 1000px; height: 568px; transform-origin: 0 0; perspective: 2400px; }
-.ans-luta { position: absolute; inset: 0; transform-style: preserve-3d; transform: rotateX(var(--rx, 0deg)) rotateY(var(--ry, 0deg)); transition: transform 0.4s ease-out; }
+.ans-luta { position: absolute; inset: 0; transform-style: preserve-3d; transform: rotateX(0deg) rotateY(0deg); transition: transform 0.4s ease-out; }
 .ans-tavla.stor .ans-yta { box-shadow: 0 34px 70px rgba(0, 0, 0, 0.6), inset 0 1.5px 0 rgba(255, 230, 190, 0.35), inset 0 -2px 0 rgba(0, 0, 0, 0.45), inset 1.5px 0 0 rgba(255, 230, 190, 0.18), inset -2px 0 0 rgba(0, 0, 0, 0.35); }
 .ans-tavla.stor:focus { outline: none; }
 .rum-ansn.framme .ans-tavla.stor .ans-yta, .rum-ansn.framme .ans-tavla.stor .ans-jute { transform-style: preserve-3d; }
