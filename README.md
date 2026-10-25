@@ -1293,7 +1293,8 @@ under omgången.
    initialer (*Vem är du?* – sparas på enheten, de ringas in), kryssar i sin kolumn med
    modellens odds under rutorna och kan skriva en kort motivering under matchen man just
    tippade (högst 140 tecken). I telefonen står matchens nummer före lagen. Raden med initialerna står kvar överst när man bläddrar.
-   Nederst hur många matcher som är tippade, garderingar och rader, med streckkoden och
+   Nederst hur många matcher som är tippade, garderingar och rader (med regeln spikarna och
+   garderingarna mot den och oddset, se *Regeln* nedan), med streckkoden och
    omgångens id till höger (som på kupongen på pulten i tobaksaffären), och under dem raden
    med allt man gör med kupongen, som står kvar nederst medan man bläddrar (som raden med
    initialerna överst): till höger *Spara* och *Lämna in*, till vänster
@@ -1302,7 +1303,7 @@ under omgången.
    kupong som inte är färdig utan att lämna in – tipsen stannar på enheten, tjänsten får
    bara antalet tippade, så att de andra ser tårtbiten – och blir *Sparad* tills man
    ändrar något. *Lämna in* kräver tecken i alla matcher – annars blir
-   rutorna som saknar kryss röda. Har
+   rutorna som saknar kryss röda – och att kupongen följer regeln. Har
    matcherna ändrats sedan sidan öppnades säger tjänsten till, och sidan visar de nya
    matcherna med ens tecken kvar där matchen fortfarande är med.
    **Ändra sin kupong** (2026-10-22): har man lämnat in går ens kolumn fortfarande att
@@ -1338,8 +1339,8 @@ under omgången.
    - *Eniga* – klubbas utan snack
 5. **Gängets kupong** (så fort man ser de andras tips, också om någon inte har lämnat in):
    man trycker på rutorna (två rutor =
-   gardering). Den börjar som förslaget – tecknen som fler än hälften har med; *Alla olika*
-   lämnas tomma – och sparas bara på enheten, så en håller i pennan under uppgörelsen (*Börja
+   gardering). Den börjar som förslaget – med regeln ett som följer den (se *Regeln*), annars
+   tecknen som fler än hälften har med och *Alla olika* tomma – och sparas bara på enheten, så en håller i pennan under uppgörelsen (*Börja
    om* går tillbaka till förslaget). Nederst syns kupongen som rutor med antal rader.
    - *Spara gängets kupong* sparar den direkt därifrån – samma tjänst och kontroller som *Spara kupong*
      under Ny kupong (se [Kupongen](#kupongen)). Matcher utan tecken kommer inte med; sidan
@@ -1369,9 +1370,33 @@ under omgången.
    Motiveringarna och kommentarerna sparas i tipparhistoriken och står sedan under matcherna
    i Grupparbetena (se [Kuponghistoriken](#kuponghistoriken)).
 
+**Regeln** (2026-10-25): gänget spelar Stryktipset med 4 spikar, 5 halvgarderingar och 4
+helgarderingar (2 592 rader) – `regel: {spik: 4, halv: 5, hel: 4}` i
+[config/kupong.js](config/kupong.js), som bygget skriver i `data/kuponger.json` under
+`samtal.regel` ([public/samtal.js](public/samtal.js), `regel`, `brott` och `fit`). Den gäller
+omgångar med lika många matcher som regeln (tretton); `regel: null` stänger av den. Med regeln:
+
+- **Foten** på papperet, i uppgörelsen och på kupongen på pulten i tobaksaffären visar
+  *Spikar*, *Halvgard* och *Helgard* mot regeln (t.ex. 3/4) och *Odds* – fyra fält på en rad.
+  Siffran blir röd när det är fler än regeln har. *Tippat*, *Garderingar* och priset står inte
+  där: med regeln är priset alltid detsamma.
+- **Lämna in** (på papperet och på pulten) går bara när kupongen har precis regelns spikar och
+  garderingar; annars står t.ex. *6 spikar – regeln är 4 spikar, 5 halvgarderingar och 4
+  helgarderingar.* En ändring av inlämnade tips får lämna matcher tomma, men inte ha fler av
+  något slag än regeln.
+- **Förslaget** till gängets kupong följer regeln, ur allas tips: varje tecken får det gänget
+  har med av det – en spik väger 3, en halvgardering 2 och en helgardering 1 – och spikarna,
+  halvgarderingarna och helgarderingarna läggs så att så mycket som möjligt av det kommer med.
+  De mest eniga matcherna blir spikar och de mest oeniga helgarderingar. Står två tecken lika
+  där ett av dem ska bort lämnas matchen tom åt uppgörelsen; ett tecken som ingen har med kommer
+  inte med. *Börja om* går tillbaka till förslaget.
+- **Spara gängets kupong** (på papperet och på pulten) går inte när den har fler av något slag
+  än regeln; matcher utan tecken frågar sidan om som förut.
+- Regeln kontrolleras på sidan, inte i tjänsten, som litar på gänget (se [Säkerhet](#säkerhet)).
+
 **Tjänsten** är samma som sparar kupongen (*profeterna-kupong*, adressen i
 [config/kupong.js](config/kupong.js) med `/samtal` i stället för `/kupong`; bygget skriver
-den i `data/kuponger.json` under `samtal`, med `gang` – vilka som tippar). Tipsen ligger i
+den i `data/kuponger.json` under `samtal`, med `gang` – vilka som tippar – och `regel`). Tipsen ligger i
 KV-bindningen `KUPONG`, inte på GitHub: `samtal:aktuellt` (omgången),
 `samtal:<id>:tips:<vem>` (en nyckel per person, så att två som lämnar in samtidigt inte
 skriver över varandra), `samtal:<id>:utkast:<vem>` (en sparad kupong som inte är inlämnad:

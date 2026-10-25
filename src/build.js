@@ -318,13 +318,14 @@ function couponSaveInfo(override) {
 }
 
 // Inför samtalet: gängets egna tips ligger i samma tjänst (…/kupong →
-// …/samtal, lokalt /api/samtal), och gang är vilka som tippar. Omgångens
+// …/samtal, lokalt /api/samtal), gang är vilka som tippar och regel hur
+// många spikar och garderingar en kupong har (config/kupong.js). Omgångens
 // namn skriver AI:n i samma proxy som analysen (…/analyze → …/namn, lokalt
 // /api/namn).
 function samtalInfo(override, analysis) {
   const save = couponSaveInfo(override);
   const a = analysisInfo(analysis);
-  return save ? { endpoint: save.replace(/kupong$/, 'samtal'), gang: kupongCfg.gang || [], namn: a ? a.endpoint.replace(/analyze$/, 'namn') : null } : null;
+  return save ? { endpoint: save.replace(/kupong$/, 'samtal'), gang: kupongCfg.gang || [], regel: kupongCfg.regel || null, namn: a ? a.endpoint.replace(/analyze$/, 'namn') : null } : null;
 }
 
 function commentInfo(override) {

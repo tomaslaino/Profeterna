@@ -12,7 +12,10 @@
 // prickar). När alla har lämnat in (senast när första matchen startar) ser
 // alla allt. Samma papper blir underlaget för uppgörelsen i telefon (steg 3):
 // matcherna sorteras efter hur oeniga vi är, och gängets kupong kryssas i
-// rutorna, med förslaget ikryssat från början. Den sparas direkt därifrån
+// rutorna, med förslaget ikryssat från början. Med gängets regel (4 spikar,
+// 5 halvgarderingar och 4 helgarderingar, config/kupong.js) räknar foten mot
+// den, Lämna in och Spara gängets kupong kräver den och förslaget följer
+// den. Gängets kupong sparas direkt därifrån
 // (postCoupon i kupong.js, samma som Ny kupong → Spara) – utan tjänsten i Ny
 // kupong med tecknen ifyllda. Gängets kupong (steg 4) står sedan på samma
 // papper med allas porträtt kvar och utfallen inringade (Samtal.paper, ritas
@@ -85,6 +88,32 @@
   };
   const rader = (signs) => signs.reduce((a, s) => a * Math.max(1, s.length), 1);
   const plural = (n, one, many) => `${n} ${n === 1 ? one : many}`;
+  // Gängets regel (config/kupong.js): så många spikar, halvgarderingar och
+  // helgarderingar har en kupong – på Stryktipsets tretton 4, 5 och 4. Gäller
+  // omgångar med lika många matcher som regeln. → {spik, halv, hel} | null.
+  const regel = (s) => {
+    const r = info() && info().regel;
+    return r && s && r.spik + r.halv + r.hel === s.matcher.length ? r : null;
+  };
+  // [nyckel, antal tecken, ett, flera, etiketten i foten (gängets ord)]
+  const SLAG = [['spik', 1, 'spik', 'spikar', 'Spikar'], ['halv', 2, 'halvgardering', 'halvgarderingar', 'Halvgard'],
+    ['hel', 3, 'helgardering', 'helgarderingar', 'Helgard']];
+  // Hur många spikar, halvgarderingar och helgarderingar tecknen i t
+  // ({matchens id: tecken}) har.
+  const slag = (s, t) => Object.fromEntries(SLAG.map(([k, n]) => [k, s.matcher.filter((x) => (t[x.id] || '').length === n).length]));
+  const och = (xs) => (xs.length > 1 ? `${xs.slice(0, -1).join(', ')} och ${xs[xs.length - 1]}` : xs[0]);
+  const regelText = (r) => och(SLAG.map(([k, , one, many]) => plural(r[k], one, many)));
+  // Det i t som bryter mot regeln: fler spikar eller garderingar än den
+  // tillåter. Med alla matcher tippade är det samma sak som att inte ha
+  // precis regelns, och medan några är tomma går resten fortfarande att
+  // fylla i enligt den. → en mening, eller '' om t följer regeln.
+  function brott(s, t) {
+    const r = regel(s);
+    if (!r) return '';
+    const n = slag(s, t);
+    const over = SLAG.filter(([k]) => n[k] > r[k]);
+    return over.length ? `${och(over.map(([k, , one, many]) => plural(n[k], one, many)))} – regeln är ${regelText(r)}.` : '';
+  }
   const kicks = (s) => s.matcher.map((x) => Date.parse(x.avspark)).filter(Number.isFinite);
   const over = (s) => Date.now() >= Math.max(...kicks(s));
   // Matchnamnet öppnar matchrutan, som på uppgörelsens papper.
@@ -403,9 +432,10 @@
   // vilken grupp matchen hamnar i.
   //   0 alla olika · 1 två mot en · 2 samma grund, olika säkerhet
   //   3 eniga mot modellen · 4 eniga · 5 bara en (eller ingen) har tippat
+  // Med regeln följer förslaget till gängets tecken den (fit).
   function analyse(s) {
     const now = Date.now();
-    return s.matcher.map((x) => {
+    const rows = s.matcher.map((x) => {
       const m = matchById(x.id);
       const t = {};
       for (const g of s.gang) {
@@ -421,12 +451,58 @@
       const same = n > 0 && new Set(who.map((k) => t[k])).size === 1;
       const kind = n < 2 ? 5 : most === 1 ? 0 : most < n ? 1 : !same ? 2
         : fav != null && !t[who[0]].includes(SIGNS[fav]) ? 3 : 4;
-      // Förslaget till gängets tecken: det som fler än hälften har med. Där
-      // alla tippat olika får uppgörelsen avgöra.
+      // Förslaget till gängets tecken utan regel: det som fler än hälften
+      // har med. Där alla tippat olika får uppgörelsen avgöra.
       const proposal = kind === 0 ? '' : SIGNS.filter((sg, i) => cov[i].length * 2 > n).join('');
       const notes = who.map((k) => ({ k, text: (s.tips[k].kommentarer || {})[x.id] })).filter((o) => o.text);
       const g = gradeRow({ id: x.id, sign: '1X2' }, now);
       return { x, m, t, n, cov, pr, fav, kind, proposal, notes, g, open: isOpen(m, now) };
+    });
+    const r = regel(s);
+    if (r) fit(rows, r);
+    return rows;
+  }
+
+  // Förslaget efter regeln, ur allas tips: varje tecken får det gänget har
+  // med av det – en spik väger 3, en halvgardering 2 och en helgardering 1 –
+  // och spikarna, halvgarderingarna och helgarderingarna läggs så att så
+  // mycket som möjligt av det kommer med. De mest eniga matcherna blir
+  // spikar och de mest oeniga helgarderingar. Står två tecken lika där ett
+  // av dem ska bort lämnas matchen åt uppgörelsen, som förut när alla tippat
+  // olika; ett tecken som ingen har med kommer inte med.
+  function fit(rows, r) {
+    const per = rows.map((row) => {
+      const sup = SIGNS.map((sg) => Object.values(row.t).reduce((a, t) => a + (t.includes(sg) ? 4 - t.length : 0), 0));
+      const order = [0, 1, 2].sort((a, b) => sup[b] - sup[a]);
+      // k tecken skär mellan två som står lika
+      const tie = (k) => k < 3 && sup[order[k]] > 0 && sup[order[k]] === sup[order[k - 1]];
+      // hur mycket k tecken får med; lite mindre när det skär mellan två lika,
+      // så att en match som går att avgöra väljs före
+      const got = (k) => order.slice(0, k).reduce((a, i) => a + sup[i], 0) - (tie(k) ? 0.01 : 0);
+      return { sup, order, tie, got };
+    });
+    // Alla sätt att fördela spikarna och garderingarna, match för match, med
+    // det bästa för varje antal spikar och halvgarderingar hittills.
+    let best = new Map([['0,0', { v: 0, ks: [] }]]);
+    per.forEach((p, i) => {
+      const next = new Map();
+      for (const [key, b] of best) {
+        const [spik, halv] = key.split(',').map(Number);
+        for (const k of [1, 2, 3]) {
+          const n = [spik + (k === 1), halv + (k === 2), i - spik - halv + (k === 3)];
+          if (n[0] > r.spik || n[1] > r.halv || n[2] > r.hel) continue;
+          const v = b.v + p.got(k);
+          const nk = `${n[0]},${n[1]}`;
+          if (!next.has(nk) || next.get(nk).v < v) next.set(nk, { v, ks: [...b.ks, k] });
+        }
+      }
+      best = next;
+    });
+    const end = best.get(`${r.spik},${r.halv}`);
+    if (!end) return;
+    end.ks.forEach((k, i) => {
+      const { sup, order, tie } = per[i];
+      rows[i].proposal = tie(k) ? '' : SIGNS.filter((sg, j) => order.indexOf(j) < k && sup[j] > 0).join('');
     });
   }
 
@@ -486,15 +562,7 @@
         });
       }
     }
-    const chosen = s.matcher.map((x) => val[x.id] || '').filter(Boolean);
-    const gard = chosen.filter((x) => x.length > 1).length;
-    const odds = chosen.length ? radOdds(s, val) : null;
-    html += '<div class="pb-foot sm-foot">' + fieldList([
-      ['Tippat', `${chosen.length}/${rows.length}`],
-      gard ? ['Garderingar', gard] : null,
-      window.Spela ? Spela.field(rader(chosen), s.spel, s.gang.length) : ['Kombinationer', rader(chosen)],
-      odds ? ['Odds', oddsText(odds), 'Oddset för att alla gängets tecken går in – matchernas odds gånger varandra'] : null,
-    ]) + '</div>';
+    html += '<div class="pb-foot sm-foot">' + fieldList(footFields(s, val, s.gang.length)) + '</div>';
     const act = boardActions(s, rows, val);
     return html + `<div class="sm-act${actMore ? ' more' : ''}" id="sm-act"${act ? '' : ' hidden'}><div class="sm-act-in" id="sm-act-in">${act}</div>` +
       '<p class="pb-msg" id="sm-msg" role="status"></p></div></div></div>';
@@ -514,7 +582,7 @@
     const made = existing(s);
     const same = made && savedAsIs(made, rows, val);
     const more = [
-      open && key(val) !== key(proposal(rows)) ? '<button type="button" class="sm-act-l" id="sm-reset" title="Det som fler än hälften har med">Börja om</button>' : '',
+      open && key(val) !== key(proposal(rows)) ? `<button type="button" class="sm-act-l" id="sm-reset" title="${regel(s) ? 'Det vi har mest med, efter regeln' : 'Det som fler än hälften har med'}">Börja om</button>` : '',
       made || over(s) ? '<a class="sm-act-l" href="#kupong/samtal/ny">+ Ny kupong</a>' : '',
     ].filter(Boolean);
     const label = direct ? (same ? `${CHECK}Sparad` : made ? 'Spara ändringen' : 'Spara gängets kupong')
@@ -729,7 +797,7 @@
         delete d.notes[r.x.id];
       }
     }
-    return { d, c, open, undecided: open.filter((r) => !val[r.x.id]).length };
+    return { d, c, open, undecided: open.filter((r) => !val[r.x.id]).length, fel: brott(s, val) };
   }
 
   const SAVED = 'Gängets kupong är sparad · syns för alla om några minuter.';
@@ -745,7 +813,7 @@
   // med tecknen ifyllda, och kupongen sparas där.
   async function makeCoupon(s, { adjust = false } = {}) {
     const msg = (h) => { $('#sm-msg').innerHTML = h; };
-    const { d, c, open, undecided } = gangDraft(s);
+    const { d, c, open, undecided, fel } = gangDraft(s);
     if (!open.length) {
       msg('<span class="note">Alla matcher har startat.</span>');
       return;
@@ -753,6 +821,10 @@
     const ctx = couponCtx(d);
     if (!ctx) {
       msg('<span class="note">Tryck på rutorna för gängets tecken först.</span>');
+      return;
+    }
+    if (fel) {
+      msg(`<span class="note">${esc(fel)}</span>`);
       return;
     }
     if (!adjust && undecided && !SM.again) {
@@ -1039,17 +1111,27 @@
   }
 
   // Fälten i foten för tecknen i mine ({matchens id: tecken}): hur många
-  // som är tippade, garderingarna, kombinationerna (priset på Stryktipset)
-  // och oddset för hela raden – på papperet och på kupongen på pulten.
-  function footFields(s, mine) {
+  // som är tippade, garderingarna, kombinationerna (priset på Stryktipset,
+  // delat på folk) och oddset för hela raden. På papperet, i uppgörelsen
+  // (folk = gänget) och på kupongen på pulten.
+  function footFields(s, mine, folk = 0) {
     const signs = s.matcher.map((x) => mine[x.id]).filter(Boolean);
-    const gard = signs.filter((x) => x.length > 1).length;
     const odds = signs.length ? radOdds(s, mine) : null;
+    const oddsField = ['Odds', odds ? oddsText(odds) : '–', `Oddset för att alla ${folk ? 'gängets' : 'dina'} tecken går in – matchernas odds gånger varandra`];
+    // Med regeln spikarna och garderingarna mot den, rött när de är för
+    // många, och oddset – fyra fält på en rad. Priset står inte där: med
+    // regeln är det alltid detsamma.
+    const r = regel(s);
+    if (r) {
+      const n = slag(s, mine);
+      return [...SLAG.map(([k, , , many, label]) => [label, `${n[k] > r[k] ? `<em class="sm-over">${n[k]}</em>` : n[k]}/${r[k]}`, `${cap(many)} – regeln är ${r[k]}`]), oddsField];
+    }
+    const gard = signs.filter((x) => x.length > 1).length;
     return [
       ['Tippat', `${signs.length}/${s.matcher.length}`],
       gard ? ['Garderingar', gard] : null,
-      window.Spela ? Spela.field(rader(signs), s.spel) : ['Kombinationer', rader(signs)],
-      odds ? ['Odds', oddsText(odds), 'Oddset för att alla dina tecken går in – matchernas odds gånger varandra'] : null,
+      window.Spela ? Spela.field(rader(signs), s.spel, folk) : ['Kombinationer', rader(signs)],
+      odds ? oddsField : null,
     ];
   }
 
@@ -1139,6 +1221,9 @@
   // Lämnar in dina tips d – från papperet här och från kupongen på pulten i
   // tobaksaffären (Samtal.pult) – och minns på enheten att du har lämnat in.
   async function handIn(s, d) {
+    // Regeln: inte fler spikar eller garderingar än den har.
+    const fel = brott(s, d.tecken);
+    if (fel) return { ok: false, error: fel };
     const notes = d.kommentarer || {};
     const out = await send({
       gor: 'tips',
@@ -1696,9 +1781,7 @@
     fields(tecken, gang = false) {
       const s = SM.data;
       if (!s) return '';
-      const list = footFields(s, tecken);
-      if (gang && window.Spela) list[2] = Spela.field(rader(s.matcher.map((x) => tecken[x.id]).filter(Boolean)), s.spel, s.gang.length);
-      return fieldList(list);
+      return fieldList(footFields(s, tecken, gang ? s.gang.length : 0));
     },
     // Ett tecken eller en gardering i en match ('' = inget).
     tippa(id, tecken) {
@@ -1816,10 +1899,11 @@
     async sparaGang({ again = false, anyway = false, adjust = false } = {}) {
       const s = SM.data;
       if (!s) return { ok: false, error: 'Omgången finns inte längre.' };
-      const { d, c, open, undecided } = gangDraft(s);
+      const { d, c, open, undecided, fel } = gangDraft(s);
       if (!open.length) return { ok: false, error: 'Alla matcher har startat.' };
       const ctx = couponCtx(d);
       if (!ctx) return { ok: false, error: 'Kryssa i gängets tecken först.' };
+      if (fel) return { ok: false, error: fel };
       if (undecided && !again) return { ok: false, ask: undecided };
       if (adjust || !(KP.data && KP.data.save)) {
         kpStore(KP_DRAFT, d);

@@ -275,6 +275,8 @@ button.sm-who:focus-visible { outline: 2px solid var(--ink); outline-offset: 1px
 
 /* foten: hur långt du har kommit */
 .sm-foot { margin-top: 18px; }
+/* fler spikar eller garderingar än regeln har – också på kupongen på pulten */
+.sm-over { font-style: normal; color: var(--pp-no, #cf2a20); }
 .sm-m .vs { margin: 0 0.35em; }
 /* matchnamnet öppnar matchrutan */
 .sm-r a.pp-t { color: inherit; text-decoration: none; }

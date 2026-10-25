@@ -10,6 +10,11 @@
 // worker/samtal.mjs). gang = vilka som tippar, med initialerna som syns i
 // samtalsunderlaget; tipsen visas när alla här har lämnat in. bild = porträttet
 // som står i rutorna på kupongen och i underlaget i stället för initialerna.
+//
+// regel = hur många spikar (ett tecken), halvgarderingar (två) och
+// helgarderingar (alla tre) en kupong har – var och ens när hen lämnar in och
+// gängets. Gäller omgångar med lika många matcher som regeln (Stryktipsets
+// tretton); null = ingen regel.
 
 module.exports = {
   enabled: true,
@@ -19,4 +24,5 @@ module.exports = {
     { id: 'DT', namn: 'Daniel Teijder', bild: 'profeterna/teijder.jpg' },
     { id: 'DJ', namn: 'Daniel Johansson', bild: 'profeterna/johansson.jpg' },
   ],
+  regel: { spik: 4, halv: 5, hel: 4 },
 };
