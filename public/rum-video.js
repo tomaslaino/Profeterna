@@ -134,15 +134,19 @@ window.RumVideo = (() => {
     <rect x="${x}" y="${y}" width="${w}" height="${h}" rx="2.4" fill="url(#vhs-dager)"/>
     <rect x="${g.x - 3}" y="${g.y - 3}" width="${g.w + 6}" height="${g.h + 6}" rx="3.4" fill="#0b0a0a" stroke="#34312d" stroke-width=".45"/>
     <rect x="${g.x - 0.8}" y="${g.y - 0.8}" width="${g.w + 1.6}" height="${g.h + 1.6}" rx="5.6" fill="#040404"/>
-    <text x="${g.x + g.w / 2}" y="${g.y + g.h + 2.35}" text-anchor="middle" font-family="Fraunces, Georgia, serif" font-size="1.55" letter-spacing=".5" fill="#a9a399">TV · VIDEO</text>
     <line x1="${x + 2}" y1="${f.y - 1.5}" x2="${x + w - 2}" y2="${f.y - 1.5}" stroke="#8a857b" stroke-width=".3" opacity=".55"/>
     <rect x="${f.x - 0.6}" y="${f.y - 0.6}" width="${f.w + 1.2}" height="${f.h + 1.2}" rx="1" fill="#4c4944"/>
     <rect x="${f.x}" y="${f.y}" width="${f.w}" height="${f.h}" rx=".7" fill="#030303"/>
     <rect class="vhs-lucka" x="${f.x + 0.5}" y="${f.y + 0.45}" width="${f.w - 1}" height="${f.h - 0.9}" rx=".4" fill="url(#vhs-lucka)"/>
-    <text x="${f.x + f.w / 2}" y="${f.y + f.h + 2.4}" text-anchor="middle" font-family="Fraunces, Georgia, serif" font-size="1.3" letter-spacing=".4" fill="#8f8a80">HQ · STEREO</text>
     <rect x="${VFD.x}" y="${VFD.y}" width="${VFD.w}" height="${VFD.h}" rx=".6" fill="#06100d" stroke="#2c2a27" stroke-width=".3"/>
     <circle class="vhs-led" cx="${x + 2.6}" cy="${f.y + f.h / 2}" r=".62"/>
   </g>`;
+  }
+  function tvText() {
+    const g = GLAS;
+    const f = FACK;
+    return `<text x="${g.x + g.w / 2}" y="${g.y + g.h + 2.35}" text-anchor="middle" font-family="Fraunces, Georgia, serif" font-size="1.55" letter-spacing=".5" fill="#a9a399">TV · VIDEO</text>
+    <text x="${f.x + f.w / 2}" y="${f.y + f.h + 2.4}" text-anchor="middle" font-family="Fraunces, Georgia, serif" font-size="1.3" letter-spacing=".4" fill="#8f8a80">HQ · STEREO</text>`;
   }
 
   // Lådans övriga sidor, i bildpunkter: vänster och höger sida med
@@ -208,33 +212,39 @@ window.RumVideo = (() => {
     <rect x="${L.x}" y="${L.y}" width="${L.w}" height=".45" fill="#fff3d8" opacity=".35"/>
     <g fill="#3a2410" opacity=".45"><rect x="${L.x + L.t}" y="${L.y + L.t - 0.5}" width="${L.w - 2 * L.t}" height=".5"/><rect x="${L.x + L.t - 0.5}" y="${L.y + L.t}" width=".5" height="${L.h - 2 * L.t}"/></g>
     ${nails}
-    <text x="${L.x + L.w / 2}" y="${L.y + L.h - 1.2}" text-anchor="middle" font-family="Anton, Impact, sans-serif" font-size="2.6" letter-spacing="1.2" fill="#9b2c1f" opacity=".5">ÄPPLEN · KLASS I</text>
-    <g transform="rotate(-1.6 ${L.x + 47} ${L.y + 2.3})">
-      <polygon points="${pts([[L.x + 25.2, L.y + 0.45], [L.x + 69, L.y + 0.2], [L.x + 69.6, L.y + 1.4], [L.x + 68.9, L.y + 2.6], [L.x + 69.5, L.y + 4.2], [L.x + 25.4, L.y + 4.5], [L.x + 24.8, L.y + 3.1], [L.x + 25.5, L.y + 1.9]])}" fill="#e7dab2" opacity=".96"/>
-      <text x="${L.x + 47}" y="${L.y + 3.55}" text-anchor="middle" font-family="Caveat, cursive" font-weight="700" font-size="3.9" letter-spacing=".5" fill="#1d1a16">ARKIVET</text>
-    </g>
+    <polygon points="${pts([[L.x + 25.2, L.y + 0.45], [L.x + 69, L.y + 0.2], [L.x + 69.6, L.y + 1.4], [L.x + 68.9, L.y + 2.6], [L.x + 69.5, L.y + 4.2], [L.x + 25.4, L.y + 4.5], [L.x + 24.8, L.y + 3.1], [L.x + 25.5, L.y + 1.9]])}" fill="#e7dab2" opacity=".96" transform="rotate(-1.6 ${L.x + 47} ${L.y + 2.3})"/>
   </g>`;
   }
+  function ladaText() {
+    const L = LADA;
+    return `<text x="${L.x + L.w / 2}" y="${L.y + L.h - 1.2}" text-anchor="middle" font-family="Anton, Impact, sans-serif" font-size="2.6" letter-spacing="1.2" fill="#9b2c1f" opacity=".5">ÄPPLEN · KLASS I</text>
+    <text x="${L.x + 47}" y="${L.y + 3.55}" text-anchor="middle" font-family="Caveat, cursive" font-weight="700" font-size="3.9" letter-spacing=".5" fill="#1d1a16" transform="rotate(-1.6 ${L.x + 47} ${L.y + 2.3})">ARKIVET</text>`;
+  }
 
-  // en ritning bara så stor som det den visar (b), så att lagret blir litet
+  // En ritning bara så stor som det den visar (b), så att lagret blir litet.
+  // Texten står i en egen ritning ovanpå: Chrome lägger ut text i SVG på
+  // nytt i varje bildruta medan rummet vrids, och då ritades hela ritningen
+  // om varje gång.
   const ritning = (b, inner) => `<svg class="vhs-ritning" viewBox="${b.x} ${b.y} ${b.w} ${b.h}" width="${b.w * S}" height="${b.h * S}" style="left:${px(b.x)}; top:${px(b.y)}" aria-hidden="true">${inner}</svg>`;
   function tvRitning() {
-    return ritning({ x: TV.x, y: TV.y, w: TV.w, h: TV.h }, `<defs>
+    const b = { x: TV.x, y: TV.y, w: TV.w, h: TV.h };
+    return ritning(b, `<defs>
     <linearGradient id="vhs-kropp" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#36332f"/><stop offset=".07" stop-color="#262421"/><stop offset=".85" stop-color="#191816"/><stop offset="1" stop-color="#0f0e0d"/></linearGradient>
     <linearGradient id="vhs-dager" x1="0" y1="0" x2="1" y2="0"><stop offset="0" stop-color="#fff" stop-opacity=".05"/><stop offset=".4" stop-color="#fff" stop-opacity="0"/><stop offset="1" stop-color="#000" stop-opacity=".22"/></linearGradient>
     <linearGradient id="vhs-lucka" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#3b3935"/><stop offset=".18" stop-color="#1b1a18"/><stop offset="1" stop-color="#0c0c0b"/></linearGradient>
   </defs>
-  ${tvSvg()}`);
+  ${tvSvg()}`) + ritning(b, tvText());
   }
   function ladaRitning() {
-    return ritning({ x: LADA.x - 14, y: LADA.y - 4, w: LADA.w + 20, h: LADA.h + 8 }, `<defs>
+    const b = { x: LADA.x - 14, y: LADA.y - 4, w: LADA.w + 20, h: LADA.h + 8 };
+    return ritning(b, `<defs>
     <linearGradient id="vhs-furu" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#d6b07a"/><stop offset=".5" stop-color="#c29a62"/><stop offset="1" stop-color="#9c7744"/></linearGradient>
     <linearGradient id="vhs-inne" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#120a04"/><stop offset=".7" stop-color="#2a1a0c"/><stop offset="1" stop-color="#3d2814"/></linearGradient>
     <filter id="vhs-ved" x="0" y="0" width="100%" height="100%"><feTurbulence type="fractalNoise" baseFrequency=".03 .9" numOctaves="3" seed="4"/><feColorMatrix values="0 0 0 0 .28  0 0 0 0 .15  0 0 0 0 .05  2.4 0 0 0 -1"/></filter>
     <filter id="vhs-ved-s" x="0" y="0" width="100%" height="100%"><feTurbulence type="fractalNoise" baseFrequency=".9 .03" numOctaves="3" seed="6"/><feColorMatrix values="0 0 0 0 .28  0 0 0 0 .15  0 0 0 0 .05  2.4 0 0 0 -1"/></filter>
   </defs>
   <ellipse cx="${LADA.x + LADA.w / 2 - 5}" cy="${LADA.y + LADA.h + 0.4}" rx="${LADA.w / 2 + 6}" ry="2" fill="#000" opacity=".6" filter="url(#rum-b1)"/>
-  ${ladaSvg()}`);
+  ${ladaSvg()}`) + ritning(b, ladaText());
   }
 
   // ---------- väggen, disken och pulten till höger om bilden ----------

@@ -42,6 +42,19 @@ html.i-rummet body > footer { display: none; }
 }
 .rum-kamera.glid { transition: transform 0.6s cubic-bezier(0.3, 0, 0.2, 1); }
 .rum-kamera.dyk { transition: transform 0.42s cubic-bezier(0.55, 0, 0.85, 0.35); }
+/* Chromium ritar annars hela rummet i närbildens skärpa så fort kameran
+   börjar glida (förstoringen i övergången gäller allt under kameran), också
+   det som strax hamnar utanför bilden: lagren tog flera gånger så mycket
+   minne som syns, mer än Chrome ger en sida, och rutor fattades i bildrutorna
+   medan kameran gick fram och tillbaka. Med perspective() i kamerans
+   transform kan Chromium inte räkna ut förstoringen och ritar i den skärpa
+   lagren redan har medan kameran glider – suddigt på vägen fram, som när
+   rummet vrids (det som ligger i kameran är platt, så perspektivet syns
+   inte). Sakerna i planen är egna lager med will-change: opacity i stället
+   för transform, så att Chromium ritar det som syns skarpt när kameran står
+   still, nära och på håll (ett lager med will-change: transform behåller sin
+   skärpa). */
+.rum.chromium .rum-kamera { transform: translate(var(--dx, 0px), var(--dy, 0px)) scale(var(--z, 1)) perspective(100000px); }
 .rum-world {
   position: absolute;
   left: 0;
@@ -59,6 +72,7 @@ html.i-rummet body > footer { display: none; }
    själv: ett plan som ritar får en yta i hela scenens storlek (Safari ritar
    den gånger skärmens pixeltäthet) också när det som ritas är litet. */
 .rum-pl > * { will-change: transform; }
+:where(.rum.chromium) .rum-pl > * { will-change: opacity; }
 /* det som sikt i rum.js följer i stället för något större: osynligt och utan eget lager */
 .rum-syn { position: absolute; visibility: hidden; pointer-events: none; }
 .rum-pl > .rum-syn { will-change: auto; }
