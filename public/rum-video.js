@@ -2,10 +2,10 @@
 
 // Videon i tobaksaffären (rum.js): en liten färg-tv med inbyggd video som
 // står på disken, nere i hörnet till höger, med ryggen mot väggen och
-// rutan vänd ut mot rummet. På tv:n ligger de senaste repriserna på VHS i
-// en hög, och i en fruktlåda resten (Arkivet) – lådan står precis utanför
-// bilden och syns först när man går fram till tv:n (klick eller V). Då
-// vrids tv:n på stället rakt mot en. Kassetterna har
+// rutan vänd mot gänget mitt i rummet. På tv:n ligger de senaste
+// repriserna på VHS i en hög, och i en fruktlåda bredvid resten (Arkivet),
+// med öppningen åt samma håll. När man går fram (klick eller V) står de
+// kvar som de står och syns från sidan, som på håll. Kassetterna har
 // handskrivna etiketter med matchen, resultatet och dagen; ett klick på en
 // kassett och den åker in i videon, som spelar matchens höjdpunkter i
 // rutan (samma klipp som spelaren på sajten, hojdpunkter.js). Knapparna
@@ -18,7 +18,8 @@
 // Tv:n är en låda i CSS 3D (framsidan, sidorna, taket och skuggan på
 // disken) i rummets eget perspektiv – 1000 bildpunkter från flyktpunkten
 // (760, 400), som högra väggen i rum.js (rum-hv) – så att den står mot
-// väggen som om den var målad dit. Kassetterna på den är också lådor.
+// väggen som om den var målad dit. Fruktlådan och kassetterna är också
+// lådor, i tv:ns mått.
 //
 // YouTube syns inte: spelaren får inte musen, har inga egna knappar, och
 // varje gång ett klipp börjar eller spelar vidare visar videon sin blå bild
@@ -35,7 +36,7 @@
 // så att det är skarpt på nära håll – i dubbla storleken till när rutan
 // fyller bilden, och spelaren i dubbla storleken till.
 // Väggen, disken och pulten fortsätter till höger om bilden (vagg och
-// pult), så att lådan står på något när kameran går dit.
+// pult), så att bilden inte tar slut när kameran går dit.
 //
 // RumVideo.html('horn' | 'vagg' | 'pult') → delarna (planen -598, -600 och -60 i rum.js)
 // RumVideo.mount(el, { calm, short, kort, aim }) → { fill(matches, ids), skarp(on), zoom(on) → hörnet i scenen, key(k), stop() }
@@ -60,46 +61,55 @@ window.RumVideo = (() => {
   // tv:ns djup, och kassetternas (de ligger med ryggen åt samma håll som rutan)
   const DJUP = 40;
   const KAS = { w: 41, h: 5.67, d: 22.4 };
-  // Tv:n står på samma ställe (PLATS) på håll och nära, mot väggen och så
-  // långt in (BAK) att den ryms i bilden, och vrids kring mitten av foten:
-  // på håll VRID grader, mot rummet och gänget – i rummets perspektiv ser
-  // den annars ut att stå rakt mot en – och nära rakt fram. Rakt fram tar
-  // den i väggen, där disken (490 i hörnet x = 1140, rum.js) möter den på
-  // tv:ns djup.
+  // Tv:n står mot väggen (PLATS), så långt in (BAK) att den ryms i bilden,
+  // vriden VRID grader kring mitten av foten: mot gänget mitt i rummet – i
+  // rummets perspektiv ser den annars ut att stå rakt mot en. Platsen är
+  // den där den skulle ta i väggen rakt fram, där disken (490 i hörnet
+  // x = 1140, rum.js) möter den på tv:ns djup.
   const VRID = 112;
   const BAK = -110;
   const MITT = [TV.x + TV.w / 2, TV.y + TV.h, -DJUP / 2];
   const VAGG = VP[0] + (1140 - 760) * (O[1] + TV.y + TV.h - 400) / (490 - 400);
   const PLATS = [VAGG - 1.5 - TV.w / 2 - MITT[0], BAK];
-  // Var en punkt på tv:ns front (z bakåt från fronten) syns i hörnet när tv:n
-  // står rakt fram, och hur mycket mindre fronten syns där.
-  const NF = 1000 / (1000 - BAK);
-  function nara(x, y, z = 0) {
-    const f = 1000 / (1000 - BAK - z);
-    return [VP[0] + (x + PLATS[0] - VP[0]) * f, VP[1] + (y - VP[1]) * f];
+  const RAD = VRID * Math.PI / 180;
+  // Lådan står på disken bredvid tv:n, längre in längs väggen: i tv:ns mått
+  // till vänster om den och z längre fram, så att den står lika långt från
+  // väggen. d är djupet.
+  const LADA = { x: TV.x - 4 - 95, y: TV.y + TV.h - 77, w: 95, h: 77, t: 4.5, d: 27 };
+  LADA.z = LADA.d - DJUP + (LADA.x - TV.x) / Math.tan(RAD);
+  // Var en punkt på tv:n eller lådan (i tv:ns mått, z framåt från tv:ns
+  // front) syns i hörnet: vriden kring MITT, flyttad till PLATS och i
+  // rummets perspektiv. ruta: det minsta i scenen som rymmer punkterna, med
+  // kanten k.
+  function syns([x, y, z]) {
+    const [dx, dz] = [x - MITT[0], z - MITT[2]];
+    const wx = MITT[0] + PLATS[0] + dx * Math.cos(RAD) - dz * Math.sin(RAD);
+    const wz = MITT[2] + PLATS[1] + dx * Math.sin(RAD) + dz * Math.cos(RAD);
+    const f = 1000 / (1000 - wz);
+    return [VP[0] + (wx - VP[0]) * f, VP[1] + (y - VP[1]) * f];
   }
-  // lådan står bredvid tv:n, så långt till höger om bilden att den inte syns
-  // på håll, ens när rummet vrids efter musen
-  const LADA = { x: 195, y: 43, w: 95, h: 77, t: 4.5 };
+  const horn = (x0, y0, x1, y1, z0, z1) => [x0, x1].flatMap((x) => [y0, y1].flatMap((y) => [z0, z1].map((z) => [x, y, z])));
+  function ruta(p, k) {
+    const s = p.map(syns);
+    const xs = s.map((q) => q[0]);
+    const ys = s.map((q) => q[1]);
+    return { x0: O[0] + Math.min(...xs) - k, y0: O[1] + Math.min(...ys) - k, x1: O[0] + Math.max(...xs) + k, y1: O[1] + Math.max(...ys) + k };
+  }
   // högarna: tv:ns och lådans två, nerifrån och upp (den nyaste överst);
   // på tv:n vrids kassetterna lite på högkant, i lådan lutar de
   const COLS = [
     { x: 39, y: TV.y, ix: [3, 2, 1, 0], j: 1.6, r: 3, tv: true },
-    { x: LADA.x + 6.4, y: LADA.y + LADA.h - 5.4, ix: [14, 13, 12, 11, 10, 9, 8, 7, 6, 5, 4], j: 0.6, r: 0.45 },
-    { x: LADA.x + 48.6, y: LADA.y + LADA.h - 5.4, ix: [24, 23, 22, 21, 20, 19, 18, 17, 16, 15], j: 0.6, r: 0.45 },
+    { x: LADA.x + 6.4, y: LADA.y + LADA.h - LADA.t - 0.2, ix: [14, 13, 12, 11, 10, 9, 8, 7, 6, 5, 4], j: 0.6, r: 0.45 },
+    { x: LADA.x + 48.6, y: LADA.y + LADA.h - LADA.t - 0.2, ix: [24, 23, 22, 21, 20, 19, 18, 17, 16, 15], j: 0.6, r: 0.45 },
   ];
   const CAP = 25;
-  // det kameran ska få med: högen, tv:n med sidan och lådan – och närmare
-  // bara rutan – i scenens mått
-  const FOCUS = { x0: O[0] + nara(TV.x, 0, -DJUP)[0] - 1.5, y0: O[1] + nara(0, TV.y - 4 * KAS.h)[1] - 8, x1: O[0] + LADA.x + LADA.w + 8, y1: O[1] + LADA.y + LADA.h + 10 };
-  const TAT = { x0: O[0] + GLAS.x, y0: O[1] + GLAS.y, x1: O[0] + GLAS.x + GLAS.w, y1: O[1] + GLAS.y + GLAS.h, z: 16 };
-  // TAT är på tv:ns front: kameran siktar dit den syns nära, och går lika
-  // mycket närmare som om den stod längst fram
-  function framme(r) {
-    const [x0, y0] = nara(r.x0 - O[0], r.y0 - O[1]);
-    const [x1, y1] = nara(r.x1 - O[0], r.y1 - O[1]);
-    return { x0: O[0] + x0, y0: O[1] + y0, x1: O[0] + x1, y1: O[1] + y1, z: r.z / NF };
-  }
+  // det kameran ska få med: högen, tv:n och lådan – och närmare bara
+  // rutan – i scenens mått
+  const FOCUS = ruta([
+    ...horn(TV.x, TV.y - 4 * KAS.h, TV.x + TV.w, TV.y + TV.h, 0, -DJUP),
+    ...horn(LADA.x, LADA.y, LADA.x + LADA.w, LADA.y + LADA.h, LADA.z, LADA.z - LADA.d),
+  ], 6);
+  const TAT = { ...ruta(horn(GLAS.x, GLAS.y, GLAS.x + GLAS.w, GLAS.y + GLAS.h, 0, 0), 1), z: 16 };
 
   const hash = (s) => {
     let a = 7;
@@ -108,19 +118,10 @@ window.RumVideo = (() => {
     return x - Math.floor(x);
   };
 
-  // En punkt längre in mot flyktpunkten (f < 1), och sidan och taket på en
-  // låda med fronten r som går dx in.
-  const toward = (f) => ([x, y]) => [VP[0] + (x - VP[0]) * f, VP[1] + (y - VP[1]) * f];
-  function faces(r, dx) {
-    const b = toward(1 - dx / (r.x - VP[0]));
-    const [x0, y0, x1, y1] = [r.x, r.y, r.x + r.w, r.y + r.h];
-    return {
-      side: [[x0, y0], b([x0, y0]), b([x0, y1]), [x0, y1]],
-      top: [[x0, y0], [x1, y0], b([x1, y0]), b([x0, y0])],
-      b,
-    };
-  }
-  const lerp = (a, b, t) => [a[0] + (b[0] - a[0]) * t, a[1] + (b[1] - a[1]) * t];
+  // En sida av en låda i 3D, i bildpunkter, och ett golv på höjden y från
+  // z0 bakåt till z1.
+  const yta = (cls, x, y, w, h, o, t) => `<i class="vhs-yta ${cls}" style="left:${r2(x)}px; top:${r2(y)}px; width:${r2(w)}px; height:${r2(h)}px; transform-origin:${o}; transform:${t}"></i>`;
+  const golv = (cls, x, y, w, z0, z1) => yta(cls, x, y - (z0 - z1), w, z0 - z1, '0 100%', `translateZ(${r2(z0)}px) rotateX(90deg)`);
 
   // ---------- tv:n ----------
 
@@ -159,10 +160,8 @@ window.RumVideo = (() => {
   const H = TV.h * S;
   const D = DJUP * S;
   function ytor() {
-    const yta = (cls, x, y, w, h, o, t) => `<i class="vhs-yta ${cls}" style="left:${r2(x)}px; top:${r2(y)}px; width:${r2(w)}px; height:${r2(h)}px; transform-origin:${o}; transform:${t}"></i>`;
-    const golv = (cls, x, w, z0, z1) => yta(cls, x, Y0 + H - (z0 - z1), w, z0 - z1, '0 100%', `translateZ(${r2(z0)}px) rotateX(90deg)`);
-    return golv('vhs-skugga', X0 - 7 * S, W + 14 * S, 6 * S, -D - 6 * S) +
-      golv('vhs-pol', X0 - 14 * S, W + 28 * S, 34 * S, 0) +
+    return golv('vhs-skugga', X0 - 7 * S, Y0 + H, W + 14 * S, 6 * S, -D - 6 * S) +
+      golv('vhs-pol', X0 - 14 * S, Y0 + H, W + 28 * S, 34 * S, 0) +
       yta('vhs-bak', X0, Y0, W, H, '50% 50%', `translateZ(${-D}px) rotateY(180deg)`) +
       yta('vhs-sida v', X0 - D, Y0, D, H, '100% 0', 'rotateY(-90deg)') +
       yta('vhs-sida h', X0 + W, Y0, D, H, '0 0', 'rotateY(90deg)') +
@@ -172,42 +171,27 @@ window.RumVideo = (() => {
       yta('vhs-fot', X0 + W - 14 * S, Y0 + H, 9 * S, 1.4 * S, '0 0', 'translateZ(-1px)');
   }
 
-  // Där man klickar på håll: framsidan med högen, högra sidan och taket,
-  // en bildpunkt utanför lådan.
+  // Där man klickar på håll: tv:ns framsida med högen, högra sidan och
+  // taket, och lådans, en bildpunkt utanför dem.
   function hitYtor() {
-    const f = `left:${(TV.x - 2) * S}px; top:${14 * S}px; width:${(TV.w + 4) * S}px; height:${(TV.y + TV.h + 2 - 14) * S}px; transform:translateZ(1px)`;
-    const h = `left:${X0 + W + 1}px; top:${Y0}px; width:${D}px; height:${H}px; transform-origin:0 0; transform:rotateY(90deg)`;
-    const t = `left:${X0}px; top:${Y0 - D - 1}px; width:${W}px; height:${D}px; transform-origin:0 100%; transform:rotateX(90deg)`;
-    return `<i style="${f}"></i><i style="${h}"></i><i style="${t}"></i>`;
+    const L = LADA;
+    const fram = (x, y, w, h, z) => `<i style="left:${px(x)}; top:${px(y)}; width:${px(w)}; height:${px(h)}; transform:translateZ(${r2(z * S + 1)}px)"></i>`;
+    const sida = (x, y, h, z, d) => `<i style="left:${r2(x * S + 1)}px; top:${px(y)}; width:${px(d)}; height:${px(h)}; transform-origin:0 0; transform:translateZ(${px(z)}) rotateY(90deg)"></i>`;
+    const tak = (x, y, w, z, d) => `<i style="left:${px(x)}; top:${r2((y - d) * S - 1)}px; width:${px(w)}; height:${px(d)}; transform-origin:0 100%; transform:translateZ(${px(z)}) rotateX(90deg)"></i>`;
+    return fram(TV.x - 2, 14, TV.w + 4, TV.y + TV.h + 2 - 14, 0) + sida(TV.x + TV.w, TV.y, TV.h, 0, DJUP) + tak(TV.x, TV.y, TV.w, 0, DJUP) +
+      fram(L.x - 1, L.y - 1, L.w + 2, L.h + 2, L.z) + sida(L.x + L.w, L.y, L.h, L.z, L.d) + tak(L.x, L.y, L.w, L.z, L.d);
   }
 
   // ---------- lådan ----------
 
-  // En fruktlåda i furu på sidan, med öppningen mot rummet: brädorna runt
-  // öppningen, sidan med springor mellan brädorna och tejpbiten med namnet.
+  // En fruktlåda i furu på sidan, med öppningen mot gänget som tv:n.
+  // Framsidan: brädorna runt öppningen och tejpbiten med namnet.
   function ladaSvg() {
     const L = LADA;
-    const { side, top, b } = faces(L, 12.5);
-    // sidans tre brädor, i sidans perspektiv
-    const band = (t0, t1) => pts([lerp(side[0], side[3], t0), lerp(side[1], side[2], t0), lerp(side[1], side[2], t1), lerp(side[0], side[3], t1)]);
-    const sida = [[0, 0.31], [0.345, 0.655], [0.69, 1]].map(([t0, t1]) => `<polygon points="${band(t0, t1)}" fill="url(#vhs-furu)"/><polygon points="${band(t0, t1)}" fill="#1b1006" opacity=".42"/>`).join('');
-    const x0 = L.x + L.t;
-    const y0 = L.y + L.t;
-    const x1 = L.x + L.w - L.t;
-    const y1 = L.y + L.h - L.t;
-    // insidan: botten (lådans baksida) med springor, och högra innerväggen i ljuset
-    const inner = `<rect x="${x0}" y="${y0}" width="${x1 - x0}" height="${y1 - y0}" fill="url(#vhs-inne)"/>
-    <polygon points="${pts([[x1, y0], [x1, y1], b([x1, y1]), b([x1, y0])])}" fill="#5a3f22" opacity=".55"/>
-    <g fill="#0d0703" opacity=".8"><rect x="${x0}" y="${y0 + 21}" width="${x1 - x0}" height="1.3"/><rect x="${x0}" y="${y0 + 44}" width="${x1 - x0}" height="1.3"/></g>`;
     const board = (x, y, w, h, cls) => `<rect x="${x}" y="${y}" width="${w}" height="${h}" fill="url(#vhs-furu)"/><rect x="${x}" y="${y}" width="${w}" height="${h}" filter="url(#${cls})" opacity=".55"/>`;
     const nails = [[L.x + 2.2, L.y + 2.2], [L.x + L.w - 2.2, L.y + 2.2], [L.x + 2.2, L.y + L.h - 2.2], [L.x + L.w - 2.2, L.y + L.h - 2.2]]
       .map(([cx, cy]) => `<circle cx="${cx}" cy="${cy}" r=".42" fill="#2a2420"/><circle cx="${cx - 0.12}" cy="${cy - 0.12}" r=".16" fill="#8d877c"/>`).join('');
-    return `<g class="massiv">
-    ${sida}
-    <polygon points="${pts(top)}" fill="#d8b47e"/>
-    ${inner}
-  </g>
-  <g class="massiv vhs-ram">
+    return `<g class="massiv vhs-ram">
     ${board(L.x, L.y, L.t, L.h, 'vhs-ved-s')}${board(L.x + L.w - L.t, L.y, L.t, L.h, 'vhs-ved-s')}
     ${board(L.x, L.y, L.w, L.t, 'vhs-ved')}${board(L.x, L.y + L.h - L.t, L.w, L.t, 'vhs-ved')}
     <rect x="${L.x}" y="${L.y}" width="${L.w}" height=".45" fill="#fff3d8" opacity=".35"/>
@@ -237,15 +221,27 @@ window.RumVideo = (() => {
   ${tvSvg()}`) + ritning(b, tvText());
   }
   function ladaRitning() {
-    const b = { x: LADA.x - 14, y: LADA.y - 4, w: LADA.w + 20, h: LADA.h + 8 };
+    const b = { x: LADA.x - 0.5, y: LADA.y - 1, w: LADA.w + 1, h: LADA.h + 1 };
     return ritning(b, `<defs>
     <linearGradient id="vhs-furu" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#d6b07a"/><stop offset=".5" stop-color="#c29a62"/><stop offset="1" stop-color="#9c7744"/></linearGradient>
-    <linearGradient id="vhs-inne" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#120a04"/><stop offset=".7" stop-color="#2a1a0c"/><stop offset="1" stop-color="#3d2814"/></linearGradient>
     <filter id="vhs-ved" x="0" y="0" width="100%" height="100%"><feTurbulence type="fractalNoise" baseFrequency=".03 .9" numOctaves="3" seed="4"/><feColorMatrix values="0 0 0 0 .28  0 0 0 0 .15  0 0 0 0 .05  2.4 0 0 0 -1"/></filter>
     <filter id="vhs-ved-s" x="0" y="0" width="100%" height="100%"><feTurbulence type="fractalNoise" baseFrequency=".9 .03" numOctaves="3" seed="6"/><feColorMatrix values="0 0 0 0 .28  0 0 0 0 .15  0 0 0 0 .05  2.4 0 0 0 -1"/></filter>
   </defs>
-  <ellipse cx="${LADA.x + LADA.w / 2 - 5}" cy="${LADA.y + LADA.h + 0.4}" rx="${LADA.w / 2 + 6}" ry="2" fill="#000" opacity=".6" filter="url(#rum-b1)"/>
   ${ladaSvg()}`) + ritning(b, ladaText());
+  }
+  // Lådans övriga sidor, i bildpunkter (lådans front i z = 0): högra sidan
+  // och taket, innanför öppningen vänstra väggen, botten och baksidan, och
+  // skuggan på disken.
+  function ladaYtor() {
+    const L = LADA;
+    const [x0, y0, x1, y1] = [L.x + L.t, L.y + L.t, L.x + L.w - L.t, L.y + L.h - L.t].map((v) => v * S);
+    const inne = (L.d - 1.5) * S;
+    return golv('vhs-skugga', (L.x - 4) * S, (L.y + L.h) * S, (L.w + 8) * S, 4 * S, -(L.d + 4) * S) +
+      yta('lada-bak', x0, y0, x1 - x0, y1 - y0, '0 0', `translateZ(${r2(-inne)}px)`) +
+      yta('lada-vagg', x0, y0, inne, y1 - y0, '0 0', 'rotateY(90deg)') +
+      golv('lada-botten', x0, y1, x1 - x0, 0, -inne) +
+      yta('lada-sida', (L.x + L.w) * S, L.y * S, L.d * S, L.h * S, '0 0', 'rotateY(90deg)') +
+      yta('lada-topp', L.x * S, (L.y - L.d) * S, L.w * S, L.d * S, '0 100%', 'rotateX(90deg)');
   }
 
   // ---------- väggen, disken och pulten till höger om bilden ----------
@@ -292,11 +288,10 @@ window.RumVideo = (() => {
       '<i class="kas-topp"></i><i class="kas-v"></i><i class="kas-h"></i></div>').join('');
     // den 16:9-stora bilden i den 4:3-stora rutan
     const bh = GLAS.w * 9 / 16;
-    const plats = `translate3d(${px(PLATS[0])}, 0px, ${px(PLATS[1])})`;
     return `<div class="rum-vhs" id="rum-vhs" data-lage="tom" style="left:${O[0]}px; top:${O[1]}px">` +
       `<div class="vhs-in" style="perspective:${1000 * S}px; perspective-origin:${px(VP[0])} ${px(VP[1])}">` +
       '<i class="vhs-sken"></i>' +
-      `<div class="vhs-tv" style="--bort:${plats} rotateY(${-VRID}deg); --nara:${plats} rotateY(0deg); transform-origin:${px(MITT[0])} ${px(MITT[1])} ${px(MITT[2])}">${ytor()}` +
+      `<div class="vhs-tv" style="transform:translate3d(${px(PLATS[0])}, 0px, ${px(PLATS[1])}) rotateY(${-VRID}deg); transform-origin:${px(MITT[0])} ${px(MITT[1])} ${px(MITT[2])}">${ytor()}` +
       `<div class="vhs-front">${tvRitning()}<div class="vhs-styr" inert>` +
       `<div class="vhs-skarm" style="${at(GLAS)}">` +
       `<div class="vhs-bild" style="top:${px((GLAS.h - bh) / 2)}; height:${px(bh)}"></div>` +
@@ -304,9 +299,9 @@ window.RumVideo = (() => {
       `<i class="vhs-mask" style="top:${px((GLAS.h - bh) / 2)}" hidden></i>` +
       '<span class="vhs-osd">STOPP</span><i class="vhs-glas"></i></div>' +
       `<span class="vhs-vfd" style="${at(VFD)}">12:00</span>${knappar}${kas(0, 4)}</div></div>` +
+      // lådan bredvid
+      `<div class="vhs-lada" style="transform:translateZ(${px(LADA.z)})">${ladaYtor()}${ladaRitning()}<div class="vhs-styr" inert>${kas(4, CAP)}</div></div>` +
       `<a class="vhs-hit rum-sak" href="#matcher" data-nav="video" aria-label="Videon">${hitYtor()}</a></div>` +
-      // lådan bredvid, utanför bilden på håll
-      `<div class="vhs-lada">${ladaRitning()}<div class="vhs-styr" inert>${kas(4, CAP)}</div></div>` +
       '</div></div>';
   }
 
@@ -407,8 +402,9 @@ window.RumVideo = (() => {
           const top = i === V.cur ? yAll : yNow;
           const x = c.x + (hash(`x${i}`) - 0.5) * 2 * c.j;
           const r = r2((hash(`r${i}`) - 0.5) * 2 * c.r);
-          // på tv:n lite in från kanten och vridna på högkant
-          const t = c.tv ? `translateZ(${-1.5 * S}px) rotateY(${r}deg)` : `rotate(${r}deg)`;
+          // på tv:n lite in från kanten och vridna på högkant, i lådan lite
+          // innanför öppningen och lutade
+          const t = c.tv ? `translateZ(${-1.5 * S}px) rotateY(${r}deg)` : `translateZ(${-S}px) rotate(${r}deg)`;
           el.style.left = px(x);
           el.style.top = px(top);
           el.style.setProperty('--t', t);
@@ -437,12 +433,10 @@ window.RumVideo = (() => {
       el.querySelector('.vhs-kas').setAttribute('aria-label', `${m.home} – ${m.away}${score ? `, ${score}` : ''}, ${dag(m.kickoff)}`);
     }
 
-    // Kassetten åker från sin plats in i facket (eller tillbaka): lyfts mot
-    // en, ställs framför facket och skjuts in. Kassetterna på tv:n lyfts
-    // fram framför rutan först; de i lådan flyger dit facket syns (tv:n står
-    // längre in) och blir mindre på vägen.
+    // Kassetten åker från sin plats in i facket (eller tillbaka): lyfts upp
+    // och fram, ställs framför facket och skjuts in. Ur lådan dras den först
+    // ut genom öppningen. Lådan står i tv:ns mått, LADA.z framför tv:ns front.
     const FC = [(FACK.x + FACK.w / 2) * S, (FACK.y + FACK.h / 2) * S];
-    const FL = nara(FACK.x + FACK.w / 2, FACK.y + FACK.h / 2).map((v) => v * S);
     function fly(el, into, done) {
       if (o.calm()) {
         done();
@@ -450,17 +444,17 @@ window.RumVideo = (() => {
       }
       const cx = parseFloat(el.style.left) + KAS.w * S / 2;
       const cy = parseFloat(el.style.top) + KAS.h * S / 2;
-      const tv = el.closest('.vhs-tv');
-      const [fx, fy] = tv ? FC : FL;
-      const [dx, dy] = [r2(fx - cx), r2(fy - cy)];
-      const z = tv ? 34 * S : 0;
-      const sk = (v, t) => r2(tv ? v : v * (1 + (NF - 1) * t));
+      const [dx, dy] = [r2(FC[0] - cx), r2(FC[1] - cy)];
+      const lada = Boolean(el.closest('.vhs-lada'));
+      const fz = lada ? r2(-LADA.z * S) : 0;
+      const z = r2(fz + 34 * S);
       const k = [
         { transform: el.dataset.t, opacity: 1, offset: 0 },
-        { transform: `translate3d(${r2(dx * 0.45)}px, ${r2(dy * 0.45 - 70)}px, ${z}px) scale(${sk(1.12, 0.45)})`, opacity: 1, offset: 0.45 },
-        { transform: `translate3d(${dx}px, ${r2(dy + 22)}px, ${z}px) scale(${sk(1.07, 1)})`, opacity: 1, offset: 0.76 },
-        { transform: `translate3d(${dx}px, ${dy}px, ${r2(z * 0.3)}px) scale(${sk(1, 1)})`, opacity: 1, offset: 0.9 },
-        { transform: `translate3d(${dx}px, ${r2(dy - 4)}px, 0px) scale(${sk(0.9, 1)})`, opacity: 0, offset: 1 },
+        ...(lada ? [{ transform: `translate3d(0px, -6px, ${(KAS.d + 3) * S}px) scale(1.04)`, opacity: 1, offset: 0.2 }] : []),
+        { transform: `translate3d(${r2(dx * 0.45)}px, ${r2(dy * 0.45 - 70)}px, ${z}px) scale(1.12)`, opacity: 1, offset: 0.45 },
+        { transform: `translate3d(${dx}px, ${r2(dy + 22)}px, ${z}px) scale(1.07)`, opacity: 1, offset: 0.76 },
+        { transform: `translate3d(${dx}px, ${dy}px, ${r2(fz + 34 * S * 0.3)}px) scale(1)`, opacity: 1, offset: 0.9 },
+        { transform: `translate3d(${dx}px, ${r2(dy - 4)}px, ${fz}px) scale(0.9)`, opacity: 0, offset: 1 },
       ];
       el.classList.add('flyger');
       el.classList.remove('inne');
@@ -736,7 +730,7 @@ window.RumVideo = (() => {
       if (on) skarp(true);
       else V.skarpT = setTimeout(() => { if (!V.tat) skarp(false); }, 900);
       box.classList.toggle('vhs-tat', on);
-      if (o.aim) o.aim(on ? framme(TAT) : FOCUS);
+      if (o.aim) o.aim(on ? TAT : FOCUS);
     }
 
     box.addEventListener('click', (e) => {
@@ -782,16 +776,13 @@ window.RumVideo = (() => {
         layout();
       },
       skarp,
-      // Nära: tv:n vrids mot en, kassetterna och knapparna går att trycka
-      // på, och videon spelar vidare om den gjorde det när man gick. Svarar
-      // med hörnet i scenen.
+      // Nära: kassetterna och knapparna går att trycka på, och videon spelar
+      // vidare om den gjorde det när man gick. Svarar med hörnet i scenen.
       zoom(on) {
         V.near = on;
         V.tat = false;
         box.classList.remove('vhs-tat');
         for (const s of styr) s.inert = !on;
-        // utan rörelser (och i stillbilder) står tv:n och lådan på plats direkt
-        box.classList.toggle('lugn', o.calm());
         if (!on && P.frame && P.st !== 2 && P.st !== 0) {
           cmd('pauseVideo');
           V.resume = true;

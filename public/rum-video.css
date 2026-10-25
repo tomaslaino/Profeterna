@@ -4,9 +4,9 @@
    förminskas (scale3d), så att det är skarpt när kameran går fram – samma
    knep som tv:n i rum-tv.css. Alla mått nedan är i de stora måtten.
 
-   Tv:n är en låda i 3D i rummets perspektiv (perspective på .vhs-in). På
-   håll står den mot väggen, vriden ut mot rummet (--bort); nära vrids den
-   på samma ställe rakt mot en (--nara). */
+   Tv:n och fruktlådan bredvid är lådor i 3D i rummets perspektiv
+   (perspective på .vhs-in). De står mot väggen, vända mot gänget mitt i
+   rummet, och står kvar så när kameran går fram. */
 
 .rum-vhs { position: absolute; width: 240px; height: 130px; transform-style: preserve-3d; pointer-events: none; }
 /* Ännu en gång dubbelt (zoom) för att tv:n ska vara skarp när man går
@@ -33,9 +33,6 @@
 .vhs-styr { position: absolute; inset: 0; }
 .vhs-ritning { position: absolute; overflow: visible; pointer-events: none; }
 .rum.vid-nara .vhs-ritning .massiv { pointer-events: auto; }
-/* lådan står still till höger om bilden och syns när kameran går fram */
-.vhs-lada { left: 0; top: 0; width: 100%; height: 100%; }
-.rum .lugn .vhs-tv { transition: none; }
 
 /* väggen, disken och pulten till höger om bilden (planen -600 och -60) */
 .vhs-vagg { position: absolute; left: 1599.5px; top: 300px; width: 500.5px; height: 720px; }
@@ -43,12 +40,9 @@
 
 /* ---------- lådan i 3D ---------- */
 
-/* på håll mot väggen och vriden mot rummet; nära vrids den på stället rakt
-   fram */
-.vhs-tv, .vhs-front, .vhs-front > .vhs-styr { left: 0; top: 0; width: 1440px; height: 780px; transform-style: preserve-3d; }
-.vhs-tv { transform: var(--bort); transition: transform 0.75s cubic-bezier(0.45, 0, 0.25, 1); }
-.rum.vid-nara .vhs-tv { transform: var(--nara); transition: transform 0.8s cubic-bezier(0.3, 0, 0.2, 1); }
-.vhs-front { position: absolute; }
+/* mot väggen och vriden mot gänget, med lådan bredvid (i tv:ns mått) */
+.vhs-tv, .vhs-front, .vhs-styr, .vhs-lada { left: 0; top: 0; width: 1440px; height: 780px; transform-style: preserve-3d; }
+.vhs-front, .vhs-lada { position: absolute; }
 .vhs-yta { position: absolute; display: block; backface-visibility: hidden; pointer-events: none; }
 .rum.vid-nara .vhs-yta:not(.vhs-skugga, .vhs-pol) { pointer-events: auto; }
 /* sidorna i svart plast, med springor i bakre halvan */
@@ -63,6 +57,23 @@
 .vhs-topp { background: linear-gradient(0deg, #4a463f, #36332e); box-shadow: inset 0 -2px 0 rgba(255, 255, 255, 0.12); }
 .vhs-bak { background: #121110; }
 .vhs-fot { background: #070606; }
+/* fruktlådan: sidan i tre brädor av furu med springor emellan, taket, och
+   innanför öppningen vänstra väggen i ljuset, botten och baksidan */
+.lada-sida {
+  background:
+    linear-gradient(180deg, rgba(0, 0, 0, 0) 31%, #140b04 31% 34.5%, rgba(0, 0, 0, 0) 34.5% 65.5%, #140b04 65.5% 69%, rgba(0, 0, 0, 0) 69%),
+    repeating-linear-gradient(180deg, rgba(58, 34, 12, 0) 0 7px, rgba(58, 34, 12, 0.07) 7px 8px, rgba(58, 34, 12, 0) 8px 19px),
+    repeating-linear-gradient(180deg, rgba(58, 34, 12, 0) 0 23px, rgba(58, 34, 12, 0.06) 23px 25px, rgba(58, 34, 12, 0) 25px 53px),
+    linear-gradient(90deg, #96764a, #806139);
+}
+.lada-topp { background: linear-gradient(90deg, rgba(255, 243, 216, 0.12), rgba(255, 243, 216, 0)), #c9a46e; }
+.lada-vagg { background: linear-gradient(90deg, #6b4c2a, #3d2814); }
+.lada-botten { background: linear-gradient(0deg, #2a1a0c, #1a1006); }
+.lada-bak {
+  background:
+    linear-gradient(180deg, rgba(0, 0, 0, 0) 30%, rgba(13, 7, 3, 0.8) 30% 32%, rgba(0, 0, 0, 0) 32% 63%, rgba(13, 7, 3, 0.8) 63% 65%, rgba(0, 0, 0, 0) 65%),
+    linear-gradient(135deg, #120a04, #2a1a0c 70%, #3d2814);
+}
 /* skuggan på disken, och skenet från rutan framför den */
 .vhs-skugga { background: radial-gradient(closest-side, rgba(0, 0, 0, 0.72), rgba(0, 0, 0, 0.5) 62%, rgba(0, 0, 0, 0)); }
 .vhs-pol { background: radial-gradient(ellipse 50% 100% at 50% 0, rgba(143, 176, 255, 0.4), rgba(143, 176, 255, 0)); transition: opacity 0.6s; }
@@ -169,8 +180,7 @@
 /* ---------- kassetterna ---------- */
 
 /* En VHS-kassett, 41 × 5,67 × 22,4 i scenen: ryggen (kassetten själv eller
-   ett pappfodral, med en etikett skriven för hand), taket och ändarna.
-   I lådan syns bara ryggen. */
+   ett pappfodral, med en etikett skriven för hand), taket och ändarna. */
 .vhs-band {
   --blk: #1b2030;
   --hus: #151515;
@@ -238,16 +248,15 @@
 :is(.v1, .v3) > .vhs-kas .lapp { left: 12%; }
 .v1 > .vhs-kas .lapp { background: none; }
 
-/* på håll: tv:n och högen leder fram till videon, och lyser när man pekar */
+/* på håll: tv:n, högen och lådan leder fram till videon, och lyser när man
+   pekar (eller går dit med tangentbordet) */
 .rum-vhs .vhs-hit { display: block; position: absolute; left: 0; top: 0; width: 0; height: 0; transform-style: preserve-3d; pointer-events: none; }
 .vhs-hit > i { position: absolute; display: block; pointer-events: auto; border-radius: 12px; }
-.vhs-hit:hover, .vhs-hit:focus-visible { filter: none; }
-.vhs-hit:focus-visible { outline: none; }
-.vhs-hit:focus-visible > i:first-child { outline: 6px solid rgba(240, 214, 153, 0.8); outline-offset: 10px; }
+.vhs-hit:hover, .vhs-hit:focus-visible { filter: none; outline: none; }
 .rum.vid-nara .vhs-hit > i { pointer-events: none; }
-.rum-vhs:has(.vhs-hit:hover) :is(.vhs-ritning, .vhs-skarm, .vhs-kas, .vhs-yta:not(.vhs-skugga, .vhs-pol), .vhs-band > i) { filter: brightness(1.16); }
+.rum:not(.vid-nara) .rum-vhs:has(.vhs-hit:is(:hover, :focus-visible)) :is(.vhs-ritning, .vhs-skarm, .vhs-kas, .vhs-yta:not(.vhs-skugga, .vhs-pol), .vhs-band > i) { filter: brightness(1.16); }
 
 @media (prefers-reduced-motion: reduce) {
   .vhs-brus, .vhs-vfd.blink { animation: none; }
-  .vhs-band, .vhs-lucka, .vhs-sken, .vhs-pol, .vhs-tv, .rum.vid-nara .vhs-tv { transition: none; }
+  .vhs-band, .vhs-lucka, .vhs-sken, .vhs-pol { transition: none; }
 }

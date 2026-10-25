@@ -1553,8 +1553,8 @@ ${window.RumRegister ? RumRegister.nara() : ''}
   }
 
   // V: videon nära. Kameran går fram till hörnet på disken – tv:n, högen
-  // på den och lådan bredvid, som annars står utanför bilden – rakt
-  // framifrån, och förstorar så mycket som ryms mellan namnet och foten.
+  // på den och lådan bredvid – och förstorar så mycket som ryms mellan
+  // namnet och foten.
   function zoomVideo(on) {
     if (!R.video || (!on && !R.vnara)) return;
     if (on && R.zoom) zoomTv(false);
