@@ -288,8 +288,8 @@ window.RumUte = (() => {
       <circle cx="317" cy="330" r="2.5" fill="${L.lampor ? '#ffe2b0' : mix('#1a1a1a', '#bdb6a6', L.dag)}"/>${L.lampor ? '<circle cx="317" cy="330" r="12" fill="url(#rum-sodium)" opacity=".5"/>' : ''}
       <rect x="40" y="318" width="120" height="66" fill="${kond ? '#ffd9a0' : mix('#0c0d10', mix('#2a3038', L.sky[2], 0.3), L.dag)}" opacity="${kond ? r1(0.32 - 0.12 * L.dag) : 1}"/>
       <rect x="40" y="318" width="120" height="66" fill="none" stroke="${mix('#0d0f14', '#e9e2cf', L.dag)}" stroke-width="2"/>
-      <rect x="40" y="300" width="120" height="14" fill="${mix('#131012', '#6e2e2a', L.dag)}"/>
-      <text x="100" y="311" text-anchor="middle" font-family="Fraunces" font-style="italic" font-size="11" fill="${mix('#6a5a44', '#f2e4c8', L.dag)}" opacity="${kond || L.dag > 0.3 ? 0.9 : 0.4}">Konditori</text>`;
+      <rect x="40" y="300" width="120" height="14" fill="${mix('#131012', '#6e2e2a', L.dag)}"/>`;
+    let skylt = `<text x="100" y="311" text-anchor="middle" font-family="Fraunces" font-style="italic" font-size="11" fill="${mix('#6a5a44', '#f2e4c8', L.dag)}" opacity="${kond || L.dag > 0.3 ? 0.9 : 0.4}">Konditori</text>`;
     if (kond) s += '<g fill="#3a2414" opacity=".5"><rect x="56" y="360" width="24" height="3"/><rect x="104" y="356" width="34" height="3"/><circle cx="66" cy="352" r="5"/><circle cx="118" cy="348" r="5"/></g>';
     if (v.arstid !== 'vinter' && !v.snotackt && kond) {
       for (let i = 0; i < 5; i++) s += `<rect x="${44 + i * 22}" y="388" width="14" height="10" fill="${mix('#2a2a2a', '#7a7068', L.dag)}"/><circle cx="${51 + i * 22}" cy="386" r="6" fill="${['#e2483a', '#f2c23a', '#f3ead9', '#b24ad0', '#ff8a3a'][i]}" opacity="${r1(0.3 + 0.6 * L.dag)}"/>`;
@@ -302,9 +302,15 @@ window.RumUte = (() => {
         <rect x="584" y="372" width="30" height="4"/><rect x="588" y="376" width="3" height="18"/><rect x="608" y="376" width="3" height="18"/>
         <rect x="716" y="370" width="34" height="4"/><rect x="722" y="374" width="3" height="20"/><rect x="744" y="374" width="3" height="20"/></g>
       ${pizza ? '<rect x="650" y="350" width="34" height="8" rx="4" fill="#fff4d8" opacity=".5"/>' : ''}<rect x="580" y="292" width="170" height="26" fill="${mix('#0e1a12', '#1f3a2a', L.dag)}"/>
-      <text x="665" y="312" text-anchor="middle" font-family="Fraunces" font-style="italic" font-weight="700" font-size="21" fill="${pizza ? '#9bf5b5' : '#2c4a36'}">Pizzeria</text>
-      ${pizza ? `<text x="665" y="312" text-anchor="middle" font-family="Fraunces" font-style="italic" font-weight="700" font-size="21" fill="#4fe08a" filter="url(#rum-ute-b4)" opacity="${r1(1 - 0.6 * L.dag)}">Pizzeria</text>` : ''}
       <path d="M808 400 V352 H834 V400 Z" fill="${port}"/><rect x="852" y="332" width="70" height="52" fill="${mix('#0c0d10', mix('#2a3038', L.sky[2], 0.35), L.dag)}"/>`;
+    skylt += `<text x="665" y="312" text-anchor="middle" font-family="Fraunces" font-style="italic" font-weight="700" font-size="21" fill="${pizza ? '#9bf5b5' : '#2c4a36'}">Pizzeria</text>
+      ${pizza ? `<text x="665" y="312" text-anchor="middle" font-family="Fraunces" font-style="italic" font-weight="700" font-size="21" fill="#4fe08a" filter="url(#rum-ute-b4)" opacity="${r1(1 - 0.6 * L.dag)}">Pizzeria</text>` : ''}`;
+    // Skyltarnas text i en egen liten SVG mellan husen och det som står
+    // framför dem (lyktstolpen framför konditoriet): Chrome lägger ut text i
+    // SVG på nytt i varje bildruta medan rummet vrids, och då ritades hela
+    // gatan om varje gång.
+    const husen = s;
+    s = '';
 
     // flaggstången (flaggan vajar i livet på gatan)
     if (flagga(v)) s += `<line x1="712" y1="204" x2="744" y2="178" stroke="${mix('#222', '#e9e4d8', L.dag)}" stroke-width="1.8"/><circle cx="744" cy="178" r="1.6" fill="${mix('#3a3020', '#d8b25a', L.dag)}"/>`;
@@ -364,7 +370,9 @@ window.RumUte = (() => {
 
     // dimman lägger sig över allt
     if (L.dimma > 0.05) s += `<rect x="-80" y="90" width="1100" height="640" fill="${mix('#2a2622', '#aeb3b6', L.dag)}" opacity="${r1(0.5 * L.dimma)}"/>`;
-    return `<defs><filter id="rum-ute-b4" x="-50%" y="-50%" width="200%" height="200%"><feGaussianBlur stdDeviation="4"/></filter><filter id="rum-ute-b10" x="-50%" y="-50%" width="200%" height="200%"><feGaussianBlur stdDeviation="10"/></filter></defs>${s}`;
+    const ruta = (inner, [x, y, w, h] = [0, 0, 1600, 1000]) => `<svg class="rum-layer" viewBox="${x} ${y} ${w} ${h}" style="left:${x}px; top:${y}px; width:${w}px; height:${h}px">${inner}</svg>`;
+    return ruta(`<defs><filter id="rum-ute-b4" x="-50%" y="-50%" width="200%" height="200%"><feGaussianBlur stdDeviation="4"/></filter><filter id="rum-ute-b10" x="-50%" y="-50%" width="200%" height="200%"><feGaussianBlur stdDeviation="10"/></filter></defs>${husen}`) +
+      ruta(skylt, [30, 280, 740, 50]) + ruta(s);
   }
 
   // ---------- livet på gatan ----------
@@ -664,7 +672,7 @@ window.RumUte = (() => {
 
   const LAGER = [
     ['himmel', 'svg', 'rum-layer rum-ute-himmel'], ['himliv', 'div', 'rum-layer rum-himliv'], ['blixt', 'div', 'rum-layer rum-blixt'],
-    ['gata', 'svg', 'rum-layer rum-ute-gata'], ['liv', 'div', 'rum-layer rum-liv'],
+    ['gata', 'div', 'rum-layer rum-ute-gata'], ['liv', 'div', 'rum-layer rum-liv'],
     ['fall', 'div', 'rum-layer rum-fall'], ['glas', 'div', 'rum-layer rum-glas'],
   ];
 

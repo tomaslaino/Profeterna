@@ -123,7 +123,6 @@ window.Rum = (() => {
     <linearGradient id="rum-streakred" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#ff3b30" stop-opacity=".55"/><stop offset="1" stop-color="#ff3b30" stop-opacity="0"/></linearGradient>
     <linearGradient id="rum-cupg" x1="0" y1="0" x2="1" y2="0"><stop offset="0" stop-color="#fff" stop-opacity=".55"/><stop offset=".35" stop-color="#fff" stop-opacity="0"/><stop offset="1" stop-color="#000" stop-opacity=".45"/></linearGradient>
     <linearGradient id="rum-guld" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#f7e3a8"/><stop offset=".55" stop-color="#d4a650"/><stop offset="1" stop-color="#9c7230"/></linearGradient>
-    <path id="rum-dorrbage" d="M66 252 Q136 232 206 252"/>
     <clipPath id="rum-win"><rect ${box(WIN)}/></clipPath>
     <clipPath id="rum-doorglass"><rect ${box(DORR)}/></clipPath>
     <mask id="rum-hal" maskUnits="userSpaceOnUse" x="0" y="0" width="${W}" height="${H}"><rect width="${W}" height="${H}" fill="#fff"/><rect ${box(WIN)} fill="#000"/><rect ${box(DORR)} fill="#000"/></mask>
@@ -203,17 +202,6 @@ window.Rum = (() => {
   <rect x="50" y="136" width="172" height="560" fill="#fff" opacity=".03"/>
   <rect x="44" y="420" width="184" height="16" rx="3" fill="url(#rum-alu)"/>
   <path d="M36 122 h200 v610 h-200 z M50 136 v560 h172 v-560 z" fill="#1e1e20" fill-rule="evenodd" opacity=".001"/>
-  <!-- namnet i bladguld på glaset, spegelvänt inifrån som neonskylten -->
-  <a class="rum-sak" href="om-oss.html" aria-label="Om oss" id="rum-dorrnamn">
-    <rect x="60" y="226" width="152" height="72" fill="#000" opacity=".001"/>
-    <g transform="translate(272 0) scale(-1 1)" font-family="Fraunces" text-anchor="middle">
-      <text font-style="italic" font-weight="700" font-size="21" fill="#1a1208" opacity=".55" transform="translate(1.5 2)"><textPath href="#rum-dorrbage" startOffset="50%">Matchfixarna</textPath></text>
-      <text font-style="italic" font-weight="700" font-size="21" fill="url(#rum-guld)" stroke="#3a2808" stroke-width=".8" paint-order="stroke"><textPath href="#rum-dorrbage" startOffset="50%">Matchfixarna</textPath></text>
-      <line x1="92" y1="262" x2="180" y2="262" stroke="url(#rum-guld)" stroke-width="1.2"/>
-      <text x="136" y="277" font-weight="700" font-size="10.5" letter-spacing="2.4" fill="url(#rum-guld)" stroke="#3a2808" stroke-width=".4" paint-order="stroke">TOBAK &amp; SPEL</text>
-      <text x="136" y="292" font-style="italic" font-size="9.5" fill="#d8b46a" opacity=".9">Öppet till spelstoppet</text>
-    </g>
-  </a>
 
   <rect x="262" y="122" width="696" height="446" fill="#3a3a3c" mask="url(#rum-hal)"/>
   <g clip-path="url(#rum-win)">
@@ -233,6 +221,20 @@ window.Rum = (() => {
     <line x1="1092" y1="500" x2="1130" y2="511"/><line x1="1236" y1="543" x2="1250" y2="547"/><line x1="1318" y1="567" x2="1372" y2="583"/><line x1="1490" y1="619" x2="1512" y2="626"/>
   </g>
   <polygon points="1060,492 1600,654 1600,700 1060,540" fill="#000" opacity=".12"/>`, '', undefined, 2 / 3) +
+      // Namnet i bladguld på glaset, spegelvänt inifrån som neonskylten, i
+      // en egen SVG: Chrome lägger ut text i SVG på nytt i varje bildruta
+      // medan rummet vrids, och då ritades hela väggen om varje gång.
+      svg(`<defs><path id="rum-dorrbage" d="M66 252 Q136 232 206 252"/></defs>
+  <a class="rum-sak" href="om-oss.html" aria-label="Om oss" id="rum-dorrnamn">
+    <rect x="60" y="226" width="152" height="72" fill="#000" opacity=".001"/>
+    <g transform="translate(272 0) scale(-1 1)" font-family="Fraunces" text-anchor="middle">
+      <text font-style="italic" font-weight="700" font-size="21" fill="#1a1208" opacity=".55" transform="translate(1.5 2)"><textPath href="#rum-dorrbage" startOffset="50%">Matchfixarna</textPath></text>
+      <text font-style="italic" font-weight="700" font-size="21" fill="url(#rum-guld)" stroke="#3a2808" stroke-width=".8" paint-order="stroke"><textPath href="#rum-dorrbage" startOffset="50%">Matchfixarna</textPath></text>
+      <line x1="92" y1="262" x2="180" y2="262" stroke="url(#rum-guld)" stroke-width="1.2"/>
+      <text x="136" y="277" font-weight="700" font-size="10.5" letter-spacing="2.4" fill="url(#rum-guld)" stroke="#3a2808" stroke-width=".4" paint-order="stroke">TOBAK &amp; SPEL</text>
+      <text x="136" y="292" font-style="italic" font-size="9.5" fill="#d8b46a" opacity=".9">Öppet till spelstoppet</text>
+    </g>
+  </a>`, '', [44, 210, 184, 100]) +
       // Neonens sken genom fönstret för sig: det blinkar med neonen
       // (neonOn), och i väggens SVG ritades hela väggen om varje gång. Det
       // står längre till vänster än disken, som ritas efter det i väggen.
@@ -728,7 +730,9 @@ window.Rum = (() => {
   function build() {
     const el = document.createElement('section');
     el.id = 'rum-section';
-    el.className = 'rum';
+    // Chromium (navigator.userAgentData) ritar lagren på ett eget sätt när
+    // kameran går fram (.chromium i rum.css); Safari behöver det inte
+    el.className = navigator.userAgentData ? 'rum chromium' : 'rum';
     el.hidden = true;
     el.setAttribute('aria-label', 'Tobaksaffären');
     el.innerHTML = `<div class="rum-stage" id="rum-stage"><div class="rum-kamera" id="rum-kamera"><div class="rum-world" id="rum-world">
@@ -1447,69 +1451,6 @@ ${window.RumRegister ? RumRegister.nara() : ''}
     w.style.setProperty('--z', z);
     w.style.setProperty('--dx', `${r1(to[0] - 800 - z * (p[0] - 800))}px`);
     w.style.setProperty('--dy', `${r1(to[1] - 500 - z * (p[1] - 500))}px`);
-    if (z > 1) R.fram = true;
-    // utan glidning är den tillbaka genast (med glidning: transitionend i wire)
-    else if (!cls) requestAnimationFrame(hemma);
-  }
-
-  // Kameran är tillbaka på håll efter en närbild. Chrome ritar ett lager i
-  // den förstoring det har när kameran glider, och minskar den bara när en
-  // animering som rör lagret tar slut och lagret inte har will-change:
-  // transform (sakerna i planen, .rum-pl > * i rum.css, och gatans figurer
-  // och löv) – och det som animeras utan slut (gatan, röken, tv:ns text)
-  // minskar aldrig. Efter en närbild låg rummet därför kvar i närbildens
-  // skärpa, med flera gånger fler bildpunkter än som syns, så att minnet tog
-  // slut och väggarna, fönstret och disken fattades – mer för varje närbild.
-  // När kameran och det som flög tillbaka står still får sakerna
-  // will-change: opacity i stället (egna lager ändå), det som rör sig utan
-  // slut står still där det är, och kameran börjar en animering på 0,01 px
-  // (en utan ändring når inte lagren) som avbryts några bildrutor senare. Då
-  // ritar Chrome om allt i den vanliga förstoringen, och sedan går allt
-  // vidare som förut. Bara i Chromium (navigator.userAgentData): Safari
-  // minskar själv.
-  function hemma() {
-    const w = document.getElementById('rum-kamera');
-    if (!R.fram || !w || w.style.getPropertyValue('--z') !== '1' || w.getAnimations().length) return;
-    const alla = R.el.getAnimations({ subtree: true });
-    const flyger = alla.filter((a) => a.playState === 'running' && a.effect && Number.isFinite(a.effect.getComputedTiming().endTime));
-    if (flyger.length) {
-      Promise.all(flyger.map((a) => a.finished.catch(() => {}))).then(hemma);
-      return;
-    }
-    R.fram = false;
-    if (!navigator.userAgentData) return;
-    const stilla = new Map();
-    for (const a of alla) {
-      const el = a.effect && a.effect.target;
-      if (!(a instanceof CSSAnimation) || !el || a.effect.pseudoElement || stilla.has(el)) continue;
-      const cs = getComputedStyle(el);
-      stilla.set(el, { transform: cs.transform, opacity: cs.opacity, t: el.getAnimations().map((b) => [b.animationName, b.currentTime, b.playState]) });
-    }
-    const hint = new Set(R.el.querySelectorAll('.rum-pl > *'));
-    for (const el of stilla.keys()) {
-      for (let p = el; p && p !== R.el; p = p.parentElement) if (getComputedStyle(p).willChange.includes('transform')) hint.add(p);
-    }
-    const t0 = performance.now();
-    for (const el of hint) el.style.willChange = 'opacity';
-    for (const [el, s] of stilla) Object.assign(el.style, { transform: s.transform, opacity: s.opacity, animationName: 'none' });
-    const t = getComputedStyle(w).transform;
-    const a = w.animate([{ transform: t }, { transform: `${t} translateX(0.01px)` }], 10000);
-    const bild = () => new Promise((r) => requestAnimationFrame(r));
-    a.ready.catch(() => {}).then(bild).then(bild).then(() => {
-      a.cancel();
-      return new Promise((r) => setTimeout(r, 150));
-    }).then(bild).then(() => {
-      const dt = performance.now() - t0;
-      for (const el of hint) el.style.willChange = '';
-      for (const [el, s] of stilla) {
-        Object.assign(el.style, { transform: '', opacity: '', animationName: '' });
-        if (!el.isConnected) continue;
-        for (const b of el.getAnimations()) {
-          const f = s.t.find(([n]) => n === b.animationName);
-          if (f && f[1] != null) b.currentTime = f[1] + (f[2] === 'running' ? dt : 0);
-        }
-      }
-    });
   }
 
   // Ett föremål: kameran går fram mot det en kort stund innan sidan byts.
@@ -2706,8 +2647,6 @@ ${window.RumRegister ? RumRegister.nara() : ''}
   function wire() {
     const el = R.el;
     swipe(el);
-    const kam = el.querySelector('#rum-kamera');
-    kam.addEventListener('transitionend', (e) => { if (e.target === kam && e.propertyName === 'transform') hemma(); });
     el.addEventListener('mouseover', (e) => {
       const a = !R.kup && e.target.closest('.rum-sak, .rum-tag, .rum-guld');
       hot(a ? a.dataset.nav : null);
