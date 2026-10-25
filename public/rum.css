@@ -24,6 +24,8 @@ html.i-rummet body > footer { display: none; }
   transition: opacity 0.42s ease-in;
 }
 .rum.dyker .rum-stage { opacity: 0; }
+/* rutan som scenen rullar i (.rull nedan); annars gör den inget */
+.rum-rull { position: absolute; inset: 0; }
 
 /* kameran: förstoringen när man går fram till något (2D, efter perspektivet) */
 .rum-kamera {
@@ -691,6 +693,16 @@ a.rum-sak, a.rum-sak:hover { color: inherit; text-decoration: none; }
 /* Fingret drar scenen (rum.js, swipe): sidan zoomar och rullar inte, och
    ett långt tryck på ett föremål visar ingen länk. */
 .rum { touch-action: none; -webkit-tap-highlight-color: transparent; }
+/* I Chrome rullar webbläsaren scenen efter fingret (.rull, RULL i rum.js):
+   dragningen och glidningen sköts utanför sidans tråd och hackar inte medan
+   gänget ritas. Ingen studs i kanterna och inga rullningslister. Nära tv:n,
+   videon, en närbild, kupongen i handen, anslagstavlan och kortregistret
+   står scenen still och svepen bläddrar, och från videohörnet drar man den
+   inte (som förut). */
+.rum.rull .rum-rull { overflow: auto; overscroll-behavior: none; scrollbar-width: none; touch-action: pan-x pan-y; }
+.rum.rull .rum-rull::-webkit-scrollbar { display: none; }
+.rum.rull:is(.tv-nara, .vid-nara, .sak-nara, .i-handen, :has(.rum-ansn.on, .rum-regn.on)) .rum-rull { overflow: hidden; touch-action: none; }
+.rum.rull #rum-vhs { touch-action: none; }
 .rum a, .rum img { -webkit-user-drag: none; -webkit-touch-callout: none; }
 /* utan tangentbord: inga tangenter i foten */
 @media (hover: none) { .rum-ft .keys { display: none; } }

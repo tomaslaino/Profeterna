@@ -78,6 +78,11 @@ window.Rum = (() => {
   const mid = (fx = 0.5, fy = 0.5) => [(innerWidth * fx - R.ox) / R.k, (innerHeight * fy - R.oy) / R.k];
   // i telefonen (som i rum-3d.js och de andra): rummet sparar på minnet
   const LATT = matchMedia('(max-width: 700px), (max-height: 500px)').matches;
+  // I Chrome med fingret rullar webbläsaren scenen själv (.rull i rum.css,
+  // pan): dragningen och glidningen sköts då utanför sidans tråd och följer
+  // fingret i varje bildruta, också medan gänget ritas. I Safari (inte
+  // prövat där) och med musen flyttas scenen som förut.
+  const RULL = Boolean(navigator.userAgentData) && matchMedia('(pointer: coarse)').matches;
 
   function rng(a) {
     return () => {
@@ -731,7 +736,8 @@ window.Rum = (() => {
     el.className = 'rum';
     el.hidden = true;
     el.setAttribute('aria-label', 'Tobaksaffären');
-    el.innerHTML = `<div class="rum-stage" id="rum-stage"><div class="rum-kamera" id="rum-kamera"><div class="rum-world" id="rum-world">
+    el.classList.toggle('rull', RULL);
+    el.innerHTML = `<div class="rum-rull" id="rum-rull"><div class="rum-stage" id="rum-stage"><div class="rum-kamera" id="rum-kamera"><div class="rum-world" id="rum-world">
 ${plane(-600, `<div class="rum-ute" id="rum-ute"></div>${bg()}${vid('vagg')}${rightWall()}${window.RumRegister ? RumRegister.html() : ''}${svg('<g id="rum-hyllor"></g>', '', [1130, 170, 200, 140])}${neon()}${frameHtml()}`, 1.035)}
 ${plane(-598, vid('horn'), 1.035, 'rum-pl3d')}
 ${plane(-470, `${tv()}`, 1.02, 'rum-pl3d')}
@@ -741,7 +747,7 @@ ${plane(0, paper())}
 </div></div>
 <div class="rum-layer rum-mork" id="rum-mork"><i class="a"></i><i class="b"></i></div>
 <div class="rum-layer rum-warm"></div><div class="rum-layer rum-dagsljus" id="rum-dagsljus"></div><div class="rum-layer rum-vign"></div><div class="rum-layer rum-grain"></div>
-</div>
+</div></div>
 ${window.RumAnslag ? RumAnslag.nara() : ''}
 ${window.RumRegister ? RumRegister.nara() : ''}
 <div class="rum-hdr"><a class="rum-brand" href="#">Matchfixarna</a></div>
@@ -2615,10 +2621,10 @@ ${window.RumRegister ? RumRegister.nara() : ''}
 
   // Med fingret (eller musen nedtryckt) ser man sig omkring: scenen följer
   // med där den är större än fönstret, och släpper man den i farten glider
-  // den vidare en bit. Nära tv:n, videon och med en lapp ur anslagstavlan
-  // eller ett kort ur kortregistret i handen bläddrar ett svep i sidled i
-  // stället, som pilarna. Klicket efter
-  // ett drag öppnar ingenting.
+  // den vidare en bit (med RULL gör webbläsaren det med fingret). Nära
+  // tv:n, videon och med en lapp ur anslagstavlan eller ett kort ur
+  // kortregistret i handen bläddrar ett svep i sidled i stället, som
+  // pilarna. Klicket efter ett drag öppnar ingenting.
   function swipe(el) {
     const P = { id: null };
     const frac = (d, o) => (o > 1 ? d / o : 0);
@@ -2639,7 +2645,8 @@ ${window.RumRegister ? RumRegister.nara() : ''}
       const dy = e.clientY - P.y;
       if (!P.drar && Math.hypot(dx, dy) < 8) return;
       P.drar = true;
-      if (nara()) return;
+      // (med RULL rullar webbläsaren scenen efter fingret)
+      if (nara() || (RULL && e.pointerType !== 'mouse')) return;
       P.spar.push([e.timeStamp, e.clientX, e.clientY]);
       if (P.spar.length > 5) P.spar.shift();
       pan(P.px - frac(dx, R.k * W - innerWidth), P.py - frac(dy, R.k * H - innerHeight));
@@ -2665,6 +2672,7 @@ ${window.RumRegister ? RumRegister.nara() : ''}
         else if (R.reg && R.reg.on() && el.querySelector('.rum-regn.lyft')) R.reg.key(k);
         return;
       }
+      if (RULL && e.pointerType !== 'mouse') return;
       // farten de sista bildpunkterna, i bildpunkter per millisekund
       const [t0, x0, y0] = P.spar[0];
       const dt = Math.max(16, e.timeStamp - t0);
@@ -2692,20 +2700,41 @@ ${window.RumRegister ? RumRegister.nara() : ''}
   }
 
   // Scenen förskjuten i fönstret: px och py (0–1) säger var i det som inte
-  // ryms man står, i sidled och på höjden.
+  // ryms man står, i sidled och på höjden. Med RULL är det rullningen.
   function pan(px, py) {
     const ow = R.k * W - innerWidth;
     const oh = R.k * H - innerHeight;
     R.px = ow > 1 ? Math.min(1, Math.max(0, px)) : 0.5;
     R.py = oh > 1 ? Math.min(1, Math.max(0, py)) : 0.5;
+    const st = R.el.querySelector('.rum-stage');
+    if (RULL) {
+      st.style.transform = `scale(${R.k.toFixed(4)})`;
+      const s = R.el.querySelector('.rum-rull');
+      s.scrollLeft = Math.max(0, ow) * R.px;
+      s.scrollTop = Math.max(0, oh) * R.py;
+      R.ox = -s.scrollLeft;
+      R.oy = -s.scrollTop;
+      return;
+    }
     R.ox = -ow * R.px;
     R.oy = -oh * R.py;
-    R.el.querySelector('.rum-stage').style.transform = `translate(${R.ox.toFixed(1)}px, ${R.oy.toFixed(1)}px) scale(${R.k.toFixed(4)})`;
+    st.style.transform = `translate(${R.ox.toFixed(1)}px, ${R.oy.toFixed(1)}px) scale(${R.k.toFixed(4)})`;
+  }
+  // fingret har rullat scenen (RULL)
+  function rullad() {
+    const s = R.el.querySelector('.rum-rull');
+    const ow = R.k * W - innerWidth;
+    const oh = R.k * H - innerHeight;
+    R.ox = -s.scrollLeft;
+    R.oy = -s.scrollTop;
+    if (ow > 1) R.px = Math.min(1, s.scrollLeft / ow);
+    if (oh > 1) R.py = Math.min(1, s.scrollTop / oh);
   }
 
   function wire() {
     const el = R.el;
     swipe(el);
+    if (RULL) el.querySelector('.rum-rull').addEventListener('scroll', rullad, { passive: true });
     const kam = el.querySelector('#rum-kamera');
     kam.addEventListener('transitionend', (e) => { if (e.target === kam && e.propertyName === 'transform') hemma(); });
     el.addEventListener('mouseover', (e) => {

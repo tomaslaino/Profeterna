@@ -1968,6 +1968,22 @@ ett drag öppnar ingenting. Föremålen lyser inte kvar efter ett tryck (`:hover
 mus), och foten har bara *Vanlig sida* – utan tangentbord står inga tangenter där. Sidan
 zoomar och rullar inte i rummet (`touch-action: none`).
 
+**I Chrome rullar webbläsaren scenen själv** (`RULL` och `pan` i rum.js, `.rull` och
+`.rum-rull` i rum.css): scenen ligger i en ruta som rullar, och fingret drar och släpper den
+som en vanlig sida, men utan studs i kanterna och utan rullningslister. Förut flyttade
+rum.js scenen med `transform` för varje rörelse av fingret, och då måste varje bildruta gå
+genom sidans tråd – stilen, en ny lagerindelning av hela rummet (ungefär 3 ms i Chromium
+här) och överlämningen till kompositorn – och var fjärde bildruta i en telefon med 120 Hz
+ritades dessutom gänget (ungefär 10 ms). Hann tråden inte med följde scenen inte fingret i
+den bildrutan. Nu sköter Chromes kompositor dragningen och glidningen utan sidans tråd:
+med tråden konstlat upptagen 40 ms av var 50:e ritade Chromium 507 bildrutor under ett drag
+i stället för 177, och alla 57 rullstegen togs om hand utanför tråden. Kameran vrids som
+förut efter var man står (`rullad` läser rullningen). Nära tv:n, videon, en närbild,
+kupongen i handen, anslagstavlan och kortregistret står scenen still (rutan rullar inte)
+och svepen bläddrar som förut; från videohörnet drar man inte scenen, som förut. Med musen
+och i Safari flyttas scenen som förut – Safari är inte prövat med rullningen (minnet och
+3D-lagren i en ruta som rullar), och där är `RULL` falskt.
+
 Närbilderna ryms i fönstret: tv:n går så nära att den fyller bredden (på datorn 3,6 gånger
 som förut; kameran siktar på frontens mått, och Safari i iPhone ger mått i något med CSS
 zoom delade med zoomen – utan GetBoundingClientRectZoomed – så att tv:n hamnade utanför
