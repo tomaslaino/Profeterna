@@ -1735,9 +1735,8 @@ klassen `chromium` på `.rum`) har kamerans transform därför ett `perspective(
 lagren i den skärpa de redan har medan kameran glider – suddigt på vägen fram, som när rummet
 vrids. Sakerna i planen har där `will-change: opacity` i stället för `transform`, så att det som
 syns ritas skarpt när kameran står still, nära och på håll (ett lager med
-`will-change: transform` behåller sin skärpa). Lagren tar nu 150–280 MB genom tv:n, videon,
-skårtavlan, oraklet, affischen och anslagstavlan i rad, och närbilderna är lika skarpa som förut
-(mätt i Chrome 153). Safari har kvar `will-change: transform`. Namnet
+`will-change: transform` behåller sin skärpa), och närbilderna är lika skarpa som förut (se
+*Minnet i Chrome* nedan). Safari har kvar `will-change: transform`. Namnet
 och foten (*K kupongen · T tv:n · A anslagstavlan · R kortregistret · V videon*, *Vanlig sida*) ligger utanför scenen i fönstrets hörn;
 någon meny finns inte, det är föremålen som leder vidare. [public/rum.js](public/rum.js)
 ritar rummet och fyller det med sajtens data, [public/rum.css](public/rum.css) ger det utseendet och
@@ -1751,6 +1750,32 @@ på disken (se [Videon](#videon)), och [public/rum-3d.js](public/rum-3d.js) rita
 [public/rum-inredning.js](public/rum-inredning.js) inredningen (se *Inredningen i 3D* nedan) i
 three.js 0.160.0 (från jsdelivr, importmap i `index.html`), som hämtas först när rummet
 visas – utan WebGL eller utan nätet står rummet kvar utan dem.
+
+**Minnet i Chrome.** Chrome ger en sida 512 MB för lagrens rutor. Räcker det inte ritas en del
+rutor inte, och de kommer och går när rummet vrids (flimmer), och det som kastats ritas om
+(segt). Lagren i rummets 3D ritar Chrome i sin egen storlek gånger pixeltätheten, hur
+förminskade de än visas (perspektivet gör att förminskningen inte räknas), men platta lager –
+ljuset, vinjetten och kornet över scenen – i den storlek de visas i; att rita med färre
+bildpunkter och förstora, som i telefonen (se [I telefonen](#i-telefonen)), sparar därför bara i
+3D i Chrome. Med pixeltäthet 2 i 1440 × 860 tog rummet 470 MB på håll och 520–570 MB med
+anslagstavlan eller kortregistret nära, och Chrome fick slut. Nu ritas tv:n i 1,5 gånger lådans
+mått på håll och i 3 först när man går fram till den (se [Tv:n](#tvn)), videohörnet i sex gånger
+på håll och i tolv först när rutan fyller bilden (se [Videon](#videon)), sidans bakgrund under
+rummet är enfärgad (den syns inte, och enfärgad tar den inga rutor), och ljuset, vinjetten och
+kornet ritas inte medan anslagstavlan eller kortregistret är framme – under deras mörka toning
+syns de knappt. Lagren tar då 280–345 MB i 1440 × 860 och 310–400 MB i 1710 × 1080, på håll
+och nära (förut 340–570 respektive 590–740 MB), och inga rutor fattas. Mät med riktig
+pixeltäthet (`--force-device-scale-factor=2` till Chrome): med Playwrights `deviceScaleFactor`
+ritar Chrome i täthet 1, och lagren ser ut att ta en fjärdedel så mycket (siffrorna här förut,
+150–280 MB, var mätta så).
+
+**Mellanbilderna.** Sidorna i tv:ns, videons och anslagstavlans lådor i 3D har
+`transform-style: preserve-3d` (de har inget i sig, så det syns inte), och de mörkare sidorna en
+inre skugga i stället för `filter: brightness()` (sidorna är ogenomskinliga, så färgen blir
+densamma): Chrome gjorde annars en egen mellanbild (render surface) av varje sida och ritade
+sedan den på skärmen: 76 mellanbilder i varje bildruta på håll, nu knappt 50. Kameran
+följer musen lika fort räknat i tid (`frame` i rum.js), också när webbläsaren hinner färre
+bilder i sekunden.
 
 **Föremålen** – pekar man på ett lyser det (pokalerna också), och snabbvalet
 på text-tv:n med samma ämne tänds, som när man pekar på snabbvalet med tv:n nära
@@ -2038,8 +2063,8 @@ Därför:
   Skenet genom fönstret låg förut i väggens SVG, så att hela väggen ritades om när neonen
   blinkade.
 - **Det som ritas i större storlek för att vara skarpt nära** ritas mindre i telefonen: tv:n i
-  1,5 gånger lådans mått i stället för 3 (se [Tv:n](#tvn)) och videohörnet i halva storleken på
-  håll (se [Videon](#videon)). Anslagstavlans yta står före ramens sidor, så att den inte blir ett
+  1,5 gånger lådans mått också nära (på datorn 3 nära, se [Tv:n](#tvn)) och videohörnet i halva
+  storleken på håll (se [Videon](#videon)). Anslagstavlans yta står före ramens sidor, så att den inte blir ett
   eget lager, och flaggan i utsikten är ett eget lager – annars ritades hela utsikten om hela
   tiden, och ett lager som ritas om hålls i två buffertar.
 - **Det suddiga ritas med färre bildpunkter.** Ljuset, vinjetten och kornet med en fjärdedel
@@ -2290,11 +2315,15 @@ ihop till ett streck och en prick, lampan blir röd och skenet på väggen slock
 till tänder den. Esc, T eller ett klick utanför zoomar ut. Med `prefers-reduced-motion`
 byts sidan direkt och tv:n står still.
 
-Lådan ritas i tre gånger storleken (`zoom: 3`) och förminskas igen (`scale3d`): Chrome
-ritar inte om lager i perspektiv när kameran går fram, så utan skärpan i reserv blir
-text-tv:n suddig på nära håll. I telefonen räcker 1,5 gånger (`zoom: 1.5`): där går kameran
-högst så nära att tv:n fyller bredden eller höjden mellan namnet och foten, ungefär 1,4 gånger
-lådans mått, och lagren tar en fjärdedel så mycket minne (se [I telefonen](#i-telefonen)).
+Lådan ritas i tre gånger storleken (`zoom: 3`) och förminskas igen (`scale3d`) när man går
+fram till den: Chrome ritar inte om lager i perspektiv när kameran går fram, så utan skärpan i
+reserv blir text-tv:n suddig på nära håll. På håll räcker 1,5 gånger (`zoom: 1.5`), och lagren
+tar en fjärdedel så mycket minne – i tre gånger ungefär 65 MB med pixeltäthet 2 (se *Minnet i
+Chrome* ovan). Storleken byts med övergångarna avstängda (`skarp` i `RumTv.zoom`), innan tv:n
+vrids fram och när den har vridits tillbaka, eftersom zoom också ändrar måtten i övergången. I
+telefonen räcker 1,5 gånger också nära: där går kameran högst så nära att tv:n fyller bredden
+eller höjden mellan namnet och foten, ungefär 1,4 gånger lådans mått (se
+[I telefonen](#i-telefonen)).
 Kameran siktar på frontens mått med tv:n vriden (`zoom(on, rekt)`); Safari i iPhone delar
 måtten med zoomen, och rum.js rättar dem (`rekt`). Tv:n sköter sig själv: rum.js bygger den (`RumTv.html`),
 kopplar in den (`RumTv.mount`), ger den omgångens rader vid varje `fill` (med Stryktipsets
@@ -2467,13 +2496,15 @@ visar videon sin blå bild med *▶ SPELA*, utan ljud, tills klippet har spelat 
 att bilden fortsätter där den stannade, och när man spolar med ◀◀ och ▶▶ hoppar den till
 3,6 sekunder före målet. Slutet, och förslagen efter det, täcks direkt.
 
-Hörnet ritas i sex gånger storleken och dubbelt till (`zoom: 2`) och förminskas, som tv:n,
-så att det är skarpt också när man går närmare rutan; ritningarna är bara så stora som tv:n
-och lådan, så att lagren inte blir större än de behöver. I telefonen (smalare än 700 eller
-lägre än 500 bildpunkter) ritas det inte dubbelt (`zoom: 1`, det räcker för hur nära
-kameran går där) och bara när rutan fyller bilden (det andra klicket); på håll och vid första
-närbilden räcker halva storleken (`zoom: 0.5`) – Safari ritar lagren i full storlek gånger
-pixeltätheten, och tobaksaffären fick slut på minne i iPhone. Storleken byts med övergångarna
+Hörnet ritas i sex gånger storleken och förminskas, som tv:n, och när rutan fyller bilden (det
+andra klicket) dubbelt till (`zoom: 2`), så att det är skarpt också så nära; på håll och vid
+första närbilden räcker sex gånger, och dubbelt tog hörnet ungefär 90 MB i Chrome med
+pixeltäthet 2 (se *Minnet i Chrome* ovan). Ritningarna är bara så stora som tv:n och lådan, så
+att lagren inte blir större än de behöver. I telefonen (smalare än 700 eller lägre än 500
+bildpunkter) ritas det inte dubbelt (`zoom: 1`, det räcker för hur nära kameran går där) och
+bara när rutan fyller bilden; på håll och vid första närbilden räcker halva storleken
+(`zoom: 0.5`) – Safari ritar lagren i full storlek gånger pixeltätheten, och tobaksaffären fick
+slut på minne i iPhone. Storleken byts med övergångarna
 avstängda (`skarp` och `tat` i rum-video.js, `zoomVideo` i rum.js), innan kameran går
 fram till rutan och när den har gått tillbaka, eftersom zoom också ändrar måtten i
 övergångarna. Spelaren är dubbelt så stor som

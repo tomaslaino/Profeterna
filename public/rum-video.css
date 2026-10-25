@@ -9,8 +9,14 @@
    på samma ställe rakt mot en (--nara). */
 
 .rum-vhs { position: absolute; width: 240px; height: 130px; transform-style: preserve-3d; pointer-events: none; }
-/* ännu en gång dubbelt (zoom) för att tv:n ska vara skarp när man går närmare rutan */
-.vhs-in { position: absolute; left: 0; top: 0; width: 1440px; height: 780px; zoom: 2; transform-origin: 0 0; transform: scale3d(0.083333, 0.083333, 0.083333); }
+/* När rutan fyller bilden ännu en gång dubbelt (zoom; skarp och tat i
+   rum-video.js), så att tv:n är skarp så nära. På håll och vid första
+   närbilden räcker sex gånger: Safari och Chrome ritar lagren i full storlek
+   gånger pixeltätheten, hur förminskade de än visas, och dubbelt tog hörnet
+   ungefär 90 MB i Chrome med pixeltäthet 2 – Chrome ger en sida 512 MB för
+   lagren, och räcker det inte flimrar rummet. */
+.vhs-in { position: absolute; left: 0; top: 0; width: 1440px; height: 780px; zoom: 1; transform-origin: 0 0; transform: scale3d(0.166667, 0.166667, 0.166667); }
+.vhs-in.skarp { zoom: 2; transform: scale3d(0.083333, 0.083333, 0.083333); }
 /* i telefonen inte dubbelt: det räcker för hur nära kameran går där, och
    lagren blir en fjärdedel så stora – Safari ritar dem i full storlek gånger
    pixeltätheten, och tobaksaffären fick slut på minne i iPhone. På håll
@@ -43,7 +49,8 @@
 .vhs-tv { transform: var(--bort); transition: transform 0.75s cubic-bezier(0.45, 0, 0.25, 1); }
 .rum.vid-nara .vhs-tv { transform: var(--nara); transition: transform 0.8s cubic-bezier(0.3, 0, 0.2, 1); }
 .vhs-front { position: absolute; }
-.vhs-yta { position: absolute; display: block; backface-visibility: hidden; pointer-events: none; }
+/* (preserve-3d och inga filter på sidorna: se .tv-f i rum-tv.css) */
+.vhs-yta { position: absolute; display: block; transform-style: preserve-3d; backface-visibility: hidden; pointer-events: none; }
 .rum.vid-nara .vhs-yta:not(.vhs-skugga, .vhs-pol) { pointer-events: auto; }
 /* sidorna i svart plast, med springor i bakre halvan */
 .vhs-sida {
@@ -52,7 +59,7 @@
     linear-gradient(180deg, rgba(255, 255, 255, 0.1), rgba(255, 255, 255, 0) 6%),
     linear-gradient(90deg, #3a3631, #2b2925 60%, #23211e);
 }
-.vhs-sida.v { background-position: 48% 9%, 0 0, 0 0; filter: brightness(0.5); }
+.vhs-sida.v { background-position: 48% 9%, 0 0, 0 0; box-shadow: inset 0 0 0 2000px rgba(0, 0, 0, 0.5); }
 .vhs-sida.h { box-shadow: inset 2px 0 0 rgba(255, 255, 255, 0.08); }
 .vhs-topp { background: linear-gradient(0deg, #4a463f, #36332e); box-shadow: inset 0 -2px 0 rgba(255, 255, 255, 0.12); }
 .vhs-bak { background: #121110; }

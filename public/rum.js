@@ -1282,7 +1282,12 @@ ${window.RumRegister ? RumRegister.nara() : ''}
       R.ty = R.k * H - innerHeight > 1 ? R.py * 2 - 1 : -0.25;
     }
     if (!still()) {
-      const f = R.kup ? 0.12 : 0.06;
+      // lika fort räknat i tid, också när webbläsaren hinner färre bilder
+      // (en andel per trettiondels sekund)
+      const ms = performance.now();
+      const n = Math.min(3, (ms - (R.tCam || ms - 1000 / 30)) / (1000 / 30));
+      R.tCam = ms;
+      const f = 1 - (1 - (R.kup ? 0.12 : 0.06)) ** n;
       R.mx += (R.tx - R.mx) * f;
       R.my += (R.ty - R.my) * f;
     }
@@ -1555,8 +1560,8 @@ ${window.RumRegister ? RumRegister.nara() : ''}
     if (on && R.ans && R.ans.on()) board(false);
     if (on && R.reg && R.reg.on()) register(false);
     R.vnara = on;
-    // i telefonen ritas hörnet skarpt bara när rutan fyller bilden (tat i
-    // rum-video.js), och i halva storleken igen när tv:n har vridits bort
+    // hörnet ritas skarpt bara när rutan fyller bilden (tat i rum-video.js),
+    // och i halva storleken igen när tv:n har vridits bort
     clearTimeout(R.vskarp);
     if (on) R.video.skarp(false);
     else R.vskarp = setTimeout(() => { if (!R.vnara) R.video.skarp(false); }, 900);

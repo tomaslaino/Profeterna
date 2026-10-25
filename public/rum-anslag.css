@@ -43,7 +43,8 @@
 .ans-f, .ans-glans, .ans-hal, .ans-rest, .ans-blek, .ans-nal, .ans-stift, .ans-lapp .d { display: block; }
 .ans-lapp i, .ans-lapp em { font-style: normal; }
 /* ramens fyra sidor, från framsidan in mot väggen */
-.ans-f { position: absolute; transform-origin: 0 0; background: var(--ek); }
+/* (preserve-3d på sidorna: se .tv-f i rum-tv.css) */
+.ans-f { position: absolute; transform-origin: 0 0; transform-style: preserve-3d; background: var(--ek); }
 .ans-topp { left: 0; top: 0; width: 1000px; height: 18px; transform: rotateX(-90deg); background: linear-gradient(rgba(255, 228, 180, 0.22), rgba(255, 228, 180, 0.22)), var(--ek); }
 .ans-botten { left: 0; top: 568px; width: 1000px; height: 18px; transform: rotateX(-90deg); background: linear-gradient(rgba(10, 5, 2, 0.6), rgba(10, 5, 2, 0.6)), var(--ek); }
 .ans-vanster { left: 0; top: 0; width: 18px; height: 568px; transform: rotateY(90deg); background: linear-gradient(90deg, rgba(10, 5, 2, 0.15), rgba(10, 5, 2, 0.5)), var(--ek); }

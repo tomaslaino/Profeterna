@@ -641,7 +641,10 @@ window.RumTv = (() => {
       },
       // Nära: tv:n vrids mot en och knapparna går att trycka på. Svarar med
       // frontens mått i det läge den vrids till (för kameran i rum.js), mätta
-      // med rekt (rum.js rättar Safaris mått i zoom).
+      // med rekt (rum.js rättar Safaris mått i zoom). Lådan ritas skarp (i
+      // dubbla storleken, .skarp i rum-tv.css) innan den vrids fram, och i
+      // halva igen när den har vridits tillbaka; zoom ändrar måtten i
+      // övergången, så det byts när inget rör sig.
       zoom(on, rekt = (e) => e.getBoundingClientRect()) {
         T.near = on;
         front.inert = !on;
@@ -649,7 +652,18 @@ window.RumTv = (() => {
           T.typed = '';
           showLed(T.on ? String(T.nr) : '   ');
         }
+        clearTimeout(T.skarpT);
         box.classList.add('mat');
+        if (on) box.classList.add('skarp');
+        else {
+          T.skarpT = setTimeout(() => {
+            if (T.near) return;
+            box.classList.add('mat');
+            box.classList.remove('skarp');
+            void box.offsetWidth;
+            box.classList.remove('mat');
+          }, 900);
+        }
         box.classList.toggle('nara', on);
         const r = rekt(front);
         box.classList.toggle('nara', !on);

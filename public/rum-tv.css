@@ -6,9 +6,14 @@
    fram att inget hörn går in i väggen (planet -600, här -130). Nära
    (.nara) vrids den rakt fram mot betraktaren.
 
-   Lådan ritas i tre gånger storleken (zoom: 3) och förminskas igen
-   (scale3d): Chrome ritar inte om lager i perspektiv när kameran går fram,
-   så text-tv:n måste ha skärpan i reserv för att vara skarp på nära håll.
+   Lådan ritas i tre gånger storleken när man går fram till den (zoom: 3,
+   .skarp) och förminskas igen (scale3d): Chrome ritar inte om lager i
+   perspektiv när kameran går fram, så text-tv:n måste ha skärpan i reserv
+   för att vara skarp på nära håll. På håll räcker en och en halv gång: Chrome
+   ritar lagren i rummet i den storleken gånger pixeltätheten, hur
+   förminskade de än visas, och i tre gånger tog lådan ungefär 65 MB med
+   pixeltäthet 2 av de 512 MB Chrome ger en sida för lagren (räcker det inte
+   flimrar rummet). skarp i rum-tv.js byter när tv:n står still.
    Alla mått nedan är i lådans egna 292 × 196. */
 
 .rum-pl3d { transform-style: preserve-3d; }
@@ -24,21 +29,31 @@
   top: 0;
   width: 292px;
   height: 196px;
-  zoom: 3;
+  zoom: 1.5;
   transform-style: preserve-3d;
   transform-origin: 0 0;
-  transform: scale3d(0.3333, 0.3333, 0.3333) translate3d(146px, 98px, -20px) rotateY(-44deg) rotateX(-5deg) translate3d(-146px, -98px, 132px);
+  transform: scale3d(0.6667, 0.6667, 0.6667) translate3d(146px, 98px, -20px) rotateY(-44deg) rotateX(-5deg) translate3d(-146px, -98px, 132px);
   transition: transform 0.6s cubic-bezier(0.3, 0, 0.2, 1);
 }
 /* nära: rakt fram, parallell med bilden – då blir rutan en rak rektangel
    (vriden mot ögat blir den sned, eftersom den sitter högt upp till höger) */
-.rum-tv3.nara { transform: scale3d(0.3333, 0.3333, 0.3333) translate3d(146px, 98px, -20px) rotateY(0deg) rotateX(0deg) translate3d(-146px, -98px, 132px); }
+.rum-tv3.nara { transform: scale3d(0.6667, 0.6667, 0.6667) translate3d(146px, 98px, -20px) rotateY(0deg) rotateX(0deg) translate3d(-146px, -98px, 132px); }
+.rum-tv3.skarp { zoom: 3; transform: scale3d(0.3333, 0.3333, 0.3333) translate3d(146px, 98px, -20px) rotateY(-44deg) rotateX(-5deg) translate3d(-146px, -98px, 132px); }
+.rum-tv3.skarp.nara { transform: scale3d(0.3333, 0.3333, 0.3333) translate3d(146px, 98px, -20px) rotateY(0deg) rotateX(0deg) translate3d(-146px, -98px, 132px); }
 .rum-tv3.mat { transition: none; }
 .rum-tv3 i, .rum-tv3 b, .rum-tv3 em { display: block; font-style: normal; }
 
 /* ---------- lådan ---------- */
 
+/* Sidorna i lådorna har inget i sig och får transform-style: preserve-3d
+   (det syns inte): Chrome gör annars en egen mellanbild (render surface) för
+   varje sida med en 3D-transform i en 3D-scen, som om något i den behövde
+   plattas till, och ritar sedan den på skärmen – ett trettiotal extra varje
+   bildruta i tv:n, videon och anslagstavlan. Av samma skäl är sidorna som
+   ska vara mörkare mörkade med en inre skugga i stället för
+   filter: brightness() – sidorna är ogenomskinliga, så färgen blir densamma. */
 .tv-f { position: absolute; transform-origin: 0 0; background: var(--plast); }
+.tv-f, .tv-hylla, .tv-fot i:not(.tv-arm) { transform-style: preserve-3d; }
 .tv-topp { left: 0; top: 0; width: 292px; height: 105px; transform: rotateX(-90deg); background: linear-gradient(rgba(255, 255, 255, 0.1), rgba(255, 255, 255, 0.1)), var(--plast); }
 .tv-botten { left: 0; top: 196px; width: 292px; height: 105px; transform: rotateX(-90deg); background: linear-gradient(180deg, rgba(10, 5, 2, 0.55), rgba(10, 5, 2, 0.8)), var(--plast); }
 .tv-vanster { left: 0; top: 0; width: 105px; height: 196px; transform: rotateY(90deg); background: linear-gradient(90deg, rgba(10, 5, 2, 0.28), rgba(10, 5, 2, 0.6)), var(--plast); }
@@ -46,8 +61,8 @@
 /* bildrörets kåpa: grå plast med luftspringor */
 .tv-kapa { background: repeating-linear-gradient(90deg, rgba(0, 0, 0, 0) 0 9px, rgba(0, 0, 0, 0.6) 9px 11px), linear-gradient(180deg, #2e2f32, #1b1c1e); }
 .k-topp { left: 40px; top: 24px; width: 212px; height: 22px; transform: translateZ(-105px) rotateX(-90deg); }
-.k-botten { left: 40px; top: 172px; width: 212px; height: 22px; transform: translateZ(-105px) rotateX(-90deg); filter: brightness(0.55); }
-.k-vanster { left: 40px; top: 24px; width: 22px; height: 148px; transform: translateZ(-105px) rotateY(90deg); filter: brightness(0.75); }
+.k-botten { left: 40px; top: 172px; width: 212px; height: 22px; transform: translateZ(-105px) rotateX(-90deg); box-shadow: inset 0 0 0 200px rgba(0, 0, 0, 0.45); }
+.k-vanster { left: 40px; top: 24px; width: 22px; height: 148px; transform: translateZ(-105px) rotateY(90deg); box-shadow: inset 0 0 0 200px rgba(0, 0, 0, 0.25); }
 .k-hoger { left: 252px; top: 24px; width: 22px; height: 148px; transform: translateZ(-105px) rotateY(90deg); }
 .k-bak { left: 40px; top: 24px; width: 212px; height: 148px; transform: translateZ(-127px); }
 
@@ -55,23 +70,24 @@
 .tv-hylla { position: absolute; transform-origin: 0 0; background: linear-gradient(180deg, #2b2a28, #121110); }
 .h-botten { left: -5px; top: 200px; width: 302px; height: 116px; transform: translateZ(5px) rotateX(-90deg); background: linear-gradient(180deg, #232220, #0c0c0b); }
 .h-fram { left: -5px; top: 191px; width: 302px; height: 9px; transform: translateZ(5px); box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.16); }
-.h-vanster { left: -5px; top: 191px; width: 116px; height: 9px; transform: translateZ(5px) rotateY(90deg); filter: brightness(0.7); }
-.h-hoger { left: 297px; top: 191px; width: 116px; height: 9px; transform: translateZ(5px) rotateY(90deg); filter: brightness(0.85); }
+.h-vanster { left: -5px; top: 191px; width: 116px; height: 9px; transform: translateZ(5px) rotateY(90deg); box-shadow: inset 0 0 0 200px rgba(0, 0, 0, 0.3); }
+.h-hoger { left: 297px; top: 191px; width: 116px; height: 9px; transform: translateZ(5px) rotateY(90deg); box-shadow: inset 0 0 0 200px rgba(0, 0, 0, 0.15); }
 
 /* armen: en fyrkantsprofil från leden bakom tv:n till väggplattan, och
    sladden som hänger från armen till uttaget under plattan. Står still när
-   tv:n vrids, och ritas i tre gånger storleken som lådan. */
+   tv:n vrids, och ritas i tre gånger storleken som lådan nära. */
 .tv-fot { position: absolute; left: 0; top: 0; width: 292px; height: 196px; zoom: 3; transform-style: preserve-3d; transform-origin: 0 0; transform: scale3d(0.3333, 0.3333, 0.3333); pointer-events: none; }
 
-/* I telefonen i en och en halv gång storleken: där går kameran högst så nära
-   att tv:n fyller bredden (stående) eller höjden mellan namnet och foten
-   (liggande), ungefär 1,4 gånger lådans mått, och Safari ritar varje lager
-   i full storlek gånger skärmens pixeltäthet – i tre gånger storleken tog
-   tv:n nästan 90 MB i en iPhone. Texten påverkas inte (18 px blir 27 px). */
+/* I telefonen i en och en halv gång storleken också nära: där går kameran
+   högst så nära att tv:n fyller bredden (stående) eller höjden mellan namnet
+   och foten (liggande), ungefär 1,4 gånger lådans mått, och Safari ritar
+   varje lager i full storlek gånger skärmens pixeltäthet – i tre gånger
+   storleken tog tv:n nästan 90 MB i en iPhone. Texten påverkas inte (18 px
+   blir 27 px). */
 @media (max-width: 700px), (max-height: 500px) {
-  .rum-tv3, .tv-fot { zoom: 1.5; }
-  .rum-tv3 { transform: scale3d(0.6667, 0.6667, 0.6667) translate3d(146px, 98px, -20px) rotateY(-44deg) rotateX(-5deg) translate3d(-146px, -98px, 132px); }
-  .rum-tv3.nara { transform: scale3d(0.6667, 0.6667, 0.6667) translate3d(146px, 98px, -20px) rotateY(0deg) rotateX(0deg) translate3d(-146px, -98px, 132px); }
+  .rum-tv3.skarp, .tv-fot { zoom: 1.5; }
+  .rum-tv3.skarp { transform: scale3d(0.6667, 0.6667, 0.6667) translate3d(146px, 98px, -20px) rotateY(-44deg) rotateX(-5deg) translate3d(-146px, -98px, 132px); }
+  .rum-tv3.skarp.nara { transform: scale3d(0.6667, 0.6667, 0.6667) translate3d(146px, 98px, -20px) rotateY(0deg) rotateX(0deg) translate3d(-146px, -98px, 132px); }
   .tv-fot { transform: scale3d(0.6667, 0.6667, 0.6667); }
 }
 .tv-fot i { position: absolute; display: block; transform-origin: 0 0; }
