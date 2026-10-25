@@ -1721,20 +1721,23 @@ fönstret; lagren ligger på olika djup (CSS 3D) och vrids lite när musen rör 
 sätts som `transform` direkt på `.rum-world` (`setCam` i rum.js), inte som CSS-variabler:
 variabler ärvs av varje element i rummet, så Chrome räknade om stilen för hela rummet och
 målade om allt i varje bildruta medan musen rörde sig, hann inte rita det och visade bildrutor
-där väggen, fönsterbänken och pulten var svarta (flimmer). När kameran har gått tillbaka
-från en närbild (tv:n, videon, anslagstavlan, kortregistret, uret …) ritar Chrome om rummet i
-den vanliga förstoringen (`hemma` i rum.js): Chrome ritar ett lager i den förstoring det har
-när kameran glider och minskar den bara när en animering som rör lagret tar slut och lagret
-inte har `will-change: transform` (sakerna i planen, gatans figurer och löv) – och det som
-animeras utan slut (gatan, röken, tv:ns text) minskar aldrig. Efter några närbilder låg
-rummet därför kvar i närbildens skärpa, grafikminnet tog slut och väggarna, fönstret och
-pulten fattades eller blinkade. När kameran och det som flög tillbaka står still får sakerna
-`will-change: opacity` en kort stund, det som rör sig utan slut står still där det är, och
-kameran börjar en rörelse på 0,01 px som avbryts några bildrutor senare (en animering utan
-ändring når inte lagren); då ritas allt om i den vanliga förstoringen, och grafikminnet är
-tillbaka där det var före närbilden (i 1400 × 743 med täthet 2: ungefär 110 MB i stället för
-370 efter tv:n och 490 efter videon). Bara i Chromium (`navigator.userAgentData`) – Safari
-minskar själv. Namnet
+där väggen, fönsterbänken och pulten var svarta (flimmer). Text i SVG står i egna små SVG:er (namnet på
+dörren, skyltarna på gatan, texten på videon): Chrome lägger ut text i SVG på nytt i varje
+bildruta medan rummet vrids, och SVG:en den stod i – hela bakväggen, gatan, videons ritning –
+målades om varje gång (målningen tog dubbelt så lång tid per bildruta). När kameran glider fram
+till en närbild eller tillbaka (tv:n, videon, anslagstavlan, kortregistret, uret …) ritade
+Chrome hela rummet i närbildens skärpa, också det som strax hamnade utanför bilden, eftersom
+förstoringen i övergången gäller allt under kameran: lagren tog 450–540 MB i 1400 × 743 med
+täthet 2, mer än de 512 MB Chrome ger en sida, så att rutor fattades medan kameran gick fram och
+tillbaka, och rummet låg kvar i närbildens skärpa efteråt. I Chromium (`navigator.userAgentData`,
+klassen `chromium` på `.rum`) har kamerans transform därför ett `perspective()` som inte syns
+(det som ligger i kameran är platt). Då kan Chromium inte räkna ut förstoringen och ritar
+lagren i den skärpa de redan har medan kameran glider – suddigt på vägen fram, som när rummet
+vrids. Sakerna i planen har där `will-change: opacity` i stället för `transform`, så att det som
+syns ritas skarpt när kameran står still, nära och på håll (ett lager med
+`will-change: transform` behåller sin skärpa). Lagren tar nu 150–280 MB genom tv:n, videon,
+skårtavlan, oraklet, affischen och anslagstavlan i rad, och närbilderna är lika skarpa som förut
+(mätt i Chrome 153). Safari har kvar `will-change: transform`. Namnet
 och foten (*K kupongen · T tv:n · A anslagstavlan · R kortregistret · V videon*, *Vanlig sida*) ligger utanför scenen i fönstrets hörn;
 någon meny finns inte, det är föremålen som leder vidare. [public/rum.js](public/rum.js)
 ritar rummet och fyller det med sajtens data, [public/rum.css](public/rum.css) ger det utseendet och
