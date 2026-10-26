@@ -699,8 +699,6 @@ a.rum-sak, a.rum-sak:hover { color: inherit; text-decoration: none; }
    rutan i snabbvalets färg och texten svart */
 .rum [data-to].hot { background: currentColor; -webkit-text-fill-color: #050505; text-shadow: none; }
 .rum-ft { position: absolute; right: 44px; bottom: 22px; display: flex; gap: 30px; align-items: baseline; z-index: 2; }
-.rum-ft .keys { font-family: -apple-system, "Helvetica Neue", sans-serif; font-size: 12px; letter-spacing: 1.2px; text-transform: uppercase; opacity: 0.8; text-shadow: 0 1px 8px #000; }
-.rum-ft .keys b { color: #f0d699; font-weight: 600; }
 .rum-ft a { font-family: Fraunces, Georgia, serif; font-size: 16px; color: #a9c8fb; text-decoration: underline; text-underline-offset: 4px; text-decoration-thickness: 1px; text-shadow: 0 1px 8px #000; }
 
 /* ---------- i telefonen ---------- */
@@ -710,7 +708,6 @@ a.rum-sak, a.rum-sak:hover { color: inherit; text-decoration: none; }
 .rum { touch-action: none; -webkit-tap-highlight-color: transparent; }
 .rum a, .rum img { -webkit-user-drag: none; -webkit-touch-callout: none; }
 /* utan tangentbord: inga tangenter i foten */
-@media (hover: none) { .rum-ft .keys { display: none; } }
 @media (max-width: 600px), (max-height: 500px) {
   .rum-hdr { left: 20px; right: 20px; top: 16px; }
   .rum-brand { font-size: 24px; }

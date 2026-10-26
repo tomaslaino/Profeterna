@@ -1,0 +1,20 @@
+# Tobaksaffären tillsammans (worker/rummet.mjs): vilka i gänget som har
+# rummet öppet och vad de pekar på, genom en websocket till ett Durable
+# Object. Egen tjänst, skild från kupongtjänsten (kupong.toml). Driftsätts för
+# hand från en dator:
+#
+#   npx wrangler@4.147.0 deploy --config worker/rummet.toml
+#
+# Adressen (wss://…workers.dev/rum) står i config/kupong.js (rummet) och
+# byggs in i sajten (data/kuponger.json, samtal.rummet).
+name = "profeterna-rummet"
+main = "rummet.mjs"
+compatibility_date = "2026-10-01"
+
+[[durable_objects.bindings]]
+name = "RUMMET"
+class_name = "Rummet"
+
+[[migrations]]
+tag = "v1"
+new_sqlite_classes = ["Rummet"]

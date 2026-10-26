@@ -728,6 +728,20 @@ window.Rum = (() => {
     })();
   }
 
+  // Tangenterna står inte i foten utan när man pekar på saken (title), och
+  // bara med tangentbord och mus.
+  const TANGENT = [['#rum-kupong', 'Kupongen', 'K'], ['#rum-tv', 'Tv:n', 'T'], ['#rum-ans', 'Anslagstavlan', 'A'], ['#rum-reg', 'Kortregistret', 'R'], ['.vhs-hit', 'Videon', 'V']];
+  function tangenter() {
+    if (!matchMedia('(hover: hover)').matches) return;
+    for (const [sel, namn, k] of TANGENT) {
+      const e = R.el.querySelector(sel);
+      if (e) {
+        e.title = `${namn} · ${k}`;
+        e.setAttribute('aria-keyshortcuts', k);
+      }
+    }
+  }
+
   function build() {
     const el = document.createElement('section');
     el.id = 'rum-section';
@@ -750,7 +764,7 @@ ${plane(0, paper())}
 ${window.RumAnslag ? RumAnslag.nara() : ''}
 ${window.RumRegister ? RumRegister.nara() : ''}
 <div class="rum-hdr"><a class="rum-brand" href="#">Matchfixarna</a></div>
-<div class="rum-ft"><span class="keys"><b>K</b> kupongen · <b>T</b> tv:n · <b>A</b> anslagstavlan · <b>R</b> kortregistret · <b>V</b> videon</span><a href="#hem">Vanlig sida</a></div>`;
+<div class="rum-ft"><a href="#hem">Vanlig sida</a></div>`;
     document.querySelector('main').prepend(el);
     R.el = el;
     R.built = true;
@@ -758,6 +772,7 @@ ${window.RumRegister ? RumRegister.nara() : ''}
     // kort: högst elva tecken
     R.tv = window.RumTv ? RumTv.mount(el, { calm, short, kort: (n) => BOARD[n] || short(n), wd, hm, matches: () => (state.all && state.all.matches) || [] }) : null;
     R.ans = window.RumAnslag ? RumAnslag.mount(el, { calm, kort: (n) => BOARD[n] || short(n), close: () => board(false) }) : null;
+    tangenter();
     R.video = window.RumVideo ? RumVideo.mount(el, { calm, short, kort: (n) => BOARD[n] || short(n), aim: (f) => { R.vf = f; aimVideo(calm() ? null : 'glid'); } }) : null;
     R.reg = window.RumRegister ? RumRegister.mount(el, { calm, kort: (n) => BOARD[n] || short(n), close: () => register(false), tur: (fn) => tur(fn, 3) }) : null;
     paintUte();
@@ -1153,6 +1168,8 @@ ${window.RumRegister ? RumRegister.nara() : ''}
     }
     set('rum-skar', skarHtml(R.table));
     const seen = ((TP.season && TP.season.rounds) || []).filter((r) => typeof tpRoundHidden !== 'function' || !tpRoundHidden(r));
+    // dagen efter: hur det gick i den senaste kupongen (rum-folk.js)
+    if (window.RumFolk) RumFolk.fyll(R.old, seen);
     set('rum-kork', corkHtml((R.old || []).filter((c) => c.n && !(window.Historik && Historik.hidden(c)))));
     const cups = seen.slice().sort((a, b) => String(a.from).localeCompare(String(b.from)))
       .flatMap((r) => (r.people || []).filter((p) => p.award === 'best').map((p) => GANG[p.id] || '#d8b06a'));
@@ -1335,6 +1352,8 @@ ${window.RumRegister ? RumRegister.nara() : ''}
     d.style.setProperty('--dagsljus', r1(L.dag * 0.9));
     d.style.setProperty('--dag-farg', L.sky[2]);
     R.el.classList.toggle('aska', v.slag === 'aska');
+    // lysröret släckt på natten (rum-folk.js)
+    if (window.RumFolk) RumFolk.ute(v);
     if (R.fig && R.fig.ute) {
       R.fig.ute(v);
       if (calm() && !still()) frame();
@@ -1391,7 +1410,7 @@ ${window.RumRegister ? RumRegister.nara() : ''}
     tur(() => import('./rum-saker.js').then((m) => m.saker(R.el, { calm: calm() })).then((x) => { R.saker = x; R.sakDuk = R.el.querySelector('canvas.rum-saker'); sikt(R.sakDuk); frame(); }), 2)
       .catch((err) => console.warn('Rummet: sakerna kunde inte ritas', err));
     // lysröret, neonen, skyltarna, uret, ramarna, paketen och kupongstället (rum-inredning.js)
-    tur(() => import('./rum-inredning.js').then((m) => m.inredning(R.el, { calm: calm(), still })).then((x) => { R.inr = x; x.namn(R.ramNamn); if (R.sak) sak(R.sak, null); frame(); }), 1)
+    tur(() => import('./rum-inredning.js').then((m) => m.inredning(R.el, { calm: calm(), still })).then((x) => { R.inr = x; x.namn(R.ramNamn); if (window.RumFolk && RumFolk.natt()) x.natt(true); if (R.sak) sak(R.sak, null); frame(); }), 1)
       .catch((err) => console.warn('Rummet: inredningen kunde inte ritas', err));
     try {
       await tur(async () => {
@@ -1399,6 +1418,8 @@ ${window.RumRegister ? RumRegister.nara() : ''}
         R.fig = await mod.figurer(document.getElementById('rum-3d'), { calm: calm(), vader: R.vader });
         if (R.vem) R.fig.inne(R.vem, now());
         if (R.lage) R.fig.lage(R.lage, now());
+        // de andra i gänget, natten och dagen efter (rum-folk.js)
+        if (window.RumFolk) RumFolk.mount(R.el, { fig: () => R.fig, inr: () => R.inr, now, nara, fokus });
         provMal();
         frame();
       });
@@ -1406,6 +1427,17 @@ ${window.RumRegister ? RumRegister.nara() : ''}
       // utan WebGL eller utan nätet står rummet kvar utan gänget
       console.warn('Rummet: figurerna kunde inte ritas', err);
     }
+  }
+
+  // Det du har framme i rummet, för din figur (rum-folk.js): kupongen i
+  // handen, tv:n, videon, anslagstavlan, kortregistret eller närbilden.
+  function fokus() {
+    if (R.kup) return 'kupong';
+    if (R.zoom) return 'tv';
+    if (R.vnara) return 'video';
+    if (R.ans && R.ans.on()) return 'anslag';
+    if (R.reg && R.reg.on()) return 'register';
+    return R.sak || null;
   }
 
   // ---------- klicken ----------
@@ -2819,7 +2851,7 @@ ${window.RumRegister ? RumRegister.nara() : ''}
   // och sedan blinkar det igång (.rum-mork i rum.css).
   function tand(ready) {
     const m = document.getElementById('rum-mork');
-    if (!m || R.tant || calm()) return;
+    if (!m || R.tant || calm() || (window.RumFolk && RumFolk.natt())) return;
     R.tant = true;
     const t0 = performance.now();
     m.classList.add('start');
@@ -2841,6 +2873,7 @@ ${window.RumRegister ? RumRegister.nara() : ''}
     R.el.hidden = false;
     document.documentElement.classList.add('i-rummet');
     R.on = true;
+    if (window.RumFolk) RumFolk.on(true);
     fit();
     zoomTv(false);
     zoomVideo(false);
@@ -2907,6 +2940,7 @@ ${window.RumRegister ? RumRegister.nara() : ''}
     zoomVideo(false);
     sak(null, null);
     R.on = false;
+    if (window.RumFolk) RumFolk.on(false);
     cancelAnimationFrame(R.raf);
     clearInterval(R.poll);
     R.el.hidden = true;

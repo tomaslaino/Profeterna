@@ -15,6 +15,11 @@
 // helgarderingar (alla tre) en kupong har – var och ens när hen lämnar in och
 // gängets. Gäller omgångar med lika många matcher som regeln (Stryktipsets
 // tretton); null = ingen regel.
+//
+// rummet = websocketen till tjänsten profeterna-rummet (worker/rummet.mjs,
+// driftsätts med worker/rummet.toml): vilka i gänget som har tobaksaffären
+// öppen och vad de pekar på, så att deras figurer tittar dit hos de andra
+// (public/rum-folk.js). null = bara din egen figur.
 
 module.exports = {
   enabled: true,
@@ -25,4 +30,5 @@ module.exports = {
     { id: 'DJ', namn: 'Daniel Johansson', bild: 'profeterna/johansson.jpg' },
   ],
   regel: { spik: 4, halv: 5, hel: 4 },
+  rummet: null,
 };

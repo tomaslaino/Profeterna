@@ -1784,8 +1784,11 @@ närbilderna av tv:n, videon, anslagstavlan, oraklet och skårtavlan: från 126�
 (Chrome 153 med grafikkortets sätt att rita, SwiftShader, i 1400 × 743 med täthet 2).
 Anslagstavlans lutning efter musen sätts av samma skäl som transform direkt; den ritar om
 ungefär hälften så mycket. Namnet
-och foten (*K kupongen · T tv:n · A anslagstavlan · R kortregistret · V videon*, *Vanlig sida*) ligger utanför scenen i fönstrets hörn;
-någon meny finns inte, det är föremålen som leder vidare. [public/rum.js](public/rum.js)
+och foten (*Vanlig sida*) ligger utanför scenen i fönstrets hörn;
+någon meny finns inte, det är föremålen som leder vidare. Tangenterna (K kupongen, T tv:n,
+A anslagstavlan, R kortregistret, V videon) står inte i foten – där låg de över kupongen i
+mindre fönster – utan när man pekar på saken (*Tv:n · T*, `tangenter` i rum.js), och bara
+med mus. [public/rum.js](public/rum.js)
 ritar rummet och fyller det med sajtens data, [public/rum.css](public/rum.css) ger det utseendet och
 rörelserna, [public/rum-tv.js](public/rum-tv.js) och [public/rum-tv.css](public/rum-tv.css)
 bygger tv:n (se [Tv:n](#tvn)), [public/rum-anslag.js](public/rum-anslag.js) och
@@ -1954,6 +1957,44 @@ som sitter bakom bordet.
   handen över ögonen (DL, DT) eller burken mot pannan (DJ). Den som inte påverkades nickar.
   Dolda resultat ger inga reaktioner, och när rummet öppnas räknas inga gamla mål.
 
+**Gänget är ni** ([public/rum-folk.js](public/rum-folk.js), `pekar` och `hej` i
+rum-3d.js): den som har rummet öppet syns i sin figur, som tittar dit hen pekar med musen –
+på tv:n, anslagstavlan, oraklet, kupongen … eller på någon annan i gänget – och på det hen
+har framme (tv:n eller videon nära, anslagstavlan, kortregistret, en närbild eller
+kupongen i handen). Blicken går dit på en halv sekund, tar det som inte ryms i nacken med
+bålen och går tillbaka när man slutar peka. Din egen figur gör det direkt (vem du är:
+samma val som på kupongen), och de andras kommer genom tjänsten profeterna-rummet
+([worker/rummet.mjs](worker/rummet.mjs)): en websocket till ett Durable Object som
+håller reda på vilka som är inne och vad de pekar på och skickar det till alla när något
+ändras. Inget sparas, sidan skickar högst var 150:e millisekund, och den stänger
+websocketen när fliken döljs. Adressen är `rummet` i config/kupong.js (`samtal.rummet` i
+data/kuponger.json); utan den gör bara din egen figur det. Pekar man på någon i gänget
+tittar hen på en och skålar: lyfter flaskan (DL), burken (DJ) eller cigaretten (DT) mot en
+och nickar, och tittar kvar tills man slutar peka. I telefonen gör ett tryck på figuren
+samma sak en stund. Den som väntar på kupongen tittar bara, och ett klick på en figur går
+inte vidare till det som står bakom.
+
+**Natten** (`natt` i rum-3d.js och rum-inredning.js, `.natt` i
+[public/rum-folk.css](public/rum-folk.css)): mellan midnatt och sex, Stockholms tid, är
+lysröret släckt. Rummet är mörkt utom där gatan lyser in genom fönstret och dörren, från
+tv:n och lite över pulten (samma lager som när lysröret tänds, med en annan mask), och
+rören och reflektorn i taket är grå. DJ sover med huvudet på bordet och ögonen stängda
+(armarna i kors under), DT:s cigarett har brunnit ner – ingen glöd, ingen rök – och han
+nickar till ibland, och DL tittar på text-tv, som lyser svagt blått på dem. Matcher på
+tv:n väcker dem, och den som inte har lämnat in är vaken med kupongen. Nära tv:n, videon,
+en sak och med kupongen i handen är mörkret borta. Den som kommer in på natten får inget
+lysrör som tänds; är sidan öppen klockan sex blinkar det igång som när man kommer in.
+
+**Dagen efter** (`efter` i rum-3d.js): dagen efter och dagen därpå att gängets kupong
+spelades färdigt (Stockholms dag) syns det vid bordet hur det gick, efter betyget i
+historiken. Gick det bra (Bra eller Utmärkt) står en prinsesstårta framme på bordet – grön
+marsipan med florsocker, en rosa ros och en bit redan uppäten, så att botten, sylten,
+krämen och grädden syns i snittet – och omgångens orakel har en papperskrona i guld med
+glaspärlor (på mössan om det är DJ). Gick det illa (Svagt eller Mycket svagt) ligger DT:s
+extraflaska omkullvält i en pöl och kupongen sönderriven i askkoppen, med ett par bitar på
+bordet. Däremellan, och med dolda resultat, syns inget. (En barstol som vält syns inte:
+golvet ligger bakom pulten.)
+
 **Kvittot** ligger på pulten i three.js med sakerna nedan
 ([public/rum-saker.js](public/rum-saker.js)): termopapper som har legat i rulle, så att änden
 med huvudet har böjt sig upp och den rivna änden lyfter lite, med en mjuk skugga under. Texten
@@ -2010,7 +2051,7 @@ släpper; går det riktigt illa ryker två cigaretter, en använd pris ligger p�
 affischen hänger i en tejpbit. Dolda resultat räknas inte (gradeRow rättar dem inte). Utan
 WebGL står affischen kvar men inte sakerna på pulten.
 
-**Lysröret tänds när man kommer in** (`tand` i rum.js, `.rum-mork` i rum.css): medan
+**Lysröret tänds när man kommer in** (`tand` i rum.js, `.rum-mork` i rum.css; inte på natten): medan
 gänget laddas är rummet mörkt, utom gatan genom skyltfönstret och dörren och tv:n som
 lyser igenom, och startarna glöder rosa i rörets ändar. Efter minst 0,7 och högst 2,6
 sekunder blinkar det igång (1,2 s). En gång per sidvisning, och inte med
@@ -2036,7 +2077,10 @@ står på samma tid), `?rum-mx=&rum-my=` (−1…1) kamerans läge,
 var de sitter vid bordet, `?rum-vantar=DL,DT` som om de inte hade lämnat in,
 `?rum-stopp=<timmar>` som om det var så långt kvar till spelstoppet, `?rum-tittar` som
 om matcherna pågick och `?rum-mal=dl:1,dt:-1,dj:0` ett mål
-(rätt, fel, ingen skillnad; vid tiden 0 med `?rum-t`, annars var femtonde sekund). Sidan
+(rätt, fel, ingen skillnad; vid tiden 0 med `?rum-t`, annars var femtonde sekund),
+`?rum-pekar=dt:tv,dl:dj` som om de pekade (på en sak eller någon i gänget),
+`?rum-hej=dl` som om man pekade på DL, `?rum-natt` (`=0` dag) natten och
+`?rum-efter=bra` (`illa`, `inget`) dagen efter. Sidan
 sätter `data-rum-klar` på `body` när allt är ritat. Vädret och klockan utanför:
 `?rum-klocka=2026-12-13T16:00` (eller bara `16:00`, Stockholms tid), `?rum-vader=klart`,
 `halvklart`, `mulet`, `dimma`, `dugg`, `regn`, `skurar`, `snoblandat`, `sno` eller `aska`,

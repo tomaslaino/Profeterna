@@ -1,0 +1,34 @@
+/* Gänget i rummet och natten (rum-folk.js). */
+
+/* På en figur i gänget: ingen hand (klicket går inte till det som står bakom) */
+.rum.pa-gang, .rum.pa-gang * { cursor: default !important; }
+
+/* Natten: lysröret är släckt. Mörkret ligger i samma lager som när
+   lysröret tänds (.rum-mork i rum.css), med ljus kvar där gatan lyser in
+   genom fönstret och dörren, från tv:n och lite över pulten; nära tv:n,
+   videon, en sak och med kupongen i handen är det borta. */
+.rum.natt .rum-mork {
+  display: block;
+  opacity: 0.84;
+  background: #04050a;
+  transition: opacity 0.3s;
+  -webkit-mask: none;
+  mask: none;
+  -webkit-mask-image:
+    radial-gradient(ellipse 10% 13% at 78% 18%, rgba(0, 0, 0, 0.2), #000 100%),
+    radial-gradient(ellipse 29% 30% at 37% 35%, rgba(0, 0, 0, 0.42), rgba(0, 0, 0, 0.6) 60%, #000 100%),
+    radial-gradient(ellipse 9% 32% at 8% 42%, rgba(0, 0, 0, 0.5), #000 100%),
+    radial-gradient(ellipse 42% 24% at 48% 92%, rgba(0, 0, 0, 0.6), #000 100%);
+  -webkit-mask-composite: source-in;
+  mask-image:
+    radial-gradient(ellipse 10% 13% at 78% 18%, rgba(0, 0, 0, 0.2), #000 100%),
+    radial-gradient(ellipse 29% 30% at 37% 35%, rgba(0, 0, 0, 0.42), rgba(0, 0, 0, 0.6) 60%, #000 100%),
+    radial-gradient(ellipse 9% 32% at 8% 42%, rgba(0, 0, 0, 0.5), #000 100%),
+    radial-gradient(ellipse 42% 24% at 48% 92%, rgba(0, 0, 0, 0.6), #000 100%);
+  mask-composite: intersect;
+}
+.rum.natt .rum-mork i { display: none; }
+.rum.natt.tv-nara .rum-mork,
+.rum.natt.vid-nara .rum-mork,
+.rum.natt.sak-nara .rum-mork,
+.rum.natt.i-handen .rum-mork { opacity: 0; }

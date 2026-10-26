@@ -20,7 +20,10 @@
 // går fram till dem (närbilderna i rum.js), och där ritas de, och ramen kring
 // skårtavlan, om skarpare (skarp).
 //
-// inredning(el, { calm, still }) → { draw(), namn(html), skarp(namn, px) } (namnet som Kronan.names)
+// På natten är lysröret släckt (natt, från rum-folk.js): rören och
+// reflektorn mörka.
+//
+// inredning(el, { calm, still }) → { draw(), namn(html), skarp(namn, px), natt(på) } (namnet som Kronan.names)
 
 const DEG = Math.PI / 180;
 const WZ = -26;
@@ -201,6 +204,9 @@ export async function inredning(el, opt = {}) {
 
   // ---------- taket, fönstret och dörren ----------
 
+  const ROR = { ljus: '#ffffff', refl: '#f4f1e6', av: '#8d8f8a', reflAv: '#6c6960' };
+  let rorLjus = null;
+  let rorRefl = null;
   function lysror(b) {
     const { mesh } = b;
     const g = new THREE.Group();
@@ -208,11 +214,13 @@ export async function inredning(el, opt = {}) {
     b.scene.add(g);
     mesh(new THREE.BoxGeometry(470, 7, 62), mat('#d9d4c4', { roughness: 0.45, metalness: 0.2 }), g, false).position.y = -3.5;
     // reflektorn: ljus undersida mellan rören
-    const refl = new THREE.Mesh(new THREE.PlaneGeometry(462, 54), new THREE.MeshBasicMaterial({ color: '#f4f1e6', toneMapped: false }));
+    const refl = new THREE.Mesh(new THREE.PlaneGeometry(462, 54), new THREE.MeshBasicMaterial({ color: ROR.refl, toneMapped: false }));
+    rorRefl = refl.material;
     refl.rotation.x = 90 * DEG;
     refl.position.y = -7.1;
     g.add(refl);
-    const ljus = new THREE.MeshBasicMaterial({ color: '#ffffff', toneMapped: false });
+    const ljus = new THREE.MeshBasicMaterial({ color: ROR.ljus, toneMapped: false });
+    rorLjus = ljus;
     for (const z of [-15, 15]) {
       const t = new THREE.Mesh(new THREE.CylinderGeometry(3.3, 3.3, 448, 20), ljus);
       t.rotation.z = 90 * DEG;
@@ -812,5 +820,14 @@ export async function inredning(el, opt = {}) {
   setNamn('');
   for (const k of ['tak', 'neon', 'hogra', 'stall']) B[k].paint();
   tick();
-  return { draw: tick, namn: setNamn, skarp: (k, px) => B[k] && B[k].skarp(px) };
+  let morkt = false;
+  function natt(on) {
+    on = Boolean(on);
+    if (on === morkt) return;
+    morkt = on;
+    rorLjus.color.set(on ? ROR.av : ROR.ljus);
+    rorRefl.color.set(on ? ROR.reflAv : ROR.refl);
+    B.tak.paint();
+  }
+  return { draw: tick, namn: setNamn, skarp: (k, px) => B[k] && B[k].skarp(px), natt };
 }

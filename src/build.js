@@ -321,11 +321,12 @@ function couponSaveInfo(override) {
 // …/samtal, lokalt /api/samtal), gang är vilka som tippar och regel hur
 // många spikar och garderingar en kupong har (config/kupong.js). Omgångens
 // namn skriver AI:n i samma proxy som analysen (…/analyze → …/namn, lokalt
-// /api/namn).
+// /api/namn). rummet är tjänsten som visar tobaksaffären vilka i gänget som
+// har den öppen och vad de pekar på (worker/rummet.mjs), null = ingen.
 function samtalInfo(override, analysis) {
   const save = couponSaveInfo(override);
   const a = analysisInfo(analysis);
-  return save ? { endpoint: save.replace(/kupong$/, 'samtal'), gang: kupongCfg.gang || [], regel: kupongCfg.regel || null, namn: a ? a.endpoint.replace(/analyze$/, 'namn') : null } : null;
+  return save ? { endpoint: save.replace(/kupong$/, 'samtal'), gang: kupongCfg.gang || [], regel: kupongCfg.regel || null, namn: a ? a.endpoint.replace(/analyze$/, 'namn') : null, rummet: kupongCfg.rummet || null } : null;
 }
 
 function commentInfo(override) {
