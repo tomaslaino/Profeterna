@@ -36,8 +36,13 @@
 // flaskan, burken eller näven, den som tappade raden tar sig för pannan och
 // sjunker ihop, och den som inte påverkades nickar bara.
 //
-// figurer(canvas, { calm, vader }) → { draw(t, mx, my), inne(vem, t), ute(vader),
-// lage({ tv, nag }, t), mal({ dl: 1, dt: -1, dj: 0 }, t) }: ute klär om gänget
+// DL och DJ blinkar (DT skrattar med ögonen stängda), det röda ljuset från
+// neonskylten bakom dem slocknar när skylten glappar, och medan matcherna
+// pågår lyser tv:n blått i ansiktena.
+//
+// figurer(canvas, { calm, vader }) → { draw(t, mx, my, neon), inne(vem, t), ute(vader),
+// lage({ tv, nag }, t), mal({ dl: 1, dt: -1, dj: 0 }, t) }: neon säger om
+// neonskylten lyser (false när den glappar), ute klär om gänget
 // efter vädret (dress) och sätter ljuset från fönstret, lage säger om
 // matcherna pågår (tv) och hur nära spelstoppet är (nag 0–1), mal ett mål.
 import * as THREE from 'three';
@@ -231,9 +236,18 @@ export async function figurer(canvas, opt = {}) {
   Object.assign(key.shadow.camera, { left: -650, right: 350, top: 450, bottom: -450, near: 10, far: 2000 });
   key.target.position.set(-150, -50, 0);
   scene.add(key, key.target);
-  const neon = new THREE.DirectionalLight('#ff3a26', 4.2);
+  // (neonen släcks när skylten glappar, draw)
+  const NEON = 4.2;
+  const neon = new THREE.DirectionalLight('#ff3a26', NEON);
   neon.position.set(-260, 260, -420);
   scene.add(neon);
+  // tv:n uppe till höger (TV nedan), mot barbordet: tänds medan matcherna
+  // pågår (tvW, draw)
+  const TVLJUS = 5;
+  const tvLjus = new THREE.DirectionalLight('#9ab8ff', 0);
+  tvLjus.position.set(490, 250, -140);
+  tvLjus.target.position.set(BORD.x, 0, BORD.z);
+  scene.add(tvLjus, tvLjus.target);
   const term = new THREE.DirectionalLight('#5ff0dc', 1.1);
   term.position.set(520, 80, -120);
   scene.add(term);
@@ -291,6 +305,24 @@ export async function figurer(canvas, opt = {}) {
     x.position.copy(v3(at));
     x.quaternion.setFromUnitVectors(new THREE.Vector3(0, 0, 1), v3(dir).normalize());
     return x;
+  }
+  // Ögonen stängda (blinkningarna, blinkar): ansiktsbilden utan ögonvitorna
+  // och ögonen, och det övre ögonlocket nere vid det nedre. Ett ansikte utan
+  // ögonvitor (DT skrattar med ögonen stängda) blinkar inte (null).
+  function blundar(svg) {
+    const doc = new DOMParser().parseFromString(svg, 'image/svg+xml');
+    const vitor = [...doc.querySelectorAll('path[fill="#f7f1ea"]')];
+    if (!vitor.length) return null;
+    const tal = (el) => el.getAttribute('d').match(/-?[\d.]+/g).map(Number);
+    for (const v of vitor) {
+      const ogat = doc.querySelector(`g[clip-path="url(#${v.nextElementSibling.id})"]`);
+      const lock = ogat.nextElementSibling;
+      const [x0, y0, cx, , x1, y1] = tal(lock);
+      lock.setAttribute('d', `M${x0} ${y0} Q${cx} ${tal(v)[7] - 2} ${x1} ${y1}`);
+      v.remove();
+      ogat.remove();
+    }
+    return new XMLSerializer().serializeToString(doc);
   }
   const imgTex = (src) => new Promise((res, rej) => {
     const img = new Image();
@@ -1130,6 +1162,14 @@ export async function figurer(canvas, opt = {}) {
   await document.fonts.ready;
   await Promise.all([
     ...['dl', 'dt', 'dj'].map(async (k) => { tex[k] = await imgTex(`rum/ansikte-${k}.svg`); }),
+    // ansiktena med ögonen stängda (blinkar; inte i en fast bild), som en
+    // blob-adress som släpps när bilden är ritad
+    ...(opt.calm ? [] : ['dl', 'dt', 'dj'].map((k) => fetch(`rum/ansikte-${k}.svg`).then((x) => x.text()).then(async (svg) => {
+      const s = blundar(svg);
+      if (!s) return;
+      const u = URL.createObjectURL(new Blob([s], { type: 'image/svg+xml' }));
+      try { tex[`${k}_blund`] = await imgTex(u); } finally { URL.revokeObjectURL(u); }
+    }).catch(() => {}))),
     imgTex('rum/skagg-dj.svg').then((t) => { tex.dj_skagg = t; }),
     ...Object.entries(LAG).filter(([, c]) => c.skold).map(([k, c]) => loadImg(c.skold).then((i) => { skold[k] = trim(i); }, () => {})),
   ]);
@@ -1468,7 +1508,7 @@ export async function figurer(canvas, opt = {}) {
     earPen.updateMatrix();
     kupBench.updateMatrix();
 
-    return { F, fig, torso, chest, hg, hc, knees, feet, arms, mouth, thigh, hipY, T, phase: hash(F.x) * 20, pen, kp, earPen, kupBench, inneAt: -1e9, key: JSON.stringify(D) };
+    return { F, fig, torso, chest, hg, hc, face: fm, blund: tex[`${F.key}_blund`], knees, feet, arms, mouth, thigh, hipY, T, phase: hash(F.x) * 20, pen, kp, earPen, kupBench, inneAt: -1e9, key: JSON.stringify(D) };
   }
 
   // Ett föremåls matris i c med x-axeln X och y-axeln Y (rätas upp).
@@ -1617,6 +1657,17 @@ export async function figurer(canvas, opt = {}) {
   const cheerW = (o, t) => { const m = M[o.F.key]; return m && m.k > 0 ? bump(t - m.at, 0, 0.45, 3.4, 4.6) : 0; };
   const sinkW = (o, t) => { const m = M[o.F.key]; return m && m.k < 0 ? bump(t - m.at, 0.2, 0.9, 4.2, 5.4) : 0; };
   const nodW = (o, t) => { const m = M[o.F.key]; return m && m.k === 0 ? bump(t - m.at, 0, 0.35, 1.0, 1.7) : 0; };
+
+  // Blinkningarna (o.blund, ansiktena med ögonvitor): en gång i varje period
+  // om BLINK sekunder, på ett ställe i den som klockan ger, och var femte gång
+  // två i rad – ögonen stängda en dryg tiondels sekund.
+  const BLINK = 4.2;
+  function blinkar(o, t) {
+    const x = t + o.phase * 3.1;
+    const n = Math.floor(x / BLINK);
+    const d = x - n * BLINK - hash(n * 7.3 + o.phase) * (BLINK - 0.6);
+    return (d >= 0 && d < 0.13) || (hash(n * 3.7 + o.phase) < 0.2 && d >= 0.34 && d < 0.47);
+  }
 
   // ---------- väntan på kupongen ----------
   // o.inneAt: när kupongen lämnades in (Infinity = väntar, −1e9 = inne sedan
@@ -2020,7 +2071,7 @@ export async function figurer(canvas, opt = {}) {
   let headA = 0;
   let headV = 0;
   let lastMx = 0;
-  function draw(t, mx, my) {
+  function draw(t, mx, my, neonPa) {
     // huvudena nickar efter när musen rör sig
     const dv = mx - lastMx;
     lastMx = mx;
@@ -2030,6 +2081,12 @@ export async function figurer(canvas, opt = {}) {
     for (const o of figs) pose(o, t);
     smoke(t);
     for (const o of figs) pose(o, t);
+    for (const o of figs) if (o.blund) o.face.material.map = blinkar(o, t) ? o.blund : tex[o.F.key];
+    // neonen bakom dem slocknar när skylten glappar, och tv:n lyser i
+    // ansiktena när de tittar på matcherna (svagt, och fladdrar som rutan)
+    neon.intensity = neonPa === false ? 0 : NEON;
+    const tv = tvW(t);
+    tvLjus.intensity = tv > 0 ? TVLJUS * tv * (0.86 + 0.08 * Math.sin(t * 2.3) + 0.06 * Math.sin(t * 13.1 + Math.sin(t * 3.7))) : 0;
     pivot.rotation.y = mx * 4.5 * DEG;
     pivot.rotation.x = my * 2.6 * DEG;
     r.render(scene, cam);

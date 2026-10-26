@@ -1294,7 +1294,7 @@ ${window.RumRegister ? RumRegister.nara() : ''}
       R.el.classList.toggle('neon-av', !on);
     }
     if ((!calm() || still()) && syns(document.getElementById('rum-damm'))) dust(t);
-    if (R.fig && syns(R.gang)) R.fig.draw(t, R.mx, R.my);
+    if (R.fig && syns(R.gang)) R.fig.draw(t, R.mx, R.my, on);
     if (R.saker) R.saker.draw(t, R.mx, R.my, R.rows, R.old, syns(R.sakDuk));
     if (R.inr) R.inr.draw();
   }

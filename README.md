@@ -1899,7 +1899,14 @@ och skrattar, DJ har en burk i ena handen och pratar med cigaretten i den andra.
 har sin loop (12–21 s) – flaskan och burken till munnen med huvudet bakåt, ett bloss med
 glöden som tänds och röken som blåses ut, benen som dinglar – och huvudena nickar efter
 musen. Röken från glöden räknas för varje bloss ur var glöden var när det föddes, så att
-samma tid alltid ger samma bild. Inga riktiga märken: flaskan säger PILSNER, burken ÖL –
+samma tid alltid ger samma bild. DL och DJ blinkar ungefär var fjärde sekund, ibland två
+gånger i rad, med ögonen stängda en dryg tiondels sekund (`blinkar` i rum-3d.js; DT skrattar
+med ögonen stängda och blinkar inte). Ansiktet med stängda ögon är samma ansiktsbild utan
+ögonvitorna och ögonen och med det övre ögonlocket nere vid det nedre (`blundar`), och det
+byts in medan ögonen är stängda. I en fast bild (`?rum-t`) och med `prefers-reduced-motion`
+blinkar de inte. Det röda ljuset från neonskylten bakom dem slocknar när skylten glappar
+(`neonOn` i rum.js skickas med till `draw`), så att kanterna på håret och jackorna mörknar
+med skylten. Inga riktiga märken: flaskan säger PILSNER, burken ÖL –
 från första advent till tjugondag Knut JULÖL (grön etikett, röd burk) och i påskveckan
 PÅSKÖL (gul etikett, grön burk; `ol` i [public/rum-fika.js](public/rum-fika.js)).
 Var och en bär sitt lag (`LAG` i rum-3d.js): DL en stickad halsduk i Nacionals vitt, blått
@@ -1937,7 +1944,9 @@ som sitter bakom bordet.
   samtidigt, och då tittar hen upp från kupongen.
 - **När matcherna pågår** (någon match live, också med dolda resultat) vänder de sig mot
   tv:n: huvudet så långt nacken räcker och resten med bålen. Då och då tittar var och en
-  bort en stund (DJ pratar med DT).
+  bort en stund (DJ pratar med DT). Tv:n lyser då svagt blått i ansiktena, från rutan uppe
+  till höger, och skenet fladdrar lite som rutan (`tvLjus` i rum-3d.js, tänds och släcks
+  med vändningen mot tv:n).
 - **Vid ett mål** – när ställningen i en match har ändrats sedan rummet läste datan förra
   gången – reagerar var och en efter sitt eget tips (allas tips när de visas, annars
   gängets kupong). Den som fick rätt lyfter flaskan (DL), näven (DT) eller burken (DJ)
