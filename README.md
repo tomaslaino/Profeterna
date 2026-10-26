@@ -1873,9 +1873,9 @@ sidan byts; oraklet, skårtavlan, uret och VM 94-affischen tittar man först på
   också omgångens matcher, tabellerna och skytteligorna (se [Tv:n](#tvn)). Esc eller ett
   klick utanför zoomar ut.
 - **Videon** nere i hörnet till höger, en liten Sony-tv med inbyggd video som står på disken med
-  ryggen mot väggen och rutan vänd mot gänget, med de senaste repriserna på VHS i en hög
-  ovanpå och resten i en fruktlåda bredvid, zoomas in med ett klick eller V; tv:n och lådan
-  står kvar som de står, och en kassett spelar matchens höjdpunkter i rutan.
+  ryggen mot väggen och rutan vänd mot gänget, med repriserna på VHS i en fruktlåda med två
+  fack bredvid (förra omgången och lagen i nästa), zoomas in med ett klick eller V; tv:n och
+  lådan står kvar som de står, och en kassett spelar matchens höjdpunkter i rutan.
   Ett klick på rutan går ännu närmare (se [Videon](#videon)). Esc, V eller ett klick utanför
   zoomar ut.
 - **Namnet på dörren** (längst till vänster, under Stängt-skylten) → Om oss: *Matchfixarna*
@@ -2577,25 +2577,43 @@ Den är en låda i CSS 3D – framsidan, sidorna med springor, taket och skuggan
 disken – i rummets eget perspektiv (1000 bildpunkter från flyktpunkten 760, 400, som högra
 väggen), vriden 112 grader mot gänget mitt i rummet och så långt in längs väggen att den
 ryms i bilden; i det perspektivet ser en tv som bara är vriden lite ut att stå rakt mot en.
-Under rutan sitter kassettfacket, displayen och knapparna ◀◀ ▶ ▶▶ ■ ⏏. Ovanpå ligger de fyra
-senaste repriserna på VHS i en hög, också de lådor (ryggen, taket och ändarna), och resten
-(21 till) ligger i en fruktlåda i furu bredvid, lite längre in längs väggen – *Arkivet* på
-en tejpbit, ÄPPLEN · KLASS I på brädan. Lådan är också en låda i 3D (sidan med springor
-mellan brädorna, taket, och innanför öppningen väggen, botten och baksidan), i tv:ns mått
-och vriden likadant, med öppningen mot gänget.
+Under rutan sitter kassettfacket, displayen och knapparna ◀◀ ▶ ▶▶ ■ ⏏. Repriserna på VHS,
+också de lådor (ryggen, taket och ändarna), står i en fruktlåda i furu bredvid, lite längre
+in längs väggen: två fack med en mellanvägg (`MV`), tretton kassetter höga, med en tejpbit
+över varje fack – dagen för förra omgången (*LÖR 24/10*) och *INFÖR 31/10* – och ÄPPLEN ·
+KLASS I på brädan. Lådan är också en låda i 3D (sidan med springor mellan brädorna, taket,
+och innanför öppningen väggen, mellanväggen, botten och baksidan), i tv:ns mått och vriden
+likadant, med öppningen mot gänget.
 
 **Kassetterna** är matcher med YouTube-klipp (samma klipp som spelaren på sajten,
-[public/hojdpunkter.js](public/hojdpunkter.js)): omgångens matcher först, sedan de senaste dag för dag, Premier
-League före Championship och så vidare samma dag. Ryggen är kassetten själv eller ett
-pappfodral (vitt med rött, blått, svart med gult, grått med orange, samma för samma match)
-med en handskriven etikett: lagen, resultatet och dagen. Långa namn skrivs mindre, och med
-Dolda resultat står inget resultat på etiketten och klippets rubrik täcks i rutan.
+[public/hojdpunkter.js](public/hojdpunkter.js)), högst 13 i varje fack (`FACKEN`): till vänster förra
+omgångens matcher i kupongens ordning, med kupongens nummer på en rund röd lapp (en match
+utan klipp lämnar sitt nummer tomt), och till höger den senaste matchen med klipp (högst tre
+veckor gammal) för lagen i nästa omgång, match för match – de som inte redan står till
+vänster. Omgången som gänget tippar (`round()` i rum.js) är nästa så länge ingen av dess
+matcher har börjat, och förra när någon har det; den andra är kupongen som spelades senast
+(historiken och kupongerna), eller efter förra de närmaste matcherna i Premier League och
+Championship efter den helgen (`omgangar`). Ryggen är kassetten själv eller ett pappfodral
+(vitt med rött, blått, svart med gult, grått med orange, samma för samma match) med en
+maskinskriven etikett (Special Elite): lagen och resultatet, så stort som det får plats
+(`passa`, högst 20 bildpunkter i ritningen) – resultatet kortas aldrig. Med Dolda resultat
+står inget resultat på etiketten eller i listan, och klippets rubrik täcks i rutan.
 
-**Nära** (klick eller V) går kameran fram tills tv:n, högen och lådan ryms mellan namnet och
+**Listan i rutan.** När ingen kassett är i visar den blå rutan kassetterna i stället för
+*STOPP*, ett fack per sida: *LÖR 24/10* med kupongens nummer (matcherna utan klipp svaga)
+och *INFÖR 31/10*, med *1/2 ▶* och *◀ 2/2* uppe till höger. Den markerade kassetten står i
+vitt; ↑/↓ (eller musen) flyttar markeringen, ←/→, ◀◀/▶▶, ett svep i sidled eller ett klick på
+rubriken byter sida, och ett klick på en rad, mellanslaget eller ▶ spelar den. Listan står i
+bildens 16:9, så att den syns hel när rutan fyller fönstret. När kassetten matas ut kommer
+listan tillbaka på samma sida, med den markerad.
+
+**Nära** (klick eller V) går kameran fram tills tv:n och lådan ryms mellan namnet och
 foten (högst sex gånger), och svänger samtidigt runt tv:n in mot rummet, så att man ser
 rutan snett framifrån i stället för från sidan. Tv:n och lådan vrids inte och flyttas inte –
 de står kvar vända mot gänget – utan det är kameran som rör sig (se *Kamerans sväng* nedan).
-Kassetterna glider ut en bit när man pekar på dem. Ett klick på rutan (eller hjulet framåt)
+Kassetterna glider ut en bit när man pekar på dem. I telefonen på höjden går kameran bara
+fram till lådan (`LADAN`), så att etiketterna går att läsa; där tar en kassett (eller ett
+tryck på kanten av tv:n bredvid lådan) kameran vidare till rutan. Ett klick på rutan (eller hjulet framåt)
 går ännu närmare, så att bilden i rutan nästan fyller fönstret (med en smal svart kant runt
 om, så att bildens gräns syns; i telefonen på höjden syns knapparna under den), och kameran
 svänger och går rakt framför tv:n, så att rutan syns rakt framifrån. Texten i rutan (*STOPP*,
@@ -2605,7 +2623,7 @@ Esc eller ett klick utanför hörnet tillbaka till rummet, där kameran svänger
 där den stod. Ett klick på en kassett: den
 lyfts (ur lådan dras den först ut genom öppningen), ställs framför facket och skjuts in,
 luckan fälls upp, och de ovanför sjunker ner i
-luckan i högen. Rutan är blå med *▶ SPELA* tills bilden kommer, och klippet spelas i
+luckan i facket. Rutan är blå med *▶ SPELA* tills bilden kommer, och klippet spelas i
 YouTubes spelare (`youtube-nocookie.com`, i 16:9 med svarta kanter i den 4:3-stora rutan)
 med displayen som räknar tiden. ▶ spelar eller pausar, och ⏏ matar ut – kassetten åker
 tillbaka till sin plats. ◀◀ och ▶▶ (och ←/→, eller ett svep i sidled i telefonen) spolar som
@@ -2615,13 +2633,14 @@ Ett tryck till åt samma håll spolar dubbelt så fort på en gång (ett nytt tr
 en nedtryckt tangent), och åt andra hållet vänder den; farten ändras mjukt (`TROG`), så att
 bandet bromsar och vänder i stället för att hoppa. ▶ spelar därifrån. ■ stoppar: rutan blir
 blå med *STOPP*, räkneverket och bandmätaren, displayen visar ■ och tiden, och ▶ spelar
-därifrån. I början och slutet av klippet stannar den av sig själv. ↑/↓ byter till en nyare
-eller äldre kassett. När klippet är slut matas den ut av sig själv. Går man därifrån mitt i
+därifrån. I början och slutet av klippet stannar den av sig själv. ↑/↓ byter till kassetten
+över eller under (efter förra omgången kommer nästa). När klippet är slut matas den ut av sig själv. Går man därifrån mitt i
 en spolning stannar bandet där, och det spelar därifrån när man kommer tillbaka.
 
 **Tangenterna.** Nära (och när rutan fyller fönstret, där knapparna inte syns) styrs videon
 med tangentbordet: ← och → spolar som ◀◀ och ▶▶, mellanslaget spelar och pausar som ▶ (och
-spelar därifrån medan den spolar), S stoppar som ■, ↑/↓ byter kassett och Esc går tillbaka.
+spelar därifrån medan den spolar), S stoppar som ■, ↑/↓ byter kassett och Esc går tillbaka;
+utan kassett flyttar ↑/↓ markeringen i listan och ←/→ byter sida.
 Med tangentbord och mus står de där i rummets fot (*← → spola · mellanslag spela · S stopp
 · ↑ ↓ kassett · Esc tillbaka*, utom i fönster smalare än 700 eller lägre än 500 bildpunkter)
 – rummets egna tangenter står inte i foten, eftersom de låg över kupongen, men nära videon

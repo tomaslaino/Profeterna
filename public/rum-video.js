@@ -2,12 +2,11 @@
 
 // Videon i tobaksaffären (rum.js): en liten Sony-tv med inbyggd video som
 // står på disken, nere i hörnet till höger, med ryggen mot väggen och
-// rutan vänd mot gänget mitt i rummet. På tv:n ligger de senaste
-// repriserna på VHS i en hög, och i en fruktlåda bredvid resten (Arkivet),
-// med öppningen åt samma håll. När man går fram (klick eller V) står de
-// kvar som de står, och kameran svänger runt tv:n så att man ser rutan
-// snett framifrån (SVANG) – närmare rutan rakt framifrån. Kassetterna har
-// handskrivna etiketter med matchen, resultatet och dagen; ett klick på en
+// rutan vänd mot gänget mitt i rummet. Bredvid står repriserna på VHS i en
+// fruktlåda med två fack, med öppningen åt samma håll. När man går fram
+// (klick eller V) står de kvar som de står, och kameran svänger runt tv:n
+// så att man ser rutan snett framifrån (SVANG) – närmare rutan rakt
+// framifrån. Kassetterna har maskinskrivna etiketter; ett klick på en
 // kassett och den åker in i videon, som spelar matchens höjdpunkter i
 // rutan (samma klipp som spelaren på sajten, hojdpunkter.js). Knapparna
 // under rutan: ◀◀ och ▶▶ spolar, fortare och fortare som en riktig video,
@@ -33,10 +32,16 @@
 // (FORVARM) – innan dess spolar den tillbaka lika mycket. Textningen stängs
 // av.
 //
-// Kassetterna: matcher med YouTube-klipp (m.y i matches.json), omgångens
-// först, sedan de senaste – dag för dag, Premier League före Championship
-// osv. Högst 25: fyra på tv:n och 21 i lådan. Dolda resultat (Spoiler) står
-// inte på etiketten, och klippets rubrik täcks som i spelaren på sajten.
+// Kassetterna: matcher med YouTube-klipp (m.y i matches.json), i lådans två
+// fack – till vänster förra omgångens 13 i kupongens ordning, med numret på
+// en rund lapp, och till höger den senaste matchen för lagen i nästa
+// omgång (högst 13, de som inte redan står till vänster). Etiketterna är
+// maskinskrivna och så stora som de får plats. När ingen kassett är i står
+// samma kassetter som en lista i den blå rutan, en sida per fack, och ett
+// klick på en rad spelar den. I telefonen (på höjden) går kameran fram
+// till lådan, och en kassett därifrån tar kameran till rutan. Dolda
+// resultat (Spoiler) står inte på etiketten eller i listan, och klippets
+// rubrik täcks som i spelaren på sajten.
 //
 // Allt ritas i sex gånger storleken och förminskas (som tv:n i rum-tv.js),
 // så att det är skarpt på nära håll – i dubbla storleken till när rutan
@@ -45,7 +50,8 @@
 // pult), så att bilden inte tar slut när kameran går dit.
 //
 // RumVideo.html('horn' | 'vagg' | 'pult') → delarna (planen -598, -600 och -60 i rum.js)
-// RumVideo.mount(el, { calm, short, kort, aim }) → { fill(matches, ids), skarp(on), zoom(on) → hörnet i scenen, key(k), stop() }
+// RumVideo.mount(el, { calm, short, kort, aim }) → { fill(matches, { rd, old }), skarp(on), zoom(on) → hörnet i scenen, key(k), stop() }
+// (rd: omgången som gänget tippar, round() i rum.js; old: de färdigspelade kupongerna, Historik.coupons())
 // aim(f) flyttar kameran till f (med f.z som största förstoring) när man går närmare tv:n.
 
 window.RumVideo = (() => {
@@ -82,8 +88,10 @@ window.RumVideo = (() => {
   const RAD = VRID * Math.PI / 180;
   // Lådan står på disken bredvid tv:n, längre in längs väggen: i tv:ns mått
   // till vänster om den och z längre fram, så att den står lika långt från
-  // väggen. d är djupet.
-  const LADA = { x: TV.x - 4 - 95, y: TV.y + TV.h - 77, w: 95, h: 77, t: 4.5, d: 27 };
+  // väggen. d är djupet. Den har två fack med en mellanvägg (MV, från
+  // lådans vänstra kant), tretton kassetter höga.
+  const LADA = { x: TV.x - 4 - 95, y: TV.y + TV.h - 87, w: 95, h: 87, t: 4.5, d: 27 };
+  const MV = { x: 46.15, w: 2.9 };
   LADA.z = LADA.d - DJUP + (LADA.x - TV.x) / Math.tan(RAD);
   // Kameran svänger runt tv:n när man går fram, så att man ser rutan snett
   // framifrån – och när man går närmare rutan rakt framifrån: rummet
@@ -116,24 +124,25 @@ window.RumVideo = (() => {
     const ys = s.map((q) => q[1]);
     return { x0: O[0] + Math.min(...xs) - k, y0: O[1] + Math.min(...ys) - k, x1: O[0] + Math.max(...xs) + k, y1: O[1] + Math.max(...ys) + k };
   }
-  // högarna: tv:ns och lådans två, nerifrån och upp (den nyaste överst);
-  // på tv:n vrids kassetterna lite på högkant, i lådan lutar de
+  // lådans två fack, nerifrån och upp (den första överst): förra omgången
+  // till vänster (0–12, i kupongens ordning) och nästa till höger (13–25);
+  // kassetterna lutar lite
+  const FACKEN = 13;
   const COLS = [
-    { x: 39, y: TV.y, ix: [3, 2, 1, 0], j: 1.6, r: 3, tv: true },
-    { x: LADA.x + 6.4, y: LADA.y + LADA.h - LADA.t - 0.2, ix: [14, 13, 12, 11, 10, 9, 8, 7, 6, 5, 4], j: 0.6, r: 0.45 },
-    { x: LADA.x + 48.6, y: LADA.y + LADA.h - LADA.t - 0.2, ix: [24, 23, 22, 21, 20, 19, 18, 17, 16, 15], j: 0.6, r: 0.45 },
+    { x: LADA.x + 4.9, y: LADA.y + LADA.h - LADA.t - 0.2, ix: [12, 11, 10, 9, 8, 7, 6, 5, 4, 3, 2, 1, 0], j: 0.25, r: 0.3 },
+    { x: LADA.x + 49.3, y: LADA.y + LADA.h - LADA.t - 0.2, ix: [25, 24, 23, 22, 21, 20, 19, 18, 17, 16, 15, 14, 13], j: 0.25, r: 0.3 },
   ];
-  const CAP = 25;
-  // det kameran ska få med: högen, tv:n och lådan – och närmare bilden i
-  // rutan, som fyller fönstret (fyll) – i scenens mått, med kameran svängd;
-  // sv: rummets vridning, mitt: där tv:n står i scenen (x), och kant:
-  // hörnets vänstra kant (lådan) hur kameran än står
-  const ALLT = [
-    ...horn(TV.x, TV.y - 4 * KAS.h, TV.x + TV.w, TV.y + TV.h, 0, -DJUP),
-    ...horn(LADA.x, LADA.y, LADA.x + LADA.w, LADA.y + LADA.h, LADA.z, LADA.z - LADA.d),
-  ];
+  const CAP = 2 * FACKEN;
+  // det kameran ska få med: tv:n och lådan – i telefonen på höjden bara
+  // lådan (LADAN), och närmare bilden i rutan, som fyller fönstret (fyll) –
+  // i scenens mått, med kameran svängd; sv: rummets vridning, mitt: där
+  // tv:n står i scenen (x), och kant: hörnets vänstra kant (lådan) hur
+  // kameran än står
+  const LADORNA = horn(LADA.x, LADA.y, LADA.x + LADA.w, LADA.y + LADA.h, LADA.z, LADA.z - LADA.d);
+  const ALLT = [...horn(TV.x, TV.y - 2, TV.x + TV.w, TV.y + TV.h, 0, -DJUP), ...LADORNA];
   const HORN = { mitt: O[0] + syns(MITT)[0], kant: Math.min(...[{ horn: 0 }, SVANG.nara, SVANG.tat].map((s) => ruta(ALLT, 0, s.horn, s.oga).x0)) };
   const FOCUS = { ...ruta(ALLT, 6, SVANG.nara.horn), ...HORN, sv: SVANG.nara.rum };
+  const LADAN = { ...FOCUS, ...ruta(LADORNA, 3, SVANG.nara.horn) };
   const TAT = { ...ruta(horn(BILD.x, BILD.y, BILD.x + BILD.w, BILD.y + BILD.h, 0, 0), 0, SVANG.tat.horn, SVANG.tat.oga), z: 32, fyll: true, ...HORN, sv: SVANG.tat.rum };
 
   const hash = (s) => {
@@ -206,21 +215,22 @@ window.RumVideo = (() => {
       yta('vhs-fot', X0 + W - 14 * S, Y0 + H, 9 * S, 1.4 * S, '0 0', 'translateZ(-1px)');
   }
 
-  // Där man klickar på håll: tv:ns framsida med högen, högra sidan och
-  // taket, och lådans, en bildpunkt utanför dem.
+  // Där man klickar på håll: tv:ns framsida, högra sidan och taket, och
+  // lådans, en bildpunkt utanför dem.
   function hitYtor() {
     const L = LADA;
     const fram = (x, y, w, h, z) => `<i style="left:${px(x)}; top:${px(y)}; width:${px(w)}; height:${px(h)}; transform:translateZ(${r2(z * S + 1)}px)"></i>`;
     const sida = (x, y, h, z, d) => `<i style="left:${r2(x * S + 1)}px; top:${px(y)}; width:${px(d)}; height:${px(h)}; transform-origin:0 0; transform:translateZ(${px(z)}) rotateY(90deg)"></i>`;
     const tak = (x, y, w, z, d) => `<i style="left:${px(x)}; top:${r2((y - d) * S - 1)}px; width:${px(w)}; height:${px(d)}; transform-origin:0 100%; transform:translateZ(${px(z)}) rotateX(90deg)"></i>`;
-    return fram(TV.x - 2, 14, TV.w + 4, TV.y + TV.h + 2 - 14, 0) + sida(TV.x + TV.w, TV.y, TV.h, 0, DJUP) + tak(TV.x, TV.y, TV.w, 0, DJUP) +
+    return fram(TV.x - 2, TV.y - 2, TV.w + 4, TV.h + 4, 0) + sida(TV.x + TV.w, TV.y, TV.h, 0, DJUP) + tak(TV.x, TV.y, TV.w, 0, DJUP) +
       fram(L.x - 1, L.y - 1, L.w + 2, L.h + 2, L.z) + sida(L.x + L.w, L.y, L.h, L.z, L.d) + tak(L.x, L.y, L.w, L.z, L.d);
   }
 
   // ---------- lådan ----------
 
   // En fruktlåda i furu på sidan, med öppningen mot gänget som tv:n.
-  // Framsidan: brädorna runt öppningen och tejpbiten med namnet.
+  // Framsidan: brädorna runt öppningen, mellanväggen och en tejpbit över
+  // varje fack med dagen (ladaText, fylls i av fill).
   function ladaSvg() {
     const L = LADA;
     const board = (x, y, w, h, cls) => `<rect x="${x}" y="${y}" width="${w}" height="${h}" fill="url(#vhs-furu)"/><rect x="${x}" y="${y}" width="${w}" height="${h}" filter="url(#${cls})" opacity=".55"/>`;
@@ -231,14 +241,18 @@ window.RumVideo = (() => {
     ${board(L.x, L.y, L.w, L.t, 'vhs-ved')}${board(L.x, L.y + L.h - L.t, L.w, L.t, 'vhs-ved')}
     <rect x="${L.x}" y="${L.y}" width="${L.w}" height=".45" fill="#fff3d8" opacity=".35"/>
     <g fill="#3a2410" opacity=".45"><rect x="${L.x + L.t}" y="${L.y + L.t - 0.5}" width="${L.w - 2 * L.t}" height=".5"/><rect x="${L.x + L.t - 0.5}" y="${L.y + L.t}" width=".5" height="${L.h - 2 * L.t}"/></g>
+    ${board(L.x + MV.x, L.y + L.t - 0.3, MV.w, L.h - 2 * L.t + 0.6, 'vhs-ved-s')}
+    <rect x="${L.x + MV.x}" y="${L.y + L.t}" width=".45" height="${L.h - 2 * L.t}" fill="#fff3d8" opacity=".3"/>
     ${nails}
-    <polygon points="${pts([[L.x + 25.2, L.y + 0.45], [L.x + 69, L.y + 0.2], [L.x + 69.6, L.y + 1.4], [L.x + 68.9, L.y + 2.6], [L.x + 69.5, L.y + 4.2], [L.x + 25.4, L.y + 4.5], [L.x + 24.8, L.y + 3.1], [L.x + 25.5, L.y + 1.9]])}" fill="#e7dab2" opacity=".96" transform="rotate(-1.6 ${L.x + 47} ${L.y + 2.3})"/>
+    <polygon points="${pts([[L.x + 12, L.y + 0.45], [L.x + 38, L.y + 0.2], [L.x + 38.6, L.y + 1.4], [L.x + 37.9, L.y + 2.6], [L.x + 38.5, L.y + 4.2], [L.x + 12.2, L.y + 4.5], [L.x + 11.6, L.y + 3.1], [L.x + 12.3, L.y + 1.9]])}" fill="#e7dab2" opacity=".96" transform="rotate(-1.4 ${L.x + 25} ${L.y + 2.3})"/>
+    <polygon points="${pts([[L.x + 53, L.y + 0.35], [L.x + 87, L.y + 0.5], [L.x + 87.6, L.y + 1.7], [L.x + 86.9, L.y + 2.8], [L.x + 87.5, L.y + 4.3], [L.x + 53.2, L.y + 4.4], [L.x + 52.6, L.y + 3], [L.x + 53.3, L.y + 1.8]])}" fill="#e7dab2" opacity=".96" transform="rotate(1.1 ${L.x + 70} ${L.y + 2.3})"/>
   </g>`;
   }
   function ladaText() {
     const L = LADA;
+    const tejp = (cls, x, r) => `<text class="${cls}" x="${x}" y="${L.y + 3.6}" text-anchor="middle" font-family="Caveat, cursive" font-weight="700" font-size="4.1" letter-spacing=".4" fill="#1d1a16" transform="rotate(${r} ${x} ${L.y + 2.3})"></text>`;
     return `<text x="${L.x + L.w / 2}" y="${L.y + L.h - 1.2}" text-anchor="middle" font-family="Anton, Impact, sans-serif" font-size="2.6" letter-spacing="1.2" fill="#9b2c1f" opacity=".5">ÄPPLEN · KLASS I</text>
-    <text x="${L.x + 47}" y="${L.y + 3.55}" text-anchor="middle" font-family="Caveat, cursive" font-weight="700" font-size="3.9" letter-spacing=".5" fill="#1d1a16" transform="rotate(-1.6 ${L.x + 47} ${L.y + 2.3})">ARKIVET</text>`;
+    ${tejp('vhs-tejp-forra', L.x + 25, -1.4)}${tejp('vhs-tejp-nasta', L.x + 70, 1.1)}`;
   }
 
   // En ritning bara så stor som det den visar (b), så att lagret blir litet.
@@ -266,8 +280,8 @@ window.RumVideo = (() => {
   ${ladaSvg()}`) + ritning(b, ladaText());
   }
   // Lådans övriga sidor, i bildpunkter (lådans front i z = 0): högra sidan
-  // och taket, innanför öppningen vänstra väggen, botten och baksidan, och
-  // skuggan på disken.
+  // och taket, innanför öppningen vänstra väggen och mellanväggens högra
+  // sida, botten och baksidan, och skuggan på disken.
   function ladaYtor() {
     const L = LADA;
     const [x0, y0, x1, y1] = [L.x + L.t, L.y + L.t, L.x + L.w - L.t, L.y + L.h - L.t].map((v) => v * S);
@@ -275,6 +289,7 @@ window.RumVideo = (() => {
     return golv('vhs-skugga', (L.x - 4) * S, (L.y + L.h) * S, (L.w + 8) * S, 4 * S, -(L.d + 4) * S) +
       yta('lada-bak', x0, y0, x1 - x0, y1 - y0, '0 0', `translateZ(${r2(-inne)}px)`) +
       yta('lada-vagg', x0, y0, inne, y1 - y0, '0 0', 'rotateY(90deg)') +
+      yta('lada-vagg', (L.x + MV.x + MV.w) * S, y0, inne, y1 - y0, '0 0', 'rotateY(90deg)') +
       golv('lada-botten', x0, y1, x1 - x0, 0, -inne) +
       yta('lada-sida', (L.x + L.w) * S, L.y * S, L.d * S, L.h * S, '0 0', 'rotateY(90deg)') +
       yta('lada-topp', L.x * S, (L.y - L.d) * S, L.w * S, L.d * S, '0 100%', 'rotateX(90deg)');
@@ -319,9 +334,10 @@ window.RumVideo = (() => {
     // knapparna, med tangenterna som gör samma sak nära (key i mount)
     const knappar = [['bak', '◀◀', 'Spola tillbaka', 'ArrowLeft'], ['spela', '▶', 'Spela', 'Space'], ['fram', '▶▶', 'Spola fram', 'ArrowRight'], ['stopp', '■', 'Stopp', 'S'], ['ut', '⏏', 'Mata ut']]
       .map(([k, t, l, tg], i) => `<button type="button" class="vhs-k" data-vhs="${k}" aria-label="${l}"${tg ? ` aria-keyshortcuts="${tg}"` : ''} style="${at({ x: KNAPP.x + i * KNAPP.d, y: KNAPP.y, w: KNAPP.w, h: KNAPP.h })}">${t}</button>`).join('');
-    // en kassett: ryggen med etiketten, och taket och ändarna bakåt
+    // en kassett: ryggen med etiketten (kupongnumret, matchen och
+    // resultatet), och taket och ändarna bakåt
     const kas = (a, b) => Array.from({ length: b - a }, (_, i) => `<div class="vhs-band" data-i="${a + i}" hidden>` +
-      `<button type="button" class="vhs-kas" data-i="${a + i}"><span class="lapp"><b></b><i></i></span></button>` +
+      `<button type="button" class="vhs-kas" data-i="${a + i}"><span class="lapp"><i></i><b></b><u></u></span></button>` +
       '<i class="kas-topp"></i><i class="kas-v"></i><i class="kas-h"></i></div>').join('');
     return `<div class="rum-vhs" id="rum-vhs" data-lage="tom" style="left:${O[0]}px; top:${O[1]}px">` +
       `<div class="vhs-in" style="perspective:${1000 * S}px; perspective-origin:${px(VP[0])} ${px(VP[1])}">` +
@@ -337,15 +353,17 @@ window.RumVideo = (() => {
       // självt inte kan visas
       `<div class="vhs-sok">${'<img alt="" referrerpolicy="no-referrer" hidden>'.repeat(3)}${'<i class="sok-rand"><i></i></i>'.repeat(2)}</div>` +
       `<i class="vhs-mask" style="top:${px(BILD.y - GLAS.y)}" hidden></i>` +
+      // listan över kassetterna när ingen är i, i bilden
+      `<div class="vhs-lista" style="top:${px(BILD.y - GLAS.y + 1.6)}; height:${px(BILD.h - 3.2)}" hidden><button type="button" class="ls-hd" aria-label="Byt sida"><span></span><span></span></button><ol></ol></div>` +
       // texten i bilden, så att den syns när bilden fyller fönstret:
       // läget och räkneverket uppe och bandmätaren nere
       `<span class="vhs-osd" style="top:${px(BILD.y - GLAS.y + 3)}">STOPP</span>` +
       `<span class="vhs-tid" style="top:${px(BILD.y - GLAS.y + 3)}">0:00:00</span>` +
       // (bandmätaren lika långt in nedifrån som bokstäverna uppifrån)
       `<span class="vhs-matare" style="bottom:${px(GLAS.y + GLAS.h - BILD.y - BILD.h + 4.6)}"><i></i></span><i class="vhs-glas"></i></div>` +
-      `<span class="vhs-vfd" style="${at(VFD)}">12:00</span>${knappar}${kas(0, 4)}</div></div>` +
+      `<span class="vhs-vfd" style="${at(VFD)}">12:00</span>${knappar}</div></div>` +
       // lådan bredvid
-      `<div class="vhs-lada" style="transform:translateZ(${px(LADA.z)})">${ladaYtor()}${ladaRitning()}<div class="vhs-styr" inert>${kas(4, CAP)}</div></div>` +
+      `<div class="vhs-lada" style="transform:translateZ(${px(LADA.z)})">${ladaYtor()}${ladaRitning()}<div class="vhs-styr" inert>${kas(0, CAP)}</div></div>` +
       `<a class="vhs-hit rum-sak" href="#matcher" data-nav="video" aria-label="Videon">${hitYtor()}</a></div></div>` +
       '</div></div>';
   }
@@ -358,18 +376,75 @@ window.RumVideo = (() => {
     const p = Object.fromEntries(fDag.formatToParts(new Date(iso)).map((x) => [x.type, x.value]));
     return `${p.day}/${p.month}`;
   };
-  const RANK = { pl: 0, ch: 1, l1: 2, l2: 3, fac: 4, lc: 5 };
+  const fVd = new Intl.DateTimeFormat('sv-SE', { timeZone: TZ, weekday: 'short' });
   const hidden = (m) => Boolean(window.Spoiler && Spoiler.hidden(m));
+  const harKlipp = (m) => Boolean(m && m.completed && m.y && m.y.length);
+  const DYGN = 86400000;
 
-  // Omgångens matcher först, sedan de senaste dag för dag, de högre
-  // divisionerna först samma dag.
-  function pick(matches, ids) {
-    const own = new Set((ids || []).map(String));
-    return (matches || []).filter((m) => m.completed && m.y && m.y.length)
-      .map((m) => ({ m, own: own.has(String(m.id)), d: fKey.format(new Date(m.kickoff)) }))
-      .sort((a, b) => (b.own - a.own) || b.d.localeCompare(a.d) || (RANK[a.m.comp] ?? 9) - (RANK[b.m.comp] ?? 9) || a.m.home.localeCompare(b.m.home))
-      .slice(0, CAP)
-      .map((x) => x.m);
+  // Förra omgången och nästa, som matchernas id i kupongens ordning.
+  // Omgången som gänget tippar (rd, round() i rum.js) är nästa så länge
+  // ingen av dess matcher har börjat, och förra när någon har det. Den
+  // andra är kupongen som spelades senast (old: historiken och kupongerna,
+  // den vars sista match var senast) – eller efter förra de närmaste
+  // matcherna i Premier League och Championship, efter den helgen.
+  function omgangar(by, matches, rd, old, t) {
+    const borjat = (ids) => ids.some((id) => {
+      const m = by.get(id);
+      return m && (m.completed || Date.parse(m.kickoff) <= t);
+    });
+    const sist = (ids) => Math.max(0, ...ids.map((id) => by.get(id)).filter(Boolean).map((m) => Date.parse(m.kickoff)));
+    const ids = rd && rd.ids ? rd.ids.map(String) : [];
+    const pagar = Boolean(rd && !rd.next && borjat(ids));
+    let forra = pagar ? ids : [];
+    let nasta = pagar ? [] : ids;
+    if (!pagar) {
+      const c = (old || []).map((x) => (x.rows || x.matches || []).map((r) => String(r.id)))
+        .filter((l) => l.length && l.join() !== ids.join() && borjat(l))
+        .sort((a, b) => sist(b) - sist(a))[0];
+      if (c) forra = c;
+    }
+    if (!nasta.length) {
+      const har = new Set(forra);
+      const fran = Math.max(t, sist(forra) + 1.5 * DYGN);
+      nasta = (matches || []).filter((m) => (m.comp === 'pl' || m.comp === 'ch') && !m.completed && !har.has(String(m.id)) && Date.parse(m.kickoff) > fran)
+        .sort((a, b) => Date.parse(a.kickoff) - Date.parse(b.kickoff)).slice(0, FACKEN).map((m) => String(m.id));
+    }
+    return { forra: forra.slice(0, FACKEN), nasta };
+  }
+
+  // Kassetterna i facken (CAP platser, null där ingen står): förra
+  // omgångens matcher på sina platser i kupongens ordning, och den senaste
+  // matchen med klipp (högst tre veckor gammal) för lagen i nästa omgång,
+  // match för match, som inte redan står till vänster.
+  function valj(by, matches, forra, nasta, t) {
+    const v = Array.from({ length: FACKEN }, (_, i) => (harKlipp(by.get(forra[i])) ? by.get(forra[i]) : null));
+    const klara = (matches || []).filter((m) => harKlipp(m) && Date.parse(m.kickoff) > t - 21 * DYGN)
+      .sort((a, b) => Date.parse(b.kickoff) - Date.parse(a.kickoff));
+    const har = new Set(v.filter(Boolean).map((m) => String(m.id)));
+    const h = [];
+    for (const n of nasta.map((id) => by.get(id)).filter(Boolean)) {
+      for (const lag of [n.home, n.away]) {
+        const m = klara.find((x) => x.home === lag || x.away === lag);
+        if (!m || har.has(String(m.id)) || h.length >= FACKEN) continue;
+        har.add(String(m.id));
+        h.push(m);
+      }
+    }
+    return [...v, ...Array.from({ length: FACKEN }, (_, i) => h[i] || null)];
+  }
+
+  // Dagen de flesta matcherna spelas, som på tejpen: LÖR 24/10.
+  function dagen(ms, infor) {
+    const n = {};
+    for (const m of ms) {
+      const d = fKey.format(new Date(m.kickoff));
+      n[d] = n[d] || m;
+      n[`#${d}`] = (n[`#${d}`] || 0) + 1;
+    }
+    const d = Object.keys(n).filter((k) => k[0] !== '#').sort((a, b) => n[`#${b}`] - n[`#${a}`] || a.localeCompare(b))[0];
+    if (!d) return '';
+    const k = n[d].kickoff;
+    return `${infor ? 'INFÖR' : fVd.format(new Date(k)).replace('.', '').toUpperCase()} ${dag(k)}`;
   }
 
   // Klipp som inte går att spela här, gemensamt med spelaren på sajten (hojdpunkter.js).
@@ -481,10 +556,15 @@ window.RumVideo = (() => {
     }
     const lucka = box.querySelector('.vhs-lucka');
     const kas = [...box.querySelectorAll('.vhs-band')].sort((a, b) => a.dataset.i - b.dataset.i);
-    // tapes: kassetternas matcher; cur: kassetten i videon (index), mid: dess
-    // match; near: kameran är framme, tat: ännu närmare; resume: spela vidare
-    // när man kommer tillbaka
-    const V = { tapes: [], key: '', cur: null, mid: null, near: false, tat: false, resume: false, lage: 'tom' };
+    const lista = box.querySelector('.vhs-lista');
+    const tejp = [box.querySelector('.vhs-tejp-forra'), box.querySelector('.vhs-tejp-nasta')];
+    // tapes: kassetternas matcher (CAP platser, null där ingen står); cur:
+    // kassetten i videon (index), mid: dess match; near: kameran är framme,
+    // tat: ännu närmare; resume: spela vidare när man kommer tillbaka;
+    // forra: förra omgångens matcher i kupongens ordning (till listan),
+    // dagar: tejpbitarnas text; sida och pek: listans sida (0 förra, 1
+    // nästa) och den markerade kassetten
+    const V = { tapes: [], key: '', cur: null, mid: null, near: false, tat: false, resume: false, lage: 'tom', forra: [], dagar: ['', ''], sida: 0, pek: null };
     // spelaren: klippen, vilket, meddelandenas id, ramen, tiden och läget;
     // dold: bilden täcks tills spelarens egna saker har tonat bort (varm);
     // mal: där bandet stannade (och spelar från), dur: klippets längd; vis,
@@ -505,13 +585,67 @@ window.RumVideo = (() => {
         cancelAnimationFrame(P.sok);
         P.sok = 0;
       }
+      if (l === 'tom') visaLista();
     }
 
-    // ---------- högarna ----------
+    // I telefonen på höjden går kameran fram till lådan, annars till tv:n
+    // och lådan.
+    const smal = () => innerWidth < 700 && innerWidth < innerHeight;
+    const nara = () => (smal() ? LADAN : FOCUS);
 
-    // Kassetterna nerifrån och upp i varje hög; den som är i videon lämnar en
-    // lucka som de ovanför sjunker ner i, men har kvar sin plats att komma
-    // tillbaka till.
+    // ---------- listan i rutan ----------
+
+    // När ingen kassett är i: ett fack i taget, förra omgången med
+    // kupongens nummer (raderna utan klipp svaga) och nästa, och den
+    // markerade kassetten i vitt. Ett klick på en rad spelar den, och på
+    // rubriken byter sidan.
+    const fack = (i) => (i < FACKEN ? 0 : 1);
+    const ord = (n) => o.kort(n).toUpperCase();
+    const sidor = () => [V.forra.length > 0, V.tapes.slice(FACKEN).some(Boolean)];
+    function visaLista() {
+      const s = sidor();
+      lista.hidden = !s[0] && !s[1];
+      box.classList.toggle('har-lista', !lista.hidden);
+      if (lista.hidden) return;
+      if (!s[V.sida]) V.sida = 1 - V.sida;
+      if (V.pek == null || !V.tapes[V.pek] || fack(V.pek) !== V.sida) V.pek = V.tapes.findIndex((m, i) => m && fack(i) === V.sida);
+      if (V.pek < 0) V.pek = null;
+      const rad = (m, i, nr) => {
+        const res = m.score && !hidden(m) ? `${m.score.home}–${m.score.away}` : '';
+        const a = i == null ? ' class="ingen"' : `data-rad="${i}"${i === V.pek ? ' class="pek"' : ''}`;
+        return `<li ${a.trim()}><b>${nr || ''}</b><span>${ord(m.home)}–${ord(m.away)}</span><i>${res}</i></li>`;
+      };
+      const rader = V.sida === 0
+        ? V.forra.map((m, i) => (m ? rad(m, V.tapes[i] ? i : null, i + 1) : ''))
+        : V.tapes.slice(FACKEN).map((m, j) => (m ? rad(m, FACKEN + j) : '')).filter(Boolean);
+      const [hd, sid] = lista.querySelectorAll('.ls-hd span');
+      hd.textContent = V.dagar[V.sida];
+      sid.textContent = s[0] && s[1] ? (V.sida ? '◀ 2/2' : '1/2 ▶') : '';
+      const ol = lista.querySelector('ol');
+      const html = rader.join('');
+      if (ol.innerHTML !== html) ol.innerHTML = html;
+    }
+    function blad(d) {
+      const s = Math.min(1, Math.max(0, V.sida + d));
+      if (s === V.sida || !sidor()[s]) return;
+      V.sida = s;
+      V.pek = null;
+      visaLista();
+    }
+    // ↑/↓ i listan: nästa eller förra kassetten på sidan
+    function peka(d) {
+      const ix = V.tapes.map((m, i) => (m && fack(i) === V.sida ? i : -1)).filter((i) => i >= 0);
+      if (!ix.length) return;
+      const j = ix.indexOf(V.pek);
+      V.pek = ix[j < 0 ? 0 : Math.min(ix.length - 1, Math.max(0, j + d))];
+      visaLista();
+    }
+
+    // ---------- lådan ----------
+
+    // Kassetterna nerifrån och upp i varje fack; den som är i videon lämnar
+    // en lucka som de ovanför sjunker ner i, men har kvar sin plats att
+    // komma tillbaka till.
     function layout() {
       for (const c of COLS) {
         let yAll = c.y;
@@ -524,9 +658,8 @@ window.RumVideo = (() => {
           const top = i === V.cur ? yAll : yNow;
           const x = c.x + (hash(`x${i}`) - 0.5) * 2 * c.j;
           const r = r2((hash(`r${i}`) - 0.5) * 2 * c.r);
-          // på tv:n lite in från kanten och vridna på högkant, i lådan lite
-          // innanför öppningen och lutade
-          const t = c.tv ? `translateZ(${-1.5 * S}px) rotateY(${r}deg)` : `translateZ(${-S}px) rotate(${r}deg)`;
+          // lite innanför öppningen och lutade
+          const t = `translateZ(${-S}px) rotate(${r}deg)`;
           el.style.left = px(x);
           el.style.top = px(top);
           el.style.setProperty('--t', t);
@@ -542,18 +675,47 @@ window.RumVideo = (() => {
       const hide = hidden(m);
       const score = !hide && m.score ? `${m.score.home}–${m.score.away}` : '';
       const name = `${o.short(m.home)}–${o.short(m.away)}`;
-      const label = name.length <= 16 ? name : `${o.kort(m.home)}–${o.kort(m.away)}`;
+      const label = name.length <= 15 ? name : `${o.kort(m.home)}–${o.kort(m.away)}`;
       const v = Math.floor(hash(m.id) * VARIANTS);
-      el.className = `vhs-band v${v}${el.classList.contains('inne') ? ' inne' : ''}`;
+      // förra omgångens kassetter har kupongens nummer
+      const i = Number(el.dataset.i);
+      const nr = i < FACKEN ? String(i + 1) : '';
+      el.className = `vhs-band v${v}${nr ? ' har-nr' : ''}${el.classList.contains('inne') ? ' inne' : ''}`;
       el.style.setProperty('--blk', INK[Math.floor(hash(`b${m.id}`) * INK.length)]);
       el.style.setProperty('--lr', `${r2((hash(`l${m.id}`) - 0.5) * 1.6)}deg`);
-      const text = score ? `${label} ${score}` : label;
-      // långa namn skrivs mindre, så att de får plats på etiketten
-      el.style.setProperty('--fs', `${text.length > 21 ? 15 : text.length > 17 ? 17.5 : 20}px`);
-      el.querySelector('b').textContent = text;
-      el.querySelector('.lapp i').textContent = dag(m.kickoff);
-      el.querySelector('.vhs-kas').setAttribute('aria-label', `${m.home} – ${m.away}${score ? `, ${score}` : ''}, ${dag(m.kickoff)}`);
+      el.querySelector('.lapp i').textContent = nr;
+      el.querySelector('.lapp b').textContent = label;
+      el.querySelector('.lapp u').textContent = score;
+      el.querySelector('.vhs-kas').setAttribute('aria-label', `${nr ? `${nr}. ` : ''}${m.home} – ${m.away}${score ? `, ${score}` : ''}, ${dag(m.kickoff)}`);
+      el.dataset.passa = '';
     }
+
+    // Etiketten så stor som den får plats, högst FS bildpunkter: texten mäts
+    // i en duk (bråkdelar av bildpunkter, som webbläsaren när den kortar)
+    // mot lappens bredd, när lådan syns (fill, zoom, skarp) – utan lappens
+    // kanter (7 + 7), numret (24 − 4 + 5), mellanrummet före resultatet (5)
+    // och 2 till godo. Resultatet kortas aldrig, namnet hellre.
+    const FS = 20;
+    const duk = document.createElement('canvas').getContext('2d');
+    const bredd = (t, f, fam) => {
+      duk.font = `400 ${f}px ${fam}`;
+      return duk.measureText(t).width - 0.4 * t.length;
+    };
+    function passa() {
+      for (const el of kas) {
+        if (el.hidden || el.dataset.passa == null) continue;
+        const lapp = el.querySelector('.lapp');
+        if (!lapp.clientWidth) continue;
+        const [b, u] = [lapp.querySelector('b'), lapp.querySelector('u')];
+        const fam = getComputedStyle(b).fontFamily;
+        const ledigt = lapp.clientWidth - 14 - (el.classList.contains('har-nr') ? 25 : 0) - (u.textContent ? 5 : 0) - 2;
+        let f = FS;
+        while (f > 11 && bredd(b.textContent, f, fam) + bredd(u.textContent, f, fam) > ledigt) f--;
+        el.style.setProperty('--fs', `${f}px`);
+        delete el.dataset.passa;
+      }
+    }
+    if (document.fonts) document.fonts.load('20px "Special Elite"').then(() => { for (const el of kas) el.dataset.passa = ''; passa(); }, () => {});
 
     // Kassetten åker från sin plats in i facket (eller tillbaka): lyfts upp
     // och fram, ställs framför facket och skjuts in. Ur lådan dras den först
@@ -987,7 +1149,11 @@ window.RumVideo = (() => {
       stopPlayer();
       V.cur = i;
       V.mid = m.id;
+      V.sida = fack(i);
+      V.pek = i;
       lage('laddar', '▶ SPELA');
+      // i telefonen syns inte rutan från lådan: kameran går dit
+      if (smal()) tat(true);
       const el = kas[i];
       layout();
       el.classList.remove('inne');
@@ -1015,10 +1181,13 @@ window.RumVideo = (() => {
       fly(el, false, () => {});
     }
 
-    // ▶: spelar eller pausar – och medan den spolar spelar den därifrån
+    // ▶: spelar eller pausar – och medan den spolar spelar den därifrån;
+    // utan kassett spelar den den som är markerad i listan
     function toggle() {
-      if (V.cur == null) insert(0);
-      else if (V.lage === 'spolar') {
+      if (V.cur == null) {
+        const i = V.pek ?? V.tapes.findIndex(Boolean);
+        if (i >= 0) insert(i);
+      } else if (V.lage === 'spolar') {
         if (rullar()) {
           landa();
           spelaHar();
@@ -1028,23 +1197,32 @@ window.RumVideo = (() => {
       else start(V.tapes[V.cur]);
     }
 
+    // ↑/↓: nästa eller förra kassetten – utan kassett i listan
     function step(d) {
-      const n = V.tapes.length;
-      if (!n) return;
-      insert(V.cur == null ? 0 : Math.min(n - 1, Math.max(0, V.cur + d)));
+      if (V.cur == null) {
+        peka(d);
+        return;
+      }
+      let j = V.cur + d;
+      while (j >= 0 && j < V.tapes.length && !V.tapes[j]) j += d;
+      if (V.tapes[j]) insert(j);
     }
 
     // Närmare: rutan fyller bilden; ett klick på rutan till
     // och man går tillbaka till tv:n och lådan.
     // Hörnet ritas i halva storleken, och i hela när rutan fyller bilden
-    // (.skarp, rum-video.css; tat). zoom ändrar också måtten i
-    // övergångarna, så det byts med övergångarna avstängda, när inget rör sig.
+    // (.skarp, rum-video.css; tat) – i telefonen på höjden också vid lådan,
+    // där etiketterna ska gå att läsa. zoom ändrar också måtten i
+    // övergångarna, så det byts med övergångarna avstängda, när inget rör sig,
+    // och etiketterna mäts om.
     function skarp(on) {
       if (inn.classList.contains('skarp') === on) return;
       inn.classList.add('byt');
       inn.classList.toggle('skarp', on);
       void inn.offsetWidth;
       inn.classList.remove('byt');
+      for (const el of kas) el.dataset.passa = '';
+      passa();
     }
 
     // Kameran runt tv:n (SVANG s, null på håll), samtidigt som rummet vrids,
@@ -1061,20 +1239,26 @@ window.RumVideo = (() => {
       V.tat = on;
       // hörnet ritas skarpt bara här, där rutan fyller bilden: innan
       // kameran går fram, och i halva storleken igen när den har gått
-      // tillbaka
+      // tillbaka (i telefonen på höjden inte, vid lådan)
       clearTimeout(V.skarpT);
       if (on) skarp(true);
-      else V.skarpT = setTimeout(() => { if (!V.tat) skarp(false); }, 900);
+      else V.skarpT = setTimeout(() => { if (!V.tat && !smal()) skarp(false); }, 900);
       box.classList.toggle('vhs-tat', on);
       sving(on ? SVANG.tat : SVANG.nara);
-      if (o.aim) o.aim(on ? TAT : FOCUS);
+      if (o.aim) o.aim(on ? TAT : nara());
     }
 
     box.addEventListener('click', (e) => {
       if (!V.near) return;
       const b = e.target.closest('.vhs-kas, [data-vhs]');
       if (!b) {
-        if (e.target.closest('.vhs-skarm')) tat(!V.tat);
+        // i listan: en rad spelar, rubriken byter sida
+        const r = e.target.closest('[data-rad]');
+        if (r) insert(Number(r.dataset.rad));
+        else if (e.target.closest('.ls-hd')) blad(V.sida ? -1 : 1);
+        else if (e.target.closest('.vhs-skarm')) tat(!V.tat);
+        // i telefonen syns bara kanten av tv:n bredvid lådan
+        else if (smal() && e.target.closest('.vhs-tv')) tat(true);
         return;
       }
       e.preventDefault();
@@ -1084,7 +1268,16 @@ window.RumVideo = (() => {
       else if (b.dataset.vhs === 'spela') toggle();
       else if (b.dataset.vhs === 'stopp') stopp();
       else if (b.dataset.vhs === 'ut') eject();
+      // utan kassett byter ◀◀ och ▶▶ sida i listan
+      else if (V.cur == null) blad(b.dataset.vhs === 'fram' ? 1 : -1);
       else spola(b.dataset.vhs === 'fram' ? 1 : -1);
+    });
+    // musen över en rad i listan markerar den
+    lista.addEventListener('pointerover', (e) => {
+      const r = e.target.closest('[data-rad]');
+      if (!r || Number(r.dataset.rad) === V.pek) return;
+      V.pek = Number(r.dataset.rad);
+      for (const li of lista.querySelectorAll('li')) li.classList.toggle('pek', li === r);
     });
     // hjulet: framåt närmare, bakåt tillbaka till tv:n och lådan
     box.addEventListener('wheel', (e) => {
@@ -1096,24 +1289,35 @@ window.RumVideo = (() => {
     tick();
 
     return {
-      fill(matches, ids) {
-        const list = pick(matches, ids);
-        const key = list.map((m) => `${m.id}:${hidden(m) ? '?' : m.score ? `${m.score.home}-${m.score.away}` : ''}`).join();
+      fill(matches, r = {}) {
+        const t = Date.now();
+        const by = new Map((matches || []).map((m) => [String(m.id), m]));
+        const { forra, nasta } = omgangar(by, matches, r.rd, r.old, t);
+        const list = valj(by, matches, forra, nasta, t);
+        const fm = forra.map((id) => by.get(id) || null);
+        const dagar = [dagen(fm.filter(Boolean), false), dagen(nasta.map((id) => by.get(id)).filter(Boolean), true)];
+        const id = (m) => (m ? `${m.id}:${hidden(m) ? '?' : m.score ? `${m.score.home}-${m.score.away}` : ''}` : '-');
+        const key = `${list.map(id).join()}|${fm.map(id).join()}|${dagar.join()}`;
         if (key === V.key) return;
         V.key = key;
         V.tapes = list;
+        V.forra = fm;
+        V.dagar = dagar;
+        tejp.forEach((e, i) => { if (e) e.textContent = dagar[i]; });
         kas.forEach((el, i) => {
           el.hidden = !list[i];
           if (list[i]) paint(el, list[i]);
         });
         // kassetten i videon kan ha fått en annan plats
         if (V.mid != null) {
-          const j = list.findIndex((m) => m.id === V.mid);
+          const j = list.findIndex((m) => m && m.id === V.mid);
           V.cur = j >= 0 ? j : null;
           const m = list[j];
           if (m) mask.hidden = !hidden(m);
         }
         layout();
+        if (V.lage === 'tom') visaLista();
+        passa();
       },
       skarp,
       // Nära: kassetterna och knapparna går att trycka på, och videon spelar
@@ -1136,14 +1340,19 @@ window.RumVideo = (() => {
           if (V.lage === 'spolar') spelaHar();
           else resume();
         }
-        return FOCUS;
+        if (on && smal()) skarp(true);
+        else if (on) passa();
+        return nara();
       },
       // När man är framme: ←/→ (och ett svep i telefonen) spolar som ◀◀ och
-      // ▶▶, mellanslaget spelar och pausar som ▶, S stoppar som ■, ↑/↓ byter
-      // kassett och Esc går tillbaka från rutan till tv:n och lådan.
+      // ▶▶ – utan kassett byter de sida i listan – mellanslaget spelar och
+      // pausar som ▶, S stoppar som ■, ↑/↓ byter kassett (i listan) och Esc
+      // går tillbaka från rutan till tv:n och lådan.
       key(k) {
-        if (k === 'ArrowRight' || k === 'ArrowLeft') spola(k === 'ArrowRight' ? 1 : -1);
-        else if (k === ' ') {
+        if (k === 'ArrowRight' || k === 'ArrowLeft') {
+          if (V.cur == null) blad(k === 'ArrowRight' ? 1 : -1);
+          else spola(k === 'ArrowRight' ? 1 : -1);
+        } else if (k === ' ') {
           // på en knapp (med tabben) trycker mellanslaget på knappen
           const a = document.activeElement;
           if (a && box.contains(a) && a.matches('button')) return false;

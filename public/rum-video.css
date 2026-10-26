@@ -1,5 +1,5 @@
 /* Videon i tobaksaffären (rum-video.js): en liten färg-tv med inbyggd video
-   på disken, kassetterna på tv:n och i lådan bredvid. Hörnet är 240 × 130 i
+   på disken, och kassetterna i lådan bredvid. Hörnet är 240 × 130 i
    scenen (planet -598 i rum.js) men ritas i sex gånger storleken och
    förminskas (scale3d), så att det är skarpt när kameran går fram – samma
    knep som tv:n i rum-tv.css. Alla mått nedan är i de stora måtten.
@@ -22,9 +22,10 @@
    lagren blir en fjärdedel så stora – Safari ritar dem i full storlek gånger
    pixeltätheten, och tobaksaffären fick slut på minne i iPhone. På håll
    och vid första närbilden räcker halva det, och hela behövs bara när
-   rutan fyller bilden (en fjärdedel av minnet igen; skarp och tat i
-   rum-video.js); knapparnas tecken och etiketterna blir då lite större
-   (Safari gör text under 9 px större), men de är för små för att läsa där. */
+   rutan fyller bilden och, på höjden, när kameran står vid lådan och
+   etiketterna ska gå att läsa (en fjärdedel av minnet igen; skarp, tat och
+   zoom i rum-video.js); knapparnas tecken blir i halva storleken lite
+   större (Safari gör text under 9 px större). */
 @media (max-width: 700px), (max-height: 500px) {
   .vhs-in { zoom: 0.5; transform: scale3d(0.333333, 0.333333, 0.333333); }
   .vhs-in.skarp { zoom: 1; transform: scale3d(0.166667, 0.166667, 0.166667); }
@@ -128,6 +129,23 @@
   filter: drop-shadow(3px 3px 0 #0c1660);
 }
 .vhs-skarm > .vhs-matare[hidden] { display: none; }
+/* Listan över kassetterna när ingen är i (i stället för STOPP): dagen och
+   sidan, och ett fack per sida – förra omgången med kupongens nummer (de
+   utan klipp svaga) och nästa – med den markerade kassetten i vitt, i
+   bildens 16:9 så att den syns hel när rutan fyller fönstret. */
+.vhs-skarm > .vhs-lista { left: 30px; right: 30px; display: flex; flex-direction: column; color: #f4f6ff; font: 400 15px/14px VT323, monospace; text-shadow: 2px 2px 0 #0c1660; }
+.vhs-skarm > .vhs-lista[hidden] { display: none; }
+.rum-vhs.har-lista[data-lage="tom"] .vhs-osd { visibility: hidden; }
+.ls-hd { appearance: none; display: flex; justify-content: space-between; width: 100%; padding: 0 0 2px; margin: 0 0 3px; border: 0; border-bottom: 2px solid rgba(244, 246, 255, 0.8); border-radius: 0; background: none; color: inherit; font: 400 18px/18px VT323, monospace; text-shadow: inherit; cursor: pointer; }
+.ls-hd:focus-visible { outline: none; color: #fff; }
+.vhs-lista ol { flex: 1; display: flex; flex-direction: column; justify-content: space-between; margin: 0; padding: 0; list-style: none; }
+.vhs-lista li { display: flex; gap: 9px; margin: 0 -5px; padding: 0 5px; white-space: nowrap; }
+.vhs-lista li b { width: 20px; text-align: right; font-weight: 400; }
+.vhs-lista li span { flex: 1; min-width: 0; overflow: hidden; }
+.vhs-lista li i { font-style: normal; }
+.vhs-lista li.ingen { opacity: 0.45; }
+.vhs-lista li[data-rad] { cursor: pointer; }
+.vhs-lista li.pek { background: #f4f6ff; color: #2441c4; text-shadow: none; }
 .vhs-matare > i {
   position: absolute;
   left: 0;
@@ -183,8 +201,8 @@
   animation: vhs-brus 0.24s steps(4) infinite;
 }
 @keyframes vhs-brus { 0% { transform: translate(0, 0); } 25% { transform: translate(-37px, 13px); } 50% { transform: translate(-11px, -29px); } 75% { transform: translate(-29px, 23px); } 100% { transform: translate(0, 0); } }
-.vhs-bla, .vhs-brus, .vhs-bild, .vhs-sok, .vhs-osd, .vhs-tid, .vhs-matare { visibility: hidden; }
-.rum-vhs[data-lage="tom"] :is(.vhs-bla, .vhs-osd),
+.vhs-bla, .vhs-brus, .vhs-bild, .vhs-sok, .vhs-osd, .vhs-tid, .vhs-matare, .vhs-lista { visibility: hidden; }
+.rum-vhs[data-lage="tom"] :is(.vhs-bla, .vhs-osd, .vhs-lista),
 .rum-vhs[data-lage="laddar"] :is(.vhs-bild, .vhs-bla, .vhs-osd),
 .rum-vhs[data-lage="spolar"] :is(.vhs-bild, .vhs-sok, .vhs-osd, .vhs-tid, .vhs-matare),
 .rum-vhs[data-lage="stopp"] :is(.vhs-bla, .vhs-osd, .vhs-tid, .vhs-matare),
@@ -243,7 +261,7 @@
 /* ---------- kassetterna ---------- */
 
 /* En VHS-kassett, 41 × 5,67 × 22,4 i scenen: ryggen (kassetten själv eller
-   ett pappfodral, med en etikett skriven för hand), taket och ändarna. */
+   ett pappfodral, med en maskinskriven etikett), taket och ändarna. */
 .vhs-band {
   --blk: #1b2030;
   --hus: #151515;
@@ -284,11 +302,11 @@
   position: absolute;
   left: 9%;
   right: 5%;
-  top: 4px;
-  bottom: 4px;
+  top: 3px;
+  bottom: 3px;
   display: flex;
   align-items: center;
-  gap: 6px;
+  gap: 5px;
   padding: 0 7px;
   overflow: hidden;
   border-radius: 1px;
@@ -296,8 +314,14 @@
   color: var(--blk);
   transform: rotate(var(--lr, 0deg));
 }
-.vhs-kas .lapp b { flex: 1 1 auto; min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; text-align: left; font: 700 var(--fs, 20px)/26px Caveat, cursive; }
-.vhs-kas .lapp i { flex: none; font: 600 15px/26px Caveat, cursive; font-style: normal; opacity: 0.8; }
+/* skrivmaskin: matchen så stor den får plats (--fs, passa i rum-video.js)
+   och resultatet, som aldrig kortas; förra omgångens kupongnummer på en
+   rund röd lapp */
+.vhs-kas .lapp :is(b, u) { font: 400 var(--fs, 20px)/28px "Special Elite", "American Typewriter", "Courier New", monospace; letter-spacing: -0.4px; white-space: nowrap; text-decoration: none; }
+.vhs-kas .lapp b { flex: 1 1 auto; min-width: 0; overflow: hidden; text-overflow: ellipsis; text-align: left; }
+.vhs-kas .lapp u { flex: none; }
+.vhs-kas .lapp i { display: none; }
+.har-nr > .vhs-kas .lapp i { display: block; flex: none; width: 24px; height: 24px; margin-left: -4px; border-radius: 50%; background: #b8322a; color: #fff6e6; font: 400 17px/24px Anton, Impact, sans-serif; font-style: normal; text-align: center; }
 /* fodralen: vitt med rött, blått med silver, svart med gult, grått med orange */
 .vhs-band.v1 { --hus: #e3ddd0; }
 .vhs-band.v2 { --hus: #1c4690; }

@@ -1134,7 +1134,8 @@ ${window.RumRegister ? RumRegister.nara() : ''}
     if (R.tv) R.tv.fill(rows, { spel: rd && rd.spel ? rd.ids : null, next: Boolean(rd && rd.next) });
     if (R.ans) R.ans.fill(rows.map((x) => x.m), (state.all && state.all.matches) || []);
     if (R.reg) R.reg.fill(rows.map((x) => x.m), (state.all && state.all.matches) || []);
-    if (R.video) R.video.fill((state.all && state.all.matches) || [], rd && !rd.next ? rd.ids : []);
+    // videon: förra omgången och nästa ur rd och kupongerna som har spelats
+    if (R.video) R.video.fill((state.all && state.all.matches) || [], { rd, old: [...(R.old || []), ...(typeof allCoupons === 'function' ? allCoupons() : [])] });
     const p = pult(rd);
     // har du lämnat in ligger din kupong i högen, och på pulten en ny – eller
     // gängets kupong, när du ser de andras tips (uppgörelsen)
