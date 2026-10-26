@@ -1615,14 +1615,15 @@ ${window.RumRegister ? RumRegister.nara() : ''}
   function aimVideo(cls) {
     // hörnet i planet -598 (1,035 gånger), och det som syns av scenen;
     // förstoringen högst f.z (rutan nära, rum-video.js), annars sex. Ska
-    // bilden fylla fönstret (f.fyll) räknas hela fönstret, utan kant
+    // bilden fylla fönstret (f.fyll) räknas hela fönstret, med en smal kant
+    // så att bildens gräns syns runt om
     const f = R.vf;
     sving(f, f.sv, cls);
     const [x0, x1] = [f.x0, f.x1].map((x) => 800 + (x - 800) * 1.035);
     const [y0, y1] = [f.y0, f.y1].map((y) => 500 + (y - 500) * 1.035);
     const [vx0, vx1] = [-R.ox / R.k, (innerWidth - R.ox) / R.k];
     const [vy0, vy1] = f.fyll ? [-R.oy / R.k, (innerHeight - R.oy) / R.k] : [(64 - R.oy) / R.k, (innerHeight - 56 - R.oy) / R.k];
-    const m = f.fyll ? 1 : 0.92;
+    const m = f.fyll ? 0.96 : 0.92;
     const z = Math.min(f.z || 6, ((vx1 - vx0) * m) / (x1 - x0), ((vy1 - vy0) * m) / (y1 - y0));
     aim([(x0 + x1) / 2, (y0 + y1) / 2], z, [(vx0 + vx1) / 2, (vy0 + vy1) / 2], cls);
   }

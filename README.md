@@ -2513,8 +2513,8 @@ foten (högst sex gånger), och svänger samtidigt runt tv:n in mot rummet, så 
 rutan snett framifrån i stället för från sidan. Tv:n och lådan vrids inte och flyttas inte –
 de står kvar vända mot gänget – utan det är kameran som rör sig (se *Kamerans sväng* nedan).
 Kassetterna glider ut en bit när man pekar på dem. Ett klick på rutan (eller hjulet framåt)
-går ännu närmare, så att bilden i rutan fyller fönstret (i 16:10 hela bredden, med rutans
-svarta kant ovanför och under; i telefonen på höjden syns knapparna under den), och kameran
+går ännu närmare, så att bilden i rutan nästan fyller fönstret (med en smal svart kant runt
+om, så att bildens gräns syns; i telefonen på höjden syns knapparna under den), och kameran
 svänger och går rakt framför tv:n, så att rutan syns rakt framifrån. Texten i rutan (*STOPP*,
 *▶ SPELA*) står inne i bilden, så att den syns där. Ett klick till, hjulet bakåt eller Esc går
 tillbaka till tv:n och lådan, och V,
