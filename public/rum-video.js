@@ -1,6 +1,6 @@
 'use strict';
 
-// Videon i tobaksaffären (rum.js): en liten färg-tv med inbyggd video som
+// Videon i tobaksaffären (rum.js): en liten Sony-tv med inbyggd video som
 // står på disken, nere i hörnet till höger, med ryggen mot väggen och
 // rutan vänd mot gänget mitt i rummet. På tv:n ligger de senaste
 // repriserna på VHS i en hög, och i en fruktlåda bredvid resten (Arkivet),
@@ -145,17 +145,29 @@ window.RumVideo = (() => {
 
   // ---------- tv:n ----------
 
-  // Framsidan: höljet, rutans ram, kassettfacket, displayen och fötterna.
+  // SONY som loggan på tv:n: en fet och bred antikva med raka seriffer och
+  // lodrät betoning, i enheter där versalhöjden är 100 (w bred).
+  const SONY = { w: 516, d: 'M77 25 76 24 76 22 75 21 75 20 74 18 73 17 71 15 69 14 67 13 64 12 62 11 59 10 55 9 52 9 48 10 44 10 40 12 37 13 34 14 31 16 29 18 28 20 27 22 26 23 26 25 26 26 26 27 27 28 26 29 26 30 26 31 26 32 26 33 27 35 28 37 30 38 33 40 36 41 40 42 44 43 48 44 53 45 58 46 62 47 67 48 71 48 75 49 79 50 83 51 87 52 90 54 94 56 97 59 100 63 102 68 103 73 102 78 100 83 98 87 95 91 91 93 87 96 83 97 79 98 75 99 71 100 66 100 62 100 57 100 52 100 48 100 44 100 40 100 36 100 32 100 29 99 25 98 22 97 18 96 15 94 12 92 9 90 6 87 5 84 25 74 26 75 26 77 27 78 27 80 28 81 30 83 31 84 33 86 36 87 38 88 41 89 45 90 48 91 52 91 56 90 60 90 64 89 68 87 71 86 73 84 75 83 77 81 77 79 78 77 78 76 78 75 78 74 78 73 78 72 78 72 78 71 79 70 78 69 77 67 76 65 73 64 71 62 67 61 64 60 60 59 55 58 51 57 46 56 42 55 37 55 33 54 29 53 25 52 21 51 17 50 13 48 10 46 6 42 4 38 2 33 2 28 2 23 3 18 6 14 9 10 13 7 16 5 20 3 25 2 29 1 33 0 38 0 42 0 47 0 52 0 56 0 59 0 63 0 67 0 70 0 74 0 77 1 80 2 84 3 87 5 90 7 93 9 96 12 97 15ZM86 4 97 4 97 35 86 35ZM5 65 16 65 16 96 5 96ZM238 50 238 55 237 60 235 65 233 69 231 74 228 78 224 82 220 85 215 89 210 92 205 94 200 96 194 98 188 99 182 100 176 100 170 100 164 99 158 98 152 96 147 94 142 92 137 89 132 85 128 82 124 78 121 74 119 69 117 65 115 60 114 55 114 50 114 45 115 40 117 35 119 31 121 26 124 22 128 18 132 15 137 11 142 8 147 6 152 4 158 2 164 1 170 0 176 0 182 0 188 1 194 2 200 4 205 6 210 8 215 11 220 15 224 18 228 22 231 26 233 31 235 35 237 40 238 45ZM212 46 211 42 210 38 209 35 208 31 206 28 204 25 201 22 199 19 196 17 193 15 190 13 186 12 183 11 180 10 176 10 172 10 169 11 166 12 162 13 159 15 156 17 153 19 151 22 148 25 146 28 144 31 143 35 142 38 141 42 140 46 140 50 140 54 141 58 142 62 143 65 144 69 146 72 148 75 151 78 153 81 156 83 159 85 162 87 166 88 169 89 172 90 176 90 180 90 183 89 186 88 190 87 193 85 196 83 199 81 201 78 204 75 206 72 208 69 209 65 210 62 211 58 212 54 212 50ZM266 0 275 0 275 100 266 100ZM266 0 294 0 366 100 338 100ZM357 0 366 0 366 100 357 100ZM252 0 294 0 294 9 252 9ZM252 91 290 91 290 100 252 100ZM342 0 380 0 380 9 342 9ZM406 0 434 0 468 55 444 55ZM494 0 504 0 468 55 458 55ZM444 50 468 50 468 100 444 100ZM394 0 444 0 444 9 394 9ZM478 0 516 0 516 9 478 9ZM430 91 482 91 482 100 430 100Z' };
+  // Trinitron under rutan: jämntjocka linjer (stroke) med runda ändar, i
+  // enheter där versalhöjden är 100.
+  const TRINITRON = { w: 496, d: 'M0 0H58M29 0V100M76 30V100M76 62C76 40 88 30 108 31M126 30V100M126 7v.1M152 30V100M152 62C152 40 164 30 180 30S206 40 206 60V100M230 30V100M230 7v.1M262 8V84C262 96 270 100 286 99M248 34H284M306 30V100M306 62C306 40 318 30 338 31M353 65A30 35 0 1 0 413 65A30 35 0 1 0 353 65M436 30V100M436 62C436 40 448 30 464 30S490 40 490 60V100' };
+
+  // Framsidan: höljet, rutans ram med SONY mitt ovanför rutan och Trinitron
+  // under, kassettfacket, displayen och fötterna.
   function tvSvg() {
     const { x, y, w, h } = TV;
     const g = GLAS;
     const f = FACK;
+    const k = 2 / 100;
+    const kt = 1.4 / 100;
     return `<g class="massiv">
     <rect x="${x}" y="${y}" width="${w}" height="${h}" rx="2.4" fill="url(#vhs-kropp)"/>
     <rect x="${x + 1}" y="${y + 0.3}" width="${w - 2}" height=".5" rx=".25" fill="#fff" opacity=".16"/>
     <rect x="${x}" y="${y}" width="${w}" height="${h}" rx="2.4" fill="url(#vhs-dager)"/>
     <rect x="${g.x - 3}" y="${g.y - 3}" width="${g.w + 6}" height="${g.h + 6}" rx="3.4" fill="#0b0a0a" stroke="#34312d" stroke-width=".45"/>
     <rect x="${g.x - 0.8}" y="${g.y - 0.8}" width="${g.w + 1.6}" height="${g.h + 1.6}" rx="5.6" fill="#040404"/>
+    <path d="${SONY.d}" transform="translate(${r2(x + w / 2 - SONY.w * k / 2)} ${r2((y + g.y - 3) / 2 - 50 * k)}) scale(${k})" fill="url(#vhs-silver)"/>
+    <path d="${TRINITRON.d}" transform="translate(${r2(g.x + g.w / 2 - TRINITRON.w * kt / 2)} ${r2(g.y + g.h + 1.8 - 50 * kt)}) scale(${kt})" fill="none" stroke="#bdb8ae" stroke-width="15" stroke-linecap="round" stroke-linejoin="round"/>
     <line x1="${x + 2}" y1="${f.y - 1.5}" x2="${x + w - 2}" y2="${f.y - 1.5}" stroke="#8a857b" stroke-width=".3" opacity=".55"/>
     <rect x="${f.x - 0.6}" y="${f.y - 0.6}" width="${f.w + 1.2}" height="${f.h + 1.2}" rx="1" fill="#4c4944"/>
     <rect x="${f.x}" y="${f.y}" width="${f.w}" height="${f.h}" rx=".7" fill="#030303"/>
@@ -165,10 +177,8 @@ window.RumVideo = (() => {
   </g>`;
   }
   function tvText() {
-    const g = GLAS;
     const f = FACK;
-    return `<text x="${g.x + g.w / 2}" y="${g.y + g.h + 2.35}" text-anchor="middle" font-family="Fraunces, Georgia, serif" font-size="1.55" letter-spacing=".5" fill="#a9a399">TV · VIDEO</text>
-    <text x="${f.x + f.w / 2}" y="${f.y + f.h + 2.4}" text-anchor="middle" font-family="Fraunces, Georgia, serif" font-size="1.3" letter-spacing=".4" fill="#8f8a80">HQ · STEREO</text>`;
+    return `<text x="${f.x + f.w / 2}" y="${f.y + f.h + 2.4}" text-anchor="middle" font-family="Fraunces, Georgia, serif" font-size="1.3" letter-spacing=".4" fill="#8f8a80">HQ · STEREO</text>`;
   }
 
   // Lådans övriga sidor, i bildpunkter: vänster och höger sida med
@@ -236,6 +246,7 @@ window.RumVideo = (() => {
     return ritning(b, `<defs>
     <linearGradient id="vhs-kropp" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#36332f"/><stop offset=".07" stop-color="#262421"/><stop offset=".85" stop-color="#191816"/><stop offset="1" stop-color="#0f0e0d"/></linearGradient>
     <linearGradient id="vhs-dager" x1="0" y1="0" x2="1" y2="0"><stop offset="0" stop-color="#fff" stop-opacity=".05"/><stop offset=".4" stop-color="#fff" stop-opacity="0"/><stop offset="1" stop-color="#000" stop-opacity=".22"/></linearGradient>
+    <linearGradient id="vhs-silver" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#ebe8e1"/><stop offset=".55" stop-color="#c4bfb5"/><stop offset="1" stop-color="#99948a"/></linearGradient>
     <linearGradient id="vhs-lucka" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#3b3935"/><stop offset=".18" stop-color="#1b1a18"/><stop offset="1" stop-color="#0c0c0b"/></linearGradient>
   </defs>
   ${tvSvg()}`) + ritning(b, tvText());

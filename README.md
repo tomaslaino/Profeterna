@@ -1852,7 +1852,7 @@ sidan byts; oraklet, skårtavlan, uret och VM 94-affischen tittar man först på
   klick eller T och vrids då mot en; den står på kupongens matcher live (377), och där finns
   också omgångens matcher, tabellerna och skytteligorna (se [Tv:n](#tvn)). Esc eller ett
   klick utanför zoomar ut.
-- **Videon** nere i hörnet till höger, en liten tv med inbyggd video som står på disken med
+- **Videon** nere i hörnet till höger, en liten Sony-tv med inbyggd video som står på disken med
   ryggen mot väggen och rutan vänd mot gänget, med de senaste repriserna på VHS i en hög
   ovanpå och resten i en fruktlåda bredvid, zoomas in med ett klick eller V; tv:n och lådan
   står kvar som de står, och en kassett spelar matchens höjdpunkter i rutan.
@@ -2505,10 +2505,13 @@ Statistiken om omgången är fördelad efter vad varje sak är bra på:
 
 ### Videon
 
-En liten färg-tv med inbyggd video står på disken nere i hörnet till höger, med ryggen mot
+En liten Sony-tv med inbyggd video står på disken nere i hörnet till höger, med ryggen mot
 väggen och rutan vänd ut mot rummet och gänget, i svart plast med blå bild när ingen kassett
 spelar, *STOPP* i hörnet och klockan på displayen som blinkar på 12:00, som den alltid gjort
 ([public/rum-video.js](public/rum-video.js), [public/rum-video.css](public/rum-video.css)).
+SONY står i silver mitt ovanför rutan och Trinitron under den, som på Sonys tv-apparater; båda
+är ritade som former i framsidans ritning (`SONY` och `TRINITRON` – en fet, bred antikva med
+raka seriffer och en jämntjock linje), inte som text, så att de är skarpa nära.
 Den är en låda i CSS 3D – framsidan, sidorna med springor, taket och skuggan och skenet på
 disken – i rummets eget perspektiv (1000 bildpunkter från flyktpunkten 760, 400, som högra
 väggen), vriden 112 grader mot gänget mitt i rummet och så långt in längs väggen att den
