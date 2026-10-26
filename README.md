@@ -1954,6 +1954,14 @@ som sitter bakom bordet.
   handen över ögonen (DL, DT) eller burken mot pannan (DJ). Den som inte påverkades nickar.
   Dolda resultat ger inga reaktioner, och när rummet öppnas räknas inga gamla mål.
 
+**Kvittot** ligger på pulten i three.js med sakerna nedan
+([public/rum-saker.js](public/rum-saker.js)): termopapper som har legat i rulle, så att änden
+med huvudet har böjt sig upp och den rivna änden lyfter lite, med en mjuk skugga under. Texten
+är den som `receiptHtml` skriver i `#rum-kvitto` (huvudet i dubbeltryck, ojämnt termotryck och
+en streckkod efter texten) och ritas om när någon lämnar in; länken blir en osynlig yta över
+papperet att klicka på (`i-3d` i rum-saker.css, kanten räknad ur papperet), och papperet lyser
+upp när musen är över den. Utan WebGL ligger det platta kvittot kvar (rum.css).
+
 **Askkoppen, snusdosan och fläkten** står på pulten till höger om kvittot, i three.js som
 gänget ([public/rum-saker.js](public/rum-saker.js), med en egen duk i pultens plan): en
 askkopp i bärnstensfärgat glas med tre spår, aska och fimpar, där en cigarett ligger i ett
@@ -1991,7 +1999,9 @@ skalat med folien tillplattad bredvid, och det är fler smulor och mer florsocke
 **Platserna och slitaget skiftar från dag till dag** (dagen i Stockholm som frö): sakerna
 på pulten står i en av fyra uppställningar (`LAYOUTS` – fläkten längst bak till höger, i
 mitten eller bakom kvittot och då vänd åt höger, askkoppen och dosan om vartannat, några
-pixlar hit eller dit), locket och prisen läggs där det finns plats, och affischen sitter
+pixlar hit eller dit), kvittot ligger någonstans till vänster om dem, vridet åt det ena eller
+andra hållet och mer eller mindre uppböjt (det första av elva lägen som går fritt från
+askkoppen, dosan och fläkten), locket och prisen läggs där det finns plats, och affischen sitter
 till vänster eller till höger under neonskylten. Slitaget följer tippningen: andelen fel
 bland omgångens avgjorda matcher, annars i den senaste färdigspelade kupongen, och utan
 rättning ett mellanläge. Går det dåligt fylls askkoppen (1–11 fimpar), askan hamnar
