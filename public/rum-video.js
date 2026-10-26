@@ -11,10 +11,12 @@
 // kassett och den åker in i videon, som spelar matchens höjdpunkter i
 // rutan (samma klipp som spelaren på sajten, hojdpunkter.js). Knapparna
 // under rutan: ◀◀ och ▶▶ spolar tio sekunder, ▶ spelar eller pausar och ⏏
-// matar ut. Ett klick på rutan (eller hjulet) går ännu närmare, så att
-// bilden i rutan fyller fönstret. Går man därifrån pausar videon, och den
-// spelar vidare när man kommer tillbaka. När inget spelar blinkar klockan
-// på 12:00, som den alltid gjort.
+// matar ut. Medan den spolar söker den i bilden som en video: bilden ur
+// klippet skakar med brusränder som rullar genom den, och räkneverket och
+// bandmätaren i rutan visar var på bandet den är. Ett klick på rutan
+// (eller hjulet) går ännu närmare, så att bilden i rutan fyller fönstret.
+// Går man därifrån pausar videon, och den spelar vidare när man kommer
+// tillbaka. När inget spelar blinkar klockan på 12:00, som den alltid gjort.
 //
 // Tv:n är en låda i CSS 3D (framsidan, sidorna, taket och skuggan på
 // disken) i rummets eget perspektiv – 1000 bildpunkter från flyktpunkten
@@ -328,8 +330,14 @@ window.RumVideo = (() => {
       `<div class="vhs-bild" style="top:${px(BILD.y - GLAS.y)}; height:${px(BILD.h)}"></div>` +
       '<div class="vhs-bla"></div><i class="vhs-brus"></i>' +
       `<i class="vhs-mask" style="top:${px(BILD.y - GLAS.y)}" hidden></i>` +
-      // texten i bilden, så att den syns när bilden fyller fönstret
-      `<span class="vhs-osd" style="top:${px(BILD.y - GLAS.y + 3)}">STOPP</span><i class="vhs-glas"></i></div>` +
+      // bildsökningen: klippets tre bildrutor och två brusränder
+      `<div class="vhs-sok">${'<img alt="" referrerpolicy="no-referrer" hidden>'.repeat(3)}${'<i class="sok-rand"><i></i></i>'.repeat(2)}</div>` +
+      // texten i bilden, så att den syns när bilden fyller fönstret:
+      // läget och räkneverket uppe och bandmätaren nere
+      `<span class="vhs-osd" style="top:${px(BILD.y - GLAS.y + 3)}">STOPP</span>` +
+      `<span class="vhs-tid" style="top:${px(BILD.y - GLAS.y + 3)}">0:00:00</span>` +
+      // (bandmätaren lika långt in nedifrån som bokstäverna uppifrån)
+      `<span class="vhs-matare" style="bottom:${px(GLAS.y + GLAS.h - BILD.y - BILD.h + 4.6)}"><i></i></span><i class="vhs-glas"></i></div>` +
       `<span class="vhs-vfd" style="${at(VFD)}">12:00</span>${knappar}${kas(0, 4)}</div></div>` +
       // lådan bredvid
       `<div class="vhs-lada" style="transform:translateZ(${px(LADA.z)})">${ladaYtor()}${ladaRitning()}<div class="vhs-styr" inert>${kas(4, CAP)}</div></div>` +
@@ -390,6 +398,50 @@ window.RumVideo = (() => {
   // sekunden)
   const SPOLA = 10;
   const SPOLA_MS = 150;
+  // Bildsökningen: räkneverket rullar mot målet som ett band som varvar upp
+  // och bromsar in (en kritiskt dämpad fjäder, FJADER per sekund), och står
+  // kvar i rutan EFTER ms när klippet har kommit; bandmätaren har MATARE steg.
+  const FJADER = 4;
+  const EFTER = 2500;
+  const MATARE = 20;
+  const YTIMG = 'https://i.ytimg.com/vi';
+
+  // Bruset i bildsökningens ränder, en rad per bildlinje (randen är 40
+  // bildpunkter hög, rutan har ungefär två linjer per bildpunkt): vita och
+  // svarta streck av olika längd i grått brus, tätast mitt i randen och
+  // glesare mot kanterna, där bilden syns igenom – ritat en gång, i en
+  // liten duk.
+  function randBrus() {
+    const [w, h] = [512, 80];
+    const c = document.createElement('canvas');
+    c.width = w;
+    c.height = h;
+    const g = c.getContext('2d');
+    const img = g.createImageData(w, h);
+    let s = 7;
+    const rnd = () => ((s = (Math.imul(s, 1103515245) + 12345) | 0) >>> 0) / 4294967296;
+    for (let y = 0; y < h; y++) {
+      const e = Math.sin(Math.PI * (y + 0.5) / h) ** 2;
+      // linjen själv: ljusare eller mörkare, och olika tät
+      const rad = 0.2 + rnd() * 0.5;
+      let streck = 0;
+      let ljus = 0;
+      for (let x = 0; x < w; x++) {
+        if (streck <= 0 && rnd() < 0.035 * e) {
+          streck = 6 + rnd() * rnd() * 160;
+          ljus = rnd() < 0.8 ? 0.8 + rnd() * 0.2 : 0.05;
+        }
+        const i = (y * w + x) * 4;
+        const v = streck > 0 ? ljus : rad * (0.4 + rnd() * 0.9);
+        const a = streck > 0 ? 0.35 + e * 0.65 : e * (0.15 + rnd() * 0.6);
+        streck--;
+        img.data[i] = img.data[i + 1] = img.data[i + 2] = 255 * Math.min(1, v);
+        img.data[i + 3] = 255 * Math.min(1, a);
+      }
+    }
+    g.putImageData(img, 0, 0);
+    return c.toDataURL();
+  }
 
   function mount(root, o) {
     const box = root.querySelector('#rum-vhs');
@@ -399,6 +451,9 @@ window.RumVideo = (() => {
     const bild = box.querySelector('.vhs-bild');
     const mask = box.querySelector('.vhs-mask');
     const osdEl = box.querySelector('.vhs-osd');
+    const tidEl = box.querySelector('.vhs-tid');
+    const matare = box.querySelector('.vhs-matare');
+    const rutor = [...box.querySelectorAll('.vhs-sok img')];
     const vfd = box.querySelector('.vhs-vfd');
     const lucka = box.querySelector('.vhs-lucka');
     const kas = [...box.querySelectorAll('.vhs-band')].sort((a, b) => a.dataset.i - b.dataset.i);
@@ -409,13 +464,19 @@ window.RumVideo = (() => {
     // spelaren: klippen, vilket, meddelandenas id, ramen, tiden och läget;
     // dold: bilden täcks tills spelarens egna saker har tonat bort (varm);
     // mal: dit den spolar (åt hållet dir), dur: klippets längd, pil: när en
-    // piltangent spolade senast
-    const P = { list: [], i: 0, seq: 0, frame: null, ready: false, ping: null, t: 0, st: -1, timer: 0, dold: true, varm: 0, mal: null, dir: 0, dur: 0, pil: 0 };
+    // piltangent spolade senast; vis och fart: räkneverket i bildsökningen,
+    // sok: dess bildruta (requestAnimationFrame) och när den förra var,
+    // efter: när räkneverket försvinner ur rutan
+    const P = { list: [], i: 0, seq: 0, frame: null, ready: false, ping: null, t: 0, st: -1, timer: 0, dold: true, varm: 0, mal: null, dir: 0, dur: 0, pil: 0, vis: 0, fart: 0, sok: 0, sokT: 0, efter: 0 };
 
     function lage(l, text) {
       V.lage = l;
       box.dataset.lage = l;
       if (text != null) osdEl.textContent = text;
+      if (l !== 'spolar' && P.sok) {
+        cancelAnimationFrame(P.sok);
+        P.sok = 0;
+      }
     }
 
     // ---------- högarna ----------
@@ -517,6 +578,10 @@ window.RumVideo = (() => {
       P.dold = true;
       P.mal = null;
       P.dur = 0;
+      cancelAnimationFrame(P.sok);
+      P.sok = 0;
+      clearTimeout(P.efter);
+      box.classList.remove('vhs-efter');
       bild.replaceChildren();
     }
 
@@ -525,10 +590,24 @@ window.RumVideo = (() => {
     };
     const listen = (f, id) => f.contentWindow.postMessage(JSON.stringify({ event: 'listening', id, channel: 'widget' }), HOST);
 
+    // Bildsökningens bilder: YouTubes tre bildrutor ur klippet, ungefär en
+    // fjärdedel, hälften och tre fjärdedelar in – i 4:3 med svarta kanter,
+    // som klippet i rutan. Finns ingen ger YouTube en grå bild i 120 × 90.
+    function ramar(id) {
+      rutor.forEach((img, n) => {
+        img.hidden = true;
+        img.dataset.ok = '';
+        img.onload = () => { img.dataset.ok = img.naturalWidth > 120 ? '1' : ''; };
+        img.onerror = () => { img.dataset.ok = ''; };
+        img.src = `${YTIMG}/${encodeURIComponent(id)}/hq${n + 1}.jpg`;
+      });
+    }
+
     // Klippet P.list[P.i] från sekund start, i rutan – utan ljud och bakom
     // videons blå bild tills spelarens egna saker har tonat bort (varm).
     function load(start) {
       stopPlayer();
+      ramar(P.list[P.i]);
       const seq = P.seq;
       lage('laddar', '▶ SPELA');
       const q = new URLSearchParams({
@@ -560,13 +639,24 @@ window.RumVideo = (() => {
       P.varm = setTimeout(() => {
         P.varm = 0;
         if (P.st !== 1) return;
+        const sokte = V.lage === 'spolar';
         P.dold = false;
         P.mal = null;
         cmd('unloadModule', ['captions']);
         cmd('unMute');
         lage('spelar');
+        if (sokte) efter();
         tick();
       }, FORVARM);
+    }
+
+    // Efter en sökning står räkneverket och bandmätaren kvar en stund när
+    // klippet har kommit, med ▶, och räknar vidare.
+    function efter() {
+      clearTimeout(P.efter);
+      osdEl.textContent = '▶';
+      box.classList.add('vhs-efter');
+      P.efter = setTimeout(() => box.classList.remove('vhs-efter'), EFTER);
     }
 
     // Spela vidare efter en paus: bakom den blå bilden, tillbaka så mycket
@@ -582,24 +672,73 @@ window.RumVideo = (() => {
       cmd('playVideo');
     }
 
-    // ◀◀ och ▶▶: tio sekunder åt gången, bakom den blå bilden med ◀◀ eller
-    // ▶▶ tills spelarens egna saker har tonat bort, och sedan spelar den
-    // därifrån (också efter en paus). Flera tryck i rad lägger ihop.
+    // ◀◀ och ▶▶: tio sekunder åt gången, med bildsökningen i rutan tills
+    // spelarens egna saker har tonat bort, och sedan spelar den därifrån
+    // (också efter en paus). Flera tryck i rad lägger ihop.
     function spola(d) {
       if (!P.frame || !P.ready || P.st === 0) return;
+      // räkneverket rullar från där bilden är, eller där sökningen är
+      if (V.lage !== 'spolar') {
+        P.vis = P.mal ?? P.t;
+        P.fart = 0;
+      }
       const mal = Math.max(0, (P.mal ?? P.t) + d * SPOLA);
       P.mal = P.dur ? Math.min(mal, Math.max(0, P.dur - 1)) : mal;
       P.dir = d;
       clearTimeout(P.varm);
       P.varm = 0;
       P.dold = true;
-      lage('laddar', d > 0 ? '▶▶' : '◀◀');
+      clearTimeout(P.efter);
+      box.classList.remove('vhs-efter');
+      if (!box.style.getPropertyValue('--sok-brus')) box.style.setProperty('--sok-brus', `url(${randBrus()})`);
+      lage('spolar', d > 0 ? '▶▶' : '◀◀');
+      box.dataset.sok = d > 0 ? 'fram' : 'bak';
+      if (!P.sok) {
+        P.sokT = performance.now();
+        P.sok = requestAnimationFrame(sok);
+      }
       cmd('mute');
       cmd('seekTo', [Math.max(0, P.mal - FORVARM / 1000), true]);
       cmd('playVideo');
       // spelar den redan kommer inget nytt läge från spelaren
       if (P.st === 1) varm();
       tick();
+    }
+
+    // En bildruta i bildsökningen: räkneverket närmar sig målet, bilden är
+    // klippets bildruta närmast det, och ränderna rullar nedåt framåt och
+    // uppåt bakåt. Framme står bilden still (darrar) med ▶ tills klippet
+    // kommer.
+    function sok(now) {
+      P.sok = 0;
+      if (P.mal == null || V.lage !== 'spolar') return;
+      const dt = Math.min(0.05, (now - P.sokT) / 1000);
+      P.sokT = now;
+      P.fart += (FJADER * FJADER * (P.mal - P.vis) - 2 * FJADER * P.fart) * dt;
+      P.vis += P.fart * dt;
+      const klar = o.calm() || (Math.abs(P.mal - P.vis) < 0.3 && Math.abs(P.fart) < 1.5);
+      if (klar) {
+        P.vis = P.mal;
+        P.fart = 0;
+      }
+      const sk = klar ? 'stilla' : P.fart >= 0 ? 'fram' : 'bak';
+      if (box.dataset.sok !== sk) {
+        box.dataset.sok = sk;
+        osdEl.textContent = { fram: '▶▶', bak: '◀◀', stilla: '▶' }[sk];
+      }
+      ruta(P.vis);
+      tick();
+      if (!klar) P.sok = requestAnimationFrame(sok);
+    }
+
+    // Klippets bildruta närmast sekund s (en av de tre som finns).
+    function ruta(s) {
+      const p = P.dur ? s / P.dur : 0;
+      const n = p < 0.375 ? 0 : p < 0.625 ? 1 : 2;
+      const ok = [n, n - 1, n + 1, n - 2, n + 2].find((j) => rutor[j] && rutor[j].dataset.ok);
+      rutor.forEach((img, j) => {
+        if (img.hidden !== (j !== ok)) img.hidden = j !== ok;
+      });
     }
 
     function start(m) {
@@ -673,16 +812,25 @@ window.RumVideo = (() => {
     });
 
     // Displayen: 12:00 som blinkar när ingen kassett är i, annars tiden (dit
-    // den spolar medan den spolar).
+    // den spolar medan den spolar, och räkneverket medan den söker). I rutan
+    // räkneverket och bandmätaren medan den söker och en stund efter.
     const clock = (s) => {
       const t = Math.max(0, Math.floor(s));
       return `${Math.floor(t / 3600)}:${String(Math.floor(t / 60) % 60).padStart(2, '0')}:${String(t % 60).padStart(2, '0')}`;
     };
     function tick() {
-      const sym = P.st === 2 ? '❚❚' : P.mal == null ? '▶' : P.dir > 0 ? '▶▶' : '◀◀';
-      const txt = V.cur == null && V.mid == null ? '12:00' : `${sym} ${clock(P.mal ?? P.t)}`;
+      const soker = V.lage === 'spolar';
+      const s = soker ? P.vis : P.mal ?? P.t;
+      const sym = soker ? osdEl.textContent : P.st === 2 ? '❚❚' : P.mal == null ? '▶' : P.dir > 0 ? '▶▶' : '◀◀';
+      const txt = V.cur == null && V.mid == null ? '12:00' : `${sym} ${clock(s)}`;
       if (vfd.textContent !== txt) vfd.textContent = txt;
       vfd.classList.toggle('blink', txt === '12:00');
+      if (!soker && !box.classList.contains('vhs-efter')) return;
+      const t = clock(s);
+      if (tidEl.textContent !== t) tidEl.textContent = t;
+      matare.hidden = !P.dur;
+      const n = String(Math.max(1, Math.ceil(Math.min(1, s / (P.dur || 1)) * MATARE)));
+      if (matare.style.getPropertyValue('--n') !== n) matare.style.setProperty('--n', n);
     }
     setInterval(() => { if (!root.hidden) tick(); }, 500);
 

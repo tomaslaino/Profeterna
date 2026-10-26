@@ -2548,10 +2548,27 @@ luckan i högen. Rutan är blå med *▶ SPELA* tills bilden kommer, och klippet
 YouTubes spelare (`youtube-nocookie.com`, i 16:9 med svarta kanter i den 4:3-stora rutan)
 med displayen som räknar tiden. ▶ spelar eller pausar, och ⏏ matar ut – kassetten åker
 tillbaka till sin plats. ◀◀ och ▶▶ (och ←/→, eller ett svep i sidled i telefonen) spolar tio
-sekunder per tryck: rutan blir blå med ◀◀ eller ▶▶ i hörnet och displayen visar dit den
-spolar, flera tryck i rad lägger ihop, och sedan spelar den därifrån (också om den stod på
-paus). En nedtryckt piltangent spolar ungefär en minut i sekunden. ↑/↓ byter till en nyare
-eller äldre kassett. När klippet är slut matas den ut av sig själv.
+sekunder per tryck, flera tryck i rad lägger ihop, och sedan spelar den därifrån (också om
+den stod på paus). En nedtryckt piltangent spolar ungefär en minut i sekunden. ↑/↓ byter
+till en nyare eller äldre kassett. När klippet är slut matas den ut av sig själv.
+
+**Bildsökningen.** Medan den spolar söker videon i bilden som en riktig video: rutan visar
+en bild ur klippet, urblekt, lite suddig och skakig, med två brusränder (vita och svarta
+streck i grått brus, en rad per bildlinje) som rullar nedåt genom bilden framåt och uppåt
+bakåt. Uppe till vänster står ◀◀ eller ▶▶ och till höger räkneverket (0:01:23), och nere
+bandmätaren – var i klippet bandet är, i tjugo steg: fyllda block dit det har kommit och
+streck resten av vägen, lika långt in från kanterna som texten uppe. Räkneverket rullar mot
+målet som ett band som varvar upp och bromsar in (en kritiskt dämpad fjäder, `FJADER`), och
+displayen på videon räknar likadant. Bilden är den av YouTubes tre bildrutor ur klippet
+(`i.ytimg.com/vi/<id>/hq1–3.jpg`, ungefär en fjärdedel, hälften och tre fjärdedelar in, i
+4:3 med svarta kanter som klippet i rutan) som ligger närmast räkneverket, så den byts när
+räkneverket passerar; det är riktiga bildrutor ur klippet, inte klippets omslagsbild, som
+kan ha resultatet. Bildrutorna hämtas när klippet laddas, och finns ingen är bilden svart
+under bruset. När räkneverket har stannat står bilden still och darrar, som en video på
+paus, med en rand kvar och ▶ i hörnet, tills klippet kommer; räkneverket och bandmätaren
+står kvar 2,5 sekunder in i klippet (`EFTER`) och räknar vidare. Bruset ritas en gång i en
+liten duk (`randBrus`, 512 × 80), och det som rör sig är egna små lager. Med
+`prefers-reduced-motion` hoppar räkneverket direkt och bilden står still.
 Går inget av matchens klipp att spela här blir det myrornas krig, och klippen hoppas över
 nästa gång (samma lista som spelaren på sajten). Går man därifrån pausar videon, och den
 frusna bilden står kvar i rutan; tillbaka och den spelar vidare. Rummet stängs och videon
@@ -2563,8 +2580,8 @@ knappen i mitten och loggan syns ändå i drygt tre sekunder varje gång ett kli
 spolas eller spelar vidare – men inte vid paus, och inte när ljudet slås av och på. Därför
 visar videon sin blå bild med *▶ SPELA*, utan ljud, tills klippet har spelat i 3,6 sekunder
 (`FORVARM`); när den spelar vidare efter en paus spolar den först tillbaka lika mycket, så
-att bilden fortsätter där den stannade, och när man spolar med ◀◀ och ▶▶ hoppar den till
-3,6 sekunder före målet. Slutet, och förslagen efter det, täcks direkt.
+att bilden fortsätter där den stannade, och när man spolar med ◀◀ och ▶▶ hoppar den, bakom
+bildsökningen, till 3,6 sekunder före målet. Slutet, och förslagen efter det, täcks direkt.
 
 **Kamerans sväng.** Rummet är målat på platta plan, så kameran kan inte gå runt i det på
 riktigt. Svängen är i stället två saker som sker samtidigt, på 0,6 sekunder som

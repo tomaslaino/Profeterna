@@ -82,7 +82,7 @@
 /* skuggan på disken, och skenet från rutan framför den */
 .vhs-skugga { background: radial-gradient(closest-side, rgba(0, 0, 0, 0.72), rgba(0, 0, 0, 0.5) 62%, rgba(0, 0, 0, 0)); }
 .vhs-pol { background: radial-gradient(ellipse 50% 100% at 50% 0, rgba(143, 176, 255, 0.4), rgba(143, 176, 255, 0)); transition: opacity 0.6s; }
-.rum-vhs:is([data-lage="spelar"], [data-lage="laddar"]) .vhs-pol { opacity: 0.45; }
+.rum-vhs:is([data-lage="spelar"], [data-lage="laddar"], [data-lage="spolar"]) .vhs-pol { opacity: 0.45; }
 
 /* skenet från rutan på väggen och disken kring tv:n */
 .vhs-sken {
@@ -95,7 +95,7 @@
   transform: translate(30px, -90px) scale(0.85);
   transition: opacity 0.6s;
 }
-.rum-vhs:is([data-lage="spelar"], [data-lage="laddar"]) .vhs-sken { opacity: 0.55; }
+.rum-vhs:is([data-lage="spelar"], [data-lage="laddar"], [data-lage="spolar"]) .vhs-sken { opacity: 0.55; }
 
 /* ---------- rutan ---------- */
 
@@ -105,14 +105,60 @@
 .vhs-skarm > * { position: absolute; display: block; }
 /* videons blå bild när ingen kassett spelar, och medan spelaren värms upp */
 .vhs-bla { inset: 0; background: radial-gradient(ellipse 80% 75% at 50% 45%, #2f52e0, #2441c4 60%, #1a2f96); }
-.vhs-osd {
-  left: 36px;
+/* texten i rutan: läget uppe till vänster och räkneverket till höger, och
+   bandmätaren nere – var i klippet bandet är, i tjugo steg (MATARE i
+   rum-video.js), lika långt in från kanterna */
+.vhs-osd, .vhs-tid {
   font: 400 40px/1 VT323, monospace;
   letter-spacing: 1px;
   color: #f4f6ff;
   text-shadow: 3px 3px 0 #0c1660;
   pointer-events: none;
 }
+.vhs-osd { left: 36px; }
+.vhs-tid { right: 36px; }
+/* bandmätaren: fyllda block dit bandet har kommit och streck resten av
+   vägen, i bokstävernas bildpunkter och med samma skugga */
+.vhs-matare {
+  left: 36px;
+  width: 334px;
+  height: 10px;
+  pointer-events: none;
+  background: repeating-linear-gradient(90deg, #f4f6ff 0 12.7px, rgba(244, 246, 255, 0) 12.7px 16.7px) 0 100% / 100% 4px no-repeat;
+  filter: drop-shadow(3px 3px 0 #0c1660);
+}
+.vhs-skarm > .vhs-matare[hidden] { display: none; }
+.vhs-matare > i {
+  position: absolute;
+  left: 0;
+  top: 0;
+  width: calc(var(--n, 1) * 5%);
+  height: 100%;
+  background: repeating-linear-gradient(90deg, #f4f6ff 0 12.7px, rgba(244, 246, 255, 0) 12.7px 16.7px);
+}
+/* Bildsökningen när man spolar: bilden ur klippet, urblekt och skakig, med
+   brusränder som rullar genom den – nedåt framåt och uppåt bakåt. När
+   räkneverket har stannat står bilden still och darrar, med en rand kvar,
+   tills klippet kommer. */
+.vhs-sok { inset: 0; overflow: hidden; background: #07080c; }
+.vhs-sok > * { position: absolute; display: block; left: 0; top: 0; width: 100%; }
+.vhs-sok > img { height: 100%; object-fit: cover; filter: saturate(0.7) contrast(1.14) brightness(1.06) blur(0.7px); }
+.vhs-sok > img[hidden] { display: none; }
+.sok-rand { height: 40px; overflow: hidden; opacity: 0.92; }
+.sok-rand + .sok-rand { height: 26px; opacity: 0.75; }
+.sok-rand > i { position: absolute; left: 0; top: 0; display: block; width: 200%; height: 100%; background: var(--sok-brus) 0 0 / 256px 100% repeat-x; }
+.rum-vhs[data-lage="spolar"] .vhs-sok > img { animation: sok-skak 0.36s steps(1) infinite; }
+.rum-vhs[data-lage="spolar"] .sok-rand { animation: sok-rull 1.25s linear infinite; }
+.rum-vhs[data-lage="spolar"] .sok-rand + .sok-rand { animation-delay: -0.6s; }
+.rum-vhs[data-lage="spolar"] .sok-rand > i { animation: sok-brus 0.2s steps(1) infinite; }
+.rum-vhs[data-sok="bak"] .sok-rand { animation-direction: reverse; }
+.rum-vhs[data-lage="spolar"][data-sok="stilla"] .vhs-sok > img { animation: sok-darr 0.18s steps(1) infinite; }
+.rum-vhs[data-lage="spolar"][data-sok="stilla"] .sok-rand { animation: none; transform: translateY(176px); opacity: 0.6; }
+.rum-vhs[data-sok="stilla"] .sok-rand + .sok-rand { visibility: hidden; }
+@keyframes sok-rull { from { transform: translateY(-40px); } to { transform: translateY(302px); } }
+@keyframes sok-brus { 0% { transform: translateX(0); } 25% { transform: translateX(-31%); } 50% { transform: translateX(-12%); } 75% { transform: translateX(-44%); } }
+@keyframes sok-skak { 0% { transform: translate(0, 0); } 33% { transform: translate(-3px, 1px); } 66% { transform: translate(2px, -1px); } }
+@keyframes sok-darr { 50% { transform: translateY(1.5px); } }
 /* spelaren i dubbla storleken, förminskad: skarp också när man går närmare,
    och den får aldrig musen (då visar den inga egna knappar) */
 .vhs-bild { left: 0; width: 100%; background: #000; }
@@ -127,10 +173,12 @@
   animation: vhs-brus 0.24s steps(4) infinite;
 }
 @keyframes vhs-brus { 0% { transform: translate(0, 0); } 25% { transform: translate(-37px, 13px); } 50% { transform: translate(-11px, -29px); } 75% { transform: translate(-29px, 23px); } 100% { transform: translate(0, 0); } }
-.vhs-bla, .vhs-brus, .vhs-bild, .vhs-osd { visibility: hidden; }
+.vhs-bla, .vhs-brus, .vhs-bild, .vhs-sok, .vhs-osd, .vhs-tid, .vhs-matare { visibility: hidden; }
 .rum-vhs[data-lage="tom"] :is(.vhs-bla, .vhs-osd),
 .rum-vhs[data-lage="laddar"] :is(.vhs-bild, .vhs-bla, .vhs-osd),
+.rum-vhs[data-lage="spolar"] :is(.vhs-bild, .vhs-sok, .vhs-osd, .vhs-tid, .vhs-matare),
 .rum-vhs[data-lage="spelar"] .vhs-bild,
+.rum-vhs.vhs-efter[data-lage="spelar"] :is(.vhs-osd, .vhs-tid, .vhs-matare),
 .rum-vhs[data-lage="brus"] .vhs-brus { visibility: visible; }
 /* glaset: buktigt, med lysröret i och mörkare hörn, och svaga linjer */
 .vhs-glas {
@@ -177,7 +225,7 @@
 .rum.vid-nara .vhs-k:is(:hover, :focus-visible) { background: linear-gradient(180deg, #77736b, #47443e 55%, #2d2b27); color: #fff; outline: none; }
 .vhs-k:active { transform: translate3d(0, 2px, 0.5px); box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.15); }
 .vhs-led { fill: #e2311f; filter: drop-shadow(0 0 0.6px #ff4a30); }
-.rum-vhs:is([data-lage="spelar"], [data-lage="laddar"], [data-lage="brus"]) .vhs-led { fill: #45ff74; filter: drop-shadow(0 0 0.6px #45ff74); }
+.rum-vhs:is([data-lage="spelar"], [data-lage="laddar"], [data-lage="spolar"], [data-lage="brus"]) .vhs-led { fill: #45ff74; filter: drop-shadow(0 0 0.6px #45ff74); }
 .vhs-lucka { transform-box: fill-box; transform-origin: 50% 0; transition: transform 0.18s ease; }
 .vhs-lucka.matar { transform: scaleY(0.25); }
 
@@ -265,6 +313,7 @@
 .rum:not(.vid-nara) .rum-vhs:has(.vhs-hit:is(:hover, :focus-visible)) :is(.vhs-ritning, .vhs-skarm, .vhs-kas, .vhs-yta:not(.vhs-skugga, .vhs-pol), .vhs-band > i) { filter: brightness(1.16); }
 
 @media (prefers-reduced-motion: reduce) {
-  .vhs-brus, .vhs-vfd.blink { animation: none; }
+  .vhs-brus, .vhs-vfd.blink, .rum-vhs .vhs-sok * { animation: none !important; }
+  .rum-vhs .sok-rand { transform: translateY(176px); }
   .vhs-band, .vhs-lucka, .vhs-sken, .vhs-pol, .vhs-kam.glid, .vhs-in.glid { transition: none; }
 }
