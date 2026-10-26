@@ -137,9 +137,9 @@
   background: repeating-linear-gradient(90deg, #f4f6ff 0 12.7px, rgba(244, 246, 255, 0) 12.7px 16.7px);
 }
 /* Bildsökningen när man spolar: bilden ur klippet, urblekt och skakig, med
-   brusränder som rullar genom den – nedåt framåt och uppåt bakåt. När
-   räkneverket har stannat står bilden still och darrar, med en rand kvar,
-   tills klippet kommer. */
+   brusränder som rullar genom den – nedåt framåt och uppåt bakåt, och
+   fortare när den spolar fort (.vhs-fort). När man trycker ▶ står bilden
+   still och darrar, med en rand kvar, tills klippet kommer. */
 .vhs-sok { inset: 0; overflow: hidden; background: #07080c; }
 .vhs-sok > * { position: absolute; display: block; left: 0; top: 0; width: 100%; }
 .vhs-sok > img { height: 100%; object-fit: cover; filter: saturate(0.7) contrast(1.14) brightness(1.06) blur(0.7px); }
@@ -150,6 +150,7 @@
 .rum-vhs[data-lage="spolar"] .vhs-sok > img { animation: sok-skak 0.36s steps(1) infinite; }
 .rum-vhs[data-lage="spolar"] .sok-rand { animation: sok-rull 1.25s linear infinite; }
 .rum-vhs[data-lage="spolar"] .sok-rand + .sok-rand { animation-delay: -0.6s; }
+.rum-vhs.vhs-fort[data-lage="spolar"] .sok-rand { animation-duration: 0.7s; }
 .rum-vhs[data-lage="spolar"] .sok-rand > i { animation: sok-brus 0.2s steps(1) infinite; }
 .rum-vhs[data-sok="bak"] .sok-rand { animation-direction: reverse; }
 .rum-vhs[data-lage="spolar"][data-sok="stilla"] .vhs-sok > img { animation: sok-darr 0.18s steps(1) infinite; }
@@ -177,6 +178,7 @@
 .rum-vhs[data-lage="tom"] :is(.vhs-bla, .vhs-osd),
 .rum-vhs[data-lage="laddar"] :is(.vhs-bild, .vhs-bla, .vhs-osd),
 .rum-vhs[data-lage="spolar"] :is(.vhs-bild, .vhs-sok, .vhs-osd, .vhs-tid, .vhs-matare),
+.rum-vhs[data-lage="stopp"] :is(.vhs-bla, .vhs-osd, .vhs-tid, .vhs-matare),
 .rum-vhs[data-lage="spelar"] .vhs-bild,
 .rum-vhs.vhs-efter[data-lage="spelar"] :is(.vhs-osd, .vhs-tid, .vhs-matare),
 .rum-vhs[data-lage="brus"] .vhs-brus { visibility: visible; }
@@ -299,6 +301,14 @@
 :is(.v2, .v4) > .vhs-kas .lapp { left: 4%; right: 16%; }
 :is(.v1, .v3) > .vhs-kas .lapp { left: 12%; }
 .v1 > .vhs-kas .lapp { background: none; }
+
+/* nära står videons tangenter i rummets fot (rum.js), där kupongen inte
+   syns – i fönster stora nog att inte vara en telefon */
+.rum-ft .vhs-tangenter { display: none; font-family: -apple-system, "Helvetica Neue", sans-serif; font-size: 12px; letter-spacing: 1.2px; text-transform: uppercase; opacity: 0.8; text-shadow: 0 1px 8px #000; }
+.rum-ft .vhs-tangenter b { color: #f0d699; font-weight: 600; }
+@media (min-width: 701px) and (min-height: 501px) {
+  .rum.vid-nara .rum-ft .vhs-tangenter { display: inline; }
+}
 
 /* på håll: tv:n, högen och lådan leder fram till videon, och lyser när man
    pekar (eller går dit med tangentbordet) */

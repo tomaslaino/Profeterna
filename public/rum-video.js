@@ -10,11 +10,14 @@
 // handskrivna etiketter med matchen, resultatet och dagen; ett klick på en
 // kassett och den åker in i videon, som spelar matchens höjdpunkter i
 // rutan (samma klipp som spelaren på sajten, hojdpunkter.js). Knapparna
-// under rutan: ◀◀ och ▶▶ spolar tio sekunder, ▶ spelar eller pausar och ⏏
-// matar ut. Medan den spolar söker den i bilden som en video: bilden ur
+// under rutan: ◀◀ och ▶▶ spolar, fortare och fortare som en riktig video,
+// tills man trycker ▶ (spelar därifrån) eller ■ (stopp); ▶ spelar eller
+// pausar och ⏏ matar ut. Medan den spolar söker den i bilden: bilden ur
 // klippet skakar med brusränder som rullar genom den, och räkneverket och
-// bandmätaren i rutan visar var på bandet den är. Ett klick på rutan
-// (eller hjulet) går ännu närmare, så att bilden i rutan fyller fönstret.
+// bandmätaren i rutan visar var på bandet den är. Nära styrs den också med
+// tangenterna (←/→, mellanslaget och S), som står i rummets fot där. Ett
+// klick på rutan (eller hjulet) går ännu närmare, så att bilden i rutan
+// fyller fönstret.
 // Går man därifrån pausar videon, och den spelar vidare när man kommer
 // tillbaka. När inget spelar blinkar klockan på 12:00, som den alltid gjort.
 //
@@ -62,7 +65,7 @@ window.RumVideo = (() => {
   const BILD = { x: GLAS.x, y: GLAS.y + (GLAS.h - GLAS.w * 9 / 16) / 2, w: GLAS.w, h: GLAS.w * 9 / 16 };
   const FACK = { x: 36, y: 103.2, w: 43, h: 6.6 };
   const VFD = { x: 82, y: 102.6, w: 27, h: 5.2 };
-  const KNAPP = { x: 82, y: 109, w: 6.1, h: 3.6, d: 6.97 };
+  const KNAPP = { x: 82, y: 109, w: 4.9, h: 3.6, d: 5.525 };
   // tv:ns djup, och kassetternas (de ligger med ryggen åt samma håll som rutan)
   const DJUP = 40;
   const KAS = { w: 41, h: 5.67, d: 22.4 };
@@ -313,8 +316,9 @@ window.RumVideo = (() => {
   function html(part) {
     if (part === 'vagg') return vaggSvg();
     if (part === 'pult') return pultSvg();
-    const knappar = [['bak', '◀◀', 'Spola tillbaka'], ['spela', '▶', 'Spela'], ['fram', '▶▶', 'Spola fram'], ['ut', '⏏', 'Mata ut']]
-      .map(([k, t, l], i) => `<button type="button" class="vhs-k" data-vhs="${k}" aria-label="${l}" style="${at({ x: KNAPP.x + i * KNAPP.d, y: KNAPP.y, w: KNAPP.w, h: KNAPP.h })}">${t}</button>`).join('');
+    // knapparna, med tangenterna som gör samma sak nära (key i mount)
+    const knappar = [['bak', '◀◀', 'Spola tillbaka', 'ArrowLeft'], ['spela', '▶', 'Spela', 'Space'], ['fram', '▶▶', 'Spola fram', 'ArrowRight'], ['stopp', '■', 'Stopp', 'S'], ['ut', '⏏', 'Mata ut']]
+      .map(([k, t, l, tg], i) => `<button type="button" class="vhs-k" data-vhs="${k}" aria-label="${l}"${tg ? ` aria-keyshortcuts="${tg}"` : ''} style="${at({ x: KNAPP.x + i * KNAPP.d, y: KNAPP.y, w: KNAPP.w, h: KNAPP.h })}">${t}</button>`).join('');
     // en kassett: ryggen med etiketten, och taket och ändarna bakåt
     const kas = (a, b) => Array.from({ length: b - a }, (_, i) => `<div class="vhs-band" data-i="${a + i}" hidden>` +
       `<button type="button" class="vhs-kas" data-i="${a + i}"><span class="lapp"><b></b><i></i></span></button>` +
@@ -393,15 +397,18 @@ window.RumVideo = (() => {
   // så länge spelarens rubrik, knapp och logga syns efter att klippet har
   // börjat spela (eller spolats)
   const FORVARM = 3600;
-  // ◀◀ och ▶▶: sekunder per tryck, och minsta tiden mellan två med
-  // piltangenterna (så att en nedtryckt tangent spolar ungefär en minut i
-  // sekunden)
-  const SPOLA = 10;
-  const SPOLA_MS = 150;
-  // Bildsökningen: räkneverket rullar mot målet som ett band som varvar upp
-  // och bromsar in (en kritiskt dämpad fjäder, FJADER per sekund), och står
-  // kvar i rutan EFTER ms när klippet har kommit; bandmätaren har MATARE steg.
-  const FJADER = 4;
+  // ◀◀ och ▶▶ spolar tills man trycker ▶ eller ■, fortare och fortare som
+  // en riktig video: FART sekunder i sekunden i början, dubbelt så fort var
+  // DUBBEL:e sekund och för varje nytt tryck åt samma håll (minst TRYCK ms
+  // efter det förra, så att en nedtryckt tangent inte räknas), upp till MAX.
+  // Farten ändras mjukt (TROG sekunder), så att bandet vänder och inte
+  // hoppar. Räkneverket och bandmätaren står kvar i rutan EFTER ms när
+  // klippet har kommit; bandmätaren har MATARE steg.
+  const FART = 4;
+  const DUBBEL = 1.5;
+  const MAX = 64;
+  const TROG = 0.25;
+  const TRYCK = 120;
   const EFTER = 2500;
   const MATARE = 20;
   const YTIMG = 'https://i.ytimg.com/vi';
@@ -455,6 +462,15 @@ window.RumVideo = (() => {
     const matare = box.querySelector('.vhs-matare');
     const rutor = [...box.querySelectorAll('.vhs-sok img')];
     const vfd = box.querySelector('.vhs-vfd');
+    // Tangenterna, med tangentbord och mus: nära står de i rummets fot
+    // (rum-video.css) – rutan fyller fönstret och knapparna syns inte – och
+    // knapparna säger sin när man pekar på dem, som sakerna i rummet (title).
+    if (matchMedia('(hover: hover)').matches) {
+      const fot = root.querySelector('.rum-ft');
+      if (fot) fot.insertAdjacentHTML('afterbegin', '<span class="vhs-tangenter"><b>← →</b> spola · <b>mellanslag</b> spela · <b>S</b> stopp · <b>↑ ↓</b> kassett · <b>Esc</b> tillbaka</span>');
+      const NAMN = { ArrowLeft: '←', ArrowRight: '→', Space: 'mellanslag', S: 'S' };
+      for (const b of box.querySelectorAll('.vhs-k[aria-keyshortcuts]')) b.title = `${b.getAttribute('aria-label')} · ${NAMN[b.getAttribute('aria-keyshortcuts')]}`;
+    }
     const lucka = box.querySelector('.vhs-lucka');
     const kas = [...box.querySelectorAll('.vhs-band')].sort((a, b) => a.dataset.i - b.dataset.i);
     // tapes: kassetternas matcher; cur: kassetten i videon (index), mid: dess
@@ -463,11 +479,12 @@ window.RumVideo = (() => {
     const V = { tapes: [], key: '', cur: null, mid: null, near: false, tat: false, resume: false, lage: 'tom' };
     // spelaren: klippen, vilket, meddelandenas id, ramen, tiden och läget;
     // dold: bilden täcks tills spelarens egna saker har tonat bort (varm);
-    // mal: dit den spolar (åt hållet dir), dur: klippets längd, pil: när en
-    // piltangent spolade senast; vis och fart: räkneverket i bildsökningen,
-    // sok: dess bildruta (requestAnimationFrame) och när den förra var,
+    // mal: där bandet stannade (och spelar från), dur: klippets längd; vis,
+    // fart och dir: räkneverket, farten och hållet medan den spolar (dir 0:
+    // står), t0: när farten började öka, tryck: det senaste trycket; sok:
+    // bildsökningens bildruta (requestAnimationFrame) och när den förra var,
     // efter: när räkneverket försvinner ur rutan
-    const P = { list: [], i: 0, seq: 0, frame: null, ready: false, ping: null, t: 0, st: -1, timer: 0, dold: true, varm: 0, mal: null, dir: 0, dur: 0, pil: 0, vis: 0, fart: 0, sok: 0, sokT: 0, efter: 0 };
+    const P = { list: [], i: 0, seq: 0, frame: null, ready: false, ping: null, t: 0, st: -1, timer: 0, dold: true, varm: 0, mal: null, dur: 0, vis: 0, fart: 0, dir: 0, t0: 0, tryck: 0, sok: 0, sokT: 0, efter: 0 };
 
     function lage(l, text) {
       V.lage = l;
@@ -578,10 +595,11 @@ window.RumVideo = (() => {
       P.dold = true;
       P.mal = null;
       P.dur = 0;
+      P.dir = 0;
       cancelAnimationFrame(P.sok);
       P.sok = 0;
       clearTimeout(P.efter);
-      box.classList.remove('vhs-efter');
+      box.classList.remove('vhs-efter', 'vhs-fort');
       bild.replaceChildren();
     }
 
@@ -633,12 +651,16 @@ window.RumVideo = (() => {
       P.timer = setTimeout(() => { if (seq === P.seq && !P.ready && V.lage === 'laddar') lage('spelar'); }, 12000);
     }
 
-    // Bilden fram och ljudet på, när klippet har spelat en stund.
+    // spolar den (och bandet rullar)
+    const rullar = () => V.lage === 'spolar' && P.dir !== 0;
+
+    // Bilden fram och ljudet på, när klippet har spelat en stund – inte
+    // medan den spolar eller står på stopp.
     function varm() {
       if (P.varm || !P.dold) return;
       P.varm = setTimeout(() => {
         P.varm = 0;
-        if (P.st !== 1) return;
+        if (P.st !== 1 || rullar() || V.lage === 'stopp') return;
         const sokte = V.lage === 'spolar';
         P.dold = false;
         P.mal = null;
@@ -659,32 +681,44 @@ window.RumVideo = (() => {
       P.efter = setTimeout(() => box.classList.remove('vhs-efter'), EFTER);
     }
 
-    // Spela vidare efter en paus: bakom den blå bilden, tillbaka så mycket
-    // som spelarens egna saker syns.
+    // Spela vidare efter en paus eller ett stopp: bakom den blå bilden (efter
+    // en sökning stillbilden), tillbaka så mycket som spelarens egna saker
+    // syns.
     function resume() {
       if (!P.frame) return;
       clearTimeout(P.varm);
       P.varm = 0;
       P.dold = true;
-      lage('laddar', '▶ SPELA');
+      if (V.lage !== 'spolar') lage('laddar', '▶ SPELA');
       cmd('mute');
       cmd('seekTo', [Math.max(0, (P.mal ?? P.t) - FORVARM / 1000), true]);
       cmd('playVideo');
+      // spelar den redan kommer inget nytt läge från spelaren
+      if (P.st === 1) varm();
+      tick();
     }
 
-    // ◀◀ och ▶▶: tio sekunder åt gången, med bildsökningen i rutan tills
-    // spelarens egna saker har tonat bort, och sedan spelar den därifrån
-    // (också efter en paus). Flera tryck i rad lägger ihop.
+    // ◀◀ och ▶▶: spolar med bildsökningen i rutan, fortare och fortare, tills
+    // man trycker ▶ (spelar därifrån) eller ■, eller bandet tar slut. Ett nytt
+    // tryck åt samma håll spolar dubbelt så fort, och åt andra hållet vänder
+    // den. Spelaren står still under tiden.
     function spola(d) {
       if (!P.frame || !P.ready || P.st === 0) return;
-      // räkneverket rullar från där bilden är, eller där sökningen är
-      if (V.lage !== 'spolar') {
-        P.vis = P.mal ?? P.t;
-        P.fart = 0;
+      const nu = performance.now();
+      if (rullar()) {
+        if (d !== P.dir) {
+          P.dir = d;
+          P.t0 = nu;
+        } else if (nu - P.tryck >= TRYCK) P.t0 -= DUBBEL * 1000;
+        P.tryck = nu;
+        return;
       }
-      const mal = Math.max(0, (P.mal ?? P.t) + d * SPOLA);
-      P.mal = P.dur ? Math.min(mal, Math.max(0, P.dur - 1)) : mal;
+      // från där bilden är, där den stannade eller där den spolade till
+      if (V.lage !== 'spolar') P.vis = P.mal ?? P.t;
+      P.fart = 0;
       P.dir = d;
+      P.t0 = nu;
+      P.tryck = nu;
       clearTimeout(P.varm);
       P.varm = 0;
       P.dold = true;
@@ -693,42 +727,72 @@ window.RumVideo = (() => {
       if (!box.style.getPropertyValue('--sok-brus')) box.style.setProperty('--sok-brus', `url(${randBrus()})`);
       lage('spolar', d > 0 ? '▶▶' : '◀◀');
       box.dataset.sok = d > 0 ? 'fram' : 'bak';
+      cmd('mute');
+      cmd('pauseVideo');
+      ruta(P.vis);
       if (!P.sok) {
-        P.sokT = performance.now();
+        P.sokT = nu;
         P.sok = requestAnimationFrame(sok);
       }
-      cmd('mute');
-      cmd('seekTo', [Math.max(0, P.mal - FORVARM / 1000), true]);
-      cmd('playVideo');
-      // spelar den redan kommer inget nytt läge från spelaren
-      if (P.st === 1) varm();
       tick();
     }
 
-    // En bildruta i bildsökningen: räkneverket närmar sig målet, bilden är
-    // klippets bildruta närmast det, och ränderna rullar nedåt framåt och
-    // uppåt bakåt. Framme står bilden still (darrar) med ▶ tills klippet
-    // kommer.
+    // En bildruta i bildsökningen: farten ökar (och vänder mjukt),
+    // räkneverket rullar, bilden är klippets bildruta närmast det, och
+    // ränderna rullar nedåt framåt och uppåt bakåt – fortare när den spolar
+    // fort. I början och slutet av bandet stannar den.
     function sok(now) {
       P.sok = 0;
-      if (P.mal == null || V.lage !== 'spolar') return;
+      if (!rullar()) return;
       const dt = Math.min(0.05, (now - P.sokT) / 1000);
       P.sokT = now;
-      P.fart += (FJADER * FJADER * (P.mal - P.vis) - 2 * FJADER * P.fart) * dt;
+      const mal = P.dir * Math.min(MAX, FART * 2 ** ((now - P.t0) / 1000 / DUBBEL));
+      P.fart += (mal - P.fart) * (1 - Math.exp(-dt / TROG));
       P.vis += P.fart * dt;
-      const klar = o.calm() || (Math.abs(P.mal - P.vis) < 0.3 && Math.abs(P.fart) < 1.5);
-      if (klar) {
-        P.vis = P.mal;
-        P.fart = 0;
+      const slut = P.dur ? Math.max(0, P.dur - 1) : Infinity;
+      if ((P.fart < 0 && P.vis <= 0) || (P.fart > 0 && P.vis >= slut)) {
+        P.vis = Math.min(Math.max(0, P.vis), slut);
+        stopp();
+        return;
       }
-      const sk = klar ? 'stilla' : P.fart >= 0 ? 'fram' : 'bak';
+      const sk = P.fart >= 0 ? 'fram' : 'bak';
       if (box.dataset.sok !== sk) {
         box.dataset.sok = sk;
-        osdEl.textContent = { fram: '▶▶', bak: '◀◀', stilla: '▶' }[sk];
+        osdEl.textContent = sk === 'fram' ? '▶▶' : '◀◀';
       }
+      box.classList.toggle('vhs-fort', Math.abs(P.fart) > 16);
       ruta(P.vis);
       tick();
-      if (!klar) P.sok = requestAnimationFrame(sok);
+      P.sok = requestAnimationFrame(sok);
+    }
+
+    // Bandet stannar där räkneverket är: stillbilden, som darrar, med ▶.
+    function landa() {
+      P.mal = P.vis;
+      P.dir = 0;
+      P.fart = 0;
+      box.dataset.sok = 'stilla';
+      box.classList.remove('vhs-fort');
+      osdEl.textContent = '▶';
+      ruta(P.vis);
+      tick();
+    }
+
+    // ■: bandet står där det är, bakom den blå bilden med STOPP, räkneverket
+    // och bandmätaren; ▶ spelar därifrån.
+    function stopp() {
+      if (V.cur == null || !P.frame || ['tom', 'brus', 'stopp'].includes(V.lage)) return;
+      P.mal = V.lage === 'spolar' ? P.vis : P.mal ?? P.t;
+      P.dir = 0;
+      P.fart = 0;
+      clearTimeout(P.varm);
+      P.varm = 0;
+      P.dold = true;
+      clearTimeout(P.efter);
+      box.classList.remove('vhs-efter', 'vhs-fort');
+      cmd('pauseVideo');
+      lage('stopp', 'STOPP');
+      tick();
     }
 
     // Klippets bildruta närmast sekund s (en av de tre som finns).
@@ -767,8 +831,10 @@ window.RumVideo = (() => {
     function state(st) {
       P.st = st;
       if (st === 1) {
+        // spolar den eller står på stopp står spelaren still
+        if (rullar() || V.lage === 'stopp') cmd('pauseVideo');
         // gick man därifrån medan den laddade: paus tills man kommer tillbaka
-        if (!V.near) {
+        else if (!V.near) {
           cmd('pauseVideo');
           V.resume = true;
         } else if (P.dold) varm();
@@ -811,9 +877,9 @@ window.RumVideo = (() => {
       }
     });
 
-    // Displayen: 12:00 som blinkar när ingen kassett är i, annars tiden (dit
-    // den spolar medan den spolar, och räkneverket medan den söker). I rutan
-    // räkneverket och bandmätaren medan den söker och en stund efter.
+    // Displayen: 12:00 som blinkar när ingen kassett är i, annars tiden
+    // (räkneverket medan den spolar). I rutan räkneverket och bandmätaren
+    // medan den spolar och står på stopp, och en stund efter en sökning.
     const clock = (s) => {
       const t = Math.max(0, Math.floor(s));
       return `${Math.floor(t / 3600)}:${String(Math.floor(t / 60) % 60).padStart(2, '0')}:${String(t % 60).padStart(2, '0')}`;
@@ -821,11 +887,11 @@ window.RumVideo = (() => {
     function tick() {
       const soker = V.lage === 'spolar';
       const s = soker ? P.vis : P.mal ?? P.t;
-      const sym = soker ? osdEl.textContent : P.st === 2 ? '❚❚' : P.mal == null ? '▶' : P.dir > 0 ? '▶▶' : '◀◀';
+      const sym = soker ? osdEl.textContent : V.lage === 'stopp' ? '■' : P.st === 2 ? '❚❚' : '▶';
       const txt = V.cur == null && V.mid == null ? '12:00' : `${sym} ${clock(s)}`;
       if (vfd.textContent !== txt) vfd.textContent = txt;
       vfd.classList.toggle('blink', txt === '12:00');
-      if (!soker && !box.classList.contains('vhs-efter')) return;
+      if (!soker && V.lage !== 'stopp' && !box.classList.contains('vhs-efter')) return;
       const t = clock(s);
       if (tidEl.textContent !== t) tidEl.textContent = t;
       matare.hidden = !P.dur;
@@ -875,9 +941,15 @@ window.RumVideo = (() => {
       fly(el, false, () => {});
     }
 
+    // ▶: spelar eller pausar – och medan den spolar spelar den därifrån
     function toggle() {
       if (V.cur == null) insert(0);
-      else if (P.st === 1) cmd('pauseVideo');
+      else if (V.lage === 'spolar') {
+        if (rullar()) {
+          landa();
+          resume();
+        }
+      } else if (P.st === 1 && V.lage !== 'stopp') cmd('pauseVideo');
       else if (P.frame) resume();
       else start(V.tapes[V.cur]);
     }
@@ -932,8 +1004,11 @@ window.RumVideo = (() => {
         return;
       }
       e.preventDefault();
+      // med musen: mellanslaget ska spela, inte trycka på knappen igen
+      if (e.detail) b.blur();
       if (b.classList.contains('vhs-kas')) insert(Number(b.dataset.i));
       else if (b.dataset.vhs === 'spela') toggle();
+      else if (b.dataset.vhs === 'stopp') stopp();
       else if (b.dataset.vhs === 'ut') eject();
       else spola(b.dataset.vhs === 'fram' ? 1 : -1);
     });
@@ -975,7 +1050,11 @@ window.RumVideo = (() => {
         box.classList.remove('vhs-tat');
         sving(on ? SVANG.nara : null);
         for (const s of styr) s.inert = !on;
-        if (!on && P.frame && P.st !== 2 && P.st !== 0) {
+        // spolar den stannar bandet, och det spelar därifrån när man kommer tillbaka
+        if (!on && rullar()) {
+          landa();
+          V.resume = true;
+        } else if (!on && P.frame && P.st !== 2 && P.st !== 0) {
           cmd('pauseVideo');
           V.resume = true;
         } else if (on && V.resume) {
@@ -984,15 +1063,18 @@ window.RumVideo = (() => {
         }
         return FOCUS;
       },
-      // ←/→ (och ett svep i telefonen) spolar som ◀◀ och ▶▶ och ↑/↓ byter
-      // kassett när man är framme, och Esc går tillbaka från rutan till
-      // tv:n och lådan.
+      // När man är framme: ←/→ (och ett svep i telefonen) spolar som ◀◀ och
+      // ▶▶, mellanslaget spelar och pausar som ▶, S stoppar som ■, ↑/↓ byter
+      // kassett och Esc går tillbaka från rutan till tv:n och lådan.
       key(k) {
-        if (k === 'ArrowRight' || k === 'ArrowLeft') {
-          if (performance.now() - P.pil < SPOLA_MS) return true;
-          P.pil = performance.now();
-          spola(k === 'ArrowRight' ? 1 : -1);
-        } else if (k === 'ArrowDown') step(1);
+        if (k === 'ArrowRight' || k === 'ArrowLeft') spola(k === 'ArrowRight' ? 1 : -1);
+        else if (k === ' ') {
+          // på en knapp (med tabben) trycker mellanslaget på knappen
+          const a = document.activeElement;
+          if (a && box.contains(a) && a.matches('button')) return false;
+          toggle();
+        } else if (k === 's' || k === 'S') stopp();
+        else if (k === 'ArrowDown') step(1);
         else if (k === 'ArrowUp') step(-1);
         else if (k === 'Escape' && V.tat) tat(false);
         else return false;

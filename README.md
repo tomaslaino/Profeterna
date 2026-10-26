@@ -2105,7 +2105,7 @@ som förut; kameran siktar på frontens mått, och Safari i iPhone ger mått i n
 zoom delade med zoomen – utan GetBoundingClientRectZoomed – så att tv:n hamnade utanför
 bilden: `rekt` i rum.js förstorar dem tillbaka), anslagstavlan och lapparna får smalare kanter, och nära tv:n, videon och med en
 lapp i handen gör ett svep i sidled som pilarna – tv:n bläddrar till nästa sida, videon
-spolar tio sekunder och anslagstavlan går till nästa lapp. Vid anslagstavlan bläddrar ett
+spolar (■ eller ▶ under rutan stannar) och anslagstavlan går till nästa lapp. Vid anslagstavlan bläddrar ett
 svep uppåt eller neråt bladen i lapparna till nästa division.
 
 **Kupongen på höjden** (`.rum.smal`: smalare än 600 px och högre än bred): kupongen på
@@ -2560,7 +2560,7 @@ Den är en låda i CSS 3D – framsidan, sidorna med springor, taket och skuggan
 disken – i rummets eget perspektiv (1000 bildpunkter från flyktpunkten 760, 400, som högra
 väggen), vriden 112 grader mot gänget mitt i rummet och så långt in längs väggen att den
 ryms i bilden; i det perspektivet ser en tv som bara är vriden lite ut att stå rakt mot en.
-Under rutan sitter kassettfacket, displayen och knapparna ◀◀ ▶ ▶▶ ⏏. Ovanpå ligger de fyra
+Under rutan sitter kassettfacket, displayen och knapparna ◀◀ ▶ ▶▶ ■ ⏏. Ovanpå ligger de fyra
 senaste repriserna på VHS i en hög, också de lådor (ryggen, taket och ändarna), och resten
 (21 till) ligger i en fruktlåda i furu bredvid, lite längre in längs väggen – *Arkivet* på
 en tejpbit, ÄPPLEN · KLASS I på brädan. Lådan är också en låda i 3D (sidan med springor
@@ -2591,28 +2591,45 @@ luckan fälls upp, och de ovanför sjunker ner i
 luckan i högen. Rutan är blå med *▶ SPELA* tills bilden kommer, och klippet spelas i
 YouTubes spelare (`youtube-nocookie.com`, i 16:9 med svarta kanter i den 4:3-stora rutan)
 med displayen som räknar tiden. ▶ spelar eller pausar, och ⏏ matar ut – kassetten åker
-tillbaka till sin plats. ◀◀ och ▶▶ (och ←/→, eller ett svep i sidled i telefonen) spolar tio
-sekunder per tryck, flera tryck i rad lägger ihop, och sedan spelar den därifrån (också om
-den stod på paus). En nedtryckt piltangent spolar ungefär en minut i sekunden. ↑/↓ byter
-till en nyare eller äldre kassett. När klippet är slut matas den ut av sig själv.
+tillbaka till sin plats. ◀◀ och ▶▶ (och ←/→, eller ett svep i sidled i telefonen) spolar som
+på en riktig video, fortare och fortare, tills man trycker ▶ eller ■: 4 sekunder i sekunden
+i början och dubbelt så fort var och en halv sekund (`FART`, `DUBBEL`), upp till 64 (`MAX`).
+Ett tryck till åt samma håll spolar dubbelt så fort på en gång (ett nytt tryck räknas, inte
+en nedtryckt tangent), och åt andra hållet vänder den; farten ändras mjukt (`TROG`), så att
+bandet bromsar och vänder i stället för att hoppa. ▶ spelar därifrån. ■ stoppar: rutan blir
+blå med *STOPP*, räkneverket och bandmätaren, displayen visar ■ och tiden, och ▶ spelar
+därifrån. I början och slutet av klippet stannar den av sig själv. ↑/↓ byter till en nyare
+eller äldre kassett. När klippet är slut matas den ut av sig själv. Går man därifrån mitt i
+en spolning stannar bandet där, och det spelar därifrån när man kommer tillbaka.
+
+**Tangenterna.** Nära (och när rutan fyller fönstret, där knapparna inte syns) styrs videon
+med tangentbordet: ← och → spolar som ◀◀ och ▶▶, mellanslaget spelar och pausar som ▶ (och
+spelar därifrån medan den spolar), S stoppar som ■, ↑/↓ byter kassett och Esc går tillbaka.
+Med tangentbord och mus står de där i rummets fot (*← → spola · mellanslag spela · S stopp
+· ↑ ↓ kassett · Esc tillbaka*, utom i fönster smalare än 700 eller lägre än 500 bildpunkter)
+– rummets egna tangenter står inte i foten, eftersom de låg över kupongen, men nära videon
+syns inte kupongen – och knapparna säger sin tangent när man pekar på dem (*Stopp · S*), som
+sakerna i rummet. Efter ett klick med musen tappar knappen fokus, så att mellanslaget spelar
+i stället för att trycka på samma knapp igen; går man till en knapp med tabben trycker
+mellanslaget på den.
 
 **Bildsökningen.** Medan den spolar söker videon i bilden som en riktig video: rutan visar
 en bild ur klippet, urblekt, lite suddig och skakig, med två brusränder (vita och svarta
 streck i grått brus, en rad per bildlinje) som rullar nedåt genom bilden framåt och uppåt
-bakåt. Uppe till vänster står ◀◀ eller ▶▶ och till höger räkneverket (0:01:23), och nere
-bandmätaren – var i klippet bandet är, i tjugo steg: fyllda block dit det har kommit och
-streck resten av vägen, lika långt in från kanterna som texten uppe. Räkneverket rullar mot
-målet som ett band som varvar upp och bromsar in (en kritiskt dämpad fjäder, `FJADER`), och
-displayen på videon räknar likadant. Bilden är den av YouTubes tre bildrutor ur klippet
+bakåt, fortare när den spolar fort. Uppe till vänster står ◀◀ eller ▶▶ och till höger
+räkneverket (0:01:23), och nere bandmätaren – var i klippet bandet är, i tjugo steg: fyllda
+block dit det har kommit och streck resten av vägen, lika långt in från kanterna som texten
+uppe. Displayen på videon räknar likadant. Spelaren står still (paus) medan den spolar, så
+att YouTubes rubrik inte kommer fram. Bilden är den av YouTubes tre bildrutor ur klippet
 (`i.ytimg.com/vi/<id>/hq1–3.jpg`, ungefär en fjärdedel, hälften och tre fjärdedelar in, i
 4:3 med svarta kanter som klippet i rutan) som ligger närmast räkneverket, så den byts när
 räkneverket passerar; det är riktiga bildrutor ur klippet, inte klippets omslagsbild, som
 kan ha resultatet. Bildrutorna hämtas när klippet laddas, och finns ingen är bilden svart
-under bruset. När räkneverket har stannat står bilden still och darrar, som en video på
-paus, med en rand kvar och ▶ i hörnet, tills klippet kommer; räkneverket och bandmätaren
+under bruset. När man trycker ▶ står bilden still och darrar, som en video på paus, med en
+rand kvar och ▶ i hörnet, tills klippet kommer; räkneverket och bandmätaren
 står kvar 2,5 sekunder in i klippet (`EFTER`) och räknar vidare. Bruset ritas en gång i en
 liten duk (`randBrus`, 512 × 80), och det som rör sig är egna små lager. Med
-`prefers-reduced-motion` hoppar räkneverket direkt och bilden står still.
+`prefers-reduced-motion` står bilden och ränderna still medan räkneverket rullar.
 Går inget av matchens klipp att spela här blir det myrornas krig, och klippen hoppas över
 nästa gång (samma lista som spelaren på sajten). Går man därifrån pausar videon, och den
 frusna bilden står kvar i rutan; tillbaka och den spelar vidare. Rummet stängs och videon
@@ -2624,8 +2641,8 @@ knappen i mitten och loggan syns ändå i drygt tre sekunder varje gång ett kli
 spolas eller spelar vidare – men inte vid paus, och inte när ljudet slås av och på. Därför
 visar videon sin blå bild med *▶ SPELA*, utan ljud, tills klippet har spelat i 3,6 sekunder
 (`FORVARM`); när den spelar vidare efter en paus spolar den först tillbaka lika mycket, så
-att bilden fortsätter där den stannade, och när man spolar med ◀◀ och ▶▶ hoppar den, bakom
-bildsökningen, till 3,6 sekunder före målet. Slutet, och förslagen efter det, täcks direkt.
+att bilden fortsätter där den stannade, och när man har spolat med ◀◀ och ▶▶ hoppar den,
+bakom stillbilden, till 3,6 sekunder före räkneverket. Slutet, och förslagen efter det, täcks direkt.
 
 **Kamerans sväng.** Rummet är målat på platta plan, så kameran kan inte gå runt i det på
 riktigt. Svängen är i stället två saker som sker samtidigt, på 0,6 sekunder som
