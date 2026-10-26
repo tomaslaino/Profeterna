@@ -1783,7 +1783,24 @@ ritades i närbildens skärpa också på håll; nu gör de det bara nära (se [T
 närbilderna av tv:n, videon, anslagstavlan, oraklet och skårtavlan: från 126–200 till 0–42
 (Chrome 153 med grafikkortets sätt att rita, SwiftShader, i 1400 × 743 med täthet 2).
 Anslagstavlans lutning efter musen sätts av samma skäl som transform direkt; den ritar om
-ungefär hälften så mycket. Namnet
+ungefär hälften så mycket. Vridningen efter musen (och efter var man står med fingret) följer
+i varje bildruta (`kamera` i rum.js), inte 30 gånger i sekunden som gänget och sakerna i 3D:
+att vrida världen ritar inte om något, och på skärmar med 60 eller 120 bilder i sekunden
+hackade vridningen förut. I WebKit (Safari, och alla webbläsare i iPhone) släpper webbläsaren
+det den har ritat av rummet utanför bilden medan kameran står nära något, och när kameran gick
+tillbaka ritades allt det om på en gång medan glidningens klocka gick: kameran stod still
+150–300 ms och hoppade sedan 30–100 % av vägen på en bildruta. Så länge något pågår på kameran
+behåller WebKit allt, så medan kameran är borta från sin plats har den en osynlig rörelse som
+aldrig tar slut – kamerans translate en hundradels bildpunkt fram och tillbaka (`kvar` i
+rum.js) – som tas bort när den är hemma igen. Mätt i WebKit (WKWebView, 390 × 664, täthet 3,
+median av tre varv): förlorad tid i bildrutorna på vägen tillbaka från tv:n 127 → 23 ms, uret
+175 → 9, skårtavlan 244 → 13, kortregistret 124 → 38 och anslagstavlan 688 → 241, och den
+längsta bildrutan 100–180 → 23–35 ms; på vägen tillbaka från tv:n stod bilden still 40–70 ms
+och gled sedan jämnt (största steget 10–30 % av vägen). Minnet blev inte högre (toppen
+870–1150 MB mot 990–1270), och närbilderna är lika skarpa. Att i stället pausa glidningen tills
+WebKit hade ritat, ge den en fördröjning, en mjukare början eller dölja det som ligger utanför
+bilden hela vägen hjälpte inte – WebKit ritar först när kameran rör sig. Chrome behöver inte
+den osynliga rörelsen och får den inte. Namnet
 och foten (*Vanlig sida*) ligger utanför scenen i fönstrets hörn;
 någon meny finns inte, det är föremålen som leder vidare. Tangenterna (K kupongen, T tv:n,
 A anslagstavlan, R kortregistret, V videon) står inte i foten – där låg de över kupongen i

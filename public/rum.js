@@ -1260,7 +1260,9 @@ ${window.RumRegister ? RumRegister.nara() : ''}
   function setCam(mx, my) {
     const w = document.getElementById('rum-world');
     if (!w) return;
-    w.style.transform = `translateZ(-330px) rotateX(${(-my * 2.6).toFixed(3)}deg) rotateY(${(mx * 4.5).toFixed(3)}deg) translateZ(330px)`;
+    const t = `translateZ(-330px) rotateX(${(-my * 2.6).toFixed(3)}deg) rotateY(${(mx * 4.5).toFixed(3)}deg) translateZ(330px)`;
+    // (samma som förra gången: inget att räkna om)
+    if (t !== R.cam) w.style.transform = R.cam = t;
   }
 
   // Neonen glappar ibland: tider ur klockan, så att stillbilderna blir samma.
@@ -1292,19 +1294,29 @@ ${window.RumRegister ? RumRegister.nara() : ''}
     }
   }
 
-  function frame() {
-    const t = now();
+  // Kameran efter musen (eller efter var i rummet man står med fingret),
+  // dt millisekunder sedan förra gången. Den följer i varje bildruta
+  // (loop), så att vridningen flyter också på skärmar med 60 eller 120
+  // bilder i sekunden – att vrida världen ritar inte om något – medan gänget
+  // och sakerna i 3D ritas 30 gånger i sekunden (frame).
+  function kamera(dt) {
     // med fingret vrids kameran efter var i rummet man står (pan)
     if (R.pek !== 'mouse' && !nara()) {
       if (R.k * W - innerWidth > 1) R.tx = R.px * 2 - 1;
       R.ty = R.k * H - innerHeight > 1 ? R.py * 2 - 1 : -0.25;
     }
     if (!still()) {
-      const f = R.kup ? 0.12 : 0.06;
+      // lika fort som när den gick 6 % av vägen (12 med kupongen i handen) 30 gånger i sekunden
+      const f = 1 - (1 - (R.kup ? 0.12 : 0.06)) ** (dt / (1000 / 30));
       R.mx += (R.tx - R.mx) * f;
       R.my += (R.ty - R.my) * f;
     }
     setCam(R.mx, R.my);
+  }
+
+  function frame(dt = 1000 / 30) {
+    const t = now();
+    kamera(dt);
     const on = neonOn(t);
     if (on !== R.neon) {
       R.neon = on;
@@ -1318,13 +1330,16 @@ ${window.RumRegister ? RumRegister.nara() : ''}
 
   function loop() {
     cancelAnimationFrame(R.raf);
+    let prev = 0;
     const tick = (ms) => {
       if (!R.on) return;
-      // 30 bilder i sekunden räcker
+      const dt = prev ? Math.min(100, ms - prev) : 1000 / 60;
+      prev = ms;
+      // 30 bilder i sekunden räcker för gänget och sakerna; kameran i varje
       if (ms - R.last > 30) {
         R.last = ms;
-        frame();
-      }
+        frame(dt);
+      } else kamera(dt);
       R.raf = requestAnimationFrame(tick);
     };
     R.raf = requestAnimationFrame(tick);
@@ -1490,6 +1505,37 @@ ${window.RumRegister ? RumRegister.nara() : ''}
     const dx = r1(to[0] - 800 - z * (p[0] - 800));
     const dy = r1(to[1] - 500 - z * (p[1] - 500));
     w.style.transform = `translate(${dx}px, ${dy}px) scale(${z})${R.el.classList.contains('chromium') ? ' perspective(100000px)' : ''}`;
+    kvar(Boolean(dx || dy || z !== 1));
+  }
+
+  // WebKit (Safari, och alla webbläsare i iPhone) släpper det den har ritat
+  // av rummet utanför bilden medan kameran står nära något, och när kameran
+  // gick tillbaka ritades allt om på en gång: kameran stod still en stund och
+  // hoppade sedan nästan hela vägen hem (glidningens klocka gick under tiden).
+  // Så länge något pågår på kameran behåller WebKit allt, så medan kameran är
+  // borta (borta) har den en osynlig rörelse som aldrig tar slut – en
+  // hundradels bildpunkt fram och tillbaka – som tas bort när den är hemma
+  // igen. Chrome behöver det inte.
+  const WEBKIT = !navigator.userAgentData && /AppleWebKit/.test(navigator.userAgent);
+  function kvar(borta) {
+    if (!WEBKIT || calm()) return;
+    const w = document.getElementById('rum-kamera');
+    const n = (R.kvarN = (R.kvarN || 0) + 1);
+    if (borta) {
+      if (!R.kvar) R.kvar = w.animate([{ translate: '0px 0px' }, { translate: '0.01px 0px' }], { duration: 1000, iterations: Infinity, direction: 'alternate' });
+      return;
+    }
+    if (!R.kvar) return;
+    // när kameran är hemma (och inte har gått iväg igen: anslagstavlan och
+    // kortregistret ställer den hemma en stund för att mäta innan den glider)
+    const hemma = () => {
+      if (R.kvarN !== n || !R.kvar) return;
+      R.kvar.cancel();
+      R.kvar = null;
+    };
+    const g = w.getAnimations().find((a) => a.transitionProperty === 'transform');
+    if (g) g.finished.then(hemma, () => {});
+    else queueMicrotask(hemma);
   }
 
   // Ett föremål: kameran går fram mot det en kort stund innan sidan byts.
