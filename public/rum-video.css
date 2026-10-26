@@ -136,10 +136,11 @@
   height: 100%;
   background: repeating-linear-gradient(90deg, #f4f6ff 0 12.7px, rgba(244, 246, 255, 0) 12.7px 16.7px);
 }
-/* Bildsökningen när man spolar: bilden ur klippet, urblekt och skakig, med
-   brusränder som rullar genom den – nedåt framåt och uppåt bakåt, och
-   fortare när den spolar fort (.vhs-fort). När man trycker ▶ står bilden
-   still och darrar, med en rand kvar, tills klippet kommer. */
+/* Bildsökningen när man spolar: klippet (eller YouTubes bildrutor ur det),
+   urblekt och skakigt, med brusränder som rullar genom det – nedåt framåt
+   och uppåt bakåt, och fortare när den spolar fort (.vhs-fort). När man
+   trycker ▶ står bilden still och darrar, med en rand kvar, tills klippet
+   kommer. */
 .vhs-sok { inset: 0; overflow: hidden; background: #07080c; }
 .vhs-sok > * { position: absolute; display: block; left: 0; top: 0; width: 100%; }
 .vhs-sok > img { height: 100%; object-fit: cover; filter: saturate(0.7) contrast(1.14) brightness(1.06) blur(0.7px); }
@@ -156,6 +157,14 @@
 .rum-vhs[data-lage="spolar"][data-sok="stilla"] .vhs-sok > img { animation: sok-darr 0.18s steps(1) infinite; }
 .rum-vhs[data-lage="spolar"][data-sok="stilla"] .sok-rand { animation: none; transform: translateY(176px); opacity: 0.6; }
 .rum-vhs[data-sok="stilla"] .sok-rand + .sok-rand { visibility: hidden; }
+/* med klippet självt (.vhs-ram): spelaren på paus som hoppar med
+   räkneverket under ränderna, lika urblekt och skakig, och efter en sökning
+   den gamla spelarens stillbild ovanpå den nya tills den kommer */
+.rum-vhs.vhs-ram .vhs-sok { background: none; }
+.rum-vhs.vhs-ram .vhs-sok > img { display: none; }
+.rum-vhs.vhs-ram[data-lage="spolar"] .vhs-bild { filter: saturate(0.7) contrast(1.14) brightness(1.06) blur(0.7px); animation: sok-skak 0.36s steps(1) infinite; }
+.rum-vhs.vhs-ram[data-lage="spolar"][data-sok="stilla"] .vhs-bild { animation: sok-darr 0.18s steps(1) infinite; }
+.vhs-bild iframe.still { z-index: 1; }
 @keyframes sok-rull { from { transform: translateY(-40px); } to { transform: translateY(302px); } }
 @keyframes sok-brus { 0% { transform: translateX(0); } 25% { transform: translateX(-31%); } 50% { transform: translateX(-12%); } 75% { transform: translateX(-44%); } }
 @keyframes sok-skak { 0% { transform: translate(0, 0); } 33% { transform: translate(-3px, 1px); } 66% { transform: translate(2px, -1px); } }
@@ -323,7 +332,7 @@
 .rum:not(.vid-nara) .rum-vhs:has(.vhs-hit:is(:hover, :focus-visible)) :is(.vhs-ritning, .vhs-skarm, .vhs-kas, .vhs-yta:not(.vhs-skugga, .vhs-pol), .vhs-band > i) { filter: brightness(1.16); }
 
 @media (prefers-reduced-motion: reduce) {
-  .vhs-brus, .vhs-vfd.blink, .rum-vhs .vhs-sok * { animation: none !important; }
+  .vhs-brus, .vhs-vfd.blink, .rum-vhs .vhs-sok *, .rum-vhs .vhs-bild { animation: none !important; }
   .rum-vhs .sok-rand { transform: translateY(176px); }
   .vhs-band, .vhs-lucka, .vhs-sken, .vhs-pol, .vhs-kam.glid, .vhs-in.glid { transition: none; }
 }

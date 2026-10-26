@@ -2630,23 +2630,31 @@ sakerna i rummet. Efter ett klick med musen tappar knappen fokus, så att mellan
 i stället för att trycka på samma knapp igen; går man till en knapp med tabben trycker
 mellanslaget på den.
 
-**Bildsökningen.** Medan den spolar söker videon i bilden som en riktig video: rutan visar
-en bild ur klippet, urblekt, lite suddig och skakig, med två brusränder (vita och svarta
-streck i grått brus, en rad per bildlinje) som rullar nedåt genom bilden framåt och uppåt
-bakåt, fortare när den spolar fort. Uppe till vänster står ◀◀ eller ▶▶ och till höger
-räkneverket (0:01:23), och nere bandmätaren – var i klippet bandet är, i tjugo steg: fyllda
-block dit det har kommit och streck resten av vägen, lika långt in från kanterna som texten
-uppe. Displayen på videon räknar likadant. Spelaren står still (paus) medan den spolar, så
-att YouTubes rubrik inte kommer fram. Bilden är den av YouTubes tre bildrutor ur klippet
-(`i.ytimg.com/vi/<id>/hq1–3.jpg`, ungefär en fjärdedel, hälften och tre fjärdedelar in, i
-4:3 med svarta kanter som klippet i rutan) som ligger närmast räkneverket, så den byts när
-räkneverket passerar; det är riktiga bildrutor ur klippet, inte klippets omslagsbild, som
-kan ha resultatet. Bildrutorna hämtas när klippet laddas, och finns ingen är bilden svart
-under bruset. När man trycker ▶ står bilden still och darrar, som en video på paus, med en
-rand kvar och ▶ i hörnet, tills klippet kommer; räkneverket och bandmätaren
-står kvar 2,5 sekunder in i klippet (`EFTER`) och räknar vidare. Bruset ritas en gång i en
-liten duk (`randBrus`, 512 × 80), och det som rör sig är egna små lager. Med
-`prefers-reduced-motion` står bilden och ränderna still medan räkneverket rullar.
+**Bildsökningen.** Medan den spolar söker videon i bilden som en riktig video: klippet
+självt rusar fram eller bak i rutan, urblekt, lite suddigt och skakigt, med två brusränder
+(vita och svarta streck i grått brus, en rad per bildlinje) som rullar nedåt genom bilden
+framåt och uppåt bakåt, fortare när den spolar fort. Uppe till vänster står ◀◀ eller ▶▶ och
+till höger räkneverket (0:01:23), och nere bandmätaren – var i klippet bandet är, i tjugo
+steg: fyllda block dit det har kommit och streck resten av vägen, lika långt in från
+kanterna som texten uppe. Displayen på videon räknar likadant. YouTubes spelare står på
+paus och hoppar dit räkneverket är ungefär åtta gånger i sekunden (`HOPP`, 120 ms, `hoppa` i
+rum-video.js): i paus kommer rubriken, knappen och loggan inte fram, bara bildrutan – fram
+och bak, hur fort det än går (provat i 4, 16 och 40 sekunder i sekunden: en ny bild vid varje
+hopp). Medan spelaren nyss har börjat spela kan dess saker ännu synas, och då visar rutan i
+stället den av YouTubes tre bildrutor ur klippet (`i.ytimg.com/vi/<id>/hq1–3.jpg`, ungefär en
+fjärdedel, hälften och tre fjärdedelar in, i 4:3 med svarta kanter som klippet i rutan) som
+ligger närmast räkneverket – riktiga bildrutor, inte omslagsbilden, som kan ha resultatet
+(utan `.vhs-ram`). Med Dolda resultat täcks överkanten av bildsökningen som av klippet.
+
+När man trycker ▶ står bilden still och darrar, som en video på paus, med en rand kvar och ▶
+i hörnet, tills klippet kommer. Spelaren kan inte börja spela utan att visa sina saker, så en
+ny spelare värms upp bakom stillbilden, från 4,4 sekunder före räkneverket, och den gamla med
+stillbilden (`.still`) tas bort när den nya kommer fram (`load` med `kvar`, `spelaHar`). I
+telefonen, där två spelare tar för mycket minne, står YouTubes bildruta still i stället
+medan samma spelare värms upp bakom den. Räkneverket och bandmätaren står kvar 2,5 sekunder in
+i klippet (`EFTER`) och räknar vidare. Bruset ritas en gång i en liten duk (`randBrus`, 512 ×
+80), och det som rör sig är egna små lager. Med `prefers-reduced-motion` står bilden och
+ränderna still medan räkneverket rullar, och klippet byts utan att skaka.
 Går inget av matchens klipp att spela här blir det myrornas krig, och klippen hoppas över
 nästa gång (samma lista som spelaren på sajten). Går man därifrån pausar videon, och den
 frusna bilden står kvar i rutan; tillbaka och den spelar vidare. Rummet stängs och videon
@@ -2654,12 +2662,15 @@ stannar. Med `prefers-reduced-motion` åker kassetterna direkt.
 
 **Att det är YouTube syns inte.** Spelaren har inga egna knappar (`controls=0`), får aldrig
 musen och textas inte (`hl=en` och `unloadModule('captions')`). Rubriken, kanalens bild,
-knappen i mitten och loggan syns ändå i drygt tre sekunder varje gång ett klipp börjar spela,
-spolas eller spelar vidare – men inte vid paus, och inte när ljudet slås av och på. Därför
-visar videon sin blå bild med *▶ SPELA*, utan ljud, tills klippet har spelat i 3,6 sekunder
-(`FORVARM`); när den spelar vidare efter en paus spolar den först tillbaka lika mycket, så
-att bilden fortsätter där den stannade, och när man har spolat med ◀◀ och ▶▶ hoppar den,
-bakom stillbilden, till 3,6 sekunder före räkneverket. Slutet, och förslagen efter det, täcks direkt.
+knappen i mitten och loggan syns ändå i knappt fyra sekunder varje gång ett klipp börjar
+spela, hoppar medan det spelar eller spelar vidare efter en paus – men inte vid paus, inte när
+det hoppar i paus och inte när ljudet slås av och på (mätt med bilder var 1/60 sekund: borta
+mellan 3,7 och 4,0 sekunder efter att spelaren sa att den spelade). Därför visar videon sin
+blå bild med *▶ SPELA*, utan ljud, tills klippet har spelat i 4,4 sekunder (`FORVARM`; förut
+3,6, då en skymt av rubriken kunde synas); när den spelar vidare efter en paus spolar den
+först tillbaka lika mycket, så att bilden fortsätter där den stannade, och efter en sökning
+börjar den nya spelaren lika långt före räkneverket. Slutet, och förslagen efter det, täcks
+direkt.
 
 **Kamerans sväng.** Rummet är målat på platta plan, så kameran kan inte gå runt i det på
 riktigt. Svängen är i stället två saker som sker samtidigt, på 0,6 sekunder som
