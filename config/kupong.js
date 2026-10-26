@@ -30,5 +30,5 @@ module.exports = {
     { id: 'DJ', namn: 'Daniel Johansson', bild: 'profeterna/johansson.jpg' },
   ],
   regel: { spik: 4, halv: 5, hel: 4 },
-  rummet: null,
+  rummet: 'wss://profeterna-rummet.fritid-moln.workers.dev/rum',
 };
