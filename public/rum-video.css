@@ -46,6 +46,7 @@
    som rummet vrids (rum.js) */
 .vhs-kam, .vhs-tv, .vhs-front, .vhs-styr, .vhs-lada { left: 0; top: 0; width: 1440px; height: 780px; transform-style: preserve-3d; }
 .vhs-kam.glid { transition: transform 0.6s cubic-bezier(0.3, 0, 0.2, 1); }
+.vhs-in.glid { transition: perspective-origin 0.6s cubic-bezier(0.3, 0, 0.2, 1); }
 .vhs-tv, .vhs-front, .vhs-lada { position: absolute; }
 .vhs-yta { position: absolute; display: block; backface-visibility: hidden; pointer-events: none; }
 .rum.vid-nara .vhs-yta:not(.vhs-skugga, .vhs-pol) { pointer-events: auto; }
@@ -106,7 +107,6 @@
 .vhs-bla { inset: 0; background: radial-gradient(ellipse 80% 75% at 50% 45%, #2f52e0, #2441c4 60%, #1a2f96); }
 .vhs-osd {
   left: 36px;
-  top: 26px;
   font: 400 40px/1 VT323, monospace;
   letter-spacing: 1px;
   color: #f4f6ff;
@@ -266,5 +266,5 @@
 
 @media (prefers-reduced-motion: reduce) {
   .vhs-brus, .vhs-vfd.blink { animation: none; }
-  .vhs-band, .vhs-lucka, .vhs-sken, .vhs-pol, .vhs-kam.glid { transition: none; }
+  .vhs-band, .vhs-lucka, .vhs-sken, .vhs-pol, .vhs-kam.glid, .vhs-in.glid { transition: none; }
 }

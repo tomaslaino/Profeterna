@@ -2513,9 +2513,11 @@ foten (högst sex gånger), och svänger samtidigt runt tv:n in mot rummet, så 
 rutan snett framifrån i stället för från sidan. Tv:n och lådan vrids inte och flyttas inte –
 de står kvar vända mot gänget – utan det är kameran som rör sig (se *Kamerans sväng* nedan).
 Kassetterna glider ut en bit när man pekar på dem. Ett klick på rutan (eller hjulet framåt)
-går ännu närmare, så att rutan fyller bilden (högst sexton gånger; i telefonen på höjden syns
-knapparna under den), och kameran svänger lite till, så att rutan syns nästan rakt
-framifrån; ett klick till, hjulet bakåt eller Esc går tillbaka till tv:n och lådan, och V,
+går ännu närmare, så att bilden i rutan fyller fönstret (i 16:10 hela bredden, med rutans
+svarta kant ovanför och under; i telefonen på höjden syns knapparna under den), och kameran
+svänger och går rakt framför tv:n, så att rutan syns rakt framifrån. Texten i rutan (*STOPP*,
+*▶ SPELA*) står inne i bilden, så att den syns där. Ett klick till, hjulet bakåt eller Esc går
+tillbaka till tv:n och lådan, och V,
 Esc eller ett klick utanför hörnet tillbaka till rummet, där kameran svänger tillbaka till
 där den stod. Ett klick på en kassett: den
 lyfts (ur lådan dras den först ut genom öppningen), ställs framför facket och skjuts in,
@@ -2544,14 +2546,21 @@ att bilden fortsätter där den stannade, och när man spolar med ◀◀ och ▶
 
 **Kamerans sväng.** Rummet är målat på platta plan, så kameran kan inte gå runt i det på
 riktigt. Svängen är i stället två saker som sker samtidigt, på 0,6 sekunder som
-förstoringen: rummets plan vrids 30 grader i 3D kring tv:n (34 när rutan fyller bilden;
+förstoringen: rummets plan vrids 30 grader i 3D kring tv:n (34 när bilden fyller fönstret;
 `sving` i rum.js), och hörnet – tv:n, högen och lådan, som är lådor i 3D i rummets eget
-perspektiv – ritas från samma håll, 30 respektive 46 grader runt tv:ns mitt (`SVANG` och
-`.vhs-kam` i rum-video.js). Planen vrids som de är, och väggen, skårtavlan, korktavlan och
+perspektiv – ritas från samma håll, 30 grader runt tv:ns mitt (`SVANG` och `.vhs-kam` i
+rum-video.js). När bilden fyller fönstret ritas hörnet 112 grader runt (`VRID`), så att rutan
+står parallellt med bilden, och ögat (perspektivets mitt i hörnet, `perspective-origin` på
+`.vhs-in`) flyttas rakt framför rutan: kameran går fram genom att förstora en del av bilden,
+så vänd mot det vanliga ögat blev rutan sned som i kanten av ett vidvinkelfoto, och därifrån
+skymde lådan rutans vänstra kant. Att rummet bara vrids 34 grader där syns inte, eftersom
+bilden fyller fönstret. Planen vrids som de är, och väggen, skårtavlan, korktavlan och
 disken följer med; tv:n och lådan ses från det nya hållet. Hörnets eget plan vrids inte: det
 står där rummet vrids kring, och Chrome ritar allt som lutar i perspektiv suddigt nära. Det
 flyttas i stället fram lika långt som väggen vrids fram bakom lådan och görs lika mycket
-mindre, så att det syns där det syntes. Större vinklar går inte: vid ungefär 40 grader glider
+mindre, så att det syns där det syntes – räknat längs synlinjen genom lådans vänstra kant,
+där den möter den vridna väggen (rakt bakom kanten räckte inte, och väggen skar av lådans
+vänstra kassettrad). Större vinklar på rummet går inte: vid ungefär 40 grader glider
 fönsterbänken in över lådan och lådan ser ut att sväva över disken. Nära tar bara hörnet
 emot klick – med kameran svängd räknade Chrome annars kortregistret på disken bakom lådan
 som närmast, och kassetterna i lådan gick inte att klicka på. Med `prefers-reduced-motion`

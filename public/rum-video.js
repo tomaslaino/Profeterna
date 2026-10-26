@@ -6,15 +6,15 @@
 // repriserna på VHS i en hög, och i en fruktlåda bredvid resten (Arkivet),
 // med öppningen åt samma håll. När man går fram (klick eller V) står de
 // kvar som de står, och kameran svänger runt tv:n så att man ser rutan
-// snett framifrån (SVANG) – närmare rutan nästan rakt. Kassetterna har
+// snett framifrån (SVANG) – närmare rutan rakt framifrån. Kassetterna har
 // handskrivna etiketter med matchen, resultatet och dagen; ett klick på en
 // kassett och den åker in i videon, som spelar matchens höjdpunkter i
 // rutan (samma klipp som spelaren på sajten, hojdpunkter.js). Knapparna
 // under rutan: ◀◀ och ▶▶ spolar tio sekunder, ▶ spelar eller pausar och ⏏
-// matar ut. Ett klick på rutan (eller hjulet) går ännu närmare, så att tv:n
-// fyller bilden. Går man därifrån pausar videon, och den spelar vidare när
-// man kommer tillbaka. När inget spelar blinkar klockan på 12:00, som den
-// alltid gjort.
+// matar ut. Ett klick på rutan (eller hjulet) går ännu närmare, så att
+// bilden i rutan fyller fönstret. Går man därifrån pausar videon, och den
+// spelar vidare när man kommer tillbaka. När inget spelar blinkar klockan
+// på 12:00, som den alltid gjort.
 //
 // Tv:n är en låda i CSS 3D (framsidan, sidorna, taket och skuggan på
 // disken) i rummets eget perspektiv – 1000 bildpunkter från flyktpunkten
@@ -56,6 +56,8 @@ window.RumVideo = (() => {
   // kassettfacket, displayen och knapparna, lådans front och kassetterna.
   const TV = { x: 31, y: 41, w: 82, h: 75 };
   const GLAS = { x: 38.5, y: 47, w: 67, h: 50.25 };
+  // den 16:9-stora bilden mitt i den 4:3-stora rutan
+  const BILD = { x: GLAS.x, y: GLAS.y + (GLAS.h - GLAS.w * 9 / 16) / 2, w: GLAS.w, h: GLAS.w * 9 / 16 };
   const FACK = { x: 36, y: 103.2, w: 43, h: 6.6 };
   const VFD = { x: 82, y: 102.6, w: 27, h: 5.2 };
   const KNAPP = { x: 82, y: 109, w: 6.1, h: 3.6, d: 6.97 };
@@ -78,28 +80,33 @@ window.RumVideo = (() => {
   // väggen. d är djupet.
   const LADA = { x: TV.x - 4 - 95, y: TV.y + TV.h - 77, w: 95, h: 77, t: 4.5, d: 27 };
   LADA.z = LADA.d - DJUP + (LADA.x - TV.x) / Math.tan(RAD);
-  // Kameran svänger runt tv:n när man går fram, så att man ser rutan nästan
-  // rakt framifrån – och lite till när man går närmare rutan: rummet vrids
-  // rum grader i 3D kring tv:n (rum.js), och här ritas hörnet horn grader
-  // längre runt (.vhs-kam, kring tv:ns mitt). Rummet är målat på platta plan,
+  // Kameran svänger runt tv:n när man går fram, så att man ser rutan snett
+  // framifrån – och när man går närmare rutan rakt framifrån: rummet
+  // vrids rum grader i 3D kring tv:n (rum.js), och här ritas hörnet horn
+  // grader runt (.vhs-kam, kring tv:ns mitt). Rummet är målat på platta plan,
   // så vridningen i 3D visar bara mer av planen; det är hörnet som ses från
-  // det nya hållet. Tv:n och lådan står som de står.
-  const SVANG = { nara: { rum: 30, horn: 30 }, tat: { rum: 34, horn: 46 } };
+  // det nya hållet. Tv:n och lådan står som de står. Rakt framifrån är
+  // VRID grader runt, så att rutan står parallellt med bilden, med ögat
+  // (perspektivets mitt, oga) flyttat från VP till rakt framför rutan:
+  // kameran går fram och förstorar en del av bilden, och vänd mot VP blev
+  // rutan sned som i kanten av ett vidvinkelfoto, och från VP skymde lådan
+  // rutans vänstra kant.
+  const SVANG = { nara: { rum: 30, horn: 30 }, tat: { rum: 34, horn: VRID, oga: [GLAS.x + GLAS.w / 2 + PLATS[0], GLAS.y + GLAS.h / 2] } };
   // Var en punkt på tv:n eller lådan (i tv:ns mått, z framåt från tv:ns
   // front) syns i hörnet: vriden kring MITT, flyttad till PLATS och i
-  // rummets perspektiv, med kameran v grader runt. ruta: det minsta i scenen
-  // som rymmer punkterna, med kanten k.
-  function syns([x, y, z], v = 0) {
+  // rummets perspektiv, med kameran v grader runt och ögat i e. ruta: det
+  // minsta i scenen som rymmer punkterna, med kanten k.
+  function syns([x, y, z], v = 0, e = VP) {
     const a = RAD - v * Math.PI / 180;
     const [dx, dz] = [x - MITT[0], z - MITT[2]];
     const wx = MITT[0] + PLATS[0] + dx * Math.cos(a) - dz * Math.sin(a);
     const wz = MITT[2] + PLATS[1] + dx * Math.sin(a) + dz * Math.cos(a);
     const f = 1000 / (1000 - wz);
-    return [VP[0] + (wx - VP[0]) * f, VP[1] + (y - VP[1]) * f];
+    return [e[0] + (wx - e[0]) * f, e[1] + (y - e[1]) * f];
   }
   const horn = (x0, y0, x1, y1, z0, z1) => [x0, x1].flatMap((x) => [y0, y1].flatMap((y) => [z0, z1].map((z) => [x, y, z])));
-  function ruta(p, k, v) {
-    const s = p.map((q) => syns(q, v));
+  function ruta(p, k, v, e) {
+    const s = p.map((q) => syns(q, v, e));
     const xs = s.map((q) => q[0]);
     const ys = s.map((q) => q[1]);
     return { x0: O[0] + Math.min(...xs) - k, y0: O[1] + Math.min(...ys) - k, x1: O[0] + Math.max(...xs) + k, y1: O[1] + Math.max(...ys) + k };
@@ -112,17 +119,17 @@ window.RumVideo = (() => {
     { x: LADA.x + 48.6, y: LADA.y + LADA.h - LADA.t - 0.2, ix: [24, 23, 22, 21, 20, 19, 18, 17, 16, 15], j: 0.6, r: 0.45 },
   ];
   const CAP = 25;
-  // det kameran ska få med: högen, tv:n och lådan – och närmare bara
-  // rutan – i scenens mått, med kameran svängd; sv: rummets vridning, mitt:
-  // där tv:n står i scenen (x), och kant: hörnets vänstra kant (lådan) hur
-  // kameran än står
+  // det kameran ska få med: högen, tv:n och lådan – och närmare bilden i
+  // rutan, som fyller fönstret (fyll) – i scenens mått, med kameran svängd;
+  // sv: rummets vridning, mitt: där tv:n står i scenen (x), och kant:
+  // hörnets vänstra kant (lådan) hur kameran än står
   const ALLT = [
     ...horn(TV.x, TV.y - 4 * KAS.h, TV.x + TV.w, TV.y + TV.h, 0, -DJUP),
     ...horn(LADA.x, LADA.y, LADA.x + LADA.w, LADA.y + LADA.h, LADA.z, LADA.z - LADA.d),
   ];
-  const HORN = { mitt: O[0] + syns(MITT)[0], kant: Math.min(...[0, SVANG.nara.horn, SVANG.tat.horn].map((v) => ruta(ALLT, 0, v).x0)) };
+  const HORN = { mitt: O[0] + syns(MITT)[0], kant: Math.min(...[{ horn: 0 }, SVANG.nara, SVANG.tat].map((s) => ruta(ALLT, 0, s.horn, s.oga).x0)) };
   const FOCUS = { ...ruta(ALLT, 6, SVANG.nara.horn), ...HORN, sv: SVANG.nara.rum };
-  const TAT = { ...ruta(horn(GLAS.x, GLAS.y, GLAS.x + GLAS.w, GLAS.y + GLAS.h, 0, 0), 1, SVANG.tat.horn), z: 16, ...HORN, sv: SVANG.tat.rum };
+  const TAT = { ...ruta(horn(BILD.x, BILD.y, BILD.x + BILD.w, BILD.y + BILD.h, 0, 0), 0, SVANG.tat.horn, SVANG.tat.oga), z: 32, fyll: true, ...HORN, sv: SVANG.tat.rum };
 
   const hash = (s) => {
     let a = 7;
@@ -299,8 +306,6 @@ window.RumVideo = (() => {
     const kas = (a, b) => Array.from({ length: b - a }, (_, i) => `<div class="vhs-band" data-i="${a + i}" hidden>` +
       `<button type="button" class="vhs-kas" data-i="${a + i}"><span class="lapp"><b></b><i></i></span></button>` +
       '<i class="kas-topp"></i><i class="kas-v"></i><i class="kas-h"></i></div>').join('');
-    // den 16:9-stora bilden i den 4:3-stora rutan
-    const bh = GLAS.w * 9 / 16;
     return `<div class="rum-vhs" id="rum-vhs" data-lage="tom" style="left:${O[0]}px; top:${O[1]}px">` +
       `<div class="vhs-in" style="perspective:${1000 * S}px; perspective-origin:${px(VP[0])} ${px(VP[1])}">` +
       '<i class="vhs-sken"></i>' +
@@ -309,10 +314,11 @@ window.RumVideo = (() => {
       `<div class="vhs-tv" style="transform:translate3d(${px(PLATS[0])}, 0px, ${px(PLATS[1])}) rotateY(${-VRID}deg); transform-origin:${px(MITT[0])} ${px(MITT[1])} ${px(MITT[2])}">${ytor()}` +
       `<div class="vhs-front">${tvRitning()}<div class="vhs-styr" inert>` +
       `<div class="vhs-skarm" style="${at(GLAS)}">` +
-      `<div class="vhs-bild" style="top:${px((GLAS.h - bh) / 2)}; height:${px(bh)}"></div>` +
+      `<div class="vhs-bild" style="top:${px(BILD.y - GLAS.y)}; height:${px(BILD.h)}"></div>` +
       '<div class="vhs-bla"></div><i class="vhs-brus"></i>' +
-      `<i class="vhs-mask" style="top:${px((GLAS.h - bh) / 2)}" hidden></i>` +
-      '<span class="vhs-osd">STOPP</span><i class="vhs-glas"></i></div>' +
+      `<i class="vhs-mask" style="top:${px(BILD.y - GLAS.y)}" hidden></i>` +
+      // texten i bilden, så att den syns när bilden fyller fönstret
+      `<span class="vhs-osd" style="top:${px(BILD.y - GLAS.y + 3)}">STOPP</span><i class="vhs-glas"></i></div>` +
       `<span class="vhs-vfd" style="${at(VFD)}">12:00</span>${knappar}${kas(0, 4)}</div></div>` +
       // lådan bredvid
       `<div class="vhs-lada" style="transform:translateZ(${px(LADA.z)})">${ladaYtor()}${ladaRitning()}<div class="vhs-styr" inert>${kas(4, CAP)}</div></div>` +
@@ -736,10 +742,13 @@ window.RumVideo = (() => {
       inn.classList.remove('byt');
     }
 
-    // Kameran runt tv:n (SVANG s, null på håll), samtidigt som rummet vrids.
+    // Kameran runt tv:n (SVANG s, null på håll), samtidigt som rummet vrids,
+    // och ögat dit kameran går.
     function sving(s) {
-      kam.classList.toggle('glid', !o.calm());
+      const oga = (s && s.oga) || VP;
+      for (const e of [kam, inn]) e.classList.toggle('glid', !o.calm());
       kam.style.transform = `rotateY(${s ? s.horn : 0}deg)`;
+      inn.style.perspectiveOrigin = `${px(oga[0])} ${px(oga[1])}`;
     }
 
     function tat(on) {
