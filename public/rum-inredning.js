@@ -20,10 +20,15 @@
 // går fram till dem (närbilderna i rum.js), och där ritas de, och ramen kring
 // skårtavlan, om skarpare (skarp).
 //
+// Uret visar också hur länge det är kvar till spelstoppet (stopp, från rum.js):
+// dagarna i ett fönster vid sexan, som datumet i ett armbandsur, en röd spets i
+// kanten vid klockslaget och de sista tolv timmarna en röd sektor från
+// timvisaren fram till spetsen.
+//
 // På natten är lysröret släckt (natt, från rum-folk.js): rören och
 // reflektorn mörka.
 //
-// inredning(el, { calm, still }) → { draw(), namn(html), skarp(namn, px), natt(på) } (namnet som Kronan.names)
+// inredning(el, { calm, still }) → { draw(), namn(html), skarp(namn, px), natt(på), stopp(ms) } (namnet som Kronan.names, ms spelstoppet eller null)
 
 const DEG = Math.PI / 180;
 const WZ = -26;
@@ -474,11 +479,83 @@ export async function inredning(el, opt = {}) {
     dome.rotation.x = 90 * DEG;
     dome.position.z = 4.6 - Rg * Math.cos(a);
     g.add(dome);
-    return (h, m, s) => {
+
+    // Spelstoppet: fönstret med dagarna kvar (kalenderdagar i Stockholm, 0 på
+    // spelstoppets dag) med DAGAR tryckt under, spetsen och sektorn. Utan
+    // spelstopp står fönstret tomt.
+    const ROD = '#a81c12';
+    const FW = r * 0.3, FH = r * 0.25, PX = 24;
+    const ruta = tex(Math.round((FW + 3) * PX), Math.round((FH + 9) * PX), () => {});
+    const fonster = mesh(new THREE.PlaneGeometry(FW + 3, FH + 9), new THREE.MeshStandardMaterial({ map: ruta, transparent: true, roughness: 0.75 }), g, false);
+    // över sektorn (0,45), under visarna
+    fonster.position.set(0, -r * 0.42 - 3, 0.55);
+    function dagar(n) {
+      const c = ruta.image.getContext('2d');
+      const k = PX;
+      c.clearRect(0, 0, ruta.image.width, ruta.image.height);
+      c.fillStyle = '#1b1915';
+      c.fillRect(0, 0, (FW + 3) * k, (FH + 3) * k);
+      c.fillStyle = '#f6efdd';
+      c.fillRect(1.5 * k, 1.5 * k, FW * k, FH * k);
+      // hjulet ligger bakom tavlan: skugga från fönstrets överkant
+      const sk = c.createLinearGradient(0, 1.5 * k, 0, (1.5 + FH * 0.35) * k);
+      sk.addColorStop(0, 'rgba(40,30,15,.45)');
+      sk.addColorStop(1, 'rgba(40,30,15,0)');
+      c.fillStyle = sk;
+      c.fillRect(1.5 * k, 1.5 * k, FW * k, FH * 0.35 * k);
+      if (n == null) { ruta.needsUpdate = true; return; }
+      c.textAlign = 'center';
+      c.textBaseline = 'middle';
+      c.fillStyle = n ? ROD : '#2a2620';
+      c.font = `700 ${FH * (n > 9 ? 0.66 : 0.86) * k}px 'Helvetica Neue', Helvetica, Arial`;
+      c.fillText(String(n), (FW + 3) * k / 2, (FH / 2 + 1.5) * k + 0.06 * FH * k);
+      c.fillStyle = '#3a342a';
+      c.font = `600 ${3.6 * k}px 'Helvetica Neue', Helvetica, Arial`;
+      c.fillText(n === 1 ? 'DAG' : 'DAGAR', (FW + 3) * k / 2, (FH + 6.2) * k);
+      ruta.needsUpdate = true;
+    }
+    const sp = new THREE.Shape([new THREE.Vector2(-r * 0.07, r), new THREE.Vector2(r * 0.07, r), new THREE.Vector2(0, r * 0.86)]);
+    const spets = mesh(new THREE.ExtrudeGeometry(sp, { depth: 0.5, bevelEnabled: false }), mat(ROD, { roughness: 0.45 }), g, false);
+    spets.position.z = 0.35;
+    const sekMat = new THREE.MeshPhysicalMaterial({ color: ROD, roughness: 0.7, transparent: true, opacity: 0.94, depthWrite: false });
+    let sektor = null;
+    let visad;
+    let sekNyckel = '';
+    const fKl = new Intl.DateTimeFormat('sv-SE', { timeZone: 'Europe/Stockholm', year: 'numeric', month: 'numeric', day: 'numeric', hour: 'numeric', minute: 'numeric', hourCycle: 'h23' });
+    const delar = (ms) => { const p = {}; for (const x of fKl.formatToParts(new Date(ms))) p[x.type] = +x.value; return p; };
+    const dagnr = (p) => Date.UTC(p.year, p.month - 1, p.day) / 864e5;
+    // timvisarens vinkel (grader medurs från tolv)
+    const vinkel = (p) => ((p.hour % 12) + p.minute / 60) * 30;
+    function kvar(ms, stopp) {
+      const nu = delar(ms);
+      const st = stopp && stopp > ms ? delar(stopp) : null;
+      const n = st ? dagnr(st) - dagnr(nu) : null;
+      if (n !== visad) { dagar(n); visad = n; }
+      spets.visible = Boolean(st);
+      let nyckel = '';
+      if (st) {
+        const a1 = vinkel(st);
+        spets.rotation.z = -a1 * DEG;
+        if (stopp - ms <= 12 * 3600e3) {
+          const a0 = vinkel(nu);
+          nyckel = `${a0} ${a1 > a0 ? a1 : a1 + 360}`;
+        }
+      }
+      if (nyckel === sekNyckel) return;
+      sekNyckel = nyckel;
+      if (sektor) { g.remove(sektor); sektor.geometry.dispose(); sektor = null; }
+      if (!nyckel) return;
+      const [a0, a1] = nyckel.split(' ').map(Number);
+      sektor = new THREE.Mesh(new THREE.CircleGeometry(r * 0.66, 96, (90 - a1) * DEG, (a1 - a0) * DEG), sekMat);
+      sektor.position.z = 0.45;
+      g.add(sektor);
+    }
+    const visare = (h, m, s) => {
       tim.rotation.z = -((h % 12) + m / 60) * 30 * DEG;
       min.rotation.z = -(m + s / 60) * 6 * DEG;
       sek.rotation.z = -s * 6 * DEG;
     };
+    return { visare, kvar };
   }
 
   // Orakelramen: förgylld list i två steg med pärlstav, rosetter i hörnen och
@@ -768,7 +845,7 @@ export async function inredning(el, opt = {}) {
   lysror(B.tak);
   stangt(B.tak);
   neon(B.neon, B.tak);
-  const visare = ur(B.ur);
+  const { visare, kvar } = ur(B.ur);
   backWall(B.ur);
   const skylt = ram(B.ram);
   backWall(B.ram);
@@ -797,6 +874,8 @@ export async function inredning(el, opt = {}) {
   const fUr = new Intl.DateTimeFormat('sv-SE', { timeZone: 'Europe/Stockholm', hour: 'numeric', minute: 'numeric', second: 'numeric', hourCycle: 'h23' });
   let off = null;
   let sekund = null;
+  let senast = null;
+  let spelstopp = null;
   function tick() {
     if (sekund != null && opt.still && opt.still()) return;
     if (off == null) off = window.Vader ? Vader.nu().t - Date.now() : 0;
@@ -804,9 +883,20 @@ export async function inredning(el, opt = {}) {
     const s = Math.floor(ms / 1000);
     if (s === sekund) return;
     sekund = s;
+    senast = ms;
     const p = {};
     for (const x of fUr.formatToParts(new Date(ms))) p[x.type] = +x.value;
     visare(p.hour, p.minute, p.second);
+    kvar(ms, spelstopp);
+    B.ur.paint();
+  }
+  // spelstoppet (ms) eller null; med ?rum-klocka jämförs det med urets tid
+  function stopp(ms) {
+    ms = ms || null;
+    if (ms === spelstopp) return;
+    spelstopp = ms;
+    if (senast == null) return;
+    kvar(senast, spelstopp);
     B.ur.paint();
   }
   let namn = null;
@@ -829,5 +919,5 @@ export async function inredning(el, opt = {}) {
     rorRefl.color.set(on ? ROR.reflAv : ROR.refl);
     B.tak.paint();
   }
-  return { draw: tick, namn: setNamn, skarp: (k, px) => B[k] && B[k].skarp(px), natt };
+  return { draw: tick, namn: setNamn, skarp: (k, px) => B[k] && B[k].skarp(px), natt, stopp };
 }

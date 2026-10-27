@@ -1895,6 +1895,16 @@ hoppar varje sekund. Det går efter Stockholms tid, med samma klocka som
 utsikten (`Vader.nu()` i vader.js, annars datorns klocka). Med `?rum-t` står det på den
 tid det visade först, och med `prefers-reduced-motion` syns inte sekundvisaren.
 
+Uret visar också hur länge det är kvar till spelstoppet, alltså den första avsparken i
+omgången som gänget tippar (`stopp`, från rum.js). I ett fönster vid sexan, som
+datumet i ett armbandsur, står dagarna kvar i rött (kalenderdagar i Stockholm), med DAGAR
+(DAG) tryckt under; på spelstoppets dag står det en svart nolla. En röd spets i kanten
+pekar på klockslaget, och de sista tolv timmarna fyller en röd sektor tavlan från
+timvisaren fram till spetsen, så att den krymper medan tiden går. Fönstret ligger över
+sektorn och under visarna. Mellan omgångarna och efter spelstoppet står fönstret tomt och
+spetsen och sektorn är borta. Med `?rum-klocka` räknar uret från sin egen tid, och
+`?rum-stopp=<timmar>` gäller uret också.
+
 **Inredningen i 3D** ([public/rum-inredning.js](public/rum-inredning.js)): lysröret i taket
 (en armatur med två rör och gavlar), neonskylten, Stängt-skylten, stationsuret,
 orakelramen med mässingsskylten, cigarettpaketen uppe på högra väggen (två hyllor med

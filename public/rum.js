@@ -1213,6 +1213,10 @@ ${window.RumRegister ? RumRegister.nara() : ''}
     const h = q.has('rum-stopp') ? parseFloat(q.get('rum-stopp')) : (first - t) / 3600000;
     const nag = !rd || rd.next || !(h > 0) || h > 24 ? 0 : h <= 1 ? 1 : 0.25 + (0.6 * (24 - h)) / 23;
     R.lage = { tv, nag };
+    // uret visar dagarna och de sista tolv timmarna till spelstoppet
+    // (rum-inredning.js); ?rum-stopp räknas från urets tid
+    R.stopp = rd && !rd.next && first ? (q.has('rum-stopp') ? (window.Vader ? Vader.nu().t : t) + h * 3600000 : first) : null;
+    if (R.inr) R.inr.stopp(R.stopp);
     if (R.fig && R.fig.lage) R.fig.lage(R.lage, now());
     // målen: ställningen mot förra gången (första gången inga)
     const s = p && p.s;
@@ -1426,7 +1430,7 @@ ${window.RumRegister ? RumRegister.nara() : ''}
     tur(() => import('./rum-saker.js').then((m) => m.saker(R.el, { calm: calm() })).then((x) => { R.saker = x; R.sakDuk = R.el.querySelector('canvas.rum-saker'); sikt(R.sakDuk); frame(); }), 2)
       .catch((err) => console.warn('Rummet: sakerna kunde inte ritas', err));
     // lysröret, neonen, skyltarna, uret, ramarna, paketen och kupongstället (rum-inredning.js)
-    tur(() => import('./rum-inredning.js').then((m) => m.inredning(R.el, { calm: calm(), still })).then((x) => { R.inr = x; x.namn(R.ramNamn); if (window.RumFolk && RumFolk.natt()) x.natt(true); if (R.sak) sak(R.sak, null); frame(); }), 1)
+    tur(() => import('./rum-inredning.js').then((m) => m.inredning(R.el, { calm: calm(), still })).then((x) => { R.inr = x; x.namn(R.ramNamn); x.stopp(R.stopp); if (window.RumFolk && RumFolk.natt()) x.natt(true); if (R.sak) sak(R.sak, null); frame(); }), 1)
       .catch((err) => console.warn('Rummet: inredningen kunde inte ritas', err));
     try {
       await tur(async () => {
