@@ -2090,7 +2090,10 @@ sekunder blinkar det igång (1,2 s). En gång per sidvisning, och inte med
 nedan), neonen glappar ibland, röken ligger under lysröret, damm syns i ljuset och stationsurets
 sekundvisare hoppar fram. Bakväggen är klädd med lackad furupanel (`furu` i rum.js):
 bräder med kvistar och ådring, mörka av röken upptill och ljusare under lysröret och där en
-tavla har hängt runt ramen. Stället är slitet: nikotingul högervägg och tak, fläckar, nötta
+tavla har hängt runt ramen. Disken längs högra väggen har en framkant i aluminium som pulten
+och en front i skivor, med fogarna lika långt isär längs disken – tätare inne vid hörnet,
+som i perspektivet (`diskfront` i rum.js; samma kant fortsätter i videons hörn, `vaggSvg` i
+rum-video.js). Stället är slitet: nikotingul högervägg och tak, fläckar, nötta
 kanter på disken och pulten, kafferingar och brännmärken. Med `prefers-reduced-motion` står
 allt still (en bild, ingen kamera efter musen).
 
@@ -2127,7 +2130,9 @@ står, som med musen (`swipe` och `pan` i rum.js; med musen nedtryckt går det l
 smalt fönster). I Chrome glider scenen till fingret på 50 ms (`.drar` i rum.css) i stället för
 att flyttas direkt, se [När datorn inte hinner med](#när-datorn-inte-hinner-med). Ett tryck på ett föremål gör samma sak som ett klick, och ett tryck efter
 ett drag öppnar ingenting. Föremålen lyser inte kvar efter ett tryck (`:hover` bara med
-mus), och foten har bara *Vanlig sida* – utan tangentbord står inga tangenter där. Sidan
+mus), och foten har bara *Vanlig sida* – utan tangentbord står inga tangenter där. På höjden
+står *Vanlig sida* uppe till höger, mitt emot namnet, eftersom kupongen fyller nederkanten
+(där låg ordet över kupongens rutor och över guldorden i närbilderna). Sidan
 zoomar och rullar inte i rummet (`touch-action: none`).
 
 Närbilderna ryms i fönstret: tv:n går så nära att den fyller bredden (på datorn 3,6 gånger
@@ -2142,7 +2147,12 @@ svep uppåt eller neråt bladen i lapparna till nästa division.
 pulten, i handen och i högen är smal och hög, 420 × 620 i stället för 660 × 470, som en
 riktig stryktipskupong, med samma mitt så att högen och handen ligger där de ligger (`KUP`
 i rum.js). Raderna har två våningar – lagen överst, dagen och motiveringen under – och
-rutorna är större (44 × 26). Fälten står över hela bredden i foten, streckkoden får inte
+rutorna är större (44 × 26). Lagen har de korta namnen, som på skårtavlan (*Tottenham –
+Crystal Palace*, *Southampton – QPR*; `short` i rum.js, där Bristol City, Bristol Rovers och
+Notts County behåller hela namnet och Milton Keynes Dons blir MK Dons), så att de ryms i
+stället för att huggas av. Överst står bara *Vem är du?* och porträtten, utan 1 X 2 –
+tecknen står i rutorna, som på papperet i telefonen – annars fick frågan inte plats och
+hamnade över första raden. Fälten står över hela bredden i foten, streckkoden får inte
 plats och pennan vilar i kanten under fälten. I handen fyller kupongen bredden, orden under
 den får gå på två rader, och meddelandet (*2 matcher saknar tecken.*) står ovanför kupongen
 där namnet annars står. Papperets regler för telefonen i papper.css gäller inte kupongen i

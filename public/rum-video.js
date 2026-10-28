@@ -302,6 +302,8 @@ window.RumVideo = (() => {
   // planet -600, under det som hänger på väggen.
   const wl = (x) => 490 + (x - 1140) * 109 / 460;
   const re = (x) => 490 + (x - 1060) * 162 / 540;
+  // diskens kant och fogar (diskfront i rum.js): större ju längre ut
+  const kk = (x) => (x - 760) / 300;
   function vaggSvg() {
     const [a, z] = [1599.5, 2100];
     const r = `x="${a}" y="300" width="${z - a}" height="720"`;
@@ -309,6 +311,9 @@ window.RumVideo = (() => {
     <rect ${r} fill="url(#rum-rwall)"/><rect ${r} filter="url(#rum-flack)" opacity=".55"/><rect ${r} fill="#000" opacity=".2"/>
     <polygon points="${a},${wl(a)} ${z},${wl(z)} ${z},${re(z)} ${a},${re(a)}" fill="#5b564c"/>
     <polygon points="${a},${re(a)} ${z},${re(z)} ${z},1020 ${a},1020" fill="#2a2019"/>
+    <polygon points="${a},${re(a)} ${z},${re(z)} ${z},${re(z) + 2 * kk(z)} ${a},${re(a) + 2 * kk(a)}" fill="#aaa69c"/>
+    <polygon points="${a},${re(a) + 2 * kk(a)} ${z},${re(z) + 2 * kk(z)} ${z},${re(z) + 4 * kk(z)} ${a},${re(a) + 4 * kk(a)}" fill="#403e3a"/>
+    <line x1="2072" y1="${re(2072) + 4 * kk(2072)}" x2="2072" y2="1020" stroke="#120c08" stroke-opacity=".55" stroke-width="${1.3 * kk(2072)}"/>
     <line x1="${a}" y1="${re(a)}" x2="${z}" y2="${re(z)}" stroke="#c9c2b2" stroke-opacity=".35" stroke-width="2"/>
     <polygon points="${a},${re(a) + 2} ${z},${re(z) + 2} ${z},${re(z) + 48} ${a},${re(a) + 48}" fill="#000" opacity=".12"/>
   </svg>`;

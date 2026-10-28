@@ -111,7 +111,7 @@ window.Rum = (() => {
     <linearGradient id="rum-furu" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#2e1804" stop-opacity=".62"/><stop offset=".22" stop-color="#2e1804" stop-opacity=".12"/>
       <stop offset=".5" stop-color="#000" stop-opacity=".05"/><stop offset="1" stop-color="#000" stop-opacity=".55"/></linearGradient>
     <radialGradient id="rum-furu-lampa" cx=".5" cy="0" r=".7"><stop offset="0" stop-color="#fff2d6" stop-opacity=".22"/><stop offset="1" stop-color="#fff2d6" stop-opacity="0"/></radialGradient>
-    <linearGradient id="rum-rwall" gradientUnits="userSpaceOnUse" x1="1140" y1="0" x2="1600" y2="0"><stop offset="0" stop-color="#5a4e39"/><stop offset="1" stop-color="#2f2920"/></linearGradient>
+    <linearGradient id="rum-rwall" gradientUnits="userSpaceOnUse" x1="1140" y1="0" x2="1600" y2="0"><stop offset="0" stop-color="#6b5733"/><stop offset="1" stop-color="#382d1c"/></linearGradient>
     <linearGradient id="rum-ceil" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#2b2519"/><stop offset="1" stop-color="#55492f"/></linearGradient>
     <linearGradient id="rum-pult" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#6e4a30"/><stop offset=".5" stop-color="#5a3b26"/><stop offset="1" stop-color="#3b2619"/></linearGradient>
     <linearGradient id="rum-alu" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#9a9a96"/><stop offset=".5" stop-color="#5e5e5b"/><stop offset="1" stop-color="#2e2e2c"/></linearGradient>
@@ -170,6 +170,21 @@ window.Rum = (() => {
   <rect x="0" y="90" width="1140" height="7" fill="#000" opacity=".35"/>`;
   }
 
+  // Diskens framkant i aluminium, som pultens, och fogarna mellan skivorna i
+  // fronten. Fronten går från hörnet (1060) ut mot pulten, mot flyktpunkten,
+  // så allt på den är större ju längre ut det är (k), och fogarna står lika
+  // långt isär längs disken – tätare inne vid hörnet. Samma kant fortsätter
+  // till höger om bilden i videons hörn (vaggSvg i rum-video.js).
+  function diskfront() {
+    const y = (x) => r1(490 + (x - 1060) * 0.3);
+    const k = (x) => (x - VP[0]) / (1060 - VP[0]);
+    const kant = (d0, d1, fill) => `<polygon points="1060,${r1(y(1060) + d0)} 1600,${r1(y(1600) + d0 * k(1600))} 1600,${r1(y(1600) + d1 * k(1600))} 1060,${r1(y(1060) + d1)}" fill="${fill}"/>`;
+    const fogar = [1, 2, 3, 4].map((i) => VP[0] + 1 / (1 / 300 - (i / 5) * (1 / 300 - 1 / 840))).map((x) =>
+      `<line x1="${r1(x)}" y1="${r1(y(x) + 4 * k(x))}" x2="${r1(x)}" y2="1000" stroke="#120c08" stroke-opacity=".55" stroke-width="${r1(1.3 * k(x))}"/>` +
+      `<line x1="${r1(x + 1.3 * k(x))}" y1="${r1(y(x) + 4 * k(x))}" x2="${r1(x + 1.3 * k(x))}" y2="1000" stroke="#d9c7a1" stroke-opacity=".1" stroke-width="${r1(k(x))}"/>`).join('');
+    return kant(0, 2, '#aaa69c') + kant(2, 4, '#403e3a') + fogar;
+  }
+
   // Bakgrunden: taket, väggarna (furupanelen och den nikotingula högra
   // väggen), dörren, skyltfönstret och disken. Lysröret, skyltarna och
   // paketen är i 3D (rum-inredning.js).
@@ -217,6 +232,7 @@ window.Rum = (() => {
 
   <polygon points="1060,490 1140,490 1600,599 1600,652" fill="url(#rum-countertop)"/>
   <polygon points="1060,490 1600,652 1600,1000 1060,1000" fill="url(#rum-counter)"/>
+  ${diskfront()}
   <line x1="1060" y1="490" x2="1600" y2="652" stroke="#c9c2b2" stroke-opacity=".35" stroke-width="2"/>
   <g stroke="#d9c7a1" stroke-opacity=".5" stroke-width="2.4" stroke-linecap="round">
     <line x1="1092" y1="500" x2="1130" y2="511"/><line x1="1236" y1="543" x2="1250" y2="547"/><line x1="1318" y1="567" x2="1372" y2="583"/><line x1="1490" y1="619" x2="1512" y2="626"/>
@@ -819,7 +835,8 @@ ${window.RumRegister ? RumRegister.nara() : ''}
   // Kortare lagnamn på papperet och skårtavlan.
   const SHORT = { 'Manchester City': 'Man City', 'Manchester United': 'Man Utd', 'Tottenham Hotspur': 'Tottenham', 'Brighton & Hove Albion': 'Brighton',
     'Wolverhampton Wanderers': 'Wolves', 'West Bromwich Albion': 'West Brom', 'Queens Park Rangers': 'QPR', 'Nottingham Forest': "Nott'm Forest",
-    'AFC Bournemouth': 'Bournemouth', 'Preston North End': 'Preston', 'Sheffield Wednesday': 'Sheff Wed', 'Sheffield United': 'Sheff Utd' };
+    'AFC Bournemouth': 'Bournemouth', 'Preston North End': 'Preston', 'Sheffield Wednesday': 'Sheff Wed', 'Sheffield United': 'Sheff Utd',
+    'Milton Keynes Dons': 'MK Dons', 'Bristol City': 'Bristol City', 'Bristol Rovers': 'Bristol Rovers', 'Notts County': 'Notts County' };
   const short = (name) => SHORT[name] || String(name || '').replace(/\s+(United|City|Town|Rovers|Athletic|County|Wanderers|Albion|Argyle|Hotspur)$/, '');
   // På text-tv:n när lagen inte ryms: högst elva tecken.
   const BOARD = { 'Nottingham Forest': 'Nottingham', 'Middlesbrough': 'Middlesbro', 'Crystal Palace': 'Palace', 'Huddersfield Town': 'Huddersfld',
@@ -941,7 +958,9 @@ ${window.RumRegister ? RumRegister.nara() : ''}
           : `<span class="box${on ? ' x' : ''}">${inner}</span>`;
       };
       return `<div class="row${sign ? '' : ' tom'}${locked ? ' locked' : ''}" data-id="${esc(x.id)}"><span class="pp-nr">${i + 1}</span>` +
-        `<span class="m"><span class="pp-tm">${esc(x.m.home)}<span class="vs"> – </span>${esc(x.m.away)}</span>` +
+        // på den smala kupongen (telefonen) de kortare namnen, som på skårtavlan (rum.css)
+        `<span class="m"><span class="pp-tm"><span class="lang">${esc(x.m.home)}<span class="vs"> – </span>${esc(x.m.away)}</span>` +
+        `<span class="kort">${esc(short(x.m.home))}<span class="vs"> – </span>${esc(short(x.m.away))}</span></span>` +
         `<span class="pp-small">${esc(fWeekdayTime.format(new Date(x.m.kickoff)))}${comp ? ` · ${esc(comp.short)}` : ''}${locked ? ' · har startat' : ''}</span>` +
         notes(v, x.id, label, { sign, started, hand, ink }) + '</span>' +
         SIGNS.map(box).join('') + '</div>';
