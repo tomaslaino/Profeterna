@@ -1786,7 +1786,8 @@ Anslagstavlans lutning efter musen sätts av samma skäl som transform direkt; d
 ungefär hälften så mycket. Vridningen efter musen (och efter var man står med fingret) följer
 i varje bildruta (`kamera` i rum.js), inte 30 gånger i sekunden som gänget och sakerna i 3D:
 att vrida världen ritar inte om något, och på skärmar med 60 eller 120 bilder i sekunden
-hackade vridningen förut. I WebKit (Safari, och alla webbläsare i iPhone) släpper webbläsaren
+hackade vridningen förut. I Chrome får världen i stället ett nytt mål var tiondels sekund och
+glider dit själv (`folj`, se [När datorn inte hinner med](#när-datorn-inte-hinner-med)). I WebKit (Safari, och alla webbläsare i iPhone) släpper webbläsaren
 det den har ritat av rummet utanför bilden medan kameran står nära något, och när kameran gick
 tillbaka ritades allt det om på en gång medan glidningens klocka gick: kameran stod still
 150–300 ms och hoppade sedan 30–100 % av vägen på en bildruta. Så länge något pågår på kameran
@@ -2123,7 +2124,8 @@ fyllde den 80 % av höjden, med svart över och under; det svarta ville vi inte 
 förstorad än så går inte utan det). Det som inte ryms når man med fingret: scenen följer med när man drar,
 glider vidare en bit när man släpper den i farten, och kameran vrids efter var i rummet man
 står, som med musen (`swipe` och `pan` i rum.js; med musen nedtryckt går det likadant i ett
-smalt fönster). Ett tryck på ett föremål gör samma sak som ett klick, och ett tryck efter
+smalt fönster). I Chrome glider scenen till fingret på 50 ms (`.drar` i rum.css) i stället för
+att flyttas direkt, se [När datorn inte hinner med](#när-datorn-inte-hinner-med). Ett tryck på ett föremål gör samma sak som ett klick, och ett tryck efter
 ett drag öppnar ingenting. Föremålen lyser inte kvar efter ett tryck (`:hover` bara med
 mus), och foten har bara *Vanlig sida* – utan tangentbord står inga tangenter där. Sidan
 zoomar och rullar inte i rummet (`touch-action: none`).
@@ -2246,7 +2248,8 @@ tionde bild längre än 50 ms, två perioder i rad tas ett steg ner.
   rum-3d.js och rum-saker.js). Gänget byggs av ungefär 310 000 trianglar i stället för
   745 000 – håret, huvudena och de runda delarna med färre segment (`seg` i rum-3d.js;
   glansen i håret blir lite kantigare) – och byggs om på stället som när kläderna byts.
-  Kameran vrids efter musen i samma takt som gänget i stället för i varje bildruta.
+  Kameran vrids efter musen i samma takt som gänget i stället för i varje bildruta (i Chrome
+  glider den ändå jämnt, `folj` nedan).
 - **Steg 2:** 15 gånger i sekunden, 55 % av bildpunkterna på ledden (aldrig under 0,75 per
   punkt), skuggorna var fjärde bild, ungefär 240 000 trianglar och inget damm i ljuset.
 
@@ -2263,8 +2266,9 @@ Också på steg 0 räknade Chrome om alla rummets lager (`PaintArtifactComposito
 varje bildruta, ungefär en millisekund per gång på en snabb dator och flera i en telefon:
 
 - **Gatan utanför:** fotgängarnas ben och armar, hjulen, löven, fåglarnas vingar och flaggan
-  rör sig inne i SVG:er, som grafikkortet inte kan flytta själv. De står nu på paus och flyttas
-  fram i samma takt som gänget (`uteTakt` i rum.js), en gång per bild där.
+  rörde sig inne i SVG:er, som grafikkortet inte kan flytta själv. De stod på paus och
+  flyttades fram i samma takt som gänget (`uteTakt` i rum.js), men varje steg räknade ändå om
+  alla lager (se nedan).
 - **Myrornas krig** i videon (`.vhs-brus`) rörde sig också när det var dolt; nu bara när det
   syns.
 - **Lagerkransen** bakom oraklet pulserade med en skugga (`kr-glint` i kronan.css); i rummet
@@ -2281,14 +2285,52 @@ och 450 ms/s. Med SwiftShader i 1366 × 768: 1,7 → 2,5 (steg 1) och 2,9 bilder
 (steg 2), och rummet gick själv ner till steg 2 på en halv minut. En snabb dator stannar på
 steg 0.
 
+Sedan dess räknar Chrome bara om lagren när något i rummet faktiskt ändras, inte när det rör
+sig:
+
+- **Gatans figurer är dukar.** Varje steg för benen på gatan, och varje vridning av hjulens
+  ekrar, var en ändring inne i en SVG och räknade om alla rummets lager (~380), 20–30 gånger i
+  sekunden; oskärpan på varje figur var dessutom ett eget pass på grafikkortet i varje
+  bildruta. Nu är de som går, cyklar och åker förbi, löven, fåglarna och flaggan var sin liten
+  duk (`duka` i rum-ute.js) som glider över gatan som förut, och ställningen ritas om i duken
+  i gängets takt (`takt`), bara för det som syns genom fönstret och dörren, med oskärpan i
+  ritningen (`ctx.filter`; utan den, i äldre Safari, får duken oskärpan i CSS). Rörelserna –
+  vinklarna, takterna och kurvorna som förut stod i rum-ute.css – står i `rorelse`. Molnen
+  ritas en gång med sin oskärpa. SVG:erna ritas i duken med samma former och färger
+  (`delar`, `rita`), så gatan ser ut som förut.
+- **Kameran efter musen** (och efter var man står med fingret): en ny vridning av världen
+  räknade om alla lager. I Chrome får världen nu ett nytt mål var tiondels sekund och glider
+  dit på 180 ms (`folj` i rum.js, `.foljer` i rum.css) – medan en övergång pågår flyttar Chrome
+  bara lagren – och gänget och sakerna i 3D ritas med den vridning som syns (`synlig`). Vid
+  närbilderna, och en sekund efter dem, vrids den direkt som förut: medan världen glider
+  behåller Chrome lagrens upplösning, och efter en närbild ska den bli hemmets. WebKit vrider
+  världen utan kostnad och gör som förut.
+- **Fingret som drar** flyttade scenen och räknade om alla lager vid varje rörelse; i Chrome
+  glider den nu till fingret på 50 ms (`pan(…, true)`, `.drar` i rum.css).
+- **Röken** från cigaretterna var 182 spritar med eget material, en ritning var i varje bild;
+  nu är puffarna en enda mesh som ritas på en gång (`ROK` i rum-saker.js), lika i bild.
+
+Mätt i headless Chrome (Apple M5, 1440 × 900, täthet 2, steg 1) med processorn fyra gånger
+långsammare, omväxlande gammal och ny kod: huvudtrådens tid med musen stilla 380 → 250 ms per
+sekund, med musen i rörelse 510 → 330, och som telefon (390 × 664, täthet 3) med fingret som
+drar 440 → 300; omräkningarna av alla lager från 20–35 i sekunden till 0–2, och
+grafikprocessen ungefär en fjärdedel mindre med musen stilla. Sakerna på pulten ritas på
+1,7 ms i stället för 3,5. Med datorn hårt belastad gick rummet med musen stilla i 60 bilder i
+sekunden i stället för 29. Med SwiftShader utan 3D (1366 × 768, som en svag grafikkrets):
+14 → 17 bilder i sekunden för samma arbete, med 15 pass på grafikkortet per bild i stället
+för 19. Bilderna av gatan (dag, natt, snö med plogbil, flaggdag), röken
+och närbilderna är desamma som förut, och kameran glider in och ut ur närbilderna utan fler
+hål i bilden.
+
 ### Utsikten och vädret
 
 Tobaksaffären ligger i Stockholm, och genom skyltfönstret och dörren syns gatan som den är
 där just nu. [public/vader.js](public/vader.js) räknar solens höjd och månens fas ur
 klockan och hämtar vädret från Open-Meteo (fritt, utan nyckel, en gång i kvarten; sparas
 på enheten), och [public/rum-ute.js](public/rum-ute.js) ritar gatan med
-[public/rum-ute.css](public/rum-ute.css) för det som rör sig. Utan nätet är det mulet och
-månadens vanliga temperatur.
+[public/rum-ute.css](public/rum-ute.css) för det som rör sig; de som går förbi, löven,
+fåglarna och flaggan ritas i små dukar (se [När datorn inte hinner med](#när-datorn-inte-hinner-med)).
+Utan nätet är det mulet och månadens vanliga temperatur.
 
 - **Ljuset:** himlen över de lägre taken går från natt via blå timme och solnedgång till
   dag, grå när det är mulet. Fasaderna mittemot (gul, terrakotta och ljus puts) är nästan

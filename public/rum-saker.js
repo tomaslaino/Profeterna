@@ -751,16 +751,60 @@ async function props(pult, opt, root) {
     halo.scale.set(15, 15, 1);
     halo.position.x = -1 - inner;
     g.add(halo);
-    const puffs = [];
-    for (let i = 0; i < SM.n; i++) {
-      const sp = new THREE.Sprite(new THREE.SpriteMaterial({ map: smokeTex, transparent: true, depthWrite: false, opacity: 0, color: '#e4e6ea', toneMapped: false }));
-      world.add(sp);
-      puffs.push(sp);
-    }
-    const c = { g, ring, ash, halo, puffs, inner, n, at: new THREE.Vector3() };
+    const c = { g, ring, ash, halo, inner, n, at: new THREE.Vector3() };
     return c;
   }
   const cigs = [cigarette(0, 19), cigarette(1, 13)];
+  // Röken: puffarna från båda cigaretterna i en enda mesh som ritas på en
+  // gång, vända mot kameran som spritar (förut en sprite med eget material
+  // per puff, 182 ritningar i varje bild). mitt: puffens mitt i världen;
+  // puff: storleken, genomskinligheten och hur den är vriden.
+  const ROK = (() => {
+    const n = SM.n * cigs.length;
+    const q = new THREE.PlaneGeometry(1, 1);
+    const g = new THREE.InstancedBufferGeometry();
+    g.index = q.index;
+    g.setAttribute('position', q.attributes.position);
+    g.setAttribute('uv', q.attributes.uv);
+    const attr = () => new THREE.InstancedBufferAttribute(new Float32Array(n * 3), 3).setUsage(THREE.DynamicDrawUsage);
+    g.setAttribute('mitt', attr());
+    g.setAttribute('puff', attr());
+    g.instanceCount = n;
+    const m = new THREE.ShaderMaterial({
+      uniforms: { map: { value: smokeTex }, color: { value: new THREE.Color('#e4e6ea') } },
+      vertexShader: `
+        attribute vec3 mitt;
+        attribute vec3 puff;
+        varying vec2 vUv;
+        varying float vA;
+        void main() {
+          vUv = uv;
+          vA = puff.y;
+          vec4 mv = modelViewMatrix * vec4(mitt, 1.0);
+          vec2 p = position.xy * vec2(length(modelMatrix[0].xyz), length(modelMatrix[1].xyz)) * puff.x;
+          float s = sin(puff.z);
+          float c = cos(puff.z);
+          mv.xy += vec2(c * p.x - s * p.y, s * p.x + c * p.y);
+          gl_Position = projectionMatrix * mv;
+        }`,
+      fragmentShader: `
+        uniform sampler2D map;
+        uniform vec3 color;
+        varying vec2 vUv;
+        varying float vA;
+        void main() {
+          vec4 t = texture2D(map, vUv);
+          gl_FragColor = vec4(color * t.rgb, t.a * vA);
+          #include <colorspace_fragment>
+        }`,
+      transparent: true,
+      depthWrite: false,
+    });
+    const mesh = new THREE.Mesh(g, m);
+    mesh.frustumCulled = false;
+    world.add(mesh);
+    return { mitt: g.attributes.mitt, puff: g.attributes.puff };
+  })();
 
   // ---------- snusdosan ----------
 
@@ -1095,14 +1139,22 @@ async function props(pult, opt, root) {
   // glöden i världens (world) axlar, så att röken inte vrids med musen
   const toWorld = new THREE.Matrix4();
   function smoke(c, t) {
-    toWorld.copy(world.matrixWorld).invert().multiply(c.g.matrixWorld);
-    c.at.set(-1 - c.inner - 0.6, 1.2, 0).applyMatrix4(toWorld);
+    const M = ROK.mitt.array;
+    const F = ROK.puff.array;
+    if (c.on) {
+      toWorld.copy(world.matrixWorld).invert().multiply(c.g.matrixWorld);
+      c.at.set(-1 - c.inner - 0.6, 1.2, 0).applyMatrix4(toWorld);
+    }
     const base = Math.floor(t / SM.every);
-    c.puffs.forEach((sp, i) => {
+    for (let i = 0; i < SM.n; i++) {
+      const o = (c.n * SM.n + i) * 3;
       const k = base - i;
       const tb = k * SM.every;
       const age = t - tb;
-      if (!c.on || age < 0 || age > SM.life) { sp.visible = false; return; }
+      if (!c.on || age < 0 || age > SM.life) {
+        F[o] = F[o + 1] = 0;
+        continue;
+      }
       const life = age / SM.life;
       const seed = k * 7.13 + c.n * 31;
       // draget från fläkten under puffens liv, åt det håll fläkten pekar
@@ -1123,13 +1175,13 @@ async function props(pult, opt, root) {
       fp.x += curl + age * 1.2 + off.x;
       fp.z += Math.cos(age * 1.1 + tb) * age * 1.6 + off.z;
       fp.y += off.y;
-      sp.position.copy(fp);
-      const size = 1.8 + age * 4.4 + age * age * 0.7 + off.length() * 0.12;
-      sp.scale.set(size, size, 1);
-      sp.material.opacity = 0.62 * Math.min(1, age * 5) * (1 - life) ** 1.35 * (1 - clamp(off.length() / 140) * 0.5);
-      sp.material.rotation = hash(seed + 2) * 6 + age * 0.3;
-      sp.visible = true;
-    });
+      M[o] = fp.x;
+      M[o + 1] = fp.y;
+      M[o + 2] = fp.z;
+      F[o] = 1.8 + age * 4.4 + age * age * 0.7 + off.length() * 0.12;
+      F[o + 1] = 0.62 * Math.min(1, age * 5) * (1 - life) ** 1.35 * (1 - clamp(off.length() / 140) * 0.5);
+      F[o + 2] = hash(seed + 2) * 6 + age * 0.3;
+    }
   }
 
   const flicker = (t, s) => 0.78 + 0.14 * Math.sin(t * 7.3 + s) + 0.08 * Math.sin(t * 17.1 + s * 2);
@@ -1140,6 +1192,7 @@ async function props(pult, opt, root) {
     scene.updateMatrixWorld();
     // askan på cigaretten växer i 50 s och faller
     for (const c of cigs) {
+      smoke(c, t);
       if (!c.on) continue;
       const ph = ((t + c.n * 17) % 50) / 50;
       const L = 1 + 6 * ph;
@@ -1149,8 +1202,8 @@ async function props(pult, opt, root) {
       c.ring.material.color.setRGB(1, 0.32 + 0.14 * f, 0.1 * f);
       c.halo.material.opacity = 0.35 + 0.3 * f;
       c.halo.position.x = -1 - c.inner - 0.4;
-      smoke(c, t);
     }
+    ROK.mitt.needsUpdate = ROK.puff.needsUpdate = true;
     // fläkten: huvudet svänger, propellern snurrar, remsan fladdrar
     const ph = phiAt(t);
     swivel.rotation.y = Math.PI / 2 - ph;

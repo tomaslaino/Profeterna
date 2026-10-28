@@ -1262,12 +1262,46 @@ ${window.RumRegister ? RumRegister.nara() : ''}
   // räknade om stilen för hela rummet och målade om allt i varje bildruta
   // medan musen rörde sig – och hann inte rita det, så att väggen, bänken
   // och pulten blinkade svart.
+  const camT = (mx, my) => `translateZ(-330px) rotateX(${(-my * 2.6).toFixed(3)}deg) rotateY(${(mx * 4.5).toFixed(3)}deg) translateZ(330px)`;
   function setCam(mx, my) {
     const w = document.getElementById('rum-world');
     if (!w) return;
-    const t = `translateZ(-330px) rotateX(${(-my * 2.6).toFixed(3)}deg) rotateY(${(mx * 4.5).toFixed(3)}deg) translateZ(330px)`;
+    // (direkt: glider världen efter musen slutar den, se folj)
+    if (R.folj) {
+      w.classList.remove('foljer');
+      R.folj = null;
+    }
+    R.camVis = [mx, my];
+    const t = camT(mx, my);
     // (samma som förra gången: inget att räkna om)
     if (t !== R.cam) w.style.transform = R.cam = t;
+  }
+
+  // Kameran efter musen i Chrome, när den är hemma: att sätta vridningen i
+  // varje bild fick Chrome att räkna om alla rummets lager (~380) varje gång.
+  // I stället får världen ett nytt mål var 100:e ms och glider dit själv
+  // (.foljer i rum.css, FOLJ ms, så att nästa mål kommer innan den är
+  // framme) – medan en övergång pågår flyttar Chrome bara lagren, också i
+  // 60 bilder i sekunden när gänget ritas 15 gånger.
+  // Gänget och sakerna i 3D ritas med den vridning som syns (synlig).
+  const FOLJ = 180;
+  function folj(mx, my) {
+    const w = document.getElementById('rum-world');
+    if (!w) return;
+    const nu = performance.now();
+    if (R.folj && nu - R.folj.t < 100) return;
+    const t = camT(mx, my);
+    if (t === R.cam) return;
+    const fran = synlig(nu);
+    if (!R.folj) w.classList.add('foljer');
+    R.folj = { t: nu, a: fran, b: [mx, my] };
+    w.style.transform = R.cam = t;
+  }
+  function synlig(nu = performance.now()) {
+    const f = R.folj;
+    if (!f) return R.camVis || [R.mx, R.my];
+    const p = Math.min(1, (nu - f.t) / FOLJ);
+    return [f.a[0] + (f.b[0] - f.a[0]) * p, f.a[1] + (f.b[1] - f.a[1]) * p];
   }
 
   // Neonen glappar ibland: tider ur klockan, så att stillbilderna blir samma.
@@ -1317,7 +1351,12 @@ ${window.RumRegister ? RumRegister.nara() : ''}
       R.mx += (R.tx - R.mx) * f;
       R.my += (R.ty - R.my) * f;
     }
-    setCam(R.mx, R.my);
+    // (inte förrän kameran har glidit hem från en närbild: medan världen
+    // glider behåller Chrome lagrens upplösning, och den ska bli hemmets)
+    const hemma = R.el.classList.contains('chromium') && !calm() && !nara() && !R.el.classList.contains('sak-nara');
+    if (!hemma) R.borta = performance.now();
+    if (hemma && performance.now() - (R.borta || 0) > 1000) folj(R.mx, R.my);
+    else setCam(R.mx, R.my);
   }
 
   function frame(dt = 1000 / 30) {
@@ -1332,8 +1371,9 @@ ${window.RumRegister ? RumRegister.nara() : ''}
     }
     const damm = document.getElementById('rum-damm');
     if ((!calm() || still()) && syns(damm) && !damm.hidden) dust(t);
-    if (R.fig && syns(R.gang)) R.fig.draw(t, R.mx, R.my, on);
-    if (R.saker) R.saker.draw(t, R.mx, R.my, R.rows, R.old, syns(R.sakDuk));
+    const [vx, vy] = synlig();
+    if (R.fig && syns(R.gang)) R.fig.draw(t, vx, vy, on);
+    if (R.saker) R.saker.draw(t, vx, vy, R.rows, R.old, syns(R.sakDuk));
     if (R.inr) R.inr.draw();
     if (!calm()) uteTakt();
   }
@@ -1439,12 +1479,11 @@ ${window.RumRegister ? RumRegister.nara() : ''}
     } catch (err) { /* nästa besök börjar som vanligt */ }
   }
 
-  // Gatan utanför: benen, armarna, hjulen, löven, vingarna och flaggan sitter
-  // inne i SVG:er, så webbläsaren kan inte låta grafikkortet flytta dem –
-  // Chrome ritade om dem och räknade om alla rummets lager i varje bildruta.
-  // De står på paus och flyttas fram i samma takt som gänget (frame), så att
-  // det görs en gång per bild där i stället. Står gatan still (.vila) flyttas
-  // de inte.
+  // Gatan utanför: benen, armarna, hjulen, löven, vingarna och flaggan ritas
+  // i dukar i samma takt som gänget (takt i rum-ute.js). Rör sig något annat
+  // inne i en SVG där står det på paus och flyttas fram här: grafikkortet kan
+  // inte flytta det, och Chrome räknade om alla rummets lager i varje
+  // bildruta. Står gatan still (.vila) flyttas ingenting.
   function uteTakt() {
     const ute = document.getElementById('rum-ute');
     if (!ute || ute.classList.contains('vila')) return;
@@ -1460,6 +1499,7 @@ ${window.RumRegister ? RumRegister.nara() : ''}
       }
     }
     for (const a of R.uteAnim) a.currentTime = ms + a.bas;
+    if (window.RumUte && RumUte.takt) RumUte.takt(ute);
   }
 
   // CSS-animationerna (regnet, röken, hörnet) står still på samma tid som klockan.
@@ -1468,6 +1508,8 @@ ${window.RumRegister ? RumRegister.nara() : ''}
       a.pause();
       a.currentTime = t * 1000;
     }
+    // (gatans dukar på samma tid)
+    if (window.RumUte && RumUte.takt) RumUte.takt(document.getElementById('rum-ute'), t * 1000);
   }
 
   // ---------- utsikten ----------
@@ -2826,7 +2868,7 @@ ${window.RumRegister ? RumRegister.nara() : ''}
       if (nara()) return;
       P.spar.push([e.timeStamp, e.clientX, e.clientY]);
       if (P.spar.length > 5) P.spar.shift();
-      pan(P.px - frac(dx, R.k * W - innerWidth), P.py - frac(dy, R.k * H - innerHeight));
+      pan(P.px - frac(dx, R.k * W - innerWidth), P.py - frac(dy, R.k * H - innerHeight), true);
     });
     el.addEventListener('pointerup', (e) => {
       if (e.pointerId !== P.id) return;
@@ -2859,7 +2901,7 @@ ${window.RumRegister ? RumRegister.nara() : ''}
       const step = (t) => {
         const ms = t - last;
         last = t;
-        pan(R.px - frac(vx * ms, R.k * W - innerWidth), R.py - frac(vy * ms, R.k * H - innerHeight));
+        pan(R.px - frac(vx * ms, R.k * W - innerWidth), R.py - frac(vy * ms, R.k * H - innerHeight), true);
         vx *= 0.995 ** ms;
         vy *= 0.995 ** ms;
         if (R.on && !nara() && Math.hypot(vx, vy) > 0.02) P.raf = requestAnimationFrame(step);
@@ -2876,15 +2918,28 @@ ${window.RumRegister ? RumRegister.nara() : ''}
   }
 
   // Scenen förskjuten i fönstret: px och py (0–1) säger var i det som inte
-  // ryms man står, i sidled och på höjden.
-  function pan(px, py) {
+  // ryms man står, i sidled och på höjden. drag: fingret drar (eller scenen
+  // glider vidare efter det) – då glider scenen dit på 50 ms i Chrome (.drar
+  // i rum.css), som kameran efter musen (folj): att flytta den direkt fick
+  // Chrome att räkna om alla rummets lager vid varje rörelse.
+  function pan(px, py, drag) {
     const ow = R.k * W - innerWidth;
     const oh = R.k * H - innerHeight;
     R.px = ow > 1 ? Math.min(1, Math.max(0, px)) : 0.5;
     R.py = oh > 1 ? Math.min(1, Math.max(0, py)) : 0.5;
     R.ox = -ow * R.px;
     R.oy = -oh * R.py;
-    R.el.querySelector('.rum-stage').style.transform = `translate(${R.ox.toFixed(1)}px, ${R.oy.toFixed(1)}px) scale(${R.k.toFixed(4)})`;
+    const s = R.el.querySelector('.rum-stage');
+    const glid = drag && R.el.classList.contains('chromium') && !calm();
+    if (glid) {
+      s.classList.add('drar');
+      clearTimeout(R.drar);
+      R.drar = setTimeout(() => s.classList.remove('drar'), 150);
+    } else if (s.classList.contains('drar')) {
+      clearTimeout(R.drar);
+      s.classList.remove('drar');
+    }
+    s.style.transform = `translate(${R.ox.toFixed(1)}px, ${R.oy.toFixed(1)}px) scale(${R.k.toFixed(4)})`;
   }
 
   function wire() {

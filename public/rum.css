@@ -24,6 +24,8 @@ html.i-rummet body > footer { display: none; }
   transition: opacity 0.42s ease-in;
 }
 .rum.dyker .rum-stage { opacity: 0; }
+/* medan fingret drar i Chrome (pan i rum.js) */
+.rum.chromium .rum-stage.drar { transition: opacity 0.42s ease-in, transform 0.05s linear; }
 
 /* kameran: förstoringen när man går fram till något (2D, efter perspektivet);
    aim i rum.js sätter transformen direkt, inte som variabler */
@@ -306,6 +308,8 @@ a.rum-sak, a.rum-sak:hover { color: inherit; text-decoration: none; }
 }
 /* rummet vrids rakt medan kameran går fram till en sak */
 .rum.sak-nara .rum-world { transition: transform 0.6s cubic-bezier(0.3, 0, 0.2, 1); }
+/* och glider efter musen i Chrome (folj i rum.js: ett nytt mål var 100:e ms) */
+.rum.chromium:not(.sak-nara) .rum-world.foljer { transition: transform 0.18s linear; }
 /* gänget och pulten går kameran förbi på vägen fram */
 .rum-pl.forbi, .rum-pl3d > .rum-inr { transition: opacity 0.5s; }
 .rum.sak-nara .rum-pl.forbi, .rum.sak-nara .rum-pl3d > .rum-inr { opacity: 0; transition-duration: 0.25s; }

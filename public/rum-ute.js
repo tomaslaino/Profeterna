@@ -676,6 +676,282 @@ window.RumUte = (() => {
     ['fall', 'div', 'rum-layer rum-fall'], ['glas', 'div', 'rum-layer rum-glas'],
   ];
 
+  // ---------- det som rör sig, i dukar ----------
+  //
+  // De som går, cyklar och åker förbi, löven, fåglarna och flaggan ritas var
+  // och en i en liten duk i stället för som SVG med ben och armar som vrids.
+  // Att vrida något inne i en SVG fick Chrome att räkna om alla rummets lager
+  // (PaintArtifactCompositor::Update) varje gång, och oskärpan på varje SVG
+  // var ett eget pass på grafikkortet i varje bildruta. Duken glider över
+  // gatan som förut (CSS-animationen i rum-ute.css, på grafikkortet), och
+  // ställningen ritas om i gängets takt (takt, från rum.js) med oskärpan i
+  // ritningen; molnen ritas en gång. Bara det som syns genom fönstret och
+  // dörren ritas om. Utan ctx.filter (äldre Safari) får duken oskärpan i CSS.
+
+  const FILTER = (() => {
+    try { return typeof document.createElement('canvas').getContext('2d').filter === 'string'; } catch { return false; }
+  })();
+
+  // ease-in-out
+  const IO = (() => {
+    const b = (t, p, q) => 3 * p * t * (1 - t) * (1 - t) + 3 * q * t * t * (1 - t) + t * t * t;
+    return (x) => {
+      let lo = 0;
+      let hi = 1;
+      let t = x;
+      for (let i = 0; i < 16; i++) {
+        if (b(t, 0.42, 0.58) < x) lo = t;
+        else hi = t;
+        t = (lo + hi) / 2;
+      }
+      return b(t, 0, 1);
+    };
+  })();
+
+  // Rörelserna inne i figurerna (klassen i SVG:n): vad som ändras (m: rot
+  // vrids, ty gungar, sy viker sig, vaj vajar, op blinkar), från a till b
+  // på d ms, fram och tillbaka (alt) eller runt, f ms före (b2 i otakt),
+  // kring o. steg är stegets längd (--steg).
+  function rorelse(e, steg) {
+    const k = e.classList;
+    const egen = (parseFloat(e.style.animationDuration) || 1) * 1000;
+    if (k.contains('gung')) return { m: 'ty', a: 0, b: -0.8, d: steg / 2, alt: 1 };
+    if (k.contains('ben')) {
+      const d = steg * (k.contains('fort') ? 0.6 : 1);
+      return { m: 'rot', a: 24, b: -24, d, f: k.contains('b2') ? d : 0, alt: 1 };
+    }
+    if (k.contains('arm')) return { m: 'rot', a: -18, b: 18, d: steg, f: steg, alt: 1 };
+    if (k.contains('hjul')) return { m: 'rot', a: 0, b: 360, d: 500 };
+    // lövet snurrar kring sin mitt, vingen viker sig kring sin och flaggan
+    // vajar från stången
+    if (k.contains('snurr')) return { m: 'rot', a: 0, b: 360, d: egen };
+    if (k.contains('vinge')) return { m: 'sy', a: 1, b: -0.5, d: egen, alt: 1, o: [0, -0.75] };
+    if (k.contains('vaj')) return { m: 'vaj', a: 0, b: 1, d: egen, alt: 1 };
+    if (k.contains('blink')) return { m: 'op', d: 900 };
+    return null;
+  }
+
+  // rörelsen r efter t ms: [a, b, c, d, e, f] (eller genomskinligheten)
+  function las(r, t) {
+    const x = (t + (r.f || 0)) / r.d;
+    let p = x - Math.floor(x);
+    if (r.m === 'op') return p < 0.5 ? 1 : 0.1;
+    if (r.alt) {
+      if (Math.floor(x) % 2) p = 1 - p;
+      p = IO(p);
+    }
+    const v = r.a + (r.b - r.a) * p;
+    if (r.m === 'ty') return [1, 0, 0, 1, 0, v];
+    if (r.m === 'sy') return [1, 0, 0, v, 0, r.o[1] * (1 - v)];
+    if (r.m === 'vaj') {
+      const sx = 0.92 + 0.08 * v;
+      return [sx, sx * Math.tan((-5 + 9 * v) * Math.PI / 180), 0, 1, 0, 0];
+    }
+    const c = Math.cos(v * Math.PI / 180);
+    const s = Math.sin(v * Math.PI / 180);
+    return [c, s, -s, c, 0, 0];
+  }
+
+  // W[o…] = A[i…] · B
+  const mul = (A, i, B, W, o) => {
+    const a = A[i];
+    const b = A[i + 1];
+    const c = A[i + 2];
+    const d = A[i + 3];
+    const e = A[i + 4];
+    const f = A[i + 5];
+    W[o] = a * B[0] + c * B[1];
+    W[o + 1] = b * B[0] + d * B[1];
+    W[o + 2] = a * B[2] + c * B[3];
+    W[o + 3] = b * B[2] + d * B[3];
+    W[o + 4] = a * B[4] + c * B[5] + e;
+    W[o + 5] = b * B[4] + d * B[5] + f;
+  };
+  const ETT = [1, 0, 0, 1, 0, 0];
+
+  // formen av ett SVG-element som Path2D (eller null)
+  function form(k) {
+    const n = (a) => parseFloat(k.getAttribute(a)) || 0;
+    const p = new Path2D();
+    switch (k.localName) {
+      case 'rect': {
+        const [x, y, w, h] = [n('x'), n('y'), n('width'), n('height')];
+        const r = Math.min(n('rx') || n('ry'), w / 2, h / 2);
+        if (r > 0 && p.roundRect) p.roundRect(x, y, w, h, r);
+        else p.rect(x, y, w, h);
+        return p;
+      }
+      case 'circle': p.ellipse(n('cx'), n('cy'), n('r'), n('r'), 0, 0, 2 * Math.PI); return p;
+      case 'ellipse': p.ellipse(n('cx'), n('cy'), n('rx'), n('ry'), 0, 0, 2 * Math.PI); return p;
+      case 'line': p.moveTo(n('x1'), n('y1')); p.lineTo(n('x2'), n('y2')); return p;
+      case 'path': return new Path2D(k.getAttribute('d') || '');
+      case 'polygon': case 'polyline': {
+        const v = (k.getAttribute('points') || '').trim().split(/[\s,]+/).map(Number);
+        for (let i = 0; i + 1 < v.length; i += 2) (i ? p.lineTo : p.moveTo).call(p, v[i], v[i + 1]);
+        if (k.localName === 'polygon') p.closePath();
+        return p;
+      }
+      default: return null;
+    }
+  }
+
+  // SVG:ns delar i ordning: förälder, egen transform eller rörelse,
+  // genomskinlighet och formen med färgerna (som ärvs från <g>)
+  function delar(svg, steg) {
+    const N = [];
+    const ARV = { fill: '#000', stroke: 'none', 'stroke-width': '1', 'stroke-linecap': 'butt', 'stroke-linejoin': 'miter', 'fill-opacity': '1', 'stroke-opacity': '1', 'fill-rule': 'nonzero', 'font-size': '16', 'font-family': 'sans-serif', 'text-anchor': 'start' };
+    const ga = (e, p, arv) => {
+      for (const k of e.children) {
+        const a = { ...arv };
+        for (const x in a) if (k.hasAttribute(x)) a[x] = k.getAttribute(x);
+        const n = { p, m: null, r: k.classList.length ? rorelse(k, steg) : null, al: k.hasAttribute('opacity') ? parseFloat(k.getAttribute('opacity')) : 1, op: null };
+        if (!n.r || n.r.m === 'op') {
+          const t = k.transform && k.transform.baseVal;
+          if (t && t.numberOfItems) {
+            const x = t.consolidate().matrix;
+            n.m = [x.a, x.b, x.c, x.d, x.e, x.f];
+          }
+        }
+        if (k.localName === 'text') n.op = { text: k.textContent, x: parseFloat(k.getAttribute('x')) || 0, y: parseFloat(k.getAttribute('y')) || 0, font: `${parseFloat(a['font-size'])}px ${a['font-family']}`, align: { middle: 'center', end: 'right' }[a['text-anchor']] || 'left', fill: a.fill };
+        else {
+          const f = form(k);
+          if (f) n.op = { f, fill: a.fill, stroke: a.stroke, lw: parseFloat(a['stroke-width']), cap: a['stroke-linecap'], join: a['stroke-linejoin'], fo: parseFloat(a['fill-opacity']), so: parseFloat(a['stroke-opacity']), rule: a['fill-rule'] };
+        }
+        N.push(n);
+        if (k.localName === 'g') ga(k, N.length - 1, a);
+      }
+    };
+    ga(svg, -1, ARV);
+    return N;
+  }
+
+  // en delad duk där figuren ritas skarp innan oskärpan läggs på
+  let KLADD = null;
+  function kladd(w, h) {
+    if (!KLADD) KLADD = document.createElement('canvas').getContext('2d');
+    const c = KLADD.canvas;
+    if (c.width < w || c.height < h) {
+      c.width = Math.max(c.width, w);
+      c.height = Math.max(c.height, h);
+    }
+    return KLADD;
+  }
+
+  // figuren f i ställningen efter t ms
+  function rita(f, t) {
+    const g = f.bakad ? kladd(f.bw, f.bh) : f.x;
+    g.setTransform(1, 0, 0, 1, 0, 0);
+    g.globalAlpha = 1;
+    g.clearRect(0, 0, f.bw, f.bh);
+    g.save();
+    g.beginPath();
+    g.rect(f.P * f.s, f.P * f.s, f.w * f.s, f.h * f.s);
+    g.clip();
+    const { N, W, A } = f;
+    for (let i = 0; i < N.length; i++) {
+      const n = N[i];
+      const L = n.r && n.r.m !== 'op' ? las(n.r, t) : n.m || ETT;
+      if (n.p < 0) mul(f.B, 0, L, W, i * 6);
+      else mul(W, n.p * 6, L, W, i * 6);
+      A[i] = (n.p < 0 ? 1 : A[n.p]) * n.al * (n.r && n.r.m === 'op' ? las(n.r, t) : 1);
+      const o = n.op;
+      if (!o || !(A[i] > 0)) continue;
+      g.setTransform(W[i * 6], W[i * 6 + 1], W[i * 6 + 2], W[i * 6 + 3], W[i * 6 + 4], W[i * 6 + 5]);
+      if (o.text != null) {
+        g.globalAlpha = A[i];
+        g.font = o.font;
+        g.textAlign = o.align;
+        g.fillStyle = o.fill;
+        g.fillText(o.text, o.x, o.y);
+        continue;
+      }
+      if (o.fill !== 'none') {
+        g.globalAlpha = A[i] * o.fo;
+        g.fillStyle = o.fill;
+        g.fill(o.f, o.rule === 'evenodd' ? 'evenodd' : 'nonzero');
+      }
+      if (o.stroke !== 'none' && o.lw > 0) {
+        g.globalAlpha = A[i] * o.so;
+        g.strokeStyle = o.stroke;
+        g.lineWidth = o.lw;
+        g.lineCap = o.cap;
+        g.lineJoin = o.join;
+        g.stroke(o.f);
+      }
+    }
+    g.restore();
+    if (f.bakad) {
+      f.x.clearRect(0, 0, f.bw, f.bh);
+      f.x.drawImage(g.canvas, 0, 0, f.bw, f.bh, 0, 0, f.bw, f.bh);
+    }
+  }
+
+  // Byter lagrets SVG:er som rör sig inuti eller är suddiga mot dukar.
+  // s: duken i bildpunkter per px.
+  function duka(lager, s) {
+    const ut = [];
+    for (const svg of [...lager.querySelectorAll(':scope > svg')]) {
+      const ror = svg.querySelector('.gung, .ben, .arm, .hjul, .blink, .snurr, .vinge, .vaj');
+      const m = /blur\(([\d.]+)px\)/.exec(getComputedStyle(svg).filter);
+      const blur = m ? parseFloat(m[1]) : 0;
+      if (!ror && !blur) continue;
+      const vb = (svg.getAttribute('viewBox') || '').split(/[\s,]+/).map(Number);
+      const w = parseFloat(svg.getAttribute('width'));
+      const h = parseFloat(svg.getAttribute('height'));
+      if (vb.length !== 4 || !(w > 0) || !(h > 0)) continue;
+      const st = svg.style;
+      const steg = (parseFloat(st.getPropertyValue('--steg')) || 0.9) * 1000;
+      // molnen är så suddiga att det räcker med en bildpunkt per px
+      const sk = blur >= 3 ? Math.min(1, s) : s;
+      const bakad = FILTER && blur > 0;
+      const P = bakad ? Math.ceil(blur * 3) : 0;
+      const c = document.createElement('canvas');
+      c.setAttribute('class', `${svg.getAttribute('class')} duk${bakad ? ' bakad' : ''}`);
+      c.setAttribute('aria-hidden', 'true');
+      c.style.cssText = `${svg.getAttribute('style') || ''}; width:${w + 2 * P}px; height:${h + 2 * P}px; margin:${-P}px 0 0 ${-P}px`;
+      const bw = Math.ceil((w + 2 * P) * sk);
+      const bh = Math.ceil((h + 2 * P) * sk);
+      c.width = bw;
+      c.height = bh;
+      const x = c.getContext('2d');
+      if (bakad) x.filter = `blur(${r1(blur * sk * 10) / 10}px)`;
+      const N = delar(svg, steg);
+      const sx = (w / vb[2]) * sk;
+      const sy = (h / vb[3]) * sk;
+      const f = {
+        c, x, N, W: new Float64Array(N.length * 6), A: new Float64Array(N.length), B: [sx, 0, 0, sy, (P - vb[0] * w / vb[2]) * sk, (P - vb[1] * h / vb[3]) * sk],
+        w, h, P, s: sk, bw, bh, bakad, ror: Boolean(ror), t0: document.timeline.currentTime || 0,
+        // var den är på gatan: left + translateX från fran till till (löven från −40 till --x1)
+        x0: parseFloat(st.left) || 0,
+        fran: svg.classList.contains('rum-lov') ? -40 : parseFloat(st.getPropertyValue('--fran')) || 0,
+        till: svg.classList.contains('rum-lov') ? parseFloat(st.getPropertyValue('--x1')) || 0 : parseFloat(st.getPropertyValue('--till')) || 0,
+        glid: /rum-(gar|fagel|moln|lov)/.test(svg.getAttribute('class')),
+      };
+      rita(f, 0);
+      svg.replaceWith(c);
+      if (f.ror) ut.push(f);
+    }
+    return ut;
+  }
+
+  // Ställningarna efter t ms (rum.js: i gängets takt, eller den fasta
+  // tiden i en stillbild); bara det som syns genom fönstret och dörren.
+  function takt(el, t) {
+    if (!el || !el._duk) return;
+    const [X0, X1] = el._x || [-Infinity, Infinity];
+    for (const f of el._duk) {
+      if (f.glid) {
+        if (f.a === undefined) f.a = f.c.getAnimations ? f.c.getAnimations()[0] || null : null;
+        const p = f.a && f.a.effect ? f.a.effect.getComputedTiming().progress : null;
+        if (p != null) {
+          const x = f.x0 + f.fran + (f.till - f.fran) * p;
+          if (x + f.w + f.P < X0 || x - f.P > X1) continue;
+        }
+      }
+      rita(f, t == null ? (document.timeline.currentTime || 0) - f.t0 : t);
+    }
+  }
+
   // el: utsiktens lager i rum.js; rects: fönstrets och dörrens glas
   function paint(el, v, rects) {
     if (!el) return false;
@@ -694,14 +970,23 @@ window.RumUte = (() => {
     sig.blixt = String(v.slag === 'aska');
     const draw = { himmel: () => himmel(v, L), himliv: () => himmelsliv(v, L), gata: () => gata(v, L), liv: () => gatliv(v, L), fall: () => fall(v), glas: () => glas(v, rects), blixt: () => (v.slag === 'aska' ? '<i></i><i class="b2"></i>' : '') };
     let changed = false;
+    // dukarna: bildpunkter per px som utsikten syns (högst 2), och det som
+    // syns genom fönstret och dörren (med marginal)
+    const skala = el.getBoundingClientRect().width / 1600;
+    const s = Math.min(2, Math.max(1, (window.devicePixelRatio || 1) * (skala > 0 ? skala : 1)));
+    if (rects && rects.length) el._x = [Math.min(...rects.map((r) => r.x)) - 60, Math.max(...rects.map((r) => r.x + r.w)) + 60];
+    el._dukar = el._dukar || {};
     for (const [k] of LAGER) {
       if (el._sig[k] === sig[k]) continue;
       el._sig[k] = sig[k];
-      el.querySelector(`[data-lager="${k}"]`).innerHTML = draw[k]();
+      const x = el.querySelector(`[data-lager="${k}"]`);
+      x.innerHTML = draw[k]();
+      if (k === 'liv' || k === 'himliv') el._dukar[k] = duka(x, s);
       changed = true;
     }
+    el._duk = [...(el._dukar.liv || []), ...(el._dukar.himliv || [])];
     return changed;
   }
 
-  return { paint, light };
+  return { paint, light, takt };
 })();
