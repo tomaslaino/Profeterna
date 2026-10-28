@@ -1826,9 +1826,10 @@ sidan byts; oraklet, skårtavlan, uret och VM 94-affischen tittar man först på
 
 - **Omgångens orakel** (tavlan under stationsuret) → närbild → Olympen: oraklet som regerar
   (`Kronan.holders`) som i Olympen och på förstasidans polaroid (`Kronan.scene`) – det
-  urklippta fotot på marmorsockeln med lagerkransen som glimmar och strålarna som vrider
-  sig – bakom glaset i en förgylld ram i 3D med pärlstav, rosetter i hörnen och en palmett
-  överst. Ett skimmer drar snett över glaset var elfte sekund. Mässingsskylten under säger
+  urklippta fotot på marmorsockeln med lagerkransen (som inte glimmar här, se [När datorn
+  inte hinner med](#när-datorn-inte-hinner-med)) och strålarna som vrider sig – bakom
+  glaset i en förgylld ram i 3D med pärlstav, rosetter i hörnen och en palmett överst. Ett
+  skimmer drar snett över glaset var elfte sekund. Mässingsskylten under säger
   *Omgångens orakel* och hela efternamnet (delat: *Laino & Johansson*, i mindre stil), och
   ramen och skylten lyser med när man pekar på dem.
 - **Pokalhyllan** (högra väggen) → Olympen: en liten pokal per vunnen omgång i vinnarens
@@ -2214,7 +2215,9 @@ Därför:
 - **3D-delarna** (gänget, sakerna, inredningen och kortlådan) ritas i telefonen med 1,5
   bildpunkter per punkt, utan kantutjämning och med skuggkartor på 1024 i stället för 2048
   (`LATT`). Gängets ansikten ritas där i halva storleken (512 × 576), och gänget sparar
-  ingen extra kopia av bilden (`preserveDrawingBuffer`).
+  ingen extra kopia av bilden (`preserveDrawingBuffer`). Telefonen börjar dessutom på steg 1
+  (se [När datorn inte hinner med](#när-datorn-inte-hinner-med)), där gänget och sakerna
+  ritas med 1,1 bildpunkter per punkt, 20 gånger i sekunden och med färre trianglar.
 
 Mätt i Safaris motor (WKWebView, täthet 2) i 390 × 664 före planen, tv:n, videon och
 blobarna: från ungefär 1,9 GB till 1,1–1,3 GB. Med WebKits eget lagerträd (WebKitGTK, via
@@ -2229,6 +2232,54 @@ toningen, skuggkartorna, ljuset i 128 och pauserna): täthet 2 ungefär 0,59 GB 
 laddningen och 0,75 GB i topp, täthet 3 ungefär 0,75–0,80 och 1,03–1,07 GB – och när man går
 fram till kupongen, tv:n, videon, uret, anslagstavlan och kortregistret högst ungefär 0,87
 respektive 1,19 GB (förut 1,4–1,6 GB i täthet 3).
+
+### När datorn inte hinner med
+
+Rummet känner själv av om datorn eller telefonen hinner med (`kanna` i rum.js) och går då
+ner ett steg (`KVAL`, steg 0–2). Bilderna räknas i två sekunder åt gången medan rummet står
+för sig självt – inte medan kameran är framme vid något, inte medan 3D-delarna startar och
+inte när fliken är dold – och kommer det färre än 45 bilder i sekunden, eller är mer än var
+tionde bild längre än 50 ms, två perioder i rad tas ett steg ner.
+
+- **Steg 1:** gänget och sakerna på pulten ritas 20 gånger i sekunden i stället för 30, med
+  tre fjärdedelar av bildpunkterna på ledden och skuggorna omräknade varannan bild (`kval` i
+  rum-3d.js och rum-saker.js). Gänget byggs av ungefär 310 000 trianglar i stället för
+  745 000 – håret, huvudena och de runda delarna med färre segment (`seg` i rum-3d.js;
+  glansen i håret blir lite kantigare) – och byggs om på stället som när kläderna byts.
+  Kameran vrids efter musen i samma takt som gänget i stället för i varje bildruta.
+- **Steg 2:** 15 gånger i sekunden, 55 % av bildpunkterna på ledden (aldrig under 0,75 per
+  punkt), skuggorna var fjärde bild, ungefär 240 000 trianglar och inget damm i ljuset.
+
+Steget sparas i webbläsaren (`rum-kval` i localStorage), så att nästa besök börjar där, i tre
+dagar. I telefonen börjar rummet på steg 1. `?rum-kval=0` (`1`, `2`) väljer steget och låser
+det, också med `?rum-t` (som annars har steg 0).
+
+Gänget var det tyngsta för grafikkortet: drygt 700 000 trianglar med klarlack och
+sammetsglans, ritade två gånger per bild (en gång till för skuggorna) 30 gånger i sekunden.
+Med mjukvarugrafik (SwiftShader, som en svag grafikkrets) var det gänget som höll nere
+bilderna, och mer trianglarna än bildpunkterna.
+
+Också på steg 0 räknade Chrome om alla rummets lager (`PaintArtifactCompositor::Update`) i
+varje bildruta, ungefär en millisekund per gång på en snabb dator och flera i en telefon:
+
+- **Gatan utanför:** fotgängarnas ben och armar, hjulen, löven, fåglarnas vingar och flaggan
+  rör sig inne i SVG:er, som grafikkortet inte kan flytta själv. De står nu på paus och flyttas
+  fram i samma takt som gänget (`uteTakt` i rum.js), en gång per bild där.
+- **Myrornas krig** i videon (`.vhs-brus`) rörde sig också när det var dolt; nu bara när det
+  syns.
+- **Lagerkransen** bakom oraklet pulserade med en skugga (`kr-glint` i kronan.css); i rummet
+  står den still.
+- **Neonen:** glappet satte en klass på hela rummet, så att stilen räknades om för alla element
+  varje gång; nu sitter den på neonen och skenet (`.av` i rum.css).
+- Dagens frö för sakerna på pulten räknades 30 gånger i sekunden; nu en gång i minuten.
+
+Mätt i headless Chrome (Apple M5) med processorn fyra gånger långsammare: huvudtrådens tid
+på håll med musen stilla 750 → 570 ms per sekund på steg 0, och med musen i rörelse 900 → 860
+(steg 0), 600 (steg 1) och 500 (steg 2). Som telefon (390 × 664, täthet 3, fingret drar,
+steg 1): från 50 bilder i sekunden med huvudtråden fullt upptagen (950 ms/s) till 60 bilder
+och 450 ms/s. Med SwiftShader i 1366 × 768: 1,7 → 2,5 (steg 1) och 2,9 bilder i sekunden
+(steg 2), och rummet gick själv ner till steg 2 på en halv minut. En snabb dator stannar på
+steg 0.
 
 ### Utsikten och vädret
 

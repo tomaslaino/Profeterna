@@ -91,7 +91,7 @@ export async function inredning(el, opt = {}) {
   function bit(namn, cam, parent) {
     const { box } = BITAR[namn];
     const canvas = document.createElement('canvas');
-    // neonen glappar som förut (rum-neon, .neon-av i rum.css)
+    // neonen glappar som förut (rum-neon, .av i rum.css)
     canvas.className = `rum-inr${namn === 'neon' ? ' rum-neon' : ''}`;
     canvas.width = Math.round(box.w * DPR);
     canvas.height = Math.round(box.h * DPR);

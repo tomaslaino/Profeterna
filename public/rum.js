@@ -1303,7 +1303,8 @@ ${window.RumRegister ? RumRegister.nara() : ''}
   // dt millisekunder sedan förra gången. Den följer i varje bildruta
   // (loop), så att vridningen flyter också på skärmar med 60 eller 120
   // bilder i sekunden – att vrida världen ritar inte om något – medan gänget
-  // och sakerna i 3D ritas 30 gånger i sekunden (frame).
+  // och sakerna i 3D ritas 30 gånger i sekunden (frame). När datorn inte
+  // hinner med följer den gänget i stället (KVAL).
   function kamera(dt) {
     // med fingret vrids kameran efter var i rummet man står (pan)
     if (R.pek !== 'mouse' && !nara()) {
@@ -1325,29 +1326,140 @@ ${window.RumRegister ? RumRegister.nara() : ''}
     const on = neonOn(t);
     if (on !== R.neon) {
       R.neon = on;
-      R.el.classList.toggle('neon-av', !on);
+      // på neonen och dess sken, inte på hela rummet: en klass på .rum
+      // räknade om stilen för alla element i rummet varje gång den glappade
+      for (const e of R.el.querySelectorAll('.rum-neon, .rum-neonhalo, .rum-neonglow')) e.classList.toggle('av', !on);
     }
-    if ((!calm() || still()) && syns(document.getElementById('rum-damm'))) dust(t);
+    const damm = document.getElementById('rum-damm');
+    if ((!calm() || still()) && syns(damm) && !damm.hidden) dust(t);
     if (R.fig && syns(R.gang)) R.fig.draw(t, R.mx, R.my, on);
     if (R.saker) R.saker.draw(t, R.mx, R.my, R.rows, R.old, syns(R.sakDuk));
     if (R.inr) R.inr.draw();
+    if (!calm()) uteTakt();
   }
 
   function loop() {
     cancelAnimationFrame(R.raf);
     let prev = 0;
+    let dt = 0;
     const tick = (ms) => {
       if (!R.on) return;
-      const dt = prev ? Math.min(100, ms - prev) : 1000 / 60;
+      const raw = prev ? ms - prev : 0;
+      dt += prev ? raw : 1000 / 60;
       prev = ms;
-      // 30 bilder i sekunden räcker för gänget och sakerna; kameran i varje
-      if (ms - R.last > 30) {
+      // gänget och sakerna 30 gånger i sekunden (eller glesare, KVAL);
+      // kameran i varje bildruta, utom när datorn inte hinner med
+      const K = KVAL[R.kval];
+      if (ms - R.last > 1000 / K.takt - 4) {
         R.last = ms;
-        frame(dt);
-      } else kamera(dt);
+        frame(Math.min(100, dt));
+        dt = 0;
+      } else if (K.vrid) {
+        kamera(Math.min(100, dt));
+        dt = 0;
+      }
+      if (raw) kanna(ms, raw);
       R.raf = requestAnimationFrame(tick);
     };
     R.raf = requestAnimationFrame(tick);
+  }
+
+  // ---------- kvaliteten ----------
+
+  // Rummet känner av om datorn eller telefonen hinner med (kanna): kommer
+  // det färre än 45 bilder i sekunden, eller hackar det, går det ner ett
+  // steg – gänget och sakerna i 3D ritas glesare och med färre bildpunkter,
+  // skuggorna räknas om mer sällan, gatan utanför rör sig i färre steg och
+  // dammet i ljuset försvinner. Steget sparas, så att nästa besök börjar där
+  // (i tre dagar). I telefonen börjar rummet på steg 1. ?rum-kval=0|1|2
+  // väljer steget och låser det; en fast bild (?rum-t) har annars allt.
+  // takt: bilder i sekunden för 3D-delarna och gatan, pr: bildpunkterna i
+  // 3D (gånger de vanliga), skugga: skuggorna räknas om var så många bilder,
+  // detalj: gänget byggs av så många trianglar (gånger de vanliga), vrid:
+  // kameran vrids efter musen i varje bildruta (annars i takten – Chrome
+  // räknar om alla rummets lager varje gång världen vrids)
+  const KVAL = [
+    { takt: 30, pr: 1, skugga: 1, detalj: 1, damm: true, vrid: true },
+    { takt: 20, pr: 0.75, skugga: 2, detalj: 0.6, damm: true, vrid: false },
+    { takt: 15, pr: 0.55, skugga: 4, detalj: 0.45, damm: false, vrid: false },
+  ];
+  const KVAL_NYCKEL = 'rum-kval';
+  R.kval = 0;
+  if (R.q.has('rum-kval')) {
+    R.kval = Math.max(0, Math.min(KVAL.length - 1, Math.round(Number(R.q.get('rum-kval'))) || 0));
+    R.kvalLas = true;
+  } else if (R.q.has('rum-t')) R.kvalLas = true;
+  else {
+    R.kval = LATT ? 1 : 0;
+    try {
+      const s = JSON.parse(localStorage.getItem(KVAL_NYCKEL) || 'null');
+      if (s && Date.now() - s.t < 3 * 864e5) R.kval = Math.max(R.kval, Math.min(KVAL.length - 1, s.k | 0));
+    } catch (err) { /* utan lagring börjar rummet som vanligt */ }
+  }
+
+  // steget till 3D-delarna och dammet (också när de har startat, three)
+  function kval(k) {
+    R.kval = k;
+    const K = KVAL[k];
+    for (const x of [R.fig, R.saker]) if (x && x.kval) x.kval(K);
+    const damm = document.getElementById('rum-damm');
+    if (damm && damm.hidden === K.damm) {
+      damm.hidden = !K.damm;
+      if (!K.damm) damm.getContext('2d').clearRect(0, 0, damm.width, damm.height);
+    }
+  }
+
+  // Bilderna räknas i två sekunder åt gången medan rummet står för sig
+  // självt – inte medan kameran är framme vid något eller på väg tillbaka,
+  // inte medan 3D-delarna startar och inte när fliken är dold – och två
+  // dåliga perioder i rad tar ett steg ner.
+  function kanna(ms, dt) {
+    if (R.kvalLas || R.kval >= KVAL.length - 1) return;
+    const K = R.kanna || (R.kanna = { fran: ms + 5000, n: 0, sum: 0, hack: 0, daliga: 0 });
+    if (document.hidden || dt > 2000 || nara() || !R.fig || (LATT && (R.turGar || TUR.length))) {
+      K.fran = Math.max(K.fran, ms + 1500);
+      K.n = K.sum = K.hack = 0;
+      return;
+    }
+    if (ms < K.fran) return;
+    K.n++;
+    K.sum += dt;
+    if (dt > 50) K.hack++;
+    if (K.sum < 2000) return;
+    const dalig = (K.n / K.sum) * 1000 < 45 || K.hack > K.n * 0.1;
+    K.daliga = dalig ? K.daliga + 1 : 0;
+    K.n = K.sum = K.hack = 0;
+    if (K.daliga < 2) return;
+    // ett steg ner, och en stund innan det räknas igen
+    K.daliga = 0;
+    K.fran = ms + 3000;
+    kval(R.kval + 1);
+    try {
+      localStorage.setItem(KVAL_NYCKEL, JSON.stringify({ k: R.kval, t: Date.now() }));
+    } catch (err) { /* nästa besök börjar som vanligt */ }
+  }
+
+  // Gatan utanför: benen, armarna, hjulen, löven, vingarna och flaggan sitter
+  // inne i SVG:er, så webbläsaren kan inte låta grafikkortet flytta dem –
+  // Chrome ritade om dem och räknade om alla rummets lager i varje bildruta.
+  // De står på paus och flyttas fram i samma takt som gänget (frame), så att
+  // det görs en gång per bild där i stället. Står gatan still (.vila) flyttas
+  // de inte.
+  function uteTakt() {
+    const ute = document.getElementById('rum-ute');
+    if (!ute || ute.classList.contains('vila')) return;
+    const ms = document.timeline.currentTime;
+    if (!R.uteAnim) {
+      R.uteAnim = ute.getAnimations({ subtree: true }).filter((a) => {
+        const e = a.effect && a.effect.target;
+        return e instanceof SVGElement && !(e instanceof SVGSVGElement);
+      });
+      for (const a of R.uteAnim) {
+        a.pause();
+        a.bas = a.currentTime - ms;
+      }
+    }
+    for (const a of R.uteAnim) a.currentTime = ms + a.bas;
   }
 
   // CSS-animationerna (regnet, röken, hörnet) står still på samma tid som klockan.
@@ -1367,6 +1479,8 @@ ${window.RumRegister ? RumRegister.nara() : ''}
     v = v || Vader.nu();
     R.vader = v;
     RumUte.paint(document.getElementById('rum-ute'), v, [WIN, DORR]);
+    // (nya fotgängare: uteTakt hämtar deras rörelser igen)
+    R.uteAnim = null;
     const L = RumUte.light(v);
     const d = document.getElementById('rum-dagsljus');
     d.style.setProperty('--dagsljus', r1(L.dag * 0.9));
@@ -1427,7 +1541,7 @@ ${window.RumRegister ? RumRegister.nara() : ''}
     if (R.fig || R.loading) return;
     R.loading = true;
     // askkoppen, snusdosan, fläkten och affischen (rum-saker.js)
-    tur(() => import('./rum-saker.js').then((m) => m.saker(R.el, { calm: calm() })).then((x) => { R.saker = x; R.sakDuk = R.el.querySelector('canvas.rum-saker'); sikt(R.sakDuk); frame(); }), 2)
+    tur(() => import('./rum-saker.js').then((m) => m.saker(R.el, { calm: calm() })).then((x) => { R.saker = x; R.sakDuk = R.el.querySelector('canvas.rum-saker'); sikt(R.sakDuk); kval(R.kval); frame(); }), 2)
       .catch((err) => console.warn('Rummet: sakerna kunde inte ritas', err));
     // lysröret, neonen, skyltarna, uret, ramarna, paketen och kupongstället (rum-inredning.js)
     tur(() => import('./rum-inredning.js').then((m) => m.inredning(R.el, { calm: calm(), still })).then((x) => { R.inr = x; x.namn(R.ramNamn); x.stopp(R.stopp); if (window.RumFolk && RumFolk.natt()) x.natt(true); if (R.sak) sak(R.sak, null); frame(); }), 1)
@@ -1435,7 +1549,8 @@ ${window.RumRegister ? RumRegister.nara() : ''}
     try {
       await tur(async () => {
         const mod = await import('./rum-3d.js');
-        R.fig = await mod.figurer(document.getElementById('rum-3d'), { calm: calm(), vader: R.vader });
+        R.fig = await mod.figurer(document.getElementById('rum-3d'), { calm: calm(), vader: R.vader, detalj: KVAL[R.kval].detalj });
+        kval(R.kval);
         if (R.vem) R.fig.inne(R.vem, now());
         if (R.lage) R.fig.lage(R.lage, now());
         // de andra i gänget, natten och dagen efter (rum-folk.js)
@@ -2926,6 +3041,7 @@ ${window.RumRegister ? RumRegister.nara() : ''}
     R.on = true;
     if (window.RumFolk) RumFolk.on(true);
     fit();
+    kval(R.kval);
     zoomTv(false);
     zoomVideo(false);
     hot(null);

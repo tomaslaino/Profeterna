@@ -198,8 +198,10 @@
 .vhs-brus {
   inset: -40px;
   background: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='160' height='120'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.9' numOctaves='2' seed='3' stitchTiles='stitch'/%3E%3CfeColorMatrix values='0 0 0 .9 0  0 0 0 .9 0  0 0 0 .9 0  0 0 0 0 1'/%3E%3C/filter%3E%3Crect width='160' height='120' filter='url(%23n)'/%3E%3C/svg%3E") 0 0 / 160px 120px;
-  animation: vhs-brus 0.24s steps(4) infinite;
 }
+/* (bara när det syns: dolt rördes det ändå, och Chrome räknade om rummets
+   alla lager i varje bildruta) */
+.rum-vhs[data-lage="brus"] .vhs-brus { animation: vhs-brus 0.24s steps(4) infinite; }
 @keyframes vhs-brus { 0% { transform: translate(0, 0); } 25% { transform: translate(-37px, 13px); } 50% { transform: translate(-11px, -29px); } 75% { transform: translate(-29px, 23px); } 100% { transform: translate(0, 0); } }
 .vhs-bla, .vhs-brus, .vhs-bild, .vhs-sok, .vhs-osd, .vhs-tid, .vhs-matare, .vhs-lista { visibility: hidden; }
 .rum-vhs[data-lage="tom"] :is(.vhs-bla, .vhs-osd, .vhs-lista),

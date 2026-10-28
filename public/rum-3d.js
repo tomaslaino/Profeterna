@@ -48,7 +48,7 @@
 // har en papperskrona när det gick bra, och när det gick illa ligger DT:s
 // extraflaska omkullvält i en pöl och kupongen sönderriven i askkoppen.
 //
-// figurer(canvas, { calm, vader }) → { draw(t, mx, my, neon), inne(vem, t), ute(vader),
+// figurer(canvas, { calm, vader, detalj }) → { draw(t, mx, my, neon), inne(vem, t), ute(vader),
 // lage({ tv, nag }, t), mal({ dl: 1, dt: -1, dj: 0 }, t), pekar(vem, [x, y, z] | null, t),
 // hej(vem, t, ut), natt(på, t), efter({ lage, krona }), under(nx, ny), huvud(vem) }: neon säger om
 // neonskylten lyser (false när den glappar), ute klär om gänget
@@ -58,6 +58,8 @@
 // hej att man pekar på vem (ut = när man slutade, Infinity = pekar fortfarande),
 // natt om lysröret är släckt, efter dagen efter (lage 'bra' | 'illa' | null,
 // krona = oraklen, 'dl' …), under vem i gänget som syns i punkten
+// och kval({ pr, skugga, detalj }) hur fint gänget ritas (KVAL i rum.js; detalj
+// också från början)
 // (nx, ny, −1…1 i duken) eller null, och huvud var vems huvud är.
 import * as THREE from 'three';
 import { RoomEnvironment } from 'three/addons/environments/RoomEnvironment.js';
@@ -222,8 +224,14 @@ export async function figurer(canvas, opt = {}) {
   // så att minnet räcker
   const LATT = matchMedia('(max-width: 700px), (max-height: 500px)').matches;
   const SKUGGA = LATT ? 1024 : 2048;
+  // hur många trianglar de byggs av (detalj i KVAL i rum.js): håret, huvudena
+  // och de runda delarna har färre när datorn inte hinner med – gänget var
+  // drygt 700 000 trianglar, två gånger per bild med skuggorna
+  let DET = opt.detalj || 1;
+  const seg = (n, min) => Math.max(min, Math.round(n * DET));
   const r = new THREE.WebGLRenderer({ canvas, alpha: true, antialias: !LATT, preserveDrawingBuffer: !LATT });
-  r.setPixelRatio(LATT ? 1.5 : Math.min(window.devicePixelRatio || 1, 2));
+  const PR = LATT ? 1.5 : Math.min(window.devicePixelRatio || 1, 2);
+  r.setPixelRatio(PR);
   r.setSize(W, H, false);
   r.toneMapping = THREE.ACESFilmicToneMapping;
   r.toneMappingExposure = 1.05;
@@ -299,26 +307,26 @@ export async function figurer(canvas, opt = {}) {
   const UP = new THREE.Vector3(0, 1, 0);
   function capsule(a, b, rad, m, parent) {
     a = v3(a); b = v3(b);
-    const x = mesh(new THREE.CapsuleGeometry(rad, a.distanceTo(b), 8, 24), m, parent);
+    const x = mesh(new THREE.CapsuleGeometry(rad, a.distanceTo(b), seg(8, 4), seg(24, 12)), m, parent);
     x.position.copy(a).add(b).multiplyScalar(0.5);
     x.quaternion.setFromUnitVectors(UP, b.clone().sub(a).normalize());
     return x;
   }
   // en kapsel med fast längd som flyttas varje bild
-  const rod = (len, rad, m, parent) => Object.assign(mesh(new THREE.CapsuleGeometry(rad, len, 8, 24), m, parent), { len });
+  const rod = (len, rad, m, parent) => Object.assign(mesh(new THREE.CapsuleGeometry(rad, len, seg(8, 4), seg(24, 12)), m, parent), { len });
   function place(x, a, b) {
     x.position.copy(a).add(b).multiplyScalar(0.5);
     x.quaternion.setFromUnitVectors(UP, b.clone().sub(a).normalize());
   }
   function ellipsoid(pos, sc, m, parent, rot) {
-    const x = mesh(new THREE.SphereGeometry(1, 40, 28), m, parent);
+    const x = mesh(new THREE.SphereGeometry(1, seg(40, 20), seg(28, 14)), m, parent);
     x.position.set(...pos);
     x.scale.set(...sc);
     if (rot) x.rotation.set(...rot);
     return x;
   }
   function ring(at, dir, R, tube, m, parent) {
-    const x = mesh(new THREE.TorusGeometry(R, tube, 12, 64), m, parent);
+    const x = mesh(new THREE.TorusGeometry(R, tube, seg(12, 6), seg(64, 28)), m, parent);
     x.position.copy(v3(at));
     x.quaternion.setFromUnitVectors(new THREE.Vector3(0, 0, 1), v3(dir).normalize());
     return x;
@@ -414,7 +422,7 @@ export async function figurer(canvas, opt = {}) {
 
   // huvudet: en deformerad sfär; ansiktsdragen målas på ett skal framtill
   function headGeo(P, front, scale = 1, dy = 0) {
-    const g = front ? new THREE.SphereGeometry(1, 96, 72, 0, Math.PI) : new THREE.SphereGeometry(1, 96, 72);
+    const g = front ? new THREE.SphereGeometry(1, seg(96, 44), seg(72, 32), 0, Math.PI) : new THREE.SphereGeometry(1, seg(96, 44), seg(72, 32));
     const p = g.attributes.position;
     const uv = g.attributes.uv;
     for (let i = 0; i < p.count; i++) {
@@ -435,8 +443,8 @@ export async function figurer(canvas, opt = {}) {
   // skulpterat hår som på en vinylfigur: grova testar med fina fåror, rundade
   // spetsar, tjock kant mot huden, volym framtill, mörkare i fårorna
   function hairGeo(P, h, seed) {
-    const N = 480;
-    const M = 96;
+    const N = seg(480, 300);
+    const M = seg(96, 48);
     const pos = [];
     const uv = [];
     const col = [];
@@ -786,7 +794,7 @@ export async function figurer(canvas, opt = {}) {
     const lim = (a) => { const ca = Math.cos(a); const sa = Math.sin(a); return (m.f * Math.max(0, ca) ** 2 + m.s * sa * sa + m.b * Math.max(0, -ca) ** 2) * DEG; };
     const dir = (th, a) => new THREE.Vector3(Math.sin(th) * Math.sin(a), Math.cos(th), Math.sin(th) * Math.cos(a));
     const at = (th, a, k) => dir(th, a).multiply(new THREE.Vector3(P.rx, P.ry, P.rz)).multiplyScalar(k);
-    const N = 160; const M = 48;
+    const N = seg(160, 96); const M = seg(48, 24);
     const NS = 18; // ränderna
     const ch = 12.5; // uppvikets höjd i enheter
     const hAt = (a, L) => ch / at(L, a, 1.1).length();
@@ -901,7 +909,7 @@ export async function figurer(canvas, opt = {}) {
       mesh(bg, mat('#ffffff', { map: badge, alphaTest: 0.5, bumpMap: badge, bumpScale: 0.8, roughness: 0.45, clearcoat: 0.5, clearcoatRoughness: 0.2, polygonOffset: true, polygonOffsetFactor: -2 }), parent);
     }
     // tofsen: en lurvig boll av garn i båda färgerna
-    const pg = new THREE.SphereGeometry(1, 64, 48);
+    const pg = new THREE.SphereGeometry(1, seg(64, 32), seg(48, 24));
     const pp = pg.attributes.position;
     const pc = [];
     const blue = new THREE.Color(C.bla); const white = new THREE.Color(C.vit);
@@ -1116,7 +1124,7 @@ export async function figurer(canvas, opt = {}) {
     const gap = open ? 0.34 : 0;
     const m = jackMat(J);
     const edge = edgeMat(J);
-    mesh(new THREE.LatheGeometry(pts, 120, gap, 2 * Math.PI - 2 * gap), m, chest).scale.z = sz;
+    mesh(new THREE.LatheGeometry(pts, seg(120, 56), gap, 2 * Math.PI - 2 * gap), m, chest).scale.z = sz;
     // en tub längs skalet: lodrätt vid vinkeln phi, eller vågrätt runt på höjden y
     const at = (phi, r, y) => new THREE.Vector3(Math.sin(phi) * r, y, Math.cos(phi) * r * sz);
     const tube = (list, rad, mt) => mesh(new THREE.TubeGeometry(new THREE.CatmullRomCurve3(list), Math.max(24, list.length * 3), rad, 8, false), mt, chest);
@@ -1132,12 +1140,12 @@ export async function figurer(canvas, opt = {}) {
     const top = pts[N];
     if (J.krage) {
       const cp = open ? [new THREE.Vector2(top.x - 1, top.y), new THREE.Vector2(top.x + 5, top.y + 4)] : [new THREE.Vector2(top.x - 0.5, top.y - 1), new THREE.Vector2(F.neckR + 5, top.y + 9)];
-      mesh(new THREE.LatheGeometry(cp, 64, gap * 0.8, 2 * Math.PI - 1.6 * gap), mat(J.tyg === 'flanell' ? J.farg : J.farg2, { side: THREE.DoubleSide, roughness: 0.55, clearcoat: 0.4 }), chest).scale.z = sz;
+      mesh(new THREE.LatheGeometry(cp, seg(64, 32), gap * 0.8, 2 * Math.PI - 1.6 * gap), mat(J.tyg === 'flanell' ? J.farg : J.farg2, { side: THREE.DoubleSide, roughness: 0.55, clearcoat: 0.4 }), chest).scale.z = sz;
     } else around(N, 0.3, 1.5, edge);
     // luvan nedfälld på ryggen, och pälskanten runt halsen
     if (J.luva) ellipsoid([0, T * 1.0, -(F.depth * 0.62 + 4)], [Wd * 0.48, 10, 9], m, chest);
     if (J.luva === 'pals') {
-      const fg = new THREE.TorusGeometry(F.neckR + 7.5, 5, 14, 64);
+      const fg = new THREE.TorusGeometry(F.neckR + 7.5, 5, seg(14, 8), seg(64, 32));
       const fp = fg.attributes.position;
       for (let i = 0; i < fp.count; i++) { const x = fp.getX(i); const y = fp.getY(i); const z = fp.getZ(i); const k = 1 + 0.08 * Math.sin(x * 1.7 + y * 2.3) * Math.sin(z * 3.1 + x); fp.setXYZ(i, x * k, y * k, z * k); }
       fg.computeVertexNormals();
@@ -1534,7 +1542,7 @@ export async function figurer(canvas, opt = {}) {
     const stol = new THREE.Group();
     fig.add(stol);
     const sits = [[0, 0], [19, 0], [22, 1.2], [23, 4], [22.2, 7], [19, 8.4], [0, 8.6]].map(([a, q]) => new THREE.Vector2(a, q));
-    mesh(new THREE.LatheGeometry(sits, 64), vinyl, stol).position.y = -6.6;
+    mesh(new THREE.LatheGeometry(sits, seg(64, 32)), vinyl, stol).position.y = -6.6;
     ring([0, -2.6, 0], [0, 1, 0], 22.6, 0.35, som, stol);
     ring([0, -7.6, 0], [0, 1, 0], 15, 1.3, krom, stol);
     ring([0, 4 - shin - 18, 0], [0, 1, 0], 19.5, 1.2, krom, stol);
@@ -1552,7 +1560,7 @@ export async function figurer(canvas, opt = {}) {
     const hips = mesh(new THREE.LatheGeometry([new THREE.Vector2(0, hipPts[0][1]), ...hipPts.map(([a, b]) => new THREE.Vector2(a, b)), new THREE.Vector2(0, 14)], 48), trou, torso);
     hips.scale.z = F.depth / Wd;
     const prof = [[0, -0.02], [0.84, -0.02], [0.86, 0.1], [0.9, 0.45], [0.97, 0.75], [1, 0.86], [0.92, 0.96], [0.6, 1.02], [0.25, 1.04], [0, 1.04]].map(([a, b]) => new THREE.Vector2(a * Wd, b * T));
-    const tg = new THREE.LatheGeometry(prof, 160);
+    const tg = new THREE.LatheGeometry(prof, seg(160, 64));
     const p = tg.attributes.position;
     for (let i = 0; i < p.count; i++) {
       const x = p.getX(i); const y = p.getY(i); const z = p.getZ(i); const rr = Math.hypot(x, z);
@@ -2436,7 +2444,30 @@ export async function figurer(canvas, opt = {}) {
     tvLjus.intensity = tv > 0 ? TVLJUS * tv * (0.86 + 0.08 * Math.sin(t * 2.3) + 0.06 * Math.sin(t * 13.1 + Math.sin(t * 3.7))) : 0;
     pivot.rotation.y = mx * 4.5 * DEG;
     pivot.rotation.x = my * 2.6 * DEG;
+    if (Q.skugga > 1) r.shadowMap.needsUpdate = Q.n++ % Q.skugga === 0;
     r.render(scene, cam);
+  }
+
+  // Hur fint gänget ritas, när datorn inte hinner med (KVAL i rum.js): pr
+  // gånger de vanliga bildpunkterna (aldrig under 0,75 per punkt),
+  // skuggorna räknade var skugga:e bild – figurerna rör sig lite, så att
+  // skuggorna hänger med ändå – och figurerna byggda av färre trianglar
+  // (detalj; de byggs om som när kläderna byts, ute).
+  const Q = { skugga: 1, n: 0 };
+  function kval({ pr = 1, skugga = 1, detalj = 1 } = {}) {
+    if (detalj !== DET) {
+      DET = detalj;
+      for (const o of figs) o.key = null;
+      ute(vNu);
+    }
+    const p = Math.max(0.75, Math.min(PR, PR * pr));
+    if (p !== r.getPixelRatio()) {
+      r.setPixelRatio(p);
+      r.setSize(W, H, false);
+    }
+    Q.skugga = skugga;
+    r.shadowMap.autoUpdate = skugga <= 1;
+    r.shadowMap.needsUpdate = true;
   }
 
   // ---------- vädret ----------
@@ -2444,7 +2475,9 @@ export async function figurer(canvas, opt = {}) {
   // Ljuset från fönstret efter dagsljuset ute (rum-ute.js), och kläderna:
   // den vars kläder (dress) har ändrats byggs om, och röken följer med.
   let hemiDag = 0.42;
+  let vNu = opt.vader;
   function ute(v) {
+    vNu = v;
     const L = v && window.RumUte ? window.RumUte.light(v) : null;
     const dag = L ? L.dag : 0;
     win.color.set('#ffb35c').lerp(new THREE.Color(L ? L.sky[2] : '#ffb35c'), dag);
@@ -2564,5 +2597,5 @@ export async function figurer(canvas, opt = {}) {
     return o ? headIn(o).toArray() : null;
   }
 
-  return { draw, inne, ute, lage, mal, pekar, hej, natt, efter, under, huvud };
+  return { draw, inne, ute, lage, mal, pekar, hej, natt, efter, under, huvud, kval };
 }

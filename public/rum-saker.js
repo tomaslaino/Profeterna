@@ -22,7 +22,8 @@
 // Fikat på vissa dagar – semlor, pepparkakor, lussekatter och annat från
 // konditoriet – står bakom kvittot eller där det får plats (rum-fika.js).
 //
-// saker(el, { calm }) → { draw(t, mx, my, rows, old, syns) } (syns: pulten ritas, rum.js)
+// saker(el, { calm }) → { draw(t, mx, my, rows, old, syns), kval({ pr, skugga }) } (syns: pulten
+// ritas, rum.js; kval: hur fint, KVAL i rum.js)
 //
 // Kvittots text är den som rum.js skriver i #rum-kvitto (receiptHtml) och
 // läses om när den ändras; länken blir en osynlig yta över papperet att
@@ -68,11 +69,17 @@ const KALLA = 'https://commons.wikimedia.org/wiki/File:Football_players_Pontus_K
 
 // Dagen i Stockholm som frö: sakerna ligger likadant hela dagen.
 const fDay = new Intl.DateTimeFormat('sv-SE', { timeZone: 'Europe/Stockholm', year: 'numeric', month: '2-digit', day: '2-digit' });
-// ?rum-dag=<tal> ger en annan dag (för bilder)
+// ?rum-dag=<tal> ger en annan dag (för bilder). Räknas högst en gång i
+// minuten – den frågas i varje bild.
+let dag = null;
 const daySeed = () => {
+  const m = Math.floor(Date.now() / 60000);
+  if (dag && dag.m === m) return dag.s;
   const q = new URLSearchParams(location.search).get('rum-dag');
-  if (q != null && Number.isFinite(Number(q))) return Number(q);
-  return [...fDay.format(Date.now())].reduce((a, c) => (Math.imul(a, 31) + c.charCodeAt(0)) | 0, 7) % 9973;
+  const s = q != null && Number.isFinite(Number(q)) ? Number(q)
+    : [...fDay.format(Date.now())].reduce((a, c) => (Math.imul(a, 31) + c.charCodeAt(0)) | 0, 7) % 9973;
+  dag = { m, s };
+  return s;
 };
 
 // 0 = nyss städat, 1 = det har gått åt skogen. rows = omgångens rader
@@ -186,6 +193,9 @@ export async function saker(el, opt = {}) {
       if (three && vader()) three.power(varmt, fika);
       if (three && syns) three.draw(t, mx, my);
     },
+    kval(k) {
+      if (three) three.kval(k);
+    },
   };
 }
 
@@ -207,7 +217,8 @@ async function props(pult, opt, root) {
   const LATT = matchMedia('(max-width: 700px), (max-height: 500px)').matches;
   const SKUGGA = LATT ? 1024 : 2048;
   const r = new THREE.WebGLRenderer({ canvas, alpha: true, antialias: !LATT });
-  r.setPixelRatio(LATT ? 1.5 : Math.min((window.devicePixelRatio || 1) * 1.25, 2.5));
+  const PR = LATT ? 1.5 : Math.min((window.devicePixelRatio || 1) * 1.25, 2.5);
+  r.setPixelRatio(PR);
   r.setSize(BOX.w, BOX.h, false);
   r.toneMapping = THREE.ACESFilmicToneMapping;
   r.toneMappingExposure = 1.05;
@@ -1164,9 +1175,24 @@ async function props(pult, opt, root) {
     p.needsUpdate = true;
     stripGeo.computeVertexNormals();
     kvLys(calm);
+    if (Q.skugga > 1) r.shadowMap.needsUpdate = Q.n++ % Q.skugga === 0;
     r.render(scene, cam);
     kvVisa();
   }
 
-  return { wear, power, draw };
+  // Hur fint sakerna ritas, när datorn inte hinner med (KVAL i rum.js), som
+  // gänget (rum-3d.js): färre bildpunkter och skuggorna var skugga:e bild.
+  const Q = { skugga: 1, n: 0 };
+  function kval({ pr = 1, skugga = 1 } = {}) {
+    const p = Math.max(0.75, Math.min(PR, PR * pr));
+    if (p !== r.getPixelRatio()) {
+      r.setPixelRatio(p);
+      r.setSize(BOX.w, BOX.h, false);
+    }
+    Q.skugga = skugga;
+    r.shadowMap.autoUpdate = skugga <= 1;
+    r.shadowMap.needsUpdate = true;
+  }
+
+  return { wear, power, draw, kval };
 }
