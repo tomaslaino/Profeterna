@@ -786,10 +786,10 @@ ${window.RumRegister ? RumRegister.nara() : ''}
     R.built = true;
     wire();
     // kort: högst elva tecken
-    R.tv = window.RumTv ? RumTv.mount(el, { calm, short, kort: (n) => BOARD[n] || short(n), wd, hm, matches: () => (state.all && state.all.matches) || [] }) : null;
+    R.tv = window.RumTv ? RumTv.mount(el, { calm, sedan, short, kort: (n) => BOARD[n] || short(n), wd, hm, matches: () => (state.all && state.all.matches) || [] }) : null;
     R.ans = window.RumAnslag ? RumAnslag.mount(el, { calm, kort: (n) => BOARD[n] || short(n), close: () => board(false) }) : null;
     tangenter();
-    R.video = window.RumVideo ? RumVideo.mount(el, { calm, short, kort: (n) => BOARD[n] || short(n), aim: (f) => { R.vf = f; aimVideo(calm() ? null : 'glid'); } }) : null;
+    R.video = window.RumVideo ? RumVideo.mount(el, { calm, sedan, short, kort: (n) => BOARD[n] || short(n), aim: (f) => { R.vf = f; aimVideo(calm() ? null : 'glid'); } }) : null;
     R.reg = window.RumRegister ? RumRegister.mount(el, { calm, kort: (n) => BOARD[n] || short(n), close: () => register(false), tur: (fn) => tur(fn, 3) }) : null;
     paintUte();
     R.bakat = baka();
@@ -1407,13 +1407,15 @@ ${window.RumRegister ? RumRegister.nara() : ''}
       dt += prev ? raw : 1000 / 60;
       prev = ms;
       // gänget och sakerna 30 gånger i sekunden (eller glesare, KVAL);
-      // kameran i varje bildruta, utom när datorn inte hinner med
+      // kameran i varje bildruta, utom när Chrome inte hinner med (i Safari
+      // alltid: där kostar vridningen lite, och i gängets takt ryckte
+      // rummet efter fingret och när kameran gled på plats efter en närbild)
       const K = KVAL[R.kval];
       if (ms - R.last > 1000 / K.takt - 4) {
         R.last = ms;
         frame(Math.min(100, dt));
         dt = 0;
-      } else if (K.vrid) {
+      } else if (K.vrid || WEBKIT) {
         kamera(Math.min(100, dt));
         dt = 0;
       }
@@ -1681,12 +1683,42 @@ ${window.RumRegister ? RumRegister.nara() : ''}
   // transformen ett perspektiv som inte syns (.chromium i rum.css).
   function aim(p, z, to, cls) {
     const w = document.getElementById('rum-kamera');
-    w.classList.remove('glid', 'dyk');
-    if (cls) w.classList.add(cls);
     const dx = r1(to[0] - 800 - z * (p[0] - 800));
     const dy = r1(to[1] - 500 - z * (p[1] - 500));
-    w.style.transform = `translate(${dx}px, ${dy}px) scale(${z})${R.el.classList.contains('chromium') ? ' perspective(100000px)' : ''}`;
-    kvar(Boolean(dx || dy || z !== 1));
+    const borta = Boolean(dx || dy || z !== 1);
+    const satt = () => {
+      w.classList.remove('glid', 'dyk');
+      if (cls) w.classList.add(cls);
+      w.style.transform = `translate(${dx}px, ${dy}px) scale(${z})${R.el.classList.contains('chromium') ? ' perspective(100000px)' : ''}`;
+      kvar(borta);
+    };
+    // (WebKit ritar hela rummet när kameran lämnar hemmet, kvar)
+    if (cls && WEBKIT && borta && !calm()) kvar(true);
+    sedan('kamera', satt, Boolean(cls));
+  }
+
+  // En rörelse som börjar samtidigt som något nytt ska ritas: i WebKit när
+  // det är ritat (glid), annars direkt. När kameran gick fram eller
+  // tillbaka, tv:n vreds, rummet svängde runt videon eller något nytt syntes
+  // tog den första bildrutan i Safari 100–250 ms på en snabb dator (längre i
+  // en telefon) medan övergångarnas klocka gick, så att det som rörde sig
+  // hoppade en tredjedel av vägen eller mer. Nu ritas det nya först, och
+  // rörelsen börjar från början efter minst två bildrutor, när en bildruta
+  // har gått fort igen (högst 20). Den senaste med samma nyckel gäller (en
+  // rörelse som inte glider tar bort den som väntar).
+  const SEDAN = {};
+  function sedan(nyckel, fn, glid = true) {
+    const n = (SEDAN[nyckel] = (SEDAN[nyckel] || 0) + 1);
+    if (!glid || !WEBKIT || calm()) return fn();
+    let k = 0;
+    let fore = 0;
+    const vanta = (ms) => {
+      if (SEDAN[nyckel] !== n) return;
+      if (++k >= 3 && (ms - fore < 40 || k > 20)) return fn();
+      fore = ms;
+      requestAnimationFrame(vanta);
+    };
+    requestAnimationFrame(vanta);
   }
 
   // WebKit (Safari, och alla webbläsare i iPhone) släpper det den har ritat
@@ -1868,8 +1900,17 @@ ${window.RumRegister ? RumRegister.nara() : ''}
       satt(0, 0);
       void pl[0].offsetWidth;
     }
-    for (const p of pl) p.classList.toggle('glid', Boolean(cls));
-    satt(sv, dz);
+    // Det tunga i Safari började först när planen började röra sig, så de
+    // får en osynlig rörelse direkt (en hundradels bildpunkt), och svängen
+    // börjar två bildrutor senare (som kameran, sedan)
+    if (cls && WEBKIT && sv && !R.svNu && !calm()) {
+      for (const p of pl) p.animate([{ translate: '0px 0px' }, { translate: '0.01px 0px' }], { duration: 120 });
+    }
+    R.svNu = sv;
+    sedan('sving', () => {
+      for (const p of pl) p.classList.toggle('glid', Boolean(cls));
+      satt(sv, dz);
+    }, Boolean(cls));
   }
   function aimVideo(cls) {
     // hörnet i planet -598 (1,035 gånger), och det som syns av scenen;

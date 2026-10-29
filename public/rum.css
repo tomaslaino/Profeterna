@@ -207,6 +207,13 @@ a.rum-sak, a.rum-sak:hover { color: inherit; text-decoration: none; }
   0%, 72% { transform: translateX(0) rotate(22deg); }
   92%, 100% { transform: translateX(250px) rotate(22deg); }
 }
+/* I telefonen står strålarna bakom oraklet och skimret still: det som rör
+   sig blev egna lager, och det som ligger över dem i ramen blev egna lager
+   bara när ramen syntes – Safari byggde om dem varje gång ramen kom in i
+   eller gick ut ur bild när man drog med fingret. */
+@media (max-width: 700px), (max-height: 500px) {
+  .rum-ram .kr-rays, .rum-ram-glans::after { animation: none; }
+}
 
 /* ---------- högra väggen: skårtavlan och korktavlan ---------- */
 

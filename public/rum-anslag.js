@@ -568,8 +568,21 @@ window.RumAnslag = (() => {
     function fly(from, to, ms) {
       cancelAnimationFrame(A.raf);
       return new Promise((done) => {
-        const t0 = performance.now();
+        // klockan börjar när tavlan i närbilden har ritats (minst två
+        // bildrutor, och en som gick fort, högst 20): i Safari tog den
+        // första bildrutan så lång tid att tavlan hoppade en bit av vägen
+        let t0 = 0;
+        let n = 0;
+        let fore = 0;
         const step = (now) => {
+          if (!t0) {
+            if (++n < 3 || (now - fore >= 40 && n <= 20)) {
+              fore = now;
+              A.raf = requestAnimationFrame(step);
+              return;
+            }
+            t0 = now;
+          }
           const t = Math.min(1, (now - t0) / ms);
           const e = ease(t);
           const lift = 1 + 0.05 * Math.sin(Math.PI * t);

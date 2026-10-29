@@ -2332,6 +2332,47 @@ för 19. Bilderna av gatan (dag, natt, snö med plogbil, flaggdag), röken
 och närbilderna är desamma som förut, och kameran glider in och ut ur närbilderna utan fler
 hål i bilden.
 
+### I Safari i telefonen
+
+I iPhone ritar alla webbläsare med WebKit, Safaris motor. Mätt i WebKit på datorn
+(WKWebView i 390 × 664 med täthet 3, som en iPhone: bildrutorna, Safaris lagerträd, dess
+räknare för omritningar och filmer av fönstret) hackade rummet på tre sätt:
+
+- **När man drog med fingret** byggdes lager om vid kanten av bilden. Safari lägger det som
+  ligger över något som rör sig eller står i 3D i ett eget lager – men bara medan det syns,
+  så varje gång anslagstavlan, tv:n eller oraklets ram kom in i eller gick ut ur bild blev
+  ett tjugotal lappar, nålar och knappar egna lager eller slutade vara det, och tavlan
+  ritades om (50–90 ms på datorn) och blinkade. Polaroiden på väggen stod i 3D fast den bara
+  vänds i handen, tv:ns ljusband rullade, och strålarna bakom oraklet och skimret på glaset
+  rörde sig. Nu är polaroiden platt på väggen (`#ans-vagg` i rum-anslag.css), och i
+  telefonen står ljusbandet, strålarna och skimret still (rum-tv.css, rum.css): när man drar
+  över hela rummet ändras antalet lager mellan 453 och 463 i stället för mellan 476 och 523.
+  Samma sak gjorde att tv:ns sifferruta, knappar, högtalare och Panasonic-logga inte ritades
+  i Safari i telefonen, och att lådan bredvid videon ritades fel; nu syns de.
+- **Kameran efter fingret**, och när den gled på plats efter en närbild, vreds i gängets takt
+  – 20 gånger i sekunden på steg 1, där telefonen börjar – så att rummet ryckte efter scenen.
+  I WebKit vrids den nu i varje bildruta (`loop` i rum.js); där kostar vridningen lite.
+- **I början av närbilderna** (och på vägen tillbaka) tog den första bildrutan 100–250 ms på
+  datorn medan övergångarnas klocka gick: Safari ritar hela rummet när kameran lämnar
+  hemmet (`kvar`), och mycket när tv:n vrids, rummet svängs runt videon eller anslagstavlan och
+  kortregistret visas nära. När första bilden syntes hade kameran redan gått två tredjedelar
+  av vägen till videon och till anslagstavlan. Nu ritas det nya först, och rörelserna börjar
+  efter minst två bildrutor, när en bildruta har gått fort igen (`sedan` i rum.js: kameran,
+  rummets sväng, hörnets sväng i rum-video.js och tv:ns vridning i rum-tv.js); rummets plan
+  får en osynlig rörelse direkt, eftersom det tunga i Safari börjar först när de rör sig.
+  Anslagstavlans och kortlådans flygturer räknar tiden på samma sätt (`fly` i rum-anslag.js,
+  `step` i rum-kortlada.js). Chrome gör som förut.
+
+Mätt omväxlande med gammal och ny kod: fingret som drar fram och tillbaka 56–59 → 59–60
+bilder i sekunden, med längsta bildrutan 55–103 → 23–49 ms och 3–8 → 0 bildrutor över 50 ms; ett svep
+över hela rummet längsta bildrutan 73 → 29 ms; kameran vrids 19 → 59 gånger i sekunden medan
+fingret drar, ändå med ungefär en fjärdedel mindre arbete för grafiken. Den första bilden på
+väg till videon visar kameran 5–13 % av vägen fram (förut 57–72 %) och 0–6 % tillbaka
+(förut 24–30 %), och därifrån glider den jämnt; till tv:n, anslagstavlan och kortregistret
+0–1 % (förut upp till två tredjedelar). Minnet är inte högre (topparna när man går till tv:n,
+videon, anslagstavlan, kupongen och kortregistret efter varandra 1,3–1,4 GB mot 1,3–1,5), och
+närbilderna ser ut som förut.
+
 ### Utsikten och vädret
 
 Tobaksaffären ligger i Stockholm, och genom skyltfönstret och dörren syns gatan som den är

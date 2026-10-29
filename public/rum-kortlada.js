@@ -388,6 +388,14 @@ export async function kortlada(o) {
     let up = 0;
     if (S.fly) {
       const f = S.fly;
+      // klockan börjar när lådan i fönstrets storlek har ritats (minst två
+      // bildrutor, och en som gick fort, högst 20): i Safari tog den första
+      // bildrutan så lång tid att lådan hoppade en bit av vägen
+      if (!f.go) {
+        f.n = (f.n || 0) + 1;
+        f.go = f.n >= 3 && (now - f.fore < 40 || f.n > 20);
+        f.fore = f.t0 = now;
+      }
       const p = Math.min(1, (now - f.t0) / f.ms);
       const e = ease(p);
       t = lerp(f.a, f.b, e);

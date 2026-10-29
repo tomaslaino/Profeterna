@@ -184,6 +184,15 @@
 .ans-vand .bak h4 + .r { margin-top: 1px; }
 .ans-vand .bak .r + h4 { margin-top: 9px; }
 .ans-vand .bak small { font-size: 11px; letter-spacing: 1px; opacity: 0.7; }
+/* På väggen vänds polaroiden aldrig (bara i handen), så där är den platt.
+   I 3D blev den ett eget lager, och lapparna, nålarna och glansen som
+   ligger över den blev egna lager bara när tavlan syntes – Safari ritade
+   om tavlan och byggde om ett tjugotal lager varje gång den kom in i eller
+   gick ut ur bild när man drog med fingret, så att det hackade och blinkade. */
+#ans-vagg .p-polaroid .ans-in { perspective: none; }
+#ans-vagg .ans-vand { transform-style: flat; transition: none; }
+#ans-vagg .ans-vand .fram { backface-visibility: visible; -webkit-backface-visibility: visible; }
+#ans-vagg .ans-vand .bak { display: none; }
 .ans-foto {
   position: absolute;
   left: 10px;

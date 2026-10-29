@@ -215,6 +215,13 @@
   animation: tv-rull 9s linear infinite;
 }
 @keyframes tv-rull { to { transform: translateY(420%); } }
+/* I telefonen rullar det inte: bandet blev ett eget lager, och det som
+   ligger över det i tv:n blev egna lager bara när tv:n syntes – Safari
+   byggde om dem varje gång tv:n kom in i eller gick ut ur bild när man drog
+   med fingret, så att det hackade. I den lilla rutan syns bandet knappt. */
+@media (max-width: 700px), (max-height: 500px) {
+  .tv-glas::after { animation: none; display: none; }
+}
 
 /* ---------- text-tv: 40 × 25 tecken i 288 × 360, förminskat till rutan med
    kant runt om, som på en riktig bildskärm ---------- */

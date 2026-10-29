@@ -663,7 +663,8 @@ window.RumTv = (() => {
         void box.offsetWidth;
         box.classList.remove('mat');
         void box.offsetWidth;
-        box.classList.toggle('nara', on);
+        // (vrids när det nya har ritats, som kameran: sedan i rum.js)
+        (o.sedan || ((k, f) => f()))('tv', () => box.classList.toggle('nara', on));
         if (!on) {
           T.skarp = setTimeout(() => {
             if (T.near) return;

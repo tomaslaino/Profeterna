@@ -1234,9 +1234,12 @@ window.RumVideo = (() => {
     // och ögat dit kameran går.
     function sving(s) {
       const oga = (s && s.oga) || VP;
-      for (const e of [kam, inn]) e.classList.toggle('glid', !o.calm());
-      kam.style.transform = `rotateY(${s ? s.horn : 0}deg)`;
-      inn.style.perspectiveOrigin = `${px(oga[0])} ${px(oga[1])}`;
+      // (samtidigt som kameran och rummet, när det nya har ritats: sedan i rum.js)
+      (o.sedan || ((k, f) => f()))('hornet', () => {
+        for (const e of [kam, inn]) e.classList.toggle('glid', !o.calm());
+        kam.style.transform = `rotateY(${s ? s.horn : 0}deg)`;
+        inn.style.perspectiveOrigin = `${px(oga[0])} ${px(oga[1])}`;
+      }, !o.calm());
     }
 
     function tat(on) {
