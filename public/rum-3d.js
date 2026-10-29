@@ -2417,16 +2417,31 @@ export async function figurer(canvas, opt = {}) {
 
   // ---------- en bild ----------
 
+  // Huvudena nickar efter när musen rör sig: en fjäder mot vridningen och
+  // dess fart, räknad i tid (240 steg i sekunden), så att de nickar lika
+  // fort och lika mycket hur glest gänget än ritas (KVAL i rum.js) – i ett
+  // steg per bild svängde de i telefonen ut längre och långsammare.
+  const NICK = { w: 8.19, z: 0.276 };
   let headA = 0;
   let headV = 0;
   let lastMx = 0;
+  let lastT = null;
   function draw(t, mx, my, neonPa) {
-    // huvudena nickar efter när musen rör sig
-    const dv = mx - lastMx;
+    const dt = lastT === null ? 0 : Math.min(0.1, t - lastT);
+    lastT = t;
+    if (dt > 0) {
+      const mal = ((mx - lastMx) / dt * (40 / 30) + mx * 3) * DEG;
+      const n = Math.ceil(dt * 240);
+      for (let i = 0; i < n; i++) {
+        headV += (NICK.w * NICK.w * (mal - headA) - 2 * NICK.z * NICK.w * headV) * (dt / n);
+        headA += headV * (dt / n);
+      }
+    } else {
+      // första bilden, och en fast bild (?rum-t): huvudena i vila
+      headA = mx * 3 * DEG;
+      headV = 0;
+    }
     lastMx = mx;
-    headV += ((dv * 40 + mx * 3) * DEG - headA) * 0.08;
-    headV *= 0.86;
-    headA += headV;
     for (const o of figs) pose(o, t);
     smoke(t);
     for (const o of figs) pose(o, t);

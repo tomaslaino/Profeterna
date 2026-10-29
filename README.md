@@ -1930,7 +1930,10 @@ fönsterbänken bakom DJ. DL dricker ur en flaska, DT röker
 och skrattar, DJ har en burk i ena handen och pratar med cigaretten i den andra. Var och en
 har sin loop (12–21 s) – flaskan och burken till munnen med huvudet bakåt, ett bloss med
 glöden som tänds och röken som blåses ut, benen som dinglar – och huvudena nickar efter
-musen. Röken från glöden räknas för varje bloss ur var glöden var när det föddes, så att
+musen, med en fjäder som räknas i tid (`NICK` i rum-3d.js), så att de nickar lika fort och lika
+mycket hur glest gänget än ritas (se [När datorn inte hinner med](#när-datorn-inte-hinner-med));
+räknad ett steg per bild svängde de i telefonen (20 bilder i sekunden) ut en fjärdedel längre
+och en och en halv gång så långsamt. Röken från glöden räknas för varje bloss ur var glöden var när det föddes, så att
 samma tid alltid ger samma bild. DL och DJ blinkar ungefär var fjärde sekund, ibland två
 gånger i rad, med ögonen stängda en dryg tiondels sekund (`blinkar` i rum-3d.js; DT skrattar
 med ögonen stängda och blinkar inte). Ansiktet med stängda ögon är samma ansiktsbild utan
@@ -2310,8 +2313,22 @@ sig:
   (`delar`, `rita`), så gatan ser ut som förut.
 - **Kameran efter musen** (och efter var man står med fingret): en ny vridning av världen
   räknade om alla lager. I Chrome får världen nu ett nytt mål var tiondels sekund och glider
-  dit på 180 ms (`folj` i rum.js, `.foljer` i rum.css) – medan en övergång pågår flyttar Chrome
-  bara lagren – och gänget och sakerna i 3D ritas med den vridning som syns (`synlig`). En
+  dit själv med en övergång (`folj` i rum.js) – medan en övergång pågår flyttar Chrome bara
+  lagren – och gänget och sakerna i 3D ritas med den vridning som syns (`synlig`). Först gled
+  den i jämn fart på 180 ms mot varje mål, så att farten ändrades i ryck tio gånger i sekunden
+  och världen kom igång en tiondels sekund efter musen. Nu står vridningen upp och ner i
+  `rotate` och den åt sidorna i `transform` medan världen följer musen, med var sin övergång
+  och en egen kurva för varje (`linear()`, `foljKurva`): samma följning som bild för bild (6 %
+  av vägen per trettiondels sekund), med musens nya läge inlagt jämnt över den följande
+  tiondelen och med farten världen redan hade, så att farten inte hoppar, inte heller när
+  musen svänger. (En animering med nyckelbilder ger samma rörelse, men Chrome räknar om lagren
+  varje gång en sådan läggs om, en övergång bara ibland.) Mätt i headless Chrome (Apple M5,
+  1440 × 900, täthet 2, steg 0), musen i en båge, omväxlande gammal och ny kod: de största
+  fartändringarna från en bildruta till nästa (98:e percentilen) 19–24 → 6 % av farten, och
+  12–19 → 0 språng över 15 % utom den mjuka starten från stillastående; lika många
+  omräkningar av lagren (3,1–3,5 i sekunden när målet läggs om, förut 3,5–3,6), samma tid på
+  huvudtråden (172–175 ms/s, förut 165–188) och 60 bilder i sekunden. Det gänget ritas efter
+  avviker högst 0,03° från det som syns, och i vila står världen där den ska. En
   sekund efter närbilderna vrids den direkt: medan världen glider behåller Chrome lagrens
   upplösning, och efter en närbild ska den bli hemmets. När kameran går fram eller tillbaka
   vrids den med kameran (`vrid`, nedan). WebKit vrider världen utan kostnad och gör som förut.

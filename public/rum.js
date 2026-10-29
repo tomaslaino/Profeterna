@@ -1287,7 +1287,9 @@ ${window.RumRegister ? RumRegister.nara() : ''}
     if (!w) return;
     // (direkt: glider världen efter musen slutar den, se folj och vrid)
     if (R.folj) {
-      w.classList.remove('foljer', 'vrider');
+      // (efter folj: hela vridningen i transform igen)
+      if (R.folj.ax) w.style.transition = w.style.translate = w.style.rotate = '';
+      w.classList.remove('vrider');
       R.folj = null;
     }
     R.camVis = [mx, my];
@@ -1298,28 +1300,85 @@ ${window.RumRegister ? RumRegister.nara() : ''}
 
   // Kameran efter musen i Chrome, när den är hemma: att sätta vridningen i
   // varje bild fick Chrome att räkna om alla rummets lager (~380) varje gång.
-  // I stället får världen ett nytt mål var 100:e ms och glider dit själv
-  // (.foljer i rum.css, FOLJ ms, så att nästa mål kommer innan den är
-  // framme) – medan en övergång pågår flyttar Chrome bara lagren, också i
-  // 60 bilder i sekunden när gänget ritas 15 gånger.
+  // I stället får världen ett nytt mål högst var 100:e ms (FOLJ) och glider
+  // dit själv med övergångar – medan en övergång pågår flyttar Chrome bara
+  // lagren. Vridningen upp och ner står då i rotate och den åt sidorna i
+  // transform (samma vridning som camT), så att de får var sin övergång med
+  // var sin kurva (linear(), foljKurva): samma följning som bild för bild
+  // (en bit av vägen mot musen, tidskonstanten TAU), med musens nya läge
+  // inlagt jämnt över de följande 100 ms och med farten världen redan hade,
+  // så att farten inte hoppar, inte heller när musen svänger. Förut gled
+  // världen i jämn fart på 180 ms mot varje mål: farten ändrades i ryck tio
+  // gånger i sekunden, och världen kom igång först en tiondels sekund efter
+  // musen.
+  // (En animering med nyckelbilder hade gett samma rörelse, men Chrome
+  // räknar om lagren varje gång en sådan läggs om, en övergång bara ibland.)
   // Gänget och sakerna i 3D ritas med den vridning som syns (synlig).
-  const FOLJ = 180;
-  function folj(mx, my) {
+  const FOLJ = 100;
+  // 6 % av vägen per 1/30 sekund, som i kamera
+  const TAU = 1000 / 30 / -Math.log(0.94);
+  // en axel s ms in: världen följer ett mål som går från T0 (där målet låg
+  // med den fart den hade) till T1 på FOLJ ms och sedan står still
+  function bana(x, s) {
+    const B = (x.T1 - x.T0) / FOLJ;
+    const ramp = (u) => x.T0 + B * (u - TAU) + (x.x0 - x.T0 + B * TAU) * Math.exp(-u / TAU);
+    if (s <= FOLJ) return ramp(Math.max(0, s));
+    return x.T1 + (ramp(FOLJ) - x.T1) * Math.exp(-(s - FOLJ) / TAU);
+  }
+  // övergången för en axel: tills den är en tiotusendel från målet, med
+  // punkterna i kurvan tätt medan målet flyttas och glesare ju närmare målet
+  // (linjärt emellan: högst en tiondels bildpunkt fel)
+  // (utan linear(), i Chromium före 113: jämn fart på 180 ms som förut)
+  const LINEAR = window.CSS && CSS.supports('transition-timing-function', 'linear(0, 1)');
+  function foljKurva(x) {
+    if (!LINEAR) return '180ms linear';
+    const d = x.T1 - x.x0;
+    const ms = FOLJ + TAU * Math.log(Math.max(1, Math.abs(bana(x, FOLJ) - x.T1) / 1e-4));
+    if (Math.abs(d) < 1e-6) return `${ms.toFixed(0)}ms`;
+    const pts = [];
+    for (let s = 0; s < ms; s += s < FOLJ ? 20 : Math.max(16, Math.min(250, TAU * 0.04 / Math.sqrt(Math.max(1e-6, Math.abs(bana(x, s) - x.T1)))))) {
+      pts.push(`${((bana(x, s) - x.x0) / d).toFixed(5)} ${(s / ms * 100).toFixed(3)}%`);
+    }
+    pts.push('1 100%');
+    return `${ms.toFixed(0)}ms linear(${pts.join(', ')})`;
+  }
+  const vridX = (my) => `x ${(-my * 2.6).toFixed(3)}deg`;
+  const vridY = (mx) => `rotateY(${(mx * 4.5).toFixed(3)}deg) translateZ(330px)`;
+  function folj(tx, ty) {
     const w = document.getElementById('rum-world');
     if (!w) return;
     const nu = performance.now();
-    if (R.folj && nu - R.folj.t < 100) return;
-    const t = camT(mx, my);
-    if (t === R.cam) return;
-    const fran = synlig(nu);
-    if (!R.folj) w.classList.add('foljer');
-    R.folj = { t: nu, a: fran, b: [mx, my] };
-    w.style.transform = R.cam = t;
+    const f = R.folj;
+    if (f && f.ax && (nu - f.t < FOLJ || (f.ax[0].T1 === tx && f.ax[1].T1 === ty))) return;
+    // från det som syns, med farten (per ms) världen har – eller hade, om
+    // den följde musen bild för bild (efter en närbild)
+    const a = synlig(nu);
+    let v = [0, 0];
+    if (f && f.ax) {
+      const p = synlig(nu - 1);
+      v = [a[0] - p[0], a[1] - p[1]];
+    } else {
+      if (Math.abs(a[0] - R.mx) + Math.abs(a[1] - R.my) < 0.02) v = [(R.tx - a[0]) / TAU, (R.ty - a[1]) / TAU];
+      if (camT(tx, ty) === camT(...a) && !v[0] && !v[1]) return;
+      // samma vridning, delad på rotate och transform (utan övergång)
+      w.style.transition = 'none';
+      w.style.translate = '0 0 -330px';
+      w.style.rotate = vridX(a[1]);
+      w.style.transform = vridY(a[0]);
+      R.cam = null;
+      void getComputedStyle(w).transform;
+    }
+    const ax = [tx, ty].map((T1, i) => ({ x0: a[i], T0: a[i] + TAU * v[i], T1 }));
+    R.folj = { t: nu, ax };
+    w.style.transition = `rotate ${foljKurva(ax[1])}, transform ${foljKurva(ax[0])}`;
+    w.style.rotate = vridX(ty);
+    w.style.transform = vridY(tx);
   }
   function synlig(nu = performance.now()) {
     const f = R.folj;
     if (!f) return R.camVis || [R.mx, R.my];
-    const p = f.e ? f.e(Math.min(1, (nu - f.t) / f.ms)) : Math.min(1, (nu - f.t) / FOLJ);
+    if (f.ax) return f.ax.map((x) => bana(x, nu - f.t));
+    const p = f.e(Math.min(1, (nu - f.t) / f.ms));
     return [f.a[0] + (f.b[0] - f.a[0]) * p, f.a[1] + (f.b[1] - f.a[1]) * p];
   }
 
@@ -1440,7 +1499,7 @@ ${window.RumRegister ? RumRegister.nara() : ''}
     // glider behåller Chrome lagrens upplösning, och den ska bli hemmets)
     const hemma = R.el.classList.contains('chromium') && !calm() && !nara() && !R.el.classList.contains('sak-nara');
     if (!hemma) R.borta = performance.now();
-    if (hemma && performance.now() - (R.borta || 0) > 1000) folj(R.mx, R.my);
+    if (hemma && performance.now() - (R.borta || 0) > 1000) folj(R.tx, R.ty);
     else setCam(R.mx, R.my);
   }
 
