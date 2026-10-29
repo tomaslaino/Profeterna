@@ -2311,10 +2311,10 @@ sig:
 - **Kameran efter musen** (och efter var man står med fingret): en ny vridning av världen
   räknade om alla lager. I Chrome får världen nu ett nytt mål var tiondels sekund och glider
   dit på 180 ms (`folj` i rum.js, `.foljer` i rum.css) – medan en övergång pågår flyttar Chrome
-  bara lagren – och gänget och sakerna i 3D ritas med den vridning som syns (`synlig`). Vid
-  närbilderna, och en sekund efter dem, vrids den direkt som förut: medan världen glider
-  behåller Chrome lagrens upplösning, och efter en närbild ska den bli hemmets. WebKit vrider
-  världen utan kostnad och gör som förut.
+  bara lagren – och gänget och sakerna i 3D ritas med den vridning som syns (`synlig`). En
+  sekund efter närbilderna vrids den direkt: medan världen glider behåller Chrome lagrens
+  upplösning, och efter en närbild ska den bli hemmets. När kameran går fram eller tillbaka
+  vrids den med kameran (`vrid`, nedan). WebKit vrider världen utan kostnad och gör som förut.
 - **Fingret som drar** flyttade scenen och räknade om alla lager vid varje rörelse; i Chrome
   glider den nu till fingret på 50 ms (`pan(…, true)`, `.drar` i rum.css).
 - **Röken** från cigaretterna var 182 spritar med eget material, en ritning var i varje bild;
@@ -2331,6 +2331,37 @@ sekunden i stället för 29. Med SwiftShader utan 3D (1366 × 768, som en svag g
 för 19. Bilderna av gatan (dag, natt, snö med plogbil, flaggdag), röken
 och närbilderna är desamma som förut, och kameran glider in och ut ur närbilderna utan fler
 hål i bilden.
+
+Närbilderna av tv:n och anslagstavlan hackade ändå i Chrome, också på en snabb dator. Medan
+kameran gled fram – på grafikkortet, i varje bildruta – flyttades två saker en bit i varje
+bildruta från huvudtråden, och varje gång räknade Chrome om alla rummets lager: världen, som
+vreds rakt mot tv:n och videon (eller färdigt mot musen vid tavlan och kortregistret), och
+tavlan på sin flygtur. Med gänget och sakerna i 3D som ritas samtidigt hann huvudtråden bara
+var andra eller tredje bildruta, så att rummet och tavlan ryckte fram i 20–30 bilder i
+sekunden medan kameran gled i 60. Nära tv:n och videon blev bilden dessutom inte skarp förrän
+vridningen hade stannat, efter ett par sekunder. Nu:
+
+- **Världen vrids med kameran.** Vid tv:n, videon, anslagstavlan och kortregistret, och
+  tillbaka därifrån och från uret, skårtavlan, oraklet och affischen, vrids världen dit den
+  ska på samma tid och med samma kurva som kameran glider (`vrid` i rum.js, `.vrider` i
+  rum.css); tillbaka mot musen (`vridHem`). Gänget och sakerna i 3D ritas med den vridning
+  som syns, längs samma kurva. Bara i Chrome.
+- **Anslagstavlan flyger på grafikkortet** (se [Anslagstavlan](#anslagstavlan)): vägen räknas
+  ut i förväg och flygs som en animering, som börjar samtidigt som kameran. I Safari börjar
+  den som förut när tavlan har ritats.
+- **Muspekaren över gänget** (ingen hand över det som står bakom) sätts på det som står under
+  musen i stället för som en klass på hela rummet (`markor` i rum-folk.js), som räknade om
+  stilen för alla rummets ~3 800 element varje gång musen gick in över eller ut från gänget.
+
+Mätt i headless Chrome (Apple M5), omväxlande gammal och ny kod, fram till saken och tillbaka
+med musen i rörelse: i 1280 × 740 med täthet 2 omräkningarna av alla lager på vägen fram till
+tv:n 96–97 → 3–5 och till tavlan 43–44 → 8–10, och längsta bildrutan vid tavlan 33–50 → 17 ms
+fram och tillbaka; med processorn fyra gånger långsammare (1440 × 900) omräkningarna fram till
+tv:n 33–36 → 3–14 och till tavlan 35–41 → 9–10, bildrutorna över 20 ms fram till tavlan
+7–15 → 1–4.
+Tv:n och videohörnet är skarpa när kameran är framme (förut suddiga ett par sekunder), och
+tavlan landar på väggen på en hundradels bildpunkt när. I WebKit (WKWebView, 1440 × 900 och
+390 × 664 med täthet 3) lika många långa bildrutor som förut och samma minne.
 
 ### I Safari i telefonen
 
@@ -2652,7 +2683,11 @@ storlek (polaroiden vänds på vägen) med bunten och flikarna, ←/→ bläddra
 och ↑/↓ mellan bladen. Esc, ett klick
 utanför eller *Häng tillbaka* sätter tillbaka lappen; Esc, A eller ett klick utanför tavlan
 hänger tillbaka tavlan – den flyger till hörnen där den hänger när kameran har gått
-tillbaka (rum.js mäter dem med kameran där en kort stund). Guldordet *Statistik* under
+tillbaka och rummet har vridits mot musen (rum.js mäter dem med kameran och rummet där en
+kort stund). Flygturen räknas ut i förväg, en avbildning var 20:e ms, och flygs som en
+animering som grafikkortet sköter själv (`fly` i rum-anslag.js), så att den går jämnt också
+när datorn har annat att göra (se [När datorn inte hinner med](#när-datorn-inte-hinner-med)).
+Guldordet *Statistik* under
 tavlan leder till Statistik, och pekar man på tavlan i rummet tänds snabbvalet Statistik på
 text-tv:n. Med `prefers-reduced-motion` står tavlan framme direkt.
 

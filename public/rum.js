@@ -1285,9 +1285,9 @@ ${window.RumRegister ? RumRegister.nara() : ''}
   function setCam(mx, my) {
     const w = document.getElementById('rum-world');
     if (!w) return;
-    // (direkt: glider världen efter musen slutar den, se folj)
+    // (direkt: glider världen efter musen slutar den, se folj och vrid)
     if (R.folj) {
-      w.classList.remove('foljer');
+      w.classList.remove('foljer', 'vrider');
       R.folj = null;
     }
     R.camVis = [mx, my];
@@ -1319,8 +1319,61 @@ ${window.RumRegister ? RumRegister.nara() : ''}
   function synlig(nu = performance.now()) {
     const f = R.folj;
     if (!f) return R.camVis || [R.mx, R.my];
-    const p = Math.min(1, (nu - f.t) / FOLJ);
+    const p = f.e ? f.e(Math.min(1, (nu - f.t) / f.ms)) : Math.min(1, (nu - f.t) / FOLJ);
     return [f.a[0] + (f.b[0] - f.a[0]) * p, f.a[1] + (f.b[1] - f.a[1]) * p];
+  }
+
+  // Kameran går fram till tv:n, videon, anslagstavlan eller kortregistret,
+  // eller tillbaka: i Chrome vrids världen dit på samma tid och med samma
+  // kurva som kameran glider (.vrider i rum.css, som .glid) i stället för en
+  // bit i varje bildruta. Varje ny vinkel räknade om alla rummets lager, och
+  // medan kameran gled hann Chrome då bara rita det som vreds – tv:n, tavlan
+  // och gänget – i varannan eller var tredje bildruta. I Safari kostar
+  // vridningen lite (och kameran börjar där när en bildruta har gått fort,
+  // sedan), så där vrids den som förut.
+  const kurva = (x1, y1, x2, y2) => {
+    const b = (p, q, s) => 3 * p * s * (1 - s) ** 2 + 3 * q * s * s * (1 - s) + s ** 3;
+    return (x) => {
+      let lo = 0;
+      let hi = 1;
+      for (let i = 0; i < 24; i++) {
+        const m = (lo + hi) / 2;
+        if (b(x1, x2, m) < x) lo = m;
+        else hi = m;
+      }
+      return b(y1, y2, (lo + hi) / 2);
+    };
+  };
+  const GLID = { ms: 600, e: kurva(0.3, 0, 0.2, 1) };
+  const vrids = () => !calm() && R.el.classList.contains('chromium');
+  function vrid(mx, my, fran = synlig()) {
+    const w = document.getElementById('rum-world');
+    if (!w || !vrids()) return setCam(R.mx, R.my);
+    const nu = performance.now();
+    // (från det som syns: stilen räknas om först, så att övergången börjar där)
+    setCam(...fran);
+    void w.offsetWidth;
+    R.mx = mx;
+    R.my = my;
+    const f = (R.folj = { t: nu, a: fran, b: [mx, my], ...GLID });
+    w.classList.add('vrider');
+    w.style.transform = R.cam = camT(mx, my);
+    R.camVis = [mx, my];
+    setTimeout(() => {
+      if (R.folj !== f) return;
+      w.classList.remove('vrider');
+      R.folj = null;
+    }, GLID.ms + 50);
+  }
+  // Tillbaka hem: världen vrids mot musen medan kameran glider, i stället för
+  // en bit i varje bildruta när musen rör sig. hemVrid är dit (i Chrome), så
+  // att anslagstavlan och kortregistret kan mäta var de ska landa.
+  const hemVrid = () => (vrids() && R.pek === 'mouse' && R.mus ? R.mus : null);
+  function vridHem(fran) {
+    const m = hemVrid();
+    if (!m) return;
+    [R.tx, R.ty] = m;
+    vrid(R.tx, R.ty, fran);
   }
 
   // Neonen glappar ibland: tider ur klockan, så att stillbilderna blir samma.
@@ -1363,6 +1416,11 @@ ${window.RumRegister ? RumRegister.nara() : ''}
     if (R.pek !== 'mouse' && !nara()) {
       if (R.k * W - innerWidth > 1) R.tx = R.px * 2 - 1;
       R.ty = R.k * H - innerHeight > 1 ? R.py * 2 - 1 : -0.25;
+    }
+    // (världen glider själv dit vrid satte den)
+    if (R.folj && R.folj.e) {
+      R.borta = performance.now();
+      return;
     }
     if (!still()) {
       // lika fort som när den gick 6 % av vägen (12 med kupongen i handen) 30 gånger i sekunden
@@ -1838,6 +1896,8 @@ ${window.RumRegister ? RumRegister.nara() : ''}
     }
     const r = R.tv && R.tv.zoom(on, rekt);
     setCam(R.mx, R.my);
+    if (on) vrid(0, 0);
+    else vridHem();
     // så nära som ryms i fönstret (i telefonen fyller tv:n bredden)
     const z = r && Math.min(3.6, (innerWidth - 24) / r.width, (innerHeight - 110) / r.height);
     if (on && r) aim(centerOf(r), z, mid(0.5, 0.48), calm() ? null : 'glid');
@@ -1863,12 +1923,13 @@ ${window.RumRegister ? RumRegister.nara() : ''}
       R.tx = 0;
       R.ty = 0;
       if (calm()) R.mx = R.my = 0;
-      setCam(R.mx, R.my);
+      vrid(0, 0);
     }
     R.vf = R.video.zoom(on);
     if (on) aimVideo(calm() ? null : 'glid');
     else {
       sving(R.vf, 0, calm() ? null : 'glid');
+      vridHem();
       aim([800, 500], 1, [800, 500], calm() ? null : 'glid');
     }
   }
@@ -1939,6 +2000,7 @@ ${window.RumRegister ? RumRegister.nara() : ''}
       if (R.vnara) zoomVideo(false);
       if (R.reg && R.reg.on()) register(false);
       R.ans.open(true, R.ans.quad());
+      vrid(R.tx, R.ty);
       const p = centerOf(document.getElementById('rum-ans'));
       const c = mid();
       aim(p, 1.25, [p[0] + (c[0] - p[0]) * 0.5, p[1] + (c[1] - p[1]) * 0.5], calm() ? null : 'glid');
@@ -1946,10 +2008,15 @@ ${window.RumRegister ? RumRegister.nara() : ''}
     }
     const w = document.getElementById('rum-kamera');
     const cam = w.style.cssText;
+    // (med världen vriden dit den vrids, vridHem)
+    const fran = synlig();
+    const hem = hemVrid();
     aim([800, 500], 1, [800, 500]);
+    if (hem) setCam(...hem);
     const q = R.ans.quad();
     w.style.cssText = cam;
     void w.offsetWidth;
+    if (hem) vridHem(fran);
     aim([800, 500], 1, [800, 500], calm() ? null : 'glid');
     R.ans.open(false, q);
   }
@@ -1966,6 +2033,7 @@ ${window.RumRegister ? RumRegister.nara() : ''}
       if (R.ans && R.ans.on()) board(false);
       const r = R.reg.at();
       R.reg.open(true, r);
+      vrid(R.tx, R.ty);
       const p = centerOf(r);
       const c = mid();
       aim(p, 1.25, [p[0] + (c[0] - p[0]) * 0.5, p[1] + (c[1] - p[1]) * 0.5], calm() ? null : 'glid');
@@ -1973,10 +2041,14 @@ ${window.RumRegister ? RumRegister.nara() : ''}
     }
     const w = document.getElementById('rum-kamera');
     const cam = w.style.cssText;
+    const fran = synlig();
+    const hem = hemVrid();
     aim([800, 500], 1, [800, 500]);
+    if (hem) setCam(...hem);
     const r = R.reg.at();
     w.style.cssText = cam;
     void w.offsetWidth;
+    if (hem) vridHem(fran);
     aim([800, 500], 1, [800, 500], calm() ? null : 'glid');
     R.reg.open(false, r);
   }
@@ -2019,6 +2091,7 @@ ${window.RumRegister ? RumRegister.nara() : ''}
     R.sak = namn || null;
     if (!namn) {
       R.el.classList.remove('sak-nara');
+      vridHem();
       aim([800, 500], 1, [800, 500], cls);
       return;
     }
@@ -2916,9 +2989,10 @@ ${window.RumRegister ? RumRegister.nara() : ''}
     });
     el.addEventListener('pointermove', (e) => {
       R.pek = e.pointerType;
-      if (e.pointerType === 'mouse' && !nara()) {
-        R.tx = (e.clientX / innerWidth) * 2 - 1;
-        R.ty = (e.clientY / innerHeight) * 2 - 1;
+      if (e.pointerType === 'mouse') {
+        // (också nära: dit vrids världen när kameran går tillbaka, vridHem)
+        R.mus = [(e.clientX / innerWidth) * 2 - 1, (e.clientY / innerHeight) * 2 - 1];
+        if (!nara()) [R.tx, R.ty] = R.mus;
       }
       if (e.pointerId !== P.id) return;
       const dx = e.clientX - P.x;

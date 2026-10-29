@@ -216,8 +216,17 @@ window.RumFolk = (() => {
     if (f && F.pa) f.hej(F.pa, t, t);
     if (f && k) f.hej(k, t);
     F.pa = k;
-    F.el.classList.toggle('pa-gang', Boolean(k));
     egen();
+  }
+  // På en figur: ingen hand (klicket går inte till det som står bakom). Det
+  // sätts på det som står under musen, inte som en klass på hela rummet –
+  // den räknade om stilen för rummets ~3 800 element och alla lager varje
+  // gång musen gick in över eller ut från gänget.
+  function markor(el) {
+    if (el === F.markor) return;
+    if (F.markor) F.markor.style.removeProperty('cursor');
+    F.markor = el;
+    if (el) el.style.setProperty('cursor', 'default', 'important');
   }
 
   function wire(el) {
@@ -234,11 +243,14 @@ window.RumFolk = (() => {
       const ms = performance.now();
       if (ms - F.rorAt < 60) return;
       F.rorAt = ms;
-      pa(vemUnder(e.clientX, e.clientY));
+      const k = vemUnder(e.clientX, e.clientY);
+      pa(k);
+      markor(k ? e.target : null);
     });
     el.addEventListener('mouseleave', () => {
       F.over = null;
       pa(null);
+      markor(null);
     });
     // ett klick (eller tryck) på en figur: hej en stund i telefonen, och
     // inget annat

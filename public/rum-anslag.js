@@ -377,6 +377,8 @@ window.RumAnslag = (() => {
     return `matrix3d(${m.map((v) => +v.toFixed(8)).join(',')})`;
   }
   const ease = (t) => (t < 0.5 ? 4 * t * t * t : 1 - Math.pow(-2 * t + 2, 3) / 2);
+  // Safari, och alla webbläsare i iPhone (som WEBKIT i rum.js)
+  const WEBKIT = !navigator.userAgentData && /AppleWebKit/.test(navigator.userAgent);
 
   // ---------- i rummet ----------
 
@@ -565,32 +567,54 @@ window.RumAnslag = (() => {
     }
 
     // Flyger mellan två fyrhörningar; mitt i rörelsen lyfter den lite mot en.
-    function fly(from, to, ms) {
+    // Vägen räknas ut i förväg, en avbildning var 20:e ms, och flygs som en
+    // animering som grafikkortet sköter själv. Förut sattes avbildningen i
+    // varje bildruta: Chrome räknade då om alla rummets lager varje gång och
+    // hann, med gänget och sakerna i 3D som ritas samtidigt, bara flytta
+    // tavlan i varannan eller var tredje bildruta medan kameran gled i
+    // varje – tavlan hackade fram.
+    function stopFly() {
       cancelAnimationFrame(A.raf);
+      if (A.fa) A.fa.cancel();
+      A.fa = null;
+    }
+    function fly(from, to, ms) {
+      stopFly();
+      const at = (t) => {
+        const e = ease(t);
+        const lift = 1 + 0.05 * Math.sin(Math.PI * t);
+        const q = from.map((p, i) => [p[0] + (to[i][0] - p[0]) * e, p[1] + (to[i][1] - p[1]) * e]);
+        const c = [0, 1].map((j) => q.reduce((s, p) => s + p[j], 0) / 4);
+        return warp(q.map((p) => [c[0] + (p[0] - c[0]) * lift, c[1] + (p[1] - c[1]) * lift]), BW, BH);
+      };
+      const n = Math.max(12, Math.round(ms / 20));
+      const vag = Array.from({ length: n + 1 }, (_, i) => ({ transform: at(i / n) }));
       return new Promise((done) => {
-        // klockan börjar när tavlan i närbilden har ritats (minst två
-        // bildrutor, och en som gick fort, högst 20): i Safari tog den
-        // första bildrutan så lång tid att tavlan hoppade en bit av vägen
-        let t0 = 0;
-        let n = 0;
+        const starta = () => {
+          const a = (A.fa = flyg.animate(vag, { duration: ms, easing: 'linear' }));
+          a.finished.then(() => {
+            if (A.fa !== a) return;
+            flyg.style.transform = vag[n].transform;
+            a.cancel();
+            A.fa = null;
+            done();
+          }, () => {});
+        };
+        // I Safari börjar den när tavlan i närbilden har ritats (minst två
+        // bildrutor, och en som gick fort, högst 20): där tog den första
+        // bildrutan så lång tid att tavlan hoppade en bit av vägen. Chrome
+        // startar klockan själv när animeringen når grafikkortet, samtidigt
+        // som kameran.
+        if (!WEBKIT) return starta();
+        let k = 0;
         let fore = 0;
         const step = (now) => {
-          if (!t0) {
-            if (++n < 3 || (now - fore >= 40 && n <= 20)) {
-              fore = now;
-              A.raf = requestAnimationFrame(step);
-              return;
-            }
-            t0 = now;
+          if (++k < 3 || (now - fore >= 40 && k <= 20)) {
+            fore = now;
+            A.raf = requestAnimationFrame(step);
+            return;
           }
-          const t = Math.min(1, (now - t0) / ms);
-          const e = ease(t);
-          const lift = 1 + 0.05 * Math.sin(Math.PI * t);
-          const q = from.map((p, i) => [p[0] + (to[i][0] - p[0]) * e, p[1] + (to[i][1] - p[1]) * e]);
-          const c = [0, 1].map((j) => q.reduce((s, p) => s + p[j], 0) / 4);
-          flyg.style.transform = warp(q.map((p) => [c[0] + (p[0] - c[0]) * lift, c[1] + (p[1] - c[1]) * lift]), BW, BH);
-          if (t < 1) A.raf = requestAnimationFrame(step);
-          else done();
+          starta();
         };
         A.raf = requestAnimationFrame(step);
       });
@@ -647,7 +671,7 @@ window.RumAnslag = (() => {
       fitWall();
       if (!A.on) return;
       place();
-      cancelAnimationFrame(A.raf);
+      stopFly();
       rest();
       if (A.lyft) placeLyft(A.W.notes.find((x) => x.id === A.lyft.id), false);
     });

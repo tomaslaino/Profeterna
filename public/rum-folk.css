@@ -1,8 +1,5 @@
 /* Gänget i rummet och natten (rum-folk.js). */
 
-/* På en figur i gänget: ingen hand (klicket går inte till det som står bakom) */
-.rum.pa-gang, .rum.pa-gang * { cursor: default !important; }
-
 /* Natten: lysröret är släckt. Mörkret ligger i samma lager som när
    lysröret tänds (.rum-mork i rum.css), med ljus kvar där gatan lyser in
    genom fönstret och dörren, från tv:n och lite över pulten; nära tv:n,
