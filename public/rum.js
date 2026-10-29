@@ -1350,6 +1350,14 @@ ${window.RumRegister ? RumRegister.nara() : ''}
     const w = document.getElementById('rum-world');
     if (!w || !vrids()) return setCam(R.mx, R.my);
     const nu = performance.now();
+    // Från en närbild, där rummet står precis rakt, börjar vridningen en
+    // tusendel snett (syns inte). Rakt räknar Chrome ut lagrens skärpa exakt
+    // – nära tv:n är väggarna tre gånger så skarpa som hemma – och när
+    // kameran började gå tillbaka behöll den den skärpan, krympt så att
+    // lagren rymdes, och ritade allt som kom i bild i den och sedan allt en
+    // gång till i hemmets skärpa när kameran stannade. Lutar rummet det minsta
+    // i perspektivet tar den hemmets skärpa direkt.
+    if (!fran[0] && !fran[1]) fran = [0.001, 0.001];
     // (från det som syns: stilen räknas om först, så att övergången börjar där)
     setCam(...fran);
     void w.offsetWidth;

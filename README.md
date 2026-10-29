@@ -2363,6 +2363,46 @@ Tv:n och videohörnet är skarpa när kameran är framme (förut suddiga ett par
 tavlan landar på väggen på en hundradels bildpunkt när. I WebKit (WKWebView, 1440 × 900 och
 390 × 664 med täthet 3) lika många långa bildrutor som förut och samma minne.
 
+Vägen tillbaka från närbilderna hackade ändå, och mest i ett riktigt Chrome-fönster:
+headless Chrome visar inte bilden på skärmen och hackade inte. I ett riktigt fönster (1280 ×
+743 med täthet 2, egen profil, uppvärmd) stod bilden still upp till 0,37 sekunder medan
+kameran gick tillbaka – från tv:n 23–28 tappade bildrutor av 90 den första och en halv
+sekunden, från videon, uret, oraklet och affischen 11–23 – och det var grafikkortet som inte
+hann med: allt som kom i bild ritades om, en del två gånger, och rutor fattades. Två orsaker:
+
+- **Muspekaren över gänget** (ingen hand över det som står bakom, `markor` i rum-folk.js)
+  sattes som stil på det som låg under musen, oftast scenen eller en vägg. Pekaren ärvs av
+  allt inuti, och Chrome ritade då om väggarnas SVG:er – bakväggen är sexton rutor i
+  fönstrets bredd – varje gång musen gick in över eller ut från en figur, upp till femton
+  gånger i sekunden, också hemma. Nu sätts den bara på länken under musen (`.rum-sak`,
+  `.rum-tag`), det enda som annars visar en hand.
+- **Skärpan på vägen tillbaka.** Står rummet precis rakt, som framför tv:n, videon, uret,
+  skårtavlan, oraklet och affischen, räknar Chrome ut lagrens skärpa exakt, och nära är
+  väggarna tre gånger så skarpa som hemma. När kameran började gå tillbaka behöll Chrome
+  närbildens skärpa, krympt så att lagren rymdes i minnet, ritade allt som kom i bild i den
+  mellanskärpan och sedan allt en gång till i hemmets skärpa när kameran stannade. Lutar
+  rummet det minsta i perspektivet tar Chrome hemmets skärpa direkt, så vridningen tillbaka
+  mot musen börjar en tusendels grad snett (`vrid` i rum.js) – det syns inte – och rummet
+  ritas en gång, i hemmets skärpa. Bara i Chrome.
+
+Mätt i ett riktigt Chrome-fönster, gammal och ny kod om vartannat för varje utzoomning (alla
+nio närbilderna två gånger, Esc med musen i rörelse, datorn belastad av annat): längsta tiden
+utan ny bild i snitt 184 → 118 ms, visade bildrutor 69 → 76 av 90 den första och en halv
+sekunden, rutor som ritas om 383 → 192 och saknade rutor (som syns som hål) 42 → 3. Med datorn
+lugnare gick vägen tillbaka från tv:n i alla 90 bildrutorna, längsta glappet 18 ms (förut
+50–130). Med mycket hög belastning (load 60–80) hackar det fortfarande, både förut och nu.
+Bilderna i närbilderna och hemma är desamma, anslagstavlan landar på en hundradels bildpunkt
+när, och i WebKit i telefonstorlek (390 × 664, täthet 3) är bildrutorna och minnet som förut –
+i telefonen körs ingen av ändringarna.
+
+Mätsättet: Chrome med egen profil i ett riktigt fönster, startat i bakgrunden (`open -g`) och
+med `--disable-features=MacWebContentsOcclusion` (annars slutar det rita när ett annat fönster
+täcker det), styrt och spårat via DevTools-protokollet. Tappade bildrutor ur
+`PipelineReporter`, väntan på grafikkortet ur `IOSurfaceImageBacking::WaitForCommandsToBeScheduled`,
+rutornas skärpa och minne ur `LayerTreeHostImpl:snapshot` (`disabled-by-default-cc.debug`). En
+ny profil kompilerar grafikkortets program första gången (upp till en sekund stopp) – värm upp
+alla närbilderna först.
+
 ### I Safari i telefonen
 
 I iPhone ritar alla webbläsare med WebKit, Safaris motor. Mätt i WebKit på datorn

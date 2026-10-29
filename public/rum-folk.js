@@ -219,9 +219,13 @@ window.RumFolk = (() => {
     egen();
   }
   // På en figur: ingen hand (klicket går inte till det som står bakom). Det
-  // sätts på det som står under musen, inte som en klass på hela rummet –
-  // den räknade om stilen för rummets ~3 800 element och alla lager varje
-  // gång musen gick in över eller ut från gänget.
+  // sätts på länken under musen (.rum-sak, .rum-tag – det enda som annars
+  // visar en hand), inte som en klass på hela rummet – den räknade om stilen
+  // för rummets ~3 800 element och alla lager varje gång musen gick in över
+  // eller ut från gänget – och inte på scenen eller en vägg: pekaren ärvs av
+  // allt inuti, och Chrome ritade då om väggarnas SVG:er (rutor i fönstrets
+  // bredd, sexton för bakväggen) upp till femton gånger i sekunden, så att
+  // grafikkortet inte hann med när kameran gick tillbaka från en närbild.
   function markor(el) {
     if (el === F.markor) return;
     if (F.markor) F.markor.style.removeProperty('cursor');
@@ -245,7 +249,7 @@ window.RumFolk = (() => {
       F.rorAt = ms;
       const k = vemUnder(e.clientX, e.clientY);
       pa(k);
-      markor(k ? e.target : null);
+      markor(k ? e.target.closest('.rum-sak, .rum-tag') : null);
     });
     el.addEventListener('mouseleave', () => {
       F.over = null;
