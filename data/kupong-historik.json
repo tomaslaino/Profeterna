@@ -26,6 +26,17 @@
         "modell": "deepseek-v4-pro",
         "skriven": "2026-10-24T19:00:55.868Z"
       }
+    },
+    {
+      "id": "2026-10-31",
+      "namn": "Bournemouth slår helst uppåt",
+      "spel": "Stryktipset",
+      "datum": "2026-10-31",
+      "källa": "sidan",
+      "matcher": [
+        { "match": "Aston Villa – Fulham", "tecken": "1", "resultat": "1–1", "modell": [50, 25, 25], "id": "401879250" },
+        { "match": "Tottenham Hotspur – Crystal Palace", "tecken": "1", "resultat": "2–0", "modell": [47, 25, 28], "id": "401878761" }
+      ]
     }
   ]
 }

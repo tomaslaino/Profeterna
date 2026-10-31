@@ -37,20 +37,21 @@
         { "id": "DT", "namn": "Daniel Teijder" },
         { "id": "DJ", "namn": "Daniel Johansson" }
       ],
+      "klar": "2026-10-31T22:48:34.650Z",
       "matcher": [
-        { "id": "401879245", "match": "Manchester City – Brighton & Hove Albion", "avspark": "2026-10-31T15:00:00.000Z", "tips": { "DL": "12", "DT": "1X2", "DJ": "X2" }, "motivering": { "DJ": "Brogton bättre i veckan. Bra bänk i hög matchtäthet." } },
-        { "id": "401879251", "match": "AFC Bournemouth – Leeds United", "avspark": "2026-10-31T15:00:00.000Z", "tips": { "DL": "1", "DT": "1", "DJ": "1X2" } },
-        { "id": "401879247", "match": "Coventry City – Sunderland", "avspark": "2026-10-31T15:00:00.000Z", "tips": { "DL": "X2", "DT": "1X2", "DJ": "1X2" } },
-        { "id": "401879249", "match": "Brentford – Nottingham Forest", "avspark": "2026-10-31T15:00:00.000Z", "tips": { "DL": "X2", "DT": "1X", "DJ": "1" } },
-        { "id": "401878763", "match": "Hull City – Ipswich Town", "avspark": "2026-10-31T15:00:00.000Z", "tips": { "DL": "1X2", "DT": "1X", "DJ": "1X2" } },
-        { "id": "401880196", "match": "Bolton Wanderers – Bristol City", "avspark": "2026-10-31T15:00:00.000Z", "tips": { "DL": "1X2", "DT": "1X2", "DJ": "1X" } },
-        { "id": "401880195", "match": "Burnley – Portsmouth", "avspark": "2026-10-31T15:00:00.000Z", "tips": { "DL": "1", "DT": "1X2", "DJ": "X2" } },
-        { "id": "401880192", "match": "Millwall – Derby County", "avspark": "2026-10-31T15:00:00.000Z", "tips": { "DL": "1X2", "DT": "1", "DJ": "1X" } },
-        { "id": "401880189", "match": "Southampton – Queens Park Rangers", "avspark": "2026-10-31T15:00:00.000Z", "tips": { "DL": "12", "DT": "12", "DJ": "12" } },
-        { "id": "401880187", "match": "Swansea City – Blackburn Rovers", "avspark": "2026-10-31T15:00:00.000Z", "tips": { "DL": "X", "DT": "1", "DJ": "1X2" } },
-        { "id": "401880186", "match": "West Ham United – West Bromwich Albion", "avspark": "2026-10-31T15:00:00.000Z", "tips": { "DL": "12", "DT": "1X", "DJ": "1" } },
-        { "id": "401878761", "match": "Tottenham Hotspur – Crystal Palace", "avspark": "2026-10-31T17:30:00.000Z", "tips": { "DL": "1X2", "DT": "1", "DJ": "1" } },
-        { "id": "401879250", "match": "Aston Villa – Fulham", "avspark": "2026-10-31T20:00:00.000Z", "tips": { "DL": "1", "DT": "1X", "DJ": "1" } }
+        { "id": "401879245", "match": "Manchester City – Brighton & Hove Albion", "avspark": "2026-10-31T15:00:00.000Z", "tips": { "DL": "12", "DT": "1X2", "DJ": "X2" }, "motivering": { "DJ": "Brogton bättre i veckan. Bra bänk i hög matchtäthet." }, "resultat": "0–1", "modell": [63, 20, 17] },
+        { "id": "401879251", "match": "AFC Bournemouth – Leeds United", "avspark": "2026-10-31T15:00:00.000Z", "tips": { "DL": "1", "DT": "1", "DJ": "1X2" }, "resultat": "2–0", "modell": [48, 25, 27] },
+        { "id": "401879247", "match": "Coventry City – Sunderland", "avspark": "2026-10-31T15:00:00.000Z", "tips": { "DL": "X2", "DT": "1X2", "DJ": "1X2" }, "resultat": "3–1", "modell": [42, 28, 30] },
+        { "id": "401879249", "match": "Brentford – Nottingham Forest", "avspark": "2026-10-31T15:00:00.000Z", "tips": { "DL": "X2", "DT": "1X", "DJ": "1" }, "resultat": "2–0", "modell": [51, 25, 24] },
+        { "id": "401878763", "match": "Hull City – Ipswich Town", "avspark": "2026-10-31T15:00:00.000Z", "tips": { "DL": "1X2", "DT": "1X", "DJ": "1X2" }, "resultat": "2–2", "modell": [35, 26, 39] },
+        { "id": "401880196", "match": "Bolton Wanderers – Bristol City", "avspark": "2026-10-31T15:00:00.000Z", "tips": { "DL": "1X2", "DT": "1X2", "DJ": "1X" }, "resultat": "2–3", "modell": [34, 27, 39] },
+        { "id": "401880195", "match": "Burnley – Portsmouth", "avspark": "2026-10-31T15:00:00.000Z", "tips": { "DL": "1", "DT": "1X2", "DJ": "X2" }, "resultat": "0–0", "modell": [55, 24, 21] },
+        { "id": "401880192", "match": "Millwall – Derby County", "avspark": "2026-10-31T15:00:00.000Z", "tips": { "DL": "1X2", "DT": "1", "DJ": "1X" }, "resultat": "4–1", "modell": [49, 27, 24] },
+        { "id": "401880189", "match": "Southampton – Queens Park Rangers", "avspark": "2026-10-31T15:00:00.000Z", "tips": { "DL": "12", "DT": "12", "DJ": "12" }, "resultat": "4–1", "modell": [60, 21, 19] },
+        { "id": "401880187", "match": "Swansea City – Blackburn Rovers", "avspark": "2026-10-31T15:00:00.000Z", "tips": { "DL": "X", "DT": "1", "DJ": "1X2" }, "resultat": "4–0", "modell": [43, 29, 28] },
+        { "id": "401880186", "match": "West Ham United – West Bromwich Albion", "avspark": "2026-10-31T15:00:00.000Z", "tips": { "DL": "12", "DT": "1X", "DJ": "1" }, "resultat": "1–3", "modell": [63, 21, 16] },
+        { "id": "401878761", "match": "Tottenham Hotspur – Crystal Palace", "avspark": "2026-10-31T17:30:00.000Z", "tips": { "DL": "1X2", "DT": "1", "DJ": "1" }, "resultat": "2–0", "modell": [47, 25, 28] },
+        { "id": "401879250", "match": "Aston Villa – Fulham", "avspark": "2026-10-31T20:00:00.000Z", "tips": { "DL": "1", "DT": "1X", "DJ": "1" }, "resultat": "1–1", "modell": [50, 25, 25] }
       ]
     }
   ]
