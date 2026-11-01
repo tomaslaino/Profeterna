@@ -36,7 +36,12 @@
       "matcher": [
         { "match": "Aston Villa – Fulham", "tecken": "1", "resultat": "1–1", "modell": [50, 25, 25], "id": "401879250" },
         { "match": "Tottenham Hotspur – Crystal Palace", "tecken": "1", "resultat": "2–0", "modell": [47, 25, 28], "id": "401878761" }
-      ]
+      ],
+      "ai": {
+        "text": "Aston Villa spelade 1–1 mot Fulham, så ert tecken 1 med odds 2,00 satt inte. Tottenham Hotspur vann med 2–0 mot Crystal Palace som väntat. Ni fick 1 rätt av 2, samma som modellens tips, vilket gav betyget 3 av 5 stjärnor. Utfallet var som förväntat.",
+        "modell": "deepseek-v4-pro",
+        "skriven": "2026-11-01T02:08:50.203Z"
+      }
     }
   ]
 }
