@@ -370,7 +370,7 @@ window.RumUte = (() => {
 
     // dimman lägger sig över allt
     if (L.dimma > 0.05) s += `<rect x="-80" y="90" width="1100" height="640" fill="${mix('#2a2622', '#aeb3b6', L.dag)}" opacity="${r1(0.5 * L.dimma)}"/>`;
-    const ruta = (inner, [x, y, w, h] = [0, 0, 1600, 1000]) => `<svg class="rum-layer" viewBox="${x} ${y} ${w} ${h}" style="left:${x}px; top:${y}px; width:${w}px; height:${h}px">${inner}</svg>`;
+    const ruta = (inner, [x, y, w, h] = [0, 0, 1600, 1000]) => `<svg class="rum-layer${w < 1600 ? ' skylt' : ''}" viewBox="${x} ${y} ${w} ${h}" style="left:${x}px; top:${y}px; width:${w}px; height:${h}px">${inner}</svg>`;
     return ruta(`<defs><filter id="rum-ute-b4" x="-50%" y="-50%" width="200%" height="200%"><feGaussianBlur stdDeviation="4"/></filter><filter id="rum-ute-b10" x="-50%" y="-50%" width="200%" height="200%"><feGaussianBlur stdDeviation="10"/></filter></defs>${husen}`) +
       ruta(skylt, [30, 280, 740, 50]) + ruta(s);
   }
@@ -691,6 +691,12 @@ window.RumUte = (() => {
   const FILTER = (() => {
     try { return typeof document.createElement('canvas').getContext('2d').filter === 'string'; } catch { return false; }
   })();
+  // I telefonen (Safari saknar ctx.filter) gjorde oskärpan i CSS varje figur
+  // till ett eget pass på grafikkortet i varje bildruta, ett tjugotal på
+  // gatan. Där får dukarna i stället en halv bildpunkt per px – förstorade
+  // blir de lika mjuka – och molnen en femtedels (rum-ute.css tar bort
+  // oskärpan), och figurerna ritas om varannan gång, hälften i taget.
+  const LATT = matchMedia('(max-width: 700px), (max-height: 500px)').matches;
 
   // ease-in-out
   const IO = (() => {
@@ -902,7 +908,7 @@ window.RumUte = (() => {
       const st = svg.style;
       const steg = (parseFloat(st.getPropertyValue('--steg')) || 0.9) * 1000;
       // molnen är så suddiga att det räcker med en bildpunkt per px
-      const sk = blur >= 3 ? Math.min(1, s) : s;
+      const sk = LATT ? (blur >= 3 ? 0.2 : 0.5) : blur >= 3 ? Math.min(1, s) : s;
       const bakad = FILTER && blur > 0;
       const P = bakad ? Math.ceil(blur * 3) : 0;
       const c = document.createElement('canvas');
@@ -934,22 +940,75 @@ window.RumUte = (() => {
     return ut;
   }
 
+  // I telefonen ritas gatan (husen och det som står framför dem, inte skylten)
+  // en gång i en grov duk, 0,4 bildpunkter per px: förstorad är den lika mjuk
+  // som med oskärpan i CSS, som var ett pass på grafikkortet över hela gatan i
+  // varje bildruta. Ett filter inne i SVG:n blev dyrare än så: Safari släpper
+  // det som är utanför bilden medan kameran står nära och ritar om gatan, med
+  // filtret, varje gång. En duk ritas inte om.
+  const GATA = 0.4;
+  async function bakaGata(x) {
+    const gen = (x._gen = (x._gen || 0) + 1);
+    const xs = new XMLSerializer();
+    for (const svg of [...x.querySelectorAll(':scope > svg:not(.skylt)')]) {
+      const k = svg.cloneNode(true);
+      k.removeAttribute('style');
+      k.removeAttribute('class');
+      k.setAttribute('width', 1600);
+      k.setAttribute('height', 1000);
+      // (en bild ser inte resten av sidan: gradienterna och filtren följer med)
+      const text = xs.serializeToString(k);
+      const ids = new Set([...text.matchAll(/url\(#([\w-]+)\)/g)].map((m) => m[1]));
+      const defs = [...ids].map((id) => (document.getElementById(id) || {}).outerHTML || '').join('');
+      const url = URL.createObjectURL(new Blob([text.replace('>', `><defs>${defs}</defs>`)], { type: 'image/svg+xml' }));
+      try {
+        const img = new Image();
+        img.src = url;
+        await img.decode();
+        if (x._gen !== gen || !svg.isConnected) return;
+        const c = document.createElement('canvas');
+        c.className = 'rum-layer';
+        c.style.cssText = 'width:1600px; height:1000px';
+        c.width = 1600 * GATA;
+        c.height = 1000 * GATA;
+        c.getContext('2d').drawImage(img, 0, 0, c.width, c.height);
+        img.src = '';
+        svg.replaceWith(c);
+      } catch { /* då står SVG:n kvar, utan oskärpa */ }
+      URL.revokeObjectURL(url);
+    }
+  }
+
   // Ställningarna efter t ms (rum.js: i gängets takt, eller den fasta
   // tiden i en stillbild); bara det som syns genom fönstret och dörren.
+  // Var en figur är läses bara för en figur i taget: i Safari räknar varje
+  // läsning (getComputedTiming) om stilen, och med den alla rummets lager om
+  // något har ändrats. Däremellan räknas läget fram ur farten.
+  let tur = 0;
   function takt(el, t) {
     if (!el || !el._duk) return;
     const [X0, X1] = el._x || [-Infinity, Infinity];
-    for (const f of el._duk) {
+    const nu = performance.now();
+    const fast = t != null;
+    tur++;
+    el._duk.forEach((f, i) => {
       if (f.glid) {
         if (f.a === undefined) f.a = f.c.getAnimations ? f.c.getAnimations()[0] || null : null;
-        const p = f.a && f.a.effect ? f.a.effect.getComputedTiming().progress : null;
-        if (p != null) {
+        if (f.a && f.a.effect && (fast || f.pt === undefined || i === tur % el._duk.length)) {
+          const c = f.a.effect.getComputedTiming();
+          f.p = c.progress;
+          f.pt = nu;
+          f.dur = c.duration;
+        }
+        if (f.p != null) {
+          const p = (f.p + (f.dur > 0 ? (nu - f.pt) / f.dur : 0)) % 1;
           const x = f.x0 + f.fran + (f.till - f.fran) * p;
-          if (x + f.w + f.P < X0 || x - f.P > X1) continue;
+          if (x + f.w + f.P < X0 || x - f.P > X1) return;
         }
       }
-      rita(f, t == null ? (document.timeline.currentTime || 0) - f.t0 : t);
-    }
+      if (LATT && !fast && (i + tur) % 2) return;
+      rita(f, fast ? t : (document.timeline.currentTime || 0) - f.t0);
+    });
   }
 
   // el: utsiktens lager i rum.js; rects: fönstrets och dörrens glas
@@ -982,6 +1041,7 @@ window.RumUte = (() => {
       const x = el.querySelector(`[data-lager="${k}"]`);
       x.innerHTML = draw[k]();
       if (k === 'liv' || k === 'himliv') el._dukar[k] = duka(x, s);
+      if (k === 'gata' && LATT) bakaGata(x);
       changed = true;
     }
     el._duk = [...(el._dukar.liv || []), ...(el._dukar.himliv || [])];

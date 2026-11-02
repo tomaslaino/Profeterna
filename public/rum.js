@@ -420,7 +420,10 @@ window.Rum = (() => {
   // bild, ungefär 350 MB för furun, väggen och pulten. Det blir också färre
   // bildpunkter där bruset är mjukt (som ådringen på höjden).
   // → när allt är bakat
-  const BAKA = { 'rum-b1': 2, 'rum-b4': 2, 'rum-b10': 0.6, 'rum-b24': 0.5, 'rum-b40': 0.35, 'rum-grainwood': 2, 'rum-ved': 2, 'rum-flack': 2, 'rum-prick': 2, 'rum-grime': 2 };
+  // (videolådans furu: filtret räknades om i processorn varje gång hörnet
+  // ritades om, också när kameran gick fram i telefonen; i datorn ska den
+  // vara skarp nära)
+  const BAKA = { 'rum-b1': 2, 'rum-b4': 2, 'rum-b10': 0.6, 'rum-b24': 0.5, 'rum-b40': 0.35, 'rum-grainwood': 2, 'rum-ved': 2, 'rum-flack': 2, 'rum-prick': 2, 'rum-grime': 2, ...(LATT ? { 'vhs-ved': 2, 'vhs-ved-s': 2 } : {}) };
 
   // feTurbulence som i SVG-specifikationen (samma slumptal, gitter och
   // oktaver som i webbläsaren): fn(kanal, x, y) → 0…1.
@@ -1513,14 +1516,43 @@ ${window.RumRegister ? RumRegister.nara() : ''}
       // räknade om stilen för alla element i rummet varje gång den glappade
       for (const e of R.el.querySelectorAll('.rum-neon, .rum-neonhalo, .rum-neonglow')) e.classList.toggle('av', !on);
     }
-    const damm = document.getElementById('rum-damm');
-    if ((!calm() || still()) && syns(damm) && !damm.hidden) dust(t);
-    const [vx, vy] = synlig();
-    if (R.fig && syns(R.gang)) R.fig.draw(t, vx, vy, on);
-    if (R.saker) R.saker.draw(t, vx, vy, R.rows, R.old, syns(R.sakDuk));
-    if (R.inr) R.inr.draw();
-    if (!calm()) uteTakt();
+    const gang = () => {
+      const [vx, vy] = synlig();
+      if (R.fig && syns(R.gang)) R.fig.draw(t, vx, vy, on);
+    };
+    const saker = () => {
+      const [vx, vy] = synlig();
+      if (R.saker) R.saker.draw(t, vx, vy, R.rows, R.old, syns(R.sakDuk));
+      if (R.inr) R.inr.draw();
+    };
+    const ute = () => {
+      const damm = document.getElementById('rum-damm');
+      if ((!calm() || still()) && syns(damm) && !damm.hidden) dust(t);
+      if (!calm()) uteTakt();
+    };
+    // I Safari väntar bildrutan på att grafiken ska hinna rita klart det som
+    // har ritats i 3D, så i en telefon blev var tredje bildruta för lång – det
+    // man såg som hack när man drog med fingret eller kameran glider. Där
+    // ritas gänget, sakerna och gatan i stället var och en för sig, en i varje
+    // bildruta, direkt efter att bildrutan är klar (efterBild): då hinner de
+    // ritas färdigt till nästa, och ingen bildruta får allt på en gång.
+    if (WEBKIT && !calm()) {
+      while (R.ko.length) R.ko.shift()();
+      R.ko.push(gang, saker, ute);
+    } else {
+      gang();
+      saker();
+      ute();
+    }
   }
+
+  // Nästa del av det som ska ritas (frame) som egen uppgift: ett meddelande
+  // som postas i bildrutan kommer efter att bildrutan har gått iväg.
+  R.ko = [];
+  const efterBild = new MessageChannel();
+  efterBild.port1.onmessage = () => {
+    if (R.on && R.ko.length) R.ko.shift()();
+  };
 
   function loop() {
     cancelAnimationFrame(R.raf);
@@ -1545,6 +1577,7 @@ ${window.RumRegister ? RumRegister.nara() : ''}
         dt = 0;
       }
       if (raw) kanna(ms, raw);
+      if (R.ko.length) efterBild.port2.postMessage(0);
       R.raf = requestAnimationFrame(tick);
     };
     R.raf = requestAnimationFrame(tick);
@@ -1569,7 +1602,9 @@ ${window.RumRegister ? RumRegister.nara() : ''}
     { takt: 20, pr: 0.75, skugga: 2, detalj: 0.6, damm: true, vrid: false },
     { takt: 15, pr: 0.55, skugga: 4, detalj: 0.45, damm: false, vrid: false },
   ];
-  const KVAL_NYCKEL = 'rum-kval';
+  // (i telefonen räknas skuggorna om var tredje bild)
+  if (LATT) KVAL[1].skugga = 3;
+  const KVAL_NYCKEL = 'rum-kval2';
   R.kval = 0;
   if (R.q.has('rum-kval')) {
     R.kval = Math.max(0, Math.min(KVAL.length - 1, Math.round(Number(R.q.get('rum-kval'))) || 0));
@@ -1612,7 +1647,10 @@ ${window.RumRegister ? RumRegister.nara() : ''}
     K.sum += dt;
     if (dt > 50) K.hack++;
     if (K.sum < 2000) return;
-    const dalig = (K.n / K.sum) * 1000 < 45 || K.hack > K.n * 0.1;
+    // (stadiga 30 bilder i sekunden är en telefon i strömsparläge – det blir
+    // inte bättre av att gänget ritas glesare)
+    const bps = (K.n / K.sum) * 1000;
+    const dalig = (bps < 45 && Math.abs(bps - 30) > 3) || K.hack > K.n * 0.1;
     K.daliga = dalig ? K.daliga + 1 : 0;
     K.n = K.sum = K.hack = 0;
     if (K.daliga < 2) return;
@@ -3287,6 +3325,15 @@ ${window.RumRegister ? RumRegister.nara() : ''}
   const fits = () => R.q.has('rum-t') || matchMedia('(min-width: 280px) and (min-height: 260px)').matches;
 
   function show() {
+    // ?rum-mat: mätningen i den riktiga telefonen (rum-mat.js)
+    if (R.q.has('rum-mat') && !R.mat) {
+      R.mat = true;
+      R.kvalLas = true;
+      const m = document.createElement('script');
+      m.src = 'rum-mat.js';
+      m.onload = () => window.RumMat(R);
+      document.head.append(m);
+    }
     if (!R.built) build();
     const q = R.q;
     if (q.has('rum-t')) R.frozen = parseFloat(q.get('rum-t')) || 0;

@@ -2221,8 +2221,8 @@ Därför:
   håll (se [Videon](#videon)). Anslagstavlans yta står före ramens sidor, så att den inte blir ett
   eget lager, och flaggan i utsikten är ett eget lager – annars ritades hela utsikten om hela
   tiden, och ett lager som ritas om hålls i två buffertar.
-- **Det suddiga ritas med färre bildpunkter.** Ljuset, vinjetten och kornet med en fjärdedel
-  respektive hälften och utsikten med 0,4 (CSS zoom, förstorat igen), tv:ns sken och
+- **Det suddiga ritas med färre bildpunkter.** Ljuset och vinjetten med en fjärdedel
+  och utsikten med 0,4 (CSS zoom, förstorat igen), tv:ns sken och
   anslagstavlans glans en fjärdedel så stora och förstorade med transform. Zoom går inte på
   det som har text mellan 9 och 18 px (Safari gör text som blir mindre än 9 px större) och
   flyttar det som inte står i 0,0.
@@ -2264,7 +2264,7 @@ inte när fliken är dold – och kommer det färre än 45 bilder i sekunden, el
 tionde bild längre än 50 ms, två perioder i rad tas ett steg ner.
 
 - **Steg 1:** gänget och sakerna på pulten ritas 20 gånger i sekunden i stället för 30, med
-  tre fjärdedelar av bildpunkterna på ledden och skuggorna omräknade varannan bild (`kval` i
+  tre fjärdedelar av bildpunkterna på ledden och skuggorna omräknade varannan bild (var tredje i telefonen) (`kval` i
   rum-3d.js och rum-saker.js). Gänget byggs av ungefär 310 000 trianglar i stället för
   745 000 – håret, huvudena och de runda delarna med färre segment (`seg` i rum-3d.js;
   glansen i håret blir lite kantigare) – och byggs om på stället som när kläderna byts.
@@ -2499,6 +2499,60 @@ väg till videon visar kameran 5–13 % av vägen fram (förut 57–72 %) och 0�
 0–1 % (förut upp till två tredjedelar). Minnet är inte högre (topparna när man går till tv:n,
 videon, anslagstavlan, kupongen och kortregistret efter varandra 1,3–1,4 GB mot 1,3–1,5), och
 närbilderna ser ut som förut.
+
+Telefonen hackade ändå (användaren 2026-11-02), och det mesta av det som återstod märks knappt
+på datorn, som har mycket mer grafikkort och minnesbandbredd:
+
+- **Bildrutan väntade på 3D-ritningen.** Innan en bildruta går iväg väntar Safari på att
+  grafikprocessen har ritat klart det som har ritats i 3D (`prepareForDisplay`). Gänget, sakerna
+  och gatan ritades alla i samma bildruta, var tredje, så att just den blev för lång – det man
+  såg som hack när man drog med fingret. Nu ritas de i Safari var och en för sig, en i varje
+  bildruta, direkt efter att bildrutan har gått iväg (`efterBild` i rum.js, ett meddelande från
+  bildrutan, som kommer efter den), så att grafiken har en hel bildruta på sig. Gänget syns en
+  bildruta senare, och det märks inte.
+- **Gänget kostar mindre.** Ställningarna räknades två gånger per bild (röken ställer figuren
+  där den var när blosset föddes, och den ställdes tillbaka efteråt; nu kommer röken först).
+  Håret, en tredjedel av alla trianglar, har drygt hälften så många i telefonen (`hairGeo`), utan
+  att det syns i den storleken. Små delar som fingrar och knappar kastar ingen skugga där
+  (`utanSmaSkuggor`), och skuggorna räknas om var tredje bild i stället för varannan på steg 1.
+- **Oskärpa och blandning i varje bildruta är borta.** Safari saknar `ctx.filter`, så gatans
+  figurer, löven, fåglarna och flaggan hade `filter: blur()` i CSS – ett eget pass på grafikkortet
+  för var och en, ett tjugotal, i varje bildruta. I telefonen har dukarna en halv bildpunkt per
+  px (molnen en femtedels), och förstorade är de lika mjuka. Hela gatan hade samma filter: den
+  ritas nu en gång i två grova dukar med 0,4 bildpunkter per px (`bakaGata` i rum-ute.js), som
+  ser ut som förut och tar en bråkdel av minnet. (Ett filter inne i SVG:n blev dyrare: Safari
+  släpper det som är utanför bilden medan kameran står nära och ritar om gatan vid varje närbild.)
+  Blandningslägena över hela rummet (ljuset, dagsljuset, dammet) läses mot allt bakom i varje
+  bildruta; i telefonen läggs ljuset ovanpå som vanligt, vilket ser nästan likadant ut. Kornet,
+  som knappt syns så litet, och röken under taket, som rör sig några bildpunkter i sekunden, står
+  inte på där.
+- **Videolådans furu** var ett SVG-filter som räknades om i processorn varje gång lådan ritades
+  om, också när kameran gick fram och tillbaka. I telefonen är det bakat som bruset i väggarna
+  (`BAKA` i rum.js).
+- **Gatan frågade efter tiden.** För att rita bara de figurer som syns läste `takt` i rum-ute.js
+  varje figurs läge (`getComputedTiming`), och i Safari räknar varje sådan läsning om stilen och,
+  om något har ändrats, alla rummets lager. Nu läses en figur åt gången och läget räknas fram
+  däremellan. I telefonen ritas hälften av figurerna åt gången. Kortlådan räknar om skuggorna var
+  tredje bild medan den rör sig (ungefär 300 ritanrop per bild).
+- **Stegen.** Stadiga 30 bilder i sekunden är en telefon i strömsparläge och räknas inte längre
+  som dåligt (`kanna`) – gänget blev bara ryckigare av att gå ner ett steg. Steget sparas under
+  ett nytt namn (`rum-kval2`), så att telefoner som hade fastnat på det lägsta börjar om.
+
+Mätt på samma sätt, omväxlande gammal och ny kod (median av tre varv, belastning 4–6): 95:e
+percentilen av bildrutorna när rummet står still och när fingret drar 21 → 18 ms, de längsta
+1 % 24 → 18 ms, bildrutor över 25 ms när det står still 2 → 0, längsta bildrutan till videon
+165 → 132 ms och 80–100 MB mindre minne genom hela turen (1,10 → 1,02 GB hemma, 1,46 → 1,35 GB i
+topp). Med gänget ritat fyra gånger per bild, för att efterlikna en långsammare grafikdel: bildrutor
+över 25 ms medan fingret drar 13 → 3, och när varje ritning väntar in grafiken 101 → 5 på 5
+sekunder (95:e percentilen 41 → 24 ms). Rummet ser likadant ut: jämfört bild för bild dag, natt
+och regn, närbilderna, kupongen och anslagstavlan. Anslagstavlans långa bildrutor (150 ms på
+datorn) är kvar: de är väntan på grafikkortet när lapparna ritas.
+
+**Mätning i den riktiga telefonen:** datorn visar inte vad en iPhone hinner med. Med `?rum-mat`
+(matchfixarna.se/?rum-mat, [public/rum-mat.js](public/rum-mat.js), laddas bara då) kör rummet
+igenom sig självt på ungefär en minut – står still, dras med ett låtsasfinger, utan gänget och
+gatan och fram och tillbaka till närbilderna – och visar bildrutorna i en tabell att ta en
+skärmbild av, med hur lång tid gängets kod och grafik tar per bild.
 
 ### Utsikten och vädret
 

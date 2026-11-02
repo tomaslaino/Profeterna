@@ -224,6 +224,7 @@ export async function figurer(canvas, opt = {}) {
   // så att minnet räcker
   const LATT = matchMedia('(max-width: 700px), (max-height: 500px)').matches;
   const SKUGGA = LATT ? 1024 : 2048;
+  const SMA_SKUGGA = 7;
   // hur många trianglar de byggs av (detalj i KVAL i rum.js): håret, huvudena
   // och de runda delarna har färre när datorn inte hinner med – gänget var
   // drygt 700 000 trianglar, två gånger per bild med skuggorna
@@ -443,8 +444,10 @@ export async function figurer(canvas, opt = {}) {
   // skulpterat hår som på en vinylfigur: grova testar med fina fåror, rundade
   // spetsar, tjock kant mot huden, volym framtill, mörkare i fårorna
   function hairGeo(P, h, seed) {
-    const N = seg(480, 300);
-    const M = seg(96, 48);
+    // (i telefonen är huvudena några dussin punkter breda: håret var en
+    // tredjedel av gängets alla trianglar)
+    const N = LATT ? seg(360, 180) : seg(480, 300);
+    const M = LATT ? seg(72, 32) : seg(96, 48);
     const pos = [];
     const uv = [];
     const col = [];
@@ -1459,7 +1462,20 @@ export async function figurer(canvas, opt = {}) {
 
   const figs = [];
   const n = placering(opt.vader || (window.Vader && window.Vader.nu()));
-  FIGS.forEach((F, i) => figs.push(build(sitt(F, PLATSER[(i + n) % 3]), dress(F.key, opt.vader))));
+  // I telefonen kastar de små delarna (fingrarna, knapparna, smycket …) ingen
+  // skugga: deras skuggor syns inte där, och varje del är ett eget ritanrop
+  // varje gång skuggorna räknas om.
+  const utanSmaSkuggor = (o) => {
+    if (LATT) {
+      o.fig.traverse((x) => {
+        if (!x.isMesh || !x.castShadow) return;
+        if (!x.geometry.boundingSphere) x.geometry.computeBoundingSphere();
+        if (x.geometry.boundingSphere.radius * Math.max(x.scale.x, x.scale.y, x.scale.z) < SMA_SKUGGA) x.castShadow = false;
+      });
+    }
+    return o;
+  };
+  FIGS.forEach((F, i) => figs.push(utanSmaSkuggor(build(sitt(F, PLATSER[(i + n) % 3]), dress(F.key, opt.vader)))));
 
   // D: kläderna (dress)
   function build(F, D) {
@@ -2442,7 +2458,7 @@ export async function figurer(canvas, opt = {}) {
       headV = 0;
     }
     lastMx = mx;
-    for (const o of figs) pose(o, t);
+    // (röken först: den ställer figuren när blosset föddes, emitter)
     smoke(t);
     for (const o of figs) pose(o, t);
     // (inte i en fast bild), och DJ blundar när han sover
@@ -2504,7 +2520,7 @@ export async function figurer(canvas, opt = {}) {
       if (JSON.stringify(D) === o.key) return;
       root.remove(o.fig);
       o.fig.traverse((x) => { if (x.geometry) x.geometry.dispose(); });
-      figs[i] = Object.assign(build(o.F, D), { inneAt: o.inneAt });
+      figs[i] = Object.assign(utanSmaSkuggor(build(o.F, D)), { inneAt: o.inneAt });
     });
     for (const sk of smokers) {
       const o = figs.find((x) => x.F === sk.o.F);

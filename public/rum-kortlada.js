@@ -424,6 +424,12 @@ export async function kortlada(o) {
     const busy = step(performance.now());
     if (!S.rect) return;
     view(S.rect);
+    // (i telefonen räknas skuggorna om var tredje bild medan lådan rör sig:
+    // varje kort är ett eget ritanrop, ungefär 300 i varje bild)
+    if (LATT) {
+      gl.shadowMap.autoUpdate = false;
+      gl.shadowMap.needsUpdate = !busy || (S.bild = (S.bild || 0) + 1) % 3 === 0;
+    }
     gl.render(scene, cam);
     if (busy) S.raf = requestAnimationFrame(loop);
   }

@@ -47,6 +47,15 @@
 
 /* oskärpan är redan i duken */
 .rum-ute canvas.bakad { filter: none; }
+/* I telefonen är oskärpan i CSS borta från allt stort och allt som rör sig: den
+   blev ett eget pass på grafikkortet för varje figur och över hela gatan i varje
+   bildruta. Dukarna är grova och mjuka ändå (LATT i rum-ute.js), och gatan ritas
+   en gång i två grova dukar (bakaGata). Skylten står kvar som text med en liten
+   oskärpa: den är liten. */
+@media (max-width: 700px), (max-height: 500px) {
+  .rum-ute canvas.duk, .rum-ute-himmel, .rum-ute-gata { filter: none; }
+  .rum-ute-gata > svg.skylt { filter: blur(0.8px); }
+}
 
 /* snön driver i sidled medan den faller */
 .rum-sno-v { position: absolute; left: -60px; top: 0; width: calc(100% + 120px); height: 100%; animation: rum-sway ease-in-out infinite alternate; }
