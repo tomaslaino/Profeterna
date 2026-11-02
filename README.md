@@ -501,6 +501,11 @@ Utan nyckel ingen knapp.
   programmet framåt och prognosdelen i lagkortet. Tabeller visar bara tabellen, med
   divisionerna som numrerade flikar (nivå 1–4); gamla länkar till `#…/prognos` hamnar på
   tabellen. Styrkan för alla lag räknas fortfarande – den är motståndet i lagstatistiken.
+- **Statistiken i tobaksaffären står på ett ställe var (2026-11-02, användarens önskemål):**
+  samma siffror stod på tv:n, anslagstavlan och kortregistret. Nu står formen bara på
+  anslagstavlan, tabellen och hemma/borta bara på tv:n, styrkan, motståndet och poängen mot
+  oddsen bara på anslagstavlan, och lagkorten har det som inte står någon annanstans. Se
+  [Vad som står var](#vad-som-står-var).
 - **Kuponghistoriken flyttar till Olympen (2026-10-20, användarens önskemål):** Kupong
   handlar bara om nästa kupong – växlaren Omgången | Historik försvinner. De färdigspelade
   kupongerna står sist i Olympen under rubriken *Grupparbetena* (`#olympen/kuponger`, en
@@ -2732,15 +2737,14 @@ föremålet (`data-to`). Filerna hämtas när sidan visas första gången.
   med ställningen (leder till matchbladet, `#match/<id>`), tävlingen och avsparken eller
   läget i bandet, oddsen och prognosen för 1, X och 2 – prognosen också som en stapel i
   mosaik, med 1 i grönt, X i gult och 2 i cyan som siffrorna ovanför – och lagen sida vid
-  sida: placering och poäng, formen (de fem senaste i alla tävlingar, den senaste först, V
-  grön, O gul, F röd) och hemmalagets hemmarad och bortalagets bortarad (V-O-F). Vilan och
-  skadorna står på anslagstavlan och xG med resten om lagen i kortregistret (se
-  [Vad som står var](#vad-som-står-var)). När resultatet är dolt visas inte lagen sida vid
-  sida.
+  sida: placering och poäng, och hemmalagets hemmarad och bortalagets bortarad (V-O-F).
+  Formen, vilan och skadorna står på anslagstavlan och xG med resten om lagen i
+  kortregistret (se [Vad som står var](#vad-som-står-var)). När resultatet är dolt visas inte
+  lagen sida vid sida.
 - **371–374 Tabeller** (Premier League, Championship, League One, League Two, ur
   `data/teams/<division>.json`): placering i färg efter zonen (uppflyttning och Champions
-  League grön, kval och Europa cyan, nedflyttning röd), lag, spelade, målskillnad, poäng och
-  formen i ligan (de fem senaste ur `data/matches.json`). Hela Premier League ryms på en sida;
+  League grön, kval och Europa cyan, nedflyttning röd), lag, spelade, vunna, oavgjorda,
+  förlorade, målskillnad och poäng. Hela Premier League ryms på en sida;
   24 lag delas i två undersidor (1–12, 13–24). Divisionerna står i bandet och leder till
   varandra.
 - **377 Stryktipset matcher live:** sidan tv:n står på när man kommer in, i stället för
@@ -2795,7 +2799,8 @@ Lapparna har det på sajten som rummet annars inte visar, om lagen i omgången (
 som kupongen och fällbladstavlan):
 
 - **Formen** – ett registerkort, maskinskrivet: de fem senaste matcherna för båda lagen före
-  avspark (alla tävlingar, den senaste först), V, O eller F efter 90 minuter.
+  avspark (alla tävlingar, den senaste först), V, O eller F. När tavlan har tagits fram
+  kommer de ur matchens fil, med Europacuperna, och annars ur `data/matches.json`.
 - **Skadelistan** – ett genomslag: de skadade, avstängda och osäkra (?) per lag ur matchens
   fil (Fantasy Premier League) – de tre som har spelat mest, och resten som +n.
 - **Starkast** – en polaroid med skölden för divisionens starkaste lag i omgången; på
@@ -2862,14 +2867,10 @@ haft ett annat jobb. I lådan står, framifrån:
 - **Lagen** – en grön avdelare av pressad kartong, och bakom den ett registerkort per lag i
   omgången i bokstavsordning, med en flik av plast i divisionens färg (som på Tabeller) och
   lagets namn på en papperslapp i den. Kortet är maskinskrivet: namnet, divisionen och
-  placeringen (inringad med rödpenna) och skölden urklippt i hörnet, och sedan *Ligan*
-  (V–O–F, mål och poäng), *Hemma* och *Borta* (V–O–F i ligan), *Formen* (de fem senaste i
-  alla tävlingar, den senaste först, förlusterna i rött), *xG* för och mot per match,
-  *Styrka* (modellens, med placeringen i divisionen), *Motstånd* (hittills, tufft eller
-  lätt), *Oddsen* (hur ofta laget har varit favorit och poäng mot oddsen), *Skytten* (bäste
-  målskytten och andelen av lagets mål) och *Nästa* (motståndet, hemma eller borta och om hur
-  många dagar, med cupen eller Europacupen när det inte är ligan). Ur
-  `data/teams/<division>.json`, matcherna och matchens fil.
+  skölden urklippt i hörnet, och sedan *Mål* och *xG* för och mot per match, *Favorit* (hur
+  ofta laget har varit favorit), *Skytten* (bäste målskytten och andelen av lagets mål) och
+  *Nästa* (motståndet, hemma eller borta och om hur många dagar, med cupen eller Europacupen
+  när det inte är ligan). Ur `data/teams/<division>.json` och matchens fil.
 - **Mötena** – en röd avdelare, och bakom den ett blått kort per match: de senaste åtta
   mötena med datum, tävling, lagen och resultatet, och hemmalagets V–O–F i dem med blyerts
   längst ner.
@@ -2895,13 +2896,21 @@ disken tom. `?rum-register` visar lådan framme i en fast bild, och `?rum-regist
 
 #### Vad som står var
 
-Statistiken om omgången är fördelad efter vad varje sak är bra på:
+Statistiken om omgången är fördelad efter vad varje sak är bra på, och varje siffra står på
+ett ställe (2026-11-02, användarens önskemål):
 
 | | Vad | Innehåll |
 |---|---|---|
-| **Tv:n** | Matcherna och ligorna, nu | Stryktipset live (377), omgångens matcher (331), en sida per match med odds, prognos, tabelläget, formen och hemma/borta (332–369), tabellerna (371–374) och skytteligorna (381–384) |
-| **Anslagstavlan** | Omgången på ett bräde: vem som sticker ut | Formen, skadorna, vilan, starkast och svagast, kryssar gärna, tur och otur, mot oddsen och motståndet |
-| **Kortregistret** | Lagen ett och ett, och historiken | Ett lagkort per lag (ligan, hemma/borta, formen, xG, styrka, motstånd, oddsen, skytten, nästa match) och mötena med resultaten |
+| **Tv:n** | Matcherna och ligorna, nu | Stryktipset live (377), omgångens matcher (331), en sida per match med odds, prognos, tabelläget och hemma/borta (332–369), tabellerna (371–374) och skytteligorna (381–384) |
+| **Anslagstavlan** | Hela omgången jämförd: vem som sticker ut | Formen, skadorna, vilan, starkast och svagast, kryssar gärna, tur och otur, mot oddsen och motståndet |
+| **Kortregistret** | Ett lag i taget, och historiken | Ett lagkort per lag (mål och xG per match, hur ofta laget har varit favorit, skytten, nästa match) och mötena med resultaten |
+
+Ny statistik placeras efter samma roller: det som gäller en match eller en liga nu på tv:n,
+det som jämför lagen i omgången på tavlan och det som beskriver ett lag i kortregistret.
+Två saker liknar varandra med flit: lagets bäste skytt kan stå med samma målantal i
+skytteligan, men kortet visar hur mycket laget hänger på en spelare och skytteligan vem som
+leder; och skårtavlan på väggen visar tabellens topp som en del av rummet, med länk till
+Tabeller.
 
 ### Videon
 

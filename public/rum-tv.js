@@ -19,12 +19,11 @@
 //   331       omgångens matcher, en rad per match som leder till matchens sida
 //   332–369   en sida per match: avsparken eller ställningen, oddsen,
 //             prognosen som en stapel och lagen sida vid sida (tabelläget,
-//             formen, hemma- och bortaraden), ur matchens fil
-//             (data/match/<id>.json). Vilan och skadorna står på
-//             anslagstavlan (rum-anslag.js), xG och resten om lagen i
-//             kortregistret (rum-register.js).
-//   371–374   tabellerna (data/teams/<division>.json) med formen i ligan ur
-//             matcherna; 24 lag = två undersidor
+//             hemma- och bortaraden), ur matchens fil (data/match/<id>.json).
+//             Formen, vilan och skadorna står på anslagstavlan (rum-anslag.js),
+//             xG och resten om lagen i kortregistret (rum-register.js).
+//   371–374   tabellerna (data/teams/<division>.json): spelade, vunna,
+//             oavgjorda, förlorade, målskillnad och poäng; 24 lag = två undersidor
 //   377       Stryktipset matcher live: kupongens matcher med avspark eller
 //             ställning och tecknet, i Stryktipsets ordning när omgången är
 //             Stryktipset; tv:n står på den när man kommer in
@@ -189,7 +188,6 @@ window.RumTv = (() => {
   const signed = (n) => (n > 0 ? `+${n}` : String(n));
   const COMP = { pl: 'Premier League', ch: 'Championship', l1: 'League One', l2: 'League Two', fac: 'FA-cupen', lc: 'Ligacupen' };
   const LIGA = { pl: 'PL', ch: 'CH', l1: 'L1', l2: 'L2' };
-  const RES = { V: 'g', O: 'y', F: 'r' };
 
   // Läget i en kort ruta (331) och i en mening (matchens sida).
   function status(g, long = false) {
@@ -289,8 +287,6 @@ window.RumTv = (() => {
 
   // Bitarna i en ruta om 13 tecken, högerställda.
   const cell = (bits) => [' '.repeat(Math.max(0, 13 - bits.reduce((a, b) => a + b[0].length, 0))), ...bits];
-  // Formen: de fem senaste, den senaste först (som på matchbladet).
-  const formBits = (list) => (list.length ? list.slice(0, 5).map((x) => (window.Spoiler && Spoiler.hidesDay(x.date) ? ['?', 'w'] : [x.result || '?', RES[x.result] || 'w'])) : [['-']]);
 
   function matchPage(T, i) {
     const { m, g } = T.rows[i];
@@ -315,30 +311,9 @@ window.RumTv = (() => {
       const pair = (label, f) => line(' ', pad(label, 12), ...cell(f(t.home, 'home')), ...cell(f(t.away, 'away')));
       rows.push(line(' '.repeat(13), [rpad(T.kort(m.home), 13) + rpad(T.kort(m.away), 13), 'c']),
         pair('Tabell', (x) => [[x.table ? `${ord(x.table.rank)}${x.league && x.league.id !== m.comp && LIGA[x.league.id] ? ` ${LIGA[x.league.id]}` : ''} ${x.table.points} p` : '-']]),
-        pair('Form', (x) => formBits(x.form || [])),
         pair('Hemma/borta', (x, side) => { const r = x.record && x.record[side]; return [[r ? `${r.w}-${r.d}-${r.l}` : '-']]; }));
     }
     return band('FOTBOLL', (d && d.match && d.match.compName) || COMP[m.comp] || '', [when]) + body(rows) + fast();
-  }
-
-  // Formen i ligan ur matcherna: de fem senaste, den senaste först. Dolda
-  // resultat syns inte här: då står ridån för hela tabellen (veil).
-  function leagueForm(T, comp, name) {
-    if (!T.forms.has(comp)) {
-      const by = new Map();
-      const ms = T.matches().filter((m) => m.comp === comp && m.completed && m.score).sort((a, b) => Date.parse(b.kickoff) - Date.parse(a.kickoff));
-      for (const m of ms) {
-        for (const side of ['home', 'away']) {
-          const l = by.get(m[side]) || [];
-          if (l.length >= 5) continue;
-          const [f, a] = side === 'home' ? [m.score.home, m.score.away] : [m.score.away, m.score.home];
-          l.push(f > a ? ['V', 'g'] : f < a ? ['F', 'r'] : ['O', 'y']);
-          by.set(m[side], l);
-        }
-      }
-      T.forms.set(comp, by);
-    }
-    return T.forms.get(comp).get(name) || [];
   }
 
   // Färgen på placeringen: uppåt grön, kval och Europa cyan, nedflyttning röd.
@@ -366,11 +341,11 @@ window.RumTv = (() => {
     if (v) rows = veilRows(v, dv);
     else if (d === false || (d && !list.length)) rows = [null, line(' Tabellen saknas just nu.')];
     else {
-      rows = list.slice(sub * per, sub * per + per).map((x) => line(' ', [rpad(x.rank, 2), zone(x.note)], ' ', pad(team(T, x.name, 16), 16),
-        rpad(x.m, 3), rpad(signed(x.gd), 4), [rpad(x.pts, 4), 'y'], '  ', ...leagueForm(T, dv.id, x.name)));
+      rows = list.slice(sub * per, sub * per + per).map((x) => line(' ', [rpad(x.rank, 2), zone(x.note)], ' ', pad(team(T, x.name, 15), 15),
+        rpad(x.m, 3), rpad(x.w, 3), rpad(x.d, 3), rpad(x.l, 3), rpad(signed(x.gd), 4), [rpad(x.pts, 4), 'y']));
     }
     return band('TABELL', chooser(TAB, k), `${dv.name}${subs > 1 ? `  ${sub + 1}/${subs}` : ''}`,
-      v || !list.length ? '' : cols([[22, 'S'], [24, '+/-'], [30, 'P'], [33, 'Form']])) + body(rows) + fast();
+      v || !list.length ? '' : cols([[21, 'S'], [24, 'V'], [27, 'O'], [30, 'F'], [32, '+/-'], [38, 'P']])) + body(rows) + fast();
   }
 
   // För långa namn: förnamnets initial, eller bara efternamnet.
@@ -440,7 +415,7 @@ window.RumTv = (() => {
 
   function mount(root, o) {
     const T = {
-      rows: [], live: { spel: null, next: false }, nr: LIVE, sub: 0, json: new Map(), teams: new Map(), players: new Map(), forms: new Map(), typed: '', on: true, near: false,
+      rows: [], live: { spel: null, next: false }, nr: LIVE, sub: 0, json: new Map(), teams: new Map(), players: new Map(), typed: '', on: true, near: false,
       short: o.short, kort: o.kort || o.short, wd: o.wd, hm: o.hm, matches: o.matches || (() => []),
     };
     const box = root.querySelector('#rum-tv3');
@@ -540,7 +515,6 @@ window.RumTv = (() => {
         T.roll = 0;
         T.nr = nr;
         T.sub = sub;
-        T.forms.clear();
         draw(!o.calm());
         tick();
       };
@@ -632,7 +606,6 @@ window.RumTv = (() => {
       fill(rows, { spel = null, next = false } = {}) {
         T.rows = rows;
         T.live = { spel, next };
-        T.forms.clear();
         if (!exists(T.nr)) {
           T.nr = FIRST;
           T.sub = 0;

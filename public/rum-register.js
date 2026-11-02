@@ -5,11 +5,9 @@
 // registerkort per lag i omgången (A–Ö) bakom avdelaren Lagen och ett blått
 // kort per match bakom avdelaren Mötena. Korten har det om lagen som tv:n och
 // tavlan inte visar:
-//   lagkortet   maskinskrivet: ligan (V–O–F, mål och poäng), hemma och borta,
-//               formen, xG för och mot, modellens styrka med placeringen i
-//               divisionen, motståndet hittills, oddsen (favorit och poäng mot
-//               oddsen), bäste målskytten och nästa match – ur
-//               data/teams/<division>.json, matcherna och matchens fil
+//   lagkortet   maskinskrivet: mål och xG per match, hur ofta laget har varit
+//               favorit, bäste målskytten och nästa match – ur
+//               data/teams/<division>.json och matchens fil
 //   mötet       de senaste mötena med datum, tävling och resultat, och
 //               hemmalagets V–O–F i dem (matchens fil)
 //
@@ -50,12 +48,7 @@ window.RumRegister = (() => {
   const esc = (s) => String(s == null ? '' : s).replace(/[&<>"']/g, (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
   const r1 = (x) => Math.round(x * 10) / 10;
   const num = (x, d = 1) => Math.abs(x).toFixed(d).replace('.', ',');
-  const signed = (x, d = 1) => {
-    const t = num(x, d);
-    return Number(t.replace(',', '.')) === 0 ? t : x > 0 ? `+${t}` : `−${t}`;
-  };
   const pct = (x) => `${Math.round(x * 100)} %`;
-  const ord = (n) => `${n}:${(n % 10 === 1 || n % 10 === 2) && n % 100 !== 11 && n % 100 !== 12 ? 'a' : 'e'}`;
   function rng(a) {
     return () => {
       a |= 0; a = a + 0x6D2B79F5 | 0;
@@ -75,8 +68,6 @@ window.RumRegister = (() => {
     return `${d} ${MAN[m - 1]} ${y}`;
   }
 
-  const hidden = (m) => Boolean(window.Spoiler && Spoiler.hidden(m));
-  const off = (m) => /POSTPONED|CANCEL|ABANDON|SUSPEND/.test(m.status || '');
   // V, O eller F för laget efter 90 minuter
   function letter(m, team) {
     const s = m.score90 || m.score;
@@ -84,67 +75,24 @@ window.RumRegister = (() => {
     const [f, a] = m.home === team ? [s.home, s.away] : [s.away, s.home];
     return f > a ? 'V' : f < a ? 'F' : 'O';
   }
-  // Lagets matcher (alla tävlingar), senaste först.
-  function byTeam(all) {
-    const map = new Map();
-    for (const m of all) {
-      if (off(m)) continue;
-      for (const t of [m.home, m.away]) {
-        if (!map.has(t)) map.set(t, []);
-        map.get(t).push(m);
-      }
-    }
-    for (const l of map.values()) l.sort((a, b) => Date.parse(b.kickoff) - Date.parse(a.kickoff));
-    return map;
-  }
-  // Hemma- och bortaraden i ligan ur matcherna.
-  function split(list, team, comp) {
-    const r = { home: { n: 0, w: 0, d: 0, l: 0 }, away: { n: 0, w: 0, d: 0, l: 0 } };
-    for (const m of list || []) {
-      if (!m.completed || m.comp !== comp) continue;
-      const l = letter(m, team);
-      if (!l) continue;
-      const x = r[m.home === team ? 'home' : 'away'];
-      x.n++;
-      x[l === 'V' ? 'w' : l === 'O' ? 'd' : 'l']++;
-    }
-    return r;
-  }
 
   // ---------- korten ----------
 
   const blank = (n) => Array.from({ length: n }, () => '<span class="r tom"></span>').join('');
   // en rad: rubriken och värdet; null = väntar på matchens fil (tom rad)
   const row = (label, value) => `<span class="r"><b>${label}</b><span>${value == null ? '' : value || '–'}</span></span>`;
-  const vof = (r) => (r && r.n ? `${r.w}–${r.d}–${r.l}` : '–');
 
   function lagkort(D, x) {
     const { name, side, m, t } = x;
     const comp = t ? t.comp : null;
     const crest = window.Skoldar && Skoldar.has(name) ? `<span class="reg-skold">${Skoldar.img(name)}</span>` : '';
-    const under = comp ? `${DIVNAME[comp]}${t.rank && !D.veil ? `, <span class="ring">${ord(t.rank)}</span>` : ''}` : 'Utanför ligorna';
-    const head = `${crest}<h4>${esc(name)}</h4><p class="reg-under">${under}</p>`;
+    const head = `${crest}<h4>${esc(name)}</h4><p class="reg-under">${comp ? DIVNAME[comp] : 'Utanför ligorna'}</p>`;
     if (D.veil) return `${head}<p class="dolt">?</p>`;
     const d = D.match.get(m.id);
     const T = d && d.teams && d.teams[side];
     const fd = t && t.fd;
-    // formen: de fem senaste före avspark i alla tävlingar, den senaste först
-    // (matchens fil, med Europacuperna, som på tv:n; annars ur matcherna);
-    // förlusterna i rött
-    const cell = (l, q) => (q ? '<i class="q">?</i>' : `<i class="${l.toLowerCase()}">${l}</i>`);
-    const before = Date.parse(m.kickoff);
-    const f = T && T.form
-      ? T.form.slice(0, 5).map((y) => cell(y.result || '?', window.Spoiler && Spoiler.hidesDay(y.date))).join('')
-      : (D.teams.get(name) || []).filter((y) => y.completed && Date.parse(y.kickoff) < before).slice(0, 5).map((y) => cell(letter(y, name), hidden(y))).join('');
-    const ha = comp ? split(D.teams.get(name), name, comp) : null;
     const xg = fd && fd.xg && fd.xg.n ? fd.xg : null;
     const mkt = fd && fd.mkt && fd.mkt.n ? fd.mkt : null;
-    const opp = fd && fd.opp != null ? fd.opp : null;
-    let str = '';
-    if (t && t.str != null) {
-      const i = (D.divs[comp] || []).findIndex((y) => y.name === name);
-      str = `${signed(t.str, 2)}${i >= 0 ? ` · ${ord(i + 1)} i ligan` : ''}`;
-    }
     const sum = d && d.squads && d.squads[side] && d.squads[side].summary;
     const top = sum && sum.topScorer && sum.topScorer.g
       ? `${esc(sum.topScorer.name)} ${sum.topScorer.g} mål${sum.topScorerShare ? ` (${pct(sum.topScorerShare)})` : ''}`
@@ -154,13 +102,9 @@ window.RumRegister = (() => {
       ? `${esc(D.kort(nx.opponent))} ${nx.home ? 'hemma' : 'borta'} om ${nx.days} d${nx.comp && nx.comp !== (comp || '').toUpperCase() ? ` (${esc(TAV[nx.comp] || nx.comp)})` : ''}`
       : d === undefined ? null : '';
     return head + '<span class="reg-rader">' +
-      row('Ligan', t ? `${t.w}–${t.d}–${t.l} · ${t.gf}–${t.ga} · ${t.pts} p` : '') +
-      `<span class="r"><b>Hemma</b><span>${ha ? vof(ha.home) : '–'}<b class="mitt">Borta</b>${ha ? vof(ha.away) : '–'}</span></span>` +
-      row('Formen', f ? `<span class="reg-form">${f}</span>` : '') +
+      row('Mål', t && t.m ? `${num(t.gf / t.m, 2)} för · ${num(t.ga / t.m, 2)} mot` : '') +
       row('xG', xg ? `${num(xg.f / xg.n, 2)} för · ${num(xg.a / xg.n, 2)} mot` : '') +
-      row('Styrka', str) +
-      row('Motstånd', opp != null ? `${signed(opp, 2)} · ${opp > 0.05 ? 'tufft hittills' : opp < -0.05 ? 'lätt hittills' : 'som snittet'}` : '') +
-      row('Oddsen', mkt ? `favorit ${mkt.fav} av ${mkt.n} · ${signed(mkt.pts - mkt.xp)} p` : '') +
+      row('Favorit', mkt ? `${mkt.fav} av ${mkt.n} matcher` : '') +
       row('Skytten', top) +
       row('Nästa', next) + '</span>';
   }
@@ -229,7 +173,7 @@ window.RumRegister = (() => {
   // ---------- i rummet ----------
 
   function mount(root, o) {
-    const A = { on: false, ms: [], all: [], byTeam: new Map(), match: new Map(), stats: null, divs: {}, loaded: 0, html: '', lyft: null, seed: -1, cards: [], L: null };
+    const A = { on: false, ms: [], all: [], match: new Map(), stats: null, loaded: 0, html: '', lyft: null, seed: -1, cards: [], L: null };
     const small = root.querySelector('#rum-reg');
     const duk = root.querySelector('#reg-duk');
     const ov = root.querySelector('#rum-regn');
@@ -245,19 +189,13 @@ window.RumRegister = (() => {
       .then((L) => { A.L = L; A.ids = ''; draw(); }))
       .catch((err) => console.warn('Rummet: kortlådan kunde inte ritas', err));
 
-    // lagfilerna (placering, styrka, xG, oddsen) – om igen efter en kvart
+    // lagfilerna (målen, xG, oddsen) – om igen efter en kvart
     function loadTeams() {
       if (A.loading || Date.now() - A.loaded < 15 * 60000) return A.loading;
       A.loading = Promise.all(DIVS.map((d) => getJSON(`data/teams/${d}.json`).catch(() => null))).then((files) => {
         const map = new Map();
-        const divs = {};
-        files.forEach((f, i) => {
-          if (!f || f.unknown) return;
-          for (const t of f.teams || []) map.set(t.name, { ...t, comp: DIVS[i] });
-          divs[DIVS[i]] = (f.teams || []).filter((t) => t.str != null).slice().sort((a, b) => b.str - a.str);
-        });
+        files.forEach((f, i) => { if (f && !f.unknown) for (const t of f.teams || []) map.set(t.name, { ...t, comp: DIVS[i] }); });
         A.stats = map;
-        A.divs = divs;
         A.loaded = Date.now();
         A.loading = null;
         draw();
@@ -289,7 +227,7 @@ window.RumRegister = (() => {
         key = `ans:${recent.map((m) => m.id).sort().join(',')}`;
         veil = n > 0 && !Spoiler.isShown(key);
       }
-      return { ms: A.ms, round, teams: A.byTeam, match: A.match, divs: A.divs, kort: o.kort, veil, key, n };
+      return { ms: A.ms, round, match: A.match, kort: o.kort, veil, key, n };
     }
 
     function draw() {
@@ -489,10 +427,7 @@ window.RumRegister = (() => {
     return {
       fill(ms, all) {
         A.ms = (ms || []).slice();
-        if (A.all !== all) {
-          A.all = all || [];
-          A.byTeam = byTeam(A.all);
-        }
+        A.all = all || [];
         if (A.on) loadMatches();
         loadTeams();
         if (window.Skoldar && Skoldar.ready && !A.crests) {

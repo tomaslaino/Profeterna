@@ -3,7 +3,8 @@
 // Anslagstavlan i tobaksaffären (rum.js): juteväv i en träram på högra
 // väggen under tv:n, med lappar på nålar. Lapparna har det på sajten som
 // rummet annars inte visar, om lagen i omgången:
-//   Formen         registerkort, maskinskrivet: de fem senaste före matchen
+//   Formen         registerkort, maskinskrivet: de fem senaste före matchen i
+//                  alla tävlingar, med Europacuperna när matchens fil har hämtats
 //   Skadelistan    genomslag: skadade, avstängda och osäkra (matchens fil)
 //   Starkast       polaroid med skölden; på baksidan modellens starkaste och
 //                  svagaste i omgången (data/teams/<division>.json)
@@ -134,6 +135,14 @@ window.RumAnslag = (() => {
     return (list || []).filter((m) => m.completed && Date.parse(m.kickoff) < before).slice(0, 5)
       .map((m) => (hidden(m) ? '?' : letter(m, team)));
   }
+  // Lagets fem senaste i matchen: ur matchens fil, med Europacuperna, när den
+  // har hämtats (tavlan tas fram), annars ur matcherna.
+  function formOf(D, m, side) {
+    const d = D.match.get(m.id);
+    const T = d && d.teams && d.teams[side];
+    if (T && T.form) return T.form.slice(0, 5).map((y) => (window.Spoiler && Spoiler.hidesDay(y.date) ? '?' : y.result || '?'));
+    return form(D.teams.get(m[side]), m[side], Date.parse(m.kickoff));
+  }
   // Dagar sedan förra matchen före avspark.
   function rest(list, m) {
     const t = Date.parse(m.kickoff);
@@ -150,11 +159,9 @@ window.RumAnslag = (() => {
   function noteForm(D) {
     if (!D.ms.length) return '<h4>Formen</h4><p class="inget">Ingen omgång</p>';
     return '<h4>Formen</h4><div class="ans-g5">' + rowsOf(D.ms.map((m) => {
-      const t = Date.parse(m.kickoff);
-      const f = (team) => form(D.teams.get(team), team, t);
       const cell = (l) => l.map((x) => `<i${x === '?' ? ' class="q"' : ''}>${x}</i>`).join('');
-      return `<span class="h">${esc(D.kort(m.home))}</span><span class="f">${cell(f(m.home))}</span><span class="s">–</span>` +
-        `<span class="f">${cell(f(m.away))}</span><span class="a">${esc(D.kort(m.away))}</span>`;
+      return `<span class="h">${esc(D.kort(m.home))}</span><span class="f">${cell(formOf(D, m, 'home'))}</span><span class="s">–</span>` +
+        `<span class="f">${cell(formOf(D, m, 'away'))}</span><span class="a">${esc(D.kort(m.away))}</span>`;
     })) + '</div>';
   }
 
@@ -412,7 +419,7 @@ window.RumAnslag = (() => {
       });
       return A.loading;
     }
-    // matchernas filer (skadorna, inbördes) hämtas när tavlan tas fram
+    // matchernas filer (formen, skadorna) hämtas när tavlan tas fram
     function loadMatches() {
       for (const m of A.ms) {
         if (A.match.has(m.id)) continue;
