@@ -55,7 +55,7 @@ export async function kortlada(o) {
   const DPR = LATT ? 1.5 : Math.min(2.5, Math.max(2, (window.devicePixelRatio || 1) * 1.25));
   const gl = new THREE.WebGLRenderer({ alpha: true, antialias: !LATT, preserveDrawingBuffer: true });
   gl.toneMapping = THREE.ACESFilmicToneMapping;
-  gl.shadowMap.enabled = true;
+  gl.shadowMap.enabled = !(await import('./rum-gpu.js')).utanSkuggor(gl);
   gl.shadowMap.type = THREE.PCFSoftShadowMap;
   gl.domElement.className = 'reg-gl';
   o.nara.append(gl.domElement);

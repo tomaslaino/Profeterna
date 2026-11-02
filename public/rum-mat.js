@@ -68,30 +68,33 @@ window.RumMat = (R) => {
     rad('drag', await drag());
     hem();
     await sov(800);
-    // gänget: tiden i koden och tills grafiken är klar (en bildpunkt läses)
-    const draw = R.fig.draw;
-    const gl = c && (c.getContext('webgl2') || c.getContext('webgl'));
-    let n = 0;
-    let js = 0;
-    let vant = 0;
-    R.fig.draw = (...a) => {
-      const u = performance.now();
-      draw(...a);
-      const v = performance.now();
-      if (gl) gl.readPixels(0, 0, 1, 1, gl.RGBA, gl.UNSIGNED_BYTE, new Uint8Array(4));
-      js += v - u;
-      vant += performance.now() - v;
-      n++;
-    };
-    await sov(3000);
-    R.fig.draw = draw;
-    rader.push(`gänget: kod ${(js / (n || 1)).toFixed(1)} ms, grafik ${(vant / (n || 1)).toFixed(1)} ms`);
-    R.fig.draw = () => {};
-    await sov(600);
-    rad('ej gänget', await spela(4000));
-    rad('ej g. drag', await drag());
-    R.fig.draw = draw;
-    hem();
+    // (utan gänget: de här raderna hoppas över)
+    if (R.fig) {
+      // gänget: tiden i koden och tills grafiken är klar (en bildpunkt läses)
+      const draw = R.fig.draw;
+      const gl = c && (c.getContext('webgl2') || c.getContext('webgl'));
+      let n = 0;
+      let js = 0;
+      let vant = 0;
+      R.fig.draw = (...a) => {
+        const u = performance.now();
+        draw(...a);
+        const v = performance.now();
+        if (gl) gl.readPixels(0, 0, 1, 1, gl.RGBA, gl.UNSIGNED_BYTE, new Uint8Array(4));
+        js += v - u;
+        vant += performance.now() - v;
+        n++;
+      };
+      await sov(3000);
+      R.fig.draw = draw;
+      rader.push(`gänget: kod ${(js / (n || 1)).toFixed(1)} ms, grafik ${(vant / (n || 1)).toFixed(1)} ms`);
+      R.fig.draw = () => {};
+      await sov(600);
+      rad('ej gänget', await spela(4000));
+      rad('ej g. drag', await drag());
+      R.fig.draw = draw;
+      hem();
+    } else rader.push('gänget saknas');
     const ute = document.getElementById('rum-ute');
     ute.classList.add('vila');
     await sov(600);

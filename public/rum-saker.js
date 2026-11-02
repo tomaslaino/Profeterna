@@ -32,6 +32,7 @@
 // platt kvitto (rum.css).
 
 import { dagens, bord } from './rum-fika.js';
+import { utanSkuggor } from './rum-gpu.js';
 
 const DEG = Math.PI / 180;
 const D = 1400;
@@ -222,7 +223,7 @@ async function props(pult, opt, root) {
   r.setSize(BOX.w, BOX.h, false);
   r.toneMapping = THREE.ACESFilmicToneMapping;
   r.toneMappingExposure = 1.05;
-  r.shadowMap.enabled = true;
+  r.shadowMap.enabled = !utanSkuggor(r);
   r.shadowMap.type = THREE.PCFSoftShadowMap;
   const scene = new THREE.Scene();
   const pmrem = new THREE.PMREMGenerator(r);

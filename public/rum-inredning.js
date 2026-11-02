@@ -66,7 +66,7 @@ export async function inredning(el, opt = {}) {
   const gl = new THREE.WebGLRenderer({ alpha: true, antialias: !LATT, preserveDrawingBuffer: true });
   gl.setPixelRatio(DPR);
   gl.toneMapping = THREE.ACESFilmicToneMapping;
-  gl.shadowMap.enabled = true;
+  gl.shadowMap.enabled = !(await import('./rum-gpu.js')).utanSkuggor(gl);
   gl.shadowMap.type = THREE.PCFSoftShadowMap;
   const pmrem = new THREE.PMREMGenerator(gl);
   if (LATT) pmrem._setSize = (n) => THREE.PMREMGenerator.prototype._setSize.call(pmrem, Math.min(n, 128));

@@ -62,6 +62,7 @@
 // också från början)
 // (nx, ny, −1…1 i duken) eller null, och huvud var vems huvud är.
 import * as THREE from 'three';
+import { utanSkuggor } from './rum-gpu.js';
 import { RoomEnvironment } from 'three/addons/environments/RoomEnvironment.js';
 import { RoundedBoxGeometry } from 'three/addons/geometries/RoundedBoxGeometry.js';
 import { ol } from './rum-fika.js';
@@ -236,7 +237,8 @@ export async function figurer(canvas, opt = {}) {
   r.setSize(W, H, false);
   r.toneMapping = THREE.ACESFilmicToneMapping;
   r.toneMappingExposure = 1.05;
-  r.shadowMap.enabled = true;
+  const POWERVR = utanSkuggor(r);
+  r.shadowMap.enabled = !POWERVR;
   r.shadowMap.type = THREE.PCFSoftShadowMap;
   const scene = new THREE.Scene();
   const pmrem = new THREE.PMREMGenerator(r);
@@ -297,6 +299,7 @@ export async function figurer(canvas, opt = {}) {
   catcher.rotation.x = -Math.PI / 2;
   catcher.position.set(-170, SILL, -24);
   catcher.receiveShadow = true;
+  catcher.visible = !POWERVR;
   root.add(catcher);
 
   const mat = (color, o = {}, sort) => {

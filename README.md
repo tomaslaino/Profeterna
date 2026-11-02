@@ -2553,7 +2553,43 @@ sekunder (95:e percentilen 41 → 24 ms). Rummet ser likadant ut: jämfört bild
 och regn, närbilderna, kupongen och anslagstavlan. Anslagstavlans långa bildrutor (150 ms på
 datorn) är kvar: de är väntan på grafikkortet när lapparna ritas.
 
-**Mätning i den riktiga telefonen:** datorn visar inte vad en iPhone hinner med. Med `?rum-mat`
+**I Chrome i telefonen** (Pixel 10, Android) ritas gänget, sakerna och gatan också var för sig
+(`WEBKIT || LATT` i `frame`), så att fingret inte behöver vänta på att allt ritas i samma bildruta.
+Mätt i Chrome som telefon (412 × 780, täthet 2,6, processorn fyra gånger långsammare), omväxlande
+före och efter, median av tre varv: 95:e percentilen när rummet står still 24 → 18 ms och när
+fingret drar 27 → 18 ms, bildrutor över 25 ms under sex sekunders drag 52 → 1. Kvar: ibland ett
+enstaka stopp på ungefär 115 ms när sakerna på pulten ritas under draget (en gång per körning, i
+ungefär hälften av körningarna; inte förklarat).
+
+**Ingen skuggkarta på PowerVR** ([public/rum-gpu.js](public/rum-gpu.js)): i en Pixel 10 (grafikkort
+PowerVR D-Series, Chrome 156, Android 17) kraschade Chromes grafikprocess alltid vid gängets bild 9–10,
+i drivrutinen (`LoadTextureState` i `libGLESv2_powervr.so`) eller med ett grafikkort som hängde sig
+(*Restarting GPU process … Context was lost*). Allt på grafikkortet var då borta: gänget försvann,
+inredningen blev tom och där sakerna på pulten låg stod en vit ruta med ett ledset ansikte, Chromes bild
+för tappad WebGL. Efter en krasch vägrar Chrome dessutom 3D i ungefär två minuter (*Web page caused
+context loss and was blocked*). Koden från före ändringarna ovan kraschade likadant, så det var inte de;
+när det började vet vi inte. Provat i telefonen med bara gänget på en egen sida, en sak i taget, kraschade
+det vid samma bild utan mipmaps, utan anisotropi, med WebGL 1, med täta `flush`, fem gånger långsammare,
+med grafikkortet färdigt mellan bilderna (12–18 ms per bild), med skuggorna omräknade varje bild eller
+bara en gång, med PCF i stället för mjuka skuggor och med skuggor bara på bordet. Utan skuggkarta höll det
+i varje försök, som längst 400 bilder och 162 000 ritanrop. På PowerVR ritas därför gänget, sakerna,
+inredningen och kortlådan utan skuggkarta (`utanSkuggor`; `?rum-skuggor` visar dem ändå, för att prova nya
+versioner av drivrutinen). Figurerna kastar där ingen skugga, men allt annat ser ut som förut. Hela rummet i
+telefonen, tre omgångar med riktiga fingerdrag och närbilder, närmare tre minuter: ingen krasch och
+allt på plats. Stilla 60 bilder i sekunden, 95:e percentilen 18–19 ms och längsta bildrutan 19–23 ms; när
+fingret drar 57–58 bilder i sekunden, 20–21 ms och 56–72 ms, 1–4 bildrutor över 50 ms på 5,6 sekunder (före
+ändringarna, då gänget hade kraschat och inte ritades, 52–55 bilder i sekunden och 130–258 ms). Kvar:
+anslagstavlan (174–273 ms och 7–8 bildrutor över 50 ms på vägen fram), och Chrome skriver ibland *tile memory
+limits exceeded*, att minnet för att rita sidan tar slut, vid närbilderna.
+
+**När grafiken ändå tappas** (`webglcontextlost` i rum.js) göms de tappade dukarna direkt, så att den vita
+rutan inte syns, och sidan laddas om, så att allt kommer tillbaka – med det lägsta steget och, om det händer
+igen inom tio minuter, utan 3D-delarna (`R.ej3d`, `tur`), så att sidan inte kan krascha grafikprocessen om
+och om igen. Kupongen i handen får vara färdig först, och med fliken dold väntar omladdningen tills den syns.
+Utan lagring laddas sidan inte om. Provat i Chrome som telefon med `Browser.crashGpuProcess` tre gånger i
+rad: omladdad efter 0,3 sekunder med allt tillbaka, sedan utan 3D-delarna, sedan ingen omladdning.
+
+**Mätning i den riktiga telefonen:** datorn visar inte vad en telefon hinner med. Med `?rum-mat`
 (matchfixarna.se/?rum-mat, [public/rum-mat.js](public/rum-mat.js), laddas bara då) kör rummet
 igenom sig självt på ungefär en minut – står still, dras med ett låtsasfinger, utan gänget och
 gatan och fram och tillbaka till närbilderna – och visar bildrutorna i en tabell att ta en

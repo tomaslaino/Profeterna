@@ -1537,8 +1537,9 @@ ${window.RumRegister ? RumRegister.nara() : ''}
     // man såg som hack när man drog med fingret eller kameran glider. Där
     // ritas gänget, sakerna och gatan i stället var och en för sig, en i varje
     // bildruta, direkt efter att bildrutan är klar (efterBild): då hinner de
-    // ritas färdigt till nästa, och ingen bildruta får allt på en gång.
-    if (WEBKIT && !calm()) {
+    // ritas färdigt till nästa, och ingen bildruta får allt på en gång. (I
+    // telefonen också i Chrome: fingret får inte vänta på att allt ritas.)
+    if ((WEBKIT || LATT) && !calm()) {
       while (R.ko.length) R.ko.shift()();
       R.ko.push(gang, saker, ute);
     } else {
@@ -1619,6 +1620,40 @@ ${window.RumRegister ? RumRegister.nara() : ''}
       if (s && Date.now() - s.t < 3 * 864e5) R.kval = Math.max(R.kval, Math.min(KVAL.length - 1, s.k | 0));
     } catch (err) { /* utan lagring börjar rummet som vanligt */ }
   }
+
+  // Hänger sig grafikkortet (det hände i en Pixel 10 i Chrome, tolv sekunder
+  // efter att sidan öppnats) startar webbläsaren om sin grafikprocess, och allt
+  // som låg på grafikkortet är borta: three.js kommer igen utan ansikten och
+  // kläder, inredningen och gatans dukar blir tomma, och går det inte att
+  // återställa visar Chrome en vit ruta med ett ledset ansikte. Det enda som ger
+  // tillbaka allt är att ladda om sidan – först med det lägsta steget och, om
+  // det hänger sig igen inom tio minuter, utan 3D-delarna, så att sidan inte
+  // hänger grafikkortet om och om igen. Kupongen i handen får vara färdig först.
+  const KRASCH = 'rum-krasch';
+  const kraschar = () => {
+    try {
+      const s = JSON.parse(localStorage.getItem(KRASCH) || 'null');
+      return s && Date.now() - s.t < 6e5 ? s.n : 0;
+    } catch (err) { return 0; }
+  };
+  if (!R.kvalLas && kraschar()) R.kval = KVAL.length - 1;
+  R.ej3d = kraschar() >= 2;
+  window.addEventListener('webglcontextlost', (e) => {
+    if (R.grafikBorta || !R.el || !R.el.contains(e.target) || still()) return;
+    R.grafikBorta = true;
+    R.el.classList.add('grafik-borta');
+    try {
+      localStorage.setItem(KRASCH, JSON.stringify({ n: kraschar() + 1, t: Date.now() }));
+    } catch (err) {
+      // utan lagring går det inte att veta när det ska sluta: ingen omladdning
+      return;
+    }
+    const igen = setInterval(() => {
+      if (document.hidden || R.kup || !R.on) return;
+      clearInterval(igen);
+      location.reload();
+    }, 300);
+  }, true);
 
   // steget till 3D-delarna och dammet (också när de har startat, three)
   function kval(k) {
@@ -1735,6 +1770,7 @@ ${window.RumRegister ? RumRegister.nara() : ''}
   // tur(fn, ordning) → fn():s löfte
   const TUR = [];
   function tur(fn, ordning = 0) {
+    if (R.ej3d) return Promise.reject(new Error('grafikkortet har hängt sig'));
     if (!LATT) return fn();
     return new Promise((res, rej) => {
       TUR.push({ fn, ordning, res, rej });
