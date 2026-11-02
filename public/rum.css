@@ -7,6 +7,14 @@
 html.i-rummet { overflow: hidden; scrollbar-gutter: auto; }
 html.i-rummet .topbar,
 html.i-rummet body > footer { display: none; }
+/* innan rummet har byggts (rum-vantar, satt i index.html): den vanliga
+   förstasidan syns inte, så att den inte blinkar till först – och syns ändå
+   efter fem sekunder om skripten aldrig kommer igång */
+html.rum-vantar { overflow: hidden; }
+html.rum-vantar .topbar,
+html.rum-vantar main > section:not(.rum),
+html.rum-vantar body > footer { visibility: hidden; animation: rum-vantar 0s 5s forwards; }
+@keyframes rum-vantar { to { visibility: visible; } }
 
 .rum { position: fixed; inset: 0; z-index: 50; overflow: hidden; background: #0b0907; color: #f3ede3; }
 .rum[hidden] { display: none; }

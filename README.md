@@ -1819,6 +1819,13 @@ på disken (se [Videon](#videon)), och [public/rum-3d.js](public/rum-3d.js) rita
 three.js 0.160.0 (från jsdelivr, importmap i `index.html`), som hämtas först när rummet
 visas – utan WebGL eller utan nätet står rummet kvar utan dem.
 
+Medan sidan laddas syns inte den vanliga förstasidan: skripten ligger sist i sidan, så
+rubriken och foten hann annars synas innan rummet var byggt. Ett litet skript i huvudet på
+index.html sätter klassen `rum-vantar` på html (samma villkor som `Rum.fits`, och bara utan
+adress), rum.css döljer sidan så länge klassen sitter och `showTab` i app.js tar bort den.
+Kommer skripten aldrig igång syns sidan ändå efter fem sekunder. Med `#hem`, i de allra
+minsta fönstren och om rum.js inte går att hämta visas den vanliga förstasidan som förut.
+
 **Föremålen** – pekar man på ett lyser det (pokalerna också), och snabbvalet
 på text-tv:n med samma ämne tänds, som när man pekar på snabbvalet med tv:n nära
 (skårtavlan Tabeller, pärmarna Skyttar). Klickar man går kameran fram mot föremålet innan

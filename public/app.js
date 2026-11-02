@@ -117,6 +117,8 @@ const TABS = {
 function showTab(sectionId) {
   // Samma sida som förut (till exempel när matchrutan stängs): ingen skroll till toppen.
   const same = !$(`#${sectionId}`).hidden;
+  // förstasidan döljs tills rummet har byggts (rum-vantar i index.html)
+  document.documentElement.classList.remove('rum-vantar');
   if (window.Rum && sectionId !== 'rum-section') Rum.hide();
   for (const sec of document.querySelectorAll('main > section')) sec.hidden = sec.id !== sectionId;
   for (const btn of document.querySelectorAll('.tablist [role="tab"]')) {

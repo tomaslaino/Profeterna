@@ -5,6 +5,10 @@
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <title>Matchfixarna – en seriös verksamhet</title>
   <meta name="theme-color" content="#0e0d0b">
+  <!-- utan adress står tobaksaffären (rum.js): den vanliga förstasidan döljs
+       redan nu, så att den inte blinkar till innan rummet har byggts
+       (rum-vantar i rum.css, tas bort av showTab i app.js) -->
+  <script>if (!location.hash && (/[?&]rum-t\b/.test(location.search) || matchMedia('(min-width: 280px) and (min-height: 260px)').matches)) document.documentElement.classList.add('rum-vantar');</script>
   <link rel="icon" type="image/svg+xml" href="logo.svg">
   <link rel="apple-touch-icon" href="apple-touch-icon.png">
   <link rel="preconnect" href="https://fonts.googleapis.com">
