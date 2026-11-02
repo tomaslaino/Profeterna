@@ -327,6 +327,9 @@ a.rum-sak, a.rum-sak:hover { color: inherit; text-decoration: none; }
 .rum.chromium .rum-world.vrider { transition: transform 0.6s cubic-bezier(0.3, 0, 0.2, 1); }
 /* gänget och pulten går kameran förbi på vägen fram */
 .rum-pl.forbi, .rum-pl3d > .rum-inr { transition: opacity 0.5s; }
+/* nära videon i telefonen (lattVideo i rum.js) */
+.rum-pl.bort { display: none; }
+.rum-pl.tona { opacity: 0; transition: opacity 0.4s; }
 .rum.sak-nara .rum-pl.forbi, .rum.sak-nara .rum-pl3d > .rum-inr { opacity: 0; transition-duration: 0.25s; }
 /* rummet vrids kring videon när kameran svänger runt den (sving i rum.js) */
 .rum-pl.glid { transition: transform 0.6s cubic-bezier(0.3, 0, 0.2, 1), opacity 0.5s; }

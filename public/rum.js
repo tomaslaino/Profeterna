@@ -792,7 +792,7 @@ ${window.RumRegister ? RumRegister.nara() : ''}
     R.tv = window.RumTv ? RumTv.mount(el, { calm, sedan, short, kort: (n) => BOARD[n] || short(n), wd, hm, matches: () => (state.all && state.all.matches) || [] }) : null;
     R.ans = window.RumAnslag ? RumAnslag.mount(el, { calm, kort: (n) => BOARD[n] || short(n), close: () => board(false) }) : null;
     tangenter();
-    R.video = window.RumVideo ? RumVideo.mount(el, { calm, sedan, short, kort: (n) => BOARD[n] || short(n), aim: (f) => { R.vf = f; aimVideo(calm() ? null : 'glid'); } }) : null;
+    R.video = window.RumVideo ? RumVideo.mount(el, { calm, sedan, short, kort: (n) => BOARD[n] || short(n), aim: (f) => { R.vf = f; aimVideo(calm() ? null : 'glid'); }, latt: () => { if (R.vnara) lattVideo(R.vniva); } }) : null;
     R.reg = window.RumRegister ? RumRegister.mount(el, { calm, kort: (n) => BOARD[n] || short(n), close: () => register(false), tur: (fn) => tur(fn, 3) }) : null;
     paintUte();
     R.bakat = baka();
@@ -1509,6 +1509,8 @@ ${window.RumRegister ? RumRegister.nara() : ''}
   function frame(dt = 1000 / 30) {
     const t = now();
     kamera(dt);
+    // (nära videon i telefonen syns inget av det här, lattVideo)
+    if (R.vlatt) return;
     const on = neonOn(t);
     if (on !== R.neon) {
       R.neon = on;
@@ -1853,10 +1855,13 @@ ${window.RumRegister ? RumRegister.nara() : ''}
       w.classList.remove('glid', 'dyk');
       if (cls) w.classList.add(cls);
       w.style.transform = `translate(${dx}px, ${dy}px) scale(${z})${R.el.classList.contains('chromium') ? ' perspective(100000px)' : ''}`;
+      R.aimT = performance.now();
       kvar(borta);
     };
-    // (WebKit ritar hela rummet när kameran lämnar hemmet, kvar)
-    if (cls && WEBKIT && borta && !calm()) kvar(true);
+    // (WebKit ritar hela rummet när kameran lämnar hemmet, kvar – och när den
+    // går hem om det har släppts medan den stod nära videon, lattVideo)
+    if (cls && WEBKIT && !calm()) kvar(true);
+    R.aimT = Infinity;
     sedan('kamera', satt, Boolean(cls));
   }
 
@@ -1894,7 +1899,8 @@ ${window.RumRegister ? RumRegister.nara() : ''}
   // igen. Chrome behöver det inte.
   const WEBKIT = !navigator.userAgentData && /AppleWebKit/.test(navigator.userAgent);
   function kvar(borta) {
-    if (!WEBKIT || calm()) return;
+    // (mellan lådan och rutan är allt annat redan borta, lattVideo)
+    if (!WEBKIT || calm() || (borta && R.utanKvar)) return;
     const w = document.getElementById('rum-kamera');
     const n = (R.kvarN = (R.kvarN || 0) + 1);
     if (borta) {
@@ -2014,6 +2020,7 @@ ${window.RumRegister ? RumRegister.nara() : ''}
   // namnet och foten.
   function zoomVideo(on) {
     if (!R.video || (!on && !R.vnara)) return;
+    if (!on) lattVideo(0);
     if (on && R.zoom) zoomTv(false);
     if (on && R.ans && R.ans.on()) board(false);
     if (on && R.reg && R.reg.on()) register(false);
@@ -2092,6 +2099,62 @@ ${window.RumRegister ? RumRegister.nara() : ''}
     const m = f.fyll ? 0.96 : 0.92;
     const z = Math.min(f.z || 6, ((vx1 - vx0) * m) / (x1 - x0), ((vy1 - vy0) * m) / (y1 - y0));
     aim([(x0 + x1) / 2, (y0 + y1) / 2], z, [(vx0 + vx1) / 2, (vy0 + vy1) / 2], cls);
+    lattVideo(f.fyll ? 2 : 1);
+  }
+
+  // Nära videon med WebKit (i iPhone slut på minne annars): över 1 GB frigör
+  // WebKit minne var trettionde sekund och ritar då om allt som syns, med
+  // toppar på ungefär en halv GB, och iPhone dödar sidan runt 1,4–1,5 GB. Så
+  // när kameran har stannat tas det bort som ändå inte syns (bort), allt utom
+  // väggen och hörnet, och 3D-delarna, gatan och neonen står still (frame).
+  // Finns en spelare släpps också det WebKit håller ritat bakom kameran (kvar,
+  // utanKvar; hörnet håller sitt eget, haller i rum-video.js) – kameran börjar
+  // då gå hem lite senare, när det är ritat (sedan i aim). När rutan fyller
+  // fönstret (2) tonar också väggen bort, medan kameran går dit, och kommer
+  // tillbaka när den har gått tillbaka.
+  function lattVideo(niva) {
+    if (!LATT && !WEBKIT) return;
+    clearTimeout(R.lattT);
+    clearTimeout(R.tonaT);
+    const pl = [...R.el.querySelectorAll('.rum-world > .rum-pl')];
+    const vagg = pl[0];
+    R.vniva = niva;
+    if (!niva) {
+      for (const p of pl) p.classList.remove('bort', 'tona');
+      R.vlatt = 0;
+      R.utanKvar = false;
+      return;
+    }
+    if (niva === 2) {
+      vagg.classList.add('tona');
+      R.tonaT = setTimeout(() => vagg.classList.add('bort'), 450);
+    }
+    const framme = () => {
+      if (performance.now() - R.aimT < 700) {
+        R.lattT = setTimeout(framme, 200);
+        return;
+      }
+      R.vlatt = niva;
+      const allt = niva === 2 || R.video.spelare();
+      for (const p of pl) if (p !== vagg && !p.querySelector('#rum-vhs')) p.classList.add('bort');
+      if (allt) {
+        R.utanKvar = true;
+        if (R.kvar) {
+          R.kvar.cancel();
+          R.kvar = null;
+        }
+        R.kvarN = (R.kvarN || 0) + 1;
+      } else {
+        R.utanKvar = false;
+        kvar(true);
+      }
+      if (niva === 1 && vagg.classList.contains('tona')) {
+        vagg.classList.remove('bort');
+        void vagg.offsetWidth;
+        vagg.classList.remove('tona');
+      }
+    };
+    R.lattT = setTimeout(framme, 700);
   }
 
   // A: anslagstavlan lossnar från väggen och flyger fram (rum-anslag.js),

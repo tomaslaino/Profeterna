@@ -2961,7 +2961,7 @@ rutan snett framifrån i stället för från sidan. Tv:n och lådan vrids inte o
 de står kvar vända mot gänget – utan det är kameran som rör sig (se *Kamerans sväng* nedan).
 Kassetterna glider ut en bit när man pekar på dem. I telefonen på höjden går kameran bara
 fram till lådan (`LADAN`), så att etiketterna går att läsa; där tar en kassett (eller ett
-tryck på kanten av tv:n bredvid lådan) kameran vidare till rutan. Ett klick på rutan (eller hjulet framåt)
+tryck på kanten av tv:n bredvid lådan) kameran vidare till rutan. I telefonen, på höjden och på bredden, spelas en kassett alltid med rutan i hela fönstret. Ett klick på rutan (eller hjulet framåt)
 går ännu närmare, så att bilden i rutan nästan fyller fönstret (med en smal svart kant runt
 om, så att bildens gräns syns; i telefonen på höjden syns knapparna under den), och kameran
 svänger och går rakt framför tv:n, så att rutan syns rakt framifrån. Texten i rutan (*STOPP*,
@@ -3017,7 +3017,7 @@ När man trycker ▶ står bilden still och darrar, som en video på paus, med e
 i hörnet, tills klippet kommer. Spelaren kan inte börja spela utan att visa sina saker, så en
 ny spelare värms upp bakom stillbilden, från 4,4 sekunder före räkneverket, och den gamla med
 stillbilden (`.still`) tas bort när den nya kommer fram (`load` med `kvar`, `spelaHar`). I
-telefonen, där två spelare tar för mycket minne, står YouTubes bildruta still i stället
+telefonen och i Safari, där det bara finns en spelare (se *Ljudet*), står YouTubes bildruta still i stället
 medan samma spelare värms upp bakom den. Räkneverket och bandmätaren står kvar 2,5 sekunder in
 i klippet (`EFTER`) och räknar vidare. Bruset ritas en gång i en liten duk (`randBrus`, 512 ×
 80), och det som rör sig är egna små lager. Med `prefers-reduced-motion` står bilden och
@@ -3037,7 +3037,49 @@ blå bild med *▶ SPELA*, utan ljud, tills klippet har spelat i 4,4 sekunder (`
 3,6, då en skymt av rubriken kunde synas); när den spelar vidare efter en paus spolar den
 först tillbaka lika mycket, så att bilden fortsätter där den stannade, och efter en sökning
 börjar den nya spelaren lika långt före räkneverket. Slutet, och förslagen efter det, täcks
-direkt.
+direkt. Hörnet byter inte heller storlek medan klippet syns, för då kommer rubriken och loggan också
+fram: det ritas i den stora storleken innan spelaren börjar (`load`, `resume`) och i den vanliga
+igen först när klippet står stilla (`skarp`).
+
+**Ljudet.** I Safari, och i alla webbläsare i iPhone, får en video inte ha ljud förrän någon har
+tryckt medan den finns. Videon slog på ljudet när den blå bilden försvann, och då pausade
+webbläsaren klippet: efter fyra sekunder frös rutan, och ▶ gjorde samma sak igen. Nu spelar klippet
+utan ljud med *TRYCK FÖR LJUD* nere i bilden tills någon trycker – på rutan, en knapp eller en
+tangent – och gesten följer med meddelandet in i spelaren (`gest`; på rutan flyttar trycket inte
+kameran). Efter det har spelaren lov, så där byts klippen och kassetterna i samma spelare
+(`loadVideoById` i `load`), som står kvar på paus när kassetten matas ut (`P.ledig`). Därför finns
+bara en spelare där, också efter en sökning. Stannar ett klipp när ljudet slås på i någon annan
+webbläsare märks det (`LJUDPAUS`), och det spelar vidare utan ljud. I strömsparläge i iPhone börjar
+inget klipp av sig självt; där startar ett tryck på rutan det.
+
+**När något krånglar.** Svarar inte spelaren på 45 sekunder (`SVAR`) provas en ny, och sedan nästa
+klipp; tar spelaren inte nästa klipp på sju sekunder börjar en ny. Ett klipp som ger fel, till exempel
+för att ägaren inte tillåter det utanför YouTube, byts mot nästa (och blir den sista myrornas krig).
+Går man därifrån medan kassetten åker in spelar den när man kommer tillbaka. Har telefonen varit
+låst spelar klippet vidare, om det spelade. WebKit lägger ibland inte ut spelaren när hörnet ritas i
+`zoom: 2` (0 × 0 bildpunkter, och rutan blir svart medan klippet spelar), så då tvingas det fram
+(`knuffa`).
+
+**Minnet i iPhone.** Det var minnet som dödade sidan. Över 1 GB frigör WebKit minne var trettionde
+sekund och ritar då om allt som syns, med toppar på ungefär en halv GB, och iPhone dödar sidan runt
+1,4–1,5 GB. Mätt i WKWebView i 390 × 664 med täthet 3 och riktiga klipp tog rummet 1,07 GB vid lådan
+och 1,15 GB med ett klipp, och var trettionde sekund 1,5–1,68 GB: videon hann aldrig spela länge. Nu tas
+det bort som inte syns när kameran har stannat (`lattVideo` i rum.js): vid lådan allt utom väggen och
+hörnet, 3D-delarna, gatan och neonen står still, och när rutan fyller fönstret tonar också väggen bort
+och lådan, tv:ns sidor och skenet försvinner (`utanLada`). Med en spelare släpps också det WebKit håller
+ritat bakom kameran (`kvar`), och hörnet håller sitt eget med samma osynliga rörelse (`haller`) – utan
+den räknar WebKit fel på vad som syns av något som står så snett, och kassetterna försvann. Spelaren
+försvinner i telefonen när man går från videon (`parkera`), och i telefonen hoppar den inte åtta gånger
+i sekunden medan bandet spolar utan YouTubes bildrutor visas hela vägen. Vid lådan är det nu 0,88 GB,
+utan toppar, och med ett klipp i rutan 0,66–1,0 GB; vägen hem från lådan går upp till 1,16 GB och första
+gången fram till 1,2 GB. Bara om man går fram och tillbaka inom ett par sekunder kommer toppar över
+1,4 GB. Kameran börjar gå hem lite senare när en spelare har funnits (när allt är ritat, `sedan`),
+utan spelare lika jämnt som förut.
+
+**Lådan i Safari.** Core Animation lade lådans väggar på tvären ovanpå kassetterna, så att bara en del
+av etiketterna syntes. Där ritas det innanför öppningen på ett enda plan precis bakom kassetterna, i
+samma färger som det syns snett från höger (`.platt`, `ladaYtor`), och kassetternas tak och ändar finns
+bara med när de lyfts eller när man pekar på dem.
 
 **Kamerans sväng.** Rummet är målat på platta plan, så kameran kan inte gå runt i det på
 riktigt. Svängen är i stället två saker som sker samtidigt, på 0,6 sekunder som

@@ -20,6 +20,13 @@
 // Går man därifrån pausar videon, och den spelar vidare när man kommer
 // tillbaka. När inget spelar blinkar klockan på 12:00, som den alltid gjort.
 //
+// I telefonen spelas en kassett alltid med rutan i hela fönstret, och
+// spelaren finns bara medan man står nära (parkera). I WebKit (Safari, och alla
+// webbläsare i iPhone) spelar klippet utan ljud tills någon trycker (gest), och
+// nästa klipp byts i samma spelare, som då har fått lov (load). Nära videon
+// tas det bort som inte syns, så att WebKit håller sig under 1 GB (lattVideo
+// i rum.js, utanLada här).
+//
 // Tv:n är en låda i CSS 3D (framsidan, sidorna, taket och skuggan på
 // disken) i rummets eget perspektiv – 1000 bildpunkter från flyktpunkten
 // (760, 400), som högra väggen i rum.js (rum-hv) – så att den står mot
@@ -50,9 +57,10 @@
 // pult), så att bilden inte tar slut när kameran går dit.
 //
 // RumVideo.html('horn' | 'vagg' | 'pult') → delarna (planen -598, -600 och -60 i rum.js)
-// RumVideo.mount(el, { calm, short, kort, aim }) → { fill(matches, { rd, old }), skarp(on), zoom(on) → hörnet i scenen, key(k), stop() }
+// RumVideo.mount(el, { calm, short, kort, aim, latt }) → { fill(matches, { rd, old }), skarp(on), spelare(), zoom(on) → hörnet i scenen, key(k), stop() }
 // (rd: omgången som gänget tippar, round() i rum.js; old: de färdigspelade kupongerna, Historik.coupons())
-// aim(f) flyttar kameran till f (med f.z som största förstoring) när man går närmare tv:n.
+// aim(f) flyttar kameran till f (med f.z som största förstoring) när man går närmare tv:n,
+// latt() säger till när en spelare har kommit till; spelare() säger om det finns någon.
 
 window.RumVideo = (() => {
   // sex gånger storleken; hörnets övre vänstra hörn i scenen och dess mått
@@ -60,6 +68,8 @@ window.RumVideo = (() => {
   const O = [1446, 494];
   const VP = [760 - O[0], 400 - O[1]];
   const TZ = 'Europe/Stockholm';
+  // WebKit (Safari, och alla webbläsare i iPhone), som i rum.js
+  const WEBKIT = !navigator.userAgentData && /AppleWebKit/.test(navigator.userAgent);
   const r2 = (x) => Math.round(x * 100) / 100;
   const pts = (list) => list.map(([x, y]) => `${r2(x)},${r2(y)}`).join(' ');
 
@@ -281,16 +291,20 @@ window.RumVideo = (() => {
   }
   // Lådans övriga sidor, i bildpunkter (lådans front i z = 0): högra sidan
   // och taket, innanför öppningen vänstra väggen och mellanväggens högra
-  // sida, botten och baksidan, och skuggan på disken.
+  // sida, botten och baksidan, och skuggan på disken. I WebKit ritas det
+  // innanför öppningen på ett enda plan precis bakom kassetterna (.platt):
+  // Core Animation lade väggarna på tvären ovanpå kassetterna, så att
+  // etiketterna inte gick att läsa.
   function ladaYtor() {
     const L = LADA;
     const [x0, y0, x1, y1] = [L.x + L.t, L.y + L.t, L.x + L.w - L.t, L.y + L.h - L.t].map((v) => v * S);
     const inne = (L.d - 1.5) * S;
     return golv('vhs-skugga', (L.x - 4) * S, (L.y + L.h) * S, (L.w + 8) * S, 4 * S, -(L.d + 4) * S) +
-      yta('lada-bak', x0, y0, x1 - x0, y1 - y0, '0 0', `translateZ(${r2(-inne)}px)`) +
-      yta('lada-vagg', x0, y0, inne, y1 - y0, '0 0', 'rotateY(90deg)') +
-      yta('lada-vagg', (L.x + MV.x + MV.w) * S, y0, inne, y1 - y0, '0 0', 'rotateY(90deg)') +
-      golv('lada-botten', x0, y1, x1 - x0, 0, -inne) +
+      (WEBKIT ? yta('lada-bak platt', x0, y0, x1 - x0, y1 - y0, '0 0', `translateZ(${-1.5 * S}px)`) :
+        yta('lada-bak', x0, y0, x1 - x0, y1 - y0, '0 0', `translateZ(${r2(-inne)}px)`) +
+        yta('lada-vagg', x0, y0, inne, y1 - y0, '0 0', 'rotateY(90deg)') +
+        yta('lada-vagg', (L.x + MV.x + MV.w) * S, y0, inne, y1 - y0, '0 0', 'rotateY(90deg)') +
+        golv('lada-botten', x0, y1, x1 - x0, 0, -inne)) +
       yta('lada-sida', (L.x + L.w) * S, L.y * S, L.d * S, L.h * S, '0 0', 'rotateY(90deg)') +
       yta('lada-topp', L.x * S, (L.y - L.d) * S, L.w * S, L.d * S, '0 100%', 'rotateX(90deg)');
   }
@@ -344,7 +358,7 @@ window.RumVideo = (() => {
     const kas = (a, b) => Array.from({ length: b - a }, (_, i) => `<div class="vhs-band" data-i="${a + i}" hidden>` +
       `<button type="button" class="vhs-kas" data-i="${a + i}"><span class="lapp"><i></i><b></b><u></u></span></button>` +
       '<i class="kas-topp"></i><i class="kas-v"></i><i class="kas-h"></i></div>').join('');
-    return `<div class="rum-vhs" id="rum-vhs" data-lage="tom" style="left:${O[0]}px; top:${O[1]}px">` +
+    return `<div class="rum-vhs${WEBKIT ? ' webkit' : ''}" id="rum-vhs" data-lage="tom" style="left:${O[0]}px; top:${O[1]}px">` +
       `<div class="vhs-in" style="perspective:${1000 * S}px; perspective-origin:${px(VP[0])} ${px(VP[1])}">` +
       '<i class="vhs-sken"></i>' +
       // kameran runt tv:ns mitt (SVANG)
@@ -364,6 +378,7 @@ window.RumVideo = (() => {
       // läget och räkneverket uppe och bandmätaren nere
       `<span class="vhs-osd" style="top:${px(BILD.y - GLAS.y + 3)}">STOPP</span>` +
       `<span class="vhs-tid" style="top:${px(BILD.y - GLAS.y + 3)}">0:00:00</span>` +
+      `<span class="vhs-ljud" style="bottom:${px(GLAS.y + GLAS.h - BILD.y - BILD.h + 3)}">TRYCK FÖR LJUD</span>` +
       // (bandmätaren lika långt in nedifrån som bokstäverna uppifrån)
       `<span class="vhs-matare" style="bottom:${px(GLAS.y + GLAS.h - BILD.y - BILD.h + 4.6)}"><i></i></span><i class="vhs-glas"></i></div>` +
       `<span class="vhs-vfd" style="${at(VFD)}">12:00</span>${knappar}</div></div>` +
@@ -497,8 +512,19 @@ window.RumVideo = (() => {
   // räkneverket är var HOPP:e ms. I paus kommer ingen rubrik, knapp eller
   // logga fram, bara bildrutan – fram och bak, hur fort det än går.
   const HOPP = 120;
-  // i telefonen (som i rum-video.css): bara en spelare åt gången
+  // i telefonen (som i rum-video.css): spelaren finns bara medan man står
+  // nära, och klippen spelas med rutan i hela fönstret
   const TELEFON = matchMedia('(max-width: 700px), (max-height: 500px)');
+  // WebKit: en video får inte ha ljud förrän någon har tryckt medan den
+  // finns (se gest), så där byts klippen i samma spelare, som bara finns i en
+  // upplaga. Stannade den när ljudet slogs på inom LJUDPAUS ms var det inte
+  // tillåtet här (andra webbläsare kan också ha den regeln).
+  const ENSAM = () => WEBKIT || TELEFON.matches;
+  const LJUDPAUS = 1500;
+  // så länge en spelare får vara tyst innan en ny provas
+  const SVAR = 45000;
+  // så länge en spelare brukar behöva för att börja själv
+  const TRYGG = 2500;
   const YTIMG = 'https://i.ytimg.com/vi';
 
   // Bruset i bildsökningens ränder, en rad per bildlinje (randen är 40
@@ -579,8 +605,12 @@ window.RumVideo = (() => {
     // efter: när räkneverket försvinner ur rutan; ren: spelarens egna saker
     // har tonat bort (och kommer inte fram i paus), hopp och hoppT: när och
     // dit spelaren hoppade senast i sökningen, still: den gamla spelaren med
-    // sin stillbild ovanpå medan en ny värms upp (load)
-    const P = { list: [], i: 0, seq: 0, frame: null, ready: false, ping: null, t: 0, st: -1, timer: 0, dold: true, varm: 0, mal: null, dur: 0, vis: 0, fart: 0, dir: 0, t0: 0, tryck: 0, sok: 0, sokT: 0, efter: 0, ren: false, hopp: 0, hoppT: null, still: null };
+    // sin stillbild ovanpå medan en ny värms upp (load); ljud: spelaren får
+    // ha ljud, ljudT: när det slogs på, ledig: spelaren på paus mellan två
+    // klipp, n: spelarna, som meddelandena skiljer dem åt (seq), borta: den
+    // spelade när sidan doldes, laddad: när klippet lades i, svar: spelare
+    // i rad som inte har svarat
+    const P = { list: [], i: 0, seq: 0, n: 0, frame: null, ledig: null, ljud: !WEBKIT, ljudT: 0, borta: false, laddad: 0, svar: 0, ready: false, ping: null, t: 0, st: -1, timer: 0, dold: true, varm: 0, mal: null, dur: 0, vis: 0, fart: 0, dir: 0, t0: 0, tryck: 0, sok: 0, sokT: 0, efter: 0, ren: false, hopp: 0, hoppT: null, still: null };
 
     function lage(l, text) {
       V.lage = l;
@@ -761,12 +791,24 @@ window.RumVideo = (() => {
 
     // ---------- spelaren ----------
 
-    function stopPlayer() {
+    // Spelaren stannar. spara: i WebKit står den kvar på paus (dold), så att
+    // nästa klipp får ljud (load); annars försvinner den.
+    function stopPlayer(spara) {
       clearTimeout(P.ping);
       clearTimeout(P.timer);
       clearTimeout(P.varm);
       P.varm = 0;
-      P.seq++;
+      if (spara && WEBKIT && P.frame && P.ready) {
+        cmd('pauseVideo');
+        cmd('mute');
+        P.ledig = P.frame;
+      } else if (!spara || !P.ledig) {
+        P.ledig = null;
+        P.ljud = !WEBKIT;
+        bild.replaceChildren();
+      }
+      P.seq = 0;
+      P.ljudT = 0;
       P.frame = null;
       P.ready = false;
       P.st = -1;
@@ -779,14 +821,42 @@ window.RumVideo = (() => {
       cancelAnimationFrame(P.sok);
       P.sok = 0;
       clearTimeout(P.efter);
-      box.classList.remove('vhs-efter', 'vhs-fort', 'vhs-ram');
-      bild.replaceChildren();
+      box.classList.remove('vhs-efter', 'vhs-fort', 'vhs-ram', 'vhs-tyst');
     }
 
     const cmd = (func, args = []) => {
       if (P.frame && P.frame.contentWindow) P.frame.contentWindow.postMessage(JSON.stringify({ event: 'command', func, args, id: P.seq, channel: 'widget' }), HOST);
     };
     const listen = (f, id) => f.contentWindow.postMessage(JSON.stringify({ event: 'listening', id, channel: 'widget' }), HOST);
+    // paus som vi själva ber om (inte den när ljudet inte var tillåtet, state)
+    const pausa = () => {
+      P.ljudT = 0;
+      cmd('pauseVideo');
+    };
+
+    // En tryckning: nu får spelaren ha ljud. Gesten följer med meddelandet in
+    // i spelaren, och sedan får den spela med ljud, också nästa klipp (load).
+    // Medan den värms upp är den fortfarande tyst, men har fått lov. Svarar
+    // om den fick det nu.
+    function gest() {
+      if (P.ljud || !P.frame || !P.ready) return false;
+      P.ljud = true;
+      P.ljudT = performance.now();
+      cmd('unMute');
+      if (P.dold) cmd('mute');
+      box.classList.remove('vhs-tyst');
+      return true;
+    }
+
+    // WebKit lägger ibland inte ut spelaren när hörnet ritas i dubbla storleken
+    // (0 × 0, och rutan blir svart): något som ändras bredvid den tvingar fram det.
+    function knuffa() {
+      if (!WEBKIT || !P.frame || P.frame.offsetWidth) return;
+      const d = document.createElement('i');
+      bild.append(d);
+      void d.offsetWidth;
+      d.remove();
+    }
 
     // Bildsökningens bilder: YouTubes tre bildrutor ur klippet, ungefär en
     // fjärdedel, hälften och tre fjärdedelar in – i 4:3 med svarta kanter,
@@ -811,7 +881,7 @@ window.RumVideo = (() => {
         clearTimeout(P.timer);
         clearTimeout(P.varm);
         P.varm = 0;
-        P.seq++;
+        P.seq = ++P.n;
         P.ready = false;
         P.st = -1;
         P.dold = true;
@@ -819,9 +889,32 @@ window.RumVideo = (() => {
         P.still = P.frame;
         P.still.classList.add('still');
       } else {
-        stopPlayer();
+        stopPlayer(true);
         ramar(P.list[P.i]);
         lage('laddar', '▶ SPELA');
+        if (V.near) skarp(true);
+        P.laddad = performance.now();
+        if (start > 0) P.mal = start;
+        // spelaren som står på paus tar nästa klipp, med ljudet den har fått
+        if (P.ledig) {
+          P.frame = P.ledig;
+          P.ledig = null;
+          P.seq = Number(P.frame.dataset.seq);
+          P.ready = true;
+          cmd('mute');
+          cmd(V.near ? 'loadVideoById' : 'cueVideoById', [{ videoId: P.list[P.i], startSeconds: Math.max(0, (start || 0) - FORVARM / 1000) }]);
+          // tar den inte klippet börjar en ny spelare
+          const seq = P.seq;
+          if (V.near) {
+            P.timer = setTimeout(() => {
+              if (seq !== P.seq || P.st === 1 || P.st === 3 || V.lage !== 'laddar') return;
+              stopPlayer(false);
+              load(start);
+            }, 7000);
+          }
+          return;
+        }
+        P.seq = ++P.n;
       }
       const seq = P.seq;
       const q = new URLSearchParams({
@@ -832,23 +925,29 @@ window.RumVideo = (() => {
       const f = document.createElement('iframe');
       f.src = `${HOST}/embed/${encodeURIComponent(P.list[P.i])}?${q}`;
       f.title = 'Höjdpunkter';
+      f.dataset.seq = seq;
       f.tabIndex = -1;
       f.allow = 'autoplay; encrypted-media';
       f.referrerPolicy = 'strict-origin-when-cross-origin';
-      const hello = (n) => {
-        if (seq !== P.seq || P.ready || !n) return;
+      const hello = () => {
+        if (seq !== P.seq || P.ready) return;
         listen(f, seq);
-        P.ping = setTimeout(hello, 250, n - 1);
+        P.ping = setTimeout(hello, 250);
       };
-      f.addEventListener('load', () => hello(40));
+      f.addEventListener('load', hello);
       P.frame = f;
       bild.append(f);
-      // svarar inte spelaren alls visas det som finns i rutan
+      knuffa();
+      // (en spelare tar minne: rummet släpper mer, lattVideo i rum.js)
+      if (o.latt) o.latt();
+      // Svarar inte spelaren alls provas en ny, och sedan nästa klipp.
       P.timer = setTimeout(() => {
         if (seq !== P.seq || P.ready || !['laddar', 'spolar'].includes(V.lage)) return;
         slapp();
-        lage('spelar');
-      }, 12000);
+        stopPlayer(false);
+        if (P.svar++ < 1) load(start);
+        else next(true);
+      }, SVAR);
     }
 
     // Den gamla spelaren bort, när den nya har kommit.
@@ -872,7 +971,11 @@ window.RumVideo = (() => {
         P.ren = true;
         P.mal = null;
         cmd('unloadModule', ['captions']);
-        cmd('unMute');
+        if (P.ljud) {
+          P.ljudT = performance.now();
+          cmd('unMute');
+        }
+        box.classList.toggle('vhs-tyst', !P.ljud);
         slapp();
         lage('spelar');
         if (sokte) efter();
@@ -893,12 +996,17 @@ window.RumVideo = (() => {
     // en sökning stillbilden), tillbaka så mycket som spelarens egna saker
     // syns.
     function resume() {
-      if (!P.frame) return;
+      if (!P.frame) {
+        // (i telefonen är spelaren borta när man har gått därifrån, parkera)
+        if (V.cur != null && P.list.length) load(P.mal ?? P.t);
+        return;
+      }
       clearTimeout(P.varm);
       P.varm = 0;
       P.dold = true;
       P.ren = false;
       if (V.lage !== 'spolar') lage('laddar', '▶ SPELA');
+      skarp(true);
       cmd('mute');
       cmd('seekTo', [Math.max(0, (P.mal ?? P.t) - FORVARM / 1000), true]);
       cmd('playVideo');
@@ -915,7 +1023,7 @@ window.RumVideo = (() => {
     // bildrutor spelar samma spelare bakom bildrutan.
     function spelaHar() {
       if (P.still) resume();
-      else if (box.classList.contains('vhs-ram') && !TELEFON.matches) load(P.mal, true);
+      else if (box.classList.contains('vhs-ram') && !ENSAM()) load(P.mal, true);
       else {
         box.classList.remove('vhs-ram');
         resume();
@@ -953,12 +1061,15 @@ window.RumVideo = (() => {
       if (!box.style.getPropertyValue('--sok-brus')) box.style.setProperty('--sok-brus', `url(${randBrus()})`);
       // den nya spelaren bakom stillbilden har inte kommit fram än
       slapp();
-      box.classList.toggle('vhs-ram', P.ren);
+      // (i telefonen visar rutan YouTubes bildrutor: spelaren hinner inte med
+      // att hoppa åtta gånger i sekunden där)
+      box.classList.toggle('vhs-ram', P.ren && !TELEFON.matches);
+      box.classList.remove('vhs-tyst');
       P.hoppT = null;
       lage('spolar', d > 0 ? '▶▶' : '◀◀');
       box.dataset.sok = d > 0 ? 'fram' : 'bak';
       cmd('mute');
-      cmd('pauseVideo');
+      pausa();
       ruta(P.vis);
       if (!P.sok) {
         P.sokT = nu;
@@ -1031,7 +1142,7 @@ window.RumVideo = (() => {
       P.dold = true;
       clearTimeout(P.efter);
       box.classList.remove('vhs-efter', 'vhs-fort');
-      cmd('pauseVideo');
+      pausa();
       lage('stopp', 'STOPP');
       tick();
     }
@@ -1049,21 +1160,30 @@ window.RumVideo = (() => {
     function start(m) {
       const skip = new Set(bad());
       P.list = m.y.filter((id) => id && !skip.has(id));
+      P.svar = 0;
       P.i = 0;
       P.t = 0;
       mask.hidden = !hidden(m);
-      if (P.list.length) load(0);
-      else {
-        stopPlayer();
+      if (!P.list.length) {
+        stopPlayer(true);
         lage('brus', '');
-      }
+      } else if (!V.near) {
+        // gick man därifrån medan kassetten åkte in spelar den när man kommer tillbaka
+        V.resume = true;
+        if (TELEFON.matches) lage('stopp', 'STOPP');
+        else load(0);
+      } else load(0);
     }
 
-    function next() {
+    // Nästa klipp. fel: det här gick inte att spela, och spelaren får bytas
+    // om den inte har fått ljud (en spelare som har gett fel tar inte alltid
+    // nästa klipp).
+    function next(fel) {
       P.t = 0;
+      if (fel && !P.ljud) stopPlayer(false);
       if (++P.i < P.list.length) load(0);
       else {
-        stopPlayer();
+        stopPlayer(true);
         lage('brus', '');
       }
     }
@@ -1071,12 +1191,20 @@ window.RumVideo = (() => {
     // Spelarens läge: 1 spelar, 2 paus, 0 slut (då matas kassetten ut).
     function state(st) {
       P.st = st;
+      // stannade den när ljudet slogs på var det inte tillåtet: utan ljud tills någon trycker
+      if (st === 2 && P.ljudT && performance.now() - P.ljudT < LJUDPAUS) {
+        P.ljudT = 0;
+        P.ljud = false;
+        box.classList.add('vhs-tyst');
+        cmd('mute');
+        cmd('playVideo');
+      }
       if (st === 1) {
         // spolar den eller står på stopp står spelaren still
-        if (rullar() || V.lage === 'stopp') cmd('pauseVideo');
+        if (rullar() || V.lage === 'stopp') pausa();
         // gick man därifrån medan den laddade: paus tills man kommer tillbaka
         else if (!V.near) {
-          cmd('pauseVideo');
+          pausa();
           V.resume = true;
         } else if (P.dold) varm();
       } else {
@@ -1107,9 +1235,10 @@ window.RumVideo = (() => {
         return;
       }
       P.ready = true;
+      P.svar = 0;
       if (d.event === 'onError') {
         if (GONE.has(d.info)) markBad(P.list[P.i]);
-        next();
+        next(true);
       } else if (d.event === 'onStateChange' && typeof d.info === 'number') state(d.info);
       else if (d.event === 'infoDelivery' && d.info) {
         if (typeof d.info.currentTime === 'number') P.t = d.info.currentTime;
@@ -1126,6 +1255,7 @@ window.RumVideo = (() => {
       return `${Math.floor(t / 3600)}:${String(Math.floor(t / 60) % 60).padStart(2, '0')}:${String(t % 60).padStart(2, '0')}`;
     };
     function tick() {
+      knuffa();
       const soker = V.lage === 'spolar';
       const s = soker ? P.vis : P.mal ?? P.t;
       const sym = soker ? osdEl.textContent : V.lage === 'stopp' ? '■' : P.st === 2 ? '❚❚' : '▶';
@@ -1141,24 +1271,34 @@ window.RumVideo = (() => {
     }
     setInterval(() => { if (!root.hidden) tick(); }, 500);
 
+    // Telefonen låstes eller man bytte app: systemet pausar videon, och den
+    // spelar vidare när man kommer tillbaka.
+    document.addEventListener('visibilitychange', () => {
+      if (document.hidden) P.borta = P.st === 1;
+      else if (P.borta && P.st === 2 && V.near && V.lage === 'spelar') resume();
+    });
+
     // ---------- kassetterna in och ut ----------
 
     function insert(i) {
       const m = V.tapes[i];
       if (!m) return;
+      clearTimeout(V.fortT);
       if (V.cur === i) {
         toggle();
         return;
       }
       if (V.cur != null) eject();
-      stopPlayer();
+      stopPlayer(true);
       V.cur = i;
       V.mid = m.id;
       V.sida = fack(i);
       V.pek = i;
+      V.resume = false;
       lage('laddar', '▶ SPELA');
-      // i telefonen syns inte rutan från lådan: kameran går dit
-      if (smal()) tat(true);
+      // i telefonen spelas den med rutan i hela fönstret
+      if (TELEFON.matches) tat(true);
+      utanLada(V.tat);
       const el = kas[i];
       layout();
       el.classList.remove('inne');
@@ -1173,7 +1313,9 @@ window.RumVideo = (() => {
 
     function eject() {
       const i = V.cur;
-      stopPlayer();
+      utanLada(false);
+      clearTimeout(V.fortT);
+      stopPlayer(true);
       V.cur = null;
       V.mid = null;
       V.resume = false;
@@ -1197,9 +1339,13 @@ window.RumVideo = (() => {
           landa();
           spelaHar();
         }
-      } else if (P.st === 1 && V.lage !== 'stopp') cmd('pauseVideo');
-      else if (P.frame) resume();
-      else start(V.tapes[V.cur]);
+      } else if (P.st === 1 && V.lage !== 'stopp') pausa();
+      else {
+        V.resume = false;
+        if (P.frame || P.mal != null) resume();
+        else start(V.tapes[V.cur]);
+        if (TELEFON.matches) tat(true);
+      }
     }
 
     // ↑/↓: nästa eller förra kassetten – utan kassett i listan
@@ -1222,6 +1368,8 @@ window.RumVideo = (() => {
     // och etiketterna mäts om.
     function skarp(on) {
       if (inn.classList.contains('skarp') === on) return;
+      // (byter den storlek medan klippet syns kommer YouTubes rubrik och logga fram)
+      if (!on && P.frame && P.st === 1 && !P.dold) return;
       inn.classList.add('byt');
       inn.classList.toggle('skarp', on);
       void inn.offsetWidth;
@@ -1254,17 +1402,80 @@ window.RumVideo = (() => {
       box.classList.toggle('vhs-tat', on);
       sving(on ? SVANG.tat : SVANG.nara);
       if (o.aim) o.aim(on ? TAT : nara());
+      utanLada(on && V.cur != null);
+      // i telefonen spelar den bara här
+      if (!TELEFON.matches) return;
+      clearTimeout(V.fortT);
+      if (on && V.resume && V.cur != null) {
+        V.resume = false;
+        if (P.frame) {
+          if (V.lage === 'spolar') spelaHar();
+          else resume();
+        } else {
+          // (en ny spelare när kameran har kommit fram: det tog minne samtidigt som allt annat)
+          lage('laddar', '▶ SPELA');
+          V.fortT = setTimeout(resume, 800);
+        }
+      } else if (!on && rullar()) {
+        landa();
+        V.resume = true;
+      } else if (!on && P.frame && (V.lage === 'laddar' || (V.lage === 'spelar' && P.st !== 2 && P.st !== 0))) {
+        pausa();
+        V.resume = true;
+      }
+    }
+
+    // I telefonen försvinner spelaren när man går från videon – den spelar
+    // vidare därifrån när man kommer tillbaka (zoom) – så att rummet har
+    // minne att gå hem med. WebKit håller hörnet ritat med en osynlig rörelse
+    // (som kvar i rum.js): rummet runt om släpps när kameran står still nära,
+    // och utan rörelsen räknade WebKit fel på vad som syns av något som står
+    // så snett och släppte kassetterna också.
+    function parkera() {
+      utanLada(false);
+      clearTimeout(V.fortT);
+      const s = V.lage === 'spolar' ? P.vis : P.mal ?? P.t;
+      const dur = P.dur;
+      const lag = V.lage;
+      stopPlayer(false);
+      if (V.cur == null || lag === 'brus') return;
+      P.mal = s;
+      P.dur = dur;
+      lage('stopp', 'STOPP');
+      tick();
+    }
+    // Med en kassett i och rutan i hela fönstret syns inte lådan, tv:ns sidor
+    // eller skenet: i telefonen tas de bort när kassetten har åkt in, och
+    // kommer tillbaka innan något ska synas där.
+    function utanLada(on) {
+      clearTimeout(V.ladaT);
+      if (on && (WEBKIT || TELEFON.matches)) V.ladaT = setTimeout(() => box.classList.add('utan-lada'), 1100);
+      else box.classList.remove('utan-lada');
+    }
+    function haller(on) {
+      if (!WEBKIT) return;
+      if (on && !V.hall) V.hall = box.animate([{ translate: '0px 0px' }, { translate: '0.01px 0px' }], { duration: 1000, iterations: Infinity, direction: 'alternate' });
+      else if (!on && V.hall) {
+        V.hall.cancel();
+        V.hall = null;
+      }
     }
 
     box.addEventListener('click', (e) => {
       if (!V.near) return;
+      const ljud = gest();
       const b = e.target.closest('.vhs-kas, [data-vhs]');
       if (!b) {
         // i listan: en rad spelar, rubriken byter sida
         const r = e.target.closest('[data-rad]');
         if (r) insert(Number(r.dataset.rad));
         else if (e.target.closest('.ls-hd')) blad(V.sida ? -1 : 1);
-        else if (e.target.closest('.vhs-skarm')) tat(!V.tat);
+        else if (e.target.closest('.vhs-skarm')) {
+          // Trycket på rutan gav ljud, eller startar en spelare som inte har
+          // fått börja själv (strömsparläge i iPhone): kameran står kvar.
+          if (V.lage === 'laddar' && P.ready && P.st !== 1 && P.st !== 3 && performance.now() - P.laddad > TRYGG) cmd('playVideo');
+          else if (!ljud) tat(!V.tat);
+        }
         // i telefonen syns bara kanten av tv:n bredvid lådan
         else if (smal() && e.target.closest('.vhs-tv')) tat(true);
         return;
@@ -1328,6 +1539,7 @@ window.RumVideo = (() => {
         passa();
       },
       skarp,
+      spelare: () => Boolean(P.frame || P.ledig),
       // Nära: kassetterna och knapparna går att trycka på, och videon spelar
       // vidare om den gjorde det när man gick. Svarar med hörnet i scenen.
       zoom(on) {
@@ -1336,19 +1548,28 @@ window.RumVideo = (() => {
         box.classList.remove('vhs-tat');
         sving(on ? SVANG.nara : null);
         for (const s of styr) s.inert = !on;
+        haller(on);
         // spolar den stannar bandet, och det spelar därifrån när man kommer tillbaka
         if (!on && rullar()) {
           landa();
           V.resume = true;
         } else if (!on && P.frame && P.st !== 2 && P.st !== 0) {
-          cmd('pauseVideo');
+          pausa();
           V.resume = true;
         } else if (on && V.resume) {
-          V.resume = false;
-          if (V.lage === 'spolar') spelaHar();
-          else resume();
+          // (i telefonen med rutan i hela fönstret, när kameran har fått sitt mål)
+          if (TELEFON.matches) queueMicrotask(() => tat(true));
+          else {
+            V.resume = false;
+            if (V.lage === 'spolar') spelaHar();
+            else resume();
+          }
         }
-        if (on && smal()) skarp(true);
+        if (!on && TELEFON.matches) parkera();
+        // (på höjden i telefonen skarpt när kameran har stannat vid lådan: hörnet
+        // ritades annars om samtidigt som allt annat, och minnet tog slut)
+        clearTimeout(V.skarpT);
+        if (on && smal()) V.skarpT = setTimeout(() => { if (V.near && smal()) skarp(true); }, 800);
         else if (on) passa();
         return nara();
       },
@@ -1357,6 +1578,7 @@ window.RumVideo = (() => {
       // pausar som ▶, S stoppar som ■, ↑/↓ byter kassett (i listan) och Esc
       // går tillbaka från rutan till tv:n och lådan.
       key(k) {
+        gest();
         if (k === 'ArrowRight' || k === 'ArrowLeft') {
           if (V.cur == null) blad(k === 'ArrowRight' ? 1 : -1);
           else spola(k === 'ArrowRight' ? 1 : -1);
@@ -1374,7 +1596,7 @@ window.RumVideo = (() => {
       },
       // Rummet stängs: videon stannar och kassetten ligger kvar på sin plats.
       stop() {
-        stopPlayer();
+        stopPlayer(false);
         V.cur = null;
         V.mid = null;
         V.resume = false;
