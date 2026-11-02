@@ -2420,6 +2420,38 @@ rutornas skärpa och minne ur `LayerTreeHostImpl:snapshot` (`disabled-by-default
 ny profil kompilerar grafikkortets program första gången (upp till en sekund stopp) – värm upp
 alla närbilderna först.
 
+Att det hackade så olika från gång till gång berodde på minnet. Lägger man beslag på 10 GB på
+en dator med 16 GB (slumpdata som hålls i bruk, `load` 3–10) kommer hacket varje gång: vägen
+tillbaka från tv:n står still i 0,2–0,3 sekunder och 15–20 av 39 bildrutor tappas, medan det är
+jämnt när kameran väl är hemma. Bara processorbelastning (`load` 75) ger nästan inget hack, och
+inte heller ett grafikkort som delvis är upptaget. Medan kameran står nära släpper Chrome det
+mesta som ligger utanför bilden, så på vägen tillbaka ritas det om på en gång: grafikminnet går
+från ungefär 350 till 530–610 MB på en bråkdel av en sekund, och är minnet fullt måste macOS
+först frigöra det. Det syns som väntan på grafikkortet
+(`IOSurfaceImageBacking::WaitForCommandsToBeScheduled`).
+
+Det enskilt största var videohörnet. Det ritades i sex gånger sin storlek för att vara skarpt
+nära, ungefär 15 miljoner bildpunkter av rummets 99, också på håll där det syns lika stort som
+ett frimärke. I Chrome i datorn ritas det nu i 3/8 av de måtten (`.rum.chromium .vhs-in` i
+rum-video.css), och Chrome skärper det själv när kameran har stannat nära: bilderna är lika
+skarpa, små texter som HQ · STEREO tydligare, och etiketterna får samma storlek. På vägen fram
+är hörnet lite mjukare, som väggarna redan var. Med rutan i hela fönstret (`.skarp`), i telefonen
+och i andra webbläsare är allt som förut.
+
+Mätt under det pressade minnet, gammal och ny storlek om vartannat för varje utzoomning (1280 ×
+743, täthet 2, tappade bildrutor av 39 under glidningen och längsta tiden utan ny bild i snitt):
+tv:n 15,8 → 5 tappade och 244 → 52 ms, videon 5,4 → 1,6 och 93 → 50 ms, oraklets ram 15,5 → 1
+och 183 → 38 ms, VM 94-affischen 6,8 → 4,5 och 100 → 67 ms, uret 12–13 → 0–1. Skårtavlan, anslagstavlan och kortregistret var jämna förut och är det nu.
+Vägen fram till videon blev inte sämre, och med ledigt minne är allt lika jämnt som förut.
+Prövat utan effekt, eller sämre: att låsa väggarnas skärpa medan kameran står nära
+(`will-change: transform` – bara hälften av bildrutorna när kameran är hemma), en osynlig
+animering som håller kvar skärpan, och att byta hörnets storlek när kameran kommer fram eller
+går tillbaka (då flyttas hacket dit).
+
+Mätsättet för minnet: ett litet Node-skript som håller 10 GB slumpdata och rör vid det hela tiden,
+under en och en halv till fem minuter. Den tyngsta spårningen
+(`disabled-by-default-cc.debug`) ritar själv om väggen och kan inte användas för att räkna rutor.
+
 ### I Safari i telefonen
 
 I iPhone ritar alla webbläsare med WebKit, Safaris motor. Mätt i WebKit på datorn

@@ -30,6 +30,17 @@
   .vhs-in { zoom: 0.5; transform: scale3d(0.333333, 0.333333, 0.333333); }
   .vhs-in.skarp { zoom: 1; transform: scale3d(0.166667, 0.166667, 0.166667); }
 }
+/* I Chrome i datorn ritas hörnet i 3/8 av de stora måtten, också nära: Chrome
+   skärper det själv när kameran har stannat, lika skarpt som förut. I de
+   stora måtten tog det ungefär 15 miljoner bildpunkter också på håll, och när
+   kameran gick tillbaka från tv:n eller något på väggen hade Chrome släppt
+   dem – de ritades om på en gång. När datorns minne är fullt måste macOS först
+   frigöra det, och bilden stod still i 0,2–0,3 sekunder. Se När datorn inte
+   hinner med i README. */
+@media (min-width: 701px) and (min-height: 501px) {
+  .rum.chromium .vhs-in { zoom: 0.375; transform: scale3d(0.444444, 0.444444, 0.444444); }
+  .rum.chromium .vhs-in.skarp { zoom: 2; transform: scale3d(0.083333, 0.083333, 0.083333); }
+}
 .vhs-in.byt, .vhs-in.byt * { transition: none !important; }
 .vhs-in > *, .vhs-styr > * { position: absolute; }
 .vhs-styr { position: absolute; inset: 0; }
