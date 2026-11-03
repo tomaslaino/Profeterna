@@ -3192,9 +3192,13 @@ haft ett annat jobb. I lådan står, framifrån:
   ofta laget har varit favorit), *Skytten* (bäste målskytten och andelen av lagets mål) och
   *Nästa* (motståndet, hemma eller borta och om hur många dagar, med cupen eller Europacupen
   när det inte är ligan). Ur `data/teams/<division>.json` och matchens fil.
-- **Mötena** – en röd avdelare, och bakom den ett blått kort per match: de senaste åtta
-  mötena med datum, tävling, lagen och resultatet, och hemmalagets V–O–F i dem med blyerts
-  längst ner.
+- **Mötena** – en röd avdelare, och bakom den ett blått kort per match: alla möten som
+  sajten har (de sex senaste från tidigare säsonger och säsongens) med datum, tävling, lagen
+  och resultatet, och hemmalagets V–O–F i dem med blyerts längst ner. Kortet rymmer elva
+  möten ovanför summan; förut stod bara de åtta senaste, och det äldsta föll bort när
+  säsongen hade gett tre möten (2026-11-03). Inget annat på korten klipps: lagkorten har
+  gott om plats också med de längsta namnen, så de behöver inte vikas som anslagstavlans
+  lappar.
 
 Flikarna sitter på fem platser (lagen) och tre (mötena), så att varje flik syns ovanför
 dem framför. Ett klick eller R: lådan lyfter från disken, vänder sig mot en och lutar så att

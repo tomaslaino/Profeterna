@@ -8,8 +8,8 @@
 //   lagkortet   maskinskrivet: mål och xG per match, hur ofta laget har varit
 //               favorit, bäste målskytten och nästa match – ur
 //               data/teams/<division>.json och matchens fil
-//   mötet       de senaste mötena med datum, tävling och resultat, och
-//               hemmalagets V–O–F i dem (matchens fil)
+//   mötet       alla möten som sajten har, med datum, tävling och resultat,
+//               och hemmalagets V–O–F i dem (matchens fil)
 //
 // Ett klick på lådan (eller R): den lyfter från disken, vänder sig mot en och
 // lutar så att man ser ner i den, medan rummet mörknar bakom; den lutar lite
@@ -35,7 +35,10 @@ window.RumRegister = (() => {
   const DIVS = ['pl', 'ch', 'l1', 'l2'];
   const DIVNAME = { pl: 'Premier League', ch: 'Championship', l1: 'League One', l2: 'League Two' };
   const MAN = ['jan', 'feb', 'mar', 'apr', 'maj', 'jun', 'jul', 'aug', 'sep', 'okt', 'nov', 'dec'];
-  const MOTEN = 8;
+  // mötena på kortet: så många som ryms ovanför summan (rader om 21 från 66,
+  // summan från 308) – fler än sajten har (de sex senaste från tidigare
+  // säsonger och säsongens), så att alla kommer med
+  const MOTEN = 11;
   // cuperna i schemat (matchens fil) som på sajten; Europacuperna heter CL, EL och ECL
   const TAV = { EFL: 'Ligacupen', FAC: 'FA-cupen' };
   // duken på disken (scenens px), där lådan syns med sin skugga
