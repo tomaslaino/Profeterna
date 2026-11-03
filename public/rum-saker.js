@@ -4,16 +4,16 @@
 // locket bredvid och, bara när det är varmt i Stockholm, en gulnad bordsfläkt
 // som svänger fram och tillbaka och blåser röken åt sidan när den pekar mot
 // askkoppen. Kvittot är termopapper som har legat i rulle: änden med
-// huvudet har böjt sig upp och den rivna änden lyfter lite. På insidan av
-// skyltfönstret sitter affischerna – VM 94, IFK Göteborg 1982 och veckans
-// löpsedel – och på väggen bredvid löpsedeln från Chelseas seger i Champions
-// League 2021, som rum-affischer.js ritar och den här filen sätter upp.
+// huvudet har böjt sig upp och den rivna änden lyfter lite. I skyltfönstret
+// sitter löpsedlarna – IFK Göteborg 1982, Nacional 1988, VM 94 och Chelsea 2021
+// på skivan, och veckans löpsedel – som rum-affischer.js ritar och den här
+// filen sätter upp.
 //
 // Slitaget skiftar från dag till dag och följer tippningen: går det dåligt
 // (fler fel bland omgångens avgjorda matcher, annars i den senaste
 // färdigspelade kupongen) fylls askkoppen och askan hamnar bredvid, snuset
-// spills, fläkten går på trean och affischerna hänger snett med ett hörn som
-// har släppt; går det riktigt dåligt ryker två cigaretter. Dolda resultat
+// spills, fläkten går på trean och löpsedlarna på skivan bleks; går det
+// riktigt dåligt ryker två cigaretter. Dolda resultat
 // räknas inte (gradeRow rättar dem inte).
 //
 // Världen: 1 enhet ≈ 1 px i pultens plan; pulten är y = 0 och z pekar mot
@@ -106,7 +106,7 @@ export async function saker(el, opt = {}) {
   const planes = [...el.querySelectorAll('.rum-world > .rum-pl')];
   const back = planes[0];
   const pult = planes.find((p) => /translateZ\(-60px\)/.test(p.style.transform));
-  // affischerna på glaset och väggen (rum-affischer.js)
+  // löpsedlarna i fönstret (rum-affischer.js)
   const aff = back ? affischer(back, { short: opt.short, namn: opt.namn }) : null;
 
   // Fläkten står där bara när det känns som VARMT grader eller mer i Stockholm,

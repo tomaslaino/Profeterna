@@ -553,6 +553,14 @@ Utan nyckel ingen knapp.
   korktavlan och kvittot så nära att de går att läsa. Kupongen som inte går att ta i handen
   visas nära på pulten, och guldorden *Statistik* och *Lagen* under anslagstavlan och
   kortregistret är borta. Se [Tobaksaffären](#tobaksaffären) och [Närbilderna](#närbilderna).
+- **Skivan med löpsedlarna (2026-11-03, användarens beslut):** de fasta löpsedlarna satt
+  huller om buller: fyra format, tejp och nålar, tre på glaset och en på väggen. Det ska synas
+  att en person har hand om det, "manligt" och inte så mycket estetik. Av fyra skisser (skena
+  med klämmor, skiva, låst anslagsskåp, ramar) valde användaren skivan: plywood i två kedjor i
+  högra delen av fönstret, IFK 1982, Nacional 1988, VM 94 och Chelsea 2021 i årsordning, lika
+  stora, med skruv i hörnen, Dymo-remsor, blyertsmåtten kvar och vattenpasset ovanpå. Det får
+  inte tynga grafiken. Veckans löpsedel är kvar för hand, men i telefonen på väggen, där
+  Chelsea satt. Se [Tobaksaffären](#tobaksaffären), *Affischerna*.
 - **Chelseas löpsedel på väggen (2026-11-03, användarens önskemål):** till höger om
   skyltfönstret, under oraklet, sitter The Sun on Sundays löpsedel från dagen efter Chelseas
   seger i Champions League 2021, med Tomas foto av laget med pokalen. Den sitter med två
@@ -1906,7 +1914,7 @@ minsta fönstren och om rum.js inte går att hämta visas den vanliga förstasid
 **Föremålen** – pekar man på ett lyser det (pokalerna också), och snabbvalet
 på text-tv:n med samma ämne tänds, som när man pekar på snabbvalet med tv:n nära
 (pärmarna Skyttar). Inget föremål byter sida: oraklet, skårtavlan, pokalhyllan, korktavlan,
-uret, affischerna på glaset och väggen, namnet på dörren och kvittot tittar man på nära (se
+uret, löpsedlarna i fönstret, namnet på dörren och kvittot tittar man på nära (se
 [Närbilderna](#närbilderna)), och tv:n, videon, anslagstavlan, kortregistret och kupongen
 kommer fram var och en på sitt sätt. Föremålen är knappar utan adress (`KNAPP` i rum.js), och
 Enter och mellanslag klickar på dem. En match på text-tv:n öppnar matchrutan ovanpå rummet:
@@ -2255,17 +2263,29 @@ mot askkoppen blåser röken åt sidan (draget räknas för varje puff under des
 samma tid ger samma bild). Inga riktiga märken: locket säger SNUS N:o 1, dosan PRIMA
 LÖSSNUS.
 
-**Affischerna** är tejpade på insidan av glaset ([public/rum-affischer.js](public/rum-affischer.js),
-rum-affischer.css; rum-saker.js sätter upp dem). Två sitter alltid i vänstra rutan av
-skyltfönstret, under neonskyltens list – Göteborgs-Postens löpsedel till vänster, där den går
-fritt från gängets huvuden, och VM 94-affischen till höger:
+**Affischerna** – de fyra gamla sitter på **skivan** i högra delen av skyltfönstret
+([public/rum-affischer.js](public/rum-affischer.js), rum-affischer.css; rum-saker.js sätter upp
+dem): en plywoodskiva i två kedjor från karmen, i årsordning (IFK 1982 och Nacional 1988 överst,
+VM 94 och Chelsea 2021 under), lika stora (80 × 120), raka och alltid på samma ställe. Det ska
+synas att en person har hand om det: en skruv med bricka i varje hörn, en Dymo-remsa under varje
+sedel, blyertsmåtten står kvar på skivan och vattenpasset ligger ovanpå, med bubblan mitt
+emellan strecken. Måtten (`SKIVA`) delas med rum-inredning.js, som ritar skivan, kedjorna, remsorna
+och passet i 3D en gång (`skiva`, duken `skiva` i `#rum-skiva`) och skarpare i närbilden. Sedlarna
+är knappar ovanpå, skruvarna följer med i sedlarnas lager (CSS) och skuggorna är bakade i skivan,
+så att sedlarna inte behöver något filter. Innan skivan är ritad är `#rum-skiva` en enda färg, så
+att sedlarna inte hänger i luften. Skivan ska inte tynga grafiken, och det gör den inte: mätt i Chrome
+som telefon (täthet 2,625, fyra mätningar var, hemma) är ritminnet 158,7–159,0 MB före och 158,5–162,1 MB
+efter (tre av fyra 158,5–159,6), lagren 294 → 296. Duken tar 0,75 MB i telefonen (uträknat) och ritas en
+gång på 39–79 ms i datorn under hög belastning (taket 213–452, kupongstället 263–729), och inget ritas om
+medan kameran rör sig. På natten ritas den om en gång, och framsidan ligger i skugga:
 
 - **VM 94-affischen:** ett riktigt foto från landslagets hemkomst (Henrik Larsson och Pontus
   Kåmark med bronsmedaljerna, Norr Mälarstrand 18 juli 1994; foto Sniper Zeta,
   [CC BY-SA 4.0](https://creativecommons.org/licenses/by-sa/4.0/),
   [Wikimedia Commons](https://commons.wikimedia.org/wiki/File:Football_players_Pontus_K%C3%A5mark_Henrik_Larsson,_July_18,_1994.jpg)),
   beskuret i `public/rum/vm94.jpg` och med fotografen i affischens title och under den i
-  närbilden (se [Närbilderna](#närbilderna)), med *VM 94* och *BRONS* i det gula bandet.
+  närbilden (se [Närbilderna](#närbilderna)), med *VM 94* och *BRONS* i det gula bandet. På
+  skivan är bilden beskuren på höjden kring flaggan och Larsson, så att alla fyra får samma format.
 - **IFK Göteborg 1982** (DJ:s lag): Göteborgs-Postens löpsedel morgonen efter segern i
   UEFA-cupen, torsdag 20 maj 1982, som någon har sparat (Tomas önskemål: en löpsedel, inte en
   plansch, och från GP eftersom det är IFK). Tidningens namn på ett blått band, datumet,
@@ -2278,9 +2298,7 @@ fritt från gängets huvuden, och VM 94-affischen till höger:
   (Dan Corneliusson, Torbjörn Nilsson, Stig Fredriksson på straff). Papperet har gulnat,
   legat vikt i fyra delar (vecken, `.veck`) och har en reva i underkanten.
 
-**Nacional 1988** (DL:s lag) sitter till höger i fönstret, till höger om gänget och ovanför
-löpsedelns högra plats. Himlen (rum-ute.js) syns ovanför den, och i telefonen på höjden syns
-den utan att man drar. Det är förstasidan i **El Día** (Montevideo) måndagen den 12 december
+**Nacional 1988** (DL:s lag) är förstasidan i **El Día** (Montevideo) måndagen den 12 december
 1988, dagen efter finalen i Intercontinental Cup på Estadio Nacional i Tokyo: *¡NACIONAL
 CAMPEÓN DEL MUNDO!*, 2–2 mot PSV Eindhoven efter förlängning (Santiago Ostolaza två mål,
 Romário och Ronald Koeman) och 7–6 på straffar (Jorge Seré räddade fyra, Tony Gómez satte den
@@ -2293,8 +2311,7 @@ som missade sina straffar) står inte med, liksom årgång, nummer och pris. Sid
 delar redan i bilden; rummet lägger bara solens blekning ovanpå, inte affischernas
 prickraster, som blir grovt i närbilden. Närbilden tar 94 % av höjden.
 
-**Chelsea 2021** (DT:s lag) sitter inte på glaset utan på furupanelen till höger om
-fönstret, under oraklets skylt och till vänster om bardisken, alltid på samma ställe: en
+**Chelsea 2021** (DT:s lag) är en
 brittisk löpsedel (news bill) från **The Sun on Sunday**, söndagen den 30 maj 2021, dagen
 efter finalen. Tidningen är riktig, som Tomas ville, men namnet är skrivet som text i det
 röda bandet (inte tidningens logga), och rubriken är vår: *CHAMPIONS LEAGUE FINAL*,
@@ -2303,17 +2320,17 @@ röda bandet (inte tidningens logga), och rubriken är vår: *CHAMPIONS LEAGUE F
 licensen är okända, så ingen rad står under närbilden) och *Havertz strike sinks Man City
 1-0 in Porto* under. Chelsea vann finalen mot Manchester City med 1–0 på Estádio do Dragão
 i Porto den 29 maj 2021 (Kai Havertz). Löpsedeln är fem år gammal: papperet har gulnat,
-det röda har bleknat och den har legat vikt på mitten. Den sitter med två häftstift i
-papperskanten, är mindre än veckans löpsedel (78 bildpunkter bred, så att den ryms mellan
-fönsterkarmen och bardisken) och skyms lite av fönsterbänkens ände när rummet vrids.
+det röda har bleknat och den har legat vikt på mitten.
 
 **Löpsedeln** är veckans, från kvällstidningen KVÄLLSPRESSEN (inget riktigt märke): röd
 tidningsrubrik med datum, en rad som *TIPSET* eller *SKRÄLLEN*, rubriken i Anton – varje rad
-så stor som ryms i bredden, en av dem röd – och en rad under. Den sitter i ett av
-skyltfönstrets nedre hörn, där gänget inte står i vägen, och byter hörn varje vecka (veckan
-i Stockholm, måndag till söndag). I telefonen på höjden sitter den alltid i det högra, som
-syns utan att man drar. (Först satt den ibland under dörrens handtag, men där hamnade den
-utanför bilden i telefonen och i smala fönster, och syntes inte.) Rubriken är det mest dramatiska som rummet vet om (`rubrik` i
+så stor som ryms i bredden, en av dem röd – och en rad under. Den är den enda som byts och
+är uppsatt för hand: varannan vecka (veckan i Stockholm, måndag till söndag) med tejp i
+skyltfönstrets nedre vänstra hörn, varannan med två häftstift på furupanelen till höger om
+fönstret, under oraklets skylt och till vänster om bardisken, där den är mindre (78 %, så att
+den ryms mellan fönsterkarmen och bardisken). I telefonen på höjden sitter den alltid på väggen,
+som syns utan att man drar. (Först satt den ibland under dörrens handtag och sedan i fönstrets
+högra hörn: dörren hamnade utanför bilden i telefonen, och hörnet är nu skivans.) Rubriken är det mest dramatiska som rummet vet om (`rubrik` i
 rum-affischer.js):
 
 - *förra omgången* (säsongens omgångar, `TP.season`): den som tippade bäst med minst 82 %
@@ -2355,16 +2372,14 @@ på pulten står i en av fyra uppställningar (`LAYOUTS` – fläkten längst ba
 mitten eller bakom kvittot och då vänd åt höger, askkoppen och dosan om vartannat, några
 pixlar hit eller dit), kvittot ligger någonstans till vänster om dem, vridet åt det ena eller
 andra hållet och mer eller mindre uppböjt (det första av elva lägen som går fritt från
-askkoppen, dosan och fläkten), locket och prisen läggs där det finns plats, och affischerna
-flyttar sig några pixlar. Slitaget följer tippningen: andelen fel
+askkoppen, dosan och fläkten), locket och prisen läggs där det finns plats. Slitaget följer tippningen: andelen fel
 bland omgångens avgjorda matcher, annars i den senaste färdigspelade kupongen, och utan
 rättning ett mellanläge. Går det dåligt fylls askkoppen (1–11 fimpar), askan hamnar
-bredvid, snuset spills, fläkten (om den står där) går på trean, affischerna bleks och ett hörn
-släpper; går det riktigt illa ryker två cigaretter, en använd pris ligger på pulten och
-affischerna hänger i en tejpbit (löpsedeln är ny för veckan och blir bara lite böjd, och
-Chelsea-löpsedeln sitter kvar med sina häftstift). Dolda
-resultat räknas inte (gradeRow rättar dem inte). Utan WebGL står affischerna kvar men inte
-sakerna på pulten.
+bredvid, snuset spills, fläkten (om den står där) går på trean och löpsedlarna på skivan bleks;
+går det riktigt illa ryker två cigaretter och en använd pris ligger på pulten (sedlarna sitter fast
+med skruv, och veckans löpsedel är ny och blir bara lite böjd). Dolda
+resultat räknas inte (gradeRow rättar dem inte). Utan WebGL står sedlarna kvar på en slät skiva,
+men inte sakerna på pulten.
 
 **Lysröret tänds när man kommer in** (`tand` i rum.js, `.rum-mork` i rum.css; inte på natten): medan
 gänget laddas är rummet mörkt, utom gatan genom skyltfönstret och dörren och tv:n som
@@ -3549,8 +3564,8 @@ tid utan ny bild: till honom 34–83 ms, tillbaka 33–34 ms, uret 34–99 ms. I
 
 ### Närbilderna
 
-Uret, skårtavlan, Omgångens orakel, pokalhyllan, korktavlan, affischerna på glaset (VM 94,
-IFK 1982, Nacional 1988 och löpsedeln) och Chelsea-löpsedeln på väggen, namnet på dörren
+Uret, skårtavlan, Omgångens orakel, pokalhyllan, korktavlan, löpsedlarna i fönstret (IFK 1982,
+Nacional 1988, VM 94 och Chelsea 2021 på skivan och veckans löpsedel), namnet på dörren
 och kvittot tittar man på nära med ett klick (`sak` i rum.js, `data-sak` på föremålen), och
 kupongen på pulten när den inte går att ta i handen: kameran ställer sig rakt framför och går fram tills
 saken fyller det mesta av fönstret – högst 90 % av bredden och 74–94 % av höjden mellan

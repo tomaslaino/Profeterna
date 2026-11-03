@@ -16,8 +16,8 @@
 //   kortregistret på disken lyfts fram (R): ett kort per lag och per möte
 //   (rum-register.js, lådan i three.js i rum-kortlada.js)
 //   uret, skårtavlan (Tipsligan), oraklet, pokalhyllan, korktavlan,
-//   affischerna på glaset (VM 94, IFK 1982, Nacional 1988 och veckans löpsedel,
-//   rum-affischer.js) och Chelsea-löpsedeln på väggen, dörren (med vilka vi
+//   löpsedlarna i fönstret (IFK 1982, Nacional 1988, VM 94 och Chelsea 2021 på
+//   skivan och veckans löpsedel, rum-affischer.js), dörren (med vilka vi
 //   är under) och kvittot: kameran
 //   går fram till dem (närbilderna, sak)
 //   kupongen tas i handen (K) – fylls i eller ändras –, annars går kameran
@@ -2075,10 +2075,10 @@ ${window.RumRegister ? RumRegister.nara() : ''}
   async function three() {
     if (R.fig || R.loading) return;
     R.loading = true;
-    // askkoppen, snusdosan, fläkten och affischerna (rum-saker.js, rum-affischer.js)
+    // askkoppen, snusdosan, fläkten och löpsedlarna (rum-saker.js, rum-affischer.js)
     tur(() => import('./rum-saker.js').then((m) => m.saker(R.el, { calm: calm(), short, namn: tavelnamn })).then((x) => { R.saker = x; R.sakDuk = R.el.querySelector('canvas.rum-saker'); sikt(R.sakDuk); kval(R.kval); frame(); }), 2)
       .catch((err) => console.warn('Rummet: sakerna kunde inte ritas', err));
-    // lysröret, neonen, skyltarna, uret, ramarna, paketen och kupongstället (rum-inredning.js)
+    // lysröret, neonen, skyltarna, skivan, uret, ramarna, paketen och kupongstället (rum-inredning.js)
     tur(() => import('./rum-inredning.js').then((m) => m.inredning(R.el, { calm: calm(), still, vagg: VAGG })).then((x) => { R.inr = x; x.namn(R.ramNamn); x.stopp(R.stopp); if (window.RumFolk && RumFolk.natt()) x.natt(true); if (R.sak) sak(R.sak, null); frame(); }), 1)
       .catch((err) => console.warn('Rummet: inredningen kunde inte ritas', err));
     try {
@@ -2504,8 +2504,8 @@ ${window.RumRegister ? RumRegister.nara() : ''}
 
   // ---------- närbilderna ----------
   //
-  // Uret, skårtavlan, oraklet, pokalhyllan, korktavlan, affischerna på
-  // glaset (VM 94, IFK 1982, Nacional 1988 och löpsedeln), Chelsea-löpsedeln på väggen, dörren och kvittot (data-sak) – och kupongen på pulten när den inte går
+  // Uret, skårtavlan, oraklet, pokalhyllan, korktavlan, löpsedlarna på
+  // skivan (IFK 1982, Nacional 1988, VM 94 och Chelsea 2021), veckans löpsedel, dörren och kvittot (data-sak) – och kupongen på pulten när den inte går
   // att ta i handen: kameran ställer sig rakt framför och går fram tills
   // saken fyller det mesta av fönstret, och det som är ritat i 3D
   // (rum-inredning.js) ritas om skarpare. Under pokalhyllan står hur många
@@ -2514,7 +2514,8 @@ ${window.RumRegister ? RumRegister.nara() : ''}
   // klick går tillbaka.
   //   el saken, mal det kameran siktar på (annars saken), h hur mycket av
   //   höjden den får, duk duken i 3D, fot under den, pult saken ligger på
-  //   pulten (inget tonar bort), tv tv:n står framför den (och tonar bort)
+  //   pulten (inget tonar bort), tv tv:n står framför den (och tonar bort),
+  //   under foten står så här mycket av sakens höjd längre ner (remsan på skivan)
   const SAKER = {
     ur: { el: '.rum-ur', h: 0.78, duk: 'ur' },
     // (skårtavlan är låg: en halv höjd, ungefär lika nära som de andra)
@@ -2522,15 +2523,15 @@ ${window.RumRegister ? RumRegister.nara() : ''}
     ram: { el: '.rum-ram', h: 0.94, duk: 'ram' },
     pokal: { el: '.rum-pokal', h: 0.72, duk: 'hogra', fot: () => pokalFot(), tv: true },
     kork: { el: '.rum-kork', h: 0.86, duk: 'hogra' },
-    vm94: { el: '#rum-vm94', h: 0.74, fot: (a) => `<span class="foto">${esc(a.title).replace('Wikimedia Commons', (m) => (a.dataset.kalla ? `<a href="${esc(a.dataset.kalla)}" target="_blank" rel="noopener">${m}</a>` : m))}</span>` },
+    vm94: { el: '#rum-vm94', h: 0.74, duk: 'skiva', under: 0.09, fot: (a) => `<span class="foto">${esc(a.title).replace('Wikimedia Commons', (m) => (a.dataset.kalla ? `<a href="${esc(a.dataset.kalla)}" target="_blank" rel="noopener">${m}</a>` : m))}</span>` },
     dorr: { el: '#rum-dorrnamn', mal: '#rum-dorrglas', h: 0.92, fot: () => OM_OSS },
     kvitto: { el: '#rum-kvitto', h: 0.9, pult: true },
     kupong: { el: '#rum-kupong', h: 0.94, pult: true },
-    ifk: { el: '#rum-ifk', h: 0.86 },
+    ifk: { el: '#rum-ifk', h: 0.86, duk: 'skiva' },
     lopsedel: { el: '#rum-lopsedel', h: 0.86 },
-    chelsea: { el: '#rum-chelsea', h: 0.86 },
+    chelsea: { el: '#rum-chelsea', h: 0.86, duk: 'skiva' },
     // (en hel tidningssida: hög, så att rubriken och fotot blir stora)
-    nacional: { el: '#rum-nacional', h: 0.94 },
+    nacional: { el: '#rum-nacional', h: 0.94, duk: 'skiva' },
   };
   // Om oss, under dörren: samma ord som på sidan Om oss, i bladguld som namnet på glaset.
   const OM_OSS = '<span class="om"><b>Vi tippar engelsk fotboll tillsammans.</b>' +
@@ -2618,7 +2619,7 @@ ${window.RumRegister ? RumRegister.nara() : ''}
     const zoom = Math.min((innerWidth * 0.9) / r.width, (h * S.h) / r.height);
     const cy = top + h / 2;
     fot.innerHTML = html;
-    fot.style.top = `${r1(cy + (r.height * zoom) / 2 + 14)}px`;
+    fot.style.top = `${r1(cy + r.height * zoom * (0.5 + (S.under || 0)) + 14)}px`;
     if (html) fot.classList.add('on');
     aim(p, zoom, [(innerWidth / 2 - R.ox) / R.k, (cy - R.oy) / R.k], cls);
     // duken i 3D ritas skarpare när kameran är framme

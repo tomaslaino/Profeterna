@@ -1,4 +1,4 @@
-// Affischerna i tobaksaffären (rum-saker.js lägger upp dem i bakväggens
+// Löpsedlarna i tobaksaffären (rum-saker.js lägger upp dem i bakväggens
 // plan, rum.js går fram till dem):
 //
 //   VM 94-affischen   ett foto från landslagets hemkomst den 18 juli 1994
@@ -13,21 +13,21 @@
 //                     Champions League (Porto, 29 maj 2021), uppnålad på
 //                     furupanelen, se nedan
 //
-// De två första sitter alltid i vänstra rutan av skyltfönstret, under
-// neonskyltens list (så att VM 94 och BRONS syns): GP:s löpsedel till vänster,
-// där den höga sedeln går fritt från gängets huvuden, och VM 94 till höger.
-// Nacional sitter till höger i fönstret, till höger om gänget och under
-// himlen (rum-ute.js), som syns ovanför den; där syns den också i telefonen
-// på höjden. Löpsedeln sitter i ett av fönstrets nedre hörn, där gänget
-// inte skymmer den, och byter hörn varje vecka – i telefonen på höjden alltid
-// det högra, som syns utan att man drar (dörren och vänstra hörnet ligger
-// utanför bilden där, och dörren i ett smalt fönster också på datorn).
-// Slitaget följer tippningen som sakerna på pulten (rum-saker.js): går det
-// dåligt bleks affischerna och ett hörn släpper; går det riktigt illa hänger de
-// i en tejpbit. Löpsedeln är veckans och blir bara lite böjd.
-// Chelsea-löpsedeln (The Sun on Sunday) sitter inte på glaset utan på väggen till höger om
-// fönstret, under oraklet och till vänster om bardisken, med två häftstift i
-// furun: den sitter alltid där, släpper inte och är gulnad av fem års rök.
+// De fyra gamla sitter på Skivan i högra delen av skyltfönstret: en plywoodskiva
+// i två kedjor, i årsordning, lika stora, med en skruv i varje hörn och en
+// Dymo-remsa under. Det ska synas att en person har hand om det. Skivan,
+// kedjorna, remsorna och vattenpasset ritas i 3D (rum-inredning.js, en gång);
+// här finns sedlarna, som knappar i #rum-skiva:s plan, och skruvarna, som
+// följer med i sedlarnas lager. Skuggorna är bakade i skivan, inga filter.
+// Sedlarna sitter alltid på samma ställe, raka; slitaget (rum-saker.js) bleker
+// bara papperet.
+// Veckans löpsedel är den enda som byts och är uppsatt för hand: varannan vecka
+// med tejp i fönstrets nedre vänstra hörn, där gänget inte skymmer den, och
+// varannan med häftstift på väggen till höger om fönstret, under oraklet och
+// till vänster om bardisken. I telefonen på höjden alltid på väggen, som syns
+// utan att man drar (vänstra hörnet ligger utanför bilden där).
+// Slitaget följer tippningen som sakerna på pulten; löpsedeln blir bara lite
+// böjd.
 //
 // Löpsedeln (rubrik): kvällstidningen KVÄLLSPRESSEN (inget riktigt märke)
 // skriver om det mest dramatiska som har hänt eller ska hända – i förra
@@ -54,18 +54,43 @@ const esc = (s) => String(s == null ? '' : s).replace(/[&<>"']/g, (c) => ({ '&':
 const DAG = 86400000;
 const q = new URLSearchParams(location.search);
 
-// Platserna (scenens px, övre vänstra hörnet). Affischerna i vänstra rutan;
-// löpsedeln i fönstrets nedre hörn, till vänster eller till höger.
-const FAST = [{ x: 286, y: 220 }, { x: 474, y: 220 }];
-const LOPPLATS = [{ x: 286, y: 404, rot: 1.4 }, { x: 836, y: 404, rot: -1.6 }];
-// Nacional i fönstrets högra kant, ovanför löpsedelns högra plats (glaset slutar vid 948)
-const NACPLATS = { x: 838, y: 228 };
-// på höjden (telefonen) syns bara mitten och högra delen av fönstret från början
+// Skivan (scenens px; glaset slutar vid x 948 och fönsterbänken börjar vid
+// y 552) och sedlarna på den, i årsordning. rum-inredning.js ritar efter samma mått.
+export const SKIVA = {
+  x: 762, y: 226, w: 186, h: 314,
+  sedel: { w: 80, h: 120 },
+  rader: [
+    { id: 'rum-ifk', x: 771, y: 244, text: 'IFK 1982' }, { id: 'rum-nacional', x: 859, y: 244, text: 'NACIONAL 1988' },
+    { id: 'rum-vm94', x: 771, y: 394, text: 'VM 1994' }, { id: 'rum-chelsea', x: 859, y: 394, text: 'CHELSEA 2021' },
+  ],
+};
+// Löpsedeln: med tejp i fönstrets nedre vänstra hörn, eller med häftstift på
+// väggen mellan fönsterkarmen (x 958; fönsterbänkens ände når x 984 i y 554–596)
+// och bardisken (x 1060), under oraklets skylt (y 483).
+const LOPPLATS = [{ x: 286, y: 404, rot: 1.4 }, { x: 972, y: 491, rot: 0.9, vagg: true }];
+// på höjden (telefonen) syns bara mitten och högra delen av rummet från början
 const smal = () => innerWidth / innerHeight < 1.2;
-// Chelsea-löpsedeln på väggen mellan fönsterkarmen (x 958; fönsterbänkens
-// ände når x 984 i y 554–596) och bardisken (x 1060), under oraklets skylt
-// (y 483).
-const CHELSEA_PLATS = { x: 979, y: 491, rot: 0.9 };
+// Platsen för skivan (rum-saker.js och rum-inredning.js startar i valfri
+// ordning): en enda färg, utan ritminne, tills rum-inredning.js har ritat
+// skivan i den, så att sedlarna inte hänger i luften under tiden.
+export function skivPlats(back) {
+  let el = back.querySelector('#rum-skiva');
+  if (el) return el;
+  el = document.createElement('div');
+  el.id = 'rum-skiva';
+  Object.assign(el.style, { left: `${SKIVA.x}px`, top: `${SKIVA.y}px`, width: `${SKIVA.w}px`, height: `${SKIVA.h}px` });
+  back.append(el);
+  return el;
+}
+// Skruvarna i sedelns hörn, och platsen på skivan.
+const SKRUVAR = '<i class="skruv a"></i><i class="skruv b"></i><i class="skruv c"></i><i class="skruv d"></i>';
+function paSkivan(el) {
+  const p = SKIVA.rader.find((r) => r.id === el.id);
+  el.classList.add('pa-skivan');
+  el.style.left = `${p.x}px`;
+  el.style.top = `${p.y}px`;
+  return el;
+}
 
 // ---------- VM 94 ----------
 
@@ -84,9 +109,8 @@ function vm94() {
   el.title = VM94.credit;
   el.setAttribute('aria-label', `Affisch: VM 94, brons. ${VM94.credit}`);
   el.innerHTML = '<span class="ark"><span class="band"><b>VM 94</b><b>BRONS</b></span>' +
-    '<span class="foto"><img src="rum/vm94.jpg" alt="" draggable="false"></span><span class="tryck"></span></span>' +
-    '<span class="hund"></span><i class="tejp a"></i><i class="tejp b"></i>';
-  return el;
+    `<span class="foto"><img src="rum/vm94.jpg" alt="" draggable="false"></span><span class="tryck"></span></span>${SKRUVAR}`;
+  return paSkivan(el);
 }
 
 // ---------- IFK Göteborg 1982: Göteborgs-Postens löpsedel ----------
@@ -117,10 +141,9 @@ function ifk() {
     `<span class="rub">${GP.rad.map(([t, rod]) => `<b${rod ? ' class="rod"' : ''}>${esc(t)}</b>`).join('')}</span>` +
     '<span class="foto"><img src="rum/ifk82.jpg" alt="" draggable="false"></span>' +
     '<span class="under">3–0 i Hamburg – pokalen hem till Göteborg</span>' +
-    '<span class="veck"></span><span class="tryck"></span></span>' +
-    '<span class="hund"></span><i class="tejp a"></i><i class="tejp b"></i>';
+    `<span class="veck"></span><span class="tryck"></span></span>${SKRUVAR}`;
   passa(el, GP);
-  return el;
+  return paSkivan(el);
 }
 
 // Rubrikens rader så stora som ryms i bredden, och alla mindre om de inte
@@ -163,18 +186,14 @@ function chelsea() {
   el.dataset.sak = 'chelsea';
   el.title = CHELSEA.title;
   el.setAttribute('aria-label', `Löpsedel: CHELSEA KINGS OF EUROPE! ${CHELSEA.title}`);
-  el.style.left = `${CHELSEA_PLATS.x}px`;
-  el.style.top = `${CHELSEA_PLATS.y}px`;
-  el.style.setProperty('--vrid', `${CHELSEA_PLATS.rot}deg`);
   el.innerHTML = '<span class="ark"><span class="huvud"><b class="sun"><i>The</i>Sun</b><em>on Sunday</em>' +
     `<small>${CHELSEA.datum.join('<br>')}</small></span>` +
     `<span class="kick">${esc(CHELSEA.kick)}</span>` +
     `<span class="rub">${CHELSEA.rad.map(([t, rod]) => `<b${rod ? ' class="rod"' : ''}>${esc(t)}</b>`).join('')}</span>` +
     '<span class="foto"><img src="rum/chelsea21.jpg" alt="" draggable="false"></span>' +
-    `<span class="under">${esc(CHELSEA.under)}</span><span class="veck"></span><span class="tryck"></span></span>` +
-    '<span class="hund"></span><i class="nal a"></i><i class="nal b"></i>';
+    `<span class="under">${esc(CHELSEA.under)}</span><span class="veck"></span><span class="tryck"></span></span>${SKRUVAR}`;
   passa(el, CHELSEA);
-  return el;
+  return paSkivan(el);
 }
 
 // ---------- Nacional 1988 ----------
@@ -199,9 +218,8 @@ function nacional() {
   el.dataset.sak = 'nacional';
   el.title = NACIONAL;
   el.setAttribute('aria-label', `Tidningssida: ¡Nacional campeón del mundo! ${NACIONAL}`);
-  el.innerHTML = '<span class="ark"><img src="rum/nacional88.jpg" alt="" draggable="false"><span class="tryck"></span></span>' +
-    '<span class="hund"></span><i class="tejp a"></i><i class="tejp b"></i>';
-  return el;
+  el.innerHTML = `<span class="ark"><img src="rum/nacional88.jpg" alt="" draggable="false"><span class="tryck"></span></span>${SKRUVAR}`;
+  return paSkivan(el);
 }
 
 // ---------- löpsedeln: rubrikerna ----------
@@ -424,7 +442,7 @@ function lopsedel() {
   return el;
 }
 
-function rita(el, r) {
+function rita(el, r, vagg) {
   const rad = r.rad.map(([t, rod]) => ({ t: String(t).toUpperCase(), rod: Boolean(rod) }));
   el.title = `${rad.map((x) => x.t).join(' ')} – ${r.under}`;
   el.setAttribute('aria-label', `Löpsedel: ${el.title}`);
@@ -432,25 +450,26 @@ function rita(el, r) {
     `<span class="kick">${esc(r.kick)}</span>` +
     `<span class="rub">${rad.map((x) => `<b${x.rod ? ' class="rod"' : ''}>${esc(x.t)}</b>`).join('')}</span>` +
     `<span class="under">${esc(r.under)}</span><span class="tryck"></span></span>` +
-    '<span class="hund"></span><i class="tejp a"></i><i class="tejp b"></i>';
+    `<span class="hund"></span>${vagg ? '<i class="nal a"></i><i class="nal b"></i>' : '<i class="tejp a"></i><i class="tejp b"></i>'}`;
   passa(el, { rad: r.rad, bred: BRED, hog: HOG, max: MAX });
 }
 
 // ---------- slitaget och platserna ----------
 
 // w: slitaget (0 = nyss städat, 1 = det har gått åt skogen), seed: dagen.
-// nal: uppnålad på väggen (Chelsea-löpsedeln) – släpper inte och hänger
-// nästan rakt, men har redan gulnat.
-function slit(el, w, seed, { lop = false, nal = false } = {}) {
-  const loose = !lop && !nal && w > 0.85;
-  el.classList.toggle('slappt', loose);
-  // (löpsedlarna vrids dessutom efter platsen, --vrid)
-  const rot = loose ? 6.5 : lop || nal ? (hash(seed + 1.7) - 0.5) * 0.6 + w * 0.8 : (hash(seed + 1.7) - 0.5) * 1.6 + w * 2.4;
-  el.style.setProperty('--rot', `${rot.toFixed(2)}deg`);
-  el.style.setProperty('--curl', `${Math.round((lop ? 0.3 : nal ? 0.45 : 1) * sm(0.45, 0.95, w) * 26)}px`);
-  el.style.setProperty('--sep', ((lop ? 0.05 : nal ? 0.22 : 0.15) + (lop ? 0.15 : nal ? 0.2 : 0.35) * w).toFixed(2));
-  el.style.setProperty('--sat', (1 - (lop ? 0.15 : nal ? 0.25 : 0.4) * w).toFixed(2));
-  el.style.setProperty('--blek', ((lop ? 0.04 : 0.1) + (lop ? 0.12 : nal ? 0.18 : 0.3) * w).toFixed(2));
+// På skivan bleks bara papperet: de sitter fast med skruv.
+function bleks(el, w) {
+  el.style.setProperty('--sep', (0.15 + 0.35 * w).toFixed(2));
+  el.style.setProperty('--sat', (1 - 0.4 * w).toFixed(2));
+  el.style.setProperty('--blek', (0.1 + 0.3 * w).toFixed(2));
+}
+// Löpsedeln böjs lite (och vrids efter platsen, --vrid).
+function slit(el, w, seed) {
+  el.style.setProperty('--rot', `${((hash(seed + 1.7) - 0.5) * 0.6 + w * 0.8).toFixed(2)}deg`);
+  el.style.setProperty('--curl', `${Math.round(0.3 * sm(0.45, 0.95, w) * 26)}px`);
+  el.style.setProperty('--sep', (0.05 + 0.15 * w).toFixed(2));
+  el.style.setProperty('--sat', (1 - 0.15 * w).toFixed(2));
+  el.style.setProperty('--blek', (0.04 + 0.12 * w).toFixed(2));
 }
 
 export function affischer(back, { short = (x) => x, namn = null } = {}) {
@@ -466,7 +485,7 @@ export function affischer(back, { short = (x) => x, namn = null } = {}) {
   const l = lopsedel();
   const c = chelsea();
   const n = nacional();
-  back.append(v, f, n, l, c);
+  back.append(skivPlats(back), f, n, v, c, l);
   let ritad = null;
   let fonter = false;
   let senast = { rows: null, old: null };
@@ -477,25 +496,19 @@ export function affischer(back, { short = (x) => x, namn = null } = {}) {
   }
   const api = {
     slit(w, seed) {
-      for (const [el, p, s] of [[f, FAST[0], seed + 17], [v, FAST[1], seed]]) {
-        el.style.left = `${Math.round(p.x + (hash(s + 62) - 0.5) * 12)}px`;
-        el.style.top = `${Math.round(p.y + (hash(s + 63) - 0.5) * 10)}px`;
-        slit(el, w, s);
-      }
-      n.style.left = `${Math.round(NACPLATS.x + (hash(seed + 64) - 0.5) * 6)}px`;
-      n.style.top = `${Math.round(NACPLATS.y + (hash(seed + 65) - 0.5) * 8)}px`;
-      slit(n, w, seed + 41);
-      slit(l, w, seed + 5, { lop: true });
-      slit(c, w, seed + 29, { nal: true });
+      for (const el of [f, n, v, c]) bleks(el, w);
+      slit(l, w, seed + 5);
     },
     // rubriken räknas om när datan ändras (rum-saker.js frågar bara då)
     data(rows, old) {
       senast = { rows, old };
       const fro = veckaFro();
-      // varannan vecka till vänster, varannan till höger; på höjden alltid till höger
+      // varannan vecka i fönstret, varannan på väggen; på höjden alltid på väggen
       const p = smal() ? LOPPLATS[1] : LOPPLATS[((fro % 2) + 2) % 2];
-      l.style.left = `${Math.round(p.x + (hash(fro + 3) - 0.5) * 10)}px`;
-      l.style.top = `${Math.round(p.y + (hash(fro + 4) - 0.5) * 8)}px`;
+      const vagg = Boolean(p.vagg);
+      l.classList.toggle('pa-vagg', vagg);
+      l.style.left = `${Math.round(p.x + (hash(fro + 3) - 0.5) * (vagg ? 4 : 10))}px`;
+      l.style.top = `${Math.round(p.y + (hash(fro + 4) - 0.5) * (vagg ? 4 : 8))}px`;
       l.style.setProperty('--vrid', `${(p.rot + (hash(fro + 5) - 0.5) * 1.2).toFixed(2)}deg`);
       let r;
       try {
@@ -504,10 +517,10 @@ export function affischer(back, { short = (x) => x, namn = null } = {}) {
         console.warn('Rummet: löpsedeln', err);
         r = { ...TIPSGUIDEN, datum: datum(Date.now()) };
       }
-      const k = JSON.stringify([r.rad, r.under, r.datum, fonter]);
+      const k = JSON.stringify([r.rad, r.under, r.datum, fonter, vagg]);
       if (k === ritad) return;
       ritad = k;
-      rita(l, r);
+      rita(l, r, vagg);
     },
   };
   return api;
