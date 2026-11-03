@@ -53,6 +53,9 @@ const BITAR = {
   ram: { plan: 0, box: { x: 968, y: 280, w: 164, h: 232 }, i: '.rum-ram', at: RAM },
   hogra: { plan: 0, box: { x: 1130, y: 0, w: 470, h: 580 } },
   stall: { plan: 3, box: { x: 30, y: 470, w: 260, h: 250 } },
+  // bardisken med barstolarna, till höger om bilden in i videons hörn; den
+  // ligger under tavlorna på högra väggen och kortlådan (fore)
+  disk: { plan: 0, box: { x: 990, y: 470, w: 1110, h: 400 }, fore: '.rum-hv' },
 };
 // närbilden: högst så många bildpunkter på dukens längsta led
 const SKARP = 2600;
@@ -105,7 +108,10 @@ export async function inredning(el, opt = {}) {
     const at = parent ? BITAR[namn].at : { x: 0, y: 0 };
     Object.assign(canvas.style, { position: 'absolute', pointerEvents: 'none', left: `${box.x - at.x}px`, top: `${box.y - at.y}px`, width: `${box.w}px`, height: `${box.h}px` });
     if (namn === 'neon') canvas.style.filter = 'drop-shadow(0 0 2px rgba(255,80,60,1)) drop-shadow(0 0 6px rgba(255,45,31,.9)) drop-shadow(0 0 16px rgba(255,45,31,.6))';
-    (parent || planes[BITAR[namn].plan]).append(canvas);
+    const pl = parent || planes[BITAR[namn].plan];
+    const fore = BITAR[namn].fore && pl.querySelector(`:scope > ${BITAR[namn].fore}`);
+    if (fore) pl.insertBefore(canvas, fore);
+    else pl.append(canvas);
     const scene = new THREE.Scene();
     scene.environment = env;
     const mesh = (g, m, p = scene, skugga = true) => { const x = new THREE.Mesh(g, m); x.castShadow = skugga; x.receiveShadow = true; p.add(x); return x; };
@@ -1140,6 +1146,201 @@ export async function inredning(el, opt = {}) {
     g.add(tejp);
   }
 
+  // ---------- bardisken och barstolarna ----------
+
+  // Bardisken längs högra väggen, som den platta i rum.js (disk) men i 3D, så
+  // att man ser att det är tomt under skivan: skivan i lackad mahogny med en
+  // rundad kant, en dryg decimeter ut över den indragna fronten med ramar och
+  // fyllningar, konsoler i järn under kanten och en krok i mässing i varje
+  // fält – på de två innersta en halsduk och en jeansjacka. Framför står tre
+  // barstolar som gängets (rum-3d.js), inskjutna under kanten. Skivan skuggar
+  // fronten och stolarna skuggar fronten och väggen under skivan.
+  // Mått i bakväggens plan (1 enhet = 1 px där, ungefär 2,37 per cm):
+  // skivan Y = −490 till −501 mellan kanten X = 1060 och väggen X = 1140,
+  // fronten X = 1115, golvet Y = −730 och ramarna 128,57 isär från bakväggen
+  // (Z = 0) mot betraktaren.
+  const DISK = { top: -490, kant: 1060, vagg: 1140, front: 1115, under: -501, golv: -730, ram: 128.57, fram: 850 };
+  function bardisk(b) {
+    const { mesh } = b;
+    const D = DISK;
+    const V = (x, y, z) => new THREE.Vector3(x, y, z);
+    // lackad mahogny: ådringen längs plankorna (v), fogarna mellan dem
+    const mahogny = (ljus, plankor) => {
+      const t = tex(512, 512, (c, w, h) => {
+        const g = c.createLinearGradient(0, 0, w, 0);
+        g.addColorStop(0, ljus ? '#7a4a2c' : '#55301b');
+        g.addColorStop(1, ljus ? '#6a3e24' : '#4a2916');
+        c.fillStyle = g;
+        c.fillRect(0, 0, w, h);
+        for (let i = 0; i < 140; i++) {
+          c.strokeStyle = `rgba(${hash(i) > 0.45 ? '40,16,6' : '170,104,60'},${0.08 + hash(i + 3) * 0.18})`;
+          c.lineWidth = 0.6 + hash(i + 7) * 2.4;
+          c.beginPath();
+          const x = hash(i + 1) * w;
+          c.moveTo(x, 0);
+          c.bezierCurveTo(x + 10 * (hash(i + 2) - 0.5), h * 0.3, x - 8 * (hash(i + 5) - 0.5), h * 0.65, x + 6 * (hash(i + 4) - 0.5), h);
+          c.stroke();
+        }
+        if (plankor) {
+          c.fillStyle = 'rgba(24,10,3,.55)';
+          for (const x of [0.32, 0.66]) c.fillRect(x * w, 0, 2, h);
+        }
+      });
+      t.wrapS = t.wrapT = THREE.RepeatWrapping;
+      return t;
+    };
+    const skivTra = mahogny(true, true);
+    skivTra.repeat.set(1 / 80, 1 / 520);
+    const skiva = mat('#ffffff', { map: skivTra, roughness: 0.32, clearcoat: 0.7, clearcoatRoughness: 0.18, envMapIntensity: 0.55 });
+    const frontTra = mahogny(false, false);
+    const front = mat('#ffffff', { map: frontTra, roughness: 0.5, clearcoat: 0.3, envMapIntensity: 0.4 });
+    const jarn = mat('#1d1611', { metalness: 0.6, roughness: 0.5 });
+    const massing = mat('#c09a52', { metalness: 1, roughness: 0.32, envMapIntensity: 1.2 });
+
+    // skivan: rundad kant fram, sedd i genomskärning och dragen längs disken
+    const r = (D.under - D.top) / -2;
+    const prof = new THREE.Shape();
+    prof.moveTo(D.vagg, D.top);
+    prof.lineTo(D.kant + r, D.top);
+    prof.absarc(D.kant + r, D.top - r, r, Math.PI / 2, Math.PI * 1.5, false);
+    prof.lineTo(D.vagg, D.under);
+    prof.closePath();
+    mesh(new THREE.ExtrudeGeometry(prof, { depth: D.fram, bevelEnabled: false, curveSegments: 14 }), skiva, b.scene);
+
+    // fronten: skivor inne, ramar utanpå (överst, nederst och vid varje ram)
+    const lada = (x0, x1, y0, y1, z0, z1, m = front) => {
+      const x = mesh(new THREE.BoxGeometry(x1 - x0, y0 - y1, z1 - z0), m, b.scene);
+      x.position.set((x0 + x1) / 2, (y0 + y1) / 2, (z0 + z1) / 2);
+      return x;
+    };
+    lada(D.front + 1.5, D.vagg, D.under, D.golv, 0, D.fram);
+    lada(D.front - 1, D.front + 1.5, D.under, -522, 0, D.fram);
+    lada(D.front - 1, D.front + 1.5, -712, D.golv, 0, D.fram);
+    for (let i = 0; i * D.ram < D.fram; i++) lada(D.front - 1, D.front + 1.5, -522, -712, Math.max(0, i * D.ram - 7), i * D.ram + 7);
+
+    // konsolerna i järn vid varannan ram, och krokarna mitt i varje fält
+    for (let i = 1; i * D.ram < D.fram; i += 2) {
+      const z = i * D.ram;
+      mesh(new THREE.TubeGeometry(new THREE.QuadraticBezierCurve3(V(D.kant + 8, D.under - 1, z), V(D.front - 4, D.under - 5, z), V(D.front - 1.5, -546, z)), 20, 1.4, 8), jarn, b.scene);
+      lada(D.kant + 8, D.front - 1, D.under, D.under - 1.6, z - 1.6, z + 1.6, jarn);
+      lada(D.front - 2, D.front - 1, D.under, -552, z - 2.2, z + 2.2, jarn);
+    }
+    for (let i = 0; (i + 0.5) * D.ram < D.fram; i++) {
+      const z = (i + 0.5) * D.ram;
+      lada(D.front - 2.4, D.front - 1, -527, -541, z - 2.6, z + 2.6, massing);
+      mesh(new THREE.TubeGeometry(new THREE.QuadraticBezierCurve3(V(D.front - 2, -533, z), V(D.front - 11, -539, z), V(D.front - 10.5, -529, z)), 12, 0.9, 8), massing, b.scene);
+      mesh(new THREE.SphereGeometry(1.25, 12, 8), massing, b.scene).position.set(D.front - 10.5, -529, z);
+    }
+
+    // halsduken och jeansjackan: ritade i en duk, med det som inte är tyg
+    // genomskinligt, och lite buktande
+    const hang = (w, h, draw, x, y, z, buk) => {
+      const t = tex(Math.round(w * 4), Math.round(h * 4), (c, cw, ch) => { c.scale(cw / w, ch / h); draw(c); });
+      const g = new THREE.PlaneGeometry(w, h, 12, 12);
+      const p = g.attributes.position;
+      for (let i = 0; i < p.count; i++) p.setZ(i, buk * Math.cos((p.getX(i) / w) * Math.PI) * (0.4 + 0.6 * (0.5 - p.getY(i) / h)));
+      g.computeVertexNormals();
+      const m = mesh(g, mat('#ffffff', { map: t, alphaTest: 0.5, side: THREE.DoubleSide, roughness: 0.85, envMapIntensity: 0.3 }), b.scene);
+      m.rotation.y = -90 * DEG;
+      m.position.set(x, y - h / 2, z);
+      return m;
+    };
+    const cm = 2.37;
+    // halsduken: vikt över kroken, två ändar i vinrött med gräddvita ränder
+    hang(20 * cm, 68 * cm, (c) => {
+      c.scale(cm, cm);
+      for (const [u, v0, len, mork] of [[2, 0, 66, 0.25], [7, 3, 56, 0]]) {
+        c.fillStyle = '#86283a';
+        c.fillRect(u, v0, 11, len);
+        c.fillStyle = '#d6c49a';
+        for (let v = v0 + 14; v < v0 + len - 4; v += 18) c.fillRect(u, v, 11, 3.5);
+        c.fillStyle = `rgba(0,0,0,${mork})`;
+        c.fillRect(u, v0, 11, len);
+        c.fillStyle = 'rgba(0,0,0,.3)';
+        c.fillRect(u + 10, v0, 1, len);
+      }
+      c.fillStyle = 'rgba(0,0,0,.35)';
+      c.fillRect(2, 0, 16, 6);
+    }, D.front - 9, -531, 0.5 * D.ram, 1.5);
+    // jeansjackan: kragen över kroken, axlarna, ärmarna, bröstfickorna och
+    // knapparna (u och v i cm från kroken, u åt höger)
+    hang(56 * cm, 78 * cm, (c) => {
+      c.scale(cm, cm);
+      c.translate(28, 1);
+      const path = (list) => { c.beginPath(); list.forEach(([u, v], i) => (i ? c.lineTo(u, v) : c.moveTo(u, v))); };
+      path([[-3, 0], [3, 0], [19, 9], [23, 13], [25, 40], [26, 76], [-26, 76], [-25, 40], [-23, 13], [-19, 9]]);
+      c.closePath();
+      const g = c.createLinearGradient(0, 0, 0, 76);
+      g.addColorStop(0, '#556a8e');
+      g.addColorStop(1, '#7186aa');
+      c.fillStyle = g;
+      c.fill();
+      c.lineWidth = 0.5;
+      c.strokeStyle = '#26303f';
+      for (const s of [-1, 1]) { path([[16 * s, 15], [17 * s, 76]]); c.stroke(); }
+      path([[0, 30], [0, 76]]);
+      c.stroke();
+      c.fillStyle = '#2e3a50';
+      path([[-3, 0], [-7, 6], [0, 30], [7, 6], [3, 0]]);
+      c.fill();
+      c.strokeStyle = 'rgba(160,172,196,.55)';
+      c.lineWidth = 0.35;
+      path([[-7, 6], [0, 30], [7, 6]]);
+      c.stroke();
+      for (const s of [-1, 1]) c.strokeRect(s > 0 ? 5 : -12, 21, 7, 7);
+      c.fillStyle = '#c0a060';
+      for (const v of [36, 48, 60]) { c.beginPath(); c.arc(1.6, v, 0.7, 0, 2 * Math.PI); c.fill(); }
+    }, D.front - 8, -532, 1.5 * D.ram, 3);
+
+    // barstolarna: röd vinyl med söm på en krom ställning, som gängets, i
+    // verklig storlek (sitsen 75 cm över golvet), inskjutna under kanten
+    const krom = mat('#d8d8d4', { metalness: 1, roughness: 0.18, envMapIntensity: 1.3 });
+    const vinyl = mat('#8b2e2a', { roughness: 0.38, clearcoat: 0.5, clearcoatRoughness: 0.3, envMapIntensity: 0.6 });
+    const som = mat('#c9b18a', { roughness: 0.8 });
+    const k = 1.6;
+    const SITS = D.golv + 75 * cm;
+    const ring = (y, R, tube, m, p) => {
+      const x = mesh(new THREE.TorusGeometry(R, tube, 10, 64), m, p);
+      x.rotation.x = 90 * DEG;
+      x.position.y = y;
+    };
+    for (const [z, vrid] of [[120, 8], [250, -14], [380, 21]]) {
+      const stol = new THREE.Group();
+      stol.position.set(D.kant - 18, SITS - 2 * k, z);
+      stol.rotation.y = vrid * DEG;
+      b.scene.add(stol);
+      const sits = [[0, 0], [19, 0], [22, 1.2], [23, 4], [22.2, 7], [19, 8.4], [0, 8.6]].map(([a, q]) => new THREE.Vector2(a * k, q * k));
+      mesh(new THREE.LatheGeometry(sits, 64), vinyl, stol).position.y = -6.6 * k;
+      ring(-2.6 * k, 22.6 * k, 0.35 * k, som, stol);
+      ring(-7.6 * k, 15 * k, 1.3 * k, krom, stol);
+      const golv = D.golv - stol.position.y;
+      ring(golv + 30 * cm, 19.5 * k, 1.2 * k, krom, stol);
+      for (const a of [45, 135, 225, 315].map((x) => x * DEG)) {
+        const p0 = V(Math.cos(a) * 15 * k, -7.6 * k, Math.sin(a) * 15 * k);
+        const p1 = V(Math.cos(a) * 24 * k, golv, Math.sin(a) * 24 * k);
+        const ben = mesh(new THREE.CylinderGeometry(1.6 * k, 1.6 * k, p0.distanceTo(p1), 16), krom, stol);
+        ben.position.copy(p0).add(p1).multiplyScalar(0.5);
+        ben.quaternion.setFromUnitVectors(V(0, 1, 0), p1.clone().sub(p0).normalize());
+      }
+    }
+    // skuggorna på bakväggen under skivan; utan skuggkarta (rum-gpu.js) en
+    // målad skugga på fronten under skivan i stället
+    catcher(b, new THREE.PlaneGeometry(140, 260), [0, 0, 0], [1080, -620, 0.3]);
+    if (!gl.shadowMap.enabled) {
+      const t = tex(4, 64, (c, w, h) => {
+        const g = c.createLinearGradient(0, 0, 0, h);
+        g.addColorStop(0, 'rgba(0,0,0,.6)');
+        g.addColorStop(1, 'rgba(0,0,0,0)');
+        c.fillStyle = g;
+        c.fillRect(0, 0, w, h);
+      });
+      const m = new THREE.Mesh(new THREE.PlaneGeometry(D.fram, 70), new THREE.MeshBasicMaterial({ map: t, transparent: true, depthWrite: false }));
+      m.rotation.y = -90 * DEG;
+      m.position.set(D.front - 2.6, D.under - 35, D.fram / 2);
+      b.scene.add(m);
+    }
+  }
+
   // ---------- allt ----------
 
   // knappen kring uret: ett klick går fram till det (närbilden i rum.js)
@@ -1182,6 +1383,7 @@ export async function inredning(el, opt = {}) {
   wallRing(B.hogra, ...opt.vagg.kork, 5, mat('#fff', { map: ved, roughness: 0.55 }));
   rightWall(B.hogra);
   stall(B.stall);
+  bardisk(B.disk);
 
   // Uret går efter Stockholms tid, med samma klocka som utsikten (Vader.nu()
   // i vader.js, annars datorns klocka). Med ?rum-t står det på den tid det
@@ -1223,7 +1425,7 @@ export async function inredning(el, opt = {}) {
     B.ram.paint();
   }
   setNamn('');
-  for (const k of ['tak', 'neon', 'hogra', 'stall']) B[k].paint();
+  for (const k of ['tak', 'neon', 'hogra', 'stall', 'disk']) B[k].paint();
   tick();
   let morkt = false;
   function natt(on) {
