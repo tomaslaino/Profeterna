@@ -187,6 +187,15 @@ ingen falsk precision · sidan kraschar aldrig av en död källa · endast fria 
   igen, tipset under den – förut två knappar, två väntetider och två sökpass. Är tipset
   äldre än ett dygn står *Analysera igen* under det: tipset skrivs om ur artikeln och
   nyheterna som hämtas just då, utan sökningar (se Matchanalysen, *Analysera*)
+- [x] **Gängets kupong efter avspark och regeln som fråga (2026-11-03, användarens beslut):**
+  en match går att fylla i på gängets kupong till 30 minuter efter avsparken
+  (`efterAvspark` i [config/kupong.js](config/kupong.js)), i uppgörelsen, på pulten, i Ny
+  kupong, Ändra och Ladda upp system – och tjänsten tar emot den lika länge. Var och ens egna
+  tips stänger som förut vid första avsparken. Följer gängets kupong inte regeln, saknar
+  matcher tecken eller är matcher låsta säger sidan det och sparar när man trycker igen –
+  förut stoppade regeln gängets kupong helt, och låsta matcher föll bort utan ett ord. Bakgrund:
+  31 oktober gick gängets slutliga kupong inte att spara, och när den sparades 16:24 kom bara de
+  två matcher med som inte hade startat
 
 ## Publicering
 
@@ -1141,8 +1150,11 @@ ställningen efter 90 minuter (samma utfall som prognosen).
    Är datumet redan taget av en kupong som sidan kände till får filen `-2` (osv.). Har
    någon annan just sparat en kupong för samma dag – som sidan inte visar än – frågar sidan
    först: *Visa den* eller *Spara ändå, som en kupong till*.
-   **Startade matcher är låsta:** en match som har startat (eller ställts in) kan inte
-   läggas till. Hinner en vald match starta medan man väljer tas den bort, med en rad om
+   **Matcher låses 30 minuter efter avspark:** en match som startade för mer än
+   `efterAvspark` minuter sedan ([config/kupong.js](config/kupong.js), 30) – eller har
+   ställts in – kan inte läggas till; fram till dess går den att fylla i, så att gängets
+   kupong kan föras in också när den spelades i sista stund (sedan 2026-11-03, förut låstes
+   den vid avsparken). Hinner en vald match låsas medan man väljer tas den bort, med en rad om
    det, innan något sparas. Proxyn kontrollerar detsamma mot avsparkstiderna i den
    publicerade `data/matches.json`, inte mot det sidan skickar.
 3. Tills dess visas kupongen i den webbläsaren där den skapades, märkt *väntar på GitHub*.
@@ -1176,7 +1188,7 @@ färgade – och fyller i kupongen. Allt sker i webbläsaren
    R-systems reducering räknas inte.
 
 Sedan öppnas Ny kupong med bara de valda matcherna synliga och en rad om vad som kom
-med (startade matcher och rader som inte hittades står där). Har en kupong som inte är
+med (låsta matcher och rader som inte hittades står där). Har en kupong som inte är
 färdigspelad redan minst hälften av matcherna öppnas den i stället i Ändra, så att det
 inte blir två kuponger för samma omgång; tecknen från bilden ersätter dess tecken i de
 matcherna och anteckningarna ligger kvar. Man ser över kupongen och sparar som vanligt.
@@ -1201,8 +1213,9 @@ Token*, mallen *Edit Cloudflare Workers*.
 - Lokalt: `KUPONG_LOKALT=1` i `.env` ger samma knapp mot `POST /api/kupong`, som skriver
   filen direkt i `data/kuponger/` (eller `KUPONG_DIR`) utan GitHub.
 
-**Ändra:** knappen *Ändra* (bara medan någon match återstår). Startade matcher ligger kvar
-som de är, med sina anteckningar – också om de hunnit starta medan man ändrade; proxyn
+**Ändra:** knappen *Ändra* (bara medan någon match återstår). Låsta matcher (startade för
+mer än 30 minuter sedan) ligger kvar
+som de är, med sina anteckningar – också om de hunnit låsas medan man ändrade; proxyn
 nekar att de ändras eller tas bort. Spara direkt skriver över filen (behåller filens
 `skapad`, lägger till `ändrad`), men bara den version som ändringen utgick från: varje
 kupong i `kuponger.json` har filens version (`sha`, git-blobbens, samma som GitHubs API
@@ -1355,6 +1368,11 @@ under omgången.
    gardering). Den börjar som förslaget – med regeln ett som följer den (se *Regeln*), annars
    tecknen som fler än hälften har med och *Alla olika* tomma – och sparas bara på enheten, så en håller i pennan under uppgörelsen (*Börja
    om* går tillbaka till förslaget). Nederst syns kupongen som rutor med antal rader.
+   Gängets tecken går att kryssa i till 30 minuter efter matchens avspark (sedan 2026-11-03),
+   så att kupongen som spelades hos Svenska Spel i sista stund kan föras in efteråt; därefter
+   är matchen låst. Innan kupongen sparas frågar sidan om den inte följer regeln, om matcher
+   saknar tecken eller om låsta matcher inte kommer med (*11 matcher startade för mer än 30
+   minuter sedan och kommer inte med. Tryck igen för att spara ändå.*).
    - *Spara gängets kupong* sparar den direkt därifrån – samma tjänst och kontroller som *Spara kupong*
      under Ny kupong (se [Kupongen](#kupongen)). Matcher utan tecken kommer inte med; sidan
      frågar först. Därefter står gängets kupong under Omgången, med en rad om att den är
@@ -1403,8 +1421,9 @@ omgångar med lika många matcher som regeln (tretton); `regel: null` stänger a
   De mest eniga matcherna blir spikar och de mest oeniga helgarderingar. Står två tecken lika
   där ett av dem ska bort lämnas matchen tom åt uppgörelsen; ett tecken som ingen har med kommer
   inte med. *Börja om* går tillbaka till förslaget.
-- **Spara gängets kupong** (på papperet och på pulten) går inte när den har fler av något slag
-  än regeln; matcher utan tecken frågar sidan om som förut.
+- **Spara gängets kupong** (på papperet och på pulten) stoppas inte av regeln: har den fler av
+  något slag än regeln säger sidan det, och ett tryck till sparar ändå – gängets kupong ska vara
+  den som spelades (sedan 2026-11-03; förut gick den inte att spara).
 - Regeln kontrolleras på sidan, inte i tjänsten, som litar på gänget (se [Säkerhet](#säkerhet)).
 
 **Tjänsten** är samma som sparar kupongen (*profeterna-kupong*, adressen i

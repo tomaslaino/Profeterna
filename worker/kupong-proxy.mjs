@@ -14,7 +14,8 @@
 // Driftsätts för hand med worker/kupong.toml; hemligheten GITHUB_TOKEN läggs
 // in med "wrangler secret put" (README, avsnittet Kupongen).
 //
-// Avsparkstiderna (startade matcher är låsta) läses ur den publicerade
+// Avsparkstiderna (en match är låst efterAvspark minuter efter avsparken,
+// config/kupong.js) läses ur den publicerade
 // sajten, <site>/data/matches.json – samma sajt som matchanalysens proxy
 // läser (config/llm.js, eller SITE).
 
@@ -77,7 +78,7 @@ export default {
       const ctx = { loadMatches: () => siteMatches(site) };
       const r = samtal
         ? await postRound(body, { ...ctx, store, gang: kupongCfg.gang })
-        : await saveCoupon(body, { ...ctx, writer: env.GITHUB_TOKEN ? githubWriter(env.GITHUB_TOKEN) : null });
+        : await saveCoupon(body, { ...ctx, writer: env.GITHUB_TOKEN ? githubWriter(env.GITHUB_TOKEN) : null, efterAvspark: kupongCfg.efterAvspark });
       return json(r.status, r.body);
     } catch (err) {
       console.error('[kupong]', err);

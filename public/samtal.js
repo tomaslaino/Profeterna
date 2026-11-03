@@ -57,7 +57,7 @@
     allDays: false, // välj matcher: alla dagar, inte bara närmaste omgången
     draft: null, // dina tips: {id, vem, tecken, kommentarer, inne}
     edit: false, // draft är en ändring av dina inlämnade tips
-    again: false, // Spara gängets kupong trots matcher utan tecken
+    again: false, // Spara gängets kupong trots matcher utan tecken, regeln eller låsta matcher
     names: new Map(), // omgång och matcher → {namn, syftar} | null (inget namn) | 'loading'
     writing: {}, // din kommentar i efterhand som inte är sparad än: matchens id → texten
     failed: {}, // matchens id → varför kommentaren inte gick att spara
@@ -456,7 +456,8 @@
       const proposal = kind === 0 ? '' : SIGNS.filter((sg, i) => cov[i].length * 2 > n).join('');
       const notes = who.map((k) => ({ k, text: (s.tips[k].kommentarer || {})[x.id] })).filter((o) => o.text);
       const g = gradeRow({ id: x.id, sign: '1X2' }, now);
-      return { x, m, t, n, cov, pr, fav, kind, proposal, notes, g, open: isOpen(m, now) };
+      // open: gängets tecken går att fylla i (till en stund efter avspark)
+      return { x, m, t, n, cov, pr, fav, kind, proposal, notes, g, open: fillable(m, now) };
     });
     const r = regel(s);
     if (r) fit(rows, r);
@@ -593,11 +594,11 @@
   }
 
   // Gängets kupong har redan tecknen som är valda här, i varje match som
-  // inte har startat.
+  // går att fylla i.
   function savedAsIs(c, rows, val) {
     const now = Date.now();
     const on = new Map(c.matches.map((x) => [x.id, x.sign]));
-    return rows.filter((r) => isOpen(r.m, now)).every((r) => (val[r.x.id] || '') === (on.get(r.x.id) || ''));
+    return rows.filter((r) => fillable(r.m, now)).every((r) => (val[r.x.id] || '') === (on.get(r.x.id) || ''));
   }
 
   // ---------- allas tips på papperet: uppgörelsen och gängets kupong ----------
@@ -671,8 +672,8 @@
   // – grön när gängets tecken gick in, annars röd, streckad i blyerts medan
   // matchen pågår – och ställningen står för hand med rättarens bock eller
   // kryss bredvid. who: vilka som har med 1, X och 2. pick: rutorna är
-  // knappar för gängets tecken (uppgörelsen), open: matchen har inte
-  // startat. day: matcherna står under sin dag, så klockslaget räcker. out:
+  // knappar för gängets tecken (uppgörelsen), open: matchen går att fylla i
+  // (fillable). day: matcherna står under sin dag, så klockslaget räcker. out:
   // matchen kom inte med på gängets kupong. after, pen: kommentarerna i
   // efterhand (afterOf, penOf).
   function upRow({ id, m, label, g, nr, who, sign, notes = [], note = '', after = [], pen = null, ids, pick = false, open = false, day = false, out = false }) {
@@ -704,7 +705,8 @@
         const b = box(sg, who[i], ids, on ? `${id}${sg}` : null, g.res === i ? `${id}${sg}` : null);
         const odds = `<small${on ? ' class="on"' : ''}>${g.pr ? pctOdds(g.pr[i]) : '–'}</small>`;
         if (!pick) return `<span class="sm-c" aria-hidden="true">${b}${odds}</span>`;
-        // Gängets tecken väljs bara i matcher som inte har startat.
+        // Gängets tecken väljs i matcher som går att fylla i – till en stund
+        // efter avspark (fillable).
         return `<button type="button" class="sm-c" data-s="${sg}" aria-pressed="${on}"${open ? '' : ' disabled'}` +
           ` aria-label="${esc(`${label}, ${sg}: ${who[i].length ? who[i].join(', ') : 'ingen'}`)}">${b}${odds}</button>`;
       }).join('') + '</div>';
@@ -773,13 +775,13 @@
   }
 
   // Gängets tecken som utkast till gängets kupong: en ändring av den om den
-  // finns (startade matcher står kvar som de är), annars en ny. Matcher som
-  // inte startat och saknar tecken kommer inte med.
+  // finns (låsta matcher står kvar som de är), annars en ny. Matcher som går
+  // att fylla i och saknar tecken kommer inte med.
   function gangDraft(s) {
     const rows = analyse(s);
     const val = decisions(s, rows);
     const now = Date.now();
-    const open = rows.filter((r) => isOpen(r.m, now));
+    const open = rows.filter((r) => fillable(r.m, now));
     const c = existing(s);
     const d = newDraft(c ? c.id : null);
     // Gängets kupong får omgångens namn, om den inte redan har ett.
@@ -797,7 +799,20 @@
         delete d.notes[r.x.id];
       }
     }
-    return { d, c, open, undecided: open.filter((r) => !val[r.x.id]).length, fel: brott(s, val) };
+    // late: låsta matcher som inte står på gängets kupong – de kommer inte med.
+    const late = rows.filter((r) => !fillable(r.m, now) && !(c && c.matches.some((x) => x.id === r.x.id))).length;
+    return { d, c, open, undecided: open.filter((r) => !val[r.x.id]).length, fel: brott(s, val), late };
+  }
+
+  // Det sidan frågar om innan gängets kupong sparas: det som bryter mot
+  // regeln, matcher utan tecken och låsta matcher som inte kommer med.
+  function askText({ fel, undecided, late }) {
+    const min = (KP.data && KP.data.efterAvspark) || 0;
+    return [
+      fel,
+      undecided ? `${undecided === 1 ? 'En match saknar' : `${undecided} matcher saknar`} tecken och kommer inte med.` : '',
+      late ? `${late === 1 ? 'En match' : `${late} matcher`} ${min ? `startade för mer än ${min} minuter sedan` : 'har startat'} och kommer inte med.` : '',
+    ].filter(Boolean).join(' ');
   }
 
   const SAVED = 'Gängets kupong är sparad · syns för alla om några minuter.';
@@ -813,7 +828,7 @@
   // med tecknen ifyllda, och kupongen sparas där.
   async function makeCoupon(s, { adjust = false } = {}) {
     const msg = (h) => { $('#sm-msg').innerHTML = h; };
-    const { d, c, open, undecided, fel } = gangDraft(s);
+    const { d, c, open, undecided, fel, late } = gangDraft(s);
     if (!open.length) {
       msg('<span class="note">Alla matcher har startat.</span>');
       return;
@@ -823,15 +838,13 @@
       msg('<span class="note">Tryck på rutorna för gängets tecken först.</span>');
       return;
     }
-    if (fel) {
-      msg(`<span class="note">${esc(fel)}</span>`);
-      return;
-    }
-    if (!adjust && undecided && !SM.again) {
+    // Regeln, matcher utan tecken och låsta matcher stoppar inte gängets
+    // kupong – den ska vara den som spelades – men sidan frågar först.
+    if (!adjust && (undecided || fel || late) && !SM.again) {
       SM.again = true;
       // Rutorna i matcherna utan tecken blir röda, som när alla tippar.
-      $('#sm-sheet').classList.add('need');
-      msg(`<span class="note">${undecided === 1 ? 'En match saknar' : `${undecided} matcher saknar`} tecken och kommer inte med. Tryck igen för att spara ändå.</span>`);
+      if (undecided) $('#sm-sheet').classList.add('need');
+      msg(`<span class="note">${esc(askText({ fel, undecided, late }))} Tryck igen för att spara ändå.</span>`);
       return;
     }
     SM.again = false;
@@ -861,7 +874,7 @@
         `<button type="button" class="kp-linkbtn" id="sm-over">${ours ? 'Spara våra tecken över den' : 'Spara ändå, som en kupong till'}</button>`);
       $('#sm-over').addEventListener('click', async () => {
         if (ours) {
-          SM.again = true; // frågan om matcher utan tecken är redan besvarad
+          SM.again = true; // frågan om matcher utan tecken, regeln och låsta matcher är redan besvarad
           makeCoupon(s);
           return;
         }
@@ -1853,7 +1866,7 @@
     // den sparade kupongen eller det du har kryssat (decisions) – och vilka
     // som har med varje tecken. → null om du inte ser de andras tips, annars
     // {val, who: {matchens id: [vilka på 1, X, 2]}, notes: {matchens id:
-    // {vem: motivering}}, open: någon match har inte startat, same: gängets
+    // {vem: motivering}}, open: någon match går att fylla i, same: gängets
     // kupong är sparad som den står, reset: tecknen är inte förslaget
     // (Börja om), label: guldordet}.
     gang() {
@@ -1894,17 +1907,20 @@
     // again: spara trots matcher utan tecken (eller över den som någon annan
     // just sparade), anyway: som en kupong till för samma dag, adjust: i Ny
     // kupong (eller Ändra) med tecknen ifyllda. → {ok} | {ask: matcher utan
-    // tecken} | {via: adressen dit} | {error, over: någon annan hann före
+    // tecken, fel: det som bryter mot regeln, late: låsta matcher som inte
+    // kommer med, text: allt det i ord – spara igen med again} | {via:
+    // adressen dit} | {error, over: någon annan hann före
     // med gängets kupong, igen: en annan kupong har samma dag, offline}.
     async sparaGang({ again = false, anyway = false, adjust = false } = {}) {
       const s = SM.data;
       if (!s) return { ok: false, error: 'Omgången finns inte längre.' };
-      const { d, c, open, undecided, fel } = gangDraft(s);
+      const { d, c, open, undecided, fel, late } = gangDraft(s);
       if (!open.length) return { ok: false, error: 'Alla matcher har startat.' };
       const ctx = couponCtx(d);
       if (!ctx) return { ok: false, error: 'Kryssa i gängets tecken först.' };
-      if (fel) return { ok: false, error: fel };
-      if (undecided && !again) return { ok: false, ask: undecided };
+      // Regeln, matcher utan tecken och låsta matcher stoppar inte, men först
+      // frågas det.
+      if ((undecided || fel || late) && !again) return { ok: false, ask: undecided, fel, late, text: askText({ fel, undecided, late }) };
       if (adjust || !(KP.data && KP.data.save)) {
         kpStore(KP_DRAFT, d);
         KP.onlyPicked = true;

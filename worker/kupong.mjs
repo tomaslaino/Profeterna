@@ -13,7 +13,7 @@
 //   → 200 {ok: true, id, skapad, sha, commit}   id får ett tillägg (-2 …) om
 //          datumet redan är taget av en kupong som sidan kände till; sha =
 //          filens nya version; commit = länk
-//   → 400 kupongen har fel, eller rör en match som redan startat
+//   → 400 kupongen har fel, eller rör en match som är låst
 //   → 409 någon annan hann före: {changed: true} – kupongen har ändrats sedan
 //          versionen "bas" som ändringen utgick från – eller {taken: true} – en
 //          kupong som sidan inte kände till har sparats för samma dag ("ändå"
@@ -27,9 +27,11 @@
 //   → 400 kupongen är färdigspelad – den finns i historiken och står kvar
 //   → 409 {changed: true, kupong} – kupongen har ändrats sedan versionen "bas"
 //
-// Startade matcher: en match som har startat (eller ställts in) enligt den
-// publicerade sajten (data/matches.json, inte förfrågan) får inte läggas
-// till, ändras eller tas bort – det som stod när den startade gäller.
+// Låsta matcher: en match som startade för mer än efterAvspark minuter sedan
+// (config/kupong.js, 30) eller har ställts in, enligt den publicerade sajten
+// (data/matches.json, inte förfrågan), får inte läggas till, ändras eller tas
+// bort – det som stod då gäller. Fram till dess går den att fylla i, så att
+// gängets kupong kan föras in också när den spelades i sista stund.
 //
 // Hemlighet i tjänsten: GITHUB_TOKEN (en fine-grained token med bara
 // Contents: Read and write på repot). Lokalt kör
@@ -89,14 +91,15 @@ const gameOf = (s) => (s === 'Stryktipset' ? s : null);
 
 const isoOrNull = (s) => (s && !Number.isNaN(Date.parse(s)) ? new Date(s).toISOString() : null);
 
-// En match som har startat eller ställts in (eller inte finns i sajtens
-// matcher) är låst: den får inte läggas till, och på en kupong som ändras ska
-// den stå kvar med samma tecken. before = raderna i filen som den ser ut nu.
-export function lockErrors(rows, before, matches, now) {
+// En match som startade för mer än grace millisekunder sedan, är färdigspelad
+// eller har ställts in (eller inte finns i sajtens matcher) är låst: den får
+// inte läggas till, och på en kupong som ändras ska den stå kvar med samma
+// tecken. before = raderna i filen som den ser ut nu.
+export function lockErrors(rows, before, matches, now, grace = 0) {
   const byId = new Map(matches.map((m) => [String(m.id), m]));
   const open = (id) => {
     const m = byId.get(id);
-    return Boolean(m && !m.completed && !OFF.test(m.status || '') && Date.parse(m.kickoff) > now);
+    return Boolean(m && !m.completed && !OFF.test(m.status || '') && Date.parse(m.kickoff) + grace > now);
   };
   const old = new Map(before.filter((r) => r && r.id != null).map((r) => [String(r.id).trim(), r]));
   const errors = [];
@@ -188,7 +191,9 @@ async function removeCoupon(id, bas, { writer, loadMatches }) {
 //   put och remove kastar {conflict: true} om filen inte längre har versionen
 //   sha (put: eller redan finns, utan sha).
 // loadMatches() → sajtens matcher [{id, kickoff, completed, status}].
-export async function saveCoupon(body, { writer, loadMatches, now = () => new Date() }) {
+// efterAvspark: så många minuter efter avsparken som en match går att fylla i
+// (config/kupong.js).
+export async function saveCoupon(body, { writer, loadMatches, now = () => new Date(), efterAvspark = 0 }) {
   if (!writer || !loadMatches) return fail(503, 'Att spara direkt är inte påslaget.');
   const b = body && typeof body === 'object' ? body : {};
   if (b.bort != null && b.bort !== '') return removeCoupon(String(b.bort), b.bas, { writer, loadMatches });
@@ -204,6 +209,7 @@ export async function saveCoupon(body, { writer, loadMatches, now = () => new Da
   }
 
   const t = now();
+  const grace = Math.max(0, Number(efterAvspark) || 0) * 60000;
   const path = (id) => `${DIR}/${id}.json`;
   const stamp = t.toISOString();
   const message = (id, isEdit) => `Kupong ${id}${v.name ? ` (${v.name})` : ''}${isEdit ? ' ändrad' : ''}`;
@@ -220,7 +226,7 @@ export async function saveCoupon(body, { writer, loadMatches, now = () => new Da
     const cur = await writer.get(path(edit));
     if (cur && b.bas !== undefined && b.bas !== cur.sha) return changed(cur);
     const before = cur ? parseFile(cur) : null;
-    const locked = lockErrors(v.rows, before && Array.isArray(before.matcher) ? before.matcher : [], matches, t.getTime());
+    const locked = lockErrors(v.rows, before && Array.isArray(before.matcher) ? before.matcher : [], matches, t.getTime(), grace);
     if (locked.length) return fail(400, `${locked.join('. ')}.`);
     const spel = 'spel' in b.kupong ? v.spel : gameOf(before && before.spel);
     const file = {
@@ -244,7 +250,7 @@ export async function saveCoupon(body, { writer, loadMatches, now = () => new Da
   // Är id:t som sidan föreslog taget har någon annan just sparat en kupong
   // för samma dag – då frågar sidan först (taken), i stället för att tyst
   // lägga en till.
-  const locked = lockErrors(v.rows, [], matches, t.getTime());
+  const locked = lockErrors(v.rows, [], matches, t.getTime(), grace);
   if (locked.length) return fail(400, `${locked.join('. ')}.`);
   const taken = (id, cur) => ({
     status: 409,

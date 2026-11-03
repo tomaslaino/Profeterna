@@ -179,7 +179,7 @@ function couponSaveRoute(writer = couponFileWriter(), loadMatches = siteMatches(
   return async (req, res) => {
     try {
       const { saveCoupon } = await import('./worker/kupong.mjs');
-      const r = await saveCoupon(req.body, { writer, loadMatches });
+      const r = await saveCoupon(req.body, { writer, loadMatches, efterAvspark: require('./config/kupong').efterAvspark });
       res.status(r.status).json(r.body);
     } catch (err) {
       console.error('[kupong]', err);

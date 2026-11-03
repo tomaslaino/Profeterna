@@ -24,7 +24,7 @@
 // man över det och sparar som vanligt.
 //
 // Läses efter kupong.js och använder dess hjälpare (KP, KP_DRAFT, kpStore,
-// newDraft, allCoupons, gradeCoupon, isOpen, whenMatches, loadCoupons,
+// newDraft, allCoupons, gradeCoupon, fillable, whenMatches, loadCoupons,
 // renderCreate, PICK_DAYS, SIGNS) och app.js (state, esc, fTime).
 
 window.Systembild = (() => {
@@ -132,7 +132,7 @@ window.Systembild = (() => {
     return state.all.matches
       .map((m) => ({ m, t: new Date(m.kickoff).getTime() }))
       .filter((c) => c.t >= from && c.t <= to)
-      .map((c) => ({ ...c, H: teamKey(c.m.home), A: teamKey(c.m.away), hm: fTime.format(new Date(c.t)).replace('.', ':'), open: isOpen(c.m, now) }));
+      .map((c) => ({ ...c, H: teamKey(c.m.home), A: teamKey(c.m.away), hm: fTime.format(new Date(c.t)).replace('.', ':'), open: fillable(c.m, now) }));
   }
 
   // Tesseracts TSV → ord med läge och storlek.
@@ -410,7 +410,7 @@ window.Systembild = (() => {
     // rutor (tomt tecken), så att man kan kryssa i dem där.
     const blank = [];
     for (const x of found) {
-      if (!isOpen(x.m, now)) started.push(x.m);
+      if (!fillable(x.m, now)) started.push(x.m);
       else if (x.sign) d.picks[x.m.id] = x.sign;
       else {
         d.picks[x.m.id] = '';

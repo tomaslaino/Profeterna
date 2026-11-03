@@ -694,25 +694,32 @@ function newDraft(editId) {
   return d;
 }
 
+// Matchen har inte startat (och spelas).
 const isOpen = (m, now) => Boolean(m && !m.completed && !OFF.test(m.status || '') && new Date(m.kickoff).getTime() > now);
+// Matchen går att fylla i på gängets kupong: till efterAvspark minuter efter
+// avsparken (config/kupong.js, 30), så att kupongen kan föras in också när
+// den spelades hos Svenska Spel i sista stund. Var och ens egna tips i
+// omgången stänger vid avsparken (isOpen). Tjänsten har samma gräns.
+const fillable = (m, now) => Boolean(m && !m.completed && !OFF.test(m.status || '') &&
+  new Date(m.kickoff).getTime() + ((KP.data && KP.data.efterAvspark) || 0) * 60000 > now);
 
-// Startade matcher går inte att ändra. På en kupong som ändras ligger de
-// kvar som de stod (locked) – också om de valts bort eller fått ett annat
-// tecken i utkastet innan de startade – och på en ny kupong tas de bort.
+// Låsta matcher (fillable) går inte att ändra. På en kupong som ändras ligger
+// de kvar som de stod (locked) – också om de valts bort eller fått ett annat
+// tecken i utkastet innan de låstes – och på en ny kupong tas de bort.
 // Körs varje gång listan ritas och när kupongen sparas, så att en match som
-// startar medan man väljer inte följer med. Tjänsten kontrollerar detsamma.
+// låses medan man väljer inte följer med. Tjänsten kontrollerar detsamma.
 function settleDraft(d, now = Date.now()) {
   const pub = d.edit ? allCoupons().find((c) => c.id === d.edit) : null;
   const was = new Map((pub ? pub.matches : []).map((x) => [x.id, x]));
   const out = { dropped: 0, reverted: 0 };
   for (const [id, sign] of Object.entries(d.picks)) {
-    if (isOpen(matchById(id), now)) continue;
+    if (fillable(matchById(id), now)) continue;
     delete d.picks[id];
     delete d.notes[id];
     if (!was.has(id)) out.dropped++;
     else if (was.get(id).sign !== sign) out.reverted++;
   }
-  d.locked = [...was.values()].filter((x) => !isOpen(matchById(x.id), now));
+  d.locked = [...was.values()].filter((x) => !fillable(matchById(x.id), now));
   return out;
 }
 
@@ -840,7 +847,7 @@ const fold = (s) => String(s).toLowerCase().normalize('NFD').replace(/[̀-ͯ]/g,
 function pickable(now = Date.now()) {
   return state.all.matches.filter((m) => {
     const t = new Date(m.kickoff).getTime();
-    return isOpen(m, now) && t <= now + PICK_DAYS * 86400000;
+    return fillable(m, now) && t <= now + PICK_DAYS * 86400000;
   });
 }
 

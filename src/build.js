@@ -236,7 +236,7 @@ function writeSite(outDir = OUT, { journal = false, analysisEndpoint, couponEndp
     console.error('[build] kupongerna:', err);
     coupons = { coupons: [], errors: [{ file: '', errors: [String(err.message || err)] }] };
   }
-  write('kuponger.json', { repo: REPO, branch: BRANCH, dir: 'data/kuponger', save: couponSaveInfo(couponEndpoint), samtal: samtalInfo(couponEndpoint, analysisEndpoint), ...coupons });
+  write('kuponger.json', { repo: REPO, branch: BRANCH, dir: 'data/kuponger', save: couponSaveInfo(couponEndpoint), samtal: samtalInfo(couponEndpoint, analysisEndpoint), efterAvspark: kupongCfg.efterAvspark || 0, ...coupons });
 
   // Kuponghistoriken (Grupparbetena i Olympen): färdiga kuponger med facit och betyg.
   // Med --journal fryses nya färdiga kuponger in i data/kupong-historik.json.

@@ -947,8 +947,9 @@ ${window.RumRegister ? RumRegister.nara() : ''}
       const sign = signs[x.id];
       const comp = compOf(x.m.comp);
       const started = !(Date.parse(x.m.kickoff) > now);
-      // i handen står matcher som har startat kvar som de var, som på papperet
-      const edit = hand && !started && (slag === 'fyll' || slag === 'din' || slag === 'gang');
+      // i handen står matcher som har startat kvar som de var, som på papperet;
+      // gängets tecken går att fylla i till en stund efter avspark (fillable)
+      const edit = hand && (slag === 'gang' ? fillable(x.m, now) : !started && (slag === 'fyll' || slag === 'din'));
       const locked = hand && started && (slag === 'fyll' || slag === 'din');
       const res = x.g && x.g.res != null ? x.g.res : null;
       const ring = res == null ? '' : x.g.state === 'live' ? ' live' : sign.includes(SIGNS[res]) ? ' ok' : ' no';
@@ -2589,7 +2590,7 @@ ${window.RumRegister ? RumRegister.nara() : ''}
   //   fyll  Spara (Sparad när utkastet är sparat som det står) och Lämna in
   //   din   Ångra och Lämna in ändringen, släckta tills något är ändrat
   //   gang  Spara gängets kupong (Spara ändringen, Sparad) medan någon match
-  //         inte har startat
+  //         går att fylla i (till en stund efter avspark, fillable)
   const CHECK = '<svg class="ok" viewBox="0 0 16 16" aria-hidden="true"><path d="M3.5 8.5l3 3 6-7"/></svg>';
   function handRow(p, v) {
     const fin = [];
@@ -2940,8 +2941,9 @@ ${window.RumRegister ? RumRegister.nara() : ''}
   }
 
   // Gängets kupong sparas, som guldordet i uppgörelsen på papperet
-  // (Samtal.pult.sparaGang). Saknar matcher tecken säger raden det, och
-  // guldordet blir Spara ändå; har någon annan hunnit före blir det Spara
+  // (Samtal.pult.sparaGang). Saknar matcher tecken, följer kupongen inte
+  // regeln eller är matcher låsta säger raden det, och guldordet blir Spara
+  // ändå; har någon annan hunnit före blir det Spara
   // över den (gängets kupong) eller Spara ändå (en kupong till samma dag).
   // Utan tjänsten öppnas Ny kupong (eller Ändra) med tecknen ifyllda.
   async function saveGang() {
@@ -2963,11 +2965,12 @@ ${window.RumRegister ? RumRegister.nara() : ''}
       return;
     }
     const n = out.ask || 0;
+    const ask = Boolean(out.text);
     if (n) k.el.classList.add('need');
-    k.next = n || out.over ? { again: true } : out.igen ? { again: true, anyway: true } : out.offline ? { again: true, adjust: true } : null;
-    gangState(n ? `${n === 1 ? 'En match saknar' : `${n} matcher saknar`} tecken och kommer inte med.` : out.error || 'Det gick inte att spara.');
+    k.next = ask || out.over ? { again: true } : out.igen ? { again: true, anyway: true } : out.offline ? { again: true, adjust: true } : null;
+    gangState(ask ? out.text : out.error || 'Det gick inte att spara.');
     if (k.next && k.go) {
-      k.go.textContent = n || out.igen ? 'Spara ändå' : out.over ? 'Spara över den' : 'Spara via Ny kupong';
+      k.go.textContent = ask || out.igen ? 'Spara ändå' : out.over ? 'Spara över den' : 'Spara via Ny kupong';
       k.go.disabled = false;
     }
   }

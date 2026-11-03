@@ -14,7 +14,15 @@
 // regel = hur många spikar (ett tecken), halvgarderingar (två) och
 // helgarderingar (alla tre) en kupong har – var och ens när hen lämnar in och
 // gängets. Gäller omgångar med lika många matcher som regeln (Stryktipsets
-// tretton); null = ingen regel.
+// tretton); null = ingen regel. Gängets kupong styrs av den men stoppas inte:
+// följer den inte regeln frågar sidan först (gänget kan ha spelat något annat).
+//
+// efterAvspark = så många minuter efter avsparken som en match går att fylla i
+// och ändra på gängets kupong (uppgörelsen, Ny kupong, Ändra och Ladda upp
+// system) – så att kupongen kan föras in också när den spelades hos Svenska
+// Spel i sista stund. Var och ens egna tips stänger fortfarande vid första
+// avsparken, när allas tips visas. Bygget skriver värdet i data/kuponger.json
+// och tjänsten (worker/kupong-proxy.mjs) kontrollerar detsamma.
 //
 // rummet = websocketen till tjänsten profeterna-rummet (worker/rummet.mjs,
 // driftsätts med worker/rummet.toml): vilka i gänget som har tobaksaffären
@@ -30,5 +38,6 @@ module.exports = {
     { id: 'DJ', namn: 'Daniel Johansson', bild: 'profeterna/johansson.jpg' },
   ],
   regel: { spik: 4, halv: 5, hel: 4 },
+  efterAvspark: 30,
   rummet: 'wss://profeterna-rummet.fritid-moln.workers.dev/rum',
 };
