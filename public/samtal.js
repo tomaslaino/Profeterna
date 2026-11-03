@@ -1608,7 +1608,7 @@
     const open = !s.visas && Date.now() < Math.min(...kicks(s));
     const du = v && s.gang.find((g) => g.id === v);
     const go = !open ? 'Till uppgörelsen' : done ? 'Se de andras tips'
-      : du && tally(s, du) ? 'Fyll i resten' : 'Fyll i kupongen';
+      : du && tally(s, du) ? 'Fyll i resten' : 'Till kupongen';
     return '<div class="card sm-teaser">' + nameBlock(s, 'ruta') + raden(s) +
       '<a class="kp-btn primary" href="#kupong">' + go + '</a></div>';
   }

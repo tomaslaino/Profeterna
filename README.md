@@ -1333,8 +1333,8 @@ under omgången.
    Teijder*, *Väntar på dig och Teijder*, *Väntar på alla* (vilka som är inne när man
    pekar), och grönt *Alla inne*. När tiden är ute står det *Dags för uppgörelsen* och vem
    som inte lämnade in; när gängets kupong är gjord tar den över. Porträtt står inte där –
-   gänget syns redan på polaroiderna (2026-10-22). Har man börjat på sin kupong heter
-   knappen *Fyll i resten*. En
+   gänget syns redan på polaroiderna (2026-10-22). Knappen heter *Till kupongen*, som i
+   rutan för en färdig kupong, och *Fyll i resten* när man har börjat på sin kupong. En
    färdigspelad kupong visas inte bredvid medan en ny omgång fylls i – den står bland
    Grupparbetena i Olympen.
 2. **Fyll i kupongen** (direkt under Omgången, `#kupong`): kupongen står på papper med en
