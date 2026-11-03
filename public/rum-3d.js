@@ -95,6 +95,9 @@ const SILL = -168;
 // Barbordet: runt, framför fönsterbänken, med skivan y över sitsarna
 // (barstolarnas sitsar är i fönsterbänkens höjd, SILL).
 const BORD = { x: -186, z: 250, r: 118, y: 32 };
+// Pennkoppen på bordet (pennkopp): var den står i bordets axlar (x åt höger,
+// z mot betraktaren) och bollens radie.
+const KOPP = { x: -88, z: 30, r: 11 };
 // Platserna runt bordet – till vänster, bakom och till höger: var barstolen
 // står (x, z) och hur den är vriden in mot bordet (turn), armen mot bordet
 // (inre; bakom vilar båda på bordet, och arm 0 har flaskan, burken eller
@@ -1272,6 +1275,114 @@ export async function figurer(canvas, opt = {}) {
   ring([0, 0.1, 0], [0, 1, 0], BORD.r + 0.4, 0.9, krom, bord);
   mesh(new THREE.CylinderGeometry(15, 6, 6, 32), krom, bord).position.y = -8;
   mesh(new THREE.CylinderGeometry(4.5, 4.5, 320, 24), krom, bord).position.y = -170;
+  bord.add(pennkopp());
+
+  // Pennkoppen: en kopp formad som en fotboll, med en gul blyertspenna med
+  // suddgummi, en röd penna (den som rättar kupongerna) och en blå
+  // kulspetspenna. Den står fram till vänster på bordet (KOPP, i bordets
+  // axlar): där skymmer den inget som står på bordet, hur de än sitter
+  // (PLATSER), och den är inte i vägen för tårtan. Två ritanrop: bollen, och
+  // pennorna och kanten i en geometri med färgerna i hörnen.
+  function pennkopp() {
+    const { x, z, r } = KOPP;
+    const T0 = 0.3 * Math.PI;
+    const TL = Math.PI - T0;
+    const g = new THREE.Group();
+    g.position.set(x, 0, z);
+    // bollen ritas punkt för punkt ur ytan den hamnar på: femhörningarna
+    // runt ikosaederns hörn, sexhörningarna runt dodekaederns, och sömmar där
+    // två möts (kvoten mellan ytornas avstånd från mitten, 1,0265)
+    const f = (1 + Math.sqrt(5)) / 2;
+    const cyc = ([a, b, c]) => [[a, b, c], [b, c, a], [c, a, b]];
+    const tecken = (v) => v.reduce((ut, a) => ut.flatMap((o) => (a ? [[...o, a], [...o, -a]] : [[...o, a]])), [[]]);
+    const riktn = (l) => l.map((v) => new THREE.Vector3(...v).normalize());
+    const fem = riktn(cyc([0, 1, f]).flatMap(tecken));
+    const sex = riktn([...tecken([1, 1, 1]), ...cyc([0, f, 1 / f]).flatMap(tecken)]);
+    const vrid = new THREE.Quaternion().setFromEuler(new THREE.Euler(0.4, 0.9, 0.2));
+    const boll = canvasTex(256, 128, (c, w, h) => {
+      const bild = c.createImageData(w, h);
+      const p = new THREE.Vector3();
+      for (let py = 0; py < h; py++) {
+        const th = T0 + ((py + 0.5) / h) * TL;
+        for (let px = 0; px < w; px++) {
+          const ph = ((px + 0.5) / w) * 2 * Math.PI;
+          p.set(-Math.cos(ph) * Math.sin(th), Math.cos(th), Math.sin(ph) * Math.sin(th)).applyQuaternion(vrid);
+          let a5 = -1;
+          let a6 = -1;
+          let b6 = -1;
+          for (const n of fem) a5 = Math.max(a5, p.dot(n));
+          for (const n of sex) {
+            const d = p.dot(n);
+            if (d > a6) { b6 = a6; a6 = d; } else if (d > b6) b6 = d;
+          }
+          a5 *= 1.0265;
+          const svart = a5 > a6;
+          const som = Math.min(Math.abs(a5 - a6), svart ? 1 : a6 - b6) < 0.012;
+          const v = som ? 70 : svart ? 34 : 238;
+          const i = (py * w + px) * 4;
+          bild.data[i] = v + (svart ? 0 : 4);
+          bild.data[i + 1] = v + (svart ? 0 : 2);
+          bild.data[i + 2] = v;
+          bild.data[i + 3] = 255;
+        }
+      }
+      c.putImageData(bild, 0, 0);
+    });
+    const y0 = r - 1;
+    mesh(new THREE.SphereGeometry(r, 28, 12, 0, 2 * Math.PI, T0, TL), mat('#ffffff', { map: boll, roughness: 0.32, clearcoat: 0.7, clearcoatRoughness: 0.15, side: THREE.DoubleSide }), g).position.y = y0;
+    // pennorna längs y från botten, lutade utåt åt var sitt håll
+    const delar = [];
+    const del = (geo, farg, m) => delar.push([geo, farg, m]);
+    const kant = r * Math.sin(T0);
+    del(new THREE.TorusGeometry(kant, 0.45, 6, 32), '#efece4', new THREE.Matrix4().compose(new THREE.Vector3(0, y0 + r * Math.cos(T0), 0), new THREE.Quaternion().setFromAxisAngle(new THREE.Vector3(1, 0, 0), Math.PI / 2), new THREE.Vector3(1, 1, 1)));
+    const penna = (vinkel, lut, delarna) => {
+      const q = new THREE.Quaternion().setFromAxisAngle(new THREE.Vector3(Math.cos(vinkel), 0, -Math.sin(vinkel)), lut);
+      const ut = new THREE.Vector3(Math.sin(vinkel), 0, Math.cos(vinkel));
+      const fot = ut.multiplyScalar(-3.5).setY(1.2);
+      let y = 0;
+      for (const [geo, farg, langd, sid = 0] of delarna) {
+        const m = new THREE.Matrix4().compose(new THREE.Vector3(sid, y + langd / 2, 0).applyQuaternion(q).add(fot), q, new THREE.Vector3(1, 1, 1));
+        del(geo, farg, m);
+        if (!sid) y += langd;
+      }
+    };
+    // blyertspennan: sexkantig, spetsen nere i koppen och suddet upp
+    penna(-1.9, 0.33, [
+      [new THREE.CylinderGeometry(1.5, 1.5, 30, 6), '#e8b52c', 30],
+      [new THREE.CylinderGeometry(1.6, 1.6, 2.4, 10), '#9a978f', 2.4],
+      [new THREE.CylinderGeometry(1.45, 1.5, 2.2, 10), '#e58c93', 2.2],
+    ]);
+    // den röda: rund kropp, mörkare hatt med en klämma
+    penna(1.3, 0.3, [
+      [new THREE.CylinderGeometry(1.6, 1.6, 22, 10), '#c3262f', 22],
+      [new THREE.CylinderGeometry(1.8, 1.8, 7.5, 10), '#8e1820', 7.5],
+      [new THREE.BoxGeometry(0.6, 6, 1.1), '#d8d8d4', -6.5, 1.95],
+      [new THREE.CylinderGeometry(1.1, 1.8, 1.2, 10), '#8e1820', 1.2],
+    ]);
+    // kulspetspennan: vit kropp och blå ände, något bakåt
+    penna(3.1, 0.16, [
+      [new THREE.CylinderGeometry(1.45, 1.45, 26, 6), '#f1ede4', 26],
+      [new THREE.CylinderGeometry(1.5, 1.5, 5, 10), '#2456b8', 5],
+      [new THREE.BoxGeometry(0.6, 5.5, 1), '#2456b8', -6, 1.75],
+      [new THREE.SphereGeometry(1.5, 10, 5, 0, 2 * Math.PI, 0, Math.PI / 2), '#2456b8', 0],
+    ]);
+    const pos = [];
+    const nor = [];
+    const col = [];
+    for (const [geo, farg, m] of delar) {
+      const e = geo.toNonIndexed().applyMatrix4(m);
+      const c = new THREE.Color(farg);
+      pos.push(...e.attributes.position.array);
+      nor.push(...e.attributes.normal.array);
+      for (let i = 0; i < e.attributes.position.count; i++) col.push(c.r, c.g, c.b);
+    }
+    const pg = new THREE.BufferGeometry();
+    pg.setAttribute('position', new THREE.Float32BufferAttribute(pos, 3));
+    pg.setAttribute('normal', new THREE.Float32BufferAttribute(nor, 3));
+    pg.setAttribute('color', new THREE.Float32BufferAttribute(col, 3));
+    mesh(pg, mat('#ffffff', { vertexColors: true, roughness: 0.38, clearcoat: 0.5, clearcoatRoughness: 0.2 }), g);
+    return g;
+  }
 
   // ---------- dagen efter ----------
   // DE: hur det gick i omgången som spelades färdigt i går eller i förrgår

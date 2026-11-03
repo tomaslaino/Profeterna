@@ -2021,7 +2021,11 @@ hängande: DL och DJ på sidorna, vända in mot bordet, och DT bakom (`BORD` och
 rum-3d.js). Bordet har en skiva av ljust laminat med ringar efter glasen, kromkant och en
 kromfot, och barstolarna röd vinyl med söm och en krom ställning med fotring. Ölen, DT:s
 askkopp och extraflaska och kupongerna står på bordet, och två tomflaskor står kvar på
-fönsterbänken bakom DJ. DL dricker ur en flaska, DT röker
+fönsterbänken bakom DJ. Fram till vänster på bordet står en pennkopp formad som en fotboll,
+med en gul blyertspenna med suddgummi, en röd penna och en blå kulspetspenna (`pennkopp` och
+`KOPP` i rum-3d.js). Där skymmer den inget på bordet hur de än sitter, och den står inte i
+vägen för tårtan. Den kostar två ritanrop: bollen, och pennorna och kanten i en geometri med
+färgerna i hörnen. DL dricker ur en flaska, DT röker
 och skrattar, DJ har en burk i ena handen och pratar med cigaretten i den andra. Var och en
 har sin loop (12–21 s) – flaskan och burken till munnen med huvudet bakåt, ett bloss med
 glöden som tänds och röken som blåses ut, benen som dinglar – och huvudena nickar efter
