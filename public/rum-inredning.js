@@ -1,5 +1,6 @@
 // Inredningen i tobaksaffären (rum.js) i three.js som gänget (rum-3d.js) och
-// sakerna på pulten (rum-saker.js): lysröret i taket, neonskylten i
+// sakerna på pulten (rum-saker.js): lysröret i taket, banderollen med en
+// gammal reklam för Stryktipset ovanför fönstret, neonskylten i
 // skyltfönstret, Stängt-skylten på dörrens glas, stationsuret och orakelramen
 // med mässingsskylten på bakväggen, cigarettpaketen uppe på högra väggen och
 // ramarna kring skårtavlan och korktavlan och kupongstället på pulten.
@@ -26,7 +27,7 @@
 // timvisaren fram till spetsen.
 //
 // På natten är lysröret släckt (natt, från rum-folk.js): rören och
-// reflektorn mörka.
+// reflektorn mörka, och banderollen mörknar.
 //
 // inredning(el, { calm, still }) → { draw(), namn(html), skarp(namn, px), natt(på), stopp(ms) } (namnet som Kronan.names, ms spelstoppet eller null)
 
@@ -38,10 +39,14 @@ const wz = (x) => 1000 * (1 - 380 / (x - 760));
 const hash = (n) => { const x = Math.sin(n * 127.1 + 311.7) * 43758.5453; return x - Math.floor(x); };
 const UR = { x: 1050, y: 152, r: 46 };
 const RAM = { x: 987, y: 302, w: 126, h: 152, b: 12 };
+// banderollen: tygets kanter (X), djupet (Z, bakom lysröret) och över- och
+// underkanten (Y); sedd härifrån hänger den mellan lysröret och fönsterkarmen,
+// från vänsterkanten fram till uret
+const BAN = { x0: 132, x1: 955, z: 88, top: -104.5, bot: -150 };
 // Sakerna och dukarna (plan: 0 = väggen, 3 = pulten). Urets
 // och ramens dukar ligger i knappen och länken (i, med hörnet at).
 const BITAR = {
-  tak: { plan: 0, box: { x: 0, y: 0, w: 960, h: 240 } },
+  tak: { plan: 0, box: { x: 0, y: 0, w: 1000, h: 240 } },
   neon: { plan: 0, box: { x: 290, y: 104, w: 300, h: 130 } },
   ur: { plan: 0, box: { x: 992, y: 94, w: 130, h: 142 }, i: '.rum-ur', at: { x: UR.x - 54, y: UR.y - 54 } },
   ram: { plan: 0, box: { x: 968, y: 280, w: 164, h: 232 }, i: '.rum-ram', at: RAM },
@@ -55,7 +60,7 @@ export async function inredning(el, opt = {}) {
   const THREE = await import('three');
   const { RoomEnvironment } = await import('three/addons/environments/RoomEnvironment.js');
   const { RoundedBoxGeometry: RB } = await import('three/addons/geometries/RoundedBoxGeometry.js');
-  await Promise.all(['italic 600 68px Fraunces', '700 40px Fraunces', '800 60px Fraunces', '700 40px Caveat']
+  await Promise.all(['italic 600 68px Fraunces', 'italic 700 40px Fraunces', '700 40px Fraunces', '800 60px Fraunces', '700 40px Caveat', '400 40px Anton']
     .map((f) => document.fonts.load(f).catch(() => null)));
 
   // i telefonen färre bildpunkter, ingen kantutjämning och mindre skuggkartor,
@@ -234,6 +239,313 @@ export async function inredning(el, opt = {}) {
     }
     const gavel = mat('#bdb8a8', { roughness: 0.4, metalness: 0.3 });
     for (const x of [-229, 229]) mesh(new RB(12, 12, 50, 2, 2), gavel, g, false).position.set(x, -11, 0);
+  }
+
+  // Banderollen: en gammal reklam för Stryktipset i tyg, som hänger i två
+  // snören från taket mellan lysröret och fönsterkarmen, från vänsterkanten
+  // fram till uret (BAN: tygets kanter, djupet och höjden). Trycket i rött,
+  // blått och gult på bomullsväv: fotbollen, Har Ni tippat?, STRYKTIPSET,
+  // 1 X 2 med ett kryss och Lycka till! Tyget har gulnat av röken (mest
+  // upptill), har legat vikt i fyra delar och rött ligger lite snett mot blått,
+  // som i ett billigt tryck; rundstavarna i fållarna håller det sträckt.
+  // Materialen (banMat) mörknar när lysröret är släckt (natt).
+  const banMat = [];
+  function banderoll(b) {
+    const { mesh: m0 } = b;
+    const mesh = (g, m, p, sk) => {
+      for (const x of [].concat(m)) if (!banMat.includes(x)) { x.userData.dag = x.color.clone(); banMat.push(x); }
+      return m0(g, m, p, sk);
+    };
+    const LW = BAN.x1 - BAN.x0, LH = BAN.top - BAN.bot;
+    const TW = LATT ? 2048 : 4096;
+    const TH = Math.round(TW * LH / LW);
+    const BLA = '#22407c', ROD = '#c02a20', GUL = '#e3ad24', PAPP = '#ebdfbf';
+    const tryck = tex(TW, TH, (c, w, h) => {
+      c.scale(w / LW, h / LH);
+      const my = LH / 2;
+      c.fillStyle = PAPP;
+      c.fillRect(0, 0, LW, LH);
+      // väven
+      c.fillStyle = 'rgba(90,68,30,.07)';
+      for (let x = 0; x < LW; x += 0.9) c.fillRect(x, 0, 0.32, LH);
+      for (let y = 0; y < LH; y += 0.9) c.fillRect(0, y, LW, 0.32);
+      // ramen, dubbel
+      c.strokeStyle = BLA;
+      c.lineWidth = 1.1;
+      c.strokeRect(7, 6.6, LW - 14, LH - 13.2);
+      c.lineWidth = 0.45;
+      c.strokeRect(9.2, 8.8, LW - 18.4, LH - 17.6);
+      // det röda ligger lite snett mot det blå
+      const rod = (fn) => { c.save(); c.translate(0.45, 0.3); fn(); c.restore(); };
+      const text = (s, font, x, y, fill, align = 'left') => {
+        c.font = font;
+        c.textAlign = align;
+        c.textBaseline = 'alphabetic';
+        c.fillStyle = fill;
+        c.fillText(s, x, y);
+      };
+      // fotbollen i en gul skiva som bryter ramen
+      const bx = 31, br = 12.4;
+      c.fillStyle = GUL;
+      c.beginPath();
+      c.arc(bx, my, 17, 0, 2 * Math.PI);
+      c.fill();
+      c.strokeStyle = BLA;
+      c.lineWidth = 0.9;
+      c.stroke();
+      c.fillStyle = '#f6f1e2';
+      c.beginPath();
+      c.arc(bx, my, br, 0, 2 * Math.PI);
+      c.fill();
+      c.save();
+      c.clip();
+      // bollen sedd rakt mot en femhörning: den i mitten och de fem runt om,
+      // förkortade mot kanten, med sömmarna mellan sexhörningarna
+      c.fillStyle = '#16140f';
+      c.strokeStyle = '#16140f';
+      c.lineWidth = 0.5;
+      c.lineJoin = 'round';
+      const a0 = -90 * DEG + 10 * DEG;
+      const pr = br * 0.34;
+      c.beginPath();
+      for (let i = 0; i < 5; i++) c.lineTo(bx + pr * Math.cos(a0 + i * 72 * DEG), my + pr * Math.sin(a0 + i * 72 * DEG));
+      c.closePath();
+      c.fill();
+      const ytter = [];
+      for (let i = 0; i < 5; i++) {
+        const a = a0 + i * 72 * DEG, ca = Math.cos(a), sa = Math.sin(a);
+        // radiellt r och tvärs t; mitten 63° ut på klotet
+        const P = (r, t) => [bx + r * ca - t * sa, my + r * sa + t * ca];
+        const v = [];
+        for (let k = 0; k < 5; k++) {
+          const h = (180 + k * 72) * DEG;
+          v.push(P(br * 0.894 + pr * 0.447 * Math.cos(h), pr * Math.sin(h)));
+        }
+        ytter.push(v);
+        c.beginPath();
+        for (const [x, y] of v) c.lineTo(x, y);
+        c.closePath();
+        c.fill();
+        c.beginPath();
+        c.moveTo(...P(pr, 0));
+        c.lineTo(...v[0]);
+        c.stroke();
+      }
+      for (let i = 0; i < 5; i++) {
+        c.beginPath();
+        c.moveTo(...ytter[i][4]);
+        c.lineTo(...ytter[(i + 1) % 5][1]);
+        c.stroke();
+      }
+      const skugga = c.createRadialGradient(bx - 4, my - 5, 1, bx, my, br);
+      skugga.addColorStop(0, 'rgba(255,255,255,0)');
+      skugga.addColorStop(1, 'rgba(60,44,16,.35)');
+      c.fillStyle = skugga;
+      c.fillRect(bx - br, my - br, 2 * br, 2 * br);
+      c.restore();
+      c.strokeStyle = '#16140f';
+      c.lineWidth = 0.6;
+      c.beginPath();
+      c.arc(bx, my, br, 0, 2 * Math.PI);
+      c.stroke();
+      // Har Ni tippat?
+      const KURS = (px) => `italic 700 ${px}px Fraunces`;
+      text('Har Ni tippat?', KURS(16.5), 56, my + 5.6, BLA);
+      c.font = KURS(16.5);
+      const vSlut = 56 + c.measureText('Har Ni tippat?').width;
+      // höger: 1 X 2 med ett kryss i X-rutan, och Lycka till!
+      const wLycka = c.measureText('Lycka till!').width;
+      const RUTA = 12.6, MELLAN = 2.4;
+      const hStart = LW - 15 - wLycka - 7 - (3 * RUTA + 2 * MELLAN);
+      c.strokeStyle = BLA;
+      c.lineWidth = 0.85;
+      ['1', 'X', '2'].forEach((t, i) => {
+        const x = hStart + i * (RUTA + MELLAN);
+        c.fillStyle = i === 1 ? 'rgba(227,173,36,.55)' : 'rgba(0,0,0,0)';
+        c.fillRect(x, my - RUTA / 2, RUTA, RUTA);
+        c.strokeRect(x, my - RUTA / 2, RUTA, RUTA);
+        if (i !== 1) text(t, '700 9.5px Fraunces', x + RUTA / 2, my + 3.4, BLA, 'center');
+      });
+      rod(() => {
+        // krysset i X-rutan, för hand
+        c.strokeStyle = ROD;
+        c.lineWidth = 1.35;
+        c.lineCap = 'round';
+        const x = hStart + RUTA + MELLAN, y = my - RUTA / 2;
+        c.beginPath();
+        c.moveTo(x + 1.2, y + 1.0);
+        c.quadraticCurveTo(x + 6.8, y + 5.8, x + 11.8, y + 11.9);
+        c.moveTo(x + 11.6, y + 0.6);
+        c.quadraticCurveTo(x + 6.0, y + 6.9, x + 1.3, y + 12.2);
+        c.stroke();
+        text('Lycka till!', KURS(16.5), LW - 15 - wLycka, my + 5.6, ROD);
+      });
+      // STRYKTIPSET mitt på, i Anton: ljusa bokstäver med blå skugga i ett
+      // rött fält med spetsiga ändar, som ett band
+      c.font = '400 100px Anton';
+      c.letterSpacing = '0px';
+      const m = c.measureText('S');
+      const kapital = (m.actualBoundingBoxAscent || 73) / 100;
+      const KAP = 20.5;
+      const fs = KAP / kapital;
+      c.font = `400 ${fs.toFixed(2)}px Anton`;
+      c.letterSpacing = `${(fs * 0.2).toFixed(2)}px`;
+      const ord = 'STRYKTIPSET';
+      const wOrd = c.measureText(ord).width - fs * 0.2;
+      const mx = (vSlut + hStart) / 2;
+      const base = my + KAP / 2;
+      const fx0 = mx - wOrd / 2 - 18, fx1 = mx + wOrd / 2 + 18, fy0 = my - 14.6, fy1 = my + 14.6;
+      const falt = (dx, dy) => {
+        c.beginPath();
+        c.moveTo(fx0 + dx, fy0 + dy);
+        c.lineTo(fx1 + dx, fy0 + dy);
+        c.lineTo(fx1 + 7 + dx, my + dy);
+        c.lineTo(fx1 + dx, fy1 + dy);
+        c.lineTo(fx0 + dx, fy1 + dy);
+        c.lineTo(fx0 - 7 + dx, my + dy);
+        c.closePath();
+      };
+      c.fillStyle = BLA;
+      falt(1.3, 1.1);
+      c.fill();
+      rod(() => { c.fillStyle = ROD; falt(0, 0); c.fill(); });
+      c.strokeStyle = 'rgba(245,234,206,.85)';
+      c.lineWidth = 0.5;
+      c.save();
+      c.translate(0.45, 0.3);
+      c.beginPath();
+      c.moveTo(fx0 + 1, fy0 + 2.2);
+      c.lineTo(fx1 - 1, fy0 + 2.2);
+      c.moveTo(fx0 + 1, fy1 - 2.2);
+      c.lineTo(fx1 - 1, fy1 - 2.2);
+      c.stroke();
+      c.restore();
+      const tx = mx + fs * 0.1;
+      text(ord, c.font, tx + 1.1, base + 0.95, BLA, 'center');
+      text(ord, c.font, tx, base, '#f3e8cb', 'center');
+      c.letterSpacing = '0px';
+      // stjärnor mellan
+      const stjarna = (x, y, r) => {
+        c.beginPath();
+        for (let i = 0; i < 10; i++) {
+          const a = -90 * DEG + i * 36 * DEG, q = i % 2 ? r * 0.42 : r;
+          c.lineTo(x + q * Math.cos(a), y + q * Math.sin(a));
+        }
+        c.closePath();
+        c.fill();
+      };
+      c.fillStyle = BLA;
+      stjarna((vSlut + fx0 - 7) / 2, my, 5.6);
+      stjarna((fx1 + 7 + hStart) / 2, my, 5.6);
+      // fållarna med sömmen, och skuggan under stavarna
+      for (const [y0, s] of [[0, 1], [LH, -1]]) {
+        const g = c.createLinearGradient(0, y0, 0, y0 + 6.5 * s);
+        g.addColorStop(0, 'rgba(70,48,14,.42)');
+        g.addColorStop(0.5, 'rgba(70,48,14,.12)');
+        g.addColorStop(1, 'rgba(70,48,14,0)');
+        c.fillStyle = g;
+        c.fillRect(0, Math.min(y0, y0 + 6.5 * s), LW, 6.5);
+        c.strokeStyle = 'rgba(96,74,40,.6)';
+        c.lineWidth = 0.32;
+        c.setLineDash([1.5, 1.05]);
+        c.beginPath();
+        c.moveTo(1, y0 + 4.4 * s);
+        c.lineTo(LW - 1, y0 + 4.4 * s);
+        c.stroke();
+        c.setLineDash([]);
+      }
+      // slitet: trycket har nötts bort i små prickar
+      for (let i = 0; i < 900; i++) {
+        c.fillStyle = `rgba(236,224,194,${(0.35 + hash(i + 0.31) * 0.5).toFixed(2)})`;
+        const r = 0.12 + hash(i + 0.77) * 0.38;
+        c.beginPath();
+        c.arc(hash(i + 0.13) * LW, 7 + hash(i + 0.53) * (LH - 14), r, 0, 2 * Math.PI);
+        c.fill();
+      }
+      // vecken efter att den legat vikt i fyra delar
+      for (const x of [LW / 4, LW / 2, 3 * LW / 4]) {
+        c.fillStyle = 'rgba(255,250,232,.28)';
+        c.fillRect(x - 0.9, 0, 0.6, LH);
+        c.fillStyle = 'rgba(70,46,12,.16)';
+        c.fillRect(x - 0.2, 0, 1.0, LH);
+      }
+      // röken: gulare upptill, och fläckar
+      c.globalCompositeOperation = 'multiply';
+      const rok = c.createLinearGradient(0, 0, 0, LH);
+      rok.addColorStop(0, 'rgba(190,140,52,.7)');
+      rok.addColorStop(0.55, 'rgba(208,170,98,.4)');
+      rok.addColorStop(1, 'rgba(218,188,128,.3)');
+      c.fillStyle = rok;
+      c.fillRect(0, 0, LW, LH);
+      for (const [x, y, r, o] of [[188, 30, 9, 0.22], [512, 12, 13, 0.16], [702, 33, 7, 0.2], [77, 10, 6, 0.18]]) {
+        const f = c.createRadialGradient(x, y, r * 0.2, x, y, r);
+        f.addColorStop(0, `rgba(200,160,90,${o * 0.6})`);
+        f.addColorStop(0.85, `rgba(170,118,48,${o})`);
+        f.addColorStop(1, 'rgba(170,118,48,0)');
+        c.fillStyle = f;
+        c.fillRect(x - r, y - r, 2 * r, 2 * r);
+      }
+      // ändarna har tagits i
+      for (const [x0, x1] of [[0, 26], [LW, LW - 26]]) {
+        const e = c.createLinearGradient(x0, 0, x1, 0);
+        e.addColorStop(0, 'rgba(150,110,60,.55)');
+        e.addColorStop(1, 'rgba(150,110,60,0)');
+        c.fillStyle = e;
+        c.fillRect(Math.min(x0, x1), 0, 26, LH);
+      }
+      c.globalCompositeOperation = 'source-over';
+    });
+
+    // tyget buktar lite mellan stavarna, och vecken syns
+    const geo = new THREE.PlaneGeometry(LW, LH, 260, 8);
+    const p = geo.attributes.position;
+    for (let i = 0; i < p.count; i++) {
+      const x = p.getX(i), y = p.getY(i);
+      const v = 0.5 - y / LH;
+      let z = 1.5 * Math.sin(x / 37 + 0.7) * Math.sin(x / 121 + 0.3) + 0.5 * Math.sin(x / 15.3 + v * 1.6);
+      [-1, 0, 1].forEach((k) => { const d = x - k * LW / 4; z += (k ? 0.9 : -0.8) * Math.exp(-(d * d) / 10); });
+      p.setZ(i, z * (0.35 + 0.65 * Math.sin(Math.PI * (0.12 + v * 0.76))));
+    }
+    geo.computeVertexNormals();
+    const g = new THREE.Group();
+    const cy = (BAN.top + BAN.bot) / 2;
+    g.position.set((BAN.x0 + BAN.x1) / 2, cy, BAN.z);
+    b.scene.add(g);
+    // den hänger lite snett: högra snöret är kortare
+    const LUT = -0.22 * DEG;
+    const ban = new THREE.Group();
+    ban.rotation.z = LUT;
+    g.add(ban);
+    mesh(geo, mat('#fff', { map: tryck, roughness: 0.9, envMapIntensity: 0.3, side: THREE.DoubleSide, sheen: 0.5, sheenColor: '#fff3d6', sheenRoughness: 0.8 }), ban, false);
+    const ved = mat('#6e4a26', { roughness: 0.5, envMapIntensity: 0.6 });
+    for (const [y, f] of [[LH / 2, '#d8c494'], [-LH / 2, '#e2d2a8']]) {
+      // fållen kring staven, och staven med knoppar som sticker ut
+      const s = mesh(new THREE.CylinderGeometry(2.3, 2.3, LW, 20, 1, true), mat(f, { roughness: 0.92, envMapIntensity: 0.3 }), ban, false);
+      s.rotation.z = 90 * DEG;
+      s.position.set(0, y, -0.6);
+      const st = mesh(new THREE.CylinderGeometry(1.5, 1.5, LW + 15, 16), ved, ban, false);
+      st.rotation.z = 90 * DEG;
+      st.position.set(0, y, -0.6);
+      for (const sx of [-1, 1]) mesh(new THREE.SphereGeometry(2.5, 16, 12), ved, ban, false).position.set(sx * (LW / 2 + 8.5), y, -0.6);
+    }
+    // snörena upp till var sin skruvögla i taket
+    const snore = mat('#d4c7a2', { roughness: 0.95, envMapIntensity: 0.2 });
+    const metall = mat('#9c968a', { metalness: 0.85, roughness: 0.35 });
+    const tak = -90 - cy;
+    for (const sx of [-1, 1]) {
+      const a = new THREE.Vector3(sx * (LW / 2 + 4), LH / 2, -0.6).applyAxisAngle(new THREE.Vector3(0, 0, 1), LUT);
+      const q = new THREE.Vector3(sx * (LW / 2 + 2.5), tak - 2.6, -0.6);
+      const d = q.clone().sub(a);
+      const l = mesh(new THREE.CylinderGeometry(0.42, 0.42, d.length(), 8), snore, g, false);
+      l.position.copy(a).addScaledVector(d, 0.5);
+      l.quaternion.setFromUnitVectors(new THREE.Vector3(0, 1, 0), d.clone().normalize());
+      // knuten om staven
+      mesh(new THREE.SphereGeometry(1.1, 10, 8), snore, g, false).position.copy(a).add(new THREE.Vector3(0, 0.6, 1.2));
+      const ogla = mesh(new THREE.TorusGeometry(1.5, 0.38, 8, 18), metall, g, false);
+      ogla.position.set(q.x, tak - 1.6, -0.6);
+      mesh(new THREE.CylinderGeometry(0.4, 0.4, 2.2, 8), metall, g, false).position.set(q.x, tak - 0.5, -0.6);
+      mesh(new THREE.CylinderGeometry(1.6, 1.6, 0.5, 14), metall, g, false).position.set(q.x, tak - 0.2, -0.6);
+    }
   }
 
   function stangt(b) {
@@ -843,6 +1155,7 @@ export async function inredning(el, opt = {}) {
     wallLights(B[k], box, !['tak', 'neon'].includes(k));
   }
   lysror(B.tak);
+  banderoll(B.tak);
   stangt(B.tak);
   neon(B.neon, B.tak);
   const { visare, kvar } = ur(B.ur);
@@ -917,6 +1230,7 @@ export async function inredning(el, opt = {}) {
     morkt = on;
     rorLjus.color.set(on ? ROR.av : ROR.ljus);
     rorRefl.color.set(on ? ROR.reflAv : ROR.refl);
+    for (const m of banMat) m.color.copy(m.userData.dag).multiplyScalar(on ? 0.4 : 1);
     B.tak.paint();
   }
   return { draw: tick, namn: setNamn, skarp: (k, px) => B[k] && B[k].skarp(px), natt, stopp };
