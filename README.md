@@ -521,6 +521,11 @@ Utan nyckel ingen knapp.
   rundad kant och fyllningar i ramar, i rummets egna toner och utan något extra att rita.
   Skivan sticker ut över fronten så att man har plats för benen, med konsoler under och
   krokar för jackor på fronten. Se [Tobaksaffären](#tobaksaffären).
+- **Barstolar vid disken, och disken i 3D (2026-11-03, användarens önskemål):** den platta
+  disken visade inte att det var tomt under skivan. Nu är disken byggd i three.js, med tre
+  barstolar likadana som gängets inskjutna under kanten, och skuggorna under skivan visar
+  håligheten. Den ritas en gång och kostar inget medan man ser sig omkring. Se
+  [Tobaksaffären](#tobaksaffären).
 - **Gänget följer hur det går för kupongen (2026-11-03, användarens önskemål):** gänget
   har fler rörelser och gör dem efter hur det går för gängets kupong – glada när den går
   bättre än väntat eller blev vinst, nervösa när nästa fel tar vinsten, deppiga när den är
@@ -2014,7 +2019,7 @@ spetsen och sektorn är borta. Med `?rum-klocka` räknar uret från sin egen tid
 (en armatur med två rör och gavlar), banderollen, neonskylten, Stängt-skylten, stationsuret,
 orakelramen med mässingsskylten, cigarettpaketen uppe på högra väggen (två hyllor med
 paket i rader om tre till sju, som börjar bakom tv:n; påhittade färger, inga märken), ramarna kring skårtavlan
-och korktavlan och kupongstället är byggda i three.js som gänget. Neonskylten är glasrör med en
+och korktavlan, kupongstället och bardisken med barstolarna (se nedan) är byggda i three.js som gänget. Neonskylten är glasrör med en
 ljus kärna som följer bokstäverna i *Tobak*, spegelvänd inifrån: texten i Fraunces kursiv
 tunnas ut till en linje och seriferna tas bort. Den hänger i kedjor från fönsterkarmen med
 en svart list och transformatorn under, och glappar som förut. Stängt-skylten hänger lite
@@ -2377,15 +2382,19 @@ sekunder blinkar det igång (1,2 s). En gång per sidvisning, och inte med
 nedan), neonen glappar ibland, röken ligger under lysröret, damm syns i ljuset och stationsurets
 sekundvisare hoppar fram. Bakväggen är klädd med lackad furupanel (`furu` i rum.js):
 bräder med kvistar och ådring, mörka av röken upptill och ljusare under lysröret och där en
-tavla har hängt runt ramen. Disken längs högra väggen är en bardisk som i en pub: en skiva i
-mörk lackad mahogny med en blank strimma och en tjock rundad kant, som sticker ut en dryg
-decimeter över den indragna fronten, så att man har plats för benen. Under kanten bär
-konsoler i järn upp skivan, och på fronten sitter en krok i mässing i varje fält – på de två
-innersta hänger en halsduk och en jeansjacka. Inne vid bakväggen syns väggen i skuggan under
-skivan. Fronten har fyllningar i ramar, och ramarna och krokarna står lika långt isär längs
-disken – tätare inne vid hörnet, som i perspektivet. Allt är polygoner i väggens SVG, utan
-filter (`disk` i rum.js; samma funktion ritar disken vidare i videons hörn, `vaggSvg` i
-rum-video.js). Stället är slitet: nikotingul högervägg och tak, fläckar, nötta
+tavla har hängt runt ramen. Disken längs högra väggen är en bardisk som i en pub, i three.js
+(`bardisk` och `DISK` i rum-inredning.js): en skiva i lackad mahogny med en rundad kant, som
+sticker ut en dryg decimeter över den indragna fronten, så att man har plats för benen. Under
+kanten bär konsoler i järn upp skivan, och på fronten sitter en krok i mässing i varje fält – på
+de två innersta hänger en halsduk och en jeansjacka. Fronten har fyllningar i ramar, en halv
+meter isär. Framför står tre barstolar likadana som gängets (röd vinyl med söm, krom, fotring),
+med sitsen 75 cm över golvet och inskjutna under kanten; den närmaste syns bara till hälften
+över pulten. Skivan skuggar fronten och stolarna skuggar fronten och bakväggen under skivan –
+det är skuggorna och stolarna som visar att det är tomt under skivan, eftersom man ser disken
+lite uppifrån. Disken ritas en gång, som inredningen, i en duk från disken in i videons hörn
+(så att den är likadan när kameran går dit) under tavlorna och kortlådan. Utan WebGL står den
+platta disken kvar (`disk` i rum.js, och i videons hörn `vaggSvg` i rum-video.js), med samma
+mått. Stället är slitet: nikotingul högervägg och tak, fläckar, nötta
 kanter på disken och pulten, kafferingar, ringar efter glas på disken och brännmärken. Med
 `prefers-reduced-motion` står allt still (en bild, ingen kamera efter musen).
 
