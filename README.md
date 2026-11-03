@@ -2007,7 +2007,7 @@ spetsen och sektorn är borta. Med `?rum-klocka` räknar uret från sin egen tid
 `?rum-stopp=<timmar>` gäller uret också.
 
 **Inredningen i 3D** ([public/rum-inredning.js](public/rum-inredning.js)): lysröret i taket
-(en armatur med två rör och gavlar), neonskylten, Stängt-skylten, stationsuret,
+(en armatur med två rör och gavlar), banderollen, neonskylten, Stängt-skylten, stationsuret,
 orakelramen med mässingsskylten, cigarettpaketen uppe på högra väggen (två hyllor med
 paket i rader om tre till sju, som börjar bakom tv:n; påhittade färger, inga märken), ramarna kring skårtavlan
 och korktavlan och kupongstället är byggda i three.js som gänget. Neonskylten är glasrör med en
@@ -2019,6 +2019,17 @@ satt och kroppen tillbaka till väggen, så att sidorna syns och skuggorna falle
 (inte på glaset och inte över anslagstavlan). Allt ritas med en och samma WebGL-duk, som
 kopieras till en vanlig duk per sak i det plan där saken står (orakelramen i länken, så
 att den lyser med); bara uret ritas om, en gång i sekunden.
+
+**Banderollen** hänger i taket ovanför skyltfönstret, tvärs över bakväggen: mellan lysröret och
+fönsterkarmen och från vänsterkanten fram till uret (`banderoll` och `BAN` i rum-inredning.js, i
+takets duk). Det är en gammal reklam för Stryktipset i tyg, i stil med 1960- och 70-talen men inte en
+riktig – en sådan gick inte att hämta, och med ett foto eller en skanning av en riktig kan trycket bytas
+mot den. Trycket är i rött, blått och gult: en fotboll i en gul skiva, *Har Ni tippat?*, STRYKTIPSET
+i ljusa bokstäver i ett rött band, och 1 X 2 med ett kryss i X och *Lycka till!* Tyget har gulnat av
+röken, mest upptill, har fläckar och har legat vikt i fyra delar, och det röda ligger lite snett mot
+det blå, som i ett billigt tryck. Rundstavar med knoppar i fållarna håller det sträckt, och det
+hänger lite snett i två snören från skruvöglor i taket. Den leder ingenstans, och på natten mörknar
+den med lysröret.
 
 **Gänget** sitter på barstolar runt ett runt barbord framför fönsterbänken, med benen
 hängande: DL och DJ på sidorna, vända in mot bordet, och DT bakom (`BORD` och `FIGS` i
