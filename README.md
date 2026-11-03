@@ -501,6 +501,11 @@ Utan nyckel ingen knapp.
   programmet framåt och prognosdelen i lagkortet. Tabeller visar bara tabellen, med
   divisionerna som numrerade flikar (nivå 1–4); gamla länkar till `#…/prognos` hamnar på
   tabellen. Styrkan för alla lag räknas fortfarande – den är motståndet i lagstatistiken.
+- **Skårtavlan blir Tipsligan (2026-11-03, användarens önskemål):** tavlan på väggen visar
+  säsongens ställning mellan Laino, Teijder och Dogge i stället för Premier Leagues topp, och
+  leder till Olympen i stället för Tabeller. Tavlan är lägre (tre rader i stället för nio),
+  och närbilden går lika nära som förut. Tabellerna står kvar på tv:n. Se
+  [Tobaksaffären](#tobaksaffären), *Föremålen*.
 - **Statistiken i tobaksaffären står på ett ställe var (2026-11-02, användarens önskemål):**
   samma siffror stod på tv:n, anslagstavlan och kortregistret. Nu står formen bara på
   anslagstavlan, tabellen och hemma/borta bara på tv:n, styrkan, motståndet och poängen mot
@@ -1833,7 +1838,7 @@ minsta fönstren och om rum.js inte går att hämta visas den vanliga förstasid
 
 **Föremålen** – pekar man på ett lyser det (pokalerna också), och snabbvalet
 på text-tv:n med samma ämne tänds, som när man pekar på snabbvalet med tv:n nära
-(skårtavlan Tabeller, pärmarna Skyttar). Klickar man går kameran fram mot föremålet innan
+(pärmarna Skyttar). Klickar man går kameran fram mot föremålet innan
 sidan byts; oraklet, skårtavlan, uret och VM 94-affischen tittar man först på nära (se
 [Närbilderna](#närbilderna)):
 
@@ -1851,11 +1856,13 @@ sidan byts; oraklet, skårtavlan, uret och VM 94-affischen tittar man först på
   Statistik (se [Anslagstavlan](#anslagstavlan)).
 - **Kortregistret** (på disken under anslagstavlan) → ett kort per lag och per möte i
   omgången, och därifrån Lagen på Statistik (se [Kortregistret](#kortregistret)).
-- **Skårtavlan** (under tv:n) → närbild → Tabeller: Premier Leagues topp ur `data/teams/pl.json`
-  med vita plastbokstäver i spåren på svart filt, i en aluminiumram som sticker ut från
-  väggen (3D). Varje bokstav sitter
-  lite snett för sig (samma frö varje gång, så att inget flyttar sig), och lådan har bara
-  fyra O – sedan blir det nollor.
+- **Skårtavlan** (under tv:n) → närbild → Olympen: *Tipsligan*, säsongens ställning i gänget
+  – samma poäng och placering som ställningen i Olympen (`kampRounds`, med omgången som
+  pågår), lika placering vid lika poäng och antal rätt. Efternamnen står där, och Johansson
+  som *Dogge* (`SMEKNAMN` i rum.js); före första omgången bara namnen. Vita plastbokstäver i
+  spåren på svart filt – rubriken, ett tomt spår och de tre – i en låg aluminiumram som
+  sticker ut från väggen (3D). Varje bokstav sitter lite snett för sig (samma frö varje gång,
+  så att inget flyttar sig), och lådan har bara fyra O – sedan blir det nollor.
 - **Korktavlan** (längst till höger, i en träram i 3D) → gängets kuponger i Olympen
   (`#olympen/kuponger`): de färdigspelade kupongerna (`Historik.coupons`) rättade med röd penna, en med kaffering.
   Tom tills den första är färdigspelad.
@@ -2162,7 +2169,7 @@ svep uppåt eller neråt bladen i lapparna till nästa division.
 pulten, i handen och i högen är smal och hög, 420 × 620 i stället för 660 × 470, som en
 riktig stryktipskupong, med samma mitt så att högen och handen ligger där de ligger (`KUP`
 i rum.js). Raderna har två våningar – lagen överst, dagen och motiveringen under – och
-rutorna är större (44 × 26). Lagen har de korta namnen, som på skårtavlan (*Tottenham –
+rutorna är större (44 × 26). Lagen har de korta namnen (*Tottenham –
 Crystal Palace*, *Southampton – QPR*; `short` i rum.js, där Bristol City, Bristol Rovers och
 Notts County behåller hela namnet och Milton Keynes Dons blir MK Dons), så att de ryms i
 stället för att huggas av. Överst står bara *Vem är du?* och porträtten, utan 1 X 2 –
@@ -2943,10 +2950,10 @@ ett ställe (2026-11-02, användarens önskemål):
 
 Ny statistik placeras efter samma roller: det som gäller en match eller en liga nu på tv:n,
 det som jämför lagen i omgången på tavlan och det som beskriver ett lag i kortregistret.
-Två saker liknar varandra med flit: lagets bäste skytt kan stå med samma målantal i
+En sak liknar en annan med flit: lagets bäste skytt kan stå med samma målantal i
 skytteligan, men kortet visar hur mycket laget hänger på en spelare och skytteligan vem som
-leder; och skårtavlan på väggen visar tabellens topp som en del av rummet, med länk till
-Tabeller.
+leder. Skårtavlan på väggen visar inte längre tabellen utan gängets egen ställning
+(Tipsligan).
 
 ### Videon
 
@@ -3160,7 +3167,8 @@ en fast bild.
 Uret, skårtavlan, Omgångens orakel och VM 94-affischen tittar man på nära med ett klick
 (`sak` i rum.js, `data-sak` på föremålen): kameran ställer sig rakt framför och går fram tills
 saken fyller det mesta av fönstret – högst 90 % av bredden och 74–94 % av höjden mellan
-namnet och foten – i telefonen också. Rummet vrids rakt medan kameran glider fram och står
+namnet och foten (den låga skårtavlan 50 %, så att den inte kommer närmare än de andra) – i
+telefonen också. Rummet vrids rakt medan kameran glider fram och står
 sedan still: så länge något vrids ritar webbläsaren lagren i den vanliga skalan och förstorar
 dem suddigt, och när det står still ritas de om skarpt. Det som står framför väggen – gänget
 vid barbordet och pulten – tonar bort medan kameran går förbi. Uret,
@@ -3168,7 +3176,7 @@ orakelramen och ramen kring skårtavlan är ritade i 3D och ritas om i närbilde
 kameran är framme (`skarp` i rum-inredning.js, högst 2600 bildpunkter på längsta ledet);
 uret går som vanligt, med sekundvisaren.
 
-Under skårtavlan och oraklet står guldordet dit de leder (*Tabeller*, *Olympen*); det, eller
+Under skårtavlan och oraklet står guldordet dit de leder (båda *Olympen*); det, eller
 ett klick till på saken, tonar bort rummet och byter sida. Under affischen står fotografen
 och licensen med en länk till fotot på Wikimedia Commons. Esc, ett klick någon annanstans
 eller ett klick till på uret eller affischen går tillbaka, och K, T, A, R och V går direkt

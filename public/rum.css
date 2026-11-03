@@ -227,7 +227,8 @@ a.rum-sak, a.rum-sak:hover { color: inherit; text-decoration: none; }
 
 .rum-hv { position: absolute; left: 0; top: 0; width: 1600px; height: 1000px; perspective: 1000px; perspective-origin: 760px 400px; }
 .rum-skar, .rum-kork { position: absolute; left: 1140px; display: block; transform-origin: 0 0; box-sizing: border-box; }
-/* svart filt med spår var 9,6:e px i en aluminiumram; bokstäverna (b) står i spåren */
+/* svart filt med spår var 9,6:e px i en aluminiumram; bokstäverna (b) står i spåren.
+   Tipsligan: rubriken, ett tomt spår och de tre i gänget – fem spår */
 .rum-skar {
   padding: 5px;
   background: linear-gradient(135deg, #d9d6cc, #8d8a80 55%, #5e5b54);
@@ -251,8 +252,7 @@ a.rum-sak, a.rum-sak:hover { color: inherit; text-decoration: none; }
 }
 .rum-skar-in b { display: inline-block; font-weight: inherit; }
 .rum-skar-in .sp { width: 0.32em; }
-.rum-skar-in .h, .rum-skar-in .tom { display: block; height: 9.6px; text-align: center; font-size: 8.6px; font-weight: 700; letter-spacing: 0.14em; }
-.rum-skar-in .tom { margin-top: 19.2px; opacity: 0.8; }
+.rum-skar-in .h { display: block; height: 9.6px; margin-bottom: 9.6px; text-align: center; font-size: 8.6px; font-weight: 700; letter-spacing: 0.14em; }
 .rum-skar-in .rad { display: flex; justify-content: space-between; gap: 4px; height: 9.6px; font-size: 7.4px; letter-spacing: 0.06em; white-space: nowrap; }
 .rum-skar-in .rad > span:first-child { overflow: hidden; }
 

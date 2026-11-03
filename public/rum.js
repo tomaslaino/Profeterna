@@ -8,7 +8,7 @@
 // dricker öl, röker och pratar. Föremålen leder vidare, som i ett rum hos
 // Felix Rieseberg:
 //   korktavlan → gängets kuponger     pokalhyllan, Omgångens orakel → Olympen
-//   skårtavlan → Tabeller             anslagstavlan: lapparna (A, rum-anslag.js)
+//   skårtavlan (Tipsligan) → Olympen  anslagstavlan: lapparna (A, rum-anslag.js)
 //   namnet på dörren → Om oss
 //   kvittot → Kupong, tv:n zoomas in (T): text-tv med en sida per match och
 //   kupongens matcher live på 377 (rum-tv.js)
@@ -283,12 +283,13 @@ window.Rum = (() => {
   }
 
   // 3. Korktavlan med gängets gamla kuponger, rättade med röd penna.
-  // 6. Skårtavlan med ligatabellen i vita plastbokstäver.
+  // 6. Skårtavlan med Tipsligan – säsongens ställning i gänget – i vita
+  //    plastbokstäver.
   // 7. Anslagstavlan under tv:n (rum-anslag.js), fri från tv:ns hylla och disken.
   function rightWall() {
     return '<div class="rum-hv">' +
       (window.RumAnslag ? onWall(1144, 1300, 316, 478, 'rum-ans', RumAnslag.wall(), 'href="statistik.html" data-nav="statistik" aria-label="Anslagstavlan" id="rum-ans"') : '') +
-      onWall(1330, 1478, 352, 458, 'rum-skar', '<span class="rum-skar-in" id="rum-skar"></span>', 'href="tabeller.html" data-nav="tabeller" data-sak="skar" aria-label="Tabeller"') +
+      onWall(1330, 1478, 376, 434, 'rum-skar', '<span class="rum-skar-in" id="rum-skar"></span>', 'href="#olympen" data-nav="olympen" data-sak="skar" aria-label="Tipsligan"') +
       onWall(1496, 1700, 330, 478, 'rum-kork', '<span class="rum-kork-in" id="rum-kork"></span>', 'href="#olympen/kuponger" data-nav="olympen" aria-label="Gängets kuponger"') +
       '</div>';
   }
@@ -835,7 +836,7 @@ ${window.RumRegister ? RumRegister.nara() : ''}
 
   // ---------- datan ----------
 
-  // Kortare lagnamn på papperet och skårtavlan.
+  // Kortare lagnamn på papperet.
   const SHORT = { 'Manchester City': 'Man City', 'Manchester United': 'Man Utd', 'Tottenham Hotspur': 'Tottenham', 'Brighton & Hove Albion': 'Brighton',
     'Wolverhampton Wanderers': 'Wolves', 'West Bromwich Albion': 'West Brom', 'Queens Park Rangers': 'QPR', 'Nottingham Forest': "Nott'm Forest",
     'AFC Bournemouth': 'Bournemouth', 'Preston North End': 'Preston', 'Sheffield Wednesday': 'Sheff Wed', 'Sheffield United': 'Sheff Utd',
@@ -961,7 +962,7 @@ ${window.RumRegister ? RumRegister.nara() : ''}
           : `<span class="box${on ? ' x' : ''}">${inner}</span>`;
       };
       return `<div class="row${sign ? '' : ' tom'}${locked ? ' locked' : ''}" data-id="${esc(x.id)}"><span class="pp-nr">${i + 1}</span>` +
-        // på den smala kupongen (telefonen) de kortare namnen, som på skårtavlan (rum.css)
+        // på den smala kupongen (telefonen) de kortare namnen (short, .kort i rum.css)
         `<span class="m"><span class="pp-tm"><span class="lang">${esc(x.m.home)}<span class="vs"> – </span>${esc(x.m.away)}</span>` +
         `<span class="kort">${esc(short(x.m.home))}<span class="vs"> – </span>${esc(short(x.m.away))}</span></span>` +
         `<span class="pp-small">${esc(fWeekdayTime.format(new Date(x.m.kickoff)))}${comp ? ` · ${esc(comp.short)}` : ''}${locked ? ' · har startat' : ''}</span>` +
@@ -1097,10 +1098,30 @@ ${window.RumRegister ? RumRegister.nara() : ''}
       '<span class="r"><span>Insats</span><span>äran</span></span><span class="bar"></span><span class="c">Spara kvittot</span>';
   }
 
-  // Skårtavlan: en plastbokstav per tecken, var och en lite sned i sitt
-  // spår (samma frö varje gång, så att inget flyttar sig när tavlan fylls
-  // om). Lådan har fyra O – sedan får det bli nollor.
-  function skarHtml(T) {
+  // Skårtavlan: Tipsligan, säsongens ställning i gänget – samma poäng som
+  // ställningen i Olympen (kampRounds i kampen.js, med omgången som pågår),
+  // lika placering vid lika poäng och antal rätt. Efternamnen, och Dogge för
+  // Johansson. Före första omgången står bara namnen där.
+  // En plastbokstav per tecken, var och en lite sned i sitt spår (samma frö
+  // varje gång, så att inget flyttar sig när tavlan fylls om). Lådan har
+  // fyra O – sedan får det bli nollor.
+  const SMEKNAMN = { DJ: 'Dogge' };
+  const tavelnamn = (p) => SMEKNAMN[p.id] || (typeof kampSurname === 'function' ? kampSurname(p.name || p.id) : p.name || p.id);
+  function liga() {
+    const rounds = typeof kampRounds === 'function' ? kampRounds().list : [];
+    const people = typeof Tippoang !== 'undefined' ? Tippoang.season(rounds).people : [];
+    if (people.length) {
+      let rank = 0;
+      let prev = null;
+      return people.map((p, i) => {
+        const key = Tippoang.key(p);
+        if (key !== prev) { rank = i + 1; prev = key; }
+        return { name: tavelnamn(p), rank, pts: tpPts(p.pts) };
+      });
+    }
+    return (typeof kampGang === 'function' ? kampGang(rounds) : []).map((g) => ({ name: tavelnamn(g) }));
+  }
+  function skarHtml(rows) {
     const R0 = rng(31);
     let o = 4;
     const ch = (c) => {
@@ -1109,10 +1130,8 @@ ${window.RumRegister ? RumRegister.nara() : ''}
       return `<b style="transform: translateY(${r1((R0() - 0.5) * 0.9)}px) rotate(${r1((R0() - 0.5) * 7)}deg)">${esc(c)}</b>`;
     };
     const word = (t) => [...String(t).toUpperCase()].map(ch).join('');
-    const rows = ((T && T.teams) || []).slice().sort((a, b) => a.rank - b.rank).slice(0, 9);
-    if (!rows.length) return `<span class="h">${word('Dagens tabell')}</span><span class="tom">${word('Kommer')}</span>`;
-    return `<span class="h">${word((T && T.name) || 'Tabellen')}</span>` +
-      rows.map((x) => `<span class="rad"><span>${word(`${x.rank}. ${short(x.name)}`)}</span><span>${word(x.pts)}</span></span>`).join('');
+    return `<span class="h">${word('Tipsligan')}</span>` +
+      rows.slice(0, 3).map((x) => `<span class="rad"><span>${word(x.rank ? `${x.rank}. ${x.name}` : x.name)}</span><span>${x.pts ? word(x.pts) : ''}</span></span>`).join('');
   }
 
   function corkHtml(list) {
@@ -1129,7 +1148,7 @@ ${window.RumRegister ? RumRegister.nara() : ''}
     }).join('');
   }
 
-  // Allt som hämtas: omgången, tabellen, säsongens omgångar och kupongerna.
+  // Allt som hämtas: omgången, säsongens omgångar och kupongerna.
   async function load() {
     await Promise.all([whenMatches(), loadCoupons()]);
     await Promise.all([
@@ -1137,7 +1156,6 @@ ${window.RumRegister ? RumRegister.nara() : ''}
       // omgången som kupongen på pulten och högen visar (samtal.js)
       window.Samtal && Samtal.load ? Samtal.load() : null,
       typeof tpLoadSeason === 'function' && !TP.season ? tpLoadSeason() : null,
-      R.table ? null : getJSON('data/teams/pl.json').then((d) => { R.table = d; }).catch(() => { R.table = null; }),
       window.Historik ? Historik.coupons().then((l) => { R.old = l; }) : null,
     ]);
     fill();
@@ -1189,7 +1207,7 @@ ${window.RumRegister ? RumRegister.nara() : ''}
       }
       tag.hidden = !go;
     }
-    set('rum-skar', skarHtml(R.table));
+    set('rum-skar', skarHtml(liga()));
     const seen = ((TP.season && TP.season.rounds) || []).filter((r) => typeof tpRoundHidden !== 'function' || !tpRoundHidden(r));
     // dagen efter: hur det gick i den senaste kupongen (rum-folk.js)
     if (window.RumFolk) RumFolk.fyll(R.old, seen);
@@ -2268,7 +2286,8 @@ ${window.RumRegister ? RumRegister.nara() : ''}
   //   el saken, h hur mycket av höjden den får, duk duken i 3D, fot under den
   const SAKER = {
     ur: { el: '.rum-ur', h: 0.78, duk: 'ur' },
-    skar: { el: '.rum-skar', h: 0.82, duk: 'hogra', fot: () => '<a class="rum-guld" href="tabeller.html">Tabeller</a>' },
+    // (skårtavlan är låg: en halv höjd, ungefär lika nära som de andra)
+    skar: { el: '.rum-skar', h: 0.5, duk: 'hogra', fot: () => '<a class="rum-guld" href="#olympen">Olympen</a>' },
     ram: { el: '.rum-ram', h: 0.94, duk: 'ram', fot: () => '<a class="rum-guld" href="#olympen">Olympen</a>' },
     vm94: { el: '#rum-vm94', h: 0.74, fot: (a) => `<span class="foto">${esc(a.title).replace('Wikimedia Commons', (m) => (a.dataset.kalla ? `<a href="${esc(a.dataset.kalla)}" target="_blank" rel="noopener">${m}</a>` : m))}</span>` },
   };

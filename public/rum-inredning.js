@@ -850,7 +850,7 @@ export async function inredning(el, opt = {}) {
   const skylt = ram(B.ram);
   backWall(B.ram);
   paket(B.hogra);
-  wallRing(B.hogra, 1330, 1478, 352, 458, 5, mat('#e2e0d8', { metalness: 0.75, roughness: 0.3, envMapIntensity: 1.4 }));
+  wallRing(B.hogra, 1330, 1478, 376, 434, 5, mat('#e2e0d8', { metalness: 0.75, roughness: 0.3, envMapIntensity: 1.4 }));
   const ved = tex(256, 256, (c, w, h) => {
     c.fillStyle = '#6a4a28';
     c.fillRect(0, 0, w, h);
