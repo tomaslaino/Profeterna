@@ -157,13 +157,12 @@ window.RumRegister = (() => {
   }
 
   function html() {
-    return `<a class="rum-reg rum-sak" id="rum-reg" href="statistik.html#pl/lag" data-nav="statistik" aria-label="Kortregistret" ` +
+    return `<a class="rum-reg rum-sak" id="rum-reg" role="button" tabindex="0" data-nav="statistik" aria-label="Kortregistret" ` +
       `style="left:${BOX.x}px; top:${BOX.y}px; width:${BOX.w}px; height:${BOX.h}px"><canvas class="reg-duk" id="reg-duk"></canvas></a>`;
   }
 
   function nara() {
     return '<div class="rum-regn" id="rum-regn" role="dialog" aria-label="Kortregistret" tabindex="-1"><div class="reg-bak"></div><div class="reg-3d" id="reg-3d"></div>' +
-      '<div class="reg-fot" id="reg-fot"><a class="rum-guld" href="statistik.html#pl/lag" data-nav="statistik">Lagen</a></div>' +
       '<div class="reg-lyft" id="reg-lyft"></div>' +
       '<div class="reg-rad" id="reg-rad"><span id="reg-sp"></span><button type="button" class="reg-tbx" data-reg="tillbaka">Sätt tillbaka</button></div></div>';
   }
@@ -177,7 +176,6 @@ window.RumRegister = (() => {
     const small = root.querySelector('#rum-reg');
     const duk = root.querySelector('#reg-duk');
     const ov = root.querySelector('#rum-regn');
-    const fot = root.querySelector('#reg-fot');
     const lyftEl = root.querySelector('#reg-lyft');
     const rad = root.querySelector('#reg-rad');
     const sp = root.querySelector('#reg-sp');
@@ -263,11 +261,6 @@ window.RumRegister = (() => {
     // Lådans ruta på disken i fönstret, där den står just nu.
     const at = () => small.getBoundingClientRect();
 
-    function place(box) {
-      if (!box) return;
-      Object.assign(fot.style, { left: `${r1(box.left)}px`, width: `${r1(box.width)}px`, top: `${r1(box.top + box.height + 10)}px` });
-    }
-
     function open(on, from) {
       if (on === A.on || !A.L) return Promise.resolve();
       A.on = on;
@@ -279,10 +272,8 @@ window.RumRegister = (() => {
         const r = from || at();
         const p = A.L.open(true, o.calm() ? null : r);
         small.classList.add('borta');
-        if (A.L.box()) place(A.L.box());
-        return p.then((box) => {
+        return p.then(() => {
           if (!A.on) return;
-          place(box);
           ov.classList.add('framme');
           ov.focus({ preventScroll: true });
         });
@@ -306,13 +297,13 @@ window.RumRegister = (() => {
       if (!A.on || !A.L) return;
       if (A.lyft) { A.L.hover(null); ov.style.cursor = ''; return; }
       if (!o.calm()) A.L.tilt((e.clientX / innerWidth) * 2 - 1, (e.clientY / innerHeight) * 2 - 1);
-      const id = e.target.closest('.reg-fot, .reg-rad') ? null : A.L.pick(e.clientX, e.clientY);
+      const id = e.target.closest('.reg-rad') ? null : A.L.pick(e.clientX, e.clientY);
       A.L.hover(id);
       ov.style.cursor = id ? 'pointer' : '';
     });
     addEventListener('resize', () => {
       if (!A.on || !A.L) return;
-      place(A.L.resize());
+      A.L.resize();
       if (A.lyft && A.lyft.framme) placeLyft();
     });
 
@@ -421,7 +412,7 @@ window.RumRegister = (() => {
       }
       const id = A.L && A.L.pick(e.clientX, e.clientY);
       if (id) { lift(id); return; }
-      if (!e.target.closest('.reg-fot')) o.close();
+      o.close();
     });
 
     return {

@@ -531,6 +531,14 @@ Utan nyckel ingen knapp.
   anslagstavlan, tabellen och hemma/borta bara på tv:n, styrkan, motståndet och poängen mot
   oddsen bara på anslagstavlan, och lagkorten har det som inte står någon annanstans. Se
   [Vad som står var](#vad-som-står-var).
+- **Inga länkar ut ur tobaksaffären (2026-11-03, användarens önskemål):** det enda som leder
+  till den vanliga sajten är *Vanlig sida* i hörnet. Oraklet och skårtavlan har ingen länk
+  under närbilden längre, och pokalhyllan, korktavlan, namnet på dörren och kvittot leder
+  inte till Olympen, Om oss och Kupong utan till en närbild: pokalhyllan med hur många
+  pokaler var och en har (tv:n framför tonar bort), dörren med Om oss-raderna under och
+  korktavlan och kvittot så nära att de går att läsa. Kupongen som inte går att ta i handen
+  visas nära på pulten, och guldorden *Statistik* och *Lagen* under anslagstavlan och
+  kortregistret är borta. Se [Tobaksaffären](#tobaksaffären) och [Närbilderna](#närbilderna).
 - **Kuponghistoriken flyttar till Olympen (2026-10-20, användarens önskemål):** Kupong
   handlar bara om nästa kupong – växlaren Omgången | Historik försvinner. De färdigspelade
   kupongerna står sist i Olympen under rubriken *Grupparbetena* (`#olympen/kuponger`, en
@@ -1843,7 +1851,7 @@ WebKit hade ritat, ge den en fördröjning, en mjukare början eller dölja det 
 bilden hela vägen hjälpte inte – WebKit ritar först när kameran rör sig. Chrome behöver inte
 den osynliga rörelsen och får den inte. Namnet
 och foten (*Vanlig sida*) ligger utanför scenen i fönstrets hörn;
-någon meny finns inte, det är föremålen som leder vidare. Tangenterna (K kupongen, T tv:n,
+någon meny finns inte, och föremålen leder inte ut ur rummet – det gör bara *Vanlig sida*. Tangenterna (K kupongen, T tv:n,
 A anslagstavlan, R kortregistret, V videon) står inte i foten – där låg de över kupongen i
 mindre fönster – utan när man pekar på saken (*Tv:n · T*, `tangenter` i rum.js), och bara
 med mus. [public/rum.js](public/rum.js)
@@ -1868,11 +1876,13 @@ minsta fönstren och om rum.js inte går att hämta visas den vanliga förstasid
 
 **Föremålen** – pekar man på ett lyser det (pokalerna också), och snabbvalet
 på text-tv:n med samma ämne tänds, som när man pekar på snabbvalet med tv:n nära
-(pärmarna Skyttar). Klickar man går kameran fram mot föremålet innan
-sidan byts; oraklet, skårtavlan, uret och VM 94-affischen tittar man först på nära (se
-[Närbilderna](#närbilderna)):
+(pärmarna Skyttar). Inget föremål byter sida: oraklet, skårtavlan, pokalhyllan, korktavlan,
+uret, VM 94-affischen, namnet på dörren och kvittot tittar man på nära (se
+[Närbilderna](#närbilderna)), och tv:n, videon, anslagstavlan, kortregistret och kupongen
+kommer fram var och en på sitt sätt. Föremålen är knappar utan adress (`KNAPP` i rum.js), och
+Enter och mellanslag klickar på dem. En match på text-tv:n öppnar matchrutan ovanpå rummet:
 
-- **Omgångens orakel** (tavlan under stationsuret) → närbild → Olympen: oraklet som regerar
+- **Omgångens orakel** (tavlan under stationsuret) → närbild: oraklet som regerar
   (`Kronan.holders`) som i Olympen och på förstasidans polaroid (`Kronan.scene`) – det
   urklippta fotot på marmorsockeln med lagerkransen (som inte glimmar här, se [När datorn
   inte hinner med](#när-datorn-inte-hinner-med)) och strålarna som vrider sig – bakom
@@ -1880,23 +1890,27 @@ sidan byts; oraklet, skårtavlan, uret och VM 94-affischen tittar man först på
   skimmer drar snett över glaset var elfte sekund. Mässingsskylten under säger
   *Omgångens orakel* och hela efternamnet (delat: *Laino & Johansson*, i mindre stil), och
   ramen och skylten lyser med när man pekar på dem.
-- **Pokalhyllan** (högra väggen) → Olympen: en liten pokal per vunnen omgång i vinnarens
-  färg (delat = en var), ur `data/tippare.json`.
-- **Anslagstavlan** (under tv:n, i hörnet) → lapparna om omgångens lag, och därifrån
-  Statistik (se [Anslagstavlan](#anslagstavlan)).
+- **Pokalhyllan** (högra väggen, till största delen bakom tv:n) → närbild: en liten pokal per
+  vunnen omgång i vinnarens färg (delat = en var), ur `data/tippare.json`. Nära tonar tv:n bort,
+  del för del (`tvBort` i rum.js; opacitet på lådan själv skulle platta till den i 3D), och
+  under hyllan står hur många pokaler var och en har, flest först.
+- **Anslagstavlan** (under tv:n, i hörnet) → lapparna om omgångens lag (se
+  [Anslagstavlan](#anslagstavlan)).
 - **Kortregistret** (på disken under anslagstavlan) → ett kort per lag och per möte i
-  omgången, och därifrån Lagen på Statistik (se [Kortregistret](#kortregistret)).
-- **Skårtavlan** (under tv:n) → närbild → Olympen: *Tipsligan*, säsongens ställning i gänget
+  omgången (se [Kortregistret](#kortregistret)).
+- **Skårtavlan** (under tv:n) → närbild: *Tipsligan*, säsongens ställning i gänget
   – samma poäng och placering som ställningen i Olympen (`kampRounds`, med omgången som
   pågår), lika placering vid lika poäng och antal rätt. Efternamnen står där, och Johansson
   som *Dogge* (`SMEKNAMN` i rum.js); före första omgången bara namnen. Vita plastbokstäver i
   spåren på svart filt – rubriken, ett tomt spår och de tre – i en låg aluminiumram som
   sticker ut från väggen (3D). Varje bokstav sitter lite snett för sig (samma frö varje gång,
   så att inget flyttar sig), och lådan har bara fyra O – sedan blir det nollor.
-- **Korktavlan** (längst till höger, i en träram i 3D) → gängets kuponger i Olympen
-  (`#olympen/kuponger`): de färdigspelade kupongerna (`Historik.coupons`) rättade med röd penna, en med kaffering.
+- **Korktavlan** (längst till höger, i en träram i 3D) → närbild: de färdigspelade kupongerna
+  (`Historik.coupons`) rättade med röd penna, en med kaffering.
   Tom tills den första är färdigspelad.
-- **Kupongen och kvittot** → Kupong. Kupongen är samma kupong som papperet under Kupong, i
+- **Kupongen och kvittot**: kupongen tas i handen (se nedan), och när den inte går att ta i
+  handen går kameran fram till den på pulten (också med K och guldordet); kvittot → närbild.
+  Kupongen är samma kupong som papperet under Kupong, i
   kupongens mått (660 × 470): bandet, under det stämpeln (vem omgången väntar på) och
   spelstoppet, porträtten med bock, tårtbit eller prickar och 1 X 2 överst, en rad per
   match i kupongens ordning med synkmarkeringen i kanten och dag, tid och serie efter lagen
@@ -1929,7 +1943,8 @@ sidan byts; oraklet, skårtavlan, uret och VM 94-affischen tittar man först på
   lådan står kvar som de står, och en kassett spelar matchens höjdpunkter i rutan.
   Ett klick på rutan går ännu närmare (se [Videon](#videon)). Esc, V eller ett klick utanför
   zoomar ut.
-- **Namnet på dörren** (längst till vänster, under Stängt-skylten) → Om oss: *Matchfixarna*
+- **Namnet på dörren** (längst till vänster, under Stängt-skylten) → närbild av dörrens övre
+  del, med raderna från Om oss under (*Vi tippar engelsk fotboll tillsammans.* …): *Matchfixarna*
   i bladguld på glaset, spegelvänt inifrån som neonskylten, med TOBAK & SPEL och *Öppet
   till spelstoppet* under. I fönster som är minst 8:5 syns hela dörren, och där står namnet
   inte i menyns hörn; i smalare fönster skärs dörren av och namnet står kvar i hörnet.
@@ -2982,8 +2997,7 @@ tillbaka och rummet har vridits mot musen (rum.js mäter dem med kameran och rum
 kort stund). Flygturen räknas ut i förväg, en avbildning var 20:e ms, och flygs som en
 animering som grafikkortet sköter själv (`fly` i rum-anslag.js), så att den går jämnt också
 när datorn har annat att göra (se [När datorn inte hinner med](#när-datorn-inte-hinner-med)).
-Guldordet *Statistik* under
-tavlan leder till Statistik, och pekar man på tavlan i rummet tänds snabbvalet Statistik på
+Pekar man på tavlan i rummet tänds snabbvalet Statistik på
 text-tv:n. Med `prefers-reduced-motion` står tavlan framme direkt.
 
 Dolda resultat: formen får ? för de dolda matcherna, och lapparna som räknar med
@@ -3024,7 +3038,7 @@ avdelare: det första kortet bakom den): det reser sig ur lådan och tas i hande
 storlek, och pilarna (i telefonen ett svep i sidled) bläddrar mellan korten.
 Esc, ett klick utanför eller *Sätt tillbaka*
 sätter tillbaka kortet; Esc, R eller ett klick utanför lådan ställer den på disken igen.
-Guldordet *Lagen* under lådan leder till Lagen på Statistik, och pekar man på lådan tänds
+Pekar man på lådan tänds
 snabbvalet Statistik på text-tv:n. Med `prefers-reduced-motion` står lådan framme direkt.
 
 Dolda resultat: lagkorten visar bara namnet och ett frågetecken när en match i lagens
@@ -3261,25 +3275,28 @@ en fast bild.
 
 ### Närbilderna
 
-Uret, skårtavlan, Omgångens orakel och VM 94-affischen tittar man på nära med ett klick
-(`sak` i rum.js, `data-sak` på föremålen): kameran ställer sig rakt framför och går fram tills
+Uret, skårtavlan, Omgångens orakel, pokalhyllan, korktavlan, VM 94-affischen, namnet på dörren
+och kvittot tittar man på nära med ett klick (`sak` i rum.js, `data-sak` på föremålen), och
+kupongen på pulten när den inte går att ta i handen: kameran ställer sig rakt framför och går fram tills
 saken fyller det mesta av fönstret – högst 90 % av bredden och 74–94 % av höjden mellan
 namnet och foten (den låga skårtavlan 50 %, så att den inte kommer närmare än de andra) – i
 telefonen också. Rummet vrids rakt medan kameran glider fram och står
 sedan still: så länge något vrids ritar webbläsaren lagren i den vanliga skalan och förstorar
 dem suddigt, och när det står still ritas de om skarpt. Det som står framför väggen – gänget
-vid barbordet och pulten – tonar bort medan kameran går förbi. Uret,
-orakelramen och ramen kring skårtavlan är ritade i 3D och ritas om i närbildens skala när
+vid barbordet och pulten – tonar bort medan kameran går förbi (inte när saken ligger på
+pulten), och vid pokalhyllan tv:n. Dörren siktar kameran på en osynlig ruta över dörrens övre
+del (`#rum-dorrglas`), så att Stängt-skylten och namnet kommer med. Uret,
+orakelramen och ramarna kring skårtavlan och korktavlan är ritade i 3D och ritas om i närbildens skala när
 kameran är framme (`skarp` i rum-inredning.js, högst 2600 bildpunkter på längsta ledet);
 uret går som vanligt, med sekundvisaren.
 
-Under skårtavlan och oraklet står guldordet dit de leder (båda *Olympen*); det, eller
-ett klick till på saken, tonar bort rummet och byter sida. Under affischen står fotografen
-och licensen med en länk till fotot på Wikimedia Commons. Esc, ett klick någon annanstans
-eller ett klick till på uret eller affischen går tillbaka, och K, T, A, R och V går direkt
-till kupongen, tv:n, anslagstavlan, kortregistret och videon. Föremålen lyser inte när man
+Ingen närbild leder ut ur rummet. Under pokalhyllan står hur många pokaler var och en har,
+under dörren raderna från Om oss i bladguld och under affischen fotografen och licensen med
+en länk till fotot på Wikimedia Commons. Esc eller ett klick (också på saken) går tillbaka,
+och K, T, A, R och V går direkt till kupongen, tv:n, anslagstavlan, kortregistret och videon
+(K nära kupongen på pulten går tillbaka). Föremålen lyser inte när man
 pekar på dem på nära håll. Med `prefers-reduced-motion` går kameran direkt.
-`?rum-sak=ur|skar|ram|vm94` visar en närbild i en fast bild.
+`?rum-sak=ur|skar|ram|pokal|kork|vm94|dorr|kvitto|kupong` visar en närbild i en fast bild.
 
 ## Statusmärkning
 

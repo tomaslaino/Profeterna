@@ -5,24 +5,25 @@
 // Förstasidan: tobaksaffären vid spelpulten, ritad i lager
 // på olika djup (CSS 3D) som vrids lite när musen rör sig. Gänget – DL, DT
 // och DJ – sitter som leksaksfigurer (three.js, rum-3d.js) vid ett barbord,
-// dricker öl, röker och pratar. Föremålen leder vidare, som i ett rum hos
-// Felix Rieseberg:
-//   korktavlan → gängets kuponger     pokalhyllan, Omgångens orakel → Olympen
-//   skårtavlan (Tipsligan) → Olympen  anslagstavlan: lapparna (A, rum-anslag.js)
-//   namnet på dörren → Om oss
-//   kvittot → Kupong, tv:n zoomas in (T): text-tv med en sida per match och
-//   kupongens matcher live på 377 (rum-tv.js)
+// dricker öl, röker och pratar. Föremålen leder inte ut ur rummet – det gör
+// bara Vanlig sida i hörnet –, utan visar sig nära, som i ett rum hos Felix
+// Rieseberg:
+//   tv:n zoomas in (T): text-tv med en sida per match och kupongens matcher
+//   live på 377 (rum-tv.js)
 //   videon på disken zoomas in (V): repriserna på VHS, på tv:n och i lådan
 //   bredvid, som spelas i rutan (rum-video.js)
-//   uret, skårtavlan, oraklet och VM 94-affischen: kameran går fram till dem
-//   (närbilderna, sak); skårtavlan och oraklet leder sedan vidare
+//   anslagstavlan lyfts ner (A): lapparna (rum-anslag.js)
 //   kortregistret på disken lyfts fram (R): ett kort per lag och per möte
 //   (rum-register.js, lådan i three.js i rum-kortlada.js)
-//   kupongen tas i handen (K) – fylls i eller ändras – eller → Kupong.
+//   uret, skårtavlan (Tipsligan), oraklet, pokalhyllan, korktavlan, VM 94-affischen,
+//   dörren (med vilka vi är under) och kvittot: kameran går fram till dem
+//   (närbilderna, sak)
+//   kupongen tas i handen (K) – fylls i eller ändras –, annars går kameran
+//   fram till den på pulten.
 //   högen bredvid: de inlämnade kupongerna med baksidan upp; din egen tas i
-//   handen därifrån när du har lämnat in, de andras → Kupong.
+//   handen därifrån när du har lämnat in, de andras när du ser deras tips.
 // Det finns ingen meny: pekar man på ett föremål lyser det, och snabbvalet på
-// text-tv:n som det leder till tänds.
+// text-tv:n med samma ämne tänds.
 //
 // Vanlig sida (#hem) är den vanliga förstasidan. I telefonen står rummet
 // också: scenen fyller höjden, och man ser sig omkring med fingret (pan) –
@@ -38,7 +39,8 @@
 // kortregistret (=Arsenal … med det kortet i handen). ?rum-stopp=<timmar> som
 // om det var så långt kvar till spelstoppet, ?rum-tittar som om matcherna
 // pågick och ?rum-mal=dl:1,dt:-1,dj:0 som om det blev mål (rätt, fel, ingen
-// skillnad), ?rum-video videon nära och ?rum-sak=ur|skar|ram|vm94 en närbild.
+// skillnad), ?rum-video videon nära och
+// ?rum-sak=ur|skar|ram|pokal|kork|vm94|dorr|kvitto|kupong en närbild.
 //
 // Läses efter kupong.js, samtal.js, tippare.js och kronan.js och använder
 // deras hjälpare (state, KP, TP, gradeRow, couponNumber, currentCoupon,
@@ -324,7 +326,7 @@ window.Rum = (() => {
       // en egen SVG: Chrome lägger ut text i SVG på nytt i varje bildruta
       // medan rummet vrids, och då ritades hela väggen om varje gång.
       svg(`<defs><path id="rum-dorrbage" d="M66 252 Q136 232 206 252"/></defs>
-  <a class="rum-sak" href="om-oss.html" aria-label="Om oss" id="rum-dorrnamn">
+  <a class="rum-sak" role="button" tabindex="0" data-sak="dorr" aria-label="Om oss" id="rum-dorrnamn">
     <rect x="60" y="226" width="152" height="72" fill="#000" opacity=".001"/>
     <g transform="translate(272 0) scale(-1 1)" font-family="Fraunces" text-anchor="middle">
       <text font-style="italic" font-weight="700" font-size="21" fill="#1a1208" opacity=".55" transform="translate(1.5 2)"><textPath href="#rum-dorrbage" startOffset="50%">Matchfixarna</textPath></text>
@@ -348,11 +350,15 @@ window.Rum = (() => {
 
   // ---------- de sju sakerna ----------
 
+  // Föremålen är knappar (utan adress): de leder inte ut ur rummet. Enter
+  // och mellanslag klickar på dem (wire).
+  const KNAPP = 'role="button" tabindex="0"';
+
   // 5. Omgångens orakel: oraklet ur Olympen (Kronan.scene, fotona på
   // sockeln) under stationsuret, i en förgylld ram med mässingsskylten under
   // (båda i 3D, rum-inredning.js). Ett skimmer drar då och då över glaset.
   function frameHtml() {
-    return '<a class="rum-ram rum-sak" href="#olympen" data-nav="olympen" data-sak="ram" aria-label="Olympen">' +
+    return `<a class="rum-ram rum-sak" ${KNAPP} data-nav="olympen" data-sak="ram" aria-label="Omgångens orakel">` +
       '<span class="rum-ram-list"><span class="kr-scene kr-orakel" id="rum-ram-bild"></span><span class="rum-ram-glans"></span></span></a>';
   }
 
@@ -370,9 +376,9 @@ window.Rum = (() => {
   // 7. Anslagstavlan under tv:n (rum-anslag.js), fri från tv:ns hylla och disken.
   function rightWall() {
     return '<div class="rum-hv">' +
-      (window.RumAnslag ? onWall(1144, 1300, 316, 478, 'rum-ans', RumAnslag.wall(), 'href="statistik.html" data-nav="statistik" aria-label="Anslagstavlan" id="rum-ans"') : '') +
-      onWall(1330, 1478, 376, 434, 'rum-skar', '<span class="rum-skar-in" id="rum-skar"></span>', 'href="#olympen" data-nav="olympen" data-sak="skar" aria-label="Tipsligan"') +
-      onWall(1496, 1700, 330, 478, 'rum-kork', '<span class="rum-kork-in" id="rum-kork"></span>', 'href="#olympen/kuponger" data-nav="olympen" aria-label="Gängets kuponger"') +
+      (window.RumAnslag ? onWall(1144, 1300, 316, 478, 'rum-ans', RumAnslag.wall(), `${KNAPP} data-nav="statistik" aria-label="Anslagstavlan" id="rum-ans"`) : '') +
+      onWall(1330, 1478, 376, 434, 'rum-skar', '<span class="rum-skar-in" id="rum-skar"></span>', `${KNAPP} data-nav="olympen" data-sak="skar" aria-label="Tipsligan"`) +
+      onWall(1496, 1700, 330, 478, 'rum-kork', '<span class="rum-kork-in" id="rum-kork"></span>', `${KNAPP} data-nav="olympen" data-sak="kork" aria-label="Korktavlan"`) +
       '</div>';
   }
 
@@ -402,14 +408,14 @@ window.Rum = (() => {
       x += 17 * sc(x);
     });
     if (x < POKAL.x1 - 8) cups += `<ellipse cx="${r1(x)}" cy="${r1(at(x, POKAL.yb) - 1)}" rx="${r1(6 * sc(x))}" ry="${r1(1.6 * sc(x))}" fill="#000" opacity=".25"/>`;
-    // pokalerna ligger i länken, med ytan man klickar på, så att de lyser
+    // pokalerna ligger i knappen, med ytan man klickar på, så att de lyser
     // som de andra föremålen när man pekar på dem
-    const hit = (x0, x1, y0, y1, nav, href, label, inner) => `<a href="${href}" data-nav="${nav}" class="rum-sak" aria-label="${label}">${inner}` +
+    const hit = (x0, x1, y0, y1, inner) => `<a ${KNAPP} data-nav="olympen" data-sak="pokal" class="rum-sak rum-pokal" aria-label="Pokalhyllan">${inner}` +
       `<polygon points="${x0},${r1(at(x0, y1))} ${x1},${r1(at(x1, y1))} ${x1},${r1(at(x1, y0))} ${x0},${r1(at(x0, y0))}" fill="#fff" opacity="0"/></a>`;
     return shelf(POKAL.yb, POKAL.x0, POKAL.x1) +
       // damm på hyllkanterna
       `<polygon points="${POKAL.x0},${r1(at(POKAL.x0, POKAL.yb) - 0.6)} ${POKAL.x1},${r1(at(POKAL.x1, POKAL.yb) - 0.8)} ${POKAL.x1},${r1(at(POKAL.x1, POKAL.yb) + 0.6)} ${POKAL.x0},${r1(at(POKAL.x0, POKAL.yb) + 0.5)}" fill="#d9d2c0" opacity=".3"/>` +
-      hit(POKAL.x0, POKAL.x1, POKAL.yb - 36, POKAL.yb + 6, 'olympen', '#olympen', 'Olympen', cups);
+      hit(POKAL.x0, POKAL.x1, POKAL.yb - 36, POKAL.yb + 6, cups);
   }
 
   // ---------- lagren ----------
@@ -476,10 +482,10 @@ window.Rum = (() => {
   }
 
   function paper() {
-    return '<a id="rum-kvitto" class="rum-flat rum-sak" href="#kupong" data-nav="kupong" aria-label="Kupong"></a>' +
+    return `<a id="rum-kvitto" class="rum-flat rum-sak" ${KNAPP} data-nav="kupong" data-sak="kvitto" aria-label="Kvittot"></a>` +
       '<span id="rum-hogen"></span>' +
-      '<a id="rum-kupong" class="rum-flat rum-kup rum-sak" href="#kupong" data-nav="kupong" aria-label="Kupong"></a>' +
-      '<a class="rum-tag" href="#kupong" data-nav="kupong" id="rum-tag">Fyll i kupongen</a>';
+      `<a id="rum-kupong" class="rum-flat rum-kup rum-sak" ${KNAPP} data-nav="kupong" aria-label="Kupong"></a>` +
+      `<a class="rum-tag" ${KNAPP} data-nav="kupong" id="rum-tag">Fyll i kupongen</a>`;
   }
 
   // Röken som lagt sig under lysröret, och dammet som syns i ljuset.
@@ -885,6 +891,9 @@ ${window.RumRegister ? RumRegister.nara() : ''}
     const ute = syn(el.querySelector('#rum-ute'), DORR.x, WIN.y, WIN.x + WIN.w - DORR.x, DORR.y + DORR.h - WIN.y);
     R.gang = syn(el.querySelector('#rum-3d').parentElement, 160, 120, 860, 560);
     for (const x of [ute, R.gang, el.querySelector('#rum-damm')]) sikt(x);
+    // dörrens övre del, med Stängt-skylten och namnet: kameran går fram dit
+    // när man klickar på namnet (närbilderna, sak)
+    syn(el.querySelector('#rum-ute').parentElement, DORR.x, DORR.y, DORR.w, 200).id = 'rum-dorrglas';
   }
 
   // en osynlig ruta som sikt följer i stället för något större (först, så
@@ -1120,7 +1129,8 @@ ${window.RumRegister ? RumRegister.nara() : ''}
   // om kupongen på pulten, i den ordning de lämnade in (den senaste överst):
   // porträttet under ett gem, namnet i personens bläck (samma som på
   // papperet under Kupong) och stämpeln – men inga tecken. Din egen tas i
-  // handen därifrån (p.hand), de andras leder till Kupong. Kupongerna har
+  // handen därifrån (p.hand), och de andras när du ser deras tips – annars
+  // lyfts de lite och faller tillbaka (nudge). Kupongerna har
   // samma mått som kupongen på pulten, förminskade, så att den som tas i
   // handen landar exakt i högen.
 
@@ -1163,7 +1173,7 @@ ${window.RumRegister ? RumRegister.nara() : ''}
       const du = Boolean(p && p.vem === g.id);
       const ta = du || Boolean(p && p.se.includes(g.id));
       const label = du ? `Din kupong (${g.id}), inlämnad${p.andra ? ' – ändra' : ''}` : ta ? `${g.id}:s kupong, inlämnad` : `${g.id}:s kupong, inlämnad – syns när du har lämnat in`;
-      return `<a class="rum-flat rum-bak rum-sak" href="#kupong" data-nav="kupong" data-vem="${esc(g.id)}" data-i="${i}"${ta ? ' data-ta' : ''}` +
+      return `<a class="rum-flat rum-bak rum-sak" ${KNAPP} data-nav="kupong" data-vem="${esc(g.id)}" data-i="${i}"${ta ? ' data-ta' : ''}` +
         ` style="transform: ${restAt(slot(i))}" aria-label="${esc(label)}"${ta ? '' : ` title="${esc(label)}"`}>${backHtml(g.id, gang.findIndex((x) => x.id === g.id))}</a>`;
     }).join('');
     if (el.dataset.html !== html) {
@@ -1296,8 +1306,12 @@ ${window.RumRegister ? RumRegister.nara() : ''}
     // dagen efter: hur det gick i den senaste kupongen (rum-folk.js)
     if (window.RumFolk) RumFolk.fyll(R.old, seen);
     set('rum-kork', corkHtml((R.old || []).filter((c) => c.n && !(window.Historik && Historik.hidden(c)))));
-    const cups = seen.slice().sort((a, b) => String(a.from).localeCompare(String(b.from)))
-      .flatMap((r) => (r.people || []).filter((p) => p.award === 'best').map((p) => GANG[p.id] || '#d8b06a'));
+    const vinnare = seen.slice().sort((a, b) => String(a.from).localeCompare(String(b.from)))
+      .flatMap((r) => (r.people || []).filter((p) => p.award === 'best').map((p) => p.id));
+    const cups = vinnare.map((id) => GANG[id] || '#d8b06a');
+    // hur många var och en har, under pokalhyllan när kameran är framme
+    R.pokaler = {};
+    for (const id of vinnare) R.pokaler[id] = (R.pokaler[id] || 0) + 1;
     const hy = document.getElementById('rum-hyllor');
     const hs = shelves(cups);
     if (hy && R.hy !== hs) { hy.innerHTML = hs; R.hy = hs; }
@@ -2063,7 +2077,7 @@ ${window.RumRegister ? RumRegister.nara() : ''}
     const dy = r1(to[1] - 500 - z * (p[1] - 500));
     const borta = Boolean(dx || dy || z !== 1);
     const satt = () => {
-      w.classList.remove('glid', 'dyk');
+      w.classList.remove('glid');
       if (cls) w.classList.add(cls);
       w.style.transform = `translate(${dx}px, ${dy}px) scale(${z})${R.el.classList.contains('chromium') ? ' perspective(100000px)' : ''}`;
       R.aimT = performance.now();
@@ -2131,61 +2145,20 @@ ${window.RumRegister ? RumRegister.nara() : ''}
     else queueMicrotask(hemma);
   }
 
-  // Ett föremål: kameran går fram mot det en kort stund innan sidan byts.
-  // Kupongen tas i handen om den går att fylla i, och din i högen om den
-  // går att ändra eller visa.
+  // Ett föremål: tv:n, videon, anslagstavlan och kortregistret kommer fram,
+  // kupongen tas i handen om den går att fylla i (annars går kameran fram
+  // till den), din i högen om den går att ändra eller visa, och resten är
+  // närbilder (sak). Inget leder ut ur rummet.
   function go(a, e) {
-    if (a.dataset.sak) {
-      e.preventDefault();
-      sak(a.dataset.sak);
-      return;
-    }
-    const href = a.getAttribute('href');
-    if (!href) return;
-    if (a.dataset.nav === 'tv') {
-      e.preventDefault();
-      zoomTv(!R.zoom);
-      return;
-    }
-    if (a.dataset.nav === 'video') {
-      e.preventDefault();
-      zoomVideo(!R.vnara);
-      return;
-    }
-    if (a.id === 'rum-ans') {
-      e.preventDefault();
-      board(true);
-      return;
-    }
-    if (a.id === 'rum-reg') {
-      e.preventDefault();
-      register(true);
-      return;
-    }
-    if ((a.id === 'rum-kupong' || a.dataset.ta != null) && openCoupon(a.id === 'rum-kupong' ? null : a)) {
-      e.preventDefault();
-      return;
-    }
-    if (a.classList.contains('rum-bak') && a.dataset.ta == null && pult()) {
-      e.preventDefault();
-      nudge(a);
-      return;
-    }
-    if (calm()) return;
     e.preventDefault();
-    const p = centerOf(a);
-    const c = mid();
-    aim(p, 1.35, [p[0] + (c[0] - p[0]) * 0.4, p[1] + (c[1] - p[1]) * 0.4], 'dyk');
-    R.el.classList.add('dyker');
-    setTimeout(() => {
-      if (/^#/.test(href)) location.hash = href.slice(1);
-      else location.href = href;
-      // tillbaka i rummet (matchrutan ligger ovanpå det, och bakåt-knappen)
-      setTimeout(() => {
-        R.el.classList.remove('dyker');
-        aim([800, 500], 1, [800, 500]);
-      }, 60);
-    }, 420);
+    if (a.dataset.sak) sak(a.dataset.sak);
+    else if (a.dataset.nav === 'tv') zoomTv(!R.zoom);
+    else if (a.dataset.nav === 'video') zoomVideo(!R.vnara);
+    else if (a.id === 'rum-ans') board(true);
+    else if (a.id === 'rum-reg') register(true);
+    else if (a.id === 'rum-kupong') {
+      if (!openCoupon()) sak('kupong');
+    } else if (a.classList.contains('rum-bak') && !(a.dataset.ta != null && openCoupon(a))) nudge(a);
   }
 
   // En kupong i högen som du inte får vända på än (du ser inte hens tips):
@@ -2434,20 +2407,50 @@ ${window.RumRegister ? RumRegister.nara() : ''}
 
   // ---------- närbilderna ----------
   //
-  // Uret, skårtavlan, oraklet och VM 94-affischen (data-sak): kameran ställer
-  // sig rakt framför och går fram tills saken fyller det mesta av fönstret,
-  // och det som är ritat i 3D (rum-inredning.js) ritas om skarpare. Under
-  // skårtavlan och oraklet står guldordet dit de leder (dit leder också ett
-  // klick på dem), under affischen fotografen. Esc eller ett klick någon
-  // annanstans går tillbaka.
-  //   el saken, h hur mycket av höjden den får, duk duken i 3D, fot under den
+  // Uret, skårtavlan, oraklet, pokalhyllan, korktavlan, VM 94-affischen,
+  // dörren och kvittot (data-sak) – och kupongen på pulten när den inte går
+  // att ta i handen: kameran ställer sig rakt framför och går fram tills
+  // saken fyller det mesta av fönstret, och det som är ritat i 3D
+  // (rum-inredning.js) ritas om skarpare. Under pokalhyllan står hur många
+  // pokaler var och en har, under affischen fotografen och under dörren
+  // vilka vi är (Om oss). Ingen av dem leder ut ur rummet: Esc eller ett
+  // klick går tillbaka.
+  //   el saken, mal det kameran siktar på (annars saken), h hur mycket av
+  //   höjden den får, duk duken i 3D, fot under den, pult saken ligger på
+  //   pulten (inget tonar bort), tv tv:n står framför den (och tonar bort)
   const SAKER = {
     ur: { el: '.rum-ur', h: 0.78, duk: 'ur' },
     // (skårtavlan är låg: en halv höjd, ungefär lika nära som de andra)
-    skar: { el: '.rum-skar', h: 0.5, duk: 'hogra', fot: () => '<a class="rum-guld" href="#olympen">Olympen</a>' },
-    ram: { el: '.rum-ram', h: 0.94, duk: 'ram', fot: () => '<a class="rum-guld" href="#olympen">Olympen</a>' },
+    skar: { el: '.rum-skar', h: 0.5, duk: 'hogra' },
+    ram: { el: '.rum-ram', h: 0.94, duk: 'ram' },
+    pokal: { el: '.rum-pokal', h: 0.72, duk: 'hogra', fot: () => pokalFot(), tv: true },
+    kork: { el: '.rum-kork', h: 0.86, duk: 'hogra' },
     vm94: { el: '#rum-vm94', h: 0.74, fot: (a) => `<span class="foto">${esc(a.title).replace('Wikimedia Commons', (m) => (a.dataset.kalla ? `<a href="${esc(a.dataset.kalla)}" target="_blank" rel="noopener">${m}</a>` : m))}</span>` },
+    dorr: { el: '#rum-dorrnamn', mal: '#rum-dorrglas', h: 0.92, fot: () => OM_OSS },
+    kvitto: { el: '#rum-kvitto', h: 0.9, pult: true },
+    kupong: { el: '#rum-kupong', h: 0.94, pult: true },
   };
+  // Om oss, under dörren: samma ord som på sidan Om oss, i bladguld som namnet på glaset.
+  const OM_OSS = '<span class="om"><b>Vi tippar engelsk fotboll tillsammans.</b>' +
+    '<i>O det handlar om pengarna. Det har alltid handlat om pengarna.</i></span>';
+  // Pokalerna per person (fill), flest först, i var och ens färg.
+  function pokalFot() {
+    const n = R.pokaler || {};
+    const vem = Object.keys(GANG).filter((id) => n[id]).sort((x, y) => n[y] - n[x]);
+    return vem.length ? `<span class="pokaler">${vem.map((id) => `<span><b style="color:${GANG[id]}">${id}</b> ${n[id]}</span>`).join('')}</span>` : '';
+  }
+  // Pokalhyllan står till största delen bakom tv:n: medan kameran står vid
+  // den tonar tv:n bort, del för del – opacitet på lådan själv skulle platta
+  // till den i 3D medan den tonar.
+  function tvBort(bort, glid) {
+    if (!bort && !R.tvBort) return;
+    const delar = R.el.querySelectorAll('#rum-tvsken, .tv-fot > *, .rum-tv3 > *');
+    for (const a of R.tvBort || []) a.cancel();
+    R.tvBort = null;
+    const ms = glid && !calm() ? (bort ? 250 : 500) : 0;
+    const anims = [...delar].map((d) => d.animate(bort ? [{ opacity: 0 }] : [{ opacity: 0, offset: 0 }], { duration: ms, fill: bort ? 'forwards' : 'none' }));
+    if (bort) R.tvBort = anims;
+  }
   function sakFot() {
     let f = document.getElementById('rum-sakfot');
     if (!f) {
@@ -2471,14 +2474,16 @@ ${window.RumRegister ? RumRegister.nara() : ''}
     R.sak = namn || null;
     if (!namn) {
       R.el.classList.remove('sak-nara');
+      tvBort(false, cls);
       vridHem();
       aim([800, 500], 1, [800, 500], cls);
       return;
     }
     const S = SAKER[namn];
     const a = S && R.el.querySelector(S.el);
+    const mal = S && S.mal ? R.el.querySelector(S.mal) : a;
     // (uret finns först när inredningen är ritad, och då frågar three() igen)
-    if (!a) return;
+    if (!a || !mal) return;
     if (R.zoom) zoomTv(false);
     if (R.vnara) zoomVideo(false);
     board(false);
@@ -2487,7 +2492,7 @@ ${window.RumRegister ? RumRegister.nara() : ''}
     const cam = w.style.cssText;
     aim([800, 500], 1, [800, 500]);
     setCam(0, 0);
-    const r = a.getBoundingClientRect();
+    const r = mal.getBoundingClientRect();
     const p = centerOf(r);
     setCam(R.mx, R.my);
     w.style.cssText = cam;
@@ -2497,34 +2502,25 @@ ${window.RumRegister ? RumRegister.nara() : ''}
     R.el.classList.add('sak-nara');
     R.tx = R.ty = R.mx = R.my = 0;
     setCam(0, 0);
-    // gänget och pulten går kameran förbi (de tonar bort)
+    // gänget och pulten går kameran förbi (de tonar bort) – inte när saken
+    // ligger på pulten
     for (const pl of R.el.querySelectorAll('.rum-world > .rum-pl:not(.rum-pl3d)')) {
-      const m = /translateZ\((-?[\d.]+)px\)/.exec(pl.style.transform);
-      pl.classList.toggle('forbi', Boolean(m) && Number(m[1]) > -560);
+      const z = /translateZ\((-?[\d.]+)px\)/.exec(pl.style.transform);
+      pl.classList.toggle('forbi', !S.pult && Boolean(z) && Number(z[1]) > -560);
     }
-    // så stor som ryms mellan namnet och foten, med guldordet under
+    tvBort(Boolean(S.tv), cls);
+    // så stor som ryms mellan namnet och foten, med det som står under
+    const html = S.fot ? S.fot(a) : '';
     const top = 64;
-    const h = innerHeight - top - (S.fot ? 112 : 64);
-    const z = Math.min((innerWidth * 0.9) / r.width, (h * S.h) / r.height);
+    const h = innerHeight - top - (html ? 112 : 64);
+    const zoom = Math.min((innerWidth * 0.9) / r.width, (h * S.h) / r.height);
     const cy = top + h / 2;
-    fot.innerHTML = S.fot ? S.fot(a) : '';
-    fot.style.top = `${r1(cy + (r.height * z) / 2 + 14)}px`;
-    if (S.fot) fot.classList.add('on');
-    aim(p, z, [(innerWidth / 2 - R.ox) / R.k, (cy - R.oy) / R.k], cls);
+    fot.innerHTML = html;
+    fot.style.top = `${r1(cy + (r.height * zoom) / 2 + 14)}px`;
+    if (html) fot.classList.add('on');
+    aim(p, zoom, [(innerWidth / 2 - R.ox) / R.k, (cy - R.oy) / R.k], cls);
     // duken i 3D ritas skarpare när kameran är framme
-    if (S.duk) R.skarp = setTimeout(() => { if (R.sak === namn && R.inr) R.inr.skarp(S.duk, z * R.k * 1.035 * (devicePixelRatio || 1)); }, cls ? 620 : 0);
-  }
-  // Vidare från närbilden: rummet tonar bort och sidan byts.
-  function sakVidare(href) {
-    R.el.classList.add('dyker');
-    setTimeout(() => {
-      if (/^#/.test(href)) location.hash = href.slice(1);
-      else location.href = href;
-      setTimeout(() => {
-        R.el.classList.remove('dyker');
-        sak(null, null);
-      }, 60);
-    }, calm() ? 0 : 420);
+    if (S.duk) R.skarp = setTimeout(() => { if (R.sak === namn && R.inr) R.inr.skarp(S.duk, zoom * R.k * 1.035 * (devicePixelRatio || 1)); }, cls ? 620 : 0);
   }
 
   // ---------- kupongen i handen ----------
@@ -3464,7 +3460,7 @@ ${window.RumRegister ? RumRegister.nara() : ''}
     const el = R.el;
     swipe(el);
     el.addEventListener('mouseover', (e) => {
-      const a = !R.kup && e.target.closest('.rum-sak, .rum-tag, .rum-guld');
+      const a = !R.kup && e.target.closest('.rum-sak, .rum-tag');
       hot(a ? a.dataset.nav : null);
     });
     el.addEventListener('click', (e) => {
@@ -3490,19 +3486,18 @@ ${window.RumRegister ? RumRegister.nara() : ''}
         }
         return;
       }
-      // nära en sak: guldordet, skårtavlan och oraklet leder vidare, och
-      // allt annat går tillbaka (utom namnet, foten och fotografens länk)
+      // nära en sak: ett klick går tillbaka (utom på namnet, foten och
+      // fotografens länk)
       if (R.sak) {
         if (e.target.closest('.rum-hdr, .rum-ft, .rum-sakfot .foto a')) return;
         e.preventDefault();
-        const l = e.target.closest('.rum-sakfot a, .rum-sak');
-        const href = l && (l.closest('.rum-sakfot') || l.dataset.sak === R.sak) ? l.getAttribute('href') : null;
-        if (href) sakVidare(href);
-        else sak(null);
+        sak(null);
         return;
       }
-      if (e.target.closest('.rum-tag') && openCoupon()) {
+      // guldordet: kupongen i handen, annars går kameran fram till den
+      if (e.target.closest('.rum-tag')) {
         e.preventDefault();
+        if (!openCoupon()) sak('kupong');
         return;
       }
       const a = e.target.closest('.rum-sak');
@@ -3511,7 +3506,14 @@ ${window.RumRegister ? RumRegister.nara() : ''}
     });
     document.addEventListener('keydown', (e) => {
       if (!R.on || e.metaKey || e.ctrlKey || e.altKey || /input|textarea|select/i.test(e.target.tagName) || document.querySelector('dialog[open]')) return;
+      // föremålen är knappar utan adress (KNAPP): Enter och mellanslag klickar
+      if ((e.key === 'Enter' || e.key === ' ') && e.target instanceof Element && e.target.matches('[role="button"]:not(button)') && R.el.contains(e.target)) {
+        e.preventDefault();
+        e.target.dispatchEvent(new MouseEvent('click', { bubbles: true, cancelable: true }));
+        return;
+      }
       const k = e.key.toLowerCase();
+      const fore = R.sak;
       // nära en sak: Esc går tillbaka, och K, T, A, R och V går dit direkt
       if (R.sak && !R.kup) {
         if (k === 'escape') {
@@ -3529,7 +3531,8 @@ ${window.RumRegister ? RumRegister.nara() : ''}
         if (R.reg.key(e.key)) e.preventDefault();
         else if (k === 'r' || k === 'escape') register(false);
       } else if (k === 'k') {
-        if (!openCoupon()) location.hash = 'kupong';
+        // (K igen nära kupongen på pulten går tillbaka)
+        if (!openCoupon() && fore !== 'kupong') sak('kupong');
       } else if (R.zoom && R.tv && R.tv.key(e.key)) e.preventDefault();
       else if (R.vnara && R.video.key(e.key)) e.preventDefault();
       else if (k === 't') zoomTv(!R.zoom);

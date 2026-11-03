@@ -31,7 +31,6 @@ html.rum-vantar body > footer { visibility: hidden; animation: rum-vantar 0s 5s 
   font-family: Fraunces, Georgia, serif;
   transition: opacity 0.42s ease-in;
 }
-.rum.dyker .rum-stage { opacity: 0; }
 /* medan fingret drar i Chrome (pan i rum.js) */
 .rum.chromium .rum-stage.drar { transition: opacity 0.42s ease-in, transform 0.05s linear; }
 
@@ -50,7 +49,6 @@ html.rum-vantar body > footer { visibility: hidden; animation: rum-vantar 0s 5s 
   pointer-events: none;
 }
 .rum-kamera.glid { transition: transform 0.6s cubic-bezier(0.3, 0, 0.2, 1); }
-.rum-kamera.dyk { transition: transform 0.42s cubic-bezier(0.55, 0, 0.85, 0.35); }
 /* Chromium ritar annars hela rummet i närbildens skärpa så fort kameran
    börjar glida (förstoringen i övergången gäller allt under kameran), också
    det som strax hamnar utanför bilden: lagren tog flera gånger så mycket
@@ -125,18 +123,6 @@ a.rum-sak, a.rum-sak:hover { color: inherit; text-decoration: none; }
    inte hela rummets stil räknas om) */
 .rum-neon.av { opacity: 0.32; }
 .rum-neonhalo.av, .rum-neonglow.av { opacity: 0.04; }
-
-/* guldordet: en länk i guld */
-.rum-guld {
-  font-family: Fraunces, Georgia, serif;
-  font-size: 22px;
-  font-weight: 600;
-  color: #f0d699;
-  text-decoration: underline;
-  text-underline-offset: 5px;
-  text-decoration-thickness: 1.5px;
-}
-.rum-guld:hover { color: #fff1c8; }
 
 /* ---------- Omgångens orakel ---------- */
 
@@ -336,7 +322,7 @@ a.rum-sak, a.rum-sak:hover { color: inherit; text-decoration: none; }
 /* nära en sak lyser ingenting när man pekar på det */
 .rum.sak-nara .rum-sak:hover, .rum.sak-nara .rum-sak:focus-visible { filter: none; }
 .rum.sak-nara #rum-vm94 { filter: drop-shadow(0 3px 4px rgba(0, 0, 0, 0.5)); }
-/* under saken: guldordet dit den leder, eller fotografen */
+/* under saken: pokalerna per person, fotografen eller vilka vi är */
 .rum-sakfot {
   position: absolute;
   left: 50%;
@@ -349,7 +335,12 @@ a.rum-sak, a.rum-sak:hover { color: inherit; text-decoration: none; }
   transition: opacity 0.2s;
 }
 .rum-sakfot.on { opacity: 1; pointer-events: auto; transition: opacity 0.4s 0.4s; }
-.rum-sakfot .rum-guld { text-shadow: 0 1px 10px #000; }
+.rum-sakfot .pokaler { display: inline-flex; gap: 26px; font: 600 21px/1.4 Fraunces, Georgia, serif; color: #e9dfc8; text-shadow: 0 1px 8px #000; }
+.rum-sakfot .pokaler b { font-weight: 700; letter-spacing: 0.04em; }
+/* Om oss under dörren, i bladguld som namnet på glaset */
+.rum-sakfot .om { display: inline-flex; flex-direction: column; align-items: center; gap: 6px; padding: 16px 40px; background: radial-gradient(closest-side, rgba(16, 11, 6, 0.62), rgba(16, 11, 6, 0)); font-family: Fraunces, Georgia, serif; text-wrap: balance; text-shadow: 0 1px 10px #000, 0 0 2px rgba(0, 0, 0, 0.6); }
+.rum-sakfot .om b { font-size: 21px; font-weight: 600; line-height: 1.2; color: #f3e6c4; }
+.rum-sakfot .om i { font-size: 17px; font-weight: 500; line-height: 1.3; color: #ecc97c; }
 .rum-sakfot .foto { font: italic 400 14px/1.5 Fraunces, Georgia, serif; color: #e9dfc8; opacity: 0.85; text-shadow: 0 1px 8px #000; }
 .rum-sakfot .foto a { color: #a9c8fb; text-decoration: underline; text-underline-offset: 3px; text-decoration-thickness: 1px; }
 @media (prefers-reduced-motion: reduce) { .rum-sakfot, .rum-sakfot.on, .rum.sak-nara .rum-world, .rum-pl.forbi, .rum-pl.glid, .rum-pl3d > .rum-inr { transition: none; } }
@@ -834,7 +825,7 @@ a.rum-sak, a.rum-sak:hover { color: inherit; text-decoration: none; }
 @media (prefers-reduced-motion: reduce) {
   .rum-regn-b, .rum-droppe, .rum-rok i, .rum-ram-glans::after,
   .rum-ram .kr-scene *, .rum-ram .kr-scene *::before, .rum-ram .kr-scene *::after { animation: none; }
-  .rum-stage, .rum-kamera.glid, .rum-kamera.dyk { transition: none; }
+  .rum-stage, .rum-kamera.glid { transition: none; }
   /* stationsuret visar tiden men sekundvisaren hoppar inte */
   #rum-ur-s { display: none; }
 }

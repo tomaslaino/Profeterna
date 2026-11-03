@@ -376,7 +376,7 @@ window.RumVideo = (() => {
       `<span class="vhs-vfd" style="${at(VFD)}">12:00</span>${knappar}</div></div>` +
       // lådan bredvid
       `<div class="vhs-lada" style="transform:translateZ(${px(LADA.z)})">${ladaYtor()}${ladaRitning()}<div class="vhs-styr" inert>${kas(0, CAP)}</div></div>` +
-      `<a class="vhs-hit rum-sak" href="#matcher" data-nav="video" aria-label="Videon">${hitYtor()}</a></div></div>` +
+      `<a class="vhs-hit rum-sak" role="button" tabindex="0" data-nav="video" aria-label="Videon">${hitYtor()}</a></div></div>` +
       '</div></div>';
   }
 

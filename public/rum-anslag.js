@@ -391,7 +391,6 @@ window.RumAnslag = (() => {
   function nara() {
     return '<div class="rum-ansn" id="rum-ansn" role="dialog" aria-label="Anslagstavlan"><div class="ans-bak"></div>' +
       '<div class="ans-flyg" id="ans-flyg"><div class="ans-luta" id="ans-luta"><div class="ans-tavla stor" id="ans-stor" tabindex="-1"></div></div></div>' +
-      '<div class="ans-fot" id="ans-fot"><a class="rum-guld" href="statistik.html" data-nav="statistik">Statistik</a></div>' +
       '<div class="ans-lyft" id="ans-lyft"></div>' +
       '<div class="ans-rad" id="ans-rad"><span id="ans-sp"></span><button type="button" class="ans-tbx" data-ans="tillbaka">Häng tillbaka</button></div></div>';
   }
@@ -429,7 +428,6 @@ window.RumAnslag = (() => {
     const flyg = root.querySelector('#ans-flyg');
     const luta = root.querySelector('#ans-luta');
     const stor = root.querySelector('#ans-stor');
-    const fot = root.querySelector('#ans-fot');
     const lyftEl = root.querySelector('#ans-lyft');
     const rad = root.querySelector('#ans-rad');
     const sp = root.querySelector('#ans-sp');
@@ -626,7 +624,6 @@ window.RumAnslag = (() => {
       const L = (innerWidth - BW * k) / 2;
       const T = (innerHeight - BH * k) / 2 - 16;
       A.place = { k, L, T, q: [[L, T], [L + BW * k, T], [L + BW * k, T + BH * k], [L, T + BH * k]] };
-      Object.assign(fot.style, { left: `${r1(L)}px`, width: `${r1(BW * k)}px`, top: `${r1(T + BH * k + 12)}px` });
       return A.place;
     }
     const rest = () => { flyg.style.transform = `translate(${r1(A.place.L)}px, ${r1(A.place.T)}px) scale(${A.place.k.toFixed(4)})`; };

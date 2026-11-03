@@ -41,11 +41,11 @@ window.RumFolk = (() => {
   const GANG = ['dl', 'dt', 'dj'];
   // Sakerna man kan peka på, med samma namn som det man har framme (fokus i
   // rum.js: kupong, tv, video, anslag, register och närbilderna ur, skar,
-  // ram, vm94).
+  // ram, pokal, kork, vm94, dorr, kvitto och kupong).
   const SAKER = {
     tv: '#rum-tv', video: '.vhs-hit', anslag: '#rum-ans', register: '#rum-reg', kupong: '#rum-kupong', tag: '#rum-tag',
     kvitto: '#rum-kvitto', hogen: '.rum-bak', ur: '.rum-ur', skar: '.rum-skar', ram: '.rum-ram',
-    pokal: '.rum-sak[aria-label="Olympen"]:not(.rum-ram)', kork: '.rum-kork', vm94: '#rum-vm94', dorr: '#rum-dorrnamn',
+    pokal: '.rum-pokal', kork: '.rum-kork', vm94: '#rum-vm94', dorr: '#rum-dorrnamn',
   };
   const F = {
     el: null, o: null, on: false, ws: null, timer: 0, ping: 0, retry: 0, loop: 0,

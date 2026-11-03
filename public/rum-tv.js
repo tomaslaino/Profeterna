@@ -407,7 +407,7 @@ window.RumTv = (() => {
       '<i class="tv-galler"></i>' +
       '<button type="button" class="tv-pa" data-tv="pa" aria-label="Stäng av tv:n" aria-pressed="true"></button><i class="tv-lampa"></i></div>' +
       '<i class="tv-namn">Panasonic</i><i class="tv-fast">FASTEXT</i></div>' +
-      '<a class="rum-tv rum-sak" href="#matcher" data-nav="tv" aria-label="Text-tv" id="rum-tv"></a>' +
+      '<a class="rum-tv rum-sak" role="button" tabindex="0" data-nav="tv" aria-label="Text-tv" id="rum-tv"></a>' +
       '</div></div>';
   }
 

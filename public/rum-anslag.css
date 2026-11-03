@@ -342,9 +342,6 @@
 .rum-ansn.framme .ans-tavla.stor .ans-lapp:hover > .ans-ark, .ans-tavla.stor .ans-lapp:focus-visible > .ans-ark { box-shadow: 2px 12px 14px rgba(0, 0, 0, 0.4), 0 0 1px rgba(0, 0, 0, 0.35); }
 .ans-tavla.stor .ans-lapp:focus-visible { outline: 2px solid #f0d699; outline-offset: 3px; }
 .ans-lapp.borta { visibility: hidden; }
-.ans-fot { position: absolute; display: flex; justify-content: flex-end; opacity: 0; transition: opacity 0.3s ease; }
-.rum-ansn.framme .ans-fot { opacity: 1; }
-.rum-ansn.lyft .ans-fot { opacity: 0; pointer-events: none; }
 
 /* en lapp i handen, mitt i fönstret */
 .ans-lyft { position: absolute; inset: 0; pointer-events: none; }
@@ -362,5 +359,5 @@
 .ans-tbx:hover { color: #d2e3ff; }
 
 @media (prefers-reduced-motion: reduce) {
-  .ans-bak, .ans-luta, .ans-vand, .ans-fot, .ans-rad, .ans-lyft::before, .ans-tavla.stor .ans-lapp { transition: none; }
+  .ans-bak, .ans-luta, .ans-vand, .ans-rad, .ans-lyft::before, .ans-tavla.stor .ans-lapp { transition: none; }
 }
