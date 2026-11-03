@@ -542,9 +542,10 @@ Utan nyckel ingen knapp.
   kortregistret är borta. Se [Tobaksaffären](#tobaksaffären) och [Närbilderna](#närbilderna).
 - **Fler affischer på glaset (2026-11-03, användarens önskemål):** bredvid VM 94-affischen
   sitter en affisch från IFK Göteborgs seger i UEFA-cupen 1982, och varje vecka en löpsedel
-  med det mest dramatiska ur förra omgången eller inför nästa. IFK-affischen är ritad: ett
-  fritt foto från finalerna (helst med Glenn Strömberg) gick inte att hitta, och Wikimedia
-  Commons gick inte att nå när den gjordes. Se [Tobaksaffären](#tobaksaffären), *Affischerna*.
+  med det mest dramatiska ur förra omgången eller inför nästa. IFK-affischen var först ritad
+  (pokalen i SVG); samma dag fick den Tomas foto från segern i Hamburg och blev en vikt,
+  sliten plansch lika stor som VM 94-affischen. Se [Tobaksaffären](#tobaksaffären),
+  *Affischerna*.
 - **Kuponghistoriken flyttar till Olympen (2026-10-20, användarens önskemål):** Kupong
   handlar bara om nästa kupong – växlaren Omgången | Historik försvinner. De färdigspelade
   kupongerna står sist i Olympen under rubriken *Grupparbetena* (`#olympen/kuponger`, en
@@ -2170,12 +2171,16 @@ skyltfönstret, under neonskyltens list, och byter sida med dagen:
   [Wikimedia Commons](https://commons.wikimedia.org/wiki/File:Football_players_Pontus_K%C3%A5mark_Henrik_Larsson,_July_18,_1994.jpg)),
   beskuret i `public/rum/vm94.jpg` och med fotografen i affischens title och under den i
   närbilden (se [Närbilderna](#närbilderna)), med *VM 94* och *BRONS* i det gula bandet.
-- **IFK Göteborg 1982** (DJ:s lag): *UEFA-CUPEN 1982* i ett blått band, pokalen på sin gula
-  marmorsockel mot blått strålkastarljus (ritad i SVG, ingen bild), skölden (samma som på
-  DJ:s mössa) och finalerna mot Hamburger SV – 1–0 på Ullevi den 5 maj (Tord Holmgren) och
-  3–0 på Volksparkstadion den 19 maj (Dan Corneliusson, Torbjörn Nilsson, Stig Fredriksson
-  på straff). Trycket är äldre än VM 94 och har gulnat mer (en ton ovanpå bandet och
-  bilden; ett CSS-filter ritades suddigt i närbilden).
+- **IFK Göteborg 1982** (DJ:s lag): en plansch från veckan efter segern, lika stor som VM
+  94-affischen – *UEFA-CUPEN 82* och *GULD* i ett blått band, fotot från Volksparkstadion med
+  laget och pokalen i luften under skylten STADION HAMBURG (`public/rum/ifk82.jpg`, beskuret
+  ur ett foto som Tomas skickade; fotografen och licensen är okända, så ingen rad står under
+  närbilden) och *IFK GÖTEBORG* och *HSV – IFK 0–3* under. Titeln har båda finalerna: 1–0 på
+  Ullevi den 5 maj (Tord Holmgren) och 3–0 i Hamburg den 19 maj (Dan Corneliusson, Torbjörn
+  Nilsson, Stig Fredriksson på straff). Planschen är äldre än VM 94 och slitnare: fotot har
+  gulnat mer, bandet har en gul ton ovanpå (ett CSS-filter på text ritas suddigt i
+  närbilden), den har legat vikt i fyra delar (vecken, `.veck`) och har en reva i
+  underkanten.
 
 Uppe till höger i fönstret syns himlen (rum-ute.js), så där hänger inget.
 

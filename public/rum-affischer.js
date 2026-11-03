@@ -3,8 +3,9 @@
 //
 //   VM 94-affischen   ett foto från landslagets hemkomst den 18 juli 1994
 //                     (Sniper Zeta, CC BY-SA 4.0, Wikimedia Commons)
-//   IFK Göteborg 1982 UEFA-cupen: pokalen på sin gula marmorsockel och de två
-//                     finalerna mot Hamburger SV (en tryckt affisch, inget foto)
+//   IFK Göteborg 1982 en plansch från segern i UEFA-cupen: laget med pokalen på
+//                     Volksparkstadion i Hamburg den 19 maj 1982 (fotot fick vi
+//                     av Tomas; fotografen är okänd), vikt och sliten
 //   löpsedeln         veckans rubrik ur förra omgången eller nästa, se nedan
 //
 // De två första sitter alltid i vänstra rutan av skyltfönstret, under
@@ -71,43 +72,15 @@ function vm94() {
 
 // ---------- IFK Göteborg 1982 ----------
 //
-// Finalerna i UEFA-cupen 1982: IFK–Hamburger SV 1–0 på Ullevi den 5 maj (Tord
-// Holmgren) och HSV–IFK 0–3 på Volksparkstadion den 19 maj (Dan Corneliusson,
-// Torbjörn Nilsson, Stig Fredriksson på straff), 4–0 sammanlagt. Bilden är
-// pokalen, ritad: den gula marmorsockeln, skålen med två stora hänklar och
-// en fris runt mitten, mot blått strålkastarljus. Skölden är ESPN:s
-// (rum/skold-ifk.png, som på DJ:s mössa i rum-3d.js).
+// En plansch som såldes veckan efter finalen, lika stor som VM 94-affischen:
+// UEFA-CUPEN 82 och GULD i ett blått band, fotot från Volksparkstadion med
+// pokalen i luften (rum/ifk82.jpg) och laget och resultatet under. Finalerna:
+// IFK–Hamburger SV 1–0 på Ullevi den 5 maj (Tord Holmgren) och HSV–IFK 0–3 i
+// Hamburg den 19 maj (Dan Corneliusson, Torbjörn Nilsson, Stig Fredriksson på
+// straff). Den har legat vikt i fyra delar (vecken) och har en reva i
+// underkanten.
 
-const IFK = 'IFK Göteborg vann UEFA-cupen 1982: 1–0 mot Hamburger SV på Ullevi den 5 maj och 3–0 i Hamburg den 19 maj.';
-
-const POKAL = `<svg viewBox="0 0 110 84" aria-hidden="true">
-  <defs>
-    <radialGradient id="aff-ifk-lj" cx=".5" cy=".38" r=".78"><stop offset="0" stop-color="#6f9ede"/><stop offset=".3" stop-color="#2a5fae"/><stop offset=".7" stop-color="#143c7c"/><stop offset="1" stop-color="#091d42"/></radialGradient>
-    <linearGradient id="aff-ifk-silver" x1="0" y1="0" x2="1" y2="0"><stop offset="0" stop-color="#565b61"/><stop offset=".16" stop-color="#cfd5da"/><stop offset=".3" stop-color="#868d94"/><stop offset=".46" stop-color="#f7f9fa"/><stop offset=".62" stop-color="#a4abb2"/><stop offset=".82" stop-color="#dde2e6"/><stop offset="1" stop-color="#43484e"/></linearGradient>
-    <linearGradient id="aff-ifk-hank" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#f3f5f7"/><stop offset=".55" stop-color="#8f969d"/><stop offset="1" stop-color="#d0d5da"/></linearGradient>
-    <linearGradient id="aff-ifk-marmor" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#ecca5e"/><stop offset=".45" stop-color="#c8982a"/><stop offset=".7" stop-color="#e0b84a"/><stop offset="1" stop-color="#946b14"/></linearGradient>
-  </defs>
-  <rect width="110" height="84" fill="url(#aff-ifk-lj)"/>
-  <g fill="#fff" opacity=".06"><rect x="1" width="9" height="84"/><rect x="19" width="9" height="84"/><rect x="37" width="9" height="84"/><rect x="55" width="9" height="84"/><rect x="73" width="9" height="84"/><rect x="91" width="9" height="84"/></g>
-  <ellipse cx="55" cy="80.5" rx="27" ry="3.4" fill="#000" opacity=".4"/>
-  <path d="M38.5 65 h33 l3.2 14.5 h-39.4 z" fill="url(#aff-ifk-marmor)"/>
-  <path d="M40 70 q6 2 10 -1 t12 3 t9 -1 M42 76 q8 -3 14 1 t12 -1" fill="none" stroke="#8a6410" stroke-width=".45" opacity=".55"/>
-  <path d="M38.5 65 h33 l.5 2.2 h-34 z" fill="#f8e7a8" opacity=".6"/>
-  <path d="M43.5 65 q11.5 -5.5 23 0 z" fill="url(#aff-ifk-silver)"/>
-  <path d="M46.5 62 q2.5 -3.6 6 -4.4 v-5.6 h5 v5.6 q3.5 .8 6 4.4 q-8.5 -2.2 -17 0 z" fill="url(#aff-ifk-silver)"/>
-  <rect x="49.5" y="50.4" width="11" height="2.4" rx="1.2" fill="url(#aff-ifk-silver)"/>
-  <path d="M41 14 C 22 9, 19 37, 48.5 47.5 M69 14 C 88 9, 91 37, 61.5 47.5" fill="none" stroke="#2c3238" stroke-width="3.6" stroke-linecap="round" opacity=".35" transform="translate(.8 1)"/>
-  <path d="M41 14 C 22 9, 19 37, 48.5 47.5 M69 14 C 88 9, 91 37, 61.5 47.5" fill="none" stroke="url(#aff-ifk-hank)" stroke-width="3.2" stroke-linecap="round"/>
-  <path d="M38 10 Q37.5 38 50 50.5 h10 Q72.5 38 72 10 z" fill="url(#aff-ifk-silver)"/>
-  <path d="M39 24 Q55 28.5 71 24 M39.6 31.5 Q55 36 70.4 31.5" fill="none" stroke="#4e545a" stroke-width=".6" opacity=".7"/>
-  <path d="M41 25.6 v5.6 M44.5 26.5 v5.8 M48 27.1 v5.9 M51.5 27.4 v6 M55 27.5 v6 M58.5 27.4 v6 M62 27.1 v5.9 M65.5 26.5 v5.8 M69 25.6 v5.6" stroke="#5f666d" stroke-width=".8" opacity=".45"/>
-  <path d="M43.6 12 Q44 34 51 46" fill="none" stroke="#fff" stroke-width="1.5" opacity=".7" stroke-linecap="round"/>
-  <path d="M66.5 13 Q66.4 30 62 40" fill="none" stroke="#fff" stroke-width=".7" opacity=".4" stroke-linecap="round"/>
-  <ellipse cx="55" cy="10" rx="17.4" ry="3" fill="#c6ccd2"/>
-  <ellipse cx="55" cy="10" rx="15.8" ry="2" fill="#3f454b"/>
-  <ellipse cx="55" cy="9.7" rx="17.4" ry="3" fill="none" stroke="#f4f6f8" stroke-width=".7"/>
-  <circle cx="44.5" cy="10.6" r="1.1" fill="#fff" opacity=".95"/>
-</svg>`;
+const IFK = 'IFK Göteborg med UEFA-cupen på Volksparkstadion i Hamburg den 19 maj 1982: 3–0 mot Hamburger SV (Corneliusson, T. Nilsson, Fredriksson på straff) efter 1–0 på Ullevi (Tord Holmgren).';
 
 function ifk() {
   const el = document.createElement('button');
@@ -116,14 +89,11 @@ function ifk() {
   el.id = 'rum-ifk';
   el.dataset.sak = 'ifk';
   el.title = IFK;
-  el.setAttribute('aria-label', `Affisch: UEFA-cupen 1982. ${IFK}`);
-  el.innerHTML = '<span class="ark"><span class="band"><b>UEFA-CUPEN</b><b>1982</b></span>' +
-    `<span class="bild">${POKAL}</span>` +
-    '<span class="text"><span class="lag"><img src="rum/skold-ifk.png" alt="" draggable="false"><b>IFK GÖTEBORG</b></span>' +
-    '<span class="res">HSV – IFK 0–3</span>' +
-    '<span class="rad">Volksparkstadion, Hamburg 19 maj 1982<br>Corneliusson, T. Nilsson, Fredriksson (str.)</span>' +
-    '<span class="rad">Ullevi 5 maj: IFK – HSV 1–0 (Tord Holmgren)</span></span>' +
-    '<span class="tryck"></span></span>' +
+  el.setAttribute('aria-label', `Affisch: UEFA-cupen 82, guld. ${IFK}`);
+  el.innerHTML = '<span class="ark"><span class="band"><b>UEFA-CUPEN 82</b><b class="guld">GULD</b></span>' +
+    '<span class="foto"><img src="rum/ifk82.jpg" alt="" draggable="false"></span>' +
+    '<span class="rad"><b>IFK GÖTEBORG</b><b>HSV – IFK 0–3</b></span>' +
+    '<span class="veck"></span><span class="tryck"></span></span>' +
     '<span class="hund"></span><i class="tejp a"></i><i class="tejp b"></i>';
   return el;
 }

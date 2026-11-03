@@ -86,34 +86,62 @@
   filter: sepia(var(--sep, 0.2)) saturate(var(--sat, 0.9)) contrast(0.92) brightness(0.96);
 }
 
-/* ---------- IFK Göteborg 1982: blått band, pokalen och finalerna ---------- */
+/* ---------- IFK Göteborg 1982: planschen från Hamburg, vikt och sliten ---------- */
 
-.rum-ifk { width: 116px; }
-.rum-ifk .ark { padding: 5px 5px 5px; background: #ebe3cc; }
-/* trycket är tolv år äldre än VM 94 och har gulnat mer: en ton ovanpå
-   bandet och bilden (ett filter ritas suddigt i närbilden, rum.js) */
-.rum-ifk .band, .rum-ifk .bild { position: relative; }
-.rum-ifk .band::after, .rum-ifk .bild::after { content: ""; position: absolute; inset: 0; background: #b08850; mix-blend-mode: color; opacity: calc(var(--sep, 0.2) + 0.18); pointer-events: none; }
+.rum-ifk { width: 120px; }
+/* en reva i underkanten, till vänster (och hörnet som släpper till höger) */
+.rum-ifk .ark {
+  padding: 5px 5px 4px;
+  background: #e8ddc1;
+  clip-path: polygon(0 0, 100% 0, 100% calc(100% - var(--curl)), calc(100% - var(--curl)) 100%, 19px 100%, 16.5px calc(100% - 3.5px), 14px 100%, 0 100%);
+}
 .rum-ifk .band {
+  position: relative;
   display: flex;
   justify-content: space-between;
   align-items: center;
-  height: 15px;
+  height: 14px;
   margin-bottom: 3px;
   padding: 0 5px;
   background: #1a4f9c;
-  box-shadow: inset 0 -1.5px 0 #d9b14e;
-  font: 400 10.5px/15px Anton, Impact, sans-serif;
+  font: 400 10px/14px Anton, Impact, sans-serif;
   letter-spacing: 1px;
-  color: #f6f1e4;
+  color: #f4efe2;
 }
-.rum-ifk .bild { display: block; }
-.rum-ifk .bild svg { display: block; width: 100%; height: auto; }
-.rum-ifk .text { display: block; padding: 3px 1px 0; color: #24467e; text-align: center; }
-.rum-ifk .lag { display: flex; align-items: center; justify-content: center; gap: 3px; font: 400 12.5px/1 Anton, Impact, sans-serif; letter-spacing: 0.8px; }
-.rum-ifk .lag img { width: 11px; height: 13px; object-fit: contain; }
-.rum-ifk .res { display: block; margin-top: 2px; font: 400 8px/1 Anton, Impact, sans-serif; letter-spacing: 0.6px; color: #1d1a14; }
-.rum-ifk .rad { display: block; margin-top: 1.6px; font: 600 3.9px/1.3 "Helvetica Neue", Arial, sans-serif; letter-spacing: 0.1px; color: #3b362c; }
+.rum-ifk .band .guld { color: #f0c22c; }
+/* trycket är äldre än VM 94 och har gulnat mer (en ton ovanpå bandet; ett
+   filter på text ritas suddigt i närbilden, rum.js) */
+.rum-ifk .band::after { content: ""; position: absolute; inset: 0; background: #b08850; mix-blend-mode: color; opacity: calc(var(--sep, 0.2) + 0.15); pointer-events: none; }
+.rum-ifk .foto { position: relative; display: block; overflow: hidden; }
+.rum-ifk img {
+  display: block;
+  width: 100%;
+  height: auto;
+  filter: sepia(calc(var(--sep, 0.2) + 0.05)) saturate(var(--sat, 0.9)) contrast(0.93) brightness(0.97);
+}
+.rum-ifk .rad {
+  display: flex;
+  justify-content: space-between;
+  margin-top: 2.5px;
+  padding: 0 2px;
+  font: 400 6.4px/1.15 Anton, Impact, sans-serif;
+  letter-spacing: 0.4px;
+  color: #22447c;
+  white-space: nowrap;
+}
+.rum-ifk .rad b { font-weight: 400; }
+/* vecken efter att den legat vikt i fyra delar: en ljus rygg och en mörk
+   dal, och smuts längs kanterna */
+.rum-ifk .veck {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  background:
+    linear-gradient(90deg, rgba(0, 0, 0, 0) calc(50% - 1.2px), rgba(255, 250, 236, 0.34) calc(50% - 0.3px), rgba(50, 32, 12, 0.24) calc(50% + 0.5px), rgba(0, 0, 0, 0) calc(50% + 1.6px)),
+    linear-gradient(180deg, rgba(0, 0, 0, 0) calc(47% - 1.2px), rgba(255, 250, 236, 0.3) calc(47% - 0.3px), rgba(50, 32, 12, 0.22) calc(47% + 0.5px), rgba(0, 0, 0, 0) calc(47% + 1.6px)),
+    radial-gradient(ellipse at 50% 47%, rgba(255, 250, 236, 0.16), rgba(255, 250, 236, 0) 9px);
+  box-shadow: inset 0 0 5px rgba(110, 80, 34, 0.4);
+}
 
 /* ---------- löpsedeln: kvällstidningens namn, rubriken och raden under ---------- */
 
