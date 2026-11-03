@@ -1333,8 +1333,8 @@ under omgången.
    Teijder*, *Väntar på dig och Teijder*, *Väntar på alla* (vilka som är inne när man
    pekar), och grönt *Alla inne*. När tiden är ute står det *Dags för uppgörelsen* och vem
    som inte lämnade in; när gängets kupong är gjord tar den över. Porträtt står inte där –
-   gänget syns redan på polaroiderna (2026-10-22). Har man börjat på sin kupong heter
-   knappen *Fyll i resten*. En
+   gänget syns redan på polaroiderna (2026-10-22). Knappen heter *Till kupongen*, som i
+   rutan för en färdig kupong, och *Fyll i resten* när man har börjat på sin kupong. En
    färdigspelad kupong visas inte bredvid medan en ny omgång fylls i – den står bland
    Grupparbetena i Olympen.
 2. **Fyll i kupongen** (direkt under Omgången, `#kupong`): kupongen står på papper med en
@@ -2031,7 +2031,8 @@ sida, och solglasögonen uppskjutna på den. Sköldarna är ESPN:s bilder i
 `public/rum/skold-nacional.png` och `skold-ifk.png` (256 px; den genomskinliga kanten skärs
 bort när de laddas, och saknas en blir det bara text). Halsduken följer bålen, tatueringen
 vrids med handen och mössan följer huvudet; håret trycks ner under mössan och sticker ut
-under kanten. Kläderna följer vädret utanför (se *Utsikten och vädret* nedan).
+under kanten. Kläderna följer vädret utanför (se *Utsikten och vädret* nedan) och högtiderna
+(se *Högtiderna* nedan).
 
 **De byter plats var tredje dag** (`PLATSER` och `placering` i rum-3d.js): DL till
 vänster, DT bakom och DJ till höger den 25–27 oktober 2026, sedan DL bakom, DT till höger
@@ -2161,6 +2162,39 @@ glaspärlor (på mössan om det är DJ). Gick det illa (Svagt eller Mycket svagt
 extraflaska omkullvält i en pöl och kupongen sönderriven i askkoppen, med ett par bitar på
 bordet. Däremellan, och med dolda resultat, syns inget. (En barstol som vält syns inte:
 golvet ligger bakom pulten.)
+
+**Högtiderna** ([public/rum-fest.js](public/rum-fest.js), `festen` och `drakt`): runt de stora
+högtiderna klär gänget sig för dem, några dagar före och efter, så att det inte bara gäller en
+dag. Dagen är Stockholms, som ölen och fikat, och kommer en ny högtid medan sidan är öppen byter
+de om (`ute`, som när vädret ändras).
+
+- **Lucia** (12–14 december): vita linnen. Den som sitter bakom bordet bär luciakronan – lingonris
+  med röda bär runt en mässingsring och sju levande ljus vars lågor fladdrar (`tick`) och lyser –
+  och de två på sidorna stjärngossestrutar av papper med guldstjärnor, guldkant och en stjärna i
+  toppen.
+- **Jul** (20–28 december): tomteluvor i röd filt med vit pälskant, och toppen som faller ner på
+  den sida som syns med tofsen vid kinden. Stickade jultröjor – DL röd, DT grön och DJ marinblå –
+  med resår, sicksack, två renar mot en gran mitt fram, snöstjärnor på sidorna och en rad stjärnor
+  upptill, stickat maska för maska (`jultroja`), och prickar på ärmarna.
+- **Nyår** (29 december – 2 januari): kavaj i sammet (DL midnattsblå, DT svart och DJ vinröd) med
+  slag i det mörkare, vit skjorta med kragsnibbar och knappar och en fluga i svart satin.
+  Partyhattar i folie med ränder i spiral och en tofs av strimlor (DL guld, DT silver och blått,
+  DJ svart och guld), och konfetti på axlarna, i håret och över bordet med några serpentiner.
+- **Påsk** (onsdagen före skärtorsdagen till tisdagen efter annandag påsk): påskkärringar med
+  huckle knutet under hakan med två snibbar – DL rött med vita prickar, DT gult med blommor och DJ
+  blårutigt – och målade röda kinder och fräknar. Mönstret ritas i huvudets vinklar, så att
+  prickarna och blommorna är lika stora överallt; öronen är under hucklet.
+- **Midsommar** (onsdagen till söndagen kring midsommarafton): blomkransar av blad, prästkragar,
+  blåklint, smörblommor och klöver, tätast över pannan.
+
+Vid lucia, jul och nyår byter de om helt – jackorna är av, det är fest inne – och har långbyxor;
+DT kavlar ändå upp ärmen med lejonet. Vid påsk och midsommar har de kläderna efter vädret och bara
+det på huvudet. Det på huvudet ersätter DJ:s mössa, och håret trycks ner under kanten som under
+mössan. Solglasögonen sitter uppskjutna på tomteluvan och hucklet, i håret med partyhatten och är
+av med struten, kronan och kransen (på näsan när solen skiner, som vanligt). Oraklet dagen efter en
+bra omgång bär papperskronan i stället för högtidens (figuren byggs om när kronan kommer eller går),
+och DJ tar av sig struten, kronan och partyhatten när han somnar med huvudet på bordet. Blad,
+blommor, bär, ljus och konfetti är sammanslagna till ett nät per sak, så att det blir få ritanrop.
 
 **Kvittot** ligger på pulten i three.js med sakerna nedan
 ([public/rum-saker.js](public/rum-saker.js)): termopapper som har legat i rulle, så att änden
@@ -2296,7 +2330,8 @@ står på samma tid), `?rum-mx=&rum-my=` (−1…1) kamerans läge,
 finns (`bast`, `samst`, `datorn`, `ledare`, `skrall`, `kross`, `kupong`, `rysaren`, `spiken`,
 `jakten`),
 `?rum-fika=semlor` (`pepparkakor`, `lussekatter`, `kanelbullar`, `paskagg`,
-`chokladbollar`) fikat och `?rum-ol=jul` (`pask`) ölen. Gänget: `?rum-plats=0` (`1`, `2`)
+`chokladbollar`) fikat, `?rum-ol=jul` (`pask`) ölen och `?rum-fest=jul` (`lucia`, `nyar`,
+`pask`, `midsommar`, `inget`) högtidskläderna. Gänget: `?rum-plats=0` (`1`, `2`)
 var de sitter vid bordet, `?rum-vantar=DL,DT` som om de inte hade lämnat in,
 `?rum-stopp=<timmar>` som om det var så långt kvar till spelstoppet, `?rum-tittar` som
 om matcherna pågick och `?rum-mal=dl:1,dt:-1,dj:0` ett mål
@@ -2818,7 +2853,8 @@ Utan nätet är det mulet och månadens vanliga temperatur.
   parkas, DT och DJ dunjackor, DJ med pälskant). När det regnar har de regnjackor (DL gul,
   DT olivgrön, DJ svart), och när det snöar ligger snö på axlarna och huvudet. DT kavlar
   alltid upp ärmen på armen med lejonet, och halsduken ligger utanpå jackan. Ändras vädret
-  medan rummet står öppet byter den som behöver om.
+  medan rummet står öppet byter den som behöver om. Runt högtiderna klär de sig för dem (se
+  *Högtiderna* under [Tobaksaffären](#tobaksaffären)).
 
 Utsikten ligger bakom väggen i det bakersta planet och syns genom hålen i den (masken
 `rum-hal` och måtten `WIN` och `DORR` i rum.js), i scenens koordinater, så att den som går
