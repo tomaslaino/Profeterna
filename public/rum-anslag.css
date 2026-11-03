@@ -117,6 +117,46 @@
 .ans-ark::after { content: ""; position: absolute; inset: 0; pointer-events: none; border-radius: inherit; background: rgba(40, 26, 8, calc(var(--lag, 0) * 0.06)); }
 .ans-in { position: absolute; inset: 0; display: block; padding: 14px 16px 10px; overflow: hidden; }
 
+/* Den vikta lappen (.vikt, rum-anslag.js): det som inte ryms är vikt bakom
+   bladet, och vecket syns i underkanten – papperet böjer av bort från
+   ljuset, så att texten försvinner runt vecket (papperets färg, --papper)
+   och kanten blir mörk, och de dubbla bladen ger en tjockare skugga. */
+.ans-vik { display: none; }
+.ans-lapp.vikt .ans-vik {
+  position: absolute;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  display: block;
+  height: 20px;
+  border-radius: 0 0 2px 2px;
+  pointer-events: none;
+  background:
+    linear-gradient(180deg, rgba(40, 26, 8, 0) 35%, rgba(40, 26, 8, 0.1) 70%, rgba(40, 26, 8, 0.3)),
+    linear-gradient(180deg, transparent, var(--papper, #f4f1e8) 62%);
+  box-shadow: 0 1px 0 rgba(40, 26, 8, 0.28), 0 3px 3px -0.5px rgba(0, 0, 0, 0.4);
+}
+
+/* Utvikt i handen: bladet är delat i paneler (.ans-pan), var och en fäst i
+   underkanten på den ovanför och vikt bakom den tills lappen är utvikt
+   (−178°: negativt vrider underkanten bort från en, och inte hela vägen,
+   så att den inte ligger i samma plan). Papperet sitter på varje panels
+   kopia (.ans-papper); baksidan är samma papper i skugga. */
+.ans-ark.delad { perspective: 1100px; box-shadow: none; }
+.ans-ark.delad::after { content: none; }
+.ans-pan { position: absolute; left: 0; width: 100%; display: block; transform-style: preserve-3d; transform-origin: 50% 0; }
+.ans-pan.vik { transform: rotateX(-178deg); }
+.utvikt .ans-pan.vik { transform: none; }
+.ans-sida, .ans-rygg { position: absolute; inset: 0; display: block; backface-visibility: hidden; -webkit-backface-visibility: hidden; }
+.ans-sida { overflow: hidden; }
+.ans-papper { position: absolute; left: 0; width: 100%; display: block; }
+.ans-pan > .ans-rygg { transform: rotateX(180deg); }
+.ans-pan > .ans-rygg::before { content: none; }
+.ans-pan > .ans-rygg::after { content: ""; position: absolute; inset: 0; background: rgba(50, 36, 14, 0.14); }
+/* vecken i det utvikta papperet, och djupet i bunten */
+.ans-pan.vik > .ans-sida::before { content: ""; position: absolute; left: 0; right: 0; top: 0; z-index: 1; height: 7px; pointer-events: none; background: linear-gradient(180deg, rgba(255, 250, 236, 0.5), rgba(40, 26, 8, 0.13) 22%, rgba(40, 26, 8, 0)); }
+.ans-sida::after { content: ""; position: absolute; inset: 0; pointer-events: none; background: rgba(40, 26, 8, calc(var(--lag, 0) * 0.06)); }
+
 /* indexflikarna: genomskinlig plast på bladets högerkant, i divisionens
    färg där den sticker ut, med förkortningen i tusch */
 .ans-flik {
@@ -146,6 +186,7 @@
 
 /* registerkortet: rött streck under rubriken, blå linjer, maskinskrivet */
 .p-kort {
+  --papper: #fbf8ef;
   background:
     linear-gradient(180deg, rgba(0, 0, 0, 0) 33px, rgba(200, 44, 40, 0.6) 33px 34.4px, rgba(0, 0, 0, 0) 34.4px),
     repeating-linear-gradient(180deg, rgba(0, 0, 0, 0) 0 12.4px, rgba(70, 120, 190, 0.26) 12.4px 13.2px) 0 36px / 100% calc(100% - 36px) no-repeat,
@@ -155,13 +196,14 @@
 .p-kort h4 { font-size: 15px; letter-spacing: 3px; text-transform: uppercase; line-height: 19px; }
 .p-kort .ans-in { padding-top: 12px; }
 .ans-g5 { display: grid; grid-template-columns: 1fr auto auto auto 1fr; column-gap: 6px; line-height: 13.2px; }
-.ans-g5 .h { text-align: right; overflow: hidden; white-space: nowrap; }
-.ans-g5 .a { overflow: hidden; white-space: nowrap; }
+.ans-g5 .h { text-align: right; overflow: hidden; white-space: nowrap; text-overflow: ellipsis; }
+.ans-g5 .a { overflow: hidden; white-space: nowrap; text-overflow: ellipsis; }
 .ans-g5 .f i { display: inline-block; width: 0.78em; text-align: center; }
 .ans-g5 .s { opacity: 0.6; }
 
 /* genomslaget: tunt papper, blålila karbontext som flyter lite */
 .p-genomslag {
+  --papper: #f1ebdb;
   background: linear-gradient(180deg, rgba(255, 255, 255, 0.4), rgba(0, 0, 0, 0) 40%), #f1ebdb;
   color: #3d3a86;
   font-size: 10.5px;
@@ -212,11 +254,12 @@
 .ans-under { position: absolute; left: 6px; right: 6px; bottom: 9px; text-align: center; font: 700 19px/1 Caveat, cursive; color: #1d2a63; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
 
 /* den gula lappen: tuschpenna, böjer sig lite nertill */
-.p-postit { background: linear-gradient(180deg, #f6ea95, #efdd73 86%, #e3cd5e); font: 700 18px/19px Caveat, cursive; color: #26221a; box-shadow: 1px 4px 5px rgba(0, 0, 0, 0.42), inset 0 -10px 12px -8px rgba(120, 90, 0, 0.25); }
-.p-postit h4 { font: 700 24px/1 Caveat, cursive; margin-bottom: 6px; text-decoration: underline; text-decoration-thickness: 1.5px; text-underline-offset: 3px; }
+.p-postit { --papper: #e8d466; background: linear-gradient(180deg, #f6ea95, #efdd73 86%, #e3cd5e); font: 700 18px/19px Caveat, cursive; color: #26221a; box-shadow: 1px 4px 5px rgba(0, 0, 0, 0.42), inset 0 -10px 12px -8px rgba(120, 90, 0, 0.25); }
+.p-postit h4 { font: 700 24px/1 Caveat, cursive; white-space: nowrap; margin-bottom: 6px; text-decoration: underline; text-decoration-thickness: 1.5px; text-underline-offset: 3px; }
 
 /* rutat papper ur ett spiralblock: blyerts, och staplar runt noll */
 .p-rutat {
+  --papper: #f5f3ea;
   background:
     radial-gradient(circle at 9px 50%, rgba(40, 30, 16, 0.85) 0 3.4px, rgba(0, 0, 0, 0) 3.8px) 0 6px / 18px 16px repeat-y,
     repeating-linear-gradient(0deg, rgba(80, 130, 190, 0.22) 0 0.8px, rgba(0, 0, 0, 0) 0.8px 9px),
@@ -235,6 +278,7 @@
 
 /* tidningsurklippet: tryckt rubrik och tabell på grått tidningspapper */
 .p-tidning {
+  --papper: #dcd4bf;
   background: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='80' height='80'%3E%3Cfilter id='p'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.8' numOctaves='2' seed='3' stitchTiles='stitch'/%3E%3CfeColorMatrix values='0 0 0 0 .3  0 0 0 0 .27  0 0 0 0 .2  0 0 0 -1.4 .9'/%3E%3C/filter%3E%3Crect width='80' height='80' filter='url(%23p)'/%3E%3C/svg%3E") 0 0 / 80px 80px, #dcd4bf;
   color: #1e1b16;
   font: 12px/14.5px Georgia, "Times New Roman", serif;
@@ -246,6 +290,7 @@
 
 /* almanacksbladet: dagen överst, vilan för hand med blå kulspets */
 .p-almanacka {
+  --papper: #fbfaf4;
   background: linear-gradient(180deg, rgba(0, 0, 0, 0) 0, rgba(0, 0, 0, 0) 100%), #fbfaf4;
   color: #1f3f8f;
   font: 600 13.5px/14.2px Caveat, cursive;
@@ -256,14 +301,15 @@
 .ans-blad > span { display: grid; gap: 3px; }
 .ans-blad small { font-size: 10px; line-height: 1; letter-spacing: 2.2px; text-transform: uppercase; }
 .ans-blad b { font-size: 38px; font-weight: 800; line-height: 1; color: #c2271c; }
-.ans-g3 { display: grid; grid-template-columns: 1fr auto auto 1fr; column-gap: 5px; }
-.ans-g3 .h { text-align: right; overflow: hidden; white-space: nowrap; }
-.ans-g3 .a { overflow: hidden; white-space: nowrap; }
-.ans-g3 .n { text-align: center; padding: 0 3px; }
+.ans-g3 { display: grid; grid-template-columns: 1fr auto auto 1fr; column-gap: 4px; }
+.ans-g3 .h { text-align: right; overflow: hidden; white-space: nowrap; text-overflow: ellipsis; }
+.ans-g3 .a { overflow: hidden; white-space: nowrap; text-overflow: ellipsis; }
+.ans-g3 .n { text-align: center; padding: 0 2px; white-space: nowrap; }
 .ans-g3 .trott { box-shadow: 0 0 0 1.4px #c2271c; border-radius: 50%; }
 
 /* anteckningsblocket: blå linjer, röd marginal, riven upptill */
 .p-linjerat {
+  --papper: #fdfcf6;
   background:
     linear-gradient(90deg, rgba(0, 0, 0, 0) 20px, rgba(200, 50, 50, 0.45) 20px 21.4px, rgba(0, 0, 0, 0) 21.4px),
     repeating-linear-gradient(180deg, rgba(0, 0, 0, 0) 0 14.4px, rgba(70, 120, 190, 0.32) 14.4px 15.2px) 0 40px / 100% calc(100% - 40px) no-repeat,
@@ -296,9 +342,6 @@
 .rum-ansn.framme .ans-tavla.stor .ans-lapp:hover > .ans-ark, .ans-tavla.stor .ans-lapp:focus-visible > .ans-ark { box-shadow: 2px 12px 14px rgba(0, 0, 0, 0.4), 0 0 1px rgba(0, 0, 0, 0.35); }
 .ans-tavla.stor .ans-lapp:focus-visible { outline: 2px solid #f0d699; outline-offset: 3px; }
 .ans-lapp.borta { visibility: hidden; }
-.ans-fot { position: absolute; display: flex; justify-content: flex-end; opacity: 0; transition: opacity 0.3s ease; }
-.rum-ansn.framme .ans-fot { opacity: 1; }
-.rum-ansn.lyft .ans-fot { opacity: 0; pointer-events: none; }
 
 /* en lapp i handen, mitt i fönstret */
 .ans-lyft { position: absolute; inset: 0; pointer-events: none; }
@@ -306,6 +349,8 @@
 .rum-ansn.lyft .ans-lyft::before { opacity: 1; }
 .ans-lyft > .ans-lapp { left: 0; top: 0; transform-origin: 50% 50%; pointer-events: auto; cursor: default; }
 .ans-lyft > .ans-lapp > .ans-ark { box-shadow: 0 14px 30px rgba(0, 0, 0, 0.32), 0 0 1px rgba(0, 0, 0, 0.4); }
+.ans-lyft > .ans-lapp > .ans-ark.delad { box-shadow: none; }
+.ans-lyft .ans-ark.delad .ans-sida { box-shadow: 0 12px 26px rgba(0, 0, 0, 0.3), 0 0 1px rgba(0, 0, 0, 0.4); }
 .ans-lyft .p-polaroid { cursor: pointer; }
 .ans-rad { position: absolute; left: 0; right: 0; display: flex; justify-content: center; align-items: center; gap: 28px; opacity: 0; pointer-events: none; transition: opacity 0.3s ease; }
 .rum-ansn.lyft .ans-rad { opacity: 1; pointer-events: auto; }
@@ -314,5 +359,5 @@
 .ans-tbx:hover { color: #d2e3ff; }
 
 @media (prefers-reduced-motion: reduce) {
-  .ans-bak, .ans-luta, .ans-vand, .ans-fot, .ans-rad, .ans-lyft::before, .ans-tavla.stor .ans-lapp { transition: none; }
+  .ans-bak, .ans-luta, .ans-vand, .ans-rad, .ans-lyft::before, .ans-tavla.stor .ans-lapp { transition: none; }
 }

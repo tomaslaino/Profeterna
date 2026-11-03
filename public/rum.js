@@ -5,24 +5,30 @@
 // Förstasidan: tobaksaffären vid spelpulten, ritad i lager
 // på olika djup (CSS 3D) som vrids lite när musen rör sig. Gänget – DL, DT
 // och DJ – sitter som leksaksfigurer (three.js, rum-3d.js) vid ett barbord,
-// dricker öl, röker och pratar. Föremålen leder vidare, som i ett rum hos
-// Felix Rieseberg:
-//   korktavlan → gängets kuponger     pokalhyllan, Omgångens orakel → Olympen
-//   skårtavlan (Tipsligan) → Olympen  anslagstavlan: lapparna (A, rum-anslag.js)
-//   namnet på dörren → Om oss
-//   kvittot → Kupong, tv:n zoomas in (T): text-tv med en sida per match och
-//   kupongens matcher live på 377 (rum-tv.js)
+// dricker öl, röker och pratar. Föremålen leder inte ut ur rummet – det gör
+// bara Vanlig sida i hörnet –, utan visar sig nära, som i ett rum hos Felix
+// Rieseberg:
+//   tv:n zoomas in (T): text-tv med en sida per match och kupongens matcher
+//   live på 377 (rum-tv.js)
 //   videon på disken zoomas in (V): repriserna på VHS, på tv:n och i lådan
 //   bredvid, som spelas i rutan (rum-video.js)
-//   uret, skårtavlan, oraklet och VM 94-affischen: kameran går fram till dem
-//   (närbilderna, sak); skårtavlan och oraklet leder sedan vidare
+//   anslagstavlan lyfts ner (A): lapparna (rum-anslag.js)
 //   kortregistret på disken lyfts fram (R): ett kort per lag och per möte
 //   (rum-register.js, lådan i three.js i rum-kortlada.js)
-//   kupongen tas i handen (K) – fylls i eller ändras – eller → Kupong.
+//   uret, skårtavlan (Tipsligan), oraklet, pokalhyllan, korktavlan,
+//   affischerna på glaset (VM 94, IFK 1982, Nacional 1988 och veckans löpsedel,
+//   rum-affischer.js) och Chelsea-löpsedeln på väggen, dörren (med vilka vi
+//   är under) och kvittot: kameran
+//   går fram till dem (närbilderna, sak)
+//   kupongen tas i handen (K) – fylls i eller ändras –, annars går kameran
+//   fram till den på pulten.
 //   högen bredvid: de inlämnade kupongerna med baksidan upp; din egen tas i
-//   handen därifrån när du har lämnat in, de andras → Kupong.
+//   handen därifrån när du har lämnat in, de andras när du ser deras tips.
+//   kaffet och notan längst till vänster på pulten → Hasse Backe, som sitter
+//   i baren utanför bilden (H, HASSE) – det enda föremålet som leder ut ur
+//   rummet, när animationen med honom finns.
 // Det finns ingen meny: pekar man på ett föremål lyser det, och snabbvalet på
-// text-tv:n som det leder till tänds.
+// text-tv:n med samma ämne tänds.
 //
 // Vanlig sida (#hem) är den vanliga förstasidan. I telefonen står rummet
 // också: scenen fyller höjden, och man ser sig omkring med fingret (pan) –
@@ -38,13 +44,14 @@
 // kortregistret (=Arsenal … med det kortet i handen). ?rum-stopp=<timmar> som
 // om det var så långt kvar till spelstoppet, ?rum-tittar som om matcherna
 // pågick och ?rum-mal=dl:1,dt:-1,dj:0 som om det blev mål (rätt, fel, ingen
-// skillnad), ?rum-video videon nära och ?rum-sak=ur|skar|ram|vm94 en närbild.
+// skillnad), ?rum-video videon nära och
+// ?rum-sak=ur|skar|ram|pokal|kork|vm94|ifk|nacional|lopsedel|chelsea|dorr|kvitto|kupong en närbild.
 //
 // Läses efter kupong.js, samtal.js, tippare.js och kronan.js och använder
 // deras hjälpare (state, KP, TP, gradeRow, couponNumber, currentCoupon,
 // Kronan.holders, Kronan.scene, Historik.coupons …) och tv:n i rum-tv.js
 // (RumTv, läses före den här), anslagstavlan i rum-anslag.js (RumAnslag,
-// också före) och kortregistret i rum-register.js (RumRegister, också före). rum-3d.js (gänget), rum-saker.js och rum-inredning.js (lysröret,
+// också före) och kortregistret i rum-register.js (RumRegister, också före). rum-3d.js (gänget), rum-saker.js (med affischerna i rum-affischer.js) och rum-inredning.js (lysröret,
 // neonskylten, uret, orakelramen, paketen, kupongstället …) hämtas
 // först när rummet visas, med three.js från jsdelivr (importmap i
 // index.html); utan WebGL står rummet kvar utan dem.
@@ -66,6 +73,11 @@ window.Rum = (() => {
   const WIN = { x: 272, y: 132, w: 676, h: 426 };
   const DORR = { x: 50, y: 136, w: 172, h: 560 };
   const box = (p) => `x="${p.x}" y="${p.y}" width="${p.w}" height="${p.h}"`;
+  // Hasse Backe sitter i baren utanför bilden till vänster. Hans kaffe och
+  // nota längst ut på pulten (och H) leder till animationen med honom på
+  // adressen här – det enda föremålet som leder ut ur rummet. Så länge den
+  // är tom skramlar koppen bara på fatet.
+  const HASSE = '';
 
 
   const R = { built: false, on: false, el: null, q: new URLSearchParams(location.search), t0: performance.now(), frozen: null,
@@ -324,7 +336,7 @@ window.Rum = (() => {
       // en egen SVG: Chrome lägger ut text i SVG på nytt i varje bildruta
       // medan rummet vrids, och då ritades hela väggen om varje gång.
       svg(`<defs><path id="rum-dorrbage" d="M66 252 Q136 232 206 252"/></defs>
-  <a class="rum-sak" href="om-oss.html" aria-label="Om oss" id="rum-dorrnamn">
+  <a class="rum-sak" role="button" tabindex="0" data-sak="dorr" aria-label="Om oss" id="rum-dorrnamn">
     <rect x="60" y="226" width="152" height="72" fill="#000" opacity=".001"/>
     <g transform="translate(272 0) scale(-1 1)" font-family="Fraunces" text-anchor="middle">
       <text font-style="italic" font-weight="700" font-size="21" fill="#1a1208" opacity=".55" transform="translate(1.5 2)"><textPath href="#rum-dorrbage" startOffset="50%">Matchfixarna</textPath></text>
@@ -348,11 +360,15 @@ window.Rum = (() => {
 
   // ---------- de sju sakerna ----------
 
+  // Föremålen är knappar (utan adress): de leder inte ut ur rummet. Enter
+  // och mellanslag klickar på dem (wire).
+  const KNAPP = 'role="button" tabindex="0"';
+
   // 5. Omgångens orakel: oraklet ur Olympen (Kronan.scene, fotona på
   // sockeln) under stationsuret, i en förgylld ram med mässingsskylten under
   // (båda i 3D, rum-inredning.js). Ett skimmer drar då och då över glaset.
   function frameHtml() {
-    return '<a class="rum-ram rum-sak" href="#olympen" data-nav="olympen" data-sak="ram" aria-label="Olympen">' +
+    return `<a class="rum-ram rum-sak" ${KNAPP} data-nav="olympen" data-sak="ram" aria-label="Omgångens orakel">` +
       '<span class="rum-ram-list"><span class="kr-scene kr-orakel" id="rum-ram-bild"></span><span class="rum-ram-glans"></span></span></a>';
   }
 
@@ -364,20 +380,33 @@ window.Rum = (() => {
     return `<a class="${cls} rum-sak" ${attrs} style="top:${yb0}px; height:${yb1 - yb0}px; width:${r1(wz(x1) - z0)}px; transform: rotateY(-90deg) translateX(${r1(z0)}px)">${inner}</a>`;
   }
 
+  // Högra väggen i tre fält, som inte går in i varandra: anslagstavlan i
+  // hörnet under tv:n, i mitten pokalhyllan med Tipsligan under (säsongen i
+  // gänget: pokalerna och ställningen) och längst ut korktavlan, hela i bild. Disken under dem:
+  // kortregistret under Tipsligan (rum-register.js), lådan och videon under
+  // korktavlan. Måtten är [x0, x1, y0, y1] som i onWall; ramarna i 3D
+  // (rum-inredning.js) får dem härifrån.
+  const VAGG = {
+    ans: [1144, 1296, 318, 478],
+    skar: [1322, 1428, 374, 432],
+    kork: [1444, 1584, 318, 478],
+  };
+
   // 3. Korktavlan med gängets gamla kuponger, rättade med röd penna.
   // 6. Skårtavlan med Tipsligan – säsongens ställning i gänget – i vita
   //    plastbokstäver.
   // 7. Anslagstavlan under tv:n (rum-anslag.js), fri från tv:ns hylla och disken.
   function rightWall() {
+    const [ans, skar, kork] = [VAGG.ans, VAGG.skar, VAGG.kork];
     return '<div class="rum-hv">' +
-      (window.RumAnslag ? onWall(1144, 1300, 316, 478, 'rum-ans', RumAnslag.wall(), 'href="statistik.html" data-nav="statistik" aria-label="Anslagstavlan" id="rum-ans"') : '') +
-      onWall(1330, 1478, 376, 434, 'rum-skar', '<span class="rum-skar-in" id="rum-skar"></span>', 'href="#olympen" data-nav="olympen" data-sak="skar" aria-label="Tipsligan"') +
-      onWall(1496, 1700, 330, 478, 'rum-kork', '<span class="rum-kork-in" id="rum-kork"></span>', 'href="#olympen/kuponger" data-nav="olympen" aria-label="Gängets kuponger"') +
+      (window.RumAnslag ? onWall(...ans, 'rum-ans', RumAnslag.wall(), `${KNAPP} data-nav="statistik" aria-label="Anslagstavlan" id="rum-ans"`) : '') +
+      onWall(...skar, 'rum-skar', '<span class="rum-skar-in" id="rum-skar"></span>', `${KNAPP} data-nav="olympen" data-sak="skar" aria-label="Tipsligan"`) +
+      onWall(...kork, 'rum-kork', '<span class="rum-kork-in" id="rum-kork"></span>', `${KNAPP} data-nav="olympen" data-sak="kork" aria-label="Korktavlan"`) +
       '</div>';
   }
 
-  // 4. Pokalhyllan: ritas på väggen (shelves()).
-  const POKAL = { yb: 288, x0: 1146, x1: 1312 };
+  // 4. Pokalhyllan: ritas på väggen (shelves()), över Tipsligan.
+  const POKAL = { yb: VAGG.skar[2] - 14, x0: VAGG.skar[0], x1: VAGG.skar[1] };
   function trophy(x, yb, col, i) {
     const k = sc(x) * 0.95;
     const y = at(x, yb);
@@ -402,14 +431,14 @@ window.Rum = (() => {
       x += 17 * sc(x);
     });
     if (x < POKAL.x1 - 8) cups += `<ellipse cx="${r1(x)}" cy="${r1(at(x, POKAL.yb) - 1)}" rx="${r1(6 * sc(x))}" ry="${r1(1.6 * sc(x))}" fill="#000" opacity=".25"/>`;
-    // pokalerna ligger i länken, med ytan man klickar på, så att de lyser
+    // pokalerna ligger i knappen, med ytan man klickar på, så att de lyser
     // som de andra föremålen när man pekar på dem
-    const hit = (x0, x1, y0, y1, nav, href, label, inner) => `<a href="${href}" data-nav="${nav}" class="rum-sak" aria-label="${label}">${inner}` +
+    const hit = (x0, x1, y0, y1, inner) => `<a ${KNAPP} data-nav="olympen" data-sak="pokal" class="rum-sak rum-pokal" aria-label="Pokalhyllan">${inner}` +
       `<polygon points="${x0},${r1(at(x0, y1))} ${x1},${r1(at(x1, y1))} ${x1},${r1(at(x1, y0))} ${x0},${r1(at(x0, y0))}" fill="#fff" opacity="0"/></a>`;
     return shelf(POKAL.yb, POKAL.x0, POKAL.x1) +
       // damm på hyllkanterna
       `<polygon points="${POKAL.x0},${r1(at(POKAL.x0, POKAL.yb) - 0.6)} ${POKAL.x1},${r1(at(POKAL.x1, POKAL.yb) - 0.8)} ${POKAL.x1},${r1(at(POKAL.x1, POKAL.yb) + 0.6)} ${POKAL.x0},${r1(at(POKAL.x0, POKAL.yb) + 0.5)}" fill="#d9d2c0" opacity=".3"/>` +
-      hit(POKAL.x0, POKAL.x1, POKAL.yb - 36, POKAL.yb + 6, 'olympen', '#olympen', 'Olympen', cups);
+      hit(POKAL.x0, POKAL.x1, POKAL.yb - 36, POKAL.yb + 6, cups);
   }
 
   // ---------- lagren ----------
@@ -476,10 +505,83 @@ window.Rum = (() => {
   }
 
   function paper() {
-    return '<a id="rum-kvitto" class="rum-flat rum-sak" href="#kupong" data-nav="kupong" aria-label="Kupong"></a>' +
+    return `<a id="rum-kvitto" class="rum-flat rum-sak" ${KNAPP} data-nav="kupong" data-sak="kvitto" aria-label="Kvittot"></a>` +
       '<span id="rum-hogen"></span>' +
-      '<a id="rum-kupong" class="rum-flat rum-kup rum-sak" href="#kupong" data-nav="kupong" aria-label="Kupong"></a>' +
-      '<a class="rum-tag" href="#kupong" data-nav="kupong" id="rum-tag">Fyll i kupongen</a>';
+      `<a id="rum-kupong" class="rum-flat rum-kup rum-sak" ${KNAPP} data-nav="kupong" aria-label="Kupong"></a>` +
+      `<a class="rum-tag" ${KNAPP} data-nav="kupong" id="rum-tag" hidden></a>`;
+  }
+
+  // Hasse Backe sitter i baren utanför bilden till vänster: längst ut på
+  // pulten står hans kaffe på ett fat, på notan som han har skrivit på Notts
+  // County (som han lämnade efter sju veckor 2009, när lönen inte kom). Ett
+  // klick, eller H, går till animationen med honom (HASSE).
+  function hasseHtml() {
+    const kopp = `<svg class="kopp" width="150" height="124" viewBox="0 0 150 124" aria-hidden="true"><defs>
+    <radialGradient id="rum-hk-skugga" cx=".5" cy=".5" r=".5"><stop offset="0" stop-color="#000" stop-opacity=".55"/><stop offset=".6" stop-color="#000" stop-opacity=".3"/><stop offset="1" stop-color="#000" stop-opacity="0"/></radialGradient>
+    <radialGradient id="rum-hk-fat" cx=".42" cy=".36" r=".75"><stop offset="0" stop-color="#fbf8f1"/><stop offset=".55" stop-color="#e6dfd1"/><stop offset="1" stop-color="#b4ab9a"/></radialGradient>
+    <linearGradient id="rum-hk-kopp" x1="0" y1="0" x2="1" y2="0"><stop offset="0" stop-color="#a99f8d"/><stop offset=".22" stop-color="#ece7dc"/><stop offset=".4" stop-color="#fffdf8"/><stop offset=".72" stop-color="#ddd6c6"/><stop offset="1" stop-color="#8f8676"/></linearGradient>
+    <radialGradient id="rum-hk-kaffe" cx=".4" cy=".35" r=".75"><stop offset="0" stop-color="#7a4520"/><stop offset=".5" stop-color="#3f200b"/><stop offset="1" stop-color="#1d0d03"/></radialGradient>
+    <linearGradient id="rum-hk-sked" x1="0" y1="0" x2="1" y2="0"><stop offset="0" stop-color="#77756f"/><stop offset=".45" stop-color="#f2f0ea"/><stop offset="1" stop-color="#8a8780"/></linearGradient></defs>
+  <ellipse cx="79" cy="100" rx="72" ry="25" fill="url(#rum-hk-skugga)"/>
+  <path d="M11 94 A64 21 0 0 0 139 94 L139 97.5 A64 21 0 0 1 11 97.5 Z" fill="#a1988a"/>
+  <ellipse cx="75" cy="94" rx="64" ry="21" fill="url(#rum-hk-fat)"/>
+  <ellipse cx="75" cy="94" rx="60" ry="19" fill="none" stroke="#fff" stroke-opacity=".45" stroke-width="1"/>
+  <ellipse cx="75" cy="93" rx="38" ry="12" fill="#000" fill-opacity=".05" stroke="#c4bba8" stroke-width="1.2"/>
+  <ellipse cx="81" cy="92" rx="29" ry="8.5" fill="#000" opacity=".2"/>
+  <g class="sked"><path d="M106 98.5 L134 88" stroke="url(#rum-hk-sked)" stroke-width="2.8" stroke-linecap="round"/>
+    <ellipse cx="101" cy="100.5" rx="6.5" ry="3.2" transform="rotate(-20 101 100.5)" fill="url(#rum-hk-sked)"/>
+    <path d="M108 97.4 L131 88.8" stroke="#fff" stroke-opacity=".7" stroke-width=".8" stroke-linecap="round"/></g>
+  <g class="kopp-in">
+    <path d="M44 59 C30 55 24 64 27.5 71 C31 78 40 79.5 47 77" fill="none" stroke="#857c6c" stroke-width="7.5" stroke-linecap="round"/>
+    <path d="M44 58.4 C30.6 54.8 25 63.6 28.4 70.4 C31.6 77 40 78.4 46.6 76.2" fill="none" stroke="#f3efe6" stroke-width="4.4" stroke-linecap="round"/>
+    <path d="M42 52 C42 76 54 90 75 90.5 C96 90 108 76 108 52 Z" fill="url(#rum-hk-kopp)"/>
+    <path d="M42.6 60 A32.4 10.3 0 0 0 107.4 60" fill="none" stroke="#2f58a8" stroke-width="2.2"/>
+    <path d="M43.4 64 A31.6 10 0 0 0 106.6 64" fill="none" stroke="#2f58a8" stroke-width=".9"/>
+    <path d="M50 66 C50.6 75 55 82 62 86" fill="none" stroke="#fff" stroke-opacity=".6" stroke-width="3" stroke-linecap="round"/>
+    <path d="M45 64 C46 73 50 80 55 84" fill="none" stroke="#ff5a3c" stroke-opacity=".2" stroke-width="2" stroke-linecap="round"/>
+    <ellipse cx="75" cy="52" rx="33" ry="10.5" fill="#f8f5ee" stroke="#cfc8b8" stroke-width="1"/>
+    <ellipse cx="75" cy="53.4" rx="29.5" ry="8.4" fill="url(#rum-hk-kaffe)"/>
+    <ellipse cx="66" cy="52" rx="11" ry="2.4" fill="#c58b55" opacity=".35"/>
+    <ellipse cx="86" cy="51.6" rx="5" ry="1.3" fill="#fff" opacity=".35"/></g></svg>`;
+    return `<a class="rum-sak" id="rum-hasse" ${KNAPP} aria-label="Hasse Backe i baren">` +
+      '<span class="nota"><span class="hd"><b>Nota</b><i>Nr 0007</i></span><span class="vem">Hasse B.</span>' +
+      '<span class="r"><span>Kaffe</span><span>32:–</span></span><span class="r"><span>Påtår ×4</span><span>–</span></span>' +
+      '<span class="r"><span>Kanelbulle</span><span>28:–</span></span><span class="r sa"><span>S:a</span><span>60:–</span></span>' +
+      '<span class="skrivs">Skrivs på</span><span class="nc">Notts County</span></span>' +
+      `${kopp}<span class="anga" aria-hidden="true"><i></i><i></i></span></a>`;
+  }
+
+  // Utan adress till animationen (HASSE) skramlar koppen på fatet.
+  function skramla(a) {
+    const k = a.querySelector('.kopp-in');
+    if (!k || calm() || k.getAnimations().length) return;
+    k.animate([
+      { transform: 'none' },
+      { transform: 'translate(1.6px, -1.2px) rotate(2.6deg)', offset: 0.14 },
+      { transform: 'translate(-1.4px, 0) rotate(-2.2deg)', offset: 0.32 },
+      { transform: 'translate(1px, -0.6px) rotate(1.3deg)', offset: 0.52 },
+      { transform: 'translate(-0.5px, 0) rotate(-0.6deg)', offset: 0.74 },
+      { transform: 'none' },
+    ], { duration: 460, easing: 'ease-out' });
+  }
+
+  // Ett klick på kaffet eller H: kameran går fram mot det och sidan byts
+  // till animationen. Kommer man tillbaka (bakåt) står kameran hemma igen.
+  function tillHasse(a = R.el.querySelector('#rum-hasse')) {
+    if (!a) return;
+    if (!HASSE) {
+      skramla(a);
+      return;
+    }
+    if (calm()) {
+      location.href = HASSE;
+      return;
+    }
+    const p = centerOf(a);
+    const c = mid();
+    aim(p, 1.35, [p[0] + (c[0] - p[0]) * 0.4, p[1] + (c[1] - p[1]) * 0.4], 'glid');
+    addEventListener('pageshow', () => aim([800, 500], 1, [800, 500]), { once: true });
+    setTimeout(() => { location.href = HASSE; }, 480);
   }
 
   // Röken som lagt sig under lysröret, och dammet som syns i ljuset.
@@ -833,7 +935,7 @@ window.Rum = (() => {
 
   // Tangenterna står inte i foten utan när man pekar på saken (title), och
   // bara med tangentbord och mus.
-  const TANGENT = [['#rum-kupong', 'Kupongen', 'K'], ['#rum-tv', 'Tv:n', 'T'], ['#rum-ans', 'Anslagstavlan', 'A'], ['#rum-reg', 'Kortregistret', 'R'], ['.vhs-hit', 'Videon', 'V']];
+  const TANGENT = [['#rum-kupong', 'Kupongen', 'K'], ['#rum-tv', 'Tv:n', 'T'], ['#rum-ans', 'Anslagstavlan', 'A'], ['#rum-reg', 'Kortregistret', 'R'], ['.vhs-hit', 'Videon', 'V'], ['#rum-hasse', 'Hasse Backe', 'H']];
   function tangenter() {
     if (!matchMedia('(hover: hover)').matches) return;
     for (const [sel, namn, k] of TANGENT) {
@@ -854,12 +956,12 @@ window.Rum = (() => {
     el.hidden = true;
     el.setAttribute('aria-label', 'Tobaksaffären');
     el.innerHTML = `<div class="rum-stage" id="rum-stage"><div class="rum-kamera" id="rum-kamera"><div class="rum-world" id="rum-world">
-${plane(-600, `<div class="rum-ute" id="rum-ute"></div>${bg()}${vid('vagg')}${rightWall()}${window.RumRegister ? RumRegister.html() : ''}${svg('<g id="rum-hyllor"></g>', '', [1130, 170, 200, 140])}${neon()}${frameHtml()}`, 1.035)}
+${plane(-600, `<div class="rum-ute" id="rum-ute"></div>${bg()}${vid('vagg')}${rightWall()}${window.RumRegister ? RumRegister.html() : ''}${svg('<g id="rum-hyllor"></g>', '', [1300, 250, 150, 120])}${neon()}${frameHtml()}`, 1.035)}
 ${plane(-598, vid('horn'), 1.035, 'rum-pl3d')}
 ${plane(-470, `${tv()}`, 1.02, 'rum-pl3d')}
 ${plane(-330, `${sill()}${haze()}`)}
 ${plane(-60, `${table()}${vid('pult')}`, 1.05)}
-${plane(0, paper())}
+${plane(0, paper() + hasseHtml())}
 </div></div>
 <div class="rum-layer rum-mork" id="rum-mork"><i class="a"></i><i class="b"></i></div>
 <div class="rum-layer rum-warm"></div><div class="rum-layer rum-dagsljus" id="rum-dagsljus"></div><div class="rum-layer rum-vign"></div><div class="rum-layer rum-grain"></div>
@@ -885,6 +987,9 @@ ${window.RumRegister ? RumRegister.nara() : ''}
     const ute = syn(el.querySelector('#rum-ute'), DORR.x, WIN.y, WIN.x + WIN.w - DORR.x, DORR.y + DORR.h - WIN.y);
     R.gang = syn(el.querySelector('#rum-3d').parentElement, 160, 120, 860, 560);
     for (const x of [ute, R.gang, el.querySelector('#rum-damm')]) sikt(x);
+    // dörrens övre del, med Stängt-skylten och namnet: kameran går fram dit
+    // när man klickar på namnet (närbilderna, sak)
+    syn(el.querySelector('#rum-ute').parentElement, DORR.x, DORR.y, DORR.w, 200).id = 'rum-dorrglas';
   }
 
   // en osynlig ruta som sikt följer i stället för något större (först, så
@@ -1120,7 +1225,8 @@ ${window.RumRegister ? RumRegister.nara() : ''}
   // om kupongen på pulten, i den ordning de lämnade in (den senaste överst):
   // porträttet under ett gem, namnet i personens bläck (samma som på
   // papperet under Kupong) och stämpeln – men inga tecken. Din egen tas i
-  // handen därifrån (p.hand), de andras leder till Kupong. Kupongerna har
+  // handen därifrån (p.hand), och de andras när du ser deras tips – annars
+  // lyfts de lite och faller tillbaka (nudge). Kupongerna har
   // samma mått som kupongen på pulten, förminskade, så att den som tas i
   // handen landar exakt i högen.
 
@@ -1163,7 +1269,7 @@ ${window.RumRegister ? RumRegister.nara() : ''}
       const du = Boolean(p && p.vem === g.id);
       const ta = du || Boolean(p && p.se.includes(g.id));
       const label = du ? `Din kupong (${g.id}), inlämnad${p.andra ? ' – ändra' : ''}` : ta ? `${g.id}:s kupong, inlämnad` : `${g.id}:s kupong, inlämnad – syns när du har lämnat in`;
-      return `<a class="rum-flat rum-bak rum-sak" href="#kupong" data-nav="kupong" data-vem="${esc(g.id)}" data-i="${i}"${ta ? ' data-ta' : ''}` +
+      return `<a class="rum-flat rum-bak rum-sak" ${KNAPP} data-nav="kupong" data-vem="${esc(g.id)}" data-i="${i}"${ta ? ' data-ta' : ''}` +
         ` style="transform: ${restAt(slot(i))}" aria-label="${esc(label)}"${ta ? '' : ` title="${esc(label)}"`}>${backHtml(g.id, gang.findIndex((x) => x.id === g.id))}</a>`;
     }).join('');
     if (el.dataset.html !== html) {
@@ -1273,7 +1379,7 @@ ${window.RumRegister ? RumRegister.nara() : ''}
     const started = rows.length && Math.min(...rows.map((x) => Date.parse(x.m.kickoff))) <= t;
     const tag = document.getElementById('rum-tag');
     if (tag) {
-      const go = p ? p.go : started ? 'Följ kupongen' : 'Fyll i kupongen';
+      const go = p ? p.go : started ? 'Följ kupongen' : '';
       // till uppgörelsen står pingklockan där i stället för guldordet
       if (tag.dataset.go !== go) {
         const klocka = go === 'Till uppgörelsen';
@@ -1296,8 +1402,12 @@ ${window.RumRegister ? RumRegister.nara() : ''}
     // dagen efter: hur det gick i den senaste kupongen (rum-folk.js)
     if (window.RumFolk) RumFolk.fyll(R.old, seen);
     set('rum-kork', corkHtml((R.old || []).filter((c) => c.n && !(window.Historik && Historik.hidden(c)))));
-    const cups = seen.slice().sort((a, b) => String(a.from).localeCompare(String(b.from)))
-      .flatMap((r) => (r.people || []).filter((p) => p.award === 'best').map((p) => GANG[p.id] || '#d8b06a'));
+    const vinnare = seen.slice().sort((a, b) => String(a.from).localeCompare(String(b.from)))
+      .flatMap((r) => (r.people || []).filter((p) => p.award === 'best').map((p) => p.id));
+    const cups = vinnare.map((id) => GANG[id] || '#d8b06a');
+    // hur många var och en har, under pokalhyllan när kameran är framme
+    R.pokaler = {};
+    for (const id of vinnare) R.pokaler[id] = (R.pokaler[id] || 0) + 1;
     const hy = document.getElementById('rum-hyllor');
     const hs = shelves(cups);
     if (hy && R.hy !== hs) { hy.innerHTML = hs; R.hy = hs; }
@@ -1362,21 +1472,92 @@ ${window.RumRegister ? RumRegister.nara() : ''}
       }
     }
     if (Object.keys(sum).length && R.fig && R.fig.mal) R.fig.mal(sum, now());
+    // humöret: hur det går för kupongen
+    R.spel = spelLage(rd, rows, p);
+    if (R.fig && R.fig.spel) R.fig.spel(R.spel, now());
+  }
+
+  // Hur det går för gängets kupong, för gängets humör (rum-3d.js, spel): bara
+  // när resultaten syns och någon match på kupongen är avgjord (också en som
+  // pågår, efter ställningen just nu). Kupongen tål tol fel – Stryktipset ger
+  // pengar från tio rätt av tretton, alltså tre fel; en kortare kupong en
+  // fjärdedel. Fler fel och den är död (deppig); lika många med matcher kvar
+  // och nästa fel tar vinsten (nerv); när allt är spelat utan fler fel är det
+  // vinst (glad). Däremellan efter hur den går mot modellen, med samma z som
+  // betyget i historiken (src/history.js): glad från 0,5, nerv från −0,5.
+  // rank: vem som leder omgången (1) och ligger sist (−1) på sina egna tips,
+  // när allas tips syns och minst tre matcher är avgjorda.
+  // ?rum-humor=glad|nerv|deppig och ?rum-rank=dl:1,dj:-1 för bilder.
+  function spelLage(rd, rows, p) {
+    const q = R.q;
+    if (q.has('rum-humor') || q.has('rum-rank')) {
+      const rank = {};
+      for (const x of (q.get('rum-rank') || '').split(',')) {
+        const r = /^(\w+):(-?1)$/.exec(x.trim());
+        if (r) rank[r[1].toLowerCase()] = Number(r[2]);
+      }
+      return { lage: q.get('rum-humor') || null, rank };
+    }
+    const out = { lage: null, rank: {} };
+    if (!rd || rd.next) return out;
+    const med = rows.filter((x) => x.sign && x.g.state !== 'off');
+    const klar = med.filter((x) => x.g.res != null);
+    if (klar.length) {
+      const n = rows.filter((x) => x.sign).length;
+      const tol = n >= 13 ? n - 10 : Math.floor(n / 4);
+      const fel = klar.filter((x) => !x.g.hit).length;
+      const kvar = med.length - klar.length;
+      // modellens chans för tecknet, annars schablonen (45 % för ett tecken, 75 % för två)
+      const pp = (x) => (x.g.p != null ? Math.min(1, x.g.p) : x.sign.length >= 3 ? 1 : x.sign.length === 2 ? 0.75 : 0.45);
+      const vant = klar.reduce((a, x) => a + pp(x), 0);
+      const z = (klar.length - fel - vant) / Math.sqrt(Math.max(0.5, klar.reduce((a, x) => a + pp(x) * (1 - pp(x)), 0)));
+      out.lage = fel > tol ? 'deppig' : !kvar ? 'glad' : fel === tol ? 'nerv' : z >= 0.5 ? 'glad' : z <= -0.5 ? 'nerv' : null;
+    }
+    const s = p && p.s;
+    const gang = rd.gang || [];
+    const avg = rows.filter((x) => x.g.res != null);
+    if (s && s.tips && gang.length > 1 && avg.length >= 3 && gang.every((g) => s.tips[g.id])) {
+      const r = gang.map((g) => ({ k: g.id.toLowerCase(), n: avg.filter((x) => (s.tips[g.id].tecken[x.id] || '').includes(SIGNS[x.g.res])).length }));
+      const hi = Math.max(...r.map((x) => x.n));
+      const lo = Math.min(...r.map((x) => x.n));
+      if (hi > lo) {
+        const forst = r.filter((x) => x.n === hi);
+        const sist = r.filter((x) => x.n === lo);
+        if (forst.length === 1) out.rank[forst[0].k] = 1;
+        if (sist.length === 1) out.rank[sist[0].k] = -1;
+      }
+    }
+    return out;
   }
 
   // ?rum-mal=dl:1,dt:-1,dj:0: ett mål för bilder – vid tiden 0 med ?rum-t,
-  // annars genast och sedan var femtonde sekund.
+  // annars genast och sedan var femtonde sekund. En bokstav efter väljer
+  // sättet (dl:1b: a som förut, b båda armarna upp eller händerna på huvudet,
+  // c handen i bordet; rum-3d.js, malV).
   function provMal() {
     const v = R.q.get('rum-mal');
     if (!v || !R.fig || !R.fig.mal) return;
     const m = {};
+    const satt = {};
     for (const x of v.split(',')) {
-      const r = /^(\w+):(-?1|0)$/.exec(x.trim());
+      const r = /^(\w+):(-?1|0)([abc])?$/.exec(x.trim());
       if (r) m[r[1]] = Number(r[2]);
+      if (r && r[3]) satt[r[1]] = 'abc'.indexOf(r[3]);
     }
-    const go = () => R.fig.mal(m, still() ? 0 : now());
+    const go = () => R.fig.mal(m, still() ? 0 : now(), satt);
     go();
     if (!still()) setInterval(() => { if (R.on) go(); }, 15000);
+  }
+
+  // ?rum-akt=dl:kors,dj:dunk: ett påhitt för bilder (rum-3d.js, AKTER) – mitt
+  // i det med ?rum-t, annars om och om igen från nu.
+  function provAkt() {
+    const v = R.q.get('rum-akt');
+    if (!v || !R.fig || !R.fig.prova) return;
+    for (const x of v.split(',')) {
+      const [k, namn] = x.split(':').map((y) => y.trim());
+      if (k && namn) R.fig.prova(k, namn, now() - (still() ? 2.6 : 0));
+    }
   }
 
   // ---------- rörelsen ----------
@@ -1906,11 +2087,11 @@ ${window.RumRegister ? RumRegister.nara() : ''}
   async function three() {
     if (R.fig || R.loading) return;
     R.loading = true;
-    // askkoppen, snusdosan, fläkten och affischen (rum-saker.js)
-    tur(() => import('./rum-saker.js').then((m) => m.saker(R.el, { calm: calm() })).then((x) => { R.saker = x; R.sakDuk = R.el.querySelector('canvas.rum-saker'); sikt(R.sakDuk); kval(R.kval); frame(); }), 2)
+    // askkoppen, snusdosan, fläkten och affischerna (rum-saker.js, rum-affischer.js)
+    tur(() => import('./rum-saker.js').then((m) => m.saker(R.el, { calm: calm(), short, namn: tavelnamn })).then((x) => { R.saker = x; R.sakDuk = R.el.querySelector('canvas.rum-saker'); sikt(R.sakDuk); kval(R.kval); frame(); }), 2)
       .catch((err) => console.warn('Rummet: sakerna kunde inte ritas', err));
     // lysröret, neonen, skyltarna, uret, ramarna, paketen och kupongstället (rum-inredning.js)
-    tur(() => import('./rum-inredning.js').then((m) => m.inredning(R.el, { calm: calm(), still })).then((x) => { R.inr = x; x.namn(R.ramNamn); x.stopp(R.stopp); if (window.RumFolk && RumFolk.natt()) x.natt(true); if (R.sak) sak(R.sak, null); frame(); }), 1)
+    tur(() => import('./rum-inredning.js').then((m) => m.inredning(R.el, { calm: calm(), still, vagg: VAGG })).then((x) => { R.inr = x; x.namn(R.ramNamn); x.stopp(R.stopp); if (window.RumFolk && RumFolk.natt()) x.natt(true); if (R.sak) sak(R.sak, null); frame(); }), 1)
       .catch((err) => console.warn('Rummet: inredningen kunde inte ritas', err));
     try {
       await tur(async () => {
@@ -1919,9 +2100,11 @@ ${window.RumRegister ? RumRegister.nara() : ''}
         kval(R.kval);
         if (R.vem) R.fig.inne(R.vem, now());
         if (R.lage) R.fig.lage(R.lage, now());
+        if (R.spel) R.fig.spel(R.spel, now());
         // de andra i gänget, natten och dagen efter (rum-folk.js)
         if (window.RumFolk) RumFolk.mount(R.el, { fig: () => R.fig, inr: () => R.inr, now, nara, fokus });
         provMal();
+        provAkt();
         frame();
       });
     } catch (err) {
@@ -1990,7 +2173,7 @@ ${window.RumRegister ? RumRegister.nara() : ''}
     const dy = r1(to[1] - 500 - z * (p[1] - 500));
     const borta = Boolean(dx || dy || z !== 1);
     const satt = () => {
-      w.classList.remove('glid', 'dyk');
+      w.classList.remove('glid');
       if (cls) w.classList.add(cls);
       w.style.transform = `translate(${dx}px, ${dy}px) scale(${z})${R.el.classList.contains('chromium') ? ' perspective(100000px)' : ''}`;
       R.aimT = performance.now();
@@ -2058,61 +2241,22 @@ ${window.RumRegister ? RumRegister.nara() : ''}
     else queueMicrotask(hemma);
   }
 
-  // Ett föremål: kameran går fram mot det en kort stund innan sidan byts.
-  // Kupongen tas i handen om den går att fylla i, och din i högen om den
-  // går att ändra eller visa.
+  // Ett föremål: tv:n, videon, anslagstavlan och kortregistret kommer fram,
+  // kupongen tas i handen om den går att fylla i (annars går kameran fram
+  // till den), din i högen om den går att ändra eller visa, och resten är
+  // närbilder (sak). Inget leder ut ur rummet, utom Hasses kaffe när
+  // animationen med honom finns (tillHasse).
   function go(a, e) {
-    if (a.dataset.sak) {
-      e.preventDefault();
-      sak(a.dataset.sak);
-      return;
-    }
-    const href = a.getAttribute('href');
-    if (!href) return;
-    if (a.dataset.nav === 'tv') {
-      e.preventDefault();
-      zoomTv(!R.zoom);
-      return;
-    }
-    if (a.dataset.nav === 'video') {
-      e.preventDefault();
-      zoomVideo(!R.vnara);
-      return;
-    }
-    if (a.id === 'rum-ans') {
-      e.preventDefault();
-      board(true);
-      return;
-    }
-    if (a.id === 'rum-reg') {
-      e.preventDefault();
-      register(true);
-      return;
-    }
-    if ((a.id === 'rum-kupong' || a.dataset.ta != null) && openCoupon(a.id === 'rum-kupong' ? null : a)) {
-      e.preventDefault();
-      return;
-    }
-    if (a.classList.contains('rum-bak') && a.dataset.ta == null && pult()) {
-      e.preventDefault();
-      nudge(a);
-      return;
-    }
-    if (calm()) return;
     e.preventDefault();
-    const p = centerOf(a);
-    const c = mid();
-    aim(p, 1.35, [p[0] + (c[0] - p[0]) * 0.4, p[1] + (c[1] - p[1]) * 0.4], 'dyk');
-    R.el.classList.add('dyker');
-    setTimeout(() => {
-      if (/^#/.test(href)) location.hash = href.slice(1);
-      else location.href = href;
-      // tillbaka i rummet (matchrutan ligger ovanpå det, och bakåt-knappen)
-      setTimeout(() => {
-        R.el.classList.remove('dyker');
-        aim([800, 500], 1, [800, 500]);
-      }, 60);
-    }, 420);
+    if (a.id === 'rum-hasse') tillHasse(a);
+    else if (a.dataset.sak) sak(a.dataset.sak);
+    else if (a.dataset.nav === 'tv') zoomTv(!R.zoom);
+    else if (a.dataset.nav === 'video') zoomVideo(!R.vnara);
+    else if (a.id === 'rum-ans') board(true);
+    else if (a.id === 'rum-reg') register(true);
+    else if (a.id === 'rum-kupong') {
+      if (!openCoupon()) sak('kupong');
+    } else if (a.classList.contains('rum-bak') && !(a.dataset.ta != null && openCoupon(a))) nudge(a);
   }
 
   // En kupong i högen som du inte får vända på än (du ser inte hens tips):
@@ -2361,20 +2505,55 @@ ${window.RumRegister ? RumRegister.nara() : ''}
 
   // ---------- närbilderna ----------
   //
-  // Uret, skårtavlan, oraklet och VM 94-affischen (data-sak): kameran ställer
-  // sig rakt framför och går fram tills saken fyller det mesta av fönstret,
-  // och det som är ritat i 3D (rum-inredning.js) ritas om skarpare. Under
-  // skårtavlan och oraklet står guldordet dit de leder (dit leder också ett
-  // klick på dem), under affischen fotografen. Esc eller ett klick någon
-  // annanstans går tillbaka.
-  //   el saken, h hur mycket av höjden den får, duk duken i 3D, fot under den
+  // Uret, skårtavlan, oraklet, pokalhyllan, korktavlan, affischerna på
+  // glaset (VM 94, IFK 1982, Nacional 1988 och löpsedeln), Chelsea-löpsedeln på väggen, dörren och kvittot (data-sak) – och kupongen på pulten när den inte går
+  // att ta i handen: kameran ställer sig rakt framför och går fram tills
+  // saken fyller det mesta av fönstret, och det som är ritat i 3D
+  // (rum-inredning.js) ritas om skarpare. Under pokalhyllan står hur många
+  // pokaler var och en har, under affischen fotografen och under dörren
+  // vilka vi är (Om oss). Ingen av dem leder ut ur rummet: Esc eller ett
+  // klick går tillbaka.
+  //   el saken, mal det kameran siktar på (annars saken), h hur mycket av
+  //   höjden den får, duk duken i 3D, fot under den, pult saken ligger på
+  //   pulten (inget tonar bort), tv tv:n står framför den (och tonar bort)
   const SAKER = {
     ur: { el: '.rum-ur', h: 0.78, duk: 'ur' },
     // (skårtavlan är låg: en halv höjd, ungefär lika nära som de andra)
-    skar: { el: '.rum-skar', h: 0.5, duk: 'hogra', fot: () => '<a class="rum-guld" href="#olympen">Olympen</a>' },
-    ram: { el: '.rum-ram', h: 0.94, duk: 'ram', fot: () => '<a class="rum-guld" href="#olympen">Olympen</a>' },
+    skar: { el: '.rum-skar', h: 0.5, duk: 'hogra' },
+    ram: { el: '.rum-ram', h: 0.94, duk: 'ram' },
+    pokal: { el: '.rum-pokal', h: 0.72, duk: 'hogra', fot: () => pokalFot(), tv: true },
+    kork: { el: '.rum-kork', h: 0.86, duk: 'hogra' },
     vm94: { el: '#rum-vm94', h: 0.74, fot: (a) => `<span class="foto">${esc(a.title).replace('Wikimedia Commons', (m) => (a.dataset.kalla ? `<a href="${esc(a.dataset.kalla)}" target="_blank" rel="noopener">${m}</a>` : m))}</span>` },
+    dorr: { el: '#rum-dorrnamn', mal: '#rum-dorrglas', h: 0.92, fot: () => OM_OSS },
+    kvitto: { el: '#rum-kvitto', h: 0.9, pult: true },
+    kupong: { el: '#rum-kupong', h: 0.94, pult: true },
+    ifk: { el: '#rum-ifk', h: 0.86 },
+    lopsedel: { el: '#rum-lopsedel', h: 0.86 },
+    chelsea: { el: '#rum-chelsea', h: 0.86 },
+    // (en hel tidningssida: hög, så att rubriken och fotot blir stora)
+    nacional: { el: '#rum-nacional', h: 0.94 },
   };
+  // Om oss, under dörren: samma ord som på sidan Om oss, i bladguld som namnet på glaset.
+  const OM_OSS = '<span class="om"><b>Vi tippar engelsk fotboll tillsammans.</b>' +
+    '<i>O det handlar om pengarna. Det har alltid handlat om pengarna.</i></span>';
+  // Pokalerna per person (fill), flest först, i var och ens färg.
+  function pokalFot() {
+    const n = R.pokaler || {};
+    const vem = Object.keys(GANG).filter((id) => n[id]).sort((x, y) => n[y] - n[x]);
+    return vem.length ? `<span class="pokaler">${vem.map((id) => `<span><b style="color:${GANG[id]}">${id}</b> ${n[id]}</span>`).join('')}</span>` : '';
+  }
+  // Tv:n hänger snett ovanför pokalhyllan, och dess underkant skulle skära in
+  // överst i närbilden: medan kameran står vid hyllan tonar tv:n bort, del för del – opacitet på lådan själv skulle platta
+  // till den i 3D medan den tonar.
+  function tvBort(bort, glid) {
+    if (!bort && !R.tvBort) return;
+    const delar = R.el.querySelectorAll('#rum-tvsken, .tv-fot > *, .rum-tv3 > *');
+    for (const a of R.tvBort || []) a.cancel();
+    R.tvBort = null;
+    const ms = glid && !calm() ? (bort ? 250 : 500) : 0;
+    const anims = [...delar].map((d) => d.animate(bort ? [{ opacity: 0 }] : [{ opacity: 0, offset: 0 }], { duration: ms, fill: bort ? 'forwards' : 'none' }));
+    if (bort) R.tvBort = anims;
+  }
   function sakFot() {
     let f = document.getElementById('rum-sakfot');
     if (!f) {
@@ -2398,14 +2577,16 @@ ${window.RumRegister ? RumRegister.nara() : ''}
     R.sak = namn || null;
     if (!namn) {
       R.el.classList.remove('sak-nara');
+      tvBort(false, cls);
       vridHem();
       aim([800, 500], 1, [800, 500], cls);
       return;
     }
     const S = SAKER[namn];
     const a = S && R.el.querySelector(S.el);
+    const mal = S && S.mal ? R.el.querySelector(S.mal) : a;
     // (uret finns först när inredningen är ritad, och då frågar three() igen)
-    if (!a) return;
+    if (!a || !mal) return;
     if (R.zoom) zoomTv(false);
     if (R.vnara) zoomVideo(false);
     board(false);
@@ -2414,7 +2595,7 @@ ${window.RumRegister ? RumRegister.nara() : ''}
     const cam = w.style.cssText;
     aim([800, 500], 1, [800, 500]);
     setCam(0, 0);
-    const r = a.getBoundingClientRect();
+    const r = mal.getBoundingClientRect();
     const p = centerOf(r);
     setCam(R.mx, R.my);
     w.style.cssText = cam;
@@ -2424,34 +2605,25 @@ ${window.RumRegister ? RumRegister.nara() : ''}
     R.el.classList.add('sak-nara');
     R.tx = R.ty = R.mx = R.my = 0;
     setCam(0, 0);
-    // gänget och pulten går kameran förbi (de tonar bort)
+    // gänget och pulten går kameran förbi (de tonar bort) – inte när saken
+    // ligger på pulten
     for (const pl of R.el.querySelectorAll('.rum-world > .rum-pl:not(.rum-pl3d)')) {
-      const m = /translateZ\((-?[\d.]+)px\)/.exec(pl.style.transform);
-      pl.classList.toggle('forbi', Boolean(m) && Number(m[1]) > -560);
+      const z = /translateZ\((-?[\d.]+)px\)/.exec(pl.style.transform);
+      pl.classList.toggle('forbi', !S.pult && Boolean(z) && Number(z[1]) > -560);
     }
-    // så stor som ryms mellan namnet och foten, med guldordet under
+    tvBort(Boolean(S.tv), cls);
+    // så stor som ryms mellan namnet och foten, med det som står under
+    const html = S.fot ? S.fot(a) : '';
     const top = 64;
-    const h = innerHeight - top - (S.fot ? 112 : 64);
-    const z = Math.min((innerWidth * 0.9) / r.width, (h * S.h) / r.height);
+    const h = innerHeight - top - (html ? 112 : 64);
+    const zoom = Math.min((innerWidth * 0.9) / r.width, (h * S.h) / r.height);
     const cy = top + h / 2;
-    fot.innerHTML = S.fot ? S.fot(a) : '';
-    fot.style.top = `${r1(cy + (r.height * z) / 2 + 14)}px`;
-    if (S.fot) fot.classList.add('on');
-    aim(p, z, [(innerWidth / 2 - R.ox) / R.k, (cy - R.oy) / R.k], cls);
+    fot.innerHTML = html;
+    fot.style.top = `${r1(cy + (r.height * zoom) / 2 + 14)}px`;
+    if (html) fot.classList.add('on');
+    aim(p, zoom, [(innerWidth / 2 - R.ox) / R.k, (cy - R.oy) / R.k], cls);
     // duken i 3D ritas skarpare när kameran är framme
-    if (S.duk) R.skarp = setTimeout(() => { if (R.sak === namn && R.inr) R.inr.skarp(S.duk, z * R.k * 1.035 * (devicePixelRatio || 1)); }, cls ? 620 : 0);
-  }
-  // Vidare från närbilden: rummet tonar bort och sidan byts.
-  function sakVidare(href) {
-    R.el.classList.add('dyker');
-    setTimeout(() => {
-      if (/^#/.test(href)) location.hash = href.slice(1);
-      else location.href = href;
-      setTimeout(() => {
-        R.el.classList.remove('dyker');
-        sak(null, null);
-      }, 60);
-    }, calm() ? 0 : 420);
+    if (S.duk) R.skarp = setTimeout(() => { if (R.sak === namn && R.inr) R.inr.skarp(S.duk, zoom * R.k * 1.035 * (devicePixelRatio || 1)); }, cls ? 620 : 0);
   }
 
   // ---------- kupongen i handen ----------
@@ -3322,6 +3494,8 @@ ${window.RumRegister ? RumRegister.nara() : ''}
       const dy = e.clientY - P.y;
       if (nara()) {
         // anslagstavlan: ett svep uppåt eller neråt bläddrar bladen i lapparna
+        // (utom när fingret flyttade en lång lapp i handen)
+        if (R.ans && R.ans.on() && R.ans.drog()) return;
         if (R.ans && R.ans.on() && Math.abs(dy) >= 40 && Math.abs(dy) > Math.abs(dx) * 1.5) {
           R.ans.key(dy < 0 ? 'ArrowDown' : 'ArrowUp');
           return;
@@ -3389,7 +3563,7 @@ ${window.RumRegister ? RumRegister.nara() : ''}
     const el = R.el;
     swipe(el);
     el.addEventListener('mouseover', (e) => {
-      const a = !R.kup && e.target.closest('.rum-sak, .rum-tag, .rum-guld');
+      const a = !R.kup && e.target.closest('.rum-sak, .rum-tag');
       hot(a ? a.dataset.nav : null);
     });
     el.addEventListener('click', (e) => {
@@ -3415,19 +3589,18 @@ ${window.RumRegister ? RumRegister.nara() : ''}
         }
         return;
       }
-      // nära en sak: guldordet, skårtavlan och oraklet leder vidare, och
-      // allt annat går tillbaka (utom namnet, foten och fotografens länk)
+      // nära en sak: ett klick går tillbaka (utom på namnet, foten och
+      // fotografens länk)
       if (R.sak) {
         if (e.target.closest('.rum-hdr, .rum-ft, .rum-sakfot .foto a')) return;
         e.preventDefault();
-        const l = e.target.closest('.rum-sakfot a, .rum-sak');
-        const href = l && (l.closest('.rum-sakfot') || l.dataset.sak === R.sak) ? l.getAttribute('href') : null;
-        if (href) sakVidare(href);
-        else sak(null);
+        sak(null);
         return;
       }
-      if (e.target.closest('.rum-tag') && openCoupon()) {
+      // guldordet: kupongen i handen, annars går kameran fram till den
+      if (e.target.closest('.rum-tag')) {
         e.preventDefault();
+        if (!openCoupon()) sak('kupong');
         return;
       }
       const a = e.target.closest('.rum-sak');
@@ -3436,14 +3609,21 @@ ${window.RumRegister ? RumRegister.nara() : ''}
     });
     document.addEventListener('keydown', (e) => {
       if (!R.on || e.metaKey || e.ctrlKey || e.altKey || /input|textarea|select/i.test(e.target.tagName) || document.querySelector('dialog[open]')) return;
+      // föremålen är knappar utan adress (KNAPP): Enter och mellanslag klickar
+      if ((e.key === 'Enter' || e.key === ' ') && e.target instanceof Element && e.target.matches('[role="button"]:not(button)') && R.el.contains(e.target)) {
+        e.preventDefault();
+        e.target.dispatchEvent(new MouseEvent('click', { bubbles: true, cancelable: true }));
+        return;
+      }
       const k = e.key.toLowerCase();
-      // nära en sak: Esc går tillbaka, och K, T, A, R och V går dit direkt
+      const fore = R.sak;
+      // nära en sak: Esc går tillbaka, och K, T, A, R, V och H går dit direkt
       if (R.sak && !R.kup) {
         if (k === 'escape') {
           sak(null);
           return;
         }
-        if (/^[ktarv]$/.test(k)) sak(null, null);
+        if (/^[ktarvh]$/.test(k)) sak(null, null);
       }
       if (R.kup) {
         if (k === 'k' || k === 'escape') closeCoupon();
@@ -3454,13 +3634,15 @@ ${window.RumRegister ? RumRegister.nara() : ''}
         if (R.reg.key(e.key)) e.preventDefault();
         else if (k === 'r' || k === 'escape') register(false);
       } else if (k === 'k') {
-        if (!openCoupon()) location.hash = 'kupong';
+        // (K igen nära kupongen på pulten går tillbaka)
+        if (!openCoupon() && fore !== 'kupong') sak('kupong');
       } else if (R.zoom && R.tv && R.tv.key(e.key)) e.preventDefault();
       else if (R.vnara && R.video.key(e.key)) e.preventDefault();
       else if (k === 't') zoomTv(!R.zoom);
       else if (k === 'a') board(true);
       else if (k === 'r') register(true);
       else if (k === 'v') zoomVideo(!R.vnara);
+      else if (k === 'h' && !R.zoom && !R.vnara) tillHasse();
       else if (k === 'escape' && R.zoom) zoomTv(false);
       else if (k === 'escape' && R.vnara) zoomVideo(false);
     });

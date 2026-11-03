@@ -502,7 +502,8 @@ Utan nyckel ingen knapp.
   riktig stryktipskupong, så att den går att fylla i; på bredden står orden bredvid kupongen
   i handen. Se [I telefonen](#i-telefonen).
 - **Närbilder i tobaksaffären (2026-10-24, användarens önskemål):** uret, skårtavlan med
-  Premier League, Omgångens orakel och VM 94-affischen går att klicka på, och kameran går
+  Premier League, Omgångens orakel och VM 94-affischen (sedan 2026-11-03 också IFK-affischen,
+  Nacionals förstasida och löpsedeln) går att klicka på, och kameran går
   fram till dem i stället för att sidan byts direkt. Skårtavlan och oraklet leder sedan vidare
   till Tabeller och Olympen. Se [Närbilderna](#närbilderna).
 - **Säsongsprognosen tas bort (2026-10-20, användarens beslut):** vyn under Tabeller och
@@ -520,11 +521,46 @@ Utan nyckel ingen knapp.
   rundad kant och fyllningar i ramar, i rummets egna toner och utan något extra att rita.
   Skivan sticker ut över fronten så att man har plats för benen, med konsoler under och
   krokar för jackor på fronten. Se [Tobaksaffären](#tobaksaffären).
+- **Gänget följer hur det går för kupongen (2026-11-03, användarens önskemål):** gänget
+  har fler rörelser och gör dem efter hur det går för gängets kupong – glada när den går
+  bättre än väntat eller blev vinst, nervösa när nästa fel tar vinsten, deppiga när den är
+  död – med påhitt som händerna i nacken, skålar över bordet, naglarna, hakan i handen,
+  armarna i kors och pannan i bordet, och tre sätt att reagera på ett mål. Se *Gängets humör
+  följer kupongen* under [Tobaksaffären](#tobaksaffären).
+- **Man väljer sig själv med ett klick på sin figur (2026-11-03, användarens önskemål):**
+  ett klick på sin egen figur vid bordet gör en till den som fyller i kupongen – samma val
+  som porträtten på kupongen – och figuren räcker upp handen med pennan, lyfter kupongen mot
+  en och skriver sedan på den, medan de andra tittar på hen. Har man redan sagt vem man är
+  väljer bara den egna figuren, så att ett tryck för att hälsa på någon annan aldrig gör en
+  till hen (och ens utkast till hens); att byta gör man med porträtten på kupongen. Se
+  [Tobaksaffären](#tobaksaffären), *Gänget är ni*.
 - **Statistiken i tobaksaffären står på ett ställe var (2026-11-02, användarens önskemål):**
   samma siffror stod på tv:n, anslagstavlan och kortregistret. Nu står formen bara på
   anslagstavlan, tabellen och hemma/borta bara på tv:n, styrkan, motståndet och poängen mot
   oddsen bara på anslagstavlan, och lagkorten har det som inte står någon annanstans. Se
   [Vad som står var](#vad-som-står-var).
+- **Inga länkar ut ur tobaksaffären (2026-11-03, användarens önskemål):** det enda som leder
+  till den vanliga sajten är *Vanlig sida* i hörnet. Oraklet och skårtavlan har ingen länk
+  under närbilden längre, och pokalhyllan, korktavlan, namnet på dörren och kvittot leder
+  inte till Olympen, Om oss och Kupong utan till en närbild: pokalhyllan med hur många
+  pokaler var och en har (tv:n framför tonar bort), dörren med Om oss-raderna under och
+  korktavlan och kvittot så nära att de går att läsa. Kupongen som inte går att ta i handen
+  visas nära på pulten, och guldorden *Statistik* och *Lagen* under anslagstavlan och
+  kortregistret är borta. Se [Tobaksaffären](#tobaksaffären) och [Närbilderna](#närbilderna).
+- **Chelseas löpsedel på väggen (2026-11-03, användarens önskemål):** till höger om
+  skyltfönstret, under oraklet, sitter The Sun on Sundays löpsedel från dagen efter Chelseas
+  seger i Champions League 2021, med Tomas foto av laget med pokalen. Den sitter med två
+  häftstift i furun och har gulnat. Se [Tobaksaffären](#tobaksaffären), *Affischerna*.
+- **Nacionals förstasida på glaset (2026-11-03, användarens önskemål):** till höger i
+  skyltfönstret sitter El Días förstasida dagen efter Nacionals seger i Intercontinental Cup
+  1988 (DL:s lag), med Tomas foto av laget med pokalerna. Se [Tobaksaffären](#tobaksaffären),
+  *Affischerna*.
+- **Fler affischer på glaset (2026-11-03, användarens önskemål):** bredvid VM 94-affischen
+  sitter en affisch från IFK Göteborgs seger i UEFA-cupen 1982, och varje vecka en löpsedel
+  med det mest dramatiska ur förra omgången eller inför nästa. IFK-affischen var först ritad
+  (pokalen i SVG), blev samma dag en plansch med Tomas foto från segern i Hamburg och till
+  sist Göteborgs-Postens löpsedel dagen efter, med fotot. Se [Tobaksaffären](#tobaksaffären),
+  *Affischerna*.
 - **Kuponghistoriken flyttar till Olympen (2026-10-20, användarens önskemål):** Kupong
   handlar bara om nästa kupong – växlaren Omgången | Historik försvinner. De färdigspelade
   kupongerna står sist i Olympen under rubriken *Grupparbetena* (`#olympen/kuponger`, en
@@ -1305,8 +1341,8 @@ under omgången.
    Teijder*, *Väntar på dig och Teijder*, *Väntar på alla* (vilka som är inne när man
    pekar), och grönt *Alla inne*. När tiden är ute står det *Dags för uppgörelsen* och vem
    som inte lämnade in; när gängets kupong är gjord tar den över. Porträtt står inte där –
-   gänget syns redan på polaroiderna (2026-10-22). Har man börjat på sin kupong heter
-   knappen *Fyll i resten*. En
+   gänget syns redan på polaroiderna (2026-10-22). Knappen heter *Till kupongen*, som i
+   rutan för en färdig kupong, och *Fyll i resten* när man har börjat på sin kupong. En
    färdigspelad kupong visas inte bredvid medan en ny omgång fylls i – den står bland
    Grupparbetena i Olympen.
 2. **Fyll i kupongen** (direkt under Omgången, `#kupong`): kupongen står på papper med en
@@ -1837,8 +1873,9 @@ WebKit hade ritat, ge den en fördröjning, en mjukare början eller dölja det 
 bilden hela vägen hjälpte inte – WebKit ritar först när kameran rör sig. Chrome behöver inte
 den osynliga rörelsen och får den inte. Namnet
 och foten (*Vanlig sida*) ligger utanför scenen i fönstrets hörn;
-någon meny finns inte, det är föremålen som leder vidare. Tangenterna (K kupongen, T tv:n,
-A anslagstavlan, R kortregistret, V videon) står inte i foten – där låg de över kupongen i
+någon meny finns inte, och föremålen leder inte ut ur rummet – det gör bara *Vanlig sida* (och
+Hasses kaffe, när animationen med honom finns). Tangenterna (K kupongen, T tv:n,
+A anslagstavlan, R kortregistret, V videon, H Hasse) står inte i foten – där låg de över kupongen i
 mindre fönster – utan när man pekar på saken (*Tv:n · T*, `tangenter` i rum.js), och bara
 med mus. [public/rum.js](public/rum.js)
 ritar rummet och fyller det med sajtens data, [public/rum.css](public/rum.css) ger det utseendet och
@@ -1862,11 +1899,13 @@ minsta fönstren och om rum.js inte går att hämta visas den vanliga förstasid
 
 **Föremålen** – pekar man på ett lyser det (pokalerna också), och snabbvalet
 på text-tv:n med samma ämne tänds, som när man pekar på snabbvalet med tv:n nära
-(pärmarna Skyttar). Klickar man går kameran fram mot föremålet innan
-sidan byts; oraklet, skårtavlan, uret och VM 94-affischen tittar man först på nära (se
-[Närbilderna](#närbilderna)):
+(pärmarna Skyttar). Inget föremål byter sida: oraklet, skårtavlan, pokalhyllan, korktavlan,
+uret, affischerna på glaset och väggen, namnet på dörren och kvittot tittar man på nära (se
+[Närbilderna](#närbilderna)), och tv:n, videon, anslagstavlan, kortregistret och kupongen
+kommer fram var och en på sitt sätt. Föremålen är knappar utan adress (`KNAPP` i rum.js), och
+Enter och mellanslag klickar på dem. En match på text-tv:n öppnar matchrutan ovanpå rummet:
 
-- **Omgångens orakel** (tavlan under stationsuret) → närbild → Olympen: oraklet som regerar
+- **Omgångens orakel** (tavlan under stationsuret) → närbild: oraklet som regerar
   (`Kronan.holders`) som i Olympen och på förstasidans polaroid (`Kronan.scene`) – det
   urklippta fotot på marmorsockeln med lagerkransen (som inte glimmar här, se [När datorn
   inte hinner med](#när-datorn-inte-hinner-med)) och strålarna som vrider sig – bakom
@@ -1874,23 +1913,27 @@ sidan byts; oraklet, skårtavlan, uret och VM 94-affischen tittar man först på
   skimmer drar snett över glaset var elfte sekund. Mässingsskylten under säger
   *Omgångens orakel* och hela efternamnet (delat: *Laino & Johansson*, i mindre stil), och
   ramen och skylten lyser med när man pekar på dem.
-- **Pokalhyllan** (högra väggen) → Olympen: en liten pokal per vunnen omgång i vinnarens
-  färg (delat = en var), ur `data/tippare.json`.
-- **Anslagstavlan** (under tv:n, i hörnet) → lapparna om omgångens lag, och därifrån
-  Statistik (se [Anslagstavlan](#anslagstavlan)).
-- **Kortregistret** (på disken under anslagstavlan) → ett kort per lag och per möte i
-  omgången, och därifrån Lagen på Statistik (se [Kortregistret](#kortregistret)).
-- **Skårtavlan** (under tv:n) → närbild → Olympen: *Tipsligan*, säsongens ställning i gänget
+- **Pokalhyllan** (mitt på högra väggen, över Tipsligan) → närbild: en liten pokal per
+  vunnen omgång i vinnarens färg (delat = en var), ur `data/tippare.json`. Nära tonar tv:n, som annars skär in
+  överst i bilden, bort del för del (`tvBort` i rum.js; opacitet på lådan själv skulle platta till den i 3D), och
+  under hyllan står hur många pokaler var och en har, flest först.
+- **Anslagstavlan** (under tv:n, i hörnet) → lapparna om omgångens lag (se
+  [Anslagstavlan](#anslagstavlan)).
+- **Kortregistret** (på disken under Tipsligan) → ett kort per lag och per möte i
+  omgången (se [Kortregistret](#kortregistret)).
+- **Skårtavlan** (mitt på högra väggen, under pokalhyllan) → närbild: *Tipsligan*, säsongens ställning i gänget
   – samma poäng och placering som ställningen i Olympen (`kampRounds`, med omgången som
   pågår), lika placering vid lika poäng och antal rätt. Efternamnen står där, och Johansson
   som *Dogge* (`SMEKNAMN` i rum.js); före första omgången bara namnen. Vita plastbokstäver i
   spåren på svart filt – rubriken, ett tomt spår och de tre – i en låg aluminiumram som
   sticker ut från väggen (3D). Varje bokstav sitter lite snett för sig (samma frö varje gång,
   så att inget flyttar sig), och lådan har bara fyra O – sedan blir det nollor.
-- **Korktavlan** (längst till höger, i en träram i 3D) → gängets kuponger i Olympen
-  (`#olympen/kuponger`): de färdigspelade kupongerna (`Historik.coupons`) rättade med röd penna, en med kaffering.
+- **Korktavlan** (längst ut på högra väggen, hel i bild, i en träram i 3D) → närbild: de
+  färdigspelade kupongerna (`Historik.coupons`) rättade med röd penna, en med kaffering.
   Tom tills den första är färdigspelad.
-- **Kupongen och kvittot** → Kupong. Kupongen är samma kupong som papperet under Kupong, i
+- **Kupongen och kvittot**: kupongen tas i handen (se nedan), och när den inte går att ta i
+  handen går kameran fram till den på pulten (också med K och guldordet); kvittot → närbild.
+  Kupongen är samma kupong som papperet under Kupong, i
   kupongens mått (660 × 470): bandet, under det stämpeln (vem omgången väntar på) och
   spelstoppet, porträtten med bock, tårtbit eller prickar och 1 X 2 överst, en rad per
   match i kupongens ordning med synkmarkeringen i kanten och dag, tid och serie efter lagen
@@ -1904,15 +1947,23 @@ sidan byts; oraklet, skårtavlan, uret och VM 94-affischen tittar man först på
   allas porträtt i rutorna (uppgörelsen). Kvittot visar när var och en lämnade in. Allt man
   gör med kupongen tas i handen, utan att man lämnar rummet (se
   [Kupongen i handen](#kupongen-i-handen)). Guldordet bredvid säger vad som väntar: *Fyll i
-  kupongen*, *Fyll i resten*, inget alls när du har lämnat in och bara ser dina egna tips
-  (din kupong i högen tas i handen med ett klick) och *Följ kupongen* när matcherna har
-  börjat. När du ser de andras tips står en pingklocka i mässing där i stället för ordet:
+  resten* när du har börjat kryssa, *Följ kupongen* när matcherna har börjat och annars
+  inget alls – en tom kupong tas i handen med ett klick på den, och har du lämnat in tas
+  din kupong i högen på samma sätt. När du ser de andras tips står en pingklocka i mässing där i stället för ordet:
   man ringer in gänget till uppgörelsen.
 - **Högen** till vänster om kupongen: de som har lämnat in har lagt sin kupong där med
   baksidan upp, i den ordning de lämnade in (den senaste överst) – porträttet under ett gem,
   initialerna i personens bläck (samma som på papperet under Kupong) och stämpeln
   *Inlämnad*, men inga tecken. Din egen tas i handen, och de andras när du ser deras tips
   (se nedan). Innan dess lyfts en annans kupong bara lite i ena kanten och faller tillbaka.
+- **Hasses kaffe** längst till vänster på pulten → Hasse Backe, som sitter i baren utanför
+  bilden till vänster och svarar på frågor om matcherna (en animation; H). Koppen ryker och
+  står på hans nota – kaffe, fyra påtår och en kanelbulle, *Skrivs på Notts County*: klubben
+  han lämnade efter sju veckor 2009, när lönen inte kom (notans nummer är 0007). Fatet
+  sticker ut över kanten, mot honom. Adressen till animationen står i `HASSE` överst i
+  rum.js; så länge den är tom skramlar koppen bara på fatet. Med en adress går kameran fram
+  mot koppen och sidan byts – det enda föremålet som leder ut ur rummet (`hasseHtml`,
+  `skramla`, `tillHasse`).
 - **Tv:n** uppe i hörnet till höger, en mörkgrå Panasonic från nittiotalet med text-tv på en arm från väggen, zoomas in med ett
   klick eller T och vrids då mot en; den står på kupongens matcher live (377), och där finns
   också omgångens matcher, tabellerna och skytteligorna (se [Tv:n](#tvn)). Esc eller ett
@@ -1923,10 +1974,19 @@ sidan byts; oraklet, skårtavlan, uret och VM 94-affischen tittar man först på
   lådan står kvar som de står, och en kassett spelar matchens höjdpunkter i rutan.
   Ett klick på rutan går ännu närmare (se [Videon](#videon)). Esc, V eller ett klick utanför
   zoomar ut.
-- **Namnet på dörren** (längst till vänster, under Stängt-skylten) → Om oss: *Matchfixarna*
+- **Namnet på dörren** (längst till vänster, under Stängt-skylten) → närbild av dörrens övre
+  del, med raderna från Om oss under (*Vi tippar engelsk fotboll tillsammans.* …): *Matchfixarna*
   i bladguld på glaset, spegelvänt inifrån som neonskylten, med TOBAK & SPEL och *Öppet
   till spelstoppet* under. I fönster som är minst 8:5 syns hela dörren, och där står namnet
   inte i menyns hörn; i smalare fönster skärs dörren av och namnet står kvar i hörnet.
+
+Högra väggen är delad i tre fält som inte går in i varandra (`VAGG` i rum.js, som också ger
+ramarna i 3D sina mått): anslagstavlan i hörnet under tv:n, i mitten pokalhyllan med
+Tipsligan under – säsongen i gänget, pokalerna och ställningen – och längst ut korktavlan,
+med samma överkant och underkant som anslagstavlan. Disken under följer fälten:
+kortregistret står under Tipsligan, fritt från anslagstavlans nederkant, och videon och
+lådan med kassetter under korktavlan. Tv:ns sladd går i en kort båge till ett uttag strax
+under väggplattan, ovanför korktavlan.
 
 **Kupongstället** står på pulten vid fönstret (till vänster) och leder ingenstans: ett
 fack av plexiglas, lågt fram och högt bak, med blanka kuponger (samma terrakottaband som
@@ -1951,9 +2011,9 @@ spetsen och sektorn är borta. Med `?rum-klocka` räknar uret från sin egen tid
 `?rum-stopp=<timmar>` gäller uret också.
 
 **Inredningen i 3D** ([public/rum-inredning.js](public/rum-inredning.js)): lysröret i taket
-(en armatur med två rör och gavlar), neonskylten, Stängt-skylten, stationsuret,
+(en armatur med två rör och gavlar), banderollen, neonskylten, Stängt-skylten, stationsuret,
 orakelramen med mässingsskylten, cigarettpaketen uppe på högra väggen (två hyllor med
-paket i rader om tre till sju; påhittade färger, inga märken), ramarna kring skårtavlan
+paket i rader om tre till sju, som börjar bakom tv:n; påhittade färger, inga märken), ramarna kring skårtavlan
 och korktavlan och kupongstället är byggda i three.js som gänget. Neonskylten är glasrör med en
 ljus kärna som följer bokstäverna i *Tobak*, spegelvänd inifrån: texten i Fraunces kursiv
 tunnas ut till en linje och seriferna tas bort. Den hänger i kedjor från fönsterkarmen med
@@ -1964,12 +2024,27 @@ satt och kroppen tillbaka till väggen, så att sidorna syns och skuggorna falle
 kopieras till en vanlig duk per sak i det plan där saken står (orakelramen i länken, så
 att den lyser med); bara uret ritas om, en gång i sekunden.
 
+**Banderollen** hänger i taket ovanför skyltfönstret, tvärs över bakväggen: mellan lysröret och
+fönsterkarmen och från vänsterkanten fram till uret (`banderoll` och `BAN` i rum-inredning.js, i
+takets duk). Det är en gammal reklam för Stryktipset i tyg, i stil med 1960- och 70-talen men inte en
+riktig – en sådan gick inte att hämta, och med ett foto eller en skanning av en riktig kan trycket bytas
+mot den. Trycket är i rött, blått och gult: en fotboll i en gul skiva, *Har Ni tippat?*, STRYKTIPSET
+i ljusa bokstäver i ett rött band, och 1 X 2 med ett kryss i X och *Lycka till!* Tyget har gulnat av
+röken, mest upptill, har fläckar och har legat vikt i fyra delar, och det röda ligger lite snett mot
+det blå, som i ett billigt tryck. Rundstavar med knoppar i fållarna håller det sträckt, och det
+hänger lite snett i två snören från skruvöglor i taket. Den leder ingenstans, och på natten mörknar
+den med lysröret.
+
 **Gänget** sitter på barstolar runt ett runt barbord framför fönsterbänken, med benen
 hängande: DL och DJ på sidorna, vända in mot bordet, och DT bakom (`BORD` och `FIGS` i
 rum-3d.js). Bordet har en skiva av ljust laminat med ringar efter glasen, kromkant och en
 kromfot, och barstolarna röd vinyl med söm och en krom ställning med fotring. Ölen, DT:s
 askkopp och extraflaska och kupongerna står på bordet, och två tomflaskor står kvar på
-fönsterbänken bakom DJ. DL dricker ur en flaska, DT röker
+fönsterbänken bakom DJ. Fram till vänster på bordet står en pennkopp formad som en fotboll,
+med en gul blyertspenna med suddgummi, en röd penna och en blå kulspetspenna (`pennkopp` och
+`KOPP` i rum-3d.js). Där skymmer den inget på bordet hur de än sitter, och den står inte i
+vägen för tårtan. Den kostar två ritanrop: bollen, och pennorna och kanten i en geometri med
+färgerna i hörnen. DL dricker ur en flaska, DT röker
 och skrattar, DJ har en burk i ena handen och pratar med cigaretten i den andra. Var och en
 har sin loop (12–21 s) – flaskan och burken till munnen med huvudet bakåt, ett bloss med
 glöden som tänds och röken som blåses ut, benen som dinglar – och huvudena nickar efter
@@ -1996,7 +2071,8 @@ sida, och solglasögonen uppskjutna på den. Sköldarna är ESPN:s bilder i
 `public/rum/skold-nacional.png` och `skold-ifk.png` (256 px; den genomskinliga kanten skärs
 bort när de laddas, och saknas en blir det bara text). Halsduken följer bålen, tatueringen
 vrids med handen och mössan följer huvudet; håret trycks ner under mössan och sticker ut
-under kanten. Kläderna följer vädret utanför (se *Utsikten och vädret* nedan).
+under kanten. Kläderna följer vädret utanför (se *Utsikten och vädret* nedan) och högtiderna
+(se *Högtiderna* nedan).
 
 **De byter plats var tredje dag** (`PLATSER` och `placering` i rum-3d.js): DL till
 vänster, DT bakom och DJ till höger den 25–27 oktober 2026, sedan DL bakom, DT till höger
@@ -2031,6 +2107,49 @@ som sitter bakom bordet.
   snett uppåt, lutar sig bakåt och studsar lite. Den som tappade raden sjunker ihop med
   handen över ögonen (DL, DT) eller burken mot pannan (DJ). Den som inte påverkades nickar.
   Dolda resultat ger inga reaktioner, och när rummet öppnas räknas inga gamla mål.
+  Var och en reagerar på ett av tre sätt, olika från mål till mål (`malV` i rum-3d.js):
+  som ovan, med båda armarna i luften (rätt) eller båda händerna på huvudet och blicken i
+  taket (fel), eller med handen i bordet – den dunkar av glädje eller lyfts och slår i en
+  gång.
+
+**Gängets humör följer kupongen** (2026-11-03, `spelLage` i rum.js, `HUM` och `AKTER` i
+rum-3d.js). Så fort en match på gängets kupong är avgjord – också en som pågår, efter
+ställningen just nu – sitter gänget efter hur det går för kupongen:
+
+- **Glad** när kupongen går bättre än modellen väntade sig (z ≥ 0,5, samma z som betyget i
+  [Kuponghistoriken](#kuponghistoriken)) eller när allt är spelat och det blev vinst. De
+  lutar sig bakåt med livligare ben och huvudena gungar lite.
+- **Nervös** när nästa fel tar vinsten (Stryktipset ger pengar från tio rätt av tretton,
+  så tre fel är gränsen; på en kortare kupong en fjärdedel av matcherna) eller när den går
+  sämre än väntat (z ≤ −0,5). De sitter framåtlutade och benen skakar.
+- **Deppig** när kupongen är död – fler fel än den tål. De sjunker ihop med blicken ner
+  och benen stilla.
+- **Som vanligt** när det går som väntat. Utan avgjorda matcher, med dolda resultat och
+  mellan omgångarna gäller dagen efter (se nedan): bra är glad och illa deppig.
+
+Humöret glider över på 2,5 sekunder. Det syns också i **påhitten**: korta rörelser som var
+och en gör ibland, en i taget, i luckor om elva sekunder (förskjutna, så att de inte börjar
+samtidigt), utan att de vanliga looparna (klunken, blosset, pratet) är i vägen. Vilket
+påhitt och hur ofta beror på humöret (`MENY`):
+
+- **Som vanligt** (ungefär fyra luckor av tio): sträcker på sig och gäspar, kliar sig i
+  bakhuvudet, trummar med fingrarna på bordet, tittar ner i den tomma flaskan eller burken,
+  vilar hakan i handen.
+- **Glad** (tre av fyra luckor): lutar sig bakåt med handen i nacken, gungar i takt med
+  ölen i luften, sträcker på sig. Ibland gör gänget något tillsammans (var 31:a sekund,
+  ungefär varannan gång): skålar över bordet och tar en klunk (DT ett bloss), eller gungar
+  i takt allihop som på läktaren.
+- **Nervös:** biter på naglarna, knäpper händerna framför munnen (om flaskan eller burken)
+  och gungar fram och tillbaka, trummar med fingrarna, kliar sig i bakhuvudet.
+- **Deppig:** hakan i handen, skakar på huvudet och suckar, armarna i kors med blicken bort
+  från bordet, tittar ner i flaskan – och DJ lägger pannan i bordet några gånger.
+
+Den som leder omgången på sina egna tips lutar sig oftare bakåt med handen i nacken, och den
+som ligger sist sitter oftare med armarna i kors (när allas tips syns och minst tre matcher
+är avgjorda; delad ledning eller jumboplats räknas inte). Inga påhitt medan man väntar på
+kupongen, på natten, vid ett mål eller när man skålar med den som pekar på en, och det som
+pågår när humöret ändras gör färdigt sitt. Samma tid ger samma bild: luckorna och valen
+räknas ur klockan, och humöret minns när det ändrades.
 
 **Gänget är ni** ([public/rum-folk.js](public/rum-folk.js), `pekar` och `hej` i
 rum-3d.js): den som har rummet öppet syns i sin figur, som tittar dit hen pekar med musen –
@@ -2048,6 +2167,20 @@ tittar hen på en och skålar: lyfter flaskan (DL), burken (DJ) eller cigaretten
 och nickar, och tittar kvar tills man slutar peka. I telefonen gör ett tryck på figuren
 samma sak en stund. Den som väntar på kupongen tittar bara, och ett klick på en figur går
 inte vidare till det som står bakom.
+
+**Klicka på din figur** (`valj` i rum-folk.js, `vald` i rum-3d.js): ett klick eller tryck
+på din egen figur gör dig till den som fyller i kupongen – samma val som porträtten på
+kupongen (`Samtal.pult.vem`), så det går medan du kan fylla i den och figuren inte har
+lämnat in. Har du inte sagt vem du är blir du den du klickar på; har du det väljer bara din
+egen figur, och ett klick på någon annan är ett hej som förut (att byta gör man med
+porträtten på kupongen, så att ens utkast aldrig följer med till någon annan av misstag).
+Figuren visar det: den studsar till, räcker upp handen med pennan och viftar med den, lyfter
+kupongen mot en och sprattlar med benen medan de andra vänder sig mot hen, och efter två
+sekunder lutar den sig över kupongen och skriver ivrigt, rad för rad med pennan lyft mellan
+raderna, innan den efter knappt sex sekunder är tillbaka i väntan. Ett klick till medan det
+pågår gör ingenting. Kupongen på pulten, stämpeln och guldordet ritas om efter vem du är
+(`Rum.redraw`), och när du har sagt vem du är – här eller med porträtten – kopplar sidan upp
+sig mot profeterna-rummet på nytt, så att de andra ser vad du pekar på (`vemKoll`).
 
 **Natten** (`natt` i rum-3d.js och rum-inredning.js, `.natt` i
 [public/rum-folk.css](public/rum-folk.css)): mellan midnatt och sex, Stockholms tid, är
@@ -2070,6 +2203,39 @@ extraflaska omkullvält i en pöl och kupongen sönderriven i askkoppen, med ett
 bordet. Däremellan, och med dolda resultat, syns inget. (En barstol som vält syns inte:
 golvet ligger bakom pulten.)
 
+**Högtiderna** ([public/rum-fest.js](public/rum-fest.js), `festen` och `drakt`): runt de stora
+högtiderna klär gänget sig för dem, några dagar före och efter, så att det inte bara gäller en
+dag. Dagen är Stockholms, som ölen och fikat, och kommer en ny högtid medan sidan är öppen byter
+de om (`ute`, som när vädret ändras).
+
+- **Lucia** (12–14 december): vita linnen. Den som sitter bakom bordet bär luciakronan – lingonris
+  med röda bär runt en mässingsring och sju levande ljus vars lågor fladdrar (`tick`) och lyser –
+  och de två på sidorna stjärngossestrutar av papper med guldstjärnor, guldkant och en stjärna i
+  toppen.
+- **Jul** (20–28 december): tomteluvor i röd filt med vit pälskant, och toppen som faller ner på
+  den sida som syns med tofsen vid kinden. Stickade jultröjor – DL röd, DT grön och DJ marinblå –
+  med resår, sicksack, två renar mot en gran mitt fram, snöstjärnor på sidorna och en rad stjärnor
+  upptill, stickat maska för maska (`jultroja`), och prickar på ärmarna.
+- **Nyår** (29 december – 2 januari): kavaj i sammet (DL midnattsblå, DT svart och DJ vinröd) med
+  slag i det mörkare, vit skjorta med kragsnibbar och knappar och en fluga i svart satin.
+  Partyhattar i folie med ränder i spiral och en tofs av strimlor (DL guld, DT silver och blått,
+  DJ svart och guld), och konfetti på axlarna, i håret och över bordet med några serpentiner.
+- **Påsk** (onsdagen före skärtorsdagen till tisdagen efter annandag påsk): påskkärringar med
+  huckle knutet under hakan med två snibbar – DL rött med vita prickar, DT gult med blommor och DJ
+  blårutigt – och målade röda kinder och fräknar. Mönstret ritas i huvudets vinklar, så att
+  prickarna och blommorna är lika stora överallt; öronen är under hucklet.
+- **Midsommar** (onsdagen till söndagen kring midsommarafton): blomkransar av blad, prästkragar,
+  blåklint, smörblommor och klöver, tätast över pannan.
+
+Vid lucia, jul och nyår byter de om helt – jackorna är av, det är fest inne – och har långbyxor;
+DT kavlar ändå upp ärmen med lejonet. Vid påsk och midsommar har de kläderna efter vädret och bara
+det på huvudet. Det på huvudet ersätter DJ:s mössa, och håret trycks ner under kanten som under
+mössan. Solglasögonen sitter uppskjutna på tomteluvan och hucklet, i håret med partyhatten och är
+av med struten, kronan och kransen (på näsan när solen skiner, som vanligt). Oraklet dagen efter en
+bra omgång bär papperskronan i stället för högtidens (figuren byggs om när kronan kommer eller går),
+och DJ tar av sig struten, kronan och partyhatten när han somnar med huvudet på bordet. Blad,
+blommor, bär, ljus och konfetti är sammanslagna till ett nät per sak, så att det blir få ritanrop.
+
 **Kvittot** ligger på pulten i three.js med sakerna nedan
 ([public/rum-saker.js](public/rum-saker.js)): termopapper som har legat i rulle, så att änden
 med huvudet har böjt sig upp och den rivna änden lyfter lite, med en mjuk skugga under. Texten
@@ -2088,16 +2254,89 @@ mer, samma gräns som gängets tunnaste kläder (vädret från vader.js, läst v
 sekund); annars är den borta från pulten. Den svänger fram och tillbaka, och när den pekar
 mot askkoppen blåser röken åt sidan (draget räknas för varje puff under dess liv, så att
 samma tid ger samma bild). Inga riktiga märken: locket säger SNUS N:o 1, dosan PRIMA
-LÖSSNUS. **VM 94-affischen** är tejpad
-på insidan av skyltfönstret, i vänstra rutan under neonskyltens list (så att *VM 94* och
-*BRONS* syns): ett riktigt foto från
-landslagets hemkomst (Henrik Larsson och Pontus Kåmark med bronsmedaljerna, Norr
-Mälarstrand 18 juli 1994; foto Sniper Zeta,
-[CC BY-SA 4.0](https://creativecommons.org/licenses/by-sa/4.0/),
-[Wikimedia Commons](https://commons.wikimedia.org/wiki/File:Football_players_Pontus_K%C3%A5mark_Henrik_Larsson,_July_18,_1994.jpg)),
-beskuret i `public/rum/vm94.jpg` och med fotografen i affischens title och under den i
-närbilden (se [Närbilderna](#närbilderna)). Uppe till höger i
-fönstret syns himlen (rum-ute.js), så där hänger den inte.
+LÖSSNUS.
+
+**Affischerna** är tejpade på insidan av glaset ([public/rum-affischer.js](public/rum-affischer.js),
+rum-affischer.css; rum-saker.js sätter upp dem). Två sitter alltid i vänstra rutan av
+skyltfönstret, under neonskyltens list – Göteborgs-Postens löpsedel till vänster, där den går
+fritt från gängets huvuden, och VM 94-affischen till höger:
+
+- **VM 94-affischen:** ett riktigt foto från landslagets hemkomst (Henrik Larsson och Pontus
+  Kåmark med bronsmedaljerna, Norr Mälarstrand 18 juli 1994; foto Sniper Zeta,
+  [CC BY-SA 4.0](https://creativecommons.org/licenses/by-sa/4.0/),
+  [Wikimedia Commons](https://commons.wikimedia.org/wiki/File:Football_players_Pontus_K%C3%A5mark_Henrik_Larsson,_July_18,_1994.jpg)),
+  beskuret i `public/rum/vm94.jpg` och med fotografen i affischens title och under den i
+  närbilden (se [Närbilderna](#närbilderna)), med *VM 94* och *BRONS* i det gula bandet.
+- **IFK Göteborg 1982** (DJ:s lag): Göteborgs-Postens löpsedel morgonen efter segern i
+  UEFA-cupen, torsdag 20 maj 1982, som någon har sparat (Tomas önskemål: en löpsedel, inte en
+  plansch, och från GP eftersom det är IFK). Tidningens namn på ett blått band, datumet,
+  *UEFA-CUPEN*, *IFK BÄST I EUROPA!* i två rader så stora som ryms (samma mätning som veckans
+  löpsedel, `passa`), fotot från Volksparkstadion med laget och pokalen i luften under
+  skylten STADION HAMBURG – svartvitt i rastret, som i tidningen – och *3–0 i Hamburg –
+  pokalen hem till Göteborg*. Fotot (`public/rum/ifk82.jpg`) är beskuret ur ett som Tomas
+  skickade; fotografen och licensen är okända, så ingen rad står under närbilden. Titeln har
+  båda finalerna: 1–0 på Ullevi onsdag 5 maj (Tord Holmgren) och 3–0 i Hamburg onsdag 19 maj
+  (Dan Corneliusson, Torbjörn Nilsson, Stig Fredriksson på straff). Papperet har gulnat,
+  legat vikt i fyra delar (vecken, `.veck`) och har en reva i underkanten.
+
+**Nacional 1988** (DL:s lag) sitter till höger i fönstret, till höger om gänget och ovanför
+löpsedelns högra plats. Himlen (rum-ute.js) syns ovanför den, och i telefonen på höjden syns
+den utan att man drar. Det är förstasidan i **El Día** (Montevideo) måndagen den 12 december
+1988, dagen efter finalen i Intercontinental Cup på Estadio Nacional i Tokyo: *¡NACIONAL
+CAMPEÓN DEL MUNDO!*, 2–2 mot PSV Eindhoven efter förlängning (Santiago Ostolaza två mål,
+Romário och Ronald Koeman) och 7–6 på straffar (Jorge Seré räddade fyra, Tony Gómez satte den
+sista), med fotot av laget med Intercontinental-pokalen och Toyota-pokalen som Tomas skickade
+(fotografen är okänd, så ingen rad står under närbilden). Tidningen är riktig, som Tomas
+ville, men namnet är skrivet som text (inte tidningens logga) och sidan är vår; det som står
+om finalen stämmer, och det källorna inte är överens om (minuten för Koemans mål, vilka i PSV
+som missade sina straffar) står inte med, liksom årgång, nummer och pris. Sidan
+(`public/rum/nacional88.jpg`, 900 × 1332) är tryckt i raster, gulnad, fläckig och vikt i fyra
+delar redan i bilden; rummet lägger bara solens blekning ovanpå, inte affischernas
+prickraster, som blir grovt i närbilden. Närbilden tar 94 % av höjden.
+
+**Chelsea 2021** (DT:s lag) sitter inte på glaset utan på furupanelen till höger om
+fönstret, under oraklets skylt och till vänster om bardisken, alltid på samma ställe: en
+brittisk löpsedel (news bill) från **The Sun on Sunday**, söndagen den 30 maj 2021, dagen
+efter finalen. Tidningen är riktig, som Tomas ville, men namnet är skrivet som text i det
+röda bandet (inte tidningens logga), och rubriken är vår: *CHAMPIONS LEAGUE FINAL*,
+*CHELSEA* och *KINGS OF EUROPE!*, fotot av laget med pokalen under WINNERS-bågen
+(`public/rum/chelsea21.jpg`, beskuret ur ett foto som Tomas skickade; fotografen och
+licensen är okända, så ingen rad står under närbilden) och *Havertz strike sinks Man City
+1-0 in Porto* under. Chelsea vann finalen mot Manchester City med 1–0 på Estádio do Dragão
+i Porto den 29 maj 2021 (Kai Havertz). Löpsedeln är fem år gammal: papperet har gulnat,
+det röda har bleknat och den har legat vikt på mitten. Den sitter med två häftstift i
+papperskanten, är mindre än veckans löpsedel (78 bildpunkter bred, så att den ryms mellan
+fönsterkarmen och bardisken) och skyms lite av fönsterbänkens ände när rummet vrids.
+
+**Löpsedeln** är veckans, från kvällstidningen KVÄLLSPRESSEN (inget riktigt märke): röd
+tidningsrubrik med datum, en rad som *TIPSET* eller *SKRÄLLEN*, rubriken i Anton – varje rad
+så stor som ryms i bredden, en av dem röd – och en rad under. Den sitter i ett av
+skyltfönstrets nedre hörn, där gänget inte står i vägen, och byter hörn varje vecka (veckan
+i Stockholm, måndag till söndag). I telefonen på höjden sitter den alltid i det högra, som
+syns utan att man drar. (Först satt den ibland under dörrens handtag, men där hamnade den
+utanför bilden i telefonen och i smala fönster, och syntes inte.) Rubriken är det mest dramatiska som rummet vet om (`rubrik` i
+rum-affischer.js):
+
+- *förra omgången* (säsongens omgångar, `TP.season`): den som tippade bäst med minst 82 %
+  rätt (*TEIJDER 12 RÄTT!*, eller *ALLA RÄTT!*), den som tippade sämst med högst hälften
+  rätt (*LAINOS MARDRÖM*), modellen mot gänget (*DATORN KROSSADE GÄNGET*, *GÄNGET SLOG
+  DATORN*) och en ny ensam etta i Tipsligan (*TEIJDER TOG TRONEN*) – ställningen och namnen
+  som på skårtavlan (Dogge för Johansson);
+- *en spelad match* i förra omgången eller gängets senaste kupong: skrällen när modellen gav
+  utfallet högst 22 % (*BRIGHTON SÄNKTE MAN CITY*, *… FÄLLDE …*), en favorit med minst 58 %
+  som bara fick oavgjort (*ARSENAL SNUBBLADE*) och segrar med fyra mål eller mer (*QPR KÖRDE
+  ÖVER SWANSEA*);
+- *gängets kupong* (Historik): betyg 1 (*KUPONGEN I SPILLROR*) eller 5 (*DRÖMKUPONGEN*);
+- *nästa omgång*, så länge ingen av dess matcher har startat: den jämnaste matchen när
+  ingen utgång har över 42 % (*RYSAREN*), den största favoriten med minst 68 % (*MAN CITY
+  KAN INTE FÖRLORA – eller?*) och jakten på ledaren i Tipsligan.
+
+Varje rubrik har en vikt efter hur dramatisk den är (hur få rätt, hur liten chans …).
+Förra omgångens väger fullt tre dagar efter sista avsparken, sedan 55 % och efter sex dagar
+30 %; nästa omgångs 90 %. Omgångar och kuponger som spoilerskyddet döljer räknas inte.
+Utan något att skriva om står *STORA TIPSGUIDEN*. Tidningen är från dagen det hände (tre
+timmar efter sista avsparken), och för nästa omgång från idag. Ett klick går fram till
+löpsedeln, som till de andra affischerna; som inget annat i rummet leder den ut ur det.
 
 **Fikat** står på pulten vissa dagar, i three.js som sakerna
 ([public/rum-fika.js](public/rum-fika.js)): två semlor i pappersform med mandelmassa,
@@ -2117,14 +2356,16 @@ på pulten står i en av fyra uppställningar (`LAYOUTS` – fläkten längst ba
 mitten eller bakom kvittot och då vänd åt höger, askkoppen och dosan om vartannat, några
 pixlar hit eller dit), kvittot ligger någonstans till vänster om dem, vridet åt det ena eller
 andra hållet och mer eller mindre uppböjt (det första av elva lägen som går fritt från
-askkoppen, dosan och fläkten), locket och prisen läggs där det finns plats, och affischen sitter
-till vänster eller till höger under neonskylten. Slitaget följer tippningen: andelen fel
+askkoppen, dosan och fläkten), locket och prisen läggs där det finns plats, och affischerna
+flyttar sig några pixlar. Slitaget följer tippningen: andelen fel
 bland omgångens avgjorda matcher, annars i den senaste färdigspelade kupongen, och utan
 rättning ett mellanläge. Går det dåligt fylls askkoppen (1–11 fimpar), askan hamnar
-bredvid, snuset spills, fläkten (om den står där) går på trean, affischen bleks och ett hörn
+bredvid, snuset spills, fläkten (om den står där) går på trean, affischerna bleks och ett hörn
 släpper; går det riktigt illa ryker två cigaretter, en använd pris ligger på pulten och
-affischen hänger i en tejpbit. Dolda resultat räknas inte (gradeRow rättar dem inte). Utan
-WebGL står affischen kvar men inte sakerna på pulten.
+affischerna hänger i en tejpbit (löpsedeln är ny för veckan och blir bara lite böjd, och
+Chelsea-löpsedeln sitter kvar med sina häftstift). Dolda
+resultat räknas inte (gradeRow rättar dem inte). Utan WebGL står affischerna kvar men inte
+sakerna på pulten.
 
 **Lysröret tänds när man kommer in** (`tand` i rum.js, `.rum-mork` i rum.css; inte på natten): medan
 gänget laddas är rummet mörkt, utom gatan genom skyltfönstret och dörren och tv:n som
@@ -2154,15 +2395,24 @@ Rummet läser om datan varje minut medan det står öppet.
 
 **Bilder:** `?rum-t=<sekunder>` fryser klockan (figurerna, röken och CSS-animationerna
 står på samma tid), `?rum-mx=&rum-my=` (−1…1) kamerans läge,
-`?rum-slit=0…1` slitaget och `?rum-dag=<tal>` dagen för sakerna och affischen,
+`?rum-slit=0…1` slitaget, `?rum-dag=<tal>` dagen för sakerna och affischerna,
+`?rum-vecka=<tal>` veckan för löpsedelns plats och `?rum-rubrik=<typ>` en viss rubrik om den
+finns (`bast`, `samst`, `datorn`, `ledare`, `skrall`, `kross`, `kupong`, `rysaren`, `spiken`,
+`jakten`),
 `?rum-fika=semlor` (`pepparkakor`, `lussekatter`, `kanelbullar`, `paskagg`,
-`chokladbollar`) fikat och `?rum-ol=jul` (`pask`) ölen. Gänget: `?rum-plats=0` (`1`, `2`)
+`chokladbollar`) fikat, `?rum-ol=jul` (`pask`) ölen och `?rum-fest=jul` (`lucia`, `nyar`,
+`pask`, `midsommar`, `inget`) högtidskläderna. Gänget: `?rum-plats=0` (`1`, `2`)
 var de sitter vid bordet, `?rum-vantar=DL,DT` som om de inte hade lämnat in,
 `?rum-stopp=<timmar>` som om det var så långt kvar till spelstoppet, `?rum-tittar` som
 om matcherna pågick och `?rum-mal=dl:1,dt:-1,dj:0` ett mål
-(rätt, fel, ingen skillnad; vid tiden 0 med `?rum-t`, annars var femtonde sekund),
+(rätt, fel, ingen skillnad; vid tiden 0 med `?rum-t`, annars var femtonde sekund; `dl:1b`
+väljer sättet: `a` som förut, `b` båda armarna eller händerna på huvudet, `c` handen i
+bordet), `?rum-humor=glad` (`nerv`, `deppig`) humöret, `?rum-rank=dl:1,dj:-1` vem som
+leder och ligger sist i omgången, `?rum-akt=dl:kors,dj:dunk` ett påhitt om och om igen
+(mitt i det med `?rum-t`; namnen står i `AKTER` i rum-3d.js),
 `?rum-pekar=dt:tv,dl:dj` som om de pekade (på en sak eller någon i gänget),
-`?rum-hej=dl` som om man pekade på DL, `?rum-natt` (`=0` dag) natten och
+`?rum-hej=dl` som om man pekade på DL, `?rum-vald=dl` som om man just hade klickat på
+DL (`dl:3` tre sekunder sedan; med `?rum-t` och den som inte har lämnat in), `?rum-natt` (`=0` dag) natten och
 `?rum-efter=bra` (`illa`, `inget`) dagen efter. Sidan
 sätter `data-rum-klar` på `body` när allt är ritat. Vädret och klockan utanför:
 `?rum-klocka=2026-12-13T16:00` (eller bara `16:00`, Stockholms tid), `?rum-vader=klart`,
@@ -2407,7 +2657,7 @@ sekunden medan kameran gled i 60. Nära tv:n och videon blev bilden dessutom int
 vridningen hade stannat, efter ett par sekunder. Nu:
 
 - **Världen vrids med kameran.** Vid tv:n, videon, anslagstavlan och kortregistret, och
-  tillbaka därifrån och från uret, skårtavlan, oraklet och affischen, vrids världen dit den
+  tillbaka därifrån och från uret, skårtavlan, oraklet och affischerna, vrids världen dit den
   ska på samma tid och med samma kurva som kameran glider (`vrid` i rum.js, `.vrider` i
   rum.css); tillbaka mot musen (`vridHem`). Gänget och sakerna i 3D ritas med den vridning
   som syns, längs samma kurva. Bara i Chrome.
@@ -2673,7 +2923,8 @@ Utan nätet är det mulet och månadens vanliga temperatur.
   parkas, DT och DJ dunjackor, DJ med pälskant). När det regnar har de regnjackor (DL gul,
   DT olivgrön, DJ svart), och när det snöar ligger snö på axlarna och huvudet. DT kavlar
   alltid upp ärmen på armen med lejonet, och halsduken ligger utanpå jackan. Ändras vädret
-  medan rummet står öppet byter den som behöver om.
+  medan rummet står öppet byter den som behöver om. Runt högtiderna klär de sig för dem (se
+  *Högtiderna* under [Tobaksaffären](#tobaksaffären)).
 
 Utsikten ligger bakom väggen i det bakersta planet och syns genom hålen i den (masken
 `rum-hal` och måtten `WIN` och `DORR` i rum.js), i scenens koordinater, så att den som går
@@ -2698,7 +2949,8 @@ och drar det andra – ett kryss med blyerts som ser likadant ut varje gång (sa
 slumpfrö för matchen och tecknet). Står pennan still en stund lägger den sig vid sidan
 igen. Ett kryss som tas bort suddas ut. Vem man är väljer man bland porträtten överst, som
 på papperet (*Vem är du?*; den som redan har lämnat in går inte att välja): pennan ringar in
-ditt porträtt, och stämpeln säger vem omgången väntar på med dig först. Fälten i foten
+ditt porträtt, och stämpeln säger vem omgången väntar på med dig först. Det går också
+med ett klick på din figur vid bordet (se *Klicka på din figur* ovan). Fälten i foten
 räknas om för varje kryss.
 
 **Motiveringen** skrivs för hand efter tiden, som på papperet: när en match är tippad står
@@ -2901,6 +3153,21 @@ nedersta fram och läggs överst), lapp för lapp över tavlan från vänster. L
 bara på divisionens lag, så att styrkan och motståndet jämförs inom divisionen; en lista
 som blir tom står som *Ingen*. Det valda bladet ligger kvar överst tills sidan laddas om.
 
+Ryms inte det längsta bladet på lappens plats är bunten vikt (2026-11-03, användarens
+önskemål – förut klipptes det som inte fick plats bort): resten är vikt bakom, och i
+underkanten syns vecket, där texten försvinner runt böjen och skuggan är tjockare. I handen
+vecklas lappen ut, ett veck i taget och i dragspel när den är mer än dubbelt så lång, och
+viks ihop igen på vägen tillbaka; vecken syns som linjer i papperet. Längden mäts i
+närbilden när lapparna ritas och igen när typsnitten har laddats (`measure` och `panels` i
+rum-anslag.js). Den utvikta lappen blir aldrig mindre än att den går att läsa (`MINS`); ryms
+den inte i fönstret då, som en lång skadelista i telefonen, flyttas den med hjulet, fingret
+eller Page Up/Page Down, och då bläddrar ett svep uppåt eller neråt inte bladen. Det är
+framför allt skadelistan som viks: med sju matcher i Premier League rymdes förut ungefär
+hälften av lagen och med tio en tredjedel. Övriga lappar ryms med en hel omgång i en division
+(tolv matcher): kryssar gärna och slår oddsen är lite högre, så att deras sista rad kommer
+med, almanacksbladet är bredare, så att långa namn (Bournemouth, Southampton) står hela, och
+polaroidens text blir mindre när lagnamnet är långt.
+
 Ett klick eller A: tavlan lossnar från väggen och flyger fram – en projektiv avbildning
 (`matrix3d`) från hörnen på väggen till rakt fram, så att den vrids ut ur väggens vinkel –
 medan kameran går lite mot hörnet och rummet mörknar bakom; där den hängde är väggen
@@ -2914,8 +3181,7 @@ tillbaka och rummet har vridits mot musen (rum.js mäter dem med kameran och rum
 kort stund). Flygturen räknas ut i förväg, en avbildning var 20:e ms, och flygs som en
 animering som grafikkortet sköter själv (`fly` i rum-anslag.js), så att den går jämnt också
 när datorn har annat att göra (se [När datorn inte hinner med](#när-datorn-inte-hinner-med)).
-Guldordet *Statistik* under
-tavlan leder till Statistik, och pekar man på tavlan i rummet tänds snabbvalet Statistik på
+Pekar man på tavlan i rummet tänds snabbvalet Statistik på
 text-tv:n. Med `prefers-reduced-motion` står tavlan framme direkt.
 
 Dolda resultat: formen får ? för de dolda matcherna, och lapparna som räknar med
@@ -2929,7 +3195,7 @@ styrka, kryss, tur, odds, vila, motstand) med den lappen i handen.
 
 ### Kortregistret
 
-På disken under anslagstavlans högra hörn står en kortlåda i lackad teak, byggd i three.js
+På disken under Tipsligan står en kortlåda i lackad teak, byggd i three.js
 som inredningen ([public/rum-kortlada.js](public/rum-kortlada.js)), med korten, datan och
 kortet i handen i [public/rum-register.js](public/rum-register.js) och
 [public/rum-register.css](public/rum-register.css). Fram på lådan sitter en mässingshållare
@@ -2943,9 +3209,13 @@ haft ett annat jobb. I lådan står, framifrån:
   ofta laget har varit favorit), *Skytten* (bäste målskytten och andelen av lagets mål) och
   *Nästa* (motståndet, hemma eller borta och om hur många dagar, med cupen eller Europacupen
   när det inte är ligan). Ur `data/teams/<division>.json` och matchens fil.
-- **Mötena** – en röd avdelare, och bakom den ett blått kort per match: de senaste åtta
-  mötena med datum, tävling, lagen och resultatet, och hemmalagets V–O–F i dem med blyerts
-  längst ner.
+- **Mötena** – en röd avdelare, och bakom den ett blått kort per match: alla möten som
+  sajten har (de sex senaste från tidigare säsonger och säsongens) med datum, tävling, lagen
+  och resultatet, och hemmalagets V–O–F i dem med blyerts längst ner. Kortet rymmer elva
+  möten ovanför summan; förut stod bara de åtta senaste, och det äldsta föll bort när
+  säsongen hade gett tre möten (2026-11-03). Inget annat på korten klipps: lagkorten har
+  gott om plats också med de längsta namnen, så de behöver inte vikas som anslagstavlans
+  lappar.
 
 Flikarna sitter på fem platser (lagen) och tre (mötena), så att varje flik syns ovanför
 dem framför. Ett klick eller R: lådan lyfter från disken, vänder sig mot en och lutar så att
@@ -2956,7 +3226,7 @@ avdelare: det första kortet bakom den): det reser sig ur lådan och tas i hande
 storlek, och pilarna (i telefonen ett svep i sidled) bläddrar mellan korten.
 Esc, ett klick utanför eller *Sätt tillbaka*
 sätter tillbaka kortet; Esc, R eller ett klick utanför lådan ställer den på disken igen.
-Guldordet *Lagen* under lådan leder till Lagen på Statistik, och pekar man på lådan tänds
+Pekar man på lådan tänds
 snabbvalet Statistik på text-tv:n. Med `prefers-reduced-motion` står lådan framme direkt.
 
 Dolda resultat: lagkorten visar bara namnet och ett frågetecken när en match i lagens
@@ -2983,6 +3253,8 @@ En sak liknar en annan med flit: lagets bäste skytt kan stå med samma målanta
 skytteligan, men kortet visar hur mycket laget hänger på en spelare och skytteligan vem som
 leder. Skårtavlan på väggen visar inte längre tabellen utan gängets egen ställning
 (Tipsligan).
+Löpsedeln på glaset (se *Affischerna* ovan) är en rubrik, inte statistik: den citerar bara
+den siffra som gör rubriken till en nyhet, som modellens chans för skrällen eller favoriten.
 
 ### Videon
 
@@ -3193,25 +3465,29 @@ en fast bild.
 
 ### Närbilderna
 
-Uret, skårtavlan, Omgångens orakel och VM 94-affischen tittar man på nära med ett klick
-(`sak` i rum.js, `data-sak` på föremålen): kameran ställer sig rakt framför och går fram tills
+Uret, skårtavlan, Omgångens orakel, pokalhyllan, korktavlan, affischerna på glaset (VM 94,
+IFK 1982, Nacional 1988 och löpsedeln) och Chelsea-löpsedeln på väggen, namnet på dörren
+och kvittot tittar man på nära med ett klick (`sak` i rum.js, `data-sak` på föremålen), och
+kupongen på pulten när den inte går att ta i handen: kameran ställer sig rakt framför och går fram tills
 saken fyller det mesta av fönstret – högst 90 % av bredden och 74–94 % av höjden mellan
 namnet och foten (den låga skårtavlan 50 %, så att den inte kommer närmare än de andra) – i
 telefonen också. Rummet vrids rakt medan kameran glider fram och står
 sedan still: så länge något vrids ritar webbläsaren lagren i den vanliga skalan och förstorar
 dem suddigt, och när det står still ritas de om skarpt. Det som står framför väggen – gänget
-vid barbordet och pulten – tonar bort medan kameran går förbi. Uret,
-orakelramen och ramen kring skårtavlan är ritade i 3D och ritas om i närbildens skala när
+vid barbordet och pulten – tonar bort medan kameran går förbi (inte när saken ligger på
+pulten), och vid pokalhyllan tv:n. Dörren siktar kameran på en osynlig ruta över dörrens övre
+del (`#rum-dorrglas`), så att Stängt-skylten och namnet kommer med. Uret,
+orakelramen och ramarna kring skårtavlan och korktavlan är ritade i 3D och ritas om i närbildens skala när
 kameran är framme (`skarp` i rum-inredning.js, högst 2600 bildpunkter på längsta ledet);
 uret går som vanligt, med sekundvisaren.
 
-Under skårtavlan och oraklet står guldordet dit de leder (båda *Olympen*); det, eller
-ett klick till på saken, tonar bort rummet och byter sida. Under affischen står fotografen
-och licensen med en länk till fotot på Wikimedia Commons. Esc, ett klick någon annanstans
-eller ett klick till på uret eller affischen går tillbaka, och K, T, A, R och V går direkt
-till kupongen, tv:n, anslagstavlan, kortregistret och videon. Föremålen lyser inte när man
+Ingen närbild leder ut ur rummet. Under pokalhyllan står hur många pokaler var och en har,
+under dörren raderna från Om oss i bladguld och under VM 94-affischen fotografen och licensen med
+en länk till fotot på Wikimedia Commons. Esc eller ett klick (också på saken) går tillbaka,
+och K, T, A, R och V går direkt till kupongen, tv:n, anslagstavlan, kortregistret och videon
+(K nära kupongen på pulten går tillbaka). Föremålen lyser inte när man
 pekar på dem på nära håll. Med `prefers-reduced-motion` går kameran direkt.
-`?rum-sak=ur|skar|ram|vm94` visar en närbild i en fast bild.
+`?rum-sak=ur|skar|ram|pokal|kork|vm94|ifk|nacional|lopsedel|chelsea|dorr|kvitto|kupong` visar en närbild i en fast bild (med `?rum-t`).
 
 ## Statusmärkning
 

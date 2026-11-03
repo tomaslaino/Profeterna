@@ -1608,7 +1608,7 @@
     const open = !s.visas && Date.now() < Math.min(...kicks(s));
     const du = v && s.gang.find((g) => g.id === v);
     const go = !open ? 'Till uppgörelsen' : done ? 'Se de andras tips'
-      : du && tally(s, du) ? 'Fyll i resten' : 'Fyll i kupongen';
+      : du && tally(s, du) ? 'Fyll i resten' : 'Till kupongen';
     return '<div class="card sm-teaser">' + nameBlock(s, 'ruta') + raden(s) +
       '<a class="kp-btn primary" href="#kupong">' + go + '</a></div>';
   }
@@ -1757,7 +1757,7 @@
         bort: !s.visas && !s.gang.some((g) => g.inne && g.id !== v),
         matcher: !s.visas && !s.gang.some((g) => g.inne),
         go: !open ? (s.visas && before ? 'Till uppgörelsen' : 'Följ kupongen')
-          : inne ? (gang ? 'Till uppgörelsen' : '') : n ? 'Fyll i resten' : 'Fyll i kupongen',
+          : inne ? (gang ? 'Till uppgörelsen' : '') : n ? 'Fyll i resten' : '',
       };
     },
     // Du kryssar för vem du är; kryssen och motiveringarna på kupongen följer med.

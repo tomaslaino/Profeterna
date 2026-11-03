@@ -24,12 +24,19 @@
 // divisionen: bladen ovanpå lyfts från nålen och läggs under bunten, lapp
 // för lapp över tavlan från vänster.
 //
+// Ryms inte det längsta bladet på lappens plats är bunten vikt: resten är
+// vikt bakom, och vecket syns i underkanten. I handen vecklas den ut (i
+// dragspel när den är mer än dubbelt så lång) och viks ihop på vägen
+// tillbaka, så att inget på bladen klipps bort. Längden mäts i närbilden.
+//
 // Ett klick på tavlan: den lossnar från väggen och flyger fram, vriden från
 // väggens vinkel till rakt fram, rummet mörknar bakom och den lutar lite
 // efter musen. Ett klick på en lapp tar den från nålen och fram i läsbar
-// storlek (polaroiden vänds); ←/→ bläddrar mellan lapparna och ↑/↓ mellan
-// bladen. Esc, ett klick utanför eller Häng tillbaka sätter tillbaka lappen,
-// och Esc igen eller ett klick utanför tavlan hänger tavlan på väggen igen.
+// storlek (polaroiden vänds, den vikta vecklas ut); ←/→ bläddrar mellan
+// lapparna och ↑/↓ mellan bladen. Ryms den utvikta lappen inte i fönstret
+// flyttas den med hjulet, fingret eller Page Up/Down. Esc, ett klick
+// utanför eller Häng tillbaka sätter tillbaka lappen, och Esc igen eller
+// ett klick utanför tavlan hänger tavlan på väggen igen.
 //
 // Dolda resultat (Spoiler): formen får ?, och lapparna som räknar med
 // resultaten (styrkan, krysset, turen, oddsen, motståndet) står med ? och
@@ -40,7 +47,7 @@
 //
 // RumAnslag.wall() → tavlan (i onWall i rum.js, på högra väggen)
 // RumAnslag.nara() → närbilden
-// RumAnslag.mount(root, { calm, kort, close }) → { fill(ms, all), quad(), open(on, q), on(), key(k) }
+// RumAnslag.mount(root, { calm, kort, close }) → { fill(ms, all), quad(), open(on, q), on(), key(k), drog() }
 
 window.RumAnslag = (() => {
   // tavlan ritas i 1000 × 568 och förminskas på väggen
@@ -74,10 +81,10 @@ window.RumAnslag = (() => {
     { id: 'form', paper: 'kort', x: 30, y: 38, w: 296, h: 206, rot: -1.4, pin: '#c2271c', name: 'Formen' },
     { id: 'skador', paper: 'genomslag', x: 354, y: 32, w: 194, h: 226, rot: 1.1, pin: '#2a52a0', name: 'Skadelistan' },
     { id: 'styrka', paper: 'polaroid', x: 576, y: 40, w: 162, h: 208, rot: -3.2, pin: 'stift', name: 'Starkast' },
-    { id: 'kryss', paper: 'postit', x: 766, y: 40, w: 166, h: 172, rot: 3, pin: '#3db37c', name: 'Kryssar gärna' },
+    { id: 'kryss', paper: 'postit', x: 766, y: 40, w: 166, h: 190, rot: 3, pin: '#3db37c', name: 'Kryssar gärna' },
     { id: 'tur', paper: 'rutat', x: 30, y: 280, w: 210, h: 228, rot: 1.6, pin: '#d8b06a', name: 'Tur & otur' },
-    { id: 'odds', paper: 'tidning', x: 270, y: 292, w: 222, h: 206, rot: -1.1, pin: '#c2271c', name: 'Mot oddsen' },
-    { id: 'vila', paper: 'almanacka', x: 522, y: 264, w: 190, h: 248, rot: 2.1, pin: '#5a5f8a', name: 'Vilan' },
+    { id: 'odds', paper: 'tidning', x: 270, y: 290, w: 202, h: 218, rot: -1.1, pin: '#c2271c', name: 'Mot oddsen' },
+    { id: 'vila', paper: 'almanacka', x: 502, y: 264, w: 210, h: 248, rot: 2.1, pin: '#5a5f8a', name: 'Vilan' },
     { id: 'motstand', paper: 'linjerat', x: 742, y: 278, w: 190, h: 230, rot: -2, pin: '#e7e1d2', name: 'Motståndet' },
   ];
   // jutens mått (tavlan innanför ramen)
@@ -195,8 +202,10 @@ window.RumAnslag = (() => {
     const divs = DIVS.filter((d) => teams.some((x) => x.t.comp === d));
     const etta = divs.length ? teams.filter((x) => x.t.comp === divs[0]).sort((a, b) => b.t.str - a.t.str)[0] : null;
     const crest = etta && window.Skoldar && Skoldar.has(etta.name) ? Skoldar.img(etta.name) : '<span class="skold"></span>';
+    // texten för hand under fotot: mindre när namnet är långt, så att den ryms
+    const under = `Starkast${etta && !D.veil ? ` – ${D.kort(etta.name)}` : ''}`;
     const front = `<span class="ans-foto">${D.veil ? '<b class="q">?</b>' : crest}</span>` +
-      `<span class="ans-under">Starkast${etta && !D.veil ? ` – ${esc(D.kort(etta.name))}` : ''}</span>`;
+      `<span class="ans-under" style="font-size:${Math.min(19, Math.floor(148 / (0.4 * under.length)))}px">${esc(under)}</span>`;
     const SHORT = { pl: 'PL', ch: 'CH', l1: 'L1', l2: 'L2' };
     // de starkaste och de svagaste i omgången, per division (styrkan
     // jämförs bara inom divisionen): tre, två eller en från var och en
@@ -243,7 +252,7 @@ window.RumAnslag = (() => {
     if (D.veil) return dolt('Tur &amp; otur');
     const [up, down] = split(D, xpd, 4);
     const max = Math.max(1, ...up.map((x) => x.v), ...down.map((x) => -x.v));
-    const row = (x) => `<span class="r"><span>${esc(D.kort(x.name))}</span><i class="bar${x.v < 0 ? ' neg' : ''}" style="width:${r1(4 + 52 * Math.abs(x.v) / max)}px"></i>` +
+    const row = (x) => `<span class="r"><span>${esc(D.kort(x.name))}</span><i class="bar${x.v < 0 ? ' neg' : ''}" style="width:${r1(4 + 36 * Math.abs(x.v) / max)}px"></i>` +
       `<span>${signed(x.v)}</span></span>`;
     if (!up.length && !down.length) return '<h4>Tur &amp; otur</h4><p class="inget">Okänt</p>';
     return `<h4>Tur &amp; otur</h4><b class="d">Tur</b>${rows(up, row)}<b class="d">Otur</b>${rows(down, row)}`;
@@ -324,18 +333,41 @@ window.RumAnslag = (() => {
   }
   // Bladen i en lapp, med det valda (top) överst och resten i ordning under
   // det: z-index och skuggan efter djupet (lag), och fliken i högerkanten.
+  // Ryms inte det längsta bladet på lappens plats är bunten vikt: på tavlan
+  // syns vecket i underkanten, och i handen (len, den utvikta längden) är
+  // bladen delade i paneler som vecklas ut (panels).
   const depth = (sheets, s, top) => (sheets.indexOf(s) - sheets.indexOf(top) + sheets.length) % sheets.length;
   const arkPos = (n, i) => `translate(${n.fan[i][1]}px, ${n.fan[i][2]}px) rotate(${n.fan[i][0]}deg)`;
-  function sheetsHtml(n, inner, sheets, top) {
+  function sheetsHtml(n, inner, sheets, top, len = n.h) {
+    const delad = len > n.h;
     return sheets.map((s, i) => {
       const a = ARK[s];
       const lag = depth(sheets, s, top);
       // flikarna med lika långt mellan sig fast bladen är vridna och förskjutna
       const y = r1(FLIK(i) - n.fan[i][2] - (n.w / 2) * Math.sin((n.fan[i][0] * Math.PI) / 180));
       const flik = a ? `<i class="ans-flik" data-flik="${s}" style="top:${y}px; --dv:${a.col}"><b>${a.short}</b></i>` : '';
-      return `<span class="ans-ark p-${n.paper}" data-ark="${s}" style="z-index:${sheets.length - lag}; --lag:${lag}; transform:${arkPos(n, i)}">` +
-        `<span class="ans-in">${inner[s]}</span>${flik}</span>`;
+      const body = delad ? panels(n, len, inner[s]) : `<span class="ans-in">${inner[s]}</span>${n.paper === 'polaroid' ? '' : '<i class="ans-vik"></i>'}`;
+      return `<span class="ans-ark ${delad ? 'delad' : `p-${n.paper}`}" data-ark="${s}" style="z-index:${sheets.length - lag}; --lag:${lag}; transform:${arkPos(n, i)}">` +
+        `${body}${flik}</span>`;
     }).join('');
+  }
+  // Ett utvikt blad: överst panelen som syns på tavlan (n.h hög), och under
+  // den resten av längden i lika långa paneler, var och en fäst i
+  // underkanten på den ovanför (ett veck) och vikt bakom den – i dragspel,
+  // så att de ryms bakom den översta. Varje panel har en kopia av hela
+  // bladet, förskjuten uppåt, så att papperet och texten fortsätter över
+  // vecken, och en baksida.
+  function panels(n, len, html) {
+    const k = Math.ceil(len / n.h);
+    const p = (len - n.h) / (k - 1);
+    let out = '';
+    for (let i = k - 1; i >= 0; i--) {
+      const y = i ? n.h + (i - 1) * p : 0;
+      const sida = `<span class="ans-sida"><span class="ans-papper p-${n.paper}" style="top:${r1(-y)}px; height:${len}px"><span class="ans-in">${html}</span></span></span>`;
+      out = `<span class="ans-pan${i ? ' vik' : ''}" data-d="${i}" style="top:${i ? r1(i === 1 ? n.h : p) : 0}px; height:${r1(i ? p : n.h)}px">` +
+        `${sida}${i ? `<span class="ans-rygg p-${n.paper}"></span>` : ''}${out}</span>`;
+    }
+    return out;
   }
   const label = (n, top) => esc(ARK[top] ? `${n.name} – ${ARK[top].name}` : n.name);
   const noteHtml = (n, inner, sheets, top, wall) => `<${wall ? 'span' : 'button type="button"'} class="ans-lapp" data-lapp="${n.id}" ` +
@@ -359,7 +391,6 @@ window.RumAnslag = (() => {
   function nara() {
     return '<div class="rum-ansn" id="rum-ansn" role="dialog" aria-label="Anslagstavlan"><div class="ans-bak"></div>' +
       '<div class="ans-flyg" id="ans-flyg"><div class="ans-luta" id="ans-luta"><div class="ans-tavla stor" id="ans-stor" tabindex="-1"></div></div></div>' +
-      '<div class="ans-fot" id="ans-fot"><a class="rum-guld" href="statistik.html" data-nav="statistik">Statistik</a></div>' +
       '<div class="ans-lyft" id="ans-lyft"></div>' +
       '<div class="ans-rad" id="ans-rad"><span id="ans-sp"></span><button type="button" class="ans-tbx" data-ans="tillbaka">Häng tillbaka</button></div></div>';
   }
@@ -390,14 +421,13 @@ window.RumAnslag = (() => {
   // ---------- i rummet ----------
 
   function mount(root, o) {
-    const A = { on: false, ms: [], all: [], teams: new Map(), match: new Map(), html: '', loaded: 0, lyft: null, raf: 0, seed: -1, W: null, sheets: ['alla'], top: 'alla', anims: [], flip: 0 };
+    const A = { on: false, ms: [], all: [], teams: new Map(), match: new Map(), html: '', loaded: 0, lyft: null, raf: 0, seed: -1, W: null, sheets: ['alla'], top: 'alla', anims: [], flip: 0, len: {}, vanims: [] };
     const vagg = root.querySelector('#ans-vagg');
     const wallEl = root.querySelector('#rum-ans');
     const ov = root.querySelector('#rum-ansn');
     const flyg = root.querySelector('#ans-flyg');
     const luta = root.querySelector('#ans-luta');
     const stor = root.querySelector('#ans-stor');
-    const fot = root.querySelector('#ans-fot');
     const lyftEl = root.querySelector('#ans-lyft');
     const rad = root.querySelector('#ans-rad');
     const sp = root.querySelector('#ans-sp');
@@ -471,14 +501,49 @@ window.RumAnslag = (() => {
       stopFlip();
       vagg.innerHTML = board(A.W, inner, A.sheets, A.top, true);
       stor.innerHTML = board(A.W, inner, A.sheets, A.top, false);
+      measure();
       if (A.lyft) {
         const n = A.W.notes.find((x) => x.id === A.lyft.id);
         stor.querySelector(`[data-lapp="${n.id}"]`).classList.add('borta');
         const card = lyftEl.querySelector('.ans-lapp');
-        if (card) card.innerHTML = sheetsHtml(n, inner[n.id], A.sheets, A.top);
+        if (card) {
+          stopVik();
+          A.lyft.len = A.len[n.id] || n.h;
+          card.style.height = `${A.lyft.len}px`;
+          card.innerHTML = sheetsHtml(n, inner[n.id], A.sheets, A.top, A.lyft.len);
+          card.classList.add('utvikt');
+          placeLyft(n, false);
+        }
         if (n.paper === 'polaroid' && A.lyft.vand) vand(true);
         spoilerRow(n);
       }
+      // typsnitten ändrar längden: mät om när de har laddats
+      if (document.fonts && !A.typsnitt) {
+        A.typsnitt = true;
+        document.fonts.ready.then(() => { if (measure() && A.lyft) { A.html = ''; draw(); } });
+      }
+    }
+
+    // Hur långa lapparna är utvikta (A.len): det längsta bladet i bunten,
+    // minst lappens plats på tavlan. De längre är vikta (.vikt), på väggen
+    // och i närbilden. Mäts i närbilden, som är utlagd också när den inte
+    // syns; utan mått (rummet är inte utlagt) mäts den när tavlan tas fram.
+    function measure() {
+      if (!stor.offsetWidth || !A.W) return false;
+      const len = {};
+      for (const n of A.W.notes) {
+        let L = n.h;
+        if (n.paper !== 'polaroid') for (const el of stor.querySelectorAll(`[data-lapp="${n.id}"] .ans-in`)) L = Math.max(L, el.scrollHeight);
+        len[n.id] = L - n.h > 3 ? Math.ceil(L) : n.h;
+      }
+      const ny = JSON.stringify(len) !== JSON.stringify(A.len);
+      A.len = len;
+      A.matt = A.html;
+      for (const el of [...vagg.querySelectorAll('.ans-lapp'), ...stor.querySelectorAll('.ans-lapp')]) {
+        const n = A.W.notes.find((x) => x.id === el.dataset.lapp);
+        el.classList.toggle('vikt', len[n.id] > n.h);
+      }
+      return ny;
     }
 
     // ---------- bladen ----------
@@ -559,7 +624,6 @@ window.RumAnslag = (() => {
       const L = (innerWidth - BW * k) / 2;
       const T = (innerHeight - BH * k) / 2 - 16;
       A.place = { k, L, T, q: [[L, T], [L + BW * k, T], [L + BW * k, T + BH * k], [L, T + BH * k]] };
-      Object.assign(fot.style, { left: `${r1(L)}px`, width: `${r1(BW * k)}px`, top: `${r1(T + BH * k + 12)}px` });
       return A.place;
     }
     const rest = () => { flyg.style.transform = `translate(${r1(A.place.L)}px, ${r1(A.place.T)}px) scale(${A.place.k.toFixed(4)})`; };
@@ -632,6 +696,7 @@ window.RumAnslag = (() => {
       A.on = on;
       if (on) {
         loadMatches();
+        if (A.matt !== A.html) measure();
         place();
         const from = q || quad();
         ov.classList.add('on');
@@ -685,21 +750,34 @@ window.RumAnslag = (() => {
 
     // ---------- en lapp i handen ----------
 
-    // Lappen i läsbar storlek mitt i fönstret: { x, y, s } för mitten. I
-    // telefonen bläddrar man med ett svep (rum.js), så där behövs ingen plats
-    // vid sidorna.
-    function held(n) {
+    // Lappen i läsbar storlek mitt i fönstret, utvikt: { x, top, s, over }
+    // med mitten i sidled, överkanten och skalan. Den långa lappen blir inte
+    // mindre än att den går att läsa (MINS); ryms den inte då, hamnar
+    // överkanten högt upp och resten (over, med knappen under) nås genom att
+    // flytta lappen (pan). I telefonen bläddrar man med ett svep (rum.js), så
+    // där behövs ingen plats vid sidorna.
+    const MINS = 1.15;
+    function held(n, len = n.h) {
       const sm = innerWidth < 700;
       // flikarna sticker ut i högerkanten: lika mycket luft på båda sidor
       const w = n.w + (ARK[A.top] ? 36 : 0);
-      const s = Math.min((innerHeight - (innerHeight < 500 ? 120 : 220)) / n.h, (innerWidth - (sm ? 32 : 160)) / w / (sm ? 1.04 : 1.2), 3.2);
-      return { x: innerWidth / 2, y: (innerHeight - 70) / 2, s };
+      const fri = innerHeight - (innerHeight < 500 ? 120 : 220);
+      const s = Math.min(Math.max(fri / len, MINS), (innerWidth - (sm ? 32 : 160)) / w / (sm ? 1.04 : 1.2), 3.2);
+      // (i telefonen under rummets namn, som ligger kvar överst)
+      const top = Math.max(sm ? 72 : 48, (innerHeight - 70) / 2 - (len * s) / 2);
+      return { x: innerWidth / 2, top, s, over: Math.max(0, top + len * s + 64 - innerHeight) };
     }
+    // Hållen: överkanten flyttad pan uppåt; transform-origin är mitt på den
+    // översta panelen, som på tavlan.
     function placeLyft(n, anim) {
-      const h = held(n);
+      const len = A.lyft.len;
+      const h = held(n, len);
+      A.lyft.over = h.over;
+      A.lyft.pan = Math.min(A.lyft.pan || 0, h.over);
+      const top = h.top - A.lyft.pan;
       const card = lyftEl.firstElementChild;
-      const to = `translate(${r1(h.x - n.w / 2)}px, ${r1(h.y - n.h / 2)}px) scale(${h.s.toFixed(3)})`;
-      rad.style.top = `${r1(h.y + (n.h * h.s) / 2 + 18)}px`;
+      const to = `translate(${r1(h.x - n.w / 2)}px, ${r1(top + (n.h * h.s) / 2 - n.h / 2)}px) scale(${h.s.toFixed(3)})`;
+      rad.style.top = `${r1(top + len * h.s + 18)}px`;
       if (!anim) { card.style.transform = to; return null; }
       // från nålen: samma plats, storlek och vinkel som på tavlan
       const r = stor.querySelector(`[data-lapp="${n.id}"]`).getBoundingClientRect();
@@ -725,16 +803,44 @@ window.RumAnslag = (() => {
       for (const v of lyftEl.querySelectorAll('.ans-vand')) v.classList.toggle('vand', on);
     }
 
+    // Vecklar ut (ut) eller viker ihop bladen i handen, ett veck i taget
+    // uppifrån (ihop nerifrån), alla blad i bunten samtidigt. Klart när
+    // det sista vecket har vänts; utan rörelser direkt.
+    function stopVik() {
+      for (const x of A.vanims) x.cancel();
+      A.vanims = [];
+    }
+    function vika(card, ut, anim, wait = 0) {
+      stopVik();
+      card.classList.toggle('utvikt', ut);
+      const pans = [...card.querySelectorAll('.ans-pan.vik')];
+      if (!anim || !pans.length) return 0;
+      const k = Math.max(...pans.map((p) => +p.dataset.d));
+      const IHOP = 'rotateX(-178deg)';
+      const UT = 'rotateX(0deg)';
+      for (const p of pans) {
+        const d = +p.dataset.d;
+        A.vanims.push(p.animate([{ transform: ut ? IHOP : UT }, { transform: ut ? UT : IHOP }], ut
+          ? { duration: 460, delay: wait + (d - 1) * 300, easing: 'cubic-bezier(0.35, 0, 0.25, 1)', fill: 'backwards' }
+          : { duration: 260, delay: wait + (k - d) * 170, easing: 'cubic-bezier(0.4, 0, 0.7, 1)', fill: 'backwards' }));
+      }
+      return ut ? wait + (k - 1) * 300 + 460 : wait + (k - 1) * 170 + 260;
+    }
+
     function lift(id) {
       const n = A.W.notes.find((x) => x.id === id);
       if (!n || !A.inner) return;
       if (A.lyft) drop(true);
-      A.lyft = { id, vand: n.paper === 'polaroid' };
+      if (A.matt !== A.html) measure();
+      const len = A.len[id] || n.h;
+      A.lyft = { id, vand: n.paper === 'polaroid', len, pan: 0 };
       ov.classList.add('lyft');
-      lyftEl.innerHTML = `<div class="ans-lapp i-handen" data-lapp="${id}" style="width:${n.w}px; height:${n.h}px">${sheetsHtml(n, A.inner[id], A.sheets, A.top)}</div>`;
+      lyftEl.innerHTML = `<div class="ans-lapp i-handen" data-lapp="${id}" style="width:${n.w}px; height:${len}px; transform-origin:50% ${n.h / 2}px">${sheetsHtml(n, A.inner[id], A.sheets, A.top, len)}</div>`;
       stor.querySelector(`[data-lapp="${id}"]`).classList.add('borta');
       spoilerRow(n);
       const anim = placeLyft(n, !o.calm());
+      // den vikta lappen vecklas ut när den nästan är framme
+      vika(lyftEl.firstElementChild, true, Boolean(anim), 340);
       // polaroiden vänds på vägen fram
       if (n.paper === 'polaroid') {
         const me = A.lyft;
@@ -755,13 +861,46 @@ window.RumAnslag = (() => {
         if (!A.lyft) lyftEl.innerHTML = '';
       };
       ov.classList.remove('lyft');
-      if (now || o.calm() || !card) { back(); return; }
+      if (now || o.calm() || !card) { stopVik(); back(); return; }
       vand(false);
+      // viks ihop på vägen tillbaka
+      const ms = Math.max(380, vika(card, false, true) + 60);
       const r = stor.querySelector(`[data-lapp="${n.id}"]`).getBoundingClientRect();
       const to = `translate(${r1(r.left + r.width / 2 - n.w / 2)}px, ${r1(r.top + r.height / 2 - n.h / 2)}px) scale(${A.place.k.toFixed(3)}) rotate(${n.rot}deg)`;
-      card.animate([{ transform: card.style.transform }, { transform: to }], { duration: 380, easing: 'cubic-bezier(0.4, 0, 0.6, 1)' }).finished.then(back, back);
+      card.animate([{ transform: card.style.transform }, { transform: to }], { duration: ms, easing: 'cubic-bezier(0.4, 0, 0.6, 1)' }).finished.then(back, back);
       card.style.transform = to;
     }
+
+    // Den långa lappen i handen flyttas med hjulet, fingret eller Page Up/Down
+    // (pan, 0 … over).
+    function panTo(px) {
+      if (!A.lyft || !A.lyft.over) return false;
+      const v = Math.max(0, Math.min(A.lyft.over, px));
+      if (v === A.lyft.pan) return true;
+      A.lyft.pan = v;
+      placeLyft(A.W.notes.find((x) => x.id === A.lyft.id), false);
+      return true;
+    }
+    ov.addEventListener('wheel', (e) => {
+      if (!A.on || !A.lyft || !A.lyft.over) return;
+      e.preventDefault();
+      panTo(A.lyft.pan + (e.deltaMode === 1 ? e.deltaY * 16 : e.deltaY));
+    }, { passive: false });
+    const DR = { id: null };
+    ov.addEventListener('pointerdown', (e) => {
+      A.drog = false;
+      if (!A.lyft || !A.lyft.over || !e.target.closest('.i-handen')) return;
+      Object.assign(DR, { id: e.pointerId, y: e.clientY, pan: A.lyft.pan });
+    });
+    addEventListener('pointermove', (e) => {
+      if (e.pointerId !== DR.id || !A.lyft) return;
+      const dy = e.clientY - DR.y;
+      if (!A.drog && Math.abs(dy) < 8) return;
+      A.drog = true;
+      panTo(DR.pan - dy);
+    });
+    addEventListener('pointerup', (e) => { if (e.pointerId === DR.id) DR.id = null; });
+    addEventListener('pointercancel', (e) => { if (e.pointerId === DR.id) DR.id = null; });
 
     function step(d) {
       const i = A.W.notes.findIndex((x) => x.id === A.lyft.id);
@@ -771,7 +910,8 @@ window.RumAnslag = (() => {
     }
 
     ov.addEventListener('click', (e) => {
-      if (!A.on) return;
+      // (en lapp som just flyttades med fingret)
+      if (!A.on || A.drog) return;
       if (e.target.closest('a[href], .sp-show')) return;
       if (e.target.closest('[data-ans="tillbaka"]')) { drop(); return; }
       // en flik bläddrar alla lappar till sin division
@@ -810,6 +950,8 @@ window.RumAnslag = (() => {
       open,
       on: () => A.on,
       lift: (id) => { if (A.on) lift(id); },
+      // lappen i handen flyttades nyss med fingret (inget svep i rum.js)
+      drog: () => Boolean(A.drog),
       // Esc sätter tillbaka lappen (sedan tavlan i rum.js); ←/→ bläddrar
       // mellan lapparna och ↑/↓ mellan bladen
       key(k) {
@@ -818,6 +960,10 @@ window.RumAnslag = (() => {
         if (/^Arrow(Up|Down)$/.test(k)) { flipBy(k === 'ArrowDown' ? 1 : -1); return true; }
         if (A.lyft && k === 'ArrowRight') { step(1); return true; }
         if (A.lyft && k === 'ArrowLeft') { step(-1); return true; }
+        if (A.lyft && /^(PageUp|PageDown|Home|End)$/.test(k)) {
+          const v = { PageUp: A.lyft.pan - innerHeight * 0.7, PageDown: A.lyft.pan + innerHeight * 0.7, Home: 0, End: Infinity }[k];
+          return panTo(v);
+        }
         if (!A.lyft && /^Arrow/.test(k)) { lift(A.W.notes[0].id); return true; }
         return false;
       },
