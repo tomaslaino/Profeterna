@@ -13,6 +13,7 @@
 //
 // dagens(v) → dagens fika (v = Vader.nu()) eller null; ?rum-fika=<namn> för bilder
 // ol(v) → 'jul' | 'pask' | null
+// fromPask(v) → dagar från påskdagen (också högtidskläderna, rum-fest.js)
 // bord(THREE, { world, mat, mesh, canvasTex, specks, heap, hash }) → { r(namn), visa(namn, p, w, s) }
 
 export const FIKA = ['semlor', 'pepparkakor', 'lussekatter', 'kanelbullar', 'paskagg', 'chokladbollar'];
@@ -25,7 +26,7 @@ function pask(Y) {
   return Date.UTC(Y, Math.floor((h + l - 7 * m + 114) / 31) - 1, ((h + l - 7 * m + 114) % 31) + 1);
 }
 // dagar från påskdagen
-const fromPask = (v) => Math.round((Date.UTC(v.ar, v.manad - 1, v.dag) - pask(v.ar)) / 864e5);
+export const fromPask = (v) => Math.round((Date.UTC(v.ar, v.manad - 1, v.dag) - pask(v.ar)) / 864e5);
 
 export function dagens(v) {
   const q = new URLSearchParams(location.search).get('rum-fika');
