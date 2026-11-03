@@ -524,7 +524,8 @@ Utan nyckel ingen knapp.
 - **Barstolar vid disken, och disken i 3D (2026-11-03, användarens önskemål):** den platta
   disken visade inte att det var tomt under skivan. Nu är disken byggd i three.js, med tre
   barstolar likadana som gängets inskjutna under kanten, och skuggorna under skivan visar
-  håligheten. Den ritas en gång och kostar inget medan man ser sig omkring. Se
+  håligheten. Den ritas en gång och kostar inget medan man ser sig omkring. Jackan och
+  halsduken på krokarna togs bort samma dag – det blev för plottrigt. Se
   [Tobaksaffären](#tobaksaffären).
 - **Gänget följer hur det går för kupongen (2026-11-03, användarens önskemål):** gänget
   har fler rörelser och gör dem efter hur det går för gängets kupong – glada när den går
@@ -2385,9 +2386,8 @@ bräder med kvistar och ådring, mörka av röken upptill och ljusare under lysr
 tavla har hängt runt ramen. Disken längs högra väggen är en bardisk som i en pub, i three.js
 (`bardisk` och `DISK` i rum-inredning.js): en skiva i lackad mahogny med en rundad kant, som
 sticker ut en dryg decimeter över den indragna fronten, så att man har plats för benen. Under
-kanten bär konsoler i järn upp skivan, och på fronten sitter en krok i mässing i varje fält – på
-de två innersta hänger en halsduk och en jeansjacka. Fronten har fyllningar i ramar, en halv
-meter isär. Framför står tre barstolar likadana som gängets (röd vinyl med söm, krom, fotring),
+kanten bär konsoler i järn upp skivan, och på fronten sitter en krok i mässing i varje fält.
+Fronten har fyllningar i ramar, en halv meter isär. Framför står tre barstolar likadana som gängets (röd vinyl med söm, krom, fotring),
 med sitsen 75 cm över golvet och inskjutna under kanten; den närmaste syns bara till hälften
 över pulten. Skivan skuggar fronten och stolarna skuggar fronten och bakväggen under skivan –
 det är skuggorna och stolarna som visar att det är tomt under skivan, eftersom man ser disken
