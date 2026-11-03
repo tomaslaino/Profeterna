@@ -60,6 +60,9 @@
 // Dagen efter en omgång (efter) står en prinsesstårta på bordet och oraklet
 // har en papperskrona när det gick bra, och när det gick illa ligger DT:s
 // extraflaska omkullvält i en pöl och kupongen sönderriven i askkoppen.
+// Runt högtiderna (rum-fest.js) klär de sig för dem: luciakrona och
+// stjärngossestrutar, tomteluvor och jultröjor, sammetskavaj, fluga och
+// partyhatt, påskkärringens huckle och midsommarens blomkrans.
 //
 // figurer(canvas, { calm, vader, detalj }) → { draw(t, mx, my, neon), inne(vem, t), ute(vader),
 // lage({ tv, nag }, t), mal({ dl: 1, dt: -1, dj: 0 }, t, sätt), spel({ lage, rank }, t),
@@ -84,6 +87,7 @@ import { utanSkuggor } from './rum-gpu.js';
 import { RoomEnvironment } from 'three/addons/environments/RoomEnvironment.js';
 import { RoundedBoxGeometry } from 'three/addons/geometries/RoundedBoxGeometry.js';
 import { ol } from './rum-fika.js';
+import { festen, drakt, festklader } from './rum-fest.js';
 
 const DEG = Math.PI / 180;
 const D = 1400;
@@ -207,10 +211,13 @@ function sitt(F, P) {
 // temperaturen avgör lagren – 0 hett (21° och mer), 1 varmt (15–21), 2 svalt
 // (8–15), 3 kallt (1–8), 4 vinter (under 1) – regn ger regnjackor, sol
 // solglasögonen på näsan och snöfall snö på axlarna. DT kavlar alltid upp
-// ärmen på armen med lejonet.
-//   ben: kort|lang, byxa: [färg, mörkare], troja: { farg, farg2, luva, ficka },
-//   jacka: { typ: oppen|stangd, tyg: bomull|skinn|dun|parka|regn|flanell,
-//            farg, farg2, luva: slat|pals, krage, tjock, tunn, upp: lejon|bada }
+// ärmen på armen med lejonet. Runt högtiderna (fest, rum-fest.js) har de
+// något på huvudet, och vid jul, lucia och nyår andra kläder.
+//   ben: kort|lang, byxa: [färg, mörkare], troja: { farg, farg2, luva, ficka,
+//            jul (jultröjan), skjorta (med fluga), upp: lejon },
+//   jacka: { typ: oppen|stangd, tyg: bomull|skinn|dun|parka|regn|flanell|sammet,
+//            farg, farg2, luva: slat|pals, krage, tjock, tunn, upp: lejon|bada },
+//   fest: lucia|jul|nyar|pask|midsommar
 function dress(key, v) {
   const k = v ? v.kanns : 17;
   const n = k >= 21 ? 0 : k >= 15 ? 1 : k >= 8 ? 2 : k >= 1 ? 3 : 4;
@@ -233,6 +240,9 @@ function dress(key, v) {
     if (n === 4) d.jacka = { typ: 'stangd', tyg: 'dun', farg: '#161618', farg2: '#0b0b0c', krage: true, tjock: 2.2, luva: 'pals' };
     if (regn) d.jacka = { typ: 'stangd', tyg: 'regn', farg: '#18191c', farg2: '#0e0f11', luva: 'slat' };
   }
+  // högtiderna (rum-fest.js): vid jul, lucia och nyår byter de om
+  const fest = festen(v);
+  if (fest) { d.fest = fest; drakt(key, d); }
   return d;
 }
 
@@ -1112,7 +1122,8 @@ export async function figurer(canvas, opt = {}) {
   });
   plaidTex.colorSpace = THREE.NoColorSpace;
   const plaid = (rx, ry) => { const t = plaidTex.clone(); t.wrapS = t.wrapT = THREE.RepeatWrapping; t.repeat.set(rx, ry); t.needsUpdate = true; return t; };
-  // jackans tyg: matt bomull och parkas, blankt skinn, glänsande nylon (dun, regn), rutig flanell
+  // jackans tyg: matt bomull och parkas, blankt skinn, glänsande nylon (dun, regn), rutig flanell,
+  // sammet (nyårskavajen)
   function jackMat(J, extra = {}) {
     const o = {
       bomull: { roughness: 0.62, clearcoat: 0.3, bumpMap: denim, bumpScale: 0.5 },
@@ -1121,6 +1132,7 @@ export async function figurer(canvas, opt = {}) {
       dun: { roughness: 0.3, clearcoat: 0.85, clearcoatRoughness: 0.16 },
       regn: { roughness: 0.16, clearcoat: 1, clearcoatRoughness: 0.05 },
       flanell: { roughness: 0.82, clearcoat: 0.12, sheen: 0.5, sheenRoughness: 0.7, map: plaid(5, 3) },
+      sammet: { roughness: 0.8, clearcoat: 0.05, sheen: 1, sheenRoughness: 0.35, bumpMap: knit, bumpScale: 0.15 },
     }[J.tyg] || {};
     return mat(J.farg, { side: J.typ === 'oppen' ? THREE.DoubleSide : THREE.FrontSide, ...o, ...extra });
   }
@@ -1189,6 +1201,9 @@ export async function figurer(canvas, opt = {}) {
     }
     return pts;
   }
+
+  // högtidskläderna (rum-fest.js)
+  const FEST = festklader({ mat, mesh, seg, canvasTex, ellipsoid, band, headGeo });
 
   // ---------- figurerna ----------
 
@@ -1479,6 +1494,14 @@ export async function figurer(canvas, opt = {}) {
     for (const c of [...bord.children]) if (c.userData.efter) bord.remove(c);
     if (lage === 'bra') bord.add(tarta());
     for (const o of figs) efterFig(o);
+    // den som bär högtidens huvudbonad och får kronan (eller blir av med den)
+    // byggs om, så att kronan sitter där bonaden satt (build)
+    let om = false;
+    for (const o of figs) {
+      const k = lage === 'bra' && krona.includes(o.F.key);
+      if (k !== o.kront && o.fest) { o.key = null; om = true; }
+    }
+    if (om) ute(vNu);
   }
 
   const figs = [];
@@ -1512,7 +1535,10 @@ export async function figurer(canvas, opt = {}) {
     root.add(fig);
     const skin = mat(c.skin, { sheenColor: new THREE.Color(c.blush), sheen: 0.3 }, 'hud');
     const fab = (col, extra = {}) => mat(col, extra, 'tyg');
-    const tee = fab(D.troja ? D.troja.farg : c.tee, { bumpMap: knit, bumpScale: 0.6 });
+    // jultröjan: mönstret stickat runt bålen och prickar på ärmarna (rum-fest.js)
+    const jul = Boolean(D.troja && D.troja.jul);
+    const tee = jul ? fab('#ffffff', { map: FEST.jultroja(F.key), bumpMap: knit, bumpScale: 0.6 }) : fab(D.troja ? D.troja.farg : c.tee, { bumpMap: knit, bumpScale: 0.6 });
+    const teeArm = jul ? fab('#ffffff', { map: FEST.armar(F.key), bumpMap: knit, bumpScale: 0.6 }) : tee;
     // DT har jeans (jeansshorts när det är hett), DL och DJ shorts eller långbyxor
     const jeans = c.pants === 'jeans';
     const lang = D.ben === 'lang';
@@ -1608,6 +1634,8 @@ export async function figurer(canvas, opt = {}) {
       p.setX(i, x * k); p.setZ(i, z * k);
     }
     tg.computeVertexNormals();
+    // (jultröjans mönster efter höjden, inte efter profilens punkter)
+    if (jul) for (let i = 0; i < p.count; i++) tg.attributes.uv.setY(i, (p.getY(i) + T * 0.02) / (T * 1.06));
     const chest = new THREE.Group();
     torso.add(chest);
     mesh(tg, tee, chest).scale.z = F.depth / Wd;
@@ -1621,6 +1649,8 @@ export async function figurer(canvas, opt = {}) {
     }
     // jackan utanpå, och halsduken utanpå jackan
     const outer = D.jacka ? jacka(F, D.jacka, chest) : prof;
+    // nyår: flugan och skjortans krage och knappar, och konfetti på axlarna (rum-fest.js)
+    if (D.troja && D.troja.skjorta) FEST.fluga(F, chest, T, prof);
     if (F.halsduk) halsduk(F, outer, chest);
     // snö på axlarna när det snöar
     if (D.sno) {
@@ -1640,6 +1670,10 @@ export async function figurer(canvas, opt = {}) {
     hc.position.y = P.ry * 0.84;
     hg.add(hc);
     mesh(headGeo(P, false), skin, hc);
+    // högtidens huvudbonad (rum-fest.js) i stället för DJ:s mössa – men oraklet
+    // dagen efter en bra omgång bär papperskronan (efterFig) i stället
+    const kront = DE.lage === 'bra' && DE.krona.includes(F.key);
+    const H = D.fest && !kront ? FEST.huvud(F, P, hc, D.fest, F.plats === PLATSER[1], opt.calm) : null;
     const fm = new THREE.Mesh(headGeo(P, true, 1.003), mat('#ffffff', { map: tex[F.key], transparent: true, polygonOffset: true, polygonOffsetFactor: -2 }, 'hud'));
     fm.receiveShadow = true;
     hc.add(fm);
@@ -1651,10 +1685,13 @@ export async function figurer(canvas, opt = {}) {
     const ny = -(P.noseY - P.cy) / P.hh;
     ellipsoid([0, ny * P.ry, Math.sqrt(Math.max(0, 1 - ny * ny)) * P.rz * 0.9], P.nose, skin, hc, P.noseRot ? [P.noseRot, 0, 0] : undefined);
     const ear = P.ear || [0.13, 0.19, 0.15, 0.35];
-    for (const s of [-1, 1]) ellipsoid([s * P.rx * 0.95, -P.ry * 0.04, -P.rz * 0.08], [P.rx * ear[0], P.ry * ear[1], P.rz * ear[2]], mat(c.skin2, { roughness: 0.55 }), hc, [0, s * ear[3], 0]);
+    if (!H || H.oron !== false) for (const s of [-1, 1]) ellipsoid([s * P.rx * 0.95, -P.ry * 0.04, -P.rz * 0.08], [P.rx * ear[0], P.ry * ear[1], P.rz * ear[2]], mat(c.skin2, { roughness: 0.55 }), hc, [0, s * ear[3], 0]);
     const ht = hairTex(c.hair, c.hair2, c.hair3, F.key.charCodeAt(1));
-    mesh(hairGeo(P, F.mossa ? { ...F.hair, cap: F.mossa } : F.hair, F.key.charCodeAt(1) * 131), mat('#ffffff', { map: ht, vertexColors: true, bumpMap: ht, bumpScale: 1.5 }, 'har'), hc);
-    const onCap = F.mossa ? mossa(F, P, hc) : null;
+    const cap = H ? H.cap : F.mossa;
+    mesh(hairGeo(P, cap ? { ...F.hair, cap } : F.hair, F.key.charCodeAt(1) * 131), mat('#ffffff', { map: ht, vertexColors: true, bumpMap: ht, bumpScale: 1.5 }, 'har'), hc);
+    const onCap = F.mossa && !H ? mossa(F, P, hc) : null;
+    if (D.fest === 'nyar') FEST.konfetti(F, outer, chest, P, hc);
+    if (D.fest === 'pask') FEST.kinder(F, P, hc);
     if (F.glasses) {
       const gl = glasses(P, hc, F.glasses, F.hair.gr || 1);
       if (D.glas) {
@@ -1665,9 +1702,12 @@ export async function figurer(canvas, opt = {}) {
       } else if (onCap) {
         // uppskjutna på mössan
         gl.position.copy(onCap); gl.rotation.x = -35 * DEG;
+      } else if (H && H.glas !== 'har') {
+        // uppskjutna på tomteluvan eller hucklet, eller av (struten, kronan, kransen)
+        if (H.glas) { gl.position.copy(H.glas); gl.rotation.x = -35 * DEG; } else gl.visible = false;
       }
     }
-    if (D.sno) ellipsoid([0, P.ry * (F.mossa ? 1.13 : 1.05), -P.rz * 0.1], [P.rx * 0.42, 3, P.rz * 0.38], snowMat, hc);
+    if (D.sno && !H) ellipsoid([0, P.ry * (F.mossa ? 1.13 : 1.05), -P.rz * 0.1], [P.rx * 0.42, 3, P.rz * 0.38], snowMat, hc);
     // munnen i huvudets axlar (ansiktsbildens y ≈ 42)
     const my = -(42 - P.cy) * P.ry / P.hh;
     const mouth = new THREE.Vector3(0, my, Math.sqrt(Math.max(0, 1 - (my / P.ry) ** 2)) * P.rz * 0.98 + 2);
@@ -1679,8 +1719,9 @@ export async function figurer(canvas, opt = {}) {
     const arms = [0, 1].map((i) => {
       const s = i === 0 ? -1 : 1;
       const kind = F.does[i];
-      const sleeve = J ? (J.upp === 'bada' || (J.upp === 'lejon' && F.tatuering.arm === i) ? 'upp' : 'jacka') : D.troja ? 'lang' : 'kort';
-      const sm = J ? jackMat(J, { side: THREE.FrontSide, ...(J.tyg === 'flanell' ? { map: plaid(2, 2) } : {}) }) : tee;
+      const lejon = F.tatuering && F.tatuering.arm === i;
+      const sleeve = J ? (J.upp === 'bada' || (J.upp === 'lejon' && lejon) ? 'upp' : 'jacka') : D.troja ? (D.troja.upp === 'lejon' && lejon ? 'upp' : 'lang') : 'kort';
+      const sm = J ? jackMat(J, { side: THREE.FrontSide, ...(J.tyg === 'flanell' ? { map: plaid(2, 2) } : {}) }) : teeArm;
       const tk = J ? (J.tunn ? 0.3 : J.tjock || 1) : 0;
       const rU = F.arm * (sleeve === 'kort' ? 1.45 : 1.22 + 0.12 * tk);
       const rL = F.arm * (1.1 + 0.1 * tk);
@@ -1797,7 +1838,7 @@ export async function figurer(canvas, opt = {}) {
     earPen.updateMatrix();
     kupBench.updateMatrix();
 
-    const o = { F, fig, torso, chest, hg, hc, face: fm, blund: tex[`${F.key}_blund`], knees, feet, arms, mouth, thigh, hipY, T, phase: hash(F.x) * 20, pen, kp, earPen, kupBench, extra, aska, inneAt: -1e9, key: JSON.stringify(D) };
+    const o = { F, fig, torso, chest, hg, hc, face: fm, blund: tex[`${F.key}_blund`], knees, feet, arms, mouth, thigh, hipY, T, phase: hash(F.x) * 20, pen, kp, earPen, kupBench, extra, aska, inneAt: -1e9, key: JSON.stringify(D), H, kront, fest: D.fest };
     efterFig(o);
     return o;
   }
@@ -2952,6 +2993,13 @@ export async function figurer(canvas, opt = {}) {
     // (röken först: den ställer figuren när blosset föddes, emitter)
     smoke(t);
     for (const o of figs) pose(o, t);
+    // högtidens huvudbonad: lågorna i luciakronan fladdrar, och en hög bonad
+    // tar DJ av sig när han sover med huvudet på bordet
+    for (const o of figs) {
+      if (!o.H) continue;
+      if (o.H.hog) o.H.grupp.visible = sovW(o, t) < 0.5;
+      if (o.H.tick) o.H.tick(t);
+    }
     // (inte i en fast bild), och DJ blundar när han sover
     for (const o of figs) if (o.blund) o.face.material.map = (!opt.calm && blinkar(o, t)) || sovW(o, t) > 0.5 ? o.blund : tex[o.F.key];
     // neonen bakom dem slocknar när skylten glappar, och tv:n lyser i
@@ -2998,8 +3046,16 @@ export async function figurer(canvas, opt = {}) {
   // den vars kläder (dress) har ändrats byggs om, och röken följer med.
   let hemiDag = 0.42;
   let vNu = opt.vader;
+  // det som hör till högtiden på bordet (nyår: konfetti och serpentiner)
+  let bordFest = { namn: undefined, g: null };
   function ute(v) {
     vNu = v;
+    const fest = festen(v);
+    if (fest !== bordFest.namn) {
+      if (bordFest.g) { bord.remove(bordFest.g); bordFest.g.traverse((x) => { if (x.geometry) x.geometry.dispose(); }); }
+      bordFest = { namn: fest, g: FEST.bord(fest, BORD.r) };
+      if (bordFest.g) bord.add(bordFest.g);
+    }
     const L = v && window.RumUte ? window.RumUte.light(v) : null;
     const dag = L ? L.dag : 0;
     win.color.set('#ffb35c').lerp(new THREE.Color(L ? L.sky[2] : '#ffb35c'), dag);
