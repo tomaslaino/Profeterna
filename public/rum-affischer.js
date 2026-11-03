@@ -1,5 +1,5 @@
-// Affischerna på glaset i tobaksaffären (rum-saker.js lägger upp dem i
-// bakväggens plan, rum.js går fram till dem):
+// Affischerna i tobaksaffären (rum-saker.js lägger upp dem i bakväggens
+// plan, rum.js går fram till dem):
 //
 //   VM 94-affischen   ett foto från landslagets hemkomst den 18 juli 1994
 //                     (Sniper Zeta, CC BY-SA 4.0, Wikimedia Commons)
@@ -7,6 +7,9 @@
 //                     Volksparkstadion i Hamburg den 19 maj 1982 (fotot fick vi
 //                     av Tomas; fotografen är okänd), vikt och sliten
 //   löpsedeln         veckans rubrik ur förra omgången eller nästa, se nedan
+//   Chelsea 2021      The Sun on Sundays löpsedel från dagen efter finalen i
+//                     Champions League (Porto, 29 maj 2021), uppnålad på
+//                     furupanelen, se nedan
 //
 // De två första sitter alltid i vänstra rutan av skyltfönstret, under
 // neonskyltens list (så att VM 94 och BRONS syns); vilken som sitter till
@@ -16,6 +19,9 @@
 // Slitaget följer tippningen som sakerna på pulten (rum-saker.js): går det
 // dåligt bleks affischerna och ett hörn släpper; går det riktigt illa hänger de
 // i en tejpbit. Löpsedeln är veckans och blir bara lite böjd.
+// Chelsea-löpsedeln (The Sun on Sunday) sitter inte på glaset utan på väggen till höger om
+// fönstret, under oraklet och till vänster om bardisken, med två häftstift i
+// furun: den sitter alltid där, släpper inte och är gulnad av fem års rök.
 //
 // Löpsedeln (rubrik): kvällstidningen KVÄLLSPRESSEN (inget riktigt märke)
 // skriver om det mest dramatiska som har hänt eller ska hända – i förra
@@ -45,8 +51,12 @@ const q = new URLSearchParams(location.search);
 // Platserna (scenens px, övre vänstra hörnet). Affischerna i vänstra rutan;
 // löpsedeln under dörrens handtag (y 420–436; lite mindre, så att
 // kupongstället inte skymmer den) eller i fönstrets nedre hörn.
+// Chelsea-löpsedeln på väggen mellan fönsterkarmen (x 958; fönsterbänkens
+// ände når x 984 i y 554–596) och bardisken (x 1060), under oraklets skylt
+// (y 483).
 const FAST = [{ x: 286, y: 220 }, { x: 474, y: 220 }];
 const LOPPLATS = [{ x: 93, y: 445, rot: -1.2, skala: 0.85 }, { x: 286, y: 404, rot: 1.4 }, { x: 836, y: 404, rot: -1.6 }];
+const CHELSEA_PLATS = { x: 979, y: 491, rot: 0.9 };
 
 // ---------- VM 94 ----------
 
@@ -96,6 +106,53 @@ function ifk() {
     '<span class="veck"></span><span class="tryck"></span></span>' +
     '<span class="hund"></span><i class="tejp a"></i><i class="tejp b"></i>';
   return el;
+}
+
+// ---------- Chelsea 2021 ----------
+//
+// En brittisk löpsedel (news bill) från söndagen den 30 maj 2021, från The Sun
+// on Sunday – en riktig tidning, som Tomas ville; namnet är skrivet som text i
+// det röda bandet, inte tidningens logga, och rubriken är vår, inte
+// tidningens. Chelsea vann finalen i Champions League mot Manchester City med
+// 1–0 på Estádio do Dragão i Porto lördagen den 29 maj (Kai Havertz, 42:a
+// minuten) – klubbens andra seger efter 2012 och Thomas Tuchels första
+// säsong. Fotot är laget med pokalen under WINNERS-bågen (rum/chelsea21.jpg,
+// beskuret ur ett foto som Tomas skickade; fotografen är okänd). Den har
+// legat vikt på mitten på vägen hem och har gulnat.
+
+const CHELSEA = {
+  datum: ['SUNDAY', 'MAY 30, 2021'],
+  kick: 'CHAMPIONS LEAGUE FINAL',
+  rad: [['CHELSEA'], ['KINGS OF EUROPE!', 1]],
+  under: 'Havertz strike sinks Man City 1-0 in\u00a0Porto',
+  title: 'The Sun on Sundays löpsedel den 30 maj 2021: Chelsea vann Champions League – 1–0 mot Manchester City i finalen i Porto lördagen den 29 maj (Kai Havertz). Kaptenen César Azpilicueta lyfter pokalen.',
+};
+
+function chelsea() {
+  const el = document.createElement('button');
+  el.type = 'button';
+  el.className = 'rum-aff rum-chelsea rum-sak';
+  el.id = 'rum-chelsea';
+  el.dataset.sak = 'chelsea';
+  el.title = CHELSEA.title;
+  el.setAttribute('aria-label', `Löpsedel: CHELSEA KINGS OF EUROPE! ${CHELSEA.title}`);
+  el.style.left = `${CHELSEA_PLATS.x}px`;
+  el.style.top = `${CHELSEA_PLATS.y}px`;
+  el.style.setProperty('--vrid', `${CHELSEA_PLATS.rot}deg`);
+  ritaChelsea(el);
+  return el;
+}
+
+// Rubrikens rader så stora som ryms i bredden (som löpsedeln, se rita).
+function ritaChelsea(el) {
+  const px = CHELSEA.rad.map(([t]) => Math.min(30, 70 / Math.max(0.3, bredd(t))));
+  el.innerHTML = '<span class="ark"><span class="huvud"><b class="sun"><i>The</i>Sun</b><em>on Sunday</em>' +
+    `<small>${CHELSEA.datum.join('<br>')}</small></span>` +
+    `<span class="kick">${esc(CHELSEA.kick)}</span>` +
+    `<span class="rub">${CHELSEA.rad.map(([t, rod], i) => `<b${rod ? ' class="rod"' : ''} style="font-size:${px[i].toFixed(1)}px">${esc(t)}</b>`).join('')}</span>` +
+    '<span class="foto"><img src="rum/chelsea21.jpg" alt="" draggable="false"></span>' +
+    `<span class="under">${esc(CHELSEA.under)}</span><span class="veck"></span><span class="tryck"></span></span>` +
+    '<span class="hund"></span><i class="nal a"></i><i class="nal b"></i>';
 }
 
 // ---------- löpsedeln: rubrikerna ----------
@@ -335,16 +392,18 @@ function rita(el, r) {
 // ---------- slitaget och platserna ----------
 
 // w: slitaget (0 = nyss städat, 1 = det har gått åt skogen), seed: dagen.
-function slit(el, w, seed, { lop = false } = {}) {
-  const loose = !lop && w > 0.85;
+// nal: uppnålad på väggen (Chelsea-löpsedeln) – släpper inte och hänger
+// nästan rakt, men har redan gulnat.
+function slit(el, w, seed, { lop = false, nal = false } = {}) {
+  const loose = !lop && !nal && w > 0.85;
   el.classList.toggle('slappt', loose);
-  // (löpsedeln vrids dessutom efter platsen, --vrid)
-  const rot = loose ? 6.5 : lop ? (hash(seed + 1.7) - 0.5) * 0.6 + w * 0.8 : (hash(seed + 1.7) - 0.5) * 1.6 + w * 2.4;
+  // (löpsedlarna vrids dessutom efter platsen, --vrid)
+  const rot = loose ? 6.5 : lop || nal ? (hash(seed + 1.7) - 0.5) * 0.6 + w * 0.8 : (hash(seed + 1.7) - 0.5) * 1.6 + w * 2.4;
   el.style.setProperty('--rot', `${rot.toFixed(2)}deg`);
-  el.style.setProperty('--curl', `${Math.round((lop ? 0.3 : 1) * sm(0.45, 0.95, w) * 26)}px`);
-  el.style.setProperty('--sep', ((lop ? 0.05 : 0.15) + (lop ? 0.15 : 0.35) * w).toFixed(2));
-  el.style.setProperty('--sat', (1 - (lop ? 0.15 : 0.4) * w).toFixed(2));
-  el.style.setProperty('--blek', ((lop ? 0.04 : 0.1) + (lop ? 0.12 : 0.3) * w).toFixed(2));
+  el.style.setProperty('--curl', `${Math.round((lop ? 0.3 : nal ? 0.45 : 1) * sm(0.45, 0.95, w) * 26)}px`);
+  el.style.setProperty('--sep', ((lop ? 0.05 : nal ? 0.22 : 0.15) + (lop ? 0.15 : nal ? 0.2 : 0.35) * w).toFixed(2));
+  el.style.setProperty('--sat', (1 - (lop ? 0.15 : nal ? 0.25 : 0.4) * w).toFixed(2));
+  el.style.setProperty('--blek', ((lop ? 0.04 : 0.1) + (lop ? 0.12 : nal ? 0.18 : 0.3) * w).toFixed(2));
 }
 
 export function affischer(back, { short = (x) => x, namn = null } = {}) {
@@ -358,13 +417,14 @@ export function affischer(back, { short = (x) => x, namn = null } = {}) {
   const v = vm94();
   const f = ifk();
   const l = lopsedel();
-  back.append(v, f, l);
+  const c = chelsea();
+  back.append(v, f, l, c);
   let ritad = null;
   let fonter = false;
   let senast = { rows: null, old: null };
   // Anton måste vara inläst innan raderna mäts: då mäts de om
   if (document.fonts && document.fonts.load) {
-    const klar = () => { fonter = true; api.data(senast.rows, senast.old); };
+    const klar = () => { fonter = true; ritaChelsea(c); api.data(senast.rows, senast.old); };
     document.fonts.load('400 30px Anton').then(klar, klar);
   }
   const api = {
@@ -376,6 +436,7 @@ export function affischer(back, { short = (x) => x, namn = null } = {}) {
         slit(el, w, s);
       }
       slit(l, w, seed + 5, { lop: true });
+      slit(c, w, seed + 29, { nal: true });
     },
     // rubriken räknas om när datan ändras (rum-saker.js frågar bara då)
     data(rows, old) {

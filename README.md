@@ -540,6 +540,10 @@ Utan nyckel ingen knapp.
   korktavlan och kvittot så nära att de går att läsa. Kupongen som inte går att ta i handen
   visas nära på pulten, och guldorden *Statistik* och *Lagen* under anslagstavlan och
   kortregistret är borta. Se [Tobaksaffären](#tobaksaffären) och [Närbilderna](#närbilderna).
+- **Chelseas löpsedel på väggen (2026-11-03, användarens önskemål):** till höger om
+  skyltfönstret, under oraklet, sitter The Sun on Sundays löpsedel från dagen efter Chelseas
+  seger i Champions League 2021, med Tomas foto av laget med pokalen. Den sitter med två
+  häftstift i furun och har gulnat. Se [Tobaksaffären](#tobaksaffären), *Affischerna*.
 - **Fler affischer på glaset (2026-11-03, användarens önskemål):** bredvid VM 94-affischen
   sitter en affisch från IFK Göteborgs seger i UEFA-cupen 1982, och varje vecka en löpsedel
   med det mest dramatiska ur förra omgången eller inför nästa. IFK-affischen var först ritad
@@ -1884,7 +1888,7 @@ minsta fönstren och om rum.js inte går att hämta visas den vanliga förstasid
 **Föremålen** – pekar man på ett lyser det (pokalerna också), och snabbvalet
 på text-tv:n med samma ämne tänds, som när man pekar på snabbvalet med tv:n nära
 (pärmarna Skyttar). Inget föremål byter sida: oraklet, skårtavlan, pokalhyllan, korktavlan,
-uret, affischerna på glaset, namnet på dörren och kvittot tittar man på nära (se
+uret, affischerna på glaset och väggen, namnet på dörren och kvittot tittar man på nära (se
 [Närbilderna](#närbilderna)), och tv:n, videon, anslagstavlan, kortregistret och kupongen
 kommer fram var och en på sitt sätt. Föremålen är knappar utan adress (`KNAPP` i rum.js), och
 Enter och mellanslag klickar på dem. En match på text-tv:n öppnar matchrutan ovanpå rummet:
@@ -2184,6 +2188,20 @@ skyltfönstret, under neonskyltens list, och byter sida med dagen:
 
 Uppe till höger i fönstret syns himlen (rum-ute.js), så där hänger inget.
 
+**Chelsea 2021** (DT:s lag) sitter inte på glaset utan på furupanelen till höger om
+fönstret, under oraklets skylt och till vänster om bardisken, alltid på samma ställe: en
+brittisk löpsedel (news bill) från **The Sun on Sunday**, söndagen den 30 maj 2021, dagen
+efter finalen. Tidningen är riktig, som Tomas ville, men namnet är skrivet som text i det
+röda bandet (inte tidningens logga), och rubriken är vår: *CHAMPIONS LEAGUE FINAL*,
+*CHELSEA* och *KINGS OF EUROPE!*, fotot av laget med pokalen under WINNERS-bågen
+(`public/rum/chelsea21.jpg`, beskuret ur ett foto som Tomas skickade; fotografen och
+licensen är okända, så ingen rad står under närbilden) och *Havertz strike sinks Man City
+1-0 in Porto* under. Chelsea vann finalen mot Manchester City med 1–0 på Estádio do Dragão
+i Porto den 29 maj 2021 (Kai Havertz). Löpsedeln är fem år gammal: papperet har gulnat,
+det röda har bleknat och den har legat vikt på mitten. Den sitter med två häftstift i
+papperskanten, är mindre än veckans löpsedel (78 bildpunkter bred, så att den ryms mellan
+fönsterkarmen och bardisken) och skyms lite av fönsterbänkens ände när rummet vrids.
+
 **Löpsedeln** är veckans, från kvällstidningen KVÄLLSPRESSEN (inget riktigt märke): röd
 tidningsrubrik med datum, en rad som *TIPSET* eller *SKRÄLLEN*, rubriken i Anton – varje rad
 så stor som ryms i bredden, en av dem röd – och en rad under. Den sitter under dörrens
@@ -2237,7 +2255,8 @@ bland omgångens avgjorda matcher, annars i den senaste färdigspelade kupongen,
 rättning ett mellanläge. Går det dåligt fylls askkoppen (1–11 fimpar), askan hamnar
 bredvid, snuset spills, fläkten (om den står där) går på trean, affischerna bleks och ett hörn
 släpper; går det riktigt illa ryker två cigaretter, en använd pris ligger på pulten och
-affischerna hänger i en tejpbit (löpsedeln är ny för veckan och blir bara lite böjd). Dolda
+affischerna hänger i en tejpbit (löpsedeln är ny för veckan och blir bara lite böjd, och
+Chelsea-löpsedeln sitter kvar med sina häftstift). Dolda
 resultat räknas inte (gradeRow rättar dem inte). Utan WebGL står affischerna kvar men inte
 sakerna på pulten.
 
@@ -3332,7 +3351,7 @@ en fast bild.
 ### Närbilderna
 
 Uret, skårtavlan, Omgångens orakel, pokalhyllan, korktavlan, affischerna på glaset (VM 94,
-IFK 1982 och löpsedeln), namnet på dörren
+IFK 1982 och löpsedeln) och Chelsea-löpsedeln på väggen, namnet på dörren
 och kvittot tittar man på nära med ett klick (`sak` i rum.js, `data-sak` på föremålen), och
 kupongen på pulten när den inte går att ta i handen: kameran ställer sig rakt framför och går fram tills
 saken fyller det mesta av fönstret – högst 90 % av bredden och 74–94 % av höjden mellan
@@ -3353,7 +3372,7 @@ en länk till fotot på Wikimedia Commons. Esc eller ett klick (också på saken
 och K, T, A, R och V går direkt till kupongen, tv:n, anslagstavlan, kortregistret och videon
 (K nära kupongen på pulten går tillbaka). Föremålen lyser inte när man
 pekar på dem på nära håll. Med `prefers-reduced-motion` går kameran direkt.
-`?rum-sak=ur|skar|ram|pokal|kork|vm94|ifk|lopsedel|dorr|kvitto|kupong` visar en närbild i en fast bild.
+`?rum-sak=ur|skar|ram|pokal|kork|vm94|ifk|lopsedel|chelsea|dorr|kvitto|kupong` visar en närbild i en fast bild.
 
 ## Statusmärkning
 
