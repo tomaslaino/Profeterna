@@ -23,6 +23,9 @@
 //   fram till den på pulten.
 //   högen bredvid: de inlämnade kupongerna med baksidan upp; din egen tas i
 //   handen därifrån när du har lämnat in, de andras när du ser deras tips.
+//   kaffet och notan längst till vänster på pulten → Hasse Backe, som sitter
+//   i baren utanför bilden (H, HASSE) – det enda föremålet som leder ut ur
+//   rummet, när animationen med honom finns.
 // Det finns ingen meny: pekar man på ett föremål lyser det, och snabbvalet på
 // text-tv:n med samma ämne tänds.
 //
@@ -69,6 +72,11 @@ window.Rum = (() => {
   const WIN = { x: 272, y: 132, w: 676, h: 426 };
   const DORR = { x: 50, y: 136, w: 172, h: 560 };
   const box = (p) => `x="${p.x}" y="${p.y}" width="${p.w}" height="${p.h}"`;
+  // Hasse Backe sitter i baren utanför bilden till vänster. Hans kaffe och
+  // nota längst ut på pulten (och H) leder till animationen med honom på
+  // adressen här – det enda föremålet som leder ut ur rummet. Så länge den
+  // är tom skramlar koppen bara på fatet.
+  const HASSE = '';
 
 
   const R = { built: false, on: false, el: null, q: new URLSearchParams(location.search), t0: performance.now(), frozen: null,
@@ -502,6 +510,79 @@ window.Rum = (() => {
       `<a class="rum-tag" ${KNAPP} data-nav="kupong" id="rum-tag" hidden></a>`;
   }
 
+  // Hasse Backe sitter i baren utanför bilden till vänster: längst ut på
+  // pulten står hans kaffe på ett fat, på notan som han har skrivit på Notts
+  // County (som han lämnade efter sju veckor 2009, när lönen inte kom). Ett
+  // klick, eller H, går till animationen med honom (HASSE).
+  function hasseHtml() {
+    const kopp = `<svg class="kopp" width="150" height="124" viewBox="0 0 150 124" aria-hidden="true"><defs>
+    <radialGradient id="rum-hk-skugga" cx=".5" cy=".5" r=".5"><stop offset="0" stop-color="#000" stop-opacity=".55"/><stop offset=".6" stop-color="#000" stop-opacity=".3"/><stop offset="1" stop-color="#000" stop-opacity="0"/></radialGradient>
+    <radialGradient id="rum-hk-fat" cx=".42" cy=".36" r=".75"><stop offset="0" stop-color="#fbf8f1"/><stop offset=".55" stop-color="#e6dfd1"/><stop offset="1" stop-color="#b4ab9a"/></radialGradient>
+    <linearGradient id="rum-hk-kopp" x1="0" y1="0" x2="1" y2="0"><stop offset="0" stop-color="#a99f8d"/><stop offset=".22" stop-color="#ece7dc"/><stop offset=".4" stop-color="#fffdf8"/><stop offset=".72" stop-color="#ddd6c6"/><stop offset="1" stop-color="#8f8676"/></linearGradient>
+    <radialGradient id="rum-hk-kaffe" cx=".4" cy=".35" r=".75"><stop offset="0" stop-color="#7a4520"/><stop offset=".5" stop-color="#3f200b"/><stop offset="1" stop-color="#1d0d03"/></radialGradient>
+    <linearGradient id="rum-hk-sked" x1="0" y1="0" x2="1" y2="0"><stop offset="0" stop-color="#77756f"/><stop offset=".45" stop-color="#f2f0ea"/><stop offset="1" stop-color="#8a8780"/></linearGradient></defs>
+  <ellipse cx="79" cy="100" rx="72" ry="25" fill="url(#rum-hk-skugga)"/>
+  <path d="M11 94 A64 21 0 0 0 139 94 L139 97.5 A64 21 0 0 1 11 97.5 Z" fill="#a1988a"/>
+  <ellipse cx="75" cy="94" rx="64" ry="21" fill="url(#rum-hk-fat)"/>
+  <ellipse cx="75" cy="94" rx="60" ry="19" fill="none" stroke="#fff" stroke-opacity=".45" stroke-width="1"/>
+  <ellipse cx="75" cy="93" rx="38" ry="12" fill="#000" fill-opacity=".05" stroke="#c4bba8" stroke-width="1.2"/>
+  <ellipse cx="81" cy="92" rx="29" ry="8.5" fill="#000" opacity=".2"/>
+  <g class="sked"><path d="M106 98.5 L134 88" stroke="url(#rum-hk-sked)" stroke-width="2.8" stroke-linecap="round"/>
+    <ellipse cx="101" cy="100.5" rx="6.5" ry="3.2" transform="rotate(-20 101 100.5)" fill="url(#rum-hk-sked)"/>
+    <path d="M108 97.4 L131 88.8" stroke="#fff" stroke-opacity=".7" stroke-width=".8" stroke-linecap="round"/></g>
+  <g class="kopp-in">
+    <path d="M44 59 C30 55 24 64 27.5 71 C31 78 40 79.5 47 77" fill="none" stroke="#857c6c" stroke-width="7.5" stroke-linecap="round"/>
+    <path d="M44 58.4 C30.6 54.8 25 63.6 28.4 70.4 C31.6 77 40 78.4 46.6 76.2" fill="none" stroke="#f3efe6" stroke-width="4.4" stroke-linecap="round"/>
+    <path d="M42 52 C42 76 54 90 75 90.5 C96 90 108 76 108 52 Z" fill="url(#rum-hk-kopp)"/>
+    <path d="M42.6 60 A32.4 10.3 0 0 0 107.4 60" fill="none" stroke="#2f58a8" stroke-width="2.2"/>
+    <path d="M43.4 64 A31.6 10 0 0 0 106.6 64" fill="none" stroke="#2f58a8" stroke-width=".9"/>
+    <path d="M50 66 C50.6 75 55 82 62 86" fill="none" stroke="#fff" stroke-opacity=".6" stroke-width="3" stroke-linecap="round"/>
+    <path d="M45 64 C46 73 50 80 55 84" fill="none" stroke="#ff5a3c" stroke-opacity=".2" stroke-width="2" stroke-linecap="round"/>
+    <ellipse cx="75" cy="52" rx="33" ry="10.5" fill="#f8f5ee" stroke="#cfc8b8" stroke-width="1"/>
+    <ellipse cx="75" cy="53.4" rx="29.5" ry="8.4" fill="url(#rum-hk-kaffe)"/>
+    <ellipse cx="66" cy="52" rx="11" ry="2.4" fill="#c58b55" opacity=".35"/>
+    <ellipse cx="86" cy="51.6" rx="5" ry="1.3" fill="#fff" opacity=".35"/></g></svg>`;
+    return `<a class="rum-sak" id="rum-hasse" ${KNAPP} aria-label="Hasse Backe i baren">` +
+      '<span class="nota"><span class="hd"><b>Nota</b><i>Nr 0007</i></span><span class="vem">Hasse B.</span>' +
+      '<span class="r"><span>Kaffe</span><span>32:–</span></span><span class="r"><span>Påtår ×4</span><span>–</span></span>' +
+      '<span class="r"><span>Kanelbulle</span><span>28:–</span></span><span class="r sa"><span>S:a</span><span>60:–</span></span>' +
+      '<span class="skrivs">Skrivs på</span><span class="nc">Notts County</span></span>' +
+      `${kopp}<span class="anga" aria-hidden="true"><i></i><i></i></span></a>`;
+  }
+
+  // Utan adress till animationen (HASSE) skramlar koppen på fatet.
+  function skramla(a) {
+    const k = a.querySelector('.kopp-in');
+    if (!k || calm() || k.getAnimations().length) return;
+    k.animate([
+      { transform: 'none' },
+      { transform: 'translate(1.6px, -1.2px) rotate(2.6deg)', offset: 0.14 },
+      { transform: 'translate(-1.4px, 0) rotate(-2.2deg)', offset: 0.32 },
+      { transform: 'translate(1px, -0.6px) rotate(1.3deg)', offset: 0.52 },
+      { transform: 'translate(-0.5px, 0) rotate(-0.6deg)', offset: 0.74 },
+      { transform: 'none' },
+    ], { duration: 460, easing: 'ease-out' });
+  }
+
+  // Ett klick på kaffet eller H: kameran går fram mot det och sidan byts
+  // till animationen. Kommer man tillbaka (bakåt) står kameran hemma igen.
+  function tillHasse(a = R.el.querySelector('#rum-hasse')) {
+    if (!a) return;
+    if (!HASSE) {
+      skramla(a);
+      return;
+    }
+    if (calm()) {
+      location.href = HASSE;
+      return;
+    }
+    const p = centerOf(a);
+    const c = mid();
+    aim(p, 1.35, [p[0] + (c[0] - p[0]) * 0.4, p[1] + (c[1] - p[1]) * 0.4], 'glid');
+    addEventListener('pageshow', () => aim([800, 500], 1, [800, 500]), { once: true });
+    setTimeout(() => { location.href = HASSE; }, 480);
+  }
+
   // Röken som lagt sig under lysröret, och dammet som syns i ljuset.
   function haze() {
     return '<div class="rum-rok"><i class="r1"></i><i class="r2"></i><i class="r3"></i><i class="r4"></i></div>' +
@@ -853,7 +934,7 @@ window.Rum = (() => {
 
   // Tangenterna står inte i foten utan när man pekar på saken (title), och
   // bara med tangentbord och mus.
-  const TANGENT = [['#rum-kupong', 'Kupongen', 'K'], ['#rum-tv', 'Tv:n', 'T'], ['#rum-ans', 'Anslagstavlan', 'A'], ['#rum-reg', 'Kortregistret', 'R'], ['.vhs-hit', 'Videon', 'V']];
+  const TANGENT = [['#rum-kupong', 'Kupongen', 'K'], ['#rum-tv', 'Tv:n', 'T'], ['#rum-ans', 'Anslagstavlan', 'A'], ['#rum-reg', 'Kortregistret', 'R'], ['.vhs-hit', 'Videon', 'V'], ['#rum-hasse', 'Hasse Backe', 'H']];
   function tangenter() {
     if (!matchMedia('(hover: hover)').matches) return;
     for (const [sel, namn, k] of TANGENT) {
@@ -879,7 +960,7 @@ ${plane(-598, vid('horn'), 1.035, 'rum-pl3d')}
 ${plane(-470, `${tv()}`, 1.02, 'rum-pl3d')}
 ${plane(-330, `${sill()}${haze()}`)}
 ${plane(-60, `${table()}${vid('pult')}`, 1.05)}
-${plane(0, paper())}
+${plane(0, paper() + hasseHtml())}
 </div></div>
 <div class="rum-layer rum-mork" id="rum-mork"><i class="a"></i><i class="b"></i></div>
 <div class="rum-layer rum-warm"></div><div class="rum-layer rum-dagsljus" id="rum-dagsljus"></div><div class="rum-layer rum-vign"></div><div class="rum-layer rum-grain"></div>
@@ -2162,10 +2243,12 @@ ${window.RumRegister ? RumRegister.nara() : ''}
   // Ett föremål: tv:n, videon, anslagstavlan och kortregistret kommer fram,
   // kupongen tas i handen om den går att fylla i (annars går kameran fram
   // till den), din i högen om den går att ändra eller visa, och resten är
-  // närbilder (sak). Inget leder ut ur rummet.
+  // närbilder (sak). Inget leder ut ur rummet, utom Hasses kaffe när
+  // animationen med honom finns (tillHasse).
   function go(a, e) {
     e.preventDefault();
-    if (a.dataset.sak) sak(a.dataset.sak);
+    if (a.id === 'rum-hasse') tillHasse(a);
+    else if (a.dataset.sak) sak(a.dataset.sak);
     else if (a.dataset.nav === 'tv') zoomTv(!R.zoom);
     else if (a.dataset.nav === 'video') zoomVideo(!R.vnara);
     else if (a.id === 'rum-ans') board(true);
@@ -3530,13 +3613,13 @@ ${window.RumRegister ? RumRegister.nara() : ''}
       }
       const k = e.key.toLowerCase();
       const fore = R.sak;
-      // nära en sak: Esc går tillbaka, och K, T, A, R och V går dit direkt
+      // nära en sak: Esc går tillbaka, och K, T, A, R, V och H går dit direkt
       if (R.sak && !R.kup) {
         if (k === 'escape') {
           sak(null);
           return;
         }
-        if (/^[ktarv]$/.test(k)) sak(null, null);
+        if (/^[ktarvh]$/.test(k)) sak(null, null);
       }
       if (R.kup) {
         if (k === 'k' || k === 'escape') closeCoupon();
@@ -3555,6 +3638,7 @@ ${window.RumRegister ? RumRegister.nara() : ''}
       else if (k === 'a') board(true);
       else if (k === 'r') register(true);
       else if (k === 'v') zoomVideo(!R.vnara);
+      else if (k === 'h' && !R.zoom && !R.vnara) tillHasse();
       else if (k === 'escape' && R.zoom) zoomTv(false);
       else if (k === 'escape' && R.vnara) zoomVideo(false);
     });

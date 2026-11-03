@@ -1865,8 +1865,9 @@ WebKit hade ritat, ge den en fördröjning, en mjukare början eller dölja det 
 bilden hela vägen hjälpte inte – WebKit ritar först när kameran rör sig. Chrome behöver inte
 den osynliga rörelsen och får den inte. Namnet
 och foten (*Vanlig sida*) ligger utanför scenen i fönstrets hörn;
-någon meny finns inte, och föremålen leder inte ut ur rummet – det gör bara *Vanlig sida*. Tangenterna (K kupongen, T tv:n,
-A anslagstavlan, R kortregistret, V videon) står inte i foten – där låg de över kupongen i
+någon meny finns inte, och föremålen leder inte ut ur rummet – det gör bara *Vanlig sida* (och
+Hasses kaffe, när animationen med honom finns). Tangenterna (K kupongen, T tv:n,
+A anslagstavlan, R kortregistret, V videon, H Hasse) står inte i foten – där låg de över kupongen i
 mindre fönster – utan när man pekar på saken (*Tv:n · T*, `tangenter` i rum.js), och bara
 med mus. [public/rum.js](public/rum.js)
 ritar rummet och fyller det med sajtens data, [public/rum.css](public/rum.css) ger det utseendet och
@@ -1947,6 +1948,14 @@ Enter och mellanslag klickar på dem. En match på text-tv:n öppnar matchrutan 
   initialerna i personens bläck (samma som på papperet under Kupong) och stämpeln
   *Inlämnad*, men inga tecken. Din egen tas i handen, och de andras när du ser deras tips
   (se nedan). Innan dess lyfts en annans kupong bara lite i ena kanten och faller tillbaka.
+- **Hasses kaffe** längst till vänster på pulten → Hasse Backe, som sitter i baren utanför
+  bilden till vänster och svarar på frågor om matcherna (en animation; H). Koppen ryker och
+  står på hans nota – kaffe, fyra påtår och en kanelbulle, *Skrivs på Notts County*: klubben
+  han lämnade efter sju veckor 2009, när lönen inte kom (notans nummer är 0007). Fatet
+  sticker ut över kanten, mot honom. Adressen till animationen står i `HASSE` överst i
+  rum.js; så länge den är tom skramlar koppen bara på fatet. Med en adress går kameran fram
+  mot koppen och sidan byts – det enda föremålet som leder ut ur rummet (`hasseHtml`,
+  `skramla`, `tillHasse`).
 - **Tv:n** uppe i hörnet till höger, en mörkgrå Panasonic från nittiotalet med text-tv på en arm från väggen, zoomas in med ett
   klick eller T och vrids då mot en; den står på kupongens matcher live (377), och där finns
   också omgångens matcher, tabellerna och skytteligorna (se [Tv:n](#tvn)). Esc eller ett
