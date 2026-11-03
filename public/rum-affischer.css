@@ -145,7 +145,7 @@
 
 /* ---------- löpsedeln: kvällstidningens namn, rubriken och raden under ---------- */
 
-.rum-lop { width: 100px; transform: rotate(calc(var(--vrid, 0deg) + var(--rot))) scale(var(--skala, 1)); }
+.rum-lop { width: 100px; transform: rotate(calc(var(--vrid, 0deg) + var(--rot))); }
 .rum-lop .ark {
   display: flex;
   flex-direction: column;

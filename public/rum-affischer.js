@@ -11,8 +11,10 @@
 // De två första sitter alltid i vänstra rutan av skyltfönstret, under
 // neonskyltens list (så att VM 94 och BRONS syns); vilken som sitter till
 // vänster skiftar med dagen. Uppe till höger syns himlen (rum-ute.js), så där
-// hänger inget. Löpsedeln byter plats med veckan: på dörrens glas under
-// handtaget eller i ett av fönstrets nedre hörn, där gänget inte skymmer den.
+// hänger inget. Löpsedeln sitter i ett av fönstrets nedre hörn, där gänget
+// inte skymmer den, och byter hörn varje vecka – i telefonen på höjden alltid
+// det högra, som syns utan att man drar (dörren och vänstra hörnet ligger
+// utanför bilden där, och dörren i ett smalt fönster också på datorn).
 // Slitaget följer tippningen som sakerna på pulten (rum-saker.js): går det
 // dåligt bleks affischerna och ett hörn släpper; går det riktigt illa hänger de
 // i en tejpbit. Löpsedeln är veckans och blir bara lite böjd.
@@ -43,10 +45,11 @@ const DAG = 86400000;
 const q = new URLSearchParams(location.search);
 
 // Platserna (scenens px, övre vänstra hörnet). Affischerna i vänstra rutan;
-// löpsedeln under dörrens handtag (y 420–436; lite mindre, så att
-// kupongstället inte skymmer den) eller i fönstrets nedre hörn.
+// löpsedeln i fönstrets nedre hörn, till vänster eller till höger.
 const FAST = [{ x: 286, y: 220 }, { x: 474, y: 220 }];
-const LOPPLATS = [{ x: 93, y: 445, rot: -1.2, skala: 0.85 }, { x: 286, y: 404, rot: 1.4 }, { x: 836, y: 404, rot: -1.6 }];
+const LOPPLATS = [{ x: 286, y: 404, rot: 1.4 }, { x: 836, y: 404, rot: -1.6 }];
+// på höjden (telefonen) syns bara mitten och högra delen av fönstret från början
+const smal = () => innerWidth / innerHeight < 1.2;
 
 // ---------- VM 94 ----------
 
@@ -381,12 +384,11 @@ export function affischer(back, { short = (x) => x, namn = null } = {}) {
     data(rows, old) {
       senast = { rows, old };
       const fro = veckaFro();
-      // en ny plats varje vecka, i en ordning som inte går runt (0 1 2 1 2 0 2 0 1 …)
-      const p = LOPPLATS[(((fro + Math.floor(fro / 3)) % 3) + 3) % 3];
+      // varannan vecka till vänster, varannan till höger; på höjden alltid till höger
+      const p = smal() ? LOPPLATS[1] : LOPPLATS[((fro % 2) + 2) % 2];
       l.style.left = `${Math.round(p.x + (hash(fro + 3) - 0.5) * 10)}px`;
       l.style.top = `${Math.round(p.y + (hash(fro + 4) - 0.5) * 8)}px`;
       l.style.setProperty('--vrid', `${(p.rot + (hash(fro + 5) - 0.5) * 1.2).toFixed(2)}deg`);
-      l.style.setProperty('--skala', p.skala || 1);
       let r;
       try {
         r = rubrik({ rows, old, short, fro });

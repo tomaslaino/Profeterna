@@ -2186,10 +2186,11 @@ Uppe till höger i fönstret syns himlen (rum-ute.js), så där hänger inget.
 
 **Löpsedeln** är veckans, från kvällstidningen KVÄLLSPRESSEN (inget riktigt märke): röd
 tidningsrubrik med datum, en rad som *TIPSET* eller *SKRÄLLEN*, rubriken i Anton – varje rad
-så stor som ryms i bredden, en av dem röd – och en rad under. Den sitter under dörrens
-handtag (lite mindre, så att kupongstället inte skymmer den) eller i ett av fönstrets
-nedre hörn, där gänget inte står i vägen, och flyttar varje vecka (veckan i Stockholm,
-måndag till söndag). Rubriken är det mest dramatiska som rummet vet om (`rubrik` i
+så stor som ryms i bredden, en av dem röd – och en rad under. Den sitter i ett av
+skyltfönstrets nedre hörn, där gänget inte står i vägen, och byter hörn varje vecka (veckan
+i Stockholm, måndag till söndag). I telefonen på höjden sitter den alltid i det högra, som
+syns utan att man drar. (Först satt den ibland under dörrens handtag, men där hamnade den
+utanför bilden i telefonen och i smala fönster, och syntes inte.) Rubriken är det mest dramatiska som rummet vet om (`rubrik` i
 rum-affischer.js):
 
 - *förra omgången* (säsongens omgångar, `TP.season`): den som tippade bäst med minst 82 %
