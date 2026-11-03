@@ -1152,8 +1152,8 @@ export async function inredning(el, opt = {}) {
   // att man ser att det är tomt under skivan: skivan i lackad mahogny med en
   // rundad kant, en dryg decimeter ut över den indragna fronten med ramar och
   // fyllningar, konsoler i järn under kanten och en krok i mässing i varje
-  // fält – på de två innersta en halsduk och en jeansjacka. Framför står tre
-  // barstolar som gängets (rum-3d.js), inskjutna under kanten. Skivan skuggar
+  // fält. Framför står tre barstolar som gängets (rum-3d.js), inskjutna
+  // under kanten. Skivan skuggar
   // fronten och stolarna skuggar fronten och väggen under skivan.
   // Mått i bakväggens plan (1 enhet = 1 px där, ungefär 2,37 per cm):
   // skivan Y = −490 till −501 mellan kanten X = 1060 och väggen X = 1140,
@@ -1232,72 +1232,13 @@ export async function inredning(el, opt = {}) {
       mesh(new THREE.SphereGeometry(1.25, 12, 8), massing, b.scene).position.set(D.front - 10.5, -529, z);
     }
 
-    // halsduken och jeansjackan: ritade i en duk, med det som inte är tyg
-    // genomskinligt, och lite buktande
-    const hang = (w, h, draw, x, y, z, buk) => {
-      const t = tex(Math.round(w * 4), Math.round(h * 4), (c, cw, ch) => { c.scale(cw / w, ch / h); draw(c); });
-      const g = new THREE.PlaneGeometry(w, h, 12, 12);
-      const p = g.attributes.position;
-      for (let i = 0; i < p.count; i++) p.setZ(i, buk * Math.cos((p.getX(i) / w) * Math.PI) * (0.4 + 0.6 * (0.5 - p.getY(i) / h)));
-      g.computeVertexNormals();
-      const m = mesh(g, mat('#ffffff', { map: t, alphaTest: 0.5, side: THREE.DoubleSide, roughness: 0.85, envMapIntensity: 0.3 }), b.scene);
-      m.rotation.y = -90 * DEG;
-      m.position.set(x, y - h / 2, z);
-      return m;
-    };
-    const cm = 2.37;
-    // halsduken: vikt över kroken, två ändar i vinrött med gräddvita ränder
-    hang(20 * cm, 68 * cm, (c) => {
-      c.scale(cm, cm);
-      for (const [u, v0, len, mork] of [[2, 0, 66, 0.25], [7, 3, 56, 0]]) {
-        c.fillStyle = '#b03448';
-        c.fillRect(u, v0, 11, len);
-        c.fillStyle = '#efe0b8';
-        for (let v = v0 + 14; v < v0 + len - 4; v += 18) c.fillRect(u, v, 11, 3.5);
-        c.fillStyle = `rgba(0,0,0,${mork})`;
-        c.fillRect(u, v0, 11, len);
-        c.fillStyle = 'rgba(0,0,0,.3)';
-        c.fillRect(u + 10, v0, 1, len);
-      }
-      c.fillStyle = 'rgba(0,0,0,.35)';
-      c.fillRect(2, 0, 16, 6);
-    }, D.front - 9, -531, 0.5 * D.ram, 1.5);
-    // jeansjackan: kragen över kroken, axlarna, ärmarna, bröstfickorna och
-    // knapparna (u och v i cm från kroken, u åt höger)
-    hang(56 * cm, 78 * cm, (c) => {
-      c.scale(cm, cm);
-      c.translate(28, 1);
-      const path = (list) => { c.beginPath(); list.forEach(([u, v], i) => (i ? c.lineTo(u, v) : c.moveTo(u, v))); };
-      path([[-3, 0], [3, 0], [19, 9], [23, 13], [25, 40], [26, 76], [-26, 76], [-25, 40], [-23, 13], [-19, 9]]);
-      c.closePath();
-      const g = c.createLinearGradient(0, 0, 0, 76);
-      g.addColorStop(0, '#8aa0c4');
-      g.addColorStop(1, '#a6b8d6');
-      c.fillStyle = g;
-      c.fill();
-      c.lineWidth = 0.5;
-      c.strokeStyle = '#3c4a64';
-      for (const s of [-1, 1]) { path([[16 * s, 15], [17 * s, 76]]); c.stroke(); }
-      path([[0, 30], [0, 76]]);
-      c.stroke();
-      c.fillStyle = '#5a6e92';
-      path([[-3, 0], [-7, 6], [0, 30], [7, 6], [3, 0]]);
-      c.fill();
-      c.strokeStyle = 'rgba(160,172,196,.55)';
-      c.lineWidth = 0.35;
-      path([[-7, 6], [0, 30], [7, 6]]);
-      c.stroke();
-      for (const s of [-1, 1]) c.strokeRect(s > 0 ? 5 : -12, 21, 7, 7);
-      c.fillStyle = '#c0a060';
-      for (const v of [36, 48, 60]) { c.beginPath(); c.arc(1.6, v, 0.7, 0, 2 * Math.PI); c.fill(); }
-    }, D.front - 8, -532, 1.5 * D.ram, 3);
-
     // barstolarna: röd vinyl med söm på en krom ställning, som gängets, i
     // verklig storlek (sitsen 75 cm över golvet), inskjutna under kanten
     const krom = mat('#d8d8d4', { metalness: 1, roughness: 0.18, envMapIntensity: 1.3 });
     const vinyl = mat('#8b2e2a', { roughness: 0.38, clearcoat: 0.5, clearcoatRoughness: 0.3, envMapIntensity: 0.6 });
     const som = mat('#c9b18a', { roughness: 0.8 });
     const k = 1.6;
+    const cm = 2.37;
     const SITS = D.golv + 75 * cm;
     const ring = (y, R, tube, m, p) => {
       const x = mesh(new THREE.TorusGeometry(R, tube, 10, 64), m, p);

@@ -129,7 +129,6 @@ window.Rum = (() => {
     <linearGradient id="rum-alu" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#9a9a96"/><stop offset=".5" stop-color="#5e5e5b"/><stop offset="1" stop-color="#2e2e2c"/></linearGradient>
     <linearGradient id="rum-counter" gradientUnits="userSpaceOnUse" x1="1060" y1="0" x2="1600" y2="0"><stop offset="0" stop-color="#472b19"/><stop offset="1" stop-color="#2a180e"/></linearGradient>
     <linearGradient id="rum-knan" gradientUnits="userSpaceOnUse" x1="0" y1="500" x2="0" y2="660"><stop offset="0" stop-color="#080401" stop-opacity=".82"/><stop offset="1" stop-color="#080401" stop-opacity=".4"/></linearGradient>
-    <linearGradient id="rum-jacka" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#2f3a50"/><stop offset=".45" stop-color="#46597a"/><stop offset="1" stop-color="#53678a"/></linearGradient>
     <linearGradient id="rum-countertop" gradientUnits="userSpaceOnUse" x1="1060" y1="0" x2="1600" y2="0"><stop offset="0" stop-color="#613a23"/><stop offset="1" stop-color="#3a2113"/></linearGradient>
     <linearGradient id="rum-sill" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#7a7262"/><stop offset="1" stop-color="#958b78"/></linearGradient>
     <radialGradient id="rum-sodium" cx=".5" cy=".5" r=".5"><stop offset="0" stop-color="#ffb35c" stop-opacity=".9"/><stop offset="1" stop-color="#ffb35c" stop-opacity="0"/></radialGradient>
@@ -187,9 +186,8 @@ window.Rum = (() => {
   // Bardisken längs högra väggen, som i en pub: en skiva i mörk lackad
   // mahogny med en tjock rundad kant, som sticker ut en dryg decimeter över
   // fronten så att man har plats för benen. Under kanten bär konsoler upp
-  // skivan, och på fronten sitter krokar i mässing – på två av dem hänger en
-  // jeansjacka och en halsduk. Inne vid bakväggen syns väggen i skuggan
-  // under skivan. Fronten har fyllningar i ramar. Den går från bakväggen
+  // skivan, och på fronten sitter krokar i mässing. Inne vid bakväggen syns
+  // väggen i skuggan under skivan. Fronten har fyllningar i ramar. Den går från bakväggen
   // ut mot pulten, mot flyktpunkten, så allt på den är större ju längre ut
   // det är, och ramarna och krokarna står lika långt isär längs disken –
   // tätare inne vid hörnet. Ritas mellan x = a och z: i bilden (bg) och till
@@ -214,9 +212,6 @@ window.Rum = (() => {
     // djupet för ram i (bakväggen 0), med ramarna en halv meter isär
     const ram = (i) => 1000 - 128.57 * i;
     const xf = (Z) => VP[0] + F * 1000 / Z;
-    // ett stycke i frontens plan (u cm mot en, v cm nedåt från (Z, yb), d
-    // bildpunkter ut från fronten)
-    const pa = (Z, yb, d) => (list) => list.map(([u, v]) => p3(F - d, yb + v * 2.37, Z - u * 2.37));
 
     // fronten, och bakväggen i skuggan under skivan
     let s = poly([[fa, fy(fa, 501)], [z, fy(z, 501)], [z, 1020], [fa, 1020]], 'url(#rum-counter)');
@@ -248,27 +243,6 @@ window.Rum = (() => {
       const [t, c, b] = [p3(E + 8, 501, Z), p3(F - 4, 506, Z), p3(F, 546, Z)];
       s += `<path d="M${pts([t])} Q${pts([c])} ${pts([b])}" fill="none" stroke="#140c07" stroke-width="${r1(2.2 * 1000 / Z)}" stroke-linecap="round"/>` +
         `<path d="M${pts([t])} Q${pts([c])} ${pts([b])}" fill="none" stroke="#8a6a4a" stroke-opacity=".3" stroke-width="${r1(0.6 * 1000 / Z)}" transform="translate(-0.8 -0.4)"/>`;
-    }
-    // halsduken på första kroken och jeansjackan på andra (bara i bilden)
-    if (a < 1300) {
-      const H = pa(ram(0.5), 535, 9);
-      const ruta = (u0, u1, v0, v1) => H([[u0, v0], [u1, v0], [u1, v1], [u0, v1]]);
-      for (const [u0, v0, len] of [[-7, 0, 66], [-2, 3, 56]]) {
-        s += poly(ruta(u0, u0 + 11, v0, v0 + len), '#6e202b');
-        for (let v = v0 + 14; v < v0 + len - 4; v += 18) s += poly(ruta(u0, u0 + 11, v, v + 3.5), '#d6c49a', ' opacity=".75"');
-        s += poly(ruta(u0 + 10, u0 + 11, v0, v0 + len), 'rgba(0,0,0,.35)');
-      }
-      s += poly(ruta(-7, 9, -1, 8), 'rgba(0,0,0,.4)');
-      const J = pa(ram(1.5), 535, 7);
-      const kropp = J([[-3, 0], [3, 0], [19, 9], [23, 13], [25, 40], [26, 76], [-26, 76], [-25, 40], [-23, 13], [-19, 9]]);
-      const linje = (list, stroke, w, extra = '') => `<polyline points="${pts(J(list))}" fill="none" stroke="${stroke}" stroke-width="${w}"${extra}/>`;
-      s += poly(kropp, 'url(#rum-jacka)') +
-        linje([[16, 15], [17, 76]], '#26303f', 1.4) + linje([[-16, 15], [-17, 76]], '#26303f', 1.4) +
-        poly(J([[-3, 0], [-7, 6], [0, 30], [7, 6], [3, 0]]), '#2e3a50') +
-        linje([[-7, 6], [0, 30], [7, 6]], '#8e9bb2', 0.9, ' stroke-opacity=".55"') + linje([[0, 30], [0, 76]], '#26303f', 1.2) +
-        poly(J([[5, 21], [12, 21], [12, 28], [5, 28]]), 'none', ' stroke="#8e9bb2" stroke-opacity=".4" stroke-width=".8"') +
-        poly(J([[-12, 21], [-5, 21], [-5, 28], [-12, 28]]), 'none', ' stroke="#8e9bb2" stroke-opacity=".4" stroke-width=".8"') +
-        [36, 48, 60].map((v) => { const [x, y] = J([[1.6, v]])[0]; return `<circle cx="${r1(x)}" cy="${r1(y)}" r="1.3" fill="#c0a060"/>`; }).join('');
     }
     // överst skivan, med en blank strimma från lysröret och fogarna mellan
     // plankorna, och kanten: ljus överst där den rundar av, mörk under
