@@ -371,20 +371,33 @@ window.Rum = (() => {
     return `<a class="${cls} rum-sak" ${attrs} style="top:${yb0}px; height:${yb1 - yb0}px; width:${r1(wz(x1) - z0)}px; transform: rotateY(-90deg) translateX(${r1(z0)}px)">${inner}</a>`;
   }
 
+  // Högra väggen i tre fält, som inte går in i varandra: anslagstavlan i
+  // hörnet under tv:n, i mitten pokalhyllan med Tipsligan under (säsongen i
+  // gänget: pokalerna och ställningen) och längst ut korktavlan, hela i bild. Disken under dem:
+  // kortregistret under Tipsligan (rum-register.js), lådan och videon under
+  // korktavlan. Måtten är [x0, x1, y0, y1] som i onWall; ramarna i 3D
+  // (rum-inredning.js) får dem härifrån.
+  const VAGG = {
+    ans: [1144, 1296, 318, 478],
+    skar: [1322, 1428, 374, 432],
+    kork: [1444, 1584, 318, 478],
+  };
+
   // 3. Korktavlan med gängets gamla kuponger, rättade med röd penna.
   // 6. Skårtavlan med Tipsligan – säsongens ställning i gänget – i vita
   //    plastbokstäver.
   // 7. Anslagstavlan under tv:n (rum-anslag.js), fri från tv:ns hylla och disken.
   function rightWall() {
+    const [ans, skar, kork] = [VAGG.ans, VAGG.skar, VAGG.kork];
     return '<div class="rum-hv">' +
-      (window.RumAnslag ? onWall(1144, 1300, 316, 478, 'rum-ans', RumAnslag.wall(), `${KNAPP} data-nav="statistik" aria-label="Anslagstavlan" id="rum-ans"`) : '') +
-      onWall(1330, 1478, 376, 434, 'rum-skar', '<span class="rum-skar-in" id="rum-skar"></span>', `${KNAPP} data-nav="olympen" data-sak="skar" aria-label="Tipsligan"`) +
-      onWall(1496, 1700, 330, 478, 'rum-kork', '<span class="rum-kork-in" id="rum-kork"></span>', `${KNAPP} data-nav="olympen" data-sak="kork" aria-label="Korktavlan"`) +
+      (window.RumAnslag ? onWall(...ans, 'rum-ans', RumAnslag.wall(), `${KNAPP} data-nav="statistik" aria-label="Anslagstavlan" id="rum-ans"`) : '') +
+      onWall(...skar, 'rum-skar', '<span class="rum-skar-in" id="rum-skar"></span>', `${KNAPP} data-nav="olympen" data-sak="skar" aria-label="Tipsligan"`) +
+      onWall(...kork, 'rum-kork', '<span class="rum-kork-in" id="rum-kork"></span>', `${KNAPP} data-nav="olympen" data-sak="kork" aria-label="Korktavlan"`) +
       '</div>';
   }
 
-  // 4. Pokalhyllan: ritas på väggen (shelves()).
-  const POKAL = { yb: 288, x0: 1146, x1: 1312 };
+  // 4. Pokalhyllan: ritas på väggen (shelves()), över Tipsligan.
+  const POKAL = { yb: VAGG.skar[2] - 14, x0: VAGG.skar[0], x1: VAGG.skar[1] };
   function trophy(x, yb, col, i) {
     const k = sc(x) * 0.95;
     const y = at(x, yb);
@@ -861,7 +874,7 @@ window.Rum = (() => {
     el.hidden = true;
     el.setAttribute('aria-label', 'Tobaksaffären');
     el.innerHTML = `<div class="rum-stage" id="rum-stage"><div class="rum-kamera" id="rum-kamera"><div class="rum-world" id="rum-world">
-${plane(-600, `<div class="rum-ute" id="rum-ute"></div>${bg()}${vid('vagg')}${rightWall()}${window.RumRegister ? RumRegister.html() : ''}${svg('<g id="rum-hyllor"></g>', '', [1130, 170, 200, 140])}${neon()}${frameHtml()}`, 1.035)}
+${plane(-600, `<div class="rum-ute" id="rum-ute"></div>${bg()}${vid('vagg')}${rightWall()}${window.RumRegister ? RumRegister.html() : ''}${svg('<g id="rum-hyllor"></g>', '', [1300, 250, 150, 120])}${neon()}${frameHtml()}`, 1.035)}
 ${plane(-598, vid('horn'), 1.035, 'rum-pl3d')}
 ${plane(-470, `${tv()}`, 1.02, 'rum-pl3d')}
 ${plane(-330, `${sill()}${haze()}`)}
@@ -1996,7 +2009,7 @@ ${window.RumRegister ? RumRegister.nara() : ''}
     tur(() => import('./rum-saker.js').then((m) => m.saker(R.el, { calm: calm(), short, namn: tavelnamn })).then((x) => { R.saker = x; R.sakDuk = R.el.querySelector('canvas.rum-saker'); sikt(R.sakDuk); kval(R.kval); frame(); }), 2)
       .catch((err) => console.warn('Rummet: sakerna kunde inte ritas', err));
     // lysröret, neonen, skyltarna, uret, ramarna, paketen och kupongstället (rum-inredning.js)
-    tur(() => import('./rum-inredning.js').then((m) => m.inredning(R.el, { calm: calm(), still })).then((x) => { R.inr = x; x.namn(R.ramNamn); x.stopp(R.stopp); if (window.RumFolk && RumFolk.natt()) x.natt(true); if (R.sak) sak(R.sak, null); frame(); }), 1)
+    tur(() => import('./rum-inredning.js').then((m) => m.inredning(R.el, { calm: calm(), still, vagg: VAGG })).then((x) => { R.inr = x; x.namn(R.ramNamn); x.stopp(R.stopp); if (window.RumFolk && RumFolk.natt()) x.natt(true); if (R.sak) sak(R.sak, null); frame(); }), 1)
       .catch((err) => console.warn('Rummet: inredningen kunde inte ritas', err));
     try {
       await tur(async () => {
@@ -2442,8 +2455,8 @@ ${window.RumRegister ? RumRegister.nara() : ''}
     const vem = Object.keys(GANG).filter((id) => n[id]).sort((x, y) => n[y] - n[x]);
     return vem.length ? `<span class="pokaler">${vem.map((id) => `<span><b style="color:${GANG[id]}">${id}</b> ${n[id]}</span>`).join('')}</span>` : '';
   }
-  // Pokalhyllan står till största delen bakom tv:n: medan kameran står vid
-  // den tonar tv:n bort, del för del – opacitet på lådan själv skulle platta
+  // Tv:n hänger snett ovanför pokalhyllan, och dess underkant skulle skära in
+  // överst i närbilden: medan kameran står vid hyllan tonar tv:n bort, del för del – opacitet på lådan själv skulle platta
   // till den i 3D medan den tonar.
   function tvBort(bort, glid) {
     if (!bort && !R.tvBort) return;

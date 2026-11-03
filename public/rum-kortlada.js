@@ -1,7 +1,7 @@
 // Kortlådan i tobaksaffären i three.js, som inredningen (rum-inredning.js)
 // och sakerna på pulten (rum-saker.js). Korten, datan och kortet i handen
 // sköts av rum-register.js. Lådan är av lackad teak och står på disken under
-// anslagstavlans högra hörn, med en mässingshållare fram där etiketten säger
+// Tipsligan, med en mässingshållare fram där etiketten säger
 // KRITAN, överstruket, och Lagen med kulspets. I lådan står avdelarna av
 // pressad kartong (Lagen grön, Mötena röd), lagkorten med flikar av plast i
 // divisionens färg (som på Tabeller) och mötenas blå kort.
@@ -27,7 +27,7 @@ const E = 1000;
 const FW = 2 * Math.max(EYE[0], 1600 - EYE[0]);
 const FH = 2 * Math.max(EYE[1], 1000 - EYE[1]);
 // lådans mitt i botten, på disken
-const POS = { x: 1109, y: -490, z: 306 };
+const POS = { x: 1109, y: -490, z: 377 };
 // lådan: bredd, höjd, djup, väggarna och botten; korten (A6), flikarna och
 // avdelarna, som är lite högre
 const B = { w: 46, h: 24, d: 68, t: 2.2, b: 1.8 };

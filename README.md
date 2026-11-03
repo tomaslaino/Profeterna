@@ -1904,23 +1904,23 @@ Enter och mellanslag klickar på dem. En match på text-tv:n öppnar matchrutan 
   skimmer drar snett över glaset var elfte sekund. Mässingsskylten under säger
   *Omgångens orakel* och hela efternamnet (delat: *Laino & Johansson*, i mindre stil), och
   ramen och skylten lyser med när man pekar på dem.
-- **Pokalhyllan** (högra väggen, till största delen bakom tv:n) → närbild: en liten pokal per
-  vunnen omgång i vinnarens färg (delat = en var), ur `data/tippare.json`. Nära tonar tv:n bort,
-  del för del (`tvBort` i rum.js; opacitet på lådan själv skulle platta till den i 3D), och
+- **Pokalhyllan** (mitt på högra väggen, över Tipsligan) → närbild: en liten pokal per
+  vunnen omgång i vinnarens färg (delat = en var), ur `data/tippare.json`. Nära tonar tv:n, som annars skär in
+  överst i bilden, bort del för del (`tvBort` i rum.js; opacitet på lådan själv skulle platta till den i 3D), och
   under hyllan står hur många pokaler var och en har, flest först.
 - **Anslagstavlan** (under tv:n, i hörnet) → lapparna om omgångens lag (se
   [Anslagstavlan](#anslagstavlan)).
-- **Kortregistret** (på disken under anslagstavlan) → ett kort per lag och per möte i
+- **Kortregistret** (på disken under Tipsligan) → ett kort per lag och per möte i
   omgången (se [Kortregistret](#kortregistret)).
-- **Skårtavlan** (under tv:n) → närbild: *Tipsligan*, säsongens ställning i gänget
+- **Skårtavlan** (mitt på högra väggen, under pokalhyllan) → närbild: *Tipsligan*, säsongens ställning i gänget
   – samma poäng och placering som ställningen i Olympen (`kampRounds`, med omgången som
   pågår), lika placering vid lika poäng och antal rätt. Efternamnen står där, och Johansson
   som *Dogge* (`SMEKNAMN` i rum.js); före första omgången bara namnen. Vita plastbokstäver i
   spåren på svart filt – rubriken, ett tomt spår och de tre – i en låg aluminiumram som
   sticker ut från väggen (3D). Varje bokstav sitter lite snett för sig (samma frö varje gång,
   så att inget flyttar sig), och lådan har bara fyra O – sedan blir det nollor.
-- **Korktavlan** (längst till höger, i en träram i 3D) → närbild: de färdigspelade kupongerna
-  (`Historik.coupons`) rättade med röd penna, en med kaffering.
+- **Korktavlan** (längst ut på högra väggen, hel i bild, i en träram i 3D) → närbild: de
+  färdigspelade kupongerna (`Historik.coupons`) rättade med röd penna, en med kaffering.
   Tom tills den första är färdigspelad.
 - **Kupongen och kvittot**: kupongen tas i handen (se nedan), och när den inte går att ta i
   handen går kameran fram till den på pulten (också med K och guldordet); kvittot → närbild.
@@ -1963,6 +1963,14 @@ Enter och mellanslag klickar på dem. En match på text-tv:n öppnar matchrutan 
   till spelstoppet* under. I fönster som är minst 8:5 syns hela dörren, och där står namnet
   inte i menyns hörn; i smalare fönster skärs dörren av och namnet står kvar i hörnet.
 
+Högra väggen är delad i tre fält som inte går in i varandra (`VAGG` i rum.js, som också ger
+ramarna i 3D sina mått): anslagstavlan i hörnet under tv:n, i mitten pokalhyllan med
+Tipsligan under – säsongen i gänget, pokalerna och ställningen – och längst ut korktavlan,
+med samma överkant och underkant som anslagstavlan. Disken under följer fälten:
+kortregistret står under Tipsligan, fritt från anslagstavlans nederkant, och videon och
+lådan med kassetter under korktavlan. Tv:ns sladd går i en kort båge till ett uttag strax
+under väggplattan, ovanför korktavlan.
+
 **Kupongstället** står på pulten vid fönstret (till vänster) och leder ingenstans: ett
 fack av plexiglas, lågt fram och högt bak, med blanka kuponger (samma terrakottaband som
 kupongen på pulten) som lutar bakåt, butikens pennor i ett rör bredvid och en lapp på
@@ -1988,7 +1996,7 @@ spetsen och sektorn är borta. Med `?rum-klocka` räknar uret från sin egen tid
 **Inredningen i 3D** ([public/rum-inredning.js](public/rum-inredning.js)): lysröret i taket
 (en armatur med två rör och gavlar), neonskylten, Stängt-skylten, stationsuret,
 orakelramen med mässingsskylten, cigarettpaketen uppe på högra väggen (två hyllor med
-paket i rader om tre till sju; påhittade färger, inga märken), ramarna kring skårtavlan
+paket i rader om tre till sju, som börjar bakom tv:n; påhittade färger, inga märken), ramarna kring skårtavlan
 och korktavlan och kupongstället är byggda i three.js som gänget. Neonskylten är glasrör med en
 ljus kärna som följer bokstäverna i *Tobak*, spegelvänd inifrån: texten i Fraunces kursiv
 tunnas ut till en linje och seriferna tas bort. Den hänger i kedjor från fönsterkarmen med
@@ -3125,7 +3133,7 @@ styrka, kryss, tur, odds, vila, motstand) med den lappen i handen.
 
 ### Kortregistret
 
-På disken under anslagstavlans högra hörn står en kortlåda i lackad teak, byggd i three.js
+På disken under Tipsligan står en kortlåda i lackad teak, byggd i three.js
 som inredningen ([public/rum-kortlada.js](public/rum-kortlada.js)), med korten, datan och
 kortet i handen i [public/rum-register.js](public/rum-register.js) och
 [public/rum-register.css](public/rum-register.css). Fram på lådan sitter en mässingshållare

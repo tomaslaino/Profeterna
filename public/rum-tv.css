@@ -64,7 +64,8 @@
 .h-hoger { left: 297px; top: 191px; width: 116px; height: 9px; transform: translateZ(5px) rotateY(90deg); filter: brightness(0.85); }
 
 /* armen: en fyrkantsprofil från leden bakom tv:n till väggplattan, och
-   sladden som hänger från armen till uttaget under plattan. Står still när
+   sladden som hänger i en kort båge från armen till uttaget strax under
+   plattan, ovanför korktavlan. Står still när
    tv:n vrids, och ritas i samma storlek som lådan. */
 .tv-fot { position: absolute; left: 0; top: 0; width: 292px; height: 196px; transform-style: preserve-3d; transform-origin: 0 0; pointer-events: none; }
 .skarp > .tv-fot { zoom: 3; transform: scale3d(0.3333, 0.3333, 0.3333); }
@@ -92,13 +93,13 @@
 .tv-sladd {
   left: 340px;
   top: 86px;
-  width: 60px;
-  height: 116px;
+  width: 62px;
+  height: 48px;
   transform: translateZ(-110px);
-  background: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='60' height='116'%3E%3Cpath d='M10 3 C 9 70, 30 108, 54 110' fill='none' stroke='%23111' stroke-width='3.4' stroke-linecap='round'/%3E%3Cpath d='M10 3 C 9 70, 30 108, 54 110' fill='none' stroke='%23666' stroke-opacity='.45' stroke-width='1' transform='translate(-.8 0)'/%3E%3C/svg%3E") no-repeat;
+  background: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='62' height='48'%3E%3Cpath d='M10 3 C 8 30, 30 46, 56 41' fill='none' stroke='%23111' stroke-width='3.4' stroke-linecap='round'/%3E%3Cpath d='M10 3 C 8 30, 30 46, 56 41' fill='none' stroke='%23666' stroke-opacity='.45' stroke-width='1' transform='translate(-.8 0)'/%3E%3C/svg%3E") no-repeat;
 }
 /* uttaget: en krämvit dosa med stickproppen i */
-.tv-uttag { left: 396px; top: 186px; width: 11px; height: 17px; transform: translateZ(-124px) skewY(-10deg); border-radius: 2px; background: linear-gradient(90deg, #f3ecda, #d3c9b0 60%, #a39a83); box-shadow: -1px 0 0 #8a816c, 0 1px 3px rgba(0, 0, 0, 0.55); }
+.tv-uttag { left: 396px; top: 118px; width: 11px; height: 17px; transform: translateZ(-124px) skewY(-10deg); border-radius: 2px; background: linear-gradient(90deg, #f3ecda, #d3c9b0 60%, #a39a83); box-shadow: -1px 0 0 #8a816c, 0 1px 3px rgba(0, 0, 0, 0.55); }
 .tv-uttag::after { content: ""; position: absolute; left: 2px; top: 4px; width: 7px; height: 9px; border-radius: 50%; background: radial-gradient(circle at 40% 35%, #4a4643, #141312 70%); }
 
 /* kaninöronen på taket, det ena med en bit folie */
