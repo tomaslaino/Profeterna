@@ -133,22 +133,27 @@ export async function saker(el, opt = {}) {
   let seed = daySeed();
   let key = null;
   let wear = 0.45;
-  // slitaget räknas om när omgången eller dagen ändras
+  // slitaget räknas om när omgången eller dagen ändras (rows är en ny lista
+  // vid varje fill: det är värdet som avgör om det görs om)
   function update(rows, old) {
     const s = daySeed();
     if (rows === key?.rows && old === key?.old && s === seed) return false;
-    seed = s;
+    const w = wearOf(rows, old, s);
+    const ny = !key || w !== wear || s !== seed;
     key = { rows, old };
-    wear = wearOf(rows, old, seed);
-    if (aff) {
-      aff.slit(wear, seed);
-      aff.data(rows, old);
+    if (ny) {
+      seed = s;
+      wear = w;
+      if (aff) aff.slit(wear, seed);
     }
-    return true;
+    // (rubriken på löpsedeln följer datan också när slitaget är detsamma)
+    if (aff) aff.data(rows, old);
+    return ny;
   }
   update(null, null);
 
   let three = null;
+  let sliten = false;
   if (pult) {
     try {
       three = await props(pult, opt, el);
@@ -158,7 +163,10 @@ export async function saker(el, opt = {}) {
   }
   return {
     draw(t, mx, my, rows, old, syns = true) {
-      if (update(rows, old) && three) three.wear(wear, seed);
+      if ((update(rows, old) || !sliten) && three) {
+        sliten = true;
+        three.wear(wear, seed);
+      }
       if (three && vader()) three.power(varmt, fika);
       if (three && syns) three.draw(t, mx, my);
     },

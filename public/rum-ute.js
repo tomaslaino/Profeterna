@@ -974,8 +974,9 @@ window.RumUte = (() => {
         c.getContext('2d').drawImage(img, 0, 0, c.width, c.height);
         img.src = '';
         svg.replaceWith(c);
-      } catch { /* då står SVG:n kvar, utan oskärpa */ }
-      URL.revokeObjectURL(url);
+      } catch { /* då står SVG:n kvar, utan oskärpa */ } finally {
+        URL.revokeObjectURL(url);
+      }
     }
   }
 

@@ -649,18 +649,22 @@ window.RumAnslag = (() => {
       if (A.fa) A.fa.cancel();
       A.fa = null;
     }
+    // Tavlans hörn t in på vägen.
+    function hornPa({ from, to }, t) {
+      const e = ease(t);
+      const lift = 1 + 0.05 * Math.sin(Math.PI * t);
+      const q = from.map((p, i) => [p[0] + (to[i][0] - p[0]) * e, p[1] + (to[i][1] - p[1]) * e]);
+      const c = [0, 1].map((j) => q.reduce((s, p) => s + p[j], 0) / 4);
+      return q.map((p) => [c[0] + (p[0] - c[0]) * lift, c[1] + (p[1] - c[1]) * lift]);
+    }
     function fly(from, to, ms) {
       stopFly();
-      const at = (t) => {
-        const e = ease(t);
-        const lift = 1 + 0.05 * Math.sin(Math.PI * t);
-        const q = from.map((p, i) => [p[0] + (to[i][0] - p[0]) * e, p[1] + (to[i][1] - p[1]) * e]);
-        const c = [0, 1].map((j) => q.reduce((s, p) => s + p[j], 0) / 4);
-        return warp(q.map((p) => [c[0] + (p[0] - c[0]) * lift, c[1] + (p[1] - c[1]) * lift]), BW, BH);
-      };
+      const bana = (A.bana = { from, to, ms });
+      const at = (t) => warp(hornPa(bana, t), BW, BH);
       const n = Math.max(12, Math.round(ms / 20));
       const vag = Array.from({ length: n + 1 }, (_, i) => ({ transform: at(i / n) }));
       return new Promise((done) => {
+        A.flygKlar = done;
         const starta = () => {
           const a = (A.fa = flyg.animate(vag, { duration: ms, easing: 'linear' }));
           a.finished.then(() => {
@@ -668,6 +672,7 @@ window.RumAnslag = (() => {
             flyg.style.transform = vag[n].transform;
             a.cancel();
             A.fa = null;
+            A.flygKlar = null;
             done();
           }, () => {});
         };
@@ -698,7 +703,8 @@ window.RumAnslag = (() => {
         loadMatches();
         if (A.matt !== A.html) measure();
         place();
-        const from = q || quad();
+        // (var den på väg tillbaka vänder den där den är)
+        const from = A.fa ? hornPa(A.bana, A.fa.currentTime / A.bana.ms) : q || quad();
         ov.classList.add('on');
         ov.classList.remove('ute');
         wallEl.classList.add('borta');
@@ -726,7 +732,9 @@ window.RumAnslag = (() => {
         wallEl.classList.remove('borta');
       };
       if (o.calm()) { end(); return Promise.resolve(); }
-      return fly(A.place ? A.place.q : quad(), q || quad(), 560).then(end);
+      // (var den på väg fram vänder den där den är)
+      const fran = A.fa ? hornPa(A.bana, A.fa.currentTime / A.bana.ms) : A.place ? A.place.q : quad();
+      return fly(fran, q || quad(), 560).then(end);
     }
 
     // Lutar lite efter musen, så att ramens djup syns. Vinkeln sätts som
@@ -743,8 +751,12 @@ window.RumAnslag = (() => {
       fitWall();
       if (!A.on) return;
       place();
+      // (var den på väg fram är den framme nu)
+      const klar = A.flygKlar;
+      A.flygKlar = null;
       stopFly();
       rest();
+      if (klar) klar();
       if (A.lyft) placeLyft(A.W.notes.find((x) => x.id === A.lyft.id), false);
     });
 

@@ -2561,7 +2561,9 @@ Rummet känner själv av om datorn eller telefonen hinner med (`kanna` i rum.js)
 ner ett steg (`KVAL`, steg 0–2). Bilderna räknas i två sekunder åt gången medan rummet står
 för sig självt – inte medan kameran är framme vid något, inte medan 3D-delarna startar och
 inte när fliken är dold – och kommer det färre än 45 bilder i sekunden, eller är mer än var
-tionde bild längre än 50 ms, två perioder i rad tas ett steg ner.
+tionde bild längre än 50 ms, två perioder i rad tas ett steg ner. I Chrome i datorn räknas
+gängets bilder (se Väcks bara när det behövs nedan): färre än 80 % av takten, eller mer än
+var tionde bild längre än 50 ms (75 ms på steg 1).
 
 - **Steg 1:** gänget och sakerna på pulten ritas 20 gånger i sekunden i stället för 30, med
   tre fjärdedelar av bildpunkterna på ledden och skuggorna omräknade varannan bild (var tredje i telefonen) (`kval` i
@@ -2758,6 +2760,42 @@ går tillbaka (då flyttas hacket dit).
 Mätsättet för minnet: ett litet Node-skript som håller 10 GB slumpdata och rör vid det hela tiden,
 under en och en halv till fem minuter. Den tyngsta spårningen
 (`disabled-by-default-cc.debug`) ritar själv om väggen och kan inte användas för att räkna rutor.
+
+**Väcks bara när det behövs.** I Chrome i datorn gör huvudtråden inget mellan gängets bilder:
+grafikkortet flyttar allt annat, och kameran glider själv (`folj`). Att den ändå väcktes i
+varje bildruta kostade en omräkning av stilen för allt som är animerat, 60 gånger i sekunden.
+Nu väntar `tick` i `loop` med en timer till bildrutan före nästa bild. Så länge kameran rör sig
+bild för bild, och i telefonen och Safari, går den i varje bildruta som förut. Mätt i headless
+Chrome (Apple M5, 1440 × 900, täthet 2), gammal och ny kod om vartannat, median: på steg 0
+huvudtrådens tid 137 → 124 ms/s och stilen 16 → 9 ms/s, på steg 1 med processorn fyra gånger
+långsammare 248 → 194 ms/s och stilen 40 → 15 ms/s. Gängets takt och jämnhet är oförändrade
+(33,3 ms på steg 0 och 50 ms på steg 1, 95:e percentilen inom 2 ms).
+
+**Att peka på gänget** räknade mot alla gängets trianglar, 4–17 ms på huvudtråden var 60:e ms
+när musen rörde sig över figurerna. Nu räknas det mot lådan runt varje del (`under` i rum-3d.js),
+högst 0,2 ms. Det används bara för att veta vem man pekar på, så träffytan får vara lite större
+än figuren.
+
+**När figurerna byggs om** (kläderna, ett steg ner) släpps material och texturer när de nya har
+ritats en gång (`slappOmbyggda`), så att shaderprogrammen de nya ska använda inte kastas.
+Förut låg ungefär 13 texturer per ombyggnad kvar tills webbläsaren städade dem.
+
+### När något går fel i rummet
+
+- **Matcherna går inte att hämta:** `whenMatches` väntar inte förgäves, och `load` försöker igen
+  varje minut. Förut förblev rummet utan matcher tills sidan laddades om, och varje försök la till
+  en lyssnare.
+- **Fel i datan:** ett undantag i `fill` lämnar inte rummet mörkt (`tand`). Tv:n klarar en spelad
+  match utan resultat.
+- **Dold flik:** rummet frågar inte tjänsten varje minut.
+- **Musen släpps utanför fönstret:** rummet slutar följa musen vid nästa rörelse utan knapp.
+- **Fönstret ändras:** tv:n nära siktas om så att den ryms, och kommer tavlan flygande är den
+  framme med en gång, med foten och pekeffekten.
+- **Snabba tryck:** anslagstavlan och kortlådan vänder där de är i stället för att hoppa till
+  slutläget (hopp på 677 → 48 px mellan två bildrutor med A två gånger).
+- **Inget ändrades:** kupongen på pulten skrivs inte om vid varje `fill`. Jämförelsen mot `innerHTML`
+  blev aldrig lika, eftersom webbläsaren skriver `<path …/>` som `<path …></path>`. Tv:n vrids inte
+  när kupongen tas i handen om den inte var nära (`zoomTv`).
 
 ### I Safari i telefonen
 

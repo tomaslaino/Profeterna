@@ -231,6 +231,7 @@ async function loadMatches() {
     el.innerHTML = `<p class="empty">Kunde inte läsa matcherna: ${esc(err.message)}</p>`;
   }
   // Kupongen väntar på matcherna (kupong.js).
+  state.matchesForsokt = true;
   document.dispatchEvent(new Event('matches-loaded'));
 }
 

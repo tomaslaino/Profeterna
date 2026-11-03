@@ -1340,6 +1340,11 @@ ${window.RumRegister ? RumRegister.nara() : ''}
 
   // Allt som hämtas: omgången, säsongens omgångar och kupongerna.
   async function load() {
+    // (gick matcherna inte att hämta försöker varje omgång igen, R.poll)
+    if (!state.all && state.matchesForsokt) {
+      state.matchesForsokt = false;
+      await loadMatches();
+    }
     await Promise.all([whenMatches(), loadCoupons()]);
     await Promise.all([
       typeof tpLoad === 'function' ? tpLoad() : null,
@@ -1358,7 +1363,15 @@ ${window.RumRegister ? RumRegister.nara() : ''}
     const rows = rd ? roundRows(rd, t) : [];
     R.rows = rows;
     const nr = rd && !rd.next && rd.ids.length && typeof couponNumber === 'function' ? couponNumber(rd.ids) : null;
-    const set = (id, html) => { const e = document.getElementById(id); if (e && e.innerHTML !== html) e.innerHTML = html; };
+    // (mot det som skrevs sist: innerHTML ger tillbaka <path …></path> där
+    // kupongen skrev <path …/>, så den skrevs annars om vid varje fill)
+    const set = (id, html) => {
+      const e = document.getElementById(id);
+      if (e && e.skrivet !== html) {
+        e.skrivet = html;
+        e.innerHTML = html;
+      }
+    };
     // tv:n: Stryktipsets ordning (spel) om omgången är Stryktipset, och next
     // mellan omgångarna, när raderna bara är de närmaste matcherna
     if (R.tv) R.tv.fill(rows, { spel: rd && rd.spel ? rd.ids : null, next: Boolean(rd && rd.next) });
@@ -1773,6 +1786,7 @@ ${window.RumRegister ? RumRegister.nara() : ''}
     // (världen glider själv dit vrid satte den)
     if (R.folj && R.folj.e) {
       R.borta = performance.now();
+      R.bildVis = false;
       return;
     }
     if (!still()) {
@@ -1785,8 +1799,9 @@ ${window.RumRegister ? RumRegister.nara() : ''}
     // glider behåller Chrome lagrens upplösning, och den ska bli hemmets)
     const hemma = R.el.classList.contains('chromium') && !calm() && !nara() && !R.el.classList.contains('sak-nara');
     if (!hemma) R.borta = performance.now();
-    if (hemma && performance.now() - (R.borta || 0) > 1000) folj(R.tx, R.ty);
-    else setCam(R.mx, R.my);
+    R.bildVis = !(hemma && performance.now() - (R.borta || 0) > 1000);
+    if (R.bildVis) setCam(R.mx, R.my);
+    else folj(R.tx, R.ty);
   }
 
   function frame(dt = 1000 / 30) {
@@ -1842,6 +1857,7 @@ ${window.RumRegister ? RumRegister.nara() : ''}
 
   function loop() {
     cancelAnimationFrame(R.raf);
+    clearTimeout(R.vila);
     let prev = 0;
     let dt = 0;
     const tick = (ms) => {
@@ -1864,7 +1880,15 @@ ${window.RumRegister ? RumRegister.nara() : ''}
       }
       if (raw) kanna(ms, raw);
       if (R.ko.length) efterBild.port2.postMessage(0);
-      R.raf = requestAnimationFrame(tick);
+      // Mellan gängets bilder har huvudtråden inget att göra i Chrome i datorn:
+      // grafikkortet flyttar allt annat, och kameran glider själv (folj). Varje
+      // väckning kostar ändå en omräkning av stilen för allt som är animerat,
+      // så den väcks först bildrutan före nästa bild (8 ms före: rätt ruta
+      // i 60 Hz och högst en ruta för mycket i 120 Hz).
+      const kvar = R.last + 1000 / K.takt - 4 - performance.now();
+      if (TOMMA && kvar > 12 && !R.ko.length && !(K.vrid && R.bildVis)) {
+        R.vila = setTimeout(() => { R.raf = requestAnimationFrame(tick); }, kvar - 8);
+      } else R.raf = requestAnimationFrame(tick);
     };
     R.raf = requestAnimationFrame(tick);
   }
@@ -1872,8 +1896,8 @@ ${window.RumRegister ? RumRegister.nara() : ''}
   // ---------- kvaliteten ----------
 
   // Rummet känner av om datorn eller telefonen hinner med (kanna): kommer
-  // det färre än 45 bilder i sekunden, eller hackar det, går det ner ett
-  // steg – gänget och sakerna i 3D ritas glesare och med färre bildpunkter,
+  // det färre än 45 bilder i sekunden (i Chrome i datorn färre än 80 % av
+  // gängets takt), eller hackar det, går det ner ett steg – gänget och sakerna i 3D ritas glesare och med färre bildpunkter,
   // skuggorna räknas om mer sällan, gatan utanför rör sig i färre steg och
   // dammet i ljuset försvinner. Steget sparas, så att nästa besök börjar där
   // (i tre dagar). I telefonen börjar rummet på steg 1. ?rum-kval=0|1|2
@@ -1965,12 +1989,14 @@ ${window.RumRegister ? RumRegister.nara() : ''}
     if (ms < K.fran) return;
     K.n++;
     K.sum += dt;
-    if (dt > 50) K.hack++;
+    // (i Chrome i datorn väcks huvudtråden bara till gängets bilder, loop)
+    const takt = KVAL[R.kval].takt;
+    if (dt > (TOMMA ? Math.max(50, 1500 / takt) : 50)) K.hack++;
     if (K.sum < 2000) return;
     // (stadiga 30 bilder i sekunden är en telefon i strömsparläge – det blir
     // inte bättre av att gänget ritas glesare)
     const bps = (K.n / K.sum) * 1000;
-    const dalig = (bps < 45 && Math.abs(bps - 30) > 3) || K.hack > K.n * 0.1;
+    const dalig = (TOMMA ? bps < takt * 0.8 : bps < 45 && Math.abs(bps - 30) > 3) || K.hack > K.n * 0.1;
     K.daliga = dalig ? K.daliga + 1 : 0;
     K.n = K.sum = K.hack = 0;
     if (K.daliga < 2) return;
@@ -2219,6 +2245,8 @@ ${window.RumRegister ? RumRegister.nara() : ''}
   // hundradels bildpunkt fram och tillbaka – som tas bort när den är hemma
   // igen. Chrome behöver det inte.
   const WEBKIT = !navigator.userAgentData && /AppleWebKit/.test(navigator.userAgent);
+  // Chrome i datorn: huvudtråden väcks bara till gängets bilder (loop)
+  const TOMMA = Boolean(navigator.userAgentData) && !LATT;
   function kvar(borta) {
     // (mellan lådan och rutan är allt annat redan borta, lattVideo)
     if (!WEBKIT || calm() || (borta && R.utanKvar)) return;
@@ -2276,6 +2304,9 @@ ${window.RumRegister ? RumRegister.nara() : ''}
   // T: tv:n nära, vriden mot en, så att text-tv:n går att läsa och knapparna
   // att trycka på. Kameran siktar på rutan där den hamnar när tv:n har vridits.
   function zoomTv(on) {
+    // (var den inte nära ska inget röra sig: tv:n svängde annars runt när
+    // kupongen togs i handen, och kameran väntade in vridningen)
+    if (!on && R.zoom === false) return;
     if (on && R.vnara) zoomVideo(false);
     if (on && R.reg && R.reg.on()) register(false);
     R.zoom = on;
@@ -2291,10 +2322,16 @@ ${window.RumRegister ? RumRegister.nara() : ''}
     setCam(R.mx, R.my);
     if (on) vrid(0, 0);
     else vridHem();
-    // så nära som ryms i fönstret (i telefonen fyller tv:n bredden)
-    const z = r && Math.min(3.6, (innerWidth - 24) / r.width, (innerHeight - 110) / r.height);
-    if (on && r) aim(centerOf(r), z, mid(0.5, 0.48), calm() ? null : 'glid');
-    else aim([800, 500], 1, [800, 500], calm() ? null : 'glid');
+    if (on && r) {
+      R.tvMatt = { c: centerOf(r), b: r.width / R.k, h: r.height / R.k };
+      aimTv(calm() ? null : 'glid');
+    } else aim([800, 500], 1, [800, 500], calm() ? null : 'glid');
+  }
+  // så nära som ryms i fönstret (i telefonen fyller tv:n bredden)
+  function aimTv(cls) {
+    const { c, b, h } = R.tvMatt;
+    const z = Math.min(3.6, (innerWidth - 24) / (b * R.k), (innerHeight - 110) / (h * R.k));
+    aim(c, z, mid(0.5, 0.48), cls);
   }
 
   // V: videon nära. Kameran går fram till hörnet på disken – tv:n, högen
@@ -3476,6 +3513,11 @@ ${window.RumRegister ? RumRegister.nara() : ''}
         if (!nara()) [R.tx, R.ty] = R.mus;
       }
       if (e.pointerId !== P.id) return;
+      // (släpptes musen utanför fönstret kom inget pointerup hit)
+      if (e.pointerType === 'mouse' && !(e.buttons & 1)) {
+        P.id = null;
+        return;
+      }
       const dx = e.clientX - P.x;
       const dy = e.clientY - P.y;
       if (!P.drar && Math.hypot(dx, dy) < 8) return;
@@ -3674,7 +3716,8 @@ ${window.RumRegister ? RumRegister.nara() : ''}
       Object.assign(PEN_VILA, vila);
       if (R.on && !R.kup) fill();
     }
-    // videon nära: hörnet ryms i det nya fönstret
+    // tv:n och videon nära: de ryms i det nya fönstret
+    if (R.zoom && R.tvMatt) aimTv(null);
     if (R.vnara) aimVideo(null);
     // närbilden: saken ryms i det nya fönstret
     if (R.sak) sak(R.sak, null);
@@ -3702,7 +3745,9 @@ ${window.RumRegister ? RumRegister.nara() : ''}
     const t0 = performance.now();
     m.classList.add('start');
     const tands = () => { m.classList.remove('start'); m.classList.add('tands'); };
+    // (också om något gick fel i datan: annars förblev rummet mörkt)
     Promise.race([ready, new Promise((r) => setTimeout(r, 2600))])
+      .catch((err) => console.warn('Rummet: datan kunde inte visas', err))
       .then(() => setTimeout(tands, Math.max(0, 700 - (performance.now() - t0))));
     m.addEventListener('animationend', (e) => { if (e.animationName === 'rum-tands') m.classList.remove('tands'); });
   }
@@ -3742,6 +3787,7 @@ ${window.RumRegister ? RumRegister.nara() : ''}
       R.visad = true;
       R.el.classList.add('laddar');
       Promise.race([Promise.all([R.bakat, data, document.fonts.ready]), new Promise((r) => setTimeout(r, 4000))])
+        .catch(() => {})
         .then(() => new Promise((r) => requestAnimationFrame(r)))
         .then(() => {
           R.el.classList.remove('laddar');
@@ -3784,7 +3830,8 @@ ${window.RumRegister ? RumRegister.nara() : ''}
     } else loop();
     clearInterval(R.poll);
     // omgången och liveställningen kan ändras medan rummet står öppet
-    R.poll = setInterval(() => { if (R.on) { load(); ute(); } }, 60000);
+    // (inte i en dold flik: varje gång är en fråga till tjänsten, samtal.js)
+    R.poll = setInterval(() => { if (R.on && !document.hidden) { load(); ute(); } }, 60000);
   }
 
   function hide() {
@@ -3798,6 +3845,7 @@ ${window.RumRegister ? RumRegister.nara() : ''}
     R.on = false;
     if (window.RumFolk) RumFolk.on(false);
     cancelAnimationFrame(R.raf);
+    clearTimeout(R.vila);
     clearInterval(R.poll);
     R.el.hidden = true;
     document.documentElement.classList.remove('i-rummet');
