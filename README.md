@@ -518,7 +518,8 @@ Utan nyckel ingen knapp.
 - **Disken blir en bardisk (2026-11-03, användarens önskemål):** disken längs högra väggen
   var svår att förstå (grå skiva, mörk front). Nu är den en bardisk i mörkt trä med tjock
   rundad kant och fyllningar i ramar, i rummets egna toner och utan något extra att rita.
-  Se [Tobaksaffären](#tobaksaffären).
+  Skivan sticker ut över fronten så att man har plats för benen, med konsoler under och
+  krokar för jackor på fronten. Se [Tobaksaffären](#tobaksaffären).
 - **Statistiken i tobaksaffären står på ett ställe var (2026-11-02, användarens önskemål):**
   samma siffror stod på tv:n, anslagstavlan och kortregistret. Nu står formen bara på
   anslagstavlan, tabellen och hemma/borta bara på tv:n, styrkan, motståndet och poängen mot
@@ -2136,10 +2137,13 @@ nedan), neonen glappar ibland, röken ligger under lysröret, damm syns i ljuset
 sekundvisare hoppar fram. Bakväggen är klädd med lackad furupanel (`furu` i rum.js):
 bräder med kvistar och ådring, mörka av röken upptill och ljusare under lysröret och där en
 tavla har hängt runt ramen. Disken längs högra väggen är en bardisk som i en pub: en skiva i
-mörk lackad mahogny med en blank strimma, en tjock rundad kant som sticker ut över fronten och
-skuggar den, och en front med fyllningar i ramar, med ramarna lika långt isär längs disken –
-tätare inne vid hörnet, som i perspektivet. Allt är polygoner i väggens SVG, utan filter
-(`disk` i rum.js; samma funktion ritar disken vidare i videons hörn, `vaggSvg` i
+mörk lackad mahogny med en blank strimma och en tjock rundad kant, som sticker ut en dryg
+decimeter över den indragna fronten, så att man har plats för benen. Under kanten bär
+konsoler i järn upp skivan, och på fronten sitter en krok i mässing i varje fält – på de två
+innersta hänger en halsduk och en jeansjacka. Inne vid bakväggen syns väggen i skuggan under
+skivan. Fronten har fyllningar i ramar, och ramarna och krokarna står lika långt isär längs
+disken – tätare inne vid hörnet, som i perspektivet. Allt är polygoner i väggens SVG, utan
+filter (`disk` i rum.js; samma funktion ritar disken vidare i videons hörn, `vaggSvg` i
 rum-video.js). Stället är slitet: nikotingul högervägg och tak, fläckar, nötta
 kanter på disken och pulten, kafferingar, ringar efter glas på disken och brännmärken. Med
 `prefers-reduced-motion` står allt still (en bild, ingen kamera efter musen).
