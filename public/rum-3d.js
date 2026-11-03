@@ -31,6 +31,11 @@
 // hen, oftare ju närmare det är, och den sista timmen vänder de sig mot hen
 // samtidigt – då tittar hen upp från kupongen.
 //
+// Den som klickar på sin figur blir den som fyller i kupongen (vald,
+// rum-folk.js): figuren studsar till, räcker upp handen med pennan, lyfter
+// kupongen mot en och sprattlar med benen medan de andra tittar på hen, och
+// lutar sig sedan över kupongen och skriver ivrigt, rad för rad.
+//
 // När matcherna pågår vänder de sig mot tv:n (och tittar bort ibland). Vid
 // ett mål reagerar var och en efter sitt eget tips: den som fick rätt lyfter
 // flaskan, burken eller näven, den som tappade raden tar sig för pannan och
@@ -59,7 +64,7 @@
 // figurer(canvas, { calm, vader, detalj }) → { draw(t, mx, my, neon), inne(vem, t), ute(vader),
 // lage({ tv, nag }, t), mal({ dl: 1, dt: -1, dj: 0 }, t, sätt), spel({ lage, rank }, t),
 // prova(vem, påhitt, at), pekar(vem, [x, y, z] | null, t),
-// hej(vem, t, ut), natt(på, t), efter({ lage, krona }), under(nx, ny), huvud(vem) }: neon säger om
+// hej(vem, t, ut), vald(vem, t), natt(på, t), efter({ lage, krona }), under(nx, ny), huvud(vem) }: neon säger om
 // neonskylten lyser (false när den glappar), ute klär om gänget
 // efter vädret (dress) och sätter ljuset från fönstret, lage säger om
 // matcherna pågår (tv) och hur nära spelstoppet är (nag 0–1), mal ett mål
@@ -68,6 +73,7 @@
 // påhitt om och om igen för bilder (utan påhitt som vanligt),
 // pekar punkten i rummet som vem pekar på (världens koordinater, null = inget),
 // hej att man pekar på vem (ut = när man slutade, Infinity = pekar fortfarande),
+// vald att vem just valdes som den som fyller i kupongen,
 // natt om lysröret är släckt, efter dagen efter (lage 'bra' | 'illa' | null,
 // krona = oraklen, 'dl' …), under vem i gänget som syns i punkten
 // och kval({ pr, skugga, detalj }) hur fint gänget ritas (KVAL i rum.js; detalj
@@ -1862,6 +1868,22 @@ export async function figurer(canvas, opt = {}) {
       breath += (w.breath - 1) * vw;
       for (let i = 0; i < 2; i++) { knee[i] += (w.knee[i] - knee[i]) * vw; foot[i] += (w.foot[i] - foot[i]) * vw; }
     }
+    // vald: rätar på sig och sprattlar med benen medan handen är uppe, och
+    // lutar sig sedan över kupongen och skriver, med huvudet som följer raden
+    const jag = jagW(o, t);
+    const skriv = skrivW(o, t);
+    if (jag > 0) {
+      lean += (-0.06 - lean) * jag;
+      side *= 1 - jag;
+      for (let i = 0; i < 2; i++) knee[i] += (0.1 + 0.34 * Math.sin(t * 8.5 + o.phase + i * 2.6) - knee[i]) * jag;
+    }
+    if (skriv > 0) {
+      const { x } = skrivRad(o, t);
+      lean += (0.1 - lean) * skriv;
+      pitch += (0.55 + 0.03 * Math.sin(t * 11) - pitch) * skriv;
+      yaw += (-0.09 * x - yaw) * skriv;
+      side *= 1 - skriv;
+    }
     // blickarna (looks): det som inte ryms i nacken tar bålen, och huvudet
     // hålls rakt fast bålen lutar sig (annars blir det på sned åt sidan)
     // (den som just tappade raden sjunker ihop och tittar ner i stället)
@@ -1872,7 +1894,7 @@ export async function figurer(canvas, opt = {}) {
     let twist = 0;
     let roll = 0;
     for (const [P, w0] of looks(o, t)) {
-      const w = w0 * (1 - 0.75 * sink);
+      const w = w0 * (1 - 0.75 * sink) * (1 - skriv);
       if (w <= 0) continue;
       const L = aim(o, P);
       // inte så långt ner att man tittar rakt ner i bordet (pulten)
@@ -1953,7 +1975,8 @@ export async function figurer(canvas, opt = {}) {
     pitch -= 0.38 * drink - 0.06 * drag;
     o.torso.rotation.y = twist;
     o.torso.rotation.z += side;
-    o.torso.position.y = o.hipY + 3 + lift + (up > 0 ? 2.4 * up * Math.abs(Math.sin((t - M[k].at) * 7.5)) : 0);
+    // (och ett skutt när man blir vald)
+    o.torso.position.y = o.hipY + 3 + lift + (up > 0 ? 2.4 * up * Math.abs(Math.sin((t - M[k].at) * 7.5)) : 0) + (jag > 0 ? 3 * bump(valdD(o, t), 0.02, 0.14, 0.24, 0.5) : 0);
     o.torso.rotation.x = lean;
     o.chest.scale.set(1 + 0.008 * Math.sin(tt * 1.6), (1 + 0.012 * Math.sin(tt * 1.6)) * breath, 1);
     o.hg.rotation.x = pitch;
@@ -1995,6 +2018,12 @@ export async function figurer(canvas, opt = {}) {
     if (w > 0) out.push([x.fran.clone().lerp(x.p, sm(x.at, x.at + 0.45, t)), w]);
     const h = hejW(o, t);
     if (h > 0) out.push([OGA, h]);
+    // den som valdes tittar på en medan handen är uppe, och de andra på hen
+    const j = jagW(o, t);
+    if (j > 0) out.push([OGA, j]);
+    const v = VAL.k && VAL.k !== o.F.key ? figs.find((x) => x.F.key === VAL.k) : null;
+    const jv = v ? jagW(v, t) * (1 - sovW(o, t)) : 0;
+    if (jv > 0) out.push([headIn(v), 0.85 * jv]);
     return out;
   }
   function looks0(o, t) {
@@ -2059,6 +2088,28 @@ export async function figurer(canvas, opt = {}) {
   const uOf = (o, t) => (t - o.inneAt) / TR;
   const ready = (o, t) => sm(0.8, 0.9, uOf(o, t));
   const after = (o, t, a, b, c, d) => bump(t - o.inneAt - TR * 0.85, a, b, c, d);
+  // VAL: vem som just valdes som den som fyller i kupongen (vald) och när.
+  // Hen räcker upp handen med pennan och lyfter kupongen mot en (jagW, ett
+  // par sekunder) och skriver sedan på kupongen (skrivW, drygt tre) – bara
+  // den som väntar på kupongen; valW är hela stunden, då de fem sakerna
+  // vilar. d = sekunder sedan hen valdes (−1 = inte hen).
+  const VAL = { k: null, at: -1e9 };
+  const VAL_SLUT = 5.6;
+  const valdD = (o, t) => (VAL.k === o.F.key && t >= VAL.at ? t - VAL.at : -1);
+  const valdW = (o, t, a, b, c, d) => { const x = valdD(o, t); return x < 0 ? 0 : bump(x, a, b, c, d) * (1 - sm(0, 0.3, uOf(o, t))); };
+  const jagW = (o, t) => valdW(o, t, 0, 0.35, 1.7, 2.15);
+  const skrivW = (o, t) => valdW(o, t, 1.9, 2.3, 5.0, VAL_SLUT);
+  const valW = (o, t) => valdW(o, t, 0, 0.3, 5.0, VAL_SLUT);
+  // Raden man skriver på: 0,75 sekunder per rad, och den sista sjättedelen
+  // tillbaka till början av nästa med pennan lyft. → { n: radens nummer, x:
+  // var på raden (−1 … 1), lyft: 0–1 }
+  const RAD = 0.75;
+  function skrivRad(o, t) {
+    const d = Math.max(0, valdD(o, t) - 2.1);
+    const n = Math.floor(d / RAD);
+    const f = d / RAD - n;
+    return { n, x: f < 0.84 ? -1 + 2 * (f / 0.84) : 1 - 2 * sm(0.84, 1, f), lyft: bump(f, 0.8, 0.86, 0.95, 1) };
+  }
   // Vad man gör just nu: de fem sakerna turas om, en i taget, med en stund
   // emellan. b = [tugga på pennan, snegla på ölen, otåliga ben, kika ner mot
   // pulten, vända på kupongen], l = sekunder in i den.
@@ -2068,7 +2119,7 @@ export async function figurer(canvas, opt = {}) {
     const n = Math.floor(x / SLOT);
     const l = x - n * SLOT;
     const b = [0, 0, 0, 0, 0];
-    b[V.ordning[((n % 5) + 5) % 5]] = bump(l, 0.3, 1.3, 5.9, 6.9);
+    b[V.ordning[((n % 5) + 5) % 5]] = bump(l, 0.3, 1.3, 5.9, 6.9) * (1 - valW(o, t));
     return { b, l };
   }
   function waitBody(o, t) {
@@ -2115,17 +2166,23 @@ export async function figurer(canvas, opt = {}) {
   const penAt = (tip, dir) => frameM(tip.clone().addScaledVector(dir, -PEN_TIP), dir, Math.abs(dir.y) > 0.9 ? new THREE.Vector3(0, 0, 1) : new THREE.Vector3(0, 1, 0));
 
   // Kupongen i handen: framför magen, lutad mot den som läser – eller (vrid)
-  // uppe i ansiktshöjd, där den vänds så att framsidan syns.
+  // uppe i ansiktshöjd, där den vänds så att framsidan syns. Den som just
+  // valdes lyfter den mot en (jagW) och lutar den bakåt för att skriva (skrivW).
   function paperM(o, t) {
     const { b, l } = acts(o, t);
     const vrid = b[4];
     const Wd = o.F.w;
     const sk = o.kp.s;
+    const jag = jagW(o, t);
+    const skriv = skrivW(o, t);
     // så långt fram att den går fri från bröstet när han lutar sig över den
     const c = new THREE.Vector3(sk * Wd * 0.14, o.hipY + o.T * 0.5 + 0.8 * Math.sin(t * 0.9 + o.phase), o.F.depth + 24)
-      .lerp(new THREE.Vector3(sk * Wd * 0.02, o.hipY + o.T * 0.98, o.F.depth + 34), vrid);
+      .lerp(new THREE.Vector3(sk * Wd * 0.02, o.hipY + o.T * 0.98, o.F.depth + 34), vrid)
+      .lerp(new THREE.Vector3(sk * Wd * 0.3, o.hipY + o.T * 0.8, o.F.depth + 36), jag)
+      // (lite längre fram, där den syns under huvudet)
+      .lerp(new THREE.Vector3(sk * Wd * 0.08, o.hipY + o.T * 0.52, o.F.depth + 34), skriv);
     // nästan upprätt, så att baksidan syns framifrån
-    const be = (24 - 14 * vrid) * DEG;
+    const be = (24 - 14 * vrid + 8 * skriv) * DEG;
     const ph = Math.PI * vrid * bump(l, 1.7, 2.6, 3.9, 4.8);
     const Y = new THREE.Vector3(0, Math.cos(be), Math.sin(be));
     const X0 = new THREE.Vector3(-1, 0, 0);
@@ -2164,6 +2221,28 @@ export async function figurer(canvas, opt = {}) {
     if (vrid > 0) {
       const knee = grip(penAt(new THREE.Vector3(sp * o.F.w * 0.36, o.hipY + 13, o.thigh * 1.05), new THREE.Vector3(-sp * 0.25, -0.15, 0.95).normalize()), L, pole);
       hp = lerpPose(hp, knee, vrid);
+    }
+    // vald: handen med pennan upp (snett utåt, huvudena är stora) och viftar,
+    // och sedan skriver den på kupongen rad för rad, med pennan lyft mellan raderna
+    const skriv = skrivW(o, t);
+    if (skriv > 0) {
+      const r = skrivRad(o, t);
+      const pa = 1 - r.lyft;
+      const at = new THREE.Vector3(e[12], e[13], e[14])
+        .addScaledVector(X, KW * (-0.04 + 0.3 * r.x) + 0.5 * Math.sin(t * 23) * pa)
+        .addScaledVector(Y, KH * (0.3 - 0.16 * (r.n % 4) - 0.08 * r.lyft) + 1.1 * Math.sin(t * 41) * pa)
+        .addScaledVector(Z, 0.9 + 2.6 * r.lyft);
+      const dir = Y.clone().multiplyScalar(-0.75).addScaledVector(new THREE.Vector3(sp, 0, 0), -0.4).addScaledVector(Z, -0.5).normalize();
+      hp = lerpPose(hp, grip(penAt(at, dir), L, pole), skriv);
+    }
+    const jag = jagW(o, t);
+    if (jag > 0) {
+      const d = valdD(o, t);
+      const n = o.F.a + o.F.b;
+      const vift = Math.sin((d - 0.35) * 9) * sm(0.3, 0.55, d);
+      const dir = new THREE.Vector3(sp * (0.3 + 0.32 * vift), 1, 0.1).normalize();
+      const uppe = shoulder(o, o.pen).add(new THREE.Vector3(sp * n * (0.42 + 0.05 * vift), n * 0.7, n * 0.18));
+      hp = lerpPose(hp, grip(penAt(uppe.addScaledVector(dir, PEN_TIP + 3), dir), L, new THREE.Vector3(sp, -0.6, -0.3)), jag);
     }
     return hp;
   }
@@ -3031,6 +3110,14 @@ export async function figurer(canvas, opt = {}) {
       x.on = false;
     }
   }
+  // vem blev just den som fyller i kupongen (ett klick på sin figur,
+  // rum-folk.js). Ett klick till medan det pågår gör ingenting.
+  function vald(vem, t) {
+    const k = String(vem).toLowerCase();
+    if (VAL.k === k && t >= VAL.at && t - VAL.at < VAL_SLUT) return;
+    VAL.k = k;
+    VAL.at = t;
+  }
   // Någon pekar på vem i gänget (ut = när hen slutade).
   function hej(vem, t, ut = Infinity) {
     const k = String(vem).toLowerCase();
@@ -3074,5 +3161,5 @@ export async function figurer(canvas, opt = {}) {
     return o ? headIn(o).toArray() : null;
   }
 
-  return { draw, inne, ute, lage, mal, spel, prova, pekar, hej, natt, efter, under, huvud, kval };
+  return { draw, inne, ute, lage, mal, spel, prova, pekar, hej, vald, natt, efter, under, huvud, kval };
 }

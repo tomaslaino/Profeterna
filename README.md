@@ -527,6 +527,13 @@ Utan nyckel ingen knapp.
   död – med påhitt som händerna i nacken, skålar över bordet, naglarna, hakan i handen,
   armarna i kors och pannan i bordet, och tre sätt att reagera på ett mål. Se *Gängets humör
   följer kupongen* under [Tobaksaffären](#tobaksaffären).
+- **Man väljer sig själv med ett klick på sin figur (2026-11-03, användarens önskemål):**
+  ett klick på sin egen figur vid bordet gör en till den som fyller i kupongen – samma val
+  som porträtten på kupongen – och figuren räcker upp handen med pennan, lyfter kupongen mot
+  en och skriver sedan på den, medan de andra tittar på hen. Har man redan sagt vem man är
+  väljer bara den egna figuren, så att ett tryck för att hälsa på någon annan aldrig gör en
+  till hen (och ens utkast till hens); att byta gör man med porträtten på kupongen. Se
+  [Tobaksaffären](#tobaksaffären), *Gänget är ni*.
 - **Statistiken i tobaksaffären står på ett ställe var (2026-11-02, användarens önskemål):**
   samma siffror stod på tv:n, anslagstavlan och kortregistret. Nu står formen bara på
   anslagstavlan, tabellen och hemma/borta bara på tv:n, styrkan, motståndet och poängen mot
@@ -2120,6 +2127,20 @@ och nickar, och tittar kvar tills man slutar peka. I telefonen gör ett tryck p�
 samma sak en stund. Den som väntar på kupongen tittar bara, och ett klick på en figur går
 inte vidare till det som står bakom.
 
+**Klicka på din figur** (`valj` i rum-folk.js, `vald` i rum-3d.js): ett klick eller tryck
+på din egen figur gör dig till den som fyller i kupongen – samma val som porträtten på
+kupongen (`Samtal.pult.vem`), så det går medan du kan fylla i den och figuren inte har
+lämnat in. Har du inte sagt vem du är blir du den du klickar på; har du det väljer bara din
+egen figur, och ett klick på någon annan är ett hej som förut (att byta gör man med
+porträtten på kupongen, så att ens utkast aldrig följer med till någon annan av misstag).
+Figuren visar det: den studsar till, räcker upp handen med pennan och viftar med den, lyfter
+kupongen mot en och sprattlar med benen medan de andra vänder sig mot hen, och efter två
+sekunder lutar den sig över kupongen och skriver ivrigt, rad för rad med pennan lyft mellan
+raderna, innan den efter knappt sex sekunder är tillbaka i väntan. Ett klick till medan det
+pågår gör ingenting. Kupongen på pulten, stämpeln och guldordet ritas om efter vem du är
+(`Rum.redraw`), och när du har sagt vem du är – här eller med porträtten – kopplar sidan upp
+sig mot profeterna-rummet på nytt, så att de andra ser vad du pekar på (`vemKoll`).
+
 **Natten** (`natt` i rum-3d.js och rum-inredning.js, `.natt` i
 [public/rum-folk.css](public/rum-folk.css)): mellan midnatt och sex, Stockholms tid, är
 lysröret släckt. Rummet är mörkt utom där gatan lyser in genom fönstret och dörren, från
@@ -2285,7 +2306,8 @@ bordet), `?rum-humor=glad` (`nerv`, `deppig`) humöret, `?rum-rank=dl:1,dj:-1` v
 leder och ligger sist i omgången, `?rum-akt=dl:kors,dj:dunk` ett påhitt om och om igen
 (mitt i det med `?rum-t`; namnen står i `AKTER` i rum-3d.js),
 `?rum-pekar=dt:tv,dl:dj` som om de pekade (på en sak eller någon i gänget),
-`?rum-hej=dl` som om man pekade på DL, `?rum-natt` (`=0` dag) natten och
+`?rum-hej=dl` som om man pekade på DL, `?rum-vald=dl` som om man just hade klickat på
+DL (`dl:3` tre sekunder sedan; med `?rum-t` och den som inte har lämnat in), `?rum-natt` (`=0` dag) natten och
 `?rum-efter=bra` (`illa`, `inget`) dagen efter. Sidan
 sätter `data-rum-klar` på `body` när allt är ritat. Vädret och klockan utanför:
 `?rum-klocka=2026-12-13T16:00` (eller bara `16:00`, Stockholms tid), `?rum-vader=klart`,
@@ -2821,7 +2843,8 @@ och drar det andra – ett kryss med blyerts som ser likadant ut varje gång (sa
 slumpfrö för matchen och tecknet). Står pennan still en stund lägger den sig vid sidan
 igen. Ett kryss som tas bort suddas ut. Vem man är väljer man bland porträtten överst, som
 på papperet (*Vem är du?*; den som redan har lämnat in går inte att välja): pennan ringar in
-ditt porträtt, och stämpeln säger vem omgången väntar på med dig först. Fälten i foten
+ditt porträtt, och stämpeln säger vem omgången väntar på med dig först. Det går också
+med ett klick på din figur vid bordet (se *Klicka på din figur* ovan). Fälten i foten
 räknas om för varje kryss.
 
 **Motiveringen** skrivs för hand efter tiden, som på papperet: när en match är tippad står
