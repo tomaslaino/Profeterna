@@ -11,6 +11,12 @@ name = "profeterna-analys"
 main = "index.mjs"
 compatibility_date = "2026-10-01"
 
+# Hasse Backes persona läses som text (prompts/hasse-backe.md, worker/hasse.mjs).
+[[rules]]
+type = "Text"
+globs = ["**/*.md"]
+fallthrough = true
+
 # Cachen: en text per match och underlag. Namnrymden skapades 2026-10-18
 # med "kv namespace create ANALYSER".
 [[kv_namespaces]]

@@ -1879,8 +1879,8 @@ WebKit hade ritat, ge den en fördröjning, en mjukare början eller dölja det 
 bilden hela vägen hjälpte inte – WebKit ritar först när kameran rör sig. Chrome behöver inte
 den osynliga rörelsen och får den inte. Namnet
 och foten (*Vanlig sida*) ligger utanför scenen i fönstrets hörn;
-någon meny finns inte, och föremålen leder inte ut ur rummet – det gör bara *Vanlig sida* (och
-Hasses kaffe, när animationen med honom finns). Tangenterna (K kupongen, T tv:n,
+någon meny finns inte, och föremålen leder inte ut ur rummet – det gör bara *Vanlig sida*.
+Tangenterna (K kupongen, T tv:n,
 A anslagstavlan, R kortregistret, V videon, H Hasse) står inte i foten – där låg de över kupongen i
 mindre fönster – utan när man pekar på saken (*Tv:n · T*, `tangenter` i rum.js), och bara
 med mus. [public/rum.js](public/rum.js)
@@ -1962,14 +1962,12 @@ Enter och mellanslag klickar på dem. En match på text-tv:n öppnar matchrutan 
   initialerna i personens bläck (samma som på papperet under Kupong) och stämpeln
   *Inlämnad*, men inga tecken. Din egen tas i handen, och de andras när du ser deras tips
   (se nedan). Innan dess lyfts en annans kupong bara lite i ena kanten och faller tillbaka.
-- **Hasses kaffe** längst till vänster på pulten → Hasse Backe, som sitter i baren utanför
-  bilden till vänster och svarar på frågor om matcherna (en animation; H). Koppen ryker och
-  står på hans nota – kaffe, fyra påtår och en kanelbulle, *Skrivs på Notts County*: klubben
-  han lämnade efter sju veckor 2009, när lönen inte kom (notans nummer är 0007). Fatet
-  sticker ut över kanten, mot honom. Adressen till animationen står i `HASSE` överst i
-  rum.js; så länge den är tom skramlar koppen bara på fatet. Med en adress går kameran fram
-  mot koppen och sidan byts – det enda föremålet som leder ut ur rummet (`hasseHtml`,
-  `skramla`, `tillHasse`).
+- **Hasses kaffe** längst till vänster på pulten → Hasse Backe, som står i baren utanför
+  bilden till vänster. Koppen med blå ränder ryker på ett fat som sticker ut över kanten,
+  mot honom, och under den ligger hans nota: kaffe, fyra påtår och en kanelbulle, Skrivs på
+  Notts County (klubben han lämnade efter sju veckor 2009, när lönen inte kom; notan har
+  nummer 0007). Bredvid ligger hans hand. Ett klick, Enter eller H och kameran svänger till
+  honom (`hasseHtml`, `skramla`, `tillHasse`, se [Hasse Backe](#hasse-backe)).
 - **Tv:n** uppe i hörnet till höger, en mörkgrå Panasonic från nittiotalet med text-tv på en arm från väggen, zoomas in med ett
   klick eller T och vrids då mot en; den står på kupongens matcher live (377), och där finns
   också omgångens matcher, tabellerna och skytteligorna (se [Tv:n](#tvn)). Esc eller ett
@@ -3504,6 +3502,50 @@ rutan och förminskas, så att klippet är skarpt nära. Väggen, disken och pul
 höger om bilden (`vagg` och `pult` i rum-video.js, i samma plan och med samma toner som i
 rum.js), så att bilden inte tar slut när kameran går fram. `?rum-video` visar videon nära i
 en fast bild.
+
+### Hasse Backe
+
+*Hasse Backe (fiktiv)* analyserar matcherna på stryktipskupongen, och det är allt man kan be
+honom om: inga följdfrågor och ingen textruta. Bredvid kaffet och notan på pulten ligger hans
+hand och trummar med fingrarna då och då (i telefonen, där kaffet ligger utanför bilden, ligger
+handen vid kupongens hörn och är det man trycker på). Ett klick eller H och kameran svänger åt
+vänster, som i ett rumshörn: ögat står mitt i, vänster vägg är vinkelrät och perspektivet är
+halva fönsterbredden (`.hasse-svang` i [public/rum-hasse.css](public/rum-hasse.css)). Där står
+han bakom disken med samma hand på disken, och Esc, *Tillbaka* eller ett klick någon annanstans
+går tillbaka.
+
+**Rösten.** Analysen är exakt densamma som i matchbladet: först artikeln och tipset (`POST
+…/artikel`, se [Matchanalysen](#matchanalysen-fas-5)), sedan skriver Claude om dem med hans röst
+utan att söka (`POST …/hasse`, [worker/hasse.mjs](worker/hasse.mjs)). Personan står i
+[prompts/hasse-backe.md](prompts/hasse-backe.md) och frasbanken i
+[config/hasse.js](config/hasse.js): två–tre signaturfraser lottas per match, så att analyserna
+inte låter likadant, ibland en krydda (färdiga rader, så att ingen historia hittas på om en
+riktig person), och Bielsa-orden bara när analysen visar att ett lag pressar högt eller har ett
+rörligt anfallsspel. Tecknen som står stort kommer direkt ur tipset och skrivs aldrig om. Ändras
+personan eller frasbanken byts `promptVersion`, så att texterna skrivs om.
+
+**Kontrollerna** (`granska`): varje tal i analysen ska stå kvar och inget nytt ska ha kommit till,
+de inringade tecknen ska stå i sista stycket, inga citat eller namn utanför analysen, de lottade
+fraserna ska användas och inga andra ur banken. Klarar svaret inte det får Claude skriva om en
+gång, och annars visas analysen som den är. Koden ser inte om en mening ändrar betydelse utan att
+ett tal ändras. Texten skrivs när någon ber om den och sparas sedan för alla (5–12 cent per match
+i provet, KV-nyckeln `hasse:<id>`), högst tre försök per tips och 40 texter per dygn. Prov
+2026-11-03 på tre analyser: talen identiska i alla tre.
+
+**Grafiken.** Vilan kostar ingenting nytt: handen är ungefär 4 000 trianglar på en liten duk och
+ritas bara när fingrarna rör sig, utan skuggkarta (PowerVR i telefonen). Figuren finns först när
+någon klickar: fotot och väggen hämtas då (ungefär 170 kB), och grafiken lämnas tillbaka en stund
+efter att man har gått. Kostymfotot (C More Entertainment, CC BY 3.0, Wikimedia Commons, bearbetat)
+ligger utan armar på en formad yta, så att huvudet vrids runt nacken och kroppen lutar sig fram,
+ögon, bryn och mun rör sig i skuggaren, och armarna är kavajärmar med armbågar och modellerade
+händer ([public/rum-hasse-3d.js](public/rum-hasse-3d.js)). Väggen och hyllorna är en färdig bild,
+bakad en gång med mjukt ljus och skärpedjup. Figuren är 48 000 trianglar och 27 ritanrop, 2–3 ms per
+bildruta på en MacBook Air, mot gängets 14,7 ms (742 900 trianglar och 461 ritanrop), och under
+svängen och medan han syns står rummet still (`Rum.vila`). Rummet ligger kvar bakom honom och flyttas
+inte ur bild: då stod bilden still 570–900 ms på vägen tillbaka i ett riktigt Chrome-fönster, och
+nu inget längre än uret. Mätt i Chrome som telefon (412 × 780, täthet 2,625, strypning × 4), längsta
+tid utan ny bild: till honom 34–83 ms, tillbaka 33–34 ms, uret 34–99 ms. Inte mätt i en riktig telefon.
+`?rum-hasse` öppnar honom direkt.
 
 ### Närbilderna
 

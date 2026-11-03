@@ -88,6 +88,23 @@ function articleRoute(siteDir = OUT, store = fileStore()) {
   };
 }
 
+// GET /api/hasse?id= och POST /api/hasse {id} – Hasse Backe (fiktiv) i
+// tobaksaffären, med samma kod som proxyn (worker/hasse.mjs).
+function hasseRoute(store = fileStore()) {
+  return async (req, res) => {
+    try {
+      const { requestHasse, currentHasse } = await import('./worker/hasse.mjs');
+      if (req.method === 'GET') return res.json({ ok: true, hasse: (await currentHasse(store, req.query.id || '')) || null });
+      const persona = fs.readFileSync(path.join(__dirname, 'prompts', 'hasse-backe.md'), 'utf8');
+      const r = await requestHasse(req.body && req.body.id, { env: process.env, store, persona });
+      res.status(r.status).json(r.body);
+    } catch (err) {
+      console.error('[hasse]', err);
+      res.status(500).json({ ok: false, error: 'Internt fel i servern.' });
+    }
+  };
+}
+
 // POST /api/kommentar {id} – AI:ns kommentar till en färdig kupong, ur den
 // byggda historiken i siteDir (Grupparbetena i Olympen).
 function commentRoute(siteDir = OUT, store = fileStore(path.join(CACHE_DIR, 'kommentarer'))) {
@@ -254,6 +271,7 @@ if (require.main === module) {
   const app = express();
   if (analysisEndpoint) app.post('/api/analyze', express.json(), analysisRoute());
   if (analysisEndpoint) app.all('/api/artikel', express.json(), articleRoute());
+  if (analysisEndpoint) app.all('/api/hasse', express.json(), hasseRoute());
   if (analysisEndpoint) app.post('/api/kommentar', express.json(), commentRoute());
   if (couponEndpoint) app.post('/api/kupong', express.json({ limit: '20kb' }), couponSaveRoute());
   if (couponEndpoint) app.all('/api/samtal', express.json({ limit: '20kb' }), samtalRoute());

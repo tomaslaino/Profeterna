@@ -24,9 +24,8 @@
 //   fram till den på pulten.
 //   högen bredvid: de inlämnade kupongerna med baksidan upp; din egen tas i
 //   handen därifrån när du har lämnat in, de andras när du ser deras tips.
-//   kaffet och notan längst till vänster på pulten → Hasse Backe, som sitter
-//   i baren utanför bilden (H, HASSE) – det enda föremålet som leder ut ur
-//   rummet, när animationen med honom finns.
+//   kaffet och notan längst till vänster på pulten → Hasse Backe, som står
+//   i baren utanför bilden (H): kameran svänger dit (rum-hasse.js).
 // Det finns ingen meny: pekar man på ett föremål lyser det, och snabbvalet på
 // text-tv:n med samma ämne tänds.
 //
@@ -73,11 +72,6 @@ window.Rum = (() => {
   const WIN = { x: 272, y: 132, w: 676, h: 426 };
   const DORR = { x: 50, y: 136, w: 172, h: 560 };
   const box = (p) => `x="${p.x}" y="${p.y}" width="${p.w}" height="${p.h}"`;
-  // Hasse Backe sitter i baren utanför bilden till vänster. Hans kaffe och
-  // nota längst ut på pulten (och H) leder till animationen med honom på
-  // adressen här – det enda föremålet som leder ut ur rummet. Så länge den
-  // är tom skramlar koppen bara på fatet.
-  const HASSE = '';
 
 
   const R = { built: false, on: false, el: null, q: new URLSearchParams(location.search), t0: performance.now(), frozen: null,
@@ -488,7 +482,7 @@ window.Rum = (() => {
   // Hasse Backe sitter i baren utanför bilden till vänster: längst ut på
   // pulten står hans kaffe på ett fat, på notan som han har skrivit på Notts
   // County (som han lämnade efter sju veckor 2009, när lönen inte kom). Ett
-  // klick, eller H, går till animationen med honom (HASSE).
+  // klick, eller H, och kameran svänger dit (tillHasse, rum-hasse.js).
   function hasseHtml() {
     const kopp = `<svg class="kopp" width="150" height="124" viewBox="0 0 150 124" aria-hidden="true"><defs>
     <radialGradient id="rum-hk-skugga" cx=".5" cy=".5" r=".5"><stop offset="0" stop-color="#000" stop-opacity=".55"/><stop offset=".6" stop-color="#000" stop-opacity=".3"/><stop offset="1" stop-color="#000" stop-opacity="0"/></radialGradient>
@@ -525,7 +519,7 @@ window.Rum = (() => {
       `${kopp}<span class="anga" aria-hidden="true"><i></i><i></i></span></a>`;
   }
 
-  // Utan adress till animationen (HASSE) skramlar koppen på fatet.
+  // Koppen skramlar på fatet när man går till honom.
   function skramla(a) {
     const k = a.querySelector('.kopp-in');
     if (!k || calm() || k.getAnimations().length) return;
@@ -539,23 +533,11 @@ window.Rum = (() => {
     ], { duration: 460, easing: 'ease-out' });
   }
 
-  // Ett klick på kaffet eller H: kameran går fram mot det och sidan byts
-  // till animationen. Kommer man tillbaka (bakåt) står kameran hemma igen.
+  // Ett klick på kaffet eller H: kameran svänger till honom (rum-hasse.js).
   function tillHasse(a = R.el.querySelector('#rum-hasse')) {
     if (!a) return;
-    if (!HASSE) {
-      skramla(a);
-      return;
-    }
-    if (calm()) {
-      location.href = HASSE;
-      return;
-    }
-    const p = centerOf(a);
-    const c = mid();
-    aim(p, 1.35, [p[0] + (c[0] - p[0]) * 0.4, p[1] + (c[1] - p[1]) * 0.4], 'glid');
-    addEventListener('pageshow', () => aim([800, 500], 1, [800, 500]), { once: true });
-    setTimeout(() => { location.href = HASSE; }, 480);
+    skramla(a);
+    if (window.RumHasse) RumHasse.oppna();
   }
 
   // Röken som lagt sig under lysröret, och dammet som syns i ljuset.
@@ -1836,6 +1818,12 @@ ${window.RumRegister ? RumRegister.nara() : ''}
     let dt = 0;
     const tick = (ms) => {
       if (!R.on) return;
+      // kameran är vänd mot Hasse (rum-hasse.js): rummet står still och syns inte
+      if (R.vilar) {
+        prev = 0;
+        R.vila = setTimeout(() => { R.raf = requestAnimationFrame(tick); }, 250);
+        return;
+      }
       const raw = prev ? ms - prev : 0;
       dt += prev ? raw : 1000 / 60;
       prev = ms;
@@ -3825,5 +3813,5 @@ ${window.RumRegister ? RumRegister.nara() : ''}
     document.documentElement.classList.remove('i-rummet');
   }
 
-  return { fits, show, hide, redraw: () => { if (R.on) fill(); } };
+  return { fits, show, hide, redraw: () => { if (R.on) fill(); }, vila: (v) => { R.vilar = Boolean(v); } };
 })();

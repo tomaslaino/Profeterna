@@ -1,0 +1,55 @@
+/* Hasse Backe i tobaksaffären (rum-hasse.js). Vilan kostar inget: inga
+   omvandlingar och ingen perspektiv förrän kameran svänger. */
+.rum-front { position: absolute; inset: 0; overflow: hidden; }
+.rum-sving { position: absolute; inset: 0; }
+.rum-pl > .rum-hasse-hand { position: absolute; pointer-events: none; will-change: auto; }
+.rum-hasse-knapp { display: none; position: absolute; left: 500px; top: 640px; width: 215px; height: 96px; padding: 0; border: 0; background: none; cursor: pointer; pointer-events: auto; will-change: auto; }
+.rum.smal .rum-hasse-knapp { display: block; }
+
+/* kameran svänger åt vänster: ett hörn i ett rum, ögat mitt i (--p = halva bredden) */
+.rum.hasse-svang { perspective: var(--p); }
+.rum.hasse-svang .rum-sving { transform-style: preserve-3d; transform-origin: 50% 50% var(--p); transform: rotateY(0deg); transition: transform 0.82s cubic-bezier(0.62, 0.02, 0.2, 1); }
+.rum.hasse-svang.hasse-vand .rum-sving { transform: rotateY(-90deg); }
+.rum.hasse-svang .rum-hasse-vy { transform: translate3d(calc(var(--p) * -1), 0, var(--p)) rotateY(90deg); }
+/* framme: inget 3D kvar; rummet ligger kvar bakom honom och står still (Rum.vila) */
+
+.rum-hasse-vy { position: absolute; inset: 0; overflow: hidden; background: #120c07; color: #f6efdc; font-family: Fraunces, Georgia, serif; }
+.rum-hasse-vy[hidden] { display: none; }
+.rh-scen { position: absolute; left: 0; top: 0; transform-origin: 0 0; }
+.rh-scen img { position: absolute; left: 0; top: 0; width: 100%; height: 100%; display: block; }
+.rh-scen canvas { position: absolute; left: 0; top: 0; display: block; }
+.rh-samtal { position: absolute; right: 3.5%; top: 19.5%; bottom: 52px; width: 37.5%; display: flex; flex-direction: column; font-size: clamp(15px, 1.22vw, 18px); line-height: 1.42; text-shadow: 0 1px 4px rgba(0, 0, 0, 0.9); }
+.rh-samtal h2 { flex: none; font: 700 2em/1.1 Fraunces, Georgia, serif; margin: 0 0 0.35em; }
+.rh-lista { flex: 1; min-height: 0; overflow-y: auto; overscroll-behavior: contain; touch-action: pan-y; }
+.rh-lista button { display: block; width: 100%; padding: 0.3em 0; border: 0; border-bottom: 1px solid rgba(244, 236, 216, 0.22); background: none; color: inherit; font: inherit; text-align: left; text-shadow: inherit; cursor: pointer; }
+.rh-lista button i { display: inline-block; width: 1.7em; font-style: normal; opacity: 0.62; }
+.rh-lista button:hover:not(:disabled) { color: #ffd86b; border-bottom-color: #ffd86b; }
+.rh-lista button:disabled { opacity: 0.42; cursor: default; }
+.rh-match { flex: none; font-weight: 600; opacity: 0.85; }
+.rh-tona { opacity: 0.45; }
+.rh-klocka { font-variant-numeric: tabular-nums; }
+.rh-dom { flex: none; margin: 0.06em 0 0.18em; font: 800 clamp(58px, 7vw, 104px)/1 Fraunces, Georgia, serif; color: #ffd86b; text-shadow: 0 3px 0 #6b4a10, 0 8px 18px rgba(0, 0, 0, 0.75); transform-origin: 12% 70%; animation: rh-dom 0.13s cubic-bezier(0.2, 0.7, 0.3, 1) both; }
+.rh-dom.lang { font-size: clamp(44px, 5vw, 76px); }
+@keyframes rh-dom { from { transform: scale(1.7) rotate(-3deg); opacity: 0; } to { transform: rotate(-1.5deg); opacity: 1; } }
+.rh-text { flex: 1; min-height: 0; overflow-y: auto; overscroll-behavior: contain; touch-action: pan-y; padding-right: 0.5em; cursor: default; }
+.rh-text p { margin: 0 0 0.62em; animation: rh-in 0.5s ease-out both; }
+@keyframes rh-in { from { opacity: 0; } to { opacity: 1; } }
+.rh-rad { font-size: 1.3em; line-height: 1.3; margin: 0.25em 0 0; }
+.rh-slut { flex: none; display: flex; gap: 1.4em; align-items: baseline; padding-top: 0.5em; }
+.rh-nasta { align-self: flex-start; padding: 0; border: 0; background: none; color: #ffd86b; font: 700 1.05em Fraunces, Georgia, serif; text-decoration: underline; cursor: pointer; text-shadow: inherit; }
+.rh-slut a { color: #a9c3ff; }
+/* slaget i disken: bilden rycker till (koppen hoppar i rum-hasse-3d.js) */
+.rh-slag { animation: rh-slag 0.42s linear; }
+@keyframes rh-slag { 0% { translate: 0 0; } 18% { translate: 0 9px; } 42% { translate: 0 -5px; } 70% { translate: 0 2px; } 100% { translate: 0 0; } }
+.rum.hasse-svang .rum-ft, .rum.hasse-svang .rum-hdr, .rum.hasse-framme .rum-ft, .rum.hasse-framme .rum-hdr { display: none; }
+.rh-fot { position: absolute; left: 24px; right: 24px; bottom: 14px; display: flex; justify-content: space-between; gap: 16px; font: 400 12.5px/1.3 Fraunces, Georgia, serif; color: rgba(246, 239, 220, 0.72); pointer-events: none; }
+.rh-fot a { color: inherit; pointer-events: auto; }
+.rh-tillbaka { flex: none; padding: 0; border: 0; background: none; color: #a9c3ff; font: 400 15px Fraunces, Georgia, serif; text-decoration: underline; cursor: pointer; pointer-events: auto; }
+/* på höjden: han överst, samtalet på diskens framsida */
+.rum-hasse-vy.hog .rh-samtal { left: 5%; right: 5%; bottom: 54px; width: auto; font-size: 15px; }
+.rum-hasse-vy.hog .rh-samtal h2 { font-size: 1.5em; margin-bottom: 0.2em; }
+.rum-hasse-vy.hog .rh-dom { font-size: 46px; }
+.rum-hasse-vy.hog .rh-dom.lang { font-size: 34px; }
+.rum-hasse-vy.hog .rh-match { font-size: 0.86em; }
+.rum-hasse-vy.hog .rh-slut { padding-top: 0.3em; }
+@media (prefers-reduced-motion: reduce) { .rum.hasse-svang .rum-sving { transition: none; } .rh-dom, .rh-text p, .rh-slag { animation: none; } }

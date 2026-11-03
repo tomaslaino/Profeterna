@@ -51,6 +51,8 @@ import { gatherNews, newsPayload, citeNews, withoutRefs } from '../src/news.mjs'
 import { comment } from './kommentar.mjs';
 import { roundName } from './namn.mjs';
 import { requestArticle, currentArticle } from './artikel.mjs';
+import { requestHasse, currentHasse } from './hasse.mjs';
+import persona from '../prompts/hasse-backe.md';
 
 const ID_RE = /^\d{1,12}$/;
 
@@ -301,6 +303,31 @@ export default {
         return json(r.status, r.body);
       } catch (err) {
         console.error('[artikel]', err);
+        return json(500, { ok: false, error: 'Internt fel i proxyn.' });
+      }
+    }
+    // Hasse Backe (fiktiv) i tobaksaffären: artikeln och tipset med hans röst.
+    if (url.pathname === '/hasse' && request.method === 'GET') {
+      try {
+        const hasse = await currentHasse(kvStore(env.ANALYSER), url.searchParams.get('id') || '');
+        return json(200, { ok: true, hasse: hasse || null });
+      } catch (err) {
+        console.error('[hasse]', err);
+        return json(500, { ok: false, error: 'Internt fel i proxyn.' });
+      }
+    }
+    if (url.pathname === '/hasse' && request.method === 'POST') {
+      let id;
+      try {
+        ({ id } = await request.json());
+      } catch {
+        return json(400, { ok: false, error: 'Ogiltig förfrågan.' });
+      }
+      try {
+        const r = await requestHasse(id, { env, store: kvStore(env.ANALYSER), persona });
+        return json(r.status, r.body);
+      } catch (err) {
+        console.error('[hasse]', err);
         return json(500, { ok: false, error: 'Internt fel i proxyn.' });
       }
     }
