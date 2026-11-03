@@ -520,6 +520,12 @@ Utan nyckel ingen knapp.
   rundad kant och fyllningar i ramar, i rummets egna toner och utan något extra att rita.
   Skivan sticker ut över fronten så att man har plats för benen, med konsoler under och
   krokar för jackor på fronten. Se [Tobaksaffären](#tobaksaffären).
+- **Gänget följer hur det går för kupongen (2026-11-03, användarens önskemål):** gänget
+  har fler rörelser och gör dem efter hur det går för gängets kupong – glada när den går
+  bättre än väntat eller blev vinst, nervösa när nästa fel tar vinsten, deppiga när den är
+  död – med påhitt som händerna i nacken, skålar över bordet, naglarna, hakan i handen,
+  armarna i kors och pannan i bordet, och tre sätt att reagera på ett mål. Se *Gängets humör
+  följer kupongen* under [Tobaksaffären](#tobaksaffären).
 - **Statistiken i tobaksaffären står på ett ställe var (2026-11-02, användarens önskemål):**
   samma siffror stod på tv:n, anslagstavlan och kortregistret. Nu står formen bara på
   anslagstavlan, tabellen och hemma/borta bara på tv:n, styrkan, motståndet och poängen mot
@@ -2031,6 +2037,49 @@ som sitter bakom bordet.
   snett uppåt, lutar sig bakåt och studsar lite. Den som tappade raden sjunker ihop med
   handen över ögonen (DL, DT) eller burken mot pannan (DJ). Den som inte påverkades nickar.
   Dolda resultat ger inga reaktioner, och när rummet öppnas räknas inga gamla mål.
+  Var och en reagerar på ett av tre sätt, olika från mål till mål (`malV` i rum-3d.js):
+  som ovan, med båda armarna i luften (rätt) eller båda händerna på huvudet och blicken i
+  taket (fel), eller med handen i bordet – den dunkar av glädje eller lyfts och slår i en
+  gång.
+
+**Gängets humör följer kupongen** (2026-11-03, `spelLage` i rum.js, `HUM` och `AKTER` i
+rum-3d.js). Så fort en match på gängets kupong är avgjord – också en som pågår, efter
+ställningen just nu – sitter gänget efter hur det går för kupongen:
+
+- **Glad** när kupongen går bättre än modellen väntade sig (z ≥ 0,5, samma z som betyget i
+  [Kuponghistoriken](#kuponghistoriken)) eller när allt är spelat och det blev vinst. De
+  lutar sig bakåt med livligare ben och huvudena gungar lite.
+- **Nervös** när nästa fel tar vinsten (Stryktipset ger pengar från tio rätt av tretton,
+  så tre fel är gränsen; på en kortare kupong en fjärdedel av matcherna) eller när den går
+  sämre än väntat (z ≤ −0,5). De sitter framåtlutade och benen skakar.
+- **Deppig** när kupongen är död – fler fel än den tål. De sjunker ihop med blicken ner
+  och benen stilla.
+- **Som vanligt** när det går som väntat. Utan avgjorda matcher, med dolda resultat och
+  mellan omgångarna gäller dagen efter (se nedan): bra är glad och illa deppig.
+
+Humöret glider över på 2,5 sekunder. Det syns också i **påhitten**: korta rörelser som var
+och en gör ibland, en i taget, i luckor om elva sekunder (förskjutna, så att de inte börjar
+samtidigt), utan att de vanliga looparna (klunken, blosset, pratet) är i vägen. Vilket
+påhitt och hur ofta beror på humöret (`MENY`):
+
+- **Som vanligt** (ungefär fyra luckor av tio): sträcker på sig och gäspar, kliar sig i
+  bakhuvudet, trummar med fingrarna på bordet, tittar ner i den tomma flaskan eller burken,
+  vilar hakan i handen.
+- **Glad** (tre av fyra luckor): lutar sig bakåt med handen i nacken, gungar i takt med
+  ölen i luften, sträcker på sig. Ibland gör gänget något tillsammans (var 31:a sekund,
+  ungefär varannan gång): skålar över bordet och tar en klunk (DT ett bloss), eller gungar
+  i takt allihop som på läktaren.
+- **Nervös:** biter på naglarna, knäpper händerna framför munnen (om flaskan eller burken)
+  och gungar fram och tillbaka, trummar med fingrarna, kliar sig i bakhuvudet.
+- **Deppig:** hakan i handen, skakar på huvudet och suckar, armarna i kors med blicken bort
+  från bordet, tittar ner i flaskan – och DJ lägger pannan i bordet några gånger.
+
+Den som leder omgången på sina egna tips lutar sig oftare bakåt med handen i nacken, och den
+som ligger sist sitter oftare med armarna i kors (när allas tips syns och minst tre matcher
+är avgjorda; delad ledning eller jumboplats räknas inte). Inga påhitt medan man väntar på
+kupongen, på natten, vid ett mål eller när man skålar med den som pekar på en, och det som
+pågår när humöret ändras gör färdigt sitt. Samma tid ger samma bild: luckorna och valen
+räknas ur klockan, och humöret minns när det ändrades.
 
 **Gänget är ni** ([public/rum-folk.js](public/rum-folk.js), `pekar` och `hej` i
 rum-3d.js): den som har rummet öppet syns i sin figur, som tittar dit hen pekar med musen –
@@ -2160,7 +2209,11 @@ står på samma tid), `?rum-mx=&rum-my=` (−1…1) kamerans läge,
 var de sitter vid bordet, `?rum-vantar=DL,DT` som om de inte hade lämnat in,
 `?rum-stopp=<timmar>` som om det var så långt kvar till spelstoppet, `?rum-tittar` som
 om matcherna pågick och `?rum-mal=dl:1,dt:-1,dj:0` ett mål
-(rätt, fel, ingen skillnad; vid tiden 0 med `?rum-t`, annars var femtonde sekund),
+(rätt, fel, ingen skillnad; vid tiden 0 med `?rum-t`, annars var femtonde sekund; `dl:1b`
+väljer sättet: `a` som förut, `b` båda armarna eller händerna på huvudet, `c` handen i
+bordet), `?rum-humor=glad` (`nerv`, `deppig`) humöret, `?rum-rank=dl:1,dj:-1` vem som
+leder och ligger sist i omgången, `?rum-akt=dl:kors,dj:dunk` ett påhitt om och om igen
+(mitt i det med `?rum-t`; namnen står i `AKTER` i rum-3d.js),
 `?rum-pekar=dt:tv,dl:dj` som om de pekade (på en sak eller någon i gänget),
 `?rum-hej=dl` som om man pekade på DL, `?rum-natt` (`=0` dag) natten och
 `?rum-efter=bra` (`illa`, `inget`) dagen efter. Sidan

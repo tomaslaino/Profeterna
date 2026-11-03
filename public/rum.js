@@ -1362,21 +1362,92 @@ ${window.RumRegister ? RumRegister.nara() : ''}
       }
     }
     if (Object.keys(sum).length && R.fig && R.fig.mal) R.fig.mal(sum, now());
+    // humöret: hur det går för kupongen
+    R.spel = spelLage(rd, rows, p);
+    if (R.fig && R.fig.spel) R.fig.spel(R.spel, now());
+  }
+
+  // Hur det går för gängets kupong, för gängets humör (rum-3d.js, spel): bara
+  // när resultaten syns och någon match på kupongen är avgjord (också en som
+  // pågår, efter ställningen just nu). Kupongen tål tol fel – Stryktipset ger
+  // pengar från tio rätt av tretton, alltså tre fel; en kortare kupong en
+  // fjärdedel. Fler fel och den är död (deppig); lika många med matcher kvar
+  // och nästa fel tar vinsten (nerv); när allt är spelat utan fler fel är det
+  // vinst (glad). Däremellan efter hur den går mot modellen, med samma z som
+  // betyget i historiken (src/history.js): glad från 0,5, nerv från −0,5.
+  // rank: vem som leder omgången (1) och ligger sist (−1) på sina egna tips,
+  // när allas tips syns och minst tre matcher är avgjorda.
+  // ?rum-humor=glad|nerv|deppig och ?rum-rank=dl:1,dj:-1 för bilder.
+  function spelLage(rd, rows, p) {
+    const q = R.q;
+    if (q.has('rum-humor') || q.has('rum-rank')) {
+      const rank = {};
+      for (const x of (q.get('rum-rank') || '').split(',')) {
+        const r = /^(\w+):(-?1)$/.exec(x.trim());
+        if (r) rank[r[1].toLowerCase()] = Number(r[2]);
+      }
+      return { lage: q.get('rum-humor') || null, rank };
+    }
+    const out = { lage: null, rank: {} };
+    if (!rd || rd.next) return out;
+    const med = rows.filter((x) => x.sign && x.g.state !== 'off');
+    const klar = med.filter((x) => x.g.res != null);
+    if (klar.length) {
+      const n = rows.filter((x) => x.sign).length;
+      const tol = n >= 13 ? n - 10 : Math.floor(n / 4);
+      const fel = klar.filter((x) => !x.g.hit).length;
+      const kvar = med.length - klar.length;
+      // modellens chans för tecknet, annars schablonen (45 % för ett tecken, 75 % för två)
+      const pp = (x) => (x.g.p != null ? Math.min(1, x.g.p) : x.sign.length >= 3 ? 1 : x.sign.length === 2 ? 0.75 : 0.45);
+      const vant = klar.reduce((a, x) => a + pp(x), 0);
+      const z = (klar.length - fel - vant) / Math.sqrt(Math.max(0.5, klar.reduce((a, x) => a + pp(x) * (1 - pp(x)), 0)));
+      out.lage = fel > tol ? 'deppig' : !kvar ? 'glad' : fel === tol ? 'nerv' : z >= 0.5 ? 'glad' : z <= -0.5 ? 'nerv' : null;
+    }
+    const s = p && p.s;
+    const gang = rd.gang || [];
+    const avg = rows.filter((x) => x.g.res != null);
+    if (s && s.tips && gang.length > 1 && avg.length >= 3 && gang.every((g) => s.tips[g.id])) {
+      const r = gang.map((g) => ({ k: g.id.toLowerCase(), n: avg.filter((x) => (s.tips[g.id].tecken[x.id] || '').includes(SIGNS[x.g.res])).length }));
+      const hi = Math.max(...r.map((x) => x.n));
+      const lo = Math.min(...r.map((x) => x.n));
+      if (hi > lo) {
+        const forst = r.filter((x) => x.n === hi);
+        const sist = r.filter((x) => x.n === lo);
+        if (forst.length === 1) out.rank[forst[0].k] = 1;
+        if (sist.length === 1) out.rank[sist[0].k] = -1;
+      }
+    }
+    return out;
   }
 
   // ?rum-mal=dl:1,dt:-1,dj:0: ett mål för bilder – vid tiden 0 med ?rum-t,
-  // annars genast och sedan var femtonde sekund.
+  // annars genast och sedan var femtonde sekund. En bokstav efter väljer
+  // sättet (dl:1b: a som förut, b båda armarna upp eller händerna på huvudet,
+  // c handen i bordet; rum-3d.js, malV).
   function provMal() {
     const v = R.q.get('rum-mal');
     if (!v || !R.fig || !R.fig.mal) return;
     const m = {};
+    const satt = {};
     for (const x of v.split(',')) {
-      const r = /^(\w+):(-?1|0)$/.exec(x.trim());
+      const r = /^(\w+):(-?1|0)([abc])?$/.exec(x.trim());
       if (r) m[r[1]] = Number(r[2]);
+      if (r && r[3]) satt[r[1]] = 'abc'.indexOf(r[3]);
     }
-    const go = () => R.fig.mal(m, still() ? 0 : now());
+    const go = () => R.fig.mal(m, still() ? 0 : now(), satt);
     go();
     if (!still()) setInterval(() => { if (R.on) go(); }, 15000);
+  }
+
+  // ?rum-akt=dl:kors,dj:dunk: ett påhitt för bilder (rum-3d.js, AKTER) – mitt
+  // i det med ?rum-t, annars om och om igen från nu.
+  function provAkt() {
+    const v = R.q.get('rum-akt');
+    if (!v || !R.fig || !R.fig.prova) return;
+    for (const x of v.split(',')) {
+      const [k, namn] = x.split(':').map((y) => y.trim());
+      if (k && namn) R.fig.prova(k, namn, now() - (still() ? 2.6 : 0));
+    }
   }
 
   // ---------- rörelsen ----------
@@ -1919,9 +1990,11 @@ ${window.RumRegister ? RumRegister.nara() : ''}
         kval(R.kval);
         if (R.vem) R.fig.inne(R.vem, now());
         if (R.lage) R.fig.lage(R.lage, now());
+        if (R.spel) R.fig.spel(R.spel, now());
         // de andra i gänget, natten och dagen efter (rum-folk.js)
         if (window.RumFolk) RumFolk.mount(R.el, { fig: () => R.fig, inr: () => R.inr, now, nara, fokus });
         provMal();
+        provAkt();
         frame();
       });
     } catch (err) {
