@@ -1,7 +1,7 @@
 'use strict';
 
 // Kortregistret i tobaksaffären (rum.js): en kortlåda i teak på disken under
-// anslagstavlans högra hörn, i three.js (rum-kortlada.js). I lådan står ett
+// Tipsligan, i three.js (rum-kortlada.js). I lådan står ett
 // registerkort per lag i omgången (A–Ö) bakom avdelaren Lagen och ett blått
 // kort per match bakom avdelaren Mötena. Korten har det om lagen som tv:n och
 // tavlan inte visar:
@@ -39,7 +39,7 @@ window.RumRegister = (() => {
   // cuperna i schemat (matchens fil) som på sajten; Europacuperna heter CL, EL och ECL
   const TAV = { EFL: 'Ligacupen', FAC: 'FA-cupen' };
   // duken på disken (scenens px), där lådan syns med sin skugga
-  const BOX = { x: 1172, y: 430, w: 190, h: 136 };
+  const BOX = { x: 1210, y: 452, w: 226, h: 140 };
   // kortet i handen ritas i 487 × 346 (A6) med fliken ovanpå
   const CW = 487;
   const CH = 346;
