@@ -2954,6 +2954,21 @@ nedersta fram och läggs överst), lapp för lapp över tavlan från vänster. L
 bara på divisionens lag, så att styrkan och motståndet jämförs inom divisionen; en lista
 som blir tom står som *Ingen*. Det valda bladet ligger kvar överst tills sidan laddas om.
 
+Ryms inte det längsta bladet på lappens plats är bunten vikt (2026-11-03, användarens
+önskemål – förut klipptes det som inte fick plats bort): resten är vikt bakom, och i
+underkanten syns vecket, där texten försvinner runt böjen och skuggan är tjockare. I handen
+vecklas lappen ut, ett veck i taget och i dragspel när den är mer än dubbelt så lång, och
+viks ihop igen på vägen tillbaka; vecken syns som linjer i papperet. Längden mäts i
+närbilden när lapparna ritas och igen när typsnitten har laddats (`measure` och `panels` i
+rum-anslag.js). Den utvikta lappen blir aldrig mindre än att den går att läsa (`MINS`); ryms
+den inte i fönstret då, som en lång skadelista i telefonen, flyttas den med hjulet, fingret
+eller Page Up/Page Down, och då bläddrar ett svep uppåt eller neråt inte bladen. Det är
+framför allt skadelistan som viks: med sju matcher i Premier League rymdes förut ungefär
+hälften av lagen och med tio en tredjedel. Övriga lappar ryms med en hel omgång i en division
+(tolv matcher): kryssar gärna och slår oddsen är lite högre, så att deras sista rad kommer
+med, almanacksbladet är bredare, så att långa namn (Bournemouth, Southampton) står hela, och
+polaroidens text blir mindre när lagnamnet är långt.
+
 Ett klick eller A: tavlan lossnar från väggen och flyger fram – en projektiv avbildning
 (`matrix3d`) från hörnen på väggen till rakt fram, så att den vrids ut ur väggens vinkel –
 medan kameran går lite mot hörnet och rummet mörknar bakom; där den hängde är väggen

@@ -3395,6 +3395,8 @@ ${window.RumRegister ? RumRegister.nara() : ''}
       const dy = e.clientY - P.y;
       if (nara()) {
         // anslagstavlan: ett svep uppåt eller neråt bläddrar bladen i lapparna
+        // (utom när fingret flyttade en lång lapp i handen)
+        if (R.ans && R.ans.on() && R.ans.drog()) return;
         if (R.ans && R.ans.on() && Math.abs(dy) >= 40 && Math.abs(dy) > Math.abs(dx) * 1.5) {
           R.ans.key(dy < 0 ? 'ArrowDown' : 'ArrowUp');
           return;
