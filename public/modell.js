@@ -124,7 +124,7 @@ function howSection(x) {
 // steg ur matchens fil (prediction.steps, samma som "Vad drog åt vilket håll"
 // i matchrutan).
 function matchesReady() {
-  return state.all ? Promise.resolve() : new Promise((r) => document.addEventListener('matches-loaded', r, { once: true }));
+  return state.all || state.matchesForsokt ? Promise.resolve() : new Promise((r) => document.addEventListener('matches-loaded', r, { once: true }));
 }
 
 async function loadExample() {

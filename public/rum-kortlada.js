@@ -398,7 +398,7 @@ export async function kortlada(o) {
       }
       const p = Math.min(1, (now - f.t0) / f.ms);
       const e = ease(p);
-      t = lerp(f.a, f.b, e);
+      t = S.t = lerp(f.a, f.b, e);
       up = Math.sin(Math.PI * p) * 7;
       S.rect = mixRect(f.ra, f.rb, e);
       if (p >= 1) { S.fly = null; f.done(); } else busy = true;
@@ -447,10 +447,12 @@ export async function kortlada(o) {
         kick();
         return Promise.resolve(F.box);
       }
-      const ra = roomRect(from);
+      // (var den på väg tillbaka vänder den där den är)
+      const ra = S.fly && S.rect ? S.rect : roomRect(from);
+      const a = S.fly ? S.t : 0;
       S.rect = ra;
       return new Promise((done) => {
-        S.fly = { t0: performance.now(), ms: 760, a: 0, b: 1, ra, rb: F.r, done: () => done(F.box) };
+        S.fly = { t0: performance.now(), ms: 760, a, b: 1, ra, rb: F.r, done: () => done(F.box) };
         kick();
       });
     }
@@ -461,7 +463,7 @@ export async function kortlada(o) {
     if (o.calm() || !from || !S.rect) { end(); return Promise.resolve(); }
     const rb = roomRect(from);
     return new Promise((done) => {
-      S.fly = { t0: performance.now(), ms: 620, a: 1, b: 0, ra: S.rect, rb, done: () => { end(); done(); } };
+      S.fly = { t0: performance.now(), ms: 620, a: S.fly ? S.t : 1, b: 0, ra: S.rect, rb, done: () => { end(); done(); } };
       S.open = false;
       kick();
     });

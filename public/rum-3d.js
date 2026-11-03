@@ -3127,6 +3127,7 @@ export async function figurer(canvas, opt = {}) {
     pivot.rotation.x = my * 2.6 * DEG;
     if (Q.skugga > 1) r.shadowMap.needsUpdate = Q.n++ % Q.skugga === 0;
     r.render(scene, cam);
+    if (ombyggda.length) slappOmbyggda();
   }
 
   // Hur fint gänget ritas, när datorn inte hinner med (KVAL i rum.js): pr
@@ -3149,6 +3150,33 @@ export async function figurer(canvas, opt = {}) {
     Q.skugga = skugga;
     r.shadowMap.autoUpdate = skugga <= 1;
     r.shadowMap.needsUpdate = true;
+  }
+
+  // Material och texturer från figurer som har byggts om (hår, halsduk,
+  // tatuering ... en bit över 10 MB per gång). De släpps när de nya har ritats:
+  // annars kastas shaderprogrammen som de nya ska använda, och de måste
+  // kompileras om. (ansiktena, tex, och det de nya figurerna delar står kvar)
+  const ombyggda = [];
+  function slappOmbyggda() {
+    const matOf = (x) => (Array.isArray(x.material) ? x.material : x.material ? [x.material] : []);
+    const texOf = (m) => Object.values(m).filter((v) => v && v.isTexture);
+    const kvar = new Set(Object.values(tex));
+    for (const o of figs) {
+      o.fig.traverse((x) => {
+        for (const m of matOf(x)) {
+          kvar.add(m);
+          for (const t of texOf(m)) kvar.add(t);
+        }
+      });
+    }
+    for (const f of ombyggda.splice(0)) {
+      f.traverse((x) => {
+        for (const m of matOf(x)) {
+          for (const t of texOf(m)) if (!kvar.has(t)) t.dispose();
+          if (!kvar.has(m)) m.dispose();
+        }
+      });
+    }
   }
 
   // ---------- vädret ----------
@@ -3178,6 +3206,7 @@ export async function figurer(canvas, opt = {}) {
       if (JSON.stringify(D) === o.key) return;
       root.remove(o.fig);
       o.fig.traverse((x) => { if (x.geometry) x.geometry.dispose(); });
+      ombyggda.push(o.fig);
       figs[i] = Object.assign(utanSmaSkuggor(build(o.F, D)), { inneAt: o.inneAt });
     });
     for (const sk of smokers) {
@@ -3311,13 +3340,26 @@ export async function figurer(canvas, opt = {}) {
     toldNatt = true;
   }
   // Vem i gänget syns i punkten (nx, ny) i duken (−1…1, y uppåt)?
+  // (mot varje dels låda, inte dess trianglar: det är bara för att veta vem man
+  // pekar på, och trianglarna tog 12–17 ms av huvudtråden var 60:e ms när musen
+  // rörde sig över gänget)
   const ray = new THREE.Raycaster();
+  const delRay = new THREE.Ray();
+  const delInv = new THREE.Matrix4();
+  const delPt = new THREE.Vector3();
   function under(nx, ny) {
     ray.setFromCamera(new THREE.Vector2(nx, ny), cam);
     let best = null;
     for (const o of figs) {
-      const hit = ray.intersectObject(o.fig, true).find((x) => x.object.visible && x.object.material && !x.object.material.transparent);
-      if (hit && (!best || hit.distance < best.d)) best = { k: o.F.key, d: hit.distance };
+      o.fig.traverseVisible((x) => {
+        if (!x.isMesh || !x.material || x.material.transparent) return;
+        const g = x.geometry;
+        if (!g.boundingBox) g.computeBoundingBox();
+        delRay.copy(ray.ray).applyMatrix4(delInv.copy(x.matrixWorld).invert());
+        if (!delRay.intersectBox(g.boundingBox, delPt)) return;
+        const d = delPt.applyMatrix4(x.matrixWorld).distanceTo(ray.ray.origin);
+        if (!best || d < best.d) best = { k: o.F.key, d };
+      });
     }
     return best && best.k;
   }

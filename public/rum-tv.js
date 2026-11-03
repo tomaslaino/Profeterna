@@ -193,7 +193,7 @@ window.RumTv = (() => {
   function status(g, long = false) {
     if (g.state === 'off') return [long ? g.off || 'Struken' : 'struken', 'r'];
     if (g.state === 'hidden') return [long ? (g.over ? 'Slut' : 'Pågår') : '?', 'w'];
-    if (g.state === 'final') return [long ? `Slut${g.extra ? ` ${g.extra}` : ''}` : `${g.score.home}-${g.score.away}`, 'w'];
+    if (g.state === 'final') return [long ? `Slut${g.extra ? ` ${g.extra}` : ''}` : g.score ? `${g.score.home}-${g.score.away}` : 'slut', 'w'];
     if (g.state === 'live') {
       const ht = g.clock === 'HT';
       return [long ? (ht ? 'Halvtid' : `Pågår ${g.clock || ''}`.trim()) : `${g.score.home}-${g.score.away} ${ht ? 'paus' : g.clock || ''}`.trim(), 'g'];

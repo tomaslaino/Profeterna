@@ -60,7 +60,7 @@ function kpStore(key, v) {
 // ---------- data ----------
 
 function whenMatches() {
-  if (state.all) return Promise.resolve();
+  if (state.all || state.matchesForsokt) return Promise.resolve();
   return new Promise((res) => document.addEventListener('matches-loaded', res, { once: true }));
 }
 
