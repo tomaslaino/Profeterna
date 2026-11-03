@@ -321,7 +321,7 @@ a.rum-sak, a.rum-sak:hover { color: inherit; text-decoration: none; }
 .rum-pl.glid { transition: transform 0.6s cubic-bezier(0.3, 0, 0.2, 1), opacity 0.5s; }
 /* nära en sak lyser ingenting när man pekar på det */
 .rum.sak-nara .rum-sak:hover, .rum.sak-nara .rum-sak:focus-visible { filter: none; }
-.rum.sak-nara #rum-vm94 { filter: drop-shadow(0 3px 4px rgba(0, 0, 0, 0.5)); }
+.rum.sak-nara .rum-aff.rum-sak { filter: drop-shadow(0 3px 4px rgba(0, 0, 0, 0.5)); }
 /* under saken: pokalerna per person, fotografen eller vilka vi är */
 .rum-sakfot {
   position: absolute;

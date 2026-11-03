@@ -502,7 +502,8 @@ Utan nyckel ingen knapp.
   riktig stryktipskupong, så att den går att fylla i; på bredden står orden bredvid kupongen
   i handen. Se [I telefonen](#i-telefonen).
 - **Närbilder i tobaksaffären (2026-10-24, användarens önskemål):** uret, skårtavlan med
-  Premier League, Omgångens orakel och VM 94-affischen går att klicka på, och kameran går
+  Premier League, Omgångens orakel och VM 94-affischen (sedan 2026-11-03 också IFK-affischen
+  och löpsedeln) går att klicka på, och kameran går
   fram till dem i stället för att sidan byts direkt. Skårtavlan och oraklet leder sedan vidare
   till Tabeller och Olympen. Se [Närbilderna](#närbilderna).
 - **Säsongsprognosen tas bort (2026-10-20, användarens beslut):** vyn under Tabeller och
@@ -539,6 +540,11 @@ Utan nyckel ingen knapp.
   korktavlan och kvittot så nära att de går att läsa. Kupongen som inte går att ta i handen
   visas nära på pulten, och guldorden *Statistik* och *Lagen* under anslagstavlan och
   kortregistret är borta. Se [Tobaksaffären](#tobaksaffären) och [Närbilderna](#närbilderna).
+- **Fler affischer på glaset (2026-11-03, användarens önskemål):** bredvid VM 94-affischen
+  sitter en affisch från IFK Göteborgs seger i UEFA-cupen 1982, och varje vecka en löpsedel
+  med det mest dramatiska ur förra omgången eller inför nästa. IFK-affischen är ritad: ett
+  fritt foto från finalerna (helst med Glenn Strömberg) gick inte att hitta, och Wikimedia
+  Commons gick inte att nå när den gjordes. Se [Tobaksaffären](#tobaksaffären), *Affischerna*.
 - **Kuponghistoriken flyttar till Olympen (2026-10-20, användarens önskemål):** Kupong
   handlar bara om nästa kupong – växlaren Omgången | Historik försvinner. De färdigspelade
   kupongerna står sist i Olympen under rubriken *Grupparbetena* (`#olympen/kuponger`, en
@@ -1877,7 +1883,7 @@ minsta fönstren och om rum.js inte går att hämta visas den vanliga förstasid
 **Föremålen** – pekar man på ett lyser det (pokalerna också), och snabbvalet
 på text-tv:n med samma ämne tänds, som när man pekar på snabbvalet med tv:n nära
 (pärmarna Skyttar). Inget föremål byter sida: oraklet, skårtavlan, pokalhyllan, korktavlan,
-uret, VM 94-affischen, namnet på dörren och kvittot tittar man på nära (se
+uret, affischerna på glaset, namnet på dörren och kvittot tittar man på nära (se
 [Närbilderna](#närbilderna)), och tv:n, videon, anslagstavlan, kortregistret och kupongen
 kommer fram var och en på sitt sätt. Föremålen är knappar utan adress (`KNAPP` i rum.js), och
 Enter och mellanslag klickar på dem. En match på text-tv:n öppnar matchrutan ovanpå rummet:
@@ -2152,16 +2158,55 @@ mer, samma gräns som gängets tunnaste kläder (vädret från vader.js, läst v
 sekund); annars är den borta från pulten. Den svänger fram och tillbaka, och när den pekar
 mot askkoppen blåser röken åt sidan (draget räknas för varje puff under dess liv, så att
 samma tid ger samma bild). Inga riktiga märken: locket säger SNUS N:o 1, dosan PRIMA
-LÖSSNUS. **VM 94-affischen** är tejpad
-på insidan av skyltfönstret, i vänstra rutan under neonskyltens list (så att *VM 94* och
-*BRONS* syns): ett riktigt foto från
-landslagets hemkomst (Henrik Larsson och Pontus Kåmark med bronsmedaljerna, Norr
-Mälarstrand 18 juli 1994; foto Sniper Zeta,
-[CC BY-SA 4.0](https://creativecommons.org/licenses/by-sa/4.0/),
-[Wikimedia Commons](https://commons.wikimedia.org/wiki/File:Football_players_Pontus_K%C3%A5mark_Henrik_Larsson,_July_18,_1994.jpg)),
-beskuret i `public/rum/vm94.jpg` och med fotografen i affischens title och under den i
-närbilden (se [Närbilderna](#närbilderna)). Uppe till höger i
-fönstret syns himlen (rum-ute.js), så där hänger den inte.
+LÖSSNUS.
+
+**Affischerna** är tejpade på insidan av glaset ([public/rum-affischer.js](public/rum-affischer.js),
+rum-affischer.css; rum-saker.js sätter upp dem). Två sitter alltid i vänstra rutan av
+skyltfönstret, under neonskyltens list, och byter sida med dagen:
+
+- **VM 94-affischen:** ett riktigt foto från landslagets hemkomst (Henrik Larsson och Pontus
+  Kåmark med bronsmedaljerna, Norr Mälarstrand 18 juli 1994; foto Sniper Zeta,
+  [CC BY-SA 4.0](https://creativecommons.org/licenses/by-sa/4.0/),
+  [Wikimedia Commons](https://commons.wikimedia.org/wiki/File:Football_players_Pontus_K%C3%A5mark_Henrik_Larsson,_July_18,_1994.jpg)),
+  beskuret i `public/rum/vm94.jpg` och med fotografen i affischens title och under den i
+  närbilden (se [Närbilderna](#närbilderna)), med *VM 94* och *BRONS* i det gula bandet.
+- **IFK Göteborg 1982** (DJ:s lag): *UEFA-CUPEN 1982* i ett blått band, pokalen på sin gula
+  marmorsockel mot blått strålkastarljus (ritad i SVG, ingen bild), skölden (samma som på
+  DJ:s mössa) och finalerna mot Hamburger SV – 1–0 på Ullevi den 5 maj (Tord Holmgren) och
+  3–0 på Volksparkstadion den 19 maj (Dan Corneliusson, Torbjörn Nilsson, Stig Fredriksson
+  på straff). Trycket är äldre än VM 94 och har gulnat mer (en ton ovanpå bandet och
+  bilden; ett CSS-filter ritades suddigt i närbilden).
+
+Uppe till höger i fönstret syns himlen (rum-ute.js), så där hänger inget.
+
+**Löpsedeln** är veckans, från kvällstidningen KVÄLLSPRESSEN (inget riktigt märke): röd
+tidningsrubrik med datum, en rad som *TIPSET* eller *SKRÄLLEN*, rubriken i Anton – varje rad
+så stor som ryms i bredden, en av dem röd – och en rad under. Den sitter under dörrens
+handtag (lite mindre, så att kupongstället inte skymmer den) eller i ett av fönstrets
+nedre hörn, där gänget inte står i vägen, och flyttar varje vecka (veckan i Stockholm,
+måndag till söndag). Rubriken är det mest dramatiska som rummet vet om (`rubrik` i
+rum-affischer.js):
+
+- *förra omgången* (säsongens omgångar, `TP.season`): den som tippade bäst med minst 82 %
+  rätt (*TEIJDER 12 RÄTT!*, eller *ALLA RÄTT!*), den som tippade sämst med högst hälften
+  rätt (*LAINOS MARDRÖM*), modellen mot gänget (*DATORN KROSSADE GÄNGET*, *GÄNGET SLOG
+  DATORN*) och en ny ensam etta i Tipsligan (*TEIJDER TOG TRONEN*) – ställningen och namnen
+  som på skårtavlan (Dogge för Johansson);
+- *en spelad match* i förra omgången eller gängets senaste kupong: skrällen när modellen gav
+  utfallet högst 22 % (*BRIGHTON SÄNKTE MAN CITY*, *… FÄLLDE …*), en favorit med minst 58 %
+  som bara fick oavgjort (*ARSENAL SNUBBLADE*) och segrar med fyra mål eller mer (*QPR KÖRDE
+  ÖVER SWANSEA*);
+- *gängets kupong* (Historik): betyg 1 (*KUPONGEN I SPILLROR*) eller 5 (*DRÖMKUPONGEN*);
+- *nästa omgång*, så länge ingen av dess matcher har startat: den jämnaste matchen när
+  ingen utgång har över 42 % (*RYSAREN*), den största favoriten med minst 68 % (*MAN CITY
+  KAN INTE FÖRLORA – eller?*) och jakten på ledaren i Tipsligan.
+
+Varje rubrik har en vikt efter hur dramatisk den är (hur få rätt, hur liten chans …).
+Förra omgångens väger fullt tre dagar efter sista avsparken, sedan 55 % och efter sex dagar
+30 %; nästa omgångs 90 %. Omgångar och kuponger som spoilerskyddet döljer räknas inte.
+Utan något att skriva om står *STORA TIPSGUIDEN*. Tidningen är från dagen det hände (tre
+timmar efter sista avsparken), och för nästa omgång från idag. Ett klick går fram till
+löpsedeln, som till de andra affischerna; som inget annat i rummet leder den ut ur det.
 
 **Fikat** står på pulten vissa dagar, i three.js som sakerna
 ([public/rum-fika.js](public/rum-fika.js)): två semlor i pappersform med mandelmassa,
@@ -2181,14 +2226,15 @@ på pulten står i en av fyra uppställningar (`LAYOUTS` – fläkten längst ba
 mitten eller bakom kvittot och då vänd åt höger, askkoppen och dosan om vartannat, några
 pixlar hit eller dit), kvittot ligger någonstans till vänster om dem, vridet åt det ena eller
 andra hållet och mer eller mindre uppböjt (det första av elva lägen som går fritt från
-askkoppen, dosan och fläkten), locket och prisen läggs där det finns plats, och affischen sitter
-till vänster eller till höger under neonskylten. Slitaget följer tippningen: andelen fel
+askkoppen, dosan och fläkten), locket och prisen läggs där det finns plats, och VM 94- och
+IFK-affischen byter sida under neonskylten. Slitaget följer tippningen: andelen fel
 bland omgångens avgjorda matcher, annars i den senaste färdigspelade kupongen, och utan
 rättning ett mellanläge. Går det dåligt fylls askkoppen (1–11 fimpar), askan hamnar
-bredvid, snuset spills, fläkten (om den står där) går på trean, affischen bleks och ett hörn
+bredvid, snuset spills, fläkten (om den står där) går på trean, affischerna bleks och ett hörn
 släpper; går det riktigt illa ryker två cigaretter, en använd pris ligger på pulten och
-affischen hänger i en tejpbit. Dolda resultat räknas inte (gradeRow rättar dem inte). Utan
-WebGL står affischen kvar men inte sakerna på pulten.
+affischerna hänger i en tejpbit (löpsedeln är ny för veckan och blir bara lite böjd). Dolda
+resultat räknas inte (gradeRow rättar dem inte). Utan WebGL står affischerna kvar men inte
+sakerna på pulten.
 
 **Lysröret tänds när man kommer in** (`tand` i rum.js, `.rum-mork` i rum.css; inte på natten): medan
 gänget laddas är rummet mörkt, utom gatan genom skyltfönstret och dörren och tv:n som
@@ -2218,7 +2264,10 @@ Rummet läser om datan varje minut medan det står öppet.
 
 **Bilder:** `?rum-t=<sekunder>` fryser klockan (figurerna, röken och CSS-animationerna
 står på samma tid), `?rum-mx=&rum-my=` (−1…1) kamerans läge,
-`?rum-slit=0…1` slitaget och `?rum-dag=<tal>` dagen för sakerna och affischen,
+`?rum-slit=0…1` slitaget, `?rum-dag=<tal>` dagen för sakerna och affischerna,
+`?rum-vecka=<tal>` veckan för löpsedelns plats och `?rum-rubrik=<typ>` en viss rubrik om den
+finns (`bast`, `samst`, `datorn`, `ledare`, `skrall`, `kross`, `kupong`, `rysaren`, `spiken`,
+`jakten`),
 `?rum-fika=semlor` (`pepparkakor`, `lussekatter`, `kanelbullar`, `paskagg`,
 `chokladbollar`) fikat och `?rum-ol=jul` (`pask`) ölen. Gänget: `?rum-plats=0` (`1`, `2`)
 var de sitter vid bordet, `?rum-vantar=DL,DT` som om de inte hade lämnat in,
@@ -2475,7 +2524,7 @@ sekunden medan kameran gled i 60. Nära tv:n och videon blev bilden dessutom int
 vridningen hade stannat, efter ett par sekunder. Nu:
 
 - **Världen vrids med kameran.** Vid tv:n, videon, anslagstavlan och kortregistret, och
-  tillbaka därifrån och från uret, skårtavlan, oraklet och affischen, vrids världen dit den
+  tillbaka därifrån och från uret, skårtavlan, oraklet och affischerna, vrids världen dit den
   ska på samma tid och med samma kurva som kameran glider (`vrid` i rum.js, `.vrider` i
   rum.css); tillbaka mot musen (`vridHem`). Gänget och sakerna i 3D ritas med den vridning
   som syns, längs samma kurva. Bara i Chrome.
@@ -3065,6 +3114,8 @@ En sak liknar en annan med flit: lagets bäste skytt kan stå med samma målanta
 skytteligan, men kortet visar hur mycket laget hänger på en spelare och skytteligan vem som
 leder. Skårtavlan på väggen visar inte längre tabellen utan gängets egen ställning
 (Tipsligan).
+Löpsedeln på glaset (se *Affischerna* ovan) är en rubrik, inte statistik: den citerar bara
+den siffra som gör rubriken till en nyhet, som modellens chans för skrällen eller favoriten.
 
 ### Videon
 
@@ -3275,7 +3326,8 @@ en fast bild.
 
 ### Närbilderna
 
-Uret, skårtavlan, Omgångens orakel, pokalhyllan, korktavlan, VM 94-affischen, namnet på dörren
+Uret, skårtavlan, Omgångens orakel, pokalhyllan, korktavlan, affischerna på glaset (VM 94,
+IFK 1982 och löpsedeln), namnet på dörren
 och kvittot tittar man på nära med ett klick (`sak` i rum.js, `data-sak` på föremålen), och
 kupongen på pulten när den inte går att ta i handen: kameran ställer sig rakt framför och går fram tills
 saken fyller det mesta av fönstret – högst 90 % av bredden och 74–94 % av höjden mellan
@@ -3291,12 +3343,12 @@ kameran är framme (`skarp` i rum-inredning.js, högst 2600 bildpunkter på län
 uret går som vanligt, med sekundvisaren.
 
 Ingen närbild leder ut ur rummet. Under pokalhyllan står hur många pokaler var och en har,
-under dörren raderna från Om oss i bladguld och under affischen fotografen och licensen med
+under dörren raderna från Om oss i bladguld och under VM 94-affischen fotografen och licensen med
 en länk till fotot på Wikimedia Commons. Esc eller ett klick (också på saken) går tillbaka,
 och K, T, A, R och V går direkt till kupongen, tv:n, anslagstavlan, kortregistret och videon
 (K nära kupongen på pulten går tillbaka). Föremålen lyser inte när man
 pekar på dem på nära håll. Med `prefers-reduced-motion` går kameran direkt.
-`?rum-sak=ur|skar|ram|pokal|kork|vm94|dorr|kvitto|kupong` visar en närbild i en fast bild.
+`?rum-sak=ur|skar|ram|pokal|kork|vm94|ifk|lopsedel|dorr|kvitto|kupong` visar en närbild i en fast bild.
 
 ## Statusmärkning
 

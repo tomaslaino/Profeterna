@@ -4,14 +4,14 @@
 // locket bredvid och, bara när det är varmt i Stockholm, en gulnad bordsfläkt
 // som svänger fram och tillbaka och blåser röken åt sidan när den pekar mot
 // askkoppen. Kvittot är termopapper som har legat i rulle: änden med
-// huvudet har böjt sig upp och den rivna änden lyfter lite. På insidan av dörrens
-// glas sitter en VM 94-affisch: ett foto från landslagets hemkomst den 18 juli
-// 1994 (Sniper Zeta, CC BY-SA 4.0, Wikimedia Commons).
+// huvudet har böjt sig upp och den rivna änden lyfter lite. På insidan av
+// skyltfönstret sitter affischerna – VM 94, IFK Göteborg 1982 och veckans
+// löpsedel – som rum-affischer.js ritar och den här filen sätter upp.
 //
 // Slitaget skiftar från dag till dag och följer tippningen: går det dåligt
 // (fler fel bland omgångens avgjorda matcher, annars i den senaste
 // färdigspelade kupongen) fylls askkoppen och askan hamnar bredvid, snuset
-// spills, fläkten går på trean och affischen hänger snett med ett hörn som
+// spills, fläkten går på trean och affischerna hänger snett med ett hörn som
 // har släppt; går det riktigt dåligt ryker två cigaretter. Dolda resultat
 // räknas inte (gradeRow rättar dem inte).
 //
@@ -22,8 +22,8 @@
 // Fikat på vissa dagar – semlor, pepparkakor, lussekatter och annat från
 // konditoriet – står bakom kvittot eller där det får plats (rum-fika.js).
 //
-// saker(el, { calm }) → { draw(t, mx, my, rows, old, syns), kval({ pr, skugga }) } (syns: pulten
-// ritas, rum.js; kval: hur fint, KVAL i rum.js)
+// saker(el, { calm, short, namn }) → { draw(t, mx, my, rows, old, syns), kval({ pr, skugga }) } (syns: pulten
+// ritas, rum.js; kval: hur fint, KVAL i rum.js; short och namn: lagen och gänget på löpsedeln)
 //
 // Kvittots text är den som rum.js skriver i #rum-kvitto (receiptHtml) och
 // läses om när den ändras; länken blir en osynlig yta över papperet att
@@ -33,6 +33,7 @@
 
 import { dagens, bord } from './rum-fika.js';
 import { utanSkuggor } from './rum-gpu.js';
+import { affischer } from './rum-affischer.js';
 
 const DEG = Math.PI / 180;
 const D = 1400;
@@ -57,16 +58,9 @@ const LAYOUTS = [
 ];
 // där det finns plats: till höger om kvittot, och bakom det längst bak
 const free = ([px, py]) => py >= 662 && py <= 846 && px <= 1522 && (px >= 1345 || (py <= 690 && px >= 1140));
-// Affischen på insidan av skyltfönstret, efter dagen: i vänstra rutan under
-// neonskylten, till vänster eller till höger (uppe till höger syns himlen,
-// rum-ute.js) – under neonens list, så att VM 94 och BRONS syns.
-const SPOTS = [{ x: 286, y: 220 }, { x: 474, y: 220 }];
 const hash = (n) => { const x = Math.sin(n * 127.1 + 311.7) * 43758.5453; return x - Math.floor(x); };
 const clamp = (x, a = 0, b = 1) => Math.min(b, Math.max(a, x));
 const sm = (a, b, x) => { const u = clamp((x - a) / (b - a)); return u * u * (3 - 2 * u); };
-
-const CREDIT = 'Henrik Larsson och Pontus Kåmark vid landslagets hemkomst efter VM, Norr Mälarstrand 18 juli 1994. Foto: Sniper Zeta, CC BY-SA 4.0 (Wikimedia Commons)';
-const KALLA = 'https://commons.wikimedia.org/wiki/File:Football_players_Pontus_K%C3%A5mark_Henrik_Larsson,_July_18,_1994.jpg';
 
 // Dagen i Stockholm som frö: sakerna ligger likadant hela dagen.
 const fDay = new Intl.DateTimeFormat('sv-SE', { timeZone: 'Europe/Stockholm', year: 'numeric', month: '2-digit', day: '2-digit' });
@@ -100,37 +94,6 @@ function wearOf(rows, old, seed) {
   return clamp(base + (hash(seed + 0.5) - 0.5) * 0.2);
 }
 
-// ---------- affischen ----------
-
-// Ett klick går fram till affischen (närbilden i rum.js), med fotografen under.
-function poster(back) {
-  const el = document.createElement('button');
-  el.type = 'button';
-  el.className = 'rum-vm94 rum-sak';
-  el.id = 'rum-vm94';
-  el.dataset.sak = 'vm94';
-  el.dataset.kalla = KALLA;
-  el.title = CREDIT;
-  el.setAttribute('aria-label', `Affisch: VM 94, brons. ${CREDIT}`);
-  el.innerHTML = '<span class="ark"><span class="band"><b>VM 94</b><b>BRONS</b></span>' +
-    '<span class="foto"><img src="rum/vm94.jpg" alt="" draggable="false"></span><span class="tryck"></span></span>' +
-    '<span class="hund"></span><i class="tejp a"></i><i class="tejp b"></i>';
-  back.append(el);
-  return (w, seed) => {
-    const p = SPOTS[Math.floor(hash(seed + 61) * SPOTS.length)];
-    el.style.left = `${Math.round(p.x + (hash(seed + 62) - 0.5) * 12)}px`;
-    el.style.top = `${Math.round(p.y + (hash(seed + 63) - 0.5) * 10)}px`;
-    const loose = w > 0.85;
-    el.classList.toggle('slappt', loose);
-    const rot = loose ? 6.5 : (hash(seed + 1.7) - 0.5) * 1.6 + w * 2.4;
-    el.style.setProperty('--rot', `${rot.toFixed(2)}deg`);
-    el.style.setProperty('--curl', `${Math.round(sm(0.45, 0.95, w) * 26)}px`);
-    el.style.setProperty('--sep', (0.15 + 0.35 * w).toFixed(2));
-    el.style.setProperty('--sat', (1 - 0.4 * w).toFixed(2));
-    el.style.setProperty('--blek', (0.1 + 0.3 * w).toFixed(2));
-  };
-}
-
 export async function saker(el, opt = {}) {
   if (!document.querySelector('link[href="rum-saker.css"]')) {
     const css = document.createElement('link');
@@ -142,7 +105,8 @@ export async function saker(el, opt = {}) {
   const planes = [...el.querySelectorAll('.rum-world > .rum-pl')];
   const back = planes[0];
   const pult = planes.find((p) => /translateZ\(-60px\)/.test(p.style.transform));
-  const wearPoster = back ? poster(back) : () => {};
+  // affischerna på glaset (rum-affischer.js)
+  const aff = back ? affischer(back, { short: opt.short, namn: opt.namn }) : null;
 
   // Fläkten står där bara när det känns som VARMT grader eller mer i Stockholm,
   // samma gräns som gängets tunnaste kläder (dress i rum-3d.js). Vädret
@@ -175,7 +139,10 @@ export async function saker(el, opt = {}) {
     seed = s;
     key = { rows, old };
     wear = wearOf(rows, old, seed);
-    wearPoster(wear, seed);
+    if (aff) {
+      aff.slit(wear, seed);
+      aff.data(rows, old);
+    }
     return true;
   }
   update(null, null);

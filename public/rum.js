@@ -15,9 +15,10 @@
 //   anslagstavlan lyfts ner (A): lapparna (rum-anslag.js)
 //   kortregistret på disken lyfts fram (R): ett kort per lag och per möte
 //   (rum-register.js, lådan i three.js i rum-kortlada.js)
-//   uret, skårtavlan (Tipsligan), oraklet, pokalhyllan, korktavlan, VM 94-affischen,
-//   dörren (med vilka vi är under) och kvittot: kameran går fram till dem
-//   (närbilderna, sak)
+//   uret, skårtavlan (Tipsligan), oraklet, pokalhyllan, korktavlan,
+//   affischerna på glaset (VM 94, IFK 1982 och veckans löpsedel,
+//   rum-affischer.js), dörren (med vilka vi är under) och kvittot: kameran
+//   går fram till dem (närbilderna, sak)
 //   kupongen tas i handen (K) – fylls i eller ändras –, annars går kameran
 //   fram till den på pulten.
 //   högen bredvid: de inlämnade kupongerna med baksidan upp; din egen tas i
@@ -40,13 +41,13 @@
 // om det var så långt kvar till spelstoppet, ?rum-tittar som om matcherna
 // pågick och ?rum-mal=dl:1,dt:-1,dj:0 som om det blev mål (rätt, fel, ingen
 // skillnad), ?rum-video videon nära och
-// ?rum-sak=ur|skar|ram|pokal|kork|vm94|dorr|kvitto|kupong en närbild.
+// ?rum-sak=ur|skar|ram|pokal|kork|vm94|ifk|lopsedel|dorr|kvitto|kupong en närbild.
 //
 // Läses efter kupong.js, samtal.js, tippare.js och kronan.js och använder
 // deras hjälpare (state, KP, TP, gradeRow, couponNumber, currentCoupon,
 // Kronan.holders, Kronan.scene, Historik.coupons …) och tv:n i rum-tv.js
 // (RumTv, läses före den här), anslagstavlan i rum-anslag.js (RumAnslag,
-// också före) och kortregistret i rum-register.js (RumRegister, också före). rum-3d.js (gänget), rum-saker.js och rum-inredning.js (lysröret,
+// också före) och kortregistret i rum-register.js (RumRegister, också före). rum-3d.js (gänget), rum-saker.js (med affischerna i rum-affischer.js) och rum-inredning.js (lysröret,
 // neonskylten, uret, orakelramen, paketen, kupongstället …) hämtas
 // först när rummet visas, med three.js från jsdelivr (importmap i
 // index.html); utan WebGL står rummet kvar utan dem.
@@ -1991,8 +1992,8 @@ ${window.RumRegister ? RumRegister.nara() : ''}
   async function three() {
     if (R.fig || R.loading) return;
     R.loading = true;
-    // askkoppen, snusdosan, fläkten och affischen (rum-saker.js)
-    tur(() => import('./rum-saker.js').then((m) => m.saker(R.el, { calm: calm() })).then((x) => { R.saker = x; R.sakDuk = R.el.querySelector('canvas.rum-saker'); sikt(R.sakDuk); kval(R.kval); frame(); }), 2)
+    // askkoppen, snusdosan, fläkten och affischerna (rum-saker.js, rum-affischer.js)
+    tur(() => import('./rum-saker.js').then((m) => m.saker(R.el, { calm: calm(), short, namn: tavelnamn })).then((x) => { R.saker = x; R.sakDuk = R.el.querySelector('canvas.rum-saker'); sikt(R.sakDuk); kval(R.kval); frame(); }), 2)
       .catch((err) => console.warn('Rummet: sakerna kunde inte ritas', err));
     // lysröret, neonen, skyltarna, uret, ramarna, paketen och kupongstället (rum-inredning.js)
     tur(() => import('./rum-inredning.js').then((m) => m.inredning(R.el, { calm: calm(), still })).then((x) => { R.inr = x; x.namn(R.ramNamn); x.stopp(R.stopp); if (window.RumFolk && RumFolk.natt()) x.natt(true); if (R.sak) sak(R.sak, null); frame(); }), 1)
@@ -2407,8 +2408,8 @@ ${window.RumRegister ? RumRegister.nara() : ''}
 
   // ---------- närbilderna ----------
   //
-  // Uret, skårtavlan, oraklet, pokalhyllan, korktavlan, VM 94-affischen,
-  // dörren och kvittot (data-sak) – och kupongen på pulten när den inte går
+  // Uret, skårtavlan, oraklet, pokalhyllan, korktavlan, affischerna på
+  // glaset (VM 94, IFK 1982 och löpsedeln), dörren och kvittot (data-sak) – och kupongen på pulten när den inte går
   // att ta i handen: kameran ställer sig rakt framför och går fram tills
   // saken fyller det mesta av fönstret, och det som är ritat i 3D
   // (rum-inredning.js) ritas om skarpare. Under pokalhyllan står hur många
@@ -2429,6 +2430,8 @@ ${window.RumRegister ? RumRegister.nara() : ''}
     dorr: { el: '#rum-dorrnamn', mal: '#rum-dorrglas', h: 0.92, fot: () => OM_OSS },
     kvitto: { el: '#rum-kvitto', h: 0.9, pult: true },
     kupong: { el: '#rum-kupong', h: 0.94, pult: true },
+    ifk: { el: '#rum-ifk', h: 0.86 },
+    lopsedel: { el: '#rum-lopsedel', h: 0.86 },
   };
   // Om oss, under dörren: samma ord som på sidan Om oss, i bladguld som namnet på glaset.
   const OM_OSS = '<span class="om"><b>Vi tippar engelsk fotboll tillsammans.</b>' +

@@ -1,0 +1,166 @@
+/* Affischerna på glaset i tobaksaffären (rum-affischer.js): VM 94-affischen,
+   IFK Göteborgs UEFA-cup 1982 och veckans löpsedel. Platsen och slitaget
+   (--rot, --curl, --sep, --sat, --blek) sätts i rum-affischer.js. */
+
+/* ---------- det gemensamma: papperet, tejpen och hörnet som släpper ---------- */
+
+.rum-aff {
+  --rot: 0deg;
+  --curl: 0px;
+  position: absolute;
+  transform: rotate(var(--rot));
+  transform-origin: 8px 4px;
+  filter: drop-shadow(0 3px 4px rgba(0, 0, 0, 0.5));
+  pointer-events: auto;
+  /* en knapp eller länk: ett klick går fram till affischen (rum.js) */
+  display: block;
+  padding: 0;
+  border: 0;
+  background: none;
+  font: inherit;
+  color: inherit;
+  text-align: left;
+  text-decoration: none;
+}
+.rum-aff.rum-sak:focus-visible { filter: drop-shadow(0 3px 4px rgba(0, 0, 0, 0.5)) brightness(1.18) drop-shadow(0 0 10px rgba(240, 214, 153, 0.35)); }
+@media (hover: hover) { .rum-aff.rum-sak:hover { filter: drop-shadow(0 3px 4px rgba(0, 0, 0, 0.5)) brightness(1.18) drop-shadow(0 0 10px rgba(240, 214, 153, 0.35)); } }
+.rum-aff .ark {
+  position: relative;
+  display: block;
+  clip-path: polygon(0 0, 100% 0, 100% calc(100% - var(--curl)), calc(100% - var(--curl)) 100%, 0 100%);
+}
+/* solen har blekt papperet snett uppifrån, och rastret syns på nära håll */
+.rum-aff .tryck {
+  position: absolute;
+  inset: 5px;
+  pointer-events: none;
+  background:
+    linear-gradient(118deg, rgba(255, 246, 222, var(--blek, 0.15)), rgba(255, 246, 222, 0) 62%),
+    radial-gradient(circle at 50% 50%, rgba(40, 24, 8, 0.14) 0 0.45px, rgba(0, 0, 0, 0) 0.6px) 0 0 / 2px 2px;
+  mix-blend-mode: multiply;
+}
+.rum-aff .tryck::after { content: ""; position: absolute; inset: 0; background: linear-gradient(118deg, rgba(255, 248, 230, var(--blek, 0.15)), rgba(255, 248, 230, 0) 55%); mix-blend-mode: screen; }
+/* hörnet som har släppt: baksidan av papperet viker sig fram */
+.rum-aff .hund {
+  position: absolute;
+  right: 0;
+  bottom: 0;
+  width: var(--curl);
+  height: var(--curl);
+  background: linear-gradient(315deg, rgba(0, 0, 0, 0) 50%, #e4dac0 50%, #c9bc9a 100%);
+  filter: drop-shadow(-1px -1px 1.5px rgba(0, 0, 0, 0.35));
+}
+.rum-aff .tejp {
+  position: absolute;
+  top: -5px;
+  width: 30px;
+  height: 11px;
+  background: rgba(232, 220, 160, 0.62);
+  box-shadow: inset 0 0 0 0.5px rgba(160, 140, 80, 0.4);
+}
+.rum-aff .tejp.a { left: -9px; transform: rotate(-33deg); }
+.rum-aff .tejp.b { right: -9px; transform: rotate(29deg); }
+.rum-aff.slappt .tejp.b { display: none; }
+
+/* ---------- VM 94 ---------- */
+
+.rum-vm94 { width: 120px; }
+.rum-vm94 .ark { padding: 5px 5px 6px; background: #ece2c8; }
+.rum-vm94 .band {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  height: 15px;
+  margin-bottom: 3px;
+  padding: 0 5px;
+  background: #f0c22c;
+  font: 400 11px/15px Anton, Impact, sans-serif;
+  letter-spacing: 1.2px;
+  color: #1c4994;
+}
+.rum-vm94 .foto { position: relative; display: block; overflow: hidden; }
+.rum-vm94 img {
+  display: block;
+  width: 100%;
+  height: auto;
+  filter: sepia(var(--sep, 0.2)) saturate(var(--sat, 0.9)) contrast(0.92) brightness(0.96);
+}
+
+/* ---------- IFK Göteborg 1982: blått band, pokalen och finalerna ---------- */
+
+.rum-ifk { width: 116px; }
+.rum-ifk .ark { padding: 5px 5px 5px; background: #ebe3cc; }
+/* trycket är tolv år äldre än VM 94 och har gulnat mer: en ton ovanpå
+   bandet och bilden (ett filter ritas suddigt i närbilden, rum.js) */
+.rum-ifk .band, .rum-ifk .bild { position: relative; }
+.rum-ifk .band::after, .rum-ifk .bild::after { content: ""; position: absolute; inset: 0; background: #b08850; mix-blend-mode: color; opacity: calc(var(--sep, 0.2) + 0.18); pointer-events: none; }
+.rum-ifk .band {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  height: 15px;
+  margin-bottom: 3px;
+  padding: 0 5px;
+  background: #1a4f9c;
+  box-shadow: inset 0 -1.5px 0 #d9b14e;
+  font: 400 10.5px/15px Anton, Impact, sans-serif;
+  letter-spacing: 1px;
+  color: #f6f1e4;
+}
+.rum-ifk .bild { display: block; }
+.rum-ifk .bild svg { display: block; width: 100%; height: auto; }
+.rum-ifk .text { display: block; padding: 3px 1px 0; color: #24467e; text-align: center; }
+.rum-ifk .lag { display: flex; align-items: center; justify-content: center; gap: 3px; font: 400 12.5px/1 Anton, Impact, sans-serif; letter-spacing: 0.8px; }
+.rum-ifk .lag img { width: 11px; height: 13px; object-fit: contain; }
+.rum-ifk .res { display: block; margin-top: 2px; font: 400 8px/1 Anton, Impact, sans-serif; letter-spacing: 0.6px; color: #1d1a14; }
+.rum-ifk .rad { display: block; margin-top: 1.6px; font: 600 3.9px/1.3 "Helvetica Neue", Arial, sans-serif; letter-spacing: 0.1px; color: #3b362c; }
+
+/* ---------- löpsedeln: kvällstidningens namn, rubriken och raden under ---------- */
+
+.rum-lop { width: 100px; transform: rotate(calc(var(--vrid, 0deg) + var(--rot))) scale(var(--skala, 1)); }
+.rum-lop .ark {
+  display: flex;
+  flex-direction: column;
+  height: 140px;
+  padding: 0 0 4px;
+  background: linear-gradient(180deg, #f6f3ea, #eeeadf);
+  color: #141210;
+}
+.rum-lop .huvud {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 1.5px 4px 0.5px;
+  background: #c8181e;
+  color: #fff;
+}
+.rum-lop .huvud b { min-width: 0; overflow: hidden; white-space: nowrap; font: 400 10px/1.35 Anton, Impact, sans-serif; letter-spacing: 0.45px; }
+/* datumet på två rader i högerkanten, så att namnet ryms också utan Anton */
+.rum-lop .huvud small { flex: 0 0 21px; margin-left: 2px; text-align: right; font: 700 3.3px/1.1 "Helvetica Neue", Arial, sans-serif; letter-spacing: 0.15px; opacity: 0.9; }
+.rum-lop .kick {
+  align-self: flex-start;
+  margin: 4px 5px 0;
+  padding: 1.6px 3px 1.2px;
+  background: #141210;
+  color: #f6f3ea;
+  font: 400 6px/1 Anton, Impact, sans-serif;
+  letter-spacing: 0.5px;
+}
+.rum-lop .rub {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  gap: 1.5px;
+  padding: 0 5px;
+  overflow: hidden;
+}
+.rum-lop .rub b { display: block; font-family: Anton, Impact, "Arial Narrow", sans-serif; font-weight: 400; line-height: 0.94; white-space: nowrap; letter-spacing: 0.2px; }
+.rum-lop .rub b.rod { color: #d0141c; }
+.rum-lop .under {
+  margin: 0 5px;
+  padding-top: 2.5px;
+  border-top: 0.8px solid #141210;
+  font: 700 4.6px/1.2 "Helvetica Neue", Arial, sans-serif;
+}
+.rum-lop .tryck { inset: 0; }
