@@ -1250,9 +1250,9 @@ export async function inredning(el, opt = {}) {
     hang(20 * cm, 68 * cm, (c) => {
       c.scale(cm, cm);
       for (const [u, v0, len, mork] of [[2, 0, 66, 0.25], [7, 3, 56, 0]]) {
-        c.fillStyle = '#86283a';
+        c.fillStyle = '#b03448';
         c.fillRect(u, v0, 11, len);
-        c.fillStyle = '#d6c49a';
+        c.fillStyle = '#efe0b8';
         for (let v = v0 + 14; v < v0 + len - 4; v += 18) c.fillRect(u, v, 11, 3.5);
         c.fillStyle = `rgba(0,0,0,${mork})`;
         c.fillRect(u, v0, 11, len);
@@ -1271,16 +1271,16 @@ export async function inredning(el, opt = {}) {
       path([[-3, 0], [3, 0], [19, 9], [23, 13], [25, 40], [26, 76], [-26, 76], [-25, 40], [-23, 13], [-19, 9]]);
       c.closePath();
       const g = c.createLinearGradient(0, 0, 0, 76);
-      g.addColorStop(0, '#556a8e');
-      g.addColorStop(1, '#7186aa');
+      g.addColorStop(0, '#8aa0c4');
+      g.addColorStop(1, '#a6b8d6');
       c.fillStyle = g;
       c.fill();
       c.lineWidth = 0.5;
-      c.strokeStyle = '#26303f';
+      c.strokeStyle = '#3c4a64';
       for (const s of [-1, 1]) { path([[16 * s, 15], [17 * s, 76]]); c.stroke(); }
       path([[0, 30], [0, 76]]);
       c.stroke();
-      c.fillStyle = '#2e3a50';
+      c.fillStyle = '#5a6e92';
       path([[-3, 0], [-7, 6], [0, 30], [7, 6], [3, 0]]);
       c.fill();
       c.strokeStyle = 'rgba(160,172,196,.55)';
