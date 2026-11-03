@@ -1757,7 +1757,7 @@
         bort: !s.visas && !s.gang.some((g) => g.inne && g.id !== v),
         matcher: !s.visas && !s.gang.some((g) => g.inne),
         go: !open ? (s.visas && before ? 'Till uppgörelsen' : 'Följ kupongen')
-          : inne ? (gang ? 'Till uppgörelsen' : '') : n ? 'Fyll i resten' : 'Fyll i kupongen',
+          : inne ? (gang ? 'Till uppgörelsen' : '') : n ? 'Fyll i resten' : '',
       };
     },
     // Du kryssar för vem du är; kryssen och motiveringarna på kupongen följer med.

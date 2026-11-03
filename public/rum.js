@@ -486,7 +486,7 @@ window.Rum = (() => {
     return `<a id="rum-kvitto" class="rum-flat rum-sak" ${KNAPP} data-nav="kupong" data-sak="kvitto" aria-label="Kvittot"></a>` +
       '<span id="rum-hogen"></span>' +
       `<a id="rum-kupong" class="rum-flat rum-kup rum-sak" ${KNAPP} data-nav="kupong" aria-label="Kupong"></a>` +
-      `<a class="rum-tag" ${KNAPP} data-nav="kupong" id="rum-tag">Fyll i kupongen</a>`;
+      `<a class="rum-tag" ${KNAPP} data-nav="kupong" id="rum-tag" hidden></a>`;
   }
 
   // Röken som lagt sig under lysröret, och dammet som syns i ljuset.
@@ -1284,7 +1284,7 @@ ${window.RumRegister ? RumRegister.nara() : ''}
     const started = rows.length && Math.min(...rows.map((x) => Date.parse(x.m.kickoff))) <= t;
     const tag = document.getElementById('rum-tag');
     if (tag) {
-      const go = p ? p.go : started ? 'Följ kupongen' : 'Fyll i kupongen';
+      const go = p ? p.go : started ? 'Följ kupongen' : '';
       // till uppgörelsen står pingklockan där i stället för guldordet
       if (tag.dataset.go !== go) {
         const klocka = go === 'Till uppgörelsen';

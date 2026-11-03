@@ -1938,9 +1938,9 @@ Enter och mellanslag klickar på dem. En match på text-tv:n öppnar matchrutan 
   allas porträtt i rutorna (uppgörelsen). Kvittot visar när var och en lämnade in. Allt man
   gör med kupongen tas i handen, utan att man lämnar rummet (se
   [Kupongen i handen](#kupongen-i-handen)). Guldordet bredvid säger vad som väntar: *Fyll i
-  kupongen*, *Fyll i resten*, inget alls när du har lämnat in och bara ser dina egna tips
-  (din kupong i högen tas i handen med ett klick) och *Följ kupongen* när matcherna har
-  börjat. När du ser de andras tips står en pingklocka i mässing där i stället för ordet:
+  resten* när du har börjat kryssa, *Följ kupongen* när matcherna har börjat och annars
+  inget alls – en tom kupong tas i handen med ett klick på den, och har du lämnat in tas
+  din kupong i högen på samma sätt. När du ser de andras tips står en pingklocka i mässing där i stället för ordet:
   man ringer in gänget till uppgörelsen.
 - **Högen** till vänster om kupongen: de som har lämnat in har lagt sin kupong där med
   baksidan upp, i den ordning de lämnade in (den senaste överst) – porträttet under ett gem,
