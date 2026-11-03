@@ -553,6 +553,10 @@ Utan nyckel ingen knapp.
   korktavlan och kvittot så nära att de går att läsa. Kupongen som inte går att ta i handen
   visas nära på pulten, och guldorden *Statistik* och *Lagen* under anslagstavlan och
   kortregistret är borta. Se [Tobaksaffären](#tobaksaffären) och [Närbilderna](#närbilderna).
+- **Expressens löpsedel från VM 94 (2026-11-03, användarens önskemål):** VM 94-affischen med
+  fotot från hemkomsten är utbytt mot en mer verklighetstrogen löpsedel, lite solblekt och
+  sliten: *JAAAAAAAA! BRONS!* med Tomas foto från Rose Bowl. Den sitter på skivan som de andra.
+  Se [Tobaksaffären](#tobaksaffären), *Affischerna*.
 - **Skivan med löpsedlarna (2026-11-03, användarens beslut):** de fasta löpsedlarna satt
   huller om buller: fyra format, tejp och nålar, tre på glaset och en på väggen. Det ska synas
   att en person har hand om det, "manligt" och inte så mycket estetik. Av fyra skisser (skena
@@ -2279,13 +2283,15 @@ efter (tre av fyra 158,5–159,6), lagren 294 → 296. Duken tar 0,75 MB i telef
 gång på 39–79 ms i datorn under hög belastning (taket 213–452, kupongstället 263–729), och inget ritas om
 medan kameran rör sig. På natten ritas den om en gång, och framsidan ligger i skugga:
 
-- **VM 94-affischen:** ett riktigt foto från landslagets hemkomst (Henrik Larsson och Pontus
-  Kåmark med bronsmedaljerna, Norr Mälarstrand 18 juli 1994; foto Sniper Zeta,
-  [CC BY-SA 4.0](https://creativecommons.org/licenses/by-sa/4.0/),
-  [Wikimedia Commons](https://commons.wikimedia.org/wiki/File:Football_players_Pontus_K%C3%A5mark_Henrik_Larsson,_July_18,_1994.jpg)),
-  beskuret i `public/rum/vm94.jpg` och med fotografen i affischens title och under den i
-  närbilden (se [Närbilderna](#närbilderna)), med *VM 94* och *BRONS* i det gula bandet. På
-  skivan är bilden beskuren på höjden kring flaggan och Larsson, så att alla fyra får samma format.
+- **VM 94:** Expressens löpsedel söndagen den 17 juli 1994, dagen efter bronsmatchen mot
+  Bulgarien (4–0) på Rose Bowl i Pasadena: *JAAAAAAAA! BRONS!* och fotot med medaljerna, lite
+  solblekt och vikt. Tidningen är riktig, som Tomas ville, med dess röda namn
+  ([logotypen](https://commons.wikimedia.org/wiki/File:Expressen_wordmark.svg) är allmän
+  egendom), men rubriken är Tomas och sedeln är vår, ingen avbild av en riktig. Hela sedeln
+  (`public/rum/expressen94.jpg`, 900 × 1350, skivans format) är tryckt redan i bilden: fotot i
+  CMYK-raster, rött som bleknat mest där solen tagit, bortnött färg längs vecken, gulnat papper
+  och märken efter gammal tejp i nederkant. Fotot är från Tomas; fotografen och licensen är
+  okända, så ingen rad står under närbilden, som tar 94 % av höjden.
 - **IFK Göteborg 1982** (DJ:s lag): Göteborgs-Postens löpsedel morgonen efter segern i
   UEFA-cupen, torsdag 20 maj 1982, som någon har sparat (Tomas önskemål: en löpsedel, inte en
   plansch, och från GP eftersom det är IFK). Tidningens namn på ett blått band, datumet,
@@ -3581,8 +3587,7 @@ kameran är framme (`skarp` i rum-inredning.js, högst 2600 bildpunkter på län
 uret går som vanligt, med sekundvisaren.
 
 Ingen närbild leder ut ur rummet. Under pokalhyllan står hur många pokaler var och en har,
-under dörren raderna från Om oss i bladguld och under VM 94-affischen fotografen och licensen med
-en länk till fotot på Wikimedia Commons. Esc eller ett klick (också på saken) går tillbaka,
+och under dörren raderna från Om oss i bladguld. Esc eller ett klick (också på saken) går tillbaka,
 och K, T, A, R och V går direkt till kupongen, tv:n, anslagstavlan, kortregistret och videon
 (K nära kupongen på pulten går tillbaka). Föremålen lyser inte när man
 pekar på dem på nära håll. Med `prefers-reduced-motion` går kameran direkt.

@@ -1,8 +1,9 @@
 // Löpsedlarna i tobaksaffären (rum-saker.js lägger upp dem i bakväggens
 // plan, rum.js går fram till dem):
 //
-//   VM 94-affischen   ett foto från landslagets hemkomst den 18 juli 1994
-//                     (Sniper Zeta, CC BY-SA 4.0, Wikimedia Commons)
+//   VM 94             Expressens löpsedel dagen efter bronsmatchen, solblekt
+//                     och vikt, med fotot från Rose Bowl (fotot fick vi av
+//                     Tomas; fotografen är okänd)
 //   IFK Göteborg 1982 Göteborgs-Postens löpsedel dagen efter segern i
 //                     UEFA-cupen, med fotot från Volksparkstadion (fotot fick vi
 //                     av Tomas; fotografen är okänd), vikt och sliten
@@ -92,12 +93,17 @@ function paSkivan(el) {
   return el;
 }
 
-// ---------- VM 94 ----------
+// ---------- VM 94: Expressens löpsedel ----------
+//
+// Löpsedeln från söndagen den 17 juli 1994, dagen efter bronsmatchen mot
+// Bulgarien på Rose Bowl (Tomas önskemål). Tidningen och dess röda namn är
+// riktiga (logotypen är allmän egendom på Wikimedia Commons), rubriken
+// JAAAAAAAA! BRONS! är Tomas och sedeln är vår. Fotot med medaljerna skickade
+// Tomas (fotografen är okänd). Hela sedeln (rum/expressen94.jpg, i skivans
+// format) är tryckt i raster, solblekt och vikt redan i bilden, som Nacionals
+// förstasida nedan.
 
-const VM94 = {
-  credit: 'Henrik Larsson och Pontus Kåmark vid landslagets hemkomst efter VM, Norr Mälarstrand 18 juli 1994. Foto: Sniper Zeta, CC BY-SA 4.0 (Wikimedia Commons)',
-  kalla: 'https://commons.wikimedia.org/wiki/File:Football_players_Pontus_K%C3%A5mark_Henrik_Larsson,_July_18,_1994.jpg',
-};
+const VM94 = 'Expressens löpsedel söndagen den 17 juli 1994: JAAAAAAAA! BRONS! Sverige slog Bulgarien med 4–0 i bronsmatchen i VM på Rose Bowl i Pasadena lördagen den 16 juli (Brolin, Mild, H. Larsson, K. Andersson).';
 
 function vm94() {
   const el = document.createElement('button');
@@ -105,11 +111,9 @@ function vm94() {
   el.className = 'rum-aff rum-vm94 rum-sak';
   el.id = 'rum-vm94';
   el.dataset.sak = 'vm94';
-  el.dataset.kalla = VM94.kalla;
-  el.title = VM94.credit;
-  el.setAttribute('aria-label', `Affisch: VM 94, brons. ${VM94.credit}`);
-  el.innerHTML = '<span class="ark"><span class="band"><b>VM 94</b><b>BRONS</b></span>' +
-    `<span class="foto"><img src="rum/vm94.jpg" alt="" draggable="false"></span><span class="tryck"></span></span>${SKRUVAR}`;
+  el.title = VM94;
+  el.setAttribute('aria-label', `Löpsedel: ${VM94}`);
+  el.innerHTML = `<span class="ark"><img src="rum/expressen94.jpg" alt="" draggable="false"><span class="tryck"></span></span>${SKRUVAR}`;
   return paSkivan(el);
 }
 

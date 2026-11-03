@@ -2509,9 +2509,8 @@ ${window.RumRegister ? RumRegister.nara() : ''}
   // att ta i handen: kameran ställer sig rakt framför och går fram tills
   // saken fyller det mesta av fönstret, och det som är ritat i 3D
   // (rum-inredning.js) ritas om skarpare. Under pokalhyllan står hur många
-  // pokaler var och en har, under affischen fotografen och under dörren
-  // vilka vi är (Om oss). Ingen av dem leder ut ur rummet: Esc eller ett
-  // klick går tillbaka.
+  // pokaler var och en har och under dörren vilka vi är (Om oss). Ingen av
+  // dem leder ut ur rummet: Esc eller ett klick går tillbaka.
   //   el saken, mal det kameran siktar på (annars saken), h hur mycket av
   //   höjden den får, duk duken i 3D, fot under den, pult saken ligger på
   //   pulten (inget tonar bort), tv tv:n står framför den (och tonar bort),
@@ -2523,7 +2522,7 @@ ${window.RumRegister ? RumRegister.nara() : ''}
     ram: { el: '.rum-ram', h: 0.94, duk: 'ram' },
     pokal: { el: '.rum-pokal', h: 0.72, duk: 'hogra', fot: () => pokalFot(), tv: true },
     kork: { el: '.rum-kork', h: 0.86, duk: 'hogra' },
-    vm94: { el: '#rum-vm94', h: 0.74, duk: 'skiva', under: 0.09, fot: (a) => `<span class="foto">${esc(a.title).replace('Wikimedia Commons', (m) => (a.dataset.kalla ? `<a href="${esc(a.dataset.kalla)}" target="_blank" rel="noopener">${m}</a>` : m))}</span>` },
+    vm94: { el: '#rum-vm94', h: 0.94, duk: 'skiva' },
     dorr: { el: '#rum-dorrnamn', mal: '#rum-dorrglas', h: 0.92, fot: () => OM_OSS },
     kvitto: { el: '#rum-kvitto', h: 0.9, pult: true },
     kupong: { el: '#rum-kupong', h: 0.94, pult: true },
@@ -3594,10 +3593,9 @@ ${window.RumRegister ? RumRegister.nara() : ''}
         }
         return;
       }
-      // nära en sak: ett klick går tillbaka (utom på namnet, foten och
-      // fotografens länk)
+      // nära en sak: ett klick går tillbaka (utom på namnet och foten)
       if (R.sak) {
-        if (e.target.closest('.rum-hdr, .rum-ft, .rum-sakfot .foto a')) return;
+        if (e.target.closest('.rum-hdr, .rum-ft')) return;
         e.preventDefault();
         sak(null);
         return;
