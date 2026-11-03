@@ -115,8 +115,8 @@ window.Rum = (() => {
     <linearGradient id="rum-ceil" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#2b2519"/><stop offset="1" stop-color="#55492f"/></linearGradient>
     <linearGradient id="rum-pult" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#6e4a30"/><stop offset=".5" stop-color="#5a3b26"/><stop offset="1" stop-color="#3b2619"/></linearGradient>
     <linearGradient id="rum-alu" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#9a9a96"/><stop offset=".5" stop-color="#5e5e5b"/><stop offset="1" stop-color="#2e2e2c"/></linearGradient>
-    <linearGradient id="rum-counter" x1="0" y1="0" x2="1" y2="0"><stop offset="0" stop-color="#4a3a2c"/><stop offset="1" stop-color="#2a2019"/></linearGradient>
-    <linearGradient id="rum-countertop" x1="0" y1="0" x2="1" y2="0"><stop offset="0" stop-color="#8b8577"/><stop offset="1" stop-color="#5b564c"/></linearGradient>
+    <linearGradient id="rum-counter" gradientUnits="userSpaceOnUse" x1="1060" y1="0" x2="1600" y2="0"><stop offset="0" stop-color="#472b19"/><stop offset="1" stop-color="#2a180e"/></linearGradient>
+    <linearGradient id="rum-countertop" gradientUnits="userSpaceOnUse" x1="1060" y1="0" x2="1600" y2="0"><stop offset="0" stop-color="#613a23"/><stop offset="1" stop-color="#3a2113"/></linearGradient>
     <linearGradient id="rum-sill" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#7a7262"/><stop offset="1" stop-color="#958b78"/></linearGradient>
     <radialGradient id="rum-sodium" cx=".5" cy=".5" r=".5"><stop offset="0" stop-color="#ffb35c" stop-opacity=".9"/><stop offset="1" stop-color="#ffb35c" stop-opacity="0"/></radialGradient>
     <radialGradient id="rum-tube" cx=".5" cy=".5" r=".5"><stop offset="0" stop-color="#eef6ff" stop-opacity=".55"/><stop offset="1" stop-color="#eef6ff" stop-opacity="0"/></radialGradient>
@@ -170,19 +170,49 @@ window.Rum = (() => {
   <rect x="0" y="90" width="1140" height="7" fill="#000" opacity=".35"/>`;
   }
 
-  // Diskens framkant i aluminium, som pultens, och fogarna mellan skivorna i
-  // fronten. Fronten går från hörnet (1060) ut mot pulten, mot flyktpunkten,
-  // så allt på den är större ju längre ut det är (k), och fogarna står lika
-  // långt isär längs disken – tätare inne vid hörnet. Samma kant fortsätter
-  // till höger om bilden i videons hörn (vaggSvg i rum-video.js).
-  function diskfront() {
-    const y = (x) => r1(490 + (x - 1060) * 0.3);
-    const k = (x) => (x - VP[0]) / (1060 - VP[0]);
-    const kant = (d0, d1, fill) => `<polygon points="1060,${r1(y(1060) + d0)} 1600,${r1(y(1600) + d0 * k(1600))} 1600,${r1(y(1600) + d1 * k(1600))} 1060,${r1(y(1060) + d1)}" fill="${fill}"/>`;
-    const fogar = [1, 2, 3, 4].map((i) => VP[0] + 1 / (1 / 300 - (i / 5) * (1 / 300 - 1 / 840))).map((x) =>
-      `<line x1="${r1(x)}" y1="${r1(y(x) + 4 * k(x))}" x2="${r1(x)}" y2="1000" stroke="#120c08" stroke-opacity=".55" stroke-width="${r1(1.3 * k(x))}"/>` +
-      `<line x1="${r1(x + 1.3 * k(x))}" y1="${r1(y(x) + 4 * k(x))}" x2="${r1(x + 1.3 * k(x))}" y2="1000" stroke="#d9c7a1" stroke-opacity=".1" stroke-width="${r1(k(x))}"/>`).join('');
-    return kant(0, 2, '#aaa69c') + kant(2, 4, '#403e3a') + fogar;
+  // Bardisken längs högra väggen, som i en pub: en skiva i mörk lackad
+  // mahogny med en tjock rundad kant som sticker ut över fronten och skuggar
+  // den, och en front med fyllningar i ramar. Fronten går från hörnet
+  // (1060) ut mot pulten, mot flyktpunkten, så allt på den är större ju
+  // längre ut det är (k), och ramarna står lika långt isär längs disken –
+  // tätare inne vid hörnet. Ritas mellan x = a och z: i bilden (bg) och till
+  // höger om den i videons hörn (vaggSvg i rum-video.js), så att disken är
+  // likadan hela vägen.
+  function disk(a = 1060, z = W) {
+    const k = (x) => (x - VP[0]) / 300;
+    // höjden yb (mätt inne vid hörnet) på fronten, och en linje i skivan X
+    // bildpunkter till höger om flyktpunkten (kanten 300, väggen 380)
+    const fy = (x, yb) => r1(VP[1] + (yb - VP[1]) * k(x));
+    const sy = (x, X) => r1(VP[1] + 90 * (x - VP[0]) / X);
+    const pts = (list) => list.map(([x, y]) => `${r1(x)},${y}`).join(' ');
+    // ett band på fronten mellan höjderna y0 och y1, från x0 till x1
+    const band = (y0, y1, fill, x0 = a, x1 = z) =>
+      `<polygon points="${pts([[x0, fy(x0, y0)], [x1, fy(x1, y0)], [x1, fy(x1, y1)], [x0, fy(x0, y1)]])}" fill="${fill}"/>`;
+    // ett band i skivan mellan linjerna X0 och X1 (de börjar vid bakväggen)
+    const start = (X) => (a < VP[0] + X ? [VP[0] + X, 490] : [a, sy(a, X)]);
+    const strimma = (X0, X1, fill) => `<polygon points="${pts([start(X0), [z, sy(z, X0)], [z, sy(z, X1)], start(X1)])}" fill="${fill}"/>`;
+    // skivan, med en blank strimma från lysröret och fogarna mellan plankorna
+    const skiva = `<polygon points="${pts([...(a < 1140 ? [[a, 490], [1140, 490]] : [[a, sy(a, 380)]]), [z, sy(z, 380)], [z, fy(z, 490)], [a, fy(a, 490)]])}" fill="url(#rum-countertop)"/>` +
+      strimma(309, 330, 'rgba(255,226,180,.05)') + strimma(313, 322, 'rgba(255,226,180,.07)') +
+      [327, 346, 364].map((X) => `<polyline points="${pts([start(X), [z, sy(z, X)]])}" fill="none" stroke="#1c0c04" stroke-opacity=".22" stroke-width="1"/>`).join('') +
+      strimma(300, 303.5, 'rgba(255,214,160,.22)');
+    // kanten: ljus överst där den rundar av, mörk under
+    const kant = band(490, 491.8, '#a87650') + band(491.8, 496.5, '#653a21') + band(496.5, 501, '#341b0d');
+    // fronten: ramar (stiles) där djupet Z (bakväggen 1000) är lika långt
+    // isär, och fyllningarna mellan dem, lite inskjutna – mörka i skuggan
+    // överst och med en ljus kant där ramen till vänster vänder sig mot en
+    const xz = (Z) => VP[0] + 300000 / Z;
+    let fyll = '';
+    for (let i = 0; ; i++) {
+      const [x0, x1] = [xz(1000 - 128.57 * i - 7), xz(1000 - 128.57 * (i + 1) + 7)];
+      if (x0 > z) break;
+      if (x1 < a) continue;
+      fyll += band(522, 712, 'rgba(0,0,0,.2)', x0, x1) + band(522, 527, 'rgba(0,0,0,.28)', x0, x1) +
+        band(522, 712, 'rgba(232,184,128,.13)', x0, x0 + 2.4 * k(x0));
+    }
+    // fronten med fyllningarna, skuggan under kanten och överst skivan och kanten
+    return `<polygon points="${pts([[a, fy(a, 490)], [z, fy(z, 490)], [z, 1020], [a, 1020]])}" fill="url(#rum-counter)"/>${fyll}` +
+      band(501, 506, 'rgba(0,0,0,.42)') + band(506, 514, 'rgba(0,0,0,.16)') + skiva + kant;
   }
 
   // Bakgrunden: taket, väggarna (furupanelen och den nikotingula högra
@@ -230,14 +260,11 @@ window.Rum = (() => {
   <rect x="262" y="558" width="696" height="12" fill="#2c2c2e"/>
   <path d="M940 122 l18 0 l0 30 l-9 -6 l-4 10 l-5 -12 z" fill="#8e8064" opacity=".5"/>
 
-  <polygon points="1060,490 1140,490 1600,599 1600,652" fill="url(#rum-countertop)"/>
-  <polygon points="1060,490 1600,652 1600,1000 1060,1000" fill="url(#rum-counter)"/>
-  ${diskfront()}
-  <line x1="1060" y1="490" x2="1600" y2="652" stroke="#c9c2b2" stroke-opacity=".35" stroke-width="2"/>
-  <g stroke="#d9c7a1" stroke-opacity=".5" stroke-width="2.4" stroke-linecap="round">
-    <line x1="1092" y1="500" x2="1130" y2="511"/><line x1="1236" y1="543" x2="1250" y2="547"/><line x1="1318" y1="567" x2="1372" y2="583"/><line x1="1490" y1="619" x2="1512" y2="626"/>
+  ${disk()}
+  <g stroke="#d9a878" stroke-opacity=".35" stroke-width="1.6" stroke-linecap="round">
+    <line x1="1092" y1="500.5" x2="1130" y2="512"/><line x1="1236" y1="543.5" x2="1250" y2="547.5"/><line x1="1318" y1="568" x2="1372" y2="584"/><line x1="1490" y1="620" x2="1512" y2="627"/>
   </g>
-  <polygon points="1060,492 1600,654 1600,700 1060,540" fill="#000" opacity=".12"/>`, '', undefined, 2 / 3) +
+  <g fill="none" stroke="#e8c89a" stroke-opacity=".1" stroke-width="1.2"><ellipse cx="1112" cy="496" rx="8" ry="2.2"/><ellipse cx="1318" cy="557" rx="12" ry="3.4"/><ellipse cx="1339" cy="562" rx="11" ry="3.2"/></g>`, '', undefined, 2 / 3) +
       // Namnet i bladguld på glaset, spegelvänt inifrån som neonskylten, i
       // en egen SVG: Chrome lägger ut text i SVG på nytt i varje bildruta
       // medan rummet vrids, och då ritades hela väggen om varje gång.
@@ -360,8 +387,9 @@ window.Rum = (() => {
 
   // Tv:n i hörnet (rum-tv.js).
   const tv = () => (window.RumTv ? RumTv.html() : '');
-  // Videon på disken, och väggen, disken och pulten till höger om bilden (rum-video.js).
-  const vid = (part) => (window.RumVideo ? RumVideo.html(part) : '');
+  // Videon på disken, och väggen, disken och pulten till höger om bilden (rum-video.js,
+  // som ritar disken där med disk).
+  const vid = (part) => (window.RumVideo ? RumVideo.html(part, { disk }) : '');
 
   // Pingklockan på pulten, där guldordet annars står: till uppgörelsen ringer
   // man in gänget. Kupan i mässing speglar lysröret och lite av neonskylten.
