@@ -56,7 +56,8 @@
 // Väggen, disken och pulten fortsätter till höger om bilden (vagg och
 // pult), så att bilden inte tar slut när kameran går dit.
 //
-// RumVideo.html('horn' | 'vagg' | 'pult') → delarna (planen -598, -600 och -60 i rum.js)
+// RumVideo.html('horn' | 'vagg' | 'pult', { disk }) → delarna (planen -598, -600 och -60 i rum.js;
+// disk ritar bardisken i väggen)
 // RumVideo.mount(el, { calm, short, kort, aim, latt }) → { fill(matches, { rd, old }), skarp(on), spelare(), zoom(on) → hörnet i scenen, key(k), stop() }
 // (rd: omgången som gänget tippar, round() i rum.js; old: de färdigspelade kupongerna, Historik.coupons())
 // aim(f) flyttar kameran till f (med f.z som största förstoring) när man går närmare tv:n,
@@ -311,25 +312,16 @@ window.RumVideo = (() => {
 
   // ---------- väggen, disken och pulten till höger om bilden ----------
 
-  // Högra väggen och disken som de är ritade i rum.js (bg), förlängda åt
-  // höger: samma toner, fläckar och linjer. Ligger direkt efter bg() i
-  // planet -600, under det som hänger på väggen.
-  const wl = (x) => 490 + (x - 1140) * 109 / 460;
-  const re = (x) => 490 + (x - 1060) * 162 / 540;
-  // diskens kant och fogar (diskfront i rum.js): större ju längre ut
-  const kk = (x) => (x - 760) / 300;
-  function vaggSvg() {
+  // Högra väggen som den är ritad i rum.js (bg), förlängd åt höger: samma
+  // toner och fläckar, och bardisken med samma ritning (disk i rum.js, som
+  // skickas hit). Ligger direkt efter bg() i planet -600, under det som
+  // hänger på väggen.
+  function vaggSvg(disk) {
     const [a, z] = [1599.5, 2100];
     const r = `x="${a}" y="300" width="${z - a}" height="720"`;
     return `<svg class="vhs-vagg" viewBox="${a} 300 ${z - a} 720" aria-hidden="true">
     <rect ${r} fill="url(#rum-rwall)"/><rect ${r} filter="url(#rum-flack)" opacity=".55"/><rect ${r} fill="#000" opacity=".2"/>
-    <polygon points="${a},${wl(a)} ${z},${wl(z)} ${z},${re(z)} ${a},${re(a)}" fill="#5b564c"/>
-    <polygon points="${a},${re(a)} ${z},${re(z)} ${z},1020 ${a},1020" fill="#2a2019"/>
-    <polygon points="${a},${re(a)} ${z},${re(z)} ${z},${re(z) + 2 * kk(z)} ${a},${re(a) + 2 * kk(a)}" fill="#aaa69c"/>
-    <polygon points="${a},${re(a) + 2 * kk(a)} ${z},${re(z) + 2 * kk(z)} ${z},${re(z) + 4 * kk(z)} ${a},${re(a) + 4 * kk(a)}" fill="#403e3a"/>
-    <line x1="2072" y1="${re(2072) + 4 * kk(2072)}" x2="2072" y2="1020" stroke="#120c08" stroke-opacity=".55" stroke-width="${1.3 * kk(2072)}"/>
-    <line x1="${a}" y1="${re(a)}" x2="${z}" y2="${re(z)}" stroke="#c9c2b2" stroke-opacity=".35" stroke-width="2"/>
-    <polygon points="${a},${re(a) + 2} ${z},${re(z) + 2} ${z},${re(z) + 48} ${a},${re(a) + 48}" fill="#000" opacity=".12"/>
+    ${disk ? disk(a, z) : ''}
   </svg>`;
   }
   // Pulten (table i rum.js) förlängd åt höger, i planet -60.
@@ -347,8 +339,8 @@ window.RumVideo = (() => {
   const px = (v) => `${r2(v * S)}px`;
   const at = (r) => `left:${px(r.x)}; top:${px(r.y)}; width:${px(r.w)}; height:${px(r.h)}`;
 
-  function html(part) {
-    if (part === 'vagg') return vaggSvg();
+  function html(part, o = {}) {
+    if (part === 'vagg') return vaggSvg(o.disk);
     if (part === 'pult') return pultSvg();
     // knapparna, med tangenterna som gör samma sak nära (key i mount)
     const knappar = [['bak', '◀◀', 'Spola tillbaka', 'ArrowLeft'], ['spela', '▶', 'Spela', 'Space'], ['fram', '▶▶', 'Spola fram', 'ArrowRight'], ['stopp', '■', 'Stopp', 'S'], ['ut', '⏏', 'Mata ut']]
