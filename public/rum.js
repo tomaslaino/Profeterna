@@ -16,7 +16,7 @@
 //   kortregistret på disken lyfts fram (R): ett kort per lag och per möte
 //   (rum-register.js, lådan i three.js i rum-kortlada.js)
 //   uret, skårtavlan (Tipsligan), oraklet, pokalhyllan, korktavlan,
-//   affischerna på glaset (VM 94, IFK 1982 och veckans löpsedel,
+//   affischerna på glaset (VM 94, IFK 1982, Nacional 1988 och veckans löpsedel,
 //   rum-affischer.js) och Chelsea-löpsedeln på väggen, dörren (med vilka vi
 //   är under) och kvittot: kameran
 //   går fram till dem (närbilderna, sak)
@@ -45,7 +45,7 @@
 // om det var så långt kvar till spelstoppet, ?rum-tittar som om matcherna
 // pågick och ?rum-mal=dl:1,dt:-1,dj:0 som om det blev mål (rätt, fel, ingen
 // skillnad), ?rum-video videon nära och
-// ?rum-sak=ur|skar|ram|pokal|kork|vm94|ifk|lopsedel|chelsea|dorr|kvitto|kupong en närbild.
+// ?rum-sak=ur|skar|ram|pokal|kork|vm94|ifk|nacional|lopsedel|chelsea|dorr|kvitto|kupong en närbild.
 //
 // Läses efter kupong.js, samtal.js, tippare.js och kronan.js och använder
 // deras hjälpare (state, KP, TP, gradeRow, couponNumber, currentCoupon,
@@ -2506,7 +2506,7 @@ ${window.RumRegister ? RumRegister.nara() : ''}
   // ---------- närbilderna ----------
   //
   // Uret, skårtavlan, oraklet, pokalhyllan, korktavlan, affischerna på
-  // glaset (VM 94, IFK 1982 och löpsedeln), Chelsea-löpsedeln på väggen, dörren och kvittot (data-sak) – och kupongen på pulten när den inte går
+  // glaset (VM 94, IFK 1982, Nacional 1988 och löpsedeln), Chelsea-löpsedeln på väggen, dörren och kvittot (data-sak) – och kupongen på pulten när den inte går
   // att ta i handen: kameran ställer sig rakt framför och går fram tills
   // saken fyller det mesta av fönstret, och det som är ritat i 3D
   // (rum-inredning.js) ritas om skarpare. Under pokalhyllan står hur många
@@ -2530,6 +2530,8 @@ ${window.RumRegister ? RumRegister.nara() : ''}
     ifk: { el: '#rum-ifk', h: 0.86 },
     lopsedel: { el: '#rum-lopsedel', h: 0.86 },
     chelsea: { el: '#rum-chelsea', h: 0.86 },
+    // (en hel tidningssida: hög, så att rubriken och fotot blir stora)
+    nacional: { el: '#rum-nacional', h: 0.94 },
   };
   // Om oss, under dörren: samma ord som på sidan Om oss, i bladguld som namnet på glaset.
   const OM_OSS = '<span class="om"><b>Vi tippar engelsk fotboll tillsammans.</b>' +

@@ -502,8 +502,8 @@ Utan nyckel ingen knapp.
   riktig stryktipskupong, så att den går att fylla i; på bredden står orden bredvid kupongen
   i handen. Se [I telefonen](#i-telefonen).
 - **Närbilder i tobaksaffären (2026-10-24, användarens önskemål):** uret, skårtavlan med
-  Premier League, Omgångens orakel och VM 94-affischen (sedan 2026-11-03 också IFK-affischen
-  och löpsedeln) går att klicka på, och kameran går
+  Premier League, Omgångens orakel och VM 94-affischen (sedan 2026-11-03 också IFK-affischen,
+  Nacionals förstasida och löpsedeln) går att klicka på, och kameran går
   fram till dem i stället för att sidan byts direkt. Skårtavlan och oraklet leder sedan vidare
   till Tabeller och Olympen. Se [Närbilderna](#närbilderna).
 - **Säsongsprognosen tas bort (2026-10-20, användarens beslut):** vyn under Tabeller och
@@ -551,6 +551,10 @@ Utan nyckel ingen knapp.
   skyltfönstret, under oraklet, sitter The Sun on Sundays löpsedel från dagen efter Chelseas
   seger i Champions League 2021, med Tomas foto av laget med pokalen. Den sitter med två
   häftstift i furun och har gulnat. Se [Tobaksaffären](#tobaksaffären), *Affischerna*.
+- **Nacionals förstasida på glaset (2026-11-03, användarens önskemål):** till höger i
+  skyltfönstret sitter El Días förstasida dagen efter Nacionals seger i Intercontinental Cup
+  1988 (DL:s lag), med Tomas foto av laget med pokalerna. Se [Tobaksaffären](#tobaksaffären),
+  *Affischerna*.
 - **Fler affischer på glaset (2026-11-03, användarens önskemål):** bredvid VM 94-affischen
   sitter en affisch från IFK Göteborgs seger i UEFA-cupen 1982, och varje vecka en löpsedel
   med det mest dramatiska ur förra omgången eller inför nästa. IFK-affischen var först ritad
@@ -2275,7 +2279,20 @@ fritt från gängets huvuden, och VM 94-affischen till höger:
   (Dan Corneliusson, Torbjörn Nilsson, Stig Fredriksson på straff). Papperet har gulnat,
   legat vikt i fyra delar (vecken, `.veck`) och har en reva i underkanten.
 
-Uppe till höger i fönstret syns himlen (rum-ute.js), så där hänger inget.
+**Nacional 1988** (DL:s lag) sitter till höger i fönstret, till höger om gänget och ovanför
+löpsedelns högra plats. Himlen (rum-ute.js) syns ovanför den, och i telefonen på höjden syns
+den utan att man drar. Det är förstasidan i **El Día** (Montevideo) måndagen den 12 december
+1988, dagen efter finalen i Intercontinental Cup på Estadio Nacional i Tokyo: *¡NACIONAL
+CAMPEÓN DEL MUNDO!*, 2–2 mot PSV Eindhoven efter förlängning (Santiago Ostolaza två mål,
+Romário och Ronald Koeman) och 7–6 på straffar (Jorge Seré räddade fyra, Tony Gómez satte den
+sista), med fotot av laget med Intercontinental-pokalen och Toyota-pokalen som Tomas skickade
+(fotografen är okänd, så ingen rad står under närbilden). Tidningen är riktig, som Tomas
+ville, men namnet är skrivet som text (inte tidningens logga) och sidan är vår; det som står
+om finalen stämmer, och det källorna inte är överens om (minuten för Koemans mål, vilka i PSV
+som missade sina straffar) står inte med, liksom årgång, nummer och pris. Sidan
+(`public/rum/nacional88.jpg`, 900 × 1332) är tryckt i raster, gulnad, fläckig och vikt i fyra
+delar redan i bilden; rummet lägger bara solens blekning ovanpå, inte affischernas
+prickraster, som blir grovt i närbilden. Närbilden tar 94 % av höjden.
 
 **Chelsea 2021** (DT:s lag) sitter inte på glaset utan på furupanelen till höger om
 fönstret, under oraklets skylt och till vänster om bardisken, alltid på samma ställe: en
@@ -3449,7 +3466,7 @@ en fast bild.
 ### Närbilderna
 
 Uret, skårtavlan, Omgångens orakel, pokalhyllan, korktavlan, affischerna på glaset (VM 94,
-IFK 1982 och löpsedeln) och Chelsea-löpsedeln på väggen, namnet på dörren
+IFK 1982, Nacional 1988 och löpsedeln) och Chelsea-löpsedeln på väggen, namnet på dörren
 och kvittot tittar man på nära med ett klick (`sak` i rum.js, `data-sak` på föremålen), och
 kupongen på pulten när den inte går att ta i handen: kameran ställer sig rakt framför och går fram tills
 saken fyller det mesta av fönstret – högst 90 % av bredden och 74–94 % av höjden mellan
@@ -3470,7 +3487,7 @@ en länk till fotot på Wikimedia Commons. Esc eller ett klick (också på saken
 och K, T, A, R och V går direkt till kupongen, tv:n, anslagstavlan, kortregistret och videon
 (K nära kupongen på pulten går tillbaka). Föremålen lyser inte när man
 pekar på dem på nära håll. Med `prefers-reduced-motion` går kameran direkt.
-`?rum-sak=ur|skar|ram|pokal|kork|vm94|ifk|lopsedel|chelsea|dorr|kvitto|kupong` visar en närbild i en fast bild.
+`?rum-sak=ur|skar|ram|pokal|kork|vm94|ifk|nacional|lopsedel|chelsea|dorr|kvitto|kupong` visar en närbild i en fast bild (med `?rum-t`).
 
 ## Statusmärkning
 

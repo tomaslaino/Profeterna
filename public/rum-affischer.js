@@ -6,6 +6,8 @@
 //   IFK Göteborg 1982 Göteborgs-Postens löpsedel dagen efter segern i
 //                     UEFA-cupen, med fotot från Volksparkstadion (fotot fick vi
 //                     av Tomas; fotografen är okänd), vikt och sliten
+//   Nacional 1988     El Días förstasida dagen efter världsmästartiteln i Tokyo
+//                     (DL:s lag), med fotot med pokalerna, gulnad och vikt
 //   löpsedeln         veckans rubrik ur förra omgången eller nästa, se nedan
 //   Chelsea 2021      The Sun on Sundays löpsedel från dagen efter finalen i
 //                     Champions League (Porto, 29 maj 2021), uppnålad på
@@ -14,8 +16,9 @@
 // De två första sitter alltid i vänstra rutan av skyltfönstret, under
 // neonskyltens list (så att VM 94 och BRONS syns): GP:s löpsedel till vänster,
 // där den höga sedeln går fritt från gängets huvuden, och VM 94 till höger.
-// Uppe till höger syns himlen (rum-ute.js), så där
-// hänger inget. Löpsedeln sitter i ett av fönstrets nedre hörn, där gänget
+// Nacional sitter till höger i fönstret, till höger om gänget och under
+// himlen (rum-ute.js), som syns ovanför den; där syns den också i telefonen
+// på höjden. Löpsedeln sitter i ett av fönstrets nedre hörn, där gänget
 // inte skymmer den, och byter hörn varje vecka – i telefonen på höjden alltid
 // det högra, som syns utan att man drar (dörren och vänstra hörnet ligger
 // utanför bilden där, och dörren i ett smalt fönster också på datorn).
@@ -55,6 +58,8 @@ const q = new URLSearchParams(location.search);
 // löpsedeln i fönstrets nedre hörn, till vänster eller till höger.
 const FAST = [{ x: 286, y: 220 }, { x: 474, y: 220 }];
 const LOPPLATS = [{ x: 286, y: 404, rot: 1.4 }, { x: 836, y: 404, rot: -1.6 }];
+// Nacional i fönstrets högra kant, ovanför löpsedelns högra plats (glaset slutar vid 948)
+const NACPLATS = { x: 838, y: 228 };
 // på höjden (telefonen) syns bara mitten och högra delen av fönstret från början
 const smal = () => innerWidth / innerHeight < 1.2;
 // Chelsea-löpsedeln på väggen mellan fönsterkarmen (x 958; fönsterbänkens
@@ -169,6 +174,33 @@ function chelsea() {
     `<span class="under">${esc(CHELSEA.under)}</span><span class="veck"></span><span class="tryck"></span></span>` +
     '<span class="hund"></span><i class="nal a"></i><i class="nal b"></i>';
   passa(el, CHELSEA);
+  return el;
+}
+
+// ---------- Nacional 1988 ----------
+//
+// Förstasidan i El Día (Montevideo) måndagen den 12 december 1988, dagen efter
+// finalen i Intercontinental Cup på Estadio Nacional i Tokyo: Nacional–PSV
+// Eindhoven 2–2 efter förlängning (Ostolaza 2; Romário, Koeman) och 7–6 på
+// straffar (Seré räddade fyra, Tony Gómez satte den sista). En riktig tidning,
+// som Tomas ville; namnet är skrivet som text, inte tidningens logga, och sidan
+// är vår. Rubriken ¡NACIONAL CAMPEÓN DEL MUNDO! och fotot med
+// Intercontinental-pokalen och Toyota-pokalen, som Tomas skickade (fotografen
+// är okänd). Sidan (rum/nacional88.jpg) är tryckt i raster, har gulnat och
+// legat vikt i fyra delar redan i bilden.
+
+const NACIONAL = 'El Días förstasida den 12 december 1988: Nacional världsmästare efter finalen mot PSV Eindhoven i Tokyo den 11 december, 2–2 efter förlängning (Ostolaza 2; Romário, Koeman) och 7–6 på straffar.';
+
+function nacional() {
+  const el = document.createElement('button');
+  el.type = 'button';
+  el.className = 'rum-aff rum-nac rum-sak';
+  el.id = 'rum-nacional';
+  el.dataset.sak = 'nacional';
+  el.title = NACIONAL;
+  el.setAttribute('aria-label', `Tidningssida: ¡Nacional campeón del mundo! ${NACIONAL}`);
+  el.innerHTML = '<span class="ark"><img src="rum/nacional88.jpg" alt="" draggable="false"><span class="tryck"></span></span>' +
+    '<span class="hund"></span><i class="tejp a"></i><i class="tejp b"></i>';
   return el;
 }
 
@@ -433,7 +465,8 @@ export function affischer(back, { short = (x) => x, namn = null } = {}) {
   const f = ifk();
   const l = lopsedel();
   const c = chelsea();
-  back.append(v, f, l, c);
+  const n = nacional();
+  back.append(v, f, n, l, c);
   let ritad = null;
   let fonter = false;
   let senast = { rows: null, old: null };
@@ -449,6 +482,9 @@ export function affischer(back, { short = (x) => x, namn = null } = {}) {
         el.style.top = `${Math.round(p.y + (hash(s + 63) - 0.5) * 10)}px`;
         slit(el, w, s);
       }
+      n.style.left = `${Math.round(NACPLATS.x + (hash(seed + 64) - 0.5) * 6)}px`;
+      n.style.top = `${Math.round(NACPLATS.y + (hash(seed + 65) - 0.5) * 8)}px`;
+      slit(n, w, seed + 41);
       slit(l, w, seed + 5, { lop: true });
       slit(c, w, seed + 29, { nal: true });
     },
