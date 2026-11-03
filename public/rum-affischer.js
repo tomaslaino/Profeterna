@@ -3,14 +3,15 @@
 //
 //   VM 94-affischen   ett foto från landslagets hemkomst den 18 juli 1994
 //                     (Sniper Zeta, CC BY-SA 4.0, Wikimedia Commons)
-//   IFK Göteborg 1982 en plansch från segern i UEFA-cupen: laget med pokalen på
-//                     Volksparkstadion i Hamburg den 19 maj 1982 (fotot fick vi
+//   IFK Göteborg 1982 Göteborgs-Postens löpsedel dagen efter segern i
+//                     UEFA-cupen, med fotot från Volksparkstadion (fotot fick vi
 //                     av Tomas; fotografen är okänd), vikt och sliten
 //   löpsedeln         veckans rubrik ur förra omgången eller nästa, se nedan
 //
 // De två första sitter alltid i vänstra rutan av skyltfönstret, under
-// neonskyltens list (så att VM 94 och BRONS syns); vilken som sitter till
-// vänster skiftar med dagen. Uppe till höger syns himlen (rum-ute.js), så där
+// neonskyltens list (så att VM 94 och BRONS syns): GP:s löpsedel till vänster,
+// där den höga sedeln går fritt från gängets huvuden, och VM 94 till höger.
+// Uppe till höger syns himlen (rum-ute.js), så där
 // hänger inget. Löpsedeln sitter i ett av fönstrets nedre hörn, där gänget
 // inte skymmer den, och byter hörn varje vecka – i telefonen på höjden alltid
 // det högra, som syns utan att man drar (dörren och vänstra hörnet ligger
@@ -73,17 +74,20 @@ function vm94() {
   return el;
 }
 
-// ---------- IFK Göteborg 1982 ----------
+// ---------- IFK Göteborg 1982: Göteborgs-Postens löpsedel ----------
 //
-// En plansch som såldes veckan efter finalen, lika stor som VM 94-affischen:
-// UEFA-CUPEN 82 och GULD i ett blått band, fotot från Volksparkstadion med
-// pokalen i luften (rum/ifk82.jpg) och laget och resultatet under. Finalerna:
-// IFK–Hamburger SV 1–0 på Ullevi den 5 maj (Tord Holmgren) och HSV–IFK 0–3 i
-// Hamburg den 19 maj (Dan Corneliusson, Torbjörn Nilsson, Stig Fredriksson på
-// straff). Den har legat vikt i fyra delar (vecken) och har en reva i
-// underkanten.
+// Löpsedeln från Göteborgs-Posten morgonen efter finalen, torsdag 20 maj 1982,
+// som någon har sparat sedan dess (Tomas önskemål): tidningens namn på ett
+// blått band, datumet, UEFA-CUPEN, IFK BÄST I EUROPA! i två rader så stora som
+// ryms (som veckans löpsedel nedan), fotot från Volksparkstadion med pokalen
+// i luften (rum/ifk82.jpg, som Tomas skickade; svartvitt som i tidningen) och
+// en rad under. Finalerna: IFK–Hamburger SV 1–0 på Ullevi onsdag 5 maj (Tord
+// Holmgren) och HSV–IFK 0–3 i Hamburg onsdag 19 maj (Dan Corneliusson,
+// Torbjörn Nilsson, Stig Fredriksson på straff). Papperet har gulnat, legat
+// vikt i fyra delar (vecken) och har en reva i underkanten.
 
-const IFK = 'IFK Göteborg med UEFA-cupen på Volksparkstadion i Hamburg den 19 maj 1982: 3–0 mot Hamburger SV (Corneliusson, T. Nilsson, Fredriksson på straff) efter 1–0 på Ullevi (Tord Holmgren).';
+const IFK = 'Göteborgs-Posten torsdag 20 maj 1982: IFK bäst i Europa! 3–0 mot Hamburger SV på Volksparkstadion i Hamburg (Corneliusson, T. Nilsson, Fredriksson på straff) efter 1–0 på Ullevi (Tord Holmgren).';
+const GP = { rad: [['IFK BÄST'], ['I EUROPA!', 1]], bred: 80, hog: 40, max: 26 };
 
 function ifk() {
   const el = document.createElement('button');
@@ -92,13 +96,25 @@ function ifk() {
   el.id = 'rum-ifk';
   el.dataset.sak = 'ifk';
   el.title = IFK;
-  el.setAttribute('aria-label', `Affisch: UEFA-cupen 82, guld. ${IFK}`);
-  el.innerHTML = '<span class="ark"><span class="band"><b>UEFA-CUPEN 82</b><b class="guld">GULD</b></span>' +
+  el.setAttribute('aria-label', `Löpsedel: ${IFK}`);
+  el.innerHTML = '<span class="ark"><span class="huvud">Göteborgs-Posten</span>' +
+    '<span class="datum">TORSDAG 20 MAJ 1982</span><span class="kick">UEFA-CUPEN</span>' +
+    `<span class="rub">${GP.rad.map(([t, rod]) => `<b${rod ? ' class="rod"' : ''}>${esc(t)}</b>`).join('')}</span>` +
     '<span class="foto"><img src="rum/ifk82.jpg" alt="" draggable="false"></span>' +
-    '<span class="rad"><b>IFK GÖTEBORG</b><b>HSV – IFK 0–3</b></span>' +
+    '<span class="under">3–0 i Hamburg – pokalen hem till Göteborg</span>' +
     '<span class="veck"></span><span class="tryck"></span></span>' +
     '<span class="hund"></span><i class="tejp a"></i><i class="tejp b"></i>';
+  passa(el, GP);
   return el;
+}
+
+// Rubrikens rader så stora som ryms i bredden, och alla mindre om de inte
+// ryms på höjden (bredd mäter med en duk, se löpsedeln nedan).
+function passa(el, { rad, bred, hog, max }) {
+  let px = rad.map(([t]) => Math.min(max, bred / Math.max(0.3, bredd(String(t).toUpperCase()))));
+  const h = px.reduce((a, x) => a + x * 0.94, 0) + (rad.length - 1) * 1.5;
+  if (h > hog) px = px.map((x) => x * (hog / h));
+  el.querySelectorAll('.rub b').forEach((b, i) => { b.style.fontSize = `${px[i].toFixed(1)}px`; });
 }
 
 // ---------- löpsedeln: rubrikerna ----------
@@ -302,7 +318,7 @@ export function rubrik({ rows, old, short = (x) => x, namn = null, now = Date.no
 // Rubrikens rader i Anton, var och en så stor som ryms i bredden, och alla
 // mindre om de inte ryms på höjden (mätt med en duk, så att inget behöver
 // läggas ut i rummet först).
-const BRED = 90;
+const BRED = 88;
 const HOG = 82;
 const MAX = 34;
 let duk = null;
@@ -323,16 +339,14 @@ function lopsedel() {
 
 function rita(el, r) {
   const rad = r.rad.map(([t, rod]) => ({ t: String(t).toUpperCase(), rod: Boolean(rod) }));
-  let px = rad.map((x) => Math.min(MAX, BRED / Math.max(0.3, bredd(x.t))));
-  const hojd = px.reduce((a, x) => a + x * 0.94, 0) + (rad.length - 1) * 1.5;
-  if (hojd > HOG) px = px.map((x) => x * (HOG / hojd));
   el.title = `${rad.map((x) => x.t).join(' ')} – ${r.under}`;
   el.setAttribute('aria-label', `Löpsedel: ${el.title}`);
   el.innerHTML = `<span class="ark"><span class="huvud"><b>KVÄLLSPRESSEN</b><small>${esc(r.datum)}</small></span>` +
     `<span class="kick">${esc(r.kick)}</span>` +
-    `<span class="rub">${rad.map((x, i) => `<b${x.rod ? ' class="rod"' : ''} style="font-size:${px[i].toFixed(1)}px">${esc(x.t)}</b>`).join('')}</span>` +
+    `<span class="rub">${rad.map((x) => `<b${x.rod ? ' class="rod"' : ''}>${esc(x.t)}</b>`).join('')}</span>` +
     `<span class="under">${esc(r.under)}</span><span class="tryck"></span></span>` +
     '<span class="hund"></span><i class="tejp a"></i><i class="tejp b"></i>';
+  passa(el, { rad: r.rad, bred: BRED, hog: HOG, max: MAX });
 }
 
 // ---------- slitaget och platserna ----------
@@ -367,13 +381,12 @@ export function affischer(back, { short = (x) => x, namn = null } = {}) {
   let senast = { rows: null, old: null };
   // Anton måste vara inläst innan raderna mäts: då mäts de om
   if (document.fonts && document.fonts.load) {
-    const klar = () => { fonter = true; api.data(senast.rows, senast.old); };
+    const klar = () => { fonter = true; passa(f, GP); api.data(senast.rows, senast.old); };
     document.fonts.load('400 30px Anton').then(klar, klar);
   }
   const api = {
     slit(w, seed) {
-      const vansterVm = hash(seed + 61) < 0.5;
-      for (const [el, p, s] of [[v, FAST[vansterVm ? 0 : 1], seed], [f, FAST[vansterVm ? 1 : 0], seed + 17]]) {
+      for (const [el, p, s] of [[f, FAST[0], seed + 17], [v, FAST[1], seed]]) {
         el.style.left = `${Math.round(p.x + (hash(s + 62) - 0.5) * 12)}px`;
         el.style.top = `${Math.round(p.y + (hash(s + 63) - 0.5) * 10)}px`;
         slit(el, w, s);

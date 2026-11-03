@@ -550,8 +550,8 @@ Utan nyckel ingen knapp.
 - **Fler affischer på glaset (2026-11-03, användarens önskemål):** bredvid VM 94-affischen
   sitter en affisch från IFK Göteborgs seger i UEFA-cupen 1982, och varje vecka en löpsedel
   med det mest dramatiska ur förra omgången eller inför nästa. IFK-affischen var först ritad
-  (pokalen i SVG); samma dag fick den Tomas foto från segern i Hamburg och blev en vikt,
-  sliten plansch lika stor som VM 94-affischen. Se [Tobaksaffären](#tobaksaffären),
+  (pokalen i SVG), blev samma dag en plansch med Tomas foto från segern i Hamburg och till
+  sist Göteborgs-Postens löpsedel dagen efter, med fotot. Se [Tobaksaffären](#tobaksaffären),
   *Affischerna*.
 - **Kuponghistoriken flyttar till Olympen (2026-10-20, användarens önskemål):** Kupong
   handlar bara om nästa kupong – växlaren Omgången | Historik försvinner. De färdigspelade
@@ -2226,7 +2226,8 @@ LÖSSNUS.
 
 **Affischerna** är tejpade på insidan av glaset ([public/rum-affischer.js](public/rum-affischer.js),
 rum-affischer.css; rum-saker.js sätter upp dem). Två sitter alltid i vänstra rutan av
-skyltfönstret, under neonskyltens list, och byter sida med dagen:
+skyltfönstret, under neonskyltens list – Göteborgs-Postens löpsedel till vänster, där den går
+fritt från gängets huvuden, och VM 94-affischen till höger:
 
 - **VM 94-affischen:** ett riktigt foto från landslagets hemkomst (Henrik Larsson och Pontus
   Kåmark med bronsmedaljerna, Norr Mälarstrand 18 juli 1994; foto Sniper Zeta,
@@ -2234,16 +2235,17 @@ skyltfönstret, under neonskyltens list, och byter sida med dagen:
   [Wikimedia Commons](https://commons.wikimedia.org/wiki/File:Football_players_Pontus_K%C3%A5mark_Henrik_Larsson,_July_18,_1994.jpg)),
   beskuret i `public/rum/vm94.jpg` och med fotografen i affischens title och under den i
   närbilden (se [Närbilderna](#närbilderna)), med *VM 94* och *BRONS* i det gula bandet.
-- **IFK Göteborg 1982** (DJ:s lag): en plansch från veckan efter segern, lika stor som VM
-  94-affischen – *UEFA-CUPEN 82* och *GULD* i ett blått band, fotot från Volksparkstadion med
-  laget och pokalen i luften under skylten STADION HAMBURG (`public/rum/ifk82.jpg`, beskuret
-  ur ett foto som Tomas skickade; fotografen och licensen är okända, så ingen rad står under
-  närbilden) och *IFK GÖTEBORG* och *HSV – IFK 0–3* under. Titeln har båda finalerna: 1–0 på
-  Ullevi den 5 maj (Tord Holmgren) och 3–0 i Hamburg den 19 maj (Dan Corneliusson, Torbjörn
-  Nilsson, Stig Fredriksson på straff). Planschen är äldre än VM 94 och slitnare: fotot har
-  gulnat mer, bandet har en gul ton ovanpå (ett CSS-filter på text ritas suddigt i
-  närbilden), den har legat vikt i fyra delar (vecken, `.veck`) och har en reva i
-  underkanten.
+- **IFK Göteborg 1982** (DJ:s lag): Göteborgs-Postens löpsedel morgonen efter segern i
+  UEFA-cupen, torsdag 20 maj 1982, som någon har sparat (Tomas önskemål: en löpsedel, inte en
+  plansch, och från GP eftersom det är IFK). Tidningens namn på ett blått band, datumet,
+  *UEFA-CUPEN*, *IFK BÄST I EUROPA!* i två rader så stora som ryms (samma mätning som veckans
+  löpsedel, `passa`), fotot från Volksparkstadion med laget och pokalen i luften under
+  skylten STADION HAMBURG – svartvitt i rastret, som i tidningen – och *3–0 i Hamburg –
+  pokalen hem till Göteborg*. Fotot (`public/rum/ifk82.jpg`) är beskuret ur ett som Tomas
+  skickade; fotografen och licensen är okända, så ingen rad står under närbilden. Titeln har
+  båda finalerna: 1–0 på Ullevi onsdag 5 maj (Tord Holmgren) och 3–0 i Hamburg onsdag 19 maj
+  (Dan Corneliusson, Torbjörn Nilsson, Stig Fredriksson på straff). Papperet har gulnat,
+  legat vikt i fyra delar (vecken, `.veck`) och har en reva i underkanten.
 
 Uppe till höger i fönstret syns himlen (rum-ute.js), så där hänger inget.
 
@@ -2295,8 +2297,8 @@ på pulten står i en av fyra uppställningar (`LAYOUTS` – fläkten längst ba
 mitten eller bakom kvittot och då vänd åt höger, askkoppen och dosan om vartannat, några
 pixlar hit eller dit), kvittot ligger någonstans till vänster om dem, vridet åt det ena eller
 andra hållet och mer eller mindre uppböjt (det första av elva lägen som går fritt från
-askkoppen, dosan och fläkten), locket och prisen läggs där det finns plats, och VM 94- och
-IFK-affischen byter sida under neonskylten. Slitaget följer tippningen: andelen fel
+askkoppen, dosan och fläkten), locket och prisen läggs där det finns plats, och affischerna
+flyttar sig några pixlar. Slitaget följer tippningen: andelen fel
 bland omgångens avgjorda matcher, annars i den senaste färdigspelade kupongen, och utan
 rättning ett mellanläge. Går det dåligt fylls askkoppen (1–11 fimpar), askan hamnar
 bredvid, snuset spills, fläkten (om den står där) går på trean, affischerna bleks och ett hörn

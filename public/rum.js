@@ -2443,7 +2443,7 @@ ${window.RumRegister ? RumRegister.nara() : ''}
     dorr: { el: '#rum-dorrnamn', mal: '#rum-dorrglas', h: 0.92, fot: () => OM_OSS },
     kvitto: { el: '#rum-kvitto', h: 0.9, pult: true },
     kupong: { el: '#rum-kupong', h: 0.94, pult: true },
-    ifk: { el: '#rum-ifk', h: 0.74 },
+    ifk: { el: '#rum-ifk', h: 0.86 },
     lopsedel: { el: '#rum-lopsedel', h: 0.86 },
   };
   // Om oss, under dörren: samma ord som på sidan Om oss, i bladguld som namnet på glaset.
