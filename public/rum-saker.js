@@ -6,7 +6,8 @@
 // askkoppen. Kvittot är termopapper som har legat i rulle: änden med
 // huvudet har böjt sig upp och den rivna änden lyfter lite. På insidan av
 // skyltfönstret sitter affischerna – VM 94, IFK Göteborg 1982 och veckans
-// löpsedel – som rum-affischer.js ritar och den här filen sätter upp.
+// löpsedel – och på väggen bredvid löpsedeln från Chelseas seger i Champions
+// League 2021, som rum-affischer.js ritar och den här filen sätter upp.
 //
 // Slitaget skiftar från dag till dag och följer tippningen: går det dåligt
 // (fler fel bland omgångens avgjorda matcher, annars i den senaste
@@ -105,7 +106,7 @@ export async function saker(el, opt = {}) {
   const planes = [...el.querySelectorAll('.rum-world > .rum-pl')];
   const back = planes[0];
   const pult = planes.find((p) => /translateZ\(-60px\)/.test(p.style.transform));
-  // affischerna på glaset (rum-affischer.js)
+  // affischerna på glaset och väggen (rum-affischer.js)
   const aff = back ? affischer(back, { short: opt.short, namn: opt.namn }) : null;
 
   // Fläkten står där bara när det känns som VARMT grader eller mer i Stockholm,

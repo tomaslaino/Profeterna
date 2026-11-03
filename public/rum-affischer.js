@@ -1,21 +1,30 @@
-// Affischerna på glaset i tobaksaffären (rum-saker.js lägger upp dem i
-// bakväggens plan, rum.js går fram till dem):
+// Affischerna i tobaksaffären (rum-saker.js lägger upp dem i bakväggens
+// plan, rum.js går fram till dem):
 //
 //   VM 94-affischen   ett foto från landslagets hemkomst den 18 juli 1994
 //                     (Sniper Zeta, CC BY-SA 4.0, Wikimedia Commons)
-//   IFK Göteborg 1982 en plansch från segern i UEFA-cupen: laget med pokalen på
-//                     Volksparkstadion i Hamburg den 19 maj 1982 (fotot fick vi
+//   IFK Göteborg 1982 Göteborgs-Postens löpsedel dagen efter segern i
+//                     UEFA-cupen, med fotot från Volksparkstadion (fotot fick vi
 //                     av Tomas; fotografen är okänd), vikt och sliten
 //   löpsedeln         veckans rubrik ur förra omgången eller nästa, se nedan
+//   Chelsea 2021      The Sun on Sundays löpsedel från dagen efter finalen i
+//                     Champions League (Porto, 29 maj 2021), uppnålad på
+//                     furupanelen, se nedan
 //
 // De två första sitter alltid i vänstra rutan av skyltfönstret, under
-// neonskyltens list (så att VM 94 och BRONS syns); vilken som sitter till
-// vänster skiftar med dagen. Uppe till höger syns himlen (rum-ute.js), så där
-// hänger inget. Löpsedeln byter plats med veckan: på dörrens glas under
-// handtaget eller i ett av fönstrets nedre hörn, där gänget inte skymmer den.
+// neonskyltens list (så att VM 94 och BRONS syns): GP:s löpsedel till vänster,
+// där den höga sedeln går fritt från gängets huvuden, och VM 94 till höger.
+// Uppe till höger syns himlen (rum-ute.js), så där
+// hänger inget. Löpsedeln sitter i ett av fönstrets nedre hörn, där gänget
+// inte skymmer den, och byter hörn varje vecka – i telefonen på höjden alltid
+// det högra, som syns utan att man drar (dörren och vänstra hörnet ligger
+// utanför bilden där, och dörren i ett smalt fönster också på datorn).
 // Slitaget följer tippningen som sakerna på pulten (rum-saker.js): går det
 // dåligt bleks affischerna och ett hörn släpper; går det riktigt illa hänger de
 // i en tejpbit. Löpsedeln är veckans och blir bara lite böjd.
+// Chelsea-löpsedeln (The Sun on Sunday) sitter inte på glaset utan på väggen till höger om
+// fönstret, under oraklet och till vänster om bardisken, med två häftstift i
+// furun: den sitter alltid där, släpper inte och är gulnad av fem års rök.
 //
 // Löpsedeln (rubrik): kvällstidningen KVÄLLSPRESSEN (inget riktigt märke)
 // skriver om det mest dramatiska som har hänt eller ska hända – i förra
@@ -43,10 +52,15 @@ const DAG = 86400000;
 const q = new URLSearchParams(location.search);
 
 // Platserna (scenens px, övre vänstra hörnet). Affischerna i vänstra rutan;
-// löpsedeln under dörrens handtag (y 420–436; lite mindre, så att
-// kupongstället inte skymmer den) eller i fönstrets nedre hörn.
+// löpsedeln i fönstrets nedre hörn, till vänster eller till höger.
 const FAST = [{ x: 286, y: 220 }, { x: 474, y: 220 }];
-const LOPPLATS = [{ x: 93, y: 445, rot: -1.2, skala: 0.85 }, { x: 286, y: 404, rot: 1.4 }, { x: 836, y: 404, rot: -1.6 }];
+const LOPPLATS = [{ x: 286, y: 404, rot: 1.4 }, { x: 836, y: 404, rot: -1.6 }];
+// på höjden (telefonen) syns bara mitten och högra delen av fönstret från början
+const smal = () => innerWidth / innerHeight < 1.2;
+// Chelsea-löpsedeln på väggen mellan fönsterkarmen (x 958; fönsterbänkens
+// ände når x 984 i y 554–596) och bardisken (x 1060), under oraklets skylt
+// (y 483).
+const CHELSEA_PLATS = { x: 979, y: 491, rot: 0.9 };
 
 // ---------- VM 94 ----------
 
@@ -70,17 +84,20 @@ function vm94() {
   return el;
 }
 
-// ---------- IFK Göteborg 1982 ----------
+// ---------- IFK Göteborg 1982: Göteborgs-Postens löpsedel ----------
 //
-// En plansch som såldes veckan efter finalen, lika stor som VM 94-affischen:
-// UEFA-CUPEN 82 och GULD i ett blått band, fotot från Volksparkstadion med
-// pokalen i luften (rum/ifk82.jpg) och laget och resultatet under. Finalerna:
-// IFK–Hamburger SV 1–0 på Ullevi den 5 maj (Tord Holmgren) och HSV–IFK 0–3 i
-// Hamburg den 19 maj (Dan Corneliusson, Torbjörn Nilsson, Stig Fredriksson på
-// straff). Den har legat vikt i fyra delar (vecken) och har en reva i
-// underkanten.
+// Löpsedeln från Göteborgs-Posten morgonen efter finalen, torsdag 20 maj 1982,
+// som någon har sparat sedan dess (Tomas önskemål): tidningens namn på ett
+// blått band, datumet, UEFA-CUPEN, IFK BÄST I EUROPA! i två rader så stora som
+// ryms (som veckans löpsedel nedan), fotot från Volksparkstadion med pokalen
+// i luften (rum/ifk82.jpg, som Tomas skickade; svartvitt som i tidningen) och
+// en rad under. Finalerna: IFK–Hamburger SV 1–0 på Ullevi onsdag 5 maj (Tord
+// Holmgren) och HSV–IFK 0–3 i Hamburg onsdag 19 maj (Dan Corneliusson,
+// Torbjörn Nilsson, Stig Fredriksson på straff). Papperet har gulnat, legat
+// vikt i fyra delar (vecken) och har en reva i underkanten.
 
-const IFK = 'IFK Göteborg med UEFA-cupen på Volksparkstadion i Hamburg den 19 maj 1982: 3–0 mot Hamburger SV (Corneliusson, T. Nilsson, Fredriksson på straff) efter 1–0 på Ullevi (Tord Holmgren).';
+const IFK = 'Göteborgs-Posten torsdag 20 maj 1982: IFK bäst i Europa! 3–0 mot Hamburger SV på Volksparkstadion i Hamburg (Corneliusson, T. Nilsson, Fredriksson på straff) efter 1–0 på Ullevi (Tord Holmgren).';
+const GP = { rad: [['IFK BÄST'], ['I EUROPA!', 1]], bred: 80, hog: 40, max: 26 };
 
 function ifk() {
   const el = document.createElement('button');
@@ -89,12 +106,69 @@ function ifk() {
   el.id = 'rum-ifk';
   el.dataset.sak = 'ifk';
   el.title = IFK;
-  el.setAttribute('aria-label', `Affisch: UEFA-cupen 82, guld. ${IFK}`);
-  el.innerHTML = '<span class="ark"><span class="band"><b>UEFA-CUPEN 82</b><b class="guld">GULD</b></span>' +
+  el.setAttribute('aria-label', `Löpsedel: ${IFK}`);
+  el.innerHTML = '<span class="ark"><span class="huvud">Göteborgs-Posten</span>' +
+    '<span class="datum">TORSDAG 20 MAJ 1982</span><span class="kick">UEFA-CUPEN</span>' +
+    `<span class="rub">${GP.rad.map(([t, rod]) => `<b${rod ? ' class="rod"' : ''}>${esc(t)}</b>`).join('')}</span>` +
     '<span class="foto"><img src="rum/ifk82.jpg" alt="" draggable="false"></span>' +
-    '<span class="rad"><b>IFK GÖTEBORG</b><b>HSV – IFK 0–3</b></span>' +
+    '<span class="under">3–0 i Hamburg – pokalen hem till Göteborg</span>' +
     '<span class="veck"></span><span class="tryck"></span></span>' +
     '<span class="hund"></span><i class="tejp a"></i><i class="tejp b"></i>';
+  passa(el, GP);
+  return el;
+}
+
+// Rubrikens rader så stora som ryms i bredden, och alla mindre om de inte
+// ryms på höjden (bredd mäter med en duk, se löpsedeln nedan).
+function passa(el, { rad, bred, hog, max }) {
+  let px = rad.map(([t]) => Math.min(max, bred / Math.max(0.3, bredd(String(t).toUpperCase()))));
+  const h = px.reduce((a, x) => a + x * 0.94, 0) + (rad.length - 1) * 1.5;
+  if (h > hog) px = px.map((x) => x * (hog / h));
+  el.querySelectorAll('.rub b').forEach((b, i) => { b.style.fontSize = `${px[i].toFixed(1)}px`; });
+}
+
+// ---------- Chelsea 2021 ----------
+//
+// En brittisk löpsedel (news bill) från söndagen den 30 maj 2021, från The Sun
+// on Sunday – en riktig tidning, som Tomas ville; namnet är skrivet som text i
+// det röda bandet, inte tidningens logga, och rubriken är vår, inte
+// tidningens. Chelsea vann finalen i Champions League mot Manchester City med
+// 1–0 på Estádio do Dragão i Porto lördagen den 29 maj (Kai Havertz, 42:a
+// minuten) – klubbens andra seger efter 2012 och Thomas Tuchels första
+// säsong. Fotot är laget med pokalen under WINNERS-bågen (rum/chelsea21.jpg,
+// beskuret ur ett foto som Tomas skickade; fotografen är okänd). Den har
+// legat vikt på mitten på vägen hem och har gulnat.
+
+const CHELSEA = {
+  datum: ['SUNDAY', 'MAY 30, 2021'],
+  kick: 'CHAMPIONS LEAGUE FINAL',
+  rad: [['CHELSEA'], ['KINGS OF EUROPE!', 1]],
+  bred: 70,
+  hog: 40,
+  max: 30,
+  under: 'Havertz strike sinks Man City 1-0 in\u00a0Porto',
+  title: 'The Sun on Sundays löpsedel den 30 maj 2021: Chelsea vann Champions League – 1–0 mot Manchester City i finalen i Porto lördagen den 29 maj (Kai Havertz). Kaptenen César Azpilicueta lyfter pokalen.',
+};
+
+function chelsea() {
+  const el = document.createElement('button');
+  el.type = 'button';
+  el.className = 'rum-aff rum-chelsea rum-sak';
+  el.id = 'rum-chelsea';
+  el.dataset.sak = 'chelsea';
+  el.title = CHELSEA.title;
+  el.setAttribute('aria-label', `Löpsedel: CHELSEA KINGS OF EUROPE! ${CHELSEA.title}`);
+  el.style.left = `${CHELSEA_PLATS.x}px`;
+  el.style.top = `${CHELSEA_PLATS.y}px`;
+  el.style.setProperty('--vrid', `${CHELSEA_PLATS.rot}deg`);
+  el.innerHTML = '<span class="ark"><span class="huvud"><b class="sun"><i>The</i>Sun</b><em>on Sunday</em>' +
+    `<small>${CHELSEA.datum.join('<br>')}</small></span>` +
+    `<span class="kick">${esc(CHELSEA.kick)}</span>` +
+    `<span class="rub">${CHELSEA.rad.map(([t, rod]) => `<b${rod ? ' class="rod"' : ''}>${esc(t)}</b>`).join('')}</span>` +
+    '<span class="foto"><img src="rum/chelsea21.jpg" alt="" draggable="false"></span>' +
+    `<span class="under">${esc(CHELSEA.under)}</span><span class="veck"></span><span class="tryck"></span></span>` +
+    '<span class="hund"></span><i class="nal a"></i><i class="nal b"></i>';
+  passa(el, CHELSEA);
   return el;
 }
 
@@ -299,7 +373,7 @@ export function rubrik({ rows, old, short = (x) => x, namn = null, now = Date.no
 // Rubrikens rader i Anton, var och en så stor som ryms i bredden, och alla
 // mindre om de inte ryms på höjden (mätt med en duk, så att inget behöver
 // läggas ut i rummet först).
-const BRED = 90;
+const BRED = 88;
 const HOG = 82;
 const MAX = 34;
 let duk = null;
@@ -320,31 +394,31 @@ function lopsedel() {
 
 function rita(el, r) {
   const rad = r.rad.map(([t, rod]) => ({ t: String(t).toUpperCase(), rod: Boolean(rod) }));
-  let px = rad.map((x) => Math.min(MAX, BRED / Math.max(0.3, bredd(x.t))));
-  const hojd = px.reduce((a, x) => a + x * 0.94, 0) + (rad.length - 1) * 1.5;
-  if (hojd > HOG) px = px.map((x) => x * (HOG / hojd));
   el.title = `${rad.map((x) => x.t).join(' ')} – ${r.under}`;
   el.setAttribute('aria-label', `Löpsedel: ${el.title}`);
   el.innerHTML = `<span class="ark"><span class="huvud"><b>KVÄLLSPRESSEN</b><small>${esc(r.datum)}</small></span>` +
     `<span class="kick">${esc(r.kick)}</span>` +
-    `<span class="rub">${rad.map((x, i) => `<b${x.rod ? ' class="rod"' : ''} style="font-size:${px[i].toFixed(1)}px">${esc(x.t)}</b>`).join('')}</span>` +
+    `<span class="rub">${rad.map((x) => `<b${x.rod ? ' class="rod"' : ''}>${esc(x.t)}</b>`).join('')}</span>` +
     `<span class="under">${esc(r.under)}</span><span class="tryck"></span></span>` +
     '<span class="hund"></span><i class="tejp a"></i><i class="tejp b"></i>';
+  passa(el, { rad: r.rad, bred: BRED, hog: HOG, max: MAX });
 }
 
 // ---------- slitaget och platserna ----------
 
 // w: slitaget (0 = nyss städat, 1 = det har gått åt skogen), seed: dagen.
-function slit(el, w, seed, { lop = false } = {}) {
-  const loose = !lop && w > 0.85;
+// nal: uppnålad på väggen (Chelsea-löpsedeln) – släpper inte och hänger
+// nästan rakt, men har redan gulnat.
+function slit(el, w, seed, { lop = false, nal = false } = {}) {
+  const loose = !lop && !nal && w > 0.85;
   el.classList.toggle('slappt', loose);
-  // (löpsedeln vrids dessutom efter platsen, --vrid)
-  const rot = loose ? 6.5 : lop ? (hash(seed + 1.7) - 0.5) * 0.6 + w * 0.8 : (hash(seed + 1.7) - 0.5) * 1.6 + w * 2.4;
+  // (löpsedlarna vrids dessutom efter platsen, --vrid)
+  const rot = loose ? 6.5 : lop || nal ? (hash(seed + 1.7) - 0.5) * 0.6 + w * 0.8 : (hash(seed + 1.7) - 0.5) * 1.6 + w * 2.4;
   el.style.setProperty('--rot', `${rot.toFixed(2)}deg`);
-  el.style.setProperty('--curl', `${Math.round((lop ? 0.3 : 1) * sm(0.45, 0.95, w) * 26)}px`);
-  el.style.setProperty('--sep', ((lop ? 0.05 : 0.15) + (lop ? 0.15 : 0.35) * w).toFixed(2));
-  el.style.setProperty('--sat', (1 - (lop ? 0.15 : 0.4) * w).toFixed(2));
-  el.style.setProperty('--blek', ((lop ? 0.04 : 0.1) + (lop ? 0.12 : 0.3) * w).toFixed(2));
+  el.style.setProperty('--curl', `${Math.round((lop ? 0.3 : nal ? 0.45 : 1) * sm(0.45, 0.95, w) * 26)}px`);
+  el.style.setProperty('--sep', ((lop ? 0.05 : nal ? 0.22 : 0.15) + (lop ? 0.15 : nal ? 0.2 : 0.35) * w).toFixed(2));
+  el.style.setProperty('--sat', (1 - (lop ? 0.15 : nal ? 0.25 : 0.4) * w).toFixed(2));
+  el.style.setProperty('--blek', ((lop ? 0.04 : 0.1) + (lop ? 0.12 : nal ? 0.18 : 0.3) * w).toFixed(2));
 }
 
 export function affischer(back, { short = (x) => x, namn = null } = {}) {
@@ -358,35 +432,35 @@ export function affischer(back, { short = (x) => x, namn = null } = {}) {
   const v = vm94();
   const f = ifk();
   const l = lopsedel();
-  back.append(v, f, l);
+  const c = chelsea();
+  back.append(v, f, l, c);
   let ritad = null;
   let fonter = false;
   let senast = { rows: null, old: null };
   // Anton måste vara inläst innan raderna mäts: då mäts de om
   if (document.fonts && document.fonts.load) {
-    const klar = () => { fonter = true; api.data(senast.rows, senast.old); };
+    const klar = () => { fonter = true; passa(f, GP); passa(c, CHELSEA); api.data(senast.rows, senast.old); };
     document.fonts.load('400 30px Anton').then(klar, klar);
   }
   const api = {
     slit(w, seed) {
-      const vansterVm = hash(seed + 61) < 0.5;
-      for (const [el, p, s] of [[v, FAST[vansterVm ? 0 : 1], seed], [f, FAST[vansterVm ? 1 : 0], seed + 17]]) {
+      for (const [el, p, s] of [[f, FAST[0], seed + 17], [v, FAST[1], seed]]) {
         el.style.left = `${Math.round(p.x + (hash(s + 62) - 0.5) * 12)}px`;
         el.style.top = `${Math.round(p.y + (hash(s + 63) - 0.5) * 10)}px`;
         slit(el, w, s);
       }
       slit(l, w, seed + 5, { lop: true });
+      slit(c, w, seed + 29, { nal: true });
     },
     // rubriken räknas om när datan ändras (rum-saker.js frågar bara då)
     data(rows, old) {
       senast = { rows, old };
       const fro = veckaFro();
-      // en ny plats varje vecka, i en ordning som inte går runt (0 1 2 1 2 0 2 0 1 …)
-      const p = LOPPLATS[(((fro + Math.floor(fro / 3)) % 3) + 3) % 3];
+      // varannan vecka till vänster, varannan till höger; på höjden alltid till höger
+      const p = smal() ? LOPPLATS[1] : LOPPLATS[((fro % 2) + 2) % 2];
       l.style.left = `${Math.round(p.x + (hash(fro + 3) - 0.5) * 10)}px`;
       l.style.top = `${Math.round(p.y + (hash(fro + 4) - 0.5) * 8)}px`;
       l.style.setProperty('--vrid', `${(p.rot + (hash(fro + 5) - 0.5) * 1.2).toFixed(2)}deg`);
-      l.style.setProperty('--skala', p.skala || 1);
       let r;
       try {
         r = rubrik({ rows, old, short, fro });

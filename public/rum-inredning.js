@@ -29,7 +29,8 @@
 // På natten är lysröret släckt (natt, från rum-folk.js): rören och
 // reflektorn mörka, och banderollen mörknar.
 //
-// inredning(el, { calm, still }) → { draw(), namn(html), skarp(namn, px), natt(på), stopp(ms) } (namnet som Kronan.names, ms spelstoppet eller null)
+// inredning(el, { calm, still, vagg }) → { draw(), namn(html), skarp(namn, px), natt(på), stopp(ms) } (namnet som Kronan.names, ms spelstoppet eller null;
+// vagg: tavlornas mått på högra väggen, VAGG i rum.js)
 
 const DEG = Math.PI / 180;
 const WZ = -26;
@@ -50,7 +51,7 @@ const BITAR = {
   neon: { plan: 0, box: { x: 290, y: 104, w: 300, h: 130 } },
   ur: { plan: 0, box: { x: 992, y: 94, w: 130, h: 142 }, i: '.rum-ur', at: { x: UR.x - 54, y: UR.y - 54 } },
   ram: { plan: 0, box: { x: 968, y: 280, w: 164, h: 232 }, i: '.rum-ram', at: RAM },
-  hogra: { plan: 0, box: { x: 1130, y: 0, w: 470, h: 520 } },
+  hogra: { plan: 0, box: { x: 1130, y: 0, w: 470, h: 580 } },
   stall: { plan: 3, box: { x: 30, y: 470, w: 260, h: 250 } },
 };
 // närbilden: högst så många bildpunkter på dukens längsta led
@@ -978,7 +979,8 @@ export async function inredning(el, opt = {}) {
   }
 
   // Cigarettpaketen på två hyllor uppe vid taket: påhittade färger, inga
-  // märken, i rader om tre till sju.
+  // märken, i rader om tre till sju. Hyllorna börjar bakom tv:n, så att
+  // inga stumpar sticker fram mellan den och hörnet.
   function paket(b) {
     const cols = ['#c8643a', '#2a52a0', '#e7e1d2', '#3db37c', '#d8b06a', '#8b2e2a', '#1f6f6a', '#f0d699', '#5a5f8a'];
     const front = cols.map((c, i) => tex(64, 96, (g, w, h) => {
@@ -1006,8 +1008,8 @@ export async function inredning(el, opt = {}) {
     let s = 23;
     const R0 = () => { s = (s * 1664525 + 1013904223) >>> 0; return s / 4294967296; };
     for (const yb of [175, 225]) {
-      hylla(b, yb, -10, 640, 30);
-      let z = 2;
+      hylla(b, yb, 100, 640, 30);
+      let z = 112;
       while (z < 630) {
         const ci = (R0() * cols.length) | 0;
         const n = 3 + ((R0() * 5) | 0);
@@ -1163,7 +1165,7 @@ export async function inredning(el, opt = {}) {
   const skylt = ram(B.ram);
   backWall(B.ram);
   paket(B.hogra);
-  wallRing(B.hogra, 1330, 1478, 376, 434, 5, mat('#e2e0d8', { metalness: 0.75, roughness: 0.3, envMapIntensity: 1.4 }));
+  wallRing(B.hogra, ...opt.vagg.skar, 5, mat('#e2e0d8', { metalness: 0.75, roughness: 0.3, envMapIntensity: 1.4 }));
   const ved = tex(256, 256, (c, w, h) => {
     c.fillStyle = '#6a4a28';
     c.fillRect(0, 0, w, h);
@@ -1177,7 +1179,7 @@ export async function inredning(el, opt = {}) {
       c.stroke();
     }
   });
-  wallRing(B.hogra, 1496, 1700, 330, 478, 5, mat('#fff', { map: ved, roughness: 0.55 }));
+  wallRing(B.hogra, ...opt.vagg.kork, 5, mat('#fff', { map: ved, roughness: 0.55 }));
   rightWall(B.hogra);
   stall(B.stall);
 

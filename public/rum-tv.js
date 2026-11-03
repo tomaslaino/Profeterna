@@ -3,7 +3,7 @@
 // mest mot pulten. Lådan är byggd i CSS 3D (rum-tv.css) i samma värld som
 // resten av rummet, så att högersidan och hyllan under syns och följer
 // musen, och bakom den sticker bildrörets kåpa ut. Armen går till en platta
-// på väggen, och sladden hänger från den ner till uttaget. På taket står
+// på väggen, och sladden hänger i en kort båge till uttaget under den. På taket står
 // kaninöronen, det ena med en bit folie för bättre bild. Till höger om rutan
 // sitter panelen: den gröna displayen med sidnumret, knappsatsen (1–9, ▼ 0
 // ▲), högtalargallret och strömbrytaren. När man går fram till tv:n (T)
