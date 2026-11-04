@@ -3,6 +3,8 @@
    utanför scenen i fönstrets hörn. Lagren ligger på olika djup och vrids med
    musen (setCam i rum.js sätter transform på .rum-world). */
 @import url("https://fonts.googleapis.com/css2?family=VT323&family=Anton&family=Alfa+Slab+One&display=swap");
+/* handstilarna för gängets namn på kupongen (.sm-namn) */
+@import url("https://fonts.googleapis.com/css2?family=Cedarville+Cursive&family=Mr+Dafoe&family=Reenie+Beanie&display=swap");
 
 html.i-rummet { overflow: hidden; scrollbar-gutter: auto; }
 html.i-rummet .topbar,
@@ -33,6 +35,8 @@ html.rum-vantar body > footer { visibility: hidden; animation: rum-vantar 0s 5s 
 }
 /* medan fingret drar i Chrome (pan i rum.js) */
 .rum.chromium .rum-stage.drar { transition: opacity 0.42s ease-in, transform 0.05s linear; }
+/* när rummet glider fram till den man tryckte på (visa i rum.js) */
+.rum-stage.glider { transition: opacity 0.42s ease-in, transform 0.5s cubic-bezier(0.3, 0, 0.2, 1); }
 
 /* kameran: förstoringen när man går fram till något (2D, efter perspektivet);
    aim i rum.js sätter transformen direkt, inte som variabler */
@@ -405,16 +409,18 @@ a.rum-sak, a.rum-sak:hover { color: inherit; text-decoration: none; }
 .rum-kup .hd > span:nth-child(n+3) { text-align: center; font-family: var(--display); font-size: 13px; font-weight: 600; letter-spacing: 0; }
 .rum-kup .hd .m { display: flex; align-items: center; justify-content: space-between; gap: 10px; min-width: 0; }
 .rum-kup .hd .sm-q { font-size: 10px; white-space: nowrap; }
-.rum-kup .sm-folk-pp { gap: 10px; }
-.rum-kup .sm-who, .rum-kup .sm-who.du { gap: 4px; padding: 2px; }
-.rum-kup .sm-who .sm-fc { --fc: 18px; }
-.rum-kup .sm-who .sm-fw > .sm-ok { right: -4px; bottom: -4px; width: 11px; height: 11px; padding: 2px; stroke-width: 3; box-shadow: 0 0 0 1.5px var(--pp-paper); }
-.rum-kup .sm-du-ring { inset: -6px; width: calc(100% + 12px); height: calc(100% + 12px); }
-.rum-kup .sm-du-ring path { vector-effect: none; stroke-width: 3.6; }
-.rum-kup .sm-pie { width: 12px; height: 12px; stroke: var(--pp-ink-soft); }
-.rum-kup .sm-pie.inne { stroke: var(--pp-ok); }
-.rum-kup .sm-dots { gap: 2px; }
-.rum-kup .sm-dots i { width: 3px; height: 3px; background: var(--pp-ink-soft); }
+/* namnet, skrivet för hand i personens bläck och handstil. Alla tre står där
+   för att inget ska flytta sig, men bara det egna syns: alla på gängets kupong
+   (.alla), och i handen när man väljer (.val), då de andra är bleka knappar */
+.rum-kup .sm-namnen { display: grid; grid-template-columns: repeat(3, auto); justify-content: end; align-content: end; align-items: end; column-gap: 10px; height: 0; margin-left: auto; letter-spacing: 0; text-transform: none; }
+.rum-kup .sm-namn { display: block; visibility: hidden; margin: 0; padding: 0; border: 0; background: none; color: var(--ink); line-height: 1; white-space: nowrap; -webkit-text-stroke: 0.3px currentColor; transform: translateY(10px) rotate(-3deg); transform-origin: 0 100%; }
+.rum-kup .sm-namn.sm-k0 { font: 400 24px/1 "Cedarville Cursive", "Caveat", cursive; }
+.rum-kup .sm-namn.sm-k1 { font: 400 30px/1 "Mr Dafoe", "Caveat", cursive; }
+.rum-kup .sm-namn.sm-k2 { font: 400 38px/1 "Reenie Beanie", "Caveat", cursive; }
+.rum-kup .sm-namn.du, .rum-kup .sm-namnen.alla .sm-namn, .rum-kup .sm-namnen.val .sm-namn { visibility: visible; }
+.rum-kup .sm-namnen.val .sm-namn:not(.du) { opacity: 0.45; }
+.rum-kup button.sm-namn { cursor: pointer; }
+.rum-kup button.sm-namn:hover, .rum-kup button.sm-namn:focus-visible { opacity: 1; outline: none; }
 .rum-kup .row { height: 22px; box-sizing: border-box; border-bottom: 1px solid var(--pp-line); white-space: nowrap; }
 /* synkmarkeringen i vänsterkanten, en per rad (kupongen är närmaste
    positionerade förälder, så att rutorna mäts mot den i rum.js) */
@@ -527,7 +533,7 @@ a.rum-sak, a.rum-sak:hover { color: inherit; text-decoration: none; }
 /* startade matcher står kvar som de var (som .sm-locked på papperet) */
 /* (pennan för kommentaren i efterhand är kvar som den är) */
 .rum-handen .row.locked :is(.pp-tm, .pp-small, .mot, .box) { opacity: 0.55; }
-.rum-handen.need-vem button[data-vem] .sm-fc { box-shadow: 0 0 0 2px #cf2a20, 0 0 0 3.5px var(--pp-box); }
+.rum-handen.need-vem button.sm-namn { opacity: 1; color: #cf2a20; }
 .rum-dimma {
   position: absolute;
   left: -400px;

@@ -1770,11 +1770,11 @@
       return true;
     },
     // Det som står överst på papperet, till kupongen på pulten: stämpeln
-    // (vem omgången väntar på) och porträtten med bock, tårtbit eller
-    // prickar, ditt inringat. vem: porträtten för dem du kan vara är knappar
-    // (data-vem), som Vem är du? på papperet. ring: vems porträtt som är
-    // inringat, om det är någon annans kupong. → {stamp, faces, vem: du har
-    // inte sagt vem du är}, eller null utan omgång.
+    // (vem omgången väntar på) och namnen, skrivna för hand. Bara det egna
+    // syns (du); vem: namnen för dem du kan vara är knappar (data-vem), som
+    // Vem är du? på papperet. ring: vems namnet är, om det är någon annans
+    // kupong. → {stamp, namn, vem: du har inte sagt vem du är}, eller null
+    // utan omgång.
     top(vem = false, ring = null) {
       const s = SM.data;
       if (!s) return null;
@@ -1782,10 +1782,14 @@
       const choose = (g) => vem && !submitted(s, v) && !g.inne;
       return {
         stamp: stamp(s),
-        faces: s.gang.map((g) => topFace(s, g, {
-          ring,
-          attrs: choose(g) ? ` type="button" aria-pressed="${g.id === v}" data-vem="${esc(g.id)}" aria-label="${esc(g.namn || g.id)}"` : '',
-        })).join(''),
+        namn: s.gang.map((g) => {
+          const du = g.id === (ring || v);
+          const text = esc(String(g.namn || g.id).trim().split(/\s+/).pop());
+          const cls = `sm-namn sm-k${pnum(g.id)}${du ? ' du' : ''}`;
+          return choose(g)
+            ? `<button type="button" class="${cls}" aria-pressed="${du}" data-vem="${esc(g.id)}" aria-label="${esc(g.namn || g.id)}">${text}</button>`
+            : `<span class="${cls}" title="${esc(g.namn || g.id)}">${text}</span>`;
+        }).join(''),
         vem: !v,
       };
     },

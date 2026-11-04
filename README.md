@@ -539,6 +539,12 @@ Utan nyckel ingen knapp.
   död – med påhitt som händerna i nacken, skålar över bordet, naglarna, hakan i handen,
   armarna i kors och pannan i bordet, och tre sätt att reagera på ett mål. Se *Gängets humör
   följer kupongen* under [Tobaksaffären](#tobaksaffären).
+- **Namnet i skrivstil på kupongen, och gänget gör tecken (2026-11-04, användarens önskemål):**
+  ett klick på någon i gänget skriver hens namn för hand på kupongen på pulten, i hens egen
+  handstil och bläck, i stället för porträtten, och hen gör ett tecken mot en: hang loose,
+  tummen upp, peace, pistolfingrar, rock, honnör, knogarna, kockens kyss eller vinkning, ett
+  nytt varje gång. Det ersätter att bara den egna figuren väljer. Se
+  [Tobaksaffären](#tobaksaffären), *Klicka på någon i gänget*.
 - **Man väljer sig själv med ett klick på sin figur (2026-11-03, användarens önskemål):**
   ett klick på sin egen figur vid bordet gör en till den som fyller i kupongen – samma val
   som porträtten på kupongen – och figuren räcker upp handen med pennan, lyfter kupongen mot
@@ -1960,16 +1966,16 @@ Enter och mellanslag klickar på dem. En match på text-tv:n öppnar matchrutan 
   handen går kameran fram till den på pulten (också med K och guldordet); kvittot → närbild.
   Kupongen är samma kupong som papperet under Kupong, i
   kupongens mått (660 × 470): bandet, under det stämpeln (vem omgången väntar på) och
-  spelstoppet, porträtten med bock, tårtbit eller prickar och 1 X 2 överst, en rad per
+  spelstoppet, namnet för hand och 1 X 2 överst, en rad per
   match i kupongens ordning med synkmarkeringen i kanten och dag, tid och serie efter lagen
   (dagens rubrik får inte plats), och i foten fälten *Tippat*, *Garderingar*,
   *Kombinationer* (eller *Pris*) och *Odds* och streckkoden med omgångens id (`Samtal.pult.top`
   och `fields`, `Papper.code`). Efter tiden står motiveringen för hand med blyerts, och
   utfallet ringas in (grönt när kupongen hade det, annars rött, streckat medan matchen
-  pågår). På pulten ligger ditt utkast med dina kryss och motiveringar och ditt porträtt
-  inringat; har du lämnat in ligger din i högen bredvid och på pulten en ny – och när du
-  ser de andras tips ligger gängets kupong där, med gängets kryss med kulspetspenna och
-  allas porträtt i rutorna (uppgörelsen). Kvittot visar när var och en lämnade in. Allt man
+  pågår). På pulten ligger ditt utkast med dina kryss och motiveringar och ditt namn;
+  har du lämnat in ligger din i högen bredvid och på pulten en ny – och när du
+  ser de andras tips ligger gängets kupong där, med gängets kryss med kulspetspenna,
+  allas porträtt i rutorna och allas namn överst (uppgörelsen). Kvittot visar när var och en lämnade in. Allt man
   gör med kupongen tas i handen, utan att man lämnar rummet (se
   [Kupongen i handen](#kupongen-i-handen)). Guldordet bredvid säger vad som väntar: *Fyll i
   resten* när du har börjat kryssa, *Följ kupongen* när matcherna har börjat och annars
@@ -2187,19 +2193,37 @@ och nickar, och tittar kvar tills man slutar peka. I telefonen gör ett tryck p�
 samma sak en stund. Den som väntar på kupongen tittar bara, och ett klick på en figur går
 inte vidare till det som står bakom.
 
-**Klicka på din figur** (`valj` i rum-folk.js, `vald` i rum-3d.js): ett klick eller tryck
-på din egen figur gör dig till den som fyller i kupongen – samma val som porträtten på
-kupongen (`Samtal.pult.vem`), så det går medan du kan fylla i den och figuren inte har
-lämnat in. Har du inte sagt vem du är blir du den du klickar på; har du det väljer bara din
-egen figur, och ett klick på någon annan är ett hej som förut (att byta gör man med
-porträtten på kupongen, så att ens utkast aldrig följer med till någon annan av misstag).
-Figuren visar det: den studsar till, räcker upp handen med pennan och viftar med den, lyfter
-kupongen mot en och sprattlar med benen medan de andra vänder sig mot hen, och efter två
-sekunder lutar den sig över kupongen och skriver ivrigt, rad för rad med pennan lyft mellan
-raderna, innan den efter knappt sex sekunder är tillbaka i väntan. Ett klick till medan det
-pågår gör ingenting. Kupongen på pulten, stämpeln och guldordet ritas om efter vem du är
-(`Rum.redraw`), och när du har sagt vem du är – här eller med porträtten – kopplar sidan upp
-sig mot profeterna-rummet på nytt, så att de andra ser vad du pekar på (`vemKoll`).
+**Klicka på någon i gänget** (`valj` i rum-folk.js, `tecken` och `vald` i rum-3d.js,
+[public/rum-tecken.js](public/rum-tecken.js)): ett klick eller tryck på en figur ger två saker.
+
+Hen gör ett tecken mot en, ett nytt varje gång och inte samma två gånger i rad: först hang
+loose och tummen upp, sedan peace, pistolfingrar, rock, honnör, knogarna, kockens kyss och
+vinkning i en ordning som blandas om varje varv (`nasta`, gemensamt för gänget). Tecknet står
+i betraktarens axlar, så att det ser likadant ut var figuren än sitter och syns framifrån
+fast figuren är vänd mot bordet. Vantarna har inga fingrar, så handen byts mot en med riktiga
+fingrar (`fingerHand`: fyra fingrar i två leder och tummen, 1 740 trianglar av gängets
+256 000) när armen är på väg upp, och den är lite större än de andra, som på en leksaksfigur,
+för att tecknet ska synas i rummet. Den byggs först när den behövs och ritas bara medan
+tecknet pågår, drygt två sekunder. Medan man väntar är det handen med pennan, och pennan går
+bakom örat så länge; annars är det den lediga handen, och DJ:s cigarett ligger på bordet så
+länge. Ett klick till medan det pågår byter tecken utan hopp. Figuren tittar på en,
+påhitten vilar, och flaskan eller burken skålar som förut när man pekar. Den som sover
+vaknar inte, men tummen kommer upp. Med minskad rörelse står tecknet som en bild en stund.
+I telefonen glider rummet så att den man tryckte på hamnar mitt i bild om hen stod långt ut
+(`visa` i rum.js), annars kunde handen hamna utanför.
+
+Går kupongen att fylla i och figuren inte har lämnat in blir du också hen – samma val som
+namnen på kupongen (`Samtal.pult.vem`), och utkastet följer med. Pennan på pulten skriver
+namnet på kupongen på pulten (`Rum.skriv`, `skrivNamn` i rum.js), i personens bläck och egen
+handstil: Laino i Cedarville Cursive, Teijder i Mr Dafoe och Johansson i Reenie Beanie. Det
+ersätter porträtten överst på kupongen här i rummet; på papperet under Kupong är de kvar.
+Stämpeln och guldordet ritas om efter vem du är. Den som valdes lyfter kupongen mot en och
+sprattlar med benen medan de andra vänder sig mot hen, och efter två sekunder lutar hen sig
+över kupongen och skriver ivrigt, rad för rad, innan hen efter knappt sex sekunder är
+tillbaka i väntan. Sidan kopplar upp sig mot profeterna-rummet på nytt, så att de andra ser
+vad du pekar på (`vemKoll`). Du byter genom att klicka på någon annan; förut valde bara den
+egna figuren, men nu är det klicket man byter med. Har du lämnat in, eller har hen gjort det,
+blir det bara ett tecken.
 
 **Natten** (`natt` i rum-3d.js och rum-inredning.js, `.natt` i
 [public/rum-folk.css](public/rum-folk.css)): mellan midnatt och sex, Stockholms tid, är
@@ -3016,11 +3040,11 @@ foten, mellan fälten och streckkoden. Samma kupong som på pulten, men rutorna 
 ur (två eller tre tecken = gardering), och pennan går dit, drar det ena strecket, lyfter
 och drar det andra – ett kryss med blyerts som ser likadant ut varje gång (samma
 slumpfrö för matchen och tecknet). Står pennan still en stund lägger den sig vid sidan
-igen. Ett kryss som tas bort suddas ut. Vem man är väljer man bland porträtten överst, som
-på papperet (*Vem är du?*; den som redan har lämnat in går inte att välja): pennan ringar in
-ditt porträtt, och stämpeln säger vem omgången väntar på med dig först. Det går också
-med ett klick på din figur vid bordet (se *Klicka på din figur* ovan). Fälten i foten
-räknas om för varje kryss.
+igen. Ett kryss som tas bort suddas ut. Ditt namn står för hand överst. Har du inte sagt vem du
+är står *Vem är du?* och de tre namnen blekt (den som redan har lämnat in går inte att
+välja), och ett klick på ditt namn visar de andra: pennan skriver det du väljer, och stämpeln
+säger vem omgången väntar på med dig först. Det går också med ett klick på någon vid bordet
+(se *Klicka på någon i gänget* ovan). Fälten i foten räknas om för varje kryss.
 
 **Motiveringen** skrivs för hand efter tiden, som på papperet: när en match är tippad står
 en liten penna där, och ett klick var som helst efter tiden och man skriver på samma rad
@@ -3037,7 +3061,7 @@ har lämnat in), och till höger *Spara* och guldordet *Lämna in*. *Spara* spar
 som inte är färdig utan att lämna in – de andra ser tårtbiten vid ditt porträtt – och blir
 *Sparad* (med en bock, släckt) tills något ändras. *Ta bort* frågar i samma ruta som på
 papperet; sedan faller kupongen ur handen, och på pulten ligger nästa omgångs matcher. Utan
-namn står *Vem är du?* och porträtten får en röd ring; saknas tecken blir rutorna i de
+namn står *Vem är du?* och namnen blir röda; saknas tecken blir rutorna i de
 matcherna röda och raden säger hur många, som på papperet under Kupong. Annars lämnas
 tipsen in med samma kod (`Samtal.pult` och `handIn`, `POST …/samtal {gor: "tips"}`),
 stämpeln *Inlämnad* slår i och kupongen vänds och läggs överst i högen; på pulten ligger

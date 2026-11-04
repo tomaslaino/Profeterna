@@ -31,10 +31,15 @@
 // hen, oftare ju närmare det är, och den sista timmen vänder de sig mot hen
 // samtidigt – då tittar hen upp från kupongen.
 //
-// Den som klickar på sin figur blir den som fyller i kupongen (vald,
-// rum-folk.js): figuren studsar till, räcker upp handen med pennan, lyfter
-// kupongen mot en och sprattlar med benen medan de andra tittar på hen, och
-// lutar sig sedan över kupongen och skriver ivrigt, rad för rad.
+// Den man klickar på blir den som fyller i kupongen (vald, rum-folk.js):
+// figuren studsar till, lyfter kupongen mot en och sprattlar med benen medan
+// de andra tittar på hen, och lutar sig sedan över kupongen och skriver ivrigt,
+// rad för rad. (Handen med pennan räcks upp där tecknet inte tar den, ?rum-vald.)
+//
+// Klickar man på någon i gänget gör hen ett tecken mot en (tecken,
+// rum-tecken.js): hang loose, tummen upp, peace och så vidare, ett nytt varje
+// gång, med en hand med riktiga fingrar. Den som sover vaknar inte, men tummen
+// kommer upp.
 //
 // När matcherna pågår vänder de sig mot tv:n (och tittar bort ibland). Vid
 // ett mål reagerar var och en efter sitt eget tips: den som fick rätt lyfter
@@ -67,7 +72,7 @@
 // figurer(canvas, { calm, vader, detalj }) → { draw(t, mx, my, neon), inne(vem, t), ute(vader),
 // lage({ tv, nag }, t), mal({ dl: 1, dt: -1, dj: 0 }, t, sätt), spel({ lage, rank }, t),
 // prova(vem, påhitt, at), pekar(vem, [x, y, z] | null, t),
-// hej(vem, t, ut), vald(vem, t), natt(på, t), efter({ lage, krona }), under(nx, ny), huvud(vem) }: neon säger om
+// hej(vem, t, ut), vald(vem, t), tecken(vem, t, namn), natt(på, t), efter({ lage, krona }), under(nx, ny), huvud(vem) }: neon säger om
 // neonskylten lyser (false när den glappar), ute klär om gänget
 // efter vädret (dress) och sätter ljuset från fönstret, lage säger om
 // matcherna pågår (tv) och hur nära spelstoppet är (nag 0–1), mal ett mål
@@ -76,7 +81,8 @@
 // påhitt om och om igen för bilder (utan påhitt som vanligt),
 // pekar punkten i rummet som vem pekar på (världens koordinater, null = inget),
 // hej att man pekar på vem (ut = när man slutade, Infinity = pekar fortfarande),
-// vald att vem just valdes som den som fyller i kupongen,
+// vald att vem just valdes som den som fyller i kupongen, tecken att man
+// klickade på vem (namn: vilket tecken, annars nästa),
 // natt om lysröret är släckt, efter dagen efter (lage 'bra' | 'illa' | null,
 // krona = oraklen, 'dl' …), under vem i gänget som syns i punkten
 // och kval({ pr, skugga, detalj }) hur fint gänget ritas (KVAL i rum.js; detalj
@@ -88,6 +94,7 @@ import { RoomEnvironment } from 'three/addons/environments/RoomEnvironment.js';
 import { RoundedBoxGeometry } from 'three/addons/geometries/RoundedBoxGeometry.js';
 import { ol } from './rum-fika.js';
 import { festen, drakt, festklader } from './rum-fest.js';
+import { TECKEN, LOS, blanda, nasta as nastaTecken } from './rum-tecken.js';
 
 const DEG = Math.PI / 180;
 const D = 1400;
@@ -1114,6 +1121,44 @@ export async function figurer(canvas, opt = {}) {
     return g;
   }
 
+  // Handen med fingrar, till tecknen (rum-tecken.js): samma axlar som vila
+  // (fingrarna längs +y, handflatan mot −z, handleden i origo), med tummen åt s.
+  // Byggs första gången den behövs. Fyra fingrar i två leder och tummen; leden
+  // är grupper som tecknet vrider (fingrar).
+  function fingerHand(q, skin, parent, s) {
+    const g = new THREE.Group();
+    parent.add(g);
+    const led = (par, x, y, z, len, rad) => {
+      const j = new THREE.Group();
+      j.position.set(x, y, z);
+      par.add(j);
+      mesh(new THREE.CapsuleGeometry(rad, len, seg(4, 2), seg(14, 8)), skin, j).position.y = len / 2;
+      return j;
+    };
+    const flata = mesh(new RoundedBoxGeometry(q * 2.2, q * 2.05, q * 1.12, seg(4, 2), q * 0.46), skin, g);
+    flata.position.y = q * 1.02;
+    const fing = [[0.8, 0.84, 0.74, 0.32], [0.27, 0.92, 0.8, 0.33], [-0.27, 0.86, 0.74, 0.32], [-0.79, 0.68, 0.6, 0.29]].map(([x, l1, l2, r]) => {
+      const a = led(g, s * x * q, q * 2, 0, l1 * q, r * q);
+      return { a, b: led(a, 0, l1 * q, 0, l2 * q, r * q * 0.95) };
+    });
+    const a = led(g, s * q * 0.94, q * 0.82, -q * 0.12, q * 0.86, q * 0.37);
+    const tum = { a, b: led(a, 0, q * 0.86, 0, q * 0.72, q * 0.34) };
+    g.userData = { wrist: new THREE.Vector3(0, 0, 0), fing, tum, s };
+    g.visible = false;
+    return g;
+  }
+  const TUM = new THREE.Vector3();
+  // Ställer fingrarna (blanda, rum-tecken.js).
+  function fingrar(H, x) {
+    const { fing, tum, s } = H.userData;
+    fing.forEach((f, i) => {
+      f.a.rotation.set(-x.f[i] * 1.62, 0, s * x.sp[i]);
+      f.b.rotation.x = -x.f[i] * 1.95;
+    });
+    tum.a.quaternion.setFromUnitVectors(UP, TUM.set(s * x.tu[0], x.tu[1], x.tu[2]).normalize());
+    tum.b.rotation.x = -x.tb;
+  }
+
   // ---------- kläderna efter vädret ----------
 
   // flanellens rutor: mörka band över tygets färg (map gånger färgen)
@@ -1949,7 +1994,7 @@ export async function figurer(canvas, opt = {}) {
     earPen.updateMatrix();
     kupBench.updateMatrix();
 
-    const o = { F, fig, torso, chest, hg, hc, face: fm, blund: tex[`${F.key}_blund`], knees, feet, arms, mouth, thigh, hipY, T, phase: hash(F.x) * 20, pen, kp, earPen, kupBench, extra, aska, inneAt: -1e9, key: JSON.stringify(D), H, kront, fest: D.fest };
+    const o = { F, fig, hud: skin, torso, chest, hg, hc, face: fm, blund: tex[`${F.key}_blund`], knees, feet, arms, mouth, thigh, hipY, T, phase: hash(F.x) * 20, pen, kp, earPen, kupBench, extra, aska, inneAt: -1e9, key: JSON.stringify(D), H, kront, fest: D.fest };
     efterFig(o);
     return o;
   }
@@ -2123,6 +2168,16 @@ export async function figurer(canvas, opt = {}) {
         knee[i] += (0.06 - knee[i]) * 0.6 * de;
       }
     }
+    // tecknet (rum-tecken.js): huvudet på sned åt handen och lite till, också
+    // om man redan tittar på en
+    const tk = teckenNu(o, t);
+    if (tk && TECKEN[tk.x.namn].kropp) {
+      const b = TECKEN[tk.x.namn].kropp(tk.T);
+      const vak = tk.w * (1 - sovW(o, t));
+      lean += (b.lean || 0) * vak;
+      pitch += (b.pitch || 0) * vak;
+      roll -= tk.A.s * (b.roll || 0) * vak;
+    }
     breath -= 0.05 * sink;
     pitch -= 0.38 * drink - 0.06 * drag;
     o.torso.rotation.y = twist;
@@ -2170,6 +2225,9 @@ export async function figurer(canvas, opt = {}) {
     if (w > 0) out.push([x.fran.clone().lerp(x.p, sm(x.at, x.at + 0.45, t)), w]);
     const h = hejW(o, t);
     if (h > 0) out.push([OGA, h]);
+    // den man klickade på tittar på en (den som sover vaknar inte)
+    const tk = teckenW(o, t) * (1 - sovW(o, t));
+    if (tk > 0) out.push([OGA, tk]);
     // den som valdes tittar på en medan handen är uppe, och de andra på hen
     const j = jagW(o, t);
     if (j > 0) out.push([OGA, j]);
@@ -2252,6 +2310,24 @@ export async function figurer(canvas, opt = {}) {
   const jagW = (o, t) => valdW(o, t, 0, 0.35, 1.7, 2.15);
   const skrivW = (o, t) => valdW(o, t, 1.9, 2.3, 5.0, VAL_SLUT);
   const valW = (o, t) => valdW(o, t, 0, 0.3, 5.0, VAL_SLUT);
+  // TK: tecknet man klickade fram, för var och en ({ namn, at, i: armen, fran:
+  // det förra om det fortfarande pågick, w0: hur högt armen redan var }).
+  // Armen är den med pennan medan man väntar och annars den lediga. Handen med
+  // fingrarna tar över när armen är på väg upp (TK_BYT).
+  const TK = {};
+  const TK_IN = 0.34;
+  const TK_UT = 0.5;
+  const TK_BYT = 0.3;
+  const TK_STOR = 1.28;
+  function teckenNu(o, t) {
+    const x = TK[o.F.key];
+    if (!x || t < x.at) return null;
+    const T = t - x.at;
+    const L = TECKEN[x.namn].langd;
+    if (T >= L + TK_UT) return null;
+    return { x, T, w: (x.w0 + (1 - x.w0) * sm(0, TK_IN, T)) * (1 - sm(L, L + TK_UT, T)), A: o.arms[x.i] };
+  }
+  const teckenW = (o, t) => { const g = teckenNu(o, t); return g ? g.w : 0; };
   // Raden man skriver på: 0,75 sekunder per rad, och den sista sjättedelen
   // tillbaka till början av nästa med pennan lyft. → { n: radens nummer, x:
   // var på raden (−1 … 1), lyft: 0–1 }
@@ -2670,7 +2746,7 @@ export async function figurer(canvas, opt = {}) {
     return { namn: pv.namn, l, t0: t - l };
   }
   const vaken = (o, t) => ready(o, t) * (1 - sovW(o, t) - slumW(o, t)) * (1 - nattW(t) * (1 - tvW(t)))
-    * (1 - Math.max(cheerW(o, t), sinkW(o, t), nodW(o, t))) * (1 - hejW(o, t));
+    * (1 - Math.max(cheerW(o, t), sinkW(o, t), nodW(o, t))) * (1 - hejW(o, t)) * (1 - teckenW(o, t));
   // Påhittet som pågår vid t ({ namn, a, l, t0, w }) eller null.
   function aktNu(o, t) {
     const x = aktRa(o, t);
@@ -2925,6 +3001,46 @@ export async function figurer(canvas, opt = {}) {
     return paBordet(o, A, 20, 12, lyft);
   }
 
+  // Var handen är i tecknet (rum-tecken.js), i figurens axlar: betraktarens
+  // axlar vridna tillbaka, med x åt armens sida.
+  function teckenLage(o, A, namn, T) {
+    const L = TECKEN[namn].lage(T);
+    const ut = new THREE.Vector3(A.s, 0, 0).applyAxisAngle(UP, -o.F.turn * DEG);
+    const fram = new THREE.Vector3(0, 0, 1).applyAxisAngle(UP, -o.F.turn * DEG);
+    const V = (a) => ut.clone().multiplyScalar(a[0]).add(new THREE.Vector3(0, a[1], 0)).addScaledVector(fram, a[2]);
+    const n = o.F.a + o.F.b;
+    const S0 = shoulder(o, A);
+    let y = V(L.y).normalize();
+    let z = V(L.z);
+    z.addScaledVector(y, -z.dot(y)).normalize();
+    // (innan handen vrids: var handleden ska vara för att fingertopparna ska nå munnen)
+    let d = V(L.p);
+    // bakom bordet är grannarnas huvuden nära: handen närmare det egna och
+    // lägre, där huvudena smalnar av, och lite fram
+    if (o.F.plats === PLATSER[1]) d.addScaledVector(ut, -0.24 * L.p[0]).add(new THREE.Vector3(0, -0.2 * Math.min(1, L.p[1] / 0.4), 0)).addScaledVector(fram, 0.1);
+    if (L.mun > 0) {
+      const topp = o.F.arm * TK_STOR * 3.2;
+      const hit = mouthIn(o).add(new THREE.Vector3(0, -2, 3)).addScaledVector(y, -topp).sub(S0).divideScalar(n);
+      d.lerp(hit, L.mun);
+    }
+    if (d.length() > 0.95) d.setLength(0.95);
+    if (L.vrid) z.applyAxisAngle(y, L.vrid * A.s);
+    if (L.vink) y.applyAxisAngle(z, L.vink * A.s);
+    return { p: S0.addScaledVector(d, n), y, z, pole: V(L.pole) };
+  }
+  // Handen och armen i tecknet just nu – från det förra tecknet om det pågick.
+  function teckenPose(o, A, g) {
+    const { x, T } = g;
+    const P = teckenLage(o, A, x.namn, T);
+    return x.fran ? lerpPose(teckenLage(o, A, x.fran.namn, T + x.fran.T), P, sm(0, TK_IN, T)) : P;
+  }
+  function teckenHand(g) {
+    const { x, T, w } = g;
+    const h = TECKEN[x.namn].hand(T);
+    const form = x.fran ? blanda(TECKEN[x.fran.namn].hand(T + x.fran.T), h, sm(0, TK_IN, T)) : h;
+    return blanda(LOS, form, sm(TK_BYT, 0.85, w));
+  }
+
   function pose(o, t) {
     body(o, t);
     o.torso.updateMatrix();
@@ -2933,6 +3049,7 @@ export async function figurer(canvas, opt = {}) {
     const u = uOf(o, t);
     o.earPen.visible = u >= 0.28;
     o.kupBench.visible = u >= 0.3;
+    const tk = teckenNu(o, t);
     for (const A of o.arms) {
       const taken = u >= 0.55;
       if (A.pen) A.pen.visible = u < 0.28;
@@ -2942,12 +3059,28 @@ export async function figurer(canvas, opt = {}) {
       const useW = A.wHand !== A.hand && !taken;
       if (A.wHand !== A.hand) { A.wHand.visible = useW; A.hand.visible = !useW; }
       let H = useW ? A.wHand : A.hand;
-      const hp = handPose(o, A, t);
+      let hp = handPose(o, A, t);
+      if (tk && tk.A === A) hp = lerpPose(hp, teckenPose(o, A, tk), tk.w);
       if (A.fist) {
         const f = cheerW(o, t) > 0.35 && malV(o) !== 2;
         A.fist.visible = f;
         H.visible = !f;
         if (f) H = A.fist;
+      }
+      // tecknet: handen med fingrar. Pennan har gått bakom örat och DJ:s
+      // cigarett ligger på bordet så länge.
+      if (A.fingerHand) A.fingerHand.visible = false;
+      if (tk && tk.A === A && tk.w > TK_BYT) {
+        if (!A.fingerHand) A.fingerHand = fingerHand(o.F.arm, o.hud, o.fig, A.s);
+        // (den vanliga handen följer med osynlig: röken räknas ur cigaretten i den)
+        orient(A.hand, hp.p, hp.y, hp.z);
+        for (const x of [A.hand, A.wHand, A.fist]) if (x) x.visible = false;
+        H = A.fingerHand;
+        H.visible = true;
+        H.scale.setScalar(1 + (TK_STOR - 1) * sm(TK_BYT, 0.8, tk.w));
+        fingrar(H, teckenHand(tk));
+        if (A.pen) o.earPen.visible = true;
+        if (A.cig && A.bench) A.bench.visible = true;
       }
       orient(H, hp.p, hp.y, hp.z);
       // näven: handleden där den öppna handens handled var
@@ -3046,7 +3179,10 @@ export async function figurer(canvas, opt = {}) {
         const seed = k * 7.13 + o.F.x;
         let alpha = 0;
         // ingen rök medan cigaretten ligger släckt och man väntar på kupongen
-        if (src === 'glod') alpha = 0.8 * (1 - dragW(o, tb) * 0.7) * sm(0.55, 0.62, uOf(o, tb)) * (1 - Math.max(slumW(o, tb), sovW(o, tb)));
+        if (src === 'glod') {
+          const tk = teckenNu(o, tb);
+          alpha = 0.8 * (1 - dragW(o, tb) * 0.7) * sm(0.55, 0.62, uOf(o, tb)) * (1 - Math.max(slumW(o, tb), sovW(o, tb))) * (tk && tk.A === sk.A ? 1 - tk.w : 1);
+        }
         else {
           // utandningen: strax efter blosset (och det första efter inlämningen)
           // (inget bloss när man gjorde något annat, aktW, och ett efter blosset i skålen)
@@ -3314,6 +3450,19 @@ export async function figurer(canvas, opt = {}) {
     VAL.k = k;
     VAL.at = t;
   }
+  // Någon klickade på vem: ett tecken mot en, ett nytt varje gång (namn: vilket).
+  // Den som sover vaknar inte men räcker upp tummen. Ett klick medan armen just
+  // är på väg upp räknas inte, annars byter hen tecken direkt.
+  function tecken(vem, t, namn) {
+    const k = String(vem).toLowerCase();
+    const o = figs.find((f) => f.F.key === k);
+    if (!o) return;
+    const g = teckenNu(o, t);
+    if (g && g.T < 0.3) return;
+    const val = namn && TECKEN[namn] ? namn : sovW(o, t) > 0.5 ? 'tumme' : nastaTecken();
+    const A = g ? g.A : uOf(o, t) < 0.55 ? o.pen : fri(o);
+    TK[k] = { namn: val, at: t, i: o.arms.indexOf(A), w0: g ? g.w : 0, fran: g ? { namn: g.x.namn, T: g.T } : null };
+  }
   // Någon pekar på vem i gänget (ut = när hen slutade).
   function hej(vem, t, ut = Infinity) {
     const k = String(vem).toLowerCase();
@@ -3370,5 +3519,5 @@ export async function figurer(canvas, opt = {}) {
     return o ? headIn(o).toArray() : null;
   }
 
-  return { draw, inne, ute, lage, mal, spel, prova, pekar, hej, vald, natt, efter, under, huvud, kval };
+  return { draw, inne, ute, lage, mal, spel, prova, pekar, hej, vald, tecken, natt, efter, under, huvud, kval };
 }

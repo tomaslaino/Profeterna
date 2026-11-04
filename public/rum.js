@@ -1047,18 +1047,19 @@ ${window.RumRegister ? RumRegister.nara() : ''}
 
   // Kupongen på pulten och i handen: samma kupong som papperet under Kupong
   // (samtal.js), i kupongens mått. Bandet, under det stämpeln (vem omgången
-  // väntar på) och spelstoppet, porträtten och 1 X 2 överst, en rad per match
+  // väntar på) och spelstoppet, namnet för hand och 1 X 2 överst, en rad per match
   // med synkmarkeringen i kanten och fälten och streckkoden i foten. v säger
   // vems kupong det är (view): utan v gängets kryss om kupongen finns.
-  //   fyll  ditt utkast: dina kryss och motiveringar, ditt porträtt inringat
+  //   fyll  ditt utkast: dina kryss och motiveringar, ditt namn
   //   din   din inlämnade kupong, med stämpeln Inlämnad
-  //   las   någon annans inlämnade kupong, med hens porträtt inringat
+  //   las   någon annans inlämnade kupong, med hens namn
   //   gang  gängets kupong i uppgörelsen: gängets kryss med kulspetspenna och
-  //         i rutorna porträtten för dem som har med tecknet, som på papperet
+  //         i rutorna porträtten för dem som har med tecknet, som på papperet,
+  //         och allas namn överst
   // Motiveringen står för hand med blyerts efter tiden, kommentaren i
   // efterhand i bläck efter den (som pennan på papperet). Utfallet ringas in:
   // grönt när kupongen hade det, annars rött, streckat medan matchen pågår.
-  // hand: kupongen i handen, där rutorna, porträtten för dem du kan vara och
+  // hand: kupongen i handen, där rutorna, namnen för dem du kan vara och
   // pennorna är knappar och fält – på din kupong och gängets så länge de går
   // att ändra.
   function couponHtml(rd, rows, v = null, hand = false) {
@@ -1104,8 +1105,8 @@ ${window.RumRegister ? RumRegister.nara() : ''}
     const id = rd && !rd.next ? rd.id || (rd.coupon && rd.coupon.id) : null;
     return `<span class="band"><small>MATCHFIXARNA · TIPSKUPONG</small><b>${nr ? `Kupong ${nr}` : 'Kupong'}</b></span>` +
       `<span class="topp">${top ? top.stamp : ''}<span class="pp-stop"><span>Spelstopp</span><b>${first ? esc(fWeekdayTime.format(new Date(first))) : '–'}</b></span></span>` +
-      `<span class="hd"><span>Nr</span><span class="m">${top && top.vem && slag === 'fyll' ? '<span class="sm-q">Vem är du?</span>' : '<span>Match</span>'}` +
-      `${top ? `<span class="sm-folk-pp">${top.faces}</span>` : ''}</span><span>1</span><span>X</span><span>2</span></span>${list}` +
+      `<span class="hd"><span>Nr</span><span class="m">${top && top.vem && hand && slag === 'fyll' ? '<span class="sm-q">Vem är du?</span>' : '<span>Match</span>'}` +
+      `${top ? `<span class="sm-namnen${slag === 'gang' ? ' alla' : top.vem && hand && slag === 'fyll' ? ' val' : ''}">${top.namn}</span>` : ''}</span><span>1</span><span>X</span><span>2</span></span>${list}` +
       `<span class="fot">${v ? Samtal.pult.fields(signs, slag === 'gang') : ''}${id ? Papper.code(id) : ''}</span>` +
       (slag === 'din' || slag === 'las' ? '<span class="stampel">Inlämnad</span>' : '') +
       `<span class="pencil${slag === 'gang' || (!v && order.some((x) => x.sign)) ? ' kula' : ''}" style="${penStyle(PEN_PULT)}"><i></i></span>`;
@@ -2077,7 +2078,7 @@ ${window.RumRegister ? RumRegister.nara() : ''}
         if (R.lage) R.fig.lage(R.lage, now());
         if (R.spel) R.fig.spel(R.spel, now());
         // de andra i gänget, natten och dagen efter (rum-folk.js)
-        if (window.RumFolk) RumFolk.mount(R.el, { fig: () => R.fig, inr: () => R.inr, now, nara, fokus });
+        if (window.RumFolk) RumFolk.mount(R.el, { fig: () => R.fig, inr: () => R.inr, now, nara, fokus, teckna, visa });
         provMal();
         provAkt();
         frame();
@@ -2923,8 +2924,7 @@ ${window.RumRegister ? RumRegister.nara() : ''}
 
   // Pennan går genom punkterna – t = millisekunder dit, e = takten – från
   // där den är just nu.
-  function penGo(path) {
-    const k = R.kup;
+  function penGo(path, k = R.kup) {
     for (const a of k.pen.getAnimations()) {
       a.commitStyles();
       a.cancel();
@@ -2941,10 +2941,10 @@ ${window.RumRegister ? RumRegister.nara() : ''}
   }
 
   // Rutans läge på kupongen, i kupongens egna mått.
-  function spot(el) {
+  function spot(el, kup = R.kup.el) {
     let x = 0;
     let y = 0;
-    for (let e = el; e && e !== R.kup.el; e = e.offsetParent) {
+    for (let e = el; e && e !== kup; e = e.offsetParent) {
       x += e.offsetLeft;
       y += e.offsetTop;
     }
@@ -2977,42 +2977,50 @@ ${window.RumRegister ? RumRegister.nara() : ''}
     }, 1800);
   }
 
-  // Pennan ringar in ditt porträtt, ett drygt varv som på papperet: den
-  // följer ringen som ritas (Papper.ring) och lyfter.
-  function drawRing(fw, key) {
-    const k = R.kup;
-    fw.querySelector('.sm-fc').insertAdjacentHTML('afterend', Papper.ring(key, 'sm-du-ring', 25));
-    const svg = fw.querySelector('.sm-du-ring');
-    const path = svg.querySelector('path');
-    if (calm()) return;
-    // ringen står 6 px utanför porträttet runt om (rum.css), i 60 × 60
-    const o = spot(fw);
-    const w = fw.offsetWidth + 12;
-    const h = fw.offsetHeight + 12;
-    const len = path.getTotalLength();
-    const n = 16;
-    const pts = Array.from({ length: n + 1 }, (_, i) => path.getPointAtLength((len * i) / n))
-      .map((q) => [o.x - 6 + (q.x / 60) * w, o.y - 6 + (q.y / 60) * h]);
-    path.setAttribute('pathLength', '1');
-    path.style.strokeDasharray = '1 2';
-    const at = (pt, l, t, e) => ({ x: pt[0], y: pt[1], a: PEN_SKRIV, l, t, e });
-    const travel = Math.round(Math.min(340, Math.max(150, Math.hypot(pts[0][0] - k.at.x, pts[0][1] - k.at.y) * 0.9)));
-    const step = 26;
-    penGo([
-      at(pts[0], 0.7, travel, 'cubic-bezier(0.4, 0, 0.2, 1)'), at(pts[0], 0, 50, 'ease-in'),
-      ...pts.slice(1).map((pt) => at(pt, 0, step, 'linear')),
-      at([pts[n][0] + 12, pts[n][1] + 10], 0.8, 220, 'ease-out'),
-    ]);
-    path.animate([{ strokeDashoffset: 1.05 }, { strokeDashoffset: 0 }], { duration: step * n, delay: travel + 50, easing: 'linear', fill: 'backwards' });
-    clearTimeout(k.idle);
-    k.idle = setTimeout(() => {
-      if (R.kup === k && !k.closing) penGo([{ ...PEN_VILA, l: 0.4, t: 480, e: 'cubic-bezier(0.4, 0, 0.3, 1)' }, { ...PEN_VILA, t: 160, e: 'ease-in' }]);
-    }, 1800);
+  // Namnet skrivs för hand: pennan (k = kupongen i handen eller på pulten) går
+  // dit och längs namnet upp och ner, medan namnet kommer fram från vänster.
+  // → hur länge det tar i millisekunder, och pennan står kvar vid slutet.
+  function skrivNamn(el, k) {
+    const o = spot(el, k.el);
+    const w = el.offsetWidth;
+    const h = el.offsetHeight;
+    const y = o.y + h * 0.72;
+    const at = (x, dy, l, t, e) => ({ x: o.x + x, y: y + dy, a: PEN_SKRIV, l, t, e });
+    const travel = Math.round(Math.min(380, Math.max(180, Math.hypot(o.x - k.at.x, y - k.at.y) * 0.9)));
+    // en båge per ungefär en bokstav
+    const n = Math.max(4, el.textContent.length);
+    const step = Math.round(Math.max(55, 620 / n));
+    const bagar = Array.from({ length: n }, (_, i) => at(((i + 1) / n) * w, i % 2 ? h * 0.1 : -h * 0.42, 0, step, 'ease-in-out'));
+    const mal = step * n;
+    penGo([at(0, 0, 0.7, travel, 'cubic-bezier(0.4, 0, 0.2, 1)'), at(0, 0, 0, 50, 'ease-in'), ...bagar, at(w + 12, 8, 0.8, 200, 'ease-out')], k);
+    el.animate([{ clipPath: 'inset(-14px 100% -14px -14px)' }, { clipPath: 'inset(-14px -14px -14px -14px)' }], { duration: mal, delay: travel + 50, easing: 'linear', fill: 'backwards' });
+    return travel + 50 + mal + 200;
+  }
+
+  // Någon i gänget klickades fram (rum-folk.js): kupongen på pulten ritas om och
+  // namnet skrivs på den, och pennan lägger sig där den låg.
+  function skrivPult() {
+    if (!R.on) return;
+    fill();
+    const desk = document.getElementById('rum-kupong');
+    const el = desk && desk.querySelector('.sm-namn.du');
+    const pen = desk && desk.querySelector('.pencil');
+    if (!el || !pen || calm() || !pult() || !pult().fyll) return;
+    const k = { pen, el: desk, at: PEN_PULT };
+    const t = skrivNamn(el, k);
+    clearTimeout(R.pultPen);
+    R.pultPen = setTimeout(() => {
+      if (!pen.isConnected) return;
+      penGo([{ ...PEN_PULT, l: 0.4, t: 420, e: 'cubic-bezier(0.4, 0, 0.3, 1)' }, { ...PEN_PULT, t: 140, e: 'ease-in' }], k).finished.then((a) => {
+        Object.assign(pen.style, penAt(PEN_PULT));
+        a.cancel();
+      }, () => {});
+    }, t + 260);
   }
 
   // Ett kryss eller en ring som tas bort suddas ut.
   function eraseCross(box) {
-    for (const svg of box.querySelectorAll('.kryss:not(.ut), .sm-du-ring:not(.ut)')) {
+    for (const svg of box.querySelectorAll('.kryss:not(.ut)')) {
       svg.classList.add('ut');
       if (calm()) svg.remove();
       else svg.animate([{ opacity: 1 }, { opacity: 0, filter: 'blur(1.5px)' }], { duration: 240, easing: 'ease-out', fill: 'forwards' }).finished.then(() => svg.remove(), () => {});
@@ -3170,10 +3178,6 @@ ${window.RumRegister ? RumRegister.nara() : ''}
     k.busy = false;
     k.msg.textContent = out.ok ? '' : out.error || 'Ingen kontakt med servern.';
     refreshSpara();
-    if (!out.ok) return;
-    const top = Samtal.pult.top(true);
-    const faces = k.el.querySelector('.sm-folk-pp');
-    if (top && faces) faces.innerHTML = top.faces;
   }
   function refreshSpara() {
     const b = R.kup && R.kup.rad.querySelector('[data-spara]');
@@ -3356,17 +3360,31 @@ ${window.RumRegister ? RumRegister.nara() : ''}
     if (out.ok && R.kup === k && document.activeElement !== f && f.value.replace(/\s+/g, ' ').trim() !== text) saveEfter(f);
   }
 
-  // Vem är du: pennan ringar in ditt porträtt, och stämpeln säger vem
-  // omgången väntar på med dig först, som på papperet.
+  // Vem är du: ett klick på ditt namn visar de andra (.val), och ett klick på
+  // ett av dem skriver det i stället för ditt. Stämpeln säger vem omgången
+  // väntar på med dig först, som på papperet.
   function choose(b) {
     const k = R.kup;
-    if (b.getAttribute('aria-pressed') === 'true' || !Samtal.pult.vem(b.dataset.vem)) return;
+    const rad = b.closest('.sm-namnen');
+    if (b.getAttribute('aria-pressed') === 'true') {
+      rad.classList.toggle('val');
+      return;
+    }
+    if (!Samtal.pult.vem(b.dataset.vem)) return;
     for (const o of k.el.querySelectorAll('button[data-vem][aria-pressed="true"]')) {
       o.setAttribute('aria-pressed', 'false');
-      eraseCross(o);
+      o.classList.remove('du');
     }
+    rad.classList.remove('val');
     b.setAttribute('aria-pressed', 'true');
-    drawRing(b.querySelector('.sm-fw'), `du${Samtal.pult.state().s.id}${b.dataset.vem}`);
+    b.classList.add('du');
+    if (!calm()) {
+      const tid = skrivNamn(b, k);
+      clearTimeout(k.idle);
+      k.idle = setTimeout(() => {
+        if (R.kup === k && !k.closing) penGo([{ ...PEN_VILA, l: 0.4, t: 480, e: 'cubic-bezier(0.4, 0, 0.3, 1)' }, { ...PEN_VILA, t: 160, e: 'ease-in' }]);
+      }, tid + 900);
+    }
     const top = Samtal.pult.top();
     const st = k.el.querySelector('.topp .pp-stamp');
     if (st && top.stamp) st.outerHTML = top.stamp;
@@ -3548,6 +3566,34 @@ ${window.RumRegister ? RumRegister.nara() : ''}
       s.classList.remove('drar');
     }
     s.style.transform = `translate(${R.ox.toFixed(1)}px, ${R.oy.toFixed(1)}px) scale(${R.k.toFixed(4)})`;
+  }
+
+  // Ett tryck på någon i gänget långt ut i bilden (telefonen, där rummet inte
+  // ryms): rummet glider så att hen hamnar mitt i bild och tecknet syns.
+  function visa(x) {
+    const ow = R.k * W - innerWidth;
+    if (ow <= 1 || (x > innerWidth * 0.3 && x < innerWidth * 0.7)) return;
+    const s = R.el.querySelector('.rum-stage');
+    if (!calm()) {
+      s.classList.add('glider');
+      clearTimeout(R.gliderT);
+      R.gliderT = setTimeout(() => s.classList.remove('glider'), 560);
+    }
+    pan(R.px + (x - innerWidth / 2) / ow, R.py);
+  }
+
+  // Ett klick på någon i gänget: ett tecken (rum-3d.js). I ett rum som står
+  // still (minskad rörelse) syns det som en bild en stund.
+  function teckna(k) {
+    if (!R.fig || !R.fig.tecken) return;
+    if (!calm()) {
+      R.fig.tecken(k, now());
+      return;
+    }
+    R.fig.tecken(k, now() - 1.1);
+    frame();
+    clearTimeout(R.tecknaT);
+    R.tecknaT = setTimeout(() => { if (R.on) frame(); }, 2300);
   }
 
   function wire() {
@@ -3774,7 +3820,8 @@ ${window.RumRegister ? RumRegister.nara() : ''}
       });
     } else if (calm()) {
       // utan rörelser: en bild, och en ny när datan ändras
-      ready.then(frame);
+      // (inte then(frame): frame tar emot dt, och kameran blev NaN så att gänget inte syntes)
+      ready.then(() => frame());
     } else loop();
     clearInterval(R.poll);
     // omgången och liveställningen kan ändras medan rummet står öppet
@@ -3799,7 +3846,7 @@ ${window.RumRegister ? RumRegister.nara() : ''}
     document.documentElement.classList.remove('i-rummet');
   }
 
-  return { fits, show, hide, redraw: () => { if (R.on) fill(); }, vila: (v) => {
+  return { fits, show, hide, redraw: () => { if (R.on) fill(); }, skriv: skrivPult, vila: (v) => {
       R.vilar = Boolean(v);
       // (kameran kommer tillbaka rak: rum-hasse.css)
       if (!v) { R.mx = R.my = 0; setCam(0, 0); }

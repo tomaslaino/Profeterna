@@ -16,12 +16,12 @@
 // telefonen gör ett tryck på figuren samma sak en stund. Ett klick på en
 // figur går inte vidare till det som står bakom.
 //
-// Ett klick på sin egen figur gör en till den som fyller i kupongen (valj):
-// samma val som porträtten på kupongen (Samtal.pult.vem), och figuren räcker
-// upp handen och skriver på kupongen (vald i rum-3d.js). Har man inte sagt
-// vem man är blir man den man klickar på; annars väljer bara den egna
-// figuren, så att man inte blir någon annan av misstag när man hälsar (det
-// gör porträtten på kupongen).
+// Ett klick på någon i gänget ger ett tecken tillbaka (tecken i rum-3d.js):
+// hang loose, tummen upp och så vidare, ett nytt varje gång. Går kupongen att
+// fylla i och hen inte har lämnat in blir man också hen (valj, samma val som
+// namnen på kupongen, Samtal.pult.vem): namnet skrivs för hand på kupongen på
+// pulten (Rum.skriv), utkastet följer med, och figuren skriver på sin kupong
+// (vald i rum-3d.js).
 //
 // Natten: mellan midnatt och sex (Stockholms tid, Vader.nu()) är lysröret
 // släckt – rummet mörkt utom gatan, neonen och tv:n (.natt, rum-folk.css),
@@ -32,7 +32,7 @@
 // färdigt syns det hur det gick, efter betyget i historiken (4–5 bra, 1–2
 // illa; rum-3d.js efter) – utom med dolda resultat.
 //
-//   RumFolk.mount(el, { fig, inr, now, nara, fokus })  när gänget har laddats
+//   RumFolk.mount(el, { fig, inr, now, nara, fokus, teckna, visa })  när gänget har laddats
 //   RumFolk.on(true | false)                           rummet visas eller inte
 //   RumFolk.ute(v)                                     klockan (Vader.nu())
 //   RumFolk.fyll(old, seen)                            de färdiga kupongerna och omgångarna
@@ -40,8 +40,9 @@
 //
 // För bilder: ?rum-natt (=0 dag), ?rum-efter=bra|illa (=inget),
 // ?rum-pekar=dt:tv,dl:dj (som om de pekade), ?rum-hej=dl (som om man
-// pekade på DL) och ?rum-vald=dl (som om man just hade klickat på DL; dl:3 tre
-// sekunder sedan).
+// pekade på DL), ?rum-vald=dl (som om man just hade blivit DL; dl:3 tre
+// sekunder sedan) och ?rum-tecken=dl:hang:1 (DL gör hang loose sedan en sekund;
+// namnen står i rum-tecken.js).
 
 window.RumFolk = (() => {
   const q = new URLSearchParams(location.search);
@@ -139,7 +140,7 @@ window.RumFolk = (() => {
     if (document.hidden) kopplaNer();
     else koppla();
   });
-  // Har du sagt vem du är (din figur eller porträtten på kupongen) kopplar
+  // Har du sagt vem du är (en figur eller namnen på kupongen) kopplar
   // sidan upp sig på nytt, så att tjänsten vet det (?vem=).
   function vemKoll() {
     if (F.ws && jag() !== F.vem) {
@@ -226,20 +227,20 @@ window.RumFolk = (() => {
     if (x < r.left || x > r.right || y < r.top || y > r.bottom) return null;
     return f.under(((x - r.left) / r.width) * 2 - 1, -(((y - r.top) / r.height) * 2 - 1));
   }
-  // Ett klick på din figur (k: dl, dt, dj): du är den som fyller i kupongen.
-  // Går medan du kan fylla i den och hen inte har lämnat in, och bara på din
-  // egen figur när du redan har sagt vem du är. → true om det blev ett val.
+  // Ett klick på någon i gänget (k: dl, dt, dj): du är den som fyller i
+  // kupongen. Går medan du kan fylla i den och hen inte har lämnat in.
+  // → true om du blev någon annan.
   function valj(k) {
     const s = samtal();
     const g = s && (s.gang || []).find((x) => String(x.id).toLowerCase() === k);
     const v = jag();
-    if (!g || (v && v !== g.id) || !window.Samtal || !Samtal.pult) return false;
+    if (!g || v === g.id || !window.Samtal || !Samtal.pult) return false;
     const p = Samtal.pult.state();
     if (!p || !p.fyll || !p.val.includes(g.id) || !Samtal.pult.vem(g.id)) return false;
     const f = fig();
     if (f && f.vald) f.vald(k, F.o.now());
-    // kupongen på pulten, stämpeln och guldordet efter vem du är
-    if (v !== g.id && window.Rum && Rum.redraw) Rum.redraw();
+    // kupongen på pulten, namnet, stämpeln och guldordet efter vem du är
+    if (window.Rum && Rum.skriv) Rum.skriv();
     vemKoll();
     egen();
     return true;
@@ -291,8 +292,8 @@ window.RumFolk = (() => {
       pa(null);
       markor(null);
     });
-    // ett klick (eller tryck) på en figur: din egen gör dig till den som
-    // fyller i kupongen (valj), annars hej en stund i telefonen – och inget annat
+    // ett klick (eller tryck) på en figur: ett tecken, namnet på kupongen
+    // (valj) och i telefonen ett hej en stund – och inget annat
     el.addEventListener('click', (e) => {
       // (inte klicket efter ett drag, som rum.js redan har stoppat, och inte i
       // Hasses vy, som står framför gänget)
@@ -301,10 +302,13 @@ window.RumFolk = (() => {
       if (!k) return;
       e.preventDefault();
       e.stopPropagation();
-      if (valj(k)) return;
-      if (F.typ !== 'mouse' && fig()) {
+      F.o.teckna(k);
+      valj(k);
+      if (F.typ !== 'mouse') {
+        const f = fig();
         const t = F.o.now();
-        fig().hej(k, t, t + 2.5);
+        if (f) f.hej(k, t, t + 2.5);
+        F.o.visa(e.clientX);
       }
     }, true);
   }
@@ -393,6 +397,10 @@ window.RumFolk = (() => {
     if (f) {
       if (F.efter !== undefined && f.efter) f.efter(F.efter);
       if (q.has('rum-hej') && f.hej) f.hej(q.get('rum-hej').toLowerCase(), o.now() - 1.2);
+      if (q.has('rum-tecken') && f.tecken) {
+        const [k, namn, sek] = q.get('rum-tecken').toLowerCase().split(':');
+        f.tecken(k, o.now() - (sek ? parseFloat(sek) || 0 : 1), namn);
+      }
       if (q.has('rum-vald') && f.vald) {
         const [k, sek] = q.get('rum-vald').toLowerCase().split(':');
         f.vald(k, o.now() - (sek ? parseFloat(sek) || 0 : 0.8));
