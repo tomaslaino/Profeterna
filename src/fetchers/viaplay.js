@@ -1,11 +1,12 @@
 'use strict';
 
 // Viaplays öppna innehålls-API (content.viaplay.se), samma JSON som
-// viaplay.se läser. Viaplay visar Premier League, Championship, League One,
-// FA-cupen och Ligacupen i Sverige och lägger ut sammandrag som går att se
-// gratis – med reklam, utan konto (verifierat 2026-10-20: Tottenham–Coventry
-// spelades utloggad efter tio sekunders reklam). League Two har inga
-// sammandrag där. API:t svarar även utanför Sverige (GitHub Actions).
+// viaplay.se läser. Viaplay visar Premier League, Championship och FA-cupen i
+// Sverige och lägger ut sammandrag som går att se gratis – med reklam, utan
+// konto (verifierat 2026-10-20: Tottenham–Coventry spelades utloggad efter
+// tio sekunders reklam). League Two har inga sammandrag där, och sidorna för
+// League One och Ligacupen svarar 404 sedan oktober 2026. API:t svarar även
+// utanför Sverige (GitHub Actions).
 //
 // Varje tävlingssida har listor med klipp: "Höjdpunkter" (Premier Leagues
 // sammandrag på fem minuter, som ligger ute en månad, och EFL:s, ett år) och
@@ -17,7 +18,7 @@
 const { getJson, mapLimit } = require('./http');
 
 const BASE = 'https://content.viaplay.se/pcdash-se/sport/fotboll';
-const PAGES = { pl: 'premier-league', ch: 'championship', l1: 'league-one', fac: 'fa-cupen', lc: 'ligacupen' };
+const PAGES = { pl: 'premier-league', ch: 'championship', fac: 'fa-cupen' };
 const FORMATS = new Set(['Höjdpunkter från Premier League', 'Sporthöjdpunkter']);
 // Sidor à 40 klipp per lista. Premier Leagues "Utvalda klipp" hade sju i
 // oktober 2026, nyast först.
