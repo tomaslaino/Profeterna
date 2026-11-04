@@ -356,7 +356,7 @@ window.Rum = (() => {
   // (rum-inredning.js) får dem härifrån.
   const VAGG = {
     ans: [1144, 1296, 318, 478],
-    skar: [1322, 1428, 374, 432],
+    skar: [1316, 1422, 371, 439],
     kork: [1444, 1584, 318, 478],
   };
 
@@ -1258,11 +1258,13 @@ ${window.RumRegister ? RumRegister.nara() : ''}
     const ch = (c) => {
       if (c === ' ') return '<b class="sp"></b>';
       if (c === 'O' && o-- <= 0) c = '0';
-      return `<b style="transform: translateY(${r1((R0() - 0.5) * 0.9)}px) rotate(${r1((R0() - 0.5) * 7)}deg)">${esc(c)}</b>`;
+      return `<b style="transform: translateY(${r1((R0() - 0.5) * 0.4)}px) rotate(${r1((R0() - 0.5) * 3)}deg)">${esc(c)}</b>`;
     };
     const word = (t) => [...String(t).toUpperCase()].map(ch).join('');
     return `<span class="h">${word('Tipsligan')}</span>` +
-      rows.slice(0, 3).map((x) => `<span class="rad"><span>${word(x.rank ? `${x.rank}. ${x.name}` : x.name)}</span><span>${x.pts ? word(x.pts) : ''}</span></span>`).join('');
+      rows.slice(0, 3).map((x) => (x.rank
+        ? `<span class="rad"><span>${word(`${x.rank}.`)}</span><span>${word(x.name)}</span><span>${x.pts ? word(x.pts) : ''}</span></span>`
+        : `<span class="rad bara"><span>${word(x.name)}</span></span>`)).join('');
   }
 
   function corkHtml(list) {
@@ -2502,8 +2504,8 @@ ${window.RumRegister ? RumRegister.nara() : ''}
   //   under foten står så här mycket av sakens höjd längre ner (remsan på skivan)
   const SAKER = {
     ur: { el: '.rum-ur', h: 0.78, duk: 'ur' },
-    // (skårtavlan är låg: en halv höjd, ungefär lika nära som de andra)
-    skar: { el: '.rum-skar', h: 0.5, duk: 'hogra' },
+    // (skårtavlan är låg: lite mer än halva höjden, ungefär lika nära som de andra)
+    skar: { el: '.rum-skar', h: 0.58, duk: 'hogra' },
     ram: { el: '.rum-ram', h: 0.94, duk: 'ram' },
     pokal: { el: '.rum-pokal', h: 0.72, duk: 'hogra', fot: () => pokalFot(), tv: true },
     kork: { el: '.rum-kork', h: 0.86, duk: 'hogra' },

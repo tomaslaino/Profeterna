@@ -737,15 +737,15 @@ export async function inredning(el, opt = {}) {
   // (Z, Y, ut från väggen) → världen
   const onRight = (geo, out = 0) => geo.applyMatrix4(new THREE.Matrix4().set(0, 0, -1, WX - out, 0, 1, 0, 0, 1, 0, 0, 0, 0, 0, 0, 1));
   // en ram kring en tavla på väggen (onWall i rum.js: x i hörnets plan, y)
-  function wallRing(b, xa, xb, ya, yb, k, m) {
+  function wallRing(b, xa, xb, ya, yb, k, m, djup = WX - 1141) {
     const z0 = wz(xa), z1 = wz(xb);
     const sh = new THREE.Shape();
     sh.moveTo(z0 - 1, -(ya - 1)); sh.lineTo(z1 + 1, -(ya - 1)); sh.lineTo(z1 + 1, -(yb + 1)); sh.lineTo(z0 - 1, -(yb + 1)); sh.closePath();
     const hole = new THREE.Path();
     hole.moveTo(z0 + k, -(ya + k)); hole.lineTo(z0 + k, -(yb - k)); hole.lineTo(z1 - k, -(yb - k)); hole.lineTo(z1 - k, -(ya + k)); hole.closePath();
     sh.holes.push(hole);
-    const geo = new THREE.ExtrudeGeometry(sh, { depth: WX - 1141, bevelEnabled: true, bevelThickness: 1, bevelSize: 0.8, bevelSegments: 2 });
-    onRight(geo);
+    const geo = new THREE.ExtrudeGeometry(sh, { depth: djup, bevelEnabled: true, bevelThickness: 1, bevelSize: 0.8, bevelSegments: 2 });
+    onRight(geo, WX - 1141 - djup);
     b.mesh(geo, m);
     const o = new THREE.PlaneGeometry(z1 - z0 - 2 * k, yb - ya - 2 * k);
     o.translate((z0 + z1) / 2, -(ya + yb) / 2, 0);
@@ -1227,7 +1227,7 @@ export async function inredning(el, opt = {}) {
   const skylt = ram(B.ram);
   backWall(B.ram);
   paket(B.hogra);
-  wallRing(B.hogra, ...opt.vagg.skar, 5, mat('#e2e0d8', { metalness: 0.75, roughness: 0.3, envMapIntensity: 1.4 }));
+  wallRing(B.hogra, ...opt.vagg.skar, 5, mat('#c6c8c8', { metalness: 0.4, roughness: 0.45 }), 4);
   const ved = tex(256, 256, (c, w, h) => {
     c.fillStyle = '#6a4a28';
     c.fillRect(0, 0, w, h);

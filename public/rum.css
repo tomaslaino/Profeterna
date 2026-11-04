@@ -214,7 +214,8 @@ a.rum-sak, a.rum-sak:hover { color: inherit; text-decoration: none; }
 .rum-hv { position: absolute; left: 0; top: 0; width: 1600px; height: 1000px; perspective: 1000px; perspective-origin: 760px 400px; }
 .rum-skar, .rum-kork { position: absolute; left: 1140px; display: block; transform-origin: 0 0; box-sizing: border-box; }
 /* svart filt med spår var 9,6:e px i en aluminiumram; bokstäverna (b) står i spåren.
-   Tipsligan: rubriken, ett tomt spår och de tre i gänget – fem spår */
+   Tipsligan: rubriken, ett tomt spår och de tre i gänget – fem spår, med lika mycket
+   filt över det första spåret som under det sista */
 .rum-skar {
   padding: 5px;
   background: linear-gradient(135deg, #d9d6cc, #8d8a80 55%, #5e5b54);
@@ -224,11 +225,11 @@ a.rum-sak, a.rum-sak:hover { color: inherit; text-decoration: none; }
   display: block;
   height: 100%;
   box-sizing: border-box;
-  padding: 0 7px;
+  padding: 5.7px 8px 0;
   overflow: hidden;
   background:
-    repeating-linear-gradient(180deg, rgba(0, 0, 0, 0) 0 8.2px, rgba(0, 0, 0, 0.8) 8.2px 9px, rgba(255, 255, 255, 0.05) 9px 9.6px),
-    radial-gradient(120% 90% at 30% 20%, #262626, #121212 70%);
+    linear-gradient(180deg, rgba(0, 0, 0, 0) 0 8.2px, rgba(0, 0, 0, 0.8) 8.2px 9px, rgba(255, 255, 255, 0.05) 9px 9.6px) 0 5.7px / 100% 9.6px,
+    radial-gradient(120% 90% at 50% 40%, #262626, #121212 70%);
   box-shadow: inset 0 0 12px rgba(0, 0, 0, 0.8);
   color: #f3f1ea;
   font-family: "Helvetica Neue", Helvetica, Arial, sans-serif;
@@ -238,9 +239,13 @@ a.rum-sak, a.rum-sak:hover { color: inherit; text-decoration: none; }
 }
 .rum-skar-in b { display: inline-block; font-weight: inherit; }
 .rum-skar-in .sp { width: 0.32em; }
-.rum-skar-in .h { display: block; height: 9.6px; margin-bottom: 9.6px; text-align: center; font-size: 8.6px; font-weight: 700; letter-spacing: 0.14em; }
-.rum-skar-in .rad { display: flex; justify-content: space-between; gap: 4px; height: 9.6px; font-size: 7.4px; letter-spacing: 0.06em; white-space: nowrap; }
-.rum-skar-in .rad > span:first-child { overflow: hidden; }
+/* rubriken fyller bredden: första och sista bokstaven står rakt över raderna */
+.rum-skar-in .h { display: flex; justify-content: space-between; height: 9.6px; margin-bottom: 9.6px; font-size: 8.6px; font-weight: 700; }
+/* placering, namn och poäng i var sin spalt; poängen slutar lika långt från kanten som placeringen börjar */
+.rum-skar-in .rad { display: grid; grid-template-columns: 1.7em 1fr auto; height: 9.6px; line-height: 10.4px; font-size: 7.4px; letter-spacing: 0.08em; white-space: nowrap; }
+.rum-skar-in .rad > :nth-child(2) { overflow: hidden; }
+.rum-skar-in .rad > :last-child b:last-child { letter-spacing: 0; }
+.rum-skar-in .rad.bara { display: block; text-align: center; }
 
 .rum-kork {
   padding: 5px;

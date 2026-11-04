@@ -516,6 +516,12 @@ Utan nyckel ingen knapp.
   leder till Olympen i stället för Tabeller. Tavlan är lägre (tre rader i stället för nio),
   och närbilden går lika nära som förut. Tabellerna står kvar på tv:n. Se
   [Tobaksaffären](#tobaksaffären), *Föremålen*.
+- **Tipsligan blir symmetrisk (2026-11-04, användarens önskemål):** rubriken fyller bredden, så
+  att första och sista bokstaven står rakt över raderna, och placering, namn och poäng står i
+  var sin spalt med lika långt till kanten på båda sidor. Tavlan är ett halvt spår högre åt
+  båda håll, så att det är lika mycket filt över rubriken som under sista raden, och den står
+  mitt emellan grannarna. Bokstäverna sitter mindre snett, och ramen är smalare och lika ljus
+  runt om. Pokalhyllan följer med. Se [Tobaksaffären](#tobaksaffären), *Föremålen*.
 - **Disken blir en bardisk (2026-11-03, användarens önskemål):** disken längs högra väggen
   var svår att förstå (grå skiva, mörk front). Nu är den en bardisk i mörkt trä med tjock
   rundad kant och fyllningar i ramar, i rummets egna toner och utan något extra att rita.
@@ -1942,10 +1948,11 @@ Enter och mellanslag klickar på dem. En match på text-tv:n öppnar matchrutan 
 - **Skårtavlan** (mitt på högra väggen, under pokalhyllan) → närbild: *Tipsligan*, säsongens ställning i gänget
   – samma poäng och placering som ställningen i Olympen (`kampRounds`, med omgången som
   pågår), lika placering vid lika poäng och antal rätt. Efternamnen står där, och Johansson
-  som *Dogge* (`SMEKNAMN` i rum.js); före första omgången bara namnen. Vita plastbokstäver i
-  spåren på svart filt – rubriken, ett tomt spår och de tre – i en låg aluminiumram som
-  sticker ut från väggen (3D). Varje bokstav sitter lite snett för sig (samma frö varje gång,
-  så att inget flyttar sig), och lådan har bara fyra O – sedan blir det nollor.
+  som *Dogge* (`SMEKNAMN` i rum.js); före första omgången bara namnen, i mitten. Vita
+  plastbokstäver i spåren på svart filt – rubriken över hela bredden, ett tomt spår och de tre,
+  med placering, namn och poäng i var sin spalt och lika mycket filt över och under – i en
+  smal aluminiumram (3D). Varje bokstav sitter lite snett för sig (samma frö varje gång, så
+  att inget flyttar sig), och lådan har bara fyra O – sedan blir det nollor.
 - **Korktavlan** (längst ut på högra väggen, hel i bild, i en träram i 3D) → närbild: de
   färdigspelade kupongerna (`Historik.coupons`) rättade med röd penna, en med kaffering.
   Tom tills den första är färdigspelad.
