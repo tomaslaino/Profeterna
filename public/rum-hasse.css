@@ -1,61 +1,47 @@
 /* Hasse Backe i baren (rum-hasse.js). Vilan i rummet kostar inget: omslagen saknar omvandling och
-   perspektiv tills kameran svänger. */
-.rum-sving { position: absolute; inset: 0; overflow: hidden; }
-.rum-front { position: absolute; inset: 0; overflow: hidden; }
-/* kameran i rummets värld: vrids runt ögat (rummets lins, .rum-kamera i rum.css) */
-.rum-vrid { position: absolute; left: 0; top: 0; width: 1600px; height: 1000px; transform-style: preserve-3d; transform-origin: 800px 500px 1400px; pointer-events: none; }
-/* Det som bara syns i svängen: rummets tak, pultens framsida nedanför bilden och skuggan i hörnet
-   på bakväggen (bara enfärgade ytor, som inte tar något grafikminne). */
-.rv-tak, .rv-pult, .rv-horn, .rh-fort { display: none; position: absolute; pointer-events: none; }
-.rum.hasse-svang :is(.rv-tak, .rv-pult, .rv-horn), .rum.hasse-svang:not(.hasse-framme) .rh-fort { display: block; }
-/* Gatan syns genom dörren i hörnet bredvid honom, men står still som resten av rummet (Rum.vila):
-   dess löv och flaggor animeras annars i varje bild, med oskärpa, inne i den vridna världen. */
-.rum.hasse-framme .rum-ute *, .rum.hasse-framme .rum-ute *::before, .rum.hasse-framme .rum-ute *::after { animation-play-state: paused; }
+   filter utom medan kameran panorerar. */
+.rum-sving { position: absolute; inset: 0; overflow: hidden; background: #0d0805; }
+/* Panoreringen: rummet och hans bild glider i sidled i ett omslag som dras ut K gånger på bredden
+   och suddas, så att oskärpan blir vågrät (utanför rummets 3D-värld). */
+.rh-pan, .rh-pan-in, .rum-front { position: absolute; inset: 0; }
+.rum-front { overflow: hidden; }
+/* mellan rummet och hans bild: rummets vägg som far förbi (syns bara i panoreringen) */
+.rh-glipa { display: none; position: absolute; left: 0; top: 0; bottom: 0; background: linear-gradient(to right, #2c1c10, #4a301b 30%, #1c120a 52%, #3d2817 70%, #2a1a0e); }
+.rum.hasse-pan .rh-glipa { display: block; }
+.rum.hasse-pan .rh-pan, .rum.hasse-pan .rh-pan-in, .rum.hasse-pan .rum-front, .rum.hasse-pan .rum-hasse-vy { will-change: transform; }
+/* framme: rummet står kvar som det var men ritas inte */
+.rum.hasse-framme .rum-front { visibility: hidden; }
 /* hans hand på pulten (rum-hasse-hand.js), och knappen över den */
 .rum-pl > .rum-hasse-hand { position: absolute; pointer-events: none; will-change: auto; }
 .rum-hasse-knapp { position: absolute; padding: 0; border: 0; background: none; cursor: pointer; pointer-events: auto; will-change: auto; }
-/* när armen lämnar pulten är det hans duk som ritar den, och när han dricker tar han koppen */
-.rum.hasse-arm-ute .rum-pl > .rum-hasse-hand { visibility: hidden; }
-.rum.hasse-klunk #rum-hasse .kopp-in, .rum.hasse-klunk #rum-hasse .anga { visibility: hidden; }
-.rv-tak { left: -2600px; top: -239px; width: 6800px; height: 1900px; transform-origin: 50% 0; transform: translateZ(-600px) rotateX(90deg); background: #150f09; transform-style: preserve-3d; }
-.rv-tak b { position: absolute; left: 0; width: 100%; height: 34px; background: #0a0704; }
-.rv-tak b:nth-child(1) { top: 260px; } .rv-tak b:nth-child(2) { top: 640px; } .rv-tak b:nth-child(3) { top: 1020px; } .rv-tak b:nth-child(4) { top: 1400px; }
-.rv-pult { left: -2600px; top: 1040px; width: 6800px; height: 1200px; transform: translateZ(-60px); background: #1c120a; }
-.rv-horn { width: 380px; transform: translateZ(-599px); background: linear-gradient(to right, rgba(6, 3, 1, 0.78), rgba(6, 3, 1, 0.42) 22%, rgba(6, 3, 1, 0.14) 60%, rgba(6, 3, 1, 0)); }
 
-/* Baren: en färdig bild, disken som en yta i CSS och figurens duk ovanpå. Kroppen slutar vid
-   diskens bakre kant (--kant), i skuggaren (rum-hasse-3d.js). */
-.rum-hasse-vy { position: absolute; inset: 0; pointer-events: auto; color: #f6efdc; font-family: Fraunces, Georgia, serif;
+/* Hans bild: väggen är en färdig bild från samma kamera, disken en duk som ritas en gång och figuren
+   en duk ovanpå. Allt läggs i fönstrets bildpunkter (passa i rum-hasse.js). */
+.rum-hasse-vy { position: absolute; inset: 0; overflow: hidden; pointer-events: auto; color: #f6efdc; font-family: Fraunces, Georgia, serif; background: #120c07;
   /* papperets fibrer, som på kupongen (papper.css) */
   --korn: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='180' height='180'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.85' numOctaves='2' stitchTiles='stitch'/%3E%3CfeColorMatrix values='0 0 0 0 .35 0 0 0 0 .27 0 0 0 0 .18 0 0 0 .09 0'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E"); }
 .rum-hasse-vy[hidden] { display: none; }
-/* hans vägg slutar i hörnet (--xc), och rummet syns till höger om det */
-.rh-scen { position: absolute; left: 0; top: 0; bottom: 0; width: var(--xc, 100%); overflow: hidden; background: #120c07; }
-.rh-scen img.rh-bak { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; object-position: 50% 30%; display: block; }
-/* Disken: lackat trä, ljusast vid den bakre kanten där lamporna speglas, mörkare mot en. */
-.rh-disk { position: absolute; left: 0; right: 0; top: var(--kant, 66%); bottom: -20px;
-  background:
-    linear-gradient(to bottom, rgba(255, 216, 168, 0.32), rgba(255, 216, 168, 0) 2px),
-    linear-gradient(to bottom, rgba(0, 0, 0, 0.42), rgba(0, 0, 0, 0) 9px),
-    radial-gradient(42% 26% at var(--hx, 62%) 0, rgba(255, 186, 112, 0.2), rgba(255, 186, 112, 0) 100%),
-    radial-gradient(90% 60% at 30% 0, rgba(255, 186, 112, 0.08), rgba(255, 186, 112, 0) 100%),
-    linear-gradient(to bottom, #53341d 0, #422915 14%, #2c1b0e 48%, #170e07 100%); }
-/* figurens duk: armen på pulten slutar i hörnet, där rummet ritar handen (utom när armen är ute) */
-.rh-duk { position: absolute; left: 0; top: 0; display: block; clip-path: inset(0 var(--kant-duk, 0px) 0 0); }
-.rum.hasse-arm-ute .rh-duk { clip-path: none; }
+.rh-scen { position: absolute; inset: 0; overflow: hidden; }
+.rh-scen img.rh-bak { position: absolute; left: 0; top: 0; display: block; max-width: none; }
+.rh-disk, .rh-duk { position: absolute; left: 0; top: 0; display: block; pointer-events: none; }
 /* väggen och disken mörknar bakom samtalet, så att texten går att läsa */
 .rh-mork { position: absolute; top: 0; bottom: 0; left: 0; width: var(--mork, 40%); background: linear-gradient(to right, rgba(14, 8, 4, 0.8) 72%, rgba(14, 8, 4, 0)); pointer-events: none; transition: opacity 0.32s ease-out; }
 .rum-hasse-vy.hog .rh-mork { z-index: 1; width: auto; right: 0; top: var(--mork, 46%); bottom: 0; background: linear-gradient(to bottom, rgba(18, 12, 7, 0), rgba(18, 12, 7, 0.72) 90px, rgba(18, 12, 7, 0.9) 40%, #120c07 86%); }
-/* Hörnet: väggen och disken mörknar mot det, och en list står där. Hans vägg når också taket och
-   golvet medan kameran vrids (.rh-fort). */
-.rh-horn { position: absolute; top: 0; bottom: 0; right: 0; width: var(--horn, 7vw); pointer-events: none; background: linear-gradient(to right, rgba(6, 3, 1, 0), rgba(6, 3, 1, 0.2) 45%, rgba(6, 3, 1, 0.62)); }
-.rh-list { position: absolute; right: 0; top: 0; width: max(5px, 0.45vw); height: var(--kant, 66%); background: linear-gradient(to right, #24170d, #5a3d26 30%, #3a2717 60%, #0b0704); }
-.rh-fort { left: 0; width: var(--xc, 100%); height: 40%; }
-.rh-fort.tak { bottom: 100%; background: linear-gradient(to top, #120b06, #090603); }
-.rh-fort.golv { top: 100%; background: #140c06; }
+/* Samma ton över hela bilden: hörnen mörknar, varmt bakom honom och lite kallt från affären till
+   höger, och ett lätt korn som rör sig (inte på de lägre stegen, .enkel). */
+.rh-ton { position: absolute; inset: 0; pointer-events: none;
+  background:
+    radial-gradient(120% 95% at 58% 38%, rgba(0, 0, 0, 0) 52%, rgba(6, 3, 1, 0.55) 100%),
+    linear-gradient(to left, rgba(70, 105, 150, 0.08), rgba(70, 105, 150, 0) 30%); }
+.rh-korn { position: absolute; left: -50%; top: -50%; width: 200%; height: 200%; pointer-events: none; opacity: 0.55;
+  background: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='256' height='256'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.95' numOctaves='2' stitchTiles='stitch'/%3E%3CfeColorMatrix values='0 0 0 0 .5 0 0 0 0 .45 0 0 0 0 .4 0 0 0 .22 -.04'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
+  mix-blend-mode: overlay; animation: rh-korn 0.5s steps(1) infinite; }
+@keyframes rh-korn { 0% { transform: translate(0, 0); } 25% { transform: translate(-7%, 4%); } 50% { transform: translate(5%, -6%); } 75% { transform: translate(-3%, -8%); } }
+.rum-hasse-vy.enkel .rh-korn { display: none; }
+.rum.hasse-pan .rh-korn { animation-play-state: paused; }
 /* samtalet kommer när man har vänt sig mot honom */
 .rh-samtal, .rh-fot { transition: opacity 0.32s ease-out; }
-.rum.hasse-svang:not(.hasse-framme) .rh-samtal, .rum.hasse-svang:not(.hasse-framme) .rh-fot, .rum.hasse-svang:not(.hasse-framme) .rh-mork { opacity: 0; pointer-events: none; }
+.rum.hasse-pan .rh-samtal, .rum.hasse-pan .rh-fot, .rum.hasse-pan .rh-mork { opacity: 0; pointer-events: none; }
 .rh-samtal { position: absolute; top: 12%; bottom: 52px; z-index: 2; display: flex; flex-direction: column; font-size: clamp(15px, 1.22vw, 18px); line-height: 1.42; text-shadow: 0 1px 4px rgba(0, 0, 0, 0.9); }
 .rh-sagt { flex: none; min-height: 1.15em; font: 700 1.62em/1.15 Fraunces, Georgia, serif; margin: 0 0 0.4em; }
 .rh-o { visibility: hidden; }
@@ -117,7 +103,7 @@
 /* slaget i disken: bilden rycker till (koppen hoppar i rum-hasse-3d.js) */
 .rh-slag { animation: rh-slag 0.42s linear; }
 @keyframes rh-slag { 0% { translate: 0 0; } 18% { translate: 0 9px; } 42% { translate: 0 -5px; } 70% { translate: 0 2px; } 100% { translate: 0 0; } }
-.rum.hasse-svang .rum-ft, .rum.hasse-svang .rum-hdr, .rum.hasse-framme .rum-ft, .rum.hasse-framme .rum-hdr { display: none; }
+.rum.hasse-pan .rum-ft, .rum.hasse-pan .rum-hdr, .rum.hasse-framme .rum-ft, .rum.hasse-framme .rum-hdr { display: none; }
 .rh-fot { position: absolute; bottom: 14px; z-index: 2; display: flex; justify-content: flex-end; pointer-events: none; }
 .rh-tillbaka, .rh-ljud { flex: none; font-size: 12px; pointer-events: auto; }
 /* ljudet av och på, längst till vänster */

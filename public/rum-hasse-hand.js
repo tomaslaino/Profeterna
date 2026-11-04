@@ -1,11 +1,11 @@
 // Hasse Backes hand på pulten i tobaksaffären (rum-hasse.js), i three.js: den ligger längst ut till
-// vänster bredvid hans kaffe, med manschetten, och armen kommer in från bildens vänstra kant. Svänger
-// kameran till honom vrids den med rummet som allt annat på pulten, och hans arm går längs disken fram
-// till den (rum-hasse-3d.js). Duken är en liten i pultens plan och ritas bara när fingrarna trummar.
+// vänster bredvid hans kaffe, med manschetten, och armen kommer in från bildens vänstra kant. Den är en
+// ledtråd: han sitter i baren utanför bilden (rum-hasse-3d.js). Duken är en liten i pultens plan och ritas
+// bara när fingrarna trummar.
 //
 // Armen och handen är figurens (rum-hasse-arm.js), och världen och kameran likaså.
 //
-// armen(plan, { hand, pr }) → { placera(), stall({ skala, mot }), trumma(), knapp(el), borta() }
+// armen(plan, { hand, pr }) → { placera(), trumma(), knapp(el), borta() }
 // hand: var handleden vilar, i rummets mått (1600 × 1000)
 import * as THREE from 'three';
 import { ARM, KAMERA, byggArm, laddaFoto, laddaHand } from './rum-hasse-arm.js';
@@ -50,8 +50,8 @@ export async function armen(plan, { hand: HAND, pr = 1.5 }) {
   // (under kaffet och notan: fingrarna når in bakom fatet)
   const kaffe = plan.querySelector('#rum-hasse');
   if (kaffe) kaffe.before(c); else plan.append(c);
-  // (bilden behålls: ligger duken utanför bilden när den ritas, som i telefonen på höjden, visade Chrome
-  // annars en tom duk när kameran svängde dit)
+  // (bilden behålls: ligger duken utanför bilden när den ritas, som i telefonen på höjden, kan Chrome
+  // annars visa en tom duk när den kommer in i bilden)
   const r = new THREE.WebGLRenderer({ canvas: c, alpha: true, antialias: true, powerPreference: 'low-power', preserveDrawingBuffer: true });
   r.setClearColor(0, 0);
   const S = new THREE.Scene();
@@ -99,6 +99,7 @@ export async function armen(plan, { hand: HAND, pr = 1.5 }) {
   // ---------- i vila ----------
 
   // skala: rummets bildpunkter på en av figurens enheter, mot: en punkt i rummet som armen pekar mot
+  // (ut ur bilden till vänster och lite mot en, mot baren där han sitter)
   const opt = { skala: 0.6, mot: [-400, 700] };
   const vila = { s: 1, W: new THREE.Vector3(), N: new THREE.Vector3(), F: new THREE.Vector3(), P: new THREE.Vector3(), D0: new THREE.Vector3() };
   const RH = new THREE.Vector3(1, 0, 0);
@@ -175,7 +176,7 @@ export async function armen(plan, { hand: HAND, pr = 1.5 }) {
       if (Math.sign(fel(mid)) === Math.sign(fl)) lo = mid; else hi = mid;
     }
     riktning((lo + hi) / 2);
-    // duken i planet: från rummets vänstra kant (och lite till, under hans vägg i svängen) till fingrarna
+    // duken i planet: från rummets vänstra kant (och lite till) till fingrarna
     const fot = 390 * opt.skala;
     box = { x: Math.floor(Math.min(HAND.x - fot, -60)), y: Math.floor(HAND.y - fot * 0.72), w: 0, h: Math.ceil(fot * 1.32) };
     box.w = Math.ceil(HAND.x + fot - box.x);
@@ -220,12 +221,6 @@ export async function armen(plan, { hand: HAND, pr = 1.5 }) {
   return {
     trumma,
     placera,
-    // storleken och var armen pekar (rum-hasse.js räknar ut dem ur svängen)
-    stall(o) {
-      const ny = (o.skala !== undefined && Math.abs(o.skala - opt.skala) > 1e-3) || (o.mot && Math.hypot(o.mot[0] - opt.mot[0], o.mot[1] - opt.mot[1]) > 0.5);
-      Object.assign(opt, o);
-      if (ny) placera();
-    },
     knapp(el) { knapp = el; placera(); },
     borta() { cancelAnimationFrame(raf); A.borta(); r.dispose(); r.forceContextLoss(); c.remove(); },
   };
