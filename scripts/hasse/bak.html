@@ -1,19 +1,22 @@
 <!doctype html><meta charset="utf-8"><body style="margin:0;background:#222"><canvas id="ut" style="width:900px"></canvas><script type="module">
-// Rummet runt Hasse Backe: väggen, hyllorna, pultens ände, barstolen och benen, spårat med riktigt
-// ljus (mjuka skuggor, ljus som studsar, blanka ytor, skärpedjup). Ögat står lägre än figurens kamera
-// (OGA_Y: tittaren sitter vid pulten, så att dess yta går ifrån en), men planet genom honom (z = 0)
-// hamnar på samma ställe i bilden, så att fotot passar.
-// Två bilder: rummet utan det nära (lag=0) och det nära med genomskinlighet (lag=1, täckningen i lag=2).
-// ?lage=bred|hog &n=antal varv &k=skala
+// Väggen bakom Hasse Backe i baren: hyllorna, lamporna, flaskorna och bakdisken, spårat med riktigt ljus
+// (mjuka skuggor, ljus som studsar, blanka ytor, skärpedjup) från figurens kamera (public/rum-hasse-scen.js):
+// snett längs baren, så att väggen går bort åt vänster. Skarpt där han sitter. Han själv och bardisken
+// framför honom syns inte men skuggar och kastar ljus (sidan ritar dem, rum-hasse-3d.js).
+// Bilden har måtten i BAK (rum-hasse-scen.js). ?lage=bred|hog &n=antal varv
+import { SCEN, BAK, kamera } from '../../rum-hasse-scen.js';
 const q = new URLSearchParams(location.search);
 const LAGE = q.get('lage') || 'bred';
-const SC = { bred: { W: 2400, H: 1500, S: 0.54, px: 1860, py: 380 }, hog: { W: 1300, H: 2100, S: 0.56, px: 540, py: 250 } }[LAGE];
-const OGA_Y = -78;
-const K = +(q.get('k') || 1), N = +(q.get('n') || 64);
-const W = Math.round(SC.W * K), H = Math.round(SC.H * K);
-const D = 3900, VAGG = -1100;
-// pulten: ytan, bakre kanten (som rummets pult), änden (x = PX) och golvet. Barstolen står vid änden.
-const TOPP = -560, PZ = -300, PX = 270, GOLV = -2300;
+const SC = BAK[LAGE];
+const N = +(q.get('n') || 64);
+const W = SC.W, H = SC.H;
+const D = SCEN.D, VAGG = SCEN.VAGG, GOLV = -2300;
+// kameran i barens mått (x längs baren, z ut ur väggen)
+const KAM = kamera();
+const VB = SCEN.BAR * Math.PI / 180;
+const tillBar = (v) => [Math.cos(VB) * v[0] - Math.sin(VB) * v[2], v[1], Math.sin(VB) * v[0] + Math.cos(VB) * v[2]];
+const v3 = (v) => `vec3(${v.map((x) => x.toFixed(5)).join(', ')})`;
+const KP = tillBar(KAM.pos), KR = tillBar(KAM.hoger), KU = tillBar(KAM.upp), KB = tillBar(KAM.bak);
 
 // ---------- paket och etiketter ----------
 const MARKE = {
@@ -69,7 +72,7 @@ grupp(() => {
   box([0, 0, 5200], [9000, 4000, 20], 0, RGB('#2a2018'));
 });
 // hyllorna
-const HYLLA = [1070, 1250];
+const HYLLA = [800, 980];
 const hylla = (y) => {
   box([0, y - 7, VAGG + 96], [7000, 7, 96], 8);
   box([0, y - 7, VAGG + 196], [7000, 8, 3], 8);
@@ -135,45 +138,25 @@ grupp(() => {
   box([830, 300, VAGG + 8], [122, 168, 8], 8);
   box([830, 300, VAGG + 17], [104, 150, 1], 3, [1, 1, 1], [7 * CELL[0] / atlas.width, 0, 8 * CELL[0] / atlas.width, CELL[1] / atlas.height]);
 });
-// Det nära (grupperna från NARA): pulten med änden, barstolen och benen. Pulten är samma som i rummet:
-// brunt trä med en list i aluminium, framstycket mörkt med fält.
-const NARA = G.length;
-grupp(() => {
-  const ZN = D - 300;
-  // skivan, och framstycket en bit in under den
-  box([PX + 3400, TOPP - 16, (PZ + ZN) / 2], [3400, 16, (ZN - PZ) / 2], 10);
-  box([PX + 3430, (TOPP - 32 + GOLV) / 2, (PZ + ZN) / 2], [3400, (TOPP - 32 - GOLV) / 2, (ZN - PZ) / 2], 8);
-  // fälten på änden
-  for (let z = PZ + 50; z < ZN; z += 520) box([PX + 26, (TOPP - 110 + GOLV + 100) / 2, z + 230], [4, (TOPP - 110 - GOLV - 100) / 2, 230], 8);
-  // listen: längs bakre kanten och runt änden
-  box([PX + 3400, TOPP + 2, PZ], [3400, 9, 13], 12, [.42, .42, .4]);
-  box([PX - 2, TOPP - 3, (PZ + ZN) / 2], [9, 9, (ZN - PZ) / 2], 12, [.42, .42, .4]);
-});
-// barstolen och benen: avståndsfunktioner (kropp i skuggaren)
-P.push({ t: 5, c: [-30, -1500, 500], h: [640, 1000, 800], mat: 11, col: [1, 1, 1], uv: [0, 0, 0, 0] });
-G.push({ mn: [-670, -2501, -301], mx: [611, -499, 1301], a: P.length - 1, b: P.length });
-// han själv, bara i speglingar och skuggor
+// han själv och bardisken framför honom: syns inte, men skuggar och kastar ljus
 const HAN = G.length;
+const hanEll = (c, h, col) => ell(tillBar(c), h, 7, col);
 grupp(() => {
-  ell([10, -60, 40], [300, 520, 150], 7, RGB('#26262a'));
-  ell([-5, 515, 80], [150, 195, 150], 7, RGB('#c89878'));
-  ell([0, 160, 170], [78, 200, 30], 7, RGB('#dcdce4'));
-  ell([-330, -180, 90], [95, 300, 100], 7, RGB('#26262a'));
-  ell([420, -240, 180], [85, 300, 120], 7, RGB('#26262a'));
+  hanEll([10, -60, 40], [300, 520, 150], RGB('#26262a'));
+  hanEll([-5, 515, 80], [150, 195, 150], RGB('#c89878'));
+  hanEll([0, 160, 170], [78, 200, 30], RGB('#dcdce4'));
+  hanEll([-330, -180, 90], [95, 300, 100], RGB('#26262a'));
+  hanEll([420, -240, 180], [85, 300, 120], RGB('#26262a'));
 });
-// benen och stolen som enkla kroppar, för skuggor och ljus som studsar (avståndsfunktionen är dyr, och räknas bara där de syns)
-const BEN = G.length;
+const DISK = G.length;
 grupp(() => {
-  ell([-420, -865, 300], [310, 165, 340], 7, RGB('#26262a'));
-  ell([-110, -905, 370], [300, 170, 370], 7, RGB('#26262a'));
-  ell([-670, -1300, 540], [120, 400, 130], 7, RGB('#26262a'));
-  ell([-315, -1400, 620], [120, 420, 130], 7, RGB('#26262a'));
-  cyl([-70, -1010, 0], 325, 60, 7, RGB('#3a1410'));
-  cyl([-70, -1650, 0], 46, 590, 7, [.5, .5, .5]);
+  const { Y, Z, DJUP } = SCEN.DISK;
+  box([0, Y - 20, Z + DJUP / 2], [7000, 20, DJUP / 2], 10);
+  box([0, (Y - 40 + GOLV) / 2, Z + DJUP / 2 + 60], [7000, (Y - 40 - GOLV) / 2, DJUP / 2 - 60], 8);
 });
 const LJ = [
-  // nyckel: vänster framifrån, varm
-  { p: [-1500, 1450, 1700], r: 460, e: [1.0, 0.86, 0.68].map((v) => v * 15) },
+  // nyckel: framifrån till vänster, varm (samma riktning som figurens ljus, rum-hasse-arm.js)
+  { p: [-700, 1450, 2100], r: 460, e: [1.0, 0.86, 0.68].map((v) => v * 13) },
   // lampan bakom honom: en varm gloria på väggen
   { p: [-260, 520, -800], r: 90, e: [1.0, 0.72, 0.42].map((v) => v * 9) },
   // ljuslisten
@@ -181,10 +164,12 @@ const LJ = [
   { p: [-200, HYLLA[0] - 26, VAGG + 66], r: 26, e: [1.0, 0.74, 0.46].map((v) => v * 14) },
   { p: [700, HYLLA[0] - 26, VAGG + 66], r: 26, e: [1.0, 0.74, 0.46].map((v) => v * 8) },
   { p: [1600, HYLLA[0] - 26, VAGG + 66], r: 26, e: [1.0, 0.74, 0.46].map((v) => v * 4) },
-  // ett svagt varmt ljus framifrån nedtill: stolen och benen försvinner inte i mörkret
-  { p: [-260, -760, 2300], r: 240, e: [1.0, 0.84, 0.66].map((v) => v * 4.2) },
-  // svag kall ton från fönstret till höger
-  { p: [2600, 800, 1500], r: 520, e: [0.55, 0.68, 1.0].map((v) => v * 3.4) },
+  // en lampa längre bort längs baren, så att den fortsätter in i mörkret
+  { p: [-3300, 560, VAGG + 300], r: 80, e: [1.0, 0.7, 0.4].map((v) => v * 7) },
+  // neonskylten i affärens fönster till höger: rött
+  { p: [2600, 650, 1500], r: 260, e: [1.0, 0.16, 0.1].map((v) => v * 12) },
+  // gatan genom fönstret till höger: kallt
+  { p: [3800, 1300, 3400], r: 620, e: [0.55, 0.68, 1.0].map((v) => v * 3.6) },
 ];
 console.log('primitiver', P.length, 'grupper', G.length);
 
@@ -203,8 +188,7 @@ in vec2 a; void main(){ gl_Position = vec4(a, 0., 1.); }`;
 const FS = `#version 300 es
 precision highp float; precision highp int; precision highp sampler2D;
 uniform sampler2D uP, uA, uPrev; uniform int uF; uniform vec4 uG0[${G.length}], uG1[${G.length}]; uniform ivec2 uGi[${G.length}];
-uniform vec4 uL[${LJ.length}], uLe[${LJ.length}]; uniform vec4 uSc; uniform vec2 uRes; uniform int uLag; uniform ivec2 uNara;
-bool sdfPa = true, utanBen = false;
+uniform vec4 uL[${LJ.length}], uLe[${LJ.length}]; uniform vec2 uRes;
 out vec4 ut;
 const float PI = 3.14159265;
 uint st;
@@ -212,50 +196,6 @@ float rn() { st = st * 747796405u + 2891336453u; uint w = ((st >> ((st >> 28u) +
 struct Hit { float t; int id; vec3 n; };
 vec4 data(int i, int k) { return texelFetch(uP, ivec2(k, i), 0); }
 bool slab(vec3 ro, vec3 ird, vec3 mn, vec3 mx, float tmax) { vec3 a = (mn - ro) * ird, b = (mx - ro) * ird; vec3 t0 = min(a, b), t1 = max(a, b); float n = max(max(t0.x, t0.y), t0.z), f = min(min(t1.x, t1.y), t1.z); return f >= max(n, 0.) && n < tmax; }
-// ---------- benen och barstolen ----------
-float kona(vec3 p, vec3 a, vec3 b, float r1, float r2) {
-  vec3 ba = b - a; float l2 = dot(ba, ba), rr = r1 - r2, a2 = l2 - rr * rr, il2 = 1. / l2;
-  vec3 pa = p - a; float y = dot(pa, ba), z = y - l2; vec3 q = pa * l2 - ba * y; float x2 = dot(q, q);
-  float y2 = y * y * l2, z2 = z * z * l2, k = sign(rr) * rr * rr * x2;
-  if (sign(z) * a2 * z2 > k) return sqrt(x2 + z2) * il2 - r2;
-  if (sign(y) * a2 * y2 < k) return sqrt(x2 + y2) * il2 - r1;
-  return (sqrt(x2 * a2 * il2) + y * rr) * il2 - r1;
-}
-float elli(vec3 p, vec3 r) { float k0 = length(p / r), k1 = length(p / (r * r)); return k0 * (k0 - 1.) / max(k1, 1e-5); }
-float rulle(vec3 p, float r, float h, float a) { vec2 d = vec2(length(p.xz) - r + a, abs(p.y) - h + a); return min(max(d.x, d.y), 0.) + length(max(d, 0.)) - a; }
-float ring(vec3 p, float R, float r) { return length(vec2(length(p.xz) - R, p.y)) - r; }
-const vec3 STOL = vec3(-70., -1000., 0.);
-// id: 0 byxorna, 1 kavajens nedre del, 2 sitsen, 3 metallen, 4 skorna
-float kropp(vec3 p, out int id) {
-  // kavajen under fotot, ned till sitsen
-  float kv = elli(p - vec3(-20., -700., 66.), vec3(336., 300., 236.));
-  kv = max(kv, -(p.y + 918.));
-  // Han sitter med sidan mot pulten: låren går ifrån den, knäna ut i rummet.
-  vec3 hV = vec3(-190., -800., 40.), kV = vec3(-640., -930., 560.), aV = vec3(-700., -1640., 520.);
-  vec3 hH = vec3(130., -800., 60.), kH = vec3(-400., -1010., 650.), aH = vec3(-370., -1780., 540.);
-  float b = min(kona(p, hV, kV, 172., 116.), kona(p, hH, kH, 172., 116.));
-  float sk = min(kona(p, kV, aV, 112., 72.), kona(p, kH, aH, 112., 72.));
-  float h = 42.; float t = clamp(.5 + .5 * (sk - b) / h, 0., 1.);
-  float by = mix(sk, b, t) - h * t * (1. - t);
-  // skorna, den ena foten på ringen och den andra på golvet
-  float sko = min(elli(p - (aV + vec3(0., -60., 130.)), vec3(72., 56., 170.)), elli(p - (aH + vec3(0., -60., 130.)), vec3(72., 56., 170.)));
-  // sitsen: stoppad, med en metallkant, ett rör ned till golvet, en ring för fötterna och en fot
-  vec3 q = p - STOL;
-  float si = rulle(q, 322., 48., 40.);
-  float me = rulle(q + vec3(0., 62., 0.), 330., 13., 6.);
-  me = min(me, rulle(q + vec3(0., 650., 0.), 46., 590., 2.));
-  me = min(me, rulle(q + vec3(0., 92., 0.), 120., 22., 8.));
-  me = min(me, ring(q + vec3(0., 830., 0.), 290., 15.));
-  me = min(me, rulle(q + vec3(0., 1280., 0.), 240., 10., 6.));
-  float d = by; id = 0;
-  if (kv < d) { d = kv; id = 1; }
-  if (si < d) { d = si; id = 2; }
-  if (me < d) { d = me; id = 3; }
-  if (sko < d) { d = sko; id = 4; }
-  return d;
-}
-float kroppD(vec3 p) { int i; return kropp(p, i); }
-vec3 kroppN(vec3 p) { const vec2 e = vec2(1.2, 0.); return normalize(vec3(kroppD(p + e.xyy) - kroppD(p - e.xyy), kroppD(p + e.yxy) - kroppD(p - e.yxy), kroppD(p + e.yyx) - kroppD(p - e.yyx))); }
 void prova(int i, vec3 ro, vec3 rd, vec3 ird, inout Hit h) {
   vec4 d0 = data(i, 0), d1 = data(i, 1);
   vec3 c = d0.xyz, s = d1.xyz; int t = int(d0.w);
@@ -271,12 +211,6 @@ void prova(int i, vec3 ro, vec3 rd, vec3 ird, inout Hit h) {
   } else if (t == 2) {
     vec3 oc = o / s, dc = rd / s; float a = dot(dc, dc), b = dot(oc, dc), cc = dot(oc, oc) - 1., dd = b * b - a * cc;
     if (dd > 0.) { float sq = sqrt(dd); float tt = (-b - sq) / a; if (tt < 1e-3) tt = (-b + sq) / a; if (tt > 1e-3 && tt < h.t) { h.t = tt; h.id = i; h.n = normalize((o + rd * tt) / (s * s)); } }
-  } else if (t == 5) {
-    if (!sdfPa) return;
-    vec3 a = (-s - o) * ird, b = (s - o) * ird; vec3 t0 = min(a, b), t1 = max(a, b);
-    float n = max(max(max(t0.x, t0.y), t0.z), 1e-3), f = min(min(min(t1.x, t1.y), t1.z), h.t);
-    float tt = n;
-    for (int k = 0; k < 90 && tt < f; k++) { float dd = kroppD(ro + rd * tt); if (dd < .35) { h.t = tt; h.id = i; h.n = kroppN(ro + rd * tt); break; } tt += dd * .92; }
   } else {
     float a = dot(rd.yz, rd.yz), b = dot(o.yz, rd.yz), cc = dot(o.yz, o.yz) - s.y * s.y, dd = b * b - a * cc;
     if (dd > 0.) { float tt = (-b - sqrt(dd)) / a; if (tt > 1e-3 && tt < h.t && abs(o.x + rd.x * tt) < s.x) { h.t = tt; h.id = i; h.n = vec3(0., o.y + rd.y * tt, o.z + rd.z * tt) / s.y; } }
@@ -285,10 +219,7 @@ void prova(int i, vec3 ro, vec3 rd, vec3 ird, inout Hit h) {
 Hit skarning(vec3 ro, vec3 rd, bool kamera) {
   Hit h; h.t = 1e9; h.id = -1; vec3 ird = 1. / rd;
   for (int g = 0; g < ${G.length}; g++) {
-    if (kamera && (g == ${HAN} || g == ${BEN})) continue;
-    if (utanBen && g == ${BEN}) continue;
-    // rummet utan det nära
-    if (kamera && uLag == 0 && g >= ${NARA} && g < ${HAN}) continue;
+    if (kamera && (g == ${HAN} || g == ${DISK})) continue;
     if (!slab(ro, ird, uG0[g].xyz, uG1[g].xyz, h.t)) continue;
     for (int i = uGi[g].x; i < uGi[g].y; i++) prova(i, ro, rd, ird, h);
   }
@@ -298,7 +229,6 @@ bool skymd(vec3 ro, vec3 rd, float mx) {
   vec3 ird = 1. / rd;
   for (int g = 0; g < ${G.length}; g++) {
     if (g == 3) continue; // ljuslisten skymmer inget
-    if (utanBen && g == ${BEN}) continue;
     if (!slab(ro, ird, uG0[g].xyz, uG1[g].xyz, mx)) continue;
     for (int i = uGi[g].x; i < uGi[g].y; i++) { if (int(data(i, 1).w) == 4 || int(data(i, 1).w) == 6) continue; Hit h; h.t = mx; h.id = -1; prova(i, ro, rd, ird, h); if (h.id >= 0) return true; }
   }
@@ -341,9 +271,7 @@ vec3 spara(vec3 ro, vec3 rd) {
   vec3 L = vec3(0.), T = vec3(1.);
   bool spec = true; bool forsta = true;
   for (int b = 0; b < 6; b++) {
-    sdfPa = forsta;
     Hit h = skarning(ro, rd, forsta);
-    utanBen = false;
     // lampor: bara sedda i blanka ytor (i övrigt räknas de nedan)
     float tl = h.t;
     if (spec && !forsta) for (int i = 0; i < ${LJ.length}; i++) { vec3 oc = ro - uL[i].xyz; float bb = dot(oc, rd), cc = dot(oc, oc) - uL[i].w * uL[i].w, dd = bb * bb - cc; if (dd > 0.) { float tt = -bb - sqrt(dd); if (tt > 1e-3 && tt < tl) { L += T * uLe[i].xyz; return L; } } }
@@ -360,22 +288,6 @@ vec3 spara(vec3 ro, vec3 rd) {
     if (m == 10) { c = pultTra(p); gloss = .5; grov = .34; }
     if (m == 12 && rn() < .4) { // listen i aluminium: lite blank, annars sin egen färg
       vec3 r = reflect(rd, n); rd = normalize(r + (vec3(rn(), rn(), rn()) - .5) * .5); ro = p + n * .5; T *= c; spec = true; forsta = false; continue;
-    }
-    if (m == 11) {
-      int id; kropp(p, id);
-      if (id == 3) { if (rn() < .45) { vec3 r = reflect(rd, n); rd = normalize(r + (vec3(rn(), rn(), rn()) - .5) * .14); ro = p + n * .8; T *= vec3(.9, .88, .84); spec = true; forsta = false; utanBen = true; continue; } c = vec3(.62, .6, .56); }
-      if (id == 2) { c = vec3(.46, .055, .05); gloss = .6; grov = .2; n = normalize(n + .05 * vec3(fbm(p.xz * .06) - .5, 0., fbm(p.xz * .06 + 7.) - .5)); }
-      else if (id == 4) { c = vec3(.012, .009, .008); gloss = .8; grov = .1; }
-      else {
-        // ylle: samma mörkgrå som kavajen i fotot, med lite liv i tyget
-        float v = fbm(p.xy * .55 + p.z * .4) - .5, s2 = fbm(vec2(p.x * .012, p.y * .05 + p.z * .03)) - .5;
-        c = vec3(.118, .118, .125) * (1. + .3 * v);
-        n = normalize(n + vec3(s2 * .3, s2 * .24, 0.) + .05 * vec3(v, -v, 0.));
-        // där tyget möter tyg blir det mörkare
-        float ao = 1.; for (int k = 1; k < 5; k++) { float hk = float(k) * 16.; ao -= max(0., hk - kroppD(p + h.n * hk)) / hk * .22; }
-        c *= max(.18, ao);
-        if (id == 0) c *= .92;
-      }
     }
     if (m == 3) {
       if (abs(h.n.z) > .5 && d3.z > 0.) { vec3 lc = p - data(h.id, 0).xyz; vec2 uv = lc.xy / d1.xy * .5 + .5; c = textureLod(uA, vec2(mix(d3.x, d3.z, uv.x), mix(d3.w, d3.y, uv.y)), 0.5).rgb; }
@@ -394,7 +306,7 @@ vec3 spara(vec3 ro, vec3 rd) {
     forsta = false;
     if (gloss > 0.) {
       float F = (.045 + .955 * pow(1. - abs(dot(n, rd)), 5.)) * gloss;
-      if (rn() < F) { rd = normalize(reflect(rd, n) + (vec3(rn(), rn(), rn()) - .5) * grov * 2.); if (dot(rd, n) < 0.) rd = reflect(rd, n); ro = p + n * .5; spec = true; utanBen = m == 11; continue; }
+      if (rn() < F) { rd = normalize(reflect(rd, n) + (vec3(rn(), rn(), rn()) - .5) * grov * 2.); if (dot(rd, n) < 0.) rd = reflect(rd, n); ro = p + n * .5; spec = true; continue; }
     }
     // direkt ljus från en slumpad lampa
     int li = int(rn() * float(${LJ.length})); if (li >= ${LJ.length}) li = ${LJ.length - 1};
@@ -403,11 +315,7 @@ vec3 spara(vec3 ro, vec3 rd) {
     vec3 lp = lc + lr * vec3(rr * cos(aa), rr * sin(aa), zz);
     vec3 ld = lp - p; float d2l = dot(ld, ld), dl = sqrt(d2l); ld /= dl;
     float ndl = dot(n, ld);
-    // (det som är benen skuggar sig självt på riktigt)
-    bool ben = m == 11;
-    sdfPa = ben; utanBen = ben;
-    bool sk = ndl > 0. && skymd(p + n * (ben ? 1.5 : .6), ld, dl - lr * .2);
-    sdfPa = false; utanBen = ben;
+    bool sk = ndl > 0. && skymd(p + n * .6, ld, dl - lr * .2);
     if (ndl > 0. && !sk) {
       // sfärlampa, jämt utspridd: ytan 4πr², cos på lampan ≈ 1/2 i snitt
       L += T * c / PI * uLe[li].xyz * ndl * (PI * lr * lr) / d2l * float(${LJ.length});
@@ -421,21 +329,19 @@ vec3 spara(vec3 ro, vec3 rd) {
 void main() {
   ivec2 f = ivec2(gl_FragCoord.xy);
   st = uint(f.x) * 1973u + uint(f.y) * 9277u + uint(uF) * 26699u + 1u; rn(); rn();
-  vec2 px = (gl_FragCoord.xy + vec2(rn(), rn()) - .5) / uRes * vec2(uSc.z, uSc.w);
-  float sx = px.x, sy = uSc.w - px.y;
-  vec3 cam = vec3(0., ${OGA_Y.toFixed(1)}, ${D}.);
-  float Yh = uSc.y + (500. - ${OGA_Y.toFixed(1)}) * ${SC.S};
-  vec3 rd = normalize(vec3((sx - uSc.x) / ${SC.S}, -(sy - Yh) / ${SC.S}, -${D}.));
-  // tunn lins: skarpt där han står
-  float zf = 250.; float tf = (${D}. - zf) / -rd.z;
-  vec3 mal = cam + rd * tf;
-  float a = rn() * 2. * PI, r = sqrt(rn()) * 22.;
-  vec3 ro = cam + vec3(r * cos(a), r * sin(a), 0.);
-  rd = normalize(mal - ro);
-  vec3 c;
-  // täckningen: träffar strålen det nära?
-  if (uLag == 2) { Hit h = skarning(ro, rd, true); c = vec3(h.id >= uNara.x && h.id < uNara.y ? 1. : 0.); }
-  else { c = spara(ro, rd); c = min(c, vec3(3.5)); }
+  // figurens kamera (rum-hasse-scen.js), i barens mått; bildpunkten med y nedåt
+  vec2 px = gl_FragCoord.xy + vec2(rn(), rn()) - .5;
+  float sx = px.x, sy = uRes.y - px.y;
+  vec3 dc = vec3((sx - ${SC.px.toFixed(2)}) / ${SC.S.toFixed(4)}, -(sy - ${SC.py.toFixed(2)}) / ${SC.S.toFixed(4)}, -${D.toFixed(1)});
+  // tunn lins: skarpt där han sitter
+  float tf = ${(D - 120).toFixed(1)} / -dc.z;
+  vec3 mal = dc * tf;
+  float a = rn() * 2. * PI, r = sqrt(rn()) * 30.;
+  vec3 o = vec3(r * cos(a), r * sin(a), 0.);
+  vec3 rc = normalize(mal - o);
+  vec3 ro = ${v3(KP)} + o.x * ${v3(KR)} + o.y * ${v3(KU)};
+  vec3 rd = normalize(rc.x * ${v3(KR)} + rc.y * ${v3(KU)} + rc.z * ${v3(KB)});
+  vec3 c = spara(ro, rd); c = min(c, vec3(3.5));
   ut = texelFetch(uPrev, f, 0) + vec4(c, 1.);
 }`;
 const FS2 = `#version 300 es
@@ -450,7 +356,7 @@ const fb = [0, 1].map(() => { const t = tex(W, H, gl.RGBA32F, gl.RGBA, gl.FLOAT,
 gl.useProgram(p1);
 const U = (n) => gl.getUniformLocation(p1, n);
 gl.uniform1i(U('uP'), 0); gl.uniform1i(U('uA'), 1); gl.uniform1i(U('uPrev'), 2);
-gl.uniform2f(U('uRes'), W, H); gl.uniform1i(U('uLag'), +(q.get('lag') || 0)); gl.uniform2i(U('uNara'), G[NARA].a, G[HAN - 1].b); gl.uniform4f(U('uSc'), SC.px, SC.py, SC.W, SC.H);
+gl.uniform2f(U('uRes'), W, H);
 G.forEach((g, i) => { gl.uniform4f(U(`uG0[${i}]`), g.mn[0], g.mn[1], g.mn[2], 0); gl.uniform4f(U(`uG1[${i}]`), g.mx[0], g.mx[1], g.mx[2], 0); gl.uniform2i(U(`uGi[${i}]`), g.a, g.b); });
 LJ.forEach((l, i) => { gl.uniform4f(U(`uL[${i}]`), l.p[0], l.p[1], l.p[2], l.r); gl.uniform4f(U(`uLe[${i}]`), l.e[0], l.e[1], l.e[2], 0); });
 gl.activeTexture(gl.TEXTURE0); gl.bindTexture(gl.TEXTURE_2D, tP);
@@ -478,7 +384,7 @@ window.__visa = () => {
   gl.bindFramebuffer(gl.FRAMEBUFFER, null);
   gl.useProgram(p2);
   gl.activeTexture(gl.TEXTURE0); gl.bindTexture(gl.TEXTURE_2D, fb[f % 2].t);
-  gl.uniform1i(gl.getUniformLocation(p2, 'uT'), 0); gl.uniform1f(gl.getUniformLocation(p2, 'uN'), f); gl.uniform1f(gl.getUniformLocation(p2, 'uRa'), q.get('lag') === '2' ? 1 : 0);
+  gl.uniform1i(gl.getUniformLocation(p2, 'uT'), 0); gl.uniform1f(gl.getUniformLocation(p2, 'uN'), f); gl.uniform1f(gl.getUniformLocation(p2, 'uRa'), 0);
   gl.drawArrays(gl.TRIANGLES, 0, 3);
   gl.finish();
   gl.useProgram(p1);
