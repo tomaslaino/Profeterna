@@ -1,12 +1,19 @@
 // Det Hasse Backe (fiktiv) säger själv i tobaksaffären (rum-hasse.js), utan att
-// någon AI är inblandad. Analysen av en match skrivs i worker/hasse.mjs; här står
+// någon AI är inblandad. Analysen av en match skrivs i förväg (src/analyser/hasse.mjs); här står
 // allt runt omkring. Han lottar bland raderna, och inget av det här är ett faktum
 // om en match eller en person. Raderna ska rymmas på en rad (ungefär 30 tecken),
 // annars knuffar de ner matcherna under sig.
 //
 // {namn} ditt efternamn, {dag} när spelstoppet är (på lördag, i morgon, i dag),
-// {du} dina tecken (etta och kryss), {bada} tecknen ni båda har.
-window.HasseRepliker = {
+// {du} dina tecken (etta och kryss), {bada} tecknen ni båda har, {res} resultatet (2–1).
+//
+// Raderna hörs: Macen tar fram ljudet till dem med fälten ifyllda
+// (src/analyser/rost.mjs), så filen är både ett skript i sidan
+// (window.HasseRepliker) och en modul för Node. lar är knappar och sägs inte.
+(function (repliker) {
+  if (typeof module === 'object' && module.exports) module.exports = repliker;
+  else window.HasseRepliker = repliker;
+})({
   // När man kommer till honom.
   oppning: ['Nå. Vilken match?', 'Säg en match.', 'Vilken match förstår du inte?', 'Jag har svaret. Vilken match?', 'Fråga på. Vilken match?'],
   oppningNamn: ['Nå, {namn}. Vilken match?', '{namn}. Vilken match?', 'Säg en match, {namn}.'],
@@ -31,12 +38,25 @@ window.HasseRepliker = {
   // Om man bara står där och inte frågar.
   ledig: ['Jag har tid.', 'Ta den översta. Den är enkel.', 'Spelstoppet är {dag}.'],
 
-  // När man har valt en match: han svarar och frågar tillbaka. valKlar när analysen
-  // redan finns, valLasa när den måste skrivas och val när det inte går att få veta.
+  // När man har valt en match: han svarar och frågar tillbaka. valKlar när man redan
+  // har frågat om den, valLasa när analysen finns och han ska låtsas läsa på, och val när
+  // den inte finns. Han har alltid svaret, också när han inte har det: att han läser på
+  // märks först när han väntar (vantar).
   val: ['Den är enkel.', 'Den där, ja.', 'Den är inte svår.'],
   valKlar: ['Den har jag tittat på.', 'Den har jag svaret på.', 'Den är redan löst.'],
-  valLasa: ['Den får jag läsa på.', 'Den har ingen frågat om än.', 'Den får jag titta på.'],
+  valLasa: [
+    'Den har jag svaret på.',
+    'Den har jag redan klar för mig.',
+    'Den vet jag allt om.',
+    'Den har jag räknat på.',
+    'Den knäckte jag i morse.',
+    'Den har jag på en lapp här.',
+    'Den pratade vi om i går kväll.',
+    'Den är solklar.',
+  ],
   fragaTillbaka: ['Vill du veta, eller ska du gissa?', 'Vill du ha svaret, eller gissar du?', 'Ska jag säga det, eller gissar du?'],
+  // Knappen som tar fram analysen: ditt svar, bredvid Jag gissar.
+  lar: ['Lär mig', 'Jag lyssnar och lär', 'Upplys mig'],
   // Trycker man på Jag gissar.
   gissar: ['Modigt. Vilken mer?', 'Det har gått förr. Vilken mer?', 'Gissa på. Vilken mer?', 'Det är din kupong. Nästa.'],
   // Direkt när man har bett om analysen.
@@ -44,7 +64,7 @@ window.HasseRepliker = {
   // Samma match en gång till.
   igen: ['Den tog vi nyss.', 'Den har du redan fått.', 'Lyssnade du inte?'],
 
-  // Medan analysen skrivs: en i taget, i den här ordningen. Allt under kontroll.
+  // Medan han låtsas analysera: en i taget, i den här ordningen. Allt under kontroll.
   vantar: [
     'Jag ska bara titta på en sak.',
     'Vi börjar bakifrån.',
@@ -68,6 +88,10 @@ window.HasseRepliker = {
   // Direkt efter domen, när han har helgarderat: han har ju alltid svar.
   helgardera: 'Det är också ett svar.',
 
+  // Efter texten: vad matchen slutar, hemma–borta. Resultatet är det troligaste i modellens
+  // prognos bland tecknen han har ringat in (resultatet i rum-hasse.js).
+  resultat: ['Det slutar {res}.', 'Det blir {res}. Skriv upp det.', 'Jag säger {res}. Inget mer med det.', 'Slutresultat {res}. Det är bara att vänta.'],
+
   // Sist, om din egen kupong.
   kupong: {
     samma: ['Det har du också. Då kan det inte gå fel.', 'Samma som du har. Du har lärt dig något.'],
@@ -81,6 +105,6 @@ window.HasseRepliker = {
   // När något inte går.
   ingenKupong: 'Ingen kupong än. Det är lugnt.',
   igang: 'Efteråt kan alla ha rätt.',
-  fel: 'Den får vi ta en annan gång.',
+  ejKlar: ['Den tar jag sen.', 'Inte än. Fråga mig sen.', 'Den har jag inte läst än.'],
   utanRost: 'Jag har tappat rösten. Här har du det i skrift.',
-};
+});

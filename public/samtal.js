@@ -32,8 +32,8 @@
 // ruta ovanpå omgången.
 //
 // Omgången heter Kupong 1, Kupong 2 … (couponNumber i kupong.js) och får
-// ett namn av AI:n när matcherna är valda (worker/namn.mjs, i samma proxy som
-// matchanalysen) – samma för alla, och det följer med när gängets kupong
+// ett namn av AI:n när matcherna är valda (data/omgangsnamn.json, skrivs av
+// scripts/analyser/skriv.mjs) – samma för alla, och det följer med när gängets kupong
 // sparas. Namnet står bredvid numret, som en bikommentar.
 //
 // Omgången och tipsen ligger i tjänsten profeterna-kupong (worker/samtal.mjs,
@@ -188,31 +188,32 @@
   // ---------- omgångens namn ----------
 
   // Namnet hämtas en gång per omgång och matcher (ändras matcherna får
-  // omgången ett nytt) och sparas på enheten. Första gången skriver AI:n det,
-  // vilket kan ta en minut – då står numret ensamt så länge.
+  // omgången ett nytt) och sparas på enheten. Det skrivs inom en kvart efter att
+  // omgången har skapats – då står numret ensamt så länge.
   const nameKey = (s) => `${s.id}:${s.matcher.map((x) => x.id).sort().join(',')}`;
   function named(s) {
     const url = info() && info().namn;
     if (!s || !url) return null;
     const k = nameKey(s);
     if (!SM.names.has(k)) {
-      // Ett namn som sparats på enheten visas direkt, men tjänsten frågas ändå
+      // Ett namn som sparats på enheten visas direkt, men filen läses ändå
       // en gång per besök – omgången kan ha fått ett nytt namn.
       const saved = kpLoad(NAMN);
       SM.names.set(k, saved && saved.key === k && saved.namn ? saved : 'loading');
-      fetchName(url, s.id, k);
+      fetchName(url, k);
     }
     const n = SM.names.get(k);
     return n && n !== 'loading' ? n : null;
   }
 
-  async function fetchName(url, id, k) {
+  async function fetchName(url, k) {
     const before = SM.names.get(k);
     let n = null;
     try {
-      const res = await fetch(url, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ id }) });
+      const res = await fetch(url, { cache: 'no-cache' });
       const j = await res.json().catch(() => ({}));
-      if (res.ok && j.ok && j.namn) n = { key: k, namn: j.namn, syftar: j.syftar || null };
+      const hit = res.ok && Array.isArray(j.namn) ? j.namn.find((x) => x.key === k) : null;
+      if (hit) n = { key: k, namn: hit.namn, syftar: hit.syftar || null };
     } catch { /* inget namn den här gången */ }
     // Utan svar står ett sparat namn kvar.
     if (!n) {

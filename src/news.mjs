@@ -77,7 +77,7 @@ export async function gatherNews(match, { now = new Date(), store = null, fetchI
 }
 
 // Underlaget till språkmodellen, med svenska nycklar som resten av
-// underlaget (worker/analysis.mjs). Artikeltexten finns bara här.
+// underlaget (src/analyser/underlag.mjs). Artikeltexten finns bara här.
 export function newsPayload(news) {
   const out = {
     förklaring: 'Hämtat online när analysen begärdes. Rapporterat i media, inte kontrollerat av Matchfixarna och inte med i prognosen. Hänvisa med artikelns id, t.ex. [N1], och ange källan.',

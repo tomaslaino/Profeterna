@@ -4,8 +4,7 @@
 // gängets färdigspelade kuponger, sorterbara efter hur det gick, med betyget
 // mot modellen och AI:ns kommentar. Data: data/historik.json (src/history.js)
 // – kupongerna i data/kupong-historik.json plus sidans färdiga kuponger som
-// inte frysts in där än. Kommentaren som saknas i filen hämtas från proxyn
-// (worker/kommentar.mjs), en i taget.
+// inte frysts in där än. Kommentaren skriver scripts/analyser/skriv.mjs in i filen.
 //
 // kampen.js ritar delen med Historik.show(el, id), längst ner i Olympen, och
 // läser kupongerna med Historik.coupons() till tabellen Omgångarna. Allt
@@ -27,8 +26,6 @@
     loading: null,
     sort: 'senaste',
     dir: 1, // 1 = bäst/senast först, -1 = omvänt
-    ai: new Map(), // id → { text } | { error } | 'loading'
-    wait: new Map(), // id → kommentaren som hämtas (Promise)
   };
 
   function esc(s) {
@@ -156,10 +153,8 @@
   }
 
   function aiBlock(c) {
-    const a = c.ai || H.ai.get(c.id);
+    const a = c.ai;
     if (!a) return '';
-    if (a === 'loading') return '<div class="hk-ai is-loading"><span class="hk-ai-who">AI-kommentar</span><p><span class="hk-dots"><i></i><i></i><i></i></span> skriver …</p></div>';
-    if (a.error) return '';
     return `<div class="hk-ai"><span class="hk-ai-who"${a.model ? ` title="${esc(a.model)}"` : ''}>AI-kommentar</span><p>${esc(a.text)}</p></div>`;
   }
 
@@ -294,48 +289,6 @@
     return '<p class="legend">' + errs.map((e) => `<span class="note">${esc(e)}</span>`).join('<br>') + '</p>';
   }
 
-  function paintAi(id) {
-    const c = (H.data.coupons || []).find((x) => x.id === id);
-    const slot = document.querySelector(`[data-ai="${CSS.escape(id)}"]`);
-    if (c && slot) slot.innerHTML = aiBlock(c);
-  }
-
-  // AI:ns kommentar till kuponger som inte har den inskriven än – en i taget,
-  // senaste först. Proxyn cachar texten, så det här kostar bara första gången.
-  // Varje kupong frågas en gång, också när rättningen (rattning.js) ber om
-  // samma kommentar.
-  function fetchComment(c, endpoint) {
-    if (H.wait.has(c.id)) return H.wait.get(c.id);
-    const p = (async () => {
-      H.ai.set(c.id, 'loading');
-      paintAi(c.id);
-      let a;
-      try {
-        const res = await fetch(endpoint, {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ id: c.id }),
-        });
-        const j = await res.json().catch(() => null);
-        a = j && j.ok && j.text ? { text: j.text, model: j.model } : { error: (j && j.error) || `HTTP ${res.status}` };
-      } catch (err) {
-        a = { error: err.message };
-      }
-      H.ai.set(c.id, a);
-      paintAi(c.id);
-      return a;
-    })();
-    H.wait.set(c.id, p);
-    return p;
-  }
-
-  async function fetchComments() {
-    const endpoint = H.data.comment && H.data.comment.endpoint;
-    if (!endpoint) return;
-    const todo = (H.data.coupons || []).filter((c) => !c.ai && c.n);
-    for (const c of todo) await fetchComment(c, endpoint);
-  }
-
   function load() {
     if (H.loading) return H.loading;
     const saved = loadKey(SORT_KEY);
@@ -349,7 +302,6 @@
     ]).then(([data]) => {
       H.data = data;
       if (window.Spoiler) Spoiler.onChange(async () => { await Spoiler.matches(); if (visible()) render(); });
-      fetchComments();
     });
     H.loading.catch(() => { H.loading = null; }); // nästa visning försöker igen
     return H.loading;
@@ -394,8 +346,7 @@
     await load();
     const c = (H.data.coupons || []).find((x) => x.id === id);
     if (!c || !c.n) return null;
-    const endpoint = H.data.comment && H.data.comment.endpoint;
-    const a = c.ai || (endpoint ? await fetchComment(c, endpoint) : null);
+    const a = c.ai;
     return { label: c.label || null, text: (a && a.text) || null, model: (a && a.model) || null };
   }
 

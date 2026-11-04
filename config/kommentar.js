@@ -1,11 +1,10 @@
 'use strict';
 
 // ============================================================================
-// AI-kommentaren till en färdig kupong (sidan Historik). Samma språkmodell och
-// proxy som matchanalysen (config/llm.js): sidan anropar proxyn med kupongens
-// id, proxyn läser kupongen ur den publicerade data/historik.json och skriver
-// en kort, saklig kommentar om hur det gick. Texten cachas för alltid per
-// kupong och underlag, och bygget på GitHub Actions skriver in den i
+// AI-kommentaren till en färdig kupong (sidan Historik). Macen skriver den med
+// Claude Code på användarens konto (scripts/analyser/skriv.mjs,
+// src/analyser/kommentar.mjs): en kort, saklig kommentar om hur det gick, ur den
+// publicerade data/historik.json. Texten skrivs in i
 // data/kupong-historik.json, så att den aldrig skrivs om (src/history.js).
 //
 // Kommentaren är en saklig sammanfattning, inte en analys, och får inte hitta
@@ -14,9 +13,11 @@
 // ============================================================================
 
 module.exports = {
-  // Ändras prompten byts versionen, så att gamla texter i cachen inte
-  // återanvänds för kuponger som ännu inte fått sin kommentar inskriven.
-  promptVersion: '2026-10-19.2',
+  model: 'claude-opus-5-5',
+  effort: 'low',
+  timeoutMs: 180000,
+  // Ett nytt försök om svaret inte klarar kontrollen.
+  attempts: 2,
   // Högst så många ord; längre svar skrivs om.
   maxWords: 80,
 

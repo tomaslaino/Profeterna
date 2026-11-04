@@ -1,37 +1,23 @@
-// Hasse Backe (fiktiv) i tobaksaffären: det viktigaste ur artikeln och tipset
-// (worker/artikel.mjs) med hans röst, lika kort som tipsets analys. Claude får den
-// färdiga analysen, personan i prompts/hasse-backe.md och två lottade uttryck ur
-// frasbanken (config/hasse.js) och skriver utan att söka. Tecknen kommer alltid ur
-// tipset och skrivs aldrig om.
+// Hasse Backe (fiktiv) i tobaksaffären: det viktigaste ur analysen (artikeln och
+// tipset) med hans röst, lika kort som tipsets analys. Macen skriver texten i förväg
+// (scripts/analyser/skriv.mjs): Claude får den färdiga analysen, personan i
+// prompts/hasse-backe.md och två lottade uttryck ur frasbanken (config/hasse.js) och
+// skriver utan verktyg. Tecknen kommer alltid ur tipset och skrivs aldrig om. På
+// sajten låtsas han analysera (public/rum-hasse.js).
 //
 // Kontrollerna (granska): inga tal, citat eller namn utanför analysen, högst
-// maxOrd ord, inga källor ("enligt …"), de inringade tecknen i sista stycket och
-// Bielsa-orden bara om de lottats. Klarar svaret inte det får Claude skriva om en
-// gång, och annars blir det ingen text.
+// maxOrd ord, inga källor ("enligt …"), de inringade tecknen i sista stycket,
+// Bielsa-orden bara om de lottats och inget ur den påhittade kollegans värld. Klarar
+// svaret inte det får Claude skriva om en gång, och annars blir det ingen text.
 //
-// Lagringen (samma KV-namnrymd som analysen):
-//   hasse:<match-id>    {hasse, tries} – hasse: {stycken, tips (tipsets
-//                       writtenAt), uppdrag, model, version, writtenAt,
-//                       attempts}; tries: [{at, ok, error, cost}]
-//   hasse:dag:<datum>   antalet texter det dygnet
-//
-// requestHasse(id, { env, store, persona }) → {status, body}: body är
-// {ok: true, hasse} när texten finns, {ok: true, hasse: null, saknas: true} när
-// artikeln eller tipset inte är skrivna än (POST /artikel först),
-// {ok: true, hasse: null, pending: true} medan någon annan skriver den och
-// annars {ok: false, error}.
+// Texten sparas i analysens post i data/analyser.json: hasse: {stycken, tips
+// (tipsets writtenAt), uppdrag, model, version, writtenAt, attempts}.
 
-import hc from '../config/hasse.js';
-import { currentArticle } from './artikel.mjs';
-import { claudeChat } from './research.mjs';
+import hc from '../../config/hasse.js';
+import ac from '../../config/analyser.js';
+import { claudeSvar } from './claude.mjs';
 
-const ID_RE = /^\d{1,12}$/;
 const REF_RE = /\s*\[\d+(?:\s*[,;]\s*\d+)*\]/g;
-const key = (id) => `hasse:${id}`;
-const dayFmt = new Intl.DateTimeFormat('sv-SE', { timeZone: 'Europe/Stockholm', year: 'numeric', month: '2-digit', day: '2-digit' });
-const dayKey = (now) => `hasse:dag:${dayFmt.format(now)}`;
-
-export const hasseOn = (env) => Boolean(hc.enabled && env[hc.keyEnv]);
 
 // Tecknen i tipset (0 = 1, 1 = X, 2 = 2) som kupongen skriver dem och i ord.
 const ORD = ['ettan', 'krysset', 'tvåan'];
@@ -118,6 +104,8 @@ export function granska(stycken, article, u) {
   const sista = stycken[stycken.length - 1];
   for (const n of signs) if (!TECKEN_RE[n].test(sista)) fel.push(`${ORD[n]} står inte i sista stycket`);
   if (/\[\d/.test(text)) fel.push('hänvisningar i hakparentes');
+  const lanat = ac.rost.egnaNamn.filter((o) => har(text, o));
+  if (lanat.length) fel.push(`${lanat.join(', ')} hör till kollegans historier, inte matchen`);
   const tillatet = [hc.bielsaCitat, hc.bielsaTillbaka, ...hc.fraser, ...(u.krydda ? [u.krydda] : [])];
   for (const m of text.matchAll(/["“”«»]([^"“”«»]{4,})["“”«»]/g)) {
     if (!har(kalla, m[1]) && !tillatet.some((f) => har(m[1], f) || har(f, m[1]))) fel.push(`citatet "${m[1]}" står inte i analysen`);
@@ -136,17 +124,15 @@ export function granska(stycken, article, u) {
 
 // ---------- samtalet ----------
 
-const costOf = (usage) => {
-  const p = hc.prices;
-  const c = (usage || []).reduce((s, u) => s + (u.input_tokens || 0) * p.input + (u.cache_creation_input_tokens || 0) * p.cacheWrite + (u.cache_read_input_tokens || 0) * p.cacheRead + (u.output_tokens || 0) * p.output, 0) / 1e6;
-  return c ? Number(c.toFixed(4)) : null;
-};
 const jsonOf = (s) => JSON.parse(s.slice(s.indexOf('{'), s.lastIndexOf('}') + 1));
 
-// Texten för artikeln. persona: innehållet i prompts/hasse-backe.md.
-export async function writeHasse(id, article, { env, persona, chat = claudeChat }) {
+// Är texten skriven för det här tipset och den här versionen?
+export const hasseKlar = (h, article) => Boolean(h && article.tip && h.tips === article.tip.writtenAt && h.version === hc.promptVersion);
+
+// Texten för analysen. persona: innehållet i prompts/hasse-backe.md.
+// → {ok: true, hasse, meta} eller {ok: false, error}.
+export async function skrivHasse(id, article, { persona, now = () => new Date(), claude = claudeSvar }) {
   const u = uppdrag(id, article);
-  const c = chat(env[hc.keyEnv], { ...hc, systemPrompt: `${persona.trim()}\n\n${hc.format}` });
   const signs = article.tip.signs;
   const rader = [
     `Analysen:\n${JSON.stringify(kallan(article))}`,
@@ -155,66 +141,19 @@ export async function writeHasse(id, article, { env, persona, chat = claudeChat 
     u.krydda && `En rad du gärna får lägga in ordagrant: ${u.krydda}`,
     u.bielsa.length && `Dina Bielsa-ord, för något som står i analysen: ${u.bielsa.join(', ')}. Den enda Bielsa-repliken du citerar är din favorit: "${hc.bielsaCitat}"`,
   ].filter(Boolean);
+  const opts = { system: `${persona.trim()}\n\n${hc.format}`, model: hc.model, effort: hc.effort, timeoutMs: hc.timeoutMs, tools: [] };
   let fel = [];
-  let attempts = 0;
   let meddelande = rader.join('\n\n');
-  for (; attempts < 2;) {
-    attempts++;
-    const r = await c.say(meddelande);
-    if (r.refused) return { ok: false, error: 'Texten nekades.', usage: c.usage };
+  for (let attempts = 1; attempts <= 2; attempts++) {
+    const r = await claude({ ...opts, prompt: meddelande });
+    if (r.refused) return { ok: false, error: 'Texten nekades.' };
     let stycken = null;
     try { stycken = jsonOf(r.content).stycken; } catch { fel = ['svaret gick inte att läsa som JSON']; }
     if (stycken) {
       fel = granska(stycken, article, u);
-      if (!fel.length) return { ok: true, usage: c.usage, hasse: { stycken: stycken.map((s) => s.trim()), tips: article.tip.writtenAt, uppdrag: u, model: r.model, version: hc.promptVersion, writtenAt: new Date().toISOString(), attempts } };
+      if (!fel.length) return { ok: true, meta: r, hasse: { stycken: stycken.map((s) => s.trim()), tips: article.tip.writtenAt, uppdrag: u, model: r.model, version: hc.promptVersion, writtenAt: now().toISOString(), attempts } };
     }
-    meddelande = `Det här stämmer inte:\n- ${fel.join('\n- ')}\n\nSkriv om hela svaret som JSON.`;
+    meddelande = `${rader.join('\n\n')}\n\nDitt förra svar:\n${r.content}\n\nDet här stämmer inte:\n- ${fel.join('\n- ')}\n\nSkriv om hela svaret som JSON.`;
   }
-  return { ok: false, error: `Texten klarade inte kontrollen: ${fel.join('; ')}.`, fel, usage: c.usage };
+  return { ok: false, error: `Texten klarade inte kontrollen: ${fel.join('; ')}.` };
 }
-
-// ---------- tjänsten ----------
-
-const giltig = (h, article) => h && article.tip && h.tips === article.tip.writtenAt && h.version === hc.promptVersion;
-const fail = (status, error, final = false) => ({ status, body: { ok: false, error, ...(final ? { retry: false } : {}) } });
-
-export async function currentHasse(store, id) {
-  if (!store || !ID_RE.test(String(id))) return null;
-  const a = await currentArticle(store, id);
-  if (!a) return null;
-  const s = await store.get(key(id));
-  return s && giltig(s.hasse, a) ? s.hasse : null;
-}
-
-export async function requestHasse(id, { env, store, persona, now = () => new Date(), write = writeHasse }) {
-  if (!ID_RE.test(String(id == null ? '' : id))) return fail(400, 'Okänt match-id.', true);
-  if (!hasseOn(env) || !store) return fail(503, 'Hasse är inte på plats.', true);
-  const article = await currentArticle(store, id);
-  if (!article || !article.tip) return { status: 200, body: { ok: true, hasse: null, saknas: true } };
-  const s = (await store.get(key(id))) || { hasse: null, tries: [] };
-  if (giltig(s.hasse, article)) return { status: 200, body: { ok: true, hasse: s.hasse } };
-  const t0 = now();
-  const tries = (s.tries || []).filter((x) => x.tips === article.tip.writtenAt);
-  const last = tries[tries.length - 1];
-  if (last && last.error === 'pågår' && t0.getTime() - Date.parse(last.at) < hc.timeoutMs + 60000) return { status: 200, body: { ok: true, hasse: null, pending: true } };
-  if (tries.length >= hc.perMatch) return fail(429, 'Texten gick inte att skriva.', true);
-  const today = Number(await store.get(dayKey(t0))) || 0;
-  if (today >= hc.perDay) return fail(429, 'Det räcker för i dag.', true);
-  const ttl = hc.keepDays * 86400;
-  tries.push({ at: t0.toISOString(), tips: article.tip.writtenAt, ok: false, error: 'pågår' });
-  await store.put(key(id), { ...s, tries }, ttl);
-  await store.put(dayKey(t0), today + 1, 2 * 86400);
-  let r;
-  try {
-    r = await write(id, article, { env, persona });
-  } catch (err) {
-    r = { ok: false, error: (err && err.message) || 'okänt fel' };
-  }
-  const cost = costOf(r.usage);
-  tries[tries.length - 1] = { at: t0.toISOString(), tips: article.tip.writtenAt, ok: r.ok, ...(r.ok ? {} : { error: r.error }), ...(cost ? { cost } : {}) };
-  await store.put(key(id), { hasse: r.ok ? r.hasse : s.hasse, tries }, ttl);
-  console.log('[hasse]', JSON.stringify({ id: String(id), ok: r.ok, error: r.ok ? undefined : r.error, cost, forsok: r.hasse && r.hasse.attempts }));
-  return r.ok ? { status: 200, body: { ok: true, hasse: r.hasse } } : fail(502, r.error);
-}
-
-export { costOf };

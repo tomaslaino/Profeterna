@@ -127,12 +127,6 @@
 }
 .hk-ai-who { display: block; font-size: 10.5px; font-weight: 800; letter-spacing: 0.14em; text-transform: uppercase; color: var(--accent-deep); }
 .hk-ai p { margin: 4px 0 0; font-size: 15px; line-height: 1.55; color: var(--fg); max-width: 70ch; }
-.hk-ai.is-loading p { color: var(--muted); font-size: 13.5px; }
-.hk-dots { display: inline-flex; gap: 3px; margin-right: 4px; vertical-align: 1px; }
-.hk-dots i { width: 5px; height: 5px; border-radius: 50%; background: var(--accent-deep); animation: hk-blink 1.2s infinite; }
-.hk-dots i:nth-child(2) { animation-delay: 0.2s; }
-.hk-dots i:nth-child(3) { animation-delay: 0.4s; }
-@keyframes hk-blink { 0%, 80%, 100% { opacity: 0.25; } 40% { opacity: 1; } }
 
 /* ---------- matcherna ---------- */
 
@@ -219,5 +213,4 @@
 }
 
 @media (prefers-reduced-motion: reduce) {
-  .hk-dots i { animation: none; opacity: 0.7; }
-}
+  }

@@ -18,7 +18,7 @@
 //           { "match": "Everton – Chelsea", "tecken": "2", "resultat": "1–2", "modell": [27, 24, 49],
 //             "kommentar": "Teijder lovade", "id": "401878771" }
 //         ],
-//         "ai": { "text": "…", "modell": "deepseek-v4-pro", "skriven": "2026-10-19T08:07:00.000Z" }
+//         "ai": { "text": "…", "modell": "claude-opus-5-5", "skriven": "2026-10-19T08:07:00.000Z" }
 //       }
 //     ]
 //   }
@@ -31,9 +31,10 @@
 //
 // Kuponger som görs på sidan (data/kuponger/, src/coupons.js) fryses in här
 // när varje match är spelad – med resultat och modellens prognos, så att
-// historiken finns kvar när säsongens matcher inte längre gör det. Det, och
-// AI:ns kommentar, skriver bara bygget på GitHub Actions (--journal), som
-// också committar filen. Lokalt visas en färdig kupong ändå, bara inte fryst.
+// historiken finns kvar när säsongens matcher inte längre gör det. Det skriver bara
+// bygget på GitHub Actions (--journal), som också committar filen. Lokalt visas en
+// färdig kupong ändå, bara inte fryst. AI:ns kommentar skriver
+// scripts/analyser/skriv.mjs in i filen.
 // Äldre kuponger, lagda före sidan, läggs in för hand i samma format.
 
 const fs = require('fs');
@@ -318,39 +319,6 @@ function buildHistory({ coupons, matches, freeze = false, file = HISTORY_FILE, n
   return { coupons: list, errors: h.errors, frozen };
 }
 
-// AI:ns kommentarer skrivs in i filen av bygget på GitHub Actions: för varje
-// kupong i filen utan kommentar frågas proxyn, som läser kupongen ur den
-// publicerade sajten. En kupong som frysts in i det här bygget är inte
-// publicerad än – den får sin kommentar i nästa bygge. Ett fel stoppar inget.
-async function writeComments({ endpoint, file = HISTORY_FILE, max = 5, fetchImpl = fetch, log = console.log }) {
-  if (!endpoint) return [];
-  const h = readHistory(file);
-  if (h.broken) return [];
-  const missing = h.entries.filter((e) => !(e.ai && e.ai.text)).slice(0, max);
-  const done = [];
-  for (const e of missing) {
-    try {
-      const res = await fetchImpl(endpoint, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ id: e.id }),
-        signal: AbortSignal.timeout(180000),
-      });
-      const j = await res.json().catch(() => null);
-      if (!res.ok || !j || !j.ok || !j.text) {
-        log(`[historik] ${e.id}: ingen kommentar (${(j && j.error) || `HTTP ${res.status}`})`);
-        continue;
-      }
-      e.ai = { text: j.text, modell: j.model || null, skriven: j.generatedAt || new Date().toISOString() };
-      done.push(e.id);
-    } catch (err) {
-      log(`[historik] ${e.id}: ingen kommentar (${err.message || err})`);
-    }
-  }
-  if (done.length) writeHistory(h.raw, file);
-  return done;
-}
-
 module.exports = {
   HISTORY_FILE,
   GRADES,
@@ -361,5 +329,4 @@ module.exports = {
   finishedFromCoupons,
   summarize,
   buildHistory,
-  writeComments,
 };
