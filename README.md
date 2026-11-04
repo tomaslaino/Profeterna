@@ -3503,7 +3503,8 @@ listan tillbaka på samma sida, med den markerad.
 **Nära** (klick eller V) går kameran fram tills tv:n och lådan ryms mellan namnet och
 foten (högst sex gånger), och svänger samtidigt runt tv:n in mot rummet, så att man ser
 rutan snett framifrån i stället för från sidan. Tv:n och lådan vrids inte och flyttas inte –
-de står kvar vända mot gänget – utan det är kameran som rör sig (se *Kamerans sväng* nedan).
+de står kvar vända mot gänget – utan det är kameran som rör sig (se *Kamerans sväng* och
+*Rummet runt tv:n* nedan).
 Kassetterna glider ut en bit när man pekar på dem. I telefonen på höjden går kameran bara
 fram till lådan (`LADAN`), så att etiketterna går att läsa; där tar en kassett (eller ett
 tryck på kanten av tv:n bredvid lådan) kameran vidare till rutan. I telefonen, på höjden och på bredden, spelas en kassett alltid med rutan i hela fönstret. Ett klick på rutan (eller hjulet framåt)
@@ -3665,18 +3666,39 @@ rum-video.js). När bilden fyller fönstret ritas hörnet 112 grader runt (`VRID
 står parallellt med bilden, och ögat (perspektivets mitt i hörnet, `perspective-origin` på
 `.vhs-in`) flyttas rakt framför rutan: kameran går fram genom att förstora en del av bilden,
 så vänd mot det vanliga ögat blev rutan sned som i kanten av ett vidvinkelfoto, och därifrån
-skymde lådan rutans vänstra kant. Att rummet bara vrids 34 grader där syns inte, eftersom
-bilden fyller fönstret. Planen vrids som de är, och väggen, skårtavlan, korktavlan och
+skymde lådan rutans vänstra kant. Planen vrids som de är, och väggen, skårtavlan, korktavlan och
 disken följer med; tv:n och lådan ses från det nya hållet. Hörnets eget plan vrids inte: det
 står där rummet vrids kring, och Chrome ritar allt som lutar i perspektiv suddigt nära. Det
-flyttas i stället fram lika långt som väggen vrids fram bakom lådan och görs lika mycket
-mindre, så att det syns där det syntes – räknat längs synlinjen genom lådans vänstra kant,
-där den möter den vridna väggen (rakt bakom kanten räckte inte, och väggen skar av lådans
-vänstra kassettrad). Större vinklar på rummet går inte: vid ungefär 40 grader glider
-fönsterbänken in över lådan och lådan ser ut att sväva över disken. Nära tar bara hörnet
-emot klick – med kameran svängd räknade Chrome annars kortregistret på disken bakom lådan
-som närmast, och kassetterna i lådan gick inte att klicka på. Med `prefers-reduced-motion`
-och i fasta bilder står kameran direkt i vinkeln. Lagren blir inte fler eller större.
+flyttas i stället fram lika långt som väggen vrids fram och görs lika mycket mindre, så att det
+syns där det syntes – räknat längs synlinjen genom bildens vänstra kant (eller lådans, om den
+står längre ut), där den möter den vridna väggen, och vid rutan från där kameran kom (`kant` i
+`sving` och `vkant` i rum.js). Förut räknades bara till lådans kant, och Chrome lät då väggen
+skära av lådan och halva tv:n nära (provat i Chrome 153 utan synligt fönster). Hörnet går
+högst till 20 enheter bakom planet -330. Större vinklar på rummet går inte: vid ungefär 40
+grader glider fönsterbänken in över lådan och lådan ser ut att sväva över disken. Nära tar bara
+hörnet emot klick – med kameran svängd räknade Chrome annars kortregistret på disken bakom
+lådan som närmast, och kassetterna i lådan gick inte att klicka på. Med `prefers-reduced-motion`
+och i fasta bilder står kameran direkt i vinkeln.
+
+**Rummet runt tv:n.** Mellan lådan och rutan går kameran 82 grader till runt tv:n, men rummets
+plan bara 4: med bara dem såg det ut som att tv:n vände sig mot en på disken medan väggen bakom
+stod still, i stället för att kameran gick runt den. Därför finns väggen bakom tv:n – med
+Tipsligan och korktavlan – och bardisken som den står på också i 3D i hörnets eget perspektiv
+(`rumYtor` och `.vhs-rum` i rum-video.js), i `.vhs-kam`, så att de svänger med tv:n och lådan:
+tv:n står kvar på disken mot väggen, och väggen vrids fram bakom den tills den står nästan rakt
+framför kameran när rutan fyller bilden. Måtten är rummets (bg, `disk` och `VAGG` i rum.js);
+hörnet är rummet förstorat 2⅓ gånger kring ögat (`SK`), så att disken hamnar under tv:ns fot och
+väggen där tv:n tar i den. Väggen och disken har rummets toner (`toning`), fronten fyllningarna
+och krokarna och skivan strimmorna och fogarna; Tipsligan och korktavlan är kopior av tavlorna i
+rum.js när man går fram (`tavlor`), utan ramarna i 3D. Diskens front står 9 enheter längre ut än
+i rummet, under skivans kant: ett plan som går genom tv:n eller lådan delar Chrome dem längs, och
+då syntes ett svart streck genom rutan. Rummet runt tv:n finns bara på vägen till rutan, vid den
+och på vägen tillbaka (`.vhs-tat`, `.vhs-runt`): det tonar in över de målade planen på 0,2
+sekunder när kameran börjar, och ut de sista 0,25 sekunderna tillbaka (hela vägen hem till rummet
+tidigare, `.vhs-hem`, innan dess kanter syns). I telefonen och Safari tonar det bort när kameran
+har stannat vid rutan med en kassett i, som väggen i rum.js gör där, och tas bort med lådan
+(`utanLada`). Ytorna ritas i rummets mått och förstoras (väggen och fronten i halva, kopiorna i
+dubbla), så att lagren är små. Med `prefers-reduced-motion` syns det direkt vid rutan.
 
 Hörnet ritas i sex gånger storleken och förminskas, som tv:n, och dubbelt till (`zoom: 2`)
 när rutan fyller bilden (det andra klicket), så att det är skarpt också där; ritningarna är

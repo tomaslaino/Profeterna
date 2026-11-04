@@ -61,6 +61,43 @@
 .vhs-in.glid { transition: perspective-origin 0.6s cubic-bezier(0.3, 0, 0.2, 1); }
 .vhs-tv, .vhs-front, .vhs-lada { position: absolute; }
 .vhs-yta { position: absolute; display: block; backface-visibility: hidden; pointer-events: none; }
+/* Rummet runt tv:n (rumYtor i rum-video.js): väggen med Tipsligan och
+   korktavlan och bardisken i 3D, som svänger med tv:n när kameran går fram
+   till rutan. De finns bara då och på vägen tillbaka (.vhs-runt), och tonar
+   in och ut över rummets målade plan medan kameran rör sig. */
+.vhs-rum { position: absolute; left: 0; top: 0; transform-style: preserve-3d; display: none; }
+.vhs-tat .vhs-rum, .vhs-runt .vhs-rum { display: block; }
+.vhs-vy { position: absolute; left: 0; top: 0; display: block; transform-origin: 0 0; backface-visibility: hidden; pointer-events: none; }
+.vhs-vy > b { display: block; position: relative; }
+.vhs-tat .vhs-vy { animation: vy-in 0.2s both; }
+.vhs-runt:not(.vhs-tat) .vhs-vy { animation: vy-ut 0.25s 0.35s both; }
+.vhs-hem:not(.vhs-tat) .vhs-vy { animation: vy-ut 0.15s 0.12s both; }
+/* i telefonen och Safari, när kameran har stannat vid rutan (utanLada) */
+.vhs-tat.vhs-tona .vhs-vy { animation: vy-ut 0.4s both; }
+@keyframes vy-in { from { opacity: 0; } }
+@keyframes vy-ut { to { opacity: 0; } }
+/* Tipsligan och korktavlan (kopior, tavlor i rum-video.js) */
+.vy-tavla > b > * { position: absolute; pointer-events: none; }
+/* fronten: skuggan under skivan, krokarna mitt i fälten och fyllningarna mellan ramarna */
+.vy-front > b {
+  background-image:
+    linear-gradient(180deg, rgba(0, 0, 0, 0.5) 0 47px, rgba(0, 0, 0, 0.26) 47px 84px, rgba(0, 0, 0, 0.1) 84px 129px, transparent 129px),
+    linear-gradient(90deg, transparent 0 68.8px, #7d5e2c 68.8px 73.8px, transparent 73.8px),
+    linear-gradient(90deg, transparent 0 14px, rgba(0, 0, 0, 0.28) 14px),
+    linear-gradient(90deg, transparent 0 14px, rgba(232, 184, 128, 0.1) 14px 16.4px, rgba(0, 0, 0, 0.2) 16.4px),
+    var(--front);
+  background-size: 100% 100%, 128.57px 9px, 128.57px 5px, 128.57px 188px, 100% 100%;
+  background-position: 0 0, var(--fas) 28px, var(--fas) 23px, var(--fas) 23px, 0 0;
+  background-repeat: no-repeat, repeat-x, repeat-x, repeat-x, no-repeat;
+}
+/* skivan: blanka strimmor längs kanten och fogarna mellan plankorna */
+.vy-topp > b {
+  background-image:
+    linear-gradient(90deg, rgba(255, 214, 160, 0.22) 0 3.5px, transparent 3.5px 9px, rgba(255, 226, 180, 0.05) 9px 13px, rgba(255, 226, 180, 0.12) 13px 22px, rgba(255, 226, 180, 0.05) 22px 30px, transparent 30px),
+    linear-gradient(90deg, transparent 0 26.5px, rgba(28, 12, 4, 0.3) 26.5px 27.5px, transparent 27.5px 45.5px, rgba(28, 12, 4, 0.3) 45.5px 46.5px, transparent 46.5px 63.5px, rgba(28, 12, 4, 0.3) 63.5px 64.5px, transparent 64.5px),
+    var(--topp);
+}
+.vy-kant > b { background: linear-gradient(180deg, #a87650 0 1.8px, #653a21 1.8px 6.5px, #341b0d 6.5px 11px, rgba(0, 0, 0, 0.55) 11px); }
 .rum.vid-nara .vhs-yta:not(.vhs-skugga, .vhs-pol) { pointer-events: auto; }
 /* sidorna i svart plast, med springor i bakre halvan */
 .vhs-sida {
@@ -233,7 +270,7 @@
 .vhs-mask[hidden] { display: none; }
 /* myrornas krig, när inget av klippen går att spela */
 /* med rutan i hela fönstret i telefonen (utanLada i rum-video.js) */
-.rum-vhs.utan-lada :is(.vhs-lada, .vhs-sken, .vhs-tv > .vhs-yta) { display: none; }
+.rum-vhs.utan-lada :is(.vhs-lada, .vhs-sken, .vhs-tv > .vhs-yta, .vhs-rum) { display: none; }
 .vhs-brus {
   inset: -40px;
   background: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='160' height='120'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.9' numOctaves='2' seed='3' stitchTiles='stitch'/%3E%3CfeColorMatrix values='0 0 0 .9 0  0 0 0 .9 0  0 0 0 .9 0  0 0 0 0 1'/%3E%3C/filter%3E%3Crect width='160' height='120' filter='url(%23n)'/%3E%3C/svg%3E") 0 0 / 160px 120px;
@@ -410,4 +447,5 @@
   .vhs-brus, .vhs-vfd.blink, .rum-vhs .vhs-sok *, .rum-vhs .vhs-bild { animation: none !important; }
   .rum-vhs .sok-rand { transform: translateY(176px); }
   .vhs-band, .vhs-lucka, .vhs-sken, .vhs-pol, .vhs-kam.glid, .vhs-in.glid { transition: none; }
+  .vhs-vy { animation: none !important; }
 }
