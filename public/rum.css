@@ -638,7 +638,7 @@ canvas.rum-neonhalo { opacity: 0.28; }
 
 /* Hasse Backe sitter i baren utanför bilden till vänster; längst ut på pulten
    står hans kaffe och notan (ett klick: rum-hasse.js). */
-#rum-hasse { position: absolute; left: -10px; top: 640px; width: 280px; height: 304px; }
+#rum-hasse { position: absolute; left: 100px; top: 640px; width: 280px; height: 304px; }
 #rum-hasse > * { position: absolute; display: block; }
 #rum-hasse .nota {
   left: 118px;
@@ -664,10 +664,11 @@ canvas.rum-neonhalo { opacity: 0.28; }
 #rum-hasse .sa { border-top: 1.5px solid currentColor; margin-right: -4px; }
 #rum-hasse .skrivs { transform: rotate(-4deg); margin-top: 1px; }
 #rum-hasse .nc { font-size: 24px; font-weight: 700; transform: rotate(-5deg); transform-origin: 0 50%; margin-left: -4px; text-decoration: underline double; text-decoration-thickness: 1.5px; text-underline-offset: 4px; text-decoration-skip-ink: none; }
-#rum-hasse .kopp { left: 0; top: 0; overflow: visible; }
+/* koppen står vid pultens bakre kant, där hans hand ligger (rum-hasse.js) */
+#rum-hasse .kopp { left: 0; top: -30px; overflow: visible; }
 #rum-hasse .kopp-in { transform-box: fill-box; transform-origin: 50% 100%; }
 /* ångan från kaffet */
-#rum-hasse .anga { left: 52px; top: -34px; width: 46px; height: 86px; pointer-events: none; }
+#rum-hasse .anga { left: 52px; top: -64px; width: 46px; height: 86px; pointer-events: none; }
 #rum-hasse .anga i {
   position: absolute;
   left: 8px;

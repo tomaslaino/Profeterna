@@ -1,5 +1,6 @@
 // Hasse Backe i tobaksaffären (rum-hasse.js), i three.js: han sitter bakom bardisken, vänd mot en, med
-// underarmarna på disken och kaffet framför sig. Kostymfotot (C More Entertainment, CC BY 3.0, Wikimedia
+// underarmarna på disken, och den vänstra går längs disken till handen på pulten i rummet (pult). Utan
+// handen där har han kaffet framför sig. Kostymfotot (C More Entertainment, CC BY 3.0, Wikimedia
 // Commons) ligger på en formad yta, så att huvudet vrids på riktigt runt nacken och kroppen lutar sig
 // fram. Ögon, bryn och mun rör sig i skuggaren. Armarna, händerna och koppen finns i rum-hasse-arm.js.
 //
@@ -10,7 +11,7 @@
 // Världen: 1 enhet = 1 bildpunkt i fotot, x = fotots x − 660, y = 900 − fotots y, z mot betraktaren.
 // Ögat står på (0, 500, D) och tittar rakt fram.
 //
-// figuren(duk, { hog, latt, pr }) → { kamera(v), rita(T, n, tal, mun), tid, info(), borta() }
+// figuren(duk, { hog, latt, pr }) → { kamera(v), pult({ W, k, E }), rita(T, n, tal, mun), tid, info(), borta() }
 // Klipp: T 0–12,4 (vila, skrattet, domen, gesterna, hem) och T 20–24,5 (en klunk kaffe, börjar och slutar som vilan).
 import * as THREE from 'three';
 import { ATLAS, LJUS, ARM, KAMERA, BORD_GLSL, laddaFoto, laddaHand, byggArm, byggKopp } from './rum-hasse-arm.js';
@@ -26,9 +27,13 @@ const spar = (k, t) => {
 
 // ---------- figuren ----------
 
+export { KAMERA };
 export const D = KAMERA.CZ;
 // Disken: ovansidan (y) och den bakre kanten (z), strax framför hans mage.
 export const BORD = { Y: -290, Z: 230 };
+// Armarna på disken: armbågens och handledens höjd, och dit armbågen går när handen ligger på pulten
+// (rum-hasse.js): på disken till höger om honom, en överarm från axeln.
+export const VILA = { EH: BORD.Y + 78, WH: BORD.Y + 42, armbage: [540, BORD.Y + 78, BORD.Z + 120] };
 // En punkt i världen i fönstret, när ögonhöjden på avståndet 0 står i (cx, ey) med s bildpunkter
 // på en enhet.
 export function iBild(v, x, y, z = 0) {
@@ -317,8 +322,7 @@ export async function figuren(duk, { hog = false, latt = false, pr = 1 } = {}) {
   // Vilan: armbågarna på disken, underarmarna på den in mot mitten, och handen på hans vänstra sida
   // vid koppen. Ur axeln (s), armbågens vinkel ut från rakt fram (a) och underarmens vinkel in (b):
   // armbågen och handleden ligger på disken, med armens längder.
-  const EH = BORD.Y + 78;
-  const WH = BORD.Y + 42;
+  const { EH, WH } = VILA;
   function paDisken(s, sida, a, b) {
     const S0 = new THREE.Vector3(s.x + 2 * sida, s.y - 8, s.z);
     const h1 = Math.sqrt(LA * LA - (S0.y - EH) ** 2);
@@ -352,15 +356,21 @@ export async function figuren(duk, { hog = false, latt = false, pr = 1 } = {}) {
     [9.25, P_(hog ? 235 : 95, 830, 320), [-0.7, -0.75, 0.1], [-0.76, 0.5, 0.3], [0.12, -0.25, 1], 0.1, 0],
     [9.95, ...VILA_A], [12.4, ...VILA_A],
   ];
-  const VB = [
+  const vbNycklar = () => [
     [0, ...VILA_B], [2.55, ...VILA_B],
     [3.0, P_(1110, 505, 310), [0.6, -0.5, 0.65], [0.12, 0.97, 0.12], [-0.12, -0.06, 1], 0.1, 0],
     [4.2, P_(1110, 505, 310), [0.6, -0.5, 0.65], [0.12, 0.97, 0.12], [-0.12, -0.06, 1], 0.1, 0],
     [4.72, ...VILA_B], [12.4, ...VILA_B],
     [20, ...VILA_B],
   ];
+  let VB = vbNycklar();
+  // Handen på pulten i rummet (pult): armen vilar på disken fram till den, och koppen är rummets. Den
+  // här koppen syns bara när han dricker, och den börjar och slutar där rummets står.
+  let iPult = false;
   // Klunken (T 20–24,5), börjar och slutar som vilan. Koppen går till munnen, handen följer örat.
-  const KF = { x: (-33 - KOPP[0]) / -405, y: (323 - KOPP[1] - 11) / 725, z: (310 - KOPP[2]) / -160 };
+  const KF = {};
+  const kfRakna = () => Object.assign(KF, { x: (-33 - KOPP[0]) / -405, y: (323 - KOPP[1] - 11) / 725, z: (310 - KOPP[2]) / -160 });
+  kfRakna();
   const KV = [[20, 0, 0, 0, 0, 0], [21.1, 0, 0, 0, 0, 0], [21.95, -405, 725, -160, -0.5, 0], [23.25, -412, 735, -168, -0.72, 0.02], [24.05, 0, 0, 0, 0, 0], [24.5, 0, 0, 0, 0, 0]];
   function klunkKopp(t, ut) {
     const y = (i) => spar(KV.map((k) => [k[0], k[i]]), t);
@@ -525,6 +535,10 @@ export async function figuren(duk, { hog = false, latt = false, pr = 1 } = {}) {
     // koppen hoppar när han slår i disken
     const hopp = t > 5 && t < 5.55 ? Math.sin(((t - 5) / 0.55) * Math.PI) * 62 * (1 - (t - 5) / 0.9) : 0;
     if (!iKlunk) { kopp.position.set(KOPP[0], KOPP[1] + 11 + hopp, KOPP[2]); kopp.rotation.set(0, -0.5, hopp * 0.0045); }
+    // (koppen och fatet på pulten är rummets: den här syns bara medan han håller i den)
+    const egen = !iPult || (t > 21.1 && t < 24.05);
+    kopp.visible = egen;
+    K.fat.visible = !iPult;
     // skuggorna: hand och underarm för båda armarna, och koppen
     const skk = (i, p, q, rd, h) => { kapA[i].set(p.x, p.z, q.x, q.z); kapH[i].set(rd, Math.max(0, h)); };
     const ah = (o) => o.y - BORD.Y;
@@ -536,8 +550,8 @@ export async function figuren(duk, { hog = false, latt = false, pr = 1 } = {}) {
     FA.copy(LB_.W).addScaledVector(LB_.F, 170);
     skk(2, LB_.W, FA, 50, ah(LB_.W) - 24);
     skk(3, LB_.E, LB_.W, 70, (ah(LB_.E) + ah(LB_.W)) / 2 - 20);
-    skk(4, kopp.position, kopp.position, 60, ah(kopp.position));
-    skk(5, K.fat.position, K.fat.position, 96, 1);
+    skk(4, kopp.position, kopp.position, egen ? 60 : 0, ah(kopp.position));
+    skk(5, K.fat.position, K.fat.position, iPult ? 0 : 96, 1);
     r.render(S, C);
   }
 
@@ -554,9 +568,31 @@ export async function figuren(duk, { hog = false, latt = false, pr = 1 } = {}) {
     bord.value.z = (v.h - kant) * (duk.height / v.h);
     rita(sistaT, sistaN);
   }
+  // Handen på pulten (rum-hasse.js): handleden W och koppen k i världen (på disken, där rummets kopp
+  // står i bilden), och en punkt dit armbågen ska (på disken bredvid honom). Armen vilar där i stället
+  // för vid koppen framför honom; handen och det som går över hörnet ritas av rummet.
+  function pult({ W, k, E }) {
+    const w = new THREE.Vector3(...W);
+    const e = new THREE.Vector3(...E);
+    const fram = w.clone().sub(e).normalize();
+    VILA_B[0] = W;
+    VILA_B[1] = e.clone().sub(SB).toArray();
+    VILA_B[2] = fram.clone().add(new THREE.Vector3(0, -0.12, 0.42)).normalize().toArray();
+    VILA_B[3] = [0.05, -1, 0.04];
+    VILA_B[4] = 0.08;
+    VB = vbNycklar();
+    KOPP[0] = k[0];
+    KOPP[1] = k[1];
+    KOPP[2] = k[2];
+    kfRakna();
+    iPult = true;
+    rita(sistaT, sistaN);
+  }
+
   return {
     rita,
     kamera,
+    pult,
     tid: 12.4,
     // fingrarna trummar en stund (bara i vilan); ror() medan de gör det
     trumma() { if (sistaN - trumT > 1.2) trumT = sistaN + 0.05; },
