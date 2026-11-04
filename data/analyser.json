@@ -1,5 +1,5 @@
 {
- "uppdaterad": "2026-11-04T17:59:09.454Z",
+ "uppdaterad": "2026-11-04T18:00:50.602Z",
  "omgang": {
   "id": "2026-11-07-st4978",
   "matcher": [
@@ -59,82 +59,6 @@
     "model": "claude-opus-5-5",
     "version": "2026-10-22.1",
     "writtenAt": "2026-11-04T07:05:57.689Z",
-    "attempts": 1
-   },
-   "hasse": null,
-   "model": "claude-opus-5-5",
-   "version": "2026-10-22.1",
-   "attempts": 1
-  },
-  {
-   "id": "401879241",
-   "match": "Fulham – Newcastle United",
-   "avspark": "2026-11-07T15:00:00.000Z",
-   "writtenAt": "2026-11-03T22:04:15.407Z",
-   "text": "Newcastle reser söderut med buropen i öronen\n\nNewcastle kommer till Craven Cottage efter två raka hemmaförluster mot Everton på fyra dagar och en utvisning som gör ont. Fulham har vunnit två av de tre senaste ligamötena och har börjat hitta en ny stabilitet. På lördag ställs ett lag i kris mot ett som just fått ordning på sig.\n\nMåndagskvällen på St James' Park var ingenting Newcastle vill minnas. Thierno Barrys mål gav Everton säsongens första bortaseger i ligan, och hemmalaget buades ut både i paus och efter slutsignalen, skriver Sky Sports [1]. Inhopparen Jacob Ramsey fick två gula kort på 86 sekunder i tilläggstiden, och han är avstängd till den 21 november. Bland supportrarna som BBC lät komma till tals beskrevs matchen som \"dispiriting\", och en av dem menade att spelarna antingen saknar självförtroende eller inte håller måttet [2]. Ligaförlusten kom bara fyra dagar efter att Everton slagit ut Newcastle ur ligacupen med 3–1.\n\nFulham har gått åt andra hållet. För en månad sedan var trycket stort på Marco Silvas lag. Nu har det enligt The Stats Zone lagt om spelet och blivit svårare att slå, och det tog en poäng på Villa Park senast [3]. Fulham har bara släppt in ett mål i sina tre senaste ligamatcher. Problemet sitter i anfallet: laget har gjort sex mål färre än chanserna normalt borde ge.\n\nFulham har vunnit två av de tre senaste ligamötena, senast med 2–0 hemma i maj. Newcastle saknar fortfarande Livramento och målvakten Jaouen, och Miley är inte säker på att kunna spela. Fulham har däremot inga skador eller avstängningar att rapportera.\n\nTipset: 1X (knapp hemmaseger)\n\nSajtens prognos ser i stort sett lika chanser för båda lagen. DraftKings ger däremot Fulham ett tydligt övertag, och det stämmer bättre med det jag har läst. Newcastle buades ut efter två raka hemmaförluster, och Ramsey är avstängd efter sina två gula kort på 86 sekunder [1]. Supportrarna tvivlar på både spelarnas självförtroende och deras kvalitet [2]. Fulham har samtidigt blivit svårare att slå [3]. Ändå har Newcastle gjort fler mål än chanserna borde ge, och Fulham har svårt att göra mål. Därför ringar jag in etta och kryss, med Fulham som huvudtecken.",
-   "title": "Newcastle reser söderut med buropen i öronen",
-   "lead": "Newcastle kommer till Craven Cottage efter två raka hemmaförluster mot Everton på fyra dagar och en utvisning som gör ont. Fulham har vunnit två av de tre senaste ligamötena och har börjat hitta en ny stabilitet. På lördag ställs ett lag i kris mot ett som just fått ordning på sig.",
-   "paragraphs": [
-    "Måndagskvällen på St James' Park var ingenting Newcastle vill minnas. Thierno Barrys mål gav Everton säsongens första bortaseger i ligan, och hemmalaget buades ut både i paus och efter slutsignalen, skriver Sky Sports [1]. Inhopparen Jacob Ramsey fick två gula kort på 86 sekunder i tilläggstiden, och han är avstängd till den 21 november. Bland supportrarna som BBC lät komma till tals beskrevs matchen som \"dispiriting\", och en av dem menade att spelarna antingen saknar självförtroende eller inte håller måttet [2]. Ligaförlusten kom bara fyra dagar efter att Everton slagit ut Newcastle ur ligacupen med 3–1.",
-    "Fulham har gått åt andra hållet. För en månad sedan var trycket stort på Marco Silvas lag. Nu har det enligt The Stats Zone lagt om spelet och blivit svårare att slå, och det tog en poäng på Villa Park senast [3]. Fulham har bara släppt in ett mål i sina tre senaste ligamatcher. Problemet sitter i anfallet: laget har gjort sex mål färre än chanserna normalt borde ge.",
-    "Fulham har vunnit två av de tre senaste ligamötena, senast med 2–0 hemma i maj. Newcastle saknar fortfarande Livramento och målvakten Jaouen, och Miley är inte säker på att kunna spela. Fulham har däremot inga skador eller avstängningar att rapportera."
-   ],
-   "sources": [
-    {
-     "n": 1,
-     "source": "Sky Sports",
-     "title": "Newcastle 0-1 Everton: Toffees earn first away league win of season as Magpies booed off after Jacob Ramsey sees red",
-     "url": "https://www.skysports.com/football/newcastle-united-vs-everton/report/559532",
-     "publishedAt": null
-    },
-    {
-     "n": 2,
-     "source": "Yahoo Sports (BBC)",
-     "title": "Newcastle 0-1 Everton - the fans' verdict",
-     "url": "https://sports.yahoo.com/articles/newcastle-0-1-everton-fans-124423318.html",
-     "publishedAt": null
-    },
-    {
-     "n": 3,
-     "source": "The Stats Zone",
-     "title": "Fulham vs Newcastle Preview: Team News & Prediction",
-     "url": "https://www.thestatszone.com/fulham-vs-newcastle-preview-team-news-prediction-234752",
-     "publishedAt": null
-    }
-   ],
-   "tip": {
-    "text": "Sajtens prognos ser i stort sett lika chanser för båda lagen. DraftKings ger däremot Fulham ett tydligt övertag, och det stämmer bättre med det jag har läst. Newcastle buades ut efter två raka hemmaförluster, och Ramsey är avstängd efter sina två gula kort på 86 sekunder [1]. Supportrarna tvivlar på både spelarnas självförtroende och deras kvalitet [2]. Fulham har samtidigt blivit svårare att slå [3]. Ändå har Newcastle gjort fler mål än chanserna borde ge, och Fulham har svårt att göra mål. Därför ringar jag in etta och kryss, med Fulham som huvudtecken.",
-    "signs": [
-     0,
-     1
-    ],
-    "note": "knapp hemmaseger",
-    "sources": [
-     {
-      "n": 1,
-      "source": "Sky Sports",
-      "title": "Newcastle 0-1 Everton: Toffees earn first away league win of season as Magpies booed off after Jacob Ramsey sees red",
-      "url": "https://www.skysports.com/football/newcastle-united-vs-everton/report/559532",
-      "publishedAt": null
-     },
-     {
-      "n": 2,
-      "source": "Yahoo Sports (BBC)",
-      "title": "Newcastle 0-1 Everton - the fans' verdict",
-      "url": "https://sports.yahoo.com/articles/newcastle-0-1-everton-fans-124423318.html",
-      "publishedAt": null
-     },
-     {
-      "n": 3,
-      "source": "The Stats Zone",
-      "title": "Fulham vs Newcastle Preview: Team News & Prediction",
-      "url": "https://www.thestatszone.com/fulham-vs-newcastle-preview-team-news-prediction-234752",
-      "publishedAt": null
-     }
-    ],
-    "model": "claude-opus-5-5",
-    "version": "2026-10-22.1",
-    "writtenAt": "2026-11-03T22:04:23.065Z",
     "attempts": 1
    },
    "hasse": null,
@@ -331,6 +255,81 @@
     "model": "claude-opus-5-5",
     "version": "2026-11-04.1",
     "writtenAt": "2026-11-04T17:59:08.811Z",
+    "attempts": 1
+   },
+   "model": "claude-opus-5-5",
+   "version": "2026-11-04.1",
+   "attempts": 1
+  },
+  {
+   "id": "401879241",
+   "match": "Fulham – Newcastle United",
+   "avspark": "2026-11-07T15:00Z",
+   "writtenAt": "2026-11-04T18:00:39.360Z",
+   "text": "Newcastle sköt på mål efter 85 minuter\n\nNewcastle kommer till Craven Cottage utbuat av sin egen publik, utan den utvisade Jacob Ramsey och med två raka förluster mot Everton i bagaget. Där väntar Fulham, som skapar mer än de får utdelning för och som senast besegrade Newcastle i Marco Silvas sista match.\n\nDet mest talande från Newcastles förra match står i Sky Sports referat. Lagets första skott på mål mot Everton kom i den 85:e minuten, och då hade hemmapubliken redan buat i halvtid. Vid slutsignalen gjorde den om det [1]. Tränaren Matthias Jaissle tog det med jämnmod: ”After a performance like that, I can understand that”, sade han och lade till ”We were not brave enough in possession” [1]. Det där löser man med en hink bollar. Jaissle ansåg också att Thierno Barrys mål borde ha dömts bort för en armbåge mot Fabian Schär, medan inhopparen Ramsey hann med två gula kort på 86 sekunder på övertid [1]. Han är avstängd till den 21 november.\n\nFulham lever på annat vis. Laget har gjort 9 mål på nio ligamatcher men skapar 1,71 i förväntade mål per match enligt Understat, och det är över sex mål mindre än chanserna brukar ge. Newcastles motsvarande siffror är 1,25 framåt och 1,89 bakåt. Hösten har gett Fulham två segrar med 1–0 och ett oavgjort på Villa Park, och matchbladet saknar skadade spelare. När lagen sist möttes vann Fulham med 2–0 i det som blev Marco Silvas sista match som tränare där, enligt ESPN [2].\n\nEfter lördagen väntar två veckors uppehåll för båda. I Tjäderfors blev jag en gång utbuad av en publik som rymdes bakom korvkiosken, och jag kan intyga att ljudet följer med hem. Newcastle har dessutom haft två dagar färre att vila än Fulham, som inte spelat sedan den 31 oktober.\n\nTipset: 1X (hemmalaget, försiktigt)\n\nPrognosen ser nästan jämnt ut, 2,63 mot 2,70 med oavgjort på 4,00, men den räknar bara mål och tabelläge. Den ser alltså varken Newcastles första skott på mål i den 85:e minuten eller buropen [1], och den väger inte fullt ut att Fulham har bättre förväntade mål än resultaten visar. Enbart årets mål ger Fulham 2,22, och DraftKings ligger på 2,10. Bollen har aldrig läst en tabell, och 1–1 är prognosens troligaste resultat, så krysset får stå kvar. Newcastles bortatvåa stryker jag, trots två bortasegrar i år.",
+   "author": "Sixten Bråvall (påhittad)",
+   "title": "Newcastle sköt på mål efter 85 minuter",
+   "lead": "Newcastle kommer till Craven Cottage utbuat av sin egen publik, utan den utvisade Jacob Ramsey och med två raka förluster mot Everton i bagaget. Där väntar Fulham, som skapar mer än de får utdelning för och som senast besegrade Newcastle i Marco Silvas sista match.",
+   "paragraphs": [
+    "Det mest talande från Newcastles förra match står i Sky Sports referat. Lagets första skott på mål mot Everton kom i den 85:e minuten, och då hade hemmapubliken redan buat i halvtid. Vid slutsignalen gjorde den om det [1]. Tränaren Matthias Jaissle tog det med jämnmod: ”After a performance like that, I can understand that”, sade han och lade till ”We were not brave enough in possession” [1]. Det där löser man med en hink bollar. Jaissle ansåg också att Thierno Barrys mål borde ha dömts bort för en armbåge mot Fabian Schär, medan inhopparen Ramsey hann med två gula kort på 86 sekunder på övertid [1]. Han är avstängd till den 21 november.",
+    "Fulham lever på annat vis. Laget har gjort 9 mål på nio ligamatcher men skapar 1,71 i förväntade mål per match enligt Understat, och det är över sex mål mindre än chanserna brukar ge. Newcastles motsvarande siffror är 1,25 framåt och 1,89 bakåt. Hösten har gett Fulham två segrar med 1–0 och ett oavgjort på Villa Park, och matchbladet saknar skadade spelare. När lagen sist möttes vann Fulham med 2–0 i det som blev Marco Silvas sista match som tränare där, enligt ESPN [2].",
+    "Efter lördagen väntar två veckors uppehåll för båda. I Tjäderfors blev jag en gång utbuad av en publik som rymdes bakom korvkiosken, och jag kan intyga att ljudet följer med hem. Newcastle har dessutom haft två dagar färre att vila än Fulham, som inte spelat sedan den 31 oktober."
+   ],
+   "sources": [
+    {
+     "n": 1,
+     "source": "Sky Sports",
+     "title": "Newcastle 0-1 Everton: Toffees earn first away league win of season as Magpies booed off after Jacob Ramsey sees red",
+     "url": "https://www.skysports.com/football/news/13605474/newcastle-0-1-everton-toffees-earn-first-away-league-win-of-season-as-magpies-booed-off-after-jacob-ramsey-sees-red",
+     "publishedAt": null
+    },
+    {
+     "n": 2,
+     "source": "ESPN",
+     "title": "Fulham confirm Marco Silva to leave club as manager this summer",
+     "url": "https://www.espn.com/soccer/story/_/id/48948294/fulham-confirm-marco-silva-leave-club-manager-summer",
+     "publishedAt": null
+    }
+   ],
+   "tip": {
+    "text": "Prognosen ser nästan jämnt ut, 2,63 mot 2,70 med oavgjort på 4,00, men den räknar bara mål och tabelläge. Den ser alltså varken Newcastles första skott på mål i den 85:e minuten eller buropen [1], och den väger inte fullt ut att Fulham har bättre förväntade mål än resultaten visar. Enbart årets mål ger Fulham 2,22, och DraftKings ligger på 2,10. Bollen har aldrig läst en tabell, och 1–1 är prognosens troligaste resultat, så krysset får stå kvar. Newcastles bortatvåa stryker jag, trots två bortasegrar i år.",
+    "signs": [
+     0,
+     1
+    ],
+    "note": "hemmalaget, försiktigt",
+    "sources": [
+     {
+      "n": 1,
+      "source": "Sky Sports",
+      "title": "Newcastle 0-1 Everton: Toffees earn first away league win of season as Magpies booed off after Jacob Ramsey sees red",
+      "url": "https://www.skysports.com/football/news/13605474/newcastle-0-1-everton-toffees-earn-first-away-league-win-of-season-as-magpies-booed-off-after-jacob-ramsey-sees-red",
+      "publishedAt": null
+     }
+    ],
+    "model": "claude-opus-5-5",
+    "version": "2026-11-04.1",
+    "writtenAt": "2026-11-04T18:00:39.360Z",
+    "attempts": 1
+   },
+   "hasse": {
+    "stycken": [
+     "Newcastle tog sitt första skott på mål mot Everton i den 85:e minuten, och då hade publiken redan buat i halvtid. Ett lag som inte vågar ha bollen kommer ingenstans, och nu reser de till Craven Cottage utan den avstängde Ramsey. Orsak och verkan.",
+     "Fulham skapar 1,71 i förväntade mål per match men har bara gjort 9 mål på nio matcher, så de jobbar rätt och får för jävligt lite betalt. Dessutom saknar de inga skadade spelare.",
+     "Eftersom de inte sätter sina chanser är 1–1 det troligaste resultatet, och det köper jag utan att bli upprörd. Newcastles borta stryker jag, trots deras två bortasegrar i år, så det blir ettan och krysset."
+    ],
+    "tips": "2026-11-04T18:00:39.360Z",
+    "uppdrag": {
+     "fraser": [
+      "Orsak och verkan",
+      "Lugn nu"
+     ],
+     "krydda": null,
+     "bielsa": []
+    },
+    "model": "claude-opus-5-5",
+    "version": "2026-11-04.1",
+    "writtenAt": "2026-11-04T18:00:50.028Z",
     "attempts": 1
    },
    "model": "claude-opus-5-5",
