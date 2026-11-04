@@ -601,6 +601,10 @@ bara lokalt. Analyserna visas som de ligger i `data/analyser.json`; hur de skriv
   (pokalen i SVG), blev samma dag en plansch med Tomas foto från segern i Hamburg och till
   sist Göteborgs-Postens löpsedel dagen efter, med fotot. Se [Tobaksaffären](#tobaksaffären),
   *Affischerna*.
+- **Svaren till Hasse Backe i kupongens tryck (2026-11-04, användarens önskemål):** guldpillren
+  och de understrukna länkarna i samtalet var webbknappar som inte hörde hemma i tobaksaffären.
+  Svaren är nu lappar i tipskupongens terrakotta och krämvita papper, och det som går härifrån
+  står med små spärrade versaler och en pil. Se [Hasse Backe](#hasse-backe), *Samtalet*.
 - **Kuponghistoriken flyttar till Olympen (2026-10-20, användarens önskemål):** Kupong
   handlar bara om nästa kupong – växlaren Omgången | Historik försvinner. De färdigspelade
   kupongerna står sist i Olympen under rubriken *Grupparbetena* (`#olympen/kuponger`, en
@@ -3686,11 +3690,13 @@ När han dricker lyfter han koppen från fatet framför sig, och när han slår 
 vet vem du är, och man svarar genom att välja en match. Då frågar han tillbaka (*Den är enkel. Vill du
 veta, eller ska du gissa?*), och först *Lär mig* ger analysen (knappen lottas som hans repliker: också *Jag lyssnar och
 lär* och *Upplys mig*), så att ett felklick inte visar ett tips. *Jag gissar* går tillbaka till listan och
-*Matchbladet* till matchen. Svaren står direkt under hans fråga: *Lär mig* som en knapp i guld,
-*Jag gissar* med en ljus ram bredvid och *Matchbladet* som en länk under dem. Frågan har sin plats
-från början, osynlig tills han säger den, så att knapparna inte flyttar sig. Förut stod svaren som
-små länkar längst ned i spalten och syntes knappt i telefonen (ändrat 2026-11-04). *Nästa match*
-efter analysen är samma guldknapp. Han har alltid svaret, både när du redan har frågat (*Den har jag tittat på*) och när
+*Matchbladet* till matchen. Svaren står direkt under hans fråga, som lappar i tipskupongens tryck
+som ligger på disken: *Lär mig* i terrakotta som kupongens band, *Jag gissar* i krämvitt papper
+bredvid, båda med en tunn ram innanför kanten, och *Matchbladet →* under dem med små spärrade
+versaler som texten i bandet. Frågan har sin plats från början, osynlig tills han säger den, så att
+knapparna inte flyttar sig. Förut stod svaren som små länkar längst ned i spalten och syntes knappt
+i telefonen, och sedan som piller i guld (ändrat 2026-11-04). *Nästa match* efter analysen är samma
+lapp i terrakotta, och *Ja, ja »* och *← Tillbaka* står med samma versaler som *Matchbladet →*. Han har alltid svaret, både när du redan har frågat (*Den har jag tittat på*) och när
 han ska läsa på (*Den knäckte jag i morse*); att han läser på märks först medan han väntar. Är analysen inte skriven än
 säger han det (*Den tar jag dagen före*). Rader där du redan har fått tecknen öppnas
 direkt. Analysen är redan skriven, men han låtsas: när du har bett om den fortsätter han prata i 15–25 sekunder (`LATSAS` i [public/rum-hasse.js](public/rum-hasse.js), raderna kommer i ordning: *Vi börjar bakifrån*, *Total kontroll*, *Det här

@@ -54,7 +54,7 @@ window.RumHasse = (() => {
     vy.hidden = true;
     vy.setAttribute('aria-label', 'Hasse Backe');
     vy.innerHTML = '<div class="rh-scen"><img class="rh-bak" alt="" draggable="false"><i class="rh-disk"></i><i class="rh-mork"></i><canvas></canvas></div>' +
-      '<i class="rh-horn" aria-hidden="true"></i><div class="rh-samtal"></div><div class="rh-fot"><button type="button" class="rh-tillbaka">Tillbaka</button></div>';
+      '<i class="rh-horn" aria-hidden="true"></i><div class="rh-samtal"></div><div class="rh-fot"><button type="button" class="rh-vag rh-tillbaka">Tillbaka</button></div>';
     sving.append(vy);
     H.vy = vy;
     // det som händer i samtalet stannar där (knapparna byter ut sig själva)
@@ -696,10 +696,10 @@ window.RumHasse = (() => {
     H.sagt = null;
     H.talMal = 0;
     s.innerHTML = `<div class="rh-match">${esc(m.namn)}?</div><h2 class="rh-sagt"></h2><p class="rh-fragan"><span class="rh-o">${esc(fragan)}</span></p>` +
-      `<div class="rh-svar"><div><button type="button" class="rh-knapp guld">${esc(lott(r.lar))}</button><button type="button" class="rh-knapp rh-gissa">Jag gissar</button></div>` +
-      `<a class="rh-blad" href="#match/${esc(m.id)}">Matchbladet</a></div>`;
+      `<div class="rh-svar"><div><button type="button" class="rh-knapp huvud">${esc(lott(r.lar))}</button><button type="button" class="rh-knapp rh-gissa">Jag gissar</button></div>` +
+      `<a class="rh-vag" href="#match/${esc(m.id)}">Matchbladet</a></div>`;
     const svar = s.querySelector('.rh-svar');
-    const ja = svar.querySelector('.guld');
+    const ja = svar.querySelector('.huvud');
     // ett dubbelklick på raden får inte landa på knappen som nu ligger under pekaren
     const t0 = performance.now();
     svar.addEventListener('click', (e) => {
@@ -793,7 +793,7 @@ window.RumHasse = (() => {
       }],
       sen: () => {
         H.fas = 'tal';
-        s.querySelector('.rh-slut').innerHTML = '<button type="button" class="rh-ja" title="Hoppa till slutet">Ja, ja</button>';
+        s.querySelector('.rh-slut').innerHTML = '<button type="button" class="rh-vag rh-ja" title="Hoppa till slutet">Ja, ja</button>';
         let x = null;
         s.querySelector('.rh-ja').addEventListener('click', () => {
           x.sen = null;
@@ -808,8 +808,8 @@ window.RumHasse = (() => {
     const s = $('.rh-samtal');
     H.fas = 'klar';
     if (Math.abs(H.T - GEST.hem.vila) > 0.01 || H.klipp) spela('hem');
-    s.querySelector('.rh-slut').innerHTML = `<button type="button" class="rh-knapp guld">Nästa match</button><a class="rh-blad" href="#match/${esc(m.id)}">Matchbladet</a>`;
-    s.querySelector('.rh-slut .guld').addEventListener('click', fraga);
+    s.querySelector('.rh-slut').innerHTML = `<button type="button" class="rh-knapp huvud">Nästa match</button><a class="rh-vag" href="#match/${esc(m.id)}">Matchbladet</a>`;
+    s.querySelector('.rh-slut .huvud').addEventListener('click', fraga);
   }
 
   // Under en match går ett klick var som helst framåt, och Tillbaka eller Esc går
