@@ -33,9 +33,20 @@ window.HasseRepliker = {
 
   // När man har valt en match: han svarar och frågar tillbaka. valKlar när analysen
   // redan finns, valLasa när den måste skrivas och val när det inte går att få veta.
+  // Han har alltid svaret, också när han inte har det: att han läser på märks först
+  // när han väntar (vantar).
   val: ['Den är enkel.', 'Den där, ja.', 'Den är inte svår.'],
   valKlar: ['Den har jag tittat på.', 'Den har jag svaret på.', 'Den är redan löst.'],
-  valLasa: ['Den får jag läsa på.', 'Den har ingen frågat om än.', 'Den får jag titta på.'],
+  valLasa: [
+    'Den har jag svaret på.',
+    'Den har jag redan klar för mig.',
+    'Den vet jag allt om.',
+    'Den har jag räknat på.',
+    'Den knäckte jag i morse.',
+    'Den har jag på en lapp här.',
+    'Den pratade vi om i går kväll.',
+    'Den är solklar.',
+  ],
   fragaTillbaka: ['Vill du veta, eller ska du gissa?', 'Vill du ha svaret, eller gissar du?', 'Ska jag säga det, eller gissar du?'],
   // Trycker man på Jag gissar.
   gissar: ['Modigt. Vilken mer?', 'Det har gått förr. Vilken mer?', 'Gissa på. Vilken mer?', 'Det är din kupong. Nästa.'],

@@ -3630,8 +3630,9 @@ koppen försvinner den ritade på fatet (`.hasse-klunk`). Fatet står kvar på p
 vet vem du är, och man svarar genom att välja en match. Då frågar han tillbaka (*Den är enkel. Vill du
 veta, eller ska du gissa?*), och först *Analysera* tar fram analysen, så att ett felklick varken
 beställer en betald text eller visar ett tips. *Jag gissar* går tillbaka till listan och
-*Matchbladet* till matchen. Han säger också om texten redan finns (*Den har jag tittat på*, `GET
-…/hasse`) eller måste skrivas (*Den får jag läsa på*). Rader där du redan har fått tecknen öppnas
+*Matchbladet* till matchen. Han har alltid svaret, både när texten redan finns (*Den har jag tittat på*, `GET
+…/hasse`) och när den måste skrivas (*Den knäckte jag i morse*); att han läser på märks först
+medan han väntar. Rader där du redan har fått tecknen öppnas
 direkt. När du har bett om analysen fortsätter han prata medan den tas fram (raderna kommer i ordning: *Vi börjar bakifrån*, *Total kontroll*, *Det här
 är helt normalt*) och tar en klunk kaffe då och då. När den är klar blir han tyst, armarna går upp, han slår i disken och domen
 står i guld. Sedan säger han texten en mening i taget, ord för ord med munnen i takt, med en paus
