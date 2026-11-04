@@ -1,14 +1,13 @@
-// Hasse Backe (fiktiv) i tobaksaffären: artikeln och tipset (worker/artikel.mjs)
-// med hans röst. Claude får den färdiga analysen, personan i
-// prompts/hasse-backe.md och två–tre lottade fraser ur frasbanken
-// (config/hasse.js) och skriver om texten utan att söka. Tecknen kommer alltid
-// ur tipset och skrivs aldrig om.
+// Hasse Backe (fiktiv) i tobaksaffären: det viktigaste ur artikeln och tipset
+// (worker/artikel.mjs) med hans röst, lika kort som tipsets analys. Claude får den
+// färdiga analysen, personan i prompts/hasse-backe.md och två lottade uttryck ur
+// frasbanken (config/hasse.js) och skriver utan att söka. Tecknen kommer alltid ur
+// tipset och skrivs aldrig om.
 //
-// Kontrollerna (granska): varje tal i analysen ska stå kvar och inget nytt ska
-// ha kommit till, de inringade tecknen ska stå i sista stycket, inga citat eller
-// namn utanför analysen, de lottade fraserna ska användas och inga andra ur
-// banken, och Bielsa-orden bara om de lottats. Klarar svaret inte det får Claude
-// skriva om en gång, och annars blir det ingen text.
+// Kontrollerna (granska): inga tal, citat eller namn utanför analysen, högst
+// maxOrd ord, inga källor ("enligt …"), de inringade tecknen i sista stycket och
+// Bielsa-orden bara om de lottats. Klarar svaret inte det får Claude skriva om en
+// gång, och annars blir det ingen text.
 //
 // Lagringen (samma KV-namnrymd som analysen):
 //   hasse:<match-id>    {hasse, tries} – hasse: {stycken, tips (tipsets
@@ -66,7 +65,7 @@ const texten = (k) => [k.rubrik, k.ingress, ...k.stycken, k.tips.text, k.tips.ma
 
 export function uppdrag(id, article) {
   const sl = lotter(`${id}:${hc.promptVersion}`);
-  const fraser = ta(hc.fraser, sl() < 0.5 ? 2 : 3, sl);
+  const fraser = ta(hc.fraser, 2, sl);
   const krydda = sl() < hc.kryddaChans ? ta(hc.kryddor, 1, sl)[0] : null;
   const bielsa = new RegExp(hc.bielsaNar, 'i').test(texten(kallan(article))) ? ta(hc.bielsaOrd, sl() < 0.5 ? 1 : 2, sl) : [];
   return { fraser, krydda, bielsa };
@@ -107,14 +106,14 @@ export function granska(stycken, article, u) {
   const text = stycken.join('\n');
   const k = kallan(article);
   const kalla = texten(k);
-  const inne = talI(kalla);
   const ute = talI(text);
-  const tillat = new Set(inne);
+  const tillat = talI(kalla);
   if (har(text, hc.bielsaCitat)) tillat.add('28');
   const nya = [...ute].filter((x) => !tillat.has(x));
   if (nya.length) fel.push(`talen ${nya.join(', ')} står inte i analysen`);
-  const borta = [...inne].filter((x) => !ute.has(x));
-  if (borta.length) fel.push(`talen ${borta.join(', ')} ur analysen saknas`);
+  const ord = text.split(/\s+/).filter(Boolean).length;
+  if (ord > hc.maxOrd) fel.push(`texten är ${ord} ord, högst 120`);
+  if (/\benligt\b/i.test(text)) fel.push('nämn inga källor, inget "enligt": det är din egen bedömning');
   const signs = (article.tip && article.tip.signs) || [];
   const sista = stycken[stycken.length - 1];
   for (const n of signs) if (!TECKEN_RE[n].test(sista)) fel.push(`${ORD[n]} står inte i sista stycket`);
@@ -128,11 +127,6 @@ export function granska(stycken, article, u) {
   for (const o of ['Hasse', 'Backe', 'Bielsa', 'Svennis', 'Manchester', 'City', 'Back', 'Ursäkta', ...u.bielsa]) kanda.add(o);
   const okanda = [...namnI(text)].filter((o) => !kanda.has(o));
   if (okanda.length) fel.push(`namnen ${okanda.join(', ')} står inte i analysen`);
-  const fick = u.fraser.filter((f) => har(text, f));
-  if (fick.length < Math.min(2, u.fraser.length)) fel.push(`använd fraserna: ${u.fraser.join(', ')}`);
-  const andra = hc.fraser.filter((f) => !u.fraser.includes(f) && har(text, f));
-  if (andra.length) fel.push(`de här fraserna är inte med den här gången: ${andra.join(', ')}`);
-  if (u.krydda && !har(text, u.krydda)) fel.push(`kryddan ska stå ordagrant: ${u.krydda}`);
   const bielsa = hc.bielsaOrd.filter((o) => har(text, o));
   const fel2 = bielsa.filter((o) => !u.bielsa.includes(o));
   if (fel2.length) fel.push(`Bielsa-orden ${fel2.join(', ')} är inte med den här gången`);
@@ -157,10 +151,10 @@ export async function writeHasse(id, article, { env, persona, chat = claudeChat 
   const rader = [
     `Analysen:\n${JSON.stringify(kallan(article))}`,
     `Tecknen som ringas in: ${signs.map((n) => ORD[n]).join(' och ')}.`,
-    `Dina signaturfraser den här gången: ${u.fraser.join(' · ')}.`,
-    u.krydda ? `Din krydda den här gången: ${u.krydda}` : 'Ingen krydda den här gången.',
-    u.bielsa.length ? `Dina Bielsa-ord den här gången, för något som står i analysen: ${u.bielsa.join(', ')}.` : 'Inga Bielsa-ord den här gången.',
-  ];
+    `Uttryck du kan ta till där de passar, annars inte alls: ${u.fraser.join(' · ')}.`,
+    u.krydda && `En rad du gärna får lägga in ordagrant: ${u.krydda}`,
+    u.bielsa.length && `Dina Bielsa-ord, för något som står i analysen: ${u.bielsa.join(', ')}. Den enda Bielsa-repliken du citerar är din favorit: "${hc.bielsaCitat}"`,
+  ].filter(Boolean);
   let fel = [];
   let attempts = 0;
   let meddelande = rader.join('\n\n');

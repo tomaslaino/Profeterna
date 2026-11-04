@@ -3,10 +3,10 @@
 // ============================================================================
 // Hasse Backe (fiktiv) i tobaksaffären (public/rum-hasse.js): Analysera med en
 // annan röst. Först tas artikeln och tipset fram som vanligt (config/artikel.js).
-// Sedan skriver Claude om dem med personan i prompts/hasse-backe.md, utan att
-// söka och utan att ändra en sakuppgift, och koden kontrollerar att det stämmer
-// (worker/hasse.mjs). Tipset, de inringade tecknen, kommer alltid ur tipset och
-// skrivs aldrig om. Skrivs bara när någon ber om det, och sparas sedan för alla.
+// Sedan säger Claude det viktigaste ur dem med personan i prompts/hasse-backe.md,
+// utan att söka och lika kort som tipsets analys, och koden kontrollerar att
+// inget har hittats på (worker/hasse.mjs). Tipset, de inringade tecknen, kommer
+// alltid ur tipset och skrivs aldrig om. Skrivs bara när någon ber om det, och sparas sedan för alla.
 // ============================================================================
 
 module.exports = {
@@ -24,31 +24,31 @@ module.exports = {
   // Så länge sparas texten (artikeln sparas högst elva dagar).
   keepDays: 12,
   // Ändras personan eller frasbanken byts versionen, så att texterna skrivs om.
-  promptVersion: '2026-11-03.1',
+  promptVersion: '2026-11-04.1',
   prices: { input: 4, cacheWrite: 5, cacheRead: 0.2, output: 20 },
 
-  // Signaturfraserna: koden lottar två eller tre per match (efter matchens id),
-  // så att två analyser inte låter likadant. Andra fraser ur banken får inte
-  // användas den gången.
+  // Högst så många ord i texten: prompten säger 120 (som tipsets analys), och
+  // koden släpper igenom lite mer.
+  maxOrd: 135,
+
+  // Uttrycken: koden lottar två per match (efter matchens id), så att två
+  // analyser inte låter likadant. Han tar dem där de passar.
   fraser: [
     'Det är lugnt',
     'Total kontroll',
-    'Jag är jävligt snäll och räknar in',
+    'Då är jag jävligt snäll',
     'Här höjer jag ett varningens finger',
     'Lugn nu',
     'Orsak och verkan',
     'Så är det bara',
     'Glöm det',
     'Solklart',
-    'Det händer bara inte',
     'Det köper jag aldrig',
     'Nej nej nej',
-    'Old school',
     'Äsch',
-    'Resultatet går före estetiken',
-    'Var är offret',
   ],
-  // Kryddan: färdiga rader, så att ingen ny historia hittas på om en riktig person.
+  // Kryddan: färdiga rader, så att ingen ny historia hittas på om en riktig
+  // person. Han tar den om den passar.
   kryddaChans: 0.4,
   kryddor: [
     'Det här pratade vi om redan i Manchester City, Svennis och jag.',
@@ -65,9 +65,9 @@ module.exports = {
   bielsaCitat: 'Det finns 28 sätt att bryta ner en backlinje.',
 
   // Står efter personan: svarets form.
-  format: `Du får analysen som JSON: rubrik, ingress, stycken och tips, och vilka tecken som ringas in. Tecknen skrivs stort ovanför din text.
+  format: `Du får analysen som JSON och vilka tecken som ringas in. Tecknen skrivs stort ovanför din text.
 
 Svara bara med JSON: {"stycken": ["…", "…"]}
 
-Tre till sex korta stycken, som du säger dem. Ta med varje sakuppgift och varje tal ur analysen, utan att lägga till något tal eller namn. Skriv inga hänvisningar i hakparentes. Ändra inte styrkan i slutsatserna: det analysen håller öppet håller du öppet, och du väger inte tecknen mot varandra på något nytt sätt. Det sista stycket är den torra avslutningen, och där står tecknen som ringas in.`,
+Högst 120 ord i två eller tre korta stycken. Samma tecken av samma skäl som i analysen, utan hänvisningar i hakparentes. Det sista stycket slutar med tecknen.`,
 };

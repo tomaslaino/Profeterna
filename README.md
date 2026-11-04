@@ -3535,23 +3535,29 @@ halva fönsterbredden (`.hasse-svang` i [public/rum-hasse.css](public/rum-hasse.
 han bakom disken med samma hand på disken, och Esc, *Tillbaka* eller ett klick någon annanstans
 går tillbaka.
 
-**Rösten.** Analysen är exakt densamma som i matchbladet: först artikeln och tipset (`POST
-…/artikel`, se [Matchanalysen](#matchanalysen-fas-5)), sedan skriver Claude om dem med hans röst
-utan att söka (`POST …/hasse`, [worker/hasse.mjs](worker/hasse.mjs)). Personan står i
-[prompts/hasse-backe.md](prompts/hasse-backe.md) och frasbanken i
-[config/hasse.js](config/hasse.js): två–tre signaturfraser lottas per match, så att analyserna
+**Rösten.** Analysen är densamma som i matchbladet: först artikeln och tipset (`POST
+…/artikel`, se [Matchanalysen](#matchanalysen-fas-5)), sedan säger Claude det viktigaste ur dem
+med hans röst utan att söka (`POST …/hasse`, [worker/hasse.mjs](worker/hasse.mjs)), högst 120 ord
+som tipsets analys. Personan står i [prompts/hasse-backe.md](prompts/hasse-backe.md) och
+frasbanken i [config/hasse.js](config/hasse.js): två uttryck lottas per match, så att analyserna
 inte låter likadant, ibland en krydda (färdiga rader, så att ingen historia hittas på om en
-riktig person), och Bielsa-orden bara när analysen visar att ett lag pressar högt eller har ett
-rörligt anfallsspel. Tecknen som står stort kommer direkt ur tipset och skrivs aldrig om. Ändras
+riktig person), och han tar dem där de passar. Bielsa-orden lottas bara när analysen visar att
+ett lag pressar högt eller har ett rörligt anfallsspel. Tecknen som står stort kommer direkt ur tipset och skrivs aldrig om. Ändras
 personan eller frasbanken byts `promptVersion`, så att texterna skrivs om.
 
-**Kontrollerna** (`granska`): varje tal i analysen ska stå kvar och inget nytt ska ha kommit till,
-de inringade tecknen ska stå i sista stycket, inga citat eller namn utanför analysen, de lottade
-fraserna ska användas och inga andra ur banken. Klarar svaret inte det får Claude skriva om en
-gång, och annars visas analysen som den är. Koden ser inte om en mening ändrar betydelse utan att
-ett tal ändras. Texten skrivs när någon ber om den och sparas sedan för alla (5–12 cent per match
-i provet, KV-nyckeln `hasse:<id>`), högst tre försök per tips och 40 texter per dygn. Prov
-2026-11-03 på tre analyser: talen identiska i alla tre.
+**Kontrollerna** (`granska`): inga tal, citat eller namn utanför analysen, högst 135 ord, inga
+källor ("enligt …") och de inringade tecknen i sista stycket. Klarar svaret inte det får Claude
+skriva om en gång, och annars visas analysen som den är. Koden ser inte om en mening ändrar
+betydelse utan att ett tal ändras. Texten skrivs när någon ber om den och sparas sedan för alla
+(2–4 cent per match i provet, KV-nyckeln `hasse:<id>`), högst tre försök per tips och 40 texter
+per dygn.
+
+Första versionen skrev om hela analysen, och koden krävde att varje tal stod kvar och att de
+lottade fraserna användes. Då blev det 350 ord med artikeln återberättad, "enligt Sky Sports" i
+munnen och fraser där de inte hörde hemma (2026-11-03: "formulerar sig ytterst märkligt"). Nu är
+kraven borta, uttrycken frivilliga och prompten 1 600 tecken i stället för 2 550 (tipsets är
+1 400). Prov på sex analyser: 112–127 ord, och i en av dem en tillagd rad om högpress för att
+prova Bielsa-utbrottet.
 
 **Grafiken.** Vilan kostar ingenting nytt: handen är ungefär 4 000 trianglar på en liten duk och
 ritas bara när fingrarna rör sig, utan skuggkarta (PowerVR i telefonen). Figuren finns först när
