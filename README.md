@@ -3701,8 +3701,8 @@ honom om: inga följdfrågor och ingen textruta. Bredvid kaffet och notan på pu
 hand och trummar med fingrarna då och då (i telefonen, där kaffet ligger utanför bilden, ligger
 den vid kupongens hörn). Handen flyttas in i bild när fönstret skär scenen, så att den alltid syns
 hel, med manschett och kavajärm in från bildens kant. Ett klick på den eller kaffet, eller H, och
-kameran svänger åt vänster (`.hasse-svang` i [public/rum-hasse.css](public/rum-hasse.css)). Där står
-han, och Esc eller *Tillbaka* går tillbaka (vid matchlistan också ett klick utanför).
+kameran svänger åt vänster (`.hasse-svang` i [public/rum-hasse.css](public/rum-hasse.css)). Där sitter
+han på en barstol vid pultens ände, med sidan mot pulten och ena handen på låret, och Esc eller *Tillbaka* går tillbaka (vid matchlistan också ett klick utanför).
 
 **Det är bara kameran som rör sig, inne i rummets egen 3D.** Rummets plan ligger kvar på sina djup
 (bakväggen 600 enheter in, tv:n 470, gänget 330, pulten 60 och det som ligger på den 0), och kameran är
@@ -3712,16 +3712,19 @@ medan ögat går i en liten båge åt vänster och tillbaka (`OGA`) och huvudet 
 platt bild som vreds som sidan på en kub, med bredare lins än rummet är ritat med, och därför såg det
 ut som en bild i taget. Hans vägg är ett plan i samma värld (`.rh-vagg`, `lage`) och möter bakväggen
 i ett riktigt hörn under samma tak (`.rv-tak`), mörkare på båda sidor (`.rv-horn`, `.rh-skugga`). Han
-och disken står närmare än väggen (`--bak-t`), och disken slutar där pulten slutar (`.rh-disk`). I
+stolen och pultens ände står närmare än väggen (`--bak-t`, `.rh-nara`), och pulten fortsätter från
+rummet till sin ände på hans sida om hörnet: dess bakre kant står i samma höjd på båda sidor (`pultKant`). I
 Safari plattas djupet i hans bild till, så där står väggen i samma plan som han; rummets djup fungerar
 som vanligt. Handen, kaffet och notan ligger kvar på pulten hela vägen, och hans ena arm går över
 hörnet till handen ([public/rum-hasse-hand.js](public/rum-hasse-hand.js) ritar den på pulten, figuren
-på sin duk, `pult` och `iScenen`). Armen går framför diskens framkant, inte genom den, och siktar förbi
-handleden, så att bara ärmen syns på hans sida om hörnet. Det finns ingen andra kopp och ingen andra
-hand på hans disk. Kameran stannar när hörnet står 83,5 % in i bilden (`KANT`), så att pulten syns kvar
+på sin duk, `pult` och `iScenen`). Ärmen på pulten och ärmen på hans duk möts i hörnet på samma linje och
+med samma bredd, och ärmen fortsätter en bit bortom hörnet, där den inte syns. Bara ärmen är hans på
+hans sida om hörnet, och där finns ingen andra kopp och ingen andra hand. Kameran stannar när hörnet står 83,5 % in i bilden (`KANT`), så att pulten syns kvar
 vid högra kanten medan man pratar med honom; ögat har då backat längs synlinjen genom hörnet (`BACK`),
-så att handen ryms. På höjden står hörnet vid bildens högra kant och pulten är just utanför, och armen
-går rakt genom hörnet. Samtalet och den mörka tonen bakom det kommer först när kameran har stannat.
+så att handen ryms. Hans storlek väljs så att hjässan ryms, att stolen syns och att samtalet får sin spalt
+till vänster om honom (`matt`). På höjden står hörnet vid bildens högra kant och rummets pult är just
+utanför, och där har han handen och koppen på sin sida av pulten, med samtalet under sig. Samtalet och
+den mörka tonen bakom det kommer först när kameran har stannat.
 Framme blir hans vägg platt, så att texten är skarp och går att trycka på, och bara rummet står kvar
 vridet (`.hasse-kant`), urklippt till det som syns. Ändras fönstret medan han syns räknas kameran om.
 
@@ -3801,15 +3804,17 @@ och hakan följer med ([public/rum-hasse-3d.js](public/rum-hasse-3d.js)).
 uträtade till en remsa i atlasen, ligger på böjbara rör med fotots mått, så att tyget och färgen är
 desamma som på kroppen. I vilan ligger armen där den låg på fotot. Händerna är en modell med 16 ben
 ([scripts/hasse/hand.mjs](scripts/hasse/hand.mjs)) med huden ur fotot, naglar och leder. Armar,
-kropp, händer och kopp har samma ljus. Rummet bakom honom är en färdig bild, spårad en gång med
-riktigt ljus, blanka ytor och skärpedjup och med samma kamera som figuren
-([scripts/hasse/bak.html](scripts/hasse/bak.html)). Disken speglar hand och kopp, och skuggorna på
-den är räknade kapslar. T 20–24,5 är ett klipp där han dricker en klunk kaffe och ställer ned
+kropp, händer och kopp har samma ljus. Rummet bakom honom och det nära (pultens ände, barstolen med röd
+sits som stolarna i rummet och benen) är färdiga bilder, spårade en gång med riktigt ljus, blanka ytor
+och skärpedjup ([scripts/hasse/bak.html](scripts/hasse/bak.html)): fotot slutar vid kavajfickorna, och
+där tar de bakade benen vid. Ögat står i de bilderna lägre än figurens kamera, som hos den som sitter
+vid pulten, så att pulten går ifrån en, medan planet genom honom är detsamma. Skuggorna på pulten är
+räknade kapslar. T 20–24,5 är ett klipp där han dricker en klunk kaffe och ställer ned
 koppen, med start och slut som vilan.
 
 Figuren är 65 000 trianglar och 17 ritanrop i datorn (43 000 i telefonen), mot gängets 742 900 och
 461. Mätt med samma skript på gammal och ny figur om vartannat, under annan last i datorn, MacBook
-Air, täthet 2: huvudtråden 0,15–0,3 ms per bild (förut 0,3 ms), med grafikkortet väntat in
+Air, täthet 2 (mätt innan han satte sig; han är nu mindre i bild och duken bara så stor som han): huvudtråden 0,15–0,3 ms per bild (förut 0,3 ms), med grafikkortet väntat in
 7–11 ms (förut 4–8 ms). Chrome som telefon (412 × 780, täthet 2,625, strypning × 4): 1 ms på
 huvudtråden (förut 1,5 ms). I båda hänger bilderna med i 16,7 ms i medeltal. Inte mätt i en riktig
 telefon. Under svängen och medan han syns står rummet still (`Rum.vila`), och det ligger kvar

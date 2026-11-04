@@ -1,15 +1,16 @@
-// Hasse Backe i tobaksaffären (rum-hasse.js), i three.js: figuren bakom disken
-// (armen på pulten och i svängen: rum-hasse-hand.js). Kostymfotot (C More Entertainment, CC BY 3.0,
+// Hasse Backe i tobaksaffären (rum-hasse.js), i three.js: han sitter på en barstol vid pultens ände
+// (handen på pulten: rum-hasse-hand.js). Kostymfotot (C More Entertainment, CC BY 3.0,
 // Wikimedia Commons) ligger på en formad yta, så att huvudet vrids på riktigt
 // runt nacken och kroppen lutar sig fram. Ögon, bryn och mun rör sig i skuggaren.
 // Armarna, händerna och koppen finns i rum-hasse-arm.js.
 //
 // Grafiken: inga skuggkartor och ingen ny bild i rummet. Figuren finns bara medan man tittar på honom, och då
 // står gänget och sakerna still och ritas inte (Rum.vila). Rummet bakom honom är
-// en färdig bild (scripts/hasse/bak.html). Skuggorna på disken är räknade kapslar.
+// en färdig bild (scripts/hasse/bak.html), liksom pultens ände, stolen och benen. Skuggorna på pulten är
+// räknade kapslar.
 //
 // Världen: 1 enhet = 1 bildpunkt i fotot, x = fotots x − 660, y = 900 − fotots y,
-// z mot betraktaren. Disken är y = TOPP, från z = ZB till ZF.
+// z mot betraktaren. Pulten är BORD, sedd av ett öga som står lägre än figurens (rummet är bakat så).
 //
 // figuren(duk, { hog, latt }) → { rita(T, n, tal, mun), tid: längden, pult(hand, kopp), borta() }
 // Klipp: T 0–12,4 (vila, skrattet, domen, gesterna, hem) och T 20–24,5 (en klunk kaffe, börjar och slutar som vilan).
@@ -27,18 +28,21 @@ const spar = (k, t) => {
 
 // ---------- figuren ----------
 
-const TOPP = -413;
-const ZB = 240;
-const ZF = 690;
+// Pulten (scripts/hasse/bak.html): ytan, bakre kanten, änden och var ögat står i bilden. En punkt på pulten
+// ligger i figurens värld så här: planet genom honom (z = 0) är detsamma, men ögat står OGA enheter lägre.
+const BORD = { TOPP: -560, Z: -300, X: 270, OGA: -78 };
 const D = 3900;
+const paBord = (x, y, z) => new THREE.Vector3(x, y + ((500 - BORD.OGA) * z) / D, z);
 // fotot: urklippt, armarna borta, ljuset anpassat (bakat ur originalet)
 const X0 = 280;
 const Y0 = 130;
 const TW = 860;
 const TH = 1350;
 export const SCEN = {
-  bred: { W: 1440, H: 900, S: 0.54, px: 530, py: 244.7, duk: { x: 0, y: 0, w: 1440, h: 860 } },
-  hog: { W: 900, H: 1500, S: 0.56, px: 450, py: 199, duk: { x: 0, y: 0, w: 900, h: 860 } },
+  // kant: var pultens bakre kant är i bilden (x vid hörnet, y), topp: hans hjässa, vans: hans yttre armbåge
+  bred: { W: 2400, H: 1500, S: 0.54, px: 1860, py: 380, duk: { x: 1100, y: 150, w: 1640, h: 1190 }, kant: [2262, 927], topp: 250, vans: 1560 },
+  // hand: hans nedersta hand på låret, samtalet börjar under den
+  hog: { W: 1300, H: 2100, S: 0.56, px: 540, py: 250, duk: { x: 40, y: 20, w: 1260, h: 1240 }, hand: 1069 },
 };
 const W_ = (x, y, z = 0) => new THREE.Vector3(x - 660, 900 - y, z);
 const P_ = (x, y, z) => [x - 660, 900 - y, z];
@@ -210,6 +214,11 @@ export async function figuren(duk, { hog = false, latt = false, pr = 1 } = {}) {
       }
       }
       vec4 c = texture2D(foto, vec2((q.x - O0.x) / TS.x, 1. - (q.y - O0.y) / TS.y));
+      // Nederst går fotot över i kavajen på stolen (bilden bakom). Sidorna nedtill är där armarna satt i
+      // fotot: där är klippet ojämnt, och nu syns det, så kroppen slutar i en mjuk linje.
+      c *= 1. - smoothstep(1412., 1478., q0.y);
+      if (q0.y > 1030.) c *= 1. - smoothstep(-2.5, 2.5, q0.x - (952. - (q0.y - 1030.) * .12));
+      if (q0.y > 1300.) c *= smoothstep(-2.5, 2.5, q0.x - (360. + (q0.y - 1300.) * .12));
       if (c.a < .02) discard;
       // munnen inifrån: mörkt, övre tandraden, tungan längst ned
       if (inre > .001) {
@@ -246,31 +255,28 @@ export async function figuren(duk, { hog = false, latt = false, pr = 1 } = {}) {
   // armarna (rum-hasse-arm.js). Kroppen får inte skymma dem: djupet börjar om efter kroppen.
   yta.renderOrder = 1;
   yta.onAfterRender = (re) => re.clearDepth();
-  const A = byggArm(S, 1, foto, handModell, 0.86);
+  const A = byggArm(S, 1, foto, handModell, 0.94);
   const B = byggArm(S, -1, foto, handModell);
-  const dolj2 = new THREE.Mesh(new THREE.BoxGeometry(3400, 600, ZF - ZB), new THREE.MeshBasicMaterial({ colorWrite: false, transparent: true }));
-  dolj2.position.set(0, TOPP - 300, (ZF + ZB) / 2);
-  dolj2.renderOrder = 2;
-  // speglingarna har skrivit djup under disken: börja om även här
-  dolj2.onBeforeRender = (re) => re.clearDepth();
-  S.add(dolj2);
-  // disken: bara djup, så att den döljer det som är bakom (väggen och disken är bilden)
-  const dolj = new THREE.Mesh(new THREE.BoxGeometry(3400, 600, ZF - ZB), new THREE.MeshBasicMaterial({ colorWrite: false, transparent: true }));
-  dolj.position.set(0, TOPP - 300, (ZF + ZB) / 2);
-  dolj.renderOrder = 0;
-  S.add(dolj);
-  const KOPP = hog ? [300, TOPP, 470] : [372, TOPP, 470];
+  const KOPP = [745, 0, 540];
+  KOPP[1] = paBord(KOPP[0], BORD.TOPP, KOPP[2]).y;
   const K = byggKopp();
   const kopp = K.kopp;
-  kopp.position.set(KOPP[0], TOPP + 11, KOPP[2]);
+  kopp.position.set(KOPP[0], KOPP[1] + 11, KOPP[2]);
   kopp.rotation.y = -0.5;
-  K.fat.position.set(KOPP[0], TOPP + 0.5, KOPP[2]);
-  S.add(kopp, K.fat, K.spegel, K.spFat);
-  // skuggorna på disken: kapslar som faller nedåt och åt höger, ingen skuggkarta
+  K.fat.position.set(KOPP[0], KOPP[1] + 0.5, KOPP[2]);
+  S.add(kopp, K.fat);
+  // skuggorna på pulten: kapslar som faller nedåt och åt höger, ingen skuggkarta
   const NK = 6;
   const kapA = Array.from({ length: NK }, () => new THREE.Vector4());
   const kapH = Array.from({ length: NK }, () => new THREE.Vector2());
-  const skugga = new THREE.Mesh(new THREE.PlaneGeometry(3400, ZF - ZB), new THREE.ShaderMaterial({
+  const skuggGeo = new THREE.BufferGeometry();
+  {
+    const zn = D - 900;
+    const h = [[BORD.X, BORD.Z], [BORD.X + 3000, BORD.Z], [BORD.X, zn], [BORD.X + 3000, zn]].flatMap(([x, z]) => paBord(x, BORD.TOPP, z).toArray());
+    skuggGeo.setAttribute('position', new THREE.BufferAttribute(new Float32Array(h), 3));
+    skuggGeo.setIndex([0, 2, 1, 1, 2, 3]);
+  }
+  const skugga = new THREE.Mesh(skuggGeo, new THREE.ShaderMaterial({
     uniforms: { uKap: { value: kapA }, uKapH: { value: kapH } }, transparent: true, depthWrite: false, depthTest: false, blending: THREE.CustomBlending, blendSrc: THREE.OneFactor, blendDst: THREE.OneMinusSrcAlphaFactor,
     vertexShader: 'varying vec3 vP; void main() { vec4 w = modelMatrix * vec4(position, 1.); vP = w.xyz; gl_Position = projectionMatrix * viewMatrix * w; }',
     fragmentShader: `precision highp float; uniform vec4 uKap[${NK}]; uniform vec2 uKapH[${NK}]; varying vec3 vP;
@@ -291,18 +297,36 @@ export async function figuren(duk, { hog = false, latt = false, pr = 1 } = {}) {
       gl_FragColor = vec4(0., 0., 0., 1. - ljus);
     }`,
   }));
-  skugga.rotation.x = -Math.PI / 2;
-  skugga.position.set(0, TOPP, (ZB + ZF) / 2);
-  skugga.renderOrder = 1.2;
+  // (under honom: pulten går bakom honom)
+  skugga.renderOrder = 0.5;
   skugga.frustumCulled = false;
   S.add(skugga);
+  // Skuggan under handen på låret: en mjuk fläck som bara syns när handen ligger där.
+  const flackDuk = document.createElement('canvas');
+  flackDuk.width = flackDuk.height = 64;
+  {
+    const x = flackDuk.getContext('2d');
+    const g = x.createRadialGradient(32, 32, 4, 32, 32, 32);
+    g.addColorStop(0, 'rgba(0,0,0,.72)');
+    g.addColorStop(0.6, 'rgba(0,0,0,.34)');
+    g.addColorStop(1, 'rgba(0,0,0,0)');
+    x.fillStyle = g;
+    x.fillRect(0, 0, 64, 64);
+  }
+  const flackTex = new THREE.CanvasTexture(flackDuk);
+  const laret = new THREE.Mesh(new THREE.PlaneGeometry(1, 1), new THREE.MeshBasicMaterial({ map: flackTex, transparent: true, depthWrite: false, depthTest: false }));
+  laret.renderOrder = 0.6;
+  laret.frustumCulled = false;
+  laret.scale.set(390, 300, 1);
+  laret.rotation.set(-1.1, 0, -0.2);
+  S.add(laret);
   // ---------- rörelserna ----------
-  const SA = W_(424, 800, -52);
+  const SA = W_(352, 792, -52);
   const SB = W_(987, 800, 8);
   const LA = ARM.LA;
   const LB = ARM.LB;
-  // handen på disken: så står han när man kommer
-  const DISK = [[-120, TOPP + 74, 430], [-0.95, -0.42, -0.1], [0.62, -0.1, 0.78], [0.12, -0.99, -0.05], 0.08, 0];
+  // handen på låret: så sitter han när man kommer
+  const DISK = [[-345, -640, 320], [-0.8, -0.58, -0.2], [0.8, -0.24, 0.55], [0.18, -0.96, -0.22], 0.12, 0];
   // [t, handled, armbågens riktning, fingrarna, handflatan, krok, peka]
   const VA = [
     [0, ...DISK], [2.5, ...DISK],
@@ -322,8 +346,12 @@ export async function figuren(duk, { hog = false, latt = false, pr = 1 } = {}) {
     [9.25, P_(hog ? 235 : 95, 830, 320), [-0.7, -0.75, 0.1], [-0.76, 0.5, 0.3], [0.12, -0.25, 1], 0.1, 0],
     [9.95, ...DISK], [12.4, ...DISK],
   ];
-  // handen i fickan: precis som armen ligger i fotot
-  const FICKA = [P_(905, 1672, 8), [1, 0.05, 0], [-0.3, -0.95, 0], [0.7, 0, 0.7], 0.45, 0];
+  // armen ned mot pulten; pult() säger var handen är
+  const FICKA = [paBord(560, BORD.TOPP + 62, 720).toArray(), [0.85, -0.5, -0.1], [0.55, -0.12, 0.82], [0.06, -0.99, 0.06], 0.1, 0];
+  // armbågen när armen vilar på pulten
+  const ARMBAGE = new THREE.Vector3(...P_(1128, 1272, 130));
+  const ARMENS_SLUT = new THREE.Vector3();
+  let iVila = 0;
   const vbNycklar = () => [
     [0, ...FICKA], [2.55, ...FICKA],
     [3.0, P_(1110, 505, 310), [0.6, -0.5, 0.65], [0.12, 0.97, 0.12], [-0.12, -0.06, 1], 0.1, 0],
@@ -334,7 +362,7 @@ export async function figuren(duk, { hog = false, latt = false, pr = 1 } = {}) {
   let VB = vbNycklar();
   // Armen på pulten (pult): koppen står där, och handen ritas av pultens duk när armen vilar.
   let iPult = false;
-  const KF = { x: 1, y: 1, z: 1 };
+  const KF = { x: (-33 - KOPP[0]) / -405, y: (323 - KOPP[1] - 11) / 725, z: (310 - KOPP[2]) / -160 };
   // Klunken (T 20–24,5), börjar och slutar som vilan. Koppen går sin väg, handen följer örat.
   const KV = [[20, 0, 0, 0, 0, 0], [21.1, 0, 0, 0, 0, 0], [21.95, -405, 725, -160, -0.5, 0], [23.25, -412, 735, -168, -0.72, 0.02], [24.05, 0, 0, 0, 0, 0], [24.5, 0, 0, 0, 0, 0]];
   const klunkOm = (t) => { const f = ss(21.1, 21.3, t) * (1 - ss(23.95, 24.15, t)); return f; };
@@ -379,6 +407,7 @@ export async function figuren(duk, { hog = false, latt = false, pr = 1 } = {}) {
     Wut.copy(Sk).addScaledVector(dir_, len);
   }
   const FA = v();
+  const vilaW = new THREE.Vector3(...DISK[0]);
   const eu = new THREE.Euler();
   const mh = new THREE.Matrix4();
   const mk = new THREE.Matrix4();
@@ -387,10 +416,9 @@ export async function figuren(duk, { hog = false, latt = false, pr = 1 } = {}) {
   const h1 = v();
   const sa = v();
   const sb = v();
-  const kb = v();
   const kk = v();
   const kh = v();
-  const klunkMjuk = (t) => 1 - ss(20, 20.5, t) * (1 - ss(24.1, 24.5, t));
+
   const FK = v().set(-0.7, 0.28, 0.66).normalize();
   const PK = v().set(-0.3, -0.8, -0.1).normalize();
   // handen vid örat: fingrarna runt det, armbågen nedåt och utåt
@@ -424,7 +452,7 @@ export async function figuren(duk, { hog = false, latt = false, pr = 1 } = {}) {
   let sistaMun = null;
   // T: var i rörelserna (0–2,5 vilan, 2,5–5,5 fram till domen, 5,5–9,95 gesterna
   // medan han pratar, hemåt till 12,4), n: klockan för det som alltid rör sig,
-  // tal: 1 medan han pratar med handen på disken, mun: hur mycket munnen rör sig
+  // tal: 1 medan han pratar med handen vilande, mun: hur mycket munnen rör sig
   // (annars följer den tal och gesterna)
   function rita(T, n, tal = 0, mun = null) {
     const t = T;
@@ -489,26 +517,31 @@ export async function figuren(duk, { hog = false, latt = false, pr = 1 } = {}) {
     b.w.y += skratt * 7 * Math.sin(n * 15 + 1);
     ik(sa, a.w, a.pol, E_, Wr_);
     A.satt(sa, E_, Wr_, a.F, a.P, a.krok, a.peka, isar, 0.45);
+    // (mot fingertopparna från handleden, och lite under handen)
+    const pa = 1 - ss(30, 150, Wr_.distanceTo(vilaW));
+    laret.visible = pa > 0.01;
+    laret.material.opacity = pa;
+    laret.position.set(Wr_.x + a.F.x * 130, Wr_.y + a.F.y * 130 - 62, Wr_.z + a.F.z * 130);
     U.uArm.value[0].copy(sa); U.uArm.value[1].copy(E_); U.uArm.value[2].copy(Wr_);
-    // den andra armen följer kroppen: i vila ligger den som i fotot
-    if (!iKlunk) b.w.applyMatrix4(mk);
-    else { kb.copy(b.w).applyMatrix4(mk); b.w.lerp(kb, klunkMjuk(t)); }
+    // Vilar armen är handen på pulten och armbågen över dess kant; annars bestämmer leden.
     ik(sb, b.w, b.pol, E_, Wr_);
+    iVila = Math.max(1 - ss(2.55, 3, t), ss(4.2, 4.72, t) * (1 - ss(20.1, 20.7, t)), ss(24, 24.5, t));
+    if (iVila > 0 && iPult) { E_.lerp(ARMBAGE, iVila); Wr_.lerp(b.w, iVila); }
+    if (iPult && !(t > 2.55 && t < 4.72) && !iKlunk) Wr_.copy(ARMENS_SLUT);
     B.satt(sb, E_, Wr_, b.F, b.P, b.krok, b.peka, isar * 0.8, 0.45);
     U.uArm.value[3].copy(sb); U.uArm.value[4].copy(E_); U.uArm.value[5].copy(Wr_);
     if (iPult) {
       const vilar = !(t > 2.55 && t < 4.72) && !iKlunk;
-      if (vilar) { B.hand.mesh.visible = false; B.hand.spegel.visible = false; }
-      const syns = t > 21.1 && t < 24.05;
-      kopp.visible = syns;
-      K.spegel.visible = K.spFat.visible = K.fat.visible = false;
+      if (vilar) B.hand.mesh.visible = false;
+      B.man.visible = !vilar;
+      kopp.visible = t > 21.1 && t < 24.05;
+      K.fat.visible = false;
     }
     const hopp = t > 5 && t < 5.55 ? Math.sin(((t - 5) / 0.55) * Math.PI) * 62 * (1 - (t - 5) / 0.9) : 0;
     if (!iKlunk) { kopp.position.set(KOPP[0], KOPP[1] + 11 + hopp, KOPP[2]); kopp.rotation.set(0, -0.5, hopp * 0.0045); }
-    K.satt();
     // skuggorna: hand och underarm för båda armarna, och koppen
     const skk = (i, a, b, rd, h) => { kapA[i].set(a.x, a.z, b.x, b.z); kapH[i].set(rd, Math.max(0, h)); };
-    const ah = (o) => o.y - TOPP;
+    const ah = (o) => o.y - paBord(0, BORD.TOPP, o.z).y;
     const LA_ = A.lage;
     const LB_ = B.lage;
     FA.copy(LA_.W).addScaledVector(LA_.F, 200);
@@ -528,23 +561,27 @@ export async function figuren(duk, { hog = false, latt = false, pr = 1 } = {}) {
     info: () => ({ trianglar: r.info.render.triangles, ritanrop: r.info.render.calls, texturer: r.info.memory.textures }),
     ctx: r.getContext(),
     // Handen på pulten och koppen där (scenens mått, rum-hasse.js): armen sträcker sig dit.
-    pult([sx, sy], [kx, ky], rakt = false) {
-      // (framför diskens framkant: armen går över den, inte genom den)
-      const z = 720;
+    // Armen vilar på pulten: handleden, var ärmen slutar på andra sidan hörnet (där syns den inte) och
+    // armbågen i hans scen, koppen och hur bred ärmen ska vara vid hörnet (halv, scenens mått).
+    pult([wx, wy], [sx, sy], [ex, ey], [kx, ky], halv) {
+      const z = 1000;
       const f = D / (D - z);
-      FICKA[0] = [(sx - L.px) / (L.S * f), 500 - (sy - L.py) / (L.S * f), z];
-      // (rakt: armen går hela sin längd genom punkten)
-      if (rakt) FICKA[0] = new THREE.Vector3(...FICKA[0]).sub(SB).setLength((LA + LB) * 0.97).add(SB).toArray();
+      FICKA[0] = [(wx - L.px) / (L.S * f), 500 - (wy - L.py) / (L.S * f), z];
+      ARMENS_SLUT.set((sx - L.px) / (L.S * f), 500 - (sy - L.py) / (L.S * f), z);
+      const ze = 260;
+      const fe = D / (D - ze);
+      ARMBAGE.set((ex - L.px) / (L.S * fe), 500 - (ey - L.py) / (L.S * fe), ze);
       FICKA[1] = [0.25, -0.96, -0.1];
       FICKA[2] = [0.96, -0.1, -0.25];
       FICKA[3] = [0, -1, 0];
       FICKA[4] = 0.05;
       VB = vbNycklar();
+      B.vidd(halv / (86 * L.S * f));
       KOPP[0] = (kx - L.px) / (L.S * f);
       KOPP[1] = 500 - (ky - L.py) / (L.S * f);
       KOPP[2] = z;
       KF.x = (-33 - KOPP[0]) / -405;
-      KF.y = (TOPP + 736 - KOPP[1] - 11) / 725;
+      KF.y = (323 - KOPP[1] - 11) / 725;
       KF.z = (310 - z) / -160;
       iPult = true;
       rita(sistaT, sistaN, sistaTal, sistaMun);
@@ -552,6 +589,7 @@ export async function figuren(duk, { hog = false, latt = false, pr = 1 } = {}) {
     borta() {
       G.dispose();
       K.borta();
+      flackTex.dispose();
       A.borta();
       B.borta();
       r.dispose();

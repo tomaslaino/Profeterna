@@ -6,18 +6,18 @@
 //
 // Armen och handen är figurens (rum-hasse-arm.js), och världen och kameran likaså.
 import * as THREE from 'three';
-import { ARM, DISK, byggArm, laddaFoto, laddaHand } from './rum-hasse-arm.js';
+import { ARM, KAMERA, byggArm, laddaFoto, laddaHand } from './rum-hasse-arm.js';
 
 const DEG = Math.PI / 180;
-const D = DISK.CZ;
-const CY = DISK.CY;
+const D = KAMERA.CZ;
+const CY = KAMERA.CY;
 
 // Var handleden vilar, i rummets mått (1600 × 1000), hur stor handen är där och hur
 // handen och armen ligger på pulten (grader, 0 = rakt åt höger). Står fönstret så att
 // kanten skär (smalare eller bredare än scenen) flyttas den in i bild: handen ska alltid
 // synas hel.
 const LAGE = {
-  bred: { x: 56, y: 944, skala: 0.7, in: 60, ner: 36, hv: 12, av: 8 },
+  bred: { x: 56, y: 914, skala: 0.7, in: 60, ner: 66, hv: -2, av: -30 },
   smal: { x: 610, y: 706, skala: 0.42, in: 44, ner: 50, hv: 16, av: 12 },
 };
 // koppen på pulten (rum.js, #rum-hasse .kopp i rum.css)
@@ -99,7 +99,6 @@ export async function armen(plan, { matt, pr = 1.5 }) {
     A.satt(far, vE, vila.W, vila.F, vila.P, KROK, 0, 0, TUMME);
     // (handen ska synas var den än är i världen)
     A.hand.mesh.visible = true;
-    A.hand.spegel.visible = false;
     skuggor(vila.W, vila.F, vila.N, vila.D0);
     r.render(S, cam);
   }
@@ -130,7 +129,7 @@ export async function armen(plan, { matt, pr = 1.5 }) {
     const oy = (m.H - 1000 * k) / 2;
     const visL = -ox / k;
     const visB = (m.H - oy) / k;
-    const L = (m.W < 600 && m.H > m.W) || visL > 150 ? LAGE.smal : LAGE.bred;
+    const L = m.W / m.H < 1.15 ? LAGE.smal : LAGE.bred;
     const px = Math.max(L === LAGE.smal ? 0 : L.x, visL + L.in);
     const py = Math.min(L.y, visB - L.ner);
     vila.x = ox + px * k;
@@ -197,6 +196,12 @@ export async function armen(plan, { matt, pr = 1.5 }) {
     knapp(el) { knapp = el; placera(); },
     // i fönstrets bildpunkter, med rummet rakt fram
     handled: () => [vila.x, vila.y],
+    // en punkt längre bort på armen, och ärmens halva bredd där (samma mått)
+    armen: (d = 400) => {
+      const p = far.copy(vila.W).addScaledVector(vila.D0, d);
+      const f = (V.M * D) / (D - p.z);
+      return { x: V.ppx + p.x * f, y: V.ppy + (CY - p.y) * f, halv: 85 * vila.s };
+    },
     koppen: () => [vila.ox + KOPP.x * vila.k, vila.oy + KOPP.y * vila.k],
     borta() { cancelAnimationFrame(raf); A.borta(); r.dispose(); r.forceContextLoss(); c.remove(); },
   };

@@ -29,20 +29,8 @@ vec3 kant(vec3 n, float styrka) {
 vec3 ton(vec3 c) { return c * (1.03 - .15 * c); }
 `;
 
-// Disken speglar det som står på den: samma modell upp och ned, bara där den syns i diskens yta.
-export const DISK = { TOPP: -413, ZB: 240, ZF: 690, CY: 500, CZ: 3900 };
-const SPEGEL = `
-float spegelAlfa(vec3 w, float s) {
-  if (s >= 1.) return 1.;
-  // det som är under disken i verkligheten speglas inte
-  if (w.y > ${DISK.TOPP}.) discard;
-  float t = (${DISK.TOPP}. - ${DISK.CY}.) / (w.y - ${DISK.CY}.);
-  float zc = ${DISK.CZ}. + t * (w.z - ${DISK.CZ}.);
-  if (zc < ${DISK.ZB}. || zc > ${DISK.ZF}.) discard;
-  return s * exp((w.y - ${DISK.TOPP}.) / 95.);
-}`;
-const MIR = new THREE.Matrix4().makeScale(1, -1, 1).setPosition(0, 2 * DISK.TOPP, 0);
-const SPEGELNIVA = 0.24;
+// figurens kamera (rum-hasse-3d.js, och handen på pulten)
+export const KAMERA = { CY: 500, CZ: 3900 };
 
 let fotoP = null;
 export function laddaFoto() {
@@ -121,14 +109,11 @@ void main() {
   gl_Position = projectionMatrix * viewMatrix * w4;
 }`;
 const HUD_F = `precision highp float;
-uniform sampler2D foto; uniform vec4 uHud; uniform float uSpegel;
+uniform sampler2D foto; uniform vec4 uHud;
 varying vec3 vN, vP; varying vec2 vUv, vNagel; varying float vAo, vTon, vPalm, vRygg;
 ${LJUS}
-${SPEGEL}
 void main() {
-  float sa = spegelAlfa(vP, uSpegel);
   vec3 n = normalize(vN);
-  if (uSpegel < 1.) n.y = -n.y;
   // huden: fotots handrygg överst i atlasen, handflatan under
   vec2 q = clamp(vUv, .004, .996);
   vec3 c = mix(texture2D(foto, uHud.xy + vec2(q.x, q.y * .5 + .5) * uHud.zw).rgb, texture2D(foto, uHud.xy + vec2(q.x, q.y * .5) * uHud.zw).rgb, vPalm);
@@ -153,7 +138,7 @@ void main() {
   float sp = pow(max(0., dot(n, h)), mix(22., 60., nagel));
   ut += vec3(1., .93, .84) * sp * mix(.07, .2, nagel) * ao;
   ut += kant(n, .28) * ao;
-  gl_FragColor = vec4(ton(ut) * sa, sa);
+  gl_FragColor = vec4(ton(ut), 1.);
 }`;
 const ax = new THREE.Vector3(1, 0, 0);
 const az = new THREE.Vector3(0, 0, 1);
@@ -174,16 +159,10 @@ export function byggHand(modell, sida, foto) {
     foto: { value: foto },
     uB: { value: ut },
     uHud: { value: new THREE.Vector4((a.hx + 0.5) / a.W, 1 - (a.hy + a.hh - 0.5) / a.H, (a.hw - 1) / a.W, (a.hh - 1) / a.H) },
-    uSpegel: { value: 1 },
   };
   const mesh = new THREE.Mesh(modell.g, new THREE.ShaderMaterial({ uniforms: U, vertexShader: HUD_V, fragmentShader: HUD_F, transparent: true, depthWrite: true, blending: THREE.CustomBlending, blendSrc: THREE.OneFactor, blendDst: THREE.OneMinusSrcAlphaFactor }));
   mesh.frustumCulled = false;
   mesh.matrixAutoUpdate = false;
-  const spegelM = new THREE.ShaderMaterial({ uniforms: { foto: U.foto, uB: U.uB, uHud: U.uHud, uSpegel: { value: SPEGELNIVA } }, vertexShader: HUD_V, fragmentShader: HUD_F, transparent: true, depthWrite: true, blending: THREE.CustomBlending, blendSrc: THREE.OneFactor, blendDst: THREE.OneMinusSrcAlphaFactor });
-  const spegel = new THREE.Mesh(modell.g, spegelM);
-  spegel.frustumCulled = false;
-  spegel.matrixAutoUpdate = false;
-  spegel.renderOrder = 1.5;
   // krok: 0 raka, 1 knuten. peka: pekfingret rakt. spar: fingrarna isär (0–1). tumme: 0 mot handen, 1 ut.
   function bojFingrar(krok, peka = 0, spar = 0, tumme = 0.4, extra = null) {
     const g = (i) => (extra ? extra[i] || 0 : 0);
@@ -232,11 +211,9 @@ export function byggHand(modell, sida, foto) {
     m.setPosition(W.x, W.y, W.z);
     mesh.matrix.copy(m);
     mesh.matrixWorldNeedsUpdate = true;
-    spegel.matrix.multiplyMatrices(MIR, m);
-    spegel.matrixWorldNeedsUpdate = true;
     bojFingrar(krok, peka, spar, tumme, extra);
   }
-  return { mesh, spegel, satt, U };
+  return { mesh, satt, U };
 }
 
 // ---------- armen ----------
@@ -260,7 +237,8 @@ ${LJUS}
 void main() {
   vec3 n = normalize(vN);
   vec4 c = texture2D(foto, vUv);
-  // remsan är utjämnad: skuggorna kommer från ljuset, vecken från fotot
+  // remsan är utjämnad: skuggorna kommer från ljuset, vecken från fotot (mjukare, för armen ligger inte som i fotot)
+  c.rgb = .135 + (c.rgb - .135) * .62;
   vec3 ut = c.rgb * ljus(n) * 1.14;
   float gr = 1. - clamp(n.z, 0., 1.);
   ut += vec3(.075, .07, .066) * gr * gr * (.4 + .6 * clamp(dot(n, NYCKEL) + .5, 0., 1.));
@@ -340,7 +318,7 @@ export function byggArm(scen, sida, foto, modell, vidd = 1) {
   const hand = byggHand(modell, sida, foto);
   ror.renderOrder = man.renderOrder = hand.mesh.renderOrder = 5;
   const grupp = new THREE.Group();
-  grupp.add(ror, man, hand.mesh, hand.spegel);
+  grupp.add(ror, man, hand.mesh);
   scen.add(grupp);
 
   const u1 = new THREE.Vector3();
@@ -352,6 +330,8 @@ export function byggArm(scen, sida, foto, modell, vidd = 1) {
   const N_ = new THREE.Vector3();
   const B_ = new THREE.Vector3();
   const topp = new THREE.Vector3();
+  let slut = 1;
+  let slutVidd = 1;
   const lage = { S: new THREE.Vector3(), E: new THREE.Vector3(), W: new THREE.Vector3(), pol: new THREE.Vector3(), F: new THREE.Vector3(), P: new THREE.Vector3(), krok: 0, peka: 0 };
   // 'allt', 'over' (ärmhuvudet till armbågen) eller 'under' (armbågen, manschetten och handen)
   let delen = 'allt';
@@ -362,7 +342,7 @@ export function byggArm(scen, sida, foto, modell, vidd = 1) {
     if (delen === 'allt') g.setDrawRange(0, tot);
     else if (delen === 'over') g.setDrawRange(0, Math.min(armbage + 1, RINGAR - 1) * per);
     else { const b = Math.max(armbage - 1, 0) * per; g.setDrawRange(b, tot - b); }
-    man.visible = hand.mesh.visible = hand.spegel.visible = delen !== 'over';
+    man.visible = hand.mesh.visible = delen !== 'over';
   };
   function satt(S, E, W, F, Pn, krok, peka, spar = 0, tumme = 0.4, extra = null) {
     lage.S.copy(S); lage.E.copy(E); lage.W.copy(W); lage.F.copy(F); lage.P.copy(Pn); lage.krok = krok; lage.peka = peka;
@@ -393,8 +373,9 @@ export function byggArm(scen, sida, foto, modell, vidd = 1) {
     const Na = g.attributes.normal.array;
     let o = 0;
     for (let i = 0; i < RINGAR; i++) {
-      const s = i / (RINGAR - 1);
-      const dist = s * tot;
+      const s0 = i / (RINGAR - 1);
+      const dist = s0 * tot;
+      const s = dist < dE ? (0.5 * dist) / dE : 0.5 + (0.5 * (dist - dE)) / (tot - dE);
       if (dist < L0 - rr) { pC.copy(topp).addScaledVector(u1, dist); T_.copy(u1); } else if (dist < L0 - rr + b) {
         const f = (dist - (L0 - rr)) / b;
         const f1 = 1 - f;
@@ -405,8 +386,9 @@ export function byggArm(scen, sida, foto, modell, vidd = 1) {
       if (N_.lengthSq() < 1e-4) N_.set(1, 0, 0).addScaledVector(T_, -T_.x);
       N_.normalize();
       B_.crossVectors(T_, N_);
-      const r0 = radie(s) * (i === RINGAR - 1 ? 0.7 : 1) * (1 + (vidd - 1) * (1 - s)) * (1 + (smal - 1) * Math.max(0, 1 - s / 0.62));
+      const r0 = radie(s) * slut * (i === RINGAR - 1 ? 0.7 : 1) * (1 + (vidd - 1) * (1 - s)) * (1 + (smal - 1) * Math.max(0, 1 - s / 0.62));
       if (i === RINGAR - 1) pC.addScaledVector(T_, -3);
+      slut = Math.min(1, Math.max(0, (s - 0.62) / 0.14)) * (slutVidd - 1) + 1;
       const platt = 0.8 + 0.11 * Math.min(1, Math.max(0, (s - 0.78) / 0.18));
       // vecken vid armbågen och lite liv i tyget
       const ve = Math.exp(-(((dist - dE) / 120) ** 2));
@@ -432,34 +414,27 @@ export function byggArm(scen, sida, foto, modell, vidd = 1) {
     man.position.copy(W).addScaledVector(u2, 4);
     man.quaternion.setFromUnitVectors(Y_AX, u2);
     hand.satt(pC.copy(W).addScaledVector(u2, 26), F, Pn, krok, peka, spar, tumme, extra);
-    // bakom disken ritas handen inte, och spegelbilden bara nära disken
-    const bakom = W.y < DISK.TOPP - 40 && W.z < DISK.ZB;
-    hand.mesh.visible = delen !== 'over' && !bakom;
-    hand.spegel.visible = hand.mesh.visible && W.y - DISK.TOPP < 240 && W.z > DISK.ZB - 120;
+    hand.mesh.visible = delen !== 'over';
   }
-  return { grupp, satt, lage, hand, del(d) { delen = d; ritaDel(); }, set visible(v) { grupp.visible = v; }, get visible() { return grupp.visible; }, borta() { g.dispose(); manG.dispose(); } };
+  return { grupp, satt, lage, hand, man, vidd(v) { slutVidd = v; }, del(d) { delen = d; ritaDel(); }, set visible(v) { grupp.visible = v; }, get visible() { return grupp.visible; }, borta() { g.dispose(); manG.dispose(); } };
 }
 
 // ---------- koppen ----------
-const KER_V = `uniform float uSpegel;
-varying vec3 vN, vP; varying vec2 vL;
+const KER_V = `varying vec3 vN, vP; varying vec2 vL;
 void main() { vL = vec2(length(position.xz), position.y); vec4 w = modelMatrix * vec4(position, 1.); vP = w.xyz; vN = normalize(mat3(modelMatrix) * normal); gl_Position = projectionMatrix * viewMatrix * w; }`;
 const KER_F = `precision highp float;
-uniform float uSpegel, uRand, uKaffe; uniform vec2 uBand[3];
+uniform float uRand, uKaffe; uniform vec2 uBand[3];
 varying vec3 vN, vP; varying vec2 vL;
 ${LJUS}
-${SPEGEL}
 void main() {
-  float sa = spegelAlfa(vP, uSpegel);
   vec3 n = normalize(vN);
-  if (uSpegel < 1.) n.y = -n.y;
   vec3 c = vec3(.93, .895, .81);
   // blå ränder som koppen på pulten
   float y = uRand > .5 ? vL.x : vL.y;
   for (int i = 0; i < 3; i++) { float m = smoothstep(uBand[i].x - .8, uBand[i].x + .8, y) * (1. - smoothstep(uBand[i].y - .8, uBand[i].y + .8, y)); c = mix(c, vec3(.22, .34, .6), m); }
   if (uKaffe > .5) c = vec3(.11, .055, .03);
   vec3 ut = c * ljus(n) * .9;
-  // nära disken blir det mörkare, och det är en blank yta
+  // nära bordet blir det mörkare, och det är en blank yta
   ut *= uRand > .5 ? 1. : .62 + .38 * smoothstep(0., 34., vL.y);
   vec3 r = reflect(vec3(0., 0., -1.), n);
   vec3 om = mix(vec3(.05, .03, .02), vec3(.62, .43, .25), smoothstep(-.1, .7, r.y));
@@ -467,16 +442,16 @@ void main() {
   float f = .05 + .95 * pow(1. - clamp(n.z, 0., 1.), 5.);
   ut = mix(ut, om, f * (uKaffe > .5 ? .7 : .85));
   ut += vec3(1., .94, .85) * pow(max(0., dot(n, normalize(NYCKEL + vec3(0., 0., 1.)))), 90.) * .55;
-  gl_FragColor = vec4(ton(ut) * sa, sa);
+  gl_FragColor = vec4(ton(ut), 1.);
 }`;
-function kerM(sp, rand, kaffe, band) {
+function kerM(rand, kaffe, band) {
   return new THREE.ShaderMaterial({
-    uniforms: { uSpegel: { value: sp }, uRand: { value: rand }, uKaffe: { value: kaffe }, uBand: { value: band.map((b) => new THREE.Vector2(b[0], b[1])) } },
+    uniforms: { uRand: { value: rand }, uKaffe: { value: kaffe }, uBand: { value: band.map((b) => new THREE.Vector2(b[0], b[1])) } },
     vertexShader: KER_V, fragmentShader: KER_F, transparent: true, blending: THREE.CustomBlending, blendSrc: THREE.OneFactor, blendDst: THREE.OneMinusSrcAlphaFactor,
   });
 }
 const V2 = (a) => a.map(([x, y]) => new THREE.Vector2(x, y));
-// koppen (botten i origo, y uppåt, örat åt +x) och fatet. spegel: en likadan upp och ned.
+// koppen (botten i origo, y uppåt, örat åt +x) och fatet
 export function byggKopp() {
   const kropp = new THREE.LatheGeometry(V2([[0, 0], [38, 0], [42, 3], [46, 16], [60, 98], [63, 111], [62, 114], [59, 113], [56, 100], [44, 24], [0, 14]]), 32);
   const yta = new THREE.CircleGeometry(57, 32);
@@ -491,30 +466,15 @@ export function byggKopp() {
   const BF = [[107, 111], [999, 999], [999, 999]];
   const kopp = new THREE.Group();
   const fatG = new THREE.Group();
-  const spegel = new THREE.Group();
-  const spFat = new THREE.Group();
-  const del = (grp, geo, sp, rand, kaffe, band, nivå) => { const m = new THREE.Mesh(geo, kerM(sp, rand, kaffe, band)); m.renderOrder = nivå; m.frustumCulled = false; grp.add(m); return m; };
-  del(kopp, kropp, 1, 0, 0, BAND, 6);
-  del(kopp, ora, 1, 0, 0, [[999, 999], [999, 999], [999, 999]], 6);
-  del(kopp, yta, 1, 0, 1, [[999, 999], [999, 999], [999, 999]], 6);
-  del(fatG, fat, 1, 1, 0, BF, 6);
-  del(spegel, kropp, SPEGELNIVA, 0, 0, BAND, 1.5);
-  del(spegel, ora, SPEGELNIVA, 0, 0, [[999, 999], [999, 999], [999, 999]], 1.5);
-  del(spFat, fat, SPEGELNIVA, 1, 0, BF, 1.5);
+  const del = (grp, geo, rand, kaffe, band) => { const m = new THREE.Mesh(geo, kerM(rand, kaffe, band)); m.renderOrder = 6; m.frustumCulled = false; grp.add(m); return m; };
+  del(kopp, kropp, 0, 0, BAND);
+  del(kopp, ora, 0, 0, [[999, 999], [999, 999], [999, 999]]);
+  del(kopp, yta, 0, 1, [[999, 999], [999, 999], [999, 999]]);
+  del(fatG, fat, 1, 0, BF);
   return {
-    kopp, fat: fatG, spegel, spFat,
+    kopp, fat: fatG,
     // örat i koppens egna mått
     ORA: new THREE.Vector3(84, 62, 0),
-    satt() {
-      kopp.updateMatrix();
-      fatG.updateMatrix();
-      spegel.matrixAutoUpdate = false;
-      spFat.matrixAutoUpdate = false;
-      spegel.matrix.multiplyMatrices(MIR, kopp.matrix);
-      spFat.matrix.multiplyMatrices(MIR, fatG.matrix);
-      spegel.matrixWorldNeedsUpdate = true;
-      spFat.matrixWorldNeedsUpdate = true;
-    },
     borta() { kropp.dispose(); yta.dispose(); ora.dispose(); fat.dispose(); },
   };
 }
