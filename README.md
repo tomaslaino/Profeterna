@@ -3532,8 +3532,28 @@ hand och trummar med fingrarna då och då (i telefonen, där kaffet ligger utan
 handen vid kupongens hörn och är det man trycker på). Ett klick eller H och kameran svänger åt
 vänster, som i ett rumshörn: ögat står mitt i, vänster vägg är vinkelrät och perspektivet är
 halva fönsterbredden (`.hasse-svang` i [public/rum-hasse.css](public/rum-hasse.css)). Där står
-han bakom disken med samma hand på disken, och Esc, *Tillbaka* eller ett klick någon annanstans
-går tillbaka.
+han bakom disken med samma hand på disken, och Esc eller *Tillbaka* går tillbaka (vid matchlistan
+också ett klick utanför).
+
+**Samtalet.** Det är han som frågar, *Vilken match förstår du inte?*, med ditt efternamn om kupongen
+vet vem du är, och man svarar genom att välja en match. Han svarar direkt och fortsätter prata
+medan analysen tas fram (raderna kommer i ordning: *Vi börjar bakifrån*, *Total kontroll*, *Det här
+är helt normalt*) och tar en klunk kaffe då och då. När den är klar blir han tyst, armarna går upp, han slår i disken och domen
+står i guld. Sedan säger han texten en mening i taget, ord för ord med munnen i takt, med en paus
+mellan meningarna och en längre före en kort mening, och gesterna kommer vid de bestämda orden
+(*Nej nej nej*, *varningens finger*) eller då och då vid en lång mening. Ett klick var som helst
+visar hela repliken och nästa klick går vidare; *Ja, ja* tar resten på en gång, och det svarar han
+på (*Som du vill.*). Sist säger han vad han tycker om det du själv har på kupongen (*Du har etta. Det
+är din kupong. Och dina pengar.*). Han minns på enheten vad du har frågat om: tecknen står på
+matchens rad, och *Nästa match* räknar (*Halva kupongen är löst*). Bara tecken du själv har bett om
+syns, så att listan inte blir ett automatiskt tips. Frågar du om samma match igen står allt direkt.
+Går hans röst inte att få säger han det och visar analysen i skrift. Allt han säger runt omkring är
+färdiga rader, utan AI, i [public/rum-hasse-repliker.js](public/rum-hasse-repliker.js). Med minskad
+rörelse i systemet står allt direkt, utan gester.
+
+Replikerna går att använda till annat: `RumHasse.repliker(lista, { i, sen, direkt })`, där varje
+replik är `{ text, gest?, vid?, ny?, skrift? }` och gesten ett namn i `RumHasse.gester`, ett klipp på
+figurens tidslinje. Munnen följer texten också under gesterna (fjärde argumentet till `rita`).
 
 **Rösten.** Analysen är densamma som i matchbladet: först artikeln och tipset (`POST
 …/artikel`, se [Matchanalysen](#matchanalysen-fas-5)), sedan säger Claude det viktigaste ur dem

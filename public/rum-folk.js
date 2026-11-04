@@ -294,8 +294,9 @@ window.RumFolk = (() => {
     // ett klick (eller tryck) på en figur: din egen gör dig till den som
     // fyller i kupongen (valj), annars hej en stund i telefonen – och inget annat
     el.addEventListener('click', (e) => {
-      // (inte klicket efter ett drag, som rum.js redan har stoppat)
-      if (e.defaultPrevented) return;
+      // (inte klicket efter ett drag, som rum.js redan har stoppat, och inte i
+      // Hasses vy, som står framför gänget)
+      if (e.defaultPrevented || e.target.closest('.rum-hasse-vy')) return;
       const k = vemUnder(e.clientX, e.clientY);
       if (!k) return;
       e.preventDefault();

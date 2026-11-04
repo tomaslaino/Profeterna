@@ -13,7 +13,7 @@
 // z mot betraktaren. Disken är y = TOPP, från z = ZB till ZF.
 //
 // pulten(plan, { smal }) → { trumma(), satt(smal), borta() }
-// figuren(duk, { hog, latt }) → { rita(T, n, tal), tid: längden, borta() }
+// figuren(duk, { hog, latt }) → { rita(T, n, tal, mun), tid: längden, borta() }
 import * as THREE from 'three';
 import { RoundedBoxGeometry } from 'three/addons/geometries/RoundedBoxGeometry.js';
 
@@ -620,8 +620,9 @@ export async function figuren(duk, { hog = false, latt = false, pr = 1 } = {}) {
   const sb = v();
   // T: var i rörelserna (0–2,5 vilan, 2,5–5,5 fram till domen, 5,5–9,95 gesterna
   // medan han pratar, hemåt till 12,4), n: klockan för det som alltid rör sig,
-  // tal: 1 medan han pratar med handen på disken
-  function rita(T, n, tal = 0) {
+  // tal: 1 medan han pratar med handen på disken, mun: hur mycket munnen rör sig
+  // (annars följer den tal och gesterna)
+  function rita(T, n, tal = 0, mun = null) {
     const t = T;
     const skratt = ss(2.75, 3.05, t) * (1 - ss(4.25, 4.6, t));
     const talar = Math.max(tal, ss(5.55, 5.7, t) * (1 - ss(9.4, 9.6, t)));
@@ -648,7 +649,7 @@ export async function figuren(duk, { hog = false, latt = false, pr = 1 } = {}) {
     U.bryn.value.set(spar([[0, 0], [2.5, 0], [3.0, 0.5], [4.4, 0.5], [5.0, 1], [5.6, 0.4], [9.4, 0.3], [9.95, 0.4], [10.6, 0.15], [11.6, 0.15], [12.4, 0]], t) + lyft, spar([[0, 1.1], [2.5, 1.1], [3.0, 0.6], [4.4, 0.6], [5.0, 1], [5.6, 0.5], [9.4, 0.4], [9.95, 0.5], [10.6, 1.05], [11.6, 1.05], [12.4, 1.1]], t) + lyft);
     U.le.value = Math.max(0.14 * (1 - ss(2.5, 2.8, t)), skratt, 0.3 * ss(8.3, 8.8, t) * (1 - ss(9.4, 9.8, t)), 0.6 * ss(10, 10.5, t) * (1 - ss(11.6, 12.4, t)), 0.14 * ss(11.6, 12.4, t));
     const sta = 0.8 * Math.abs(Math.sin(n * 8.7)) * (0.5 + 0.5 * Math.sin(n * 2.9 + 0.7)) * (0.72 + 0.28 * Math.sin(n * 17.3));
-    U.munn.value = Math.max(talar * sta, skratt * (0.7 + 0.2 * Math.sin(n * 14)), ss(4.9, 5.0, t) * (1 - ss(5.0, 5.25, t)) * 0.6);
+    U.munn.value = Math.max((mun === null ? talar : mun) * sta, skratt * (0.7 + 0.2 * Math.sin(n * 14)), ss(4.9, 5.0, t) * (1 - ss(5.0, 5.25, t)) * 0.6);
     // blinkningarna: en gång i några sekunder, klockan avgör
     const fas = (n % 4.3);
     const bl = 1 - clamp(Math.abs(fas - 0.3) / 0.085);
