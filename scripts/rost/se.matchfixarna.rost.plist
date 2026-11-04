@@ -1,0 +1,43 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<!--
+  Hasse Backes röst på Matchfixarna: scripts/rost/las.mjs. Mallen fylls i av installera.sh
+  och hamnar i ~/Library/LaunchAgents.
+
+  StartInterval: var 15:e minut. launchd startar inte jobbet igen medan det kör, så en lång
+  körning (högst perKorning meningar, 10–15 minuter) skjuter bara upp nästa. Sover datorn
+  när det är dags körs jobbet när den vaknar. RunAtLoad: också när användaren loggar in.
+  När allt redan är uppläst slutar skriptet direkt.
+  LowPriorityIO och Nice: datorn ska gå att använda medan han läser.
+-->
+<plist version="1.0">
+<dict>
+  <key>Label</key>
+  <string>se.matchfixarna.rost</string>
+  <key>ProgramArguments</key>
+  <array>
+    <string>__NODE__</string>
+    <string>__KLON__/scripts/rost/las.mjs</string>
+    <string>--publicera</string>
+  </array>
+  <key>WorkingDirectory</key>
+  <string>__KLON__</string>
+  <key>EnvironmentVariables</key>
+  <dict>
+    <key>PATH</key>
+    <string>/usr/local/bin:/opt/homebrew/bin:/usr/bin:/bin:/usr/sbin:/sbin</string>
+  </dict>
+  <key>StartInterval</key>
+  <integer>900</integer>
+  <key>RunAtLoad</key>
+  <true/>
+  <key>Nice</key>
+  <integer>5</integer>
+  <key>LowPriorityIO</key>
+  <true/>
+  <key>StandardOutPath</key>
+  <string>__HEM__/Library/Logs/Matchfixarna/launchd-rost.log</string>
+  <key>StandardErrorPath</key>
+  <string>__HEM__/Library/Logs/Matchfixarna/launchd-rost.log</string>
+</dict>
+</plist>

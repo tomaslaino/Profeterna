@@ -22,6 +22,12 @@
 // Avtrycket räknas på rösten, takten, tonen, formatet och meningen, så ett nytt
 // ljud tas fram när något av det ändras. Ljud som inte använts på sparasDagar
 // tas bort ur cachen (data/cache/rost/anvant.json).
+//
+// Tomas egen röst: iMacen läser upp samma meningar med Chatterbox (scripts/rost/)
+// och lägger ljudet i grenen rost: rost.json {filer: {"<mening>": "<avtryck>"}} och
+// <avtryck>.mp3. Workflowen hämtar grenen till data/egen-rost/ (EGEN). Där en mening
+// finns i den tar publicera() den filen, och fyll() frågar inte Azure om den. Saknas
+// grenen eller meningen är det Azure-rösten som förut.
 
 const crypto = require('crypto');
 const fs = require('fs');
@@ -34,6 +40,7 @@ const { CACHE_DIR } = require('./store');
 const rc = hc.rost;
 const ROOT = path.join(__dirname, '..');
 const BANK = path.join(CACHE_DIR, 'rost');
+const EGEN = process.env.ROST_EGEN ? path.resolve(process.env.ROST_EGEN) : path.join(ROOT, 'data', 'egen-rost');
 const DAG = 86400000;
 
 const enkel = (t) => String(t).replace(/\s+/g, ' ').trim();
@@ -112,7 +119,52 @@ function texter({ analyser = lasAnalyser(), gang = [], now = Date.now() } = {}) 
   return [...new Set([...analystexter(kommande), ...repliktexter(gang), ...analystexter(spelade)])];
 }
 
+// ---------- talen i ord ----------
+//
+// Chatterbox får talen som ord: "2–1" blir "två–ett", "28" "tjugoåtta", "40 %"
+// "fyrtio procent". Det är oprövat hur den läser siffror. Bara uppläsningen ändras;
+// meningen i registret är densamma som på sidan.
+const ENTAL = ['noll', 'ett', 'två', 'tre', 'fyra', 'fem', 'sex', 'sju', 'åtta', 'nio', 'tio', 'elva', 'tolv', 'tretton', 'fjorton', 'femton', 'sexton', 'sjutton', 'arton', 'nitton'];
+const TIOTAL = ['', '', 'tjugo', 'trettio', 'fyrtio', 'femtio', 'sextio', 'sjuttio', 'åttio', 'nittio'];
+function iOrdTal(n) {
+  if (n < 20) return ENTAL[n];
+  if (n < 100) return TIOTAL[Math.floor(n / 10)] + (n % 10 ? ENTAL[n % 10] : '');
+  if (n < 1000) return `${n < 200 ? '' : ENTAL[Math.floor(n / 100)]}hundra${n % 100 ? iOrdTal(n % 100) : ''}`;
+  // årtal som 1988 och 2026
+  if (n >= 1100 && n < 2000) return `${iOrdTal(Math.floor(n / 100))}hundra${n % 100 ? iOrdTal(n % 100) : ''}`;
+  if (n < 1000000) return `${n < 2000 ? '' : iOrdTal(Math.floor(n / 1000))}tusen${n % 1000 ? iOrdTal(n % 1000) : ''}`;
+  return String(n);
+}
+function uttal(text) {
+  const tal = (d) => iOrdTal(Number(String(d).replace(/\s/g, '')));
+  return enkel(text)
+    .replace(/(\d+)\s*[–-]\s*(\d+)/g, (_, a, b) => `${tal(a)}–${tal(b)}`)
+    .replace(/(\d+),(\d+)/g, (_, a, b) => `${tal(a)} komma ${[...b].map((c) => ENTAL[c]).join(' ')}`)
+    .replace(/\d{1,3}(?: \d{3})+|\d+/g, (d) => tal(d))
+    .replace(/\s*%/g, ' procent');
+}
+
 const avtryck = (t) => crypto.createHash('sha256').update(JSON.stringify([rc.voice, rc.rate, rc.pitch, rc.format, enkel(t)])).digest('hex').slice(0, 16);
+
+// Avtrycket för Tomas egen röst: inställningarna, referensens avtryck (ref) och det som
+// läses upp. Ändras något av det tas ljudet fram på nytt.
+const egenAvtryck = (t, ref, e = rc.egen) => crypto.createHash('sha256')
+  .update(JSON.stringify(['chatterbox', ref, e.sprak, e.exaggeration, e.cfgWeight, e.temperature, e.kbps, uttal(t)]))
+  .digest('hex').slice(0, 16);
+
+// Registret i grenen rost, med de filer som finns: {"<mening>": "<avtryck>"}.
+function lasEgen(egen = EGEN) {
+  try {
+    const j = JSON.parse(fs.readFileSync(path.join(egen, 'rost.json'), 'utf8'));
+    const ut = {};
+    for (const [t, h] of Object.entries((j && j.filer) || {})) {
+      if (/^[0-9a-f]{16}$/.test(h) && fs.existsSync(path.join(egen, `${h}.mp3`))) ut[enkel(t)] = h;
+    }
+    return ut;
+  } catch {
+    return {};
+  }
+}
 
 // ---------- talsyntesen ----------
 
@@ -157,8 +209,10 @@ function lasAnvant(bank) {
 }
 
 // Tar fram det ljud som saknas. → {gjorda, saknas, fel}
-async function fyll({ env = process.env, bank = BANK, gang = [], analyser, now = Date.now(), fetcher, vila = (ms) => new Promise((ok) => setTimeout(ok, ms)), max = rc.perBygge } = {}) {
-  const alla = texter({ analyser, gang, now });
+async function fyll({ env = process.env, bank = BANK, egen = EGEN, gang = [], analyser, now = Date.now(), fetcher, vila = (ms) => new Promise((ok) => setTimeout(ok, ms)), max = rc.perBygge } = {}) {
+  // Det som finns med Tomas egen röst behöver inte Azure.
+  const egna = lasEgen(egen);
+  const alla = texter({ analyser, gang, now }).filter((t) => !egna[t]);
   const saknas = alla.filter((t) => !fs.existsSync(path.join(bank, `${avtryck(t)}.mp3`)));
   const key = String(env.AZURE_SPEECH_KEY || '').trim();
   if (!saknas.length || !key) return { gjorda: 0, saknas: saknas.length, fel: saknas.length && !key ? 'ingen AZURE_SPEECH_KEY' : null };
@@ -184,27 +238,40 @@ async function fyll({ env = process.env, bank = BANK, gang = [], analyser, now =
 }
 
 // Lägger ljudet i <dataDir>/rost/ och registret i <dataDir>/rost.json, och städar
-// cachen. → {filer: antal meningar med ljud, av: antal meningar}
-function publicera(dataDir, { bank = BANK, gang = [], analyser, now = Date.now() } = {}) {
+// cachen. Tomas egen röst först, Azure där den saknas.
+// → {filer: antal meningar med ljud, egna: av dem med egen röst, av: antal meningar}
+function publicera(dataDir, { bank = BANK, egen = EGEN, gang = [], analyser, now = Date.now() } = {}) {
   const alla = texter({ analyser, gang, now });
+  const egna = lasEgen(egen);
   const filer = {};
+  const kalla = {};
+  const azure = [];
   for (const t of alla) {
+    if (egna[t]) {
+      filer[t] = egna[t];
+      kalla[egna[t]] = egen;
+      continue;
+    }
     const h = avtryck(t);
-    if (fs.existsSync(path.join(bank, `${h}.mp3`))) filer[t] = h;
+    if (fs.existsSync(path.join(bank, `${h}.mp3`))) {
+      filer[t] = h;
+      kalla[h] = bank;
+      azure.push(h);
+    }
   }
   const n = Object.keys(filer).length;
   if (n) {
     const mapp = path.join(dataDir, 'rost');
     fs.mkdirSync(mapp, { recursive: true });
-    for (const h of new Set(Object.values(filer))) fs.copyFileSync(path.join(bank, `${h}.mp3`), path.join(mapp, `${h}.mp3`));
+    for (const [h, k] of Object.entries(kalla)) fs.copyFileSync(path.join(k, `${h}.mp3`), path.join(mapp, `${h}.mp3`));
   }
   // Registret finns alltid, så att sidan inte får 404 när han är tyst.
-  fs.writeFileSync(path.join(dataDir, 'rost.json'), JSON.stringify({ rost: rc.voice, filer }));
+  fs.writeFileSync(path.join(dataDir, 'rost.json'), JSON.stringify({ rost: azure.length < n ? `egen+${rc.voice}` : rc.voice, filer }));
   // Det som används nu får dagens datum; det som inte använts på sparasDagar tas bort.
   if (fs.existsSync(bank)) {
     const anvant = lasAnvant(bank);
     const idag = new Date(now).toISOString().slice(0, 10);
-    for (const h of Object.values(filer)) anvant[h] = idag;
+    for (const h of azure) anvant[h] = idag;
     for (const f of fs.readdirSync(bank)) {
       const h = f.replace(/\.mp3$/, '');
       if (h === f) continue;
@@ -217,7 +284,7 @@ function publicera(dataDir, { bank = BANK, gang = [], analyser, now = Date.now()
     for (const h of Object.keys(anvant)) if (!fs.existsSync(path.join(bank, `${h}.mp3`))) delete anvant[h];
     fs.writeFileSync(path.join(bank, 'anvant.json'), JSON.stringify(anvant));
   }
-  return { filer: n, av: alla.length };
+  return { filer: n, egna: n - azure.length, av: alla.length };
 }
 
-module.exports = { fyll, publicera, texter, repliktexter, analystexter, avtryck, ssml, BANK };
+module.exports = { fyll, publicera, texter, repliktexter, analystexter, avtryck, egenAvtryck, uttal, lasEgen, ssml, BANK, EGEN };

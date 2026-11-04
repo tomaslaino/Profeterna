@@ -27,7 +27,8 @@ module.exports = {
   // aldrig. Nyckeln är hemligheten AZURE_SPEECH_KEY i GitHub. Ljudet sparas i
   // källcachen (data/cache/rost/) och tas fram en gång per mening. Mattias är den enda
   // svenska mansrösten, här lite långsammare och mörkare, för lugnet. Ändras rösten,
-  // takten eller tonen tas allt ljud fram på nytt (det ingår i filnamnen).
+  // takten eller tonen tas allt ljud fram på nytt (det ingår i filnamnen). Finns
+  // meningen med Tomas egen röst (egen nedan) tas den i stället, och Azure tillfrågas inte.
   rost: {
     region: 'swedencentral',
     voice: 'sv-SE-MattiasNeural',
@@ -40,6 +41,37 @@ module.exports = {
     timeoutMs: 30000,
     // Ljud som inte har använts på så länge tas bort ur cachen.
     sparasDagar: 30,
+
+    // Tomas egen röst, klonad med Chatterbox Multilingual på iMacen (scripts/rost/):
+    // jobbet läser upp allt han säger och lägger ljudet i grenen rost, som bygget
+    // föredrar framför Azure. Ändras något här (utom perKorning och sökvägarna) tas
+    // allt ljud fram på nytt, eftersom det ingår i avtrycket. Det gör referensen också.
+    egen: {
+      // ~ är hemkatalogen på iMacen.
+      python: '~/Kod/chatterbox-rost/.venv/bin/python',
+      referens: '~/Kod/chatterbox-rost/min_rost.wav',
+      sprak: 'sv',
+      exaggeration: 0.7,
+      cfgWeight: 0.5,
+      temperature: 0.8,
+      // mp3 till sajten: mono, så här många kbit/s.
+      kbps: 64,
+      // Högst så många meningar per körning (var 15:e minut), så att ljudet kommer
+      // ut successivt: med ca 5 s räknetid per sekund tal är det 10–15 minuter.
+      perKorning: 30,
+      // Kontrollen av längden: talet (tystnaden borträknad) ska vara mellan kortast
+      // och langst gånger den väntade längden, tecknen / tecknenPerSekund, men aldrig
+      // under minstaSek. Annars görs meningen om med nytt slumpfrö, högst forsok gånger
+      // i allt. Säger Chatterbox "forcing EOS token" görs den också om.
+      tecknenPerSekund: 14,
+      kortast: 0.55,
+      langst: 2.2,
+      minstaSek: 0.5,
+      forsok: 4,
+      // En mening som inte klarar kontrollen prövas igen efter så många timmar; tills
+      // dess tas Azure-rösten.
+      omIgenTimmar: 24,
+    },
   },
 
   // Uttrycken: koden lottar två per match (efter matchens id), så att två

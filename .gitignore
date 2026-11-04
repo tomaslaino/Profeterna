@@ -1,6 +1,8 @@
 node_modules/
 .env
 data/cache/
+# Hasse Backes egen röst: grenen rost, hämtad av workflowen (src/rost.js)
+data/egen-rost/
 _site/
 _site.tmp/
 .DS_Store

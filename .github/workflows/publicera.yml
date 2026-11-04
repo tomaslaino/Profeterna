@@ -71,8 +71,24 @@ jobs:
           key: kallcache-${{ github.run_id }}
           restore-keys: kallcache-
 
+      # Hasse Backes egna röst (src/rost.js, scripts/rost/): iMacen lägger ljudet i
+      # grenen rost, en enda commit som skrivs över, så att main inte växer. Bygget
+      # tar den filen där den finns och Azure där den saknas. Finns inte grenen är
+      # det Azure-rösten som förut.
+      - name: Hämta Hasse Backes egen röst
+        run: |
+          rm -rf data/egen-rost
+          if git fetch -q --depth=1 origin +refs/heads/rost:refs/remotes/origin/rost 2>/dev/null; then
+            mkdir -p data/egen-rost
+            git archive refs/remotes/origin/rost | tar -x -C data/egen-rost
+            echo "Grenen rost: $(find data/egen-rost -name '*.mp3' | wc -l | tr -d ' ') ljudfiler."
+          else
+            echo "Grenen rost finns inte: Azure-rösten."
+          fi
+
       # Hasse Backes röst (src/rost.js): nyckeln till Azures talsyntes på den fria
-      # nivån. Saknas hemligheten blir han tyst, och bygget går som förut.
+      # nivån, för det som inte finns med egen röst. Saknas hemligheten blir han tyst
+      # där, och bygget går som förut.
       - name: Hämta källor, logga prognoser och bygg sajten
         run: npm run build -- --journal
         env:

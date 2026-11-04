@@ -692,8 +692,9 @@ window.RumHasse = (() => {
   // ljudstyrkan i steg om 10 ms, och under vilken styrka (mot den starkaste) det är tyst
   const STEG = 0.01;
   const TYSTNAD = 0.03;
-  const V = { ctx: null, av: false, funkar: false, reg: null, regVid: 0, rep: new Map(), spel: null };
-  try { V.av = localStorage.getItem(TYST) === '1'; } catch (e) { /* då hörs han */ }
+  // Ljudet är av tills besökaren slår på det med knappen (det minns enheten, '0').
+  const V = { ctx: null, av: true, funkar: false, reg: null, regVid: 0, rep: new Map(), spel: null };
+  try { V.av = localStorage.getItem(TYST) !== '0'; } catch (e) { /* då är han tyst */ }
   const enkel = (t) => String(t).replace(/\s+/g, ' ').trim();
 
   // Ljud får bara börja efter ett klick eller en tangent: då väcks det.

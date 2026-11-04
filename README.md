@@ -243,9 +243,14 @@ GitHub Actions (var 30:e min)  →  källorna  →  src/build.js  →  _site/ (H
 - **Analyserna** ingår inte i bygget: datorn committar `data/analyser.json` och
   `data/omgangsnamn.json` till `main`, och den pushen bygger om sajten som vilken annan push
   som helst. Bygget kopierar filerna till sajten. Se [Analyserna](#analyserna).
-- **Hasse Backes röst** tas fram i bygget: det ljud som saknas hämtas från Azures talsyntes
-  med hemligheten `AZURE_SPEECH_KEY`, sparas i källcachen (`data/cache/rost/`) och laddas upp
-  med sajten (`data/rost/`, `data/rost.json`). Det committas inte. Se [Ljudet](#hasse-backe).
+- **Hasse Backes röst** är i första hand Tomas egen: iMacen läser upp allt han säger och
+  force-pushar ljudet till grenen `rost`, en enda föräldralös commit med `rost.json` och de
+  mp3-filer som behövs nu. Steget *Hämta Hasse Backes egen röst* hämtar grenen (djup 1) till
+  `data/egen-rost/`, som inte committas. Det som saknas där hämtas i bygget från Azures
+  talsyntes med hemligheten `AZURE_SPEECH_KEY` och sparas i källcachen (`data/cache/rost/`).
+  Allt laddas upp med sajten (`data/rost/`, `data/rost.json`). Inget av det hamnar på main,
+  och en push till `rost` startar inget bygge: nästa schemalagda körning tar med det nya. Se
+  [Ljudet](#hasse-backe).
 - **Läge 2026-10-19:** sidan ligger på <https://matchfixarna.se/> (custom domain i
   *Settings → Pages*, HTTPS påtvingat). Gamla <https://tomaslaino.github.io/Profeterna/>
   skickas vidare dit, så även `site` i [config/kupong.js](config/kupong.js) fungerar via
@@ -612,6 +617,13 @@ bara lokalt. Analyserna visas som de ligger i `data/analyser.json`; hur de skriv
   vad matchen slutar, det troligaste resultatet i modellens prognos bland tecknen han har ringat
   in, och resultatet står bredvid tecknen på matchens rad. Se [Hasse Backe](#hasse-backe),
   *Samtalet*.
+- **Hasse Backe med Tomas röst, och tyst tills man slår på ljudet (2026-11-04, användarens
+  beslut):** Hasse Backe talar med Tomas egen röst, klonad med Chatterbox Multilingual på
+  iMacen, i stället för Azures Mattias. Ett launchd-jobb läser upp allt han säger, ett
+  trettiotal meningar per körning, och lägger ljudet i grenen `rost`, som skrivs över varje
+  gång så att main inte växer. Bygget tar det egna ljudet där det finns och Azure där det
+  saknas, så han blir aldrig tyst. Ljudet är av tills besökaren slår på det. Se
+  [Hasse Backe](#hasse-backe), *Ljudet*.
 - **Kuponghistoriken flyttar till Olympen (2026-10-20, användarens önskemål):** Kupong
   handlar bara om nästa kupong – växlaren Omgången | Historik försvinner. De färdigspelade
   kupongerna står sist i Olympen under rubriken *Grupparbetena* (`#olympen/kuponger`, en
@@ -3803,18 +3815,20 @@ kraven borta, uttrycken frivilliga och prompten 1 600 tecken i stället för 2 5
 1 400). Prov på sex analyser: 112–127 ord, och i en av dem en tillagd rad om högpress för att
 prova Bielsa-utbrottet.
 
-**Ljudet.** Det han säger hörs. Bygget tar fram ljudet med Azures talsyntes på den fria nivån
-(F0: 500 000 tecken i månaden; när de är slut stryps tjänsten, och den debiterar aldrig), med den
-svenska mansrösten Mattias lite långsammare och mörkare än vanligt (`rost` i
-[config/hasse.js](config/hasse.js)). Det är en röst i personans anda, inte en kopia av den
-verklige Hasse Backes. Han säger två slags saker ([src/rost.js](src/rost.js)): de färdiga
+**Ljudet.** Det han säger hörs, när besökaren har slagit på ljudet. Rösten är Tomas egen,
+klonad med Chatterbox Multilingual på iMacen (se *Den egna rösten* nedan). Hasse Backe är en
+påhittad figur i en verklig persons anda, och rösten är Tomas, inte en kopia av den verklige
+Hasse Backes. Där den egna rösten ännu saknas tar bygget fram ljudet med Azures talsyntes på den
+fria nivån (F0: 500 000 tecken i månaden; när de är slut stryps tjänsten, och den debiterar
+aldrig), med den svenska mansrösten Mattias lite långsammare och mörkare än vanligt (`rost` i
+[config/hasse.js](config/hasse.js)). Han säger två slags saker ([src/rost.js](src/rost.js)): de färdiga
 replikerna i [public/rum-hasse-repliker.js](public/rum-hasse-repliker.js) med fälten ifyllda på
 alla sätt som sidan kan fylla dem (gängets efternamn, dagarna, tecknen i ord och resultaten 0–0
 till 4–4 – 250 repliker, 7 400 tecken), och sin text till varje analys, mening för mening, delad som sidan delar den
 ([public/rum-hasse-meningar.js](public/rum-hasse-meningar.js)). En omgång med tretton matcher är
 ungefär 10 000 tecken.
 
-Ljudet tas fram en gång per mening och sparas i källcachen, `data/cache/rost/<avtryck>.mp3`, där
+Azures ljud tas fram en gång per mening och sparas i källcachen, `data/cache/rost/<avtryck>.mp3`, där
 avtrycket räknas på rösten, takten, tonen och meningen (ändras något av dem tas allt fram på
 nytt). Kommande matcher först, sedan replikerna; högst 80 anrop per bygge och ett var 3,2 s,
 eftersom den fria nivån tar 20 anrop i minuten. Första gången tar replikerna alltså ett par
@@ -3822,16 +3836,58 @@ byggen, och en ny omgångs text kommer i bygget efter att iMacen har pushat den.
 som finns i `_site/data/rost/` med registret `data/rost.json` (mening → fil), och ljud som inte har
 använts på 30 dagar tas bort ur cachen. Inget av det committas, så repot växer inte (allt ljud
 till en omgång är 3–4 MB). Utan nyckeln, eller när Azure inte svarar, blir han tyst där ljudet
-saknas, och bygget går som förut. Bygget skriver hur många meningar som har ljud.
+saknas, och bygget går som förut. Meningar som redan har egen röst frågas Azure aldrig om, så
+den fria kvoten räcker längre. Bygget skriver hur många meningar som har ljud och hur många av
+dem med egen röst.
+
+**Den egna rösten** ([scripts/rost/](scripts/rost/)). Launchd-jobbet `se.matchfixarna.rost`
+på iMacen körs var 15:e minut (launchd kör det aldrig två gånger samtidigt) i en egen klon som
+återställs till origin/main varje gång, som analysernas jobb. Det tar listan över allt han
+säger ur `texter()` i [src/rost.js](src/rost.js), kommande matchers meningar först och sedan
+replikerna (ca 350 meningar), och läser upp högst 30 som saknas per körning med
+[chatterbox.py](scripts/rost/chatterbox.py), som laddar modellen en gång (ca 30 s) och räknar
+ungefär 5 s per sekund tal. Inställningarna står i `rost.egen` i
+[config/hasse.js](config/hasse.js): exaggeration 0,7, cfg_weight 0,5, temperature 0,8 och
+referensen `~/Kod/chatterbox-rost/min_rost.wav`. Talen läses som ord ("2–1" blir "två–ett", 0
+"noll"), eftersom det är oprövat hur Chatterbox läser siffror; meningen i registret är densamma
+som på sidan.
+
+Chatterbox avbryter ibland själv med "forcing EOS token" och klipper slutet, och ibland blir
+talet för kort eller för långt. Därför mäts talet utan tystnad mot den väntade längden (14
+tecken i sekunden): under 0,55 eller över 2,2 gånger den, eller med "forcing EOS", görs meningen
+om med nytt slumpfrö, högst fyra gånger. Klarar den sig inte prövas den igen efter ett dygn, och
+till dess är det Azures röst. Ljudet sparas som mp3 (64 kbit/s, ffmpeg) i en ljudbank utanför
+repot, `~/Library/Application Support/Matchfixarna/Rost/ljud/`, med ett avtryck på
+inställningarna, referensen och texten: ändras något av dem läses allt upp på nytt.
+
+Efter varje körning byggs grenen `rost` med git:s egna verktyg: en enda commit utan förälder,
+med registret `rost.json` (mening → avtryck) och de mp3-filer som behövs nu. Den force-pushas
+bara när innehållet har ändrats, så git-historiken växer inte, varken på main eller i grenen.
+Loggen är `~/Library/Logs/Matchfixarna/rost.log`, och Chatterbox egen utskrift från senaste
+körningen står i `rost-chatterbox.log` bredvid.
+
+**Sätt upp den egna rösten** på iMacen (Chatterbox ska redan fungera i `~/Kod/chatterbox-rost`):
+
+1. `bash scripts/rost/installera.sh` i repot. Den klonar repot till
+   `~/Library/Application Support/Matchfixarna/Rost/Profeterna`, skriver jobbets fil i
+   `~/Library/LaunchAgents` och säger till om Python-miljön, referensen eller ffmpeg saknas.
+2. Starta jobbet med `launchctl bootstrap` som skriptet skriver ut. Första körningen börjar
+   direkt.
+3. Följ `rost.log`. Efter första körningen finns grenen `rost` på GitHub, och nästa bygge tar
+   med ljudet.
+
+Stoppa med `launchctl bootout gui/$(id -u)/se.matchfixarna.rost`; grenen ligger kvar, och
+bygget fortsätter att ta ljudet ur den. Ta bort grenen på GitHub för att gå tillbaka helt till
+Azure.
 
 I sidan spelas ljudet med Web Audio ([public/rum-hasse.js](public/rum-hasse.js), *rösten*). Det
 hämtas medan han gör annat – hans text medan han låtsas läsa på – och orden kommer i takt med
 ljudet, utspridda efter sin längd, medan munnen följer ljudstyrkan. Saknas meningen i registret
 eller är ljudet inte framme inom 2,5 s säger han den tyst, som förut. Ett klick visar hela
-repliken och tystar den, liksom *Ja, ja* och *Tillbaka*. *Ljud av* längst ned till vänster, med
-samma små versaler som *← Tillbaka*, stänger av honom (det minns enheten) och syns när han har hörts en gång. Med minskad rörelse står
-allt direkt och inget hörs, och ljud får bara börja efter ett klick: med `?rum-hasse` är han tyst
-tills man klickar. *Jag har tappat rösten* sägs tyst.
+repliken och tystar den, liksom *Ja, ja* och *Tillbaka*. Ljudet är av tills besökaren trycker på
+*Ljud på* längst ned till vänster, med samma små versaler som *← Tillbaka*; klicket väcker
+ljudet i webbläsaren, och valet minns enheten. Sedan heter knappen *Ljud av*. Med minskad
+rörelse står allt direkt och inget hörs. *Jag har tappat rösten* sägs tyst.
 
 **Slå på rösten** (ett gratis konto hos Microsoft Azure; kortet som Azure frågar efter när kontot
 skapas debiteras inte på F0):
@@ -3851,6 +3907,15 @@ cachen (en tonstöt per ord, mp3) publicerat med `publicera()` som i bygget: rep
 analysen hördes mening för mening med orden i takt, och *Ljud av* mitt i en mening och ett tomt
 register fungerade utan fel i sidan. Inte provat mot Azure på riktigt (ingen nyckel där provet
 gjordes), och inte i Safari eller en riktig telefon.
+
+Den egna rösten provades 2026-11-04 utan Chatterbox: [las.mjs](scripts/rost/las.mjs) med låtsad
+modell (`--latsas`, tonstötar) mot en låtsad GitHub (ett lokalt repo), som läste upp fem
+meningar och pushade grenen `rost`, inte pushade igen när inget hade ändrats och inte
+markerade något som misslyckat när modellen kraschade; [chatterbox.py](scripts/rost/chatterbox.py)
+med låtsad modell, som gjorde om en mening efter "forcing EOS" och gav upp en för kort efter
+fyra försök; workflowens steg mot den låtsade grenen; och `npm run build -- --no-fetch`, som
+tog de fem egna och Azure för resten, och där `fyll()` inte frågade Azure om de egna. Inte
+provat med den riktiga modellen.
 
 **Grafiken.** Handen på pulten är en liten WebGL-duk i pultens plan som läggs dit när rummet är
 klart, med handens modell (133 kB) och fotot (149 kB). Den ritas en gång och sedan bara när fingrarna
