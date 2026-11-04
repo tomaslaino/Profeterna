@@ -243,6 +243,9 @@ GitHub Actions (var 30:e min)  →  källorna  →  src/build.js  →  _site/ (H
 - **Analyserna** ingår inte i bygget: datorn committar `data/analyser.json` och
   `data/omgangsnamn.json` till `main`, och den pushen bygger om sajten som vilken annan push
   som helst. Bygget kopierar filerna till sajten. Se [Analyserna](#analyserna).
+- **Hasse Backes röst** tas fram i bygget: det ljud som saknas hämtas från Azures talsyntes
+  med hemligheten `AZURE_SPEECH_KEY`, sparas i källcachen (`data/cache/rost/`) och laddas upp
+  med sajten (`data/rost/`, `data/rost.json`). Det committas inte. Se [Ljudet](#hasse-backe).
 - **Läge 2026-10-19:** sidan ligger på <https://matchfixarna.se/> (custom domain i
   *Settings → Pages*, HTTPS påtvingat). Gamla <https://tomaslaino.github.io/Profeterna/>
   skickas vidare dit, så även `site` i [config/kupong.js](config/kupong.js) fungerar via
@@ -3697,7 +3700,7 @@ han ska läsa på (*Den knäckte jag i morse*); att han läser på märks först
 säger han det (*Den tar jag sen*). Rader där du redan har fått tecknen öppnas
 direkt. Analysen är redan skriven, men han låtsas: när du har bett om den fortsätter han prata i 15–25 sekunder (`LATSAS` i [public/rum-hasse.js](public/rum-hasse.js), raderna kommer i ordning: *Vi börjar bakifrån*, *Total kontroll*, *Det här
 är helt normalt*) och tar en klunk kaffe då och då. När den är klar blir han tyst, armarna går upp, han slår i disken och domen
-står i guld. Sedan säger han texten en mening i taget, ord för ord med munnen i takt, med en paus
+står i guld. Sedan säger han texten en mening i taget, ord för ord med munnen i takt (och det hörs, se *Ljudet*), med en paus
 mellan meningarna och en längre före en kort mening, och gesterna kommer vid de bestämda orden
 (*Nej nej nej*, *varningens finger*) eller då och då vid en lång mening. Ett klick var som helst
 visar hela repliken och nästa klick går vidare; *Ja, ja* tar resten på en gång, och det svarar han
@@ -3736,6 +3739,55 @@ munnen och fraser där de inte hörde hemma (2026-11-03: "formulerar sig ytterst
 kraven borta, uttrycken frivilliga och prompten 1 600 tecken i stället för 2 550 (tipsets är
 1 400). Prov på sex analyser: 112–127 ord, och i en av dem en tillagd rad om högpress för att
 prova Bielsa-utbrottet.
+
+**Ljudet.** Det han säger hörs. Bygget tar fram ljudet med Azures talsyntes på den fria nivån
+(F0: 500 000 tecken i månaden; när de är slut stryps tjänsten, och den debiterar aldrig), med den
+svenska mansrösten Mattias lite långsammare och mörkare än vanligt (`rost` i
+[config/hasse.js](config/hasse.js)). Det är en röst i personans anda, inte en kopia av den
+verklige Hasse Backes. Han säger två slags saker ([src/rost.js](src/rost.js)): de färdiga
+replikerna i [public/rum-hasse-repliker.js](public/rum-hasse-repliker.js) med fälten ifyllda på
+alla sätt som sidan kan fylla dem (gängets efternamn, dagarna, tecknen i ord – 150 repliker, 4 500
+tecken), och sin text till varje analys, mening för mening, delad som sidan delar den
+([public/rum-hasse-meningar.js](public/rum-hasse-meningar.js)). En omgång med tretton matcher är
+ungefär 10 000 tecken.
+
+Ljudet tas fram en gång per mening och sparas i källcachen, `data/cache/rost/<avtryck>.mp3`, där
+avtrycket räknas på rösten, takten, tonen och meningen (ändras något av dem tas allt fram på
+nytt). Kommande matcher först, sedan replikerna; högst 80 anrop per bygge och ett var 3,2 s,
+eftersom den fria nivån tar 20 anrop i minuten. Första gången tar replikerna alltså ett par
+byggen, och en ny omgångs text kommer i bygget efter att iMacen har pushat den. Bygget lägger det
+som finns i `_site/data/rost/` med registret `data/rost.json` (mening → fil), och ljud som inte har
+använts på 30 dagar tas bort ur cachen. Inget av det committas, så repot växer inte (allt ljud
+till en omgång är 3–4 MB). Utan nyckeln, eller när Azure inte svarar, blir han tyst där ljudet
+saknas, och bygget går som förut. Bygget skriver hur många meningar som har ljud.
+
+I sidan spelas ljudet med Web Audio ([public/rum-hasse.js](public/rum-hasse.js), *rösten*). Det
+hämtas medan han gör annat – hans text medan han låtsas läsa på – och orden kommer i takt med
+ljudet, utspridda efter sin längd, medan munnen följer ljudstyrkan. Saknas meningen i registret
+eller är ljudet inte framme inom 2,5 s säger han den tyst, som förut. Ett klick visar hela
+repliken och tystar den, liksom *Ja, ja* och *Tillbaka*. *Ljud av* längst ned till vänster
+stänger av honom (det minns enheten) och syns när han har hörts en gång. Med minskad rörelse står
+allt direkt och inget hörs, och ljud får bara börja efter ett klick: med `?rum-hasse` är han tyst
+tills man klickar. *Jag har tappat rösten* sägs tyst.
+
+**Slå på rösten** (ett gratis konto hos Microsoft Azure; kortet som Azure frågar efter när kontot
+skapas debiteras inte på F0):
+
+1. Skapa en resurs av typen *Speech* (Azure AI services) med prisnivån **Free F0** i regionen
+   Sweden Central. Väljs en annan region: lägg den som variabeln `AZURE_SPEECH_REGION` under
+   *Settings → Secrets and variables → Actions → Variables* (t.ex. `westeurope`).
+2. Kopiera *KEY 1* under *Keys and Endpoint*.
+3. Lägg den som hemligheten `AZURE_SPEECH_KEY` under *Settings → Secrets and variables →
+   Actions → Secrets* i repot på GitHub (eller `gh secret set AZURE_SPEECH_KEY`).
+4. Kör workflowen *Hämta data och publicera* (eller vänta på nästa körning). Loggen säger hur
+   många meningar som har ljud.
+
+Provat: [src/rost.js](src/rost.js) i Node med låtsad Azure (ordningen, taket per bygge, stopp vid
+429, registret och städningen av cachen); sidan i headless Chrome 1440 × 900 med låtsat tal i
+cachen (en tonstöt per ord, mp3) publicerat med `publicera()` som i bygget: replikerna och
+analysen hördes mening för mening med orden i takt, och *Ljud av* mitt i en mening och ett tomt
+register fungerade utan fel i sidan. Inte provat mot Azure på riktigt (ingen nyckel där provet
+gjordes), och inte i Safari eller en riktig telefon.
 
 **Grafiken.** Allt han behöver hämtas först när någon pekar på kaffet eller klickar: bilden av
 väggen (41 kB, 20 kB på höjden), fotot (149 kB) och handens modell (133 kB). Rummet har ingen egen

@@ -73,7 +73,10 @@
 @keyframes rh-slag { 0% { translate: 0 0; } 18% { translate: 0 9px; } 42% { translate: 0 -5px; } 70% { translate: 0 2px; } 100% { translate: 0 0; } }
 .rum.hasse-svang .rum-ft, .rum.hasse-svang .rum-hdr, .rum.hasse-framme .rum-ft, .rum.hasse-framme .rum-hdr { display: none; }
 .rh-fot { position: absolute; bottom: 14px; z-index: 2; display: flex; justify-content: flex-end; pointer-events: none; }
-.rh-tillbaka { flex: none; padding: 0; border: 0; background: none; color: #a9c3ff; font: 400 15px Fraunces, Georgia, serif; text-decoration: underline; cursor: pointer; pointer-events: auto; }
+.rh-tillbaka, .rh-ljud { flex: none; padding: 0; border: 0; background: none; color: #a9c3ff; font: 400 15px Fraunces, Georgia, serif; text-decoration: underline; cursor: pointer; pointer-events: auto; }
+/* ljudet av och på, längst till vänster */
+.rh-ljud { margin-right: auto; }
+.rh-ljud[hidden] { display: none; }
 /* på höjden: han överst, samtalet under honom */
 .rum-hasse-vy.hog .rh-samtal { left: 5%; right: 5%; bottom: 54px; width: auto; font-size: 15px; }
 .rum-hasse-vy.hog .rh-fot { left: 5%; right: 5%; }
