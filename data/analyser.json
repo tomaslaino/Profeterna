@@ -1,5 +1,5 @@
 {
- "uppdaterad": "2026-11-04T18:00:50.602Z",
+ "uppdaterad": "2026-11-04T18:02:41.061Z",
  "omgang": {
   "id": "2026-11-07-st4978",
   "matcher": [
@@ -255,6 +255,81 @@
     "model": "claude-opus-5-5",
     "version": "2026-11-04.1",
     "writtenAt": "2026-11-04T17:59:08.811Z",
+    "attempts": 1
+   },
+   "model": "claude-opus-5-5",
+   "version": "2026-11-04.1",
+   "attempts": 1
+  },
+  {
+   "id": "401880171",
+   "match": "Blackburn Rovers – West Ham United",
+   "avspark": "2026-11-07T15:00Z",
+   "writtenAt": "2026-11-04T18:02:29.348Z",
+   "text": "West Ham packar väskorna utan huvudtränare\n\nWest Ham sparkade Nuno Espírito Santo i tisdags och spelar i Cardiff i kväll, innan resan går vidare till Ewood Park. Där väntar ett Blackburn som har förlorat två raka och en tränare som studerar hur snabbt Augustus Kargbo går tillbaka.\n\nWest Ham meddelade i tisdags att Nuno Espírito Santo lämnar sitt uppdrag med omedelbar verkan, enligt Goal [1]. Assisterande tränaren Rui Pedro Silva och målvaktstränaren Rui Barbosa försvann samtidigt, och förberedelserna sköts tills vidare av Mark Noble, Steve Potts och Gerard Prenderville. Beskedet följde på 1–3 hemma mot West Bromwich, och laget ska spela i Cardiff i kväll innan det reser till Ewood Park. Någon efterträdare var inte utsedd när Goal skrev. När jag fick sparken i Tjäderfors tog materialförvaltaren nästa träning, och det enda han rörde var hörnorna.\n\nDet underliga är att resorna har varit West Hams trygga del av säsongen. Före kvällen i Cardiff har laget sex bortamatcher i ligan utan förlust, medan hemmaplanen har gett tre förluster på sju. Ewood Park har gett fyra segrar, tre förluster och inte en enda oavgjord. De fem senaste ligamötena lagen emellan, från 2009 till 2011, slutade däremot alla lika.\n\nHos Blackburn handlar veckan om kondition. Efter 0–4 i Swansea och 1–2 mot Stoke släpper laget till 17,5 skott per match. Inför Stoke sa Tony Mowbray till The72 [2] att Augustus Kargbo, tillbaka efter mer än ett års frånvaro med en skada i baksida lår och med fyra inhopp i år, är nästan redo för en start. Mowbray berättade att Kargbo kan springa 60 yards i högt tempo utan boll och fortfarande gå tillbaka fem minuter senare, och drog slutsatsen att grundkonditionen saknas för att börja en match. Det ser du redan på uppvärmningen.\n\nTipset: X2 (vilan oroar)\n\nPrognosen ger West Ham 1,82 och Blackburn 4,76, och den vet ingenting om att tränaren försvann i tisdags [1] eller om vad som händer i Cardiff i kväll, ett resultat jag inte har sett. Blackburn skapar bara 0,98 i förväntade mål per match och har gjort fler mål än chanserna brukar ge. West Ham skapar 2,02 och släpper till 1,27. Jag ringar därför in tvåan, och krysset också eftersom laget har kort vila och en tillfällig ledning. Ettan lämnar jag, för fyra hemmasegrar räcker inte mot de siffrorna.",
+   "author": "Sixten Bråvall (påhittad)",
+   "title": "West Ham packar väskorna utan huvudtränare",
+   "lead": "West Ham sparkade Nuno Espírito Santo i tisdags och spelar i Cardiff i kväll, innan resan går vidare till Ewood Park. Där väntar ett Blackburn som har förlorat två raka och en tränare som studerar hur snabbt Augustus Kargbo går tillbaka.",
+   "paragraphs": [
+    "West Ham meddelade i tisdags att Nuno Espírito Santo lämnar sitt uppdrag med omedelbar verkan, enligt Goal [1]. Assisterande tränaren Rui Pedro Silva och målvaktstränaren Rui Barbosa försvann samtidigt, och förberedelserna sköts tills vidare av Mark Noble, Steve Potts och Gerard Prenderville. Beskedet följde på 1–3 hemma mot West Bromwich, och laget ska spela i Cardiff i kväll innan det reser till Ewood Park. Någon efterträdare var inte utsedd när Goal skrev. När jag fick sparken i Tjäderfors tog materialförvaltaren nästa träning, och det enda han rörde var hörnorna.",
+    "Det underliga är att resorna har varit West Hams trygga del av säsongen. Före kvällen i Cardiff har laget sex bortamatcher i ligan utan förlust, medan hemmaplanen har gett tre förluster på sju. Ewood Park har gett fyra segrar, tre förluster och inte en enda oavgjord. De fem senaste ligamötena lagen emellan, från 2009 till 2011, slutade däremot alla lika.",
+    "Hos Blackburn handlar veckan om kondition. Efter 0–4 i Swansea och 1–2 mot Stoke släpper laget till 17,5 skott per match. Inför Stoke sa Tony Mowbray till The72 [2] att Augustus Kargbo, tillbaka efter mer än ett års frånvaro med en skada i baksida lår och med fyra inhopp i år, är nästan redo för en start. Mowbray berättade att Kargbo kan springa 60 yards i högt tempo utan boll och fortfarande gå tillbaka fem minuter senare, och drog slutsatsen att grundkonditionen saknas för att börja en match. Det ser du redan på uppvärmningen."
+   ],
+   "sources": [
+    {
+     "n": 1,
+     "source": "Goal",
+     "title": "West Ham sack Nuno Espirito Santo! Hammers confirm coaching change after West Brom defeat as replacement confirmed",
+     "url": "https://www.goal.com/en-us/news/west-ham-sack-nuno-espirito-santo-west-brom-defeat/blt72d2793bf3c8d3ad",
+     "publishedAt": null
+    },
+    {
+     "n": 2,
+     "source": "The72",
+     "title": "Blackburn Rovers man 'almost ready' for first start of the season ahead of Stoke City game, says Tony Mowbray",
+     "url": "https://the72.co.uk/2026/11/03/blackburn-rovers-augustus-kargbo-selection-update/",
+     "publishedAt": null
+    }
+   ],
+   "tip": {
+    "text": "Prognosen ger West Ham 1,82 och Blackburn 4,76, och den vet ingenting om att tränaren försvann i tisdags [1] eller om vad som händer i Cardiff i kväll, ett resultat jag inte har sett. Blackburn skapar bara 0,98 i förväntade mål per match och har gjort fler mål än chanserna brukar ge. West Ham skapar 2,02 och släpper till 1,27. Jag ringar därför in tvåan, och krysset också eftersom laget har kort vila och en tillfällig ledning. Ettan lämnar jag, för fyra hemmasegrar räcker inte mot de siffrorna.",
+    "signs": [
+     1,
+     2
+    ],
+    "note": "vilan oroar",
+    "sources": [
+     {
+      "n": 1,
+      "source": "Goal",
+      "title": "West Ham sack Nuno Espirito Santo! Hammers confirm coaching change after West Brom defeat as replacement confirmed",
+      "url": "https://www.goal.com/en-us/news/west-ham-sack-nuno-espirito-santo-west-brom-defeat/blt72d2793bf3c8d3ad",
+      "publishedAt": null
+     }
+    ],
+    "model": "claude-opus-5-5",
+    "version": "2026-11-04.1",
+    "writtenAt": "2026-11-04T18:02:29.348Z",
+    "attempts": 1
+   },
+   "hasse": {
+    "stycken": [
+     "West Ham sparkade tränaren i tisdags, spelar i Cardiff i kväll och reser sedan till Ewood Park med en tillfällig ledning. Vad som händer i Cardiff vet jag inte än, men kort vila blir det hur som helst.",
+     "Blackburn skapar bara 0,98 i förväntade mål per match och har gjort fler mål än chanserna brukar ge, medan West Ham skapar 2,02. Orsak och verkan, så är det bara. Blackburn har visserligen fyra hemmasegrar på Ewood Park. Det er helt i orden, som danskarna säger. Mot de siffrorna räcker det ändå inte, så ettan lämnar jag.",
+     "West Ham är bäst på pappret, men vilan och den tillfälliga ledningen oroar mig lite, och det gör jag inte ofta. Därför blir det kryss och tvåa."
+    ],
+    "tips": "2026-11-04T18:02:29.348Z",
+    "uppdrag": {
+     "fraser": [
+      "Så är det bara",
+      "Orsak och verkan"
+     ],
+     "krydda": "Det er helt i orden, som danskarna säger.",
+     "bielsa": []
+    },
+    "model": "claude-opus-5-5",
+    "version": "2026-11-04.1",
+    "writtenAt": "2026-11-04T18:02:40.453Z",
     "attempts": 1
    },
    "model": "claude-opus-5-5",
