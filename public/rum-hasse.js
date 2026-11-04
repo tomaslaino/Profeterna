@@ -112,7 +112,7 @@ window.RumHasse = (() => {
   // hans bilder hämtas först när någon pekar på handen eller klickar
   function forladda() {
     if (!H.bilder) {
-      H.bilder = [bakbild(), 'rum/hasse-foto.webp'].map((u) => { const i = new Image(); i.src = u; return i.decode().catch(() => {}); });
+      H.bilder = [bakbild(), 'rum/hasse-atlas.webp'].map((u) => { const i = new Image(); i.src = u; return i.decode().catch(() => {}); });
     }
     return H.bilder;
   }

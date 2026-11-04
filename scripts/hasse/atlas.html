@@ -1,0 +1,244 @@
+<!doctype html><meta charset="utf-8"><body style="background:#444;margin:0"><script type="module">
+// Fotoatlasen till Hasse: kroppen utan armar, kavajärmen uträtad och huden. Ett enda webp.
+const img = await new Promise((ok) => { const i = new Image(); i.onload = () => ok(i); i.src = 'c2013.png'; });
+const FW = img.width, FH = img.height;
+const c0 = document.createElement('canvas'); c0.width = FW; c0.height = FH;
+const x0 = c0.getContext('2d', { willReadFrequently: true }); x0.drawImage(img, 0, 0);
+const src = x0.getImageData(0, 0, FW, FH);
+const D = src.data;
+// --- 1. bort med den vita kanten: färgen inifrån sprids ut över kanten, alfat dras in lite
+const A0 = new Float32Array(FW * FH);
+for (let i = 0; i < A0.length; i++) A0[i] = D[i * 4 + 3] / 255;
+const ero = (a, n) => { let b = a; for (let k = 0; k < n; k++) { const u = new Float32Array(a.length); for (let y = 1; y < FH - 1; y++) for (let x = 1; x < FW - 1; x++) { const i = y * FW + x; u[i] = Math.min(b[i], b[i - 1], b[i + 1], b[i - FW], b[i + FW]); } b = u; } return b; };
+const fast = ero(A0.map((v) => (v > 0.96 ? 1 : 0)), 3);
+const fast6 = ero(fast, 5);
+const R = new Float32Array(FW * FH), G = new Float32Array(FW * FH), B = new Float32Array(FW * FH);
+let fylld = new Uint8Array(FW * FH);
+for (let i = 0; i < A0.length; i++) { R[i] = D[i * 4]; G[i] = D[i * 4 + 1]; B[i] = D[i * 4 + 2]; fylld[i] = fast[i] > 0.5 ? 1 : 0; }
+for (let pass = 0; pass < 16; pass++) {
+  const ny = fylld.slice();
+  for (let y = 1; y < FH - 1; y++) for (let x = 1; x < FW - 1; x++) {
+    const i = y * FW + x; if (fylld[i] || A0[i] <= 0) continue;
+    let r = 0, g = 0, b = 0, n = 0;
+    for (const j of [i - 1, i + 1, i - FW, i + FW, i - FW - 1, i - FW + 1, i + FW - 1, i + FW + 1]) if (fylld[j]) { r += R[j]; g += G[j]; b += B[j]; n++; }
+    if (n) { R[i] = r / n; G[i] = g / n; B[i] = b / n; ny[i] = 1; }
+  }
+  fylld = ny;
+}
+// alfat: 1,5 bildpunkter in och mjukt
+const bl = new Float32Array(A0.length);
+for (let y = 1; y < FH - 1; y++) for (let x = 1; x < FW - 1; x++) { const i = y * FW + x; bl[i] = (A0[i] * 4 + A0[i - 1] + A0[i + 1] + A0[i - FW] + A0[i + FW] + A0[i - FW - 1] + A0[i - FW + 1] + A0[i + FW - 1] + A0[i + FW + 1]) / 12; }
+const al = (i) => { const t = Math.min(1, Math.max(0, (bl[i] - 0.62) / 0.34)); return t * t * (3 - 2 * t); };
+const ren = new ImageData(FW, FH);
+for (let i = 0; i < A0.length; i++) { ren.data[i * 4] = R[i]; ren.data[i * 4 + 1] = G[i]; ren.data[i * 4 + 2] = B[i]; ren.data[i * 4 + 3] = 255 * al(i); }
+for (let y = 1160; y < 1420; y++) for (let x = 880; x < 1010; x++) { const q = (y * FW + x) * 4; if (D[q] + D[q + 1] + D[q + 2] > 360) { for (let dy = -3; dy <= 3; dy++) for (let dx = -3; dx <= 3; dx++) ren.data[((y + dy) * FW + x + dx) * 4 + 3] = 0; } }
+const cRen = document.createElement('canvas'); cRen.width = FW; cRen.height = FH; cRen.getContext('2d').putImageData(ren, 0, 0);
+window.cRen = cRen;
+// --- 2. kroppen: samma utsnitt som förr, armarna bort
+const X0 = 280, Y0 = 130, TW = 860, TH = 1350;
+const AW = 1372, AH = 1350;
+const atlas = document.createElement('canvas'); atlas.width = AW; atlas.height = AH;
+const a = atlas.getContext('2d');
+const V_ = (x, y) => [120 + x / 1.4286, 600 + y / 1.4286];
+const H_ = (x, y) => [800 + x / 1.458, 600 + y / 1.458];
+const PV = [V_(-90, 180), V_(322, 200), V_(330, 420), V_(347, 600), V_(372, 730), V_(350, 860), V_(322, 990), V_(305, 1290), V_(292, 1415), V_(300, 1490), V_(300, 1760), V_(-90, 1760)];
+const PH_ = [[1140, 835], [1040, 862], [985, 890], [956, 950], [948, 1020], [950, 1100], [955, 1200], [958, 1290], [950, 1375], [903, 1430], [901, 1490], [869, 1546], [841, 1629], [848, 1725], [917, 1766], [1006, 1807], [1321, 1807], [1321, 758]];
+const poly = (x, pts) => { x.beginPath(); pts.forEach(([p, q], i) => (i ? x.lineTo(p, q) : x.moveTo(p, q))); x.closePath(); x.fill(); };
+const kropp = document.createElement('canvas'); kropp.width = TW; kropp.height = TH;
+const kx = kropp.getContext('2d');
+kx.translate(-X0, -Y0);
+kx.drawImage(cRen, 0, 0);
+kx.filter = 'blur(1.5px)'; kx.globalCompositeOperation = 'destination-out'; kx.fillStyle = '#000'; poly(kx, PV); poly(kx, PH_);
+kx.filter = 'none'; kx.globalCompositeOperation = 'source-over';
+a.drawImage(kropp, 0, 0);
+// --- 3. ärmen: mittlinjen genom hans vänstra arm (i bild till höger), uträtad till en remsa
+const LINJE = [[985, 712, 62], [986, 760, 76], [989, 800, 82], [991, 900, 110], [993, 1000, 118], [1014, 1100, 122], [1036, 1190, 118], [1048, 1270, 110], [1024, 1360, 98], [1010, 1400, 92], [978, 1500, 80], [958, 1580, 68], [944, 1640, 58], [936, 1672, 54]];
+// tät linje, utjämnad, med jämn båglängd
+const fin = [];
+for (let i = 0; i < LINJE.length - 1; i++) for (let k = 0; k < 40; k++) { const f = k / 40; fin.push(LINJE[i].map((v, j) => v + (LINJE[i + 1][j] - v) * f)); }
+fin.push(LINJE[LINJE.length - 1]);
+const jamn = (p, n) => { let b = p; for (let k = 0; k < n; k++) b = b.map((q, i) => (i === 0 || i === b.length - 1 ? q : q.map((v, j) => (b[i - 1][j] + v * 2 + b[i + 1][j]) / 4))); return b; };
+const mj = jamn(fin, 900);
+let lang = [0]; for (let i = 1; i < mj.length; i++) lang.push(lang[i - 1] + Math.hypot(mj[i][0] - mj[i - 1][0], mj[i][1] - mj[i - 1][1]));
+const TOT = lang[lang.length - 1];
+const SW = 256, SH = 1024;
+const remsa = new ImageData(SW, SH);
+const sD = ren.data;
+const las = (x, y, o) => { const xi = Math.floor(x), yi = Math.floor(y); const fx = x - xi, fy = y - yi; const i = (yi * FW + xi) * 4; for (let c = 0; c < 3; c++) o[c] = (sD[i + c] * (1 - fx) + sD[i + 4 + c] * fx) * (1 - fy) + (sD[i + FW * 4 + c] * (1 - fx) + sD[i + FW * 4 + 4 + c] * fx) * fy; };
+const o = [0, 0, 0];
+let ki = 0;
+const prof = [];
+for (let j = 0; j < SH; j++) {
+  const d = ((j + 0.5) / SH) * TOT;
+  while (ki < lang.length - 2 && lang[ki + 1] < d) ki++;
+  const f = (d - lang[ki]) / (lang[ki + 1] - lang[ki]);
+  const p = mj[ki].map((v, q) => v + (mj[ki + 1][q] - v) * f);
+  const tx = mj[Math.min(ki + 6, mj.length - 1)][0] - mj[Math.max(ki - 6, 0)][0], ty = mj[Math.min(ki + 6, mj.length - 1)][1] - mj[Math.max(ki - 6, 0)][1];
+  const tl = Math.hypot(tx, ty);
+  const nx = ty / tl, ny = -tx / tl; // åt höger i bild när linjen går nedåt
+  if (j % 64 === 0) prof.push({ j, x: +p[0].toFixed(1), y: +p[1].toFixed(1), w: +p[2].toFixed(1) });
+  // nedre delen av underarmen ligger i skugga och i fickan på fotot: där tas den andra armens underarm,
+  // som är jämnt belyst. I vilan är den delen ändå bakom disken.
+  const SA = j / SH;
+  const ANDRA = SA > 0.56;
+  const f2 = Math.min(1, Math.max(0, (SA - 0.56) / 0.08));
+  const y2 = 1200 + ((SA - 0.6) / 0.4) * 375;
+  const LA2 = [[1150, 322, 44], [1200, 318, 50], [1300, 306, 58], [1400, 292, 58], [1500, 276, 54], [1575, 262, 50], [1600, 259, 48]];
+  let la = 0; while (la < LA2.length - 2 && LA2[la + 1][0] < y2) la++;
+  const fa = Math.min(1, Math.max(0, (y2 - LA2[la][0]) / (LA2[la + 1][0] - LA2[la][0])));
+  const xa = LA2[la][1] + (LA2[la + 1][1] - LA2[la][1]) * fa, wa = LA2[la][2] + (LA2[la + 1][2] - LA2[la][2]) * fa;
+  const axn = 0.99, ayn = 0.14; // tvärs över armen, åt höger i bild
+  const o2 = [0, 0, 0];
+  for (let i = 0; i < SW; i++) {
+    const t = ((i + 0.5) / SW) * 2 - 1;
+    // utanför kavajen (glipan vid armbågen, kanten): gå inåt tills det är tyg
+    let tt = t;
+    const tyg = (xx, yy) => al(yy * FW + xx) > 0.97 && fast6[yy * FW + xx] > 0.5 && R[yy * FW + xx] + G[yy * FW + xx] + B[yy * FW + xx] < 400;
+    for (let k = 0; k < 14; k++) { if (tyg(Math.round(p[0] + nx * tt * p[2]), Math.round(p[1] + ny * tt * p[2]))) break; tt *= 0.93; }
+    las(p[0] + nx * tt * p[2], p[1] + ny * tt * p[2], o);
+    if (ANDRA) {
+      let t2 = -t;
+      for (let k = 0; k < 14; k++) { if (tyg(Math.round(xa + axn * t2 * wa), Math.round(y2 + ayn * t2 * wa))) break; t2 *= 0.93; }
+      las(xa + axn * t2 * wa, y2 + ayn * t2 * wa, o2);
+      for (let c = 0; c < 3; c++) o[c] = o[c] * (1 - f2) + o2[c] * f2;
+    }
+    const q = (j * SW + i) * 4;
+    remsa.data[q] = o[0]; remsa.data[q + 1] = o[1]; remsa.data[q + 2] = o[2]; remsa.data[q + 3] = 255;
+  }
+}
+{
+  const L = new Float32Array(SW * SH);
+  for (let i = 0; i < L.length; i++) L[i] = 0.3 * remsa.data[i * 4] + 0.59 * remsa.data[i * 4 + 1] + 0.11 * remsa.data[i * 4 + 2];
+  const lada = (src, r) => { // tre lådfilter, ungefär gauss
+    let a = src.slice(); const b = new Float32Array(a.length);
+    for (let p = 0; p < 3; p++) {
+      for (let y = 0; y < SH; y++) { let t = 0; for (let x = -r; x <= r; x++) t += a[y * SW + Math.min(SW - 1, Math.max(0, x))]; for (let x = 0; x < SW; x++) { b[y * SW + x] = t / (2 * r + 1); t += a[y * SW + Math.min(SW - 1, x + r + 1)] - a[y * SW + Math.max(0, x - r)]; } }
+      for (let x = 0; x < SW; x++) { let t = 0; for (let y = -r; y <= r; y++) t += b[Math.min(SH - 1, Math.max(0, y)) * SW + x]; for (let y = 0; y < SH; y++) { a[y * SW + x] = t / (2 * r + 1); t += b[Math.min(SH - 1, y + r + 1) * SW + x] - b[Math.max(0, y - r) * SW + x]; } }
+    }
+    return a;
+  };
+  const stor = lada(L, 34);
+  // samma ljushet som kavajen på kroppen
+  let medel = 0, nm = 0; for (let y = 1050; y < 1200; y += 2) for (let x = 690; x < 800; x += 2) { const i = y * FW + x; medel += 0.3 * R[i] + 0.59 * G[i] + 0.11 * B[i]; nm++; } medel /= nm;
+  window.__armMedel = medel;
+  for (let i = 0; i < L.length; i++) {
+    let v = L[i] * Math.min(3, Math.pow(medel / Math.max(8, stor[i]), 0.92));
+    // underarmen: lugnare veck
+    if (i >= SW * SH * 0.6) v = medel + (v - medel) * 0.78;
+    remsa.data[i * 4] = v * 1.012; remsa.data[i * 4 + 1] = v; remsa.data[i * 4 + 2] = v * 1.012;
+  }
+}
+const cS = document.createElement('canvas'); cS.width = SW; cS.height = SH; const csx = cS.getContext('2d'); csx.putImageData(remsa, 0, 0);
+for (const sb of [0.905, 0.928, 0.951, 0.974]) {
+  const ux = ((0.86 + 1) / 2) * SW, uy = sb * SH;
+  const g = csx.createRadialGradient(ux - 1, uy - 1, 0.4, ux, uy, 4.6);
+  g.addColorStop(0, '#5a5654'); g.addColorStop(0.4, '#232120'); g.addColorStop(0.85, '#111010'); g.addColorStop(1, 'rgba(10,10,10,0)');
+  csx.fillStyle = g; csx.beginPath(); csx.arc(ux, uy, 4.8, 0, 7); csx.fill();
+}
+a.drawImage(cS, TW, 0);
+
+// --- 4. huden: handryggen ur fotot, utjämnad och upprepad, med leder, senor och handflatans linjer.
+// Spalt 256 × 512: ryggen överst, flatan under. Handens x −145…145 och y −34…306.
+const HW = 256, HH = 256;
+const hud = document.createElement('canvas'); hud.width = HW; hud.height = HH * 2;
+const hx = hud.getContext('2d', { willReadFrequently: true });
+// fläcken ur fotot
+const PX = 222, PY = 1650, PW = 62, PH = 46;
+const pc = document.createElement('canvas'); pc.width = PW; pc.height = PH;
+const px = pc.getContext('2d', { willReadFrequently: true });
+px.drawImage(cRen, PX, PY, PW, PH, 0, 0, PW, PH);
+const pD = px.getImageData(0, 0, PW, PH).data;
+// låg frekvens bort, så att ljuset i fotot inte upprepas
+const bly = (i, j, rd, ch) => { let t = 0, n = 0; for (let y = Math.max(0, j - rd); y <= Math.min(PH - 1, j + rd); y++) for (let x = Math.max(0, i - rd); x <= Math.min(PW - 1, i + rd); x++) { t += pD[(y * PW + x) * 4 + ch]; n++; } return t / n; };
+const detalj = new Float32Array(PW * PH);
+let medel = [0, 0, 0];
+for (let c = 0; c < 3; c++) { let t = 0; for (let i = 0; i < PW * PH; i++) t += pD[i * 4 + c]; medel[c] = t / (PW * PH); }
+for (let j = 0; j < PH; j++) for (let i = 0; i < PW; i++) detalj[j * PW + i] = (pD[(j * PW + i) * 4] + pD[(j * PW + i) * 4 + 1] * 2) / 3 / ((bly(i, j, 9, 0) + bly(i, j, 9, 1) * 2) / 3);
+const SKAL = 0.9; // fotots bildpunkter per atlaspunkt
+const mir = (v, m) => { const k = ((v % (2 * m)) + 2 * m) % (2 * m); return k < m ? k : 2 * m - k; };
+const las2 = (x, y) => { const xx = mir(x, PW - 1.001), yy = mir(y, PH - 1.001); const xi = Math.floor(xx), yi = Math.floor(yy); const fx = xx - xi, fy = yy - yi; return (detalj[yi * PW + xi] * (1 - fx) + detalj[yi * PW + xi + 1] * fx) * (1 - fy) + (detalj[(yi + 1) * PW + xi] * (1 - fx) + detalj[(yi + 1) * PW + xi + 1] * fx) * fy; };
+let slump = 12345; const rnd = () => (slump = (slump * 16807) % 2147483647) / 2147483647;
+const buller = new Float32Array(64 * 64).map(() => rnd());
+const bul = (x, y) => { const xi = Math.floor(x), yi = Math.floor(y); const fx = x - xi, fy = y - yi; const s = (a, b) => buller[((b & 63) * 64 + (a & 63))]; const u = fx * fx * (3 - 2 * fx), v = fy * fy * (3 - 2 * fy); return (s(xi, yi) * (1 - u) + s(xi + 1, yi) * u) * (1 - v) + (s(xi, yi + 1) * (1 - u) + s(xi + 1, yi + 1) * u) * v; };
+const fbm = (x, y) => bul(x, y) * 0.5 + bul(x * 2.1, y * 2.1) * 0.3 + bul(x * 4.3, y * 4.3) * 0.2;
+const rygg = hx.createImageData(HW, HH);
+const flat = hx.createImageData(HW, HH);
+const BAS = [medel[0] * 1.05, medel[1] * 1.03, medel[2] * 1.02];
+for (let j = 0; j < HH; j++) for (let i = 0; i < HW; i++) {
+  const d = las2(i * SKAL * 0.9 + 3, j * SKAL * 0.9 + 3);
+  const sk = 0.92 + 0.16 * fbm(i * 0.035 + 3, j * 0.035);
+  const rod = 0.9 + 0.2 * fbm(i * 0.05 + 9, j * 0.05 + 4);
+  const q = (j * HW + i) * 4;
+  rygg.data[q] = BAS[0] * d * sk * rod; rygg.data[q + 1] = BAS[1] * d * sk; rygg.data[q + 2] = BAS[2] * d * sk * (2 - rod); rygg.data[q + 3] = 255;
+  const d2 = 1 + (d - 1) * 0.5;
+  flat.data[q] = 214 * d2 * sk * rod; flat.data[q + 1] = 150 * d2 * sk; flat.data[q + 2] = 128 * d2 * sk; flat.data[q + 3] = 255;
+}
+hx.putImageData(rygg, 0, 0);
+hx.putImageData(flat, 0, HH);
+// från handens mått till spalten
+const hs = (x, y) => [((x + 145) / 290) * HW, (1 - (y + 34) / 340) * HH];
+const FG = [{ mcp: [47, 131], fan: 8, l: [63, 39, 29], r: 16 }, { mcp: [15, 137], fan: 1.5, l: [69, 43, 31], r: 16.5 }, { mcp: [-17, 132], fan: -5.5, l: [64, 41, 30], r: 15.5 }, { mcp: [-47, 119], fan: -14, l: [49, 29, 25], r: 13.5 }];
+const dirF = (f) => { const a = (f.fan * Math.PI) / 180; return [Math.sin(a), Math.cos(a)]; };
+const streck = (ox, a, b, w, st) => { ox.lineWidth = w; ox.strokeStyle = st; ox.beginPath(); ox.moveTo(a[0], a[1]); ox.lineTo(b[0], b[1]); ox.stroke(); };
+const bage = (ox, m, tv, h, w, st) => { ox.lineWidth = w; ox.strokeStyle = st; ox.beginPath(); const a = [m[0] - tv[0], m[1] - tv[1]], b = [m[0] + tv[0], m[1] + tv[1]]; ox.moveTo(a[0], a[1]); ox.quadraticCurveTo(m[0] + h[0], m[1] + h[1], b[0], b[1]); ox.stroke(); };
+hx.lineCap = 'round';
+// handryggen: senorna som ljusa stråk, gropar mellan, och några ådror
+hx.save();
+hx.beginPath(); hx.rect(0, 0, HW, HH); hx.clip();
+for (const f of FG) {
+  const a = hs(f.mcp[0] * 0.42, 10), b = hs(f.mcp[0], f.mcp[1] - 8);
+  hx.filter = 'blur(3px)'; streck(hx, a, b, 7, 'rgba(255,214,190,.13)');
+  hx.filter = 'blur(4px)'; streck(hx, [a[0] + 8, a[1]], [b[0] + 9, b[1] + 6], 7, 'rgba(70,28,18,.10)');
+}
+hx.filter = 'blur(1.2px)';
+hx.strokeStyle = 'rgba(92,70,92,.17)'; hx.lineWidth = 2.6;
+for (const v of [[[-20, 12], [-8, 50], [10, 72], [6, 118]], [[18, 14], [26, 54], [14, 74]], [[-38, 26], [-32, 70], [-30, 108]]]) { hx.beginPath(); v.forEach((p, i) => { const q = hs(p[0], p[1]); if (i) hx.lineTo(q[0], q[1]); else hx.moveTo(q[0], q[1]); }); hx.stroke(); }
+hx.filter = 'none';
+// leder och knogar: korta veck på tvären
+for (const f of FG) {
+  const [dx, dy] = dirF(f);
+  const tv = [dy, -dx];
+  let y = 0;
+  [0, 1, 2].forEach((led) => {
+    y += f.l[led];
+    const p = [f.mcp[0] + dx * (led === 0 ? 0 : f.l.slice(0, led).reduce((a, b) => a + b, 0)), f.mcp[1] + dy * (led === 0 ? 0 : f.l.slice(0, led).reduce((a, b) => a + b, 0))];
+    if (led === 0) { const c = hs(p[0], p[1]); hx.filter = 'blur(2px)'; hx.fillStyle = 'rgba(255,190,160,.18)'; hx.beginPath(); hx.arc(c[0], c[1], 9, 0, 7); hx.fill(); hx.filter = 'none'; }
+    const n = led === 1 ? 5 : led === 2 ? 3 : 3;
+    for (let k = 0; k < n; k++) {
+      const of = (k - (n - 1) / 2) * 2.5;
+      const m = hs(p[0] + dx * of, p[1] + dy * of);
+      const br = (f.r * (led === 1 ? 0.62 : led === 2 ? 0.5 : 0.55) * (0.8 + rnd() * 0.3) * HW) / 290;
+      const tvv = [(tv[0] * br), -(tv[1] * br)];
+      bage(hx, m, tvv, [0, (k - (n - 1) / 2) * 1.1], 0.8, `rgba(74,36,28,${0.28 + rnd() * 0.2})`);
+      if (k < n - 1) bage(hx, [m[0], m[1] - 1], tvv, [0, 0], 0.7, 'rgba(255,214,190,.14)');
+    }
+  });
+}
+// tummen
+{ const a = [40, 30], d = [0.676, 0.737]; for (const L of [64, 109]) { const p = [a[0] + d[0] * L, a[1] + d[1] * L]; for (let k = 0; k < 4; k++) { const m = hs(p[0] + d[0] * (k - 1.5) * 2.5, p[1] + d[1] * (k - 1.5) * 2.5); const br = 12; bage(hx, m, [d[1] * br, d[0] * br], [0, 0.8], 0.8, 'rgba(74,36,28,.3)'); } } }
+// fläckar
+for (let k = 0; k < 26; k++) { const c = hs(-60 + rnd() * 120, 8 + rnd() * 112); hx.fillStyle = `rgba(92,46,24,${0.08 + rnd() * 0.14})`; hx.filter = 'blur(.7px)'; hx.beginPath(); hx.arc(c[0], c[1], 0.8 + rnd() * 1.8, 0, 7); hx.fill(); }
+hx.filter = 'none';
+hx.restore();
+// handflatan: tre stora linjer, tvärveck vid varje led
+hx.save();
+hx.translate(0, HH);
+hx.beginPath(); hx.rect(0, 0, HW, HH); hx.clip();
+const fp = (pts, w, st) => { hx.lineWidth = w; hx.strokeStyle = st; hx.beginPath(); pts.forEach((p, i) => { const q = hs(p[0], p[1]); if (!i) hx.moveTo(q[0], q[1]); else hx.lineTo(q[0], q[1]); }); hx.stroke(); };
+const kurva = (a, b, c, n = 20) => Array.from({ length: n + 1 }, (_, i) => { const t = i / n, u = 1 - t; return [u * u * a[0] + 2 * u * t * b[0] + t * t * c[0], u * u * a[1] + 2 * u * t * b[1] + t * t * c[1]]; });
+hx.filter = 'blur(.6px)';
+fp(kurva([46, 104], [-4, 76], [8, 10]), 1.5, 'rgba(118,58,50,.3)');
+fp(kurva([52, 92], [6, 72], [-50, 56]), 1.3, 'rgba(118,58,50,.24)');
+fp(kurva([-58, 100], [-10, 90], [38, 116]), 1.3, 'rgba(118,58,50,.24)');
+hx.filter = 'blur(6px)'; hx.fillStyle = 'rgba(230,110,90,.16)'; for (const c of [[-38, 40], [34, 48], [-6, 118]]) { const q = hs(c[0], c[1]); hx.beginPath(); hx.ellipse(q[0], q[1], 26, 20, 0, 0, 7); hx.fill(); }
+hx.filter = 'none';
+for (const f of FG) { const [dx, dy] = dirF(f); const tv = [dy, -dx]; let L = 0; [0, 1, 2].forEach((led) => { const p = [f.mcp[0] + dx * L, f.mcp[1] + dy * L]; const m = hs(p[0], p[1]); const br = (f.r * 0.9 * HW) / 290; bage(hx, m, [tv[0] * br, -tv[1] * br], [0, 0.5], 0.9, 'rgba(118,58,50,.5)'); L += f.l[led]; }); }
+hx.restore();
+a.drawImage(hud, 860 + 256, 0);
+window.__hud = hud;
+
+window.__info = { TOT, prof, medel: window.__armMedel };
+atlas.style.cssText = 'width:686px;display:block'; document.body.append(atlas);
+window.__atlas = atlas;
+document.documentElement.dataset.klar = '1';
+</script>

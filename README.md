@@ -3579,20 +3579,31 @@ kraven borta, uttrycken frivilliga och prompten 1 600 tecken i stället för 2 5
 1 400). Prov på sex analyser: 112–127 ord, och i en av dem en tillagd rad om högpress för att
 prova Bielsa-utbrottet.
 
-**Grafiken.** Vilan kostar ingenting nytt: handen är ungefär 4 000 trianglar på en liten duk och
-ritas bara när fingrarna rör sig, utan skuggkarta (PowerVR i telefonen). Figuren finns först när
-någon klickar: fotot och väggen hämtas då (ungefär 170 kB), och grafiken lämnas tillbaka en stund
-efter att man har gått. Kostymfotot (C More Entertainment, CC BY 3.0, Wikimedia Commons, bearbetat)
-ligger utan armar på en formad yta, så att huvudet vrids runt nacken och kroppen lutar sig fram,
-ögon, bryn och mun rör sig i skuggaren, och armarna är kavajärmar med armbågar och modellerade
-händer ([public/rum-hasse-3d.js](public/rum-hasse-3d.js)). Väggen och hyllorna är en färdig bild,
-bakad en gång med mjukt ljus och skärpedjup. Figuren är 48 000 trianglar och 27 ritanrop, 2–3 ms per
-bildruta på en MacBook Air, mot gängets 14,7 ms (742 900 trianglar och 461 ritanrop), och under
-svängen och medan han syns står rummet still (`Rum.vila`). Rummet ligger kvar bakom honom och flyttas
-inte ur bild: då stod bilden still 570–900 ms på vägen tillbaka i ett riktigt Chrome-fönster, och
-nu inget längre än uret. Mätt i Chrome som telefon (412 × 780, täthet 2,625, strypning × 4), längsta
-tid utan ny bild: till honom 34–83 ms, tillbaka 33–34 ms, uret 34–99 ms. Inte mätt i en riktig telefon.
-`?rum-hasse` öppnar honom direkt.
+**Grafiken.** Vilan kostar ingenting nytt: handen är en liten duk som ritas bara när fingrarna
+rör sig, utan skuggkarta (PowerVR i telefonen). Figuren finns först när någon klickar: atlasen,
+handen och rummet hämtas då (ungefär 310 kB), och grafiken lämnas tillbaka en stund efter att man
+har gått. Kostymfotot (C More Entertainment, CC BY 3.0, Wikimedia Commons, bearbetat) ligger utan
+armar på en formad yta, så att huvudet vrids runt nacken och kroppen lutar sig fram. Ögon, bryn och
+mun rör sig i skuggaren: locken blinkar utan att ögat tänjs, munnen öppnas med tänder och tunga,
+och hakan följer med ([public/rum-hasse-3d.js](public/rum-hasse-3d.js)).
+
+Ärmarna är kavajen ur fotot ([public/rum-hasse-arm.js](public/rum-hasse-arm.js)): fotots armar,
+uträtade till en remsa i atlasen, ligger på böjbara rör med fotots mått, så att tyget och färgen är
+desamma som på kroppen. I vilan ligger armen där den låg på fotot. Händerna är en modell med 16 ben
+([scripts/hasse/hand.mjs](scripts/hasse/hand.mjs)) med huden ur fotot, naglar och leder. Armar,
+kropp, händer och kopp har samma ljus. Rummet bakom honom är en färdig bild, spårad en gång med
+riktigt ljus, blanka ytor och skärpedjup och med samma kamera som figuren
+([scripts/hasse/bak.html](scripts/hasse/bak.html)). Disken speglar hand och kopp, och skuggorna på
+den är räknade kapslar. T 20–24,5 är ett klipp där han dricker en klunk kaffe och ställer ned
+koppen, med start och slut som vilan.
+
+Figuren är 65 000 trianglar och 17 ritanrop i datorn (43 000 i telefonen), mot gängets 742 900 och
+461. Mätt med samma skript på gammal och ny figur om vartannat, under annan last i datorn, MacBook
+Air, täthet 2: huvudtråden 0,15–0,3 ms per bild (förut 0,3 ms), med grafikkortet väntat in
+7–11 ms (förut 4–8 ms). Chrome som telefon (412 × 780, täthet 2,625, strypning × 4): 1 ms på
+huvudtråden (förut 1,5 ms). I båda hänger bilderna med i 16,7 ms i medeltal. Inte mätt i en riktig
+telefon. Under svängen och medan han syns står rummet still (`Rum.vila`), och det ligger kvar
+bakom honom. `?rum-hasse` öppnar honom direkt.
 
 ### Närbilderna
 
