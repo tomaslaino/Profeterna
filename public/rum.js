@@ -3627,7 +3627,7 @@ ${window.RumRegister ? RumRegister.nara() : ''}
         // (K igen nära kupongen på pulten går tillbaka)
         if (!openCoupon() && fore !== 'kupong') sak('kupong');
       } else if (R.zoom && R.tv && R.tv.key(e.key)) e.preventDefault();
-      else if (R.vnara && R.video.key(e.key)) e.preventDefault();
+      else if (R.vnara && R.video.key(e.key, e.repeat)) e.preventDefault();
       else if (k === 't') zoomTv(!R.zoom);
       else if (k === 'a') board(true);
       else if (k === 'r') register(true);
