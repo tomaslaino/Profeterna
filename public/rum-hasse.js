@@ -292,8 +292,8 @@ window.RumHasse = (() => {
   // ---------- samtalet ----------
   //
   // Man ber honom bara analysera en match på kupongen, men det är ett samtal: han
-  // frågar, man väljer en match, han svarar direkt och pratar medan analysen tas
-  // fram, slår i disken med domen och säger texten en mening i taget. Sist säger
+  // frågar, man väljer en match och han frågar tillbaka. Ber man om analysen pratar
+  // han medan den tas fram, slår i disken med domen och säger texten en mening i taget. Sist säger
   // han vad han tycker om det du själv har på kupongen, och han minns vad du har
   // frågat om. Det han säger runt omkring står i rum-hasse-repliker.js.
   //
@@ -639,7 +639,13 @@ window.RumHasse = (() => {
       b.type = 'button';
       b.innerHTML = `<i>${i + 1}</i><span>${esc(m.namn)}</span>${fragat[m.id] ? `<b>${esc(fragat[m.id])}</b>` : ''}`;
       b.disabled = Date.parse(m.avspark) <= nu;
-      b.addEventListener('click', () => svara(m, lista));
+      b.dataset.id = m.id;
+      // har du redan fått svaret finns inget att ta ställning till: tecknen står på raden
+      b.addEventListener('click', (e) => {
+        H.listaTopp = l.scrollTop;
+        if (fragat[m.id]) svara(m, lista);
+        else valj(m, lista, e);
+      });
       l.append(b);
       if (!forsta && !b.disabled && !fragat[m.id]) forsta = b;
     });
@@ -667,6 +673,69 @@ window.RumHasse = (() => {
     if (oppna.length - n === 1) return r.enKvar;
     if (n === Math.ceil(oppna.length / 2)) return r.halva;
     return r.antal[n] || lott(r.nasta);
+  }
+
+  // Finns hans text redan, så att det går direkt och inte kostar något? → true, false,
+  // eller null om det inte går att få veta i tid. Ett tips äldre än TIPS_TIMMAR skrivs om
+  // när man ber om analysen, och då skrivs också hans text om.
+  const TIPS_TIMMAR = 24; // tip.refreshHours i config/artikel.js
+  async function harSvaret(id) {
+    const u = adress('hasse');
+    if (!u) return null;
+    try {
+      const res = await fetch(`${u}?id=${encodeURIComponent(id)}`, { signal: AbortSignal.timeout(800) });
+      const j = res.ok ? await res.json() : null;
+      if (!j || !j.ok) return null;
+      return Boolean(j.hasse) && Date.now() - Date.parse(j.hasse.tips) < TIPS_TIMMAR * 3600000;
+    } catch (e) {
+      return null;
+    }
+  }
+
+  // Du pekar ut en match och han frågar tillbaka. Först när du ber om det tas analysen
+  // fram (svara), så att ett felklick varken kostar en text eller visar ett tips. Samma
+  // uppställning som under analysen, så att inget flyttar sig när man går vidare.
+  function valj(m, lista, klick) {
+    const s = $('.rh-samtal');
+    const vem = {};
+    H.fraga = vem;
+    H.fas = 'val';
+    H.prat = null;
+    H.sagt = null;
+    H.talMal = 0;
+    s.innerHTML = `<div class="rh-match">${esc(m.namn)}?</div><h2 class="rh-sagt"></h2><div class="rh-text"></div>` +
+      `<div class="rh-slut"><button type="button" class="rh-nasta">Analysera</button><button type="button" class="rh-ja">Jag gissar</button><a href="#match/${esc(m.id)}">Matchbladet</a></div>`;
+    const slut = s.querySelector('.rh-slut');
+    const ja = slut.querySelector('.rh-nasta');
+    // ett dubbelklick på raden får inte landa på knappen som nu ligger under pekaren
+    const t0 = performance.now();
+    slut.addEventListener('click', (e) => {
+      if (performance.now() - t0 >= 500) return;
+      e.preventDefault();
+      e.stopPropagation();
+    }, true);
+    ja.addEventListener('click', () => svara(m, lista));
+    slut.querySelector('.rh-ja').addEventListener('click', (e) => gissa(m, e));
+    if (!klick.detail) ja.focus({ preventScroll: true });
+    harSvaret(m.id).then((finns) => {
+      if (H.fraga !== vem) return;
+      const r = REP();
+      rad(lott(finns === null ? r.val : finns ? r.valKlar : r.valLasa), () => {
+        if (H.fraga !== vem) return;
+        repliker([{ text: lott(r.fragaTillbaka) }]).tid = performance.now() + 450;
+      });
+    });
+  }
+  // Du gissar själv: tillbaka till listan, där du var.
+  function gissa(m, e) {
+    fraga();
+    const l = $('.rh-lista');
+    l.scrollTop = H.listaTopp || 0;
+    rad(lott(REP().gissar));
+    if (!e.detail) {
+      const b = [...l.children].find((x) => x.dataset.id === m.id);
+      if (b) b.focus({ preventScroll: true });
+    }
   }
 
   async function svara(m, lista) {
