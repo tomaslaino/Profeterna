@@ -1,5 +1,5 @@
 {
- "uppdaterad": "2026-11-04T18:17:53.876Z",
+ "uppdaterad": "2026-11-04T18:19:34.454Z",
  "omgang": {
   "id": "2026-11-07-st4978",
   "matcher": [
@@ -607,6 +607,80 @@
     "model": "claude-opus-5-5",
     "version": "2026-11-04.1",
     "writtenAt": "2026-11-04T18:00:50.028Z",
+    "attempts": 1
+   },
+   "model": "claude-opus-5-5",
+   "version": "2026-11-04.1",
+   "attempts": 1
+  },
+  {
+   "id": "401931121",
+   "match": "Oxford United – Stevenage",
+   "avspark": "2026-11-07T15:00Z",
+   "writtenAt": "2026-11-04T18:19:21.804Z",
+   "text": "Två målskyttar som knappt hann värma upp\n\nOxford United och Stevenage möts i FA-cupen, elva veckor efter en ligamatch som vändes från bänken. Stevenage har sedan dess fått en egen hjälte, som gjorde mål direkt efter inhoppet i ligadebuten och firade med en volt. Sådant bör man ha uppsikt över.\n\nNär lagen möttes i augusti avgjordes det mesta vid sidlinjen. Jamie Cumming gick skadad av redan efter sju minuter, och in kom Simon Eastwood till sin första match sedan februari 2024, enligt Oxfords egen hemsida [1]. Efter 64 minuter bytte Aaron Ramsey in Gatlin O'Donkor, som gjorde 1–0 tre minuter senare. Cameron Brannagan satte en straff i den 86:e minuten, Jordan Roberts reducerade på övertid och Ramsey hade sin första seger som Oxfords tränare [1]. Vem som är beredd att gå in och göra nytta ser du redan på uppvärmningen.\n\nStevenage har nu en liknande historia. I lördags låg de under två gånger borta mot Leicester och kom tillbaka båda gångerna. Den andra kvitteringen gjorde Tugra Turhan, turkisk U19-landslagsman, ungefär två minuter in i sin engelska ligadebut, och sedan firade han med en snurrande bakåtvolt, skriver Neil Metcalfe i nyhetsbrevet The Boro [2]. Tränaren skämtade om böter. I Grusnäs hade jag en inhoppare som försökte sig på samma sak på grus, och honom behövde ingen bötfälla. Metcalfe beskriver också skadenyheterna som inte bra [2], och det är sällan något man vill ta med sig in i en cupomgång.\n\nOxford har bara förlorat en av tolv ligamatcher och är obesegrade hemma, men de har släppt in sju och ett halvt mål färre än motståndarnas chanser brukar ge. Ett bakre lag som lever så gott får förr eller senare betala tillbaka, och det där löser man med en hink bollar.\n\nTipset: 1X (Hemmalaget, knappt)\n\nPrognosen ger Oxford 2,13, oavgjort 3,33 och Stevenage 4,35 efter 90 minuter, och spelbolagen hamnar nära på etta men ger bortalaget lite mer. Oxfords försvar har haft tur, så ettan ska inte stå ensam. Samtidigt ser skadeläget i Stevenage inte bra ut [1], och det väger prognosen inte in, så jag låter tvåan vara. Stevenage har dessutom inte gjort mål i fyra av tolv ligamatcher, och de troligaste resultaten är 1–0, 0–0 och 1–1. Jag ringar in etta och kryss.",
+   "author": "Sixten Bråvall (påhittad)",
+   "title": "Två målskyttar som knappt hann värma upp",
+   "lead": "Oxford United och Stevenage möts i FA-cupen, elva veckor efter en ligamatch som vändes från bänken. Stevenage har sedan dess fått en egen hjälte, som gjorde mål direkt efter inhoppet i ligadebuten och firade med en volt. Sådant bör man ha uppsikt över.",
+   "paragraphs": [
+    "När lagen möttes i augusti avgjordes det mesta vid sidlinjen. Jamie Cumming gick skadad av redan efter sju minuter, och in kom Simon Eastwood till sin första match sedan februari 2024, enligt Oxfords egen hemsida [1]. Efter 64 minuter bytte Aaron Ramsey in Gatlin O'Donkor, som gjorde 1–0 tre minuter senare. Cameron Brannagan satte en straff i den 86:e minuten, Jordan Roberts reducerade på övertid och Ramsey hade sin första seger som Oxfords tränare [1]. Vem som är beredd att gå in och göra nytta ser du redan på uppvärmningen.",
+    "Stevenage har nu en liknande historia. I lördags låg de under två gånger borta mot Leicester och kom tillbaka båda gångerna. Den andra kvitteringen gjorde Tugra Turhan, turkisk U19-landslagsman, ungefär två minuter in i sin engelska ligadebut, och sedan firade han med en snurrande bakåtvolt, skriver Neil Metcalfe i nyhetsbrevet The Boro [2]. Tränaren skämtade om böter. I Grusnäs hade jag en inhoppare som försökte sig på samma sak på grus, och honom behövde ingen bötfälla. Metcalfe beskriver också skadenyheterna som inte bra [2], och det är sällan något man vill ta med sig in i en cupomgång.",
+    "Oxford har bara förlorat en av tolv ligamatcher och är obesegrade hemma, men de har släppt in sju och ett halvt mål färre än motståndarnas chanser brukar ge. Ett bakre lag som lever så gott får förr eller senare betala tillbaka, och det där löser man med en hink bollar."
+   ],
+   "sources": [
+    {
+     "n": 1,
+     "source": "Oxford United",
+     "title": "Oxford United Secure Important Win Over Stevenage",
+     "url": "https://www.oufc.co.uk/news/oxford-united-secure-important-win-over-stevenage",
+     "publishedAt": null
+    },
+    {
+     "n": 2,
+     "source": "The Boro (Neil Metcalfe)",
+     "title": "Flipping brilliant celebration might have earned Stevenage hero a fine",
+     "url": "https://npmetcalfe.substack.com/p/the-boro-leicester-city-v-stevenage-ratings-reaction-report",
+     "publishedAt": null
+    }
+   ],
+   "tip": {
+    "text": "Prognosen ger Oxford 2,13, oavgjort 3,33 och Stevenage 4,35 efter 90 minuter, och spelbolagen hamnar nära på etta men ger bortalaget lite mer. Oxfords försvar har haft tur, så ettan ska inte stå ensam. Samtidigt ser skadeläget i Stevenage inte bra ut [1], och det väger prognosen inte in, så jag låter tvåan vara. Stevenage har dessutom inte gjort mål i fyra av tolv ligamatcher, och de troligaste resultaten är 1–0, 0–0 och 1–1. Jag ringar in etta och kryss.",
+    "signs": [
+     0,
+     1
+    ],
+    "note": "Hemmalaget, knappt",
+    "sources": [
+     {
+      "n": 1,
+      "source": "The Boro (Neil Metcalfe)",
+      "title": "Flipping brilliant celebration might have earned Stevenage hero a fine",
+      "url": "https://npmetcalfe.substack.com/p/the-boro-leicester-city-v-stevenage-ratings-reaction-report",
+      "publishedAt": null
+     }
+    ],
+    "model": "claude-opus-5-5",
+    "version": "2026-11-04.1",
+    "writtenAt": "2026-11-04T18:19:21.804Z",
+    "attempts": 1
+   },
+   "hasse": {
+    "stycken": [
+     "Oxford förlorar nästan aldrig och är obesegrade hemma, men de har släppt in sju och ett halvt mål färre än motståndarnas chanser brukar ge. Det är ren tur och den håller inte i längden, så ettan ska inte stå ensam. Det är orsak och verkan, och jag har sällan fel om sånt.",
+     "Stevenage har fått en ung Turhan som gjorde mål direkt efter inhoppet och firade med en bakåtvolt. Nej nej nej. Det hjälper föga när skadeläget ser jävligt dåligt ut och laget har gått mållöst i fyra av tolv ligamatcher, så tvåan får vara. Det blir få mål och Oxford är knappt bättre, alltså etta och kryss."
+    ],
+    "tips": "2026-11-04T18:19:21.804Z",
+    "uppdrag": {
+     "fraser": [
+      "Nej nej nej",
+      "Total kontroll"
+     ],
+     "krydda": null,
+     "bielsa": []
+    },
+    "model": "claude-opus-5-5",
+    "version": "2026-11-04.1",
+    "writtenAt": "2026-11-04T18:19:33.857Z",
     "attempts": 1
    },
    "model": "claude-opus-5-5",
