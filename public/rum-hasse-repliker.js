@@ -48,6 +48,8 @@ window.HasseRepliker = {
     'Den är solklar.',
   ],
   fragaTillbaka: ['Vill du veta, eller ska du gissa?', 'Vill du ha svaret, eller gissar du?', 'Ska jag säga det, eller gissar du?'],
+  // Knappen som tar fram analysen: ditt svar, bredvid Jag gissar.
+  lar: ['Lär mig', 'Jag lyssnar och lär', 'Upplys mig'],
   // Trycker man på Jag gissar.
   gissar: ['Modigt. Vilken mer?', 'Det har gått förr. Vilken mer?', 'Gissa på. Vilken mer?', 'Det är din kupong. Nästa.'],
   // Direkt när man har bett om analysen.

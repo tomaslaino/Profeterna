@@ -71,7 +71,8 @@
 .rh-rep { color: rgba(246, 239, 220, 0.66); }
 .rh-rep.nu, .rh-klar .rh-rep { color: #f6efdc; }
 .rh-orsak { opacity: 0.72; }
-.rh-slut { flex: none; display: flex; gap: 1.4em; align-items: baseline; min-height: 1.9em; padding-top: 0.5em; }
+.rh-slut { flex: none; display: flex; flex-wrap: wrap; gap: 0.2em 1.4em; align-items: baseline; min-height: 1.9em; padding-top: 0.5em; }
+.rh-slut > * { white-space: nowrap; }
 .rh-ja { padding: 0; border: 0; background: none; color: #a9c3ff; font: 400 1em Fraunces, Georgia, serif; text-decoration: underline; cursor: pointer; text-shadow: inherit; }
 .rh-nasta { align-self: flex-start; padding: 0; border: 0; background: none; color: #ffd86b; font: 700 1.05em Fraunces, Georgia, serif; text-decoration: underline; cursor: pointer; text-shadow: inherit; }
 .rh-slut a { color: #a9c3ff; }

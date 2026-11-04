@@ -3628,7 +3628,8 @@ koppen försvinner den ritade på fatet (`.hasse-klunk`). Fatet står kvar på p
 
 **Samtalet.** Det är han som frågar, *Vilken match förstår du inte?*, med ditt efternamn om kupongen
 vet vem du är, och man svarar genom att välja en match. Då frågar han tillbaka (*Den är enkel. Vill du
-veta, eller ska du gissa?*), och först *Analysera* tar fram analysen, så att ett felklick varken
+veta, eller ska du gissa?*), och först *Lär mig* tar fram analysen (knappen lottas som hans repliker: också *Jag lyssnar och
+lär* och *Upplys mig*), så att ett felklick varken
 beställer en betald text eller visar ett tips. *Jag gissar* går tillbaka till listan och
 *Matchbladet* till matchen. Han har alltid svaret, både när texten redan finns (*Den har jag tittat på*, `GET
 …/hasse`) och när den måste skrivas (*Den knäckte jag i morse*); att han läser på märks först
