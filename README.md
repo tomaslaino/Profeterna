@@ -1974,12 +1974,13 @@ Enter och mellanslag klickar på dem. En match på text-tv:n öppnar matchrutan 
   initialerna i personens bläck (samma som på papperet under Kupong) och stämpeln
   *Inlämnad*, men inga tecken. Din egen tas i handen, och de andras när du ser deras tips
   (se nedan). Innan dess lyfts en annans kupong bara lite i ena kanten och faller tillbaka.
-- **Hasses kaffe** längst till vänster på pulten → Hasse Backe, som står i baren utanför
-  bilden till vänster. Koppen med blå ränder ryker på ett fat som sticker ut över kanten,
-  mot honom, och under den ligger hans nota: kaffe, fyra påtår och en kanelbulle, Skrivs på
-  Notts County (klubben han lämnade efter sju veckor 2009, när lönen inte kom; notan har
-  nummer 0007). Bredvid ligger hans hand. Ett klick, Enter eller H och kameran svänger till
-  honom (`hasseHtml`, `skramla`, `tillHasse`, se [Hasse Backe](#hasse-backe)).
+- **Hasses hand och kaffe** längst till vänster på pulten → Hasse Backe, som står i baren
+  utanför bilden till vänster. Armen kommer in från bildens kant, och handen ligger hel på
+  pulten bredvid notan. Koppen med blå ränder ryker på ett fat, och under den ligger hans nota:
+  kaffe, fyra påtår och en kanelbulle, Skrivs på Notts County (klubben han lämnade efter sju
+  veckor 2009, när lönen inte kom; notan har nummer 0007). Ett klick på handen eller kaffet,
+  Enter eller H och kameran svänger till honom (`hasseHtml`, `skramla`, `tillHasse`, se
+  [Hasse Backe](#hasse-backe)).
 - **Tv:n** uppe i hörnet till höger, en mörkgrå Panasonic från nittiotalet med text-tv på en arm från väggen, zoomas in med ett
   klick eller T och vrids då mot en; den står på kupongens matcher live (377), och där finns
   också omgångens matcher, tabellerna och skytteligorna (se [Tv:n](#tvn)). Esc eller ett
@@ -3529,11 +3530,22 @@ en fast bild.
 *Hasse Backe (fiktiv)* analyserar matcherna på stryktipskupongen, och det är allt man kan be
 honom om: inga följdfrågor och ingen textruta. Bredvid kaffet och notan på pulten ligger hans
 hand och trummar med fingrarna då och då (i telefonen, där kaffet ligger utanför bilden, ligger
-handen vid kupongens hörn och är det man trycker på). Ett klick eller H och kameran svänger åt
-vänster, som i ett rumshörn: ögat står mitt i, vänster vägg är vinkelrät och perspektivet är
-halva fönsterbredden (`.hasse-svang` i [public/rum-hasse.css](public/rum-hasse.css)). Där står
-han bakom disken med samma hand på disken, och Esc eller *Tillbaka* går tillbaka (vid matchlistan
-också ett klick utanför).
+den vid kupongens hörn). Handen flyttas in i bild när fönstret skär scenen, så att den alltid syns
+hel, med manschett och kavajärm in från bildens kant. Ett klick på den eller kaffet, eller H, och
+kameran svänger åt vänster, som i ett rumshörn: ögat står mitt i, vänster vägg är vinkelrät och
+perspektivet är halva fönsterbredden (`.hasse-svang` i [public/rum-hasse.css](public/rum-hasse.css)).
+Där står han bakom disken, och Esc eller *Tillbaka* går tillbaka (vid matchlistan också ett klick
+utanför).
+
+**Handen följer med** ([public/rum-hasse-hand.js](public/rum-hasse-hand.js)). Kameran följer
+handen när han drar den till sig: de första 6 graderna ligger den stilla och rummet glider under
+den, sedan lyfter den, går långsamt in i bilden medan rummet far förbi och passerar över hans
+kaffe, och från ungefär 70° ligger den på disken och följer väggen som allt annat. Vrids kameran
+vrids handen lika mycket, så att den ligger still i världen. Under svängen är underarmen, manschetten
+och handen en egen duk ovanpå båda väggarna, med figurens kamera och arm, medan axeln och överarmen
+står kvar på väggen; armbågen kommer in i bild först när handen ligger där den ska, så att armen
+aldrig ser för lång ut. När kameran stannar tar figurens arm över, och bilden är densamma. Vägen
+tillbaka är samma väg.
 
 **Samtalet.** Det är han som frågar, *Vilken match förstår du inte?*, med ditt efternamn om kupongen
 vet vem du är, och man svarar genom att välja en match. Han svarar direkt och fortsätter prata
@@ -3579,10 +3591,16 @@ kraven borta, uttrycken frivilliga och prompten 1 600 tecken i stället för 2 5
 1 400). Prov på sex analyser: 112–127 ord, och i en av dem en tillagd rad om högpress för att
 prova Bielsa-utbrottet.
 
-**Grafiken.** Vilan kostar ingenting nytt: handen är en liten duk som ritas bara när fingrarna
-rör sig, utan skuggkarta (PowerVR i telefonen). Figuren finns först när någon klickar: atlasen,
-handen och rummet hämtas då (ungefär 310 kB), och grafiken lämnas tillbaka en stund efter att man
-har gått. Kostymfotot (C More Entertainment, CC BY 3.0, Wikimedia Commons, bearbetat) ligger utan
+**Grafiken.** Vilan kostar lite: handen är en liten duk som ritas bara när fingrarna rör sig, utan
+skuggkarta (PowerVR i telefonen). Handen och armen behöver atlasen och handens modell (ungefär
+280 kB), och de hämtas sist av allt när rummet är klart. Under svängen är duken större och ritas
+om i varje bild med färre bildpunkter (högst 1,25 per bildpunkt i datorn och 1,5 i telefonen), utom
+de sista graderna hem. Mätt i ett riktigt Chrome-fönster (1280 × 743, täthet 2): vägen dit är lika
+jämn med och utan handens duk, ungefär 50 bildrutor på 0,82 sekunder och längst 33 ms utan ny bild.
+På vägen tillbaka är de sista 0,4 sekunderna ojämna (ungefär 29 bildrutor i hela svängen, längst
+67 ms), ibland också utan duken; orsaken är inte hittad, och i Chrome som telefon (412 × 780,
+strypning × 4) tappas inga bilder. Figuren finns först när någon klickar: rummet bakom honom hämtas
+då, och grafiken lämnas tillbaka en stund efter att man har gått. Kostymfotot (C More Entertainment, CC BY 3.0, Wikimedia Commons, bearbetat) ligger utan
 armar på en formad yta, så att huvudet vrids runt nacken och kroppen lutar sig fram. Ögon, bryn och
 mun rör sig i skuggaren: locken blinkar utan att ögat tänjs, munnen öppnas med tänder och tunga,
 och hakan följer med ([public/rum-hasse-3d.js](public/rum-hasse-3d.js)).

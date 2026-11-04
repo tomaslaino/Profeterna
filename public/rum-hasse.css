@@ -3,8 +3,8 @@
 .rum-front { position: absolute; inset: 0; overflow: hidden; }
 .rum-sving { position: absolute; inset: 0; }
 .rum-pl > .rum-hasse-hand { position: absolute; pointer-events: none; will-change: auto; }
-.rum-hasse-knapp { display: none; position: absolute; left: 500px; top: 640px; width: 215px; height: 96px; padding: 0; border: 0; background: none; cursor: pointer; pointer-events: auto; will-change: auto; }
-.rum.smal .rum-hasse-knapp { display: block; }
+.rum > .rum-hasse-hand { position: absolute; z-index: 2; pointer-events: none; }
+.rum-hasse-knapp { position: absolute; padding: 0; border: 0; background: none; cursor: pointer; pointer-events: auto; will-change: auto; }
 
 /* kameran svänger åt vänster: ett hörn i ett rum, ögat mitt i (--p = halva bredden) */
 .rum.hasse-svang { perspective: var(--p); }

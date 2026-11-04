@@ -1,6 +1,7 @@
-// Hasse Backe i tobaksaffären: en arm på pulten bredvid hans kaffe (rum.js), han
-// står precis utanför bilden. Ett klick (eller H) och kameran svänger åt vänster,
-// och där står han bakom disken (rum-hasse-3d.js). Fiktivt, och det står i foten.
+// Hasse Backe i tobaksaffären: en arm på pulten bredvid hans kaffe (rum.js,
+// rum-hasse-hand.js), han står precis utanför bilden. Ett klick (eller H) och
+// kameran svänger åt vänster, med handen, och där står han bakom disken
+// (rum-hasse-3d.js). Fiktivt, och det står i foten.
 //
 // Rummet rörs inte: tobaksaffärens scen läggs i två omslag (.rum-sving och
 // .rum-front), som saknar omvandling tills kameran svänger. Under svängen och
@@ -72,25 +73,27 @@ window.RumHasse = (() => {
     const plan = [...H.rum.querySelectorAll('.rum-world > .rum-pl')].at(-1);
     if (!plan) return;
     try {
-      const m = await import('./rum-hasse-3d.js');
+      const [m, a] = await Promise.all([import('./rum-hasse-3d.js'), import('./rum-hasse-hand.js')]);
       H.m = m;
-      H.pulten = m.pulten(plan, { smal: smal(), pr: latt() ? 1.5 : Math.min((devicePixelRatio || 1) * 1.25, 2.5) });
-      // Pekar man på kaffet och notan (rum.js) trummar han, och hans bilder hämtas.
-      const kaffe = H.rum.querySelector('#rum-hasse');
-      if (kaffe) kaffe.addEventListener('pointerenter', (e) => { if (e.pointerType === 'mouse' && ledigt()) { H.pulten.trumma(); forladda(); } });
-      // I telefonen ligger kaffet utanför bilden: där är det handen man trycker på.
+      const dpr = devicePixelRatio || 1;
+      H.pulten = await a.armen(plan, { matt, pr: latt() ? 1.5 : Math.min(dpr * 1.25, 2.5), prUt: Math.min(dpr, latt() ? 1.5 : 1.25) });
+      // Handen går att trycka på; pekar man på den eller på kaffet och notan
+      // (rum.js) trummar han, och hans bilder hämtas.
       const b = document.createElement('button');
       b.type = 'button';
       b.className = 'rum-hasse-knapp';
       b.setAttribute('aria-label', 'Hasse Backe');
       plan.append(b);
+      H.pulten.knapp(b);
       b.addEventListener('click', (e) => {
         if (!ledigt()) return;
         e.stopPropagation();
         e.preventDefault();
         oppna();
       });
-      addEventListener('resize', () => H.pulten.satt(smal()));
+      const kaffe = H.rum.querySelector('#rum-hasse');
+      for (const x of [kaffe, b]) if (x) x.addEventListener('pointerenter', (e) => { if (e.pointerType === 'mouse' && ledigt()) { H.pulten.trumma(); forladda(); } });
+      addEventListener('resize', () => H.pulten.placera());
       // då och då trummar han otåligt med fingrarna
       if (!calm()) {
         const vantan = () => {
@@ -117,14 +120,21 @@ window.RumHasse = (() => {
     return H.bilder;
   }
 
+  // hans vägg i fönstret
+  function matt() {
+    const h = hog();
+    const L = H.m.SCEN[h ? 'hog' : 'bred'];
+    const W = innerWidth;
+    const Hj = innerHeight;
+    const k = Math.max(W / L.W, Hj / L.H);
+    const tx = Math.min(0, Math.max(W - L.W * k, W * (h ? 0.5 : 0.36) - L.px * k));
+    const ty = h ? 0 : Math.max(Hj - L.H * k, 0 - (L.H * k - Hj) * 0.8);
+    return { W, H: Hj, k, tx, ty, L };
+  }
+
   function passa() {
-    const L = H.m.SCEN[H.hog ? 'hog' : 'bred'];
-    const vw = innerWidth;
+    const { W: vw, k, tx, ty, L } = matt();
     const vh = innerHeight;
-    const k = Math.max(vw / L.W, vh / L.H);
-    const mal = H.hog ? 0.5 : 0.36;
-    const tx = Math.min(0, Math.max(vw - L.W * k, vw * mal - L.px * k));
-    const ty = H.hog ? 0 : Math.max(vh - L.H * k, 0 - (L.H * k - vh) * 0.8);
     const sc = $('.rh-scen');
     Object.assign(sc.style, { width: `${L.W}px`, height: `${L.H}px`, transform: `translate(${tx.toFixed(1)}px, ${ty.toFixed(1)}px) scale(${k.toFixed(4)})` });
     const c = sc.querySelector('canvas');
@@ -142,7 +152,10 @@ window.RumHasse = (() => {
     await Promise.all(forladda());
     $('.rh-scen img').src = bakbild();
     passa();
+    // (fönstret har vridits sedan sist: han står på ett annat sätt)
+    if (H.fig && H.figHog !== H.hog) { H.fig.borta(); H.fig = null; const d = $('.rh-scen canvas'); d.replaceWith(d.cloneNode(false)); }
     if (!H.fig) {
+      H.figHog = H.hog;
       const c = $('.rh-scen canvas');
       const pr = Math.min(H.k * (devicePixelRatio || 1), latt() ? 1.6 : 2);
       H.fig = await H.m.figuren(c, { hog: H.hog, latt: latt(), pr });
@@ -150,7 +163,7 @@ window.RumHasse = (() => {
   }
 
   async function oppna() {
-    if (H.on || H.oppnar) return;
+    if (H.on || H.oppnar || H.svanger) return;
     H.oppnar = true;
     clearTimeout(H.ner);
     if (H.pulten && !calm()) H.pulten.trumma();
@@ -173,6 +186,8 @@ window.RumHasse = (() => {
     r.classList.add('hasse-svang');
     void r.offsetWidth;
     if (calm()) { framme(); return; }
+    H.svanger = true;
+    armenUt(0);
     requestAnimationFrame(() => requestAnimationFrame(() => {
       r.classList.add('hasse-vand');
       const s = r.querySelector('.rum-sving');
@@ -182,9 +197,22 @@ window.RumHasse = (() => {
     }));
   }
 
+  // Under svängen är armen en duk ovanpå allt (rum-hasse-hand.js), inte hans.
+  function armenUt(vinkel) {
+    if (!H.pulten) return;
+    H.fig.rita(H.T, performance.now() / 1000, H.tal || 0, H.tal || 0);
+    H.pulten.ut(H.fig.armLage(), H.rum.querySelector('.rum-sving'), vinkel, H.rum.classList.contains('natt') ? 0.17 : 0.95);
+    H.fig.visaArm(false);
+  }
+
   // framme: inget 3D kvar, rummet ur bild, och han börjar röra sig
   function framme() {
     const r = H.rum;
+    H.svanger = false;
+    if (H.pulten) {
+      H.pulten.hem();
+      H.fig.visaArm(true);
+    }
     r.classList.remove('hasse-svang', 'hasse-vand');
     r.classList.add('hasse-framme');
     H.last = null;
@@ -220,18 +248,23 @@ window.RumHasse = (() => {
   }
 
   async function stang() {
-    if (!H.on) return;
+    if (!H.on || H.svanger) return;
     H.on = false;
     H.fraga = null;
     cancelAnimationFrame(H.raf);
     const r = H.rum;
     r.classList.remove('hasse-framme');
     if (calm()) { hemma(); return; }
+    // (kameran står redan vänd mot honom: ingen sväng dit först)
+    H.svanger = true;
+    const s = r.querySelector('.rum-sving');
+    s.style.transition = 'none';
     r.classList.add('hasse-svang', 'hasse-vand');
     void r.offsetWidth;
+    s.style.transition = '';
+    armenUt(90);
     requestAnimationFrame(() => requestAnimationFrame(() => {
       r.classList.remove('hasse-vand');
-      const s = r.querySelector('.rum-sving');
       const klar = (e) => { if (e.target === s) { s.removeEventListener('transitionend', klar); clearTimeout(H.sv); hemma(); } };
       s.addEventListener('transitionend', klar);
       H.sv = setTimeout(() => { s.removeEventListener('transitionend', klar); hemma(); }, 1100);
@@ -239,6 +272,9 @@ window.RumHasse = (() => {
   }
 
   function hemma() {
+    H.svanger = false;
+    if (H.pulten) H.pulten.hem();
+    if (H.fig) H.fig.visaArm(true);
     if (window.Rum && Rum.vila) Rum.vila(false);
     H.rum.classList.remove('hasse-svang', 'hasse-vand', 'hasse-framme');
     H.vy.hidden = true;

@@ -1,22 +1,19 @@
-// Hasse Backe i tobaksaffären (rum-hasse.js), i three.js: armen på pulten och
-// figuren bakom disken. Kostymfotot (C More Entertainment, CC BY 3.0,
+// Hasse Backe i tobaksaffären (rum-hasse.js), i three.js: figuren bakom disken
+// (armen på pulten och i svängen: rum-hasse-hand.js). Kostymfotot (C More Entertainment, CC BY 3.0,
 // Wikimedia Commons) ligger på en formad yta, så att huvudet vrids på riktigt
 // runt nacken och kroppen lutar sig fram. Ögon, bryn och mun rör sig i skuggaren.
 // Armarna, händerna och koppen finns i rum-hasse-arm.js.
 //
-// Grafiken: inga skuggkartor och ingen ny bild i rummet. Handen på pulten ritas bara
-// när fingrarna trummar. Figuren finns bara medan man tittar på honom, och då
+// Grafiken: inga skuggkartor och ingen ny bild i rummet. Figuren finns bara medan man tittar på honom, och då
 // står gänget och sakerna still och ritas inte (Rum.vila). Rummet bakom honom är
 // en färdig bild (scripts/hasse/bak.html). Skuggorna på disken är räknade kapslar.
 //
 // Världen: 1 enhet = 1 bildpunkt i fotot, x = fotots x − 660, y = 900 − fotots y,
 // z mot betraktaren. Disken är y = TOPP, från z = ZB till ZF.
 //
-// pulten(plan, { smal }) → { trumma(), satt(smal), borta() }
 // figuren(duk, { hog, latt }) → { rita(T, n, tal, mun), tid: längden, armLage(), visaArm(j), borta() }
 // Klipp: T 0–12,4 (vila, skrattet, domen, gesterna, hem) och T 20–24,5 (en klunk kaffe, börjar och slutar som vilan).
 import * as THREE from 'three';
-import { RoundedBoxGeometry } from 'three/addons/geometries/RoundedBoxGeometry.js';
 import { ATLAS, LJUS, ARM, laddaFoto, laddaHand, byggArm, byggKopp } from './rum-hasse-arm.js';
 
 const DEG = Math.PI / 180;
@@ -27,205 +24,6 @@ const spar = (k, t) => {
   for (let i = 1; i < k.length; i++) if (t <= k[i][0]) return k[i - 1][1] + (k[i][1] - k[i - 1][1]) * ss(k[i - 1][0], k[i][0], t);
   return k[k.length - 1][1];
 };
-
-// ---------- handen ----------
-
-const HUD = '#cf9f8a';
-const hudM = () => new THREE.MeshStandardMaterial({ color: HUD, roughness: 0.58 });
-const kavajTex = (() => {
-  let t = null;
-  return () => {
-    if (t) return t;
-    const c = document.createElement('canvas');
-    c.width = c.height = 256;
-    const x = c.getContext('2d');
-    const id = x.createImageData(256, 256);
-    for (let j = 0; j < 256; j++) for (let i = 0; i < 256; i++) {
-      const v = 43 + (Math.random() - 0.5) * 13 + 5 * Math.sin((i + j) * 1.57);
-      const o = (j * 256 + i) * 4;
-      id.data[o] = v; id.data[o + 1] = v; id.data[o + 2] = v + 2; id.data[o + 3] = 255;
-    }
-    x.putImageData(id, 0, 0);
-    t = new THREE.CanvasTexture(c);
-    t.wrapS = t.wrapT = THREE.RepeatWrapping;
-    t.colorSpace = THREE.SRGBColorSpace;
-    t.anisotropy = 4;
-    return t;
-  };
-})();
-
-// Lokalt: +y mot fingertopparna, +z ut ur handflatan; sida = +1 har tummen åt +x.
-function byggHand(sida, hud) {
-  const g = new THREE.Group();
-  g.scale.setScalar(0.92);
-  const palm = new THREE.Mesh(new RoundedBoxGeometry(108, 122, 44, 4, 19), hud);
-  palm.position.y = 56;
-  g.add(palm);
-  const kapsel = (r, l) => { const m = new THREE.Mesh(new THREE.CapsuleGeometry(r, l, 3, 10), hud); m.position.y = l / 2; return m; };
-  const leder = [];
-  const finger = (x, y, ls, r, rotZ) => {
-    const led = [];
-    let f = g;
-    ls.forEach((l, i) => {
-      const p = new THREE.Group();
-      if (i === 0) { p.position.set(x, y, 0); p.rotation.z = rotZ; } else p.position.y = ls[i - 1];
-      p.add(kapsel(r * (1 - i * 0.07), l));
-      f.add(p);
-      f = p;
-      led.push(p);
-    });
-    leder.push(led);
-  };
-  // från tumsidan: pekfingret ligger närmast tummen
-  finger(sida * 37, 114, [50, 32, 25], 13.2, -sida * 0.05);
-  finger(sida * 12, 118, [55, 36, 26], 14.2, -sida * 0.01);
-  finger(-sida * 13, 116, [52, 34, 26], 13.6, sida * 0.02);
-  finger(-sida * 38, 108, [40, 26, 21], 12, sida * 0.07);
-  const tumme = new THREE.Group();
-  tumme.position.set(sida * 56, 38, 8);
-  tumme.rotation.z = -sida * 0.85;
-  g.add(tumme);
-  tumme.add(kapsel(17, 44));
-  const t2 = new THREE.Group();
-  t2.position.y = 44;
-  t2.add(kapsel(15, 34));
-  tumme.add(t2);
-  return { g, leder, tumme, t2 };
-}
-function bojFingrar(h, krok, peka, sida) {
-  h.leder.forEach((led, i) => {
-    const k = i === 0 ? krok * (1 - peka) : krok;
-    led[0].rotation.x = k * 1.35 + 0.08;
-    led[1].rotation.x = k * 1.5 + 0.12;
-    led[2].rotation.x = k + 0.08;
-  });
-  h.tumme.rotation.x = krok * 0.7;
-  h.t2.rotation.z = -sida * krok * 0.5;
-}
-
-// en mjuk skugga som färdig fläck: inga skuggkartor (PowerVR i telefonen)
-function flack() {
-  const c = document.createElement('canvas');
-  c.width = c.height = 128;
-  const x = c.getContext('2d');
-  const g = x.createRadialGradient(64, 64, 8, 64, 64, 64);
-  g.addColorStop(0, 'rgba(0,0,0,.62)');
-  g.addColorStop(0.55, 'rgba(0,0,0,.3)');
-  g.addColorStop(1, 'rgba(0,0,0,0)');
-  x.fillStyle = g;
-  x.fillRect(0, 0, 128, 128);
-  return new THREE.CanvasTexture(c);
-}
-
-// ---------- på pulten ----------
-
-// Armen kommer in från vänster och handen ligger på pulten vid hans kaffe (rum.js):
-// han står precis utanför bilden. Ritas bara när fingrarna rör sig, på en liten egen duk i
-// pultens plan. Kameran som i rum-saker.js: 34° uppifrån, kring lådans mitt.
-const LAGE = {
-  bred: { box: { x: -40, y: 770, w: 210, h: 240 }, o: { x: 40, y: 890 }, spets: [64, 930], bas: [-130, 1062], sk: 0.74 },
-  smal: { box: { x: 470, y: 590, w: 320, h: 320 }, o: { x: 640, y: 690 }, spets: [705, 672], bas: [430, 758], sk: 0.62 },
-};
-export function pulten(plan, { smal = false, pr = 1.5 } = {}) {
-  const c = document.createElement('canvas');
-  c.className = 'rum-hasse-hand';
-  plan.append(c);
-  const r = new THREE.WebGLRenderer({ canvas: c, alpha: true, antialias: pr < 1.6, powerPreference: 'low-power' });
-  r.setPixelRatio(pr);
-  const s = new THREE.Scene();
-  s.add(new THREE.HemisphereLight('#e8dcc4', '#3a2a20', 0.95));
-  const key = new THREE.DirectionalLight('#fff0d6', 2.2);
-  key.position.set(-420, 700, 300);
-  s.add(key);
-  const fyll = new THREE.DirectionalLight('#ff8a6a', 0.35);
-  fyll.position.set(-500, 220, -320);
-  s.add(fyll);
-  const hud = hudM();
-  const kav = new THREE.MeshStandardMaterial({ map: kavajTex(), roughness: 0.8 });
-  const skj = new THREE.MeshStandardMaterial({ color: '#eceae2', roughness: 0.7 });
-  const g = new THREE.Group();
-  s.add(g);
-  const h = byggHand(1, hud);
-  // handen platt: fingrarna längs −z i g, handflatan neråt
-  h.g.rotation.set(-Math.PI / 2, Math.PI, 0);
-  h.g.position.set(0, 16, 208);
-  g.add(h.g);
-  bojFingrar(h, 0.14, 0, 1);
-  const ma = new THREE.Mesh(new THREE.CylinderGeometry(50, 53, 36, 20), skj);
-  ma.rotation.x = Math.PI / 2;
-  ma.position.set(0, 18, 224);
-  g.add(ma);
-  const arm = new THREE.Mesh(new THREE.CylinderGeometry(112, 60, 760, 22), kav);
-  arm.rotation.x = Math.PI / 2;
-  arm.position.set(0, 36, 224 + 18 + 380);
-  g.add(arm);
-  const fl = new THREE.Mesh(new THREE.PlaneGeometry(1, 1), new THREE.MeshBasicMaterial({ map: flack(), transparent: true, depthWrite: false }));
-  fl.rotation.x = -Math.PI / 2;
-  fl.scale.set(300, 1300, 1);
-  fl.position.set(26, 1, 620);
-  g.add(fl);
-  const cam = new THREE.PerspectiveCamera(30, 1, 50, 6000);
-  const ray = new THREE.Raycaster();
-  const golv = new THREE.Plane(new THREE.Vector3(0, 1, 0), 0);
-  function satt(sm) {
-    const L = sm ? LAGE.smal : LAGE.bred;
-    const B = L.box;
-    Object.assign(c.style, { left: `${B.x}px`, top: `${B.y}px`, width: `${B.w}px`, height: `${B.h}px` });
-    r.setSize(B.w, B.h, false);
-    const D = 1400;
-    const ELEV = 34 * DEG;
-    const fw = 2 * Math.max(L.o.x - B.x, B.x + B.w - L.o.x);
-    const fh = 2 * Math.max(L.o.y - B.y, B.y + B.h - L.o.y);
-    cam.fov = 2 * Math.atan(fh / 2 / D) / DEG;
-    cam.aspect = fw / fh;
-    cam.position.set(0, D * Math.sin(ELEV), D * Math.cos(ELEV));
-    cam.lookAt(0, 0, 0);
-    cam.setViewOffset(fw, fh, B.x - (L.o.x - fw / 2), B.y - (L.o.y - fh / 2), B.w, B.h);
-    cam.updateMatrixWorld();
-    const pa = ([px, py]) => {
-      ray.setFromCamera(new THREE.Vector2(((px - B.x) / B.w) * 2 - 1, 1 - ((py - B.y) / B.h) * 2), cam);
-      return ray.ray.intersectPlane(golv, new THREE.Vector3());
-    };
-    const sp = pa(L.spets);
-    const dir = sp.clone().sub(pa(L.bas)).setY(0).normalize();
-    g.position.set(sp.x, 0, sp.z);
-    g.quaternion.setFromUnitVectors(new THREE.Vector3(0, 0, -1), dir);
-    g.scale.setScalar(L.sk);
-    r.render(s, cam);
-  }
-  satt(smal);
-  // Fingrarna trummar: från lillfingret till pekfingret, två varv.
-  let raf = 0;
-  function trumma() {
-    if (raf) return;
-    const t0 = performance.now();
-    const steg = (ms) => {
-      const t = (ms - t0) / 1000;
-      if (t > 0.86) {
-        bojFingrar(h, 0.14, 0, 1);
-        r.render(s, cam);
-        raf = 0;
-        return;
-      }
-      h.leder.forEach((led, i) => {
-        // var finger lyfter och faller i sin tur
-        const f = ((t * 3.2) % 1) * 4 - (3 - i);
-        const lyft = f > 0 && f < 1 ? Math.sin(f * Math.PI) : 0;
-        led[0].rotation.x = 0.14 * 1.35 + 0.08 - lyft * 0.42;
-        led[1].rotation.x = 0.14 * 1.5 + 0.12 + lyft * 0.1;
-      });
-      r.render(s, cam);
-      raf = requestAnimationFrame(steg);
-    };
-    raf = requestAnimationFrame(steg);
-  }
-  return {
-    trumma,
-    satt,
-    kval: 0,
-    borta() { cancelAnimationFrame(raf); r.dispose(); r.forceContextLoss(); c.remove(); },
-  };
-}
 
 // ---------- figuren ----------
 
@@ -504,7 +302,7 @@ export async function figuren(duk, { hog = false, latt = false, pr = 1 } = {}) {
   const SB = W_(987, 800, 8);
   const LA = ARM.LA;
   const LB = ARM.LB;
-  // handen på disken: så står han när man kommer, med samma hand som syns på pulten
+  // handen på disken: så står han när man kommer
   const DISK = [[-120, TOPP + 74, 430], [-0.95, -0.42, -0.1], [0.62, -0.1, 0.78], [0.12, -0.99, -0.05], 0.08, 0];
   // [t, handled, armbågens riktning, fingrarna, handflatan, krok, peka]
   const VA = [
