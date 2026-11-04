@@ -3755,7 +3755,11 @@ vet vem du är, och man svarar genom att välja en match. Då frågar han tillba
 veta, eller ska du gissa?*), och först *Lär mig* tar fram analysen (knappen lottas som hans repliker: också *Jag lyssnar och
 lär* och *Upplys mig*), så att ett felklick varken
 beställer en betald text eller visar ett tips. *Jag gissar* går tillbaka till listan och
-*Matchbladet* till matchen. Han har alltid svaret, både när texten redan finns (*Den har jag tittat på*, `GET
+*Matchbladet* till matchen. Svaren står direkt under hans fråga: *Lär mig* som en knapp i guld,
+*Jag gissar* med en ljus ram bredvid och *Matchbladet* som en länk under dem. Frågan har sin plats
+från början, osynlig tills han säger den, så att knapparna inte flyttar sig. Förut stod svaren som
+små länkar längst ned i spalten och syntes knappt i telefonen (ändrat 2026-11-04). *Nästa match*
+efter analysen är samma guldknapp. Han har alltid svaret, både när texten redan finns (*Den har jag tittat på*, `GET
 …/hasse`) och när den måste skrivas (*Den knäckte jag i morse*); att han läser på märks först
 medan han väntar. Rader där du redan har fått tecknen öppnas
 direkt. När du har bett om analysen fortsätter han prata medan den tas fram (raderna kommer i ordning: *Vi börjar bakifrån*, *Total kontroll*, *Det här
