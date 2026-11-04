@@ -5,7 +5,10 @@
 // data/skoldar.json (lagnamn → [ESPN-id, mörk finns]); Skoldar.img(namn)
 // ger skölden i en ruta av fast storlek, så att namnen står i linje även när
 // ett lag saknar sköld – då är rutan tom. dark = varianten för mörk botten,
-// när laget har en (Tottenhams tupp vit i stället för marinblå).
+// när laget har en (Tottenhams tupp vit i stället för marinblå). Bilderna
+// hämtas när de syns (loading="lazy"): matchlistan ritas i sin dolda flik också
+// när tobaksaffären står framme, och dess ~100 sköldar (0,9 MB) trängde annars
+// undan gänget på långsamt nät. rum.js släpper dem när gänget står där.
 //
 // Läses före sidornas egna skript.
 
@@ -19,7 +22,7 @@
   function img(name, { dark = false } = {}) {
     const t = lag[name];
     const src = t ? `skoldar/${t[0]}${dark && t[1] ? '-m' : ''}.png` : '';
-    return `<span class="skold" aria-hidden="true">${src ? `<img src="${src}" alt="" decoding="async">` : ''}</span>`;
+    return `<span class="skold" aria-hidden="true">${src ? `<img src="${src}" alt="" loading="lazy" decoding="async">` : ''}</span>`;
   }
 
   // finns en sköld för laget? (lagrutan visar annars initialerna)

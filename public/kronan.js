@@ -136,7 +136,7 @@ window.Kronan = (() => {
       return `<div class="kr-fig kr-noimg"><span class="kr-ini">${esc2(p.id)}</span>${extra}</div>`;
     }
     return `<div class="kr-fig" style="--hx:${k.hx}%;--sy:${k.sy}%">` +
-      `<img src="${k.bild}" alt="" draggable="false">${extra}</div>`;
+      `<img src="${k.bild}" alt="" loading="lazy" draggable="false">${extra}</div>`;
   }
 
   // Scenen: oraklet på sockeln i solstrålarna, Ikaros på väg upp mot solen

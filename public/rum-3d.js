@@ -92,6 +92,7 @@ import * as THREE from 'three';
 import { utanSkuggor } from './rum-gpu.js';
 import { RoomEnvironment } from 'three/addons/environments/RoomEnvironment.js';
 import { RoundedBoxGeometry } from 'three/addons/geometries/RoundedBoxGeometry.js';
+import { mergeGeometries } from 'three/addons/utils/BufferGeometryUtils.js';
 import { ol } from './rum-fika.js';
 import { festen, drakt, festklader } from './rum-fest.js';
 import { TECKEN, LOS, blanda, nasta as nastaTecken } from './rum-tecken.js';
@@ -264,25 +265,33 @@ export async function figurer(canvas, opt = {}) {
   const LATT = matchMedia('(max-width: 700px), (max-height: 500px)').matches;
   const SKUGGA = LATT ? 1024 : 2048;
   const SMA_SKUGGA = 7;
+  // hur fint de ritas (kval nedan)
+  const Q = { skugga: 1, n: 0, enkel: Boolean(opt.enkel) };
+  const HEMI_ENKEL = 3;
   // hur många trianglar de byggs av (detalj i KVAL i rum.js): håret, huvudena
   // och de runda delarna har färre när datorn inte hinner med – gänget var
   // drygt 700 000 trianglar, två gånger per bild med skuggorna
   let DET = opt.detalj || 1;
   const seg = (n, min) => Math.max(min, Math.round(n * DET));
-  const r = new THREE.WebGLRenderer({ canvas, alpha: true, antialias: !LATT, preserveDrawingBuffer: !LATT });
+  // (kantutjämning bara när datorn hinner med från början, kant i rum.js: den går
+  // inte att stänga av sedan, och den är dyr på en svag grafikkrets)
+  const r = new THREE.WebGLRenderer({ canvas, alpha: true, antialias: !LATT && opt.kant !== false });
   const PR = LATT ? 1.5 : Math.min(window.devicePixelRatio || 1, 2);
   r.setPixelRatio(PR);
   r.setSize(W, H, false);
   r.toneMapping = THREE.ACESFilmicToneMapping;
   r.toneMappingExposure = 1.05;
   const POWERVR = utanSkuggor(r);
-  r.shadowMap.enabled = !POWERVR;
+  r.shadowMap.enabled = !POWERVR && !opt.enkel;
   r.shadowMap.type = THREE.PCFSoftShadowMap;
   const scene = new THREE.Scene();
-  const pmrem = new THREE.PMREMGenerator(r);
-  if (LATT) pmrem._setSize = (n) => THREE.PMREMGenerator.prototype._setSize.call(pmrem, Math.min(n, 128));
-  scene.environment = pmrem.fromScene(new RoomEnvironment(), 0.04).texture;
-  pmrem.dispose();
+  // (det enkla ljuset, enkeltLjus nedan, klarar sig utan miljön)
+  if (!opt.enkel) {
+    const pmrem = new THREE.PMREMGenerator(r);
+    if (LATT) pmrem._setSize = (n) => THREE.PMREMGenerator.prototype._setSize.call(pmrem, Math.min(n, 128));
+    scene.environment = pmrem.fromScene(new RoomEnvironment(), 0.04).texture;
+    pmrem.dispose();
+  }
   const cam = new THREE.PerspectiveCamera(2 * Math.atan(H / 2 / D) / DEG, W / H, 50, 5000);
   cam.position.set(0, 0, D);
   cam.lookAt(0, 0, 0);
@@ -337,7 +346,7 @@ export async function figurer(canvas, opt = {}) {
   catcher.rotation.x = -Math.PI / 2;
   catcher.position.set(-170, SILL, -24);
   catcher.receiveShadow = true;
-  catcher.visible = !POWERVR;
+  catcher.visible = !POWERVR && !opt.enkel;
   root.add(catcher);
 
   const mat = (color, o = {}, sort) => {
@@ -1675,7 +1684,109 @@ export async function figurer(canvas, opt = {}) {
     }
     return o;
   };
-  FIGS.forEach((F, i) => figs.push(utanSmaSkuggor(build(sitt(F, PLATSER[(i + n) % 3]), dress(F.key, opt.vader)))));
+
+  // Gänget är ett par hundra delar, och varje del är ett ritanrop: i en svag
+  // telefon är det de anropen, i koden här och i webbläsarens grafikprocess, som
+  // tar tiden. Delar som sitter fast på samma led och bara skiljer sig i färgen
+  // slås ihop till en (färgen per hörn), så att det ser likadant ut. Det som
+  // figuren flyttar för sig (allt som står i o, o.arms och userData) och det
+  // med bilder eller genomskinlighet får vara i fred. Inte på steg 0: där är det
+  // inte anropen som är problemet.
+  const KARTOR = ['map', 'alphaMap', 'normalMap', 'roughnessMap', 'metalnessMap', 'aoMap', 'emissiveMap', 'lightMap', 'clearcoatMap', 'sheenColorMap', 'sheenRoughnessMap'];
+  function delNyckel(x) {
+    const m = x.material;
+    const g = x.geometry;
+    if (!x.isMesh || !m || Array.isArray(m) || !m.isMeshStandardMaterial || m.transparent || m.vertexColors || m.alphaTest) return null;
+    if (KARTOR.some((k) => m[k]) || !g.index || Object.keys(g.attributes).sort().join() !== 'normal,position,uv') return null;
+    x.updateMatrix();
+    if (x.children.length || x.matrix.determinant() <= 0) return null;
+    return [m.type, m.side, m.roughness, m.metalness, m.envMapIntensity, m.clearcoat, m.clearcoatRoughness, m.sheen, m.sheenRoughness, m.sheen ? m.sheenColor.getHex() : 0,
+      m.emissive.getHex(), m.emissiveIntensity, m.bumpMap ? m.bumpMap.uuid : '', m.bumpScale, m.polygonOffset, m.depthWrite, x.castShadow, x.receiveShadow, x.renderOrder, x.visible].join('|');
+  }
+  function slaIhopUnder(rot, skydd) {
+    const foraldrar = [];
+    rot.traverse((x) => { if (x.children.length > 1) foraldrar.push(x); });
+    for (const p of foraldrar) {
+      const grupper = new Map();
+      for (const x of p.children) {
+        if (skydd.has(x)) continue;
+        const k = delNyckel(x);
+        if (!k) continue;
+        if (!grupper.has(k)) grupper.set(k, []);
+        grupper.get(k).push(x);
+      }
+      for (const delar of grupper.values()) {
+        if (delar.length < 2) continue;
+        const g = mergeGeometries(delar.map((x) => {
+          const d = x.geometry.clone().applyMatrix4(x.matrix);
+          const n = d.attributes.position.count;
+          const f = new Float32Array(n * 3);
+          const c = x.material.color;
+          for (let i = 0; i < n; i++) { f[i * 3] = c.r; f[i * 3 + 1] = c.g; f[i * 3 + 2] = c.b; }
+          d.setAttribute('color', new THREE.BufferAttribute(f, 3));
+          return d;
+        }), false);
+        if (!g) continue;
+        const m = delar[0].material.clone();
+        m.vertexColors = true;
+        m.color.set('#ffffff');
+        const hel = new THREE.Mesh(g, m);
+        hel.castShadow = delar[0].castShadow;
+        hel.receiveShadow = delar[0].receiveShadow;
+        hel.renderOrder = delar[0].renderOrder;
+        for (const x of delar) { p.remove(x); x.geometry.dispose(); }
+        p.add(hel);
+      }
+    }
+  }
+  function slaIhop(o) {
+    if ((!LATT && DET >= 1) || /[?&]rum-hel\b/.test(location.search)) return o;
+    const skydd = new Set();
+    const sok = (v, d) => {
+      if (!v || typeof v !== 'object' || d > 5) return;
+      if (v.isObject3D) {
+        skydd.add(v);
+        sok(v.userData, d + 1);
+      } else if (Array.isArray(v)) {
+        for (const x of v) sok(x, d + 1);
+      } else if (Object.getPrototypeOf(v) === Object.prototype) {
+        for (const x of Object.values(v)) sok(x, d + 1);
+      }
+    };
+    sok(o, 0);
+    o.fig.traverse((x) => sok(x.userData, 1));
+    // (högtidens bonad flyttar sina delar själv, H.tick)
+    if (o.H && o.H.grupp) o.H.grupp.traverse((x) => skydd.add(x));
+    slaIhopUnder(o.fig, skydd);
+    return o;
+  }
+
+  // Det enkla ljuset, det lägsta steget (enkel i KVAL i rum.js): figurerna utan
+  // miljö, skuggkarta och de svaga lamporna, och tygerna utan knottror och
+  // lack. Mätt med mjukvarugrafik är miljön och skuggorna det dyraste i varje
+  // bild. Himlen (hemi) tar över en del av det ljus som försvinner.
+  const FYLLER = [tvLjus, term, fill];
+  function enkelMaterial(rot) {
+    rot.traverse((x) => {
+      const m = x.material;
+      if (!m || Array.isArray(m) || !m.isMeshStandardMaterial) return;
+      m.bumpMap = null;
+      if (m.isMeshPhysicalMaterial) { m.clearcoat = 0; m.sheen = 0; }
+      m.needsUpdate = true;
+    });
+  }
+  function enkeltLjus() {
+    Q.enkel = true;
+    scene.environment = null;
+    r.shadowMap.enabled = false;
+    catcher.visible = false;
+    for (const l of FYLLER) l.visible = false;
+    enkelMaterial(scene);
+    hemi.intensity = hemiDag * HEMI_ENKEL;
+  }
+  if (opt.enkel) for (const l of FYLLER) l.visible = false;
+  const klar = (o) => { slaIhop(utanSmaSkuggor(o)); if (Q.enkel) enkelMaterial(o.fig); return o; };
+  FIGS.forEach((F, i) => figs.push(klar(build(sitt(F, PLATSER[(i + n) % 3]), dress(F.key, opt.vader)))));
 
   // D: kläderna (dress)
   function build(F, D) {
@@ -3256,7 +3367,7 @@ export async function figurer(canvas, opt = {}) {
     const natt = nattW(t);
     key.intensity = KEY * (1 - 0.86 * natt);
     fill.intensity = FILL * (1 - 0.6 * natt);
-    hemi.intensity = hemiDag * (1 - 0.55 * natt);
+    hemi.intensity = hemiDag * (Q.enkel ? HEMI_ENKEL : 1) * (1 - 0.55 * natt);
     const tv = Math.max(tvW(t), 0.55 * natt);
     tvLjus.intensity = tv > 0 ? TVLJUS * tv * (0.86 + 0.08 * Math.sin(t * 2.3) + 0.06 * Math.sin(t * 13.1 + Math.sin(t * 3.7))) : 0;
     pivot.rotation.y = mx * 4.5 * DEG;
@@ -3271,8 +3382,8 @@ export async function figurer(canvas, opt = {}) {
   // skuggorna räknade var skugga:e bild – figurerna rör sig lite, så att
   // skuggorna hänger med ändå – och figurerna byggda av färre trianglar
   // (detalj; de byggs om som när kläderna byts, ute).
-  const Q = { skugga: 1, n: 0 };
-  function kval({ pr = 1, skugga = 1, detalj = 1 } = {}) {
+  function kval({ pr = 1, skugga = 1, detalj = 1, enkel = false } = {}) {
+    if (enkel && !Q.enkel) enkeltLjus();
     if (detalj !== DET) {
       DET = detalj;
       for (const o of figs) o.key = null;
@@ -3343,7 +3454,7 @@ export async function figurer(canvas, opt = {}) {
       root.remove(o.fig);
       o.fig.traverse((x) => { if (x.geometry) x.geometry.dispose(); });
       ombyggda.push(o.fig);
-      figs[i] = Object.assign(utanSmaSkuggor(build(o.F, D)), { inneAt: o.inneAt });
+      figs[i] = Object.assign(klar(build(o.F, D)), { inneAt: o.inneAt });
     });
     for (const sk of smokers) {
       const o = figs.find((x) => x.F === sk.o.F);
@@ -3519,5 +3630,12 @@ export async function figurer(canvas, opt = {}) {
     return o ? headIn(o).toArray() : null;
   }
 
+  if (opt.enkel) enkelMaterial(scene);
+  // Grafikprogrammen byggs i bakgrunden innan gänget ritas första gången: annars
+  // står huvudtråden still medan grafikdrivern arbetar, och rummet svarar inte på
+  // fingret så länge.
+  try {
+    await r.compileAsync(scene, cam);
+  } catch (err) { /* då byggs de när gänget ritas, som förut */ }
   return { draw, inne, ute, lage, mal, spel, prova, pekar, hej, vald, tecken, natt, efter, under, huvud, kval };
 }

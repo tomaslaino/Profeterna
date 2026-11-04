@@ -385,7 +385,7 @@ window.RumAnslag = (() => {
   }
 
   function wall() {
-    return '<i class="ans-flack"></i><i class="ans-skugga"></i><span class="ans-tavla" id="ans-vagg"></span>' +
+    return '<i class="ans-flack"></i><i class="ans-skugga"><i></i></i><span class="ans-tavla" id="ans-vagg"></span>' +
       '<i class="ans-hj" data-hj="0"></i><i class="ans-hj" data-hj="1"></i><i class="ans-hj" data-hj="2"></i><i class="ans-hj" data-hj="3"></i>';
   }
   function nara() {
@@ -449,13 +449,21 @@ window.RumAnslag = (() => {
       });
       return A.loading;
     }
-    // matchernas filer (formen, skadorna) hämtas när tavlan tas fram
+    // matchernas filer (formen, skadorna) hämtas när tavlan tas fram, och de
+    // som kommer nära varandra ritas tillsammans
+    function rita() {
+      if (A.ritT) return;
+      A.ritT = setTimeout(() => {
+        A.ritT = 0;
+        draw();
+      }, 100);
+    }
     function loadMatches() {
       for (const m of A.ms) {
         if (A.match.has(m.id)) continue;
         A.match.set(m.id, undefined);
-        getJSON(`data/match/${encodeURIComponent(m.id)}.json`).then((d) => { A.match.set(m.id, d); draw(); })
-          .catch(() => { A.match.set(m.id, null); draw(); });
+        getJSON(`data/match/${encodeURIComponent(m.id)}.json`).then((d) => { A.match.set(m.id, d); rita(); })
+          .catch(() => { A.match.set(m.id, null); rita(); });
       }
     }
 
@@ -483,7 +491,14 @@ window.RumAnslag = (() => {
       return { ark, veil, key, n };
     }
 
+    // Medan tavlan flyger ritas inget (landat): filerna kommer just då, och
+    // varje ombyggnad stoppade flygturen. Sedan byts bara lapparna som har
+    // ändrats.
     function draw() {
+      if (A.flyger) {
+        A.ritaSen = true;
+        return;
+      }
       fitWall();
       const D = data();
       A.D = D;
@@ -497,10 +512,23 @@ window.RumAnslag = (() => {
       const h = JSON.stringify([A.sheets, inner]);
       if (h === A.html) return;
       A.html = h;
+      const nu = A.inner;
       A.inner = inner;
       stopFlip();
-      vagg.innerHTML = board(A.W, inner, A.sheets, A.top, true);
-      stor.innerHTML = board(A.W, inner, A.sheets, A.top, false);
+      const hela = `${seed}|${A.sheets}`;
+      if (hela === A.hela) {
+        for (const n of A.W.notes) {
+          if (JSON.stringify(nu[n.id]) === JSON.stringify(inner[n.id])) continue;
+          const lapp = sheetsHtml(n, inner[n.id], A.sheets, A.top);
+          for (const b of [vagg, stor]) b.querySelector(`[data-lapp="${n.id}"]`).innerHTML = lapp;
+        }
+        // (bläddrades det just stannar bladen där de ska ligga, stopFlip)
+        for (const el of lapparna()) stack(el, A.top);
+      } else {
+        A.hela = hela;
+        vagg.innerHTML = board(A.W, inner, A.sheets, A.top, true);
+        stor.innerHTML = board(A.W, inner, A.sheets, A.top, false);
+      }
       measure();
       if (A.lyft) {
         const n = A.W.notes.find((x) => x.id === A.lyft.id);
@@ -648,6 +676,13 @@ window.RumAnslag = (() => {
       cancelAnimationFrame(A.raf);
       if (A.fa) A.fa.cancel();
       A.fa = null;
+      landat();
+    }
+    function landat() {
+      A.flyger = false;
+      if (!A.ritaSen) return;
+      A.ritaSen = false;
+      draw();
     }
     // Tavlans hörn t in på vägen.
     function hornPa({ from, to }, t) {
@@ -659,6 +694,7 @@ window.RumAnslag = (() => {
     }
     function fly(from, to, ms) {
       stopFly();
+      A.flyger = true;
       const bana = (A.bana = { from, to, ms });
       const at = (t) => warp(hornPa(bana, t), BW, BH);
       const n = Math.max(12, Math.round(ms / 20));
@@ -673,6 +709,7 @@ window.RumAnslag = (() => {
             a.cancel();
             A.fa = null;
             A.flygKlar = null;
+            landat();
             done();
           }, () => {});
         };

@@ -51,8 +51,8 @@
 /* bildrörets kåpa: grå plast med luftspringor */
 .tv-kapa { background: repeating-linear-gradient(90deg, rgba(0, 0, 0, 0) 0 9px, rgba(0, 0, 0, 0.6) 9px 11px), linear-gradient(180deg, #2e2f32, #1b1c1e); }
 .k-topp { left: 40px; top: 24px; width: 212px; height: 22px; transform: translateZ(-105px) rotateX(-90deg); }
-.k-botten { left: 40px; top: 172px; width: 212px; height: 22px; transform: translateZ(-105px) rotateX(-90deg); filter: brightness(0.55); }
-.k-vanster { left: 40px; top: 24px; width: 22px; height: 148px; transform: translateZ(-105px) rotateY(90deg); filter: brightness(0.75); }
+.k-botten { left: 40px; top: 172px; width: 212px; height: 22px; transform: translateZ(-105px) rotateX(-90deg); background: linear-gradient(rgba(0, 0, 0, 0.45), rgba(0, 0, 0, 0.45)), repeating-linear-gradient(90deg, rgba(0, 0, 0, 0) 0 9px, rgba(0, 0, 0, 0.6) 9px 11px), linear-gradient(180deg, #2e2f32, #1b1c1e); }
+.k-vanster { left: 40px; top: 24px; width: 22px; height: 148px; transform: translateZ(-105px) rotateY(90deg); background: linear-gradient(rgba(0, 0, 0, 0.25), rgba(0, 0, 0, 0.25)), repeating-linear-gradient(90deg, rgba(0, 0, 0, 0) 0 9px, rgba(0, 0, 0, 0.6) 9px 11px), linear-gradient(180deg, #2e2f32, #1b1c1e); }
 .k-hoger { left: 252px; top: 24px; width: 22px; height: 148px; transform: translateZ(-105px) rotateY(90deg); }
 .k-bak { left: 40px; top: 24px; width: 212px; height: 148px; transform: translateZ(-127px); }
 
@@ -60,8 +60,8 @@
 .tv-hylla { position: absolute; transform-origin: 0 0; background: linear-gradient(180deg, #2b2a28, #121110); }
 .h-botten { left: -5px; top: 200px; width: 302px; height: 116px; transform: translateZ(5px) rotateX(-90deg); background: linear-gradient(180deg, #232220, #0c0c0b); }
 .h-fram { left: -5px; top: 191px; width: 302px; height: 9px; transform: translateZ(5px); box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.16); }
-.h-vanster { left: -5px; top: 191px; width: 116px; height: 9px; transform: translateZ(5px) rotateY(90deg); filter: brightness(0.7); }
-.h-hoger { left: 297px; top: 191px; width: 116px; height: 9px; transform: translateZ(5px) rotateY(90deg); filter: brightness(0.85); }
+.h-vanster { left: -5px; top: 191px; width: 116px; height: 9px; transform: translateZ(5px) rotateY(90deg); background: linear-gradient(rgba(0, 0, 0, 0.3), rgba(0, 0, 0, 0.3)), linear-gradient(180deg, #2b2a28, #121110); }
+.h-hoger { left: 297px; top: 191px; width: 116px; height: 9px; transform: translateZ(5px) rotateY(90deg); background: linear-gradient(rgba(0, 0, 0, 0.15), rgba(0, 0, 0, 0.15)), linear-gradient(180deg, #2b2a28, #121110); }
 
 /* armen: en fyrkantsprofil från leden bakom tv:n till väggplattan, och
    sladden som hänger i en kort båge från armen till uttaget strax under

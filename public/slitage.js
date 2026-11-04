@@ -438,7 +438,15 @@
     requestAnimationFrame(scan);
   }
   const sizes = new ResizeObserver(later);
-  new MutationObserver(later).observe(document.body, { childList: true, subtree: true });
+  // (bara när något händer i ett papper eller ett nytt papper kommer: i rummet
+  // ändras saker hela tiden, och varje genomgång mäter alla papper)
+  new MutationObserver((rs) => {
+    for (const r of rs) {
+      if (r.target.closest && r.target.closest(SEL)) return later();
+      for (const n of r.addedNodes) if (n.querySelector && (n.matches(SEL) || n.querySelector(SEL))) return later();
+    }
+    return undefined;
+  }).observe(document.body, { childList: true, subtree: true });
   window.addEventListener('hashchange', later);
   later();
 })();

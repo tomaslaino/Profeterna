@@ -89,6 +89,14 @@
   opacity: var(--dagsljus, 0);
   transition: opacity 0.6s;
 }
+/* I telefonen utan blandningsläge: soft-light läser in allt som är ritat bakom
+   i varje bildruta och kräver två extra pass över hela skärmen. Lagt ovanpå som
+   vanligt blir det samma ljus med en bråkdel av täckningen. */
+@media (max-width: 700px), (max-height: 500px) {
+  .rum-dagsljus { mix-blend-mode: normal; opacity: calc(var(--dagsljus, 0) * 0.2); }
+  /* (blixtens nyckelbilder har full styrka: blixten syns på gatan i stället) */
+  .rum.aska .rum-dagsljus { animation: none; }
+}
 
 @media (prefers-reduced-motion: reduce) {
   .rum-ute *, .rum-ute *::before, .rum-ute *::after { animation: none; }

@@ -980,13 +980,47 @@ window.RumUte = (() => {
     }
   }
 
+  // Himlen på samma sätt i telefonen: en gradient som täcker hela utsikten tog 10 MB
+  // av ritminnet, fast den bara syns genom fönstret. SVG:n ligger kvar, dold, så att
+  // nästa ändring (paint) har något att skriva i.
+  async function bakaHimmel(x) {
+    const gen = (x._gen = (x._gen || 0) + 1);
+    const k = x.cloneNode(true);
+    k.removeAttribute('style');
+    k.removeAttribute('class');
+    k.setAttribute('width', 1600);
+    k.setAttribute('height', 1000);
+    const text = new XMLSerializer().serializeToString(k);
+    const ids = new Set([...text.matchAll(/url\(#([\w-]+)\)/g)].map((m) => m[1]));
+    const defs = [...ids].map((id) => (document.getElementById(id) || {}).outerHTML || '').join('');
+    const url = URL.createObjectURL(new Blob([text.replace('>', `><defs>${defs}</defs>`)], { type: 'image/svg+xml' }));
+    try {
+      const img = new Image();
+      img.src = url;
+      await img.decode();
+      if (x._gen !== gen || !x.isConnected) return;
+      const c = x._duk || document.createElement('canvas');
+      c.className = 'rum-layer';
+      c.style.cssText = 'width:1600px; height:1000px';
+      c.width = 1600 * GATA;
+      c.height = 1000 * GATA;
+      c.getContext('2d').drawImage(img, 0, 0, c.width, c.height);
+      img.src = '';
+      if (!x._duk) x.after(c);
+      x._duk = c;
+      x.style.display = 'none';
+    } catch { /* då står SVG:n kvar */ } finally {
+      URL.revokeObjectURL(url);
+    }
+  }
+
   // Ställningarna efter t ms (rum.js: i gängets takt, eller den fasta
   // tiden i en stillbild); bara det som syns genom fönstret och dörren.
   // Var en figur är läses bara för en figur i taget: i Safari räknar varje
   // läsning (getComputedTiming) om stilen, och med den alla rummets lager om
   // något har ändrats. Däremellan räknas läget fram ur farten.
   let tur = 0;
-  function takt(el, t) {
+  function takt(el, t, glesa = true) {
     if (!el || !el._duk) return;
     const [X0, X1] = el._x || [-Infinity, Infinity];
     const nu = performance.now();
@@ -1007,7 +1041,7 @@ window.RumUte = (() => {
           if (x + f.w + f.P < X0 || x - f.P > X1) return;
         }
       }
-      if (LATT && !fast && (i + tur) % 2) return;
+      if (LATT && !fast && glesa && (i + tur) % 2) return;
       rita(f, fast ? t : (document.timeline.currentTime || 0) - f.t0);
     });
   }
@@ -1043,6 +1077,7 @@ window.RumUte = (() => {
       x.innerHTML = draw[k]();
       if (k === 'liv' || k === 'himliv') el._dukar[k] = duka(x, s);
       if (k === 'gata' && LATT) bakaGata(x);
+      if (k === 'himmel' && LATT) bakaHimmel(x);
       changed = true;
     }
     el._duk = [...(el._dukar.liv || []), ...(el._dukar.himliv || [])];

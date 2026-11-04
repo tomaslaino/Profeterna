@@ -34,6 +34,7 @@
 // vagg: tavlornas mått på högra väggen, VAGG i rum.js)
 
 import { SKIVA, skivPlats } from './rum-affischer.js';
+import { ROR as NEON_ROR } from './rum-neon.js';
 
 const DEG = Math.PI / 180;
 const WZ = -26;
@@ -101,18 +102,45 @@ export async function inredning(el, opt = {}) {
     return t;
   }
 
+  // Neonens sken är ritat i duken. Som filter på duken (tre skuggor i rad)
+  // räknades oskärpan om på grafikkortet i varje bildruta, flera pass i full
+  // upplösning för något som bara ändras när skylten glappar – och då sköter
+  // opaciteten det (.av i rum.css). Skuggorna här är samma skuggor och görs en
+  // gång (spridningen i filtret är standardavvikelsen, och shadowBlur är dubbla
+  // den). SKEN_M: rum runt rören, i planets px.
+  const SKEN_M = 50;
+  function medSken(g, bild, m, pr) {
+    let sist = bild;
+    let x = m;
+    let y = m;
+    for (const [blur, farg] of [[2, 'rgba(255,80,60,1)'], [6, 'rgba(255,45,31,.9)'], [16, 'rgba(255,45,31,.6)']]) {
+      const c = document.createElement('canvas');
+      c.width = g.canvas.width;
+      c.height = g.canvas.height;
+      const t = c.getContext('2d');
+      t.shadowColor = farg;
+      t.shadowBlur = 2 * blur * pr;
+      t.drawImage(sist, x, y);
+      sist = c;
+      x = 0;
+      y = 0;
+    }
+    g.drawImage(sist, 0, 0);
+  }
+
   // En sak: en scen med kamera och ljus, och duken den kopieras till.
   function bit(namn, cam, parent) {
     const { box } = BITAR[namn];
     const canvas = document.createElement('canvas');
     // neonen glappar som förut (rum-neon, .av i rum.css)
     canvas.className = `rum-inr${namn === 'neon' ? ' rum-neon' : ''}`;
-    canvas.width = Math.round(box.w * DPR);
-    canvas.height = Math.round(box.h * DPR);
+    // (neonens sken ritas i duken, utanför rören: medSken)
+    const M = namn === 'neon' ? SKEN_M : 0;
+    canvas.width = Math.round((box.w + 2 * M) * DPR);
+    canvas.height = Math.round((box.h + 2 * M) * DPR);
     let pr = DPR;
     const at = parent ? BITAR[namn].at : { x: 0, y: 0 };
-    Object.assign(canvas.style, { position: 'absolute', pointerEvents: 'none', left: `${box.x - at.x}px`, top: `${box.y - at.y}px`, width: `${box.w}px`, height: `${box.h}px` });
-    if (namn === 'neon') canvas.style.filter = 'drop-shadow(0 0 2px rgba(255,80,60,1)) drop-shadow(0 0 6px rgba(255,45,31,.9)) drop-shadow(0 0 16px rgba(255,45,31,.6))';
+    Object.assign(canvas.style, { position: 'absolute', pointerEvents: 'none', left: `${box.x - at.x - M}px`, top: `${box.y - at.y - M}px`, width: `${box.w + 2 * M}px`, height: `${box.h + 2 * M}px` });
     const pl = parent || planes[BITAR[namn].plan];
     const fore = BITAR[namn].fore && pl.querySelector(`:scope > ${BITAR[namn].fore}`);
     if (fore) pl.insertBefore(canvas, fore);
@@ -126,11 +154,14 @@ export async function inredning(el, opt = {}) {
       paint() {
         // samma storlek som förra gången: duken behöver inte göras om
         if (gl.getPixelRatio() !== pr) gl.setPixelRatio(pr);
-        if (gl.domElement.width !== canvas.width || gl.domElement.height !== canvas.height) gl.setSize(box.w, box.h, false);
+        const gw = Math.round(box.w * pr);
+        const gh = Math.round(box.h * pr);
+        if (gl.domElement.width !== gw || gl.domElement.height !== gh) gl.setSize(box.w, box.h, false);
         gl.render(scene, cam);
         const g = canvas.getContext('2d');
         g.clearRect(0, 0, canvas.width, canvas.height);
-        g.drawImage(gl.domElement, 0, 0, canvas.width, canvas.height);
+        if (M) medSken(g, gl.domElement, M * pr, pr);
+        else g.drawImage(gl.domElement, 0, 0, canvas.width, canvas.height);
         // i telefonen behövs skuggkartan bara medan saken ritas – den ritas
         // sällan om, utom uret varje sekund – och three gör en ny nästa gång
         if (LATT && namn !== 'ur') {
@@ -147,8 +178,8 @@ export async function inredning(el, opt = {}) {
         const p = Math.max(DPR, Math.min(px, SKARP / Math.max(box.w, box.h)));
         if (p === pr) return;
         pr = p;
-        canvas.width = Math.floor(box.w * pr);
-        canvas.height = Math.floor(box.h * pr);
+        canvas.width = Math.floor((box.w + 2 * M) * pr);
+        canvas.height = Math.floor((box.h + 2 * M) * pr);
         this.paint();
       },
     };
@@ -373,95 +404,6 @@ export async function inredning(el, opt = {}) {
     }
   }
 
-  // Neonskylten: skelettet av "Tobak" i Fraunces kursiv. Texten ritas stort,
-  // tunnas ut till en pixel (Zhang–Suen) och följs till linjer, som blir
-  // glasrör med en ljus kärna; seriferna (korta stumpar) tas bort.
-  function skelett(text, px) {
-    const W = Math.ceil(px * 3.2), H = Math.ceil(px * 1.35), base = Math.round(px * 1.02);
-    const c = document.createElement('canvas');
-    c.width = W;
-    c.height = H;
-    const g = c.getContext('2d');
-    g.font = `italic 600 ${px}px Fraunces`;
-    g.textAlign = 'center';
-    g.fillStyle = '#fff';
-    g.fillText(text, W / 2, base);
-    const d = g.getImageData(0, 0, W, H).data;
-    const A = new Uint8Array(W * H);
-    for (let i = 0; i < W * H; i++) A[i] = d[i * 4 + 3] > 110 ? 1 : 0;
-    const N = [[0, -1], [1, -1], [1, 0], [1, 1], [0, 1], [-1, 1], [-1, 0], [-1, -1]];
-    for (let changed = true; changed;) {
-      changed = false;
-      for (const step of [0, 1]) {
-        const del = [];
-        for (let y = 1; y < H - 1; y++) for (let x = 1; x < W - 1; x++) {
-          const i = y * W + x;
-          if (!A[i]) continue;
-          const p = N.map(([dx, dy]) => A[i + dy * W + dx]);
-          const B = p.reduce((a, q) => a + q, 0);
-          if (B < 2 || B > 6) continue;
-          let tr = 0;
-          for (let k = 0; k < 8; k++) if (!p[k] && p[(k + 1) % 8]) tr++;
-          if (tr !== 1) continue;
-          if (step === 0 ? (p[0] * p[2] * p[4] || p[2] * p[4] * p[6]) : (p[0] * p[2] * p[6] || p[0] * p[4] * p[6])) continue;
-          del.push(i);
-        }
-        for (const i of del) A[i] = 0;
-        if (del.length) changed = true;
-      }
-    }
-    // grannarna: de raka, och de sneda bara när ingen rak granne går emellan
-    const nb = (i) => {
-      const x = i % W, y = (i / W) | 0, out = [];
-      for (const [dx, dy] of [[1, 0], [-1, 0], [0, 1], [0, -1]]) if (A[(y + dy) * W + x + dx]) out.push((y + dy) * W + x + dx);
-      for (const [dx, dy] of [[1, 1], [1, -1], [-1, 1], [-1, -1]]) if (A[(y + dy) * W + x + dx] && !A[y * W + x + dx] && !A[(y + dy) * W + x]) out.push((y + dy) * W + x + dx);
-      return out;
-    };
-    const trace = () => {
-      const pix = [];
-      for (let i = 0; i < W * H; i++) if (A[i]) pix.push(i);
-      const node = (i) => nb(i).length !== 2;
-      const seen = new Set();
-      const key = (a, q) => (a < q ? `${a},${q}` : `${q},${a}`);
-      const walk = (a, q) => {
-        const path = [a];
-        let prev = a, cur = q;
-        seen.add(key(a, q));
-        while (!node(cur)) {
-          path.push(cur);
-          const nx = nb(cur).find((n) => n !== prev && !seen.has(key(cur, n)));
-          if (nx == null) break;
-          seen.add(key(cur, nx));
-          prev = cur;
-          cur = nx;
-          if (cur === a) break;
-        }
-        path.push(cur);
-        return path;
-      };
-      const paths = [];
-      for (const i of pix) if (node(i)) for (const n of nb(i)) if (!seen.has(key(i, n))) paths.push(walk(i, n));
-      for (const i of pix) for (const n of nb(i)) if (!seen.has(key(i, n))) paths.push(walk(i, n));
-      return paths;
-    };
-    for (let k = 0; k < 3; k++) {
-      let cut = false;
-      for (const p of trace()) {
-        const a = nb(p[0]).length, q = nb(p[p.length - 1]).length;
-        if (p.length < px * 0.16 && ((a === 1 && q >= 3) || (q === 1 && a >= 3))) {
-          for (const i of (a === 1 ? p.slice(0, -1) : p.slice(1))) A[i] = 0;
-          cut = true;
-        }
-      }
-      if (!cut) break;
-    }
-    return trace().filter((p) => p.length > px * 0.06).map((p) => ({
-      pts: p.map((i) => [i % W - W / 2, ((i / W) | 0) - base]),
-      closed: p[0] === p[p.length - 1],
-      ends: [nb(p[0]).length === 1, nb(p[p.length - 1]).length === 1],
-    }));
-  }
-
   // rören i en egen duk som lyser (rum-neon: den glappar som förut), och
   // ställningen – listen, transformatorn och kedjorna – i takets duk
   function neon(b, tak) {
@@ -469,18 +411,8 @@ export async function inredning(el, opt = {}) {
     const core = new THREE.MeshBasicMaterial({ color: '#ffe0d6', toneMapped: false });
     const ror = glas({ color: '#ff3a26', emissive: '#ff2a18', emissiveIntensity: 1.5, opacity: 0.62, roughness: 0.15, envMapIntensity: 0.5 });
     const elektrod = mat('#3a302a', { roughness: 0.6 });
-    for (const { pts, closed, ends } of skelett('Tobak', px)) {
-      // jämna till och gles ut; spegelvänd, sett inifrån
-      const sm = pts.map((p, i) => {
-        if (!closed && (i < 3 || i > pts.length - 4)) return p;
-        let x = 0, y = 0;
-        for (let j = -4; j <= 4; j++) { const q = pts[(i + j + pts.length) % pts.length]; x += q[0]; y += q[1]; }
-        return [x / 9, y / 9];
-      });
-      const v = [];
-      for (let i = 0; i < sm.length; i += 5) v.push(sm[i]);
-      if (!closed && v[v.length - 1] !== sm[sm.length - 1]) v.push(sm[sm.length - 1]);
-      if (v.length < 2) continue;
+    // (rören är uträknade i förväg, rum-neon.js; spegelvända, sett inifrån)
+    for (const { v, closed, ends } of NEON_ROR) {
       const P = v.map(([x, y]) => new THREE.Vector3(440 - x * k, -(190 + y * k), Z));
       const curve = new THREE.CatmullRomCurve3(P, closed, 'centripetal');
       const n = Math.max(12, Math.round(curve.getLength() / 1.5));
@@ -1286,9 +1218,19 @@ export async function inredning(el, opt = {}) {
     skylt(s);
     B.ram.paint();
   }
-  setNamn('');
-  for (const k of ['tak', 'neon', 'hogra', 'skiva', 'stall', 'disk']) B[k].paint();
-  tick();
+  // En sak i taget, med grafikprogrammen byggda i bakgrunden och en paus emellan:
+  // allt på en gång höll huvudtråden medan grafikkortet arbetade, och rummet svarade
+  // inte på fingret så länge.
+  const paus = () => new Promise((r) => setTimeout(r));
+  for (const k of ['ram', 'ur', 'tak', 'neon', 'hogra', 'skiva', 'stall', 'disk']) {
+    try {
+      await gl.compileAsync(B[k].scene, B[k].cam);
+    } catch (err) { /* då byggs de när saken ritas */ }
+    if (k === 'ram') setNamn('');
+    else if (k === 'ur') tick();
+    else B[k].paint();
+    await paus();
+  }
   // skivans material, för natten: gatan lyser in bakom den, och framsidan ligger i skugga
   const skivMat = new Set();
   B.skiva.scene.traverse((x) => {

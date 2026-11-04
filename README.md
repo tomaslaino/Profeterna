@@ -2620,9 +2620,23 @@ var tionde bild längre än 50 ms (75 ms på steg 1).
   glider den ändå jämnt, `folj` nedan).
 - **Steg 2:** 15 gånger i sekunden, 55 % av bildpunkterna på ledden (aldrig under 0,75 per
   punkt), skuggorna var fjärde bild, ungefär 240 000 trianglar och inget damm i ljuset.
+- **Steg 3:** samma takt, hälften av bildpunkterna på ledden, ungefär 190 000 trianglar och det
+  enkla ljuset (`enkeltLjus` i rum-3d.js och rum-saker.js): ingen skuggkarta, ingen miljö, bara
+  huvudlampan, neonen och fönstret plus mer ljus från himlen, och tygerna utan knottror och lack.
+  Figurerna på gatan rör sig i färre steg (`ute` i `KVAL`).
+
+Från steg 1 är det i datorn som i telefonen: ljuset utan blandningslägen, inget korn, och föremålen
+lyser upp direkt i stället för med en övergång av filtret (`.enkel` i rum.css).
+
+Rummet börjar på rätt steg (`startSteg` i rum.js): i ett svep byggs gänget om för varje steg ner,
+och det är det som hackar mest. Med 4 GB minne eller 4 kärnor börjar det ett steg lägre, med 2 GB
+eller 2 kärnor och med mjukvarugrafik på steg 3, och äldre grafikkretsar (Mali, Adreno, PowerVR, Intel
+HD/UHD) börjar på steg 1 eller 2. Safari säger inget om sådant, där får `kanna` känna efter. Går det under
+45 % av takten hoppar `kanna` direkt till steg 3. Kantutjämningen går inte att stänga av när
+grafiken väl har startat, så den är av när rummet börjar på steg 1 eller lägre.
 
 Steget sparas i webbläsaren (`rum-kval` i localStorage), så att nästa besök börjar där, i tre
-dagar. I telefonen börjar rummet på steg 1. `?rum-kval=0` (`1`, `2`) väljer steget och låser
+dagar. I telefonen börjar rummet på steg 1. `?rum-kval=0` (`1`, `2`, `3`) väljer steget och låser
 det, också med `?rum-t` (som annars har steg 0).
 
 Gänget var det tyngsta för grafikkortet: drygt 700 000 trianglar med klarlack och
@@ -2826,6 +2840,67 @@ högst 0,2 ms. Det används bara för att veta vem man pekar på, så träffytan
 ritats en gång (`slappOmbyggda`), så att shaderprogrammen de nya ska använda inte kastas.
 Förut låg ungefär 13 texturer per ombyggnad kvar tills webbläsaren städade dem.
 
+**Svaga telefoner och datorer (2026-11-04).** En snabb dator visar inte det här. Mätt på tre sätt:
+med mjukvarugrafik (SwiftShader, `--use-angle=swiftshader`) som en svag grafikkrets, med processorn
+fyra gånger långsammare, och med knappt ritminne (`--force-gpu-mem-available-mb=128` och telefonens
+täthet med `--force-device-scale-factor=2.625`). Det sista framkallar flimret: rutor som inte får
+plats i minnet ritas inte, och syns som hål.
+
+- **Flimret.** Hemma tog rummet 216 MB att rita i telefonens täthet (det hade vuxit från 199 med
+  löpsedlarna), och i en billigare telefon får en sida mindre än så. Nu 98 MB. Utöver ljuset ovan:
+  dagsljuset (`dagDuk`), röken under taket, anslagstavlans skugga och himlen ritas på små dukar, och
+  sidans egen bakgrund med gradient, som ligger helt bakom rummet, är borta medan rummet syns
+  (`rum-pa`).
+- **Passen på grafikkortet.** Dagsljuset skulle ha varit utan blandningsläge i telefonen, men rum-ute.css
+  läses efter rum.css och skrev över det, så att allt som ritats bakom lästes in igen i varje bildruta,
+  med två extra pass över hela skärmen. Nu är det rättat, med en femtedel av täckningen, som ger ungefär
+  samma ljus. Neonens sken var tre skuggor i rad som filter, flera pass i varje bildruta; nu ritas de en
+  gång i duken (`medSken` i rum-inredning.js). Anslagstavlans skugga och tv:ns sidor hade också filter på
+  egna lager (nu oskärpa inuti, respektive en mörk toning i bakgrunden). Från 16 till 12 pass per bild och från
+  127 till 74 ytor per bild.
+- **Gänget.** Med mjukvarugrafik är gänget över 100 ms per bild och håller tillbaka hela rummet. Skuggorna
+  lägger till ungefär 120 ms var tredje bild (därav det ryckiga), miljön kostar 40 %, de svaga lamporna
+  ungefär 25 % och bildpunkterna ungefär en tredjedel; klarlacken och tonmappningen nästan inget. Därav steg 3.
+- **Ritanropen.** Delar som sitter på samma led och bara skiljer sig i färgen är en enda mesh med färg per hörn
+  (`slaIhop` i rum-3d.js, inte på steg 0 och inte med `?rum-hel`): från 273 till 194 anrop per bild, utan att det
+  syns. Jämfört i tolv lägen (olika tider, mål, väntan på kupongen, matcher på tv:n, natt, påhitt och tecken):
+  61–76 dB.
+- **Stoppen under laddningen.** Neonens rör räknades ut ur bokstäverna vid varje start, 1,6 sekunder i
+  Chrome som telefon, för samma svar varje gång; nu ligger de färdiga ([public/rum-neon.js](public/rum-neon.js)).
+  Grafikprogrammen byggs i bakgrunden (`compileAsync`), och inredningen målas en sak i taget. Längsta stoppet
+  1,5–2,1 s → 0,34 s och alla långa stopp tillsammans 3,4–4,3 s → 1,9 s, och allt i rummet är klart efter 7,6–8 s i
+  stället för 8,6–9,6.
+- **Väckningarna i telefonen.** Huvudtråden väcks inte när den inget har att göra också i Chrome i telefonen
+  (`TOMMA`), och sakerna och gatan turas om i stället för att ritas varje gång: 43 väckningar i sekunden i
+  stället för 60. Dammet i ljuset, en stor duk som ritas om, är borta i telefonen.
+
+Mätt med gammal och ny kod om vartannat, median:
+
+| | Före | Efter |
+|---|---|---|
+| Mjukvarugrafik som telefon: bilder i sekunden | 18 | 56–58 |
+| Mjukvarugrafik som telefon: bildrutor över 50 ms på 8 s | 85–87 | 0 |
+| Mjukvarugrafik som telefon: gängets bilder i sekunden | 11 | 15–16 |
+| Mjukvarugrafik som telefon: allt klart | 34–36 s | 24–25 s |
+| Mjukvarugrafik som dator (1366 × 768): bilder i sekunden | 4 | 12–13 |
+| Mjukvarugrafik som dator: längsta bildrutan | 283–317 ms | 100–117 ms |
+| Mjukvarugrafik som dator: allt klart | 70–73 s | 50–52 s |
+| Som telefon, 128 MB ritminne: bildrutor med hål hemma | 181 av 181 | 2 av 180 |
+| Som telefon, 128 MB ritminne: bildrutor med hål vid tavlan | 90 av 90 | 2 av 89–90 |
+| Som telefon, processorn × 4: huvudtråden stilla | 202 ms/s | 166 ms/s |
+| Som telefon: grafikprocessen stilla | 50 ms/s | 29 ms/s |
+| Snabb dator: bilder i sekunden | 60 | 60 |
+| Snabb dator: grafikprocessen stilla | 162 ms/s | 138 ms/s |
+
+Delarna går igenom alla närbilder och Hasse Backe utan fel i Chrome som telefon och som dator, och i WebKit i
+telefonstorlek (60 bilder i sekunden stilla, samma tid till klart som förut). Bilderna jämförda hemma: rören i
+neonen är desamma och skenet lika, och dagsljuset i telefonen är lite mattare i det svarta (35,7 dB). På steg 3
+är gänget matt och mjukare, men det är fortfarande de och samma rum.
+
+Prövat utan effekt: planen som `preserve-3d` (fyra pass mindre, men kupongen skär genom pulten, eftersom den lutar i
+rummet), och delar under grupper som ingen flyttar (inga fler ihopslagningar). Inte mätt i en riktig telefon. Kvar:
+vägen fram till videon i telefonen är tyngst (ungefär 40 bilder i sekunden med processorn fyra gånger långsammare, som förut).
+
 ### När något går fel i rummet
 
 - **Matcherna går inte att hämta:** `whenMatches` väntar inte förgäves, och `load` försöker igen
@@ -2957,9 +3032,42 @@ versioner av drivrutinen). Figurerna kastar där ingen skugga, men allt annat se
 telefonen, tre omgångar med riktiga fingerdrag och närbilder, närmare tre minuter: ingen krasch och
 allt på plats. Stilla 60 bilder i sekunden, 95:e percentilen 18–19 ms och längsta bildrutan 19–23 ms; när
 fingret drar 57–58 bilder i sekunden, 20–21 ms och 56–72 ms, 1–4 bildrutor över 50 ms på 5,6 sekunder (före
-ändringarna, då gänget hade kraschat och inte ritades, 52–55 bilder i sekunden och 130–258 ms). Kvar:
-anslagstavlan (174–273 ms och 7–8 bildrutor över 50 ms på vägen fram), och Chrome skriver ibland *tile memory
-limits exceeded*, att minnet för att rita sidan tar slut, vid närbilderna.
+ändringarna, då gänget hade kraschat och inte ritades, 52–55 bilder i sekunden och 130–258 ms). Då var
+anslagstavlan kvar (174–273 ms och 7–8 bildrutor över 50 ms på vägen fram), och Chrome skrev ibland *tile memory
+limits exceeded*, att minnet för att rita sidan tar slut, vid närbilderna; se de tre följande styckena.
+
+**Gänget före sköldarna:** drygt 90 lagsköldar i de dolda flikarna hämtades först av allt och knuffade gängets
+filer bakåt på långsamt nät. Nu hämtas de när de syns (`loading="lazy"` i [public/skoldar.js](public/skoldar.js)
+och [public/kronan.js](public/kronan.js)), gängets kod och bilder börjar hämtas när rummet visas (`forhamta` i
+rum.js; de hamnar i webbläsarens cache och tar inget minne förrän de används), och när 3D-delarna står där släpps
+resten (`slappBilder`): sköldarna i rummet alltid, de i flikarna bara med bra nät. Mätt i Chrome som telefon
+(processorn fyra gånger långsammare), gammal och ny kod om vartannat, median: med 60 kB/s syns rummet efter
+15,5 → 15,6 sekunder, gänget efter 44,7 → 28,7 och allt i rummet efter 52,7 → 35,5, medan alla sköldar är klara
+efter 35,1 → 54,5; utan nätbroms (tio varv) rummet 2,4 → 2,4, gänget 4,0 → 3,9 och allt 9,6 → 8,7; i datorn (utan
+broms, sju varv) rummet 0,1 → 0,1 och gänget 1,6 → 1,6. Att vänta med gängets filer tills rummet syns gav inget:
+rummet lika sent, gänget 0,4 sekunder senare.
+
+**Ljuset på dukar:** i Chrome ritas ett lager i perspektiv i minst sin egen storlek, hur litet det än syns, så
+ljuset, som knappt syns, tog mest av minnet för att rita sidan. `ljusDukar` i rum.js (bara Chromium) lägger de tre
+skenen, `.rum-warm`, `.rum-vign` och tv:ns sken på dukar, som är små (tillsammans ungefär 2 MB), ligger utanför det
+minnet och inte ritas om nära. Mätt med Chromes egen uppgift om varje lager (412 × 780, täthet 2,625): hemma
+199 → 128 MB, nära tavlan 204 → 139, nära tv:n 149 → 81, nära videon 170 → 123, nära kortregistret 175 → 118. Bilderna
+jämförda med den gamla koden hemma och nära, i telefonens och datorns storlek: 46–60 dB (två körningar av den gamla
+koden i datorns storlek skiljer sig 49–63 dB), ingen skillnad att se.
+
+**Anslagstavlan på vägen fram:** stoppen kom inte av ritandet (8–23 ms av 200) utan av att `draw` byggde om hela
+tavlan för varje matchfil som kom under flygningen, ungefär 13 gånger, och att `scan` i
+[public/slitage.js](public/slitage.js) gick igenom sidan efter varje gång. Nu samlas matchfilerna ihop (`rita`,
+100 ms), tavlan väntar tills flygningen är klar (`A.flyger`, `landat`), bara lappar som ändrats ritas om och
+slitage.js bryr sig bara om sina egna element. Mätt som ovan, fyra varv: 41 → 60 bilder i sekunden, längsta
+bildrutan 160 → 35 ms, bildrutor över 50 ms 4 → 0, vägen tillbaka oförändrad.
+
+**Väggarna är inte färdigritade i förväg:** provat på samma sätt som ljuset blev de synligt mjukare nära uret, det
+tog 0,3 sekunder extra vid start på en Apple M5 och minnet flyttades mest ur ritbudgeten (hemma ner till 102 MB).
+Tavlan på väggen hade gett högst 18 MB och 15 lager till, men behöver typsnitten och sköldarna inbäddade och göras
+om när datan ändras; stoppen är borta utan det. I WKWebView (390 × 664) byggs rummet som förut och tavlan öppnas och
+stängs utan fel; Safari får inga ljusdukar. Inte mätt i den riktiga telefonen än, och därför inte heller om *tile
+memory limits exceeded* är borta.
 
 **När grafiken ändå tappas** (`webglcontextlost` i rum.js) göms de tappade dukarna direkt, så att den vita
 rutan inte syns, och sidan laddas om, så att allt kommer tillbaka – med det lägsta steget och, om det händer

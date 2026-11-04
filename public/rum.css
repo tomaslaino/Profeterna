@@ -12,6 +12,9 @@ html.i-rummet body > footer { display: none; }
 /* innan rummet har byggts (rum-vantar, satt i index.html): den vanliga
    förstasidan syns inte, så att den inte blinkar till först – och syns ändå
    efter fem sekunder om skripten aldrig kommer igång */
+/* Sidans bakgrund med gradient ligger helt bakom rummet, men ritas ändå (10 MB i
+   en telefon); utan den är bakgrunden en enda färg, som inte tar något minne. */
+html.rum-pa { background-image: none; }
 html.rum-vantar { overflow: hidden; }
 html.rum-vantar .topbar,
 html.rum-vantar main > section:not(.rum),
@@ -127,6 +130,9 @@ a.rum-sak, a.rum-sak:hover { color: inherit; text-decoration: none; }
    inte hela rummets stil räknas om) */
 .rum-neon.av { opacity: 0.32; }
 .rum-neonhalo.av, .rum-neonglow.av { opacity: 0.04; }
+/* som duk i Chrome (ljusDukar i rum.js) */
+canvas.rum-neonglow { opacity: 0.08; }
+canvas.rum-neonhalo { opacity: 0.28; }
 
 /* ---------- Omgångens orakel ---------- */
 
@@ -820,6 +826,17 @@ a.rum-sak, a.rum-sak:hover { color: inherit; text-decoration: none; }
   /* toningen bakom kupongen i handen är 2400 × 1800 (left och top delade med zoom) */
   .rum-dimma { zoom: 0.25; left: -1600px; top: -1600px; transform: scale(4); transform-origin: 0 0; }
 }
+
+/* Samma sak i datorn när den inte hinner med (steg 1 och nedåt, kval i rum.js):
+   blandningslägena är de dyraste passen på en svag grafikkrets. Och föremålen lyser
+   upp direkt när man pekar på dem: en övergång av ett filter räknar om alla rummets
+   lager i varje bildruta. */
+.rum.enkel .rum-warm, .rum.enkel .rum-dagsljus, .rum.enkel .rum-damm { mix-blend-mode: normal; }
+.rum.enkel .rum-dagsljus { opacity: calc(var(--dagsljus, 0) * 0.2); }
+.rum.enkel.aska .rum-dagsljus { animation: none; }
+.rum.enkel .rum-grain { display: none; }
+.rum.enkel .rum-rok i { animation: none; }
+.rum.enkel .rum-sak { transition: none; }
 
 /* papperets regler för telefonen (papper.css) gäller inte kupongen i rummet */
 .rum-kup .row .pp-nr { display: grid; }

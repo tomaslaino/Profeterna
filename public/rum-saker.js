@@ -193,19 +193,22 @@ async function props(pult, opt, root) {
   // så att minnet räcker
   const LATT = matchMedia('(max-width: 700px), (max-height: 500px)').matches;
   const SKUGGA = LATT ? 1024 : 2048;
-  const r = new THREE.WebGLRenderer({ canvas, alpha: true, antialias: !LATT });
+  const r = new THREE.WebGLRenderer({ canvas, alpha: true, antialias: !LATT && opt.kant !== false });
   const PR = LATT ? 1.5 : Math.min((window.devicePixelRatio || 1) * 1.25, 2.5);
   r.setPixelRatio(PR);
   r.setSize(BOX.w, BOX.h, false);
   r.toneMapping = THREE.ACESFilmicToneMapping;
   r.toneMappingExposure = 1.05;
-  r.shadowMap.enabled = !utanSkuggor(r);
+  r.shadowMap.enabled = !utanSkuggor(r) && !opt.enkel;
   r.shadowMap.type = THREE.PCFSoftShadowMap;
   const scene = new THREE.Scene();
-  const pmrem = new THREE.PMREMGenerator(r);
-  if (LATT) pmrem._setSize = (n) => THREE.PMREMGenerator.prototype._setSize.call(pmrem, Math.min(n, 128));
-  scene.environment = pmrem.fromScene(new RoomEnvironment(), 0.04).texture;
-  pmrem.dispose();
+  // (det enkla ljuset, enkeltLjus nedan, klarar sig utan miljön)
+  if (!opt.enkel) {
+    const pmrem = new THREE.PMREMGenerator(r);
+    if (LATT) pmrem._setSize = (n) => THREE.PMREMGenerator.prototype._setSize.call(pmrem, Math.min(n, 128));
+    scene.environment = pmrem.fromScene(new RoomEnvironment(), 0.04).texture;
+    pmrem.dispose();
+  }
   // kameran ser på O; duken är en bit av en bild som har O i mitten
   const full = { w: 2 * Math.max(O.x - BOX.x, BOX.x + BOX.w - O.x), h: 2 * Math.max(O.y - BOX.y, BOX.y + BOX.h - O.y) };
   const cam = new THREE.PerspectiveCamera(2 * Math.atan(full.h / 2 / D) / DEG, full.w / full.h, 50, 5000);
@@ -223,7 +226,8 @@ async function props(pult, opt, root) {
 
   // ljuset som i rummet: lysröret uppe till vänster, neonen bakom till
   // vänster, terminalen bakom till höger
-  scene.add(new THREE.HemisphereLight('#d8d0b8', '#3a2a20', 0.5));
+  const hemi = new THREE.HemisphereLight('#d8d0b8', '#3a2a20', opt.enkel ? 1.4 : 0.5);
+  scene.add(hemi);
   const key = new THREE.DirectionalLight('#fff0d6', 2.1);
   key.position.set(-420, 700, 300);
   key.target.position.set(0, 0, 80);
@@ -243,6 +247,7 @@ async function props(pult, opt, root) {
   const fill = new THREE.DirectionalLight('#ffd9b0', 0.45);
   fill.position.set(-200, 120, 600);
   scene.add(fill);
+  if (opt.enkel) term.visible = fill.visible = false;
 
   const world = new THREE.Group();
   scene.add(world);
@@ -251,6 +256,7 @@ async function props(pult, opt, root) {
   catcher.rotation.x = -Math.PI / 2;
   catcher.position.z = -27 + 320;
   catcher.receiveShadow = true;
+  catcher.visible = !opt.enkel;
   world.add(catcher);
 
   const mat = (color, o = {}) => new THREE.MeshPhysicalMaterial(Object.assign({ color, envMapIntensity: 0.5, roughness: 0.6 }, o));
@@ -1212,8 +1218,25 @@ async function props(pult, opt, root) {
 
   // Hur fint sakerna ritas, när datorn inte hinner med (KVAL i rum.js), som
   // gänget (rum-3d.js): färre bildpunkter och skuggorna var skugga:e bild.
-  const Q = { skugga: 1, n: 0 };
-  function kval({ pr = 1, skugga = 1 } = {}) {
+  const Q = { skugga: 1, n: 0, enkel: Boolean(opt.enkel) };
+  // Det enkla ljuset, som gänget: ingen miljö, ingen skuggkarta, färre lampor.
+  function enkeltLjus() {
+    Q.enkel = true;
+    scene.environment = null;
+    r.shadowMap.enabled = false;
+    catcher.visible = false;
+    term.visible = fill.visible = false;
+    hemi.intensity = 1.4;
+    scene.traverse((x) => {
+      const m = x.material;
+      if (!m || Array.isArray(m) || !m.isMeshStandardMaterial) return;
+      m.bumpMap = null;
+      if (m.isMeshPhysicalMaterial) { m.clearcoat = 0; m.sheen = 0; }
+      m.needsUpdate = true;
+    });
+  }
+  function kval({ pr = 1, skugga = 1, enkel = false } = {}) {
+    if (enkel && !Q.enkel) enkeltLjus();
     const p = Math.max(0.75, Math.min(PR, PR * pr));
     if (p !== r.getPixelRatio()) {
       r.setPixelRatio(p);
@@ -1224,5 +1247,9 @@ async function props(pult, opt, root) {
     r.shadowMap.needsUpdate = true;
   }
 
+  // (i bakgrunden, som gänget i rum-3d.js)
+  try {
+    await r.compileAsync(scene, cam);
+  } catch (err) { /* då byggs de när sakerna ritas, som förut */ }
   return { wear, power, draw, kval };
 }

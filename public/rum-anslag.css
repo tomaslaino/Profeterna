@@ -13,7 +13,10 @@
 .rum-ans:hover .ans-yta, .rum-ans:focus-visible .ans-yta { filter: brightness(1.18) drop-shadow(0 0 10px rgba(240, 214, 153, 0.35)); }
 .rum-ans > .ans-tavla { position: absolute; left: 0; top: 0; transform-origin: 0 0; transform: scale3d(var(--s), var(--s), var(--s)) translateZ(var(--dj)); }
 .rum-ans > i { display: block; }
-.rum-ans .ans-skugga { position: absolute; left: 1.5%; top: 4%; width: 100%; height: 100%; background: rgba(8, 5, 2, 0.55); filter: blur(5px); }
+/* (oskärpan på det inre: på .ans-skugga, som är ett eget lager, räknades den om
+   på grafikkortet i varje bildruta) */
+.rum-ans .ans-skugga { position: absolute; left: 1.5%; top: 4%; width: 100%; height: 100%; }
+.rum-ans .ans-skugga > i { display: block; width: 100%; height: 100%; background: rgba(8, 5, 2, 0.55); filter: blur(5px); }
 /* där tavlan hänger är väggen ljusare, och två skruvar sitter kvar */
 .rum-ans .ans-flack { position: absolute; inset: -1px; visibility: hidden; background: rgba(255, 236, 200, 0.07); box-shadow: inset 0 0 6px rgba(0, 0, 0, 0.25); }
 .rum-ans .ans-flack::before, .rum-ans .ans-flack::after { content: ""; position: absolute; top: 12%; width: 2.2px; height: 2.2px; border-radius: 50%; background: radial-gradient(circle at 35% 30%, #b8b2a2, #34302a 70%); }
