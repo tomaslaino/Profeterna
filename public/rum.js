@@ -2506,17 +2506,18 @@ ${window.RumRegister ? RumRegister.nara() : ''}
   // ritar hörnet från samma håll. Hörnets plan vrids inte – Chrome ritar det
   // som lutar i perspektiv suddigt nära, och tv:n står ju där rummet vrids
   // kring – utan står kvar vänt mot kameran, så långt framför väggen som den
-  // vrids fram bakom lådan (f.kant) och lika mycket mindre, så att det syns
-  // där det syntes. Bakom lådan räknas längs synlinjen genom lådans vänstra
-  // kant, där den möter den vridna väggen (nämnaren) – rakt bakom kanten
-  // räckte inte, och väggen skar av lådans vänstra del. Första gången får
+  // vrids fram vid kant (bildens vänstra kant eller lådans, aimVideo) och
+  // lika mycket mindre, så att det syns där det syntes. Det räknas längs
+  // synlinjen genom kanten, där den möter den vridna väggen (nämnaren) – rakt
+  // bakom kanten räckte inte, och väggen skar av lådans vänstra del. Första gången får
   // planen samma form utan övergång, så att de vrids kring tv:n hela vägen.
   const KV = ((PERSP + 598) / PERSP) * 1.035;
-  function sving(f, sv, cls) {
+  function sving(f, sv, cls, kant = f.kant) {
     const pl = [...R.el.querySelectorAll('.rum-world > .rum-pl')];
     const dx = r1((f.mitt - 800) * KV);
     const tan = Math.tan((sv * Math.PI) / 180);
-    const dz = sv ? ((f.mitt - f.kant) * KV * tan) / (1 - ((f.kant - 800) * 1.035 * tan) / PERSP) + 8 : 0;
+    // (högst till 20 bakom planet -330, så att ordningen mot det är som förut)
+    const dz = sv ? Math.min(((f.mitt - kant) * KV * tan) / (1 - ((kant - 800) * 1.035 * tan) / PERSP) + 8, 598 - 350) : 0;
     const satt = (v, z) => {
       for (const p of pl) {
         p.style.transform = p.querySelector('#rum-vhs')
@@ -2547,13 +2548,21 @@ ${window.RumRegister ? RumRegister.nara() : ''}
     // bilden fylla fönstret (f.fyll) räknas hela fönstret, med en smal kant
     // så att bildens gräns syns runt om
     const f = R.vf;
-    sving(f, f.sv, cls);
     const [x0, x1] = [f.x0, f.x1].map((x) => 800 + (x - 800) * 1.035);
     const [y0, y1] = [f.y0, f.y1].map((y) => 500 + (y - 500) * 1.035);
     const [vx0, vx1] = [-R.ox / R.k, (innerWidth - R.ox) / R.k];
     const [vy0, vy1] = f.fyll ? [-R.oy / R.k, (innerHeight - R.oy) / R.k] : [(64 - R.oy) / R.k, (innerHeight - 56 - R.oy) / R.k];
     const m = f.fyll ? 0.96 : 0.92;
     const z = Math.min(f.z || 6, ((vx1 - vx0) * m) / (x1 - x0), ((vy1 - vy0) * m) / (y1 - y0));
+    // Hörnet ska ligga framför den vridna väggen ända ut till bildens
+    // vänstra kant, inte bara lådans: på vägen till rutan fyller rummet runt
+    // tv:n (rumYtor i rum-video.js) hela bilden, och Chrome lät väggen skära
+    // av lådan och halva tv:n när den bara räknades fram till lådan. Vid rutan
+    // gäller kanten där kameran kom ifrån (vkant), så att hörnet inte går
+    // bakåt på vägen.
+    const kant = 800 + ((x0 + x1) / 2 - (vx1 - vx0) / (2 * z) - 800) / 1.035;
+    if (!f.fyll || R.vkant == null) R.vkant = kant;
+    sving(f, f.sv, cls, Math.min(f.kant, R.vkant));
     aim([(x0 + x1) / 2, (y0 + y1) / 2], z, [(vx0 + vx1) / 2, (vy0 + vy1) / 2], cls);
     lattVideo(f.fyll ? 2 : 1);
   }
