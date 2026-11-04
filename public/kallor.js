@@ -113,6 +113,9 @@ function renderSources(d) {
     html += '<p class="legend src-unmapped"><strong title="Används inte förrän de lagts in i aliastabellen (config/team-aliases.js)">Okända lagnamn</strong>: ' +
       d.unmapped.map((u) => `${esc(u.name)} <span class="muted">(${esc(u.source)}, ${esc(u.comp)})</span>`).join(', ') + '</p>';
   }
+  // Ett fritt foto ska ange fotografen och licensen.
+  html += '<h3>Bilder</h3><p class="legend">Hasse Backe (fiktiv). Foto <a href="https://commons.wikimedia.org/wiki/File:Hasse_Backe_2013-03-26_001.jpg" target="_blank" rel="noopener">C More Entertainment</a>, ' +
+    '<a href="https://creativecommons.org/licenses/by/3.0/deed.sv" target="_blank" rel="noopener">CC BY 3.0</a>, bearbetat</p>';
   return html + '</div>';
 }
 

@@ -3604,7 +3604,7 @@ jämn med och utan handens duk, ungefär 50 bildrutor på 0,82 sekunder och län
 På vägen tillbaka är de sista 0,4 sekunderna ojämna (ungefär 29 bildrutor i hela svängen, längst
 67 ms), ibland också utan duken; orsaken är inte hittad, och i Chrome som telefon (412 × 780,
 strypning × 4) tappas inga bilder. Figuren finns först när någon klickar: rummet bakom honom hämtas
-då, och grafiken lämnas tillbaka en stund efter att man har gått. Kostymfotot (C More Entertainment, CC BY 3.0, Wikimedia Commons, bearbetat) ligger utan
+då, och grafiken lämnas tillbaka en stund efter att man har gått. Kostymfotot (C More Entertainment, CC BY 3.0, Wikimedia Commons, bearbetat; krediten står sist under Källor) ligger utan
 armar på en formad yta, så att huvudet vrids runt nacken och kroppen lutar sig fram. Ögon, bryn och
 mun rör sig i skuggaren: locken blinkar utan att ögat tänjs, munnen öppnas med tänder och tunga,
 och hakan följer med ([public/rum-hasse-3d.js](public/rum-hasse-3d.js)).
