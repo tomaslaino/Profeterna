@@ -1,7 +1,7 @@
 // Hasse Backe i tobaksaffären: en arm på pulten bredvid hans kaffe (rum.js,
 // rum-hasse-hand.js), han står precis utanför bilden. Ett klick (eller H) och
 // kameran svänger åt vänster, med handen, och där står han bakom disken
-// (rum-hasse-3d.js). Fiktivt, och det står i foten.
+// (rum-hasse-3d.js).
 //
 // Rummet rörs inte: tobaksaffärens scen läggs i två omslag (.rum-sving och
 // .rum-front), som saknar omvandling tills kameran svänger. Under svängen och
@@ -42,7 +42,7 @@ window.RumHasse = (() => {
     vy.hidden = true;
     vy.setAttribute('aria-label', 'Hasse Backe');
     vy.innerHTML = '<div class="rh-scen"><img alt="" draggable="false"><canvas></canvas></div><div class="rh-samtal"></div>' +
-      '<div class="rh-fot"><span>Hasse Backe (fiktiv). Foto <a href="https://commons.wikimedia.org/wiki/File:Hasse_Backe_2013-03-26_001.jpg" target="_blank" rel="noopener">C More Entertainment</a>, CC BY 3.0, bearbetat</span><button type="button" class="rh-tillbaka">Tillbaka</button></div>';
+      '<div class="rh-fot"><button type="button" class="rh-tillbaka">Tillbaka</button></div>';
     sving.append(vy);
     H.vy = vy;
     // det som händer i samtalet stannar där (knapparna byter ut sig själva)
@@ -51,7 +51,7 @@ window.RumHasse = (() => {
     for (const n of ['pointerdown', 'pointerup', 'pointermove', 'mouseover', 'wheel', 'touchstart', 'touchmove']) vy.addEventListener(n, (e) => e.stopPropagation());
     vy.addEventListener('click', (e) => {
       e.stopPropagation();
-      if (e.target.closest('.rh-tillbaka') || !e.target.closest('a')) stang();
+      stang();
     });
     document.addEventListener('keydown', (e) => {
       if (e.metaKey || e.ctrlKey || e.altKey) return;

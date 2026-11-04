@@ -46,8 +46,7 @@
 .rh-slag { animation: rh-slag 0.42s linear; }
 @keyframes rh-slag { 0% { translate: 0 0; } 18% { translate: 0 9px; } 42% { translate: 0 -5px; } 70% { translate: 0 2px; } 100% { translate: 0 0; } }
 .rum.hasse-svang .rum-ft, .rum.hasse-svang .rum-hdr, .rum.hasse-framme .rum-ft, .rum.hasse-framme .rum-hdr { display: none; }
-.rh-fot { position: absolute; left: 24px; right: 24px; bottom: 14px; display: flex; justify-content: space-between; gap: 16px; font: 400 12.5px/1.3 Fraunces, Georgia, serif; color: rgba(246, 239, 220, 0.72); pointer-events: none; }
-.rh-fot a { color: inherit; pointer-events: auto; }
+.rh-fot { position: absolute; left: 24px; right: 24px; bottom: 14px; display: flex; justify-content: flex-end; pointer-events: none; }
 .rh-tillbaka { flex: none; padding: 0; border: 0; background: none; color: #a9c3ff; font: 400 15px Fraunces, Georgia, serif; text-decoration: underline; cursor: pointer; pointer-events: auto; }
 /* väggen mörknar bakom samtalet, så att texten går att läsa (på höjden ligger den på diskens mörka framsida) */
 .rh-scen::after { content: ''; position: absolute; top: 0; bottom: 0; right: 0; width: 42%; background: linear-gradient(to right, rgba(20, 11, 5, 0), rgba(20, 11, 5, 0.62) 34%); pointer-events: none; }
