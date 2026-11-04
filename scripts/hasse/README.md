@@ -2,7 +2,7 @@
 
 Fyra filer i `public/rum/` byggs härifrån. De behöver bara göras om när utseendet ska ändras.
 
-- `hasse-hand.bin`: handmodellen. `node scripts/hasse/hand.mjs`
+- `hasse-hand.bin`: handmodellen, både till figuren och till handen på pulten i rummet (`public/rum-hasse-hand.js`). `node scripts/hasse/hand.mjs`
 - `hasse-atlas.webp`: fotot utan armar, kavajärmen uträtad och huden. `node scripts/hasse/baka.mjs atlas`, sedan `cwebp -q 84 -alpha_q 90 -m 6 atlas.png -o public/rum/hasse-atlas.webp`
 - `hasse-bak.webp`: väggen bakom honom i baren (hyllorna, lamporna, flaskorna och bardisken bakom honom), spårad med riktigt ljus i webbläsarens grafikkort. `node scripts/hasse/baka.mjs bak 800`, sedan `cwebp -q 88 -m 6 -sharp_yuv bak.png -o public/rum/hasse-bak.webp`. Med `bak-hog 800 0.8` blir det `bak-hog.png`, och `hasse-bak-hog.webp` på samma sätt med `-resize 780 0` (telefonens grafikminne). Ett varv tar ungefär en kvarts sekund.
 

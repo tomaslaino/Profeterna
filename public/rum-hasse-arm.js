@@ -7,7 +7,7 @@
 //
 // laddaFoto() → THREE.Texture, laddaHand() → modellen (båda hämtas en gång)
 // byggHand(modell, sida, foto, bord) → { mesh, satt(W, F, P, krok, peka) }
-// byggArm(scen, sida, foto, modell, vidd, bord) → { satt(S, E, W, F, P, krok, peka), visible, hand }
+// byggArm(scen, sida, foto, modell, vidd, bord) → { satt(S, E, W, F, P, krok, peka), del('allt' | 'under'), visible, hand }
 // byggKopp(bord) → { kopp, fat, ORA }
 // byggCigarr(bord) → { mesh, U, FOT }, byggAskkopp(bord) → { mesh }, byggRok(N, bord) → { mesh, slapp, steg }
 import * as THREE from 'three';
@@ -341,6 +341,15 @@ export function byggArm(scen, sida, foto, modell, vidd = 1, bord = ingenBord()) 
   const grupp = new THREE.Group();
   grupp.add(ror, man, hand.mesh);
   scen.add(grupp);
+  // 'allt', eller 'under' (armbågen, manschetten och handen)
+  let delen = 'allt';
+  let armbage = 22;
+  const ritaDel = () => {
+    const per = SEG * 6;
+    const tot = (RINGAR - 1) * per;
+    if (delen === 'allt') g.setDrawRange(0, tot);
+    else { const b = Math.max(armbage - 1, 0) * per; g.setDrawRange(b, tot - b); }
+  };
 
   const u1 = new THREE.Vector3();
   const u2 = new THREE.Vector3();
@@ -369,6 +378,8 @@ export function byggArm(scen, sida, foto, modell, vidd = 1, bord = ingenBord()) 
     const b = 2 * rr * Math.cos(bojd / 2) * (1 + 0.1 * bojd);
     const tot = (L0 - rr) + b + (L2 - rr);
     const dE = (L0 - rr) + b / 2;
+    armbage = Math.round((dE / tot) * (RINGAR - 1));
+    if (delen !== 'allt') ritaDel();
     lage.pol.copy(u1).sub(u2);
     if (lage.pol.lengthSq() > 1e-6) lage.pol.normalize();
     // kavajen hänger löst bara när armen hänger: uppe är ärmen smalare
@@ -420,7 +431,7 @@ export function byggArm(scen, sida, foto, modell, vidd = 1, bord = ingenBord()) 
     man.quaternion.setFromUnitVectors(Y_AX, u2);
     hand.satt(pC.copy(W).addScaledVector(u2, 26), F, Pn, krok, peka, spar, tumme, extra);
   }
-  return { grupp, satt, lage, hand, man, set visible(v) { grupp.visible = v; }, get visible() { return grupp.visible; }, borta() { g.dispose(); manG.dispose(); } };
+  return { grupp, satt, lage, hand, man, del(d) { delen = d; ritaDel(); }, set visible(v) { grupp.visible = v; }, get visible() { return grupp.visible; }, borta() { g.dispose(); manG.dispose(); } };
 }
 
 // ---------- koppen ----------
