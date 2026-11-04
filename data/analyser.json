@@ -1,5 +1,5 @@
 {
- "uppdaterad": "2026-11-04T18:04:20.282Z",
+ "uppdaterad": "2026-11-04T18:06:19.127Z",
  "omgang": {
   "id": "2026-11-07-st4978",
   "matcher": [
@@ -429,6 +429,94 @@
     "model": "claude-opus-5-5",
     "version": "2026-11-04.1",
     "writtenAt": "2026-11-04T18:02:40.453Z",
+    "attempts": 1
+   },
+   "model": "claude-opus-5-5",
+   "version": "2026-11-04.1",
+   "attempts": 1
+  },
+  {
+   "id": "401880169",
+   "match": "Cardiff City – Burnley",
+   "avspark": "2026-11-07T15:00Z",
+   "writtenAt": "2026-11-04T18:06:08.211Z",
+   "text": "Cardiff har ont om mittbackar just nu\n\nCardiff har tappat mittbackar i en takt som skulle ha oroat även oss i Tjäderfors. Till Cardiff City Stadium kommer Burnley med en nytillträdd schweizisk tränare, två matcher i klubben och supportrar som knappt visste vem han var.\n\nDen viktigaste frågan i Cardiff är vem som kan spela mittback på lördag. Efter 0–3 mot Wolves påminde Brian Barry-Murphy om att fyra mittbackar varit skadade samtidigt, något han trodde inte skulle hända igen, enligt Hayters [1]. Dylan Lawlor, Callum Chambers och Krystian Bielik saknades, Gabriel Osho var avstängd och Will Fish tvingades av med en öm baksida lår [1]. Perry Ng hade det enligt tränaren svårt på mittbacken, och Alex Robertson fick ett problem med hälsenan [1]. Bielik är tillbaka i träning, men Barry-Murphy kunde inte lova honom till West Ham-matchen i kväll [1]. Jag har varit med om värre, och då hade vi ingen målvakt.\n\nPå andra sidan står Fabio Celestini, som presenterades den 28 oktober sedan Nicky Hayen fått gå efter 1–4 mot Lincoln [2]. Han tog över ett Basel som låg sist i oktober 2023 och vann både ligan och cupen säsongen 2024/25, men i Burnley var välkomnandet försiktigt. ”I've never heard of him”, skrev supportern Clarets1882 [2]. Hans två matcher har gett 0–0 mot Portsmouth och 1–1 mot QPR, där Largie Ramazani gav laget ledningen. Efteråt medgav Celestini att det saknades lite kvalitet i anfallet [3].\n\nSedan har vi två lag som har haft otur åt varsitt håll. Cardiff har gjort fem mål färre än chanserna brukar ge, och Burnley har släppt in fem fler. Hemma har Cardiff ännu inte förlorat, och Burnley har bara vunnit en av fjorton ligamatcher. Jag skulle ägna hela torsdagen åt hörnor.\n\nTipset: X2 (Mittbackarna avgör)\n\nPrognosen ger Burnley 2,44 mot Cardiffs 3,03 och oavgjort på 3,85, men räknar bara mål och tabelläge. Den vet alltså ingenting om Cardiffs tomma mittförsvar, där Fish, Ng och Robertson är nya oroshärdar [1], och West Ham kommer dessutom bara tre dagar före. Det drar mig bort från ettan, trots att Cardiff är obesegrade hemma. Burnley har å sin sida bara en seger på fjorton ligamatcher och saknar enligt Celestini kvalitet i anfallet [2], så oavgjort får vara med. Jag ringar in kryss och tvåa. Bollen har aldrig läst en tabell, men den brukar hitta en ensam mittback.",
+   "author": "Sixten Bråvall (påhittad)",
+   "title": "Cardiff har ont om mittbackar just nu",
+   "lead": "Cardiff har tappat mittbackar i en takt som skulle ha oroat även oss i Tjäderfors. Till Cardiff City Stadium kommer Burnley med en nytillträdd schweizisk tränare, två matcher i klubben och supportrar som knappt visste vem han var.",
+   "paragraphs": [
+    "Den viktigaste frågan i Cardiff är vem som kan spela mittback på lördag. Efter 0–3 mot Wolves påminde Brian Barry-Murphy om att fyra mittbackar varit skadade samtidigt, något han trodde inte skulle hända igen, enligt Hayters [1]. Dylan Lawlor, Callum Chambers och Krystian Bielik saknades, Gabriel Osho var avstängd och Will Fish tvingades av med en öm baksida lår [1]. Perry Ng hade det enligt tränaren svårt på mittbacken, och Alex Robertson fick ett problem med hälsenan [1]. Bielik är tillbaka i träning, men Barry-Murphy kunde inte lova honom till West Ham-matchen i kväll [1]. Jag har varit med om värre, och då hade vi ingen målvakt.",
+    "På andra sidan står Fabio Celestini, som presenterades den 28 oktober sedan Nicky Hayen fått gå efter 1–4 mot Lincoln [2]. Han tog över ett Basel som låg sist i oktober 2023 och vann både ligan och cupen säsongen 2024/25, men i Burnley var välkomnandet försiktigt. ”I've never heard of him”, skrev supportern Clarets1882 [2]. Hans två matcher har gett 0–0 mot Portsmouth och 1–1 mot QPR, där Largie Ramazani gav laget ledningen. Efteråt medgav Celestini att det saknades lite kvalitet i anfallet [3].",
+    "Sedan har vi två lag som har haft otur åt varsitt håll. Cardiff har gjort fem mål färre än chanserna brukar ge, och Burnley har släppt in fem fler. Hemma har Cardiff ännu inte förlorat, och Burnley har bara vunnit en av fjorton ligamatcher. Jag skulle ägna hela torsdagen åt hörnor."
+   ],
+   "sources": [
+    {
+     "n": 1,
+     "source": "Hayters",
+     "title": "Barry-Murphy shares updates on more Cardiff City injury worries after loss to Wolves",
+     "url": "https://hayters.com/barry-murphy-shares-updates-on-more-cardiff-city-injury-worries-after-loss-to-wolves/",
+     "publishedAt": null
+    },
+    {
+     "n": 2,
+     "source": "Fan Banter",
+     "title": "burnley appoint fabio celestini head coach",
+     "url": "https://fanbanter.co.uk/burnley-appoint-fabio-celestini-head-coach/",
+     "publishedAt": null
+    },
+    {
+     "n": 3,
+     "source": "The Irish News",
+     "title": "Fabio Celestini believes Burnley are close to another victory after draw at QPR",
+     "url": "https://www.irishnews.com/sport/soccer/fabio-celestini-believes-burnley-are-close-to-another-victory-after-draw-at-qpr-QKW3EOTIL5PLLLJV2ARZWRJVWI/",
+     "publishedAt": null
+    }
+   ],
+   "tip": {
+    "text": "Prognosen ger Burnley 2,44 mot Cardiffs 3,03 och oavgjort på 3,85, men räknar bara mål och tabelläge. Den vet alltså ingenting om Cardiffs tomma mittförsvar, där Fish, Ng och Robertson är nya oroshärdar [1], och West Ham kommer dessutom bara tre dagar före. Det drar mig bort från ettan, trots att Cardiff är obesegrade hemma. Burnley har å sin sida bara en seger på fjorton ligamatcher och saknar enligt Celestini kvalitet i anfallet [2], så oavgjort får vara med. Jag ringar in kryss och tvåa. Bollen har aldrig läst en tabell, men den brukar hitta en ensam mittback.",
+    "signs": [
+     1,
+     2
+    ],
+    "note": "Mittbackarna avgör",
+    "sources": [
+     {
+      "n": 1,
+      "source": "Hayters",
+      "title": "Barry-Murphy shares updates on more Cardiff City injury worries after loss to Wolves",
+      "url": "https://hayters.com/barry-murphy-shares-updates-on-more-cardiff-city-injury-worries-after-loss-to-wolves/",
+      "publishedAt": null
+     },
+     {
+      "n": 2,
+      "source": "The Irish News",
+      "title": "Fabio Celestini believes Burnley are close to another victory after draw at QPR",
+      "url": "https://www.irishnews.com/sport/soccer/fabio-celestini-believes-burnley-are-close-to-another-victory-after-draw-at-qpr-QKW3EOTIL5PLLLJV2ARZWRJVWI/",
+      "publishedAt": null
+     }
+    ],
+    "model": "claude-opus-5-5",
+    "version": "2026-11-04.1",
+    "writtenAt": "2026-11-04T18:06:08.211Z",
+    "attempts": 1
+   },
+   "hasse": {
+    "stycken": [
+     "Cardiff har ont om mittbackar, och utan mittbackar faller hela organisationen. Lawlor, Chambers och Bielik saknades mot Wolves, Osho var avstängd och Fish fick gå av med en öm baksida lår. Det slutade 0–3, och Ng hade det svårt där bak. Sedan ska de dessutom spela mot West Ham tre dagar före den här matchen. Orsak och verkan, och den verkan blir jävligt tråkig för Cardiff.",
+     "Cardiff har visserligen inte förlorat hemma, så jag tar inte ifrån dem allt. Burnley har bara vunnit en av fjorton ligamatcher, och Celestini medger själv att det saknas lite kvalitet i anfallet. Därför får oavgjort vara med, och jag har som vanligt rätt. Solklart kryss och tvåa."
+    ],
+    "tips": "2026-11-04T18:06:08.211Z",
+    "uppdrag": {
+     "fraser": [
+      "Solklart",
+      "Total kontroll"
+     ],
+     "krydda": null,
+     "bielsa": []
+    },
+    "model": "claude-opus-5-5",
+    "version": "2026-11-04.1",
+    "writtenAt": "2026-11-04T18:06:18.553Z",
     "attempts": 1
    },
    "model": "claude-opus-5-5",
