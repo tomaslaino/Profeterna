@@ -94,6 +94,6 @@ window.HasseRepliker = {
   // När något inte går.
   ingenKupong: 'Ingen kupong än. Det är lugnt.',
   igang: 'Efteråt kan alla ha rätt.',
-  ejKlar: ['Den tar jag dagen före.', 'Inte än. Fråga dagen före.', 'Den har jag inte läst än.'],
+  ejKlar: ['Den tar jag sen.', 'Inte än. Fråga mig sen.', 'Den har jag inte läst än.'],
   utanRost: 'Jag har tappat rösten. Här har du det i skrift.',
 };

@@ -431,7 +431,7 @@ bara lokalt. Analyserna visas som de ligger i `data/analyser.json`; hur de skriv
 - **Analyserna i förväg på datorn (2026-11-04, användarens beslut):** sajten ska bara visa
   färdiga texter, och allt AI-skrivande ska gå på användarens Claude-konto på en dator som står
   på dygnet runt, inte på en API-nyckel. Bara omgångens matcher skrivs, oftast Stryktipsets
-  tretton. Claude får söka och läsa på nätet (`WebSearch`, `WebFetch`) men inget annat, eftersom
+  tretton, måndag 08, onsdag 16, fredag 16 och lördag 11. Claude får söka och läsa på nätet (`WebSearch`, `WebFetch`) men inget annat, eftersom
   underlaget i dag är just det Claude hittar. En påhittad tränare skriver analysen, medan Hasse
   Backe ligger kvar i tobaksaffären och låtsas analysera. DeepSeek är borta helt: omgångens namn
   och kupongernas kommentarer skrivs också på datorn.
@@ -1000,7 +1000,7 @@ och anropar aldrig någon språkmodell. (Fram till 2026-11-04 skrevs texterna vi
 `profeterna-analys` på Cloudflare, med API-nycklar.)
 
 ```
-launchd var 15:e min  →  scripts/analyser/skriv.mjs  →  claude -p (en gång per match)
+launchd               →  scripts/analyser/skriv.mjs  →  claude -p (en gång per match)
                                      ↓
        data/analyser.json, data/omgangsnamn.json, data/kupong-historik.json
                                      ↓
@@ -1008,15 +1008,17 @@ launchd var 15:e min  →  scripts/analyser/skriv.mjs  →  claude -p (en gång 
 ```
 
 **Vad som skrivs och när.** Omgången är gängets kupong, `GET …/samtal`, oftast Stryktipsets
-tretton matcher. Jobbet kontrollerar var 15:e minut, men de flesta körningar har inget att göra
-och anropar inte Claude.
+tretton matcher. Jobbet startar på analysernas tider och kontrollerar dessutom var 15:e minut, men
+de flesta körningar har inget att göra och anropar inte Claude.
 
 - **Namnet på omgången** så snart omgången finns, oftast måndag strax efter 07.00.
-- **Analyserna** 24 timmar före omgångens första avspark (`forhandTimmar` i
-  [config/analyser.js](config/analyser.js)). Stryktipset börjar oftast lördag 16.00, så de kommer
-  fredag 16.00, efter de flesta presskonferenserna. Avsparkstiderna i 660 spelade matcher: lördag
-  16.00 (311), lördag 13.30 (81), tisdag 20.45 (77), söndag 15.00 (21), fredag 21.00 (13). Har
-  matcherna ändrats skrivs de nya vid nästa kontroll.
+- **Analyserna** måndag 08.00, onsdag 16.00, fredag 16.00 och lördag 11.00, svensk tid (`tider` i
+  [config/analyser.js](config/analyser.js) och `StartCalendarInterval` i
+  [plist-filen](scripts/analyser/se.matchfixarna.analyser.plist); användarens önskan 2026-11-04). Varje
+  tid skriver nya analyser för omgångens matcher som inte har börjat, och den nya texten ersätter den
+  gamla, så hela omgången ger upp till 52 analyser i veckan. En tid gäller omgångar som fanns när klockan
+  slog: en omgång som skapas senare väntar till nästa tid, men en match utan analys skrivs ändå när
+  det är högst 24 timmar kvar till avspark. Har matcherna ändrats skrivs de nya vid nästa kontroll.
 - **Hasse Backes text** direkt efter varje analys.
 - **Kommentaren till en färdig kupong** när kupongen finns i den publicerade historiken.
 
@@ -1069,7 +1071,7 @@ webbsidornas innehåll når bara texten, som går genom kontrollerna.
 
 **När något går fel.** Varje färdig text sparas först i `vantande.json` utanför repot. Misslyckas en
 match skrivs de andra ändå, en gammal analys ligger kvar tills en ny finns, och matchen försöks igen
-efter en timme, högst tre gånger (`forsok.json`; ta bort posten för att försöka igen direkt). Når
+efter en timme, högst tre gånger per tid (`forsok.json`; ta bort posten för att försöka igen direkt). Når
 abonnemanget sin gräns pausar jobbet en timme. Går det inte att pusha ligger texten kvar till nästa
 körning. Spelade matcher faller bort ur filen efter 14 dagar. Loggen står i
 `~/Library/Logs/Matchfixarna/analyser.log`, och launchds egen i `launchd.log` bredvid.
@@ -1088,7 +1090,7 @@ node scripts/analyser/skriv.mjs --en-match <id> --ut /tmp/prov  # prova en match
 node scripts/analyser/skriv.mjs --torrt                       # visa vad som skulle göras
 ```
 
-**launchd** (`StartInterval`, `RunAtLoad`) kör ett tillfälle som missas medan datorn sover när den
+**launchd** (`StartCalendarInterval`, `StartInterval`, `RunAtLoad`) kör ett tillfälle som missas medan datorn sover när den
 vaknar, och flera missade blir ett. Jobbet väcker inte datorn. För att det ska gå att lita på att
 analyserna kommer i tid ska automatisk vila vara avstängd, och Claude Code ska vara inloggat
 (`claude auth login --claudeai`).
@@ -3692,7 +3694,7 @@ från början, osynlig tills han säger den, så att knapparna inte flyttar sig.
 små länkar längst ned i spalten och syntes knappt i telefonen (ändrat 2026-11-04). *Nästa match*
 efter analysen är samma guldknapp. Han har alltid svaret, både när du redan har frågat (*Den har jag tittat på*) och när
 han ska läsa på (*Den knäckte jag i morse*); att han läser på märks först medan han väntar. Är analysen inte skriven än
-säger han det (*Den tar jag dagen före*). Rader där du redan har fått tecknen öppnas
+säger han det (*Den tar jag sen*). Rader där du redan har fått tecknen öppnas
 direkt. Analysen är redan skriven, men han låtsas: när du har bett om den fortsätter han prata i 15–25 sekunder (`LATSAS` i [public/rum-hasse.js](public/rum-hasse.js), raderna kommer i ordning: *Vi börjar bakifrån*, *Total kontroll*, *Det här
 är helt normalt*) och tar en klunk kaffe då och då. När den är klar blir han tyst, armarna går upp, han slår i disken och domen
 står i guld. Sedan säger han texten en mening i taget, ord för ord med munnen i takt, med en paus
@@ -3880,8 +3882,8 @@ schemaintervall gammalt.
   små tal finns nästan alltid (datum, antal matcher). Ordningstal ("tredje") kontrolleras
   inte. Prompten är det främsta skyddet; kontrollen fångar påhittade siffror som 73 %.
 - **Analyserna:** de kommer inte om datorn är avstängd eller sover hela tiden fram till avspark,
-  och Hasse Backes och matchbladets texter tar inte med nyheter efter körningen (en skada samma
-  morgon). Claudes tecken sparas inte i journalen och rättas inte. Antalet sökningar och sidor kan
+  och Hasse Backes och matchbladets texter tar inte med nyheter efter den senaste tiden (en skada
+  samma morgon). Claudes tecken sparas inte i journalen och rättas inte. Antalet sökningar och sidor kan
   bara begäras i prompten, inte tvingas fram med `claude -p`, och `WebFetch` ger en sammanfattning
   av sidan, så sifferkontrollen kan säga nej till ett tal som stod på sidan men inte i
   sammanfattningen (då skrivs texten om). `WebSearch` kan inte spärra spelbolag, men deras sidor
