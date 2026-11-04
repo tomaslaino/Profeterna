@@ -4,7 +4,7 @@
 // det hörs (public/rum-hasse.js). Han säger två slags saker:
 //   - de färdiga replikerna i public/rum-hasse-repliker.js, med fälten ifyllda
 //     ({namn} efternamnen i gänget, {dag} när spelstoppet är, {du} och {Bada}
-//     tecken i ord), och
+//     tecken i ord, {res} resultatet 0–0 till 4–4), och
 //   - sin text till varje analys i data/analyser.json (hasse.stycken), mening för
 //     mening, delad som sidan delar den (public/rum-hasse-meningar.js).
 //
@@ -46,6 +46,8 @@ const MANGDER = [[0], [1], [2], [0, 1], [0, 2], [1, 2], [0, 1, 2]];
 const iOrd = (m) => (m.length === 3 ? 'helgardering' : m.map((i) => ORD[i]).join(' och '));
 const stor = (t) => t.replace(/^./, (c) => c.toUpperCase());
 const DAGAR = ['i dag', 'i morgon', ...['måndag', 'tisdag', 'onsdag', 'torsdag', 'fredag', 'lördag', 'söndag'].map((d) => `på ${d}`)];
+// Resultaten han kan säga: modellens resultatmatris har 0–4 mål per lag (resultatet i rum-hasse.js).
+const RESULTAT = [0, 1, 2, 3, 4].flatMap((h) => [0, 1, 2, 3, 4].map((b) => `${h}–${b}`));
 // Knapparna (lar) sägs inte, och inte heller att han har tappat rösten.
 const TYSTA = new Set(['lar', 'utanRost']);
 
@@ -67,6 +69,7 @@ function repliktexter(gang = []) {
     const med = (lista, f) => { fyllningar = fyllningar.flatMap((o) => lista.map((v) => f(o, v))); };
     if (falt.has('namn')) med(namn, (o, v) => ({ ...o, namn: v }));
     if (falt.has('dag')) med(DAGAR, (o, v) => ({ ...o, dag: v }));
+    if (falt.has('res')) med(RESULTAT, (o, v) => ({ ...o, res: v }));
     if (falt.has('du') && falt.has('Bada')) {
       // det ni båda har är en del av ditt, men inte allt
       const par = MANGDER.flatMap((du) => MANGDER.filter((b) => b.length < du.length && b.every((x) => du.includes(x))).map((b) => [du, b]));

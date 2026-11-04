@@ -604,6 +604,14 @@ bara lokalt. Analyserna visas som de ligger i `data/analyser.json`; hur de skriv
   (pokalen i SVG), blev samma dag en plansch med Tomas foto från segern i Hamburg och till
   sist Göteborgs-Postens löpsedel dagen efter, med fotot. Se [Tobaksaffären](#tobaksaffären),
   *Affischerna*.
+- **Svaren till Hasse Backe i kupongens tryck (2026-11-04, användarens önskemål):** guldpillren
+  och de understrukna länkarna i samtalet var webbknappar som inte hörde hemma i tobaksaffären.
+  Svaren är nu lappar i tipskupongens terrakotta och krämvita papper, och det som går härifrån
+  står med små spärrade versaler och en pil. Se [Hasse Backe](#hasse-backe), *Samtalet*.
+- **Hasse Backe säger resultatet (2026-11-04, användarens önskemål):** efter sin text säger han
+  vad matchen slutar, det troligaste resultatet i modellens prognos bland tecknen han har ringat
+  in, och resultatet står bredvid tecknen på matchens rad. Se [Hasse Backe](#hasse-backe),
+  *Samtalet*.
 - **Kuponghistoriken flyttar till Olympen (2026-10-20, användarens önskemål):** Kupong
   handlar bara om nästa kupong – växlaren Omgången | Historik försvinner. De färdigspelade
   kupongerna står sist i Olympen under rubriken *Grupparbetena* (`#olympen/kuponger`, en
@@ -3710,11 +3718,13 @@ ligger cigarren kvar i askkoppen, men röken stiger, på samma sätt som han for
 vet vem du är, och man svarar genom att välja en match. Då frågar han tillbaka (*Den är enkel. Vill du
 veta, eller ska du gissa?*), och först *Lär mig* ger analysen (knappen lottas som hans repliker: också *Jag lyssnar och
 lär* och *Upplys mig*), så att ett felklick inte visar ett tips. *Jag gissar* går tillbaka till listan och
-*Matchbladet* till matchen. Svaren står direkt under hans fråga: *Lär mig* som en knapp i guld,
-*Jag gissar* med en ljus ram bredvid och *Matchbladet* som en länk under dem. Frågan har sin plats
-från början, osynlig tills han säger den, så att knapparna inte flyttar sig. Förut stod svaren som
-små länkar längst ned i spalten och syntes knappt i telefonen (ändrat 2026-11-04). *Nästa match*
-efter analysen är samma guldknapp. Han har alltid svaret, både när du redan har frågat (*Den har jag tittat på*) och när
+*Matchbladet* till matchen. Svaren står direkt under hans fråga, som lappar i tipskupongens tryck
+som ligger på disken: *Lär mig* i terrakotta som kupongens band, *Jag gissar* i krämvitt papper
+bredvid, båda med en tunn ram innanför kanten, och *Matchbladet →* under dem med små spärrade
+versaler som texten i bandet. Frågan har sin plats från början, osynlig tills han säger den, så att
+knapparna inte flyttar sig. Förut stod svaren som små länkar längst ned i spalten och syntes knappt
+i telefonen, och sedan som piller i guld (ändrat 2026-11-04). *Nästa match* efter analysen är samma
+lapp i terrakotta, och *Ja, ja »* och *← Tillbaka* står med samma versaler som *Matchbladet →*. Han har alltid svaret, både när du redan har frågat (*Den har jag tittat på*) och när
 han ska läsa på (*Den knäckte jag i morse*); att han läser på märks först medan han väntar. Är analysen inte skriven än
 säger han det (*Den tar jag sen*). Rader där du redan har fått tecknen öppnas
 direkt. Analysen är redan skriven, men han låtsas: när du har bett om den fortsätter han prata i 15–25 sekunder (`LATSAS` i [public/rum-hasse.js](public/rum-hasse.js), raderna kommer i ordning: *Vi börjar bakifrån*, *Total kontroll*, *Det här
@@ -3723,10 +3733,15 @@ står i guld. Sedan säger han texten en mening i taget, ord för ord med munnen
 mellan meningarna och en längre före en kort mening, och gesterna kommer vid de bestämda orden
 (*Nej nej nej*, *varningens finger*) eller då och då vid en lång mening. Ett klick var som helst
 visar hela repliken och nästa klick går vidare; *Ja, ja* tar resten på en gång, och det svarar han
-på (*Som du vill.*). Sist säger han vad han tycker om det du själv har på kupongen (*Du har etta. Det
-är din kupong. Och dina pengar.*). Han minns på enheten vad du har frågat om: tecknen står på
-matchens rad, och *Nästa match* räknar (*Halva kupongen är löst*). Bara tecken du själv har bett om
-syns, så att listan inte blir ett automatiskt tips. Frågar du om samma match igen står allt direkt.
+på (*Som du vill.*). Efter texten säger han vad matchen slutar (*Det slutar 1–1.*): det troligaste
+resultatet i modellens prognos (resultatmatrisen i `data/match/<id>.json`, samma som matchbladet
+visar) bland utfallen han har ringat in, så att resultatet aldrig går emot tecknen. Har modellen
+ingen prognos för matchen säger han inget resultat (`resultatet` i
+[public/rum-hasse.js](public/rum-hasse.js)). Sist säger han vad han tycker om det du själv har på
+kupongen (*Du har etta. Det är din kupong. Och dina pengar.*). Han minns på enheten vad du har
+frågat om: tecknen står på matchens rad, i guld, med resultatet bredvid, och *Nästa match* räknar
+(*Halva kupongen är löst*). Bara tecken du själv har bett om syns, så att listan inte blir ett
+automatiskt tips. Frågar du om samma match igen står allt direkt.
 Går hans röst inte att få säger han det och visar analysen i skrift. Allt han säger runt omkring är
 färdiga rader, utan AI, i [public/rum-hasse-repliker.js](public/rum-hasse-repliker.js). Med minskad
 rörelse i systemet står allt direkt, utan gester.
@@ -3765,8 +3780,8 @@ svenska mansrösten Mattias lite långsammare och mörkare än vanligt (`rost` i
 [config/hasse.js](config/hasse.js)). Det är en röst i personans anda, inte en kopia av den
 verklige Hasse Backes. Han säger två slags saker ([src/rost.js](src/rost.js)): de färdiga
 replikerna i [public/rum-hasse-repliker.js](public/rum-hasse-repliker.js) med fälten ifyllda på
-alla sätt som sidan kan fylla dem (gängets efternamn, dagarna, tecknen i ord – 150 repliker, 4 500
-tecken), och sin text till varje analys, mening för mening, delad som sidan delar den
+alla sätt som sidan kan fylla dem (gängets efternamn, dagarna, tecknen i ord och resultaten 0–0
+till 4–4 – 250 repliker, 7 400 tecken), och sin text till varje analys, mening för mening, delad som sidan delar den
 ([public/rum-hasse-meningar.js](public/rum-hasse-meningar.js)). En omgång med tretton matcher är
 ungefär 10 000 tecken.
 
@@ -3784,8 +3799,8 @@ I sidan spelas ljudet med Web Audio ([public/rum-hasse.js](public/rum-hasse.js),
 hämtas medan han gör annat – hans text medan han låtsas läsa på – och orden kommer i takt med
 ljudet, utspridda efter sin längd, medan munnen följer ljudstyrkan. Saknas meningen i registret
 eller är ljudet inte framme inom 2,5 s säger han den tyst, som förut. Ett klick visar hela
-repliken och tystar den, liksom *Ja, ja* och *Tillbaka*. *Ljud av* längst ned till vänster
-stänger av honom (det minns enheten) och syns när han har hörts en gång. Med minskad rörelse står
+repliken och tystar den, liksom *Ja, ja* och *Tillbaka*. *Ljud av* längst ned till vänster, med
+samma små versaler som *← Tillbaka*, stänger av honom (det minns enheten) och syns när han har hörts en gång. Med minskad rörelse står
 allt direkt och inget hörs, och ljud får bara börja efter ett klick: med `?rum-hasse` är han tyst
 tills man klickar. *Jag har tappat rösten* sägs tyst.
 

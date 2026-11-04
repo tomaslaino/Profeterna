@@ -5,7 +5,7 @@
 // annars knuffar de ner matcherna under sig.
 //
 // {namn} ditt efternamn, {dag} när spelstoppet är (på lördag, i morgon, i dag),
-// {du} dina tecken (etta och kryss), {bada} tecknen ni båda har.
+// {du} dina tecken (etta och kryss), {bada} tecknen ni båda har, {res} resultatet (2–1).
 //
 // Raderna hörs: Macen tar fram ljudet till dem med fälten ifyllda
 // (src/analyser/rost.mjs), så filen är både ett skript i sidan
@@ -87,6 +87,10 @@
 
   // Direkt efter domen, när han har helgarderat: han har ju alltid svar.
   helgardera: 'Det är också ett svar.',
+
+  // Efter texten: vad matchen slutar, hemma–borta. Resultatet är det troligaste i modellens
+  // prognos bland tecknen han har ringat in (resultatet i rum-hasse.js).
+  resultat: ['Det slutar {res}.', 'Det blir {res}. Skriv upp det.', 'Jag säger {res}. Inget mer med det.', 'Slutresultat {res}. Det är bara att vänta.'],
 
   // Sist, om din egen kupong.
   kupong: {

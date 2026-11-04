@@ -54,7 +54,7 @@ window.RumHasse = (() => {
     vy.hidden = true;
     vy.setAttribute('aria-label', 'Hasse Backe');
     vy.innerHTML = '<div class="rh-scen"><img class="rh-bak" alt="" draggable="false"><i class="rh-disk"></i><i class="rh-mork"></i><canvas></canvas></div>' +
-      '<i class="rh-horn" aria-hidden="true"></i><div class="rh-samtal"></div><div class="rh-fot"><button type="button" class="rh-ljud" hidden></button><button type="button" class="rh-tillbaka">Tillbaka</button></div>';
+      '<i class="rh-horn" aria-hidden="true"></i><div class="rh-samtal"></div><div class="rh-fot"><button type="button" class="rh-vag rh-ljud" hidden></button><button type="button" class="rh-vag rh-tillbaka">Tillbaka</button></div>';
     sving.append(vy);
     H.vy = vy;
     // det som händer i samtalet stannar där (knapparna byter ut sig själva)
@@ -368,6 +368,27 @@ window.RumHasse = (() => {
   }
   // Den färdiga analysen (analysOf i app.js), eller null.
   const analysen = (id) => (typeof analysOf === 'function' ? analysOf(id) : Promise.resolve(null)).catch(() => null);
+  // Modellens prognos för matchen, samma fil som matchbladet läser (data/match/<id>.json), eller null.
+  const prognoser = new Map();
+  function prognosen(id) {
+    if (!prognoser.has(id)) {
+      const p = typeof getJSON === 'function' ? getJSON(`data/match/${encodeURIComponent(id)}.json`).then((d) => (d && d.prediction) || null) : Promise.resolve(null);
+      prognoser.set(id, p.catch(() => { prognoser.delete(id); return null; }));
+    }
+    return prognoser.get(id);
+  }
+  // Resultatet han säger: det troligaste i modellens resultatmatris (0–4 mål per lag) bland
+  // utfallen han har ringat in, så att det aldrig går emot tecknen. Hemma–borta, eller null.
+  function resultatet(p, signs) {
+    const g = p && p.scores && p.scores.grid;
+    if (!Array.isArray(g)) return null;
+    let bast = null;
+    g.forEach((rad, h) => rad.forEach((q, b) => {
+      const utfall = h > b ? 0 : h === b ? 1 : 2;
+      if (signs.includes(utfall) && (!bast || q > bast.q)) bast = { h, b, q };
+    }));
+    return bast ? `${bast.h}–${bast.b}` : null;
+  }
 
   // Det han minns: vilka matcher du har frågat om och vad han svarade (på enheten,
   // för den här kupongen). Bara tecken du själv har bett om står på raderna.
@@ -379,9 +400,9 @@ window.RumHasse = (() => {
       return j && j.k === nyckel(lista) ? j.m || {} : {};
     } catch (e) { return {}; }
   }
-  function minnas(lista, id, signs) {
+  function minnas(lista, id, signs, res) {
     const m = minns(lista);
-    m[id] = [...signs].sort().map((n) => KORT[n]).join('');
+    m[id] = [...signs].sort().map((n) => KORT[n]).join('') + (res ? ` ${res}` : '');
     try { localStorage.setItem(MINNE, JSON.stringify({ k: nyckel(lista), m })); } catch (e) { /* då minns han det bara nu */ }
   }
 
@@ -843,7 +864,8 @@ window.RumHasse = (() => {
     lista.forEach((m, i) => {
       const b = document.createElement('button');
       b.type = 'button';
-      b.innerHTML = `<i>${i + 1}</i><span>${esc(m.namn)}</span>${fragat[m.id] ? `<b>${esc(fragat[m.id])}</b>` : ''}`;
+      const [tecken, res] = String(fragat[m.id] || '').split(' ');
+      b.innerHTML = `<i>${i + 1}</i><span>${esc(m.namn)}</span>${tecken ? `<b>${esc(tecken)}${res ? `<small>${esc(res)}</small>` : ''}</b>` : ''}`;
       b.disabled = Date.parse(m.avspark) <= nu;
       b.dataset.id = m.id;
       // har du redan fått svaret finns inget att ta ställning till: tecknen står på raden
@@ -898,10 +920,10 @@ window.RumHasse = (() => {
     H.sagt = null;
     H.talMal = 0;
     s.innerHTML = `<div class="rh-match">${esc(m.namn)}?</div><h2 class="rh-sagt"></h2><p class="rh-fragan"><span class="rh-o">${esc(fragan)}</span></p>` +
-      `<div class="rh-svar"><div><button type="button" class="rh-knapp guld">${esc(lott(r.lar))}</button><button type="button" class="rh-knapp rh-gissa">Jag gissar</button></div>` +
-      `<a class="rh-blad" href="#match/${esc(m.id)}">Matchbladet</a></div>`;
+      `<div class="rh-svar"><div><button type="button" class="rh-knapp huvud">${esc(lott(r.lar))}</button><button type="button" class="rh-knapp rh-gissa">Jag gissar</button></div>` +
+      `<a class="rh-vag" href="#match/${esc(m.id)}">Matchbladet</a></div>`;
     const svar = s.querySelector('.rh-svar');
-    const ja = svar.querySelector('.guld');
+    const ja = svar.querySelector('.huvud');
     // ett dubbelklick på raden får inte landa på knappen som nu ligger under pekaren
     const t0 = performance.now();
     svar.addEventListener('click', (e) => {
@@ -946,6 +968,7 @@ window.RumHasse = (() => {
     rad(lott(igen ? REP().igen : REP().reaktion));
     const dag = spelstopp(lista);
     const t0 = Date.now();
+    const prog = prognosen(m.id);
     const a = await analysen(m.id);
     if (H.fraga !== vem) return;
     if (!a || !a.tip) {
@@ -974,17 +997,21 @@ window.RumHasse = (() => {
       : [{ text: REP().utanRost }, ...[a.lead, ...a.paragraphs, a.tip.text].filter(Boolean).map((text) => ({ text: text.replace(/\s*\[\d+(?:\s*[,;]\s*\d+)*\]/g, ''), skrift: true }))];
     const signs = a.tip.signs;
     if (signs.length === 3 && egen) texten.unshift({ text: REP().helgardera });
+    // sist resultatet, och efter det vad han tycker om din kupong
+    const res = resultatet(await prog, signs);
+    if (H.fraga !== vem) return;
+    if (res) texten.push({ text: fyll(lott(REP().resultat), { res }) });
     const om = omKupongen(m, signs);
     if (om) texten.push({ text: om });
-    tala(m, lista, signs, texten, igen);
+    tala(m, lista, signs, res, texten, igen);
   }
 
   // Slaget i pulten med domen, och sedan texten medan han pratar.
-  function tala(m, lista, signs, texten, igen) {
+  function tala(m, lista, signs, res, texten, igen) {
     const s = $('.rh-samtal');
     H.fas = 'dom';
     H.sagda.add(m.id);
-    minnas(lista, m.id, signs);
+    minnas(lista, m.id, signs, res);
     const nu = () => s.querySelector('.rh-text');
     // tyst när armarna går upp: sedan slaget och domen
     tystna();
@@ -999,7 +1026,7 @@ window.RumHasse = (() => {
       }],
       sen: () => {
         H.fas = 'tal';
-        s.querySelector('.rh-slut').innerHTML = '<button type="button" class="rh-ja" title="Hoppa till slutet">Ja, ja</button>';
+        s.querySelector('.rh-slut').innerHTML = '<button type="button" class="rh-vag rh-ja" title="Hoppa till slutet">Ja, ja</button>';
         let x = null;
         s.querySelector('.rh-ja').addEventListener('click', () => {
           x.sen = null;
@@ -1014,8 +1041,8 @@ window.RumHasse = (() => {
     const s = $('.rh-samtal');
     H.fas = 'klar';
     if (Math.abs(H.T - GEST.hem.vila) > 0.01 || H.klipp) spela('hem');
-    s.querySelector('.rh-slut').innerHTML = `<button type="button" class="rh-knapp guld">Nästa match</button><a class="rh-blad" href="#match/${esc(m.id)}">Matchbladet</a>`;
-    s.querySelector('.rh-slut .guld').addEventListener('click', fraga);
+    s.querySelector('.rh-slut').innerHTML = `<button type="button" class="rh-knapp huvud">Nästa match</button><a class="rh-vag" href="#match/${esc(m.id)}">Matchbladet</a>`;
+    s.querySelector('.rh-slut .huvud').addEventListener('click', fraga);
   }
 
   // Under en match går ett klick var som helst framåt, och Tillbaka eller Esc går
