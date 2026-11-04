@@ -71,8 +71,13 @@ jobs:
           key: kallcache-${{ github.run_id }}
           restore-keys: kallcache-
 
+      # Hasse Backes röst (src/rost.js): nyckeln till Azures talsyntes på den fria
+      # nivån. Saknas hemligheten blir han tyst, och bygget går som förut.
       - name: Hämta källor, logga prognoser och bygg sajten
         run: npm run build -- --journal
+        env:
+          AZURE_SPEECH_KEY: ${{ secrets.AZURE_SPEECH_KEY }}
+          AZURE_SPEECH_REGION: ${{ vars.AZURE_SPEECH_REGION }}
 
       - name: Spara källcachen
         if: always()

@@ -243,6 +243,9 @@ GitHub Actions (var 30:e min)  →  källorna  →  src/build.js  →  _site/ (H
 - **Analyserna** ingår inte i bygget: datorn committar `data/analyser.json` och
   `data/omgangsnamn.json` till `main`, och den pushen bygger om sajten som vilken annan push
   som helst. Bygget kopierar filerna till sajten. Se [Analyserna](#analyserna).
+- **Hasse Backes röst** tas fram i bygget: det ljud som saknas hämtas från Azures talsyntes
+  med hemligheten `AZURE_SPEECH_KEY`, sparas i källcachen (`data/cache/rost/`) och laddas upp
+  med sajten (`data/rost/`, `data/rost.json`). Det committas inte. Se [Ljudet](#hasse-backe).
 - **Läge 2026-10-19:** sidan ligger på <https://matchfixarna.se/> (custom domain i
   *Settings → Pages*, HTTPS påtvingat). Gamla <https://tomaslaino.github.io/Profeterna/>
   skickas vidare dit, så även `site` i [config/kupong.js](config/kupong.js) fungerar via
@@ -431,7 +434,7 @@ bara lokalt. Analyserna visas som de ligger i `data/analyser.json`; hur de skriv
 - **Analyserna i förväg på datorn (2026-11-04, användarens beslut):** sajten ska bara visa
   färdiga texter, och allt AI-skrivande ska gå på användarens Claude-konto på en dator som står
   på dygnet runt, inte på en API-nyckel. Bara omgångens matcher skrivs, oftast Stryktipsets
-  tretton. Claude får söka och läsa på nätet (`WebSearch`, `WebFetch`) men inget annat, eftersom
+  tretton, måndag 08, onsdag 16, fredag 16 och lördag 11. Claude får söka och läsa på nätet (`WebSearch`, `WebFetch`) men inget annat, eftersom
   underlaget i dag är just det Claude hittar. En påhittad tränare skriver analysen, medan Hasse
   Backe ligger kvar i tobaksaffären och låtsas analysera. DeepSeek är borta helt: omgångens namn
   och kupongernas kommentarer skrivs också på datorn.
@@ -1000,7 +1003,7 @@ och anropar aldrig någon språkmodell. (Fram till 2026-11-04 skrevs texterna vi
 `profeterna-analys` på Cloudflare, med API-nycklar.)
 
 ```
-launchd var 15:e min  →  scripts/analyser/skriv.mjs  →  claude -p (en gång per match)
+launchd               →  scripts/analyser/skriv.mjs  →  claude -p (en gång per match)
                                      ↓
        data/analyser.json, data/omgangsnamn.json, data/kupong-historik.json
                                      ↓
@@ -1008,15 +1011,17 @@ launchd var 15:e min  →  scripts/analyser/skriv.mjs  →  claude -p (en gång 
 ```
 
 **Vad som skrivs och när.** Omgången är gängets kupong, `GET …/samtal`, oftast Stryktipsets
-tretton matcher. Jobbet kontrollerar var 15:e minut, men de flesta körningar har inget att göra
-och anropar inte Claude.
+tretton matcher. Jobbet startar på analysernas tider och kontrollerar dessutom var 15:e minut, men
+de flesta körningar har inget att göra och anropar inte Claude.
 
 - **Namnet på omgången** så snart omgången finns, oftast måndag strax efter 07.00.
-- **Analyserna** 24 timmar före omgångens första avspark (`forhandTimmar` i
-  [config/analyser.js](config/analyser.js)). Stryktipset börjar oftast lördag 16.00, så de kommer
-  fredag 16.00, efter de flesta presskonferenserna. Avsparkstiderna i 660 spelade matcher: lördag
-  16.00 (311), lördag 13.30 (81), tisdag 20.45 (77), söndag 15.00 (21), fredag 21.00 (13). Har
-  matcherna ändrats skrivs de nya vid nästa kontroll.
+- **Analyserna** måndag 08.00, onsdag 16.00, fredag 16.00 och lördag 11.00, svensk tid (`tider` i
+  [config/analyser.js](config/analyser.js) och `StartCalendarInterval` i
+  [plist-filen](scripts/analyser/se.matchfixarna.analyser.plist); användarens önskan 2026-11-04). Varje
+  tid skriver nya analyser för omgångens matcher som inte har börjat, och den nya texten ersätter den
+  gamla, så hela omgången ger upp till 52 analyser i veckan. En tid gäller omgångar som fanns när klockan
+  slog: en omgång som skapas senare väntar till nästa tid, men en match utan analys skrivs ändå när
+  det är högst 24 timmar kvar till avspark. Har matcherna ändrats skrivs de nya vid nästa kontroll.
 - **Hasse Backes text** direkt efter varje analys.
 - **Kommentaren till en färdig kupong** när kupongen finns i den publicerade historiken.
 
@@ -1069,7 +1074,7 @@ webbsidornas innehåll når bara texten, som går genom kontrollerna.
 
 **När något går fel.** Varje färdig text sparas först i `vantande.json` utanför repot. Misslyckas en
 match skrivs de andra ändå, en gammal analys ligger kvar tills en ny finns, och matchen försöks igen
-efter en timme, högst tre gånger (`forsok.json`; ta bort posten för att försöka igen direkt). Når
+efter en timme, högst tre gånger per tid (`forsok.json`; ta bort posten för att försöka igen direkt). Når
 abonnemanget sin gräns pausar jobbet en timme. Går det inte att pusha ligger texten kvar till nästa
 körning. Spelade matcher faller bort ur filen efter 14 dagar. Loggen står i
 `~/Library/Logs/Matchfixarna/analyser.log`, och launchds egen i `launchd.log` bredvid.
@@ -1088,7 +1093,7 @@ node scripts/analyser/skriv.mjs --en-match <id> --ut /tmp/prov  # prova en match
 node scripts/analyser/skriv.mjs --torrt                       # visa vad som skulle göras
 ```
 
-**launchd** (`StartInterval`, `RunAtLoad`) kör ett tillfälle som missas medan datorn sover när den
+**launchd** (`StartCalendarInterval`, `StartInterval`, `RunAtLoad`) kör ett tillfälle som missas medan datorn sover när den
 vaknar, och flera missade blir ett. Jobbet väcker inte datorn. För att det ska gå att lita på att
 analyserna kommer i tid ska automatisk vila vara avstängd, och Claude Code ska vara inloggat
 (`claude auth login --claudeai`).
@@ -3711,10 +3716,10 @@ från början, osynlig tills han säger den, så att knapparna inte flyttar sig.
 små länkar längst ned i spalten och syntes knappt i telefonen (ändrat 2026-11-04). *Nästa match*
 efter analysen är samma guldknapp. Han har alltid svaret, både när du redan har frågat (*Den har jag tittat på*) och när
 han ska läsa på (*Den knäckte jag i morse*); att han läser på märks först medan han väntar. Är analysen inte skriven än
-säger han det (*Den tar jag dagen före*). Rader där du redan har fått tecknen öppnas
+säger han det (*Den tar jag sen*). Rader där du redan har fått tecknen öppnas
 direkt. Analysen är redan skriven, men han låtsas: när du har bett om den fortsätter han prata i 15–25 sekunder (`LATSAS` i [public/rum-hasse.js](public/rum-hasse.js), raderna kommer i ordning: *Vi börjar bakifrån*, *Total kontroll*, *Det här
 är helt normalt*) och tar en klunk kaffe eller cigarren då och då. När den är klar blir han tyst, armarna går upp, han slår i disken och domen
-står i guld. Sedan säger han texten en mening i taget, ord för ord med munnen i takt, med en paus
+står i guld. Sedan säger han texten en mening i taget, ord för ord med munnen i takt (och det hörs, se *Ljudet*), med en paus
 mellan meningarna och en längre före en kort mening, och gesterna kommer vid de bestämda orden
 (*Nej nej nej*, *varningens finger*) eller då och då vid en lång mening. Ett klick var som helst
 visar hela repliken och nästa klick går vidare; *Ja, ja* tar resten på en gång, och det svarar han
@@ -3753,6 +3758,55 @@ munnen och fraser där de inte hörde hemma (2026-11-03: "formulerar sig ytterst
 kraven borta, uttrycken frivilliga och prompten 1 600 tecken i stället för 2 550 (tipsets är
 1 400). Prov på sex analyser: 112–127 ord, och i en av dem en tillagd rad om högpress för att
 prova Bielsa-utbrottet.
+
+**Ljudet.** Det han säger hörs. Bygget tar fram ljudet med Azures talsyntes på den fria nivån
+(F0: 500 000 tecken i månaden; när de är slut stryps tjänsten, och den debiterar aldrig), med den
+svenska mansrösten Mattias lite långsammare och mörkare än vanligt (`rost` i
+[config/hasse.js](config/hasse.js)). Det är en röst i personans anda, inte en kopia av den
+verklige Hasse Backes. Han säger två slags saker ([src/rost.js](src/rost.js)): de färdiga
+replikerna i [public/rum-hasse-repliker.js](public/rum-hasse-repliker.js) med fälten ifyllda på
+alla sätt som sidan kan fylla dem (gängets efternamn, dagarna, tecknen i ord – 150 repliker, 4 500
+tecken), och sin text till varje analys, mening för mening, delad som sidan delar den
+([public/rum-hasse-meningar.js](public/rum-hasse-meningar.js)). En omgång med tretton matcher är
+ungefär 10 000 tecken.
+
+Ljudet tas fram en gång per mening och sparas i källcachen, `data/cache/rost/<avtryck>.mp3`, där
+avtrycket räknas på rösten, takten, tonen och meningen (ändras något av dem tas allt fram på
+nytt). Kommande matcher först, sedan replikerna; högst 80 anrop per bygge och ett var 3,2 s,
+eftersom den fria nivån tar 20 anrop i minuten. Första gången tar replikerna alltså ett par
+byggen, och en ny omgångs text kommer i bygget efter att iMacen har pushat den. Bygget lägger det
+som finns i `_site/data/rost/` med registret `data/rost.json` (mening → fil), och ljud som inte har
+använts på 30 dagar tas bort ur cachen. Inget av det committas, så repot växer inte (allt ljud
+till en omgång är 3–4 MB). Utan nyckeln, eller när Azure inte svarar, blir han tyst där ljudet
+saknas, och bygget går som förut. Bygget skriver hur många meningar som har ljud.
+
+I sidan spelas ljudet med Web Audio ([public/rum-hasse.js](public/rum-hasse.js), *rösten*). Det
+hämtas medan han gör annat – hans text medan han låtsas läsa på – och orden kommer i takt med
+ljudet, utspridda efter sin längd, medan munnen följer ljudstyrkan. Saknas meningen i registret
+eller är ljudet inte framme inom 2,5 s säger han den tyst, som förut. Ett klick visar hela
+repliken och tystar den, liksom *Ja, ja* och *Tillbaka*. *Ljud av* längst ned till vänster
+stänger av honom (det minns enheten) och syns när han har hörts en gång. Med minskad rörelse står
+allt direkt och inget hörs, och ljud får bara börja efter ett klick: med `?rum-hasse` är han tyst
+tills man klickar. *Jag har tappat rösten* sägs tyst.
+
+**Slå på rösten** (ett gratis konto hos Microsoft Azure; kortet som Azure frågar efter när kontot
+skapas debiteras inte på F0):
+
+1. Skapa en resurs av typen *Speech* (Azure AI services) med prisnivån **Free F0** i regionen
+   Sweden Central. Väljs en annan region: lägg den som variabeln `AZURE_SPEECH_REGION` under
+   *Settings → Secrets and variables → Actions → Variables* (t.ex. `westeurope`).
+2. Kopiera *KEY 1* under *Keys and Endpoint*.
+3. Lägg den som hemligheten `AZURE_SPEECH_KEY` under *Settings → Secrets and variables →
+   Actions → Secrets* i repot på GitHub (eller `gh secret set AZURE_SPEECH_KEY`).
+4. Kör workflowen *Hämta data och publicera* (eller vänta på nästa körning). Loggen säger hur
+   många meningar som har ljud.
+
+Provat: [src/rost.js](src/rost.js) i Node med låtsad Azure (ordningen, taket per bygge, stopp vid
+429, registret och städningen av cachen); sidan i headless Chrome 1440 × 900 med låtsat tal i
+cachen (en tonstöt per ord, mp3) publicerat med `publicera()` som i bygget: replikerna och
+analysen hördes mening för mening med orden i takt, och *Ljud av* mitt i en mening och ett tomt
+register fungerade utan fel i sidan. Inte provat mot Azure på riktigt (ingen nyckel där provet
+gjordes), och inte i Safari eller en riktig telefon.
 
 **Grafiken.** Allt han behöver hämtas först när någon pekar på kaffet eller klickar: bilden av
 väggen (41 kB, 20 kB på höjden), fotot (149 kB) och handens modell (133 kB). Rummet har ingen egen
@@ -3906,8 +3960,8 @@ schemaintervall gammalt.
   små tal finns nästan alltid (datum, antal matcher). Ordningstal ("tredje") kontrolleras
   inte. Prompten är det främsta skyddet; kontrollen fångar påhittade siffror som 73 %.
 - **Analyserna:** de kommer inte om datorn är avstängd eller sover hela tiden fram till avspark,
-  och Hasse Backes och matchbladets texter tar inte med nyheter efter körningen (en skada samma
-  morgon). Claudes tecken sparas inte i journalen och rättas inte. Antalet sökningar och sidor kan
+  och Hasse Backes och matchbladets texter tar inte med nyheter efter den senaste tiden (en skada
+  samma morgon). Claudes tecken sparas inte i journalen och rättas inte. Antalet sökningar och sidor kan
   bara begäras i prompten, inte tvingas fram med `claude -p`, och `WebFetch` ger en sammanfattning
   av sidan, så sifferkontrollen kan säga nej till ett tal som stod på sidan men inte i
   sammanfattningen (då skrivs texten om). `WebSearch` kan inte spärra spelbolag, men deras sidor

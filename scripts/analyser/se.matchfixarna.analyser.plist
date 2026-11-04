@@ -1,12 +1,15 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
 <!--
-  Analyserna på Matchfixarna: scripts/analyser/skriv.mjs var 15:e minut. Mallen fylls i
-  av installera.sh och hamnar i ~/Library/LaunchAgents.
+  Analyserna på Matchfixarna: scripts/analyser/skriv.mjs. Mallen fylls i av installera.sh
+  och hamnar i ~/Library/LaunchAgents.
 
-  StartInterval: sover datorn när det är dags körs jobbet när den vaknar, och flera
-  missade tillfällen blir ett. RunAtLoad: också när datorn startas och användaren
-  loggar in. Skriptet har oftast inget att göra och slutar direkt.
+  StartCalendarInterval: analysernas tider (samma som tider i config/analyser.js), så att
+  de kommer på minuten. Weekday: 0 = söndag, 1 = måndag … 6 = lördag.
+  StartInterval: en kontroll var 15:e minut, för omgångens namn, nya försök och kupongernas
+  kommentarer. Sover datorn när det är dags körs jobbet när den vaknar, och flera missade
+  tillfällen blir ett. RunAtLoad: också när datorn startas och användaren loggar in.
+  Skriptet har oftast inget att göra och slutar direkt.
 -->
 <plist version="1.0">
 <dict>
@@ -25,6 +28,13 @@
     <key>PATH</key>
     <string>/usr/local/bin:/opt/homebrew/bin:/usr/bin:/bin:/usr/sbin:/sbin</string>
   </dict>
+  <key>StartCalendarInterval</key>
+  <array>
+    <dict><key>Weekday</key><integer>1</integer><key>Hour</key><integer>8</integer><key>Minute</key><integer>0</integer></dict>
+    <dict><key>Weekday</key><integer>3</integer><key>Hour</key><integer>16</integer><key>Minute</key><integer>0</integer></dict>
+    <dict><key>Weekday</key><integer>5</integer><key>Hour</key><integer>16</integer><key>Minute</key><integer>0</integer></dict>
+    <dict><key>Weekday</key><integer>6</integer><key>Hour</key><integer>11</integer><key>Minute</key><integer>0</integer></dict>
+  </array>
   <key>StartInterval</key>
   <integer>900</integer>
   <key>RunAtLoad</key>

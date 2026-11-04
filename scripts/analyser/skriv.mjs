@@ -1,15 +1,16 @@
 #!/usr/bin/env node
 // Skriver allt AI-innehåll på sajten från den här datorn, med Claude Code
-// (claude -p) på användarens Claude-konto. Startas av launchd var 15:e minut
-// (se README, Analyserna); de flesta körningar har inget att göra och slutar direkt.
+// (claude -p) på användarens Claude-konto. Startas av launchd på analysernas tider och
+// var 15:e minut (se README, Analyserna); de flesta körningar har inget att göra och
+// slutar direkt.
 //
 //   - Omgångens matcher och namn: så snart gängets omgång finns (oftast
 //     Stryktipset, måndag kl. 07) skrivs matcherna i data/analyser.json och namnet
 //     i data/omgangsnamn.json.
-//   - Analyserna: forhandTimmar före omgångens första avspark skrivs en analys per
-//     match (config/analyser.js) och Hasse Backes text ur den. Misslyckas en match
+//   - Analyserna: på varje tid i config/analyser.js (tider) skrivs en ny analys per
+//     match som inte har börjat, och Hasse Backes text ur den. Misslyckas en match
 //     sparas de andra, en gammal analys ligger kvar tills en ny finns, och nästa
-//     körning försöker igen med högst perMatch försök.
+//     körning försöker igen med högst perMatch försök per tid.
 //   - Kommentarerna till färdiga kuponger: i data/kupong-historik.json.
 //
 // Publicering: varje färdig text sparas först i vantande.json utanför repot, sedan
@@ -39,6 +40,7 @@ import { skrivAnalys } from '../../src/analyser/artikel.mjs';
 import { skrivHasse, hasseKlar } from '../../src/analyser/hasse.mjs';
 import { skrivNamn, namnNyckel } from '../../src/analyser/namn.mjs';
 import { skrivKommentar } from '../../src/analyser/kommentar.mjs';
+import { attSkriva } from '../../src/analyser/tider.mjs';
 
 const require = createRequire(import.meta.url);
 const { readHistory, writeHistory } = require('../../src/history.js');
@@ -132,6 +134,11 @@ for (const s of ['SIGTERM', 'SIGINT']) process.on(s, () => { logg(`avbruten (${s
 
 const forsok = lasJson(FORSOK, { poster: {}, pausTill: null });
 const sparaForsok = () => skrivJson(FORSOK, forsok);
+// Försöken för tider som har passerat behövs inte längre.
+function rensaForsok() {
+  const gans = Date.now() - 8 * 24 * H;
+  for (const [k, f] of Object.entries(forsok.poster)) if (Date.parse(f.senast) < gans) delete forsok.poster[k];
+}
 
 // Får saken försökas nu? Högst perMatch försök, med nyttForsokMinuter emellan.
 function far(nyckel) {
@@ -345,8 +352,7 @@ async function kommentarerna() {
   }
 }
 
-async function enAnalys(id, namn, gammal, roster) {
-  const nyckel = `analys:${id}`;
+async function enAnalys(id, namn, gammal, roster, nyckel = `analys:${id}`) {
   try {
     const d = await fardata(`match/${id}.json`);
     if (!d) throw new Error('matchen finns inte på sajten');
@@ -383,38 +389,30 @@ async function hasseText(id, entry, roster) {
   }
 }
 
-// Omgången skrivs forhandTimmar före sin första avspark som inte har varit.
-function dags(round, now) {
-  const kvar = round.matcher.filter((x) => Date.parse(x.avspark) > now);
-  if (!kvar.length) return { kvar, dags: false, vid: null };
-  const forsta = Math.min(...kvar.map((x) => Date.parse(x.avspark)));
-  return { kvar, dags: forsta - now <= ac.forhandTimmar * H, vid: new Date(forsta - ac.forhandTimmar * H) };
-}
-
 async function analyserna(round, roster) {
-  const now = Date.now();
-  const { kvar, dags: ar, vid } = dags(round, now);
   const per = new Map(lasAnalyser().analyser.map((a) => [String(a.id), a]));
   for (const [id, a] of Object.entries(vantande.analyser)) per.set(id, a);
-  const klara = kvar.filter((x) => { const a = per.get(String(x.id)); return a && a.version === ac.promptVersion; });
-  if (!ar && !TVINGA) {
-    logg(`kontroll: ${round.id}, ${klara.length} av ${kvar.length} analyser klara${vid ? `, skrivs ${vid.toISOString()}` : ''}`);
+  const v = attSkriva(round, per, { now: Date.now(), tider: ac.tider, forhandTimmar: ac.forhandTimmar, version: ac.promptVersion, tvinga: TVINGA });
+  const nyckel = (x) => `analys:${x.id}:${v.tid}`;
+  const att = v.att.filter((x) => far(nyckel(x)));
+  // Analyser som fick sin text men inte Hasses.
+  const hasse = v.kvar.filter((x) => {
+    const a = per.get(String(x.id));
+    return a && a.version === ac.promptVersion && a.tip && !v.att.includes(x) && !hasseKlar(a.hasse, a) && far(`hasse:${x.id}`);
+  });
+  const nasta = v.nasta ? new Date(v.nasta).toISOString() : 'okänt';
+  if (!att.length && !hasse.length) {
+    logg(`kontroll: ${round.id}, ${v.klara.length} av ${v.kvar.length} analyser aktuella, nästa tid ${nasta}`);
     return;
   }
-  const att = kvar.filter((x) => (TVINGA || !klara.includes(x)) && far(`analys:${x.id}`));
-  // Analyser som fick sin text men inte Hasses.
-  const hasse = kvar.filter((x) => {
-    const a = per.get(String(x.id));
-    return a && a.version === ac.promptVersion && a.tip && !att.includes(x) && !hasseKlar(a.hasse, a) && far(`hasse:${x.id}`);
-  });
-  logg(`kontroll: ${round.id}, dags: ${att.length} analyser och ${hasse.length} Hasse-texter att skriva, ${klara.length} av ${kvar.length} klara`);
+  logg(`kontroll: ${round.id}, ${att.length} analyser och ${hasse.length} Hasse-texter att skriva, ${v.klara.length} av ${v.kvar.length} aktuella`);
   if (TORRT) {
     for (const x of att) logg(`skulle skriva analysen av ${x.match}`);
     return;
   }
   for (const x of att) {
     if (lage.stoppad) return;
-    await enAnalys(String(x.id), x.match, per.get(String(x.id)), roster);
+    await enAnalys(String(x.id), x.match, per.get(String(x.id)), roster, nyckel(x));
   }
   for (const x of hasse) {
     if (lage.stoppad) return;
@@ -449,6 +447,7 @@ async function main() {
     return;
   }
   forsok.pausTill = null;
+  rensaForsok();
 
   // Det som inte hann publiceras förra gången.
   if (finnsVantande() && !TORRT) {

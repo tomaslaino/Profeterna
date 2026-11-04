@@ -1187,8 +1187,8 @@ async function tableFill(root, d) {
 
 // ---------- Analysera ----------
 
-// Analyserna skrivs i förväg av en dator (scripts/analyser/skriv.mjs), en gång per
-// omgång, och ligger färdiga i data/analyser.json: artikeln om matchen och tipset
+// Analyserna skrivs i förväg av en dator (scripts/analyser/skriv.mjs), på bestämda
+// tider, och ligger färdiga i data/analyser.json: artikeln om matchen och tipset
 // under den. Sidan anropar ingen språkmodell. Knappen visar den sparade texten direkt,
 // och sedan står den kvar medan sidan är öppen (articles). notReady: matcher där
 // knappen har tryckts men analysen inte är klar än.
@@ -1238,7 +1238,7 @@ function analysPane(d) {
   if (a) return articlePane(a) + tipCard(d, a);
   const waiting = notReady.has(id) && !(analyserData && analyserData.per.has(id));
   return '<article class="card artikel" id="artikel-card">' + (waiting
-    ? '<p class="unknown">Analysen är inte klar än. Den skrivs dagen före omgångens första avspark, så titta in igen då.</p>'
+    ? '<p class="unknown">Analysen är inte klar än. Nya analyser skrivs måndag 08, onsdag 16, fredag 16 och lördag 11, så titta in igen då.</p>'
     : `<button type="button" class="analyze" data-artikel="${esc(id)}" title="Artikeln om matchen och tecknen som ringas in">Analysera</button>`) + '</article>';
 }
 
