@@ -1,7 +1,8 @@
 // Det Hasse Backe (fiktiv) säger själv i tobaksaffären (rum-hasse.js), utan att
 // någon AI är inblandad. Analysen av en match skrivs i worker/hasse.mjs; här står
 // allt runt omkring. Han lottar bland raderna, och inget av det här är ett faktum
-// om en match eller en person. Raderna ska rymmas på en rad (ungefär 30 tecken),
+// om en match eller en person. Han tvivlar aldrig, så ingen rad får låta som att
+// han måste ta reda på något. Raderna ska rymmas på en rad (ungefär 30 tecken),
 // annars knuffar de ner matcherna under sig.
 //
 // {namn} ditt efternamn, {dag} när spelstoppet är (på lördag, i morgon, i dag),
@@ -35,7 +36,7 @@ window.HasseRepliker = {
   // redan finns, valLasa när den måste skrivas och val när det inte går att få veta.
   val: ['Den är enkel.', 'Den där, ja.', 'Den är inte svår.'],
   valKlar: ['Den har jag tittat på.', 'Den har jag svaret på.', 'Den är redan löst.'],
-  valLasa: ['Den får jag läsa på.', 'Den har ingen frågat om än.', 'Den får jag titta på.'],
+  valLasa: ['Den har ingen frågat om än.', 'Den har ingen vågat fråga om.', 'Ny fråga. Den är enkel.'],
   fragaTillbaka: ['Vill du veta, eller ska du gissa?', 'Vill du ha svaret, eller gissar du?', 'Ska jag säga det, eller gissar du?'],
   // Trycker man på Jag gissar.
   gissar: ['Modigt. Vilken mer?', 'Det har gått förr. Vilken mer?', 'Gissa på. Vilken mer?', 'Det är din kupong. Nästa.'],
@@ -46,7 +47,7 @@ window.HasseRepliker = {
 
   // Medan analysen skrivs: en i taget, i den här ordningen. Allt under kontroll.
   vantar: [
-    'Jag ska bara titta på en sak.',
+    'Svaret har jag redan.',
     'Vi börjar bakifrån.',
     'Bra analys tar sin tid.',
     'Jag läser vad de skriver.',
@@ -81,6 +82,6 @@ window.HasseRepliker = {
   // När något inte går.
   ingenKupong: 'Ingen kupong än. Det är lugnt.',
   igang: 'Efteråt kan alla ha rätt.',
-  fel: 'Den får vi ta en annan gång.',
+  fel: 'Den tar vi en annan gång.',
   utanRost: 'Jag har tappat rösten. Här har du det i skrift.',
 };
