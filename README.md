@@ -605,6 +605,10 @@ bara lokalt. Analyserna visas som de ligger i `data/analyser.json`; hur de skriv
   och de understrukna länkarna i samtalet var webbknappar som inte hörde hemma i tobaksaffären.
   Svaren är nu lappar i tipskupongens terrakotta och krämvita papper, och det som går härifrån
   står med små spärrade versaler och en pil. Se [Hasse Backe](#hasse-backe), *Samtalet*.
+- **Hasse Backe säger resultatet (2026-11-04, användarens önskemål):** efter sin text säger han
+  vad matchen slutar, det troligaste resultatet i modellens prognos bland tecknen han har ringat
+  in, och resultatet står bredvid tecknen på matchens rad. Se [Hasse Backe](#hasse-backe),
+  *Samtalet*.
 - **Kuponghistoriken flyttar till Olympen (2026-10-20, användarens önskemål):** Kupong
   handlar bara om nästa kupong – växlaren Omgången | Historik försvinner. De färdigspelade
   kupongerna står sist i Olympen under rubriken *Grupparbetena* (`#olympen/kuponger`, en
@@ -3705,10 +3709,15 @@ står i guld. Sedan säger han texten en mening i taget, ord för ord med munnen
 mellan meningarna och en längre före en kort mening, och gesterna kommer vid de bestämda orden
 (*Nej nej nej*, *varningens finger*) eller då och då vid en lång mening. Ett klick var som helst
 visar hela repliken och nästa klick går vidare; *Ja, ja* tar resten på en gång, och det svarar han
-på (*Som du vill.*). Sist säger han vad han tycker om det du själv har på kupongen (*Du har etta. Det
-är din kupong. Och dina pengar.*). Han minns på enheten vad du har frågat om: tecknen står på
-matchens rad, och *Nästa match* räknar (*Halva kupongen är löst*). Bara tecken du själv har bett om
-syns, så att listan inte blir ett automatiskt tips. Frågar du om samma match igen står allt direkt.
+på (*Som du vill.*). Efter texten säger han vad matchen slutar (*Det slutar 1–1.*): det troligaste
+resultatet i modellens prognos (resultatmatrisen i `data/match/<id>.json`, samma som matchbladet
+visar) bland utfallen han har ringat in, så att resultatet aldrig går emot tecknen. Har modellen
+ingen prognos för matchen säger han inget resultat (`resultatet` i
+[public/rum-hasse.js](public/rum-hasse.js)). Sist säger han vad han tycker om det du själv har på
+kupongen (*Du har etta. Det är din kupong. Och dina pengar.*). Han minns på enheten vad du har
+frågat om: tecknen står på matchens rad, i guld, med resultatet bredvid, och *Nästa match* räknar
+(*Halva kupongen är löst*). Bara tecken du själv har bett om syns, så att listan inte blir ett
+automatiskt tips. Frågar du om samma match igen står allt direkt.
 Går hans röst inte att få säger han det och visar analysen i skrift. Allt han säger runt omkring är
 färdiga rader, utan AI, i [public/rum-hasse-repliker.js](public/rum-hasse-repliker.js). Med minskad
 rörelse i systemet står allt direkt, utan gester.

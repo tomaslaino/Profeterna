@@ -38,6 +38,8 @@
 .rh-lista button i { flex: none; width: 1.7em; font-style: normal; opacity: 0.62; }
 .rh-lista button span { flex: 1; min-width: 0; }
 .rh-lista button b { flex: none; margin-left: 0.8em; font-weight: 700; color: #ffd86b; font-variant-numeric: tabular-nums; }
+/* resultatet han sa, i ljust bredvid tecknen i guld */
+.rh-lista button b small { margin-left: 0.55em; font-size: inherit; font-weight: 600; color: #f6efdc; opacity: 0.78; }
 @media (hover: hover) { .rh-lista button:hover:not(:disabled) { color: #ffd86b; border-bottom-color: #ffd86b; } }
 .rh-lista button:disabled { opacity: 0.42; cursor: default; }
 .rh-match { flex: none; font-weight: 600; opacity: 0.85; }
