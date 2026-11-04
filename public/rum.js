@@ -24,8 +24,8 @@
 //   fram till den på pulten.
 //   högen bredvid: de inlämnade kupongerna med baksidan upp; din egen tas i
 //   handen därifrån när du har lämnat in, de andras när du ser deras tips.
-//   kaffet och notan längst till vänster på pulten → Hasse Backe, som står
-//   i baren utanför bilden (H): kameran svänger dit (rum-hasse.js).
+//   kaffet och notan längst till vänster på pulten → Hasse Backe, som sitter
+//   i baren utanför bilden (H): man vänder sig dit (rum-hasse.js).
 // Det finns ingen meny: pekar man på ett föremål lyser det, och snabbvalet på
 // text-tv:n med samma ämne tänds.
 //
@@ -482,7 +482,7 @@ window.Rum = (() => {
   // Hasse Backe sitter i baren utanför bilden till vänster: längst ut på
   // pulten står hans kaffe på ett fat, på notan som han har skrivit på Notts
   // County (som han lämnade efter sju veckor 2009, när lönen inte kom). Ett
-  // klick, eller H, och kameran svänger dit (tillHasse, rum-hasse.js).
+  // klick, eller H, och man vänder sig dit (tillHasse, rum-hasse.js).
   function hasseHtml() {
     const kopp = `<svg class="kopp" width="150" height="124" viewBox="0 0 150 124" aria-hidden="true"><defs>
     <radialGradient id="rum-hk-skugga" cx=".5" cy=".5" r=".5"><stop offset="0" stop-color="#000" stop-opacity=".55"/><stop offset=".6" stop-color="#000" stop-opacity=".3"/><stop offset="1" stop-color="#000" stop-opacity="0"/></radialGradient>
@@ -519,7 +519,7 @@ window.Rum = (() => {
       `${kopp}<span class="anga" aria-hidden="true"><i></i><i></i></span></a>`;
   }
 
-  // Ett klick på kaffet eller H: kameran svänger till honom (rum-hasse.js).
+  // Ett klick på kaffet eller H: man vänder sig mot honom (rum-hasse.js).
   function tillHasse(a = R.el.querySelector('#rum-hasse')) {
     if (!a) return;
     if (window.RumHasse) RumHasse.oppna();
@@ -1926,7 +1926,7 @@ ${window.RumRegister ? RumRegister.nara() : ''}
     let dt = 0;
     const tick = (ms) => {
       if (!R.on) return;
-      // kameran är vänd mot Hasse (rum-hasse.js): rummet står still och syns inte
+      // man har vänt sig mot Hasse (rum-hasse.js): rummet står still och syns inte
       if (R.vilar) {
         prev = 0;
         R.vila = setTimeout(() => { R.raf = requestAnimationFrame(tick); }, 250);
@@ -4036,9 +4036,10 @@ ${window.RumRegister ? RumRegister.nara() : ''}
     document.documentElement.classList.remove('i-rummet');
   }
 
-  return { fits, show, hide, redraw: () => { if (R.on) fill(); }, skriv: skrivPult, vila: (v) => {
+  // kval: rummets steg (KVAL), som Hasse Backe också ritas efter (rum-hasse.js)
+  return { fits, show, hide, redraw: () => { if (R.on) fill(); }, skriv: skrivPult, kval: () => R.kval, vila: (v) => {
       R.vilar = Boolean(v);
-      // (kameran kommer tillbaka rak: rum-hasse.css)
+      // (rummet kommer tillbaka rakt: rum-hasse.js rätar upp det på vägen dit)
       if (!v) { R.mx = R.my = 0; setCam(0, 0); }
     } };
 })();
