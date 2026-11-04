@@ -712,36 +712,39 @@ window.RumHasse = (() => {
   }
 
   // Du pekar ut en match och han frågar tillbaka. Först när du ber om det tas analysen
-  // fram (svara), så att ett felklick varken kostar en text eller visar ett tips. Samma
-  // uppställning som under analysen, så att inget flyttar sig när man går vidare.
+  // fram (svara), så att ett felklick varken kostar en text eller visar ett tips. Matchen och
+  // det han säger står där de står under analysen. Dina svar står direkt under hans fråga,
+  // som har sin plats från början (osynlig tills han säger den), så att de inte flyttar sig.
   function valj(m, lista, klick) {
     const s = $('.rh-samtal');
     const vem = {};
+    const r = REP();
+    const fragan = lott(r.fragaTillbaka);
     H.fraga = vem;
     H.fas = 'val';
     H.prat = null;
     H.sagt = null;
     H.talMal = 0;
-    s.innerHTML = `<div class="rh-match">${esc(m.namn)}?</div><h2 class="rh-sagt"></h2><div class="rh-text"></div>` +
-      `<div class="rh-slut"><button type="button" class="rh-nasta">${esc(lott(REP().lar))}</button><button type="button" class="rh-ja">Jag gissar</button><a href="#match/${esc(m.id)}">Matchbladet</a></div>`;
-    const slut = s.querySelector('.rh-slut');
-    const ja = slut.querySelector('.rh-nasta');
+    s.innerHTML = `<div class="rh-match">${esc(m.namn)}?</div><h2 class="rh-sagt"></h2><p class="rh-fragan"><span class="rh-o">${esc(fragan)}</span></p>` +
+      `<div class="rh-svar"><div><button type="button" class="rh-knapp guld">${esc(lott(r.lar))}</button><button type="button" class="rh-knapp rh-gissa">Jag gissar</button></div>` +
+      `<a class="rh-blad" href="#match/${esc(m.id)}">Matchbladet</a></div>`;
+    const svar = s.querySelector('.rh-svar');
+    const ja = svar.querySelector('.guld');
     // ett dubbelklick på raden får inte landa på knappen som nu ligger under pekaren
     const t0 = performance.now();
-    slut.addEventListener('click', (e) => {
+    svar.addEventListener('click', (e) => {
       if (performance.now() - t0 >= 500) return;
       e.preventDefault();
       e.stopPropagation();
     }, true);
     ja.addEventListener('click', () => svara(m, lista));
-    slut.querySelector('.rh-ja').addEventListener('click', (e) => gissa(m, e));
+    svar.querySelector('.rh-gissa').addEventListener('click', (e) => gissa(m, e));
     if (!klick.detail) ja.focus({ preventScroll: true });
     harSvaret(m.id).then((finns) => {
       if (H.fraga !== vem) return;
-      const r = REP();
       rad(lott(finns === null ? r.val : finns ? r.valKlar : r.valLasa), () => {
         if (H.fraga !== vem) return;
-        repliker([{ text: lott(r.fragaTillbaka) }]).tid = performance.now() + 450;
+        repliker([{ text: fragan }], { i: s.querySelector('.rh-fragan'), rad: true }).tid = performance.now() + 450;
       });
     });
   }
@@ -840,8 +843,8 @@ window.RumHasse = (() => {
     const s = $('.rh-samtal');
     H.fas = 'klar';
     if (Math.abs(H.T - GEST.hem.vila) > 0.01 || H.klipp) spela('hem');
-    s.querySelector('.rh-slut').innerHTML = `<button type="button" class="rh-nasta">Nästa match</button><a href="#match/${esc(m.id)}">Matchbladet</a>`;
-    s.querySelector('.rh-nasta').addEventListener('click', fraga);
+    s.querySelector('.rh-slut').innerHTML = `<button type="button" class="rh-knapp guld">Nästa match</button><a class="rh-blad" href="#match/${esc(m.id)}">Matchbladet</a>`;
+    s.querySelector('.rh-slut .guld').addEventListener('click', fraga);
   }
 
   // Under en match går ett klick var som helst framåt, och Tillbaka eller Esc går

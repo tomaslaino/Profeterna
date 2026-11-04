@@ -47,11 +47,27 @@
 .rh-rep { color: rgba(246, 239, 220, 0.66); }
 .rh-rep.nu, .rh-klar .rh-rep { color: #f6efdc; }
 .rh-orsak { opacity: 0.72; }
-.rh-slut { flex: none; display: flex; flex-wrap: wrap; gap: 0.2em 1.4em; align-items: baseline; min-height: 1.9em; padding-top: 0.5em; }
+/* foten under analysen: Ja, ja medan han pratar och dina svar när han är klar, lika hög hela tiden */
+.rh-slut { flex: none; display: flex; flex-wrap: wrap; gap: 10px 14px; align-items: center; min-height: 46px; padding-top: 0.6em; }
 .rh-slut > * { white-space: nowrap; }
 .rh-ja { padding: 0; border: 0; background: none; color: #a9c3ff; font: 400 1em Fraunces, Georgia, serif; text-decoration: underline; cursor: pointer; text-shadow: inherit; }
-.rh-nasta { align-self: flex-start; padding: 0; border: 0; background: none; color: #ffd86b; font: 700 1.05em Fraunces, Georgia, serif; text-decoration: underline; cursor: pointer; text-shadow: inherit; }
-.rh-slut a { color: #a9c3ff; }
+/* hans fråga när man har valt en match, och dina svar direkt under den */
+.rh-fragan { flex: none; margin: 0; font-size: 1.12em; }
+.rh-svar { flex: none; display: flex; flex-direction: column; align-items: flex-start; gap: 14px; margin-top: 1.1em; animation: rh-svar 0.3s 0.08s cubic-bezier(0.2, 0.7, 0.3, 1) both; }
+.rh-svar > div { display: flex; flex-wrap: wrap; gap: 12px; }
+@keyframes rh-svar { from { opacity: 0; transform: translateY(8px); } }
+/* Dina svar är knappar som syns i det dunkla: guld för det han väntar på, de andra med en ljus ram. */
+.rh-knapp { min-height: 46px; padding: 0 1.25em; border: 1.5px solid rgba(246, 239, 220, 0.6); border-radius: 999px; background: rgba(18, 12, 7, 0.55); color: #f6efdc; font: 600 1.08em/1.1 Fraunces, Georgia, serif; text-shadow: none; white-space: nowrap; cursor: pointer; box-shadow: 0 6px 16px rgba(0, 0, 0, 0.4); -webkit-tap-highlight-color: transparent; transition: background 0.15s, border-color 0.15s, color 0.15s, transform 0.1s; }
+.rh-knapp.guld { border-color: #ffd86b; background: linear-gradient(#ffe08c, #f4c64c); color: #2a1906; box-shadow: 0 2px 0 #7a5512, 0 8px 22px rgba(0, 0, 0, 0.55), 0 0 28px rgba(255, 196, 92, 0.2); }
+@media (hover: hover) {
+  .rh-knapp:hover { border-color: #ffd86b; color: #ffd86b; }
+  .rh-knapp.guld:hover { color: #2a1906; background: linear-gradient(#ffeaa8, #ffd263); }
+}
+.rh-knapp:active { transform: translateY(1px); }
+.rh-knapp.guld:active { box-shadow: 0 1px 0 #7a5512, 0 4px 12px rgba(0, 0, 0, 0.5); }
+.rh-knapp:focus-visible, .rh-blad:focus-visible { outline: 2px solid #a9c3ff; outline-offset: 3px; }
+/* Matchbladet går härifrån: en länk under knapparna (efter analysen bredvid) */
+.rh-blad { color: #a9c3ff; text-decoration: underline; text-underline-offset: 4px; text-decoration-thickness: 1px; white-space: nowrap; }
 /* slaget i disken: bilden rycker till (koppen hoppar i rum-hasse-3d.js) */
 .rh-slag { animation: rh-slag 0.42s linear; }
 @keyframes rh-slag { 0% { translate: 0 0; } 18% { translate: 0 9px; } 42% { translate: 0 -5px; } 70% { translate: 0 2px; } 100% { translate: 0 0; } }
@@ -61,10 +77,10 @@
 /* på höjden: han överst, samtalet under honom */
 .rum-hasse-vy.hog .rh-samtal { left: 5%; right: 5%; bottom: 54px; width: auto; font-size: 15px; }
 .rum-hasse-vy.hog .rh-fot { left: 5%; right: 5%; }
-.rum-hasse-vy.hog .rh-text { font-size: 1em; }
+.rum-hasse-vy.hog .rh-text, .rum-hasse-vy.hog .rh-fragan { font-size: 1em; }
 .rum-hasse-vy.hog .rh-sagt { font-size: 1.4em; margin-bottom: 0.2em; }
 .rum-hasse-vy.hog .rh-dom { font-size: 46px; }
 .rum-hasse-vy.hog .rh-dom.lang { font-size: 34px; }
 .rum-hasse-vy.hog .rh-match { font-size: 0.86em; }
 .rum-hasse-vy.hog .rh-slut { padding-top: 0.3em; }
-@media (prefers-reduced-motion: reduce) { .rh-dom, .rh-slag { animation: none; } }
+@media (prefers-reduced-motion: reduce) { .rh-dom, .rh-slag, .rh-svar { animation: none; } }
