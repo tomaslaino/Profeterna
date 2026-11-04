@@ -2,30 +2,20 @@
 
 // ============================================================================
 // Hasse Backe (fiktiv) i tobaksaffären (public/rum-hasse.js): Analysera med en
-// annan röst. Först tas artikeln och tipset fram som vanligt (config/artikel.js).
+// annan röst. Först tas artikeln och tipset fram som vanligt (config/analyser.js).
 // Sedan säger Claude det viktigaste ur dem med personan i prompts/hasse-backe.md,
-// utan att söka och lika kort som tipsets analys, och koden kontrollerar att
-// inget har hittats på (worker/hasse.mjs). Tipset, de inringade tecknen, kommer
-// alltid ur tipset och skrivs aldrig om. Skrivs bara när någon ber om det, och sparas sedan för alla.
+// utan verktyg och lika kort som tipsets analys, och koden kontrollerar att
+// inget har hittats på (src/analyser/hasse.mjs). Tipset, de inringade tecknen, kommer
+// alltid ur tipset och skrivs aldrig om. Macen skriver texten i förväg med Claude
+// Code (scripts/analyser/skriv.mjs), och på sajten låtsas han analysera.
 // ============================================================================
 
 module.exports = {
-  enabled: true,
-  provider: 'Anthropic',
   model: 'claude-opus-5-5',
-  keyEnv: 'ANTHROPIC_API_KEY',
   effort: 'medium',
-  maxTokens: 12000,
-  searches: 0,
   timeoutMs: 180000,
-  // Högst så många försök per tips och så många texter per dygn (svensk tid).
-  perMatch: 3,
-  perDay: 40,
-  // Så länge sparas texten (artikeln sparas högst elva dagar).
-  keepDays: 12,
   // Ändras personan eller frasbanken byts versionen, så att texterna skrivs om.
   promptVersion: '2026-11-04.1',
-  prices: { input: 4, cacheWrite: 5, cacheRead: 0.2, output: 20 },
 
   // Högst så många ord i texten: prompten säger 120 (som tipsets analys), och
   // koden släpper igenom lite mer.
@@ -69,5 +59,7 @@ module.exports = {
 
 Svara bara med JSON: {"stycken": ["…", "…"]}
 
-Högst 120 ord i två eller tre korta stycken. Samma tecken av samma skäl som i analysen, utan hänvisningar i hakparentes. Det sista stycket slutar med tecknen.`,
+Högst 120 ord i två eller tre korta stycken. Samma tecken av samma skäl som i analysen, utan hänvisningar i hakparentes. Det sista stycket slutar med tecknen.
+
+Analysen är skriven av en kollega med egna uttryck och historier ur sitt liv. Ta bara sakuppgifterna om matchen och aldrig hans uttryck, historier, klubbar eller namn.`,
 };

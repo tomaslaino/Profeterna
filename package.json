@@ -9,13 +9,13 @@
     "refresh": "node src/build.js --force",
     "check": "node src/check.js",
     "backtest": "node src/backtest.js",
-    "kandidater": "node src/candidates.js"
+    "kandidater": "node src/candidates.js",
+    "analyser": "node scripts/analyser/skriv.mjs"
   },
   "engines": {
     "node": ">=18"
   },
   "dependencies": {
-    "@anthropic-ai/sdk": "^0.135.0",
     "express": "^4.19.0"
   }
 }

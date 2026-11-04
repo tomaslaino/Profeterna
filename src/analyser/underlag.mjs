@@ -1,11 +1,9 @@
-// Matchanalysen (fas 5): underlaget som skickas till språkmodellen,
-// innehållsavtrycket och sifferkontrollen. Ren kod utan beroenden – körs i
-// proxyn på Cloudflare (worker/index.mjs) och lokalt i Express-servern.
+// Analyserna: underlaget som Claude får och sifferkontrollen. Ren kod utan
+// beroenden (scripts/analyser/skriv.mjs).
 //
 // Underlaget är det matchvyn visar, med sidans precision: prognosens chanser
 // som odds med två decimaler (ur hela procent, som på sidan), mål med en
-// decimal, decimalkomma. Ingen hämttid ingår, så samma underlag ger samma
-// avtryck oavsett när källorna hämtades. Det är också facit för
+// decimal, decimalkomma. Det är också facit för
 // sifferkontrollen – ett tal som inte står här får inte stå i texten.
 
 const TZ = 'Europe/Stockholm';
@@ -200,14 +198,6 @@ function squadOf(s) {
   if (!s.players.length) return 'inga skador eller avstängningar rapporterade';
   return s.players.map((p) => `${p.name}${p.pos ? ` (${p.pos})` : ''} ${p.status}` +
     `${p.chance != null ? `, ${p.chance} % chans att spela` : ''}${p.news ? `: ${p.news}` : ''}${p.since ? ` (${p.since})` : ''}`);
-}
-
-// ---------- innehållsavtryck ----------
-
-export async function fingerprint(obj) {
-  const bytes = new TextEncoder().encode(JSON.stringify(obj));
-  const hash = await crypto.subtle.digest('SHA-256', bytes);
-  return [...new Uint8Array(hash)].map((x) => x.toString(16).padStart(2, '0')).join('');
 }
 
 // ---------- sifferkontroll ----------

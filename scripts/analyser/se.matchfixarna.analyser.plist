@@ -1,0 +1,37 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<!--
+  Analyserna på Matchfixarna: scripts/analyser/skriv.mjs var 15:e minut. Mallen fylls i
+  av installera.sh och hamnar i ~/Library/LaunchAgents.
+
+  StartInterval: sover datorn när det är dags körs jobbet när den vaknar, och flera
+  missade tillfällen blir ett. RunAtLoad: också när datorn startas och användaren
+  loggar in. Skriptet har oftast inget att göra och slutar direkt.
+-->
+<plist version="1.0">
+<dict>
+  <key>Label</key>
+  <string>se.matchfixarna.analyser</string>
+  <key>ProgramArguments</key>
+  <array>
+    <string>__NODE__</string>
+    <string>__KLON__/scripts/analyser/skriv.mjs</string>
+    <string>--publicera</string>
+  </array>
+  <key>WorkingDirectory</key>
+  <string>__KLON__</string>
+  <key>EnvironmentVariables</key>
+  <dict>
+    <key>PATH</key>
+    <string>/usr/local/bin:/opt/homebrew/bin:/usr/bin:/bin:/usr/sbin:/sbin</string>
+  </dict>
+  <key>StartInterval</key>
+  <integer>900</integer>
+  <key>RunAtLoad</key>
+  <true/>
+  <key>StandardOutPath</key>
+  <string>__HEM__/Library/Logs/Matchfixarna/launchd.log</string>
+  <key>StandardErrorPath</key>
+  <string>__HEM__/Library/Logs/Matchfixarna/launchd.log</string>
+</dict>
+</plist>

@@ -16,10 +16,8 @@
 //
 // Avsparkstiderna (en match är låst efterAvspark minuter efter avsparken,
 // config/kupong.js) läses ur den publicerade
-// sajten, <site>/data/matches.json – samma sajt som matchanalysens proxy
-// läser (config/llm.js, eller SITE).
+// sajten, <site>/data/matches.json (config/kupong.js, eller SITE).
 
-import cfg from '../config/llm.js';
 import kupongCfg from '../config/kupong.js';
 import { saveCoupon, githubWriter } from './kupong.mjs';
 import { getRound, postRound, kvStore } from './samtal.mjs';
@@ -54,7 +52,7 @@ export default {
     }
     const samtal = url.pathname === '/samtal';
     const store = env.KUPONG ? kvStore(env.KUPONG) : null;
-    const site = String(env.SITE || cfg.site).replace(/\/+$/, '');
+    const site = String(env.SITE || kupongCfg.site).replace(/\/+$/, '');
     if (samtal && request.method === 'GET') {
       try {
         // Pågår ingen omgång startar veckans Stryktips av sig själv.

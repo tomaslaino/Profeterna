@@ -456,9 +456,9 @@ async function openMatch(id) {
     document.documentElement.classList.add('mr-open');
   }
   try {
-    // Artikeln inför matchen hämtas samtidigt, så att fliken finns från början,
-    // och sköldarnas index, så att rubriken ritas med dem.
-    const [d] = await Promise.all([getJSON(`data/match/${encodeURIComponent(id)}.json`), loadArticle(id), window.Skoldar && Skoldar.ready]);
+    // Analyserna hämtas samtidigt, så att fliken finns från början, och sköldarnas
+    // index, så att rubriken ritas med dem.
+    const [d] = await Promise.all([getJSON(`data/match/${encodeURIComponent(id)}.json`), loadAnalyser(), window.Skoldar && Skoldar.ready]);
     if (location.hash !== `#match/${id}`) return;
     const fresh = !state.detail || state.detail.match.id !== id;
     state.detail = d;
@@ -556,8 +556,8 @@ function selectMatchTab(id, focus) {
 // Flikarna i matchbladets ordning: Startelvor först – planen, avbytarna, vilka
 // som saknas och domaren, som i ett matchprogram – och Matchen efter den när
 // matchen har börjat. Startelvor och Matchen fylls av matchruta.js, Tabellen
-// av tableFill(). Analysera står efter dem när Claude har skrivit en artikel
-// om matchen, och före avspark med knappen Analysera (analysPane).
+// av tableFill(). Analysera står efter dem för omgångens matcher och matcher
+// med en färdig analys (articleOn, analysPane).
 function matchPanes(d) {
   const m = d.match;
   const started = m.completed || (Date.parse(m.kickoff) <= Date.now() && !/POSTPONED|CANCEL/.test(m.status || ''));
@@ -565,7 +565,7 @@ function matchPanes(d) {
   const panes = [];
   panes.push(['startelvor', 'Startelvor', (R ? R.lineupPane(m, absentees(d)) : squadCard(d)) + refereeCard(d)]);
   if (started && R) panes.push(['matchen', 'Matchen', R.eventsPane(m)]);
-  if (articles.get(m.id) || articleOn(d)) panes.push(['analysera', 'Analysera', analysPane(d)]);
+  if (articleOn(d)) panes.push(['analysera', 'Analysera', analysPane(d)]);
   panes.push(['prognos', 'Prognos', prognosPane(d)]);
   const table = tableDivs(d).length > 0;
   panes.push(['form', 'Form', formCard(d) + sideCard(d, table)]);
@@ -1187,92 +1187,73 @@ async function tableFill(root, d) {
 
 // ---------- Analysera ----------
 
-// När någon trycker på Analysera läser Claude på och skriver en artikel om
-// matchen och tipset under den (worker/artikel.mjs), som sedan finns för
-// alla. Proxyn lämnar ut dem bredvid DeepSeeks analys (…/analyze →
-// …/artikel). Per match: artikeln (med tipset) eller null, och det senaste
-// felet när Analysera inte gav någon artikel eller något tips.
+// Analyserna skrivs i förväg av en dator (scripts/analyser/skriv.mjs), en gång per
+// omgång, och ligger färdiga i data/analyser.json: artikeln om matchen och tipset
+// under den. Sidan anropar ingen språkmodell. Knappen visar den sparade texten direkt,
+// och sedan står den kvar medan sidan är öppen (articles). notReady: matcher där
+// knappen har tryckts men analysen inte är klar än.
 const articles = new Map();
-const articleFails = new Map();
-// Så långt före avspark kan artikeln skrivas (aheadDays i config/artikel.js),
-// och så gammalt får tipset bli innan det kan skrivas om (tip.refreshHours).
-const ARTICLE_DAYS = 7;
-const TIP_HOURS = 24;
+const notReady = new Set();
+const ANALYSER_MS = 5 * 60000;
+let analyserData = null; // {omgang: Set med match-id, per: match-id → analysen}
+let analyserAt = 0;
+let analyserReq = null;
 
-async function loadArticle(id) {
-  const a = state.meta && state.meta.analysis;
-  if (!a || !a.endpoint || articles.has(id)) return;
-  try {
-    // Matchbladet väntar inte längre än så på artikeln.
-    const res = await fetch(`${a.endpoint.replace(/analyze$/, 'artikel')}?id=${encodeURIComponent(id)}`, { signal: AbortSignal.timeout(2500) });
-    const j = res.ok ? await res.json() : null;
-    articles.set(id, j && j.ok && j.article ? j.article : null);
-  } catch {
-    // Ingen artikel den här gången – nästa öppning försöker igen.
-  }
+// data/analyser.json, högst var femte minut. Går filen inte att läsa finns inga
+// analyser den här gången.
+function loadAnalyser() {
+  if (analyserReq && Date.now() - analyserAt < ANALYSER_MS) return analyserReq;
+  analyserAt = Date.now();
+  analyserReq = getJSON('data/analyser.json').then((j) => {
+    analyserData = {
+      omgang: new Set(((j.omgang && j.omgang.matcher) || []).map(String)),
+      per: new Map((j.analyser || []).map((a) => [String(a.id), a])),
+    };
+    return analyserData;
+  }).catch(() => {
+    if (!analyserData) analyserData = { omgang: new Set(), per: new Map() };
+    return analyserData;
+  });
+  return analyserReq;
 }
 
-// Analysera finns för en kommande match när bygget pekat ut proxyn.
+// Den färdiga analysen av matchen, eller null. Också för tobaksaffären (rum-hasse.js).
+async function analysOf(id) {
+  return (await loadAnalyser()).per.get(String(id)) || null;
+}
+
+// Fliken finns när matchen har en analys, och före avspark för omgångens matcher.
 function articleOn(d) {
-  const a = state.meta && state.meta.analysis;
   const m = d.match;
-  const left = Date.parse(m.kickoff) - Date.now();
-  return Boolean(a && a.endpoint && !m.completed && m.status === 'STATUS_SCHEDULED' && left > 0 && left <= ARTICLE_DAYS * 86400000);
+  if (!analyserData) return false;
+  if (analyserData.per.has(String(m.id))) return true;
+  return analyserData.omgang.has(String(m.id)) && !m.completed && m.status === 'STATUS_SCHEDULED' && Date.parse(m.kickoff) > Date.now();
 }
 
-// Fliken Analysera: först bara knappen, sedan artikeln med tipset under.
+// Fliken Analysera: först bara knappen, sedan artikeln med tipset under, eller en rad
+// om analysen inte är klar än.
 function analysPane(d) {
-  const a = articles.get(d.match.id);
-  return a ? articlePane(a) + tipCard(d, a) : articleAsk(d.match.id);
+  const id = String(d.match.id);
+  const a = articles.get(id);
+  if (a) return articlePane(a) + tipCard(d, a);
+  const waiting = notReady.has(id) && !(analyserData && analyserData.per.has(id));
+  return '<article class="card artikel" id="artikel-card">' + (waiting
+    ? '<p class="unknown">Analysen är inte klar än. Den skrivs dagen före omgångens första avspark, så titta in igen då.</p>'
+    : `<button type="button" class="analyze" data-artikel="${esc(id)}" title="Artikeln om matchen och tecknen som ringas in">Analysera</button>`) + '</article>';
 }
 
-// Utan artikel: bara knappen, och felet om förra försöket inte gav någon.
-function articleAsk(id) {
-  const r = articleFails.get(id);
-  const final = r && r.retry === false;
-  return '<article class="card artikel" id="artikel-card">' +
-    (r ? `<p class="unknown">Ingen analys: ${esc(r.error || 'okänt fel')}</p>` : '') +
-    (final ? '' : `<button type="button" class="analyze" data-artikel="${esc(id)}" title="AI:n läser tidningar, presskonferenser och supporterforum på nätet, skriver en artikel och ringar in sina tecken">${r ? 'Försök igen' : 'Analysera'}</button>`) +
-    '</article>';
-}
-
-// Analysera: proxyn skriver artikeln och tipset, ett par minuter – eller bara
-// tipset om artikeln redan finns. Skriver någon annan dem just nu (pending)
-// frågar knappen igen en stund senare.
-async function runArticle(id, btn) {
-  btn.disabled = true;
-  const stop = readingClock(btn);
-  const t0 = Date.now();
-  const url = state.meta.analysis.endpoint.replace(/analyze$/, 'artikel');
-  const before = articles.get(id);
-  let r;
-  for (;;) {
-    try {
-      const res = await fetch(url, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ id }) });
-      r = await res.json().catch(() => ({ ok: false, error: `HTTP ${res.status}` }));
-    } catch {
-      r = { ok: false, error: 'analysen gick inte att nå.' };
-    }
-    if (!(r.ok && r.pending) || Date.now() - t0 > 10 * 60000) break;
-    await new Promise((ok) => setTimeout(ok, 15000));
-  }
-  stop();
-  if (r.ok && r.article) {
-    articles.set(id, r.article);
-    if (r.tipError) articleFails.set(id, { error: r.tipError });
-    else articleFails.delete(id);
-  } else {
-    articleFails.set(id, r.ok ? { error: 'analysen blev inte klar.' } : r);
-  }
+// Knappen: visar den sparade texten direkt.
+async function showArticle(id) {
+  const a = await analysOf(id);
+  if (a) articles.set(id, a);
+  else notReady.add(id);
   const d = state.detail;
-  if (!d || d.match.id !== id || location.hash !== `#match/${id}`) return;
+  if (!d || String(d.match.id) !== id || location.hash !== `#match/${id}`) return;
   const pane = $('#mr-pane-analysera');
   if (!pane) return;
-  // Ett nytt tips ritas med pennan medan man tittar (fc-fresh).
-  const tip = r.ok && r.article && r.article.tip;
-  const fresh = tip && !(before && before.tip && before.tip.writtenAt === tip.writtenAt);
   const html = analysPane(d);
-  pane.innerHTML = fresh ? html.replace('class="fc-main"', 'class="fc-main fc-fresh"') : html;
+  // Tipset ritas med pennan medan man tittar (fc-fresh).
+  pane.innerHTML = a ? html.replace('class="fc-main"', 'class="fc-main fc-fresh"') : html;
 }
 
 // Rubrik, ingress och stycken med hänvisningar till källistan, som
@@ -1281,7 +1262,7 @@ function articlePane(a) {
   const refs = refLinks(a.sources);
   const para = (t, cls) => `<p class="${cls}">${refs(esc(t)).replace(/(\d) %/g, '$1&nbsp;%')}</p>`;
   const at = a.writtenAt ? fDateTime.format(new Date(a.writtenAt)) : 'okänt';
-  return `<article class="card artikel"><h4 title="${esc(`Skriven av ${a.model} efter sökningar på nätet · rapporterat i media, inte kontrollerat av Matchfixarna och inte med i prognosen`)}">Skriven ${esc(at)}</h4>` +
+  return `<article class="card artikel"><h4 title="${esc(`Skriven av ${a.model} efter sökningar på nätet · rapporterat i media, inte kontrollerat av Matchfixarna och inte med i prognosen`)}">Skriven ${esc(at)}${a.author ? ` av ${esc(a.author)}` : ''}</h4>` +
     `<h3 class="art-title">${esc(a.title)}</h3>` +
     (a.lead ? para(a.lead, 'art-lead') : '') +
     a.paragraphs.map((t) => para(t, 'analysis-text')).join('') +
@@ -1293,32 +1274,21 @@ function articlePane(a) {
 // Tipset finns bara för en kommande match med prognos – annars renderas
 // inget alls.
 function analysisOn(d) {
-  const a = state.meta && state.meta.analysis;
   const m = d.match;
-  return Boolean(a && a.endpoint && !m.completed && m.status === 'STATUS_SCHEDULED' &&
+  return Boolean(!m.completed && m.status === 'STATUS_SCHEDULED' &&
     Date.parse(m.kickoff) > Date.now() && d.prediction && d.prediction.status === 'ok');
 }
 
 // Tipset under artikeln: kupongens rutor med AI:ns tecken inringade (penRow)
-// och texten, med hänvisningar som länkar direkt till sidorna. Saknas tipset
-// eller är det äldre än TIP_HOURS står knappen Analysera (igen) – tipset
-// skrivs då om ur artikeln och det senaste nyhetsläget, utan att AI:n söker
-// på nätet.
+// och texten, med hänvisningar som länkar direkt till sidorna.
 function tipCard(d, a) {
-  if (!analysisOn(d)) return '';
   const t = a.tip;
-  const r = articleFails.get(d.match.id);
-  const final = r && r.retry === false;
-  const old = !t || Date.now() - Date.parse(t.writtenAt) > TIP_HOURS * 3600000;
-  const at = t && t.writtenAt ? fDateTime.format(new Date(t.writtenAt)) : 'okänt';
-  const paras = t ? t.text.split(/\n\s*\n/).filter((p) => p.trim())
-    .map((p) => `<p class="analysis-text">${refLinks(t.sources)(esc(p.trim())).replace(/(\d) %/g, '$1&nbsp;%')}</p>`).join('') : '';
+  if (!analysisOn(d) || !t) return '';
+  const at = t.writtenAt ? fDateTime.format(new Date(t.writtenAt)) : 'okänt';
+  const paras = t.text.split(/\n\s*\n/).filter((p) => p.trim())
+    .map((p) => `<p class="analysis-text">${refLinks(t.sources)(esc(p.trim())).replace(/(\d) %/g, '$1&nbsp;%')}</p>`).join('');
   return '<div class="card analysis" id="analysis-card">' +
-    (t ? `<h4 title="${esc(`Skriven av ${t.model} ${at} · rapporterat i media, inte kontrollerat av Matchfixarna och inte med i prognosen`)}">Tipset</h4>` + penRow(d) + paras : '<h4>Tipset</h4>') +
-    (r ? `<p class="unknown">${t ? 'Ingen ny analys' : 'Inget tips'}: ${esc(r.error || 'okänt fel')}</p>` : '') +
-    (old && !final ? `<button type="button" class="analyze" data-artikel="${esc(d.match.id)}" title="${t
-      ? `Tipset skrevs ${esc(at)}. AI:n väger in det senaste nyhetsläget och ringar in sina tecken på nytt, utan att söka på nätet`
-      : 'AI:n väger prognosen mot artikeln och det senaste nyhetsläget och ringar in sina tecken'}">${r ? 'Försök igen' : t ? 'Analysera igen' : 'Analysera'}</button>` : '') + '</div>';
+    `<h4 title="${esc(`Skriven av ${t.model} ${at} · rapporterat i media, inte kontrollerat av Matchfixarna och inte med i prognosen`)}">Tipset</h4>` + penRow(d) + paras + '</div>';
 }
 
 // Tecknen AI:n ringade in, med pennan i kupongens rutor – samma rutor som
@@ -1352,22 +1322,9 @@ function sourceList(sources) {
   }).join('') + '</ol>';
 }
 
-// AI:n analyserar ett par minuter – tiden tickar i knappen, så att det syns
-// att något händer. → stop().
-function readingClock(btn) {
-  const t0 = Date.now();
-  const tick = () => {
-    const s = Math.round((Date.now() - t0) / 1000);
-    btn.textContent = s < 5 ? 'Analyserar …' : `Analyserar … ${Math.floor(s / 60)}:${String(s % 60).padStart(2, '0')}`;
-  };
-  tick();
-  const timer = setInterval(tick, 1000);
-  return () => clearInterval(timer);
-}
-
 $('#match-detail-view').addEventListener('click', (e) => {
   const b = e.target.closest('button.analyze');
-  if (b && !b.disabled) runArticle(b.dataset.artikel, b);
+  if (b && !b.disabled) showArticle(b.dataset.artikel);
   if (e.target.closest('[data-close]')) closeMatch();
   const t = e.target.closest('[data-mtab]');
   if (t) selectMatchTab(t.dataset.mtab);

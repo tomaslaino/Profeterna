@@ -1,5 +1,5 @@
 // Det Hasse Backe (fiktiv) säger själv i tobaksaffären (rum-hasse.js), utan att
-// någon AI är inblandad. Analysen av en match skrivs i worker/hasse.mjs; här står
+// någon AI är inblandad. Analysen av en match skrivs i förväg (src/analyser/hasse.mjs); här står
 // allt runt omkring. Han lottar bland raderna, och inget av det här är ett faktum
 // om en match eller en person. Raderna ska rymmas på en rad (ungefär 30 tecken),
 // annars knuffar de ner matcherna under sig.
@@ -31,10 +31,10 @@ window.HasseRepliker = {
   // Om man bara står där och inte frågar.
   ledig: ['Jag har tid.', 'Ta den översta. Den är enkel.', 'Spelstoppet är {dag}.'],
 
-  // När man har valt en match: han svarar och frågar tillbaka. valKlar när analysen
-  // redan finns, valLasa när den måste skrivas och val när det inte går att få veta.
-  // Han har alltid svaret, också när han inte har det: att han läser på märks först
-  // när han väntar (vantar).
+  // När man har valt en match: han svarar och frågar tillbaka. valKlar när man redan
+  // har frågat om den, valLasa när analysen finns och han ska låtsas läsa på, och val när
+  // den inte finns. Han har alltid svaret, också när han inte har det: att han läser på
+  // märks först när han väntar (vantar).
   val: ['Den är enkel.', 'Den där, ja.', 'Den är inte svår.'],
   valKlar: ['Den har jag tittat på.', 'Den har jag svaret på.', 'Den är redan löst.'],
   valLasa: [
@@ -57,7 +57,7 @@ window.HasseRepliker = {
   // Samma match en gång till.
   igen: ['Den tog vi nyss.', 'Den har du redan fått.', 'Lyssnade du inte?'],
 
-  // Medan analysen skrivs: en i taget, i den här ordningen. Allt under kontroll.
+  // Medan han låtsas analysera: en i taget, i den här ordningen. Allt under kontroll.
   vantar: [
     'Jag ska bara titta på en sak.',
     'Vi börjar bakifrån.',
@@ -94,6 +94,6 @@ window.HasseRepliker = {
   // När något inte går.
   ingenKupong: 'Ingen kupong än. Det är lugnt.',
   igang: 'Efteråt kan alla ha rätt.',
-  fel: 'Den får vi ta en annan gång.',
+  ejKlar: ['Den tar jag dagen före.', 'Inte än. Fråga dagen före.', 'Den har jag inte läst än.'],
   utanRost: 'Jag har tappat rösten. Här har du det i skrift.',
 };

@@ -1,0 +1,9 @@
+# Matchfixarna ska inte listas av sökmotorer. Varje sida har meta-taggen
+# <meta name="robots" content="noindex, nofollow">. Sidorna spärras inte här, för
+# en sökmotor som inte får läsa en sida kan inte heller se taggen och kan ändå
+# lista adressen. Det här stoppar datafilerna och bilderna, som inte kan ha någon tagg.
+User-agent: *
+Disallow: /data/
+Disallow: /rum/
+Disallow: /skoldar/
+Disallow: /profeterna/

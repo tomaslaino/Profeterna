@@ -4,14 +4,8 @@
 // och byggs av GitHub Actions; här görs samma bygge lokalt var 15:e minut och
 // _site/ serveras precis som GitHub Pages gör.
 //
-// Matchanalysen (fas 5): finns DEEPSEEK_API_KEY i .env visas knappen
-// Analysera, som skriver artikeln och tipset (GET/POST /api/artikel, med
-// ANTHROPIC_API_KEY) med samma kod som proxyn på Cloudflare
-// (worker/artikel.mjs). DeepSeeks korta analys (POST /api/analyze,
-// worker/index.mjs) finns kvar men anropas inte av matchbladet. Utan nyckel
-// ingen knapp.
-// Samma nyckel ger AI:ns kommentarer i Olympen (POST /api/kommentar)
-// och, med KUPONG_LOKALT, omgångens namn (POST /api/namn).
+// Analyserna, omgångarnas namn och kommentarerna skrivs på en dator med Claude Code
+// (scripts/analyser/skriv.mjs). Här visas filerna som de ligger i data/.
 //
 // Kupongen: med KUPONG_LOKALT=1 i .env sparar knappen Spara kupongen direkt
 // (POST /api/kupong) – lokalt skrivs filen i data/kuponger/ (eller
@@ -27,136 +21,8 @@ const { loadEnv } = require('./src/env');
 const { build, OUT } = require('./src/build');
 const { CACHE_DIR } = require('./src/store');
 const { COUPON_DIR, blobSha } = require('./src/coupons');
-const llm = require('./config/llm');
 
 const TICK_MINUTES = 15;
-
-// Cachen för analyserna: en fil per match och underlag.
-function fileStore(dir = path.join(CACHE_DIR, 'analysis')) {
-  const file = (k) => path.join(dir, k.replace(/[^\w.-]/g, '_') + '.json');
-  return {
-    get: (k) => (fs.existsSync(file(k)) ? JSON.parse(fs.readFileSync(file(k), 'utf8')) : null),
-    put: (k, v) => {
-      fs.mkdirSync(dir, { recursive: true });
-      fs.writeFileSync(file(k), JSON.stringify(v));
-    },
-  };
-}
-
-// POST /api/analyze {id} – underlaget läses ur den byggda sajten i siteDir.
-function analysisRoute(siteDir = OUT, store = fileStore()) {
-  return async (req, res) => {
-    try {
-      const { analyze } = await import('./worker/index.mjs');
-      const r = await analyze(req.body && req.body.id, {
-        env: process.env,
-        store,
-        loadMatch: async (id) => {
-          const f = path.join(siteDir, 'data', 'match', `${id}.json`);
-          return fs.existsSync(f) ? JSON.parse(fs.readFileSync(f, 'utf8')) : null;
-        },
-      });
-      res.status(r.status).json(r.body);
-    } catch (err) {
-      console.error('[analys]', err);
-      res.status(500).json({ ok: false, error: 'Internt fel i servern.' });
-    }
-  };
-}
-
-// GET /api/artikel?id= och POST /api/artikel {id} – artikeln och tipset
-// (Analysera), med samma kod som proxyn (worker/artikel.mjs). De sparas bredvid
-// analyserna.
-function articleRoute(siteDir = OUT, store = fileStore()) {
-  return async (req, res) => {
-    try {
-      const { requestArticle, currentArticle } = await import('./worker/artikel.mjs');
-      if (req.method === 'GET') return res.json({ ok: true, article: (await currentArticle(store, req.query.id || '')) || null });
-      const r = await requestArticle(req.body && req.body.id, {
-        env: process.env,
-        store,
-        loadMatch: async (id) => {
-          const f = path.join(siteDir, 'data', 'match', `${id}.json`);
-          return fs.existsSync(f) ? JSON.parse(fs.readFileSync(f, 'utf8')) : null;
-        },
-      });
-      res.status(r.status).json(r.body);
-    } catch (err) {
-      console.error('[artikel]', err);
-      res.status(500).json({ ok: false, error: 'Internt fel i servern.' });
-    }
-  };
-}
-
-// GET /api/hasse?id= och POST /api/hasse {id} – Hasse Backe (fiktiv) i
-// tobaksaffären, med samma kod som proxyn (worker/hasse.mjs).
-function hasseRoute(store = fileStore()) {
-  return async (req, res) => {
-    try {
-      const { requestHasse, currentHasse } = await import('./worker/hasse.mjs');
-      if (req.method === 'GET') return res.json({ ok: true, hasse: (await currentHasse(store, req.query.id || '')) || null });
-      const persona = fs.readFileSync(path.join(__dirname, 'prompts', 'hasse-backe.md'), 'utf8');
-      const r = await requestHasse(req.body && req.body.id, { env: process.env, store, persona });
-      res.status(r.status).json(r.body);
-    } catch (err) {
-      console.error('[hasse]', err);
-      res.status(500).json({ ok: false, error: 'Internt fel i servern.' });
-    }
-  };
-}
-
-// POST /api/kommentar {id} – AI:ns kommentar till en färdig kupong, ur den
-// byggda historiken i siteDir (Grupparbetena i Olympen).
-function commentRoute(siteDir = OUT, store = fileStore(path.join(CACHE_DIR, 'kommentarer'))) {
-  return async (req, res) => {
-    try {
-      const { couponComment } = await import('./worker/index.mjs');
-      const r = await couponComment(req.body && req.body.id, {
-        env: process.env,
-        store,
-        loadHistory: async () => {
-          const f = path.join(siteDir, 'data', 'historik.json');
-          return fs.existsSync(f) ? JSON.parse(fs.readFileSync(f, 'utf8')) : null;
-        },
-      });
-      res.status(r.status).json(r.body);
-    } catch (err) {
-      console.error('[kommentar]', err);
-      res.status(500).json({ ok: false, error: 'Internt fel i servern.' });
-    }
-  };
-}
-
-// POST /api/namn {id} – AI:ns namn på omgången som gänget tippar, ur
-// omgången i samtalets lagring och matchernas underlag i siteDir.
-function nameRoute(siteDir = OUT, samtal = samtalFileStore(), store = fileStore(path.join(CACHE_DIR, 'namn'))) {
-  return async (req, res) => {
-    try {
-      const { nameRound } = await import('./worker/index.mjs');
-      const read = (p) => {
-        const f = path.join(siteDir, 'data', p);
-        return fs.existsSync(f) ? JSON.parse(fs.readFileSync(f, 'utf8')) : null;
-      };
-      const r = await nameRound(req.body && req.body.id, {
-        env: process.env,
-        store,
-        readOnly: Boolean(req.body && req.body.las === true),
-        loadRound: async (id) => {
-          const cur = await samtal.get('samtal:aktuellt');
-          return cur && cur.id === id ? cur : samtal.get(`samtal:${id}`);
-        },
-        loadSite: async (round) => ({
-          details: Object.fromEntries(round.matcher.map((x) => [String(x.id), /^\d{1,12}$/.test(x.id) ? read(`match/${x.id}.json`) : null]).filter(([, d]) => d)),
-          history: read('historik.json'),
-        }),
-      });
-      res.status(r.status).json(r.body);
-    } catch (err) {
-      console.error('[namn]', err);
-      res.status(500).json({ ok: false, error: 'Internt fel i servern.' });
-    }
-  };
-}
 
 // Lokalt skrivs kupongen som fil i stället för med en commit på GitHub –
 // med samma versionskontroll (filens blob-sha) som GitHubs API.
@@ -253,12 +119,11 @@ function stryktipsetRoute() {
 
 if (require.main === module) {
   loadEnv();
-  const analysisEndpoint = process.env[llm.keyEnv] ? '/api/analyze' : null;
   const couponEndpoint = process.env.KUPONG_LOKALT ? '/api/kupong' : null;
 
   const cycle = async () => {
     try {
-      const { results, site } = await build({ analysisEndpoint, couponEndpoint });
+      const { results, site } = await build({ couponEndpoint });
       const fetched = results.filter((r) => r.action === 'fetched').length;
       const errors = results.filter((r) => r.action === 'error');
       console.log(`[build] ${site.generatedAt}: ${fetched} källor hämtade, ${errors.length} fel, ${site.pages} matchsidor`);
@@ -269,25 +134,17 @@ if (require.main === module) {
   };
 
   const app = express();
-  if (analysisEndpoint) app.post('/api/analyze', express.json(), analysisRoute());
-  if (analysisEndpoint) app.all('/api/artikel', express.json(), articleRoute());
-  if (analysisEndpoint) app.all('/api/hasse', express.json(), hasseRoute());
-  if (analysisEndpoint) app.post('/api/kommentar', express.json(), commentRoute());
   if (couponEndpoint) app.post('/api/kupong', express.json({ limit: '20kb' }), couponSaveRoute());
   if (couponEndpoint) app.all('/api/samtal', express.json({ limit: '20kb' }), samtalRoute());
   if (couponEndpoint) app.get('/api/stryktipset', stryktipsetRoute());
-  if (analysisEndpoint && couponEndpoint) app.post('/api/namn', express.json(), nameRoute());
   app.use(express.static(OUT));
 
   const port = parseInt(process.env.PORT || '3001', 10);
   app.listen(port, async () => {
     console.log(`Matchfixarna körs lokalt på http://localhost:${port}`);
-    console.log(analysisEndpoint
-      ? `Matchanalysen: på (${llm.provider}, ${llm.model}).`
-      : `Matchanalysen: av (ingen ${llm.keyEnv} i .env).`);
     await cycle();
     setInterval(cycle, TICK_MINUTES * 60 * 1000);
   });
 }
 
-module.exports = { analysisRoute, articleRoute, commentRoute, nameRoute, couponSaveRoute, couponFileWriter, samtalRoute, samtalFileStore, stryktipsetRoute, siteMatches, fileStore };
+module.exports = { couponSaveRoute, couponFileWriter, samtalRoute, samtalFileStore, stryktipsetRoute, siteMatches };

@@ -316,9 +316,9 @@ window.RumHasse = (() => {
   // han vad han tycker om det du själv har på kupongen, och han minns vad du har
   // frågat om. Det han säger runt omkring står i rum-hasse-repliker.js.
   //
-  // Först artikeln och tipset som vanligt (POST …/artikel, som i matchbladet), sedan
-  // hans röst (POST …/hasse, worker/hasse.mjs). Finns de redan går det direkt.
-  // Tecknen kommer ur tipset. Går hans röst inte att få står analysen i skrift.
+  // Allt är skrivet i förväg (scripts/analyser/skriv.mjs, data/analyser.json): artikeln,
+  // tipset och hans röst. Han låtsas analysera (svara). Tecknen kommer ur tipset. Saknas
+  // hans röst står analysen i skrift.
   const TECKEN = ['Etta', 'Kryss', 'Tvåa'];
   const KORT = ['1', 'X', '2'];
   function domen(signs) {
@@ -349,21 +349,8 @@ window.RumHasse = (() => {
     if (c) return c.matches.map((x) => { const m = alla.find((y) => String(y.id) === String(x.id)); return m ? { id: String(x.id), namn: `${m.home} – ${m.away}`, avspark: m.kickoff } : null; }).filter(Boolean);
     return [];
   }
-  const adress = (vad) => { const a = typeof state !== 'undefined' && state.meta && state.meta.analysis; return a && a.endpoint ? a.endpoint.replace(/analyze$/, vad) : null; };
-  async function posta(url, id) {
-    const res = await fetch(url, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ id }) });
-    return res.json().catch(() => ({ ok: false, error: `HTTP ${res.status}` }));
-  }
-  // Frågar om igen medan någon annan skriver.
-  async function tillSvar(url, id, vem) {
-    const t0 = Date.now();
-    for (;;) {
-      if (H.fraga !== vem) return null;
-      const r = await posta(url, id);
-      if (!(r.ok && r.pending) || Date.now() - t0 > 10 * 60000) return r;
-      await new Promise((ok) => setTimeout(ok, 15000));
-    }
-  }
+  // Den färdiga analysen (analysOf i app.js), eller null.
+  const analysen = (id) => (typeof analysOf === 'function' ? analysOf(id) : Promise.resolve(null)).catch(() => null);
 
   // Det han minns: vilka matcher du har frågat om och vad han svarade (på enheten,
   // för den här kupongen). Bara tecken du själv har bett om står på raderna.
@@ -694,27 +681,10 @@ window.RumHasse = (() => {
     return r.antal[n] || lott(r.nasta);
   }
 
-  // Finns hans text redan, så att det går direkt och inte kostar något? → true, false,
-  // eller null om det inte går att få veta i tid. Ett tips äldre än TIPS_TIMMAR skrivs om
-  // när man ber om analysen, och då skrivs också hans text om.
-  const TIPS_TIMMAR = 24; // tip.refreshHours i config/artikel.js
-  async function harSvaret(id) {
-    const u = adress('hasse');
-    if (!u) return null;
-    try {
-      const res = await fetch(`${u}?id=${encodeURIComponent(id)}`, { signal: AbortSignal.timeout(800) });
-      const j = res.ok ? await res.json() : null;
-      if (!j || !j.ok) return null;
-      return Boolean(j.hasse) && Date.now() - Date.parse(j.hasse.tips) < TIPS_TIMMAR * 3600000;
-    } catch (e) {
-      return null;
-    }
-  }
-
-  // Du pekar ut en match och han frågar tillbaka. Först när du ber om det tas analysen
-  // fram (svara), så att ett felklick varken kostar en text eller visar ett tips. Matchen och
-  // det han säger står där de står under analysen. Dina svar står direkt under hans fråga,
-  // som har sin plats från början (osynlig tills han säger den), så att de inte flyttar sig.
+  // Du pekar ut en match och han frågar tillbaka. Först när du ber om det kommer analysen
+  // (svara), så att ett felklick inte visar ett tips. Matchen och det han säger står där de
+  // står under analysen. Dina svar står direkt under hans fråga, som har sin plats från
+  // början (osynlig tills han säger den), så att de inte flyttar sig.
   function valj(m, lista, klick) {
     const s = $('.rh-samtal');
     const vem = {};
@@ -740,9 +710,9 @@ window.RumHasse = (() => {
     ja.addEventListener('click', () => svara(m, lista));
     svar.querySelector('.rh-gissa').addEventListener('click', (e) => gissa(m, e));
     if (!klick.detail) ja.focus({ preventScroll: true });
-    harSvaret(m.id).then((finns) => {
+    analysen(m.id).then((a) => {
       if (H.fraga !== vem) return;
-      rad(lott(finns === null ? r.val : finns ? r.valKlar : r.valLasa), () => {
+      rad(lott(H.sagda.has(m.id) ? r.valKlar : a ? r.valLasa : r.val), () => {
         if (H.fraga !== vem) return;
         repliker([{ text: fragan }], { i: s.querySelector('.rh-fragan'), rad: true }).tid = performance.now() + 450;
       });
@@ -760,6 +730,9 @@ window.RumHasse = (() => {
     }
   }
 
+  // Analysen är redan skriven, men han låtsas: första gången du frågar om en match pratar
+  // han och tar en klunk kaffe en stund innan han slår till (minst och längst i ms).
+  const LATSAS = [15000, 25000];
   async function svara(m, lista) {
     const s = $('.rh-samtal');
     const vem = {};
@@ -769,37 +742,29 @@ window.RumHasse = (() => {
     s.innerHTML = `<div class="rh-match">${esc(m.namn)}?</div><h2 class="rh-sagt"></h2><div class="rh-text"></div><div class="rh-slut"></div>`;
     rad(lott(igen ? REP().igen : REP().reaktion));
     const dag = spelstopp(lista);
-    H.prat = { rader: medDag(REP().vantar, dag), i: 0, nasta: performance.now() + 6000, gang: 7000, runt: true };
     const t0 = Date.now();
-    let art = null;
-    let has = null;
-    let fel = null;
-    try {
-      const u = adress('artikel');
-      if (!u) throw new Error('Hasse är inte på plats.');
-      art = await tillSvar(u, m.id, vem);
+    const a = await analysen(m.id);
+    if (H.fraga !== vem) return;
+    if (!a || !a.tip) {
+      await tystnat();
       if (H.fraga !== vem) return;
-      if (!art || !art.ok || !art.article || !art.article.tip) fel = (art && art.error) || 'Analysen blev inte klar.';
-      else has = await tillSvar(adress('hasse'), m.id, vem).catch(() => null);
-    } catch (e) {
-      fel = e.message === 'Hasse är inte på plats.' ? e.message : 'Analysen gick inte att nå.';
-    }
-    if (H.fraga !== vem) return;
-    H.prat = null;
-    await tystnat();
-    if (H.fraga !== vem) return;
-    if (fel) {
-      rad(REP().fel);
-      s.querySelector('.rh-text').innerHTML = `<p class="rh-orsak">${esc(fel)}</p>`;
+      rad(lott(REP().ejKlar));
       slutet(m);
       return;
     }
+    if (!igen && !calm()) {
+      H.prat = { rader: medDag(REP().vantar, dag), i: 0, nasta: performance.now() + 6000, gang: 7000, runt: true };
+      await new Promise((ok) => setTimeout(ok, LATSAS[0] + Math.random() * (LATSAS[1] - LATSAS[0])));
+      if (H.fraga !== vem) return;
+    }
+    H.prat = null;
+    await tystnat();
+    if (H.fraga !== vem) return;
     // han hinner säga sitt innan han slår till
     const t = Date.now() - t0;
     if (t < 900) await new Promise((ok) => setTimeout(ok, 900 - t));
     if (H.fraga !== vem) return;
-    const a = art.article;
-    const egen = has && has.ok && has.hasse && has.hasse.stycken;
+    const egen = a.hasse && a.hasse.stycken;
     const texten = egen ? somRepliker(egen)
       : [{ text: REP().utanRost }, ...[a.lead, ...a.paragraphs, a.tip.text].filter(Boolean).map((text) => ({ text: text.replace(/\s*\[\d+(?:\s*[,;]\s*\d+)*\]/g, ''), skrift: true }))];
     const signs = a.tip.signs;

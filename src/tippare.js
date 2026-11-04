@@ -50,6 +50,7 @@ const fs = require('fs');
 const path = require('path');
 const Tippoang = require('../public/tippoang.js');
 
+const NAMES_FILE = path.join(__dirname, '..', 'data', 'omgangsnamn.json');
 const FILE = process.env.TIPPAR_HISTORIK
   ? path.resolve(process.env.TIPPAR_HISTORIK)
   : path.join(__dirname, '..', 'data', 'tippar-historik.json');
@@ -340,11 +341,21 @@ function buildTippare({ samtal = null, matches = [], freeze = false, file = FILE
   };
 }
 
+// Omgångarnas namn, äldst först.
+function readNames(file = NAMES_FILE) {
+  try {
+    const j = JSON.parse(fs.readFileSync(file, 'utf8'));
+    return Array.isArray(j.namn) ? j.namn : [];
+  } catch {
+    return [];
+  }
+}
+
 // GET …/samtal → omgången och den förra (om dess tips visades), som en
-// lista, eller null om tjänsten inte svarar. Med nameEndpoint (…/namn)
-// hämtas också namnet AI:n senast gav varje omgång – bara läsning, inget nytt
-// skrivs. Ett fel stoppar inget – nästa bygge försöker igen.
-async function fetchSamtal(endpoint, { nameEndpoint = null, fetchImpl = fetch, log = console.log } = {}) {
+// lista, eller null om tjänsten inte svarar. Namnet AI:n senast gav varje omgång
+// står i data/omgangsnamn.json (scripts/analyser/skriv.mjs). Ett fel stoppar inget
+// – nästa bygge försöker igen.
+async function fetchSamtal(endpoint, { namesFile = NAMES_FILE, fetchImpl = fetch, log = console.log } = {}) {
   if (!endpoint || !/^https?:/.test(endpoint)) return null;
   try {
     const res = await fetchImpl(endpoint, { headers: { accept: 'application/json' }, signal: AbortSignal.timeout(20000) });
@@ -354,21 +365,10 @@ async function fetchSamtal(endpoint, { nameEndpoint = null, fetchImpl = fetch, l
       return null;
     }
     const list = [j.samtal, j.forra].filter(Boolean);
-    if (nameEndpoint && /^https?:/.test(nameEndpoint)) {
-      await Promise.all(list.map(async (s) => {
-        try {
-          const r = await fetchImpl(nameEndpoint, {
-            method: 'POST',
-            headers: { 'content-type': 'application/json' },
-            body: JSON.stringify({ id: s.id, las: true }),
-            signal: AbortSignal.timeout(15000),
-          });
-          const n = await r.json().catch(() => null);
-          if (r.ok && n && n.ok && n.namn) Object.assign(s, { namn: n.namn, ...(n.syftar ? { syftar: n.syftar } : {}) });
-        } catch (err) {
-          log(`[tippare] namnet på ${s.id}: ${err.message || err}`);
-        }
-      }));
+    const names = readNames(namesFile);
+    for (const s of list) {
+      const n = names.filter((x) => x && x.id === s.id && x.namn).pop();
+      if (n) Object.assign(s, { namn: n.namn, ...(n.syftar ? { syftar: n.syftar } : {}) });
     }
     return list;
   } catch (err) {

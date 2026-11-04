@@ -32,6 +32,8 @@
 module.exports = {
   enabled: true,
   endpoint: 'https://profeterna-kupong.fritid-moln.workers.dev/kupong',
+  // Den publicerade sajten, som tjänsten och scripts/analyser/skriv.mjs läser.
+  site: 'https://tomaslaino.github.io/Profeterna',
   gang: [
     { id: 'DL', namn: 'Daniel Laino', bild: 'profeterna/laino.jpg' },
     { id: 'DT', namn: 'Daniel Teijder', bild: 'profeterna/teijder.jpg' },

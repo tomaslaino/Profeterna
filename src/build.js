@@ -26,9 +26,9 @@
 //                          tippare på förstasidan, src/tippare.js)
 //   data/journal/*.jsonl   prognosjournalen som den ligger i repot
 //
-// Matchanalysen (fas 5) görs inte i bygget utan på begäran i matchvyn, via en
-// proxy (worker/). Bygget skriver bara i meta.json om knappen ska visas och
-// vart den anropar (config/llm.js; avstängd som standard).
+// Analyserna och omgångarnas namn skrivs inte i bygget utan på en dator med Claude
+// Code (scripts/analyser/skriv.mjs), som committar data/analyser.json och
+// data/omgangsnamn.json. Bygget kopierar dem till sajten.
 //
 // Den genererade datan committas inte (den skulle svälla repot med varje
 // körning) – den laddas upp som Pages-artefakt. Källcachen i data/cache/
@@ -54,12 +54,11 @@ const { divisionStats } = require('./divisions');
 const { playerFiles, teamSquad } = require('./players');
 const { teamFiles } = require('./teamstats');
 const { readCoupons, REPO, BRANCH } = require('./coupons');
-const { buildHistory, writeComments } = require('./history');
+const { buildHistory } = require('./history');
 const { buildTippare, fetchSamtal, roundNames, roundNotes } = require('./tippare');
 const { highlightsByMatch, youtubeByMatch } = require('./hojdpunkter');
 const { wholePercent } = require('./model');
 const rules = require('../config/forecast-rules');
-const llm = require('../config/llm');
 const kupongCfg = require('../config/kupong');
 const { COMPETITIONS, SEASON } = require('../config/competitions');
 
@@ -71,13 +70,12 @@ const OUT = path.join(ROOT, '_site');
 // datan borde vara.
 const UPDATE_EVERY_MINUTES = 30;
 
-// analysisEndpoint: undefined = enligt config/llm.js, null = ingen knapp,
 // annars adressen (lokalt '/api/analyze', se server.js).
 // couponEndpoint: Spara-knappen för kupongen – undefined = enligt
 // config/kupong.js, null = ingen (bara GitHub-länken), annars adressen.
 // samtal: omgången och den förra ur GET …/samtal (hämtas av build() med
 // --journal, src/tippare.js).
-function writeSite(outDir = OUT, { journal = false, analysisEndpoint, couponEndpoint, samtal = null } = {}) {
+function writeSite(outDir = OUT, { journal = false, couponEndpoint, samtal = null } = {}) {
   const tmp = `${outDir}.tmp`;
   fs.rmSync(tmp, { recursive: true, force: true });
   fs.cpSync(PUBLIC, tmp, { recursive: true });
@@ -94,9 +92,13 @@ function writeSite(outDir = OUT, { journal = false, analysisEndpoint, couponEndp
     season: SEASON.label,
     rulesVersion: rules.version,
     journalHorizonDays: HORIZON_DAYS,
-    analysis: analysisInfo(analysisEndpoint),
     competitions: COMPETITIONS.map((c) => ({ id: c.id, name: c.name, short: c.short, type: c.type, espn: c.espn })),
   });
+  // Analyserna och omgångarnas namn, som de ligger i repot.
+  for (const f of ['analyser.json', 'omgangsnamn.json']) {
+    const src = path.join(ROOT, 'data', f);
+    if (fs.existsSync(src)) fs.copyFileSync(src, path.join(dataDir, f));
+  }
   const sources = sourceReport();
   write('sources.json', sources);
 
@@ -236,7 +238,7 @@ function writeSite(outDir = OUT, { journal = false, analysisEndpoint, couponEndp
     console.error('[build] kupongerna:', err);
     coupons = { coupons: [], errors: [{ file: '', errors: [String(err.message || err)] }] };
   }
-  write('kuponger.json', { repo: REPO, branch: BRANCH, dir: 'data/kuponger', save: couponSaveInfo(couponEndpoint), samtal: samtalInfo(couponEndpoint, analysisEndpoint), efterAvspark: kupongCfg.efterAvspark || 0, ...coupons });
+  write('kuponger.json', { repo: REPO, branch: BRANCH, dir: 'data/kuponger', save: couponSaveInfo(couponEndpoint), samtal: samtalInfo(couponEndpoint), efterAvspark: kupongCfg.efterAvspark || 0, ...coupons });
 
   // Kuponghistoriken (Grupparbetena i Olympen): färdiga kuponger med facit och betyg.
   // Med --journal fryses nya färdiga kuponger in i data/kupong-historik.json.
@@ -251,7 +253,7 @@ function writeSite(outDir = OUT, { journal = false, analysisEndpoint, couponEndp
     history = { coupons: [], errors: [String(err.message || err)], frozen: [] };
   }
   // gang: porträtten till motiveringarna och kommentarerna, i gängets ordning.
-  write('historik.json', { comment: commentInfo(analysisEndpoint), gang: (kupongCfg.gang || []).map(({ id, namn, bild }) => ({ id, namn, bild })),
+  write('historik.json', { gang: (kupongCfg.gang || []).map(({ id, namn, bild }) => ({ id, namn, bild })),
     coupons: history.coupons, errors: history.errors });
 
   // Säsongens tippare: gängets egna tips, omgång för omgång. Med --journal
@@ -303,13 +305,6 @@ function squads(m) {
   }
 }
 
-function analysisInfo(override) {
-  const endpoint = override !== undefined ? override : (llm.enabled ? llm.endpoint : null);
-  return endpoint ? { endpoint, provider: llm.provider, model: llm.model, news: Boolean(llm.news) } : null;
-}
-
-// AI:ns kommentar till kupongerna går via samma proxy som analysen
-// (…/analyze → …/kommentar, lokalt /api/kommentar).
 // Kupongen sparas av tjänsten profeterna-kupong, som committar filen i repot
 // (worker/kupong-proxy.mjs).
 function couponSaveInfo(override) {
@@ -320,18 +315,11 @@ function couponSaveInfo(override) {
 // Inför samtalet: gängets egna tips ligger i samma tjänst (…/kupong →
 // …/samtal, lokalt /api/samtal), gang är vilka som tippar och regel hur
 // många spikar och garderingar en kupong har (config/kupong.js). Omgångens
-// namn skriver AI:n i samma proxy som analysen (…/analyze → …/namn, lokalt
-// /api/namn). rummet är tjänsten som visar tobaksaffären vilka i gänget som
+// namn ligger i data/omgangsnamn.json. rummet är tjänsten som visar tobaksaffären vilka i gänget som
 // har den öppen och vad de pekar på (worker/rummet.mjs), null = ingen.
-function samtalInfo(override, analysis) {
+function samtalInfo(override) {
   const save = couponSaveInfo(override);
-  const a = analysisInfo(analysis);
-  return save ? { endpoint: save.replace(/kupong$/, 'samtal'), gang: kupongCfg.gang || [], regel: kupongCfg.regel || null, namn: a ? a.endpoint.replace(/analyze$/, 'namn') : null, rummet: kupongCfg.rummet || null } : null;
-}
-
-function commentInfo(override) {
-  const a = analysisInfo(override);
-  return a ? { endpoint: a.endpoint.replace(/analyze$/, 'kommentar') } : null;
+  return save ? { endpoint: save.replace(/kupong$/, 'samtal'), gang: kupongCfg.gang || [], regel: kupongCfg.regel || null, namn: 'data/omgangsnamn.json', rummet: kupongCfg.rummet || null } : null;
 }
 
 // Kompakt prognos för matchlistan: hela procent 1 · X · 2 (summa 100), och
@@ -347,23 +335,12 @@ function roundNumbers(key, v) {
   return typeof v === 'number' && !Number.isInteger(v) ? Math.round(v * 10000) / 10000 : v;
 }
 
-async function build({ force = false, fetch = true, journal = false, analysisEndpoint, couponEndpoint } = {}) {
+async function build({ force = false, fetch = true, journal = false, couponEndpoint } = {}) {
   const results = fetch ? await refreshAll({ force }) : [];
   // Gängets egna tips hämtas bara när de ska frysas in (src/tippare.js).
   const s = journal ? samtalInfo(couponEndpoint) : null;
-  const samtal = s ? await fetchSamtal(s.endpoint, { nameEndpoint: s.namn }) : null;
-  const site = writeSite(OUT, { journal, analysisEndpoint, couponEndpoint, samtal });
-  // AI:ns kommentarer skrivs in i historiken efter bygget: proxyn läser
-  // kupongen ur den publicerade sajten (se src/history.js).
-  site.comments = 0;
-  if (journal) {
-    try {
-      const c = commentInfo(analysisEndpoint);
-      site.comments = (await writeComments({ endpoint: c && c.endpoint })).length;
-    } catch (err) {
-      console.error('[build] kommentarerna:', err);
-    }
-  }
+  const samtal = s ? await fetchSamtal(s.endpoint) : null;
+  const site = writeSite(OUT, { journal, couponEndpoint, samtal });
   return { results, site };
 }
 
@@ -377,7 +354,7 @@ if (require.main === module) {
       const counts = Object.entries(site.counts).map(([k, v]) => `${v} ${k}`).join(', ');
       console.log(`Sajten byggd i _site/: ${site.pages} matchsidor, ${site.failed.length} fel, prognoser på ${site.forecastMs} ms. Källor: ${counts}.`);
       console.log(journal ? `Prognosjournalen: ${site.logged} nya rader.` : 'Prognosjournalen: bara läst (skrivs med --journal).');
-      if (journal) console.log(`Kuponghistoriken: ${site.frozen} nya kuponger, ${site.comments} nya kommentarer.`);
+      if (journal) console.log(`Kuponghistoriken: ${site.frozen} nya kuponger.`);
       if (journal) console.log(`Tipparna: ${site.tippare.added.length} nya omgångar, ${site.tippare.frozen.length} avslutade.`);
     })
     .catch((err) => {
