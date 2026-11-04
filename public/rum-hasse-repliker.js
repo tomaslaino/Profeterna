@@ -6,7 +6,14 @@
 //
 // {namn} ditt efternamn, {dag} när spelstoppet är (på lördag, i morgon, i dag),
 // {du} dina tecken (etta och kryss), {bada} tecknen ni båda har, {res} resultatet (2–1).
-window.HasseRepliker = {
+//
+// Raderna hörs: Macen tar fram ljudet till dem med fälten ifyllda
+// (src/analyser/rost.mjs), så filen är både ett skript i sidan
+// (window.HasseRepliker) och en modul för Node. lar är knappar och sägs inte.
+(function (repliker) {
+  if (typeof module === 'object' && module.exports) module.exports = repliker;
+  else window.HasseRepliker = repliker;
+})({
   // När man kommer till honom.
   oppning: ['Nå. Vilken match?', 'Säg en match.', 'Vilken match förstår du inte?', 'Jag har svaret. Vilken match?', 'Fråga på. Vilken match?'],
   oppningNamn: ['Nå, {namn}. Vilken match?', '{namn}. Vilken match?', 'Säg en match, {namn}.'],
@@ -98,6 +105,6 @@ window.HasseRepliker = {
   // När något inte går.
   ingenKupong: 'Ingen kupong än. Det är lugnt.',
   igang: 'Efteråt kan alla ha rätt.',
-  ejKlar: ['Den tar jag dagen före.', 'Inte än. Fråga dagen före.', 'Den har jag inte läst än.'],
+  ejKlar: ['Den tar jag sen.', 'Inte än. Fråga mig sen.', 'Den har jag inte läst än.'],
   utanRost: 'Jag har tappat rösten. Här har du det i skrift.',
-};
+});

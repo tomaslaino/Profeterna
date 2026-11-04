@@ -30,6 +30,10 @@
 // Code (scripts/analyser/skriv.mjs), som committar data/analyser.json och
 // data/omgangsnamn.json. Bygget kopierar dem till sajten.
 //
+// Hasse Backes röst (src/rost.js): bygget tar fram ljudet till hans text och
+// repliker som saknas (med AZURE_SPEECH_KEY), sparar det i källcachen och lägger
+// det i data/rost/ med registret data/rost.json.
+//
 // Den genererade datan committas inte (den skulle svälla repot med varje
 // körning) – den laddas upp som Pages-artefakt. Källcachen i data/cache/
 // sparas mellan körningarna med actions/cache. Det enda som committas är
@@ -57,6 +61,7 @@ const { readCoupons, REPO, BRANCH } = require('./coupons');
 const { buildHistory } = require('./history');
 const { buildTippare, fetchSamtal, roundNames, roundNotes } = require('./tippare');
 const { highlightsByMatch, youtubeByMatch } = require('./hojdpunkter');
+const rost = require('./rost');
 const { wholePercent } = require('./model');
 const rules = require('../config/forecast-rules');
 const kupongCfg = require('../config/kupong');
@@ -99,6 +104,8 @@ function writeSite(outDir = OUT, { journal = false, couponEndpoint, samtal = nul
     const src = path.join(ROOT, 'data', f);
     if (fs.existsSync(src)) fs.copyFileSync(src, path.join(dataDir, f));
   }
+  // Hasse Backes röst: det ljud som finns i cachen (build() tar fram det som saknas).
+  const rosten = rost.publicera(dataDir, { gang: kupongCfg.gang || [] });
   const sources = sourceReport();
   write('sources.json', sources);
 
@@ -293,7 +300,7 @@ function writeSite(outDir = OUT, { journal = false, couponEndpoint, samtal = nul
   // Byt hela katalogen på en gång, så att en halvfärdig sajt aldrig serveras.
   fs.rmSync(outDir, { recursive: true, force: true });
   fs.renameSync(tmp, outDir);
-  return { generatedAt, pages, failed, counts: sources.counts, forecastMs: forecast.ms, logged: logged.length, frozen: history.frozen.length, tippare };
+  return { generatedAt, pages, failed, counts: sources.counts, forecastMs: forecast.ms, logged: logged.length, frozen: history.frozen.length, tippare, rosten };
 }
 
 function squads(m) {
@@ -337,11 +344,14 @@ function roundNumbers(key, v) {
 
 async function build({ force = false, fetch = true, journal = false, couponEndpoint } = {}) {
   const results = fetch ? await refreshAll({ force }) : [];
+  // Hasse Backes röst: det ljud som saknas, innan sajten skrivs. Går det inte blir han
+  // tystare, men bygget fortsätter.
+  const rostNu = fetch ? await rost.fyll({ gang: kupongCfg.gang || [] }).catch((err) => ({ gjorda: 0, saknas: null, fel: err.message })) : null;
   // Gängets egna tips hämtas bara när de ska frysas in (src/tippare.js).
   const s = journal ? samtalInfo(couponEndpoint) : null;
   const samtal = s ? await fetchSamtal(s.endpoint) : null;
   const site = writeSite(OUT, { journal, couponEndpoint, samtal });
-  return { results, site };
+  return { results, site, rost: rostNu };
 }
 
 if (require.main === module) {
@@ -349,13 +359,14 @@ if (require.main === module) {
   const fetch = !process.argv.includes('--no-fetch');
   const journal = process.argv.includes('--journal');
   build({ force, fetch, journal })
-    .then(({ results, site }) => {
+    .then(({ results, site, rost: r }) => {
       for (const r of results) console.log(r.action.padEnd(8), r.id, r.error || '');
       const counts = Object.entries(site.counts).map(([k, v]) => `${v} ${k}`).join(', ');
       console.log(`Sajten byggd i _site/: ${site.pages} matchsidor, ${site.failed.length} fel, prognoser på ${site.forecastMs} ms. Källor: ${counts}.`);
       console.log(journal ? `Prognosjournalen: ${site.logged} nya rader.` : 'Prognosjournalen: bara läst (skrivs med --journal).');
       if (journal) console.log(`Kuponghistoriken: ${site.frozen} nya kuponger.`);
       if (journal) console.log(`Tipparna: ${site.tippare.added.length} nya omgångar, ${site.tippare.frozen.length} avslutade.`);
+      console.log(`Hasse Backes röst: ${site.rosten.filer} av ${site.rosten.av} meningar har ljud${r ? `, ${r.gjorda} nya${r.saknas ? `, ${r.saknas} saknas` : ''}${r.fel ? ` (${r.fel})` : ''}` : ''}.`);
     })
     .catch((err) => {
       console.error(err);

@@ -21,6 +21,27 @@ module.exports = {
   // koden släpper igenom lite mer.
   maxOrd: 135,
 
+  // Rösten (src/rost.js): bygget tar fram ljudet till allt han säger – hans text och
+  // de färdiga replikerna i public/rum-hasse-repliker.js – med Azures talsyntes på den
+  // fria nivån (F0), som ger 500 000 tecken i månaden och sedan stryps; den debiterar
+  // aldrig. Nyckeln är hemligheten AZURE_SPEECH_KEY i GitHub. Ljudet sparas i
+  // källcachen (data/cache/rost/) och tas fram en gång per mening. Mattias är den enda
+  // svenska mansrösten, här lite långsammare och mörkare, för lugnet. Ändras rösten,
+  // takten eller tonen tas allt ljud fram på nytt (det ingår i filnamnen).
+  rost: {
+    region: 'swedencentral',
+    voice: 'sv-SE-MattiasNeural',
+    rate: '-8%',
+    pitch: '-6%',
+    format: 'audio-24khz-48kbitrate-mono-mp3',
+    // Den fria nivån tar 20 anrop i minuten: ett var 3,2 s, högst så många per bygge.
+    mellanrumMs: 3200,
+    perBygge: 80,
+    timeoutMs: 30000,
+    // Ljud som inte har använts på så länge tas bort ur cachen.
+    sparasDagar: 30,
+  },
+
   // Uttrycken: koden lottar två per match (efter matchens id), så att två
   // analyser inte låter likadant. Han tar dem där de passar.
   fraser: [

@@ -1,9 +1,9 @@
 'use strict';
 
 // ============================================================================
-// Analyserna (användarens beslut 2026-11-04). Macen skriver dem i förväg, en
-// gång per omgång, med Claude Code i icke-interaktivt läge (claude -p) på
-// användarens Claude-konto: scripts/analyser/skriv.mjs, startad av launchd.
+// Analyserna (användarens beslut 2026-11-04). Datorn skriver dem i förväg på
+// bestämda tider (tider nedan) med Claude Code i icke-interaktivt läge
+// (claude -p) på användarens Claude-konto: scripts/analyser/skriv.mjs, startad av launchd.
 // Sajten visar bara färdiga texter ur data/analyser.json och anropar aldrig
 // någon språkmodell.
 //
@@ -33,19 +33,29 @@ module.exports = {
   tools: ['WebSearch', 'WebFetch'],
   timeoutMs: 420000,
 
-  // Omgången skrivs så många timmar före sin första avspark som inte har varit.
-  // Stryktipset börjar oftast lördag 16.00, så analyserna kommer fredag 16.00,
-  // efter de flesta presskonferenserna.
+  // När analyserna skrivs, i svensk tid (användarens önskan 2026-11-04). Varje tid
+  // skriver nya analyser för omgångens matcher som inte har börjat, och den nya texten
+  // ersätter den gamla. dag: 0 = söndag, 1 = måndag … 6 = lördag. launchd-jobbet
+  // (scripts/analyser/se.matchfixarna.analyser.plist) startar på samma klockslag för
+  // att komma i tid; ändras tiderna bara här kommer de högst en kvart sent.
+  tider: [
+    { dag: 1, kl: '08:00' },
+    { dag: 3, kl: '16:00' },
+    { dag: 5, kl: '16:00' },
+    { dag: 6, kl: '11:00' },
+  ],
+  // En match utan analys skrivs ändå när det är högst så här många timmar kvar, om
+  // omgången skapades efter den senaste tiden.
   forhandTimmar: 24,
-  // Ett försök per match i taget: misslyckas det görs högst så många, med minst
-  // så många minuter emellan.
+  // Försök per match och tid: misslyckas det görs högst så många, med minst så
+  // många minuter emellan.
   perMatch: 3,
   nyttForsokMinuter: 60,
   // Analysen ligger kvar så här många dagar efter avspark.
   sparasDagar: 14,
 
-  // Står i analysen. Byts den skrivs kommande matchers analyser om vid nästa
-  // körning, till exempel när rösten har finslipats.
+  // Står i analysen. Byts den skrivs kommande matchers analyser om direkt, till
+  // exempel när rösten har finslipats.
   promptVersion: '2026-11-04.1',
 
   rost: {
