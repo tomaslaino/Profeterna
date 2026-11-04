@@ -723,7 +723,7 @@ window.RumHasse = (() => {
     H.sagt = null;
     H.talMal = 0;
     s.innerHTML = `<div class="rh-match">${esc(m.namn)}?</div><h2 class="rh-sagt"></h2><div class="rh-text"></div>` +
-      `<div class="rh-slut"><button type="button" class="rh-nasta">Analysera</button><button type="button" class="rh-ja">Jag gissar</button><a href="#match/${esc(m.id)}">Matchbladet</a></div>`;
+      `<div class="rh-slut"><button type="button" class="rh-nasta">${esc(lott(REP().lar))}</button><button type="button" class="rh-ja">Jag gissar</button><a href="#match/${esc(m.id)}">Matchbladet</a></div>`;
     const slut = s.querySelector('.rh-slut');
     const ja = slut.querySelector('.rh-nasta');
     // ett dubbelklick på raden får inte landa på knappen som nu ligger under pekaren
