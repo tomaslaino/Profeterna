@@ -3799,5 +3799,9 @@ ${window.RumRegister ? RumRegister.nara() : ''}
     document.documentElement.classList.remove('i-rummet');
   }
 
-  return { fits, show, hide, redraw: () => { if (R.on) fill(); }, vila: (v) => { R.vilar = Boolean(v); } };
+  return { fits, show, hide, redraw: () => { if (R.on) fill(); }, vila: (v) => {
+      R.vilar = Boolean(v);
+      // (kameran kommer tillbaka rak: rum-hasse.css)
+      if (!v) { R.mx = R.my = 0; setCam(0, 0); }
+    } };
 })();

@@ -528,10 +528,13 @@ export async function figuren(duk, { hog = false, latt = false, pr = 1 } = {}) {
     info: () => ({ trianglar: r.info.render.triangles, ritanrop: r.info.render.calls, texturer: r.info.memory.textures }),
     ctx: r.getContext(),
     // Handen på pulten och koppen där (scenens mått, rum-hasse.js): armen sträcker sig dit.
-    pult([sx, sy], [kx, ky]) {
-      const z = 400;
+    pult([sx, sy], [kx, ky], rakt = false) {
+      // (framför diskens framkant: armen går över den, inte genom den)
+      const z = 720;
       const f = D / (D - z);
       FICKA[0] = [(sx - L.px) / (L.S * f), 500 - (sy - L.py) / (L.S * f), z];
+      // (rakt: armen går hela sin längd genom punkten)
+      if (rakt) FICKA[0] = new THREE.Vector3(...FICKA[0]).sub(SB).setLength((LA + LB) * 0.97).add(SB).toArray();
       FICKA[1] = [0.25, -0.96, -0.1];
       FICKA[2] = [0.96, -0.1, -0.25];
       FICKA[3] = [0, -1, 0];

@@ -3564,20 +3564,33 @@ hel, med manschett och kavajärm in från bildens kant. Ett klick på den eller 
 kameran svänger åt vänster (`.hasse-svang` i [public/rum-hasse.css](public/rum-hasse.css)). Där står
 han, och Esc eller *Tillbaka* går tillbaka (vid matchlistan också ett klick utanför).
 
-**Det är bara kameran som rör sig.** Den vrids runt ögat, som står mitt i bilden med perspektivet
-halva fönsterbredden, och inget annat flyttar sig. Rummet och hans vägg är två plan i samma rum, och
-en vridning runt ögat ger exakt samma bild av ett plan som av det riktiga rummet. Handen, kaffet och
-notan ligger alltså kvar på pulten hela vägen, och de glider från bildens vänstra kant till den högra.
-Hans ena arm går över hörnet till handen ([public/rum-hasse-hand.js](public/rum-hasse-hand.js) ritar
-den på pulten, figuren på väggen, `pult` och `iScenen`), och det finns ingen andra kopp och ingen
-andra hand på hans disk. Kameran stannar vid 79° (`VINKEL`), så att pulten syns kvar vid bildens
-högra kant medan man pratar med honom; på höjden går den 90° och pulten är just utanför bilden. Hans
-vägg står rakt fram och möter rummets vänstra kant, och väggarna fortsätter uppåt och nedåt
-(`.rh-fort`), så att inget slutar mitt i bilden. Samtalet och den mörka tonen bakom det kommer först
-när kameran har stannat. Framme blir hans vägg platt, så att texten är skarp och går att trycka på,
-och bara rummet står kvar vridet (`.hasse-kant`), urklippt till det som syns.
+**Det är bara kameran som rör sig, inne i rummets egen 3D.** Rummets plan ligger kvar på sina djup
+(bakväggen 600 enheter in, tv:n 470, gänget 330, pulten 60 och det som ligger på den 0), och kameran är
+ett omslag runt världen (`.rum-vrid`) med rummets egen lins, 1400 enheter (`LINS`). Den vrids runt ögat
+medan ögat går i en liten båge åt vänster och tillbaka (`OGA`) och huvudet lutar en aning (`LUT`,
+`NICK`), så att pulten far förbi fortare än gänget och gänget fortare än fönstret. Rummet var förut en
+platt bild som vreds som sidan på en kub, med bredare lins än rummet är ritat med, och därför såg det
+ut som en bild i taget. Hans vägg är ett plan i samma värld (`.rh-vagg`, `lage`) och möter bakväggen
+i ett riktigt hörn under samma tak (`.rv-tak`), mörkare på båda sidor (`.rv-horn`, `.rh-skugga`). Han
+och disken står närmare än väggen (`--bak-t`), och disken slutar där pulten slutar (`.rh-disk`). I
+Safari plattas djupet i hans bild till, så där står väggen i samma plan som han; rummets djup fungerar
+som vanligt. Handen, kaffet och notan ligger kvar på pulten hela vägen, och hans ena arm går över
+hörnet till handen ([public/rum-hasse-hand.js](public/rum-hasse-hand.js) ritar den på pulten, figuren
+på sin duk, `pult` och `iScenen`). Armen går framför diskens framkant, inte genom den, och siktar förbi
+handleden, så att bara ärmen syns på hans sida om hörnet. Det finns ingen andra kopp och ingen andra
+hand på hans disk. Kameran stannar när hörnet står 83,5 % in i bilden (`KANT`), så att pulten syns kvar
+vid högra kanten medan man pratar med honom; ögat har då backat längs synlinjen genom hörnet (`BACK`),
+så att handen ryms. På höjden står hörnet vid bildens högra kant och pulten är just utanför, och armen
+går rakt genom hörnet. Samtalet och den mörka tonen bakom det kommer först när kameran har stannat.
+Framme blir hans vägg platt, så att texten är skarp och går att trycka på, och bara rummet står kvar
+vridet (`.hasse-kant`), urklippt till det som syns. Ändras fönstret medan han syns räknas kameran om.
 
-Under svängen ritas ingenting om, och handen behöver ingen egen duk ovanpå allt. När han dricker eller
+Svängen är färdiga listor av mellanbilder (`svang`, 22 bilder på 1,1 sekunder) som grafikprocessen spelar
+upp själv, på lager som redan finns. Ingen duk ritas om, och taket och pultens framsida är enfärgade
+ytor som inte tar grafikminne. Omslagen ligger kvar hela tiden utan omvandling, så att inget byggs om
+när kameran börjar. Världen rätar upp sig efter musen med vanliga övergångar: med `!important` i
+stilmallen hamnade de på huvudtråden (`compositeFailed` 262144), och stilen räknades om i varje bild.
+När han dricker eller
 skrattar lämnar armen pulten: då tar figurens duk över handen (`.hasse-arm-ute`), och när han lyfter
 koppen försvinner den ritade på fatet (`.hasse-klunk`). Fatet står kvar på pulten.
 
@@ -3631,13 +3644,14 @@ prova Bielsa-utbrottet.
 
 **Grafiken.** Vilan kostar lite: handen är en liten duk som ritas bara när fingrarna rör sig, utan
 skuggkarta (PowerVR i telefonen). Handen och armen behöver atlasen och handens modell (ungefär
-280 kB), och de hämtas sist av allt när rummet är klart. Under svängen är duken större och ritas
-om i varje bild med färre bildpunkter (högst 1,25 per bildpunkt i datorn och 1,5 i telefonen), utom
-de sista graderna hem. Mätt i ett riktigt Chrome-fönster (1280 × 743, täthet 2): vägen dit är lika
-jämn med och utan handens duk, ungefär 50 bildrutor på 0,82 sekunder och längst 33 ms utan ny bild.
-På vägen tillbaka är de sista 0,4 sekunderna ojämna (ungefär 29 bildrutor i hela svängen, längst
-67 ms), ibland också utan duken; orsaken är inte hittad, och i Chrome som telefon (412 × 780,
-strypning × 4) tappas inga bilder. Figuren finns först när någon klickar: rummet bakom honom hämtas
+280 kB), och de hämtas sist av allt när rummet är klart. Duken i pulten ritas
+inte om under svängen. Mätt mot svängen med en platt bild, om vartannat och vid låg belastning. I ett
+riktigt Chrome-fönster (täthet 2): vägen tillbaka gick från 56 visade bilder, 20 tappade, längst 68 ms utan
+ny bild och 815 saknade rutor till 91 visade, 1 tappad, längst 33 ms och 2 saknade rutor; vägen dit från
+76 visade och längst 18 ms till 93 visade, 1 tappad och längst 33 ms. I Chrome som telefon (412 × 780,
+täthet 2,625, strypning × 4): rastrering 20 → 6 ms dit och 16 → 4,5 ms tillbaka, huvudtråden 185 → 203 ms dit
+(svängen är längre) och 179 → 126 ms tillbaka, längst 33 ms. Provat i Safaris motor (WKWebView, 390 × 664).
+Inte mätt på en riktig telefon. Figuren finns först när någon klickar: rummet bakom honom hämtas
 då, och grafiken lämnas tillbaka en stund efter att man har gått. Kostymfotot (C More Entertainment, CC BY 3.0, Wikimedia Commons, bearbetat; krediten står sist under Källor) ligger utan
 armar på en formad yta, så att huvudet vrids runt nacken och kroppen lutar sig fram. Ögon, bryn och
 mun rör sig i skuggaren: locken blinkar utan att ögat tänjs, munnen öppnas med tänder och tunga,
