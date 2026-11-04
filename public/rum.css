@@ -636,8 +636,8 @@ canvas.rum-neonhalo { opacity: 0.28; }
 
 /* ---------- Hasse i baren (rum.js, hasseHtml) ---------- */
 
-/* Hasse Backe står i baren utanför bilden till vänster; hans arm ligger på
-   pulten (rum-hasse-hand.js), och bredvid handen står hans kaffe och notan. */
+/* Hasse Backe sitter i baren utanför bilden till vänster; längst ut på pulten
+   står hans kaffe och notan (ett klick: rum-hasse.js). */
 #rum-hasse { position: absolute; left: -10px; top: 640px; width: 280px; height: 304px; }
 #rum-hasse > * { position: absolute; display: block; }
 #rum-hasse .nota {

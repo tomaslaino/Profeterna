@@ -1,21 +1,19 @@
-// Hasse Backe i tobaksaffären (rum-hasse.js), i three.js: han sitter på en barstol vid pultens ände
-// (handen på pulten: rum-hasse-hand.js). Kostymfotot (C More Entertainment, CC BY 3.0,
-// Wikimedia Commons) ligger på en formad yta, så att huvudet vrids på riktigt
-// runt nacken och kroppen lutar sig fram. Ögon, bryn och mun rör sig i skuggaren.
-// Armarna, händerna och koppen finns i rum-hasse-arm.js.
+// Hasse Backe i tobaksaffären (rum-hasse.js), i three.js: han sitter bakom bardisken, vänd mot en, med
+// underarmarna på disken och kaffet framför sig. Kostymfotot (C More Entertainment, CC BY 3.0, Wikimedia
+// Commons) ligger på en formad yta, så att huvudet vrids på riktigt runt nacken och kroppen lutar sig
+// fram. Ögon, bryn och mun rör sig i skuggaren. Armarna, händerna och koppen finns i rum-hasse-arm.js.
 //
-// Grafiken: inga skuggkartor och ingen ny bild i rummet. Figuren finns bara medan man tittar på honom, och då
-// står gänget och sakerna still och ritas inte (Rum.vila). Rummet bakom honom är
-// en färdig bild (scripts/hasse/bak.html), liksom pultens ände, stolen och benen. Skuggorna på pulten är
-// räknade kapslar.
+// Disken ritas inte här: den är en enkel yta på sidan under duken (.rh-disk i rum-hasse.css). Det som är
+// under den döljs i skuggarna (BORD_GLSL), så att kroppen slutar vid diskens bakre kant och det som
+// ligger på disken trycks mot den. Skuggorna på disken är räknade kapslar, utan skuggkarta.
 //
-// Världen: 1 enhet = 1 bildpunkt i fotot, x = fotots x − 660, y = 900 − fotots y,
-// z mot betraktaren. Pulten är BORD, sedd av ett öga som står lägre än figurens (rummet är bakat så).
+// Världen: 1 enhet = 1 bildpunkt i fotot, x = fotots x − 660, y = 900 − fotots y, z mot betraktaren.
+// Ögat står på (0, 500, D) och tittar rakt fram.
 //
-// figuren(duk, { hog, latt }) → { rita(T, n, tal, mun), tid: längden, pult(hand, kopp), borta() }
+// figuren(duk, { hog, latt, pr }) → { kamera(v), rita(T, n, tal, mun), tid, info(), borta() }
 // Klipp: T 0–12,4 (vila, skrattet, domen, gesterna, hem) och T 20–24,5 (en klunk kaffe, börjar och slutar som vilan).
 import * as THREE from 'three';
-import { ATLAS, LJUS, ARM, laddaFoto, laddaHand, byggArm, byggKopp } from './rum-hasse-arm.js';
+import { ATLAS, LJUS, ARM, KAMERA, BORD_GLSL, laddaFoto, laddaHand, byggArm, byggKopp } from './rum-hasse-arm.js';
 
 const DEG = Math.PI / 180;
 const clamp = (x, a = 0, b = 1) => Math.min(b, Math.max(a, x));
@@ -28,22 +26,28 @@ const spar = (k, t) => {
 
 // ---------- figuren ----------
 
-// Pulten (scripts/hasse/bak.html): ytan, bakre kanten, änden och var ögat står i bilden. En punkt på pulten
-// ligger i figurens värld så här: planet genom honom (z = 0) är detsamma, men ögat står OGA enheter lägre.
-const BORD = { TOPP: -560, Z: -300, X: 270, OGA: -78 };
-const D = 3900;
-const paBord = (x, y, z) => new THREE.Vector3(x, y + ((500 - BORD.OGA) * z) / D, z);
+export const D = KAMERA.CZ;
+// Disken: ovansidan (y) och den bakre kanten (z), strax framför hans mage.
+export const BORD = { Y: -290, Z: 230 };
+// En punkt i världen i fönstret, när ögonhöjden på avståndet 0 står i (cx, ey) med s bildpunkter
+// på en enhet.
+export function iBild(v, x, y, z = 0) {
+  const f = (v.s * D) / (D - z);
+  return [v.cx + x * f, v.ey + (KAMERA.CY - y) * f];
+}
+// Det som ska rymmas: hjässan, och allt som rör sig (armarna i gesterna, koppen när han dricker,
+// händerna och skuggorna på disken). Gesten där armen går ut åt sidan är smalare på höjden.
+export const MATT = {
+  topp: [0, 772, 120],
+  // hans bredd i vila (ärmarna), till samtalet bredvid honom
+  vanster: [-470, -200, 300],
+  hoger: [470, -200, 340],
+  ram: (hog) => [[hog ? -640 : -790, 860, 330], [660, 860, 330], [hog ? -640 : -790, BORD.Y, 330], [560, BORD.Y, 1000], [-260, BORD.Y, 1000]],
+};
 // fotot: urklippt, armarna borta, ljuset anpassat (bakat ur originalet)
 const X0 = 280;
 const Y0 = 130;
 const TW = 860;
-const TH = 1350;
-export const SCEN = {
-  // kant: var pultens bakre kant är i bilden (x vid hörnet, y), topp: hans hjässa, vans: hans yttre armbåge
-  bred: { W: 2400, H: 1500, S: 0.54, px: 1860, py: 380, duk: { x: 1100, y: 150, w: 1640, h: 1190 }, kant: [2262, 927], topp: 250, vans: 1560 },
-  // hand: hans nedersta hand på låret, samtalet börjar under den
-  hog: { W: 1300, H: 2100, S: 0.56, px: 540, py: 250, duk: { x: 40, y: 20, w: 1260, h: 1240 }, hand: 1069 },
-};
 const W_ = (x, y, z = 0) => new THREE.Vector3(x - 660, 900 - y, z);
 const P_ = (x, y, z) => [x - 660, 900 - y, z];
 const g2 = (x, y, cx, cy, sx, sy) => { const a = (x - cx) / sx; const b = (y - cy) / sy; return Math.exp(-(a * a + b * b)); };
@@ -80,23 +84,22 @@ function djup(x, y) {
 }
 
 export async function figuren(duk, { hog = false, latt = false, pr = 1 } = {}) {
-  const L = hog ? SCEN.hog : SCEN.bred;
   const r = new THREE.WebGLRenderer({ canvas: duk, alpha: true, antialias: !latt, powerPreference: latt ? 'default' : 'high-performance' });
   r.setPixelRatio(pr);
-  r.setSize(L.duk.w, L.duk.h, false);
   r.setClearColor(0, 0);
   const S = new THREE.Scene();
-  const C = new THREE.PerspectiveCamera(2 * Math.atan((L.H / L.S / 2) / D) / DEG, L.W / L.H, 200, 6000);
-  C.position.set(0, 500, D);
-  C.lookAt(0, 500, 0);
-  C.setViewOffset(L.W, L.H, L.W / 2 - L.px + L.duk.x, L.H / 2 - L.py + L.duk.y, L.duk.w, L.duk.h);
+  const C = new THREE.PerspectiveCamera(30, 1, 200, 6000);
+  C.position.set(0, KAMERA.CY, D);
+  C.lookAt(0, KAMERA.CY, 0);
+  // disken i skuggarna: ovansidan, bakre kanten och den kanten i duken (kamera)
+  const bord = { value: new THREE.Vector3(BORD.Y, BORD.Z, -1) };
   const [foto, handModell] = await Promise.all([laddaFoto(), laddaHand()]);
-  // ytan: tätare kring huvudet
+  // ytan: tätare kring huvudet, och bara ned till disken
   const nx = latt ? 88 : 128;
   const Xs = Array.from({ length: nx }, (_, i) => X0 + (i / (nx - 1)) * TW);
   const Ys = [];
   for (let y = Y0; y < 720; y += latt ? 8 : 5.2) Ys.push(y);
-  for (let y = 720; y <= Y0 + TH; y += latt ? 26 : 17) Ys.push(y);
+  for (let y = 720; y <= 1350; y += latt ? 26 : 17) Ys.push(y);
   const ny = Ys.length;
   const pos = new Float32Array(nx * ny * 3);
   const uvs = new Float32Array(nx * ny * 2);
@@ -134,11 +137,12 @@ export async function figuren(duk, { hog = false, latt = false, pr = 1 } = {}) {
     foto: { value: foto }, uHuvud: { value: new THREE.Matrix3() }, uPiv: { value: W_(650, 650, 40) }, uKropp: { value: new THREE.Matrix4() }, uAx: { value: new THREE.Vector2() }, uAndas: { value: 0 },
     blund: { value: 0 }, kis: { value: 0 }, munn: { value: 0 }, rund: { value: 0 }, le: { value: 0 }, bryn: { value: new THREE.Vector2() }, blick: { value: new THREE.Vector2() },
     uArm: { value: [new THREE.Vector3(), new THREE.Vector3(), new THREE.Vector3(), new THREE.Vector3(), new THREE.Vector3(), new THREE.Vector3()] },
+    uBord: bord,
   };
   const yta = new THREE.Mesh(G, new THREE.ShaderMaterial({
     uniforms: U, transparent: true, blending: THREE.CustomBlending, blendSrc: THREE.OneFactor, blendDst: THREE.OneMinusSrcAlphaFactor, side: THREE.DoubleSide,
     vertexShader: `attribute float aW; attribute vec2 aAx; uniform mat3 uHuvud; uniform vec3 uPiv; uniform mat4 uKropp; uniform vec2 uAx; uniform float uAndas; uniform vec3 uArm[6];
-    varying vec2 vQ; varying vec3 vN, vN0; varying float vAo;
+    varying vec2 vQ; varying vec3 vN, vN0, vW; varying float vAo;
     float seg3(vec3 p, vec3 a, vec3 b) { vec3 ab = b - a; return length(p - a - ab * clamp(dot(p - a, ab) / dot(ab, ab), 0., 1.)); }
     void main(){ vec3 p = position; vec3 n = normal; vN0 = n; vQ = uv;
       p.y += aAx.x * uAx.x + aAx.y * uAx.y; p.x += aAx.x * -uAx.x * .25 + aAx.y * uAx.y * .25;
@@ -146,14 +150,15 @@ export async function figuren(duk, { hog = false, latt = false, pr = 1 } = {}) {
       p.z += uAndas * bar; p.y += uAndas * .5 * bar;
       vec3 h = uPiv + uHuvud * (p - uPiv); p = mix(p, h, aW);
       n = normalize(mix(n, uHuvud * n, aW));
-      vec4 w = uKropp * vec4(p, 1.); vN = mat3(uKropp) * n;
+      vec4 w = uKropp * vec4(p, 1.); vN = mat3(uKropp) * n; vW = w.xyz;
       // armarna skuggar kroppen
       float dA = min(seg3(w.xyz, uArm[0], uArm[1]), seg3(w.xyz, uArm[1], uArm[2]));
       float dB = min(seg3(w.xyz, uArm[3], uArm[4]), seg3(w.xyz, uArm[4], uArm[5]));
       vAo = exp(-pow(max(0., dA - 80.) / 80., 2.)) * .3 + exp(-pow(max(0., dB - 80.) / 80., 2.)) * .3;
       gl_Position = projectionMatrix * viewMatrix * w; }`,
-    fragmentShader: `precision highp float; uniform sampler2D foto; uniform float blund, kis, munn, rund, le; uniform vec2 bryn, blick; varying vec2 vQ; varying vec3 vN, vN0; varying float vAo;
+    fragmentShader: `precision highp float; uniform sampler2D foto; uniform float blund, kis, munn, rund, le; uniform vec2 bryn, blick; varying vec2 vQ; varying vec3 vN, vN0, vW; varying float vAo;
     ${LJUS}
+    ${BORD_GLSL}
     const vec2 O0 = vec2(${X0}., ${Y0}.), TS = vec2(${ATLAS.W}., ${ATLAS.H}.);
     float g(vec2 p, vec2 c, vec2 r) { vec2 d = (p - c) / r; return exp(-dot(d, d)); }
     float seg2(vec2 p, vec2 a, vec2 b) { vec2 ab = b - a; return length(p - a - ab * clamp(dot(p - a, ab) / dot(ab, ab), 0., 1.)); }
@@ -175,6 +180,7 @@ export async function figuren(duk, { hog = false, latt = false, pr = 1 } = {}) {
       return q;
     }
     void main(){
+      if (underBord(vW)) discard;
       vec2 q = vQ;
       vec2 q0 = q;
       float frans = 0., inre = 0., lipp = 0., n01 = 0., dx = 0., xn = 0., uU = 0., uL = 0., A = 0.;
@@ -214,9 +220,8 @@ export async function figuren(duk, { hog = false, latt = false, pr = 1 } = {}) {
       }
       }
       vec4 c = texture2D(foto, vec2((q.x - O0.x) / TS.x, 1. - (q.y - O0.y) / TS.y));
-      // Nederst går fotot över i kavajen på stolen (bilden bakom). Sidorna nedtill är där armarna satt i
-      // fotot: där är klippet ojämnt, och nu syns det, så kroppen slutar i en mjuk linje.
-      c *= 1. - smoothstep(1412., 1478., q0.y);
+      // Sidorna nedtill är där armarna satt i fotot: där är klippet ojämnt, så kroppen slutar i en
+      // mjuk linje (ärmarna ligger framför).
       if (q0.y > 1030.) c *= 1. - smoothstep(-2.5, 2.5, q0.x - (952. - (q0.y - 1030.) * .12));
       if (q0.y > 1300.) c *= smoothstep(-2.5, 2.5, q0.x - (360. + (q0.y - 1300.) * .12));
       if (c.a < .02) discard;
@@ -255,24 +260,24 @@ export async function figuren(duk, { hog = false, latt = false, pr = 1 } = {}) {
   // armarna (rum-hasse-arm.js). Kroppen får inte skymma dem: djupet börjar om efter kroppen.
   yta.renderOrder = 1;
   yta.onAfterRender = (re) => re.clearDepth();
-  const A = byggArm(S, 1, foto, handModell, 0.94);
-  const B = byggArm(S, -1, foto, handModell);
-  const KOPP = [745, 0, 540];
-  KOPP[1] = paBord(KOPP[0], BORD.TOPP, KOPP[2]).y;
-  const K = byggKopp();
+  const A = byggArm(S, 1, foto, handModell, 0.94, bord);
+  const B = byggArm(S, -1, foto, handModell, 1, bord);
+  // koppen på sitt fat, framför honom och närmast hans vänstra hand
+  const KOPP = [100, BORD.Y, 720];
+  const K = byggKopp(bord);
   const kopp = K.kopp;
   kopp.position.set(KOPP[0], KOPP[1] + 11, KOPP[2]);
   kopp.rotation.y = -0.5;
   K.fat.position.set(KOPP[0], KOPP[1] + 0.5, KOPP[2]);
   S.add(kopp, K.fat);
-  // skuggorna på pulten: kapslar som faller nedåt och åt höger, ingen skuggkarta
-  const NK = 6;
+  // skuggorna på disken: kapslar som faller bakåt och åt höger, ingen skuggkarta
+  const NK = 7;
   const kapA = Array.from({ length: NK }, () => new THREE.Vector4());
   const kapH = Array.from({ length: NK }, () => new THREE.Vector2());
   const skuggGeo = new THREE.BufferGeometry();
   {
     const zn = D - 900;
-    const h = [[BORD.X, BORD.Z], [BORD.X + 3000, BORD.Z], [BORD.X, zn], [BORD.X + 3000, zn]].flatMap(([x, z]) => paBord(x, BORD.TOPP, z).toArray());
+    const h = [[-2400, BORD.Z], [2400, BORD.Z], [-2400, zn], [2400, zn]].flatMap(([x, z]) => [x, BORD.Y, z]);
     skuggGeo.setAttribute('position', new THREE.BufferAttribute(new Float32Array(h), 3));
     skuggGeo.setIndex([0, 2, 1, 1, 2, 3]);
   }
@@ -297,75 +302,66 @@ export async function figuren(duk, { hog = false, latt = false, pr = 1 } = {}) {
       gl_FragColor = vec4(0., 0., 0., 1. - ljus);
     }`,
   }));
-  // (under honom: pulten går bakom honom)
+  // (först: kroppen slutar vid diskens kant, och skuggorna ligger framför den)
   skugga.renderOrder = 0.5;
   skugga.frustumCulled = false;
   S.add(skugga);
-  // Skuggan under handen på låret: en mjuk fläck som bara syns när handen ligger där.
-  const flackDuk = document.createElement('canvas');
-  flackDuk.width = flackDuk.height = 64;
-  {
-    const x = flackDuk.getContext('2d');
-    const g = x.createRadialGradient(32, 32, 4, 32, 32, 32);
-    g.addColorStop(0, 'rgba(0,0,0,.72)');
-    g.addColorStop(0.6, 'rgba(0,0,0,.34)');
-    g.addColorStop(1, 'rgba(0,0,0,0)');
-    x.fillStyle = g;
-    x.fillRect(0, 0, 64, 64);
-  }
-  const flackTex = new THREE.CanvasTexture(flackDuk);
-  const laret = new THREE.Mesh(new THREE.PlaneGeometry(1, 1), new THREE.MeshBasicMaterial({ map: flackTex, transparent: true, depthWrite: false, depthTest: false }));
-  laret.renderOrder = 0.6;
-  laret.frustumCulled = false;
-  laret.scale.set(390, 300, 1);
-  laret.rotation.set(-1.1, 0, -0.2);
-  S.add(laret);
+  // kroppen nära disken skuggar dess bakre kant
+  kapA[6].set(-330, BORD.Z + 10, 330, BORD.Z + 10);
+  kapH[6].set(64, 26);
   // ---------- rörelserna ----------
   const SA = W_(352, 792, -52);
   const SB = W_(987, 800, 8);
   const LA = ARM.LA;
   const LB = ARM.LB;
-  // handen på låret: så sitter han när man kommer
-  const DISK = [[-345, -640, 320], [-0.8, -0.58, -0.2], [0.8, -0.24, 0.55], [0.18, -0.96, -0.22], 0.12, 0];
+  // Vilan: armbågarna på disken, underarmarna på den in mot mitten, och handen på hans vänstra sida
+  // vid koppen. Ur axeln (s), armbågens vinkel ut från rakt fram (a) och underarmens vinkel in (b):
+  // armbågen och handleden ligger på disken, med armens längder.
+  const EH = BORD.Y + 78;
+  const WH = BORD.Y + 42;
+  function paDisken(s, sida, a, b) {
+    const S0 = new THREE.Vector3(s.x + 2 * sida, s.y - 8, s.z);
+    const h1 = Math.sqrt(LA * LA - (S0.y - EH) ** 2);
+    const E = new THREE.Vector3(S0.x - sida * h1 * Math.sin(a * DEG), EH, S0.z + h1 * Math.cos(a * DEG));
+    const h2 = Math.sqrt(LB * LB - (EH - WH) ** 2);
+    const W = new THREE.Vector3(E.x + sida * h2 * Math.sin(b * DEG), WH, E.z + h2 * Math.cos(b * DEG));
+    return { W: W.toArray(), pol: E.clone().sub(S0).toArray() };
+  }
+  const va = paDisken(SA, 1, 17, 40);
+  const vb = paDisken(SB, -1, 14, 12);
+  // [handled, armbågens riktning, fingrarna, handflatan, krok, peka]
+  const VILA_A = [va.W, va.pol, [0.84, -0.1, 0.53], [0.2, -0.97, 0.1], 0.36, 0];
+  const VILA_B = [vb.W, vb.pol, [-0.4, -0.1, 0.91], [-0.22, -0.97, 0.08], 0.34, 0];
   // [t, handled, armbågens riktning, fingrarna, handflatan, krok, peka]
   const VA = [
-    [0, ...DISK], [2.5, ...DISK],
+    [0, ...VILA_A], [2.5, ...VILA_A],
     // gapskrattet: båda armarna upp framför kroppen
     [3.0, P_(210, 505, 300), [-0.6, -0.5, 0.65], [-0.12, 0.97, 0.12], [0.12, -0.06, 1], 0.1, 0],
     [4.35, P_(210, 505, 300), [-0.6, -0.5, 0.65], [-0.12, 0.97, 0.12], [0.12, -0.06, 1], 0.1, 0],
     [4.78, P_(270, 680, 340), [-0.8, -0.6, 0.2], [-0.05, 0.95, 0.3], [0.9, 0, 0.3], 0.06, 0],
-    [5.0, ...DISK], [5.5, ...DISK],
+    // slaget i disken
+    [5.0, ...VILA_A], [5.5, ...VILA_A],
     // pekfingret: så är det bara
     [5.95, P_(310, 640, 390), [-0.8, -0.75, 0.15], [0.2, 0.9, 0.38], [0.9, -0.1, -0.3], 0.62, 1],
     [6.8, P_(310, 640, 390), [-0.8, -0.75, 0.15], [0.2, 0.9, 0.38], [0.9, -0.1, -0.3], 0.62, 1],
     // karateslaget
     [7.1, P_(300, 690, 400), [-0.8, -0.75, 0.15], [0.2, 0.8, 0.55], [0.95, 0, -0.2], 0.06, 0],
     [8.15, P_(300, 690, 400), [-0.8, -0.75, 0.15], [0.2, 0.8, 0.55], [0.95, 0, -0.2], 0.06, 0],
-    // armen ut åt sidan, inom bilden (i telefonen är bilden smalare)
+    // armen ut åt sidan, inom bilden (på höjden är bilden smalare)
     [8.7, P_(hog ? 210 : 70, 790, 330), [-0.7, -0.75, 0.1], [-0.72, 0.6, 0.25], [0.12, -0.25, 1], 0.1, 0],
     [9.25, P_(hog ? 235 : 95, 830, 320), [-0.7, -0.75, 0.1], [-0.76, 0.5, 0.3], [0.12, -0.25, 1], 0.1, 0],
-    [9.95, ...DISK], [12.4, ...DISK],
+    [9.95, ...VILA_A], [12.4, ...VILA_A],
   ];
-  // armen ned mot pulten; pult() säger var handen är
-  const FICKA = [paBord(560, BORD.TOPP + 62, 720).toArray(), [0.85, -0.5, -0.1], [0.55, -0.12, 0.82], [0.06, -0.99, 0.06], 0.1, 0];
-  // armbågen när armen vilar på pulten
-  const ARMBAGE = new THREE.Vector3(...P_(1128, 1272, 130));
-  const ARMENS_SLUT = new THREE.Vector3();
-  let iVila = 0;
-  const vbNycklar = () => [
-    [0, ...FICKA], [2.55, ...FICKA],
+  const VB = [
+    [0, ...VILA_B], [2.55, ...VILA_B],
     [3.0, P_(1110, 505, 310), [0.6, -0.5, 0.65], [0.12, 0.97, 0.12], [-0.12, -0.06, 1], 0.1, 0],
     [4.2, P_(1110, 505, 310), [0.6, -0.5, 0.65], [0.12, 0.97, 0.12], [-0.12, -0.06, 1], 0.1, 0],
-    [4.72, ...FICKA], [12.4, ...FICKA],
-    [20, ...FICKA],
+    [4.72, ...VILA_B], [12.4, ...VILA_B],
+    [20, ...VILA_B],
   ];
-  let VB = vbNycklar();
-  // Armen på pulten (pult): koppen står där, och handen ritas av pultens duk när armen vilar.
-  let iPult = false;
+  // Klunken (T 20–24,5), börjar och slutar som vilan. Koppen går till munnen, handen följer örat.
   const KF = { x: (-33 - KOPP[0]) / -405, y: (323 - KOPP[1] - 11) / 725, z: (310 - KOPP[2]) / -160 };
-  // Klunken (T 20–24,5), börjar och slutar som vilan. Koppen går sin väg, handen följer örat.
   const KV = [[20, 0, 0, 0, 0, 0], [21.1, 0, 0, 0, 0, 0], [21.95, -405, 725, -160, -0.5, 0], [23.25, -412, 735, -168, -0.72, 0.02], [24.05, 0, 0, 0, 0, 0], [24.5, 0, 0, 0, 0, 0]];
-  const klunkOm = (t) => { const f = ss(21.1, 21.3, t) * (1 - ss(23.95, 24.15, t)); return f; };
   function klunkKopp(t, ut) {
     const y = (i) => spar(KV.map((k) => [k[0], k[i]]), t);
     ut.set(y(1) * KF.x, y(2) * KF.y, y(3) * KF.z);
@@ -393,7 +389,7 @@ export async function figuren(duk, { hog = false, latt = false, pr = 1 } = {}) {
   const Wr_ = v();
   function ik(Sk, Wr, pol, Eut, Wut) {
     d_.subVectors(Wr, Sk);
-    // (utsträckt mot pulten får den vara något längre än i fotot: det syns inte på en raklång arm)
+    // (utsträckt får den vara något längre än i fotot: det syns inte på en raklång arm)
     const hel = d_.length();
     const tj = Math.min(1.3, Math.max(1, hel / (0.97 * (LA + LB))));
     const la = LA * tj;
@@ -407,7 +403,6 @@ export async function figuren(duk, { hog = false, latt = false, pr = 1 } = {}) {
     Wut.copy(Sk).addScaledVector(dir_, len);
   }
   const FA = v();
-  const vilaW = new THREE.Vector3(...DISK[0]);
   const eu = new THREE.Euler();
   const mh = new THREE.Matrix4();
   const mk = new THREE.Matrix4();
@@ -421,6 +416,8 @@ export async function figuren(duk, { hog = false, latt = false, pr = 1 } = {}) {
 
   const FK = v().set(-0.7, 0.28, 0.66).normalize();
   const PK = v().set(-0.3, -0.8, -0.1).normalize();
+  const POLK = v().set(0.5, -0.82, 0.2);
+  const tmp = v();
   // handen vid örat: fingrarna runt det, armbågen nedåt och utåt
   function klunkArm(t, b) {
     klunkKopp(t, kk);
@@ -432,31 +429,34 @@ export async function figuren(duk, { hog = false, latt = false, pr = 1 } = {}) {
     // på väg dit, och kvar medan han håller
     const mot = ss(20.1, 21.05, t) * (1 - ss(24.1, 24.5, t));
     const W = kh.addScaledVector(FK, -176);
-    FICKA_W.fromArray(FICKA[0]);
-    FICKA_W.lerp(W, mot);
-    b.w.copy(FICKA_W);
-    FICKA_W.fromArray(FICKA[1]);
-    b.pol.copy(FICKA_W).lerp(POLK, mot);
-    FICKA_W.fromArray(FICKA[2]);
-    b.F.copy(FICKA_W).lerp(FK, mot);
-    FICKA_W.fromArray(FICKA[3]);
-    b.P.copy(FICKA_W).lerp(PK, mot);
-    b.krok = FICKA[4] + (spar([[20, 0.1], [21, 0.18], [21.2, 0.6], [24, 0.6], [24.2, 0.18], [24.5, FICKA[4]]], t) - FICKA[4]) * mot;
+    b.w.fromArray(VILA_B[0]).lerp(W, mot);
+    b.pol.copy(tmp.fromArray(VILA_B[1])).lerp(POLK, mot);
+    b.F.copy(tmp.fromArray(VILA_B[2])).lerp(FK, mot);
+    b.P.copy(tmp.fromArray(VILA_B[3])).lerp(PK, mot);
+    b.krok = VILA_B[4] + (spar([[20, 0.1], [21, 0.18], [21.2, 0.6], [24, 0.6], [24.2, 0.18], [24.5, VILA_B[4]]], t) - VILA_B[4]) * mot;
     b.peka = 0;
   }
-  const FICKA_W = v();
-  const POLK = v().set(0.5, -0.82, 0.2);
+  // Fingrarna trummar otåligt på disken (trumma): från lillfingret till pekfingret, två varv.
+  let trumT = -9;
+  const trumF = [0, 0, 0, 0];
+  function trummar(n) {
+    const t = n - trumT;
+    if (t < 0 || t > 0.86) return null;
+    for (let i = 0; i < 4; i++) {
+      const f = ((t * 3.2) % 1) * 4 - (3 - i);
+      trumF[i] = f > 0 && f < 1 ? -Math.sin(f * Math.PI) * 0.3 : 0;
+    }
+    return trumF;
+  }
   let sistaT = 0;
   let sistaN = 0;
-  let sistaTal = 0;
-  let sistaMun = null;
   // T: var i rörelserna (0–2,5 vilan, 2,5–5,5 fram till domen, 5,5–9,95 gesterna
   // medan han pratar, hemåt till 12,4), n: klockan för det som alltid rör sig,
-  // tal: 1 medan han pratar med handen vilande, mun: hur mycket munnen rör sig
+  // tal: 1 medan han pratar med händerna vilande, mun: hur mycket munnen rör sig
   // (annars följer den tal och gesterna)
   function rita(T, n, tal = 0, mun = null) {
     const t = T;
-    sistaT = T; sistaN = n; sistaTal = tal; sistaMun = mun;
+    sistaT = T; sistaN = n;
     const skratt = ss(2.75, 3.05, t) * (1 - ss(4.25, 4.6, t));
     const talar = Math.max(tal, ss(5.55, 5.7, t) * (1 - ss(9.4, 9.6, t)));
     const dricker = ss(21.2, 21.85, t) * (1 - ss(23.2, 23.9, t));
@@ -516,80 +516,57 @@ export async function figuren(duk, { hog = false, latt = false, pr = 1 } = {}) {
     a.w.y += skratt * 7 * Math.sin(n * 15);
     b.w.y += skratt * 7 * Math.sin(n * 15 + 1);
     ik(sa, a.w, a.pol, E_, Wr_);
-    A.satt(sa, E_, Wr_, a.F, a.P, a.krok, a.peka, isar, 0.45);
-    // (mot fingertopparna från handleden, och lite under handen)
-    const pa = 1 - ss(30, 150, Wr_.distanceTo(vilaW));
-    laret.visible = pa > 0.01;
-    laret.material.opacity = pa;
-    laret.position.set(Wr_.x + a.F.x * 130, Wr_.y + a.F.y * 130 - 62, Wr_.z + a.F.z * 130);
+    const trum = t < 2.5 || (t > 9.95 && t < 20) ? trummar(n) : null;
+    A.satt(sa, E_, Wr_, a.F, a.P, a.krok, a.peka, isar, 0.45, trum);
     U.uArm.value[0].copy(sa); U.uArm.value[1].copy(E_); U.uArm.value[2].copy(Wr_);
-    // Vilar armen är handen på pulten och armbågen över dess kant; annars bestämmer leden.
     ik(sb, b.w, b.pol, E_, Wr_);
-    iVila = Math.max(1 - ss(2.55, 3, t), ss(4.2, 4.72, t) * (1 - ss(20.1, 20.7, t)), ss(24, 24.5, t));
-    if (iVila > 0 && iPult) { E_.lerp(ARMBAGE, iVila); Wr_.lerp(b.w, iVila); }
-    if (iPult && !(t > 2.55 && t < 4.72) && !iKlunk) Wr_.copy(ARMENS_SLUT);
     B.satt(sb, E_, Wr_, b.F, b.P, b.krok, b.peka, isar * 0.8, 0.45);
     U.uArm.value[3].copy(sb); U.uArm.value[4].copy(E_); U.uArm.value[5].copy(Wr_);
-    if (iPult) {
-      const vilar = !(t > 2.55 && t < 4.72) && !iKlunk;
-      if (vilar) B.hand.mesh.visible = false;
-      B.man.visible = !vilar;
-      kopp.visible = t > 21.1 && t < 24.05;
-      K.fat.visible = false;
-    }
+    // koppen hoppar när han slår i disken
     const hopp = t > 5 && t < 5.55 ? Math.sin(((t - 5) / 0.55) * Math.PI) * 62 * (1 - (t - 5) / 0.9) : 0;
     if (!iKlunk) { kopp.position.set(KOPP[0], KOPP[1] + 11 + hopp, KOPP[2]); kopp.rotation.set(0, -0.5, hopp * 0.0045); }
     // skuggorna: hand och underarm för båda armarna, och koppen
-    const skk = (i, a, b, rd, h) => { kapA[i].set(a.x, a.z, b.x, b.z); kapH[i].set(rd, Math.max(0, h)); };
-    const ah = (o) => o.y - paBord(0, BORD.TOPP, o.z).y;
+    const skk = (i, p, q, rd, h) => { kapA[i].set(p.x, p.z, q.x, q.z); kapH[i].set(rd, Math.max(0, h)); };
+    const ah = (o) => o.y - BORD.Y;
     const LA_ = A.lage;
     const LB_ = B.lage;
-    FA.copy(LA_.W).addScaledVector(LA_.F, 200);
-    skk(0, LA_.W, FA, 52, ah(LA_.W) - 20);
-    skk(1, LA_.E, LA_.W, 64, (ah(LA_.E) + ah(LA_.W)) / 2);
-    FA.copy(LB_.W).addScaledVector(LB_.F, 200);
-    skk(2, LB_.W, FA, 52, ah(LB_.W) - 20);
-    skk(3, LB_.E, LB_.W, 64, (ah(LB_.E) + ah(LB_.W)) / 2);
-    skk(4, kopp.position, kopp.position, iPult ? 0 : 60, ah(kopp.position));
-    skk(5, K.fat.position, K.fat.position, iPult ? 0 : 96, 1);
+    FA.copy(LA_.W).addScaledVector(LA_.F, 170);
+    skk(0, LA_.W, FA, 50, ah(LA_.W) - 24);
+    skk(1, LA_.E, LA_.W, 70, (ah(LA_.E) + ah(LA_.W)) / 2 - 20);
+    FA.copy(LB_.W).addScaledVector(LB_.F, 170);
+    skk(2, LB_.W, FA, 50, ah(LB_.W) - 24);
+    skk(3, LB_.E, LB_.W, 70, (ah(LB_.E) + ah(LB_.W)) / 2 - 20);
+    skk(4, kopp.position, kopp.position, 60, ah(kopp.position));
+    skk(5, K.fat.position, K.fat.position, 96, 1);
     r.render(S, C);
   }
-  rita(0, 0);
+
+  // Kameran: v är fönstret (W, H), var ögonhöjden står i det (cx, ey), s bildpunkter på en enhet på
+  // avståndet 0, och dukens ruta (x, y, w, h), allt i fönstrets bildpunkter.
+  function kamera(v) {
+    Object.assign(duk.style, { left: `${v.x}px`, top: `${v.y}px`, width: `${v.w}px`, height: `${v.h}px` });
+    r.setSize(v.w, v.h, false);
+    C.fov = (2 * Math.atan(v.H / 2 / (v.s * D))) / DEG;
+    C.aspect = v.W / v.H;
+    C.setViewOffset(v.W, v.H, v.W / 2 - v.cx + v.x, v.H / 2 - v.ey + v.y, v.w, v.h);
+    // diskens bakre kant i duken, räknat nedifrån som gl_FragCoord
+    const kant = iBild(v, 0, BORD.Y, BORD.Z)[1] - v.y;
+    bord.value.z = (v.h - kant) * (duk.height / v.h);
+    rita(sistaT, sistaN);
+  }
   return {
     rita,
+    kamera,
     tid: 12.4,
+    // fingrarna trummar en stund (bara i vilan); ror() medan de gör det
+    trumma() { if (sistaN - trumT > 1.2) trumT = sistaN + 0.05; },
+    ror: () => sistaN - trumT < 0.9,
     info: () => ({ trianglar: r.info.render.triangles, ritanrop: r.info.render.calls, texturer: r.info.memory.textures }),
     ctx: r.getContext(),
-    // Handen på pulten och koppen där (scenens mått, rum-hasse.js): armen sträcker sig dit.
-    // Armen vilar på pulten: handleden, var ärmen slutar på andra sidan hörnet (där syns den inte) och
-    // armbågen i hans scen, koppen och hur bred ärmen ska vara vid hörnet (halv, scenens mått).
-    pult([wx, wy], [sx, sy], [ex, ey], [kx, ky], halv) {
-      const z = 1000;
-      const f = D / (D - z);
-      FICKA[0] = [(wx - L.px) / (L.S * f), 500 - (wy - L.py) / (L.S * f), z];
-      ARMENS_SLUT.set((sx - L.px) / (L.S * f), 500 - (sy - L.py) / (L.S * f), z);
-      const ze = 260;
-      const fe = D / (D - ze);
-      ARMBAGE.set((ex - L.px) / (L.S * fe), 500 - (ey - L.py) / (L.S * fe), ze);
-      FICKA[1] = [0.25, -0.96, -0.1];
-      FICKA[2] = [0.96, -0.1, -0.25];
-      FICKA[3] = [0, -1, 0];
-      FICKA[4] = 0.05;
-      VB = vbNycklar();
-      B.vidd(halv / (86 * L.S * f));
-      KOPP[0] = (kx - L.px) / (L.S * f);
-      KOPP[1] = 500 - (ky - L.py) / (L.S * f);
-      KOPP[2] = z;
-      KF.x = (-33 - KOPP[0]) / -405;
-      KF.y = (323 - KOPP[1] - 11) / 725;
-      KF.z = (310 - z) / -160;
-      iPult = true;
-      rita(sistaT, sistaN, sistaTal, sistaMun);
-    },
     borta() {
       G.dispose();
+      skuggGeo.dispose();
       K.borta();
-      flackTex.dispose();
       A.borta();
       B.borta();
       r.dispose();

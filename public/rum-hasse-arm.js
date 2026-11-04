@@ -3,10 +3,12 @@
 // att tyg, veck och färg är desamma som på kroppen. Händerna är en modell med 16 ben
 // (scripts/hasse/hand.mjs, rum/hasse-hand.bin) med huden ur fotot, naglar och leder.
 // Allt ljus är samma ljus som på kroppen (LJUS). Ingen skuggkarta (PowerVR i telefonen).
+// Disken framför honom döljer det som är under den (BORD_GLSL, uniformen bord).
 //
 // laddaFoto() → THREE.Texture, laddaHand() → modellen (båda hämtas en gång)
-// byggHand(modell, sida, foto) → { mesh, satt(W, F, P, krok, peka) }
-// byggArm(scen, sida, foto, modell) → { satt(S, E, W, F, P, krok, peka), visible, hand }
+// byggHand(modell, sida, foto, bord) → { mesh, satt(W, F, P, krok, peka) }
+// byggArm(scen, sida, foto, modell, vidd, bord) → { satt(S, E, W, F, P, krok, peka), visible, hand }
+// byggKopp(bord) → { kopp, fat, ORA }
 import * as THREE from 'three';
 
 // atlasen (bildpunkter): kroppen 860 × 1350, sedan ärmens remsa, huden bredvid
@@ -29,7 +31,17 @@ vec3 kant(vec3 n, float styrka) {
 vec3 ton(vec3 c) { return c * (1.03 - .15 * c); }
 `;
 
-// figurens kamera (rum-hasse-3d.js, och handen på pulten)
+// Disken (rum-hasse-3d.js): ovansidan på höjden x, den bakre kanten på djupet y och den kanten i
+// bilden på raden z (gl_FragCoord.y). Framför kanten döljer disken det som är under ovansidan,
+// bakom kanten det som syns under kanten i bilden.
+export const BORD_GLSL = `
+uniform vec3 uBord;
+bool underBord(vec3 w) { return w.z >= uBord.y ? w.y < uBord.x : gl_FragCoord.y < uBord.z; }
+`;
+// (utan disk döljs ingenting)
+export const ingenBord = () => ({ value: new THREE.Vector3(-1e9, 1e9, -1) });
+
+// figurens kamera (rum-hasse-3d.js): ögat på höjden CY, CZ framför fotots plan
 export const KAMERA = { CY: 500, CZ: 3900 };
 
 let fotoP = null;
@@ -112,12 +124,15 @@ const HUD_F = `precision highp float;
 uniform sampler2D foto; uniform vec4 uHud;
 varying vec3 vN, vP; varying vec2 vUv, vNagel; varying float vAo, vTon, vPalm, vRygg;
 ${LJUS}
+${BORD_GLSL}
 void main() {
+  if (underBord(vP)) discard;
   vec3 n = normalize(vN);
   // huden: fotots handrygg överst i atlasen, handflatan under
   vec2 q = clamp(vUv, .004, .996);
   vec3 c = mix(texture2D(foto, uHud.xy + vec2(q.x, q.y * .5 + .5) * uHud.zw).rgb, texture2D(foto, uHud.xy + vec2(q.x, q.y * .5) * uHud.zw).rgb, vPalm);
-  c *= 1.1;
+  // (lite mattare än fotots hud: ljuset ovanifrån gör den annars orange bredvid ansiktet)
+  c = mix(c, vec3(dot(c, vec3(.3, .55, .15))), .12);
   c = mix(c, c * vec3(1.1, .9, .84), vTon * .7);
   float ao = vAo * vAo * .7 + .3;
   // nageln: rosa nagelbädd, ljus halvmåne vid roten och ljus kant längst ut
@@ -148,7 +163,7 @@ const q2 = new THREE.Quaternion();
 const v1 = new THREE.Vector3();
 const skala = new THREE.Vector3(1, 1, 1);
 
-export function byggHand(modell, sida, foto) {
+export function byggHand(modell, sida, foto, bord = ingenBord()) {
   const ben = modell.ben;
   const inv = ben.map((b) => new THREE.Matrix4().makeTranslation(-b.pos[0], -b.pos[1], -b.pos[2]));
   const lok = ben.map(() => new THREE.Matrix4());
@@ -159,6 +174,7 @@ export function byggHand(modell, sida, foto) {
     foto: { value: foto },
     uB: { value: ut },
     uHud: { value: new THREE.Vector4((a.hx + 0.5) / a.W, 1 - (a.hy + a.hh - 0.5) / a.H, (a.hw - 1) / a.W, (a.hh - 1) / a.H) },
+    uBord: bord,
   };
   const mesh = new THREE.Mesh(modell.g, new THREE.ShaderMaterial({ uniforms: U, vertexShader: HUD_V, fragmentShader: HUD_F, transparent: true, depthWrite: true, blending: THREE.CustomBlending, blendSrc: THREE.OneFactor, blendDst: THREE.OneMinusSrcAlphaFactor }));
   mesh.frustumCulled = false;
@@ -228,13 +244,15 @@ function radie(s) {
 }
 const ARM_V = `
 attribute vec3 aN0; attribute float aS, aI;
-varying vec2 vUv; varying vec3 vN, vN0; varying float vS, vI;
-void main() { vUv = uv; vN = normal; vN0 = aN0; vS = aS; vI = aI; gl_Position = projectionMatrix * viewMatrix * vec4(position, 1.); }`;
+varying vec2 vUv; varying vec3 vN, vN0, vW; varying float vS, vI;
+void main() { vUv = uv; vN = normal; vN0 = aN0; vS = aS; vI = aI; vW = position; gl_Position = projectionMatrix * viewMatrix * vec4(position, 1.); }`;
 const ARM_F = `precision highp float;
 uniform sampler2D foto;
-varying vec2 vUv; varying vec3 vN, vN0; varying float vS, vI;
+varying vec2 vUv; varying vec3 vN, vN0, vW; varying float vS, vI;
 ${LJUS}
+${BORD_GLSL}
 void main() {
+  if (underBord(vW)) discard;
   vec3 n = normalize(vN);
   vec4 c = texture2D(foto, vUv);
   // remsan är utjämnad: skuggorna kommer från ljuset, vecken från fotot (mjukare, för armen ligger inte som i fotot)
@@ -249,9 +267,11 @@ void main() {
   gl_FragColor = vec4(ton(ut) * a, a);
 }`;
 const SKJ_F = `precision highp float;
-varying vec3 vN; varying vec2 vUv;
+varying vec3 vN, vW; varying vec2 vUv;
 ${LJUS}
+${BORD_GLSL}
 void main() {
+  if (underBord(vW)) discard;
   vec3 n = normalize(vN); if (!gl_FrontFacing) n = -n;
   // insidan av manschetten är mörk
   float inne = gl_FrontFacing ? 1. : .34;
@@ -259,10 +279,10 @@ void main() {
   c *= .7 + .3 * smoothstep(.05, .55, vUv.y);
   gl_FragColor = vec4(ton(c), 1.);
 }`;
-const SKJ_V = `varying vec3 vN; varying vec2 vUv; void main() { vUv = uv; vN = mat3(modelMatrix) * normal; gl_Position = projectionMatrix * viewMatrix * modelMatrix * vec4(position, 1.); }`;
+const SKJ_V = `varying vec3 vN, vW; varying vec2 vUv; void main() { vUv = uv; vN = mat3(modelMatrix) * normal; vec4 w = modelMatrix * vec4(position, 1.); vW = w.xyz; gl_Position = projectionMatrix * viewMatrix * w; }`;
 
 const Y_AX = new THREE.Vector3(0, 1, 0);
-export function byggArm(scen, sida, foto, modell, vidd = 1) {
+export function byggArm(scen, sida, foto, modell, vidd = 1, bord = ingenBord()) {
   const n = RINGAR * (SEG + 1);
   const g = new THREE.BufferGeometry();
   const P = new Float32Array(n * 3);
@@ -306,16 +326,16 @@ export function byggArm(scen, sida, foto, modell, vidd = 1) {
   g.setAttribute('aS', new THREE.BufferAttribute(sS, 1));
   g.setAttribute('aI', new THREE.BufferAttribute(sI, 1));
   g.setIndex(ix);
-  const rorM = new THREE.ShaderMaterial({ uniforms: { foto: { value: foto } }, vertexShader: ARM_V, fragmentShader: ARM_F, transparent: true, depthWrite: true, blending: THREE.CustomBlending, blendSrc: THREE.OneFactor, blendDst: THREE.OneMinusSrcAlphaFactor });
+  const rorM = new THREE.ShaderMaterial({ uniforms: { foto: { value: foto }, uBord: bord }, vertexShader: ARM_V, fragmentShader: ARM_F, transparent: true, depthWrite: true, blending: THREE.CustomBlending, blendSrc: THREE.OneFactor, blendDst: THREE.OneMinusSrcAlphaFactor });
   const ror = new THREE.Mesh(g, rorM);
   ror.frustumCulled = false;
   // skjortans manschett: ett rör med en tjock kant
   const prof = [new THREE.Vector2(51, -40), new THREE.Vector2(53, 34), new THREE.Vector2(53, 46), new THREE.Vector2(50.5, 49.5), new THREE.Vector2(47.5, 46), new THREE.Vector2(47, -40)];
   const manG = new THREE.LatheGeometry(prof, 24);
   manG.scale(1, 1, 0.78);
-  const man = new THREE.Mesh(manG, new THREE.ShaderMaterial({ vertexShader: SKJ_V, fragmentShader: SKJ_F, transparent: true, side: THREE.DoubleSide }));
+  const man = new THREE.Mesh(manG, new THREE.ShaderMaterial({ uniforms: { uBord: bord }, vertexShader: SKJ_V, fragmentShader: SKJ_F, transparent: true, side: THREE.DoubleSide }));
   man.frustumCulled = false;
-  const hand = byggHand(modell, sida, foto);
+  const hand = byggHand(modell, sida, foto, bord);
   ror.renderOrder = man.renderOrder = hand.mesh.renderOrder = 5;
   const grupp = new THREE.Group();
   grupp.add(ror, man, hand.mesh);
@@ -330,20 +350,7 @@ export function byggArm(scen, sida, foto, modell, vidd = 1) {
   const N_ = new THREE.Vector3();
   const B_ = new THREE.Vector3();
   const topp = new THREE.Vector3();
-  let slut = 1;
-  let slutVidd = 1;
   const lage = { S: new THREE.Vector3(), E: new THREE.Vector3(), W: new THREE.Vector3(), pol: new THREE.Vector3(), F: new THREE.Vector3(), P: new THREE.Vector3(), krok: 0, peka: 0 };
-  // 'allt', 'over' (ärmhuvudet till armbågen) eller 'under' (armbågen, manschetten och handen)
-  let delen = 'allt';
-  let armbage = 22;
-  const ritaDel = () => {
-    const per = SEG * 6;
-    const tot = (RINGAR - 1) * per;
-    if (delen === 'allt') g.setDrawRange(0, tot);
-    else if (delen === 'over') g.setDrawRange(0, Math.min(armbage + 1, RINGAR - 1) * per);
-    else { const b = Math.max(armbage - 1, 0) * per; g.setDrawRange(b, tot - b); }
-    man.visible = hand.mesh.visible = delen !== 'over';
-  };
   function satt(S, E, W, F, Pn, krok, peka, spar = 0, tumme = 0.4, extra = null) {
     lage.S.copy(S); lage.E.copy(E); lage.W.copy(W); lage.F.copy(F); lage.P.copy(Pn); lage.krok = krok; lage.peka = peka;
     u1.subVectors(E, S);
@@ -361,8 +368,6 @@ export function byggArm(scen, sida, foto, modell, vidd = 1) {
     const b = 2 * rr * Math.cos(bojd / 2) * (1 + 0.1 * bojd);
     const tot = (L0 - rr) + b + (L2 - rr);
     const dE = (L0 - rr) + b / 2;
-    armbage = Math.round((dE / tot) * (RINGAR - 1));
-    if (delen !== 'allt') ritaDel();
     lage.pol.copy(u1).sub(u2);
     if (lage.pol.lengthSq() > 1e-6) lage.pol.normalize();
     // kavajen hänger löst bara när armen hänger: uppe är ärmen smalare
@@ -386,9 +391,8 @@ export function byggArm(scen, sida, foto, modell, vidd = 1) {
       if (N_.lengthSq() < 1e-4) N_.set(1, 0, 0).addScaledVector(T_, -T_.x);
       N_.normalize();
       B_.crossVectors(T_, N_);
-      const r0 = radie(s) * slut * (i === RINGAR - 1 ? 0.7 : 1) * (1 + (vidd - 1) * (1 - s)) * (1 + (smal - 1) * Math.max(0, 1 - s / 0.62));
+      const r0 = radie(s) * (i === RINGAR - 1 ? 0.7 : 1) * (1 + (vidd - 1) * (1 - s)) * (1 + (smal - 1) * Math.max(0, 1 - s / 0.62));
       if (i === RINGAR - 1) pC.addScaledVector(T_, -3);
-      slut = Math.min(1, Math.max(0, (s - 0.62) / 0.14)) * (slutVidd - 1) + 1;
       const platt = 0.8 + 0.11 * Math.min(1, Math.max(0, (s - 0.78) / 0.18));
       // vecken vid armbågen och lite liv i tyget
       const ve = Math.exp(-(((dist - dE) / 120) ** 2));
@@ -414,9 +418,8 @@ export function byggArm(scen, sida, foto, modell, vidd = 1) {
     man.position.copy(W).addScaledVector(u2, 4);
     man.quaternion.setFromUnitVectors(Y_AX, u2);
     hand.satt(pC.copy(W).addScaledVector(u2, 26), F, Pn, krok, peka, spar, tumme, extra);
-    hand.mesh.visible = delen !== 'over';
   }
-  return { grupp, satt, lage, hand, man, vidd(v) { slutVidd = v; }, del(d) { delen = d; ritaDel(); }, set visible(v) { grupp.visible = v; }, get visible() { return grupp.visible; }, borta() { g.dispose(); manG.dispose(); } };
+  return { grupp, satt, lage, hand, man, set visible(v) { grupp.visible = v; }, get visible() { return grupp.visible; }, borta() { g.dispose(); manG.dispose(); } };
 }
 
 // ---------- koppen ----------
@@ -426,7 +429,9 @@ const KER_F = `precision highp float;
 uniform float uRand, uKaffe; uniform vec2 uBand[3];
 varying vec3 vN, vP; varying vec2 vL;
 ${LJUS}
+${BORD_GLSL}
 void main() {
+  if (underBord(vP)) discard;
   vec3 n = normalize(vN);
   vec3 c = vec3(.93, .895, .81);
   // blå ränder som koppen på pulten
@@ -444,15 +449,15 @@ void main() {
   ut += vec3(1., .94, .85) * pow(max(0., dot(n, normalize(NYCKEL + vec3(0., 0., 1.)))), 90.) * .55;
   gl_FragColor = vec4(ton(ut), 1.);
 }`;
-function kerM(rand, kaffe, band) {
+function kerM(rand, kaffe, band, bord) {
   return new THREE.ShaderMaterial({
-    uniforms: { uRand: { value: rand }, uKaffe: { value: kaffe }, uBand: { value: band.map((b) => new THREE.Vector2(b[0], b[1])) } },
+    uniforms: { uRand: { value: rand }, uKaffe: { value: kaffe }, uBand: { value: band.map((b) => new THREE.Vector2(b[0], b[1])) }, uBord: bord },
     vertexShader: KER_V, fragmentShader: KER_F, transparent: true, blending: THREE.CustomBlending, blendSrc: THREE.OneFactor, blendDst: THREE.OneMinusSrcAlphaFactor,
   });
 }
 const V2 = (a) => a.map(([x, y]) => new THREE.Vector2(x, y));
 // koppen (botten i origo, y uppåt, örat åt +x) och fatet
-export function byggKopp() {
+export function byggKopp(bord = ingenBord()) {
   const kropp = new THREE.LatheGeometry(V2([[0, 0], [38, 0], [42, 3], [46, 16], [60, 98], [63, 111], [62, 114], [59, 113], [56, 100], [44, 24], [0, 14]]), 32);
   const yta = new THREE.CircleGeometry(57, 32);
   yta.rotateX(-Math.PI / 2);
@@ -466,7 +471,7 @@ export function byggKopp() {
   const BF = [[107, 111], [999, 999], [999, 999]];
   const kopp = new THREE.Group();
   const fatG = new THREE.Group();
-  const del = (grp, geo, rand, kaffe, band) => { const m = new THREE.Mesh(geo, kerM(rand, kaffe, band)); m.renderOrder = 6; m.frustumCulled = false; grp.add(m); return m; };
+  const del = (grp, geo, rand, kaffe, band) => { const m = new THREE.Mesh(geo, kerM(rand, kaffe, band, bord)); m.renderOrder = 6; m.frustumCulled = false; grp.add(m); return m; };
   del(kopp, kropp, 0, 0, BAND);
   del(kopp, ora, 0, 0, [[999, 999], [999, 999], [999, 999]]);
   del(kopp, yta, 0, 1, [[999, 999], [999, 999], [999, 999]]);
