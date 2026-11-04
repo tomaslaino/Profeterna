@@ -1,16 +1,24 @@
-// Hasse Backe i tobaksaffären: en arm på pulten bredvid hans kaffe (rum.js,
-// rum-hasse-hand.js), han står precis utanför bilden. Ett klick (eller H) och
-// kameran svänger åt vänster, med handen, och där står han bakom disken
-// (rum-hasse-3d.js).
+// Hasse Backe i tobaksaffären: en arm på pulten bredvid hans kaffe (rum.js), han
+// står precis utanför bilden. Ett klick (eller H) och kameran svänger åt vänster,
+// och där står han (rum-hasse-3d.js).
+//
+// Det är bara kameran som rör sig: den vrids runt ögat, och rummet och hans vägg är två
+// plan i samma rum, så att bilderna blir som av ett och samma ställe. Handen, kaffet och
+// notan ligger kvar på pulten hela vägen, hans arm går över hörnet dit, och när kameran
+// har stannat syns de kvar vid bildens högra kant (på höjden är de just utanför).
 //
 // Rummet rörs inte: tobaksaffärens scen läggs i två omslag (.rum-sving och
 // .rum-front), som saknar omvandling tills kameran svänger. Under svängen och
 // medan han syns står rummet still (Rum.vila): gänget och sakerna ritas inte. Det
-// ligger kvar bakom honom, så att inget behöver ritas om på vägen tillbaka, och
+// ligger kvar, så att inget behöver ritas om på vägen tillbaka, och
 // när man har gått tillbaka en stund lämnas figurens grafik tillbaka.
 //
 // ?rum-hasse öppnar direkt (för bilder).
 window.RumHasse = (() => {
+  // hur långt kameran svänger när fönstret är brett
+  const VINKEL = 79;
+  // armen på pulten lämnar den bara i skrattet och för att dricka (rum-hasse-3d.js)
+  const armUte = (T) => (T > 2.55 && T < 4.72) || (T > 20.02 && T < 24.48);
   const H = { on: false, rum: null, fig: null, last: null, t0: 0, T: 0, raf: 0, vant: 0, tal: 0, talMal: 0, ko: [], klipp: null };
   const calm = () => matchMedia('(prefers-reduced-motion: reduce)').matches;
   const hog = () => innerWidth / innerHeight < 1.15;
@@ -36,6 +44,7 @@ window.RumHasse = (() => {
     stage.before(sving);
     sving.append(front);
     front.append(stage);
+    for (const c of ['tak', 'golv', 'vagg tak', 'vagg golv']) { const d = document.createElement('i'); d.className = `rh-fort ${c}`; sving.append(d); }
     const vy = document.createElement('div');
     vy.className = 'rum-hasse-vy';
     vy.id = 'rum-hasse-vy';
@@ -76,7 +85,8 @@ window.RumHasse = (() => {
       const [m, a] = await Promise.all([import('./rum-hasse-3d.js'), import('./rum-hasse-hand.js')]);
       H.m = m;
       const dpr = devicePixelRatio || 1;
-      H.pulten = await a.armen(plan, { matt, pr: latt() ? 1.5 : Math.min(dpr * 1.25, 2.5), prUt: Math.min(dpr, latt() ? 1.5 : 1.25) });
+      H.pulten = await a.armen(plan, { matt, pr: latt() ? 1.5 : Math.min(dpr * 1.25, 2.5) });
+      pultlage();
       // Handen går att trycka på; pekar man på den eller på kaffet och notan
       // (rum.js) trummar han, och hans bilder hämtas.
       const b = document.createElement('button');
@@ -126,9 +136,10 @@ window.RumHasse = (() => {
     const L = H.m.SCEN[h ? 'hog' : 'bred'];
     const W = innerWidth;
     const Hj = innerHeight;
-    const k = Math.max(W / L.W, Hj / L.H);
-    const tx = Math.min(0, Math.max(W - L.W * k, W * (h ? 0.5 : 0.36) - L.px * k));
-    const ty = h ? 0 : Math.max(Hj - L.H * k, 0 - (L.H * k - Hj) * 0.8);
+    const k = Math.max(W / L.W, Hj / L.H) * (h ? 1 : 1.15);
+    const tx = Math.min(0, Math.max(W - L.W * k, W * (h ? 0.5 : 0.31) - L.px * k));
+    // (huvudet ska synas helt)
+    const ty = h ? 0 : Math.max(Hj - L.H * k, Math.min(0, 20 - 113 * k));
     return { W, H: Hj, k, tx, ty, L };
   }
 
@@ -142,7 +153,37 @@ window.RumHasse = (() => {
     if (H.hog) $('.rh-samtal').style.top = `${(ty + 828 * k).toFixed(0)}px`;
     else $('.rh-samtal').style.top = '';
     H.rum.style.setProperty('--p', `${vw / 2}px`);
+    const th = H.hog ? 90 : VINKEL;
+    const r = th * Math.PI / 180;
+    const kant = (1 - Math.tan(r - Math.PI / 4)) / 2;
+    H.rum.style.setProperty('--th', `${th}deg`);
+    H.rum.style.setProperty('--s', (Math.sin(r) + Math.cos(r)).toFixed(5));
+    H.rum.style.setProperty('--kant', `${(kant * 100).toFixed(3)}%`);
+    H.vy.style.setProperty('--kant-sc', `${Math.max(0, L.W - (vw * (1 - kant) - tx) / k).toFixed(2)}px`);
+    H.rum.classList.toggle('hasse-kant', th !== 90);
+    H.th = th;
     H.k = k;
+    pultlage();
+  }
+
+  // Var något på pulten syns när kameran har stannat (rummet i fönstrets bildpunkter →
+  // hans scen): samma vridning som kameran gör.
+  function iScenen(x, y) {
+    const { W, H: Hj, k, tx, ty } = matt();
+    const p = W / 2;
+    const r = H.th * Math.PI / 180;
+    const dx = x - p;
+    const dj = -dx * Math.sin(r) + p * Math.cos(r);
+    const xc = dx * Math.cos(r) + p * Math.sin(r);
+    // (på höjden går kameran hela vägen: handen är just utanför bilden, till höger)
+    const X = dj > 1 ? p + (p * xc) / dj : W * 1.4;
+    const Y = dj > 1 ? Hj / 2 + (p * (y - Hj / 2)) / dj : Hj * 0.72;
+    return [(X - tx) / k, (Y - ty) / k];
+  }
+  // Hans ena arm ligger på pulten, och koppen står där.
+  function pultlage() {
+    if (!H.fig || !H.pulten) return;
+    H.fig.pult(iScenen(...H.pulten.handled()), iScenen(...H.pulten.koppen()));
   }
 
   async function bygg() {
@@ -160,13 +201,13 @@ window.RumHasse = (() => {
       const pr = Math.min(H.k * (devicePixelRatio || 1), latt() ? 1.6 : 2);
       H.fig = await H.m.figuren(c, { hog: H.hog, latt: latt(), pr });
     }
+    pultlage();
   }
 
   async function oppna() {
     if (H.on || H.oppnar || H.svanger) return;
     H.oppnar = true;
     clearTimeout(H.ner);
-    if (H.pulten && !calm()) H.pulten.trumma();
     try {
       H.vy.hidden = false;
       await bygg();
@@ -185,9 +226,8 @@ window.RumHasse = (() => {
     const r = H.rum;
     r.classList.add('hasse-svang');
     void r.offsetWidth;
-    if (calm()) { framme(); return; }
+    if (calm()) { r.classList.add('hasse-vand'); framme(); return; }
     H.svanger = true;
-    armenUt(0);
     requestAnimationFrame(() => requestAnimationFrame(() => {
       r.classList.add('hasse-vand');
       const s = r.querySelector('.rum-sving');
@@ -197,22 +237,11 @@ window.RumHasse = (() => {
     }));
   }
 
-  // Under svängen är armen en duk ovanpå allt (rum-hasse-hand.js), inte hans.
-  function armenUt(vinkel) {
-    if (!H.pulten) return;
-    H.fig.rita(H.T, performance.now() / 1000, H.tal || 0, H.tal || 0);
-    H.pulten.ut(H.fig.armLage(), H.rum.querySelector('.rum-sving'), vinkel, H.rum.classList.contains('natt') ? 0.17 : 0.95);
-    H.fig.visaArm(false);
-  }
-
-  // framme: inget 3D kvar, rummet ur bild, och han börjar röra sig
+  // Framme: han börjar röra sig. Hans vägg går över till platt, och rummet står kvar vridet
+  // så att pulten syns vid kanten (på höjden syns inget av rummet, och där är inget 3D kvar).
   function framme() {
     const r = H.rum;
     H.svanger = false;
-    if (H.pulten) {
-      H.pulten.hem();
-      H.fig.visaArm(true);
-    }
     r.classList.remove('hasse-svang', 'hasse-vand');
     r.classList.add('hasse-framme');
     H.last = null;
@@ -239,6 +268,9 @@ window.RumHasse = (() => {
       const dt = last ? Math.min(0.1, (ms - last) / 1000) : 0;
       last = ms;
       figurSteg(dt);
+      // Lämnar armen pulten ritar hans duk den, och dricker han tar han koppen.
+      H.rum.classList.toggle('hasse-arm-ute', armUte(H.T));
+      H.rum.classList.toggle('hasse-klunk', H.T > 21.1 && H.T < 24.05);
       pratSteg(ms);
       talSteg(ms);
       H.tal += (H.talMal - H.tal) * Math.min(1, dt * 12);
@@ -253,7 +285,12 @@ window.RumHasse = (() => {
     H.fraga = null;
     cancelAnimationFrame(H.raf);
     const r = H.rum;
-    r.classList.remove('hasse-framme');
+    r.classList.remove('hasse-framme', 'hasse-arm-ute', 'hasse-klunk');
+    H.klipp = null;
+    H.ko.length = 0;
+    // armen ska ligga på pulten när kameran går tillbaka
+    if (armUte(H.T)) H.T = 0;
+    H.fig.rita(H.T, performance.now() / 1000);
     if (calm()) { hemma(); return; }
     // (kameran står redan vänd mot honom: ingen sväng dit först)
     H.svanger = true;
@@ -262,7 +299,6 @@ window.RumHasse = (() => {
     r.classList.add('hasse-svang', 'hasse-vand');
     void r.offsetWidth;
     s.style.transition = '';
-    armenUt(90);
     requestAnimationFrame(() => requestAnimationFrame(() => {
       r.classList.remove('hasse-vand');
       const klar = (e) => { if (e.target === s) { s.removeEventListener('transitionend', klar); clearTimeout(H.sv); hemma(); } };
@@ -273,8 +309,6 @@ window.RumHasse = (() => {
 
   function hemma() {
     H.svanger = false;
-    if (H.pulten) H.pulten.hem();
-    if (H.fig) H.fig.visaArm(true);
     if (window.Rum && Rum.vila) Rum.vila(false);
     H.rum.classList.remove('hasse-svang', 'hasse-vand', 'hasse-framme');
     H.vy.hidden = true;

@@ -11,7 +11,7 @@
 // Världen: 1 enhet = 1 bildpunkt i fotot, x = fotots x − 660, y = 900 − fotots y,
 // z mot betraktaren. Disken är y = TOPP, från z = ZB till ZF.
 //
-// figuren(duk, { hog, latt }) → { rita(T, n, tal, mun), tid: längden, armLage(), visaArm(j), borta() }
+// figuren(duk, { hog, latt }) → { rita(T, n, tal, mun), tid: längden, pult(hand, kopp), borta() }
 // Klipp: T 0–12,4 (vila, skrattet, domen, gesterna, hem) och T 20–24,5 (en klunk kaffe, börjar och slutar som vilan).
 import * as THREE from 'three';
 import { ATLAS, LJUS, ARM, laddaFoto, laddaHand, byggArm, byggKopp } from './rum-hasse-arm.js';
@@ -37,7 +37,7 @@ const Y0 = 130;
 const TW = 860;
 const TH = 1350;
 export const SCEN = {
-  bred: { W: 1440, H: 900, S: 0.54, px: 530, py: 244.7, duk: { x: 0, y: 0, w: 1150, h: 860 } },
+  bred: { W: 1440, H: 900, S: 0.54, px: 530, py: 244.7, duk: { x: 0, y: 0, w: 1440, h: 860 } },
   hog: { W: 900, H: 1500, S: 0.56, px: 450, py: 199, duk: { x: 0, y: 0, w: 900, h: 860 } },
 };
 const W_ = (x, y, z = 0) => new THREE.Vector3(x - 660, 900 - y, z);
@@ -296,7 +296,6 @@ export async function figuren(duk, { hog = false, latt = false, pr = 1 } = {}) {
   skugga.renderOrder = 1.2;
   skugga.frustumCulled = false;
   S.add(skugga);
-  let armSyns = true;
   // ---------- rörelserna ----------
   const SA = W_(424, 800, -52);
   const SB = W_(987, 800, 8);
@@ -325,19 +324,23 @@ export async function figuren(duk, { hog = false, latt = false, pr = 1 } = {}) {
   ];
   // handen i fickan: precis som armen ligger i fotot
   const FICKA = [P_(905, 1672, 8), [1, 0.05, 0], [-0.3, -0.95, 0], [0.7, 0, 0.7], 0.45, 0];
-  const VB = [
+  const vbNycklar = () => [
     [0, ...FICKA], [2.55, ...FICKA],
     [3.0, P_(1110, 505, 310), [0.6, -0.5, 0.65], [0.12, 0.97, 0.12], [-0.12, -0.06, 1], 0.1, 0],
     [4.2, P_(1110, 505, 310), [0.6, -0.5, 0.65], [0.12, 0.97, 0.12], [-0.12, -0.06, 1], 0.1, 0],
     [4.72, ...FICKA], [12.4, ...FICKA],
     [20, ...FICKA],
   ];
+  let VB = vbNycklar();
+  // Armen på pulten (pult): koppen står där, och handen ritas av pultens duk när armen vilar.
+  let iPult = false;
+  const KF = { x: 1, y: 1, z: 1 };
   // Klunken (T 20–24,5), börjar och slutar som vilan. Koppen går sin väg, handen följer örat.
   const KV = [[20, 0, 0, 0, 0, 0], [21.1, 0, 0, 0, 0, 0], [21.95, -405, 725, -160, -0.5, 0], [23.25, -412, 735, -168, -0.72, 0.02], [24.05, 0, 0, 0, 0, 0], [24.5, 0, 0, 0, 0, 0]];
   const klunkOm = (t) => { const f = ss(21.1, 21.3, t) * (1 - ss(23.95, 24.15, t)); return f; };
   function klunkKopp(t, ut) {
     const y = (i) => spar(KV.map((k) => [k[0], k[i]]), t);
-    ut.set(y(1), y(2), y(3));
+    ut.set(y(1) * KF.x, y(2) * KF.y, y(3) * KF.z);
     return ut;
   }
   const v = () => new THREE.Vector3();
@@ -362,10 +365,15 @@ export async function figuren(duk, { hog = false, latt = false, pr = 1 } = {}) {
   const Wr_ = v();
   function ik(Sk, Wr, pol, Eut, Wut) {
     d_.subVectors(Wr, Sk);
-    const len = Math.min(d_.length(), LA + LB - 4);
+    // (utsträckt mot pulten får den vara något längre än i fotot: det syns inte på en raklång arm)
+    const hel = d_.length();
+    const tj = Math.min(1.3, Math.max(1, hel / (0.97 * (LA + LB))));
+    const la = LA * tj;
+    const lb = LB * tj;
+    const len = Math.min(hel, la + lb - 4);
     dir_.copy(d_).normalize();
-    const a = (LA * LA - LB * LB + len * len) / (2 * len);
-    const h = Math.sqrt(Math.max(0, LA * LA - a * a));
+    const a = (la * la - lb * lb + len * len) / (2 * len);
+    const h = Math.sqrt(Math.max(0, la * la - a * a));
     pp_.copy(pol).addScaledVector(dir_, -pol.dot(dir_)).normalize();
     Eut.copy(Sk).addScaledVector(dir_, a).addScaledVector(pp_, h);
     Wut.copy(Sk).addScaledVector(dir_, len);
@@ -388,7 +396,7 @@ export async function figuren(duk, { hog = false, latt = false, pr = 1 } = {}) {
   // handen vid örat: fingrarna runt det, armbågen nedåt och utåt
   function klunkArm(t, b) {
     klunkKopp(t, kk);
-    kopp.position.set(KOPP[0] + kk.x, TOPP + 11 + kk.y, KOPP[2] + kk.z);
+    kopp.position.set(KOPP[0] + kk.x, KOPP[1] + 11 + kk.y, KOPP[2] + kk.z);
     const lyft = kk.y / 725;
     kopp.rotation.set(kk.y > 0 ? spar(KV.map((k) => [k[0], k[4]]), t) : 0, -0.5 + lyft * 0.62, -0.22 * lyft);
     kopp.updateMatrix();
@@ -405,7 +413,7 @@ export async function figuren(duk, { hog = false, latt = false, pr = 1 } = {}) {
     b.F.copy(FICKA_W).lerp(FK, mot);
     FICKA_W.fromArray(FICKA[3]);
     b.P.copy(FICKA_W).lerp(PK, mot);
-    b.krok = 0.45 + (spar([[20, 0.1], [21, 0.18], [21.2, 0.6], [24, 0.6], [24.2, 0.18], [24.5, 0.45]], t) - 0.45) * mot;
+    b.krok = FICKA[4] + (spar([[20, 0.1], [21, 0.18], [21.2, 0.6], [24, 0.6], [24.2, 0.18], [24.5, FICKA[4]]], t) - FICKA[4]) * mot;
     b.peka = 0;
   }
   const FICKA_W = v();
@@ -488,8 +496,15 @@ export async function figuren(duk, { hog = false, latt = false, pr = 1 } = {}) {
     ik(sb, b.w, b.pol, E_, Wr_);
     B.satt(sb, E_, Wr_, b.F, b.P, b.krok, b.peka, isar * 0.8, 0.45);
     U.uArm.value[3].copy(sb); U.uArm.value[4].copy(E_); U.uArm.value[5].copy(Wr_);
+    if (iPult) {
+      const vilar = !(t > 2.55 && t < 4.72) && !iKlunk;
+      if (vilar) { B.hand.mesh.visible = false; B.hand.spegel.visible = false; }
+      const syns = t > 21.1 && t < 24.05;
+      kopp.visible = syns;
+      K.spegel.visible = K.spFat.visible = K.fat.visible = false;
+    }
     const hopp = t > 5 && t < 5.55 ? Math.sin(((t - 5) / 0.55) * Math.PI) * 62 * (1 - (t - 5) / 0.9) : 0;
-    if (!iKlunk) { kopp.position.set(KOPP[0], TOPP + 11 + hopp, KOPP[2]); kopp.rotation.set(0, -0.5, hopp * 0.0045); }
+    if (!iKlunk) { kopp.position.set(KOPP[0], KOPP[1] + 11 + hopp, KOPP[2]); kopp.rotation.set(0, -0.5, hopp * 0.0045); }
     K.satt();
     // skuggorna: hand och underarm för båda armarna, och koppen
     const skk = (i, a, b, rd, h) => { kapA[i].set(a.x, a.z, b.x, b.z); kapH[i].set(rd, Math.max(0, h)); };
@@ -497,13 +512,13 @@ export async function figuren(duk, { hog = false, latt = false, pr = 1 } = {}) {
     const LA_ = A.lage;
     const LB_ = B.lage;
     FA.copy(LA_.W).addScaledVector(LA_.F, 200);
-    skk(0, LA_.W, FA, armSyns ? 52 : 0, ah(LA_.W) - 20);
-    skk(1, LA_.E, LA_.W, armSyns ? 64 : 0, (ah(LA_.E) + ah(LA_.W)) / 2);
+    skk(0, LA_.W, FA, 52, ah(LA_.W) - 20);
+    skk(1, LA_.E, LA_.W, 64, (ah(LA_.E) + ah(LA_.W)) / 2);
     FA.copy(LB_.W).addScaledVector(LB_.F, 200);
     skk(2, LB_.W, FA, 52, ah(LB_.W) - 20);
     skk(3, LB_.E, LB_.W, 64, (ah(LB_.E) + ah(LB_.W)) / 2);
-    skk(4, kopp.position, kopp.position, 60, ah(kopp.position));
-    skk(5, K.fat.position, K.fat.position, 96, 1);
+    skk(4, kopp.position, kopp.position, iPult ? 0 : 60, ah(kopp.position));
+    skk(5, K.fat.position, K.fat.position, iPult ? 0 : 96, 1);
     r.render(S, C);
   }
   rita(0, 0);
@@ -512,9 +527,25 @@ export async function figuren(duk, { hog = false, latt = false, pr = 1 } = {}) {
     tid: 12.4,
     info: () => ({ trianglar: r.info.render.triangles, ritanrop: r.info.render.calls, texturer: r.info.memory.textures }),
     ctx: r.getContext(),
-    // armen på disken, för svängen (rum-hasse.js): var den står, och att den kan lämnas åt någon annan
-    armLage: () => A.lage,
-    visaArm(j) { armSyns = j; A.del(j ? 'allt' : 'over'); rita(sistaT, sistaN, sistaTal, sistaMun); },
+    // Handen på pulten och koppen där (scenens mått, rum-hasse.js): armen sträcker sig dit.
+    pult([sx, sy], [kx, ky]) {
+      const z = 400;
+      const f = D / (D - z);
+      FICKA[0] = [(sx - L.px) / (L.S * f), 500 - (sy - L.py) / (L.S * f), z];
+      FICKA[1] = [0.25, -0.96, -0.1];
+      FICKA[2] = [0.96, -0.1, -0.25];
+      FICKA[3] = [0, -1, 0];
+      FICKA[4] = 0.05;
+      VB = vbNycklar();
+      KOPP[0] = (kx - L.px) / (L.S * f);
+      KOPP[1] = 500 - (ky - L.py) / (L.S * f);
+      KOPP[2] = z;
+      KF.x = (-33 - KOPP[0]) / -405;
+      KF.y = (TOPP + 736 - KOPP[1] - 11) / 725;
+      KF.z = (310 - z) / -160;
+      iPult = true;
+      rita(sistaT, sistaN, sistaTal, sistaMun);
+    },
     borta() {
       G.dispose();
       K.borta();

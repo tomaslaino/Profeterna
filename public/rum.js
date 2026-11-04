@@ -519,24 +519,9 @@ window.Rum = (() => {
       `${kopp}<span class="anga" aria-hidden="true"><i></i><i></i></span></a>`;
   }
 
-  // Koppen skramlar på fatet när man går till honom.
-  function skramla(a) {
-    const k = a.querySelector('.kopp-in');
-    if (!k || calm() || k.getAnimations().length) return;
-    k.animate([
-      { transform: 'none' },
-      { transform: 'translate(1.6px, -1.2px) rotate(2.6deg)', offset: 0.14 },
-      { transform: 'translate(-1.4px, 0) rotate(-2.2deg)', offset: 0.32 },
-      { transform: 'translate(1px, -0.6px) rotate(1.3deg)', offset: 0.52 },
-      { transform: 'translate(-0.5px, 0) rotate(-0.6deg)', offset: 0.74 },
-      { transform: 'none' },
-    ], { duration: 460, easing: 'ease-out' });
-  }
-
   // Ett klick på kaffet eller H: kameran svänger till honom (rum-hasse.js).
   function tillHasse(a = R.el.querySelector('#rum-hasse')) {
     if (!a) return;
-    skramla(a);
     if (window.RumHasse) RumHasse.oppna();
   }
 

@@ -1979,7 +1979,7 @@ Enter och mellanslag klickar på dem. En match på text-tv:n öppnar matchrutan 
   pulten bredvid notan. Koppen med blå ränder ryker på ett fat, och under den ligger hans nota:
   kaffe, fyra påtår och en kanelbulle, Skrivs på Notts County (klubben han lämnade efter sju
   veckor 2009, när lönen inte kom; notan har nummer 0007). Ett klick på handen eller kaffet,
-  Enter eller H och kameran svänger till honom (`hasseHtml`, `skramla`, `tillHasse`, se
+  Enter eller H och kameran svänger till honom (`hasseHtml`, `tillHasse`, se
   [Hasse Backe](#hasse-backe)).
 - **Tv:n** uppe i hörnet till höger, en mörkgrå Panasonic från nittiotalet med text-tv på en arm från väggen, zoomas in med ett
   klick eller T och vrids då mot en; den står på kupongens matcher live (377), och där finns
@@ -3532,20 +3532,25 @@ honom om: inga följdfrågor och ingen textruta. Bredvid kaffet och notan på pu
 hand och trummar med fingrarna då och då (i telefonen, där kaffet ligger utanför bilden, ligger
 den vid kupongens hörn). Handen flyttas in i bild när fönstret skär scenen, så att den alltid syns
 hel, med manschett och kavajärm in från bildens kant. Ett klick på den eller kaffet, eller H, och
-kameran svänger åt vänster, som i ett rumshörn: ögat står mitt i, vänster vägg är vinkelrät och
-perspektivet är halva fönsterbredden (`.hasse-svang` i [public/rum-hasse.css](public/rum-hasse.css)).
-Där står han bakom disken, och Esc eller *Tillbaka* går tillbaka (vid matchlistan också ett klick
-utanför).
+kameran svänger åt vänster (`.hasse-svang` i [public/rum-hasse.css](public/rum-hasse.css)). Där står
+han, och Esc eller *Tillbaka* går tillbaka (vid matchlistan också ett klick utanför).
 
-**Handen följer med** ([public/rum-hasse-hand.js](public/rum-hasse-hand.js)). Kameran följer
-handen när han drar den till sig: de första 6 graderna ligger den stilla och rummet glider under
-den, sedan lyfter den, går långsamt in i bilden medan rummet far förbi och passerar över hans
-kaffe, och från ungefär 70° ligger den på disken och följer väggen som allt annat. Vrids kameran
-vrids handen lika mycket, så att den ligger still i världen. Under svängen är underarmen, manschetten
-och handen en egen duk ovanpå båda väggarna, med figurens kamera och arm, medan axeln och överarmen
-står kvar på väggen; armbågen kommer in i bild först när handen ligger där den ska, så att armen
-aldrig ser för lång ut. När kameran stannar tar figurens arm över, och bilden är densamma. Vägen
-tillbaka är samma väg.
+**Det är bara kameran som rör sig.** Den vrids runt ögat, som står mitt i bilden med perspektivet
+halva fönsterbredden, och inget annat flyttar sig. Rummet och hans vägg är två plan i samma rum, och
+en vridning runt ögat ger exakt samma bild av ett plan som av det riktiga rummet. Handen, kaffet och
+notan ligger alltså kvar på pulten hela vägen, och de glider från bildens vänstra kant till den högra.
+Hans ena arm går över hörnet till handen ([public/rum-hasse-hand.js](public/rum-hasse-hand.js) ritar
+den på pulten, figuren på väggen, `pult` och `iScenen`), och det finns ingen andra kopp och ingen
+andra hand på hans disk. Kameran stannar vid 79° (`VINKEL`), så att pulten syns kvar vid bildens
+högra kant medan man pratar med honom; på höjden går den 90° och pulten är just utanför bilden. Hans
+vägg står rakt fram och möter rummets vänstra kant, och väggarna fortsätter uppåt och nedåt
+(`.rh-fort`), så att inget slutar mitt i bilden. Samtalet och den mörka tonen bakom det kommer först
+när kameran har stannat. Framme blir hans vägg platt, så att texten är skarp och går att trycka på,
+och bara rummet står kvar vridet (`.hasse-kant`), urklippt till det som syns.
+
+Under svängen ritas ingenting om, och handen behöver ingen egen duk ovanpå allt. När han dricker eller
+skrattar lämnar armen pulten: då tar figurens duk över handen (`.hasse-arm-ute`), och när han lyfter
+koppen försvinner den ritade på fatet (`.hasse-klunk`). Fatet står kvar på pulten.
 
 **Samtalet.** Det är han som frågar, *Vilken match förstår du inte?*, med ditt efternamn om kupongen
 vet vem du är, och man svarar genom att välja en match. Då frågar han tillbaka (*Den är enkel. Vill du
