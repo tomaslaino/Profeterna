@@ -214,10 +214,20 @@
 @keyframes sok-brus { 0% { transform: translateX(0); } 25% { transform: translateX(-31%); } 50% { transform: translateX(-12%); } 75% { transform: translateX(-44%); } }
 @keyframes sok-skak { 0% { transform: translate(0, 0); } 33% { transform: translate(-3px, 1px); } 66% { transform: translate(2px, -1px); } }
 @keyframes sok-darr { 50% { transform: translateY(1.5px); } }
-/* spelaren i dubbla storleken, förminskad: skarp också när man går närmare,
-   och den får aldrig musen (då visar den inga egna knappar) */
-.vhs-bild { left: 0; width: 100%; background: #000; }
-.vhs-bild iframe { position: absolute; left: 0; top: 0; width: 200%; height: 200%; border: 0; transform: scale(0.5); transform-origin: 0 0; pointer-events: none; }
+/* Spelaren i 2880 × 1620, förminskad till 1,1 gånger bilden. Dess rubrik, logga
+   och förslag är lika stora hur stor spelaren än är, så de hamnar i kanten som
+   skärs bort, som på en gammal tv. Den får aldrig musen (då visar den inga egna
+   knappar). */
+.vhs-bild { left: 0; width: 100%; overflow: hidden; background: #000; }
+.vhs-bild iframe { position: absolute; left: 50%; top: 50%; width: 2880px; height: 1620px; border: 0; transform: translate(-50%, -50%) scale(0.1535); pointer-events: none; }
+/* videons ▶ mitt i bilden några sekunder efter ett tryck, i rutans bokstavsfärger
+   och med samma skugga. Spelarens runda knapp, 8,6 bildpunkter här, ligger under
+   den: triangelns inskrivna cirkel är 10,5 bred och har sin mitt i bildens mitt
+   (dolj i rum-video.js). */
+.vhs-skarm > .vhs-mitt { left: 50%; top: 50%; width: 16px; height: 18px; margin: -9px 0 0 -5.26px; pointer-events: none; }
+.vhs-mitt::before, .vhs-mitt::after { content: ""; position: absolute; inset: 0; clip-path: polygon(0 0, 100% 50%, 0 100%); }
+.vhs-mitt::before { background: #0c1660; transform: translate(1.5px, 1.5px); }
+.vhs-mitt::after { background: #f4f6ff; }
 /* rubriken på klippet kan ha resultatet: täcks när resultatet är dolt */
 .vhs-mask { left: 0; width: 100%; height: 50px; background: linear-gradient(180deg, #000 70%, transparent); pointer-events: none; }
 .vhs-mask[hidden] { display: none; }
@@ -232,16 +242,18 @@
    alla lager i varje bildruta) */
 .rum-vhs[data-lage="brus"] .vhs-brus { animation: vhs-brus 0.24s steps(4) infinite; }
 @keyframes vhs-brus { 0% { transform: translate(0, 0); } 25% { transform: translate(-37px, 13px); } 50% { transform: translate(-11px, -29px); } 75% { transform: translate(-29px, 23px); } 100% { transform: translate(0, 0); } }
-.vhs-bla, .vhs-brus, .vhs-bild, .vhs-sok, .vhs-osd, .vhs-tid, .vhs-matare, .vhs-lista { visibility: hidden; }
+.vhs-bla, .vhs-brus, .vhs-bild, .vhs-mitt, .vhs-sok, .vhs-osd, .vhs-tid, .vhs-matare, .vhs-lista { visibility: hidden; }
 .rum-vhs[data-lage="tom"] :is(.vhs-bla, .vhs-osd, .vhs-lista),
 .rum-vhs[data-lage="laddar"] :is(.vhs-bild, .vhs-bla, .vhs-osd),
 .rum-vhs[data-lage="spolar"] :is(.vhs-bild, .vhs-sok, .vhs-osd, .vhs-tid, .vhs-matare),
 .rum-vhs[data-lage="paus"] :is(.vhs-bild, .vhs-sok, .vhs-osd, .vhs-tid, .vhs-matare),
 .rum-vhs:is([data-lage="stopp"], [data-lage="vind"]) :is(.vhs-bla, .vhs-osd, .vhs-tid, .vhs-matare),
 .rum-vhs[data-lage="spelar"] .vhs-bild,
-.rum-vhs.vhs-hack[data-lage="spelar"] .vhs-bla,
+.rum-vhs.vhs-dolj:is([data-lage="spelar"], [data-lage="paus"]) .vhs-mitt,
 .rum-vhs.vhs-efter[data-lage="spelar"] :is(.vhs-osd, .vhs-tid, .vhs-matare),
 .rum-vhs[data-lage="brus"] .vhs-brus { visibility: visible; }
+/* (▶ står i mitten i stället för i hörnet) */
+.rum-vhs.vhs-dolj[data-lage="spelar"] .vhs-osd { visibility: hidden; }
 /* glaset: buktigt, med lysröret i och mörkare hörn, och svaga linjer */
 .vhs-glas {
   inset: 0;

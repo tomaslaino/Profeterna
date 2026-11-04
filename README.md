@@ -3409,10 +3409,14 @@ rum-video.js): spelaren följer efter.
   bandmätaren. Efter fem minuter går videon till stopp av sig själv (`PAUSTID`), som en riktig
   för att skona bandet.
 - **Stopp:** blå bild med *STOPP*, räkneverket och bandmätaren, och displayen visar ■ och tiden.
-- **▶:** går alltid över den blå bilden med *▶ SPELA*, ungefär 4,5 sekunder (se *Att det är
-  YouTube syns inte*), och bilden fortsätter där bandet stod. När bilden kommer rullar brusränderna
-  genom den en gång (`.vhs-las`, `LAS`), och räkneverket och bandmätaren står kvar 2,5 sekunder
-  (`EFTER`). Ett tryck till medan den håller på ändrar inget, och spelar den redan händer inget.
+- **▶ från paus och sökning:** spelar direkt, utan blå bild (`direkt`). Efter en sökning rullar
+  brusränderna genom bilden en gång medan bandet låser (`.vhs-las`, `LAS`).
+- **▶ från stopp, och när kassetten har åkt in:** bandet ska ut ur kassetten, så det går en kort
+  blå bild med *▶ SPELA* (`BLA`, 0,8 sekunder efter att bandet har börjat gå), och bilden kommer med
+  brusränderna där bandet stod. Ett tryck till medan den håller på ändrar inget, och spelar den
+  redan händer inget.
+- **Efter ▶** står ▶ mitt i rutan, med räkneverket och bandmätaren, i ungefär fyra sekunder
+  (`FORVARM`), som texten i rutan på en riktig video.
 - **Bandets ändar:** i början stannar bandet på 0:00:00. I slutet, spelat, sökt eller spolat,
   spolar videon tillbaka av sig själv och stannar på 0:00:00 (`bandSlut`); kassetten matas inte ut.
 - **⏏:** går bandet stannar det först, och kassetten kommer ut 0,6 sekunder senare (`UT`).
@@ -3421,8 +3425,8 @@ rum-video.js): spelaren följer efter.
 - **Går man därifrån** pausar videon, och den spelar vidare när man kommer tillbaka. Mitt i en
   sökning står bilden still och spelar därifrån, en spolning stannar där den är, och paus är paus
   även när man kommer tillbaka.
-- **Väntar spelaren på data** medan klippet spelar syns den blå bilden efter 0,35 sekunder
-  (`.vhs-hack`), i stället för spelarens eget hjul.
+- **Väntar spelaren på data** står bilden kvar, och efter 0,4 sekunder ▶ i mitten över spelarens
+  hjul (se *Att det är YouTube syns inte*).
 
 I telefonen på höjden räknas kameran så att hela knappraden får plats (`TATH`), med rutan lite
 mindre än fönstret, och ett tryck en bit under en knapp räknas också.
@@ -3463,18 +3467,22 @@ nästa gång (samma lista som spelaren på sajten). Rummet stängs och videon
 stannar. Med `prefers-reduced-motion` åker kassetterna direkt.
 
 **Att det är YouTube syns inte.** Spelaren har inga egna knappar (`controls=0`), får aldrig
-musen och textas inte (`hl=en` och `unloadModule('captions')`). Rubriken, kanalens bild,
-knappen i mitten och loggan syns ändå i knappt fyra sekunder varje gång ett klipp börjar
-spela, hoppar medan det spelar eller spelar vidare efter en paus – men inte vid paus, inte när
-det hoppar i paus och inte när ljudet slås av och på (mätt med bilder var 1/60 sekund: borta
-mellan 3,7 och 4,0 sekunder efter att spelaren sa att den spelade). Därför visar videon sin
-blå bild med *▶ SPELA*, utan ljud, tills klippet har spelat i 4,4 sekunder (`FORVARM`; förut
-3,6, då en skymt av rubriken kunde synas); när den spelar vidare efter en paus spolar den
-först tillbaka lika mycket, så att bilden fortsätter där den stannade, också efter en sökning.
-Slutet, och förslagen efter det, täcks
-direkt. Hörnet byter inte heller storlek medan klippet syns, för då kommer rubriken och loggan också
-fram: det ritas i den stora storleken innan spelaren börjar (`load`, `resume`) och i den vanliga
-igen först när klippet står stilla (`skarp`).
+musen och textas inte (`hl=en` och `setOption('captions', 'track', {})` när den börjar spela;
+`unloadModule` räcker inte, för då kommer textningen tillbaka vid nästa ▶). Rubriken, kanalens bild, symbolen i
+mitten, förslagen och loggan syns ändå i knappt fyra sekunder varje gång ett klipp börjar spela,
+hoppar medan det spelar eller spelar vidare efter en paus, men inte vid paus, inte när det hoppar i
+paus och inte när ljudet slås av och på. De går inte att stänga av (spelarens fart stannar på en
+fjärdedel, och `hideControls` och liknande gör inget utifrån), men de är lika stora hur stor spelaren
+än är. Därför ritas spelaren i 2880 × 1620 och förminskas till 1,1 gånger bilden (`.vhs-bild iframe`):
+rubriken, förslagen och loggan hamnar i kanten som skärs bort, som på en gammal tv. Kvar är
+spelarens runda knapp i mitten (och hjulet när den väntar på data), ungefär 2 % av bredden, och den
+täcks av videons egen ▶ (`.vhs-mitt`) från att spelaren börjar spela till 4,4 sekunder efter (`dolj`,
+`FORVARM`). Pausar man innan dess står knappen kvar i paus, och ▶ med den. Oskärpa över knappen
+provades men blev en ljus fläck, ungefär som en andra boll. I en sökning syns knappen i de fyra
+sekunderna, men bilden skakar och är sönderbrusad då. Slutet, och förslagen efter det, täcks direkt.
+Klippet väljer samma bildkvalitet som förut (1080p, mätt). Hörnet byter inte storlek medan klippet
+syns, för då kommer knappen fram utan ▶: det ritas i den stora storleken innan spelaren börjar (`load`, `resume`, `direkt`) och i
+den vanliga igen först när klippet står stilla (`skarp`).
 
 **Ljudet.** I Safari, och i alla webbläsare i iPhone, får en video inte ha ljud förrän någon har
 tryckt medan den finns. Videon slog på ljudet när den blå bilden försvann, och då pausade
