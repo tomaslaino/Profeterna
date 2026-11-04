@@ -79,7 +79,8 @@ const samtalUrl = kupongCfg.endpoint.replace(/kupong$/, 'samtal');
 
 function logg(text) {
   const rad = `${new Date().toISOString()} ${text}`;
-  console.log(rad);
+  // Under launchd går stdout till launchd.log, som bara ska ha det oväntade.
+  if (process.stdout.isTTY || !PUBLICERA) console.log(rad);
   try {
     fs.mkdirSync(path.dirname(LOGG), { recursive: true });
     if (fs.existsSync(LOGG) && fs.statSync(LOGG).size > MAX_LOGG) fs.renameSync(LOGG, `${LOGG}.1`);
