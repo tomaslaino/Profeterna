@@ -3657,7 +3657,8 @@ när man vrider på huvudet (0,9 s). Där sitter han bakom bardisken, vänd mot 
 disken, händerna mot mitten och kaffet framför sig. Bakom honom är barens vägg med hyllorna och
 lamporna. Samtalet står i en spalt till vänster om honom (på höjden under händerna), och kommer
 när man har vänt sig mot honom. Esc eller *Tillbaka* går tillbaka (vid matchlistan också ett klick
-utanför). Medan han väntar på att man ska välja trummar han med fingrarna på disken då och då.
+utanför). Medan han väntar på att man ska välja trummar han med fingrarna på disken då och då, och
+ibland tar han cigarren ur askkoppen och njuter av den en stund.
 
 **Scenen.** Han sitter så att fotot inte behöver något under sig: disken framför honom döljer allt
 nedanför magen, så det finns inga ben, ingen stol och inget hörn att foga ihop. Disken är en enkel
@@ -3682,6 +3683,24 @@ pultens ände med en arm över hörnet till handen på pulten; det såg konstigt
 och koppen), och det kostade mer.
 När han dricker lyfter han koppen från fatet framför sig, och när han slår i disken hoppar koppen.
 
+**Cigarren.** Till vänster om hans högra hand står en tung askkopp av samma gods som koppen, med två
+urtag. I det ena ligger cigarren: huvudet på disken, ringen (guld och rött) synlig och glöden över
+askkoppens mitt, där en tunn rökslinga stiger. Då och då tar han den (klippet `cigarr`, T 30–40, 10 s):
+han tittar ned och tar den ovanifrån, för den till munnen, drar två bloss med halvslutna ögon (glöden
+flammar upp, och mellan blossen pyser lite rök ur mungipan), tar ut den, lutar huvudet bakåt och blåser
+ut röken snett uppåt åt sidan med slutna ögon, ler, tittar på den och lägger tillbaka den. Han håller
+den som en cigarr ska hållas, tummen under och pek- och långfingret ovanpå, och vid munnen sitter
+handen vid kinden så att den inte skymmer ansiktet. Det är cigarren som styr: dess läge räknas fram
+(i askkoppen, vid munnen i huvudets mått så att den följer när han rör huvudet, vid axeln) och handen
+räknas ur greppet, så att den sitter kvar i fingrarna hela vägen. Den första kommer 18–32 sekunder
+efter att man har vänt sig mot honom, sedan var 45–80:e sekund (`CIGARR` i
+[public/rum-hasse.js](public/rum-hasse.js)), bara när han väntar på en och inte pratar eller trummar.
+Medan han väntar på en analys tar han kaffet och cigarren varannan gång. Ska något annat spelas
+medan han har den (slaget med domen, vägen hem efter analysen) lägger han tillbaka den 2,5 gånger så
+fort (`skynda`). Röken är partiklar i en gemensam luftström: lugn och rak nära glöden, slingrig
+högre upp (`byggRok` i [public/rum-hasse-arm.js](public/rum-hasse-arm.js)). Med minskad rörelse
+ligger cigarren kvar i askkoppen, men röken stiger, på samma sätt som han fortfarande andas.
+
 **Samtalet.** Det är han som frågar, *Vilken match förstår du inte?*, med ditt efternamn om kupongen
 vet vem du är, och man svarar genom att välja en match. Då frågar han tillbaka (*Den är enkel. Vill du
 veta, eller ska du gissa?*), och först *Lär mig* ger analysen (knappen lottas som hans repliker: också *Jag lyssnar och
@@ -3694,7 +3713,7 @@ efter analysen är samma guldknapp. Han har alltid svaret, både när du redan h
 han ska läsa på (*Den knäckte jag i morse*); att han läser på märks först medan han väntar. Är analysen inte skriven än
 säger han det (*Den tar jag dagen före*). Rader där du redan har fått tecknen öppnas
 direkt. Analysen är redan skriven, men han låtsas: när du har bett om den fortsätter han prata i 15–25 sekunder (`LATSAS` i [public/rum-hasse.js](public/rum-hasse.js), raderna kommer i ordning: *Vi börjar bakifrån*, *Total kontroll*, *Det här
-är helt normalt*) och tar en klunk kaffe då och då. När den är klar blir han tyst, armarna går upp, han slår i disken och domen
+är helt normalt*) och tar en klunk kaffe eller cigarren då och då. När den är klar blir han tyst, armarna går upp, han slår i disken och domen
 står i guld. Sedan säger han texten en mening i taget, ord för ord med munnen i takt, med en paus
 mellan meningarna och en längre före en kort mening, och gesterna kommer vid de bestämda orden
 (*Nej nej nej*, *varningens finger*) eller då och då vid en lång mening. Ett klick var som helst
@@ -3757,12 +3776,19 @@ remsa i atlasen, ligger på böjbara rör med fotots mått, så att tyget och f�
 kroppen. Händerna är en modell med 16 ben ([scripts/hasse/hand.mjs](scripts/hasse/hand.mjs)) med
 huden ur fotot, naglar och leder. Armar, kropp, händer och kopp har samma ljus. Väggen bakom honom
 är en färdig bild, spårad en gång med riktigt ljus ([scripts/hasse/bak.html](scripts/hasse/bak.html)).
-Skuggorna på disken är räknade kapslar, utan skuggkarta. T 20–24,5 är ett klipp där han dricker en
+Skuggorna på disken är räknade kapslar, utan skuggkarta (också askkoppens och cigarrens). Askkoppen,
+cigarren och röken är tre ritanrop och ungefär 3 700 trianglar till. T 30–40 är cigarren. T 20–24,5 är ett klipp där han dricker en
 klunk kaffe och ställer ned koppen, med start och slut som vilan. `?rum-hasse` öppnar honom direkt.
 
 Provat i headless Chrome: 2560 × 1100, 2000 × 1342, 1440 × 900, 1280 × 743, 1100 × 900, som telefon
 412 × 915, 390 × 664 och 915 × 412, alla gester och klunken, vändningen dit och tillbaka frusen på
 vägen, ändrat fönster och vriden telefon medan han syns, och minskad rörelse.
+
+Cigarren (2026-11-04) är provad med figuren ensam i headless Chrome (mjukvarugrafik), 1440 × 900 och
+412 × 915: vilan, hela klippet bild för bild och i följd, närbilder av munnen och utblåsningen, och
+cigarrens, handens och armbågens förflyttning mellan varje hundradels sekund (inga hopp). Inte provad i
+hela sidan, i Safari eller i en riktig telefon, och turerna i samtalet (när han tar den, `skynda`) är
+bara genomlästa.
 
 ### Närbilderna
 

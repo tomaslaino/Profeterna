@@ -1,7 +1,8 @@
 // Hasse Backe i tobaksaffären (rum-hasse.js), i three.js: han sitter bakom bardisken, vänd mot en, med
-// underarmarna på disken och kaffet framför sig. Kostymfotot (C More Entertainment, CC BY 3.0, Wikimedia
+// underarmarna på disken, kaffet framför sig och cigarren i askkoppen till vänster. Kostymfotot (C More Entertainment, CC BY 3.0, Wikimedia
 // Commons) ligger på en formad yta, så att huvudet vrids på riktigt runt nacken och kroppen lutar sig
-// fram. Ögon, bryn och mun rör sig i skuggaren. Armarna, händerna och koppen finns i rum-hasse-arm.js.
+// fram. Ögon, bryn och mun rör sig i skuggaren. Armarna, händerna, koppen, askkoppen, cigarren och röken
+// finns i rum-hasse-arm.js.
 //
 // Disken ritas inte här: den är en enkel yta på sidan under duken (.rh-disk i rum-hasse.css). Det som är
 // under den döljs i skuggarna (BORD_GLSL), så att kroppen slutar vid diskens bakre kant och det som
@@ -11,9 +12,10 @@
 // Ögat står på (0, 500, D) och tittar rakt fram.
 //
 // figuren(duk, { hog, latt, pr }) → { kamera(v), rita(T, n, tal, mun), tid, info(), borta() }
-// Klipp: T 0–12,4 (vila, skrattet, domen, gesterna, hem) och T 20–24,5 (en klunk kaffe, börjar och slutar som vilan).
+// Klipp: T 0–12,4 (vila, skrattet, domen, gesterna, hem), T 20–24,5 (en klunk kaffe) och T 30–40 (cigarren),
+// de två sista börjar och slutar som vilan.
 import * as THREE from 'three';
-import { ATLAS, LJUS, ARM, KAMERA, BORD_GLSL, laddaFoto, laddaHand, byggArm, byggKopp } from './rum-hasse-arm.js';
+import { ATLAS, LJUS, ARM, KAMERA, BORD_GLSL, CIGARR, ASKKOPP, laddaFoto, laddaHand, byggArm, byggKopp, byggCigarr, byggAskkopp, byggRok } from './rum-hasse-arm.js';
 
 const DEG = Math.PI / 180;
 const clamp = (x, a = 0, b = 1) => Math.min(b, Math.max(a, x));
@@ -270,8 +272,19 @@ export async function figuren(duk, { hog = false, latt = false, pr = 1 } = {}) {
   kopp.rotation.y = -0.5;
   K.fat.position.set(KOPP[0], KOPP[1] + 0.5, KOPP[2]);
   S.add(kopp, K.fat);
+  // askkoppen till vänster om hans högra hand, med cigarren i urtaget som pekar åt höger och lite
+  // mot en: huvudet ligger på disken, glöden över askkoppens mitt och röken stiger därifrån
+  const ASK = new THREE.Vector3(-330, BORD.Y, 820);
+  const ASKV = 0.35;
+  const ask = byggAskkopp(bord);
+  ask.mesh.position.copy(ASK);
+  ask.mesh.rotation.y = -ASKV;
+  const cig = byggCigarr(bord);
+  cig.mesh.matrixAutoUpdate = false;
+  const rok = byggRok(latt ? 200 : 280, bord);
+  S.add(ask.mesh, cig.mesh, rok.mesh);
   // skuggorna på disken: kapslar som faller bakåt och åt höger, ingen skuggkarta
-  const NK = 7;
+  const NK = 9;
   const kapA = Array.from({ length: NK }, () => new THREE.Vector4());
   const kapH = Array.from({ length: NK }, () => new THREE.Vector2());
   const skuggGeo = new THREE.BufferGeometry();
@@ -448,6 +461,222 @@ export async function figuren(duk, { hog = false, latt = false, pr = 1 } = {}) {
     }
     return trumF;
   }
+
+  // ---------- cigarren (T 30–40) ----------
+  // Han tar cigarren ur askkoppen med höger hand, drar två bloss med halvslutna ögon, blåser ut
+  // röken med huvudet bakåt, tittar nöjt på den och lägger tillbaka den. Det är cigarren som styr:
+  // handen räknas ur greppet, så att den sitter kvar i fingrarna hela vägen.
+  // Greppet (handens mått, skalad som handen): tummen under, pek- och långfingret ovanpå. I
+  // cigarrens läge är x fingrarnas riktning, y från huvudet mot glöden och z ut ur handflatan.
+  const GREPP = new THREE.Vector3(43, 148, 100).multiplyScalar(0.92);
+  const SG = 60;
+  const EXTRA_C = [0, 0.02, 0.2, 0.3];
+  const extraC = [0, 0, 0, 0];
+  const mq = new THREE.Matrix4();
+  const nyPose = () => ({ p: v(), q: new THREE.Quaternion() });
+  const pA_ = v();
+  const pF_ = v();
+  const pP_ = v();
+  // läget ur greppets punkt p, cigarrens riktning A (huvudet mot glöden) och handflatans P
+  function pose(ut, p, A, P) {
+    pA_.copy(A).normalize();
+    pF_.crossVectors(pA_, P).normalize();
+    pP_.crossVectors(pF_, pA_);
+    mq.makeBasis(pF_, pA_, pP_);
+    ut.q.setFromRotationMatrix(mq);
+    ut.p.copy(p);
+    return ut;
+  }
+  // I askkoppen: huvudet på disken, cigarren över urtagets yttre kant och glöden över mitten.
+  // Han tar den ovanifrån, med handflatan nedåt.
+  const CU = new THREE.Vector3(Math.cos(ASKV), 0, Math.sin(ASKV));
+  const SN = 105;
+  const sinA = (ASKKOPP.URTAG + 0.2) / SN;
+  const A_VILA = CU.clone().multiplyScalar(-Math.sqrt(1 - sinA * sinA));
+  A_VILA.y = sinA;
+  const HUV = ASK.clone().addScaledVector(CU, ASKKOPP.R + SN * Math.sqrt(1 - sinA * sinA));
+  HUV.y += CIGARR.R + 0.4;
+  const NED = new THREE.Vector3(0, -1, 0);
+  // läget ur handen: handens origo H, fingrarnas riktning F och handflatans P
+  const fA = v();
+  function fraHand(ut, H, F, P) {
+    fA.crossVectors(F, P).negate().normalize();
+    return pose(ut, H.clone().addScaledVector(fA, -GREPP.x).addScaledVector(F, GREPP.y).addScaledVector(P, GREPP.z), fA, P);
+  }
+  const V3 = (x, y, z) => new THREE.Vector3(x, y, z);
+  const PV = {
+    vila: pose(nyPose(), HUV.clone().addScaledVector(A_VILA, SG), A_VILA, NED),
+    // armbågen på disken och handen uppe vid axeln, cigarren tvärs över och glöden utåt
+    hall: fraHand(nyPose(), V3(-310, 165, 540), V3(0.12, 0.9, 0.42).normalize(), V3(0.25, -0.45, 0.86).normalize()),
+    // lite högre och vriden, glöden uppåt: han tittar på den
+    se: fraHand(nyPose(), V3(-290, 215, 560), V3(0.3, 0.85, 0.43).normalize(), V3(0.1, -0.48, 0.87).normalize()),
+  };
+  // Vid munnen räknas läget i huvudets mått: huvudet en bit in mellan läpparna, cigarren ut åt
+  // hans högra sida och lite nedåt. Tummen pekar mot munnen och handen sitter ut åt sidan (d) från
+  // greppet, vid kinden, så att den inte skymmer ansiktet.
+  const MUND = W_(662, 509, 0);
+  MUND.z = djup(662, 509) - 6;
+  const A_MUN = new THREE.Vector3(-0.7, -0.2, 0.68).normalize();
+  const P_MUN = (() => {
+    const T = A_MUN.clone().negate();
+    const d = new THREE.Vector3(-1, -0.25, -0.35);
+    const e = d.addScaledVector(T, -d.dot(T)).normalize().negate();
+    const e2 = new THREE.Vector3().crossVectors(T, e);
+    return e2.multiplyScalar(GREPP.y).addScaledVector(e, GREPP.z).normalize();
+  })();
+  const BORT = new THREE.Vector3(-58, -36, 52);
+  const PIV = U.uPiv.value;
+  const iHuvud = (p, ut) => ut.copy(p).sub(PIV).applyMatrix3(U.uHuvud.value).add(PIV).applyMatrix4(mk);
+  const riktH = (d, ut) => ut.copy(d).applyMatrix3(U.uHuvud.value).transformDirection(mk);
+  const hA = v();
+  const hP = v();
+  const hp = v();
+  function vidMunnen(ut, ut2) {
+    riktH(A_MUN, hA);
+    riktH(P_MUN, hP);
+    iHuvud(MUND, hp);
+    pose(ut, hp.addScaledVector(hA, SG), hA, hP);
+    // och utdragen
+    iHuvud(hp.copy(MUND).add(BORT), hp);
+    pose(ut2, hp.addScaledVector(hA, SG), hA, hP);
+  }
+  const PM = { mun: nyPose(), bort: nyPose() };
+  // [T, läge, båge uppåt på vägen dit]
+  const CK = [[31.0, 'vila'], [32.1, 'mun', 70], [33.9, 'mun'], [34.35, 'bort'], [34.95, 'hall'], [36.25, 'hall'], [36.9, 'se'], [37.6, 'se'], [38.45, 'vila', 90]];
+  const posen = (namn) => PM[namn] || PV[namn];
+  function cigarrLage(t, ut) {
+    if (t <= CK[0][0] || t >= CK[CK.length - 1][0]) return pose(ut, PV.vila.p, A_VILA, NED);
+    let i = 1;
+    while (t > CK[i][0]) i++;
+    const f = ss(CK[i - 1][0], CK[i][0], t);
+    const a = posen(CK[i - 1][1]);
+    const b = posen(CK[i][1]);
+    ut.p.lerpVectors(a.p, b.p, f);
+    ut.p.y += (CK[i][2] || 0) * Math.sin(f * Math.PI);
+    ut.q.slerpQuaternions(a.q, b.q, f);
+    return ut;
+  }
+  const cp = nyPose();
+  const fot = v();
+  const cA = v();
+  const cF = v();
+  const cP = v();
+  const cX = v();
+  const cH = v();
+  const cW = v();
+  const cE = v();
+  const cWr = v();
+  const POL_UPP = new THREE.Vector3(-0.62, -0.78, 0.1).normalize();
+  const cPol = v();
+  // cigarren på sin plats, och var handen ska vara för att hålla den
+  function cigarrSatt(cp) {
+    cA.set(0, 1, 0).applyQuaternion(cp.q);
+    cF.set(1, 0, 0).applyQuaternion(cp.q);
+    cP.set(0, 0, 1).applyQuaternion(cp.q);
+    cig.mesh.matrix.makeRotationFromQuaternion(cp.q).setPosition(cX.copy(cp.p).addScaledVector(cA, -SG));
+    cig.mesh.matrixWorldNeedsUpdate = true;
+    fot.copy(cig.FOT).applyMatrix4(cig.mesh.matrix);
+    // handens origo: tummen (handens x) pekar mot huvudet
+    cH.copy(cp.p).addScaledVector(cA, GREPP.x).addScaledVector(cF, -GREPP.y).addScaledVector(cP, -GREPP.z);
+  }
+  // handleden för handen i H: handen sitter 26 bortom handleden längs underarmen
+  function vristTill(Sk, H, pol, ut) {
+    ut.copy(H).sub(Sk).normalize();
+    for (let i = 0; i < 3; i++) {
+      cW.copy(H).addScaledVector(ut, -26);
+      ik(Sk, cW, pol, cE, cWr);
+      ut.subVectors(cWr, cE).normalize();
+    }
+    return cW.copy(H).addScaledVector(ut, -26);
+  }
+  const cU = v();
+  const KROK_C = [[30, VILA_A[4]], [30.5, 0.12], [30.8, 0.12], [31.0, 0.45], [38.4, 0.45], [38.6, 0.14], [39.1, 0.2], [39.6, VILA_A[4]]];
+  function cigarrArm(t, Sk, a) {
+    vidMunnen(PM.mun, PM.bort);
+    cigarrLage(t, cp);
+    cigarrSatt(cp);
+    // fram till askkoppen och tillbaka i en båge; däremellan håller han den
+    const mot = ss(30.05, 30.85, t) * (1 - ss(38.5, 39.4, t));
+    const upp = ss(31.0, 31.9, t) * (1 - ss(37.7, 38.4, t));
+    // (vilans riktning är armbågens hela längd: båda som enhetsvektorer, annars tar den nya över först på slutet)
+    cPol.fromArray(VILA_A[1]).normalize().lerp(POL_UPP, upp);
+    vristTill(Sk, cH, cPol, cU);
+    a.w.lerp(cW, mot);
+    a.w.y += 220 * mot * (1 - mot);
+    a.pol.normalize().lerp(cPol, mot);
+    a.F.lerp(cF, mot);
+    a.P.lerp(cP, mot);
+    a.krok = spar(KROK_C, t);
+    a.peka = 0;
+    const g = ss(30.8, 31.0, t) * (1 - ss(38.4, 38.6, t));
+    for (let i = 0; i < 4; i++) extraC[i] = EXTRA_C[i] * g;
+    return extraC;
+  }
+  // röken: glöden ryker hela tiden (mer när han drar), och han blåser ut genom munnen
+  const fot0 = v();
+  const rv = v();
+  const rd = v();
+  const rm = v();
+  const rj = v();
+  let rokN = null;
+  let rokSkuld = 0;
+  let blasSkuld = 0;
+  // (snett uppåt åt hans vänstra sida, inte framför ansiktet)
+  const BLAS = new THREE.Vector3(0.7, 0.72, 0.25).normalize();
+  const PUFF = new THREE.Vector3(0.35, 0.28, 0.9).normalize();
+  const MUNHORN = W_(680, 511, 0);
+  MUNHORN.z = djup(680, 511);
+  const slump = () => Math.random() - 0.5;
+  function roken(n, t, glod, iCig) {
+    const dt = rokN === null ? 0 : clamp(n - rokN, 0, 0.1);
+    rokN = n;
+    if (dt > 0) {
+      // en tunn tråd ur glöden, utspridd längs vägen om cigarren rör sig
+      rokSkuld += dt * (14 + 34 * glod);
+      const k = Math.floor(rokSkuld);
+      rokSkuld -= k;
+      for (let i = 0; i < k; i++) {
+        rm.lerpVectors(fot0, fot, (i + 1) / k);
+        rok.slapp(rm, rv.set(slump() * 4, 26 + slump() * 8, slump() * 4), { liv: 3.4, r0: 1.7, r1: 22, a: 0.2, lyft: 16 });
+      }
+      if (iCig) {
+        // en liten pust mellan blossen, i mungipan
+        const puff = t > 32.95 && t < 33.2;
+        // och ut med röken, mest i början
+        const blas = t > 34.25 && t < 36.2 ? 75 * Math.exp(-(t - 34.25) * 1.3) : 0;
+        if (puff || blas) {
+          blasSkuld += dt * (puff ? 40 : blas);
+          const kb = Math.floor(blasSkuld);
+          blasSkuld -= kb;
+          iHuvud(puff ? MUNHORN : MUND, rm);
+          riktH(puff ? PUFF : BLAS, rd);
+          for (let i = 0; i < kb; i++) {
+            rv.copy(rd).multiplyScalar(puff ? 35 : 165 + slump() * 50).add(rj.set(slump(), slump(), slump()).multiplyScalar(puff ? 14 : 46));
+            rok.slapp(rm, rv, puff ? { liv: 2.2, r0: 3, r1: 28, a: 0.12, broms: 1.2, lyft: 15, sort: 1, virv: 0.7 } : { liv: 3.0, r0: 5, r1: 70, a: 0.13, broms: 1.6, lyft: 24, sort: 1, virv: 0.7, inn: 0.3 });
+          }
+        }
+      }
+    }
+    fot0.copy(fot);
+    rok.steg(dt, n, BORD.Y);
+  }
+
+  // Huvudet, kroppen och ansiktet under cigarren, som skillnad mot vilan. Han tittar ned mot
+  // askkoppen, möter cigarren, blundar halvt medan han drar, lutar sig bakåt och blåser ut, ler
+  // och tittar på den, och tittar ned igen när han lägger tillbaka den.
+  const C_YAW = [[30, 0], [30.15, 0], [30.75, -1.3], [31.3, -0.8], [32.0, 0.05], [33.9, 0.05], [34.4, 0.2], [36.2, 0.2], [36.75, -1.25], [37.6, -1.1], [38.0, -1.15], [38.5, -1.2], [39.3, 0], [40, 0]];
+  const C_PITCH = [[30, 0], [30.15, 0], [30.75, 1.7], [31.3, 1.1], [32.0, 0.25], [33.9, 0.25], [34.05, 0.1], [34.6, -1.8], [35.9, -1.8], [36.45, 0.1], [36.85, 0.75], [37.6, 0.75], [38.0, 1.4], [38.5, 1.6], [39.3, 0], [40, 0]];
+  const C_ROLL = [[30, 0], [36.4, 0], [36.9, 0.07], [37.6, 0.07], [38.0, 0], [40, 0]];
+  const C_LUT = [[30, 0], [30.75, 0.03], [31.4, 0.01], [32, 0], [34.15, 0], [34.7, -0.05], [36.0, -0.05], [36.6, 0], [38.0, 0.02], [38.5, 0.03], [39.4, 0], [40, 0]];
+  const C_VRID = [[30, 0], [30.75, -0.07], [31.6, -0.02], [36.4, -0.02], [36.9, -0.06], [37.6, -0.06], [38.45, -0.07], [39.4, 0], [40, 0]];
+  const C_AX = [[30, 0], [31.2, 6], [32.0, 20], [33.9, 20], [34.6, 12], [36.3, 12], [36.9, 16], [37.6, 16], [38.2, 4], [39.2, 0], [40, 0]];
+  const C_BLUND = [[30, 0], [32.15, 0], [32.45, 0.5], [33.8, 0.5], [34.05, 0.25], [34.4, 0.85], [35.75, 0.85], [36.2, 0], [40, 0]];
+  const C_BRYN = [[30, 0], [32.15, 0], [32.5, 0.3], [33.8, 0.3], [34.4, 0.1], [36.1, 0.1], [36.75, 0.65], [37.6, 0.55], [38.1, 0], [40, 0]];
+  const C_LE = [[30, 0], [35.9, 0], [36.4, 0.45], [37.6, 0.35], [38.3, 0.08], [40, 0]];
+  const C_KIS = [[30, 0], [36.0, 0], [36.4, 0.32], [36.9, 0.1], [40, 0]];
+  // glöden: två bloss
+  const GLOD = [[32.2, 0], [32.5, 1], [32.95, 0.12], [33.25, 0.12], [33.55, 1], [33.85, 0]];
+
   let sistaT = 0;
   let sistaN = 0;
   // T: var i rörelserna (0–2,5 vilan, 2,5–5,5 fram till domen, 5,5–9,95 gesterna
@@ -460,14 +689,20 @@ export async function figuren(duk, { hog = false, latt = false, pr = 1 } = {}) {
     const skratt = ss(2.75, 3.05, t) * (1 - ss(4.25, 4.6, t));
     const talar = Math.max(tal, ss(5.55, 5.7, t) * (1 - ss(9.4, 9.6, t)));
     const dricker = ss(21.2, 21.85, t) * (1 - ss(23.2, 23.9, t));
-    const yaw = 0.22 * (spar([[0, -0.3], [2.5, -0.3], [3.0, 0.15], [4.5, 0.1], [5.0, 0], [8.2, 0], [8.7, -0.8], [9.3, -0.65], [9.95, 0], [10.6, 0.25], [11.6, 0.25], [12.4, -0.3]], t) + 0.1 * Math.sin(n * 0.8) + talar * 0.28 * Math.sin(n * 2.7 + 1));
-    const pitch = 0.17 * (spar([[0, -0.45], [2.5, -0.45], [3.0, -1.2], [4.4, -1.1], [4.8, -0.55], [5.0, 0.95], [5.2, 0.05], [8.2, 0.05], [9.95, 0.05], [10.6, -0.6], [11.6, -0.6], [12.4, -0.45]], t) + talar * 0.3 * Math.sin(n * 6.1) + skratt * 0.16 * Math.sin(n * 15) - dricker * 1.15);
-    const roll = -(spar([[0, -0.08], [2.5, -0.08], [3.0, 0.09], [4.4, 0.07], [5.0, 0], [8.2, 0], [8.7, -0.06], [9.3, -0.05], [9.95, 0], [10.6, 0.05], [11.6, 0.05], [12.4, -0.08]], t) + talar * 0.03 * Math.sin(n * 3.3));
+    // cigarren: i munnen, och när han blåser ut
+    const iCig = t > 30 && t < 40;
+    const iMun = iCig ? ss(31.95, 32.15, t) * (1 - ss(33.9, 34.05, t)) : 0;
+    const blaser = iCig ? ss(34.15, 34.35, t) * (1 - ss(35.9, 36.3, t)) : 0;
+    const glod = iCig ? spar(GLOD, t) : 0;
+    const c = (k) => (iCig ? spar(k, t) : 0);
+    const yaw = 0.22 * (c(C_YAW) + spar([[0, -0.3], [2.5, -0.3], [3.0, 0.15], [4.5, 0.1], [5.0, 0], [8.2, 0], [8.7, -0.8], [9.3, -0.65], [9.95, 0], [10.6, 0.25], [11.6, 0.25], [12.4, -0.3]], t) + 0.1 * Math.sin(n * 0.8) * (1 - iMun * 0.6) + talar * 0.28 * Math.sin(n * 2.7 + 1));
+    const pitch = 0.17 * (c(C_PITCH) + spar([[0, -0.45], [2.5, -0.45], [3.0, -1.2], [4.4, -1.1], [4.8, -0.55], [5.0, 0.95], [5.2, 0.05], [8.2, 0.05], [9.95, 0.05], [10.6, -0.6], [11.6, -0.6], [12.4, -0.45]], t) + talar * 0.3 * Math.sin(n * 6.1) + skratt * 0.16 * Math.sin(n * 15) - dricker * 1.15);
+    const roll = -(c(C_ROLL) + spar([[0, -0.08], [2.5, -0.08], [3.0, 0.09], [4.4, 0.07], [5.0, 0], [8.2, 0], [8.7, -0.06], [9.3, -0.05], [9.95, 0], [10.6, 0.05], [11.6, 0.05], [12.4, -0.08]], t) + talar * 0.03 * Math.sin(n * 3.3));
     eu.set(pitch, yaw, roll, 'YXZ');
     mh.makeRotationFromEuler(eu);
     U.uHuvud.value.setFromMatrix4(mh);
-    const lut = spar([[0, 0.05], [2.5, 0.05], [3.0, -0.03], [4.72, -0.04], [5.0, 0.09], [5.5, 0.06], [8.2, 0.05], [9.95, 0.06], [12.4, 0.05]], t);
-    const vrid = spar([[0, -0.09], [2.5, -0.09], [3, 0], [4.72, 0.05], [5.0, -0.1], [5.5, -0.08], [8.2, -0.03], [8.7, -0.17], [9.3, -0.14], [9.95, -0.08], [12.4, -0.09]], t) + talar * 0.015 * Math.sin(n * 2.1);
+    const lut = c(C_LUT) + spar([[0, 0.05], [2.5, 0.05], [3.0, -0.03], [4.72, -0.04], [5.0, 0.09], [5.5, 0.06], [8.2, 0.05], [9.95, 0.06], [12.4, 0.05]], t);
+    const vrid = c(C_VRID) + spar([[0, -0.09], [2.5, -0.09], [3, 0], [4.72, 0.05], [5.0, -0.1], [5.5, -0.08], [8.2, -0.03], [8.7, -0.17], [9.3, -0.14], [9.95, -0.08], [12.4, -0.09]], t) + talar * 0.015 * Math.sin(n * 2.1);
     const sid = spar([[0, -0.008], [2.5, -0.008], [3, -0.006], [4.72, 0.015], [5, -0.012], [8.7, 0.015], [9.95, -0.012], [12.4, -0.008]], t) + 0.003 * Math.sin(n * 0.55);
     eu.set(lut, vrid, sid, 'YXZ');
     mr.makeRotationFromEuler(eu);
@@ -475,24 +710,27 @@ export async function figuren(duk, { hog = false, latt = false, pr = 1 } = {}) {
     h1.copy(HOFT).applyMatrix4(mr);
     mk.setPosition(HOFT.x - h1.x, HOFT.y - h1.y, HOFT.z - h1.z);
     U.uKropp.value.copy(mk);
-    const axV = spar([[0, -8], [2.5, -8], [3.0, 42], [4.35, 42], [4.78, 26], [5.0, -8], [5.5, -8], [5.95, 18], [8.15, 18], [8.7, 26], [9.95, -8], [12.4, -8]], t) + skratt * 5 * Math.sin(n * 15);
+    const axV = c(C_AX) + spar([[0, -8], [2.5, -8], [3.0, 42], [4.35, 42], [4.78, 26], [5.0, -8], [5.5, -8], [5.95, 18], [8.15, 18], [8.7, 26], [9.95, -8], [12.4, -8]], t) + skratt * 5 * Math.sin(n * 15);
     const axH = spar([[0, 0], [2.55, 0], [3.0, 42], [4.2, 42], [4.72, 0], [12.4, 0]], t) + skratt * 5 * Math.sin(n * 15);
     U.uAx.value.set(axV, axH);
     U.uAndas.value = 7 * Math.sin(n * 1.5) + skratt * 5 * Math.sin(n * 15);
     const lyft = talar * 0.38 * Math.max(0, Math.sin(n * 4.3));
-    U.bryn.value.set(spar([[0, 0], [2.5, 0], [3.0, 0.5], [4.4, 0.5], [5.0, 1], [5.6, 0.4], [9.4, 0.3], [9.95, 0.4], [10.6, 0.15], [11.6, 0.15], [12.4, 0]], t) + lyft, spar([[0, 1.1], [2.5, 1.1], [3.0, 0.6], [4.4, 0.6], [5.0, 1], [5.6, 0.5], [9.4, 0.4], [9.95, 0.5], [10.6, 1.05], [11.6, 1.05], [12.4, 1.1]], t) + lyft);
-    U.le.value = Math.max(0.14 * (1 - ss(2.5, 2.8, t)), skratt, 0.3 * ss(8.3, 8.8, t) * (1 - ss(9.4, 9.8, t)), 0.6 * ss(10, 10.5, t) * (1 - ss(11.6, 12.4, t)), 0.14 * ss(11.6, 12.4, t), 0.34 * ss(23.7, 24.1, t) * (1 - ss(24.3, 24.5, t)));
+    const brynC = c(C_BRYN);
+    U.bryn.value.set(brynC + spar([[0, 0], [2.5, 0], [3.0, 0.5], [4.4, 0.5], [5.0, 1], [5.6, 0.4], [9.4, 0.3], [9.95, 0.4], [10.6, 0.15], [11.6, 0.15], [12.4, 0]], t) + lyft, brynC * 0.8 + spar([[0, 1.1], [2.5, 1.1], [3.0, 0.6], [4.4, 0.6], [5.0, 1], [5.6, 0.5], [9.4, 0.4], [9.95, 0.5], [10.6, 1.05], [11.6, 1.05], [12.4, 1.1]], t) + lyft);
+    U.le.value = Math.max(0.14 * (1 - ss(2.5, 2.8, t)), skratt, 0.3 * ss(8.3, 8.8, t) * (1 - ss(9.4, 9.8, t)), 0.6 * ss(10, 10.5, t) * (1 - ss(11.6, 12.4, t)), 0.14 * ss(11.6, 12.4, t), 0.34 * ss(23.7, 24.1, t) * (1 - ss(24.3, 24.5, t)), c(C_LE));
     // talet: stavelser med små pauser, ibland rundare läppar
     const stav = Math.abs(Math.sin(n * 7.3)) * (0.42 + 0.58 * ss(-0.35, 0.5, Math.sin(n * 2.3 + 0.7))) * (0.72 + 0.28 * Math.sin(n * 17.3));
-    const talMun = (mun === null ? talar : mun) * (1 - dricker);
-    U.munn.value = Math.max(talMun * stav * 0.62, skratt * (0.92 + 0.14 * Math.sin(n * 14)), ss(4.9, 5.0, t) * (1 - ss(5.0, 5.25, t)) * 0.72);
+    const talMun = (mun === null ? talar : mun) * (1 - dricker) * (1 - Math.max(iMun, blaser));
+    // läpparna om cigarren, en pust mellan blossen och ett o när han blåser ut
+    const puff = iCig ? ss(32.93, 33.0, t) * (1 - ss(33.12, 33.22, t)) : 0;
+    U.munn.value = Math.max(talMun * stav * 0.62, skratt * (0.92 + 0.14 * Math.sin(n * 14)), ss(4.9, 5.0, t) * (1 - ss(5.0, 5.25, t)) * 0.72, iMun * (0.15 + 0.12 * puff), blaser * (0.27 + 0.05 * Math.sin(n * 7)));
     U.rund.value = talMun * Math.max(0, Math.sin(n * 3.1 + 1.3)) * 0.8;
-    U.kis.value = Math.max(skratt * 0.75, U.le.value * 0.45);
+    U.kis.value = Math.max(skratt * 0.75, U.le.value * 0.45, c(C_KIS));
     // blinkningarna: en gång i några sekunder, klockan avgör
     const fas = (n % 4.3);
     const bl = 1 - clamp(Math.abs(fas - 0.3) / 0.085);
-    U.rund.value = Math.max(U.rund.value, dricker * 0.7);
-    U.blund.value = Math.max(dricker * 0.82, skratt * 0.42, bl, ss(10.7, 10.9, t) * (1 - ss(11.25, 11.45, t)));
+    U.rund.value = Math.max(U.rund.value, dricker * 0.7, iMun * 0.85, blaser);
+    U.blund.value = Math.max(dricker * 0.82, skratt * 0.42, bl, ss(10.7, 10.9, t) * (1 - ss(11.25, 11.45, t)), c(C_BLUND));
     U.blick.value.set(4 * clamp(yaw / 0.2, -1, 1), 0);
     sa.copy(SA);
     sa.y += axV;
@@ -504,6 +742,12 @@ export async function figuren(duk, { hog = false, latt = false, pr = 1 } = {}) {
     sb.applyMatrix4(mk);
     const a = nyckel(VA, t, na);
     const b = nyckel(VB, t, nb);
+    // cigarren ligger i askkoppen, eller i hans hand
+    let extraA = null;
+    if (iCig) extraA = cigarrArm(t, sa, a);
+    else cigarrSatt(cigarrLage(0, cp));
+    cig.U.uGlod.value = glod;
+    cig.U.uTid.value = n;
     const iKlunk = t > 20 && t < 24.5;
     if (iKlunk) klunkArm(t, b);
     const isar = ss(2.5, 3, t) * (1 - ss(4.3, 4.8, t));
@@ -516,7 +760,7 @@ export async function figuren(duk, { hog = false, latt = false, pr = 1 } = {}) {
     a.w.y += skratt * 7 * Math.sin(n * 15);
     b.w.y += skratt * 7 * Math.sin(n * 15 + 1);
     ik(sa, a.w, a.pol, E_, Wr_);
-    const trum = t < 2.5 || (t > 9.95 && t < 20) ? trummar(n) : null;
+    const trum = t < 2.5 || (t > 9.95 && t < 20) ? trummar(n) : extraA;
     A.satt(sa, E_, Wr_, a.F, a.P, a.krok, a.peka, isar, 0.45, trum);
     U.uArm.value[0].copy(sa); U.uArm.value[1].copy(E_); U.uArm.value[2].copy(Wr_);
     ik(sb, b.w, b.pol, E_, Wr_);
@@ -538,6 +782,9 @@ export async function figuren(duk, { hog = false, latt = false, pr = 1 } = {}) {
     skk(3, LB_.E, LB_.W, 70, (ah(LB_.E) + ah(LB_.W)) / 2 - 20);
     skk(4, kopp.position, kopp.position, 60, ah(kopp.position));
     skk(5, K.fat.position, K.fat.position, 96, 1);
+    skk(7, ASK, ASK, 92, 1);
+    skk(8, cX, fot, 14, Math.min(ah(cX), ah(fot)));
+    roken(n, t, glod, iCig);
     r.render(S, C);
   }
 
@@ -567,6 +814,9 @@ export async function figuren(duk, { hog = false, latt = false, pr = 1 } = {}) {
       G.dispose();
       skuggGeo.dispose();
       K.borta();
+      ask.borta();
+      cig.borta();
+      rok.borta();
       A.borta();
       B.borta();
       r.dispose();

@@ -9,6 +9,7 @@
 // byggHand(modell, sida, foto, bord) → { mesh, satt(W, F, P, krok, peka) }
 // byggArm(scen, sida, foto, modell, vidd, bord) → { satt(S, E, W, F, P, krok, peka), visible, hand }
 // byggKopp(bord) → { kopp, fat, ORA }
+// byggCigarr(bord) → { mesh, U, FOT }, byggAskkopp(bord) → { mesh }, byggRok(N, bord) → { mesh, slapp, steg }
 import * as THREE from 'three';
 
 // atlasen (bildpunkter): kroppen 860 × 1350, sedan ärmens remsa, huden bredvid
@@ -482,4 +483,271 @@ export function byggKopp(bord = ingenBord()) {
     ORA: new THREE.Vector3(84, 62, 0),
     borta() { kropp.dispose(); yta.dispose(); ora.dispose(); fat.dispose(); },
   };
+}
+
+// ---------- cigarren ----------
+// Munänden (huvudet) i origo, +y mot den tända änden (foten). Ringen nära huvudet, askan vid foten.
+export const CIGARR = { L: 196, R: 12.6, ASKA: 22, RING: [17, 35] };
+const BRUS_GLSL = `
+float h2(vec2 p) { return fract(sin(dot(p, vec2(127.1, 311.7))) * 43758.5453); }
+float brus(vec2 p) { vec2 i = floor(p), f = fract(p); f = f * f * (3. - 2. * f); return mix(mix(h2(i), h2(i + vec2(1., 0.)), f.x), mix(h2(i + vec2(0., 1.)), h2(i + 1.), f.x), f.y); }
+`;
+const CIG_V = `varying vec3 vN, vP, vL;
+void main() { vL = position; vec4 w = modelMatrix * vec4(position, 1.); vP = w.xyz; vN = normalize(mat3(modelMatrix) * normal); gl_Position = projectionMatrix * viewMatrix * w; }`;
+const CIG_F = `precision highp float;
+uniform float uGlod, uTid;
+varying vec3 vN, vP, vL;
+${LJUS}
+${BORD_GLSL}
+${BRUS_GLSL}
+const float L = ${CIGARR.L}., G0 = ${CIGARR.L - CIGARR.ASKA}.;
+void main() {
+  if (underBord(vP)) discard;
+  vec3 n = normalize(vN);
+  float y = vL.y;
+  float a = atan(vL.z, vL.x);
+  // runt om i bildpunkter (skarven vid a = ±π syns inte i bruset)
+  vec2 q = vec2(a * ${CIGARR.R}, y);
+  // täckbladet: brunt och flammigt, med ådror snett över och skarven i en spiral
+  float b = brus(q * vec2(.11, .035)) * .6 + brus(q * vec2(.33, .12)) * .4;
+  vec3 c = mix(vec3(.2, .11, .055), vec3(.37, .22, .115), b);
+  float sp = fract(a / 6.2832 + y / 64.);
+  c *= 1. - .4 * exp(-pow((sp - .5) / .014, 2.));
+  float adra = abs(fract((q.x * .7 + y) / 21. + brus(q * .04) * .7) - .5);
+  c += vec3(.05, .032, .016) * exp(-adra * adra / .0012);
+  // locket på huvudet
+  c *= mix(.78, 1., smoothstep(3., 9., y));
+  float glans = .22;
+  // ringen: guld, med ett rött fält och en guldkant
+  float ring = smoothstep(${CIGARR.RING[0]}. - .4, ${CIGARR.RING[0]}. + .4, y) * (1. - smoothstep(${CIGARR.RING[1]}. - .4, ${CIGARR.RING[1]}. + .4, y));
+  if (ring > 0.) {
+    float m = (y - ${CIGARR.RING[0]}.) / ${CIGARR.RING[1] - CIGARR.RING[0]}.;
+    vec3 rc = vec3(.8, .58, .2) * (.85 + .3 * brus(q * .5));
+    float rod = smoothstep(.2, .25, m) * (1. - smoothstep(.75, .8, m));
+    rc = mix(rc, vec3(.52, .06, .05), rod);
+    // en liten vit sköld fram
+    rc = mix(rc, vec3(.92, .88, .78), rod * (1. - smoothstep(.45, .6, abs(a - 1.2))) * smoothstep(.3, .36, m) * (1. - smoothstep(.64, .7, m)));
+    c = mix(c, rc, ring);
+    glans = mix(glans, .9, ring);
+  }
+  // kolet och askan
+  float kol = smoothstep(G0 - 7., G0 - 1., y);
+  c = mix(c, vec3(.045, .032, .025), kol);
+  float aska = smoothstep(G0 - .5, G0 + 1., y);
+  float rand = abs(fract((y - G0) / 5.5 + brus(q * .15) * .5) - .5);
+  vec3 ac = vec3(.52, .5, .47) * (.62 + .55 * brus(q * vec2(.25, .5))) * (.75 + .25 * smoothstep(.0, .2, rand));
+  ac = mix(ac, vec3(.72, .7, .66), smoothstep(L - 2., L, y) * .6);
+  c = mix(c, ac, aska);
+  glans *= 1. - aska;
+  vec3 ut = c * ljus(n);
+  vec3 h = normalize(NYCKEL + vec3(0., 0., 1.));
+  ut += vec3(1., .92, .8) * pow(max(0., dot(n, h)), mix(18., 60., ring)) * glans;
+  ut += kant(n, .2) * (1. - aska * .5);
+  // glöden: en ring under askan, och fläckar i änden när han drar
+  float f = brus(q * .45 + vec2(uTid * 2.3, 0.)) * .6 + brus(q * 1.3 - vec2(0., uTid * 3.1)) * .4;
+  float glod = exp(-pow((y - G0 + .8) / 2.4, 2.)) * (.45 + .55 * f);
+  glod += smoothstep(L - 1.5, L, y) * smoothstep(.55, .8, f) * uGlod * .8;
+  glod += exp(-pow((y - G0 - 4.) / 4., 2.)) * smoothstep(.62, .85, f) * uGlod * .5;
+  ut += vec3(1., .3, .05) * glod * (.22 + 1.5 * uGlod);
+  gl_FragColor = vec4(ton(ut), 1.);
+}`;
+export function byggCigarr(bord = ingenBord()) {
+  const { L, R, ASKA } = CIGARR;
+  const prof = [[0, 0], [4.5, 0.5], [8, 1.9], [10.6, 4.2], [12, 7.2], [R, 11], [R, 40], [R, L - ASKA - 6], [R - 0.15, L - ASKA - 1], [R - 0.5, L - ASKA + 1], [R - 0.3, L - 12], [R - 0.8, L - 4], [R - 2.6, L - 1.1], [R - 6, L - 0.1], [0, L + 0.2]];
+  const g = new THREE.LatheGeometry(V2(prof), 24);
+  const U = { uGlod: { value: 0 }, uTid: { value: 0 }, uBord: bord };
+  const mesh = new THREE.Mesh(g, new THREE.ShaderMaterial({ uniforms: U, vertexShader: CIG_V, fragmentShader: CIG_F, transparent: true, blending: THREE.CustomBlending, blendSrc: THREE.OneFactor, blendDst: THREE.OneMinusSrcAlphaFactor }));
+  mesh.renderOrder = 6;
+  mesh.frustumCulled = false;
+  return {
+    mesh, U,
+    // den tända änden i cigarrens egna mått
+    FOT: new THREE.Vector3(0, L + 1, 0),
+    borta() { g.dispose(); mesh.material.dispose(); },
+  };
+}
+
+// ---------- askkoppen ----------
+// Rund och tung, av samma glaserade gods som koppen, med två urtag för cigarren mitt emot
+// varandra (urtaget pekar åt +x). Botten i origo, y uppåt.
+export const ASKKOPP = { R: 92, H: 34, URTAG: 21, BREDD: 14.5, KANT: 88 };
+const ASK_V = `varying vec3 vN, vP, vL;
+void main() { vL = position; vec4 w = modelMatrix * vec4(position, 1.); vP = w.xyz; vN = normalize(mat3(modelMatrix) * normal); gl_Position = projectionMatrix * viewMatrix * w; }`;
+const ASK_F = `precision highp float;
+varying vec3 vN, vP, vL;
+${LJUS}
+${BORD_GLSL}
+${BRUS_GLSL}
+void main() {
+  if (underBord(vP)) discard;
+  vec3 n = normalize(vN);
+  float r = length(vL.xz);
+  float y = vL.y;
+  vec3 c = vec3(.9, .865, .78);
+  // det blå bandet strax under kanten, utanpå
+  float ute = smoothstep(86., 89., r);
+  c = mix(c, vec3(.2, .32, .58), ute * smoothstep(23.2, 24., y) * (1. - smoothstep(27., 27.8, y)));
+  // askan i botten
+  float inne = (1. - smoothstep(70., 78., r)) * (1. - smoothstep(13., 18., y));
+  float ab = brus(vL.xz * .09) * .6 + brus(vL.xz * .31) * .4;
+  c = mix(c, vec3(.58, .56, .53) * (.7 + .5 * ab), inne * smoothstep(.3, .6, ab + .2 * (1. - r / 70.)));
+  vec3 ut = c * ljus(n) * .9;
+  // mörkare mot disken och inne i skålen
+  ut *= .64 + .36 * smoothstep(0., 20., y);
+  ut *= 1. - .18 * (1. - smoothstep(60., 82., r)) * smoothstep(20., 30., 40. - y);
+  // glaserad: speglar baren
+  vec3 rf = reflect(vec3(0., 0., -1.), n);
+  vec3 om = mix(vec3(.05, .03, .02), vec3(.62, .43, .25), smoothstep(-.1, .7, rf.y));
+  om += vec3(1.3, 1.15, .95) * smoothstep(.93, .985, dot(rf, NYCKEL));
+  float f = .05 + .95 * pow(1. - clamp(n.z, 0., 1.), 5.);
+  ut = mix(ut, om, f * .8 * (1. - inne * .7));
+  ut += vec3(1., .94, .85) * pow(max(0., dot(n, normalize(NYCKEL + vec3(0., 0., 1.)))), 70.) * .5 * (1. - inne);
+  gl_FragColor = vec4(ton(ut), 1.);
+}`;
+export function byggAskkopp(bord = ingenBord()) {
+  const { H, URTAG, BREDD, KANT } = ASKKOPP;
+  // profilen utifrån och in: botten, väggen, kanten, skålen
+  const prof = [[0, 0], [76, 0], [83, 1.2], [87.5, 4.5], [90.5, 12], [92, 24], [91.6, 30], [89.8, 33.2], [86.5, 34], [82.5, 33.6], [80, 31.5], [77, 25], [70, 16.5], [58, 11.5], [40, 10.2], [0, 9.8]];
+  // tätare kring urtagen
+  const vinklar = [];
+  for (let a = 0; a < Math.PI * 2 - 1e-6;) {
+    vinklar.push(a);
+    const d = Math.min(...[0, Math.PI, Math.PI * 2].map((u) => Math.abs(a - u))) * KANT;
+    a += d < BREDD * 1.8 ? 2.2 / KANT : 0.09;
+  }
+  const na = vinklar.length;
+  const np = prof.length;
+  const pos = new Float32Array((na + 1) * np * 3);
+  // urtaget: en halvcirkel ned i kanten, genom hela godset
+  const golv = (a) => {
+    const d = Math.min(...[0, Math.PI, Math.PI * 2].map((u) => Math.abs(a - u))) * KANT;
+    if (d >= BREDD + 3) return 1e9;
+    const k = d < BREDD ? URTAG + (H - URTAG) * (1 - Math.sqrt(1 - (d / BREDD) ** 2)) : H;
+    // rundad övergång mot kanten
+    return d < BREDD - 2 ? k : k + (H + 2 - k) * ((d - (BREDD - 2)) / 5) ** 2;
+  };
+  for (let i = 0; i <= na; i++) {
+    const a = vinklar[i % na];
+    const gy = golv(a);
+    for (let j = 0; j < np; j++) {
+      const [r, y] = prof[j];
+      const o = (i * np + j) * 3;
+      pos[o] = Math.cos(a) * r;
+      pos[o + 1] = j > 3 && j < np - 3 ? Math.min(y, gy) : y;
+      pos[o + 2] = -Math.sin(a) * r;
+    }
+  }
+  const ix = [];
+  for (let i = 0; i < na; i++) for (let j = 0; j < np - 1; j++) {
+    const a = i * np + j;
+    const b = a + np;
+    ix.push(a, b, a + 1, b, b + 1, a + 1);
+  }
+  const g = new THREE.BufferGeometry();
+  g.setAttribute('position', new THREE.BufferAttribute(pos, 3));
+  g.setIndex(ix);
+  g.computeVertexNormals();
+  // skarven: samma normal på båda sidor
+  const nr = g.attributes.normal.array;
+  for (let j = 0; j < np; j++) {
+    const a = j * 3;
+    const b = (na * np + j) * 3;
+    for (let k = 0; k < 3; k++) nr[a + k] = nr[b + k] = (nr[a + k] + nr[b + k]) / 2;
+  }
+  const mesh = new THREE.Mesh(g, new THREE.ShaderMaterial({ uniforms: { uBord: bord }, vertexShader: ASK_V, fragmentShader: ASK_F, transparent: true, blending: THREE.CustomBlending, blendSrc: THREE.OneFactor, blendDst: THREE.OneMinusSrcAlphaFactor }));
+  mesh.renderOrder = 6;
+  mesh.frustumCulled = false;
+  return { mesh, borta() { g.dispose(); mesh.material.dispose(); } };
+}
+
+// ---------- röken ----------
+// Partiklar som rör sig i en gemensam luftström: så länge röken är tunn stiger den lugnt och
+// rakt, högre upp slingrar den sig. slapp(p, v, o) släpper en partikel, steg(dt, n) flyttar dem.
+const ROK_V = `attribute vec4 aP; attribute vec3 aR; varying vec2 vH; varying vec3 vR; varying vec3 vW;
+void main() { vH = position.xy; vR = aR; vW = aP.xyz; vec4 c = viewMatrix * vec4(aP.xyz, 1.); c.xy += position.xy * aP.w; gl_Position = projectionMatrix * c; }`;
+const ROK_F = `precision highp float;
+varying vec2 vH; varying vec3 vR; varying vec3 vW;
+${BORD_GLSL}
+${BRUS_GLSL}
+void main() {
+  if (underBord(vW)) discard;
+  float r = length(vH);
+  if (r > 1.) discard;
+  vec2 q = vH * 1.6 + vR.y * 17.3;
+  float b = brus(q) * .6 + brus(q * 2.3 + 4.1) * .4;
+  float a = vR.x * (1. - smoothstep(.15, 1., r)) * (.35 + 1.1 * b);
+  // blå rök från glöden, grå när han blåser ut
+  vec3 c = mix(vec3(.6, .64, .74), vec3(.8, .77, .73), vR.z);
+  gl_FragColor = vec4(c * a, a);
+}`;
+export function byggRok(N = 240, bord = ingenBord()) {
+  const quad = new THREE.InstancedBufferGeometry();
+  quad.setAttribute('position', new THREE.BufferAttribute(new Float32Array([-1, -1, 0, 1, -1, 0, 1, 1, 0, -1, 1, 0]), 3));
+  quad.setIndex([0, 1, 2, 0, 2, 3]);
+  const aP = new Float32Array(N * 4);
+  const aR = new Float32Array(N * 3);
+  const iP = new THREE.InstancedBufferAttribute(aP, 4);
+  const iR = new THREE.InstancedBufferAttribute(aR, 3);
+  iP.setUsage(THREE.DynamicDrawUsage);
+  iR.setUsage(THREE.DynamicDrawUsage);
+  quad.setAttribute('aP', iP);
+  quad.setAttribute('aR', iR);
+  quad.instanceCount = 0;
+  const mesh = new THREE.Mesh(quad, new THREE.ShaderMaterial({ uniforms: { uBord: bord }, vertexShader: ROK_V, fragmentShader: ROK_F, transparent: true, depthWrite: false, blending: THREE.CustomBlending, blendSrc: THREE.OneFactor, blendDst: THREE.OneMinusSrcAlphaFactor }));
+  mesh.renderOrder = 8;
+  mesh.frustumCulled = false;
+  // partiklarna: läge, fart, ålder, livslängd, storlek från och till, täthet, frö, sort (0 blå, 1 grå),
+  // virvel, broms, lyft och hur länge den tonar in
+  const P = Array.from({ length: N }, () => ({ p: new THREE.Vector3(), v: new THREE.Vector3(), t: 0, liv: 0, r0: 0, r1: 0, a: 0, fro: 0, sort: 0, virv: 0, broms: 0, lyft: 0, inn: 0 }));
+  let n = 0;
+  function slapp(p, v, o = {}) {
+    if (n >= N) return;
+    const x = P[n++];
+    x.p.copy(p);
+    x.v.copy(v);
+    x.t = 0;
+    x.liv = o.liv ?? 3;
+    x.r0 = o.r0 ?? 3;
+    x.r1 = o.r1 ?? 30;
+    x.a = o.a ?? 0.12;
+    x.fro = Math.random();
+    x.sort = o.sort ?? 0;
+    x.virv = o.virv ?? 1;
+    x.broms = o.broms ?? 0;
+    x.lyft = o.lyft ?? 0;
+    x.inn = o.inn ?? 0.12;
+  }
+  function steg(dt, tid, golv) {
+    for (let i = 0; i < n;) {
+      const x = P[i];
+      x.t += dt;
+      if (x.t >= x.liv) { P[i] = P[n - 1]; P[n - 1] = x; n--; continue; }
+      // luftströmmen: lugn nära källan, slingrig högre upp, och ett svagt drag åt höger
+      const h = Math.max(0, x.p.y - golv);
+      const s = x.virv * Math.min(1, x.t / 1.4) * (8 + Math.min(h, 500) * 0.09);
+      const y = x.p.y * 0.021;
+      const fx = s * (Math.sin(tid * 1.3 + y + x.p.z * 0.01) + 0.6 * Math.sin(tid * 2.9 - y * 2.3 + 1.7)) + 7;
+      const fz = s * 0.6 * Math.sin(tid * 1.7 - y * 1.4 + 0.5);
+      const k = Math.exp(-x.broms * dt);
+      x.v.multiplyScalar(k);
+      x.v.y += x.lyft * dt;
+      x.p.x += (x.v.x + fx) * dt;
+      x.p.y += x.v.y * dt;
+      x.p.z += (x.v.z + fz) * dt;
+      i++;
+    }
+    for (let i = 0; i < n; i++) {
+      const x = P[i];
+      const f = x.t / x.liv;
+      const r = x.r0 + (x.r1 - x.r0) * Math.sqrt(f);
+      aP[i * 4] = x.p.x; aP[i * 4 + 1] = x.p.y; aP[i * 4 + 2] = x.p.z; aP[i * 4 + 3] = r;
+      aR[i * 3] = x.a * Math.min(1, x.t / x.inn) * (1 - f) * (1 - f);
+      aR[i * 3 + 1] = x.fro;
+      aR[i * 3 + 2] = x.sort;
+    }
+    quad.instanceCount = n;
+    iP.needsUpdate = true;
+    iR.needsUpdate = true;
+  }
+  return { mesh, slapp, steg, bord, get antal() { return n; }, borta() { quad.dispose(); mesh.material.dispose(); } };
 }
