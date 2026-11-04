@@ -1,5 +1,5 @@
 {
- "uppdaterad": "2026-11-04T18:14:31.298Z",
+ "uppdaterad": "2026-11-04T18:16:14.687Z",
  "omgang": {
   "id": "2026-11-07-st4978",
   "matcher": [
@@ -838,6 +838,105 @@
     "model": "claude-opus-5-5",
     "version": "2026-11-04.1",
     "writtenAt": "2026-11-04T18:14:30.702Z",
+    "attempts": 2
+   },
+   "model": "claude-opus-5-5",
+   "version": "2026-11-04.1",
+   "attempts": 1
+  },
+  {
+   "id": "401880162",
+   "match": "West Bromwich Albion – Millwall",
+   "avspark": "2026-11-07T15:00Z",
+   "writtenAt": "2026-11-04T18:15:57.743Z",
+   "text": "Tre raka 0–0 på The Hawthorns räcker gott\n\nWest Brom och Millwall har spelat tre raka mållösa matcher på The Hawthorns. På lördag möts de där igen, med Isaac Price som motor i hemmalaget och en Alex Neil som efter tisdagens 0–3 i Birmingham hade synpunkter ända bak till målvakten.\n\nFem av de sex senaste mötena mellan lagen har slutat oavgjort, och på The Hawthorns har de tre senaste stannat vid 0–0. Sådant kommer inte av en slump utan av att båda lagen står rätt och ingen vill vara den som kliver fram först. Den här hösten håller de sämre tätt. West Brom har hållit nollan två gånger på 14 ligamatcher, och Millwall har släppt in 24 mål.\n\nSenast var det Birmingham som hälsade på i Millwalls straffområde. Alex Cochrane gjorde första målet efter 40 sekunder enligt Southwark News [1], och efter 29 minuter stod det 3–0 enligt Sports Mole [2]. Alex Neil konstaterade att varje mål kom ur en omställning. Han ville se fler vunna nickdueller, färre omställningar och vassare avslut, och lade till att den som är målvakt får försöka rädda något [1]. Det där löser man med en hink bollar. Femton skott gav bara två på mål [2], tre dagar efter 4–1 mot Derby.\n\nHos West Brom börjar det mesta med Isaac Price. Enligt The False 9 startade han alla tre målen i 3–1-segern mot West Ham, det sista med en hörna [3], och mot Southampton satte han straffen [4]. Bakåt har James Morrison ett bekymmer. George Campbell kände av ljumsken i tisdags och spelar bara om han är helt frisk, så Nat Phillips står redo bredvid Chris Mepham, skriver The72 [4]. Jimmy-Jay Morgan, med fyra mål i år, gick dessutom skadad av mot West Ham [3].\n\nTipset: 1X (Mest ettan)\n\nPrognosen ger West Brom oddset 2,33 mot Millwalls 3,45, och den känner bara mål och tabelläge. Den vet alltså inte att Campbell kan saknas [1], vilket drar åt Millwalls håll. Den vet heller inte att alla tre baklängesmålen i Birmingham kom ur omställningar [2], och det passar West Brom med Price i laget. Spelbolagets 2,05 på hemmasegern är ändå för snålt för mig. Millwall skapar mer än West Brom, 1,92 förväntade mål per match mot 1,45, så en ensam etta vore kaxigt. Fem oavgjorda på sex möten gör krysset självskrivet. Jag ringar in etta och kryss.",
+   "author": "Sixten Bråvall (påhittad)",
+   "title": "Tre raka 0–0 på The Hawthorns räcker gott",
+   "lead": "West Brom och Millwall har spelat tre raka mållösa matcher på The Hawthorns. På lördag möts de där igen, med Isaac Price som motor i hemmalaget och en Alex Neil som efter tisdagens 0–3 i Birmingham hade synpunkter ända bak till målvakten.",
+   "paragraphs": [
+    "Fem av de sex senaste mötena mellan lagen har slutat oavgjort, och på The Hawthorns har de tre senaste stannat vid 0–0. Sådant kommer inte av en slump utan av att båda lagen står rätt och ingen vill vara den som kliver fram först. Den här hösten håller de sämre tätt. West Brom har hållit nollan två gånger på 14 ligamatcher, och Millwall har släppt in 24 mål.",
+    "Senast var det Birmingham som hälsade på i Millwalls straffområde. Alex Cochrane gjorde första målet efter 40 sekunder enligt Southwark News [1], och efter 29 minuter stod det 3–0 enligt Sports Mole [2]. Alex Neil konstaterade att varje mål kom ur en omställning. Han ville se fler vunna nickdueller, färre omställningar och vassare avslut, och lade till att den som är målvakt får försöka rädda något [1]. Det där löser man med en hink bollar. Femton skott gav bara två på mål [2], tre dagar efter 4–1 mot Derby.",
+    "Hos West Brom börjar det mesta med Isaac Price. Enligt The False 9 startade han alla tre målen i 3–1-segern mot West Ham, det sista med en hörna [3], och mot Southampton satte han straffen [4]. Bakåt har James Morrison ett bekymmer. George Campbell kände av ljumsken i tisdags och spelar bara om han är helt frisk, så Nat Phillips står redo bredvid Chris Mepham, skriver The72 [4]. Jimmy-Jay Morgan, med fyra mål i år, gick dessutom skadad av mot West Ham [3]."
+   ],
+   "sources": [
+    {
+     "n": 1,
+     "source": "Southwark News",
+     "title": "Millwall boss points to two key problems in Birmingham defeat",
+     "url": "https://southwarknews.co.uk/sport/football/millwall/millwall-boss-points-to-two-key-problems-in-birmingham-defeat",
+     "publishedAt": null
+    },
+    {
+     "n": 2,
+     "source": "Sports Mole",
+     "title": "Birmingham City 3-0 Millwall: Highlights, man of the match, stats as Max Bird solves August Priske problem",
+     "url": "https://www.sportsmole.co.uk/football/birmingham-city/result/st-andrews-dreams-of-premier-league-return-after-birmingham-thrash-millwall_608339.html",
+     "publishedAt": null
+    },
+    {
+     "n": 3,
+     "source": "The False 9",
+     "title": "West Ham 1-3 West Brom: Talking Points as Albion Win Away",
+     "url": "https://thefalse9.com/2026/11/west-ham-1-3-west-brom-talking-points-price.html",
+     "publishedAt": null
+    },
+    {
+     "n": 4,
+     "source": "The72",
+     "title": "West Brom injury latest on George Campbell after Southampton draw",
+     "url": "https://the72.co.uk/2026/11/04/west-brom-george-campbell-injury-latest/",
+     "publishedAt": null
+    }
+   ],
+   "tip": {
+    "text": "Prognosen ger West Brom oddset 2,33 mot Millwalls 3,45, och den känner bara mål och tabelläge. Den vet alltså inte att Campbell kan saknas [1], vilket drar åt Millwalls håll. Den vet heller inte att alla tre baklängesmålen i Birmingham kom ur omställningar [2], och det passar West Brom med Price i laget. Spelbolagets 2,05 på hemmasegern är ändå för snålt för mig. Millwall skapar mer än West Brom, 1,92 förväntade mål per match mot 1,45, så en ensam etta vore kaxigt. Fem oavgjorda på sex möten gör krysset självskrivet. Jag ringar in etta och kryss.",
+    "signs": [
+     0,
+     1
+    ],
+    "note": "Mest ettan",
+    "sources": [
+     {
+      "n": 1,
+      "source": "The72",
+      "title": "West Brom injury latest on George Campbell after Southampton draw",
+      "url": "https://the72.co.uk/2026/11/04/west-brom-george-campbell-injury-latest/",
+      "publishedAt": null
+     },
+     {
+      "n": 2,
+      "source": "Southwark News",
+      "title": "Millwall boss points to two key problems in Birmingham defeat",
+      "url": "https://southwarknews.co.uk/sport/football/millwall/millwall-boss-points-to-two-key-problems-in-birmingham-defeat",
+      "publishedAt": null
+     }
+    ],
+    "model": "claude-opus-5-5",
+    "version": "2026-11-04.1",
+    "writtenAt": "2026-11-04T18:15:57.743Z",
+    "attempts": 1
+   },
+   "hasse": {
+    "stycken": [
+     "Fem av de sex senaste mötena har slutat oavgjort, och de tre senaste på The Hawthorns stannade vid 0–0. Två lag som står rätt och väntar på varandra får det resultatet. Orsak och verkan. Jag har sett det förr, i Manchester. Det gick bra då också.",
+     "Millwall släppte in alla tre målen i Birmingham på omställningar, och hemmalaget har Isaac Price, som startade alla tre målen mot West Ham. Transisiones, Price som ombre libre, \"Det finns 28 sätt att bryta ner en backlinje.\" … Ursäkta. Back to basis.",
+     "George Campbell kan saknas i hemmalagets backlinje, och Millwall skapar mer framåt, så jag vågar inte lämna West Brom ensamt på ettan. Det lutar mest åt hemmaseger, men det blir etta och kryss."
+    ],
+    "tips": "2026-11-04T18:15:57.743Z",
+    "uppdrag": {
+     "fraser": [
+      "Orsak och verkan",
+      "Då är jag jävligt snäll"
+     ],
+     "krydda": "Jag har sett det förr, i Manchester. Det gick bra då också.",
+     "bielsa": [
+      "ombre libre",
+      "transisiones"
+     ]
+    },
+    "model": "claude-opus-5-5",
+    "version": "2026-11-04.1",
+    "writtenAt": "2026-11-04T18:16:14.062Z",
     "attempts": 2
    },
    "model": "claude-opus-5-5",
