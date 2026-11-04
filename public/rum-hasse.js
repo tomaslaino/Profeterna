@@ -1,8 +1,8 @@
 // Hasse Backe i tobaksaffären: han sitter i baren till vänster utanför bilden, och längst ut på
 // pulten står hans kaffe på notan (rum.js). Ett klick på dem (eller H) och man vänder sig mot honom:
 // rummet glider undan åt höger och baren kommer in från vänster, som när man vrider på huvudet. Där
-// sitter han bakom bardisken, vänd mot en, med underarmarna på disken och kaffet framför sig
-// (rum-hasse-3d.js), och samtalet står bredvid honom (på höjden under honom).
+// sitter han bakom bardisken, vänd mot en, med underarmarna på disken, kaffet framför sig och
+// cigarren i askkoppen (rum-hasse-3d.js), och samtalet står bredvid honom (på höjden under honom).
 //
 // Grafiken: vändningen är två lager som flyttas i sidled, färdiga animeringar som grafikprocessen
 // spelar upp själv, och ingenting ritas om på vägen. Baren är en färdig bild, disken en yta i CSS och
@@ -16,7 +16,7 @@ window.RumHasse = (() => {
   // vändningen (ms) och mörkret mellan rummet och baren, i fönstrets bredd
   const TID = 900;
   const HORN = 0.1;
-  const H = { on: false, rum: null, fig: null, last: null, t0: 0, T: 0, raf: 0, tal: 0, talMal: 0, mun: 0, munMal: null, ko: [], klipp: null, trum: 0 };
+  const H = { on: false, rum: null, fig: null, last: null, t0: 0, T: 0, raf: 0, tal: 0, talMal: 0, mun: 0, munMal: null, ko: [], klipp: null, trum: 0, cigarr: 0, vana: 0 };
   const calm = () => matchMedia('(prefers-reduced-motion: reduce)').matches;
   const hog = () => innerWidth / innerHeight < 1.15;
   const latt = () => matchMedia('(max-width: 700px), (max-height: 500px)').matches;
@@ -249,6 +249,7 @@ window.RumHasse = (() => {
     H.last = null;
     H.t0 = performance.now();
     H.trum = H.t0 + 4000 + Math.random() * 5000;
+    H.cigarr = H.t0 + CIGARR[0] * 0.4 + Math.random() * CIGARR[0] * 0.3;
     loop();
   }
 
@@ -271,6 +272,11 @@ window.RumHasse = (() => {
       if (ms > H.trum) {
         H.trum = ms + 7000 + Math.random() * 9000;
         if (!calm() && !H.klipp && !H.ko.length && (!H.sagt || H.sagt.klar) && ['fraga', 'val', 'klar'].includes(H.fas)) H.fig.trumma();
+      }
+      // och ibland tar han cigarren ur askkoppen och njuter av den en stund
+      if (ms > H.cigarr && !H.klipp && !H.ko.length && !H.fig.ror() && (!H.sagt || H.sagt.klar) && ['fraga', 'val', 'klar'].includes(H.fas)) {
+        H.cigarr = ms + CIGARR[0] + Math.random() * (CIGARR[1] - CIGARR[0]);
+        gest('cigarr');
       }
       const ror = H.klipp || H.ko.length || (H.sagt && !H.sagt.klar) || H.fig.ror();
       if (ms - last < takt(ror)) return;
@@ -405,7 +411,11 @@ window.RumHasse = (() => {
     armar: { fran: 5.5, till: 9.95, vila: 5.5 }, // fingret, handen som hackar, armen ut
     hem: { fran: 9.95, till: 12.4, vila: 0 }, // nöjd, ögonen igen, tillbaka
     klunk: { fran: 20, till: 24.5, vila: 0 }, // en klunk kaffe
+    cigarr: { fran: 30, till: 40, vila: 0, skynda: true }, // cigarren ur askkoppen, två bloss, röken ut och tillbaka
   };
+  // Medan han väntar på en tar han cigarren då och då (minst och längst i ms mellan gångerna).
+  // Ska något spelas medan han håller den (skynda) lägger han tillbaka den fortare.
+  const CIGARR = [45000, 80000];
   // Måste spelas: väntar på sin tur. vid: [T, gör] när tidslinjen når T.
   function spela(namn, o = {}) {
     if (calm()) {
@@ -429,7 +439,7 @@ window.RumHasse = (() => {
       H.T = H.klipp.fran;
     }
     const k = H.klipp;
-    H.T = Math.min(k.till, H.T + dt);
+    H.T = Math.min(k.till, H.T + dt * (k.skynda && H.ko.length ? 2.5 : 1));
     if (k.vid && H.T >= k.vid[0]) {
       const f = k.vid[1];
       k.vid = null;
@@ -749,7 +759,7 @@ window.RumHasse = (() => {
     x.sen = () => { if (f) f(); ok(); };
   });
   // Rader som kommer med jämna mellanrum: medan man väntar på honom, eller han på en.
-  // Väntar man på honom tar han en klunk kaffe då och då i stället för att prata.
+  // Väntar man på honom tar han en klunk kaffe då och då i stället för att prata, eller cigarren.
   function pratSteg(ms) {
     const v = H.prat;
     if (!v || ms < v.nasta || H.klipp || H.ko.length || (H.sagt && !H.sagt.klar)) return;
@@ -759,7 +769,8 @@ window.RumHasse = (() => {
     }
     if (v.runt && v.i % 5 === 2 && v.drack !== v.i) {
       v.drack = v.i;
-      gest('klunk');
+      H.vana = (H.vana + 1) % 2;
+      gest(H.vana ? 'klunk' : 'cigarr');
       v.nasta = ms + 1200;
       return;
     }
