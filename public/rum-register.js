@@ -10,6 +10,7 @@
 //               data/teams/<division>.json och matchens fil
 //   mötet       alla möten som sajten har, med datum, tävling och resultat,
 //               och hemmalagets V–O–F i dem (matchens fil)
+// Lagkortet på Statistik (openTeam i divisioner.js) har samma rader.
 //
 // Ett klick på lådan (eller R): den lyfter från disken, vänder sig mot en och
 // lutar så att man ser ner i den, medan rummet mörknar bakom; den lutar lite

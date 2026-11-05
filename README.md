@@ -154,7 +154,8 @@ ingen falsk precision · sidan kraschar aldrig av en död källa · endast fria 
   xG), *Förtjänar mer* och *Förtjänar mindre* (tagna poäng mot vad chanserna var värda,
   3 × vinstchansen + oavgjortchansen ur matchens xG med oberoende Poisson – tur som
   brukar jämna ut sig, och där tabellen lurar) och *Slår oddsen*. xG-fliken och lagkortet
-  har samma tre nya siffror ([src/teamstats.js](src/teamstats.js))
+  har samma tre nya siffror ([src/teamstats.js](src/teamstats.js)). Sedan 2026-11-05 är
+  topplistorna anslagstavlans sex (*Statistik som i tobaksaffären* nedan)
 - [x] **Modell och Källor (2026-10-20):** Modell börjar med fyra steg på vanlig svenska
   och ett räknat exempel ur nästa match i Premier League (väntade mål och odds efter varje
   steg), sedan avståndet mellan divisionerna som staplar, *Hur bra är den?* – domen i ord,
@@ -200,6 +201,19 @@ ingen falsk precision · sidan kraschar aldrig av en död källa · endast fria 
   filer. Sajten visar bara färdiga texter och anropar ingen språkmodell. DeepSeek och proxyn
   `profeterna-analys` är borta, och sajten är inte längre sökbar (`noindex`). Se
   [Analyserna](#analyserna)
+- [x] **Statistik som i tobaksaffären (2026-11-05, användarens önskemål):** Statistik → Lagen
+  har anslagstavlans topplistor, med samma namn, i samma ordning och ur samma tal: *Formen*
+  (de fem senaste i ligan och de engelska cuperna, flest poäng överst), *Starkast & svagast*,
+  *Kryssar gärna*, *Tur & otur*, *Mot oddsen* (*Slår oddsen* och *Sviker*) och *Motståndet*
+  (*Tufft hittills* och *Lätt hittills*). Listorna åt två håll har de tre högsta och de tre
+  lägsta med en stapel från mitten, och *Alla lag* under varje lista visar hela divisionen
+  likadant. Tabellen Alla lag har kolumnen *Form* (inte i telefonen, där tabellen ska rymmas
+  utan att man sveper). Lagkortet har det kortregistret har om ett lag – nästa match, formen
+  match för match, mål och xG för och mot per match och hur ofta laget varit favorit – och
+  lagets tal från tavlan under samma namn som i tabellen. Topplistorna under Spelarna delar
+  plats vid lika tal, som skytteligan på text-tv:n. I telefonen står topplistorna i en rad som
+  man sveper i sidled ([public/divisioner.js](public/divisioner.js),
+  [public/divisioner.css](public/divisioner.css))
 
 ## Publicering
 
@@ -631,6 +645,13 @@ bara lokalt. Analyserna visas som de ligger i `data/analyser.json`; hur de skriv
   gång så att main inte växer. Bygget tar det egna ljudet där det finns och Azure där det
   saknas, så han blir aldrig tyst. Ljudet är av tills besökaren slår på det. Se
   [Hasse Backe](#hasse-backe), *Ljudet*.
+- **Statistik som i tobaksaffären (2026-11-05, användarens önskemål):** statistiken på den
+  vanliga sajten ska stämma med den i tobaksaffären – samma tal under samma namn och samma
+  uppdelning: det som jämför lagen står som på anslagstavlan (topplistorna under Lagen), det
+  om ett lag som i kortregistret (lagkortet). Skadelistan står redan i lagkortet (Frånvaro) och
+  vilan hör till omgången, så de blir inga topplistor. Formen räknas ur `data/matches.json`,
+  som på tavlan innan den tas fram, alltså utan Europacuperna, som bara finns i matchens fil.
+  Se Status.
 - **Kuponghistoriken flyttar till Olympen (2026-10-20, användarens önskemål):** Kupong
   handlar bara om nästa kupong – växlaren Omgången | Historik försvinner. De färdigspelade
   kupongerna står sist i Olympen under rubriken *Grupparbetena* (`#olympen/kuponger`, en
@@ -3420,6 +3441,11 @@ leder. Skårtavlan på väggen visar inte längre tabellen utan gängets egen st
 (Tipsligan).
 Löpsedeln på glaset (se *Affischerna* ovan) är en rubrik, inte statistik: den citerar bara
 den siffra som gör rubriken till en nyhet, som modellens chans för skrällen eller favoriten.
+
+Statistik på den vanliga sajten har samma tal under samma namn, för hela divisionen i stället
+för omgången: topplistorna under Lagen är tavlans lappar (utom skadelistan och vilan), och
+lagkortet har kortregistrets rader (2026-11-05). Ändras en lapp eller ett kort här bör
+Statistik följa med, och tvärtom.
 
 ### Videon
 
