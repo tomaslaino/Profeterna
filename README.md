@@ -2075,8 +2075,8 @@ med en gul blyertspenna med suddgummi, en röd penna och en blå kulspetspenna (
 `KOPP` i rum-3d.js). Där skymmer den inget på bordet hur de än sitter, och den står inte i
 vägen för tårtan. Den kostar två ritanrop: bollen, och pennorna och kanten i en geometri med
 färgerna i hörnen. DL dricker ur en flaska, DT röker
-och skrattar, DJ har en burk i ena handen och pratar med cigaretten i den andra. Var och en
-har sin loop (12–21 s) – flaskan och burken till munnen med huvudet bakåt, ett bloss med
+och skrattar, DJ har en flaska i ena handen och pratar med cigaretten i den andra. Var och en
+har sin loop (12–21 s) – flaskan till munnen med huvudet bakåt, ett bloss med
 glöden som tänds och röken som blåses ut, benen som dinglar – och huvudena nickar efter
 musen, med en fjäder som räknas i tid (`NICK` i rum-3d.js), så att de nickar lika fort och lika
 mycket hur glest gänget än ritas (se [När datorn inte hinner med](#när-datorn-inte-hinner-med));
@@ -2089,9 +2089,14 @@ med ögonen stängda och blinkar inte). Ansiktet med stängda ögon är samma an
 byts in medan ögonen är stängda. I en fast bild (`?rum-t`) och med `prefers-reduced-motion`
 blinkar de inte. Det röda ljuset från neonskylten bakom dem slocknar när skylten glappar
 (`neonOn` i rum.js skickas med till `draw`), så att kanterna på håret och jackorna mörknar
-med skylten. Inga riktiga märken: flaskan säger PILSNER, burken ÖL –
-från första advent till tjugondag Knut JULÖL (grön etikett, röd burk) och i påskveckan
-PÅSKÖL (gul etikett, grön burk; `ol` i [public/rum-fika.js](public/rum-fika.js)).
+med skylten. Ölen är Pripps Blå i 90-talets returflaska (`bottle` i rum-3d.js): grönt glas,
+marinblå folie runt halsen, ett silverband snett över axeln och en silveretikett med skeppet
+i en oval mellan två lejon. Förlagan är reklamfilmen från 1992 (glaset och folien) och
+flaskan SLM 31192 i Sörmlands museum (formen och etiketten; den är odaterad), och
+etiketten är ritad för hand, inte en avbildning. Från första advent till tjugondag Knut står
+det PRIPPS JULÖL (röd folie) och i påskveckan PRIPPS PÅSKÖL (grön folie; `ol` i
+[public/rum-fika.js](public/rum-fika.js)). Allt tryck ligger på en duk och flaskorna delar
+geometrierna, så en flaska kostar två ritanrop.
 Var och en bär sitt lag (`LAG` i rum-3d.js): DL en stickad halsduk i Nacionals vitt, blått
 och rött med BOLSO på den ena änden, Nacionals sköld på den andra och fransar längst ner,
 DT ett lejonhuvud i gammal stil i kungsblått med bandet BLUES på underarmen som håller
@@ -2111,8 +2116,8 @@ Dagen är Stockholms (`Vader.nu()`), så alla ser samma placering, och ingen byt
 medan sidan är öppen – den nya syns vid nästa laddning. Platserna är en tabell: var
 barstolen står och är vriden, vilken hand som är mot bordet och var sakerna står på
 bordet (ölen, askkoppen, cigaretten, kupongen, handen som vilar och DT:s extraflaska), och
-figuren tar sin del ur sidan (`sitt`). Den som hamnar på andra sidan byter hand: flaskan,
-burken och cigaretten är alltid i handen mot bordet, och kupongen, pennan, lejonet (med
+figuren tar sin del ur sidan (`sitt`). Den som hamnar på andra sidan byter hand: flaskan
+och cigaretten är alltid i handen mot bordet, och kupongen, pennan, lejonet (med
 den uppkavlade ärmen), handen som lyfts vid ett mål och den mot pannan följer med, liksom
 blickarna åt sidan. Bakom bordet vilar båda händerna på bordet. Sakerna ligger minst 10
 innanför bordskanten och inom räckhåll för alla tre, och när någon kikar ner mot pulten
@@ -2122,7 +2127,7 @@ som sitter bakom bordet.
 **Gänget följer omgången** (rum-3d.js, med läget från `gangTv` i rum.js):
 
 - **Den som inte har lämnat in** en öppen omgång sitter med kupongen och pennan i stället
-  för flaskan, burken och cigaretten, tuggar på pennan, sneglar på ölen och vänder på
+  för flaskan och cigaretten, tuggar på pennan, sneglar på ölen och vänder på
   kupongen. Från ett dygn före spelstoppet tittar de som har lämnat in på hen en stund i
   taget, oftare ju närmare spelstoppet det är. Den sista timmen vänder de sig mot hen
   samtidigt, och då tittar hen upp från kupongen.
@@ -2133,9 +2138,9 @@ som sitter bakom bordet.
   med vändningen mot tv:n).
 - **Vid ett mål** – när ställningen i en match har ändrats sedan rummet läste datan förra
   gången – reagerar var och en efter sitt eget tips (allas tips när de visas, annars
-  gängets kupong). Den som fick rätt lyfter flaskan (DL), näven (DT) eller burken (DJ)
+  gängets kupong). Den som fick rätt lyfter flaskan (DL, DJ) eller näven (DT)
   snett uppåt, lutar sig bakåt och studsar lite. Den som tappade raden sjunker ihop med
-  handen över ögonen (DL, DT) eller burken mot pannan (DJ). Den som inte påverkades nickar.
+  handen över ögonen (DL, DT) eller flaskan mot pannan (DJ). Den som inte påverkades nickar.
   Dolda resultat ger inga reaktioner, och när rummet öppnas räknas inga gamla mål.
   Var och en reagerar på ett av tre sätt, olika från mål till mål (`malV` i rum-3d.js):
   som ovan, med båda armarna i luften (rätt) eller båda händerna på huvudet och blicken i
@@ -2163,13 +2168,13 @@ samtidigt), utan att de vanliga looparna (klunken, blosset, pratet) är i vägen
 påhitt och hur ofta beror på humöret (`MENY`):
 
 - **Som vanligt** (ungefär fyra luckor av tio): sträcker på sig och gäspar, kliar sig i
-  bakhuvudet, trummar med fingrarna på bordet, tittar ner i den tomma flaskan eller burken,
+  bakhuvudet, trummar med fingrarna på bordet, tittar ner i den tomma flaskan,
   vilar hakan i handen.
 - **Glad** (tre av fyra luckor): lutar sig bakåt med handen i nacken, gungar i takt med
   ölen i luften, sträcker på sig. Ibland gör gänget något tillsammans (var 31:a sekund,
   ungefär varannan gång): skålar över bordet och tar en klunk (DT ett bloss), eller gungar
   i takt allihop som på läktaren.
-- **Nervös:** biter på naglarna, knäpper händerna framför munnen (om flaskan eller burken)
+- **Nervös:** biter på naglarna, knäpper händerna framför munnen (om flaskan)
   och gungar fram och tillbaka, trummar med fingrarna, kliar sig i bakhuvudet.
 - **Deppig:** hakan i handen, skakar på huvudet och suckar, armarna i kors med blicken bort
   från bordet, tittar ner i flaskan – och DJ lägger pannan i bordet några gånger.
@@ -2193,7 +2198,7 @@ håller reda på vilka som är inne och vad de pekar på och skickar det till al
 ändras. Inget sparas, sidan skickar högst var 150:e millisekund, och den stänger
 websocketen när fliken döljs. Adressen är `rummet` i config/kupong.js (`samtal.rummet` i
 data/kuponger.json); utan den gör bara din egen figur det. Pekar man på någon i gänget
-tittar hen på en och skålar: lyfter flaskan (DL), burken (DJ) eller cigaretten (DT) mot en
+tittar hen på en och skålar: lyfter flaskan (DL, DJ) eller cigaretten (DT) mot en
 och nickar, och tittar kvar tills man slutar peka. I telefonen gör ett tryck på figuren
 samma sak en stund. Den som väntar på kupongen tittar bara, och ett klick på en figur går
 inte vidare till det som står bakom.
@@ -2212,7 +2217,7 @@ för att tecknet ska synas i rummet. Den byggs först när den behövs och ritas
 tecknet pågår, drygt två sekunder. Medan man väntar är det handen med pennan, och pennan går
 bakom örat så länge; annars är det den lediga handen, och DJ:s cigarett ligger på bordet så
 länge. Ett klick till medan det pågår byter tecken utan hopp. Figuren tittar på en,
-påhitten vilar, och flaskan eller burken skålar som förut när man pekar. Den som sover
+påhitten vilar, och flaskan skålar som förut när man pekar. Den som sover
 vaknar inte, men tummen kommer upp. Med minskad rörelse står tecknet som en bild en stund.
 I telefonen glider rummet så att den man tryckte på hamnar mitt i bild om hen stod långt ut
 (`visa` i rum.js), annars kunde handen hamna utanför.

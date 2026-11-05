@@ -1,12 +1,12 @@
 // Gänget i tobaksaffären (rum.js): DL, DT och DJ som leksaksfigurer i
 // three.js. De sitter på barstolar runt barbordet framför fönstret med benen
-// hängande, dricker öl ur en flaska och en burk utan märken (julöl och påsköl
+// hängande, dricker Pripps Blå ur 90-talets flaskor (julöl och påsköl
 // i sin tid), röker (glöden och röken som stiger) och pratar med händerna, i
 // lugna loopar. Huvudena nickar efter musen.
 // De byter plats vid bordet var tredje dag (PLATSER, placering): var och en
 // får sin tur bakom bordet och på var sida, efter dagen i Stockholm, så att
 // alla ser samma sak och ingen flyttar sig medan sidan är öppen. Den som
-// hamnar på andra sidan byter hand (sitt): flaskan, burken och cigaretten är i
+// hamnar på andra sidan byter hand (sitt): flaskan och cigaretten är i
 // handen mot bordet, och kupongen, pennan, lejonet och målen följer med.
 // Figurerna är tobak-a7 v2: ansiktena (rum/ansikte-*.svg, ritade av
 // ansikten.py), skulpterat hår, riktiga händer, kläddetaljer och blank vinyl,
@@ -19,11 +19,11 @@
 // föddes.
 //
 // Den som inte har lämnat in en öppen omgång sitter med kupongen och pennan i
-// stället för flaskan, burken och cigaretten, som står på bordet. Fem saker
+// stället för flaskan och cigaretten, som står på bordet. Fem saker
 // turas om (vanta.ordning): tuggar på pennan och kliar sig bakom örat med den,
 // sneglar på ölen, otåliga ben, kikar ner mot pulten och håller upp kupongen
 // mot lysröret och vänder på den. När kupongen är inne sätts pennan bakom
-// örat, kupongen läggs upp och ner på bordet och handen tar flaskan, burken
+// örat, kupongen läggs upp och ner på bordet och handen tar flaskan
 // eller cigaretten – först ett bloss eller en lång klunk, sedan de vanliga
 // looparna.
 //
@@ -43,7 +43,7 @@
 //
 // När matcherna pågår vänder de sig mot tv:n (och tittar bort ibland). Vid
 // ett mål reagerar var och en efter sitt eget tips: den som fick rätt lyfter
-// flaskan, burken eller näven, den som tappade raden tar sig för pannan och
+// flaskan eller näven, den som tappade raden tar sig för pannan och
 // sjunker ihop, och den som inte påverkades nickar bara – eller (malV) med
 // båda armarna i luften, båda händerna på huvudet eller handen i bordet.
 //
@@ -108,10 +108,10 @@ const BORD = { x: -186, z: 250, r: 118, y: 32 };
 const KOPP = { x: -88, z: 30, r: 11 };
 // Platserna runt bordet – till vänster, bakom och till höger: var barstolen
 // står (x, z) och hur den är vriden in mot bordet (turn), armen mot bordet
-// (inre; bakom vilar båda på bordet, och arm 0 har flaskan, burken eller
+// (inre; bakom vilar båda på bordet, och arm 0 har flaskan eller
 // cigaretten) och armen som håller kupongen medan man väntar (kupong; pennan
 // i den andra). På bordet, i stolens axlar (x åt figurens vänster, z framåt):
-// flaskan eller burken (sak), askkoppen (aska), cigaretten som ligger där
+// flaskan (sak), askkoppen (aska), cigaretten som ligger där
 // medan man väntar (cigg), kupongen när den är inne (lagg: x, z, vridning),
 // handen som vilar på bordet (vila) och DT:s extraflaska (flaska); tomma: DJ:s
 // tomflaskor på fönsterbänken (x och z i rummet och vinkeln, 0 = står) – bakom
@@ -180,7 +180,7 @@ const LAG = {
 // sakerna kommer (förskjutna med fas, så att ingen gör samma sak som någon
 // annan samtidigt).
 // mal: handen som lyfts vid ett mål (jubel) och den som tas mot pannan (panna;
-// DJ trycker burken mot pannan), efter vad den gör.
+// DJ trycker flaskan mot pannan), efter vad den gör.
 const FIGS = [
   { key: 'dl', tilt: -4, legs: 74, torso: 86, w: 50, depth: 30, neck: 12, neckR: 17, arm: 8.5, leg: 9, a: 42, b: 36,
     head: { rx: 56.7, ry: 70.65, rz: 54, hw: 63, hh: 78.5, cy: -5.5, taper: 0.06, noseY: 19, nose: [8, 7.6, 7.2], cheek: 0.08, ear: [0.15, 0.21, 0.16, 0.5] }, glasses: 0,
@@ -197,9 +197,9 @@ const FIGS = [
   { key: 'dj', tilt: -2, legs: 104, torso: 100, w: 42, depth: 24, neck: 18, neckR: 13, arm: 7, leg: 8, a: 48, b: 44,
     head: { rx: 49, ry: 75, rz: 50, hw: 54, hh: 84, cy: -6, taper: 0.22, noseY: 18, nose: [5.8, 9, 7.2], noseRot: -0.3 }, glasses: 36,
     hair: { style: 'svep', sw: 28, f: 50, s: 82, b: 140, temple: 5, vol: 0.1, lift: 7, back: 2, n: 18, fine: 4, fineW: 0.3, g: 0.075, dark: 0.4, wob: 0.4, tip: 6, tipAt: 'bak', edge: 0.7, sideCut: 0.45, quiff: { dir: [-0.3, 0.62, 0.72], h: 0.13, w: 0.42 }, gr: 1.07 },
-    mossa: { f: 56, s: 76, b: 104, text: ['BLÅ', 'VITT'] }, beard: [1.024, -2], does: ['burk', 'prat'],
+    mossa: { f: 56, s: 76, b: 104, text: ['BLÅ', 'VITT'] }, beard: [1.024, -2], does: ['flaska', 'prat'],
     vanta: { fot: 0, ordning: [4, 2, 0, 3, 1], fas: 5 },
-    mal: { jubel: 'burk', panna: 'burk' } },
+    mal: { jubel: 'flaska', panna: 'flaska' } },
 ];
 
 // Figuren F på platsen P: armarna efter sidan (does, vanta.penna/kupong,
@@ -984,49 +984,161 @@ export async function figurer(canvas, opt = {}) {
     return at(m.f * DEG - ch / (P.ry * 0.9) - 0.12, 0, 1.14);
   }
 
-  // ---------- sakerna: flaskan, burken, cigaretten, askkoppen ----------
+  // ---------- sakerna: flaskan, cigaretten, askkoppen ----------
 
-  // julöl från första advent till tjugondag Knut och påsköl i påskveckan
-  // (ol i rum-fika.js), annars PILSNER och ÖL
+  // Gängets öl är Pripps Blå i 90-talets returflaska: grönt glas, marinblå
+  // folie runt halsen, ett silverband snett över axeln och en silveretikett
+  // med skeppet i en oval mellan två lejon (reklamfilmen från 1992 och flaskan
+  // SLM 31192 i Sörmlands museum). Från första advent till tjugondag Knut står
+  // det JULÖL och i påskveckan PÅSKÖL på samma flaska (ol i rum-fika.js).
+  // Allt tryck ligger på en duk och alla flaskor delar geometrierna, så att en
+  // flaska kostar två ritanrop.
   const OL = ol(opt.vader);
-  const labelTex = canvasTex(512, 128, (g, w, h) => {
-    g.fillStyle = '#efe3c2'; g.fillRect(0, 0, w, h);
-    g.fillStyle = { jul: '#2f5a34', pask: '#d9a21f' }[OL] || '#b8312a'; g.fillRect(0, 18, w, 16); g.fillRect(0, h - 30, w, 10);
-    g.fillStyle = '#2a2014'; g.font = '700 46px Fraunces, Georgia, serif'; g.textAlign = 'center'; g.textBaseline = 'middle';
-    for (const x of [w * 0.25, w * 0.75]) g.fillText({ jul: 'JULÖL', pask: 'PÅSKÖL' }[OL] || 'PILSNER', x, 70);
-  });
-  const canTex = canvasTex(512, 256, (g, w, h) => {
-    const mid = { jul: '#8a1d1f', pask: '#2e6a3c' }[OL] || '#1f3f7a';
-    const gr = g.createLinearGradient(0, 0, 0, h); gr.addColorStop(0, '#d9dde2'); gr.addColorStop(0.18, mid); gr.addColorStop(0.82, mid); gr.addColorStop(1, '#c9cdd2');
-    g.fillStyle = gr; g.fillRect(0, 0, w, h);
-    g.fillStyle = OL === 'pask' ? '#f0c93a' : '#e3b84a'; g.fillRect(0, h * 0.62, w, 10);
-    g.fillStyle = '#f3ead9'; g.font = `800 ${OL ? 60 : 92}px Fraunces, Georgia, serif`; g.textAlign = 'center'; g.textBaseline = 'middle';
-    for (const x of [w * 0.25, w * 0.75]) g.fillText({ jul: 'JULÖL', pask: 'PÅSKÖL' }[OL] || 'ÖL', x, h * 0.43);
-  });
-  const glass = new THREE.MeshPhysicalMaterial({ color: '#4a2408', roughness: 0.08, clearcoat: 1, clearcoatRoughness: 0.04, transparent: true, opacity: 0.88, envMapIntensity: 1.2 });
+  const FLASKA = [[0, -24], [6.9, -24], [7.4, -23.4], [7.6, -22.4], [7.6, -0.3], [7.35, 2], [5.9, 7.5], [4.2, 11.9], [3.1, 15], [2.85, 17], [2.8, 23], [3.25, 23.4], [3.4, 24.5], [3.3, 26], [2.9, 26.4], [2.1, 26.4], [1.9, 23], [0, 23]];
+  const flaskRadie = (y) => {
+    for (let i = 5; i < 11; i++) {
+      const [r0, y0] = FLASKA[i - 1]; const [r1, y1] = FLASKA[i];
+      if (y <= y1) return r0 + (r1 - r0) * Math.max(0, (y - y0) / (y1 - y0));
+    }
+    return FLASKA[10][0];
+  };
+  // duken uppifrån: etiketten (y 0–276), axelbandet och halsfolien
+  const FD = { w: 768, h: 352, etikett: [0, 276], axel: [282, 322], hals: [328, 352] };
+  const ritaFolie = (g, w, h) => {
+    const TAU = Math.PI * 2;
+    const NAVY = '#12306e'; const GULD = '#c79f35'; const ROD = '#b3202a';
+    const band = { jul: '#8a1d1f', pask: '#2e6a3c' }[OL] || '#1b47a0';
+    const folie = { jul: '#8a1d1f', pask: '#2e6a3c' }[OL] || NAVY;
+    const ord = { jul: 'JULÖL', pask: 'PÅSKÖL' }[OL] || 'BLÅ';
+    g.setTransform(1, 0, 0, 1, 0, 0);
+    const silver = g.createLinearGradient(0, 0, 0, FD.etikett[1]);
+    silver.addColorStop(0, '#e9ecef'); silver.addColorStop(0.5, '#c6ccd2'); silver.addColorStop(1, '#e2e5e9');
+    g.fillStyle = silver; g.fillRect(0, 0, w, h);
+    const H = FD.etikett[1];
+    g.fillStyle = folie; g.fillRect(0, 0, w, 6); g.fillRect(0, H - 6, w, 6);
+    g.fillStyle = GULD; g.fillRect(0, 8, w, 3); g.fillRect(0, H - 11, w, 3);
+    const lejon = (x, y, m) => {
+      g.save(); g.translate(x, y); g.scale(m, 1);
+      g.lineCap = 'round'; g.lineJoin = 'round';
+      for (const [c, e] of [['#6f5210', 3], [GULD, 0]]) {
+        g.strokeStyle = g.fillStyle = c;
+        const linje = (b, ...p) => { g.lineWidth = b + e; g.beginPath(); g.moveTo(p[0], p[1]); for (let i = 2; i < p.length; i += 2) g.lineTo(p[i], p[i + 1]); g.stroke(); };
+        // kroppen, manen, frambenen mot ovalen, bakbenen och svansen
+        g.lineWidth = e; g.beginPath(); g.ellipse(-3, 7, 11 + e / 2, 23 + e / 2, 0.32, 0, TAU); g.fill();
+        g.beginPath(); for (let i = 0; i < 12; i++) { const a = i * TAU / 12; const r = (i % 2 ? 18 : 14) + e / 2; g.lineTo(7 + r * Math.cos(a), -22 + r * Math.sin(a)); } g.closePath(); g.fill();
+        linje(6, 6, -6, 26, -14, 31, -8);
+        linje(6, 6, 2, 25, 6, 31, 2);
+        linje(8, -9, 25, 4, 36, 11, 42);
+        linje(8, -11, 26, -14, 41, -6, 47);
+        g.lineWidth = 4 + e; g.beginPath(); g.moveTo(-11, 24); g.bezierCurveTo(-36, 26, -36, 0, -26, -10); g.stroke();
+        g.beginPath(); g.arc(-25, -13, 5 + e / 2, 0, TAU); g.fill();
+      }
+      g.fillStyle = '#6f5210'; g.beginPath(); g.arc(11, -24, 1.6, 0, TAU); g.fill();
+      g.restore();
+    };
+    const segel = (x, y, b, s) => {
+      g.beginPath(); g.moveTo(x - b, y); g.quadraticCurveTo(x, y + s * 0.2, x + b, y);
+      g.quadraticCurveTo(x + b * 1.3, y + s * 0.55, x + b * 1.05, y + s); g.quadraticCurveTo(x, y + s * 0.78, x - b * 1.05, y + s);
+      g.quadraticCurveTo(x - b * 1.3, y + s * 0.55, x - b, y); g.fill();
+    };
+    for (const cx of [w * 0.25, w * 0.75]) {
+      // den röda bågen överst, namnet
+      g.fillStyle = ROD; g.beginPath(); g.moveTo(cx - 72, 39); g.quadraticCurveTo(cx, -4, cx + 72, 39); g.closePath(); g.fill();
+      g.strokeStyle = GULD; g.lineWidth = 2.5; g.stroke();
+      g.textAlign = 'center'; g.textBaseline = 'alphabetic';
+      g.fillStyle = NAVY; g.font = '800 42px Fraunces, Georgia, serif';
+      if ('letterSpacing' in g) g.letterSpacing = '3px';
+      g.fillText('PRIPPS', cx, 78);
+      if ('letterSpacing' in g) g.letterSpacing = '0px';
+      // lejonen och ovalen med skeppet
+      lejon(cx - 92, 128, 1); lejon(cx + 92, 128, -1);
+      const CY = 130;
+      g.save();
+      g.beginPath(); g.ellipse(cx, CY, 54, 46, 0, 0, TAU); g.fillStyle = NAVY; g.fill();
+      g.clip();
+      g.fillStyle = '#ffffff'; g.strokeStyle = '#ffffff'; g.lineWidth = 1.6;
+      for (const [mx, t, b0] of [[-21, -33, 10], [2, -39, 12], [25, -31, 9]]) {
+        g.beginPath(); g.moveTo(cx + mx, CY + t); g.lineTo(cx + mx, CY + 12); g.stroke();
+        segel(cx + mx, CY + t + 4, b0 * 0.62, 10);
+        segel(cx + mx, CY + t + 15, b0 * 0.82, 11);
+        segel(cx + mx, CY + t + 27, b0, 12);
+      }
+      g.fillStyle = GULD;
+      g.beginPath(); g.moveTo(cx - 44, CY + 7); g.lineTo(cx - 38, CY + 24); g.quadraticCurveTo(cx, CY + 31, cx + 34, CY + 24); g.lineTo(cx + 46, CY + 9); g.lineTo(cx + 14, CY + 15); g.lineTo(cx - 26, CY + 15); g.lineTo(cx - 30, CY + 7); g.closePath(); g.fill();
+      g.strokeStyle = '#8fb6e8'; g.lineWidth = 2;
+      for (const [yy, f] of [[CY + 31, 0], [CY + 38, 7]]) { g.beginPath(); for (let x = -60 + f; x < 60; x += 14) { g.moveTo(cx + x, yy); g.quadraticCurveTo(cx + x + 7, yy - 5, cx + x + 14, yy); } g.stroke(); }
+      g.restore();
+      g.strokeStyle = GULD; g.lineWidth = 3; g.beginPath(); g.ellipse(cx, CY, 54, 46, 0, 0, TAU); g.stroke();
+      // bandet med BLÅ
+      g.fillStyle = band;
+      g.beginPath(); g.moveTo(cx - 96, 180); g.lineTo(cx + 96, 180); g.lineTo(cx + 84, 203); g.lineTo(cx + 96, 228); g.lineTo(cx - 96, 228); g.lineTo(cx - 84, 203); g.closePath(); g.fill();
+      g.strokeStyle = GULD; g.lineWidth = 2.5; g.stroke();
+      g.fillStyle = '#ffffff'; g.font = `800 ${ord.length > 3 ? 36 : 44}px Fraunces, Georgia, serif`; g.textBaseline = 'middle';
+      g.fillText(ord, cx, 205);
+      g.fillStyle = NAVY; g.font = '700 16px Fraunces, Georgia, serif'; g.textBaseline = 'alphabetic';
+      g.fillText('KLASS I  ·  ANNO 1828', cx, 253);
+    }
+    // axelbandet: bokstäverna breddas, duken har fler punkter på längden
+    const [a0, a1] = FD.axel;
+    g.fillStyle = '#d7dbe0'; g.fillRect(0, a0, w, a1 - a0);
+    g.fillStyle = folie; g.fillRect(0, a0, w, 4); g.fillRect(0, a1 - 4, w, 4);
+    g.fillStyle = NAVY; g.font = '800 22px Fraunces, Georgia, serif'; g.textAlign = 'center'; g.textBaseline = 'middle';
+    const namn = `PRIPPS ${ord}`;
+    for (let i = 0; i < 3; i++) {
+      g.save(); g.translate((i + 0.5) * w / 3, (a0 + a1) / 2 + 1); g.scale(1.75, 1); g.fillText(namn, 0, 0); g.restore();
+    }
+    // halsfolien med en guldkant upptill och nedtill
+    const [h0, h1] = FD.hals;
+    g.fillStyle = folie; g.fillRect(0, h0, w, h1 - h0);
+    g.fillStyle = GULD; g.fillRect(0, h0, w, 2); g.fillRect(0, h1 - 2, w, 2);
+  };
+  const folieTex = canvasTex(FD.w, FD.h, ritaFolie);
+  const flaskGeo = new THREE.LatheGeometry(FLASKA.map(([x, y]) => new THREE.Vector2(x, y)), 24);
+  // en yta runt flaskan: rad(v, u) ger y för raden v (0–1 uppifrån) och r ger radien
+  const folieGeo = (() => {
+    const pos = []; const uv = []; const ix = [];
+    const yta = (rader, y, r, [p0, p1]) => {
+      const n = 24; const b = pos.length / 3;
+      for (let j = 0; j <= rader; j++) for (let i = 0; i <= n; i++) {
+        const u = i / n; const v = j / rader; const a = (u - 0.25) * Math.PI * 2;
+        const yy = y(v, a); const rr = r(yy);
+        pos.push(rr * Math.sin(a), yy, rr * Math.cos(a));
+        uv.push(u, 1 - (p0 + (p1 - p0) * v) / FD.h);
+      }
+      for (let j = 0; j < rader; j++) for (let i = 0; i < n; i++) {
+        const A = b + j * (n + 1) + i; const B = A + n + 1;
+        ix.push(A, B, A + 1, B, B + 1, A + 1);
+      }
+    };
+    yta(1, (v) => -2.8 - 17.4 * v, () => 7.72, FD.etikett);
+    yta(2, (v, a) => 10.4 - 3.2 * v + 1.9 * Math.sin(a + 0.5), (y) => flaskRadie(y) + 0.1, FD.axel);
+    yta(3, (v) => 23.1 - 11.3 * v, (y) => flaskRadie(y) + 0.07, FD.hals);
+    const g = new THREE.BufferGeometry();
+    g.setAttribute('position', new THREE.Float32BufferAttribute(pos, 3));
+    g.setAttribute('uv', new THREE.Float32BufferAttribute(uv, 2));
+    g.setIndex(ix);
+    g.computeVertexNormals();
+    return g;
+  })();
+  const folieMat = mat('#ffffff', { map: folieTex, metalness: 0.55, roughness: 0.34, clearcoat: 0.4, envMapIntensity: 1 });
+  const glass = new THREE.MeshPhysicalMaterial({ color: '#143a18', roughness: 0.08, clearcoat: 1, clearcoatRoughness: 0.04, transparent: true, opacity: 0.88, envMapIntensity: 1.2 });
   function bottle(parent) {
     const g = new THREE.Group();
     parent.add(g);
-    const prof = [[0, -24], [7.2, -24], [7.6, -22], [7.6, 6], [7, 9], [3.4, 15], [2.8, 23], [3.2, 24], [3.2, 26], [2.4, 26.4], [0, 26.4]].map(([x, y]) => new THREE.Vector2(x, y));
-    mesh(new THREE.LatheGeometry(prof, 32), glass, g);
-    const lb = mesh(new THREE.CylinderGeometry(7.75, 7.75, 14, 32, 1, true), mat('#ffffff', { map: labelTex, roughness: 0.5, clearcoat: 0.3 }), g);
-    lb.position.y = -9;
+    mesh(flaskGeo, glass, g);
+    g.userData.folie = mesh(folieGeo, folieMat, g);
     g.userData.top = 26;
     g.userData.bottom = -24;
     return g;
   }
-  function can(parent) {
-    const g = new THREE.Group();
-    parent.add(g);
-    const alu = mat('#c9cdd2', { metalness: 0.9, roughness: 0.25, envMapIntensity: 1 });
-    const body = mesh(new THREE.CylinderGeometry(7.4, 7.4, 30, 36, 1, true), mat('#ffffff', { map: canTex, metalness: 0.55, roughness: 0.28, clearcoat: 0.6, envMapIntensity: 1 }), g);
-    body.position.y = 0;
-    const top = mesh(new THREE.CylinderGeometry(6.2, 7.4, 2.6, 36), alu, g); top.position.y = 16.3;
-    const bot = mesh(new THREE.CylinderGeometry(7.4, 6.4, 2.4, 36), alu, g); bot.position.y = -16.2;
-    g.userData.top = 17.6;
-    g.userData.bottom = -17.4;
-    return g;
-  }
+  // en flaska som står stilla vänder etiketten mot rummet, ungefär: figurens och
+  // flaskans vridning ska inte gömma skeppet i kanten
+  const framsida = (b, fig) => {
+    const q = new THREE.Quaternion().setFromEuler(fig.rotation).multiply(b.quaternion);
+    const x = new THREE.Vector3(1, 0, 0).applyQuaternion(q);
+    const z = new THREE.Vector3(0, 0, 1).applyQuaternion(q);
+    b.userData.folie.rotation.y = Math.atan2(x.z, z.z) + 0.22 * Math.sin(b.position.x * 1.7 + b.position.z);
+  };
   const ember = new THREE.MeshBasicMaterial({ color: '#ff6a24' });
   const glowTex = canvasTex(64, 64, (g) => { const gr = g.createRadialGradient(32, 32, 0, 32, 32, 32); gr.addColorStop(0, 'rgba(255,180,90,1)'); gr.addColorStop(0.4, 'rgba(255,90,30,.5)'); gr.addColorStop(1, 'rgba(255,60,20,0)'); g.fillStyle = gr; g.fillRect(0, 0, 64, 64); });
   // cigaretten längs x: filtret vid −x, glöden vid +x
@@ -1104,7 +1216,7 @@ export async function figurer(canvas, opt = {}) {
 
   // ---------- händerna ----------
   // Byggda i handens egna axlar och placerade varje bild:
-  //   grepp: fingrarna runt något längs y (flaskan, burken), handryggen mot +z;
+  //   grepp: fingrarna runt något längs y (flaskan), handryggen mot +z;
   //   nyp:   vante med fingrarna längs +y och cigaretten i topparna, längs x;
   //   vila:  vante som vilar, fingrarna längs +y, handflatan mot −z.
   function hand(kind, q, skin, parent, r0 = 7.6) {
@@ -1282,6 +1394,7 @@ export async function figurer(canvas, opt = {}) {
   }
   await document.fonts.ready;
   await Promise.all([
+    document.fonts.load('800 42px Fraunces').catch(() => {}),
     ...['dl', 'dt', 'dj'].map(async (k) => { tex[k] = await imgTex(`rum/ansikte-${k}.svg`); }),
     // ansiktena med ögonen stängda (blinkar, och DJ när han sover), som en
     // blob-adress som släpps när bilden är ritad
@@ -1294,8 +1407,8 @@ export async function figurer(canvas, opt = {}) {
     imgTex('rum/skagg-dj.svg').then((t) => { tex.dj_skagg = t; }),
     ...Object.entries(LAG).filter(([, c]) => c.skold).map(([k, c]) => loadImg(c.skold).then((i) => { skold[k] = trim(i); }, () => {})),
   ]);
-  labelTex.needsUpdate = true;
-  canTex.needsUpdate = true;
+  ritaFolie(folieTex.image.getContext('2d'), FD.w, FD.h);
+  folieTex.needsUpdate = true;
   kupTex.fram = canvasTex(260, 180, (g, w, h) => drawCoupon(g, w, h, false));
   kupTex.bak = canvasTex(260, 180, (g, w, h) => drawCoupon(g, w, h, true));
 
@@ -1499,6 +1612,7 @@ export async function figurer(canvas, opt = {}) {
       if (o.extra) {
         o.extra.rotation.set(0, 0, 0);
         o.extra.position.set(F.plats.flaska[0], BORD.y + 24.4, F.plats.flaska[1]);
+        framsida(o.extra, o.fig);
       }
       return;
     }
@@ -1507,6 +1621,7 @@ export async function figurer(canvas, opt = {}) {
     const ut = Math.atan2(fx, fz);
     o.extra.rotation.set(0, ut + Math.PI / 2, Math.PI / 2 + 0.1);
     o.extra.position.set(fx, BORD.y + 7.7, fz);
+    framsida(o.extra, o.fig);
     const hals = new THREE.Vector3(Math.sin(ut), 0, Math.cos(ut));
     const pol = new THREE.Mesh(new THREE.CircleGeometry(1, 40), polMat);
     pol.rotation.set(-Math.PI / 2, 0, ut - Math.PI / 2);
@@ -2008,9 +2123,9 @@ export async function figurer(canvas, opt = {}) {
       // dunjackans kanaler runt ärmarna
       if (J && J.tyg === 'dun' && sleeve !== 'kort') A.quilt = [[0, 0.38, rU], [0, 0.72, rU], ...(A.loS ? [[1, 0.32, rL], [1, 0.62, rL]] : [])].map(([seg, f, r]) => ({ seg, f, x: ring([0, 0, 0], [0, 1, 0], r * 0.98, 1.2 + 0.2 * tk, sm, fig) }));
       const q = F.arm;
-      if (kind === 'flaska' || kind === 'burk') {
-        A.hand = hand('grepp', q, skin, fig, kind === 'burk' ? 7.4 : 7.6);
-        A.thing = kind === 'burk' ? can(A.hand) : bottle(A.hand);
+      if (kind === 'flaska') {
+        A.hand = hand('grepp', q, skin, fig, 7.6);
+        A.thing = bottle(A.hand);
       } else if (kind === 'cigg' || kind === 'prat') {
         A.hand = hand('nyp', q, skin, fig);
         A.cig = cigarette(A.hand);
@@ -2033,6 +2148,7 @@ export async function figurer(canvas, opt = {}) {
     if (F.key === 'dt') {
       const b2 = bottle(fig);
       b2.position.set(Pl.flaska[0], BORD.y + 24.4, Pl.flaska[1]);
+      framsida(b2, fig);
       extra = b2;
       const tray = new THREE.Group();
       aska = tray;
@@ -2052,11 +2168,12 @@ export async function figurer(canvas, opt = {}) {
         const e = bottle(fig);
         e.rotation.z = tilt;
         e.position.set(x - F.x, tilt ? 7.6 : 24.4, z - F.z).applyAxisAngle(UP, -F.turn * DEG);
+        framsida(e, fig);
       }
     }
 
     // väntan på kupongen: pennan nyps som cigaretten, kupongen hålls i en
-    // vilande hand; flaskan, burken och cigaretten (släckt) står bredvid
+    // vilande hand; flaskan och cigaretten (släckt) står bredvid
     const V = F.vanta;
     const pen = arms[V.penna];
     const kp = arms[V.kupong];
@@ -2075,10 +2192,13 @@ export async function figurer(canvas, opt = {}) {
           .decompose(A.kup.position, A.kup.quaternion, A.kup.scale);
       }
       if (A.thing) {
-        A.bench = A.kind === 'burk' ? can(fig) : bottle(fig);
+        A.bench = bottle(fig);
         A.bench.position.set(Pl.sak[0], BORD.y + 0.4 - A.thing.userData.bottom, Pl.sak[1]);
         // handryggen utåt när den tas
         A.bench.rotation.y = A.s * Math.PI / 4;
+        // samma etikett när handen tar den
+        framsida(A.bench, fig);
+        A.thing.userData.folie.rotation.y = A.bench.userData.folie.rotation.y;
       }
       if (A.cig) {
         A.bench = cigarette(fig);
@@ -2376,7 +2496,7 @@ export async function figurer(canvas, opt = {}) {
   const pekW = (o, t) => { const x = PK[o.F.key]; return x ? x.w0 + ((x.on ? 1 : 0) - x.w0) * sm(x.wAt, x.wAt + 0.5, t) : 0; };
   // den som sover vaknar inte
   const hejW = (o, t) => { const h = HEJ[o.F.key]; return h ? sm(h.at, h.at + 0.35, t) * (1 - sm(h.ut, h.ut + 0.6, t)) * (1 - sovW(o, t)) : 0; };
-  // flaskan, burken eller cigaretten lyfts en stund (inte medan man väntar)
+  // flaskan eller cigaretten lyfts en stund (inte medan man väntar)
   const skalW = (o, t) => { const h = HEJ[o.F.key]; return h ? bump(t - h.at, 0.15, 0.7, 2.4, 3.2) * (1 - sm(h.ut, h.ut + 0.5, t)) * ready(o, t) * (1 - sovW(o, t)) : 0; };
   // N: natten (lysröret släckt), som tonar in och ut på 2,5 sekunder
   const N = { on: false, at: -1e9, fran: 0 };
@@ -2402,7 +2522,7 @@ export async function figurer(canvas, opt = {}) {
   // ---------- väntan på kupongen ----------
   // o.inneAt: när kupongen lämnades in (Infinity = väntar, −1e9 = inne sedan
   // länge). u = 0 → 1 är övergången: pennan bakom örat (u 0,28), kupongen på
-  // bordet (0,3), flaskan, burken eller cigaretten i handen (0,55),
+  // bordet (0,3), flaskan eller cigaretten i handen (0,55),
   // som vanligt (0,82) och strax därpå det första blosset eller klunken.
   const TR = 4.4;
   const SLOT = 7.5;
@@ -2631,7 +2751,7 @@ export async function figurer(canvas, opt = {}) {
     if (A.bench && u < 0.82) return lerpPose(next, handDone(o, A, t), sm(0.55, 0.82, u));
     return handDone(o, A, t);
   }
-  // Vid ett mål: flaskan, burken eller näven upp, handen eller burken mot
+  // Vid ett mål: flaskan eller näven upp, handen eller flaskan mot
   // pannan – från det man gjorde, och tillbaka.
   function handDone(o, A, t) {
     let base = handRest(o, A, t);
@@ -2661,7 +2781,7 @@ export async function figurer(canvas, opt = {}) {
     return base;
   }
   // Armen snett uppåt, utåt och lite framåt (huvudena är stora: rakt upp når
-  // den inte över dem) och skakar lite: flaskan och burken upprätta, näven
+  // den inte över dem) och skakar lite: flaskan upprätt, näven
   // med underarmen – p är handleden för näven (pose).
   function cheerPose(o, A, t) {
     const s = A.s;
@@ -2675,7 +2795,7 @@ export async function figurer(canvas, opt = {}) {
     const n = o.F.a + o.F.b;
     return { p: S0.add(new THREE.Vector3(s * n * 0.42, n * 0.62 + shake, n * 0.1)), y: new THREE.Vector3(s * 0.2, 0.1, 1), z: new THREE.Vector3(-s * 0.45, -0.9, 0), pole: new THREE.Vector3(s, -0.6, -0.3) };
   }
-  // Skålen: flaskan eller burken (DT cigaretten) lyfts fram mot den som
+  // Skålen: flaskan (DT cigaretten) lyfts fram mot den som
   // pekar på en, med en liten stöt framåt när man nickar.
   const skalArm = (o) => o.arms.find((A) => A.thing) || o.arms.find((A) => A.kind === 'cigg');
   function skalPose(o, A, t) {
@@ -2707,7 +2827,7 @@ export async function figurer(canvas, opt = {}) {
     const p = mot.clone().multiplyScalar(kant + SOV.fram).addScaledVector(tvar, s * SOV.sid).add(new THREE.Vector3(0, BORD.y + 3 + (s > 0 ? SOV.lyft : 0), 0));
     return { p, y: tvar.clone().multiplyScalar(-s).addScaledVector(mot, 0.25), z: new THREE.Vector3(0, 1, 0), pole: new THREE.Vector3(s, -0.2, -0.3) };
   }
-  // Handflatan över ögonen och pannan – eller den kalla burken mot pannan.
+  // Handflatan över ögonen och pannan – eller den kalla flaskan mot pannan.
   function palmPose(o, A, t) {
     const s = A.s;
     const P = o.F.head;
@@ -2715,12 +2835,12 @@ export async function figurer(canvas, opt = {}) {
     const Mh = o.torso.matrix.clone().multiply(o.hg.matrix).multiply(o.hc.matrix);
     const dir = (x, y, z) => new THREE.Vector3(x, y, z).transformDirection(Mh);
     if (A.thing) {
-      const r = 7.4;
+      const r = 7.6;
       return { p: inHead(o, new THREE.Vector3(s * P.rx * 0.12, P.ry * 0.12, P.rz * 0.96 + r + 1)), y: dir(0, 1, 0.15), z: dir(s * 0.7, -0.5, 0.5), pole: new THREE.Vector3(s, -0.7, 0.2) };
     }
     return { p: inHead(o, new THREE.Vector3(s * P.rx * 0.14, -P.ry * 0.3, P.rz * 0.96 + o.F.arm * 1.1)), y: dir(-s * 0.25, 1, -0.12), z: dir(0, 0, 1), pole: new THREE.Vector3(s, -0.7, 0.3) };
   }
-  // Flaskan eller burken vid munnen, lutad mer ju längre in i klunken (w).
+  // Flaskan vid munnen, lutad mer ju längre in i klunken (w).
   function supAt(o, A, t, w) {
     const s = A.s;
     const top = A.thing.userData.top;
@@ -2747,7 +2867,7 @@ export async function figurer(canvas, opt = {}) {
     const Wd = o.F.w;
     const th = o.thigh;
     const y0 = o.hipY;
-    if (A.kind === 'flaska' || A.kind === 'burk') {
+    if (A.kind === 'flaska') {
       // står på bordet i handen, där den stod medan man väntade
       const rest = grip(A.bench.matrix, A.thing.matrix, new THREE.Vector3(s, -0.6, -0.6));
       const w = drinkW(o, t);
@@ -2874,7 +2994,7 @@ export async function figurer(canvas, opt = {}) {
   };
 
   // Armarna: den fria (DL:s och DT:s lediga hand, DJ:s med cigaretten) och
-  // den med flaskan, burken eller (DT) cigaretten (skalArm).
+  // den med flaskan eller (DT) cigaretten (skalArm).
   const fri = (o) => o.arms.find((A) => A.kind === 'vila' || A.kind === 'prat');
   // en punkt i bålens axlar i figurens
   const iBal = (o, v) => { o.torso.updateMatrix(); return v.clone().applyMatrix4(o.torso.matrix); };
@@ -2909,7 +3029,7 @@ export async function figurer(canvas, opt = {}) {
     p.y = BORD.y + 3 + lyft;
     return { p, y: mot.clone().addScaledVector(tvar, -A.s * 0.25).add(new THREE.Vector3(0, -0.06, 0)), z: new THREE.Vector3(0, 1, 0.05), pole: new THREE.Vector3(A.s, -0.3, -0.6) };
   }
-  // Armen upp med flaskan, burken eller den öppna handen, snett utåt.
+  // Armen upp med flaskan eller den öppna handen, snett utåt.
   function upp(o, A, x, y, z) {
     const s = A.s;
     const n = o.F.a + o.F.b;
@@ -2979,7 +3099,7 @@ export async function figurer(canvas, opt = {}) {
       },
       kropp: (o, t) => ({ lean: 0.12, pitch: 0.02, knee: [0.26 * Math.sin(t * 3.6 + o.phase), 0.26 * Math.sin(t * 3.6 + o.phase + 2.2)] }),
     },
-    // händerna knäppta framför munnen (om flaskan, burken eller cigaretten),
+    // händerna knäppta framför munnen (om flaskan eller cigaretten),
     // och gungar fram och tillbaka
     knappt: {
       len: 6.5, in: 1, ut: 1,
@@ -3021,7 +3141,7 @@ export async function figurer(canvas, opt = {}) {
       },
       kropp: (o) => ({ lean: -0.06, yaw: -o.F.inn * 0.42, pitch: -0.06 }),
     },
-    // tittar ner i flaskan eller burken, som är tom
+    // tittar ner i flaskan, som är tom
     stirrar: {
       len: 5.5, in: 1.1, ut: 1,
       hand: (o, A, t) => {
@@ -3097,7 +3217,7 @@ export async function figurer(canvas, opt = {}) {
     return h;
   }
   // båda händerna på huvudet: handflatorna mot tinningarna, armbågarna ut
-  // (flaskan och burken i handen bredvid)
+  // (flaskan i handen bredvid)
   function haret(o, A) {
     const s = A.s;
     const P = o.F.head;
@@ -3156,7 +3276,7 @@ export async function figurer(canvas, opt = {}) {
     body(o, t);
     o.torso.updateMatrix();
     // pennan i handen eller bakom örat, kupongen i handen eller på bordet,
-    // flaskan, burken och cigaretten bredvid eller i handen
+    // flaskan och cigaretten bredvid eller i handen
     const u = uOf(o, t);
     o.earPen.visible = u >= 0.28;
     o.kupBench.visible = u >= 0.3;

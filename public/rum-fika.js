@@ -5,7 +5,7 @@
 // chokladägg i folie i påskveckan och chokladbollar på chokladbollens dag
 // (11 maj). Går det dåligt med tippningen har någon redan tagit för sig:
 // locket ligger bredvid semlan, pepparkaksgubben saknar huvudet, ett ägg är
-// avskalat, det har blivit fler smulor. Gängets öl är julöl från första
+// avskalat, det har blivit fler smulor. Gängets Pripps är julöl från första
 // advent till tjugondag Knut och påsköl i påskveckan (ol, rum-3d.js).
 //
 // Samma världsaxlar som sakerna: 1 enhet ≈ 1 px i pultens plan, y uppåt från
