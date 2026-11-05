@@ -9,13 +9,18 @@ rost.egen.python) och en jobbfil:
 
 Modellen laddas en gång. Varje mening läses upp med nytt slumpfrö tills talet
 (tystnaden borträknad) har en rimlig längd för texten och Chatterbox inte har
-avbrutit med "forcing EOS token", högst `forsok` gånger. Den godkända uppläsningen
-blir mp3 med ffmpeg. En rad per mening skrivs till resultatfilen:
+avbrutit med "forcing EOS token" av någon annan orsak än token_repetition (se
+avbruten()), högst `forsok` gånger. Den godkända uppläsningen blir mp3 med ffmpeg.
+En rad per mening skrivs till resultatfilen:
 
     {"avtryck", "ok", "sek", "vantat", "forsok", "fel"}
 
-    python chatterbox.py jobb.json            som jobbet
-    python chatterbox.py jobb.json --latsas   utan modell: tonstötar (för prov)
+    python chatterbox_jobb.py jobb.json            som jobbet
+    python chatterbox_jobb.py jobb.json --latsas   utan modell: tonstötar (för prov)
+
+Skriptet får inte heta chatterbox.py. Dess mapp står först i sys.path, och då importerar
+"from chatterbox.mtl_tts import ..." skriptet självt i stället för paketet. --latsas
+importerar inte paketet, så det provet visar inte ett sådant fel.
 """
 
 import contextlib
@@ -25,6 +30,7 @@ import logging
 import math
 import os
 import random
+import re
 import subprocess
 import sys
 import tempfile
@@ -134,6 +140,21 @@ class Fangare(logging.Handler):
         self.rader.append(post.getMessage())
 
 
+def avbruten(rad):
+    """Säger raden att Chatterbox avbröt talet på ett sätt som gör uppläsningen oduglig?
+
+    token_repetition räknas inte: den slår till i de flesta uppläsningar redan när samma
+    ljudtoken kommer två gånger, och klippen där den slog till har lyssnats på och var hela
+    (README, Hasse Backe, Ljudet). Längdkontrollen i las() står kvar. long_tail,
+    alignment_repetition och en rad som inte går att tyda räknas som förut.
+    """
+    if "forcing EOS" not in rad:
+        return False
+    if re.search(r"(long_tail|alignment_repetition)=(tensor\()?True", rad):
+        return True
+    return not re.search(r"token_repetition=(tensor\()?True", rad)
+
+
 def las(modell, frö, jobb, s, fangare):
     text = jobb["text"]
     vantat = max(s["minstaSek"], len(text) / s["tecknenPerSekund"])
@@ -155,7 +176,7 @@ def las(modell, frö, jobb, s, fangare):
         sys.stderr.write(utskrift.getvalue())
         d = till_numpy(wav)
         sek = talets_langd(d, modell.sr)
-        eos = any("forcing EOS" in r for r in fangare.rader) or "forcing EOS" in utskrift.getvalue()
+        eos = any(avbruten(r) for r in [*fangare.rader, *utskrift.getvalue().splitlines()])
         kvot = sek / vantat
         ok = not eos and s["kortast"] <= kvot <= s["langst"] and sek >= s["minstaSek"]
         print(f"  försök {forsok}: {sek:.1f} s mot väntat {vantat:.1f} s{' (forcing EOS)' if eos else ''}{'' if ok else ' – om'}", file=sys.stderr, flush=True)

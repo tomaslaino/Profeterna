@@ -645,6 +645,14 @@ bara lokalt. Analyserna visas som de ligger i `data/analyser.json`; hur de skriv
   gång så att main inte växer. Bygget tar det egna ljudet där det finns och Azure där det
   saknas, så han blir aldrig tyst. Ljudet är av tills besökaren slår på det. Se
   [Hasse Backe](#hasse-backe), *Ljudet*.
+- **Hasse Backe slår domen i disken på fler sätt, och det hörs (2026-11-05, användarens
+  önskemål):** han är en bestämd och tydlig herre, så domen slås i disken på ett av fem sätt
+  (skrattet, näven, tre slag, båda händerna, fingret och handflatan), och vid ett bestämt ord
+  mitt i talet slår han ibland handflatan i disken. Varje slag dunkar i träet och koppen studsar
+  och klirrar på fatet, när ljudet är på. Han har också fler sätt att dricka kaffe och röka
+  cigarr: han blåser på kaffet, tittar ned i koppen, tar ett kort bloss med röken ur mungipan,
+  blåser rökringar och knackar av askan och blåser ut röken genom näsan. Se
+  [Hasse Backe](#hasse-backe), *Slaget*, *Kaffet* och *Cigarren*.
 - **Statistik som i tobaksaffären (2026-11-05, användarens önskemål):** statistiken på den
   vanliga sajten ska stämma med den i tobaksaffären – samma tal under samma namn och samma
   uppdelning: det som jämför lagen står som på anslagstavlan (topplistorna under Lagen), det
@@ -3722,7 +3730,7 @@ vänstra handen och cigarren i askkoppen vid den högra. Bakom honom är barens 
 cigarettpaketen och lamporna. Samtalet står i en spalt till vänster om honom (på höjden under honom)
 och kommer när kameran har stannat. Esc eller *Tillbaka* går tillbaka (vid matchlistan också ett klick
 utanför). Medan han väntar på att man ska välja trummar han med fingrarna på disken då och då, och
-ibland tar han cigarren ur askkoppen och njuter av den en stund. I rummet ligger kaffet, notan och
+ibland tar han cigarren ur askkoppen och njuter av den en stund, på ett av fyra sätt. I rummet ligger kaffet, notan och
 handen kvar på pulten som en ledtråd, och handen trummar när man pekar på den eller kaffet, och
 ibland ändå.
 
@@ -3796,7 +3804,31 @@ mötte bakväggen i ett hörn, med handen kvar på pulten: rummet är en kuliss 
 med kaffet, notan och handen stod på högkant när den sågs från sidan, hörnet blev 135°, skarven mellan
 hans arm och rummets hand hamnade vid handleden, och en fotografisk man satt bredvid ett tecknat rum.
 
-När han dricker tar han koppen från fatet och dricker. När han slår i disken rycker hela bilden till.
+**Rörelserna** är klipp på en tidslinje (`KLIPP` i [public/rum-hasse-3d.js](public/rum-hasse-3d.js)):
+T 0–12,4 vilan, skrattet, slaget, gesterna och vägen hem, och efter det ett klipp i taget med var
+sin bit av tidslinjen. Varje klipp börjar och slutar där han står (i vilan, eller med händerna på
+disken när han pratar) och har sina egna nycklar för huvudet, kroppen, ansiktet och armarna
+(`RORELSER`), så att ett nytt klipp bara behöver det som händer i det. Klippen i samma grupp (domen,
+kaffet, cigarren) lottas av sidan, utan att samma kommer två gånger innan alla har varit med.
+
+**Slaget.** När domen är klar slår han den i disken på ett av fem sätt: armarna upp i ett gapskratt
+och handen i disken (`slag`); tyst och allvarlig med knuten näve i hakhöjd, som han slår i disken med
+lillfingersidan och låter ligga kvar medan han nickar (`naven`); tre slag med handflatan, varje gång
+lite högre upp ifrån och lite hårdare, med en nick för varje (`treslag`); båda händerna lyfta medan han
+andas in och lutar sig bakåt, och sedan ned i disken samtidigt (`bada`); eller pekfingret i luften
+bredvid ansiktet, en stöt fram mot en och sedan handflatan i disken (`fingret`). Domen står i guld i
+det ögonblick det hårdaste slaget träffar (`dom`). Vid ett bestämt ord mitt i talet (*solklart*,
+*glöm det*) slår han ibland handflatan i disken i stället för att lyfta fingret (`dunka`). Handen
+går allt fortare mot disken och stannar tvärt, studsar lite och blir liggande, och han blinkar och
+nickar när den träffar. Vid varje slag rycker hela bilden till, mer ju hårdare han slår (`--slag` i
+[public/rum-hasse.css](public/rum-hasse.css)), och det som står på disken hoppar: koppen studsar
+på fatet, lägre för varje gång, fatet och askkoppen lite och cigarren i urtaget (`hoppar`).
+
+**Kaffet.** Han dricker på tre sätt: en klunk (`klunk`); koppen under hakan medan han blåser på
+kaffet två gånger, så att ångan far bort från honom, en klunk och ett *ah* med slutna ögon (`blasa`);
+eller koppen vid bröstet medan han tittar ned i den med höjda bryn och snurrar den lite, och sedan
+dricker ur den (`titta`). Handen följer koppens öra, och koppen klirrar mot fatet när han ställer ned
+den.
 
 **Cigarren.** Till vänster om hans högra hand står en tung askkopp av samma gods som koppen, med två
 urtag. I det ena ligger cigarren: huvudet på disken, ringen (guld och rött) synlig och glöden över
@@ -3816,6 +3848,13 @@ fort (`skynda`). Röken är partiklar i en gemensam luftström: lugn och rak nä
 högre upp (`byggRok` i [public/rum-hasse-arm.js](public/rum-hasse-arm.js)). Med minskad rörelse
 ligger cigarren kvar i askkoppen, men röken stiger, på samma sätt som han fortfarande andas.
 
+Klippet ovan är ett av fyra som lottas. I de andra tar han ett bloss och blåser ut röken i en tunn
+stråle ur mungipan med huvudet på sned och ett höjt bryn (`bloss`); drar två korta bloss och blåser
+tre rökringar med munnen som ett o, åt sidan så att de far ut i luften bredvid honom, och tittar efter
+dem (`ringar`); eller knackar av askan över askkoppen med två korta ryck (askan faller), tittar på
+glöden, drar ett bloss och blåser ut röken genom näsan (`aska`). Rökringen är partiklar i en cirkel
+som far iväg och vidgar sig, med svag virvel så att den håller ihop (`ring`).
+
 **Samtalet.** Det är han som frågar, *Vilken match förstår du inte?*, med ditt efternamn om kupongen
 vet vem du är, och man svarar genom att välja en match. Då frågar han tillbaka (*Den är enkel. Vill du
 veta, eller ska du gissa?*), och först *Lär mig* ger analysen (knappen lottas som hans repliker: också *Jag lyssnar och
@@ -3830,10 +3869,10 @@ lapp i terrakotta, och *Ja, ja »* och *← Tillbaka* står med samma versaler s
 han ska läsa på (*Den knäckte jag i morse*); att han läser på märks först medan han väntar. Är analysen inte skriven än
 säger han det (*Den tar jag sen*). Rader där du redan har fått tecknen öppnas
 direkt. Analysen är redan skriven, men han låtsas: när du har bett om den fortsätter han prata i 15–25 sekunder (`LATSAS` i [public/rum-hasse.js](public/rum-hasse.js), raderna kommer i ordning: *Vi börjar bakifrån*, *Total kontroll*, *Det här
-är helt normalt*) och tar en klunk kaffe eller cigarren då och då. När den är klar blir han tyst, armarna går upp, han slår i disken och domen
-står i guld. Sedan säger han texten en mening i taget, ord för ord med munnen i takt (och det hörs, se *Ljudet*), med en paus
+är helt normalt*) och tar en klunk kaffe eller cigarren då och då. När den är klar blir han tyst och slår domen i disken
+(se *Slaget*), och domen står i guld. Sedan säger han texten en mening i taget, ord för ord med munnen i takt (och det hörs, se *Ljudet*), med en paus
 mellan meningarna och en längre före en kort mening, och gesterna kommer vid de bestämda orden
-(*Nej nej nej*, *varningens finger*) eller då och då vid en lång mening. Ett klick var som helst
+(*Nej nej nej*, *varningens finger*, ibland handflatan i disken) eller då och då vid en lång mening. Ett klick var som helst
 visar hela repliken och nästa klick går vidare; *Ja, ja* tar resten på en gång, och det svarar han
 på (*Som du vill.*). Efter texten säger han vad matchen slutar (*Det slutar 1–1.*): det troligaste
 resultatet i modellens prognos (resultatmatrisen i `data/match/<id>.json`, samma som matchbladet
@@ -3906,17 +3945,19 @@ på iMacen körs var 15:e minut (launchd kör det aldrig två gånger samtidigt)
 återställs till origin/main varje gång, som analysernas jobb. Det tar listan över allt han
 säger ur `texter()` i [src/rost.js](src/rost.js), kommande matchers meningar först och sedan
 replikerna (ca 350 meningar), och läser upp högst 30 som saknas per körning med
-[chatterbox.py](scripts/rost/chatterbox.py), som laddar modellen en gång (ca 30 s) och räknar
+[chatterbox_jobb.py](scripts/rost/chatterbox_jobb.py), som laddar modellen en gång (ca 30 s) och räknar
 ungefär 5 s per sekund tal. Inställningarna står i `rost.egen` i
 [config/hasse.js](config/hasse.js): exaggeration 0,7, cfg_weight 0,5, temperature 0,8 och
 referensen `~/Kod/chatterbox-rost/min_rost.wav`. Talen läses som ord ("2–1" blir "två–ett", 0
 "noll"), eftersom det är oprövat hur Chatterbox läser siffror; meningen i registret är densamma
 som på sidan.
 
-Chatterbox avbryter ibland själv med "forcing EOS token" och klipper slutet, och ibland blir
-talet för kort eller för långt. Därför mäts talet utan tystnad mot den väntade längden (14
-tecken i sekunden): under 0,55 eller över 2,2 gånger den, eller med "forcing EOS", görs meningen
-om med nytt slumpfrö, högst fyra gånger. Klarar den sig inte prövas den igen efter ett dygn, och
+Chatterbox avbryter ibland själv med "forcing EOS token", och ibland blir talet för kort eller
+för långt. Därför mäts talet utan tystnad mot den väntade längden (14 tecken i sekunden): under
+0,55 eller över 2,2 gånger den, eller med "forcing EOS" av någon annan orsak än
+`token_repetition`, görs meningen om med nytt slumpfrö, högst fyra gånger. `token_repetition`
+räknas inte: den slog till i 3 av 4 uppläsningar i provet, redan när samma ljudtoken kom två
+gånger, och Tomas lyssnade på de klippen 2026-11-05 och slutet var helt. Klarar den sig inte prövas den igen efter ett dygn, och
 till dess är det Azures röst. Ljudet sparas som mp3 (64 kbit/s, ffmpeg) i en ljudbank utanför
 repot, `~/Library/Application Support/Matchfixarna/Rost/ljud/`, med ett avtryck på
 inställningarna, referensen och texten: ändras något av dem läses allt upp på nytt.
@@ -3950,6 +3991,18 @@ repliken och tystar den, liksom *Ja, ja* och *Tillbaka*. Ljudet är av tills bes
 ljudet i webbläsaren, och valet minns enheten. Sedan heter knappen *Ljud av*. Med minskad
 rörelse står allt direkt och inget hörs. *Jag har tappat rösten* sägs tyst.
 
+När ljudet är på hörs också det som händer på disken
+([public/rum-hasse-ljud.js](public/rum-hasse-ljud.js), hämtas när ljudet slås på): handen i
+disken, och koppen som klirrar på fatet. Figuren säger när det händer (`handelser` i
+rum-hasse-3d.js: slagen, när koppen landar efter dem och när han ställer ned den), och ljudet
+räknas fram med Web Audio, utan ljudfiler och lite olika varje gång. Slaget är en dov duns som
+sjunker, träets knack, handflatans smäll (näven nästan ingen, båda händerna två strax efter
+varandra) och skivan som klingar kort, och allt på disken skramlar till. Klirret är porslin mot
+porslin, några deltoner som inte är övertoner och där de höga klingar av fortast; koppens fot slår
+oftast två gånger. Allt går genom en mjuk begränsare, så att ett hårt slag inte spräcker ljudet, och
+slaget är ungefär lika starkt som rösten. Slaget hörs från hans högra hand till vänster i bilden och
+koppen från höger.
+
 **Slå på rösten** (ett gratis konto hos Microsoft Azure; kortet som Azure frågar efter när kontot
 skapas debiteras inte på F0):
 
@@ -3972,11 +4025,15 @@ gjordes), och inte i Safari eller en riktig telefon.
 Den egna rösten provades 2026-11-04 utan Chatterbox: [las.mjs](scripts/rost/las.mjs) med låtsad
 modell (`--latsas`, tonstötar) mot en låtsad GitHub (ett lokalt repo), som läste upp fem
 meningar och pushade grenen `rost`, inte pushade igen när inget hade ändrats och inte
-markerade något som misslyckat när modellen kraschade; [chatterbox.py](scripts/rost/chatterbox.py)
+markerade något som misslyckat när modellen kraschade; [chatterbox_jobb.py](scripts/rost/chatterbox_jobb.py)
 med låtsad modell, som gjorde om en mening efter "forcing EOS" och gav upp en för kort efter
 fyra försök; workflowens steg mot den låtsade grenen; och `npm run build -- --no-fetch`, som
-tog de fem egna och Azure för resten, och där `fyll()` inte frågade Azure om de egna. Inte
-provat med den riktiga modellen.
+tog de fem egna och Azure för resten, och där `fyll()` inte frågade Azure om de egna.
+
+Med den riktiga modellen provades den 2026-11-05 på iMacen: [las.mjs](scripts/rost/las.mjs) utan
+`--publicera` läste upp fyra meningar på 145 s, alla i första försöket. Det provet visade också
+varför skriptet inte får heta `chatterbox.py` (det skuggar paketet med samma namn), vilket den
+låtsade modellen inte kunde visa.
 
 **Grafiken.** Handen på pulten är en liten WebGL-duk i pultens plan som läggs dit när rummet är
 klart, med handens modell (133 kB) och fotot (149 kB). Den ritas en gång och sedan bara när fingrarna
@@ -4006,8 +4063,8 @@ kroppen. Händerna är en modell med 16 ben ([scripts/hasse/hand.mjs](scripts/ha
 huden ur fotot, naglar och leder. Armar, kropp, händer och kopp har samma ljus. Väggen bakom honom
 är en färdig bild, spårad en gång med riktigt ljus ([scripts/hasse/bak.html](scripts/hasse/bak.html)).
 Skuggorna på disken är räknade kapslar, utan skuggkarta (också askkoppens och cigarrens). Askkoppen,
-cigarren och röken är tre ritanrop och ungefär 3 700 trianglar till. T 30–40 är cigarren. T 20–24,5 är ett klipp där han dricker en
-klunk kaffe och ställer ned koppen, med start och slut som vilan. `?rum-hasse` öppnar honom direkt.
+cigarren och röken är tre ritanrop och ungefär 3 700 trianglar till. Klippen står i `KLIPP` (se
+*Rörelserna*). `?rum-hasse` öppnar honom direkt.
 
 Provat i headless Chrome med mjukvarugrafik (2026-11-04): hans bild i 2000 × 1080, 1440 × 900 och som
 telefon 412 × 915, på rummets steg 0 (med kornet) och 3, panoreringen frusen på sex ställen på vägen
@@ -4023,6 +4080,16 @@ Cigarren (2026-11-04) är provad med figuren ensam i headless Chrome (mjukvarugr
 cigarrens, handens och armbågens förflyttning mellan varje hundradels sekund (inga hopp). Inte provad i
 hela sidan, i Safari eller i en riktig telefon, och turerna i samtalet (när han tar den, `skynda`) är
 bara genomlästa.
+
+Slagen, kaffet, cigarren och ljuden (2026-11-05) är provade i headless Chrome med mjukvarugrafik: figuren
+ensam i 1440 × 900 och 412 × 915, varje klipp bild för bild och de med rök och ånga i följd, och
+klippen före ombyggnaden jämförda bild för bild med klippen efter (lika, utom slaget i originalet, som
+nu går allt fortare mot disken, och koppens studs). Hela sidan (byggd utan att hämta något, så utan
+kupong) med `?rum-hasse` och ljudet på: slagen, `dunka` medan han står som när han pratar, och
+kaffet, spelade som repliker med gester, där bilden ryckte till vid varje slag och slagen och klirret
+spelades. Ljuden är framräknade i en `OfflineAudioContext` och mätta (toppar 0,44–0,55 för slagen,
+0,24 för klirret), men inte lyssnade på, och inte provade i Safari eller på en riktig telefon.
+Samtalet med en riktig analys är inte provat (ingen kupong i provet), bara genomläst.
 
 ### Närbilderna
 
