@@ -9,7 +9,7 @@
 //   - Ljudbanken ligger utanför repot (TILLSTAND/ljud/<avtryck>.mp3). Avtrycket räknas
 //     på inställningarna i config/hasse.js (rost.egen), referensen och texten, så att
 //     ljudet tas fram på nytt när något av det ändras.
-//   - Högst perKorning meningar per körning läses upp (chatterbox.py, som laddar
+//   - Högst perKorning meningar per körning läses upp (chatterbox_jobb.py, som laddar
 //     modellen en gång), så att ljudet kommer ut successivt. En mening som inte klarar
 //     längdkontrollen prövas igen efter omIgenTimmar.
 //   - Grenen rost: en enda föräldralös commit med rost.json {filer: {mening: avtryck}}
@@ -172,7 +172,7 @@ function uppdrag(att, egen, referens) {
   fs.mkdirSync(path.dirname(MODELLOGG), { recursive: true });
   const ut = fs.openSync(MODELLOGG, 'w');
   const t0 = Date.now();
-  const r = spawnSync(python, [path.join(HAR, 'chatterbox.py'), jobbfil, ...(LATSAS ? ['--latsas'] : [])], {
+  const r = spawnSync(python, [path.join(HAR, 'chatterbox_jobb.py'), jobbfil, ...(LATSAS ? ['--latsas'] : [])], {
     cwd: TILLSTAND, stdio: ['ignore', ut, ut], timeout: 50 * 60000,
     env: { ...process.env, PYTHONUNBUFFERED: '1', PYTORCH_ENABLE_MPS_FALLBACK: '1' },
   });

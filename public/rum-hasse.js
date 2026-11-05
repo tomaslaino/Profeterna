@@ -25,7 +25,7 @@ window.RumHasse = (() => {
   const PAN = { TID: 420, BILDER: 28, GLIPA: 0.12, OSKARPA: 0.046, K: 40 };
   // fort i början, som ett ryck, och mjukt på slutet (0 → 1)
   const ryck = (t) => { const x = t ** 0.8; const k = 5.5; return 0.5 + (0.5 * Math.tanh(k * (x - 0.5))) / Math.tanh(k / 2); };
-  const H = { on: false, rum: null, fig: null, last: null, t0: 0, T: 0, raf: 0, tal: 0, talMal: 0, mun: 0, munMal: null, ko: [], klipp: null, trum: 0, cigarr: 0, vana: 0 };
+  const H = { on: false, rum: null, fig: null, last: null, t0: 0, T: 0, raf: 0, tal: 0, talMal: 0, mun: 0, munMal: null, ko: [], klipp: null, trum: 0, vanaT: 0, vana: 0 };
   const calm = () => matchMedia('(prefers-reduced-motion: reduce)').matches;
   const hog = () => innerWidth / innerHeight < 1.15;
   const latt = () => matchMedia('(max-width: 700px), (max-height: 500px)').matches;
@@ -113,7 +113,7 @@ window.RumHasse = (() => {
     if (!plan) return;
     try {
       const a = await import('./rum-hasse-hand.js');
-      H.pulten = await a.armen(plan, { hand: { x: 34, y: 686 }, pr: Math.min(devicePixelRatio || 1, [2, 1.5, 1.25, 1][steg()]) * 1.25 });
+      H.pulten = await a.armen(plan, { hand: { x: 34, y: 686 }, kopp: { x: 268, y: 708 }, pr: Math.min(devicePixelRatio || 1, [2, 1.5, 1.25, 1][steg()]) * 1.25 });
       const b = document.createElement('button');
       b.type = 'button';
       b.className = 'rum-hasse-knapp';
@@ -344,7 +344,7 @@ window.RumHasse = (() => {
     H.last = null;
     H.t0 = performance.now();
     H.trum = H.t0 + 4000 + Math.random() * 5000;
-    H.cigarr = H.t0 + CIGARR[0] * 0.4 + Math.random() * CIGARR[0] * 0.3;
+    H.vanaT = H.t0 + VANA[0] * 0.4 + Math.random() * VANA[0] * 0.3;
     loop();
   }
 
@@ -368,10 +368,10 @@ window.RumHasse = (() => {
         H.trum = ms + 7000 + Math.random() * 9000;
         if (!calm() && !H.klipp && !H.ko.length && (!H.sagt || H.sagt.klar) && ['fraga', 'val', 'klar'].includes(H.fas)) H.fig.trumma();
       }
-      // och ibland tar han cigarren ur askkoppen och njuter av den en stund
-      if (ms > H.cigarr && !H.klipp && !H.ko.length && !H.fig.ror() && (!H.sagt || H.sagt.klar) && ['fraga', 'val', 'klar'].includes(H.fas)) {
-        H.cigarr = ms + CIGARR[0] + Math.random() * (CIGARR[1] - CIGARR[0]);
-        gest(ettAv('cigarr', 'cigarr'));
+      // och ibland njuter han av kaffet eller tar cigarren ur askkoppen, varannan gång
+      if (ms > H.vanaT && !H.klipp && !H.ko.length && !H.fig.ror() && (!H.sagt || H.sagt.klar) && ['fraga', 'val', 'klar'].includes(H.fas)) {
+        H.vanaT = ms + VANA[0] + Math.random() * (VANA[1] - VANA[0]);
+        vana();
       }
       const ror = H.klipp || H.ko.length || (H.sagt && !H.sagt.klar) || H.fig.ror();
       if (ms - last < takt(ror)) return;
@@ -524,9 +524,14 @@ window.RumHasse = (() => {
   const GRUPP = {};
   const grupp = (g) => (GRUPP[g] = GRUPP[g] && GRUPP[g].length ? GRUPP[g] : Object.keys(GEST).filter((n) => GEST[n].grupp === g));
   const ettAv = (g, annars) => lott(grupp(g)) || annars;
-  // Medan han väntar på en tar han cigarren då och då (minst och längst i ms mellan gångerna).
-  // Ska något spelas medan han håller den (skynda) lägger han tillbaka den fortare.
-  const CIGARR = [45000, 80000];
+  // kaffet och cigarren varannan gång, kaffet först
+  function vana() {
+    H.vana = (H.vana + 1) % 2;
+    gest(H.vana ? ettAv('kaffe', 'klunk') : ettAv('cigarr', 'cigarr'));
+  }
+  // Medan han väntar på en tar han kaffet och cigarren varannan gång då och då (minst och längst i ms
+  // mellan gångerna). Ska något spelas medan han håller cigarren (skynda) lägger han tillbaka den fortare.
+  const VANA = [45000, 80000];
   // Måste spelas: väntar på sin tur. vid: [T, gör] när tidslinjen når T.
   function spela(namn, o = {}) {
     if (calm()) {
@@ -902,8 +907,7 @@ window.RumHasse = (() => {
     }
     if (v.runt && v.i % 5 === 2 && v.drack !== v.i) {
       v.drack = v.i;
-      H.vana = (H.vana + 1) % 2;
-      gest(H.vana ? ettAv('kaffe', 'klunk') : ettAv('cigarr', 'cigarr'));
+      vana();
       v.nasta = ms + 1200;
       return;
     }

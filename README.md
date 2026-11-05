@@ -653,6 +653,13 @@ bara lokalt. Analyserna visas som de ligger i `data/analyser.json`; hur de skriv
   cigarr: han blåser på kaffet, tittar ned i koppen, tar ett kort bloss med röken ur mungipan,
   blåser rökringar och knackar av askan och blåser ut röken genom näsan. Se
   [Hasse Backe](#hasse-backe), *Slaget*, *Kaffet* och *Cigarren*.
+- **Hasse Backe dricker kaffe på sex sätt, och njuter (2026-11-05, användarens önskemål):** kaffet
+  syntes nästan aldrig och såg skevt ut: koppen stod nästan upprätt framför hakan och handen satt
+  inte i örat. Nu lutas koppen mot underläppen och handen följer örat, och han dricker på sex sätt,
+  överdrivet och med njutning: klunken med mmm, blåsa och ah, dricka ur och titta i den tomma koppen,
+  doften, skål och lillfingret ut. Medan han väntar på att man ska välja tar han kaffet och cigarren
+  varannan gång; förut tog han då bara cigarren, så kaffet kom bara medan han låtsades läsa på. Se
+  [Hasse Backe](#hasse-backe), *Kaffet*.
 - **Hasse Backe njuter av cigarren på elva sätt (2026-11-05, användarens önskemål):** cigarren såg
   skev ut: ansiktet förvreds när han vred huvudet mot askkoppen, handen höll cigarren som en stång,
   och röken lade sig som en fläck över ögat. Nu tittar han mest med ögonen, håller den löst i
@@ -667,6 +674,11 @@ bara lokalt. Analyserna visas som de ligger i `data/analyser.json`; hur de skriv
   vilan hör till omgången, så de blir inga topplistor. Formen räknas ur `data/matches.json`,
   som på tavlan innan den tas fram, alltså utan Europacuperna, som bara finns i matchens fil.
   Se Status.
+- **Kaffet i rummet som i baren (2026-11-05, användarens önskemål):** handen låg under fatet i
+  rummet, koppen var en platt teckning sedd från sidan medan papperen bredvid ses uppifrån, och notan
+  låg bredvid i stället för under fatet som i baren. Nu är koppen bardiskens kopp i samma ljus,
+  ritad i handens duk, fatet står på notan och handen ligger bredvid, och bardisken har pultens
+  bruna. Se [Hasse Backe](#hasse-backe), *Kaffet i rummet*.
 - **Kuponghistoriken flyttar till Olympen (2026-10-20, användarens önskemål):** Kupong
   handlar bara om nästa kupong – växlaren Omgången | Historik försvinner. De färdigspelade
   kupongerna står sist i Olympen under rubriken *Grupparbetena* (`#olympen/kuponger`, en
@@ -1988,10 +2000,10 @@ Enter och mellanslag klickar på dem. En match på text-tv:n öppnar matchrutan 
   *Inlämnad*, men inga tecken. Din egen tas i handen, och de andras när du ser deras tips
   (se nedan). Innan dess lyfts en annans kupong bara lite i ena kanten och faller tillbaka.
 - **Hasses kaffe** längst till vänster på pulten → Hasse Backe, som sitter i baren
-  utanför bilden till vänster. Hans hand ligger på pulten vid koppen, med armen in från bildens kant.
-  Koppen med blå ränder ryker på ett fat vid pultens bakre kant, och bredvid ligger hans nota:
-  kaffe, fyra påtår och en kanelbulle, Skrivs på Notts County (klubben han lämnade efter sju
-  veckor 2009, när lönen inte kom; notan har nummer 0007). Ett klick på kaffet eller notan,
+  utanför bilden till vänster. Hans hand ligger på pulten, med armen in från bildens kant, och till
+  höger om fingrarna står koppen med blå ränder och ryker på sitt fat vid pultens bakre kant. Fatet
+  står på hans nota, som i baren: kaffe, fyra påtår och en kanelbulle, Skrivs på Notts County
+  (klubben han lämnade efter sju veckor 2009, när lönen inte kom; notan har nummer 0007). Ett klick på kaffet eller notan,
   Enter eller H och man vänder sig mot honom (`hasseHtml`, `tillHasse`, se
   [Hasse Backe](#hasse-backe)).
 - **Tv:n** uppe i hörnet till höger, en mörkgrå Panasonic från nittiotalet med text-tv på en arm från väggen, zoomas in med ett
@@ -2070,8 +2082,8 @@ med en gul blyertspenna med suddgummi, en röd penna och en blå kulspetspenna (
 `KOPP` i rum-3d.js). Där skymmer den inget på bordet hur de än sitter, och den står inte i
 vägen för tårtan. Den kostar två ritanrop: bollen, och pennorna och kanten i en geometri med
 färgerna i hörnen. DL dricker ur en flaska, DT röker
-och skrattar, DJ har en burk i ena handen och pratar med cigaretten i den andra. Var och en
-har sin loop (12–21 s) – flaskan och burken till munnen med huvudet bakåt, ett bloss med
+och skrattar, DJ har en flaska i ena handen och pratar med cigaretten i den andra. Var och en
+har sin loop (12–21 s) – flaskan till munnen med huvudet bakåt, ett bloss med
 glöden som tänds och röken som blåses ut, benen som dinglar – och huvudena nickar efter
 musen, med en fjäder som räknas i tid (`NICK` i rum-3d.js), så att de nickar lika fort och lika
 mycket hur glest gänget än ritas (se [När datorn inte hinner med](#när-datorn-inte-hinner-med));
@@ -2084,9 +2096,14 @@ med ögonen stängda och blinkar inte). Ansiktet med stängda ögon är samma an
 byts in medan ögonen är stängda. I en fast bild (`?rum-t`) och med `prefers-reduced-motion`
 blinkar de inte. Det röda ljuset från neonskylten bakom dem slocknar när skylten glappar
 (`neonOn` i rum.js skickas med till `draw`), så att kanterna på håret och jackorna mörknar
-med skylten. Inga riktiga märken: flaskan säger PILSNER, burken ÖL –
-från första advent till tjugondag Knut JULÖL (grön etikett, röd burk) och i påskveckan
-PÅSKÖL (gul etikett, grön burk; `ol` i [public/rum-fika.js](public/rum-fika.js)).
+med skylten. Ölen är Pripps Blå i 90-talets returflaska (`bottle` i rum-3d.js): grönt glas,
+marinblå folie runt halsen, ett silverband snett över axeln och en silveretikett med skeppet
+i en oval mellan två lejon. Förlagan är reklamfilmen från 1992 (glaset och folien) och
+flaskan SLM 31192 i Sörmlands museum (formen och etiketten; den är odaterad), och
+etiketten är ritad för hand, inte en avbildning. Från första advent till tjugondag Knut står
+det PRIPPS JULÖL (röd folie) och i påskveckan PRIPPS PÅSKÖL (grön folie; `ol` i
+[public/rum-fika.js](public/rum-fika.js)). Allt tryck ligger på en duk och flaskorna delar
+geometrierna, så en flaska kostar två ritanrop.
 Var och en bär sitt lag (`LAG` i rum-3d.js): DL en stickad halsduk i Nacionals vitt, blått
 och rött med BOLSO på den ena änden, Nacionals sköld på den andra och fransar längst ner,
 DT ett lejonhuvud i gammal stil i kungsblått med bandet BLUES på underarmen som håller
@@ -2106,8 +2123,8 @@ Dagen är Stockholms (`Vader.nu()`), så alla ser samma placering, och ingen byt
 medan sidan är öppen – den nya syns vid nästa laddning. Platserna är en tabell: var
 barstolen står och är vriden, vilken hand som är mot bordet och var sakerna står på
 bordet (ölen, askkoppen, cigaretten, kupongen, handen som vilar och DT:s extraflaska), och
-figuren tar sin del ur sidan (`sitt`). Den som hamnar på andra sidan byter hand: flaskan,
-burken och cigaretten är alltid i handen mot bordet, och kupongen, pennan, lejonet (med
+figuren tar sin del ur sidan (`sitt`). Den som hamnar på andra sidan byter hand: flaskan
+och cigaretten är alltid i handen mot bordet, och kupongen, pennan, lejonet (med
 den uppkavlade ärmen), handen som lyfts vid ett mål och den mot pannan följer med, liksom
 blickarna åt sidan. Bakom bordet vilar båda händerna på bordet. Sakerna ligger minst 10
 innanför bordskanten och inom räckhåll för alla tre, och när någon kikar ner mot pulten
@@ -2117,7 +2134,7 @@ som sitter bakom bordet.
 **Gänget följer omgången** (rum-3d.js, med läget från `gangTv` i rum.js):
 
 - **Den som inte har lämnat in** en öppen omgång sitter med kupongen och pennan i stället
-  för flaskan, burken och cigaretten, tuggar på pennan, sneglar på ölen och vänder på
+  för flaskan och cigaretten, tuggar på pennan, sneglar på ölen och vänder på
   kupongen. Från ett dygn före spelstoppet tittar de som har lämnat in på hen en stund i
   taget, oftare ju närmare spelstoppet det är. Den sista timmen vänder de sig mot hen
   samtidigt, och då tittar hen upp från kupongen.
@@ -2128,9 +2145,9 @@ som sitter bakom bordet.
   med vändningen mot tv:n).
 - **Vid ett mål** – när ställningen i en match har ändrats sedan rummet läste datan förra
   gången – reagerar var och en efter sitt eget tips (allas tips när de visas, annars
-  gängets kupong). Den som fick rätt lyfter flaskan (DL), näven (DT) eller burken (DJ)
+  gängets kupong). Den som fick rätt lyfter flaskan (DL, DJ) eller näven (DT)
   snett uppåt, lutar sig bakåt och studsar lite. Den som tappade raden sjunker ihop med
-  handen över ögonen (DL, DT) eller burken mot pannan (DJ). Den som inte påverkades nickar.
+  handen över ögonen (DL, DT) eller flaskan mot pannan (DJ). Den som inte påverkades nickar.
   Dolda resultat ger inga reaktioner, och när rummet öppnas räknas inga gamla mål.
   Var och en reagerar på ett av tre sätt, olika från mål till mål (`malV` i rum-3d.js):
   som ovan, med båda armarna i luften (rätt) eller båda händerna på huvudet och blicken i
@@ -2158,13 +2175,13 @@ samtidigt), utan att de vanliga looparna (klunken, blosset, pratet) är i vägen
 påhitt och hur ofta beror på humöret (`MENY`):
 
 - **Som vanligt** (ungefär fyra luckor av tio): sträcker på sig och gäspar, kliar sig i
-  bakhuvudet, trummar med fingrarna på bordet, tittar ner i den tomma flaskan eller burken,
+  bakhuvudet, trummar med fingrarna på bordet, tittar ner i den tomma flaskan,
   vilar hakan i handen.
 - **Glad** (tre av fyra luckor): lutar sig bakåt med handen i nacken, gungar i takt med
   ölen i luften, sträcker på sig. Ibland gör gänget något tillsammans (var 31:a sekund,
   ungefär varannan gång): skålar över bordet och tar en klunk (DT ett bloss), eller gungar
   i takt allihop som på läktaren.
-- **Nervös:** biter på naglarna, knäpper händerna framför munnen (om flaskan eller burken)
+- **Nervös:** biter på naglarna, knäpper händerna framför munnen (om flaskan)
   och gungar fram och tillbaka, trummar med fingrarna, kliar sig i bakhuvudet.
 - **Deppig:** hakan i handen, skakar på huvudet och suckar, armarna i kors med blicken bort
   från bordet, tittar ner i flaskan – och DJ lägger pannan i bordet några gånger.
@@ -2188,7 +2205,7 @@ håller reda på vilka som är inne och vad de pekar på och skickar det till al
 ändras. Inget sparas, sidan skickar högst var 150:e millisekund, och den stänger
 websocketen när fliken döljs. Adressen är `rummet` i config/kupong.js (`samtal.rummet` i
 data/kuponger.json); utan den gör bara din egen figur det. Pekar man på någon i gänget
-tittar hen på en och skålar: lyfter flaskan (DL), burken (DJ) eller cigaretten (DT) mot en
+tittar hen på en och skålar: lyfter flaskan (DL, DJ) eller cigaretten (DT) mot en
 och nickar, och tittar kvar tills man slutar peka. I telefonen gör ett tryck på figuren
 samma sak en stund. Den som väntar på kupongen tittar bara, och ett klick på en figur går
 inte vidare till det som står bakom.
@@ -2207,7 +2224,7 @@ för att tecknet ska synas i rummet. Den byggs först när den behövs och ritas
 tecknet pågår, drygt två sekunder. Medan man väntar är det handen med pennan, och pennan går
 bakom örat så länge; annars är det den lediga handen, och DJ:s cigarett ligger på bordet så
 länge. Ett klick till medan det pågår byter tecken utan hopp. Figuren tittar på en,
-påhitten vilar, och flaskan eller burken skålar som förut när man pekar. Den som sover
+påhitten vilar, och flaskan skålar som förut när man pekar. Den som sover
 vaknar inte, men tummen kommer upp. Med minskad rörelse står tecknet som en bild en stund.
 I telefonen glider rummet så att den man tryckte på hamnar mitt i bild om hen stod långt ut
 (`visa` i rum.js), annars kunde handen hamna utanför.
@@ -3732,7 +3749,7 @@ vänstra handen och cigarren i askkoppen vid den högra. Bakom honom är barens 
 cigarettpaketen och lamporna. Samtalet står i en spalt till vänster om honom (på höjden under honom)
 och kommer när kameran har stannat. Esc eller *Tillbaka* går tillbaka (vid matchlistan också ett klick
 utanför). Medan han väntar på att man ska välja trummar han med fingrarna på disken då och då, och
-ibland tar han cigarren ur askkoppen och njuter av den en stund, på ett av fyra sätt. I rummet ligger kaffet, notan och
+ibland njuter han av kaffet (på ett av sex sätt) eller av cigarren (på ett av fyra), varannan gång. I rummet ligger kaffet, notan och
 handen kvar på pulten som en ledtråd, och handen trummar när man pekar på den eller kaffet, och
 ibland ändå.
 
@@ -3787,6 +3804,17 @@ neonskyltens röda sken och gatans kalla ljus från höger, där affären är (`
 bilden mörknar hörnen, och ett lätt korn rör sig (`.rh-ton`, `.rh-korn`), inte på rummets lägre steg
 och inte i telefonen. Handen på pulten i rummet har rummets ljus utan baren.
 
+**Kaffet i rummet.** Handen, koppen och notan på pulten är samma som i hans bild, så att man känner
+igen dem när kameran slår över: koppen är bardiskens modell (`byggKopp`) med samma ljus, fatet står
+på notans övre hörn och handen ligger till vänster om koppen, som hans vänstra hand vid koppen i
+baren ([public/rum-hasse-hand.js](public/rum-hasse-hand.js)). Koppen ritas i handens duk med en egen
+kamera: den ses 44° uppifrån och rakt framifrån som det andra på pulten, eftersom handens kamera ser
+hörnet långt från sin mitt och en kopp där skulle luta. Den är lite mindre än i baren (`KOPP_SKALA`),
+där handen pekar mot en och ser kortare ut. Duken tonar in när den är klar, och den ritade koppen i
+`hasseHtml` tonar då bort; den står kvar utan WebGL. Bardiskens trä har pultens bruna, inte rödare.
+Förut stod en platt ritad kopp, sedd nästan från sidan, bredvid notan, och handen låg under fatet så
+att det såg ut som om den bar det (ändrat 2026-11-05).
+
 Tre tidigare försök: först satt han på en barstol vid pultens ände med en arm som ett gummiband över
 hörnet till handen långt nere på pulten (armen, benen, hörnet och koppen såg konstiga ut). Sedan gled
 rummet och baren i sidled med en mörk vägg emellan, och det såg ut som två olika ställen, med en egen
@@ -3815,11 +3843,26 @@ nickar när den träffar. Vid varje slag rycker hela bilden till, mer ju hårdar
 [public/rum-hasse.css](public/rum-hasse.css)), och det som står på disken hoppar: koppen studsar
 på fatet, lägre för varje gång, fatet och askkoppen lite och cigarren i urtaget (`hoppar`).
 
-**Kaffet.** Han dricker på tre sätt: en klunk (`klunk`); koppen under hakan medan han blåser på
-kaffet två gånger, så att ångan far bort från honom, en klunk och ett *ah* med slutna ögon (`blasa`);
-eller koppen vid bröstet medan han tittar ned i den med höjda bryn och snurrar den lite, och sedan
-dricker ur den (`titta`). Handen följer koppens öra, och koppen klirrar mot fatet när han ställer ned
-den.
+**Kaffet.** Han dricker på sex sätt, och han överdriver och njuter: en ordentlig klunk med slutna
+ögon, och sedan smackar han och säger mmm med höjda bryn och ett brett leende medan huvudet vaggar
+(`klunk`); blåser på kaffet tre gånger med koppen under hakan, så att ångan far bort från honom,
+smakar försiktigt och rycker till av värmen, och tar sedan en riktig klunk och ett långt *ah* med
+huvudet bakåt (`blasa`); tittar ned i koppen med höjda bryn, snurrar den och nickar gillande, dricker
+ur den i ett svep, tittar förvånat ned i den tomma koppen och ställer ned den med en smäll (`titta`);
+håller koppen under näsan och drar in doften länge med slutna ögon, så att ångan sugs mot näsan och
+bröstet häver sig, och tar sedan en liten klunk (`dofta`); skålar med en, tar en stor klunk och
+ställer ned koppen med en smäll och ett *ah* (`skal`); eller dricker fint med lillfingret ut och
+näsan i vädret, två små läppjanden, och smackar och nickar som en vinprovare (`fint`).
+
+Det är koppen som styr, som med cigarren (`kaffeArm` i [public/rum-hasse-3d.js](public/rum-hasse-3d.js)):
+dess läge räknas fram (på fatet; vid läppen och under näsan i huvudets mått, så att den följer med när
+han lutar huvudet bakåt; under hakan, framför bröstet och upplyft mot en i kroppens), och handen sitter
+i örat med samma grepp hela vägen, fingrarna mot koppen och handflatan mot honom. När han dricker lutas
+koppen runt kanten mot hans underläpp, så att den ligger kvar där, och örat vrids samtidigt in mot
+kinden, så att handen inte stiger upp framför ögat. Förut stod koppen nästan upprätt framför hakan,
+snett åt sidan, och handen hade samma vinkel hur koppen än stod (ändrat 2026-11-05). Lillfingret står
+rakt ut och spretar (`extra` i `bojFingrar`, [public/rum-hasse-arm.js](public/rum-hasse-arm.js)).
+Koppen klirrar mot fatet när han ställer ned den, hårdare efter en smäll.
 
 **Cigarren.** Till vänster om hans högra hand står en tung askkopp av samma gods som koppen, med två
 urtag. I det ena ligger cigarren: huvudet på disken, ringen (guld och rött) synlig och glöden över
@@ -3837,10 +3880,10 @@ krökta handen, så att fingrarna såg ut att hänga i den som i en stång, vred
 askkoppen att ansiktet förvreds, och röken stannade framför ögat som en blek fläck och kom ur näsan som
 en vit mustasch (ändrat 2026-11-05).
 
-Den första kommer 18–32 sekunder efter att man har vänt sig mot honom, sedan var 45–80:e sekund
-(`CIGARR` i [public/rum-hasse.js](public/rum-hasse.js)), bara när han väntar på en och inte pratar
-eller trummar. Medan han väntar på en analys tar han kaffet och cigarren varannan gång. Ska något
-annat spelas medan han har den (slaget med domen, vägen hem efter analysen) lägger han tillbaka den
+Kaffet och cigarren kommer varannan gång, kaffet först: 18–32 sekunder efter att man har vänt sig
+mot honom, sedan var 45–80:e sekund (`VANA` i [public/rum-hasse.js](public/rum-hasse.js)), bara när
+han väntar på en och inte pratar eller trummar. Medan han väntar på en analys tar han också kaffet och
+cigarren varannan gång. Ska något annat spelas medan han har den (slaget med domen, vägen hem efter analysen) lägger han tillbaka den
 2,5 gånger så fort (`skynda`). Röken är partiklar i en gemensam luftström: lugn och rak nära glöden,
 slingrig högre upp (`byggRok` i [public/rum-hasse-arm.js](public/rum-hasse-arm.js)). Med minskad
 rörelse ligger cigarren kvar i askkoppen, men röken stiger, på samma sätt som han fortfarande andas.
@@ -3873,12 +3916,11 @@ Sätten (`KLIPP` i [public/rum-hasse-3d.js](public/rum-hasse-3d.js); de sju sist
 - `smaka`: han håller röken i munnen och smakar på den med slutna ögon och höjda bryn, och släpper sedan
   ut den långsamt.
 
-**Samtalet.** Det är han som frågar, *Vilken match förstår du inte?*, med ditt efternamn om kupongen
-vet vem du är, och man svarar genom att välja en match. Då frågar han tillbaka (*Den är enkel. Vill du
-veta, eller ska du gissa?*), och först *Lär mig* ger analysen (knappen lottas som hans repliker: också *Jag lyssnar och
-lär* och *Upplys mig*), så att ett felklick inte visar ett tips. *Jag gissar* går tillbaka till listan och
+**Samtalet.** Det är han som frågar, *Vilken match ska jag hjälpa dig med?*, och när du kommer tillbaka *Har du kört fast igen, Laino?*, med ditt efternamn om kupongen
+vet vem du är. Han talar i hela meningar, och över matchlistan finns alltid plats för två rader, så att listan står still vad han än säger. Man svarar genom att välja en match. Då frågar han tillbaka (*Den är solklar. Vill du
+veta, eller ska du gissa?*), och först *Jag är idel öra* ger analysen (knappen lottas som hans repliker: också *Tala om det för mig*), så att ett felklick inte visar ett tips. *Jag gissar* går tillbaka till listan och
 *Matchbladet* till matchen. Svaren står direkt under hans fråga, som lappar i tipskupongens tryck
-som ligger på disken: *Lär mig* i terrakotta som kupongens band, *Jag gissar* i krämvitt papper
+som ligger på disken: *Jag är idel öra* i terrakotta som kupongens band, *Jag gissar* i krämvitt papper
 bredvid, båda med en tunn ram innanför kanten, och *Matchbladet →* under dem med små spärrade
 versaler som texten i bandet. Frågan har sin plats från början, osynlig tills han säger den, så att
 knapparna inte flyttar sig. Förut stod svaren som små länkar längst ned i spalten och syntes knappt
@@ -3886,8 +3928,8 @@ i telefonen, och sedan som piller i guld (ändrat 2026-11-04). *Nästa match* ef
 lapp i terrakotta, och *Ja, ja »* och *← Tillbaka* står med samma versaler som *Matchbladet →*. Han har alltid svaret, både när du redan har frågat (*Den har jag tittat på*) och när
 han ska läsa på (*Den knäckte jag i morse*); att han läser på märks först medan han väntar. Är analysen inte skriven än
 säger han det (*Den tar jag sen*). Rader där du redan har fått tecknen öppnas
-direkt. Analysen är redan skriven, men han låtsas: när du har bett om den fortsätter han prata i 15–25 sekunder (`LATSAS` i [public/rum-hasse.js](public/rum-hasse.js), raderna kommer i ordning: *Vi börjar bakifrån*, *Total kontroll*, *Det här
-är helt normalt*) och tar en klunk kaffe eller cigarren då och då. När den är klar blir han tyst och slår domen i disken
+direkt. Analysen är redan skriven, men han låtsas: när du har bett om den fortsätter han prata i 15–25 sekunder (`LATSAS` i [public/rum-hasse.js](public/rum-hasse.js), raderna kommer i ordning: *Jag läser tidningarna*, *Jag har full kontroll*, *Det ska
+gå till så här*) och tar en klunk kaffe eller cigarren då och då. När den är klar blir han tyst och slår domen i disken
 (se *Slaget*), och domen står i guld. Sedan säger han texten en mening i taget, ord för ord med munnen i takt (och det hörs, se *Ljudet*), med en paus
 mellan meningarna och en längre före en kort mening, och gesterna kommer vid de bestämda orden
 (*Nej nej nej*, *varningens finger*, ibland handflatan i disken) eller då och då vid en lång mening. Ett klick var som helst
@@ -3897,9 +3939,9 @@ resultatet i modellens prognos (resultatmatrisen i `data/match/<id>.json`, samma
 visar) bland utfallen han har ringat in, så att resultatet aldrig går emot tecknen. Har modellen
 ingen prognos för matchen säger han inget resultat (`resultatet` i
 [public/rum-hasse.js](public/rum-hasse.js)). Sist säger han vad han tycker om det du själv har på
-kupongen (*Du har etta. Det är din kupong. Och dina pengar.*). Han minns på enheten vad du har
+kupongen (*Du har etta, och det är dina pengar.*). Han minns på enheten vad du har
 frågat om: tecknen står på matchens rad, i guld, med resultatet bredvid, och *Nästa match* räknar
-(*Halva kupongen är löst*). Bara tecken du själv har bett om syns, så att listan inte blir ett
+(*Nu är halva kupongen klar*). Bara tecken du själv har bett om syns, så att listan inte blir ett
 automatiskt tips. Frågar du om samma match igen står allt direkt.
 Går hans röst inte att få säger han det och visar analysen i skrift. Allt han säger runt omkring är
 färdiga rader, utan AI, i [public/rum-hasse-repliker.js](public/rum-hasse-repliker.js). Med minskad
@@ -3963,17 +4005,19 @@ på iMacen körs var 15:e minut (launchd kör det aldrig två gånger samtidigt)
 återställs till origin/main varje gång, som analysernas jobb. Det tar listan över allt han
 säger ur `texter()` i [src/rost.js](src/rost.js), kommande matchers meningar först och sedan
 replikerna (ca 350 meningar), och läser upp högst 30 som saknas per körning med
-[chatterbox.py](scripts/rost/chatterbox.py), som laddar modellen en gång (ca 30 s) och räknar
+[chatterbox_jobb.py](scripts/rost/chatterbox_jobb.py), som laddar modellen en gång (ca 30 s) och räknar
 ungefär 5 s per sekund tal. Inställningarna står i `rost.egen` i
 [config/hasse.js](config/hasse.js): exaggeration 0,7, cfg_weight 0,5, temperature 0,8 och
 referensen `~/Kod/chatterbox-rost/min_rost.wav`. Talen läses som ord ("2–1" blir "två–ett", 0
 "noll"), eftersom det är oprövat hur Chatterbox läser siffror; meningen i registret är densamma
 som på sidan.
 
-Chatterbox avbryter ibland själv med "forcing EOS token" och klipper slutet, och ibland blir
-talet för kort eller för långt. Därför mäts talet utan tystnad mot den väntade längden (14
-tecken i sekunden): under 0,55 eller över 2,2 gånger den, eller med "forcing EOS", görs meningen
-om med nytt slumpfrö, högst fyra gånger. Klarar den sig inte prövas den igen efter ett dygn, och
+Chatterbox avbryter ibland själv med "forcing EOS token", och ibland blir talet för kort eller
+för långt. Därför mäts talet utan tystnad mot den väntade längden (14 tecken i sekunden): under
+0,55 eller över 2,2 gånger den, eller med "forcing EOS" av någon annan orsak än
+`token_repetition`, görs meningen om med nytt slumpfrö, högst fyra gånger. `token_repetition`
+räknas inte: den slog till i 3 av 4 uppläsningar i provet, redan när samma ljudtoken kom två
+gånger, och Tomas lyssnade på de klippen 2026-11-05 och slutet var helt. Klarar den sig inte prövas den igen efter ett dygn, och
 till dess är det Azures röst. Ljudet sparas som mp3 (64 kbit/s, ffmpeg) i en ljudbank utanför
 repot, `~/Library/Application Support/Matchfixarna/Rost/ljud/`, med ett avtryck på
 inställningarna, referensen och texten: ändras något av dem läses allt upp på nytt.
@@ -4041,11 +4085,15 @@ gjordes), och inte i Safari eller en riktig telefon.
 Den egna rösten provades 2026-11-04 utan Chatterbox: [las.mjs](scripts/rost/las.mjs) med låtsad
 modell (`--latsas`, tonstötar) mot en låtsad GitHub (ett lokalt repo), som läste upp fem
 meningar och pushade grenen `rost`, inte pushade igen när inget hade ändrats och inte
-markerade något som misslyckat när modellen kraschade; [chatterbox.py](scripts/rost/chatterbox.py)
+markerade något som misslyckat när modellen kraschade; [chatterbox_jobb.py](scripts/rost/chatterbox_jobb.py)
 med låtsad modell, som gjorde om en mening efter "forcing EOS" och gav upp en för kort efter
 fyra försök; workflowens steg mot den låtsade grenen; och `npm run build -- --no-fetch`, som
-tog de fem egna och Azure för resten, och där `fyll()` inte frågade Azure om de egna. Inte
-provat med den riktiga modellen.
+tog de fem egna och Azure för resten, och där `fyll()` inte frågade Azure om de egna.
+
+Med den riktiga modellen provades den 2026-11-05 på iMacen: [las.mjs](scripts/rost/las.mjs) utan
+`--publicera` läste upp fyra meningar på 145 s, alla i första försöket. Det provet visade också
+varför skriptet inte får heta `chatterbox.py` (det skuggar paketet med samma namn), vilket den
+låtsade modellen inte kunde visa.
 
 **Grafiken.** Handen på pulten är en liten WebGL-duk i pultens plan som läggs dit när rummet är
 klart, med handens modell (133 kB) och fotot (149 kB). Den ritas en gång och sedan bara när fingrarna
@@ -4108,6 +4156,12 @@ kaffet, spelade som repliker med gester, där bilden ryckte till vid varje slag 
 spelades. Ljuden är framräknade i en `OfflineAudioContext` och mätta (toppar 0,44–0,55 för slagen,
 0,24 för klirret), men inte lyssnade på, och inte provade i Safari eller på en riktig telefon.
 Samtalet med en riktig analys är inte provat (ingen kupong i provet), bara genomläst.
+
+Kaffet på sex sätt (2026-11-05) är provat i headless Chromium med mjukvarugrafik, figuren ensam i
+1440 × 900 och 412 × 915: varje klipp bild för bild, ångan i följd (med förstärkt ånga, för att se att
+den sugs mot näsan), och koppens och handens förflyttning mellan varje hundradels sekund (inga hopp,
+och båda exakt tillbaka i vilan när klippet slutar). Inte provat i hela sidan, i Safari eller i en
+riktig telefon, och att han tar kaffet varannan gång medan man väljer är bara genomläst.
 
 ### Närbilderna
 

@@ -12,7 +12,8 @@
 /* framme: rummet står kvar som det var men ritas inte */
 .rum.hasse-framme .rum-front { visibility: hidden; }
 /* hans hand på pulten (rum-hasse-hand.js), och knappen över den */
-.rum-pl > .rum-hasse-hand { position: absolute; pointer-events: none; will-change: auto; }
+.rum-pl > .rum-hasse-hand { position: absolute; pointer-events: none; will-change: auto; opacity: 0; transition: opacity 0.6s; }
+.rum-pl > .rum-hasse-hand.klar { opacity: 1; }
 .rum-hasse-knapp { position: absolute; padding: 0; border: 0; background: none; cursor: pointer; pointer-events: auto; will-change: auto; }
 
 /* Hans bild: väggen är en färdig bild från samma kamera, disken en duk som ritas en gång och figuren
@@ -44,6 +45,8 @@
 .rum.hasse-pan .rh-samtal, .rum.hasse-pan .rh-fot, .rum.hasse-pan .rh-mork { opacity: 0; pointer-events: none; }
 .rh-samtal { position: absolute; top: 12%; bottom: 52px; z-index: 2; display: flex; flex-direction: column; font-size: clamp(15px, 1.22vw, 18px); line-height: 1.42; text-shadow: 0 1px 4px rgba(0, 0, 0, 0.9); }
 .rh-sagt { flex: none; min-height: 1.15em; font: 700 1.62em/1.15 Fraunces, Georgia, serif; margin: 0 0 0.4em; }
+/* över matchlistan alltid plats för två rader, så att listan står still vad han än säger */
+.rh-sagt:has(+ .rh-lista) { min-height: 2.3em; text-wrap: balance; }
 .rh-o { visibility: hidden; }
 .rh-o.s { visibility: visible; }
 .rh-lista { flex: 1; min-height: 0; overflow-y: auto; overscroll-behavior: contain; touch-action: pan-y; }
