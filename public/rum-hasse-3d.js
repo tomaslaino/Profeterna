@@ -72,6 +72,21 @@ export const KLIPP = {
   skal: { fran: 150, till: 158.5, vila: 0, grupp: 'kaffe', ned: [[7.25, 0.8]] },
   // kaffet: lillfingret ut, näsan i vädret och två små läppjanden, som en vinprovare
   fint: { fran: 160, till: 168.8, vila: 0, grupp: 'kaffe', ned: [[8.1, 0.18]] },
+  // Han njuter av cigarren (cigarrKlipp nedan), med cigarren ur askkoppen och tillbaka:
+  // ett långt bloss med slutna ögon, lutar sig bakåt och blåser ut röken länge, ah, och tittar nöjt på den
+  lang: { fran: 175, till: 189.8, vila: 0, skynda: true, grupp: 'cigarr' },
+  // ett bloss, och sedan lutar han sig bakåt och blundar en lång stund med cigarren i handen
+  luta: { fran: 192, till: 206.4, vila: 0, skynda: true, grupp: 'cigarr' },
+  // biter om den i mungipan och släpper den, sitter nöjd och puffar med händerna på disken
+  tand: { fran: 208, till: 224.4, vila: 0, skynda: true, grupp: 'cigarr' },
+  // håller upp den, rullar den mellan fingrarna och beundrar den, nickar gillande och tar ett bloss
+  beundra: { fran: 227, till: 240.0, vila: 0, skynda: true, grupp: 'cigarr' },
+  // tre korta bloss, ett nöjt moln och ett litet skratt
+  puffar: { fran: 242, till: 253.2, vila: 0, skynda: true, grupp: 'cigarr' },
+  // ett bloss, och sedan visar han den mot en: det här, det är livet
+  vifta: { fran: 255, till: 267.2, vila: 0, skynda: true, grupp: 'cigarr' },
+  // ett bloss som han håller kvar i munnen och smakar på, och röken ut långsamt
+  smaka: { fran: 270, till: 283.4, vila: 0, skynda: true, grupp: 'cigarr' },
 };
 for (const k of Object.values(KLIPP)) {
   if (k.dunk) k.dom = k.fran + k.dunk.reduce((a, b) => (b[1] > a[1] ? b : a))[0];
@@ -716,8 +731,9 @@ export async function figuren(duk, { hog = false, latt = false, pr = 1 } = {}) {
     brynY: [[0, 1.1], [2.5, 1.1], [3.0, 0.6], [4.4, 0.6], [5.0, 1], [5.6, 0.5], [9.4, 0.4], [9.95, 0.5], [10.6, 1.05], [11.6, 1.05], [12.4, 1.1]],
   };
   const KANAL = Object.keys(HUV);
-  // ansiktet i klippen: läggs till som det största av det som rör sig
-  const ANSIKTE = ['le', 'kis', 'blund', 'munn', 'rund', 'dricker'];
+  // ansiktet i klippen: läggs till som det största av det som rör sig (blicken läggs till: blickX åt hans
+  // vänstra sida, blickY nedåt, i fotots bildpunkter)
+  const ANSIKTE = ['le', 'kis', 'blund', 'munn', 'rund', 'dricker', 'blickX', 'blickY'];
   const lage = (T) => Object.fromEntries(KANAL.map((x) => [x, spar(HUV[x], T)]));
   const S0 = lage(0);
 
@@ -738,6 +754,8 @@ export async function figuren(duk, { hog = false, latt = false, pr = 1 } = {}) {
   const vilaB = (t, slag = false) => [t, ...VILA_B, slag];
   const studsA = (t, h) => [t, [va.W[0], va.W[1] + h, va.W[2]], ...VILA_A.slice(1)];
   const studsB = (t, h) => [t, [vb.W[0], vb.W[1] + h, vb.W[2]], ...VILA_B.slice(1)];
+  // fingrarnas krok när han håller cigarren (ring- och lillfingret böjs mer, EXTRA_C)
+  const KG = 0.3;
   // kaffet: handen till koppens öra och tillbaka (mot) och fingrarna runt örat (krok), när koppen står
   // på fatet igen vid ned
   const grepp = (ned) => ({ mot: [0.1, 1.05, ned + 0.05, ned + 0.5], krok: [[0, 0.1], [1, 0.18], [1.2, 0.72], [ned, 0.72], [ned + 0.2, 0.18], [ned + 0.5, VILA_B[4]]] });
@@ -892,22 +910,24 @@ export async function figuren(duk, { hog = false, latt = false, pr = 1 } = {}) {
     // Cigarren: se cigarrArm.
     cigarr: {
       k: {
-        yaw: [[0.15, 0], [0.75, -1.3], [1.3, -0.8], [2.0, 0.05], [3.9, 0.05], [4.4, 0.2], [6.2, 0.2], [6.75, -1.25], [7.6, -1.1], [8.0, -1.15], [8.5, -1.2], [9.3, 0]],
-        pitch: [[0.15, 0], [0.75, 1.7], [1.3, 1.1], [2.0, 0.25], [3.9, 0.25], [4.05, 0.1], [4.6, -1.8], [5.9, -1.8], [6.45, 0.1], [6.85, 0.75], [7.6, 0.75], [8.0, 1.4], [8.5, 1.6], [9.3, 0]],
+        yaw: [[0.15, 0], [0.75, -0.55], [1.3, -0.4], [2.0, 0.05], [3.9, 0.05], [4.4, 0.2], [6.2, 0.2], [6.75, -0.6], [7.6, -0.55], [8.0, -0.5], [8.5, -0.55], [9.3, 0]],
+        pitch: [[0.15, 0], [0.75, 0.75], [1.3, 0.5], [2.0, 0.25], [3.9, 0.25], [4.05, 0.1], [4.6, -1.0], [5.9, -1.0], [6.45, 0.1], [6.85, 0.35], [7.6, 0.35], [8.0, 0.75], [8.5, 0.8], [9.3, 0]],
+        blickX: [[0.2, 0], [0.6, -3], [1.3, -2], [1.9, 0], [6.5, 0], [6.85, -4], [7.6, -4], [8.0, -3], [8.6, -3], [9.2, 0]],
+        blickY: [[0.2, 0], [0.6, 4], [1.2, 3.5], [1.8, 0], [6.5, 0], [6.85, 1.5], [7.6, 1.5], [8.0, 4], [8.6, 4], [9.2, 0]],
         roll: [[6.4, 0], [6.9, 0.07], [7.6, 0.07], [8.0, 0]],
         lut: [[0.75, 0.03], [1.4, 0.01], [2, 0], [4.15, 0], [4.7, -0.05], [6.0, -0.05], [6.6, 0], [8.0, 0.02], [8.5, 0.03], [9.4, 0]],
         vrid: [[0.75, -0.07], [1.6, -0.02], [6.4, -0.02], [6.9, -0.06], [7.6, -0.06], [8.45, -0.07], [9.4, 0]],
         axV: [[1.2, 6], [2.0, 20], [3.9, 20], [4.6, 12], [6.3, 12], [6.9, 16], [7.6, 16], [8.2, 4], [9.2, 0]],
         brynX: [[2.15, 0], [2.5, 0.3], [3.8, 0.3], [4.4, 0.1], [6.1, 0.1], [6.75, 0.65], [7.6, 0.55], [8.1, 0]],
         brynY: [[2.15, 0], [2.5, 0.24], [3.8, 0.24], [4.4, 0.08], [6.1, 0.08], [6.75, 0.52], [7.6, 0.44], [8.1, 0]],
-        blund: [[2.15, 0], [2.45, 0.5], [3.8, 0.5], [4.05, 0.25], [4.4, 0.85], [5.75, 0.85], [6.2, 0]],
+        blund: [[0.2, 0], [0.6, 0.28], [1.3, 0.2], [1.8, 0], [2.15, 0], [2.45, 0.5], [3.8, 0.5], [4.05, 0.25], [4.4, 0.85], [5.75, 0.85], [6.2, 0], [7.8, 0], [8.1, 0.28], [8.6, 0.28], [9.2, 0]],
         le: [[5.9, 0], [6.4, 0.45], [7.6, 0.35], [8.3, 0.08]],
         kis: [[6.0, 0], [6.4, 0.32], [6.9, 0.1]],
       },
       cig: {
         // [t, läge, båge uppåt på vägen dit]
         ck: [[1.0, 'vila'], [2.1, 'mun', 70], [3.9, 'mun'], [4.35, 'bort'], [4.95, 'hall'], [6.25, 'hall'], [6.9, 'se'], [7.6, 'se'], [8.45, 'vila', 90]],
-        krok: [[0, VILA_A[4]], [0.5, 0.12], [0.8, 0.12], [1.0, 0.45], [8.4, 0.45], [8.6, 0.14], [9.1, 0.2], [9.6, VILA_A[4]]],
+        krok: [[0, VILA_A[4]], [0.5, 0.12], [0.8, 0.12], [1.0, KG], [8.4, KG], [8.6, 0.14], [9.1, 0.2], [9.6, VILA_A[4]]],
         // fram till askkoppen och tillbaka, upp mot ansiktet och ned, och när fingrarna har den
         mot: [0.05, 0.85, 8.5, 9.4],
         upp: [1.0, 1.9, 7.7, 8.4],
@@ -979,21 +999,23 @@ export async function figuren(duk, { hog = false, latt = false, pr = 1 } = {}) {
     // höjt bryn, medan han tittar på en.
     bloss: {
       k: {
-        yaw: [[0.15, 0], [0.75, -1.3], [1.3, -0.8], [2.0, 0.05], [3.3, 0.05], [3.8, 0.45], [5.4, 0.45], [6.0, 0.1], [6.4, -1.1], [6.9, -1.2], [7.6, 0]],
-        pitch: [[0.15, 0], [0.75, 1.7], [1.3, 1.1], [2.0, 0.25], [3.3, 0.25], [3.8, -0.2], [5.4, -0.2], [6.0, 0.2], [6.4, 1.4], [6.9, 1.6], [7.6, 0]],
+        yaw: [[0.15, 0], [0.75, -0.55], [1.3, -0.4], [2.0, 0.05], [3.3, 0.05], [3.8, 0.45], [5.4, 0.45], [6.0, 0.1], [6.4, -0.5], [6.9, -0.55], [7.6, 0]],
+        pitch: [[0.15, 0], [0.75, 0.75], [1.3, 0.5], [2.0, 0.25], [3.3, 0.25], [3.8, -0.2], [5.4, -0.2], [6.0, 0.2], [6.4, 0.75], [6.9, 0.8], [7.6, 0]],
+        blickX: [[0.2, 0], [0.6, -3], [1.3, -2], [1.9, 0], [6.0, 0], [6.4, -3], [6.9, -3], [7.5, 0]],
+        blickY: [[0.2, 0], [0.6, 4], [1.2, 3.5], [1.8, 0], [6.0, 0], [6.4, 4], [6.9, 4], [7.5, 0]],
         roll: [[3.3, 0], [3.8, -0.06], [5.4, -0.06], [6.0, 0]],
         lut: [[0.75, 0.03], [1.4, 0.01], [2, 0], [3.3, 0], [3.8, -0.02], [5.5, -0.02], [6.4, 0.02], [6.9, 0.03], [7.7, 0]],
         vrid: [[0.75, -0.07], [1.6, -0.02], [5.6, -0.02], [6.85, -0.07], [7.7, 0]],
         axV: [[1.2, 6], [2.0, 20], [3.3, 20], [3.9, 12], [5.8, 12], [6.6, 4], [7.5, 0]],
         brynX: [[2.15, 0], [2.5, 0.2], [3.3, 0.2], [3.9, 0.1], [5.3, 0.1], [5.8, 0]],
         brynY: [[2.15, 0], [2.5, 0.16], [3.3, 0.16], [3.9, 0.7], [5.3, 0.7], [5.8, 0]],
-        blund: [[2.15, 0], [2.45, 0.45], [3.3, 0.45], [3.5, 0]],
+        blund: [[0.2, 0], [0.6, 0.28], [1.3, 0.2], [1.8, 0], [2.15, 0], [2.45, 0.45], [3.3, 0.45], [3.5, 0], [6.1, 0], [6.4, 0.28], [6.9, 0.28], [7.5, 0]],
         le: [[3.9, 0], [4.3, 0.22], [5.4, 0.22], [5.9, 0.3], [6.4, 0.1]],
         kis: [[3.9, 0], [4.3, 0.25], [5.4, 0.25], [5.9, 0]],
       },
       cig: {
         ck: [[1.0, 'vila'], [2.1, 'mun', 70], [3.3, 'mun'], [3.7, 'bort'], [4.3, 'hall'], [5.9, 'hall'], [6.85, 'vila', 90]],
-        krok: [[0, VILA_A[4]], [0.5, 0.12], [0.8, 0.12], [1.0, 0.45], [6.75, 0.45], [6.95, 0.14], [7.45, 0.2], [7.9, VILA_A[4]]],
+        krok: [[0, VILA_A[4]], [0.5, 0.12], [0.8, 0.12], [1.0, KG], [6.75, KG], [6.95, 0.14], [7.45, 0.2], [7.9, VILA_A[4]]],
         mot: [0.05, 0.85, 6.9, 7.75],
         upp: [1.0, 1.9, 6.0, 6.75],
         grepp: [0.8, 1.0, 6.75, 6.95],
@@ -1007,8 +1029,10 @@ export async function figuren(duk, { hog = false, latt = false, pr = 1 } = {}) {
     // nöjd, och lägger tillbaka cigarren.
     ringar: {
       k: {
-        yaw: [[0.15, 0], [0.75, -1.3], [1.3, -0.8], [2.0, 0.05], [3.5, 0.05], [4.3, 0.75], [6.8, 0.75], [7.4, 0.55], [8.3, 0.45], [8.9, -0.6], [9.4, -0.9], [10.0, -1.2], [10.8, 0]],
-        pitch: [[0.15, 0], [0.75, 1.7], [1.3, 1.1], [2.0, 0.25], [3.5, 0.25], [4.3, -0.4], [6.7, -0.4], [7.3, -1.3], [8.2, -1.0], [8.9, 0.6], [9.4, 0.75], [10.0, 1.5], [10.8, 0]],
+        yaw: [[0.15, 0], [0.75, -0.55], [1.3, -0.4], [2.0, 0.05], [3.5, 0.05], [4.3, 0.75], [6.8, 0.75], [7.4, 0.55], [8.3, 0.45], [8.9, -0.3], [9.4, -0.45], [10.0, -0.55], [10.8, 0]],
+        pitch: [[0.15, 0], [0.75, 0.75], [1.3, 0.5], [2.0, 0.25], [3.5, 0.25], [4.3, -0.4], [6.7, -0.4], [7.3, -0.9], [8.2, -0.75], [8.9, 0.3], [9.4, 0.4], [10.0, 0.8], [10.8, 0]],
+        blickX: [[0.2, 0], [0.6, -3], [1.3, -2], [1.9, 0], [8.7, 0], [9.2, -3], [10.0, -3], [10.6, 0]],
+        blickY: [[0.2, 0], [0.6, 4], [1.2, 3.5], [1.8, 0], [7.0, 0], [7.4, -2.5], [8.2, -2], [8.7, 0], [9.4, 2], [10.0, 4], [10.6, 0]],
         lut: [[0.75, 0.03], [1.4, 0.01], [2, 0], [3.6, 0], [4.3, -0.03], [6.7, -0.03], [7.4, -0.05], [8.2, -0.04], [9.0, 0], [10.0, 0.03], [10.9, 0]],
         vrid: [[0.75, -0.07], [1.6, -0.02], [8.6, -0.02], [9.4, -0.06], [10.0, -0.07], [10.9, 0]],
         axV: [[1.2, 6], [2.0, 20], [3.5, 20], [4.3, 14], [8.3, 14], [9.0, 16], [9.6, 10], [10.6, 0]],
@@ -1018,11 +1042,11 @@ export async function figuren(duk, { hog = false, latt = false, pr = 1 } = {}) {
         brynY: [[7.0, 0], [7.4, 0.56], [8.2, 0.48], [8.8, 0]],
         le: [[7.1, 0], [7.5, 0.5], [8.3, 0.4], [8.9, 0.1]],
         kis: [[7.1, 0], [7.5, 0.3], [8.3, 0.25], [8.9, 0]],
-        blund: [[2.15, 0], [2.45, 0.4], [3.4, 0.4], [3.6, 0]],
+        blund: [[0.2, 0], [0.6, 0.28], [1.3, 0.2], [1.8, 0], [2.15, 0], [2.45, 0.4], [3.4, 0.4], [3.6, 0], [9.6, 0], [10.0, 0.28], [10.6, 0]],
       },
       cig: {
         ck: [[1.0, 'vila'], [2.1, 'mun', 70], [3.5, 'mun'], [3.9, 'bort'], [4.5, 'hall'], [8.4, 'hall'], [8.9, 'se'], [9.3, 'se'], [9.95, 'vila', 90]],
-        krok: [[0, VILA_A[4]], [0.5, 0.12], [0.8, 0.12], [1.0, 0.45], [9.9, 0.45], [10.1, 0.14], [10.6, 0.2], [10.95, VILA_A[4]]],
+        krok: [[0, VILA_A[4]], [0.5, 0.12], [0.8, 0.12], [1.0, KG], [9.9, KG], [10.1, 0.14], [10.6, 0.2], [10.95, VILA_A[4]]],
         mot: [0.05, 0.85, 10.0, 10.85],
         upp: [1.0, 1.9, 9.2, 9.9],
         grepp: [0.8, 1.0, 9.9, 10.1],
@@ -1035,20 +1059,22 @@ export async function figuren(duk, { hog = false, latt = false, pr = 1 } = {}) {
     // bloss och blåser ut röken genom näsan med halvslutna ögon.
     aska: {
       k: {
-        yaw: [[0.15, 0], [0.75, -1.3], [1.3, -1.1], [2.8, -1.15], [3.3, -1.0], [3.8, -1.0], [4.4, 0.05], [5.8, 0.05], [6.2, 0.55], [7.9, 0.5], [8.6, 0], [9.1, -1.0], [9.6, -1.1], [10.4, 0]],
-        pitch: [[0.15, 0], [0.75, 1.7], [1.3, 1.4], [2.8, 1.5], [3.3, 0.8], [3.8, 0.75], [4.4, 0.25], [5.7, 0.25], [6.1, -0.5], [7.8, -0.5], [8.4, 0], [9.1, 1.4], [9.6, 1.6], [10.4, 0]],
+        yaw: [[0.15, 0], [0.75, -0.55], [1.3, -0.5], [2.8, -0.55], [3.3, -0.5], [3.8, -0.5], [4.4, 0.05], [5.8, 0.05], [6.2, 0.55], [7.9, 0.5], [8.6, 0], [9.1, -0.45], [9.6, -0.55], [10.4, 0]],
+        pitch: [[0.15, 0], [0.75, 0.8], [1.3, 0.75], [2.8, 0.8], [3.3, 0.4], [3.8, 0.35], [4.4, 0.25], [5.7, 0.25], [6.1, -0.5], [7.8, -0.5], [8.4, 0], [9.1, 0.75], [9.6, 0.8], [10.4, 0]],
+        blickX: [[0.2, 0], [0.6, -3], [2.8, -3], [3.3, -4], [3.8, -4], [4.3, 0], [8.8, 0], [9.2, -3], [9.6, -3], [10.3, 0]],
+        blickY: [[0.2, 0], [0.6, 4.5], [2.8, 4.5], [3.3, 1.5], [3.8, 1.5], [4.3, 0], [8.8, 0], [9.2, 4], [9.6, 4], [10.3, 0]],
         lut: [[0.75, 0.03], [1.4, 0.04], [2.8, 0.04], [3.3, 0.01], [6.1, -0.03], [7.8, -0.03], [8.4, 0], [9.3, 0.03], [10.4, 0]],
         vrid: [[0.75, -0.07], [2.8, -0.08], [3.4, -0.04], [6.4, -0.02], [8.6, -0.04], [9.5, -0.07], [10.4, 0]],
         axV: [[1.2, 4], [2.8, 6], [3.6, 14], [4.4, 20], [5.7, 22], [6.3, 12], [8.2, 12], [9.2, 2]],
         brynX: [[2.9, 0], [3.4, 0.5], [3.9, 0.45], [4.5, 0.1], [6.1, 0.2], [7.8, 0.2], [8.4, 0]],
         brynY: [[2.9, 0], [3.4, 0.4], [3.9, 0.36], [4.5, 0.08], [6.1, 0.16], [7.8, 0.16], [8.4, 0]],
-        blund: [[4.65, 0], [4.9, 0.5], [5.6, 0.5], [6.0, 0.3], [6.3, 0.65], [7.6, 0.65], [8.0, 0]],
+        blund: [[0.2, 0], [0.6, 0.28], [2.8, 0.28], [3.2, 0], [4.65, 0], [4.9, 0.5], [5.6, 0.5], [6.0, 0.3], [6.3, 0.65], [7.6, 0.65], [8.0, 0], [8.8, 0], [9.2, 0.28], [9.6, 0.28], [10.3, 0]],
         le: [[3.2, 0], [3.5, 0.25], [3.9, 0.2], [4.3, 0], [7.6, 0], [8.0, 0.4], [9.0, 0.25], [9.8, 0.05]],
         kis: [[7.8, 0], [8.0, 0.25], [8.6, 0.05]],
       },
       cig: {
         ck: [[1.0, 'vila'], [1.85, 'knack', 45], [2.08, 'knackN'], [2.22, 'knack'], [2.46, 'knackN'], [2.6, 'knack'], [3.2, 'se'], [3.8, 'se'], [4.6, 'mun', 40], [5.7, 'mun'], [6.1, 'bort'], [6.7, 'hall'], [8.6, 'hall'], [9.5, 'vila', 90]],
-        krok: [[0, VILA_A[4]], [0.5, 0.12], [0.8, 0.12], [1.0, 0.45], [9.4, 0.45], [9.6, 0.14], [10.1, 0.2], [10.6, VILA_A[4]]],
+        krok: [[0, VILA_A[4]], [0.5, 0.12], [0.8, 0.12], [1.0, KG], [9.4, KG], [9.6, 0.14], [10.1, 0.2], [10.6, VILA_A[4]]],
         mot: [0.05, 0.85, 9.55, 10.4],
         upp: [3.0, 3.8, 8.7, 9.4],
         grepp: [0.8, 1.0, 9.4, 9.6],
@@ -1131,6 +1157,214 @@ export async function figuren(duk, { hog = false, latt = false, pr = 1 } = {}) {
       },
     },
   };
+  // Ett cigarrklipp där han njuter: han tittar ned och tar cigarren ur askkoppen (0–2), och lägger
+  // tillbaka den så att den ligger där vid E. k och cig är det som händer däremellan; början och slutet
+  // fylls i här (av början det som kommer före klippets första nyckel i en kanal, av slutet det som kommer
+  // efter den sista). Klippet är E + 1,4 s långt.
+  const CIG_START = {
+    yaw: [[0.15, 0], [0.75, -0.55], [1.3, -0.4], [2.0, 0.05]],
+    pitch: [[0.15, 0], [0.75, 0.75], [1.3, 0.5], [2.0, 0.25]],
+    lut: [[0.75, 0.03], [1.4, 0.01], [2.0, 0]],
+    vrid: [[0.75, -0.07], [1.6, -0.02]],
+    axV: [[1.2, 6], [2.0, 20]],
+    blickX: [[0.2, 0], [0.6, -3], [1.3, -2], [1.9, 0]],
+    blickY: [[0.2, 0], [0.6, 4], [1.2, 3.5], [1.8, 0]],
+    blund: [[0.2, 0], [0.6, 0.28], [1.3, 0.2], [1.8, 0]],
+  };
+  const cigSlut = (E) => ({
+    yaw: [[E - 0.45, -0.5], [E + 0.05, -0.55], [E + 0.85, 0]],
+    pitch: [[E - 0.45, 0.75], [E + 0.05, 0.8], [E + 0.85, 0]],
+    lut: [[E - 0.45, 0.02], [E + 0.05, 0.03], [E + 0.95, 0]],
+    vrid: [[E - 0.45, -0.06], [E, -0.07], [E + 0.95, 0]],
+    axV: [[E - 0.25, 4], [E + 0.75, 0]],
+    blickX: [[E - 0.75, 0], [E - 0.35, -3], [E + 0.15, -3], [E + 0.75, 0]],
+    blickY: [[E - 0.75, 0], [E - 0.35, 4], [E + 0.15, 4], [E + 0.75, 0]],
+    blund: [[E - 0.7, 0], [E - 0.35, 0.28], [E + 0.15, 0.28], [E + 0.75, 0]],
+  });
+  function cigarrKlipp(E, k, cig) {
+    const S = cigSlut(E);
+    const ut = {};
+    for (const x of new Set([...Object.keys(CIG_START), ...Object.keys(k), ...Object.keys(S)])) {
+      const m = k[x] || [];
+      const a = m.length ? m[0][0] : Infinity;
+      const b = m.length ? m[m.length - 1][0] : -Infinity;
+      ut[x] = [...(CIG_START[x] || []).filter((p) => p[0] < a), ...m, ...(S[x] || []).filter((p) => p[0] > b)];
+    }
+    return {
+      k: ut,
+      cig: {
+        ...cig,
+        ck: [[1.0, 'vila'], ...cig.ck, [E, 'vila', 90]],
+        krok: cig.krok || [[0, VILA_A[4]], [0.5, 0.12], [0.8, 0.12], [1.0, KG], [E - 0.05, KG], [E + 0.15, 0.14], [E + 0.65, 0.2], [E + 1.15, VILA_A[4]]],
+        mot: cig.mot || [0.05, 0.85, E + 0.05, E + 0.9],
+        upp: cig.upp || [1.0, 1.9, E - 0.75, E - 0.05],
+        grepp: cig.grepp || [0.8, 1.0, E - 0.05, E + 0.15],
+      },
+    };
+  }
+  Object.assign(RORELSER, {
+    // Det långa blosset: han drar länge och långsamt med ögonen som sluts och axlarna som stiger, håller
+    // röken en stund, lutar huvudet bakåt och blåser ut den länge medan axlarna sjunker. Sedan ah: ett
+    // brett leende och en liten skakning på huvudet, och han tittar nöjt på cigarren och nickar.
+    lang: cigarrKlipp(13.4, {
+      yaw: [[2.0, 0.05], [5.2, 0.05], [6.8, 0.3], [8.8, 0.3], [9.4, 0.3], [9.75, 0.05], [10.1, 0.3], [10.45, 0.1], [10.9, 0.05], [11.3, -0.45], [12.4, -0.45]],
+      pitch: [[2.0, 0.25], [5.2, -0.15], [6.0, -0.15], [6.9, -1.0], [8.7, -1.0], [9.5, 0], [10.6, 0], [11.2, 0.3], [11.55, 0.6], [11.85, 0.3], [12.1, 0.55], [12.4, 0.35]],
+      lut: [[2.0, 0], [5.2, -0.03], [6.9, -0.05], [8.8, -0.05], [9.6, -0.01]],
+      axV: [[2.0, 20], [3.6, 30], [5.2, 34], [6.4, 34], [9.0, 8], [9.8, 12], [10.6, 14]],
+      brynX: [[2.4, 0], [3.6, 0.35], [6.2, 0.4], [6.9, 0.15], [8.7, 0.15], [9.4, 0.7], [10.4, 0.55], [11.0, 0.2], [11.5, 0.5], [12.6, 0.2]],
+      brynY: [[2.4, 0], [3.6, 0.3], [6.2, 0.32], [6.9, 0.12], [8.7, 0.12], [9.4, 0.6], [10.4, 0.45], [11.0, 0.16], [11.5, 0.4], [12.6, 0.16]],
+      blund: [[2.15, 0], [2.8, 0.55], [4.2, 0.85], [8.7, 0.85], [9.4, 0.35], [10.6, 0.3], [11.0, 0]],
+      kis: [[9.0, 0], [9.5, 0.35], [10.6, 0.3], [11.0, 0.1]],
+      le: [[5.5, 0], [6.2, 0.15], [8.7, 0.1], [9.4, 0.6], [10.6, 0.55], [11.2, 0.35], [12.6, 0.3]],
+      munn: [[5.45, 0], [5.6, 0.04], [5.8, 0], [6.0, 0.05], [6.2, 0]],
+      blickX: [[10.9, 0], [11.3, -4], [12.4, -4]],
+      blickY: [[10.9, 0], [11.3, 1.5], [12.4, 1.5]],
+    }, {
+      ck: [[2.1, 'mun', 70], [5.2, 'mun'], [5.65, 'bort'], [6.3, 'hall'], [10.6, 'hall'], [11.1, 'se'], [12.4, 'se']],
+      glod: [[2.2, 0], [2.9, 0.7], [4.0, 1], [5.05, 1], [5.5, 0]],
+      iMun: [[1.95, 0], [2.15, 1], [5.2, 1], [5.35, 0]],
+      blaser: [[6.35, 0], [6.6, 0.8], [8.4, 0.7], [8.9, 0]],
+      rok: [{ fran: 6.45, till: 8.9, sort: 'blas', styrka: 95, avtag: 0.45, fart: 0.8 }],
+    }),
+    // Han drar ett bloss och blåser ut röken, och sedan lutar han sig bakåt med cigarren i handen och
+    // blundar en lång stund: andas djupt och långsamt, med ett leende som växer och röken som ringlar upp
+    // från glöden bredvid honom. Han öppnar ögonen, nickar nöjt mot en och lägger tillbaka den.
+    luta: cigarrKlipp(13.0, {
+      yaw: [[2.0, 0.05], [3.4, 0.05], [3.9, 0.35], [5.2, 0.35], [6.0, 0.15], [10.2, 0.2], [10.8, 0.05], [11.6, 0.05]],
+      pitch: [[2.0, 0.25], [3.4, 0.25], [3.9, -0.3], [5.2, -0.3], [6.2, -0.75], [10.2, -0.7], [10.8, 0], [11.1, 0.4], [11.4, 0.05], [11.7, 0.3], [12.0, 0.1]],
+      roll: [[5.0, 0], [6.2, 0.07], [10.2, 0.06], [10.9, 0]],
+      lut: [[2.0, 0], [3.4, 0], [5.0, -0.02], [6.4, -0.065], [10.2, -0.065], [11.0, 0]],
+      vrid: [[5.0, -0.02], [6.4, 0.02], [10.2, 0.02], [11.0, 0]],
+      axV: [[2.0, 20], [3.4, 26], [4.4, 14], [5.6, 6], [6.8, 22], [8.0, 6], [9.2, 22], [10.4, 8], [11.2, 12]],
+      brynX: [[3.4, 0], [4.0, 0.25], [5.4, 0.2], [6.4, 0.3], [10.2, 0.3], [10.8, 0.6], [11.6, 0.3]],
+      brynY: [[3.4, 0], [4.0, 0.2], [5.4, 0.16], [6.4, 0.25], [10.2, 0.25], [10.8, 0.5], [11.6, 0.24]],
+      blund: [[2.15, 0], [2.45, 0.45], [3.3, 0.45], [3.9, 0.75], [5.2, 0.7], [6.0, 0.92], [10.2, 0.92], [10.7, 0.15], [11.6, 0.1]],
+      le: [[4.6, 0], [5.4, 0.15], [7.0, 0.3], [9.4, 0.45], [10.2, 0.5], [10.9, 0.55], [11.8, 0.35]],
+      kis: [[10.5, 0], [10.9, 0.3], [11.8, 0.15]],
+      munn: [[7.9, 0], [8.05, 0.05], [8.5, 0.05], [8.7, 0]],
+    }, {
+      ck: [[2.1, 'mun', 70], [3.3, 'mun'], [3.7, 'bort'], [4.3, 'hall'], [11.6, 'hall']],
+      glod: [[2.2, 0], [2.6, 1], [3.05, 0.85], [3.3, 0.2], [6.0, 0.2], [11.6, 0.15], [12.6, 0]],
+      iMun: [[1.95, 0], [2.15, 1], [3.3, 1], [3.45, 0]],
+      blaser: [[3.8, 0], [4.0, 0.7], [5.0, 0.6], [5.3, 0]],
+      rok: [{ fran: 3.85, till: 5.3, sort: 'blas', styrka: 85, avtag: 0.9 }],
+    }),
+    // Tänderna: han biter om cigarren i mungipan och släpper den, och sitter nöjd med händerna på disken,
+    // lutar sig lite bakåt och puffar, med röken ur andra mungipan, innan han tar den igen.
+    tand: cigarrKlipp(15.0, {
+      yaw: [[2.0, 0.05], [3.4, 0.05], [4.4, 0.3], [7.0, 0.35], [9.0, 0.2], [11.2, 0.3], [12.0, 0.05]],
+      pitch: [[2.0, 0.25], [3.4, 0.2], [4.6, -0.35], [6.8, -0.3], [7.1, -0.05], [7.4, -0.3], [9.4, -0.35], [11.4, -0.25], [12.0, 0.2], [12.7, -0.2], [14.0, -0.1]],
+      roll: [[3.4, 0], [4.6, 0.05], [10.8, 0.05], [11.6, 0]],
+      lut: [[2.0, 0], [3.6, 0], [4.8, -0.045], [11.0, -0.045], [12.0, 0]],
+      axV: [[2.0, 20], [3.4, 20], [4.6, 2], [5.4, 8], [6.4, 4], [7.6, 9], [8.6, 4], [9.6, 9], [10.8, 4], [12.0, 14]],
+      brynX: [[4.0, 0], [4.8, 0.25], [10.8, 0.25], [11.6, 0], [13.0, 0.35]],
+      brynY: [[4.0, 0], [4.8, 0.2], [10.8, 0.2], [11.6, 0], [13.0, 0.3]],
+      blund: [[2.15, 0], [2.45, 0.45], [3.0, 0.45], [3.3, 0], [4.4, 0], [5.0, 0.45], [5.4, 0.6], [6.2, 0.45], [7.6, 0.6], [8.4, 0.45], [9.6, 0.6], [10.5, 0.45], [11.2, 0], [12.8, 0], [13.1, 0.6], [13.9, 0.5], [14.2, 0]],
+      le: [[3.3, 0], [4.6, 0.32], [10.8, 0.32], [11.4, 0.15], [13.3, 0.35]],
+      kis: [[4.6, 0], [5.2, 0.2], [10.8, 0.2], [11.4, 0]],
+      munn: [[3.3, 0], [3.5, 0.03], [5.95, 0.03], [6.05, 0.1], [6.4, 0.1], [6.5, 0.03], [8.25, 0.03], [8.35, 0.1], [8.7, 0.1], [8.8, 0.03], [10.35, 0.03], [10.45, 0.1], [10.8, 0.1], [10.9, 0.03], [12.0, 0.03], [12.1, 0]],
+    }, {
+      ck: [[2.1, 'mun', 70], [3.0, 'mun'], [3.35, 'tand'], [12.1, 'tand'], [12.6, 'bort'], [13.2, 'hall'], [14.0, 'hall']],
+      // handen släpper den och lägger sig på disken (mot 0), och kommer tillbaka och tar den
+      mot: [[0.05, 0], [0.85, 1], [3.4, 1], [4.3, 0], [11.3, 0], [12.1, 1], [15.05, 1], [15.9, 0]],
+      upp: [[1.0, 0], [1.9, 1], [3.4, 1], [4.3, 0], [11.3, 0], [12.0, 1], [14.25, 1], [14.95, 0]],
+      grepp: [[0.8, 0], [1.0, 1], [3.35, 1], [3.55, 0], [11.95, 0], [12.1, 1], [14.95, 1], [15.15, 0]],
+      krok: [[0, VILA_A[4]], [0.5, 0.12], [0.8, 0.12], [1.0, KG], [3.35, KG], [3.6, 0.15], [4.3, VILA_A[4]], [11.3, VILA_A[4]], [11.6, 0.12], [11.95, 0.12], [12.1, KG], [14.95, KG], [15.15, 0.14], [15.65, 0.2], [16.15, VILA_A[4]]],
+      glod: [[2.2, 0], [2.5, 1], [2.95, 0.2], [3.4, 0.12], [5.3, 0.12], [5.6, 0.9], [6.0, 0.15], [7.6, 0.15], [7.9, 0.9], [8.3, 0.15], [9.7, 0.15], [10.0, 0.85], [10.4, 0.12], [12.0, 0.1], [12.5, 0]],
+      iMun: [[1.95, 0], [2.15, 1], [3.0, 1], [3.3, 0]],
+      blaser: [[12.65, 0], [12.85, 0.6], [13.9, 0.5], [14.2, 0]],
+      rok: [{ fran: 6.05, till: 6.5, sort: 'strale', styrka: 30, avtag: 1 }, { fran: 8.35, till: 8.8, sort: 'strale', styrka: 30, avtag: 1 }, { fran: 10.45, till: 10.9, sort: 'strale', styrka: 30, avtag: 1 }, { fran: 12.7, till: 14.2, sort: 'blas', styrka: 60, avtag: 1.0 }],
+    }),
+    // Han håller upp cigarren och beundrar den: rullar den mellan fingrarna med höjda bryn och mun som
+    // säger hm, nickar gillande, och tar ett bloss med röken i en stråle ur mungipan.
+    beundra: cigarrKlipp(11.6, {
+      yaw: [[2.0, -0.5], [5.6, -0.55], [6.3, 0.05], [7.6, 0.05], [8.1, 0.45], [9.4, 0.45], [10.2, 0.1]],
+      pitch: [[2.0, 0.35], [4.3, 0.3], [4.6, 0.65], [4.9, 0.3], [5.2, 0.6], [5.5, 0.3], [6.3, 0.25], [7.6, 0.25], [8.1, -0.2], [9.4, -0.2], [9.9, 0.3], [10.2, 0.1]],
+      roll: [[2.0, 0.04], [4.2, 0.05], [5.6, 0]],
+      axV: [[2.0, 22], [5.6, 22], [6.4, 20], [7.6, 26], [8.4, 14]],
+      brynX: [[2.0, 0.2], [2.6, 0.7], [4.3, 0.75], [5.0, 0.35], [6.4, 0.1], [7.6, 0.2], [8.1, 0.65], [9.4, 0.6], [10.0, 0.2]],
+      brynY: [[2.0, 0.15], [2.6, 0.55], [4.3, 0.6], [5.0, 0.28], [6.4, 0.08], [7.6, 0.16], [8.1, 0.5], [9.4, 0.48], [10.0, 0.16]],
+      rund: [[2.6, 0], [3.0, 0.4], [4.2, 0.4], [4.5, 0]],
+      munn: [[2.6, 0], [3.0, 0.04], [4.2, 0.04], [4.5, 0]],
+      le: [[4.3, 0], [4.8, 0.4], [5.8, 0.3], [6.4, 0], [8.1, 0.2], [9.4, 0.3], [10.0, 0.45]],
+      blund: [[6.45, 0], [6.75, 0.5], [7.6, 0.5], [7.8, 0]],
+      blickX: [[1.9, -2], [2.3, -6], [5.4, -6], [5.9, 0]],
+      blickY: [[1.9, 1], [2.3, 3.5], [5.4, 3.5], [5.9, 0]],
+    }, {
+      ck: [[2.0, 'visa', 40], [5.6, 'visa'], [6.4, 'mun', 30], [7.6, 'mun'], [8.0, 'bort'], [8.6, 'hall'], [10.6, 'hall']],
+      rull: [[2.2, 0], [2.9, 0.6], [3.6, -0.35], [4.3, 0.45], [5.0, 0]],
+      glod: [[6.6, 0], [6.95, 1], [7.4, 0.85], [7.7, 0]],
+      iMun: [[6.3, 0], [6.5, 1], [7.6, 1], [7.75, 0]],
+      blaser: [[8.1, 0], [8.25, 0.5], [9.3, 0.5], [9.6, 0]],
+      rok: [{ fran: 8.15, till: 9.5, sort: 'strale', styrka: 60, avtag: 0.8 }],
+    }),
+    // Tre korta bloss i rad med kisande ögon och lite rök ur mungipan efter vart och ett, sedan ut med ett
+    // nöjt moln med huvudet bakåt, ett brett leende och ett litet skratt, och en blick på cigarren.
+    puffar: cigarrKlipp(9.8, {
+      yaw: [[2.0, 0.05], [4.6, 0.05], [5.4, 0.3], [6.4, 0.3], [7.0, 0.1], [7.6, 0.1], [8.2, -0.45], [8.9, -0.45]],
+      pitch: [[2.0, 0.25], [4.6, 0.2], [5.4, -0.8], [6.4, -0.8], [6.9, 0], [7.6, 0], [8.2, 0.35], [8.5, 0.55], [8.9, 0.35]],
+      lut: [[2.0, 0], [4.6, 0], [5.4, -0.04], [6.4, -0.04], [7.0, 0]],
+      axV: [[2.0, 20], [2.5, 24], [2.75, 20], [3.2, 24], [3.45, 20], [3.9, 26], [4.6, 26], [6.4, 10], [6.6, 14], [6.75, 20], [6.9, 14], [7.05, 19], [7.2, 14], [7.6, 14]],
+      brynX: [[2.2, 0], [2.5, -0.3], [4.2, -0.3], [4.6, 0.2], [6.4, 0.2], [6.8, 0.7], [7.6, 0.5], [8.2, 0.3]],
+      brynY: [[2.2, 0], [2.5, -0.2], [4.2, -0.2], [4.6, 0.16], [6.4, 0.16], [6.8, 0.56], [7.6, 0.4], [8.2, 0.24]],
+      kis: [[2.2, 0], [2.5, 0.35], [4.3, 0.35], [4.7, 0], [6.5, 0], [6.8, 0.45], [7.6, 0.35], [8.0, 0.1]],
+      blund: [[2.15, 0], [2.4, 0.3], [4.4, 0.3], [4.8, 0.8], [6.3, 0.8], [6.6, 0], [7.9, 0], [8.2, 0.2], [8.9, 0.2]],
+      le: [[6.2, 0], [6.6, 0.6], [7.6, 0.5], [8.2, 0.3], [8.9, 0.3]],
+      munn: [[6.55, 0], [6.65, 0.14], [6.8, 0.04], [6.95, 0.12], [7.1, 0.03], [7.3, 0]],
+      blickX: [[7.8, 0], [8.2, -4], [8.9, -4]],
+      blickY: [[7.8, 0], [8.2, 1.5], [8.9, 1.5]],
+    }, {
+      ck: [[2.1, 'mun', 70], [4.6, 'mun'], [5.0, 'bort'], [5.6, 'hall'], [7.6, 'hall'], [8.2, 'se'], [8.9, 'se']],
+      glod: [[2.2, 0], [2.45, 0.9], [2.7, 0.3], [3.15, 0.95], [3.4, 0.3], [3.85, 1], [4.2, 0.2], [4.6, 0]],
+      iMun: [[1.95, 0], [2.15, 1], [4.6, 1], [4.75, 0]],
+      pust: [[2.7, 0], [2.75, 1], [2.9, 1], [2.98, 0], [3.4, 0], [3.45, 1], [3.6, 1], [3.68, 0], [4.15, 0], [4.2, 1], [4.35, 1], [4.43, 0]],
+      blaser: [[4.85, 0], [5.05, 0.8], [6.1, 0.7], [6.4, 0]],
+      rok: [{ fran: 2.72, till: 2.95, sort: 'pust' }, { fran: 3.42, till: 3.65, sort: 'pust' }, { fran: 4.17, till: 4.4, sort: 'pust' }, { fran: 4.95, till: 6.4, sort: 'blas', styrka: 95, avtag: 1.1 }],
+    }),
+    // Ett bloss och ut med röken, och sedan visar han cigarren mot en, två små knyckar som säger: det här,
+    // det är livet. Han skrockar och tittar gillande på den.
+    vifta: cigarrKlipp(10.8, {
+      yaw: [[2.0, 0.05], [3.3, 0.05], [3.9, 0.4], [5.0, 0.4], [5.5, 0.2], [6.7, 0.2], [7.6, 0.1], [8.6, -0.45], [9.8, -0.45]],
+      pitch: [[2.0, 0.25], [3.3, 0.25], [3.9, -0.2], [5.0, -0.2], [5.5, 0.1], [5.8, 0.35], [6.1, 0.1], [6.7, 0], [7.6, 0], [8.6, 0.35], [8.9, 0.6], [9.2, 0.35], [9.8, 0.4]],
+      lut: [[2.0, 0], [5.0, 0], [5.5, 0.03], [6.4, 0.03], [7.2, 0]],
+      axV: [[2.0, 20], [3.3, 24], [4.0, 14], [6.7, 14], [6.85, 20], [7.0, 14], [7.15, 19], [7.3, 14]],
+      brynX: [[3.4, 0], [3.8, 0.3], [5.0, 0.2], [5.4, 0.8], [6.4, 0.75], [7.2, 0.4], [8.6, 0.3]],
+      brynY: [[3.4, 0], [3.8, 0.24], [5.0, 0.16], [5.4, 0.65], [6.4, 0.6], [7.2, 0.32], [8.6, 0.24]],
+      blund: [[2.15, 0], [2.45, 0.45], [3.3, 0.45], [3.9, 0.7], [4.9, 0.6], [5.3, 0]],
+      kis: [[5.3, 0], [5.6, 0.25], [6.6, 0.3], [7.0, 0.45], [7.6, 0.2]],
+      le: [[4.0, 0], [4.5, 0.3], [5.4, 0.45], [6.6, 0.5], [7.0, 0.6], [7.8, 0.4], [9.8, 0.3]],
+      munn: [[6.7, 0], [6.8, 0.12], [6.95, 0.03], [7.1, 0.1], [7.25, 0]],
+      blickX: [[8.2, 0], [8.6, -4], [9.8, -4]],
+      blickY: [[8.2, 0], [8.6, 1.5], [9.8, 1.5]],
+    }, {
+      ck: [[2.1, 'mun', 70], [3.3, 'mun'], [3.7, 'bort'], [4.3, 'hall'], [5.0, 'hall'], [5.5, 'vift'], [5.8, 'vift2'], [6.1, 'vift'], [6.7, 'hall'], [8.0, 'hall'], [8.6, 'se'], [9.8, 'se']],
+      glod: [[2.2, 0], [2.6, 1], [3.05, 0.85], [3.3, 0]],
+      iMun: [[1.95, 0], [2.15, 1], [3.3, 1], [3.45, 0]],
+      blaser: [[3.8, 0], [4.0, 0.7], [4.8, 0.6], [5.1, 0]],
+      rok: [{ fran: 3.85, till: 5.1, sort: 'blas', styrka: 80, avtag: 1.1 }],
+    }),
+    // Han drar ett bloss och håller röken i munnen och smakar på den, med slutna ögon och höjda bryn, och
+    // släpper sedan ut den långsamt så att den ringlar uppåt, och ler brett.
+    smaka: cigarrKlipp(12.0, {
+      yaw: [[2.0, 0.05], [4.0, 0.05], [6.4, 0.1], [7.0, 0.45], [8.9, 0.45], [9.6, 0.15], [10.4, 0.1]],
+      pitch: [[2.0, 0.25], [4.0, 0.15], [4.6, 0.25], [5.0, 0.05], [5.4, 0.25], [6.4, 0.1], [7.0, -0.45], [8.9, -0.45], [9.6, 0.1], [9.9, 0.4], [10.2, 0.1]],
+      roll: [[4.0, 0], [4.8, 0.06], [6.4, 0.06], [7.0, 0]],
+      lut: [[2.0, 0], [6.4, 0], [7.0, -0.03], [8.9, -0.03], [9.6, 0]],
+      axV: [[2.0, 20], [3.6, 30], [6.4, 28], [9.0, 10], [10.0, 12]],
+      brynX: [[2.5, 0], [3.6, 0.3], [4.4, 0.7], [6.4, 0.7], [7.0, 0.3], [8.9, 0.3], [9.5, 0.6], [10.4, 0.3]],
+      brynY: [[2.5, 0], [3.6, 0.25], [4.4, 0.55], [6.4, 0.55], [7.0, 0.24], [8.9, 0.24], [9.5, 0.48], [10.4, 0.24]],
+      blund: [[2.15, 0], [2.6, 0.5], [3.6, 0.6], [4.2, 0.85], [8.9, 0.85], [9.4, 0.2], [10.2, 0.15]],
+      kis: [[9.2, 0], [9.6, 0.4], [10.4, 0.25]],
+      munn: [[3.85, 0], [4.25, 0], [4.4, 0.05], [4.6, 0], [4.9, 0.06], [5.1, 0], [5.5, 0.05], [5.7, 0], [6.0, 0.04], [6.2, 0]],
+      le: [[4.0, 0], [5.6, 0.2], [6.4, 0.25], [7.0, 0.15], [8.9, 0.2], [9.5, 0.6], [10.4, 0.45]],
+    }, {
+      ck: [[2.1, 'mun', 70], [3.6, 'mun'], [4.0, 'bort'], [4.6, 'hall'], [10.4, 'hall']],
+      glod: [[2.2, 0], [2.6, 0.9], [3.4, 1], [3.75, 0]],
+      iMun: [[1.95, 0], [2.15, 1], [3.6, 1], [3.75, 0]],
+      blaser: [[6.6, 0], [7.0, 0.32], [8.8, 0.28], [9.1, 0]],
+      rok: [{ fran: 6.9, till: 9.0, sort: 'blas', styrka: 45, avtag: 0.3, fart: 0.75, broms: 1.0, lyft: 46 }],
+    }),
+  });
   // Klippen in i tidslinjen: nycklarna i tidslinjens tid, med början och slut.
   const KL = [];
   const tom = (a = 0, b = 0) => [[0, a], [1e-3, b]];
@@ -1168,8 +1402,10 @@ export async function figuren(duk, { hog = false, latt = false, pr = 1 } = {}) {
     }
     if (o.cig) {
       const c = o.cig;
+      // (mot, upp och grepp: fyra tider, upp och ned igen, eller nycklar [t, 0–1])
+      const tb = (x) => (Array.isArray(x[0]) ? tid(x) : x.map((t) => fran + t));
       k.cig = {
-        ck: tid(c.ck), krok: tid(c.krok), mot: c.mot.map((t) => fran + t), upp: c.upp.map((t) => fran + t), grepp: c.grepp.map((t) => fran + t),
+        ck: tid(c.ck), krok: tid(c.krok), mot: tb(c.mot), upp: tb(c.upp), grepp: tb(c.grepp), rull: c.rull ? tid(c.rull) : tom(),
         glod: tid(c.glod), iMun: tid(c.iMun), blaser: c.blaser ? tid(c.blaser) : tom(), pust: c.pust ? tid(c.pust) : tom(),
         rok: rokTid(c.rok),
       };
@@ -1283,11 +1519,13 @@ export async function figuren(duk, { hog = false, latt = false, pr = 1 } = {}) {
   // sitter kvar i fingrarna hela vägen. Klippets cig: lägena (ck), fingrarna (krok), när armen går
   // fram och tillbaka (mot) och upp mot ansiktet (upp), när fingrarna har den (grepp), glöden, läpparna
   // om den (iMun), munnen när han blåser ut (blaser) och pustar (pust), och röken.
-  // Greppet (handens mått, skalad som handen): tummen under, pek- och långfingret ovanpå. I
-  // cigarrens läge är x fingrarnas riktning, y från huvudet mot glöden och z ut ur handflatan.
-  const GREPP = new THREE.Vector3(43, 148, 100).multiplyScalar(0.92);
+  // Greppet (handens mått, skalad som handen): löst i fingertopparna, tummen under och pek- och
+  // långfingret ovanpå, ring- och lillfingret böjda in mot handflatan. I cigarrens läge är x fingrarnas
+  // riktning, y från huvudet mot glöden och z ut ur handflatan. (Förut låg den djupt i den krökta handen,
+  // och fingrarna såg ut att hänga i den som i en stång.)
+  const GREPP = new THREE.Vector3(52, 178, 82).multiplyScalar(0.92);
   const SG = 60;
-  const EXTRA_C = [0, 0.02, 0.2, 0.3];
+  const EXTRA_C = [0, 0.03, 0.45, 0.55];
   const extraC = [0, 0, 0, 0];
   const mq = new THREE.Matrix4();
   const nyPose = () => ({ p: v(), q: new THREE.Quaternion() });
@@ -1322,10 +1560,15 @@ export async function figuren(duk, { hog = false, latt = false, pr = 1 } = {}) {
   }
   const PV = {
     vila: pose(nyPose(), HUV_C.clone().addScaledVector(A_VILA, SG), A_VILA, NED_),
-    // armbågen på disken och handen uppe vid axeln, cigarren tvärs över och glöden utåt
-    hall: fraHand(nyPose(), V3(-310, 165, 540), V3(0.12, 0.9, 0.42).normalize(), V3(0.25, -0.45, 0.86).normalize()),
+    // armbågen på disken och handen uppe vid axeln, cigarren tvärs över och glöden utåt och lite uppåt
+    hall: fraHand(nyPose(), V3(-310, 165, 540), V3(0.4, 0.82, 0.42).normalize(), V3(0.25, -0.45, 0.86).normalize()),
     // lite högre och vriden, glöden uppåt: han tittar på den
     se: fraHand(nyPose(), V3(-290, 215, 560), V3(0.3, 0.85, 0.43).normalize(), V3(0.1, -0.48, 0.87).normalize()),
+    // framför bröstet under hakan, snett uppåt, så att han ser ringen när han beundrar den
+    visa: pose(nyPose(), V3(10, 310, 790), V3(-0.6, 0.6, 0.5).normalize(), V3(0.2, -0.5, 0.85)),
+    // fram mot en, glöden mot en (vift2 lite högre: knycken)
+    vift: pose(nyPose(), V3(-160, 180, 800), V3(-0.55, 0.25, 0.8).normalize(), V3(0.3, -0.9, 0.2)),
+    vift2: pose(nyPose(), V3(-150, 215, 830), V3(-0.5, 0.4, 0.77).normalize(), V3(0.3, -0.85, 0.3)),
   };
   // Över askkoppen, med glöden över skålen och cigarren snett nedåt ut från handen; han knackar av
   // askan med ett kort ryck nedåt (knackN).
@@ -1341,31 +1584,43 @@ export async function figuren(duk, { hog = false, latt = false, pr = 1 } = {}) {
   // greppet, vid kinden, så att den inte skymmer ansiktet.
   const MUND = W_(662, 509, 0);
   MUND.z = djup(662, 509) - 6;
-  const A_MUN = new THREE.Vector3(-0.7, -0.2, 0.68).normalize();
-  const P_MUN = (() => {
-    const T = A_MUN.clone().negate();
-    const d = new THREE.Vector3(-1, -0.25, -0.35);
-    const e = d.addScaledVector(T, -d.dot(T)).normalize().negate();
+  // handflatan när cigarren pekar åt A och handen sitter åt d från greppet (tummen mot cigarrens huvud)
+  const flata = (A, d) => {
+    const T = A.clone().negate();
+    const e = d.clone().addScaledVector(T, -d.dot(T)).normalize().negate();
     const e2 = new THREE.Vector3().crossVectors(T, e);
     return e2.multiplyScalar(GREPP.y).addScaledVector(e, GREPP.z).normalize();
-  })();
-  const BORT = new THREE.Vector3(-58, -36, 52);
+  };
+  const A_MUN = new THREE.Vector3(-0.7, -0.2, 0.68).normalize();
+  const P_MUN = flata(A_MUN, V3(-1, -0.25, -0.35));
+  // utdragen: rakt ut längs sig själv och lite ned, fri från käken
+  const BORT = A_MUN.clone().multiplyScalar(55).add(V3(0, -30, 35));
+  // Lägen i huvudets mått: [cigarrens huvud, dess riktning, handflatan]. Fast i mungipan (tand): han
+  // biter om den och släpper den, och den pekar ut och ned.
+  const MUNHORN_H = W_(622, 509, 0);
+  MUNHORN_H.z = djup(622, 509) - 10;
+  const A_TAND = V3(-0.62, -0.42, 0.66).normalize();
+  const HL = {
+    mun: [MUND, A_MUN, P_MUN],
+    bort: [MUND.clone().add(BORT), A_MUN, P_MUN],
+    tand: [MUNHORN_H, A_TAND, flata(A_TAND, V3(-1, -0.4, -0.3))],
+  };
   const PIV = U.uPiv.value;
   const iHuvud = (p, ut) => ut.copy(p).sub(PIV).applyMatrix3(U.uHuvud.value).add(PIV).applyMatrix4(mk);
   const riktH = (d, ut) => ut.copy(d).applyMatrix3(U.uHuvud.value).transformDirection(mk);
   const hA = v();
   const hP = v();
   const hp = v();
-  function vidMunnen(ut, ut2) {
-    riktH(A_MUN, hA);
-    riktH(P_MUN, hP);
-    iHuvud(MUND, hp);
-    pose(ut, hp.addScaledVector(hA, SG), hA, hP);
-    // och utdragen
-    iHuvud(hp.copy(MUND).add(BORT), hp);
-    pose(ut2, hp.addScaledVector(hA, SG), hA, hP);
+  const PM = Object.fromEntries(Object.keys(HL).map((n) => [n, nyPose()]));
+  function vidMunnen() {
+    for (const n in HL) {
+      const [h, A, P] = HL[n];
+      riktH(A, hA);
+      riktH(P, hP);
+      iHuvud(h, hp);
+      pose(PM[n], hp.addScaledVector(hA, SG), hA, hP);
+    }
   }
-  const PM = { mun: nyPose(), bort: nyPose() };
   const posen = (namn) => PM[namn] || PV[namn];
   function cigarrLage(t, ut, c) {
     const CK = c && c.ck;
@@ -1414,13 +1669,19 @@ export async function figuren(duk, { hog = false, latt = false, pr = 1 } = {}) {
     return cW.copy(H).addScaledVector(ut, -26);
   }
   const cU = v();
+  // upp och ned igen (fyra tider), eller nycklar
+  const bump = (x, t) => (Array.isArray(x[0]) ? spar(x, t) : ss(x[0], x[1], t) * (1 - ss(x[2], x[3], t)));
+  const rq = new THREE.Quaternion();
   function cigarrArm(t, Sk, a, c) {
-    vidMunnen(PM.mun, PM.bort);
+    vidMunnen();
     cigarrLage(t, cp, c);
+    // han rullar den mellan fingrarna: runt dess egen längd
+    const rull = spar(c.rull, t);
+    if (rull) cp.q.multiply(rq.setFromAxisAngle(UPP, rull));
     cigarrSatt(cp);
-    // fram till askkoppen och tillbaka i en båge; däremellan håller han den
-    const mot = ss(c.mot[0], c.mot[1], t) * (1 - ss(c.mot[2], c.mot[3], t));
-    const upp = ss(c.upp[0], c.upp[1], t) * (1 - ss(c.upp[2], c.upp[3], t));
+    // fram till askkoppen och tillbaka i en båge; däremellan håller han den (eller har den i munnen)
+    const mot = bump(c.mot, t);
+    const upp = bump(c.upp, t);
     // (vilans riktning är armbågens hela längd: båda som enhetsvektorer, annars tar den nya över först på slutet)
     cPol.fromArray(VILA_A[1]).normalize().lerp(POL_UPP, upp);
     vristTill(Sk, cH, cPol, cU);
@@ -1431,7 +1692,7 @@ export async function figuren(duk, { hog = false, latt = false, pr = 1 } = {}) {
     a.P.lerp(cP, mot);
     a.krok = spar(c.krok, t);
     a.peka = 0;
-    const g = ss(c.grepp[0], c.grepp[1], t) * (1 - ss(c.grepp[2], c.grepp[3], t));
+    const g = bump(c.grepp, t);
     for (let i = 0; i < 4; i++) extraC[i] = EXTRA_C[i] * g;
     return extraC;
   }
@@ -1559,8 +1820,8 @@ export async function figuren(duk, { hog = false, latt = false, pr = 1 } = {}) {
   let rokN = null;
   let rokSkuld = 0;
   const skuld = new Map();
-  // (snett uppåt åt hans vänstra sida, inte framför ansiktet)
-  const BLAS = new THREE.Vector3(0.7, 0.72, 0.25).normalize();
+  // (snett uppåt åt hans vänstra sida och fram, så att den far förbi ansiktet och inte stannar framför det)
+  const BLAS = new THREE.Vector3(0.9, 0.32, 0.3).normalize();
   const PUFF = new THREE.Vector3(0.35, 0.28, 0.9).normalize();
   const MUNHORN = W_(680, 511, 0);
   MUNHORN.z = djup(680, 511);
@@ -1568,7 +1829,7 @@ export async function figuren(duk, { hog = false, latt = false, pr = 1 } = {}) {
   const STRALE = V3(0.85, 0.3, 0.45).normalize();
   const RINGEN = V3(0.86, 0.36, 0.36).normalize();
   const NASAN = [W_(645, 476, 0), W_(679, 476, 0)].map((p) => { p.z = djup(p.x + 660, 900 - p.y) + 4; return p; });
-  const NASDIR = V3(0.5, -0.6, 0.62).normalize();
+  const NASDIR = V3(0.42, -0.74, 0.52).normalize();
   // (ångan han blåser bort från koppen: åt hans vänstra sida och uppåt, så att den syns framifrån)
   const ANGA = V3(0.82, 0.4, 0.4).normalize();
   const UPP = V3(0, 1, 0);
@@ -1647,12 +1908,12 @@ export async function figuren(duk, { hog = false, latt = false, pr = 1 } = {}) {
           if (nas) iHuvud(NASAN[nasa++ % 2], rm);
           if (pust) rv.copy(rd).multiplyScalar(35).add(rj.set(slump(), slump(), slump()).multiplyScalar(14));
           else if (strale) rv.copy(rd).multiplyScalar(230 + slump() * 40).add(rj.set(slump(), slump(), slump()).multiplyScalar(16));
-          else if (nas) rv.copy(rd).multiplyScalar(105 + slump() * 30).add(rj.set(slump(), slump(), slump()).multiplyScalar(14));
-          else rv.copy(rd).multiplyScalar(165 + slump() * 50).add(rj.set(slump(), slump(), slump()).multiplyScalar(46));
+          else if (nas) rv.copy(rd).multiplyScalar(175 + slump() * 40).add(rj.set(slump(), slump(), slump()).multiplyScalar(18));
+          else rv.copy(rd).multiplyScalar((420 + slump() * 80) * (r.fart ?? 1)).add(rj.set(slump(), slump(), slump()).multiplyScalar(50 * (r.fart ?? 1)));
           rok.slapp(rm, rv, pust ? { liv: 2.2, r0: 3, r1: 28, a: 0.12, broms: 1.2, lyft: 15, sort: 1, virv: 0.7 }
             : strale ? { liv: 2.8, r0: 3, r1: 48, a: 0.12, broms: 1.5, lyft: 20, sort: 1, virv: 0.6, inn: 0.15 }
-              : nas ? { liv: 2.6, r0: 4, r1: 46, a: 0.15, broms: 1.4, lyft: 22, sort: 1, virv: 0.6, inn: 0.15 }
-                : { liv: 3.0, r0: 5, r1: 70, a: 0.13, broms: 1.6, lyft: 24, sort: 1, virv: 0.7, inn: 0.3 });
+              : nas ? { liv: 2.4, r0: 2.5, r1: 42, a: 0.1, broms: 1.0, lyft: 26, sort: 1, virv: 0.6, inn: 0.25 }
+                : { liv: 3.2, r0: 3, r1: 64, a: 0.1, broms: r.broms ?? 1.25, lyft: r.lyft ?? 30, sort: 1, virv: 0.7, inn: 0.25 });
         }
       }
     }
@@ -1718,7 +1979,7 @@ export async function figuren(duk, { hog = false, latt = false, pr = 1 } = {}) {
     const bl = 1 - clamp(Math.abs(fas - 0.3) / 0.085);
     U.rund.value = Math.max(U.rund.value, dricker * 0.7, iMun * 0.85, blaser, d('rund'));
     U.blund.value = Math.max(dricker * 0.82, skratt * 0.42, bl, ss(10.7, 10.9, t) * (1 - ss(11.25, 11.45, t)), d('blund'));
-    U.blick.value.set(4 * clamp((yaw - YAW0) / 0.2, -1, 1), 0);
+    U.blick.value.set(4 * clamp((yaw - YAW0) / 0.2, -1, 1) + d('blickX'), d('blickY'));
     sa.copy(SA);
     sa.y += axV;
     sa.x -= axV * 0.25;

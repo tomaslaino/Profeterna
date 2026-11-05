@@ -660,6 +660,13 @@ bara lokalt. Analyserna visas som de ligger i `data/analyser.json`; hur de skriv
   doften, skål och lillfingret ut. Medan han väntar på att man ska välja tar han kaffet och cigarren
   varannan gång; förut tog han då bara cigarren, så kaffet kom bara medan han låtsades läsa på. Se
   [Hasse Backe](#hasse-backe), *Kaffet*.
+- **Hasse Backe njuter av cigarren på elva sätt (2026-11-05, användarens önskemål):** cigarren såg
+  skev ut: ansiktet förvreds när han vred huvudet mot askkoppen, handen höll cigarren som en stång,
+  och röken lade sig som en fläck över ögat. Nu tittar han mest med ögonen, håller den löst i
+  fingertopparna, och röken far förbi ansiktet. Han njuter också ordentligt och på fler sätt: ett
+  långt bloss med *ah*, lutar sig bakåt och blundar, biter om den i mungipan med händerna på disken,
+  beundrar den, puffar, visar den mot en och smakar på röken. Se [Hasse Backe](#hasse-backe),
+  *Cigarren*.
 - **Statistik som i tobaksaffären (2026-11-05, användarens önskemål):** statistiken på den
   vanliga sajten ska stämma med den i tobaksaffären – samma tal under samma namn och samma
   uppdelning: det som jämför lagen står som på anslagstavlan (topplistorna under Lagen), det
@@ -3859,28 +3866,55 @@ Koppen klirrar mot fatet när han ställer ned den, hårdare efter en smäll.
 
 **Cigarren.** Till vänster om hans högra hand står en tung askkopp av samma gods som koppen, med två
 urtag. I det ena ligger cigarren: huvudet på disken, ringen (guld och rött) synlig och glöden över
-askkoppens mitt, där en tunn rökslinga stiger. Då och då tar han den (klippet `cigarr`, T 30–40, 10 s):
-han tittar ned och tar den ovanifrån, för den till munnen, drar två bloss med halvslutna ögon (glöden
-flammar upp, och mellan blossen pyser lite rök ur mungipan), tar ut den, lutar huvudet bakåt och blåser
-ut röken snett uppåt åt sidan med slutna ögon, ler, tittar på den och lägger tillbaka den. Han håller
-den som en cigarr ska hållas, tummen under och pek- och långfingret ovanpå, och vid munnen sitter
-handen vid kinden så att den inte skymmer ansiktet. Det är cigarren som styr: dess läge räknas fram
-(i askkoppen, vid munnen i huvudets mått så att den följer när han rör huvudet, vid axeln) och handen
-räknas ur greppet, så att den sitter kvar i fingrarna hela vägen. Kaffet och cigarren kommer
-varannan gång, kaffet först: 18–32 sekunder efter att man har vänt sig mot honom, sedan var 45–80:e
-sekund (`VANA` i [public/rum-hasse.js](public/rum-hasse.js)), bara när han väntar på en och inte
-pratar eller trummar. Medan han väntar på en analys tar han också kaffet och cigarren varannan gång. Ska något annat spelas
-medan han har den (slaget med domen, vägen hem efter analysen) lägger han tillbaka den 2,5 gånger så
-fort (`skynda`). Röken är partiklar i en gemensam luftström: lugn och rak nära glöden, slingrig
-högre upp (`byggRok` i [public/rum-hasse-arm.js](public/rum-hasse-arm.js)). Med minskad rörelse
-ligger cigarren kvar i askkoppen, men röken stiger, på samma sätt som han fortfarande andas.
+askkoppens mitt, där en tunn rökslinga stiger. Då och då tar han den och njuter av den en stund, på ett
+av elva sätt som lottas (nedan). Han tittar ned och tar den ovanifrån, och han håller den löst i
+fingertopparna, tummen under och pek- och långfingret ovanpå, med ring- och lillfingret böjda in mot
+handflatan; vid munnen sitter handen vid kinden så att den inte skymmer ansiktet. Det är cigarren som
+styr: dess läge räknas fram (i askkoppen, vid munnen eller i mungipan i huvudets mått så att den följer
+när han rör huvudet, vid axeln, framför bröstet) och handen räknas ur greppet, så att den sitter kvar i
+fingrarna hela vägen. Handen kan också släppa den: då sitter den kvar i munnen och handen vilar på
+disken. På askkoppen och cigarren tittar han mest med ögonen (`blickX`, `blickY`) och vrider huvudet
+bara lite, eftersom ansiktet är ett foto som förvrids vid större vridningar. När han blåser ut far
+röken förbi ansiktet åt sidan och blir ett moln bredvid honom. Förut höll han cigarren djupt i den
+krökta handen, så att fingrarna såg ut att hänga i den som i en stång, vred huvudet så långt mot
+askkoppen att ansiktet förvreds, och röken stannade framför ögat som en blek fläck och kom ur näsan som
+en vit mustasch (ändrat 2026-11-05).
 
-Klippet ovan är ett av fyra som lottas. I de andra tar han ett bloss och blåser ut röken i en tunn
-stråle ur mungipan med huvudet på sned och ett höjt bryn (`bloss`); drar två korta bloss och blåser
-tre rökringar med munnen som ett o, åt sidan så att de far ut i luften bredvid honom, och tittar efter
-dem (`ringar`); eller knackar av askan över askkoppen med två korta ryck (askan faller), tittar på
-glöden, drar ett bloss och blåser ut röken genom näsan (`aska`). Rökringen är partiklar i en cirkel
-som far iväg och vidgar sig, med svag virvel så att den håller ihop (`ring`).
+Kaffet och cigarren kommer varannan gång, kaffet först: 18–32 sekunder efter att man har vänt sig
+mot honom, sedan var 45–80:e sekund (`VANA` i [public/rum-hasse.js](public/rum-hasse.js)), bara när
+han väntar på en och inte pratar eller trummar. Medan han väntar på en analys tar han också kaffet och
+cigarren varannan gång. Ska något annat spelas medan han har den (slaget med domen, vägen hem efter analysen) lägger han tillbaka den
+2,5 gånger så fort (`skynda`). Röken är partiklar i en gemensam luftström: lugn och rak nära glöden,
+slingrig högre upp (`byggRok` i [public/rum-hasse-arm.js](public/rum-hasse-arm.js)). Med minskad
+rörelse ligger cigarren kvar i askkoppen, men röken stiger, på samma sätt som han fortfarande andas.
+
+Sätten (`KLIPP` i [public/rum-hasse-3d.js](public/rum-hasse-3d.js); de sju sista byggs med
+`cigarrKlipp`, som fyller i hur han tar upp den och lägger tillbaka den):
+
+- `cigarr`: två bloss med halvslutna ögon (glöden flammar upp, och mellan blossen pyser lite rök ur
+  mungipan), huvudet bakåt och röken ut med slutna ögon, ett leende och en blick på cigarren.
+- `bloss`: ett bloss och röken i en tunn stråle ur mungipan, med huvudet på sned och ett höjt bryn.
+- `ringar`: två korta bloss och tre rökringar med munnen som ett o, åt sidan så att de far ut i luften
+  bredvid honom, och han tittar efter dem. Rökringen är partiklar i en cirkel som far iväg och vidgar
+  sig, med svag virvel så att den håller ihop (`ring`).
+- `aska`: han knackar av askan över askkoppen med två korta ryck (askan faller), tittar på glöden, drar
+  ett bloss och blåser ut röken genom näsan.
+- `lang`: ett långt, långsamt bloss med ögonen som sluts och axlarna som stiger, röken kvar i munnen en
+  stund, huvudet bakåt och en lång utandning medan axlarna sjunker, och sedan *ah*: ett brett leende,
+  en liten skakning på huvudet och en gillande nick mot cigarren.
+- `luta`: ett bloss, och sedan lutar han sig bakåt med cigarren i handen och blundar en lång stund,
+  andas djupt och långsamt med ett leende som växer medan röken ringlar upp från glöden, och nickar
+  nöjt mot en.
+- `tand`: han biter om cigarren i mungipan och släpper den, sitter nöjd med händerna på disken och
+  puffar, med lite rök ur andra mungipan, och tar den sedan igen.
+- `beundra`: han håller upp den framför bröstet, rullar den mellan fingrarna och tittar på den med
+  höjda bryn och munnen som säger hm, nickar gillande och tar ett bloss.
+- `puffar`: tre korta bloss i rad med lite rök ur mungipan efter vart och ett, ett nöjt moln med
+  huvudet bakåt, ett brett leende och ett litet skratt.
+- `vifta`: ett bloss, och sedan visar han cigarren mot en med två små knyckar – det här, det är livet –
+  och skrockar.
+- `smaka`: han håller röken i munnen och smakar på den med slutna ögon och höjda bryn, och släpper sedan
+  ut den långsamt.
 
 **Samtalet.** Det är han som frågar, *Vilken match ska jag hjälpa dig med?*, och när du kommer tillbaka *Har du kört fast igen, Laino?*, med ditt efternamn om kupongen
 vet vem du är. Han talar i hela meningar, och över matchlistan finns alltid plats för två rader, så att listan står still vad han än säger. Man svarar genom att välja en match. Då frågar han tillbaka (*Den är solklar. Vill du
@@ -4106,6 +4140,12 @@ Cigarren (2026-11-04) är provad med figuren ensam i headless Chrome (mjukvarugr
 cigarrens, handens och armbågens förflyttning mellan varje hundradels sekund (inga hopp). Inte provad i
 hela sidan, i Safari eller i en riktig telefon, och turerna i samtalet (när han tar den, `skynda`) är
 bara genomlästa.
+
+Cigarrens elva sätt (2026-11-05) är provade med figuren ensam i headless Chrome (mjukvarugrafik),
+900 × 700: varje klipp bild för bild var 0,6 s, närbilder av handen, ögonen och röken, och när handen
+släpper cigarren i mungipan och tar den igen; slaget, gesterna och klunken ser ut som förut. I hela
+sidan (1440 × 900) finns alla elva i lotten, och `tand` och `ringar` spelades utan fel. Inte provade i
+Safari eller i en riktig telefon.
 
 Slagen, kaffet, cigarren och ljuden (2026-11-05) är provade i headless Chrome med mjukvarugrafik: figuren
 ensam i 1440 × 900 och 412 × 915, varje klipp bild för bild och de med rök och ånga i följd, och
