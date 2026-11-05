@@ -3,7 +3,11 @@
 // Sidorna Tabeller och Statistik: en division åt gången, vald med numrerade
 // flikar (nivå 1–4). Tabeller har tabellen; Statistik har spelarna och lagen.
 // Vilken sida det är står i <body data-page>. Data: data/divisions.json
-// (src/divisions.js) och data/players/<liga>.json (src/players.js).
+// (src/divisions.js), data/players/<liga>.json (src/players.js),
+// data/teams/<liga>.json (src/teamstats.js) och data/matches.json (formen
+// och nästa match). Lagens topplistor och lagkortet har samma tal under
+// samma namn som anslagstavlan och kortregistret i tobaksaffären
+// (rum-anslag.js, rum-register.js).
 // Fristående från app.js – egna hjälpare, en fast färg per division ur
 // theme.css.
 //
@@ -40,6 +44,7 @@ const state = {
   pf: { q: '', team: '', pos: '', played: true, sort: 'g', dir: -1, limit: 60, cols: 'oversikt' },
   tf: { cols: 'tabell', sort: 'rank', dir: 1 },
   mtab: { team: null, player: null }, // senast valda flik i lag- och spelarrutan
+  form: null, // lagnamn → lagets matcher, senaste först (loadForm)
 };
 
 function esc(s) {
@@ -534,38 +539,69 @@ function playerTableHtml(P) {
 const playerRow = (p) => ({ attr: `data-pid="${esc(p.id)}"`, name: p.name, sub: p.team });
 // Laget har sin sköld framför namnet, som i Tabeller.
 const teamRow = (t) => ({ attr: t.espnId ? `data-team="${esc(t.espnId)}"` : 'disabled', name: t.name, sub: `${ordinal(t.rank)} plats`, crest: true });
-const leaderLi = (x, i, value, who) => {
+// rank = placeringen som text ('' när den delas med raden ovanför), bar =
+// en stapel mellan namnet och talet (dbar).
+const leaderLi = (x, rank, value, who, bar = '') => {
   const r = who(x);
-  const name = `${esc(r.name)}<small>${esc(r.sub)}</small>`;
-  return `<li><button type="button" class="dv-lrow" ${r.attr}>` +
-    `<span class="dv-lrank">${i + 1}</span>` +
+  const name = `${esc(r.name)}<small>${r.subHtml || esc(r.sub)}</small>`;
+  return `<li><button type="button" class="dv-lrow${bar ? ' bar' : ''}" ${r.attr}>` +
+    `<span class="dv-lrank">${rank}</span>` +
     (r.crest ? `<span class="dv-lname dv-lteam">${teamCrest(r.name)}<span>${name}</span></span>` : `<span class="dv-lname">${name}</span>`) +
+    (bar ? `<span class="dv-lbar" aria-hidden="true">${bar}</span>` : '') +
     `<span class="dv-lval">${value(x)}</span></button></li>`;
 };
 
-function leaderCard(title, list, value, { empty = 'inga än', note, top, tip, who = playerRow } = {}) {
-  const rows = list.length
-    ? list.map((x, i) => leaderLi(x, i, value, who)).join('')
-    : `<li class="dv-lempty">${esc(empty)}</li>`;
-  return `<section class="dv-leader"><h4${tipAttr(title, tip)}>${esc(title)}</h4><ol>${rows}</ol>` +
-    (note ? `<p class="dv-lnote">${note}</p>` : '') +
-    (top ? `<button type="button" class="dv-lmore dv-linkbtn" data-top="${esc(top)}">Topp 20 →</button>` : '') + '</section>';
+// Delad placering, som skytteligan på text-tv:n i tobaksaffären: lika tal
+// delar plats, och numret står bara på den första.
+const ranks = (list, same) => list.map((x, i) => (i && same && same(list[i - 1], x) ? '' : String(i + 1)));
+const sameOn = (get) => (a, b) => get(a) === get(b);
+
+// Stapeln i en lista åt två håll. r = talet delat med divisionens största
+// (−1–1). Den börjar i mitten: åt höger för plus, åt vänster för minus,
+// grön och röd när plus är bra (tone 'signed') och grå när det bara är
+// olika (Motståndet).
+function dbar(r, tone = 'signed') {
+  const w = `${(Math.min(1, Math.abs(r)) * 50).toFixed(1)}%`;
+  return `<span class="dv-dbar"><i class="${r > 0 ? 'up' : 'down'}${tone === 'even' ? ' even' : ''}" style="width:${w}"></i></span>`;
 }
 
-// Topplistorna: fem på kortet, upp till 20 i en dialog. Listan sparas per
-// vy så att knappen Topp 20 kan öppna den.
+const lmore = (key, label) => `<p class="dv-lfoot"><button type="button" class="dv-lmore dv-linkbtn" data-top="${esc(key)}">${label} →</button></p>`;
+
+function leaderCard(title, list, value, { empty = 'inga än', note, top, tip, who = playerRow, same, bar, more = 'Topp 20' } = {}) {
+  const rk = ranks(list, same);
+  const rows = list.length
+    ? list.map((x, i) => leaderLi(x, rk[i], value, who, bar ? bar(x) : '')).join('')
+    : `<li class="dv-lempty">${esc(empty)}</li>`;
+  return `<section class="dv-leader"><h4${tipAttr(title, tip)}>${esc(title)}</h4><ol>${rows}</ol>` +
+    (note ? `<p class="dv-lnote">${note}</p>` : '') + (top ? lmore(top, more) : '') + '</section>';
+}
+
+// Topplistorna: fem på kortet (n), upp till 20 i en dialog. Listan sparas
+// per vy så att knappen Topp 20 kan öppna den. Lagens listor (all) visar
+// hela divisionen i dialogen, med knappen Alla lag.
 const tops = new Map();
 function topCard(key, title, list, value, opts = {}) {
-  tops.set(key, { title, list, value, note: opts.note, who: opts.who || playerRow });
-  return leaderCard(title, list.slice(0, 5), value, { ...opts, top: list.length > 5 ? key : null });
+  const n = opts.n || 5;
+  tops.set(key, { title, list, value, note: opts.note, who: opts.who || playerRow, same: opts.same, bar: opts.bar, all: opts.all });
+  return leaderCard(title, list.slice(0, n), value, { ...opts, top: list.length > n ? key : null, more: opts.all ? 'Alla lag' : 'Topp 20' });
 }
 
 function openTop(key) {
   const t = tops.get(key);
   if (!t) return;
-  const rows = t.list.slice(0, 20).map((x, i) => leaderLi(x, i, t.value, t.who)).join('');
-  showModal(mhead(null, t.title, [`${esc(divName())} · topp ${Math.min(20, t.list.length)}`]) +
-    `<ol class="dv-toplist">${rows}</ol>` + mfoot(t.note ? [t.note] : []));
+  let body;
+  let n;
+  if (t.full) {
+    body = t.full();
+    n = t.n;
+  } else {
+    const list = t.all ? t.list : t.list.slice(0, 20);
+    const rk = ranks(list, t.same);
+    body = `<ol class="dv-toplist">${list.map((x, i) => leaderLi(x, rk[i], t.value, t.who, t.bar ? t.bar(x) : '')).join('')}</ol>`;
+    n = list.length;
+  }
+  showModal(mhead(null, t.title, [`${esc(divName())} · ${t.all || t.full ? `alla ${n} lag` : `topp ${n}`}`]) +
+    body + mfoot(t.note ? [t.note] : []));
 }
 
 function playersView(dv, P) {
@@ -587,12 +623,13 @@ function playersView(dv, P) {
   // Tre topplistor, samma i alla divisioner. Resten (xG, kort, skott) går
   // att sortera fram i tabellen Alla spelare. Betygen ersätter målvakterna
   // när de finns (målvakterna finns kvar under Försvar i tabellen).
+  // Lika tal delar plats, som skytteligan på text-tv:n.
   html += '<div class="dv-leaders">' +
-    topCard('goals', 'Skytteliga', leaders(P, 'g'), (p) => `<b>${p.g}</b>`) +
-    topCard('assists', 'Flest assist', leaders(P, 'a'), (p) => `<b>${p.a}</b>`) +
+    topCard('goals', 'Skytteliga', leaders(P, 'g'), (p) => `<b>${p.g}</b>`, { same: sameOn((p) => p.g) }) +
+    topCard('assists', 'Flest assist', leaders(P, 'a'), (p) => `<b>${p.a}</b>`, { same: sameOn((p) => p.a) }) +
     (P.ratings
-      ? topCard('rating', 'Högst betyg', leaders(P, 'rt'), (p) => `<b>${num(p.rt, 1)}</b>`, { empty: 'okänt' })
-      : topCard('keepers', 'Målvakter', L.keepers, (p) => `<b>${pct(p.savePct)}</b>`, { empty: 'okänt' })) +
+      ? topCard('rating', 'Högst betyg', leaders(P, 'rt'), (p) => `<b>${num(p.rt, 1)}</b>`, { empty: 'okänt', same: sameOn((p) => Math.round(p.rt * 10)) })
+      : topCard('keepers', 'Målvakter', L.keepers, (p) => `<b>${pct(p.savePct)}</b>`, { empty: 'okänt', same: sameOn((p) => Math.round(p.savePct * 100)) })) +
     '</div>';
 
   html += card('Alla spelare', {
@@ -647,6 +684,125 @@ const roi = (t) => { const m = fdOf(t, 'mkt'); return m ? (m.ret - m.n) / m.n : 
 const sqOf = (t, k) => (t.sq ? t.sq[k] : null);
 const signedInt = (x) => (x > 0 ? `+${x}` : x < 0 ? `−${-x}` : '0');
 
+// ---------- formen och nästa match ----------
+
+// Som på anslagstavlan i tobaksaffären och i matchrutan: de fem senaste
+// matcherna, nyast först, V, O eller F efter 90 minuter. Ur data/matches.json,
+// alltså ligan och de engelska cuperna (Europacuperna finns bara i matchens
+// fil). Ett dolt resultat står som ? och räknas inte.
+const FORM_TIP = 'De fem senaste matcherna i ligan och de engelska cuperna, nyast till vänster: V = vinst, O = oavgjort, F = förlust. ' +
+  'Det är ställningen efter 90 minuter som gäller. Peka på en ruta för att se vilken match det var.';
+const FORM_RESULT = { V: 'Vinst', O: 'Oavgjort', F: 'Förlust' };
+const FORM_PTS = { V: 3, O: 1, F: 0 };
+// cuperna på svenska, som i kortregistret
+const COMP_SV = { FAC: 'FA-cupen', EFL: 'Ligacupen' };
+const compSv = (m) => COMP_SV[m.compShort] || m.compName || '';
+const offMatch = (m) => /POSTPONED|CANCEL|ABANDON|SUSPEND/.test(m.status || '');
+const fDay = new Intl.DateTimeFormat('sv-SE', { timeZone: TZ, year: 'numeric', month: '2-digit', day: '2-digit' });
+const dayNo = (t) => Math.round(Date.parse(`${fDay.format(new Date(t))}T00:00:00Z`) / 86400000);
+const fKick = new Intl.DateTimeFormat('sv-SE', { timeZone: TZ, weekday: 'long', day: 'numeric', month: 'long', hour: '2-digit', minute: '2-digit' });
+const shortDay = (iso) => { const d = new Date(`${fDay.format(new Date(iso))}T12:00:00Z`); return `${d.getUTCDate()} ${MONTHS[d.getUTCMonth()].slice(0, 3)}`; };
+
+// [mål för, mål emot] för laget efter 90 minuter (och efter förlängningen)
+function goalsOf(m, team, s = m.score90 || m.score) {
+  if (!s) return null;
+  return m.home === team ? [s.home, s.away] : [s.away, s.home];
+}
+function letter(m, team) {
+  const g = goalsOf(m, team);
+  return !g ? null : g[0] > g[1] ? 'V' : g[0] < g[1] ? 'F' : 'O';
+}
+
+// Lagnamn → lagets matcher i alla tävlingar, senaste först. Hämtas en gång.
+let formLoad = null;
+function loadForm() {
+  if (!formLoad) {
+    formLoad = allMatches().then((all) => {
+      const map = new Map();
+      for (const m of all || []) {
+        if (offMatch(m)) continue;
+        for (const t of [m.home, m.away]) {
+          if (!map.has(t)) map.set(t, []);
+          map.get(t).push(m);
+        }
+      }
+      for (const l of map.values()) l.sort((a, b) => Date.parse(b.kickoff) - Date.parse(a.kickoff));
+      state.form = map;
+      return map;
+    }, () => { state.form = new Map(); return state.form; });
+  }
+  return formLoad;
+}
+
+// De fem senaste: [{ m, l: 'V' | 'O' | 'F' | '?' }]
+function teamForm(name) {
+  const list = (state.form && state.form.get(name)) || [];
+  return list.filter((m) => m.completed).slice(0, 5)
+    .map((m) => ({ m, l: window.Spoiler && Spoiler.hidden(m) ? '?' : letter(m, name) || '–' }));
+}
+// Poängen i de fem (3 för vinst, 1 för oavgjort); null utan ett enda känt resultat.
+function formPts(f) {
+  const known = f.filter((x) => x.l in FORM_PTS);
+  return known.length ? known.reduce((s, x) => s + FORM_PTS[x.l], 0) : null;
+}
+// Nästa match: den första som inte är spelad (en som pågår räknas).
+function teamNext(name) {
+  const list = (state.form && state.form.get(name)) || [];
+  const soon = Date.now() - 3 * 3600000;
+  return list.filter((m) => !m.completed && Date.parse(m.kickoff) > soon).pop() || null;
+}
+
+// Matchen bakom en formruta, i ord.
+function formText(x, team) {
+  const m = x.m;
+  const home = m.home === team;
+  const g = goalsOf(m, team);
+  const g2 = m.score90 && m.score ? goalsOf(m, team, m.score) : null;
+  const more = g2 && (g2[0] !== g[0] || g2[1] !== g[1]) ? ` efter 90 minuter, ${g2[0]}–${g2[1]} efter förlängning` : '';
+  return `${shortDay(m.kickoff)} · ${compSv(m)} · ${home ? 'hemma' : 'borta'} mot ${home ? m.away : m.home}${g ? ` · ${g[0]}–${g[1]}${more}` : ''}`;
+}
+// Rutorna (style.css .form). Förklaringen i förklaringsrutan på sidan
+// (data-tip), som title i lag- och spelarrutan.
+function formChips(f, team, { title = false } = {}) {
+  if (!f.length) return '<span class="dv-nil" title="Inga spelade matcher">–</span>';
+  return `<span class="form dv-form">${f.map((x) => {
+    const head = x.l === '?' ? 'Dold' : FORM_RESULT[x.l] || 'Resultat saknas';
+    const text = x.l === '?' ? 'Du har valt att dölja resultat.' : formText(x, team);
+    const attr = title ? ` title="${esc(`${head}: ${text}`)}"` : ` data-tip-head="${esc(head)}" data-tip="${esc(text)}"`;
+    return `<span class="${x.l === '?' ? 'sp-form' : x.l}"${attr}>${esc(x.l)}</span>`;
+  }).join('')}</span>`;
+}
+
+// I lagkortet: nästa match som en rad – motståndet med skölden, hemma eller
+// borta, avsparken och tävlingen när det inte är ligan, och om hur många
+// dagar (som Nästa på lagkortet i kortregistret).
+function nextMatch(team, m) {
+  const home = m.home === team;
+  const opp = home ? m.away : m.home;
+  const d = dayNo(Date.parse(m.kickoff)) - dayNo(Date.now());
+  const live = Date.parse(m.kickoff) <= Date.now();
+  const when = live ? 'pågår' : d <= 0 ? 'i dag' : d === 1 ? 'i morgon' : `om ${d} dagar`;
+  const comp = m.comp !== state.div ? compSv(m) : '';
+  return `<div class="dv-next"><span class="dv-tname">${teamCrest(opp)}<span><b>${esc(opp)}</b>` +
+    `<small>${home ? 'Hemma' : 'Borta'} · ${esc(fKick.format(new Date(m.kickoff)))}${comp ? ` · ${esc(comp)}` : ''}</small></span></span>` +
+    `<b class="dv-next-when">${when}</b></div>`;
+}
+
+// I lagkortet: de fem senaste en och en – rutan, motståndet, hemma eller
+// borta, dagen och tävlingen, och resultatet ur lagets synvinkel.
+function formList(team, f) {
+  return `<ul class="dv-flist">${f.map((x) => {
+    const m = x.m;
+    const home = m.home === team;
+    const opp = home ? m.away : m.home;
+    const g = x.l === '?' ? null : goalsOf(m, team);
+    return `<li><span class="form dv-form"><span class="${x.l === '?' ? 'sp-form' : x.l}">${esc(x.l)}</span></span>` +
+      `<span class="dv-tname">${teamCrest(opp)}<span>${esc(opp)}<small>${home ? 'hemma' : 'borta'} · ${esc(shortDay(m.kickoff))}` +
+      `${m.comp !== state.div ? ` · ${esc(compSv(m))}` : ''}</small></span></span>` +
+      `<b>${g ? `${g[0]}–${g[1]}` : '?'}</b></li>`;
+  }).join('')}</ul>`;
+}
+
 const T_GROUPS = [
   { id: 'tabell', label: 'Tabell', sort: 'rank', dir: 1 },
   { id: 'xg', label: 'xG', sort: 'xgd', dir: -1, needs: 'xg' },
@@ -668,6 +824,8 @@ const TCOLS = [
     get: (t) => t.gd, cls: 'num', in: ['tabell'], show: (t) => signedInt(t.gd) },
   { key: 'pts', label: 'P', name: 'Poäng', title: '3 poäng för vinst, 1 för oavgjort. En stjärna betyder att laget fått poängavdrag.', get: (t) => t.pts, cls: 'num pts', in: ['tabell'],
     show: (t) => `<b>${t.pts}</b>${t.ded ? `<sup title="${t.ded} poängs avdrag">*</sup>` : ''}` },
+  { key: 'form', label: 'Form', sub: 'nyast först', name: 'Formen', title: `${FORM_TIP} Sorteras på poängen i de fem matcherna.`,
+    get: (t) => formPts(teamForm(t.name)), cls: 'c dv-fcol hide-xs', in: ['tabell'], show: (t) => formChips(teamForm(t.name), t.name) },
   { key: 'gpm', label: 'Mål', sub: 'per match', name: 'Gjorda mål per match',
     title: 'Gjorda mål delat med antalet matcher – går att jämföra även när lagen har spelat olika många matcher.',
     get: (t) => (t.m ? t.gf / t.m : null), d: 2, cls: 'num hide-sm', in: ['tabell'] },
@@ -767,12 +925,33 @@ function teamRows(T, P) {
 }
 
 // Lagen som topplistor, byggda som spelarnas: placeringen under namnet och
-// Topp 20 under listan – vad talet betyder står i rubrikens förklaring.
-// Raderna öppnar lagkortet när det finns.
-function teamTop(key, title, list, value, { tip, asc = false, get } = {}) {
-  const rows = list.filter((t) => get(t) != null)
-    .sort((a, b) => (asc ? get(a) - get(b) : get(b) - get(a)) || a.rank - b.rank);
-  return topCard(key, title, rows, value, { tip, empty: 'okänt', who: teamRow });
+// Alla lag under listan – vad talet betyder står i rubrikens förklaring.
+// Raderna öppnar lagkortet när det finns. Sju rader, så att korten blir
+// lika höga som listorna åt två håll (som Kryssar gärna på anslagstavlan).
+// who = raden, om underraden ska vara något annat än placeringen.
+function teamTop(key, title, list, value, { tip, get, who = teamRow } = {}) {
+  const rows = list.filter((t) => get(t) != null && Number.isFinite(get(t)))
+    .sort((a, b) => get(b) - get(a) || a.rank - b.rank);
+  return topCard(key, title, rows, value, { tip, empty: 'okänt', who, n: 7, all: true });
+}
+
+// En lista åt två håll, som Tur & otur och Slår oddsen på anslagstavlan: de
+// tre högsta (plus) under det första ordet och de tre lägsta (minus) under
+// det andra, med stapeln från mitten. Alla lag visar hela divisionen likadant.
+function twoWay(key, title, list, get, { up, down, value, tip, tone = 'signed' }) {
+  const known = list.filter((t) => get(t) != null && Number.isFinite(get(t)));
+  const max = Math.max(...known.map((t) => Math.abs(get(t)))) || 1;
+  const hi = known.filter((t) => get(t) > 0).sort((a, b) => get(b) - get(a) || a.rank - b.rank);
+  const lo = known.filter((t) => !(get(t) > 0)).sort((a, b) => get(a) - get(b) || b.rank - a.rank);
+  const half = (label, side, xs, n, cls = '') => `<p class="dv-lsub ${side}${tone === 'even' ? ' even' : ''}">${esc(label)}</p>` +
+    (xs.length
+      ? `<ol${cls ? ` class="${cls}"` : ''}>${xs.slice(0, n).map((t, i) => leaderLi(t, String(i + 1), value, teamRow, dbar(get(t) / max, tone))).join('')}</ol>`
+      : '<p class="dv-lempty">Inget lag</p>');
+  tops.set(key, { title, n: known.length, full: () => half(up, 'up', hi, Infinity, 'dv-toplist') + half(down, 'down', lo, Infinity, 'dv-toplist') });
+  const body = known.length
+    ? half(up, 'up', hi, 3) + half(down, 'down', lo.filter((t) => get(t) < 0), 3) + lmore(key, 'Alla lag')
+    : '<ol><li class="dv-lempty">okänt</li></ol>';
+  return `<section class="dv-leader dv-two"><h4${tipAttr(title, tip)}>${esc(title)}</h4>${body}</section>`;
 }
 
 function teamsView(dv, P, T) {
@@ -798,17 +977,32 @@ function teamsView(dv, P, T) {
     truppen: P && !P.unknown ? `ESPN-trupperna, hämtat ${when(P.source.fetchedAt)}` : '',
   }[f.cols];
 
-  // Tre topplistor, en för varje tecken: vilka som vinner (1), vilka som
-  // förlorar (2) och vilka som spelar lika (X). Poäng mot chanserna och mot
-  // oddsen står i tabellen Alla lag.
-  const strength = (t) => `<b>${delta(t.str, { d: 2, dead: 0.005 })}</b>`;
-  const strTip = 'Modellens väntade målskillnad per match mot ett snittlag i divisionen, med motståndet inräknat.';
+  // Topplistorna är anslagstavlans lappar i tobaksaffären (rum-anslag.js),
+  // med samma namn, i samma ordning och ur samma tal: Formen, Starkast,
+  // Kryssar gärna, Tur & otur, Slår oddsen och Motståndet. Skadelistan står
+  // i lagkortet (Frånvaro), och vilan hör till omgången.
+  const opp = (t) => fdOf(t, 'opp');
   tops.clear();
   const leaders =
-    teamTop('strong', 'Starkast', all, strength, { get: (t) => t.str, tip: strTip }) +
-    teamTop('weak', 'Svagast', all, strength, { get: (t) => t.str, asc: true, tip: strTip }) +
-    teamTop('draws', 'Kryssar gärna', all, (t) => `<b>${pct(xdraw(t))}</b>`,
-      { get: xdraw, tip: 'Chansen till oavgjort i lagets matcher, i snitt, räknat ur båda lagens xG.' });
+    // Formen: rutorna under namnet i stället för placeringen, och poängen i
+    // de fem matcherna till höger – så att namnen får plats.
+    teamTop('form', 'Formen', all, (t) => `<b>${formPts(teamForm(t.name))} p</b>`, {
+      get: (t) => formPts(teamForm(t.name)), who: (t) => ({ ...teamRow(t), subHtml: formChips(teamForm(t.name), t.name) }),
+      tip: `${FORM_TIP} Flest poäng i de fem överst (3 för vinst, 1 för oavgjort).` }) +
+    twoWay('styrka', 'Starkast & svagast', all, (t) => t.str, {
+      up: 'Starkast', down: 'Svagast', value: (t) => `<b>${delta(t.str, { d: 2, dead: 0.005 })}</b>`,
+      tip: 'Modellens väntade målskillnad per match mot ett snittlag i divisionen, med motståndet inräknat.' }) +
+    teamTop('kryss', 'Kryssar gärna', all, (t) => `<b>${pct(xdraw(t))}</b>`,
+      { get: xdraw, tip: 'Chansen till oavgjort i lagets matcher, i snitt, räknat ur båda lagens xG.' }) +
+    twoWay('tur', 'Tur & otur', all, xpd, {
+      up: 'Tur', down: 'Otur', value: (t) => `<b>${delta(xpd(t), { d: 1 })}</b>`,
+      tip: 'Poäng mot chanserna: tagna poäng minus de poäng lagets chanser (xG) brukar ge. Tur = fler poäng än chanserna var värda, otur = färre. Brukar jämna ut sig.' }) +
+    twoWay('odds', 'Mot oddsen', all, vsOdds, {
+      up: 'Slår oddsen', down: 'Sviker', value: (t) => `<b>${delta(vsOdds(t), { d: 1 })}</b>`,
+      tip: 'Tagna poäng minus de poäng oddsen vid avspark väntade sig. Slår oddsen = fler poäng än väntat, sviker = färre.' }) +
+    twoWay('motstand', 'Motståndet', all, opp, {
+      up: 'Tufft hittills', down: 'Lätt hittills', tone: 'even', value: (t) => `<b class="dv-even">${signed(opp(t), 2)}</b>`,
+      tip: 'Motståndarnas styrka hittills mot ett normalt spelschema i divisionen, i mål per match enligt prognosmodellen. Tufft = svårare motstånd än snittet, lätt = lättare.' });
 
   return '<div class="dv-leaders">' + leaders + '</div>' +
     card('Alla lag', {
@@ -1092,7 +1286,7 @@ function allMatches() {
 async function openTeam(id, pick) {
   const P = state.players.get(state.div);
   if (!P || P.unknown) return;
-  const [T, all] = await Promise.all([loadTeams(state.div), allMatches(), window.Skoldar && Skoldar.ready]);
+  const [T, all] = await Promise.all([loadTeams(state.div), allMatches(), window.Skoldar && Skoldar.ready, loadForm()]);
   const t = P.teams.find((x) => x.espnId === id);
   if (!t) return;
   const r = P.table ? P.table.rows.find((x) => x.espnId === id) : null;
@@ -1103,33 +1297,48 @@ async function openTeam(id, pick) {
   let html = mhead(t.name.slice(0, 2).toUpperCase(), t.name,
     [[divName(), r ? `${ordinal(r.rank)} plats` : null, z ? z.label : null].filter(Boolean).map(esc).join(' · ')], ' team',
     '', window.Skoldar && Skoldar.has(t.name) ? teamCrest(t.name) : '');
+  const f = teamForm(t.name);
   html += kpis([
     r ? [cell(r.points, { strong: true }), 'Poäng'] : null,
     r ? [`${r.gf}–${r.ga}`, 'Mål'] : null,
+    f.length ? [formChips(f, t.name, { title: true }), 'Form', FORM_TIP] : null,
   ]);
-  // Flikarna: Spelet, Truppen, Frånvaro och Höjdpunkter. Poängen och målen
-  // står ovanför och följer med.
+  // Flikarna: Spelet, Truppen, Frånvaro och Höjdpunkter. Poängen, målen och
+  // formen står ovanför och följer med. Spelet har det som kortregistret i
+  // tobaksaffären har om ett lag – nästa match, målen och xG för och mot,
+  // hur ofta laget varit favorit – och formen match för match, och sedan
+  // lagets tal från anslagstavlan (Tur & otur, Kryssar gärna, Mot oddsen,
+  // Starkast och Motståndet) under samma namn som i tabellen Alla lag.
   const tt = T && !T.unknown ? T.teams.find((x) => x.espnId === id) : null;
   let game = '';
-  if (tt && tt.fd && (tt.fd.xg || tt.fd.mkt)) {
-    const x = tt.fd.xg;
-    const m = tt.fd.mkt;
-    const link = [viewHref(state.div, 'lag'), 'Alla lag'];
-    const judged = tt.str != null || m;
-    if (x) {
-      game += msec('Chanserna', facts([
-        [num(x.f / x.n, 2), 'xG per match', 'Förväntade mål per match – hur bra chanser laget skapar'],
-        [num(x.a / x.n, 2), 'xG mot per match', 'Motståndarnas förväntade mål per match'],
-        [delta(x.pts - x.xp, { d: 1 }), 'Poäng mot chanserna', `${x.pts} poäng, ${num(x.xp, 1)} enligt chanserna (xG)`],
-        [pct(x.xd / x.n), 'Kryss enligt chanserna', `${x.d} kryss på ${x.n} matcher`],
-      ]), { link });
-    }
-    if (judged) {
-      game += msec(tt.str != null && m ? 'Modellen och oddsen' : m ? 'Oddsen' : 'Modellen', facts([
-        tt.str != null ? [delta(tt.str, { d: 2, dead: 0.005 }), 'Styrka enligt modellen', 'Väntad målskillnad per match mot ett snittlag i divisionen, med motståndet inräknat'] : null,
-        m ? [delta(m.pts - m.xp, { d: 1 }), 'Poäng mot oddsen', `${m.pts} poäng, ${num(m.xp, 1)} väntade enligt oddsen vid avspark`] : null,
-      ]), { link: x ? null : link });
-    }
+  const nx = teamNext(t.name);
+  if (nx) game += msec('Nästa match', nextMatch(t.name, nx));
+  if (f.length) game += msec('Formen', formList(t.name, f));
+  const x = tt && tt.fd ? tt.fd.xg : null;
+  const m = tt && tt.fd ? tt.fd.mkt : null;
+  const link = [viewHref(state.div, 'lag'), 'Alla lag'];
+  if ((r && r.played) || x) {
+    game += msec('Målen och chanserna', facts([
+      r && r.played ? [num(r.gf / r.played, 2), 'Mål per match', 'Gjorda mål per match i ligan'] : null,
+      x ? [num(x.f / x.n, 2), 'xG per match', 'Förväntade mål per match – hur bra chanser laget skapar'] : null,
+      r && r.played ? [num(r.ga / r.played, 2), 'Insläppta per match', 'Insläppta mål per match i ligan'] : null,
+      x ? [num(x.a / x.n, 2), 'xG mot per match', 'Motståndarnas förväntade mål per match'] : null,
+    ]), { link });
+  }
+  if (x || m) {
+    game += msec('Mot chanserna och oddsen', facts([
+      x ? [delta(x.pts - x.xp, { d: 1 }), 'Poäng mot chanserna', `Tur & otur: ${x.pts} poäng, ${num(x.xp, 1)} enligt chanserna (xG)`] : null,
+      x ? [pct(x.xd / x.n), 'Kryss enligt chanserna', `Kryssar gärna: ${x.d} kryss på ${x.n} matcher`] : null,
+      m ? [delta(m.pts - m.xp, { d: 1 }), 'Poäng mot oddsen', `Mot oddsen: ${m.pts} poäng, ${num(m.xp, 1)} väntade enligt oddsen vid avspark`] : null,
+      m ? [`${m.fav}<small>av ${m.n}</small>`, 'Favorit', 'Matcher där laget hade större chans än motståndaren att vinna, enligt oddsen före avspark'] : null,
+    ]));
+  }
+  const op = tt && tt.fd ? tt.fd.opp : null;
+  if (tt && (tt.str != null || op != null)) {
+    game += msec('Modellen', facts([
+      tt.str != null ? [delta(tt.str, { d: 2, dead: 0.005 }), 'Styrka enligt modellen', 'Väntad målskillnad per match mot ett snittlag i divisionen, med motståndet inräknat'] : null,
+      op != null ? [`<span class="dv-even">${signed(op, 2)}</span>`, 'Motstånd hittills', 'Motståndarnas styrka mot ett normalt spelschema i divisionen, i mål per match. Plus = tuffare än snittet'] : null,
+    ]));
   }
 
   let scorer = '';
@@ -1174,6 +1383,9 @@ const GLOSSARY = [
   ['– och grå 0', 'Streck = okänt (ESPN har ingen statistik för spelaren), grå 0 = noll.'],
   ['Spelarstatistiken', 'Bara ligamatcher i år, ur ESPN:s trupper. Den släpar ofta en omgång efter tabellen; självmål och spelare som lämnat klubben saknas. I Premier League kommer speltid, xG, försvarsspel från Fantasy Premier League, i övriga ligor räknas speltiden ur ESPN:s matchrapporter (byten och röda kort, utan tilläggstid). Målens sort och betydelse kommer från matchrapporterna i alla fyra ligor.', 'statistik'],
   ['Per 90', 'Per 90 spelade minuter – som om spelaren spelat hela matcher. Visas för spelare med minst tre hela matchers speltid; dämpade siffror har för litet underlag.', 'statistik'],
+  ['Formen', 'De fem senaste matcherna i ligan och de engelska cuperna (inte Europacuperna), nyast till vänster: V = vinst, O = oavgjort, F = förlust. Ställningen efter 90 minuter gäller, så en match som avgjorts i förlängning eller på straffar räknas som oavgjord. Topplistan Formen räknar 3 poäng för vinst och 1 för oavgjort i de fem.', 'statistik'],
+  ['Topplistorna under Lagen', 'Samma som lapparna på anslagstavlan i tobaksaffären: Formen, Starkast & svagast, Kryssar gärna, Tur & otur, Mot oddsen och Motståndet. Listorna åt två håll visar de tre högsta och de tre lägsta, med en stapel från mitten (längst för divisionens största tal); Alla lag visar hela divisionen.', 'statistik'],
+  ['Delad placering', 'Har två lika tal i en topplista delar de plats, och numret står bara på den första – som skytteligan på text-tv:n.', 'statistik'],
   ['Lagstatistiken', 'Tabellen är ESPN:s. xG, skott, kort och odds kommer från football-data.co.uk, som ofta ligger en omgång efter – därför visas de per match eller som skillnad inom samma matcher.', 'statistik'],
   ['Beroende', 'Hur stor del av lagets mål den bäste målskytten gjort.', 'statistik'],
   ['Effektivast', 'Mål per skott, bland spelare med minst tio skott.', 'statistik'],
@@ -1190,11 +1402,12 @@ const GLOSSARY = [
   ['xG', 'Förväntade mål: varje skott får ett värde efter hur ofta ett sådant skott brukar bli mål – en straff runt 0,8, ett långskott några hundradelar. Summan visar hur många mål chanserna brukar ge, oavsett om de gick in.', 'statistik'],
   ['xG mot, xA', 'xG mot: motståndarnas förväntade mål, alltså hur bra chanser laget släpper till. xA: förväntade assist, ur passningarna före lagkamraternas skott.', 'statistik'],
   ['Mål mot xG', 'Gjorda mål minus xG (och insläppta mål minus xG mot). Stora avvikelser är ofta tur eller otur och brukar jämna ut sig under en säsong.', 'statistik'],
-  ['Motstånd', 'Motståndets styrka hittills enligt prognosmodellen, i mål per match, mot vad ett lag i divisionen möter i snitt. Plus = svårare program än snittet.', 'statistik'],
-  ['Poäng och kryss mot chanserna', 'Varje match räknas om till chanser att vinna, spela oavgjort och förlora ur båda lagens xG. Poäng mot chanserna: tagna poäng minus 3 × vinstchansen plus oavgjortchansen, match för match – plus är oftast tur, som brukar jämna ut sig. Kryss enligt chanserna: oavgjortchansen i snitt.', 'statistik'],
+  ['Motstånd', 'Motståndets styrka hittills enligt prognosmodellen, i mål per match, mot vad ett lag i divisionen möter i snitt. Plus = svårare program än snittet (Tufft hittills i topplistan Motståndet), minus = lättare (Lätt hittills).', 'statistik'],
+  ['Poäng och kryss mot chanserna', 'Varje match räknas om till chanser att vinna, spela oavgjort och förlora ur båda lagens xG. Poäng mot chanserna: tagna poäng minus 3 × vinstchansen plus oavgjortchansen, match för match – plus är oftast tur, som brukar jämna ut sig (Tur & otur). Kryss enligt chanserna: oavgjortchansen i snitt (Kryssar gärna).', 'statistik'],
   ['Styrka', 'Prognosmodellens bedömning av laget: väntad målskillnad per match mot ett snittlag i divisionen på neutral plan, med motståndet inräknat och tidigare säsonger med mindre vikt.', 'statistik'],
   ['Nollor', 'Andel av lagets matcher utan insläppt mål.', 'statistik'],
-  ['Väntat, Tog, Mot oddsen', 'Poängen oddsen vid avspark väntade sig – 3 × vinstchansen plus oavgjortchansen, match för match – poängen laget tog i samma matcher, och skillnaden. Plus = bättre än oddsen trodde.', 'statistik'],
+  ['Väntat, Tog, Mot oddsen', 'Poängen oddsen vid avspark väntade sig – 3 × vinstchansen plus oavgjortchansen, match för match – poängen laget tog i samma matcher, och skillnaden. Plus = bättre än oddsen trodde (Slår oddsen), minus = sämre (Sviker).', 'statistik'],
+  ['Favorit', 'Matcher där laget hade större chans än motståndaren att vinna, enligt oddsen före avspark.', 'statistik'],
   ['Spel på seger', 'Vinst eller förlust i procent av insatserna om man satsat lika mycket på att laget vinner varje match, till oddset vid avspark. Spelbolagens marginal är inräknad.', 'statistik'],
   ['Marginal', 'Spelbolagens påslag: hur mycket summan av 1/odds överstiger 100 %.', 'statistik'],
   ['Grundserien', 'Ligans ordinarie matcher, utan kvalspel (playoff) och cuper.'],
@@ -1275,7 +1488,7 @@ async function renderView() {
   }
   const el = $('#dv-view');
   const P = await loadPlayers(dv.id);
-  const T = state.view === 'lag' ? await loadTeams(dv.id) : null;
+  const [T] = state.view === 'lag' ? await Promise.all([loadTeams(dv.id), loadForm()]) : [null];
   // Spoilerskyddet behöver matcherna innan något ritas, annars hinner det dolda synas.
   if (window.Spoiler && Spoiler.on()) await Spoiler.matches();
   // Användaren kan ha bytt vy medan spelarfilen laddades.
