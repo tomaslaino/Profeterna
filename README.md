@@ -3929,17 +3929,19 @@ på iMacen körs var 15:e minut (launchd kör det aldrig två gånger samtidigt)
 återställs till origin/main varje gång, som analysernas jobb. Det tar listan över allt han
 säger ur `texter()` i [src/rost.js](src/rost.js), kommande matchers meningar först och sedan
 replikerna (ca 350 meningar), och läser upp högst 30 som saknas per körning med
-[chatterbox.py](scripts/rost/chatterbox.py), som laddar modellen en gång (ca 30 s) och räknar
+[chatterbox_jobb.py](scripts/rost/chatterbox_jobb.py), som laddar modellen en gång (ca 30 s) och räknar
 ungefär 5 s per sekund tal. Inställningarna står i `rost.egen` i
 [config/hasse.js](config/hasse.js): exaggeration 0,7, cfg_weight 0,5, temperature 0,8 och
 referensen `~/Kod/chatterbox-rost/min_rost.wav`. Talen läses som ord ("2–1" blir "två–ett", 0
 "noll"), eftersom det är oprövat hur Chatterbox läser siffror; meningen i registret är densamma
 som på sidan.
 
-Chatterbox avbryter ibland själv med "forcing EOS token" och klipper slutet, och ibland blir
-talet för kort eller för långt. Därför mäts talet utan tystnad mot den väntade längden (14
-tecken i sekunden): under 0,55 eller över 2,2 gånger den, eller med "forcing EOS", görs meningen
-om med nytt slumpfrö, högst fyra gånger. Klarar den sig inte prövas den igen efter ett dygn, och
+Chatterbox avbryter ibland själv med "forcing EOS token", och ibland blir talet för kort eller
+för långt. Därför mäts talet utan tystnad mot den väntade längden (14 tecken i sekunden): under
+0,55 eller över 2,2 gånger den, eller med "forcing EOS" av någon annan orsak än
+`token_repetition`, görs meningen om med nytt slumpfrö, högst fyra gånger. `token_repetition`
+räknas inte: den slog till i 3 av 4 uppläsningar i provet, redan när samma ljudtoken kom två
+gånger, och Tomas lyssnade på de klippen 2026-11-05 och slutet var helt. Klarar den sig inte prövas den igen efter ett dygn, och
 till dess är det Azures röst. Ljudet sparas som mp3 (64 kbit/s, ffmpeg) i en ljudbank utanför
 repot, `~/Library/Application Support/Matchfixarna/Rost/ljud/`, med ett avtryck på
 inställningarna, referensen och texten: ändras något av dem läses allt upp på nytt.
@@ -4007,11 +4009,15 @@ gjordes), och inte i Safari eller en riktig telefon.
 Den egna rösten provades 2026-11-04 utan Chatterbox: [las.mjs](scripts/rost/las.mjs) med låtsad
 modell (`--latsas`, tonstötar) mot en låtsad GitHub (ett lokalt repo), som läste upp fem
 meningar och pushade grenen `rost`, inte pushade igen när inget hade ändrats och inte
-markerade något som misslyckat när modellen kraschade; [chatterbox.py](scripts/rost/chatterbox.py)
+markerade något som misslyckat när modellen kraschade; [chatterbox_jobb.py](scripts/rost/chatterbox_jobb.py)
 med låtsad modell, som gjorde om en mening efter "forcing EOS" och gav upp en för kort efter
 fyra försök; workflowens steg mot den låtsade grenen; och `npm run build -- --no-fetch`, som
-tog de fem egna och Azure för resten, och där `fyll()` inte frågade Azure om de egna. Inte
-provat med den riktiga modellen.
+tog de fem egna och Azure för resten, och där `fyll()` inte frågade Azure om de egna.
+
+Med den riktiga modellen provades den 2026-11-05 på iMacen: [las.mjs](scripts/rost/las.mjs) utan
+`--publicera` läste upp fyra meningar på 145 s, alla i första försöket. Det provet visade också
+varför skriptet inte får heta `chatterbox.py` (det skuggar paketet med samma namn), vilket den
+låtsade modellen inte kunde visa.
 
 **Grafiken.** Handen på pulten är en liten WebGL-duk i pultens plan som läggs dit när rummet är
 klart, med handens modell (133 kB) och fotot (149 kB). Den ritas en gång och sedan bara när fingrarna

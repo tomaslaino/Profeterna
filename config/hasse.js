@@ -62,7 +62,8 @@ module.exports = {
       // Kontrollen av längden: talet (tystnaden borträknad) ska vara mellan kortast
       // och langst gånger den väntade längden, tecknen / tecknenPerSekund, men aldrig
       // under minstaSek. Annars görs meningen om med nytt slumpfrö, högst forsok gånger
-      // i allt. Säger Chatterbox "forcing EOS token" görs den också om.
+      // i allt. Säger Chatterbox "forcing EOS token" av någon annan orsak än
+      // token_repetition görs den också om.
       tecknenPerSekund: 14,
       kortast: 0.55,
       langst: 2.2,

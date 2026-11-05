@@ -1,4 +1,5 @@
 node_modules/
+__pycache__/
 .env
 data/cache/
 # Hasse Backes egen röst: grenen rost, hämtad av workflowen (src/rost.js)
