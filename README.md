@@ -653,6 +653,13 @@ bara lokalt. Analyserna visas som de ligger i `data/analyser.json`; hur de skriv
   cigarr: han blåser på kaffet, tittar ned i koppen, tar ett kort bloss med röken ur mungipan,
   blåser rökringar och knackar av askan och blåser ut röken genom näsan. Se
   [Hasse Backe](#hasse-backe), *Slaget*, *Kaffet* och *Cigarren*.
+- **Hasse Backe dricker kaffe på sex sätt, och njuter (2026-11-05, användarens önskemål):** kaffet
+  syntes nästan aldrig och såg skevt ut: koppen stod nästan upprätt framför hakan och handen satt
+  inte i örat. Nu lutas koppen mot underläppen och handen följer örat, och han dricker på sex sätt,
+  överdrivet och med njutning: klunken med mmm, blåsa och ah, dricka ur och titta i den tomma koppen,
+  doften, skål och lillfingret ut. Medan han väntar på att man ska välja tar han kaffet och cigarren
+  varannan gång; förut tog han då bara cigarren, så kaffet kom bara medan han låtsades läsa på. Se
+  [Hasse Backe](#hasse-backe), *Kaffet*.
 - **Statistik som i tobaksaffären (2026-11-05, användarens önskemål):** statistiken på den
   vanliga sajten ska stämma med den i tobaksaffären – samma tal under samma namn och samma
   uppdelning: det som jämför lagen står som på anslagstavlan (topplistorna under Lagen), det
@@ -3730,7 +3737,7 @@ vänstra handen och cigarren i askkoppen vid den högra. Bakom honom är barens 
 cigarettpaketen och lamporna. Samtalet står i en spalt till vänster om honom (på höjden under honom)
 och kommer när kameran har stannat. Esc eller *Tillbaka* går tillbaka (vid matchlistan också ett klick
 utanför). Medan han väntar på att man ska välja trummar han med fingrarna på disken då och då, och
-ibland tar han cigarren ur askkoppen och njuter av den en stund, på ett av fyra sätt. I rummet ligger kaffet, notan och
+ibland njuter han av kaffet (på ett av sex sätt) eller av cigarren (på ett av fyra), varannan gång. I rummet ligger kaffet, notan och
 handen kvar på pulten som en ledtråd, och handen trummar när man pekar på den eller kaffet, och
 ibland ändå.
 
@@ -3824,11 +3831,26 @@ nickar när den träffar. Vid varje slag rycker hela bilden till, mer ju hårdar
 [public/rum-hasse.css](public/rum-hasse.css)), och det som står på disken hoppar: koppen studsar
 på fatet, lägre för varje gång, fatet och askkoppen lite och cigarren i urtaget (`hoppar`).
 
-**Kaffet.** Han dricker på tre sätt: en klunk (`klunk`); koppen under hakan medan han blåser på
-kaffet två gånger, så att ångan far bort från honom, en klunk och ett *ah* med slutna ögon (`blasa`);
-eller koppen vid bröstet medan han tittar ned i den med höjda bryn och snurrar den lite, och sedan
-dricker ur den (`titta`). Handen följer koppens öra, och koppen klirrar mot fatet när han ställer ned
-den.
+**Kaffet.** Han dricker på sex sätt, och han överdriver och njuter: en ordentlig klunk med slutna
+ögon, och sedan smackar han och säger mmm med höjda bryn och ett brett leende medan huvudet vaggar
+(`klunk`); blåser på kaffet tre gånger med koppen under hakan, så att ångan far bort från honom,
+smakar försiktigt och rycker till av värmen, och tar sedan en riktig klunk och ett långt *ah* med
+huvudet bakåt (`blasa`); tittar ned i koppen med höjda bryn, snurrar den och nickar gillande, dricker
+ur den i ett svep, tittar förvånat ned i den tomma koppen och ställer ned den med en smäll (`titta`);
+håller koppen under näsan och drar in doften länge med slutna ögon, så att ångan sugs mot näsan och
+bröstet häver sig, och tar sedan en liten klunk (`dofta`); skålar med en, tar en stor klunk och
+ställer ned koppen med en smäll och ett *ah* (`skal`); eller dricker fint med lillfingret ut och
+näsan i vädret, två små läppjanden, och smackar och nickar som en vinprovare (`fint`).
+
+Det är koppen som styr, som med cigarren (`kaffeArm` i [public/rum-hasse-3d.js](public/rum-hasse-3d.js)):
+dess läge räknas fram (på fatet; vid läppen och under näsan i huvudets mått, så att den följer med när
+han lutar huvudet bakåt; under hakan, framför bröstet och upplyft mot en i kroppens), och handen sitter
+i örat med samma grepp hela vägen, fingrarna mot koppen och handflatan mot honom. När han dricker lutas
+koppen runt kanten mot hans underläpp, så att den ligger kvar där, och örat vrids samtidigt in mot
+kinden, så att handen inte stiger upp framför ögat. Förut stod koppen nästan upprätt framför hakan,
+snett åt sidan, och handen hade samma vinkel hur koppen än stod (ändrat 2026-11-05). Lillfingret står
+rakt ut och spretar (`extra` i `bojFingrar`, [public/rum-hasse-arm.js](public/rum-hasse-arm.js)).
+Koppen klirrar mot fatet när han ställer ned den, hårdare efter en smäll.
 
 **Cigarren.** Till vänster om hans högra hand står en tung askkopp av samma gods som koppen, med två
 urtag. I det ena ligger cigarren: huvudet på disken, ringen (guld och rött) synlig och glöden över
@@ -3839,10 +3861,10 @@ ut röken snett uppåt åt sidan med slutna ögon, ler, tittar på den och lägg
 den som en cigarr ska hållas, tummen under och pek- och långfingret ovanpå, och vid munnen sitter
 handen vid kinden så att den inte skymmer ansiktet. Det är cigarren som styr: dess läge räknas fram
 (i askkoppen, vid munnen i huvudets mått så att den följer när han rör huvudet, vid axeln) och handen
-räknas ur greppet, så att den sitter kvar i fingrarna hela vägen. Den första kommer 18–32 sekunder
-efter att man har vänt sig mot honom, sedan var 45–80:e sekund (`CIGARR` i
-[public/rum-hasse.js](public/rum-hasse.js)), bara när han väntar på en och inte pratar eller trummar.
-Medan han väntar på en analys tar han kaffet och cigarren varannan gång. Ska något annat spelas
+räknas ur greppet, så att den sitter kvar i fingrarna hela vägen. Kaffet och cigarren kommer
+varannan gång, kaffet först: 18–32 sekunder efter att man har vänt sig mot honom, sedan var 45–80:e
+sekund (`VANA` i [public/rum-hasse.js](public/rum-hasse.js)), bara när han väntar på en och inte
+pratar eller trummar. Medan han väntar på en analys tar han också kaffet och cigarren varannan gång. Ska något annat spelas
 medan han har den (slaget med domen, vägen hem efter analysen) lägger han tillbaka den 2,5 gånger så
 fort (`skynda`). Röken är partiklar i en gemensam luftström: lugn och rak nära glöden, slingrig
 högre upp (`byggRok` i [public/rum-hasse-arm.js](public/rum-hasse-arm.js)). Med minskad rörelse
@@ -4090,6 +4112,12 @@ kaffet, spelade som repliker med gester, där bilden ryckte till vid varje slag 
 spelades. Ljuden är framräknade i en `OfflineAudioContext` och mätta (toppar 0,44–0,55 för slagen,
 0,24 för klirret), men inte lyssnade på, och inte provade i Safari eller på en riktig telefon.
 Samtalet med en riktig analys är inte provat (ingen kupong i provet), bara genomläst.
+
+Kaffet på sex sätt (2026-11-05) är provat i headless Chromium med mjukvarugrafik, figuren ensam i
+1440 × 900 och 412 × 915: varje klipp bild för bild, ångan i följd (med förstärkt ånga, för att se att
+den sugs mot näsan), och koppens och handens förflyttning mellan varje hundradels sekund (inga hopp,
+och båda exakt tillbaka i vilan när klippet slutar). Inte provat i hela sidan, i Safari eller i en
+riktig telefon, och att han tar kaffet varannan gång medan man väljer är bara genomläst.
 
 ### Närbilderna
 
