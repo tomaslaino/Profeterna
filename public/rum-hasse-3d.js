@@ -473,7 +473,7 @@ export async function figuren(duk, { hog = false, latt = false, pr = 1 } = {}) {
         // lackat trä, ådrat längs baren, slitet och mörkare närmast en
         vec2 g = vec2(vB.x * .0026, vB.z * .02);
         float a = fbm(g * vec2(1., 2.2)), b = fbm(g * vec2(.7, 8.) + 3.), c2 = fbm(vB.xz * vec2(.012, .06) + 17.);
-        vec3 tra = mix(vec3(.34, .19, .095), vec3(.5, .29, .15), a);
+        vec3 tra = mix(vec3(.34, .215, .13), vec3(.5, .325, .2), a);
         tra *= .8 + .34 * b;
         tra *= .92 + .12 * c2;
         vec3 l = ljus(n) * (.32 + .9 * pol) + vec3(.5, .06, .04) * hoger * .35 + vec3(.16, .2, .3) * hoger * .2;

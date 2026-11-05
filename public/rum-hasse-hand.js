@@ -1,14 +1,15 @@
-// Hasse Backes hand på pulten i tobaksaffären (rum-hasse.js), i three.js: den ligger längst ut till
-// vänster bredvid hans kaffe, med manschetten, och armen kommer in från bildens vänstra kant. Den är en
-// ledtråd: han sitter i baren utanför bilden (rum-hasse-3d.js). Duken är en liten i pultens plan och ritas
-// bara när fingrarna trummar.
+// Hasse Backes hand och kaffe på pulten i tobaksaffären (rum-hasse.js), i three.js: handen ligger längst ut
+// till vänster, med manschetten, och armen kommer in från bildens vänstra kant. Till höger om fingrarna står
+// koppen på sitt fat, och fatet står på notan (rum.js), som i baren. Det är en ledtråd: han sitter i baren
+// utanför bilden (rum-hasse-3d.js). Duken är en liten i pultens plan och ritas bara när fingrarna trummar.
 //
-// Armen och handen är figurens (rum-hasse-arm.js), och världen och kameran likaså.
+// Armen, handen och koppen är figurens (rum-hasse-arm.js), och världen och kameran likaså, så att koppen
+// ses från samma håll och i samma ljus som handen och är samma kopp som i baren.
 //
-// armen(plan, { hand, pr }) → { placera(), trumma(), knapp(el), borta() }
-// hand: var handleden vilar, i rummets mått (1600 × 1000)
+// armen(plan, { hand, kopp, pr }) → { placera(), trumma(), knapp(el), borta() }
+// hand: var handleden vilar, kopp: fatets mitt, i rummets mått (1600 × 1000)
 import * as THREE from 'three';
-import { ARM, KAMERA, byggArm, laddaFoto, laddaHand } from './rum-hasse-arm.js';
+import { ARM, KAMERA, byggArm, byggKopp, laddaFoto, laddaHand } from './rum-hasse-arm.js';
 
 const DEG = Math.PI / 180;
 const D = KAMERA.CZ;
@@ -43,13 +44,13 @@ function matt() {
   return { W: L.W, H: L.H, k, tx: L.W * 0.31 - L.px * k, ty: 20 - 113 * k, L };
 }
 
-export async function armen(plan, { hand: HAND, pr = 1.5 }) {
+export async function armen(plan, { hand: HAND, kopp: KOPP, pr = 1.5 }) {
   const [foto, modell] = await Promise.all([laddaFoto(), laddaHand()]);
   const c = document.createElement('canvas');
   c.className = 'rum-hasse-hand';
-  // (under kaffet och notan: fingrarna når in bakom fatet)
+  // (över notan: fatet står på den)
   const kaffe = plan.querySelector('#rum-hasse');
-  if (kaffe) kaffe.before(c); else plan.append(c);
+  if (kaffe) kaffe.after(c); else plan.append(c);
   // (bilden behålls: ligger duken utanför bilden när den ritas, som i telefonen på höjden, kan Chrome
   // annars visa en tom duk när den kommer in i bilden)
   const r = new THREE.WebGLRenderer({ canvas: c, alpha: true, antialias: true, powerPreference: 'low-power', preserveDrawingBuffer: true });
@@ -67,10 +68,27 @@ export async function armen(plan, { hand: HAND, pr = 1.5 }) {
   };
   const hs = skugga();
   const as = skugga();
+  // Koppen på sitt fat, samma som i baren: den står upprätt i en egen värld med figurens ljus och ses av
+  // en egen kamera (koppKamera), så att den lyses som i baren.
+  const S2 = new THREE.Scene();
+  const K = byggKopp();
+  S2.add(K.kopp, K.fat);
+  const fs = new THREE.Mesh(new THREE.PlaneGeometry(1, 1), new THREE.MeshBasicMaterial({ map: tex, opacity: 0.85, transparent: true, depthWrite: false, depthTest: false }));
+  fs.renderOrder = -1;
+  S2.add(fs);
+  const cam2 = new THREE.PerspectiveCamera(10, 1, 200, 30000);
   // (en liten hand ligger långt bort i figurens värld: den bortre gränsen räcker för det)
   const cam = new THREE.PerspectiveCamera(30, 1, 200, 30000);
   cam.position.set(0, CY, D);
   cam.lookAt(0, CY, 0);
+  // båda bilderna på duken: handen, och koppen ovanpå
+  r.autoClear = false;
+  function rita() {
+    r.clear();
+    r.render(S, cam);
+    r.clearDepth();
+    r.render(S2, cam2);
+  }
 
   // Handens fönster och figurens kamera, beskuren till duken.
   const V = { W: 1, H: 1, M: 1, ppx: 0, ppy: 0 };
@@ -95,6 +113,8 @@ export async function armen(plan, { hand: HAND, pr = 1.5 }) {
     const f = (V.M * D) / (D - p.z);
     return [V.ppx + p.x * f, V.ppy + (CY - p.y) * f];
   }
+  // rummet i handens fönster: förstoringen och förskjutningen (placera)
+  const R = { k: 1, ox: 0, oy: 0 };
 
   // ---------- i vila ----------
 
@@ -114,7 +134,7 @@ export async function armen(plan, { hand: HAND, pr = 1.5 }) {
     // (handen ska synas var den än är i världen)
     A.hand.mesh.visible = true;
     skuggor(vila.W, vila.F, vila.N, vila.D0);
-    r.render(S, cam);
+    rita();
   }
   const m4 = new THREE.Matrix4();
   const sx = new THREE.Vector3();
@@ -144,6 +164,66 @@ export async function armen(plan, { hand: HAND, pr = 1.5 }) {
     const h = -a - BOJ;
     vila.F.copy(RH).multiplyScalar(Math.cos(h * DEG)).addScaledVector(AW, Math.sin(h * DEG));
   }
+  // Koppen står på pulten till höger om fingrarna, med örat åt höger och lite mot en som i baren. Den ses
+  // KOPP_VY grader uppifrån och rakt framifrån, som allt annat på pulten: figurens kamera ser hörnet långt
+  // från sin mitt, och där skulle en kopp luta. Den är lite mindre än i baren, där handen pekar mot en och
+  // ser kortare ut; här ligger den i full längd bredvid. Fatets skugga faller bort från ljuset, som kommer
+  // framifrån till vänster.
+  const KOPP_VY = 44 * DEG;
+  const KOPP_SKALA = 0.8;
+  const KOPP_AVST = D;
+  K.kopp.position.set(0, 11, 0);
+  K.kopp.rotation.y = -0.5;
+  K.fat.position.set(0, 0.5, 0);
+  K.fat.rotation.y = -0.5;
+  fs.rotation.x = -Math.PI / 2;
+  fs.position.set(16, 0, -14);
+  fs.scale.set(300, 290, 1);
+  cam2.position.set(0, Math.sin(KOPP_VY), Math.cos(KOPP_VY)).multiplyScalar(KOPP_AVST);
+  cam2.lookAt(0, 0, 0);
+  // fatets mitt i handens fönster, och koppens kamera beskuren till duken som handens
+  const KM = { x: 0, y: 0 };
+  function koppKamera(crop) {
+    const m = matt();
+    KM.x = R.ox + KOPP.x * R.k;
+    KM.y = R.oy + KOPP.y * R.k;
+    const f = vila.s * KOPP_SKALA * KOPP_AVST;
+    cam2.fov = (2 * Math.atan(m.H / 2 / f)) / DEG;
+    cam2.aspect = m.W / m.H;
+    cam2.setViewOffset(m.W, m.H, m.W / 2 - KM.x + crop[0], m.H / 2 - KM.y + crop[1], crop[2], crop[3]);
+    cam2.updateMatrixWorld();
+  }
+  // koppens värld → rummets mått
+  const C2F = new THREE.Vector3().copy(cam2.position).negate().normalize();
+  const C2R = new THREE.Vector3(1, 0, 0);
+  const C2U = new THREE.Vector3().crossVectors(C2R, C2F);
+  const PK = new THREE.Vector3();
+  function koppIRum(p) {
+    PK.copy(p).sub(cam2.position);
+    const z = PK.dot(C2F);
+    const f = vila.s * KOPP_SKALA * KOPP_AVST;
+    return [(KM.x + (f * PK.dot(C2R)) / z - R.ox) / R.k, (KM.y - (f * PK.dot(C2U)) / z - R.oy) / R.k];
+  }
+  // det koppen och fatet tar i rummet (fatets kant, koppens kant och örat)
+  function koppRuta() {
+    K.fat.updateMatrixWorld();
+    K.kopp.updateMatrixWorld();
+    const p = new THREE.Vector3();
+    let x0 = Infinity, y0 = Infinity, x1 = -Infinity, y1 = -Infinity;
+    for (const [g, rr, h] of [[K.fat, 120, 0], [K.fat, 120, 28], [K.kopp, 64, 114], [K.kopp, 96, 62]]) for (let i = 0; i < 16; i++) {
+      const a = (i / 16) * Math.PI * 2;
+      const [x, y] = koppIRum(p.set(rr * Math.cos(a), h, rr * Math.sin(a)).applyMatrix4(g.matrixWorld));
+      x0 = Math.min(x0, x); y0 = Math.min(y0, y); x1 = Math.max(x1, x); y1 = Math.max(y1, y);
+    }
+    return { x0, y0, x1, y1 };
+  }
+  // ångan ur koppen (rum.css) börjar vid kaffets yta
+  function anga() {
+    const a = kaffe && kaffe.querySelector('.anga');
+    if (!a) return;
+    const [x, y] = koppIRum(new THREE.Vector3(0, 96, 0).applyMatrix4(K.kopp.matrixWorld));
+    Object.assign(a.style, { left: `${(x - kaffe.offsetLeft - 24).toFixed(1)}px`, top: `${(y - kaffe.offsetTop - 80).toFixed(1)}px` });
+  }
   function placera() {
     kamera([0, 0, 1, 1]);
     const m = matt();
@@ -151,6 +231,7 @@ export async function armen(plan, { hand: HAND, pr = 1.5 }) {
     const k = Math.max(m.W / 1600, m.H / 1000);
     const ox = (m.W - 1600 * k) / 2;
     const oy = (m.H - 1000 * k) / 2;
+    Object.assign(R, { k, ox, oy });
     const x = ox + HAND.x * k;
     const y = oy + HAND.y * k;
     vila.s = opt.skala * k;
@@ -176,15 +257,24 @@ export async function armen(plan, { hand: HAND, pr = 1.5 }) {
       if (Math.sign(fel(mid)) === Math.sign(fl)) lo = mid; else hi = mid;
     }
     riktning((lo + hi) / 2);
-    // duken i planet: från rummets vänstra kant (och lite till) till fingrarna
+    // (fatets mitt i fönstret, till rutan nedan)
+    koppKamera([0, 0, 1, 1]);
+    // duken i planet: från rummets vänstra kant (och lite till) till fingrarna och koppen med skuggan
     const fot = 390 * opt.skala;
-    box = { x: Math.floor(Math.min(HAND.x - fot, -60)), y: Math.floor(HAND.y - fot * 0.72), w: 0, h: Math.ceil(fot * 1.32) };
-    box.w = Math.ceil(HAND.x + fot - box.x);
+    const kr = koppRuta();
+    box = { x: Math.floor(Math.min(HAND.x - fot, -60)), y: Math.floor(Math.min(HAND.y - fot * 0.72, kr.y0 - 6)), w: 0, h: 0 };
+    box.w = Math.ceil(Math.max(HAND.x + fot, kr.x1 + 24) - box.x);
+    box.h = Math.ceil(Math.max(HAND.y + fot * 0.6, kr.y1 + 24) - box.y);
     Object.assign(c.style, { left: `${box.x}px`, top: `${box.y}px`, width: `${box.w}px`, height: `${box.h}px` });
     r.setPixelRatio(pr);
     r.setSize(box.w, box.h, false);
     kamera([ox + box.x * k, oy + box.y * k, box.w * k, box.h * k]);
+    koppKamera([ox + box.x * k, oy + box.y * k, box.w * k, box.h * k]);
     ritaVila();
+    anga();
+    // (koppen här ersätter den ritade i rummet, rum.css)
+    if (kaffe) kaffe.classList.add('tre');
+    c.classList.add('klar');
     // det man trycker på: handen och manschetten
     if (knapp) Object.assign(knapp.style, { left: `${HAND.x - 40}px`, top: `${HAND.y - fot * 0.5}px`, width: `${40 + fot * 0.8}px`, height: `${fot * 0.8}px` });
   }
@@ -211,7 +301,7 @@ export async function armen(plan, { hand: HAND, pr = 1.5 }) {
         extra[i] = f > 0 && f < 1 ? -Math.sin(f * Math.PI) * 0.3 : 0;
       }
       A.hand.satt(handled, vila.F, vila.P, KROK, 0, 0, TUMME, extra);
-      r.render(S, cam);
+      rita();
       raf = requestAnimationFrame(steg);
     };
     raf = requestAnimationFrame(steg);
@@ -222,6 +312,6 @@ export async function armen(plan, { hand: HAND, pr = 1.5 }) {
     trumma,
     placera,
     knapp(el) { knapp = el; placera(); },
-    borta() { cancelAnimationFrame(raf); A.borta(); r.dispose(); r.forceContextLoss(); c.remove(); },
+    borta() { cancelAnimationFrame(raf); A.borta(); K.borta(); r.dispose(); r.forceContextLoss(); c.remove(); if (kaffe) kaffe.classList.remove('tre'); },
   };
 }
