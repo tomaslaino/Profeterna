@@ -3882,12 +3882,11 @@ dem (`ringar`); eller knackar av askan över askkoppen med två korta ryck (aska
 glöden, drar ett bloss och blåser ut röken genom näsan (`aska`). Rökringen är partiklar i en cirkel
 som far iväg och vidgar sig, med svag virvel så att den håller ihop (`ring`).
 
-**Samtalet.** Det är han som frågar, *Vilken match förstår du inte?*, med ditt efternamn om kupongen
-vet vem du är, och man svarar genom att välja en match. Då frågar han tillbaka (*Den är enkel. Vill du
-veta, eller ska du gissa?*), och först *Lär mig* ger analysen (knappen lottas som hans repliker: också *Jag lyssnar och
-lär* och *Upplys mig*), så att ett felklick inte visar ett tips. *Jag gissar* går tillbaka till listan och
+**Samtalet.** Det är han som frågar, *Vilken match ska jag hjälpa dig med?*, och när du kommer tillbaka *Har du kört fast igen, Laino?*, med ditt efternamn om kupongen
+vet vem du är. Han talar i hela meningar, och över matchlistan finns alltid plats för två rader, så att listan står still vad han än säger. Man svarar genom att välja en match. Då frågar han tillbaka (*Den är solklar. Vill du
+veta, eller ska du gissa?*), och först *Jag är idel öra* ger analysen (knappen lottas som hans repliker: också *Tala om det för mig*), så att ett felklick inte visar ett tips. *Jag gissar* går tillbaka till listan och
 *Matchbladet* till matchen. Svaren står direkt under hans fråga, som lappar i tipskupongens tryck
-som ligger på disken: *Lär mig* i terrakotta som kupongens band, *Jag gissar* i krämvitt papper
+som ligger på disken: *Jag är idel öra* i terrakotta som kupongens band, *Jag gissar* i krämvitt papper
 bredvid, båda med en tunn ram innanför kanten, och *Matchbladet →* under dem med små spärrade
 versaler som texten i bandet. Frågan har sin plats från början, osynlig tills han säger den, så att
 knapparna inte flyttar sig. Förut stod svaren som små länkar längst ned i spalten och syntes knappt
@@ -3895,8 +3894,8 @@ i telefonen, och sedan som piller i guld (ändrat 2026-11-04). *Nästa match* ef
 lapp i terrakotta, och *Ja, ja »* och *← Tillbaka* står med samma versaler som *Matchbladet →*. Han har alltid svaret, både när du redan har frågat (*Den har jag tittat på*) och när
 han ska läsa på (*Den knäckte jag i morse*); att han läser på märks först medan han väntar. Är analysen inte skriven än
 säger han det (*Den tar jag sen*). Rader där du redan har fått tecknen öppnas
-direkt. Analysen är redan skriven, men han låtsas: när du har bett om den fortsätter han prata i 15–25 sekunder (`LATSAS` i [public/rum-hasse.js](public/rum-hasse.js), raderna kommer i ordning: *Vi börjar bakifrån*, *Total kontroll*, *Det här
-är helt normalt*) och tar en klunk kaffe eller cigarren då och då. När den är klar blir han tyst och slår domen i disken
+direkt. Analysen är redan skriven, men han låtsas: när du har bett om den fortsätter han prata i 15–25 sekunder (`LATSAS` i [public/rum-hasse.js](public/rum-hasse.js), raderna kommer i ordning: *Jag läser tidningarna*, *Jag har full kontroll*, *Det ska
+gå till så här*) och tar en klunk kaffe eller cigarren då och då. När den är klar blir han tyst och slår domen i disken
 (se *Slaget*), och domen står i guld. Sedan säger han texten en mening i taget, ord för ord med munnen i takt (och det hörs, se *Ljudet*), med en paus
 mellan meningarna och en längre före en kort mening, och gesterna kommer vid de bestämda orden
 (*Nej nej nej*, *varningens finger*, ibland handflatan i disken) eller då och då vid en lång mening. Ett klick var som helst
@@ -3906,9 +3905,9 @@ resultatet i modellens prognos (resultatmatrisen i `data/match/<id>.json`, samma
 visar) bland utfallen han har ringat in, så att resultatet aldrig går emot tecknen. Har modellen
 ingen prognos för matchen säger han inget resultat (`resultatet` i
 [public/rum-hasse.js](public/rum-hasse.js)). Sist säger han vad han tycker om det du själv har på
-kupongen (*Du har etta. Det är din kupong. Och dina pengar.*). Han minns på enheten vad du har
+kupongen (*Du har etta, och det är dina pengar.*). Han minns på enheten vad du har
 frågat om: tecknen står på matchens rad, i guld, med resultatet bredvid, och *Nästa match* räknar
-(*Halva kupongen är löst*). Bara tecken du själv har bett om syns, så att listan inte blir ett
+(*Nu är halva kupongen klar*). Bara tecken du själv har bett om syns, så att listan inte blir ett
 automatiskt tips. Frågar du om samma match igen står allt direkt.
 Går hans röst inte att få säger han det och visar analysen i skrift. Allt han säger runt omkring är
 färdiga rader, utan AI, i [public/rum-hasse-repliker.js](public/rum-hasse-repliker.js). Med minskad

@@ -1,110 +1,113 @@
 // Det Hasse Backe (fiktiv) säger själv i tobaksaffären (rum-hasse.js), utan att
 // någon AI är inblandad. Analysen av en match skrivs i förväg (src/analyser/hasse.mjs); här står
 // allt runt omkring. Han lottar bland raderna, och inget av det här är ett faktum
-// om en match eller en person. Raderna ska rymmas på en rad (ungefär 30 tecken),
-// annars knuffar de ner matcherna under sig.
+// om en match eller en person. Skriv hela meningar med verb: "Vilken match?" och "Modigt."
+// är avhuggna på ett sätt som svenskan inte tål. Över matchlistan finns alltid plats för
+// två rader (ungefär 30 tecken var i ett fönster 1440 brett och i telefonen), så att
+// listan står still vad han än säger.
 //
 // {namn} ditt efternamn, {dag} när spelstoppet är (på lördag, i morgon, i dag),
-// {du} dina tecken (etta och kryss), {bada} tecknen ni båda har, {res} resultatet (2–1).
+// {du} dina tecken (etta och kryss), {Bada} tecknen ni båda har, {res} resultatet (2–1).
 //
 // Raderna hörs: Macen tar fram ljudet till dem med fälten ifyllda
-// (src/analyser/rost.mjs), så filen är både ett skript i sidan
+// (src/rost.js), så filen är både ett skript i sidan
 // (window.HasseRepliker) och en modul för Node. lar är knappar och sägs inte.
 (function (repliker) {
   if (typeof module === 'object' && module.exports) module.exports = repliker;
   else window.HasseRepliker = repliker;
 })({
   // När man kommer till honom.
-  oppning: ['Nå. Vilken match?', 'Säg en match.', 'Vilken match förstår du inte?', 'Jag har svaret. Vilken match?', 'Fråga på. Vilken match?'],
-  oppningNamn: ['Nå, {namn}. Vilken match?', '{namn}. Vilken match?', 'Säg en match, {namn}.'],
+  oppning: ['Vilken match ska jag hjälpa dig med?', 'Vilken match gick du bet på?'],
+  oppningNamn: ['Vilken match ska jag hjälpa dig med?', 'Vilken match gick du bet på?'],
   // När man har varit här förut.
-  tillbaka: ['Du igen. Vilken match?', 'Tillbaka. Vilken match?', 'Fler frågor?'],
-  tillbakaNamn: ['{namn} igen. Vilken match?', 'Tillbaka, {namn}?'],
+  tillbaka: ['Har du kört fast igen?', 'Vilken match är det nu då?'],
+  tillbakaNamn: ['Har du kört fast igen, {namn}?', 'Vilken match är det nu då, {namn}?'],
 
   // Efter en analys.
-  nasta: ['Nästa.', 'Vilken mer?', 'Fråga på.', 'Vidare.'],
+  nasta: ['Vilken match tar vi nu?', 'Vi tar nästa match.', 'Undrar du över någon mer match?'],
   // ... när man har frågat om just så många matcher.
   antal: {
-    3: 'Tre stycken. Du lär dig.',
-    5: 'Fem stycken. Du är nyfiken.',
-    10: 'Tio. Snart kan du ta över här.',
+    3: 'Det är tre nu. Det börjar likna något.',
+    5: 'Det är fem nu. Du är nyfiken av dig.',
+    10: 'Det är tio nu. Du kan ta över min stol.',
   },
-  halva: 'Halva kupongen är löst.',
-  enKvar: 'En kvar. Den är också enkel.',
+  halva: 'Nu är halva kupongen klar.',
+  enKvar: 'Nu är det en kvar. Den är lika lätt.',
   // ... när alla är klara, nyss och när man kommer tillbaka.
-  alla: 'Klart. Nu kan det inte gå fel.',
-  allaIgen: 'Du har fått alla. Lyssna bättre.',
+  alla: 'Då är det klart. Lämna in kupongen.',
+  allaIgen: 'Du har redan fått alla.',
 
   // Om man bara står där och inte frågar.
-  ledig: ['Jag har tid.', 'Ta den översta. Den är enkel.', 'Spelstoppet är {dag}.'],
+  ledig: ['Jag sitter kvar här.', 'Börja uppifrån, den är lätt.', 'Spelstoppet är {dag}.'],
 
   // När man har valt en match: han svarar och frågar tillbaka. valKlar när man redan
   // har frågat om den, valLasa när analysen finns och han ska låtsas läsa på, och val när
   // den inte finns. Han har alltid svaret, också när han inte har det: att han läser på
   // märks först när han väntar (vantar).
-  val: ['Den är enkel.', 'Den där, ja.', 'Den är inte svår.'],
-  valKlar: ['Den har jag tittat på.', 'Den har jag svaret på.', 'Den är redan löst.'],
+  val: ['Den är solklar.', 'Den kan jag i sömnen.', 'Glöm allt du har läst.'],
+  valKlar: ['Den har jag tittat på.', 'Den har jag svaret på.', 'Den är redan klar.'],
   valLasa: [
+    'Den är solklar.',
+    'Den kan jag i sömnen.',
+    'Glöm allt du har läst.',
     'Den har jag svaret på.',
     'Den har jag redan klar för mig.',
     'Den vet jag allt om.',
     'Den har jag räknat på.',
     'Den knäckte jag i morse.',
     'Den har jag på en lapp här.',
-    'Den pratade vi om i går kväll.',
-    'Den är solklar.',
   ],
   fragaTillbaka: ['Vill du veta, eller ska du gissa?', 'Vill du ha svaret, eller gissar du?', 'Ska jag säga det, eller gissar du?'],
   // Knappen som tar fram analysen: ditt svar, bredvid Jag gissar.
-  lar: ['Lär mig', 'Jag lyssnar och lär', 'Upplys mig'],
+  lar: ['Jag är idel öra', 'Tala om det för mig'],
   // Trycker man på Jag gissar.
-  gissar: ['Modigt. Vilken mer?', 'Det har gått förr. Vilken mer?', 'Gissa på. Vilken mer?', 'Det är din kupong. Nästa.'],
+  gissar: ['Då får du skylla dig själv.', 'Gissa du, det har gått förr.'],
   // Direkt när man har bett om analysen.
-  reaktion: ['Bra att du frågar.', 'Det är lugnt.', 'Ja, den.', 'Den tar vi.'],
+  reaktion: ['Där frågade du rätt man.', 'Nu ska du få höra.'],
   // Samma match en gång till.
-  igen: ['Den tog vi nyss.', 'Den har du redan fått.', 'Lyssnade du inte?'],
+  igen: ['Du får samma svar som nyss.', 'Den tog vi ju nyss.'],
 
   // Medan han låtsas analysera: en i taget, i den här ordningen. Allt under kontroll.
   vantar: [
     'Jag ska bara titta på en sak.',
-    'Vi börjar bakifrån.',
-    'Bra analys tar sin tid.',
-    'Jag läser vad de skriver.',
-    'Det är mest fel.',
-    'Total kontroll.',
+    'Jag läser tidningarna.',
+    'De har fel, som vanligt.',
+    'Det här får ta sin tid.',
     'Du har väl inte bråttom?',
     'Spelstoppet är {dag}.',
-    'Det här är helt normalt.',
-    'Orsak och verkan tar en stund.',
-    'Jag har sett det förr.',
-    'Lugn nu.',
+    'Det är orsak och verkan, alltså.',
+    'Det här har jag sett förut.',
+    'Ta det bara lugnt.',
+    'Jag har full kontroll.',
     'Det är ingen fara.',
-    'Det är lugnt.',
+    'Det ska gå till så här.',
+    'Jag är strax klar.',
+    'Allt är under kontroll.',
   ],
 
   // Trycker man på Ja, ja mitt i.
-  avbruten: ['Som du vill.', 'Läs själv, då.', 'Det är lugnt. Du får läsa själv.'],
+  avbruten: ['Då får du läsa själv.', 'Som du vill.'],
 
   // Direkt efter domen, när han har helgarderat: han har ju alltid svar.
-  helgardera: 'Det är också ett svar.',
+  helgardera: 'Då har jag rätt hur det än går.',
 
   // Efter texten: vad matchen slutar, hemma–borta. Resultatet är det troligaste i modellens
   // prognos bland tecknen han har ringat in (resultatet i rum-hasse.js).
-  resultat: ['Det slutar {res}.', 'Det blir {res}. Skriv upp det.', 'Jag säger {res}. Inget mer med det.', 'Slutresultat {res}. Det är bara att vänta.'],
+  resultat: ['Det blir {res}, så är det bara.', 'Det blir {res}, det är solklart.', 'Det slutar {res}.'],
 
   // Sist, om din egen kupong.
   kupong: {
-    samma: ['Det har du också. Då kan det inte gå fel.', 'Samma som du har. Du har lärt dig något.'],
-    farre: ['Du har bara {du}. Modigt.', 'Du har {du} och inget mer. Modigt.'],
-    fler: ['Du har {du}. Det behövs inte.', 'Du har {du}. Det är ett sätt att slippa bestämma sig.'],
-    korsar: ['Du har {du}. {Bada} får du behålla.'],
-    skilda: ['Du har {du}. Det är din kupong. Och dina pengar.', 'Du har {du}. Det får stå för dig.'],
+    samma: ['Du har samma som jag. Det är klokt.'],
+    farre: ['Du har bara {du}. Det var kaxigt.'],
+    fler: ['Du har {du}. Det är onödigt.'],
+    korsar: ['{Bada} kan du behålla, men glöm resten.'],
+    skilda: ['Du har {du}, och det kan du glömma.', 'Du har {du}, och det är dina pengar.'],
     tom: ['Du har inget på den här än. Nu vet du vad du ska skriva.'],
   },
 
   // När något inte går.
-  ingenKupong: 'Ingen kupong än. Det är lugnt.',
-  igang: 'Efteråt kan alla ha rätt.',
-  ejKlar: ['Den tar jag sen.', 'Inte än. Fråga mig sen.', 'Den har jag inte läst än.'],
-  utanRost: 'Jag har tappat rösten. Här har du det i skrift.',
+  ingenKupong: 'Det finns ingen kupong än.',
+  igang: 'Efteråt är alla kloka.',
+  ejKlar: ['Den har jag inte kommit till än.', 'Den tar jag sen.'],
+  utanRost: 'Jag har tappat rösten. Läs här.',
 });
