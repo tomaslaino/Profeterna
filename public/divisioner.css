@@ -229,10 +229,27 @@ dl.facts.dv-facts dd { font-variant-numeric: tabular-nums; }
 
 /* ---------- topplistor ---------- */
 
-/* Högst tre topplistor i bredd – fler blir för mycket. */
+/* Högst tre topplistor i bredd – fler blir för mycket (Lagen har sex, i två
+   rader). I telefonen står de i en rad som man sveper i sidled, ut till
+   skärmkanten, med nästa kort en bit in i bild. */
 .dv-leaders { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 14px; margin-bottom: 16px; }
-@media (max-width: 760px) { .dv-leaders { grid-template-columns: 1fr; } }
+@media (max-width: 760px) {
+  .dv-leaders {
+    display: flex;
+    gap: 12px;
+    margin: 0 calc(-1 * var(--gutter, 20px)) 16px;
+    padding: 2px var(--gutter, 20px) 6px;
+    overflow-x: auto;
+    scroll-snap-type: x mandatory;
+    scroll-padding: 0 var(--gutter, 20px);
+    scrollbar-width: none;
+  }
+  .dv-leaders::-webkit-scrollbar { display: none; }
+  .dv-leaders > .dv-leader { flex: 0 0 min(86%, 380px); scroll-snap-align: start; }
+}
 .dv-leader {
+  display: flex;
+  flex-direction: column;
   position: relative;
   background: var(--glass, var(--card));
   border: 1px solid var(--border);
@@ -275,10 +292,63 @@ li:first-child .dv-lname { font-weight: 650; }
 .dv-lval { text-align: right; font-variant-numeric: tabular-nums; white-space: nowrap; }
 .dv-lval b { font-size: 15px; font-weight: 600; }
 .dv-lval small { display: block; font-size: 11px; color: var(--muted); }
-.dv-lempty { padding: 8px 2px; color: var(--muted); font-size: 13px; }
+.dv-lempty { margin: 0; padding: 8px 2px; color: var(--muted); font-size: 13px; }
 .dv-lnote { margin: 8px 0 0; font-size: 12px; color: var(--muted); }
-.dv-lmore { display: inline-block; margin-top: 8px; font-size: 13px; font-weight: 600; }
+.dv-lmore { display: inline-block; font-size: 13px; font-weight: 600; }
 button.dv-lmore { padding: 0; }
+/* Topp 20 och Alla lag längst ned, i linje mellan korten bredvid varandra */
+.dv-lfoot { margin: auto 0 0; padding-top: 8px; }
+
+/* En stapel mellan namnet och talet i listorna åt två håll. */
+.dv-lrow.bar { grid-template-columns: 1rem minmax(0, 1fr) 40px auto; gap: 12px; }
+.dv-dbar { position: relative; display: block; height: 6px; border-radius: 999px; background: var(--hair); }
+/* nollan mitt i stapeln */
+.dv-dbar::after { content: ""; position: absolute; left: 50%; top: -3px; bottom: -3px; width: 1px; background: var(--border); }
+.dv-dbar i { position: absolute; top: 0; bottom: 0; min-width: 2px; }
+.dv-dbar i.up { left: 50%; border-radius: 0 999px 999px 0; background: var(--fresh); }
+.dv-dbar i.down { right: 50%; border-radius: 999px 0 0 999px; background: var(--down); }
+.dv-dbar i.even { background: color-mix(in srgb, var(--muted) 75%, transparent); }
+
+/* Listorna åt två håll: ett ord för varje håll (Tur, Otur …) med stapelns färg. */
+.dv-lsub {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin: 8px 0 0;
+  font-size: 12.5px;
+  font-weight: 650;
+  color: var(--ink-soft, var(--fg));
+}
+.dv-lsub::before { content: ""; width: 10px; height: 4px; border-radius: 2px; background: var(--fresh); }
+.dv-lsub.down::before { background: var(--down); }
+.dv-lsub.even::before { background: color-mix(in srgb, var(--muted) 75%, transparent); }
+.dv-leader h4 + .dv-lsub { margin-top: 2px; }
+.dv-modal .dv-lsub { margin: 18px 0 4px; }
+.dv-modal .dv-mhead + .dv-lsub { margin-top: 0; }
+
+/* Formen: style.css .form, lite mindre i listorna och tabellen. */
+.dv-form { flex-wrap: nowrap; gap: 3px; }
+.dv-form span { width: 1.3rem; height: 1.3rem; border-radius: 5px; font-size: 0.66rem; line-height: 1; cursor: default; }
+.dv-lrow .dv-form, td .dv-form { display: inline-flex; vertical-align: middle; }
+/* i Formen står rutorna på raden under namnet, där placeringen annars står */
+.dv-lname small .dv-form { display: flex; margin-top: 4px; }
+.dv-lname small .dv-form span { width: 1.15rem; height: 1.15rem; font-size: 0.62rem; }
+td.dv-fcol { white-space: nowrap; }
+.dv-kpis .dv-form { justify-content: center; margin: 2px 0 1px; }
+.dv-kpis .dv-form span { width: 1.45rem; height: 1.45rem; font-family: var(--sans, inherit); font-size: 0.7rem; font-weight: 700; }
+
+/* lagkortet: nästa match och formen match för match */
+.dv-next { display: flex; align-items: center; justify-content: space-between; gap: 14px; font-size: 14px; }
+.dv-next .dv-tname, .dv-flist .dv-tname { min-width: 0; }
+.dv-next .dv-tname .skold { width: 26px; height: 26px; }
+.dv-next b { font-weight: 650; }
+.dv-next small, .dv-flist small { display: block; margin-top: 1px; font-size: 12.5px; color: var(--muted); }
+.dv-next-when { flex: none; font-size: 15px; font-variant-numeric: tabular-nums; }
+.dv-flist { list-style: none; margin: 0; padding: 0; }
+.dv-flist li { display: grid; grid-template-columns: auto minmax(0, 1fr) auto; align-items: center; gap: 14px; padding: 8px 0; border-top: 1px solid var(--hair); font-size: 14px; }
+.dv-flist li:first-child { border-top: 0; padding-top: 0; }
+.dv-flist > li > b { font-size: 15px; font-weight: 650; font-variant-numeric: tabular-nums; }
+.dv-flist .dv-form span { width: 1.45rem; height: 1.45rem; font-size: 0.7rem; }
 .dv-lrow:disabled { cursor: default; }
 .dv-lrow:disabled:hover { background: none; }
 .dv-toplist { list-style: none; margin: 0; padding: 0; }

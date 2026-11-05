@@ -15,6 +15,8 @@
 //   Motståndet     anteckningsblock: de som har mött svårast och lättast
 //                  motstånd hittills (modellens styrka, som på Statistik)
 // Mötena och lagen ett och ett står i kortregistret på disken (rum-register.js).
+// Samma lappar (utom skadelistan och vilan) står som topplistor för hela
+// divisionen på Statistik → Lagen (divisioner.js): ändras en, följer den andra med.
 //
 // Varje lapp är en bunt blad på samma nål, ett per division i omgången med
 // Premier League överst och cupmatcherna sist, och bladen under sticker
