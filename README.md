@@ -631,6 +631,11 @@ bara lokalt. Analyserna visas som de ligger i `data/analyser.json`; hur de skriv
   gång så att main inte växer. Bygget tar det egna ljudet där det finns och Azure där det
   saknas, så han blir aldrig tyst. Ljudet är av tills besökaren slår på det. Se
   [Hasse Backe](#hasse-backe), *Ljudet*.
+- **Kaffet i rummet som i baren (2026-11-05, användarens önskemål):** handen låg under fatet i
+  rummet, koppen var en platt teckning sedd från sidan medan papperen bredvid ses uppifrån, och notan
+  låg bredvid i stället för under fatet som i baren. Nu är koppen bardiskens kopp i samma ljus,
+  ritad i handens duk, fatet står på notan och handen ligger bredvid, och bardisken har pultens
+  bruna. Se [Hasse Backe](#hasse-backe), *Kaffet i rummet*.
 - **Kuponghistoriken flyttar till Olympen (2026-10-20, användarens önskemål):** Kupong
   handlar bara om nästa kupong – växlaren Omgången | Historik försvinner. De färdigspelade
   kupongerna står sist i Olympen under rubriken *Grupparbetena* (`#olympen/kuponger`, en
@@ -1952,10 +1957,10 @@ Enter och mellanslag klickar på dem. En match på text-tv:n öppnar matchrutan 
   *Inlämnad*, men inga tecken. Din egen tas i handen, och de andras när du ser deras tips
   (se nedan). Innan dess lyfts en annans kupong bara lite i ena kanten och faller tillbaka.
 - **Hasses kaffe** längst till vänster på pulten → Hasse Backe, som sitter i baren
-  utanför bilden till vänster. Hans hand ligger på pulten vid koppen, med armen in från bildens kant.
-  Koppen med blå ränder ryker på ett fat vid pultens bakre kant, och bredvid ligger hans nota:
-  kaffe, fyra påtår och en kanelbulle, Skrivs på Notts County (klubben han lämnade efter sju
-  veckor 2009, när lönen inte kom; notan har nummer 0007). Ett klick på kaffet eller notan,
+  utanför bilden till vänster. Hans hand ligger på pulten, med armen in från bildens kant, och till
+  höger om fingrarna står koppen med blå ränder och ryker på sitt fat vid pultens bakre kant. Fatet
+  står på hans nota, som i baren: kaffe, fyra påtår och en kanelbulle, Skrivs på Notts County
+  (klubben han lämnade efter sju veckor 2009, när lönen inte kom; notan har nummer 0007). Ett klick på kaffet eller notan,
   Enter eller H och man vänder sig mot honom (`hasseHtml`, `tillHasse`, se
   [Hasse Backe](#hasse-backe)).
 - **Tv:n** uppe i hörnet till höger, en mörkgrå Panasonic från nittiotalet med text-tv på en arm från väggen, zoomas in med ett
@@ -3745,6 +3750,17 @@ neonskyltens röda sken och gatans kalla ljus från höger, där affären är (`
 [public/rum-hasse-arm.js](public/rum-hasse-arm.js); väggen är spårad med samma ljus). Över hela
 bilden mörknar hörnen, och ett lätt korn rör sig (`.rh-ton`, `.rh-korn`), inte på rummets lägre steg
 och inte i telefonen. Handen på pulten i rummet har rummets ljus utan baren.
+
+**Kaffet i rummet.** Handen, koppen och notan på pulten är samma som i hans bild, så att man känner
+igen dem när kameran slår över: koppen är bardiskens modell (`byggKopp`) med samma ljus, fatet står
+på notans övre hörn och handen ligger till vänster om koppen, som hans vänstra hand vid koppen i
+baren ([public/rum-hasse-hand.js](public/rum-hasse-hand.js)). Koppen ritas i handens duk med en egen
+kamera: den ses 44° uppifrån och rakt framifrån som det andra på pulten, eftersom handens kamera ser
+hörnet långt från sin mitt och en kopp där skulle luta. Den är lite mindre än i baren (`KOPP_SKALA`),
+där handen pekar mot en och ser kortare ut. Duken tonar in när den är klar, och den ritade koppen i
+`hasseHtml` tonar då bort; den står kvar utan WebGL. Bardiskens trä har pultens bruna, inte rödare.
+Förut stod en platt ritad kopp, sedd nästan från sidan, bredvid notan, och handen låg under fatet så
+att det såg ut som om den bar det (ändrat 2026-11-05).
 
 Tre tidigare försök: först satt han på en barstol vid pultens ände med en arm som ett gummiband över
 hörnet till handen långt nere på pulten (armen, benen, hörnet och koppen såg konstiga ut). Sedan gled

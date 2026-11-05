@@ -12,7 +12,8 @@
 /* framme: rummet står kvar som det var men ritas inte */
 .rum.hasse-framme .rum-front { visibility: hidden; }
 /* hans hand på pulten (rum-hasse-hand.js), och knappen över den */
-.rum-pl > .rum-hasse-hand { position: absolute; pointer-events: none; will-change: auto; }
+.rum-pl > .rum-hasse-hand { position: absolute; pointer-events: none; will-change: auto; opacity: 0; transition: opacity 0.6s; }
+.rum-pl > .rum-hasse-hand.klar { opacity: 1; }
 .rum-hasse-knapp { position: absolute; padding: 0; border: 0; background: none; cursor: pointer; pointer-events: auto; will-change: auto; }
 
 /* Hans bild: väggen är en färdig bild från samma kamera, disken en duk som ritas en gång och figuren
