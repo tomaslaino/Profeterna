@@ -637,12 +637,12 @@ canvas.rum-neonhalo { opacity: 0.28; }
 /* ---------- Hasse i baren (rum.js, hasseHtml) ---------- */
 
 /* Hasse Backe sitter i baren utanför bilden till vänster; längst ut på pulten
-   står hans kaffe och notan (ett klick: rum-hasse.js). */
-#rum-hasse { position: absolute; left: 100px; top: 640px; width: 280px; height: 304px; }
+   står hans kaffe på notan, som i baren (ett klick: rum-hasse.js). */
+#rum-hasse { position: absolute; left: 100px; top: 600px; width: 280px; height: 344px; }
 #rum-hasse > * { position: absolute; display: block; }
 #rum-hasse .nota {
-  left: 118px;
-  top: 12px;
+  left: 120px;
+  top: 82px;
   width: 148px;
   height: 236px;
   box-sizing: border-box;
@@ -664,11 +664,15 @@ canvas.rum-neonhalo { opacity: 0.28; }
 #rum-hasse .sa { border-top: 1.5px solid currentColor; margin-right: -4px; }
 #rum-hasse .skrivs { transform: rotate(-4deg); margin-top: 1px; }
 #rum-hasse .nc { font-size: 24px; font-weight: 700; transform: rotate(-5deg); transform-origin: 0 50%; margin-left: -4px; text-decoration: underline double; text-decoration-thickness: 1.5px; text-underline-offset: 4px; text-decoration-skip-ink: none; }
-/* koppen står vid pultens bakre kant, där hans hand ligger (rum-hasse.js) */
-#rum-hasse .kopp { left: 0; top: -30px; overflow: visible; }
+/* fatet står på notans övre hörn, till höger om hans hand: mitten vid (268, 708) i rummet, som
+   koppen i rum-hasse-hand.js som ersätter den här när handen ligger där */
+#rum-hasse .kopp { left: 93px; top: 14px; overflow: visible; }
 #rum-hasse .kopp-in { transform-box: fill-box; transform-origin: 50% 100%; }
+/* när handen ligger där står koppen i samma duk (rum-hasse-hand.js), och den ritade tonar bort */
+#rum-hasse .kopp { transition: opacity 0.6s; }
+#rum-hasse.tre .kopp { opacity: 0; }
 /* ångan från kaffet */
-#rum-hasse .anga { left: 52px; top: -64px; width: 46px; height: 86px; pointer-events: none; }
+#rum-hasse .anga { left: 144px; top: -14px; width: 46px; height: 86px; pointer-events: none; }
 #rum-hasse .anga i {
   position: absolute;
   left: 8px;

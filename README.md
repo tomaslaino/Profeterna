@@ -667,6 +667,11 @@ bara lokalt. Analyserna visas som de ligger i `data/analyser.json`; hur de skriv
   vilan hör till omgången, så de blir inga topplistor. Formen räknas ur `data/matches.json`,
   som på tavlan innan den tas fram, alltså utan Europacuperna, som bara finns i matchens fil.
   Se Status.
+- **Kaffet i rummet som i baren (2026-11-05, användarens önskemål):** handen låg under fatet i
+  rummet, koppen var en platt teckning sedd från sidan medan papperen bredvid ses uppifrån, och notan
+  låg bredvid i stället för under fatet som i baren. Nu är koppen bardiskens kopp i samma ljus,
+  ritad i handens duk, fatet står på notan och handen ligger bredvid, och bardisken har pultens
+  bruna. Se [Hasse Backe](#hasse-backe), *Kaffet i rummet*.
 - **Kuponghistoriken flyttar till Olympen (2026-10-20, användarens önskemål):** Kupong
   handlar bara om nästa kupong – växlaren Omgången | Historik försvinner. De färdigspelade
   kupongerna står sist i Olympen under rubriken *Grupparbetena* (`#olympen/kuponger`, en
@@ -1988,10 +1993,10 @@ Enter och mellanslag klickar på dem. En match på text-tv:n öppnar matchrutan 
   *Inlämnad*, men inga tecken. Din egen tas i handen, och de andras när du ser deras tips
   (se nedan). Innan dess lyfts en annans kupong bara lite i ena kanten och faller tillbaka.
 - **Hasses kaffe** längst till vänster på pulten → Hasse Backe, som sitter i baren
-  utanför bilden till vänster. Hans hand ligger på pulten vid koppen, med armen in från bildens kant.
-  Koppen med blå ränder ryker på ett fat vid pultens bakre kant, och bredvid ligger hans nota:
-  kaffe, fyra påtår och en kanelbulle, Skrivs på Notts County (klubben han lämnade efter sju
-  veckor 2009, när lönen inte kom; notan har nummer 0007). Ett klick på kaffet eller notan,
+  utanför bilden till vänster. Hans hand ligger på pulten, med armen in från bildens kant, och till
+  höger om fingrarna står koppen med blå ränder och ryker på sitt fat vid pultens bakre kant. Fatet
+  står på hans nota, som i baren: kaffe, fyra påtår och en kanelbulle, Skrivs på Notts County
+  (klubben han lämnade efter sju veckor 2009, när lönen inte kom; notan har nummer 0007). Ett klick på kaffet eller notan,
   Enter eller H och man vänder sig mot honom (`hasseHtml`, `tillHasse`, se
   [Hasse Backe](#hasse-backe)).
 - **Tv:n** uppe i hörnet till höger, en mörkgrå Panasonic från nittiotalet med text-tv på en arm från väggen, zoomas in med ett
@@ -3787,6 +3792,17 @@ neonskyltens röda sken och gatans kalla ljus från höger, där affären är (`
 bilden mörknar hörnen, och ett lätt korn rör sig (`.rh-ton`, `.rh-korn`), inte på rummets lägre steg
 och inte i telefonen. Handen på pulten i rummet har rummets ljus utan baren.
 
+**Kaffet i rummet.** Handen, koppen och notan på pulten är samma som i hans bild, så att man känner
+igen dem när kameran slår över: koppen är bardiskens modell (`byggKopp`) med samma ljus, fatet står
+på notans övre hörn och handen ligger till vänster om koppen, som hans vänstra hand vid koppen i
+baren ([public/rum-hasse-hand.js](public/rum-hasse-hand.js)). Koppen ritas i handens duk med en egen
+kamera: den ses 44° uppifrån och rakt framifrån som det andra på pulten, eftersom handens kamera ser
+hörnet långt från sin mitt och en kopp där skulle luta. Den är lite mindre än i baren (`KOPP_SKALA`),
+där handen pekar mot en och ser kortare ut. Duken tonar in när den är klar, och den ritade koppen i
+`hasseHtml` tonar då bort; den står kvar utan WebGL. Bardiskens trä har pultens bruna, inte rödare.
+Förut stod en platt ritad kopp, sedd nästan från sidan, bredvid notan, och handen låg under fatet så
+att det såg ut som om den bar det (ändrat 2026-11-05).
+
 Tre tidigare försök: först satt han på en barstol vid pultens ände med en arm som ett gummiband över
 hörnet till handen långt nere på pulten (armen, benen, hörnet och koppen såg konstiga ut). Sedan gled
 rummet och baren i sidled med en mörk vägg emellan, och det såg ut som två olika ställen, med en egen
@@ -3951,17 +3967,19 @@ på iMacen körs var 15:e minut (launchd kör det aldrig två gånger samtidigt)
 återställs till origin/main varje gång, som analysernas jobb. Det tar listan över allt han
 säger ur `texter()` i [src/rost.js](src/rost.js), kommande matchers meningar först och sedan
 replikerna (ca 350 meningar), och läser upp högst 30 som saknas per körning med
-[chatterbox.py](scripts/rost/chatterbox.py), som laddar modellen en gång (ca 30 s) och räknar
+[chatterbox_jobb.py](scripts/rost/chatterbox_jobb.py), som laddar modellen en gång (ca 30 s) och räknar
 ungefär 5 s per sekund tal. Inställningarna står i `rost.egen` i
 [config/hasse.js](config/hasse.js): exaggeration 0,7, cfg_weight 0,5, temperature 0,8 och
 referensen `~/Kod/chatterbox-rost/min_rost.wav`. Talen läses som ord ("2–1" blir "två–ett", 0
 "noll"), eftersom det är oprövat hur Chatterbox läser siffror; meningen i registret är densamma
 som på sidan.
 
-Chatterbox avbryter ibland själv med "forcing EOS token" och klipper slutet, och ibland blir
-talet för kort eller för långt. Därför mäts talet utan tystnad mot den väntade längden (14
-tecken i sekunden): under 0,55 eller över 2,2 gånger den, eller med "forcing EOS", görs meningen
-om med nytt slumpfrö, högst fyra gånger. Klarar den sig inte prövas den igen efter ett dygn, och
+Chatterbox avbryter ibland själv med "forcing EOS token", och ibland blir talet för kort eller
+för långt. Därför mäts talet utan tystnad mot den väntade längden (14 tecken i sekunden): under
+0,55 eller över 2,2 gånger den, eller med "forcing EOS" av någon annan orsak än
+`token_repetition`, görs meningen om med nytt slumpfrö, högst fyra gånger. `token_repetition`
+räknas inte: den slog till i 3 av 4 uppläsningar i provet, redan när samma ljudtoken kom två
+gånger, och Tomas lyssnade på de klippen 2026-11-05 och slutet var helt. Klarar den sig inte prövas den igen efter ett dygn, och
 till dess är det Azures röst. Ljudet sparas som mp3 (64 kbit/s, ffmpeg) i en ljudbank utanför
 repot, `~/Library/Application Support/Matchfixarna/Rost/ljud/`, med ett avtryck på
 inställningarna, referensen och texten: ändras något av dem läses allt upp på nytt.
@@ -4029,11 +4047,15 @@ gjordes), och inte i Safari eller en riktig telefon.
 Den egna rösten provades 2026-11-04 utan Chatterbox: [las.mjs](scripts/rost/las.mjs) med låtsad
 modell (`--latsas`, tonstötar) mot en låtsad GitHub (ett lokalt repo), som läste upp fem
 meningar och pushade grenen `rost`, inte pushade igen när inget hade ändrats och inte
-markerade något som misslyckat när modellen kraschade; [chatterbox.py](scripts/rost/chatterbox.py)
+markerade något som misslyckat när modellen kraschade; [chatterbox_jobb.py](scripts/rost/chatterbox_jobb.py)
 med låtsad modell, som gjorde om en mening efter "forcing EOS" och gav upp en för kort efter
 fyra försök; workflowens steg mot den låtsade grenen; och `npm run build -- --no-fetch`, som
-tog de fem egna och Azure för resten, och där `fyll()` inte frågade Azure om de egna. Inte
-provat med den riktiga modellen.
+tog de fem egna och Azure för resten, och där `fyll()` inte frågade Azure om de egna.
+
+Med den riktiga modellen provades den 2026-11-05 på iMacen: [las.mjs](scripts/rost/las.mjs) utan
+`--publicera` läste upp fyra meningar på 145 s, alla i första försöket. Det provet visade också
+varför skriptet inte får heta `chatterbox.py` (det skuggar paketet med samma namn), vilket den
+låtsade modellen inte kunde visa.
 
 **Grafiken.** Handen på pulten är en liten WebGL-duk i pultens plan som läggs dit när rummet är
 klart, med handens modell (133 kB) och fotot (149 kB). Den ritas en gång och sedan bara när fingrarna
