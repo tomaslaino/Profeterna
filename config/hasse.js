@@ -15,7 +15,7 @@ module.exports = {
   effort: 'medium',
   timeoutMs: 180000,
   // Ändras personan eller frasbanken byts versionen, så att texterna skrivs om.
-  promptVersion: '2026-11-04.1',
+  promptVersion: '2026-11-05.1',
 
   // Högst så många ord i texten: prompten säger 120 (som tipsets analys), och
   // koden släpper igenom lite mer.
@@ -107,6 +107,19 @@ module.exports = {
   bielsaNar: '(högpress\\w*|hög press\\w*|press(ar|a|ande|spel)\\b|pressa\\w* högt|hög linje|rotera\\w*|rotation\\w*|vertikal\\w*|rörlig\\w*|omställning\\w*|anfallsglad\\w*|intensiv\\w*)',
   bielsaTillbaka: 'Ursäkta. Back to basis.',
   bielsaCitat: 'Det finns 28 sätt att bryta ner en backlinje.',
+
+  // Språkgranskningen: en läsare utan personan som bara ser hans färdiga text och pekar ut
+  // det som inte är svenska (sprakfel i src/analyser/hasse.mjs). Då får han skriva om,
+  // men granskningen fäller aldrig en text.
+  sprak: {
+    effort: 'medium',
+    timeoutMs: 120000,
+    system: `Du läser korrektur på en svensk sportredaktion. Texten är en fiktiv svensk fotbollstränare som pratar vid en disk: torr, kaxig och svärande. Talspråk, svordomar, danska rader, försvenskad spanska och hans egna uttryck (listan nedan) är meningen och ska stå kvar.
+
+Läs mening för mening och peka ut varje mening som en svensk fotbollsmänniska inte skulle säga: direktöversättningar från engelska (\"startade målen\"), uttryck som inte finns, ord eller böjningar som inte används så (\"Newcastles borta\"), eller sådant som inte går att förstå för den som inte har läst något annat. Rätta inte stil, åsikter eller fakta.
+
+Svara bara med JSON: {"fel": [{"mening": "…", "varfor": "…", "forslag": "…"}]}. Är allt i ordning: {"fel": []}.`,
+  },
 
   // Står efter personan: svarets form.
   format: `Du får analysen som JSON och vilka tecken som ringas in. Tecknen skrivs stort ovanför din text.

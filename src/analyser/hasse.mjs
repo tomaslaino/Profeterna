@@ -10,12 +10,16 @@
 // Bielsa-orden bara om de lottats och inget ur den påhittade kollegans värld. Klarar
 // svaret inte det får Claude skriva om en gång, och annars blir det ingen text.
 //
+// Språket (sprakfel): en läsare utan personan pekar ut det som inte är svenska, och då
+// får han skriva om. Språket fäller aldrig en text: blir omskrivningen sämre är det
+// den förra som gäller.
+//
 // Texten sparas i analysens post i data/analyser.json: hasse: {stycken, tips
 // (tipsets writtenAt), uppdrag, model, version, writtenAt, attempts}.
 
 import hc from '../../config/hasse.js';
 import ac from '../../config/analyser.js';
-import { claudeSvar } from './claude.mjs';
+import { claudeSvar, Stopp } from './claude.mjs';
 
 const REF_RE = /\s*\[\d+(?:\s*[,;]\s*\d+)*\]/g;
 
@@ -129,6 +133,21 @@ const jsonOf = (s) => JSON.parse(s.slice(s.indexOf('{'), s.lastIndexOf('}') + 1)
 // Är texten skriven för det här tipset och den här versionen?
 export const hasseKlar = (h, article) => Boolean(h && article.tip && h.tips === article.tip.writtenAt && h.version === hc.promptVersion);
 
+// Det som inte är svenska i texten, som rader att skriva om efter. Tomt om allt är i
+// ordning, och också om granskningen inte går att få: den får aldrig stoppa en text.
+export async function sprakfel(stycken, { claude = claudeSvar } = {}) {
+  try {
+    const egna = [...hc.fraser, ...hc.kryddor, hc.bielsaCitat, hc.bielsaTillbaka].join(' · ');
+    const r = await claude({ system: `${hc.sprak.system}\n\nHans egna uttryck: ${egna}`, prompt: stycken.join('\n\n'), model: hc.model, effort: hc.sprak.effort, timeoutMs: hc.sprak.timeoutMs, tools: [] });
+    const lista = jsonOf(r.content).fel;
+    if (!Array.isArray(lista)) return [];
+    return lista.filter((f) => f && f.mening).map((f) => `"${f.mening}" är inte svenska: ${f.varfor || 'det säger man inte'}${f.forslag ? ` (till exempel "${f.forslag}")` : ''}`);
+  } catch (e) {
+    if (e instanceof Stopp) throw e;
+    return [];
+  }
+}
+
 // Texten för analysen. persona: innehållet i prompts/hasse-backe.md.
 // → {ok: true, hasse, meta} eller {ok: false, error}.
 export async function skrivHasse(id, article, { persona, now = () => new Date(), claude = claudeSvar }) {
@@ -144,16 +163,24 @@ export async function skrivHasse(id, article, { persona, now = () => new Date(),
   const opts = { system: `${persona.trim()}\n\n${hc.format}`, model: hc.model, effort: hc.effort, timeoutMs: hc.timeoutMs, tools: [] };
   let fel = [];
   let meddelande = rader.join('\n\n');
-  for (let attempts = 1; attempts <= 2; attempts++) {
+  // Tredje försöket finns bara för språket: en text som har klarat kontrollerna ligger i reserv.
+  let reserv = null;
+  const klar = (stycken, r, attempts) => ({ ok: true, meta: r, hasse: { stycken: stycken.map((s) => s.trim().replace(/([^.?!…"”])$/, '$1.')), tips: article.tip.writtenAt, uppdrag: u, model: r.model, version: hc.promptVersion, writtenAt: now().toISOString(), attempts } });
+  for (let attempts = 1; attempts <= 3; attempts++) {
     const r = await claude({ ...opts, prompt: meddelande });
-    if (r.refused) return { ok: false, error: 'Texten nekades.' };
+    if (r.refused) return reserv || { ok: false, error: 'Texten nekades.' };
     let stycken = null;
     try { stycken = jsonOf(r.content).stycken; } catch { fel = ['svaret gick inte att läsa som JSON']; }
     if (stycken) {
       fel = granska(stycken, article, u);
-      if (!fel.length) return { ok: true, meta: r, hasse: { stycken: stycken.map((s) => s.trim()), tips: article.tip.writtenAt, uppdrag: u, model: r.model, version: hc.promptVersion, writtenAt: now().toISOString(), attempts } };
+      if (!fel.length) {
+        reserv = klar(stycken, r, attempts);
+        fel = attempts < 3 ? await sprakfel(stycken, { claude }) : [];
+        if (!fel.length) return reserv;
+      }
     }
+    if (attempts === 2 && !reserv) break;
     meddelande = `${rader.join('\n\n')}\n\nDitt förra svar:\n${r.content}\n\nDet här stämmer inte:\n- ${fel.join('\n- ')}\n\nSkriv om hela svaret som JSON.`;
   }
-  return { ok: false, error: `Texten klarade inte kontrollen: ${fel.join('; ')}.` };
+  return reserv || { ok: false, error: `Texten klarade inte kontrollen: ${fel.join('; ')}.` };
 }

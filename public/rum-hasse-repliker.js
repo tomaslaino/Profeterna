@@ -6,10 +6,14 @@
 // "den" och "det" får bara syfta på matchen man just har valt, annars skrivs det ut vad
 // det gäller ("Vilken match vill du ha hjälp med?", inte "Vilken match är det?"). Över
 // matchlistan finns alltid plats för två rader (ungefär 30 tecken var i ett fönster 1440
-// brett och i telefonen), så att listan står still vad han än säger.
+// brett och i telefonen), så att listan står still vad han än säger. Läs varje rad efter
+// repliken före den: det han säger om kupongen kommer direkt efter "Det slutar 2–1", och
+// ett "Det har du också" låter då som att man har tippat resultatet. npm run repliker
+// (scripts/hasse/kolla-repliker.js) fäller det som går att fälla, och underkända uttryck
+// läggs till där.
 //
 // {namn} ditt efternamn, {dag} när spelstoppet är (på lördag, i morgon, i dag),
-// {du} dina tecken (etta och kryss), {Bada} tecknen ni båda har, {res} resultatet (2–1).
+// {du} dina tecken (etta och kryss), {Bada} tecknet ni båda har (Ettan), {res} resultatet (2–1).
 //
 // Raderna hörs: Macen tar fram ljudet till dem med fälten ifyllda
 // (src/rost.js), så filen är både ett skript i sidan
@@ -18,26 +22,29 @@
   if (typeof module === 'object' && module.exports) module.exports = repliker;
   else window.HasseRepliker = repliker;
 })({
+  // Tecknen i ord, för sidan och rösten: du som i "etta och kryss", bestamd som i "Ettan kan du behålla".
+  tecken: { 1: { du: 'etta', bestamd: 'ettan' }, X: { du: 'kryss', bestamd: 'krysset' }, 2: { du: 'tvåa', bestamd: 'tvåan' } },
+
   // När man kommer till honom.
   oppning: ['Vilken match ska jag hjälpa dig med?', 'Vilken match har du kört fast på?'],
   oppningNamn: ['Vilken match ska jag hjälpa dig med?', 'Vilken match har du kört fast på?'],
   // När man har varit här förut.
-  tillbaka: ['Har du kört fast igen?', 'Vilken match vill du ha hjälp med nu då?'],
-  tillbakaNamn: ['Har du kört fast igen, {namn}?', 'Vilken match vill du ha hjälp med nu då, {namn}?'],
+  tillbaka: ['Har du kört fast igen?', 'Vilken match vill du ha hjälp med nu då?', 'Är du här igen?'],
+  tillbakaNamn: ['Har du kört fast igen, {namn}?', 'Vilken match vill du ha hjälp med nu då, {namn}?', 'Är du här igen, {namn}?'],
 
   // Efter en analys.
-  nasta: ['Vilken match tar vi nu?', 'Vi tar nästa match.', 'Är det någon mer match du undrar över?'],
+  nasta: ['Vilken match tar vi nu?', 'Vi tar nästa match.', 'Är det någon mer match du undrar över?', 'Vilken match är nästa?'],
   // ... när man har frågat om just så många matcher.
   antal: {
-    3: 'Du har frågat om tre matcher. Kupongen börjar likna något.',
-    5: 'Du har frågat om fem matcher. Du är nyfiken av dig.',
-    10: 'Du har frågat om tio matcher. Du kan ta över min stol.',
+    3: ['Du har frågat om tre matcher. Kupongen börjar likna något.', 'Du har frågat om tre matcher. Du börjar lära dig.', 'Du har frågat om tre matcher. Det börjar sitta.'],
+    5: ['Du har frågat om fem matcher. Du är nyfiken av dig.'],
+    10: ['Du har frågat om tio matcher. Du kan ta över min stol.'],
   },
-  halva: 'Nu är halva kupongen klar.',
+  halva: ['Nu är halva kupongen klar.', 'Halva matcherna är klara. Resten är också enkla.'],
   enKvar: 'Nu är det en match kvar. Den är lika lätt som de andra.',
   // ... när alla är klara, nyss och när man kommer tillbaka.
   alla: 'Nu är hela kupongen klar. Lämna in den.',
-  allaIgen: 'Du har redan fått svar på alla matcher.',
+  allaIgen: ['Du har redan fått svar på alla matcher.', 'Du har redan fått svar på alla matcher. Du kunde ha lyssnat.', 'Alla matcher har du fått svar på. Du får lyssna nästa gång.'],
 
   // Om man bara står där och inte frågar.
   ledig: ['Jag sitter kvar här.', 'Välj vilken match du vill. Alla är lätta.', 'Spelstoppet är {dag}.'],
@@ -128,14 +135,21 @@
 
   // Efter texten: vad matchen slutar, hemma–borta. Resultatet är det troligaste i modellens
   // prognos bland tecknen han har ringat in (resultatet i rum-hasse.js).
-  resultat: ['Det blir {res}, så är det bara.', 'Det blir {res}, det är solklart.', 'Det slutar {res}.'],
+  resultat: [
+    'Det blir {res}, så är det bara.',
+    'Det blir {res}, det är solklart.',
+    'Det slutar {res}.',
+    'Jag säger {res}. Mer än så är det inte.',
+    'Jag säger {res}. Så är det bara.',
+    'Jag säger {res}. Glöm allt annat.',
+  ],
 
   // Sist, om din egen kupong.
   kupong: {
-    samma: ['På din kupong har du samma tecken som jag. Det är klokt.'],
+    samma: ['På din kupong har du samma tecken som jag. Det är klokt.', 'På din kupong har du samma tecken som jag. Du har lärt dig något.'],
     farre: ['På din kupong har du bara {du}. Det var kaxigt.'],
     fler: ['På din kupong har du {du}. Så många tecken behövs inte.'],
-    korsar: ['{Bada} kan du behålla på din kupong, men stryk resten.'],
+    korsar: ['{Bada} kan du behålla på din kupong, men stryk resten.', 'På din kupong har du {du}. {Bada} får du behålla.'],
     skilda: ['På din kupong har du {du}, och det kan du glömma.'],
   },
 

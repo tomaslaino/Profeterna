@@ -47,16 +47,16 @@ const enkel = (t) => String(t).replace(/\s+/g, ' ').trim();
 
 // ---------- vad han säger ----------
 
-// Tecknen i ord som sidan skriver dem (iOrd i rum-hasse.js).
-const ORD = ['etta', 'kryss', 'tvåa'];
+// Tecknen i ord, från samma ställe som sidan tar dem (iOrd i rum-hasse.js).
+const TECKEN = ['1', 'X', '2'].map((k) => repliker.tecken[k]);
 const MANGDER = [[0], [1], [2], [0, 1], [0, 2], [1, 2], [0, 1, 2]];
-const iOrd = (m) => (m.length === 3 ? 'helgardering' : m.map((i) => ORD[i]).join(' och '));
+const iOrd = (m) => (m.length === 3 ? 'helgardering' : m.map((i) => TECKEN[i].du).join(' och '));
 const stor = (t) => t.replace(/^./, (c) => c.toUpperCase());
 const DAGAR = ['i dag', 'i morgon', ...['måndag', 'tisdag', 'onsdag', 'torsdag', 'fredag', 'lördag', 'söndag'].map((d) => `på ${d}`)];
 // Resultaten han kan säga: modellens resultatmatris har 0–4 mål per lag (resultatet i rum-hasse.js).
 const RESULTAT = [0, 1, 2, 3, 4].flatMap((h) => [0, 1, 2, 3, 4].map((b) => `${h}–${b}`));
-// Knapparna (lar, hjalpSvar) sägs inte, och inte heller att han har tappat rösten.
-const TYSTA = new Set(['lar', 'hjalpSvar', 'utanRost']);
+// Knapparna (lar, hjalpSvar) och tecknen i ord sägs inte, och inte heller att han har tappat rösten.
+const TYSTA = new Set(['lar', 'hjalpSvar', 'tecken', 'utanRost']);
 
 function mallar(o, ut = [], nyckel = '') {
   if (TYSTA.has(nyckel)) return ut;
@@ -77,14 +77,11 @@ function repliktexter(gang = []) {
     if (falt.has('namn')) med(namn, (o, v) => ({ ...o, namn: v }));
     if (falt.has('dag')) med(DAGAR, (o, v) => ({ ...o, dag: v }));
     if (falt.has('res')) med(RESULTAT, (o, v) => ({ ...o, res: v }));
-    if (falt.has('du') && falt.has('Bada')) {
-      // det ni båda har är en del av ditt, men inte allt
-      const par = MANGDER.flatMap((du) => MANGDER.filter((b) => b.length < du.length && b.every((x) => du.includes(x))).map((b) => [du, b]));
-      med(par, (o, [du, b]) => ({ ...o, du: iOrd(du), Bada: stor(iOrd(b)) }));
-    } else {
-      if (falt.has('du')) med(MANGDER, (o, v) => ({ ...o, du: iOrd(v) }));
-      if (falt.has('Bada')) med(MANGDER, (o, v) => ({ ...o, Bada: stor(iOrd(v)) }));
-    }
+    if (falt.has('Bada')) {
+      // ni har två tecken var och ett gemensamt, i bestämd form: "Ettan kan du behålla"
+      const par = MANGDER.filter((du) => du.length === 2).flatMap((du) => du.map((b) => [du, b]));
+      med(par, (o, [du, b]) => ({ ...o, du: iOrd(du), Bada: stor(TECKEN[b].bestamd) }));
+    } else if (falt.has('du')) med(MANGDER, (o, v) => ({ ...o, du: iOrd(v) }));
     for (const o of fyllningar) {
       const t = mall.replace(/\{(\w+)\}/g, (_, k) => (o[k] == null ? '' : o[k]));
       if (!/\{\w+\}/.test(t)) ut.add(enkel(t));

@@ -4208,7 +4208,12 @@ resultatet bredvid i en rak spalt. *Nästa match* räknar
 (*Nu är halva kupongen klar*). Bara tecken du själv har bett om syns, så att listan inte blir ett
 automatiskt tips.
 Går hans röst inte att få säger han det och visar analysen i skrift. Allt han säger runt omkring är
-färdiga rader, utan AI, i [public/rum-hasse-repliker.js](public/rum-hasse-repliker.js). Med minskad
+färdiga rader, utan AI, i [public/rum-hasse-repliker.js](public/rum-hasse-repliker.js). `npm run repliker`
+([scripts/hasse/kolla-repliker.js](scripts/hasse/kolla-repliker.js)) kontrollerar filen, och GitHub kör den
+när filen ändras (ett kryss på ändringen, publiceringen stoppas inte): uttryck som redan har underkänts,
+avhuggna meningar på ett eller två ord, rader om kupongen som börjar med ett Det som låter som resultatet,
+fält som inte går att fylla, listor som blivit strängar och att rösten får samma meningar som sidan. Vad
+som är bra svenska kan koden inte avgöra, så de underkända uttrycken läggs till där när det händer. Med minskad
 rörelse i systemet står allt direkt, utan gester.
 
 **Han fyller i din kupong.** Efter analysen frågar han om han ska fylla i matchen på din egen kupong,
@@ -4262,6 +4267,13 @@ källor ("enligt …"), de inringade tecknen i sista stycket och inget ur den p�
 Klarar svaret inte det får Claude skriva om en gång, och annars visas analysen som den är. Koden ser
 inte om en mening ändrar betydelse utan att ett tal ändras. Texten ligger i analysens post i
 `data/analyser.json`.
+
+**Språket** (`sprakfel`): när texten har klarat kontrollerna läser en korrekturläsare utan personan
+(`sprak` i [config/hasse.js](config/hasse.js)) den mening för mening och pekar ut direktöversättningar
+och sådant som inte går att förstå utan analysen, och då får han skriva om. Hans egna uttryck ur
+frasbanken ska stå kvar. Språket fäller aldrig en text: går granskningen inte att få, eller blir
+omskrivningen sämre, är det den senaste godkända texten som gäller. Läsaren missar ibland något och
+klagar ibland i onödan, så det minskar felen men garanterar inget.
 
 Första versionen skrev om hela analysen, och koden krävde att varje tal stod kvar och att de
 lottade fraserna användes. Då blev det 350 ord med artikeln återberättad, "enligt Sky Sports" i

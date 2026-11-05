@@ -1,0 +1,28 @@
+# Kontrollen av Hasse Backes färdiga repliker (scripts/hasse/kolla-repliker.js).
+# Egen körning, så att ett fel syns på ändringen utan att stoppa publiceringen.
+name: Hasses repliker
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - "public/rum-hasse-repliker.js"
+      - "public/rum-hasse.js"
+      - "src/rost.js"
+      - "scripts/hasse/kolla-repliker.js"
+  pull_request:
+    paths:
+      - "public/rum-hasse-repliker.js"
+      - "public/rum-hasse.js"
+      - "src/rost.js"
+      - "scripts/hasse/kolla-repliker.js"
+
+jobs:
+  kolla:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "22"
+      - run: npm run repliker

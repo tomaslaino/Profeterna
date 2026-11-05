@@ -1145,8 +1145,8 @@ window.RumHasse = (() => {
     return ut;
   }
   // Vad han säger om det du har på kupongen. null om du inte har någon att tala om.
-  const ORD = { 1: 'etta', X: 'kryss', 2: 'tvåa' };
-  const iOrd = (t) => (t.length === 3 ? 'helgardering' : t.map((c) => ORD[c]).join(' och '));
+  // tecknen i ord står i rum-hasse-repliker.js, så att rösten säger samma sak (src/rost.js)
+  const iOrd = (t) => (t.length === 3 ? 'helgardering' : t.map((c) => REP().tecken[c].du).join(' och '));
   function omKupongen(m, signs) {
     const p = window.Samtal && Samtal.pult ? Samtal.pult.state() : null;
     if (!p || !p.s) return null;
@@ -1156,12 +1156,13 @@ window.RumHasse = (() => {
     if (!du.length) return null;
     const bada = du.filter((c) => han.includes(c));
     const sort = (a) => [...a].sort((x, y) => KORT.indexOf(x) - KORT.indexOf(y));
-    const o = { du: iOrd(sort(du)), Bada: iOrd(sort(bada)).replace(/^./, (c) => c.toUpperCase()) };
+    const o = { du: iOrd(sort(du)) };
     if (!bada.length) return fyll(lott(k.skilda), o);
     if (bada.length === du.length && bada.length === han.length) return lott(k.samma);
     if (bada.length === du.length) return fyll(lott(k.farre), o);
     if (bada.length === han.length) return fyll(lott(k.fler), o);
-    return fyll(lott(k.korsar), o);
+    // två tecken var och ett gemensamt: "Ettan kan du behålla"
+    return fyll(lott(k.korsar), { ...o, Bada: REP().tecken[bada[0]].bestamd.replace(/^./, (c) => c.toUpperCase()) });
   }
 
   // Han frågar. Första gången eller när man kommer igen; annars nästa match.
@@ -1231,14 +1232,14 @@ window.RumHasse = (() => {
     const n = lista.filter((m) => fragat[m.id]).length;
     const namn = dittNamn();
     if (forst) {
-      if (n && n === oppna.length) return r.allaIgen;
+      if (n && n === oppna.length) return lott(r.allaIgen);
       if (n) return fyll(lott(namn ? r.tillbakaNamn : r.tillbaka), { namn });
       return fyll(lott(namn ? r.oppningNamn : r.oppning), { namn });
     }
     if (n >= oppna.length) return r.alla;
     if (oppna.length - n === 1) return r.enKvar;
-    if (n === Math.ceil(oppna.length / 2)) return r.halva;
-    return r.antal[n] || lott(r.nasta);
+    if (n === Math.ceil(oppna.length / 2)) return lott(r.halva);
+    return lott(r.antal[n] || r.nasta);
   }
 
   // Du pekar ut en match och han frågar tillbaka. Först när du ber om det kommer analysen

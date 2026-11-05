@@ -10,7 +10,8 @@
     "check": "node src/check.js",
     "backtest": "node src/backtest.js",
     "kandidater": "node src/candidates.js",
-    "analyser": "node scripts/analyser/skriv.mjs"
+    "analyser": "node scripts/analyser/skriv.mjs",
+    "repliker": "node scripts/hasse/kolla-repliker.js"
   },
   "engines": {
     "node": ">=18"
