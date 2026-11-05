@@ -237,6 +237,7 @@ window.RumHasse = (() => {
     H.vy.classList.toggle('hog', H.hog);
     await Promise.all(forladda());
     H.m = H.m || await import('./rum-hasse-3d.js');
+    Object.assign(GEST, H.m.KLIPP);
     $('.rh-bak').src = bakbild();
     // (fönstret har vridits sedan sist: han sitter på ett annat sätt)
     if (H.fig && H.figHog !== H.hog) borta();
@@ -370,7 +371,7 @@ window.RumHasse = (() => {
       // och ibland tar han cigarren ur askkoppen och njuter av den en stund
       if (ms > H.cigarr && !H.klipp && !H.ko.length && !H.fig.ror() && (!H.sagt || H.sagt.klar) && ['fraga', 'val', 'klar'].includes(H.fas)) {
         H.cigarr = ms + CIGARR[0] + Math.random() * (CIGARR[1] - CIGARR[0]);
-        gest('cigarr');
+        gest(ettAv('cigarr', 'cigarr'));
       }
       const ror = H.klipp || H.ko.length || (H.sagt && !H.sagt.klar) || H.fig.ror();
       if (ms - last < takt(ror)) return;
@@ -516,15 +517,13 @@ window.RumHasse = (() => {
   }
   const medDag = (rader, dagen) => rader.filter((r) => dagen || !r.includes('{dag}')).map((r) => fyll(r, { dag: dagen }));
 
-  // Rörelserna: klipp på tidslinjen i rum-hasse-3d.js. fran: var det börjar (måste
-  // vara där han står, utom fri), till: var det slutar, vila: där han står sedan.
-  const GEST = {
-    slag: { fran: 2.5, till: 5.5, vila: 5.5, fri: true }, // armarna upp, skrattet, slaget i pulten
-    armar: { fran: 5.5, till: 9.95, vila: 5.5 }, // fingret, handen som hackar, armen ut
-    hem: { fran: 9.95, till: 12.4, vila: 0 }, // nöjd, ögonen igen, tillbaka
-    klunk: { fran: 20, till: 24.5, vila: 0 }, // en klunk kaffe
-    cigarr: { fran: 30, till: 40, vila: 0, skynda: true }, // cigarren ur askkoppen, två bloss, röken ut och tillbaka
-  };
+  // Rörelserna: klipp på tidslinjen (KLIPP i rum-hasse-3d.js, hit när figuren hämtas). fran: var det
+  // börjar (måste vara där han står, utom fri), till: var det slutar, vila: där han står sedan, grupp:
+  // domen, kaffet eller cigarren, och han lottar bland klippen i gruppen.
+  const GEST = {};
+  const GRUPP = {};
+  const grupp = (g) => (GRUPP[g] = GRUPP[g] && GRUPP[g].length ? GRUPP[g] : Object.keys(GEST).filter((n) => GEST[n].grupp === g));
+  const ettAv = (g, annars) => lott(grupp(g)) || annars;
   // Medan han väntar på en tar han cigarren då och då (minst och längst i ms mellan gångerna).
   // Ska något spelas medan han håller den (skynda) lägger han tillbaka den fortare.
   const CIGARR = [45000, 80000];
@@ -551,7 +550,10 @@ window.RumHasse = (() => {
       H.T = H.klipp.fran;
     }
     const k = H.klipp;
+    const T0 = H.T;
     H.T = Math.min(k.till, H.T + dt * (k.skynda && H.ko.length ? 2.5 : 1));
+    // slagen i disken och koppen på fatet: bilden rycker till, och det hörs
+    for (const e of H.fig.handelser(T0, H.T)) hands(e);
     if (k.vid && H.T >= k.vid[0]) {
       const f = k.vid[1];
       k.vid = null;
@@ -589,6 +591,7 @@ window.RumHasse = (() => {
     try {
       if (!V.ctx) V.ctx = new (window.AudioContext || window.webkitAudioContext)();
       if (V.ctx.state === 'suspended') Promise.resolve(V.ctx.resume()).catch(() => {});
+      ljudet();
     } catch (e) {
       V.ctx = null;
     }
@@ -606,6 +609,23 @@ window.RumHasse = (() => {
     if (V.av) tystna();
     else vakna();
     ljudknapp();
+  }
+
+  // Det som händer på disken (handelser i rum-hasse-3d.js): vid varje slag rycker hela bilden till, också
+  // rummet i hörnet, mer ju hårdare han slår, och när ljudet är på hörs handen i disken och koppen som
+  // klirrar på fatet (rum-hasse-ljud.js, hämtas när ljudet slås på).
+  const ljudet = () => (V.fx = V.fx || import('./rum-hasse-ljud.js').catch(() => { V.fx = null; return null; }));
+  function hands(e) {
+    if (calm()) return;
+    if (e.typ === 'dunk') {
+      const v = H.sving;
+      v.style.setProperty('--slag', `${(9 * Math.min(1.5, e.styrka)).toFixed(1)}px`);
+      v.classList.remove('rh-slag');
+      void v.offsetWidth;
+      v.classList.add('rh-slag');
+    }
+    if (V.av || !V.ctx || V.ctx.state !== 'running') return;
+    ljudet().then((m) => { if (m && !V.av && V.ctx) m.spela(V.ctx, e); });
   }
 
   // Registret, högst var femte minut (som analyserna).
@@ -883,7 +903,7 @@ window.RumHasse = (() => {
     if (v.runt && v.i % 5 === 2 && v.drack !== v.i) {
       v.drack = v.i;
       H.vana = (H.vana + 1) % 2;
-      gest(H.vana ? 'klunk' : 'cigarr');
+      gest(H.vana ? ettAv('kaffe', 'klunk') : ettAv('cigarr', 'cigarr'));
       v.nasta = ms + 1200;
       return;
     }
@@ -897,16 +917,18 @@ window.RumHasse = (() => {
   // (rum-hasse-meningar.js: samma delning som när Macen tar fram ljudet)
   const meningar = (t) => window.HasseMeningar(t);
   // Styckena som repliker, med en gest där det passar: alltid vid de bestämda
-  // orden, annars då och då vid en lång mening. Bielsa får honom att slå ut med armarna.
+  // orden (fingret och armarna, eller handen i disken), annars då och då vid en lång mening.
+  // Bielsa får honom att slå ut med armarna.
   const BIELSA = /rotasiones|intensid|verticalid|transisiones|presj[oó]n|ombre libre/i;
   const BESTAMT = /nej nej nej|glöm det|äsch|aldrig|varningens finger|solklart|så är det bara|köper jag/i;
+  const FINGRET = /nej nej nej|varningens finger/i;
   function somRepliker(stycken) {
     const ut = [];
     stycken.forEach((st) => meningar(st).forEach((text, i) => ut.push({ text, ny: i === 0 })));
     let sedan = 1;
     ut.forEach((r) => {
       sedan++;
-      if (BIELSA.test(r.text)) { r.gest = 'slag'; sedan = 0; } else if (sedan >= 2 && BESTAMT.test(r.text)) { r.gest = 'armar'; sedan = 0; } else if (sedan >= 4 && r.text.length > 60) { r.gest = 'armar'; sedan = 0; }
+      if (BIELSA.test(r.text)) { r.gest = 'slag'; sedan = 0; } else if (sedan >= 2 && BESTAMT.test(r.text)) { r.gest = FINGRET.test(r.text) || Math.random() < 0.5 ? 'armar' : 'dunka'; sedan = 0; } else if (sedan >= 4 && r.text.length > 60) { r.gest = 'armar'; sedan = 0; }
     });
     return ut;
   }
@@ -1110,12 +1132,12 @@ window.RumHasse = (() => {
     H.sagt = null;
     H.talMal = 0;
     s.querySelector('.rh-sagt').textContent = '';
-    spela('slag', {
-      vid: [4.98, () => {
+    // han slår domen i disken, på ett av sina sätt
+    const slag = ettAv('dom', 'slag');
+    spela(slag, {
+      vid: [(GEST[slag] ? GEST[slag].dom : 5) - 0.02, () => {
         const d = domen(signs);
         s.querySelector('.rh-sagt').outerHTML = `<div class="rh-dom${d.length > 7 ? ' lang' : ''}">${esc(d)}</div>`;
-        // (hela bilden rycker till, också rummet i hörnet)
-        if (!calm()) { const v = H.sving; v.classList.remove('rh-slag'); void v.offsetWidth; v.classList.add('rh-slag'); }
       }],
       sen: () => {
         H.fas = 'tal';
