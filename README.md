@@ -4311,7 +4311,7 @@ låtsade modellen inte kunde visa.
 klart, med handens modell (133 kB) och fotot (149 kB). Den ritas en gång och sedan bara när fingrarna
 trummar, och den behåller sin bild (`preserveDrawingBuffer`), så att den inte är tom om duken låg
 utanför bilden när den ritades (i telefonen på höjden och i smala fönster). Resten hämtas först när
-någon pekar på kaffet eller klickar: bilden av väggen (61 kB, 33 kB på höjden; på natten 38 och 24 kB) och figuren. Disken
+någon pekar på kaffet eller klickar: bilden av väggen (61 kB, 33 kB på höjden; på natten 38 och 24 kB), på dagen också fönsterljuset på den (40 kB) och figuren. Disken
 ritas en gång med figurens grafik när han öppnas, och sedan när fönstret har slutat ändras; kameran
 väntar högst 1,5 s på den. Figurens duk är bara så stor som han och det han gör, och den ritas efter
 rummets steg (`Rum.kval`, se [När datorn inte hinner med](#när-datorn-inte-hinner-med)): högst täthet
