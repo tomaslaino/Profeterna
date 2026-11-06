@@ -2044,8 +2044,8 @@ tid det visade först, och med `prefers-reduced-motion` syns inte sekundvisaren.
 
 Uret visar också hur länge det är kvar till spelstoppet, alltså den första avsparken i
 omgången som gänget tippar (`stopp`, från rum.js). I ett fönster vid sexan, som
-datumet i ett armbandsur, står dagarna kvar i rött (kalenderdagar i Stockholm), med DAGAR
-(DAG) tryckt under; på spelstoppets dag står det en svart nolla. En röd spets i kanten
+datumet i ett armbandsur, står dagarna kvar i rött (kalenderdagar i Stockholm), med DAGAR TILL
+SPELSTOPP (DAG TILL) tryckt under på två rader; på spelstoppets dag står det en svart nolla. En röd spets i kanten
 pekar på klockslaget, och de sista tolv timmarna fyller en röd sektor tavlan från
 timvisaren fram till spetsen, så att den krymper medan tiden går. Fönstret ligger över
 sektorn och under visarna. Mellan omgångarna och efter spelstoppet står fönstret tomt och
