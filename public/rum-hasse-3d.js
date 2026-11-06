@@ -2113,8 +2113,10 @@ export async function figuren(duk, { hog = false, latt = false, pr = 1 } = {}) {
     PV.knackN = pose(nyPose(), PV.knack.p.clone().add(V3(0, -14, 0)), A, P);
   }
   // Vid munnen räknas läget i huvudets mått: huvudet en bit in mellan läpparna, cigarren ut åt
-  // hans högra sida och lite nedåt. Tummen pekar mot munnen och handen sitter ut åt sidan (d) från
-  // greppet, vid kinden, så att den inte skymmer ansiktet.
+  // hans högra sida och lite nedåt. Handen sitter under greppet och lite ut åt sidan (d), vid käken,
+  // med fingrarna uppåt i underarmens förlängning: armbågen nere och handleden nästan rak. (Förut satt
+  // den ut åt sidan vid kinden, och då gick handleden inte att räta: antingen knäcktes den åt sidan eller
+  // så for armbågen upp över huvudet.)
   const MUND = W_(662, 509, 0);
   MUND.z = djup(662, 509) - 6;
   // handflatan när cigarren pekar åt A och handen sitter åt d från greppet (tummen mot cigarrens huvud)
@@ -2125,7 +2127,7 @@ export async function figuren(duk, { hog = false, latt = false, pr = 1 } = {}) {
     return e2.multiplyScalar(GREPP.y).addScaledVector(e, GREPP.z).normalize();
   };
   const A_MUN = new THREE.Vector3(-0.7, -0.2, 0.68).normalize();
-  const P_MUN = flata(A_MUN, V3(-1, -0.25, -0.35));
+  const P_MUN = flata(A_MUN, V3(-0.6, -0.8, -0.1));
   // utdragen: rakt ut längs sig själv och lite ned, fri från käken
   const BORT = A_MUN.clone().multiplyScalar(55).add(V3(0, -30, 35));
   // Lägen i huvudets mått: [cigarrens huvud, dess riktning, handflatan]. Fast i mungipan (tand): han
@@ -2136,7 +2138,7 @@ export async function figuren(duk, { hog = false, latt = false, pr = 1 } = {}) {
   const HL = {
     mun: [MUND, A_MUN, P_MUN],
     bort: [MUND.clone().add(BORT), A_MUN, P_MUN],
-    tand: [MUNHORN_H, A_TAND, flata(A_TAND, V3(-1, -0.4, -0.3))],
+    tand: [MUNHORN_H, A_TAND, flata(A_TAND, V3(-0.6, -0.8, -0.1))],
   };
   const PIV = U.uPiv.value;
   const iHuvud = (p, ut) => ut.copy(p).sub(PIV).applyMatrix3(U.uHuvud.value).add(PIV).applyMatrix4(mk);
@@ -2201,23 +2203,105 @@ export async function figuren(duk, { hog = false, latt = false, pr = 1 } = {}) {
     }
     return cW.copy(H).addScaledVector(ut, -26);
   }
+  // Armbågen där handleden ser naturlig ut. Handen är given av det han håller i (handens origo H,
+  // fingrarna F, handflatan P), och armbågen kan bara ligga på en cirkel: överarmen från axeln och
+  // underarmen till handen. Förut valdes den efter en fast riktning (pol), och då kunde handen sitta
+  // nästan i rät vinkel mot underarmen och sticka ut ur manschettens sida. Nu ligger den där underarmen
+  // går i handens förlängning: handleden lite bakåtböjd, hellre böjd mot handflatan än åt sidan, och
+  // armbågen inte för långt från pol. sida: 1 höger hand (A), −1 vänster (B). → handleden i cW och
+  // armbågens riktning i polUt.
+  // (handledens vila: BAK bakåt och ULNAR mot lillfingret; hur långt den går lätt: BOJ fram, BAKAT bak,
+  // TUM mot tummen och LILL mot lillfingret. POL: hur gärna armbågen ligger åt pol, HOJD: hur ogärna den
+  // går upp mot axelns höjd, från HOJD0 under den, och INN: hur ogärna den går in framför magen, från
+  // INN0 innanför axeln, båda i överarmens längder)
+  const NAT = { BAK: 12 * DEG, BOJ: 34 * DEG, BAKAT: 40 * DEG, ULNAR: 6 * DEG, TUM: 14 * DEG, LILL: 26 * DEG, POL: 0.5, HOJD: 14, HOJD0: 0.3, INN: 10, INN0: 0.35, N: 36 };
+  const nD = v();
+  const nC = v();
+  const n1 = v();
+  const n2 = v();
+  const nF = v();
+  const nP = v();
+  const nT = v();
+  const nE = v();
+  const nU = v();
+  function naturlig(Sk, H, F, P, sida, pol, polUt) {
+    const LH = LB + 26;
+    nD.subVectors(H, Sk);
+    const d = nD.length();
+    // utsträckt eller hopvikt: som förut
+    if (d > LA + LH - 8 || d < Math.abs(LA - LH) + 8) {
+      polUt.copy(pol);
+      return vristTill(Sk, H, pol, cU);
+    }
+    nD.divideScalar(d);
+    const a = (LA * LA - LH * LH + d * d) / (2 * d);
+    const r = Math.sqrt(Math.max(0, LA * LA - a * a));
+    nC.copy(Sk).addScaledVector(nD, a);
+    n1.copy(pol).addScaledVector(nD, -pol.dot(nD));
+    if (n1.lengthSq() < 1e-6) n1.set(0, -1, 0).addScaledVector(nD, -nD.y);
+    n1.normalize();
+    n2.crossVectors(nD, n1);
+    nF.copy(F).normalize();
+    nP.copy(P).addScaledVector(nF, -P.dot(nF)).normalize();
+    nT.crossVectors(nF, nP).multiplyScalar(sida);
+    // handledens böjning när armbågen ligger vid vinkeln th (0 = pol): bakåt (−) och framåt mot
+    // handflatan, och mot tummen (+) eller lillfingret
+    const kost = (th) => {
+      nE.copy(nC).addScaledVector(n1, r * Math.cos(th)).addScaledVector(n2, r * Math.sin(th));
+      nU.subVectors(H, nE).normalize();
+      const fram = nU.dot(nF);
+      const boj = Math.atan2(-nU.dot(nP), fram) + NAT.BAK;
+      const tum = Math.atan2(-nU.dot(nT), fram) + NAT.ULNAR;
+      const hojd = Math.max(0, (nE.y - Sk.y) / LA + NAT.HOJD0);
+      const inn = Math.max(0, (sida * (nE.x - Sk.x)) / LA - NAT.INN0);
+      return (boj / (boj > 0 ? NAT.BOJ : NAT.BAKAT)) ** 2 + (tum / (tum > 0 ? NAT.TUM : NAT.LILL)) ** 2 + NAT.POL * (1 - Math.cos(th)) + NAT.HOJD * hojd * hojd + NAT.INN * inn * inn;
+    };
+    let bast = 0;
+    let bk = Infinity;
+    for (let i = 0; i < NAT.N; i++) {
+      const th = ((i / NAT.N) * 2 - 1) * Math.PI;
+      const k = kost(th);
+      if (k < bk) { bk = k; bast = th; }
+    }
+    // och finare runt den bästa (gyllene snittet)
+    let lo = bast - (2 * Math.PI) / NAT.N;
+    let hi = bast + (2 * Math.PI) / NAT.N;
+    const G = 0.381966;
+    let x1 = lo + G * (hi - lo);
+    let x2 = hi - G * (hi - lo);
+    let k1 = kost(x1);
+    let k2 = kost(x2);
+    for (let i = 0; i < 10; i++) {
+      if (k1 < k2) { hi = x2; x2 = x1; k2 = k1; x1 = lo + G * (hi - lo); k1 = kost(x1); } else { lo = x1; x1 = x2; k1 = k2; x2 = hi - G * (hi - lo); k2 = kost(x2); }
+    }
+    const th = (lo + hi) / 2;
+    nE.copy(nC).addScaledVector(n1, r * Math.cos(th)).addScaledVector(n2, r * Math.sin(th));
+    nU.subVectors(H, nE).normalize();
+    polUt.subVectors(nE, Sk).normalize();
+    return cW.copy(H).addScaledVector(nU, -26);
+  }
   const cU = v();
   // upp och ned igen (fyra tider), eller nycklar
   const bump = (x, t) => (Array.isArray(x[0]) ? spar(x, t) : ss(x[0], x[1], t) * (1 - ss(x[2], x[3], t)));
   const rq = new THREE.Quaternion();
+  const rq2 = new THREE.Quaternion();
   function cigarrArm(t, Sk, a, c) {
     vidMunnen();
     cigarrLage(t, cp, c);
-    // han rullar den mellan fingrarna: runt dess egen längd
-    const rull = spar(c.rull, t);
-    if (rull) cp.q.multiply(rq.setFromAxisAngle(UPP, rull));
     cigarrSatt(cp);
+    // han rullar den mellan fingrarna: cigarren runt sin egen längd, och handen står kvar (förut vreds
+    // handen med, så att handleden knäcktes fram och tillbaka)
+    const rull = spar(c.rull, t);
+    if (rull) {
+      rq.copy(cp.q).multiply(rq2.setFromAxisAngle(UPP, rull));
+      cig.mesh.matrix.makeRotationFromQuaternion(rq).setPosition(cX);
+    }
     // fram till askkoppen och tillbaka i en båge; däremellan håller han den (eller har den i munnen)
     const mot = bump(c.mot, t);
     const upp = bump(c.upp, t);
     // (vilans riktning är armbågens hela längd: båda som enhetsvektorer, annars tar den nya över först på slutet)
     cPol.fromArray(VILA_A[1]).normalize().lerp(POL_UPP, upp);
-    vristTill(Sk, cH, cPol, cU);
+    naturlig(Sk, cH, cF, cP, 1, cPol, cPol);
     a.w.lerp(cW, mot);
     a.w.y += 220 * mot * (1 - mot);
     a.pol.normalize().lerp(cPol, mot);
@@ -2398,6 +2482,14 @@ export async function figuren(duk, { hog = false, latt = false, pr = 1 } = {}) {
   const GF = V3(-1, 0.12, 0.3).normalize();
   const GP = V3(0.1, -0.3, -1).normalize();
   const GW = K.ORA.clone().addScaledVector(GF, -165);
+  // handens origo, 26 bortom handleden
+  const GH = GW.clone().addScaledVector(GF, 26);
+  // Vid fatet pekar örat bort från honom: med greppet ovan skulle handen sitta i rät vinkel mot
+  // underarmen. Där håller han det bakifrån, med fingrarna genom örat och tummen ovanpå (greppet vridet
+  // GREPP_FAT runt örat), och handen vrids till greppet medan han lyfter koppen.
+  const GREPP_FAT = 73 * DEG;
+  const GREPP_LYFT = 480;
+  const qG = new THREE.Quaternion();
   // armbågen: nedåt och utåt, och ut åt sidan (arm)
   const POLK = V3(0.5, -0.82, 0.2).normalize();
   const POLK_UT = V3(0.9, -0.45, 0.1).normalize();
@@ -2424,7 +2516,7 @@ export async function figuren(duk, { hog = false, latt = false, pr = 1 } = {}) {
     hake: vidLappen(-160, 150, 0.1),
     ah: vidLappen(-150, 130, 0.15),
     brost: { p: V3(70, -10, 480), A: V3(0, 1, -0.3), H: V3(1, 0, 0.45) },
-    skal: { p: V3(250, 330, 620), A: V3(0.05, 1, 0.3), H: V3(1, 0, 0.1) },
+    skal: { p: V3(250, 330, 620), A: V3(0.05, 1, 0.3), H: V3(1, 0, -0.3) },
   };
   const KP = { fat: koppPose(nyPose(), KUP, V3(0, 1, 0), V3(Math.cos(0.5), 0, Math.sin(0.5))) };
   for (const n of [...Object.keys(KHUV), ...Object.keys(KKROPP)]) KP[n] = nyPose();
@@ -2467,6 +2559,7 @@ export async function figuren(duk, { hog = false, latt = false, pr = 1 } = {}) {
     return ut;
   }
   const kp = nyPose();
+  const kPol = v();
   const extraK = [0, 0, 0, 0, 0, 0, 0, 0];
   function kaffeArm(t, b, c) {
     kaffeLagen();
@@ -2477,11 +2570,19 @@ export async function figuren(duk, { hog = false, latt = false, pr = 1 } = {}) {
     // på väg dit, och kvar medan han håller
     const [m0, m1, m2, m3] = c.mot;
     const mot = ss(m0, m1, t) * (1 - ss(m2, m3, t));
-    b.w.fromArray(VILA_B[0]).lerp(kp_.copy(GW).applyQuaternion(kp.q).add(kp.p), mot);
+    // handen i örat, och armbågen där handleden ser naturlig ut (naturlig): nedåt och utåt, och ut åt
+    // sidan (arm) så långt det behövs
+    qG.setFromAxisAngle(UPP, GREPP_FAT * (1 - ss(0, GREPP_LYFT, kp.p.y - KUP.y)));
+    kp_.copy(GH).sub(K.ORA).applyQuaternion(qG).add(K.ORA).applyQuaternion(kp.q).add(kp.p);
+    kH.copy(GF).applyQuaternion(qG).applyQuaternion(kp.q);
+    kA.copy(GP).applyQuaternion(qG).applyQuaternion(kp.q);
+    kPol.copy(POLK).lerp(POLK_UT, spar(c.arm, t));
+    naturlig(sb, kp_, kH, kA, -1, kPol, kPol);
+    b.w.fromArray(VILA_B[0]).lerp(cW, mot);
     // (vilans riktning som enhetsvektor, annars tar den nya över först på slutet)
-    b.pol.fromArray(VILA_B[1]).normalize().lerp(kA.copy(POLK).lerp(POLK_UT, spar(c.arm, t)), mot);
-    b.F.fromArray(VILA_B[2]).lerp(kH.copy(GF).applyQuaternion(kp.q), mot);
-    b.P.fromArray(VILA_B[3]).lerp(kA.copy(GP).applyQuaternion(kp.q), mot);
+    b.pol.fromArray(VILA_B[1]).normalize().lerp(kPol, mot);
+    b.F.fromArray(VILA_B[2]).lerp(kH, mot);
+    b.P.fromArray(VILA_B[3]).lerp(kA, mot);
     b.krok = VILA_B[4] + (spar(c.krok, t) - VILA_B[4]) * mot;
     b.peka = 0;
     // lillfingret rakt ut och ut från de andra, och ringfingret lite

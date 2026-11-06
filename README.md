@@ -710,6 +710,13 @@ bara lokalt. Analyserna visas som de ligger i `data/analyser.json`; hur de skriv
   nöjd och säker på sin sak, fortfarande lite överdrivet: båda brynen lite uppe, huvudet nästan rakt
   och ett leende som når ögonen, också när han pratar. Ögonbrynet han höjer medan han väntar kommer med
   ett brett leende och en nick i stället för ett snett leende. Se [Hasse Backe](#hasse-backe), *Minen*.
+- **Hasse Backes händer när han dricker och röker (2026-11-06, användarens önskemål):** handen satt
+  ofta nästan i rät vinkel mot underarmen och stack ut ur manschettens sida, så att man såg in i
+  manschetten: när han tog koppen från fatet, när han höll den under hakan och när han hade cigarren vid
+  munnen. Nu väljs armbågen så att underarmen går i handens förlängning, koppen tas bakifrån med
+  fingrarna genom örat, och vid munnen hålls cigarren med fingrarna uppåt och armbågen nere. När han
+  rullar cigarren mellan fingrarna rullar bara cigarren, inte handen. Se [Hasse Backe](#hasse-backe),
+  *Kaffet* och *Cigarren*.
 - **Veckans löpsedel från riktiga tidningar (2026-11-06, användarens önskemål):** KVÄLLSPRESSEN
   finns inte, och rubrikerna var lama. Nu är löpsedeln Sportbladets (rosa papper) eller Expressens
   (det röda namnet), två veckor i taget, med namnet som text och våra rubriker: större ord och mer
@@ -4091,19 +4098,29 @@ näsan i vädret, två små läppjanden, och smackar och nickar som en vinprovar
 Det är koppen som styr, som med cigarren (`kaffeArm` i [public/rum-hasse-3d.js](public/rum-hasse-3d.js)):
 dess läge räknas fram (på fatet; vid läppen och under näsan i huvudets mått, så att den följer med när
 han lutar huvudet bakåt; under hakan, framför bröstet och upplyft mot en i kroppens), och handen sitter
-i örat med samma grepp hela vägen, fingrarna mot koppen och handflatan mot honom. När han dricker lutas
+i örat med samma grepp hela vägen, fingrarna mot koppen och handflatan mot honom. Vid fatet pekar örat
+bort från honom, så där håller han det bakifrån, med fingrarna genom örat och tummen ovanpå, och handen
+vrids runt örat till greppet medan han lyfter koppen (`GREPP_FAT`). När han dricker lutas
 koppen runt kanten mot hans underläpp, så att den ligger kvar där, och örat vrids samtidigt in mot
 kinden, så att handen inte stiger upp framför ögat. Förut stod koppen nästan upprätt framför hakan,
 snett åt sidan, och handen hade samma vinkel hur koppen än stod (ändrat 2026-11-05). Lillfingret står
 rakt ut och spretar (`extra` i `bojFingrar`, [public/rum-hasse-arm.js](public/rum-hasse-arm.js)).
 Koppen klirrar mot fatet när han ställer ned den, hårdare efter en smäll.
 
+Armbågen läggs där handleden ser naturlig ut (`naturlig`, också för cigarren). Med handen given av det
+han håller i kan armbågen bara ligga på en cirkel mellan axeln och handen, och där väljs den så att
+underarmen går i handens förlängning: handleden lite bakåtböjd, hellre böjd mot handflatan än åt
+sidan, och armbågen inte upp över axeln eller in framför magen. Förut pekade armbågen åt ett fast
+håll, och då kunde handen sitta nästan i rät vinkel mot underarmen och sticka ut ur manschettens sida,
+så att man såg in i den (ändrat 2026-11-06).
+
 **Cigarren.** Till vänster om hans högra hand står en tung askkopp av samma gods som koppen, med två
 urtag. I det ena ligger cigarren: huvudet på disken, ringen (guld och rött) synlig och glöden över
 askkoppens mitt, där en tunn rökslinga stiger. Då och då tar han den och njuter av den en stund, på ett
 av elva sätt som lottas (nedan). Han tittar ned och tar den ovanifrån, och han håller den löst i
 fingertopparna, tummen under och pek- och långfingret ovanpå, med ring- och lillfingret böjda in mot
-handflatan; vid munnen sitter handen vid kinden så att den inte skymmer ansiktet. Det är cigarren som
+handflatan; vid munnen sitter handen under den vid käken, med fingrarna uppåt i underarmens förlängning
+och armbågen nere (förut satt den vid kinden, och då knäcktes handleden åt sidan). Det är cigarren som
 styr: dess läge räknas fram (i askkoppen, vid munnen eller i mungipan i huvudets mått så att den följer
 när han rör huvudet, vid axeln, framför bröstet) och handen räknas ur greppet, så att den sitter kvar i
 fingrarna hela vägen. Handen kan också släppa den: då sitter den kvar i munnen och handen vilar på
