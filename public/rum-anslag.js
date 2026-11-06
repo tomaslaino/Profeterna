@@ -1130,8 +1130,8 @@ window.RumAnslag = (() => {
     // pratbubblan inte får täcka (håret får den) och mun punkten en bit till höger om munnen,
     // dit bubblans spets pekar.
     const FIG = { x0: 40, y0: 20, x1: 820, y1: 760, ansikte: [220, 150, 550, 470], mun: [560, 395], lut: 6 };
-    function figur(over) {
-      const H = over ? Math.min(180, Math.max(110, innerHeight * 0.21)) : Math.min(innerHeight * (innerHeight < 760 ? 0.38 : 0.45), 400);
+    function figur(over, Hn) {
+      const H = Hn || (over ? Math.min(180, Math.max(110, innerHeight * 0.21)) : Math.min(innerHeight * (innerHeight < 760 ? 0.38 : 0.45), 400));
       const s = H / (FIG.y1 - FIG.y0);
       const W = (FIG.x1 - FIG.x0) * s;
       const fx = -W * 0.16;
@@ -1158,7 +1158,15 @@ window.RumAnslag = (() => {
       const namn = document.querySelector('.rum-brand');
       const min = innerWidth < 700 ? 72 : Math.max(24, namn && getComputedStyle(namn).visibility === 'visible' ? namn.getBoundingClientRect().bottom + 12 : 0);
       const over = h.kort == null;
-      const F = figur(over);
+      let F = figur(over);
+      // I telefonen ska raden under bubblan få plats på en rad till höger om spetsen; allt i
+      // figuren växer med dess höjd, så i ett smalt fönster blir han så mycket mindre som behövs.
+      if (over) {
+        const barn = [...rad.children].filter((e) => e.offsetWidth);
+        const bredd = barn.reduce((sum, e) => sum + e.offsetWidth, 0) + 16 * (barn.length - 1);
+        const plats = innerWidth - 16 - bredd - 10 - 28 - 4;
+        if (F.hoger > plats) F = figur(over, F.H * Math.max(0.7, plats / F.hoger));
+      }
       const w = hkEl.offsetWidth;
       const x = over ? (innerWidth - w) / 2 : h.kort;
       // bubblans underkant: ovanför håret när den står ovanför honom, och i telefonen också
