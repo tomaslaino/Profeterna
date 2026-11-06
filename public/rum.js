@@ -3166,12 +3166,13 @@ ${window.RumRegister ? RumRegister.nara() : ''}
 
   // Pennan drar krysset i rutan: ner, ett streck, upp och över, ett streck
   // till, och lyfter. Står den still en stund lägger den sig vid sidan igen.
-  function drawCross(box, key, kula = false) {
-    const k = R.kup;
+  // k: kupongen i handen, eller den som Hasse Backe fyller i (hasseKryssa).
+  // → hur länge pennan håller på (ms).
+  function drawCross(box, key, kula = false, k = R.kup) {
     box.insertAdjacentHTML('beforeend', crossSvg(key, kula));
-    if (calm()) return;
+    if (calm()) return 0;
     const svg = box.lastElementChild;
-    const o = spot(box);
+    const o = spot(box, k.el);
     const [s1, s2] = strokes(key);
     const at = (pt, l, t, e) => ({ x: o.x + pt[0], y: o.y + pt[1], a: PEN_SKRIV, l, t, e });
     const travel = Math.round(Math.min(340, Math.max(150, Math.hypot(o.x - k.at.x, o.y - k.at.y) * 0.9)));
@@ -3179,15 +3180,18 @@ ${window.RumRegister ? RumRegister.nara() : ''}
       at(s1.a, 0.7, travel, 'cubic-bezier(0.4, 0, 0.2, 1)'), at(s1.a, 0, 50, 'ease-in'), at(s1.b, 0, 120, 'cubic-bezier(0.3, 0, 0.6, 1)'),
       at(s1.b, 0.45, 50, 'ease-out'), at(s2.a, 0.45, 90, 'ease-in-out'), at(s2.a, 0, 45, 'ease-in'), at(s2.b, 0, 120, 'cubic-bezier(0.3, 0, 0.6, 1)'),
       at([s2.b[0] + 12, s2.b[1] + 10], 0.8, 220, 'ease-out'),
-    ]);
+    ], k);
     const [p1, p2] = svg.querySelectorAll('path');
     const line = (p, delay) => p.animate([{ strokeDashoffset: 1.05 }, { strokeDashoffset: 0 }], { duration: 120, delay, easing: 'cubic-bezier(0.3, 0, 0.6, 1)', fill: 'backwards' });
     line(p1, travel + 50);
     line(p2, travel + 50 + 120 + 50 + 90 + 45);
-    clearTimeout(k.idle);
-    k.idle = setTimeout(() => {
-      if (R.kup === k && !k.closing) penGo([{ ...PEN_VILA, l: 0.4, t: 480, e: 'cubic-bezier(0.4, 0, 0.3, 1)' }, { ...PEN_VILA, t: 160, e: 'ease-in' }]);
-    }, 1800);
+    if (k === R.kup) {
+      clearTimeout(k.idle);
+      k.idle = setTimeout(() => {
+        if (R.kup === k && !k.closing) penGo([{ ...PEN_VILA, l: 0.4, t: 480, e: 'cubic-bezier(0.4, 0, 0.3, 1)' }, { ...PEN_VILA, t: 160, e: 'ease-in' }]);
+      }, 1800);
+    }
+    return travel + 50 + 120 + 50 + 90 + 45 + 120 + 220;
   }
 
   // Namnet skrivs för hand: pennan (k = kupongen i handen eller på pulten) går
@@ -3456,6 +3460,95 @@ ${window.RumRegister ? RumRegister.nara() : ''}
       k.el.animate([{ transform: 'none' }, { transform: 'translate(-60px, 760px) rotate(-26deg)' }],
         { duration: 700, easing: 'cubic-bezier(0.55, 0, 0.9, 0.55)', composite: 'add', fill: 'forwards' }).finished.then(gone, gone);
     });
+  }
+
+  // ---------- Hasse Backe fyller i ----------
+  //
+  // Hasse Backe kan fylla i en match på din kupong (rum-hasse.js): den glider
+  // dit från pulten, och pennan kryssar i hans tecken med samma blyerts som här.
+  // Kryss som inte ska stå där suddas först, och har du nyss sagt vem du är
+  // skrivs ditt namn först. Utkastet är detsamma som här (Samtal.pult), så han
+  // tippar i det och pulten ritas om (Rum.redraw).
+  //   kupong(el, namn)  din kupong som den ligger på pulten, i el → {w, h},
+  //             kupongens mått, eller null om den inte går att fylla i (du har
+  //             lämnat in eller omgången har börjat). namn: ditt namn står inte
+  //             där förrän pennan skriver det (kryssa)
+  //   kryssa(el, id, tecken, namn)  pennan på kupongen i el ställer matchen id
+  //             som tecknen ('1X') och lägger sig sedan där den ligger på
+  //             pulten → Promise när den ligger där
+  const OSKRIVET = 'inset(-14px 100% -14px -14px)';
+
+  function hasseKupong(el, namn = false) {
+    const p = pult();
+    if (!p || !p.fyll || !R.el) return null;
+    const rd = { id: p.s.id, ids: p.s.matcher.map((x) => String(x.id)), gang: p.s.gang };
+    el.innerHTML = couponHtml(rd, roundRows(rd), view(p, 'fyll'));
+    const du = namn ? el.querySelector('.sm-namn.du') : null;
+    if (du) du.style.clipPath = OSKRIVET;
+    const [w, h] = R.smal ? KUP.smal : KUP.bred;
+    return { w, h };
+  }
+
+  async function hasseKryssa(el, id, tecken, namn = false) {
+    const k = { el, pen: el.querySelector('.pencil'), at: { ...PEN_PULT } };
+    const row = [...el.querySelectorAll('.row')].find((r) => r.dataset.id === String(id));
+    if (!row || !k.pen) return;
+    const boxes = [...row.querySelectorAll('.box')];
+    const ska = (j) => String(tecken).includes(SIGNS[j]);
+    const bort = boxes.filter((b, j) => b.classList.contains('x') && !ska(j));
+    const dit = boxes.filter((b, j) => !b.classList.contains('x') && ska(j));
+    const du = namn ? el.querySelector('.sm-namn.du') : null;
+    const sudda = () => {
+      for (const b of bort) {
+        b.classList.remove('x');
+        eraseCross(b);
+      }
+    };
+    const fot = () => {
+      row.classList.toggle('tom', !tecken);
+      const f = el.querySelector('.fot .pp-fields');
+      if (f) f.outerHTML = Samtal.pult.fields(Samtal.pult.state() ? Samtal.pult.state().tecken : {});
+    };
+    if (du) du.style.clipPath = '';
+    if (calm()) {
+      sudda();
+      for (const b of dit) {
+        b.classList.add('x');
+        drawCross(b, `${id}${SIGNS[boxes.indexOf(b)]}`, false, k);
+      }
+      fot();
+      return;
+    }
+    const vila = (ms) => new Promise((ok) => setTimeout(ok, ms));
+    const kvar = () => el.isConnected;
+    // namnet för hand, om det inte stod där förut
+    if (du) {
+      await vila(skrivNamn(du, k) + 140);
+      if (!kvar()) return;
+    }
+    // till raden: det som inte ska stå där suddas ut när pennan kommer dit
+    if (bort.length) {
+      const o = spot(bort[0], el);
+      const travel = Math.round(Math.min(340, Math.max(150, Math.hypot(o.x - k.at.x, o.y - k.at.y) * 0.9)));
+      penGo([{ x: o.x + 20, y: o.y + 6, a: PEN_SKRIV, l: 0.5, t: travel, e: 'cubic-bezier(0.4, 0, 0.2, 1)' }, { x: o.x + 26, y: o.y + 9, a: PEN_SKRIV, l: 0.35, t: 160, e: 'ease-in-out' }], k);
+      await vila(travel);
+      if (!kvar()) return;
+      sudda();
+      await vila(320);
+      if (!kvar()) return;
+    }
+    // och ett kryss i taget
+    for (const b of dit) {
+      b.classList.add('x');
+      await vila(drawCross(b, `${id}${SIGNS[boxes.indexOf(b)]}`, false, k) + 60);
+      if (!kvar()) return;
+    }
+    fot();
+    // pennan lägger sig där den ligger på pulten
+    await vila(260);
+    if (!kvar()) return;
+    const a = penGo([{ ...PEN_PULT, l: 0.4, t: 460, e: 'cubic-bezier(0.4, 0, 0.3, 1)' }, { ...PEN_PULT, t: 150, e: 'ease-in' }], k);
+    await a.finished.catch(() => {});
   }
 
   // ---------- pennan skriver ----------
@@ -4064,7 +4157,7 @@ ${window.RumRegister ? RumRegister.nara() : ''}
   }
 
   // kval: rummets steg (KVAL), som Hasse Backe också ritas efter (rum-hasse.js)
-  return { fits, show, hide, redraw: () => { if (R.on) fill(); }, skriv: skrivPult, kval: () => R.kval, vila: (v) => {
+  return { fits, show, hide, redraw: () => { if (R.on) fill(); }, skriv: skrivPult, kval: () => R.kval, hasse: { kupong: hasseKupong, kryssa: hasseKryssa }, vila: (v) => {
       R.vilar = Boolean(v);
       // (rummet kommer tillbaka rakt: rum-hasse.js rätar upp det på vägen dit)
       if (!v) { R.mx = R.my = 0; setCam(0, 0); }
