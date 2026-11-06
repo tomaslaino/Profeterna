@@ -3,8 +3,8 @@
 // väggen ovanför fönstret, neonskylten i
 // skyltfönstret, Stängt-skylten på dörrens glas, skivan med löpsedlarna i
 // fönstret, stationsuret och orakelramen med mässingsskylten på bakväggen,
-// cigarettpaketen uppe på högra väggen och ramarna kring skårtavlan och
-// korktavlan och kupongstället på pulten.
+// cigarettpaketen uppe på högra väggen, ramarna kring skårtavlan och
+// korktavlan, bardisken med barstolarna och kupongstället på disken.
 //
 // Allt ritas med en och samma WebGL-duk utanför sidan och kopieras till en
 // vanlig duk per sak, i det plan där den platta saken låg, så att den följer
@@ -15,8 +15,8 @@
 // högra väggens perspektiv i rum.js, så att 1 enhet är 1 px i bakväggens
 // plan. X = x, Y = −y och Z pekar mot betraktaren. Sakernas framsida ligger
 // där de platta var ritade och kroppen går tillbaka till väggen (bakväggen
-// Z = WZ, högra väggen X = WX). Kupongstället står på pulten med samma
-// kamera som sakerna i rum-saker.js.
+// Z = WZ, högra väggen X = WX). Bardisken och kupongstället på den ses med
+// samma kamera, som kortlådan (rum-kortlada.js).
 //
 // Uret ligger i en knapp (.rum-ur) och ramen i länken (.rum-ram): ett klick
 // går fram till dem (närbilderna i rum.js), och där ritas de, och ramen kring
@@ -47,7 +47,7 @@ const RAM = { x: 987, y: 302, w: 126, h: 152, b: 12 };
 // det målade bandet på bakväggen, mellan taket och fönsterkarmen och lika brett
 // som fönstret (i bakväggens bild)
 const MAL = { x0: 262, x1: 958, y0: 92, y1: 121 };
-// Sakerna och dukarna (plan: 0 = väggen, 3 = pulten). Urets
+// Sakerna och dukarna (plan: 0 = väggen). Urets
 // och ramens dukar ligger i knappen och länken (i, med hörnet at).
 const BITAR = {
   tak: { plan: 0, box: { x: 0, y: 0, w: 960, h: 240 } },
@@ -58,10 +58,12 @@ const BITAR = {
   // skivan med löpsedlarna, kedjorna upp till karmen och skuggan på glaset;
   // duken ligger under sedlarna (#rum-skiva, rum-affischer.js)
   skiva: { plan: 0, box: { x: SKIVA.x - 6, y: 134, w: SKIVA.w + 14, h: SKIVA.y + SKIVA.h + 10 - 134 }, i: '#rum-skiva', at: SKIVA },
-  stall: { plan: 3, box: { x: 30, y: 470, w: 260, h: 250 } },
   // bardisken med barstolarna, till höger om bilden in i videons hörn; den
   // ligger under tavlorna på högra väggen och kortlådan (fore)
   disk: { plan: 0, box: { x: 990, y: 470, w: 1110, h: 400 }, fore: '.rum-hv' },
+  // kupongstället på disken: det står framför anslagstavlan och ligger över
+  // den, men under kortlådan (z-index i rum-register.css)
+  stall: { plan: 0, box: { x: 1150, y: 440, w: 110, h: 95 } },
 };
 // närbilden: högst så många bildpunkter på dukens längsta led
 const SKARP = 2600;
@@ -185,7 +187,7 @@ export async function inredning(el, opt = {}) {
     };
   }
 
-  // kameran för väggarna (se överst) och för pulten (som rum-saker.js)
+  // kameran för väggarna (se överst)
   function wallCam(box, eye = [760, 400], E = 1000) {
     const fw = 2 * Math.max(eye[0], 1600 - eye[0]);
     const fh = 2 * Math.max(eye[1], 1000 - eye[1]);
@@ -196,23 +198,6 @@ export async function inredning(el, opt = {}) {
     cam.updateMatrixWorld();
     return cam;
   }
-  function deskCam(box, O, D = 1400, ELEV = 34 * DEG) {
-    const fw = 2 * Math.max(O.x, 1600 - O.x);
-    const fh = 2 * Math.max(O.y, 1000 - O.y);
-    const cam = new THREE.PerspectiveCamera(2 * Math.atan(fh / 2 / D) / DEG, fw / fh, 50, 5000);
-    cam.position.set(0, D * Math.sin(ELEV), D * Math.cos(ELEV));
-    cam.lookAt(0, 0, 0);
-    cam.setViewOffset(fw, fh, box.x - (O.x - fw / 2), box.y - (O.y - fh / 2), box.w, box.h);
-    cam.updateMatrixWorld();
-    const ray = new THREE.Raycaster();
-    const desk = new THREE.Plane(new THREE.Vector3(0, 1, 0), 0);
-    cam.onDesk = (px, py) => {
-      ray.setFromCamera(new THREE.Vector2(((px - box.x) / box.w) * 2 - 1, 1 - ((py - box.y) / box.h) * 2), cam);
-      return ray.ray.intersectPlane(desk, new THREE.Vector3());
-    };
-    return cam;
-  }
-
   // ljuset som i rummet: lysröret ovanför och framför till vänster, neonen
   // från fönstret och tv:n från hörnet
   function wallLights(b, box, skugga = true) {
@@ -742,122 +727,6 @@ export async function inredning(el, opt = {}) {
     }
   }
 
-  // ---------- disken och pulten ----------
-
-  // Kupongstället vid fönstret: fack av plexiglas, lågt fram och högt bak,
-  // med blanka kuponger som lutar bakåt, butikens pennor i ett rör och lappen
-  // på plexit.
-  function stall(b) {
-    const { mesh, cam } = b;
-    b.scene.add(new THREE.HemisphereLight('#d8d0b8', '#3a2a20', 0.5));
-    const key = new THREE.DirectionalLight('#fff0d6', 2.1);
-    key.position.set(-420, 700, 300);
-    key.target.position.set(0, 0, 80);
-    key.castShadow = true;
-    key.shadow.mapSize.set(SKUGGA, SKUGGA);
-    key.shadow.radius = 6;
-    key.shadow.bias = -0.0005;
-    key.shadow.normalBias = 0.6;
-    Object.assign(key.shadow.camera, { left: -1000, right: 1000, top: 1000, bottom: -1000, near: 10, far: 3000 });
-    b.scene.add(key, key.target);
-    const nl = new THREE.DirectionalLight('#ff3a26', 1.4);
-    nl.position.set(-300, 220, -320);
-    const fl = new THREE.DirectionalLight('#ffd9b0', 0.45);
-    fl.position.set(-200, 120, 600);
-    b.scene.add(nl, fl);
-    const p0 = cam.onDesk(150, 686);
-    const c = new THREE.Mesh(new THREE.PlaneGeometry(800, 400), new THREE.ShadowMaterial({ opacity: 0.4 }));
-    c.rotation.x = -90 * DEG;
-    c.position.set(p0.x, 0, p0.z + 150);
-    c.receiveShadow = true;
-    b.scene.add(c);
-    const g = new THREE.Group();
-    g.position.copy(p0);
-    g.scale.setScalar(cam.onDesk(151, 686).distanceTo(p0) * 0.85);
-    g.rotation.y = -3 * DEG;
-    b.scene.add(g);
-    const plexi = glas({ color: '#dfeaf2', opacity: 0.2, side: THREE.DoubleSide });
-    const lista = new THREE.MeshPhysicalMaterial({ color: '#e8f4f8', transparent: true, opacity: 0.75, roughness: 0.1, clearcoat: 1 });
-    mesh(new RB(160, 6, 36, 2, 1.5), mat('#c9c6bc', { metalness: 0.9, roughness: 0.35 }), g).position.set(-1, 3, 0);
-    const panel = (w, h, x, y, z, ry = 0) => {
-      const m = new THREE.Mesh(new THREE.BoxGeometry(w, h, 1.6), plexi);
-      m.position.set(x, y, z);
-      m.rotation.y = ry;
-      m.renderOrder = 3;
-      g.add(m);
-      const e = new THREE.Mesh(new THREE.BoxGeometry(w, 1.4, 1.8), lista);
-      e.position.set(x, y + h / 2, z);
-      e.rotation.y = ry;
-      g.add(e);
-    };
-    panel(118, 62, -18, 37, 15);
-    panel(118, 136, -18, 74, -15);
-    panel(30, 62, -77, 37, 0, 90 * DEG);
-    panel(30, 62, 41, 37, 0, 90 * DEG);
-    const blank = tex(200, 256, (x, w, h) => {
-      x.fillStyle = '#e9dfc6';
-      x.fillRect(0, 0, w, h);
-      x.fillStyle = '#c8643a';
-      x.fillRect(0, 0, w, 30);
-      x.fillStyle = '#f6ecd9';
-      x.font = '700 8px Fraunces';
-      x.fillText('MATCHFIXARNA', 10, 19);
-      x.font = '800 18px Fraunces';
-      x.textAlign = 'right';
-      x.fillText('Kupong', w - 10, 22);
-      for (let i = 0; i < 16; i++) {
-        const ry = 44 + i * 13;
-        x.strokeStyle = 'rgba(138,106,74,.45)';
-        x.beginPath();
-        x.moveTo(12, ry + 8);
-        x.lineTo(96, ry + 8);
-        x.stroke();
-        x.strokeStyle = '#a87650';
-        for (const bx of [112, 140, 168]) x.strokeRect(bx, ry, 20, 9);
-      }
-    });
-    const kup = mat('#fff', { map: blank, roughness: 0.85, side: THREE.DoubleSide });
-    [[-20, -9, -3], [-16, -6, 2], [-18, -3, 0]].forEach(([x, z, rz], i) => {
-      const m = mesh(new THREE.PlaneGeometry(100, 128), kup, g);
-      m.position.set(x, 68 + i * 2, z);
-      m.rotation.set(-10 * DEG, 0, rz * DEG);
-    });
-    const ror = new THREE.Mesh(new THREE.CylinderGeometry(13, 13, 46, 32, 1, true), plexi);
-    ror.position.set(60, 26, 2);
-    ror.renderOrder = 3;
-    g.add(ror);
-    const rk = new THREE.Mesh(new THREE.TorusGeometry(13, 0.7, 8, 32), lista);
-    rk.rotation.x = 90 * DEG;
-    rk.position.set(60, 49, 2);
-    g.add(rk);
-    const tra = mat('#e2c08c', { roughness: 0.7 });
-    for (const [x, a, l, z] of [[53, -9, 54, -2], [58, -2, 62, 3], [63, 6, 52, -3], [67, 12, 48, 4]]) {
-      const pg = new THREE.Group();
-      pg.position.set(x, 6, 2 + z);
-      pg.rotation.set(z * 1.5 * DEG, 0, -a * DEG);
-      g.add(pg);
-      mesh(new THREE.CylinderGeometry(2.6, 2.6, l, 6), mat('#d9d7d0', { roughness: 0.45 }), pg).position.y = l / 2;
-      mesh(new THREE.ConeGeometry(2.6, 8, 6), tra, pg).position.y = l + 4;
-      mesh(new THREE.ConeGeometry(0.9, 2.8, 6), mat('#2a2a2a'), pg).position.y = l + 6.6;
-    }
-    const lapp = tex(352, 64, (x, w, h) => {
-      x.fillStyle = '#f6f1a8';
-      x.fillRect(0, 0, w, h);
-      x.fillStyle = '#2a241c';
-      x.font = '700 40px Caveat';
-      x.textAlign = 'center';
-      x.textBaseline = 'middle';
-      x.fillText('Pennorna är räknade', w / 2, h / 2 + 2);
-    });
-    const la = mesh(new THREE.PlaneGeometry(88, 16), mat('#fff', { map: lapp, roughness: 0.9 }), g);
-    la.position.set(-18, 40, 16.2);
-    la.rotation.z = -4 * DEG;
-    const tejp = new THREE.Mesh(new THREE.PlaneGeometry(16, 6), mat('#e8e2c8', { transparent: true, opacity: 0.75, roughness: 0.5 }));
-    tejp.position.set(-17, 48, 16.4);
-    tejp.rotation.z = -4 * DEG;
-    g.add(tejp);
-  }
-
   // ---------- bardisken och barstolarna ----------
 
   // Bardisken längs högra väggen, som den platta i rum.js (disk) men i 3D, så
@@ -992,6 +861,122 @@ export async function inredning(el, opt = {}) {
       m.position.set(D.front - 2.6, D.under - 35, D.fram / 2);
       b.scene.add(m);
     }
+  }
+
+  // ---------- kupongstället ----------
+
+  // Kupongstället på bardisken, under anslagstavlan mellan barstolarna och
+  // kortlådan (rum-kortlada.js): ett fack av plexiglas, lågt fram och högt bak,
+  // med blanka kuponger som lutar bakåt, butikens pennor i ett rör och lappen
+  // på plexit. Det står in mot väggen, vänt ut mot rummet och lite mot den som
+  // står vid pulten. Stället är ritat i millimeter, k enheter per mm (disken
+  // har 0,237; stället är lite större, som kortlådan), och står på skivan i
+  // (x, z) vridet vrid grader.
+  const STALL = { x: 1104, z: 225, vrid: -66, k: 0.3 };
+  function stall(b) {
+    const { mesh } = b;
+    const D = DISK;
+    // skuggan på skivan (inte utanför kanten) och på väggen strax ovanför
+    catcher(b, new THREE.PlaneGeometry(D.vagg - D.kant - 6, 240), [-90 * DEG, 0, 0], [(D.kant + 6 + D.vagg) / 2, D.top + 0.05, STALL.z - 40]);
+    catcher(b, new THREE.PlaneGeometry(240, 60), [0, -90 * DEG, 0], [D.vagg - 0.05, D.top + 30, STALL.z - 40], 0.3);
+    const g = new THREE.Group();
+    g.position.set(STALL.x, D.top, STALL.z);
+    g.scale.setScalar(STALL.k);
+    g.rotation.y = STALL.vrid * DEG;
+    b.scene.add(g);
+    // Ljuset kommer ungefär därifrån man ser stället, så skuggan faller bakom
+    // det. En mjuk skugga tätt under foten håller det på skivan, också utan
+    // skuggkarta (rum-gpu.js).
+    const fot = tex(256, 96, (c, w, h) => {
+      c.shadowColor = 'rgba(0,0,0,.7)';
+      c.shadowBlur = 14;
+      c.shadowOffsetY = 1000;
+      c.fillRect(28, 26 - 1000, w - 56, h - 52);
+    });
+    const ks = new THREE.Mesh(new THREE.PlaneGeometry(200, 75), new THREE.MeshBasicMaterial({ map: fot, transparent: true, depthWrite: false }));
+    ks.rotation.x = -90 * DEG;
+    ks.position.set(-1, 0.4, 0);
+    g.add(ks);
+    const plexi = glas({ color: '#dfeaf2', opacity: 0.2, side: THREE.DoubleSide });
+    const lista = new THREE.MeshPhysicalMaterial({ color: '#e8f4f8', transparent: true, opacity: 0.75, roughness: 0.1, clearcoat: 1 });
+    mesh(new RB(160, 6, 36, 2, 1.5), mat('#c9c6bc', { metalness: 0.9, roughness: 0.35 }), g).position.set(-1, 3, 0);
+    const panel = (w, h, x, y, z, ry = 0) => {
+      const m = new THREE.Mesh(new THREE.BoxGeometry(w, h, 1.6), plexi);
+      m.position.set(x, y, z);
+      m.rotation.y = ry;
+      m.renderOrder = 3;
+      g.add(m);
+      const e = new THREE.Mesh(new THREE.BoxGeometry(w, 1.4, 1.8), lista);
+      e.position.set(x, y + h / 2, z);
+      e.rotation.y = ry;
+      g.add(e);
+    };
+    panel(118, 62, -18, 37, 15);
+    panel(118, 136, -18, 74, -15);
+    panel(30, 62, -77, 37, 0, 90 * DEG);
+    panel(30, 62, 41, 37, 0, 90 * DEG);
+    const blank = tex(200, 256, (x, w, h) => {
+      x.fillStyle = '#e9dfc6';
+      x.fillRect(0, 0, w, h);
+      x.fillStyle = '#c8643a';
+      x.fillRect(0, 0, w, 30);
+      x.fillStyle = '#f6ecd9';
+      x.font = '700 8px Fraunces';
+      x.fillText('MATCHFIXARNA', 10, 19);
+      x.font = '800 18px Fraunces';
+      x.textAlign = 'right';
+      x.fillText('Kupong', w - 10, 22);
+      for (let i = 0; i < 16; i++) {
+        const ry = 44 + i * 13;
+        x.strokeStyle = 'rgba(138,106,74,.45)';
+        x.beginPath();
+        x.moveTo(12, ry + 8);
+        x.lineTo(96, ry + 8);
+        x.stroke();
+        x.strokeStyle = '#a87650';
+        for (const bx of [112, 140, 168]) x.strokeRect(bx, ry, 20, 9);
+      }
+    });
+    const kup = mat('#fff', { map: blank, roughness: 0.85, side: THREE.DoubleSide });
+    [[-20, -9, -3], [-16, -6, 2], [-18, -3, 0]].forEach(([x, z, rz], i) => {
+      const m = mesh(new THREE.PlaneGeometry(100, 128), kup, g);
+      m.position.set(x, 68 + i * 2, z);
+      m.rotation.set(-10 * DEG, 0, rz * DEG);
+    });
+    const ror = new THREE.Mesh(new THREE.CylinderGeometry(13, 13, 46, 32, 1, true), plexi);
+    ror.position.set(60, 26, 2);
+    ror.renderOrder = 3;
+    g.add(ror);
+    const rk = new THREE.Mesh(new THREE.TorusGeometry(13, 0.7, 8, 32), lista);
+    rk.rotation.x = 90 * DEG;
+    rk.position.set(60, 49, 2);
+    g.add(rk);
+    const tra = mat('#e2c08c', { roughness: 0.7 });
+    for (const [x, a, l, z] of [[53, -9, 54, -2], [58, -2, 62, 3], [63, 6, 52, -3], [67, 12, 48, 4]]) {
+      const pg = new THREE.Group();
+      pg.position.set(x, 6, 2 + z);
+      pg.rotation.set(z * 1.5 * DEG, 0, -a * DEG);
+      g.add(pg);
+      mesh(new THREE.CylinderGeometry(2.6, 2.6, l, 6), mat('#d9d7d0', { roughness: 0.45 }), pg).position.y = l / 2;
+      mesh(new THREE.ConeGeometry(2.6, 8, 6), tra, pg).position.y = l + 4;
+      mesh(new THREE.ConeGeometry(0.9, 2.8, 6), mat('#2a2a2a'), pg).position.y = l + 6.6;
+    }
+    const lapp = tex(352, 64, (x, w, h) => {
+      x.fillStyle = '#f6f1a8';
+      x.fillRect(0, 0, w, h);
+      x.fillStyle = '#2a241c';
+      x.font = '700 40px Caveat';
+      x.textAlign = 'center';
+      x.textBaseline = 'middle';
+      x.fillText('Pennorna är räknade', w / 2, h / 2 + 2);
+    });
+    const la = mesh(new THREE.PlaneGeometry(88, 16), mat('#fff', { map: lapp, roughness: 0.9 }), g);
+    la.position.set(-18, 40, 16.2);
+    la.rotation.z = -4 * DEG;
+    const tejp = new THREE.Mesh(new THREE.PlaneGeometry(16, 6), mat('#e8e2c8', { transparent: true, opacity: 0.75, roughness: 0.5 }));
+    tejp.position.set(-17, 48, 16.4);
+    tejp.rotation.z = -4 * DEG;
+    g.add(tejp);
   }
 
   // ---------- skivan med löpsedlarna ----------
@@ -1148,7 +1133,6 @@ export async function inredning(el, opt = {}) {
   skivPlats(planes[0]);
   const B = {};
   for (const [k, { box, i }] of Object.entries(BITAR)) {
-    if (k === 'stall') { B[k] = bit(k, deskCam(box, { x: 160, y: 640 })); continue; }
     // uret och ramen ligger i knappen och länken, så att de lyser när man pekar på dem
     B[k] = bit(k, wallCam(box), i ? el.querySelector(i) : null);
     wallLights(B[k], box, !['tak', 'neon'].includes(k));
