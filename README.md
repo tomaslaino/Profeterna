@@ -686,6 +686,10 @@ bara lokalt. Analyserna visas som de ligger i `data/analyser.json`; hur de skriv
   låg bredvid i stället för under fatet som i baren. Nu är koppen bardiskens kopp i samma ljus,
   ritad i handens duk, fatet står på notan och handen ligger bredvid, och bardisken har pultens
   bruna. Se [Hasse Backe](#hasse-backe), *Kaffet i rummet*.
+- **Hasse Backe minns vad han sa (2026-11-06, användarens önskemål):** klickade man på en match
+  man redan hade frågat om slog han domen i disken en gång till, och efter en omladdning gjorde han
+  om allt, med 15–25 sekunders väntan. Nu står det han sa direkt, sparat på enheten så att det
+  finns kvar när analysen skrivs om, och han erbjuder sig ödmjukt, på sitt sätt, att titta igen. Se [Hasse Backe](#hasse-backe), *Samtalet*.
 - **Kuponghistoriken flyttar till Olympen (2026-10-20, användarens önskemål):** Kupong
   handlar bara om nästa kupong – växlaren Omgången | Historik försvinner. De färdigspelade
   kupongerna står sist i Olympen under rubriken *Grupparbetena* (`#olympen/kuponger`, en
@@ -3964,10 +3968,19 @@ bredvid, båda med en tunn ram innanför kanten, och *Matchbladet →* under dem
 versaler som texten i bandet. Frågan har sin plats från början, osynlig tills han säger den, så att
 knapparna inte flyttar sig. Förut stod svaren som små länkar längst ned i spalten och syntes knappt
 i telefonen, och sedan som piller i guld (ändrat 2026-11-04). *Nästa match* efter analysen är samma
-lapp i terrakotta, och *Ja, ja »* och *← Tillbaka* står med samma versaler som *Matchbladet →*. Han har alltid svaret, både när du redan har frågat (*Den har jag tittat på*) och när
+lapp i terrakotta, och *Ja, ja »* och *← Tillbaka* står med samma versaler som *Matchbladet →*. Han har alltid svaret, också när
 han ska läsa på (*Den knäckte jag i morse*); att han läser på märks först medan han väntar. Är analysen inte skriven än
-säger han det (*Den tar jag sen*). Rader där du redan har fått tecknen öppnas
-direkt. Analysen är redan skriven, men han låtsas: när du har bett om den fortsätter han prata i 15–25 sekunder (`LATSAS` i [public/rum-hasse.js](public/rum-hasse.js)) och tar en klunk kaffe eller cigarren då och då. Han hinner säga två eller
+säger han det (*Den tar jag sen*). En match du redan har frågat om står direkt, som han sa
+den: domen i guld, hans text och resultatet, och sist vad han tycker om det du har på kupongen nu.
+Det han sa sparas på enheten, så att det står kvar också när analysen har skrivits om sedan dess
+(det görs upp till fyra gånger i veckan, se [Analyserna](#analyserna)). Sedan erbjuder han sig att
+titta igen, ödmjukt på sitt sätt (*Jag har haft fel en gång förut. Ska jag titta på den igen, för
+säkerhets skull?*), och har analysen skrivits om sedan han sa det säger han det (*Tidningarna har
+skrivit mer om den sedan dess.*). *Ja, titta igen* bredvid *Nästa match* ger hela analysen en gång
+till, med väntan, slaget och rösten (*Då tar vi den från början.*), och det nya ersätter det gamla
+(`tidigare` i [public/rum-hasse.js](public/rum-hasse.js)). Matcher han svarade på innan texten
+sparades (före 2026-11-06) får dagens analys om tecknen är desamma, annars bara domen och
+resultatet. Analysen är redan skriven, men han låtsas: när du har bett om den fortsätter han prata i 15–25 sekunder (`LATSAS` i [public/rum-hasse.js](public/rum-hasse.js)) och tar en klunk kaffe eller cigarren då och då. Han hinner säga två eller
 tre rader: han börjar (*Vänta lite, var har jag glasögonen?*), håller på (*Experterna i tidningarna förstår ingenting.*)
 och är nästan klar (*Nu faller bitarna på plats.*), med en rad lottad ur varje del (`vantar` i
 [public/rum-hasse-repliker.js](public/rum-hasse-repliker.js)), så att det låter olika varje gång. När den är klar blir han tyst och slår domen i disken
@@ -3984,7 +3997,7 @@ kupongen (*På din kupong har du bara etta. Det var kaxigt.*); har du inget på 
 frågat om: på matchens rad står hans tecken ifyllda i guld i rutorna 1 X 2, som på kupongen, med
 resultatet bredvid i en rak spalt. *Nästa match* räknar
 (*Nu är halva kupongen klar*). Bara tecken du själv har bett om syns, så att listan inte blir ett
-automatiskt tips. Frågar du om samma match igen står allt direkt.
+automatiskt tips.
 Går hans röst inte att få säger han det och visar analysen i skrift. Allt han säger runt omkring är
 färdiga rader, utan AI, i [public/rum-hasse-repliker.js](public/rum-hasse-repliker.js). Med minskad
 rörelse i systemet står allt direkt, utan gester.
