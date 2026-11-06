@@ -667,6 +667,13 @@ bara lokalt. Analyserna visas som de ligger i `data/analyser.json`; hur de skriv
   långt bloss med *ah*, lutar sig bakåt och blundar, biter om den i mungipan med händerna på disken,
   beundrar den, puffar, visar den mot en och smakar på röken. Se [Hasse Backe](#hasse-backe),
   *Cigarren*.
+- **Hasse Backe gör fler saker medan han väntar (2026-11-06, användarens önskemål):** i vilan
+  upprepades allt: han blinkade exakt var 4,3:e sekund, huvudet och bröstet rörde sig i jämna vågor, och
+  mellan kaffet och cigarren trummade han bara, likadant varje gång. Nu går blinkningarna, blicken,
+  huvudet och andningen aldrig i takt, fingrarna trummar på fyra sätt med båda händerna, och han gör
+  nio andra småsaker som lottas: tittar mot gänget och längs baren, på notan och kaffet, nickar för sig
+  själv, suckar, sträcker på nacken, höjer ett ögonbryn och skrockar. Se [Hasse Backe](#hasse-backe),
+  *Vilan*.
 - **Statistik som i tobaksaffären (2026-11-05, användarens önskemål):** statistiken på den
   vanliga sajten ska stämma med den i tobaksaffären – samma tal under samma namn och samma
   uppdelning: det som jämför lagen står som på anslagstavlan (topplistorna under Lagen), det
@@ -2051,8 +2058,8 @@ tid det visade först, och med `prefers-reduced-motion` syns inte sekundvisaren.
 
 Uret visar också hur länge det är kvar till spelstoppet, alltså den första avsparken i
 omgången som gänget tippar (`stopp`, från rum.js). I ett fönster vid sexan, som
-datumet i ett armbandsur, står dagarna kvar i rött (kalenderdagar i Stockholm), med DAGAR
-(DAG) tryckt under; på spelstoppets dag står det en svart nolla. En röd spets i kanten
+datumet i ett armbandsur, står dagarna kvar i rött (kalenderdagar i Stockholm), med DAGAR TILL
+SPELSTOPP (DAG TILL) tryckt under på två rader; på spelstoppets dag står det en svart nolla. En röd spets i kanten
 pekar på klockslaget, och de sista tolv timmarna fyller en röd sektor tavlan från
 timvisaren fram till spetsen, så att den krymper medan tiden går. Fönstret ligger över
 sektorn och under visarna. Mellan omgångarna och efter spelstoppet står fönstret tomt och
@@ -3774,8 +3781,9 @@ anslagstavlan, och har vridit sig lite mot en, med underarmarna på disken, kaff
 vänstra handen och cigarren i askkoppen vid den högra. Bakom honom är barens vägg med hyllorna,
 cigarettpaketen och lamporna. Samtalet står i en spalt till vänster om honom (på höjden under honom)
 och kommer när kameran har stannat. Esc eller *Tillbaka* går tillbaka (vid matchlistan också ett klick
-utanför). Medan han väntar på att man ska välja trummar han med fingrarna på disken då och då, och
-ibland njuter han av kaffet (på ett av sex sätt) eller av cigarren (på ett av fyra), varannan gång. I rummet ligger kaffet, notan och
+utanför). Medan han väntar på att man ska välja gör han något litet då och då – trummar med fingrarna,
+tittar bort, nickar för sig själv, suckar (se *Vilan*) – och ibland njuter han av kaffet (på ett av sex
+sätt) eller av cigarren (på ett av elva), varannan gång. I rummet ligger kaffet, notan och
 handen kvar på pulten som en ledtråd, och handen trummar när man pekar på den eller kaffet, och
 ibland ändå.
 
@@ -3854,7 +3862,38 @@ T 0–12,4 vilan, skrattet, slaget, gesterna och vägen hem, och efter det ett k
 sin bit av tidslinjen. Varje klipp börjar och slutar där han står (i vilan, eller med händerna på
 disken när han pratar) och har sina egna nycklar för huvudet, kroppen, ansiktet och armarna
 (`RORELSER`), så att ett nytt klipp bara behöver det som händer i det. Klippen i samma grupp (domen,
-kaffet, cigarren) lottas av sidan, utan att samma kommer två gånger innan alla har varit med.
+kaffet, cigarren, småsakerna) lottas av sidan, utan att samma kommer två gånger innan alla har varit med.
+
+**Vilan.** När han bara sitter och väntar på en upprepar sig ingenting. Det som alltid rör sig går
+aldrig i takt: han blinkar ungefär var fjärde sekund men oregelbundet, någon gång mellan en halv och
+sju och en halv sekund isär och ibland två gånger i rad (`blinkar`); blicken flyttar sig lite med en
+snabb ryckning ungefär varannan sekund, oftast tillbaka till en (`sakkader`); huvudet driver långsamt
+i svängningar som inte går jämnt ut (`drift`), och andningen byter takt och djup (`andning`, allt i
+[public/rum-hasse-3d.js](public/rum-hasse-3d.js)). Samma klocka ger alltid samma bild, men inget mönster
+går igen. Förut blinkade han exakt var 4,3:e sekund, huvudet vaggade och bröstet hävde sig i
+rena sinusvågor, och det enda han gjorde mellan kaffet och cigarren var att trumma, likadant varje gång
+(ändrat 2026-11-06).
+
+Var 5–11:e sekund gör han något litet (`SMATT` i [public/rum-hasse.js](public/rum-hasse.js)), lottat utan
+att samma sak kommer två gånger innan allt har varit med, och fingrarna dubbelt så ofta som det andra.
+Fingrarna trummar på ett av fyra sätt, oftast med höger hand och annars med vänster: två varv från
+lillfingret till pekfingret, tre fortare, ett långsamt, eller pekfingret som knackar fyra gånger
+(`TRUM`). Annars ett av nio klipp med händerna kvar på disken (gruppen `smatt`), där ögonen går först och
+huvudet efter, som man gör:
+
+- `affaren`: tittar bort mot gänget i affären, kisar, skakar lite på huvudet och ler åt dem.
+- `baren`: tittar längs baren och nickar med brynen upp åt någon han känner.
+- `notan`: tittar ned på notan, brynen åker upp och munnen säger oj, och han skakar på huvudet och pustar.
+- `nicka`: nickar för sig själv med blicken ned åt sidan och ett leende.
+- `suck`: andas in djupt så att bröstet häver sig och axlarna åker upp, och andas ut genom munnen.
+- `nacken`: sträcker på nacken åt båda hållen med slutna ögon.
+- `brynet`: hakan ned, ena brynet upp och det andra ned, och ett snett leende: jaså?
+- `skrocka`: skrockar åt något han kommer att tänka på, med axlarna som hoppar.
+- `smacka`: tittar på kaffet, smackar och säger mm.
+
+Börjar han prata mitt i ett av dem läggs det undan 2,5 gånger så fort. Kaffet och cigarren kommer som
+förut (se *Cigarren*), när han inte gör något annat. Med minskad rörelse gör han inget av det, men han
+blinkar och andas.
 
 **Slaget.** När domen är klar slår han den i disken på ett av fem sätt: armarna upp i ett gapskratt
 och handen i disken (`slag`); tyst och allvarlig med knuten näve i hakhöjd, som han slår i disken med
@@ -3954,8 +3993,10 @@ i telefonen, och sedan som piller i guld (ändrat 2026-11-04). *Nästa match* ef
 lapp i terrakotta, och *Ja, ja »* och *← Tillbaka* står med samma versaler som *Matchbladet →*. Han har alltid svaret, både när du redan har frågat (*Den har jag tittat på*) och när
 han ska läsa på (*Den knäckte jag i morse*); att han läser på märks först medan han väntar. Är analysen inte skriven än
 säger han det (*Den tar jag sen*). Rader där du redan har fått tecknen öppnas
-direkt. Analysen är redan skriven, men han låtsas: när du har bett om den fortsätter han prata i 15–25 sekunder (`LATSAS` i [public/rum-hasse.js](public/rum-hasse.js), raderna kommer i ordning: *Jag läser tidningarna*, *Jag har full kontroll*, *Man ska
-inte stressa fram ett tips*) och tar en klunk kaffe eller cigarren då och då. När den är klar blir han tyst och slår domen i disken
+direkt. Analysen är redan skriven, men han låtsas: när du har bett om den fortsätter han prata i 15–25 sekunder (`LATSAS` i [public/rum-hasse.js](public/rum-hasse.js)) och tar en klunk kaffe eller cigarren då och då. Han hinner säga två eller
+tre rader: han börjar (*Vänta lite, var har jag glasögonen?*), håller på (*Experterna i tidningarna förstår ingenting.*)
+och är nästan klar (*Nu faller bitarna på plats.*), med en rad lottad ur varje del (`vantar` i
+[public/rum-hasse-repliker.js](public/rum-hasse-repliker.js)), så att det låter olika varje gång. När den är klar blir han tyst och slår domen i disken
 (se *Slaget*), och domen står i guld. Sedan säger han texten en mening i taget, ord för ord med munnen i takt (och det hörs, se *Ljudet*), med en paus
 mellan meningarna och en längre före en kort mening, och gesterna kommer vid de bestämda orden
 (*Nej nej nej*, *varningens finger*, ibland handflatan i disken) eller då och då vid en lång mening. Ett klick var som helst
@@ -3965,7 +4006,7 @@ resultatet i modellens prognos (resultatmatrisen i `data/match/<id>.json`, samma
 visar) bland utfallen han har ringat in, så att resultatet aldrig går emot tecknen. Har modellen
 ingen prognos för matchen säger han inget resultat (`resultatet` i
 [public/rum-hasse.js](public/rum-hasse.js)). Sist säger han vad han tycker om det du själv har på
-kupongen (*På din kupong har du bara etta. Det var kaxigt.*). Han minns på enheten vad du har
+kupongen (*På din kupong har du bara etta. Det var kaxigt.*); har du inget på matchen säger han inget om den. Han minns på enheten vad du har
 frågat om: på matchens rad står hans tecken ifyllda i guld i rutorna 1 X 2, som på kupongen, med
 resultatet bredvid i en rak spalt. *Nästa match* räknar
 (*Nu är halva kupongen klar*). Bara tecken du själv har bett om syns, så att listan inte blir ett

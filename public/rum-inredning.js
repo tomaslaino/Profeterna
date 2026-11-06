@@ -509,14 +509,16 @@ export async function inredning(el, opt = {}) {
     g.add(dome);
 
     // Spelstoppet: fönstret med dagarna kvar (kalenderdagar i Stockholm, 0 på
-    // spelstoppets dag) med DAGAR tryckt under, spetsen och sektorn. Utan
-    // spelstopp står fönstret tomt.
+    // spelstoppets dag) med DAGAR TILL / SPELSTOPP tryckt under, spetsen och
+    // sektorn. Utan spelstopp står fönstret tomt.
     const ROD = '#a81c12';
     const FW = r * 0.3, FH = r * 0.25, PX = 24;
-    const ruta = tex(Math.round((FW + 3) * PX), Math.round((FH + 9) * PX), () => {});
-    const fonster = mesh(new THREE.PlaneGeometry(FW + 3, FH + 9), new THREE.MeshStandardMaterial({ map: ruta, transparent: true, roughness: 0.75 }), g, false);
-    // över sektorn (0,45), under visarna
-    fonster.position.set(0, -r * 0.42 - 3, 0.55);
+    // ramen (FH + 3) och två rader text under den
+    const FT = FH + 9.8;
+    const ruta = tex(Math.round((FW + 3) * PX), Math.round(FT * PX), () => {});
+    const fonster = mesh(new THREE.PlaneGeometry(FW + 3, FT), new THREE.MeshStandardMaterial({ map: ruta, transparent: true, roughness: 0.75 }), g, false);
+    // över sektorn (0,45), under visarna; så högt att texten går fri från sexan
+    fonster.position.set(0, -r * 0.41, 0.55);
     function dagar(n) {
       const c = ruta.image.getContext('2d');
       const k = PX;
@@ -538,8 +540,9 @@ export async function inredning(el, opt = {}) {
       c.font = `700 ${FH * (n > 9 ? 0.66 : 0.86) * k}px 'Helvetica Neue', Helvetica, Arial`;
       c.fillText(String(n), (FW + 3) * k / 2, (FH / 2 + 1.5) * k + 0.06 * FH * k);
       c.fillStyle = '#3a342a';
-      c.font = `600 ${3.6 * k}px 'Helvetica Neue', Helvetica, Arial`;
-      c.fillText(n === 1 ? 'DAG' : 'DAGAR', (FW + 3) * k / 2, (FH + 6.2) * k);
+      c.font = `600 ${2.7 * k}px 'Helvetica Neue', Helvetica, Arial`;
+      c.fillText(n === 1 ? 'DAG TILL' : 'DAGAR TILL', (FW + 3) * k / 2, (FH + 4.85) * k, (FW + 3) * k);
+      c.fillText('SPELSTOPP', (FW + 3) * k / 2, (FH + 7.95) * k, (FW + 3) * k);
       ruta.needsUpdate = true;
     }
     const sp = new THREE.Shape([new THREE.Vector2(-r * 0.07, r), new THREE.Vector2(r * 0.07, r), new THREE.Vector2(0, r * 0.86)]);

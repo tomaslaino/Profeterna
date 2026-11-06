@@ -69,23 +69,45 @@
   // Samma match en gång till.
   igen: ['Du får samma svar som nyss.', 'Den tog vi ju nyss.'],
 
-  // Medan han låtsas analysera: en i taget, i den här ordningen. Allt under kontroll.
-  vantar: [
-    'Jag ska bara titta på en sak.',
-    'Jag läser tidningarna.',
-    'Tidningarna har fel, som vanligt.',
-    'Det här får ta sin tid.',
-    'Du har väl inte bråttom?',
-    'Spelstoppet är {dag}.',
-    'Allt är orsak och verkan, alltså.',
-    'Det här har jag sett förut.',
-    'Ta det bara lugnt.',
-    'Jag har full kontroll.',
-    'Det är ingen fara.',
-    'Man ska inte stressa fram ett tips.',
-    'Jag är strax klar.',
-    'Allt är under kontroll.',
-  ],
+  // Medan han låtsas analysera: han börjar, håller på och är nästan klar, en rad lottad ur
+  // varje del (vantan i rum-hasse.js). Han hinner säga två eller tre rader, så det är
+  // lottningen som gör att det låter olika varje gång. Allt under kontroll.
+  vantar: {
+    forst: [
+      'Jag ska bara titta på en sak.',
+      'Ge mig bara en minut.',
+      'Vänta lite, var har jag glasögonen?',
+      'Jag läser på lite, för formens skull.',
+      'Svaret har jag redan, men jag dubbelkollar.',
+      'Jag ska bara slå upp tabellen.',
+      'Jag ska bara leta fram mina anteckningar.',
+    ],
+    sedan: [
+      'Jag läser tidningarna.',
+      'Tidningarna har fel, som vanligt.',
+      'Experterna i tidningarna förstår ingenting.',
+      'Du har väl inte bråttom?',
+      'Spelstoppet är {dag}.',
+      'Allt är orsak och verkan, alltså.',
+      'Den här sortens match har jag sett förut.',
+      'Den här matchen har fler bottnar än man tror.',
+      'Man ska inte stressa fram ett tips.',
+      'Tyst nu, jag räknar.',
+      'Magkänslan har aldrig svikit mig.',
+      'Jag har tippat i femtio år.',
+      'Jag går igenom skadelistan.',
+      'Det gäller att läsa mellan raderna.',
+    ],
+    sist: [
+      'Jag är strax klar.',
+      'Nu faller bitarna på plats.',
+      'Snart ska du få ditt svar.',
+      'Nu vet jag hur matchen slutar.',
+      'Jag har full kontroll.',
+      'Ta det bara lugnt.',
+      'Det är ingen fara.',
+    ],
+  },
 
   // Trycker man på Ja, ja mitt i.
   avbruten: ['Då får du läsa själv.', 'Som du vill.'],
@@ -104,7 +126,6 @@
     fler: ['På din kupong har du {du}. Så många tecken behövs inte.'],
     korsar: ['{Bada} kan du behålla på din kupong, men stryk resten.'],
     skilda: ['På din kupong har du {du}, och det kan du glömma.'],
-    tom: ['Du har inte fyllt i den här matchen än. Nu vet du vad du ska sätta.'],
   },
 
   // När något inte går.
