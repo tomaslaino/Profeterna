@@ -2074,10 +2074,15 @@ kortregistret står under Tipsligan, fritt från anslagstavlans nederkant, och v
 lådan med kassetter under korktavlan. Tv:ns sladd går i en kort båge till ett uttag strax
 under väggplattan, ovanför korktavlan.
 
-**Kupongstället** står på pulten vid fönstret (till vänster) och leder ingenstans: ett
-fack av plexiglas, lågt fram och högt bak, med blanka kuponger (samma terrakottaband som
-kupongen på pulten) som lutar bakåt, butikens pennor i ett rör bredvid och en lapp på
-plexit: *Pennorna är räknade*.
+**Kupongstället** står på bardisken under anslagstavlan, mellan barstolarna och kortregistret,
+och leder ingenstans: ett fack av plexiglas, lågt fram och högt bak, med blanka kuponger (samma
+terrakottaband som kupongen på pulten) som lutar bakåt, butikens pennor i ett rör bredvid och en
+lapp på plexit: *Pennorna är räknade*. Det är byggt i three.js och ses med samma kamera och ljus
+som disken (`stall` och `STALL` i rum-inredning.js: platsen, vridningen och storleken), står in
+mot väggen och är vänt ut mot rummet och lite mot pulten. Ljuset kommer ungefär därifrån man ser
+det, så skuggan faller bakom; en mjuk skugga under foten håller det på skivan, också utan
+skuggkarta. Duken ligger över tavlorna på högra väggen, eftersom stället står framför
+anslagstavlan, men under kortlådan.
 
 **Stationsuret** sitter på bakväggen till höger om fönstret och leder bara till en närbild: ett
 svarvat hölje i mörk metall från väggen fram till ett glas som buktar lite, vit tavla med
@@ -2559,7 +2564,8 @@ med sitsen 75 cm över golvet och inskjutna under kanten; den närmaste syns bar
 över pulten. Skivan skuggar fronten och stolarna skuggar fronten och bakväggen under skivan –
 det är skuggorna och stolarna som visar att det är tomt under skivan, eftersom man ser disken
 lite uppifrån. Disken ritas en gång, som inredningen, i en duk från disken in i videons hörn
-(så att den är likadan när kameran går dit) under tavlorna och kortlådan. Utan WebGL står den
+(så att den är likadan när kameran går dit) under tavlorna och kortlådan. På disken står
+kupongstället, kortregistret, videon och lådan med kassetter. Utan WebGL står den
 platta disken kvar (`disk` i rum.js, och i videons hörn `vaggSvg` i rum-video.js), med samma
 mått. Stället är slitet: nikotingul högervägg och tak, fläckar, nötta
 kanter på disken och pulten, kafferingar, ringar efter glas på disken och brännmärken. Med
