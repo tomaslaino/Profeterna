@@ -516,6 +516,18 @@ window.RumHasse = (() => {
     return `på ${new Intl.DateTimeFormat('sv-SE', { timeZone: 'Europe/Stockholm', weekday: 'long' }).format(t)}`;
   }
   const medDag = (rader, dagen) => rader.filter((r) => dagen || !r.includes('{dag}')).map((r) => fyll(r, { dag: dagen }));
+  // Medan han låtsas läsa på: en lottad rad ur var och en av delarna i vantar (först, sedan, sist).
+  function vantan(dagen) {
+    const ur = (lista) => {
+      for (let n = 0; n < lista.length; n++) {
+        const r = lott(lista);
+        if (dagen || !r.includes('{dag}')) return fyll(r, { dag: dagen });
+      }
+      return null;
+    };
+    const v = REP().vantar;
+    return [ur(v.forst), ur(v.sedan), ur(v.sist)].filter(Boolean);
+  }
 
   // Rörelserna: klipp på tidslinjen (KLIPP i rum-hasse-3d.js, hit när figuren hämtas). fran: var det
   // börjar (måste vara där han står, utom fri), till: var det slutar, vila: där han står sedan, grupp:
@@ -1111,7 +1123,7 @@ window.RumHasse = (() => {
     if (!igen && !calm()) {
       // hans text hämtas medan han låtsas läsa på
       if (a.hasse && a.hasse.stycken) for (const st of a.hasse.stycken) for (const t of meningar(st)) ljudTill(t);
-      H.prat = { rader: medDag(REP().vantar, dag), i: 0, nasta: performance.now() + 6000, gang: 7000, runt: true };
+      H.prat = { rader: vantan(dag), i: 0, nasta: performance.now() + 6000, gang: 7000, runt: true };
       await new Promise((ok) => setTimeout(ok, LATSAS[0] + Math.random() * (LATSAS[1] - LATSAS[0])));
       if (H.fraga !== vem) return;
     }
