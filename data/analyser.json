@@ -1,5 +1,5 @@
 {
- "uppdaterad": "2026-11-06T17:26:38.642Z",
+ "uppdaterad": "2026-11-06T17:27:04.655Z",
  "omgang": {
   "id": "2026-11-07-st4978",
   "matcher": [
@@ -479,22 +479,21 @@
    },
    "hasse": {
     "stycken": [
-     "Wimbledon har förlorat sex av sina sju senaste matcher, och utan Mathew Stevens och Dujuan Richards finns det ingen som sätter bollen i nät. Ett lag som inte gör mål vinner inte borta mot ett lag som inte förlorar hemma, och det är ren orsak och verkan.",
-     "Crewe är obesegrat hemma, men de gör inte särskilt många mål själva. Dessutom har fyra av de sex senaste mötena slutat oavgjort, så det här kan bli en jävligt seg eftermiddag. Jag har själv vunnit matcher på mindre än så och förlorat på mer, så jag vet hur det går till.",
-     "Hemmaplan bär. Jag ringar in etta och kryss."
+     "Wimbledon har förlorat sex av sina sju senaste matcher, och de har tappat ledningar sent i matcherna. Deras bästa målskytt har varit borta sedan i mars, och laget har gjort nio mål på tretton ligamatcher. Ett lag som inte gör mål och inte orkar hålla emot på slutet vinner inte borta.",
+     "Crewe har inte förlorat hemma i ligan i höst, och då är det hemmaplan som bär den här matchen. Ikke noget at tale om, som man säger i Aalborg. Men Crewe gör få mål själva, och fyra av de sex senaste mötena mellan lagen har slutat oavgjort. Då är jag jävligt snäll mot Wimbledon, men jag tar med krysset och ringar in etta och kryss."
     ],
     "tips": "2026-11-06T15:16:04.774Z",
     "uppdrag": {
      "fraser": [
-      "Total kontroll",
-      "Glöm det"
+      "Då är jag jävligt snäll",
+      "Det är lugnt"
      ],
-     "krydda": null,
+     "krydda": "Ikke noget at tale om, som man säger i Aalborg.",
      "bielsa": []
     },
     "model": "claude-opus-5-5",
-    "version": "2026-11-04.1",
-    "writtenAt": "2026-11-06T15:16:17.056Z",
+    "version": "2026-11-05.1",
+    "writtenAt": "2026-11-06T17:26:51.845Z",
     "attempts": 1
    },
    "model": "claude-opus-5-5",
