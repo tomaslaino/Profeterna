@@ -1,5 +1,5 @@
 {
- "uppdaterad": "2026-11-06T17:24:31.332Z",
+ "uppdaterad": "2026-11-06T17:25:00.746Z",
  "omgang": {
   "id": "2026-11-07-st4978",
   "matcher": [
@@ -738,22 +738,21 @@
    },
    "hasse": {
     "stycken": [
-     "Preston har inte vunnit en enda match sedan Graham Alexander tog över, och de har släppt in 30 mål, vilket är mest i hela serien. Mot Sheffield United tog de ledningen tidigt och förlorade ändå. Ett lag som inte kan hålla en ledning har ingen organisation bakåt, och det tränar man inte fram på några dagar.",
-     "Southampton saknar Larin och Jander, och Scienza har haft ont, så deras anfall blir tunnare. Det spelar mindre roll när motståndaren inte har hållit nollan en enda gång i år. Preston saknar dessutom fyra ordinarie spelare, Kenny är skadad och Leroy är avstängd.",
-     "Southampton har inte förlorat på sex matcher. Att Preston skulle vända det på lördag kan du glömma, det vore jävligt optimistiskt. Jag spikar tvåan."
+     "Preston har släppt in 30 mål, mest i serien, och har inte hållit nollan en enda gång i år. I tisdags tog de ledningen mot Sheffield United och förlorade ändå med 2–3. Ett lag som inte kan stänga en match har en organisation som läcker som ett jävla såll. Det blir inte bättre av att Kenny gick av skadad och att Leroy är avstängd.",
+     "Här höjer jag ett varningens finger för Southamptons anfall. Larin och Jander är osäkra och Scienza har haft ont, så det kan bli tunt där framme. Men de har inte förlorat sedan i september, och mot det här försvaret behöver man inte så mycket. Jag spikar tvåan."
     ],
     "tips": "2026-11-06T16:19:02.129Z",
     "uppdrag": {
      "fraser": [
-      "Glöm det",
-      "Nej nej nej"
+      "Här höjer jag ett varningens finger",
+      "Äsch"
      ],
      "krydda": null,
      "bielsa": []
     },
     "model": "claude-opus-5-5",
-    "version": "2026-11-04.1",
-    "writtenAt": "2026-11-06T16:19:13.826Z",
+    "version": "2026-11-05.1",
+    "writtenAt": "2026-11-06T17:24:45.981Z",
     "attempts": 1
    },
    "model": "claude-opus-5-5",
