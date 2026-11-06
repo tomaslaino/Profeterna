@@ -1,5 +1,5 @@
 {
- "uppdaterad": "2026-11-06T17:26:15.664Z",
+ "uppdaterad": "2026-11-06T17:26:38.642Z",
  "omgang": {
   "id": "2026-11-07-st4978",
   "matcher": [
@@ -976,22 +976,22 @@
    },
    "hasse": {
     "stycken": [
-     "Fyra raka 0–0 på The Hawthorns. De här två lagen tar helt enkelt ut varandra, och Millwall har dessutom inte förlorat mot West Brom på väldigt länge. Orsak och verkan, mer än så är det inte.",
-     "Den här gången står Millwall med sin tredjemålvakt Crocombe och utan Crama i backlinjen. West Brom saknar lagkaptenen Campbell och får spela med ett mittbackspar som inte har spelat ihop, men laget har inte förlorat på länge, och Millwall vinner inte mycket just nu. När en reservmålvakt ska försvara sig mot en ihopsatt backlinje på andra sidan avgörs det på de fasta situationerna, och där ligger fördelen hos West Brom.",
-     "Jag har sett det förr, i Manchester. Det gick bra då också. Krysset ligger nära, så jag tar etta och kryss."
+     "De här lagen har spelat fyra raka matcher på The Hawthorns utan att någon gjort mål. Två lag som tar ut varandra så där gör det gärna en gång till, och Millwall brukar dessutom inte förlora mot West Brom.",
+     "Men nu står Millwall med sin tredjemålvakt och utan mittbacken Crama, och då blir varje fast situation en prövning för dem. West Brom saknar sin lagkapten Campbell i backlinjen och blir svagare bakåt. Det är ändå ett lag som inte har förlorat på länge i ligan, och Millwall vinner sällan just nu.",
+     "Äsch, jag tror inte på en bortaseger med en reservmålvakt. West Brom kan få hål på det, annars blir det mållöst igen. Etta och kryss, och krysset ligger nära."
     ],
     "tips": "2026-11-06T15:14:51.655Z",
     "uppdrag": {
      "fraser": [
-      "Orsak och verkan",
-      "Då är jag jävligt snäll"
+      "Äsch",
+      "Nej nej nej"
      ],
-     "krydda": "Jag har sett det förr, i Manchester. Det gick bra då också.",
+     "krydda": null,
      "bielsa": []
     },
     "model": "claude-opus-5-5",
-    "version": "2026-11-04.1",
-    "writtenAt": "2026-11-06T15:15:05.031Z",
+    "version": "2026-11-05.1",
+    "writtenAt": "2026-11-06T17:26:30.489Z",
     "attempts": 1
    },
    "model": "claude-opus-5-5",
