@@ -3917,7 +3917,7 @@ Sätten (`KLIPP` i [public/rum-hasse-3d.js](public/rum-hasse-3d.js); de sju sist
   ut den långsamt.
 
 **Samtalet.** Det är han som frågar, *Vilken match ska jag hjälpa dig med?*, och när du kommer tillbaka *Har du kört fast igen, Laino?*, med ditt efternamn om kupongen
-vet vem du är. Han talar i hela meningar, och över matchlistan finns alltid plats för två rader, så att listan står still vad han än säger. Man svarar genom att välja en match. Då frågar han tillbaka (*Den är solklar. Vill du
+vet vem du är. Han talar i hela meningar som går att förstå för sig: han säger vad det gäller (*Vilken match vill du ha hjälp med nu då?*, inte *Vilken match är det nu då?*), och "den" syftar bara på matchen du har valt. Över matchlistan finns alltid plats för två rader, så att listan står still vad han än säger. Man svarar genom att välja en match. Då frågar han tillbaka (*Den är solklar. Vill du
 veta, eller ska du gissa?*), och först *Jag är idel öra* ger analysen (knappen lottas som hans repliker: också *Tala om det för mig*), så att ett felklick inte visar ett tips. *Jag gissar* går tillbaka till listan och
 *Matchbladet* till matchen. Svaren står direkt under hans fråga, som lappar i tipskupongens tryck
 som ligger på disken: *Jag är idel öra* i terrakotta som kupongens band, *Jag gissar* i krämvitt papper
@@ -3928,8 +3928,8 @@ i telefonen, och sedan som piller i guld (ändrat 2026-11-04). *Nästa match* ef
 lapp i terrakotta, och *Ja, ja »* och *← Tillbaka* står med samma versaler som *Matchbladet →*. Han har alltid svaret, både när du redan har frågat (*Den har jag tittat på*) och när
 han ska läsa på (*Den knäckte jag i morse*); att han läser på märks först medan han väntar. Är analysen inte skriven än
 säger han det (*Den tar jag sen*). Rader där du redan har fått tecknen öppnas
-direkt. Analysen är redan skriven, men han låtsas: när du har bett om den fortsätter han prata i 15–25 sekunder (`LATSAS` i [public/rum-hasse.js](public/rum-hasse.js), raderna kommer i ordning: *Jag läser tidningarna*, *Jag har full kontroll*, *Det ska
-gå till så här*) och tar en klunk kaffe eller cigarren då och då. När den är klar blir han tyst och slår domen i disken
+direkt. Analysen är redan skriven, men han låtsas: när du har bett om den fortsätter han prata i 15–25 sekunder (`LATSAS` i [public/rum-hasse.js](public/rum-hasse.js), raderna kommer i ordning: *Jag läser tidningarna*, *Jag har full kontroll*, *Man ska
+inte stressa fram ett tips*) och tar en klunk kaffe eller cigarren då och då. När den är klar blir han tyst och slår domen i disken
 (se *Slaget*), och domen står i guld. Sedan säger han texten en mening i taget, ord för ord med munnen i takt (och det hörs, se *Ljudet*), med en paus
 mellan meningarna och en längre före en kort mening, och gesterna kommer vid de bestämda orden
 (*Nej nej nej*, *varningens finger*, ibland handflatan i disken) eller då och då vid en lång mening. Ett klick var som helst
@@ -3939,7 +3939,7 @@ resultatet i modellens prognos (resultatmatrisen i `data/match/<id>.json`, samma
 visar) bland utfallen han har ringat in, så att resultatet aldrig går emot tecknen. Har modellen
 ingen prognos för matchen säger han inget resultat (`resultatet` i
 [public/rum-hasse.js](public/rum-hasse.js)). Sist säger han vad han tycker om det du själv har på
-kupongen (*Du har etta, och det är dina pengar.*). Han minns på enheten vad du har
+kupongen (*På din kupong har du bara etta. Det var kaxigt.*). Han minns på enheten vad du har
 frågat om: på matchens rad står hans tecken ifyllda i guld i rutorna 1 X 2, som på kupongen, med
 resultatet bredvid i en rak spalt. *Nästa match* räknar
 (*Nu är halva kupongen klar*). Bara tecken du själv har bett om syns, så att listan inte blir ett
@@ -3985,7 +3985,7 @@ aldrig), med den svenska mansrösten Mattias lite långsammare och mörkare än 
 [config/hasse.js](config/hasse.js)). Han säger två slags saker ([src/rost.js](src/rost.js)): de färdiga
 replikerna i [public/rum-hasse-repliker.js](public/rum-hasse-repliker.js) med fälten ifyllda på
 alla sätt som sidan kan fylla dem (gängets efternamn, dagarna, tecknen i ord och resultaten 0–0
-till 4–4 – 250 repliker, 7 400 tecken), och sin text till varje analys, mening för mening, delad som sidan delar den
+till 4–4 – 183 repliker, 6 000 tecken), och sin text till varje analys, mening för mening, delad som sidan delar den
 ([public/rum-hasse-meningar.js](public/rum-hasse-meningar.js)). En omgång med tretton matcher är
 ungefär 10 000 tecken.
 
