@@ -439,10 +439,6 @@ window.RumHasse = (() => {
     loop();
   }
 
-  // Han väntar på en: vid matchlistan, när du ska välja och efter en analys – och när han har frågat
-  // om han ska fylla i din kupong, om han har lutat sig tillbaka och kupongen inte är hos honom.
-  const vantar = () => ['fraga', 'val', 'klar'].includes(H.fas) || (H.fas === 'hjalp' && !H.kup && Math.abs(stalle()) < 0.01);
-
   function loop() {
     cancelAnimationFrame(H.raf);
     let last = 0;
@@ -462,10 +458,10 @@ window.RumHasse = (() => {
       // för sig själv, suckar (smatt)
       if (ms > H.trum) {
         H.trum = ms + SMATT[0] + Math.random() * (SMATT[1] - SMATT[0]);
-        if (!calm() && !H.klipp && !H.ko.length && !H.fig.ror() && (!H.sagt || H.sagt.klar) && vantar()) smatt();
+        if (!calm() && !H.klipp && !H.ko.length && !H.fig.ror() && (!H.sagt || H.sagt.klar) && ['fraga', 'val', 'klar'].includes(H.fas)) smatt();
       }
       // och ibland njuter han av kaffet eller tar cigarren ur askkoppen, varannan gång
-      if (ms > H.vanaT && !H.klipp && !H.ko.length && !H.fig.ror() && (!H.sagt || H.sagt.klar) && vantar()) {
+      if (ms > H.vanaT && !H.klipp && !H.ko.length && !H.fig.ror() && (!H.sagt || H.sagt.klar) && ['fraga', 'val', 'klar'].includes(H.fas)) {
         H.vanaT = ms + VANA[0] + Math.random() * (VANA[1] - VANA[0]);
         vana();
       }
@@ -489,7 +485,6 @@ window.RumHasse = (() => {
     H.on = false;
     H.fraga = null;
     tystna();
-    hjalpBort();
     cancelAnimationFrame(H.raf);
     H.klipp = null;
     H.ko.length = 0;
@@ -505,7 +500,6 @@ window.RumHasse = (() => {
 
   function hemma() {
     H.svanger = false;
-    hjalpBort();
     if (window.Rum && Rum.vila) Rum.vila(false);
     H.world.style.transition = '';
     H.rum.classList.remove('hasse-pan', 'hasse-framme');
@@ -1169,7 +1163,6 @@ window.RumHasse = (() => {
   function fraga() {
     const s = $('.rh-samtal');
     const forst = !H.on;
-    hjalpBort();
     if (forst) {
       H.klipp = null;
       H.ko = [];
@@ -1424,224 +1417,18 @@ window.RumHasse = (() => {
         s.querySelector('.rh-ja').addEventListener('click', () => {
           x.sen = null;
           hoppa();
-          repliker([{ text: lott(REP().avbruten) }], { i: nu(), sen: () => slutet(m, signs) });
+          repliker([{ text: lott(REP().avbruten) }], { i: nu(), sen: () => slutet(m) });
         });
-        x = repliker(texten, { i: nu(), sen: () => slutet(m, signs), direkt: calm() });
+        x = repliker(texten, { i: nu(), sen: () => slutet(m), direkt: calm() });
       },
     });
   }
-  // Efter texten: han erbjuder sig att fylla i din kupong med det han sa (signs), om det går, och
-  // annars Nästa match.
-  function slutet(m, signs = null) {
-    const vem = H.fraga;
-    if (!signs) { klar(m); return; }
-    H.fas = 'hjalp';
-    forslagen(m, signs).then((f) => {
-      if (H.fraga !== vem) return;
-      if (f) erbjud(m, f, vem);
-      else klar(m);
-    }, () => { if (H.fraga === vem) klar(m); });
-  }
-  function klar(m) {
+  function slutet(m) {
     const s = $('.rh-samtal');
     H.fas = 'klar';
-    hemat();
+    if (Math.abs(H.T - GEST.hem.vila) > 0.01 || H.klipp) spela('hem');
     s.querySelector('.rh-slut').innerHTML = `<button type="button" class="rh-knapp huvud">Nästa match</button><a class="rh-vag" href="#match/${esc(m.id)}">Matchbladet</a>`;
     s.querySelector('.rh-slut .huvud').addEventListener('click', fraga);
-  }
-  // Där han står när det som spelas och väntar är klart: 0 i vilan, 5,5 med händerna på disken när
-  // han pratar. Han lutar sig tillbaka (hem) en gång, också om det ber om det två gånger.
-  const stalle = () => (H.ko.length ? H.ko[H.ko.length - 1].vila : H.klipp ? H.klipp.vila : H.T);
-  function hemat() {
-    if (GEST.hem && Math.abs(stalle() - GEST.hem.vila) > 0.01) spela('hem');
-  }
-  // En gest nu, om han inte gör något annat: tal när han sitter med händerna på disken som när han
-  // pratar (gruppen tal börjar där), annars vila ur vilan (gruppen smatt).
-  function gestNu(tal, vila) {
-    if (calm() || H.klipp || H.ko.length) return;
-    const n = Math.abs(H.T - 5.5) < 0.01 ? tal : Math.abs(H.T) < 0.01 ? vila : null;
-    if (n && GEST[n]) spela(n);
-  }
-
-  // ---------- han fyller i din kupong ----------
-  //
-  // Allra sist erbjuder han sig att fylla i matchen på din kupong: den som är din, Dogges, Teijders
-  // eller Lainos, som du fyller i på pulten och under Kupong (Samtal.pult, utkastet på enheten). Dina
-  // svar är hans tecken och, när han har garderat, ett smalare val ur dem: spiken, eller de två
-  // troligaste när han har helgarderat, efter modellens prognos. Vet kupongen inte vem du är frågar
-  // han vems den är (bara de som inte har lämnat in). Sedan glider din kupong in längs disken från
-  // affären och reser sig framför samtalet, pennan skriver ditt namn om du nyss sa det och kryssar i
-  // matchen (Rum.hasse i rum.js), och kupongen glider tillbaka samma väg till pulten. Inget lämnas in
-  // och inget sparas hos tjänsten: det är samma sak som att kryssa själv på kupongen i handen.
-  // Han frågar bara när din kupong går att fylla i (du har inte lämnat in, och omgången har inte
-  // börjat) och du inte redan har hans tecken. Det han säger står i rum-hasse-repliker.js (hjalp …).
-  const BESTAMD = { 1: 'ettan', X: 'krysset', 2: 'tvåan' };
-  const iOrdning = (t) => [...t].sort((a, b) => KORT.indexOf(a) - KORT.indexOf(b)).join('');
-  // Samtal.pult.state() när din kupong går att fylla i med den här matchen, annars null.
-  function fyllbar(m) {
-    const p = window.Samtal && Samtal.pult ? Samtal.pult.state() : null;
-    if (!p || !p.fyll || !window.Rum || !Rum.hasse) return null;
-    if (!p.s.matcher.some((x) => String(x.id) === String(m.id)) || !(Date.parse(m.avspark) > Date.now())) return null;
-    return p.vem || p.val.length ? p : null;
-  }
-  // Dina svar: [{tecken, text}], hans tecken först, eller null om han inte ska fråga.
-  async function forslagen(m, signs) {
-    const p = fyllbar(m);
-    if (!p) return null;
-    const du = iOrdning(String(p.tecken[m.id] || ''));
-    const han = iOrdning(signs.map((n) => KORT[n]));
-    if (!han || han === du) return null;
-    const S = REP().hjalpSvar;
-    const ut = [{ tecken: han, text: han.length === 3 ? S.helgardera : fyll(S.ja, { han: iOrd([...han]) }) }];
-    // det smalare valet: de troligaste av hans tecken i modellens prognos (1, X, 2)
-    const pr = han.length > 1 ? await prognosen(m.id) : null;
-    const q = pr && pr.status === 'ok' && Array.isArray(pr.p) && pr.p.length === 3 ? pr.p : null;
-    if (q) {
-      const smal = iOrdning([...han].sort((a, b) => q[KORT.indexOf(b)] - q[KORT.indexOf(a)]).slice(0, han.length - 1));
-      if (smal !== du) ut.push({ tecken: smal, text: smal.length === 1 ? fyll(S.spika, { en: BESTAMD[smal] }) : fyll(S.bara, { han: iOrd([...smal]) }) });
-    }
-    return ut;
-  }
-  // Svaren i foten, där Nästa match annars står: lappar och Nej tack. Ett dubbelklick på förra svaret
-  // får inte landa på knappen som nu ligger under pekaren (som i valj).
-  function svaren(lappar, nej) {
-    const slut = $('.rh-samtal .rh-slut');
-    const t0 = performance.now();
-    const nar = (f) => () => { if (performance.now() - t0 >= 450) f(); };
-    slut.innerHTML = lappar.map((l, i) => `<button type="button" class="rh-knapp${l.huvud ? ' huvud' : ''}" data-i="${i}">${esc(l.text)}</button>`).join('') +
-      `<button type="button" class="rh-vag rh-nej">${esc(REP().hjalpSvar.nej)}</button>`;
-    for (const b of slut.querySelectorAll('[data-i]')) b.addEventListener('click', nar(() => lappar[+b.dataset.i].gor()));
-    slut.querySelector('.rh-nej').addEventListener('click', nar(nej));
-  }
-  // Det han säger om kupongen står på en egen rad direkt ovanför svaren (som när han erbjuder sig
-  // att titta igen), så att frågan syns också när texten ovanför inte är utläst.
-  const sager = (text, sen = null) => repliker([{ text }], { i: $('.rh-samtal .rh-hjalp'), sen, rad: true });
-  // Han frågar, med händerna kvar på disken som när han pratade; dröjer du lutar han sig tillbaka.
-  function erbjud(m, forslag, vem) {
-    const r = REP();
-    const namn = dittNamn();
-    H.fas = 'hjalp';
-    const text = $('.rh-samtal .rh-text');
-    const nere = text.scrollHeight - text.scrollTop - text.clientHeight < 40;
-    if (!$('.rh-samtal .rh-hjalp')) text.insertAdjacentHTML('afterend', '<p class="rh-fragan rh-hjalp"></p>');
-    if (nere) text.scrollTop = text.scrollHeight;
-    svaren(forslag.map((f, i) => ({ text: f.text, huvud: !i, gor: () => ja(m, f, vem) })), () => nej(m, vem));
-    sager(fyll(lott(namn ? r.hjalpNamn : r.hjalp), { namn }));
-    clearTimeout(H.hemT);
-    H.hemT = setTimeout(() => { if (H.fraga === vem) hemat(); }, 9000);
-  }
-  function nej(m, vem) {
-    if (H.fraga !== vem) return;
-    clearTimeout(H.hemT);
-    $('.rh-samtal .rh-slut').innerHTML = '';
-    gestNu('axla', 'brynet');
-    sager(lott(REP().hjalpNej), () => { if (H.fraga === vem) klar(m); });
-  }
-  // Det gick inte (du hann lämna in, eller matchen startade): han säger det, och sedan Nästa match.
-  function garInte(m, vem) {
-    $('.rh-samtal .rh-slut').innerHTML = '';
-    sager(REP().hjalpGarInte, () => { if (H.fraga === vem) klar(m); });
-  }
-  function ja(m, f, vem) {
-    if (H.fraga !== vem) return;
-    clearTimeout(H.hemT);
-    const p = fyllbar(m);
-    if (!p) { garInte(m, vem); return; }
-    if (p.vem) { fyllI(m, f, vem, false); return; }
-    // vems kupong: bara de som inte har lämnat in, med efternamnet som på kupongen
-    const namnen = p.s.gang.filter((g) => p.val.includes(g.id));
-    svaren(namnen.map((g) => ({ text: String(g.namn || g.id).trim().split(/\s+/).pop(), gor: () => {
-      if (H.fraga !== vem) return;
-      if (!fyllbar(m) || !Samtal.pult.vem(g.id)) { garInte(m, vem); return; }
-      fyllI(m, f, vem, true);
-    } })), () => nej(m, vem));
-    sager(REP().hjalpVem);
-  }
-  // Han tar kupongen och fyller i den. namn: du sa nyss vem du är, och han skriver ditt namn.
-  async function fyllI(m, f, vem, namn) {
-    // din kupong som den ligger på pulten, innan han har fyllt i den
-    const el = document.createElement('div');
-    el.className = 'rum-flat rum-kup rh-kup';
-    el.setAttribute('aria-hidden', 'true');
-    const kup = Rum.hasse.kupong(el, namn);
-    if (!kup) { garInte(m, vem); return; }
-    // utkastet först, så att det står rätt också om man går härifrån mitt i
-    Samtal.pult.tippa(m.id, f.tecken);
-    if (Rum.redraw) Rum.redraw();
-    H.fas = 'hjalp';
-    $('.rh-samtal .rh-slut').innerHTML = '';
-    gestNu('gnida', 'skrocka');
-    sager(lott(REP().hjalpTar));
-    await tystnat();
-    if (H.fraga !== vem) return;
-    await visaKupongen(m, f, el, kup, namn, vem);
-    if (H.fraga !== vem) return;
-    gestNu('tummen', 'nicka');
-    sager(lott(REP().hjalpKlar), () => { if (H.fraga === vem) klar(m); });
-  }
-  // Din kupong glider in längs disken från affären till höger, reser sig och stannar framför samtalet
-  // (på höjden mitt i bilden), så stor som får plats; pennan fyller i den, och den glider tillbaka
-  // samma väg. Samtalet bleknar under den så länge.
-  async function visaKupongen(m, f, el, kup, namn, vem) {
-    hjalpBort();
-    H.vy.append(el);
-    H.kup = el;
-    const sa = $('.rh-samtal');
-    const vr = H.vy.getBoundingClientRect();
-    const sr = sa.getBoundingClientRect();
-    const W = vr.width;
-    const Hj = vr.height;
-    let z;
-    let cx;
-    let cy;
-    if (H.hog) {
-      z = Math.min((W * 0.94) / kup.w, (Hj * 0.8) / kup.h);
-      cx = W / 2;
-      cy = Hj / 2;
-    } else {
-      z = Math.min(1.1, (sr.width + 70) / kup.w, (Hj * 0.78) / kup.h);
-      cx = Math.max((kup.w * z) / 2 + 16, sr.left - vr.left + sr.width / 2);
-      cy = Hj * 0.5;
-    }
-    const at = (x, y, rx, rz, s) => `translate(${x.toFixed(1)}px, ${y.toFixed(1)}px) translate(-50%, -50%) perspective(1300px) rotateX(${rx}deg) rotateZ(${rz}deg) scale(${s.toFixed(4)})`;
-    const framme = at(cx, cy, 0, -1.5, z);
-    sa.classList.add('under-kup');
-    const vila = (ms) => new Promise((ok) => setTimeout(ok, ms));
-    if (calm()) {
-      el.style.transform = framme;
-      await Rum.hasse.kryssa(el, m.id, f.tecken, namn);
-      await vila(1600);
-    } else {
-      // disken framför honom (dess framkant, H.v.kant), och vägen längs den
-      const disk = Math.min(Hj - 30, (H.v && H.v.kant) || Hj * 0.78);
-      const skugga = (a) => `0 ${Math.round(8 + 26 * a)}px ${Math.round(16 + 64 * a)}px rgba(0, 0, 0, ${(0.45 + 0.15 * a).toFixed(2)})`;
-      const vagen = [
-        { offset: 0, transform: at(W + (kup.w * z) / 2, disk, 62, -12, z * 0.8), boxShadow: skugga(0), easing: 'cubic-bezier(0.3, 0.5, 0.45, 1)' },
-        { offset: 0.5, transform: at(W * (H.hog ? 0.55 : 0.46), disk - Hj * 0.05, 50, -6, z * 0.86), boxShadow: skugga(0.15), easing: 'cubic-bezier(0.25, 0.55, 0.3, 1)' },
-        { offset: 0.86, transform: at(cx, cy + 5, -3, -0.8, z * 1.008), boxShadow: skugga(0.9), easing: 'ease-in-out' },
-        { offset: 1, transform: framme, boxShadow: skugga(1) },
-      ];
-      const dit = el.animate(vagen, { duration: 1150, fill: 'both' });
-      await dit.finished.catch(() => {});
-      if (H.kup !== el) return;
-      await Rum.hasse.kryssa(el, m.id, f.tecken, namn);
-      if (H.kup !== el) return;
-      await vila(550);
-      if (H.kup !== el) return;
-      // tillbaka till pulten samma väg, lite fortare
-      dit.reverse();
-      dit.updatePlaybackRate(-1.25);
-      await dit.finished.catch(() => {});
-    }
-    if (H.kup === el) hjalpBort();
-  }
-  // Kupongen hos honom tas bort (också när man går härifrån mitt i), och samtalet syns igen.
-  function hjalpBort() {
-    clearTimeout(H.hemT);
-    if (H.kup) H.kup.remove();
-    H.kup = null;
-    const sa = H.vy && H.vy.querySelector('.rh-samtal');
-    if (sa) sa.classList.remove('under-kup');
   }
 
   // Under en match går ett klick var som helst framåt, och Tillbaka eller Esc går

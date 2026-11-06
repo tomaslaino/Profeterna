@@ -55,8 +55,8 @@ const stor = (t) => t.replace(/^./, (c) => c.toUpperCase());
 const DAGAR = ['i dag', 'i morgon', ...['måndag', 'tisdag', 'onsdag', 'torsdag', 'fredag', 'lördag', 'söndag'].map((d) => `på ${d}`)];
 // Resultaten han kan säga: modellens resultatmatris har 0–4 mål per lag (resultatet i rum-hasse.js).
 const RESULTAT = [0, 1, 2, 3, 4].flatMap((h) => [0, 1, 2, 3, 4].map((b) => `${h}–${b}`));
-// Knapparna (lar, hjalpSvar) och tecknen i ord sägs inte, och inte heller att han har tappat rösten.
-const TYSTA = new Set(['lar', 'hjalpSvar', 'tecken', 'utanRost']);
+// Knapparna (lar) och tecknen i ord sägs inte, och inte heller att han har tappat rösten.
+const TYSTA = new Set(['lar', 'tecken', 'utanRost']);
 
 function mallar(o, ut = [], nyckel = '') {
   if (TYSTA.has(nyckel)) return ut;

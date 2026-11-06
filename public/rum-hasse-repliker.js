@@ -153,21 +153,6 @@
     skilda: ['På din kupong har du {du}, och det kan du glömma.'],
   },
 
-  // Allra sist erbjuder han sig att fylla i matchen på din kupong (hjalp i rum-hasse.js), när den går
-  // att fylla i och du inte redan har hans tecken. "den" är matchen. hjalpSvar är dina svar
-  // (knappar, sägs inte): {han} hans tecken i ord (etta och kryss), {en} det troligaste av dem
-  // (ettan, krysset, tvåan).
-  hjalp: ['Ska jag fylla i den på din kupong?', 'Vill du att jag kryssar i den på din kupong?'],
-  hjalpNamn: ['Ska jag fylla i den på din kupong, {namn}?', 'Vill du att jag kryssar i den på din kupong, {namn}?'],
-  hjalpSvar: { ja: 'Ja, {han}', helgardera: 'Ja, helgardera', spika: 'Spika {en}', bara: 'Bara {han}', nej: 'Nej tack' },
-  // ... när kupongen inte vet vem du är
-  hjalpVem: 'Vems kupong ska jag fylla i?',
-  // ... när du har svarat: innan kupongen kommer, när den är ifylld och när du inte vill
-  hjalpTar: ['Ge hit kupongen.', 'Ge mig kupongen, så fixar jag det.'],
-  hjalpKlar: ['Nu står det rätt på din kupong.', 'Nu har du rätt tecken på din kupong. Lämna in kupongen när du är klar.', 'Det där kommer du att tacka mig för.'],
-  hjalpNej: ['Som du vill. Det är din kupong.', 'Då får du fylla i den själv.'],
-  hjalpGarInte: 'Din kupong går inte att fylla i längre.',
-
   // När något inte går.
   ingenKupong: 'Det finns ingen kupong än.',
   ejKlar: ['Den har jag inte kommit till än.', 'Den tar jag sen.'],

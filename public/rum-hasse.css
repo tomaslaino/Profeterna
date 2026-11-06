@@ -118,12 +118,6 @@
 .rh-tillbaka::before { content: "←"; }
 .rh-tillbaka::after { content: none; }
 .rh-knapp:focus-visible, .rh-vag:focus-visible { outline: 2px solid #f0d699; outline-offset: 3px; }
-/* Din kupong när han fyller i den (hjalp i rum-hasse.js): samma kupong som på pulten (rum.css), som
-   glider in längs disken och reser sig framför samtalet. Mitten läggs i (x, y) med transform, och
-   samtalet bleknar under den så länge. */
-.rum-hasse-vy .rh-kup { left: 0; top: 0; z-index: 3; pointer-events: none; box-shadow: 0 34px 80px rgba(0, 0, 0, 0.6); will-change: transform; }
-.rum.smal .rum-hasse-vy .rh-kup { width: 420px; height: 620px; }
-.rh-samtal.under-kup { opacity: 0; pointer-events: none; }
 /* slaget i disken: bilden rycker till (koppen hoppar i rum-hasse-3d.js) */
 .rh-slag { animation: rh-slag 0.42s linear; }
 /* --slag: hur hårt han slår (rum-hasse.js) */
