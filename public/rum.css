@@ -776,7 +776,8 @@ canvas.rum-neonhalo { opacity: 0.28; }
 @keyframes rum-kl-kupa { 20% { transform: rotate(1.6deg); } 45% { transform: rotate(-1.2deg); } 70% { transform: rotate(0.6deg); } }
 @keyframes rum-kl-pl { 0% { opacity: 0; transform: scale(0.7); } 25% { opacity: 0.9; } 100% { opacity: 0; transform: scale(1.35); } }
 
-.rum-3d { position: absolute; left: 160px; top: 120px; width: 1280px; height: 560px; pointer-events: none; }
+/* gänget (rum-3d.js): ända ut till scenens vänsterkant, så att den som går iväg går ut ur bilden */
+.rum-3d { position: absolute; left: 0; top: 120px; width: 1440px; height: 560px; pointer-events: none; }
 
 /* ---------- röken under taket och dammet i ljuset ---------- */
 

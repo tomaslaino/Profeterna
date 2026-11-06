@@ -42,7 +42,8 @@
 // kortregistret (=Arsenal … med det kortet i handen). ?rum-stopp=<timmar> som
 // om det var så långt kvar till spelstoppet, ?rum-tittar som om matcherna
 // pågick och ?rum-mal=dl:1,dt:-1,dj:0 som om det blev mål (rätt, fel, ingen
-// skillnad), ?rum-video videon nära och
+// skillnad), ?rum-akt=dl:skamt@6 ett påhitt, ?rum-ga=dl:5 att DL går iväg
+// (fem sekunder in), ?rum-video videon nära och
 // ?rum-sak=ur|skar|ram|kort|pokal|kork|vm94|ifk|nacional|lopsedel|chelsea|dorr|kupong en närbild.
 //
 // Läses efter kupong.js, samtal.js, tippare.js och kronan.js och använder
@@ -449,7 +450,7 @@ window.Rum = (() => {
   <rect x="236" y="${S + 22}" width="748" height="6" fill="#000" opacity=".3" filter="url(#rum-b4)"/>`, '', [220, 540, 780, 75]) +
       // det svaga skenet från neonen för sig, med en fjärdedel av bildpunkterna i telefonen
       svg(`<ellipse cx="560" cy="${S - 150}" rx="360" ry="150" fill="#ff3a2a" opacity=".05" filter="url(#rum-b40)"/>`, 'rum-sken', [40, 120, 1040, 600], 0.25) +
-      '<canvas id="rum-3d" class="rum-3d" width="1280" height="560"></canvas>';
+      '<canvas id="rum-3d" class="rum-3d" width="1440" height="560"></canvas>';
   }
 
   // Tv:n i hörnet (rum-tv.js).
@@ -1625,14 +1626,27 @@ ${window.RumRegister ? RumRegister.nara() : ''}
   }
 
   // ?rum-akt=dl:kors,dj:dunk: ett påhitt för bilder (rum-3d.js, AKTER) – mitt
-  // i det med ?rum-t, annars om och om igen från nu.
+  // i det med ?rum-t (dl:skamt@6: sex sekunder in), annars om och om igen från
+  // nu. Gängets påhitt (skamt, gral, titta) ges alla tre.
   function provAkt() {
     const v = R.q.get('rum-akt');
     if (!v || !R.fig || !R.fig.prova) return;
     for (const x of v.split(',')) {
-      const [k, namn] = x.split(':').map((y) => y.trim());
-      if (k && namn) R.fig.prova(k, namn, now() - (still() ? 2.6 : 0));
+      const [k, y] = x.split(':').map((z) => z.trim());
+      const [namn, at] = (y || '').split('@');
+      if (k && namn) R.fig.prova(k, namn, now() - (at ? Number(at) || 0 : still() ? 2.6 : 0));
     }
+  }
+
+  // ?rum-ga=dl: DL går iväg och kommer tillbaka (rum-3d.js, gaNu) – nu och
+  // sedan var fyrtionde sekund, eller med ?rum-t så långt in (dl:5: fem sekunder).
+  function provGa() {
+    const v = R.q.get('rum-ga');
+    if (!v || !R.fig || !R.fig.ga) return;
+    const [k, l] = v.split(':').map((y) => y.trim());
+    const go = () => R.fig.ga(k, now(), Number(l) || 0);
+    go();
+    if (!still()) setInterval(() => { if (R.on) go(); }, 40000);
   }
 
   // ---------- rörelsen ----------
@@ -2270,6 +2284,7 @@ ${window.RumRegister ? RumRegister.nara() : ''}
         if (window.RumFolk) RumFolk.mount(R.el, { fig: () => R.fig, inr: () => R.inr, now, nara, fokus, teckna, visa });
         provMal();
         provAkt();
+        provGa();
         frame();
       });
     } catch (err) {
