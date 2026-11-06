@@ -436,8 +436,9 @@ canvas.rum-neonhalo { opacity: 0.28; }
 /* ---------- pulten: kupongen ---------- */
 
 .rum-flat { position: absolute; display: block; transform-origin: 50% 50%; }
-/* kupongen på pulten och i handen (id:t går före a.rum-sak:hover, färgen) */
-#rum-kupong, .rum-handen {
+/* kupongen på pulten och i handen (id:t går före a.rum-sak:hover, färgen), och hos Hasse Backe när han
+   fyller i den (.rh-kup, på sin plats i rum-hasse.css) */
+#rum-kupong, .rum-handen, .rh-kup {
   left: 430px;
   top: 618px;
   width: 660px;
@@ -907,7 +908,7 @@ canvas.rum-neonhalo { opacity: 0.28; }
    Mitten är densamma som den breda kupongens (760, 853), så att högen och
    handen ligger där de ligger (rum.js, KUP). */
 .rum.smal #rum-kupong, .rum.smal .rum-handen, .rum.smal .rum-bak { left: 550px; top: 543px; width: 420px; height: 620px; }
-.rum.smal #rum-kupong, .rum.smal .rum-handen { padding: 0 16px 0 36px; }
+.rum.smal #rum-kupong, .rum.smal .rum-handen, .rum.smal .rh-kup { padding: 0 16px 0 36px; }
 .rum.smal .rum-kup .band { margin: 0 -16px 0 -36px; padding: 0 16px 0 36px; }
 .rum.smal .rum-kup .band small { letter-spacing: 0.18em; }
 .rum.smal .rum-kup .topp .pp-stop { min-width: 0; }

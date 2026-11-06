@@ -3879,9 +3879,10 @@ en fast bild.
 
 ### Hasse Backe
 
-*Hasse Backe (fiktiv)* analyserar matcherna på stryktipskupongen, och det är allt man kan be
-honom om i baren: inga följdfrågor och ingen textruta. (Vid anslagstavlan kan man också ropa till
-honom om en lapp, och han svarar från baren, se [Anslagstavlan](#anslagstavlan).) Han sitter i baren till vänster utanför bilden, och
+*Hasse Backe (fiktiv)* analyserar matcherna på stryktipskupongen och fyller i dem på din kupong om du
+vill, och det är allt man kan be honom om i baren: inga följdfrågor och ingen textruta. (Vid
+anslagstavlan kan man också ropa till honom om en lapp, och han svarar från baren, se
+[Anslagstavlan](#anslagstavlan).) Han sitter i baren till vänster utanför bilden, och
 längst ut på pulten står hans kaffe vid notan, och där ligger hans hand. Ett klick på dem, eller H,
 och kameran slår snabbt åt vänster till honom. Där sitter han bakom bardisken, mitt emot väggen med
 anslagstavlan, och har vridit sig lite mot en, med underarmarna på disken, kaffet och notan vid den
@@ -4174,7 +4175,8 @@ resultatet i modellens prognos (resultatmatrisen i `data/match/<id>.json`, samma
 visar) bland utfallen han har ringat in, så att resultatet aldrig går emot tecknen. Har modellen
 ingen prognos för matchen säger han inget resultat (`resultatet` i
 [public/rum-hasse.js](public/rum-hasse.js)). Sist säger han vad han tycker om det du själv har på
-kupongen (*På din kupong har du bara etta. Det var kaxigt.*); har du inget på matchen säger han inget om den. Han minns på enheten vad du har
+kupongen (*På din kupong har du bara etta. Det var kaxigt.*); har du inget på matchen säger han inget om den. Allra sist
+erbjuder han sig att fylla i den på din kupong (se *Han fyller i din kupong* nedan). Han minns på enheten vad du har
 frågat om: på matchens rad står hans tecken ifyllda i guld i rutorna 1 X 2, som på kupongen, med
 resultatet bredvid i en rak spalt. *Nästa match* räknar
 (*Nu är halva kupongen klar*). Bara tecken du själv har bett om syns, så att listan inte blir ett
@@ -4182,6 +4184,37 @@ automatiskt tips.
 Går hans röst inte att få säger han det och visar analysen i skrift. Allt han säger runt omkring är
 färdiga rader, utan AI, i [public/rum-hasse-repliker.js](public/rum-hasse-repliker.js). Med minskad
 rörelse i systemet står allt direkt, utan gester.
+
+**Han fyller i din kupong.** Efter analysen frågar han om han ska fylla i matchen på din egen kupong,
+den som är Dogges, Teijders eller Lainos och som du fyller i på pulten och under Kupong (samma utkast
+på enheten, `Samtal.pult`): *Vill du att jag kryssar i den på din kupong, Laino?* Frågan står på en
+egen rad direkt ovanför svaren, så att den syns också när texten ovanför inte är utläst. Svaren är hans
+tecken i terrakotta (*Ja, etta och kryss*) och, när han har garderat, ett smalare val ur dem i
+krämvitt: spiken (*Spika ettan*), eller två tecken när han har helgarderat (*Bara etta och kryss*),
+de troligaste av hans tecken i modellens prognos. *Nej tack* går vidare till *Nästa match*. Vet
+kupongen inte vem du är frågar han *Vems kupong ska jag fylla i?*, med efternamnen på dem som inte har
+lämnat in, och den du väljer blir den du är, som när du väljer namn på kupongen. Sedan säger han *Ge
+hit kupongen.* och gnuggar händerna, samtalet bleknar, och din kupong – samma som på pulten, med dina
+kryss och motiveringar – glider in längs disken från affären till höger, reser sig och stannar framför
+samtalet (på höjden mitt i bilden). Pennan skriver ditt namn om du nyss sa det, suddar ut det som inte
+ska stå där, drar hans kryss ett i taget med samma blyerts och samma kryss som på pulten och lägger sig
+där den ligger på pulten. Kupongen glider tillbaka samma väg, och han sätter tummen upp: *Nu står det
+rätt på din kupong.* Har du dröjt med svaret har han lutat sig tillbaka, och då skrockar och nickar
+han i stället för att gnugga händerna och sätta tummen upp. Inget lämnas in och inget sparas hos
+tjänsten: det är samma sak som att kryssa själv på kupongen i handen, och du lämnar in som vanligt.
+Han frågar bara när din kupong går att fylla i (du har inte lämnat in och omgången har inte börjat)
+och du inte redan har hans tecken på matchen; efter en match han redan har svarat på (den står
+direkt) frågar han inte. Med minskad rörelse står kupongen ifylld en stund. Samtalet står i `slutet`
+och det som följer i [public/rum-hasse.js](public/rum-hasse.js), raderna under `hjalp` i
+[public/rum-hasse-repliker.js](public/rum-hasse-repliker.js), och kupongen och pennan i `Rum.hasse`
+i [public/rum.js](public/rum.js) (`hasseKupong`, `hasseKryssa`).
+
+Provat 2026-11-06 i headless Chromium med mjukvarugrafik mot ett lokalt bygge med en påhittad omgång
+(lördagens tretton matcher med sina analyser, prognoserna ur journalen): 1440 × 900 där Laino hade en
+tvåa och en motivering och fick ettan och krysset (tvåan suddades, motiveringen stod kvar), utan namn
+där Johansson valdes och namnet skrevs innan ettan kryssades, *Nej tack*, 412 × 915 och minskad
+rörelse. Utkastet och kupongen på pulten fick tecknen, och inget skickades till tjänsten. Inte provat i
+Safari, i en riktig telefon eller med ljudet på.
 
 Replikerna går att använda till annat: `RumHasse.repliker(lista, { i, sen, direkt })`, där varje
 replik är `{ text, gest?, vid?, ny?, skrift? }` och gesten ett namn i `RumHasse.gester`, ett klipp på
@@ -4220,7 +4253,7 @@ aldrig), med den svenska mansrösten Mattias lite långsammare och mörkare än 
 [config/hasse.js](config/hasse.js)). Han säger två slags saker ([src/rost.js](src/rost.js)): de färdiga
 replikerna i [public/rum-hasse-repliker.js](public/rum-hasse-repliker.js) med fälten ifyllda på
 alla sätt som sidan kan fylla dem (gängets efternamn, dagarna, tecknen i ord och resultaten 0–0
-till 4–4 – 183 repliker, 6 000 tecken), och sin text till varje analys, mening för mening, delad som sidan delar den
+till 4–4 – 255 repliker, 10 000 tecken), och sin text till varje analys, mening för mening, delad som sidan delar den
 ([public/rum-hasse-meningar.js](public/rum-hasse-meningar.js)). En omgång med tretton matcher är
 ungefär 10 000 tecken.
 
