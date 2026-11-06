@@ -1,5 +1,5 @@
 {
- "uppdaterad": "2026-11-06T17:23:50.072Z",
+ "uppdaterad": "2026-11-06T17:24:31.332Z",
  "omgang": {
   "id": "2026-11-07-st4978",
   "matcher": [
@@ -411,23 +411,23 @@
    },
    "hasse": {
     "stycken": [
-     "Charlton har förlorat fyra raka och skapar minst av alla lag i serien. De har inte gjort mål i tre av de fyra senaste matcherna, och ett lag som inte kommer till chanser vinner inga matcher, hur mycket tränaren än ber om det.",
-     "Sheffield United vände mot Preston trots att de låg under efter två minuter, och nu kan Phillips och Rothwell vara tillbaka. Här höjer jag ändå ett varningens finger. Charlton släpper in mindre än ett mål per match hemma, och en tränare som spelar för jobbet brukar få laget att springa som fan.",
-     "Det blir få mål, och Sheffield United är det bättre laget. Jag ringar in krysset och tvåan."
+     "Charlton har inte vunnit på elva matcher och skapar minst chanser av alla lag i serien. Har man gjort sex mål på elva matcher har man ett problem i anfallsspelet, och det löser man inte till lördag. Sheffield United har vunnit tre av de fem senaste och kan få tillbaka Phillips och Rothwell, så de har mer kvalitet på planen.",
+     "Charlton släpper ändå in mindre än ett mål per match hemma, och när Nathan Jones spelar för jobbet brukar han få laget att jobba hårt. Wilder säger åt sina spelare att inte tappa huvudet när de vinner en match. Det här pratade vi om redan i Manchester City, Svennis och jag.",
+     "Jag tror på få mål och att Sheffield United är närmast. Kryss eller tvåa."
     ],
     "tips": "2026-11-06T15:08:44.117Z",
     "uppdrag": {
      "fraser": [
-      "Äsch",
-      "Här höjer jag ett varningens finger"
+      "Lugn nu",
+      "Nej nej nej"
      ],
-     "krydda": null,
+     "krydda": "Det här pratade vi om redan i Manchester City, Svennis och jag.",
      "bielsa": []
     },
     "model": "claude-opus-5-5",
-    "version": "2026-11-04.1",
-    "writtenAt": "2026-11-06T15:08:56.159Z",
-    "attempts": 1
+    "version": "2026-11-05.1",
+    "writtenAt": "2026-11-06T17:24:30.312Z",
+    "attempts": 3
    },
    "model": "claude-opus-5-5",
    "version": "2026-11-04.1",
