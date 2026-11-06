@@ -40,13 +40,13 @@
 // utanför eller Häng tillbaka sätter tillbaka lappen, och Esc igen eller
 // ett klick utanför tavlan hänger tavlan på väggen igen.
 //
-// Under lappen i handen kan man ropa på Hasse Backe (fiktiv), som sitter i
-// baren till vänster (Hasse, vad betyder procenten?, eller H). Han skickar
-// över ett kort där han förklarar lappen: vad talen är, ett exempel ur bladet
-// man har framme och vad han själv gör med det. Kortet glider in från
-// vänster och lägger sig bredvid lappen, eller över den när fönstret är för
-// smalt, och följer med när man bläddrar mellan lapparna. Tack, Hasse, Esc,
-// ett klick på kortet eller utanför lägger undan det.
+// Under lappen i handen kan man ropa till Hasse Backe (fiktiv), som sitter i
+// baren till vänster utanför bilden (Hasse, vad betyder procenten?, eller H),
+// och han svarar därifrån: vad talen är, ett exempel ur bladet man har framme
+// och vad han själv gör med det. Svaret kommer ord för ord bredvid lappen,
+// eller över den när fönstret är för smalt, och med ljudet på hörs han från
+// vänster (RumHasse.fjarran). Tack, Hasse, Esc eller ett klick utanför tystar
+// honom; ett klick på svaret visar resten direkt.
 //
 // Dolda resultat (Spoiler): formen får ?, och lapparna som räknar med
 // resultaten (styrkan, krysset, turen, oddsen, motståndet) står med ? och
@@ -303,14 +303,13 @@ window.RumAnslag = (() => {
   const BUILD = { form: noteForm, skador: noteSkador, styrka: noteStyrka, kryss: noteKryss, tur: noteTur, odds: noteOdds, vila: noteVila, motstand: noteMotstand };
   const VEILED = new Set(['styrka', 'kryss', 'tur', 'odds', 'motstand']);
 
-  // ---------- Hasse förklarar ----------
+  // ---------- Hasse svarar ----------
 
-  // Det man ropar till Hasse om varje lapp (länken under lappen i handen), och
-  // hans kort: stycken i hans röst (prompts/hasse-backe.md: lugn, säker, hela
-  // meningar och inga retoriska frågor). Talen förklaras som på Statistik →
-  // Lagen (divisioner.js), så ändras en lapp ska hans kort följa med. Exemplet
-  // i mitten tas ur bladet man har framme; utan data, eller när bladet räknar
-  // med dolda resultat (D är då null), står kortet utan det.
+  // Det man ropar till Hasse om varje lapp (länken under lappen i handen). Han svarar från
+  // baren med det som står under anslag i rum-hasse-repliker.js, där det också får sitt ljud,
+  // och med ett exempel ur bladet man har framme, som räknas här: en mening, eller null utan
+  // data och när bladet räknar med dolda resultat (D är då null). Exemplet ändras med datan och
+  // sägs därför tyst.
   const ROP = {
     form: 'Hasse, hur läser man formen?',
     skador: 'Hasse, hur mycket betyder skadorna?',
@@ -322,15 +321,18 @@ window.RumAnslag = (() => {
     motstand: 'Hasse, vad säger motståndet?',
   };
   const TACK = 'Tack, Hasse';
-  const lag = (D, name) => esc(D.kort(name));
   // små tal i ord, som i löptext
   const ORD = ['noll', 'en', 'två', 'tre', 'fyra', 'fem', 'sex', 'sju', 'åtta', 'nio', 'tio', 'elva', 'tolv'];
   const ord = (n) => ORD[n] || String(n);
-  const dagar = (n) => `${n === 1 ? 'en' : ord(n)} ${n === 1 ? 'dags' : 'dagars'}`;
+  const dagar = (n) => `${ord(n)} ${n === 1 ? 'dags' : 'dagars'}`;
   // den högsta och den lägsta i bladet (ur samma tal som lappen), eller null
   const ytter = (D, get) => (D ? split(D, get, 1).map((l) => l[0] || null) : [null, null]);
+  // "A har tagit 6,5 poäng mer än …, och B 9,6 poäng mindre."
+  const merMindre = (D, [upp, ned], an) => (upp
+    ? `${D.kort(upp.name)} har tagit ${num(upp.v)} poäng mer än ${an}${ned ? `, och ${D.kort(ned.name)} ${num(ned.v)} poäng mindre` : ''}.`
+    : ned ? `${D.kort(ned.name)} har tagit ${num(ned.v)} poäng mindre än ${an}.` : null);
 
-  const FORKLARA = {
+  const EXEMPEL = {
     form(D) {
       let bast = null;
       for (const m of D ? D.ms : []) {
@@ -341,11 +343,7 @@ window.RumAnslag = (() => {
           if (!bast || p > bast.p) bast = { name: m[side], p };
         }
       }
-      return [
-        'Det är de fem senaste matcherna för båda lagen, i alla tävlingar. V är vinst, O oavgjort och F förlust, och längst till vänster står den senaste. Det är ställningen efter nittio minuter som räknas, så en match som avgjordes på straffar står som oavgjord.',
-        bast && `${lag(D, bast.name)} har bäst form på lappen, med ${bast.p} poäng av 15 möjliga när vinst ger tre poäng och oavgjort en.`,
-        'Formen säger hur det har gått men inget om vilka de har mött. Har de slagit tre bottenlag i rad betyder raden inte så mycket, så titta på Starkast och Motståndet också.',
-      ];
+      return bast && `${D.kort(bast.name)} har bäst form på lappen, med ${bast.p} poäng av 15 möjliga när vinst ger tre poäng och oavgjort en.`;
     },
     skador(D) {
       let flest = null;
@@ -356,52 +354,25 @@ window.RumAnslag = (() => {
           if (s && !s.unknown && s.players.length >= 2 && (!flest || s.players.length > flest.n)) flest = { name: m[side], n: s.players.length };
         }
       }
-      return [
-        'Här står de som saknas eller är osäkra i varje lag. Ett frågetecken efter namnet betyder att han kanske spelar, och avst. att han är avstängd. De tre som har spelat mest står först, och +3 betyder att tre till saknas.',
-        flest && `${lag(D, flest.name)} har flest på listan, ${ord(flest.n)} man.`,
-        'Räkna inte namnen. Det som avgör är om de som saknas brukar spela, och en ordinarie mittback väger tyngre än fem man från bänken. Därför står de som har spelat mest först.',
-      ];
+      return flest && `${D.kort(flest.name)} har flest på listan, ${ord(flest.n)} man.`;
     },
     styrka(D) {
       const teams = D ? D.round.filter((x) => x.t && x.t.str != null) : [];
       const div = DIVS.find((d) => teams.some((x) => x.t.comp === d));
       const etta = div ? teams.filter((x) => x.t.comp === div).sort((a, b) => b.t.str - a.t.str)[0] : null;
-      return [
-        'Siffran är modellens bedömning av laget: hur många mål det i snitt skulle vinna med mot ett vanligt lag i samma serie, på neutral plan. Svåra och lätta motståndare är inräknade. Polaroiden visar omgångens starkaste lag, och på baksidan står de starkaste och de svagaste.',
-        etta && etta.t.str > 0 && `${lag(D, etta.name)} har ${signed(etta.t.str, 2)}. Mot ett vanligt lag i serien skulle de alltså i snitt vinna med ${num(etta.t.str, 2)} mål per match.`,
-        'Tabellen kan vara missvisande tidigt på säsongen. Den här siffran tar hänsyn till vilka lagen har mött, och därför tittar jag på den först.',
-      ];
+      return etta && etta.t.str > 0
+        ? `${D.kort(etta.name)} har ${signed(etta.t.str, 2)}. Mot ett vanligt lag i serien skulle de alltså i snitt vinna med ${num(etta.t.str, 2)} mål per match.`
+        : null;
     },
     kryss(D) {
       const [topp] = D ? teamList(D, xdraw, 1) : [];
-      const hur = topp && (topp.v >= 0.29 ? 'klart mer än vanligt' : topp.v >= 0.26 ? 'lite mer än vanligt' : 'ungefär som vanligt');
-      return [
-        'Procenten är chansen till oavgjort i lagets matcher hittills, i snitt. Den räknas ur målchanserna som båda lagen har skapat och inte ur resultaten, så ett turligt mål på tilläggstid lurar den inte.',
-        'Ungefär var fjärde match slutar oavgjord, så runt 25 % är vanligt. Ett lag högt upp här spelar jämna matcher där ingen skapar särskilt mycket.',
-        topp && `${lag(D, topp.name)} står överst med ${pct(topp.v)}, alltså ${hur}.`,
-        'Möts två lag från den här lappen ska du fundera på krysset.',
-      ];
+      if (!topp) return null;
+      const hur = topp.v >= 0.29 ? 'klart mer än vanligt' : topp.v >= 0.26 ? 'lite mer än vanligt' : 'ungefär som vanligt';
+      return `${D.kort(topp.name)} står överst med ${pct(topp.v)}, alltså ${hur}.`;
     },
-    tur(D) {
-      const [upp, ned] = ytter(D, xpd);
-      return [
-        'Varje skott får ett värde efter hur ofta ett sådant skott brukar bli mål. Det kallas xG. Ur båda lagens xG räknar man ut hur många poäng matchen var värd, och sedan jämför man med poängen laget faktiskt tog.',
-        'Plus betyder fler poäng än chanserna var värda, och det är tur. Minus är otur.',
-        upp && `${lag(D, upp.name)} har tagit ${num(upp.v)} poäng mer än chanserna var värda${ned ? `, och ${lag(D, ned.name)} ${num(ned.v)} poäng mindre` : ''}.`,
-        !upp && ned && `${lag(D, ned.name)} har tagit ${num(ned.v)} poäng mindre än chanserna var värda.`,
-        'Tur jämnar ut sig, det kan du skriva upp. Ett lag som står under Tur brukar tappa, och ett lag under Otur brukar komma igen.',
-      ];
-    },
-    odds(D) {
-      const [upp, ned] = ytter(D, vsOdds);
-      return [
-        'Före varje match säger oddsen hur många poäng laget borde ta. Siffran är poängen laget har tagit hittills under säsongen minus de poäng oddsen väntade sig. Plus betyder att laget slår oddsen, och under Sviker står de som har tagit färre poäng än spelbolagen trodde.',
-        upp && `${lag(D, upp.name)} har tagit ${num(upp.v)} poäng mer än oddsen väntade sig${ned ? `, och ${lag(D, ned.name)} ${num(ned.v)} poäng mindre` : ''}.`,
-        !upp && ned && `${lag(D, ned.name)} har tagit ${num(ned.v)} poäng mindre än oddsen väntade sig.`,
-        'Spelbolagen är jävligt duktiga, så ett lag högt upp här har oftast haft tur eller blivit bättre under säsongen. Står laget under Tur på lappen bredvid är det mest tur.',
-      ];
-    },
-    vila(D) {
+    tur: (D) => (D ? merMindre(D, ytter(D, xpd), 'chanserna var värda') : null),
+    odds: (D) => (D ? merMindre(D, ytter(D, vsOdds), 'oddsen väntade sig') : null),
+    vila(D, rep) {
       let mest = null;
       for (const m of D ? D.ms : []) {
         const h = rest(D.teams.get(m.home), m);
@@ -409,26 +380,24 @@ window.RumAnslag = (() => {
         if (h == null || a == null || Math.abs(h - a) < 2) continue;
         if (!mest || Math.abs(h - a) > mest.d) mest = h < a ? { d: a - h, trott: m.home, pigg: m.away, t: h, p: a } : { d: h - a, trott: m.away, pigg: m.home, t: a, p: h };
       }
-      return [
-        'Siffrorna är hur många dagar det har gått sedan lagets förra match, i alla tävlingar. Skiljer det två dagar eller mer är det tröttare lagets siffra som är inringad.',
-        'Tre dagars vila mot en vecka märks den sista halvtimmen, särskilt för ett lag som springer mycket. Mer än en vecka ger inget extra.',
-        mest && `${lag(D, mest.trott)} har ${dagar(mest.t)} vila mot ${ord(mest.p)} för ${lag(D, mest.pigg)}.`,
-        D && D.ms.length && !mest && 'I den här omgången skiljer det mindre än två dagar i alla matcher.',
-      ];
+      if (mest) return `${D.kort(mest.trott)} har ${dagar(mest.t)} vila mot ${ord(mest.p)} för ${D.kort(mest.pigg)}.`;
+      return D && D.ms.length ? rep.lugnt : null;
     },
     motstand(D) {
       const [upp, ned] = ytter(D, opp);
-      return [
-        'Här ser du vilka som har haft ett svårt eller ett lätt schema hittills. Man tar motståndarnas styrka enligt modellen och jämför med vad ett lag i serien möter i snitt, i mål per match. Plus betyder tuffare motstånd än vanligt och minus lättare.',
-        upp && ned && `${lag(D, upp.name)} har haft det tuffast med ${signed(upp.v, 2)}, och ${lag(D, ned.name)} det lättast med ${signed(ned.v, 2)}.`,
-        'Den som har haft det lätt står ofta för högt i tabellen och får det tyngre när schemat jämnar ut sig. För den som har haft det tufft gäller det omvända.',
-      ];
+      return upp && ned ? `${D.kort(upp.name)} har haft det tuffast med ${signed(upp.v, 2)}, och ${D.kort(ned.name)} det lättast med ${signed(ned.v, 2)}.` : null;
     },
   };
-  // Hasses kort om lappen n, med exemplet ur bladet D. Ringen efter hans kopp
-  // och namnet som på notan.
-  const hasseKort = (n, D) => `<div class="ans-hk-kort">${FORKLARA[n.id](D).filter(Boolean).map((p) => `<p>${p}</p>`).join('')}` +
-    '<span class="ans-hk-namn">Hasse B.</span><i class="ans-hk-ring"></i></div>';
+  // Det han svarar om lappen id, i stycken av meningar: en rad ur anslagSvar, förklaringen,
+  // exemplet och vad han själv gör med det. null utan repliker.
+  function svaret(id, D) {
+    const R = window.HasseRepliker;
+    const rep = R && R.anslag && R.anslag[id];
+    if (!rep) return null;
+    const ex = EXEMPEL[id](D, rep);
+    const forst = R.anslagSvar[Math.floor(Math.random() * R.anslagSvar.length)];
+    return [[forst], ...rep.forklaring, ...(ex ? [[ex]] : []), ...rep.rad];
+  }
 
   // ---------- tavlan ----------
 
@@ -528,7 +497,7 @@ window.RumAnslag = (() => {
   function nara() {
     return '<div class="rum-ansn" id="rum-ansn" role="dialog" aria-label="Anslagstavlan"><div class="ans-bak"></div>' +
       '<div class="ans-flyg" id="ans-flyg"><div class="ans-luta" id="ans-luta"><div class="ans-tavla stor" id="ans-stor" tabindex="-1"></div></div></div>' +
-      '<div class="ans-lyft" id="ans-lyft"></div><div class="ans-hk" id="ans-hk" role="note" aria-live="polite"></div>' +
+      '<div class="ans-lyft" id="ans-lyft"></div><i class="ans-hasse-mork"></i><div class="ans-hasse" id="ans-hasse" aria-label="Hasse svarar"></div>' +
       '<div class="ans-rad" id="ans-rad"><span id="ans-sp"></span><button type="button" class="ans-ropa" data-ans="hasse" aria-expanded="false"></button>' +
       '<button type="button" class="ans-tbx" data-ans="tillbaka">Häng tillbaka</button></div></div>';
   }
@@ -569,7 +538,8 @@ window.RumAnslag = (() => {
     const lyftEl = root.querySelector('#ans-lyft');
     const rad = root.querySelector('#ans-rad');
     const sp = root.querySelector('#ans-sp');
-    const hkEl = root.querySelector('#ans-hk');
+    const hkEl = root.querySelector('#ans-hasse');
+    const mork = root.querySelector('.ans-hasse-mork');
     const ropa = root.querySelector('[data-ans="hasse"]');
     if (!vagg || !ov) return null;
     // tavlan på väggen: förminskad till elementets bredd
@@ -680,7 +650,6 @@ window.RumAnslag = (() => {
           card.style.height = `${A.lyft.len}px`;
           card.innerHTML = sheetsHtml(n, inner[n.id], A.sheets, A.top, A.lyft.len);
           card.classList.add('utvikt');
-          if (A.hk) hkFyll(n);
           placeLyft(n, false);
         }
         if (n.paper === 'polaroid' && A.lyft.vand) vand(true);
@@ -747,7 +716,6 @@ window.RumAnslag = (() => {
       const steps = fwd ? d : N - d;
       const from = A.top;
       A.top = to;
-      hkNy();
       for (const el of lapparna()) {
         const n = A.W.notes.find((x) => x.id === el.dataset.lapp);
         if (el.tagName === 'BUTTON') el.setAttribute('aria-label', label(n, to).replace(/&amp;/g, '&'));
@@ -948,9 +916,9 @@ window.RumAnslag = (() => {
     // flytta lappen (pan). I telefonen bläddrar man med ett svep (rum.js), så
     // där behövs ingen plats vid sidorna.
     const MINS = 1.15;
-    // Hasses kort (HK_W brett, HK_G till lappen) står till vänster om lappen
-    // när lappen då kan bli minst 1,3 gånger så stor som på tavlan
-    // (bredvid: den största skalan som ryms), annars över lappen.
+    // Hasses svar (HK_W brett, HK_G till lappen) står till vänster om lappen,
+    // åt baren till, när lappen då kan bli minst 1,3 gånger så stor som på
+    // tavlan (bredvid: den största skalan som ryms), annars över lappen.
     const HK_W = 380;
     const HK_G = 28;
     const bredvid = (n) => (innerWidth - 96 - HK_W - HK_G) / (n.w + (ARK[A.top] ? 18 : 0));
@@ -963,15 +931,15 @@ window.RumAnslag = (() => {
       const s = Math.min(Math.max(fri / len, MINS), hk ? bredvid(n) : (innerWidth - (sm ? 32 : 160)) / w / (sm ? 1.04 : 1.2), 3.2);
       // (i telefonen under rummets namn, som ligger kvar överst)
       const top = Math.max(sm ? 72 : 48, (innerHeight - 70) / 2 - (len * s) / 2);
-      // med kortet bredvid står de två tillsammans mitt i fönstret (kort:
-      // kortets vänsterkant)
+      // med svaret bredvid står de två tillsammans mitt i fönstret (kort:
+      // svarets vänsterkant)
       const kort = hk ? (innerWidth - HK_W - HK_G - (n.w + (ARK[A.top] ? 18 : 0)) * s) / 2 : null;
       return { x: hk ? kort + HK_W + HK_G + (n.w * s) / 2 : innerWidth / 2, top, s, over: Math.max(0, top + len * s + 64 - innerHeight), kort };
     }
     // Hållen: överkanten flyttad pan uppåt; transform-origin är mitt på den
     // översta panelen, som på tavlan.
-    // anim: true från nålen, 'flytta' från där lappen står (när Hasses kort
-    // kommer eller går), annars direkt.
+    // anim: true från nålen, 'flytta' från där lappen står (när Hasse börjar
+    // svara eller tystnar), annars direkt.
     function placeLyft(n, anim) {
       const len = A.lyft.len;
       const h = held(n, len);
@@ -980,7 +948,7 @@ window.RumAnslag = (() => {
       const top = h.top - A.lyft.pan;
       const card = lyftEl.firstElementChild;
       const to = `translate(${r1(h.x - n.w / 2)}px, ${r1(top + (n.h * h.s) / 2 - n.h / 2)}px) scale(${h.s.toFixed(3)})`;
-      // raden står under lappen, också när kortet har skjutit den åt höger
+      // raden står under lappen, också när svaret har skjutit den åt höger
       const fore = anim === 'flytta' && !o.calm() ? [card.style.transform, rad.style.top, rad.style.transform || 'none'] : null;
       rad.style.top = `${r1(top + len * h.s + 18)}px`;
       rad.style.transform = `translateX(${r1(h.x - innerWidth / 2)}px)`;
@@ -1007,60 +975,185 @@ window.RumAnslag = (() => {
       ], { duration: 520 });
     }
 
-    // ---------- Hasses kort ----------
+    // ---------- Hasse svarar ----------
 
-    // Kortet om lappen i handen, med exemplet ur bladet som ligger överst
-    // (utan, när bladet räknar med dolda resultat). true när texten är ny.
-    function hkFyll(n) {
-      const D = A.D && A.D.ark[A.top];
-      const html = hasseKort(n, D && !(VEILED.has(n.id) && D.veil) ? D : null);
-      if (html === A.hkHtml) return false;
-      A.hkHtml = html;
-      hkEl.innerHTML = html;
-      return true;
-    }
-    // ett annat blad överst: exemplet byts
-    function hkNy() {
-      if (!A.hk || !A.lyft) return;
-      const n = A.W.notes.find((x) => x.id === A.lyft.id);
-      if (hkFyll(n)) placeLyft(n, false);
-    }
+    // Han svarar från baren, utanför bilden till vänster: svaret står bredvid lappen i
+    // samma stil som hans tal i baren, eller över lappen när det inte får plats bredvid,
+    // och kommer ord för ord, en mening i taget (som repliker i rum-hasse.js). Med ljudet
+    // på (knappen i baren) hörs han från vänster och orden kommer i takt med rösten;
+    // meningar utan ljud, som exemplet, säger han tyst i skriftens takt. Med minskad
+    // rörelse står allt direkt och han hörs inte, som i baren.
+    const ORD_MS = 44;
+    const ordTid = (w) => ORD_MS * (w.length + 1) + (/[,:;]$/.test(w) ? 170 : 0);
+    const VANTA = 2500;
+    const rostEn = () => (window.RumHasse && RumHasse.fjarran) || null;
+    const paus = (x) => { const nx = x.m[x.i + 1]; return !nx ? 0 : nx.ny ? 850 : 400; };
+
     function ropText(n) {
       ropa.textContent = A.hk ? TACK : ROP[n.id];
       ropa.setAttribute('aria-expanded', String(A.hk));
     }
-    // Kortets plats: bredvid lappen till vänster (h.kort) med överkanten vid
-    // lappens, eller mitt över lappen när det inte får plats bredvid – då med
-    // raden under kortet i stället för under lappen. Ryms kortet inte i
-    // fönstret rullar det.
+    function stoppa(x) {
+      clearTimeout(x.t);
+      cancelAnimationFrame(x.raf);
+      if (x.ljud) x.ljud.stop();
+      x.ljud = null;
+    }
+    function tyst() {
+      const x = A.tal;
+      A.tal = null;
+      if (x) stoppa(x);
+    }
+    // Svaret skrivs ut osynligt från början, så att inget flyttar sig medan han pratar.
+    function svara(n) {
+      tyst();
+      const D = A.D && A.D.ark[A.top];
+      const st = svaret(n.id, D && !(VEILED.has(n.id) && D.veil) ? D : null) || [];
+      const R = o.calm() ? null : rostEn();
+      if (R) R.vakna();
+      const tal = document.createElement('div');
+      const m = [];
+      for (const stycke of st) {
+        const p = document.createElement('p');
+        stycke.forEach((text, i) => {
+          if (i) p.append(' ');
+          const el = document.createElement('span');
+          el.className = 'ans-rep';
+          const orden = text.split(/\s+/).filter(Boolean).map((w, j) => {
+            if (j) el.append(' ');
+            const ett = document.createElement('span');
+            ett.className = 'ans-o';
+            ett.textContent = w;
+            el.append(ett);
+            return ett;
+          });
+          p.append(el);
+          m.push({ el, ord: orden, ny: i === 0, klipp: R ? R.ljud(text) : null });
+        });
+        tal.append(p);
+      }
+      hkEl.replaceChildren(tal);
+      hkEl.classList.remove('klar');
+      hkEl.scrollTop = 0;
+      const x = { m, i: -1, t: 0, raf: 0, ljud: null };
+      A.tal = x;
+      if (o.calm()) hoppaTal();
+      else x.t = setTimeout(() => nastaMening(x), 300);
+    }
+    // följer med nedåt när svaret är längre än fönstret
+    function folj(el) {
+      const ner = el.offsetTop + el.offsetHeight - hkEl.clientHeight + 12;
+      if (ner > hkEl.scrollTop) hkEl.scrollTop = ner;
+    }
+    function nastaMening(x) {
+      if (A.tal !== x) return;
+      if (x.m[x.i]) x.m[x.i].el.classList.remove('nu');
+      const i = ++x.i;
+      const m = x.m[i];
+      if (!m) {
+        hkEl.classList.add('klar');
+        return;
+      }
+      m.el.classList.add('nu');
+      folj(m.el);
+      // väntar på ljudet en stund, och säger meningen tyst om det inte kommer
+      const ga = (k) => {
+        if (A.tal !== x || x.i !== i || m.gatt) return;
+        m.gatt = true;
+        clearTimeout(x.t);
+        const R = rostEn();
+        if (k && R && !R.av()) medRost(x, m, k, R);
+        else ordForOrd(x, m, 0);
+      };
+      if (!m.klipp) {
+        ga(null);
+        return;
+      }
+      x.t = setTimeout(() => ga(null), VANTA);
+      m.klipp.then(ga, () => ga(null));
+    }
+    function ordForOrd(x, m, j) {
+      if (A.tal !== x) return;
+      if (j < m.ord.length) {
+        m.ord[j].classList.add('s');
+        x.t = setTimeout(() => ordForOrd(x, m, j + 1), ordTid(m.ord[j].textContent));
+        return;
+      }
+      x.t = setTimeout(() => nastaMening(x), paus(x));
+    }
+    // Orden får sin tid efter längden, utspridd över talet i klippet (borja i rum-hasse.js).
+    function medRost(x, m, k, R) {
+      const l = (x.ljud = R.spela(k));
+      const vikt = m.ord.map((w) => ordTid(w.textContent));
+      const sum = vikt.reduce((s, v) => s + v, 0) || 1;
+      let acc = 0;
+      const tider = vikt.map((v) => { const t = k.fran + (acc / sum) * (k.till - k.fran); acc += v; return t; });
+      let j = 0;
+      const steg = () => {
+        if (A.tal !== x) return;
+        const p = l.fran + (R.nu() - l.t0);
+        while (j < m.ord.length && p >= tider[j]) m.ord[j++].classList.add('s');
+        if (p < l.till && !l.slut) {
+          x.raf = requestAnimationFrame(steg);
+          return;
+        }
+        while (j < m.ord.length) m.ord[j++].classList.add('s');
+        x.ljud = null;
+        x.t = setTimeout(() => nastaMening(x), paus(x));
+      };
+      x.raf = requestAnimationFrame(steg);
+    }
+    // Hela svaret på en gång (ett klick på det, och med minskad rörelse).
+    function hoppaTal() {
+      const x = A.tal;
+      if (!x) return;
+      stoppa(x);
+      for (const m of x.m) {
+        m.el.classList.remove('nu');
+        for (const w of m.ord) w.classList.add('s');
+      }
+      x.i = x.m.length;
+      hkEl.classList.add('klar');
+    }
+
+    // Svarets plats: bredvid lappen till vänster (h.kort) med överkanten vid lappens, eller
+    // mitt över lappen när det inte får plats bredvid – då med raden under svaret i stället
+    // för under lappen. Bakom svaret mörknar det från vänster, som i baren, och över lappen
+    // helt. Ryms svaret inte i fönstret rullar det.
     function hkPlats(h, top) {
       if (!A.hk) return;
-      const min = innerWidth < 700 ? 72 : 20;
+      const min = innerWidth < 700 ? 72 : 24;
       const over = h.kort == null;
-      hkEl.style.maxHeight = `${Math.max(160, innerHeight - min - (over ? 80 : 20))}px`;
+      hkEl.style.maxHeight = `${Math.max(160, innerHeight - min - (over ? 80 : 24))}px`;
       const H = hkEl.offsetHeight;
-      const y = Math.max(min, over ? (innerHeight - H - 60) / 2 : Math.min(top, innerHeight - H - 20));
-      hkEl.style.left = `${r1(over ? (innerWidth - hkEl.offsetWidth) / 2 : h.kort)}px`;
+      const y = Math.max(min, over ? (innerHeight - H - 60) / 2 : Math.min(top, innerHeight - H - 24));
+      const x = over ? (innerWidth - hkEl.offsetWidth) / 2 : h.kort;
+      hkEl.style.left = `${r1(x)}px`;
       hkEl.style.top = `${r1(y)}px`;
+      mork.classList.toggle('over', over);
+      mork.style.width = over ? '' : `${r1(x + hkEl.offsetWidth + 40)}px`;
       if (over) {
-        rad.style.top = `${r1(y + H)}px`;
+        rad.style.top = `${r1(y + H + 8)}px`;
         rad.style.transform = 'translateX(0px)';
       }
     }
-    // Vägen in och ut: från fönstrets vänstra kant, där han sitter, lite vridet.
-    const hkUte = () => `translateX(${-r1(hkEl.offsetLeft + hkEl.offsetWidth + 60)}px) rotate(-9deg)`;
     function hkUt(now) {
+      tyst();
       if (A.hkAnim) A.hkAnim.cancel();
-      if (now || o.calm()) { hkEl.classList.remove('on'); return; }
-      const a = (A.hkAnim = hkEl.animate([{ transform: 'none' }, { transform: hkUte() }], { duration: 340, easing: 'cubic-bezier(0.5, 0, 0.75, 0.4)', fill: 'forwards' }));
+      ov.classList.remove('hasse');
+      if (now || o.calm()) {
+        hkEl.classList.remove('on');
+        return;
+      }
+      const a = (A.hkAnim = hkEl.animate([{ opacity: 1 }, { opacity: 0 }], { duration: 220, easing: 'ease-in', fill: 'forwards' }));
       a.finished.then(() => {
         if (A.hkAnim !== a) return;
         hkEl.classList.remove('on');
         a.cancel();
       }, () => {});
     }
-    // Ropar på Hasse (on) eller lägger undan hans kort. Lappen i handen
-    // flyttar sig åt höger när kortet får plats bredvid den.
+    // Ropar till Hasse (on), eller tackar och går vidare. Lappen i handen flyttar sig åt
+    // höger när svaret får plats bredvid den.
     function hasse(on) {
       if (!A.lyft || on === A.hk) return;
       const n = A.W.notes.find((x) => x.id === A.lyft.id);
@@ -1072,10 +1165,11 @@ window.RumAnslag = (() => {
         return;
       }
       if (A.hkAnim) A.hkAnim.cancel();
-      hkFyll(n);
+      svara(n);
       hkEl.classList.add('on');
+      ov.classList.add('hasse');
       placeLyft(n, 'flytta');
-      if (!o.calm()) A.hkAnim = hkEl.animate([{ transform: hkUte() }, { transform: 'none' }], { duration: 520, easing: 'cubic-bezier(0.2, 0.7, 0.25, 1)' });
+      if (!o.calm()) A.hkAnim = hkEl.animate([{ opacity: 0 }, { opacity: 1 }], { duration: 300, easing: 'ease-out' });
     }
 
     function spoilerRow(n) {
@@ -1125,11 +1219,7 @@ window.RumAnslag = (() => {
       lyftEl.innerHTML = `<div class="ans-lapp i-handen" data-lapp="${id}" style="width:${n.w}px; height:${len}px; transform-origin:50% ${n.h / 2}px">${sheetsHtml(n, A.inner[id], A.sheets, A.top, len)}</div>`;
       stor.querySelector(`[data-lapp="${id}"]`).classList.add('borta');
       spoilerRow(n);
-      // (bläddrade man med Hasses kort framme står hans kort om den här lappen)
       ropText(n);
-      if (A.hk && hkFyll(n) && !o.calm()) {
-        hkEl.firstElementChild.animate([{ opacity: 0, translate: '-18px 0' }, { opacity: 1, translate: '0 0' }], { duration: 280, easing: 'ease-out' });
-      }
       const anim = placeLyft(n, !o.calm());
       // den vikta lappen vecklas ut när den nästan är framme
       vika(lyftEl.firstElementChild, true, Boolean(anim), 340);
@@ -1142,12 +1232,12 @@ window.RumAnslag = (() => {
       rad.querySelector('[data-ans="tillbaka"]').focus({ preventScroll: true });
     }
 
-    // kvar: Hasses kort ligger kvar till nästa lapp (step)
-    function drop(now, kvar) {
+    function drop(now) {
       if (!A.lyft) return;
       const n = A.W.notes.find((x) => x.id === A.lyft.id);
       A.lyft = null;
-      if (A.hk && !kvar) {
+      // Hasse tystnar när lappen sätts tillbaka
+      if (A.hk) {
         A.hk = false;
         hkUt(now);
       }
@@ -1179,15 +1269,15 @@ window.RumAnslag = (() => {
       return true;
     }
     ov.addEventListener('wheel', (e) => {
-      if (!A.on || !A.lyft || !A.lyft.over || e.target.closest('#ans-hk')) return;
+      if (!A.on || !A.lyft || !A.lyft.over || e.target.closest('#ans-hasse')) return;
       e.preventDefault();
       panTo(A.lyft.pan + (e.deltaMode === 1 ? e.deltaY * 16 : e.deltaY));
     }, { passive: false });
     const DR = { id: null };
     ov.addEventListener('pointerdown', (e) => {
       A.drog = false;
-      // (ett svep på Hasses kort bläddrar inte bladen, drog)
-      A.hkDrar = Boolean(e.target.closest('#ans-hk'));
+      // (ett svep på Hasses svar bläddrar inte bladen, drog)
+      A.hkDrar = Boolean(e.target.closest('#ans-hasse'));
       if (!A.lyft || !A.lyft.over || !e.target.closest('.i-handen')) return;
       Object.assign(DR, { id: e.pointerId, y: e.clientY, pan: A.lyft.pan });
     });
@@ -1204,7 +1294,7 @@ window.RumAnslag = (() => {
     function step(d) {
       const i = A.W.notes.findIndex((x) => x.id === A.lyft.id);
       const n = A.W.notes[(i + d + A.W.notes.length) % A.W.notes.length];
-      drop(true, true);
+      drop(true);
       lift(n.id);
     }
 
@@ -1214,7 +1304,8 @@ window.RumAnslag = (() => {
       if (e.target.closest('a[href], .sp-show')) return;
       if (e.target.closest('[data-ans="tillbaka"]')) { drop(); return; }
       if (e.target.closest('[data-ans="hasse"]')) { hasse(!A.hk); return; }
-      if (e.target.closest('#ans-hk')) { hasse(false); return; }
+      // ett klick på svaret: resten direkt
+      if (e.target.closest('#ans-hasse')) { hoppaTal(); return; }
       // en flik bläddrar alla lappar till sin division
       const f = e.target.closest('[data-flik]');
       if (f && !vagg.contains(f)) { flip(f.dataset.flik); return; }
@@ -1253,14 +1344,14 @@ window.RumAnslag = (() => {
       open,
       on: () => A.on,
       lift: (id) => { if (A.on) lift(id); },
-      // Hasses kort om lappen i handen
+      // Hasse svarar om lappen i handen
       hasse: (on = true) => { if (A.on) hasse(on); },
       // lappen i handen flyttades nyss med fingret, eller fingret var på
-      // Hasses kort (inget svep i rum.js)
+      // på Hasses svar (inget svep i rum.js)
       drog: () => Boolean(A.drog || A.hkDrar),
-      // Esc lägger undan Hasses kort och sätter tillbaka lappen (sedan tavlan
-      // i rum.js); ←/→ bläddrar mellan lapparna och ↑/↓ mellan bladen, och H
-      // ropar på Hasse
+      // Esc tystar Hasse och sätter tillbaka lappen (sedan tavlan i rum.js);
+      // ←/→ bläddrar mellan lapparna och ↑/↓ mellan bladen, och H ropar till
+      // Hasse
       key(k) {
         if (!A.on) return false;
         if (k === 'Escape' && A.lyft) {

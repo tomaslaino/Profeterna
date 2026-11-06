@@ -143,4 +143,107 @@
   ingenKupong: 'Det finns ingen kupong än.',
   ejKlar: ['Den har jag inte kommit till än.', 'Den tar jag sen.'],
   utanRost: 'Jag har tappat rösten. Läs här.',
+
+  // Anslagstavlan (rum-anslag.js): med en lapp i handen ropar man till honom (Hasse, vad
+  // betyder procenten?), och han svarar från baren, utanför bilden. Först en rad ur svar, sedan
+  // förklaringen i stycken med en mening i taget, så att varje mening får sitt ljud. Mellan
+  // förklaringen och rad (vad han själv gör med det) kommer ett exempel ur lappen som sidan
+  // räknar fram; det ändras med datan och har därför inget ljud. Talen förklaras som under
+  // Statistik → Lagen (divisioner.js): ändras en lapp ska hans svar följa med.
+  anslagSvar: ['Det ska jag tala om för dig.', 'Lyssna nu, så tar vi det lugnt.', 'Det är enklare än det ser ut.'],
+  anslag: {
+    form: {
+      forklaring: [[
+        'Det är de fem senaste matcherna för båda lagen, i alla tävlingar.',
+        'V är vinst, O är oavgjort och F är förlust, och längst till vänster står den senaste.',
+        'Det är ställningen efter nittio minuter som räknas, så en match som avgjordes på straffar står som oavgjord.',
+      ]],
+      rad: [[
+        'Formen säger hur det har gått men inget om vilka de har mött.',
+        'Har de slagit tre bottenlag i rad betyder raden inte så mycket, så titta på Starkast och Motståndet också.',
+      ]],
+    },
+    skador: {
+      forklaring: [[
+        'Här står de som saknas eller är osäkra i varje lag.',
+        'Står det ett frågetecken efter namnet kan han spela ändå.',
+        'De avstängda är utmärkta, och resten är skadade eller borta av andra skäl.',
+        'De tre som har spelat mest står först, och siffran efter plustecknet är hur många fler som saknas.',
+      ]],
+      rad: [[
+        'Räkna inte namnen.',
+        'Det som avgör är om de som saknas brukar spela, och en ordinarie mittback väger tyngre än fem man från bänken.',
+      ]],
+    },
+    styrka: {
+      forklaring: [[
+        'Siffran är modellens bedömning av laget.',
+        'Den säger hur många mål laget i snitt skulle vinna med mot ett vanligt lag i samma serie, på neutral plan.',
+        'Svåra och lätta motståndare är inräknade.',
+        'Polaroiden visar omgångens starkaste lag, och på baksidan står de starkaste och de svagaste.',
+      ]],
+      rad: [[
+        'Tabellen kan vara missvisande tidigt på säsongen.',
+        'Den här siffran tar hänsyn till vilka lagen har mött, och därför tittar jag på den först.',
+      ]],
+    },
+    kryss: {
+      forklaring: [[
+        'Procenten är chansen till oavgjort i lagets matcher hittills, i snitt.',
+        'Den räknas ur målchanserna som båda lagen har skapat och inte ur resultaten, så ett turligt mål på tilläggstid lurar den inte.',
+      ], [
+        'Ungefär var fjärde match slutar oavgjord, så runt 25 % är vanligt.',
+        'Ett lag högt upp här spelar jämna matcher där ingen skapar särskilt mycket.',
+      ]],
+      rad: [['Möts två lag från den här lappen ska du fundera på krysset.']],
+    },
+    tur: {
+      forklaring: [[
+        'Varje skott får ett värde efter hur ofta ett sådant skott brukar bli mål.',
+        'Det kallas xG.',
+        'Ur båda lagens xG räknar man ut hur många poäng matchen var värd, och sedan jämför man med poängen laget faktiskt tog.',
+      ], [
+        'Plus betyder fler poäng än chanserna var värda, och det är tur.',
+        'Minus är otur.',
+      ]],
+      rad: [[
+        'Tur jämnar ut sig, det kan du skriva upp.',
+        'Ett lag som står under Tur brukar tappa, och ett lag under Otur brukar komma igen.',
+      ]],
+    },
+    odds: {
+      forklaring: [[
+        'Före varje match säger oddsen hur många poäng laget borde ta.',
+        'Siffran är poängen laget har tagit hittills under säsongen minus de poäng oddsen väntade sig.',
+        'Plus betyder att laget slår oddsen, och under Sviker står de som har tagit färre poäng än spelbolagen trodde.',
+      ]],
+      rad: [[
+        'Spelbolagen är jävligt duktiga, så ett lag högt upp här har oftast haft tur eller blivit bättre under säsongen.',
+        'Står laget under Tur på lappen bredvid är det mest tur.',
+      ]],
+    },
+    vila: {
+      forklaring: [[
+        'Siffrorna är hur många dagar det har gått sedan lagets förra match, i alla tävlingar.',
+        'Skiljer det två dagar eller mer är det tröttare lagets siffra som är inringad.',
+      ], [
+        'Tre dagars vila mot en vecka märks den sista halvtimmen, särskilt för ett lag som springer mycket.',
+        'Mer än en vecka ger inget extra.',
+      ]],
+      // i stället för exemplet, när ingen match skiljer två dagar
+      lugnt: 'I den här omgången skiljer det mindre än två dagar i alla matcher.',
+      rad: [],
+    },
+    motstand: {
+      forklaring: [[
+        'Här ser du vilka som har haft ett svårt eller ett lätt schema hittills.',
+        'Man tar motståndarnas styrka enligt modellen och jämför med vad ett lag i serien möter i snitt, i mål per match.',
+        'Plus betyder tuffare motstånd än vanligt och minus lättare.',
+      ]],
+      rad: [[
+        'Den som har haft det lätt står ofta för högt i tabellen och får det tyngre när schemat jämnar ut sig.',
+        'För den som har haft det tufft gäller det omvända.',
+      ]],
+    },
+  },
 });

@@ -835,6 +835,51 @@ window.RumHasse = (() => {
     }
   }
 
+  // Rösten från baren när man ropar till honom vid anslagstavlan (rum-anslag.js). Han syns
+  // inte, så ljudet kommer från vänster och lite dovt, som från andra sidan affären. Samma
+  // register och samma ljud som här. vakna() vid klicket, ljud(text) → Promise<klipp | null>
+  // eller null (som ljudTill), spela(klipp) → { t0, fran, till, slut, stop() } i ljudets klocka
+  // (nu()), och av() när han inte hörs.
+  const fjarran = {
+    vakna,
+    ljud: (text) => ljudTill(text),
+    av: () => V.av || !V.ctx || V.ctx.state !== 'running',
+    nu: () => (V.ctx ? V.ctx.currentTime : 0),
+    spela(k) {
+      const c = V.ctx;
+      const src = c.createBufferSource();
+      src.buffer = k.buf;
+      const dov = c.createBiquadFilter();
+      dov.type = 'lowpass';
+      dov.frequency.value = 3800;
+      const styrka = c.createGain();
+      styrka.gain.value = 0.85;
+      src.connect(dov);
+      dov.connect(styrka);
+      let ut = styrka;
+      if (c.createStereoPanner) {
+        const sida = c.createStereoPanner();
+        sida.pan.value = -0.7;
+        styrka.connect(sida);
+        ut = sida;
+      }
+      ut.connect(c.destination);
+      const fran = Math.max(0, k.fran - 0.03);
+      const till = Math.min(k.buf.duration, k.till + 0.08);
+      const t0 = c.currentTime + 0.03;
+      src.start(t0, fran, till - fran);
+      const l = {
+        t0, fran, till, slut: false,
+        stop() {
+          src.onended = null;
+          try { src.stop(); } catch (e) { /* redan slut */ }
+        },
+      };
+      src.onended = () => { l.slut = true; };
+      return l;
+    },
+  };
+
   // ---------- replikerna ----------
   //
   // repliker(lista, { i, sen, direkt }): han säger en replik i taget, ord för ord
@@ -1354,5 +1399,5 @@ window.RumHasse = (() => {
   if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', vanta);
   else vanta();
 
-  return { oppna, stang, repliker, framat, hoppa, gester: GEST };
+  return { oppna, stang, repliker, framat, hoppa, gester: GEST, fjarran };
 })();

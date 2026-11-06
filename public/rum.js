@@ -39,7 +39,7 @@
 // dem sitta med kupongen som om de inte hade lämnat in, ?rum-plats=0|1|2 var
 // gänget sitter vid bordet (de byter var tredje dag). ?rum-anslag visar anslagstavlan
 // framme (=form, =skador … med den lappen i handen, och &rum-anslag-hasse
-// med Hasses kort om den), ?rum-register
+// med Hasses svar om den), ?rum-register
 // kortregistret (=Arsenal … med det kortet i handen). ?rum-stopp=<timmar> som
 // om det var så långt kvar till spelstoppet, ?rum-tittar som om matcherna
 // pågick och ?rum-mal=dl:1,dt:-1,dj:0 som om det blev mål (rätt, fel, ingen

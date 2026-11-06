@@ -363,62 +363,43 @@
 /* (i telefonen bryts raden hellre än att gå utanför fönstret) */
 .ans-rad { flex-wrap: wrap; row-gap: 10px; padding: 0 16px; }
 
-/* Hasse förklarar (rum-anslag.js): det man ropar till honom står under
-   lappen, och kortet han skickar över från baren är kraftigt, lite gulnat
-   papper med hans kulspets, en ring efter kaffekoppen och namnet som på
-   notan. Ytterlådan (.ans-hk) har luft för vinkeln och skuggan, och i ett
-   lågt fönster rullar kortet i den. */
+/* Hasse svarar (rum-anslag.js): det man ropar till honom står under lappen, och hans svar
+   kommer från baren till vänster, utanför bilden, i samma stil som hans tal i baren
+   (rum-hasse.css: .rh-text, .rh-rep och .rh-o): ljus serif med skugga, orden synliga när han
+   har sagt dem och det han redan har sagt lite dämpat. Bakom svaret mörknar det från vänster
+   som i baren (.rh-mork), och när svaret ligger över lappen mörknar allt. */
 .ans-ropa { border: 0; padding: 0; background: none; cursor: pointer; font: italic 17px Fraunces, Georgia, serif; color: #e9cf8e; text-decoration: underline dotted; text-underline-offset: 4px; text-decoration-thickness: 1px; text-shadow: 0 1px 8px #000; }
 .ans-ropa:hover { color: #fbe8b8; }
 .ans-ropa:empty { display: none; }
-.ans-hk {
+.ans-hasse-mork { position: absolute; left: 0; top: 0; bottom: 0; width: 0; opacity: 0; pointer-events: none; background: linear-gradient(to right, rgba(14, 8, 4, 0.82) calc(100% - 90px), rgba(14, 8, 4, 0)); transition: opacity 0.3s ease; }
+.ans-hasse-mork.over { right: 0; width: auto; background: rgba(14, 8, 4, 0.92); }
+.rum-ansn.hasse .ans-hasse-mork { opacity: 1; }
+.ans-hasse {
   position: absolute;
   left: 0;
   top: 0;
   width: 380px;
-  max-width: calc(100% - 24px);
+  max-width: calc(100% - 32px);
   box-sizing: border-box;
-  padding: 14px;
-  overflow: auto;
+  padding: 0 8px 0 0;
+  overflow-y: auto;
   overscroll-behavior: contain;
+  touch-action: pan-y;
   visibility: hidden;
   pointer-events: none;
-}
-.ans-hk.on { visibility: visible; pointer-events: auto; }
-.ans-hk-kort {
-  position: relative;
-  display: block;
-  overflow: hidden;
-  padding: 18px 22px 14px;
-  border-radius: 5px;
-  background:
-    url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='120' height='120'%3E%3Cfilter id='p'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.9' numOctaves='2' seed='7' stitchTiles='stitch'/%3E%3CfeColorMatrix values='0 0 0 0 .35  0 0 0 0 .28  0 0 0 0 .15  0 0 0 -1.6 .75'/%3E%3C/filter%3E%3Crect width='120' height='120' filter='url(%23p)'/%3E%3C/svg%3E") 0 0 / 120px 120px,
-    linear-gradient(172deg, #f8f1dd, #efe3c4);
-  color: #1d2a63;
-  font: 600 21px/1.2 Caveat, cursive;
+  color: #f6efdc;
+  font: 400 clamp(16px, 1.37vw, 20px)/1.42 Fraunces, Georgia, serif;
   text-align: left;
-  box-shadow: 0 18px 36px rgba(0, 0, 0, 0.5), 0 2px 4px rgba(0, 0, 0, 0.3), inset 0 0 0 1px rgba(120, 90, 40, 0.12);
-  transform: rotate(-1.3deg);
-  cursor: pointer;
+  text-shadow: 0 1px 4px rgba(0, 0, 0, 0.9);
+  cursor: default;
 }
-.ans-hk-kort p { position: relative; margin: 0 0 9px; }
-.ans-hk-namn { position: relative; display: block; margin: 4px 6px 0 0; text-align: right; font: 700 27px/1 Caveat, cursive; transform: rotate(-4deg); }
-/* ringen efter koppen, som han ställde på kortet medan han skrev */
-.ans-hk-ring {
-  position: absolute;
-  right: -26px;
-  top: -30px;
-  width: 104px;
-  height: 104px;
-  border-radius: 50%;
-  pointer-events: none;
-  background: radial-gradient(circle, rgba(130, 84, 34, 0) 58%, rgba(130, 84, 34, 0.1) 62%, rgba(130, 84, 34, 0.24) 65.5%, rgba(130, 84, 34, 0.07) 68%, rgba(130, 84, 34, 0) 71%);
-  transform: scaleY(0.94) rotate(20deg);
-}
-@media (max-width: 700px) {
-  .ans-hk-kort { padding: 16px 18px 12px; font-size: 19px; }
-}
+.ans-hasse.on { visibility: visible; pointer-events: auto; }
+.ans-hasse p { margin: 0 0 0.62em; }
+.ans-hasse .ans-o { visibility: hidden; }
+.ans-hasse.on .ans-o.s { visibility: visible; }
+.ans-rep { color: rgba(246, 239, 220, 0.66); }
+.ans-rep.nu, .ans-hasse.klar .ans-rep { color: #f6efdc; }
 
 @media (prefers-reduced-motion: reduce) {
-  .ans-bak, .ans-luta, .ans-vand, .ans-rad, .ans-lyft::before, .ans-tavla.stor .ans-lapp { transition: none; }
+  .ans-bak, .ans-luta, .ans-vand, .ans-rad, .ans-lyft::before, .ans-tavla.stor .ans-lapp, .ans-hasse-mork { transition: none; }
 }
