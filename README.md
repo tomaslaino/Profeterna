@@ -3883,14 +3883,17 @@ Figuren skuggar det som är under disken eller skyms av den (`BORD_GLSL` i
 ovansidan, bakom den det som strålen från kameran bara når genom disken. Kroppen slutar alltså vid
 kanten, och armbågar, händer och fat trycks mot disken utan att något sticker igenom. Armarna vilar
 med armbågarna på disken och armens riktiga längder (`paDisken`), och gesterna börjar och slutar
-där; eftersom disken går snett når den vänstra armbågen den bara nära axeln. Den vänstra handen
-ligger rakt fram med fatet tätt intill lillfingret och fingertopparna vid notans hörn, som handen på
-pulten i rummet. Fingrarna lägger sig på disken: ett finger vars två yttre leder skulle nå under
+där; eftersom disken går snett når den vänstra armbågen den bara nära axeln. Den vänstra armbågen
+ligger nära kroppen och handen är vriden lite ut mot koppen, och koppen står till höger om den, fritt
+från armen: en bit disk mellan fatet och handen, och fingertopparna några centimeter från fatets kant,
+som handen på pulten i rummet. Kameran står lågt, så koppen skymmer ärmen i bild, men fatet ligger
+framför den på disken. Fingrarna lägger sig på disken: ett finger vars två yttre leder skulle nå under
 ovansidan böjs mindre, tills den lägsta punkten ligger på ytan (`golv` i
 [public/rum-hasse-arm.js](public/rum-hasse-arm.js)), så att fingertopparna aldrig går ned i disken,
 inte heller när han trummar eller slår i den. Förut var fingrarna krökta som klor i vilan, topparna
 försvann ned i disken och den vänstra handen pekade in mot honom med koppen vid handleden (ändrat
-2026-11-06).
+2026-11-06). Sedan låg handen rakt fram med armbågen ute, och ärmen gick genom fatets kant, så att det
+såg ut som om armen låg över fatet (ändrat 2026-11-06).
 
 Han fyller höjden från hjässan nära överkanten till disken vid tre fjärdedelar av höjden, med mitten
 av honom vid 60 % av bredden och samtalet i en spalt till vänster; får samtalet inte plats blir han
@@ -3914,33 +3917,47 @@ filter. `?rum-hasse-pan=0.5` fryser panoreringen på vägen (för bilder).
 **Ljuset.** Samma ljus på allt i hans bild, på fotot, armarna, händerna, koppen, askkoppen, cigarren
 och disken: varmt framifrån till vänster, ett varmt kantljus bakifrån från barens lampor, och
 neonskyltens röda sken och gatans kalla ljus från höger, där affären är (`LJUS` i
-[public/rum-hasse-arm.js](public/rum-hasse-arm.js); väggen är spårad med samma ljus). Över hela
+[public/rum-hasse-arm.js](public/rum-hasse-arm.js); väggen är spårad med samma ljus). På dagen kommer
+dagsljuset genom affärens stora fönster till höger (nedan). Över hela
 bilden mörknar hörnen, och ett lätt korn rör sig (`.rh-ton`, `.rh-korn`), inte på rummets lägre steg
 och inte i telefonen. Handen på pulten i rummet har rummets ljus utan baren.
 
-Baren har samma tid på dygnet som rummet (`tand` i [public/rum-hasse.js](public/rum-hasse.js)). Från
-sex på morgonen till midnatt är lysröret i affärens tak tänt, som i rummet (`RumFolk.natt`): väggen är
-då en egen bild spårad med röret framför baren och affären i dess sken till höger
+Baren har samma tid på dygnet som rummet (`ljuset` och `tand` i [public/rum-hasse.js](public/rum-hasse.js)).
+Från sex på morgonen till midnatt är lysröret i affärens tak tänt, som i rummet (`RumFolk.natt`): väggen
+är då en egen bild spårad med röret framför baren och affären i dess sken till höger
 (`hasse-bak-lys.webp`), och figuren, disken och koppen får ett brett ljus från affären och lite mer
-ljus överallt (`uDag` i `LJUS`, `DAG`), medan neonen och gatans kalla ljus syns mindre. Dagsljuset
-faller in från höger i himlens färg och lika starkt som i rummet (`RumUte.light`, `.rh-dagsljus` som
-rummets `.rum-dagsljus`), så att det skiftar med klockan och vädret. Mellan midnatt och sex är
-lysröret släckt och baren lyses bara av sina egna lampor (`hasse-bak.webp`). Förut var baren alltid
-en mörk kvällsbar, också mitt på dagen när rummet bredvid var ljust (ändrat 2026-11-06).
+ljus överallt (`uLys` i `LJUS`, `LYS`), medan neonen och gatans kalla ljus syns mindre. Mellan midnatt
+och sex är lysröret släckt och baren lyses bara av sina egna lampor (`hasse-bak.webp`).
+
+Dagsljuset faller in genom affärens stora fönster till höger, efter samma klocka och väder som utsikten
+i rummet (`RumUte.light`): så starkt som det är ljust ute, och i himlens färg nere vid taken, men vitare,
+som ögat ser dagsljus inne, och svalare än barens varma lampor. Sol gör det starkare och varmare, låg
+sol gyllene, den blå timmen blå, och mulet, regn och dimma grått och svagare; på natten finns det inte.
+På figuren, disken och koppen är det ett brett, mjukt ljus från höger och lite framifrån (`uDag` i
+`LJUS`, `DAG`), så att hans vänstra sida är ljus och den andra faller av mjukt, och när det är dag ger
+lamporna, neonen och gatans ljus vika. Skuggorna på disken faller då åt vänster, bort från fönstret,
+och disken är ljusast närmast affären. Väggen har fönsterljuset spårat för sig, i vitt, från samma
+fönster och med hans skugga (`hasse-bak-dag.webp`, `?dag=1` i [scripts/hasse/bak.html](scripts/hasse/bak.html)),
+och sidan lägger det på väggens bild i fönstrets färg och styrka, som ljus läggs till ljus, på en duk
+som disken också speglar (`vagg`). Förut var baren alltid en mörk kvällsbar, också mitt på dagen när
+rummet bredvid var ljust, och sedan låg ett dis i himlens färg över hela bilden, också över honom, medan
+ljuset på honom nästan var detsamma dag som kväll (ändrat 2026-11-06).
 
 **Kaffet i rummet.** Handen, koppen och notan på pulten är samma som i hans bild, så att man känner
 igen dem när kameran slår över: koppen är bardiskens modell (`byggKopp`) med samma ljus, fatet står
-på notans övre hörn och handen ligger tätt till vänster om fatet med fingertopparna vid notans kant,
+på notans övre hörn och handen ligger till vänster om fatet med fingertopparna strax före fatets kant,
 som hans vänstra hand vid koppen i baren ([public/rum-hasse-hand.js](public/rum-hasse-hand.js)).
-Armen kommer in från bildens vänstra kant och ligger på pulten en bit framför dess bakre kant, så att
-han inte ser ut att hålla i kanten. Koppen ritas i handens duk med en egen
+Armen kommer rakt in från bildens vänstra kant, från baren, och ligger helt på pulten en bit framför
+dess bakre kant, så att pulten syns fortsätta bakom armen och han inte ser ut att hålla i kanten. Koppen ritas i handens duk med en egen
 kamera: den ses 44° uppifrån och rakt framifrån som det andra på pulten, eftersom handens kamera ser
 hörnet långt från sin mitt och en kopp där skulle luta. Den är lite mindre än i baren (`KOPP_SKALA`),
 där handen pekar mot en och ser kortare ut. Duken tonar in när den är klar, och den ritade koppen i
 `hasseHtml` tonar då bort; den står kvar utan WebGL. Bardiskens trä har pultens bruna, inte rödare.
 Förut stod en platt ritad kopp, sedd nästan från sidan, bredvid notan, och handen låg under fatet så
 att det såg ut som om den bar det (ändrat 2026-11-05). Sedan låg handen tryckt mot pultens bakre kant
-med fingrarna mot fatet, medan den i baren låg en bit från koppen (ändrat 2026-11-06).
+med fingrarna mot fatet, medan den i baren låg en bit från koppen (ändrat 2026-11-06). Sedan kom armen
+snett uppifrån, och ärmen låg på pultens bakre kant, så att pulten såg ut att ta slut vid armen (ändrat
+2026-11-06).
 
 Tre tidigare försök: först satt han på en barstol vid pultens ände med en arm som ett gummiband över
 hörnet till handen långt nere på pulten (armen, benen, hörnet och koppen såg konstiga ut). Sedan gled
