@@ -1,5 +1,5 @@
 {
- "uppdaterad": "2026-11-06T17:21:00.440Z",
+ "uppdaterad": "2026-11-06T17:21:42.514Z",
  "omgang": {
   "id": "2026-11-07-st4978",
   "matcher": [
@@ -576,22 +576,22 @@
    },
    "hasse": {
     "stycken": [
-     "Newcastle har förlorat två gånger mot Everton på fyra dagar och fick höra burop från sin egen publik. Joelinton är skadad igen och Ramsey är avstängd efter två gula kort i tilläggstiden, så mittfältet är tunt. Ett lag utan mittfält har ingen organisation, och då blir det tränaren som får stå och prata om effektivitet. Orsak och verkan.",
-     "Fulham skjuter ofta och har gjort drygt sex mål färre än chanserna borde ha gett. Sådant jämnar ut sig, det har det alltid gjort, och Arbeloa jobbar med just avsluten. Jag har varit med om att ett lag missar läge efter läge, och till slut går de in, jävligt ofta mot ett lag som redan är trött i huvudet. Etta och kryss."
+     "Newcastle åker till Fulham efter två förluster mot Everton på fyra dagar och med burop från sin egen publik i öronen. Det som avgör är ändå mittfältet, som är tunt. Joelinton är skadad igen och Ramsey är avstängd efter två gula kort i tilläggstiden. Ett lag som saknar folk i mitten får svårt att hålla ihop organisationen, och det löser man inte på en vecka.",
+     "Fulham skjuter ofta men har gjort drygt sex mål färre än chanserna borde ha gett. Lugn nu, sådant brukar jämna ut sig, och Arbeloa jobbar med just avsluten. Här höjer jag ändå ett varningens finger, för det är fortfarande det som talar emot dem. Fulham hemma ligger närmast, men det är tunt. Etta och kryss."
     ],
     "tips": "2026-11-06T15:03:36.300Z",
     "uppdrag": {
      "fraser": [
-      "Orsak och verkan",
+      "Här höjer jag ett varningens finger",
       "Lugn nu"
      ],
      "krydda": null,
      "bielsa": []
     },
     "model": "claude-opus-5-5",
-    "version": "2026-11-04.1",
-    "writtenAt": "2026-11-06T15:03:49.508Z",
-    "attempts": 1
+    "version": "2026-11-05.1",
+    "writtenAt": "2026-11-06T17:21:34.569Z",
+    "attempts": 2
    },
    "model": "claude-opus-5-5",
    "version": "2026-11-04.1",
