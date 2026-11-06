@@ -103,13 +103,12 @@
     farre: ['På din kupong har du bara {du}. Det var kaxigt.'],
     fler: ['På din kupong har du {du}. Så många tecken behövs inte.'],
     korsar: ['{Bada} kan du behålla på din kupong, men stryk resten.'],
-    skilda: ['På din kupong har du {du}, och det kan du glömma.', 'På din kupong har du {du}, och det är dina pengar.'],
+    skilda: ['På din kupong har du {du}, och det kan du glömma.'],
     tom: ['Du har inte fyllt i den här matchen än. Nu vet du vad du ska sätta.'],
   },
 
   // När något inte går.
   ingenKupong: 'Det finns ingen kupong än.',
-  igang: 'Matcherna har redan börjat. Efteråt är alla kloka.',
   ejKlar: ['Den har jag inte kommit till än.', 'Den tar jag sen.'],
   utanRost: 'Jag har tappat rösten. Läs här.',
 });

@@ -997,7 +997,8 @@ window.RumHasse = (() => {
     });
     // nästa match man inte har frågat om syns utan att man rullar
     if (forsta) l.scrollTop = Math.max(0, forsta.offsetTop - l.offsetTop - 40);
-    rad(forstaRad(lista, fragat, forst));
+    const forstaText = forstaRad(lista, fragat, forst);
+    if (forstaText) rad(forstaText);
     const dag = spelstopp(lista);
     H.prat = lista.length && forsta ? { rader: medDag(REP().ledig, dag), i: 0, nasta: performance.now() + 24000, gang: 24000 } : null;
     klick();
@@ -1007,7 +1008,8 @@ window.RumHasse = (() => {
     if (!lista.length) return r.ingenKupong;
     const nu = Date.now();
     const oppna = lista.filter((m) => Date.parse(m.avspark) > nu);
-    if (!oppna.length) return r.igang;
+    // när alla matcher har börjat säger han inget
+    if (!oppna.length) return null;
     const n = lista.filter((m) => fragat[m.id]).length;
     const namn = dittNamn();
     if (forst) {
