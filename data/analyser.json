@@ -1,5 +1,5 @@
 {
- "uppdaterad": "2026-11-06T17:27:04.655Z",
+ "uppdaterad": "2026-11-06T17:27:37.328Z",
  "omgang": {
   "id": "2026-11-07-st4978",
   "matcher": [
@@ -655,24 +655,26 @@
    },
    "hasse": {
     "stycken": [
-     "Oxford har släppt in elva mål på tretton ligamatcher, och chanserna mot dem borde ha gett ungefär nio till. En stor del av den skillnaden har målvakten stått för, och han är avstängd. Eastwood väntas stå, och mittbacken Helik är osäker med en knäskada. Med ny målvakt och ny mittback tänker jag direkt att det finns 28 sätt att bryta ner en backlinje, och med lite verticalidá rakt mot den nya mittbacken så … Ursäkta. Back to basis.",
-     "Stevenage har en jävligt lång skadelista, saknar bland andra Kemp och Roberts och har vunnit en enda ligamatch på bortaplan. Oxford har inte förlorat hemma på hela säsongen, och båda lagen lär rotera. Krysset tar jag för målvakten, och det blir snålt. Jag ringar in etta och kryss."
+     "Oxford har släppt in betydligt färre mål än chanserna mot dem borde ge, och mycket av det har Cumming räddat bort. Nu är han avstängd. Mittbacken Helik gick dessutom av med en knäskada senast, så den nya målvakten kan få en ny mittback framför sig, och det märks vid första hörnan.",
+     "Båda lagen väntas rotera i cupen, och då blir det rotasiones, verticalidá, det är … Ursäkta. Back to basis. Stevenage saknar Kemp och Roberts och har vunnit en enda ligamatch på bortaplan hela säsongen.",
+     "Oxford har inte förlorat hemma i år, och någon bortaseger tror jag inte på. Men med ny målvakt och rotation i båda lagen ligger ett målsnålt kryss nära till hands. Etta och kryss."
     ],
     "tips": "2026-11-06T15:17:22.895Z",
     "uppdrag": {
      "fraser": [
-      "Nej nej nej",
-      "Total kontroll"
+      "Äsch",
+      "Lugn nu"
      ],
      "krydda": null,
      "bielsa": [
+      "rotasiones",
       "verticalidá"
      ]
     },
     "model": "claude-opus-5-5",
-    "version": "2026-11-04.1",
-    "writtenAt": "2026-11-06T15:17:37.113Z",
-    "attempts": 1
+    "version": "2026-11-05.1",
+    "writtenAt": "2026-11-06T17:27:29.191Z",
+    "attempts": 2
    },
    "model": "claude-opus-5-5",
    "version": "2026-11-04.1",
