@@ -3519,6 +3519,27 @@ när datorn har annat att göra (se [När datorn inte hinner med](#när-datorn-i
 Pekar man på tavlan i rummet tänds snabbvalet Statistik på
 text-tv:n. Med `prefers-reduced-motion` står tavlan framme direkt.
 
+**Ropa till Hasse** (2026-11-06, användarens önskemål): under lappen i handen står det man ropar
+till Hasse Backe (fiktiv), som sitter i baren till vänster utanför bilden – *Hasse, vad betyder
+procenten?*, *Hasse, vad är tur och otur?* och så vidare, en fråga per lapp – och ett klick eller
+H, så svarar han därifrån. Man står kvar vid tavlan med lappen i handen, och hans svar kommer ord
+för ord, en mening i taget, i samma stil som hans tal i baren: bredvid lappen, åt baren till, med
+lappen flyttad åt höger och mörkt från vänster som i baren, eller över lappen när de inte ryms
+bredvid varandra (i telefonen och i smala fönster). Med ljudet på (knappen i baren) hörs han från
+vänster och lite dovt, som från andra sidan affären, och orden kommer i takt med rösten
+(`fjarran` i [public/rum-hasse.js](public/rum-hasse.js)). Han säger vad talen är och hur de räknas
+(samma innehåll som förklaringarna under Statistik → Lagen), ett exempel ur bladet man har framme
+(*Nottingham står överst med 27 %, alltså lite mer än vanligt.*) och vad han själv gör med det, i
+sin egen röst ([prompts/hasse-backe.md](prompts/hasse-backe.md)). Meningarna står under `anslag` i
+[public/rum-hasse-repliker.js](public/rum-hasse-repliker.js), så att de får hans röst som de andra
+replikerna (src/rost.js tar med dem av sig själv); exemplet räknas i sidan ur samma tal som lappen,
+ändras med datan och sägs därför tyst, och när bladet räknar med dolda resultat eller saknar data
+hoppar han över det. Ett klick på svaret visar resten direkt, och med minskad rörelse står allt
+direkt utan ljud, som i baren. *Tack, Hasse*, Esc eller ett klick utanför tystar honom (Esc och ett
+klick utanför sätter sedan tillbaka lappen), och han tystnar också när lappen sätts tillbaka eller
+man går till nästa lapp. Ändras vad en lapp visar ska hans svar följa med. Förut (samma dag)
+förklarade han på ett kort som gled in från baren; användaren ville hellre att han svarade.
+
 Dolda resultat: formen får ? för de dolda matcherna, och lapparna som räknar med
 resultaten (styrkan, krysset, turen, oddsen och motståndet) visar bara rubriken och ett
 frågetecken när en match i lagens divisioner är dold – den lyfta lappen har då *Visa ändå*.
@@ -3526,7 +3547,8 @@ Lagfilerna hämtas med rummet (om igen efter en kvart), matchernas filer när ta
 Slitaget skiftar med dagen: lapparnas och bladens vinklar, nålhålen och hörnen av rivna
 lappar.
 `?rum-anslag` visar tavlan framme i en fast bild, och `?rum-anslag=<lapp>` (form, skador,
-styrka, kryss, tur, odds, vila, motstand) med den lappen i handen.
+styrka, kryss, tur, odds, vila, motstand) med den lappen i handen, och med
+`&rum-anslag-hasse` också Hasses svar om den.
 
 ### Kortregistret
 
@@ -3858,7 +3880,8 @@ en fast bild.
 ### Hasse Backe
 
 *Hasse Backe (fiktiv)* analyserar matcherna på stryktipskupongen, och det är allt man kan be
-honom om: inga följdfrågor och ingen textruta. Han sitter i baren till vänster utanför bilden, och
+honom om i baren: inga följdfrågor och ingen textruta. (Vid anslagstavlan kan man också ropa till
+honom om en lapp, och han svarar från baren, se [Anslagstavlan](#anslagstavlan).) Han sitter i baren till vänster utanför bilden, och
 längst ut på pulten står hans kaffe vid notan, och där ligger hans hand. Ett klick på dem, eller H,
 och kameran slår snabbt åt vänster till honom. Där sitter han bakom bardisken, mitt emot väggen med
 anslagstavlan, och har vridit sig lite mot en, med underarmarna på disken, kaffet och notan vid den
