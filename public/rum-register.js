@@ -16,6 +16,8 @@
 // lutar så att man ser ner i den, medan rummet mörknar bakom; den lutar lite
 // efter musen, och kortet under pekaren reser sig. Ett klick på ett kort: det
 // reser sig ur lådan och tas i handen i läsbar storlek, och pilarna bläddrar.
+// Med fingret reser sig kortet under fingret medan man trycker, byts när
+// fingret glider och tas upp när det släpper.
 // Esc, ett klick utanför eller Sätt tillbaka sätter tillbaka kortet, och Esc
 // igen, R eller ett klick utanför lådan ställer den på disken igen.
 //
@@ -296,14 +298,47 @@ window.RumRegister = (() => {
       return A.L.open(false, o.calm() ? null : from || at()).then(end);
     }
 
-    // Lutar efter musen, och kortet under pekaren reser sig.
-    ov.addEventListener('mousemove', (e) => {
-      if (!A.on || !A.L) return;
+    // Lutar efter musen, och kortet under pekaren reser sig. (Bara musen: ett
+    // tryck med fingret ger också mushändelser, och då lutade lådan mot
+    // fingret precis när kortet skulle väljas.)
+    ov.addEventListener('pointermove', (e) => {
+      if (e.pointerType !== 'mouse' || !A.on || !A.L) return;
       if (A.lyft) { A.L.hover(null); ov.style.cursor = ''; return; }
       if (!o.calm()) A.L.tilt((e.clientX / innerWidth) * 2 - 1, (e.clientY / innerHeight) * 2 - 1);
       const id = e.target.closest('.reg-rad') ? null : A.L.pick(e.clientX, e.clientY);
       A.L.hover(id);
       ov.style.cursor = id ? 'pointer' : '';
+    });
+
+    // Med fingret: kortet under fingret reser sig så högt att fliken syns
+    // ovanför fingertoppen, byts när fingret glider över lådan och tas upp när
+    // fingret släpper. Släpper det utanför lådan händer ingenting.
+    const F = { id: null, upp: 0 };
+    const under = (e) => A.L.pick(e.clientX, e.clientY, true);
+    ov.addEventListener('pointerdown', (e) => {
+      if (e.pointerType === 'mouse') return;
+      F.upp = 0;
+      if (!e.isPrimary || !A.on || !A.L || A.lyft || !ov.classList.contains('framme')) return;
+      F.id = e.pointerId;
+      A.L.hover(under(e), true);
+    });
+    ov.addEventListener('pointermove', (e) => {
+      if (e.pointerId === F.id) A.L.hover(under(e), true);
+    });
+    ov.addEventListener('pointerup', (e) => {
+      if (e.pointerId !== F.id) return;
+      F.id = null;
+      const id = under(e);
+      if (!id) { A.L.hover(null); return; }
+      F.upp = e.timeStamp;
+      // (efter händelsen: annars tog svepet i rum.js det upptagna kortet för
+      // ett kort i handen och bläddrade vidare)
+      setTimeout(() => { if (A.on && !A.lyft) lift(id); });
+    });
+    ov.addEventListener('pointercancel', (e) => {
+      if (e.pointerId !== F.id) return;
+      F.id = null;
+      A.L.hover(null);
     });
     addEventListener('resize', () => {
       if (!A.on || !A.L) return;
@@ -408,6 +443,8 @@ window.RumRegister = (() => {
 
     ov.addEventListener('click', (e) => {
       if (!A.on) return;
+      // (kortet togs redan upp när fingret släppte)
+      if (F.upp && e.timeStamp - F.upp < 800) { F.upp = 0; return; }
       if (e.target.closest('a[href], .sp-show')) return;
       if (e.target.closest('[data-reg="tillbaka"]')) { drop(); return; }
       if (A.lyft) {
