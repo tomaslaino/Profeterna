@@ -1,5 +1,5 @@
 {
- "uppdaterad": "2026-11-06T17:22:31.975Z",
+ "uppdaterad": "2026-11-06T17:23:25.442Z",
  "omgang": {
   "id": "2026-11-07-st4978",
   "matcher": [
@@ -159,23 +159,23 @@
    },
    "hasse": {
     "stycken": [
-     "Birmingham har inte förlorat hemma i ligan i år. Priske är osäker, men laget klarade sig utmärkt utan honom mot Millwall. Max Bird tog över mittfältet, gjorde 2–0 och slog passningen till 3–0, och alla målen kom före paus.",
-     "Swansea har Vipotnik, och han gör mål. Men laget tappade två poäng på tilläggstid i Portsmouth och har inte gjort mål i fyra av fjorton ligamatcher. Släpper man in mål i slutet när benen är trötta har man dålig ordning, och det straffar sig jävligt fort.",
-     "Här höjer jag ett varningens finger. Birmingham har släppt in färre mål än chanserna mot dem borde ha gett, och sådant brukar jämna ut sig. Därför tar jag inte ettan ensam. Etta och kryss."
+     "Birmingham har inte förlorat hemma i ligan i år, och i tisdags klarade de sig utmärkt utan Priske. Max Bird fick sin första ligastart, tog över mittfältet, gjorde ett mål och slog passningen till ett annat. Ikke noget at tale om, som man säger i Aalborg.",
+     "Swansea har Vipotnik, som har gjort flest mål i hela serien. Men i Portsmouth släppte laget in två mål på tilläggstid, och de har inte gjort mål i fyra av sina fjorton ligamatcher. Ett lag som tappar poäng så sent har fan ingen total kontroll.",
+     "Samtidigt har Birmingham släppt in färre mål än chanserna mot dem borde ha gett, och sådant brukar jämna ut sig. Priske är dessutom osäker till spel, så ett kryss ligger nära till hands. Jag tar etta och kryss."
     ],
     "tips": "2026-11-06T15:06:26.568Z",
     "uppdrag": {
      "fraser": [
       "Total kontroll",
-      "Här höjer jag ett varningens finger"
+      "Äsch"
      ],
-     "krydda": null,
+     "krydda": "Ikke noget at tale om, som man säger i Aalborg.",
      "bielsa": []
     },
     "model": "claude-opus-5-5",
-    "version": "2026-11-04.1",
-    "writtenAt": "2026-11-06T15:06:40.318Z",
-    "attempts": 1
+    "version": "2026-11-05.1",
+    "writtenAt": "2026-11-06T17:23:12.828Z",
+    "attempts": 2
    },
    "model": "claude-opus-5-5",
    "version": "2026-11-04.1",
