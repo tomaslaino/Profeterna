@@ -15,7 +15,8 @@
 //
 // figuren(duk, { hog, latt, pr }) → { kamera(v), diskBild(duk2d, v, bak), rita(T, n, tal, mun), handelser(T0, T1), info(), borta() }
 // Klipp: T 0–12,4 (vila, skrattet, domen, gesterna, hem), och sedan ett klipp i taget på var sin bit av
-// tidslinjen (KLIPP): fler sätt att slå domen i disken, kaffet (sex sätt) och cigarren.
+// tidslinjen (KLIPP): fler sätt att slå domen i disken, kaffet (sex sätt), cigarren och småsakerna medan han
+// väntar.
 import * as THREE from 'three';
 import { ATLAS, LJUS, ARM, KAMERA, BORD_GLSL, CIGARR, ASKKOPP, laddaFoto, laddaHand, byggArm, byggKopp, byggCigarr, byggAskkopp, byggRok } from './rum-hasse-arm.js';
 import { SCEN, BAK, kamera as scenKamera, iKamera, disken, franBaren } from './rum-hasse-scen.js';
@@ -32,7 +33,7 @@ const spar = (k, t) => {
 // ---------- klippen ----------
 // Rörelserna är klipp på en tidslinje (rum-hasse.js spelar dem): fran–till, och där han står efteråt
 // (vila: 0 är vilan, 5,5 när han pratar). fri: får börja var som helst, skynda: läggs undan fortare
-// när något annat väntar, grupp: sidan lottar bland klippen i gruppen (domen, kaffet, cigarren, talet).
+// när något annat väntar, grupp: sidan lottar bland klippen i gruppen (domen, kaffet, cigarren, småsakerna).
 // dunk: [tid i klippet, styrka, sort] när handen slår i disken, dom: när domen slås i disken (det
 // starkaste slaget), ned: [tid, styrka] när koppen ställs tillbaka på fatet.
 export const KLIPP = {
@@ -87,6 +88,26 @@ export const KLIPP = {
   vifta: { fran: 255, till: 267.2, vila: 0, skynda: true, grupp: 'cigarr' },
   // ett bloss som han håller kvar i munnen och smakar på, och röken ut långsamt
   smaka: { fran: 270, till: 283.4, vila: 0, skynda: true, grupp: 'cigarr' },
+  // Småsakerna medan han väntar på en (grupp smatt, lottas med fingrarna som trummar), några sekunder
+  // var, med händerna på disken:
+  // tittar bort mot gänget i affären, skakar lite på huvudet och ler
+  affaren: { fran: 290, till: 295, vila: 0, skynda: true, grupp: 'smatt' },
+  // tittar längs baren, och nickar åt någon där
+  baren: { fran: 297, till: 301.3, vila: 0, skynda: true, grupp: 'smatt' },
+  // tittar ned på notan, höjer brynen och skakar på huvudet
+  notan: { fran: 303, till: 307.6, vila: 0, skynda: true, grupp: 'smatt' },
+  // nickar för sig själv, nöjd med något han har tänkt
+  nicka: { fran: 309, till: 312.6, vila: 0, skynda: true, grupp: 'smatt' },
+  // en djup, belåten suck
+  suck: { fran: 314, till: 318.6, vila: 0, skynda: true, grupp: 'smatt' },
+  // sträcker på nacken åt båda hållen med slutna ögon
+  nacken: { fran: 320, till: 324, vila: 0, skynda: true, grupp: 'smatt' },
+  // höjer ett ögonbryn mot en: jaså?
+  brynet: { fran: 326, till: 329.6, vila: 0, skynda: true, grupp: 'smatt' },
+  // skrockar åt något han kommer att tänka på
+  skrocka: { fran: 331, till: 335.2, vila: 0, skynda: true, grupp: 'smatt' },
+  // tittar på kaffet och smackar
+  smacka: { fran: 337, till: 340.4, vila: 0, skynda: true, grupp: 'smatt' },
 };
 for (const k of Object.values(KLIPP)) {
   if (k.dunk) k.dom = k.fran + k.dunk.reduce((a, b) => (b[1] > a[1] ? b : a))[0];
@@ -732,8 +753,8 @@ export async function figuren(duk, { hog = false, latt = false, pr = 1 } = {}) {
   };
   const KANAL = Object.keys(HUV);
   // ansiktet i klippen: läggs till som det största av det som rör sig (blicken läggs till: blickX åt hans
-  // vänstra sida, blickY nedåt, i fotots bildpunkter)
-  const ANSIKTE = ['le', 'kis', 'blund', 'munn', 'rund', 'dricker', 'blickX', 'blickY'];
+  // vänstra sida, blickY nedåt, i fotots bildpunkter; andas läggs till andningen)
+  const ANSIKTE = ['le', 'kis', 'blund', 'munn', 'rund', 'dricker', 'blickX', 'blickY', 'andas'];
   const lage = (T) => Object.fromEntries(KANAL.map((x) => [x, spar(HUV[x], T)]));
   const S0 = lage(0);
 
@@ -1365,6 +1386,144 @@ export async function figuren(duk, { hog = false, latt = false, pr = 1 } = {}) {
       rok: [{ fran: 6.9, till: 9.0, sort: 'blas', styrka: 45, avtag: 0.3, fart: 0.75, broms: 1.0, lyft: 46 }],
     }),
   });
+  // Småsakerna (grupp smatt): bara huvudet, kroppen och ansiktet, med händerna kvar på disken. Han
+  // tittar med ögonen först och vrider huvudet efter, som man gör; blickX åt hans vänstra sida (mot
+  // affären), blickY nedåt. andas läggs till andningen (bröstet).
+  Object.assign(RORELSER, {
+    // Bort mot gänget i affären: ögonen först och huvudet efter, brynen upp, och sedan kisar han, skakar
+    // lite på huvudet och ler åt dem innan blicken kommer tillbaka.
+    affaren: {
+      k: {
+        blickX: [[0.1, 0], [0.2, 5.5], [0.8, 3.5], [2.6, 3.5], [2.7, 4.5], [3.5, 4.5], [3.6, 0]],
+        blickY: [[0.1, 0], [0.2, -0.5], [3.5, -0.5], [3.6, 0]],
+        yaw: [[0.15, 0], [0.9, 0.4], [2.6, 0.4], [2.85, 0.28], [3.1, 0.42], [3.35, 0.3], [3.6, 0.35], [4.5, 0]],
+        pitch: [[0.15, 0], [0.9, -0.15], [2.6, -0.15], [3.6, -0.1], [4.5, 0]],
+        roll: [[0.2, 0], [1.0, 0.04], [3.6, 0.04], [4.5, 0]],
+        vrid: [[0.3, 0], [1.2, 0.03], [3.6, 0.03], [4.6, 0]],
+        brynX: [[0.2, 0], [0.7, 0.5], [2.4, 0.4], [3.0, 0.2], [4.6, 0]],
+        brynY: [[0.2, 0], [0.7, 0.4], [2.4, 0.3], [3.0, 0.1], [4.6, 0]],
+        kis: [[0.9, 0], [1.4, 0.25], [2.5, 0.25], [3.0, 0.3], [4.4, 0]],
+        le: [[2.4, 0], [3.0, 0.32], [3.8, 0.35], [4.9, 0]],
+      },
+    },
+    // Längs baren: blicken och huvudet åt andra hållet, hakan lite upp, och en kort nick med brynen upp
+    // och ett litet leende, som åt någon han känner.
+    baren: {
+      k: {
+        blickX: [[0.1, 0], [0.2, -5], [0.9, -3.5], [3.0, -3.5], [3.1, 0]],
+        yaw: [[0.15, 0], [0.9, -0.45], [3.0, -0.45], [3.9, 0]],
+        pitch: [[0.15, 0], [0.9, -0.2], [1.6, -0.2], [1.85, 0.3], [2.15, -0.15], [3.0, -0.15], [3.9, 0]],
+        brynX: [[1.5, 0], [1.75, 0.8], [2.2, 0.7], [2.8, 0]],
+        brynY: [[1.5, 0], [1.75, 0.6], [2.2, 0.5], [2.8, 0]],
+        le: [[1.5, 0], [1.85, 0.3], [2.6, 0.25], [3.3, 0]],
+        munn: [[1.8, 0], [1.9, 0.05], [2.05, 0]],
+      },
+    },
+    // Notan: han tittar ned på den, brynen åker upp och munnen säger oj, han skakar på huvudet och pustar
+    // ut, och ler snett.
+    notan: {
+      k: {
+        blickX: [[0.1, 0], [0.2, 3], [3.2, 3], [3.3, 0]],
+        blickY: [[0.1, 0], [0.2, 5], [3.2, 5], [3.3, 0]],
+        pitch: [[0.15, 0], [0.8, 0.45], [3.2, 0.45], [3.9, 0]],
+        yaw: [[0.15, 0], [0.8, 0.2], [1.9, 0.2], [2.15, 0.05], [2.4, 0.3], [2.65, 0.08], [2.9, 0.22], [3.3, 0.2], [3.9, 0]],
+        brynX: [[0.8, 0], [1.2, 0.9], [2.0, 0.85], [3.4, 0]],
+        brynY: [[0.8, 0], [1.2, 0.8], [2.0, 0.75], [3.4, 0]],
+        rund: [[1.0, 0], [1.25, 0.45], [1.9, 0.4], [2.2, 0]],
+        munn: [[1.0, 0], [1.25, 0.04], [1.9, 0.04], [2.2, 0]],
+        andas: [[2.0, 0], [2.4, -6], [3.0, 0]],
+        le: [[3.0, 0], [3.5, 0.2], [4.3, 0]],
+      },
+    },
+    // Han nickar för sig själv, två gånger och en liten, med blicken ned åt sidan och ett leende.
+    nicka: {
+      k: {
+        blickX: [[0.1, 0], [0.25, -2], [2.6, -2], [2.75, 0]],
+        blickY: [[0.1, 0], [0.25, 1.5], [2.6, 1.5], [2.75, 0]],
+        pitch: [[0.2, 0], [0.6, 0.1], [0.95, 0.55], [1.3, 0.05], [1.65, 0.5], [2.0, 0.05], [2.3, 0.3], [2.7, 0]],
+        roll: [[0.2, 0], [0.8, 0.05], [2.3, 0.05], [2.9, 0]],
+        le: [[0.3, 0], [1.0, 0.3], [2.6, 0.35], [3.4, 0]],
+        brynX: [[0.3, 0], [0.9, 0.3], [2.4, 0.3], [3.2, 0]],
+        brynY: [[0.3, 0], [0.9, 0.2], [2.4, 0.2], [3.2, 0]],
+      },
+    },
+    // Suckan: han andas in djupt så att bröstet häver sig och axlarna åker upp, med hakan upp och
+    // halvslutna ögon, och andas ut genom munnen medan axlarna sjunker.
+    suck: {
+      k: {
+        andas: [[0.1, 0], [1.3, 16], [1.7, 16], [3.2, -5], [4.2, 0]],
+        axV: [[0.1, 0], [1.3, 16], [1.7, 16], [3.2, -4], [4.2, 0]],
+        axH: [[0.1, 0], [1.3, 16], [1.7, 16], [3.2, -4], [4.2, 0]],
+        lut: [[0.1, 0], [1.3, -0.025], [1.7, -0.025], [3.2, 0.01], [4.2, 0]],
+        pitch: [[0.1, 0], [1.3, -0.35], [1.7, -0.35], [3.2, 0.15], [4.2, 0]],
+        brynX: [[0.1, 0], [1.3, 0.6], [1.7, 0.6], [3.0, 0.1], [4.0, 0]],
+        brynY: [[0.1, 0], [1.3, 0.5], [1.7, 0.5], [3.0, 0.1], [4.0, 0]],
+        blund: [[0.6, 0], [1.3, 0.45], [2.6, 0.55], [3.2, 0]],
+        munn: [[1.65, 0], [1.85, 0.07], [2.8, 0.05], [3.1, 0]],
+        rund: [[1.65, 0], [1.85, 0.5], [2.8, 0.4], [3.1, 0]],
+        le: [[2.6, 0], [3.2, 0.2], [4.3, 0]],
+      },
+    },
+    // Nacken: huvudet åt ena sidan och sedan den andra, med slutna ögon och axeln som åker upp på andra
+    // sidan.
+    nacken: {
+      k: {
+        roll: [[0.2, 0], [0.9, 0.14], [1.5, 0.14], [2.3, -0.12], [2.9, -0.12], [3.6, 0]],
+        yaw: [[0.2, 0], [0.9, -0.1], [1.5, -0.1], [2.3, 0.1], [2.9, 0.1], [3.6, 0]],
+        pitch: [[0.2, 0], [0.9, -0.1], [2.9, -0.1], [3.6, 0]],
+        axV: [[0.2, 0], [0.9, -4], [1.5, -4], [2.3, 12], [2.9, 12], [3.6, 0]],
+        axH: [[0.2, 0], [0.9, 12], [1.5, 12], [2.3, -4], [2.9, -4], [3.6, 0]],
+        blund: [[0.4, 0], [0.9, 0.8], [2.9, 0.8], [3.3, 0]],
+        kis: [[0.6, 0], [1.0, 0.2], [2.9, 0.2], [3.3, 0]],
+        munn: [[0.9, 0], [1.2, 0.03], [2.6, 0.03], [2.9, 0]],
+      },
+    },
+    // Ögonbrynet: hakan ned och huvudet lite på sned mot en, ena brynet högt och det andra ned, och
+    // sedan ett snett leende. Jaså?
+    brynet: {
+      k: {
+        yaw: [[0.2, 0], [0.7, 0.2], [2.3, 0.2], [3.0, 0]],
+        pitch: [[0.2, 0], [0.7, 0.25], [2.3, 0.25], [3.0, 0]],
+        roll: [[0.2, 0], [0.7, -0.05], [2.3, -0.05], [3.0, 0]],
+        brynX: [[0.25, 0], [0.7, 1.7], [2.3, 1.6], [3.0, 0]],
+        brynY: [[0.25, 0], [0.7, -1.3], [2.3, -1.2], [3.0, 0]],
+        kis: [[0.3, 0], [0.7, 0.3], [2.3, 0.3], [2.9, 0]],
+        le: [[1.4, 0], [1.9, 0.22], [2.5, 0.25], [3.3, 0]],
+      },
+    },
+    // Han skrockar för sig själv: blicken ned åt sidan, ett leende som växer, och axlarna och bröstet
+    // som hoppar tre gånger; sedan tittar han upp på en med leendet kvar.
+    skrocka: {
+      k: {
+        blickX: [[0.1, 0], [0.25, -2.5], [1.0, -2.5], [1.1, -1.5], [2.4, -1.5], [2.55, 0]],
+        blickY: [[0.1, 0], [0.25, 2.5], [2.4, 2.5], [2.55, 0]],
+        pitch: [[0.2, 0], [0.8, 0.3], [1.2, 0.35], [1.4, 0.2], [1.6, 0.4], [1.8, 0.25], [2.0, 0.42], [2.5, 0.1], [3.4, 0]],
+        yaw: [[0.2, 0], [0.8, -0.15], [2.3, -0.1], [2.8, 0.15], [3.6, 0]],
+        le: [[0.3, 0], [0.9, 0.35], [1.2, 0.65], [2.4, 0.6], [3.0, 0.45], [4.0, 0]],
+        kis: [[0.9, 0], [1.2, 0.45], [2.3, 0.4], [3.0, 0.2], [3.8, 0]],
+        axV: [[1.1, 0], [1.3, 7], [1.45, 1], [1.65, 8], [1.8, 1], [2.0, 6], [2.2, 0]],
+        axH: [[1.1, 0], [1.3, 7], [1.45, 1], [1.65, 8], [1.8, 1], [2.0, 6], [2.2, 0]],
+        andas: [[1.1, 0], [1.3, 4], [1.45, -1], [1.65, 4], [1.8, -1], [2.0, 3], [2.2, 0]],
+        munn: [[1.15, 0], [1.3, 0.1], [1.45, 0.02], [1.65, 0.11], [1.8, 0.02], [2.0, 0.08], [2.2, 0]],
+        brynX: [[1.0, 0], [1.3, 0.4], [2.6, 0.4], [3.5, 0]],
+        brynY: [[1.0, 0], [1.3, 0.3], [2.6, 0.3], [3.5, 0]],
+      },
+    },
+    // Kaffet: han tittar på koppen, smackar två gånger och säger mm med höjda bryn.
+    smacka: {
+      k: {
+        blickX: [[0.1, 0], [0.22, 4.5], [1.9, 4.5], [2.05, 0]],
+        blickY: [[0.1, 0], [0.22, 3.5], [1.9, 3.5], [2.05, 0]],
+        yaw: [[0.15, 0], [0.7, 0.2], [1.9, 0.2], [2.6, 0]],
+        pitch: [[0.15, 0], [0.7, 0.25], [1.9, 0.25], [2.6, 0]],
+        munn: [[0.8, 0], [0.9, 0.06], [1.0, 0], [1.12, 0.07], [1.22, 0]],
+        rund: [[1.4, 0], [1.6, 0.35], [2.3, 0.3], [2.5, 0]],
+        brynX: [[1.3, 0], [1.6, 0.5], [2.4, 0.4], [3.0, 0]],
+        brynY: [[1.3, 0], [1.6, 0.4], [2.4, 0.3], [3.0, 0]],
+        le: [[2.2, 0], [2.6, 0.2], [3.2, 0]],
+      },
+    },
+  });
   // Klippen in i tidslinjen: nycklarna i tidslinjens tid, med början och slut.
   const KL = [];
   const tom = (a = 0, b = 0) => [[0, a], [1e-3, b]];
@@ -1500,18 +1659,66 @@ export async function figuren(duk, { hog = false, latt = false, pr = 1 } = {}) {
   const sa = v();
   const sb = v();
 
-  // Fingrarna trummar otåligt på disken (trumma): från lillfingret till pekfingret, två varv.
+  // Fingrarna trummar otåligt på disken (trumma), på ett av fyra sätt och med någon av händerna:
+  // från lillfingret till pekfingret två varv (varv), tre fortare (fort), ett långsamt (lugnt), eller
+  // pekfingret som knackar fyra gånger (peka). [hur länge, varv i sekunden, varv]; fingrarna 0–3 är
+  // pek- till lillfingret.
+  const TRUM = { varv: [0.86, 3.2], fort: [0.78, 4.4], lugnt: [0.95, 1.1], peka: [1.45, 2.8] };
   let trumT = -9;
+  let trumS = TRUM.varv;
+  let trumPeka = false;
+  let trumHand = 'A';
   const trumF = [0, 0, 0, 0];
   function trummar(n) {
     const t = n - trumT;
-    if (t < 0 || t > 0.86) return null;
+    if (t < 0 || t > trumS[0]) return null;
     for (let i = 0; i < 4; i++) {
-      const f = ((t * 3.2) % 1) * 4 - (3 - i);
+      if (trumPeka) {
+        const f = (t * trumS[1]) % 1;
+        trumF[i] = i ? 0.05 : -Math.sin(Math.min(1, f * 1.6) * Math.PI) * 0.42;
+        continue;
+      }
+      const f = ((t * trumS[1]) % 1) * 4 - (3 - i);
       trumF[i] = f > 0 && f < 1 ? -Math.sin(f * Math.PI) * 0.3 : 0;
     }
     return trumF;
   }
+
+  // ---------- det som alltid rör sig ----------
+  // Blinkningarna, blicken, huvudet och andningen går aldrig i takt, så att inget upprepar sig när han
+  // bara sitter: samma klocka ger alltid samma bild (hash), men inget mönster går igen.
+  const hash = (x) => { const s = Math.sin(x * 127.1 + 311.7) * 43758.5453; return s - Math.floor(s); };
+  // Han blinkar ungefär var fjärde sekund, någon gång mellan 0,6 och 7,8 s isär och ibland två gånger
+  // i rad.
+  const BLINK = 4.2;
+  function blinkar(n) {
+    const k = Math.floor(n / BLINK);
+    let b = 0;
+    for (let j = k - 1; j <= k; j++) {
+      const d = n - (j * BLINK + hash(j * 7.3) * (BLINK - 0.6));
+      b = Math.max(b, 1 - clamp(Math.abs(d - 0.085) / 0.085));
+      if (hash(j * 3.7 + 1) < 0.22) b = Math.max(b, 1 - clamp(Math.abs(d - 0.4) / 0.085));
+    }
+    return b;
+  }
+  // Blicken vilar aldrig helt: varannan sekund eller så flyttar den sig lite (en snabb ryckning), oftast
+  // tillbaka till en. [x, y] i fotots bildpunkter.
+  const SAKK = 1.7;
+  const sakkMal = (j) => (hash(j * 2.9) < 0.45 ? [0, 0] : [(hash(j * 1.31) - 0.5) * 3.2, (hash(j * 2.17) - 0.5) * 1.8]);
+  const blickUt = [0, 0];
+  function sakkader(n) {
+    const k = Math.floor(n / SAKK);
+    const t0 = k * SAKK + hash(k * 5.1) * SAKK * 0.7;
+    const [j, f] = n < t0 ? [k - 1, 1] : [k, ss(t0, t0 + 0.06, n)];
+    const a = sakkMal(j - 1);
+    const b = sakkMal(j);
+    blickUt[0] = a[0] + (b[0] - a[0]) * f;
+    blickUt[1] = a[1] + (b[1] - a[1]) * f;
+    return blickUt;
+  }
+  // Huvudet driver långsamt (svängningar som inte går jämnt ut), och andningen byter takt och djup.
+  const drift = (n, a, b, c) => 0.6 * Math.sin(n * a) + 0.4 * Math.sin(n * b + 2) + 0.25 * Math.sin(n * c + 1);
+  const andning = (n) => 7 * (0.85 + 0.2 * Math.sin(n * 0.17 + 1)) * Math.sin(n * 1.45 + 0.9 * Math.sin(n * 0.21));
 
   // ---------- cigarren ----------
   // Han tar cigarren ur askkoppen med höger hand, och det är cigarren som styr: dess läge räknas fram
@@ -1944,9 +2151,9 @@ export async function figuren(duk, { hog = false, latt = false, pr = 1 } = {}) {
     const iMun = cc ? spar(cc.iMun, t) : 0;
     const blaser = cc ? spar(cc.blaser, t) : 0;
     const glod = cc ? spar(cc.glod, t) : 0;
-    const yaw = YAW0 + 0.22 * (kan('yaw') + 0.1 * Math.sin(n * 0.8) * (1 - iMun * 0.6) + talar * 0.28 * Math.sin(n * 2.7 + 1));
-    const pitch = 0.17 * (kan('pitch') + talar * 0.3 * Math.sin(n * 6.1) + skratt * 0.16 * Math.sin(n * 15) - dricker * 1.15);
-    const roll = -(kan('roll') + talar * 0.03 * Math.sin(n * 3.3));
+    const yaw = YAW0 + 0.22 * (kan('yaw') + 0.1 * drift(n, 0.8, 0.37, 1.33) * (1 - iMun * 0.6) + talar * 0.28 * Math.sin(n * 2.7 + 1));
+    const pitch = 0.17 * (kan('pitch') + 0.07 * drift(n, 0.53, 0.23, 0.97) + talar * 0.3 * Math.sin(n * 6.1) + skratt * 0.16 * Math.sin(n * 15) - dricker * 1.15);
+    const roll = -(kan('roll') + 0.012 * drift(n, 0.29, 0.61, 0.13) + talar * 0.03 * Math.sin(n * 3.3));
     eu.set(pitch, yaw, roll, 'YXZ');
     mh.makeRotationFromEuler(eu);
     U.uHuvud.value.setFromMatrix4(mh);
@@ -1962,7 +2169,7 @@ export async function figuren(duk, { hog = false, latt = false, pr = 1 } = {}) {
     const axV = kan('axV') + skratt * 5 * Math.sin(n * 15);
     const axH = kan('axH') + skratt * 5 * Math.sin(n * 15);
     U.uAx.value.set(axV, axH);
-    U.uAndas.value = 7 * Math.sin(n * 1.5) + skratt * 5 * Math.sin(n * 15);
+    U.uAndas.value = andning(n) + d('andas') + skratt * 5 * Math.sin(n * 15);
     const lyft = talar * 0.38 * Math.max(0, Math.sin(n * 4.3));
     U.bryn.value.set(kan('brynX') + lyft, kan('brynY') + lyft);
     U.le.value = Math.max(0.14 * (1 - ss(2.5, 2.8, t)), skratt, 0.3 * ss(8.3, 8.8, t) * (1 - ss(9.4, 9.8, t)), 0.6 * ss(10, 10.5, t) * (1 - ss(11.6, 12.4, t)), 0.14 * ss(11.6, 12.4, t), d('le'));
@@ -1974,12 +2181,12 @@ export async function figuren(duk, { hog = false, latt = false, pr = 1 } = {}) {
     U.munn.value = Math.max(talMun * stav * 0.62, skratt * (0.92 + 0.14 * Math.sin(n * 14)), ss(4.9, 5.0, t) * (1 - ss(5.0, 5.25, t)) * 0.72, iMun * (0.15 + 0.12 * puff), blaser * (0.27 + 0.05 * Math.sin(n * 7)), d('munn'));
     U.rund.value = talMun * Math.max(0, Math.sin(n * 3.1 + 1.3)) * 0.8;
     U.kis.value = Math.max(skratt * 0.75, U.le.value * 0.45, d('kis'));
-    // blinkningarna: en gång i några sekunder, klockan avgör
-    const fas = (n % 4.3);
-    const bl = 1 - clamp(Math.abs(fas - 0.3) / 0.085);
+    // blinkningarna och blicken som flyttar sig lite (blinkar, sakkader)
+    const bl = blinkar(n);
+    const sk = sakkader(n);
     U.rund.value = Math.max(U.rund.value, dricker * 0.7, iMun * 0.85, blaser, d('rund'));
     U.blund.value = Math.max(dricker * 0.82, skratt * 0.42, bl, ss(10.7, 10.9, t) * (1 - ss(11.25, 11.45, t)), d('blund'));
-    U.blick.value.set(4 * clamp((yaw - YAW0) / 0.2, -1, 1) + d('blickX'), d('blickY'));
+    U.blick.value.set(4 * clamp((yaw - YAW0) / 0.2, -1, 1) + d('blickX') + sk[0], d('blickY') + sk[1]);
     sa.copy(SA);
     sa.y += axV;
     sa.x -= axV * 0.25;
@@ -2015,11 +2222,14 @@ export async function figuren(duk, { hog = false, latt = false, pr = 1 } = {}) {
     a.w.y += skratt * 7 * Math.sin(n * 15);
     b.w.y += skratt * 7 * Math.sin(n * 15 + 1);
     ik(sa, a.w, a.pol, E_, Wr_);
-    const trum = t < 2.5 || (t > 9.95 && t < 20) ? trummar(n) : extraA;
-    A.satt(sa, E_, Wr_, a.F, a.P, a.krok, a.peka, isar, 0.45, trum);
+    // fingrarna trummar bara i vilan, med den ena eller den andra handen
+    const iVila = t < 2.5 || (t > 9.95 && t < 20);
+    const trumA = iVila && trumHand === 'A' ? trummar(n) : extraA;
+    const trumB = iVila && trumHand === 'B' ? trummar(n) : extraB;
+    A.satt(sa, E_, Wr_, a.F, a.P, a.krok, a.peka, isar, 0.45, trumA);
     U.uArm.value[0].copy(sa); U.uArm.value[1].copy(E_); U.uArm.value[2].copy(Wr_);
     ik(sb, b.w, b.pol, E_, Wr_);
-    B.satt(sb, E_, Wr_, b.F, b.P, b.krok, b.peka, isar * 0.8, 0.45, extraB);
+    B.satt(sb, E_, Wr_, b.F, b.P, b.krok, b.peka, isar * 0.8, 0.45, trumB);
     U.uArm.value[3].copy(sb); U.uArm.value[4].copy(E_); U.uArm.value[5].copy(Wr_);
     // koppen och fatet hoppar när han slår i disken
     K.fat.position.y = KOPP[1] + 0.5 + HOPP.fat;
@@ -2075,9 +2285,16 @@ export async function figuren(duk, { hog = false, latt = false, pr = 1 } = {}) {
     kamera,
     diskBild,
     handelser,
-    // fingrarna trummar en stund (bara i vilan); ror() medan de gör det
-    trumma() { if (sistaN - trumT > 1.2) trumT = sistaN + 0.05; },
-    ror: () => sistaN - trumT < 0.9,
+    // fingrarna trummar en stund (bara i vilan), på ett av sätten i TRUM och med höger (A) eller vänster
+    // hand (B); ror() medan de gör det
+    trumma(sort = 'varv', hand = 'A') {
+      if (sistaN - trumT < trumS[0] + 0.35) return;
+      trumS = TRUM[sort] || TRUM.varv;
+      trumPeka = sort === 'peka';
+      trumHand = hand;
+      trumT = sistaN + 0.05;
+    },
+    ror: () => sistaN - trumT < trumS[0] + 0.05,
     info: () => ({ trianglar: r.info.render.triangles, ritanrop: r.info.render.calls, texturer: r.info.memory.textures }),
     ctx: r.getContext(),
     borta() {

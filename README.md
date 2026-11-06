@@ -667,6 +667,13 @@ bara lokalt. Analyserna visas som de ligger i `data/analyser.json`; hur de skriv
   långt bloss med *ah*, lutar sig bakåt och blundar, biter om den i mungipan med händerna på disken,
   beundrar den, puffar, visar den mot en och smakar på röken. Se [Hasse Backe](#hasse-backe),
   *Cigarren*.
+- **Hasse Backe gör fler saker medan han väntar (2026-11-06, användarens önskemål):** i vilan
+  upprepades allt: han blinkade exakt var 4,3:e sekund, huvudet och bröstet rörde sig i jämna vågor, och
+  mellan kaffet och cigarren trummade han bara, likadant varje gång. Nu går blinkningarna, blicken,
+  huvudet och andningen aldrig i takt, fingrarna trummar på fyra sätt med båda händerna, och han gör
+  nio andra småsaker som lottas: tittar mot gänget och längs baren, på notan och kaffet, nickar för sig
+  själv, suckar, sträcker på nacken, höjer ett ögonbryn och skrockar. Se [Hasse Backe](#hasse-backe),
+  *Vilan*.
 - **Statistik som i tobaksaffären (2026-11-05, användarens önskemål):** statistiken på den
   vanliga sajten ska stämma med den i tobaksaffären – samma tal under samma namn och samma
   uppdelning: det som jämför lagen står som på anslagstavlan (topplistorna under Lagen), det
@@ -3748,8 +3755,9 @@ anslagstavlan, och har vridit sig lite mot en, med underarmarna på disken, kaff
 vänstra handen och cigarren i askkoppen vid den högra. Bakom honom är barens vägg med hyllorna,
 cigarettpaketen och lamporna. Samtalet står i en spalt till vänster om honom (på höjden under honom)
 och kommer när kameran har stannat. Esc eller *Tillbaka* går tillbaka (vid matchlistan också ett klick
-utanför). Medan han väntar på att man ska välja trummar han med fingrarna på disken då och då, och
-ibland njuter han av kaffet (på ett av sex sätt) eller av cigarren (på ett av fyra), varannan gång. I rummet ligger kaffet, notan och
+utanför). Medan han väntar på att man ska välja gör han något litet då och då – trummar med fingrarna,
+tittar bort, nickar för sig själv, suckar (se *Vilan*) – och ibland njuter han av kaffet (på ett av sex
+sätt) eller av cigarren (på ett av elva), varannan gång. I rummet ligger kaffet, notan och
 handen kvar på pulten som en ledtråd, och handen trummar när man pekar på den eller kaffet, och
 ibland ändå.
 
@@ -3828,7 +3836,38 @@ T 0–12,4 vilan, skrattet, slaget, gesterna och vägen hem, och efter det ett k
 sin bit av tidslinjen. Varje klipp börjar och slutar där han står (i vilan, eller med händerna på
 disken när han pratar) och har sina egna nycklar för huvudet, kroppen, ansiktet och armarna
 (`RORELSER`), så att ett nytt klipp bara behöver det som händer i det. Klippen i samma grupp (domen,
-kaffet, cigarren) lottas av sidan, utan att samma kommer två gånger innan alla har varit med.
+kaffet, cigarren, småsakerna) lottas av sidan, utan att samma kommer två gånger innan alla har varit med.
+
+**Vilan.** När han bara sitter och väntar på en upprepar sig ingenting. Det som alltid rör sig går
+aldrig i takt: han blinkar ungefär var fjärde sekund men oregelbundet, någon gång mellan en halv och
+sju och en halv sekund isär och ibland två gånger i rad (`blinkar`); blicken flyttar sig lite med en
+snabb ryckning ungefär varannan sekund, oftast tillbaka till en (`sakkader`); huvudet driver långsamt
+i svängningar som inte går jämnt ut (`drift`), och andningen byter takt och djup (`andning`, allt i
+[public/rum-hasse-3d.js](public/rum-hasse-3d.js)). Samma klocka ger alltid samma bild, men inget mönster
+går igen. Förut blinkade han exakt var 4,3:e sekund, huvudet vaggade och bröstet hävde sig i
+rena sinusvågor, och det enda han gjorde mellan kaffet och cigarren var att trumma, likadant varje gång
+(ändrat 2026-11-06).
+
+Var 5–11:e sekund gör han något litet (`SMATT` i [public/rum-hasse.js](public/rum-hasse.js)), lottat utan
+att samma sak kommer två gånger innan allt har varit med, och fingrarna dubbelt så ofta som det andra.
+Fingrarna trummar på ett av fyra sätt, oftast med höger hand och annars med vänster: två varv från
+lillfingret till pekfingret, tre fortare, ett långsamt, eller pekfingret som knackar fyra gånger
+(`TRUM`). Annars ett av nio klipp med händerna kvar på disken (gruppen `smatt`), där ögonen går först och
+huvudet efter, som man gör:
+
+- `affaren`: tittar bort mot gänget i affären, kisar, skakar lite på huvudet och ler åt dem.
+- `baren`: tittar längs baren och nickar med brynen upp åt någon han känner.
+- `notan`: tittar ned på notan, brynen åker upp och munnen säger oj, och han skakar på huvudet och pustar.
+- `nicka`: nickar för sig själv med blicken ned åt sidan och ett leende.
+- `suck`: andas in djupt så att bröstet häver sig och axlarna åker upp, och andas ut genom munnen.
+- `nacken`: sträcker på nacken åt båda hållen med slutna ögon.
+- `brynet`: hakan ned, ena brynet upp och det andra ned, och ett snett leende: jaså?
+- `skrocka`: skrockar åt något han kommer att tänka på, med axlarna som hoppar.
+- `smacka`: tittar på kaffet, smackar och säger mm.
+
+Börjar han prata mitt i ett av dem läggs det undan 2,5 gånger så fort. Kaffet och cigarren kommer som
+förut (se *Cigarren*), när han inte gör något annat. Med minskad rörelse gör han inget av det, men han
+blinkar och andas.
 
 **Slaget.** När domen är klar slår han den i disken på ett av fem sätt: armarna upp i ett gapskratt
 och handen i disken (`slag`); tyst och allvarlig med knuten näve i hakhöjd, som han slår i disken med

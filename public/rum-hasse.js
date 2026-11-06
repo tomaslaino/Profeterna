@@ -363,10 +363,11 @@ window.RumHasse = (() => {
       }
       H.raf = requestAnimationFrame(tick);
       if (!H.fig) return;
-      // då och då trummar han med fingrarna medan han väntar på en
+      // då och då gör han något litet medan han väntar på en: trummar med fingrarna, tittar bort, nickar
+      // för sig själv, suckar (smatt)
       if (ms > H.trum) {
-        H.trum = ms + 7000 + Math.random() * 9000;
-        if (!calm() && !H.klipp && !H.ko.length && (!H.sagt || H.sagt.klar) && ['fraga', 'val', 'klar'].includes(H.fas)) H.fig.trumma();
+        H.trum = ms + SMATT[0] + Math.random() * (SMATT[1] - SMATT[0]);
+        if (!calm() && !H.klipp && !H.ko.length && !H.fig.ror() && (!H.sagt || H.sagt.klar) && ['fraga', 'val', 'klar'].includes(H.fas)) smatt();
       }
       // och ibland njuter han av kaffet eller tar cigarren ur askkoppen, varannan gång
       if (ms > H.vanaT && !H.klipp && !H.ko.length && !H.fig.ror() && (!H.sagt || H.sagt.klar) && ['fraga', 'val', 'klar'].includes(H.fas)) {
@@ -437,15 +438,20 @@ window.RumHasse = (() => {
   const esc = (t) => String(t).replace(/[&<>"]/g, (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c]));
   const REP = () => window.HasseRepliker;
   const fyll = (t, o = {}) => t.replace(/\{(\w+)\}/g, (_, k) => (o[k] == null ? '' : o[k]));
-  // Lottar utan att samma rad kommer två gånger innan alla har varit med.
+  // Lottar utan att samma rad kommer två gånger innan alla har varit med, och inte heller två gånger i
+  // rad när alla har varit med och det börjar om.
   const pasar = new WeakMap();
+  const sist = new WeakMap();
   function lott(lista) {
     let p = pasar.get(lista);
     if (!p || !p.length) {
       p = [...lista].sort(() => Math.random() - 0.5);
+      if (p.length > 1 && p[p.length - 1] === sist.get(lista)) [p[0], p[p.length - 1]] = [p[p.length - 1], p[0]];
       pasar.set(lista, p);
     }
-    return p.pop();
+    const x = p.pop();
+    sist.set(lista, x);
+    return x;
   }
 
   // Kupongens matcher, i kupongens ordning.
@@ -531,7 +537,7 @@ window.RumHasse = (() => {
 
   // Rörelserna: klipp på tidslinjen (KLIPP i rum-hasse-3d.js, hit när figuren hämtas). fran: var det
   // börjar (måste vara där han står, utom fri), till: var det slutar, vila: där han står sedan, grupp:
-  // domen, kaffet eller cigarren, och han lottar bland klippen i gruppen.
+  // domen, kaffet, cigarren eller småsakerna, och han lottar bland klippen i gruppen.
   const GEST = {};
   const GRUPP = {};
   const grupp = (g) => (GRUPP[g] = GRUPP[g] && GRUPP[g].length ? GRUPP[g] : Object.keys(GEST).filter((n) => GEST[n].grupp === g));
@@ -544,6 +550,18 @@ window.RumHasse = (() => {
   // Medan han väntar på en tar han kaffet och cigarren varannan gång då och då (minst och längst i ms
   // mellan gångerna). Ska något spelas medan han håller cigarren (skynda) lägger han tillbaka den fortare.
   const VANA = [45000, 80000];
+  // Och emellanåt gör han något litet (minst och längst i ms mellan gångerna): fingrarna trummar (på ett
+  // av sätten, oftast med höger hand), eller ett av klippen i gruppen smatt (han tittar bort, nickar för
+  // sig själv, suckar, sträcker på nacken …), lottade. Fingrarna kommer dubbelt så ofta som ett klipp.
+  const SMATT = [5000, 11000];
+  const TRUMSATT = ['varv', 'varv', 'fort', 'lugnt', 'peka'];
+  const SMATT_L = [];
+  function smatt() {
+    if (!SMATT_L.length) SMATT_L.push('trumma', 'trumma', ...grupp('smatt'));
+    const namn = lott(SMATT_L);
+    if (namn === 'trumma') H.fig.trumma(TRUMSATT[Math.floor(Math.random() * TRUMSATT.length)], Math.random() < 0.65 ? 'A' : 'B');
+    else gest(namn);
+  }
   // Måste spelas: väntar på sin tur. vid: [T, gör] när tidslinjen når T.
   function spela(namn, o = {}) {
     if (calm()) {
@@ -568,7 +586,10 @@ window.RumHasse = (() => {
     }
     const k = H.klipp;
     const T0 = H.T;
-    H.T = Math.min(k.till, H.T + dt * (k.skynda && H.ko.length ? 2.5 : 1));
+    // (det som ska undan går 2,5 gånger så fort när något annat väntar, och småsakerna också när han
+    // börjar prata)
+    const fort = k.skynda && (H.ko.length || (k.grupp === 'smatt' && H.sagt && !H.sagt.klar));
+    H.T = Math.min(k.till, H.T + dt * (fort ? 2.5 : 1));
     // slagen i disken och koppen på fatet: bilden rycker till, och det hörs
     for (const e of H.fig.handelser(T0, H.T)) hands(e);
     if (k.vid && H.T >= k.vid[0]) {
