@@ -696,6 +696,11 @@ bara lokalt. Analyserna visas som de ligger i `data/analyser.json`; hur de skriv
   man redan hade frågat om slog han domen i disken en gång till, och efter en omladdning gjorde han
   om allt, med 15–25 sekunders väntan. Nu står det han sa direkt, sparat på enheten så att det
   finns kvar när analysen skrivs om, och han erbjuder sig ödmjukt, på sitt sätt, att titta igen. Se [Hasse Backe](#hasse-backe), *Samtalet*.
+- **Hasse Backe nöjd i stället för hånfull (2026-11-06, användarens önskemål):** i vilan hade han ena
+  brynet högt, huvudet på sned och hakan uppe med ett tunt leende, och det såg hånfullt ut. Nu är han
+  nöjd och säker på sin sak, fortfarande lite överdrivet: båda brynen lite uppe, huvudet nästan rakt
+  och ett leende som når ögonen, också när han pratar. Ögonbrynet han höjer medan han väntar kommer med
+  ett brett leende och en nick i stället för ett snett leende. Se [Hasse Backe](#hasse-backe), *Minen*.
 - **Veckans löpsedel från riktiga tidningar (2026-11-06, användarens önskemål):** KVÄLLSPRESSEN
   finns inte, och rubrikerna var lama. Nu är löpsedeln Sportbladets (rosa papper) eller Expressens
   (det röda namnet), två veckor i taget, med namnet som text och våra rubriker: större ord och mer
@@ -3957,6 +3962,13 @@ disken när han pratar) och har sina egna nycklar för huvudet, kroppen, ansikte
 (`RORELSER`), så att ett nytt klipp bara behöver det som händer i det. Klippen i samma grupp (domen,
 kaffet, cigarren, småsakerna, talet) lottas av sidan, utan att samma kommer två gånger innan alla har varit med.
 
+**Minen.** Han är nöjd och säker på sin sak, lite överdrivet: hakan lite upp, huvudet nästan rakt, båda
+brynen lite uppe och ett leende som når ögonen, i vilan och när han pratar (`HUV` och `NOJD` i
+[public/rum-hasse-3d.js](public/rum-hasse-3d.js)). Leendet viker bara undan när han drar ned brynen, som
+när han blir allvarlig före ett slag. Förut hade han ena brynet högt, huvudet på sned och hakan uppe med
+ett tunt leende, och det såg hånfullt ut; leendet i skuggaren var också så svagt att det knappt syntes
+(ändrat 2026-11-06).
+
 **Vilan.** När han bara sitter och väntar på en upprepar sig ingenting. Det som alltid rör sig går
 aldrig i takt: han blinkar ungefär var fjärde sekund men oregelbundet, någon gång mellan en halv och
 sju och en halv sekund isär och ibland två gånger i rad (`blinkar`); blicken flyttar sig lite med en
@@ -3980,7 +3992,7 @@ huvudet efter, som man gör:
 - `nicka`: nickar för sig själv med blicken ned åt sidan och ett leende.
 - `suck`: andas in djupt så att bröstet häver sig och axlarna åker upp, och andas ut genom munnen.
 - `nacken`: sträcker på nacken åt båda hållen med slutna ögon.
-- `brynet`: hakan ned, ena brynet upp och det andra ned, och ett snett leende: jaså?
+- `brynet`: hakan lite upp, ena brynet högt och ett brett leende, och en långsam nick: visst är det så?
 - `skrocka`: skrockar åt något han kommer att tänka på, med axlarna som hoppar.
 - `smacka`: tittar på kaffet, smackar och säger mm.
 
@@ -4074,7 +4086,7 @@ Sätten (`KLIPP` i [public/rum-hasse-3d.js](public/rum-hasse-3d.js); de sju sist
 - `smaka`: han håller röken i munnen och smakar på den med slutna ögon och höjda bryn, och släpper sedan
   ut den långsamt.
 
-**Händerna när han pratar.** Han är nöjd med det han säger: han ler lite medan han pratar, och händerna
+**Händerna när han pratar.** Han är nöjd med det han säger: han ler medan han pratar (se *Minen*), och händerna
 hjälper till på ett av tio sätt (gruppen `tal`). Förut hade han bara ett (`armar`: fingret, handen som
 hackar och armen ut åt sidan), och det blev samma rörelse om och om igen (2026-11-06). Nu lottas:
 
