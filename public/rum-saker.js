@@ -1,10 +1,9 @@
-// Sakerna i tobaksaffären (rum.js): på pulten kvittot och till höger om det, i
-// three.js som gänget (rum-3d.js), en askkopp i bärnstensfärgat glas med
-// fimpar och en cigarett som ryker i ett av spåren, en öppen snusdosa med
-// locket bredvid och, bara när det är varmt i Stockholm, en gulnad bordsfläkt
-// som svänger fram och tillbaka och blåser röken åt sidan när den pekar mot
-// askkoppen. Kvittot är termopapper som har legat i rulle: änden med
-// huvudet har böjt sig upp och den rivna änden lyfter lite. I skyltfönstret
+// Sakerna i tobaksaffären (rum.js): på pulten domarens gula och röda kort och
+// hans visselpipa och till höger om dem, i three.js som gänget (rum-3d.js),
+// en askkopp i bärnstensfärgat glas med fimpar och en cigarett som ryker i
+// ett av spåren, en öppen snusdosa med locket bredvid och, bara när det är
+// varmt i Stockholm, en gulnad bordsfläkt som svänger fram och tillbaka och
+// blåser röken åt sidan när den pekar mot askkoppen. I skyltfönstret
 // sitter löpsedlarna – IFK Göteborg 1982, Nacional 1988, VM 94 och Chelsea 2021
 // på skivan, och veckans löpsedel – som rum-affischer.js ritar och den här
 // filen sätter upp.
@@ -21,16 +20,10 @@
 // röken. ?rum-slit=0…1 bestämmer slitaget (för bilder).
 //
 // Fikat på vissa dagar – semlor, pepparkakor, lussekatter och annat från
-// konditoriet – står bakom kvittot eller där det får plats (rum-fika.js).
+// konditoriet – står bakom korten eller där det får plats (rum-fika.js).
 //
 // saker(el, { calm, short, namn }) → { draw(t, mx, my, rows, old, syns), kval({ pr, skugga }) } (syns: pulten
 // ritas, rum.js; kval: hur fint, KVAL i rum.js; short och namn: lagen och gänget på löpsedeln)
-//
-// Kvittots text är den som rum.js skriver i #rum-kvitto (receiptHtml) och
-// läses om när den ändras; länken blir en osynlig yta över papperet att
-// klicka på (i-3d i rum-saker.css), och papperet lyser upp som de andra
-// sakerna när musen är över den. Utan WebGL ligger länken kvar som ett
-// platt kvitto (rum.css).
 
 import { dagens, bord } from './rum-fika.js';
 import { utanSkuggor } from './rum-gpu.js';
@@ -39,15 +32,14 @@ import { affischer } from './rum-affischer.js';
 const DEG = Math.PI / 180;
 const D = 1400;
 const ELEV = 34 * DEG;
-// Sakerna står till höger om kvittot, kring O i pultens plan (före planets
+// Sakerna står till höger om korten, kring O i pultens plan (före planets
 // skala 1,095 kring mitten: x ≤ 1530 och y ≤ 850 syns i alla fönster).
 // Duken är större åt vänster och uppåt, så att röken får plats när fläkten
-// blåser den åt sidan, och nedåt, där kvittot ligger.
+// blåser den åt sidan, och nedåt, där korten ligger.
 const O = { x: 1418, y: 665 };
 const BOX = { x: 1110, y: 400, w: 426, h: 570 };
-// Kvittot (pultens px, mitten av där det hamnar) och papperets mått i
-// världens enheter
-const KVITTO = { x: 1256, y: 800, w: 140, l: 262 };
+// Domarens kort och visselpipa (pultens px, mitten av där de hamnar)
+const DOMARE = { x: 1256, y: 796 };
 // Platserna på pulten (pultens px), en per dag: fläkten med det håll den
 // svänger kring (grader, 90 = mot betraktaren, 180 = åt vänster),
 // askkoppen och snusdosan. Locket och prisen läggs där det finns plats.
@@ -57,7 +49,7 @@ const LAYOUTS = [
   { fan: [1236, 668, 35], ash: [1402, 738], snus: [1490, 806] },
   { fan: [1392, 668, 100], ash: [1478, 748], snus: [1394, 815] },
 ];
-// där det finns plats: till höger om kvittot, och bakom det längst bak
+// där det finns plats: till höger om korten, och bakom dem längst bak
 const free = ([px, py]) => py >= 662 && py <= 846 && px <= 1522 && (px >= 1345 || (py <= 690 && px >= 1140));
 const hash = (n) => { const x = Math.sin(n * 127.1 + 311.7) * 43758.5453; return x - Math.floor(x); };
 const clamp = (x, a = 0, b = 1) => Math.min(b, Math.max(a, x));
@@ -156,7 +148,7 @@ export async function saker(el, opt = {}) {
   let sliten = false;
   if (pult) {
     try {
-      three = await props(pult, opt, el);
+      three = await props(pult, opt);
     } catch (err) {
       console.warn('Rummet: sakerna på pulten kunde inte ritas', err);
     }
@@ -178,10 +170,11 @@ export async function saker(el, opt = {}) {
 
 // ---------- pulten ----------
 
-async function props(pult, opt, root) {
+async function props(pult, opt) {
   const THREE = await import('three');
   const { RoomEnvironment } = await import('three/addons/environments/RoomEnvironment.js');
   const { RoundedBoxGeometry } = await import('three/addons/geometries/RoundedBoxGeometry.js');
+  const { mergeGeometries } = await import('three/addons/utils/BufferGeometryUtils.js');
   const canvas = document.createElement('canvas');
   canvas.className = 'rum-saker';
   canvas.width = BOX.w;
@@ -292,273 +285,133 @@ async function props(pult, opt, root) {
     return geo;
   }
 
-  // ---------- kvittot ----------
-  // Papperet ligger i sin grupp med den rivna änden mot betraktaren (+z) och
-  // huvudet bort (−z). Formen följer papperet från den rivna änden (q = 0)
-  // till huvudet (q = l): vinkeln mot pulten är negativ i början (änden
-  // lyfter) och växer mot huvudet (det har rullat upp sig), och U och V är
-  // hur långt in och hur högt varje rad i nätet hamnar.
+  // ---------- domarens kort och visselpipa ----------
+  // Till vänster om sakerna: domarens gula och röda kort i plast, slängda så
+  // att det röda ligger lite över det gula, och en förkromad visselpipa på sidan
+  // med en svart snodd som ringlar sig över korten. Allt ligger i en grupp
+  // (domare) med korten kring mitten. Pipan ligger på sidan: kammaren står
+  // upp, munstycket går ut åt +x längs kammarens främre kant och ringen för
+  // snodden sitter bakom. Korten är ett nät (färgen per punkt), pipan ett och
+  // snodden med springan i munstycket ett, så att det blir tre ritanrop och
+  // inga bilder.
 
-  const kvEl = root && root.querySelector('#rum-kvitto');
-  const KV = { w: KVITTO.w, l: KVITTO.l, nx: 6, ny: 60, x: 0, z: 0, rot: 0, d: KVITTO.l, U: [], V: [], up: [] };
-  const kvGeo = new THREE.PlaneGeometry(KV.w, KV.l, KV.nx, KV.ny);
-  const kvC = document.createElement('canvas');
-  kvC.width = 512;
-  kvC.height = Math.round((512 * KV.l) / KV.w);
-  const kvTex = new THREE.CanvasTexture(kvC);
-  kvTex.colorSpace = THREE.SRGBColorSpace;
-  kvTex.anisotropy = Math.min(8, r.capabilities.getMaxAnisotropy());
-  const kvMat = mat('#ffffff', { map: kvTex, roughness: 0.5, envMapIntensity: 0.6, side: THREE.DoubleSide, alphaTest: 0.5, emissive: '#f0d699', emissiveMap: kvTex, emissiveIntensity: 0 });
-  // (syns först när det har fått sin plats, kvLagg)
-  const kvGrp = new THREE.Group();
-  kvGrp.visible = false;
-  world.add(kvGrp);
-  mesh(kvGeo, kvMat, kvGrp);
-  // en mjuk skugga under papperet, åt samma håll som skuggorna från lysröret
-  const kvSkugga = new THREE.Mesh(new THREE.PlaneGeometry(KV.w + 24, KV.l + 24), new THREE.MeshBasicMaterial({
-    color: '#000', transparent: true, opacity: 0.32, depthWrite: false,
-    alphaMap: canvasTex(64, 112, (g, w, h) => {
-      g.fillStyle = '#000';
-      g.fillRect(0, 0, w, h);
-      g.shadowColor = '#fff';
-      g.shadowBlur = 7;
-      g.shadowOffsetX = 1000;
-      g.fillRect(6 - 1000, 6, w - 12, h - 12);
-    }),
-  }));
-  kvSkugga.rotation.x = -Math.PI / 2;
-  kvSkugga.position.set(3, 0.06, -1);
-  kvGrp.add(kvSkugga);
-
-  // Texten som i rum.css (#rum-kvitto): rader om 17, huvudet i fetstil
-  // (dubbeltryck), streckade linjer och en streckkod efter texten. Trycket
-  // ritas för sig och nöts ojämnt, som termotryck, och den nedre kanten är
-  // riven.
-  async function kvRita() {
-    if (!kvEl) return;
-    await document.fonts.load('48px VT323').catch(() => {});
-    const W = kvC.width;
-    const H = kvC.height;
-    const k = W / KV.w;
-    const g = kvC.getContext('2d');
-    g.globalCompositeOperation = 'source-over';
-    const bg = g.createLinearGradient(0, 0, 0, H);
-    bg.addColorStop(0, '#f2efe7');
-    bg.addColorStop(1, '#e9e5da');
-    g.fillStyle = bg;
-    g.fillRect(0, 0, W, H);
-    specks(g, W, H, 700, ['#ddd8ca', '#faf8f2', '#d3cdbd'], 1.1, 91);
-    g.strokeStyle = 'rgba(90, 80, 60, 0.12)';
-    g.lineWidth = 3;
-    g.strokeRect(1.5, -2, W - 3, H + 4);
-
-    const ink = document.createElement('canvas');
-    ink.width = W;
-    ink.height = H;
-    const p = ink.getContext('2d');
-    p.fillStyle = '#2c2a27';
-    p.font = `${16 * k}px VT323, monospace`;
-    p.textBaseline = 'middle';
-    const PAD = 13 * k;
-    const LH = 17 * k;
-    let y = 20 * k;
-    const text = (s, x, align, bold) => {
-      p.textAlign = align;
-      p.fillText(s, x, y + LH / 2);
-      if (bold) p.fillText(s, x + 0.35 * k, y + LH / 2);
-    };
-    let first = true;
-    for (const c of kvEl.children) {
-      if (c.tagName === 'HR') {
-        for (let x = PAD; x < W - PAD; x += 6 * k) p.fillRect(x, y + 7 * k, 3.4 * k, 1.1 * k);
-        y += 15 * k;
-      } else if (c.classList.contains('bar')) {
-        let x = PAD + 6 * k;
-        let n = [...kvEl.textContent].reduce((a, ch) => a + ch.charCodeAt(0), 0);
-        while (x < W - PAD - 6 * k) {
-          const b = (1 + Math.floor(hash(n++) * 3)) * k;
-          p.fillRect(x, y + 8 * k, Math.min(b, W - PAD - 6 * k - x), 30 * k);
-          x += b + (1 + Math.floor(hash(n++) * 2.5)) * k;
-        }
-        y += 42 * k;
-      } else if (c.classList.contains('r') && c.children.length >= 2) {
-        text(c.children[0].textContent, PAD, 'left');
-        text(c.children[1].textContent, W - PAD, 'right');
-        y += LH;
-      } else {
-        for (const n of c.childNodes) {
-          if (n.nodeType !== 3 || !n.textContent.trim()) continue;
-          text(n.textContent.trim(), W / 2, 'center', first);
-          y += LH;
-        }
-        first = false;
-      }
-    }
-    // termotrycket: ljusare fläckar och ett svagare band på ena sidan
-    p.globalCompositeOperation = 'destination-out';
-    specks(p, W, H, 900, ['#000'], 1.6, 13);
-    const fade = p.createLinearGradient(0, 0, W, 0);
-    fade.addColorStop(0, 'rgba(0, 0, 0, 0.22)');
-    fade.addColorStop(0.5, 'rgba(0, 0, 0, 0)');
-    fade.addColorStop(1, 'rgba(0, 0, 0, 0.08)');
-    p.fillStyle = fade;
-    p.fillRect(0, 0, W, H);
-    g.globalAlpha = 0.92;
-    g.drawImage(ink, 0, 0);
-    g.globalAlpha = 1;
-
-    // den rivna kanten: tänder om 6 enheter
-    g.globalCompositeOperation = 'destination-out';
-    g.beginPath();
-    g.moveTo(0, H + 2);
-    const per = 6 * k;
-    for (let x = 0, i = 0; x <= W + per; x += per, i++) {
-      g.lineTo(x, H - (2.2 + hash(i * 1.7) * 1.4) * k);
-      g.lineTo(x + per / 2, H - 0.3 * k);
-    }
-    g.lineTo(W, H + 2);
-    g.closePath();
-    g.fill();
-    g.globalCompositeOperation = 'source-over';
-    kvTex.needsUpdate = true;
+  const DM = { x: 0, z: 0, rot: 0, cx: 0, cz: 0, hx: 0, hz: 0 };
+  const domare = new THREE.Group();
+  // (syns först när den har fått sin plats, domLagg)
+  domare.visible = false;
+  world.add(domare);
+  // korten: 56 × 80, 1,2 tjocka och med rundade hörn
+  const KORT = { w: 56, l: 80, t: 1.2 };
+  const kortForm = new THREE.Shape();
+  {
+    const x = KORT.w / 2 - 4;
+    const z = KORT.l / 2 - 4;
+    kortForm.moveTo(-x, -KORT.l / 2);
+    kortForm.absarc(x, -z, 4, -Math.PI / 2, 0);
+    kortForm.absarc(x, z, 4, 0, Math.PI / 2);
+    kortForm.absarc(-x, z, 4, Math.PI / 2, Math.PI);
+    kortForm.absarc(-x, -z, 4, Math.PI, Math.PI * 1.5);
   }
-  if (kvEl) {
-    await kvRita();
-    new MutationObserver(() => { kvRita(); }).observe(kvEl, { childList: true, subtree: true, characterData: true });
-  }
-
-  // Dagens form: hur mycket huvudet har rullat upp sig, hur mycket den
-  // rivna änden lyfter och en liten skevhet.
-  function kvForm(s) {
-    const L = KV.l;
-    const A = (30 + hash(s + 71) * 14) * DEG;
-    const B = (4 + hash(s + 72) * 4) * DEG;
-    const tw = (hash(s + 73) - 0.5) * 0.08;
-    const curl = (q) => Math.max(0, (q - 0.6 * L) / (0.4 * L)) ** 2;
-    const phi = (q) => A * curl(q) - B * (1 - sm(0, 0.16 * L, q));
-    const U = [0];
-    const V = [0];
-    const up = [0];
-    let u = 0;
-    let v = 0;
-    const SUB = 8;
-    const dq = L / KV.ny / SUB;
-    for (let j = 1; j <= KV.ny; j++) {
-      for (let m = 0; m < SUB; m++) {
-        const q = ((j - 1) * SUB + m + 0.5) * dq;
-        u += Math.cos(phi(q)) * dq;
-        v += Math.sin(phi(q)) * dq;
-      }
-      U.push(u);
-      V.push(v);
-      up.push(curl((j * L) / KV.ny));
-    }
-    const v0 = Math.min(...V);
-    Object.assign(KV, { U, V: V.map((x) => x - v0), up, d: u, tw });
-    // nätet: rad 0 är huvudet (överst i bilden), rad ny den rivna änden
-    const pos = kvGeo.attributes.position;
-    for (let i = 0; i < pos.count; i++) {
-      const j = KV.ny - Math.floor(i / (KV.nx + 1));
-      const x = -KV.w / 2 + ((i % (KV.nx + 1)) * KV.w) / KV.nx;
-      pos.setXYZ(i, x, kvY(j, x), KV.d / 2 - U[j]);
-    }
-    pos.needsUpdate = true;
-    kvGeo.computeVertexNormals();
-    kvGeo.computeBoundingSphere();
-  }
-  // höjden i rad j: papperet välver sig lite på tvären och är skevt där det
-  // har rullat upp sig
-  const kvY = (j, x) => 0.3 + KV.V[j] + 1.4 * (x / (KV.w / 2)) ** 2 + x * KV.tw * KV.up[j];
-  // en punkt på pulten i kvittots axlar
-  const kvLok = (x, z) => {
-    const dx = x - KV.x;
-    const dz = z - KV.z;
-    const c = Math.cos(KV.rot);
-    const s = Math.sin(KV.rot);
+  const kortGeo = new THREE.ExtrudeGeometry(kortForm, { depth: KORT.t - 0.4, bevelEnabled: true, bevelThickness: 0.2, bevelSize: 0.3, bevelSegments: 1, curveSegments: 4 });
+  kortGeo.rotateX(-Math.PI / 2);
+  kortGeo.translate(0, 0.2, 0);
+  // platsen och vridningen i gruppen; det andra ligger ovanpå det första
+  const KORTEN = [
+    { c: '#ffd014', x: -13, z: 4, a: 14 * DEG, y: 0 },
+    { c: '#c8201c', x: 15, z: -6, a: -16 * DEG, y: KORT.t },
+  ];
+  mesh(mergeGeometries(KORTEN.map((k) => {
+    const g = kortGeo.clone().rotateY(k.a).translate(k.x, k.y, k.z);
+    const c = new THREE.Color(k.c);
+    g.setAttribute('color', new THREE.Float32BufferAttribute(new Float32Array(g.attributes.position.count * 3).map((_, i) => [c.r, c.g, c.b][i % 3]), 3));
+    return g;
+  })), mat('#ffffff', { vertexColors: true, roughness: 0.3, clearcoat: 0.7, clearcoatRoughness: 0.2 }), domare);
+  kortGeo.dispose();
+  // en punkt i ett vridet läge (x, z, a) i dess egna axlar
+  const lok = (x, z, o) => {
+    const c = Math.cos(o.a);
+    const s = Math.sin(o.a);
+    const dx = x - o.x;
+    const dz = z - o.z;
     return [dx * c - dz * s, dx * s + dz * c];
   };
-  // hur långt från kvittot (0 = på det), till det som ska ligga fritt
-  const kvAvst = (x, z) => {
-    if (!kvGrp.visible) return Infinity;
-    const [lx, lz] = kvLok(x, z);
-    return Math.hypot(Math.max(0, Math.abs(lx) - KV.w / 2), Math.max(0, Math.abs(lz) - KV.d / 2));
+  // höjden ovanpå korten i gruppens axlar (0 bredvid dem)
+  function kortHojd(x, z) {
+    let h = 0;
+    for (const k of KORTEN) {
+      const [lx, lz] = lok(x, z, k);
+      if (Math.abs(lx) <= KORT.w / 2 && Math.abs(lz) <= KORT.l / 2) h = Math.max(h, k.y + KORT.t);
+    }
+    return h;
+  }
+
+  // Pipan: kammaren (radien R, h hög), munstycket och ringen, i pipans axlar
+  // och sedan vriden och flyttad till sin plats i gruppen
+  const PIPA = { x: 30, z: 38, a: -32 * DEG, R: 8, h: 9 };
+  const iGruppen = (g) => g.rotateY(PIPA.a).translate(PIPA.x, 0, PIPA.z);
+  // (RoundedBoxGeometry har inget index, så inget av dem får ha det)
+  const slaIhop = (gs) => mergeGeometries(gs.map((g) => (g.index ? g.toNonIndexed() : g)));
+  mesh(iGruppen(slaIhop([
+    new THREE.CylinderGeometry(PIPA.R, PIPA.R, PIPA.h, 32).translate(0, PIPA.h / 2, 0),
+    new RoundedBoxGeometry(24, PIPA.h - 1, 6, 2, 1.4).translate(12, PIPA.h / 2, PIPA.R - 3),
+    new THREE.TorusGeometry(3.6, 0.9, 8, 20).rotateX(Math.PI / 2).translate(-PIPA.R - 2.4, 0.9, PIPA.R - 3.4),
+  ])), mat('#e4e5e7', { metalness: 0.85, roughness: 0.2, envMapIntensity: 1.3 }), domare);
+  // Snodden: en slinga från ringen, över korten. Höjden följer korten och
+  // jämnas ut, så att snodden lägger sig över kanten i stället för att gå
+  // rakt upp.
+  const ringen = new THREE.Vector3(-PIPA.R - 2.4, 0, PIPA.R - 3.4).applyAxisAngle(new THREE.Vector3(0, 1, 0), PIPA.a);
+  const SLINGA = [[0, 0], [-10, 3], [-30, 6], [-52, 0], [-66, -16], [-60, -36], [-42, -44], [-22, -36], [-10, -20], [-3, -7]];
+  const SN_N = 160;
+  const snodd = new THREE.CatmullRomCurve3(SLINGA.map(([dx, dz]) => new THREE.Vector3(PIPA.x + ringen.x + dx, 0, PIPA.z + ringen.z + dz)), true, 'centripetal')
+    .getSpacedPoints(SN_N).slice(0, SN_N);
+  {
+    const hs = snodd.map((p) => kortHojd(p.x, p.z));
+    snodd.forEach((p, i) => {
+      let sum = 0;
+      for (let k = -3; k <= 3; k++) sum += hs[(i + k + SN_N) % SN_N];
+      p.y = Math.max(hs[i], sum / 7) + 1;
+    });
+  }
+  mesh(slaIhop([
+    new THREE.TubeGeometry(new THREE.CatmullRomCurve3(snodd, true), SN_N, 1, 6, true),
+    iGruppen(new THREE.BoxGeometry(6, PIPA.h - 4, 0.6).translate(1.5, PIPA.h / 2, PIPA.R + 0.1)),
+  ]), mat('#1c1a19', { roughness: 0.85 }), domare);
+  // ytan som de tar på pulten, i gruppens axlar
+  {
+    domare.updateMatrixWorld(true);
+    const b = new THREE.Box3().setFromObject(domare);
+    Object.assign(DM, { cx: (b.min.x + b.max.x) / 2, cz: (b.min.z + b.max.z) / 2, hx: (b.max.x - b.min.x) / 2, hz: (b.max.z - b.min.z) / 2 });
+  }
+  // hur långt från dem (0 = på dem), till det som ska ligga fritt
+  const domAvst = (x, z) => {
+    if (!domare.visible) return Infinity;
+    const [lx, lz] = lok(x, z, { x: DM.x, z: DM.z, a: DM.rot });
+    return Math.hypot(Math.max(0, Math.abs(lx - DM.cx) - DM.hx), Math.max(0, Math.abs(lz - DM.cz) - DM.hz));
   };
-  // höjden på papperet där (−1 utanför), till askan och smulorna
-  function kvHojd(x, z) {
-    if (kvAvst(x, z) > 0) return -1;
-    const [lx, lz] = kvLok(x, z);
-    const inat = KV.d / 2 - lz;
-    let j = 1;
-    while (j < KV.ny && KV.U[j] < inat) j++;
-    const f = clamp((inat - KV.U[j - 1]) / (KV.U[j] - KV.U[j - 1] || 1));
-    return kvY(j - 1, lx) * (1 - f) + kvY(j, lx) * f;
+  // höjden där (−1 bredvid), till askan och smulorna: ovanpå korten, och
+  // under pipan och snodden syns de inte
+  function domHojd(x, z) {
+    if (domAvst(x, z) > 0) return -1;
+    const [lx, lz] = lok(x, z, { x: DM.x, z: DM.z, a: DM.rot });
+    const [px, pz] = lok(lx, lz, PIPA);
+    if ((px > -PIPA.R - 8 && px < 25 && Math.abs(pz) < PIPA.R + 1) || snodd.some((p) => Math.hypot(lx - p.x, lz - p.z) < 3)) return 9;
+    return kortHojd(lx, lz);
   }
   // Dagens plats (efter askkoppen, dosan och fläkten, arrange): någonstans
-  // inom ±24 och ±18 px från KVITTO, vriden −10…16° (huvudet åt höger
-  // eller vänster), det första av elva lägen som går fritt från dem – annars
-  // en bit till vänster, vriden 8°, där det alltid är fritt. Och ytan att
-  // klicka på: papperets kant i pultens px.
-  let kvKlar = false;
-  let kvYta = null;
-  function kvLagg(s) {
-    kvGrp.visible = !!kvEl;
-    kvForm(s);
-    // (fläkten också när den inte står där, så att kvittot inte flyttar sig när vädret slår om)
-    const fritt = () => kvAvst(ASH.x, ASH.z) > ASH.R + 10 && kvAvst(SN.x, SN.z) > 21 + 8 && kvAvst(FAN.x, FAN.z) > 42;
+  // inom ±24 och ±18 px från DOMARE, vriden ±25°, det första av elva lägen
+  // som går fritt från dem – annars en bit till vänster, där det alltid är
+  // fritt.
+  function domLagg(s) {
+    domare.visible = true;
+    // (fläkten också när den inte står där, så att korten inte flyttar sig när vädret slår om)
+    const fritt = () => domAvst(ASH.x, ASH.z) > ASH.R + 10 && domAvst(SN.x, SN.z) > 21 + 8 && domAvst(FAN.x, FAN.z) > 42;
     for (let i = 0; i <= 11; i++) {
-      const c = i < 11 ? onDesk(KVITTO.x + (hash(s + 74 + i * 7) - 0.5) * 48, KVITTO.y + (hash(s + 75 + i * 7) - 0.5) * 36) : onDesk(KVITTO.x - 20, KVITTO.y);
-      Object.assign(KV, { x: c.x, z: c.z, rot: (i < 11 ? -10 + hash(s + 76 + i * 7) * 26 : 8) * DEG });
+      const c = i < 11 ? onDesk(DOMARE.x + (hash(s + 74 + i * 7) - 0.5) * 48, DOMARE.y + (hash(s + 75 + i * 7) - 0.5) * 36) : onDesk(DOMARE.x - 30, DOMARE.y);
+      Object.assign(DM, { x: c.x, z: c.z, rot: (i < 11 ? (hash(s + 76 + i * 7) - 0.5) * 50 : 0) * DEG });
       if (fritt()) break;
     }
-    kvGrp.position.set(KV.x, 0, KV.z);
-    kvGrp.rotation.y = KV.rot;
-    kvGrp.updateMatrix();
-    if (!kvEl) return;
-    const n = KV.nx + 1;
-    const idx = [];
-    for (let i = 0; i < n; i++) idx.push(i);
-    for (let j = 2; j < KV.ny; j += 3) idx.push(j * n + n - 1);
-    for (let i = n - 1; i >= 0; i--) idx.push(KV.ny * n + i);
-    for (let j = KV.ny - 2; j > 0; j -= 3) idx.push(j * n);
-    // Länken ligger i ett annat plan än pulten (rum.js, plane): planen är
-    // förstorade olika mycket kring mitten (800, 500) – pultens 1,05 gånger
-    // så mycket – med perspektivet 1400 (PERSP).
-    const skala = (pl) => {
-      const m = /translateZ\((-?[\d.]+)px\) scale\(([\d.]+)\)/.exec((pl && pl.style.transform) || '');
-      return m ? (Number(m[2]) * 1400) / (1400 - Number(m[1])) : 1;
-    };
-    const f = skala(pult) / skala(kvEl.parentElement);
-    const v = new THREE.Vector3();
-    const pts = idx.map((i) => {
-      v.fromBufferAttribute(kvGeo.attributes.position, i).applyMatrix4(kvGrp.matrix).project(cam);
-      return [800 + (BOX.x + ((v.x + 1) / 2) * BOX.w - 800) * f, 500 + (BOX.y + ((1 - v.y) / 2) * BOX.h - 500) * f];
-    });
-    const x0 = Math.floor(Math.min(...pts.map((q) => q[0])));
-    const y0 = Math.floor(Math.min(...pts.map((q) => q[1])));
-    const x1 = Math.ceil(Math.max(...pts.map((q) => q[0])));
-    const y1 = Math.ceil(Math.max(...pts.map((q) => q[1])));
-    kvYta = {
-      left: `${x0}px`, top: `${y0}px`, width: `${x1 - x0}px`, height: `${y1 - y0}px`,
-      clipPath: `polygon(${pts.map(([x, y]) => `${(x - x0).toFixed(1)}px ${(y - y0).toFixed(1)}px`).join(', ')})`,
-    };
-    if (kvKlar) Object.assign(kvEl.style, kvYta);
-  }
-  // när papperet har ritats en gång tar det över från det platta kvittot
-  function kvVisa() {
-    if (kvKlar || !kvEl || !kvYta) return;
-    kvKlar = true;
-    Object.assign(kvEl.style, kvYta);
-    kvEl.classList.add('i-3d');
-  }
-  // papperet lyser upp när musen är över länken eller den har fokus, som
-  // de andra sakerna (.rum-sak:hover i rum.css), utom i närbilderna
-  const HOVER = matchMedia('(hover: hover)');
-  let kvLjus = 0;
-  function kvLys(calm) {
-    if (!kvKlar) return;
-    const on = !root.classList.contains('sak-nara') && (kvEl.matches(':focus-visible') || (HOVER.matches && kvEl.matches(':hover')));
-    kvLjus = calm ? +on : kvLjus + (+on - kvLjus) * 0.35;
-    kvMat.emissiveIntensity = 0.3 * kvLjus;
+    domare.position.set(DM.x, 0, DM.z);
+    domare.rotation.y = DM.rot;
   }
 
   // ---------- askkoppen ----------
@@ -688,8 +541,8 @@ async function props(pult, opt, root) {
       const a = (110 + hash(s + i * 1.9) * 200) * DEG;
       const rr = ASH.R + 6 + hash(s + i * 2.7) ** 1.6 * 46;
       m.position.set(ASH.x + Math.cos(a) * rr, 0.15, ASH.z + Math.sin(a) * rr * 0.8);
-      // på kvittot ligger askan på papperet, och inte där det har rullat upp sig
-      const h = kvHojd(m.position.x, m.position.z);
+      // på korten ligger askan ovanpå, och under pipan och snodden syns den inte
+      const h = domHojd(m.position.x, m.position.z);
       if (h > 3) m.visible = false;
       else if (h >= 0) m.position.y += h;
       const k = 0.8 + hash(s + i * 3.1) * 2.6;
@@ -841,7 +694,7 @@ async function props(pult, opt, root) {
   lidTop.position.y = 4;
   mesh(new THREE.CylinderGeometry(21.6, 21.6, 4.2, 48, 1, true), mat('#1f3566', { roughness: 0.4, clearcoat: 0.5, side: THREE.DoubleSide }), lid).position.y = 2.1;
   // En plats d från p åt något håll (börjar vid a0) där det finns plats på
-  // pulten och som går fri från kvittot, askkoppen, fläkten och det som
+  // pulten och som går fri från korten, askkoppen, fläkten och det som
   // redan ligger där (keep = [x, z, radie]).
   function spotNear(p, d, a0, r, keep = []) {
     const busy = [[ASH.x, ASH.z, ASH.R], [FAN.x, FAN.z, 34], ...keep];
@@ -849,7 +702,7 @@ async function props(pult, opt, root) {
       const a = a0 + 0.4 * (k % 2 ? 1 : -1) * Math.ceil(k / 2);
       const x = p.x + Math.cos(a) * d;
       const z = p.z + Math.sin(a) * d * 0.7;
-      if (free(toPult(x, z)) && kvAvst(x, z) > r + 6 && busy.every(([bx, bz, br]) => Math.hypot(x - bx, z - bz) > br + r + 4)) return { x, z, a };
+      if (free(toPult(x, z)) && domAvst(x, z) > r + 6 && busy.every(([bx, bz, br]) => Math.hypot(x - bx, z - bz) > br + r + 4)) return { x, z, a };
     }
     return null;
   }
@@ -897,7 +750,7 @@ async function props(pult, opt, root) {
       const a = hash(s + i * 1.37) * Math.PI * 2;
       const rr = 22 + hash(s + i * 2.17) ** 1.5 * 34;
       m.position.set(SN.x + Math.cos(a) * rr, 0.5, SN.z + Math.sin(a) * rr * 0.75);
-      const h = kvHojd(m.position.x, m.position.z);
+      const h = domHojd(m.position.x, m.position.z);
       if (h > 3) m.visible = false;
       else if (h >= 0) m.position.y += h;
       const k = 0.6 + hash(s + i * 4.3) * 1.2;
@@ -1068,7 +921,7 @@ async function props(pult, opt, root) {
   }
 
   // ---------- fikat ----------
-  // Dagens fika (rum-fika.js): bakom kvittot om det får plats där, annars
+  // Dagens fika (rum-fika.js): bakom korten om det får plats där, annars
   // till höger, fritt från askkoppen, dosan, locket, prisen och fläkten.
 
   const FK = bord(THREE, { world, mat, mesh, canvasTex, specks, heap, hash });
@@ -1082,13 +935,13 @@ async function props(pult, opt, root) {
     if (pris.visible) busy.push([pris.position.x, pris.position.z, 8]);
     const cand = [[1250, 682], [1200, 682], [1300, 682]];
     for (let y = 700; y <= 836; y += 12) for (let x = 1370; x <= 1510; x += 14) cand.push([x, y]);
-    const ok = cand.find((c) => { const p = onDesk(...c); return free(c) && kvAvst(p.x, p.z) > r * 0.8 && busy.every(([bx, bz, br]) => Math.hypot(p.x - bx, p.z - bz) > br + r * 0.8); });
+    const ok = cand.find((c) => { const p = onDesk(...c); return free(c) && domAvst(p.x, p.z) > r * 0.8 && busy.every(([bx, bz, br]) => Math.hypot(p.x - bx, p.z - bz) > br + r * 0.8); });
     FK.visa(fikat, onDesk(...(ok || cand[0])), w, s);
   }
 
   function wear(w, s) {
     arrange(s);
-    kvLagg(s);
+    domLagg(s);
     ashFill(w, s);
     placeButts(w, s);
     placeFlakes(w, s);
@@ -1210,10 +1063,8 @@ async function props(pult, opt, root) {
     }
     p.needsUpdate = true;
     stripGeo.computeVertexNormals();
-    kvLys(calm);
     if (Q.skugga > 1) r.shadowMap.needsUpdate = Q.n++ % Q.skugga === 0;
     r.render(scene, cam);
-    kvVisa();
   }
 
   // Hur fint sakerna ritas, när datorn inte hinner med (KVAL i rum.js), som

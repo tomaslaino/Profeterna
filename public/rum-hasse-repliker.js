@@ -42,12 +42,10 @@
   // Om man bara står där och inte frågar.
   ledig: ['Jag sitter kvar här.', 'Välj vilken match du vill. Alla är lätta.', 'Spelstoppet är {dag}.'],
 
-  // När man har valt en match: han svarar och frågar tillbaka. valKlar när man redan
-  // har frågat om den, valLasa när analysen finns och han ska låtsas läsa på, och val när
-  // den inte finns. Han har alltid svaret, också när han inte har det: att han läser på
-  // märks först när han väntar (vantar).
+  // När man har valt en match: han svarar och frågar tillbaka. valLasa när analysen finns
+  // och han ska låtsas läsa på, och val när den inte finns. Han har alltid svaret, också när
+  // han inte har det: att han läser på märks först när han väntar (vantar).
   val: ['Den är solklar.', 'Den kan jag i sömnen.', 'Glöm allt du har läst.'],
-  valKlar: ['Den har jag tittat på.', 'Den har jag svaret på.', 'Den är redan klar.'],
   valLasa: [
     'Den är solklar.',
     'Den kan jag i sömnen.',
@@ -66,26 +64,61 @@
   gissar: ['Då får du skylla dig själv.', 'Gissa du, det har gått förr.'],
   // Direkt när man har bett om analysen.
   reaktion: ['Där frågade du rätt man.', 'Nu ska du få höra.'],
-  // Samma match en gång till.
-  igen: ['Du får samma svar som nyss.', 'Den tog vi ju nyss.'],
 
-  // Medan han låtsas analysera: en i taget, i den här ordningen. Allt under kontroll.
-  vantar: [
-    'Jag ska bara titta på en sak.',
-    'Jag läser tidningarna.',
-    'Tidningarna har fel, som vanligt.',
-    'Det här får ta sin tid.',
-    'Du har väl inte bråttom?',
-    'Spelstoppet är {dag}.',
-    'Allt är orsak och verkan, alltså.',
-    'Det här har jag sett förut.',
-    'Ta det bara lugnt.',
-    'Jag har full kontroll.',
-    'Det är ingen fara.',
-    'Man ska inte stressa fram ett tips.',
-    'Jag är strax klar.',
-    'Allt är under kontroll.',
+  // En match man redan har frågat om: det han sa står direkt, och han erbjuder sig att
+  // titta på den igen, ödmjukt på sitt sätt (han tvivlar ju aldrig). erbjudNytt när
+  // analysen har skrivits om sedan han sa det. Knappen under är "Ja, titta igen".
+  erbjud: [
+    'Jag kan titta på den igen, om du vill. Jag är inte för fin för det.',
+    'Ska jag titta på den en gång till? Det blir samma svar, men jag gör det gärna.',
+    'Jag har haft fel en gång förut. Ska jag titta på den igen, för säkerhets skull?',
   ],
+  erbjudNytt: [
+    'Tidningarna har skrivit mer om den sedan dess. Ska jag titta på den igen?',
+    'Det har kommit nytt om den sedan jag sa det här. Vill du att jag tittar igen?',
+  ],
+  // Direkt när man har bett honom titta igen.
+  tittaIgen: ['Då tar vi den från början.', 'Jag tar den en gång till.'],
+
+  // Medan han låtsas analysera: han börjar, håller på och är nästan klar, en rad lottad ur
+  // varje del (vantan i rum-hasse.js). Han hinner säga två eller tre rader, så det är
+  // lottningen som gör att det låter olika varje gång. Allt under kontroll.
+  vantar: {
+    forst: [
+      'Jag ska bara titta på en sak.',
+      'Ge mig bara en minut.',
+      'Vänta lite, var har jag glasögonen?',
+      'Jag läser på lite, för formens skull.',
+      'Svaret har jag redan, men jag dubbelkollar.',
+      'Jag ska bara slå upp tabellen.',
+      'Jag ska bara leta fram mina anteckningar.',
+    ],
+    sedan: [
+      'Jag läser tidningarna.',
+      'Tidningarna har fel, som vanligt.',
+      'Experterna i tidningarna förstår ingenting.',
+      'Du har väl inte bråttom?',
+      'Spelstoppet är {dag}.',
+      'Allt är orsak och verkan, alltså.',
+      'Den här sortens match har jag sett förut.',
+      'Den här matchen har fler bottnar än man tror.',
+      'Man ska inte stressa fram ett tips.',
+      'Tyst nu, jag räknar.',
+      'Magkänslan har aldrig svikit mig.',
+      'Jag har tippat i femtio år.',
+      'Jag går igenom skadelistan.',
+      'Det gäller att läsa mellan raderna.',
+    ],
+    sist: [
+      'Jag är strax klar.',
+      'Nu faller bitarna på plats.',
+      'Snart ska du få ditt svar.',
+      'Nu vet jag hur matchen slutar.',
+      'Jag har full kontroll.',
+      'Ta det bara lugnt.',
+      'Det är ingen fara.',
+    ],
+  },
 
   // Trycker man på Ja, ja mitt i.
   avbruten: ['Då får du läsa själv.', 'Som du vill.'],
@@ -104,7 +137,6 @@
     fler: ['På din kupong har du {du}. Så många tecken behövs inte.'],
     korsar: ['{Bada} kan du behålla på din kupong, men stryk resten.'],
     skilda: ['På din kupong har du {du}, och det kan du glömma.'],
-    tom: ['Du har inte fyllt i den här matchen än. Nu vet du vad du ska sätta.'],
   },
 
   // När något inte går.

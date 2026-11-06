@@ -30,23 +30,27 @@
 // Slitaget följer tippningen som sakerna på pulten; löpsedeln blir bara lite
 // böjd.
 //
-// Löpsedeln (rubrik): kvällstidningen KVÄLLSPRESSEN (inget riktigt märke)
-// skriver om det mest dramatiska som har hänt eller ska hända – i förra
+// Löpsedeln (rubrik): Sportbladets eller Expressens (två veckor i taget),
+// med namnet som text och våra rubriker i kvällstidningens tonläge, torrt
+// ironiska, om det mest dramatiska som har hänt eller ska hända – i förra
 // omgången den som tippade bäst eller sämst, en ny ledare i Tipsligan, modellen
 // mot gänget, skrällen, krossen och gängets kupong; i nästa omgång den jämnaste
-// matchen, den största favoriten och jakten på ledaren. Förra omgångens nyheter
-// väger tyngst de första dagarna och nästa omgångs bara innan någon av dess
-// matcher har startat. Omgångar och kuponger som spoilerskyddet döljer räknas
-// inte. Utan något att skriva om blir det tipsguiden. Som de andra föremålen
-// leder den inte ut ur rummet: ett klick går fram till den (rum.js).
+// matchen, den största favoriten och jakten på ledaren. Längst ner den näst
+// största nyheten. Förra omgångens nyheter väger tyngst de första dagarna och
+// nästa omgångs bara innan någon av dess matcher har startat. Omgångar och
+// kuponger som spoilerskyddet döljer räknas inte. Utan något att skriva om blir
+// det tipsguiden. Som de andra föremålen leder den inte ut ur rummet: ett klick
+// går fram till den (rum.js).
 //
 // affischer(back, { short, namn }) → { slit(w, seed), data(rows, old) }
 //   short: kortare lagnamn, namn: namnet på skårtavlan (rum.js)
 //   rows: omgångens rader (roundRows i rum.js), old: de färdigspelade
 //   kupongerna (Historik.coupons()); säsongens omgångar läses ur TP.season
 //   (tippare.js).
-// För bilder: ?rum-vecka=<tal> en annan vecka (löpsedelns plats) och
-// ?rum-rubrik=<typ> en viss rubrik om den finns (typerna står i RUBRIKER).
+// För bilder: ?rum-vecka=<tal> en annan vecka (löpsedelns plats),
+// ?rum-tidning=sb|ex en viss tidning, ?rum-rubrik=<typ> en viss rubrik om den
+// finns (typ i bakat, matchRubriker, kupongRubriker och framat) och
+// ?rum-variant=<tal> en viss variant av den.
 
 const hash = (n) => { const x = Math.sin(n * 127.1 + 311.7) * 43758.5453; return x - Math.floor(x); };
 const clamp = (x, a = 0, b = 1) => Math.min(b, Math.max(a, x));
@@ -152,9 +156,15 @@ function ifk() {
 
 // Rubrikens rader så stora som ryms i bredden, och alla mindre om de inte
 // ryms på höjden (bredd mäter med en duk, se löpsedeln nedan).
-function passa(el, { rad, bred, hog, max }) {
-  let px = rad.map(([t]) => Math.min(max, bred / Math.max(0.3, bredd(String(t).toUpperCase()))));
-  const h = px.reduce((a, x) => a + x * 0.94, 0) + (rad.length - 1) * 1.5;
+// En rad vit på rött (stil 2) har sin kant att rymma också. Med topp blir
+// ingen rad mer än så många gånger större än den minsta (QPR ska inte ta
+// hela papperet). Med prick får en rad med Å, Ä eller Ö så mycket mer luft
+// ovanför (i em, CSS:en .prick), så att prickarna inte når raden ovanför.
+const PRICK = /[ÅÄÖ]/i;
+function passa(el, { rad, bred, hog, max, topp = Infinity, prick = 0 }) {
+  let px = rad.map(([t, s]) => Math.min(max, bred / Math.max(0.3, bredd(String(t).toUpperCase()) + (s === 2 ? 0.24 : 0))));
+  px = px.map((x) => Math.min(x, Math.min(...px) * topp));
+  const h = px.reduce((a, x, i) => a + x * (0.94 + (PRICK.test(rad[i][0]) ? prick : 0)), 0) + (rad.length - 1) * 1.5;
   if (h > hog) px = px.map((x) => x * (hog / h));
   el.querySelectorAll('.rub b').forEach((b, i) => { b.style.fontSize = `${px[i].toFixed(1)}px`; });
 }
@@ -226,7 +236,23 @@ function nacional() {
   return paSkivan(el);
 }
 
-// ---------- löpsedeln: rubrikerna ----------
+// ---------- löpsedeln: tidningen och rubrikerna ----------
+//
+// Veckans löpsedel är från en riktig kvällstidning, som de andra (Tomas
+// önskemål): Sportbladet, Aftonbladets sportdel på sitt rosa papper, eller
+// Expressen med det röda namnet, två veckor i taget. Namnen är skrivna som
+// text, inte tidningarnas loggor, och rubrikerna är våra: kvällstidningens
+// tonläge om gängets tips, allvarligt menat på ytan. ?rum-tidning=sb|ex ger
+// en viss tidning.
+export const TIDNINGAR = {
+  sb: { namn: 'Sportbladet', gen: 'Sportbladets', T: 'SPORTBLADET', font: '900 100px "Helvetica Neue", Arial, sans-serif', bred: 90 },
+  ex: { namn: 'EXPRESSEN', gen: 'Expressens', T: 'EXPRESSEN', font: '400 100px "Alfa Slab One", Georgia, serif', bred: 84 },
+};
+function tidning(fro) {
+  const v = q.get('rum-tidning');
+  if (v && TIDNINGAR[v]) return v;
+  return ((Math.floor(fro / 2) % 2) + 2) % 2 ? 'ex' : 'sb';
+}
 
 const fDatum = new Intl.DateTimeFormat('sv-SE', { timeZone: 'Europe/Stockholm', weekday: 'long', day: 'numeric', month: 'long' });
 const fDag = new Intl.DateTimeFormat('sv-SE', { timeZone: 'Europe/Stockholm', weekday: 'short' });
@@ -278,7 +304,9 @@ function stallning(rs) {
 }
 
 // Rubrikerna ur en färdigspelad omgång (säsongens): var och en
-// { typ, kick, rad: [[text, röd]], under, poang, t (när det hände) }.
+// { typ, poang, t (när det hände), id (matchen), v: varianterna }, och varje
+// variant { kick, rad: [[text, stil]], under } (stil 1 röd, 2 vit på rött;
+// {T} i kick blir tidningens namn). Veckan väljer variant (vald i rubrik).
 function bakat(r, alla, short) {
   const out = [];
   const t = Date.parse(r.to || r.from);
@@ -289,18 +317,38 @@ function bakat(r, alla, short) {
   const m = r.model || null;
   const ensam = (p, f) => folk.filter((x) => f(x) === f(p)).length === 1;
   if (bast.ok === bast.n && bast.n >= 8) {
-    out.push({ typ: 'bast', kick: 'TIPSET', rad: [[namnAv(bast)], ['ALLA RÄTT!', 1]], under: `${bast.ok} av ${bast.n} – bäst i gänget`, poang: 1, t });
+    const N = namnAv(bast);
+    out.push({ typ: 'bast', poang: 1, t, v: [
+      { kick: 'HISTORISKT', rad: [[N], ['ALLA RÄTT!', 1]], under: `${bast.n} av ${bast.n}. Datorn: ”Statistiskt osannolikt”` },
+      { kick: 'TIPSGENIET', rad: [[N], ['ALLA'], ['RÄTT!', 1]], under: `${bast.n} av ${bast.n} – bäst i gänget. Är det Sveriges bästa tippare?` },
+    ] });
   } else if (bast.ok / bast.n >= 0.82 && ensam(bast, (x) => x.ok)) {
-    out.push({ typ: 'bast', kick: 'TIPSET', rad: [[namnAv(bast)], [`${bast.ok} RÄTT!`, 1]], under: m && m.ok < bast.ok ? `Bäst i gänget – modellen fick ${m.ok}` : `Bäst i gänget av ${bast.n} matcher`, poang: 0.6 + (bast.ok / bast.n - 0.82) * 2, t });
+    const N = namnAv(bast);
+    const jmf = m && m.ok < bast.ok ? `datorn fick ${m.ok}` : `${bast.ok} av ${bast.n}`;
+    out.push({ typ: 'bast', poang: 0.6 + (bast.ok / bast.n - 0.82) * 2, t, v: [
+      { kick: 'TIPSGENIET', rad: [[N], [`${bast.ok} RÄTT!`, 1]], under: `Bäst i gänget – ${jmf}. Är det Sveriges bästa tippare?` },
+      { kick: 'TIPSET', rad: [[N], ['SLOG'], ['ALLA', 1]], under: `${bast.ok} rätt av ${bast.n}. Nu talar ${N} ut – hela berättelsen` },
+    ] });
   }
   if (samst.ok / samst.n <= 0.5 && ensam(samst, (x) => x.ok)) {
-    out.push({ typ: 'samst', kick: 'TIPSKRASCHEN', rad: [[gen(namnAv(samst))], ['MARDRÖM', 1]], under: `Bara ${samst.ok} rätt av ${samst.n} – sämst i gänget`, poang: 0.55 + (0.5 - samst.ok / samst.n), t });
+    const N = namnAv(samst);
+    out.push({ typ: 'samst', poang: 0.55 + (0.5 - samst.ok / samst.n), t, v: [
+      { kick: 'KRISEN', rad: [[gen(N)], ['MARDRÖM', 1]], under: `Bara ${samst.ok} rätt av ${samst.n} – sämst i gänget. Nu krävs svar` },
+      { kick: 'TIPSKRASCHEN', rad: [[N], ['I FRITT'], ['FALL', 1]], under: `${samst.ok} av ${samst.n} rätt. Så gick allt fel – match för match` },
+      { kick: '{T} AVSLÖJAR', rad: [['SANNINGEN'], [`OM ${gen(N)}`], ['TIPS', 1]], under: `Bara ${samst.ok} rätt av ${samst.n} – sämst i gänget` },
+    ] });
   }
   if (m && m.n && folk.length >= 2) {
     if (folk.every((p) => p.ok < m.ok)) {
-      out.push({ typ: 'datorn', kick: 'TIPSET', rad: [['DATORN'], ['KROSSADE'], ['GÄNGET', 1]], under: `Modellen ${m.ok} rätt – gängets bästa ${bast.ok}`, poang: 0.5 + (m.ok - bast.ok) * 0.05, t });
+      out.push({ typ: 'datorn', poang: 0.5 + (m.ok - bast.ok) * 0.05, t, v: [
+        { kick: 'AI-CHOCKEN', rad: [['DATORN'], ['KROSSADE'], ['GÄNGET', 1]], under: `Datorn ${m.ok} rätt – gängets bästa ${bast.ok}. Är människan överspelad?` },
+        { kick: 'AI-CHOCKEN', rad: [['MASKINEN'], ['VANN', 1]], under: `${m.ok} rätt mot gängets ${bast.ok}. Experterna: ”Vi har varnat för det här”` },
+      ] });
     } else if (folk.every((p) => p.ok > m.ok)) {
-      out.push({ typ: 'datorn', kick: 'TIPSET', rad: [['GÄNGET'], ['SLOG'], ['DATORN', 1]], under: `Alla fick fler rätt än modellens ${m.ok}`, poang: 0.5 + (samst.ok - m.ok) * 0.05, t });
+      out.push({ typ: 'datorn', poang: 0.5 + (samst.ok - m.ok) * 0.05, t, v: [
+        { kick: 'MÄNNISKAN SLÅR TILLBAKA', rad: [['GÄNGET'], ['SLOG'], ['DATORN', 1]], under: `Alla fick fler rätt än datorns ${m.ok}. Datorn avböjer att kommentera` },
+        { kick: 'TIPSET', rad: [['FIASKO'], ['FÖR'], ['DATORN', 1]], under: `Bara ${m.ok} rätt – sämst av alla. Datorn avböjer att kommentera` },
+      ] });
     }
   }
   // en ny ledare i Tipsligan efter omgången (ensam etta, före ensam etta)
@@ -310,7 +358,11 @@ function bakat(r, alla, short) {
     const nu = stallning(alla.slice(0, i + 1));
     const ensamEtta = (l) => l.length && (l.length === 1 || nyckel(l[0]) > nyckel(l[1]));
     if (ensamEtta(fore) && ensamEtta(nu) && nu[0].id !== fore[0].id) {
-      out.push({ typ: 'ledare', kick: 'TIPSLIGAN', rad: [[namnAv(nu[0])], ['TOG'], ['TRONEN', 1]], under: `Leder efter ${i + 1} omgångar – ${namnAv(fore[0])} petad`, poang: 0.75, t });
+      const [N, F] = [namnAv(nu[0]), namnAv(fore[0])];
+      out.push({ typ: 'ledare', poang: 0.75, t, v: [
+        { kick: 'MAKTSKIFTET', rad: [[N], ['TOG'], ['TRONEN', 1]], under: `Ny etta i Tipsligan efter ${i + 1} omgångar – ${F} petad` },
+        { kick: 'BARA I {T}', rad: [['KUPPEN!', 1], [N], ['NY ETTA']], under: `${F} petad efter ${i + 1} omgångar. Så gick det till` },
+      ] });
     }
   }
   for (const x of r.matches) out.push(...matchRubriker({ id: x.id, match: x.match, res: x.res, score: x.score, model: x.model, t }, short));
@@ -327,17 +379,33 @@ function matchRubriker(x, short) {
   if (!h || !a || !x.score) return out;
   const mal = String(x.score).split(/[–-]/).map(Number);
   if (p != null && p <= 22 && x.res !== 'X') {
-    const [v, f] = x.res === '1' ? [h, a] : [a, h];
-    out.push({ typ: 'skrall', kick: 'SKRÄLLEN', rad: [[short(v)], [x.res === '1' ? 'FÄLLDE' : 'SÄNKTE', 1], [short(f)]], under: `${x.score} – modellen gav det ${Math.round(p)} %`, poang: 0.5 + ((22 - p) / 22) * 0.45, t: x.t, id: x.id });
+    const [v, f] = (x.res === '1' ? [h, a] : [a, h]).map(short);
+    const verb = x.res === '1' ? 'FÄLLDE' : 'SÄNKTE';
+    out.push({ typ: 'skrall', poang: 0.5 + ((22 - p) / 22) * 0.45, t: x.t, id: x.id, v: [
+      { kick: 'SKRÄLLEN', rad: [[v], [verb, 1], [f]], under: `${x.score} – datorn gav det ${Math.round(p)} %. Datorn avböjer att kommentera` },
+      { kick: 'CHOCKEN', rad: [[v], [verb, 1], [f]], under: `${x.score}. Bara ${Math.round(p)} % enligt datorn – nu ifrågasätts allt` },
+    ] });
   } else if (x.res === 'X' && x.model && Math.max(x.model[0], x.model[2]) >= 58) {
     const fav = x.model[0] >= x.model[2] ? 0 : 2;
-    const [v, f] = fav === 0 ? [h, a] : [a, h];
-    out.push({ typ: 'skrall', kick: 'SKRÄLLEN', rad: [[short(v)], ['SNUBBLADE', 1]], under: `${x.score} mot ${short(f)} – ${Math.round(x.model[fav])} % för seger enligt modellen`, poang: 0.45 + (x.model[fav] - 58) / 80, t: x.t, id: x.id });
+    const [v, f] = (fav === 0 ? [h, a] : [a, h]).map(short);
+    const pf = Math.round(x.model[fav]);
+    out.push({ typ: 'skrall', poang: 0.45 + (x.model[fav] - 58) / 80, t: x.t, id: x.id, v: [
+      { kick: 'FIASKOT', rad: [[v], ['SNUBBLADE', 1]], under: `${x.score} mot ${f} – trots ${pf} % enligt datorn. Hur är det möjligt?` },
+      { kick: 'PINSAMT', rad: [[v], ['TAPPADE'], ['POÄNG', 1]], under: `${x.score} mot ${f}. ${pf} % för seger enligt datorn – och ändå` },
+    ] });
   }
   const skillnad = Math.abs(mal[0] - mal[1]);
   if (mal.length === 2 && skillnad >= 4) {
-    const [v, f] = mal[0] > mal[1] ? [h, a] : [a, h];
-    out.push({ typ: 'kross', kick: mal[0] + mal[1] >= 7 ? 'MÅLFESTEN' : 'KROSSEN', rad: [[short(v)], ['KÖRDE ÖVER', 1], [short(f)]], under: `${x.score}${p != null ? ` – modellen gav det ${Math.round(p)} %` : ''}`, poang: 0.45 + (skillnad - 4) * 0.1, t: x.t, id: x.id });
+    const [v, f] = (mal[0] > mal[1] ? [h, a] : [a, h]).map(short);
+    const tot = mal[0] + mal[1];
+    const pr = p != null ? ` – datorn gav det ${Math.round(p)} %` : '';
+    out.push({ typ: 'kross', poang: 0.45 + (skillnad - 4) * 0.1, t: x.t, id: x.id, v: tot >= 7 ? [
+      { kick: 'MÅLFESTEN', rad: [[v], ['KÖRDE ÖVER', 1], [f]], under: `${x.score} – ${tot} mål. Hela målfesten i bilder` },
+      { kick: 'MÅLREGNET', rad: [[`${tot} MÅL!`, 1], [short(h)], [`– ${short(a)}`]], under: `${x.score}. Försvararna saknas fortfarande` },
+    ] : [
+      { kick: 'FÖRNEDRINGEN', rad: [[v], ['KÖRDE ÖVER', 1], [f]], under: `${x.score}${pr}. Siffrorna talar sitt tydliga språk` },
+      { kick: 'MASSAKERN', rad: [[v], ['KROSSADE', 1], [f]], under: `${x.score} – hela målfesten i bilder` },
+    ] });
   }
   return out;
 }
@@ -346,10 +414,17 @@ function matchRubriker(x, short) {
 function kupongRubriker(c, short) {
   const out = [];
   const t = Date.parse(`${c.till || c.date}T17:00:00Z`);
+  const facit = `${c.ok} rätt av ${c.n} – datorn väntade ${tal(c.exp)}`;
   if (c.n >= 6 && c.grade === 1) {
-    out.push({ typ: 'kupong', kick: 'TIPSET', rad: [['KUPONGEN'], ['I SPILLROR', 1]], under: `${c.ok} rätt av ${c.n} – modellen väntade ${tal(c.exp)}`, poang: 0.65, t });
+    out.push({ typ: 'kupong', poang: 0.65, t, v: [
+      { kick: 'FIASKOT', rad: [['KUPONGEN'], ['I SPILLROR', 1]], under: `${facit}. Nu letas syndabockar` },
+      { kick: 'TIPSKRASCHEN', rad: [['KUPONG-'], ['HAVERIET', 1]], under: `Gängets kupong: ${c.ok} rätt av ${c.n}. Ingen tar på sig skulden` },
+    ] });
   } else if (c.n >= 6 && c.grade === 5) {
-    out.push({ typ: 'kupong', kick: 'TIPSET', rad: [['DRÖM-'], ['KUPONGEN', 1]], under: `${c.ok} rätt av ${c.n} – modellen väntade ${tal(c.exp)}`, poang: 0.65, t });
+    out.push({ typ: 'kupong', poang: 0.65, t, v: [
+      { kick: 'JUBLET', rad: [['DRÖM-'], ['KUPONGEN', 1]], under: `${facit}. Gänget firar – med måtta` },
+      { kick: 'BARA I {T}', rad: [['SÅ KNÄCKTE'], ['GÄNGET'], ['KODEN', 1]], under: `${facit}. Hela kupongen` },
+    ] });
   }
   for (const r of c.rows || []) {
     if (r.res == null || !r.id) continue;
@@ -368,29 +443,53 @@ function framat(rows, alla, short) {
     const jamn = med.reduce((a, x) => (Math.max(...x.g.pr) < Math.max(...a.g.pr) ? x : a));
     const pj = jamn.g.pr.map(Math.round);
     if (Math.max(...pj) <= 42) {
-      out.push({ typ: 'rysaren', kick: 'INFÖR HELGEN', rad: [['RYSAREN', 1], [short(jamn.m.home)], [`– ${short(jamn.m.away)}`]], under: `Modellen kan inte välja: ${pj.join(' – ')} %, ${nar(jamn.m.kickoff)}`, poang: 0.42 + (42 - Math.max(...pj)) / 40, t, framat: true });
+      const [h, a] = [short(jamn.m.home), short(jamn.m.away)];
+      out.push({ typ: 'rysaren', poang: 0.42 + (42 - Math.max(...pj)) / 40, t, framat: true, v: [
+        { kick: 'RYSAREN', rad: [['DATORN'], ['GER UPP', 1]], under: `${h}–${a}: ${pj.join('–')} %. Nu får du välja själv` },
+        { kick: 'NERVKRIGET', rad: [['RYSAREN', 1], [h], [`– ${a}`]], under: `Datorn kan inte välja: ${pj.join('–')} %. Avspark ${nar(jamn.m.kickoff)}` },
+      ] });
     }
     const fav = med.reduce((a, x) => (Math.max(x.g.pr[0], x.g.pr[2]) > Math.max(a.g.pr[0], a.g.pr[2]) ? x : a));
     const k = fav.g.pr[0] >= fav.g.pr[2] ? 0 : 2;
     const pf = Math.round(fav.g.pr[k]);
     if (pf >= 68) {
-      const [v, f] = k === 0 ? [fav.m.home, fav.m.away] : [fav.m.away, fav.m.home];
-      out.push({ typ: 'spiken', kick: 'SPIKEN', rad: [[short(v)], ['KAN INTE'], ['FÖRLORA', 1]], under: `${pf} % mot ${short(f)} enligt modellen – eller?`, poang: 0.4 + (pf - 68) / 60, t, framat: true });
+      const [v, f] = (k === 0 ? [fav.m.home, fav.m.away] : [fav.m.away, fav.m.home]).map(short);
+      out.push({ typ: 'spiken', poang: 0.4 + (pf - 68) / 60, t, framat: true, v: [
+        { kick: 'SPIKEN', rad: [[v], ['KAN INTE'], ['FÖRLORA', 1]], under: `${pf} % mot ${f} enligt datorn. Vad kan gå fel?` },
+        { kick: 'OMGÅNGENS SPIK', rad: [['GARANTERAT!', 2], [v], ['VINNER']], under: `Mot ${f}. (${pf} procent enligt datorn)` },
+        { kick: 'SÄKRA PENGAR', rad: [['SPIKA'], [`${v}!`, 1]], under: `${pf} % mot ${f} enligt datorn. Vi lovar ingenting` },
+      ] });
     }
   }
   const st = stallning(alla);
   if (alla.length >= 2 && st.length >= 2 && st[0].pts - st[1].pts >= 0.5) {
-    out.push({ typ: 'jakten', kick: 'TIPSLIGAN', rad: [['JAKTEN'], [`PÅ ${namnAv(st[0])}`, 1]], under: `Leder med ${tal(st[0].pts - st[1].pts)} poäng efter ${alla.length} omgångar`, poang: 0.38, t, framat: true });
+    const N = namnAv(st[0]);
+    const d = tal(st[0].pts - st[1].pts);
+    out.push({ typ: 'jakten', poang: 0.38, t, framat: true, v: [
+      { kick: 'TIPSLIGAN', rad: [['JAKTEN'], [`PÅ ${N}`, 1]], under: `Leder med ${d} poäng efter ${alla.length} omgångar. Kan någon stoppa ${N}?` },
+      { kick: 'TIPSLIGAN', rad: [[N], ['OHOTAD?', 1]], under: `${d} poängs ledning efter ${alla.length} omgångar. Jakten har bara börjat` },
+    ] });
   }
   return out;
 }
 
-const TIPSGUIDEN = { typ: 'guide', kick: 'SPORT', rad: [['STORA'], ['TIPSGUIDEN', 1]], under: 'Så tar du hem helgens 13 rätt', poang: 0 };
+// Utan något att skriva om: tipsguiden, och nyheten längst ner när veckan
+// bara har en.
+const GUIDEN = { typ: 'guide', poang: 0, v: [
+  { kick: 'EXTRA', rad: [['STORA'], ['TIPSGUIDEN', 1]], under: 'Så tar du hem 13 rätt – experterna avslöjar allt' },
+  { kick: 'GUIDEN', rad: [['SÅ BLIR'], ['DU RIK', 1], ['PÅ TIPSET']], under: '8 enkla knep – nummer 5 gör alla fel' },
+  { kick: 'EXPERTERNA', rad: [['SÅ SLÅR'], ['DU'], ['DATORN', 1]], under: 'Hela guiden – steg för steg' },
+] };
+const PLUS = ['HOROSKOPET: TIPPA X', 'BÄST I TEST: TIPSPENNOR', '13 RÄTT – SÅ DELAR DU VINSTEN', 'LÄKAREN: SÅ PÅVERKAR TIPSET SÖMNEN'];
+
+// Rubrikens rader som en rad text (DRÖM- KUPONGEN blir DRÖMKUPONGEN).
+const radText = (rad) => rad.map(([t]) => String(t).toUpperCase()).join(' ').replace(/- /g, '');
 
 // Veckans rubrik: förra omgångens nyheter väger fullt tre dagar, sedan
-// mindre; nästa omgångs bara innan den har startat. Samma vecka och samma
-// data ger samma rubrik.
-export function rubrik({ rows, old, short = (x) => x, namn = null, now = Date.now(), fro = veckaFro(now) }) {
+// mindre; nästa omgångs bara innan den har startat. Den näst största nyheten
+// (helst av ett annat slag) står längst ner. Samma vecka och samma data ger
+// samma löpsedel. → { typ, tidning, kick, rad, under, plus, datum }
+export function rubrik({ rows, old, short = (x) => x, namn = null, now = Date.now(), fro = veckaFro(now), tid = tidning(fro) }) {
   if (namn) namnAv = namn;
   const alla = omgangar();
   const kand = [];
@@ -410,32 +509,44 @@ export function rubrik({ rows, old, short = (x) => x, namn = null, now = Date.no
     sett.add(k);
     return true;
   };
+  const ord = (s) => [...s].reduce((a, ch) => a + ch.charCodeAt(0), 0);
   const lista = kand.filter(forsta).map((x) => {
     const dagar = (now - x.t) / DAG;
     const vikt = x.framat ? 0.9 : dagar <= 3 ? 1 : dagar <= 6 ? 0.55 : 0.3;
     return { ...x, vikt: x.poang * vikt + hash(fro + x.typ.length + (x.id ? Number(String(x.id).slice(-4)) || 0 : 0)) * 0.04 };
-  });
+  }).sort((a, b) => b.vikt - a.vikt);
   const vill = q.get('rum-rubrik');
-  const val = (vill && lista.find((x) => x.typ === vill)) || lista.sort((a, b) => b.vikt - a.vikt)[0];
-  if (!val) return { ...TIPSGUIDEN, datum: datum(now) };
+  const val = (vill && lista.find((x) => x.typ === vill)) || lista[0] || GUIDEN;
+  const T = TIDNINGAR[tid];
+  // veckans variant (?rum-variant=<tal> en viss)
+  const valj = (x, k) => {
+    const n = Number(q.get('rum-variant'));
+    const i = k === 0 && q.get('rum-variant') != null && Number.isFinite(n) ? n : Math.floor(hash(fro * 1.37 + k * 5.1 + ord(x.typ)) * x.v.length);
+    const v = x.v[((i % x.v.length) + x.v.length) % x.v.length];
+    return { ...v, kick: v.kick.replace('{T}', T.T) };
+  };
+  const andra = lista.find((x) => x !== val && x.typ !== val.typ) || lista.find((x) => x !== val);
+  const plus = andra ? radText(valj(andra, 1).rad) : PLUS[Math.floor(hash(fro + 9.3) * PLUS.length) % PLUS.length];
   // tidningen är från dagen det hände (en sen match: dagen efter), eller idag
-  return { ...val, datum: datum(val.framat ? now : Math.min(now, val.t + 3 * 3600e3)) };
+  const t = val === GUIDEN || val.framat ? now : Math.min(now, val.t + 3 * 3600e3);
+  return { typ: val.typ, tidning: tid, ...valj(val, 0), plus, datum: datum(t) };
 }
 
 // ---------- löpsedeln: papperet ----------
 //
-// Rubrikens rader i Anton, var och en så stor som ryms i bredden, och alla
-// mindre om de inte ryms på höjden (mätt med en duk, så att inget behöver
-// läggas ut i rummet först).
-const BRED = 88;
-const HOG = 82;
-const MAX = 34;
+// Tidningens namn så brett som papperet, en rad med vinjetten (kick) och
+// datumet, rubrikens rader i Anton, var och en så stor som ryms i bredden och
+// alla mindre om de inte ryms på höjden, raden under och den andra nyheten
+// längst ner (mätt med en duk, så att inget behöver läggas ut i rummet först).
+const BRED = 92;
+const MAX = 36;
 let duk = null;
-function bredd(text) {
+function bredd(text, font = '400 100px Anton, Impact, "Arial Narrow", sans-serif') {
   duk = duk || document.createElement('canvas').getContext('2d');
-  duk.font = '400 100px Anton, Impact, "Arial Narrow", sans-serif';
+  duk.font = font;
   return duk.measureText(text).width / 100;
 }
+const UNDER = '700 100px "Helvetica Neue", Arial, sans-serif';
 
 function lopsedel() {
   const el = document.createElement('button');
@@ -447,15 +558,38 @@ function lopsedel() {
 }
 
 function rita(el, r, vagg) {
-  const rad = r.rad.map(([t, rod]) => ({ t: String(t).toUpperCase(), rod: Boolean(rod) }));
-  el.title = `${rad.map((x) => x.t).join(' ')} – ${r.under}`;
-  el.setAttribute('aria-label', `Löpsedel: ${el.title}`);
-  el.innerHTML = `<span class="ark"><span class="huvud"><b>KVÄLLSPRESSEN</b><small>${esc(r.datum)}</small></span>` +
-    `<span class="kick">${esc(r.kick)}</span>` +
-    `<span class="rub">${rad.map((x) => `<b${x.rod ? ' class="rod"' : ''}>${esc(x.t)}</b>`).join('')}</span>` +
-    `<span class="under">${esc(r.under)}</span><span class="tryck"></span></span>` +
+  const T = TIDNINGAR[r.tidning] || TIDNINGAR.sb;
+  const rad = r.rad.map(([t, s]) => [String(t).toUpperCase(), Number(s) || 0]);
+  el.title = `${T.gen} löpsedel: ${radText(rad)} – ${r.under}${r.plus ? `. ${r.plus}` : ''}`;
+  el.setAttribute('aria-label', el.title);
+  el.classList.remove(...Object.keys(TIDNINGAR).map((k) => `tid-${k}`));
+  el.classList.add(`tid-${r.tidning}`);
+  const stil = (t, s) => {
+    const k = [s === 1 ? 'rod' : s === 2 ? 'inv' : '', PRICK.test(t) ? 'prick' : ''].filter(Boolean).join(' ');
+    return k ? ` class="${k}"` : '';
+  };
+  el.innerHTML = `<span class="ark"><span class="huvud"><b class="namn">${esc(T.namn)}</b></span>` +
+    `<span class="linje"><span class="kick">${esc(r.kick)}</span><small>${esc(r.datum)}</small></span>` +
+    `<span class="rub">${rad.map(([t, s]) => `<b${stil(t, s)}>${esc(t)}</b>`).join('')}</span>` +
+    `<span class="under">${esc(r.under)}</span>` +
+    (r.plus ? `<span class="plus"><b>+</b>${esc(r.plus)}</span>` : '') +
+    '<span class="tryck"></span></span>' +
     `<span class="hund"></span>${vagg ? '<i class="nal a"></i><i class="nal b"></i>' : '<i class="tejp a"></i><i class="tejp b"></i>'}`;
-  passa(el, { rad: r.rad, bred: BRED, hog: HOG, max: MAX });
+  // namnet, vinjetten och den andra nyheten så stora som ryms (sp: spärren
+  // mellan bokstäverna och kanterna i em, som i CSS:en)
+  const fyll = (sel, text, font, bred, max, sp = 0) => {
+    const b = el.querySelector(sel);
+    if (b) b.style.fontSize = `${Math.min(max, bred / Math.max(0.3, bredd(text, font) + sp * text.length)).toFixed(2)}px`;
+  };
+  fyll('.namn', T.namn, T.font, T.bred, 22);
+  fyll('.kick', r.kick + '  ', undefined, 66, 6.4, 0.06);
+  if (r.plus) fyll('.plus', `+ ${r.plus}`, undefined, 88, 5.6, 0.02);
+  // rubriken får det som blir över av höjden: papperet 140 utan kanterna
+  // (6,5), namnet (18), vinjetten (12), raden under, den andra nyheten och
+  // luft för ringen och prickarna över Å, Ä och Ö (rub, 5) och en pixel att ta av
+  const underRader = Math.max(1, Math.ceil((bredd(r.under, UNDER) * 4.6) / BRED));
+  const hog = 140 - 6.5 - 18 - 12 - (underRader * 5.52 + 2.5) - (r.plus ? 11.8 : 0) - 5 - 1;
+  passa(el, { rad, bred: BRED, hog, max: MAX, topp: 1.55, prick: 0.2 });
 }
 
 // ---------- slitaget och platserna ----------
@@ -496,7 +630,7 @@ export function affischer(back, { short = (x) => x, namn = null } = {}) {
   // Anton måste vara inläst innan raderna mäts: då mäts de om
   if (document.fonts && document.fonts.load) {
     const klar = () => { fonter = true; passa(f, GP); passa(c, CHELSEA); api.data(senast.rows, senast.old); };
-    document.fonts.load('400 30px Anton').then(klar, klar);
+    Promise.all([document.fonts.load('400 30px Anton'), document.fonts.load('400 30px "Alfa Slab One"')]).then(klar, klar);
   }
   const api = {
     slit(w, seed) {
@@ -519,9 +653,9 @@ export function affischer(back, { short = (x) => x, namn = null } = {}) {
         r = rubrik({ rows, old, short, fro });
       } catch (err) {
         console.warn('Rummet: löpsedeln', err);
-        r = { ...TIPSGUIDEN, datum: datum(Date.now()) };
+        r = { ...GUIDEN.v[0], typ: 'guide', tidning: 'sb', plus: PLUS[0], datum: datum(Date.now()) };
       }
-      const k = JSON.stringify([r.rad, r.under, r.datum, fonter, vagg]);
+      const k = JSON.stringify([r.tidning, r.kick, r.rad, r.under, r.plus, r.datum, fonter, vagg]);
       if (k === ritad) return;
       ritad = k;
       rita(l, r, vagg);
