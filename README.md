@@ -3523,8 +3523,8 @@ På disken under Tipsligan står en kortlåda i lackad teak, byggd i three.js
 som inredningen ([public/rum-kortlada.js](public/rum-kortlada.js)), med korten, datan och
 kortet i handen i [public/rum-register.js](public/rum-register.js) och
 [public/rum-register.css](public/rum-register.css). Fram på lådan sitter en mässingshållare
-med etiketten *KRITAN*, överstruket med kulspets och *Lagen* skrivet bredvid – lådan har
-haft ett annat jobb. I lådan står, framifrån:
+med en maskinskriven etikett, *KARTOTEK* (`ETIKETT` i rum-kortlada.js). I lådan står,
+framifrån:
 
 - **Lagen** – en grön avdelare av pressad kartong, och bakom den ett registerkort per lag i
   omgången i bokstavsordning, med en flik av plast i divisionens färg (som på Tabeller) och
