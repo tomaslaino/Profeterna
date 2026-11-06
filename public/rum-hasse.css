@@ -24,6 +24,17 @@
 .rum-hasse-vy[hidden] { display: none; }
 .rh-scen { position: absolute; inset: 0; overflow: hidden; }
 .rh-scen img.rh-bak { position: absolute; left: 0; top: 0; display: block; max-width: none; }
+/* väggen i lysrörets ljus (tänt utom mellan midnatt och sex, som i rummet), annars i nattens */
+.rh-scen img.rh-lys, .rum-hasse-vy.lys .rh-scen img.rh-bak:not(.rh-lys) { display: none; }
+.rum-hasse-vy.lys .rh-scen img.rh-lys { display: block; }
+/* dagsljuset som faller in från affären till höger, som i rummet (rum-ute.css): himlens färg, efter
+   klockan och vädret (tand i rum-hasse.js) */
+.rh-dagsljus { position: absolute; inset: 0; pointer-events: none;
+  background: radial-gradient(75% 95% at 100% 42%, var(--dag-farg, #c4daec), rgba(196, 218, 236, 0) 72%);
+  mix-blend-mode: soft-light; opacity: var(--dagsljus, 0); }
+@media (max-width: 700px), (max-height: 500px) {
+  .rh-dagsljus { mix-blend-mode: normal; opacity: calc(var(--dagsljus, 0) * 0.2); }
+}
 .rh-disk, .rh-duk { position: absolute; left: 0; top: 0; display: block; pointer-events: none; }
 /* väggen och disken mörknar bakom samtalet, så att texten går att läsa */
 .rh-mork { position: absolute; top: 0; bottom: 0; left: 0; width: var(--mork, 40%); background: linear-gradient(to right, rgba(14, 8, 4, 0.8) 72%, rgba(14, 8, 4, 0)); pointer-events: none; transition: opacity 0.32s ease-out; }
