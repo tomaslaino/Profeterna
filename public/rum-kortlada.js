@@ -1,8 +1,8 @@
 // Kortlådan i tobaksaffären i three.js, som inredningen (rum-inredning.js)
 // och sakerna på pulten (rum-saker.js). Korten, datan och kortet i handen
 // sköts av rum-register.js. Lådan är av lackad teak och står på disken under
-// Tipsligan, med en mässingshållare fram där etiketten säger vad lådan har
-// i sig (ETIKETT). I lådan står avdelarna av
+// Tipsligan, med en mässingshållare fram och etiketten KARTOTEK maskinskriven
+// (ETIKETT). I lådan står avdelarna av
 // pressad kartong (Lagen grön, Mötena röd), lagkorten med flikar av plast i
 // divisionens färg (som på Tabeller) och mötenas blå kort.
 //
@@ -33,8 +33,8 @@ const POS = { x: 1109, y: -490, z: 377 };
 const B = { w: 46, h: 24, d: 68, t: 2.2, b: 1.8 };
 const C = { w: 40.6, h: 28.8, th: 0.26, tab: 3.6, skilj: 1.4 };
 const DV = { pl: '#2a78d6', ch: '#eb6834', l1: '#1baf7a', l2: '#eda100' };
-// etiketten fram på lådan, maskinskriven: de två avdelarna i den
-const ETIKETT = 'LAG & MÖTEN';
+// etiketten fram på lådan, maskinskriven
+const ETIKETT = 'KARTOTEK';
 // lådan nära: lyft från disken och vänd mot ögat, lutad så att man ser ner i den
 const NARA_AT = { x: POS.x - 24, y: POS.y + 34, z: POS.z + 50 };
 const NARA = { yaw: Math.atan2(EYE[0] - NARA_AT.x, E - NARA_AT.z), pitch: 31 * DEG };
@@ -159,7 +159,7 @@ export async function kortlada(o) {
     mesh(new THREE.BoxGeometry(W - 2 * t, b, D - 2 * t), traInne, lada).position.set(0, b / 2, 0);
     // fyra små filttassar
     for (const [x, z] of [[-1, -1], [1, -1], [1, 1], [-1, 1]]) mesh(new THREE.CylinderGeometry(1.4, 1.4, 0.4, 12), mat('#2a2420', { roughness: 1 }), lada).position.set(x * (W / 2 - 3), -0.2, z * (D / 2 - 3));
-    // mässingshållaren med etiketten, maskinskriven: vad lådan har i sig
+    // mässingshållaren med etiketten, maskinskriven
     const etikett = tex(360, 120, (c, w, h) => {
       c.fillStyle = '#f1e9d2';
       c.fillRect(0, 0, w, h);
