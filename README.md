@@ -2178,9 +2178,7 @@ påhitt och hur ofta beror på humöret (`MENY`):
   bakhuvudet, trummar med fingrarna på bordet, tittar ner i den tomma flaskan,
   vilar hakan i handen.
 - **Glad** (tre av fyra luckor): lutar sig bakåt med handen i nacken, gungar i takt med
-  ölen i luften, sträcker på sig. Ibland gör gänget något tillsammans (var 31:a sekund,
-  ungefär varannan gång): skålar över bordet och tar en klunk (DT ett bloss), eller gungar
-  i takt allihop som på läktaren.
+  ölen i luften, sträcker på sig.
 - **Nervös:** biter på naglarna, knäpper händerna framför munnen (om flaskan)
   och gungar fram och tillbaka, trummar med fingrarna, kliar sig i bakhuvudet.
 - **Deppig:** hakan i handen, skakar på huvudet och suckar, armarna i kors med blicken bort
@@ -2192,6 +2190,48 @@ som ligger sist sitter oftare med armarna i kors (när allas tips syns och minst
 kupongen, på natten, vid ett mål eller när man skålar med den som pekar på en, och det som
 pågår när humöret ändras gör färdigt sitt. Samma tid ger samma bild: luckorna och valen
 räknas ur klockan, och humöret minns när det ändrades.
+
+**Gänget gör saker tillsammans** (2026-11-06, `GRUPP` och `roller` i rum-3d.js): var 31:a
+sekund kan det bli något som alla tre gör, med chansen efter humöret – ungefär varannan gång
+som vanligt, fyra av fem när det går bra, en av fem när det är nervöst och sällan när
+kupongen är död. Vem som börjar, vem som svarar och hur var och en skrattar räknas ur luckan:
+
+- **Skämtet** (alla lägen): en lutar sig in och berättar med handen och blicken på de andra,
+  en i taget, medan de lutar sig in och lyssnar (någon med hakan i handen). Vid poängen slår
+  hen ut med handen, det är tyst ett ögonblick – och sedan skrattar alla i fem sekunder, var
+  och en på sitt sätt: handen som dunkar i bordet, dubbelvikt med handen på magen, handen för
+  pannan eller pekar på den som skämtade. Huvudet åker bakåt, ansiktet vänds ut från bordet
+  så att skrattet syns, bålen skakar, och ögonen kniper ihop sig till bågar med skrattrynkor,
+  som på DT, med munnen vidöppen – DL:s leende byts mot ett skratt och DJ:s mun öppnar sig i
+  skägget (`skrattar` och `skaggSkratt`: ansiktsbilderna görs om när rummet laddas, `skrattW`).
+- **Grälet** (som vanligt och nervös): två pratar i munnen på varandra med handen som hackar
+  i luften, och den som lyssnar skakar på huvudet; den tredje tittar från den ena till den
+  andra som på tennis. Till sist viftar den ena bort det, den andra sätter sig med armarna i
+  kors och tittar bort, och den tredje skrattar eller skakar på huvudet.
+- **Tv:n** (som vanligt och nervös): en pekar upp på tv:n, de andra vänder sig dit en efter en
+  och tittar en stund; sedan nickar den ena och den andra rycker på axlarna.
+- **Skålen** (som vanligt och glad) och **allsången** (glad) som förut.
+
+Skämtet, grälet och tv:n kommer bara när alla tre har lämnat in och är vakna och matcherna
+inte pågår, och inte medan någon är borta (nedan). Ingen gör något eget påhitt samtidigt.
+
+**Någon går iväg** (2026-11-06, `gaNu`, `stalle` och `VAGAR` i rum-3d.js): ungefär var tredje
+minut kliver någon ner från barstolen och går ut ur bilden till vänster, mot baren där
+Hasse sitter, med flaskan eller cigaretten i handen, och kommer tillbaka efter 5–14 sekunder,
+klättrar upp med ett skutt och tar en klunk (DT ett bloss). Golvet ligger bakom pulten, så den
+som går syns från midjan och uppåt, med axlarna som gungar och den lediga armen som pendlar;
+höjden räknas efter djupet (`golv`), så att benen alltid är under pultens kant också när kameran
+lutar. Vägen går efter var man sitter: från vänster rakt ut, bakom bordet förbi den som sitter
+till vänster, och från höger bakom den som sitter bakom bordet och sedan förbi den till vänster.
+Stolen och det som står på bordet står kvar (`gaFlytta` flyttar tillbaka allt som har
+`userData.fast`), de andra tittar efter hen och när hen kommer tillbaka, och ett klick där hen
+går går igenom. Gänget gör inget tillsammans medan någon är borta, och ingen går medan någon
+väntar på kupongen, på natten, när matcherna pågår, medan gänget gör något tillsammans eller med
+minskad rörelse. Duken som gänget ritas i går därför ända ut till scenens vänsterkant (1440 ×
+560 från vänster, `.rum-3d` i rum.css), så att man går ut ur bilden och inte ut ur duken
+framför dörren; kameran ritar den del av en bild med mitten i scenens mitt som duken täcker
+(`setViewOffset`), så att allt annat står där det stod. Om någon går iväg i en lucka avgörs när
+luckan börjar och står fast, så att en promenad går färdigt fast läget ändras.
 
 **Gänget är ni** ([public/rum-folk.js](public/rum-folk.js), `pekar` och `hej` i
 rum-3d.js): den som har rummet öppet syns i sin figur, som tittar dit hen pekar med musen –
@@ -2481,7 +2521,9 @@ om matcherna pågick och `?rum-mal=dl:1,dt:-1,dj:0` ett mål
 väljer sättet: `a` som förut, `b` båda armarna eller händerna på huvudet, `c` handen i
 bordet), `?rum-humor=glad` (`nerv`, `deppig`) humöret, `?rum-rank=dl:1,dj:-1` vem som
 leder och ligger sist i omgången, `?rum-akt=dl:kors,dj:dunk` ett påhitt om och om igen
-(mitt i det med `?rum-t`; namnen står i `AKTER` i rum-3d.js),
+(mitt i det med `?rum-t`, `dl:skamt@6` sex sekunder in; namnen står i `AKTER` i rum-3d.js, och
+gängets påhitt `skamt`, `gral` och `titta` ges alla tre), `?rum-ga=dl` att DL går iväg och
+kommer tillbaka (var fyrtionde sekund; `dl:5` fem sekunder in med `?rum-t`),
 `?rum-pekar=dt:tv,dl:dj` som om de pekade (på en sak eller någon i gänget),
 `?rum-hej=dl` som om man pekade på DL, `?rum-vald=dl` som om man just hade klickat på
 DL (`dl:3` tre sekunder sedan; med `?rum-t` och den som inte har lämnat in), `?rum-natt` (`=0` dag) natten och
