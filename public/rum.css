@@ -219,6 +219,83 @@ canvas.rum-neonhalo { opacity: 0.28; }
   .rum-ram .kr-rays, .rum-ram-glans::after { animation: none; }
 }
 
+/* ---------- visitkortet (rum.js, kortHtml) ---------- */
+
+/* På väggen mellan stationsuret och orakelramen, till höger om palmetten
+   (under oraklet sitter veckans löpsedel varannan vecka, rum-affischer.js).
+   Länken är lite större än kortet, så att det går att träffa med fingret.
+   Kortet ritas i sina egna mått (440 × 285, ungefär 85 × 55 mm) och
+   förminskas kring stiftet till 44 × 28,5 i scenen. */
+.rum-kort { position: absolute; left: 1060px; top: 235px; width: 56px; height: 40px; display: block; }
+@media (hover: hover) { .rum-kort:hover { filter: brightness(1.12) drop-shadow(0 0 3px rgba(240, 214, 153, 0.5)); } }
+.rum-kort:focus-visible { filter: brightness(1.12) drop-shadow(0 0 3px rgba(240, 214, 153, 0.5)); }
+.rum-kort .vk {
+  position: absolute;
+  left: -192px;
+  top: -6px;
+  width: 440px;
+  height: 285px;
+  box-sizing: border-box;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding: 30px 30px 24px;
+  transform-origin: 220px 14px;
+  transform: rotate(-4deg) scale(0.1);
+  border-radius: 4px;
+  /* tjockt papper, lite ljusare där lysröret faller, och kortet välver sig en aning */
+  background:
+    radial-gradient(120% 90% at 30% 0%, rgba(255, 255, 255, 0.55), rgba(255, 255, 255, 0) 60%),
+    linear-gradient(172deg, #fbf7ec, #efe6d0 70%, #e4d8bb);
+  box-shadow: inset 0 0 0 1px rgba(120, 95, 55, 0.25), inset 0 -10px 18px rgba(120, 90, 40, 0.1), 0 10px 14px rgba(0, 0, 0, 0.5), 0 2px 3px rgba(0, 0, 0, 0.45);
+  color: #2b2116;
+  font-family: Fraunces, Georgia, serif;
+  text-align: center;
+}
+.rum-kort .vk > * { display: block; }
+/* dubbel linje i terrakotta innanför kanten */
+.rum-kort .vk::before { content: ""; position: absolute; inset: 10px; border: 3px double rgba(200, 100, 58, 0.55); border-radius: 2px; pointer-events: none; }
+.rum-kort .vk-namn { display: flex; align-items: center; justify-content: center; gap: 12px; height: 34px; }
+.rum-kort .vk-namn img { width: 28px; height: 28px; }
+/* namnet i guldfolie */
+.rum-kort .vk-namn b {
+  font-size: 25px;
+  font-weight: 800;
+  letter-spacing: 0.17em;
+  text-transform: uppercase;
+  line-height: 1;
+  color: #8a5e1c;
+  background: linear-gradient(180deg, #c9993f, #8a5e1c 55%, #b07f2c);
+  -webkit-background-clip: text;
+  background-clip: text;
+  -webkit-text-fill-color: transparent;
+}
+/* autograferna över var sin linje, med det tryckta namnet under */
+.rum-kort .vk-gang { display: flex; justify-content: space-between; width: 100%; margin: auto 0; }
+.rum-kort .vk-gang > span { position: relative; display: flex; flex-direction: column; align-items: center; width: 118px; padding-top: 44px; color: var(--ink); }
+.rum-kort .vk-gang i { position: absolute; left: 50%; bottom: 22px; font-style: normal; line-height: 1; white-space: nowrap; -webkit-text-stroke: 0.35px currentColor; transform: translateX(-50%) rotate(-6deg); }
+.rum-kort .vk-gang svg { position: absolute; left: 0; bottom: 16px; width: 118px; height: 18px; overflow: visible; fill: none; stroke: currentColor; stroke-width: 1.6; stroke-linecap: round; opacity: 0.85; }
+.rum-kort .vk-gang small { display: block; width: 100%; padding-top: 5px; border-top: 1px solid rgba(70, 55, 35, 0.45); font-size: 12px; font-weight: 600; line-height: 1.2; letter-spacing: 0.03em; color: #5a4a34; }
+.rum-kort .vk-k0 { --ink: #2146a6; }
+.rum-kort .vk-k0 i { font: 400 30px/1 "Cedarville Cursive", Caveat, cursive; }
+.rum-kort .vk-k1 { --ink: #16784b; }
+.rum-kort .vk-k1 i { font: 400 38px/1 "Mr Dafoe", Caveat, cursive; }
+.rum-kort .vk-k2 { --ink: #6d3aa8; }
+.rum-kort .vk-k2 i { font: 400 40px/1 "Reenie Beanie", Caveat, cursive; }
+.rum-kort .vk-devis b { display: block; font-size: 16.5px; font-weight: 600; line-height: 1.25; }
+.rum-kort .vk-devis i { display: block; margin-top: 4px; font-size: 13.5px; font-weight: 500; line-height: 1.3; color: #9a4a26; }
+/* stiftet i mässing */
+.rum-kort .vk-stift {
+  position: absolute;
+  left: 211px;
+  top: 5px;
+  width: 18px;
+  height: 18px;
+  border-radius: 50%;
+  background: radial-gradient(circle at 35% 30%, #fff6d6, #e2b85c 30%, #9a6a1c 72%, #5a3a0c);
+  box-shadow: 2px 4px 4px rgba(0, 0, 0, 0.5);
+}
+
 /* ---------- högra väggen: skårtavlan och korktavlan ---------- */
 
 .rum-hv { position: absolute; left: 0; top: 0; width: 1600px; height: 1000px; perspective: 1000px; perspective-origin: 760px 400px; }
@@ -337,7 +414,7 @@ canvas.rum-neonhalo { opacity: 0.28; }
 /* nära en sak lyser ingenting när man pekar på det */
 .rum.sak-nara .rum-sak:hover, .rum.sak-nara .rum-sak:focus-visible { filter: none; }
 .rum.sak-nara .rum-aff.rum-sak { filter: drop-shadow(0 3px 4px rgba(0, 0, 0, 0.5)); }
-/* under saken: pokalerna per person, fotografen eller vilka vi är */
+/* under saken: pokalerna per person */
 .rum-sakfot {
   position: absolute;
   left: 50%;
@@ -352,15 +429,11 @@ canvas.rum-neonhalo { opacity: 0.28; }
 .rum-sakfot.on { opacity: 1; pointer-events: auto; transition: opacity 0.4s 0.4s; }
 .rum-sakfot .pokaler { display: inline-flex; gap: 26px; font: 600 21px/1.4 Fraunces, Georgia, serif; color: #e9dfc8; text-shadow: 0 1px 8px #000; }
 .rum-sakfot .pokaler b { font-weight: 700; letter-spacing: 0.04em; }
-/* Om oss under dörren, i bladguld som namnet på glaset */
-.rum-sakfot .om { display: inline-flex; flex-direction: column; align-items: center; gap: 6px; padding: 16px 40px; background: radial-gradient(closest-side, rgba(16, 11, 6, 0.62), rgba(16, 11, 6, 0)); font-family: Fraunces, Georgia, serif; text-wrap: balance; text-shadow: 0 1px 10px #000, 0 0 2px rgba(0, 0, 0, 0.6); }
-.rum-sakfot .om b { font-size: 21px; font-weight: 600; line-height: 1.2; color: #f3e6c4; }
-.rum-sakfot .om i { font-size: 17px; font-weight: 500; line-height: 1.3; color: #ecc97c; }
 @media (prefers-reduced-motion: reduce) { .rum-sakfot, .rum-sakfot.on, .rum.sak-nara .rum-world, .rum-pl.forbi, .rum-pl.glid, .rum-pl3d > .rum-inr { transition: none; } }
 
 /* ---------- tv:n: rum-tv.css ---------- */
 
-/* ---------- pulten: kupongen och kvittot ---------- */
+/* ---------- pulten: kupongen ---------- */
 
 .rum-flat { position: absolute; display: block; transform-origin: 50% 50%; }
 /* kupongen på pulten och i handen (id:t går före a.rum-sak:hover, färgen) */
@@ -612,28 +685,6 @@ canvas.rum-neonhalo { opacity: 0.28; }
 .rum-bak .regler { left: 58px; right: 58px; top: 318px; bottom: 44px; border-top: 2px solid rgba(90, 70, 40, 0.22); padding-top: 12px; font: 700 14px/1 Fraunces, Georgia, serif; letter-spacing: 4px; text-transform: uppercase; color: #9a8a70;
   background: repeating-linear-gradient(180deg, rgba(90, 70, 40, 0.16) 0 5px, rgba(0, 0, 0, 0) 5px 17px) 0 40px / 100% calc(100% - 40px) no-repeat; }
 
-#rum-kvitto {
-  left: 1196px;
-  top: 676px;
-  width: 168px;
-  height: 290px;
-  box-sizing: border-box;
-  padding: 14px;
-  transform: perspective(1100px) rotateX(46deg) rotateZ(11deg);
-  background: linear-gradient(180deg, #f1eee6, #e0dccf);
-  color: #3a3833;
-  font-family: VT323, monospace;
-  font-size: 17px;
-  line-height: 17px;
-  box-shadow: 0 18px 20px rgba(0, 0, 0, 0.5);
-  clip-path: polygon(0 0, 100% 0, 100% 97%, 92% 100%, 84% 97%, 76% 100%, 68% 97%, 60% 100%, 52% 97%, 44% 100%, 36% 97%, 28% 100%, 20% 97%, 12% 100%, 4% 97%, 0 100%);
-}
-#rum-kvitto > span { display: block; }
-#rum-kvitto .c { text-align: center; }
-#rum-kvitto hr { border: 0; border-top: 1px dashed #77736a; margin: 7px 0; }
-#rum-kvitto .r { display: flex; justify-content: space-between; }
-#rum-kvitto .bar { height: 30px; margin: 8px 6px 4px; background: repeating-linear-gradient(90deg, #3a3833 0 2px, rgba(0, 0, 0, 0) 2px 3px, #3a3833 3px 6px, rgba(0, 0, 0, 0) 6px 8px, #3a3833 8px 9px, rgba(0, 0, 0, 0) 9px 12px); }
-
 /* ---------- Hasse i baren (rum.js, hasseHtml) ---------- */
 
 /* Hasse Backe sitter i baren utanför bilden till vänster; längst ut på pulten
@@ -725,7 +776,8 @@ canvas.rum-neonhalo { opacity: 0.28; }
 @keyframes rum-kl-kupa { 20% { transform: rotate(1.6deg); } 45% { transform: rotate(-1.2deg); } 70% { transform: rotate(0.6deg); } }
 @keyframes rum-kl-pl { 0% { opacity: 0; transform: scale(0.7); } 25% { opacity: 0.9; } 100% { opacity: 0; transform: scale(1.35); } }
 
-.rum-3d { position: absolute; left: 160px; top: 120px; width: 1280px; height: 560px; pointer-events: none; }
+/* gänget (rum-3d.js): ända ut till scenens vänsterkant, så att den som går iväg går ut ur bilden */
+.rum-3d { position: absolute; left: 0; top: 120px; width: 1440px; height: 560px; pointer-events: none; }
 
 /* ---------- röken under taket och dammet i ljuset ---------- */
 

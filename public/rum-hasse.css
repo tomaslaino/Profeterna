@@ -89,6 +89,8 @@
 .rh-slut { flex: none; display: flex; flex-wrap: wrap; gap: 10px 12px; align-items: center; min-height: 48px; padding-top: 0.6em; }
 /* hans fråga när man har valt en match, och dina svar direkt under den */
 .rh-fragan { flex: none; margin: 0; font-size: 1.12em; }
+/* hans erbjudande att titta igen under det han sa förra gången (tidigare i rum-hasse.js) */
+.rh-text + .rh-fragan { margin-top: 0.5em; }
 .rh-svar { flex: none; display: flex; flex-direction: column; align-items: flex-start; gap: 12px; margin-top: 1.1em; animation: rh-svar 0.3s 0.08s cubic-bezier(0.2, 0.7, 0.3, 1) both; }
 .rh-svar > div { display: flex; flex-wrap: wrap; gap: 12px; }
 @keyframes rh-svar { from { opacity: 0; transform: translateY(8px); } }

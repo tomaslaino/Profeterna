@@ -200,56 +200,73 @@
 }
 .rum-nac .tryck, .rum-vm94 .tryck { inset: 0; background: linear-gradient(118deg, rgba(255, 246, 222, var(--blek, 0.15)), rgba(255, 246, 222, 0) 62%); }
 
-/* ---------- löpsedeln: kvällstidningens namn, rubriken och raden under ---------- */
+/* ---------- löpsedeln: tidningens namn, vinjetten, rubriken och raden under ---------- */
 
+/* Sportbladet på sitt rosa papper eller Expressen på vitt, med det röda
+   namnet (tid-sb, tid-ex). Storlekarna på namnet, vinjetten, rubrikens rader
+   och den andra nyheten sätts i rum-affischer.js, så att de fyller bredden. */
 .rum-lop { width: 100px; transform: rotate(calc(var(--vrid, 0deg) + var(--rot))); }
 /* på väggen: mindre, så att den ryms mellan fönstret och bardisken */
 .rum-lop.pa-vagg { transform: rotate(calc(var(--vrid, 0deg) + var(--rot))) scale(0.78); transform-origin: 1.5px 1.5px; filter: drop-shadow(0 2px 2.5px rgba(0, 0, 0, 0.55)); }
+.rum-lop.tid-sb { --papper: #f4c5cf; --papper2: #eebac6; --rod: #d0141d; --kick: #191716; }
+.rum-lop.tid-ex { --papper: #f8f6f0; --papper2: #eeebe1; --rod: #d5141b; --kick: #d5141b; }
 .rum-lop .ark {
   display: flex;
   flex-direction: column;
+  box-sizing: border-box;
   height: 140px;
-  padding: 0 0 4px;
-  background: linear-gradient(180deg, #f6f3ea, #eeeadf);
-  color: #141210;
+  padding: 3px 4px 3.5px;
+  background: linear-gradient(180deg, var(--papper, #f6f3ea), var(--papper2, #eeeadf));
+  color: #191716;
 }
 .rum-lop .huvud {
   display: flex;
-  justify-content: space-between;
+  justify-content: center;
   align-items: center;
-  padding: 1.5px 4px 0.5px;
-  background: #c8181e;
-  color: #fff;
+  height: 17px;
+  border-bottom: 1px solid #191716;
+  overflow: hidden;
 }
-.rum-lop .huvud b { min-width: 0; overflow: hidden; white-space: nowrap; font: 400 10px/1.35 Anton, Impact, sans-serif; letter-spacing: 0.45px; }
-/* datumet på två rader i högerkanten, så att namnet ryms också utan Anton */
-.rum-lop .huvud small { flex: 0 0 21px; margin-left: 2px; text-align: right; font: 700 3.3px/1.1 "Helvetica Neue", Arial, sans-serif; letter-spacing: 0.15px; opacity: 0.9; }
+.rum-lop .namn { white-space: nowrap; line-height: 1; font-weight: 400; }
+.rum-lop.tid-sb .namn { font-family: "Helvetica Neue", Arial, sans-serif; font-weight: 900; letter-spacing: -0.04em; }
+.rum-lop.tid-ex .namn { font-family: "Alfa Slab One", Georgia, serif; color: var(--rod); transform: skewX(-11deg); letter-spacing: -0.01em; }
+.rum-lop .linje { display: flex; justify-content: space-between; align-items: center; gap: 2px; margin-top: 2.5px; }
 .rum-lop .kick {
-  align-self: flex-start;
-  margin: 4px 5px 0;
-  padding: 1.6px 3px 1.2px;
-  background: #141210;
-  color: #f6f3ea;
+  padding: 0.28em 0.42em 0.2em;
+  background: var(--kick, #191716);
+  color: #fff;
   font: 400 6px/1 Anton, Impact, sans-serif;
-  letter-spacing: 0.5px;
+  letter-spacing: 0.06em;
+  white-space: nowrap;
 }
+/* datumet på två rader i högerkanten */
+.rum-lop .linje small { flex: 0 0 20px; text-align: right; font: 700 3.1px/1.15 "Helvetica Neue", Arial, sans-serif; letter-spacing: 0.15px; opacity: 0.85; }
 .rum-lop .rub {
   flex: 1;
+  min-height: 0;
   display: flex;
   flex-direction: column;
   justify-content: center;
   gap: 1.5px;
-  padding: 0 5px;
+  padding: 3px 0 2px;
   overflow: hidden;
 }
 .rum-lop .rub b { display: block; font-family: Anton, Impact, "Arial Narrow", sans-serif; font-weight: 400; line-height: 0.94; white-space: nowrap; letter-spacing: 0.2px; }
-.rum-lop .rub b.rod { color: #d0141c; }
-.rum-lop .under {
-  margin: 0 5px;
-  padding-top: 2.5px;
-  border-top: 0.8px solid #141210;
-  font: 700 4.6px/1.2 "Helvetica Neue", Arial, sans-serif;
+.rum-lop .rub b.rod { color: var(--rod); }
+.rum-lop .rub b.prick { margin-top: 0.2em; }
+.rum-lop .rub b.inv { align-self: flex-start; padding: 0.06em 0.12em 0.02em; background: var(--rod); color: #fff; }
+.rum-lop .under { margin-top: 2.5px; font: 700 4.6px/1.2 "Helvetica Neue", Arial, sans-serif; }
+/* den andra nyheten, under ett streck */
+.rum-lop .plus {
+  margin-top: 3px;
+  padding-top: 2.2px;
+  border-top: 1.2px solid #191716;
+  font: 400 5.4px/1 Anton, Impact, sans-serif;
+  letter-spacing: 0.02em;
+  white-space: nowrap;
+  overflow: hidden;
 }
+.rum-lop .plus b { margin-right: 0.3em; color: var(--rod); font-weight: 400; }
 .rum-lop .tryck { inset: 0; }
 
 /* ---------- Chelsea 2021: löpsedeln på väggen, gulnad och vikt ---------- */
