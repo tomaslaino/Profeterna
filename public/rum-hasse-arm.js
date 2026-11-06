@@ -202,10 +202,11 @@ export function byggHand(modell, sida, foto, bord = ingenBord()) {
   mesh.frustumCulled = false;
   mesh.matrixAutoUpdate = false;
   // krok: 0 raka, 1 knuten. peka: pekfingret rakt. spar: fingrarna isär (0–1). tumme: 0 mot handen, 1 ut.
-  // extra: mer böjning per finger (pek-, lång-, ring- och lillfingret), och sedan hur mycket mer var och
-  // ett spretar ut (grader).
+  // extra: mer böjning per finger (pek-, lång-, ring- och lillfingret), sedan hur mycket mer var och
+  // ett spretar ut (grader), och sist hur rak tummen är fast handen är knuten (0–1, tummen upp).
   function bojFingrar(krok, peka = 0, spar = 0, tumme = 0.4, extra = null) {
     const g = (i) => (extra ? extra[i] || 0 : 0);
+    const kt = krok * (1 - g(8));
     const K = [0.0, 0.05, 0.09, 0.16];
     const FAN = [8, 1.5, -5.5, -14];
     for (let i = 1; i < ben.length; i++) {
@@ -221,8 +222,8 @@ export function byggHand(modell, sida, foto, bord = ingenBord()) {
         q1.multiply(q2);
       } else {
         // tummen: lägger sig över handflatan när handen knyts
-        if (led === 0) { q2.setFromAxisAngle(az, 0.12 - tumme * 0.42 + krok * 0.22); q1.multiply(q2); }
-        q2.setFromAxisAngle(TAX, led === 0 ? krok * 0.42 + 0.06 : krok * 0.8 + 0.12);
+        if (led === 0) { q2.setFromAxisAngle(az, 0.12 - tumme * 0.42 + kt * 0.22); q1.multiply(q2); }
+        q2.setFromAxisAngle(TAX, led === 0 ? kt * 0.42 + 0.06 : kt * 0.8 + 0.12);
         q1.multiply(q2);
       }
       v1.set(b.pos[0] - (b.far >= 0 ? ben[b.far].pos[0] : 0), b.pos[1] - (b.far >= 0 ? ben[b.far].pos[1] : 0), b.pos[2] - (b.far >= 0 ? ben[b.far].pos[2] : 0));
