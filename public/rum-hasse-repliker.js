@@ -42,12 +42,10 @@
   // Om man bara står där och inte frågar.
   ledig: ['Jag sitter kvar här.', 'Välj vilken match du vill. Alla är lätta.', 'Spelstoppet är {dag}.'],
 
-  // När man har valt en match: han svarar och frågar tillbaka. valKlar när man redan
-  // har frågat om den, valLasa när analysen finns och han ska låtsas läsa på, och val när
-  // den inte finns. Han har alltid svaret, också när han inte har det: att han läser på
-  // märks först när han väntar (vantar).
+  // När man har valt en match: han svarar och frågar tillbaka. valLasa när analysen finns
+  // och han ska låtsas läsa på, och val när den inte finns. Han har alltid svaret, också när
+  // han inte har det: att han läser på märks först när han väntar (vantar).
   val: ['Den är solklar.', 'Den kan jag i sömnen.', 'Glöm allt du har läst.'],
-  valKlar: ['Den har jag tittat på.', 'Den har jag svaret på.', 'Den är redan klar.'],
   valLasa: [
     'Den är solklar.',
     'Den kan jag i sömnen.',
@@ -66,8 +64,21 @@
   gissar: ['Då får du skylla dig själv.', 'Gissa du, det har gått förr.'],
   // Direkt när man har bett om analysen.
   reaktion: ['Där frågade du rätt man.', 'Nu ska du få höra.'],
-  // Samma match en gång till.
-  igen: ['Du får samma svar som nyss.', 'Den tog vi ju nyss.'],
+
+  // En match man redan har frågat om: det han sa står direkt, och han erbjuder sig att
+  // titta på den igen, ödmjukt på sitt sätt (han tvivlar ju aldrig). erbjudNytt när
+  // analysen har skrivits om sedan han sa det. Knappen under är "Ja, titta igen".
+  erbjud: [
+    'Jag kan titta på den igen, om du vill. Jag är inte för fin för det.',
+    'Ska jag titta på den en gång till? Det blir samma svar, men jag gör det gärna.',
+    'Jag har haft fel en gång förut. Ska jag titta på den igen, för säkerhets skull?',
+  ],
+  erbjudNytt: [
+    'Tidningarna har skrivit mer om den sedan dess. Ska jag titta på den igen?',
+    'Det har kommit nytt om den sedan jag sa det här. Vill du att jag tittar igen?',
+  ],
+  // Direkt när man har bett honom titta igen.
+  tittaIgen: ['Då tar vi den från början.', 'Jag tar den en gång till.'],
 
   // Medan han låtsas analysera: en i taget, i den här ordningen. Allt under kontroll.
   vantar: [
