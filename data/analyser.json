@@ -1,5 +1,5 @@
 {
- "uppdaterad": "2026-11-06T17:21:42.514Z",
+ "uppdaterad": "2026-11-06T17:22:31.975Z",
  "omgang": {
   "id": "2026-11-07-st4978",
   "matcher": [
@@ -248,23 +248,22 @@
    },
    "hasse": {
     "stycken": [
-     "West Ham fick en ny tränare på onsdagsmorgonen, och efter 39 minuter i Cardiff samma kväll låg de under med 0–3. De kom tillbaka till 3–3, så det finns folk i laget som kan göra mål. Bakåt är det sämre. De har släppt in tre mål i var och en av de tre senaste matcherna och legat under i första halvlek i elva av sjutton.",
-     "Det löser ingen tränare på tre dagar, inte ens om han sover på den jävla anläggningen. Orsak och verkan. Blackburn har förlorat två raka och har ett par frågetecken i truppen, så de är inget lag man behöver darra inför.",
-     "West Ham blir inte täta på lördag, men de gör mål. Det er helt i orden, som danskarna säger. Kryss och tvåa."
+     "West Ham bytte tränare på onsdagsmorgonen och låg under med 3–0 i Cardiff efter 39 minuter samma kväll. Sedan hämtade de upp till 3–3, och det visar att det finns folk i den truppen som kan göra mål. Men ett lag som har släppt in tre mål i var och en av sina tre senaste matcher blir inte organiserat bakåt bara för att en ny man har stått vid sidlinjen i tre dagar.",
+     "Blackburn har förlorat två raka matcher och har ett par frågetecken i truppen, så jag ser inte hemmalaget som favorit heller. West Ham gör mål och släpper in mål, och det är orsak och verkan. Jag ringar in kryss och tvåa."
     ],
     "tips": "2026-11-06T15:05:16.529Z",
     "uppdrag": {
      "fraser": [
-      "Så är det bara",
-      "Orsak och verkan"
+      "Orsak och verkan",
+      "Då är jag jävligt snäll"
      ],
-     "krydda": "Det er helt i orden, som danskarna säger.",
+     "krydda": null,
      "bielsa": []
     },
     "model": "claude-opus-5-5",
-    "version": "2026-11-04.1",
-    "writtenAt": "2026-11-06T15:05:29.869Z",
-    "attempts": 1
+    "version": "2026-11-05.1",
+    "writtenAt": "2026-11-06T17:22:21.217Z",
+    "attempts": 2
    },
    "model": "claude-opus-5-5",
    "version": "2026-11-04.1",
