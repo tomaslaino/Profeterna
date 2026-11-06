@@ -51,11 +51,18 @@
 .rh-o.s { visibility: visible; }
 .rh-lista { flex: 1; min-height: 0; overflow-y: auto; overscroll-behavior: contain; touch-action: pan-y; }
 .rh-lista button { display: flex; align-items: baseline; width: 100%; padding: 0.3em 0; border: 0; border-bottom: 1px solid rgba(244, 236, 216, 0.22); background: none; color: inherit; font: inherit; text-align: left; text-shadow: inherit; cursor: pointer; }
-.rh-lista button i { flex: none; width: 1.7em; font-style: normal; opacity: 0.62; }
-.rh-lista button span { flex: 1; min-width: 0; }
-.rh-lista button b { flex: none; margin-left: 0.8em; font-weight: 700; color: #ffd86b; font-variant-numeric: tabular-nums; }
-/* resultatet han sa, i ljust bredvid tecknen i guld */
-.rh-lista button b small { margin-left: 0.55em; font-size: inherit; font-weight: 600; color: #f6efdc; opacity: 0.78; }
+.rh-lista button > i { flex: none; width: 1.7em; font-style: normal; opacity: 0.62; font-variant-numeric: tabular-nums; }
+.rh-lista button > span { flex: 1; min-width: 0; }
+/* Det han sa (hansTips i rum-hasse.js): rutorna 1 X 2 som på kupongen, hans tecken ifyllda i guld,
+   och resultatet. Båda har fast bredd och står längst till höger, så att de bildar raka spalter. */
+.rh-tips { flex: none; align-self: center; display: flex; align-items: center; gap: 0.75em; margin-left: 0.9em; }
+.rh-rutor { display: flex; gap: 3px; }
+.rh-rutor em { display: grid; place-items: center; box-sizing: border-box; width: 2.05em; height: 1.65em; border: 1px solid rgba(246, 239, 220, 0.26); border-radius: 3px; font: normal 700 0.76em/1 Fraunces, Georgia, serif; color: rgba(246, 239, 220, 0.42); text-shadow: none; }
+.rh-rutor em.pa { border-color: #ffd86b; background: #ffd86b; color: #2a1c08; box-shadow: 0 1px 0 #6b4a10; }
+.rh-tips small { display: grid; grid-template-columns: 1fr auto 1fr; gap: 0.12em; width: 2.4em; font-size: inherit; font-weight: 700; color: #f6efdc; white-space: nowrap; }
+.rh-tips small i { font-style: normal; text-align: right; }
+.rh-tips small i + i { text-align: left; }
+.rh-vh { position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap; }
 @media (hover: hover) { .rh-lista button:hover:not(:disabled) { color: #ffd86b; border-bottom-color: #ffd86b; } }
 .rh-lista button:disabled { opacity: 0.42; cursor: default; }
 .rh-match { flex: none; font-weight: 600; opacity: 0.85; }
@@ -122,5 +129,7 @@
 .rum-hasse-vy.hog .rh-dom { font-size: 46px; }
 .rum-hasse-vy.hog .rh-dom.lang { font-size: 34px; }
 .rum-hasse-vy.hog .rh-match { font-size: 0.86em; }
+.rum-hasse-vy.hog .rh-tips { gap: 0.5em; margin-left: 0.6em; }
+.rum-hasse-vy.hog .rh-rutor em { width: 1.8em; }
 .rum-hasse-vy.hog .rh-slut { padding-top: 0.3em; }
 @media (prefers-reduced-motion: reduce) { .rh-dom, .rh-slag, .rh-svar { animation: none; } }

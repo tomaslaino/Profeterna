@@ -982,8 +982,7 @@ window.RumHasse = (() => {
     lista.forEach((m, i) => {
       const b = document.createElement('button');
       b.type = 'button';
-      const [tecken, res] = String(fragat[m.id] || '').split(' ');
-      b.innerHTML = `<i>${i + 1}</i><span>${esc(m.namn)}</span>${tecken ? `<b>${esc(tecken)}${res ? `<small>${esc(res)}</small>` : ''}</b>` : ''}`;
+      b.innerHTML = `<i>${i + 1}</i><span>${esc(m.namn)}</span>${hansTips(fragat[m.id])}`;
       b.disabled = Date.parse(m.avspark) <= nu;
       b.dataset.id = m.id;
       // har du redan fått svaret finns inget att ta ställning till: tecknen står på raden
@@ -1001,6 +1000,17 @@ window.RumHasse = (() => {
     const dag = spelstopp(lista);
     H.prat = lista.length && forsta ? { rader: medDag(REP().ledig, dag), i: 0, nasta: performance.now() + 24000, gang: 24000 } : null;
     klick();
+  }
+  // Det han sa om matchen, på dess rad: rutorna 1 X 2 som på kupongen med hans tecken ifyllda,
+  // och resultatet. Rutorna och resultatet har fast bredd och strecket i resultatet står mitt i
+  // sin spalt (siffrorna är olika breda i Fraunces), så att allt står i raka spalter.
+  function hansTips(minne) {
+    const [tecken, res] = String(minne || '').split(' ');
+    if (!tecken) return '';
+    const rutor = KORT.map((k) => `<em${tecken.includes(k) ? ' class="pa"' : ''}>${k}</em>`).join('');
+    const [h, b] = String(res || '').split('–');
+    const mal = b === undefined ? '' : `<i>${esc(h)}</i>–<i>${esc(b)}</i>`;
+    return `<b class="rh-tips"><span class="rh-vh">${esc(tecken)}</span><span class="rh-rutor" aria-hidden="true">${rutor}</span><small>${mal}</small></b>`;
   }
   function forstaRad(lista, fragat, forst) {
     const r = REP();
