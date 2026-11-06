@@ -343,7 +343,7 @@ window.RumAnslag = (() => {
           if (!bast || p > bast.p) bast = { name: m[side], p };
         }
       }
-      return bast && `${D.kort(bast.name)} har bäst form på lappen, med ${bast.p} poäng av 15 möjliga när vinst ger tre poäng och oavgjort en.`;
+      return bast && `${D.kort(bast.name)} har bäst form på lappen: ${bast.p} poäng av 15 möjliga, med tre poäng för vinst och en för oavgjort.`;
     },
     skador(D) {
       let flest = null;
@@ -361,17 +361,17 @@ window.RumAnslag = (() => {
       const div = DIVS.find((d) => teams.some((x) => x.t.comp === d));
       const etta = div ? teams.filter((x) => x.t.comp === div).sort((a, b) => b.t.str - a.t.str)[0] : null;
       return etta && etta.t.str > 0
-        ? `${D.kort(etta.name)} har ${signed(etta.t.str, 2)}. Mot ett vanligt lag i serien skulle de alltså i snitt vinna med ${num(etta.t.str, 2)} mål per match.`
+        ? `${D.kort(etta.name)} har ${signed(etta.t.str, 2)}. Mot ett medelbra lag i serien skulle de alltså vinna med ${num(etta.t.str, 2)} mål per match i snitt.`
         : null;
     },
     kryss(D) {
       const [topp] = D ? teamList(D, xdraw, 1) : [];
       if (!topp) return null;
       const hur = topp.v >= 0.29 ? 'klart mer än vanligt' : topp.v >= 0.26 ? 'lite mer än vanligt' : 'ungefär som vanligt';
-      return `${D.kort(topp.name)} står överst med ${pct(topp.v)}, alltså ${hur}.`;
+      return `${D.kort(topp.name)} står överst med ${pct(topp.v)}. Det är ${hur}.`;
     },
     tur: (D) => (D ? merMindre(D, ytter(D, xpd), 'chanserna var värda') : null),
-    odds: (D) => (D ? merMindre(D, ytter(D, vsOdds), 'oddsen väntade sig') : null),
+    odds: (D) => (D ? merMindre(D, ytter(D, vsOdds), 'oddsen räknade med') : null),
     vila(D, rep) {
       let mest = null;
       for (const m of D ? D.ms : []) {
