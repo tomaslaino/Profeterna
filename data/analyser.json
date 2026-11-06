@@ -1,5 +1,5 @@
 {
- "uppdaterad": "2026-11-06T17:25:00.746Z",
+ "uppdaterad": "2026-11-06T17:25:50.388Z",
  "omgang": {
   "id": "2026-11-07-st4978",
   "matcher": [
@@ -826,23 +826,23 @@
    },
    "hasse": {
     "stycken": [
-     "Kone är spelbar, och det avgör det mesta. Han har fyra mål på nio matcher och är QPR:s bäste målskytt. Mot Burnley gick han av strax före timmen, och sex minuter senare hade de kvitterat. Det är orsak och verkan, och det behöver man inte vara tränare för att se.",
-     "Lincoln vann tre raka bortamatcher med tre mittbackar och gick sedan över till en backlinje på fyra. Där lagade de något som var helt, och nu kommer de med två raka förluster. Det är jävligt svårt att hitta sitt lag när man byter grund mitt i hösten.",
-     "QPR har bara förlorat en hemmamatch. Lincoln gör färre mål än chanserna borde ge, och det kan lossna för dem en dag, så jag gardera med krysset. Etta och kryss."
+     "Richard Kone är hel, och det är det som avgör matchen. Han har gjort fyra mål på nio matcher och är QPR:s bäste målskytt. När han gick av mot Burnley tog det sex minuter innan Burnley kvitterade. Med honom på plan har QPR sin farligaste spelare, och hemma har de bara förlorat en gång.",
+     "Lincoln vann tre raka bortamatcher med tre mittbackar och bytte sedan till en backlinje på fyra. Det hade jag aldrig gjort, för man ändrar inte på något som fungerar. Nu kommer de med två raka förluster och en tränarduo som fortfarande letar efter sitt lag.",
+     "Lugn nu, Lincoln skapar mer än de får utdelning på, och någon gång lossnar det. Därför låter jag krysset stå kvar. Etta och kryss."
     ],
     "tips": "2026-11-06T15:11:57.724Z",
     "uppdrag": {
      "fraser": [
-      "Lugn nu",
-      "Orsak och verkan"
+      "Solklart",
+      "Lugn nu"
      ],
      "krydda": null,
      "bielsa": []
     },
     "model": "claude-opus-5-5",
-    "version": "2026-11-04.1",
-    "writtenAt": "2026-11-06T15:12:13.370Z",
-    "attempts": 1
+    "version": "2026-11-05.1",
+    "writtenAt": "2026-11-06T17:25:37.068Z",
+    "attempts": 2
    },
    "model": "claude-opus-5-5",
    "version": "2026-11-04.1",
