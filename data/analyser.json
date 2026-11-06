@@ -1,5 +1,5 @@
 {
- "uppdaterad": "2026-11-06T17:23:25.442Z",
+ "uppdaterad": "2026-11-06T17:23:50.072Z",
  "omgang": {
   "id": "2026-11-07-st4978",
   "matcher": [
@@ -329,22 +329,22 @@
    },
    "hasse": {
     "stycken": [
-     "Cardiff har inte förlorat hemma på hela hösten, men nu saknar de fyra mittbackar och kanske Perry Ng också. Mot West Ham släppte de in tre mål på hemmaplan, och det säger det mesta om hur det ser ut bakåt. Kommer Bielik tillbaka hjälper det, men en man bygger ingen backlinje.",
-     "Burnley har en ny tränare som har spelat två matcher och fått två oavgjorda, 0–0 och 1–1. Han vill ha ett jämnare lag och gå in i uppehållet med en god känsla. Ett lag fyra poäng under strecket spelar inte ihjäl sig på bortaplan, och de möter en ihopplockad backlinje.",
-     "Backlinjen avgör den här matchen. Jag ringar in kryss och tvåa, och det är jävligt solklart."
+     "Cardiff saknar fyra mittbackar, och Perry Ng är tveksam efter att han fick gå av i onsdags. Det är ett jävligt stort problem. Laget släppte in tre mål hemma mot West Ham, och nu sitter halva backlinjen på läktaren. Att de inte har förlorat hemma på hela hösten hjälper inte när man inte har några mittbackar att ställa upp.",
+     "Burnley har en ny tränare som har spelat två matcher, båda oavgjorda. Han vill få en jämnare nivå i laget och gå in i uppehållet med en bra känsla. Ett lag som håller ihop på det sättet brukar inte ge bort poäng i första taget.",
+     "Jag har sett det förr, i Manchester. Det gick bra då också. Lugn nu, det blir kryss och tvåa."
     ],
     "tips": "2026-11-06T15:07:32.691Z",
     "uppdrag": {
      "fraser": [
-      "Solklart",
-      "Total kontroll"
+      "Nej nej nej",
+      "Lugn nu"
      ],
-     "krydda": null,
+     "krydda": "Jag har sett det förr, i Manchester. Det gick bra då också.",
      "bielsa": []
     },
     "model": "claude-opus-5-5",
-    "version": "2026-11-04.1",
-    "writtenAt": "2026-11-06T15:07:45.546Z",
+    "version": "2026-11-05.1",
+    "writtenAt": "2026-11-06T17:23:42.006Z",
     "attempts": 1
    },
    "model": "claude-opus-5-5",
