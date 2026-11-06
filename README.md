@@ -679,6 +679,13 @@ bara lokalt. Analyserna visas som de ligger i `data/analyser.json`; hur de skriv
   låg bredvid i stället för under fatet som i baren. Nu är koppen bardiskens kopp i samma ljus,
   ritad i handens duk, fatet står på notan och handen ligger bredvid, och bardisken har pultens
   bruna. Se [Hasse Backe](#hasse-backe), *Kaffet i rummet*.
+- **Veckans löpsedel från riktiga tidningar (2026-11-06, användarens önskemål):** KVÄLLSPRESSEN
+  finns inte, och rubrikerna var lama. Nu är löpsedeln Sportbladets (rosa papper) eller Expressens
+  (det röda namnet), två veckor i taget, med namnet som text och våra rubriker: större ord och mer
+  kvällstidning, men torra (*GARANTERAT! ARSENAL VINNER* – *(74 procent enligt datorn)*, *Datorn
+  avböjer att kommentera*). Varje slags rubrik har två eller tre varianter som veckan väljer mellan,
+  och den näst största nyheten står längst ner, som på en riktig löpsedel. Se
+  [Tobaksaffären](#tobaksaffären), *Affischerna*.
 - **Kuponghistoriken flyttar till Olympen (2026-10-20, användarens önskemål):** Kupong
   handlar bara om nästa kupong – växlaren Omgången | Historik försvinner. De färdigspelade
   kupongerna står sist i Olympen under rubriken *Grupparbetena* (`#olympen/kuponger`, en
@@ -2377,37 +2384,56 @@ licensen är okända, så ingen rad står under närbilden) och *Havertz strike 
 i Porto den 29 maj 2021 (Kai Havertz). Löpsedeln är fem år gammal: papperet har gulnat,
 det röda har bleknat och den har legat vikt på mitten.
 
-**Löpsedeln** är veckans, från kvällstidningen KVÄLLSPRESSEN (inget riktigt märke): röd
-tidningsrubrik med datum, en rad som *TIPSET* eller *SKRÄLLEN*, rubriken i Anton – varje rad
-så stor som ryms i bredden, en av dem röd – och en rad under. Den är den enda som byts och
-är uppsatt för hand: varannan vecka (veckan i Stockholm, måndag till söndag) med tejp i
-skyltfönstrets nedre vänstra hörn, varannan med två häftstift på furupanelen till höger om
-fönstret, under oraklets skylt och till vänster om bardisken, där den är mindre (78 %, så att
-den ryms mellan fönsterkarmen och bardisken). I telefonen på höjden sitter den alltid på väggen,
-som syns utan att man drar. (Först satt den ibland under dörrens handtag och sedan i fönstrets
-högra hörn: dörren hamnade utanför bilden i telefonen, och hörnet är nu skivans.) Rubriken är det mest dramatiska som rummet vet om (`rubrik` i
+**Löpsedeln** är veckans, från en riktig kvällstidning som de andra (Tomas önskemål):
+**Sportbladet**, Aftonbladets sportdel, på sitt rosa papper, eller **Expressen** på vitt med det
+röda namnet, två veckor i taget (`TIDNINGAR` i rum-affischer.js). Namnen är skrivna som text,
+inte tidningarnas loggor, och rubrikerna är våra. Överst namnet så brett som papperet, under det
+vinjetten (*SPIKEN*, *KRISEN*, *BARA I SPORTBLADET*) och datumet, rubriken i Anton – varje rad
+så stor som ryms i bredden men ingen mer än 1,55 gånger den minsta, en av dem röd eller vit på
+rött, och rader med Å, Ä eller Ö med luft ovanför – raden under och, under ett streck, veckans
+näst största nyhet (helst av ett annat slag) efter ett rött plustecken. Utan någon står något ur
+kvällstidningens vanliga utbud där (*HOROSKOPET: TIPPA X*, *BÄST I TEST: TIPSPENNOR*). Tonen är
+kvällstidningens, stora ord och allvar på ytan, men torr: modellen heter *datorn* och *avböjer
+att kommentera* när den har fel, *GARANTERAT!* står ovanför *(74 procent enligt datorn)*, och
+*Är det Sveriges bästa tippare?* handlar om bäst i gänget. Namnen, resultaten och siffrorna
+stämmer; det påhittade är kvällstidningens fraser (*Nu krävs svar*, *Hela målfesten i bilder*),
+aldrig vad en riktig person har sagt. Varje slags rubrik har två eller tre varianter, och
+veckan väljer bland dem. Den är den enda som byts och är uppsatt för hand: varannan vecka (veckan i
+Stockholm, måndag till söndag) med tejp i skyltfönstrets nedre vänstra hörn, varannan med två
+häftstift på furupanelen till höger om fönstret, under oraklets skylt och till vänster om
+bardisken, där den är mindre (78 %, så att den ryms mellan fönsterkarmen och bardisken). I
+telefonen på höjden sitter den alltid på väggen, som syns utan att man drar. (Först satt den
+ibland under dörrens handtag och sedan i fönstrets högra hörn: dörren hamnade utanför bilden i
+telefonen, och hörnet är nu skivans. Till och med 2026-11-05 var den från den påhittade
+kvällstidningen KVÄLLSPRESSEN.) Rubriken är det mest dramatiska som rummet vet om (`rubrik` i
 rum-affischer.js):
 
 - *förra omgången* (säsongens omgångar, `TP.season`): den som tippade bäst med minst 82 %
-  rätt (*TEIJDER 12 RÄTT!*, eller *ALLA RÄTT!*), den som tippade sämst med högst hälften
-  rätt (*LAINOS MARDRÖM*), modellen mot gänget (*DATORN KROSSADE GÄNGET*, *GÄNGET SLOG
-  DATORN*) och en ny ensam etta i Tipsligan (*TEIJDER TOG TRONEN*) – ställningen och namnen
-  som på skårtavlan (Dogge för Johansson);
+  rätt (*TEIJDER 12 RÄTT!*, *TEIJDER SLOG ALLA*, *HISTORISKT: TEIJDER ALLA RÄTT!*), den som
+  tippade sämst med högst hälften rätt (*LAINOS MARDRÖM*, *LAINO I FRITT FALL*, *SANNINGEN OM
+  LAINOS TIPS*), modellen mot gänget (*AI-CHOCKEN: DATORN KROSSADE GÄNGET*, *MÄNNISKAN SLÅR
+  TILLBAKA: GÄNGET SLOG DATORN*) och en ny ensam etta i Tipsligan (*TEIJDER TOG TRONEN*,
+  *KUPPEN!*) – ställningen och namnen som på skårtavlan (Dogge för Johansson);
 - *en spelad match* i förra omgången eller gängets senaste kupong: skrällen när modellen gav
-  utfallet högst 22 % (*BRIGHTON SÄNKTE MAN CITY*, *… FÄLLDE …*), en favorit med minst 58 %
-  som bara fick oavgjort (*ARSENAL SNUBBLADE*) och segrar med fyra mål eller mer (*QPR KÖRDE
-  ÖVER SWANSEA*);
-- *gängets kupong* (Historik): betyg 1 (*KUPONGEN I SPILLROR*) eller 5 (*DRÖMKUPONGEN*);
+  utfallet högst 22 % (*BRIGHTON FÄLLDE MAN CITY*, *… SÄNKTE …*), en favorit med minst 58 %
+  som bara fick oavgjort (*ARSENAL SNUBBLADE*, *ARSENAL TAPPADE POÄNG*) och segrar med fyra mål
+  eller mer (*FÖRNEDRINGEN: QPR KÖRDE ÖVER SWANSEA*, med sju mål eller fler *MÅLFESTEN*);
+- *gängets kupong* (Historik): betyg 1 (*KUPONGEN I SPILLROR*, *KUPONGHAVERIET*) eller 5
+  (*DRÖMKUPONGEN*, *SÅ KNÄCKTE GÄNGET KODEN*);
 - *nästa omgång*, så länge ingen av dess matcher har startat: den jämnaste matchen när
-  ingen utgång har över 42 % (*RYSAREN*), den största favoriten med minst 68 % (*MAN CITY
-  KAN INTE FÖRLORA – eller?*) och jakten på ledaren i Tipsligan.
+  ingen utgång har över 42 % (*DATORN GER UPP*, *RYSAREN*), den största favoriten med minst 68 %
+  (*ARSENAL KAN INTE FÖRLORA* – *Vad kan gå fel?*, *GARANTERAT! ARSENAL VINNER*, *SPIKA
+  ARSENAL!* – *Vi lovar ingenting*) och jakten på ledaren i Tipsligan (*JAKTEN PÅ TEIJDER*,
+  *TEIJDER OHOTAD?*).
 
 Varje rubrik har en vikt efter hur dramatisk den är (hur få rätt, hur liten chans …).
 Förra omgångens väger fullt tre dagar efter sista avsparken, sedan 55 % och efter sex dagar
 30 %; nästa omgångs 90 %. Omgångar och kuponger som spoilerskyddet döljer räknas inte.
-Utan något att skriva om står *STORA TIPSGUIDEN*. Tidningen är från dagen det hände (tre
-timmar efter sista avsparken), och för nästa omgång från idag. Ett klick går fram till
-löpsedeln, som till de andra affischerna; som inget annat i rummet leder den ut ur det.
+Utan något att skriva om står tipsguiden (*STORA TIPSGUIDEN*, *SÅ BLIR DU RIK PÅ TIPSET* – *8
+enkla knep – nummer 5 gör alla fel*). Tidningen är från dagen det hände (tre timmar efter sista
+avsparken), och för nästa omgång från idag. Ett klick går fram till löpsedeln, som till de andra
+affischerna; som inget annat i rummet leder den ut ur det. För bilder: `?rum-tidning=sb|ex`,
+`?rum-rubrik=<typ>` och `?rum-variant=<tal>`.
 
 **Fikat** står på pulten vissa dagar, i three.js som sakerna
 ([public/rum-fika.js](public/rum-fika.js)): två semlor i pappersform med mandelmassa,
