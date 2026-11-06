@@ -102,11 +102,13 @@
     fler: ['Du har {du}. Det är onödigt.'],
     korsar: ['{Bada} kan du behålla, men glöm resten.'],
     skilda: ['Du har {du}, och det kan du glömma.', 'Du har {du}, och det är dina pengar.'],
+    // Varje början går med vartdera slutet.
     tom: [
-      'Du har inte tippat den här matchen än. Ta mina tecken.',
-      'Den här matchen har du lämnat tom. Fyll i det jag sa.',
-      'Matchen står tom på din kupong. Gör som jag säger.',
-    ],
+      'Du har inte tippat den här matchen än.',
+      'Du har inte tippat matchen än.',
+      'Matchen är inte ifylld på din kupong.',
+      'Den här matchen har du lämnat tom på din kupong.',
+    ].flatMap((forst) => ['Gör som jag säger om du vill tjäna pengar.', 'Nu vet du vad du ska välja.'].map((sist) => `${forst} ${sist}`)),
   },
 
   // När något inte går.
