@@ -17,9 +17,8 @@
 //   (rum-register.js, lådan i three.js i rum-kortlada.js)
 //   uret, skårtavlan (Tipsligan), oraklet, pokalhyllan, korktavlan,
 //   löpsedlarna i fönstret (IFK 1982, Nacional 1988, VM 94 och Chelsea 2021 på
-//   skivan och veckans löpsedel, rum-affischer.js), dörren (med vilka vi
-//   är under) och kvittot: kameran
-//   går fram till dem (närbilderna, sak)
+//   skivan och veckans löpsedel, rum-affischer.js) och dörren (med vilka vi
+//   är under): kameran går fram till dem (närbilderna, sak)
 //   kupongen tas i handen (K) – fylls i eller ändras –, annars går kameran
 //   fram till den på pulten.
 //   högen bredvid: de inlämnade kupongerna med baksidan upp; din egen tas i
@@ -44,7 +43,7 @@
 // om det var så långt kvar till spelstoppet, ?rum-tittar som om matcherna
 // pågick och ?rum-mal=dl:1,dt:-1,dj:0 som om det blev mål (rätt, fel, ingen
 // skillnad), ?rum-video videon nära och
-// ?rum-sak=ur|skar|ram|pokal|kork|vm94|ifk|nacional|lopsedel|chelsea|dorr|kvitto|kupong en närbild.
+// ?rum-sak=ur|skar|ram|pokal|kork|vm94|ifk|nacional|lopsedel|chelsea|dorr|kupong en närbild.
 //
 // Läses efter kupong.js, samtal.js, tippare.js och kronan.js och använder
 // deras hjälpare (state, KP, TP, gradeRow, couponNumber, currentCoupon,
@@ -473,8 +472,7 @@ window.Rum = (() => {
   }
 
   function paper() {
-    return `<a id="rum-kvitto" class="rum-flat rum-sak" ${KNAPP} data-nav="kupong" data-sak="kvitto" aria-label="Kvittot"></a>` +
-      '<span id="rum-hogen"></span>' +
+    return '<span id="rum-hogen"></span>' +
       `<a id="rum-kupong" class="rum-flat rum-kup rum-sak" ${KNAPP} data-nav="kupong" aria-label="Kupong"></a>` +
       `<a class="rum-tag" ${KNAPP} data-nav="kupong" id="rum-tag" hidden></a>`;
   }
@@ -1336,15 +1334,6 @@ ${window.RumRegister ? RumRegister.nara() : ''}
     for (const a of el.children) a.style.visibility = R.kup && R.kup.vem === a.dataset.vem ? 'hidden' : '';
   }
 
-  function receiptHtml(rd, nr) {
-    const gang = (rd && rd.gang) || [];
-    const fDt = new Intl.DateTimeFormat('sv-SE', { timeZone: 'Europe/Stockholm', weekday: 'short', hour: '2-digit', minute: '2-digit' });
-    const lines = gang.map((g) => `<span class="r"><span>${esc(g.id)}</span><span>${g.inne ? esc(fDt.format(new Date(g.inne)).replace('.', '').replace(':', '.')) : '–'}</span></span>`).join('');
-    return '<span class="c">MATCHFIXARNAS<br>TOBAK &amp; SPEL</span><hr>' +
-      `<span class="r"><span>${nr ? `KUPONG ${nr}` : 'KUPONG'}</span><span>INNE</span></span>${lines}<hr>` +
-      '<span class="r"><span>Insats</span><span>äran</span></span><span class="bar"></span><span class="c">Spara kvittot</span>';
-  }
-
   // Skårtavlan: Tipsligan, säsongens ställning i gänget – samma poäng som
   // ställningen i Olympen (kampRounds i kampen.js, med omgången som pågår),
   // lika placering vid lika poäng och antal rätt. Efternamnen, och Dogge för
@@ -1421,7 +1410,6 @@ ${window.RumRegister ? RumRegister.nara() : ''}
     const rd = round();
     const rows = rd ? roundRows(rd, t) : [];
     R.rows = rows;
-    const nr = rd && !rd.next && rd.ids.length && typeof couponNumber === 'function' ? couponNumber(rd.ids) : null;
     // (mot det som skrevs sist: innerHTML ger tillbaka <path …></path> där
     // kupongen skrev <path …/>, så den skrevs annars om vid varje fill)
     const set = (id, html) => {
@@ -1443,7 +1431,6 @@ ${window.RumRegister ? RumRegister.nara() : ''}
     // gängets kupong, när du ser de andras tips (uppgörelsen)
     set('rum-kupong', couponHtml(rd, rows, p && p.gang ? view(p, 'gang') : p && !p.inne ? view(p, 'fyll') : null));
     pile(rd, p);
-    set('rum-kvitto', receiptHtml(rd, nr));
     // gänget vid barbordet: den som inte har lämnat in sitter med kupongen
     R.vem = vemInne(rd, rows, t, p);
     if (R.fig && R.fig.inne) R.fig.inne(R.vem, now());
@@ -2689,7 +2676,7 @@ ${window.RumRegister ? RumRegister.nara() : ''}
   // ---------- närbilderna ----------
   //
   // Uret, skårtavlan, oraklet, pokalhyllan, korktavlan, löpsedlarna på
-  // skivan (IFK 1982, Nacional 1988, VM 94 och Chelsea 2021), veckans löpsedel, dörren och kvittot (data-sak) – och kupongen på pulten när den inte går
+  // skivan (IFK 1982, Nacional 1988, VM 94 och Chelsea 2021), veckans löpsedel och dörren (data-sak) – och kupongen på pulten när den inte går
   // att ta i handen: kameran ställer sig rakt framför och går fram tills
   // saken fyller det mesta av fönstret, och det som är ritat i 3D
   // (rum-inredning.js) ritas om skarpare. Under pokalhyllan står hur många
@@ -2708,7 +2695,6 @@ ${window.RumRegister ? RumRegister.nara() : ''}
     kork: { el: '.rum-kork', h: 0.86, duk: 'hogra' },
     vm94: { el: '#rum-vm94', h: 0.94, duk: 'skiva' },
     dorr: { el: '#rum-dorrnamn', mal: '#rum-dorrglas', h: 0.92, fot: () => OM_OSS },
-    kvitto: { el: '#rum-kvitto', h: 0.9, pult: true },
     kupong: { el: '#rum-kupong', h: 0.94, pult: true },
     ifk: { el: '#rum-ifk', h: 0.86, duk: 'skiva' },
     lopsedel: { el: '#rum-lopsedel', h: 0.86 },
@@ -3648,7 +3634,7 @@ ${window.RumRegister ? RumRegister.nara() : ''}
       k.vem = p.vem;
       k.bak = backHtml(p.vem, p.s.gang.findIndex((g) => g.id === p.vem));
     }
-    // kvittot visar att du är inne
+    // omgången läses om, så att gänget vid barbordet ser att du är inne
     if (typeof tpLoad === 'function') tpLoad(true).then(() => { if (R.on) fill(); });
     setTimeout(() => { if (R.kup === k) closeCoupon(); }, calm() ? 700 : 1100);
   }

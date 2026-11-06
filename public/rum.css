@@ -360,7 +360,7 @@ canvas.rum-neonhalo { opacity: 0.28; }
 
 /* ---------- tv:n: rum-tv.css ---------- */
 
-/* ---------- pulten: kupongen och kvittot ---------- */
+/* ---------- pulten: kupongen ---------- */
 
 .rum-flat { position: absolute; display: block; transform-origin: 50% 50%; }
 /* kupongen på pulten och i handen (id:t går före a.rum-sak:hover, färgen) */
@@ -611,28 +611,6 @@ canvas.rum-neonhalo { opacity: 0.28; }
 .rum-bak .stampel { left: auto; right: 52px; top: 214px; padding: 9px 16px 7px; font-size: 28px; border-width: 5px; border-radius: 12px; }
 .rum-bak .regler { left: 58px; right: 58px; top: 318px; bottom: 44px; border-top: 2px solid rgba(90, 70, 40, 0.22); padding-top: 12px; font: 700 14px/1 Fraunces, Georgia, serif; letter-spacing: 4px; text-transform: uppercase; color: #9a8a70;
   background: repeating-linear-gradient(180deg, rgba(90, 70, 40, 0.16) 0 5px, rgba(0, 0, 0, 0) 5px 17px) 0 40px / 100% calc(100% - 40px) no-repeat; }
-
-#rum-kvitto {
-  left: 1196px;
-  top: 676px;
-  width: 168px;
-  height: 290px;
-  box-sizing: border-box;
-  padding: 14px;
-  transform: perspective(1100px) rotateX(46deg) rotateZ(11deg);
-  background: linear-gradient(180deg, #f1eee6, #e0dccf);
-  color: #3a3833;
-  font-family: VT323, monospace;
-  font-size: 17px;
-  line-height: 17px;
-  box-shadow: 0 18px 20px rgba(0, 0, 0, 0.5);
-  clip-path: polygon(0 0, 100% 0, 100% 97%, 92% 100%, 84% 97%, 76% 100%, 68% 97%, 60% 100%, 52% 97%, 44% 100%, 36% 97%, 28% 100%, 20% 97%, 12% 100%, 4% 97%, 0 100%);
-}
-#rum-kvitto > span { display: block; }
-#rum-kvitto .c { text-align: center; }
-#rum-kvitto hr { border: 0; border-top: 1px dashed #77736a; margin: 7px 0; }
-#rum-kvitto .r { display: flex; justify-content: space-between; }
-#rum-kvitto .bar { height: 30px; margin: 8px 6px 4px; background: repeating-linear-gradient(90deg, #3a3833 0 2px, rgba(0, 0, 0, 0) 2px 3px, #3a3833 3px 6px, rgba(0, 0, 0, 0) 6px 8px, #3a3833 8px 9px, rgba(0, 0, 0, 0) 9px 12px); }
 
 /* ---------- Hasse i baren (rum.js, hasseHtml) ---------- */
 

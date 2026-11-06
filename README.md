@@ -697,6 +697,11 @@ bara lokalt. Analyserna visas som de ligger i `data/analyser.json`; hur de skriv
   avböjer att kommentera*). Varje slags rubrik har två eller tre varianter som veckan väljer mellan,
   och den näst största nyheten står längst ner, som på en riktig löpsedel. Se
   [Tobaksaffären](#tobaksaffären), *Affischerna*.
+- **Domarens kort i stället för kvittot (2026-11-06, användarens önskemål):** kvittot på pulten
+  tillförde inget – vilka som har lämnat in syns redan på högen – och var ett tredje papper
+  bredvid notan och kupongen. Där ligger nu domarens gula och röda kort och visselpipan med
+  snodden, som passar Matchfixarna bättre, och de är lättare för grafiken än kvittot (ingen bild).
+  Se [Tobaksaffären](#tobaksaffären).
 - **Kuponghistoriken flyttar till Olympen (2026-10-20, användarens önskemål):** Kupong
   handlar bara om nästa kupong – växlaren Omgången | Historik försvinner. De färdigspelade
   kupongerna står sist i Olympen under rubriken *Grupparbetena* (`#olympen/kuponger`, en
@@ -1960,7 +1965,7 @@ minsta fönstren och om rum.js inte går att hämta visas den vanliga förstasid
 **Föremålen** – pekar man på ett lyser det (pokalerna också), och snabbvalet
 på text-tv:n med samma ämne tänds, som när man pekar på snabbvalet med tv:n nära
 (pärmarna Skyttar). Inget föremål byter sida: oraklet, skårtavlan, pokalhyllan, korktavlan,
-uret, löpsedlarna i fönstret, namnet på dörren och kvittot tittar man på nära (se
+uret, löpsedlarna i fönstret och namnet på dörren tittar man på nära (se
 [Närbilderna](#närbilderna)), och tv:n, videon, anslagstavlan, kortregistret och kupongen
 kommer fram var och en på sitt sätt. Föremålen är knappar utan adress (`KNAPP` i rum.js), och
 Enter och mellanslag klickar på dem. En match på text-tv:n öppnar matchrutan ovanpå rummet:
@@ -1992,8 +1997,8 @@ Enter och mellanslag klickar på dem. En match på text-tv:n öppnar matchrutan 
 - **Korktavlan** (längst ut på högra väggen, hel i bild, i en träram i 3D) → närbild: de
   färdigspelade kupongerna (`Historik.coupons`) rättade med röd penna, en med kaffering.
   Tom tills den första är färdigspelad.
-- **Kupongen och kvittot**: kupongen tas i handen (se nedan), och när den inte går att ta i
-  handen går kameran fram till den på pulten (också med K och guldordet); kvittot → närbild.
+- **Kupongen**: kupongen tas i handen (se nedan), och när den inte går att ta i
+  handen går kameran fram till den på pulten (också med K och guldordet).
   Kupongen är samma kupong som papperet under Kupong, i
   kupongens mått (660 × 470): bandet, under det stämpeln (vem omgången väntar på) och
   spelstoppet, namnet för hand och 1 X 2 överst, en rad per
@@ -2005,7 +2010,7 @@ Enter och mellanslag klickar på dem. En match på text-tv:n öppnar matchrutan 
   pågår). På pulten ligger ditt utkast med dina kryss och motiveringar och ditt namn;
   har du lämnat in ligger din i högen bredvid och på pulten en ny – och när du
   ser de andras tips ligger gängets kupong där, med gängets kryss med kulspetspenna,
-  allas porträtt i rutorna och allas namn överst (uppgörelsen). Kvittot visar när var och en lämnade in. Allt man
+  allas porträtt i rutorna och allas namn överst (uppgörelsen). Allt man
   gör med kupongen tas i handen, utan att man lämnar rummet (se
   [Kupongen i handen](#kupongen-i-handen)). Guldordet bredvid säger vad som väntar: *Fyll i
   resten* när du har börjat kryssa, *Följ kupongen* när matcherna har börjat och annars
@@ -2314,15 +2319,16 @@ bra omgång bär papperskronan i stället för högtidens (figuren byggs om när
 och DJ tar av sig struten, kronan och partyhatten när han somnar med huvudet på bordet. Blad,
 blommor, bär, ljus och konfetti är sammanslagna till ett nät per sak, så att det blir få ritanrop.
 
-**Kvittot** ligger på pulten i three.js med sakerna nedan
-([public/rum-saker.js](public/rum-saker.js)): termopapper som har legat i rulle, så att änden
-med huvudet har böjt sig upp och den rivna änden lyfter lite, med en mjuk skugga under. Texten
-är den som `receiptHtml` skriver i `#rum-kvitto` (huvudet i dubbeltryck, ojämnt termotryck och
-en streckkod efter texten) och ritas om när någon lämnar in; länken blir en osynlig yta över
-papperet att klicka på (`i-3d` i rum-saker.css, kanten räknad ur papperet), och papperet lyser
-upp när musen är över den. Utan WebGL ligger det platta kvittot kvar (rum.css).
+**Domarens kort och visselpipa** ligger på pulten i three.js med sakerna nedan
+([public/rum-saker.js](public/rum-saker.js), `domLagg`): ett gult och ett rött kort i plast,
+slängda så att det röda ligger lite över det gula, och en förkromad visselpipa på sidan med en
+svart snodd som ringlar sig över korten – domarens grejer på Matchfixarnas pult. De är bara
+rekvisita och går inte att klicka på. De är lätta att rita: inga bilder, korten är ett nät,
+pipan ett och snodden med springan i munstycket ett, tre ritanrop i allt (kvittot som låg där
+förut hade en bild på 512 × 958 bildpunkter som ritades om när någon lämnade in). Utan WebGL
+ligger inget där, som med sakerna nedan.
 
-**Askkoppen, snusdosan och fläkten** står på pulten till höger om kvittot, i three.js som
+**Askkoppen, snusdosan och fläkten** står på pulten till höger om korten, i three.js som
 gänget ([public/rum-saker.js](public/rum-saker.js), med en egen duk i pultens plan): en
 askkopp i bärnstensfärgat glas med tre spår, aska och fimpar, där en cigarett ligger i ett
 spår och ryker; en öppen dosa lössnus med locket bredvid, lutat mot dosan eller upp och ner;
@@ -2452,7 +2458,7 @@ grädde och lock med florsocker på fettisdagen, två pepparkakshjärtan och en 
 glasyr på en servett i december, två lussekatter med russin på luciadagen, två
 kanelbullar med pärlsocker i pappersform den 4 oktober, chokladägg i röd, blå, grön och
 guldfolie i påskveckan (skärtorsdagen till annandag påsk) och tre chokladbollar på en
-servett den 11 maj. Det står bakom kvittot om det får plats där, annars till höger, fritt
+servett den 11 maj. Det står bakom korten om det får plats där, annars till höger, fritt
 från askkoppen, dosan, locket, prisen och fläkten. Dagen är Stockholms (`Vader.nu()`,
 läst var tionde sekund som vädret). Går det dåligt med tippningen har någon redan tagit
 för sig: locket ligger bredvid den ena semlan och det är en grop i grädden, gubben saknar
@@ -2461,10 +2467,10 @@ skalat med folien tillplattad bredvid, och det är fler smulor och mer florsocke
 
 **Platserna och slitaget skiftar från dag till dag** (dagen i Stockholm som frö): sakerna
 på pulten står i en av fyra uppställningar (`LAYOUTS` – fläkten längst bak till höger, i
-mitten eller bakom kvittot och då vänd åt höger, askkoppen och dosan om vartannat, några
-pixlar hit eller dit), kvittot ligger någonstans till vänster om dem, vridet åt det ena eller
-andra hållet och mer eller mindre uppböjt (det första av elva lägen som går fritt från
-askkoppen, dosan och fläkten), locket och prisen läggs där det finns plats. Slitaget följer tippningen: andelen fel
+mitten eller bakom korten och då vänd åt höger, askkoppen och dosan om vartannat, några
+pixlar hit eller dit), domarens kort och pipa ligger någonstans till vänster om dem, vridna åt
+det ena eller andra hållet (det första av elva lägen som går fritt från askkoppen, dosan och
+fläkten), locket och prisen läggs där det finns plats. Slitaget följer tippningen: andelen fel
 bland omgångens avgjorda matcher, annars i den senaste färdigspelade kupongen, och utan
 rättning ett mellanläge. Går det dåligt fylls askkoppen (1–11 fimpar), askan hamnar
 bredvid, snuset spills, fläkten (om den står där) går på trean och löpsedlarna på skivan bleks;
@@ -4247,8 +4253,8 @@ riktig telefon, och att han tar kaffet varannan gång medan man väljer är bara
 ### Närbilderna
 
 Uret, skårtavlan, Omgångens orakel, pokalhyllan, korktavlan, löpsedlarna i fönstret (IFK 1982,
-Nacional 1988, VM 94 och Chelsea 2021 på skivan och veckans löpsedel), namnet på dörren
-och kvittot tittar man på nära med ett klick (`sak` i rum.js, `data-sak` på föremålen), och
+Nacional 1988, VM 94 och Chelsea 2021 på skivan och veckans löpsedel) och namnet på dörren
+tittar man på nära med ett klick (`sak` i rum.js, `data-sak` på föremålen), och
 kupongen på pulten när den inte går att ta i handen: kameran ställer sig rakt framför och går fram tills
 saken fyller det mesta av fönstret – högst 90 % av bredden och 74–94 % av höjden mellan
 namnet och foten (den låga skårtavlan 50 %, så att den inte kommer närmare än de andra) – i
@@ -4267,7 +4273,7 @@ och under dörren raderna från Om oss i bladguld. Esc eller ett klick (också p
 och K, T, A, R och V går direkt till kupongen, tv:n, anslagstavlan, kortregistret och videon
 (K nära kupongen på pulten går tillbaka). Föremålen lyser inte när man
 pekar på dem på nära håll. Med `prefers-reduced-motion` går kameran direkt.
-`?rum-sak=ur|skar|ram|pokal|kork|vm94|ifk|nacional|lopsedel|chelsea|dorr|kvitto|kupong` visar en närbild i en fast bild (med `?rum-t`).
+`?rum-sak=ur|skar|ram|pokal|kork|vm94|ifk|nacional|lopsedel|chelsea|dorr|kupong` visar en närbild i en fast bild (med `?rum-t`).
 
 ## Statusmärkning
 
