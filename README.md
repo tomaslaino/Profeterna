@@ -3508,6 +3508,23 @@ när datorn har annat att göra (se [När datorn inte hinner med](#när-datorn-i
 Pekar man på tavlan i rummet tänds snabbvalet Statistik på
 text-tv:n. Med `prefers-reduced-motion` står tavlan framme direkt.
 
+**Hasse förklarar** (2026-11-06, användarens önskemål): under lappen i handen står det man ropar
+till Hasse Backe (fiktiv), som sitter i baren till vänster – *Hasse, vad betyder procenten?*,
+*Hasse, vad är tur och otur?* och så vidare, en fråga per lapp – och ett klick eller H ger hans
+kort. Det glider in från vänster, där han sitter, och lägger sig bredvid lappen, som flyttar åt
+höger; ryms de inte bredvid varandra (i telefonen och i smala fönster) ligger kortet över lappen
+med raden under kortet. Kortet är kraftigt, lite gulnat papper med hans kulspets, en ring efter
+kaffekoppen och *Hasse B.* som på notan. Han förklarar lappen i sin egen röst, lugn och säker och i
+hela meningar som i baren ([prompts/hasse-backe.md](prompts/hasse-backe.md)): vad talen är och hur
+de räknas (samma innehåll som förklaringarna under Statistik → Lagen), ett exempel ur bladet man
+har framme (*Nottingham står överst med 27 %, alltså lite mer än vanligt.*) och vad han själv gör
+med det. Exemplet räknas i sidan ur samma tal som lappen och byts när man bläddrar bland bladen;
+när bladet räknar med dolda resultat, eller saknar data, står kortet utan exempel. Kortet ligger
+kvar när man går till nästa lapp med ←/→ och byter då text. *Tack, Hasse*, Esc, ett klick på
+kortet eller ett klick utanför lägger undan det (Esc och ett klick utanför sätter sedan tillbaka
+lappen), och ett svep på kortet bläddrar inte bladen. Texterna är fasta, utan AI och utan ljud, och
+står i `ROP` och `FORKLARA` i rum-anslag.js: ändras vad en lapp visar ska hans kort följa med.
+
 Dolda resultat: formen får ? för de dolda matcherna, och lapparna som räknar med
 resultaten (styrkan, krysset, turen, oddsen och motståndet) visar bara rubriken och ett
 frågetecken när en match i lagens divisioner är dold – den lyfta lappen har då *Visa ändå*.
@@ -3515,7 +3532,8 @@ Lagfilerna hämtas med rummet (om igen efter en kvart), matchernas filer när ta
 Slitaget skiftar med dagen: lapparnas och bladens vinklar, nålhålen och hörnen av rivna
 lappar.
 `?rum-anslag` visar tavlan framme i en fast bild, och `?rum-anslag=<lapp>` (form, skador,
-styrka, kryss, tur, odds, vila, motstand) med den lappen i handen.
+styrka, kryss, tur, odds, vila, motstand) med den lappen i handen, och med
+`&rum-anslag-hasse` också Hasses kort om den.
 
 ### Kortregistret
 
@@ -3847,7 +3865,8 @@ en fast bild.
 ### Hasse Backe
 
 *Hasse Backe (fiktiv)* analyserar matcherna på stryktipskupongen, och det är allt man kan be
-honom om: inga följdfrågor och ingen textruta. Han sitter i baren till vänster utanför bilden, och
+honom om i baren: inga följdfrågor och ingen textruta. (Vid anslagstavlan kan man också ropa till
+honom och få en lapp förklarad på ett kort, se [Anslagstavlan](#anslagstavlan).) Han sitter i baren till vänster utanför bilden, och
 längst ut på pulten står hans kaffe vid notan, och där ligger hans hand. Ett klick på dem, eller H,
 och kameran slår snabbt åt vänster till honom. Där sitter han bakom bardisken, mitt emot väggen med
 anslagstavlan, och har vridit sig lite mot en, med underarmarna på disken, kaffet och notan vid den
