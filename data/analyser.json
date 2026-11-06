@@ -1,5 +1,5 @@
 {
- "uppdaterad": "2026-11-06T17:25:50.388Z",
+ "uppdaterad": "2026-11-06T17:26:15.664Z",
  "omgang": {
   "id": "2026-11-07-st4978",
   "matcher": [
@@ -894,22 +894,22 @@
    },
    "hasse": {
     "stycken": [
-     "Middlesbrough leder serien under Hellberg och är det bättre laget på papperet. Men anfallet håller inte riktigt. Strelec har bara tränat en vecka efter skadan, Lankshear är skadad och två spelare saknas fortfarande. Dessutom förlorade de med 0–2 mot Wrexham i onsdags, och då blir det tunga ben tre dagar senare.",
-     "Watford är ett helt annat lag hemma. Borta har de en enda poäng på sju matcher, men på Vicarage Road har de vunnit fyra av sju. Ett lag som tar sina poäng på det viset ska man inte avfärda, framför allt inte när motståndaren kommer halvskadad. Så er det sagt, som vi sa i Köpenhamn.",
-     "Jag tror ändå inte att Watford vinner, så ettan stryker jag. Kryss och tvåa."
+     "Middlesbrough leder serien med 28 poäng på 14 matcher, men i onsdags förlorade de med 0–2 mot Wrexham, och nu har Hellberg bekymmer längst fram. Strelec har bara tränat med truppen i en vecka efter skadan, och Lankshear är skadad. Har man inga friska anfallare så blir det svårt att göra mål, det är orsak och verkan.",
+     "Watford ligger långt ner i tabellen, men hemma har de vunnit fyra av sju matcher. På Vicarage Road är det ett helt annat lag än på bortaplan, och det vet jag redan innan de har knutit skorna.",
+     "Middlesbrough är ändå det bättre laget på papperet, så ettan låter jag vara. Jag tar kryss och tvåa."
     ],
     "tips": "2026-11-06T15:13:27.299Z",
     "uppdrag": {
      "fraser": [
-      "Glöm det",
-      "Total kontroll"
+      "Orsak och verkan",
+      "Lugn nu"
      ],
-     "krydda": "Så er det sagt, som vi sa i Köpenhamn.",
+     "krydda": null,
      "bielsa": []
     },
     "model": "claude-opus-5-5",
-    "version": "2026-11-04.1",
-    "writtenAt": "2026-11-06T15:13:42.761Z",
+    "version": "2026-11-05.1",
+    "writtenAt": "2026-11-06T17:26:07.410Z",
     "attempts": 1
    },
    "model": "claude-opus-5-5",
