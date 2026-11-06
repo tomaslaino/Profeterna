@@ -1,10 +1,5 @@
-/* Sakerna i tobaksaffären (rum-saker.js): kvittot, askkoppen, snusdosan och
-   fläkten på pulten i three.js. Affischerna på glaset: rum-affischer.css. */
+/* Sakerna i tobaksaffären (rum-saker.js): domarens kort och visselpipa,
+   askkoppen, snusdosan och fläkten på pulten i three.js. Affischerna på
+   glaset: rum-affischer.css. */
 
 .rum-saker { position: absolute; pointer-events: none; }
-
-/* Kvittot ritas på duken: länken är bara ytan att klicka på (platsen och
-   kanten sätts i rum-saker.js), och papperet lyser upp i stället för den */
-#rum-kvitto.i-3d { transform: none; padding: 0; background: none; box-shadow: none; }
-#rum-kvitto.i-3d > * { visibility: hidden; }
-#rum-kvitto.i-3d:hover, #rum-kvitto.i-3d:focus-visible { filter: none; }
