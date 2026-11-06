@@ -102,7 +102,11 @@
     fler: ['Du har {du}. Det är onödigt.'],
     korsar: ['{Bada} kan du behålla, men glöm resten.'],
     skilda: ['Du har {du}, och det kan du glömma.', 'Du har {du}, och det är dina pengar.'],
-    tom: ['Du har inget på den här än. Nu vet du vad du ska skriva.'],
+    tom: [
+      'Du har inte tippat den här matchen än. Ta mina tecken.',
+      'Den här matchen har du lämnat tom. Fyll i det jag sa.',
+      'Matchen står tom på din kupong. Gör som jag säger.',
+    ],
   },
 
   // När något inte går.
