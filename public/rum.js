@@ -1153,7 +1153,33 @@ ${window.RumRegister ? RumRegister.nara() : ''}
       return { a, b, d: `M${r1(a[0])} ${r1(a[1])}Q${r1(c[0])} ${r1(c[1])} ${r1(b[0])} ${r1(b[1])}` };
     });
   }
-  const crossSvg = (key, kula = false) => `<svg class="kryss${kula ? ' kula' : ''}" viewBox="0 0 40 19" preserveAspectRatio="none" aria-hidden="true">${strokes(key).map((s) => `<path d="${s.d}" pathLength="1"/>`).join('')}</svg>`;
+  const crossSvg = (key, kula = false, hasse = false) => `<svg class="kryss${kula ? ' kula' : ''}${hasse ? ' hasse' : ''}" viewBox="0 0 40 19" preserveAspectRatio="none" aria-hidden="true">${(hasse ? slarv(key) : strokes(key)).map((s) => `<path d="${s.d}" pathLength="1"/>`).join('')}</svg>`;
+  // Hasse Backes kryss (rum-hasse-kupong.js): samma penna men större och med mer fart, ut över
+  // rutans kanter och med en svans på det andra draget. Slarvigt, men det går inte att ta miste på.
+  function slarv(key) {
+    const R0 = rng(seed(`hasse${key}`));
+    const j = (n) => (R0() - 0.5) * 2 * n;
+    return [[3, -3.5, 37, 21.5], [36.5, -4, 1, 24]].map(([x1, y1, x2, y2]) => {
+      const a = [x1 + j(2.4), y1 + j(1.4)];
+      const b = [x2 + j(2.4), y2 + j(1.4)];
+      const c = [(a[0] + b[0]) / 2 + j(3.4), (a[1] + b[1]) / 2 + j(2.4)];
+      return { a, b, c, d: `M${r1(a[0])} ${r1(a[1])}Q${r1(c[0])} ${r1(c[1])} ${r1(b[0])} ${r1(b[1])}` };
+    });
+  }
+  // Vilka kryss som är hans, för den här omgången (på enheten). Tar man bort ett och kryssar själv är det ditt.
+  const HASSES = 'profeterna.hasse.kryss';
+  function hassesKryss(id) {
+    try {
+      const j = JSON.parse(localStorage.getItem(HASSES));
+      return j && j.id === id ? j.k || {} : {};
+    } catch (e) { return {}; }
+  }
+  function hasseSkrev(id, key, ja) {
+    const k = hassesKryss(id);
+    if (ja) k[key] = 1;
+    else delete k[key];
+    try { localStorage.setItem(HASSES, JSON.stringify({ id, k })); } catch (e) { /* då är det ett vanligt kryss nästa gång */ }
+  }
 
   // Pennan: spetsen i (x, y) på kupongen, vriden a grader och lyft l (0 =
   // mot papperet, 1 = i luften). Skuggan faller nedåt på papperet hur pennan
@@ -1204,6 +1230,7 @@ ${window.RumRegister ? RumRegister.nara() : ''}
     const gang = (KP.data && KP.data.samtal && KP.data.samtal.gang) || [];
     const ink = v && v.vem ? Math.max(0, gang.findIndex((g) => g.id === v.vem)) : 0;
     const now = Date.now();
+    const hans = v && (slag === 'fyll' || slag === 'din') && rd && rd.id ? hassesKryss(rd.id) : {};
     const list = order.map((x, i) => {
       const sign = signs[x.id];
       const comp = compOf(x.m.comp);
@@ -1217,7 +1244,7 @@ ${window.RumRegister ? RumRegister.nara() : ''}
       const label = `${x.m.home} – ${x.m.away}`;
       const box = (s, j) => {
         const on = sign.includes(s);
-        const inner = `<i>${s}</i>${slag === 'gang' ? seats(v, x.id, j) : ''}${on ? crossSvg(`${x.id}${s}`, kula) : ''}` +
+        const inner = `<i>${s}</i>${slag === 'gang' ? seats(v, x.id, j) : ''}${on ? crossSvg(`${x.id}${s}`, kula, Boolean(hans[`${x.id}${s}`])) : ''}` +
           (res === j ? Papper.ring(`${x.id}${s}`, `rum-ring${ring}`, 25) : '');
         return edit
           ? `<button type="button" class="box${on ? ' x' : ''}" data-s="${s}" aria-pressed="${on}" aria-label="${esc(`${label}: ${s}`)}">${inner}</button>`
@@ -3250,6 +3277,8 @@ ${window.RumRegister ? RumRegister.nara() : ''}
     b.classList.toggle('x', on);
     if (on) drawCross(b, `${row.dataset.id}${b.dataset.s}`);
     else eraseCross(b);
+    // (kryssar du om det är det ditt, inte Hasse Backes)
+    if (k.slag !== 'gang' && pult()) hasseSkrev(pult().s.id, `${row.dataset.id}${b.dataset.s}`, false);
     const sign = SIGNS.filter((s) => row.querySelector(`[data-s="${s}"]`).getAttribute('aria-pressed') === 'true').join('');
     row.classList.toggle('tom', !sign);
     penShown(row);
@@ -4064,7 +4093,30 @@ ${window.RumRegister ? RumRegister.nara() : ''}
   }
 
   // kval: rummets steg (KVAL), som Hasse Backe också ritas efter (rum-hasse.js)
-  return { fits, show, hide, redraw: () => { if (R.on) fill(); }, skriv: skrivPult, kval: () => R.kval, vila: (v) => {
+  // Din kupong hos Hasse Backe (rum-hasse-kupong.js): samma kupong som på pulten, medan den går att fylla i.
+  //   html()         kupongen, som på pulten (null om den inte går att fylla i)
+  //   kryss(key, h)  ett kryss (h: bara hans; annars hans om han har skrivit det), drag(key) hans drag
+  //   skrev(key, ja) krysset är hans, eller inte längre, ritaOm() pulten igen, penna() var pennan ligger
+  const kupong = {
+    html() {
+      const p = pult();
+      if (!p || !p.fyll) return null;
+      const rd = { id: p.s.id, ids: p.s.matcher.map((x) => String(x.id)), gang: p.s.gang, name: (window.Samtal && Samtal.name()) || null };
+      return couponHtml(rd, roundRows(rd), view(p, 'fyll'));
+    },
+    kryss(key, h = false) {
+      const p = pult();
+      return crossSvg(key, false, h || Boolean(p && hassesKryss(p.s.id)[key]));
+    },
+    drag: (key) => slarv(key),
+    skrev(key, ja) {
+      const p = pult();
+      if (p) hasseSkrev(p.s.id, key, ja);
+    },
+    ritaOm() { if (R.on) fill(); },
+    penna: () => ({ x: PEN_PULT.x, y: PEN_PULT.y, a: PEN_PULT.a }),
+  };
+  return { fits, show, hide, kupong, redraw: () => { if (R.on) fill(); }, skriv: skrivPult, kval: () => R.kval, vila: (v) => {
       R.vilar = Boolean(v);
       // (rummet kommer tillbaka rakt: rum-hasse.js rätar upp det på vägen dit)
       if (!v) { R.mx = R.my = 0; setCam(0, 0); }

@@ -660,6 +660,15 @@ bara lokalt. Analyserna visas som de ligger i `data/analyser.json`; hur de skriv
   doften, skål och lillfingret ut. Medan han väntar på att man ska välja tar han kaffet och cigarren
   varannan gång; förut tog han då bara cigarren, så kaffet kom bara medan han låtsades läsa på. Se
   [Hasse Backe](#hasse-backe), *Kaffet*.
+- **Hasse Backe fyller i din kupong (2026-11-05, användarens önskemål):** han får samma kupong som
+  ligger på pulten, med samma grafik och det du redan har fyllt i, och fyller i den med pennan: lite slarvigt,
+  men självklart. Du väljer 1, X eller 2, stort, direkt eller efter analysen, och efter en analys tar han
+  den själv om du inte säger *Låt bli*. Se [Hasse Backe](#hasse-backe), *Din kupong*. 2026-11-06 ersatte den
+  här versionen en annan som hade lagts ut samma dag från en annan session (9c30df2, där han efter analysen
+  frågade om han skulle kryssa i sina tecken och man svarade med knappar). Användaren bad om den bästa av
+  de två, och den här ligger närmast önskemålet: stort 1 X 2 som man väljer fritt, och han börjar själv. Därifrån finns frågan
+  *Vems kupong ska jag fylla i?* kvar. Samma dag ville användaren kunna fylla i matcher man redan har frågat om
+  och välja tecken han inte håller med om: då säger han emot men kryssar ändå.
 - **Hasse Backe njuter av cigarren på elva sätt (2026-11-05, användarens önskemål):** cigarren såg
   skev ut: ansiktet förvreds när han vred huvudet mot askkoppen, handen höll cigarren som en stång,
   och röken lade sig som en fläck över ögat. Nu tittar han mest med ögonen, håller den löst i
@@ -3888,8 +3897,8 @@ en fast bild.
 
 ### Hasse Backe
 
-*Hasse Backe (fiktiv)* analyserar matcherna på stryktipskupongen, och det är allt man kan be
-honom om i baren: inga följdfrågor och ingen textruta. (Vid anslagstavlan kan man också ropa till
+*Hasse Backe (fiktiv)* analyserar matcherna på stryktipskupongen och fyller i din kupong (se
+*Din kupong*), och det är allt man kan be honom om i baren: inga följdfrågor och ingen textruta. (Vid anslagstavlan kan man också ropa till
 honom om en lapp, och han svarar från baren, se [Anslagstavlan](#anslagstavlan).) Han sitter i baren till vänster utanför bilden, och
 längst ut på pulten står hans kaffe vid notan, och där ligger hans hand. Ett klick på dem, eller H,
 och kameran slår snabbt åt vänster till honom. Där sitter han bakom bardisken, mitt emot väggen med
@@ -4169,8 +4178,8 @@ rakt in i kameran och syntes inte, så det sättet är borttaget.
 vet vem du är. Han talar i hela meningar som går att förstå för sig: han säger vad det gäller (*Vilken match vill du ha hjälp med nu då?*, inte *Vilken match är det nu då?*), och "den" syftar bara på matchen du har valt. Över matchlistan finns alltid plats för två rader, så att listan står still vad han än säger. Man svarar genom att välja en match. Då frågar han tillbaka (*Den är solklar. Vill du
 veta, eller ska du gissa?*), och först *Jag är idel öra* ger analysen (knappen lottas som hans repliker: också *Tala om det för mig*), så att ett felklick inte visar ett tips. *Jag gissar* går tillbaka till listan och
 *Matchbladet* till matchen. Svaren står direkt under hans fråga, som lappar i tipskupongens tryck
-som ligger på disken: *Jag är idel öra* i terrakotta som kupongens band, *Jag gissar* i krämvitt papper
-bredvid, båda med en tunn ram innanför kanten, och *Matchbladet →* under dem med små spärrade
+som ligger på disken: stort 1 X 2 överst (se *Din kupong*), *Jag är idel öra* i terrakotta som kupongens band, *Jag fyller i själv* i krämvitt papper
+bredvid (*Jag gissar* när kupongen inte går att fylla i), båda med en tunn ram innanför kanten, och *Matchbladet →* under dem med små spärrade
 versaler som texten i bandet. Frågan har sin plats från början, osynlig tills han säger den, så att
 knapparna inte flyttar sig. Förut stod svaren som små länkar längst ned i spalten och syntes knappt
 i telefonen, och sedan som piller i guld (ändrat 2026-11-04). *Nästa match* efter analysen är samma
@@ -4217,6 +4226,43 @@ rörelse i systemet står allt direkt, utan gester.
 Replikerna går att använda till annat: `RumHasse.repliker(lista, { i, sen, direkt })`, där varje
 replik är `{ text, gest?, vid?, ny?, skrift? }` och gesten ett namn i `RumHasse.gester`, ett klipp på
 figurens tidslinje. Munnen följer texten också under gesterna (fjärde argumentet till `rita`).
+
+**Din kupong.** Han fyller i din kupong åt dig
+([public/rum-hasse-kupong.js](public/rum-hasse-kupong.js)). När du har valt en match står 1, X och 2 stort,
+i kupongens tryck och med samma kryss som på kupongen, och du kan välja direkt eller trycka på *Jag är idel öra*
+först för att höra analysen. Väljer du ett tecken säger han *Ge hit kupongen* och får den: det är samma kupong som på
+pulten, ritad av samma kod (`Rum.kupong`, `couponHtml` i [public/rum.js](public/rum.js)) med samma kryss,
+slitage, stämpel, namn och fält, och det han skriver hamnar i samma utkast (`Samtal.pult.tippa`). Efter en analys tar han
+kupongen själv och skriver det han just har sagt, om du inte redan har något på raden. Väljer du ett annat tecken
+medan han håller på skriver han ditt i stället. Står det redan ett kryss i rutan du väljer suddar han det. Väljer du
+något han inte har sagt säger han emot (*Jag håller inte med, men det är din kupong.*) men kryssar det ändå, och väljer
+du hans tecken håller han med. Rutorna står också under en match du redan har frågat om, under det han sa då, så att
+du kan fylla i den eller byta tecken utan att höra analysen igen; det han säger om kupongen står då på raden där han
+erbjöd sig att titta igen (i telefonen sist i texten, så att allt ryms). Vet kupongen inte vem du är frågar han först
+*Vems kupong ska jag fylla i?*, med efternamnen på dem som inte har lämnat in i rutornas ställe, och den du väljer blir
+den du är, som när du väljer namn på kupongen (`Samtal.pult.vem`). *Låt bli*
+står i stället för *Matchbladet* medan han håller på: han lägger tillbaka pennan, suddar det han hann skriva och
+lämnar tillbaka kupongen, och sedan tar han den inte själv efter analyserna förrän du har valt ett tecken igen (på
+enheten, `profeterna.hasse.fyller`). Han fyller bara i kupongen medan den går att fylla i. Är den inlämnad eller
+visas allas tips ser samtalet ut som förut, med *Jag gissar*.
+
+Kupongen kommer upp underifrån så stor att den går att läsa, står en stund och glider in under hans händer på disken. Den
+är ett plan i figurens värld: på disken med rätt perspektiv, mellan disken och figurens duk så att händerna ligger
+ovanpå den, och på vägen dit ett plan som rör sig genom luften. Varje läge räknas genom figurens kamera om till en
+`matrix3d`, och mellanbilderna är färdiga, så att grafikprocessen spelar upp dem själv. Han tar pennan som ligger på
+den (klippen `skriv1`–`skriv3`, ett per antal kryss, i [public/rum-hasse-3d.js](public/rum-hasse-3d.js)), den
+vänstra handen drar sig undan till kupongens övre hörn, och han tittar ned och sedan upp på en med höjda bryn medan han
+skriver, för det är så självklart att han inte behöver titta. Det är pennan som styr, som med cigarren: spetsens väg räknas fram i
+kupongens mått, handen ur greppet och armen ur handen, och bläcket följer spetsen bild för bild (`steg`). Pennan hörs
+(`skrap`, om ljudet är på). Hans kryss är större än dina och går ut över rutans kanter (`slarv` i rum.js), och de ser
+likadana ut på pulten efteråt; vilka kryss som är hans minns enheten (`profeterna.hasse.kryss`), och kryssar du om
+det själv är det ditt. På papperet under Kupong är de vanliga kryss.
+
+Första gången under ett besök visar han upp kupongen när han har skrivit, så att man ser vad det blev (ett klick lägger
+tillbaka den), och sedan ligger den kvar på disken medan du går vidare. *Nästa match* tar nästa match som du inte har något
+på. Ett klick på kupongen och du har den i handen, och ett klick till och den är borta, och då tar han den inte
+själv efter analyserna. I listan står det du har på raden för hand, i en egen spalt längst ut, efter tecknen han har sagt. Med minskad rörelse står allt
+direkt. På disken är kupongen hopklämd av perspektivet, som notan, och det är därför man får se den stor.
 
 **Rösten.** Analysen är densamma som i matchbladet, skriven i förväg (se [Analyserna](#analyserna)):
 direkt efter artikeln och tipset säger Claude det viktigaste ur dem med hans röst, utan verktyg

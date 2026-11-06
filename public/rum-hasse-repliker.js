@@ -65,9 +65,9 @@
     'Den har jag på en lapp här.',
   ],
   fragaTillbaka: ['Vill du veta, eller ska du gissa?', 'Vill du ha svaret, eller gissar du?', 'Ska jag säga hur det går, eller gissar du?'],
-  // Knappen som tar fram analysen: ditt svar, bredvid Jag gissar.
+  // Knappen som tar fram analysen: ditt svar, bredvid Jag fyller i själv (Jag gissar om kupongen inte går att fylla i).
   lar: ['Jag är idel öra', 'Tala om det för mig'],
-  // Trycker man på Jag gissar.
+  // Trycker man på Jag fyller i själv eller Jag gissar.
   gissar: ['Då får du skylla dig själv.', 'Gissa du, det har gått förr.'],
   // Direkt när man har bett om analysen.
   reaktion: ['Där frågade du rätt man.', 'Nu ska du få höra.'],
@@ -151,6 +151,26 @@
     fler: ['På din kupong har du {du}. Så många tecken behövs inte.'],
     korsar: ['{Bada} kan du behålla på din kupong, men stryk resten.', 'På din kupong har du {du}. {Bada} får du behålla.'],
     skilda: ['På din kupong har du {du}, och det kan du glömma.'],
+  },
+
+  // Din kupong: han tar den och fyller i den (rum-hasse-kupong.js), antingen det du väljer eller det han
+  // själv har sagt. hit: när han tar den, skriver: när det är gjort, gardera: när han har skrivit flera.
+  fyller: {
+    hit: ['Ge hit kupongen.', 'Ge mig kupongen.', 'Ge hit, så tar jag det.'],
+    // när kupongen inte vet vem du är: efternamnen står i rutornas ställe
+    vem: 'Vems kupong ska jag fylla i?',
+    skriver: {
+      1: ['Det blir etta. Så är det bara.', 'Etta, det är självklart.', 'Hemmalaget vinner den. Mer än så är det inte.'],
+      X: ['Det blir kryss. Så är det bara.', 'Kryss, det är självklart.', 'Ingen vinner den. Mer än så är det inte.'],
+      2: ['Det blir tvåa. Så är det bara.', 'Tvåa, det är självklart.', 'Bortalaget vinner den. Mer än så är det inte.'],
+    },
+    gardera: ['Nu är den garderad. Det är också ett svar.', 'Där har du den. Det är solklart.'],
+    // du väljer det han sa, och du väljer något annat: då säger han emot, men kryssar det ändå
+    medhall: ['Bra, du börjar lära dig.', 'Vad var det jag sa?', 'Där ser du.'],
+    emot: ['Jag håller inte med, men det är din kupong.', 'Fel tecken, men jag kryssar det.', 'Jag kryssar, du betalar.', 'Det är dina pengar, inte mina.'],
+    suddar: ['Då suddar vi det.', 'Som om det aldrig hänt.'],
+    // Låt bli
+    bort: ['Som du vill.', 'Då får du fylla i den själv.', 'Det är din kupong.'],
   },
 
   // När något inte går.

@@ -2,8 +2,8 @@
 // fatet när den landar efter slaget eller när han ställer ned den. Allt räknas fram med Web Audio när
 // det hörs, utan ljudfiler, och lite olika varje gång.
 //
-// spela(ctx, { typ: 'dunk' | 'klirr', styrka, sort, mjuk }), från figurens händelser
-// (handelser i rum-hasse-3d.js). sort: 'hand' (handflatan), 'nave' (lillfingersidan av näven) eller
+// spela(ctx, { typ: 'dunk' | 'klirr' | 'skrap', styrka, sort, mjuk, ms }), från figurens händelser
+// (handelser i rum-hasse-3d.js) och pennan på din kupong (rum-hasse-kupong.js). sort: 'hand' (handflatan), 'nave' (lillfingersidan av näven) eller
 // 'bada' (båda händerna). mjuk: koppen ställs ned, inte tappas.
 
 const brus = new WeakMap();
@@ -131,6 +131,27 @@ function skrammel(ctx, mal, t, s) {
   }
 }
 
+// Pennan mot papperet och disken under: ett kort, torrt skrap.
+function skrap(ctx, mal, t, s, ms) {
+  const o = ut(ctx, mal, -0.1);
+  const lang = ms / 1000;
+  for (const [typ, f, q, a] of [['bandpass', slump(2500, 3300), 0.7, 0.2], ['bandpass', slump(700, 950), 1.1, 0.12]]) {
+    const b = ctx.createBufferSource();
+    b.buffer = bruset(ctx);
+    const fl = ctx.createBiquadFilter();
+    fl.type = typ;
+    fl.frequency.value = f;
+    fl.Q.value = q;
+    const g = ctx.createGain();
+    g.gain.setValueAtTime(0, t);
+    g.gain.linearRampToValueAtTime(a * s, t + 0.012);
+    g.gain.setValueAtTime(a * s, t + lang * 0.7);
+    g.gain.linearRampToValueAtTime(0, t + lang);
+    b.connect(fl).connect(g).connect(o);
+    b.start(t, Math.random() * 0.5, lang + 0.02);
+  }
+}
+
 export function spela(ctx, e) {
   if (!ctx || ctx.state !== 'running') return;
   const t = ctx.currentTime + 0.01;
@@ -138,4 +159,5 @@ export function spela(ctx, e) {
   const mal = slutet(ctx);
   if (e.typ === 'dunk') dunk(ctx, mal, t, s, e.sort);
   else if (e.typ === 'klirr' && s > 0.02) klirr(ctx, mal, t, s, e.mjuk);
+  else if (e.typ === 'skrap') skrap(ctx, mal, t, s, e.ms);
 }

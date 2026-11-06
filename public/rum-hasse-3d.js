@@ -18,7 +18,7 @@
 // tidslinjen (KLIPP): fler sätt att slå domen i disken, kaffet (sex sätt), cigarren, småsakerna medan han
 // väntar och händerna medan han pratar (talet).
 import * as THREE from 'three';
-import { ATLAS, LJUS, ARM, KAMERA, BORD_GLSL, CIGARR, ASKKOPP, DAG, LYS, laddaFoto, laddaHand, byggArm, byggKopp, byggCigarr, byggAskkopp, byggRok } from './rum-hasse-arm.js';
+import { ATLAS, LJUS, ARM, KAMERA, BORD_GLSL, CIGARR, ASKKOPP, DAG, LYS, laddaFoto, laddaHand, byggArm, byggKopp, byggCigarr, byggAskkopp, byggRok, byggPenna, PENNA } from './rum-hasse-arm.js';
 import { SCEN, BAK, kamera as scenKamera, iKamera, disken, franBaren } from './rum-hasse-scen.js';
 
 const DEG = Math.PI / 180;
@@ -29,6 +29,13 @@ const spar = (k, t) => {
   for (let i = 1; i < k.length; i++) if (t <= k[i][0]) return k[i - 1][1] + (k[i][1] - k[i - 1][1]) * ss(k[i - 1][0], k[i][0], t);
   return k[k.length - 1][1];
 };
+
+// Tiderna när han skriver på din kupong (s, i klippets tid): armen till pennan och greppet, pennan till
+// första rutan, kryssen med en stund emellan och vägen tillbaka.
+const SKRIV = { MOT: 0.85, LYFT: 0.6, NED: 0.09, DRAG: 0.17, UPP: 0.06, OVER: 0.14, NED2: 0.05, DRAG2: 0.2, EFTER: 0.14, MELLAN: 0.2, HALL: 0.65, TILLBAKA: 0.7, HEM: 1 };
+SKRIV.KRYSS = SKRIV.NED + SKRIV.DRAG + SKRIV.UPP + SKRIV.OVER + SKRIV.NED2 + SKRIV.DRAG2 + SKRIV.EFTER;
+function skrivSlut(n) { return SKRIV.MOT + SKRIV.LYFT + n * SKRIV.KRYSS + (n - 1) * SKRIV.MELLAN; }
+function skrivTid(n) { return skrivSlut(n) + SKRIV.HALL + SKRIV.TILLBAKA + SKRIV.HEM; }
 
 // ---------- klippen ----------
 // Rörelserna är klipp på en tidslinje (rum-hasse.js spelar dem): fran–till, och där han står efteråt
@@ -127,6 +134,10 @@ export const KLIPP = {
   nojd: { fran: 380, till: 383.6, vila: 5.5, start: 5.5, grupp: 'tal', dunk: [[1.15, 0.22, 'hand'], [1.75, 0.28, 'hand']] },
   // handen rullar framåt: och så rullar det på
   rulla: { fran: 385, till: 388.6, vila: 5.5, start: 5.5, grupp: 'tal' },
+  // din kupong: tar pennan, skriver ett, två eller tre kryss (SKRIV) och lägger tillbaka den
+  skriv1: { fran: 395, till: 395 + skrivTid(1), vila: 0, skynda: true },
+  skriv2: { fran: 405, till: 405 + skrivTid(2), vila: 0, skynda: true },
+  skriv3: { fran: 415, till: 415 + skrivTid(3), vila: 0, skynda: true },
 };
 for (const k of Object.values(KLIPP)) {
   if (k.dunk) k.dom = k.fran + k.dunk.reduce((a, b) => (b[1] > a[1] ? b : a))[0];
@@ -134,7 +145,7 @@ for (const k of Object.values(KLIPP)) {
 
 // ---------- figuren ----------
 
-export { KAMERA, SCEN, BAK, DAG, LYS };
+export { KAMERA, SCEN, BAK, DAG, LYS, KAM };
 export const D = KAMERA.CZ;
 const KAM = scenKamera();
 const DK = disken();
@@ -1786,6 +1797,30 @@ export async function figuren(duk, { hog = false, latt = false, pr = 1 } = {}) {
   // Klippen in i tidslinjen: nycklarna i tidslinjens tid, med början och slut.
   const KL = [];
   const tom = (a = 0, b = 0) => [[0, a], [1e-3, b]];
+  const HALLER_B = [[vb.W[0] + 85, vb.W[1] - 6, vb.W[2] - 190], [0.7, -0.62, 0.32], [-0.08, -0.2, 0.97], [-0.1, -0.98, 0.12], 0.34, 0];
+  // Din kupong: han tittar ned och tar pennan, och när han skriver tittar han på en med höjda bryn, för
+  // det är så självklart att han inte behöver titta. När det är gjort är han nöjd.
+  for (const n of [1, 2, 3]) {
+    const E = skrivSlut(n);
+    const T = skrivTid(n);
+    RORELSER[`skriv${n}`] = {
+      k: {
+        yaw: [[0.1, 0], [0.6, -0.25], [SKRIV.MOT + 0.35, -0.2], [SKRIV.MOT + 0.75, 0.1], [T - 1.2, 0.1], [T, 0]],
+        pitch: [[0.1, 0], [0.55, 1.2], [SKRIV.MOT + 0.35, 1.2], [SKRIV.MOT + 0.75, 0.5], [E, 0.45], [E + 0.3, 0.15], [T - 1.3, 0.15], [T - 0.9, 0.75], [T - 0.4, 0.5], [T, 0]],
+        lut: [[0.3, 0.03], [SKRIV.MOT + 0.3, 0.075], [E, 0.08], [E + 0.5, 0.025], [T - 0.9, 0.04], [T, 0]],
+        vrid: [[0.3, -0.02], [SKRIV.MOT + 0.3, 0.05], [E, 0.06], [E + 0.5, 0.01], [T, 0]],
+        axV: [[0.3, 8], [SKRIV.MOT, 20], [E, 22], [E + 0.5, 12], [T - 0.6, 8], [T, 0]],
+        brynX: [[0.2, 0], [SKRIV.MOT + 0.4, 0.1], [SKRIV.MOT + 0.8, 0.55], [E, 0.6], [E + 0.3, 0.7], [T - 0.9, 0.35], [T - 0.2, 0]],
+        brynY: [[0.2, 0], [SKRIV.MOT + 0.4, 0.1], [SKRIV.MOT + 0.8, 0.5], [E, 0.55], [E + 0.3, 0.65], [T - 0.9, 0.3], [T - 0.2, 0]],
+        blund: [[0.2, 0], [0.55, 0.42], [SKRIV.MOT + 0.35, 0.42], [SKRIV.MOT + 0.65, 0], [T - 1.1, 0], [T - 0.85, 0.3], [T - 0.5, 0.12], [T, 0]],
+        le: [[E - 0.1, 0], [E + 0.45, 0.72], [T - 1, 0.55], [T - 0.1, 0.1]],
+        kis: [[E + 0.1, 0], [E + 0.5, 0.25], [T - 1, 0.1]],
+      },
+      // den vänstra handen drar sig undan till kupongens övre hörn och håller i den, så att rutorna syns
+      B: [[0.2, ...VILA_B], [0.95, ...HALLER_B], [T - 1, ...HALLER_B], [T - 0.2, ...VILA_B]],
+      pen: { n },
+    };
+  }
   for (const [namn, o] of Object.entries(RORELSER)) {
     const m = KLIPP[namn];
     const { fran, till, vila = 0, start = 0 } = m;
@@ -1797,7 +1832,7 @@ export async function figuren(duk, { hog = false, latt = false, pr = 1 } = {}) {
     const d = {};
     for (const x of KANAL) d[x] = abs(o.k && o.k[x], Sa[x] - S0[x], Sb[x] - S0[x], Sa[x] - S0[x]);
     for (const x of ANSIKTE) if (o.k && o.k[x]) d[x] = abs(o.k[x]);
-    const k = { namn, fran, till, d, kaffe: o.kaffe, cig: o.cig, dunk: (m.dunk || []).map(([t, s, sort]) => [fran + t, s, sort]) };
+    const k = { namn, fran, till, d, kaffe: o.kaffe, cig: o.cig, pen: o.pen, dunk: (m.dunk || []).map(([t, s, sort]) => [fran + t, s, sort]) };
     // armarna: mellan klippen i vilan
     const armar = (K, nycklar, vila_, pol) => {
       if (!nycklar) return;
@@ -2194,6 +2229,157 @@ export async function figuren(duk, { hog = false, latt = false, pr = 1 } = {}) {
     for (let i = 0; i < 4; i++) extraC[i] = EXTRA_C[i] * g;
     return extraC;
   }
+  // ---------- pennan ----------
+  // Din kupong ligger på disken (rum-hasse-kupong.js säger var), med pennan på sig. Det är pennan som
+  // styr, som med cigarren: spetsens väg räknas fram i kupongens mått, handen räknas ur greppet och
+  // armen ur handen. Han håller den som man håller en penna: den går från greppet (mellan tummen och
+  // fingrarna) snett bakåt mot tumsidan och spetsen ut bortom fingertopparna. Så skriver han lite
+  // snett över rutan, och handen skymmer inte rutan.
+  const pen = byggPenna(bord);
+  S.add(pen.mesh);
+  // greppet i handens mått (mot tummen, längs fingrarna, ut ur handflatan), hur långt det är från
+  // spetsen, spetsens riktning när han skriver och handflatan då
+  const PG = { x: 34, y: 122, z: 84, SP: 80 };
+  const T_SKRIV = V3(0.5, -0.7, 0.5).normalize();
+  const P_SKRIV = V3(0.75, -0.45, -0.1);
+  const P_TA = V3(0, -1, 0);
+  // vinkeln (i handens plan) från tummen till spetsen när han skriver och när han tar pennan
+  const V_SKRIV = 128 * DEG;
+  const V_TA = 180 * DEG;
+  const KPG = { o: v(), ex: v(), ey: v(), upp: V3(0, 1, 0), vila: null, vilaA: v(), kryss: [], bana: [], synlig: false };
+  const pp = (x, y, h, ut) => ut.copy(KPG.o).addScaledVector(KPG.ex, x).addScaledVector(KPG.ey, y).addScaledVector(KPG.upp, h);
+  // Spetsens väg: [t0, t1, a, b, c] i klippets tid, från a till b (c: böjen), [x, y, höjd] i kupongens
+  // mått. Bläcket följer dragen: varje kryss har tiderna för sina två drag (drag).
+  function banan(kryss) {
+    const bana = [];
+    let t = SKRIV.MOT + SKRIV.LYFT;
+    const ut = [];
+    const H_LUFT = 26;
+    kryss.forEach((k, i) => {
+      const steg = (dur, a, b, c = null) => { bana.push([t, t + dur, a, b, c]); t += dur; };
+      const [s1, s2] = k.drag;
+      if (i) steg(SKRIV.MELLAN, [...kryss[i - 1].drag[1].b, H_LUFT], [...s1.a, H_LUFT]);
+      steg(SKRIV.NED, [...s1.a, H_LUFT], [...s1.a, 0]);
+      const d1 = [t, t + SKRIV.DRAG];
+      steg(SKRIV.DRAG, [...s1.a, 0], [...s1.b, 0], [...s1.c, 0]);
+      steg(SKRIV.UPP, [...s1.b, 0], [...s1.b, H_LUFT]);
+      steg(SKRIV.OVER, [...s1.b, H_LUFT], [...s2.a, H_LUFT]);
+      steg(SKRIV.NED2, [...s2.a, H_LUFT], [...s2.a, 0]);
+      const d2 = [t, t + SKRIV.DRAG2];
+      steg(SKRIV.DRAG2, [...s2.a, 0], [...s2.b, 0], [...s2.c, 0]);
+      steg(SKRIV.EFTER, [...s2.b, 0], [...s2.b, 60]);
+      ut.push([d1, d2]);
+    });
+    return { bana, tider: ut };
+  }
+  const tipp = v();
+  function spets(tau, ut) {
+    const b = KPG.bana;
+    if (!b.length) return pp(0, 0, 40, ut);
+    if (tau <= b[0][0]) { const a = b[0][2]; return pp(a[0], a[1], a[2], ut); }
+    for (const [t0, t1, a, e, c] of b) {
+      if (tau > t1) continue;
+      const u = ss(t0, t1, tau);
+      if (c) {
+        const w = 1 - u;
+        return pp(w * w * a[0] + 2 * w * u * c[0] + u * u * e[0], w * w * a[1] + 2 * w * u * c[1] + u * u * e[1], 0, ut);
+      }
+      return pp(a[0] + (e[0] - a[0]) * u, a[1] + (e[1] - a[1]) * u, a[2] + (e[2] - a[2]) * u, ut);
+    }
+    const a = b[b.length - 1][3];
+    return pp(a[0], a[1], a[2], ut);
+  }
+  const qV = new THREE.Quaternion();
+  const qS = new THREE.Quaternion();
+  const qN = new THREE.Quaternion();
+  const pA = v();
+  const pP = v();
+  const pF = v();
+  const pW = v();
+  const pH = v();
+  const pX = v();
+  const pK = v();
+  const pB = new THREE.Matrix4();
+  // pennans läge som kvaternion: y mot änden, z ut ur handflatan
+  function pennQ(q, A, P) {
+    pA.copy(A).normalize();
+    pF.crossVectors(pA, P).normalize();
+    pP.crossVectors(pF, pA);
+    pB.makeBasis(pF, pA, pP);
+    return q.setFromRotationMatrix(pB);
+  }
+  pennQ(qS, T_SKRIV.clone().negate(), P_SKRIV);
+  // Spetsen och pennans riktning vid tau. → hur mycket fingrarna har den (0–1), vinkeln i handen
+  function pennLage(tau, n) {
+    const E = skrivSlut(n);
+    const G0 = SKRIV.MOT;
+    const LYFT1 = G0 + SKRIV.LYFT;
+    const G1 = E + SKRIV.HALL + SKRIV.TILLBAKA;
+    const liggerH = (x) => pp(KPG.vila.x, KPG.vila.y, PENNA.R + 0.5, x);
+    let f = 0;
+    if (tau <= G0) { liggerH(tipp); qN.copy(qV); f = 0; } else if (tau < LYFT1) {
+      f = ss(G0, LYFT1, tau);
+      liggerH(tipp);
+      spets(LYFT1, pX);
+      tipp.lerp(pX, f);
+      tipp.y += 60 * Math.sin(f * Math.PI);
+      qN.slerpQuaternions(qV, qS, f);
+    } else if (tau < E + SKRIV.HALL) {
+      f = 1;
+      spets(tau, tipp);
+      // han håller pennan uppe en stund efteråt
+      tipp.y += 34 * ss(E, E + 0.3, tau);
+      qN.copy(qS);
+    } else {
+      f = 1 - ss(E + SKRIV.HALL, G1, tau);
+      spets(E + SKRIV.HALL, pX);
+      pX.y += 34;
+      liggerH(tipp);
+      tipp.lerp(pX, f);
+      tipp.y += 70 * Math.sin(f * Math.PI);
+      qN.slerpQuaternions(qV, qS, f);
+    }
+    return f;
+  }
+  function pennArm(t, Sk, a, c) {
+    const n = c.n;
+    const tau = t - c.fran;
+    const E = skrivSlut(n);
+    const T = skrivTid(n);
+    const f = pennLage(tau, n);
+    pA.set(0, 1, 0).applyQuaternion(qN);
+    pP.set(0, 0, 1).applyQuaternion(qN);
+    // pennan på sin plats
+    pB.makeRotationFromQuaternion(qN).setPosition(tipp);
+    pen.mesh.matrix.copy(pB);
+    pen.mesh.matrixWorldNeedsUpdate = true;
+    // handens mått ur pennans: spetsens riktning T, och i handens plan w = P × T
+    const vk = V_TA + (V_SKRIV - V_TA) * f;
+    pX.copy(pA).negate();
+    pW.crossVectors(pP, pX);
+    pF.copy(pX).multiplyScalar(Math.sin(vk)).addScaledVector(pW, Math.cos(vk));
+    pK.copy(pX).multiplyScalar(Math.cos(vk)).addScaledVector(pW, -Math.sin(vk));
+    pH.copy(tipp).addScaledVector(pA, PG.SP).addScaledVector(pK, -PG.x).addScaledVector(pF, -PG.y).addScaledVector(pP, -PG.z);
+    // handleden, och armbågen ut åt sidan och nedåt
+    cPol.fromArray(VILA_A[1]).normalize();
+    vristTill(Sk, pH, cPol, cU);
+    const mot = ss(0.05, SKRIV.MOT, tau) * (1 - ss(T - SKRIV.HEM, T - 0.05, tau));
+    a.w.lerp(cW, mot);
+    a.w.y += 90 * mot * (1 - mot);
+    a.pol.normalize().lerp(cPol, mot);
+    a.F.lerp(pF, mot);
+    a.P.lerp(pP, mot);
+    const lg = T - SKRIV.HEM;
+    a.krok = tau < 0.55 ? VILA_A[4] + (0.1 - VILA_A[4]) * ss(0.1, 0.55, tau)
+      : tau < lg + 0.2 ? 0.1 + 0.38 * ss(SKRIV.MOT - 0.2, SKRIV.MOT, tau) * (1 - ss(lg - 0.1, lg + 0.1, tau))
+        : 0.1 + (VILA_A[4] - 0.1) * ss(lg + 0.2, T - 0.1, tau);
+    a.peka = 0;
+    const g = ss(SKRIV.MOT - 0.2, SKRIV.MOT, tau) * (1 - ss(lg - 0.1, lg + 0.1, tau));
+    for (let i = 0; i < 4; i++) extraC[i] = [0, 0.04, 0.16, 0.26][i] * g;
+    void E;
+    return extraC;
+  }
+
   // ---------- kaffet ----------
   // Det är koppen som styr, som med cigarren: dess läge räknas fram och handen sitter i örat med samma
   // grepp hela vägen, fingrarna mot koppen, pekfingret genom örat, tummen ovanpå och handflatan mot
@@ -2499,6 +2685,16 @@ export async function figuren(duk, { hog = false, latt = false, pr = 1 } = {}) {
     hoppar(t);
     // cigarren ligger i askkoppen, eller i hans hand
     let extraA = null;
+    const pc = kl && kl.pen;
+    if (pc) extraA = pennArm(t, sa, a, { n: pc.n, fran: kl.fran });
+    else if (KPG.synlig) {
+      // pennan ligger på kupongen
+      pp(KPG.vila.x, KPG.vila.y, PENNA.R + 0.5, tipp);
+      pB.makeRotationFromQuaternion(qV).setPosition(tipp);
+      pen.mesh.matrix.copy(pB);
+      pen.mesh.matrixWorldNeedsUpdate = true;
+    }
+    pen.mesh.visible = KPG.synlig;
     if (cc) extraA = cigarrArm(t, sa, a, cc);
     else {
       cigarrLage(0, cp, null);
@@ -2598,6 +2794,27 @@ export async function figuren(duk, { hog = false, latt = false, pr = 1 } = {}) {
       trumHand = hand;
       trumT = sistaN + 0.05;
     },
+    // Din kupong på disken, eller null när den inte ligger där: o, ex, ey (kupongens mått → världen),
+    // vila: var pennan ligger { x, y, a } (spetsen, och riktningen mot änden i grader).
+    kupong(k) {
+      KPG.synlig = Boolean(k);
+      if (!k) { pen.mesh.visible = false; return; }
+      KPG.o.fromArray(k.o);
+      KPG.ex.fromArray(k.ex);
+      KPG.ey.fromArray(k.ey);
+      KPG.vila = k.vila;
+      const a = k.vila.a * DEG;
+      KPG.vilaA.copy(KPG.ex).normalize().multiplyScalar(Math.cos(a)).addScaledVector(pX.copy(KPG.ey).normalize(), Math.sin(a)).normalize();
+      pennQ(qV, KPG.vilaA, P_TA);
+    },
+    // Vad han ska skriva: [{ drag: [{ a, b, c }, { a, b, c }] }] med [x, y] i kupongens mått. → klippets
+    // namn och tiderna för dragen, [[[t0, t1], [t0, t1]], …] i klippets tid.
+    skriv(kryss) {
+      const { bana, tider } = banan(kryss);
+      KPG.bana = bana;
+      KPG.kryss = kryss;
+      return { klipp: `skriv${kryss.length}`, tider };
+    },
     ror: () => sistaN - trumT < trumS[0] + 0.05,
     info: () => ({ trianglar: r.info.render.triangles, ritanrop: r.info.render.calls, texturer: r.info.memory.textures }),
     ctx: r.getContext(),
@@ -2607,6 +2824,7 @@ export async function figuren(duk, { hog = false, latt = false, pr = 1 } = {}) {
       K.borta();
       ask.borta();
       cig.borta();
+      pen.borta();
       rok.borta();
       A.borta();
       B.borta();

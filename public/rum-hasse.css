@@ -141,3 +141,52 @@
 .rum-hasse-vy.hog .rh-rutor em { width: 1.8em; }
 .rum-hasse-vy.hog .rh-slut { padding-top: 0.3em; }
 @media (prefers-reduced-motion: reduce) { .rh-dom, .rh-slag, .rh-svar { animation: none; } }
+
+/* Din kupong hos honom (rum-hasse-kupong.js): samma kupong som på pulten (rum.css, .rum-kup), på
+   disken mellan bordet och figuren, så att hans händer ligger ovanpå den. I luften ligger den över allt. */
+.rh-kupong { position: absolute; left: 0; top: 0; width: 660px; height: 470px; box-sizing: border-box; padding: 0 22px 0 46px; transform-origin: 0 0; background: linear-gradient(180deg, #f3e9d4, #e7dbc0); color: #2b241b; box-shadow: 0 3px 5px rgba(0, 0, 0, 0.55), 0 14px 24px rgba(0, 0, 0, 0.32); text-shadow: none; line-height: normal; cursor: pointer; pointer-events: auto; outline: none; -webkit-tap-highlight-color: transparent; }
+.rh-kupong.ror { will-change: transform; pointer-events: none; }
+.rh-kupong.over { z-index: 5; box-shadow: 0 30px 60px rgba(0, 0, 0, 0.55); }
+.rum.smal .rh-kupong { width: 420px; height: 620px; padding: 0 16px 0 36px; }
+/* Hans kryss: samma blyerts med mer tryck, ut över rutans kanter (slarv i rum.js) */
+.rum-kup .kryss.hasse path { stroke-width: 2.8; opacity: 0.92; }
+/* Stort 1 X 2 i kupongens tryck */
+.rh-tecken { flex: none; align-self: stretch; display: flex; gap: 10px; margin: 0.9em 0 0; }
+.rh-svar > .rh-tecken { margin: 0; }
+.rh-tecken.gom { visibility: hidden; }
+.rh-ruta { position: relative; flex: 1 1 0; max-width: 112px; height: clamp(58px, 9vh, 76px); padding: 0; border: 2px solid #9a876a; border-radius: 4px; background: var(--korn), #fbf7ec; color: #8a7a60; font: 650 clamp(30px, 5vh, 42px)/1 Fraunces, Georgia, serif; text-shadow: none; cursor: pointer; box-shadow: 0 2px 0 rgba(0, 0, 0, 0.5), 0 8px 16px rgba(0, 0, 0, 0.42); -webkit-tap-highlight-color: transparent; transition: transform 0.12s, box-shadow 0.12s, filter 0.12s; }
+.rh-ruta i { font-style: normal; }
+.rh-ruta .kryss { position: absolute; left: 6%; top: 8%; width: 88%; height: 84%; overflow: visible; pointer-events: none; }
+.rh-ruta .kryss path { fill: none; stroke: #3a3632; stroke-width: 1.5; stroke-linecap: round; stroke-dasharray: 1 2; opacity: 0.9; }
+/* (färgen: knappar blir annars ljusa när man pekar på dem, och lapparna är ljusa) */
+@media (hover: hover) {
+  .rh-ruta:hover { transform: translateY(-1px); color: #5f523c; background: var(--korn), #fbf7ec; border-color: #7d6c50; filter: brightness(1.04); box-shadow: 0 3px 0 rgba(0, 0, 0, 0.5), 0 12px 22px rgba(0, 0, 0, 0.45); }
+  .rh-knapp:not(.huvud):hover { color: #2a231d; background: var(--korn), linear-gradient(172deg, #f8f1e1, #efe5cf 55%, #e1d2b3); }
+  .rh-knapp.huvud:hover { color: #fbf1de; background: var(--korn), linear-gradient(172deg, #d6763f, #c4612f 55%, #a8482a); }
+}
+.rh-ruta:active { transform: translateY(1px); box-shadow: 0 1px 0 rgba(0, 0, 0, 0.5), 0 3px 8px rgba(0, 0, 0, 0.4); }
+.rh-ruta:focus-visible { outline: 2px solid #f0d699; outline-offset: 3px; }
+/* det du själv har på raden, i listan */
+.rh-lista button u { flex: none; width: 2em; margin-left: 0.6em; text-align: right; color: #f6efdc; opacity: 0.82; font: 600 1.18em/1 Caveat, cursive; text-decoration: none; }
+.rum-hasse-vy.hog .rh-ruta { height: 52px; font-size: 28px; max-width: none; }
+.rum-hasse-vy.hog .rh-tecken { margin-top: 0.5em; }
+/* lågt fönster (telefonen på bredden): rutorna och svaren lite mindre, så att allt ryms ovanför foten */
+@media (max-height: 500px) {
+  .rh-svar { margin-top: 0.5em; gap: 8px; }
+  .rh-svar > div { flex-wrap: nowrap; gap: 8px; }
+  .rh-ruta { height: 42px; font-size: 25px; }
+  .rh-svar .rh-knapp { min-height: 40px; padding: 0 0.8em; font-size: 0.92em; }
+  .rh-svar .rh-vag { min-height: 28px; }
+}
+/* telefonen: rutorna och svaren ryms under en match du redan har frågat om, med erbjudandet att titta
+   igen i knappen i stället för på en egen rad (det han säger om kupongen står då sist i texten) */
+.rum-hasse-vy.hog .rh-fragan:has(+ .rh-tecken) { display: none; }
+.rum-hasse-vy.hog .rh-tecken + .rh-slut { gap: 6px 12px; }
+.rum-hasse-vy.hog .rh-tecken + .rh-slut .rh-vag { min-height: 28px; }
+@media (max-height: 500px) {
+  .rh-fragan:has(+ .rh-tecken) { display: none; }
+  .rh-tecken + .rh-slut { gap: 6px 12px; }
+  .rh-tecken + .rh-slut .rh-vag { min-height: 28px; }
+}
+/* vems kupong: efternamnen i rutornas ställe, lika höga */
+.rh-vem .rh-ruta, .rum-hasse-vy.hog .rh-vem .rh-ruta { max-width: none; font-size: clamp(17px, 2.7vh, 23px); }

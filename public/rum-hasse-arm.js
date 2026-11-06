@@ -686,6 +686,44 @@ export function byggCigarr(bord = ingenBord()) {
   };
 }
 
+// ---------- pennan ----------
+// Samma penna som ligger på kupongen (rum.css, .rum-kup .pencil), vit med träspets, lite grövre så att den
+// syns i handen. Blyets spets i origo och y mot änden.
+export const PENNA = { L: 215, R: 7.2, TRA: 30 };
+const PEN_F = `precision highp float;
+varying vec3 vN, vP, vL;
+${LJUS}
+${BORD_GLSL}
+void main() {
+  if (underBord(vP)) discard;
+  vec3 n = normalize(vN);
+  float y = vL.y;
+  // sidorna: ljus, ljusare och mörkare ränder runt om, som på kupongen
+  float a = atan(vL.z, vL.x);
+  vec3 c = mix(vec3(.78, .77, .72), vec3(.95, .95, .92), .5 + .5 * cos(a * 6.));
+  c = mix(vec3(.82, .68, .46), c, smoothstep(${PENNA.TRA}. - .6, ${PENNA.TRA}. + .6, y));
+  c = mix(vec3(.09, .09, .1), c, smoothstep(5.5, 6.5, y));
+  // ringen i änden
+  float ring = smoothstep(${PENNA.L}. - 12., ${PENNA.L}. - 11., y);
+  c = mix(c, vec3(.55, .54, .5), ring);
+  vec3 ut = c * ljus(n);
+  vec3 h = normalize(NYCKEL + normalize(cameraPosition - vP));
+  ut += vec3(1., .95, .88) * pow(max(0., dot(n, h)), 30.) * .25;
+  ut += kant(n, .15);
+  gl_FragColor = vec4(ton(ut), 1.);
+}`;
+export function byggPenna(bord = ingenBord()) {
+  const { L, R, TRA } = PENNA;
+  const g = new THREE.LatheGeometry(V2([[0, 0], [0.9, 0.6], [R, TRA], [R, L - 1], [R - 2, L], [0, L + 0.2]]), 12);
+  const U = { uBord: bord, uButik: bord.butik || BUTIK_AV };
+  const mesh = new THREE.Mesh(g, new THREE.ShaderMaterial({ uniforms: U, vertexShader: CIG_V, fragmentShader: PEN_F, transparent: true, blending: THREE.CustomBlending, blendSrc: THREE.OneFactor, blendDst: THREE.OneMinusSrcAlphaFactor }));
+  mesh.renderOrder = 6;
+  mesh.frustumCulled = false;
+  mesh.matrixAutoUpdate = false;
+  mesh.visible = false;
+  return { mesh, borta() { g.dispose(); mesh.material.dispose(); } };
+}
+
 // ---------- askkoppen ----------
 // Rund och tung, av samma glaserade gods som koppen, med två urtag för cigarren mitt emot
 // varandra (urtaget pekar åt +x). Botten i origo, y uppåt.

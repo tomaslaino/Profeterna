@@ -43,10 +43,10 @@ const UNDERKANT = [
 // Korta meningar som Tomas själv har valt eller som har ett verb.
 const KORTA_OK = new Set(['Bra.', 'Läs här.']);
 
-// Vilka fält som går att fylla var (forstaRad, medDag, vantan, omKupongen och hjalp i rum-hasse.js).
+// Vilka fält som går att fylla var (forstaRad, medDag, vantan och omKupongen i rum-hasse.js).
 // Står det inget för hela vägen (kupong.korsar) gäller det som står för första delen (vantar).
 const FALT = {
-  oppningNamn: ['namn'], tillbakaNamn: ['namn'], hjalpNamn: ['namn'],
+  oppningNamn: ['namn'], tillbakaNamn: ['namn'],
   ledig: ['dag'], vantar: ['dag'],
   resultat: ['res'],
   'kupong.farre': ['du'], 'kupong.fler': ['du'], 'kupong.skilda': ['du'], 'kupong.korsar': ['du', 'Bada'],
@@ -54,10 +54,12 @@ const FALT = {
 // Sidan lottar bland de här, så de måste vara listor.
 const LISTOR = ['oppning', 'oppningNamn', 'tillbaka', 'tillbakaNamn', 'nasta', 'halva', 'allaIgen', 'ledig', 'val', 'valLasa',
   'fragaTillbaka', 'lar', 'gissar', 'reaktion', 'erbjud', 'erbjudNytt', 'tittaIgen', 'vantar.forst', 'vantar.sedan', 'vantar.sist',
-  'avbruten', 'resultat', 'ejKlar', 'hjalp', 'hjalpNamn', 'hjalpTar', 'hjalpKlar', 'hjalpNej', 'anslagSvar',
+  'avbruten', 'resultat', 'ejKlar', 'anslagSvar',
+  'fyller.hit', 'fyller.skriver.1', 'fyller.skriver.X', 'fyller.skriver.2', 'fyller.gardera', 'fyller.medhall', 'fyller.emot',
+  'fyller.suddar', 'fyller.bort',
   'kupong.samma', 'kupong.farre', 'kupong.fler', 'kupong.korsar', 'kupong.skilda'];
 // Knappar och ord, inte meningar.
-const INTE_MENINGAR = ['lar', 'hjalpSvar', 'tecken'];
+const INTE_MENINGAR = ['lar', 'tecken'];
 
 const fel = [];
 const varde = (vag) => vag.split('.').reduce((o, k) => (o == null ? o : o[k]), repliker);
