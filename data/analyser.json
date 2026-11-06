@@ -1,5 +1,5 @@
 {
- "uppdaterad": "2026-11-06T17:20:22.985Z",
+ "uppdaterad": "2026-11-06T17:21:00.440Z",
  "omgang": {
   "id": "2026-11-07-st4978",
   "matcher": [
@@ -64,22 +64,22 @@
    },
    "hasse": {
     "stycken": [
-     "Hull kommer med fem backar i ett 5-4-1, och det är en hederlig plan. Bakom fem backar går det att stå länge. Problemet är att någon ska orka flytta det där blocket fram och tillbaka i nittio minuter, och utan Crooks, Targett och Morita har de helt enkelt inte mittfältare nog. Borta har de dessutom bara fyra poäng på fyra matcher.",
-     "Arsenal har vunnit alla fyra hemmamatcher i ligan och hållit nollan i sex av nio. Att Saka saknas väger lätt när Rice är den som bär laget. Resan till Prag sitter i benen, men det får de lösa själva. Jag är jävligt snäll mot Hull när jag säger att de kan hänga med en stund. Etta."
+     "Hull ställer upp med fem backar och tänker stå där och vänta ut motståndet, och det har gett en hel del kryss. Borta har det däremot bara blivit fyra poäng på fyra matcher. Nu saknar de dessutom både Crooks och Morita på mittfältet, och då finns det ingen kvar som orkar flytta blocket fram och tillbaka i nittio minuter.",
+     "Arsenal har hållit nollan i sex matcher av nio och har vunnit alla hemmamatcher i ligan. Att Saka är borta väger lätt, för det är Rice som bär laget den här hösten. Här höjer jag ett varningens finger, för resan till Prag sitter i benen, men äsch, det springer de av sig. Jag spikar en etta."
     ],
     "tips": "2026-11-06T15:02:15.170Z",
     "uppdrag": {
      "fraser": [
-      "Då är jag jävligt snäll",
-      "Glöm det"
+      "Här höjer jag ett varningens finger",
+      "Äsch"
      ],
      "krydda": null,
      "bielsa": []
     },
     "model": "claude-opus-5-5",
-    "version": "2026-11-04.1",
-    "writtenAt": "2026-11-06T15:02:26.405Z",
-    "attempts": 1
+    "version": "2026-11-05.1",
+    "writtenAt": "2026-11-06T17:20:53.511Z",
+    "attempts": 2
    },
    "model": "claude-opus-5-5",
    "version": "2026-11-04.1",
