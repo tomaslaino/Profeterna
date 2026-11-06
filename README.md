@@ -3581,6 +3581,15 @@ duk över hela fönstret med samma perspektiv som rummet, så att lådan är ska
 lite efter musen, och kortet under pekaren reser sig. Ett klick på ett kort (eller en
 avdelare: det första kortet bakom den): det reser sig ur lådan och tas i handen i läsbar
 storlek, och pilarna (i telefonen ett svep i sidled) bläddrar mellan korten.
+I en stående telefon är det skärmens bredd som sätter lådans storlek, så där lutar lådan
+brantare (42° i stället för 31°) och använder höjden i stället: raderna av flikar glider
+isär, ingen flik skyms längre av korten framför, och flikarna blir i snitt ungefär 30 %
+större att trycka på, medan texten på dem bara blir lite lägre (2026-11-06). Med
+fingret reser sig kortet under fingret så högt att fliken syns ovanför fingertoppen, byts
+när fingret glider över lådan och tas i handen när fingret släpper; släpper det utanför
+lådan händer ingenting. Vilket kort som står under fingret räknas som om alla kort stod
+nere i lådan, så att det upplyfta kortet inte skymmer de andra, och lådan lutar bara
+efter musen: förut lutade den mot fingret i samma ögonblick som kortet valdes.
 Esc, ett klick utanför eller *Sätt tillbaka*
 sätter tillbaka kortet; Esc, R eller ett klick utanför lådan ställer den på disken igen.
 Pekar man på lådan tänds

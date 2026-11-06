@@ -11,15 +11,16 @@
 // på den. Närbilden ritas direkt i en duk över hela fönstret: lådan lyfter
 // från disken, vänder sig mot en och lutar så att man ser ner i den, medan
 // bilden zoomar in (en del av samma bild, så att perspektivet är detsamma och
-// lådan skarp). Kortet under muspekaren reser sig lite, och ett kort som tas
-// upp reser sig ur lådan innan det tas i handen.
+// lådan skarp). Kortet under muspekaren reser sig lite (under fingret mer),
+// och ett kort som tas upp reser sig ur lådan innan det tas i handen. I en
+// stående telefon lutar lådan brantare (BRANT).
 //
 // Världen: som rum-inredning.js – X = x, Y = −y och Z ut från hörnet mot
 // betraktaren, i högra väggens mått; ögat står i (760, 400) på avståndet
 // 1000, och disken är Y = −490 mellan X = 1060 och väggen i X = 1140.
 //
 // kortlada({ duk, nara, calm, box }) → { deck(cards, wear), paint(), open(on, från) → Promise,
-//   pick(x, y), hover(id), rise(id, up) → Promise, hide(id, on), rect(id), tilt(x, y), frame(), resize() }
+//   pick(x, y, vila), hover(id, finger), rise(id, up) → Promise, hide(id, on), rect(id), tilt(x, y), frame(), resize() }
 
 const DEG = Math.PI / 180;
 const EYE = [760, 400];
@@ -38,6 +39,14 @@ const ETIKETT = 'KARTOTEK';
 // lådan nära: lyft från disken och vänd mot ögat, lutad så att man ser ner i den
 const NARA_AT = { x: POS.x - 24, y: POS.y + 34, z: POS.z + 50 };
 const NARA = { yaw: Math.atan2(EYE[0] - NARA_AT.x, E - NARA_AT.z), pitch: 31 * DEG };
+// I en stående telefon är det bredden som sätter lådans storlek, och höjden
+// räcker till mer: där lutar lådan brantare, så att raderna av flikar glider
+// isär och varje flik syns hel och blir större att trycka på
+const BRANT = 42 * DEG;
+const staende = () => innerWidth < 700 && innerHeight > innerWidth * 1.3;
+// kortet under muspekaren reser sig lite; under fingret så högt att fliken
+// syns ovanför fingertoppen
+const HOV = { mus: 2.4, finger: 9 };
 const hash = (n) => { const x = Math.sin(n * 127.1 + 311.7) * 43758.5453; return x - Math.floor(x); };
 const ease = (t) => (t < 0.5 ? 4 * t * t * t : 1 - Math.pow(-2 * t + 2, 3) / 2);
 const lerp = (a, b, t) => a + (b - a) * t;
@@ -308,10 +317,10 @@ export async function kortlada(o) {
 
   // ---------- lägena ----------
 
-  const S = { open: false, fly: null, tilt: [0, 0], tiltCur: [0, 0], hov: null, rect: null, raf: 0, lyft: new Set() };
+  const S = { open: false, fly: null, tilt: [0, 0], tiltCur: [0, 0], hov: null, hovUp: HOV.mus, rect: null, raf: 0, lyft: new Set() };
   function setPose(t, up = 0) {
     lada.position.set(lerp(POS.x, NARA_AT.x, t), lerp(POS.y, NARA_AT.y, t) + up, lerp(POS.z, NARA_AT.z, t));
-    lada.rotation.set(t * NARA.pitch + S.tiltCur[1] * t, t * NARA.yaw + S.tiltCur[0] * t, 0);
+    lada.rotation.set(t * (staende() ? BRANT : NARA.pitch) + S.tiltCur[1] * t, t * NARA.yaw + S.tiltCur[0] * t, 0);
     lada.updateMatrixWorld(true);
   }
   // Rektangeln (scenens px) som lådan nära ryms i, mitt i fönstret mellan
@@ -461,21 +470,35 @@ export async function kortlada(o) {
     });
   }
 
-  // Kortet under punkten (x, y) i fönstret.
+  // Kortet under punkten (x, y) i fönstret. vila: som om alla kort stod nere
+  // i lådan, så att kortet som reser sig under fingret inte skymmer de andra
+  // och samma punkt alltid ger samma kort.
   const ray = new THREE.Raycaster();
-  function pick(x, y) {
+  function pick(x, y, vila = false) {
     if (!S.rect || S.fly) return null;
     view(S.rect);
+    const gs = [...K.values()].filter((g) => g.visible);
+    if (vila) {
+      for (const g of gs) g.position.y = g.userData.y;
+      kort.updateMatrixWorld(true);
+    }
     ray.setFromCamera(new THREE.Vector2((x / innerWidth) * 2 - 1, 1 - (y / innerHeight) * 2), cam);
-    const hit = ray.intersectObjects([...K.values()].filter((g) => g.visible), true)[0];
+    const hit = ray.intersectObjects(gs, true)[0];
+    if (vila) {
+      for (const g of gs) g.position.y = g.userData.y + g.userData.cur;
+      kort.updateMatrixWorld(true);
+    }
     let g = hit && hit.object;
     while (g && !(g.userData && g.userData.id)) g = g.parent;
     return g ? g.userData.id : null;
   }
-  function hover(id) {
-    if (id === S.hov) return;
+  // Kortet under pekaren reser sig (finger: högre, så att fliken syns ovanför fingret).
+  function hover(id, finger = false) {
+    const up = finger ? HOV.finger : HOV.mus;
+    if (id === S.hov && up === S.hovUp) return;
     S.hov = id;
-    for (const [k, g] of K) if (!S.lyft.has(k)) g.userData.mal = k === id ? 2.4 : 0;
+    S.hovUp = up;
+    for (const [k, g] of K) if (!S.lyft.has(k)) g.userData.mal = k === id ? up : 0;
     kick();
   }
   // Kortet reser sig ur lådan (up) eller sjunker tillbaka.
@@ -483,7 +506,7 @@ export async function kortlada(o) {
     const g = K.get(id);
     if (!g) return Promise.resolve();
     if (up) S.lyft.add(id); else S.lyft.delete(id);
-    g.userData.mal = up ? C.h * 0.82 : id === S.hov ? 2.4 : 0;
+    g.userData.mal = up ? C.h * 0.82 : id === S.hov ? S.hovUp : 0;
     if (o.calm()) { g.userData.cur = g.userData.mal; kick(); return Promise.resolve(); }
     return new Promise((done) => { g.userData.wait = done; kick(); });
   }
