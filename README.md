@@ -3538,14 +3538,22 @@ text-tv:n. Med `prefers-reduced-motion` står tavlan framme direkt.
 **Ropa till Hasse** (2026-11-06, användarens önskemål): under lappen i handen står det man ropar
 till Hasse Backe (fiktiv), som sitter i baren till vänster utanför bilden – *Hasse, vad betyder
 procenten?*, *Hasse, vad är tur och otur?* och så vidare, en fråga per lapp – och ett klick eller
-H, så svarar han därifrån. Man står kvar vid tavlan med lappen i handen, och hans svar kommer ord
-för ord, en mening i taget, i samma stil som hans tal i baren: bredvid lappen, åt baren till, med
-lappen flyttad åt höger och mörkt från vänster som i baren, eller över lappen när de inte ryms
-bredvid varandra (i telefonen och i smala fönster). Med ljudet på (knappen i baren) hörs han från
+H, så lutar han sig in från baren nere till vänster (överkroppen ur kostymfotot,
+`rum/hasse-atlas.webp`) och svarar i en mörk pratbubbla med guldkant, vars spets pekar mot hans
+mun. Det var för otydligt att det var han som talade när svaret stod som vanlig text (användaren,
+2026-11-06; av tre skisser valde hen den där han lutar sig in, framför en ljus serietidningsbubbla
+med porträtt och en diskret rad med namn och talstreck). Man står kvar vid tavlan med lappen i
+handen, och svaret kommer ord för ord, en mening i taget: bredvid lappen, åt baren till, med
+lappen flyttad åt höger, eller över lappen när de inte ryms bredvid varandra (i telefonen och i
+smala fönster). Bubblan täcker aldrig hans ansikte (håret får den): står den ovanför honom slutar
+den ovanför pannan och rullar om svaret inte ryms, och spetsen går ner till höger om ansiktet. I
+telefonen står knapparna under bubblan till höger om spetsen, och i en hög telefon står bubblan
+nära honom så att spetsen inte blir lång (`figur` och `hkPlats` i rum-anslag.js). Han lutar sig
+in på knappa halvsekunden, och med minskad rörelse står allt direkt. Med ljudet på (knappen i baren) hörs han från
 vänster och lite dovt, som från andra sidan affären, och orden kommer i takt med rösten
 (`fjarran` i [public/rum-hasse.js](public/rum-hasse.js)). Han säger vad talen är och hur de räknas
 (samma innehåll som förklaringarna under Statistik → Lagen), ett exempel ur bladet man har framme
-(*Nottingham står överst med 27 %, alltså lite mer än vanligt.*) och vad han själv gör med det, i
+(*Nottingham står överst med 27 %. Det är lite mer än vanligt.*) och vad han själv gör med det, i
 sin egen röst ([prompts/hasse-backe.md](prompts/hasse-backe.md)). Meningarna står under `anslag` i
 [public/rum-hasse-repliker.js](public/rum-hasse-repliker.js), så att de får hans röst som de andra
 replikerna (src/rost.js tar med dem av sig själv); exemplet räknas i sidan ur samma tal som lappen,

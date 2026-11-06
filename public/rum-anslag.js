@@ -42,11 +42,12 @@
 //
 // Under lappen i handen kan man ropa till Hasse Backe (fiktiv), som sitter i
 // baren till vänster utanför bilden (Hasse, vad betyder procenten?, eller H),
-// och han svarar därifrån: vad talen är, ett exempel ur bladet man har framme
-// och vad han själv gör med det. Svaret kommer ord för ord bredvid lappen,
-// eller över den när fönstret är för smalt, och med ljudet på hörs han från
-// vänster (RumHasse.fjarran). Tack, Hasse, Esc eller ett klick utanför tystar
-// honom; ett klick på svaret visar resten direkt.
+// och han lutar sig in nere till vänster och svarar i en pratbubbla: vad talen
+// är, ett exempel ur bladet man har framme och vad han själv gör med det.
+// Svaret kommer ord för ord bredvid lappen, eller över den när fönstret är för
+// smalt, och med ljudet på hörs han från vänster (RumHasse.fjarran). Tack,
+// Hasse, Esc eller ett klick utanför tystar honom; ett klick på svaret visar
+// resten direkt.
 //
 // Dolda resultat (Spoiler): formen får ?, och lapparna som räknar med
 // resultaten (styrkan, krysset, turen, oddsen, motståndet) står med ? och
@@ -497,7 +498,8 @@ window.RumAnslag = (() => {
   function nara() {
     return '<div class="rum-ansn" id="rum-ansn" role="dialog" aria-label="Anslagstavlan"><div class="ans-bak"></div>' +
       '<div class="ans-flyg" id="ans-flyg"><div class="ans-luta" id="ans-luta"><div class="ans-tavla stor" id="ans-stor" tabindex="-1"></div></div></div>' +
-      '<div class="ans-lyft" id="ans-lyft"></div><i class="ans-hasse-mork"></i><div class="ans-hasse" id="ans-hasse" aria-label="Hasse svarar"></div>' +
+      '<div class="ans-lyft" id="ans-lyft"></div><i class="ans-hasse-mork"></i><i class="ans-hasse-fig" aria-hidden="true"></i>' +
+      '<div class="ans-hasse" id="ans-hasse" aria-label="Hasse Backe svarar"></div><svg class="ans-svans" aria-hidden="true"><path class="f"></path><path class="k"></path></svg>' +
       '<div class="ans-rad" id="ans-rad"><span id="ans-sp"></span><button type="button" class="ans-ropa" data-ans="hasse" aria-expanded="false"></button>' +
       '<button type="button" class="ans-tbx" data-ans="tillbaka">Häng tillbaka</button></div></div>';
   }
@@ -540,6 +542,10 @@ window.RumAnslag = (() => {
     const sp = root.querySelector('#ans-sp');
     const hkEl = root.querySelector('#ans-hasse');
     const mork = root.querySelector('.ans-hasse-mork');
+    const figEl = root.querySelector('.ans-hasse-fig');
+    const svans = root.querySelector('.ans-svans');
+    // det som syns när han svarar: han själv, pratbubblan och dess spets
+    const hkDelar = [figEl, hkEl, svans];
     const ropa = root.querySelector('[data-ans="hasse"]');
     if (!vagg || !ov) return null;
     // tavlan på väggen: förminskad till elementets bredd
@@ -919,7 +925,7 @@ window.RumAnslag = (() => {
     // Hasses svar (HK_W brett, HK_G till lappen) står till vänster om lappen,
     // åt baren till, när lappen då kan bli minst 1,3 gånger så stor som på
     // tavlan (bredvid: den största skalan som ryms), annars över lappen.
-    const HK_W = 380;
+    const HK_W = 400;
     const HK_G = 28;
     const bredvid = (n) => (innerWidth - 96 - HK_W - HK_G) / (n.w + (ARK[A.top] ? 18 : 0));
     function held(n, len = n.h) {
@@ -952,6 +958,8 @@ window.RumAnslag = (() => {
       const fore = anim === 'flytta' && !o.calm() ? [card.style.transform, rad.style.top, rad.style.transform || 'none'] : null;
       rad.style.top = `${r1(top + len * h.s + 18)}px`;
       rad.style.transform = `translateX(${r1(h.x - innerWidth / 2)}px)`;
+      rad.style.paddingLeft = '';
+      rad.style.columnGap = '';
       hkPlats(h, top);
       if (anim === 'flytta') {
         card.style.transform = to;
@@ -977,8 +985,8 @@ window.RumAnslag = (() => {
 
     // ---------- Hasse svarar ----------
 
-    // Han svarar från baren, utanför bilden till vänster: svaret står bredvid lappen i
-    // samma stil som hans tal i baren, eller över lappen när det inte får plats bredvid,
+    // Han lutar sig in från baren nere till vänster: svaret står i en pratbubbla bredvid
+    // lappen, eller över lappen när det inte får plats bredvid,
     // och kommer ord för ord, en mening i taget (som repliker i rum-hasse.js). Med ljudet
     // på (knappen i baren) hörs han från vänster och orden kommer i takt med rösten;
     // meningar utan ljud, som exemplet, säger han tyst i skriftens takt. Med minskad
@@ -1116,40 +1124,103 @@ window.RumAnslag = (() => {
       hkEl.classList.add('klar');
     }
 
+    // Hasse lutar sig in från baren, nere till vänster i fönstret: överkroppen ur kostymfotot
+    // (rum/hasse-atlas.webp, samma som i baren), lutad FIG.lut grader kring nedre vänstra
+    // hörnet. FIG är utsnittet i fotots pixlar, ansikte rutan från pannan och ner som
+    // pratbubblan inte får täcka (håret får den) och mun punkten en bit till höger om munnen,
+    // dit bubblans spets pekar.
+    const FIG = { x0: 40, y0: 20, x1: 820, y1: 760, ansikte: [220, 150, 550, 470], mun: [560, 395], lut: 6 };
+    function figur(over) {
+      const H = over ? Math.min(180, Math.max(110, innerHeight * 0.21)) : Math.min(innerHeight * (innerHeight < 760 ? 0.38 : 0.45), 400);
+      const s = H / (FIG.y1 - FIG.y0);
+      const W = (FIG.x1 - FIG.x0) * s;
+      const fx = -W * 0.16;
+      const fy = innerHeight - H + 6;
+      const a = (FIG.lut * Math.PI) / 180;
+      // en punkt i fotot på skärmen
+      const pa = (px, py) => {
+        const u = (px - FIG.x0) * s;
+        const v = (py - FIG.y0) * s - H;
+        return [fx + u * Math.cos(a) - v * Math.sin(a), fy + H + u * Math.sin(a) + v * Math.cos(a)];
+      };
+      const [l, t, rr] = FIG.ansikte;
+      return { H, s, W, fx, fy, pa, topp: pa(l, t)[1], hoger: pa(rr, t)[0] };
+    }
+
     // Svarets plats: bredvid lappen till vänster (h.kort) med överkanten vid lappens, eller
     // mitt över lappen när det inte får plats bredvid – då med raden under svaret i stället
-    // för under lappen. Bakom svaret mörknar det från vänster, som i baren, och över lappen
-    // helt. Ryms svaret inte i fönstret rullar det.
+    // för under lappen. Svaret är en pratbubbla som aldrig täcker hans ansikte: står den
+    // ovanför honom slutar den ovanför hans hår, och ryms svaret inte rullar det. Bakom
+    // mörknar det lite från vänster, som i baren, och över lappen helt.
     function hkPlats(h, top) {
       if (!A.hk) return;
-      const min = innerWidth < 700 ? 72 : 24;
+      // under rummets namn när det syns (det ligger över tavlan)
+      const namn = document.querySelector('.rum-brand');
+      const min = innerWidth < 700 ? 72 : Math.max(24, namn && getComputedStyle(namn).visibility === 'visible' ? namn.getBoundingClientRect().bottom + 12 : 0);
       const over = h.kort == null;
-      hkEl.style.maxHeight = `${Math.max(160, innerHeight - min - (over ? 80 : 24))}px`;
+      const F = figur(over);
+      const w = hkEl.offsetWidth;
+      const x = over ? (innerWidth - w) / 2 : h.kort;
+      // bubblans underkant: ovanför håret när den står ovanför honom, och i telefonen också
+      // plats för raden mellan dem
+      const golv = over ? F.topp - 56 : x < F.hoger + 12 ? F.topp - 14 : innerHeight - 24;
+      hkEl.style.maxHeight = `${r1(Math.max(160, golv - min))}px`;
       const H = hkEl.offsetHeight;
-      const y = Math.max(min, over ? (innerHeight - H - 60) / 2 : Math.min(top, innerHeight - H - 24));
-      const x = over ? (innerWidth - hkEl.offsetWidth) / 2 : h.kort;
+      const [mx, my] = F.pa(...FIG.mun);
+      // (i en hög telefon står bubblan så nära honom att spetsen inte blir längre än ~170 px)
+      const y = Math.max(min, over ? Math.min(golv - H, Math.max((min + golv - H) / 2, my - 170 - H)) : Math.min(top, golv - H));
       hkEl.style.left = `${r1(x)}px`;
       hkEl.style.top = `${r1(y)}px`;
       mork.classList.toggle('over', over);
-      mork.style.width = over ? '' : `${r1(x + hkEl.offsetWidth + 40)}px`;
+      mork.style.width = over ? '' : `${r1(x + w + 40)}px`;
+      figEl.style.cssText = `left:${r1(F.fx)}px; top:${r1(F.fy)}px; width:${r1(F.W)}px; height:${r1(F.H)}px; ` +
+        `background-size:${r1(1372 * F.s)}px auto; background-position:${r1(-FIG.x0 * F.s)}px ${r1(-FIG.y0 * F.s)}px; transform:rotate(${FIG.lut}deg)`;
+      // Spetsen går från bubblans kant mot munnen: från underkanten när munnen är lägre än
+      // bubblan, annars från vänsterkanten. Foten ligger 2 px inne i bubblan, över ramen.
+      const b = y + H;
+      let f1;
+      let f2;
+      if (my > b - 30) {
+        // till höger om ansiktet, så att den inte går över det
+        const bx = Math.max(x + 26, Math.min(F.hoger + 4, x + w - 80));
+        f1 = [bx, b - 2];
+        f2 = [bx + 28, b - 2];
+      } else {
+        const by = Math.max(y + 24, Math.min(my - 40, b - 54));
+        f1 = [x + 2, by];
+        f2 = [x + 2, by + 30];
+      }
+      // raden under bubblan i telefonen står till höger om spetsen
       if (over) {
         rad.style.top = `${r1(y + H + 8)}px`;
         rad.style.transform = 'translateX(0px)';
+        if (my > b - 30) {
+          rad.style.paddingLeft = `${r1(f2[0] + 10)}px`;
+          rad.style.columnGap = '16px';
+        }
       }
+      const p = (q) => `${r1(q[0])} ${r1(q[1])}`;
+      svans.firstChild.setAttribute('d', `M${p(f1)} L${p([mx, my])} L${p(f2)} Z`);
+      svans.lastChild.setAttribute('d', `M${p(f1)} L${p([mx, my])} L${p(f2)}`);
     }
+    const hkStopp = () => {
+      for (const a of A.hkAnim || []) a.cancel();
+      A.hkAnim = null;
+    };
     function hkUt(now) {
       tyst();
-      if (A.hkAnim) A.hkAnim.cancel();
+      hkStopp();
       ov.classList.remove('hasse');
       if (now || o.calm()) {
-        hkEl.classList.remove('on');
+        for (const el of hkDelar) el.classList.remove('on');
         return;
       }
-      const a = (A.hkAnim = hkEl.animate([{ opacity: 1 }, { opacity: 0 }], { duration: 220, easing: 'ease-in', fill: 'forwards' }));
-      a.finished.then(() => {
-        if (A.hkAnim !== a) return;
-        hkEl.classList.remove('on');
-        a.cancel();
+      const g = { duration: 220, easing: 'ease-in', fill: 'forwards' };
+      const anims = (A.hkAnim = hkDelar.map((el) => el.animate([{ opacity: 1 }, { opacity: 0 }], g)));
+      anims[0].finished.then(() => {
+        if (A.hkAnim !== anims) return;
+        for (const el of hkDelar) el.classList.remove('on');
+        hkStopp();
       }, () => {});
     }
     // Ropar till Hasse (on), eller tackar och går vidare. Lappen i handen flyttar sig åt
@@ -1164,12 +1235,19 @@ window.RumAnslag = (() => {
         hkUt();
         return;
       }
-      if (A.hkAnim) A.hkAnim.cancel();
+      hkStopp();
       svara(n);
-      hkEl.classList.add('on');
+      for (const el of hkDelar) el.classList.add('on');
       ov.classList.add('hasse');
       placeLyft(n, 'flytta');
-      if (!o.calm()) A.hkAnim = hkEl.animate([{ opacity: 0 }, { opacity: 1 }], { duration: 300, easing: 'ease-out' });
+      // han lutar sig in och bubblan tonar fram, spetsen sist
+      if (!o.calm()) {
+        A.hkAnim = [
+          figEl.animate([{ opacity: 0, transform: `rotate(${FIG.lut + 12}deg)` }, { opacity: 1, transform: `rotate(${FIG.lut}deg)` }], { duration: 480, easing: 'cubic-bezier(0.2, 0.8, 0.3, 1)' }),
+          hkEl.animate([{ opacity: 0 }, { opacity: 1 }], { duration: 300, delay: 120, easing: 'ease-out', fill: 'backwards' }),
+          svans.animate([{ opacity: 0 }, { opacity: 1 }], { duration: 200, delay: 340, easing: 'ease-out', fill: 'backwards' }),
+        ];
+      }
     }
 
     function spoilerRow(n) {
@@ -1215,6 +1293,7 @@ window.RumAnslag = (() => {
       if (A.matt !== A.html) measure();
       const len = A.len[id] || n.h;
       A.lyft = { id, vand: n.paper === 'polaroid', len, pan: 0 };
+      if (!A.fotot) (A.fotot = new Image()).src = 'rum/hasse-atlas.webp';
       ov.classList.add('lyft');
       lyftEl.innerHTML = `<div class="ans-lapp i-handen" data-lapp="${id}" style="width:${n.w}px; height:${len}px; transform-origin:50% ${n.h / 2}px">${sheetsHtml(n, A.inner[id], A.sheets, A.top, len)}</div>`;
       stor.querySelector(`[data-lapp="${id}"]`).classList.add('borta');

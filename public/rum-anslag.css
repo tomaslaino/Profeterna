@@ -360,39 +360,59 @@
 .ans-rad { position: absolute; left: 0; right: 0; display: flex; justify-content: center; align-items: center; gap: 28px; opacity: 0; pointer-events: none; transition: opacity 0.3s ease; }
 .rum-ansn.lyft .ans-rad { opacity: 1; pointer-events: auto; }
 .ans-rad .sp-card { margin: 0; }
+/* (tom tar den ingen plats, och knapparna står mitt under lappen) */
+#ans-sp:empty { display: none; }
 .ans-tbx { border: 0; padding: 0; background: none; cursor: pointer; font-family: Fraunces, Georgia, serif; font-size: 18px; color: #a9c8fb; text-decoration: underline; text-underline-offset: 4px; text-decoration-thickness: 1px; text-shadow: 0 1px 8px #000; }
 .ans-tbx:hover { color: #d2e3ff; }
 /* (i telefonen bryts raden hellre än att gå utanför fönstret) */
 .ans-rad { flex-wrap: wrap; row-gap: 10px; padding: 0 16px; }
 
-/* Hasse svarar (rum-anslag.js): det man ropar till honom står under lappen, och hans svar
-   kommer från baren till vänster, utanför bilden, i samma stil som hans tal i baren
-   (rum-hasse.css: .rh-text, .rh-rep och .rh-o): ljus serif med skugga, orden synliga när han
-   har sagt dem och det han redan har sagt lite dämpat. Bakom svaret mörknar det från vänster
-   som i baren (.rh-mork), och när svaret ligger över lappen mörknar allt. */
+/* Hasse svarar (rum-anslag.js): det man ropar till honom står under lappen, och han lutar sig
+   in från baren nere till vänster (.ans-hasse-fig, kostymfotot) och svarar i en mörk pratbubbla
+   med guldkant vars spets (.ans-svans) pekar mot hans mun. Orden syns när han har sagt dem och
+   det han redan har sagt är lite dämpat, som hans tal i baren (rum-hasse.css: .rh-rep, .rh-o).
+   Bakom mörknar det lite från vänster, och helt när bubblan ligger över lappen. */
 .ans-ropa { border: 0; padding: 0; background: none; cursor: pointer; font: italic 17px Fraunces, Georgia, serif; color: #e9cf8e; text-decoration: underline dotted; text-underline-offset: 4px; text-decoration-thickness: 1px; text-shadow: 0 1px 8px #000; }
 .ans-ropa:hover { color: #fbe8b8; }
 .ans-ropa:empty { display: none; }
-.ans-hasse-mork { position: absolute; left: 0; top: 0; bottom: 0; width: 0; opacity: 0; pointer-events: none; background: linear-gradient(to right, rgba(14, 8, 4, 0.82) calc(100% - 90px), rgba(14, 8, 4, 0)); transition: opacity 0.3s ease; }
-.ans-hasse-mork.over { right: 0; width: auto; background: rgba(14, 8, 4, 0.92); }
+.ans-hasse-mork { position: absolute; left: 0; top: 0; bottom: 0; width: 0; opacity: 0; pointer-events: none; background: linear-gradient(to right, rgba(14, 8, 4, 0.5) calc(100% - 90px), rgba(14, 8, 4, 0)); transition: opacity 0.3s ease; }
+.ans-hasse-mork.over { right: 0; width: auto; background: rgba(14, 8, 4, 0.86); }
 .rum-ansn.hasse .ans-hasse-mork { opacity: 1; }
+/* läge, storlek och utsnitt sätts i hkPlats */
+.ans-hasse-fig {
+  position: absolute;
+  visibility: hidden;
+  pointer-events: none;
+  background: url(rum/hasse-atlas.webp) no-repeat;
+  transform-origin: 0 100%;
+  /* i rummets dova ljus, och med en skugga mot tavlan */
+  filter: drop-shadow(0 10px 22px rgba(0, 0, 0, 0.7)) brightness(0.92) sepia(0.15);
+}
+.ans-svans { position: absolute; left: 0; top: 0; width: 100%; height: 100%; overflow: visible; visibility: hidden; pointer-events: none; }
+.ans-svans .f { fill: rgb(24, 16, 10); }
+.ans-svans .k { fill: none; stroke: rgba(233, 207, 142, 0.75); stroke-width: 1.5; stroke-linejoin: round; }
+.ans-hasse-fig.on, .ans-svans.on { visibility: visible; }
 .ans-hasse {
   position: absolute;
   left: 0;
   top: 0;
-  width: 380px;
+  width: 400px;
   max-width: calc(100% - 32px);
   box-sizing: border-box;
-  padding: 0 8px 0 0;
+  padding: 18px 22px 6px 24px;
   overflow-y: auto;
   overscroll-behavior: contain;
   touch-action: pan-y;
   visibility: hidden;
   pointer-events: none;
   color: #f6efdc;
-  font: 400 clamp(16px, 1.37vw, 20px)/1.42 Fraunces, Georgia, serif;
+  background: rgba(24, 16, 10, 0.94);
+  border: 1.5px solid rgba(233, 207, 142, 0.75);
+  border-radius: 24px;
+  box-shadow: 0 14px 34px rgba(0, 0, 0, 0.55);
+  font: 400 clamp(15.5px, 1.22vw, 18px)/1.42 Fraunces, Georgia, serif;
   text-align: left;
-  text-shadow: 0 1px 4px rgba(0, 0, 0, 0.9);
+  text-shadow: 0 1px 2px rgba(0, 0, 0, 0.6);
   cursor: default;
 }
 .ans-hasse.on { visibility: visible; pointer-events: auto; }
