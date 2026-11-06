@@ -3940,7 +3940,8 @@ visar) bland utfallen han har ringat in, så att resultatet aldrig går emot tec
 ingen prognos för matchen säger han inget resultat (`resultatet` i
 [public/rum-hasse.js](public/rum-hasse.js)). Sist säger han vad han tycker om det du själv har på
 kupongen (*Du har etta, och det är dina pengar.*). Han minns på enheten vad du har
-frågat om: tecknen står på matchens rad, i guld, med resultatet bredvid, och *Nästa match* räknar
+frågat om: på matchens rad står hans tecken ifyllda i guld i rutorna 1 X 2, som på kupongen, med
+resultatet bredvid i en rak spalt. *Nästa match* räknar
 (*Nu är halva kupongen klar*). Bara tecken du själv har bett om syns, så att listan inte blir ett
 automatiskt tips. Frågar du om samma match igen står allt direkt.
 Går hans röst inte att få säger han det och visar analysen i skrift. Allt han säger runt omkring är
