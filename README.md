@@ -702,6 +702,10 @@ bara lokalt. Analyserna visas som de ligger i `data/analyser.json`; hur de skriv
   bredvid notan och kupongen. Där ligger nu domarens gula och röda kort och visselpipan med
   snodden, som passar Matchfixarna bättre, och de är lättare för grafiken än kvittot (ingen bild).
   Se [Tobaksaffären](#tobaksaffären).
+- **Visitkortet i stället för raderna vid dörren (2026-11-06, användarens önskemål):** under
+  närbilden av dörren stod raderna från Om oss. De är borta, och i stället sitter Matchfixarnas
+  visitkort med ett mässingsstift på väggen mellan stationsuret och orakelramen: namnet, våra autografer och
+  devisen. Ett klick går fram till det. Se [Tobaksaffären](#tobaksaffären), *Visitkortet*.
 - **Kuponghistoriken flyttar till Olympen (2026-10-20, användarens önskemål):** Kupong
   handlar bara om nästa kupong – växlaren Omgången | Historik försvinner. De färdigspelade
   kupongerna står sist i Olympen under rubriken *Grupparbetena* (`#olympen/kuponger`, en
@@ -1978,6 +1982,17 @@ Enter och mellanslag klickar på dem. En match på text-tv:n öppnar matchrutan 
   skimmer drar snett över glaset var elfte sekund. Mässingsskylten under säger
   *Omgångens orakel* och hela efternamnet (delat: *Laino & Johansson*, i mindre stil), och
   ramen och skylten lyser med när man pekar på dem.
+- **Visitkortet** (på väggen mellan stationsuret och orakelramen, till höger om palmetten,
+  fäst med ett mässingsstift och lite snett; under oraklet sitter veckans löpsedel varannan
+  vecka) → närbild: Matchfixarnas visitkort på tjockt gräddvitt papper med en dubbel linje i
+  terrakotta, logon och MATCHFIXARNA i guldfolie överst, i mitten våra autografer – efternamnet
+  i var och ens handstil och bläck, samma som på kupongen (`sm-k0`–`sm-k2`), med en släng under
+  – över var sin linje med namnet tryckt under, och längst ner devisen från Om oss: *Vi tippar
+  engelsk fotboll tillsammans.* och *O det handlar om pengarna. Det har alltid handlat om
+  pengarna.* (`kortHtml` i rum.js, `.rum-kort` i rum.css). Kortet ritas i sina egna mått
+  (440 × 285, ungefär 85 × 55 mm) och förminskas kring stiftet till 44 × 28,5 i scenen, så att
+  texten ritas skarpt nära; länken är lite större än kortet, så att det går att träffa med
+  fingret.
 - **Pokalhyllan** (mitt på högra väggen, över Tipsligan) → närbild: en liten pokal per
   vunnen omgång i vinnarens färg (delat = en var), ur `data/tippare.json`. Nära tonar tv:n, som annars skär in
   överst i bilden, bort del för del (`tvBort` i rum.js; opacitet på lådan själv skulle platta till den i 3D), och
@@ -2040,7 +2055,7 @@ Enter och mellanslag klickar på dem. En match på text-tv:n öppnar matchrutan 
   Ett klick på rutan går ännu närmare (se [Videon](#videon)). Esc, V eller ett klick utanför
   zoomar ut.
 - **Namnet på dörren** (längst till vänster, under Stängt-skylten) → närbild av dörrens övre
-  del, med raderna från Om oss under (*Vi tippar engelsk fotboll tillsammans.* …): *Matchfixarna*
+  del: *Matchfixarna*
   i bladguld på glaset, spegelvänt inifrån som neonskylten, med TOBAK & SPEL och *Öppet
   till spelstoppet* under. I fönster som är minst 8:5 syns hela dörren, och där står namnet
   inte i menyns hörn; i smalare fönster skärs dörren av och namnet står kvar i hörnet.
@@ -4252,12 +4267,13 @@ riktig telefon, och att han tar kaffet varannan gång medan man väljer är bara
 
 ### Närbilderna
 
-Uret, skårtavlan, Omgångens orakel, pokalhyllan, korktavlan, löpsedlarna i fönstret (IFK 1982,
+Uret, skårtavlan, Omgångens orakel, visitkortet, pokalhyllan, korktavlan, löpsedlarna i fönstret (IFK 1982,
 Nacional 1988, VM 94 och Chelsea 2021 på skivan och veckans löpsedel) och namnet på dörren
 tittar man på nära med ett klick (`sak` i rum.js, `data-sak` på föremålen), och
 kupongen på pulten när den inte går att ta i handen: kameran ställer sig rakt framför och går fram tills
 saken fyller det mesta av fönstret – högst 90 % av bredden och 74–94 % av höjden mellan
-namnet och foten (den låga skårtavlan 50 %, så att den inte kommer närmare än de andra) – i
+namnet och foten (den låga skårtavlan 50 %, så att den inte kommer närmare än de andra, och
+visitkortet 72 %, eftersom det är litet) – i
 telefonen också. Rummet vrids rakt medan kameran glider fram och står
 sedan still: så länge något vrids ritar webbläsaren lagren i den vanliga skalan och förstorar
 dem suddigt, och när det står still ritas de om skarpt. Det som står framför väggen – gänget
@@ -4268,12 +4284,12 @@ orakelramen och ramarna kring skårtavlan och korktavlan är ritade i 3D och rit
 kameran är framme (`skarp` i rum-inredning.js, högst 2600 bildpunkter på längsta ledet);
 uret går som vanligt, med sekundvisaren.
 
-Ingen närbild leder ut ur rummet. Under pokalhyllan står hur många pokaler var och en har,
-och under dörren raderna från Om oss i bladguld. Esc eller ett klick (också på saken) går tillbaka,
+Ingen närbild leder ut ur rummet. Under pokalhyllan står hur många pokaler var och en har.
+Esc eller ett klick (också på saken) går tillbaka,
 och K, T, A, R och V går direkt till kupongen, tv:n, anslagstavlan, kortregistret och videon
 (K nära kupongen på pulten går tillbaka). Föremålen lyser inte när man
 pekar på dem på nära håll. Med `prefers-reduced-motion` går kameran direkt.
-`?rum-sak=ur|skar|ram|pokal|kork|vm94|ifk|nacional|lopsedel|chelsea|dorr|kupong` visar en närbild i en fast bild (med `?rum-t`).
+`?rum-sak=ur|skar|ram|kort|pokal|kork|vm94|ifk|nacional|lopsedel|chelsea|dorr|kupong` visar en närbild i en fast bild (med `?rum-t`).
 
 ## Statusmärkning
 
