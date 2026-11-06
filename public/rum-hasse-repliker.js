@@ -126,7 +126,6 @@
     fler: ['På din kupong har du {du}. Så många tecken behövs inte.'],
     korsar: ['{Bada} kan du behålla på din kupong, men stryk resten.'],
     skilda: ['På din kupong har du {du}, och det kan du glömma.'],
-    tom: ['Du har inte fyllt i den här matchen än. Nu vet du vad du ska sätta.'],
   },
 
   // När något inte går.

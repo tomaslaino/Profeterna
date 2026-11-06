@@ -3941,7 +3941,7 @@ resultatet i modellens prognos (resultatmatrisen i `data/match/<id>.json`, samma
 visar) bland utfallen han har ringat in, så att resultatet aldrig går emot tecknen. Har modellen
 ingen prognos för matchen säger han inget resultat (`resultatet` i
 [public/rum-hasse.js](public/rum-hasse.js)). Sist säger han vad han tycker om det du själv har på
-kupongen (*På din kupong har du bara etta. Det var kaxigt.*). Han minns på enheten vad du har
+kupongen (*På din kupong har du bara etta. Det var kaxigt.*); har du inget på matchen säger han inget om den. Han minns på enheten vad du har
 frågat om: på matchens rad står hans tecken ifyllda i guld i rutorna 1 X 2, som på kupongen, med
 resultatet bredvid i en rak spalt. *Nästa match* räknar
 (*Nu är halva kupongen klar*). Bara tecken du själv har bett om syns, så att listan inte blir ett

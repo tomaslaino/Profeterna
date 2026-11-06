@@ -957,7 +957,7 @@ window.RumHasse = (() => {
     const k = REP().kupong;
     const du = String(p.tecken[m.id] || '').split('');
     const han = signs.map((n) => KORT[n]);
-    if (!du.length) return p.fyll ? lott(k.tom) : null;
+    if (!du.length) return null;
     const bada = du.filter((c) => han.includes(c));
     const sort = (a) => [...a].sort((x, y) => KORT.indexOf(x) - KORT.indexOf(y));
     const o = { du: iOrd(sort(du)), Bada: iOrd(sort(bada)).replace(/^./, (c) => c.toUpperCase()) };
