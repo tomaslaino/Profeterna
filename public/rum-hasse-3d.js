@@ -18,7 +18,7 @@
 // tidslinjen (KLIPP): fler sätt att slå domen i disken, kaffet (sex sätt), cigarren, småsakerna medan han
 // väntar och händerna medan han pratar (talet).
 import * as THREE from 'three';
-import { ATLAS, LJUS, ARM, KAMERA, BORD_GLSL, CIGARR, ASKKOPP, DAG, laddaFoto, laddaHand, byggArm, byggKopp, byggCigarr, byggAskkopp, byggRok } from './rum-hasse-arm.js';
+import { ATLAS, LJUS, ARM, KAMERA, BORD_GLSL, CIGARR, ASKKOPP, DAG, LYS, laddaFoto, laddaHand, byggArm, byggKopp, byggCigarr, byggAskkopp, byggRok } from './rum-hasse-arm.js';
 import { SCEN, BAK, kamera as scenKamera, iKamera, disken, franBaren } from './rum-hasse-scen.js';
 
 const DEG = Math.PI / 180;
@@ -134,7 +134,7 @@ for (const k of Object.values(KLIPP)) {
 
 // ---------- figuren ----------
 
-export { KAMERA, SCEN, BAK, DAG };
+export { KAMERA, SCEN, BAK, DAG, LYS };
 export const D = KAMERA.CZ;
 const KAM = scenKamera();
 const DK = disken();
@@ -144,9 +144,10 @@ const kantZ = (x) => (DK.c - DK.n[0] * x) / DK.n[1];
 export const BORD = { Y: DK.Y, Z: kantZ(0) };
 // Armarna på disken: armbågens och handledens höjd.
 export const VILA = { EH: BORD.Y + 78, WH: BORD.Y + 42 };
-// Koppen på sitt fat och notan under fatet, till höger om hans vänstra hand; askkoppen till vänster om
-// hans högra hand. På disken, i figurens värld.
-export const KOPP = [372, BORD.Y, 790];
+// Koppen på sitt fat och notan under fatet, till höger om hans vänstra hand och fritt från armen: en bit
+// disk mellan fatet och handen, och fingertopparna några centimeter från fatets kant (handen i VILA_B);
+// askkoppen till vänster om hans högra hand. På disken, i figurens värld.
+export const KOPP = [375, BORD.Y, 830];
 export const ASK = [-345, BORD.Y, 700];
 // En punkt i världen i fönstret: (cx, ey) är där kamerans axel träffar fönstret och s bildpunkter på en
 // enhet på avståndet D.
@@ -261,7 +262,7 @@ export async function figuren(duk, { hog = false, latt = false, pr = 1 } = {}) {
     foto: { value: foto }, uHuvud: { value: new THREE.Matrix3() }, uPiv: { value: W_(650, 650, 40) }, uKropp: { value: new THREE.Matrix4() }, uAx: { value: new THREE.Vector2() }, uAndas: { value: 0 },
     blund: { value: 0 }, kis: { value: 0 }, munn: { value: 0 }, rund: { value: 0 }, le: { value: 0 }, bryn: { value: new THREE.Vector2() }, blick: { value: new THREE.Vector2() },
     uArm: { value: [new THREE.Vector3(), new THREE.Vector3(), new THREE.Vector3(), new THREE.Vector3(), new THREE.Vector3(), new THREE.Vector3()] },
-    uBord: bord, uButik: bord.butik, uDag: DAG,
+    uBord: bord, uButik: bord.butik, uDag: DAG, uLys: LYS,
   };
   const yta = new THREE.Mesh(G, new THREE.ShaderMaterial({
     uniforms: U, transparent: true, blending: THREE.CustomBlending, blendSrc: THREE.OneFactor, blendDst: THREE.OneMinusSrcAlphaFactor, side: THREE.DoubleSide,
@@ -407,7 +408,7 @@ export async function figuren(duk, { hog = false, latt = false, pr = 1 } = {}) {
   cig.mesh.matrixAutoUpdate = false;
   const rok = byggRok(latt ? 200 : 280, bord);
   S.add(ask.mesh, cig.mesh, rok.mesh);
-  // skuggorna på disken: kapslar som faller bakåt och åt höger, ingen skuggkarta
+  // skuggorna på disken: kapslar som faller bakåt och bort från ljuset, ingen skuggkarta
   const NK = 9;
   const kapA = Array.from({ length: NK }, () => new THREE.Vector4());
   const kapH = Array.from({ length: NK }, () => new THREE.Vector2());
@@ -421,9 +422,9 @@ export async function figuren(duk, { hog = false, latt = false, pr = 1 } = {}) {
     skuggGeo.setIndex([0, 2, 1, 1, 2, 3]);
   }
   const skugga = new THREE.Mesh(skuggGeo, new THREE.ShaderMaterial({
-    uniforms: { uKap: { value: kapA }, uKapH: { value: kapH } }, transparent: true, depthWrite: false, depthTest: false, blending: THREE.CustomBlending, blendSrc: THREE.OneFactor, blendDst: THREE.OneMinusSrcAlphaFactor,
+    uniforms: { uKap: { value: kapA }, uKapH: { value: kapH }, uDag: DAG }, transparent: true, depthWrite: false, depthTest: false, blending: THREE.CustomBlending, blendSrc: THREE.OneFactor, blendDst: THREE.OneMinusSrcAlphaFactor,
     vertexShader: 'varying vec3 vP; void main() { vec4 w = modelMatrix * vec4(position, 1.); vP = w.xyz; gl_Position = projectionMatrix * viewMatrix * w; }',
-    fragmentShader: `precision highp float; uniform vec4 uKap[${NK}]; uniform vec2 uKapH[${NK}]; varying vec3 vP;
+    fragmentShader: `precision highp float; uniform vec4 uKap[${NK}]; uniform vec2 uKapH[${NK}]; uniform vec4 uDag; varying vec3 vP;
     float seg(vec2 p, vec2 a, vec2 b) { vec2 ab = b - a; return length(p - a - ab * clamp(dot(p - a, ab) / max(dot(ab, ab), 1.), 0., 1.)); }
     void main() {
       float ljus = 1.;
@@ -433,7 +434,8 @@ export async function figuren(duk, { hog = false, latt = false, pr = 1 } = {}) {
         float d = max(0., seg(vP.xz, uKap[i].xy, uKap[i].zw) - r * .4);
         float rd = r * .72 + h * .34;
         ljus *= 1. - .78 * exp(-d * d / (rd * rd)) / (1. + h * .012);
-        vec2 of = vec2(.42, -.55) * (h + r);
+        // (bort från ljuset: lamporna framifrån till vänster, på dagen fönstret till höger)
+        vec2 of = mix(vec2(.42, -.55), vec2(-.62, -.36), uDag.w) * (h + r);
         d = max(0., seg(vP.xz - of, uKap[i].xy, uKap[i].zw) - r * .3);
         rd = r * .85 + h * .55;
         ljus *= 1. - .34 * exp(-d * d / (rd * rd)) / (1. + h * .006);
@@ -458,7 +460,7 @@ export async function figuren(duk, { hog = false, latt = false, pr = 1 } = {}) {
   const diskU = {
     uBak: { value: null }, uBakRam: { value: new THREE.Vector4(0, 0, 1, 1) }, uBakSt: { value: new THREE.Vector2(1, 1) },
     uKr: { value: new THREE.Vector3(...KAM.hoger) }, uKu: { value: new THREE.Vector3(...KAM.upp) }, uKb: { value: new THREE.Vector3(...KAM.bak) }, uD: { value: D },
-    uNb: { value: new THREE.Vector2(DK.n[0], DK.n[1]) }, uVagg: { value: SCEN.VAGG + 180 }, uButik: bord.butik, uDag: DAG,
+    uNb: { value: new THREE.Vector2(DK.n[0], DK.n[1]) }, uVagg: { value: SCEN.VAGG + 180 }, uButik: bord.butik, uDag: DAG, uLys: LYS,
   };
   const diskG = new THREE.BufferGeometry();
   {
@@ -541,7 +543,9 @@ export async function figuren(duk, { hog = false, latt = false, pr = 1 } = {}) {
         vec3 tra = mix(vec3(.33, .23, .16), vec3(.48, .35, .25), a);
         tra *= .8 + .34 * b;
         tra *= .92 + .12 * c2;
-        vec3 l = ljus(n) * (.32 + .9 * pol) + vec3(.5, .06, .04) * hoger * .35 + vec3(.16, .2, .3) * hoger * .2;
+        // (på dagen lyser fönstret till höger upp hela disken, mest närmast affären, och neonen syns mindre)
+        float dag = uDag.w;
+        vec3 l = ljus(n) * mix(.32 + .9 * pol, .5 + .55 * hoger, .6 * dag) + (vec3(.5, .06, .04) * hoger * .35 + vec3(.16, .2, .3) * hoger * .2) * (1. - .75 * dag);
         ut = tra * l;
         // bakre kanten: en smal ljus kant där lamporna fångas
         float kant = exp(-pow((vB.z - ${SCEN.DISK.Z.toFixed(1)} - 3.) / 3.5, 2.));
@@ -555,7 +559,7 @@ export async function figuren(duk, { hog = false, latt = false, pr = 1 } = {}) {
         vec3 sp = R.y > 0. ? spegel(vW, R, .04) : vec3(.05, .04, .035);
         vec3 l = ljus(n) * (.25 + .6 * pol);
         ut = vec3(.36, .36, .35) * l * .55 + sp * .75;
-        ut += vec3(1., .2, .12) * hoger * pow(max(0., dot(n, normalize(vec3(.7, .5, .5)))), 4.) * .35;
+        ut += vec3(1., .2, .12) * hoger * pow(max(0., dot(n, normalize(vec3(.7, .5, .5)))), 4.) * .35 * (1. - .75 * uDag.w);
         ut += vec3(1., .9, .75) * pow(max(0., dot(R, NYCKEL)), 30.) * .35;
       } else {
         // framsidan: mörkt trä i fält, i skugga under kanten
@@ -565,7 +569,7 @@ export async function figuren(duk, { hog = false, latt = false, pr = 1 } = {}) {
         vec3 tra = mix(vec3(.16, .085, .045), vec3(.25, .14, .075), fbm(g * vec2(1.6, 1.)));
         float ned = exp((vB.y - ${SCEN.DISK.Y.toFixed(1)}) / 380.);
         ut = tra * (ljus(n) * (.2 + .5 * pol) * (.25 + .75 * ned)) * (.55 + .45 * spar);
-        ut += vec3(.5, .06, .04) * hoger * .08 * ned;
+        ut += vec3(.5, .06, .04) * hoger * .08 * ned * (1. - .75 * uDag.w);
       }
       gl_FragColor = vec4(ton(ut), 1.);
     }`,
@@ -591,7 +595,7 @@ export async function figuren(duk, { hog = false, latt = false, pr = 1 } = {}) {
     notaG.computeVertexNormals();
   }
   const nota = new THREE.Mesh(notaG, new THREE.ShaderMaterial({
-    uniforms: { uT: { value: notaTex }, uButik: bord.butik, uDag: DAG },
+    uniforms: { uT: { value: notaTex }, uButik: bord.butik, uDag: DAG, uLys: LYS },
     transparent: true,
     vertexShader: 'varying vec2 vUv; varying vec3 vN; void main() { vUv = uv; vN = mat3(modelMatrix) * normal; gl_Position = projectionMatrix * viewMatrix * modelMatrix * vec4(position, 1.); }',
     fragmentShader: `precision highp float; uniform sampler2D uT; varying vec2 vUv; varying vec3 vN;
@@ -678,7 +682,7 @@ export async function figuren(duk, { hog = false, latt = false, pr = 1 } = {}) {
   // bak: väggens bild { bild, px, py, S, W, H } (scripts/hasse/bak.html).
   async function diskBild(ut, v, bak) {
     await ritaNota();
-    if (!bakTex || bakTex.image !== bak.bild) {
+    if (!bakTex || bakTex.image !== bak.bild || bak.ny) {
       if (bakTex) bakTex.dispose();
       bakTex = new THREE.Texture(bak.bild);
       bakTex.colorSpace = THREE.NoColorSpace;
@@ -730,10 +734,12 @@ export async function figuren(duk, { hog = false, latt = false, pr = 1 } = {}) {
     return { W: W.toArray(), pol: E.clone().sub(S0).toArray() };
   }
   const va = paDisken(SA, 1, 17, 40);
-  const vb = paDisken(SB, -1, 14, 25);
+  // (den vänstra armbågen nära kroppen och handen vriden lite ut mot koppen, så att underarmen går fri
+  // från fatet: med armbågen längre ut låg ärmen över fatet)
+  const vb = paDisken(SB, -1, 8, 30);
   // [handled, armbågens riktning, fingrarna, handflatan, krok, peka]
   const VILA_A = [va.W, va.pol, [0.84, -0.1, 0.53], [0.2, -0.97, 0.1], 0.36, 0];
-  const VILA_B = [vb.W, vb.pol, [0.04, -0.08, 0.99], [-0.05, -0.99, 0.08], 0.3, 0];
+  const VILA_B = [vb.W, vb.pol, [0.28, -0.08, 0.95], [-0.05, -0.99, 0.08], 0.3, 0];
   // [t, handled, armbågens riktning, fingrarna, handflatan, krok, peka, slag]. slag: på vägen dit går
   // handen allt fortare och stannar tvärt, som när den slår i disken (annars mjukt in och ut).
   const VA = [

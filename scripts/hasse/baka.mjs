@@ -1,6 +1,7 @@
-// Bakar Hasse Backes bilder: node scripts/hasse/baka.mjs atlas | bak | bak-hog | bak-lys | bak-lys-hog [varv]
+// Bakar Hasse Backes bilder: node scripts/hasse/baka.mjs atlas | bak | bak-hog | bak-lys | bak-lys-hog | bak-dag | bak-dag-hog [varv]
 // bak ger väggen bakom honom i baren (bak.png, eller bak-hog.png för telefonen på höjden), från figurens kamera
-// och i måtten i BAK (public/rum-hasse-scen.js); bak-lys samma vägg med lysröret i affären tänt (bak-lys.png).
+// och i måtten i BAK (public/rum-hasse-scen.js); bak-lys samma vägg med lysröret i affären tänt (bak-lys.png),
+// bak-dag bara dagsljuset genom affärens fönster, i vitt (bak-dag.png).
 // Kräver Google Chrome och en filserver på PORT (standard 8765) med public/ i roten och scripts/hasse/ under
 // /skiss/bake/, och cwebp för att göra webp av resultatet. Se scripts/hasse/README.md.
 import fs from 'node:fs';
@@ -9,7 +10,7 @@ const vad = process.argv[2] || 'atlas';
 const n = +(process.argv[3] || 400);
 const ut = process.env.UT || '.';
 const lage = vad.endsWith('-hog') ? 'hog' : 'bred';
-const lys = vad.startsWith('bak-lys') ? '&lys=1' : '';
+const lys = vad.startsWith('bak-lys') ? '&lys=1' : vad.startsWith('bak-dag') ? '&dag=1' : '';
 async function kor(varv) {
   const c = await oppna({ W: 1000, H: 700, D: 1, tid: 14400000 });
   await c.ga(`/skiss/bake/bak.html?lage=${lage}&n=${varv}${lys}`);

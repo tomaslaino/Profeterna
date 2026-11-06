@@ -23,18 +23,13 @@
   --korn: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='180' height='180'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.85' numOctaves='2' stitchTiles='stitch'/%3E%3CfeColorMatrix values='0 0 0 0 .35 0 0 0 0 .27 0 0 0 0 .18 0 0 0 .09 0'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E"); }
 .rum-hasse-vy[hidden] { display: none; }
 .rh-scen { position: absolute; inset: 0; overflow: hidden; }
-.rh-scen img.rh-bak { position: absolute; left: 0; top: 0; display: block; max-width: none; }
+.rh-scen .rh-bak { position: absolute; left: 0; top: 0; display: block; max-width: none; }
 /* väggen i lysrörets ljus (tänt utom mellan midnatt och sex, som i rummet), annars i nattens */
 .rh-scen img.rh-lys, .rum-hasse-vy.lys .rh-scen img.rh-bak:not(.rh-lys) { display: none; }
 .rum-hasse-vy.lys .rh-scen img.rh-lys { display: block; }
-/* dagsljuset som faller in från affären till höger, som i rummet (rum-ute.css): himlens färg, efter
-   klockan och vädret (tand i rum-hasse.js) */
-.rh-dagsljus { position: absolute; inset: 0; pointer-events: none;
-  background: radial-gradient(75% 95% at 100% 42%, var(--dag-farg, #c4daec), rgba(196, 218, 236, 0) 72%);
-  mix-blend-mode: soft-light; opacity: var(--dagsljus, 0); }
-@media (max-width: 700px), (max-height: 500px) {
-  .rh-dagsljus { mix-blend-mode: normal; opacity: calc(var(--dagsljus, 0) * 0.2); }
-}
+/* på dagen: väggen med dagsljuset genom affärens fönster, ritad på en duk (vagg i rum-hasse.js) */
+.rh-scen canvas.rh-vagg, .rum-hasse-vy.vagg .rh-scen img.rh-bak { display: none; }
+.rum-hasse-vy.vagg .rh-scen canvas.rh-vagg { display: block; }
 .rh-disk, .rh-duk { position: absolute; left: 0; top: 0; display: block; pointer-events: none; }
 /* väggen och disken mörknar bakom samtalet, så att texten går att läsa */
 .rh-mork { position: absolute; top: 0; bottom: 0; left: 0; width: var(--mork, 40%); background: linear-gradient(to right, rgba(14, 8, 4, 0.8) 72%, rgba(14, 8, 4, 0)); pointer-events: none; transition: opacity 0.32s ease-out; }

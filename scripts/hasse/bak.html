@@ -154,7 +154,12 @@ grupp(() => {
   box([0, Y - 20, Z + DJUP / 2], [7000, 20, DJUP / 2], 10);
   box([0, (Y - 40 + GOLV) / 2, Z + DJUP / 2 + 60], [7000, (Y - 40 - GOLV) / 2, DJUP / 2 - 60], 8);
 });
-const LJ = [
+// ?dag=1: bara dagsljuset genom affärens stora fönster till höger, vitt, som ett eget lager. Sidan lägger
+// det ovanpå väggen i himlens färg och så starkt som det är ljust ute (dagsljus i rum-hasse.js), så att
+// väggen får samma fönsterljus som han (DAGSLJUS i rum-hasse-arm.js).
+const LJ = q.get('dag') ? [
+  { p: [4700, 760, 3100], r: 1050, e: [1, 1, 1].map((v) => v * +(q.get('ds') || 30)) },
+] : [
   // nyckel: framifrån till vänster, varm (samma riktning som figurens ljus, rum-hasse-arm.js)
   { p: [-700, 1450, 2100], r: 460, e: [1.0, 0.86, 0.68].map((v) => v * 13) },
   // lampan bakom honom: en varm gloria på väggen
@@ -171,8 +176,8 @@ const LJ = [
   // gatan genom fönstret till höger: kallt
   { p: [3800, 1300, 3400], r: 620, e: [0.55, 0.68, 1.0].map((v) => v * 3.6) },
   // ?lys=1: lysröret i affärens tak är tänt, som i rummet från sex på morgonen till midnatt (rum-folk.js):
-  // röret framför baren och affären i dess sken till höger. Sidan tonar mellan den här bilden och
-  // nattens efter klockan, och lägger dagsljuset ovanpå som i rummet (dagsljus i rum-hasse.js).
+  // röret framför baren och affären i dess sken till höger. Sidan byter mellan den här bilden och
+  // nattens efter klockan, och lägger fönsterljuset (?dag=1) ovanpå på dagen (vagg i rum-hasse.js).
   ...(q.get('lys') ? [
     { p: [-700, 1820, 2300], r: 210, e: [0.96, 0.98, 1.0].map((v) => v * +(q.get('ls') || 100)) },
     { p: [1500, 1820, 2300], r: 210, e: [0.96, 0.98, 1.0].map((v) => v * +(q.get('ls') || 100)) },

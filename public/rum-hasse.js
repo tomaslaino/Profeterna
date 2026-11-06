@@ -64,8 +64,8 @@ window.RumHasse = (() => {
     vy.id = 'rum-hasse-vy';
     vy.hidden = true;
     vy.setAttribute('aria-label', 'Hasse Backe');
-    vy.innerHTML = '<div class="rh-scen"><img class="rh-bak" alt="" draggable="false"><img class="rh-bak rh-lys" alt="" draggable="false"><canvas class="rh-disk"></canvas><i class="rh-mork"></i></div>' +
-      '<canvas class="rh-duk"></canvas><i class="rh-dagsljus" aria-hidden="true"></i><i class="rh-ton" aria-hidden="true"></i><i class="rh-korn" aria-hidden="true"></i>' +
+    vy.innerHTML = '<div class="rh-scen"><img class="rh-bak" alt="" draggable="false"><img class="rh-bak rh-lys" alt="" draggable="false"><canvas class="rh-bak rh-vagg"></canvas><canvas class="rh-disk"></canvas><i class="rh-mork"></i></div>' +
+      '<canvas class="rh-duk"></canvas><i class="rh-ton" aria-hidden="true"></i><i class="rh-korn" aria-hidden="true"></i>' +
       '<div class="rh-samtal"></div><div class="rh-fot"><button type="button" class="rh-vag rh-ljud" hidden></button><button type="button" class="rh-vag rh-tillbaka">Tillbaka</button></div>';
     H.panIn.append(vy);
     H.vy = vy;
@@ -113,7 +113,7 @@ window.RumHasse = (() => {
     if (!plan) return;
     try {
       const a = await import('./rum-hasse-hand.js');
-      H.pulten = await a.armen(plan, { hand: { x: 62, y: 716 }, kopp: { x: 268, y: 708 }, pr: Math.min(devicePixelRatio || 1, [2, 1.5, 1.25, 1][steg()]) * 1.25 });
+      H.pulten = await a.armen(plan, { hand: { x: 38, y: 730 }, kopp: { x: 268, y: 708 }, pr: Math.min(devicePixelRatio || 1, [2, 1.5, 1.25, 1][steg()]) * 1.25 });
       const b = document.createElement('button');
       b.type = 'button';
       b.className = 'rum-hasse-knapp';
@@ -143,38 +143,92 @@ window.RumHasse = (() => {
   }
 
   // väggen bakom honom (scripts/hasse/bak.html), med sina mått i rum-hasse-scen.js (BAK): på natten bara
-  // barens lampor, annars också i lysrörets ljus (ljuset nedan)
-  const bakbild = (lys = false) => `rum/hasse-bak${lys ? '-lys' : ''}${hog() ? '-hog' : ''}.webp`;
+  // barens lampor, annars också i lysrörets ljus (ljuset nedan); dagsljuset genom fönstret är en egen bild
+  const hogt = () => (hog() ? '-hog' : '');
+  const bakbild = (lys = false) => `rum/hasse-bak${lys ? '-lys' : ''}${hogt()}.webp`;
+  const dagbild = () => `rum/hasse-bak-dag${hogt()}.webp`;
   // Ljuset i baren som i rummet (rum.js, rum-folk.js, rum-ute.js): lysröret i affärens tak är tänt utom
-  // mellan midnatt och sex, och dagsljuset faller in efter klockan och vädret. Väggen är bilden i det
-  // ljuset, dagsljuset ligger över hela bilden som i rummet (.rh-dagsljus), och figuren, disken och koppen
-  // lyses av affären till höger (DAG i rum-hasse-arm.js). lys: lysröret, dag: 0–1, farg: himlens.
+  // mellan midnatt och sex, och dagsljuset faller in genom affärens stora fönster till höger efter klockan
+  // och vädret. lys: lysröret, dag: hur ljust det är ute (0–1), f: fönsterljusets styrka, c: dess färg.
+  // Färgen är himlens nere vid taken, men vitare, som ögat ser dagsljus inne; solen gör den varmare och
+  // starkare, låg sol gyllene, och i den blå timmen blåare. Mulet blir den grå och svagare, i regn mer.
+  const hex = (h) => [1, 3, 5].map((i) => parseInt(h.slice(i, i + 2), 16) / 255);
   function ljuset() {
     const v = window.Vader ? Vader.nu() : null;
     const L = v && window.RumUte ? RumUte.light(v) : null;
     const natt = window.RumFolk ? RumFolk.natt() : false;
-    return { lys: !natt, dag: L ? L.dag : 0, farg: L ? L.sky[2] : '#c4daec' };
+    const ut = { lys: !natt, dag: L ? L.dag : 0, f: 0, c: [1, 1, 1] };
+    if (!L || L.dag < 0.01) return ut;
+    const a = hex(L.sky[1]);
+    const b = hex(L.sky[2]);
+    const norm = (c) => { const m = Math.max(...c, 1e-3); return c.map((x) => x / m); };
+    let c = norm(a.map((x, i) => 0.4 * x + 0.6 * b[i])).map((x) => 0.4 + 0.6 * x);
+    const sol = [1, 0.93, 0.82].map((x, i) => x + ([1, 0.74, 0.5][i] - x) * L.guld);
+    c = c.map((x, i) => x + (sol[i] - x) * 0.5 * L.sol);
+    c = c.map((x, i) => x + ([0.62, 0.72, 1][i] - x) * 0.45 * L.bla);
+    // (svalare än barens varma lampor, som dagsljus ser ut bredvid glödljus)
+    ut.c = norm(c.map((x, i) => x * [0.86, 0.95, 1.08][i]));
+    ut.f = L.dag * (1 + 0.4 * L.sol);
+    return ut;
   }
   function tand() {
     const l = ljuset();
     H.ljus = l;
     H.vy.classList.toggle('lys', l.lys);
-    H.vy.style.setProperty('--dagsljus', (l.dag * 0.9).toFixed(2));
-    H.vy.style.setProperty('--dag-farg', l.farg);
     if (H.m && H.m.DAG) {
-      // lysrörets vita, och himlens färg när det är dag
-      const h = parseInt(l.farg.slice(1), 16);
-      const f = [(h >> 16) & 255, (h >> 8) & 255, h & 255].map((c) => c / 255);
-      const k = 0.45 * l.dag;
-      const c = [0.92, 0.93, 0.95].map((x, i) => (x * (1 - k) + f[i] * k) * (0.85 + 0.35 * l.dag));
-      H.m.DAG.value.set(c[0], c[1], c[2], l.lys ? 0.75 + 0.25 * l.dag : 0.5 * l.dag);
+      // fönstret i figurens ljus (rum-hasse-arm.js), och lysröret som förut
+      H.m.DAG.value.set(...l.c.map((x) => x * l.f * 0.8), l.dag);
+      if (l.lys) H.m.LYS.value.set(0.587, 0.593, 0.606, 0.75);
+      else H.m.LYS.value.set(0, 0, 0, 0);
     }
     return l;
+  }
+  // Väggen med dagsljuset: bilden i lysrörets eller nattens ljus, och fönsterljuset (bakat för sig i vitt)
+  // ovanpå i fönstrets färg och styrka, som ljus läggs till ljus, på en duk. Disken speglar samma duk.
+  // Ritas när han öppnas. Utan dagsljus syns bilden som den är.
+  async function vagg() {
+    const l = H.ljus;
+    const bas = $(l.lys ? 'img.rh-lys' : 'img.rh-bak:not(.rh-lys)');
+    await bas.decode().catch(() => {});
+    H.vy.classList.remove('vagg');
+    if (l.f < 0.02 || !bas.naturalWidth) return bas;
+    if (!H.dag || H.dag.src.indexOf(dagbild()) < 0) {
+      H.dag = new Image();
+      H.dag.src = dagbild();
+    }
+    try { await H.dag.decode(); } catch (e) { return bas; }
+    const W = bas.naturalWidth;
+    const Hh = bas.naturalHeight;
+    const t = H.dagDuk || (H.dagDuk = document.createElement('canvas'));
+    t.width = W;
+    t.height = Hh;
+    const tx = t.getContext('2d');
+    tx.drawImage(H.dag, 0, 0, W, Hh);
+    tx.globalCompositeOperation = 'multiply';
+    tx.fillStyle = `rgb(${l.c.map((x) => Math.round(x * 255)).join(',')})`;
+    tx.fillRect(0, 0, W, Hh);
+    tx.globalCompositeOperation = 'source-over';
+    const c = $('.rh-vagg');
+    c.width = W;
+    c.height = Hh;
+    const x = c.getContext('2d');
+    x.drawImage(bas, 0, 0);
+    x.globalCompositeOperation = 'lighter';
+    for (let k = l.f * 0.45; k > 0.005; k -= 1) {
+      x.globalAlpha = Math.min(1, k);
+      x.drawImage(t, 0, 0);
+    }
+    x.globalAlpha = 1;
+    x.globalCompositeOperation = 'source-over';
+    H.vy.classList.add('vagg');
+    H.vaggNr = (H.vaggNr || 0) + 1;
+    return c;
   }
   // hans bilder och figuren hämtas först när någon pekar på kaffet eller klickar
   function forladda() {
     if (!H.bilder) {
-      H.bilder = [bakbild(ljuset().lys), 'rum/hasse-atlas.webp'].map((u) => { const i = new Image(); i.src = u; return i.decode().catch(() => {}); });
+      const l = ljuset();
+      H.bilder = [bakbild(l.lys), 'rum/hasse-atlas.webp', ...(l.f >= 0.02 ? [dagbild()] : [])].map((u) => { const i = new Image(); i.src = u; return i.decode().catch(() => {}); });
       H.bilder.push(import('./rum-hasse-3d.js').then((m) => { H.m = m; }));
     }
     return H.bilder;
@@ -232,9 +286,15 @@ window.RumHasse = (() => {
     // disken: ritas en gång, med väggen i lacken (medan fönstret ändras först när det har stannat)
     let disk = Promise.resolve();
     if (H.fig) {
-      const bild = $(H.ljus && H.ljus.lys ? '.rh-lys' : '.rh-bak');
+      // (väggen med dagsljuset, eller bilden som den är; ny: duken har ritats om sedan disken ritades)
+      const bild = H.vaggBild || $(H.ljus && H.ljus.lys ? 'img.rh-lys' : 'img.rh-bak:not(.rh-lys)');
       const n = ++H.diskNr;
-      const rita = () => (bild.complete ? Promise.resolve() : bild.decode()).then(() => { if (n === H.diskNr && H.fig) return H.fig.diskBild($('.rh-disk'), v, { bild, ...b }); }).catch(() => {});
+      const rita = () => (bild.complete === false ? bild.decode() : Promise.resolve()).then(() => {
+        if (n !== H.diskNr || !H.fig) return;
+        const ny = H.diskVagg !== H.vaggNr;
+        H.diskVagg = H.vaggNr;
+        return H.fig.diskBild($('.rh-disk'), v, { bild, ny, ...b });
+      }).catch(() => {});
       clearTimeout(H.diskT);
       if (H.on) H.diskT = setTimeout(rita, 150);
       else disk = rita();
@@ -267,7 +327,9 @@ window.RumHasse = (() => {
     Object.assign(GEST, H.m.KLIPP);
     // väggen i lysrörets ljus, eller i nattens (bara den som syns hämtas)
     const l = tand();
-    $(l.lys ? '.rh-lys' : '.rh-bak').src = bakbild(l.lys);
+    $(l.lys ? 'img.rh-lys' : 'img.rh-bak:not(.rh-lys)').src = bakbild(l.lys);
+    // och dagsljuset genom fönstret på den
+    H.vaggBild = await vagg();
     // (fönstret har vridits sedan sist: han sitter på ett annat sätt)
     if (H.fig && H.figHog !== H.hog) borta();
     if (!H.fig) {

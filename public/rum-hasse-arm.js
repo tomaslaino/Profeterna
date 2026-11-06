@@ -18,15 +18,20 @@ export const ATLAS = { W: 1372, H: 1350, X0: 280, Y0: 130, TW: 860, TH: 1350, rx
 
 // Samma ljus på allt: varmt framifrån till vänster (NYCKEL), ett varmt kantljus bakifrån från barens
 // lampor, och i baren (uButik) neonskyltens röda sken och gatans kalla ljus från affären till höger.
+// Där lyser också lysröret i affärens tak (uLys, tänt från sex till midnatt) och dagsljuset genom
+// affärens stora fönster (uDag): ett brett, mjukt ljus från höger och lite framifrån, i himlens färg och
+// så starkt som det är ljust ute. När det är dag tar fönstret över: lamporna, neonen och gatan syns mindre.
 // Riktningarna är i figurens värld, med kameran snett från hans vänstra sida (VY, rum-hasse-scen.js).
 // fotoLjus() är ljuset som fotot redan har, så att en vriden yta får rätt skillnad.
 export const LJUS = `
 uniform float uButik;
 uniform vec4 uDag;
+uniform vec4 uLys;
 const vec3 NYCKEL = vec3(-.449, .549, .699);
 const vec3 NEON = vec3(.702, .12, .702);
 const vec3 GATA = vec3(.54, .19, .82);
-const vec3 DAGSLJUS = vec3(.72, .42, .55);
+const vec3 ROR = vec3(.72, .42, .55);
+const vec3 FONSTER = vec3(.62, .2, .76);
 const vec3 VY = vec3(.208, .044, .977);
 vec3 ljus(vec3 n) {
   float k = max(0., dot(n, NYCKEL) * .86 + .14);
@@ -37,12 +42,17 @@ vec3 ljus(vec3 n) {
   vec3 ns = normalize(n + .6 * VY);
   float r = clamp(dot(ns, NEON) * .6 + .4, 0., 1.);
   float g = clamp(dot(ns, GATA) * .5 + .5, 0., 1.);
-  // dagen i affären till höger (uDag): dagsljuset och lysröret som ett brett sken därifrån och lite
-  // mer ljus överallt; neonen och gatans kalla ljus syns mindre då
-  float d = clamp(dot(ns, DAGSLJUS) * .55 + .45, 0., 1.);
+  // lysröret: ett brett sken från affären och lite mer ljus överallt
+  float d = clamp(dot(ns, ROR) * .55 + .45, 0., 1.);
+  // fönstret: stort, så ljuset sveper långt runt (mjuka skuggor), och himlen ger lite ljus överallt
+  float f = clamp(dot(ns, FONSTER) * .6 + .4, 0., 1.);
   float dag = uDag.w;
-  vec3 b = l * vec3(.95, .93, .92) * (1. + .16 * dag) + vec3(.27, .027, .022) * r * r * r * (1. - .55 * dag) + vec3(.06, .085, .14) * g * g * (1. - dag)
-    + uDag.rgb * dag * (.1 + .62 * d * d);
+  float lys = uLys.w;
+  vec3 b = l * vec3(.95, .93, .92) * (1. + .16 * lys) * (1. - .5 * dag)
+    + vec3(.27, .027, .022) * r * r * r * (1. - .55 * lys) * (1. - .7 * dag)
+    + vec3(.06, .085, .14) * g * g * (1. - lys) * (1. - dag)
+    + uLys.rgb * (.1 + .62 * d * d) * (1. - .5 * dag)
+    + uDag.rgb * (.08 + .95 * f * f);
   return mix(l, b, uButik);
 }
 float fotoLjus(vec3 n) { return max(.3, .42 + .58 * dot(n, vec3(-.249, .549, .798))); }
@@ -69,9 +79,11 @@ bool underBord(vec3 w) {
 `;
 // (utan disk döljs ingenting, och det är rummets ljus utan baren)
 const BUTIK_AV = { value: 0 };
-// Dagen i affären (uDag i LJUS): färgen på dagsljuset och hur mycket dag det är (0–1). Sidan sätter den
-// efter klockan och vädret, som i rummet (dagsljus i rum-hasse.js).
-export const DAG = { value: new THREE.Vector4(0.77, 0.85, 0.93, 0) };
+// Fönstret och lysröret i affären (uDag och uLys i LJUS): ljusets färg gånger styrka, och hur mycket dag
+// det är (0–1) respektive om röret är tänt. Sidan sätter dem efter klockan och vädret, som i rummet
+// (ljuset i rum-hasse.js).
+export const DAG = { value: new THREE.Vector4(0, 0, 0, 0) };
+export const LYS = { value: new THREE.Vector4(0, 0, 0, 0) };
 export const ingenBord = () => ({ value: new THREE.Vector4(0, 1, -1e9, -1e9) });
 
 // figurens kamera (rum-hasse-3d.js): ögat på höjden CY, CZ framför fotots plan
@@ -207,7 +219,7 @@ export function byggHand(modell, sida, foto, bord = ingenBord()) {
     foto: { value: foto },
     uB: { value: ut },
     uHud: { value: new THREE.Vector4((a.hx + 0.5) / a.W, 1 - (a.hy + a.hh - 0.5) / a.H, (a.hw - 1) / a.W, (a.hh - 1) / a.H) },
-    uBord: bord, uButik: bord.butik || BUTIK_AV, uDag: DAG,
+    uBord: bord, uButik: bord.butik || BUTIK_AV, uDag: DAG, uLys: LYS,
   };
   const mesh = new THREE.Mesh(modell.g, new THREE.ShaderMaterial({ uniforms: U, vertexShader: HUD_V, fragmentShader: HUD_F, transparent: true, depthWrite: true, blending: THREE.CustomBlending, blendSrc: THREE.OneFactor, blendDst: THREE.OneMinusSrcAlphaFactor }));
   mesh.frustumCulled = false;
@@ -421,14 +433,14 @@ export function byggArm(scen, sida, foto, modell, vidd = 1, bord = ingenBord()) 
   g.setAttribute('aS', new THREE.BufferAttribute(sS, 1));
   g.setAttribute('aI', new THREE.BufferAttribute(sI, 1));
   g.setIndex(ix);
-  const rorM = new THREE.ShaderMaterial({ uniforms: { foto: { value: foto }, uBord: bord, uButik: bord.butik || BUTIK_AV, uDag: DAG }, vertexShader: ARM_V, fragmentShader: ARM_F, transparent: true, depthWrite: true, blending: THREE.CustomBlending, blendSrc: THREE.OneFactor, blendDst: THREE.OneMinusSrcAlphaFactor });
+  const rorM = new THREE.ShaderMaterial({ uniforms: { foto: { value: foto }, uBord: bord, uButik: bord.butik || BUTIK_AV, uDag: DAG, uLys: LYS }, vertexShader: ARM_V, fragmentShader: ARM_F, transparent: true, depthWrite: true, blending: THREE.CustomBlending, blendSrc: THREE.OneFactor, blendDst: THREE.OneMinusSrcAlphaFactor });
   const ror = new THREE.Mesh(g, rorM);
   ror.frustumCulled = false;
   // skjortans manschett: ett rör med en tjock kant
   const prof = [new THREE.Vector2(51, -40), new THREE.Vector2(53, 34), new THREE.Vector2(53, 46), new THREE.Vector2(50.5, 49.5), new THREE.Vector2(47.5, 46), new THREE.Vector2(47, -40)];
   const manG = new THREE.LatheGeometry(prof, 24);
   manG.scale(1, 1, 0.78);
-  const man = new THREE.Mesh(manG, new THREE.ShaderMaterial({ uniforms: { uBord: bord, uButik: bord.butik || BUTIK_AV, uDag: DAG }, vertexShader: SKJ_V, fragmentShader: SKJ_F, transparent: true, side: THREE.DoubleSide }));
+  const man = new THREE.Mesh(manG, new THREE.ShaderMaterial({ uniforms: { uBord: bord, uButik: bord.butik || BUTIK_AV, uDag: DAG, uLys: LYS }, vertexShader: SKJ_V, fragmentShader: SKJ_F, transparent: true, side: THREE.DoubleSide }));
   man.frustumCulled = false;
   const hand = byggHand(modell, sida, foto, bord);
   ror.renderOrder = man.renderOrder = hand.mesh.renderOrder = 5;
@@ -559,7 +571,7 @@ void main() {
 }`;
 function kerM(rand, kaffe, band, bord) {
   return new THREE.ShaderMaterial({
-    uniforms: { uRand: { value: rand }, uKaffe: { value: kaffe }, uBand: { value: band.map((b) => new THREE.Vector2(b[0], b[1])) }, uBord: bord, uButik: bord.butik || BUTIK_AV, uDag: DAG },
+    uniforms: { uRand: { value: rand }, uKaffe: { value: kaffe }, uBand: { value: band.map((b) => new THREE.Vector2(b[0], b[1])) }, uBord: bord, uButik: bord.butik || BUTIK_AV, uDag: DAG, uLys: LYS },
     vertexShader: KER_V, fragmentShader: KER_F, transparent: true, blending: THREE.CustomBlending, blendSrc: THREE.OneFactor, blendDst: THREE.OneMinusSrcAlphaFactor,
   });
 }
@@ -662,7 +674,7 @@ export function byggCigarr(bord = ingenBord()) {
   const { L, R, ASKA } = CIGARR;
   const prof = [[0, 0], [4.5, 0.5], [8, 1.9], [10.6, 4.2], [12, 7.2], [R, 11], [R, 40], [R, L - ASKA - 6], [R - 0.15, L - ASKA - 1], [R - 0.5, L - ASKA + 1], [R - 0.3, L - 12], [R - 0.8, L - 4], [R - 2.6, L - 1.1], [R - 6, L - 0.1], [0, L + 0.2]];
   const g = new THREE.LatheGeometry(V2(prof), 24);
-  const U = { uGlod: { value: 0 }, uTid: { value: 0 }, uBord: bord, uButik: bord.butik || BUTIK_AV, uDag: DAG };
+  const U = { uGlod: { value: 0 }, uTid: { value: 0 }, uBord: bord, uButik: bord.butik || BUTIK_AV, uDag: DAG, uLys: LYS };
   const mesh = new THREE.Mesh(g, new THREE.ShaderMaterial({ uniforms: U, vertexShader: CIG_V, fragmentShader: CIG_F, transparent: true, blending: THREE.CustomBlending, blendSrc: THREE.OneFactor, blendDst: THREE.OneMinusSrcAlphaFactor }));
   mesh.renderOrder = 6;
   mesh.frustumCulled = false;
@@ -762,7 +774,7 @@ export function byggAskkopp(bord = ingenBord()) {
     const b = (na * np + j) * 3;
     for (let k = 0; k < 3; k++) nr[a + k] = nr[b + k] = (nr[a + k] + nr[b + k]) / 2;
   }
-  const mesh = new THREE.Mesh(g, new THREE.ShaderMaterial({ uniforms: { uBord: bord, uButik: bord.butik || BUTIK_AV, uDag: DAG }, vertexShader: ASK_V, fragmentShader: ASK_F, transparent: true, blending: THREE.CustomBlending, blendSrc: THREE.OneFactor, blendDst: THREE.OneMinusSrcAlphaFactor }));
+  const mesh = new THREE.Mesh(g, new THREE.ShaderMaterial({ uniforms: { uBord: bord, uButik: bord.butik || BUTIK_AV, uDag: DAG, uLys: LYS }, vertexShader: ASK_V, fragmentShader: ASK_F, transparent: true, blending: THREE.CustomBlending, blendSrc: THREE.OneFactor, blendDst: THREE.OneMinusSrcAlphaFactor }));
   mesh.renderOrder = 6;
   mesh.frustumCulled = false;
   return { mesh, borta() { g.dispose(); mesh.material.dispose(); } };
@@ -801,7 +813,7 @@ export function byggRok(N = 240, bord = ingenBord()) {
   quad.setAttribute('aP', iP);
   quad.setAttribute('aR', iR);
   quad.instanceCount = 0;
-  const mesh = new THREE.Mesh(quad, new THREE.ShaderMaterial({ uniforms: { uBord: bord, uButik: bord.butik || BUTIK_AV, uDag: DAG }, vertexShader: ROK_V, fragmentShader: ROK_F, transparent: true, depthWrite: false, blending: THREE.CustomBlending, blendSrc: THREE.OneFactor, blendDst: THREE.OneMinusSrcAlphaFactor }));
+  const mesh = new THREE.Mesh(quad, new THREE.ShaderMaterial({ uniforms: { uBord: bord, uButik: bord.butik || BUTIK_AV, uDag: DAG, uLys: LYS }, vertexShader: ROK_V, fragmentShader: ROK_F, transparent: true, depthWrite: false, blending: THREE.CustomBlending, blendSrc: THREE.OneFactor, blendDst: THREE.OneMinusSrcAlphaFactor }));
   mesh.renderOrder = 8;
   mesh.frustumCulled = false;
   // partiklarna: läge, fart, ålder, livslängd, storlek från och till, täthet, frö, sort (0 blå, 1 grå),

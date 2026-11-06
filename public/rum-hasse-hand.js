@@ -119,8 +119,10 @@ export async function armen(plan, { hand: HAND, kopp: KOPP, pr = 1.5 }) {
   // ---------- i vila ----------
 
   // skala: rummets bildpunkter på en av figurens enheter, mot: en punkt i rummet som armen pekar mot
-  // (ut ur bilden till vänster och lite mot en, mot baren där han sitter)
-  const opt = { skala: 0.6, mot: [-400, 610] };
+  // (rakt ut ur bilden till vänster, mot baren där han sitter, och en bit framför pultens bakre kant, så
+  // att pulten syns fortsätta bakom armen: när armen pekade snett uppåt låg ärmen på kanten, och pulten
+  // såg ut att ta slut där)
+  const opt = { skala: 0.6, mot: [-400, 770] };
   const vila = { s: 1, W: new THREE.Vector3(), N: new THREE.Vector3(), F: new THREE.Vector3(), P: new THREE.Vector3(), D0: new THREE.Vector3() };
   const RH = new THREE.Vector3(1, 0, 0);
   let box = { x: 0, y: 0, w: 1, h: 1 };
