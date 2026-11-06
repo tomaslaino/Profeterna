@@ -5,7 +5,7 @@
 // koordinater och inbakad skugga. Körs en gång: node scripts/hasse/hand.mjs
 import fs from 'node:fs';
 
-const STEG = 6;
+const STEG = 4.5;
 const add = (a, b) => [a[0] + b[0], a[1] + b[1], a[2] + b[2]];
 const sub = (a, b) => [a[0] - b[0], a[1] - b[1], a[2] - b[2]];
 const mul = (a, k) => [a[0] * k, a[1] * k, a[2] * k];
@@ -67,7 +67,9 @@ const TR = [25, 20.5, 17.6, 14.6];
 }
 
 // ---------- formen ----------
-function fingerD(p, ked) {
+function fingerD(p0, ked) {
+  // fingrarna är lite bredare än tjocka (utom tummen)
+  const p = ked.f.namn === 'tumme' ? p0 : [p0[0], p0[1], p0[2] * 1.1];
   let d = 1e9;
   for (const s of ked.led) d = smin(d, kapsel(p, s.a, s.b, s.ra, s.rb), 2.5);
   // lederna buktar ut lite

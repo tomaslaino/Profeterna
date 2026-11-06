@@ -113,7 +113,7 @@ window.RumHasse = (() => {
     if (!plan) return;
     try {
       const a = await import('./rum-hasse-hand.js');
-      H.pulten = await a.armen(plan, { hand: { x: 34, y: 686 }, kopp: { x: 268, y: 708 }, pr: Math.min(devicePixelRatio || 1, [2, 1.5, 1.25, 1][steg()]) * 1.25 });
+      H.pulten = await a.armen(plan, { hand: { x: 14, y: 688 }, kopp: { x: 268, y: 708 }, pr: Math.min(devicePixelRatio || 1, [2, 1.5, 1.25, 1][steg()]) * 1.25 });
       const b = document.createElement('button');
       b.type = 'button';
       b.className = 'rum-hasse-knapp';
