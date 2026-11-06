@@ -976,18 +976,29 @@ window.RumHasse = (() => {
   // (rum-hasse-meningar.js: samma delning som när Macen tar fram ljudet)
   const meningar = (t) => window.HasseMeningar(t);
   // Styckena som repliker, med en gest där det passar: alltid vid de bestämda
-  // orden (fingret och armarna, eller handen i disken), annars då och då vid en lång mening.
-  // Bielsa får honom att slå ut med armarna.
+  // orden (fingret och armarna, handen i disken eller en annan gest), annars då och då vid en
+  // lång mening. Bielsa får honom att slå ut med armarna.
   const BIELSA = /rotasiones|intensid|verticalid|transisiones|presj[oó]n|ombre libre/i;
   const BESTAMT = /nej nej nej|glöm det|äsch|aldrig|varningens finger|solklart|så är det bara|köper jag/i;
   const FINGRET = /nej nej nej|varningens finger/i;
+  // Gesterna medan han pratar (gruppen tal i KLIPP) lottas, utom att vissa ord ibland har sin egen:
+  // han räknar till två, lägger handen på bröstet när han själv tycker något och lugnar med händerna.
+  const ORDGEST = [
+    [/\btvå\b|\bdels\b|för det andra/i, 'tva'],
+    [/\b(tror|säger|vet|köper|lovar) jag\b|\bjag (tror|säger|vet|lovar)\b/i, 'brost'],
+    [/\blugn|organis|kontroll|ordning/i, 'lugnt'],
+  ];
+  function talGest(text) {
+    const o = ORDGEST.find(([re]) => re.test(text));
+    return o && GEST[o[1]] && Math.random() < 0.6 ? o[1] : ettAv('tal', 'armar');
+  }
   function somRepliker(stycken) {
     const ut = [];
     stycken.forEach((st) => meningar(st).forEach((text, i) => ut.push({ text, ny: i === 0 })));
     let sedan = 1;
     ut.forEach((r) => {
       sedan++;
-      if (BIELSA.test(r.text)) { r.gest = 'slag'; sedan = 0; } else if (sedan >= 2 && BESTAMT.test(r.text)) { r.gest = FINGRET.test(r.text) || Math.random() < 0.5 ? 'armar' : 'dunka'; sedan = 0; } else if (sedan >= 4 && r.text.length > 60) { r.gest = 'armar'; sedan = 0; }
+      if (BIELSA.test(r.text)) { r.gest = 'slag'; sedan = 0; } else if (sedan >= 2 && BESTAMT.test(r.text)) { r.gest = FINGRET.test(r.text) ? 'armar' : Math.random() < 0.4 ? 'dunka' : talGest(r.text); sedan = 0; } else if (sedan >= 3 && r.text.length > 50) { r.gest = talGest(r.text); sedan = 0; }
     });
     return ut;
   }

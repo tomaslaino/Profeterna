@@ -3887,7 +3887,7 @@ T 0–12,4 vilan, skrattet, slaget, gesterna och vägen hem, och efter det ett k
 sin bit av tidslinjen. Varje klipp börjar och slutar där han står (i vilan, eller med händerna på
 disken när han pratar) och har sina egna nycklar för huvudet, kroppen, ansiktet och armarna
 (`RORELSER`), så att ett nytt klipp bara behöver det som händer i det. Klippen i samma grupp (domen,
-kaffet, cigarren, småsakerna) lottas av sidan, utan att samma kommer två gånger innan alla har varit med.
+kaffet, cigarren, småsakerna, talet) lottas av sidan, utan att samma kommer två gånger innan alla har varit med.
 
 **Vilan.** När han bara sitter och väntar på en upprepar sig ingenting. Det som alltid rör sig går
 aldrig i takt: han blinkar ungefär var fjärde sekund men oregelbundet, någon gång mellan en halv och
@@ -4006,6 +4006,30 @@ Sätten (`KLIPP` i [public/rum-hasse-3d.js](public/rum-hasse-3d.js); de sju sist
 - `smaka`: han håller röken i munnen och smakar på den med slutna ögon och höjda bryn, och släpper sedan
   ut den långsamt.
 
+**Händerna när han pratar.** Han är nöjd med det han säger: han ler lite medan han pratar, och händerna
+hjälper till på ett av tio sätt (gruppen `tal`). Förut hade han bara ett (`armar`: fingret, handen som
+hackar och armen ut åt sidan), och det blev samma rörelse om och om igen (2026-11-06). Nu lottas:
+
+- `armar`: pekfingret upp, handen som hackar och armen ut åt sidan, som förut.
+- `oppna`: handflatan upp mot en, med en liten knuff framåt och en nick – där har du det.
+- `axla`: båda handflatorna upp och axlarna upp, huvudet på sned och ett belåtet leende – vad ska man säga.
+- `lugnt`: handflatorna nedåt över disken, två lugna tryck med en nick och halvslutna ögon för varje, och
+  sedan isär.
+- `tva`: räknar på fingrarna med handflatan mot en, pekfingret och sedan långfingret, med en nick för varje.
+- `tummen`: tummen upp mot en, med en knyck och ett kisande.
+- `brost`: handen på bröstet och två klappar, med hakan upp och ögonen halvslutna – det säger jag.
+- `gnida`: gnuggar händerna framför sig med axlarna lite uppe – det här blir bra.
+- `nojd`: lutar sig bakåt med hakan upp och klappar disken två gånger, så att det hörs lite.
+- `rulla`: handen rullar framåt i små cirklar – och så rullar det på.
+
+Några ord har ibland sin egen gest (`ORDGEST` i [public/rum-hasse.js](public/rum-hasse.js)): *två* och
+*för det andra* ger fingrarna, *tror jag* och *säger jag* handen på bröstet, och *lugn*, *ordning* och
+*kontroll* de lugna händerna. Varje gest börjar och slutar med händerna på disken som när han pratar.
+Fingrarna formas per klipp (`fA` och `fB`: hur mycket de spretar, tummen ut, varje finger för sig och
+tummen rak fast handen är knuten, nionde talet i `extra` i `bojFingrar`), och handen kan svänga runt
+sitt läge (`sv`: när han rullar och gnuggar). Han pekade också på en ett tag, men fingret pekade då
+rakt in i kameran och syntes inte, så det sättet är borttaget.
+
 **Samtalet.** Det är han som frågar, *Vilken match ska jag hjälpa dig med?*, och när du kommer tillbaka *Har du kört fast igen, Laino?*, med ditt efternamn om kupongen
 vet vem du är. Han talar i hela meningar som går att förstå för sig: han säger vad det gäller (*Vilken match vill du ha hjälp med nu då?*, inte *Vilken match är det nu då?*), och "den" syftar bara på matchen du har valt. Över matchlistan finns alltid plats för två rader, så att listan står still vad han än säger. Man svarar genom att välja en match. Då frågar han tillbaka (*Den är solklar. Vill du
 veta, eller ska du gissa?*), och först *Jag är idel öra* ger analysen (knappen lottas som hans repliker: också *Tala om det för mig*), så att ett felklick inte visar ett tips. *Jag gissar* går tillbaka till listan och
@@ -4033,7 +4057,8 @@ och är nästan klar (*Nu faller bitarna på plats.*), med en rad lottad ur varj
 [public/rum-hasse-repliker.js](public/rum-hasse-repliker.js)), så att det låter olika varje gång. När den är klar blir han tyst och slår domen i disken
 (se *Slaget*), och domen står i guld. Sedan säger han texten en mening i taget, ord för ord med munnen i takt (och det hörs, se *Ljudet*), med en paus
 mellan meningarna och en längre före en kort mening, och gesterna kommer vid de bestämda orden
-(*Nej nej nej*, *varningens finger*, ibland handflatan i disken) eller då och då vid en lång mening. Ett klick var som helst
+(*Nej nej nej* och *varningens finger* ger fingret, annars handflatan i disken eller en av gesterna i
+*Händerna när han pratar*) eller vid ungefär var tredje lång mening. Ett klick var som helst
 visar hela repliken och nästa klick går vidare; *Ja, ja* tar resten på en gång, och det svarar han
 på (*Som du vill.*). Efter texten säger han vad matchen slutar (*Det slutar 1–1.*): det troligaste
 resultatet i modellens prognos (resultatmatrisen i `data/match/<id>.json`, samma som matchbladet
