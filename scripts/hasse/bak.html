@@ -170,6 +170,14 @@ const LJ = [
   { p: [2600, 650, 1500], r: 260, e: [1.0, 0.16, 0.1].map((v) => v * 12) },
   // gatan genom fönstret till höger: kallt
   { p: [3800, 1300, 3400], r: 620, e: [0.55, 0.68, 1.0].map((v) => v * 3.6) },
+  // ?lys=1: lysröret i affärens tak är tänt, som i rummet från sex på morgonen till midnatt (rum-folk.js):
+  // röret framför baren och affären i dess sken till höger. Sidan tonar mellan den här bilden och
+  // nattens efter klockan, och lägger dagsljuset ovanpå som i rummet (dagsljus i rum-hasse.js).
+  ...(q.get('lys') ? [
+    { p: [-700, 1820, 2300], r: 210, e: [0.96, 0.98, 1.0].map((v) => v * +(q.get('ls') || 100)) },
+    { p: [1500, 1820, 2300], r: 210, e: [0.96, 0.98, 1.0].map((v) => v * +(q.get('ls') || 100)) },
+    { p: [5600, 1000, 3200], r: 1300, e: [0.95, 0.92, 0.86].map((v) => v * +(q.get('as') || 18)) },
+  ] : []),
 ];
 console.log('primitiver', P.length, 'grupper', G.length);
 

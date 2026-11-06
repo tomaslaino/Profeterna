@@ -120,7 +120,7 @@ export async function armen(plan, { hand: HAND, kopp: KOPP, pr = 1.5 }) {
 
   // skala: rummets bildpunkter på en av figurens enheter, mot: en punkt i rummet som armen pekar mot
   // (ut ur bilden till vänster och lite mot en, mot baren där han sitter)
-  const opt = { skala: 0.6, mot: [-400, 700] };
+  const opt = { skala: 0.6, mot: [-400, 610] };
   const vila = { s: 1, W: new THREE.Vector3(), N: new THREE.Vector3(), F: new THREE.Vector3(), P: new THREE.Vector3(), D0: new THREE.Vector3() };
   const RH = new THREE.Vector3(1, 0, 0);
   let box = { x: 0, y: 0, w: 1, h: 1 };
@@ -170,7 +170,7 @@ export async function armen(plan, { hand: HAND, kopp: KOPP, pr = 1.5 }) {
   // ser kortare ut; här ligger den i full längd bredvid. Fatets skugga faller bort från ljuset, som kommer
   // framifrån till vänster.
   const KOPP_VY = 44 * DEG;
-  const KOPP_SKALA = 0.8;
+  const KOPP_SKALA = 0.9;
   const KOPP_AVST = D;
   K.kopp.position.set(0, 11, 0);
   K.kopp.rotation.y = -0.5;

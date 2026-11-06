@@ -1,6 +1,6 @@
-// Bakar Hasse Backes bilder: node scripts/hasse/baka.mjs atlas | bak | bak-hog [varv]
+// Bakar Hasse Backes bilder: node scripts/hasse/baka.mjs atlas | bak | bak-hog | bak-lys | bak-lys-hog [varv]
 // bak ger väggen bakom honom i baren (bak.png, eller bak-hog.png för telefonen på höjden), från figurens kamera
-// och i måtten i BAK (public/rum-hasse-scen.js).
+// och i måtten i BAK (public/rum-hasse-scen.js); bak-lys samma vägg med lysröret i affären tänt (bak-lys.png).
 // Kräver Google Chrome och en filserver på PORT (standard 8765) med public/ i roten och scripts/hasse/ under
 // /skiss/bake/, och cwebp för att göra webp av resultatet. Se scripts/hasse/README.md.
 import fs from 'node:fs';
@@ -8,10 +8,11 @@ import { oppna } from './cdp.mjs';
 const vad = process.argv[2] || 'atlas';
 const n = +(process.argv[3] || 400);
 const ut = process.env.UT || '.';
-const lage = vad === 'bak-hog' ? 'hog' : 'bred';
+const lage = vad.endsWith('-hog') ? 'hog' : 'bred';
+const lys = vad.startsWith('bak-lys') ? '&lys=1' : '';
 async function kor(varv) {
   const c = await oppna({ W: 1000, H: 700, D: 1, tid: 14400000 });
-  await c.ga(`/skiss/bake/bak.html?lage=${lage}&n=${varv}`);
+  await c.ga(`/skiss/bake/bak.html?lage=${lage}&n=${varv}${lys}`);
   if (!await c.vantaPa('document.documentElement.dataset.klar==="1"', 200000)) console.log('inte klar', c.fel);
   await c.ev('window.__steg()');
   const url = await c.ev('window.__visa()');
@@ -28,7 +29,7 @@ if (vad === 'atlas') {
   fs.writeFileSync(`${ut}/atlas.png`, Buffer.from((await c.ev('__atlas.toDataURL("image/png")')).split(',')[1], 'base64'));
   c.stang();
 } else {
-  const namn = vad === 'bak-hog' ? 'bak-hog' : 'bak';
+  const namn = vad;
   const rum = await kor(n);
   const c = await oppna({ W: 400, H: 300, D: 1, tid: 120000 });
   // väggen är ändå oskarp: en liten oskärpa tar bort kornet, som annars blir fläckar i webp

@@ -17,7 +17,7 @@
 // Klipp: T 0–12,4 (vila, skrattet, domen, gesterna, hem), och sedan ett klipp i taget på var sin bit av
 // tidslinjen (KLIPP): fler sätt att slå domen i disken, kaffet (sex sätt) och cigarren.
 import * as THREE from 'three';
-import { ATLAS, LJUS, ARM, KAMERA, BORD_GLSL, CIGARR, ASKKOPP, laddaFoto, laddaHand, byggArm, byggKopp, byggCigarr, byggAskkopp, byggRok } from './rum-hasse-arm.js';
+import { ATLAS, LJUS, ARM, KAMERA, BORD_GLSL, CIGARR, ASKKOPP, DAG, laddaFoto, laddaHand, byggArm, byggKopp, byggCigarr, byggAskkopp, byggRok } from './rum-hasse-arm.js';
 import { SCEN, BAK, kamera as scenKamera, iKamera, disken, franBaren } from './rum-hasse-scen.js';
 
 const DEG = Math.PI / 180;
@@ -94,7 +94,7 @@ for (const k of Object.values(KLIPP)) {
 
 // ---------- figuren ----------
 
-export { KAMERA, SCEN, BAK };
+export { KAMERA, SCEN, BAK, DAG };
 export const D = KAMERA.CZ;
 const KAM = scenKamera();
 const DK = disken();
@@ -106,7 +106,7 @@ export const BORD = { Y: DK.Y, Z: kantZ(0) };
 export const VILA = { EH: BORD.Y + 78, WH: BORD.Y + 42 };
 // Koppen på sitt fat och notan under fatet, till höger om hans vänstra hand; askkoppen till vänster om
 // hans högra hand. På disken, i figurens värld.
-export const KOPP = [352, BORD.Y, 790];
+export const KOPP = [372, BORD.Y, 790];
 export const ASK = [-345, BORD.Y, 700];
 // En punkt i världen i fönstret: (cx, ey) är där kamerans axel träffar fönstret och s bildpunkter på en
 // enhet på avståndet D.
@@ -122,7 +122,9 @@ export const MATT = {
   vanster: [-470, -200, 300],
   hoger: [470, -200, 340],
   ram: (hog) => [[hog ? -640 : -790, 860, 330], [660, 860, 330], [hog ? -640 : -790, BORD.Y, 330], [-260, BORD.Y, 1000],
-    [KOPP[0] + 190, BORD.Y, KOPP[2] + 60], [KOPP[0] - 60, BORD.Y + 150, KOPP[2] + 150], [ASK[0] - 140, BORD.Y, ASK[2] + 120]],
+    [KOPP[0] + 190, BORD.Y, KOPP[2] + 60], [KOPP[0] - 60, BORD.Y + 150, KOPP[2] + 150], [ASK[0] - 140, BORD.Y, ASK[2] + 120],
+    // (fingertopparna på den vänstra handen bredvid fatet)
+    [KOPP[0] - 170, BORD.Y, KOPP[2] + 210]],
 };
 // fotot: urklippt, armarna borta, ljuset anpassat (bakat ur originalet)
 const X0 = 280;
@@ -219,7 +221,7 @@ export async function figuren(duk, { hog = false, latt = false, pr = 1 } = {}) {
     foto: { value: foto }, uHuvud: { value: new THREE.Matrix3() }, uPiv: { value: W_(650, 650, 40) }, uKropp: { value: new THREE.Matrix4() }, uAx: { value: new THREE.Vector2() }, uAndas: { value: 0 },
     blund: { value: 0 }, kis: { value: 0 }, munn: { value: 0 }, rund: { value: 0 }, le: { value: 0 }, bryn: { value: new THREE.Vector2() }, blick: { value: new THREE.Vector2() },
     uArm: { value: [new THREE.Vector3(), new THREE.Vector3(), new THREE.Vector3(), new THREE.Vector3(), new THREE.Vector3(), new THREE.Vector3()] },
-    uBord: bord, uButik: bord.butik,
+    uBord: bord, uButik: bord.butik, uDag: DAG,
   };
   const yta = new THREE.Mesh(G, new THREE.ShaderMaterial({
     uniforms: U, transparent: true, blending: THREE.CustomBlending, blendSrc: THREE.OneFactor, blendDst: THREE.OneMinusSrcAlphaFactor, side: THREE.DoubleSide,
@@ -415,7 +417,7 @@ export async function figuren(duk, { hog = false, latt = false, pr = 1 } = {}) {
   const diskU = {
     uBak: { value: null }, uBakRam: { value: new THREE.Vector4(0, 0, 1, 1) }, uBakSt: { value: new THREE.Vector2(1, 1) },
     uKr: { value: new THREE.Vector3(...KAM.hoger) }, uKu: { value: new THREE.Vector3(...KAM.upp) }, uKb: { value: new THREE.Vector3(...KAM.bak) }, uD: { value: D },
-    uNb: { value: new THREE.Vector2(DK.n[0], DK.n[1]) }, uVagg: { value: SCEN.VAGG + 180 }, uButik: bord.butik,
+    uNb: { value: new THREE.Vector2(DK.n[0], DK.n[1]) }, uVagg: { value: SCEN.VAGG + 180 }, uButik: bord.butik, uDag: DAG,
   };
   const diskG = new THREE.BufferGeometry();
   {
@@ -494,7 +496,8 @@ export async function figuren(duk, { hog = false, latt = false, pr = 1 } = {}) {
         // lackat trä, ådrat längs baren, slitet och mörkare närmast en
         vec2 g = vec2(vB.x * .0026, vB.z * .02);
         float a = fbm(g * vec2(1., 2.2)), b = fbm(g * vec2(.7, 8.) + 3.), c2 = fbm(vB.xz * vec2(.012, .06) + 17.);
-        vec3 tra = mix(vec3(.34, .215, .13), vec3(.5, .325, .2), a);
+        // (pultens bruna som det ser ut i rummet, i dess luft: lite gråare än rent trä)
+        vec3 tra = mix(vec3(.33, .23, .16), vec3(.48, .35, .25), a);
         tra *= .8 + .34 * b;
         tra *= .92 + .12 * c2;
         vec3 l = ljus(n) * (.32 + .9 * pol) + vec3(.5, .06, .04) * hoger * .35 + vec3(.16, .2, .3) * hoger * .2;
@@ -547,7 +550,7 @@ export async function figuren(duk, { hog = false, latt = false, pr = 1 } = {}) {
     notaG.computeVertexNormals();
   }
   const nota = new THREE.Mesh(notaG, new THREE.ShaderMaterial({
-    uniforms: { uT: { value: notaTex }, uButik: bord.butik },
+    uniforms: { uT: { value: notaTex }, uButik: bord.butik, uDag: DAG },
     transparent: true,
     vertexShader: 'varying vec2 vUv; varying vec3 vN; void main() { vUv = uv; vN = mat3(modelMatrix) * normal; gl_Position = projectionMatrix * viewMatrix * modelMatrix * vec4(position, 1.); }',
     fragmentShader: `precision highp float; uniform sampler2D uT; varying vec2 vUv; varying vec3 vN;
@@ -686,10 +689,10 @@ export async function figuren(duk, { hog = false, latt = false, pr = 1 } = {}) {
     return { W: W.toArray(), pol: E.clone().sub(S0).toArray() };
   }
   const va = paDisken(SA, 1, 17, 40);
-  const vb = paDisken(SB, -1, 14, 35);
+  const vb = paDisken(SB, -1, 14, 25);
   // [handled, armbågens riktning, fingrarna, handflatan, krok, peka]
   const VILA_A = [va.W, va.pol, [0.84, -0.1, 0.53], [0.2, -0.97, 0.1], 0.36, 0];
-  const VILA_B = [vb.W, vb.pol, [-0.25, -0.1, 0.96], [-0.1, -0.98, 0.12], 0.3, 0];
+  const VILA_B = [vb.W, vb.pol, [0.04, -0.08, 0.99], [-0.05, -0.99, 0.08], 0.3, 0];
   // [t, handled, armbågens riktning, fingrarna, handflatan, krok, peka, slag]. slag: på vägen dit går
   // handen allt fortare och stannar tvärt, som när den slår i disken (annars mjukt in och ut).
   const VA = [

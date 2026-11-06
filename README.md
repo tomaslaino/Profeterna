@@ -679,6 +679,12 @@ bara lokalt. Analyserna visas som de ligger i `data/analyser.json`; hur de skriv
   låg bredvid i stället för under fatet som i baren. Nu är koppen bardiskens kopp i samma ljus,
   ritad i handens duk, fatet står på notan och handen ligger bredvid, och bardisken har pultens
   bruna. Se [Hasse Backe](#hasse-backe), *Kaffet i rummet*.
+- **Rummet och baren är samma ställe (2026-11-06, användarens önskemål):** handen låg vid koppen på
+  pulten men en bit från den i baren, fingrarna gick ned i bardisken, handen på pulten låg tryckt mot
+  bakkanten, och baren var mörk som en kväll fast det var dag i rummet. Nu ligger den vänstra handen
+  tätt intill fatet på båda ställena, fingrarna lägger sig på disken, och baren har rummets tid på
+  dygnet: lysröret tänt från sex till midnatt och dagsljuset efter klockan och vädret. Se
+  [Hasse Backe](#hasse-backe), *Bilden*, *Ljuset* och *Kaffet i rummet*.
 - **Kuponghistoriken flyttar till Olympen (2026-10-20, användarens önskemål):** Kupong
   handlar bara om nästa kupong – växlaren Omgången | Historik försvinner. De färdigspelade
   kupongerna står sist i Olympen under rubriken *Grupparbetena* (`#olympen/kuponger`, en
@@ -2000,8 +2006,8 @@ Enter och mellanslag klickar på dem. En match på text-tv:n öppnar matchrutan 
   *Inlämnad*, men inga tecken. Din egen tas i handen, och de andras när du ser deras tips
   (se nedan). Innan dess lyfts en annans kupong bara lite i ena kanten och faller tillbaka.
 - **Hasses kaffe** längst till vänster på pulten → Hasse Backe, som sitter i baren
-  utanför bilden till vänster. Hans hand ligger på pulten, med armen in från bildens kant, och till
-  höger om fingrarna står koppen med blå ränder och ryker på sitt fat vid pultens bakre kant. Fatet
+  utanför bilden till vänster. Hans hand ligger på pulten, med armen in från bildens kant, och tätt
+  till höger om den står koppen med blå ränder och ryker på sitt fat nära pultens bakre kant. Fatet
   står på hans nota, som i baren: kaffe, fyra påtår och en kanelbulle, Skrivs på Notts County
   (klubben han lämnade efter sju veckor 2009, när lönen inte kom; notan har nummer 0007). Ett klick på kaffet eller notan,
   Enter eller H och man vänder sig mot honom (`hasseHtml`, `tillHasse`, se
@@ -3776,7 +3782,14 @@ Figuren skuggar det som är under disken eller skyms av den (`BORD_GLSL` i
 ovansidan, bakom den det som strålen från kameran bara når genom disken. Kroppen slutar alltså vid
 kanten, och armbågar, händer och fat trycks mot disken utan att något sticker igenom. Armarna vilar
 med armbågarna på disken och armens riktiga längder (`paDisken`), och gesterna börjar och slutar
-där; eftersom disken går snett når den vänstra armbågen den bara nära axeln.
+där; eftersom disken går snett når den vänstra armbågen den bara nära axeln. Den vänstra handen
+ligger rakt fram med fatet tätt intill lillfingret och fingertopparna vid notans hörn, som handen på
+pulten i rummet. Fingrarna lägger sig på disken: ett finger vars två yttre leder skulle nå under
+ovansidan böjs mindre, tills den lägsta punkten ligger på ytan (`golv` i
+[public/rum-hasse-arm.js](public/rum-hasse-arm.js)), så att fingertopparna aldrig går ned i disken,
+inte heller när han trummar eller slår i den. Förut var fingrarna krökta som klor i vilan, topparna
+försvann ned i disken och den vänstra handen pekade in mot honom med koppen vid handleden (ändrat
+2026-11-06).
 
 Han fyller höjden från hjässan nära överkanten till disken vid tre fjärdedelar av höjden, med mitten
 av honom vid 60 % av bredden och samtalet i en spalt till vänster; får samtalet inte plats blir han
@@ -3804,16 +3817,29 @@ neonskyltens röda sken och gatans kalla ljus från höger, där affären är (`
 bilden mörknar hörnen, och ett lätt korn rör sig (`.rh-ton`, `.rh-korn`), inte på rummets lägre steg
 och inte i telefonen. Handen på pulten i rummet har rummets ljus utan baren.
 
+Baren har samma tid på dygnet som rummet (`tand` i [public/rum-hasse.js](public/rum-hasse.js)). Från
+sex på morgonen till midnatt är lysröret i affärens tak tänt, som i rummet (`RumFolk.natt`): väggen är
+då en egen bild spårad med röret framför baren och affären i dess sken till höger
+(`hasse-bak-lys.webp`), och figuren, disken och koppen får ett brett ljus från affären och lite mer
+ljus överallt (`uDag` i `LJUS`, `DAG`), medan neonen och gatans kalla ljus syns mindre. Dagsljuset
+faller in från höger i himlens färg och lika starkt som i rummet (`RumUte.light`, `.rh-dagsljus` som
+rummets `.rum-dagsljus`), så att det skiftar med klockan och vädret. Mellan midnatt och sex är
+lysröret släckt och baren lyses bara av sina egna lampor (`hasse-bak.webp`). Förut var baren alltid
+en mörk kvällsbar, också mitt på dagen när rummet bredvid var ljust (ändrat 2026-11-06).
+
 **Kaffet i rummet.** Handen, koppen och notan på pulten är samma som i hans bild, så att man känner
 igen dem när kameran slår över: koppen är bardiskens modell (`byggKopp`) med samma ljus, fatet står
-på notans övre hörn och handen ligger till vänster om koppen, som hans vänstra hand vid koppen i
-baren ([public/rum-hasse-hand.js](public/rum-hasse-hand.js)). Koppen ritas i handens duk med en egen
+på notans övre hörn och handen ligger tätt till vänster om fatet med fingertopparna vid notans kant,
+som hans vänstra hand vid koppen i baren ([public/rum-hasse-hand.js](public/rum-hasse-hand.js)).
+Armen kommer in från bildens vänstra kant och ligger på pulten en bit framför dess bakre kant, så att
+han inte ser ut att hålla i kanten. Koppen ritas i handens duk med en egen
 kamera: den ses 44° uppifrån och rakt framifrån som det andra på pulten, eftersom handens kamera ser
 hörnet långt från sin mitt och en kopp där skulle luta. Den är lite mindre än i baren (`KOPP_SKALA`),
 där handen pekar mot en och ser kortare ut. Duken tonar in när den är klar, och den ritade koppen i
 `hasseHtml` tonar då bort; den står kvar utan WebGL. Bardiskens trä har pultens bruna, inte rödare.
 Förut stod en platt ritad kopp, sedd nästan från sidan, bredvid notan, och handen låg under fatet så
-att det såg ut som om den bar det (ändrat 2026-11-05).
+att det såg ut som om den bar det (ändrat 2026-11-05). Sedan låg handen tryckt mot pultens bakre kant
+med fingrarna mot fatet, medan den i baren låg en bit från koppen (ändrat 2026-11-06).
 
 Tre tidigare försök: först satt han på en barstol vid pultens ände med en arm som ett gummiband över
 hörnet till handen långt nere på pulten (armen, benen, hörnet och koppen såg konstiga ut). Sedan gled
@@ -4100,7 +4126,7 @@ låtsade modellen inte kunde visa.
 klart, med handens modell (133 kB) och fotot (149 kB). Den ritas en gång och sedan bara när fingrarna
 trummar, och den behåller sin bild (`preserveDrawingBuffer`), så att den inte är tom om duken låg
 utanför bilden när den ritades (i telefonen på höjden och i smala fönster). Resten hämtas först när
-någon pekar på kaffet eller klickar: bilden av väggen (38 kB, 24 kB på höjden) och figuren. Disken
+någon pekar på kaffet eller klickar: bilden av väggen (61 kB, 33 kB på höjden; på natten 38 och 24 kB) och figuren. Disken
 ritas en gång med figurens grafik när han öppnas, och sedan när fönstret har slutat ändras; kameran
 väntar högst 1,5 s på den. Figurens duk är bara så stor som han och det han gör, och den ritas efter
 rummets steg (`Rum.kval`, se [När datorn inte hinner med](#när-datorn-inte-hinner-med)): högst täthet
