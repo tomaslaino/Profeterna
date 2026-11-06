@@ -1,5 +1,5 @@
 {
- "uppdaterad": "2026-11-06T16:19:14.543Z",
+ "uppdaterad": "2026-11-06T17:20:22.985Z",
  "omgang": {
   "id": "2026-11-07-st4978",
   "matcher": [
@@ -1058,22 +1058,23 @@
    },
    "hasse": {
     "stycken": [
-     "Glasner har skällt offentligt efter förlusten mot Brentford, bett om ursäkt för tonen men inte för innehållet, och sedan stängt dörren till träningen. Det får han göra. Problemet är att han har förlorat fyra av fem möten med City, och det ändrar ingen presskonferens i världen.",
-     "Forest skapar chanser, nästan sjutton skott per match, men laget har stått på noll framåt i fem av nio ligamatcher. Ett lag som inte får in bollen bygger jag ingen kupong på. City har förlorat två raka i ligan, men de kom tillbaka och vann i Leipzig i veckan, och det väger tyngre. Tvåan, och då är jag jävligt snäll mot Forest."
+     "Forest skjuter nästan sjutton skott per match men har inte gjort mål i fem av nio ligamatcher. Man kan skapa hur mycket man vill, men bollen måste in i mål, och det gör den inte där. Orsak och verkan.",
+     "Glasner har bara tagit en poäng på fem möten med City. Efter förlusten mot Brentford gick han dessutom ut hårt både i tv och på presskonferensen och sa att fyra förluster på fem matcher inte duger. Vad han har ändrat på träningen vill han inte berätta, och sådant brukar inte göra ett lag lugnare inför en sådan match.",
+     "City har förlorat två raka ligamatcher, men de svarade med att vinna i Leipzig i veckan. Ikke noget at tale om, som man säger i Aalborg. Jag spikar tvåan, inga garderingar."
     ],
     "tips": "2026-11-06T15:01:22.422Z",
     "uppdrag": {
      "fraser": [
-      "Total kontroll",
-      "Då är jag jävligt snäll"
+      "Då är jag jävligt snäll",
+      "Orsak och verkan"
      ],
-     "krydda": null,
+     "krydda": "Ikke noget at tale om, som man säger i Aalborg.",
      "bielsa": []
     },
     "model": "claude-opus-5-5",
-    "version": "2026-11-04.1",
-    "writtenAt": "2026-11-06T15:01:31.523Z",
-    "attempts": 1
+    "version": "2026-11-05.1",
+    "writtenAt": "2026-11-06T17:20:22.358Z",
+    "attempts": 3
    },
    "model": "claude-opus-5-5",
    "version": "2026-11-04.1",
