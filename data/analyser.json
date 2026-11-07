@@ -1,5 +1,5 @@
 {
- "uppdaterad": "2026-11-07T10:53:03.863Z",
+ "uppdaterad": "2026-11-07T10:53:55.115Z",
  "omgang": {
   "id": "2026-11-07-st4978",
   "matcher": [
@@ -774,22 +774,26 @@
    },
    "hasse": {
     "stycken": [
-     "Preston ligger sist med fem poäng på fjorton matcher, och den nya tränaren har förlorat fem av sex matcher. Laget har släppt in 30 mål, och det säger mig att de står fel när motståndaren slår in bollen.",
-     "Till lördagen saknas dessutom anfallaren Kenny och den avstängde Leroy, och fyra spelare till är skadade. Här höjer jag ett varningens finger för att skytteligaledaren Larin i Southampton kanske inte spelar, men laget har ändå gått obesegrat i sex matcher.",
-     "Ett halvtrasigt bottenlag möter ett lag med ordning och reda, och då behöver man inte fundera länge. Jag ringar bara in tvåan."
+     "Preston har släppt in 30 mål på fjorton matcher och ligger sist med fem poäng. Den nye tränaren har tagit en enda poäng på sex matcher. Det handlar om hur laget står när motståndaren slår in bollen, och så länge det inte sitter åker bollen in. Orsak och verkan.",
+     "Nu saknas dessutom anfallaren Kenny och den avstängde mittfältaren Leroy, och fyra spelare till är skadade. En mittfältare som värvades i fredags ska rakt in i laget, och det är ingen organisation man bygger på två träningar.",
+     "Southampton har inte förlorat på sex matcher. Om deras skyttekung Larin inte kan spela får någon annan göra målen, för Preston kommer att släppa till chanser. Jag spikar Southampton, alltså en tvåa."
     ],
+    "tecken": [
+     2
+    ],
+    "resultat": "1–3",
     "tips": "2026-11-07T10:11:59.507Z",
     "uppdrag": {
      "fraser": [
-      "Här höjer jag ett varningens finger",
+      "Orsak och verkan",
       "Äsch"
      ],
      "krydda": null,
      "bielsa": []
     },
     "model": "claude-opus-5-5",
-    "version": "2026-11-05.1",
-    "writtenAt": "2026-11-07T10:12:36.006Z",
+    "version": "2026-11-07.1",
+    "writtenAt": "2026-11-07T10:53:54.504Z",
     "attempts": 3
    },
    "model": "claude-opus-5-5",
