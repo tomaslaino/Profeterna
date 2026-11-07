@@ -1,5 +1,5 @@
 {
- "uppdaterad": "2026-11-07T10:54:48.114Z",
+ "uppdaterad": "2026-11-07T10:55:33.447Z",
  "omgang": {
   "id": "2026-11-07-st4978",
   "matcher": [
@@ -533,23 +533,27 @@
    },
    "hasse": {
     "stycken": [
-     "Wimbledon har gjort nio mål på tretton ligamatcher, och det hänger ihop med att Mathew Stevens har varit borta sedan i mars. Laget har inte vunnit sedan september, och anfallet vilar nu på Harry Cornick och Jayden Stockley. Ikke noget at tale om, som man säger i Aalborg.",
-     "Crewe har haft en tung höst, men på hemmaplan har laget inte förlorat en enda match den här säsongen. Jordan Gibson gör dessutom mål. Ett lag som inte kan göra mål åker inte dit och slår ett sådant hemmalag.",
-     "Samtidigt har de flesta av lagens senaste möten slutat lika, och en Wimbledonseger är inte mer trolig än ett kryss. Det är lugnt. Jag tar etta och kryss."
+     "Wimbledon har inte vunnit på nio matcher och har gjort nio mål på tretton ligamatcher. Mathew Stevens, som gjorde 26 ligamål på två säsonger, har varit borta sedan i mars, så nu hänger allt på Cornick och Stockley. Ett lag som inte gör mål åker inte bort och vinner en cupmatch.",
+     "Crewe har haft en ruskig höst med 1–5 i Chesterfield, men hemma har de inte förlorat den här säsongen. Jordan Gibson har gjort fem mål på sina sju senaste matcher, och det räcker långt mot det här Wimbledon. Wimbledon tappade dessutom en ledning sent mot Stockport.",
+     "Spelbolagen tror en hel del på kryss, men för att det ska bli kryss måste Wimbledon göra mål, och det tror jag inte på. Jag ringar in en etta och inget annat."
     ],
+    "tecken": [
+     0
+    ],
+    "resultat": "2–0",
     "tips": "2026-11-07T10:17:36.693Z",
     "uppdrag": {
      "fraser": [
-      "Då är jag jävligt snäll",
-      "Det är lugnt"
+      "Solklart",
+      "Här höjer jag ett varningens finger"
      ],
-     "krydda": "Ikke noget at tale om, som man säger i Aalborg.",
+     "krydda": "Det er helt i orden, som danskarna säger.",
      "bielsa": []
     },
     "model": "claude-opus-5-5",
-    "version": "2026-11-05.1",
-    "writtenAt": "2026-11-07T10:17:48.952Z",
-    "attempts": 1
+    "version": "2026-11-07.1",
+    "writtenAt": "2026-11-07T10:55:18.637Z",
+    "attempts": 2
    },
    "model": "claude-opus-5-5",
    "version": "2026-11-04.1",
