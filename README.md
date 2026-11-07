@@ -829,6 +829,12 @@ bara lokalt. Analyserna visas som de ligger i `data/analyser.json`; hur de skriv
   till höger, där domarens kort och visselpipa låg – de är borta. En kupong ur högen vänds
   mot mitten när den tas i handen, och i uppgörelsen kommer kupongerna in från höger. Askan,
   smulorna, locket och fikat hamnar aldrig på högen. Se [Tobaksaffären](#tobaksaffären).
+- **Gängets kupong med baksidan upp (2026-11-07, användarens önskemål):** när allas tips visas
+  syntes allas kryss direkt på pulten. Nu ligger gängets kupong med baksidan upp, med stämpeln
+  (*Alla inne*) stort mitt på, och framsidan lyser svagt igenom, spegelvänd, som på tunt papper.
+  Ett klick vänder den, och den ligger vänd på enheten tills någon mer har lämnat in; tas den i
+  handen (pingklockan) läggs den tillbaka med framsidan upp. Valt bland fem skisser (vikt kant,
+  skrapfält, kuvert, bara gängets kryss). Se [Tobaksaffären](#tobaksaffären).
 - **Visitkortet i stället för raderna vid dörren (2026-11-06, användarens önskemål):** under
   närbilden av dörren stod raderna från Om oss. De är borta, och i stället sitter Matchfixarnas
   visitkort med ett mässingsstift på väggen mellan stationsuret och orakelramen: namnet, våra autografer och

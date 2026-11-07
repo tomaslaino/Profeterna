@@ -750,6 +750,19 @@ canvas.rum-neonhalo { opacity: 0.28; }
 .rum-bak .regler { left: 58px; right: 58px; top: 318px; bottom: 44px; border-top: 2px solid rgba(90, 70, 40, 0.22); padding-top: 12px; font: 700 14px/1 Fraunces, Georgia, serif; letter-spacing: 4px; text-transform: uppercase; color: #9a8a70;
   background: repeating-linear-gradient(180deg, rgba(90, 70, 40, 0.16) 0 5px, rgba(0, 0, 0, 0) 5px 17px) 0 40px / 100% calc(100% - 40px) no-repeat; }
 
+/* ---------- gängets kupong med baksidan upp (rum.js, vandHtml) ---------- */
+
+/* Samma papper som högens baksidor; framsidan lyser svagt igenom, spegelvänd,
+   och stämpeln står stort mitt på. Pennan ligger kvar ovanpå. */
+.rum-kup > .rum-vand { position: absolute; inset: 0; z-index: 5; box-sizing: border-box; padding: inherit; overflow: hidden;
+  background: linear-gradient(180deg, rgba(200, 100, 58, 0.14) 0 46px, rgba(0, 0, 0, 0) 46px), linear-gradient(180deg, #ece2cb, #ddd0b3); }
+.rum-kup .rum-vand ~ .pencil { z-index: 6; }
+.rum-vand .genom { position: absolute; inset: 0; display: block; box-sizing: border-box; padding: inherit; transform: scaleX(-1); opacity: 0.065; pointer-events: none; }
+.rum-vand .genom .band { background: #a8401a; color: #3a1a0a; }
+.rum-vand .st { position: absolute; left: 50%; top: 44%; display: block; transform: translate(-50%, -50%); pointer-events: none; }
+.rum-vand .st .pp-stamp { padding: 12px 24px 9px; font-size: 42px; letter-spacing: 0.18em; border-width: 6px; border-radius: 14px; white-space: nowrap; transform: rotate(-6deg); }
+.rum.smal .rum-vand .st .pp-stamp { padding: 10px 18px 7px; font-size: 32px; border-width: 5px; }
+
 /* ---------- Hasse i baren (rum.js, hasseHtml) ---------- */
 
 /* Hasse Backe sitter i baren utanför bilden till vänster; längst ut på pulten

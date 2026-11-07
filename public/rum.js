@@ -1284,12 +1284,16 @@ ${window.RumRegister ? RumRegister.nara() : ''}
     const p = v ? pult(rd) : null;
     const top = p ? Samtal.pult.top(hand && slag === 'fyll' && p.fyll, slag === 'las' ? v.vem : null) : null;
     const id = rd && !rd.next ? rd.id || (rd.coupon && rd.coupon.id) : null;
-    return `<span class="band"><small>MATCHFIXARNA · TIPSKUPONG</small><b>${nr ? `Kupong ${nr}` : 'Kupong'}</b></span>` +
+    const band = `<span class="band"><small>MATCHFIXARNA · TIPSKUPONG</small><b>${nr ? `Kupong ${nr}` : 'Kupong'}</b></span>`;
+    const hd = `<span class="hd"><span>Nr</span><span class="m">${top && top.vem && hand && slag === 'fyll' ? '<span class="sm-q">Vem är du?</span>' : '<span>Match</span>'}` +
+      `${top ? `<span class="sm-namnen${slag === 'gang' ? ' alla' : top.vem && hand && slag === 'fyll' ? ' val' : ''}">${top.namn}</span>` : ''}</span><span>1</span><span>X</span><span>2</span></span>`;
+    return band +
       `<span class="topp">${top ? top.stamp : ''}<span class="pp-stop"><span>Spelstopp</span><b>${first ? esc(fWeekdayTime.format(new Date(first))) : '–'}</b></span></span>` +
-      `<span class="hd"><span>Nr</span><span class="m">${top && top.vem && hand && slag === 'fyll' ? '<span class="sm-q">Vem är du?</span>' : '<span>Match</span>'}` +
-      `${top ? `<span class="sm-namnen${slag === 'gang' ? ' alla' : top.vem && hand && slag === 'fyll' ? ' val' : ''}">${top.namn}</span>` : ''}</span><span>1</span><span>X</span><span>2</span></span>${list}` +
+      hd + list +
       `<span class="fot">${v ? Samtal.pult.fields(signs, slag === 'gang') : ''}${id ? Papper.code(id) : ''}</span>` +
       (slag === 'din' || slag === 'las' ? '<span class="stampel">Inlämnad</span>' : '') +
+      // gängets kupong på pulten ligger med baksidan upp tills den vänds
+      (slag === 'gang' && !hand && p && !vand(p) ? vandHtml(band + hd + list, top) : '') +
       `<span class="pencil${slag === 'gang' || (!v && order.some((x) => x.sign)) ? ' kula' : ''}" style="${penStyle(PEN_PULT)}"><i></i></span>`;
   }
 
@@ -1382,7 +1386,26 @@ ${window.RumRegister ? RumRegister.nara() : ''}
     const j = (n) => r1((R0() - 0.5) * 2 * n);
     return `<svg class="rum-bock" viewBox="0 0 16 16" aria-hidden="true"><path pathLength="1" d="M${2.4 + j(0.5)} ${8.6 + j(0.6)}Q${4.6 + j(0.5)} ${10.6 + j(0.5)} 6.3 ${13 + j(0.4)}Q${9.4 + j(0.6)} ${6.4 + j(0.6)} ${14 + j(0.4)} ${2.4 + j(0.5)}"/></svg>`;
   }
-  const nrRing = (id, klar) => Papper.ring(`s${id}`, 'rum-strid', 22).replace('<path ', '<path pathLength="1" ') + (klar ? bockSvg(id) : '');
+  // Gängets kupong på pulten ligger med baksidan upp, så att allas tips inte
+  // syns direkt: bandet, raderna och kryssen lyser svagt igenom, spegelvända
+  // (utan title, så att inget syns när man pekar), och stämpeln står mitt på.
+  // Ett klick vänder den (vandKupong), och den ligger vänd på enheten tills
+  // någon mer har lämnat in – eller kupongen tas i handen (openCoupon).
+  const VAND = 'profeterna.rum.vand';
+  const vandNyckel = (p) => `${p.s.id}|${p.se.slice().sort().join(',')}`;
+  function vand(p) {
+    if (R.vand === vandNyckel(p)) return true;
+    try { return localStorage.getItem(VAND) === vandNyckel(p); } catch (e) { return false; }
+  }
+  function sparaVand(p) {
+    R.vand = vandNyckel(p);
+    try { localStorage.setItem(VAND, R.vand); } catch (e) { /* då ligger den vänd tills sidan laddas om */ }
+  }
+  const vandHtml = (fram, top) => '<span class="rum-vand" aria-hidden="true">' +
+    `<span class="genom">${fram.replace(/ title="[^"]*"/g, '')}</span>` +
+    `${top && top.stamp ? `<span class="st">${top.stamp.replace(/ title="[^"]*"/g, '')}</span>` : ''}</span>`;
+
+  const nrRing = (id, klar) =>Papper.ring(`s${id}`, 'rum-strid', 22).replace('<path ', '<path pathLength="1" ') + (klar ? bockSvg(id) : '');
 
   // Vad kupongen visar (couponHtml) ur Samtal.pult: slag och vems.
   function view(p, slag, vem = null) {
@@ -2545,8 +2568,38 @@ ${window.RumRegister ? RumRegister.nara() : ''}
     else if (a.id === 'rum-ans') board(true);
     else if (a.id === 'rum-reg') register(true);
     else if (a.id === 'rum-kupong') {
-      if (!openCoupon()) sak('kupong');
+      if (a.querySelector('.rum-vand')) vandKupong(a);
+      else if (!openCoupon()) sak('kupong');
     } else if (a.classList.contains('rum-bak') && !(a.dataset.ta != null && openCoupon(a))) nudge(a);
+  }
+
+  // Gängets kupong med baksidan upp vänds på pulten: den lyfts och vänds
+  // runt sin långa mitt, och framsidan ritas när den står på kant. Pennan
+  // följer inte med i vändningen.
+  function vandKupong(desk) {
+    const p = pult();
+    if (!p || R.vander) return;
+    sparaVand(p);
+    if (calm()) {
+      fill();
+      return;
+    }
+    const m = getComputedStyle(desk).transform;
+    const at = (z, y) => ({ transform: `${m} translateZ(${z}px) rotateY(${y}deg)` });
+    const pen = desk.querySelector('.pencil');
+    if (pen) pen.style.visibility = 'hidden';
+    R.vander = true;
+    const upp = desk.animate([at(0, 0), at(40, 90)], { duration: 240, easing: 'cubic-bezier(0.45, 0, 0.9, 0.6)', fill: 'forwards' });
+    upp.finished.then(() => {
+      fill();
+      const ned = desk.animate([at(40, -90), at(0, 0)], { duration: 380, easing: 'cubic-bezier(0.15, 0.5, 0.35, 1)' });
+      upp.cancel();
+      return ned.finished;
+    }).catch(() => {}).finally(() => {
+      R.vander = false;
+      const p2 = desk.querySelector('.pencil');
+      if (p2) p2.style.visibility = '';
+    });
   }
 
   // En kupong i högen som du inte får vända på än (du ser inte hens tips):
@@ -3062,7 +3115,11 @@ ${window.RumRegister ? RumRegister.nara() : ''}
     // din inlämnade: med det Hasse har ändrat och inte lämnat in än
     const inlamnat = { ...v.tecken };
     if (slag === 'din' && p.andra) v.tecken = { ...v.tecken, ...hassesAndring(p) };
-    if (slag === 'gang') pling();
+    // (gängets kupong läggs tillbaka med framsidan upp)
+    if (slag === 'gang') {
+      pling();
+      sparaVand(p);
+    }
     zoomTv(false);
     zoomVideo(false);
     const desk = document.getElementById('rum-kupong');
