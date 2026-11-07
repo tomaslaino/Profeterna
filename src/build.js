@@ -9,8 +9,9 @@
 //   data/matches.json      hela säsongens matcher, kompakt (med
 //                          höjdpunkterna på YouTube och längsta
 //                          sammandraget hos Viaplay, src/hojdpunkter.js)
-//   data/match/<id>.json   underlaget och prognosen för en match, och
-//                          matchens höjdpunkter
+//   data/match/<id>.json   underlaget och prognosen för en match,
+//                          matchens höjdpunkter och den beräknade
+//                          startelvan (src/startelvor.js)
 //   data/model.json        regelversion, skattade storheter, backtestet och
 //                          kandidatloggen (fliken Modell)
 //   data/evaluation.json   journalen och utvärderingen mot facit (sist på
@@ -57,6 +58,7 @@ const { readJournal, appendJournal, HORIZON_DAYS } = require('./journal');
 const { evaluate } = require('./evaluate');
 const { divisionStats } = require('./divisions');
 const { playerFiles, teamSquad } = require('./players');
+const { elvaFor } = require('./startelvor');
 const { teamFiles } = require('./teamstats');
 const { readCoupons, REPO, BRANCH } = require('./coupons');
 const { buildHistory } = require('./history');
@@ -286,6 +288,8 @@ function writeSite(outDir = OUT, { journal = false, couponEndpoint, samtal = nul
       d.journal = ev.perMatch.get(id) || null;
       // Trupperna (ESPN) visas i matchvyn men ingår inte i analysens underlag.
       d.squads = squads(d.match);
+      // Den beräknade startelvan (src/startelvor.js), för kommande matcher.
+      d.elva = elva(id);
       d.highlights = video.get(id) || null;
       d.youtube = yt.get(id) || null;
       // Bygget som underlaget kommer ur – matchanalysen jämför mot det.
@@ -302,6 +306,15 @@ function writeSite(outDir = OUT, { journal = false, couponEndpoint, samtal = nul
   fs.rmSync(outDir, { recursive: true, force: true });
   fs.renameSync(tmp, outDir);
   return { generatedAt, pages, failed, counts: sources.counts, forecastMs: forecast.ms, logged: logged.length, frozen: history.frozen.length, tippare, rosten };
+}
+
+function elva(id) {
+  try {
+    return elvaFor(id);
+  } catch (err) {
+    console.error(`[build] startelvan ${id}: ${err.message || err}`);
+    return null;
+  }
 }
 
 function squads(m) {

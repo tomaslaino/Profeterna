@@ -22,8 +22,8 @@ const PROVIDERS = [
     id: 'ESPN',
     name: 'ESPN',
     url: 'https://www.espn.com/soccer/',
-    gives: 'Spelprogram, resultat och tabeller i alla sex tävlingar, trupperna och matchrapporterna i ligorna, Europacuperna, FA-cupens tidigare säsonger och lagsköldarna.',
-    used: 'Matcherna, tabellerna, spelarstatistiken, vilan inför matcherna och prognosens underlag i cuperna',
+    gives: 'Spelprogram, resultat och tabeller i alla sex tävlingar, trupperna, matchrapporterna med startelvorna i ligorna och cuperna, Europacuperna, FA-cupens tidigare säsonger och lagsköldarna.',
+    used: 'Matcherna, tabellerna, spelarstatistiken, den beräknade startelvan, vilan inför matcherna och prognosens underlag i cuperna',
     live: 'Ställningen och matchhändelserna – mål, kort, byten och statistik – hämtas när kupongen eller matchrutan är öppen, varje minut medan matchen pågår.',
   },
   {

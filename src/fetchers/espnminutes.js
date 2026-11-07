@@ -26,12 +26,20 @@
 // Adeboyejo (Bromley) Goal at 70'" – minut och målskytt men inte sorten.
 // Sådana matcher får d: 0 och målens sort är där okänd, inte noll.
 //
+// Startelvorna (verifierat 2026-11-07 för ligorna, cuperna och Europacuperna,
+// 1 410 elvor): varje lag har sin formation ("4-2-3-1") och varje startande
+// spelare sitt platsnummer 1–11 (formationPlace, Optas numrering – målvakten
+// är 1), så att elvan går att rita på planen (public/elva.js). Avbytarna står
+// med plats 0. Underlag för den beräknade startelvan (src/startelvor.js).
+//
 // En rapport är ~400 kB, men en spelad match ändras inte: den hämtas en gång
 // och sparas kompakt som { k: avspark, t: { lag-id: { spelar-id: minuter } },
+// e: { lag-id: { f: formation, s: [spelar-id för plats 1–11], b: [avbytare] } },
 // g: [mål i tidsordning], pm: [missade straffar] } (se goalsOf). Bara nya
 // matcher hämtas, högst MAX_NEW per körning, och därefter matcher sparade
-// före 2026-10-20 som saknar målen eller d. En match som inte gick att hämta eller
-// saknar startelvor prövas igen vid nästa hämtning.
+// före 2026-10-20 som saknar målen eller d, och före 2026-11-07 som saknar
+// elvorna (e). En match som inte gick att hämta eller saknar startelvor
+// prövas igen vid nästa hämtning.
 
 const { getJson, mapLimit } = require('./http');
 
@@ -52,7 +60,7 @@ async function fetchMinutes(slug, events, previous) {
   for (const e of events) {
     if (old[e.id]) matches[e.id] = old[e.id];
     if (!old[e.id]) todo.push(e);
-    else if (!('d' in old[e.id])) upgrade.push(e);
+    else if (!('d' in old[e.id]) || !('e' in old[e.id])) upgrade.push(e);
   }
   const batch = todo.concat(upgrade).slice(0, MAX_NEW);
   let ok = 0;
@@ -87,6 +95,7 @@ function parseMatch(j, e) {
   const status = (comp && comp.status && comp.status.type && comp.status.type.name) || e.status || '';
   const full = /AET|PEN|EXTRA/.test(status) ? 120 : 90;
   const t = {};
+  const lineups = {};
   const subIns = new Set();
   for (const side of j.rosters) {
     const list = Array.isArray(side.roster) ? side.roster : [];
@@ -98,8 +107,24 @@ function parseMatch(j, e) {
       if (!p.starter && p.subbedIn && p.athlete) subIns.add(String(p.athlete.id));
     }
     t[String(side.team.id)] = mins;
+    lineups[String(side.team.id)] = lineupOf(side, list);
   }
-  return { k: e.kickoff, t, ...goalsOf(j, subIns, comp) };
+  return { k: e.kickoff, t, e: lineups, ...goalsOf(j, subIns, comp) };
+}
+
+// Elvan på sina platser och avbytarna. null om formationen saknas eller
+// platserna inte är 1–11 en gång var (okänt, inte gissat).
+function lineupOf(side, list) {
+  const s = new Array(11).fill(null);
+  for (const p of list) {
+    if (!p.starter || !p.athlete) continue;
+    const i = Number(p.formationPlace) - 1;
+    if (!(i >= 0 && i < 11) || s[i]) return null;
+    s[i] = String(p.athlete.id);
+  }
+  if (!side.formation || s.some((x) => !x)) return null;
+  const b = list.filter((p) => !p.starter && p.athlete).map((p) => String(p.athlete.id));
+  return { f: String(side.formation), s, b };
 }
 
 // Målen i tidsordning: { t: laget som fick målet, m: minut, p: målskytt,
