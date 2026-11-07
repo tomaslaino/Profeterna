@@ -154,8 +154,15 @@
   },
 
   // Din kupong: han tar den och fyller i den (rum-hasse-kupong.js), antingen det du väljer eller det han
-  // själv har sagt. hit: när han tar den, skriver: när det är gjort, gardera: när han har skrivit flera.
+  // själv har sagt, när du har bett om det. foreslar: efter analysen, när du inte har något på raden
+  // (knappen under är "Fyll i den"), hit: när han tar den, skriver: när det är gjort, gardera: när han
+  // har skrivit flera.
   fyller: {
+    foreslar: [
+      'Så ska det stå på din kupong. Ska jag fylla i den?',
+      'Jag skulle fylla i den direkt. Ska jag göra det åt dig?',
+      'Nu vet du svaret. Ska jag fylla i den på din kupong?',
+    ],
     hit: ['Ge hit kupongen.', 'Ge mig kupongen.', 'Ge hit, så tar jag det.'],
     // när kupongen inte vet vem du är: efternamnen står i rutornas ställe
     vem: 'Vems kupong ska jag fylla i?',
@@ -169,8 +176,6 @@
     medhall: ['Bra, du börjar lära dig.', 'Vad var det jag sa?', 'Där ser du.'],
     emot: ['Jag håller inte med, men det är din kupong.', 'Fel tecken, men jag kryssar det.', 'Jag kryssar, du betalar.', 'Det är dina pengar, inte mina.'],
     suddar: ['Då suddar vi det.', 'Som om det aldrig hänt.'],
-    // Låt bli
-    bort: ['Som du vill.', 'Då får du fylla i den själv.', 'Det är din kupong.'],
     // Din inlämnade kupong: ändringen lämnas in när den följer gängets regel (4 spikar, 5 halvgarderingar
     // och 4 helgarderingar). Gör den inte det säger han vad som är för många och vad som fattas
     // (för-fattas, eller bara för när en match saknar tecken), och väntar med att lämna in den.

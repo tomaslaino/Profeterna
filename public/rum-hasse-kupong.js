@@ -1,5 +1,6 @@
-// Din kupong hos Hasse Backe (rum-hasse.js): man väljer 1, X eller 2, stort, eller så tar han det han
-// själv har kommit fram till i analysen, och han får din kupong och fyller i den. Det är samma kupong
+// Din kupong hos Hasse Backe (rum-hasse.js): man väljer 1, X eller 2, stort, eller ber honom fylla i det
+// han har kommit fram till i analysen (han föreslår det, men tar den inte själv), och han får din kupong
+// och fyller i den. Det är samma kupong
 // som på pulten, samma märkning och samma kryss (Rum.kupong i rum.js), och det han skriver hamnar i
 // samma utkast (Samtal.pult.tippa). Hans kryss är slarviga men självklara, och de ser likadana ut
 // på pulten efteråt.
@@ -7,8 +8,7 @@
 // Kupongen kommer underifrån, så stor att den går att läsa, och glider in under hans händer på
 // disken. Han tar pennan som ligger på den (rum-hasse-3d.js, klippen skriv1–3) och skriver, och
 // bläcket följer pennans spets (steg). Den ligger kvar medan man går vidare till nästa match. Ett klick
-// på den och man har den i handen, ett klick till och den är borta. Låt bli tar den ifrån honom medan
-// han håller på, och då suddas det han hann skriva.
+// på den och man har den i handen, ett klick till och den är borta.
 //
 // Allt ligger i figurens värld: kupongen är ett plan på disken, och vägen dit är ett plan som rör sig
 // genom luften, och varje läge räknas om till en matrix3d genom samma kamera som figuren. Mellanbilderna
@@ -17,9 +17,6 @@ window.RumHasseKupong = (ctx) => {
   const { H, $, calm, spela, sag, lott, REP, ljud } = ctx;
   const K = { el: null, fas: null, ko: [], kor: false, jobb: null, id: 0 };
   const SIGNS = ['1', 'X', '2'];
-  const AV = 'profeterna.hasse.fyller';
-  const lasAv = () => { try { return localStorage.getItem(AV) === '0'; } catch (e) { return false; } };
-  const satAv = (av) => { try { if (av) localStorage.setItem(AV, '0'); else localStorage.removeItem(AV); } catch (e) { /* då gäller det bara nu */ } };
   const pult = () => (window.Samtal && Samtal.pult ? Samtal.pult.state() : null);
   const api = () => (window.Rum && Rum.kupong ? Rum.kupong : null);
   // Han kan fylla i din kupong medan den går att fylla i, och ändra den när du har lämnat in, tills
@@ -51,9 +48,11 @@ window.RumHasseKupong = (ctx) => {
       return `<button type="button" class="rh-ruta${on ? ' x' : ''}" data-s="${s}" aria-pressed="${on}"><i>${s}</i>${on ? a.kryss(`${id}${s}`) : ''}</button>`;
     }).join('')}</div>`;
   }
-  function kopplaRutor(t, m, klickat) {
+  // hans: tecknen han har sagt, som lyser i guld (som domen) så att man ser vad han föreslår
+  function kopplaRutor(t, m, klickat, hans = []) {
     t.classList.remove('gom');
     for (const b of t.querySelectorAll('.rh-ruta')) {
+      b.classList.toggle('hans', hans.includes(b.dataset.s));
       b.addEventListener('click', (e) => {
         e.stopPropagation();
         klickat(b.dataset.s, b);
@@ -299,7 +298,7 @@ window.RumHasseKupong = (ctx) => {
     if (K.jobb || K.ko.length) return;
     if (K.visar) { if (K.visarKlar) K.visarKlar(); return; }
     if (K.fas === 'disk') iHanden();
-    else if (K.fas === 'hand') { satAv(true); bort(); }
+    else if (K.fas === 'hand') bort();
   }
   // Har man kupongen i handen är ett klick var som helst att ta den med sig. Är det han som visar upp
   // den lägger ett klick tillbaka den.
@@ -307,7 +306,6 @@ window.RumHasseKupong = (ctx) => {
     if (K.fas !== 'hand' || (e.target.closest && e.target.closest('.rh-tecken, .rh-knapp, .rh-vag'))) return false;
     e.stopPropagation();
     if (K.visar) { if (K.visarKlar) K.visarKlar(); return true; }
-    satAv(true);
     bort();
     return true;
   }
@@ -554,10 +552,9 @@ window.RumHasseKupong = (ctx) => {
 
   // Du valde ett tecken: det står i utkastet direkt, och han skriver det. Står det redan där suddar han.
   function valt(id, s, { sagt, tok = () => true, sen, suddat } = {}) {
-    satAv(false);
     // (kupongen byggs medan krysset inte står där än: det är han som skriver det)
     if (!K.el) bygg();
-    // Håller han på av sig själv är det du som bestämmer nu: samma tecken får han skriva, och ett annat
+    // Håller han på med sina egna tecken är det du som bestämmer nu: samma tecken får han skriva, och ett annat
     // skriver han i stället, om han inte redan har hunnit börja.
     const iKo = K.ko.find((o) => o.auto && o.id === id);
     if (iKo) {
@@ -592,28 +589,15 @@ window.RumHasseKupong = (ctx) => {
     K.ko.push({ id, tecken: [{ s, av }], hit: true, sagt: vad, tok, sen });
     korKo();
   }
-  // Efter analysen: om du inte redan har något på raden och inte har tackat nej tar han kupongen själv.
-  // Tar han den själv efter analysen?
+  // Efter analysen föreslår han att fylla i det han har sagt, om du inte redan har något på raden, och
+  // fyller i det när du ber om det (sjalv). Han tar aldrig kupongen själv.
   // (inte i en inlämnad: där skriver han bara det du väljer)
-  const kommer = (id) => kan() && !inne() && !lasAv() && !din(id);
+  const foreslar = (id) => kan() && !inne() && !din(id);
   function sjalv(id, tecken, { sagt, tok = () => true, sen } = {}) {
-    if (!kommer(id)) return false;
+    if (!foreslar(id)) return false;
     K.ko.push({ id, tecken: tecken.map((s) => ({ s, av: false })), auto: true, hit: true, sagt, tok, sen });
     korKo();
     return true;
-  }
-  // Låt bli: det han inte hann skriva blir inte skrivet, det han hann suddas, och kupongen går tillbaka.
-  function latBli() {
-    satAv(true);
-    utanVem();
-    for (const o of K.ko) o.avbruten = true;
-    K.ko.length = 0;
-    if (K.jobb) {
-      avbryt(K.jobb);
-      vantaBort();
-      return;
-    }
-    bort();
   }
   // Det han håller på med blir inte av: det han hann skriva suddas, och han lägger tillbaka pennan fortare.
   function avbryt(J) {
@@ -631,10 +615,6 @@ window.RumHasseKupong = (ctx) => {
     }
     if (H.klipp && H.klipp.namn === J.klipp) H.klipp.bort = true;
   }
-  async function vantaBort() {
-    while (K.jobb) await new Promise((ok) => setTimeout(ok, 80));
-    bort();
-  }
 
   // ---------- rummet ----------
 
@@ -651,7 +631,8 @@ window.RumHasseKupong = (ctx) => {
     K.el.style.transform = form(K.l.disk);
     pennaPa(true);
   }
-  // Man går härifrån. Det man själv valde står kvar; det han tog själv och inte hann börja med blir inte av.
+  // Man går härifrån. Det man själv valde står kvar; det han skulle skriva åt en och inte hann börja med
+  // blir inte av.
   function stang() {
     K.vems = null;
     K.ko.length = 0;
@@ -670,8 +651,11 @@ window.RumHasseKupong = (ctx) => {
   }
 
   return {
-    kan, din, kommer, rutor, kopplaRutor, vems, valt, sjalv, latBli, steg, passa, stang, klickUtanfor,
+    kan, din, foreslar, rutor, kopplaRutor, vems, valt, sjalv, steg, passa, stang, klickUtanfor,
     borta: bort,
+    // (en äldre rum-hasse.js i webbläsarens cache, några minuter efter en publicering, frågar om han tar
+    // kupongen själv efter analysen: det gör han inte längre)
+    kommer: () => false,
     get paDisken() { return K.fas === 'disk' || K.fas === 'fram'; },
     get skriver() { return Boolean(K.jobb || K.ko.length); },
     get fas() { return K.fas; },
