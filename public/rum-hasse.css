@@ -158,8 +158,10 @@
 .rh-tecken.gom { visibility: hidden; }
 .rh-ruta { position: relative; flex: 1 1 0; max-width: 112px; height: clamp(58px, 9vh, 76px); padding: 0; border: 2px solid #9a876a; border-radius: 4px; background: var(--korn), #fbf7ec; color: #8a7a60; font: 650 clamp(30px, 5vh, 42px)/1 Fraunces, Georgia, serif; text-shadow: none; cursor: pointer; box-shadow: 0 2px 0 rgba(0, 0, 0, 0.5), 0 8px 16px rgba(0, 0, 0, 0.42); -webkit-tap-highlight-color: transparent; transition: transform 0.12s, box-shadow 0.12s, filter 0.12s; }
 .rh-ruta i { font-style: normal; }
-.rh-ruta .kryss { position: absolute; left: 6%; top: 8%; width: 88%; height: 84%; overflow: visible; pointer-events: none; }
-.rh-ruta .kryss path { fill: none; stroke: #3a3632; stroke-width: 1.5; stroke-linecap: round; stroke-dasharray: 1 2; opacity: 0.9; }
+/* Det du har valt är inringat med hans blyerts (ring i rum-hasse-kupong.js), och tecknet står i bläck */
+.rh-ruta .ring { position: absolute; left: 50%; top: 50%; width: 2em; height: 1.62em; transform: translate(-50%, -50%) rotate(var(--vrid, -5deg)); overflow: visible; pointer-events: none; }
+.rh-ruta .ring path { fill: none; stroke: #3a3632; stroke-width: 2.8; stroke-linecap: round; stroke-linejoin: round; stroke-dasharray: 1 2; opacity: 0.92; }
+.rh-ruta.x i { color: #2a231d; }
 /* (färgen: knappar blir annars ljusa när man pekar på dem, och lapparna är ljusa) */
 @media (hover: hover) {
   .rh-ruta:hover { transform: translateY(-1px); color: #5f523c; background: var(--korn), #fbf7ec; border-color: #7d6c50; filter: brightness(1.04); box-shadow: 0 3px 0 rgba(0, 0, 0, 0.5), 0 12px 22px rgba(0, 0, 0, 0.45); }
@@ -169,7 +171,7 @@
 .rh-ruta:active { transform: translateY(1px); box-shadow: 0 1px 0 rgba(0, 0, 0, 0.5), 0 3px 8px rgba(0, 0, 0, 0.4); }
 .rh-ruta:focus-visible { outline: 2px solid #f0d699; outline-offset: 3px; }
 /* Hans tecken, det han föreslår: kanten i guld som domen (och som hans tecken i listan), och den
-   lyser upp när rutorna kommer. Krysset i rutan är fortfarande bara ditt. */
+   lyser upp när rutorna kommer. Ringen i rutan är fortfarande bara ditt. */
 .rh-ruta.hans { border-color: #ffd86b; color: #94640f; box-shadow: 0 0 0 2px rgba(255, 216, 107, 0.5), 0 0 22px rgba(255, 216, 107, 0.3), 0 2px 0 rgba(0, 0, 0, 0.5), 0 8px 16px rgba(0, 0, 0, 0.42); animation: rh-hans 0.9s ease-out both; }
 @keyframes rh-hans { from { box-shadow: 0 0 0 9px rgba(255, 216, 107, 0), 0 0 40px rgba(255, 216, 107, 0.65), 0 2px 0 rgba(0, 0, 0, 0.5), 0 8px 16px rgba(0, 0, 0, 0.42); } }
 @media (hover: hover) { .rh-ruta.hans:hover { border-color: #ffd86b; color: #7a5009; } }
