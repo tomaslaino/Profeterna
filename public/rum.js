@@ -1231,6 +1231,9 @@ ${window.RumRegister ? RumRegister.nara() : ''}
     const ink = v && v.vem ? Math.max(0, gang.findIndex((g) => g.id === v.vem)) : 0;
     const now = Date.now();
     const hans = v && (slag === 'fyll' || slag === 'din') && rd && rd.id ? hassesKryss(rd.id) : {};
+    // uppgörelsen: de omtvistade matcherna, och vilka av dem som är klubbade
+    const strid = new Set(slag === 'gang' && v.g ? v.g.strid : []);
+    const klar = strid.size && rd && rd.id ? klubbat(rd.id) : new Set();
     const list = order.map((x, i) => {
       const sign = signs[x.id];
       const comp = compOf(x.m.comp);
@@ -1252,7 +1255,9 @@ ${window.RumRegister ? RumRegister.nara() : ''}
       };
       // i handen är lagen en knapp: bladet med båda lagen läggs på kupongen (lagen, rum-lagen.js)
       const tm = hand ? 'button' : 'span';
-      return `<div class="row${sign ? '' : ' tom'}${locked ? ' locked' : ''}" data-id="${esc(x.id)}"><span class="pp-nr">${i + 1}</span>` +
+      const st = strid.has(x.id);
+      return `<div class="row${sign ? '' : ' tom'}${locked ? ' locked' : ''}${st ? ' strid' : ''}${st && klar.has(x.id) ? ' klubbad' : ''}" data-id="${esc(x.id)}">` +
+        `<span class="pp-nr">${i + 1}${st ? nrRing(x.id, klar.has(x.id)) : ''}</span>` +
         // på den smala kupongen (telefonen) de kortare namnen (short, .kort i rum.css)
         `<span class="m"><${tm} class="pp-tm"${hand ? ` type="button" data-lagen aria-label="${esc(`${label}: lagen`)}"` : ''}>` +
         `<span class="lang">${esc(x.m.home)}<span class="vs"> – </span>${esc(x.m.away)}</span>` +
@@ -1295,6 +1300,10 @@ ${window.RumRegister ? RumRegister.nara() : ''}
     let html = '';
     if (hand && !started && (v.slag === 'fyll' || v.slag === 'din')) html += field('mot', id, mot, label, sign || mot ? '' : ' gom');
     else if (mot) html += `<span class="mot" title="${esc(mot)}">${esc(mot)}</span>`;
+    // gängets kupong: i en omtvistad match förklarar en, i sitt bläck (skal);
+    // platsen står där också när ingen har skrivit något, så att den kan fyllas
+    const strid = v.slag === 'gang' && !started && v.g && v.g.strid.includes(id);
+    if (strid) html += `<span class="skal">${skal(v.g, id, v.tecken)}</span>`;
     if (hand && v.skriv && (v.slag === 'din' || v.slag === 'gang') && (started || eft)) html += field('eft', id, eft, label, k);
     else if (eft) html += `<span class="eft${k}" title="${esc(eft)}">${esc(eft)}</span>`;
     return html ? `<span class="not">${html}</span>` : '';
@@ -1304,20 +1313,70 @@ ${window.RumRegister ? RumRegister.nara() : ''}
   // efterhand (seats, och ordPa i telefonen).
   const said = (v, id, vem) => ({ mot: (v.notes && v.notes[id] && v.notes[id][vem]) || '', eft: (v.after && v.after[id] && v.after[id][vem]) || '' });
 
-  // Uppgörelsen: porträtten för dem som har med tecknet, var och en på sin
-  // plats i rutan (samma ordning som överst), och när man pekar motiveringen
-  // och kommentaren i efterhand – i telefonen med ett långt tryck på rutan
-  // (ordPa).
+  // Uppgörelsen: de tre kupongerna lagda på varandra. Var och ens kryss står
+  // kvar i rutan, litet och i ens bläck, på sin plats (samma ordning som
+  // namnen överst), så att rutan blir mörkare ju fler som har med tecknet;
+  // gängets kryss med kulspetspennan står över dem. När man pekar på ett kryss
+  // motiveringen och kommentaren i efterhand – i telefonen med ett långt tryck
+  // på rutan (ordPa).
   function seats(v, id, j) {
     const gang = (KP.data && KP.data.samtal && KP.data.samtal.gang) || [];
     const who = (v.who && v.who[id] && v.who[id][j]) || [];
     return '<span class="sits">' + gang.map((g, i) => {
       if (!who.includes(g.id)) return '<b></b>';
       const { mot, eft } = said(v, id, g.id);
-      const src = photoOf(g.id);
-      return `<b class="sm-k${i}" title="${esc(`${g.id}${mot ? `: ${mot}` : ''}${eft ? `\nEfteråt: ${eft}` : ''}`)}">${src ? `<img src="${esc(src)}" alt="" draggable="false">` : ''}</b>`;
+      return `<b class="sm-k${i}" title="${esc(`${g.id}${mot ? `: ${mot}` : ''}${eft ? `\nEfteråt: ${eft}` : ''}`)}">${smaKryss(`${id}${SIGNS[j]}${g.id}`)}</b>`;
     }).join('') + '</span>';
   }
+  // Den som förklarar en omtvistad match, i sitt bläck – raden blir inte
+  // högre, så det är en: den som avviker, annars den vars tips gängets tecken
+  // (val) lämnar mest utanför just nu, annars den första som har skrivit
+  // något. Hela motiveringen när man pekar. g: Samtal.pult.gang().
+  function skal(g, id, val) {
+    const gang = (KP.data && KP.data.samtal && KP.data.samtal.gang) || [];
+    const said = (x) => (g.notes && g.notes[id] && g.notes[id][x]) || '';
+    const tips = (x) => SIGNS.filter((s, j) => ((g.who[id] && g.who[id][j]) || []).includes(x));
+    const sign = (val && val[id]) || '';
+    const ute = (x) => { const t = tips(x); return t.length ? t.filter((s) => !sign.includes(s)).length / t.length : 0; };
+    const vem = (g.avvik[id] || []).find(said) || gang.map((x) => x.id).filter(said).sort((a, b) => ute(b) - ute(a))[0];
+    if (!vem) return '';
+    const i = gang.findIndex((x) => x.id === vem);
+    return `<span class="sk sm-k${i}" title="${esc(`${vem}: ${said(vem)}`)}">${esc(said(vem))}</span>`;
+  }
+  // Ett litet kryss med blyerts (10 × 10), samma varje gång för samma match,
+  // tecken och person.
+  function smaKryss(key) {
+    const R0 = rng(seed(key));
+    const j = (n) => (R0() - 0.5) * 2 * n;
+    const d = [[1.6, 1.8, 8.6, 8.4], [8.4, 1.4, 1.8, 8.8]].map(([x1, y1, x2, y2]) => {
+      const a = [x1 + j(0.6), y1 + j(0.6)];
+      const b = [x2 + j(0.6), y2 + j(0.6)];
+      const c = [(a[0] + b[0]) / 2 + j(0.9), (a[1] + b[1]) / 2 + j(0.9)];
+      return `M${r1(a[0])} ${r1(a[1])}Q${r1(c[0])} ${r1(c[1])} ${r1(b[0])} ${r1(b[1])}`;
+    }).join('');
+    return `<svg viewBox="0 0 10 10" aria-hidden="true"><path d="${d}"/></svg>`;
+  }
+
+  // Uppgörelsen: numren på de matcher där vi inte har något tecken gemensamt
+  // (v.g.strid) är inringade med kulspetspennan, och en match som har
+  // klubbats – gängets tecken ändrat, eller ett klick på matchen – har en bock
+  // vid ringen. Klubbat sparas på enheten, för omgången.
+  const KLUBBAT = 'profeterna.rum.klubbat';
+  function klubbat(id) {
+    try {
+      const j = JSON.parse(localStorage.getItem(KLUBBAT));
+      return new Set(j && j.id === id ? j.rows || [] : []);
+    } catch (e) { return new Set(); }
+  }
+  function sparaKlubbat(id, rows) {
+    try { localStorage.setItem(KLUBBAT, JSON.stringify({ id, rows: [...rows] })); } catch (e) { /* då är bara ringen kvar nästa gång */ }
+  }
+  function bockSvg(key) {
+    const R0 = rng(seed(`bock${key}`));
+    const j = (n) => r1((R0() - 0.5) * 2 * n);
+    return `<svg class="rum-bock" viewBox="0 0 16 16" aria-hidden="true"><path pathLength="1" d="M${2.4 + j(0.5)} ${8.6 + j(0.6)}Q${4.6 + j(0.5)} ${10.6 + j(0.5)} 6.3 ${13 + j(0.4)}Q${9.4 + j(0.6)} ${6.4 + j(0.6)} ${14 + j(0.4)} ${2.4 + j(0.5)}"/></svg>`;
+  }
+  const nrRing = (id, klar) => Papper.ring(`s${id}`, 'rum-strid', 22).replace('<path ', '<path pathLength="1" ') + (klar ? bockSvg(id) : '');
 
   // Vad kupongen visar (couponHtml) ur Samtal.pult: slag och vems.
   function view(p, slag, vem = null) {
@@ -3012,7 +3071,10 @@ ${window.RumRegister ? RumRegister.nara() : ''}
       // matcherna i kupongens ordning, till bladet med lagen (lagen)
       matcher: rd.ids.map((id) => rows.find((x) => x.id === id)).filter(Boolean).map((x) => x.m), kupong: nr ? `Kupong ${nr}` : 'Kupong' };
     k.msg = k.rad.querySelector('.msg');
-    k.go = k.rad.querySelector('.guld');
+    // gängets kupong: guldordet och, när den är sparad, Spela hos Svenska Spel
+    // bredvid (gangState ritar om dem tillsammans)
+    k.go = k.rad.querySelector(slag === 'gang' ? '[data-gang]' : '.guld');
+    if (slag === 'gang') k.gw = k.rad.querySelector('.hoger');
     if (from) {
       // ur högen: vems och var den låg, och baksidan att vända tillbaka till
       Object.assign(k, { vem: from.dataset.vem, slot: slot(Number(from.dataset.i)), bak: from.innerHTML });
@@ -3057,6 +3119,7 @@ ${window.RumRegister ? RumRegister.nara() : ''}
       k.show = k.rad.animate([{ opacity: 0, transform: 'translateY(8px)' }, { opacity: 1, transform: 'none' }], { duration: 320, delay: 780, easing: 'ease-out', fill: 'both' });
       // pennan följer med upp och rullar sedan undan till sidan
       penGo([{ ...PEN_PULT, l: 0.15, t: 420, e: 'ease-in' }, { ...PEN_VILA, l: 0.5, t: 380, e: 'cubic-bezier(0.3, 0, 0.3, 1)' }, { ...PEN_VILA, t: 160, e: 'ease-in' }]);
+      if (slag === 'gang') uppgorelse(k, rd.id);
     }
     el.focus({ preventScroll: true });
     el.addEventListener('click', (e) => {
@@ -3081,9 +3144,13 @@ ${window.RumRegister ? RumRegister.nara() : ''}
         k.holl = false;
         return;
       }
-      // tiden och det som står efter den: man skriver på raden (writeOn)
       const b = e.target.closest('button.box, button[data-vem]');
-      if (!b) writeOn(e.target);
+      // en omtvistad match som inte är klubbad: ett klick på raden – numret,
+      // tiden eller förklaringen – klubbar den
+      const row = !b && k.slag === 'gang' && !e.target.closest('input, label') && e.target.closest('.row.strid:not(.klubbad)');
+      if (row && !row.querySelector('.pen:not(.gom) input.pen-in')) klubba(row, true);
+      // tiden och det som står efter den: man skriver på raden (writeOn)
+      else if (!b) writeOn(e.target);
       else if (b.dataset.vem) choose(b);
       else if (k.slag === 'gang') tickGang(b);
       else tick(b);
@@ -3091,6 +3158,11 @@ ${window.RumRegister ? RumRegister.nara() : ''}
     wireNotes(k);
     if (slag === 'gang') wireHold(k, v);
     k.rad.addEventListener('click', (e) => {
+      // Spela hos Svenska Spel: länken öppnas, och kupongen lämnas över disken
+      if (e.target.closest('a[data-spela]')) {
+        if (!k.closing) lamnaOver(k);
+        return;
+      }
       const b = e.target.closest('button');
       if (!b || b.disabled || k.closing) return;
       // det man gör med kupongen syns på kupongen: bladet med lagen tas bort först
@@ -3131,7 +3203,13 @@ ${window.RumRegister ? RumRegister.nara() : ''}
       `<p class="msg" role="status"></p><span class="hoger">${go}</span>`;
   }
   const sparaHtml = (p) => `<button type="button" class="bla${p.sparad ? ' sparad' : ''}" data-spara${p.sparad || p.tom ? ' disabled' : ''}>${p.sparad ? `${CHECK}Sparad` : 'Spara'}</button>`;
-  const gangHtml = (g) => `<button type="button" class="guld${g.same ? ' sparad' : ''}" data-gang${g.same ? ' disabled' : ''}>${g.same ? `${CHECK}Sparad` : esc(g.label)}</button>`;
+  // Gängets kupong: guldordet (Spara gängets kupong, Spara ändringen), och när
+  // den är sparad som den står Sparad – med Spela hos Svenska Spel som guldord
+  // bredvid när omgången är Stryktipset och går att spela (g.spela, spela.js).
+  const gangHtml = (g) => (g.same && g.spela
+    ? `<button type="button" class="bla sparad" data-gang disabled>${CHECK}Sparad</button>` +
+      `<a class="guld" data-spela href="${esc(g.spela)}" target="_blank" rel="noopener">Spela hos Svenska Spel</a>`
+    : `<button type="button" class="guld${g.same ? ' sparad' : ''}" data-gang${g.same ? ' disabled' : ''}>${g.same ? `${CHECK}Sparad` : esc(g.label)}</button>`);
 
   // ---------- lagen: bladet ovanpå kupongen i handen (rum-lagen.js) ----------
   //
@@ -3420,7 +3498,179 @@ ${window.RumRegister ? RumRegister.nara() : ''}
     Samtal.pult.besluta(row.dataset.id, sign);
     k.next = null;
     gangState();
+    // en omtvistad match är klubbad när gängets tecken ändras – den som nu
+    // blir utan förklarar – och pennan går sedan vidare till nästa
+    if (row.classList.contains('strid')) {
+      const g = Samtal.pult.gang();
+      const sk = row.querySelector('.skal');
+      if (g && sk) sk.innerHTML = skal(g, row.dataset.id, g.val);
+      klubba(row);
+    }
+    clearTimeout(k.idle);
+    k.idle = setTimeout(() => vanta(k, row), 1800);
   }
+
+  // ---------- uppgörelsen med pennan ----------
+  //
+  // Första gången gängets kupong tas i handen på enheten under omgången läggs
+  // de tre kupongerna ur högen på den, en i taget, genomskinliga, och var och
+  // ens kryss stannar kvar i rutorna; sedan dras gängets kryss med
+  // kulspetspennan, och pennan ringar in numren på de omtvistade matcherna.
+  // Därefter står allt där direkt. Sedan väntar pennan vid den första
+  // omtvistade matchen som inte är klubbad, och efter ett beslut vid nästa.
+  const LAGDA = 'profeterna.rum.lagda';
+  // var kupongerna kommer ifrån (högen ligger till vänster om pulten) och hur de är vridna
+  const FAN = [[-170, 80, -6], [-205, 34, 5], [-140, 120, -2]];
+  function uppgorelse(k, id) {
+    let forst = false;
+    try {
+      forst = localStorage.getItem(LAGDA) !== id;
+      if (forst) localStorage.setItem(LAGDA, id);
+    } catch (e) { forst = false; }
+    if (!forst) {
+      k.idle = setTimeout(() => vanta(k), 1000);
+      return;
+    }
+    const gang = (KP.data && KP.data.samtal && KP.data.samtal.gang) || [];
+    let t = 650;
+    gang.forEach((g, i) => {
+      const marks = [...k.el.querySelectorAll(`.sits b.sm-k${i}`)];
+      if (!marks.length) return;
+      const [dx, dy, a] = FAN[i % FAN.length];
+      const fly = { duration: 820, delay: t, easing: 'cubic-bezier(0.25, 0.1, 0.25, 1)' };
+      const sheet = document.createElement('span');
+      sheet.className = `rum-genom sm-k${i}`;
+      k.el.appendChild(sheet);
+      sheet.animate([
+        { transform: `translate(${dx}px, ${dy}px) rotate(${a}deg)`, opacity: 0 },
+        { offset: 0.2, opacity: 0.72 },
+        { offset: 0.72, transform: 'none', opacity: 0.6 },
+        { transform: 'none', opacity: 0 },
+      ], { ...fly, fill: 'both' }).finished.then(() => sheet.remove(), () => sheet.remove());
+      for (const m of marks) {
+        m.animate([
+          { transform: `translate(${dx}px, ${dy}px)`, opacity: 0 },
+          { offset: 0.2, opacity: 1 },
+          { offset: 0.72, transform: 'none' },
+          { transform: 'none' },
+        ], { ...fly, fill: 'backwards' });
+      }
+      t += 230;
+    });
+    // gängets kryss, ett i taget, när kupongerna ligger där
+    t += 700;
+    [...k.el.querySelectorAll('.box .kryss.kula')].forEach((svg, n) => {
+      [...svg.querySelectorAll('path')].forEach((path, j) => path.animate([{ strokeDashoffset: 1.05 }, { strokeDashoffset: 0 }],
+        { duration: 110, delay: t + n * 32 + j * 60, easing: 'cubic-bezier(0.3, 0, 0.6, 1)', fill: 'backwards' }));
+    });
+    t += k.el.querySelectorAll('.box .kryss.kula').length * 32 + 200;
+    // pennan ringar in numren på de omtvistade matcherna (ringarna syns först
+    // när pennan drar dem) och väntar sedan vid den första
+    const path = [];
+    let at = 0;
+    for (const ring of k.el.querySelectorAll('.row.strid .rum-strid')) {
+      const nr = ring.parentElement;
+      const o = spot(nr);
+      const cx = o.x + nr.offsetWidth / 2;
+      const cy = o.y + nr.offsetHeight / 2;
+      const rx = (nr.offsetWidth + 14) * 0.37;
+      const ry = (nr.offsetHeight + 10) * 0.34;
+      const p = (v, l, dt, e) => ({ x: cx + rx * Math.cos(v), y: cy + ry * Math.sin(v), a: PEN_SKRIV, l, t: dt, e });
+      const a0 = -0.6;
+      const travel = path.length ? 260 : 380;
+      path.push(p(a0, 0.6, travel, 'cubic-bezier(0.4, 0, 0.2, 1)'), p(a0, 0, 40, 'ease-in'));
+      at += travel + 40;
+      const draw = ring.querySelector('path');
+      if (draw) draw.animate([{ strokeDashoffset: 1.05 }, { strokeDashoffset: 0 }], { duration: 7 * 48, delay: t + at, easing: 'linear', fill: 'backwards' });
+      // förklaringen kommer fram med ringen
+      const sk = nr.parentElement.querySelector('.skal');
+      if (sk) sk.animate([{ opacity: 0 }, { opacity: 1 }], { duration: 360, delay: t + at + 120, easing: 'ease-out', fill: 'backwards' });
+      for (let s = 1; s <= 7; s++) path.push(p(a0 + (s / 7) * Math.PI * 2.15, 0, 48, 'linear'));
+      path.push(p(a0 + Math.PI * 2.15, 0.45, 70, 'ease-out'));
+      at += 7 * 48 + 70;
+    }
+    k.idle = setTimeout(() => {
+      if (R.kup !== k || k.closing) return;
+      if (path.length) penGo(path);
+      k.idle = setTimeout(() => vanta(k), at + 120);
+    }, t);
+  }
+
+  // Där pennan väntar vid en match: till höger om rutorna, med spetsen mot raden.
+  function vidRad(row) {
+    const b = row.lastElementChild;
+    const o = spot(b);
+    return { x: o.x + b.offsetWidth + 8, y: o.y + b.offsetHeight * 0.55, a: -6 };
+  }
+
+  // Pennan går till nästa omtvistade match som inte är klubbad (efter efter,
+  // annars den första), eller lägger sig vid sidan när alla är klubbade.
+  function vanta(k, efter = null) {
+    if (R.kup !== k || k.closing || calm()) return;
+    const a = document.activeElement;
+    if (a && k.el.contains(a) && a.matches('input.pen-in')) return;
+    const all = [...k.el.querySelectorAll('.row')];
+    const open = all.filter((r) => r.matches('.strid:not(.klubbad)'));
+    const i = efter ? all.indexOf(efter) : -1;
+    const row = open.find((r) => all.indexOf(r) > i) || open[0] || null;
+    const to = row ? vidRad(row) : PEN_VILA;
+    penGo([{ ...to, l: 0.45, t: 460, e: 'cubic-bezier(0.4, 0, 0.3, 1)' }, { ...to, l: row ? 0.18 : 0, t: 160, e: 'ease-in' }]);
+  }
+
+  // En omtvistad match klubbas: bocken vid ringen, sparad på enheten. pen:
+  // pennan drar bocken (ett klick på matchen) och går sedan vidare.
+  function klubba(row, pen = false) {
+    const k = R.kup;
+    if (!k || row.classList.contains('klubbad')) return;
+    const id = Samtal.pult.state() && Samtal.pult.state().s.id;
+    if (!id) return;
+    const rows = klubbat(id);
+    rows.add(row.dataset.id);
+    sparaKlubbat(id, rows);
+    row.classList.add('klubbad');
+    const nr = row.querySelector('.pp-nr');
+    nr.insertAdjacentHTML('beforeend', bockSvg(row.dataset.id));
+    if (calm()) return;
+    const bock = nr.lastElementChild;
+    const delay = pen ? 300 : 0;
+    bock.querySelector('path').animate([{ strokeDashoffset: 1.05 }, { strokeDashoffset: 0 }], { duration: 220, delay, easing: 'cubic-bezier(0.3, 0, 0.5, 1)', fill: 'backwards' });
+    if (!pen) return;
+    // bockens tre punkter, i kupongens mått (rum.css: 13 × 13 vid ringens övre högra hörn)
+    const o = spot(nr);
+    const at = ([x, y], l, t, e) => ({ x: o.x + nr.offsetWidth - 4 + x * 0.81, y: o.y - 7 + y * 0.81, a: PEN_SKRIV, l, t, e });
+    clearTimeout(k.idle);
+    penGo([at([2.4, 8.6], 0.6, 260, 'cubic-bezier(0.4, 0, 0.2, 1)'), at([2.4, 8.6], 0, 40, 'ease-in'), at([6.3, 13], 0, 80, 'ease-out'),
+      at([14, 2.4], 0, 140, 'ease-in'), at([16, 0], 0.5, 80, 'ease-out')]);
+    k.idle = setTimeout(() => vanta(k, row), 900);
+  }
+
+  // Spela hos Svenska Spel: länken öppnar Stryktipset med gängets tecken i en
+  // ny flik, och kupongen skjuts över disken – den sjunker ner mot disken och
+  // glider bort – och ligger sedan på pulten igen.
+  function lamnaOver(k) {
+    if (calm() || !k.anim) {
+      closeCoupon(true);
+      return;
+    }
+    k.busy = true;
+    clearTimeout(k.idle);
+    const h = held();
+    if (k.pen) k.pen.animate([{ opacity: 1 }, { opacity: 0 }], { duration: 200, fill: 'forwards' });
+    k.show.reverse();
+    k.fade.reverse();
+    k.anim.cancel();
+    k.el.animate([
+      { transform: T(h.dx, h.dy, 0, 0, 0, h.z), boxShadow: glow(0, '0 34px 80px rgba(0, 0, 0, 0.6)'), opacity: 1, easing: 'cubic-bezier(0.4, 0, 0.6, 1)' },
+      { offset: 0.3, transform: T(h.dx, h.dy + 24, 0, 24, 0, h.z * 0.97), boxShadow: glow(0, '0 20px 40px rgba(0, 0, 0, 0.55)'), opacity: 1, easing: 'cubic-bezier(0.5, 0, 0.75, 0)' },
+      { transform: T(h.dx + 30, h.dy - 230, -520, 64, -4, h.z * 0.5), boxShadow: glow(0, '0 8px 14px rgba(0, 0, 0, 0.4)'), opacity: 0 },
+    ], { duration: 820, fill: 'forwards' }).finished.then(() => closeCoupon(true), () => closeCoupon(true));
+  }
+  // Svenska Spels omgång har hämtats (spela.js): gängets kupong i handen får
+  // Spela hos Svenska Spel om den går att spela.
+  addEventListener('spela', () => {
+    const k = R.kup;
+    if (k && k.slag === 'gang' && !k.busy && !k.closing) gangState(k.msg.textContent);
+  });
 
   // Gängets kupong i handen efter ett kryss: fälten i foten, guldordet (Spara
   // gängets kupong, Spara ändringen eller Sparad) och Börja om.
@@ -3431,9 +3681,9 @@ ${window.RumRegister ? RumRegister.nara() : ''}
     k.tecken = g.val;
     const f = k.el.querySelector('.fot .pp-fields');
     if (f) f.outerHTML = Samtal.pult.fields(g.val, true);
-    if (k.go) {
-      k.go.outerHTML = gangHtml(g);
-      k.go = k.rad.querySelector('[data-gang]');
+    if (k.gw && k.go) {
+      k.gw.innerHTML = gangHtml(g);
+      k.go = k.gw.querySelector('[data-gang]');
     }
     const r = k.rad.querySelector('[data-borjaom]');
     if (r) r.hidden = !g.reset;
@@ -3477,6 +3727,16 @@ ${window.RumRegister ? RumRegister.nara() : ''}
     if (g) setSigns(g.val, true);
     k.next = null;
     gangState();
+    // förslaget igen: inget är klubbat, och pennan väntar vid den första
+    const id = Samtal.pult.state() && Samtal.pult.state().s.id;
+    if (id) sparaKlubbat(id, []);
+    for (const row of k.el.querySelectorAll('.row.klubbad')) {
+      row.classList.remove('klubbad');
+      const b = row.querySelector('.rum-bock');
+      if (b) b.remove();
+    }
+    clearTimeout(k.idle);
+    k.idle = setTimeout(() => vanta(k), 1200);
   }
 
   // Din inlämnade kupong: Ångra och Lämna in ändringen tänds när något är

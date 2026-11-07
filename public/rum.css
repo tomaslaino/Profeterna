@@ -545,11 +545,12 @@ canvas.rum-neonhalo { opacity: 0.28; }
 .rum-kup .pencil i { position: absolute; left: 24px; top: -6px; width: 104px; height: 12px; background: linear-gradient(180deg, #f0f0ec 0 30%, #d9d7d0 30% 70%, #b8b5ac 70%); }
 .rum-kup .pencil i::before { content: ""; position: absolute; left: -24px; top: 0; width: 24px; height: 12px; background: linear-gradient(90deg, #2a2a2a 0 24%, #e2c08c 24%); clip-path: polygon(0 50%, 100% 0, 100% 100%); }
 .rum-kup .pencil i::after { content: ""; position: absolute; right: -5px; top: 3px; width: 7px; height: 6px; border: 2px solid #8a8780; border-radius: 50%; }
-/* gängets kupong: kulspetspennan och dess kryss i blått bläck */
-.rum-kup .pencil.kula i { top: -5px; width: 98px; height: 10px; border-radius: 0 4px 4px 0; background: linear-gradient(180deg, #4b78d8 0 28%, #2146a6 28% 72%, #15306f 72%); }
+/* gängets kupong: kulspetspennan och dess kryss i svart bläck – blått är
+   Lainos bläck (.sm-k0), och gängets kryss ska inte se ut som hans */
+.rum-kup .pencil.kula i { top: -5px; width: 98px; height: 10px; border-radius: 0 4px 4px 0; background: linear-gradient(180deg, #5b5e66 0 28%, #22242a 28% 72%, #0f1013 72%); }
 .rum-kup .pencil.kula i::before { left: -20px; width: 20px; height: 10px; background: linear-gradient(90deg, #22262e 0 14%, #d6d6cf 14% 55%, #9c9c95 55%); }
 .rum-kup .pencil.kula i::after { right: 10px; top: -3px; width: 26px; height: 3px; border: 0; border-radius: 2px; background: #c9c9c2; }
-.rum-kup .kryss.kula path { stroke: #2146a6; stroke-width: 2.1; opacity: 0.92; }
+.rum-kup .kryss.kula path { stroke: #1d1e22; stroke-width: 2.1; opacity: 0.92; }
 
 /* efter tiden: motiveringen för hand med blyerts och kommentaren i
    efterhand i ens bläck (rum.js, notes), på samma rad så att raden aldrig
@@ -603,13 +604,28 @@ canvas.rum-neonhalo { opacity: 0.28; }
 .rum-handen .row:has(.pen:focus-within) :is(.pp-small, .mot, .pp-tm .lang) { display: none; }
 .rum-handen .row:has(.pen:focus-within) .pp-tm .kort { display: inline; }
 
-/* uppgörelsen: porträtten för dem som har med tecknet, var och en på sin
-   plats i rutan, som på papperet */
+/* uppgörelsen: de tre kupongerna lagda på varandra – var och ens kryss litet
+   och i ens bläck, på sin plats i rutan (rum.js, seats) */
 .rum-kup .box:has(.sits) { display: flex; align-items: center; justify-content: center; gap: 2px; }
 .rum-kup .box .sits { display: flex; gap: 1px; }
-.rum-kup .sits b { flex: none; width: 8px; height: 8px; border-radius: 50%; }
-.rum-kup .sits b[class] { background: var(--pp-box); box-shadow: 0 0 0 1px var(--ink); }
-.rum-kup .sits img { display: block; width: 100%; height: 100%; border-radius: 50%; object-fit: cover; }
+.rum-kup .sits b { flex: none; width: 9px; height: 9px; }
+.rum-kup .sits svg { display: block; width: 100%; height: 100%; overflow: visible; }
+.rum-kup .sits path { fill: none; stroke: var(--ink); stroke-width: 1.6; stroke-linecap: round; opacity: 0.85; }
+.rum.smal .rum-kup .sits b { width: 10px; height: 10px; }
+/* kupongerna ur högen på väg in, genomskinliga (rum.js, uppgorelse) */
+.rum-kup .rum-genom { position: absolute; inset: 0; z-index: 3; pointer-events: none; border-radius: 2px; border: 1px solid color-mix(in srgb, var(--ink) 35%, transparent); background: color-mix(in srgb, var(--pp-paper) 82%, var(--ink)); box-shadow: 0 14px 30px rgba(0, 0, 0, 0.3); }
+/* de omtvistade matcherna: numret inringat med kulspetspennan, en bock när
+   matchen är klubbad, och den som avviker förklarar efter tiden i sitt bläck */
+.rum-kup .row .pp-nr { position: relative; }
+.rum-kup .rum-strid { position: absolute; left: -7px; top: -5px; width: calc(100% + 14px); height: calc(100% + 10px); overflow: visible; fill: none; stroke: #1d1e22; stroke-width: 1.5; stroke-linecap: round; stroke-dasharray: 1 2; vector-effect: non-scaling-stroke; opacity: 0.85; pointer-events: none; }
+.rum-kup .rum-strid path { vector-effect: non-scaling-stroke; }
+.rum-kup .rum-bock { position: absolute; right: -9px; top: -7px; width: 13px; height: 13px; overflow: visible; fill: none; stroke: #1d1e22; stroke-width: 1.8; stroke-linecap: round; stroke-linejoin: round; stroke-dasharray: 1 2; pointer-events: none; }
+.rum-kup .not .skal { display: flex; flex: 0 1 auto; min-width: 0; }
+.rum-kup .not .sk { flex: 0 1 auto; min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; color: var(--ink); }
+/* där får förklaringen raden: lagen med de korta namnen och utan tiden, som när man skriver */
+.rum-kup .row.strid:has(.sk) :is(.pp-small, .pp-tm .lang) { display: none; }
+.rum-kup .row.strid:has(.sk) .pp-tm .kort { display: inline; }
+.rum-handen .row.strid:not(.klubbad) .m, .rum-handen .row.strid:not(.klubbad) .pp-nr { cursor: pointer; }
 /* utfallet: en ring runt rutan – grön när kupongen hade det, annars röd,
    streckad i blyerts medan matchen pågår */
 .rum-kup .rum-ring { position: absolute; left: -7px; top: -5px; width: calc(100% + 14px); height: calc(100% + 10px); overflow: visible; fill: none; stroke: var(--pp-no); stroke-width: 2; stroke-linecap: round; pointer-events: none; }
