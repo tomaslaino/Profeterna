@@ -52,7 +52,7 @@
 .rh-samtal { position: absolute; top: 12%; bottom: 52px; z-index: 2; display: flex; flex-direction: column; font-size: clamp(15px, 1.22vw, 18px); line-height: 1.42; text-shadow: 0 1px 4px rgba(0, 0, 0, 0.9); }
 .rh-sagt { flex: none; min-height: 1.15em; font: 700 1.62em/1.15 Fraunces, Georgia, serif; margin: 0 0 0.4em; }
 /* över matchlistan alltid plats för två rader, så att listan står still vad han än säger */
-.rh-sagt:has(+ .rh-lista) { min-height: 2.3em; text-wrap: balance; }
+.rh-sagt:has(+ .rh-lista, + .rh-kol) { min-height: 2.3em; text-wrap: balance; }
 .rh-o { visibility: hidden; }
 .rh-o.s { visibility: visible; }
 .rh-lista { flex: 1; min-height: 0; overflow-y: auto; overscroll-behavior: contain; touch-action: pan-y; }
@@ -68,6 +68,26 @@
 .rh-tips small { display: grid; grid-template-columns: 1fr auto 1fr; gap: 0.12em; width: 2.4em; font-size: inherit; font-weight: 700; color: #f6efdc; white-space: nowrap; }
 .rh-tips small i { font-style: normal; text-align: right; }
 .rh-tips small i + i { text-align: left; }
+/* Vem som säger vad (spalter i rum-hasse.js): porträtt och namn mitt över hans spalt och över din.
+   Raden har osynliga rutor som håller samma bredd som på raderna under. */
+.rh-kol { flex: none; display: flex; justify-content: flex-end; height: 30px; margin-bottom: 0.3em; }
+.rh-kol .rh-tips { position: relative; align-self: stretch; }
+.rh-kol .rh-rutor, .rh-kol small { visibility: hidden; }
+.rh-kol u { position: relative; }
+.rh-vem { --a: 26px; position: absolute; top: 50%; translate: 0 -50%; display: flex; align-items: center; gap: 7px; font: 700 11px/1 Fraunces, Georgia, serif; letter-spacing: 0.17em; text-transform: uppercase; color: rgba(246, 239, 220, 0.82); white-space: nowrap; }
+.rh-vem.hasse { left: 50%; translate: -50% -50%; color: #ffd86b; }
+.rh-vem.du { right: 0; }
+.rh-ans { flex: none; width: var(--a); height: var(--a); border-radius: 50%; background: #3a2c20 no-repeat center / cover; box-shadow: 0 0 0 1.5px var(--ring, rgba(246, 239, 220, 0.6)), 0 2px 6px rgba(0, 0, 0, 0.6); }
+.rh-vem.hasse .rh-ans { --ring: #ffd86b; background-image: url(rum/hasse-atlas.webp); background-size: calc(var(--a) * 4.15) auto; background-position: calc(var(--a) * -0.65) calc(var(--a) * -0.23); }
+/* ditt namn i din handstil och porträttet i din färg, som på kupongen (rum.css .sm-k0–2) */
+.rh-vem.du .rh-namn { letter-spacing: 0; text-transform: none; color: #f6efdc; }
+.rh-vem.k0 .rh-ans { --ring: var(--gang-0); }
+.rh-vem.k1 .rh-ans { --ring: var(--gang-1); }
+.rh-vem.k2 .rh-ans { --ring: var(--gang-2); }
+.rh-vem.k0 .rh-namn { font: 400 15px/1 "Cedarville Cursive", Caveat, cursive; }
+.rh-vem.k1 .rh-namn { font: 400 16px/1 "Mr Dafoe", Caveat, cursive; }
+.rh-vem.k2 .rh-namn { font: 400 20px/1 "Reenie Beanie", Caveat, cursive; }
+.rh-kol.trangt .du .rh-ans + .rh-namn, .rh-kol.trangare .rh-ans + .rh-namn { display: none; }
 .rh-vh { position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap; }
 @media (hover: hover) { .rh-lista button:hover:not(:disabled) { color: #ffd86b; border-bottom-color: #ffd86b; } }
 .rh-lista button:disabled { opacity: 0.42; cursor: default; }
@@ -141,6 +161,8 @@
 .rum-hasse-vy.hog .rh-match { font-size: 0.86em; }
 .rum-hasse-vy.hog .rh-tips { gap: 0.5em; margin-left: 0.6em; }
 .rum-hasse-vy.hog .rh-rutor em { width: 1.8em; }
+.rum-hasse-vy.hog .rh-kol { height: 26px; margin-bottom: 0.2em; }
+.rum-hasse-vy.hog .rh-vem { --a: 24px; }
 .rum-hasse-vy.hog .rh-slut { padding-top: 0.3em; }
 @media (prefers-reduced-motion: reduce) { .rh-dom, .rh-slag, .rh-svar { animation: none; } }
 
@@ -177,7 +199,8 @@
 @media (hover: hover) { .rh-ruta.hans:hover { border-color: #ffd86b; color: #7a5009; } }
 @media (prefers-reduced-motion: reduce) { .rh-ruta.hans { animation: none; } }
 /* det du själv har på raden, i listan */
-.rh-lista button u { flex: none; width: 2em; margin-left: 0.6em; text-align: right; color: #f6efdc; opacity: 0.82; font: 600 1.18em/1 Caveat, cursive; text-decoration: none; }
+.rh-lista button u, .rh-kol u { flex: none; width: 2em; margin-left: 0.6em; text-align: right; color: #f6efdc; font: 600 1.3em/1 Caveat, cursive; text-decoration: none; }
+.rh-lista button u { align-self: center; opacity: 0.92; }
 .rum-hasse-vy.hog .rh-ruta { height: 52px; font-size: 28px; max-width: none; }
 .rum-hasse-vy.hog .rh-tecken { margin-top: 0.5em; }
 /* lågt fönster (telefonen på bredden): rutorna och svaren lite mindre, så att allt ryms ovanför foten */
