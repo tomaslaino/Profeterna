@@ -1,5 +1,5 @@
 {
- "uppdaterad": "2026-11-07T10:51:07.255Z",
+ "uppdaterad": "2026-11-07T10:51:29.463Z",
  "omgang": {
   "id": "2026-11-07-st4978",
   "matcher": [
@@ -251,22 +251,25 @@
    },
    "hasse": {
     "stycken": [
-     "Scott Parker har haft West Ham i tre dagar, och hans första match slutade 3–3 i Cardiff efter 0–3 i halvtid. Det säger en del om viljan och ännu mer om försvaret. Laget har släppt in tre mål i tre raka matcher, och det fixar ingen tränare på tre dagar, inte ens jag.",
-     "Samtidigt har West Ham inte förlorat på bortaplan i år. Blackburn har förlorat tre av sina fyra senaste, Morishita, Miller och Forshaw är skadade och Alebiosu haltade av senast. Ett lag som läcker bakåt möter alltså ett lag som saknar en jävla massa folk. Orsak och verkan.",
-     "Tvåan väger tyngst, men båda lagen släpper in mål, så oavgjort får följa med. Tvåan och krysset."
+     "West Ham har en ny tränare som har hunnit med en match, och den slutade 3–3 efter att laget låg under med 3–0 i halvtid. Försvaret har släppt in tre mål i tre raka matcher, och det ordnar ingen på tre dagar. Det är orsak och verkan, och Blackburn kommer att få sina chanser.",
+     "Men Blackburn har förlorat tre av sina fyra senaste matcher och har gjort ett enda mål på de två senaste. Morishita, Miller och Forshaw är skadade, och Alebiosu haltade av senast. West Ham har inte förlorat på bortaplan i år och gör mål på alla. Ett lag som läcker men vinner mot ett lag som både läcker och inte gör mål, det är ingen svår match. Jag tar tvåan, rent och utan kryss."
     ],
+    "tecken": [
+     2
+    ],
+    "resultat": "1–3",
     "tips": "2026-11-07T10:05:56.593Z",
     "uppdrag": {
      "fraser": [
-      "Orsak och verkan",
-      "Då är jag jävligt snäll"
+      "Total kontroll",
+      "Orsak och verkan"
      ],
      "krydda": null,
      "bielsa": []
     },
     "model": "claude-opus-5-5",
-    "version": "2026-11-05.1",
-    "writtenAt": "2026-11-07T10:06:06.750Z",
+    "version": "2026-11-07.1",
+    "writtenAt": "2026-11-07T10:51:17.166Z",
     "attempts": 1
    },
    "model": "claude-opus-5-5",
