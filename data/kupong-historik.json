@@ -63,7 +63,12 @@
         { "match": "West Bromwich Albion – Millwall", "tecken": "1X", "resultat": "3–0", "modell": [43, 28, 29], "id": "401880162" },
         { "match": "Crewe Alexandra – AFC Wimbledon", "tecken": "1X2", "resultat": "2–1", "modell": [42, 29, 29], "id": "401931120" },
         { "match": "Oxford United – Stevenage", "tecken": "1X", "resultat": "0–1", "modell": [48, 30, 22], "id": "401931121" }
-      ]
+      ],
+      "ai": {
+        "text": "Kupongen gav 10 av 13 mot väntade 9,7, och modellens tips hade bara 5 av 13 rätt. Den tyngsta förlusten var X2 på Nottingham Forest – Manchester City, där modellen gav 1,18, men 3–1 till hemmalaget fällde garderingen. Även Oxford United – Stevenage sprack på 1X till 1,28. Däremot satt Birmingham City till 2,13, och ni fick rätt på 1X i Cardiff City – Burnley mot modellens tips 2.",
+        "modell": "claude-opus-5-5",
+        "skriven": "2026-11-07T19:33:29.759Z"
+      }
     }
   ]
 }
