@@ -97,6 +97,14 @@
     return `<svg class="pp-tick" viewBox="0 0 34 34" aria-hidden="true"><path d="${d}"/></svg>`;
   }
 
+  // Kortare lagnamn, där raden är smal: på kupongen i tobaksaffären (rum.js)
+  // och i förstasidans ruta (samtal.js).
+  const KORT = { 'Manchester City': 'Man City', 'Manchester United': 'Man Utd', 'Tottenham Hotspur': 'Tottenham', 'Brighton & Hove Albion': 'Brighton',
+    'Wolverhampton Wanderers': 'Wolves', 'West Bromwich Albion': 'West Brom', 'Queens Park Rangers': 'QPR', 'Nottingham Forest': "Nott'm Forest",
+    'AFC Bournemouth': 'Bournemouth', 'Preston North End': 'Preston', 'Sheffield Wednesday': 'Sheff Wed', 'Sheffield United': 'Sheff Utd',
+    'Milton Keynes Dons': 'MK Dons', 'Bristol City': 'Bristol City', 'Bristol Rovers': 'Bristol Rovers', 'Notts County': 'Notts County' };
+  const kort = (name) => KORT[name] || String(name || '').replace(/\s+(United|City|Town|Rovers|Athletic|County|Wanderers|Albion|Argyle|Hotspur)$/, '');
+
   // Streckkoden längst ner, ur kupongens id.
   function barcode(id) {
     const r = rng(`streck${id}`);
@@ -466,5 +474,5 @@
     }
   }
 
-  window.Papper = { RADER, coupon, builder, reveal, program, slip, bump, open: pull, banner, cross, ring, tick, grade, result, foot, code, inDayOrder };
+  window.Papper = { RADER, coupon, builder, reveal, program, slip, bump, open: pull, banner, cross, ring, tick, grade, result, foot, code, inDayOrder, kort };
 }());

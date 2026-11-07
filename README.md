@@ -624,8 +624,10 @@ bara lokalt. Analyserna visas som de ligger i `data/analyser.json`; hur de skriv
   ("Gör samma sak på papperet under Kupong"): samma omtvistade matcher, inringade och med bleka
   kryss, och *Samma grund, olika säkerhet* delad i två – där förslaget lämnar någons tecken
   utanför, och *Alla får med sitt*. Det klubbade delas mellan papperet och rummet, och en klubbad
-  match står kvar mörk, så att den går att kryssa färdigt. Se *Kupongen i handen*, *Pennan visar
-  vägen*, och [Inför uppgörelsen](#inför-uppgörelsen), punkt 4.
+  match står kvar mörk, så att den går att kryssa färdigt. Samma dag också förstasidans ruta ("Gör
+  samma sak på förstasidans ruta"): under *Alla inne* de omtvistade matcherna med inringade nummer,
+  bockarna och var och ens tecken i sin färg. Se *Kupongen i handen*, *Pennan visar vägen*, och
+  [Inför uppgörelsen](#inför-uppgörelsen), punkt 1 och 4.
 - **Expressens löpsedel från VM 94 (2026-11-03, användarens önskemål):** VM 94-affischen med
   fotot från hemkomsten är utbytt mot en mer verklighetstrogen löpsedel, lite solblekt och
   sliten: *JAAAAAAAA! BRONS!* med Tomas foto från Rose Bowl. Den sitter på skivan som de andra.
@@ -1649,7 +1651,12 @@ under omgången.
    Tejder*, *Väntar på dig och Tejder*, *Väntar på alla* (vilka som är inne när man
    pekar), och grönt *Alla inne*. När tiden är ute står det *Dags för uppgörelsen* och vem
    som inte lämnade in; när gängets kupong är gjord tar den över. Porträtt står inte där –
-   gänget syns redan på polaroiderna (2026-10-22). Knappen heter *Till kupongen*, som i
+   gänget syns redan på polaroiderna (2026-10-22). **När allas tips visas** (2026-11-07) står
+   de omtvistade matcherna under raden, som på papperet och i rummet (punkt 4): numret inringat i
+   guld, med en bock när matchen är klubbad på enheten, lagen med de korta namnen (`Papper.kort`,
+   samma som på kupongen i rummet; de öppnar matchrutan) och vad var och en har tippat i sin färg
+   (`--gang-0–2`), under små porträtt (`strider` i samtal.js). Matcherna som inte är omtvistade
+   står inte där. Knappen heter *Till kupongen*, som i
    rutan för en färdig kupong, och *Fyll i resten* när man har börjat på sin kupong. En
    färdigspelad kupong visas inte bredvid medan en ny omgång fylls i – den står bland
    Grupparbetena i Olympen.
