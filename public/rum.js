@@ -1300,18 +1300,22 @@ ${window.RumRegister ? RumRegister.nara() : ''}
     return html ? `<span class="not">${html}</span>` : '';
   }
 
+  // Vad någon har skrivit om matchen: motiveringen och kommentaren i
+  // efterhand (seats, och ordPa i telefonen).
+  const said = (v, id, vem) => ({ mot: (v.notes && v.notes[id] && v.notes[id][vem]) || '', eft: (v.after && v.after[id] && v.after[id][vem]) || '' });
+
   // Uppgörelsen: porträtten för dem som har med tecknet, var och en på sin
   // plats i rutan (samma ordning som överst), och när man pekar motiveringen
-  // och kommentaren i efterhand.
+  // och kommentaren i efterhand – i telefonen med ett långt tryck på rutan
+  // (ordPa).
   function seats(v, id, j) {
     const gang = (KP.data && KP.data.samtal && KP.data.samtal.gang) || [];
     const who = (v.who && v.who[id] && v.who[id][j]) || [];
     return '<span class="sits">' + gang.map((g, i) => {
       if (!who.includes(g.id)) return '<b></b>';
-      const note = v.notes && v.notes[id] && v.notes[id][g.id];
-      const eft = v.after && v.after[id] && v.after[id][g.id];
+      const { mot, eft } = said(v, id, g.id);
       const src = photoOf(g.id);
-      return `<b class="sm-k${i}" title="${esc(`${g.id}${note ? `: ${note}` : ''}${eft ? `\nEfteråt: ${eft}` : ''}`)}">${src ? `<img src="${esc(src)}" alt="" draggable="false">` : ''}</b>`;
+      return `<b class="sm-k${i}" title="${esc(`${g.id}${mot ? `: ${mot}` : ''}${eft ? `\nEfteråt: ${eft}` : ''}`)}">${src ? `<img src="${esc(src)}" alt="" draggable="false">` : ''}</b>`;
     }).join('') + '</span>';
   }
 
@@ -3070,6 +3074,13 @@ ${window.RumRegister ? RumRegister.nara() : ''}
         lagen(t.closest('.row').dataset.id);
         return;
       }
+      // efter ett långt tryck på en ruta kryssas den inte, och ett tryck på
+      // lappen tar bort den (wireHold)
+      if (k.holl || e.target.closest('.rum-ord')) {
+        if (!k.holl) ordUt(k);
+        k.holl = false;
+        return;
+      }
       // tiden och det som står efter den: man skriver på raden (writeOn)
       const b = e.target.closest('button.box, button[data-vem]');
       if (!b) writeOn(e.target);
@@ -3078,6 +3089,7 @@ ${window.RumRegister ? RumRegister.nara() : ''}
       else tick(b);
     });
     wireNotes(k);
+    if (slag === 'gang') wireHold(k, v);
     k.rad.addEventListener('click', (e) => {
       const b = e.target.closest('button');
       if (!b || b.disabled || k.closing) return;
@@ -3596,6 +3608,76 @@ ${window.RumRegister ? RumRegister.nara() : ''}
     if (!w) return;
     const f = w.querySelector('input');
     w.classList.toggle('gom', row.classList.contains('tom') && !f.value.trim() && document.activeElement !== f);
+  }
+
+  // ---------- långt tryck i telefonen ----------
+  //
+  // Med musen syns motiveringen och kommentaren i efterhand när man pekar på
+  // porträttet i rutan (seats). I telefonen finns ingen pekare och porträtten
+  // är för små för ett finger, så där visar ett långt tryck på rutan samma
+  // rader för alla i den, på en lapp ovanför rutan: porträttet, namnet,
+  // motiveringen med blyerts och kommentaren i bläck. Rutan kryssas inte av
+  // det långa trycket, och nästa tryck tar bort lappen.
+  const HALL = 450;
+  function wireHold(k, v) {
+    const el = k.el;
+    let h = null;
+    const sluta = () => { if (h) clearTimeout(h.t); h = null; };
+    el.addEventListener('pointerdown', (e) => {
+      k.holl = false;
+      sluta();
+      if (!e.target.closest('.rum-ord')) ordUt(k);
+      if (e.pointerType === 'mouse' || !e.isPrimary) return;
+      const box = e.target.closest('.box');
+      if (!box || !box.querySelector('.sits b[class]')) return;
+      h = { id: e.pointerId, x: e.clientX, y: e.clientY };
+      h.t = setTimeout(() => {
+        h = null;
+        if (ordPa(k, v, box)) k.holl = true;
+      }, HALL);
+    });
+    el.addEventListener('pointermove', (e) => {
+      if (h && e.pointerId === h.id && Math.hypot(e.clientX - h.x, e.clientY - h.y) > 10) sluta();
+    });
+    el.addEventListener('pointerup', sluta);
+    el.addEventListener('pointercancel', sluta);
+    el.addEventListener('contextmenu', (e) => { if (e.target.closest('.box, .rum-ord')) e.preventDefault(); });
+  }
+
+  // Lappen ovanför rutan, med högerkanten mot rutans (under den när den inte
+  // får plats ovanför). → om det fanns något att visa.
+  function ordPa(k, v, box) {
+    if (R.kup !== k || k.closing) return false;
+    const row = box.closest('.row');
+    const id = row.dataset.id;
+    const j = [...row.querySelectorAll('.box')].indexOf(box);
+    const gang = (KP.data && KP.data.samtal && KP.data.samtal.gang) || [];
+    const who = (v.who && v.who[id] && v.who[id][j]) || [];
+    const rader = gang.map((g, i) => [g, i]).filter(([g]) => who.includes(g.id)).map(([g, i]) => {
+      const { mot, eft } = said(v, id, g.id);
+      const src = photoOf(g.id);
+      return `<p class="sm-k${i}">${src ? `<img src="${esc(src)}" alt="" draggable="false">` : ''}<b>${esc(g.id)}</b>` +
+        `${mot ? `<span class="ord-mot">${esc(mot)}</span>` : ''}${eft ? `<span class="ord-eft">Efteråt: ${esc(eft)}</span>` : ''}</p>`;
+    });
+    if (!rader.length) return false;
+    ordUt(k);
+    const el = document.createElement('div');
+    el.className = 'rum-ord';
+    el.innerHTML = rader.join('');
+    k.el.appendChild(el);
+    k.ord = el;
+    const o = spot(box);
+    el.style.right = `${r1(k.el.offsetWidth - o.x - box.offsetWidth)}px`;
+    el.style.maxWidth = `${r1(o.x + box.offsetWidth - 12)}px`;
+    const top = o.y - el.offsetHeight - 8;
+    el.style.top = `${r1(top > 8 ? top : o.y + box.offsetHeight + 8)}px`;
+    if (!calm()) el.animate([{ opacity: 0, transform: 'translateY(6px) scale(0.97)' }, { opacity: 1, transform: 'none' }], { duration: 160, easing: 'ease-out' });
+    return true;
+  }
+  function ordUt(k) {
+    if (!k.ord) return;
+    k.ord.remove();
+    k.ord = null;
   }
 
   function wireNotes(k) {
