@@ -1,5 +1,5 @@
 {
- "uppdaterad": "2026-11-07T10:52:13.490Z",
+ "uppdaterad": "2026-11-07T10:52:41.407Z",
  "omgang": {
   "id": "2026-11-07-st4978",
   "matcher": [
@@ -360,24 +360,28 @@
    },
    "hasse": {
     "stycken": [
-     "Cardiff ledde med 3–0 i halvlek mot West Ham och fick nöja sig med 3–3. Ett lag som släpper in tre mål på en halvlek har slarvat med organisationen, och nu saknar de dessutom Ng, Chambers, Bielik och Lawlor i backlinjen.",
-     "Cardiff försvarar högt och pressar, med intensidá, presión arriba, och Bielsa säger ju: \"Det finns 28 sätt att bryta ner en backlinje.\" Ursäkta. Back to basis. Burnley har två oavgjorda under Celestini och står rätt, och Amdouni ser ut att vara tillgänglig.",
-     "Sju hemmamatcher utan förlust talar för Cardiff, men en backlinje full av hål håller inte i längden. Jag har sett det förr, i Manchester. Det gick bra då också. Kryss och tvåa."
+     "Cardiff ledde med 3–0 i halvlek mot West Ham och fick nöja sig med 3–3. Nu saknar de dessutom Perry Ng, Calum Chambers, Krystian Bielik och Dylan Lawlor i backlinjen. Sju hemmamatcher utan förlust är fint, men den sviten köper jag aldrig när halva backlinjen sitter på läktaren.",
+     "Cardiff vill försvara högt och pressa. Med en ihoplappad backlinje bakom blir det intensidá utan skydd, och det finns 28 sätt att bryta ner en backlinje, och Burnley behöver bara hitta ett av dem … Ursäkta. Back to basis.",
+     "Burnley har spelat två oavgjorda under den nya tränaren och står rätt. Amdouni ser ut att vara tillbaka. Det räcker mot ett lag som släpper in mål. Jag ringar in en tvåa, och det är lugnt."
     ],
+    "tecken": [
+     2
+    ],
+    "resultat": "1–2",
     "tips": "2026-11-07T10:09:02.220Z",
     "uppdrag": {
      "fraser": [
-      "Nej nej nej",
-      "Lugn nu"
+      "Det är lugnt",
+      "Det köper jag aldrig"
      ],
-     "krydda": "Jag har sett det förr, i Manchester. Det gick bra då också.",
+     "krydda": null,
      "bielsa": [
       "intensidá"
      ]
     },
     "model": "claude-opus-5-5",
-    "version": "2026-11-05.1",
-    "writtenAt": "2026-11-07T10:09:12.151Z",
+    "version": "2026-11-07.1",
+    "writtenAt": "2026-11-07T10:52:28.385Z",
     "attempts": 1
    },
    "model": "claude-opus-5-5",
