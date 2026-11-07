@@ -1,5 +1,5 @@
 {
- "uppdaterad": "2026-11-07T10:53:55.115Z",
+ "uppdaterad": "2026-11-07T10:54:17.665Z",
  "omgang": {
   "id": "2026-11-07-st4978",
   "matcher": [
@@ -949,23 +949,26 @@
    },
    "hasse": {
     "stycken": [
-     "Middlesbrough leder serien men förlorade med 0–2 mot Wrexham i onsdags, trots att de hade 62,2 procent av bollen. Då har man haft bollen utan att komma någonstans med den. Will Lankshear är dessutom osäker efter en muskelskada, och utan honom blir det ännu svårare för dem att göra mål.",
-     "Watford har vunnit två raka hemmamatcher på ren envishet. Nu är Hector Kyprianou avstängd och fyra spelare skadade. Tar man bort en mittfältare från ett lag som lever på att stå kompakt, så blir det tunnare i mitten. Orsak och verkan.",
-     "Middlesbrough är bättre men skakiga, och Watford kommer att slåss för varje boll. Hemmasegern låter jag vara, fast jag gillar lag som sliter. Jag ringar in kryss och tvåa."
+     "Middlesbrough leder serien och har förlorat en enda ligamatch sedan augusti. Den förlusten var 0–2 mot Wrexham, där laget hade över sextio procent av bollen och inte kom någonstans med den. Det oroar mig inte nämnvärt. Ett bra lag som får en smäll brukar komma tillbaka med lite mer allvar, och det gäller även om Lankshear inte hinner bli frisk och Strelec får gå in längst fram.",
+     "Watford har vunnit två raka hemmamatcher och kämpar bra, det ska de ha. Men nu är Kyprianou avstängd på mittfältet och fyra spelare till är borta. Då blir det svårt att vara kompakt och fysisk i nittio minuter mot serieledaren. Watford gör ett mål på envishet, men mer blir det inte. Jag ringar in en ensam tvåa."
     ],
+    "tecken": [
+     2
+    ],
+    "resultat": "1–2",
     "tips": "2026-11-07T10:14:38.079Z",
     "uppdrag": {
      "fraser": [
-      "Orsak och verkan",
-      "Lugn nu"
+      "Nej nej nej",
+      "Det är lugnt"
      ],
      "krydda": null,
      "bielsa": []
     },
     "model": "claude-opus-5-5",
-    "version": "2026-11-05.1",
-    "writtenAt": "2026-11-07T10:15:08.014Z",
-    "attempts": 3
+    "version": "2026-11-07.1",
+    "writtenAt": "2026-11-07T10:54:05.689Z",
+    "attempts": 1
    },
    "model": "claude-opus-5-5",
    "version": "2026-11-04.1",
