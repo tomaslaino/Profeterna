@@ -153,8 +153,9 @@ export function laddaHand() {
 
 // ---------- handen ----------
 // Handens storlek (modellen är en hand på ungefär 17 cm i skala 1; en enhet är ungefär 0,6 mm) och
-// manschettens vidd. Greppen om cigarren och koppen (rum-hasse-3d.js) räknas med samma skala.
-export const HAND = { SK: 1.04, MAN: 0.95 };
+// manschettens vidd. Greppen om cigarren och koppen (rum-hasse-3d.js) räknas med samma skala. Förut
+// var skalan 1,04, och händerna såg stora ut bredvid ansiktet och koppen (ändrat 2026-11-08).
+export const HAND = { SK: 0.92, MAN: 0.95 };
 const HUD_V = `
 attribute vec4 aN, aBen; attribute float aPalm, aRygg; attribute vec2 aNagel;
 uniform mat4 uB[16];
@@ -194,6 +195,10 @@ void main() {
   c *= vec3(1.03, 1.17, 1.22);
   c = mix(c, vec3(dot(c, vec3(.3, .55, .15))), .1);
   c = mix(c, c * vec3(1.08, .92, .88), vTon * .5);
+  // lite varmare och rödare vid knogarna, som ansiktet (förut blekare än det, ändrat 2026-11-08)
+  c = mix(c, c * vec3(1.09, .93, .83), .25);
+  c = mix(c, c * vec3(1.14, .84, .78), vTon * .2);
+  c *= .98;
   // inbakad skugga mellan fingrarna: varm, som hud i skugga (förut grå, som smuts mellan fingrarna)
   float ao = vAo * vAo * .6 + .4;
   // nageln: rosa nagelbädd, ljus halvmåne vid roten och ljus kant längst ut
@@ -213,7 +218,8 @@ void main() {
   vec3 ut = c * l * mix(vec3(.5, .36, .32), vec3(1.), ao);
   vec3 h = normalize(NYCKEL + normalize(cameraPosition - vP));
   float sp = pow(max(0., dot(n, h)), mix(22., 60., nagel));
-  ut += vec3(1., .93, .84) * sp * mix(.07, .2, nagel) * ao;
+  // (huden matt som fotots, naglarna blanka: förut glänste knogarna som plast, ändrat 2026-11-08)
+  ut += vec3(1., .93, .84) * sp * mix(.028, .2, nagel) * ao;
   ut += kant(n, .28) * ao;
   gl_FragColor = vec4(ton(ut), 1.);
 }`;
