@@ -505,7 +505,7 @@ bara lokalt. Analyserna visas som de ligger i `data/analyser.json`; hur de skriv
 - **Lugnare förstasida (2026-10-22, användarens önskemål):** förstasidan visar det
   väsentliga – omgången och vad man ska göra – med mycket luft. Jätterubriken
   *Matchfixarna* (namnet står redan i toppbaren) och lagbilden är borta; i stället står
-  oraklet och Ikaros som polaroider bredvid omgången, och raden *Väntar på Teijder* i
+  oraklet och Ikaros som polaroider bredvid omgången, och raden *Väntar på Tejder* i
   stället för porträtten. Omgångens tippare med utmärkelserna flyttar upp överst i
   Olympen, och Säsongens tippare försvinner – Olympens ställning visar samma sak.
 - **Tobaksaffären blir förstasidan på stora skärmar (2026-10-22, användarens önskemål):**
@@ -553,7 +553,7 @@ bara lokalt. Analyserna visas som de ligger i `data/analyser.json`; hur de skriv
   divisionerna som numrerade flikar (nivå 1–4); gamla länkar till `#…/prognos` hamnar på
   tabellen. Styrkan för alla lag räknas fortfarande – den är motståndet i lagstatistiken.
 - **Skårtavlan blir Tipsligan (2026-11-03, användarens önskemål):** tavlan på väggen visar
-  säsongens ställning mellan Laino, Teijder och Dogge i stället för Premier Leagues topp, och
+  säsongens ställning mellan Laino, Tejder och Dogge i stället för Premier Leagues topp, och
   leder till Olympen i stället för Tabeller. Tavlan är lägre (tre rader i stället för nio),
   och närbilden går lika nära som förut. Tabellerna står kvar på tv:n. Se
   [Tobaksaffären](#tobaksaffären), *Föremålen*.
@@ -1520,7 +1520,7 @@ matchid):
   "skapad": "2026-10-16T18:20:11.000Z",
   "matcher": [
     { "id": "401879263", "match": "AFC Bournemouth – Sunderland", "tecken": "1" },
-    { "id": "401879260", "match": "Leeds United – Manchester United", "tecken": "X2", "kommentar": "Teijder drev X2" }
+    { "id": "401879260", "match": "Leeds United – Manchester United", "tecken": "X2", "kommentar": "Tejder drev X2" }
   ]
 }
 ```
@@ -1572,7 +1572,7 @@ under omgången.
    Förstasidan visar hur lång tid som är kvar – till första avsparken, då inlämningen
    stänger (nedräkningen går av sig själv och blir bärnstensfärgad den sista timmen) – och
    en rad som säger samma sak som stämpeln på papperet, med efternamnen: *Väntar på
-   Teijder*, *Väntar på dig och Teijder*, *Väntar på alla* (vilka som är inne när man
+   Tejder*, *Väntar på dig och Tejder*, *Väntar på alla* (vilka som är inne när man
    pekar), och grönt *Alla inne*. När tiden är ute står det *Dags för uppgörelsen* och vem
    som inte lämnade in; när gängets kupong är gjord tar den över. Porträtt står inte där –
    gänget syns redan på polaroiderna (2026-10-22). Knappen heter *Till kupongen*, som i
@@ -1798,7 +1798,7 @@ kupong. Grunden står i [src/history.js](src/history.js).
 
 **AI-kommentaren** skrivs på datorn med Claude Code, utan verktyg ([Analyserna](#analyserna),
 [src/analyser/kommentar.mjs](src/analyser/kommentar.mjs)): 2–4 meningar i saklig ton, utan skämt, som
-tar upp anteckningarna ("Teijder drev X2"). Kupongen läses ur den publicerade
+tar upp anteckningarna ("Tejder drev X2"). Kupongen läses ur den publicerade
 `data/historik.json`. Samma regler som analysen: inga egna fakta om lag och matcher, inga påhittade
 målförlopp, modellens chans för gängets tecken som odds (som på sidan), och varje tal ska finnas i
 underlaget (annars skrivs texten om, därefter ingen text). Texten skrivs in i
@@ -1980,7 +1980,7 @@ startas. En omgång som ersattes innan tipsen visades räknas inte.
       "till": "2026-10-18",
       "gang": [
         { "id": "DL", "namn": "Daniel Laino" },
-        { "id": "DT", "namn": "Daniel Teijder" },
+        { "id": "DT", "namn": "Daniel Tejder" },
         { "id": "DJ", "namn": "Daniel Johansson" }
       ],
       "klar": "2026-10-18T18:07:00.000Z",
@@ -2470,7 +2470,7 @@ I telefonen glider rummet så att den man tryckte på hamnar mitt i bild om hen 
 Går kupongen att fylla i och figuren inte har lämnat in blir du också hen – samma val som
 namnen på kupongen (`Samtal.pult.vem`), och utkastet följer med. Pennan på pulten skriver
 namnet på kupongen på pulten (`Rum.skriv`, `skrivNamn` i rum.js), i personens bläck och egen
-handstil: Laino i Cedarville Cursive, Teijder i Mr Dafoe och Johansson i Reenie Beanie. Det
+handstil: Laino i Cedarville Cursive, Tejder i Mr Dafoe och Johansson i Reenie Beanie. Det
 ersätter porträtten överst på kupongen här i rummet; på papperet under Kupong är de kvar.
 Stämpeln och guldordet ritas om efter vem du är. Den som valdes lyfter kupongen mot en och
 sprattlar med benen medan de andra vänder sig mot hen, och efter två sekunder lutar hen sig
@@ -2632,10 +2632,10 @@ kvällstidningen KVÄLLSPRESSEN.) Rubriken är det mest dramatiska som rummet ve
 rum-affischer.js):
 
 - *förra omgången* (säsongens omgångar, `TP.season`): den som tippade bäst med minst 82 %
-  rätt (*TEIJDER 12 RÄTT!*, *TEIJDER SLOG ALLA*, *HISTORISKT: TEIJDER ALLA RÄTT!*), den som
+  rätt (*TEJDER 12 RÄTT!*, *TEJDER SLOG ALLA*, *HISTORISKT: TEJDER ALLA RÄTT!*), den som
   tippade sämst med högst hälften rätt (*LAINOS MARDRÖM*, *LAINO I FRITT FALL*, *SANNINGEN OM
   LAINOS TIPS*), modellen mot gänget (*AI-CHOCKEN: DATORN KROSSADE GÄNGET*, *MÄNNISKAN SLÅR
-  TILLBAKA: GÄNGET SLOG DATORN*) och en ny ensam etta i Tipsligan (*TEIJDER TOG TRONEN*,
+  TILLBAKA: GÄNGET SLOG DATORN*) och en ny ensam etta i Tipsligan (*TEJDER TOG TRONEN*,
   *KUPPEN!*) – ställningen och namnen som på skårtavlan (Dogge för Johansson);
 - *en spelad match* i förra omgången eller gängets senaste kupong: skrällen när modellen gav
   utfallet högst 22 % (*BRIGHTON FÄLLDE MAN CITY*, *… SÄNKTE …*), en favorit med minst 58 %
@@ -2646,8 +2646,8 @@ rum-affischer.js):
 - *nästa omgång*, så länge ingen av dess matcher har startat: den jämnaste matchen när
   ingen utgång har över 42 % (*DATORN GER UPP*, *RYSAREN*), den största favoriten med minst 68 %
   (*ARSENAL KAN INTE FÖRLORA* – *Vad kan gå fel?*, *GARANTERAT! ARSENAL VINNER*, *SPIKA
-  ARSENAL!* – *Vi lovar ingenting*) och jakten på ledaren i Tipsligan (*JAKTEN PÅ TEIJDER*,
-  *TEIJDER OHOTAD?*).
+  ARSENAL!* – *Vi lovar ingenting*) och jakten på ledaren i Tipsligan (*JAKTEN PÅ TEJDER*,
+  *TEJDER OHOTAD?*).
 
 Varje rubrik har en vikt efter hur dramatisk den är (hur få rätt, hur liten chans …).
 Förra omgångens väger fullt tre dagar efter sista avsparken, sedan 55 % och efter sex dagar
@@ -3490,7 +3490,7 @@ kupong på pulten, och pingklockan där guldordet annars står (eller *Följ kup
 matcherna har börjat), kupongen eller K tar den i handen – klockan lyser när man pekar på
 den och plingar när kupongen tas upp (`bell` och `pling` i rum.js). Gängets kupong är de tre
 kupongerna lagda på varandra (2026-11-07): i varje ruta står var och ens kryss kvar, litet och
-i ens bläck (blått Laino, grönt Teijder, lila Johansson, som namnen överst), på sin plats i
+i ens bläck (blått Laino, grönt Tejder, lila Johansson, som namnen överst), på sin plats i
 rutan, så att rutan blir mörkare ju fler som har med tecknet (`seats` och `smaKryss` i rum.js;
 förut stod porträtten där, 8 bildpunkter stora). När man pekar på ett kryss syns personens
 motivering och, på en rad under, kommentaren i efterhand (*Efteråt: …*, `efter` i

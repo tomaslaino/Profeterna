@@ -36,7 +36,7 @@ module.exports = {
   site: 'https://tomaslaino.github.io/Profeterna',
   gang: [
     { id: 'DL', namn: 'Daniel Laino', bild: 'profeterna/laino.jpg' },
-    { id: 'DT', namn: 'Daniel Teijder', bild: 'profeterna/teijder.jpg' },
+    { id: 'DT', namn: 'Daniel Tejder', bild: 'profeterna/teijder.jpg' },
     { id: 'DJ', namn: 'Daniel Johansson', bild: 'profeterna/johansson.jpg' },
   ],
   regel: { spik: 4, halv: 5, hel: 4 },

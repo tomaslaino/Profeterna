@@ -263,7 +263,7 @@ const nar = (t) => `${fDag.format(new Date(t)).replace('.', '')} ${fTid.format(n
 const tal = (x) => String(Math.round(x * 10) / 10).replace('.', ',');
 const S = ['1', 'X', '2'];
 // Namnet som på skårtavlan (tavelnamn i rum.js: efternamnet, Dogge för
-// Johansson), annars efternamnet; och genitiv (Teijders, men Ros).
+// Johansson), annars efternamnet; och genitiv (Tejders, men Ros).
 const efter = (p) => String(p.name || p.id || '').trim().split(/\s+/).pop();
 let namnAv = efter;
 const gen = (namn) => (/[sxz]$/i.test(namn) ? namn : `${namn}s`);

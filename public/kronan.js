@@ -28,7 +28,7 @@
 
 const KRONAN_KROPPAR = {
   DL: { namn: 'Daniel Laino', bild: 'profeterna/kropp-laino.png', hx: 49.7, sy: 16 },
-  DT: { namn: 'Daniel Teijder', bild: 'profeterna/kropp-teijder.png', hx: 52.8, sy: 16.7 },
+  DT: { namn: 'Daniel Tejder', bild: 'profeterna/kropp-teijder.png', hx: 52.8, sy: 16.7 },
   DJ: { namn: 'Daniel Johansson', bild: 'profeterna/kropp-johansson.png', hx: 60.5, sy: 18.1 },
 };
 const KRONAN_START = { orakel: ['DL'], ikaros: ['DJ'] };

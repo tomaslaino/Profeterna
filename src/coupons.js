@@ -15,7 +15,7 @@
 //     "matcher": [
 //       { "id": "401879263", "match": "AFC Bournemouth – Sunderland", "tecken": "1" },
 //       { "id": "401879260", "match": "Leeds United – Manchester United", "tecken": "X2",
-//         "kommentar": "Teijder vägrade tro på United" }
+//         "kommentar": "Tejder vägrade tro på United" }
 //     ]
 //   }
 //

@@ -7,7 +7,7 @@
       "datum": "2026-10-24",
       "gang": [
         { "id": "DL", "namn": "Daniel Laino" },
-        { "id": "DT", "namn": "Daniel Teijder" },
+        { "id": "DT", "namn": "Daniel Tejder" },
         { "id": "DJ", "namn": "Daniel Johansson" }
       ],
       "klar": "2026-10-24T18:58:50.814Z",
@@ -34,7 +34,7 @@
       "datum": "2026-10-31",
       "gang": [
         { "id": "DL", "namn": "Daniel Laino" },
-        { "id": "DT", "namn": "Daniel Teijder" },
+        { "id": "DT", "namn": "Daniel Tejder" },
         { "id": "DJ", "namn": "Daniel Johansson" }
       ],
       "klar": "2026-10-31T22:48:34.650Z",

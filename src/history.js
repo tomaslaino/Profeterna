@@ -16,7 +16,7 @@
 //         "källa": "sidan",                      fryst ur data/kuponger/; saknas = inlagd för hand
 //         "matcher": [
 //           { "match": "Everton – Chelsea", "tecken": "2", "resultat": "1–2", "modell": [27, 24, 49],
-//             "kommentar": "Teijder lovade", "id": "401878771" }
+//             "kommentar": "Tejder lovade", "id": "401878771" }
 //         ],
 //         "ai": { "text": "…", "modell": "claude-opus-5-5", "skriven": "2026-10-19T08:07:00.000Z" }
 //       }

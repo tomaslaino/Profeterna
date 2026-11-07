@@ -346,7 +346,7 @@ window.Rum = (() => {
   // handstil och bläck, som på kupongen (samtal.css) – och devisen från Om oss.
   // Ett klick går fram till det (närbilderna, sak). Kortet ritas i sina egna
   // mått (440 × 285) och förminskas till scenens (rum.css).
-  const VISIT = [['Laino', 'M3 9 C30 14 70 13 116 4'], ['Teijder', 'M2 6 C28 15 64 3 92 10 S112 12 118 6'], ['Johansson', 'M4 11 C40 4 82 15 118 7']];
+  const VISIT = [['Laino', 'M3 9 C30 14 70 13 116 4'], ['Tejder', 'M2 6 C28 15 64 3 92 10 S112 12 118 6'], ['Johansson', 'M4 11 C40 4 82 15 118 7']];
   function kortHtml() {
     const gang = VISIT.map(([n, d], i) => `<span class="vk-k${i}"><i>${n}</i>` +
       `<svg viewBox="0 0 120 18" aria-hidden="true"><path d="${d}"/></svg><small>Daniel ${n}</small></span>`).join('');
