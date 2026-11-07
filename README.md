@@ -785,6 +785,15 @@ bara lokalt. Analyserna visas som de ligger i `data/analyser.json`; hur de skriv
   uppifrån, och i baren står koppen lite längre bak med fatet på notans övre vänstra hörn som i rummet,
   så att Hasse B. syns. Fingertopparna på hans vänstra hand skars av vid dukens underkant; nu ryms de.
   Se [Hasse Backe](#hasse-backe), *Kaffet i rummet*.
+- **Hasses händer avslappnade och som fotot (2026-11-08, användarens val):** "Det viktiga är att de är
+  bekväma o passar med den vanliga animationsbilden." Användaren valde bland renderade varianter
+  (hållning B och justering 1–4): händerna vilar med handlederna lite upp, fingrarna böjda ned mot
+  disken och tummarna intill, så att den vänstra tummen inte längre skärs av av disken; en tät skugga
+  under händerna där de ligger an; händerna ungefär 12 % mindre (16 cm i stället för 18); och huden
+  matt och lite varmare, som ansiktet. Handen på pulten i rummet följer med. Prövat och bortvalt:
+  händerna lagda över varandra (den undre handens fingrar stack fram), en löst knuten näve (såg ut som
+  tummen ned) och händerna vilande på lillfingersidan (såg ut som klor). Se [Hasse Backe](#hasse-backe),
+  *Bilden* och *Armarna och händerna*.
 - **Hasse Backe minns vad han sa (2026-11-06, användarens önskemål):** klickade man på en match
   man redan hade frågat om slog han domen i disken en gång till, och efter en omladdning gjorde han
   om allt, med 15–25 sekunders väntan. Nu står det han sa direkt, sparat på enheten så att det
@@ -4342,11 +4351,12 @@ kanten, och armbågar, händer och fat trycks mot disken utan att något sticker
 med armbågarna på disken och armens riktiga längder (`paDisken`), och gesterna börjar och slutar
 där. Han sitter bekvämt: armbågarna nästan rakt framför axlarna, så att överarmarna faller som på
 fotot, och underarmarna lite in mot mitten i ett lugnt V. Händerna ligger i underarmarnas förlängning,
-bara lite vinklade mot lillfingret som en hand som vilar, med fingrarna lätt krökta och samlade och en
-bit isär: den vänstra bredvid koppen, med en bit disk mellan handen och fatet, och den högra mellan
-den och askkoppen, lite rullad mot lillfingret. Den vänstra tummen ligger intill handen, så att
-händerna inte når varandra (`SAMLA`, `TUMME_VILA`); det tonar bort när handen tar kaffet, cigarren
-eller pennan. Askkoppen står så långt till vänster att cigarren i den går fri från handen. Fatet står
+bara lite vinklade mot lillfingret som en hand som vilar, avslappnade: handlederna lite upp och
+fingrarna böjda ned mot disken och samlade, och händerna en bit isär: den vänstra bredvid koppen, med
+en bit disk mellan handen och fatet, och den högra mellan den och askkoppen, lite rullad mot
+lillfingret. Tummarna ligger intill händerna, så att händerna inte når varandra och den vänstra tummen
+inte går ned i disken (`SAMLA`, `TUMME_VILA`); det tonar bort när handen tar kaffet, cigarren eller
+pennan. Askkoppen står så långt till vänster att cigarren i den går fri från handen. Fatet står
 på hörnet och notan på pultens arm. Fingrarna lägger sig på disken: ett finger vars två yttre leder skulle nå under
 ovansidan böjs mindre, tills den lägsta punkten ligger på ytan (`golv` i
 [public/rum-hasse-arm.js](public/rum-hasse-arm.js)), så att fingertopparna aldrig går ned i disken,
@@ -4356,7 +4366,8 @@ försvann ned i disken och den vänstra handen pekade in mot honom med koppen vi
 såg ut som om armen låg över fatet (ändrat 2026-11-06). Sedan pekade den högra handen tvärs över mot
 den vänstras handled, vinklad nästan 20° mot tummen, och den vänstra var vriden ut mot koppen nästan
 50° mot underarmen, med armbågarna ute: händerna låg på varandra och såg krampaktiga ut, och de liknade
-inte den lugna handen på pulten i rummet (ändrat 2026-11-07).
+inte den lugna handen på pulten i rummet (ändrat 2026-11-07). Sedan låg händerna platta med nästan
+raka fingrar, och den vänstra tummen gick ned i disken och skars av i en rak kant (ändrat 2026-11-08).
 
 Han fyller höjden från hjässan nära överkanten, och pultens inre hörn ligger nära underkanten, så att
 man ser att pulten går vidare mot en; mitten av honom står vid 60 % av bredden och samtalet i en spalt
@@ -4728,13 +4739,17 @@ ihop och lägger sig i veck som skuggar sig själva, och överarmens och underar
 sida om armbågens mittplan, så att inget går igenom det andra; normalerna räknas ur formen, så att vecken
 syns i ljuset. Mot ärmslutet blir ärmen platt som handleden, med handflatan åt den platta sidan, och
 genom ärmslutet syns den mörka insidan. Skjortans manschett går in i ärmen och sticker fram ungefär en
-centimeter, platt som handleden och med en söm nära kanten. Händerna är en vuxen mans, ungefär 18 cm
-(`HAND` i rum-hasse-arm.js; greppen om cigarren och koppen räknas med samma skala), med fingrar som är
-lite bredare än tjocka. Huden tar porerna, vecken och ådrorna ur fotot men tonen från ansiktet: fotots
-händer låg i skugga och var rödare, och dess hud är sammansatt av bitar med mörka fläckar, som annars
-blev streck tvärs över fingrarna. Skuggan mellan fingrarna är varm som hud i skugga, och naglarna ligger
-nära hudens ton med en ljusare kant ytterst. I vilan ligger fingertopparna på disken i stället för att
-gå ned i den. Munnen inifrån har en tand i taget (framtänderna bredast), tandkött när han skrattar stort
+centimeter, platt som handleden och med en söm nära kanten. Händerna är ungefär 16 cm (`HAND` i
+rum-hasse-arm.js; greppen om cigarren och koppen räknas med samma skala), så att de ser lagom ut
+bredvid ansiktet och koppen i bilden, med fingrar som är lite bredare än tjocka. Huden tar porerna,
+vecken och ådrorna ur fotot men tonen från ansiktet: fotots händer låg i skugga och var rödare, och dess
+hud är sammansatt av bitar med mörka fläckar, som annars blev streck tvärs över fingrarna. Den är lite
+varm och rödare vid knogarna, som ansiktet, och matt som fotots hud: bara naglarna glänser. Skuggan
+mellan fingrarna är varm som hud i skugga, och naglarna ligger nära hudens ton med en ljusare kant
+ytterst. I vilan ligger fingertopparna på disken i stället för att gå ned i den, och under händerna
+ligger en tät skugga där de vilar mot disken, som försvinner när han lyfter dem. Sedan var händerna 18
+cm, blekare än ansiktet och blanka som plast på knogarna, och de såg ut att sväva över disken (ändrat
+2026-11-08). Munnen inifrån har en tand i taget (framtänderna bredast), tandkött när han skrattar stort
 och de nedre tändernas kant när munnen är vidöppen, och när han pratar skiljs läpparna åt och öppnas upp
 till en dryg centimeter. Förut hade underarmen överarmens bredd nästan ända ut, armbågen blev en ballong
 när armen böjdes, händerna var 15 cm och orangea, manschetten var ett tre centimeter långt vitt rör,

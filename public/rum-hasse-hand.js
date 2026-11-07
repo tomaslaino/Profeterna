@@ -22,8 +22,9 @@ const CY = KAMERA.CY;
 // underarmen och lite rullad upp mot tummen, och handleden hojd över pulten med fingertopparna vilande på den
 // (golvet i rum-hasse-arm.js). F och P är fingrarnas riktning och handflatan i baren uttryckta i underarmens
 // mått: längs underarmen, upp ur pulten och mot tummen; lyft: hur mycket underarmen stiger mot armbågen.
-// (Förut låg handen platt med raka, utspärrade fingrar.)
-const VILA = { F: [0.97, -0.05, -0.242], P: [0.121, -0.97, 0.167], krok: 0.24, spar: 0.5, tumme: 0.15, hojd: 45, lyft: 0.077 };
+// (Förut låg handen platt med raka, utspärrade fingrar. Sedan 2026-11-08 är vilan i baren mer avslappnad,
+// med handleden högre och fingrarna mer böjda, och den här följer med.)
+const VILA = { F: [0.97, -0.05, -0.242], P: [0.121, -0.97, 0.167], krok: 0.5, spar: 0.75, tumme: 0.4, hojd: 61, lyft: 0.077 };
 // Pulten ses LUT grader uppifrån, både handen och koppen, som i baren där ögat ser hans hand och kopp ungefär
 // 31° uppifrån (rum-hasse-scen.js). Förut sågs handen 52° och koppen 44° uppifrån, så att de såg ut som
 // andra saker än i baren.
