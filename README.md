@@ -3313,6 +3313,15 @@ klick utanför och pennan lägger sig vid sidan igen. Motiveringen står i utkas
 som papperets), syns på kupongen på pulten och följer med när man lämnar in; den som inte
 får plats slutar med … och syns hel när man pekar på den.
 
+**Hela matchen är en plats att skriva på** (2026-11-07, användarens önskemål): ett klick på
+lagen, tiden eller det som står efter den – allt utom rutorna – och man skriver på raden,
+med markören sist: kommentaren i efterhand när matchen har startat, annars motiveringen
+(`writeOn` i rum.js). Medan man skriver får texten raden: tiden och motiveringen viker
+undan och lagen står med de korta namnen, så att det man skriver syns – förut kunde
+fältet bli några bildpunkter brett bredvid en lång motivering, och då syntes varken det man
+skrev eller det man redan hade skrivit. När man är klar står allt som förut. Raden blir
+aldrig högre.
+
 Under kupongen står till vänster *Lägg tillbaka* och, i finstil som på papperet, *Ändra
 matcherna* (tills någon har lämnat in; leder till Kupong) och *Ta bort* (tills någon annan
 har lämnat in), och till höger *Spara* och guldordet *Lämna in*. *Spara* sparar en kupong
@@ -3347,7 +3356,8 @@ efterhand efter tiden på din kupong ur högen och på gängets kupong, i ditt b
 avspark bara om du redan har skrivit något) – samma kommentar som pennan på papperet
 (`POST …/samtal {gor: "efter"}`). Den sparas när du lämnar fältet eller trycker Enter; Esc
 ångrar, och går den inte att spara blir den röd tills nästa försök. Den står efter
-motiveringen, i bläck i stället för blyerts.
+motiveringen, i bläck i stället för blyerts, och får minst hälften av platsen efter tiden;
+motiveringen kortas i stället. Ett klick på matchen visar den hel (se ovan).
 
 **De andras kuponger.** När du ser någons tips – du har lämnat in och hen också, eller allas
 tips visas – tas hens kupong ur högen på samma sätt: hens kryss, motiveringar och
