@@ -1,5 +1,5 @@
 {
- "uppdaterad": "2026-11-07T10:52:41.407Z",
+ "uppdaterad": "2026-11-07T10:53:03.863Z",
  "omgang": {
   "id": "2026-11-07-st4978",
   "matcher": [
@@ -455,22 +455,25 @@
    },
    "hasse": {
     "stycken": [
-     "Sheffield United låg under efter två minuter i Preston och vann ändå, och Sydie Peck gjorde alla tre målen före paus. Laget är obesegrat i fyra matcher. Tränaren säger att man varken ska ryckas med av vinster eller riva allt när det går dåligt. Det här pratade vi om redan i Manchester City, Svennis och jag.",
-     "Charlton har förlorat fyra raka ligamatcher och gjort ett enda mål på dem. Ett lag som inte gör mål vinner inte matcher, det är orsak och verkan. Rothwell är opererad och Bamford är osäker, och Charlton vann faktiskt båda mötena förra säsongen. Därför lugn nu.",
-     "Jag tror på bortalaget, men jag är inte så dum att jag släpper krysset. Kryss och tvåa."
+     "Sheffield United låg under efter två minuter i Preston och vände ändå till 3–2. Sydie Peck gjorde alla tre målen före paus. Laget är obesegrat i fyra matcher och har en poäng upp till playoffplatserna. Rothwell är opererad och Bamford är osäker, men det är ett mittfält som vet vad det håller på med.",
+     "Charlton har förlorat fyra raka ligamatcher och gjort ett enda mål på de fyra. Att de vann båda mötena förra säsongen med 1–0 spelar ingen roll nu. Ett lag som inte gör mål kan inte vinna, och det har inget med förra året att göra. Lugn nu, jag vet att Charlton spelar hemma. Jag ringar in en ren bortaseger, en tvåa."
     ],
+    "tecken": [
+     2
+    ],
+    "resultat": "0–1",
     "tips": "2026-11-07T10:10:31.633Z",
     "uppdrag": {
      "fraser": [
-      "Lugn nu",
-      "Nej nej nej"
+      "Så är det bara",
+      "Lugn nu"
      ],
-     "krydda": "Det här pratade vi om redan i Manchester City, Svennis och jag.",
+     "krydda": null,
      "bielsa": []
     },
     "model": "claude-opus-5-5",
-    "version": "2026-11-05.1",
-    "writtenAt": "2026-11-07T10:10:42.329Z",
+    "version": "2026-11-07.1",
+    "writtenAt": "2026-11-07T10:52:54.099Z",
     "attempts": 1
    },
    "model": "claude-opus-5-5",
