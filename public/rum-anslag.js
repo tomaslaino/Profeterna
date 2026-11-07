@@ -11,7 +11,8 @@
 //   Kryssar gärna  gul lapp: chansen till oavgjort i lagets matcher (xG)
 //   Tur & otur     rutat papper: poäng mot chanserna (xG), med staplar
 //   Mot oddsen     tidningsurklipp: poäng mot vad oddsen väntade sig
-//   Vilan          almanacksblad: dagar sedan förra matchen
+//   Vilan          almanacksblad: dagar sedan förra matchen i alla tävlingar,
+//                  med Europacuperna när matchens fil har hämtats
 //   Motståndet     anteckningsblock: de som har mött svårast och lättast
 //                  motstånd hittills (modellens styrka, som på Statistik)
 // Mötena och lagen ett och ett står i kortregistret på disken (rum-register.js).
@@ -161,10 +162,15 @@ window.RumAnslag = (() => {
     if (T && T.form) return T.form.slice(0, 5).map((y) => (window.Spoiler && Spoiler.hidesDay(y.date) ? '?' : y.result || '?'));
     return form(D.teams.get(m[side]), m[side], Date.parse(m.kickoff));
   }
-  // Dagar sedan förra matchen före avspark.
-  function rest(list, m) {
+  // Dagar sedan lagets förra match före avspark: ur matchens fil, i alla
+  // tävlingar med Europacuperna, när den har hämtats (som formen), annars ur
+  // matcherna.
+  function rest(D, m, side) {
+    const d = D.match.get(m.id);
+    const S = d && d.teams && d.teams[side] && d.teams[side].schedule;
+    if (S) return S.last ? S.last.days : null;
     const t = Date.parse(m.kickoff);
-    const prev = (list || []).find((x) => x.id !== m.id && Date.parse(x.kickoff) < t);
+    const prev = (D.teams.get(m[side]) || []).find((x) => x.id !== m.id && Date.parse(x.kickoff) < t);
     return prev ? dayNo(t) - dayNo(Date.parse(prev.kickoff)) : null;
   }
 
@@ -282,8 +288,8 @@ window.RumAnslag = (() => {
     const head = `<span class="ans-blad"><b>${esc(dag)}</b><span><small>${first ? esc(fWd.format(new Date(first.kickoff))) : ''}</small><small>${esc(man || '')}</small></span></span>`;
     if (!D.ms.length) return `${head}<p class="inget">Ingen omgång</p>`;
     return head + '<div class="ans-g3">' + D.ms.map((m) => {
-      const h = rest(D.teams.get(m.home), m);
-      const a = rest(D.teams.get(m.away), m);
+      const h = rest(D, m, 'home');
+      const a = rest(D, m, 'away');
       const tired = h != null && a != null && Math.abs(h - a) >= 2 ? (h < a ? 'h' : 'a') : '';
       const d = (x, side) => `<span class="n${tired === side ? ' trott' : ''}">${x == null ? '–' : `${x} d`}</span>`;
       return `<span class="h">${esc(D.kort(m.home))}</span>${d(h, 'h')}${d(a, 'a')}<span class="a">${esc(D.kort(m.away))}</span>`;
@@ -376,8 +382,8 @@ window.RumAnslag = (() => {
     vila(D, rep) {
       let mest = null;
       for (const m of D ? D.ms : []) {
-        const h = rest(D.teams.get(m.home), m);
-        const a = rest(D.teams.get(m.away), m);
+        const h = rest(D, m, 'home');
+        const a = rest(D, m, 'away');
         if (h == null || a == null || Math.abs(h - a) < 2) continue;
         if (!mest || Math.abs(h - a) > mest.d) mest = h < a ? { d: a - h, trott: m.home, pigg: m.away, t: h, p: a } : { d: h - a, trott: m.away, pigg: m.home, t: a, p: h };
       }

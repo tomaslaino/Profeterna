@@ -3486,7 +3486,9 @@ som kupongen och fällbladstavlan):
   blyerts.
 - **Slår oddsen** – ett tidningsurklipp: poäng mot vad oddsen väntade sig, och *Sviker*.
 - **Vilan** – ett almanacksblad med omgångens första dag: dagar sedan förra matchen för båda
-  lagen; skiljer det två dagar eller mer ringas det tröttare lagets siffra in.
+  lagen i alla tävlingar; skiljer det två dagar eller mer ringas det tröttare lagets siffra in.
+  Som formen kommer de ur matchens fil, med Europacuperna, när tavlan har tagits fram, och
+  annars ur `data/matches.json`.
 - **Motståndet** – ett anteckningsblock: *Tufft hittills* och *Lätt hittills*, de lag i
   omgången som har mött svårast och lättast motstånd jämfört med ett normalt spelschema i
   divisionen (mål per match enligt modellen, som Motstånd på Statistik).
