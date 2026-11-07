@@ -1,5 +1,5 @@
 {
- "uppdaterad": "2026-11-07T10:19:20.569Z",
+ "uppdaterad": "2026-11-07T10:50:11.877Z",
  "omgang": {
   "id": "2026-11-07-st4978",
   "matcher": [
@@ -1083,23 +1083,26 @@
    },
    "hasse": {
     "stycken": [
-     "Forest har inte gjort ett enda mål hemma i ligan den här säsongen, och laget har bara vunnit en av nio ligamatcher. De skjuter mycket men träffar ingenting, och utan Igor Jesus blir det knappast bättre. Orsak och verkan.",
-     "City har förlorat två ligamatcher i rad, och det finns ett frågetecken kring Donnarumma. Det bekymrar mig inte ett dugg. Glasner har mött City fem gånger i Premier League och aldrig vunnit. Ikke noget at tale om, som man säger i Aalborg.",
-     "Ett lag som inte gör mål hemma vinner ingen hemmamatch, så City tar det här. Då är jag jävligt snäll mot Forest. Tvåan."
+     "Forest ligger näst sist och har inte gjort ett enda mål hemma i ligan den här säsongen. De sköt nästan 17 skott per match i oktober, så de kommer till lägen men får inte in bollen. Igor Jesus väntas dessutom saknas, och då blir det inte lättare att hitta nätet.",
+     "City har förlorat två ligamatcher i rad, och det gör mig inte nervös. Ett lag med den kvaliteten skärper sig när det börjar svida, och frågetecknet kring Donnarumma spelar mindre roll när motståndaren inte gör mål. Forests tränare Oliver Glasner har aldrig slagit City i Premier League, och han lär inte börja med ett lag som har gjort sex mål på nio matcher. Jag spikar City och bara City, tvåan."
     ],
+    "tecken": [
+     2
+    ],
+    "resultat": "0–2",
     "tips": "2026-11-07T10:01:10.276Z",
     "uppdrag": {
      "fraser": [
-      "Då är jag jävligt snäll",
-      "Orsak och verkan"
+      "Total kontroll",
+      "Äsch"
      ],
-     "krydda": "Ikke noget at tale om, som man säger i Aalborg.",
+     "krydda": null,
      "bielsa": []
     },
     "model": "claude-opus-5-5",
-    "version": "2026-11-05.1",
-    "writtenAt": "2026-11-07T10:01:34.231Z",
-    "attempts": 2
+    "version": "2026-11-07.1",
+    "writtenAt": "2026-11-07T10:50:10.471Z",
+    "attempts": 3
    },
    "model": "claude-opus-5-5",
    "version": "2026-11-04.1",
