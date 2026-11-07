@@ -140,10 +140,14 @@
   // annanstans: hens tips sparades inte här vid inlämningen. (Tjänstens tips
   // räknas inte: dem får enheten så fort den står på någon som har lämnat in.)
   const kanByta = (s) => !submitted(s, me()) || !handedIn(s);
+  // Vilka i gänget enheten kan bli: när allas tips visas vem som helst (det
+  // finns inget dolt att se), annars de som inte har lämnat in, när kanByta.
+  const bytTill = (s) => s.gang.filter((g) => s.visas || (kanByta(s) && !g.inne)).map((g) => g.id);
   // Enheten blir id. Stod den på någon som har lämnat in glöms allas tips,
-  // som bara hen fick se (load), tills tjänsten svarar igen.
+  // som bara hen fick se (load), tills tjänsten svarar igen – utom när de
+  // visas för alla.
   const bytVem = (s, id) => {
-    if (s && submitted(s, me())) Object.assign(s, { tips: null, efter: null });
+    if (s && !s.visas && submitted(s, me())) Object.assign(s, { tips: null, efter: null });
     kpStore(VEM, id);
   };
   // Dina inlämnade tips går att ändra tills matcherna startar, på vilken av
@@ -1851,7 +1855,7 @@
         s, vem: v, inne, open, fyll: open && !inne, andra, hand,
         tecken: { ...((mine && mine.tecken) || {}) }, kommentarer: { ...((mine && mine.kommentarer) || {}) },
         val: inne ? [] : s.gang.filter((g) => !g.inne).map((g) => g.id),
-        byt: open && kanByta(s) ? s.gang.filter((g) => !g.inne).map((g) => g.id) : [],
+        byt: open || s.visas ? bytTill(s) : [],
         sparad: Boolean(d && mine.sparad && mine.sparad === sig(s, d)),
         tom: !d || (!mine.sparad && !sig(s, d).replace(/[:|]/g, '')),
         se, skriv: writer(s), gang,
@@ -1864,10 +1868,11 @@
     },
     // Du kryssar för vem du är; kryssen och motiveringarna på kupongen följer med.
     // Går också när enheten står på någon som har lämnat in någon annanstans
-    // (kanByta): man hade klickat på hen i tobaksaffären.
+    // (kanByta): man hade klickat på hen i tobaksaffären – och till vem som
+    // helst när allas tips visas (bytTill).
     vem(id) {
       const s = SM.data;
-      if (!s || !kanByta(s) || !s.gang.some((g) => g.id === id && !g.inne)) return false;
+      if (!s || !bytTill(s).includes(id)) return false;
       const d = draftOf(s, me());
       bytVem(s, id);
       if (d) kpStore(TIPS, { id: s.id, vem: id, tecken: d.tecken, kommentarer: d.kommentarer || {} });

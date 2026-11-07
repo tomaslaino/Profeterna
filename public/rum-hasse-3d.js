@@ -193,13 +193,15 @@ const P_ = (x, y, z) => [x - 660, 900 - y, z];
 const g2 = (x, y, cx, cy, sx, sy) => { const a = (x - cx) / sx; const b = (y - cy) / sy; return Math.exp(-(a * a + b * b)); };
 const smax = (a, b, k = 34) => { const h = clamp(0.5 + 0.5 * (a - b) / k); return b + (a - b) * h + k * h * (1 - h); };
 // formen: huvudet som en ellipsoid med ansiktets drag ur fotots mått (Vision), halsen och bålen
-function djup(x, y) {
+function djup(x, y, drag = true) {
   const hx = (x - 660) / 182;
   const hy = (y - 385) / 240;
   const dh = hx * hx + hy * hy;
   let zh = dh < 2.4 ? 70 : -400;
   if (dh < 1) {
     zh = 70 + 170 * Math.sqrt(1 - dh);
+  }
+  if (dh < 1 && drag) {
     zh += 40 * g2(x, y, 662, 432, 17, 52) + 26 * g2(x, y, 662, 464, 24, 17) + 7 * g2(x, y, 632, 468, 14, 14) + 7 * g2(x, y, 692, 468, 14, 14);
     zh += -22 * g2(x, y, 608, 391, 34, 15) - 22 * g2(x, y, 716, 392, 34, 15);
     zh += 9 * g2(x, y, 603, 360, 50, 14) + 9 * g2(x, y, 727, 362, 50, 14);
@@ -275,6 +277,19 @@ export async function figuren(duk, { hog = false, latt = false, pr = 1 } = {}) {
   G.setAttribute('aAx', new THREE.BufferAttribute(aAx, 2));
   G.setIndex(idx);
   G.computeVertexNormals();
+  // Ljuset faller på huvudets släta form (aNs: utan näsa, bryn, kinder och mun), och bara en fjärdedel på
+  // dragen. Fotot har redan sina egna skuggor kring näsan; när ljuset föll på den handbyggda näsan fick
+  // den en ljus rand på ena sidan och en rosa skugga på den andra, och näsan såg inte ut som hans.
+  {
+    const ps = new Float32Array(pos);
+    for (let j = 0, o = 0; j < ny; j++) for (let i = 0; i < nx; i++, o++) ps[o * 3 + 2] = djup(Xs[i], Ys[j], false);
+    const GS = new THREE.BufferGeometry();
+    GS.setAttribute('position', new THREE.BufferAttribute(ps, 3));
+    GS.setIndex(idx);
+    GS.computeVertexNormals();
+    G.setAttribute('aNs', GS.getAttribute('normal'));
+    GS.dispose();
+  }
   const U = {
     foto: { value: foto }, uHuvud: { value: new THREE.Matrix3() }, uPiv: { value: W_(650, 650, 40) }, uKropp: { value: new THREE.Matrix4() }, uAx: { value: new THREE.Vector2() }, uAndas: { value: 0 },
     blund: { value: 0 }, kis: { value: 0 }, munn: { value: 0 }, rund: { value: 0 }, le: { value: 0 }, bryn: { value: new THREE.Vector2() }, blick: { value: new THREE.Vector2() },
@@ -283,10 +298,12 @@ export async function figuren(duk, { hog = false, latt = false, pr = 1 } = {}) {
   };
   const yta = new THREE.Mesh(G, new THREE.ShaderMaterial({
     uniforms: U, transparent: true, blending: THREE.CustomBlending, blendSrc: THREE.OneFactor, blendDst: THREE.OneMinusSrcAlphaFactor, side: THREE.DoubleSide,
-    vertexShader: `attribute float aW; attribute vec2 aAx; uniform mat3 uHuvud; uniform vec3 uPiv; uniform mat4 uKropp; uniform vec2 uAx; uniform float uAndas; uniform vec3 uArm[6];
-    varying vec2 vQ; varying vec3 vN, vN0, vW; varying float vAo;
+    vertexShader: `attribute float aW; attribute vec2 aAx; attribute vec3 aNs; uniform mat3 uHuvud; uniform vec3 uPiv; uniform mat4 uKropp; uniform vec2 uAx; uniform float uAndas; uniform vec3 uArm[6];
+    varying vec2 vQ; varying vec3 vN, vN0, vW; varying float vAo, vHuv;
     float seg3(vec3 p, vec3 a, vec3 b) { vec3 ab = b - a; return length(p - a - ab * clamp(dot(p - a, ab) / dot(ab, ab), 0., 1.)); }
-    void main(){ vec3 p = position; vec3 n = normal; vN0 = n; vQ = uv;
+    void main(){ vec3 p = position; vec3 n = normalize(mix(aNs, normal, .25)); vN0 = n; vQ = uv;
+      // (huvudet och halsen ned till kragen)
+      vHuv = (1. - smoothstep(.95, 1.22, length(vec2(p.x / 215., (515. - p.y) / 270.)))) * (1. - smoothstep(590., 640., 900. - p.y));
       p.y += aAx.x * uAx.x + aAx.y * uAx.y; p.x += aAx.x * -uAx.x * .25 + aAx.y * uAx.y * .25;
       float bar = (1. - aW) * smoothstep(620., 300., abs(p.y + 100.));
       p.z += uAndas * bar; p.y += uAndas * .5 * bar;
@@ -298,7 +315,7 @@ export async function figuren(duk, { hog = false, latt = false, pr = 1 } = {}) {
       float dB = min(seg3(w.xyz, uArm[3], uArm[4]), seg3(w.xyz, uArm[4], uArm[5]));
       vAo = exp(-pow(max(0., dA - 80.) / 80., 2.)) * .3 + exp(-pow(max(0., dB - 80.) / 80., 2.)) * .3;
       gl_Position = projectionMatrix * viewMatrix * w; }`,
-    fragmentShader: `precision highp float; uniform sampler2D foto; uniform float blund, kis, munn, rund, le; uniform vec2 bryn, blick; varying vec2 vQ; varying vec3 vN, vN0, vW; varying float vAo;
+    fragmentShader: `precision highp float; uniform sampler2D foto; uniform float blund, kis, munn, rund, le; uniform vec2 bryn, blick; varying vec2 vQ; varying vec3 vN, vN0, vW; varying float vAo, vHuv;
     ${LJUS}
     ${BORD_GLSL}
     const vec2 O0 = vec2(${X0}., ${Y0}.), TS = vec2(${ATLAS.W}., ${ATLAS.H}.);
@@ -415,6 +432,9 @@ export async function figuren(duk, { hog = false, latt = false, pr = 1 } = {}) {
       // samma ljus som på armarna
       vec3 n = normalize(vN);
       vec3 r = mix(vec3(1.), ljus(n) / fotoLjus(normalize(vN0)), .82);
+      // Ansiktet: fotot är redan ljust där, så det får bli högst lite ljusare än fotot (annars fräts huden
+      // ut och blir blekare än händerna). Hela huvudet lika mycket, så att kontrasten är fotots.
+      r /= mix(1., max(1., dot(r, vec3(.3, .59, .11)) / 1.12), vHuv);
       vec3 ut = c.rgb * r;
       ut *= 1. - min(.5, vAo);
       ut += kant(n, .3) * c.a;
