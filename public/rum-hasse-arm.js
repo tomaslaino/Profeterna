@@ -11,7 +11,7 @@
 // byggKopp(bord) → { kopp, fat, ORA }
 // byggCigarr(bord) → { mesh, U, FOT }, byggAskkopp(bord) → { mesh }, byggRok(N, bord) → { mesh, slapp, steg }
 import * as THREE from 'three';
-import { SCEN } from './rum-hasse-scen.js';
+import { SCEN, kamera } from './rum-hasse-scen.js';
 
 // atlasen (bildpunkter): kroppen 860 × 1350, sedan ärmens remsa, huden bredvid
 export const ATLAS = { W: 1372, H: 1350, X0: 280, Y0: 130, TW: 860, TH: 1350, rx: 860, rw: 256, rh: 1024, hx: 1116, hy: 0, hw: 256, hh: 512 };
@@ -21,8 +21,9 @@ export const ATLAS = { W: 1372, H: 1350, X0: 280, Y0: 130, TW: 860, TH: 1350, rx
 // Där lyser också lysröret i affärens tak (uLys, tänt från sex till midnatt) och dagsljuset genom
 // affärens stora fönster (uDag): ett brett, mjukt ljus från höger och lite framifrån, i himlens färg och
 // så starkt som det är ljust ute. När det är dag tar fönstret över: lamporna, neonen och gatan syns mindre.
-// Riktningarna är i figurens värld, med kameran snett från hans vänstra sida (VY, rum-hasse-scen.js).
+// Riktningarna är i figurens värld; VY är riktningen mot kameran (rum-hasse-scen.js).
 // fotoLjus() är ljuset som fotot redan har, så att en vriden yta får rätt skillnad.
+const VY = kamera().bak.map((x) => x.toFixed(3)).join(', ');
 export const LJUS = `
 uniform float uButik;
 uniform vec4 uDag;
@@ -32,7 +33,7 @@ const vec3 NEON = vec3(.702, .12, .702);
 const vec3 GATA = vec3(.54, .19, .82);
 const vec3 ROR = vec3(.72, .42, .55);
 const vec3 FONSTER = vec3(.62, .2, .76);
-const vec3 VY = vec3(.208, .044, .977);
+const vec3 VY = vec3(${VY});
 vec3 ljus(vec3 n) {
   float k = max(0., dot(n, NYCKEL) * .86 + .14);
   vec3 a = mix(vec3(.28, .225, .19), vec3(.43, .395, .36), .5 + .5 * n.y);

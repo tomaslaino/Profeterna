@@ -1,8 +1,8 @@
 <!doctype html><meta charset="utf-8"><body style="margin:0;background:#222"><canvas id="ut" style="width:900px"></canvas><script type="module">
 // Väggen bakom Hasse Backe i baren: hyllorna, lamporna, flaskorna och bakdisken, spårat med riktigt ljus
 // (mjuka skuggor, ljus som studsar, blanka ytor, skärpedjup) från figurens kamera (public/rum-hasse-scen.js):
-// snett längs baren, så att väggen går bort åt vänster. Skarpt där han sitter. Han själv och bardisken
-// framför honom syns inte men skuggar och kastar ljus (sidan ritar dem, rum-hasse-3d.js).
+// framför honom, där han sitter vid pultens hörn. Skarpt där han sitter. Han själv och pulten framför
+// honom syns inte men skuggar och kastar ljus (sidan ritar dem, rum-hasse-3d.js).
 // Bilden har måtten i BAK (rum-hasse-scen.js). ?lage=bred|hog &n=antal varv
 import { SCEN, BAK, kamera } from '../../rum-hasse-scen.js';
 const q = new URLSearchParams(location.search);
@@ -11,7 +11,7 @@ const SC = BAK[LAGE];
 const N = +(q.get('n') || 64);
 const W = SC.W, H = SC.H;
 const D = SCEN.D, VAGG = SCEN.VAGG, GOLV = -2300;
-// kameran i barens mått (x längs baren, z ut ur väggen)
+// kameran i barens mått (x längs benet, z ut ur väggen)
 const KAM = kamera();
 const VB = SCEN.BAR * Math.PI / 180;
 const tillBar = (v) => [Math.cos(VB) * v[0] - Math.sin(VB) * v[2], v[1], Math.sin(VB) * v[0] + Math.cos(VB) * v[2]];
@@ -138,7 +138,7 @@ grupp(() => {
   box([830, 300, VAGG + 8], [122, 168, 8], 8);
   box([830, 300, VAGG + 17], [104, 150, 1], 3, [1, 1, 1], [7 * CELL[0] / atlas.width, 0, 8 * CELL[0] / atlas.width, CELL[1] / atlas.height]);
 });
-// han själv och bardisken framför honom: syns inte, men skuggar och kastar ljus
+// han själv och pulten framför honom: syns inte, men skuggar och kastar ljus
 const HAN = G.length;
 const hanEll = (c, h, col) => ell(tillBar(c), h, 7, col);
 grupp(() => {
@@ -149,10 +149,14 @@ grupp(() => {
   hanEll([420, -240, 180], [85, 300, 120], RGB('#26262a'));
 });
 const DISK = G.length;
+// (pulten vid hörnet: benet framför honom och armen som går fram mot en, förbi kameran)
 grupp(() => {
   const { Y, Z, DJUP } = SCEN.DISK;
-  box([0, Y - 20, Z + DJUP / 2], [7000, 20, DJUP / 2], 10);
-  box([0, (Y - 40 + GOLV) / 2, Z + DJUP / 2 + 60], [7000, (Y - 40 - GOLV) / 2, DJUP / 2 - 60], 8);
+  const xi = SCEN.HORN.X, xo = xi + SCEN.HORN.B, zl = 4400;
+  box([(xo - 7000) / 2, Y - 20, Z + DJUP / 2], [(xo + 7000) / 2, 20, DJUP / 2], 10);
+  box([(xo - 7000) / 2, (Y - 40 + GOLV) / 2, Z + DJUP / 2 + 60], [(xo + 7000) / 2, (Y - 40 - GOLV) / 2, DJUP / 2 - 60], 8);
+  box([(xi + xo) / 2, Y - 20, (Z + DJUP + zl) / 2], [(xo - xi) / 2, 20, (zl - Z - DJUP) / 2], 10);
+  box([(xi + xo) / 2 + 30, (Y - 40 + GOLV) / 2, (Z + DJUP + zl) / 2], [(xo - xi) / 2 - 60, (Y - 40 - GOLV) / 2, (zl - Z - DJUP) / 2], 8);
 });
 // ?dag=1: bara dagsljuset genom affärens stora fönster till höger, vitt, som ett eget lager. Sidan lägger
 // det ovanpå väggen i himlens färg och så starkt som det är ljust ute (dagsljus i rum-hasse.js), så att

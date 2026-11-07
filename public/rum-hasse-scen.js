@@ -2,26 +2,34 @@
 // bakom honom (scripts/hasse/bak.html) läser samma mått härifrån, så att de står på samma ställe i bilden.
 //
 // Figurens värld: 1 enhet = 1 bildpunkt i fotot (ungefär 0,6 mm), x åt höger, y uppåt, z mot betraktaren,
-// fotots plan z = 0. Kameran ser snett längs baren åt vänster: baren är vriden BAR grader och kameran
-// VRID grader åt andra hållet runt samma lodräta axel (x = 0, z = 0), så att baren ses ungefär 27° från
-// sidan men han, som har vridit sig ut mot affären, bara 12°. Kroppen är ett foto taget framifrån och
-// tål inte mycket mer.
+// fotots plan z = 0.
 //
-// Barens egna mått (x längs baren åt höger, z ut ur väggen mot affären): p i figurens värld = Ry(BAR)·p.
+// Han sitter vid pultens hörn: samma pult som man står vid i rummet. Pulten går från en, längs ens högra
+// sida, fram till hörnet, och viker där av åt vänster förbi honom (benet framför honom). Han sitter på
+// andra sidan om benet, med vänsterarmen över hörnet på pulten, där kaffet och notan står (rummets hand,
+// kaffe och nota, rum-hasse-hand.js). Kameran är ens öga när man har vänt sig åt vänster: framför honom,
+// lite högre än han (man står, han sitter) och så nära att pulten ses uppifrån som i rummet.
+//
+// Barens egna mått (x längs benet åt höger, z ut ur väggen mot en): p i figurens värld = Ry(BAR)·p.
+// Pultens arm (HORN) ligger i barens mått mellan x = HORN.X och HORN.X + HORN.B och går från benets bakre
+// kant fram mot en, förbi kameran.
 const DEG = Math.PI / 180;
 
 export const SCEN = {
   // kameran: D från axeln, svängd VRID grader mot hans vänstra sida, ögat HOJD över hans ögonhöjd CY
   // och lutad LUT grader nedåt (han sitter, man står vid pulten)
-  D: 3900,
+  D: 3000,
   CY: 500,
-  VRID: 12,
-  HOJD: 170,
-  LUT: 2.5,
-  // baren: negativt vriden, så att dess högra del (mot affären) är närmare
-  BAR: -15,
+  VRID: 0,
+  HOJD: 520,
+  LUT: 10,
+  // baren: positivt vriden, så att benets högra del går bort från en och pultens arm går fram förbi
+  // kamerans högra sida (man har vänt sig lite mindre än en rät vinkel)
+  BAR: 8,
   // disken i barens mått: ovansidan Y, den bakre kanten Z och djupet; väggen bakom honom
-  DISK: { Y: -290, Z: 185, DJUP: 1000 },
+  DISK: { Y: -290, Z: 185, DJUP: 900 },
+  // pultens arm mot en: dess vänstra kant och bredden (lika bred som benet, som pulten i rummet)
+  HORN: { X: 110, B: 900 },
   VAGG: -1100,
 };
 
@@ -69,9 +77,10 @@ export function disken(S = SCEN) {
 
 // Väggens bilder (scripts/hasse/bak.html → public/rum/hasse-bak*.webp): W × H bildpunkter, S bildpunkter
 // på en enhet på avståndet D, och (px, py) där kamerans axel träffar bilden. Sidan lägger bilden så att
-// den passar figuren (passa i rum-hasse.js). Bilden räcker från hjässan och uppåt ned till disken, i
-// alla fönster från 844 × 390 till 3440 × 1440 och på höjden från 360 × 780 till 1000 × 1000.
+// den passar figuren (passa i rum-hasse.js). Bilden räcker från hjässan och uppåt ned till pulten, och
+// till höger om pultens arm ned till fönstrets underkant, i alla fönster från 844 × 390 till 3440 × 1440
+// och på höjden från 360 × 780 till 1000 × 1000.
 export const BAK = {
-  bred: { W: 1900, H: 760, S: 0.4, px: 1120, py: 180 },
-  hog: { W: 1040, H: 608, S: 0.32, px: 512, py: 144 },
+  bred: { W: 2025, H: 945, S: 0.45, px: 1193, py: 180 },
+  hog: { W: 992, H: 608, S: 0.32, px: 480, py: 128 },
 };

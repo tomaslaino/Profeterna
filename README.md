@@ -739,6 +739,13 @@ bara lokalt. Analyserna visas som de ligger i `data/analyser.json`; hur de skriv
   tätt intill fatet på båda ställena, fingrarna lägger sig på disken, och baren har rummets tid på
   dygnet: lysröret tänt från sex till midnatt och dagsljuset efter klockan och vädret. Se
   [Hasse Backe](#hasse-backe), *Bilden*, *Ljuset* och *Kaffet i rummet*.
+- **Hasse Backe vid pultens hörn (2026-11-07, användarens önskemål):** "ser det här och det här ut som
+  samma bänk?", "Det ser ju ut som helt olika vinklar" och "Hasse ska ju sitta vid ett hörn". I baren
+  satt han bakom en blank, mörk bardisk som sågs i låg vinkel på 2,3 meters håll, medan pulten i
+  rummet är matt brunt trä med lister i aluminium som ses snett uppifrån. Nu sitter han vid pultens
+  hörn: pulten går fram längs ens högra sida och viker av förbi honom, i samma trä och med samma
+  lister, och kameran står närmare och högre, så att koppen, notan och handen ses uppifrån som i
+  rummet. Väggen bakom honom är ombakad för den nya kameran. Se [Hasse Backe](#hasse-backe), *Bilden*.
 - **Hasse Backe minns vad han sa (2026-11-06, användarens önskemål):** klickade man på en match
   man redan hade frågat om slog han domen i disken en gång till, och efter en omladdning gjorde han
   om allt, med 15–25 sekunders väntan. Nu står det han sa direkt, sparat på enheten så att det
@@ -4143,9 +4150,10 @@ en fast bild.
 *Din kupong*), och det är allt man kan be honom om i baren: inga följdfrågor och ingen textruta. (Vid anslagstavlan kan man också ropa till
 honom om en lapp, och han svarar från baren, se [Anslagstavlan](#anslagstavlan).) Han sitter i baren till vänster utanför bilden, och
 längst ut på pulten står hans kaffe vid notan, och där ligger hans hand. Ett klick på dem, eller H,
-och kameran slår snabbt åt vänster till honom. Där sitter han bakom bardisken, mitt emot väggen med
-anslagstavlan, och har vridit sig lite mot en, med underarmarna på disken, kaffet och notan vid den
-vänstra handen och cigarren i askkoppen vid den högra. Bakom honom är barens vägg med hyllorna,
+och kameran slår snabbt åt vänster till honom. Där sitter han vid pultens hörn: samma pult som man
+står vid, som går fram längs ens högra sida och viker av åt vänster förbi honom. Han sitter på andra
+sidan om den, vänd mot en, med underarmarna på pulten, kaffet och notan vid den vänstra handen i hörnet
+och cigarren i askkoppen vid den högra. Bakom honom är barens vägg med hyllorna,
 cigarettpaketen och lamporna. Samtalet står i en spalt till vänster om honom (på höjden under honom)
 och kommer när kameran har stannat. Ett klick på bilden utanför samtalet går tillbaka, liksom Esc. Medan han väntar på att man ska välja gör han något litet då och då – trummar med fingrarna,
 tittar bort, nickar för sig själv, suckar (se *Vilan*) – och ibland njuter han av kaffet (på ett av sex
@@ -4155,21 +4163,26 @@ ibland ändå.
 
 **Bilden.** Hans bild är en egen filmbild där rummet inte syns, och allt i den hör till hans värld:
 väggen, disken, kaffet, notan och han själv har samma kamera
-([public/rum-hasse-scen.js](public/rum-hasse-scen.js)). Baren går längs affärens vänstra vägg, parallellt
-med väggen med anslagstavlan, och kameran står vid pulten och ser snett längs baren åt vänster: baren
-ses 27° från sidan, så att väggen och disken går bort åt vänster mot affärens framsida och kommer
-närmare åt höger, där affären är. Vinkeln ligger i rummet, inte i honom: kroppen är ett foto taget
-framifrån (djupet i [public/rum-hasse-3d.js](public/rum-hasse-3d.js)) och tål inte mycket mer än 15°.
-Han har därför vridit sig 15° från disken mot en, så att kroppen ses 12° från sidan, och huvudet är
-vänt mot kameran, så att ansiktet ses nästan rakt framifrån. Kameran står lite högre än hans ögon och
-lutar lite nedåt, som när man står och han sitter.
+([public/rum-hasse-scen.js](public/rum-hasse-scen.js)). Han sitter vid pultens hörn: pulten man står
+vid i rummet går fram längs ens högra sida när man har vänt sig åt vänster, och viker i hörnet av åt
+vänster förbi honom (benet framför honom). Han sitter på andra sidan om benet med vänsterarmen över
+hörnet, där kaffet och notan står, som handen, kaffet och notan på pulten i rummet. Bakom honom är
+affärens vägg med hyllorna. Kameran är ens öga: 1,8 m framför honom, rakt framifrån (kroppen är ett
+foto taget framifrån, djupet i [public/rum-hasse-3d.js](public/rum-hasse-3d.js), och tål inte mycket
+från sidan), 31 cm högre än hans ögon och lutad 10° nedåt, som när man står och han sitter. Det gör
+att pulten ses uppifrån som i rummet: koppen ungefär 31° uppifrån och det inre hörnet 34°, mot 17°
+när han satt längre bort bakom en bardisk (ändrat 2026-11-07, se nedan). Benet är vridet 8° (`BAR`),
+så att pultens arm går fram förbi kamerans högra sida, som när man har vänt sig lite mindre än en rät
+vinkel.
 
 Han sitter så att fotot inte behöver något under sig: disken framför honom döljer allt nedanför
-magen, så det finns inga ben och ingen stol. Disken är geometri i hans värld, snett som baren, och
-ritas en gång på en egen duk under figuren (`diskBild`): lackat trä i pultens bruna med ådringen
-längs baren, en list i aluminium på framkanten som pultens, och framsidan i fält nedanför. Lacken
-speglar väggen bakom honom: den speglade strålen träffar väggen, och där hämtas färgen ur väggens
-bild, suddigare ju längre strålen går; han själv speglas som en mörk form. Notan ligger under fatet,
+magen, så det finns inga ben och ingen stol. Pulten är geometri i hans värld, vriden som benet, och
+ritas en gång på en egen duk under figuren (`diskBild`): benet framför honom och armen mot en
+(`SCEN.HORN`), i pultens matta bruna trä som i rummet, ådrat längs benet och längs armen med ett
+geringssnitt i hörnet, en smal list i aluminium längs de bortre kanterna och en rundad längs kanterna
+mot en, som pultens, och framsidan i fält nedanför. Träet speglar väggen bakom honom svagt: den
+speglade strålen träffar väggen, och där hämtas färgen ur väggens bild, suddigare ju längre strålen
+går; han själv speglas som en mörk form. Notan ligger under fatet,
 samma nota som på pulten (ritad på en duk med samma typsnitt), med den främre änden lite uppböjd.
 Figuren skuggar det som är under disken eller skyms av den (`BORD_GLSL` i
 [public/rum-hasse-arm.js](public/rum-hasse-arm.js)): framför diskens bakre kant det som är under
@@ -4179,8 +4192,7 @@ med armbågarna på disken och armens riktiga längder (`paDisken`), och gestern
 där; eftersom disken går snett når den vänstra armbågen den bara nära axeln. Den vänstra armbågen
 ligger nära kroppen och handen är vriden lite ut mot koppen, och koppen står till höger om den, fritt
 från armen: en bit disk mellan fatet och handen, och fingertopparna några centimeter från fatets kant,
-som handen på pulten i rummet. Kameran står lågt, så koppen skymmer ärmen i bild, men fatet ligger
-framför den på disken. Fingrarna lägger sig på disken: ett finger vars två yttre leder skulle nå under
+som handen på pulten i rummet. Fatet står på hörnet och notan på pultens arm. Fingrarna lägger sig på disken: ett finger vars två yttre leder skulle nå under
 ovansidan böjs mindre, tills den lägsta punkten ligger på ytan (`golv` i
 [public/rum-hasse-arm.js](public/rum-hasse-arm.js)), så att fingertopparna aldrig går ned i disken,
 inte heller när han trummar eller slår i den. Förut var fingrarna krökta som klor i vilan, topparna
@@ -4188,9 +4200,9 @@ försvann ned i disken och den vänstra handen pekade in mot honom med koppen vi
 2026-11-06). Sedan låg handen rakt fram med armbågen ute, och ärmen gick genom fatets kant, så att det
 såg ut som om armen låg över fatet (ändrat 2026-11-06).
 
-Han fyller höjden från hjässan nära överkanten till disken vid tre fjärdedelar av höjden, med mitten
-av honom vid 60 % av bredden och samtalet i en spalt till vänster; får samtalet inte plats blir han
-mindre (`matt` i [public/rum-hasse.js](public/rum-hasse.js)). Kaffet och notan får hamna utanför bilden
+Han fyller höjden från hjässan nära överkanten, och pultens inre hörn ligger nära underkanten, så att
+man ser att pulten går vidare mot en; mitten av honom står vid 60 % av bredden och samtalet i en spalt
+till vänster, och får samtalet inte plats blir han mindre (`matt` i [public/rum-hasse.js](public/rum-hasse.js)). Kaffet och notan får hamna utanför bilden
 i smala fönster. På höjden står han överst och samtalet under notan. Ändras fönstret medan han syns
 räknas det om; vrids telefonen sitter han på det andra sättet.
 

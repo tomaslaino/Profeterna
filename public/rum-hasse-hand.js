@@ -12,7 +12,8 @@ import * as THREE from 'three';
 import { ARM, KAMERA, byggArm, byggKopp, laddaFoto, laddaHand } from './rum-hasse-arm.js';
 
 const DEG = Math.PI / 180;
-const D = KAMERA.CZ;
+// (rummets kamera mot handen: som när baren sågs från 3900, oberoende av barens kamera nu)
+const D = 3900;
 const CY = KAMERA.CY;
 
 // hur böjd handen är mot armen (grader)

@@ -1,13 +1,13 @@
-// Hasse Backe i tobaksaffären (rum-hasse.js), i three.js: han sitter bakom bardisken och har vridit sig ut
-// mot affären och mot en, med underarmarna på disken, kaffet och notan vid den vänstra handen och cigarren
-// i askkoppen vid den högra. Kameran ser snett längs baren åt vänster (rum-hasse-scen.js).
+// Hasse Backe i tobaksaffären (rum-hasse.js), i three.js: han sitter vid pultens hörn, vänd mot en, med
+// underarmarna på pulten, kaffet och notan vid den vänstra handen i hörnet och cigarren i askkoppen vid den
+// högra. Kameran står framför honom, lite högre, och pulten går fram förbi dess högra sida (rum-hasse-scen.js).
 // Kostymfotot (C More Entertainment, CC BY 3.0, Wikimedia Commons) ligger på en formad yta, så att huvudet vrids på riktigt runt nacken och kroppen lutar sig
 // fram. Ögon, bryn och mun rör sig i skuggaren. Armarna, händerna, koppen, askkoppen, cigarren och röken
 // finns i rum-hasse-arm.js.
 //
-// Disken är geometri i hans värld, snett som baren, och ritas en gång på en egen duk under figuren
-// (diskBild): lackat trä som speglar väggen bakom honom (bilden från scripts/hasse/bak.html), en list i
-// aluminium som pultens, och notan. Det som är under disken eller skyms av den döljs i skuggarna
+// Disken är pulten vid hörnet, geometri i hans värld, och ritas en gång på en egen duk under figuren
+// (diskBild): pultens trä som speglar väggen bakom honom svagt (bilden från scripts/hasse/bak.html), lister
+// i aluminium som pultens, och notan. Det som är under disken eller skyms av den döljs i skuggarna
 // (BORD_GLSL), så att kroppen slutar vid diskens bakre kant och det som ligger på disken trycks mot den.
 // Skuggorna på disken är räknade kapslar, utan skuggkarta.
 //
@@ -170,6 +170,8 @@ export function iBild(v, x, y, z = 0) {
 // händerna, koppen, askkoppen och skuggorna på disken). Gesten där armen går ut åt sidan är smalare på höjden.
 export const MATT = {
   topp: [0, 772, 120],
+  // pultens inre hörn, där armen mot en börjar: ska synas
+  horn: franBaren([SCEN.HORN.X, BORD.Y, SCEN.DISK.Z + SCEN.DISK.DJUP]),
   // hans bredd i vila (ärmarna), till samtalet bredvid honom
   vanster: [-470, -200, 300],
   hoger: [470, -200, 340],
@@ -224,7 +226,7 @@ export async function figuren(duk, { hog = false, latt = false, pr = 1 } = {}) {
   r.setPixelRatio(pr);
   r.setClearColor(0, 0);
   const S = new THREE.Scene();
-  // kameran ser snett längs baren (rum-hasse-scen.js); den bortre gränsen räcker till diskens bortre ände
+  // kameran framför honom (rum-hasse-scen.js); den bortre gränsen räcker till diskens bortre ände
   const C = new THREE.PerspectiveCamera(30, 1, 200, 30000);
   C.position.fromArray(KAM.pos);
   C.rotation.set(KAM.euler[0], KAM.euler[1], 0, 'YXZ');
@@ -447,12 +449,14 @@ export async function figuren(duk, { hog = false, latt = false, pr = 1 } = {}) {
   const kapH = Array.from({ length: NK }, () => new THREE.Vector2());
   const skuggGeo = new THREE.BufferGeometry();
   {
-    // diskens ovansida
+    // pultens ovansida: benet framför honom och armen mot en
     const z0 = SCEN.DISK.Z;
     const z1 = z0 + SCEN.DISK.DJUP;
-    const h = [[-3000, z0], [3000, z0], [-3000, z1], [3000, z1]].flatMap(([x, z]) => franBaren([x, BORD.Y, z]));
+    const { X: xi, B } = SCEN.HORN;
+    const xo = xi + B;
+    const h = [[-3000, z0], [xo, z0], [-3000, z1], [xo, z1], [xi, z1], [xo, z1], [xi, 5000], [xo, 5000]].flatMap(([x, z]) => franBaren([x, BORD.Y, z]));
     skuggGeo.setAttribute('position', new THREE.BufferAttribute(new Float32Array(h), 3));
-    skuggGeo.setIndex([0, 2, 1, 1, 2, 3]);
+    skuggGeo.setIndex([0, 2, 1, 1, 2, 3, 4, 6, 5, 5, 6, 7]);
   }
   const skugga = new THREE.Mesh(skuggGeo, new THREE.ShaderMaterial({
     uniforms: { uKap: { value: kapA }, uKapH: { value: kapH }, uDag: DAG, uRuta: { value: new THREE.Vector3(1e4, 1e4, 1) } }, transparent: true, depthWrite: false, depthTest: false, blending: THREE.CustomBlending, blendSrc: THREE.OneFactor, blendDst: THREE.OneMinusSrcAlphaFactor,
@@ -486,10 +490,13 @@ export async function figuren(duk, { hog = false, latt = false, pr = 1 } = {}) {
   kapA[6].set(-330, kantZ(-330) + 10, 330, kantZ(330) + 10);
   kapH[6].set(64, 26);
   // ---------- disken (diskBild) ----------
-  // Geometri i barens mått (x längs baren), vriden som baren: ovansidan i lackat trä, framkanten med en
-  // list i aluminium som pultens och framsidan nedanför. Den ritas en gång på en egen duk under figuren.
-  // Lacken speglar väggen bakom honom: den speglade strålen träffar väggen, och där hämtas färgen ur
-  // väggens bild (samma kamera), suddigare ju längre strålen går. Han själv speglas som en mörk form.
+  // Pulten från rummet, vid hörnet: geometri i barens mått (x längs benet), vriden som baren. Benet framför
+  // honom och armen som går mot en (SCEN.HORN) har samma ovansida som pulten i rummet (rum.js, table):
+  // brunt, matt trä som ådras längs pulten och möts i ett geringssnitt i hörnet, en smal list i aluminium
+  // längs de bortre kanterna och en rundad list i aluminium längs kanterna mot en, som pultens
+  // framkant, med framsidan nedanför. Den ritas en gång på en egen duk under figuren. Träet speglar
+  // väggen bakom honom svagt: den speglade strålen träffar väggen, och där hämtas färgen ur väggens bild
+  // (samma kamera), suddigare ju längre strålen går. Han själv speglas som en mörk form.
   const SD = new THREE.Scene();
   const LR = 17;
   const diskU = {
@@ -511,22 +518,41 @@ export async function figuren(duk, { hog = false, latt = false, pr = 1 } = {}) {
       for (const q of [a, b, c, d]) { pos.push(...q); nor.push(...n); del.push(k); }
       idx.push(o, o + 2, o + 1, o + 1, o + 2, o + 3);
     };
-    // ovansidan, listen (en halv cylinder) och framsidan
-    quad([-X, Y, Z], [X, Y, Z], [-X, Y, zf - LR], [X, Y, zf - LR], [0, 1, 0], 0);
+    // armen mot en: vänstra kanten xi, högra xo, och den går förbi kameran (zl)
+    const xi = SCEN.HORN.X;
+    const xo = xi + SCEN.HORN.B;
+    const zl = 6000;
+    // ovansidan: benet med hörnet, och armen (utom listerna mot en)
+    quad([-X, Y, Z], [xo, Y, Z], [-X, Y, zf - LR], [xo, Y, zf - LR], [0, 1, 0], 0);
+    quad([xi + LR, Y, zf - LR], [xo, Y, zf - LR], [xi + LR, Y, zl], [xo, Y, zl], [0, 1, 0], 0);
+    // listerna mot en, halva cylindrar: längs benets framkant (fram till hörnet) och längs armens vänstra
+    // kant. I hörnet går de in i varandra, och djupet ger snittet.
     const N = 14;
-    for (let i = 0; i < N; i++) {
-      const a0 = Math.PI / 2 - (i / N) * Math.PI;
-      const a1 = Math.PI / 2 - ((i + 1) / N) * Math.PI;
-      const p = (a) => [zf - LR + Math.cos(a) * LR, Y - LR + Math.sin(a) * LR];
-      const [z0, y0] = p(a0);
-      const [z1, y1] = p(a1);
-      const o = pos.length / 3;
-      for (const [z, y, a] of [[z0, y0, a0], [z0, y0, a0], [z1, y1, a1], [z1, y1, a1]]) nor.push(0, Math.sin(a), Math.cos(a));
-      pos.push(-X, y0, z0, X, y0, z0, -X, y1, z1, X, y1, z1);
-      del.push(1, 1, 1, 1);
-      idx.push(o, o + 2, o + 1, o + 1, o + 2, o + 3);
-    }
-    quad([-X, Y - 2 * LR, zf - LR], [X, Y - 2 * LR, zf - LR], [-X, Y - 2400, zf - LR], [X, Y - 2400, zf - LR], [0, 0, 1], 2);
+    const list = (langs) => {
+      for (let i = 0; i < N; i++) {
+        const a0 = Math.PI / 2 - (i / N) * Math.PI;
+        const a1 = Math.PI / 2 - ((i + 1) / N) * Math.PI;
+        const o = pos.length / 3;
+        for (const a of [a0, a0, a1, a1]) {
+          const ny = Math.sin(a);
+          const nu = Math.cos(a);
+          if (langs) nor.push(-nu, ny, 0);
+          else nor.push(0, ny, nu);
+        }
+        const p = (a) => [Math.cos(a) * LR, Y - LR + Math.sin(a) * LR];
+        const [u0, y0] = p(a0);
+        const [u1, y1] = p(a1);
+        if (langs) pos.push(xi + LR - u0, y0, zf - LR, xi + LR - u0, y0, zl, xi + LR - u1, y1, zf - LR, xi + LR - u1, y1, zl);
+        else pos.push(-X, y0, zf - LR + u0, xi + LR, y0, zf - LR + u0, -X, y1, zf - LR + u1, xi + LR, y1, zf - LR + u1);
+        del.push(1, 1, 1, 1);
+        idx.push(o, o + 2, o + 1, o + 1, o + 2, o + 3);
+      }
+    };
+    list(false);
+    list(true);
+    // framsidan under listerna: benets mot en och armens vänstra sida
+    quad([-X, Y - 2 * LR, zf - LR], [xi + LR, Y - 2 * LR, zf - LR], [-X, Y - 2400, zf - LR], [xi + LR, Y - 2400, zf - LR], [0, 0, 1], 2);
+    quad([xi + LR, Y - 2 * LR, zf - LR], [xi + LR, Y - 2 * LR, zl], [xi + LR, Y - 2400, zf - LR], [xi + LR, Y - 2400, zl], [-1, 0, 0], 2);
     diskG.setAttribute('position', new THREE.BufferAttribute(new Float32Array(pos), 3));
     diskG.setAttribute('normal', new THREE.BufferAttribute(new Float32Array(nor), 3));
     diskG.setAttribute('aDel', new THREE.BufferAttribute(new Float32Array(del), 1));
@@ -534,11 +560,11 @@ export async function figuren(duk, { hog = false, latt = false, pr = 1 } = {}) {
   }
   const diskM = new THREE.Mesh(diskG, new THREE.ShaderMaterial({
     uniforms: diskU,
-    vertexShader: `attribute float aDel; varying vec3 vB, vW, vN; varying float vDel;
-    void main() { vB = position; vDel = aDel; vec4 w = modelMatrix * vec4(position, 1.); vW = w.xyz; vN = mat3(modelMatrix) * normal; gl_Position = projectionMatrix * viewMatrix * w; }`,
+    vertexShader: `attribute float aDel; varying vec3 vB, vW, vN, vNb; varying float vDel;
+    void main() { vB = position; vNb = normal; vDel = aDel; vec4 w = modelMatrix * vec4(position, 1.); vW = w.xyz; vN = mat3(modelMatrix) * normal; gl_Position = projectionMatrix * viewMatrix * w; }`,
     fragmentShader: `precision highp float;
     uniform sampler2D uBak; uniform vec4 uBakRam; uniform vec2 uBakSt; uniform vec3 uKr, uKu, uKb; uniform float uD, uVagg; uniform vec2 uNb;
-    varying vec3 vB, vW, vN; varying float vDel;
+    varying vec3 vB, vW, vN, vNb; varying float vDel;
     ${LJUS}
     float h2(vec2 p) { return fract(sin(dot(p, vec2(127.1, 311.7))) * 43758.5453); }
     float nz(vec2 p) { vec2 i = floor(p), f = fract(p); f = f * f * (3. - 2. * f); return mix(mix(h2(i), h2(i + vec2(1, 0)), f.x), mix(h2(i + vec2(0, 1)), h2(i + vec2(1, 1)), f.x), f.y); }
@@ -571,23 +597,39 @@ export async function figuren(duk, { hog = false, latt = false, pr = 1 } = {}) {
       // neonen och gatan från höger, där affären ligger
       float hoger = smoothstep(-200., 2600., vB.x);
       if (vDel < .5) {
-        // lackat trä, ådrat längs baren, slitet och mörkare närmast en
-        vec2 g = vec2(vB.x * .0026, vB.z * .02);
-        float a = fbm(g * vec2(1., 2.2)), b = fbm(g * vec2(.7, 8.) + 3.), c2 = fbm(vB.xz * vec2(.012, .06) + 17.);
-        // (pultens bruna som det ser ut i rummet, i dess luft: lite gråare än rent trä)
-        vec3 tra = mix(vec3(.33, .23, .16), vec3(.48, .35, .25), a);
-        tra *= .8 + .34 * b;
+        // pultens trä som i rummet (rum.js: #6e4a30 till #3b2619, ådrat och fläckigt), ådrat längs benet
+        // och längs armen; de möts i ett geringssnitt från det inre hörnet till det yttre
+        float xi = ${SCEN.HORN.X.toFixed(1)}, xo = ${(SCEN.HORN.X + SCEN.HORN.B).toFixed(1)}, zf = ${(SCEN.DISK.Z + SCEN.DISK.DJUP).toFixed(1)};
+        float geri = (vB.x - xi) - (zf - vB.z);
+        bool arm = vB.x > xi && geri > 0.;
+        vec2 pl = arm ? vec2(vB.z, xo - vB.x) : vec2(vB.x, vB.z);
+        vec2 g = vec2(pl.x * .0026, pl.y * .02);
+        float a = fbm(g * vec2(1., 2.2)), b = fbm(g * vec2(.7, 8.) + 3.), c2 = fbm(pl * vec2(.012, .06) + 17.);
+        vec3 tra = mix(vec3(.35, .25, .17), vec3(.49, .36, .25), a);
+        tra *= .85 + .26 * b;
         tra *= .92 + .12 * c2;
+        // fläckar och slitage, som pultens
+        float fl = fbm(vB.xz * vec2(.0042, .0061) + 41.);
+        tra *= 1. - .22 * smoothstep(.55, .75, fl);
+        // geringssnittet: en mörk fog
+        if (vB.x > xi - 2. && vB.z < zf + 2.) tra *= 1. - .45 * exp(-geri * geri / 9.);
         // (på dagen lyser fönstret till höger upp hela disken, mest närmast affären, och neonen syns mindre)
         float dag = uDag.w;
         vec3 l = ljus(n) * mix(.32 + .9 * pol, .5 + .55 * hoger, .6 * dag) + (vec3(.5, .06, .04) * hoger * .35 + vec3(.16, .2, .3) * hoger * .2) * (1. - .75 * dag);
         ut = tra * l;
-        // bakre kanten: en smal ljus kant där lamporna fångas
-        float kant = exp(-pow((vB.z - ${SCEN.DISK.Z.toFixed(1)} - 3.) / 3.5, 2.));
-        ut += vec3(1., .78, .52) * kant * .22 * (.4 + pol);
         vec3 R = reflect(V, n);
-        float grov = .0025 + .005 * fbm(vB.xz * vec2(.004, .03));
-        ut = mix(ut, spegel(vW, R, grov) * 1.25, min(1., F * 1.3));
+        float grov = .006 + .01 * fbm(vB.xz * vec2(.004, .03));
+        // matt som pulten: bara en svag glans
+        ut = mix(ut, spegel(vW, R, grov) * 1.1, min(1., F * 1.3) * .32);
+        // de bortre kanterna (bakom honom och armens högra): en smal list i aluminium, som pultens bortre
+        // kant i rummet, med en ljus kant där lamporna fångas
+        float ytter = min(vB.z - ${SCEN.DISK.Z.toFixed(1)}, vB.x > xi ? xo - vB.x : 1e4);
+        float al = 1. - smoothstep(10., 12., ytter);
+        vec3 alu = vec3(.42, .42, .4) * ljus(n) * (.35 + .6 * pol) + spegel(vW, R, .03) * .35;
+        alu += vec3(1., .78, .52) * exp(-pow((ytter - 2.) / 2.5, 2.)) * .3 * (.4 + pol);
+        ut = mix(ut, alu, al);
+        // (och en mörk fog där listen möter träet)
+        ut *= 1. - .35 * exp(-pow((ytter - 12.5) / 1.6, 2.));
       } else if (vDel < 1.5) {
         // listen: borstad aluminium som pultens, speglar suddigt, rött från neonen till höger
         vec3 R = reflect(V, n);
@@ -597,8 +639,8 @@ export async function figuren(duk, { hog = false, latt = false, pr = 1 } = {}) {
         ut += vec3(1., .2, .12) * hoger * pow(max(0., dot(n, normalize(vec3(.7, .5, .5)))), 4.) * .35 * (1. - .75 * uDag.w);
         ut += vec3(1., .9, .75) * pow(max(0., dot(R, NYCKEL)), 30.) * .35;
       } else {
-        // framsidan: mörkt trä i fält, i skugga under kanten
-        float x = vB.x / 520.;
+        // framsidan: mörkt trä i fält, i skugga under kanten (benets längs x, armens längs z)
+        float x = (abs(vNb.x) > .5 ? vB.z : vB.x) / 520.;
         float spar = smoothstep(0., .015, fract(x)) * smoothstep(0., .015, 1. - fract(x));
         vec2 g = vec2(vB.x * .02, vB.y * .0026);
         vec3 tra = mix(vec3(.16, .085, .045), vec3(.25, .14, .075), fbm(g * vec2(1.6, 1.)));
@@ -637,7 +679,8 @@ export async function figuren(duk, { hog = false, latt = false, pr = 1 } = {}) {
     ${LJUS}
     void main() { vec4 c = texture2D(uT, vUv); if (c.a < .02) discard; vec3 n = normalize(vN); gl_FragColor = vec4(ton(c.rgb * (ljus(n) * .78 + vec3(.12, .02, .015))), c.a); }`,
   }));
-  nota.position.set(KOPP[0] + 60, BORD.Y, KOPP[2] + 185);
+  // (på pultens arm, fritt från dess kant mot en)
+  nota.position.set(KOPP[0] + 95, BORD.Y, KOPP[2] + 185);
   nota.rotation.y = 0.22;
   nota.renderOrder = 1;
   SD.add(nota);
@@ -730,7 +773,7 @@ export async function figuren(duk, { hog = false, latt = false, pr = 1 } = {}) {
     diskU.uBakSt.value.set(bak.W, bak.H);
     // den bakre kanten i fönstret: dess högsta punkt där den syns
     const ka = iBild(v, ...franBaren([-9000, BORD.Y, SCEN.DISK.Z]));
-    const kb = iBild(v, ...franBaren([1500, BORD.Y, SCEN.DISK.Z]));
+    const kb = iBild(v, ...franBaren([SCEN.HORN.X + SCEN.HORN.B, BORD.Y, SCEN.DISK.Z]));
     const yVid = (x) => ka[1] + ((kb[1] - ka[1]) * (x - ka[0])) / (kb[0] - ka[0]);
     const y0 = Math.max(0, Math.floor(Math.min(yVid(0), yVid(v.W)) - 4));
     const box = { x: 0, y: y0, w: v.W, h: Math.max(1, v.H - y0) };
@@ -2736,8 +2779,8 @@ export async function figuren(duk, { hog = false, latt = false, pr = 1 } = {}) {
     rok.steg(dt, n, BORD.Y);
   }
 
-  // Huvudet vänt mot kameran, som står vid hans vänstra sida: ansiktet ses nästan rakt framifrån.
-  const YAW0 = 0.25;
+  // Huvudet vänt mot kameran (rum-hasse-scen.js, VRID): ansiktet ses nästan rakt framifrån.
+  const YAW0 = SCEN.VRID * DEG + 0.04;
   // Leendet han alltid har, i vilan och när han pratar: nöjd och säker på sin sak, och lite överdrivet
   // (kisandet följer leendet, så att det når ögonen). Det viker undan när han drar ned brynen, som när
   // han blir allvarlig före ett slag: man ler inte och rynkar pannan på en gång. Förut log han 0,14 i

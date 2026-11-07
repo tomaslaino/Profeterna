@@ -1,14 +1,15 @@
 // Hasse Backe i tobaksaffären: han sitter i baren till vänster utanför bilden, och längst ut på
 // pulten står hans kaffe vid notan (rum.js), där hans hand ligger (rum-hasse-hand.js). Ett klick på
-// dem (eller H) och kameran slår åt vänster, till honom. Där sitter han bakom bardisken och har vridit
-// sig ut mot affären och mot en, med kaffet och notan vid den vänstra handen och cigarren i askkoppen
-// vid den högra (rum-hasse-3d.js). Samtalet står bredvid honom (på höjden under honom).
+// dem (eller H) och kameran slår åt vänster, till honom. Där sitter han vid pultens hörn, vänd mot en:
+// pulten går fram längs ens högra sida och viker av förbi honom, med kaffet och notan vid hans vänstra
+// hand i hörnet och cigarren i askkoppen vid den högra (rum-hasse-3d.js). Samtalet står bredvid honom
+// (på höjden under honom).
 //
 // Panoreringen: rummet och hans bild ligger bredvid varandra, med hans till vänster, och allt glider
 // åt höger på 0,42 s med vågrät rörelseoskärpa, störst när bilderna byter plats; hans bild stannar
 // mjukt. Tillbaka går det likadant åt andra hållet. Oskärpan ligger på ett omslag utanför rummets
-// 3D-värld (.rh-pan). Hans bild är en egen värld där rummet inte syns: kameran ser snett längs baren
-// (rum-hasse-scen.js), och kaffet, notan och handen på pulten i rummet är bara en ledtråd.
+// 3D-värld (.rh-pan). Hans bild är en egen värld där rummet inte syns: kameran står framför honom vid
+// pulten (rum-hasse-scen.js), och kaffet, notan och handen på pulten i rummet är samma som i hörnet.
 //
 // Grafiken: panoreringen är färdiga mellanbilder som grafikprocessen spelar upp själv. Väggen bakom
 // honom är en färdig bild, disken ritas en gång på en egen duk och figuren på en duk som bara är så
@@ -253,10 +254,12 @@ window.RumHasse = (() => {
       v.cx = W * 0.5 - mitt * v.s;
       v.ey = Hj * 0.03 - topp * v.s;
     } else {
-      // hjässan nära överkanten och disken framför honom vid tre fjärdedelar av höjden, och mitten av
-      // honom vid 60 % av bredden; mindre om samtalet inte får plats
-      const sitt = (s) => ({ s, cx: W * 0.6 - mitt * s, ey: Hj * 0.05 - topp * s });
-      let x = sitt((0.7 * Hj) / (kant - topp));
+      // hjässan nära överkanten och pultens inre hörn nära underkanten, så att man ser att han sitter vid
+      // hörnet och pulten går vidare mot en, och mitten av honom vid 60 % av bredden; mindre om samtalet
+      // inte får plats
+      const horn = iBild(o, ...MATT.horn)[1];
+      const sitt = (s) => ({ s, cx: W * 0.6 - mitt * s, ey: Hj * 0.04 - topp * s });
+      let x = sitt((0.86 * Hj) / (horn - topp));
       for (let i = 0; i < 30 && x.cx + vans * x.s < 400; i++) x = sitt(x.s * 0.96);
       Object.assign(v, x);
     }
@@ -283,7 +286,7 @@ window.RumHasse = (() => {
     const b = H.m.BAK[H.hog ? 'hog' : 'bred'];
     const f = v.s / b.S;
     for (const i of H.vy.querySelectorAll('.rh-bak')) Object.assign(i.style, { left: `${(v.cx - b.px * f).toFixed(1)}px`, top: `${(v.ey - b.py * f).toFixed(1)}px`, width: `${(b.W * f).toFixed(1)}px`, height: `${(b.H * f).toFixed(1)}px` });
-    // disken: ritas en gång, med väggen i lacken (medan fönstret ändras först när det har stannat)
+    // pulten: ritas en gång, med väggen i träets glans (medan fönstret ändras först när det har stannat)
     let disk = Promise.resolve();
     if (H.fig) {
       // (väggen med dagsljuset, eller bilden som den är; ny: duken har ritats om sedan disken ritades)
