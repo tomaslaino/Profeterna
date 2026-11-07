@@ -257,7 +257,8 @@ window.RumHasse = (() => {
       // hjässan nära överkanten och pultens inre hörn nära underkanten, så att man ser att han sitter vid
       // hörnet och pulten går vidare mot en, och mitten av honom vid 60 % av bredden; mindre om samtalet
       // inte får plats
-      const horn = iBild(o, ...MATT.horn)[1];
+      // (utan hörnet: en äldre rum-hasse-3d.js i webbläsarens cache, några minuter efter en publicering)
+      const horn = MATT.horn ? iBild(o, ...MATT.horn)[1] : topp + ((kant - topp) * 0.86) / 0.7;
       const sitt = (s) => ({ s, cx: W * 0.6 - mitt * s, ey: Hj * 0.04 - topp * s });
       let x = sitt((0.86 * Hj) / (horn - topp));
       for (let i = 0; i < 30 && x.cx + vans * x.s < 400; i++) x = sitt(x.s * 0.96);
