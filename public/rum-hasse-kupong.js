@@ -3,7 +3,7 @@
 // och fyller i den. Det är samma kupong
 // som på pulten, samma märkning och samma kryss (Rum.kupong i rum.js), och det han skriver hamnar i
 // samma utkast (Samtal.pult.tippa). Hans kryss är slarviga men självklara, och de ser likadana ut
-// på pulten efteråt.
+// på pulten efteråt. I de stora rutorna ringar han in tecknet i stället (ring), medan han skriver.
 //
 // Kupongen kommer underifrån, så stor att den går att läsa, och glider in under hans händer på
 // disken. Han tar pennan som ligger på den (rum-hasse-3d.js, klippen skriv1–3) och skriver, och
@@ -39,14 +39,30 @@ window.RumHasseKupong = (ctx) => {
 
   // ---------- de stora rutorna ----------
 
-  // 1 X 2 i kupongens tryck, med samma kryss som på kupongen.
+  // 1 X 2 i kupongens tryck, med det du har på kupongen inringat.
   function rutor(id, dold = false) {
-    const a = api();
     const har = din(id);
     return `<div class="rh-tecken${dold ? ' gom' : ''}" role="group" aria-label="1 X 2" data-id="${id}">${SIGNS.map((s) => {
       const on = har.includes(s);
-      return `<button type="button" class="rh-ruta${on ? ' x' : ''}" data-s="${s}" aria-pressed="${on}"><i>${s}</i>${on ? a.kryss(`${id}${s}`) : ''}</button>`;
+      return `<button type="button" class="rh-ruta${on ? ' x' : ''}" data-s="${s}" aria-pressed="${on}"><i>${s}</i>${on ? ring(`${id}${s}`) : ''}</button>`;
     }).join('')}</div>`;
+  }
+  // Hans ring runt det valda i de stora rutorna: en slarvig ögla med blyerts som slutar en bit förbi där
+  // den började, lite olika för varje match och tecken. (Kupongens kryss över hela rutan såg ut som att
+  // tecknet var struket.) Ett enda drag, som följer pennan medan han kryssar på kupongen (steg).
+  const RING = [80, 8, 58, -1, 15, 2, 6, 25, -1, 46, 31, 60, 61, 57, 88, 54, 102, 39, 95, 21, 90, 8, 70, 1, 47, 6];
+  function ring(key) {
+    let h = 2166136261;
+    for (const c of `ring${key}`) h = Math.imul(h ^ c.charCodeAt(0), 16777619);
+    const r = () => {
+      h = Math.imul(h ^ (h >>> 15), 2246822507);
+      h = Math.imul(h ^ (h >>> 13), 3266489909);
+      return ((h ^ (h >>> 16)) >>> 0) / 4294967296;
+    };
+    const p = RING.map((v) => Math.round((v + (r() - 0.5) * 5) * 10) / 10);
+    const vrid = Math.round(r() * 90 - 80) / 10;
+    const c = (i) => `C${p.slice(i, i + 6).join(' ')}`;
+    return `<svg class="ring" viewBox="0 0 100 60" preserveAspectRatio="none" style="--vrid: ${vrid}deg" aria-hidden="true"><path d="M${p[0]} ${p[1]}${c(2)}${c(8)}${c(14)}${c(20)}" pathLength="1"/></svg>`;
   }
   // hans: tecknen han har sagt, som lyser i guld (som domen) så att man ser vad han föreslår
   function kopplaRutor(t, m, klickat, hans = []) {
@@ -424,7 +440,7 @@ window.RumHasseKupong = (ctx) => {
     const stor = iSamtalet(id, s);
     if (j.av) {
       j.syns = [...j.box.querySelectorAll('.kryss')];
-      if (stor) j.syns.push(...stor.querySelectorAll('.kryss'));
+      if (stor) j.syns.push(...stor.querySelectorAll('.ring'));
       return;
     }
     j.box.classList.add('x');
@@ -433,9 +449,11 @@ window.RumHasseKupong = (ctx) => {
     if (stor) {
       stor.classList.add('x');
       stor.setAttribute('aria-pressed', 'true');
-      stor.querySelector('.kryss')?.remove();
-      stor.insertAdjacentHTML('beforeend', a.kryss(j.key, true));
-      j.paths.push([...stor.lastElementChild.querySelectorAll('path')]);
+      stor.querySelector('.ring')?.remove();
+      stor.insertAdjacentHTML('beforeend', ring(j.key));
+      const ps = [...stor.lastElementChild.querySelectorAll('path')];
+      ps.ring = true;
+      j.paths.push(ps);
     }
     for (const p of j.paths.flat()) p.style.strokeDashoffset = 1.05;
   }
@@ -466,6 +484,8 @@ window.RumHasseKupong = (ctx) => {
         andra(J.id, j.s, false);
       }
       for (const ps of j.paths) {
+        // (ringen i den stora rutan går runt under båda dragen)
+        if (ps.ring) { ps[0].style.strokeDashoffset = 1.05 * (1 - u([d1[0], d2[1]])); continue; }
         if (ps[0]) ps[0].style.strokeDashoffset = 1.05 * (1 - u(d1));
         if (ps[1]) ps[1].style.strokeDashoffset = 1.05 * (1 - u(d2));
       }
