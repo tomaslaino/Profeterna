@@ -1392,8 +1392,9 @@ ${window.RumRegister ? RumRegister.nara() : ''}
 
   // ---------- högen ----------
   //
-  // De som har lämnat in har lagt sin kupong med baksidan upp till vänster
-  // om kupongen på pulten, i den ordning de lämnade in (den senaste överst):
+  // De som har lämnat in har lagt sin kupong med baksidan upp till höger
+  // om kupongen på pulten (till vänster låg den under Hasses nota), i den
+  // ordning de lämnade in (den senaste överst):
   // porträttet under ett gem, namnet i personens bläck (samma som på
   // papperet under Kupong) och stämpeln – men inga tecken. Din egen tas i
   // handen därifrån (p.hand), och de andras när du ser deras tips – annars
@@ -1404,7 +1405,8 @@ ${window.RumRegister ? RumRegister.nara() : ''}
   const T = (dx, dy, z, rx, rz, s, ry = 0) => `translate(${r1(dx)}px, ${r1(dy)}px) perspective(1300px) translateZ(${z}px) rotateX(${rx}deg) rotateY(${ry}deg) rotateZ(${rz}deg) scale(${s.toFixed(4)})`;
   const glow = (a, drop) => `0 0 0 3px rgba(240, 214, 153, ${a}), 0 0 80px rgba(240, 214, 153, ${(0.45 * a).toFixed(2)}), ${drop}`;
   // mitten (x, y) och vridningen för den första, andra och tredje i högen
-  const HOG = { s: 0.3, at: [[338, 790, -5], [348, 836, 4], [336, 882, -2]], skugga: '0 22px 30px rgba(0, 0, 0, 0.55)' };
+  // (askkoppen och dosan står till höger om den, i rum-saker.js: HOGEN där)
+  const HOG = { s: 0.3, at: [[1204, 790, 5], [1196, 836, -4], [1208, 882, 2]], skugga: '0 22px 30px rgba(0, 0, 0, 0.55)' };
   const INK = ['#2146a6', '#16784b', '#6d3aa8', '#8a6a0c', '#a0306a'];
   function slot(i) {
     const [x, y, a] = HOG.at[i % HOG.at.length];
@@ -2542,13 +2544,13 @@ ${window.RumRegister ? RumRegister.nara() : ''}
   }
 
   // En kupong i högen som du inte får vända på än (du ser inte hens tips):
-  // den lyfts lite i ena kanten och faller tillbaka.
+  // den lyfts lite i kanten mot kupongen och faller tillbaka.
   function nudge(a) {
     if (calm() || a.getAnimations().length) return;
     const base = a.style.transform;
     a.animate([
       { transform: base, easing: 'cubic-bezier(0.3, 0, 0.4, 1)' },
-      { transform: `${base} translateZ(18px) rotateY(-8deg) rotateX(-5deg)`, offset: 0.4, easing: 'cubic-bezier(0.6, 0, 0.8, 0.4)' },
+      { transform: `${base} translateZ(18px) rotateY(8deg) rotateX(-5deg)`, offset: 0.4, easing: 'cubic-bezier(0.6, 0, 0.8, 0.4)' },
       { transform: base, offset: 0.78, easing: 'ease-out' },
       { transform: `${base} translateZ(3px)`, offset: 0.88, easing: 'ease-in' },
       { transform: base },
@@ -2990,17 +2992,17 @@ ${window.RumRegister ? RumRegister.nara() : ''}
     Object.assign(el.style, { transform, boxShadow });
   }
 
-  // Mellan högen och handen: kupongen lyfts, vänds över långsidan och
-  // förstoras till mitten. → två delar, upp till kanten och därifrån till
+  // Mellan högen och handen: kupongen lyfts, vänds över långsidan (mot
+  // mitten, högen ligger till höger) och förstoras till mitten. → två delar, upp till kanten och därifrån till
   // handen; innehållet byts när den står på kant (turn).
   function flipFrames(sl, h) {
     const f = 0.4;
     const mid = (ry) => T(sl.dx + (h.dx - sl.dx) * f, sl.dy + (h.dy - sl.dy) * f - 70, 60, 22, sl.a / 2, HOG.s + (h.z - HOG.s) * f, ry);
     const lyft = glow(0, '0 60px 60px rgba(0, 0, 0, 0.4)');
     return [
-      [{ transform: restAt(sl), boxShadow: glow(0, HOG.skugga), easing: 'cubic-bezier(0.4, 0, 0.7, 1)' }, { transform: mid(90), boxShadow: lyft }],
+      [{ transform: restAt(sl), boxShadow: glow(0, HOG.skugga), easing: 'cubic-bezier(0.4, 0, 0.7, 1)' }, { transform: mid(-90), boxShadow: lyft }],
       [
-        { offset: 0, transform: mid(-90), boxShadow: lyft, easing: 'cubic-bezier(0.2, 0.6, 0.35, 1)' },
+        { offset: 0, transform: mid(90), boxShadow: lyft, easing: 'cubic-bezier(0.2, 0.6, 0.35, 1)' },
         { offset: 0.8, transform: T(h.dx, h.dy + 4, 0, -4, 1, h.z * 1.006), boxShadow: glow(0, '0 40px 90px rgba(0, 0, 0, 0.6)'), easing: 'ease-in-out' },
         { offset: 1, transform: T(h.dx, h.dy, 0, 0, 0, h.z), boxShadow: glow(0, '0 34px 80px rgba(0, 0, 0, 0.6)') },
       ],
@@ -3530,8 +3532,8 @@ ${window.RumRegister ? RumRegister.nara() : ''}
   // Därefter står allt där direkt. Sedan väntar pennan vid den första
   // omtvistade matchen som inte är klubbad, och efter ett beslut vid nästa.
   const LAGDA = 'profeterna.rum.lagda';
-  // var kupongerna kommer ifrån (högen ligger till vänster om pulten) och hur de är vridna
-  const FAN = [[-170, 80, -6], [-205, 34, 5], [-140, 120, -2]];
+  // var kupongerna kommer ifrån (högen ligger till höger om kupongen) och hur de är vridna
+  const FAN = [[170, 80, 6], [205, 34, -5], [140, 120, 2]];
   function uppgorelse(k, id) {
     let forst = false;
     try {

@@ -753,6 +753,11 @@ bara lokalt. Analyserna visas som de ligger i `data/analyser.json`; hur de skriv
   bredvid notan och kupongen. Där ligger nu domarens gula och röda kort och visselpipan med
   snodden, som passar Matchfixarna bättre, och de är lättare för grafiken än kvittot (ingen bild).
   Se [Tobaksaffären](#tobaksaffären).
+- **Högen till höger om kupongen (2026-11-07, användarens önskemål):** högen med de
+  inlämnade kupongerna låg till vänster om kupongen, under Hasses nota och hand. Nu ligger den
+  till höger, där domarens kort och visselpipa låg – de är borta. En kupong ur högen vänds
+  mot mitten när den tas i handen, och i uppgörelsen kommer kupongerna in från höger. Askan,
+  smulorna, locket och fikat hamnar aldrig på högen. Se [Tobaksaffären](#tobaksaffären).
 - **Visitkortet i stället för raderna vid dörren (2026-11-06, användarens önskemål):** under
   närbilden av dörren stod raderna från Om oss. De är borta, och i stället sitter Matchfixarnas
   visitkort med ett mässingsstift på väggen mellan stationsuret och orakelramen: namnet, våra autografer och
@@ -2175,7 +2180,7 @@ Enter och mellanslag klickar på dem. En match på text-tv:n öppnar matchrutan 
   inget alls – en tom kupong tas i handen med ett klick på den, och har du lämnat in tas
   din kupong i högen på samma sätt. När du ser de andras tips står en pingklocka i mässing där i stället för ordet:
   man ringer in gänget till uppgörelsen.
-- **Högen** till vänster om kupongen: de som har lämnat in har lagt sin kupong där med
+- **Högen** till höger om kupongen: de som har lämnat in har lagt sin kupong där med
   baksidan upp, i den ordning de lämnade in (den senaste överst) – porträttet under ett gem,
   initialerna i personens bläck (samma som på papperet under Kupong) och stämpeln
   *Inlämnad*, men inga tecken. Din egen tas i handen, och de andras när du ser deras tips
@@ -2522,16 +2527,7 @@ bra omgång bär papperskronan i stället för högtidens (figuren byggs om när
 och DJ tar av sig struten, kronan och partyhatten när han somnar med huvudet på bordet. Blad,
 blommor, bär, ljus och konfetti är sammanslagna till ett nät per sak, så att det blir få ritanrop.
 
-**Domarens kort och visselpipa** ligger på pulten i three.js med sakerna nedan
-([public/rum-saker.js](public/rum-saker.js), `domLagg`): ett gult och ett rött kort i plast,
-slängda så att det röda ligger lite över det gula, och en förkromad visselpipa på sidan med en
-svart snodd som ringlar sig över korten – domarens grejer på Matchfixarnas pult. De är bara
-rekvisita och går inte att klicka på. De är lätta att rita: inga bilder, korten är ett nät,
-pipan ett och snodden med springan i munstycket ett, tre ritanrop i allt (kvittot som låg där
-förut hade en bild på 512 × 958 bildpunkter som ritades om när någon lämnade in). Utan WebGL
-ligger inget där, som med sakerna nedan.
-
-**Askkoppen, snusdosan och fläkten** står på pulten till höger om korten, i three.js som
+**Askkoppen, snusdosan och fläkten** står på pulten till höger om högen, i three.js som
 gänget ([public/rum-saker.js](public/rum-saker.js), med en egen duk i pultens plan): en
 askkopp i bärnstensfärgat glas med tre spår, aska och fimpar, där en cigarett ligger i ett
 spår och ryker; en öppen dosa lössnus med locket bredvid, lutat mot dosan eller upp och ner;
@@ -2661,7 +2657,7 @@ grädde och lock med florsocker på fettisdagen, två pepparkakshjärtan och en 
 glasyr på en servett i december, två lussekatter med russin på luciadagen, två
 kanelbullar med pärlsocker i pappersform den 4 oktober, chokladägg i röd, blå, grön och
 guldfolie i påskveckan (skärtorsdagen till annandag påsk) och tre chokladbollar på en
-servett den 11 maj. Det står bakom korten om det får plats där, annars till höger, fritt
+servett den 11 maj. Det står bakom högen om det får plats där, annars till höger, fritt
 från askkoppen, dosan, locket, prisen och fläkten. Dagen är Stockholms (`Vader.nu()`,
 läst var tionde sekund som vädret). Går det dåligt med tippningen har någon redan tagit
 för sig: locket ligger bredvid den ena semlan och det är en grop i grädden, gubben saknar
@@ -2670,10 +2666,9 @@ skalat med folien tillplattad bredvid, och det är fler smulor och mer florsocke
 
 **Platserna och slitaget skiftar från dag till dag** (dagen i Stockholm som frö): sakerna
 på pulten står i en av fyra uppställningar (`LAYOUTS` – fläkten längst bak till höger, i
-mitten eller bakom korten och då vänd åt höger, askkoppen och dosan om vartannat, några
-pixlar hit eller dit), domarens kort och pipa ligger någonstans till vänster om dem, vridna åt
-det ena eller andra hållet (det första av elva lägen som går fritt från askkoppen, dosan och
-fläkten), locket och prisen läggs där det finns plats. Slitaget följer tippningen: andelen fel
+mitten eller bakom högen och då vänd åt höger, askkoppen och dosan om vartannat, några
+pixlar hit eller dit), locket och prisen läggs där det finns plats, och inget av det, askan
+eller smulorna hamnar på högen (`HOGEN`, samma plats som `HOG` i rum.js). Slitaget följer tippningen: andelen fel
 bland omgångens avgjorda matcher, annars i den senaste färdigspelade kupongen, och utan
 rättning ett mellanläge. Går det dåligt fylls askkoppen (1–11 fimpar), askan hamnar
 bredvid, snuset spills, fläkten (om den står där) går på trean och löpsedlarna på skivan bleks;
