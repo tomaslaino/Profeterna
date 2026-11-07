@@ -285,7 +285,7 @@ window.RumHasse = (() => {
     v.kant = iBild(v, 0, BORD.Y, BORD.Z)[1];
     v.vanster = iBild(v, ...MATT.vanster)[0];
     // händerna, och notan framför kaffet, på disken
-    v.hand = Math.max(iBild(v, 0, BORD.Y, 900)[1], iBild(v, KOPP[0] + 60, BORD.Y, KOPP[2] + 380)[1]);
+    v.hand = Math.max(iBild(v, 0, BORD.Y, 900)[1], iBild(v, KOPP[0] + 60, BORD.Y, KOPP[2] + 450)[1]);
     // duken: det han gör ska rymmas, inom fönstret
     const p = MATT.ram(H.hog).map((q) => iBild(v, ...q));
     v.x = Math.max(0, Math.floor(Math.min(...p.map((q) => q[0]))));

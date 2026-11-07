@@ -157,8 +157,9 @@ export const BORD = { Y: DK.Y, Z: kantZ(0) };
 export const VILA = { EH: BORD.Y + 78, WH: BORD.Y + 45 };
 // Koppen på sitt fat och notan under fatet, till höger om hans vänstra hand och fritt från armen: en bit
 // disk mellan fatet och handen (handen i VILA_B); askkoppen till vänster om hans högra hand, så långt ut
-// att cigarren i den går fri från handen. På disken, i figurens värld.
-export const KOPP = [375, BORD.Y, 830];
+// att cigarren i den går fri från handen. På disken, i figurens värld. (Koppen stod 50 längre fram, och
+// fatet täckte då namnet på notan, 2026-11-07.)
+export const KOPP = [375, BORD.Y, 780];
 export const ASK = [-420, BORD.Y, 690];
 // En punkt i världen i fönstret: (cx, ey) är där kamerans axel träffar fönstret och s bildpunkter på en
 // enhet på avståndet D.
@@ -177,8 +178,9 @@ export const MATT = {
   hoger: [470, -200, 340],
   ram: (hog) => [[hog ? -640 : -790, 860, 330], [660, 860, 330], [hog ? -640 : -790, BORD.Y, 330], [-260, BORD.Y, 1000],
     [KOPP[0] + 190, BORD.Y, KOPP[2] + 60], [KOPP[0] - 60, BORD.Y + 150, KOPP[2] + 150], [ASK[0] - 140, BORD.Y, ASK[2] + 120],
-    // (fingertopparna på den vänstra handen bredvid fatet)
-    [KOPP[0] - 170, BORD.Y, KOPP[2] + 210],
+    // (fingertopparna på den vänstra handen i vila, vid pultens framkant: förut skars de av rakt vid
+    // dukens underkant)
+    [100, BORD.Y, 1120],
     // handen i koppens öra, med manschetten och ärmen (förut skars de av vid dukens kant)
     [KOPP[0] + 330, BORD.Y - 10, KOPP[2] + 170], [KOPP[0] + 360, BORD.Y + 220, KOPP[2] + 40]],
 };
@@ -679,9 +681,15 @@ export async function figuren(duk, { hog = false, latt = false, pr = 1 } = {}) {
     ${LJUS}
     void main() { vec4 c = texture2D(uT, vUv); if (c.a < .02) discard; vec3 n = normalize(vN); gl_FragColor = vec4(ton(c.rgb * (ljus(n) * .78 + vec3(.12, .02, .015))), c.a); }`,
   }));
-  // (på pultens arm, fritt från dess kant mot en)
-  nota.position.set(KOPP[0] + 95, BORD.Y, KOPP[2] + 185);
-  nota.rotation.y = 0.22;
+  // På pultens arm, fritt från dess kant mot en, och fatet på notans övre vänstra hörn som i rummet (rum.css):
+  // fatets mitt FAT[0] från notans vänstra kant och FAT[1] bortom dess överkant, så långt ut att namnet
+  // (Hasse B.) syns framför fatet. Förut stod fatet mitt på överkanten och täckte namnet.
+  const FAT = [70, 28];
+  const NV = 0.22;
+  const fx = FAT[0] - NOTA.B / 2;
+  const fz = -NOTA.L / 2 - FAT[1];
+  nota.position.set(KOPP[0] - fx * Math.cos(NV) - fz * Math.sin(NV), BORD.Y, KOPP[2] + fx * Math.sin(NV) - fz * Math.cos(NV));
+  nota.rotation.y = NV;
   nota.renderOrder = 1;
   SD.add(nota);
   let notaKlar = null;

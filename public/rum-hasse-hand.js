@@ -1,7 +1,8 @@
 // Hasse Backes hand och kaffe på pulten i tobaksaffären (rum-hasse.js), i three.js: handen ligger längst ut
-// till vänster, med manschetten, och armen kommer in från bildens vänstra kant. Till höger om fingrarna står
-// koppen på sitt fat, och fatet står på notan (rum.js), som i baren. Det är en ledtråd: han sitter i baren
-// utanför bilden (rum-hasse-3d.js). Duken är en liten i pultens plan och ritas bara när fingrarna trummar.
+// till vänster, med manschetten, och armen kommer in från bildens vänstra kant. Till höger om handen står
+// koppen på sitt fat, och fatet står på notans övre vänstra hörn (rum.js), som i baren. Det är en ledtråd: han
+// sitter vid pultens hörn utanför bilden (rum-hasse-3d.js). Duken är en liten i pultens plan och ritas bara
+// när fingrarna trummar.
 //
 // Armen, handen och koppen är figurens (rum-hasse-arm.js), och världen och kameran likaså, så att koppen
 // ses från samma håll och i samma ljus som handen och är samma kopp som i baren.
@@ -16,14 +17,18 @@ const DEG = Math.PI / 180;
 const D = 3900;
 const CY = KAMERA.CY;
 
-// hur böjd handen är mot armen (grader)
-const BOJ = -6;
-// lutningen på pultens plan mot figurens kamera (handen ska ses uppifrån, som allt på
-// pulten), och hur krökta fingrarna är
-const LUT = 52 * DEG;
-const KROK = 0.02;
+// Handen ligger som hans vänstra hand i vila i baren (VILA_B i rum-hasse-3d.js), så att det syns att det är
+// samma hand: fingrarna lätt krökta och samlade, tummen in mot handen, handen 14° mot lillfingret från
+// underarmen och lite rullad upp mot tummen, och handleden hojd över pulten med fingertopparna vilande på den
+// (golvet i rum-hasse-arm.js). F och P är fingrarnas riktning och handflatan i baren uttryckta i underarmens
+// mått: längs underarmen, upp ur pulten och mot tummen; lyft: hur mycket underarmen stiger mot armbågen.
+// (Förut låg handen platt med raka, utspärrade fingrar.)
+const VILA = { F: [0.97, -0.05, -0.242], P: [0.121, -0.97, 0.167], krok: 0.24, spar: 0.5, tumme: 0.15, hojd: 45, lyft: 0.077 };
+// Pulten ses LUT grader uppifrån, både handen och koppen, som i baren där ögat ser hans hand och kopp ungefär
+// 31° uppifrån (rum-hasse-scen.js). Förut sågs handen 52° och koppen 44° uppifrån, så att de såg ut som
+// andra saker än i baren.
+const LUT = 33 * DEG;
 const { LA, LB } = ARM;
-const TUMME = 0.45;
 // en mjuk skugga som färdig fläck
 function flack() {
   const c = document.createElement('canvas');
@@ -57,7 +62,13 @@ export async function armen(plan, { hand: HAND, kopp: KOPP, pr = 1.5 }) {
   const r = new THREE.WebGLRenderer({ canvas: c, alpha: true, antialias: true, powerPreference: 'low-power', preserveDrawingBuffer: true });
   r.setClearColor(0, 0);
   const S = new THREE.Scene();
-  const A = byggArm(S, -1, foto, modell);
+  // Pulten under handen, vågrät i figurens värld som disken i baren: fingrarna lägger sig på den, och ljuset
+  // faller som där. Handen räknas fram i pultens lutande plan framför kameran (ifran nedan) och vrids sedan
+  // till världen med Q, och kameran likaså, så att bilden blir densamma.
+  const bord = { value: new THREE.Vector4(0, 1, -1e9, 0) };
+  const Q = new THREE.Quaternion().setFromAxisAngle(new THREE.Vector3(1, 0, 0), -LUT);
+  const iVarld = (p, ut) => ut.copy(p).applyQuaternion(Q);
+  const A = byggArm(S, -1, foto, modell, 1, bord);
   A.del('under');
   // skuggorna: färdiga fläckar
   const tex = flack();
@@ -80,8 +91,8 @@ export async function armen(plan, { hand: HAND, kopp: KOPP, pr = 1.5 }) {
   const cam2 = new THREE.PerspectiveCamera(10, 1, 200, 30000);
   // (en liten hand ligger långt bort i figurens värld: den bortre gränsen räcker för det)
   const cam = new THREE.PerspectiveCamera(30, 1, 200, 30000);
-  cam.position.set(0, CY, D);
-  cam.lookAt(0, CY, 0);
+  cam.position.set(0, CY, D).applyQuaternion(Q);
+  cam.quaternion.copy(Q);
   // båda bilderna på duken: handen, och koppen ovanpå
   r.autoClear = false;
   function rita() {
@@ -120,20 +131,24 @@ export async function armen(plan, { hand: HAND, kopp: KOPP, pr = 1.5 }) {
   // ---------- i vila ----------
 
   // skala: rummets bildpunkter på en av figurens enheter, mot: en punkt i rummet som armen pekar mot
-  // (rakt ut ur bilden till vänster, mot baren där han sitter, och en bit framför pultens bakre kant, så
-  // att pulten syns fortsätta bakom armen: när armen pekade snett uppåt låg ärmen på kanten, och pulten
-  // såg ut att ta slut där)
-  const opt = { skala: 0.6, mot: [-400, 770] };
+  // (snett upp till vänster ut ur bilden, mot hörnet där han sitter framför en till vänster, så att handen
+  // pekar snett ned mot en och man ser handryggen och knogarna som i baren, där han sitter mitt emot och
+  // handen pekar mot en; förut pekade den rakt åt höger mot fatet och sågs från sidan). Ärmen går in i
+  // bildkanten en bit framför pultens bakre kant, så att pulten syns fortsätta bakom armen: när den låg
+  // på kanten såg pulten ut att ta slut där.
+  const opt = { skala: 0.6, mot: [-400, 500] };
   const vila = { s: 1, W: new THREE.Vector3(), N: new THREE.Vector3(), F: new THREE.Vector3(), P: new THREE.Vector3(), D0: new THREE.Vector3() };
   const RH = new THREE.Vector3(1, 0, 0);
   let box = { x: 0, y: 0, w: 1, h: 1 };
   let knapp = null;
   const far = new THREE.Vector3();
   const vE = new THREE.Vector3();
+  const w = [0, 1, 2, 3, 4].map(() => new THREE.Vector3());
   function ritaVila() {
     far.copy(vila.W).addScaledVector(vila.D0, LA + LB);
     vE.copy(vila.W).addScaledVector(vila.D0, LB);
-    A.satt(far, vE, vila.W, vila.F, vila.P, KROK, 0, 0, TUMME);
+    bord.value.w = iVarld(vila.W, w[2]).y - VILA.hojd;
+    A.satt(iVarld(far, w[0]), iVarld(vE, w[1]), w[2], iVarld(vila.F, w[3]), iVarld(vila.P, w[4]), VILA.krok, 0, VILA.spar, VILA.tumme);
     // (handen ska synas var den än är i världen)
     A.hand.mesh.visible = true;
     skuggor(vila.W, vila.F, vila.N, vila.D0);
@@ -157,22 +172,32 @@ export async function armen(plan, { hand: HAND, kopp: KOPP, pr = 1.5 }) {
     as.quaternion.setFromRotationMatrix(m4);
     as.position.copy(W).addScaledVector(sy, 470).addScaledVector(N, -36).addScaledVector(sx, 14);
     as.scale.set(300, 1100, 1);
+    for (const m of [hs, as]) {
+      m.position.applyQuaternion(Q);
+      m.quaternion.premultiply(Q);
+    }
   }
   // Pultens plan som figurens kamera ser det, och armen och handen i det: armen åt vinkeln a
-  // (grader, 0 = rakt åt vänster, positivt bort från en) och handen BOJ grader närmare en.
+  // (grader, 0 = rakt åt vänster, positivt bort från en), och handen som i baren (VILA) i underarmens mått
+  // (fram längs den mot fingrarna, upp ur pulten och mot tummen).
   const N = new THREE.Vector3(0, Math.cos(LUT), Math.sin(LUT));
   const AW = new THREE.Vector3(0, Math.sin(LUT), -Math.cos(LUT));
+  const fram = new THREE.Vector3();
+  const tumme = new THREE.Vector3();
+  const iArmen = (v, ut) => ut.set(0, 0, 0).addScaledVector(fram, v[0]).addScaledVector(N, v[1]).addScaledVector(tumme, v[2]).normalize();
   function riktning(a) {
-    vila.D0.copy(RH).multiplyScalar(-Math.cos(a * DEG)).addScaledVector(AW, Math.sin(a * DEG)).addScaledVector(N, 0.03).normalize();
-    const h = -a - BOJ;
-    vila.F.copy(RH).multiplyScalar(Math.cos(h * DEG)).addScaledVector(AW, Math.sin(h * DEG));
+    fram.copy(RH).multiplyScalar(Math.cos(a * DEG)).addScaledVector(AW, -Math.sin(a * DEG));
+    tumme.crossVectors(fram, N);
+    vila.D0.copy(fram).negate().addScaledVector(N, VILA.lyft).normalize();
+    iArmen(VILA.F, vila.F);
+    iArmen(VILA.P, vila.P);
   }
   // Koppen står på pulten till höger om fingrarna, med örat åt höger och lite mot en som i baren. Den ses
-  // KOPP_VY grader uppifrån och rakt framifrån, som allt annat på pulten: figurens kamera ser hörnet långt
-  // från sin mitt, och där skulle en kopp luta. Den är lite mindre än i baren, där handen pekar mot en och
-  // ser kortare ut; här ligger den i full längd bredvid. Fatets skugga faller bort från ljuset, som kommer
-  // framifrån till vänster.
-  const KOPP_VY = 44 * DEG;
+  // KOPP_VY grader uppifrån (som handen) och rakt framifrån: figurens kamera ser hörnet långt från sin mitt,
+  // och där skulle en kopp luta. Den är lite mindre än i baren, där handen pekar rakt mot en och ser kortare
+  // ut; här ses den mer från sidan. Fatets skugga faller bort från ljuset, som kommer framifrån till
+  // vänster.
+  const KOPP_VY = LUT;
   const KOPP_SKALA = 0.9;
   const KOPP_AVST = D;
   K.kopp.position.set(0, 11, 0);
@@ -240,7 +265,6 @@ export async function armen(plan, { hand: HAND, kopp: KOPP, pr = 1.5 }) {
     vila.s = opt.skala * k;
     ifran(x, y, vila.s, vila.W);
     vila.N.copy(N);
-    vila.P.copy(N).negate();
     // Armen pekar mot opt.mot i bilden: vinkeln som träffar dit, sökt i figurens värld.
     const mal = Math.atan2(oy + opt.mot[1] * k - y, ox + opt.mot[0] * k - x);
     const p = new THREE.Vector3();
@@ -303,7 +327,7 @@ export async function armen(plan, { hand: HAND, kopp: KOPP, pr = 1.5 }) {
         const f = ((t * 3.2) % 1) * 4 - (3 - i);
         extra[i] = f > 0 && f < 1 ? -Math.sin(f * Math.PI) * 0.3 : 0;
       }
-      A.hand.satt(handled, vila.F, vila.P, KROK, 0, 0, TUMME, extra);
+      A.hand.satt(iVarld(handled, w[0]), iVarld(vila.F, w[3]), iVarld(vila.P, w[4]), VILA.krok, 0, VILA.spar, VILA.tumme, extra);
       rita();
       raf = requestAnimationFrame(steg);
     };
