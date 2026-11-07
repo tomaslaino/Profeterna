@@ -1271,7 +1271,7 @@ ${window.RumRegister ? RumRegister.nara() : ''}
           ? `<button type="button" class="box${on ? ' x' : ''}" data-s="${s}" aria-pressed="${on}" aria-label="${esc(`${label}: ${s}`)}">${inner}</button>`
           : `<span class="box${on ? ' x' : ''}">${inner}</span>`;
       };
-      // i handen är lagen en knapp: bladet med båda lagen läggs på kupongen (lagen, rum-lagen.js)
+      // i handen är lagen en knapp: matchbladet läggs på kupongen (lagen, rum-matchblad.js)
       const tm = hand ? 'button' : 'span';
       const st = strid.has(x.id);
       return `<div class="row${sign ? '' : ' tom'}${locked ? ' locked' : ''}${st ? ' strid' : ''}${st && klar.has(x.id) ? ' klubbad' : ''}" data-id="${esc(x.id)}">` +
@@ -3091,7 +3091,7 @@ ${window.RumRegister ? RumRegister.nara() : ''}
     const k = R.kup = { el, dim: document.getElementById('rum-dimma'), rad: document.getElementById('rum-hand'), pen: el.querySelector('.pencil'), at: PEN_PULT, desk,
       slag, andra: slag === 'din' && p.andra, orig: inlamnat, tecken: { ...v.tecken }, origNot: { ...(v.not || {}) }, not: { ...(v.not || {}) },
       efter: { ...(v.efter || {}) }, fram,
-      // matcherna i kupongens ordning, till bladet med lagen (lagen)
+      // matcherna i kupongens ordning, till matchbladet (lagen)
       matcher: rd.ids.map((id) => rows.find((x) => x.id === id)).filter(Boolean).map((x) => x.m), kupong: nr ? `Kupong ${nr}` : 'Kupong' };
     k.msg = k.rad.querySelector('.msg');
     // gängets kupong: guldordet och, när den är sparad, Spela hos Svenska Spel
@@ -3148,14 +3148,8 @@ ${window.RumRegister ? RumRegister.nara() : ''}
     el.focus({ preventScroll: true });
     el.addEventListener('click', (e) => {
       if (k.closing) return;
-      // bladet med lagen: foten styr det, och lagen i en rad lägger det på kupongen
-      const lapp = e.target.closest('.rum-lagen');
-      if (lapp) {
-        const s = e.target.closest('button[data-steg]');
-        if (e.target.closest('[data-lagen-ut]')) lagenUt();
-        else if (s && !s.disabled) lagenSteg(Number(s.dataset.steg));
-        return;
-      }
+      // matchbladet sköter sig självt (rum-matchblad.js), och lagen i en rad lägger det på kupongen
+      if (e.target.closest('.rum-blad')) return;
       const t = e.target.closest('button[data-lagen]');
       if (t) {
         lagen(t.closest('.row').dataset.id);
@@ -3189,7 +3183,7 @@ ${window.RumRegister ? RumRegister.nara() : ''}
       }
       const b = e.target.closest('button');
       if (!b || b.disabled || k.closing) return;
-      // det man gör med kupongen syns på kupongen: bladet med lagen tas bort först
+      // det man gör med kupongen syns på kupongen: matchbladet tas bort först
       if (b.dataset.tillbaka == null) lagenUt(true);
       if (b.dataset.tillbaka != null) closeCoupon();
       else if (b.dataset.lamna != null) handIn();
@@ -3235,69 +3229,33 @@ ${window.RumRegister ? RumRegister.nara() : ''}
       `<a class="guld" data-spela href="${esc(g.spela)}" target="_blank" rel="noopener">Spela hos Svenska Spel</a>`
     : `<button type="button" class="guld${g.same ? ' sparad' : ''}" data-gang${g.same ? ' disabled' : ''}>${g.same ? `${CHECK}Sparad` : esc(g.label)}</button>`);
 
-  // ---------- lagen: bladet ovanpå kupongen i handen (rum-lagen.js) ----------
+  // ---------- lagen: matchbladet ovanpå kupongen i handen (rum-matchblad.js) ----------
   //
-  // Ett klick på lagen i en rad lägger ett blad med båda lagen på kupongen –
-  // chansen ur oddsen, ligan hittills och formen – på samma papper och i samma
-  // mått, så att det står där kupongen står. Det glider upp över kupongen och
-  // lägger sig lite snett; pilarna (‹ ›, ← →) byter match i kupongens ordning,
-  // och Kupongen, Esc eller ett klick utanför tar bort det igen.
-  function lagen(id, steg = 0) {
+  // Ett klick på lagen i en rad lägger matchbladet på kupongen, på samma papper
+  // och i samma mått, så att det står där kupongen står. Det glider upp över
+  // kupongen och lägger sig lite snett; flikarna är bladets sidor, pilarna
+  // (‹ ›, ← →) byter match i kupongens ordning, och Kupongen, Esc eller ett
+  // klick utanför tar bort det igen. Samma blad som Matchbladet hos Hasse Backe.
+  function lagen(id) {
     const k = R.kup;
-    if (!k || k.closing || !window.RumLagen) return;
-    const i = k.matcher.findIndex((m) => String(m.id) === String(id));
-    const m = k.matcher[i];
-    if (!m) return;
-    const comp = compOf(m.comp);
-    const ctx = { m, nr: i + 1, av: k.matcher.length, kupong: k.kupong, nar: `${fWeekdayTime.format(new Date(m.kickoff))}${comp ? ` · ${comp.short}` : ''}` };
-    const gammal = k.lapp;
-    const el = document.createElement('div');
-    el.className = 'rum-lagen';
-    el.tabIndex = -1;
-    el.setAttribute('role', 'dialog');
-    el.setAttribute('aria-label', `${m.home} – ${m.away}`);
-    el.dataset.id = String(m.id);
-    el.innerHTML = RumLagen.html(ctx);
-    k.el.appendChild(el);
-    k.lapp = el;
-    el.focus({ preventScroll: true });
-    RumLagen.load(String(m.id)).then((d) => {
-      if (k.lapp === el && R.kup === k) el.innerHTML = RumLagen.html(ctx, d);
-    });
-    const vila = getComputedStyle(el).transform;
-    if (gammal) {
-      // nästa blad läggs ovanpå det förra, från det håll man bläddrar
-      if (calm()) gammal.remove();
-      else {
-        el.animate([{ opacity: 0, transform: `translate(${steg * 46}px, 10px) rotate(${steg * 1.6}deg)` }, { opacity: 1, transform: vila }],
-          { duration: 300, easing: 'cubic-bezier(0.2, 0.7, 0.2, 1)' }).finished.then(() => gammal.remove(), () => gammal.remove());
-      }
-    } else if (!calm()) {
-      el.animate([{ opacity: 0, transform: 'translate(0, 64px) rotate(2.4deg)' }, { opacity: 1, offset: 0.45 }, { opacity: 1, transform: vila }],
-        { duration: 440, easing: 'cubic-bezier(0.2, 0.7, 0.2, 1)' });
-    }
+    if (!k || k.closing || !window.RumMatchblad) return;
+    if (k.lapp) return;
+    k.lapp = RumMatchblad.oppna({ host: k.el, matcher: k.matcher, id, kupong: k.kupong, tillbaka: 'Kupongen', ut: () => lagenUt(), calm });
   }
   function lagenUt(now = false) {
     const k = R.kup;
-    const el = k && k.lapp;
-    if (!el) return;
+    const b = k && k.lapp;
+    if (!b) return;
     k.lapp = null;
-    for (const x of k.el.querySelectorAll('.rum-lagen')) if (x !== el) x.remove();
-    const t = k.el.querySelector(`.row[data-id="${CSS.escape(el.dataset.id)}"] button[data-lagen]`);
+    const id = b.id;
+    b.ut(now);
+    const t = k.el.querySelector(`.row[data-id="${CSS.escape(id)}"] button[data-lagen]`);
     if (t && !now) t.focus({ preventScroll: true });
     else if (!now) k.el.focus({ preventScroll: true });
-    if (now || calm()) {
-      el.remove();
-      return;
-    }
-    el.animate([{ opacity: 1, transform: getComputedStyle(el).transform }, { opacity: 0, transform: 'translate(0, 48px) rotate(2deg)' }],
-      { duration: 240, easing: 'ease-in', fill: 'forwards' }).finished.then(() => el.remove(), () => el.remove());
   }
   function lagenSteg(n) {
     const k = R.kup;
-    if (!k || !k.lapp) return;
-    const i = k.matcher.findIndex((m) => String(m.id) === k.lapp.dataset.id) + n;
-    if (i >= 0 && i < k.matcher.length) lagen(k.matcher[i].id, n);
+    if (k && k.lapp) k.lapp.steg(n);
   }
 
   function closeCoupon(now = false) {
@@ -4028,7 +3986,7 @@ ${window.RumRegister ? RumRegister.nara() : ''}
   }
 
   // Ett klick på matchen – tiden eller det som står efter den, inte lagen
-  // (bladet med lagen, lagen) eller rutorna – och man skriver på raden, med markören sist: kommentaren i
+  // (matchbladet, lagen) eller rutorna – och man skriver på raden, med markören sist: kommentaren i
   // efterhand när matchen har startat, annars motiveringen när matchen är
   // tippad. Medan man skriver får texten raden (rum.css).
   function writeOn(t) {
@@ -4335,11 +4293,11 @@ ${window.RumRegister ? RumRegister.nara() : ''}
     el.addEventListener('click', (e) => {
       // kupongen i handen: ett klick utanför den lägger tillbaka den
       if (R.kup) {
-        // klickets väg, inte var målet sitter nu: ett blad med lagen som klicket
+        // klickets väg, inte var målet sitter nu: ett matchblad som klicket
         // tog bort (lagenUt, nästa blad) sitter inte längre i kupongen
         if (e.composedPath().some((n) => n instanceof Element && n.matches('#rum-handen, #rum-hand, .rum-hdr'))) return;
         e.preventDefault();
-        // med bladet med lagen ovanpå tar klicket bort bladet först
+        // med matchbladet ovanpå tar klicket bort bladet först
         if (R.kup.lapp) lagenUt();
         else closeCoupon();
         return;
@@ -4348,7 +4306,14 @@ ${window.RumRegister ? RumRegister.nara() : ''}
       if (R.ans && R.ans.on()) return;
       // kortregistret sköter sina kort själv (rum-register.js)
       if (R.reg && R.reg.on()) return;
-      // nära tv:n sköter den sina knappar och länkar själv (rum-tv.js)
+      // nära tv:n sköter den sina knappar och länkar själv (rum-tv.js), utom matchens rad på
+      // matchsidan: den lägger fram matchbladet (bladFram)
+      const tvMatch = R.zoom && e.target.closest('#rum-tv3 a[href^="#match/"]');
+      if (tvMatch && window.RumMatchblad) {
+        e.preventDefault();
+        bladFram(tvMatch.getAttribute('href').slice(7), 'Tv:n');
+        return;
+      }
       if (R.zoom && e.target.closest('#rum-tv3')) return;
       // nära videon sköter den kassetterna och knapparna själv (rum-video.js);
       // ett klick utanför hörnet går tillbaka
@@ -4386,6 +4351,17 @@ ${window.RumRegister ? RumRegister.nara() : ''}
       }
       const k = e.key.toLowerCase();
       const fore = R.sak;
+      // matchbladet för sig (bladFram): Esc lägger bort det, ← → byter match och ↑ ↓ sida
+      if (R.blad) {
+        const n = { arrowleft: -1, arrowright: 1, arrowup: -1, arrowdown: 1 }[k];
+        if (k === 'escape') R.blad.ut();
+        else if (n) {
+          e.preventDefault();
+          if (k === 'arrowleft' || k === 'arrowright') R.blad.steg(n);
+          else R.blad.flik(n);
+        }
+        return;
+      }
       // nära en sak: Esc går tillbaka, och K, T, A, R, V och H går dit direkt
       if (R.sak && !R.kup) {
         if (k === 'escape') {
@@ -4395,12 +4371,15 @@ ${window.RumRegister ? RumRegister.nara() : ''}
         if (/^[ktarvh]$/.test(k)) sak(null, null);
       }
       if (R.kup && R.kup.lapp) {
-        // bladet med lagen: Esc tar bort det, pilarna byter match
+        // matchbladet: Esc tar bort det, ← → byter match och ↑ ↓ sida
         if (k === 'escape') lagenUt();
         else if (k === 'k') closeCoupon();
         else if (k === 'arrowleft' || k === 'arrowright') {
           e.preventDefault();
           lagenSteg(k === 'arrowleft' ? -1 : 1);
+        } else if (k === 'arrowup' || k === 'arrowdown') {
+          e.preventDefault();
+          R.kup.lapp.flik(k === 'arrowup' ? -1 : 1);
         }
       } else if (R.kup) {
         if (k === 'k' || k === 'escape') closeCoupon();
@@ -4575,6 +4554,7 @@ ${window.RumRegister ? RumRegister.nara() : ''}
 
   function hide() {
     if (!R.on) return;
+    if (R.blad) R.blad.ut(true);
     closeCoupon(true);
     board(false);
     register(false);
@@ -4621,7 +4601,32 @@ ${window.RumRegister ? RumRegister.nara() : ''}
     ritaOm() { if (R.on) fill(); },
     penna: () => ({ x: PEN_PULT.x, y: PEN_PULT.y, a: PEN_PULT.a }),
   };
-  return { fits, show, hide, kupong, redraw: () => { if (R.on) fill(); }, skriv: skrivPult, kval: () => R.kval, vila: (v) => {
+  // Matchbladet för sig, mitt i rummet (RumMatchblad.fram): från matchens rad på tv:ns matchsida.
+  // Matcherna är kupongens, som när bladet läggs på kupongen i handen.
+  function bladFram(id, tillbaka) {
+    if (R.blad || !R.el) return;
+    const c = bladet();
+    let matcher = c ? c.matcher : [];
+    if (!matcher.some((m) => String(m.id) === String(id))) {
+      const m = state.all ? state.all.matches.find((x) => String(x.id) === String(id)) : null;
+      matcher = m ? [m] : [];
+    }
+    if (!matcher.length) return;
+    R.blad = RumMatchblad.fram({ inom: R.el, matcher, id: String(id), kupong: c ? c.kupong : 'Kupong', tillbaka, smal: () => Boolean(R.smal), calm,
+      nar: () => { R.blad = null; } });
+  }
+
+  // Matchbladet hos Hasse Backe (rum-hasse.js): omgångens matcher i kupongens ordning och kupongens
+  // namn, som när bladet läggs på kupongen i handen (lagen). (smal: kupongen är den smala.)
+  function bladet() {
+    const p = pult();
+    if (!p) return null;
+    const rd = { id: p.s.id, ids: p.s.matcher.map((x) => String(x.id)) };
+    const rows = roundRows(rd);
+    const nr = typeof couponNumber === 'function' ? couponNumber(rd.ids) : null;
+    return { matcher: rd.ids.map((id) => rows.find((x) => x.id === id)).filter(Boolean).map((x) => x.m), kupong: nr ? `Kupong ${nr}` : 'Kupong' };
+  }
+  return { fits, show, hide, kupong, bladet, smal: () => Boolean(R.smal), redraw: () => { if (R.on) fill(); }, skriv: skrivPult, kval: () => R.kval, vila: (v) => {
       R.vilar = Boolean(v);
       // (rummet kommer tillbaka rakt: rum-hasse.js rätar upp det på vägen dit)
       if (!v) { R.mx = R.my = 0; setCam(0, 0); }

@@ -794,7 +794,19 @@ bara lokalt. Analyserna visas som de ligger i `data/analyser.json`; hur de skriv
   gröna vinster och röda förluster, hemmamatcherna i en rad och bortamatcherna i en annan, med
   lagets och motståndarnas xG under ställningen. Bladet är byggt av det sajten redan visar, med
   samma tal under samma namn och samma grafik (konkordansen står under
-  [Kupongen i handen](#kupongen-i-handen), *Lagen*).
+  [Kupongen i handen](#kupongen-i-handen), *Matchbladet*). Samma dag blev bladet sidan *Lagen* i
+  matchbladet (nästa punkt).
+- **Ett matchblad i tobaksaffären (2026-11-07, användarens önskemål):** "Nu verkar det som att du har
+  ordnat så att det finns en massa olika matchanalys-lappar. Jag vill ha en som man kan kika i. Kan du
+  lägga ihop de som finns på ett snyggt sätt och ordna så att man får fram samma på Hasse
+  Backe-sidan och på den vanliga animationssidan." Om en match fanns två blad i rummet: bladet med
+  lagen på kupongen i handen och matchrutan från den vanliga sajten, som *Matchbladet* hos Hasse
+  Backe, *Matchbladet →* på bladet och matchens rad på tv:n öppnade ovanpå rummet. Nu är de ett blad
+  på kupongens papper med flikarna *Lagen* (det som stod på bladet med lagen), *Prognos*, *Analys*,
+  *Startelvor*, *Tabellen* och *Mötena*, och det är samma blad på kupongen i handen, hos Hasse och
+  från tv:n – där läggs det fram mitt i fönstret, lika stort som kupongen i handen. Inget i rummet
+  öppnar längre matchrutan, i linje med att inget leder ut ur tobaksaffären. Matchrutan på den
+  vanliga sajten är som förut. Se *Matchbladet* under [Kupongen i handen](#kupongen-i-handen).
 - **Kuponghistoriken flyttar till Olympen (2026-10-20, användarens önskemål):** Kupong
   handlar bara om nästa kupong – växlaren Omgången | Historik försvinner. De färdigspelade
   kupongerna står sist i Olympen under rubriken *Grupparbetena* (`#olympen/kuponger`, en
@@ -884,9 +896,9 @@ server:
   [public/utmarkelser.css](public/utmarkelser.css), se [Utmärkelserna](#utmärkelserna).
 - **Tobaksaffären:** förstasidan, [public/rum.js](public/rum.js) med
   [public/rum.css](public/rum.css) och gänget i three.js i [public/rum-3d.js](public/rum-3d.js)
-  (ansiktena i `public/rum/`), och bladet med lagen på kupongen i handen i
-  [public/rum-lagen.js](public/rum-lagen.js) med [public/rum-lagen.css](public/rum-lagen.css).
-  Se [Tobaksaffären](#tobaksaffären).
+  (ansiktena i `public/rum/`), och matchbladet – på kupongen i handen, hos Hasse Backe och från
+  tv:n – i [public/rum-matchblad.js](public/rum-matchblad.js) med
+  [public/rum-matchblad.css](public/rum-matchblad.css). Se [Tobaksaffären](#tobaksaffären).
 - **Frontend:** ren HTML/CSS/JS i `public/`, flikarna Matcher, Kupong och Olympen och
   sidorna Källor och Modell i sidfoten ([public/kallor.js](public/kallor.js),
   [public/modell.js](public/modell.js); `#utvardering` leder till *I skarpt läge* på
@@ -1245,7 +1257,8 @@ Verkliga lag och personer nämns bara när underlaget eller det Claude läste ta
 **Sajten.** Bygget kopierar filerna till `_site/data/`. Matchbladets flik Analysera finns för
 omgångens matcher och för matcher som har en analys; knappen visar den sparade texten direkt, eller
 en rad om att den inte är klar än ([public/app.js](public/app.js)). I tobaksaffären låtsas Hasse
-Backe analysera (se [Hasse Backe](#hasse-backe)). `data/analyser.json`:
+Backe analysera (se [Hasse Backe](#hasse-backe)), och samma text med tipset står på sidan *Analys* i
+matchbladet där (se *Matchbladet* under [Kupongen i handen](#kupongen-i-handen)). `data/analyser.json`:
 
 ```json
 { "uppdaterad": "…", "omgang": { "id": "2026-11-07-st4978", "matcher": ["401878757"] },
@@ -2146,7 +2159,8 @@ på text-tv:n med samma ämne tänds, som när man pekar på snabbvalet med tv:n
 uret, löpsedlarna i fönstret och namnet på dörren tittar man på nära (se
 [Närbilderna](#närbilderna)), och tv:n, videon, anslagstavlan, kortregistret och kupongen
 kommer fram var och en på sitt sätt. Föremålen är knappar utan adress (`KNAPP` i rum.js), och
-Enter och mellanslag klickar på dem. En match på text-tv:n öppnar matchrutan ovanpå rummet:
+Enter och mellanslag klickar på dem. En match på text-tv:n lägger fram matchbladet mitt i rummet
+(se *Matchbladet* under [Kupongen i handen](#kupongen-i-handen)):
 
 - **Omgångens orakel** (tavlan under stationsuret) → närbild: oraklet som regerar
   (`Kronan.holders`) som i Olympen och på förstasidans polaroid (`Kronan.scene`) – det
@@ -3452,7 +3466,7 @@ får plats slutar med … och syns hel när man pekar på den.
 
 **Hela matchen är en plats att skriva på** (2026-11-07, användarens önskemål): ett klick på
 tiden eller det som står efter den – allt utom lagen och rutorna – och man skriver på raden,
-med markören sist (ett klick på lagen lägger bladet med lagen på kupongen, se *Lagen* nedan): kommentaren i efterhand när matchen har startat, annars motiveringen
+med markören sist (ett klick på lagen lägger matchbladet på kupongen, se *Matchbladet* nedan): kommentaren i efterhand när matchen har startat, annars motiveringen
 (`writeOn` i rum.js). Medan man skriver får texten raden: tiden och motiveringen viker
 undan och lagen står med de korta namnen, så att det man skriver syns – förut kunde
 fältet bli några bildpunkter brett bredvid en lång motivering, och då syntes varken det man
@@ -3534,7 +3548,7 @@ tips gängets tecken just nu lämnar mest utanför, annars den första som har s
 gängets tecken i matchen byts förklaringen till den som nu blir utan. Pennan väntar till
 höger om rutorna vid den första omtvistade matchen som inte är klubbad. En match klubbas när
 gängets tecken i den ändras, eller med ett klick på raden – numret, tiden eller förklaringen,
-medan lagen lägger bladet med lagen på kupongen som förut – och pennan drar bocken; då får
+medan lagen lägger matchbladet på kupongen som förut – och pennan drar bocken; då får
 ringen en bock och pennan går vidare till nästa, och när alla är klubbade lägger den sig vid
 sidan. Klubbat sparas på enheten för omgången (`profeterna.rum.klubbat`), och *Börja om* tar
 bort bockarna. **Första gången** gängets kupong tas i handen på enheten under omgången
@@ -3561,41 +3575,75 @@ skjuts över disken: den sjunker mot disken, glider bort och ligger sedan på pu
 den är spelad. Svenska Spels omgång hämtas när den behövs (högst var femte minut), och när den
 har kommit får kupongen i handen knappen (händelsen `spela`).
 
-**Lagen.** På kupongen i handen är lagen i varje rad en knapp – på alla kuponger i handen, också
-de andras och gängets; tiden och det som står efter den är kvar att skriva på (se ovan). Ett klick lägger ett blad med båda lagen ovanpå kupongen, på samma papper och
-i samma mått, så att det står där kupongen står: det glider upp över den och lägger sig lite snett,
-med kupongen synlig i kanten (`lagen` i rum.js, [public/rum-lagen.js](public/rum-lagen.js) och
-[public/rum-lagen.css](public/rum-lagen.css)). Överst står bandet med kupongens namn och *Match 3*
-och lagen med sköldarna, dag, tid och tävling mellan dem. Sedan, uppifrån:
+**Matchbladet** (2026-11-07, användarens önskemål: "en massa olika matchanalys-lappar … Jag vill ha en
+som man kan kika i"). Allt om en match i rummet står på ett blad med flikar, och det är samma blad var man
+än tar fram det. På kupongen i handen är lagen i varje rad en knapp – på alla kuponger i handen, också de
+andras och gängets; tiden och det som står efter den är kvar att skriva på (se ovan). Ett klick lägger
+matchbladet ovanpå kupongen, på samma papper och i samma mått, så att det står där kupongen står: det
+glider upp över den och lägger sig lite snett, med kupongen synlig i kanten (`lagen` i rum.js,
+[public/rum-matchblad.js](public/rum-matchblad.js) och [public/rum-matchblad.css](public/rum-matchblad.css)).
+*Matchbladet* hos Hasse Backe och matchens rad på tv:ns matchsida lägger fram samma blad mitt i
+fönstret, lika stort som kupongen i handen, med det bakom mörkt (`RumMatchblad.fram`); där står
+*← Hasse* eller *← Tv:n* längst ner i stället för *← Kupongen*, och man är kvar där man var när bladet
+läggs bort. Förut fanns två olika blad: bladet med lagen på kupongen och matchrutan från den vanliga
+sajten, som *Matchbladet →* på bladet, *Matchbladet* hos Hasse och matchens rad på tv:n öppnade. Matchrutan
+öppnas inte längre från rummet (jfr *Inga länkar ut ur tobaksaffären* under [Beslut](#beslut)).
 
-- **Chansen ur oddsen** – 1, X och 2 i hela procent, en stapel delad efter chansen, och oddsen
-  under den. Chansen är spelbolagens odds med marginalen bortdragen i proportion.
-- **Ligan hittills** – *Mål* och *xG*, lagets först och motståndarnas sedan, hemmalaget till
-  vänster. xG är summerat över säsongen; har källan inte hunnit med den senaste omgången står
-  antalet matcher det gäller under (*10 matcher*). Spelar lagen i olika ligor står ligan överst.
-- **Form** – de tio senaste matcherna i alla tävlingar för vart lag, nyast till vänster, en kolumn
-  per match: hemmamatcherna i den övre raden och bortamatcherna i den undre, så att det syns direkt
-  om ett lag är starkt hemma. Rutan är grön vid vinst, röd vid förlust och grå vid oavgjort (efter
-  90 minuter), med ställningen i rutan, lagets först, och lagets och motståndarnas xG i mindre stil
-  under. Cupmatcher har inget xG. Datum, tävling, motståndare och xG står i rutans title.
+Överst står bandet med kupongens namn och *Match 3* och lagen med sköldarna, dag, tid och tävling
+mellan dem, och under dem flikarna – bladets sidor, i den ordning man behöver dem inför ett tecken.
+Alla flikar står alltid där, så att de står still när man bläddrar:
 
-I foten står *← Kupongen*, pilarna med *3 av 13* och *Matchbladet →*, som öppnar matchrutan ovanpå
-rummet. Pilarna och ← → byter match i kupongens ordning (nästa blad läggs ovanpå det förra från det
-hållet); *Kupongen*, Esc eller ett klick utanför tar bort bladet, och K lägger tillbaka kupongen.
-Det man gör med kupongen under den (*Spara*, *Lämna in* …) tar bort bladet först. Matchens fil
-hämtas när bladet läggs fram (*Hämtar …* för hand så länge) och sparas medan sidan är öppen. Dolda
-resultat står som ? i rutorna, och har ett lag en dold match står dess *Mål* och *xG* också som ?.
+- **Lagen** – det som stod på bladet med lagen (2026-11-07):
+  - *Chansen ur oddsen* – 1, X och 2 i hela procent, en stapel delad efter chansen, och oddsen
+    under den. Chansen är spelbolagens odds med marginalen bortdragen i proportion.
+  - *Ligan hittills* – *Mål* och *xG*, lagets först och motståndarnas sedan, hemmalaget till
+    vänster. xG är summerat över säsongen; har källan inte hunnit med den senaste omgången står
+    antalet matcher det gäller under (*10 matcher*). Spelar lagen i olika ligor står ligan överst.
+  - *Form* – de tio senaste matcherna i alla tävlingar för vart lag, nyast till vänster, en kolumn
+    per match: hemmamatcherna i den övre raden och bortamatcherna i den undre, så att det syns direkt
+    om ett lag är starkt hemma. Rutan är grön vid vinst, röd vid förlust och grå vid oavgjort (efter
+    90 minuter), med ställningen i rutan, lagets först, och lagets och motståndarnas xG i mindre stil
+    under. Cupmatcher har inget xG. Datum, tävling, motståndare och xG står i rutans title.
+- **Prognos** – sajtens prognos som i matchrutans flik Prognos: 1, X och 2 som odds i kupongens
+  rutor, *Förväntade mål*, de tre troligaste resultaten och *Vad drog åt vilket håll*. För en spelad
+  match prognosen före avspark.
+- **Analys** – den färdiga analysen med rubrik, ingress, stycken och källor, och tipset under med
+  tecknen inringade och raden i marginalen, som matchrutans flik Analysera. Källorna står som text
+  (källan och rubriken när man pekar på numret), utan länkar ut ur rummet. Finns ingen analys än står
+  samma rad som i matchrutan.
+- **Startelvor** – matchrutans startelvor ([public/matchruta.js](public/matchruta.js)): planen tryckt
+  på papperet, 365Scores eller den beräknade elvan, avbytarna och vilka som saknas, och domaren.
+  När resultatet är dolt står bara *Visa ändå*, eftersom elvorna visar målen.
+- **Tabellen** – ligatabellen runt lagen: två lag på var sida om vart och ett, och ligger de långt
+  ifrån varandra ett utdrag kring vart och ett, med ⋯ där tabellen fortsätter. Har divisionen dolda
+  resultat står *Visa ändå* i stället, som i matchrutan.
+- **Mötena** – samma möten som kortet i kortregistret: säsongens och tidigare säsongers, de elva
+  senaste, och hemmalagets V–O–F i dem med blyerts.
+
+En sida som inte ryms flyttas med hjulet eller fingret inom bladet (*Analys* och *Startelvor* i
+telefonen). Sidan man har framme följer med när man bläddrar mellan matcherna och nästa gång bladet tas
+fram under besöket. I foten står *← Kupongen* och pilarna med *3 av 13*. Pilarna, ← → och ett svep i
+sidled byter match i kupongens ordning (nästa blad läggs ovanpå det förra från det hållet), ↑ ↓ byter
+sida; *Kupongen*, Esc eller ett klick utanför tar bort bladet, och K lägger tillbaka kupongen. Det man
+gör med kupongen under den (*Spara*, *Lämna in* …) tar bort bladet först. Matchens fil hämtas när
+bladet läggs fram (*Hämtar …* för hand så länge) och sparas medan sidan är öppen. Dolda resultat står
+som ? i rutorna, och har ett lag en dold match står dess *Mål* och *xG* också som ?.
 
 Konkordansen – bladet visar inget nytt tal under ett gammalt namn, och inget gammalt tal på ett nytt
 sätt:
 
 | På bladet | Samma tal | Ur |
 |---|---|---|
-| Chansen ur oddsen och oddsen | Spelbolagens rad under prognosens rutor i matchbladet: snittet vid avspark, annars när oddsen öppnade, annars ESPN:s bolag (`bookOdds` i app.js). Procenten avrundas som överallt (`pct3`), stapeln är *Vad drog åt vilket håll* (`.tug-stack`) i matchbladets färger, hemmalaget blått och bortalaget terrakotta | `odds` i matchens fil |
+| Chansen ur oddsen och oddsen | Spelbolagens rad under prognosens rutor i matchrutan: snittet vid avspark, annars när oddsen öppnade, annars ESPN:s bolag (`bookOdds` i app.js). Procenten avrundas som överallt (`pct3`), stapeln är *Vad drog åt vilket håll* (`.tug-stack`) i matchrutans färger, hemmalaget blått och bortalaget terrakotta | `odds` i matchens fil |
 | Mål | *Mål* under *Ligan hittills* i *Lagen sida vid sida* och tabellen (ESPN, före avspark) | `teams.*.record.all` |
-| xG | Raden *xG* i *Lagen sida vid sida* gånger antalet matcher: Understat i Premier League, annars football-data.co.uk (`oneXg` i app.js). Kortregistret och Statistik visar football-data.co.uk, så i Premier League skiljer de sig från både matchbladet och bladet | `teams.*.xg` (`xgSource` i src/matches.js) |
-| Form | De fem första rutorna är matchbladets *Form*, i samma stämplade rutor och färger (grön vinst, grå oavgjort, röd förlust, avgjort efter 90 minuter) | `teams.*.senaste` |
+| xG | Raden *xG* i *Lagen sida vid sida* gånger antalet matcher: Understat i Premier League, annars football-data.co.uk (`oneXg` i app.js). Kortregistret och Statistik visar football-data.co.uk, så i Premier League skiljer de sig från både matchrutan och bladet | `teams.*.xg` (`xgSource` i src/matches.js) |
+| Form | De fem första rutorna är matchrutans *Form*, i samma stämplade rutor och färger (grön vinst, grå oavgjort, röd förlust, avgjort efter 90 minuter) | `teams.*.senaste` |
 | xG under rutan | Samma källa som *xG* ovan, så att ligamatchernas xG summerar till säsongens | `teams.*.senaste[].xg` |
+| Prognos | Matchrutans *Prognos*: oddsen ur hela procent (`pct3`, `pctOdds`), *Förväntade mål*, *Troligast* och *Vad drog åt vilket håll* räknade som i `forecastCard`, `journalCard` och `stepsCard` i app.js | `prediction`, `journal.counted` |
+| Analys och tipset | Matchrutans *Analysera* (`analysOf`, samma regel för när tipset visas som `analysisOn`) | `data/analyser.json` |
+| Startelvor | Matchrutans *Startelvor*, samma kod (`Matchruta.lineupPane` och `hydrate`) | 365Scores, `elva` i matchens fil |
+| Tabellen | Matchrutans *Tabellen* (`leagueTable`): samma kolumner och rader, men bara utdraget runt lagen | `data/teams/<division>.json` |
+| Mötena | Kortregistrets kort om mötet (`motet` i rum-register.js) | `meetings`, `pastMeetings` |
 
 Rummet läser om omgången från tjänsten varje minut (`Samtal.load`), så att högen, gängets
 kupong och de andras kuponger följer med när någon lämnar in. Med `prefers-reduced-motion`
@@ -3636,7 +3684,7 @@ föremålet (`data-to`). Filerna hämtas när sidan visas första gången.
   (grön med minuten medan matchen pågår, `paus` i halvtid, `?` när resultatet är dolt,
   `struken`) och matchens sida. Fler än 17 matcher ger undersidor.
 - **332–369, en sida per match**, ur matchens fil (`data/match/<id>.json`): lagen dubbelhöga
-  med ställningen (leder till matchbladet, `#match/<id>`), tävlingen och avsparken eller
+  med ställningen (lägger fram matchbladet, `bladFram` i rum.js), tävlingen och avsparken eller
   läget i bandet, oddsen och prognosen för 1, X och 2 – prognosen också som en stapel i
   mosaik, med 1 i grönt, X i gult och 2 i cyan som siffrorna ovanför – och lagen sida vid
   sida: placering och poäng, och hemmalagets hemmarad och bortalagets bortarad (V-O-F).
@@ -3865,11 +3913,11 @@ ett ställe (2026-11-02, användarens önskemål):
 | **Tv:n** | Matcherna och ligorna, nu | Stryktipset live (377), omgångens matcher (331), en sida per match med odds, prognos, tabelläget och hemma/borta (332–369), tabellerna (371–374) och skytteligorna (381–384) |
 | **Anslagstavlan** | Hela omgången jämförd: vem som sticker ut | Formen, skadorna, vilan, starkast och svagast, kryssar gärna, tur och otur, mot oddsen och motståndet |
 | **Kortregistret** | Ett lag i taget, och historiken | Ett lagkort per lag (mål och xG per match, hur ofta laget har varit favorit, skytten, nästa match) och mötena med resultaten |
-| **Kupongen i handen** | En match i taget, när man tippar | Bladet med lagen (se [Kupongen i handen](#kupongen-i-handen), *Lagen*): chansen ur oddsen, mål och xG i ligan hittills och de tio senaste matcherna hemma och borta |
+| **Matchbladet** | En match i taget, när man tippar – på kupongen i handen, hos Hasse Backe och från tv:n | Lagen (chansen ur oddsen, mål och xG i ligan hittills och de tio senaste matcherna hemma och borta), prognosen, analysen, startelvorna, tabellen och mötena (se *Matchbladet* under [Kupongen i handen](#kupongen-i-handen)) |
 
-Bladet med lagen är ett undantag med flit (2026-11-07, användarens önskemål): det samlar det man
-behöver inför ett tecken, så dess tal står också på andra ställen – men alltid samma tal under
-samma namn, ur samma källa (konkordansen under *Lagen*).
+Matchbladet är ett undantag med flit (2026-11-07, användarens önskemål): det samlar allt om en
+match på ett ställe, så dess tal står också på andra ställen – men alltid samma tal under samma
+namn, ur samma källa (konkordansen under *Matchbladet*).
 
 Ny statistik placeras efter samma roller: det som gäller en match eller en liga nu på tv:n,
 det som jämför lagen i omgången på tavlan och det som beskriver ett lag i kortregistret.
@@ -4443,7 +4491,10 @@ rakt in i kameran och syntes inte, så det sättet är borttaget.
 **Samtalet.** Det är han som frågar, *Vilken match ska jag hjälpa dig med?*, och när du kommer tillbaka *Har du kört fast igen, Laino?*, med ditt efternamn om kupongen
 vet vem du är. Han talar i hela meningar som går att förstå för sig: han säger vad det gäller (*Vilken match vill du ha hjälp med nu då?*, inte *Vilken match är det nu då?*), och "den" syftar bara på matchen du har valt. Över matchlistan finns alltid plats för två rader, så att listan står still vad han än säger. Man svarar genom att välja en match. Då frågar han tillbaka (*Den är solklar. Vill du
 veta, eller ska du gissa?*), och först *Jag är idel öra* ger analysen (knappen lottas som hans repliker: också *Tala om det för mig*), så att ett felklick inte visar ett tips. *Jag gissar* går tillbaka till listan och
-*Matchbladet* till matchen. Svaren står direkt under hans fråga, som lappar i tipskupongens tryck
+*Matchbladet* lägger fram matchbladet över baren – samma blad som när man klickar på lagen på kupongen i
+rummet (se *Matchbladet* under [Kupongen i handen](#kupongen-i-handen)), lika stort som kupongen i handen och
+med baren mörk bakom; *← Hasse* längst ner, Esc eller ett klick utanför lägger bort det, och man är kvar hos
+honom (`bladet` i [public/rum-hasse.js](public/rum-hasse.js)). Svaren står direkt under hans fråga, som lappar i tipskupongens tryck
 som ligger på disken: stort 1 X 2 överst (se *Din kupong*), *Jag är idel öra* i terrakotta som kupongens band, *Jag fyller i själv* i krämvitt papper
 bredvid (*Jag gissar* när kupongen inte går att fylla i), båda med en tunn ram innanför kanten, och *Matchbladet →* under dem med små spärrade
 versaler som texten i bandet. Frågan har sin plats från början, osynlig tills han säger den, så att

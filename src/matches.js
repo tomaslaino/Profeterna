@@ -18,7 +18,7 @@ const { keyOf, espnKey } = require('./teams');
 const { newsSv } = require('./skadetext');
 
 const FORM_N = 5;
-// Lagen på kupongen i rummet (rum-lagen.js): de tio senaste matcherna.
+// Matchbladet i rummet (sidan Lagen i rum-matchblad.js): de tio senaste matcherna.
 const SENASTE_N = 10;
 
 // ---------- inläsning (memoiserad på cachefilernas mtime) ----------

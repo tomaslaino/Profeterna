@@ -9,7 +9,9 @@
    Sajtens tokens (theme.css) skrivs om till tryck inuti rutan, så att korten,
    tabellerna, formen och flikarna följer med av sig själva. Här står papperet,
    rubriken, prognosen och det som har egna färger. Allt gäller bara i
-   dialog.mr-modal och laddas efter matchruta.css. */
+   dialog.mr-modal och laddas efter matchruta.css – utom planen med
+   startelvorna, som gäller också på matchbladet i tobaksaffären (.rum-blad,
+   rum-matchblad.css). */
 
 dialog.mr-modal {
   /* papperets tokens, desamma som .pp i papper.css */
@@ -568,7 +570,7 @@ dialog.mr-modal .ref-flag { margin-left: 3px; font-size: 12px; color: var(--pp-n
 
 /* ---------- startelvorna: planen tryckt på papperet ---------- */
 
-dialog.mr-modal .mr-pitch {
+:is(dialog.mr-modal, .rum-blad) .mr-pitch {
   background:
     repeating-linear-gradient(90deg, rgba(169, 69, 43, 0.075) 0 9.09%, rgba(169, 69, 43, 0.03) 9.09% 18.18%),
     var(--pp-box);
@@ -576,26 +578,26 @@ dialog.mr-modal .mr-pitch {
   border-radius: 3px;
   box-shadow: none;
 }
-dialog.mr-modal .mr-lines { stroke: rgba(169, 69, 43, 0.55); }
-dialog.mr-modal .mr-dot { border-color: var(--pp-box); box-shadow: 0 1px 3px rgba(42, 35, 29, 0.35); }
-dialog.mr-modal .mr-nm { color: var(--pp-ink); text-shadow: 0 0 3px var(--pp-box), 0 0 2px var(--pp-box), 0 0 1px var(--pp-box); }
-dialog.mr-modal .mr-dot .mr-rt { color: var(--pp-paper); background: var(--pp-ink); box-shadow: none; }
-dialog.mr-modal .mr-dot .mr-rt.top { color: #f0d699; box-shadow: 0 0 0 1px #d8b06a; }
-dialog.mr-modal .mr-names .mr-rt.top { color: var(--pp-print); }
+:is(dialog.mr-modal, .rum-blad) .mr-lines { stroke: rgba(169, 69, 43, 0.55); }
+:is(dialog.mr-modal, .rum-blad) .mr-dot { border-color: var(--pp-box); box-shadow: 0 1px 3px rgba(42, 35, 29, 0.35); }
+:is(dialog.mr-modal, .rum-blad) .mr-nm { color: var(--pp-ink); text-shadow: 0 0 3px var(--pp-box), 0 0 2px var(--pp-box), 0 0 1px var(--pp-box); }
+:is(dialog.mr-modal, .rum-blad) .mr-dot .mr-rt { color: var(--pp-paper); background: var(--pp-ink); box-shadow: none; }
+:is(dialog.mr-modal, .rum-blad) .mr-dot .mr-rt.top { color: #f0d699; box-shadow: 0 0 0 1px #d8b06a; }
+:is(dialog.mr-modal, .rum-blad) .mr-names .mr-rt.top { color: var(--pp-print); }
 /* stämpeln: trolig elva i pennans blå, bekräftad i grönt, ingen än i tryckets färg
    och vår egen beräknade i blyerts */
-dialog.mr-modal .mr-stamp.prob { --pp-stamp: var(--pp-pen); }
-dialog.mr-modal .mr-stamp.calc { --pp-stamp: var(--pp-pencil); }
-dialog.mr-modal .mr-stamp.ok { --pp-stamp: var(--pp-ok); }
-dialog.mr-modal .mr-stamp.none { --pp-stamp: var(--pp-print); }
-dialog.mr-modal .mr-pitch.empty .mr-pl { display: none; }
-dialog.mr-modal .mr-coach { margin: 0 0 4px; }
-dialog.mr-modal .mr-out .n { font-weight: 600; }
-dialog.mr-modal .mr-off { color: var(--pp-no); }
+:is(dialog.mr-modal, .rum-blad) .mr-stamp.prob { --pp-stamp: var(--pp-pen); }
+:is(dialog.mr-modal, .rum-blad) .mr-stamp.calc { --pp-stamp: var(--pp-pencil); }
+:is(dialog.mr-modal, .rum-blad) .mr-stamp.ok { --pp-stamp: var(--pp-ok); }
+:is(dialog.mr-modal, .rum-blad) .mr-stamp.none { --pp-stamp: var(--pp-print); }
+:is(dialog.mr-modal, .rum-blad) .mr-pitch.empty .mr-pl { display: none; }
+:is(dialog.mr-modal, .rum-blad) .mr-coach { margin: 0 0 4px; }
+:is(dialog.mr-modal, .rum-blad) .mr-out .n { font-weight: 600; }
+:is(dialog.mr-modal, .rum-blad) .mr-off { color: var(--pp-no); }
 /* målen i händelserna: ställningen i tryckets siffror på en tonad rad */
-dialog.mr-modal .mr-ev.goal { background: var(--pp-print-tint); }
-dialog.mr-modal .mr-ev.goal .mr-score { font-size: 18px; color: var(--pp-ink); }
-dialog.mr-modal .mr-on { color: var(--pp-ok); }
+:is(dialog.mr-modal, .rum-blad) .mr-ev.goal { background: var(--pp-print-tint); }
+:is(dialog.mr-modal, .rum-blad) .mr-ev.goal .mr-score { font-size: 18px; color: var(--pp-ink); }
+:is(dialog.mr-modal, .rum-blad) .mr-on { color: var(--pp-ok); }
 
 @media (max-width: 760px) {
   dialog.mr-modal .mr-pitch {

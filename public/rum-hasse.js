@@ -72,6 +72,13 @@ window.RumHasse = (() => {
     H.vy = vy;
     // det som händer i samtalet stannar där (knapparna byter ut sig själva)
     vy.querySelector('.rh-samtal').addEventListener('click', (e) => e.stopPropagation());
+    // Matchbladet: samma blad som på kupongen i rummet läggs fram över baren (bladet)
+    vy.querySelector('.rh-samtal').addEventListener('click', (e) => {
+      const a = e.target.closest('a.rh-vag[href^="#match/"]');
+      if (!a || !window.RumMatchblad) return;
+      e.preventDefault();
+      bladet(a.getAttribute('href').slice(7));
+    });
     // i hans vy är det han som gäller: inget når rummets svep och klick
     for (const n of ['pointerdown', 'pointerup', 'pointermove', 'mouseover', 'wheel', 'touchstart', 'touchmove']) vy.addEventListener(n, (e) => e.stopPropagation());
     vy.addEventListener('click', (e) => {
@@ -88,6 +95,17 @@ window.RumHasse = (() => {
       if (e.metaKey || e.ctrlKey || e.altKey) return;
       if (!H.on) return;
       e.stopPropagation();
+      // med matchbladet framme: Esc lägger bort det, ← → byter match och ↑ ↓ sida
+      if (H.blad) {
+        const n = { ArrowLeft: -1, ArrowRight: 1, ArrowUp: -1, ArrowDown: 1 }[e.key];
+        if (e.key === 'Escape') bladetUt();
+        else if (n) {
+          e.preventDefault();
+          if (/Left|Right/.test(e.key)) H.blad.steg(n);
+          else H.blad.flik(n);
+        }
+        return;
+      }
       if (e.key === 'Escape') stang();
     }, true);
     addEventListener('resize', () => {
@@ -451,6 +469,7 @@ window.RumHasse = (() => {
       if (!H.on) return;
       // någon har lämnat rummet (bakåt i webbläsaren, en länk): direkt hem
       if (H.rum.hidden) {
+        bladetUt(true);
         H.on = false;
         H.fraga = null;
         tystna();
@@ -489,6 +508,7 @@ window.RumHasse = (() => {
 
   async function stang() {
     if (!H.on || H.svanger) return;
+    bladetUt(true);
     H.on = false;
     H.fraga = null;
     tystna();
@@ -515,6 +535,32 @@ window.RumHasse = (() => {
     // figuren lämnas tillbaka efter en stund, så att den inte tar minne i onödan
     clearTimeout(H.ner);
     H.ner = setTimeout(() => { if (!H.on && H.fig) borta(); }, latt() ? 20000 : 90000);
+  }
+
+  // ---------- matchbladet ----------
+
+  // Matchbladet i samtalet lägger fram samma blad som ett klick på lagen på kupongen i rummet
+  // (RumMatchblad.fram i rum-matchblad.js): i kupongens mått, lika stort som kupongen i handen,
+  // över baren som mörknar bakom. Det läggs bort med Hasse längst ner, Esc eller ett klick utanför,
+  // och man är kvar hos honom.
+  function bladet(id) {
+    if (H.blad) return;
+    const c = window.Rum && Rum.bladet ? Rum.bladet() : null;
+    let matcher = c ? c.matcher : [];
+    if (!matcher.some((m) => String(m.id) === id)) {
+      const m = typeof state !== 'undefined' && state.all ? state.all.matches.find((x) => String(x.id) === id) : null;
+      matcher = m ? [m] : [];
+    }
+    if (!matcher.length) return;
+    H.blad = RumMatchblad.fram({ inom: H.vy, matcher, id, kupong: c ? c.kupong : 'Kupong', tillbaka: 'Hasse', smal: () => Boolean(window.Rum && Rum.smal && Rum.smal()), calm,
+      nar: (mid) => {
+        H.blad = null;
+        const a = H.vy.querySelector(`.rh-samtal a.rh-vag[href="#match/${mid}"]`);
+        if (a && H.on) a.focus({ preventScroll: true });
+      } });
+  }
+  function bladetUt(nu = false) {
+    if (H.blad) H.blad.ut(nu);
   }
 
   // ---------- samtalet ----------
