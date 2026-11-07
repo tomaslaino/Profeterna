@@ -1891,10 +1891,13 @@
     // open: någon match går att fylla i, same: gängets
     // kupong är sparad som den står, reset: tecknen är inte förslaget
     // (Börja om), label: guldordet, strid: de matcher som går att fylla i
-    // där vi inte har något tecken gemensamt (Alla olika, Två mot en) eller
-    // förslaget lämnar matchen tom, i kupongens ordning, avvik: {matchens id:
-    // de som avviker} i dem (tom när ingen ensam avviker), spela: länken till
-    // Svenska Spel när gängets kupong är sparad som den står (spela.js)}.
+    // där vi inte har något tecken gemensamt (Alla olika, Två mot en),
+    // förslaget lämnar matchen tom eller förslaget lämnar ett tecken som någon
+    // av oss har med utanför (Samma grund, olika säkerhet – till exempel en
+    // spik där två har helgarderat), i kupongens ordning, avvik: {matchens id:
+    // de som avviker} i dem (tom när ingen ensam avviker), gjord: gängets
+    // kupong finns, spela: länken till Svenska Spel när gängets kupong är
+    // sparad som den står (spela.js)}.
     gang() {
       const s = SM.data;
       if (!s || !(s.tips && Object.keys(s.tips).length >= (s.visas ? 1 : 2))) return null;
@@ -1905,7 +1908,9 @@
       const direct = Boolean(KP.data && KP.data.save);
       const same = Boolean(made && savedAsIs(made, rows, val));
       const open = rows.some((r) => r.open);
-      const strid = rows.filter((r) => r.open && r.n >= 2 && (r.kind <= 1 || !r.proposal));
+      // förslaget lämnar något som någon av oss har med utanför
+      const ute = (r) => Object.values(r.t).some((t) => [...t].some((sg) => !r.proposal.includes(sg)));
+      const strid = rows.filter((r) => r.open && r.n >= 2 && (r.kind <= 1 || !r.proposal || (r.kind === 2 && ute(r))));
       // den som avviker: inte med i något av de tecken som flest har med
       const avvik = (r) => {
         const most = Math.max(...r.cov.map((c) => c.length));
@@ -1915,6 +1920,7 @@
       return {
         strid: strid.map((r) => r.x.id),
         avvik: Object.fromEntries(strid.map((r) => [r.x.id, avvik(r)])),
+        gjord: Boolean(made),
         spela: same && direct && window.Spela ? Spela.href(made) : null,
         val: { ...val },
         who: Object.fromEntries(rows.map((r) => [r.x.id, r.cov])),

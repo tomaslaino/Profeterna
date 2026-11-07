@@ -1249,9 +1249,10 @@ ${window.RumRegister ? RumRegister.nara() : ''}
     const ink = v && v.vem ? Math.max(0, gang.findIndex((g) => g.id === v.vem)) : 0;
     const now = Date.now();
     const hans = v && (slag === 'fyll' || slag === 'din') && rd && rd.id ? hassesKryss(rd.id) : {};
-    // uppgörelsen: de omtvistade matcherna, och vilka av dem som är klubbade
+    // uppgörelsen: de omtvistade matcherna, och vilka av dem som är klubbade –
+    // alla, när gängets kupong redan är sparad och inget är klubbat på enheten
     const strid = new Set(slag === 'gang' && v.g ? v.g.strid : []);
-    const klar = strid.size && rd && rd.id ? klubbat(rd.id) : new Set();
+    const klar = strid.size && rd && rd.id ? klubbat(rd.id, v.g.gjord ? strid : null) : new Set();
     const list = order.map((x, i) => {
       const sign = signs[x.id];
       const comp = compOf(x.m.comp);
@@ -1375,16 +1376,18 @@ ${window.RumRegister ? RumRegister.nara() : ''}
     return `<svg viewBox="0 0 10 10" aria-hidden="true"><path d="${d}"/></svg>`;
   }
 
-  // Uppgörelsen: numren på de matcher där vi inte har något tecken gemensamt
-  // (v.g.strid) är inringade med kulspetspennan, och en match som har
-  // klubbats – gängets tecken ändrat, eller ett klick på matchen – har en bock
-  // vid ringen. Klubbat sparas på enheten, för omgången.
+  // Uppgörelsen: numren på de omtvistade matcherna (v.g.strid) är inringade
+  // med kulspetspennan, och en match som har klubbats – gängets tecken
+  // ändrat, eller ett klick på matchen – har en bock vid ringen. Klubbat
+  // sparas på enheten, för omgången; finns inget sparat för omgången är det
+  // annars (alla, när gängets kupong redan är sparad).
   const KLUBBAT = 'profeterna.rum.klubbat';
-  function klubbat(id) {
+  function klubbat(id, annars = null) {
     try {
       const j = JSON.parse(localStorage.getItem(KLUBBAT));
-      return new Set(j && j.id === id ? j.rows || [] : []);
-    } catch (e) { return new Set(); }
+      if (j && j.id === id) return new Set(j.rows || []);
+    } catch (e) { /* som när inget är sparat */ }
+    return new Set(annars || []);
   }
   function sparaKlubbat(id, rows) {
     try { localStorage.setItem(KLUBBAT, JSON.stringify({ id, rows: [...rows] })); } catch (e) { /* då är bara ringen kvar nästa gång */ }
@@ -3851,6 +3854,12 @@ ${window.RumRegister ? RumRegister.nara() : ''}
     }
     if (out.ok) {
       gangState('Sparad · syns för alla om några minuter.');
+      // kupongen är sparad: det som inte hann klubbas är klubbat, och pennan lägger sig
+      const open = [...k.el.querySelectorAll('.row.strid:not(.klubbad)')];
+      if (open.length) {
+        open.forEach((row) => klubba(row));
+        vanta(k);
+      }
       return;
     }
     const n = out.ask || 0;

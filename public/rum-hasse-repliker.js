@@ -50,8 +50,7 @@
   ledig: ['Jag sitter kvar här.', 'Välj vilken match du vill. Alla är lätta.', 'Spelstoppet är {dag}.'],
 
   // När man har valt en match: han svarar och frågar tillbaka. valLasa när analysen finns
-  // och han ska låtsas läsa på, och val när den inte finns. Han har alltid svaret, också när
-  // han inte har det: att han läser på märks först när han väntar (vantar).
+  // och val när den inte finns. Han har alltid svaret, också när han inte har det.
   val: ['Den är solklar.', 'Den kan jag i sömnen.', 'Glöm allt du har läst.'],
   valLasa: [
     'Den är solklar.',
@@ -69,8 +68,6 @@
   lar: ['Jag är idel öra', 'Tala om det för mig'],
   // Trycker man på Jag fyller i själv eller Jag gissar.
   gissar: ['Då får du skylla dig själv.', 'Gissa du, det har gått förr.'],
-  // Direkt när man har bett om analysen.
-  reaktion: ['Där frågade du rätt man.', 'Nu ska du få höra.'],
 
   // En match man redan har frågat om: det han sa står direkt, och han erbjuder sig att
   // titta på den igen, ödmjukt på sitt sätt (han tvivlar ju aldrig). erbjudNytt när
@@ -84,51 +81,6 @@
     'Tidningarna har skrivit mer om den sedan dess. Ska jag titta på den igen?',
     'Det har kommit nytt om den sedan jag sa det här. Vill du att jag tittar igen?',
   ],
-  // Direkt när man har bett honom titta igen.
-  tittaIgen: ['Då tar vi den från början.', 'Jag tar den en gång till.'],
-
-  // Medan han låtsas analysera: han börjar, håller på och är nästan klar, en rad lottad ur
-  // varje del (vantan i rum-hasse.js). Han hinner säga två eller tre rader, så det är
-  // lottningen som gör att det låter olika varje gång. Allt under kontroll.
-  vantar: {
-    forst: [
-      'Jag ska bara titta på en sak.',
-      'Ge mig bara en minut.',
-      'Vänta lite, var har jag glasögonen?',
-      'Jag läser på lite, för formens skull.',
-      'Svaret har jag redan, men jag dubbelkollar.',
-      'Jag ska bara slå upp tabellen.',
-      'Jag ska bara leta fram mina anteckningar.',
-    ],
-    sedan: [
-      'Jag läser tidningarna.',
-      'Tidningarna har fel, som vanligt.',
-      'Experterna i tidningarna förstår ingenting.',
-      'Du har väl inte bråttom?',
-      'Spelstoppet är {dag}.',
-      'Allt är orsak och verkan, alltså.',
-      'Den här sortens match har jag sett förut.',
-      'Den här matchen har fler bottnar än man tror.',
-      'Man ska inte stressa fram ett tips.',
-      'Tyst nu, jag räknar.',
-      'Magkänslan har aldrig svikit mig.',
-      'Jag har tippat i femtio år.',
-      'Jag går igenom skadelistan.',
-      'Det gäller att läsa mellan raderna.',
-    ],
-    sist: [
-      'Jag är strax klar.',
-      'Nu faller bitarna på plats.',
-      'Snart ska du få ditt svar.',
-      'Nu vet jag hur matchen slutar.',
-      'Jag har full kontroll.',
-      'Ta det bara lugnt.',
-      'Det är ingen fara.',
-    ],
-  },
-
-  // Trycker man på Ja, ja mitt i.
-  avbruten: ['Då får du läsa själv.', 'Som du vill.'],
 
   // Direkt efter domen, när han har helgarderat: han har ju alltid svar.
   helgardera: 'Då har jag rätt hur det än går.',
