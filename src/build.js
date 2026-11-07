@@ -65,6 +65,7 @@ const { buildHistory } = require('./history');
 const { buildTippare, fetchSamtal, roundNames, roundNotes } = require('./tippare');
 const { highlightsByMatch, youtubeByMatch } = require('./hojdpunkter');
 const rost = require('./rost');
+const { minifySite, packaBinart } = require('./minify');
 const { wholePercent } = require('./model');
 const rules = require('../config/forecast-rules');
 const kupongCfg = require('../config/kupong');
@@ -83,7 +84,9 @@ const UPDATE_EVERY_MINUTES = 30;
 // config/kupong.js, null = ingen (bara GitHub-länken), annars adressen.
 // samtal: omgången och den förra ur GET …/samtal (hämtas av build() med
 // --journal, src/tippare.js).
-function writeSite(outDir = OUT, { journal = false, couponEndpoint, samtal = null } = {}) {
+// minify: JavaScript och CSS i mindre form (src/minify.js), som på GitHub
+// Actions; lokalt står koden kvar som den är skriven.
+function writeSite(outDir = OUT, { journal = false, couponEndpoint, samtal = null, minify = false } = {}) {
   const tmp = `${outDir}.tmp`;
   fs.rmSync(tmp, { recursive: true, force: true });
   fs.cpSync(PUBLIC, tmp, { recursive: true });
@@ -302,10 +305,13 @@ function writeSite(outDir = OUT, { journal = false, couponEndpoint, samtal = nul
     }
   }
 
+  packaBinart(tmp);
+  const minified = minify ? minifySite(tmp) : null;
+
   // Byt hela katalogen på en gång, så att en halvfärdig sajt aldrig serveras.
   fs.rmSync(outDir, { recursive: true, force: true });
   fs.renameSync(tmp, outDir);
-  return { generatedAt, pages, failed, counts: sources.counts, forecastMs: forecast.ms, logged: logged.length, frozen: history.frozen.length, tippare, rosten };
+  return { generatedAt, minified, pages, failed, counts: sources.counts, forecastMs: forecast.ms, logged: logged.length, frozen: history.frozen.length, tippare, rosten };
 }
 
 function elva(id) {
@@ -356,7 +362,7 @@ function roundNumbers(key, v) {
   return typeof v === 'number' && !Number.isInteger(v) ? Math.round(v * 10000) / 10000 : v;
 }
 
-async function build({ force = false, fetch = true, journal = false, couponEndpoint } = {}) {
+async function build({ force = false, fetch = true, journal = false, couponEndpoint, minify = false } = {}) {
   const results = fetch ? await refreshAll({ force }) : [];
   // Hasse Backes röst: det ljud som saknas, innan sajten skrivs. Går det inte blir han
   // tystare, men bygget fortsätter.
@@ -364,7 +370,7 @@ async function build({ force = false, fetch = true, journal = false, couponEndpo
   // Gängets egna tips hämtas bara när de ska frysas in (src/tippare.js).
   const s = journal ? samtalInfo(couponEndpoint) : null;
   const samtal = s ? await fetchSamtal(s.endpoint) : null;
-  const site = writeSite(OUT, { journal, couponEndpoint, samtal });
+  const site = writeSite(OUT, { journal, couponEndpoint, samtal, minify });
   return { results, site, rost: rostNu };
 }
 
@@ -372,7 +378,8 @@ if (require.main === module) {
   const force = process.argv.includes('--force');
   const fetch = !process.argv.includes('--no-fetch');
   const journal = process.argv.includes('--journal');
-  build({ force, fetch, journal })
+  const minify = process.argv.includes('--minify');
+  build({ force, fetch, journal, minify })
     .then(({ results, site, rost: r }) => {
       for (const r of results) console.log(r.action.padEnd(8), r.id, r.error || '');
       const counts = Object.entries(site.counts).map(([k, v]) => `${v} ${k}`).join(', ');
@@ -380,6 +387,8 @@ if (require.main === module) {
       console.log(journal ? `Prognosjournalen: ${site.logged} nya rader.` : 'Prognosjournalen: bara läst (skrivs med --journal).');
       if (journal) console.log(`Kuponghistoriken: ${site.frozen} nya kuponger.`);
       if (journal) console.log(`Tipparna: ${site.tippare.added.length} nya omgångar, ${site.tippare.frozen.length} avslutade.`);
+      const m = site.minified;
+      if (m) console.log(`Koden i mindre form: ${m.filer} filer, ${Math.round(m.fore / 1024)} → ${Math.round(m.efter / 1024)} kB${m.fel.length ? `, ${m.fel.length} kvar som de var` : ''}.`);
       console.log(`Hasse Backes röst: ${site.rosten.filer} av ${site.rosten.av} meningar har ljud, ${site.rosten.egna} med egen röst${r ? `, ${r.gjorda} nya från Azure${r.saknas ? `, ${r.saknas} saknas` : ''}${r.fel ? ` (${r.fel})` : ''}` : ''}.`);
     })
     .catch((err) => {

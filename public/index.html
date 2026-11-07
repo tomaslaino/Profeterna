@@ -12,8 +12,7 @@
   <script>if (!location.hash && (/[?&]rum-t\b/.test(location.search) || matchMedia('(min-width: 280px) and (min-height: 260px)').matches)) document.documentElement.classList.add('rum-vantar');</script>
   <link rel="icon" type="image/svg+xml" href="logo.svg">
   <link rel="apple-touch-icon" href="apple-touch-icon.png">
-  <link rel="preconnect" href="https://fonts.googleapis.com">
-  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link rel="stylesheet" href="typsnitt.css">
   <link rel="stylesheet" href="style.css">
   <link rel="stylesheet" href="divisioner.css">
   <link rel="stylesheet" href="theme.css">
@@ -51,6 +50,12 @@
   <link rel="stylesheet" href="rum-folk.css">
   <!-- three.js till gänget i rummet (rum-3d.js), hämtas först när rummet visas -->
   <script type="importmap">{"imports":{"three":"https://cdn.jsdelivr.net/npm/three@0.160.0/build/three.module.min.js","three/addons/":"https://cdn.jsdelivr.net/npm/three@0.160.0/examples/jsm/"}}</script>
+  <!-- Står tobaksaffären (rum-vantar ovan) börjar rummets 3D-delar hämtas redan
+       här, samtidigt som sidans övriga filer – förut först när rum.js hade
+       kört (forhamta i rum.js), i telefonen nästan en sekund senare. Sidan
+       visas inte förrän gänget står där, så de ligger på vägen dit. Efter
+       importmapen, så att three hämtas därifrån. -->
+  <script>if (document.documentElement.classList.contains('rum-vantar')) (function () { var im = JSON.parse(document.querySelector('script[type="importmap"]').textContent).imports; ['rum-3d.js', 'rum-gpu.js', 'rum-fika.js', 'rum-fest.js', 'rum-tecken.js', 'rum-uttryck.js', 'rum-saker.js', 'rum-inredning.js', 'rum-affischer.js', 'rum-neon.js', 'rum-kortlada.js', im.three, im['three/addons/'] + 'environments/RoomEnvironment.js', im['three/addons/'] + 'geometries/RoundedBoxGeometry.js', im['three/addons/'] + 'utils/BufferGeometryUtils.js'].forEach(function (href) { var l = document.createElement('link'); l.rel = 'modulepreload'; l.href = href; document.head.appendChild(l); }); })();</script>
 </head>
 <body>
   <header class="topbar">
