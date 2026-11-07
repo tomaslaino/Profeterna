@@ -75,6 +75,8 @@
 .rh-dom { flex: none; margin: 0.06em 0 0.18em; font: 800 clamp(58px, 7vw, 104px)/1 Fraunces, Georgia, serif; color: #ffd86b; text-shadow: 0 3px 0 #6b4a10, 0 8px 18px rgba(0, 0, 0, 0.75); transform-origin: 12% 70%; animation: rh-dom 0.13s cubic-bezier(0.2, 0.7, 0.3, 1) both; }
 .rh-dom.lang { font-size: clamp(44px, 5vw, 76px); }
 @keyframes rh-dom { from { transform: scale(1.7) rotate(-3deg); opacity: 0; } to { transform: rotate(-1.5deg); opacity: 1; } }
+/* domens plats står klar från början, och den slås fram när handen träffar disken (svara i rum-hasse.js) */
+.rh-dom.vantar { visibility: hidden; animation: none; }
 .rh-text { flex: 1; min-height: 0; font-size: 1.12em; overflow-y: auto; overscroll-behavior: contain; touch-action: pan-y; padding-right: 0.5em; cursor: default; }
 .rh-text p { margin: 0 0 0.62em; }
 .rh-rep { color: rgba(246, 239, 220, 0.66); }
@@ -114,6 +116,9 @@
 .rh-vag { display: inline-flex; align-items: center; gap: 0.35em; min-height: 40px; margin: 0; padding: 0 2px; border: 0; background: none; color: rgba(246, 239, 220, 0.8); font: 700 0.8em/1 Fraunces, Georgia, serif; letter-spacing: 0.17em; text-transform: uppercase; text-decoration: none; text-shadow: inherit; white-space: nowrap; cursor: pointer; -webkit-tap-highlight-color: transparent; transition: color 0.12s; }
 .rh-vag::after { content: "→"; font-weight: 400; font-size: 1.3em; letter-spacing: 0; transition: transform 0.12s; }
 .rh-ja::after { content: "»"; }
+/* Läs upp: utan pil; medan han läser heter den Ja, ja, med pilen */
+.rh-las:not(.rh-ja)::after { content: none; }
+.rh-las[hidden] { display: none; }
 .rh-knapp:focus-visible, .rh-vag:focus-visible { outline: 2px solid #f0d699; outline-offset: 3px; }
 /* slaget i disken: bilden rycker till (koppen hoppar i rum-hasse-3d.js) */
 .rh-slag { animation: rh-slag 0.42s linear; }
