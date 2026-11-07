@@ -134,6 +134,17 @@
   // Dina inlämnade tips, var du än lämnade in: från tjänsten, annars som de
   // sparades här.
   const mineIn = (s, v) => (s.tips && s.tips[v]) || handedIn(s);
+  // Vem enheten är går att byta (till någon som inte har lämnat in) tills du
+  // har lämnat in – och när enheten står på någon som lämnade in någon
+  // annanstans: hens tips sparades inte här vid inlämningen. (Tjänstens tips
+  // räknas inte: dem får enheten så fort den står på någon som har lämnat in.)
+  const kanByta = (s) => !submitted(s, me()) || !handedIn(s);
+  // Enheten blir id. Stod den på någon som har lämnat in glöms allas tips,
+  // som bara hen fick se (load), tills tjänsten svarar igen.
+  const bytVem = (s, id) => {
+    if (s && submitted(s, me())) Object.assign(s, { tips: null, efter: null });
+    kpStore(VEM, id);
+  };
   // Dina inlämnade tips går att ändra tills matcherna startar, på vilken av
   // dina enheter som helst – på papperet, så länge det bara visar dina.
   const canEdit = (s) => {
@@ -1010,10 +1021,10 @@
     const cols = s.gang.map((g) => ({ g, ...column(s, g, v) }));
     // En plats i rutorna för var och en vars tips syns på papperet.
     const ids = cols.filter((c) => c.st !== 'hidden' && c.st !== 'blank').map((c) => c.g.id);
-    // Vem du är går att välja tills du har lämnat in – men inte byta till
-    // någon som redan har lämnat in, så att ingen ser allas tips av misstag.
-    // På en ny enhet väljer du fritt.
-    const choose = (g) => !submitted(s, v) && (!v || !g.inne);
+    // Vem du är går att välja tills du har lämnat in (kanByta) – men inte
+    // byta till någon som redan har lämnat in, så att ingen ser allas tips
+    // av misstag. På en ny enhet väljer du fritt.
+    const choose = (g) => kanByta(s) && (!v || !g.inne);
     let html = '<div class="sm-r sm-hd"><span class="sm-hd-nr" aria-hidden="true">Nr</span>' +
       `<span class="sm-m">${v ? '<span class="sm-hd-l" aria-hidden="true">Match</span>' : '<span class="sm-q">Vem är du?</span>'}` +
       '<span class="sm-folk-pp">' + cols.map(({ g }) =>
@@ -1176,7 +1187,7 @@
       const who = e.target.closest('button[data-vem]');
       if (who) {
         if (who.dataset.vem === me()) return;
-        kpStore(VEM, who.dataset.vem);
+        bytVem(SM.data, who.dataset.vem);
         // Har hen lämnat in syns allas tips direkt.
         if (submitted(SM.data, who.dataset.vem)) show(KP.view.sub);
         else renderRound();
@@ -1753,7 +1764,7 @@
         s, vem: v, inne, open, fyll: open && !inne, andra, hand,
         tecken: { ...((mine && mine.tecken) || {}) }, kommentarer: { ...((mine && mine.kommentarer) || {}) },
         val: inne ? [] : s.gang.filter((g) => !g.inne).map((g) => g.id),
-        byt: open && !(inne && mine) ? s.gang.filter((g) => !g.inne).map((g) => g.id) : [],
+        byt: open && kanByta(s) ? s.gang.filter((g) => !g.inne).map((g) => g.id) : [],
         sparad: Boolean(d && mine.sparad && mine.sparad === sig(s, d)),
         tom: !d || (!mine.sparad && !sig(s, d).replace(/[:|]/g, '')),
         se, skriv: writer(s), gang,
@@ -1766,12 +1777,12 @@
     },
     // Du kryssar för vem du är; kryssen och motiveringarna på kupongen följer med.
     // Går också när enheten står på någon som har lämnat in någon annanstans
-    // (inget av hens tips finns här): man hade klickat på hen i tobaksaffären.
+    // (kanByta): man hade klickat på hen i tobaksaffären.
     vem(id) {
       const s = SM.data;
-      if (!s || (submitted(s, me()) && mineIn(s, me())) || !s.gang.some((g) => g.id === id && !g.inne)) return false;
+      if (!s || !kanByta(s) || !s.gang.some((g) => g.id === id && !g.inne)) return false;
       const d = draftOf(s, me());
-      kpStore(VEM, id);
+      bytVem(s, id);
       if (d) kpStore(TIPS, { id: s.id, vem: id, tecken: d.tecken, kommentarer: d.kommentarer || {} });
       return true;
     },
