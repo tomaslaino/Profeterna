@@ -5,9 +5,11 @@
 // annan röst. Först tas artikeln och tipset fram som vanligt (config/analyser.js).
 // Sedan säger Claude det viktigaste ur dem med personan i prompts/hasse-backe.md,
 // utan verktyg och lika kort som tipsets analys, och koden kontrollerar att
-// inget har hittats på (src/analyser/hasse.mjs). Tipset, de inringade tecknen, kommer
-// alltid ur tipset och skrivs aldrig om. Macen skriver texten i förväg med Claude
-// Code (scripts/analyser/skriv.mjs), och på sajten låtsas han analysera.
+// inget har hittats på (src/analyser/hasse.mjs). Tecknen och resultatet bestämmer han
+// själv (användarens önskan 2026-11-07: vassare, och emot oddsen när han har skäl):
+// han får analysen, spelbolagens odds, sajtens prognos och kollegans tecken. Macen
+// skriver texten i förväg med Claude Code (scripts/analyser/skriv.mjs), och på sajten
+// låtsas han analysera.
 // ============================================================================
 
 module.exports = {
@@ -15,7 +17,7 @@ module.exports = {
   effort: 'medium',
   timeoutMs: 180000,
   // Ändras personan eller frasbanken byts versionen, så att texterna skrivs om.
-  promptVersion: '2026-11-05.1',
+  promptVersion: '2026-11-07.1',
 
   // Högst så många ord i texten: prompten säger 120 (som tipsets analys), och
   // koden släpper igenom lite mer.
@@ -122,11 +124,13 @@ Svara bara med JSON: {"fel": [{"mening": "…", "varfor": "…", "forslag": "…
   },
 
   // Står efter personan: svarets form.
-  format: `Du får analysen som JSON och vilka tecken som ringas in. Tecknen skrivs stort ovanför din text.
+  format: `Du får analysen som JSON, vad spelbolagen och sajtens prognos säger och vilka tecken kollegan ringade in. Dina tecken skrivs stort ovanför din text, och resultatet säger du sist för sig.
 
-Svara bara med JSON: {"stycken": ["…", "…"]}
+Svara bara med JSON: {"stycken": ["…", "…"], "tecken": "…", "resultat": "…"}
 
-Högst 120 ord i två eller tre korta stycken. Samma tecken av samma skäl som i analysen, utan hänvisningar i hakparentes. Det sista stycket slutar med tecknen.
+stycken: högst 120 ord i två eller tre korta stycken, utan hänvisningar i hakparentes. Det sista stycket slutar med dina tecken i ord. Resultatet står inte i texten.
+tecken: det du ringar in – "1", "X", "2", två av dem eller "1X2".
+resultat: hur matchen slutar, hemmalagets mål först, som "3–1": högst 4 mål per lag och ett utfall du har ringat in.
 
-Analysen är skriven av en kollega med egna uttryck och historier ur sitt liv. Ta bara sakuppgifterna om matchen och aldrig hans uttryck, historier, klubbar eller namn.`,
+Analysen är skriven av en kollega med egna uttryck och historier ur sitt liv. Ta bara sakuppgifterna om matchen och aldrig hans uttryck, historier, klubbar eller namn. Nämn aldrig kollegan eller hans tips: det du säger är din egen bedömning. Säg inte heller vilken dag matchen spelas, för texten står kvar fram till avspark.`,
 };

@@ -522,8 +522,9 @@ window.RumHasse = (() => {
   // frågat om. Det han säger runt omkring står i rum-hasse-repliker.js.
   //
   // Allt är skrivet i förväg (scripts/analyser/skriv.mjs, data/analyser.json): artikeln,
-  // tipset och hans röst. Han låtsas analysera (svara). Tecknen kommer ur tipset. Saknas
-  // hans röst står analysen i skrift.
+  // tipset och hans röst. Han låtsas analysera (svara). Tecknen och resultatet har han
+  // bestämt själv när han skrev (hasse.tecken, hasse.resultat); saknas hans röst står
+  // analysen i skrift med tipsets tecken.
   const TECKEN = ['Etta', 'Kryss', 'Tvåa'];
   const KORT = ['1', 'X', '2'];
   function domen(signs) {
@@ -570,9 +571,14 @@ window.RumHasse = (() => {
     }
     return prognoser.get(id);
   }
-  // Resultatet han säger: det troligaste i modellens resultatmatris (0–4 mål per lag) bland
-  // utfallen han har ringat in, så att det aldrig går emot tecknen. Hemma–borta, eller null.
-  function resultatet(p, signs) {
+  // Hans tecken: de han valde när han skrev sin text, annars tipsets (äldre texter).
+  const hans = (a) => a.hasse && a.hasse.stycken && Array.isArray(a.hasse.tecken) && a.hasse.tecken.length;
+  const hansTecken = (a) => (hans(a) ? a.hasse.tecken : a.tip.signs);
+  // Resultatet han säger: hans eget, annars (äldre texter, eller analysen i skrift) det
+  // troligaste i modellens resultatmatris (0–4 mål per lag) bland utfallen han har ringat
+  // in, så att det aldrig går emot tecknen. Hemma–borta, eller null.
+  function resultatet(p, signs, a) {
+    if (hans(a) && /^[0-4]–[0-4]$/.test(a.hasse.resultat || '')) return a.hasse.resultat;
     const g = p && p.scores && p.scores.grid;
     if (!Array.isArray(g)) return null;
     let bast = null;
@@ -1323,7 +1329,7 @@ window.RumHasse = (() => {
     const egen = a.hasse && a.hasse.stycken;
     const ut = egen ? somRepliker(egen)
       : [a.lead, ...a.paragraphs, a.tip.text].filter(Boolean).map((text) => ({ text: text.replace(/\s*\[\d+(?:\s*[,;]\s*\d+)*\]/g, ''), skrift: true }));
-    if (a.tip.signs.length === 3 && egen) ut.unshift({ text: REP().helgardera });
+    if (hansTecken(a).length === 3 && egen) ut.unshift({ text: REP().helgardera });
     if (res) ut.push({ text: fyll(lott(REP().resultat), { res }) });
     return ut;
   }
@@ -1365,9 +1371,9 @@ window.RumHasse = (() => {
     const t = Date.now() - t0;
     if (t < 900) await new Promise((ok) => setTimeout(ok, 900 - t));
     if (H.fraga !== vem) return;
-    const signs = a.tip.signs;
+    const signs = hansTecken(a);
     // sist resultatet, och efter det vad han tycker om din kupong (det sparas inte: kupongen ändras)
-    const res = resultatet(await prog, signs);
+    const res = resultatet(await prog, signs, a);
     if (H.fraga !== vem) return;
     const texten = hansText(a, res);
     const sagt = { at: skriven(a), st: stycken(texten) };
@@ -1400,7 +1406,7 @@ window.RumHasse = (() => {
     if (H.fraga !== vem) return;
     const nu = a && a.tip ? a : null;
     // (sparat innan han sparade sin text: dagens analys, om den har samma tecken)
-    if (!sagt && nu && nu.tip.signs.length === signs.length && nu.tip.signs.every((n) => signs.includes(n))) {
+    if (!sagt && nu && hansTecken(nu).length === signs.length && hansTecken(nu).every((n) => signs.includes(n))) {
       sagt = { at: skriven(nu), st: stycken(hansText(nu, res)) };
       minnas(lista, m.id, signs, res, sagt);
     }

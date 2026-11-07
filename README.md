@@ -652,7 +652,14 @@ bara lokalt. Analyserna visas som de ligger i `data/analyser.json`; hur de skriv
 - **Hasse Backe säger resultatet (2026-11-04, användarens önskemål):** efter sin text säger han
   vad matchen slutar, det troligaste resultatet i modellens prognos bland tecknen han har ringat
   in, och resultatet står bredvid tecknen på matchens rad. Se [Hasse Backe](#hasse-backe),
-  *Samtalet*.
+  *Samtalet*. Sedan 2026-11-07 bestämmer han tecknen och resultatet själv (nästa punkt).
+- **Hasse Backe vassare, och emot oddsen när han har skäl (2026-11-07, användarens önskemål):**
+  "han ska uttrycka sig vassare – alltså inte språkligt precist utan resultatmässigt och hitta
+  argument för det", och han får gå emot oddsen "om han finner argument för det", men "efter en
+  egen bra bedömning" och inte alltid. Förut upprepade han tipsets tecken och sa det troligaste
+  resultatet i modellen, nästan alltid 1–0, 1–1 eller 2–1. Nu väljer han tecken och resultat när
+  hans text skrivs, med spelbolagens odds, sajtens prognos och kollegans tecken framför sig. Se
+  [Hasse Backe](#hasse-backe), *Rösten*.
 - **Hasse Backe med Tomas röst, och tyst tills man slår på ljudet (2026-11-04, användarens
   beslut):** Hasse Backe talar med Tomas egen röst, klonad med Chatterbox Multilingual på
   iMacen, i stället för Azures Mattias. Ett launchd-jobb läser upp allt han säger, ett
@@ -4451,11 +4458,11 @@ mellan meningarna och en längre före en kort mening, och gesterna kommer vid d
 (*Nej nej nej* och *varningens finger* ger fingret, annars handflatan i disken eller en av gesterna i
 *Händerna när han pratar*) eller vid ungefär var tredje lång mening. Ett klick i samtalet
 visar hela repliken och nästa klick går vidare; *Ja, ja* tar resten på en gång, och det svarar han
-på (*Som du vill.*). Efter texten säger han vad matchen slutar (*Det slutar 1–1.*): det troligaste
-resultatet i modellens prognos (resultatmatrisen i `data/match/<id>.json`, samma som matchbladet
-visar) bland utfallen han har ringat in, så att resultatet aldrig går emot tecknen. Har modellen
-ingen prognos för matchen säger han inget resultat (`resultatet` i
-[public/rum-hasse.js](public/rum-hasse.js)). Sist säger han vad han tycker om det du själv har på
+på (*Som du vill.*). Efter texten säger han vad matchen slutar (*Det slutar 3–1.*): resultatet han
+valde när texten skrevs (`hasse.resultat`, se *Rösten*). Texter från före 2026-11-07, och analysen
+i skrift när hans text saknas, tar i stället det troligaste resultatet i modellens prognos
+(resultatmatrisen i `data/match/<id>.json`) bland utfallen han har ringat in, och har modellen
+ingen prognos säger han inget resultat (`resultatet` i [public/rum-hasse.js](public/rum-hasse.js)). Sist säger han vad han tycker om det du själv har på
 kupongen (*På din kupong har du bara etta. Det var kaxigt.*); har du inget på matchen säger han inget om den. Han minns på enheten vad du har
 frågat om: på matchens rad står hans tecken ifyllda i guld i rutorna 1 X 2, som på kupongen, med
 resultatet bredvid i en rak spalt. *Alla matcher* tar en tillbaka till listan, och där räknar han
@@ -4552,11 +4559,25 @@ som tipsets analys. Personan står i [prompts/hasse-backe.md](prompts/hasse-back
 frasbanken i [config/hasse.js](config/hasse.js): två uttryck lottas per match, så att analyserna
 inte låter likadant, ibland en krydda (färdiga rader, så att ingen historia hittas på om en
 riktig person), och han tar dem där de passar. Bielsa-orden lottas bara när analysen visar att
-ett lag pressar högt eller har ett rörligt anfallsspel. Tecknen som står stort kommer direkt ur tipset och skrivs aldrig om. Ändras
+ett lag pressar högt eller har ett rörligt anfallsspel. Ändras
 personan eller frasbanken byts `promptVersion`, så att texterna skrivs om.
 
-**Kontrollerna** (`granska`): inga tal, citat eller namn utanför analysen, högst 135 ord, inga
-källor ("enligt …"), de inringade tecknen i sista stycket och inget ur den påhittade tränarens värld.
+**Tecknen och resultatet bestämmer han själv** (2026-11-07). Han får spelbolagens odds, sajtens
+prognos och kollegans tecken (`oddsen` i [src/analyser/hasse.mjs](src/analyser/hasse.mjs)) och
+svarar med `tecken` och `resultat` bredvid styckena. Personan säger åt honom att inte gardera för
+säkerhets skull, att säga det resultat han tror på (3–0, 2–2) i stället för det försiktigaste, och
+att gå emot oddsen och tipset när analysen ger honom ett skäl, men aldrig hitta på ett skäl för
+att vara annorlunda. Kollegan nämner han inte, och inte heller vilken dag matchen spelas. Det som
+står stort, i rutorna och på matchens rad är hans tecken (`hasse.tecken`); tipset under artikeln i
+Inför är kollegans och ändras inte. Äldre texter utan egna tecken visar tipsets. Provet på
+omgången 2026-11-07: 13 ensamma tecken, emot spelbolagens favorit i fyra matcher (Burnley borta
+mot Cardiff som saknar fyra mittbackar, kryss mot West Ham, Middlesbrough och West Brom), och
+resultat som 3–0 och 2–2.
+
+**Kontrollerna** (`granska`): inga tal, citat eller namn utanför analysen och oddsen, högst 135
+ord, inga källor ("enligt …"), ingen kollega och inget "i morgon", tecknen som "1", "X", "2" och i
+ord i sista stycket, resultatet med högst 4 mål per lag (rösten har ljud för 0–0 till 4–4) och inom
+tecknen men inte i texten, och inget ur den påhittade tränarens värld.
 Klarar svaret inte det får Claude skriva om en gång, och annars visas analysen som den är. Koden ser
 inte om en mening ändrar betydelse utan att ett tal ändras. Texten ligger i analysens post i
 `data/analyser.json`.

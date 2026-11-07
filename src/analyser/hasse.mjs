@@ -1,31 +1,73 @@
 // Hasse Backe (fiktiv) i tobaksaffären: det viktigaste ur analysen (artikeln och
 // tipset) med hans röst, lika kort som tipsets analys. Macen skriver texten i förväg
-// (scripts/analyser/skriv.mjs): Claude får den färdiga analysen, personan i
-// prompts/hasse-backe.md och två lottade uttryck ur frasbanken (config/hasse.js) och
-// skriver utan verktyg. Tecknen kommer alltid ur tipset och skrivs aldrig om. På
-// sajten låtsas han analysera (public/rum-hasse.js).
+// (scripts/analyser/skriv.mjs): Claude får den färdiga analysen, spelbolagens odds,
+// sajtens prognos och kollegans tecken (oddsen), personan i prompts/hasse-backe.md och
+// två lottade uttryck ur frasbanken (config/hasse.js) och skriver utan verktyg. Tecknen
+// och resultatet bestämmer han själv, och han får gå emot både oddsen och kollegan när
+// han har skäl. På sajten låtsas han analysera (public/rum-hasse.js).
 //
-// Kontrollerna (granska): inga tal, citat eller namn utanför analysen, högst
-// maxOrd ord, inga källor ("enligt …"), de inringade tecknen i sista stycket,
-// Bielsa-orden bara om de lottats och inget ur den påhittade kollegans värld. Klarar
-// svaret inte det får Claude skriva om en gång, och annars blir det ingen text.
+// Kontrollerna (granska): inga tal, citat eller namn utanför analysen och oddsen, högst
+// maxOrd ord, inga källor ("enligt …"), ingen kollega och inget "i morgon", tecknen som
+// "1", "X", "2" och i ord i sista stycket, resultatet 0–4 mål per lag inom tecknen och
+// inte i texten, Bielsa-orden bara om de lottats och inget ur den påhittade kollegans värld. Klarar svaret inte det får
+// Claude skriva om en gång, och annars blir det ingen text.
 //
 // Språket (sprakfel): en läsare utan personan pekar ut det som inte är svenska, och då
 // får han skriva om. Språket fäller aldrig en text: blir omskrivningen sämre är det
 // den förra som gäller.
 //
-// Texten sparas i analysens post i data/analyser.json: hasse: {stycken, tips
-// (tipsets writtenAt), uppdrag, model, version, writtenAt, attempts}.
+// Texten sparas i analysens post i data/analyser.json: hasse: {stycken, tecken
+// ([0 = 1, 1 = X, 2 = 2]), resultat ("3–1", hemma–borta), tips (tipsets writtenAt),
+// uppdrag, model, version, writtenAt, attempts}.
 
 import hc from '../../config/hasse.js';
 import ac from '../../config/analyser.js';
 import { claudeSvar, Stopp } from './claude.mjs';
+import { pct3, pctOdds } from './underlag.mjs';
 
 const REF_RE = /\s*\[\d+(?:\s*[,;]\s*\d+)*\]/g;
 
 // Tecknen i tipset (0 = 1, 1 = X, 2 = 2) som kupongen skriver dem och i ord.
 const ORD = ['ettan', 'krysset', 'tvåan'];
+const KORT = ['1', 'X', '2'];
 const TECKEN_RE = [/\b(ettan?|hemmaseger\w*|hemmavinst\w*)\b/i, /\b(kryss\w*|oavgjort)\b/i, /\b(tvåan?|bortaseger\w*|bortavinst\w*)\b/i];
+
+// "1", "X2", "1X2" … → [0], [1, 2], [0, 1, 2], eller null.
+export function teckenAv(t) {
+  if (typeof t !== 'string') return null;
+  const s = t.toUpperCase().replace(/\s+/g, '');
+  if (!/^[1X2]{1,3}$/.test(s) || new Set(s).size !== s.length) return null;
+  return [0, 1, 2].filter((n) => s.includes(KORT[n]));
+}
+// "3–1" → {h: 3, b: 1, utfall: 0}, eller null.
+export function resultatAv(r) {
+  const m = typeof r === 'string' && r.match(/^\s*(\d+)\s*[–—-]\s*(\d+)\s*$/);
+  if (!m) return null;
+  const h = Number(m[1]);
+  const b = Number(m[2]);
+  return { h, b, utfall: h > b ? 0 : h === b ? 1 : 2 };
+}
+
+// ---------- oddsen: vad alla andra tror ----------
+
+const odds2 = (x) => x.toFixed(2).replace('.', ',');
+// Spelbolagens odds (snittet, annars DraftKings), sajtens prognos och kollegans tecken, som
+// rader till Claude. d: matchens fil på sajten (data/match/<id>.json), eller null.
+export function oddsen(d, article) {
+  const ut = [];
+  try {
+    const m = d && d.match;
+    const p = d && d.prediction;
+    const trio = (v) => `${m.home} ${v[0]} · oavgjort ${v[1]} · ${m.away} ${v[2]}`;
+    const mk = p && p.baselines && p.baselines.market;
+    const bolag = mk && Array.isArray(mk.odds) ? mk.odds : d && d.odds && d.odds.espn && d.odds.espn.x12;
+    if (m && Array.isArray(bolag) && bolag.length === 3) ut.push(`Spelbolagen: ${trio(bolag.map(odds2))}. Lägre odds, större chans.`);
+    if (m && p && Array.isArray(p.p)) ut.push(`Sajtens prognos, odds utan spelbolagens marginal: ${trio(pct3(p.p).map(pctOdds))}.`);
+  } catch { /* utan odds */ }
+  const signs = (article.tip && article.tip.signs) || [];
+  if (signs.length) ut.push(`Kollegan ringade in ${signs.map((n) => ORD[n]).join(' och ')}. Du bestämmer själv.`);
+  return ut;
+}
 
 // ---------- uppdraget: fraserna som lottas ----------
 
@@ -89,25 +131,38 @@ function namnI(t) {
   return ut;
 }
 
+// svar: {stycken, tecken, resultat} som Claude skrev dem; odds: raderna ur oddsen().
 // → en lista med vad som är fel (tom = godkänd).
-export function granska(stycken, article, u) {
+export function granska(svar, article, u, odds = []) {
   const fel = [];
+  const { stycken } = svar || {};
   if (!Array.isArray(stycken) || !stycken.length || stycken.some((s) => typeof s !== 'string' || !s.trim())) return ['svaret saknar stycken'];
   const text = stycken.join('\n');
   const k = kallan(article);
   const kalla = texten(k);
   const ute = talI(text);
-  const tillat = talI(kalla);
+  const tillat = talI(`${kalla}\n${odds.join('\n')}`);
   if (har(text, hc.bielsaCitat)) tillat.add('28');
   const nya = [...ute].filter((x) => !tillat.has(x));
   if (nya.length) fel.push(`talen ${nya.join(', ')} står inte i analysen`);
   const ord = text.split(/\s+/).filter(Boolean).length;
   if (ord > hc.maxOrd) fel.push(`texten är ${ord} ord, högst 120`);
   if (/\benligt\b/i.test(text)) fel.push('nämn inga källor, inget "enligt": det är din egen bedömning');
-  const signs = (article.tip && article.tip.signs) || [];
+  const signs = teckenAv(svar.tecken);
+  const res = resultatAv(svar.resultat);
   const sista = stycken[stycken.length - 1];
-  for (const n of signs) if (!TECKEN_RE[n].test(sista)) fel.push(`${ORD[n]} står inte i sista stycket`);
+  if (!signs) fel.push('tecken ska vara "1", "X", "2", två av dem eller "1X2"');
+  else for (const n of signs) if (!TECKEN_RE[n].test(sista)) fel.push(`${ORD[n]} står inte i sista stycket`);
+  if (!res) fel.push('resultat ska vara hemmalagets och bortalagets mål, som "3–1"');
+  else {
+    if (res.h > 4 || res.b > 4) fel.push('resultatet får ha högst 4 mål per lag');
+    if (signs && !signs.includes(res.utfall)) fel.push(`resultatet ${res.h}–${res.b} är ${ORD[res.utfall]}, som du inte har ringat in`);
+    const iText = new RegExp(`(?<!\\d)${res.h}\\s*[–—-]\\s*${res.b}(?!\\d)`);
+    if (iText.test(text) && !iText.test(kalla)) fel.push('resultatet står inte i texten: det säger du sist för sig');
+  }
   if (/\[\d/.test(text)) fel.push('hänvisningar i hakparentes');
+  if (/\bkolleg/i.test(text)) fel.push('nämn inte kollegan: det är din egen bedömning');
+  if (/\bi ?morgon\b/i.test(text)) fel.push('säg inte "i morgon": texten står kvar fram till avspark');
   const lanat = ac.rost.egnaNamn.filter((o) => har(text, o));
   if (lanat.length) fel.push(`${lanat.join(', ')} hör till kollegans historier, inte matchen`);
   const tillatet = [hc.bielsaCitat, hc.bielsaTillbaka, ...hc.fraser, ...(u.krydda ? [u.krydda] : [])];
@@ -148,14 +203,15 @@ export async function sprakfel(stycken, { claude = claudeSvar } = {}) {
   }
 }
 
-// Texten för analysen. persona: innehållet i prompts/hasse-backe.md.
+// Texten för analysen. persona: innehållet i prompts/hasse-backe.md; match: matchens fil
+// på sajten (data/match/<id>.json) för oddsen, eller null.
 // → {ok: true, hasse, meta} eller {ok: false, error}.
-export async function skrivHasse(id, article, { persona, now = () => new Date(), claude = claudeSvar }) {
+export async function skrivHasse(id, article, { persona, match = null, now = () => new Date(), claude = claudeSvar }) {
   const u = uppdrag(id, article);
-  const signs = article.tip.signs;
+  const odds = oddsen(match, article);
   const rader = [
     `Analysen:\n${JSON.stringify(kallan(article))}`,
-    `Tecknen som ringas in: ${signs.map((n) => ORD[n]).join(' och ')}.`,
+    ...odds,
     `Uttryck du kan ta till där de passar, annars inte alls: ${u.fraser.join(' · ')}.`,
     u.krydda && `En rad du gärna får lägga in ordagrant: ${u.krydda}`,
     u.bielsa.length && `Dina Bielsa-ord, för något som står i analysen: ${u.bielsa.join(', ')}. Den enda Bielsa-repliken du citerar är din favorit: "${hc.bielsaCitat}"`,
@@ -165,17 +221,21 @@ export async function skrivHasse(id, article, { persona, now = () => new Date(),
   let meddelande = rader.join('\n\n');
   // Tredje försöket finns bara för språket: en text som har klarat kontrollerna ligger i reserv.
   let reserv = null;
-  const klar = (stycken, r, attempts) => ({ ok: true, meta: r, hasse: { stycken: stycken.map((s) => s.trim().replace(/([^.?!…"”])$/, '$1.')), tips: article.tip.writtenAt, uppdrag: u, model: r.model, version: hc.promptVersion, writtenAt: now().toISOString(), attempts } });
+  const klar = (svar, r, attempts) => {
+    const res = resultatAv(svar.resultat);
+    const hasse = { stycken: svar.stycken.map((s) => s.trim().replace(/([^.?!…"”])$/, '$1.')), tecken: teckenAv(svar.tecken), resultat: `${res.h}–${res.b}`, tips: article.tip.writtenAt, uppdrag: u, model: r.model, version: hc.promptVersion, writtenAt: now().toISOString(), attempts };
+    return { ok: true, meta: r, hasse };
+  };
   for (let attempts = 1; attempts <= 3; attempts++) {
     const r = await claude({ ...opts, prompt: meddelande });
     if (r.refused) return reserv || { ok: false, error: 'Texten nekades.' };
-    let stycken = null;
-    try { stycken = jsonOf(r.content).stycken; } catch { fel = ['svaret gick inte att läsa som JSON']; }
-    if (stycken) {
-      fel = granska(stycken, article, u);
+    let svar = null;
+    try { svar = jsonOf(r.content); } catch { fel = ['svaret gick inte att läsa som JSON']; }
+    if (svar) {
+      fel = granska(svar, article, u, odds);
       if (!fel.length) {
-        reserv = klar(stycken, r, attempts);
-        fel = attempts < 3 ? await sprakfel(stycken, { claude }) : [];
+        reserv = klar(svar, r, attempts);
+        fel = attempts < 3 ? await sprakfel(svar.stycken, { claude }) : [];
         if (!fel.length) return reserv;
       }
     }

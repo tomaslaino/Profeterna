@@ -362,7 +362,7 @@ async function enAnalys(id, namn, gammal, roster, nyckel = `analys:${id}`) {
     logg(`analys: ${entry.match} (${metaText(r.meta)})${r.tipError ? ` – utan tips: ${r.tipError}` : ''}`);
     // Hasses text ur den nya analysen. Blir den inte av sparas analysen ändå.
     if (entry.tip) {
-      const t = await hasseText(id, entry, roster);
+      const t = await hasseText(id, entry, roster, d);
       if (t) entry.hasse = t;
     }
     vantande.analyser[id] = entry;
@@ -375,10 +375,13 @@ async function enAnalys(id, namn, gammal, roster, nyckel = `analys:${id}`) {
   }
 }
 
-async function hasseText(id, entry, roster) {
+// d: matchens fil på sajten, för oddsen han får (hämtas om den saknas; går den inte att
+// hämta skriver han utan oddsen).
+async function hasseText(id, entry, roster, d = null) {
   const nyckel = `hasse:${id}`;
   try {
-    const h = await skrivHasse(id, entry, { persona: roster.hasse });
+    const match = d || await fardata(`match/${id}.json`).catch(() => null);
+    const h = await skrivHasse(id, entry, { persona: roster.hasse, match });
     if (!h.ok) throw new Error(h.error);
     lyckat(nyckel);
     logg(`hasse: ${entry.match} (${h.meta.seconds} s)`);
@@ -493,7 +496,7 @@ async function main() {
     if (lage.stoppad || !entry) process.exit(1);
     console.log(`\n${entry.text}\n`);
     for (const s of entry.sources) console.log(`[${s.n}] ${s.source}: ${s.title}\n    ${s.url}`);
-    if (entry.hasse) console.log(`\n--- Hasse Backe (${entry.tip.signs.map((i) => '1X2'[i]).join('')})\n${entry.hasse.stycken.join('\n\n')}`);
+    if (entry.hasse) console.log(`\n--- Hasse Backe (${(entry.hasse.tecken || entry.tip.signs).map((i) => '1X2'[i]).join('')}, ${entry.hasse.resultat || '–'}; kollegan ${entry.tip.signs.map((i) => '1X2'[i]).join('')})\n${entry.hasse.stycken.join('\n\n')}`);
     return;
   }
 
