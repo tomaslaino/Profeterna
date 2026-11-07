@@ -2424,7 +2424,8 @@ räknad ett steg per bild svängde de i telefonen (20 bilder i sekunden) ut en f
 och en och en halv gång så långsamt. Röken från glöden räknas för varje bloss ur var glöden var när det föddes, så att
 samma tid alltid ger samma bild. DL och DJ blinkar ungefär var fjärde sekund, ibland två
 gånger i rad, med ögonen stängda en dryg tiondels sekund (`blinkar` i rum-3d.js; DT skrattar
-med ögonen stängda och blinkar inte). Ansiktet med stängda ögon är samma ansiktsbild utan
+med ögonen stängda och blinkar inte – utom när humöret ger honom öppna ögon, se
+*Ansiktena följer kupongen* nedan). Ansiktet med stängda ögon är samma ansiktsbild utan
 ögonvitorna och ögonen och med det övre ögonlocket nere vid det nedre (`blundar`), och det
 byts in medan ögonen är stängda. I en fast bild (`?rum-t`) och med `prefers-reduced-motion`
 blinkar de inte. Det röda ljuset från neonskylten bakom dem slocknar när skylten glappar
@@ -2523,6 +2524,36 @@ som ligger sist sitter oftare med armarna i kors (när allas tips syns och minst
 kupongen, på natten, vid ett mål eller när man skålar med den som pekar på en, och det som
 pågår när humöret ändras gör färdigt sitt. Samma tid ger samma bild: luckorna och valen
 räknas ur klockan, och humöret minns när det ändrades.
+
+**Ansiktena följer kupongen** (2026-11-08, [public/rum-uttryck.js](public/rum-uttryck.js),
+`ansikten` i rum-3d.js och `senastAv` i rum-folk.js). Hur glada de ser ut beror på hur gängets
+senaste kupong gick, ända tills nästa är spelad. Blev det vinst (tio rätt av tretton på
+Stryktipset, en fjärdedel fel på en kortare kupong, som humöret ovan) är de glada, och de jublar
+när betyget i [Kuponghistoriken](#kuponghistoriken) är Bra eller Utmärkt eller det blev högst
+ett fel av tretton. Utan vinst är de nöjda om kupongen ändå gick bättre än väntat (Bra eller
+Utmärkt), sura när den gick som väntat och deppiga när den gick sämre (Svagt eller Mycket
+svagt). Medan en omgång spelas går den före: glada när den går bra, oroliga när nästa fel tar
+vinsten och deppiga när den är död. När allt är spelat räknas läget som i historiken, också innan kupongen
+har kommit in där (`ansikte` i `spelLage`). Med dolda resultat och utan historik ser de ut som
+bilderna är ritade.
+
+- **Jublar:** munnen öppen i ett skratt, ögonbrynen uppe och kinderna som trycker upp ögonen
+  (DT skrattar som han är ritad, med ögonen hopknipna).
+- **Glad:** DL ler med tänderna och DJ i skägget, som de är ritade, och DT har öppna ögon och
+  ett brett leende med tänderna.
+- **Nöjd:** munnen stängd i ett litet leende.
+- **Sur:** munnen rak och nedåt i mungiporna, ögonbrynen ihopdragna med en rynka emellan och
+  ögonlocken lite tunga.
+- **Deppig:** munnen nedåt, ögonbrynen uppåt inåt, tunga ögonlock, påsar under ögonen och
+  nästan ingen rodnad på kinderna.
+- **Orolig:** läpparna ihoppressade och ögonbrynen uppåt inåt, med rynkor i pannan.
+
+Ansiktsbilderna (`rum/ansikte-*.svg` och DJ:s mun i `rum/skagg-dj.svg`) görs om i webbläsaren
+för läget (`uttryck` och `skaggUttryck`): munnen och vecken runt den ritas om, ögonbrynen vrids
+kring ytterändan, ett ögonlock i hudens färg läggs över ögat och rodnaden tonas ner eller upp.
+Ögonen har samma uppbyggnad som förut, så att blinkningen (`blundar`) görs av det nya ansiktet.
+Bilderna för läget byggs när det ändras (sju till som mest: ansiktena, deras blinkningar och
+skägget) och de förra släpps; skrattar de åt ett skämt är det de vanliga skrattbilderna.
 
 **Gänget gör saker tillsammans** (2026-11-06, `GRUPP` och `roller` i rum-3d.js): var 31:a
 sekund kan det bli något som alla tre gör, med chansen efter humöret – ungefär varannan gång
@@ -2869,6 +2900,8 @@ leder och ligger sist i omgången, `?rum-akt=dl:kors,dj:dunk` ett påhitt om och
 gängets påhitt `skamt`, `gral` och `titta` ges alla tre), `?rum-ga=dl` att DL går iväg och
 kommer tillbaka (var fyrtionde sekund; `dl:5` fem sekunder in med `?rum-t`),
 `?rum-pekar=dt:tv,dl:dj` som om de pekade (på en sak eller någon i gänget),
+`?rum-ansikte=jublar` (`glad`, `nojd`, `sur`, `deppig`, `orolig`) ansiktena (med `?rum-humor=`
+utan värde, så att omgången som spelas inte går före),
 `?rum-hej=dl` som om man pekade på DL, `?rum-vald=dl` som om man just hade klickat på
 DL (`dl:3` tre sekunder sedan; med `?rum-t` och den som inte har lämnat in), `?rum-natt` (`=0` dag) natten och
 `?rum-efter=bra` (`illa`, `inget`) dagen efter. Sidan

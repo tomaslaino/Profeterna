@@ -36,13 +36,20 @@
 // färdigt syns det hur det gick, efter betyget i historiken (4–5 bra, 1–2
 // illa; rum-3d.js efter) – utom med dolda resultat.
 //
+// Ansiktena: tills nästa kupong är spelad syns det i ansiktena hur den
+// senaste gick (senastAv, rum-3d.js senast och rum-uttryck.js) – om det
+// blev vinst och efter betyget – utom med dolda resultat.
+//
 //   RumFolk.mount(el, { fig, inr, now, nara, fokus, teckna, visa, ta })  när gänget har laddats
 //   RumFolk.on(true | false)                           rummet visas eller inte
 //   RumFolk.ute(v)                                     klockan (Vader.nu())
 //   RumFolk.fyll(old, seen)                            de färdiga kupongerna och omgångarna
 //   RumFolk.natt()                                     är det natt?
+//   RumFolk.senast()                                   hur den senaste kupongen gick (ansiktena)
+//   RumFolk.ansikte(betyg, n, fel)                     ansiktena efter en färdig kupong
 //
 // För bilder: ?rum-natt (=0 dag), ?rum-efter=bra|illa (=inget),
+// ?rum-ansikte=jublar|glad|nojd|sur|deppig|orolig (=inget),
 // ?rum-pekar=dt:tv,dl:dj (som om de pekade), ?rum-hej=dl (som om man
 // pekade på DL), ?rum-vald=dl (som om man just hade blivit DL; dl:3 tre
 // sekunder sedan) och ?rum-tecken=dl:hang:1 (DL gör hang loose sedan en sekund;
@@ -387,10 +394,35 @@ window.RumFolk = (() => {
     const lage = c.grade >= 4 ? 'bra' : c.grade <= 2 ? 'illa' : null;
     return lage ? { lage, krona: best(c) } : null;
   }
+  // Ansiktena efter en färdig kupong (rum-uttryck.js): med vinst glada, och
+  // jublar med betyget Bra eller Utmärkt eller högst ett fel av tretton (Stryktipset
+  // ger pengar från tio rätt av tretton; en kortare kupong tål en fjärdedel
+  // fel, som spelLage i rum.js). Utan vinst nöjda när den ändå gick bättre
+  // än väntat (4–5), sura som väntat (3) och deppiga sämre (1–2).
+  // n: matcherna som spelades (utan strukna).
+  const ANSIKTEN = ['jublar', 'glad', 'nojd', 'sur', 'deppig', 'orolig'];
+  function ansikteAv(grade, n, fel) {
+    if (!grade || !n) return null;
+    const vinst = fel <= (n >= 13 ? n - 10 : Math.floor(n / 4));
+    if (vinst) return grade >= 4 || (n >= 13 && fel <= 1) ? 'jublar' : 'glad';
+    return grade >= 4 ? 'nojd' : grade === 3 ? 'sur' : 'deppig';
+  }
+  // Hur den senaste färdiga kupongen i historiken gick, för ansiktena; gäller
+  // tills nästa kupong är spelad. Inget med dolda resultat.
+  function senastAv(old) {
+    const f = q.get('rum-ansikte');
+    if (f) return ANSIKTEN.includes(f) ? f : null;
+    const c = (old || []).find((x) => x.n && x.rows && x.rows.length);
+    if (!c || (window.Historik && Historik.hidden(c))) return null;
+    const n = c.rows.filter((r) => !r.off).length;
+    return c.n >= n ? ansikteAv(c.grade, n, c.n - c.ok) : null;
+  }
   function fyll(old, seen) {
     F.efter = efterAv(old, seen);
+    F.senast = senastAv(old);
     const f = fig();
     if (f && f.efter) f.efter(F.efter);
+    if (f && f.senast) f.senast(F.senast);
   }
 
   // ---------- in och ut ----------
@@ -413,6 +445,7 @@ window.RumFolk = (() => {
     const f = fig();
     if (f) {
       if (F.efter !== undefined && f.efter) f.efter(F.efter);
+      if (F.senast !== undefined && f.senast) f.senast(F.senast);
       if (q.has('rum-hej') && f.hej) f.hej(q.get('rum-hej').toLowerCase(), o.now() - 1.2);
       if (q.has('rum-tecken') && f.tecken) {
         const [k, namn, sek] = q.get('rum-tecken').toLowerCase().split(':');
@@ -443,5 +476,5 @@ window.RumFolk = (() => {
     }, 250);
   }
 
-  return { mount, on, ute, fyll, natt: () => Boolean(F.natt) };
+  return { mount, on, ute, fyll, natt: () => Boolean(F.natt), senast: () => (F.senast !== undefined ? F.senast : senastAv(null)), ansikte: ansikteAv };
 })();

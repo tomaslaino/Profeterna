@@ -49,7 +49,10 @@
 //
 // Humöret följer gängets kupong (spel, HUM): glada när den går bättre än
 // väntat eller blev vinst, nervösa när nästa fel tar vinsten, deppiga när den
-// är död. Det syns i hur de sitter och i påhitten (AKTER, MENY): korta
+// är död. Ansiktena följer den också (ansikten, rum-uttryck.js), och mellan
+// omgångarna hur den senaste gick (senast): jublar, glad, nöjd, sur eller
+// deppig efter om det blev vinst och betyget. Humöret syns i hur de sitter
+// och i påhitten (AKTER, MENY): korta
 // rörelser som var och en gör då och då – händerna i nacken, naglarna, hakan i
 // handen, armarna i kors, pannan i bordet … – och ibland tillsammans (GRUPP):
 // skålar över bordet, gungar i takt, skrattar åt ett skämt (med ögonen
@@ -61,7 +64,8 @@
 // ligger bakom pulten, så man ser bara överkroppen; stolen och det som står på
 // bordet står kvar (gaFlytta). Duken går därför ut till scenens vänsterkant.
 //
-// DL och DJ blinkar (DT skrattar med ögonen stängda), det röda ljuset från
+// DL och DJ blinkar (DT skrattar med ögonen stängda, utom när humöret ger
+// honom öppna ögon), det röda ljuset från
 // neonskylten bakom dem slocknar när skylten glappar, och medan matcherna
 // pågår lyser tv:n blått i ansiktena.
 //
@@ -76,15 +80,19 @@
 // stjärngossestrutar, tomteluvor och jultröjor, sammetskavaj, fluga och
 // partyhatt, påskkärringens huckle och midsommarens blomkrans.
 //
-// figurer(canvas, { calm, vader, detalj }) → { draw(t, mx, my, neon), inne(vem, t), ute(vader),
-// lage({ tv, nag }, t), mal({ dl: 1, dt: -1, dj: 0 }, t, sätt), spel({ lage, rank }, t),
+// figurer(canvas, { calm, vader, detalj, spel, senast, rita }) → { draw(t, mx, my, neon), inne(vem, t), ute(vader),
+// lage({ tv, nag }, t), mal({ dl: 1, dt: -1, dj: 0 }, t, sätt), spel({ lage, rank, ansikte }, t),
+// senast(lage), uttryck(),
 // prova(vem, påhitt, at), ga(vem, t, l), pekar(vem, [x, y, z] | null, t),
 // hej(vem, t, ut), vald(vem, t), tecken(vem, t, namn), natt(på, t), efter({ lage, krona }), under(nx, ny), huvud(vem) }: neon säger om
 // neonskylten lyser (false när den glappar), ute klär om gänget
 // efter vädret (dress) och sätter ljuset från fönstret, lage säger om
 // matcherna pågår (tv) och hur nära spelstoppet är (nag 0–1), mal ett mål
 // (sätt: { dl: 0|1|2 }, annars efter tiden), spel hur det går för kupongen
-// (lage 'glad' | 'nerv' | 'deppig' | null, rank { dl: 1, dj: -1 }), prova ett
+// (lage 'glad' | 'nerv' | 'deppig' | null, rank { dl: 1, dj: -1 }, ansikte när
+// allt är spelat), senast hur den senaste kupongen gick för ansiktena
+// (rum-uttryck.js LAGEN, null = inget), uttryck ett löfte som är klart när
+// ansiktena för läget är ritade (rita anropas då också), prova ett
 // påhitt om och om igen för bilder (utan påhitt som vanligt), ga att vem går
 // iväg från t − l (för bilder),
 // pekar punkten i rummet som vem pekar på (världens koordinater, null = inget),
@@ -104,6 +112,7 @@ import { mergeGeometries } from 'three/addons/utils/BufferGeometryUtils.js';
 import { ol } from './rum-fika.js';
 import { festen, drakt, festklader } from './rum-fest.js';
 import { TECKEN, LOS, blanda, nasta as nastaTecken } from './rum-tecken.js';
+import { uttryck, skaggUttryck, ansiktsLage } from './rum-uttryck.js';
 
 const DEG = Math.PI / 180;
 const D = 1400;
@@ -456,6 +465,63 @@ export async function figurer(canvas, opt = {}) {
   function skaggSkratt(svg) {
     const d = 'M-16 31 Q0 35 16 31 Q13 47 0 50 Q-13 47 -16 31 Z';
     return svg.replace('</svg>', `${MUN(d)}<g clip-path="url(#skr-m)"><path d="M-17 30 Q0 34 17 30 L17 37 Q0 41 -17 37 Z" fill="#f1ebe0"/><ellipse cx="0" cy="46" rx="7" ry="3.5" fill="#9c4038"/></g></svg>`);
+  }
+  // Ansiktsuttrycken (rum-uttryck.js): hur glada de ser ut efter hur gängets
+  // senaste kupong gick (senast) och, medan omgången spelas, hur det går för
+  // den (spel). Bilderna för läget – ansiktena, deras blinkningar och DJ:s mun
+  // i skägget – byggs när läget ändras och ligger i tex som ans_dl,
+  // ans_dl_blund … ans_skagg; de förra släpps när de nya är klara. Utan läge
+  // (null) och där bilden redan är så (DL och DJ glada) används de vanliga.
+  // Skrattar de åt något (skrattW) är det de vanliga skrattbilderna, och DT:s
+  // ritade ansikte. När de nya är klara ritas rummet om (opt.rita, när gänget
+  // finns: ute), och ANS.p är klart då.
+  const ANS = { svg: {}, mal: null, nr: 0, spel: opt.spel ? opt.spel.ansikte || opt.spel.lage : null, senast: opt.senast || null, p: Promise.resolve(), ute: false };
+  const svgTex = async (s) => {
+    const u = URL.createObjectURL(new Blob([s], { type: 'image/svg+xml' }));
+    try { return await imgTex(u); } finally { URL.revokeObjectURL(u); }
+  };
+  function ansikten(lage) {
+    if (lage !== ANS.mal) {
+      ANS.mal = lage;
+      ANS.p = byggAnsikten(lage, ++ANS.nr);
+    }
+    return ANS.p;
+  }
+  async function byggAnsikten(lage, nr) {
+    const ny = {};
+    const jobb = [];
+    const bygg = (k, s) => jobb.push(svgTex(s).then((t) => { ny[k] = t; }, () => {}));
+    try {
+      for (const k of ['dl', 'dt', 'dj']) {
+        const s0 = ANS.svg[k];
+        const s = s0 && uttryck(s0, k, lage);
+        if (!s || s === s0) continue;
+        bygg(k, s);
+        const b = (!opt.calm || k === 'dj') && blundar(s);
+        if (b) bygg(`${k}_blund`, b);
+      }
+      const sk = ANS.svg.skagg && skaggUttryck(ANS.svg.skagg, lage);
+      if (sk && sk !== ANS.svg.skagg) bygg('skagg', sk);
+    } catch (err) {
+      console.warn('Rummet: ansiktsuttrycket kunde inte ritas', err);
+    }
+    await Promise.all(jobb);
+    if (nr !== ANS.nr) {
+      for (const t of Object.values(ny)) t.dispose();
+      return;
+    }
+    const gamla = Object.keys(tex).filter((k) => k.startsWith('ans_')).map((k) => { const t = tex[k]; delete tex[k]; return t; });
+    for (const [k, t] of Object.entries(ny)) tex[`ans_${k}`] = t;
+    for (const t of gamla) t.dispose();
+    // de vanliga som byttes ut behövs inte på grafikkortet så länge (three.js
+    // laddar upp dem igen om de används); DT:s ritade ansikte är hans skratt
+    for (const k of Object.keys(ny)) if (k !== 'dt' && tex[k]) tex[k].dispose();
+    if (opt.rita && ANS.ute) opt.rita();
+  }
+  // ansiktet som vem har nu, och samma ansikte med ögonen stängda
+  function ansiktet(k) {
+    const a = tex[`ans_${k}`];
+    return a ? { bas: a, blund: tex[`ans_${k}_blund`] } : { bas: tex[k], blund: tex[`${k}_blund`] };
   }
   const imgTex = (src) => new Promise((res, rej) => {
     const img = new Image();
@@ -1473,8 +1539,13 @@ export async function figurer(canvas, opt = {}) {
       try { tex.dj_skagg_skratt = await imgTex(u); } finally { URL.revokeObjectURL(u); }
     }).catch(() => {}),
     imgTex('rum/skagg-dj.svg').then((t) => { tex.dj_skagg = t; }),
+    // bilderna som text, för ansiktsuttrycken (ansikten)
+    ...['dl', 'dt', 'dj'].map((k) => fetch(`rum/ansikte-${k}.svg`).then((x) => x.text()).then((s) => { ANS.svg[k] = s; }).catch(() => {})),
+    fetch('rum/skagg-dj.svg').then((x) => x.text()).then((s) => { ANS.svg.skagg = s; }).catch(() => {}),
     ...Object.entries(LAG).filter(([, c]) => c.skold).map(([k, c]) => loadImg(c.skold).then((i) => { skold[k] = trim(i); }, () => {})),
   ]);
+  // ansiktena efter hur det gick senast, redan från början (opt.senast, opt.spel)
+  await ansikten(ansiktsLage(ANS.spel, ANS.senast));
   ritaFolie(folieTex.image.getContext('2d'), FD.w, FD.h);
   folieTex.needsUpdate = true;
   kupTex.fram = canvasTex(260, 180, (g, w, h) => drawCoupon(g, w, h, false));
@@ -2127,12 +2198,12 @@ export async function figurer(canvas, opt = {}) {
     // dagen efter en bra omgång bär papperskronan (efterFig) i stället
     const kront = DE.lage === 'bra' && DE.krona.includes(F.key);
     const H = D.fest && !kront ? FEST.huvud(F, P, hc, D.fest, F.plats === PLATSER[1], opt.calm) : null;
-    const fm = new THREE.Mesh(headGeo(P, true, 1.003), mat('#ffffff', { map: tex[F.key], transparent: true, polygonOffset: true, polygonOffsetFactor: -2 }, 'hud'));
+    const fm = new THREE.Mesh(headGeo(P, true, 1.003), mat('#ffffff', { map: ansiktet(F.key).bas, transparent: true, polygonOffset: true, polygonOffsetFactor: -2 }, 'hud'));
     fm.receiveShadow = true;
     hc.add(fm);
     let skagg = null;
     if (F.beard) {
-      const bm = skagg = new THREE.Mesh(headGeo(P, true, F.beard[0], F.beard[1]), mat('#ffffff', { map: tex.dj_skagg, transparent: true, alphaTest: 0.3, roughness: 0.85, bumpMap: tex.dj_skagg, bumpScale: 1.5 }));
+      const bm = skagg = new THREE.Mesh(headGeo(P, true, F.beard[0], F.beard[1]), mat('#ffffff', { map: tex.ans_skagg || tex.dj_skagg, transparent: true, alphaTest: 0.3, roughness: 0.85, bumpMap: tex.dj_skagg, bumpScale: 1.5 }));
       bm.castShadow = bm.receiveShadow = true;
       hc.add(bm);
     }
@@ -2303,7 +2374,7 @@ export async function figurer(canvas, opt = {}) {
     earPen.updateMatrix();
     kupBench.updateMatrix();
 
-    const o = { F, fig, hud: skin, torso, chest, hg, hc, face: fm, blund: tex[`${F.key}_blund`], knees, feet, arms, mouth, thigh, hipY, T, phase: hash(F.x) * 20, pen, kp, earPen, kupBench, extra, aska, inneAt: -1e9, key: JSON.stringify(D), H, kront, fest: D.fest,
+    const o = { F, fig, hud: skin, torso, chest, hg, hc, face: fm, knees, feet, arms, mouth, thigh, hipY, T, phase: hash(F.x) * 20, pen, kp, earPen, kupBench, extra, aska, inneAt: -1e9, key: JSON.stringify(D), H, kront, fest: D.fest,
       skratt: tex[`${F.key}_skratt`], skagg, turnNu: F.turn };
     efterFig(o);
     return o;
@@ -2611,7 +2682,7 @@ export async function figurer(canvas, opt = {}) {
   const sinkW = (o, t) => { const m = M[o.F.key]; return m && m.k < 0 ? bump(t - m.at, 0.2, 0.9, 4.2, 5.4) : 0; };
   const nodW = (o, t) => { const m = M[o.F.key]; return m && m.k === 0 ? bump(t - m.at, 0, 0.35, 1.0, 1.7) : 0; };
 
-  // Blinkningarna (o.blund, ansiktena med ögonvitor): en gång i varje period
+  // Blinkningarna (ansiktet, de med ögonvitor): en gång i varje period
   // om BLINK sekunder, på ett ställe i den som klockan ger, och var femte gång
   // två i rad – ögonen stängda en dryg tiondels sekund.
   const BLINK = 4.2;
@@ -3957,11 +4028,14 @@ export async function figurer(canvas, opt = {}) {
       if (o.H.tick) o.H.tick(t);
     }
     // (inte i en fast bild), och DJ blundar när han sover
-    // och skrattar (skrattW) med ögonen hopknipna och munnen öppen (DJ:s i skägget)
+    // och skrattar (skrattW) med ögonen hopknipna och munnen öppen (DJ:s i
+    // skägget) – annars ansiktet efter humöret (ansiktet)
     for (const o of figs) {
       const sk = skrattW(o, t) > 0.3;
-      if (o.blund || o.skratt) o.face.material.map = sk && o.skratt ? o.skratt : o.blund && ((!opt.calm && blinkar(o, t)) || sovW(o, t) > 0.5) ? o.blund : tex[o.F.key];
-      if (o.skagg && tex.dj_skagg_skratt) o.skagg.material.map = sk ? tex.dj_skagg_skratt : tex.dj_skagg;
+      const a = ansiktet(o.F.key);
+      const skratt = o.skratt || (a.bas !== tex[o.F.key] ? tex[o.F.key] : null);
+      o.face.material.map = sk && skratt ? skratt : a.blund && ((!opt.calm && blinkar(o, t)) || sovW(o, t) > 0.5) ? a.blund : a.bas;
+      if (o.skagg) o.skagg.material.map = sk && tex.dj_skagg_skratt ? tex.dj_skagg_skratt : tex.ans_skagg || tex.dj_skagg;
     }
     // neonen bakom dem slocknar när skylten glappar, och tv:n lyser i
     // ansiktena när de tittar på matcherna (svagt, och fladdrar som rutan)
@@ -4108,8 +4182,9 @@ export async function figurer(canvas, opt = {}) {
   }
 
   // Hur det går för gängets kupong ({ lage: 'glad' | 'nerv' | 'deppig' | null,
-  // rank: { dl: 1, dj: -1 } }): första gången som det är, sedan glider
+  // rank: { dl: 1, dj: -1 }, ansikte }): första gången som det är, sedan glider
   // humöret över på 2,5 sekunder; påhittet som pågår gör färdigt sitt.
+  // Ansiktena följer läget, eller ansikte när allt är spelat (ansikten).
   let toldSpel = false;
   function spel(x, t) {
     const lage = x && ['glad', 'nerv', 'deppig'].includes(x.lage) ? x.lage : null;
@@ -4126,6 +4201,15 @@ export async function figurer(canvas, opt = {}) {
       HUM.rank = rank;
     }
     toldSpel = true;
+    ANS.spel = (x && x.ansikte) || lage;
+    ansikten(ansiktsLage(ANS.spel, ANS.senast));
+  }
+  // Hur gängets senaste kupong gick (rum-folk.js, rum-uttryck.js LAGEN:
+  // 'jublar' … 'deppig', null = inget att gå efter): ansiktena när ingen
+  // omgång spelas som säger något annat (spel).
+  function senast(x) {
+    ANS.senast = x || null;
+    ansikten(ansiktsLage(ANS.spel, ANS.senast));
   }
   // Ett påhitt (AKTER) som vem gör om och om igen från at, för bilder
   // (?rum-akt); utan namn som vanligt igen.
@@ -4250,5 +4334,6 @@ export async function figurer(canvas, opt = {}) {
   try {
     await r.compileAsync(scene, cam);
   } catch (err) { /* då byggs de när gänget ritas, som förut */ }
-  return { draw, inne, ute, lage, mal, spel, prova, ga, pekar, hej, vald, tecken, natt, efter, under, huvud, kval };
+  ANS.ute = true;
+  return { draw, inne, ute, lage, mal, spel, senast, uttryck: () => ANS.p, prova, ga, pekar, hej, vald, tecken, natt, efter, under, huvud, kval };
 }
