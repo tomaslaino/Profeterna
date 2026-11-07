@@ -1,5 +1,5 @@
 {
- "uppdaterad": "2026-11-07T10:54:17.665Z",
+ "uppdaterad": "2026-11-07T10:54:48.114Z",
  "omgang": {
   "id": "2026-11-07-st4978",
   "matcher": [
@@ -1034,26 +1034,29 @@
    },
    "hasse": {
     "stycken": [
-     "Millwall har kommit till The Hawthorns fyra gånger i rad och åkt hem med 0–0, och de har inte förlorat mot West Bromwich på tio möten. Ett lag som står så stadigt mot samma motståndare vet precis hur den här matchen ska spelas.",
-     "West Bromwich saknar visserligen lagkaptenen Campbell i mittförsvaret. Men Millwall släppte in tre mål på en halvtimme mot Birmingham, alla på omställningar, och det stod jävligt glest framför mittbackarna. Då blir det transisiones, ombre libre framför backlinjen, och som Bielsa säger: ”Det finns 28 sätt att bryta ner en backlinje.” Ursäkta. Back to basis.",
-     "Hemmalaget har störst chans, men Millwall kan den här motståndaren utantill. Jag ringar in ettan och krysset, och krysset väger tungt."
+     "Millwall har inte förlorat mot West Bromwich på tio möten, och de fyra senaste gångerna på The Hawthorns har det slutat 0–0. Ett lag som står så stadigt mot samma motståndare har lärt sig något, och det glömmer man inte över en natt.",
+     "Men Millwall står glest framför mittbackarna just nu. Mot Birmingham kom tre mål i omställningar, och där får Price och Morgan sin ombre libre mellan linjerna. ”Det finns 28 sätt att bryta ner en backlinje”, och här finns det ett tomrum stort som … Ursäkta. Back to basis. West Bromwich saknar samtidigt lagkaptenen Campbell i mittförsvaret, och då läcker det åt andra hållet också.",
+     "Den här gången blir det mål i båda ändarna, men ingen vinner. Jag ringar in krysset och bara krysset."
     ],
+    "tecken": [
+     1
+    ],
+    "resultat": "1–1",
     "tips": "2026-11-07T10:16:14.452Z",
     "uppdrag": {
      "fraser": [
-      "Äsch",
-      "Nej nej nej"
+      "Glöm det",
+      "Äsch"
      ],
-     "krydda": null,
+     "krydda": "Jag har sett det förr, i Manchester. Det gick bra då också.",
      "bielsa": [
-      "transisiones",
       "ombre libre"
      ]
     },
     "model": "claude-opus-5-5",
-    "version": "2026-11-05.1",
-    "writtenAt": "2026-11-07T10:16:38.775Z",
-    "attempts": 2
+    "version": "2026-11-07.1",
+    "writtenAt": "2026-11-07T10:54:33.888Z",
+    "attempts": 1
    },
    "model": "claude-opus-5-5",
    "version": "2026-11-04.1",
