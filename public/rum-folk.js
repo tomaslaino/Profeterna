@@ -22,7 +22,8 @@
 // namnen på kupongen, Samtal.pult.vem): namnet skrivs för hand på kupongen på
 // pulten (Rum.skriv), utkastet följer med, och figuren skriver på sin kupong
 // (vald i rum-3d.js). Det går också när enheten står på någon som har lämnat
-// in någon annanstans (Samtal.pult.state().byt). Är det du – nu eller sedan
+// in någon annanstans, och till vem som helst när allas tips visas
+// (Samtal.pult.state().byt). Är det du – nu eller sedan
 // förut – tas kupongen sedan i handen att fylla i eller ändra (ta i rum.js),
 // när namnet är skrivet eller tecknet syns.
 //
@@ -232,7 +233,8 @@ window.RumFolk = (() => {
   }
   // Ett klick på någon i gänget (k: dl, dt, dj): du är den som fyller i
   // kupongen. Går medan omgången är öppen och hen inte har lämnat in – och
-  // du inte heller, utom från en annan enhet (byt i Samtal.pult.state()).
+  // du inte heller, utom från en annan enhet – och när allas tips visas
+  // (byt i Samtal.pult.state()).
   // → hur länge namnet skrivs på kupongen (ms) om du blev någon annan, annars null.
   function valj(k) {
     const s = samtal();
