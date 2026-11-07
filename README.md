@@ -597,6 +597,12 @@ bara lokalt. Analyserna visas som de ligger i `data/analyser.json`; hur de skriv
   korktavlan och kvittot så nära att de går att läsa. Kupongen som inte går att ta i handen
   visas nära på pulten, och guldorden *Statistik* och *Lagen* under anslagstavlan och
   kortregistret är borta. Se [Tobaksaffären](#tobaksaffären) och [Närbilderna](#närbilderna).
+- **Spela hos Svenska Spel i tobaksaffären (2026-11-07, användarens beslut):** det enda
+  undantaget från att inget leder ut ur rummet. Gängets kupong i handen har *Spela hos Svenska
+  Spel* som guldord när den är sparad, eftersom det är hela uppgörelsens mål; länken öppnas i
+  en ny flik, så att rummet står kvar. Samma dag lades de tre kupongerna på varandra i
+  uppgörelsen, gängets penna blev svart och pennan ringar in de omtvistade matcherna. Se
+  *Kupongen i handen* under [Tobaksaffären](#tobaksaffären).
 - **Expressens löpsedel från VM 94 (2026-11-03, användarens önskemål):** VM 94-affischen med
   fotot från hemkomsten är utbytt mot en mer verklighetstrogen löpsedel, lite solblekt och
   sliten: *JAAAAAAAA! BRONS!* med Tomas foto från Rose Bowl. Den sitter på skivan som de andra.
@@ -3379,18 +3385,43 @@ kommentarer i efterhand, hens porträtt inringat och stämpeln *Inlämnad*, men 
 **Uppgörelsen.** När du ser de andras tips (som när papperet visar underlaget) ligger gängets
 kupong på pulten, och pingklockan där guldordet annars står (eller *Följ kupongen* när
 matcherna har börjat), kupongen eller K tar den i handen – klockan lyser när man pekar på
-den och plingar när kupongen tas upp (`bell` och `pling` i rum.js). I varje ruta står
-porträtten för dem som har med tecknet, var och en på sin plats som överst, och när man
-pekar på porträttet syns deras motivering och, på en rad under, deras kommentar i efterhand
-(*Efteråt: …*, `efter` i `Samtal.pult.gang`) – på pulten och i handen. Bara din egen
-kommentar står på raden, eftersom raden inte blir högre. I telefonen går det inte att peka,
-och porträtten är för små för ett finger: där visar ett långt tryck på rutan i handen samma
-rader för alla i den, på en lapp ovanför rutan – porträttet, namnet, motiveringen med
-blyerts och kommentaren i bläck. Rutan kryssas inte av trycket, och nästa tryck tar bort
-lappen (`wireHold` och `ordPa` i rum.js). Gängets kryss dras med en blå kulspetspenna i
-stället för blyertspennan: förslaget – det som fler än hälften har med – står ikryssat från
+den och plingar när kupongen tas upp (`bell` och `pling` i rum.js). Gängets kupong är de tre
+kupongerna lagda på varandra (2026-11-07): i varje ruta står var och ens kryss kvar, litet och
+i ens bläck (blått Laino, grönt Teijder, lila Johansson, som namnen överst), på sin plats i
+rutan, så att rutan blir mörkare ju fler som har med tecknet (`seats` och `smaKryss` i rum.js;
+förut stod porträtten där, 8 bildpunkter stora). När man pekar på ett kryss syns personens
+motivering och, på en rad under, kommentaren i efterhand (*Efteråt: …*, `efter` i
+`Samtal.pult.gang`) – på pulten och i handen. Bara din egen kommentar står på raden, eftersom
+raden inte blir högre. I telefonen går det inte att peka, och kryssen är för små för ett
+finger: där visar ett långt tryck på rutan i handen samma rader för alla i den, på en lapp
+ovanför rutan – porträttet, namnet, motiveringen med blyerts och kommentaren i bläck. Rutan
+kryssas inte av trycket, och nästa tryck tar bort lappen (`wireHold` och `ordPa` i rum.js).
+Gängets kryss dras med en svart kulspetspenna i stället för blyertspennan – förut blå, samma
+blå som Lainos bläck, så att gängets kryss såg ut som hans: förslaget – det som fler än
+hälften har med – står ikryssat från
 början, eller gängets kupong om den redan är sparad, och ett tryck kryssar i eller ur (`Samtal.pult.besluta`,
-sparat på enheten som på papperet). *Börja om* i finstil går tillbaka till förslaget, och
+sparat på enheten som på papperet).
+
+**Pennan visar vägen** (2026-11-07). Numren på de omtvistade matcherna är inringade med
+kulspetspennan: de som går att fylla i där vi inte har något tecken gemensamt (*Alla olika*
+och *Två mot en* på papperet) eller där förslaget lämnar matchen tom (`strid` i
+`Samtal.pult.gang`). Efter tiden står där en förklaring i sitt bläck, med de korta lagnamnen
+och utan tiden så att den får plats (raden blir inte högre): den som avviker, annars den vars
+tips gängets tecken just nu lämnar mest utanför, annars den första som har skrivit något
+(`avvik` i `Samtal.pult.gang`, `skal` i rum.js); hela motiveringen när man pekar. Ändras
+gängets tecken i matchen byts förklaringen till den som nu blir utan. Pennan väntar till
+höger om rutorna vid den första omtvistade matchen som inte är klubbad. En match klubbas när
+gängets tecken i den ändras, eller med ett klick på raden – numret, tiden eller förklaringen,
+medan lagen lägger bladet med lagen på kupongen som förut – och pennan drar bocken; då får
+ringen en bock och pennan går vidare till nästa, och när alla är klubbade lägger den sig vid
+sidan. Klubbat sparas på enheten för omgången (`profeterna.rum.klubbat`), och *Börja om* tar
+bort bockarna. **Första gången** gängets kupong tas i handen på enheten under omgången
+(`profeterna.rum.lagda`) läggs de tre kupongerna ur högen på den, en i taget och
+genomskinliga, och var och ens kryss stannar kvar i rutorna; sedan dras gängets kryss, ett i
+taget, och pennan ringar in numren och väntar vid den första (`uppgorelse` i rum.js, ungefär
+fyra sekunder). Därefter står allt där direkt. Man kan kryssa medan det pågår.
+
+*Börja om* i finstil går tillbaka till förslaget, och
 guldordet *Spara gängets kupong* (*Spara ändringen* när den finns, *Sparad* när den står som
 den sparade) sparar den direkt med samma tjänst som papperet (`Samtal.pult.sparaGang`,
 `postCoupon` i kupong.js). Saknar matcher tecken säger raden det och guldordet blir *Spara
@@ -3398,6 +3429,15 @@ den sparade) sparar den direkt med samma tjänst som papperet (`Samtal.pult.spar
 ändå* (en kupong till samma dag), och kan tjänsten inte spara *Spara via Ny kupong*. Utan
 tjänsten öppnas Ny kupong (eller Ändra) med tecknen ifyllda. Matcher som har startat går
 inte att ändra; där står pennan för kommentaren i efterhand.
+
+**Spela hos Svenska Spel** (2026-11-07, användarens beslut). När gängets kupong är sparad som den
+står och omgången är Stryktipset som går att spela, står *Sparad* släckt och guldordet blir *Spela hos
+Svenska Spel* – samma länk som på kupongsidan (`Spela.href` i spela.js, `spela` i
+`Samtal.pult.gang`). Länken öppnar Stryktipset med gängets tecken i en ny flik, och kupongen
+skjuts över disken: den sjunker mot disken, glider bort och ligger sedan på pulten igen
+(`lamnaOver` i rum.js). Sajten vet inte om kupongen blev betald, så ingen stämpel säger att
+den är spelad. Svenska Spels omgång hämtas när den behövs (högst var femte minut), och när den
+har kommit får kupongen i handen knappen (händelsen `spela`).
 
 **Lagen.** På kupongen i handen är lagen i varje rad en knapp – på alla kuponger i handen, också
 de andras och gängets; tiden och det som står efter den är kvar att skriva på (se ovan). Ett klick lägger ett blad med båda lagen ovanpå kupongen, på samma papper och
@@ -3438,8 +3478,9 @@ sätt:
 Rummet läser om omgången från tjänsten varje minut (`Samtal.load`), så att högen, gängets
 kupong och de andras kuponger följer med när någon lämnar in. Med `prefers-reduced-motion`
 (och med `?rum-t=`) står kupongen direkt i handen, kryssen direkt på papperet och pennan
-stilla. Rörelserna är Web Animations (`openCoupon`, `flipFrames`, `drawCross`, `penTo`, `setSigns`
-och `penGo` i [public/rum.js](public/rum.js)); kupongen och högen ligger i samma lager som
+stilla – också i uppgörelsen, där kupongerna inte läggs på och ringarna och bockarna står direkt.
+Rörelserna är Web Animations (`openCoupon`, `flipFrames`, `drawCross`, `penTo`, `setSigns`,
+`uppgorelse`, `klubba`, `lamnaOver` och `penGo` i [public/rum.js](public/rum.js)); kupongen och högen ligger i samma lager som
 pulten, och kupongerna i högen har kupongens mått, förminskade, så att kupongen börjar
 exakt där den låg och landar exakt på sin plats i högen.
 

@@ -32,7 +32,11 @@ window.Spela = (() => {
     const next = got && got.omgang.lage === 'Open' ? { nr: got.omgang.nr, stang: Date.parse(got.omgang.stang), rows: got.rows } : null;
     const was = draw;
     draw = next;
-    if (next || was) redraw();
+    if (next || was) {
+      redraw();
+      // gängets kupong i handen i tobaksaffären (rum.js) får knappen också
+      window.dispatchEvent(new Event('spela'));
+    }
   }
 
   // Länken till Svenska Spel med kupongens tecken, eller null.

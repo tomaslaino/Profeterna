@@ -1874,7 +1874,11 @@
     // {vem: motivering}}, efter: {matchens id: {vem: kommentar i efterhand}},
     // open: någon match går att fylla i, same: gängets
     // kupong är sparad som den står, reset: tecknen är inte förslaget
-    // (Börja om), label: guldordet}.
+    // (Börja om), label: guldordet, strid: de matcher som går att fylla i
+    // där vi inte har något tecken gemensamt (Alla olika, Två mot en) eller
+    // förslaget lämnar matchen tom, i kupongens ordning, avvik: {matchens id:
+    // de som avviker} i dem (tom när ingen ensam avviker), spela: länken till
+    // Svenska Spel när gängets kupong är sparad som den står (spela.js)}.
     gang() {
       const s = SM.data;
       if (!s || !(s.tips && Object.keys(s.tips).length >= (s.visas ? 1 : 2))) return null;
@@ -1885,7 +1889,17 @@
       const direct = Boolean(KP.data && KP.data.save);
       const same = Boolean(made && savedAsIs(made, rows, val));
       const open = rows.some((r) => r.open);
+      const strid = rows.filter((r) => r.open && r.n >= 2 && (r.kind <= 1 || !r.proposal));
+      // den som avviker: inte med i något av de tecken som flest har med
+      const avvik = (r) => {
+        const most = Math.max(...r.cov.map((c) => c.length));
+        const med = new Set(r.cov.filter((c) => c.length === most).flat());
+        return Object.keys(r.t).filter((k) => !med.has(k));
+      };
       return {
+        strid: strid.map((r) => r.x.id),
+        avvik: Object.fromEntries(strid.map((r) => [r.x.id, avvik(r)])),
+        spela: same && direct && window.Spela ? Spela.href(made) : null,
         val: { ...val },
         who: Object.fromEntries(rows.map((r) => [r.x.id, r.cov])),
         notes: Object.fromEntries(rows.map((r) => [r.x.id, Object.fromEntries(r.notes.map((o) => [o.k, o.text]))])),
