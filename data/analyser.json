@@ -1,5 +1,5 @@
 {
- "uppdaterad": "2026-11-07T10:50:39.034Z",
+ "uppdaterad": "2026-11-07T10:51:07.255Z",
  "omgang": {
   "id": "2026-11-07-st4978",
   "matcher": [
@@ -594,23 +594,27 @@
    },
    "hasse": {
     "stycken": [
-     "Newcastle har förlorat två gånger mot Everton på mindre än en vecka, och nu saknar de både Joelinton och Ramsey på mittfältet. Då ska en artonåring ta närkamperna åt dem borta i London. Det är modigt, och det är jävligt tunt.",
-     "Tränaren har dessutom fått lägga presskonferensen på att förklara att långa bollar faktiskt är tillåtna. Måste man förklara taktiken i efterhand så sitter den inte i benen på spelarna. Fulham skapar sina chanser men gör alldeles för få mål, och sådant brukar jämna ut sig förr eller senare.",
-     "Lugn nu, hemmalaget har övertaget men jag rycks inte med. Fulham har hemmaplan och det räcker långt, men utan övermod blir det etta och kryss."
+     "Newcastle har förlorat två gånger mot Everton på mindre än en vecka, och tränaren har fått förklara när laget får slå en lång boll. Ett lag som behöver höra det ser inte säkert ut i sin organisation.",
+     "Dessutom saknas Joelinton på grund av skada och Ramsey på grund av avstängning, och de är två mittfältare som springer och vinner närkamper. I stället kliver en artonåring in borta i London, och då blir det ett hål på mitten.",
+     "Fulham gör för få mål på sina chanser, men mot ett så tunt mittfält jämnar det ut sig fort. Jag ringar in en etta och inget annat."
     ],
+    "tecken": [
+     0
+    ],
+    "resultat": "2–0",
     "tips": "2026-11-07T10:04:10.298Z",
     "uppdrag": {
      "fraser": [
-      "Här höjer jag ett varningens finger",
-      "Lugn nu"
+      "Solklart",
+      "Det är lugnt"
      ],
      "krydda": null,
      "bielsa": []
     },
     "model": "claude-opus-5-5",
-    "version": "2026-11-05.1",
-    "writtenAt": "2026-11-07T10:04:52.120Z",
-    "attempts": 3
+    "version": "2026-11-07.1",
+    "writtenAt": "2026-11-07T10:50:58.735Z",
+    "attempts": 2
    },
    "model": "claude-opus-5-5",
    "version": "2026-11-04.1",
