@@ -1280,7 +1280,10 @@ ${window.RumRegister ? RumRegister.nara() : ''}
   // efterhand – i handen som fält där du kan skriva. Pennan för motiveringen
   // kommer när matchen är tippad, men platsen står där ändå, så att ingenting
   // flyttar sig. Kommentaren i efterhand skrivs när matchen har startat (före
-  // det bara om du redan har skrivit något), som på papperet.
+  // det bara om du redan har skrivit något), som på papperet. Utanför handen
+  // står det som text, likadant på alla kuponger i rummet – också på gängets
+  // kupong på pulten, så att det man skrev i handen står kvar när den läggs
+  // tillbaka.
   function notes(v, id, label, { sign, started, hand, ink }) {
     if (!v) return '';
     const mot = (v.not && v.not[id]) || '';
@@ -1290,7 +1293,7 @@ ${window.RumRegister ? RumRegister.nara() : ''}
     if (hand && !started && (v.slag === 'fyll' || v.slag === 'din')) html += field('mot', id, mot, label, sign || mot ? '' : ' gom');
     else if (mot) html += `<span class="mot" title="${esc(mot)}">${esc(mot)}</span>`;
     if (hand && v.skriv && (v.slag === 'din' || v.slag === 'gang') && (started || eft)) html += field('eft', id, eft, label, k);
-    else if (eft && v.slag !== 'gang') html += `<span class="eft${k}" title="${esc(eft)}">${esc(eft)}</span>`;
+    else if (eft) html += `<span class="eft${k}" title="${esc(eft)}">${esc(eft)}</span>`;
     return html ? `<span class="not">${html}</span>` : '';
   }
 

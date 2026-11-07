@@ -3357,7 +3357,10 @@ avspark bara om du redan har skrivit något) – samma kommentar som pennan på 
 (`POST …/samtal {gor: "efter"}`). Den sparas när du lämnar fältet eller trycker Enter; Esc
 ångrar, och går den inte att spara blir den röd tills nästa försök. Den står efter
 motiveringen, i bläck i stället för blyerts, och får minst hälften av platsen efter tiden;
-motiveringen kortas i stället. Ett klick på matchen visar den hel (se ovan).
+motiveringen kortas i stället. Ett klick på matchen visar den hel (se ovan). Kupongen ser
+likadan ut var den än ligger i rummet: kommentaren står också på gängets kupong på pulten,
+så att det man skrev i handen står kvar när kupongen läggs tillbaka (förut syntes den bara i
+handen).
 
 **De andras kuponger.** När du ser någons tips – du har lämnat in och hen också, eller allas
 tips visas – tas hens kupong ur högen på samma sätt: hens kryss, motiveringar och
