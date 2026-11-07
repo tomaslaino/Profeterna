@@ -627,6 +627,32 @@ canvas.rum-neonhalo { opacity: 0.28; }
 /* (pennan för kommentaren i efterhand är kvar som den är) */
 .rum-handen .row.locked :is(.pp-tm, .pp-small, .mot, .box) { opacity: 0.55; }
 .rum-handen.need-vem button.sm-namn { opacity: 1; color: #cf2a20; }
+/* Långt tryck på en ruta i telefonen: för dem i rutan porträttet, namnet,
+   motiveringen med blyerts och kommentaren i efterhand i bläck, på en lapp
+   ovanför rutan (wireHold och ordPa i rum.js). Rutan markeras inte av trycket. */
+.rum-handen .box { -webkit-touch-callout: none; -webkit-user-select: none; user-select: none; }
+.rum-ord {
+  position: absolute;
+  z-index: 6;
+  box-sizing: border-box;
+  min-width: 170px;
+  padding: 5px 11px 6px;
+  background: #fbf7ec;
+  border: 1px solid var(--pp-rule);
+  border-radius: 4px;
+  box-shadow: 0 8px 22px rgba(0, 0, 0, 0.4);
+  color: #2b241b;
+  white-space: normal;
+  -webkit-user-select: none;
+  user-select: none;
+}
+.rum-ord p { margin: 0; padding: 5px 0; }
+.rum-ord p + p { border-top: 1px solid var(--pp-line); }
+.rum-ord img { width: 20px; height: 20px; margin-right: 6px; border-radius: 50%; object-fit: cover; vertical-align: -5px; box-shadow: 0 0 0 1px var(--ink); }
+.rum-ord b { font: 700 13px/1.2 var(--sans); color: var(--ink); }
+.rum-ord .ord-mot, .rum-ord .ord-eft { display: block; font: 600 17px/1.15 Caveat, cursive; overflow-wrap: anywhere; }
+.rum-ord .ord-mot { color: #55524e; }
+.rum-ord .ord-eft { color: var(--ink); }
 .rum-dimma {
   position: absolute;
   left: -400px;

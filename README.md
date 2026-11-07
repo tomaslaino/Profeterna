@@ -3383,7 +3383,11 @@ den och plingar när kupongen tas upp (`bell` och `pling` i rum.js). I varje rut
 porträtten för dem som har med tecknet, var och en på sin plats som överst, och när man
 pekar på porträttet syns deras motivering och, på en rad under, deras kommentar i efterhand
 (*Efteråt: …*, `efter` i `Samtal.pult.gang`) – på pulten och i handen. Bara din egen
-kommentar står på raden, eftersom raden inte blir högre. Gängets kryss dras med en blå kulspetspenna i
+kommentar står på raden, eftersom raden inte blir högre. I telefonen går det inte att peka,
+och porträtten är för små för ett finger: där visar ett långt tryck på rutan i handen samma
+rader för alla i den, på en lapp ovanför rutan – porträttet, namnet, motiveringen med
+blyerts och kommentaren i bläck. Rutan kryssas inte av trycket, och nästa tryck tar bort
+lappen (`wireHold` och `ordPa` i rum.js). Gängets kryss dras med en blå kulspetspenna i
 stället för blyertspennan: förslaget – det som fler än hälften har med – står ikryssat från
 början, eller gängets kupong om den redan är sparad, och ett tryck kryssar i eller ur (`Samtal.pult.besluta`,
 sparat på enheten som på papperet). *Börja om* i finstil går tillbaka till förslaget, och
