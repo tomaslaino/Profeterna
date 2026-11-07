@@ -1096,12 +1096,8 @@ ${window.RumRegister ? RumRegister.nara() : ''}
 
   // ---------- datan ----------
 
-  // Kortare lagnamn på papperet.
-  const SHORT = { 'Manchester City': 'Man City', 'Manchester United': 'Man Utd', 'Tottenham Hotspur': 'Tottenham', 'Brighton & Hove Albion': 'Brighton',
-    'Wolverhampton Wanderers': 'Wolves', 'West Bromwich Albion': 'West Brom', 'Queens Park Rangers': 'QPR', 'Nottingham Forest': "Nott'm Forest",
-    'AFC Bournemouth': 'Bournemouth', 'Preston North End': 'Preston', 'Sheffield Wednesday': 'Sheff Wed', 'Sheffield United': 'Sheff Utd',
-    'Milton Keynes Dons': 'MK Dons', 'Bristol City': 'Bristol City', 'Bristol Rovers': 'Bristol Rovers', 'Notts County': 'Notts County' };
-  const short = (name) => SHORT[name] || String(name || '').replace(/\s+(United|City|Town|Rovers|Athletic|County|Wanderers|Albion|Argyle|Hotspur)$/, '');
+  // Kortare lagnamn på papperet (Papper.kort, samma i förstasidans ruta).
+  const short = (name) => Papper.kort(name);
   // På text-tv:n när lagen inte ryms: högst elva tecken.
   const BOARD = { 'Nottingham Forest': 'Nottingham', 'Middlesbrough': 'Middlesbro', 'Crystal Palace': 'Palace', 'Huddersfield Town': 'Huddersfld',
     'Peterborough United': "P'borough", 'Leyton Orient': 'Orient', 'Milton Keynes Dons': 'MK Dons', 'AFC Wimbledon': 'Wimbledon',

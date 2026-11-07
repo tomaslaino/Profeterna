@@ -1685,8 +1685,31 @@
     const du = v && s.gang.find((g) => g.id === v);
     const go = !open ? 'Till uppgörelsen' : done ? 'Se de andras tips'
       : du && tally(s, du) ? 'Fyll i resten' : 'Till kupongen';
-    return '<div class="card sm-teaser">' + nameBlock(s, 'ruta') + raden(s) +
+    return '<div class="card sm-teaser">' + nameBlock(s, 'ruta') + raden(s) + strider(s) +
       '<a class="kp-btn primary" href="#kupong">' + go + '</a></div>';
+  }
+
+  // Uppgörelsen i rutan: de omtvistade matcherna, som på papperet och i
+  // rummet – numret inringat, med en bock när matchen är klubbad (samma på
+  // enheten), lagen med de korta namnen och vad var och en har tippat, i sitt
+  // bläck under sitt porträtt. Lagen öppnar matchrutan.
+  function strider(s) {
+    if (!s.visas) return '';
+    const rows = analyse(s);
+    const list = rows.filter((r) => r.strid);
+    if (!list.length) return '';
+    const done = klar(s, rows);
+    const ids = s.gang.filter((g) => s.tips && s.tips[g.id]).map((g) => g.id);
+    const nr = new Map(s.matcher.map((x, i) => [x.id, i + 1]));
+    return `<div class="sm-strider" style="--n: ${ids.length}"><span></span><span></span>${ids.map((id) => face(id)).join('')}` +
+      list.map((r) => {
+        const id = r.x.id;
+        const ok = done.has(id);
+        const teams = r.m ? `${esc(Papper.kort(r.m.home))}<span class="vs">–</span>${esc(Papper.kort(r.m.away))}` : esc(r.x.match);
+        return `<span class="pp-nr${ok ? ' klubbad' : ''}">${nr.get(id)}${Papper.ring(`s${id}`, 'sm-strid', 25)}${ok ? bock(id) : ''}</span>` +
+          (r.m ? `<a class="sm-st-m" href="#match/${esc(id)}">${teams}</a>` : `<span class="sm-st-m">${teams}</span>`) +
+          ids.map((k) => `<b class="sm-k${pnum(k)}" title="${esc(`${person(k).namn}: ${r.t[k] || 'inget'}`)}">${esc(r.t[k] || '–')}</b>`).join('');
+      }).join('') + '</div>';
   }
 
   // Nedräkningen i rutan går av sig själv. När tiden är ute ritas rutan om.

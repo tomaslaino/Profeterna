@@ -542,4 +542,31 @@ button.sm-who[data-lyft][aria-pressed="true"] .sm-fc { box-shadow: 0 0 0 2px var
 .sm-teaser .page-title a { color: inherit; text-decoration: none; }
 /* tiden kvar att lämna in – bärnsten den sista timmen */
 .sm-kvar.snart [data-kvar] { color: var(--stale); }
+/* uppgörelsen: de omtvistade matcherna (samtal.js, strider) – numret inringat
+   som på papperet, i guld som knappen, och var och ens tecken i sin färg
+   under sitt porträtt; bläcken för mörk botten (--gang-0–2) */
+.sm-strider {
+  display: grid;
+  grid-template-columns: 30px minmax(0, max-content) repeat(var(--n), 42px);
+  align-items: center;
+  gap: 9px 10px;
+  margin: 24px 0 0;
+  max-width: 100%;
+  text-align: left;
+}
+.sm-strider .sm-k0 { --ink: var(--gang-0); }
+.sm-strider .sm-k1 { --ink: var(--gang-1); }
+.sm-strider .sm-k2 { --ink: var(--gang-2); }
+.sm-strider .sm-fc { --fc: 22px; justify-self: center; }
+.sm-strider .pp-nr { display: grid; position: relative; width: 24px; height: 24px; font-size: 13px; color: var(--fg); }
+.sm-strider .sm-strid { stroke: var(--gold); stroke-width: 1.6; }
+.sm-strider .sm-bock { stroke: var(--gold); }
+.sm-st-m { min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; font-family: var(--display); font-size: 16px; color: var(--fg); text-decoration: none; }
+.sm-st-m .vs { margin: 0 0.3em; color: var(--muted); }
+a.sm-st-m:hover { text-decoration: underline; text-decoration-thickness: 1px; text-underline-offset: 3px; }
+.sm-strider b { text-align: center; font-family: var(--display); font-size: 15px; font-weight: 700; font-variant-numeric: tabular-nums; color: var(--ink); }
+@media (max-width: 440px) {
+  .sm-strider { grid-template-columns: 26px minmax(0, max-content) repeat(var(--n), 34px); gap: 8px 7px; }
+  .sm-st-m { font-size: 15px; }
+}
 
