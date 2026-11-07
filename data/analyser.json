@@ -1,5 +1,5 @@
 {
- "uppdaterad": "2026-11-07T10:55:33.447Z",
+ "uppdaterad": "2026-11-07T10:55:55.508Z",
  "omgang": {
   "id": "2026-11-07-st4978",
   "matcher": [
@@ -698,21 +698,25 @@
    },
    "hasse": {
     "stycken": [
-     "Oxford har gått tio ligamatcher utan att förlora, men förstemålvakten Cumming är avstängd och Eastwood får stå i stället. Laget har släppt in nio mål färre än chanserna borde ha gett, och en del av det har Cumming fixat alldeles själv. Nu får backlinjen visa vad den går för utan honom, och där är jag inte helt lugn.",
-     "Stevenage saknar fyra spelare och kanske en femte, så de kommer inte direkt med full trupp. Oxford har dessutom spelat oavgjort tre gånger på sina fem senaste matcher. Lugn nu, det här blir ingen målfest, och jag skulle bli förvånad om någon vinner med mer än ett mål. Jag tar etta och kryss."
+     "Oxford har gått tio ligamatcher utan förlust, men nu saknas förstemålvakten Cumming som är avstängd, och Helik klev av med en knäskada senast. Bakåt har laget släppt in nio mål färre än chanserna borde ha gett, och en del av den turen har Cumming stått för. Därför tror jag att Oxford släpper in ett mål.",
+     "Stevenage har det ändå värre. Fyra spelare saknas, kanske fem, och laget har bara en bortaseger i ligan. Att de har vunnit cupmatcher borta i Wycombe och Walsall gör mig inte nervös. Det är lugnt. Oxford har inte förlorat hemma i ligan i år och har mer kvar att plocka bland reserverna än Stevenage. Jag ringar in en ren etta."
     ],
+    "tecken": [
+     0
+    ],
+    "resultat": "2–1",
     "tips": "2026-11-07T10:19:01.346Z",
     "uppdrag": {
      "fraser": [
-      "Äsch",
-      "Lugn nu"
+      "Nej nej nej",
+      "Det är lugnt"
      ],
      "krydda": null,
      "bielsa": []
     },
     "model": "claude-opus-5-5",
-    "version": "2026-11-05.1",
-    "writtenAt": "2026-11-07T10:19:12.630Z",
+    "version": "2026-11-07.1",
+    "writtenAt": "2026-11-07T10:55:43.635Z",
     "attempts": 1
    },
    "model": "claude-opus-5-5",
