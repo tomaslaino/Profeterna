@@ -432,6 +432,26 @@ button.sm-who:focus-visible { outline: 2px solid var(--ink); outline-offset: 1px
 /* gängets kupong: en match som gänget inte gav något tecken */
 .sm-r.sm-out > :not(.pp-nr) { opacity: 0.5; }
 
+/* de omtvistade matcherna i uppgörelsen, som i rummet: numret inringat med
+   pennan, en bock vid ringen när matchen är klubbad och gängets kryss blekt –
+   ett förslag – tills dess. Så länge någon omtvistad match återstår träder de
+   andra tillbaka; en klubbad står kvar, så att den går att kryssa färdigt. */
+.sm-r > .pp-nr { position: relative; }
+.sm-r.strid > .pp-nr { color: var(--pp-ink); }
+.sm-strid { position: absolute; left: -6px; top: -5px; width: calc(100% + 12px); height: calc(100% + 10px); overflow: visible; fill: none; stroke: var(--pp-pen); stroke-width: 1.8; stroke-linecap: round; pointer-events: none; }
+.sm-bock { position: absolute; right: -13px; top: -13px; width: 17px; height: 17px; overflow: visible; fill: none; stroke: var(--pp-pen); stroke-width: 2.8; stroke-linecap: round; stroke-linejoin: round; pointer-events: none; }
+.sm-bock.ny path { stroke-dasharray: 1; animation: sm-bock 0.3s cubic-bezier(0.3, 0, 0.5, 1) backwards; }
+@keyframes sm-bock { from { stroke-dashoffset: 1; } to { stroke-dashoffset: 0; } }
+.sm-r.strid:not(.klubbad) { cursor: pointer; }
+.sm-r.strid .sm-bx .pp-x { transition: opacity 0.5s ease; }
+.sm-r.strid:not(.klubbad) .sm-bx .pp-x { opacity: 0.3; }
+.sm-up .sm-r:not(.sm-hd) > * { transition: opacity 0.5s ease; }
+.sm-sheet:has(.sm-r.strid:not(.klubbad)) .sm-r:not(.sm-hd, .strid) > * { opacity: 0.4; }
+@media (prefers-reduced-motion: reduce) {
+  .sm-bock.ny path { animation: none; }
+  .sm-up .sm-r:not(.sm-hd) > *, .sm-r.strid .sm-bx .pp-x { transition: none; }
+}
+
 /* rubrikerna: hur oeniga vi är, tryckt – och en rad i blyerts bredvid */
 .sm-grp { display: flex; flex-wrap: wrap; align-items: baseline; gap: 0 12px; }
 .sm-grp span {

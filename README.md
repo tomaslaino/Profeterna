@@ -620,7 +620,12 @@ bara lokalt. Analyserna visas som de ligger i `data/analyser.json`; hur de skriv
   också där det gjorde Fulham–Newcastle till en spik fast två av tre hade helgarderat. Nu är en
   match omtvistad också när förslaget lämnar ett tecken som någon har med utanför (i Kupong 3 sex
   matcher), gängets kryss där är bleka tills matchen är klubbad, och i handen träder resten av
-  kupongen tillbaka tills alla omtvistade är klubbade. Se *Kupongen i handen*, *Pennan visar vägen*.
+  kupongen tillbaka tills alla omtvistade är klubbade. Samma dag likadant på papperet under Kupong
+  ("Gör samma sak på papperet under Kupong"): samma omtvistade matcher, inringade och med bleka
+  kryss, och *Samma grund, olika säkerhet* delad i två – där förslaget lämnar någons tecken
+  utanför, och *Alla får med sitt*. Det klubbade delas mellan papperet och rummet, och en klubbad
+  match står kvar mörk, så att den går att kryssa färdigt. Se *Kupongen i handen*, *Pennan visar
+  vägen*, och [Inför uppgörelsen](#inför-uppgörelsen), punkt 4.
 - **Expressens löpsedel från VM 94 (2026-11-03, användarens önskemål):** VM 94-affischen med
   fotot från hemkomsten är utbytt mot en mer verklighetstrogen löpsedel, lite solblekt och
   sliten: *JAAAAAAAA! BRONS!* med Tomas foto från Rose Bowl. Den sitter på skivan som de andra.
@@ -1704,9 +1709,20 @@ under omgången.
    under lagen. Matcherna sorteras efter hur oeniga vi är:
    - *Alla olika* – inget tecken har mer än en
    - *Två mot en* – den som avviker förklarar
-   - *Samma grund, olika säkerhet* – alla har med samma tecken, men någon har garderat
+   - *Samma grund, olika säkerhet* – alla har med samma tecken, men någon har garderat, och
+     förslaget till gängets kupong (punkt 5) lämnar något av det utanför
+   - *Alla får med sitt* – som ovan, men förslaget har med allt vi har tippat (sedan 2026-11-07;
+     förut stod de under *Samma grund, olika säkerhet*, och med regeln var det nästan alla matcher)
    - *Eniga mot modellen* – alla har samma tecken, och modellens troligaste är inte med
    - *Eniga* – klubbas utan snack
+
+   **De omtvistade matcherna** (2026-11-07) är märkta som på kupongen i tobaksaffären, med samma
+   kod (`strid` i `analyse`, se *Pennan visar vägen* under [Kupongen i handen](#kupongen-i-handen)):
+   numret är inringat med pennan, gängets kryss där är bleka – ett förslag – och så länge någon
+   omtvistad match återstår träder de andra matcherna tillbaka. Ett klick på raden utanför
+   rutorna, lagen och pennan klubbar matchen, liksom en ändring av gängets tecken i den: bocken
+   dras vid ringen och kryssen fylls i. Det klubbade delas med rummet på enheten
+   (`profeterna.rum.klubbat`), och *Börja om* tar bort det.
 5. **Gängets kupong** (så fort man ser de andras tips, också om någon inte har lämnat in):
    man trycker på rutorna (två rutor =
    gardering). Den börjar som förslaget – med regeln ett som följer den (se *Regeln*), annars
@@ -3582,9 +3598,11 @@ tecken som någon av oss har med utanför – till exempel en spik där två har
 `Samtal.pult.gang`). Eniga matcher, och matcher där förslaget får med allt vi har tippat, är inte
 omtvistade. Tills en omtvistad match är klubbad står gängets kryss där blekt, som ett förslag,
 så att var och ens kryss syns; när den klubbas fylls de i. I handen träder resten av kupongen
-tillbaka – de matcher som inte är omtvistade och de som redan är klubbade – så länge någon
-omtvistad match återstår, så att det mörka är det vi har kvar att prata om; när den sista är
-klubbad står hela kupongen fram igen (`.strid` och `.klubbad` i rum.css). Efter tiden står där en förklaring i sitt bläck, med de korta lagnamnen
+tillbaka – de matcher som inte är omtvistade – så länge någon omtvistad match återstår, så att
+det mörka är det vi ska prata om; en klubbad match står kvar mörk med sin bock, så att den går
+att kryssa färdigt (en halvgardering är två tryck), och när den sista är klubbad står hela
+kupongen fram igen (`.strid` och `.klubbad` i rum.css). Papperet under Kupong märker samma
+matcher på samma sätt (*Inför uppgörelsen*, punkt 4). Efter tiden står där en förklaring i sitt bläck, med de korta lagnamnen
 och utan tiden så att den får plats (raden blir inte högre): den som avviker, annars den vars
 tips gängets tecken just nu lämnar mest utanför, annars den första som har skrivit något
 (`avvik` i `Samtal.pult.gang`, `skal` i rum.js); hela motiveringen när man pekar. Ändras
@@ -3593,10 +3611,10 @@ höger om rutorna vid den första omtvistade matchen som inte är klubbad. En ma
 gängets tecken i den ändras, eller med ett klick på raden – numret, tiden eller förklaringen,
 medan lagen lägger matchbladet på kupongen som förut – och pennan drar bocken; då får
 ringen en bock och pennan går vidare till nästa, och när alla är klubbade lägger den sig vid
-sidan. Klubbat sparas på enheten för omgången (`profeterna.rum.klubbat`), och *Börja om* tar
-bort bockarna. Är gängets kupong redan sparad och inget klubbat på enheten är alla klubbade
-(`gjord` i `Samtal.pult.gang`), och när gängets kupong sparas i handen klubbas det som återstår –
-en sparad kupong står aldrig med bleka kryss. **Första gången** gängets kupong tas i handen på enheten under omgången
+sidan. Klubbat sparas på enheten för omgången (`profeterna.rum.klubbat`, `klubba` och `klar` i
+samtal.js), samma i rummet och på papperet, och *Börja om* tar bort bockarna. Är gängets kupong
+redan sparad och inget klubbat på enheten är alla klubbade (`klar` i `Samtal.pult.gang`), och när
+gängets kupong sparas klubbas det som återstår – en sparad kupong står aldrig med bleka kryss. **Första gången** gängets kupong tas i handen på enheten under omgången
 (`profeterna.rum.lagda`) läggs de tre kupongerna ur högen på den, en i taget och
 genomskinliga, och var och ens kryss stannar kvar i rutorna; sedan dras gängets kryss, ett i
 taget, och pennan ringar in numren och väntar vid den första (`uppgorelse` i rum.js, ungefär
