@@ -763,6 +763,13 @@ bara lokalt. Analyserna visas som de ligger i `data/analyser.json`; hur de skriv
   hörn: pulten går fram längs ens högra sida och viker av förbi honom, i samma trä och med samma
   lister, och kameran står närmare och högre, så att koppen, notan och handen ses uppifrån som i
   rummet. Väggen bakom honom är ombakad för den nya kameran. Se [Hasse Backe](#hasse-backe), *Bilden*.
+- **Hasse Backe sitter bekvämt (2026-11-07, användarens önskemål):** "Hasse ser lite obekväm ut där han
+  sitter med händerna", och de stämde inte med den lugna handen på pulten i rummet. Den högra handen
+  pekade tvärs över mot den vänstras handled och var vinklad mot tummen, den vänstra var vriden nästan
+  50° ut mot koppen, och armbågarna stod ut. Nu ligger armbågarna nästan rakt framför axlarna och
+  underarmarna i ett lugnt V, med händerna i deras förlängning, fingrarna lätt krökta och en bit
+  emellan; askkoppen står lite längre till vänster, så att cigarren går fri från handen. Se
+  [Hasse Backe](#hasse-backe), *Bilden*.
 - **Hasse Backe minns vad han sa (2026-11-06, användarens önskemål):** klickade man på en match
   man redan hade frågat om slog han domen i disken en gång till, och efter en omladdning gjorde han
   om allt, med 15–25 sekunders väntan. Nu står det han sa direkt, sparat på enheten så att det
@@ -4220,16 +4227,23 @@ Figuren skuggar det som är under disken eller skyms av den (`BORD_GLSL` i
 ovansidan, bakom den det som strålen från kameran bara når genom disken. Kroppen slutar alltså vid
 kanten, och armbågar, händer och fat trycks mot disken utan att något sticker igenom. Armarna vilar
 med armbågarna på disken och armens riktiga längder (`paDisken`), och gesterna börjar och slutar
-där; eftersom disken går snett når den vänstra armbågen den bara nära axeln. Den vänstra armbågen
-ligger nära kroppen och handen är vriden lite ut mot koppen, och koppen står till höger om den, fritt
-från armen: en bit disk mellan fatet och handen, och fingertopparna några centimeter från fatets kant,
-som handen på pulten i rummet. Fatet står på hörnet och notan på pultens arm. Fingrarna lägger sig på disken: ett finger vars två yttre leder skulle nå under
+där. Han sitter bekvämt: armbågarna nästan rakt framför axlarna, så att överarmarna faller som på
+fotot, och underarmarna lite in mot mitten i ett lugnt V. Händerna ligger i underarmarnas förlängning,
+bara lite vinklade mot lillfingret som en hand som vilar, med fingrarna lätt krökta och samlade och en
+bit isär: den vänstra bredvid koppen, med en bit disk mellan handen och fatet, och den högra mellan
+den och askkoppen, lite rullad mot lillfingret. Den vänstra tummen ligger intill handen, så att
+händerna inte når varandra (`SAMLA`, `TUMME_VILA`); det tonar bort när handen tar kaffet, cigarren
+eller pennan. Askkoppen står så långt till vänster att cigarren i den går fri från handen. Fatet står
+på hörnet och notan på pultens arm. Fingrarna lägger sig på disken: ett finger vars två yttre leder skulle nå under
 ovansidan böjs mindre, tills den lägsta punkten ligger på ytan (`golv` i
 [public/rum-hasse-arm.js](public/rum-hasse-arm.js)), så att fingertopparna aldrig går ned i disken,
 inte heller när han trummar eller slår i den. Förut var fingrarna krökta som klor i vilan, topparna
 försvann ned i disken och den vänstra handen pekade in mot honom med koppen vid handleden (ändrat
 2026-11-06). Sedan låg handen rakt fram med armbågen ute, och ärmen gick genom fatets kant, så att det
-såg ut som om armen låg över fatet (ändrat 2026-11-06).
+såg ut som om armen låg över fatet (ändrat 2026-11-06). Sedan pekade den högra handen tvärs över mot
+den vänstras handled, vinklad nästan 20° mot tummen, och den vänstra var vriden ut mot koppen nästan
+50° mot underarmen, med armbågarna ute: händerna låg på varandra och såg krampaktiga ut, och de liknade
+inte den lugna handen på pulten i rummet (ändrat 2026-11-07).
 
 Han fyller höjden från hjässan nära överkanten, och pultens inre hörn ligger nära underkanten, så att
 man ser att pulten går vidare mot en; mitten av honom står vid 60 % av bredden och samtalet i en spalt
