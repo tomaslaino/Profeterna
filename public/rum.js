@@ -1298,15 +1298,17 @@ ${window.RumRegister ? RumRegister.nara() : ''}
   }
 
   // Uppgörelsen: porträtten för dem som har med tecknet, var och en på sin
-  // plats i rutan (samma ordning som överst), och motiveringen när man pekar.
+  // plats i rutan (samma ordning som överst), och när man pekar motiveringen
+  // och kommentaren i efterhand.
   function seats(v, id, j) {
     const gang = (KP.data && KP.data.samtal && KP.data.samtal.gang) || [];
     const who = (v.who && v.who[id] && v.who[id][j]) || [];
     return '<span class="sits">' + gang.map((g, i) => {
       if (!who.includes(g.id)) return '<b></b>';
       const note = v.notes && v.notes[id] && v.notes[id][g.id];
+      const eft = v.after && v.after[id] && v.after[id][g.id];
       const src = photoOf(g.id);
-      return `<b class="sm-k${i}" title="${esc(`${g.id}${note ? `: ${note}` : ''}`)}">${src ? `<img src="${esc(src)}" alt="" draggable="false">` : ''}</b>`;
+      return `<b class="sm-k${i}" title="${esc(`${g.id}${note ? `: ${note}` : ''}${eft ? `\nEfteråt: ${eft}` : ''}`)}">${src ? `<img src="${esc(src)}" alt="" draggable="false">` : ''}</b>`;
     }).join('') + '</span>';
   }
 
@@ -1316,7 +1318,7 @@ ${window.RumRegister ? RumRegister.nara() : ''}
     if (slag === 'fyll') return { slag, vem: p.vem, tecken: p.tecken, not: p.kommentarer, efter: {} };
     if (slag === 'gang') {
       const g = Samtal.pult.gang();
-      return g && { slag, vem: p.vem, tecken: g.val, who: g.who, notes: g.notes, efter: p.efter, skriv: Boolean(p.skriv), g };
+      return g && { slag, vem: p.vem, tecken: g.val, who: g.who, notes: g.notes, after: g.efter, efter: p.efter, skriv: Boolean(p.skriv), g };
     }
     const t = Samtal.pult.tips(vem);
     return t && { slag, vem, tecken: t.tecken, not: t.kommentarer, efter: t.efter, skriv: slag === 'din' && p.skriv === vem };

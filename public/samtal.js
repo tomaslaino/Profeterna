@@ -1871,7 +1871,8 @@
     // den sparade kupongen eller det du har kryssat (decisions) – och vilka
     // som har med varje tecken. → null om du inte ser de andras tips, annars
     // {val, who: {matchens id: [vilka på 1, X, 2]}, notes: {matchens id:
-    // {vem: motivering}}, open: någon match går att fylla i, same: gängets
+    // {vem: motivering}}, efter: {matchens id: {vem: kommentar i efterhand}},
+    // open: någon match går att fylla i, same: gängets
     // kupong är sparad som den står, reset: tecknen är inte förslaget
     // (Börja om), label: guldordet}.
     gang() {
@@ -1888,6 +1889,7 @@
         val: { ...val },
         who: Object.fromEntries(rows.map((r) => [r.x.id, r.cov])),
         notes: Object.fromEntries(rows.map((r) => [r.x.id, Object.fromEntries(r.notes.map((o) => [o.k, o.text]))])),
+        efter: Object.fromEntries(rows.map((r) => [r.x.id, Object.fromEntries(afterOf(s, r.x.id, null).map((o) => [o.k, o.text]))])),
         open,
         same: same && direct,
         reset: open && key(val) !== key(proposal(rows)),
