@@ -92,7 +92,7 @@
 /* Dina svar är lappar i tipskupongens tryck (papper.css) som ligger på disken: terrakotta som
    kupongens band för det han väntar på och krämvitt papper för det andra du kan svara, med en tunn
    ram innanför kanten som rutorna på kupongen. Det som går härifrån eller avbryter (Matchbladet,
-   Ja, ja, Tillbaka) står med små spärrade versaler och en pil, som texten i kupongens band. */
+   Ja, ja, Låt bli) står med små spärrade versaler och en pil, som texten i kupongens band. */
 .rh-knapp {
   --ram: rgba(169, 69, 43, 0.5);
   position: relative; display: inline-flex; align-items: center; justify-content: center; box-sizing: border-box;
@@ -109,14 +109,11 @@
   .rh-knapp:hover { transform: translateY(-1px); filter: brightness(1.06); box-shadow: 0 3px 0 rgba(0, 0, 0, 0.5), 0 12px 22px rgba(0, 0, 0, 0.45); }
   .rh-vag:hover { color: #fbf1de; }
   .rh-vag:hover::after { transform: translateX(3px); }
-  .rh-tillbaka:hover::before { transform: translateX(-3px); }
 }
 .rh-knapp:active { transform: translateY(1px); box-shadow: 0 1px 0 rgba(0, 0, 0, 0.5), 0 3px 8px rgba(0, 0, 0, 0.4); }
 .rh-vag { display: inline-flex; align-items: center; gap: 0.35em; min-height: 40px; margin: 0; padding: 0 2px; border: 0; background: none; color: rgba(246, 239, 220, 0.8); font: 700 0.8em/1 Fraunces, Georgia, serif; letter-spacing: 0.17em; text-transform: uppercase; text-decoration: none; text-shadow: inherit; white-space: nowrap; cursor: pointer; -webkit-tap-highlight-color: transparent; transition: color 0.12s; }
-.rh-vag::after, .rh-tillbaka::before { content: "→"; font-weight: 400; font-size: 1.3em; letter-spacing: 0; transition: transform 0.12s; }
+.rh-vag::after { content: "→"; font-weight: 400; font-size: 1.3em; letter-spacing: 0; transition: transform 0.12s; }
 .rh-ja::after { content: "»"; }
-.rh-tillbaka::before { content: "←"; }
-.rh-tillbaka::after { content: none; }
 .rh-knapp:focus-visible, .rh-vag:focus-visible { outline: 2px solid #f0d699; outline-offset: 3px; }
 /* slaget i disken: bilden rycker till (koppen hoppar i rum-hasse-3d.js) */
 .rh-slag { animation: rh-slag 0.42s linear; }
@@ -124,7 +121,7 @@
 @keyframes rh-slag { 0% { translate: 0 0; } 18% { translate: 0 var(--slag, 9px); } 42% { translate: 0 calc(var(--slag, 9px) * -0.55); } 70% { translate: 0 calc(var(--slag, 9px) * 0.22); } 100% { translate: 0 0; } }
 .rum.hasse-pan .rum-ft, .rum.hasse-pan .rum-hdr, .rum.hasse-framme .rum-ft, .rum.hasse-framme .rum-hdr { display: none; }
 .rh-fot { position: absolute; bottom: 14px; z-index: 2; display: flex; justify-content: flex-end; pointer-events: none; }
-.rh-tillbaka, .rh-ljud { flex: none; font-size: 12px; pointer-events: auto; }
+.rh-ljud { flex: none; font-size: 12px; pointer-events: auto; }
 /* ljudet av och på, längst till vänster */
 .rh-ljud { margin-right: auto; }
 .rh-ljud::after { content: none; }

@@ -74,7 +74,7 @@
 
   // En match man redan har frågat om: det han sa står direkt, och han erbjuder sig att
   // titta på den igen, ödmjukt på sitt sätt (han tvivlar ju aldrig). erbjudNytt när
-  // analysen har skrivits om sedan han sa det. Knappen under är "Ja, titta igen".
+  // analysen har skrivits om sedan han sa det. Knappen under är "Titta igen".
   erbjud: [
     'Jag kan titta på den igen, om du vill. Jag är inte för fin för det.',
     'Ska jag titta på den en gång till? Det blir samma svar, men jag gör det gärna.',

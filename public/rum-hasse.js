@@ -66,7 +66,7 @@ window.RumHasse = (() => {
     vy.setAttribute('aria-label', 'Hasse Backe');
     vy.innerHTML = '<div class="rh-scen"><img class="rh-bak" alt="" draggable="false"><img class="rh-bak rh-lys" alt="" draggable="false"><canvas class="rh-bak rh-vagg"></canvas><canvas class="rh-disk"></canvas><i class="rh-mork"></i></div>' +
       '<canvas class="rh-duk"></canvas><i class="rh-ton" aria-hidden="true"></i><i class="rh-korn" aria-hidden="true"></i>' +
-      '<div class="rh-samtal"></div><div class="rh-fot"><button type="button" class="rh-vag rh-ljud" hidden></button><button type="button" class="rh-vag rh-tillbaka">Tillbaka</button></div>';
+      '<div class="rh-samtal"></div><div class="rh-fot"><button type="button" class="rh-vag rh-ljud" hidden></button></div>';
     H.panIn.append(vy);
     H.vy = vy;
     // det som händer i samtalet stannar där (knapparna byter ut sig själva)
@@ -1284,16 +1284,14 @@ window.RumHasse = (() => {
         const fr = s.querySelector('.rh-fragan');
         if (fr) fr.style.opacity = 0;
         K().vems(t, () => fyllIn(m, lista, sign, () => {
-          // Lär mig står kvar där den stod, och bredvid den Nästa match
+          // Lär mig står kvar där den stod, och bredvid den Alla matcher
           const g = svar.querySelector('.rh-gissa');
-          if (!g || g.dataset.nasta) return;
-          g.dataset.nasta = '1';
+          if (!g || g.dataset.alla) return;
+          g.dataset.alla = '1';
           const ny = g.cloneNode(false);
-          ny.textContent = 'Nästa match';
-          ny.classList.add('huvud');
-          ja.classList.remove('huvud');
+          ny.textContent = 'Alla matcher';
           g.replaceWith(ny);
-          ny.addEventListener('click', () => nastaMatch(m, lista));
+          ny.addEventListener('click', fraga);
         }));
       });
     }
@@ -1383,7 +1381,7 @@ window.RumHasse = (() => {
   // En match du redan har frågat om: det han sa står direkt, under domen, som han sa det (också
   // om analysen har skrivits om sedan dess), och sist vad han tycker om din kupong nu. Sedan
   // erbjuder han sig att titta igen, ödmjukt på sitt sätt, och säger till om analysen har skrivits
-  // om sedan han sa det. Ja, titta igen ger hela analysen (svara).
+  // om sedan han sa det. Titta igen ger hela analysen (svara), Alla matcher listan.
   async function tidigare(m, lista, klick) {
     const s = $('.rh-samtal');
     const vem = {};
@@ -1416,12 +1414,11 @@ window.RumHasse = (() => {
     const fylla = K().kan();
     s.innerHTML = `<div class="rh-match">${esc(m.namn)}?</div><div class="rh-dom${d.length > 7 ? ' lang' : ''}">${esc(d)}</div>` +
       `<div class="rh-text"></div>${nu ? `<p class="rh-fragan"><span class="rh-o">${esc(erbjud)}</span></p>` : ''}${fylla ? K().rutor(m.id) : ''}` +
-      `<div class="rh-slut"><button type="button" class="rh-knapp huvud">Nästa match</button>${nu ? '<button type="button" class="rh-knapp rh-igen">Ja, titta igen</button>' : ''}` +
-      `<a class="rh-vag" href="#match/${esc(m.id)}">Matchbladet</a></div>`;
+      `<div class="rh-slut">${knappar(!!nu)}<a class="rh-vag" href="#match/${esc(m.id)}">Matchbladet</a></div>`;
     // (texten läses från början, också när den inte får plats: i telefonen)
     repliker([...st, om].filter(Boolean).map((text) => ({ text })), { i: s.querySelector('.rh-text'), direkt: true }).ruta.scrollTop = 0;
     const slut = s.querySelector('.rh-slut');
-    slut.querySelector('.huvud').addEventListener('click', fraga);
+    kopplaKnappar(slut, m, lista);
     if (fylla) {
       const t = s.querySelector('.rh-tecken');
       // (det han säger om kupongen står där erbjudandet stod, sag)
@@ -1429,7 +1426,6 @@ window.RumHasse = (() => {
     }
     if (klick && !klick.detail) slut.querySelector('.huvud').focus({ preventScroll: true });
     if (!nu) return;
-    slut.querySelector('.rh-igen').addEventListener('click', () => svara(m, lista, true));
     repliker([{ text: erbjud }], { i: s.querySelector('.rh-fragan'), rad: true }).tid = performance.now() + 700;
   }
 
@@ -1470,8 +1466,8 @@ window.RumHasse = (() => {
     H.fas = 'klar';
     if (Math.abs(H.T - GEST.hem.vila) > 0.01 || H.klipp) spela('hem');
     const slut = s.querySelector('.rh-slut');
-    slut.innerHTML = `<button type="button" class="rh-knapp huvud">Nästa match</button><a class="rh-vag" href="#match/${esc(m.id)}">Matchbladet</a>`;
-    slut.querySelector('.huvud').addEventListener('click', () => nastaMatch(m, lista));
+    slut.innerHTML = `${knappar(!!(signs && signs.length))}<a class="rh-vag" href="#match/${esc(m.id)}">Matchbladet</a>`;
+    kopplaKnappar(slut, m, lista);
     const t = s.querySelector('.rh-tecken');
     if (!t) return;
     K().kopplaRutor(t, m, (sign) => {
@@ -1514,14 +1510,14 @@ window.RumHasse = (() => {
     const sagt = hans ? lott(hans.includes(sign) ? r.medhall : r.emot) : lott(r.skriver[sign]);
     K().valt(m.id, sign, { sagt, suddat: lott(r.suddar), tok: () => H.fraga === vem, sen });
   }
-  // Nästa match som du inte har något på, annars listan.
-  function nastaMatch(m, lista) {
-    const nu = Date.now();
-    const i = lista.findIndex((x) => x.id === m.id);
-    const ordning = [...lista.slice(i + 1), ...lista.slice(0, i)];
-    const n = K().kan() ? ordning.find((x) => Date.parse(x.avspark) > nu && !K().din(x.id)) : null;
-    if (n) valj(n, lista, { detail: 1 });
-    else fraga();
+  // Svaren när han har sagt sitt: Titta igen (hela analysen en gång till) först, där den finns,
+  // och Alla matcher (listan) bredvid. Står Alla matcher ensam är det den man väntar på.
+  const knappar = (igen) => (igen ? '<button type="button" class="rh-knapp huvud rh-igen">Titta igen</button>' : '') +
+    `<button type="button" class="rh-knapp${igen ? '' : ' huvud'} rh-alla">Alla matcher</button>`;
+  function kopplaKnappar(slut, m, lista) {
+    const igen = slut.querySelector('.rh-igen');
+    if (igen) igen.addEventListener('click', () => svara(m, lista, true));
+    slut.querySelector('.rh-alla').addEventListener('click', fraga);
   }
   // Det han säger om kupongen: överst, på raden direkt ovanför svaren när den syns (en match du
   // redan har frågat om: där han erbjöd sig att titta igen), eller sist i texten.
@@ -1542,15 +1538,15 @@ window.RumHasse = (() => {
     return H.kupong;
   }
 
-  // Under en match går ett klick var som helst framåt, och Tillbaka eller Esc går
-  // härifrån; vid matchlistan går ett klick utanför härifrån, som förut.
+  // Ett klick på bilden, utanför samtalet, går härifrån (som Esc), och under en match går ett
+  // klick i samtalet framåt.
   function klick() {
     if (H.klickar) return;
     H.klickar = true;
     H.vy.addEventListener('click', (e) => {
       // kupongen i handen: ett klick tar den med sig
       if (H.kupong && H.kupong.klickUtanfor(e)) { e.stopImmediatePropagation(); return; }
-      if (H.fas === 'fraga' || e.target.closest('a, button, .rh-kupong')) return;
+      if (H.fas === 'fraga' || e.target.closest('a, button, .rh-kupong') || !e.target.closest('.rh-samtal')) return;
       e.stopImmediatePropagation();
       framat();
     }, true);

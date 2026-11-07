@@ -736,6 +736,11 @@ bara lokalt. Analyserna visas som de ligger i `data/analyser.json`; hur de skriv
   man redan hade frågat om slog han domen i disken en gång till, och efter en omladdning gjorde han
   om allt, med 15–25 sekunders väntan. Nu står det han sa direkt, sparat på enheten så att det
   finns kvar när analysen skrivs om, och han erbjuder sig ödmjukt, på sitt sätt, att titta igen. Se [Hasse Backe](#hasse-backe), *Samtalet*.
+- **Titta igen och Alla matcher hos Hasse Backe, utan Tillbaka (2026-11-07, användarens önskemål):**
+  knappen *Nästa match* tog en till listan med alla 13 matcherna och var "helt fel", och *Tillbaka*
+  var onödig. Nu står *Titta igen* (hela analysen en gång till) där *Nästa match* stod, både efter
+  en analys och vid en match man redan har frågat om, och *Alla matcher* (listan) bredvid. Ett klick
+  på bilden utanför samtalet går tillbaka till rummet, som Esc. Se [Hasse Backe](#hasse-backe).
 - **Hasse Backe nöjd i stället för hånfull (2026-11-06, användarens önskemål):** i vilan hade han ena
   brynet högt, huvudet på sned och hakan uppe med ett tunt leende, och det såg hånfullt ut. Nu är han
   nöjd och säker på sin sak, fortfarande lite överdrivet: båda brynen lite uppe, huvudet nästan rakt
@@ -4135,8 +4140,7 @@ och kameran slår snabbt åt vänster till honom. Där sitter han bakom bardiske
 anslagstavlan, och har vridit sig lite mot en, med underarmarna på disken, kaffet och notan vid den
 vänstra handen och cigarren i askkoppen vid den högra. Bakom honom är barens vägg med hyllorna,
 cigarettpaketen och lamporna. Samtalet står i en spalt till vänster om honom (på höjden under honom)
-och kommer när kameran har stannat. Esc eller *Tillbaka* går tillbaka (vid matchlistan också ett klick
-utanför). Medan han väntar på att man ska välja gör han något litet då och då – trummar med fingrarna,
+och kommer när kameran har stannat. Ett klick på bilden utanför samtalet går tillbaka, liksom Esc. Medan han väntar på att man ska välja gör han något litet då och då – trummar med fingrarna,
 tittar bort, nickar för sig själv, suckar (se *Vilan*) – och ibland njuter han av kaffet (på ett av sex
 sätt) eller av cigarren (på ett av elva), varannan gång. I rummet ligger kaffet, notan och
 handen kvar på pulten som en ledtråd, och handen trummar när man pekar på den eller kaffet, och
@@ -4425,8 +4429,8 @@ som ligger på disken: stort 1 X 2 överst (se *Din kupong*), *Jag är idel öra
 bredvid (*Jag gissar* när kupongen inte går att fylla i), båda med en tunn ram innanför kanten, och *Matchbladet →* under dem med små spärrade
 versaler som texten i bandet. Frågan har sin plats från början, osynlig tills han säger den, så att
 knapparna inte flyttar sig. Förut stod svaren som små länkar längst ned i spalten och syntes knappt
-i telefonen, och sedan som piller i guld (ändrat 2026-11-04). *Nästa match* efter analysen är samma
-lapp i terrakotta, och *Ja, ja »* och *← Tillbaka* står med samma versaler som *Matchbladet →*. Han har alltid svaret, också när
+i telefonen, och sedan som piller i guld (ändrat 2026-11-04). *Titta igen* efter analysen är samma
+lapp i terrakotta, med *Alla matcher* i krämvitt bredvid, och *Ja, ja »* står med samma versaler som *Matchbladet →*. Han har alltid svaret, också när
 han ska läsa på (*Den knäckte jag i morse*); att han läser på märks först medan han väntar. Är analysen inte skriven än
 säger han det (*Den tar jag sen*). En match du redan har frågat om står direkt, som han sa
 den: domen i guld, hans text och resultatet, och sist vad han tycker om det du har på kupongen nu.
@@ -4434,7 +4438,7 @@ Det han sa sparas på enheten, så att det står kvar också när analysen har s
 (det görs upp till fyra gånger i veckan, se [Analyserna](#analyserna)). Sedan erbjuder han sig att
 titta igen, ödmjukt på sitt sätt (*Jag har haft fel en gång förut. Ska jag titta på den igen, för
 säkerhets skull?*), och har analysen skrivits om sedan han sa det säger han det (*Tidningarna har
-skrivit mer om den sedan dess.*). *Ja, titta igen* bredvid *Nästa match* ger hela analysen en gång
+skrivit mer om den sedan dess.*). *Titta igen* bredvid *Alla matcher* ger hela analysen en gång
 till, med väntan, slaget och rösten (*Då tar vi den från början.*), och det nya ersätter det gamla
 (`tidigare` i [public/rum-hasse.js](public/rum-hasse.js)). Matcher han svarade på innan texten
 sparades (före 2026-11-06) får dagens analys om tecknen är desamma, annars bara domen och
@@ -4445,7 +4449,7 @@ och är nästan klar (*Nu faller bitarna på plats.*), med en rad lottad ur varj
 (se *Slaget*), och domen står i guld. Sedan säger han texten en mening i taget, ord för ord med munnen i takt (och det hörs, se *Ljudet*), med en paus
 mellan meningarna och en längre före en kort mening, och gesterna kommer vid de bestämda orden
 (*Nej nej nej* och *varningens finger* ger fingret, annars handflatan i disken eller en av gesterna i
-*Händerna när han pratar*) eller vid ungefär var tredje lång mening. Ett klick var som helst
+*Händerna när han pratar*) eller vid ungefär var tredje lång mening. Ett klick i samtalet
 visar hela repliken och nästa klick går vidare; *Ja, ja* tar resten på en gång, och det svarar han
 på (*Som du vill.*). Efter texten säger han vad matchen slutar (*Det slutar 1–1.*): det troligaste
 resultatet i modellens prognos (resultatmatrisen i `data/match/<id>.json`, samma som matchbladet
@@ -4454,7 +4458,7 @@ ingen prognos för matchen säger han inget resultat (`resultatet` i
 [public/rum-hasse.js](public/rum-hasse.js)). Sist säger han vad han tycker om det du själv har på
 kupongen (*På din kupong har du bara etta. Det var kaxigt.*); har du inget på matchen säger han inget om den. Han minns på enheten vad du har
 frågat om: på matchens rad står hans tecken ifyllda i guld i rutorna 1 X 2, som på kupongen, med
-resultatet bredvid i en rak spalt. *Nästa match* räknar
+resultatet bredvid i en rak spalt. *Alla matcher* tar en tillbaka till listan, och där räknar han
 (*Nu är halva kupongen klar*). Bara tecken du själv har bett om syns, så att listan inte blir ett
 automatiskt tips.
 Går hans röst inte att få säger han det och visar analysen i skrift. Allt han säger runt omkring är
@@ -4514,8 +4518,8 @@ likadana ut på pulten efteråt; vilka kryss som är hans minns enheten (`profet
 det själv är det ditt. På papperet under Kupong är de vanliga kryss.
 
 Första gången under ett besök visar han upp kupongen när han har skrivit, så att man ser vad det blev (ett klick lägger
-tillbaka den), och sedan ligger den kvar på disken medan du går vidare. *Nästa match* tar nästa match som du inte har något
-på. Ett klick på kupongen och du har den i handen, och ett klick till och den är borta, och då tar han den inte
+tillbaka den), och sedan ligger den kvar på disken medan du går vidare.
+Ett klick på kupongen och du har den i handen, och ett klick till och den är borta, och då tar han den inte
 själv efter analyserna. I listan står det du har på raden för hand, i en egen spalt längst ut, efter tecknen han har sagt. Med minskad rörelse står allt
 direkt. På disken är kupongen hopklämd av perspektivet, som notan, och det är därför man får se den stor.
 
@@ -4641,9 +4645,9 @@ Azure.
 I sidan spelas ljudet med Web Audio ([public/rum-hasse.js](public/rum-hasse.js), *rösten*). Det
 hämtas medan han gör annat – hans text medan han låtsas läsa på – och orden kommer i takt med
 ljudet, utspridda efter sin längd, medan munnen följer ljudstyrkan. Saknas meningen i registret
-eller är ljudet inte framme inom 2,5 s säger han den tyst, som förut. Ett klick visar hela
-repliken och tystar den, liksom *Ja, ja* och *Tillbaka*. Ljudet är av tills besökaren trycker på
-*Ljud på* längst ned till vänster, med samma små versaler som *← Tillbaka*; klicket väcker
+eller är ljudet inte framme inom 2,5 s säger han den tyst, som förut. Ett klick i samtalet visar hela
+repliken och tystar den, liksom *Ja, ja*, och han tystnar när man går därifrån. Ljudet är av tills besökaren trycker på
+*Ljud på* längst ned till vänster, med samma små versaler som *Matchbladet →*; klicket väcker
 ljudet i webbläsaren, och valet minns enheten. Sedan heter knappen *Ljud av*. Med minskad
 rörelse står allt direkt och inget hörs. *Jag har tappat rösten* sägs tyst.
 
