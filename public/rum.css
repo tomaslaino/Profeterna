@@ -594,7 +594,8 @@ canvas.rum-neonhalo { opacity: 0.28; }
 .rum-kup .pen.fel .sm-pen { opacity: 1; }
 .rum-kup .pen.fel .pen-in { border-bottom-color: var(--pp-no); }
 .rum-kup .pen.skickar .pen-in { opacity: 0.6; }
-/* I handen är hela matchen en plats att skriva på (writeOn i rum.js), och
+/* I handen är hela matchen en plats att skriva på (writeOn i rum.js) utom
+   lagen, som lägger bladet med lagen på kupongen (rum-lagen.css), och
    medan man skriver får texten raden: tiden och motiveringen viker undan och
    lagen står med de korta namnen, tills man är klar */
 .rum-handen .row:has(.pen:not(.gom)) .m { cursor: text; }
