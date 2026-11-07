@@ -11,6 +11,9 @@
 //   matchid finns inte hos 365Scores, så matchen hittas på tävling, avspark
 //   och lagnamn (alla 505 matcher 1/9–8/11 2026 hittades, verifierat
 //   2026-10-19). Gräver Grav hämtar sina startelvor på samma sätt.
+//   Har 365Scores ingen elva än ritas den beräknade (src/startelvor.js,
+//   public/elva.js): planen kommer med matchbladet, och de som 365Scores
+//   (eller FPL) säger saknas stryks här innan elvan tas ut.
 // - Matchen: ESPN:s matchsammanfattning (samma id som spelprogrammet) –
 //   målen, korten, bytena, lagstatistiken och publiken. Uppdateras varje
 //   minut medan matchen pågår och rutan är öppen.
@@ -44,6 +47,7 @@
   const lineups = new Map();
   const summaries = new Map();
   const absent = new Map(); // matchid → frånvaron från app.js (FPL) { home, away }
+  const plans = new Map(); // matchid → den beräknade startelvans plan (d.elva) eller null
   let current = null; // { root, m, espn }
   let timer = null;
 
@@ -370,8 +374,65 @@
       `<div class="mr-pitch${inner ? '' : ' empty'}">${LINES_WIDE}${LINES_TALL}${inner}${inner ? '' : mark}</div></div>`;
   }
 
-  // ix = spelarkorten (cards), saknas tills de är inlästa.
-  function renderLineups(m, r, alt, ix) {
+  // ---------- den beräknade startelvan ----------
+
+  const POS_OF = { G: 'Goalkeeper', D: 'Defender', M: 'Midfielder', F: 'Attacker' };
+  const fDay = new Intl.DateTimeFormat('sv-SE', { timeZone: TZ, day: 'numeric', month: 'short' });
+  const lastWord = (s) => { const w = norm(s).split(' '); return w[w.length - 1]; };
+
+  // Saknas spelaren? Med 365Scores lista (t.out) på id eller namn – hela
+  // namnet, eller efternamn och förnamnets första bokstav. Med FPL:s
+  // (t.outKnown) på FPL:s status, som bygget kopplat till ESPN-spelaren.
+  // Osäkra räknas inte som saknade.
+  function outTest(t) {
+    if (t.outKnown) return (pl) => ['skadad', 'avstängd', 'ej uttagbar'].includes(pl.x);
+    const gone = t.out.filter((x) => !x.doubtful);
+    const aids = new Set(gone.map((x) => x.aid).filter((x) => x != null));
+    const full = new Set(gone.map((x) => norm(x.name)));
+    const brief = new Set(gone.map((x) => `${norm(x.name).charAt(0)} ${lastWord(x.name)}`));
+    return (pl) => (pl.a != null && aids.has(pl.a)) || full.has(norm(pl.n)) || brief.has(`${norm(pl.n).charAt(0)} ${lastWord(pl.n)}`);
+  }
+
+  // Elvan ur planen, som 365Scores elvor: spelarna med linje och sida.
+  function calcTeam(t, plan) {
+    if (!plan || !window.Elva) return false;
+    const xi = window.Elva.fill({ slots: plan.slots.map(([l, s, g]) => ({ l, s, g })), pool: plan.pool }, outTest(t));
+    if (!xi) return false;
+    t.starters = xi.map(({ slot, player: p }) => ({
+      id: `e${p.i}`, aid: p.a, name: p.n, short: p.k, nr: p.nr ? Number(p.nr) : null,
+      line: slot.l, side: slot.s, pos: POS_OF[slot.g], rt: null, ev: null,
+    }));
+    t.formation = plan.f;
+    t.placed = true;
+    return true;
+  }
+
+  // Stämpelns title: hur elvan räknats för var och en, och hur ofta det
+  // stämt i säsongens matcher (utan skadelistorna, src/startelvor.js).
+  function calcTitle(m, E) {
+    const one = (name, p) => {
+      if (!p) return `${name}: ingen elva att gå på`;
+      const at = `mot ${p.from.opp || 'okänd'} ${fDay.format(new Date(p.from.t))}`;
+      if (p.k !== 'C') return `${name}: ligaelvan ${at}`;
+      const r = p.rot || {};
+      const how = r.xi ? 'bänken först, sedan elvan' : 'elvan';
+      const gk = r.xi && !r.gk ? ', målvakten kvar' : !r.xi && r.gk ? ', målvakten från bänken' : '';
+      return `${name}: ${how} ${at}${gk}`;
+    };
+    const fit = (E.fit && E.fit[m.type === 'cup' ? 'C' : 'L']) || null;
+    const how = m.type === 'cup'
+      ? 'Cupmatch: roterar lagen i divisionen i cupen tas bänken från förra ligamatchen först'
+      : 'Ligamatch: förra ligaelvan – cup- och Europamatcherna hoppas över';
+    return [
+      'Beräknad av Matchfixarna ur lagens elvor hos ESPN', how, one(m.home, E.home), one(m.away, E.away),
+      'Utan dem som saknas',
+      fit ? `Stämde på ${fit.hit.toFixed(1).replace('.', ',')} av 11 i säsongens ${fit.n.toLocaleString('sv-SE')} ${m.type === 'cup' ? 'cupmatcher' : 'ligamatcher'} per lag` : null,
+    ].filter(Boolean).join(' · ');
+  }
+
+  // ix = spelarkorten (cards), saknas tills de är inlästa. E = den beräknade
+  // startelvans plan (d.elva), null utan.
+  function renderLineups(m, r, alt, ix, E) {
     if (!r) return '<p class="mr-wait">Hämtar startelvorna …</p>';
     const L = r.data || null;
     const blank = { status: '', formation: null, starters: [], placed: false, bench: [], coach: null, out: [] };
@@ -384,16 +445,21 @@
     if (alt && !has(home) && !has(away)) {
       for (const [t, a] of [[home, alt.home], [away, alt.away]]) if (a) { t.out = a; t.outKnown = true; }
     }
-    const both = home.placed && away.placed;
+    const played = Boolean(L && L.played) || m.completed;
+    // Ingen elva hos 365Scores: den beräknade, om bygget har en plan.
+    const calc = !played && E && !home.starters.length && !away.starters.length
+      ? [calcTeam(home, E.home), calcTeam(away, E.away)].some(Boolean) : false;
+    const both = calc || (home.placed && away.placed);
     home.placedBoth = both;
     away.placedBoth = both;
-    const played = Boolean(L && L.played) || m.completed;
     const top = played && L ? L.top : null;
     const at = `365Scores, hämtat ${fClock.format(new Date(r.at))}`;
     const confirmed = (t) => /^confirmed$/i.test(t.status);
     const any = home.starters.length || away.starters.length;
     let h = '';
-    if (both) {
+    if (calc) {
+      h += pitch(m, home, away, spots(home, 'h', null, ix) + spots(away, 'a', null, ix), stamp('Beräknad elva', 'calc', calcTitle(m, E)));
+    } else if (both) {
       const mark = played ? ''
         : confirmed(home) && confirmed(away) ? stamp('Bekräftad', 'ok', at)
           : stamp('Trolig elva', 'prob', `Bedömd av 365Scores · bekräftad ungefär en timme före avspark · ${at}`);
@@ -404,7 +470,8 @@
     } else if (!played) {
       h += `<div class="mr-lu-head">${stamp(confirmed(home) && confirmed(away) ? 'Bekräftad' : 'Trolig elva', 'inline', at)}</div>`;
     }
-    const some = (t) => has(t) || t.coach || t.outKnown;
+    // Elvan på planen står inte en gång till under den.
+    const some = (t) => (!t.placedBoth && t.starters.length) || t.bench.length || t.out.length || t.coach || t.outKnown;
     if (some(home) || some(away)) h += `<div class="mr-teams">${teamBlock(m.home, home, played, 'h', top, ix)}${teamBlock(m.away, away, played, 'a', top, ix)}</div>`;
     return h;
   }
@@ -531,7 +598,7 @@
     const { root, m } = current;
     if (kind === 'lineups') {
       const el = root.querySelector('[data-mr-lineups]');
-      if (el && el.dataset.mrLineups === m.id) el.innerHTML = renderLineups(m, lineups.get(m.id), absent.get(m.id), cards.get(m.id));
+      if (el && el.dataset.mrLineups === m.id) el.innerHTML = renderLineups(m, lineups.get(m.id), absent.get(m.id), cards.get(m.id), plans.get(m.id));
     } else {
       const el = root.querySelector('[data-mr-events]');
       if (el && el.dataset.mrEvents === m.id) el.innerHTML = renderEvents(m, summaries.get(m.id));
@@ -569,6 +636,7 @@
     hydrate(root, d, espn) {
       const same = current && current.m.id === d.match.id;
       const sq = d.squads || {};
+      plans.set(d.match.id, d.elva || null);
       current = { root, m: d.match, espn, squads: { h: sq.home, a: sq.away } };
       if (!root.dataset.mrCards) {
         root.dataset.mrCards = '1';

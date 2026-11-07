@@ -1,9 +1,10 @@
 'use strict';
 
 // Källorna för spelardatan (trupp och spelarstatistik per liga, speltiden
-// utanför Premier League och målen ur matchrapporterna i alla fyra ligor, och
-// spelarnas betyg och bilder från 365Scores). Egen fil så att registret i src/sources.js bara
-// behöver en rad för att ta med dem.
+// utanför Premier League, målen och startelvorna ur matchrapporterna i alla
+// fyra ligor och cuperna, och spelarnas betyg och bilder från 365Scores).
+// Egen fil så att registret i src/sources.js bara behöver en rad för att ta
+// med dem.
 
 const { COMPETITIONS } = require('../config/competitions');
 const espnPlayers = require('./fetchers/espnplayers');
@@ -33,8 +34,9 @@ const PLAYER_SOURCES = LEAGUES.map((c) => ({
   },
 }));
 
-// Speltid och mål per spelare ur ESPN:s matchrapporter. Premier League har
-// speltiden redan från FPL och använder rapporterna bara för målen. Läser
+// Speltid, mål och startelvor per spelare ur ESPN:s matchrapporter. Premier
+// League har speltiden redan från FPL och använder rapporterna för målen och
+// startelvorna (den beräknade startelvan, src/startelvor.js). Läser
 // spelprogrammet ur cachen (andra steget) och hämtar bara rapporterna för
 // matcher som inte redan finns sparade.
 for (const c of LEAGUES) {
@@ -43,12 +45,47 @@ for (const c of LEAGUES) {
     id,
     provider: 'ESPN',
     short: 'ESPN',
-    label: `${c.fpl ? 'Målen' : 'Speltid och mål'} per spelare ur matchrapporterna – ${c.name}`,
+    label: `${c.fpl ? 'Målen' : 'Speltid och mål'} per spelare och startelvorna ur matchrapporterna – ${c.name}`,
     comps: [c.id],
-    kinds: ['players'],
+    kinds: ['players', 'lineups'],
     maxAgeHours: 6,
     staleAfterHours: 72,
     verified: '2026-10-20',
+    stage: 2,
+    fetch: () => {
+      const fx = readCache(`espn_fixtures_${c.id}`);
+      if (!fx || !fx.data) throw new Error('inget spelprogram i cachen än');
+      const played = fx.data.matches.filter((m) => m.completed && m.score)
+        .map((m) => ({ id: m.id, kickoff: m.kickoff, status: m.status }));
+      const prev = readCache(id);
+      return espnMinutes.fetchMinutes(c.espn, played, prev && prev.data);
+    },
+    summarize: (d) => {
+      const n = Object.keys(d.matches).length;
+      return {
+        n,
+        detail: `${n} av ${d.played} spelade matcher${d.missing ? `, ${d.missing} hämtas nästa gång` : ''}`,
+        latestData: n ? Object.values(d.matches).map((m) => m.k).sort().pop().slice(0, 10) : null,
+      };
+    },
+  });
+}
+
+// Startelvorna i cuperna ur samma matchrapporter, för den beräknade
+// startelvan (src/startelvor.js): hur mycket lagen roterar i cupen. Speltiden
+// och målen följer med men används inte.
+for (const c of COMPETITIONS.filter((x) => x.type === 'cup')) {
+  const id = `espn_elvor_${c.id}`;
+  PLAYER_SOURCES.push({
+    id,
+    provider: 'ESPN',
+    short: 'ESPN',
+    label: `Startelvor ur matchrapporterna – ${c.name}`,
+    comps: [c.id],
+    kinds: ['lineups'],
+    maxAgeHours: 6,
+    staleAfterHours: 72,
+    verified: '2026-11-07',
     stage: 2,
     fetch: () => {
       const fx = readCache(`espn_fixtures_${c.id}`);

@@ -214,6 +214,14 @@ ingen falsk precision · sidan kraschar aldrig av en död källa · endast fria 
   plats vid lika tal, som skytteligan på text-tv:n. I telefonen står topplistorna i en rad som
   man sveper i sidled ([public/divisioner.js](public/divisioner.js),
   [public/divisioner.css](public/divisioner.css))
+- [x] **Den beräknade startelvan (2026-11-07, användarens önskemål):** har 365Scores ingen
+  elva än – i League One, League Two och cuperna, och i Premier League och Championship mer
+  än några dagar före – visar Startelvor en egen elva med stämpeln *Beräknad elva*. Den tar
+  med rotationen i Champions League och cuperna: i ligan är den lagets senaste ligaelva, så
+  att elvorna från cupen och Europa inte styr, och i cupen tas bänken från förra ligamatchen
+  först när lagen i divisionen brukar rotera där. De som saknas enligt 365Scores eller FPL
+  stryks och ersätts. Stämde på 8,8 av 11 i säsongens ligamatcher och 7,0 i cupmatcherna (se
+  [Den beräknade startelvan](#den-beräknade-startelvan))
 
 ## Publicering
 
@@ -312,6 +320,7 @@ bara lokalt. Analyserna visas som de ligger i `data/analyser.json`; hur de skriv
 | Odds, alla tävlingar | ESPN matchsammanfattning (DraftKings) | alla sex | 6 h, matcher inom 7 dagar | Amerikanska odds räknas om till decimalodds. Ögonblicksbild; historiken är luckig (Bet365 2021/22, inget 2022/23–2024/25). Enda fria källan för cupodds. |
 | Skador och avstängningar; speltid, xG/xA, pris och poäng per spelare | Fantasy Premier League (`bootstrap-static`) | PL | 3 h | Status, chans att spela och nyhetstext med datum. Status avser nästa omgång. Speltid och xG (Opta) gäller säsongen hittills, verifierat 2026-10-19. Kopplas till ESPN-truppen inom laget på födelsedatum, annars namnet, bara vid entydig träff (547 av 592 spelare 2026-10-19; okopplade får inga FPL-siffror). |
 | Speltid per spelare | ESPN matchsammanfattning (`summary?event=<id>`, samma som oddsen) | CH, L1, L2 | 6 h, bara nya matcher | Verifierat 2026-10-19 för `eng.1`–`eng.4`: båda startelvorna (alltid 11), byten med minut (tilläggstid som `90'+3'`) och röda kort (även andra gula), med samma spelar-id som trupperna. Minuter = in till ut (full tid, byte eller rött), tilläggstid räknas inte, inbytt i tilläggstid = 1 min. Stickprov: matcher per spelare ur rapporterna = truppens för alla 84 spelare i Birmingham, AFC Wimbledon och Accrington; Arsenal och Coventry högst 6 min från FPL per spelare (0,4 % totalt). En rapport är ~400 kB men hämtas en gång per match och sparas kompakt (~50 kB per liga och säsong); 371 matcher tog 10 s. Minuterna räknas för spelarens första matcher i laget upp till truppens antal (truppen släpar ofta en omgång); har rapporterna färre matcher än truppen är speltiden okänd (1 av 1 846 spelare 2026-10-19). |
+| Startelvor bakåt (för den beräknade startelvan) | ESPN matchsammanfattning (samma rapporter som speltiden) | alla fyra ligor och båda cuperna | 6 h, bara nya matcher | Verifierat 2026-11-07 för ligorna, cuperna och Europacuperna (1 410 elvor): lagets formation (`4-2-3-1`) och varje startande spelares platsnummer 1–11 (`formationPlace`, Optas numrering, målvakten 1), avbytarna med plats 0 och samma spelar-id som trupperna. Positionsnamnen (`LB`, `CD-L`, `AM-R` …) ligger på samma sida som platsnumret i 15 490 av 15 510 platser, men följer inte linjen (i 4-2-3-1 heter de defensiva mittfältarna `LM` och `RM`) – därför en egen tabell från plats till linje och sida per formation ([public/elva.js](public/elva.js)). Sparas kompakt i samma cache som speltiden (`e` per match, ligorna) och i `espn_elvor_<cup>`; matcher sparade före 2026-11-07 hämtas om en gång. Styr inte prognosen. |
 | National League | football-data.co.uk (`EC`) | underlag för FA-cupens non-league-lag | 12 h | Resultat, skott och odds, ingen xG. |
 | Tidigare säsonger, ligorna | football-data.co.uk (`mmz4281/<säsong>/E0–E3, EC.csv`) | PL–L2, National League | 30 d | E0–E3 2000/01–2025/26 (26 säsonger, 52 672 matcher), EC 2005/06–2025/26 (11 234; 2000/01–2004/05 svarar 300). Fulla säsonger utom League One/Two 2019/20 (400/440 matcher, avbruten säsong) och EC 2019/20–2021/22 (451, 477, 506). En fil per säsong, ~0,25 s styck – allt hämtas på ~4 s. Äldre filer är Windows-1252 (t.ex. "King’s Lynn" i EC 2021/22), nyare UTF-8; läses därefter. Sparar resultat, skott och odds (marknadssnitt hette `BbAv` före 2019/20). |
 | xG, tidigare säsonger | Understat (`getLeagueData/EPL/<år>`) | PL | 30 d, bara kandidatjakten | 2014/15–2025/26, 380/380 matcher med xG varje säsong (verifierat 2026-10-17), alla 4 560 parade mot football-data.co.uk på (hemma, borta). Hämtas av `npm run kandidater`, inte av bygget – används först om xG-kandidaten klarar kravet. |
@@ -319,7 +328,7 @@ bara lokalt. Analyserna visas som de ligger i `data/analyser.json`; hur de skriv
 | Domare och kort, tidigare säsonger | football-data.co.uk (samma filer som raden ovan, andra kolumner) | PL–L2, National League – domaren i matchrutan | 30 d | Verifierat 2026-10-18. De tre senaste avslutade säsongerna (`HISTORY.referees` i [config/competitions.js](config/competitions.js)), med domare, kort och frisparkar. Egen cache (`fdcouk_stats_*`), så att prognosmotorns underlag och efterhandstestets signatur inte ändras. Domare saknas 2012/13 i E1–EC, och frisparkar saknas i EC från 2016/17. Hämtade fram till 2026-10-20 alla säsonger sedan 2000/01 med halvtid, hörnor och publik för divisionsstatistiken, som togs bort ur Statistik 2026-10-19. |
 | Europacuperna (för vila och form) | ESPN (`uefa.champions`, `uefa.europa`, `uefa.europa.conf`, kvalomgångarna i `*_qual` juli–augusti) | PL och cuperna – bara underlag | 3 h | Verifierat 2026-10-18: 234/224/366 matcher 2026/27 med kvalet, nio engelska lag (Brighton i Conference Leagues playoffomgång i augusti). Kopplas på ESPN:s lag-id, samma i alla ESPN:s turneringar. Ingen prognos för matcherna och inte med i prognosmotorns underlag. |
 | Domare, kommande ligamatcher | football-data.co.uk (`fixtures.csv`, kolumnen `Referee`) | ligorna | 6 h | Verifierat 2026-10-18: namnet finns för alla 46 kommande matcher i filen (läggs ut med oddsen fre/tis). Domarens historik ur raden *Domare och kort* ovan. |
-| Startelvor och frånvaro | 365Scores öppna webb-API (`webws.365scores.com/web/games/` och `/web/game/?gameId=`), hämtas **i webbläsaren** | alla sex | när matchrutan öppnas, varje minut medan matchen pågår | Verifierat 2026-10-19: ingen nyckel, `Access-Control-Allow-Origin: *`. Trolig elva (`NotConfirmed`) dagar före matchen i Premier League och Championship (inte i League One, League Two och EFL-cupen), bekräftad (`Confirmed`) ungefär en timme före avspark, efter matchen elvorna med mål, kort, byten och varje spelares betyg (`ranking`, 1–10; -1 eller inget = inget betyg). Spelarnas plats som linje och sida, så planen ritas utan positionstolkning. Vilka som saknas (skada med orsak och väntad återkomst, avstängning) även utanför Premier League. ESPN:s matchid finns inte där: matchen hittas på tävling (PL 7, CH 1, L1 2, L2 3, FA-cupen 8, EFL-cupen 9), avspark inom tre timmar och lagnamn – 505 av 505 matcher 1/9–8/11 2026 hittades (MK Dons heter så där). Samma källa som Gräver Gravs startelvor. Styr inte prognosen. |
+| Startelvor och frånvaro | 365Scores öppna webb-API (`webws.365scores.com/web/games/` och `/web/game/?gameId=`), hämtas **i webbläsaren** | alla sex | när matchrutan öppnas, varje minut medan matchen pågår | Verifierat 2026-10-19: ingen nyckel, `Access-Control-Allow-Origin: *`. Trolig elva (`NotConfirmed`) dagar före matchen i Premier League och Championship (inte i League One, League Two och EFL-cupen), bekräftad (`Confirmed`) ungefär en timme före avspark, efter matchen elvorna med mål, kort, byten och varje spelares betyg (`ranking`, 1–10; -1 eller inget = inget betyg). Spelarnas plats som linje och sida, så planen ritas utan positionstolkning. Vilka som saknas (skada med orsak och väntad återkomst, avstängning) även utanför Premier League. ESPN:s matchid finns inte där: matchen hittas på tävling (PL 7, CH 1, L1 2, L2 3, FA-cupen 8, EFL-cupen 9), avspark inom tre timmar och lagnamn – 505 av 505 matcher 1/9–8/11 2026 hittades (MK Dons heter så där). Samma källa som Gräver Gravs startelvor. Har 365Scores ingen elva visas den beräknade, och listan över vilka som saknas stryker spelare ur den (se [Den beräknade startelvan](#den-beräknade-startelvan)). Styr inte prognosen. |
 | Spelarbetyg | 365Scores öppna webb-API (`/web/games/results/?competitions=<id>` bakåt via `paging.previousPage`, sedan `/web/game/?gameId=`) | ligorna | 6 h, bara nya matcher | Verifierat 2026-10-20: betyg 1–10 med en decimal (`ranking`) för alla i startelvan och för inhoppare som spelat en stund (några minuter ger -1, inget betyg). 365Scores räknar betyget ur spelarens statistik i matchen; metoden är odokumenterad. Snittet är 6,6–6,8 per liga och vart tionde betyg är över 7,5. Alla 70, 131 och 114 spelade matcher i PL, CH och L1 hade betyg; i League Two 66 av 126 – matcherna före 12 september saknar betyg och sparas som utan. Säsongens matcher listas ~20 per sida tills förra säsongens (`seasonNum`) börjar. Matchen hittas på avspark inom tre timmar och lagnamn som i matchrutan (alla 441 hittades). Samma spelare kan ha olika id i olika matcher, så spelarna hålls isär på namnet inom laget. Kopplas till ESPN-truppen inom laget på hela namnet, efternamn med förnamnets initial och sist tröjnummer med lika början på efternamnet (Yarmoliuk–Yarmolyuk, Sávio–Savinho), bara vid entydig träff. En match är ~135 kB men sparas kompakt (~70–140 kB per liga). Svarar även från GitHub Actions (verifierat 2026-10-20); svarar den inte visas topplistan Målvakter som förut. Styr inte prognosen. |
 | Spelarbilder | 365Scores öppna webb-API (`/web/standings/?competitions=<id>` för lagen, `/web/squads/?competitors=<id,…>` för trupperna); bilden visas från `imagecache.365scores.com/…/v<imageVersion>/Athletes/<id>` i webbläsaren | ligorna | 24 h | Verifierat 2026-10-20: truppen per lag med id, namn, tröjnummer, födelsedatum, position och `imageVersion`; tränare och domare (`isStaff`) tas inte med. `imageVersion` 1 betyder att bild saknas (alla 13 med version 1 gav 404, alla 46 med högre version en bild). Alla 92 lag hittades på namnet som för betygen (Utd och Wed skrivs ut, så att Sheffieldlagen hålls isär); bild på 539 av 542 spelare i PL, 660 av 671 i CH, 649 av 651 i L1 och 540 av 663 i L2. Kopplas till ESPN-truppen inom laget på hela namnet, födelsedatum med ett gemensamt namn eller tröjnummer, efternamn med förnamnets initial och sist tröjnummer, bara vid entydig träff – 2 329 av 2 818 spelare i ESPN-trupperna fick bild; de övriga saknar bild hos 365Scores eller finns inte i deras trupp (oftast unga spelare och lån). Bilden står i spelarkortet med tröjnumret i hörnet; går den inte att ladda står tröjnumret som förut. ~25–30 kB per liga. Styr inte prognosen. |
 | Lagsköldar | ESPN:s bildtjänst (`a.espncdn.com/combiner/i?img=/i/teamlogos/soccer/500/<id>.png&h=96&w=96`, och `500-dark` för mörk botten) | alla sex | 7 d | Verifierat 2026-10-21: alla 92 ligalag har sköld, 67 av dem också en för mörk botten (Tottenhams tupp vit i stället för marinblå). Lagen tas ur spelprogrammen på ESPN:s lag-id, så att cupmotståndet kommer med; de flesta i National League har sköld, lag längre ner oftast inte (HTTP 404) och får en tom sköld. 96 × 96 px, ~1,5 MB för alla. Sparas i källcachen (`data/cache/skoldar/`) och läggs på sajten av bygget, i stället för att visas direkt från ESPN. Visas i Tabeller (den för mörk botten) och i matchbladets huvud (den vanliga – matchbladet är ljust). Styr inte prognosen. |
@@ -801,6 +810,11 @@ server:
   [prompts/analys-rost.md](prompts/analys-rost.md). Se [Analyserna](#analyserna).
   [src/news.mjs](src/news.mjs) används inte längre av något men ligger kvar och går att prova med
   [src/news-cli.mjs](src/news-cli.mjs).
+- **Den beräknade startelvan:** [src/startelvor.js](src/startelvor.js) läser elvorna ur
+  matchrapporterna, tar fram planen (formation, platser och kö) för kommande matcher inom
+  14 dagar i `data/match/<id>.json` (fältet `elva`) och mäter i varje bygge hur ofta den
+  stämt. Uttagningen och platserna räknas av [public/elva.js](public/elva.js), som både
+  bygget och matchrutan använder. Se [Den beräknade startelvan](#den-beräknade-startelvan).
 - **Styrkan:** [src/strength.js](src/strength.js) körs i slutet av prognosmotorn och ger
   modellens styrka för alla lag i nivå 1–4 – motståndet i lagstatistiken
   (`data/teams/<division>.json`). Se [Styrkan](#styrkan).
@@ -1252,6 +1266,84 @@ snittet av motståndarnas styrka mot vad ett lag i divisionen möter i snitt.
 
 Säsongsprognosen (resten av säsongen spelad 10 000 gånger, under Tabeller) och programmet
 framåt fanns 2026-10-18 – 2026-10-20 och togs bort på användarens begäran.
+
+## Den beräknade startelvan
+
+365Scores har en trolig elva bara i Premier League och Championship, och först några dagar
+före matchen. För övriga kommande matcher inom 14 dagar räknar sajten fram en egen elva ur
+lagens startelvor i säsongens liga- och cupmatcher hos ESPN (användarens önskemål
+2026-11-07: ta med rotationen i Champions League och cuperna). Matchrutan visar den med
+stämpeln *Beräknad elva* i blyerts när 365Scores inte har någon elva; har 365Scores en
+trolig eller bekräftad elva visas den som förut. Stämpelns title säger hur elvan räknats för
+vart lag och hur ofta regeln stämt i säsongens matcher. Styr inte prognosen
+([src/startelvor.js](src/startelvor.js), [public/elva.js](public/elva.js)).
+
+**Regeln.** Rotationen syns i datan som att elvorna från cupen och Europa säger lite om nästa
+ligaelva, och att cupelvan mest består av dem som satt på bänken i ligan:
+
+- *Ligamatch:* lagets senaste elva i ligan. Cup- och Europamatcher däremellan hoppas över.
+- *Cupmatch:* roterar lagen i divisionen i säsongens cupmatcher – färre än sex ur ligaelvan
+  före startade, i snitt – tas bänken från lagets senaste ligamatch först och ligaelvan
+  sedan, annars ligaelvan. Målvakten för sig: stod ligans målvakt kvar i högst hälften av
+  divisionens cupmatcher tas målvakten från bänken. Har divisionen färre än fem cupmatcher
+  gäller alla fyra divisionerna ihop, och finns inga alls (första omgångarna i augusti)
+  roterar lagen – så var det 2026/27 i alla divisionerna.
+- *Kön efter det:* resten av truppen efter starter (1) och inhopp (0,5) i de tio senaste
+  matcherna, med vikten 0,7 per match bakåt; matcher i en annan sorts tävling väger hälften.
+  Bara den som finns i ESPN-truppen, och inte den FPL säger har lämnat klubben (status `u`).
+- *Platserna:* formationen är den senaste ligamatchens. Kön tas ut uppifrån, och var och en
+  sätts på en ledig plats i sin del av laget – målvakt, försvar (första linjen), anfall
+  (sista) eller mittfält – närmast där han brukar stå. Den delen och platsen räknas ur hans
+  starter i de tio senaste matcherna; den som inte startat får truppens position. Den som
+  startade senaste ligamatchen står på sin plats därifrån. En formation utanför tabellen i
+  [public/elva.js](public/elva.js) (19 formationer, alla som förekommit 2026/27) ger ingen elva.
+- *De som saknas:* matchrutan stryker dem 365Scores lista för matchen säger saknas (inte de
+  osäkra), på 365Scores id eller namnet; har 365Scores ingen lista, dem FPL anger som
+  skadade, avstängda eller ej uttagbara (Premier League). Nästa i kön som spelar i samma del
+  av laget tar platsen.
+
+**Mätt 2026-11-07** på säsongens matcher fram till dess, med bara matcherna före varje
+match och utan skadelistorna (de finns inte bakåt) – hur många av de elva som startade som
+fanns i elvan. Bygget räknar om det varje gång (`elva.fit`).
+
+| Lagmatcher | Regeln | Förra elvan, vilken tävling som helst | Förra cupelvan, annars ligaelvan |
+|---|---|---|---|
+| Liga (1 072) | 8,8 | 8,35 | – |
+| – efter en Europamatch (27) | 8,9 | 7,19 (Europaelvan) | – |
+| – efter en cupmatch (94) | 9,1 | 4,52 (cupelvan) | – |
+| Cup (97) | 7,0 | 4,06 | 5,06 |
+
+I cupen behöll lagen 3,5 (Premier League), 3,2 (Championship), 5,1 (League One) och 7,0
+(League Two) ur ligaelvan före, och ligans målvakt stod kvar i 9 av 43, 4 av 24, 15 av 23
+och 7 av 7 cupmatcher. Att ta bänken först i alla divisioner gav 6,9, med divisionens
+rotation 7,0.
+
+**Prövat och inte infört** (samma matcher):
+
+- *Chans att starta per spelare* (logistisk regression) ur starter och inhopp i ligan,
+  starter i cupen och Europa, vila (förra matchen högst 3,5 dagar sedan, och om den var i
+  Europa) och en match högst 3,5 dagar efter – skattad på matcherna före 1 oktober och
+  prövad på dem efter: 8,74 i ligan mot förra ligaelvans 8,77, och 6,1 i cupen mot förra
+  cupelvans 6,6 (19 matcher). Efter
+  en Europamatch byter Premier League-lagen något fler (8,9 kvar ur ligaelvan mot 9,2
+  annars), men vilka som vilar går inte att se i förväg.
+- *Förra cupelvans spelare först bland avbytarna i cupen:* 6,84 mot 6,87.
+- *Lagets egen förra cupmatch i stället för divisionens rotation:* 6,92 mot 6,99.
+- *Vikter för cup- och Europastarter i kön:* ersättarna stämde lika ofta (0,49 per ersättare)
+  med vikten 0, 0,5 och 1 – prövat genom att stryka dem ur förra ligaelvan som inte startade.
+
+**Kända brister:**
+
+- Mätningen saknar skadorna. Med 365Scores eller FPL:s lista bör elvan stämma oftare än
+  siffrorna ovan, men det går inte att mäta bakåt.
+- FA-cupen och EFL-cupen räknas ihop: 2026-11-07 fanns två FA-cupmatcher. Hur mycket lagen i
+  League One och League Two roterar i FA-cupens första omgångar är alltså lånat från
+  EFL-cupen, tills FA-cupen gett egna matcher.
+- Europacupernas elvor hämtas inte – regeln hoppar över dem, och kön blev inte bättre med dem.
+  Bänken i en cupmatch tas ur senaste ligamatchen även när laget spelat i Europa sedan dess.
+- Nyförvärv utan start och utan position i ESPN-truppen kommer inte med.
+- Namnet på planen är efternamnet ur ESPN:s namn, med "van", "de", "Mac" och liknande ("van de
+  Ven", "Mac Allister"), inte 365Scores egna korta namn.
 
 ## Kupongen
 

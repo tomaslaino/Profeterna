@@ -158,6 +158,7 @@ function fplIndex(compId, teams) {
   // Cache från före 2026-10-19 saknar xG och speltidsfälten.
   if (!fc || !fc.data || !fc.data.players.some((p) => p.xg !== undefined)) return null;
   const out = new Map();
+  const status = new Map();
   let of = 0;
   for (const t of teams) {
     const ft = fc.data.teams.find((x) => keyOf(x.name) === espnKey(t.name));
@@ -181,6 +182,7 @@ function fplIndex(compId, teams) {
         }));
       if (!hit) continue;
       used.add(hit.id);
+      status.set(p.id, { st: hit.status, ch: hit.chanceNext });
       out.set(p.id, {
         min: hit.minutes,
         fg: hit.goals,
@@ -201,7 +203,7 @@ function fplIndex(compId, teams) {
       });
     }
   }
-  return { map: out, matched: out.size, of, fetchedAt: fc.fetchedAt };
+  return { map: out, status, matched: out.size, of, fetchedAt: fc.fetchedAt };
 }
 
 // Speltiden utanför Premier League, ur matchrapporterna (espn_minutes_<liga>).
@@ -331,6 +333,7 @@ function photosIndex(compId, teams) {
   const c = readCache(`s365_squads_${compId}`);
   if (!c || !c.data || !c.data.teams) return null;
   const out = new Map();
+  const aids = new Map();
   let of = 0;
   for (const t of teams) {
     const sq = c.data.teams[t.espnId];
@@ -343,6 +346,7 @@ function photosIndex(compId, teams) {
     const left = [];
     const take = (p, hit) => {
       used.add(hit);
+      aids.set(p.id, hit.aid);
       if (hit.v > 1) out.set(p.id, [hit.aid, hit.v]);
     };
     for (const p of t.players) {
@@ -362,7 +366,16 @@ function photosIndex(compId, teams) {
       if (hit) take(p, hit);
     }
   }
-  return { map: out, matched: out.size, of, fetchedAt: c.fetchedAt };
+  return { map: out, aids, matched: out.size, of, fetchedAt: c.fetchedAt };
+}
+
+// Kopplingarna för den beräknade startelvan (src/startelvor.js): ESPN-id →
+// 365Scores id (alla som gick att koppla, med eller utan bild) och ESPN-id →
+// FPL:s status { st, ch } i Premier League. Tomma kartor utan källan.
+function linkIndexes(compId, teams) {
+  const f = fplIndex(compId, teams);
+  const ph = photosIndex(compId, teams);
+  return { aids: ph ? ph.aids : new Map(), fpl: f ? f.status : new Map() };
 }
 
 // Målen ur matchrapporterna (espn_minutes_<liga>, alla fyra ligor): sorten,
@@ -681,4 +694,4 @@ function playerFiles() {
   return LEAGUES.map((c) => ({ path: `players/${c.id}.json`, data: divisionPlayers(c.id) }));
 }
 
-module.exports = { divisionPlayers, teamSquad, playerFiles, LEAGUES };
+module.exports = { divisionPlayers, teamSquad, playerFiles, linkIndexes, LEAGUES };

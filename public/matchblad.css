@@ -582,8 +582,10 @@ dialog.mr-modal .mr-nm { color: var(--pp-ink); text-shadow: 0 0 3px var(--pp-box
 dialog.mr-modal .mr-dot .mr-rt { color: var(--pp-paper); background: var(--pp-ink); box-shadow: none; }
 dialog.mr-modal .mr-dot .mr-rt.top { color: #f0d699; box-shadow: 0 0 0 1px #d8b06a; }
 dialog.mr-modal .mr-names .mr-rt.top { color: var(--pp-print); }
-/* stämpeln: trolig elva i pennans blå, bekräftad i grönt, ingen än i tryckets färg */
+/* stämpeln: trolig elva i pennans blå, bekräftad i grönt, ingen än i tryckets färg
+   och vår egen beräknade i blyerts */
 dialog.mr-modal .mr-stamp.prob { --pp-stamp: var(--pp-pen); }
+dialog.mr-modal .mr-stamp.calc { --pp-stamp: var(--pp-pencil); }
 dialog.mr-modal .mr-stamp.ok { --pp-stamp: var(--pp-ok); }
 dialog.mr-modal .mr-stamp.none { --pp-stamp: var(--pp-print); }
 dialog.mr-modal .mr-pitch.empty .mr-pl { display: none; }
