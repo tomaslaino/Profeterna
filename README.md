@@ -690,13 +690,21 @@ bara lokalt. Analyserna visas som de ligger i `data/analyser.json`; hur de skriv
   frågade om han skulle kryssa i sina tecken och man svarade med knappar). Användaren bad om den bästa av
   de två, och den här ligger närmast önskemålet: stort 1 X 2 som man väljer fritt, och han börjar själv. Därifrån finns frågan
   *Vems kupong ska jag fylla i?* kvar. Samma dag ville användaren kunna fylla i matcher man redan har frågat om
-  och välja tecken han inte håller med om: då säger han emot men kryssar ändå.
+  och välja tecken han inte håller med om: då säger han emot men kryssar ändå. Sedan 2026-11-07 tar han
+  inte kupongen själv efter analysen, utan föreslår det (se nedan).
 - **Hasse Backe ändrar din inlämnade kupong (2026-11-07, användarens önskemål):** "Jag har fortfarande
   inte möjlighet att fylla i kupongen utefter det här", om hans *Etta, kryss* på en match där kupongen hade
   helgardering. Kupongen var inlämnad, och då visade han inga rutor alls. Nu står 1 X 2 också under en
   inlämnad kupong så länge den går att ändra, och han lämnar in ändringen direkt när den följer gängets regel.
   Gör den inte det (en helgardering som blir 1X ger sex halvgarderingar) säger han vad som fattas och väntar,
   och den väntande ändringen står på kupongen när man tar den ur högen, med *Lämna in ändringen* tänd. Se
+  [Hasse Backe](#hasse-backe), *Din kupong*.
+- **Hasse Backe föreslår att fylla i kupongen, och du väljer (2026-11-07, användarens önskemål):** "Jag gillar
+  inte att Hasse Backe själv fyller i sin egna rekommendation direkt efter sin analys – han kan däremot
+  rekommendera att göra det så får man välja om man vill det". Förut tog han kupongen och kryssade sina tecken
+  så fort han hade sagt sitt, om man inte hann trycka på *Låt bli*. Nu frågar han (*Så ska det stå på din
+  kupong. Ska jag fylla i den?*), hans tecken lyser i guld i rutorna 1 X 2, och man svarar med *Fyll i den*,
+  ett eget tecken eller *Alla matcher*. *Låt bli* behövs inte längre och är borttagen. Se
   [Hasse Backe](#hasse-backe), *Din kupong*.
 - **Hasse Backe njuter av cigarren på elva sätt (2026-11-05, användarens önskemål):** cigarren såg
   skev ut: ansiktet förvreds när han vred huvudet mot askkoppen, handen höll cigarren som en stång,
@@ -4500,7 +4508,8 @@ bredvid (*Jag gissar* när kupongen inte går att fylla i), båda med en tunn ra
 versaler som texten i bandet. Frågan har sin plats från början, osynlig tills han säger den, så att
 knapparna inte flyttar sig. Förut stod svaren som små länkar längst ned i spalten och syntes knappt
 i telefonen, och sedan som piller i guld (ändrat 2026-11-04). *Titta igen* efter analysen är samma
-lapp i terrakotta, med *Alla matcher* i krämvitt bredvid, och *Ja, ja »* står med samma versaler som *Matchbladet →*. Han har alltid svaret, också när
+lapp i terrakotta, med *Alla matcher* i krämvitt bredvid (*Fyll i den* i stället för *Titta igen* medan han
+föreslår att fylla i kupongen, se *Din kupong*), och *Ja, ja »* står med samma versaler som *Matchbladet →*. Han har alltid svaret, också när
 han ska läsa på (*Den knäckte jag i morse*); att han läser på märks först medan han väntar. Är analysen inte skriven än
 säger han det (*Den tar jag sen*). En match du redan har frågat om står direkt, som han sa
 den: domen i guld, hans text och resultatet, och sist vad han tycker om det du har på kupongen nu.
@@ -4526,7 +4535,8 @@ valde när texten skrevs (`hasse.resultat`, se *Rösten*). Texter från före 20
 i skrift när hans text saknas, tar i stället det troligaste resultatet i modellens prognos
 (resultatmatrisen i `data/match/<id>.json`) bland utfallen han har ringat in, och har modellen
 ingen prognos säger han inget resultat (`resultatet` i [public/rum-hasse.js](public/rum-hasse.js)). Sist säger han vad han tycker om det du själv har på
-kupongen (*På din kupong har du bara etta. Det var kaxigt.*); har du inget på matchen säger han inget om den. Han minns på enheten vad du har
+kupongen (*På din kupong har du bara etta. Det var kaxigt.*); har du inget på matchen föreslår han i stället att
+fylla i den (se *Din kupong*). Han minns på enheten vad du har
 frågat om: på matchens rad står hans tecken ifyllda i guld i rutorna 1 X 2, som på kupongen, med
 resultatet bredvid i en rak spalt. *Alla matcher* tar en tillbaka till listan, och där räknar han
 (*Nu är halva kupongen klar*). Bara tecken du själv har bett om syns, så att listan inte blir ett
@@ -4549,22 +4559,28 @@ figurens tidslinje. Munnen följer texten också under gesterna (fjärde argumen
 i kupongens tryck och med samma kryss som på kupongen, och du kan välja direkt eller trycka på *Jag är idel öra*
 först för att höra analysen. Väljer du ett tecken säger han *Ge hit kupongen* och får den: det är samma kupong som på
 pulten, ritad av samma kod (`Rum.kupong`, `couponHtml` i [public/rum.js](public/rum.js)) med samma kryss,
-slitage, stämpel, namn och fält, och det han skriver hamnar i samma utkast (`Samtal.pult.tippa`). Efter en analys tar han
-kupongen själv och skriver det han just har sagt, om du inte redan har något på raden. Väljer du ett annat tecken
-medan han håller på skriver han ditt i stället. Står det redan ett kryss i rutan du väljer suddar han det. Väljer du
+slitage, stämpel, namn och fält, och det han skriver hamnar i samma utkast (`Samtal.pult.tippa`).
+
+Han tar aldrig kupongen själv. Har du inget på raden när han har sagt sitt föreslår han att fylla i det han just har
+sagt (*Så ska det stå på din kupong. Ska jag fylla i den?*, `fyller.foreslar` i
+[public/rum-hasse-repliker.js](public/rum-hasse-repliker.js)): hans tecken lyser i guld i rutorna 1 X 2, som domen och
+som hans tecken i listan, och under dem står *Fyll i den* i terrakotta där *Titta igen* annars står, med *Alla
+matcher* bredvid. *Fyll i den* och han tar kupongen och kryssar sina tecken (`sjalv` i rum-hasse-kupong.js); ett eget
+tecken i rutorna och han kryssar ditt; *Alla matcher* och kupongen ligger orörd. När förslaget är besvarat står *Titta
+igen* där igen. Guldet står kvar i rutorna också när du kommer tillbaka till matchen, så att man ser vad han sa
+bredvid det man själv har kryssat. Har kupongen redan något på raden när du har sagt vem du är säger han vad han
+tycker om det i stället. Väljer du ett annat tecken medan han kryssar sina skriver han ditt i stället. Står det redan ett kryss i rutan du väljer suddar han det. Väljer du
 något han inte har sagt säger han emot (*Jag håller inte med, men det är din kupong.*) men kryssar det ändå, och väljer
 du hans tecken håller han med. Rutorna står också under en match du redan har frågat om, under det han sa då, så att
 du kan fylla i den eller byta tecken utan att höra analysen igen; det han säger om kupongen står då på raden där han
 erbjöd sig att titta igen (i telefonen sist i texten, så att allt ryms). Vet kupongen inte vem du är frågar han först
 *Vems kupong ska jag fylla i?*, med efternamnen på dem som inte har lämnat in i rutornas ställe, och den du väljer blir
-den du är, som när du väljer namn på kupongen (`Samtal.pult.vem`). *Låt bli*
-står i stället för *Matchbladet* medan han håller på: han lägger tillbaka pennan, suddar det han hann skriva och
-lämnar tillbaka kupongen, och sedan tar han den inte själv efter analyserna förrän du har valt ett tecken igen (på
-enheten, `profeterna.hasse.fyller`). Han fyller i kupongen medan den går att fylla i, och ändrar den när du har lämnat
+den du är, som när du väljer namn på kupongen (`Samtal.pult.vem`). Han fyller i kupongen medan den går att fylla i, och ändrar den när du har lämnat
 in, tills matcherna startar (`Samtal.pult.state().andra`). Visas allas tips utan att du har lämnat in ser samtalet
 ut som förut, med *Jag gissar*.
 
-*Din inlämnade kupong.* Där skriver han bara det du väljer: han tar den inte själv efter en analys. Ändringen lämnas
+*Din inlämnade kupong.* Där skriver han bara det du väljer, och efter en analys föreslår han inget: alla rader har
+redan tecken, så han säger vad han tycker om dem. Ändringen lämnas
 in direkt (`Samtal.pult.lamnaIn`) när kupongen följer gängets regel (`regel` i [config/kupong.js](config/kupong.js),
 4 spikar, 5 halvgarderingar och 4 helgarderingar) och alla matcher har tecken. Följer den inte regeln säger han vad som
 är för många och vad som fattas (*Nu har du för många halvgarderingar. Helgardera en av de andra, så lämnar jag in
@@ -4589,8 +4605,7 @@ det själv är det ditt. På papperet under Kupong är de vanliga kryss.
 
 Första gången under ett besök visar han upp kupongen när han har skrivit, så att man ser vad det blev (ett klick lägger
 tillbaka den), och sedan ligger den kvar på disken medan du går vidare.
-Ett klick på kupongen och du har den i handen, och ett klick till och den är borta, och då tar han den inte
-själv efter analyserna. I listan står det du har på raden för hand, i en egen spalt längst ut, efter tecknen han har sagt. Med minskad rörelse står allt
+Ett klick på kupongen och du har den i handen, och ett klick till och den är borta. I listan står det du har på raden för hand, i en egen spalt längst ut, efter tecknen han har sagt. Med minskad rörelse står allt
 direkt. På disken är kupongen hopklämd av perspektivet, som notan, och det är därför man får se den stor.
 
 **Armarna och händerna.** Ärmen har fotots bredd på överarmen, där den möter kavajen där armarna satt,
@@ -4858,6 +4873,13 @@ Kaffet på sex sätt (2026-11-05) är provat i headless Chromium med mjukvarugra
 den sugs mot näsan), och koppens och handens förflyttning mellan varje hundradels sekund (inga hopp,
 och båda exakt tillbaka i vilan när klippet slutar). Inte provat i hela sidan, i Safari eller i en
 riktig telefon, och att han tar kaffet varannan gång medan man väljer är bara genomläst.
+
+Förslaget att fylla i kupongen (2026-11-07) är provat i headless Chromium med mjukvarugrafik i hela sidan, med en
+påhittad omgång från kupongtjänsten och tre matcher i `data/matches.json` (bygget i provet kunde inte hämta något),
+i 1440 × 900 och 412 × 915, med och utan minskad rörelse: frågan och guldet efter analysen (också efter *Ja, ja*),
+att kupongen ligger orörd fem sekunder efteråt, *Fyll i den* med och utan att kupongen vet vem man är, ett eget
+tecken mot hans och guldet när man kommer tillbaka till matchen. Inte provat i Safari eller i en riktig telefon,
+och de nya raderna har Tomas röst först när iMacen har läst upp dem (till dess Azures).
 
 ### Närbilderna
 

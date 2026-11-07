@@ -92,7 +92,7 @@
 /* Dina svar är lappar i tipskupongens tryck (papper.css) som ligger på disken: terrakotta som
    kupongens band för det han väntar på och krämvitt papper för det andra du kan svara, med en tunn
    ram innanför kanten som rutorna på kupongen. Det som går härifrån eller avbryter (Matchbladet,
-   Ja, ja, Låt bli) står med små spärrade versaler och en pil, som texten i kupongens band. */
+   Ja, ja) står med små spärrade versaler och en pil, som texten i kupongens band. */
 .rh-knapp {
   --ram: rgba(169, 69, 43, 0.5);
   position: relative; display: inline-flex; align-items: center; justify-content: center; box-sizing: border-box;
@@ -163,6 +163,12 @@
 }
 .rh-ruta:active { transform: translateY(1px); box-shadow: 0 1px 0 rgba(0, 0, 0, 0.5), 0 3px 8px rgba(0, 0, 0, 0.4); }
 .rh-ruta:focus-visible { outline: 2px solid #f0d699; outline-offset: 3px; }
+/* Hans tecken, det han föreslår: kanten i guld som domen (och som hans tecken i listan), och den
+   lyser upp när rutorna kommer. Krysset i rutan är fortfarande bara ditt. */
+.rh-ruta.hans { border-color: #ffd86b; color: #94640f; box-shadow: 0 0 0 2px rgba(255, 216, 107, 0.5), 0 0 22px rgba(255, 216, 107, 0.3), 0 2px 0 rgba(0, 0, 0, 0.5), 0 8px 16px rgba(0, 0, 0, 0.42); animation: rh-hans 0.9s ease-out both; }
+@keyframes rh-hans { from { box-shadow: 0 0 0 9px rgba(255, 216, 107, 0), 0 0 40px rgba(255, 216, 107, 0.65), 0 2px 0 rgba(0, 0, 0, 0.5), 0 8px 16px rgba(0, 0, 0, 0.42); } }
+@media (hover: hover) { .rh-ruta.hans:hover { border-color: #ffd86b; color: #7a5009; } }
+@media (prefers-reduced-motion: reduce) { .rh-ruta.hans { animation: none; } }
 /* det du själv har på raden, i listan */
 .rh-lista button u { flex: none; width: 2em; margin-left: 0.6em; text-align: right; color: #f6efdc; opacity: 0.82; font: 600 1.18em/1 Caveat, cursive; text-decoration: none; }
 .rum-hasse-vy.hog .rh-ruta { height: 52px; font-size: 28px; max-width: none; }

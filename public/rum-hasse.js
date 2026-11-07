@@ -1428,8 +1428,8 @@ window.RumHasse = (() => {
     const texten = hansText(a, res);
     const sagt = { at: skriven(a), st: stycken(texten) };
     if (!(a.hasse && a.hasse.stycken)) texten.unshift({ text: REP().utanRost });
-    // (har du inget på raden tar han kupongen själv efter det här)
-    const om = K().kommer(m.id) ? null : omKupongen(m, signs);
+    // (har du inget på raden föreslår han efter det här att fylla i den, i slutet)
+    const om = omKupongen(m, signs);
     if (om) texten.push({ text: om });
     tala(m, lista, signs, res, texten, sagt);
   }
@@ -1478,7 +1478,7 @@ window.RumHasse = (() => {
     if (fylla) {
       const t = s.querySelector('.rh-tecken');
       // (det han säger om kupongen står där erbjudandet stod, sag)
-      K().kopplaRutor(t, m, (sign) => K().vems(t, () => fyllIn(m, lista, sign, null, signs)));
+      K().kopplaRutor(t, m, (sign) => K().vems(t, () => fyllIn(m, lista, sign, null, signs)), signs.map((n) => KORT[n]));
     }
     if (klick && !klick.detail) slut.querySelector('.huvud').focus({ preventScroll: true });
     if (!nu) return;
@@ -1516,45 +1516,50 @@ window.RumHasse = (() => {
       },
     });
   }
+  // Han har sagt sitt. Har du inget på raden föreslår han att fylla i det han har sagt, med hans tecken
+  // i guld i rutorna, och du väljer: Fyll i den, ett eget tecken eller Alla matcher. Han tar aldrig
+  // kupongen själv. Är förslaget besvarat står Titta igen och Alla matcher som efter en analys.
   function slutet(m, lista, signs = null) {
     const s = $('.rh-samtal');
     const vem = H.fraga;
     H.fas = 'klar';
     if (Math.abs(H.T - GEST.hem.vila) > 0.01 || H.klipp) spela('hem');
     const slut = s.querySelector('.rh-slut');
-    slut.innerHTML = `${knappar(!!(signs && signs.length))}<a class="rh-vag" href="#match/${esc(m.id)}">Matchbladet</a>`;
-    kopplaKnappar(slut, m, lista);
     const t = s.querySelector('.rh-tecken');
+    const han = (signs || []).map((n) => KORT[n]);
+    const blad = `<a class="rh-vag" href="#match/${esc(m.id)}">Matchbladet</a>`;
+    const svaren = (fokus = false) => {
+      slut.innerHTML = `${knappar(han.length > 0)}${blad}`;
+      kopplaKnappar(slut, m, lista);
+      if (fokus) slut.querySelector('.huvud').focus({ preventScroll: true });
+    };
+    // (en äldre rum-hasse-kupong.js i cachen har inget förslag)
+    let forslag = Boolean(t && han.length && K().foreslar && REP().fyller.foreslar && K().foreslar(m.id));
+    if (forslag) {
+      slut.innerHTML = `<button type="button" class="rh-knapp huvud rh-fyll">Fyll i den</button><button type="button" class="rh-knapp rh-alla">Alla matcher</button>${blad}`;
+      slut.querySelector('.rh-alla').addEventListener('click', fraga);
+      slut.querySelector('.rh-fyll').addEventListener('click', (e) => {
+        forslag = false;
+        svaren(!e.detail);
+        // (och vet kupongen inte vem du är frågar han först)
+        K().vems(t, () => {
+          if (H.fraga !== vem) return;
+          const sagt = lott(han.length > 1 ? REP().fyller.gardera : REP().fyller.skriver[han[0]]);
+          // (står det redan något på raden, på kupongen du just valde, säger han vad han tycker om det)
+          if (!K().sjalv(m.id, han, { sagt, tok: () => H.fraga === vem })) {
+            const om = omKupongen(m, signs);
+            if (om) sag(om);
+          }
+        });
+      });
+      sag(lott(REP().fyller.foreslar));
+    } else svaren();
     if (!t) return;
     K().kopplaRutor(t, m, (sign) => {
-      // väljer du själv är det du som bestämmer, och då finns inget att säga nej till
-      if (H.bladTillbaka) H.bladTillbaka();
+      // väljer du själv är förslaget besvarat
+      if (forslag) { forslag = false; svaren(); }
       K().vems(t, () => fyllIn(m, lista, sign, null, signs));
-    });
-    // Han tar kupongen själv och skriver det han just har sagt, om du inte säger till (och vet den
-    // inte vem du är frågar han först)
-    if (signs && signs.length && K().kommer(m.id)) {
-      const han = signs.map((n) => KORT[n]);
-      // Låt bli står där Matchbladet står, så länge han håller på
-      const blad = slut.querySelector('.rh-vag');
-      const lat = document.createElement('button');
-      lat.type = 'button';
-      lat.className = 'rh-vag rh-lat';
-      lat.textContent = 'Låt bli';
-      lat.addEventListener('click', () => {
-        lat.replaceWith(blad);
-        K().latBli();
-        sag(lott(REP().fyller.bort));
-      });
-      blad.replaceWith(lat);
-      slut.dataset.blad = '1';
-      H.bladTillbaka = () => { if (lat.isConnected) lat.replaceWith(blad); };
-      K().vems(t, () => {
-        if (H.fraga !== vem) return;
-        const satt = K().sjalv(m.id, han, { sagt: lott(han.length > 1 ? REP().fyller.gardera : REP().fyller.skriver[han[0]]), tok: () => H.fraga === vem, sen: () => { if (H.bladTillbaka) H.bladTillbaka(); } });
-        if (!satt) H.bladTillbaka();
-      });
-    }
+    }, han);
   }
   // Du väljer ett tecken: han tar kupongen (om han inte redan har den) och skriver det. Har han sagt något
   // annat i analysen (dom) svarar han på det.
