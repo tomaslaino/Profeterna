@@ -698,6 +698,15 @@ bara lokalt. Analyserna visas som de ligger i `data/analyser.json`; hur de skriv
   nio andra småsaker som lottas: tittar mot gänget och längs baren, på notan och kaffet, nickar för sig
   själv, suckar, sträcker på nacken, höjer ett ögonbryn och skrockar. Se [Hasse Backe](#hasse-backe),
   *Vilan*.
+- **Hasse Backe snyggare och mindre buggig (2026-11-06, användarens önskemål):** armarna såg ut som
+  uppblåsta korvar, med en ballong till armbåge när han böjde dem; händerna var för små och orangea
+  bredvid ansiktet, med grå smuts mellan fingrarna och naglar som laxrosa klistermärken; handen gick rakt
+  genom koppen när han tog den och ned genom disken när han höll den; manschetten var ett långt vitt rör;
+  tänderna i skrattet var ett band med streck, som en linjal; och han såg ut att mumla när han pratade.
+  Nu smalnar ärmen av mot ärmslutet, armbågen viker sig i veck på insidan, manschetten sticker fram en
+  bit ur ärmen, händerna har en vuxen mans storlek och ansiktets hudton, handen går över koppen, tänderna
+  står en och en och munnen rör sig som när man pratar. Se [Hasse Backe](#hasse-backe), *Armarna och
+  händerna*.
 - **Statistik som i tobaksaffären (2026-11-05, användarens önskemål):** statistiken på den
   vanliga sajten ska stämma med den i tobaksaffären – samma tal under samma namn och samma
   uppdelning: det som jämför lagen står som på anslagstavlan (topplistorna under Lagen), det
@@ -4317,7 +4326,10 @@ koppen runt kanten mot hans underläpp, så att den ligger kvar där, och örat 
 kinden, så att handen inte stiger upp framför ögat. Förut stod koppen nästan upprätt framför hakan,
 snett åt sidan, och handen hade samma vinkel hur koppen än stod (ändrat 2026-11-05). Lillfingret står
 rakt ut och spretar (`extra` i `bojFingrar`, [public/rum-hasse-arm.js](public/rum-hasse-arm.js)).
-Koppen klirrar mot fatet när han ställer ned den, hårdare efter en smäll.
+Koppen klirrar mot fatet när han ställer ned den, hårdare efter en smäll. Örat sitter på andra sidan koppen från
+handen, så på väg dit och tillbaka går handen upp och över koppen, och pekfingret håller i örats övre
+del, så att handen inte går ned i disken medan koppen står på fatet (förut gick handen rakt genom koppen
+och fatet, och den nedre delen av handen försvann i disken; ändrat 2026-11-06).
 
 Armbågen läggs där handleden ser naturlig ut (`naturlig`, också för cigarren). Med handen given av det
 han håller i kan armbågen bara ligga på en cirkel mellan axeln och handen, och där väljs den så att
@@ -4493,6 +4505,27 @@ på. Ett klick på kupongen och du har den i handen, och ett klick till och den 
 själv efter analyserna. I listan står det du har på raden för hand, i en egen spalt längst ut, efter tecknen han har sagt. Med minskad rörelse står allt
 direkt. På disken är kupongen hopklämd av perspektivet, som notan, och det är därför man får se den stor.
 
+**Armarna och händerna.** Ärmen har fotots bredd på överarmen, där den möter kavajen där armarna satt,
+och smalnar sedan av från armbågen mot ärmslutet som en kavajärm (`BREDD` i
+[public/rum-hasse-arm.js](public/rum-hasse-arm.js)). Armbågen är en tät böj: på insidan trycks tyget
+ihop och lägger sig i veck som skuggar sig själva, och överarmens och underarmens tyg stannar var på sin
+sida om armbågens mittplan, så att inget går igenom det andra; normalerna räknas ur formen, så att vecken
+syns i ljuset. Mot ärmslutet blir ärmen platt som handleden, med handflatan åt den platta sidan, och
+genom ärmslutet syns den mörka insidan. Skjortans manschett går in i ärmen och sticker fram ungefär en
+centimeter, platt som handleden och med en söm nära kanten. Händerna är en vuxen mans, ungefär 18 cm
+(`HAND` i rum-hasse-arm.js; greppen om cigarren och koppen räknas med samma skala), med fingrar som är
+lite bredare än tjocka. Huden tar porerna, vecken och ådrorna ur fotot men tonen från ansiktet: fotots
+händer låg i skugga och var rödare, och dess hud är sammansatt av bitar med mörka fläckar, som annars
+blev streck tvärs över fingrarna. Skuggan mellan fingrarna är varm som hud i skugga, och naglarna ligger
+nära hudens ton med en ljusare kant ytterst. I vilan ligger fingertopparna på disken i stället för att
+gå ned i den. Munnen inifrån har en tand i taget (framtänderna bredast), tandkött när han skrattar stort
+och de nedre tändernas kant när munnen är vidöppen, och när han pratar skiljs läpparna åt och öppnas upp
+till en dryg centimeter. Förut hade underarmen överarmens bredd nästan ända ut, armbågen blev en ballong
+när armen böjdes, händerna var 15 cm och orangea, manschetten var ett tre centimeter långt vitt rör,
+tänderna ett band med streck och munnen öppnades knappt en halv centimeter när han pratade (ändrat
+2026-11-06). Skuggorna på disken tonar ut mot figurens dukkant, och duken rymmer handen vid koppens
+öra, som förut skars av där.
+
 **Rösten.** Analysen är densamma som i matchbladet, skriven i förväg (se [Analyserna](#analyserna)):
 direkt efter artikeln och tipset säger Claude det viktigaste ur dem med hans röst, utan verktyg
 ([src/analyser/hasse.mjs](src/analyser/hasse.mjs)). Sakuppgifterna tas ur analysen men inte den
@@ -4645,7 +4678,7 @@ varför skriptet inte får heta `chatterbox.py` (det skuggar paketet med samma n
 låtsade modellen inte kunde visa.
 
 **Grafiken.** Handen på pulten är en liten WebGL-duk i pultens plan som läggs dit när rummet är
-klart, med handens modell (133 kB) och fotot (149 kB). Den ritas en gång och sedan bara när fingrarna
+klart, med handens modell (228 kB, 150 kB packad) och fotot (149 kB). Den ritas en gång och sedan bara när fingrarna
 trummar, och den behåller sin bild (`preserveDrawingBuffer`), så att den inte är tom om duken låg
 utanför bilden när den ritades (i telefonen på höjden och i smala fönster). Resten hämtas först när
 någon pekar på kaffet eller klickar: bilden av väggen (61 kB, 33 kB på höjden; på natten 38 och 24 kB), på dagen också fönsterljuset på den (40 kB, 23 kB på höjden) och figuren. Disken
@@ -4667,9 +4700,9 @@ Källor) ligger utan armar på en formad yta, så att huvudet vrids runt nacken 
 fram. Ögon, bryn och mun rör sig i skuggaren: locken blinkar utan att ögat tänjs, munnen öppnas med
 tänder och tunga, och hakan följer med ([public/rum-hasse-3d.js](public/rum-hasse-3d.js)). Ärmarna är
 kavajen ur fotot ([public/rum-hasse-arm.js](public/rum-hasse-arm.js)): fotots armar, uträtade till en
-remsa i atlasen, ligger på böjbara rör med fotots mått, så att tyget och färgen är desamma som på
+remsa i atlasen, ligger på böjbara rör, så att tyget och färgen är desamma som på
 kroppen. Händerna är en modell med 16 ben ([scripts/hasse/hand.mjs](scripts/hasse/hand.mjs)) med
-huden ur fotot, naglar och leder. Armar, kropp, händer och kopp har samma ljus. Väggen bakom honom
+huden ur fotot, naglar och leder (se *Armarna och händerna*). Armar, kropp, händer och kopp har samma ljus. Väggen bakom honom
 är en färdig bild, spårad en gång med riktigt ljus ([scripts/hasse/bak.html](scripts/hasse/bak.html)).
 Skuggorna på disken är räknade kapslar, utan skuggkarta (också askkoppens och cigarrens). Askkoppen,
 cigarren och röken är tre ritanrop och ungefär 3 700 trianglar till. Klippen står i `KLIPP` (se
@@ -4705,6 +4738,18 @@ kaffet, spelade som repliker med gester, där bilden ryckte till vid varje slag 
 spelades. Ljuden är framräknade i en `OfflineAudioContext` och mätta (toppar 0,44–0,55 för slagen,
 0,24 för klirret), men inte lyssnade på, och inte provade i Safari eller på en riktig telefon.
 Samtalet med en riktig analys är inte provat (ingen kupong i provet), bara genomläst.
+
+Armarna, händerna och munnen (2026-11-06) är provade i headless Chrome med mjukvarugrafik, i hela sidan med
+`?rum-hasse` (byggd utan att hämta något, så utan kupong) och figuren frusen på tidslinjen: alla 34
+klipp i sex bilder vardera i 1440 × 900 och jämförda med bilderna före ändringen, närbilder av
+armbågarna (skrattet, fingret, klunken), händerna i vilan, vid koppen och med cigarren, manschetterna,
+munnen i skrattet och åtta bilder i följd medan han pratar, och telefonen på höjden (412 × 915) mot
+samma bilder före. Handen på pulten i rummet är provad i 1440 × 900. Inte provat i Safari eller på en
+riktig telefon. Lagt ovanpå main 2026-11-07, där greppen om koppen och pennan hade ändrats under
+tiden: de räknas nu i den större handens skala, handen går upp och över koppen till örat, och handen på
+pulten ligger 20 bildpunkter till vänster om mains nya läge. Provat i headless Chrome mot main bild för
+bild: vilan, talet, slaget, gesterna, klunken (tätt när handen tar och ställer koppen), cigarren och
+pennan i 1440 × 900, vilan, klunken och talet i telefonen (412 × 915), och handen på pulten i rummet.
 
 Kaffet på sex sätt (2026-11-05) är provat i headless Chromium med mjukvarugrafik, figuren ensam i
 1440 × 900 och 412 × 915: varje klipp bild för bild, ångan i följd (med förstärkt ånga, för att se att

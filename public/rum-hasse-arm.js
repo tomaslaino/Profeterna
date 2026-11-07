@@ -151,6 +151,9 @@ export function laddaHand() {
 }
 
 // ---------- handen ----------
+// Handens storlek (modellen är en hand på ungefär 17 cm i skala 1; en enhet är ungefär 0,6 mm) och
+// manschettens vidd. Greppen om cigarren och koppen (rum-hasse-3d.js) räknas med samma skala.
+export const HAND = { SK: 1.04, MAN: 0.95 };
 const HUD_V = `
 attribute vec4 aN, aBen; attribute float aPalm, aRygg; attribute vec2 aNagel;
 uniform mat4 uB[16];
@@ -170,30 +173,43 @@ uniform sampler2D foto; uniform vec4 uHud;
 varying vec3 vN, vP; varying vec2 vUv, vNagel; varying float vAo, vTon, vPalm, vRygg;
 ${LJUS}
 ${BORD_GLSL}
+// Huden ur fotot: dess detaljer (porer, veck och ådror) på en jämn ton. Fotots hud är sammansatt av
+// bitar och har mörka fläckar i ett rutmönster, som annars blir mörka streck tvärs över fingrarna. (Den
+// suddiga bilden delas med sin täckning, så att det genomskinliga runt bitarna inte gör den mörkare.)
+vec3 hud(vec2 uv, vec3 ton0) {
+  vec3 d = texture2D(foto, uv).rgb;
+  vec4 b = texture2D(foto, uv, 4.);
+  vec3 bl = b.rgb / max(b.a, .05);
+  return mix(bl, ton0, .75) * clamp(d / max(bl, vec3(.05)), .72, 1.28);
+}
 void main() {
   if (underBord(vP)) discard;
   vec3 n = normalize(vN);
   // huden: fotots handrygg överst i atlasen, handflatan under
   vec2 q = clamp(vUv, .004, .996);
-  vec3 c = mix(texture2D(foto, uHud.xy + vec2(q.x, q.y * .5 + .5) * uHud.zw).rgb, texture2D(foto, uHud.xy + vec2(q.x, q.y * .5) * uHud.zw).rgb, vPalm);
-  // (lite mattare än fotots hud: ljuset ovanifrån gör den annars orange bredvid ansiktet)
-  c = mix(c, vec3(dot(c, vec3(.3, .55, .15))), .12);
-  c = mix(c, c * vec3(1.1, .9, .84), vTon * .7);
-  float ao = vAo * vAo * .7 + .3;
+  vec3 c = mix(hud(uHud.xy + vec2(q.x, q.y * .5 + .5) * uHud.zw, vec3(.745, .498, .424)), hud(uHud.xy + vec2(q.x, q.y * .5) * uHud.zw, vec3(.831, .584, .494)), vPalm);
+  // Fotots händer är rödare och mörkare än ansiktet (de låg i skugga): huden dras mot ansiktets ton,
+  // och lite mattare, så att ljuset ovanifrån inte gör den orange bredvid ansiktet
+  c *= vec3(1.03, 1.17, 1.22);
+  c = mix(c, vec3(dot(c, vec3(.3, .55, .15))), .1);
+  c = mix(c, c * vec3(1.08, .92, .88), vTon * .5);
+  // inbakad skugga mellan fingrarna: varm, som hud i skugga (förut grå, som smuts mellan fingrarna)
+  float ao = vAo * vAo * .6 + .4;
   // nageln: rosa nagelbädd, ljus halvmåne vid roten och ljus kant längst ut
   float rd = length(max(abs(vNagel) - vec2(.6, .58), 0.)) - .36;
   float rygg = smoothstep(.45, .7, vRygg);
-  float nagel = (1. - smoothstep(-.04, .05, rd)) * rygg;
-  vec3 nc = c * vec3(1.12, 1.03, 1.02) + .035;
-  nc = mix(nc, vec3(.86, .74, .68), .55 * (1. - smoothstep(-.92, -.55, vNagel.y)));
-  nc = mix(nc, vec3(.92, .86, .78), smoothstep(.72, .92, vNagel.y));
-  c = mix(c, nc, nagel * .9);
-  c *= 1. - .2 * rygg * exp(-rd * rd * 240.);
+  // (mjuk kant och nära huden: förut laxrosa fält med skarp kant, som klistermärken)
+  float nagel = (1. - smoothstep(-.09, .07, rd)) * rygg;
+  vec3 nc = mix(c, vec3(dot(c, vec3(.3, .55, .15))), .35) * vec3(1.02, 1., 1.02) + .05;
+  nc = mix(nc, vec3(.88, .8, .76), .45 * (1. - smoothstep(-.92, -.5, vNagel.y)));
+  nc = mix(nc, vec3(.9, .86, .8), .8 * smoothstep(.7, .95, vNagel.y));
+  c = mix(c, nc, nagel * .75);
+  c *= 1. - .12 * rygg * exp(-rd * rd * 160.);
   vec3 l = ljus(n);
   // ljuset som går igenom huden: varmare där ljuset tar slut
   float ter = max(0., dot(n, NYCKEL) + .3);
-  l += vec3(.16, .035, .015) * ter * (1. - ter) * 2.2;
-  vec3 ut = c * l * mix(.72, 1., ao) * ao;
+  l += vec3(.16, .045, .025) * ter * (1. - ter) * 1.7;
+  vec3 ut = c * l * mix(vec3(.5, .36, .32), vec3(1.), ao);
   vec3 h = normalize(NYCKEL + normalize(cameraPosition - vP));
   float sp = pow(max(0., dot(n, h)), mix(22., 60., nagel));
   ut += vec3(1., .93, .84) * sp * mix(.07, .2, nagel) * ao;
@@ -320,7 +336,7 @@ export function byggHand(modell, sida, foto, bord = ingenBord()) {
   const fx = new THREE.Vector3();
   const m = new THREE.Matrix4();
   const sp = new THREE.Vector3(sida, 1, 1);
-  const SK = 0.92;
+  const SK = HAND.SK;
   // W: handleden, F: mot fingertopparna, P: ut ur handflatan, i världen
   function satt(W, F, P, krok, peka, spar, tumme, extra) {
     fy.copy(F).normalize();
@@ -341,40 +357,52 @@ export function byggHand(modell, sida, foto, bord = ingenBord()) {
 
 // ---------- armen ----------
 export const ARM = { LA: 466, LB: 431, TOPP: 88 };
-const RINGAR = 44;
-const SEG = 22;
-// fotots halva bredd längs armen (s = 0 överst på ärmhuvudet)
-const BREDD = [[0, 56], [0.03, 66], [0.0625, 78], [0.125, 92], [0.1875, 105], [0.25, 113], [0.3125, 118], [0.375, 119], [0.4375, 118], [0.5, 115], [0.5625, 109], [0.625, 102], [0.6875, 95], [0.75, 91], [0.8125, 88], [0.875, 84], [0.9375, 77], [1, 68]];
+const RINGAR = 48;
+const SEG = 24;
+// Ärmens halva bredd längs armen (s = 0 överst på ärmhuvudet, 0,5 armbågen, 1 ärmslutet). Överarmen har
+// fotots mått, så att den möter kavajen där armarna satt; från armbågen smalnar ärmen av mot ärmslutet,
+// som en kavajärm gör. (Förut hade underarmen överarmens bredd nästan ända ut, och armen såg ut som en
+// uppblåst korv.)
+const BREDD = [[0, 56], [0.03, 66], [0.0625, 78], [0.125, 92], [0.1875, 105], [0.25, 113], [0.3125, 117], [0.375, 117], [0.4375, 113], [0.5, 106], [0.5625, 98], [0.625, 91], [0.6875, 86], [0.75, 82], [0.8125, 78], [0.875, 72], [0.9375, 68], [1, 65]];
 function radie(s) {
   for (let i = 1; i < BREDD.length; i++) if (s <= BREDD[i][0]) return BREDD[i - 1][1] + ((BREDD[i][1] - BREDD[i - 1][1]) * (s - BREDD[i - 1][0])) / (BREDD[i][0] - BREDD[i - 1][0]);
-  return 68;
+  return 65;
 }
 const ARM_V = `
-attribute vec3 aN0; attribute float aS, aI;
-varying vec2 vUv; varying vec3 vN, vN0, vW; varying float vS, vI;
-void main() { vUv = uv; vN = normal; vN0 = aN0; vS = aS; vI = aI; vW = position; gl_Position = projectionMatrix * viewMatrix * vec4(position, 1.); }`;
+attribute vec3 aN0; attribute float aS, aI, aVeck;
+varying vec2 vUv; varying vec3 vN, vN0, vW; varying float vS, vI, vVeck;
+void main() { vUv = uv; vN = normal; vN0 = aN0; vS = aS; vI = aI; vVeck = aVeck; vW = position; gl_Position = projectionMatrix * viewMatrix * vec4(position, 1.); }`;
 const ARM_F = `precision highp float;
 uniform sampler2D foto;
-varying vec2 vUv; varying vec3 vN, vN0, vW; varying float vS, vI;
+varying vec2 vUv; varying vec3 vN, vN0, vW; varying float vS, vI, vVeck;
 ${LJUS}
 ${BORD_GLSL}
 void main() {
   if (underBord(vW)) discard;
   vec3 n = normalize(vN);
+  // insidan av ärmen (genom ärmslutet): mörk, med lite av ljuset utifrån
+  float ute = gl_FrontFacing ? 1. : 0.;
+  if (!gl_FrontFacing) n = -n;
   vec4 c = texture2D(foto, vUv);
-  // remsan är utjämnad: skuggorna kommer från ljuset, vecken från fotot (mjukare, för armen ligger inte som i fotot)
+  // remsan är utjämnad: skuggorna kommer från ljuset, vecken från formen och fotot (mjukare, för armen
+  // ligger inte som i fotot)
   c.rgb = .135 + (c.rgb - .135) * .62;
   vec3 ut = c.rgb * ljus(n) * 1.14;
-  float gr = 1. - clamp(dot(n, normalize(cameraPosition - vW)), 0., 1.);
-  ut += vec3(.075, .07, .066) * gr * gr * (.4 + .6 * clamp(dot(n, NYCKEL) + .5, 0., 1.));
-  ut += kant(n, .1);
+  vec3 e = normalize(cameraPosition - vW);
+  // ylle: ljuset fastnar i luddet där tyget vänder sig bort, och vecken skuggar sig själva
+  float gr = 1. - clamp(dot(n, e), 0., 1.);
+  ut += vec3(.075, .07, .066) * gr * gr * (.4 + .6 * clamp(dot(n, NYCKEL) + .5, 0., 1.)) * (1. - vVeck);
+  ut += kant(n, .1) * (1. - .6 * vVeck);
+  ut *= 1. - .55 * vVeck;
+  // lite glans på tyget där det spänner över armbågen
+  ut += vec3(.05, .045, .04) * pow(max(0., dot(n, normalize(NYCKEL + e))), 6.) * (1. - vVeck);
+  ut = mix(ut * .3, ut, ute);
   // ärmhuvudet och insidan av överarmen tonar in i kavajen på fotot
   float a = smoothstep(.0, .07, vS) * (1. - smoothstep(.62, 1., -vI) * (1. - smoothstep(.07, .2, vS)));
-  ut *= 1. - .7 * smoothstep(.985, 1., vS);
   gl_FragColor = vec4(ton(ut) * a, a);
 }`;
 const SKJ_F = `precision highp float;
-varying vec3 vN, vW; varying vec2 vUv;
+varying vec3 vN, vW, vL;
 ${LJUS}
 ${BORD_GLSL}
 void main() {
@@ -382,13 +410,20 @@ void main() {
   vec3 n = normalize(vN); if (!gl_FrontFacing) n = -n;
   // insidan av manschetten är mörk
   float inne = gl_FrontFacing ? 1. : .34;
-  vec3 c = vec3(.98, .97, .95) * (ljus(n) * 1.06) * inne;
-  c *= .7 + .3 * smoothstep(.05, .55, vUv.y);
+  vec3 c = vec3(.97, .965, .955) * (ljus(n) * 1.04) * inne;
+  // skuggad där den går in i ärmen, och sömmen en bit från kanten
+  c *= .5 + .5 * smoothstep(-12., 22., vL.y);
+  c *= 1. - .14 * exp(-pow((vL.y - 37.5) / 1.3, 2.)) * inne;
+  vec3 e = normalize(cameraPosition - vW);
+  c += vec3(.06, .058, .055) * pow(max(0., dot(n, normalize(NYCKEL + e))), 12.) * inne;
   gl_FragColor = vec4(ton(c), 1.);
 }`;
-const SKJ_V = `varying vec3 vN, vW; varying vec2 vUv; void main() { vUv = uv; vN = mat3(modelMatrix) * normal; vec4 w = modelMatrix * vec4(position, 1.); vW = w.xyz; gl_Position = projectionMatrix * viewMatrix * w; }`;
+const SKJ_V = `varying vec3 vN, vW, vL; void main() { vL = position; vN = mat3(modelMatrix) * normal; vec4 w = modelMatrix * vec4(position, 1.); vW = w.xyz; gl_Position = projectionMatrix * viewMatrix * w; }`;
 
 const Y_AX = new THREE.Vector3(0, 1, 0);
+// skjortans manschett (radien, höjden längs underarmen från ärmslutet): går in i ärmen och slutar en bit
+// före handleden, med en rundad kant
+const MANSCHETT = [[54, -44], [54.5, 10], [54.2, 16], [53, 20.5], [51, 22.6], [49.2, 21.4], [48.6, 16], [48.6, -44]];
 export function byggArm(scen, sida, foto, modell, vidd = 1, bord = ingenBord()) {
   const n = RINGAR * (SEG + 1);
   const g = new THREE.BufferGeometry();
@@ -398,6 +433,8 @@ export function byggArm(scen, sida, foto, modell, vidd = 1, bord = ingenBord()) 
   const n0 = new Float32Array(n * 3);
   const sS = new Float32Array(n);
   const sI = new Float32Array(n);
+  const vk = new Float32Array(n);
+  const rad = new Float32Array(n * 3);
   const ix = [];
   const A = ATLAS;
   // så låg armen i fotot: överarmen något utåt, underarmen inåt (för remsans ljus)
@@ -414,7 +451,7 @@ export function byggArm(scen, sida, foto, modell, vidd = 1, bord = ingenBord()) 
     const sTri = Math.asin(Math.sin(th)) / 1.5708;
     const t = -(Math.sin(th) * 0.35 + sTri * 0.65) * sida * 0.9;
     uv[o * 2] = (A.rx + 0.5 + ((t + 1) / 2) * (A.rw - 1)) / A.W;
-    uv[o * 2 + 1] = 1 - (0.5 + s * (A.rh - 1)) / A.H;
+    uv[o * 2 + 1] = 1 - (0.5 + Math.min(s, 0.985) * (A.rh - 1)) / A.H;
     tt.copy(T1).lerp(T2, Math.min(1, Math.max(0, (s - 0.5) / 0.14))).normalize();
     b0.crossVectors(tt, Z);
     const sn = Math.sin(th) * sida;
@@ -432,16 +469,18 @@ export function byggArm(scen, sida, foto, modell, vidd = 1, bord = ingenBord()) 
   g.setAttribute('aN0', new THREE.BufferAttribute(n0, 3));
   g.setAttribute('aS', new THREE.BufferAttribute(sS, 1));
   g.setAttribute('aI', new THREE.BufferAttribute(sI, 1));
+  g.setAttribute('aVeck', new THREE.BufferAttribute(vk, 1));
   g.setIndex(ix);
-  const rorM = new THREE.ShaderMaterial({ uniforms: { foto: { value: foto }, uBord: bord, uButik: bord.butik || BUTIK_AV, uDag: DAG, uLys: LYS }, vertexShader: ARM_V, fragmentShader: ARM_F, transparent: true, depthWrite: true, blending: THREE.CustomBlending, blendSrc: THREE.OneFactor, blendDst: THREE.OneMinusSrcAlphaFactor });
+  // (dubbelsidig: genom ärmslutet syns insidan)
+  const rorM = new THREE.ShaderMaterial({ uniforms: { foto: { value: foto }, uBord: bord, uButik: bord.butik || BUTIK_AV, uDag: DAG, uLys: LYS }, vertexShader: ARM_V, fragmentShader: ARM_F, transparent: true, depthWrite: true, side: THREE.DoubleSide, blending: THREE.CustomBlending, blendSrc: THREE.OneFactor, blendDst: THREE.OneMinusSrcAlphaFactor });
   const ror = new THREE.Mesh(g, rorM);
   ror.frustumCulled = false;
-  // skjortans manschett: ett rör med en tjock kant
-  const prof = [new THREE.Vector2(51, -40), new THREE.Vector2(53, 34), new THREE.Vector2(53, 46), new THREE.Vector2(50.5, 49.5), new THREE.Vector2(47.5, 46), new THREE.Vector2(47, -40)];
-  const manG = new THREE.LatheGeometry(prof, 24);
-  manG.scale(1, 1, 0.78);
+  // skjortans manschett: ett rör med en rundad kant, lite plattare som handleden (handflatan åt z)
+  const manG = new THREE.LatheGeometry(MANSCHETT.map(([r, y]) => new THREE.Vector2(r * HAND.MAN, y)), 28);
+  manG.scale(1, 1, 0.74);
   const man = new THREE.Mesh(manG, new THREE.ShaderMaterial({ uniforms: { uBord: bord, uButik: bord.butik || BUTIK_AV, uDag: DAG, uLys: LYS }, vertexShader: SKJ_V, fragmentShader: SKJ_F, transparent: true, side: THREE.DoubleSide }));
   man.frustumCulled = false;
+  man.matrixAutoUpdate = false;
   const hand = byggHand(modell, sida, foto, bord);
   ror.renderOrder = man.renderOrder = hand.mesh.renderOrder = 5;
   const grupp = new THREE.Group();
@@ -465,6 +504,15 @@ export function byggArm(scen, sida, foto, modell, vidd = 1, bord = ingenBord()) 
   const T_ = new THREE.Vector3();
   const N_ = new THREE.Vector3();
   const B_ = new THREE.Vector3();
+  const O_ = new THREE.Vector3();
+  const nb = new THREE.Vector3();
+  const FL = new THREE.Vector3();
+  const mzT = new THREE.Vector3();
+  const dI = new THREE.Vector3();
+  const dJ = new THREE.Vector3();
+  const nn = new THREE.Vector3();
+  const mx = new THREE.Vector3();
+  const mz = new THREE.Vector3();
   const topp = new THREE.Vector3();
   const lage = { S: new THREE.Vector3(), E: new THREE.Vector3(), W: new THREE.Vector3(), pol: new THREE.Vector3(), F: new THREE.Vector3(), P: new THREE.Vector3(), krok: 0, peka: 0 };
   function satt(S, E, W, F, Pn, krok, peka, spar = 0, tumme = 0.4, extra = null) {
@@ -477,8 +525,11 @@ export function byggArm(scen, sida, foto, modell, vidd = 1, bord = ingenBord()) 
     u2.normalize();
     topp.copy(S).addScaledVector(u1, -ARM.TOPP);
     const L0 = L1 + ARM.TOPP;
-    const rr = Math.min(105, L1 * 0.34, L2 * 0.34);
     const bojd = Math.acos(Math.min(1, Math.max(-1, u1.dot(u2))));
+    // Armbågen: en tät böj (förut en vid båge, så att armbågen blev en ballong när armen böjdes), där
+    // tyget trycks ihop på insidan och lägger sig i veck, och spänner över armbågsspetsen på utsidan.
+    const kb = Math.min(1, bojd / 1.7);
+    const rr = Math.min(105 - 80 * kb, L1 * 0.34, L2 * 0.34);
     pA.copy(E).addScaledVector(u1, -rr);
     pB.copy(E).addScaledVector(u2, rr);
     const b = 2 * rr * Math.cos(bojd / 2) * (1 + 0.1 * bojd);
@@ -490,7 +541,12 @@ export function byggArm(scen, sida, foto, modell, vidd = 1, bord = ingenBord()) 
     if (lage.pol.lengthSq() > 1e-6) lage.pol.normalize();
     // kavajen hänger löst bara när armen hänger: uppe är ärmen smalare
     const hang = Math.min(1, Math.max(0, (-u1.y - 0.25) / 0.6));
-    const smal = 0.82 + 0.18 * hang * hang * (3 - 2 * hang);
+    const smal = 0.78 + 0.22 * hang * hang * (3 - 2 * hang);
+    // armbågens mittplan: överarmens tyg stannar på sin sida och underarmens på sin, så att insidan
+    // viker sig i ett veck i stället för att gå igenom den andra delen
+    nb.copy(u1).add(u2);
+    const nbL = nb.length();
+    if (nbL > 1e-4) nb.multiplyScalar(1 / nbL);
     N_.set(0, 0, 1);
     const Pa = g.attributes.position.array;
     const Na = g.attributes.normal.array;
@@ -509,32 +565,95 @@ export function byggArm(scen, sida, foto, modell, vidd = 1, bord = ingenBord()) 
       if (N_.lengthSq() < 1e-4) N_.set(1, 0, 0).addScaledVector(T_, -T_.x);
       N_.normalize();
       B_.crossVectors(T_, N_);
-      const r0 = radie(s) * (i === RINGAR - 1 ? 0.7 : 1) * (1 + (vidd - 1) * (1 - s)) * (1 + (smal - 1) * Math.max(0, 1 - s / 0.62));
-      if (i === RINGAR - 1) pC.addScaledVector(T_, -3);
-      const platt = 0.8 + 0.11 * Math.min(1, Math.max(0, (s - 0.78) / 0.18));
-      // vecken vid armbågen och lite liv i tyget
-      const ve = Math.exp(-(((dist - dE) / 120) ** 2));
+      // utsidan av böjen (mot armbågsspetsen), vinkelrätt mot armen här
+      O_.copy(lage.pol).addScaledVector(T_, -lage.pol.dot(T_));
+      const oL = O_.length();
+      if (oL > 1e-4) O_.multiplyScalar(1 / oL);
+      const sista = i === RINGAR - 1;
+      const r0 = radie(s) * (1 + (vidd - 1) * (1 - s)) * (1 + (smal - 1) * Math.max(0, 1 - s / 0.62));
+      // ärmslutet: kanten viker sig in en aning, så att den har en tjocklek
+      if (sista) pC.addScaledVector(T_, -4);
+      // Ärmen är lite platt: i början mot kameran (N_), och mot ärmslutet som handleden och manschetten,
+      // med handflatan åt den platta sidan
+      const platt = 0.8;
+      const wf = Math.min(1, Math.max(0, (s - 0.62) / 0.3));
+      FL.copy(N_).multiplyScalar(1 - wf).addScaledVector(mzT.copy(Pn).addScaledVector(T_, -Pn.dot(T_)).normalize(), wf * (N_.dot(mzT) < 0 ? -1 : 1));
+      if (FL.lengthSq() < 1e-6) FL.copy(N_);
+      FL.normalize();
+      const e = dist - dE;
+      // armbågen (tätt), vecken på insidan (bredare), och lite liv i tyget
+      const we = kb * Math.exp(-((e / 95) ** 2));
+      const wv = kb * Math.exp(-((e / 170) ** 2));
+      // ärmen hopar sig lite ovanför ärmslutet när armen är böjd
+      const wh = (0.4 + 0.6 * kb) * Math.min(1, Math.max(0, (s - 0.8) / 0.12)) * (1 - Math.min(1, Math.max(0, (s - 0.97) / 0.03)));
       for (let j = 0; j <= SEG; j++) {
         const th = ((j % SEG) / SEG) * 6.28318;
         const si = Math.sin(th);
         const cs = Math.cos(th);
-        const rd = r0 * (1 + 0.075 * bojd * ve * Math.sin(dist * 0.055 + th * 2 + sida) * (0.5 + 0.5 * si) + 0.012 * Math.sin(dist * 0.021 + th * 3));
-        const c = cs * rd * platt;
-        const d = si * rd;
-        Pa[o * 3] = pC.x + N_.x * c + B_.x * d;
-        Pa[o * 3 + 1] = pC.y + N_.y * c + B_.y * d;
-        Pa[o * 3 + 2] = pC.z + N_.z * c + B_.z * d;
-        Na[o * 3] = N_.x * cs + B_.x * si;
-        Na[o * 3 + 1] = N_.y * cs + B_.y * si;
-        Na[o * 3 + 2] = N_.z * cs + B_.z * si;
+        const rx = N_.x * cs + B_.x * si;
+        const ry = N_.y * cs + B_.y * si;
+        const rz = N_.z * cs + B_.z * si;
+        const ob = oL > 1e-4 ? rx * O_.x + ry * O_.y + rz * O_.z : 0;
+        const inn = Math.max(0, -ob);
+        // vecken: valv som går runt insidan av armbågen och planar ut mot sidorna
+        const vf = Math.sin(e * 0.085 - 1.9 * ob + sida);
+        const veck = wv * (0.5 - 0.5 * ob) ** 1.5 * (0.5 + 0.5 * vf);
+        let rd = r0 * (1 - 0.3 * we * inn ** 1.3 + 0.07 * wv * (0.5 - 0.5 * ob) ** 1.5 * vf + 0.03 * we * Math.max(0, ob) ** 3 + 0.012 * Math.sin(dist * 0.021 + th * 3) + 0.022 * wh * Math.sin(dist * 0.07 + th * 2 + sida * 1.3));
+        if (sista) rd *= 0.9;
+        // (radien, och den platta sidan in mot mitten)
+        const fl = (rx * FL.x + ry * FL.y + rz * FL.z) * rd * (1 - platt);
+        let px = pC.x + rx * rd - FL.x * fl;
+        let py = pC.y + ry * rd - FL.y * fl;
+        let pz = pC.z + rz * rd - FL.z * fl;
+        if (nbL > 1e-4 && kb > 0.05) {
+          const sd = (px - E.x) * nb.x + (py - E.y) * nb.y + (pz - E.z) * nb.z;
+          if ((e < 0 && sd > 0) || (e > 0 && sd < 0)) { px -= nb.x * sd; py -= nb.y * sd; pz -= nb.z * sd; }
+        }
+        Pa[o * 3] = px;
+        Pa[o * 3 + 1] = py;
+        Pa[o * 3 + 2] = pz;
+        rad[o * 3] = rx;
+        rad[o * 3 + 1] = ry;
+        rad[o * 3 + 2] = rz;
+        // skuggan i vecken, och djupast inne i armbågsvecket
+        vk[o] = Math.min(0.75, 0.55 * veck * (1 - 0.5 * (0.5 + 0.5 * vf)) + 0.45 * we * inn ** 2 + (sista ? 0.25 : 0));
         o++;
       }
     }
+    // normalerna ur formen (veck och armbåge syns i ljuset), utåt
+    const R1 = SEG + 1;
+    for (let i = 0; i < RINGAR; i++) {
+      const ia = Math.max(0, i - 1);
+      const ib = Math.min(RINGAR - 1, i + 1);
+      for (let j = 0; j < SEG; j++) {
+        const ja = (j + SEG - 1) % SEG;
+        const jb = (j + 1) % SEG;
+        const k = i * R1 + j;
+        dI.set(Pa[(ib * R1 + j) * 3] - Pa[(ia * R1 + j) * 3], Pa[(ib * R1 + j) * 3 + 1] - Pa[(ia * R1 + j) * 3 + 1], Pa[(ib * R1 + j) * 3 + 2] - Pa[(ia * R1 + j) * 3 + 2]);
+        dJ.set(Pa[(i * R1 + jb) * 3] - Pa[(i * R1 + ja) * 3], Pa[(i * R1 + jb) * 3 + 1] - Pa[(i * R1 + ja) * 3 + 1], Pa[(i * R1 + jb) * 3 + 2] - Pa[(i * R1 + ja) * 3 + 2]);
+        nn.crossVectors(dI, dJ);
+        const l = nn.length();
+        if (l < 1e-6) nn.set(rad[k * 3], rad[k * 3 + 1], rad[k * 3 + 2]).normalize();
+        else {
+          nn.multiplyScalar(1 / l);
+          if (nn.x * rad[k * 3] + nn.y * rad[k * 3 + 1] + nn.z * rad[k * 3 + 2] < 0) nn.negate();
+        }
+        Na[k * 3] = nn.x; Na[k * 3 + 1] = nn.y; Na[k * 3 + 2] = nn.z;
+      }
+      const k0 = i * R1;
+      const kS = k0 + SEG;
+      Na[kS * 3] = Na[k0 * 3]; Na[kS * 3 + 1] = Na[k0 * 3 + 1]; Na[kS * 3 + 2] = Na[k0 * 3 + 2];
+    }
     g.attributes.position.needsUpdate = true;
     g.attributes.normal.needsUpdate = true;
-    // manschetten följer handleden
-    man.position.copy(W).addScaledVector(u2, 4);
-    man.quaternion.setFromUnitVectors(Y_AX, u2);
+    g.attributes.aVeck.needsUpdate = true;
+    // manschetten följer handleden, platt som den (handflatan åt manschettens z)
+    mz.copy(Pn).addScaledVector(u2, -Pn.dot(u2));
+    if (mz.lengthSq() < 1e-6) mz.copy(N_);
+    mz.normalize();
+    mx.crossVectors(u2, mz);
+    man.matrix.makeBasis(mx, u2, mz).setPosition(W.x, W.y, W.z);
+    man.matrixWorldNeedsUpdate = true;
     hand.satt(pC.copy(W).addScaledVector(u2, 26), F, Pn, krok, peka, spar, tumme, extra);
   }
   return { grupp, satt, lage, hand, man, del(d) { delen = d; ritaDel(); }, set visible(v) { grupp.visible = v; }, get visible() { return grupp.visible; }, borta() { g.dispose(); manG.dispose(); } };
