@@ -1250,10 +1250,13 @@ ${window.RumRegister ? RumRegister.nara() : ''}
           ? `<button type="button" class="box${on ? ' x' : ''}" data-s="${s}" aria-pressed="${on}" aria-label="${esc(`${label}: ${s}`)}">${inner}</button>`
           : `<span class="box${on ? ' x' : ''}">${inner}</span>`;
       };
+      // i handen är lagen en knapp: bladet med båda lagen läggs på kupongen (lagen, rum-lagen.js)
+      const tm = hand ? 'button' : 'span';
       return `<div class="row${sign ? '' : ' tom'}${locked ? ' locked' : ''}" data-id="${esc(x.id)}"><span class="pp-nr">${i + 1}</span>` +
         // på den smala kupongen (telefonen) de kortare namnen (short, .kort i rum.css)
-        `<span class="m"><span class="pp-tm"><span class="lang">${esc(x.m.home)}<span class="vs"> – </span>${esc(x.m.away)}</span>` +
-        `<span class="kort">${esc(short(x.m.home))}<span class="vs"> – </span>${esc(short(x.m.away))}</span></span>` +
+        `<span class="m"><${tm} class="pp-tm"${hand ? ` type="button" data-lagen aria-label="${esc(`${label}: lagen`)}"` : ''}>` +
+        `<span class="lang">${esc(x.m.home)}<span class="vs"> – </span>${esc(x.m.away)}</span>` +
+        `<span class="kort">${esc(short(x.m.home))}<span class="vs"> – </span>${esc(short(x.m.away))}</span></${tm}>` +
         `<span class="pp-small">${esc(fWeekdayTime.format(new Date(x.m.kickoff)))}${comp ? ` · ${esc(comp.short)}` : ''}${locked ? ' · har startat' : ''}</span>` +
         notes(v, x.id, label, { sign, started, hand, ink }) + '</span>' +
         SIGNS.map(box).join('') + '</div>';
@@ -2986,7 +2989,8 @@ ${window.RumRegister ? RumRegister.nara() : ''}
     const desk = document.getElementById('rum-kupong');
     const rd = { id: p.s.id, ids: p.s.matcher.map((x) => String(x.id)), gang: p.s.gang, name: (window.Samtal && Samtal.name()) || null };
     const nr = typeof couponNumber === 'function' ? couponNumber(rd.ids) : null;
-    const fram = couponHtml(rd, roundRows(rd), v, true);
+    const rows = roundRows(rd);
+    const fram = couponHtml(rd, rows, v, true);
     const vems = slag === 'las' ? `${v.vem}:s kupong` : slag === 'gang' ? 'Gängets kupong' : nr ? `Kupong ${nr}` : 'Kupong';
     desk.parentElement.insertAdjacentHTML('beforeend', '<div class="rum-dimma" id="rum-dimma"></div>' +
       `<div class="rum-flat ${from ? 'rum-bak' : 'rum-kup'} rum-handen" id="rum-handen" role="dialog" aria-modal="true" aria-label="${esc(vems)}" tabindex="-1">` +
@@ -2995,7 +2999,9 @@ ${window.RumRegister ? RumRegister.nara() : ''}
     const el = document.getElementById('rum-handen');
     const k = R.kup = { el, dim: document.getElementById('rum-dimma'), rad: document.getElementById('rum-hand'), pen: el.querySelector('.pencil'), at: PEN_PULT, desk,
       slag, andra: slag === 'din' && p.andra, orig: { ...v.tecken }, tecken: { ...v.tecken }, origNot: { ...(v.not || {}) }, not: { ...(v.not || {}) },
-      efter: { ...(v.efter || {}) }, fram };
+      efter: { ...(v.efter || {}) }, fram,
+      // matcherna i kupongens ordning, till bladet med lagen (lagen)
+      matcher: rd.ids.map((id) => rows.find((x) => x.id === id)).filter(Boolean).map((x) => x.m), kupong: nr ? `Kupong ${nr}` : 'Kupong' };
     k.msg = k.rad.querySelector('.msg');
     k.go = k.rad.querySelector('.guld');
     if (from) {
@@ -3045,8 +3051,22 @@ ${window.RumRegister ? RumRegister.nara() : ''}
     }
     el.focus({ preventScroll: true });
     el.addEventListener('click', (e) => {
+      if (k.closing) return;
+      // bladet med lagen: foten styr det, och lagen i en rad lägger det på kupongen
+      const lapp = e.target.closest('.rum-lagen');
+      if (lapp) {
+        const s = e.target.closest('button[data-steg]');
+        if (e.target.closest('[data-lagen-ut]')) lagenUt();
+        else if (s && !s.disabled) lagenSteg(Number(s.dataset.steg));
+        return;
+      }
+      const t = e.target.closest('button[data-lagen]');
+      if (t) {
+        lagen(t.closest('.row').dataset.id);
+        return;
+      }
       const b = e.target.closest('button.box, button[data-vem]');
-      if (!b || k.closing) return;
+      if (!b) return;
       if (b.dataset.vem) choose(b);
       else if (k.slag === 'gang') tickGang(b);
       else tick(b);
@@ -3055,6 +3075,8 @@ ${window.RumRegister ? RumRegister.nara() : ''}
     k.rad.addEventListener('click', (e) => {
       const b = e.target.closest('button');
       if (!b || b.disabled || k.closing) return;
+      // det man gör med kupongen syns på kupongen: bladet med lagen tas bort först
+      if (b.dataset.tillbaka == null) lagenUt(true);
       if (b.dataset.tillbaka != null) closeCoupon();
       else if (b.dataset.lamna != null) handIn();
       else if (b.dataset.spara != null) save();
@@ -3093,9 +3115,75 @@ ${window.RumRegister ? RumRegister.nara() : ''}
   const sparaHtml = (p) => `<button type="button" class="bla${p.sparad ? ' sparad' : ''}" data-spara${p.sparad || p.tom ? ' disabled' : ''}>${p.sparad ? `${CHECK}Sparad` : 'Spara'}</button>`;
   const gangHtml = (g) => `<button type="button" class="guld${g.same ? ' sparad' : ''}" data-gang${g.same ? ' disabled' : ''}>${g.same ? `${CHECK}Sparad` : esc(g.label)}</button>`;
 
+  // ---------- lagen: bladet ovanpå kupongen i handen (rum-lagen.js) ----------
+  //
+  // Ett klick på lagen i en rad lägger ett blad med båda lagen på kupongen –
+  // chansen ur oddsen, ligan hittills och formen – på samma papper och i samma
+  // mått, så att det står där kupongen står. Det glider upp över kupongen och
+  // lägger sig lite snett; pilarna (‹ ›, ← →) byter match i kupongens ordning,
+  // och Kupongen, Esc eller ett klick utanför tar bort det igen.
+  function lagen(id, steg = 0) {
+    const k = R.kup;
+    if (!k || k.closing || !window.RumLagen) return;
+    const i = k.matcher.findIndex((m) => String(m.id) === String(id));
+    const m = k.matcher[i];
+    if (!m) return;
+    const comp = compOf(m.comp);
+    const ctx = { m, nr: i + 1, av: k.matcher.length, kupong: k.kupong, nar: `${fWeekdayTime.format(new Date(m.kickoff))}${comp ? ` · ${comp.short}` : ''}` };
+    const gammal = k.lapp;
+    const el = document.createElement('div');
+    el.className = 'rum-lagen';
+    el.tabIndex = -1;
+    el.setAttribute('role', 'dialog');
+    el.setAttribute('aria-label', `${m.home} – ${m.away}`);
+    el.dataset.id = String(m.id);
+    el.innerHTML = RumLagen.html(ctx);
+    k.el.appendChild(el);
+    k.lapp = el;
+    el.focus({ preventScroll: true });
+    RumLagen.load(String(m.id)).then((d) => {
+      if (k.lapp === el && R.kup === k) el.innerHTML = RumLagen.html(ctx, d);
+    });
+    const vila = getComputedStyle(el).transform;
+    if (gammal) {
+      // nästa blad läggs ovanpå det förra, från det håll man bläddrar
+      if (calm()) gammal.remove();
+      else {
+        el.animate([{ opacity: 0, transform: `translate(${steg * 46}px, 10px) rotate(${steg * 1.6}deg)` }, { opacity: 1, transform: vila }],
+          { duration: 300, easing: 'cubic-bezier(0.2, 0.7, 0.2, 1)' }).finished.then(() => gammal.remove(), () => gammal.remove());
+      }
+    } else if (!calm()) {
+      el.animate([{ opacity: 0, transform: 'translate(0, 64px) rotate(2.4deg)' }, { opacity: 1, offset: 0.45 }, { opacity: 1, transform: vila }],
+        { duration: 440, easing: 'cubic-bezier(0.2, 0.7, 0.2, 1)' });
+    }
+  }
+  function lagenUt(now = false) {
+    const k = R.kup;
+    const el = k && k.lapp;
+    if (!el) return;
+    k.lapp = null;
+    for (const x of k.el.querySelectorAll('.rum-lagen')) if (x !== el) x.remove();
+    const t = k.el.querySelector(`.row[data-id="${CSS.escape(el.dataset.id)}"] button[data-lagen]`);
+    if (t && !now) t.focus({ preventScroll: true });
+    else if (!now) k.el.focus({ preventScroll: true });
+    if (now || calm()) {
+      el.remove();
+      return;
+    }
+    el.animate([{ opacity: 1, transform: getComputedStyle(el).transform }, { opacity: 0, transform: 'translate(0, 48px) rotate(2deg)' }],
+      { duration: 240, easing: 'ease-in', fill: 'forwards' }).finished.then(() => el.remove(), () => el.remove());
+  }
+  function lagenSteg(n) {
+    const k = R.kup;
+    if (!k || !k.lapp) return;
+    const i = k.matcher.findIndex((m) => String(m.id) === k.lapp.dataset.id) + n;
+    if (i >= 0 && i < k.matcher.length) lagen(k.matcher[i].id, n);
+  }
+
   function closeCoupon(now = false) {
     const k = R.kup;
     if (!k || k.closing) return;
+    lagenUt(true);
     // på väg upp ur högen: läggs tillbaka när den är framme
     if (k.opening && !now) {
       k.later = true;
@@ -3848,9 +3936,13 @@ ${window.RumRegister ? RumRegister.nara() : ''}
     el.addEventListener('click', (e) => {
       // kupongen i handen: ett klick utanför den lägger tillbaka den
       if (R.kup) {
-        if (e.target.closest('#rum-handen, #rum-hand, .rum-hdr')) return;
+        // klickets väg, inte var målet sitter nu: ett blad med lagen som klicket
+        // tog bort (lagenUt, nästa blad) sitter inte längre i kupongen
+        if (e.composedPath().some((n) => n instanceof Element && n.matches('#rum-handen, #rum-hand, .rum-hdr'))) return;
         e.preventDefault();
-        closeCoupon();
+        // med bladet med lagen ovanpå tar klicket bort bladet först
+        if (R.kup.lapp) lagenUt();
+        else closeCoupon();
         return;
       }
       // anslagstavlan sköter sina lappar själv (rum-anslag.js)
@@ -3903,7 +3995,15 @@ ${window.RumRegister ? RumRegister.nara() : ''}
         }
         if (/^[ktarvh]$/.test(k)) sak(null, null);
       }
-      if (R.kup) {
+      if (R.kup && R.kup.lapp) {
+        // bladet med lagen: Esc tar bort det, pilarna byter match
+        if (k === 'escape') lagenUt();
+        else if (k === 'k') closeCoupon();
+        else if (k === 'arrowleft' || k === 'arrowright') {
+          e.preventDefault();
+          lagenSteg(k === 'arrowleft' ? -1 : 1);
+        }
+      } else if (R.kup) {
         if (k === 'k' || k === 'escape') closeCoupon();
       } else if (R.ans && R.ans.on()) {
         if (R.ans.key(e.key)) e.preventDefault();

@@ -18,6 +18,8 @@ const { keyOf, espnKey } = require('./teams');
 const { newsSv } = require('./skadetext');
 
 const FORM_N = 5;
+// Lagen på kupongen i rummet (rum-lagen.js): de tio senaste matcherna.
+const SENASTE_N = 10;
 
 // ---------- inläsning (memoiserad på cachefilernas mtime) ----------
 
@@ -521,6 +523,7 @@ function teamProfile(D, k, before, S = null) {
   // Motståndets styrka är modellens senaste skattning, inte den vid matchen
   // (som tabellen en ögonblicksbild).
   const cal = calendar(D, k);
+  const xgSrc = xgSource(D, leagueId);
   const form = cal.filter((x) => x.completed && x.kickoff < before).map((x) => {
     const s = x.score90 || (x.status === 'STATUS_FULL_TIME' ? x.score : null);
     const gf = s ? (x.home ? s.home : s.away) : null;
@@ -534,11 +537,65 @@ function teamProfile(D, k, before, S = null) {
       result: gf == null ? null : gf > ga ? 'V' : gf < ga ? 'F' : 'O',
       decided: x.shootout ? 'straffar' : x.status === 'STATUS_FINAL_AET' ? 'förlängning' : null,
       opp: opponentStrength(D, S, leagueId, x.oppKey),
+      xg: x.comp === leagueId && xgSrc ? xgSrc.of(x.home ? k : x.oppKey, x.home ? x.oppKey : k, x.home) : null,
     };
   });
   p.schedule = schedule(D, cal, before, leagueId);
-  p.form = form.slice(-FORM_N).reverse();
+  // Formen (fem) som förut, utan xG; de tio senaste med lagets och
+  // motståndarnas xG i ligamatcherna (null i cuperna).
+  p.form = form.slice(-FORM_N).reverse().map(({ xg, ...x }) => x);
+  p.senaste = form.slice(-SENASTE_N).reverse().map(({ opp, ...x }) => x);
+  // xG i ligan hittills, summerat, ur samma källa som matcherna ovan
+  // (lagets och motståndarnas, n = matcher med xG).
+  if (xgSrc) p.xg = xgSrc.season(k, before);
   return p;
+}
+
+// xG i ligan för ett lag: en källa per liga, som raden xG i Lagen sida vid
+// sida (oneXg i app.js) – Understat i Premier League där den finns, annars
+// football-data.co.uk. of(hk, ak, hemma) ger [lagets, motståndarnas] i en
+// match, season(k, before) summan före avspark.
+function xgSource(D, leagueId) {
+  const r2 = (x) => Math.round(x * 100) / 100;
+  const fin = (x) => typeof x === 'number' && Number.isFinite(x);
+  if (leagueId === 'pl' && D.understat.matches.length) {
+    const ok = (m) => m && m.played && m.xg && fin(m.xg.home) && fin(m.xg.away);
+    return {
+      of(hk, ak, home) {
+        const m = hk && ak ? D.understat.byPair.get(`${hk}|${ak}`) : null;
+        return ok(m) ? (home ? [r2(m.xg.home), r2(m.xg.away)] : [r2(m.xg.away), r2(m.xg.home)]) : null;
+      },
+      season(k, before) {
+        const ms = D.understat.matches.filter((m) => ok(m) && m.kickoff < before && (m.hk === k || m.ak === k));
+        const sum = (fn) => r2(ms.reduce((t, m) => t + fn(m), 0));
+        return {
+          n: ms.length,
+          f: sum((m) => (m.hk === k ? m.xg.home : m.xg.away)),
+          a: sum((m) => (m.hk === k ? m.xg.away : m.xg.home)),
+          source: { provider: 'Understat', fetchedAt: D.understat.fetchedAt },
+        };
+      },
+    };
+  }
+  const fd = D.fd[leagueId];
+  if (!fd) return null;
+  const ok = (r) => r && r.FTHG != null && fin(r.HxG) && fin(r.AxG);
+  return {
+    of(hk, ak, home) {
+      const r = hk && ak ? fd.byPair.get(`${hk}|${ak}`) : null;
+      return ok(r) ? (home ? [r2(r.HxG), r2(r.AxG)] : [r2(r.AxG), r2(r.HxG)]) : null;
+    },
+    season(k, before) {
+      const rows = fd.rows.filter((r) => ok(r) && r.date < before.slice(0, 10) && (r.hk === k || r.ak === k));
+      const sum = (fn) => r2(rows.reduce((t, r) => t + fn(r), 0));
+      return {
+        n: rows.length,
+        f: sum((r) => (r.hk === k ? r.HxG : r.AxG)),
+        a: sum((r) => (r.hk === k ? r.AxG : r.HxG)),
+        source: { provider: 'football-data.co.uk', fetchedAt: fd.fetchedAt },
+      };
+    },
+  };
 }
 
 // Lagets matcher i alla tävlingar som källorna har, i tidsordning: ligan och
