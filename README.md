@@ -3371,8 +3371,10 @@ kommentarer i efterhand, hens porträtt inringat och stämpeln *Inlämnad*, men 
 kupong på pulten, och pingklockan där guldordet annars står (eller *Följ kupongen* när
 matcherna har börjat), kupongen eller K tar den i handen – klockan lyser när man pekar på
 den och plingar när kupongen tas upp (`bell` och `pling` i rum.js). I varje ruta står
-porträtten för dem som har med tecknet, var och en på sin plats som överst, och deras
-motivering syns när man pekar på porträttet. Gängets kryss dras med en blå kulspetspenna i
+porträtten för dem som har med tecknet, var och en på sin plats som överst, och när man
+pekar på porträttet syns deras motivering och, på en rad under, deras kommentar i efterhand
+(*Efteråt: …*, `efter` i `Samtal.pult.gang`) – på pulten och i handen. Bara din egen
+kommentar står på raden, eftersom raden inte blir högre. Gängets kryss dras med en blå kulspetspenna i
 stället för blyertspennan: förslaget – det som fler än hälften har med – står ikryssat från
 början, eller gängets kupong om den redan är sparad, och ett tryck kryssar i eller ur (`Samtal.pult.besluta`,
 sparat på enheten som på papperet). *Börja om* i finstil går tillbaka till förslaget, och
