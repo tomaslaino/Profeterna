@@ -156,10 +156,10 @@ export const BORD = { Y: DK.Y, Z: kantZ(0) };
 // Armarna på disken: armbågens och handledens höjd.
 export const VILA = { EH: BORD.Y + 78, WH: BORD.Y + 45 };
 // Koppen på sitt fat och notan under fatet, till höger om hans vänstra hand och fritt från armen: en bit
-// disk mellan fatet och handen, och fingertopparna några centimeter från fatets kant (handen i VILA_B);
-// askkoppen till vänster om hans högra hand. På disken, i figurens värld.
+// disk mellan fatet och handen (handen i VILA_B); askkoppen till vänster om hans högra hand, så långt ut
+// att cigarren i den går fri från handen. På disken, i figurens värld.
 export const KOPP = [375, BORD.Y, 830];
-export const ASK = [-345, BORD.Y, 700];
+export const ASK = [-420, BORD.Y, 690];
 // En punkt i världen i fönstret: (cx, ey) är där kamerans axel träffar fönstret och s bildpunkter på en
 // enhet på avståndet D.
 export function iBild(v, x, y, z = 0) {
@@ -798,26 +798,31 @@ export async function figuren(duk, { hog = false, latt = false, pr = 1 } = {}) {
   const SB = W_(987, 800, 8);
   const LA = ARM.LA;
   const LB = ARM.LB;
-  // Vilan: armbågarna på disken och underarmarna på den in mot mitten, den vänstra med handen bredvid
-  // koppen. Ur axeln (s), armbågens vinkel ut från rakt fram (a) och underarmens vinkel
-  // in (b): armbågen och handleden ligger på disken, med armens längder. (Disken går snett, så att den
-  // vänstra armbågen når den bara nära axeln.)
+  // Vilan: armbågarna på disken nästan rakt framför axlarna och underarmarna lite in mot mitten, i ett
+  // lugnt V, med händerna i underarmarnas förlängning och en bit isär: den vänstra bredvid koppen med en
+  // bit disk emellan, den högra mellan den och askkoppen. Ur axeln (s), armbågens vinkel ut från rakt fram
+  // (a) och underarmens vinkel in (b): armbågen och handleden ligger på disken, med armens längder (lyft:
+  // handleden lite högre). Handen pekar några grader mindre in än underarmen, som en hand som vilar
+  // (handleden lite vinklad mot lillfingret), med fingrarna lätt krökta. Förut pekade den högra handen
+  // tvärs över mot den vänstras handled, vinklad nästan 20° mot tummen, och den vänstra var vriden ut mot
+  // koppen nästan 50° mot underarmen, med armbågarna ute: han såg ut att sitta obekvämt (ändrat 2026-11-07).
   const { EH, WH } = VILA;
-  function paDisken(s, sida, a, b) {
+  function paDisken(s, sida, a, b, lyft = 0) {
     const S0 = new THREE.Vector3(s.x + 2 * sida, s.y - 8, s.z);
     const h1 = Math.sqrt(LA * LA - (S0.y - EH) ** 2);
     const E = new THREE.Vector3(S0.x - sida * h1 * Math.sin(a * DEG), EH, S0.z + h1 * Math.cos(a * DEG));
-    const h2 = Math.sqrt(LB * LB - (EH - WH) ** 2);
-    const W = new THREE.Vector3(E.x + sida * h2 * Math.sin(b * DEG), WH, E.z + h2 * Math.cos(b * DEG));
+    const h2 = Math.sqrt(LB * LB - (EH - WH - lyft) ** 2);
+    const W = new THREE.Vector3(E.x + sida * h2 * Math.sin(b * DEG), WH + lyft, E.z + h2 * Math.cos(b * DEG));
     return { W: W.toArray(), pol: E.clone().sub(S0).toArray() };
   }
-  const va = paDisken(SA, 1, 17, 40);
-  // (den vänstra armbågen nära kroppen och handen vriden lite ut mot koppen, så att underarmen går fri
-  // från fatet: med armbågen längre ut låg ärmen över fatet)
-  const vb = paDisken(SB, -1, 8, 30);
+  // fingrarnas riktning när handen pekar g grader in mot mitten
+  const inat = (sida, g) => [sida * Math.sin(g * DEG), -0.05, Math.cos(g * DEG)];
+  // (den högra handen lite rullad mot lillfingret, med handleden lite högre så att den inte går ned i disken)
+  const va = paDisken(SA, 1, 10, 30, 10);
+  const vb = paDisken(SB, -1, 0, 22);
   // [handled, armbågens riktning, fingrarna, handflatan, krok, peka]
-  const VILA_A = [va.W, va.pol, [0.84, -0.05, 0.53], [0.2, -0.97, 0.1], 0.3, 0];
-  const VILA_B = [vb.W, vb.pol, [0.28, -0.05, 0.95], [-0.05, -0.99, 0.08], 0.26, 0];
+  const VILA_A = [va.W, va.pol, inat(1, 18), [0.45, -0.88, 0.1], 0.38, 0];
+  const VILA_B = [vb.W, vb.pol, inat(-1, 8), [-0.2, -0.97, 0.05], 0.24, 0];
   // [t, handled, armbågens riktning, fingrarna, handflatan, krok, peka, slag]. slag: på vägen dit går
   // handen allt fortare och stannar tvärt, som när den slår i disken (annars mjukt in och ut).
   const VA = [
@@ -887,8 +892,16 @@ export async function figuren(duk, { hog = false, latt = false, pr = 1 } = {}) {
   const studsB = (t, h) => [t, [vb.W[0], vb.W[1] + h, vb.W[2]], ...VILA_B.slice(1)];
   // fingrarnas krok när han håller cigarren (ring- och lillfingret böjs mer, EXTRA_C)
   const KG = 0.3;
-  // tummen i vilan (0 mot handen, 1 ut)
+  // tummen (0 mot handen, 1 ut)
   const TUMME = 0.45;
+  // I vilan ligger fingrarna lite samlade (SAMLA: 0 som när han gestikulerar, 1 raka bredvid varandra) och
+  // den vänstra tummen intill handen, så att händerna inte når varandra. Det tonar bort när handen tar
+  // något (bortA, bortB: 0–1, från cigarren, pennan och kaffet) och när han skrattar med armarna uppe, och
+  // klippen börjar och slutar med det (form).
+  const SAMLA = { A: 0.4, B: 0.5 };
+  const TUMME_VILA = { A: TUMME, B: 0.15 };
+  let bortA = 0;
+  let bortB = 0;
   // kaffet: handen till koppens öra och tillbaka (mot) och fingrarna runt örat (krok), när koppen står
   // på fatet igen vid ned
   const grepp = (ned) => ({ mot: [0.1, 1.05, ned + 0.05, ned + 0.5], krok: [[0, 0.1], [1, 0.18], [1.2, 0.72], [ned, 0.72], [ned + 0.2, 0.18], [ned + 0.5, VILA_B[4]]] });
@@ -1910,13 +1923,13 @@ export async function figuren(duk, { hog = false, latt = false, pr = 1 } = {}) {
     armar(VA, o.A, VILA_A, polA);
     armar(VB, o.B, VILA_B, polB);
     // händernas form och svängning (fA, fB: se handForm), med vilans värden på gränserna
-    const form = (f) => f && {
-      spar: abs(f.spar), tumme: abs(f.tumme, TUMME, TUMME, 0),
+    const form = (f, h) => f && {
+      spar: abs(f.spar, SAMLA[h], SAMLA[h]), tumme: abs(f.tumme, TUMME_VILA[h], TUMME_VILA[h], 0),
       ex: Array.from({ length: 9 }, (_, i) => (f[`e${i}`] ? abs(f[`e${i}`]) : null)),
       sv: f.sv && { ...f.sv, amp: abs(f.sv.amp), t0: fran },
     };
-    k.fA = form(o.fA);
-    k.fB = form(o.fB);
+    k.fA = form(o.fA, 'A');
+    k.fB = form(o.fB, 'B');
     const tid = (k2) => k2.map(([t, ...r]) => [fran + t, ...r]);
     // röken: under en tid (fran–till) eller på en gång (t)
     const rokTid = (l = []) => l.map((r) => ({ ...r, fran: fran + (r.fran ?? r.t), till: fran + (r.till ?? r.t), t: fran + (r.t ?? r.fran) }));
@@ -2365,6 +2378,7 @@ export async function figuren(duk, { hog = false, latt = false, pr = 1 } = {}) {
     }
     // fram till askkoppen och tillbaka i en båge; däremellan håller han den (eller har den i munnen)
     const mot = bump(c.mot, t);
+    bortA = mot;
     const upp = bump(c.upp, t);
     // (vilans riktning är armbågens hela längd: båda som enhetsvektorer, annars tar den nya över först på slutet)
     cPol.fromArray(VILA_A[1]).normalize().lerp(POL_UPP, upp);
@@ -2516,6 +2530,7 @@ export async function figuren(duk, { hog = false, latt = false, pr = 1 } = {}) {
     cPol.fromArray(VILA_A[1]).normalize();
     vristTill(Sk, pH, cPol, cU);
     const mot = ss(0.05, SKRIV.MOT, tau) * (1 - ss(T - SKRIV.HEM, T - 0.05, tau));
+    bortA = mot;
     a.w.lerp(cW, mot);
     a.w.y += 90 * mot * (1 - mot);
     a.pol.normalize().lerp(cPol, mot);
@@ -2638,6 +2653,7 @@ export async function figuren(duk, { hog = false, latt = false, pr = 1 } = {}) {
     // på väg dit, och kvar medan han håller
     const [m0, m1, m2, m3] = c.mot;
     const mot = ss(m0, m1, t) * (1 - ss(m2, m3, t));
+    bortB = mot;
     // handen i örat, och armbågen där handleden ser naturlig ut (naturlig): nedåt och utåt, och ut åt
     // sidan (arm) så långt det behövs
     qG.setFromAxisAngle(UPP, GREPP_FAT * (1 - ss(0, GREPP_LYFT, kp.p.y - KUP.y)));
@@ -2860,6 +2876,8 @@ export async function figuren(duk, { hog = false, latt = false, pr = 1 } = {}) {
     hoppar(t);
     // cigarren ligger i askkoppen, eller i hans hand
     let extraA = null;
+    bortA = 0;
+    bortB = 0;
     const pc = kl && kl.pen;
     if (pc) extraA = pennArm(t, sa, a, { n: pc.n, fran: kl.fran });
     else if (KPG.synlig) {
@@ -2899,12 +2917,15 @@ export async function figuren(duk, { hog = false, latt = false, pr = 1 } = {}) {
     const iVila = t < 2.5 || (t > 9.95 && t < 20);
     const trumA = iVila && trumHand === 'A' ? trummar(n) : extraA;
     const trumB = iVila && trumHand === 'B' ? trummar(n) : extraB;
+    // (fingrarna samlade och tummen i vilan, utom när handen tar något och när han skrattar)
+    const vA = (1 - isar) * (1 - bortA);
+    const vB = (1 - isar) * (1 - bortB);
     if (fA) A.satt(sa, E_, Wr_, a.F, a.P, a.krok, a.peka, spar(fA.spar, t), spar(fA.tumme, t), handForm(fA, t, exA));
-    else A.satt(sa, E_, Wr_, a.F, a.P, a.krok, a.peka, isar, TUMME, trumA);
+    else A.satt(sa, E_, Wr_, a.F, a.P, a.krok, a.peka, isar + SAMLA.A * vA, TUMME + (TUMME_VILA.A - TUMME) * vA, trumA);
     U.uArm.value[0].copy(sa); U.uArm.value[1].copy(E_); U.uArm.value[2].copy(Wr_);
     ik(sb, b.w, b.pol, E_, Wr_);
     if (fB) B.satt(sb, E_, Wr_, b.F, b.P, b.krok, b.peka, spar(fB.spar, t), spar(fB.tumme, t), handForm(fB, t, exB));
-    else B.satt(sb, E_, Wr_, b.F, b.P, b.krok, b.peka, isar * 0.8, TUMME, trumB);
+    else B.satt(sb, E_, Wr_, b.F, b.P, b.krok, b.peka, isar * 0.8 + SAMLA.B * vB, TUMME + (TUMME_VILA.B - TUMME) * vB, trumB);
     U.uArm.value[3].copy(sb); U.uArm.value[4].copy(E_); U.uArm.value[5].copy(Wr_);
     // koppen och fatet hoppar när han slår i disken
     K.fat.position.y = KOPP[1] + 0.5 + HOPP.fat;
