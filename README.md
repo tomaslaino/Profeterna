@@ -763,6 +763,12 @@ bara lokalt. Analyserna visas som de ligger i `data/analyser.json`; hur de skriv
   var onödig. Nu står *Titta igen* (hela analysen en gång till) där *Nästa match* stod, både efter
   en analys och vid en match man redan har frågat om, och *Alla matcher* (listan) bredvid. Ett klick
   på bilden utanför samtalet går tillbaka till rummet, som Esc. Se [Hasse Backe](#hasse-backe).
+- **Hasse Backe svarar direkt, och läser upp när man vill (2026-11-07, användarens önskemål):** "Kan du ordna så
+  att Hasse Backes svar går fortare – just nu är det trögt och ingen orkar lyssna på det" och "Det bästa vore om bara
+  texten dök upp och att man hade möjlighet att höra honom läsa upp det". Förut låtsades han läsa på i 15–25 sekunder,
+  slog domen i disken och sa sedan texten ord för ord, en dryg minut i allt. Nu står hela texten direkt när man ber om
+  analysen, han slår domen i disken medan man läser, och *Läs upp* under texten låter honom läsa den med sin röst.
+  Raderna han sa medan han låtsades läsa på är borttagna. Se [Hasse Backe](#hasse-backe), *Samtalet*.
 - **Hasse Backe nöjd i stället för hånfull (2026-11-06, användarens önskemål):** i vilan hade han ena
   brynet högt, huvudet på sned och hakan uppe med ett tunt leende, och det såg hånfullt ut. Nu är han
   nöjd och säker på sin sak, fortfarande lite överdrivet: båda brynen lite uppe, huvudet nästan rakt
@@ -1252,8 +1258,8 @@ Verkliga lag och personer nämns bara när underlaget eller det Claude läste ta
 
 **Sajten.** Bygget kopierar filerna till `_site/data/`. Matchbladets flik Analysera finns för
 omgångens matcher och för matcher som har en analys; knappen visar den sparade texten direkt, eller
-en rad om att den inte är klar än ([public/app.js](public/app.js)). I tobaksaffären låtsas Hasse
-Backe analysera (se [Hasse Backe](#hasse-backe)). `data/analyser.json`:
+en rad om att den inte är klar än ([public/app.js](public/app.js)). I tobaksaffären svarar Hasse
+Backe med sin text, och läser upp den om man vill (se [Hasse Backe](#hasse-backe)). `data/analyser.json`:
 
 ```json
 { "uppdaterad": "…", "omgang": { "id": "2026-11-07-st4978", "matcher": ["401878757"] },
@@ -4458,8 +4464,8 @@ versaler som texten i bandet. Frågan har sin plats från början, osynlig tills
 knapparna inte flyttar sig. Förut stod svaren som små länkar längst ned i spalten och syntes knappt
 i telefonen, och sedan som piller i guld (ändrat 2026-11-04). *Titta igen* efter analysen är samma
 lapp i terrakotta, med *Alla matcher* i krämvitt bredvid (*Fyll i den* i stället för *Titta igen* medan han
-föreslår att fylla i kupongen, se *Din kupong*), och *Ja, ja »* står med samma versaler som *Matchbladet →*. Han har alltid svaret, också när
-han ska läsa på (*Den knäckte jag i morse*); att han läser på märks först medan han väntar. Är analysen inte skriven än
+föreslår att fylla i kupongen, se *Din kupong*), och *Läs upp* står bredvid dem med samma versaler som *Matchbladet →* men
+utan pil. Han har alltid svaret (*Den knäckte jag i morse*). Är analysen inte skriven än
 säger han det (*Den tar jag sen*). En match du redan har frågat om står direkt, som han sa
 den: domen i guld, hans text och resultatet, och sist vad han tycker om det du har på kupongen nu.
 Det han sa sparas på enheten, så att det står kvar också när analysen har skrivits om sedan dess
@@ -4467,19 +4473,22 @@ Det han sa sparas på enheten, så att det står kvar också när analysen har s
 titta igen, ödmjukt på sitt sätt (*Jag har haft fel en gång förut. Ska jag titta på den igen, för
 säkerhets skull?*), och har analysen skrivits om sedan han sa det säger han det (*Tidningarna har
 skrivit mer om den sedan dess.*). *Titta igen* bredvid *Alla matcher* ger hela analysen en gång
-till, med väntan, slaget och rösten (*Då tar vi den från början.*), och det nya ersätter det gamla
+till, med slaget, och det nya ersätter det gamla
 (`tidigare` i [public/rum-hasse.js](public/rum-hasse.js)). Matcher han svarade på innan texten
 sparades (före 2026-11-06) får dagens analys om tecknen är desamma, annars bara domen och
-resultatet. Analysen är redan skriven, men han låtsas: när du har bett om den fortsätter han prata i 15–25 sekunder (`LATSAS` i [public/rum-hasse.js](public/rum-hasse.js)) och tar en klunk kaffe eller cigarren då och då. Han hinner säga två eller
-tre rader: han börjar (*Vänta lite, var har jag glasögonen?*), håller på (*Experterna i tidningarna förstår ingenting.*)
-och är nästan klar (*Nu faller bitarna på plats.*), med en rad lottad ur varje del (`vantar` i
-[public/rum-hasse-repliker.js](public/rum-hasse-repliker.js)), så att det låter olika varje gång. När den är klar blir han tyst och slår domen i disken
-(se *Slaget*), och domen står i guld. Sedan säger han texten en mening i taget, ord för ord med munnen i takt (och det hörs, se *Ljudet*), med en paus
-mellan meningarna och en längre före en kort mening, och gesterna kommer vid de bestämda orden
-(*Nej nej nej* och *varningens finger* ger fingret, annars handflatan i disken eller en av gesterna i
-*Händerna när han pratar*) eller vid ungefär var tredje lång mening. Ett klick i samtalet
-visar hela repliken och nästa klick går vidare; *Ja, ja* tar resten på en gång, och det svarar han
-på (*Som du vill.*). Efter texten säger han vad matchen slutar (*Det slutar 3–1.*): resultatet han
+resultatet. När du har bett om analysen står hela hans text direkt (`svara` i [public/rum-hasse.js](public/rum-hasse.js)).
+Medan man läser slår han domen i disken (se *Slaget*), och domen står i guld när handen träffar; dess plats är hållen
+från början, så att texten står still, och har han något annat i händerna står domen där ändå efter tre sekunder.
+*Läs upp* under texten låter honom läsa den med sin röst (`lasUpp`, och det hörs, se *Ljudet*): en mening i taget med
+munnen efter ljudet, och meningen han läser står ljus medan resten är dämpad. Det blir en paus mellan meningarna och en
+längre före en kort mening, och gesterna kommer vid de bestämda orden (*Nej nej nej* och *varningens finger* ger
+fingret, annars handflatan i disken eller en av gesterna i *Händerna när han pratar*) eller vid ungefär var tredje lång
+mening, när han sitter så att han kan göra dem. Han läser det som står i rutan: ett stycke som har ljud för sig (en
+färdig replik, som resultatet) i ett svep, annars mening för mening, och det som saknar ljud hoppar han över. Knappen
+syns när minst hälften av det har ljud, och den slår på ljudet om det är av, som *Ljud på*. Medan han läser heter den
+*Ja, ja »* och tystar honom, ett klick i samtalet går till nästa mening, och säger han något annat (om kupongen) slutar
+han läsa. Förut låtsades han läsa på i 15–25 sekunder och sa sedan texten ord för ord, och det orkade ingen lyssna på
+(ändrat 2026-11-07). Efter texten säger han vad matchen slutar (*Det slutar 3–1.*): resultatet han
 valde när texten skrevs (`hasse.resultat`, se *Rösten*). Texter från före 2026-11-07, och analysen
 i skrift när hans text saknas, tar i stället det troligaste resultatet i modellens prognos
 (resultatmatrisen i `data/match/<id>.json`) bland utfallen han har ringat in, och har modellen
@@ -4691,13 +4700,15 @@ bygget fortsätter att ta ljudet ur den. Ta bort grenen på GitHub för att gå 
 Azure.
 
 I sidan spelas ljudet med Web Audio ([public/rum-hasse.js](public/rum-hasse.js), *rösten*). Det
-hämtas medan han gör annat – hans text medan han låtsas läsa på – och orden kommer i takt med
+hämtas medan han gör annat – hans text när den står, om ljudet är på – och orden kommer i takt med
 ljudet, utspridda efter sin längd, medan munnen följer ljudstyrkan. Saknas meningen i registret
-eller är ljudet inte framme inom 2,5 s säger han den tyst, som förut. Ett klick i samtalet visar hela
-repliken och tystar den, liksom *Ja, ja*, och han tystnar när man går därifrån. Ljudet är av tills besökaren trycker på
-*Ljud på* längst ned till vänster, med samma små versaler som *Matchbladet →*; klicket väcker
+eller är ljudet inte framme inom 2,5 s säger han den tyst, som förut, och när han läser upp sin text
+hoppar han över den. Ett klick i samtalet visar hela repliken och tystar den, *Ja, ja* tystar
+uppläsningen, och han tystnar när man går därifrån. Hans text läses bara upp när man trycker på *Läs
+upp* (se *Samtalet*); de korta replikerna runt omkring hörs när ljudet är på. Ljudet är av tills besökaren trycker på
+*Ljud på* längst ned till vänster, med samma små versaler som *Matchbladet →*, eller på *Läs upp*; klicket väcker
 ljudet i webbläsaren, och valet minns enheten. Sedan heter knappen *Ljud av*. Med minskad
-rörelse står allt direkt och inget hörs. *Jag har tappat rösten* sägs tyst.
+rörelse står allt direkt och inget hörs utom det man ber honom läsa upp. *Jag har tappat rösten* sägs tyst.
 
 När ljudet är på hörs också det som händer på disken
 ([public/rum-hasse-ljud.js](public/rum-hasse-ljud.js), hämtas när ljudet slås på): handen i

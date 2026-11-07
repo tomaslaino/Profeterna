@@ -520,13 +520,13 @@ window.RumHasse = (() => {
   // ---------- samtalet ----------
   //
   // Man ber honom bara analysera en match på kupongen, men det är ett samtal: han
-  // frågar, man väljer en match och han frågar tillbaka. Ber man om analysen pratar
-  // han medan den tas fram, slår i pulten med domen och säger texten en mening i taget. Sist säger
-  // han vad han tycker om det du själv har på kupongen, och han minns vad du har
+  // frågar, man väljer en match och han frågar tillbaka. Ber man om analysen står den
+  // direkt, och han slår domen i pulten medan man läser; Läs upp låter honom läsa den. Sist
+  // säger han vad han tycker om det du själv har på kupongen, och han minns vad du har
   // frågat om. Det han säger runt omkring står i rum-hasse-repliker.js.
   //
   // Allt är skrivet i förväg (scripts/analyser/skriv.mjs, data/analyser.json): artikeln,
-  // tipset och hans röst. Han låtsas analysera (svara). Tecknen och resultatet har han
+  // tipset och hans röst (svara). Tecknen och resultatet har han
   // bestämt själv när han skrev (hasse.tecken, hasse.resultat); saknas hans röst står
   // analysen i skrift med tipsets tecken.
   const TECKEN = ['Etta', 'Kryss', 'Tvåa'];
@@ -649,18 +649,6 @@ window.RumHasse = (() => {
     return `på ${new Intl.DateTimeFormat('sv-SE', { timeZone: 'Europe/Stockholm', weekday: 'long' }).format(t)}`;
   }
   const medDag = (rader, dagen) => rader.filter((r) => dagen || !r.includes('{dag}')).map((r) => fyll(r, { dag: dagen }));
-  // Medan han låtsas läsa på: en lottad rad ur var och en av delarna i vantar (först, sedan, sist).
-  function vantan(dagen) {
-    const ur = (lista) => {
-      for (let n = 0; n < lista.length; n++) {
-        const r = lott(lista);
-        if (dagen || !r.includes('{dag}')) return fyll(r, { dag: dagen });
-      }
-      return null;
-    };
-    const v = REP().vantar;
-    return [ur(v.forst), ur(v.sedan), ur(v.sist)].filter(Boolean);
-  }
 
   // Rörelserna: klipp på tidslinjen (KLIPP i rum-hasse-3d.js, hit när figuren hämtas). fran: var det
   // börjar (måste vara där han står, utom fri), till: var det slutar, vila: där han står sedan, grupp:
@@ -737,10 +725,10 @@ window.RumHasse = (() => {
   // Det han säger hörs. Bygget tar fram ljudet till hans text och de färdiga replikerna
   // (src/rost.js) och lägger det i data/rost/ med registret data/rost.json, mening → fil.
   // Ljudet spelas med Web Audio: orden kommer i takt med ljudet och munnen följer
-  // ljudstyrkan. Det hämtas medan han gör annat, analysens medan han låtsas läsa på.
+  // ljudstyrkan. Det hämtas medan han gör annat, analysens när den står (lasKnapp).
   // Saknas meningen i registret, eller är ljudet inte framme i tid (r.vanta), säger han
-  // den tyst i skriftens takt, som förut. Så också när ljudet är avstängt och med
-  // minskad rörelse (då står allt direkt).
+  // den tyst i skriftens takt, som förut, och när han läser upp hoppar han över den. Så
+  // också när ljudet är avstängt och med minskad rörelse (då står allt direkt).
   const TYST = 'profeterna.hasse.tyst';
   const VANTA = 2500;
   // ljudstyrkan i steg om 10 ms, och under vilken styrka (mot den starkaste) det är tyst
@@ -962,21 +950,62 @@ window.RumHasse = (() => {
   // repliker(lista, { i, sen, direkt }): han säger en replik i taget, ord för ord
   // med munnen i takt, och väntar lite innan nästa. Platsen är reserverad från
   // början, så inget flyttar sig. Ett klick (eller mellanslag) visar hela repliken,
-  // nästa klick går vidare, och "Ja, ja" (hoppa) tar resten på en gång. Repliken hörs
+  // nästa klick går vidare, och hoppa tar resten på en gång. Repliken hörs
   // (rösten ovan): ljudet hämtas direkt, om det inte redan är givet (medLjud).
   //   lista: [{ text, gest?: namn i GEST, vid?(i): när repliken börjar,
   //             ny?: false = samma stycke som förra, skrift?: visas utan att sägas }]
   //   i: rutan (.rh-text om inget annat sägs), sen: när allt är sagt,
-  //   direkt: allt på en gång, rad: repliken står direkt i rutan, utan stycke.
+  //   direkt: allt på en gång, rad: repliken står direkt i rutan, utan stycke,
+  //   synlig: allt står redan i rutan och han läser upp det (Läs upp, lasUpp).
   const ORD_MS = 44;
   const ordTid = (w) => ORD_MS * (w.length + 1) + (/[,:;]$/.test(w) ? 170 : 0);
-  function repliker(lista, { i: ruta = $('.rh-text'), sen = null, direkt = calm(), rad: somRad = false } = {}) {
+  function repliker(lista, { i: ruta = $('.rh-text'), sen = null, direkt = calm(), rad: somRad = false, synlig = false } = {}) {
+    avbrytLasning();
     tystna();
-    const x = { lista, ruta, sen, somRad, i: -1, ord: [], n: 0, tid: 0, klar: false, tyst: true, p: null, el: null, ljud: null, vanta: 0 };
+    const x = { lista, ruta, sen, somRad, synlig, i: -1, ord: [], n: 0, tid: 0, klar: false, tyst: true, p: null, el: null, ljud: null, vanta: 0 };
     H.sagt = x;
+    if (synlig) utskrivet(x);
     if (direkt) hoppa();
     else for (const r of lista) if (!('klipp' in r) && !r.skrift) medLjud(r, ljudTill(r.text));
     return x;
+  }
+  // Det han ska läsa upp står redan, som det stod: varje replik i sitt stycke, alla ord synliga. Medan
+  // han läser är det han inte läser dämpat (rh-klar tas bort tills han är klar).
+  function utskrivet(x) {
+    const topp = x.ruta.scrollTop;
+    x.ruta.textContent = '';
+    x.ruta.classList.remove('rh-klar');
+    let p = null;
+    for (const r of x.lista) {
+      if (r.ny !== false || !p) {
+        p = document.createElement('p');
+        x.ruta.append(p);
+      } else p.append(' ');
+      r.el = document.createElement('span');
+      r.el.className = 'rh-rep';
+      p.append(r.el);
+      r.ord = ordI(r.el, r.text);
+      for (const o of r.ord) o.classList.add('s');
+    }
+    x.ruta.scrollTop = topp;
+  }
+  // Börjar han säga något annat mitt i en uppläsning slutar han läsa, och allt står som förut.
+  function avbrytLasning() {
+    const x = H.sagt;
+    if (!x || !x.synlig || x.klar) return;
+    x.klar = true;
+    if (x.el) x.el.classList.remove('nu');
+    x.ruta.classList.add('rh-klar');
+    const f = x.sen;
+    x.sen = null;
+    if (f) f();
+  }
+  // Meningen han läser syns i rutan: rutan rullar bara när den inte gör det.
+  function synas(ruta, el) {
+    const r = el.getBoundingClientRect();
+    const b = ruta.getBoundingClientRect();
+    if (r.bottom > b.bottom) ruta.scrollTop += r.bottom - b.bottom + 8;
+    else if (r.top < b.top) ruta.scrollTop -= b.top - r.top + 8;
   }
   function ordI(el, text) {
     return text.split(/\s+/).filter(Boolean).map((w, i) => {
@@ -1007,6 +1036,18 @@ window.RumHasse = (() => {
       return;
     }
     const r = x.lista[x.i];
+    if (x.synlig) {
+      x.el = r.el;
+      x.el.classList.add('nu');
+      x.ord = r.ord;
+      x.n = 0;
+      x.tyst = false;
+      x.tid = ms;
+      x.vanta = !tyst && !r.skrift && r.klipp ? ms + (r.vanta || VANTA) : 0;
+      synas(x.ruta, x.el);
+      if (!tyst && !r.skrift && r.gest) gest(r.gest);
+      return;
+    }
     const nere = x.ruta.scrollHeight - x.ruta.scrollTop - x.ruta.clientHeight < 40;
     if (x.somRad) x.ruta.textContent = '';
     else if (r.ny !== false || !x.p) {
@@ -1050,6 +1091,12 @@ window.RumHasse = (() => {
       if (r.klippet === false || V.av || ms > x.vanta) x.vanta = 0;
       else return;
     }
+    // (när han läser upp hoppar han över det som inte hörs: orden står ju redan)
+    if (x.synlig && x.n < x.ord.length) {
+      x.n = x.ord.length;
+      x.tyst = true;
+      return;
+    }
     if (x.n < x.ord.length) {
       const o = x.ord[x.n++];
       o.classList.add('s');
@@ -1071,6 +1118,12 @@ window.RumHasse = (() => {
     vakna();
     tystna();
     const nu = performance.now();
+    // (när han läser upp går klicket till nästa mening)
+    if (x.synlig) {
+      H.talMal = 0;
+      nastaReplik(x, nu);
+      return;
+    }
     if (x.n < x.ord.length) {
       while (x.n < x.ord.length) x.ord[x.n++].classList.add('s');
       H.talMal = 0;
@@ -1093,30 +1146,13 @@ window.RumHasse = (() => {
     }
     H.talMal = 0;
   }
-  // En rad överst: frågan, eller det han säger medan han tänker.
+  // En rad överst: det han frågar eller säger mellan analyserna.
   const rad = (text, sen) => repliker([{ text }], { i: $('.rh-sagt'), sen, rad: true, direkt: calm() });
-  // → när han har tystnat
-  const tystnat = () => new Promise((ok) => {
-    const x = H.sagt;
-    if (!x || x.klar) { ok(); return; }
-    const f = x.sen;
-    x.sen = () => { if (f) f(); ok(); };
-  });
-  // Rader som kommer med jämna mellanrum: medan man väntar på honom, eller han på en.
-  // Väntar man på honom tar han en klunk kaffe då och då i stället för att prata, eller cigarren.
+  // Rader som kommer med jämna mellanrum medan han väntar på en.
   function pratSteg(ms) {
     const v = H.prat;
     if (!v || ms < v.nasta || H.klipp || H.ko.length || (H.sagt && !H.sagt.klar)) return;
-    if (v.i >= v.rader.length) {
-      if (!v.runt) { H.prat = null; return; }
-      v.i = 0;
-    }
-    if (v.runt && v.i % 5 === 2 && v.drack !== v.i) {
-      v.drack = v.i;
-      vana();
-      v.nasta = ms + 1200;
-      return;
-    }
+    if (v.i >= v.rader.length) { H.prat = null; return; }
     rad(v.rader[v.i++]);
     v.nasta = ms + v.gang;
   }
@@ -1146,12 +1182,72 @@ window.RumHasse = (() => {
   function somRepliker(stycken) {
     const ut = [];
     stycken.forEach((st) => meningar(st).forEach((text, i) => ut.push({ text, ny: i === 0 })));
+    return medGester(ut);
+  }
+  function medGester(ut) {
     let sedan = 1;
     ut.forEach((r) => {
       sedan++;
       if (BIELSA.test(r.text)) { r.gest = 'slag'; sedan = 0; } else if (sedan >= 2 && BESTAMT.test(r.text)) { r.gest = FINGRET.test(r.text) ? 'armar' : Math.random() < 0.4 ? 'dunka' : talGest(r.text); sedan = 0; } else if (sedan >= 3 && r.text.length > 50) { r.gest = talGest(r.text); sedan = 0; }
     });
     return ut;
+  }
+
+  // ---------- Läs upp ----------
+  //
+  // Hans text står direkt. Läs upp under den låter honom läsa den med sin röst, en mening i taget,
+  // och meningen han läser står ljus medan resten är dämpad. Han läser det som står i rutan: ett
+  // stycke som har ljud för sig (en färdig replik, som resultatet) i ett svep, annars mening för
+  // mening (hans text). Det som saknar ljud hoppar han över. Knappen finns när minst hälften av det
+  // har ljud, och medan han läser heter den Ja, ja och tystar honom. Knappen slår på ljudet, som
+  // Ljud på.
+  function enheter(ruta, filer) {
+    const ut = [];
+    for (const p of ruta.querySelectorAll('p')) {
+      const t = enkel(p.textContent);
+      if (!t) continue;
+      (filer[t] ? [t] : meningar(t)).forEach((text, i) => ut.push({ text, ny: i === 0, skrift: !filer[enkel(text)] }));
+    }
+    return medGester(ut);
+  }
+  const laser = (ruta) => Boolean(H.sagt && H.sagt.synlig && !H.sagt.klar && H.sagt.ruta === ruta);
+  // Knappen i foten (slut), före Matchbladet. Kallas igen när foten har ritats om.
+  function lasKnapp(slut, ruta) {
+    if (!slut || !ruta) return;
+    let b = slut.querySelector('.rh-las');
+    if (!b) {
+      b = document.createElement('button');
+      b.type = 'button';
+      b.className = 'rh-vag rh-las';
+      b.hidden = true;
+      slut.insertBefore(b, slut.querySelector('a.rh-vag'));
+      b.addEventListener('click', () => lasUpp(slut, ruta));
+    }
+    const nu = laser(ruta);
+    b.textContent = nu ? 'Ja, ja' : 'Läs upp';
+    b.classList.toggle('rh-ja', nu);
+    if (nu) return;
+    registret().then((filer) => {
+      if (!ruta.isConnected) return;
+      const e = enheter(ruta, filer);
+      const med = e.filter((r) => !r.skrift);
+      b.hidden = !(med.length && med.length * 2 >= e.length);
+      // (med ljudet på hämtas det redan nu, så att han kan börja direkt)
+      if (!V.av) for (const r of med) ljudTill(r.text);
+    });
+  }
+  function lasUpp(slut, ruta) {
+    if (laser(ruta)) {
+      hoppa();
+      return;
+    }
+    if (V.av) vaxla();
+    else vakna();
+    registret().then((filer) => {
+      if (!ruta.isConnected || laser(ruta)) return;
+      repliker(enheter(ruta, filer), { i: ruta, synlig: true, direkt: false, sen: () => lasKnapp(slut, ruta) });
+      lasKnapp(slut, ruta);
+    });
   }
   // Vad han säger om det du har på kupongen. null om du inte har någon att tala om.
   // tecknen i ord står i rum-hasse-repliker.js, så att rösten säger samma sak (src/rost.js)
@@ -1338,43 +1434,30 @@ window.RumHasse = (() => {
     return ut;
   }
 
-  // Analysen är redan skriven, men han låtsas: han pratar och tar en klunk kaffe en stund innan
-  // han slår till (minst och längst i ms). Också när du har bett honom titta igen (omIgen).
-  const LATSAS = [15000, 25000];
-  async function svara(m, lista, omIgen = false) {
+  // Han svarar direkt: domen, hans text och resultatet står på en gång, och sist vad han tycker om
+  // det du har på kupongen. Medan man läser slår han domen i disken på ett av sina sätt, och domen
+  // står i guld när handen träffar (platsen är hållen från början, så att texten står still). Läs
+  // upp låter honom läsa texten (lasUpp). Också när du har bett honom titta igen.
+  async function svara(m, lista) {
     const s = $('.rh-samtal');
     const vem = {};
     vakna();
+    tystna();
     H.fraga = vem;
-    H.fas = 'tanker';
-    s.innerHTML = `<div class="rh-match">${esc(m.namn)}?</div><h2 class="rh-sagt"></h2><div class="rh-text"></div>${K().kan() ? K().rutor(m.id, true) : ''}<div class="rh-slut"></div>`;
-    rad(lott(omIgen ? REP().tittaIgen : REP().reaktion));
-    const dag = spelstopp(lista);
-    const t0 = Date.now();
+    H.prat = null;
+    H.sagt = null;
+    H.talMal = 0;
     const prog = prognosen(m.id);
     const a = await analysen(m.id);
     if (H.fraga !== vem) return;
+    H.fas = 'klar';
+    const fylla = K().kan() ? K().rutor(m.id) : '';
     if (!a || !a.tip) {
-      await tystnat();
-      if (H.fraga !== vem) return;
+      s.innerHTML = `<div class="rh-match">${esc(m.namn)}?</div><h2 class="rh-sagt"></h2><div class="rh-text"></div>${fylla}<div class="rh-slut"></div>`;
       rad(lott(REP().ejKlar));
       slutet(m, lista);
       return;
     }
-    if (!calm()) {
-      // hans text hämtas medan han låtsas läsa på
-      if (a.hasse && a.hasse.stycken) for (const st of a.hasse.stycken) for (const t of meningar(st)) ljudTill(t);
-      H.prat = { rader: vantan(dag), i: 0, nasta: performance.now() + 6000, gang: 7000, runt: true };
-      await new Promise((ok) => setTimeout(ok, LATSAS[0] + Math.random() * (LATSAS[1] - LATSAS[0])));
-      if (H.fraga !== vem) return;
-    }
-    H.prat = null;
-    await tystnat();
-    if (H.fraga !== vem) return;
-    // han hinner säga sitt innan han slår till
-    const t = Date.now() - t0;
-    if (t < 900) await new Promise((ok) => setTimeout(ok, 900 - t));
-    if (H.fraga !== vem) return;
     const signs = hansTecken(a);
     // sist resultatet, och efter det vad han tycker om din kupong (det sparas inte: kupongen ändras)
     const res = resultatet(await prog, signs, a);
@@ -1382,10 +1465,24 @@ window.RumHasse = (() => {
     const texten = hansText(a, res);
     const sagt = { at: skriven(a), st: stycken(texten) };
     if (!(a.hasse && a.hasse.stycken)) texten.unshift({ text: REP().utanRost });
-    // (har du inget på raden föreslår han efter det här att fylla i den, i slutet)
+    // (har du inget på raden föreslår han efter det här att fylla i den, under texten)
     const om = omKupongen(m, signs);
     if (om) texten.push({ text: om });
-    tala(m, lista, signs, res, texten, sagt);
+    minnas(lista, m.id, signs, res, sagt);
+    const d = domen(signs);
+    s.innerHTML = `<div class="rh-match">${esc(m.namn)}?</div><div class="rh-dom vantar${d.length > 7 ? ' lang' : ''}">${esc(d)}</div>` +
+      `<div class="rh-text"></div><p class="rh-fragan"></p>${fylla}<div class="rh-slut"></div>`;
+    repliker(texten, { i: s.querySelector('.rh-text'), direkt: true }).ruta.scrollTop = 0;
+    const dom = s.querySelector('.rh-dom');
+    const visa = () => dom.classList.remove('vantar');
+    const slag = ettAv('dom', 'slag');
+    // (har han något annat i händerna står domen där ändå efter en stund)
+    const slaget = new Promise((ok) => {
+      spela(slag, { vid: [(GEST[slag] ? GEST[slag].dom : 5) - 0.02, visa], sen: ok });
+      setTimeout(visa, 3000);
+      setTimeout(ok, 4500);
+    });
+    slutet(m, lista, signs, slaget);
   }
 
   // En match du redan har frågat om: det han sa står direkt, under domen, som han sa det (också
@@ -1426,9 +1523,11 @@ window.RumHasse = (() => {
       `<div class="rh-text"></div>${nu ? `<p class="rh-fragan"><span class="rh-o">${esc(erbjud)}</span></p>` : ''}${fylla ? K().rutor(m.id) : ''}` +
       `<div class="rh-slut">${knappar(!!nu)}<a class="rh-vag" href="#match/${esc(m.id)}">Matchbladet</a></div>`;
     // (texten läses från början, också när den inte får plats: i telefonen)
-    repliker([...st, om].filter(Boolean).map((text) => ({ text })), { i: s.querySelector('.rh-text'), direkt: true }).ruta.scrollTop = 0;
+    const ruta = repliker([...st, om].filter(Boolean).map((text) => ({ text })), { i: s.querySelector('.rh-text'), direkt: true }).ruta;
+    ruta.scrollTop = 0;
     const slut = s.querySelector('.rh-slut');
     kopplaKnappar(slut, m, lista);
+    lasKnapp(slut, ruta);
     if (fylla) {
       const t = s.querySelector('.rh-tecken');
       // (det han säger om kupongen står där erbjudandet stod, sag)
@@ -1439,52 +1538,26 @@ window.RumHasse = (() => {
     repliker([{ text: erbjud }], { i: s.querySelector('.rh-fragan'), rad: true }).tid = performance.now() + 700;
   }
 
-  // Slaget i pulten med domen, och sedan texten medan han pratar.
-  function tala(m, lista, signs, res, texten, sagt) {
-    const s = $('.rh-samtal');
-    H.fas = 'dom';
-    minnas(lista, m.id, signs, res, sagt);
-    const nu = () => s.querySelector('.rh-text');
-    // tyst när armarna går upp: sedan slaget och domen
-    tystna();
-    H.sagt = null;
-    H.talMal = 0;
-    s.querySelector('.rh-sagt').textContent = '';
-    // han slår domen i disken, på ett av sina sätt
-    const slag = ettAv('dom', 'slag');
-    spela(slag, {
-      vid: [(GEST[slag] ? GEST[slag].dom : 5) - 0.02, () => {
-        const d = domen(signs);
-        s.querySelector('.rh-sagt').outerHTML = `<div class="rh-dom${d.length > 7 ? ' lang' : ''}">${esc(d)}</div>`;
-      }],
-      sen: () => {
-        H.fas = 'tal';
-        s.querySelector('.rh-slut').innerHTML = '<button type="button" class="rh-vag rh-ja" title="Hoppa till slutet">Ja, ja</button>';
-        let x = null;
-        s.querySelector('.rh-ja').addEventListener('click', () => {
-          x.sen = null;
-          hoppa();
-          repliker([{ text: lott(REP().avbruten) }], { i: nu(), sen: () => slutet(m, lista, signs) });
-        });
-        x = repliker(texten, { i: nu(), sen: () => slutet(m, lista, signs), direkt: calm() });
-      },
-    });
-  }
   // Han har sagt sitt. Har du inget på raden föreslår han att fylla i det han har sagt, med hans tecken
   // i guld i rutorna, och du väljer: Fyll i den, ett eget tecken eller Alla matcher. Han tar aldrig
   // kupongen själv. Är förslaget besvarat står Titta igen och Alla matcher som efter en analys.
-  function slutet(m, lista, signs = null) {
+  // Knapparna står direkt; förslaget säger han när slaget är över (efter).
+  function slutet(m, lista, signs = null, efter = null) {
     const s = $('.rh-samtal');
     const vem = H.fraga;
     H.fas = 'klar';
-    if (Math.abs(H.T - GEST.hem.vila) > 0.01 || H.klipp) spela('hem');
+    // tillbaka till vilan efter det han håller på med, om det inte slutar där
+    const sist = H.ko.length ? H.ko[H.ko.length - 1] : H.klipp;
+    if (Math.abs((sist ? sist.vila : H.T) - GEST.hem.vila) > 0.01) spela('hem');
     const slut = s.querySelector('.rh-slut');
+    const ruta = s.querySelector('.rh-text');
     const t = s.querySelector('.rh-tecken');
     const han = (signs || []).map((n) => KORT[n]);
     const blad = `<a class="rh-vag" href="#match/${esc(m.id)}">Matchbladet</a>`;
     const svaren = (fokus = false) => {
       slut.innerHTML = `${knappar(han.length > 0)}${blad}`;
       kopplaKnappar(slut, m, lista);
+      if (han.length) lasKnapp(slut, ruta);
       if (fokus) slut.querySelector('.huvud').focus({ preventScroll: true });
     };
     // (en äldre rum-hasse-kupong.js i cachen har inget förslag)
@@ -1506,7 +1579,21 @@ window.RumHasse = (() => {
           }
         });
       });
-      sag(lott(REP().fyller.foreslar));
+      lasKnapp(slut, ruta);
+      // (texten ska läsas från början: förslaget rullar den inte till slutet, i telefonen; och läser han
+      // upp den säger han förslaget när han har läst klart)
+      const foresla = () => {
+        if (!forslag || H.fraga !== vem) return;
+        if (laser(ruta)) {
+          const x = H.sagt;
+          const f = x.sen;
+          x.sen = () => { if (f) f(); foresla(); };
+          return;
+        }
+        sag(lott(REP().fyller.foreslar), null, false);
+      };
+      if (efter) efter.then(foresla);
+      else foresla();
     } else svaren();
     if (!t) return;
     K().kopplaRutor(t, m, (sign) => {
@@ -1531,19 +1618,20 @@ window.RumHasse = (() => {
     `<button type="button" class="rh-knapp${igen ? '' : ' huvud'} rh-alla">Alla matcher</button>`;
   function kopplaKnappar(slut, m, lista) {
     const igen = slut.querySelector('.rh-igen');
-    if (igen) igen.addEventListener('click', () => svara(m, lista, true));
+    if (igen) igen.addEventListener('click', () => svara(m, lista));
     slut.querySelector('.rh-alla').addEventListener('click', fraga);
   }
   // Det han säger om kupongen: överst, på raden direkt ovanför svaren när den syns (en match du
-  // redan har frågat om: där han erbjöd sig att titta igen), eller sist i texten.
-  function sag(text, sen = null) {
+  // redan har frågat om: där han erbjöd sig att titta igen; efter en analys: under texten), eller
+  // sist i texten (i telefonen), som rullas fram dit om inte rulla är false.
+  function sag(text, sen = null, rulla = true) {
     const r = $('.rh-sagt');
     const f = $('.rh-samtal .rh-fragan');
     const tx = $('.rh-text');
     if (r) rad(text, sen);
     else if (f && f.offsetParent) repliker([{ text }], { i: f, sen, rad: true });
     else if (tx) {
-      tx.scrollTop = tx.scrollHeight;
+      if (rulla) tx.scrollTop = tx.scrollHeight;
       repliker([{ text }], { i: tx, sen, direkt: calm() });
     }
   }
