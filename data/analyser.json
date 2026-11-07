@@ -1,5 +1,5 @@
 {
- "uppdaterad": "2026-11-07T10:50:11.877Z",
+ "uppdaterad": "2026-11-07T10:50:39.034Z",
  "omgang": {
   "id": "2026-11-07-st4978",
   "matcher": [
@@ -77,23 +77,26 @@
    },
    "hasse": {
     "stycken": [
-     "Arsenal har vunnit åtta av nio ligamatcher, och ett sånt lag faller inte ihop för att motståndaren har tittat på mycket video. Saka saknas, men Konsa ser ut att kunna spela, och efter matchen väntar ett uppehåll, så Arteta behöver inte spara på någon.",
-     "Hull har inte vunnit på sex matcher, och de oavgjorda matcherna har kommit mot lag på deras egen nivå och inte mot serieledaren på bortaplan. Jakirović har övat in tre olika matchplaner, men han saknar flera spelare på mittfältet och längre bak. Då spelar det ingen jävla roll hur många upplägg man har i pärmen.",
-     "Hörnorna blir viktiga, och där höjer jag ett varningens finger. Men jag tar ett tecken och sover gott. Etta."
+     "Hull kommer till Emirates med tre färdiga matchplaner, och det är fint, men det hjälper inte särskilt mycket när flera spelare saknas på mittfältet och längre bak. Det här pratade vi om redan i Manchester City, Svennis och jag. En plan blir aldrig bättre än spelarna som ska genomföra den.",
+     "Arsenal har hållit nollan i sex av nio ligamatcher, och Konsa ser ut att kunna spela. Hull har gått sex matcher utan seger, och sina oavgjorda matcher har de tagit hemma mot lag som Everton och Ipswich. Saka saknas, men Arsenal har ändå total kontroll på den här matchen. Jag ringar in en etta och ingenting annat."
     ],
+    "tecken": [
+     0
+    ],
+    "resultat": "2–0",
     "tips": "2026-11-07T10:02:30.055Z",
     "uppdrag": {
      "fraser": [
-      "Här höjer jag ett varningens finger",
-      "Äsch"
+      "Total kontroll",
+      "Det köper jag aldrig"
      ],
-     "krydda": null,
+     "krydda": "Det här pratade vi om redan i Manchester City, Svennis och jag.",
      "bielsa": []
     },
     "model": "claude-opus-5-5",
-    "version": "2026-11-05.1",
-    "writtenAt": "2026-11-07T10:02:57.907Z",
-    "attempts": 2
+    "version": "2026-11-07.1",
+    "writtenAt": "2026-11-07T10:50:24.798Z",
+    "attempts": 1
    },
    "model": "claude-opus-5-5",
    "version": "2026-11-04.1",
