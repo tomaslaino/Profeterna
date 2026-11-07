@@ -573,6 +573,149 @@
   const group = (r) => (r.kind === 2 && r.proposal && !r.ute ? 3 : r.kind <= 2 ? r.kind : r.kind + 1);
   const groupName = (k, s) => GROUPS[k][0] || (s.gang.length === 3 ? 'Två mot en' : 'Delade meningar');
 
+  // ---------- dagordningen ----------
+
+  // Uppgörelsen sker i telefon, så papperet säger det som ska sägas: överst
+  // dagordningen – vem som förklarar vilka matcher, vilka som avgörs i luren,
+  // vilka vi är eniga om mot modellen och vilka vi är överens om – och i
+  // varje omtvistad match en rad i blyerts om vad som ska förklaras (punkt).
+  // Allt utgår från allas tips och förslaget, inte från gängets kryss, så att
+  // inget skrivs om medan pennan rör sig; det som klubbas stryks med pennan.
+  const ORD = { 1: 'ettan', X: 'krysset', 2: 'tvåan' };
+  const TAL = ['noll', 'en', 'två', 'tre', 'fyra', 'fem', 'sex', 'sju', 'åtta', 'nio', 'tio', 'elva', 'tolv', 'tretton'];
+  const tal = (n) => TAL[n] || String(n);
+  // a, b och c – eller a, b eller c
+  const lista = (xs, bind = 'och') => (xs.length > 1 ? `${xs.slice(0, -1).join(', ')} ${bind} ${xs[xs.length - 1]}` : xs[0] || '');
+  // Tecknen som man säger dem i telefon: ettan, krysset och tvåan.
+  const ord = (t, bind = 'och') => lista([...t].map((sg) => ORD[sg]), bind);
+  // Du först, sedan i gängets ordning – som på stämpeln.
+  const duForst = (ids) => [...ids].sort((a, b) => (b === me()) - (a === me()) || pnum(a) - pnum(b));
+  // Namnen i sitt bläck: du, annars efternamnet. stor: först i meningen.
+  const namnen = (ids, stor = false) => lista(duForst(ids).map((k, i) =>
+    `<b class="sm-k${pnum(k)}">${esc(k === me() ? (stor && !i ? 'Du' : 'du') : surname(person(k)))}</b>`));
+
+  // Punkten på dagordningen för en match (r ur analyse) → {typ, vem, html},
+  // eller null när vi är överens eller matchen inte går att fylla i.
+  //   forklara – förslaget lämnar någons tecken utanför, eller (när det får
+  //              med allt) någon är ensam om ett tecken: de förklarar det
+  //   luren    – ingen särskild att fråga: alla olika, två tecken står lika,
+  //              eller ingen ger sig och förslaget garderar
+  //   modellen – eniga, men inte om modellens troligaste
+  function punkt(r) {
+    if (!r.open || r.n < 2) return null;
+    if (r.kind === 3) {
+      return { typ: 'modellen', vem: [], html: `Alla har ${ord(Object.values(r.t)[0])} – modellen tror på ${ORD[SIGNS[r.fav]]}.` };
+    }
+    if (!r.strid) return null;
+    const luren = (text) => ({ typ: 'luren', vem: [], html: `${esc(text)}.` });
+    if (!r.proposal) {
+      if (r.kind === 0) return luren('Alla olika – avgörs i luren');
+      // förslaget lämnade matchen tom: två tecken står lika
+      const sup = SIGNS.map((sg) => Object.values(r.t).reduce((a, t) => a + (t.includes(sg) ? 4 - t.length : 0), 0));
+      const lika = SIGNS.filter((sg, i) => sup[i] > 0 && sup.filter((v) => v === sup[i]).length > 1).join('');
+      return luren(lika.length > 1 ? `${cap(ord(lika, 'eller'))} – avgörs i luren` : 'Avgörs i luren');
+    }
+    const ut = (f) => duForst(Object.keys(r.t)).map((k) => [k, [...r.t[k]].filter(f).join('')]).filter(([, t]) => t);
+    let vem = ut((sg) => !r.proposal.includes(sg));
+    if (!vem.length) vem = ut((sg) => r.cov[SIGNS.indexOf(sg)].length === 1);
+    if (!vem.length) return luren(`Ingen ger sig – förslaget ${r.proposal.length === 3 ? 'helgarderar' : 'halvgarderar'}`);
+    // samma tecken, samma mening: Du och Tejder förklarar ettan.
+    const by = new Map();
+    for (const [k, t] of vem) by.set(t, [...(by.get(t) || []), k]);
+    const parts = [...by].map(([t, ks], i) => `${namnen(ks, !i)} ${i ? '' : 'förklarar '}${ord(t)}`);
+    return {
+      typ: 'forklara',
+      vem: vem.map(([k]) => k),
+      html: `${parts.some((p) => p.includes(' och ')) ? parts.join(', ') : lista(parts)}.`,
+    };
+  }
+
+  // Hur många omtvistade matcher som återstår, överst på dagordningen.
+  function kvarText(rows, done) {
+    const strid = rows.filter((r) => r.strid);
+    const kvar = strid.filter((r) => !done.has(r.x.id)).length;
+    if (!strid.length) return 'Inget att prata om.';
+    if (!kvar) return 'Allt är klubbat.';
+    return kvar === strid.length ? `${cap(tal(kvar))} ${kvar === 1 ? 'match' : 'matcher'} att prata om.` : `${cap(tal(kvar))} kvar att prata om.`;
+  }
+
+  // Dagordningen överst på papperet: en rad per person – vilka matcher hen
+  // förklarar – och sedan det som avgörs i luren, det vi är eniga om mot
+  // modellen och det vi är överens om. Matcherna står i kupongens ordning
+  // med de korta namnen; ett tryck visar matchen på papperet. done: det
+  // klubbade (klar).
+  function dagordning(s, rows, done) {
+    const open = rows.filter((r) => r.open && r.n >= 2);
+    if (!open.length) return '';
+    const per = new Map(s.gang.map((g) => [g.id, []]));
+    const luren = [];
+    const modellen = [];
+    const overens = [];
+    for (const r of open) {
+      const p = punkt(r);
+      if (!p) overens.push(r);
+      else if (p.typ === 'modellen') modellen.push(r);
+      else if (p.typ === 'luren') luren.push(r);
+      else for (const k of p.vem) per.get(k).push(r);
+    }
+    // en länk i texten, så att kommat och punkten följer med matchen
+    const item = (r) => `<a class="sm-dag-m${r.strid && done.has(r.x.id) ? ' klubbad' : ''}" href="#kupong/samtal" data-till="${esc(r.x.id)}">` +
+      `${r.m ? `${esc(Papper.kort(r.m.home))}–${esc(Papper.kort(r.m.away))}` : esc(r.x.match)}</a>`;
+    // en mening per rad, med porträttet i spalten till vänster
+    const line = (text, id = null) => `<p class="sm-dag-p${id ? '' : ' sm-dag-vi'}">${id ? face(id) : '<span></span>'}<span class="sm-dag-t">${text}</span></p>`;
+    let html = '';
+    for (const g of s.gang) {
+      const list = per.get(g.id);
+      const vem = namnen([g.id], true);
+      html += line(!(s.tips && s.tips[g.id]) ? `${vem} ${s.visas ? 'lämnade inte in' : 'har inte lämnat in än'}.`
+        : list.length ? `${vem} förklarar ${lista(list.map(item))}.` : `${vem} har inget att förklara.`, g.id);
+    }
+    if (luren.length) html += line(`${lista(luren.map(item))} avgörs i luren.`);
+    if (modellen.length) html += line(`Alla går emot modellen i ${lista(modellen.map(item))}.`);
+    if (overens.length) html += line(`Vi är överens om ${lista(overens.map(item))}.`);
+    return `<div class="sm-dag"><p class="pp-day sm-grp">Dagordning<span id="sm-dag-kvar">${esc(kvarText(open, done))}</span></p>` +
+      `<div class="sm-dag-g">${html}</div></div>`;
+  }
+
+  // En match är klubbad utan att papperet ritas om (ett klick på raden): den
+  // stryks på dagordningen, och raden överst säger hur många som är kvar.
+  function strykPunkt(s, id) {
+    for (const b of document.querySelectorAll(`#sm-sheet [data-till="${CSS.escape(id)}"]`)) b.classList.add('klubbad');
+    const k = $('#sm-dag-kvar');
+    if (!k) return;
+    const rows = analyse(s).filter((r) => r.open && r.n >= 2);
+    k.textContent = kvarText(rows, klar(s, rows));
+  }
+
+  // Ett tryck på en match på dagordningen: papperet bläddrar dit och raden
+  // lyser upp en stund, som med en överstrykningspenna.
+  function visaRad(id) {
+    const row = document.querySelector(`#sm-sheet .sm-r[data-id="${CSS.escape(id)}"]`);
+    if (!row) return;
+    const lugn = window.matchMedia && matchMedia('(prefers-reduced-motion: reduce)').matches;
+    row.scrollIntoView({ behavior: lugn ? 'auto' : 'smooth', block: 'center' });
+    row.classList.remove('sm-hit');
+    void row.offsetWidth; // så att den lyser upp igen vid ett tryck till
+    row.classList.add('sm-hit');
+    row.addEventListener('animationend', () => row.classList.remove('sm-hit'), { once: true });
+  }
+
+  // Det som inte går ihop med regeln, kort, i raden längst ner medan pennan
+  // rör sig: En halvgardering för mycket. När alla matcher har tecken också
+  // det som fattas: En spik för lite och en halvgardering för mycket.
+  function regelKort(s, val) {
+    const r = regel(s);
+    if (!r) return '';
+    const n = slag(s, val);
+    const full = s.matcher.every((x) => val[x.id]);
+    const parts = SLAG.map(([k, , one, many]) => {
+      const d = n[k] - r[k];
+      if (!d || (d < 0 && !full)) return '';
+      return `${tal(Math.abs(d))} ${Math.abs(d) === 1 ? one : many} för ${d > 0 ? 'mycket' : 'lite'}`;
+    }).filter(Boolean);
+    return parts.length ? `${cap(lista(parts))}.` : '';
+  }
+
   // Gängets tecken under uppgörelsen, på enheten. Tills man själv har tryckt på
   // rutorna (own) följer de gängets kupong, om den redan är sparad (t.ex. på
   // en annan enhet), annars förslaget – som följer med när någon lämnar in
@@ -604,11 +747,11 @@
       html += `<p class="legend"><span class="note">${esc(missing.map((g) => g.id).join(' och '))} hann inte lämna in` +
         `${s.orsak === 'avspark' ? ' innan första matchen startade' : ''}.</span></p>`;
     }
-    html += paperTop(stopBox(s), ' sm-up', stamp(s)) +
-      upHead(s, ids, rows.filter((r) => r.g.res != null).map((r) => [r.x.id, r.g.res]));
-    const w = writer(s);
     // de omtvistade matcherna och vilka av dem som är klubbade, som i rummet
     const done = klar(s, rows);
+    html += paperTop(stopBox(s), ' sm-up', stamp(s)) + dagordning(s, rows, done) +
+      upHead(s, ids, rows.filter((r) => r.g.res != null).map((r) => [r.x.id, r.g.res]));
+    const w = writer(s);
     for (let k = 0; k < GROUPS.length; k++) {
       const list = rows.filter((r) => group(r) === k);
       if (!list.length) continue;
@@ -617,7 +760,7 @@
         html += upRow({
           id: r.x.id, m: r.m, label: r.m ? `${r.m.home} – ${r.m.away}` : r.x.match, g: r.g, nr: nr.get(r.x.id),
           who: r.cov, sign: val[r.x.id] || '', notes: r.notes, after: afterOf(s, r.x.id, w), pen: penOf(s, r.x.id, w),
-          ids, pick: true, open: r.open, strid: r.strid, klubbad: r.strid && done.has(r.x.id),
+          ids, pick: true, open: r.open, strid: r.strid, klubbad: r.strid && done.has(r.x.id), punkt: (punkt(r) || {}).html || '',
         });
       }
     }
@@ -648,8 +791,12 @@
     const label = direct ? (same ? `${CHECK}Sparad` : made ? 'Spara ändringen' : 'Spara gängets kupong')
       : made ? 'Ändra gängets kupong' : 'Gör gängets kupong';
     const go = open ? `<button type="button" class="kp-btn primary${same && direct ? ' kept' : ''}" id="sm-make"${same && direct ? ' disabled' : ''}>${label}</button>` : '';
+    // Går gängets tecken inte ihop med regeln står det ovanför knappen, med
+    // rättarens röda – så syns det medan pennan rör sig, var man än är.
+    const fel = open ? regelKort(s, val) : '';
     return (more.length ? `<button type="button" class="sm-act-more" aria-expanded="${actMore}" aria-controls="sm-act-ls" aria-label="Fler val">${DOTS3}</button>` +
-      `<span class="sm-act-ls" id="sm-act-ls">${more.join('')}</span>` : '') + (go ? `<span class="sm-act-go">${go}</span>` : '');
+      `<span class="sm-act-ls" id="sm-act-ls">${more.join('')}</span>` : '') +
+      (fel ? `<span class="sm-act-fel" role="status">${esc(fel)}</span>` : '') + (go ? `<span class="sm-act-go">${go}</span>` : '');
   }
 
   // Gängets kupong har redan tecknen som är valda här, i varje match som
@@ -737,7 +884,8 @@
   // efterhand (afterOf, penOf).
   // strid: en omtvistad match i uppgörelsen – numret inringat med pennan och
   // gängets kryss blekt som ett förslag tills den är klubbad (bocken vid ringen).
-  function upRow({ id, m, label, g, nr, who, sign, notes = [], note = '', after = [], pen = null, ids, pick = false, open = false, day = false, out = false, strid = false, klubbad = false }) {
+  // punkt: vad som ska förklaras i uppgörelsen (punkt), i blyerts under lagen.
+  function upRow({ id, m, label, g, nr, who, sign, notes = [], note = '', after = [], pen = null, ids, pick = false, open = false, day = false, out = false, strid = false, klubbad = false, punkt = '' }) {
     const hit = g.res != null && sign ? sign.includes(SIGNS[g.res]) : null;
     const cls = rowClass({ ...g, hit });
     const comp = m ? compOf(m.comp) : null;
@@ -759,6 +907,7 @@
           `<input type="text" class="sm-note-in" data-efter="${esc(id)}" maxlength="${NOTE_MAX}" autocomplete="off" enterkeyhint="done" placeholder=" "` +
           ` aria-label="Kommentar till ${esc(label)}"${pen.fel ? ' aria-invalid="true"' : ''} value="${esc(pen.text)}"></label>` : '') + '</span>' : '') +
       (note ? `<span class="pp-note">${esc(note)}</span>` : '') +
+      (punkt ? `<span class="sm-punkt">${punkt}</span>` : '') +
       [...notes, ...after].map((o) => `<span class="sm-said sm-k${pnum(o.k)}">${face(o.k)}<span>${esc(o.text)}</span></span>`).join('') +
       `<span class="pp-sr">${esc(sr)}</span></span>${res}</span>` +
       SIGNS.map((sg, i) => {
@@ -970,6 +1119,13 @@
         makeCoupon(s);
         return;
       }
+      // en match på dagordningen: papperet bläddrar dit
+      const till = e.target.closest('[data-till]');
+      if (till) {
+        e.preventDefault();
+        visaRad(till.dataset.till);
+        return;
+      }
       // Börja om: tecknen som fler än hälften har med.
       if (e.target.closest('#sm-reset')) {
         kpStore(DECIDE, { id: s.id, val: proposal(analyse(s)), own: true });
@@ -993,6 +1149,7 @@
         klubba(s, row.dataset.id);
         row.classList.add('klubbad');
         row.querySelector('.pp-nr').insertAdjacentHTML('beforeend', bock(row.dataset.id, true));
+        strykPunkt(s, row.dataset.id);
         return;
       }
       if (!b || b.disabled) return;

@@ -464,6 +464,87 @@ button.sm-who:focus-visible { outline: 2px solid var(--ink); outline-offset: 1px
   color: var(--pp-pencil);
 }
 
+/* Dagordningen överst (samtal.js, dagordning): en mening per person, för
+   hand med namnet i sitt bläck och porträttet i spalten till vänster – vilka
+   matcher hen förklarar – och sedan det som avgörs i luren, det som går emot
+   modellen och det vi är överens om. Det klubbade stryks med samma penna som
+   bocken vid ringen. */
+.sm-dag { margin: 0 0 18px; }
+.sm-dag > .sm-grp { margin-top: 0; }
+.sm-dag-g { display: grid; gap: 8px; padding: 14px 8px 2px; }
+.sm-dag-p { display: grid; grid-template-columns: 24px minmax(0, 1fr); align-items: start; column-gap: 12px; margin: 0; }
+/* luft mellan personerna och resten */
+.sm-dag-p:not(.sm-dag-vi) + .sm-dag-vi { margin-top: 6px; }
+.sm-dag-p > .sm-fc { --fc: 24px; margin-top: 1px; box-shadow: 0 0 0 1.5px var(--ink), 0 0 0 3px var(--pp-paper); }
+.sm-dag-t {
+  font-family: var(--pp-hand);
+  font-size: 20px;
+  font-weight: 600;
+  line-height: 1.2;
+  color: var(--pp-pencil);
+}
+.sm-dag-t b { font-weight: 700; color: var(--ink); }
+/* en match: ett tryck visar den på papperet */
+.sm-dag-m {
+  color: var(--pp-ink);
+  white-space: nowrap;
+  text-decoration: underline dotted 1.5px color-mix(in srgb, var(--pp-ink) 35%, transparent);
+  text-underline-offset: 4px;
+  cursor: pointer;
+}
+.sm-dag-m:hover { text-decoration: underline solid 1.5px var(--pp-ink); }
+.sm-dag-m:focus-visible { outline: 2px solid var(--pp-pen); outline-offset: 2px; border-radius: 2px; }
+.sm-dag-m.klubbad, .sm-dag-m.klubbad:hover {
+  color: var(--pp-ink-soft);
+  text-decoration: line-through 2px var(--pp-pen);
+}
+@media (max-width: 720px) {
+  .sm-dag-g { padding: 12px 2px 0; }
+  .sm-dag-p { column-gap: 10px; }
+  .sm-dag-t { font-size: 19px; }
+}
+
+/* vad som ska förklaras, i blyerts under lagen; namnen i sitt bläck */
+.sm-punkt {
+  display: block;
+  margin-top: 3px;
+  font-family: var(--pp-hand);
+  font-size: 18px;
+  font-weight: 600;
+  line-height: 1.08;
+  color: var(--pp-pencil);
+}
+.sm-punkt b { font-weight: 700; color: var(--ink); }
+.sm-r.klubbad .sm-punkt { text-decoration: line-through 1.5px var(--pp-pen); }
+
+/* matchen man tryckte på i dagordningen lyser upp en stund */
+.sm-r.sm-hit::after {
+  content: "";
+  position: absolute;
+  inset: 3px -4px;
+  z-index: 0;
+  border-radius: 3px;
+  background: var(--pp-marker);
+  mix-blend-mode: multiply;
+  pointer-events: none;
+  animation: sm-hit 1.8s ease-out forwards;
+}
+@keyframes sm-hit { 0% { opacity: 0; } 12% { opacity: 0.7; } 100% { opacity: 0; } }
+@media (prefers-reduced-motion: reduce) { .sm-r.sm-hit::after { animation-duration: 1.2s; } }
+
+/* regeln går inte ihop: ovanför knappen, med rättarens röda */
+.sm-act-fel {
+  flex-basis: 100%;
+  order: -1;
+  font-family: var(--pp-hand);
+  font-size: 19px;
+  font-weight: 600;
+  line-height: 1;
+  text-align: right;
+  color: var(--pp-no);
+}
+@media (max-width: 640px) { .sm-act-fel { text-align: center; } }
+
 /* gängets kryss över tecknet */
 .sm-bx i { position: relative; }
 .sm-bx i .pp-x { inset: auto; top: 50%; left: 50%; width: 30px; height: 30px; margin: -15px 0 0 -15px; }

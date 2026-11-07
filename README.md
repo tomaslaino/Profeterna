@@ -1744,6 +1744,25 @@ under omgången.
    rutorna, lagen och pennan klubbar matchen, liksom en ändring av gängets tecken i den: bocken
    dras vid ringen och kryssen fylls i. Det klubbade delas med rummet på enheten
    (`profeterna.rum.klubbat`), och *Börja om* tar bort det.
+
+   **Dagordningen** (2026-11-07): uppgörelsen sker i telefon, så papperet säger det som ska
+   sägas. Överst, under stämpeln, står *Dagordning* med hur många omtvistade matcher som är
+   kvar (*Sex matcher att prata om*, *Fyra kvar att prata om*, *Allt är klubbat*) och under
+   den en mening per person för hand, med porträttet och namnet i sitt bläck: *Johansson
+   förklarar Bournemouth–Nott'm Forest och Norwich–Cardiff*, *Du har inget att förklara* (eller
+   *har inte lämnat in än*). Sedan det som avgörs i luren, det som alla tippar emot modellen
+   och *Vi är överens om …*. Matcherna står i kupongens ordning med de korta namnen; ett tryck
+   bläddrar till matchen, som lyser upp en stund som med en överstrykningspenna. I varje
+   omtvistad match står samma sak i blyerts under lagen, med tecknet: *Du och Laino förklarar
+   ettan och krysset*, *Tejder förklarar krysset och Johansson tvåan*, *Alla olika – avgörs i
+   luren*, *Ingen ger sig – förslaget helgarderar*, och i matcher där alla går emot modellen
+   *Alla har krysset – modellen tror på ettan*. Den som förklarar är den vars tecken förslaget
+   lämnar utanför – eller, när förslaget får med allt, den som är ensam om ett tecken. Allt
+   utgår från allas tips och förslaget, inte från gängets kryss, så att inget skrivs om medan
+   pennan rör sig; det som klubbas stryks med pennan, på dagordningen och i matchen
+   (`dagordning` och `punkt` i samtal.js). Följer gängets tecken inte regeln står det med
+   rött ovanför knappen i raden längst ner – *En spik för lite och en halvgardering för
+   mycket* – så att det syns var man än är på papperet.
 5. **Gängets kupong** (så fort man ser de andras tips, också om någon inte har lämnat in):
    man trycker på rutorna (två rutor =
    gardering). Den börjar som förslaget – med regeln ett som följer den (se *Regeln*), annars
