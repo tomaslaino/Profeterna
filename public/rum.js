@@ -2380,7 +2380,7 @@ ${window.RumRegister ? RumRegister.nara() : ''}
         if (R.lage) R.fig.lage(R.lage, now());
         if (R.spel) R.fig.spel(R.spel, now());
         // de andra i gänget, natten och dagen efter (rum-folk.js)
-        if (window.RumFolk) RumFolk.mount(R.el, { fig: () => R.fig, inr: () => R.inr, now, nara, fokus, teckna, visa });
+        if (window.RumFolk) RumFolk.mount(R.el, { fig: () => R.fig, inr: () => R.inr, now, nara, fokus, teckna, visa, ta: taKupong });
         provMal();
         provAkt();
         provGa();
@@ -3422,14 +3422,15 @@ ${window.RumRegister ? RumRegister.nara() : ''}
   }
 
   // Någon i gänget klickades fram (rum-folk.js): kupongen på pulten ritas om och
-  // namnet skrivs på den, och pennan lägger sig där den låg.
+  // namnet skrivs på den, och pennan lägger sig där den låg. → hur länge
+  // namnet skrivs i millisekunder (0 när det inte syns skrivas)
   function skrivPult() {
-    if (!R.on) return;
+    if (!R.on) return 0;
     fill();
     const desk = document.getElementById('rum-kupong');
     const el = desk && desk.querySelector('.sm-namn.du');
     const pen = desk && desk.querySelector('.pencil');
-    if (!el || !pen || calm() || !pult() || !pult().fyll) return;
+    if (!el || !pen || calm() || !pult() || !pult().fyll) return 0;
     const k = { pen, el: desk, at: PEN_PULT };
     const t = skrivNamn(el, k);
     clearTimeout(R.pultPen);
@@ -3440,6 +3441,16 @@ ${window.RumRegister ? RumRegister.nara() : ''}
         a.cancel();
       }, () => {});
     }, t + 260);
+    return t;
+  }
+
+  // Ett klick på dig själv i gänget (rum-folk.js): kupongen tas i handen att
+  // fylla i eller ändra – om rummet står som när du klickade (inget nära,
+  // inte hos Hasse). → om den togs.
+  function taKupong() {
+    const p = pult();
+    if (!R.on || nara() || R.vilar || !p || !p.hand) return false;
+    return openCoupon();
   }
 
   // Ett kryss eller en ring som tas bort suddas ut.

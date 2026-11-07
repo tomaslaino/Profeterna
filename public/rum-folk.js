@@ -21,7 +21,10 @@
 // fylla i och hen inte har lämnat in blir man också hen (valj, samma val som
 // namnen på kupongen, Samtal.pult.vem): namnet skrivs för hand på kupongen på
 // pulten (Rum.skriv), utkastet följer med, och figuren skriver på sin kupong
-// (vald i rum-3d.js).
+// (vald i rum-3d.js). Det går också när enheten står på någon som har lämnat
+// in någon annanstans (Samtal.pult.state().byt). Är det du – nu eller sedan
+// förut – tas kupongen sedan i handen att fylla i eller ändra (ta i rum.js),
+// när namnet är skrivet eller tecknet syns.
 //
 // Natten: mellan midnatt och sex (Stockholms tid, Vader.nu()) är lysröret
 // släckt – rummet mörkt utom gatan, neonen och tv:n (.natt, rum-folk.css),
@@ -32,7 +35,7 @@
 // färdigt syns det hur det gick, efter betyget i historiken (4–5 bra, 1–2
 // illa; rum-3d.js efter) – utom med dolda resultat.
 //
-//   RumFolk.mount(el, { fig, inr, now, nara, fokus, teckna, visa })  när gänget har laddats
+//   RumFolk.mount(el, { fig, inr, now, nara, fokus, teckna, visa, ta })  när gänget har laddats
 //   RumFolk.on(true | false)                           rummet visas eller inte
 //   RumFolk.ute(v)                                     klockan (Vader.nu())
 //   RumFolk.fyll(old, seen)                            de färdiga kupongerna och omgångarna
@@ -228,22 +231,28 @@ window.RumFolk = (() => {
     return f.under(((x - r.left) / r.width) * 2 - 1, -(((y - r.top) / r.height) * 2 - 1));
   }
   // Ett klick på någon i gänget (k: dl, dt, dj): du är den som fyller i
-  // kupongen. Går medan du kan fylla i den och hen inte har lämnat in.
-  // → true om du blev någon annan.
+  // kupongen. Går medan omgången är öppen och hen inte har lämnat in – och
+  // du inte heller, utom från en annan enhet (byt i Samtal.pult.state()).
+  // → hur länge namnet skrivs på kupongen (ms) om du blev någon annan, annars null.
   function valj(k) {
     const s = samtal();
     const g = s && (s.gang || []).find((x) => String(x.id).toLowerCase() === k);
     const v = jag();
-    if (!g || v === g.id || !window.Samtal || !Samtal.pult) return false;
+    if (!g || v === g.id || !window.Samtal || !Samtal.pult) return null;
     const p = Samtal.pult.state();
-    if (!p || !p.fyll || !p.val.includes(g.id) || !Samtal.pult.vem(g.id)) return false;
+    if (!p || !(p.byt || []).includes(g.id) || !Samtal.pult.vem(g.id)) return null;
     const f = fig();
     if (f && f.vald) f.vald(k, F.o.now());
     // kupongen på pulten, namnet, stämpeln och guldordet efter vem du är
-    if (window.Rum && Rum.skriv) Rum.skriv();
+    const ms = window.Rum && Rum.skriv ? Rum.skriv() : 0;
     vemKoll();
     egen();
-    return true;
+    return ms || 0;
+  }
+  // Du klickade på dig själv: kupongen i handen om en stund (ms).
+  function taSen(ms) {
+    clearTimeout(F.taT);
+    if (F.o.ta) F.taT = setTimeout(() => F.o.ta(), ms);
   }
   function pa(k) {
     if (k === F.pa) return;
@@ -299,11 +308,17 @@ window.RumFolk = (() => {
       // Hasses vy, som står framför gänget)
       if (e.defaultPrevented || e.target.closest('.rum-hasse-vy')) return;
       const k = vemUnder(e.clientX, e.clientY);
+      // (ett klick på något annat: kupongen tas inte i handen)
+      clearTimeout(F.taT);
       if (!k) return;
       e.preventDefault();
       e.stopPropagation();
       F.o.teckna(k);
-      valj(k);
+      // du, nu eller sedan förut: kupongen i handen när namnet är skrivet,
+      // annars när tecknet syns
+      const blev = valj(k);
+      if (blev != null) taSen(blev + 300);
+      else if ((jag() || '').toLowerCase() === k) taSen(900);
       if (F.typ !== 'mouse') {
         const f = fig();
         const t = F.o.now();

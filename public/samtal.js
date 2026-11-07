@@ -1711,7 +1711,7 @@
   // de andras tips och kommentarerna i efterhand (tips, efter), gängets
   // kupong i uppgörelsen (gang, besluta, sparaGang) och Ta bort (bort).
   // state() → null utan omgång, annars {s, vem, tecken, kommentarer, inne,
-  // open, fyll, andra, hand, val, sparad, tom, se, skriv, gang, efter,
+  // open, fyll, andra, hand, val, byt, sparad, tom, se, skriv, gang, efter,
   // bort, matcher, go}: tecken, kommentarer = dina tecken och motiveringar
   // (utkastet eller de inlämnade), inne = du har lämnat in, open = allas
   // tips visas inte än och första matchen har inte startat, fyll = du kan
@@ -1719,7 +1719,9 @@
   // har lämnat in och kan ändra: tills matcherna startar, också när du ser
   // de andras tips (startade matcher står kvar), hand = kupongen kan tas i
   // handen att fylla i eller ändra, val = vilka du kan kryssa för att du är
-  // – de som inte har lämnat in –, sparad = utkastet är sparat som det står
+  // – de som inte har lämnat in –, byt = vilka du kan bli med ett klick på
+  // figuren i tobaksaffären (som val, och också när enheten står på någon
+  // som har lämnat in någon annanstans), sparad = utkastet är sparat som det står
   // (Sparad), tom = utkastet har inget att spara, se = vilkas tips du ser,
   // skriv = du (om du kan skriva kommentarer i efterhand), gang = du ser
   // de andras tips och kan göra gängets kupong, som uppgörelsen här (board),
@@ -1751,6 +1753,7 @@
         s, vem: v, inne, open, fyll: open && !inne, andra, hand,
         tecken: { ...((mine && mine.tecken) || {}) }, kommentarer: { ...((mine && mine.kommentarer) || {}) },
         val: inne ? [] : s.gang.filter((g) => !g.inne).map((g) => g.id),
+        byt: open && !(inne && mine) ? s.gang.filter((g) => !g.inne).map((g) => g.id) : [],
         sparad: Boolean(d && mine.sparad && mine.sparad === sig(s, d)),
         tom: !d || (!mine.sparad && !sig(s, d).replace(/[:|]/g, '')),
         se, skriv: writer(s), gang,
@@ -1762,9 +1765,11 @@
       };
     },
     // Du kryssar för vem du är; kryssen och motiveringarna på kupongen följer med.
+    // Går också när enheten står på någon som har lämnat in någon annanstans
+    // (inget av hens tips finns här): man hade klickat på hen i tobaksaffären.
     vem(id) {
       const s = SM.data;
-      if (!s || submitted(s, me()) || !s.gang.some((g) => g.id === id && !g.inne)) return false;
+      if (!s || (submitted(s, me()) && mineIn(s, me())) || !s.gang.some((g) => g.id === id && !g.inne)) return false;
       const d = draftOf(s, me());
       kpStore(VEM, id);
       if (d) kpStore(TIPS, { id: s.id, vem: id, tecken: d.tecken, kommentarer: d.kommentarer || {} });
