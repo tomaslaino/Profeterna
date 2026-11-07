@@ -1,5 +1,5 @@
 {
- "uppdaterad": "2026-11-07T10:51:29.463Z",
+ "uppdaterad": "2026-11-07T10:52:13.490Z",
  "omgang": {
   "id": "2026-11-07-st4978",
   "matcher": [
@@ -162,22 +162,26 @@
    },
    "hasse": {
     "stycken": [
-     "Hemma har Birmingham haft total kontroll. Tre raka matcher utan insläppt mål, och det beror på att laget står organiserat bakåt. Men nu saknas förstemålvakten Beadle, och Priske, som är lagets skarpaste avslutare, är tveksam till spel. En ny målvakt bakom backlinjen ändrar mer än folk tror.",
-     "Med Swansea vet man aldrig vad man får. Ena veckan förlorar de med fem mål och nästa vinner de med fyra, och tre av de fyra senaste matcherna har de förlorat. Ett lag som svänger så har ingen ordning på sig. Ikke noget at tale om, som man säger i Aalborg.",
-     "Birmingham har inte förlorat hemma i år, men utan förstemålvakten och kanske utan sin bäste avslutare kan det lika gärna sluta lika. Etta och kryss."
+     "Birmingham har vunnit sina tre senaste hemmamatcher utan att släppa in ett enda mål, och de har inte förlorat hemma i ligan i år. Ett sådant lag vet var alla ska stå. Dessutom kan Dael Fry komma tillbaka i backlinjen, och det gör inte saken sämre.",
+     "Här höjer jag ett varningens finger för målvakten, för förstemålvakten Beadle väntas missa matchen och Priske är osäker efter en smäll. Men Swansea har förlorat tre av sina fyra senaste matcher, och mot Portsmouth släppte de in två mål på slutet. Ett lag som tappar så sent ska inte åka till ett tätt hemmalag och tro att det håller i nittio minuter.",
+     "Jag tar etta rakt av, och jag sover gott på det."
     ],
+    "tecken": [
+     0
+    ],
+    "resultat": "2–0",
     "tips": "2026-11-07T10:07:16.024Z",
     "uppdrag": {
      "fraser": [
-      "Total kontroll",
-      "Äsch"
+      "Glöm det",
+      "Här höjer jag ett varningens finger"
      ],
-     "krydda": "Ikke noget at tale om, som man säger i Aalborg.",
+     "krydda": null,
      "bielsa": []
     },
     "model": "claude-opus-5-5",
-    "version": "2026-11-05.1",
-    "writtenAt": "2026-11-07T10:07:46.024Z",
+    "version": "2026-11-07.1",
+    "writtenAt": "2026-11-07T10:52:01.452Z",
     "attempts": 2
    },
    "model": "claude-opus-5-5",
