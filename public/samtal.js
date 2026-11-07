@@ -63,6 +63,7 @@
     failed: {}, // matchens id → varför kommentaren inte gick att spara
     sending: new Set(), // matcher vars kommentar sparas just nu
     lyft: null, // vems tips som lyfts fram på papperet (ett tryck på porträttet överst)
+    nyBock: null, // den omtvistade match som just klubbades: bocken dras när papperet ritas om
   };
   const VEM = 'profeterna.samtal.vem';
   const TIPS = 'profeterna.samtal.tips';
@@ -473,7 +474,41 @@
     });
     const r = regel(s);
     if (r) fit(rows, r);
+    // ute: förslaget lämnar ett tecken som någon av oss har med utanför.
+    // strid: matchen är omtvistad och går att fylla i – vi har inget tecken
+    // gemensamt, förslaget lämnar den tom eller lämnar någons tecken utanför
+    // (till exempel en spik där två har helgarderat). Samma på papperet och i
+    // rummet (Samtal.pult.gang).
+    for (const row of rows) {
+      row.ute = Object.values(row.t).some((t) => [...t].some((sg) => !row.proposal.includes(sg)));
+      row.strid = row.open && row.n >= 2 && (row.kind <= 1 || !row.proposal || (row.kind === 2 && row.ute));
+    }
     return rows;
+  }
+
+  // Klubbat i uppgörelsen: de omtvistade matcher som är avgjorda, på enheten
+  // för omgången – samma på papperet och i rummet (rum.js). Finns inget
+  // sparat för omgången är det annars (alla, när gängets kupong redan är
+  // sparad). Nyckeln heter som när bara rummet hade den.
+  const KLUBBAT = 'profeterna.rum.klubbat';
+  function klubbat(id, annars = null) {
+    try {
+      const j = JSON.parse(localStorage.getItem(KLUBBAT));
+      if (j && j.id === id) return new Set(j.rows || []);
+    } catch (e) { /* som när inget är sparat */ }
+    return new Set(annars || []);
+  }
+  function sparaKlubbat(id, rows) {
+    try { localStorage.setItem(KLUBBAT, JSON.stringify({ id, rows: [...rows] })); } catch (e) { /* då är bara ringen kvar nästa gång */ }
+  }
+  // Det som är klubbat i omgången just nu (board, rummet).
+  const klar = (s, rows) => klubbat(s.id, existing(s) ? rows.filter((r) => r.strid).map((r) => r.x.id) : null);
+  // En match klubbas – eller alla omtvistade (id = null), när gängets kupong sparas.
+  function klubba(s, id, rows = null) {
+    const k = klar(s, rows || analyse(s));
+    if (id) k.add(id);
+    else for (const r of rows || analyse(s)) if (r.strid) k.add(r.x.id);
+    sparaKlubbat(s.id, k);
   }
 
   // Förslaget efter regeln, ur allas tips: varje tecken får det gänget har
@@ -519,14 +554,19 @@
     });
   }
 
+  // Grupperna på papperet, i den ordning de står. Samma grund, olika säkerhet
+  // delas: där förslaget lämnar någons tecken utanför (omtvistad) och där
+  // förslaget får med allt vi har tippat (Alla får med sitt).
   const GROUPS = [
     ['Alla olika', 'Kanske en gardering?'],
     [null, 'Den som avviker förklarar.'],
     ['Samma grund, olika säkerhet', 'Räcker det, eller ska vi gardera?'],
+    ['Alla får med sitt', 'Ingen behöver backa.'],
     ['Eniga mot modellen', 'Stämmer det verkligen?'],
     ['Eniga', 'Klubbas utan snack.'],
     ['Saknar tips', ''],
   ];
+  const group = (r) => (r.kind === 2 && r.proposal && !r.ute ? 3 : r.kind <= 2 ? r.kind : r.kind + 1);
   const groupName = (k, s) => GROUPS[k][0] || (s.gang.length === 3 ? 'Två mot en' : 'Delade meningar');
 
   // Gängets tecken under uppgörelsen, på enheten. Tills man själv har tryckt på
@@ -563,18 +603,21 @@
     html += paperTop(stopBox(s), ' sm-up', stamp(s)) +
       upHead(s, ids, rows.filter((r) => r.g.res != null).map((r) => [r.x.id, r.g.res]));
     const w = writer(s);
-    for (let k = 0; k <= 5; k++) {
-      const list = rows.filter((r) => r.kind === k);
+    // de omtvistade matcherna och vilka av dem som är klubbade, som i rummet
+    const done = klar(s, rows);
+    for (let k = 0; k < GROUPS.length; k++) {
+      const list = rows.filter((r) => group(r) === k);
       if (!list.length) continue;
       html += `<p class="pp-day sm-grp">${esc(groupName(k, s))}${GROUPS[k][1] ? `<span>${esc(GROUPS[k][1])}</span>` : ''}</p>`;
       for (const r of list) {
         html += upRow({
           id: r.x.id, m: r.m, label: r.m ? `${r.m.home} – ${r.m.away}` : r.x.match, g: r.g, nr: nr.get(r.x.id),
           who: r.cov, sign: val[r.x.id] || '', notes: r.notes, after: afterOf(s, r.x.id, w), pen: penOf(s, r.x.id, w),
-          ids, pick: true, open: r.open,
+          ids, pick: true, open: r.open, strid: r.strid, klubbad: r.strid && done.has(r.x.id),
         });
       }
     }
+    SM.nyBock = null;
     html += '<div class="pb-foot sm-foot">' + fieldList(footFields(s, val, s.gang.length)) + '</div>';
     const act = boardActions(s, rows, val);
     return html + `<div class="sm-act${actMore ? ' more' : ''}" id="sm-act"${act ? '' : ' hidden'}><div class="sm-act-in" id="sm-act-in">${act}</div>` +
@@ -688,7 +731,9 @@
   // (fillable). day: matcherna står under sin dag, så klockslaget räcker. out:
   // matchen kom inte med på gängets kupong. after, pen: kommentarerna i
   // efterhand (afterOf, penOf).
-  function upRow({ id, m, label, g, nr, who, sign, notes = [], note = '', after = [], pen = null, ids, pick = false, open = false, day = false, out = false }) {
+  // strid: en omtvistad match i uppgörelsen – numret inringat med pennan och
+  // gängets kryss blekt som ett förslag tills den är klubbad (bocken vid ringen).
+  function upRow({ id, m, label, g, nr, who, sign, notes = [], note = '', after = [], pen = null, ids, pick = false, open = false, day = false, out = false, strid = false, klubbad = false }) {
     const hit = g.res != null && sign ? sign.includes(SIGNS[g.res]) : null;
     const cls = rowClass({ ...g, hit });
     const comp = m ? compOf(m.comp) : null;
@@ -699,8 +744,8 @@
       : `<span class="sm-res"><span class="sm-res-s">${Papper.result(g)}</span>${tick}</span>`;
     const sr = `${sign ? `Gängets tecken ${sign}${hit === true ? ', rätt' : hit === false ? ', fel' : ''}` : 'Inget tecken'}. ` +
       ids.map((k) => `${k}: ${SIGNS.filter((sg, i) => who[i].includes(k)).join('') || 'inget'}`).join(', ');
-    return `<div class="sm-r s-${cls.replace(' ', ' s-')}${pick && open && !sign ? ' unsigned' : ''}${out ? ' sm-out' : ''}" data-id="${esc(id)}">` +
-      `<span class="pp-nr">${nr}</span>` +
+    return `<div class="sm-r s-${cls.replace(' ', ' s-')}${pick && open && !sign ? ' unsigned' : ''}${out ? ' sm-out' : ''}${strid ? ' strid' : ''}${klubbad ? ' klubbad' : ''}" data-id="${esc(id)}">` +
+      `<span class="pp-nr">${nr}${strid ? Papper.ring(`s${id}`, 'sm-strid', 25) + (klubbad ? bock(id, SM.nyBock === id) : '') : ''}</span>` +
       '<span class="sm-m"><span class="sm-mt">' +
       `<span class="pp-tm">${m ? `<a class="pp-t" href="#match/${esc(id)}">${teams}</a>` : `<span class="pp-t">${teams}</span>`}</span>` +
       (when || pen ? `<span class="sm-meta">${when ? `<span class="pp-small">${when}</span>` : ''}` +
@@ -723,6 +768,9 @@
           ` aria-label="${esc(`${label}, ${sg}: ${who[i].length ? who[i].join(', ') : 'ingen'}`)}">${b}${odds}</button>`;
       }).join('') + '</div>';
   }
+
+  // Bocken vid ringen när en omtvistad match är klubbad (ny: den dras nu).
+  const bock = (id, ny = false) => Papper.tick(`k${id}`, true).replace('class="pp-tick"', `class="sm-bock${ny ? ' ny' : ''}"`).replace('<path ', '<path pathLength="1" ');
 
   // Gängets kupong ur omgången (steg 4, kupong.js): samma papper med allas
   // porträtt i rutorna, gängets kryss, utfallet inringat och betyget i
@@ -873,6 +921,7 @@
     if (!here('')) return;
     btn.disabled = false;
     if (r.ok) {
+      klubba(s, null); // kupongen är sparad: det som inte hann klubbas är klubbat
       toCoupon();
       return;
     }
@@ -920,6 +969,7 @@
       // Börja om: tecknen som fler än hälften har med.
       if (e.target.closest('#sm-reset')) {
         kpStore(DECIDE, { id: s.id, val: proposal(analyse(s)), own: true });
+        sparaKlubbat(s.id, []); // förslaget igen: inget är klubbat
         SM.again = false;
         renderRound();
         return;
@@ -932,8 +982,22 @@
         return;
       }
       const b = e.target.closest('button[data-s]');
+      // en omtvistad match som inte är klubbad: ett klick på raden utanför
+      // rutorna, lagen och pennan klubbar den – bocken dras vid ringen
+      const row = !b && !e.target.closest('a, button, input, label') && e.target.closest('.sm-r.strid:not(.klubbad)');
+      if (row) {
+        klubba(s, row.dataset.id);
+        row.classList.add('klubbad');
+        row.querySelector('.pp-nr').insertAdjacentHTML('beforeend', bock(row.dataset.id, true));
+        return;
+      }
       if (!b || b.disabled) return;
       const id = b.closest('[data-id]').dataset.id;
+      // en omtvistad match är klubbad när gängets tecken i den ändras
+      if (b.closest('.sm-r.strid:not(.klubbad)')) {
+        klubba(s, id);
+        SM.nyBock = id;
+      }
       const saved = { id: s.id, val: { ...decisions(s, analyse(s)) }, own: true };
       const cur = saved.val[id] || '';
       const next = SIGNS.filter((x) => (x === b.dataset.s ? !cur.includes(x) : cur.includes(x))).join('');
@@ -1895,9 +1959,9 @@
     // förslaget lämnar matchen tom eller förslaget lämnar ett tecken som någon
     // av oss har med utanför (Samma grund, olika säkerhet – till exempel en
     // spik där två har helgarderat), i kupongens ordning, avvik: {matchens id:
-    // de som avviker} i dem (tom när ingen ensam avviker), gjord: gängets
-    // kupong finns, spela: länken till Svenska Spel när gängets kupong är
-    // sparad som den står (spela.js)}.
+    // de som avviker} i dem (tom när ingen ensam avviker), klar: de av dem
+    // som är klubbade (klubbat), spela: länken till Svenska Spel när gängets
+    // kupong är sparad som den står (spela.js)}.
     gang() {
       const s = SM.data;
       if (!s || !(s.tips && Object.keys(s.tips).length >= (s.visas ? 1 : 2))) return null;
@@ -1908,9 +1972,7 @@
       const direct = Boolean(KP.data && KP.data.save);
       const same = Boolean(made && savedAsIs(made, rows, val));
       const open = rows.some((r) => r.open);
-      // förslaget lämnar något som någon av oss har med utanför
-      const ute = (r) => Object.values(r.t).some((t) => [...t].some((sg) => !r.proposal.includes(sg)));
-      const strid = rows.filter((r) => r.open && r.n >= 2 && (r.kind <= 1 || !r.proposal || (r.kind === 2 && ute(r))));
+      const strid = rows.filter((r) => r.strid);
       // den som avviker: inte med i något av de tecken som flest har med
       const avvik = (r) => {
         const most = Math.max(...r.cov.map((c) => c.length));
@@ -1920,7 +1982,7 @@
       return {
         strid: strid.map((r) => r.x.id),
         avvik: Object.fromEntries(strid.map((r) => [r.x.id, avvik(r)])),
-        gjord: Boolean(made),
+        klar: [...klar(s, rows)],
         spela: same && direct && window.Spela ? Spela.href(made) : null,
         val: { ...val },
         who: Object.fromEntries(rows.map((r) => [r.x.id, r.cov])),
@@ -1933,18 +1995,23 @@
       };
     },
     // Gängets tecken i en match ('' = inget) – eller förslaget igen, Börja om
-    // (id = null).
+    // (id = null), och då är inget klubbat.
     besluta(id, tecken = '') {
       const s = SM.data;
       if (!s) return;
       if (id == null) {
         kpStore(DECIDE, { id: s.id, val: proposal(analyse(s)), own: true });
+        sparaKlubbat(s.id, []);
         return;
       }
       const saved = { id: s.id, val: { ...decisions(s, analyse(s)) }, own: true };
       if (tecken) saved.val[id] = tecken;
       else delete saved.val[id];
       kpStore(DECIDE, saved);
+    },
+    // En omtvistad match är klubbad, som ett klick på raden här (klubba).
+    klubba(id) {
+      if (SM.data) klubba(SM.data, id);
     },
     // Spara gängets kupong, som guldordet i uppgörelsen här (makeCoupon).
     // again: spara trots matcher utan tecken (eller över den som någon annan
@@ -1970,7 +2037,10 @@
         return { ok: false, via: c ? `kupong/andra/${c.id}` : 'kupong/ny' };
       }
       const r = await postCoupon(anyway ? { ...ctx, anyway: true } : ctx);
-      if (r.ok) return { ok: true };
+      if (r.ok) {
+        klubba(s, null); // kupongen är sparad: det som inte hann klubbas är klubbat
+        return { ok: true };
+      }
       if (r.changed || r.taken) {
         const ours = covers(r.other);
         return { ok: false, error: ours ? 'Någon annan har just sparat gängets kupong.' : r.error, over: ours, igen: !ours };

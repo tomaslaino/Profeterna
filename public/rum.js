@@ -1249,10 +1249,10 @@ ${window.RumRegister ? RumRegister.nara() : ''}
     const ink = v && v.vem ? Math.max(0, gang.findIndex((g) => g.id === v.vem)) : 0;
     const now = Date.now();
     const hans = v && (slag === 'fyll' || slag === 'din') && rd && rd.id ? hassesKryss(rd.id) : {};
-    // uppgörelsen: de omtvistade matcherna, och vilka av dem som är klubbade –
-    // alla, när gängets kupong redan är sparad och inget är klubbat på enheten
+    // uppgörelsen: de omtvistade matcherna, och vilka av dem som är klubbade
+    // (samma som på papperet under Kupong)
     const strid = new Set(slag === 'gang' && v.g ? v.g.strid : []);
-    const klar = strid.size && rd && rd.id ? klubbat(rd.id, v.g.gjord ? strid : null) : new Set();
+    const klar = new Set(slag === 'gang' && v.g ? v.g.klar : []);
     const list = order.map((x, i) => {
       const sign = signs[x.id];
       const comp = compOf(x.m.comp);
@@ -1378,20 +1378,9 @@ ${window.RumRegister ? RumRegister.nara() : ''}
 
   // Uppgörelsen: numren på de omtvistade matcherna (v.g.strid) är inringade
   // med kulspetspennan, och en match som har klubbats – gängets tecken
-  // ändrat, eller ett klick på matchen – har en bock vid ringen. Klubbat
-  // sparas på enheten, för omgången; finns inget sparat för omgången är det
-  // annars (alla, när gängets kupong redan är sparad).
-  const KLUBBAT = 'profeterna.rum.klubbat';
-  function klubbat(id, annars = null) {
-    try {
-      const j = JSON.parse(localStorage.getItem(KLUBBAT));
-      if (j && j.id === id) return new Set(j.rows || []);
-    } catch (e) { /* som när inget är sparat */ }
-    return new Set(annars || []);
-  }
-  function sparaKlubbat(id, rows) {
-    try { localStorage.setItem(KLUBBAT, JSON.stringify({ id, rows: [...rows] })); } catch (e) { /* då är bara ringen kvar nästa gång */ }
-  }
+  // ändrat, eller ett klick på matchen – har en bock vid ringen (v.g.klar).
+  // Klubbat sparas på enheten för omgången, samma som på papperet
+  // (Samtal.pult.klubba).
   function bockSvg(key) {
     const R0 = rng(seed(`bock${key}`));
     const j = (n) => r1((R0() - 0.5) * 2 * n);
@@ -3655,16 +3644,13 @@ ${window.RumRegister ? RumRegister.nara() : ''}
     penGo([{ ...to, l: 0.45, t: 460, e: 'cubic-bezier(0.4, 0, 0.3, 1)' }, { ...to, l: row ? 0.18 : 0, t: 160, e: 'ease-in' }]);
   }
 
-  // En omtvistad match klubbas: bocken vid ringen, sparad på enheten. pen:
-  // pennan drar bocken (ett klick på matchen) och går sedan vidare.
+  // En omtvistad match klubbas: bocken vid ringen, sparad på enheten som på
+  // papperet (Samtal.pult.klubba). pen: pennan drar bocken (ett klick på
+  // matchen) och går sedan vidare.
   function klubba(row, pen = false) {
     const k = R.kup;
     if (!k || row.classList.contains('klubbad')) return;
-    const id = Samtal.pult.state() && Samtal.pult.state().s.id;
-    if (!id) return;
-    const rows = klubbat(id);
-    rows.add(row.dataset.id);
-    sparaKlubbat(id, rows);
+    Samtal.pult.klubba(row.dataset.id);
     row.classList.add('klubbad');
     const nr = row.querySelector('.pp-nr');
     nr.insertAdjacentHTML('beforeend', bockSvg(row.dataset.id));
@@ -3765,9 +3751,8 @@ ${window.RumRegister ? RumRegister.nara() : ''}
     if (g) setSigns(g.val, true);
     k.next = null;
     gangState();
-    // förslaget igen: inget är klubbat, och pennan väntar vid den första
-    const id = Samtal.pult.state() && Samtal.pult.state().s.id;
-    if (id) sparaKlubbat(id, []);
+    // förslaget igen: inget är klubbat (Samtal.pult.besluta), och pennan
+    // väntar vid den första
     for (const row of k.el.querySelectorAll('.row.klubbad')) {
       row.classList.remove('klubbad');
       const b = row.querySelector('.rum-bock');

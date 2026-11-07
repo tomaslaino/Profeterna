@@ -630,10 +630,11 @@ canvas.rum-neonhalo { opacity: 0.28; }
    blekt, så att var och ens kryss syns; när den klubbas fylls de i */
 .rum-kup .row.strid .kryss.kula { transition: opacity 0.5s ease; }
 .rum-kup .row.strid:not(.klubbad) .kryss.kula { opacity: 0.32; }
-/* i handen träder resten av kupongen tillbaka så länge någon omtvistad match
-   återstår – det mörka är det vi har kvar att prata om */
+/* i handen träder de matcher som inte är omtvistade tillbaka så länge någon
+   omtvistad match återstår – det mörka är det vi ska prata om; en klubbad
+   match står kvar mörk med sin bock, så att den går att kryssa färdigt */
 .rum-handen .row > * { transition: opacity 0.5s ease; }
-.rum-handen:has(.row.strid:not(.klubbad)) .row:is(:not(.strid), .klubbad) > * { opacity: 0.4; }
+.rum-handen:has(.row.strid:not(.klubbad)) .row:not(.strid) > * { opacity: 0.4; }
 /* utfallet: en ring runt rutan – grön när kupongen hade det, annars röd,
    streckad i blyerts medan matchen pågår */
 .rum-kup .rum-ring { position: absolute; left: -7px; top: -5px; width: calc(100% + 14px); height: calc(100% + 10px); overflow: visible; fill: none; stroke: var(--pp-no); stroke-width: 2; stroke-linecap: round; pointer-events: none; }
