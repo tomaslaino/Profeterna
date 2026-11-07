@@ -3484,8 +3484,8 @@ Lapparna har det på sajten som rummet annars inte visar, om lagen i omgången (
 som kupongen och fällbladstavlan):
 
 - **Formen** – ett registerkort, maskinskrivet: de fem senaste matcherna för båda lagen före
-  avspark (alla tävlingar, den senaste först), V, O eller F. När tavlan har tagits fram
-  kommer de ur matchens fil, med Europacuperna, och annars ur `data/matches.json`.
+  avspark (alla tävlingar, den senaste först), V, O eller F. De kommer ur matchens fil, med
+  Europacuperna, och ur `data/matches.json` tills filen har hämtats.
 - **Skadelistan** – ett genomslag: de skadade, avstängda och osäkra (?) per lag ur matchens
   fil (Fantasy Premier League) – de tre som har spelat mest, och resten som +n.
 - **Starkast** – en polaroid med skölden för divisionens starkaste lag i omgången; på
@@ -3496,7 +3496,8 @@ som kupongen och fällbladstavlan):
   blyerts.
 - **Slår oddsen** – ett tidningsurklipp: poäng mot vad oddsen väntade sig, och *Sviker*.
 - **Vilan** – ett almanacksblad med omgångens första dag: dagar sedan förra matchen för båda
-  lagen; skiljer det två dagar eller mer ringas det tröttare lagets siffra in.
+  lagen i alla tävlingar; skiljer det två dagar eller mer ringas det tröttare lagets siffra in.
+  Som formen kommer de ur matchens fil, med Europacuperna.
 - **Motståndet** – ett anteckningsblock: *Tufft hittills* och *Lätt hittills*, de lag i
   omgången som har mött svårast och lättast motstånd jämfört med ett normalt spelschema i
   divisionen (mål per match enligt modellen, som Motstånd på Statistik).
@@ -3577,7 +3578,8 @@ förklarade han på ett kort som gled in från baren; användaren ville hellre a
 Dolda resultat: formen får ? för de dolda matcherna, och lapparna som räknar med
 resultaten (styrkan, krysset, turen, oddsen och motståndet) visar bara rubriken och ett
 frågetecken när en match i lagens divisioner är dold – den lyfta lappen har då *Visa ändå*.
-Lagfilerna hämtas med rummet (om igen efter en kvart), matchernas filer när tavlan tas fram.
+Lagfilerna hämtas med rummet (om igen efter en kvart), och matchernas filer också, så att
+formen och vilan på väggen räknar med Europacuperna redan innan tavlan tas fram.
 Slitaget skiftar med dagen: lapparnas och bladens vinklar, nålhålen och hörnen av rivna
 lappar.
 `?rum-anslag` visar tavlan framme i en fast bild, och `?rum-anslag=<lapp>` (form, skador,
