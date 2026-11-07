@@ -4,7 +4,7 @@
    stilmallar före kupong.css/historik.css och skriver över färger och
    komponenter i style.css och divisioner.css, så att de filerna kan ändras för
    sig utan att utseendet går förlorat. */
-@import url("https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,400..900;1,9..144,400..700&display=swap");
+/* Fraunces ligger i typsnitt.css */
 
 /* Medvetet bara mörkt läge. Tokens skrivs utan media-fråga så de vinner över
    båda lägena i style.css. */

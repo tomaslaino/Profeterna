@@ -222,6 +222,15 @@ ingen falsk precision · sidan kraschar aldrig av en död källa · endast fria 
   först när lagen i divisionen brukar rotera där. De som saknas enligt 365Scores eller FPL
   stryks och ersätts. Stämde på 8,8 av 11 i säsongens ligamatcher och 7,0 i cupmatcherna (se
   [Den beräknade startelvan](#den-beräknade-startelvan))
+- [x] **Snabbare laddning (2026-11-07, användarens önskemål):** "laddas fortare (grafiken o allt)
+  utan att grafiken blir sämre eller att det blir mer ansträngt för datorer o mobiler". Samma bild
+  och samma arbete i webbläsaren, färre och mindre filer: bygget på GitHub Actions gör JavaScript
+  och CSS mindre ([src/minify.js](src/minify.js)), typsnitten ligger på sajten i stället för hos
+  Google Fonts ([public/typsnitt.css](public/typsnitt.css)), rummets 3D-filer börjar hämtas redan i
+  `<head>`, Hasse Backes handmodell skickas packad och figur- och sköldbilderna är packade om utan
+  förlust. Rummet klart i Chrome som telefon på långsamt nät efter 17,0 → 14,3 sekunder, på 4G
+  8,5 → 8,1 (11,4 → 10,8 med en långsammare processor), i datorn oförändrat ungefär 2 sekunder; bilden jämförd bildpunkt för bildpunkt (se
+  [Mindre filer](#mindre-filer))
 
 ## Publicering
 
@@ -273,6 +282,9 @@ GitHub Actions (var 30:e min)  →  källorna  →  src/build.js  →  _site/ (H
   Allt laddas upp med sajten (`data/rost/`, `data/rost.json`). Inget av det hamnar på main,
   och en push till `rost` startar inget bygge: nästa schemalagda körning tar med det nya. Se
   [Ljudet](#hasse-backe).
+- **Mindre filer** (se [Mindre filer](#mindre-filer)): bygget körs med `--minify`, som gör
+  JavaScript och CSS i `_site/` mindre. Lokala byggen gör det inte, så att koden går att läsa i
+  webbläsaren; `npm run build -- --minify` bygger som på GitHub Actions.
 - **Läge 2026-10-19:** sidan ligger på <https://matchfixarna.se/> (custom domain i
   *Settings → Pages*, HTTPS påtvingat). Gamla <https://tomaslaino.github.io/Profeterna/>
   skickas vidare dit, så även `site` i [config/kupong.js](config/kupong.js) fungerar via
@@ -284,6 +296,66 @@ GitHub Actions (var 30:e min)  →  källorna  →  src/build.js  →  _site/ (H
   annars visar GitHub "There isn't a GitHub Pages site here" och ett certifikat för
   *.github.io (webbläsaren säger "inte säker").
 
+### Mindre filer
+
+Sajten hämtar samma saker och ritar samma bild som förut, men med färre byte och färre
+uppkopplingar (2026-11-07, användarens önskemål: fortare "utan att grafiken blir sämre eller att det
+blir mer ansträngt för datorer o mobiler").
+
+- **JavaScript och CSS** görs mindre i bygget med esbuild, fil för fil
+  ([src/minify.js](src/minify.js), `--minify`): blanksteg och kommentarer bort och korta namn på det
+  som bara syns inuti en funktion. Ingen buntning och samma filnamn, så att sidorna, `import()` och
+  importmapen pekar på samma filer; namnen högst upp i ett vanligt skript (som andra filer läser)
+  står kvar. Med gzip 701 → 437 kB JavaScript och 155 → 103 kB CSS för hela sajten. Går esbuild
+  inte att läsa in, eller en fil inte att tolka, står filen kvar som den är. esbuild är ett
+  utvecklingsberoende och installeras av `npm ci` på GitHub Actions.
+- **Typsnitten** ligger i [public/typsnitt/](public/typsnitt/) med reglerna i
+  [public/typsnitt.css](public/typsnitt.css), som varje sida länkar först. Det är samma woff2-filer
+  och samma `@font-face`-regler (vikter, `unicode-range`, `font-display: swap`) som Google Fonts
+  skickar – Chrome, Safari i iPhone och Firefox får samma filer därifrån (kontrollerat 2026-11-07).
+  Förut låg de som `@import` i theme.css, papper.css, rum.css, rum-anslag.css och rum-register.css:
+  sidan → stilmallen → Googles stilmall → typsnittet, och två egna uppkopplingar
+  (fonts.googleapis.com, fonts.gstatic.com). Alla har SIL Open Font License. Ett nytt typsnitt: hämta
+  Googles stilmall med en webbläsares User-Agent, lägg filerna i typsnitt/ och reglerna i
+  typsnitt.css med de lokala adresserna.
+- **Rummets 3D-filer redan i `<head>`:** står tobaksaffären (klassen `rum-vantar`) lägger ett skript
+  efter importmapen `modulepreload` för three.js och dess tre tillägg, rum-3d.js och de moduler den
+  läser (samma lista som `forhamta`), sakerna, inredningen, löpsedlarna, neonen och kortlådan – samma filer som `forhamta` i rum.js
+  annars börjar hämta när rummet visas, nästan en sekund senare i telefonen. Bilderna hämtas som
+  förut av `forhamta`.
+- **Hasse Backes hand** ([scripts/hasse/hand.mjs](scripts/hasse/hand.mjs)) är en binär fil, som
+  GitHub Pages skickar opackad. Bygget lägger samma fil packad bredvid (`rum/hasse-hand.bin.gz`,
+  233 → 163 kB, `packaBinart` i [src/minify.js](src/minify.js), i varje bygge så att den aldrig blir
+  äldre än originalet), och [public/rum-hasse-arm.js](public/rum-hasse-arm.js) packar upp den med
+  `DecompressionStream`; går det inte hämtas den opackade.
+- **Bilderna:** kropp-*.png, skold-*.png och apple-touch-icon.png är packade om utan förlust (samma
+  bildpunkter, kontrollerat), med färgbitarna kvar (gAMA, cHRM, sRGB) och utan metadata (EXIF, XMP,
+  pHYs): 390 → 342 kB. Kropparna är kvar som PNG: de är märkta med gamma 2,2, som WebP inte bär, så
+  de mörkaste tonerna hade blivit en aning andra. JPEG-filerna blev inte mindre utan att göras om till
+  progressiv JPEG och är orörda.
+
+**Mätt** i Chrome (headless, Metal) mot en lokal HTTP/2-server som skickar som GitHub Pages (gzip,
+`max-age=600`), gammal och ny kod om vartannat, till dess rummets egna delar är klara (`?rum-mat`:
+gänget, inredningen och sakerna, och kön i telefonen tom). Som telefon (390 × 844, processorn två
+gånger långsammare): på långsamt nät (1,6 Mbit/s, 150 ms) 17,0 → 14,3 sekunder och gänget
+11,7 → 10,2; på 4G (9 Mbit/s, 70 ms) 8,5 → 8,1; med processorn fyra gånger långsammare på 4G
+11,4 → 10,8 (där är det mest processorn som bromsar). I datorn utan broms ungefär 2,2 → 2,0
+sekunder, inom bruset. Hämtat 4,0 → 3,7 MB. Utan förhämtningen i `<head>` blev det 15,3 sekunder
+på långsamt nät, med bara gängets filer förhämtade (de som `forhamta` tar) 15,1.
+
+**Samma bild:** rummet med fryst tid (`?rum-t=4`) och sidorna Statistik, Tabeller och Matcher
+fotograferade före och efter och jämförda bildpunkt för bildpunkt: minifieringen och bilderna ger
+ingen skillnad alls. Med typsnitten och förhämtningen skiljer några hundra bildpunkter av 1,3
+miljoner med högst 11 av 255 i kantutjämningen av texten på dörren och tv:n – lagren hinner ritas i
+en annan ordning, inte andra bokstäver – och lika mycket som samma kod skiljer mot sig själv
+mellan två laddningar på kupongen och Om oss.
+
+**Det som är kvar:** första gången rummet visas i en webbläsare kompilerar grafikkortet ungefär 95
+shaderprogram åt fem WebGL-dukar (kortlådan, gänget, sakerna, inredningen och handen), och det tog
+5–10 sekunder i datorn med tom shadercache – mer än allt ovan. Sedan har webbläsaren dem sparade.
+Färre program kräver färre olika material eller en gemensam duk, alltså ändringar i rum-3d.js,
+rum-saker.js och rum-inredning.js; det är inte gjort.
+
 ## Lokalt
 
 Kräver Node.js ≥ 18.
@@ -292,6 +364,7 @@ Kräver Node.js ≥ 18.
 npm install
 npm start              # bygger och serverar _site/ på http://localhost:3001, bygger om var 15:e min
 npm run build          # bara bygget (hämtar källor vars cache är för gammal)
+npm run build -- --minify  # som på GitHub Actions: JavaScript och CSS i mindre form (se Mindre filer)
 npm run refresh        # bygget med omhämtning av alla källor
 npm run check          # prognosmotorns kontroll mot förra säsongen (se Prognosmotorn)
 npm run backtest       # walk-forward-backtest över alla säsonger, ~1,5 min (se Backtestet)

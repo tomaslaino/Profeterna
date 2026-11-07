@@ -111,11 +111,30 @@ export function laddaFoto() {
   return fotoP;
 }
 
+// Handmodellens byte. Bygget lägger samma fil packad bredvid (hasse-hand.bin.gz,
+// src/minify.js: 233 → 163 kB), eftersom GitHub Pages inte packar .bin; den packas
+// upp här. Går det inte (eller filen saknas) hämtas den opackade som förut.
+async function handBytes() {
+  if (window.DecompressionStream) {
+    try {
+      const r = await fetch('rum/hasse-hand.bin.gz');
+      if (r.ok) {
+        const b = await r.arrayBuffer();
+        const u = new Uint8Array(b, 0, 2);
+        // (redan uppackad av webbläsaren om servern skickade den som gzip)
+        if (u[0] !== 0x1f || u[1] !== 0x8b) return b;
+        return await new Response(new Blob([b]).stream().pipeThrough(new DecompressionStream('gzip'))).arrayBuffer();
+      }
+    } catch { /* då den opackade */ }
+  }
+  return (await fetch('rum/hasse-hand.bin')).arrayBuffer();
+}
+
 let handP = null;
 export function laddaHand() {
   if (!handP) {
     handP = (async () => {
-      const buf = await (await fetch('rum/hasse-hand.bin')).arrayBuffer();
+      const buf = await handBytes();
       const hl = new DataView(buf).getUint32(0, true);
       const head = JSON.parse(new TextDecoder().decode(new Uint8Array(buf, 4, hl)));
       const o = 4 + hl;

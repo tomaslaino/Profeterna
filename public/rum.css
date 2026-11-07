@@ -2,9 +2,8 @@
    1600 × 1000 och skalas så att den täcker fönstret; namnet och foten ligger
    utanför scenen i fönstrets hörn. Lagren ligger på olika djup och vrids med
    musen (setCam i rum.js sätter transform på .rum-world). */
-@import url("https://fonts.googleapis.com/css2?family=VT323&family=Anton&family=Alfa+Slab+One&display=swap");
-/* handstilarna för gängets namn på kupongen (.sm-namn) */
-@import url("https://fonts.googleapis.com/css2?family=Cedarville+Cursive&family=Mr+Dafoe&family=Reenie+Beanie&display=swap");
+/* VT323, Anton och Alfa Slab One, och handstilarna för gängets namn på
+   kupongen (.sm-namn), ligger i typsnitt.css */
 
 html.i-rummet { overflow: hidden; scrollbar-gutter: auto; }
 html.i-rummet .topbar,
