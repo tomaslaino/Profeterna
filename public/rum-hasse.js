@@ -1150,7 +1150,8 @@ window.RumHasse = (() => {
     const p = window.Samtal && Samtal.pult ? Samtal.pult.state() : null;
     if (!p || !p.s) return null;
     const k = REP().kupong;
-    const du = String(p.tecken[m.id] || '').split('');
+    // (med det han har ändrat i din inlämnade och inte lämnat in än)
+    const du = K().din(m.id).split('');
     const han = signs.map((n) => KORT[n]);
     if (!du.length) return null;
     const bada = du.filter((c) => han.includes(c));

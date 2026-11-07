@@ -171,6 +171,24 @@
     suddar: ['Då suddar vi det.', 'Som om det aldrig hänt.'],
     // Låt bli
     bort: ['Som du vill.', 'Då får du fylla i den själv.', 'Det är din kupong.'],
+    // Din inlämnade kupong: ändringen lämnas in när den följer gängets regel (4 spikar, 5 halvgarderingar
+    // och 4 helgarderingar). Gör den inte det säger han vad som är för många och vad som fattas
+    // (för-fattas, eller bara för när en match saknar tecken), och väntar med att lämna in den.
+    regel: {
+      'halv-hel': 'Nu har du för många halvgarderingar. Helgardera en av de andra, så lämnar jag in den.',
+      'halv-spik': 'Nu har du för många halvgarderingar. Spika en av de andra, så lämnar jag in den.',
+      'hel-halv': 'Nu har du för många helgarderingar. Halvgardera en av de andra, så lämnar jag in den.',
+      'hel-spik': 'Nu har du för många helgarderingar. Spika en av de andra, så lämnar jag in den.',
+      'spik-halv': 'Nu har du för många spikar. Halvgardera en av de andra, så lämnar jag in den.',
+      'spik-hel': 'Nu har du för många spikar. Helgardera en av de andra, så lämnar jag in den.',
+      halv: 'Nu har du för många halvgarderingar. Så lämnar jag inte in den.',
+      hel: 'Nu har du för många helgarderingar. Så lämnar jag inte in den.',
+      spik: 'Nu har du för många spikar. Så lämnar jag inte in den.',
+    },
+    // när den går ihop igen, och han lämnar in den
+    inne: ['Nu går den ihop. Jag lämnar in den åt dig.', 'Nu stämmer den. Jag lämnar in den direkt.'],
+    // när den inte gick att lämna in (den står kvar vid pulten, med Lämna in ändringen)
+    fel: ['Maskinen vid kassan krånglar igen. Lämna in den vid pulten sedan.', 'Den gick inte igenom. Lämna in den vid pulten sedan.'],
   },
 
   // När något inte går.

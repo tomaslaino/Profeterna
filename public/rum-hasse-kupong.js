@@ -22,15 +22,23 @@ window.RumHasseKupong = (ctx) => {
   const satAv = (av) => { try { if (av) localStorage.setItem(AV, '0'); else localStorage.removeItem(AV); } catch (e) { /* då gäller det bara nu */ } };
   const pult = () => (window.Samtal && Samtal.pult ? Samtal.pult.state() : null);
   const api = () => (window.Rum && Rum.kupong ? Rum.kupong : null);
-  // Han kan bara fylla i din kupong medan den går att fylla i: inte en inlämnad, och inte när allas tips visas.
+  // Han kan fylla i din kupong medan den går att fylla i, och ändra den när du har lämnat in, tills
+  // matcherna startar (inne).
   function kan() {
     const p = pult();
-    return Boolean(p && p.fyll && api());
+    return Boolean(p && (p.fyll || p.andra) && api());
   }
-  const din = (id) => {
+  const inne = () => {
     const p = pult();
-    return String((p && p.tecken[id]) || '');
+    return Boolean(p && !p.fyll && p.andra);
   };
+  // I din inlämnade kupong står också det han har ändrat och inte lämnat in än (api().andring).
+  const tecknen = () => {
+    const p = pult();
+    if (!p) return {};
+    return inne() ? { ...p.tecken, ...api().andring() } : p.tecken;
+  };
+  const din = (id) => String(tecknen()[id] || '');
 
   // ---------- de stora rutorna ----------
 
@@ -341,18 +349,77 @@ window.RumHasseKupong = (ctx) => {
     const t = H.vy.querySelector(`.rh-tecken[data-id="${CSS.escape(id)}"]`);
     return t ? t.querySelector(`[data-s="${s}"]`) : null;
   };
-  // Det valda står nu i utkastet. av: krysset ska bort.
+  // Det valda står nu i utkastet. av: krysset ska bort. I din inlämnade kupong står det som en ändring,
+  // som han lämnar in (lamna).
   function andra(id, s, av) {
     const fore = din(id);
     const nytt = SIGNS.filter((x) => (x === s ? !av : fore.includes(x))).join('');
     api().skrev(`${id}${s}`, !av);
     // (pulten ritas om när man går härifrån: rummet syns inte nu)
-    Samtal.pult.tippa(id, nytt);
+    if (!inne()) { Samtal.pult.tippa(id, nytt); return; }
+    const t = { ...api().andring(), [id]: nytt };
+    if (nytt === String(pult().tecken[id] || '')) delete t[id];
+    api().andrat(t);
+    lamna();
   }
   // Fälten i foten av kupongen räknas om, som när man själv kryssar.
   function foten() {
     const f = K.el && K.el.querySelector('.fot .pp-fields');
-    if (f && Samtal.pult.fields) f.outerHTML = Samtal.pult.fields(pult().tecken);
+    if (f && Samtal.pult.fields) f.outerHTML = Samtal.pult.fields(tecknen());
+  }
+
+  // ---------- din inlämnade kupong ----------
+
+  // Gängets regel (config/kupong.js, som brott i samtal.js): så många spikar, halvgarderingar och
+  // helgarderingar. Det som är för många och det som fattas i t, eller null när t följer den.
+  const SLAG = ['spik', 'halv', 'hel'];
+  function regeln(t) {
+    const p = pult();
+    // (KP är en const i kupong.js, inte window.KP)
+    const r = typeof KP !== 'undefined' && KP.data && KP.data.samtal && KP.data.samtal.regel;
+    if (!p || !r || r.spik + r.halv + r.hel !== p.s.matcher.length) return null;
+    const n = SLAG.map((k, i) => p.s.matcher.filter((x) => String(t[x.id] || '').length === i + 1).length);
+    const for_ = SLAG.find((k, i) => n[i] > r[k]);
+    return for_ ? { for: for_, till: SLAG.find((k, i) => n[i] < r[k]) || null } : null;
+  }
+  // Vad han säger när han har skrivit en ändring i din inlämnade kupong: följer den inte regeln lämnar han
+  // inte in den, och säger vad som behövs; går den ihop efter det (vantade: den gjorde inte det förut)
+  // lämnar han in den och säger det. Annars som vanligt (sagt), och den lämnas in medan han skriver.
+  // Saknar en match tecken väntar den också, utan att han säger något mer.
+  function omAndringen(sagt, vantade) {
+    const r = REP().fyller;
+    const t = tecknen();
+    const fel = regeln(t);
+    if (fel) return r.regel[fel.till ? `${fel.for}-${fel.till}` : fel.for];
+    if (vantade && pult().s.matcher.every((x) => t[x.id])) return lott(r.inne);
+    return sagt;
+  }
+  // Ändringen lämnas in, när den följer regeln och alla matcher har tecken. En i taget; ändras den medan
+  // den lämnas in lämnas den in igen efteråt. Går det inte står den kvar och han säger till när han har
+  // skrivit klart (och vid pulten står Lämna in ändringen tänd).
+  async function lamna() {
+    if (K.lamnar) { K.igen = true; return; }
+    const p = pult();
+    const andring = api().andring();
+    if (!p || !p.andra || !Object.keys(andring).length) return;
+    const t = { ...p.tecken, ...andring };
+    if (regeln(t) || !p.s.matcher.every((x) => t[x.id])) return;
+    K.lamnar = true;
+    const out = await Samtal.pult.lamnaIn(t);
+    K.lamnar = false;
+    if (out.ok) {
+      // det som nu står inlämnat väntar inte längre (och det som ändrades under tiden har det inlämnade
+      // som grund nu)
+      const q = pult();
+      const kvar = api().andring(true);
+      if (q) for (const id of Object.keys(kvar)) if (kvar[id] === String(q.tecken[id] || '')) delete kvar[id];
+      api().andrat(q && q.andra ? kvar : {});
+      if (!H.on) api().ritaOm();
+    } else if (!K.igen) {
+      while (K.jobb || K.ko.length) await new Promise((ok) => setTimeout(ok, 120));
+      if (H.on) sag(lott(REP().fyller.fel));
+    }
+    if (K.igen) { K.igen = false; lamna(); }
   }
   function ritaKryss(j, id, s) {
     const a = api();
@@ -519,13 +586,16 @@ window.RumHasseKupong = (ctx) => {
       avbryt(J);
     }
     const av = din(id).includes(s);
+    const vantade = inne() && Boolean(regeln(tecknen()));
     andra(id, s, av);
-    K.ko.push({ id, tecken: [{ s, av }], hit: true, sagt: av ? suddat : sagt, tok, sen });
+    const vad = inne() ? omAndringen(av ? suddat : sagt, vantade) : av ? suddat : sagt;
+    K.ko.push({ id, tecken: [{ s, av }], hit: true, sagt: vad, tok, sen });
     korKo();
   }
   // Efter analysen: om du inte redan har något på raden och inte har tackat nej tar han kupongen själv.
   // Tar han den själv efter analysen?
-  const kommer = (id) => kan() && !lasAv() && !din(id);
+  // (inte i en inlämnad: där skriver han bara det du väljer)
+  const kommer = (id) => kan() && !inne() && !lasAv() && !din(id);
   function sjalv(id, tecken, { sagt, tok = () => true, sen } = {}) {
     if (!kommer(id)) return false;
     K.ko.push({ id, tecken: tecken.map((s) => ({ s, av: false })), auto: true, hit: true, sagt, tok, sen });

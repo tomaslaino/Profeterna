@@ -56,7 +56,7 @@ const LISTOR = ['oppning', 'oppningNamn', 'tillbaka', 'tillbakaNamn', 'nasta', '
   'fragaTillbaka', 'lar', 'gissar', 'reaktion', 'erbjud', 'erbjudNytt', 'tittaIgen', 'vantar.forst', 'vantar.sedan', 'vantar.sist',
   'avbruten', 'resultat', 'ejKlar', 'anslagSvar',
   'fyller.hit', 'fyller.skriver.1', 'fyller.skriver.X', 'fyller.skriver.2', 'fyller.gardera', 'fyller.medhall', 'fyller.emot',
-  'fyller.suddar', 'fyller.bort',
+  'fyller.suddar', 'fyller.bort', 'fyller.inne', 'fyller.fel',
   'kupong.samma', 'kupong.farre', 'kupong.fler', 'kupong.korsar', 'kupong.skilda'];
 // Knappar och ord, inte meningar.
 const INTE_MENINGAR = ['lar', 'tecken'];

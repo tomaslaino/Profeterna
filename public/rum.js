@@ -1180,6 +1180,24 @@ ${window.RumRegister ? RumRegister.nara() : ''}
     else delete k[key];
     try { localStorage.setItem(HASSES, JSON.stringify({ id, k })); } catch (e) { /* då är det ett vanligt kryss nästa gång */ }
   }
+  // Det han har ändrat i din inlämnade kupong och inte lämnat in än, för att den inte följer regeln
+  // (rum-hasse-kupong.js): {matchens id: tecken}. Det står på kupongen när du tar den i handen, med
+  // Lämna in ändringen tänd. Gäller bara så länge det inlämnade är som när han skrev (bas; alla: ändå).
+  const HASSES_ANDRING = 'profeterna.hasse.andring';
+  const tSig = (t) => Object.keys(t).filter((k) => t[k]).sort().map((k) => `${k}:${t[k]}`).join(',');
+  function hassesAndring(p, alla = false) {
+    if (!p || p.fyll || !p.andra) return {};
+    try {
+      const j = JSON.parse(localStorage.getItem(HASSES_ANDRING));
+      return j && j.id === p.s.id && j.vem === p.vem && (alla || j.bas === tSig(p.tecken)) ? j.t || {} : {};
+    } catch (e) { return {}; }
+  }
+  function hasseAndrade(p, t) {
+    try {
+      if (p && t && Object.keys(t).length) localStorage.setItem(HASSES_ANDRING, JSON.stringify({ id: p.s.id, vem: p.vem, bas: tSig(p.tecken), t }));
+      else localStorage.removeItem(HASSES_ANDRING);
+    } catch (e) { /* då står det bara hos honom */ }
+  }
 
   // Pennan: spetsen i (x, y) på kupongen, vriden a grader och lyft l (0 =
   // mot papperet, 1 = i luften). Skuggan faller nedåt på papperet hur pennan
@@ -3053,6 +3071,9 @@ ${window.RumRegister ? RumRegister.nara() : ''}
     }
     const v = slag && view(p, slag, from ? from.dataset.vem : null);
     if (!v || (slag !== 'fyll' && slag !== 'gang' && !from)) return false;
+    // din inlämnade: med det Hasse har ändrat och inte lämnat in än
+    const inlamnat = { ...v.tecken };
+    if (slag === 'din' && p.andra) v.tecken = { ...v.tecken, ...hassesAndring(p) };
     if (slag === 'gang') pling();
     zoomTv(false);
     zoomVideo(false);
@@ -3068,7 +3089,7 @@ ${window.RumRegister ? RumRegister.nara() : ''}
     R.el.insertAdjacentHTML('beforeend', `<div class="rum-hand" id="rum-hand">${handRow(p, v)}</div>`);
     const el = document.getElementById('rum-handen');
     const k = R.kup = { el, dim: document.getElementById('rum-dimma'), rad: document.getElementById('rum-hand'), pen: el.querySelector('.pencil'), at: PEN_PULT, desk,
-      slag, andra: slag === 'din' && p.andra, orig: { ...v.tecken }, tecken: { ...v.tecken }, origNot: { ...(v.not || {}) }, not: { ...(v.not || {}) },
+      slag, andra: slag === 'din' && p.andra, orig: inlamnat, tecken: { ...v.tecken }, origNot: { ...(v.not || {}) }, not: { ...(v.not || {}) },
       efter: { ...(v.efter || {}) }, fram,
       // matcherna i kupongens ordning, till bladet med lagen (lagen)
       matcher: rd.ids.map((id) => rows.find((x) => x.id === id)).filter(Boolean).map((x) => x.m), kupong: nr ? `Kupong ${nr}` : 'Kupong' };
@@ -3077,6 +3098,7 @@ ${window.RumRegister ? RumRegister.nara() : ''}
     // bredvid (gangState ritar om dem tillsammans)
     k.go = k.rad.querySelector(slag === 'gang' ? '[data-gang]' : '.guld');
     if (slag === 'gang') k.gw = k.rad.querySelector('.hoger');
+    if (k.andra) dirty();
     if (from) {
       // ur högen: vems och var den låg, och baksidan att vända tillbaka till
       Object.assign(k, { vem: from.dataset.vem, slot: slot(Number(from.dataset.i)), bak: from.innerHTML });
@@ -3767,6 +3789,7 @@ ${window.RumRegister ? RumRegister.nara() : ''}
     const k = R.kup;
     if (k.busy) return;
     setSigns(k.orig);
+    hasseAndrade(null);
     k.tecken = { ...k.orig };
     k.not = { ...k.origNot };
     for (const f of k.el.querySelectorAll('input[data-not]')) {
@@ -4139,6 +4162,8 @@ ${window.RumRegister ? RumRegister.nara() : ''}
     }
     k.msg.textContent = '';
     k.go.disabled = true;
+    // (det Hasse hade ändrat var med i den)
+    if (k.andra) hasseAndrade(null);
     let st = k.el.querySelector('.stampel');
     if (!st) {
       k.pen.insertAdjacentHTML('beforebegin', '<span class="stampel">Inlämnad</span>');
@@ -4567,17 +4592,23 @@ ${window.RumRegister ? RumRegister.nara() : ''}
   }
 
   // kval: rummets steg (KVAL), som Hasse Backe också ritas efter (rum-hasse.js)
-  // Din kupong hos Hasse Backe (rum-hasse-kupong.js): samma kupong som på pulten, medan den går att fylla i.
-  //   html()         kupongen, som på pulten (null om den inte går att fylla i)
+  // Din kupong hos Hasse Backe (rum-hasse-kupong.js): samma kupong som på pulten, medan den går att fylla i
+  // eller, inlämnad, att ändra.
+  //   html()         kupongen, som på pulten (null om den inte går att fylla i eller ändra)
   //   kryss(key, h)  ett kryss (h: bara hans; annars hans om han har skrivit det), drag(key) hans drag
   //   skrev(key, ja) krysset är hans, eller inte längre, ritaOm() pulten igen, penna() var pennan ligger
+  //   andring(alla)  det han har ändrat i din inlämnade och inte lämnat in, andrat(t) det nu ({} = inget)
   const kupong = {
     html() {
       const p = pult();
-      if (!p || !p.fyll) return null;
+      const v = !p ? null : p.fyll ? view(p, 'fyll') : p.andra ? view(p, 'din', p.vem) : null;
+      if (!v) return null;
+      if (v.slag === 'din') v.tecken = { ...v.tecken, ...hassesAndring(p) };
       const rd = { id: p.s.id, ids: p.s.matcher.map((x) => String(x.id)), gang: p.s.gang, name: (window.Samtal && Samtal.name()) || null };
-      return couponHtml(rd, roundRows(rd), view(p, 'fyll'));
+      return couponHtml(rd, roundRows(rd), v);
     },
+    andring: (alla = false) => hassesAndring(pult(), alla),
+    andrat: (t) => hasseAndrade(pult(), t),
     kryss(key, h = false) {
       const p = pult();
       return crossSvg(key, false, h || Boolean(p && hassesKryss(p.s.id)[key]));

@@ -684,6 +684,13 @@ bara lokalt. Analyserna visas som de ligger i `data/analyser.json`; hur de skriv
   de två, och den här ligger närmast önskemålet: stort 1 X 2 som man väljer fritt, och han börjar själv. Därifrån finns frågan
   *Vems kupong ska jag fylla i?* kvar. Samma dag ville användaren kunna fylla i matcher man redan har frågat om
   och välja tecken han inte håller med om: då säger han emot men kryssar ändå.
+- **Hasse Backe ändrar din inlämnade kupong (2026-11-07, användarens önskemål):** "Jag har fortfarande
+  inte möjlighet att fylla i kupongen utefter det här", om hans *Etta, kryss* på en match där kupongen hade
+  helgardering. Kupongen var inlämnad, och då visade han inga rutor alls. Nu står 1 X 2 också under en
+  inlämnad kupong så länge den går att ändra, och han lämnar in ändringen direkt när den följer gängets regel.
+  Gör den inte det (en helgardering som blir 1X ger sex halvgarderingar) säger han vad som fattas och väntar,
+  och den väntande ändringen står på kupongen när man tar den ur högen, med *Lämna in ändringen* tänd. Se
+  [Hasse Backe](#hasse-backe), *Din kupong*.
 - **Hasse Backe njuter av cigarren på elva sätt (2026-11-05, användarens önskemål):** cigarren såg
   skev ut: ansiktet förvreds när han vred huvudet mot askkoppen, handen höll cigarren som en stång,
   och röken lade sig som en fläck över ögat. Nu tittar han mest med ögonen, håller den löst i
@@ -4479,8 +4486,20 @@ erbjöd sig att titta igen (i telefonen sist i texten, så att allt ryms). Vet k
 den du är, som när du väljer namn på kupongen (`Samtal.pult.vem`). *Låt bli*
 står i stället för *Matchbladet* medan han håller på: han lägger tillbaka pennan, suddar det han hann skriva och
 lämnar tillbaka kupongen, och sedan tar han den inte själv efter analyserna förrän du har valt ett tecken igen (på
-enheten, `profeterna.hasse.fyller`). Han fyller bara i kupongen medan den går att fylla i. Är den inlämnad eller
-visas allas tips ser samtalet ut som förut, med *Jag gissar*.
+enheten, `profeterna.hasse.fyller`). Han fyller i kupongen medan den går att fylla i, och ändrar den när du har lämnat
+in, tills matcherna startar (`Samtal.pult.state().andra`). Visas allas tips utan att du har lämnat in ser samtalet
+ut som förut, med *Jag gissar*.
+
+*Din inlämnade kupong.* Där skriver han bara det du väljer: han tar den inte själv efter en analys. Ändringen lämnas
+in direkt (`Samtal.pult.lamnaIn`) när kupongen följer gängets regel (`regel` i [config/kupong.js](config/kupong.js),
+4 spikar, 5 halvgarderingar och 4 helgarderingar) och alla matcher har tecken. Följer den inte regeln säger han vad som
+är för många och vad som fattas (*Nu har du för många halvgarderingar. Helgardera en av de andra, så lämnar jag in
+den.*) och väntar, och när den går ihop igen säger han det och lämnar in den. En helgardering som blir 1X behöver
+alltså en halvgardering som blir helgardering någon annanstans; vilken är upp till dig. Det som väntar sparas på
+enheten (`profeterna.hasse.andring`, med det inlämnade som grund: ändras det någon annanstans gäller det inte längre)
+och står också på kupongen när du tar den ur högen vid pulten, med *Ångra* och *Lämna in ändringen* tända. *Ångra*
+eller en inlämning där tar bort det. Går inlämningen inte igenom säger han till (*Den gick inte igenom. Lämna in den
+vid pulten sedan.*), och ändringen står kvar.
 
 Kupongen kommer upp underifrån så stor att den går att läsa, står en stund och glider in under hans händer på disken. Den
 är ett plan i figurens värld: på disken med rätt perspektiv, mellan disken och figurens duk så att händerna ligger
