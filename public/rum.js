@@ -1692,7 +1692,8 @@ ${window.RumRegister ? RumRegister.nara() : ''}
   // vinst (glad). Däremellan efter hur den går mot modellen, med samma z som
   // betyget i historiken (src/history.js): glad från 0,5, nerv från −0,5.
   // rank: vem som leder omgången (1) och ligger sist (−1) på sina egna tips,
-  // när allas tips syns och minst tre matcher är avgjorda.
+  // när allas tips syns och minst tre matcher är avgjorda. ansikte: hur glada
+  // de ser ut när allt är spelat (rum-uttryck.js).
   // ?rum-humor=glad|nerv|deppig och ?rum-rank=dl:1,dj:-1 för bilder.
   function spelLage(rd, rows, p) {
     const q = R.q;
@@ -1718,6 +1719,10 @@ ${window.RumRegister ? RumRegister.nara() : ''}
       const vant = klar.reduce((a, x) => a + pp(x), 0);
       const z = (klar.length - fel - vant) / Math.sqrt(Math.max(0.5, klar.reduce((a, x) => a + pp(x) * (1 - pp(x)), 0)));
       out.lage = fel > tol ? 'deppig' : !kvar ? 'glad' : fel === tol ? 'nerv' : z >= 0.5 ? 'glad' : z <= -0.5 ? 'nerv' : null;
+      // när allt är spelat: ansiktena som när kupongen kommer in i historiken
+      // (betyget ur z, rum-folk.js ansikte), också innan den har gjort det
+      const betyg = z >= 1.25 ? 5 : z >= 0.5 ? 4 : z >= -0.5 ? 3 : z >= -1.25 ? 2 : 1;
+      if (!kvar && window.RumFolk) out.ansikte = RumFolk.ansikte(betyg, med.length, fel);
     }
     const s = p && p.s;
     const gang = rd.gang || [];
@@ -2371,7 +2376,7 @@ ${window.RumRegister ? RumRegister.nara() : ''}
     const m = document.querySelector('script[type="importmap"]');
     const im = m ? JSON.parse(m.textContent).imports : {};
     const fil = ['environments/RoomEnvironment.js', 'geometries/RoundedBoxGeometry.js', 'utils/BufferGeometryUtils.js'].map((f) => im['three/addons/'] + f);
-    for (const href of ['rum-3d.js', 'rum-gpu.js', 'rum-fika.js', 'rum-fest.js', 'rum-tecken.js', im.three, ...fil]) {
+    for (const href of ['rum-3d.js', 'rum-gpu.js', 'rum-fika.js', 'rum-fest.js', 'rum-tecken.js', 'rum-uttryck.js', im.three, ...fil]) {
       const l = document.createElement('link');
       l.rel = 'modulepreload';
       l.href = href;
@@ -2405,7 +2410,8 @@ ${window.RumRegister ? RumRegister.nara() : ''}
     try {
       await tur(async () => {
         const mod = await import('./rum-3d.js');
-        R.fig = await mod.figurer(document.getElementById('rum-3d'), { calm: calm(), vader: R.vader, detalj: KVAL[R.kval].detalj, kant: R.kval === 0, enkel: Boolean(KVAL[R.kval].enkel) });
+        // (ansiktena efter hur det går och gick för kupongen redan från början: spel, senast)
+        R.fig = await mod.figurer(document.getElementById('rum-3d'), { calm: calm(), vader: R.vader, detalj: KVAL[R.kval].detalj, kant: R.kval === 0, enkel: Boolean(KVAL[R.kval].enkel), spel: R.spel, senast: window.RumFolk ? RumFolk.senast() : null, rita: () => frame() });
         kval(R.kval);
         if (R.vem) R.fig.inne(R.vem, now());
         if (R.lage) R.fig.lage(R.lage, now());
@@ -4570,7 +4576,7 @@ ${window.RumRegister ? RumRegister.nara() : ''}
     if (still()) {
       // en fast bild: allt på samma tid, och klar när datan och gänget är
       // ritade (och i telefonen resten av 3D-delarna, tur)
-      ready.then(turTom).then(() => {
+      ready.then(turTom).then(() => R.fig && R.fig.uttryck && R.fig.uttryck()).then(() => {
         freezeCss(R.frozen);
         if (q.has('rum-anslag')) {
           board(true);
