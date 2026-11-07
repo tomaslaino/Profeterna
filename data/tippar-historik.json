@@ -53,6 +53,32 @@
         { "id": "401878761", "match": "Tottenham Hotspur – Crystal Palace", "avspark": "2026-10-31T17:30:00.000Z", "tips": { "DL": "1X2", "DT": "1", "DJ": "1" }, "resultat": "2–0", "modell": [47, 25, 28] },
         { "id": "401879250", "match": "Aston Villa – Fulham", "avspark": "2026-10-31T20:00:00.000Z", "tips": { "DL": "1", "DT": "1X", "DJ": "1" }, "resultat": "1–1", "modell": [50, 25, 25] }
       ]
+    },
+    {
+      "id": "2026-11-07-st4978",
+      "namn": "Näten på City Ground håller fint",
+      "syftar": "Forest har inte gjort ett enda mål hemma den här säsongen, så näten på City Ground är fortfarande som nya – och på lördag kommer Manchester City dit.",
+      "datum": "2026-11-07",
+      "gang": [
+        { "id": "DL", "namn": "Daniel Laino" },
+        { "id": "DT", "namn": "Daniel Teijder" },
+        { "id": "DJ", "namn": "Daniel Johansson" }
+      ],
+      "matcher": [
+        { "id": "401878760", "match": "Arsenal – Hull City", "avspark": "2026-11-07T15:00:00.000Z", "tips": { "DL": "1", "DT": "1", "DJ": "1X" } },
+        { "id": "401879241", "match": "Fulham – Newcastle United", "avspark": "2026-11-07T15:00:00.000Z", "tips": { "DL": "1X2", "DT": "1X2", "DJ": "1" } },
+        { "id": "401880171", "match": "Blackburn Rovers – West Ham United", "avspark": "2026-11-07T15:00:00.000Z", "tips": { "DL": "X2", "DT": "1X2", "DJ": "2" } },
+        { "id": "401880172", "match": "Birmingham City – Swansea City", "avspark": "2026-11-07T15:00:00.000Z", "tips": { "DL": "1", "DT": "1X", "DJ": "12" } },
+        { "id": "401880169", "match": "Cardiff City – Burnley", "avspark": "2026-11-07T15:00:00.000Z", "tips": { "DL": "12", "DT": "1X", "DJ": "1" }, "motivering": { "DJ": "Hemmastarka så in i kuken" } },
+        { "id": "401880168", "match": "Charlton Athletic – Sheffield United", "avspark": "2026-11-07T15:00:00.000Z", "tips": { "DL": "1X2", "DT": "2", "DJ": "1X2" } },
+        { "id": "401880165", "match": "Preston North End – Southampton", "avspark": "2026-11-07T15:00:00.000Z", "tips": { "DL": "X2", "DT": "2", "DJ": "X2" }, "motivering": { "DJ": "Tvångshalva" } },
+        { "id": "401880164", "match": "Queens Park Rangers – Lincoln City", "avspark": "2026-11-07T15:00:00.000Z", "tips": { "DL": "1", "DT": "1X", "DJ": "1X" } },
+        { "id": "401880163", "match": "Watford – Middlesbrough", "avspark": "2026-11-07T15:00:00.000Z", "tips": { "DL": "1X2", "DT": "1X2", "DJ": "2" } },
+        { "id": "401880162", "match": "West Bromwich Albion – Millwall", "avspark": "2026-11-07T15:00:00.000Z", "tips": { "DL": "1X", "DT": "1X", "DJ": "12" } },
+        { "id": "401931120", "match": "Crewe Alexandra – AFC Wimbledon", "avspark": "2026-11-07T15:00:00.000Z", "tips": { "DL": "1X2", "DT": "1X2", "DJ": "1X2" } },
+        { "id": "401931121", "match": "Oxford United – Stevenage", "avspark": "2026-11-07T15:00:00.000Z", "tips": { "DL": "1X", "DT": "1X", "DJ": "1X2" } },
+        { "id": "401878757", "match": "Nottingham Forest – Manchester City", "avspark": "2026-11-07T17:30:00.000Z", "tips": { "DL": "2", "DT": "2", "DJ": "1X2" } }
+      ]
     }
   ]
 }
