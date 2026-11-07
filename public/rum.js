@@ -3045,9 +3045,10 @@ ${window.RumRegister ? RumRegister.nara() : ''}
     }
     el.focus({ preventScroll: true });
     el.addEventListener('click', (e) => {
+      if (k.closing) return;
       const b = e.target.closest('button.box, button[data-vem]');
-      if (!b || k.closing) return;
-      if (b.dataset.vem) choose(b);
+      if (!b) writeOn(e.target);
+      else if (b.dataset.vem) choose(b);
       else if (k.slag === 'gang') tickGang(b);
       else tick(b);
     });
@@ -3553,6 +3554,19 @@ ${window.RumRegister ? RumRegister.nara() : ''}
         }
       }, 1200);
     });
+  }
+
+  // Ett klick på matchen – lagen, tiden eller det som står efter den, inte
+  // rutorna – och man skriver på raden, med markören sist: kommentaren i
+  // efterhand när matchen har startat, annars motiveringen när matchen är
+  // tippad. Medan man skriver får texten raden (rum.css).
+  function writeOn(t) {
+    const row = !t.closest('input, label, button, .box') && t.closest('.row');
+    const f = row && row.querySelector('.pen:not(.gom) input.pen-in');
+    if (!f) return;
+    const n = f.value.length;
+    f.setSelectionRange(n, n);
+    f.focus({ preventScroll: true });
   }
 
   // Pennan går till där texten slutar i fältet (vid markören) och hoppar

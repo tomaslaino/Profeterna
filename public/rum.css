@@ -558,6 +558,12 @@ canvas.rum-neonhalo { opacity: 0.28; }
 .rum-kup .not:has(.pen) { min-width: 18px; }
 .rum-kup .not .mot, .rum-kup .not .eft { flex: 0 1 auto; min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
 .rum-kup .not .eft, .rum-kup .not .pen-eft { color: var(--ink); }
+/* kommentaren i efterhand är det senaste på raden: bredvid motiveringen får
+   den minst hälften av platsen, och motiveringen kortas i stället (pennan
+   syns alltid) */
+.rum-kup .not .mot + .eft { flex-shrink: 0; max-width: 50%; }
+.rum-kup .not .pen-eft { min-width: 15px; }
+.rum-kup .not:has(.mot) .pen-eft:has(.pen-in:not(:placeholder-shown)) { flex: 1 0 50%; }
 /* hela platsen efter tiden är fältet: ett klick var som helst där och man skriver */
 .rum-kup .pen { flex: 1 1 auto; display: flex; align-items: center; gap: 3px; min-width: 0; height: 21px; cursor: text; }
 .rum-kup .pen.gom { visibility: hidden; }
@@ -588,6 +594,13 @@ canvas.rum-neonhalo { opacity: 0.28; }
 .rum-kup .pen.fel .sm-pen { opacity: 1; }
 .rum-kup .pen.fel .pen-in { border-bottom-color: var(--pp-no); }
 .rum-kup .pen.skickar .pen-in { opacity: 0.6; }
+/* I handen är hela matchen en plats att skriva på (writeOn i rum.js), och
+   medan man skriver får texten raden: tiden och motiveringen viker undan och
+   lagen står med de korta namnen, tills man är klar */
+.rum-handen .row:has(.pen:not(.gom)) .m { cursor: text; }
+.rum-handen .row:has(.pen:not(.gom)):hover .sm-pen { opacity: 1; }
+.rum-handen .row:has(.pen:focus-within) :is(.pp-small, .mot, .pp-tm .lang) { display: none; }
+.rum-handen .row:has(.pen:focus-within) .pp-tm .kort { display: inline; }
 
 /* uppgörelsen: porträtten för dem som har med tecknet, var och en på sin
    plats i rutan, som på papperet */
