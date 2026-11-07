@@ -837,6 +837,12 @@ bara lokalt. Analyserna visas som de ligger i `data/analyser.json`; hur de skriv
   från tv:n – där läggs det fram mitt i fönstret, lika stort som kupongen i handen. Inget i rummet
   öppnar längre matchrutan, i linje med att inget leder ut ur tobaksaffären. Matchrutan på den
   vanliga sajten är som förut. Se *Matchbladet* under [Kupongen i handen](#kupongen-i-handen).
+- **Vem som säger vad i Hasse Backes matchlista (2026-11-07, användarens önskemål):** rutorna 1 X 2,
+  resultatet och tecknen för hand längst ut stod utan avsändare, så det gick inte att se vem som
+  tyckte vad. Nu står Hasses porträtt och namn i guld över hans spalt och ditt porträtt med namnet i
+  din handstil över din, som spalthuvuden. Av tre skisser i den riktiga vyn (två spalter, samma
+  rutor med ditt kryss över hans guld, din kupong med hans ringar i guld) valde användaren två
+  spalter. Se [Hasse Backe](#hasse-backe), *Samtalet*.
 - **Kuponghistoriken flyttar till Olympen (2026-10-20, användarens önskemål):** Kupong
   handlar bara om nästa kupong – växlaren Omgången | Historik försvinner. De färdigspelade
   kupongerna står sist i Olympen under rubriken *Grupparbetena* (`#olympen/kuponger`, en
@@ -4582,6 +4588,7 @@ frågat om: på matchens rad står hans tecken ifyllda i guld i rutorna 1 X 2, s
 resultatet bredvid i en rak spalt. *Alla matcher* tar en tillbaka till listan, och där räknar han
 (*Nu är halva kupongen klar*). Bara tecken du själv har bett om syns, så att listan inte blir ett
 automatiskt tips.
+Överst i listan står vem som säger vad, utan förklarande text: Hasses porträtt och namn i guld mitt över hans rutor och resultat, och ditt porträtt i din färg med namnet i din handstil (som på kupongen) över din spalt. Får namnen inte plats bredvid varandra, som i telefonen, går ditt namn först och sedan hans, så att porträtten står kvar. En spalt som inte syns på någon rad får inget huvud.
 Går hans röst inte att få säger han det och visar analysen i skrift. Allt han säger runt omkring är
 färdiga rader, utan AI, i [public/rum-hasse-repliker.js](public/rum-hasse-repliker.js). `npm run repliker`
 ([scripts/hasse/kolla-repliker.js](scripts/hasse/kolla-repliker.js)) kontrollerar filen, och GitHub kör den

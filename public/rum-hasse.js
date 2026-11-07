@@ -339,6 +339,7 @@ window.RumHasse = (() => {
       s.setProperty('--mork', `${(hoger + 70).toFixed(0)}px`);
     }
     if (H.kupong) H.kupong.passa();
+    passaSpalter();
     return disk;
   }
 
@@ -1336,7 +1337,7 @@ window.RumHasse = (() => {
     const lista = kupongen();
     const fragat = minns(lista);
     const nu = Date.now();
-    s.innerHTML = '<h2 class="rh-sagt"></h2><div class="rh-lista"></div>';
+    s.innerHTML = `<h2 class="rh-sagt"></h2>${spalter(lista, fragat)}<div class="rh-lista"></div>`;
     const l = s.querySelector('.rh-lista');
     let forsta = null;
     lista.forEach((m, i) => {
@@ -1355,6 +1356,9 @@ window.RumHasse = (() => {
       l.append(b);
       if (!forsta && !b.disabled && !fragat[m.id]) forsta = b;
     });
+    passaSpalter();
+    // (handstilen kan komma efter: då mäts namnen igen)
+    if (document.fonts) document.fonts.ready.then(passaSpalter);
     // nästa match man inte har frågat om syns utan att man rullar
     if (forsta) l.scrollTop = Math.max(0, forsta.offsetTop - l.offsetTop - 40);
     const forstaText = forstaRad(lista, fragat, forst);
@@ -1373,6 +1377,42 @@ window.RumHasse = (() => {
     const [h, b] = String(res || '').split('–');
     const mal = b === undefined ? '' : `<i>${esc(h)}</i>–<i>${esc(b)}</i>`;
     return `<b class="rh-tips"><span class="rh-vh">${esc(tecken)}</span><span class="rh-rutor" aria-hidden="true">${rutor}</span><small>${mal}</small></b>`;
+  }
+  // Vem som säger vad, överst i listan: Hasse (porträtt och namn i guld) över hans rutor och
+  // resultat, du (porträtt i din färg och namnet i din handstil, som på kupongen) över det du har.
+  // Huvudet är byggt som en rad, med osynliga rutor som håller bredden, så att det står mitt över
+  // spalterna i alla storlekar. Spalterna som inte syns på någon rad får inget huvud.
+  function spalter(lista, fragat) {
+    const han = lista.some((m) => fragat[m.id]);
+    const du = K().kan();
+    if (!han && !du) return '';
+    const hans = han ? `<b class="rh-tips"><span class="rh-rutor">${KORT.map((k) => `<em>${k}</em>`).join('')}</span><small></small><span class="rh-vem hasse"><span class="rh-ans"></span><span class="rh-namn">Hasse</span></span></b>` : '';
+    let din = '';
+    if (du) {
+      // (porträtten står i gängets uppgifter i kuponger.json, KP i kupong.js, som rum.js läser dem)
+      const p = Samtal.pult.state();
+      const gang = (typeof KP !== 'undefined' && KP.data && KP.data.samtal && KP.data.samtal.gang) || p.s.gang || [];
+      const i = p.vem ? gang.findIndex((g) => g.id === p.vem) : -1;
+      const g = i >= 0 ? gang[i] : null;
+      const namn = dittNamn();
+      din = g && namn
+        ? `<u><span class="rh-vem du k${i}"><span class="rh-ans"${g.bild ? ` style="background-image: url('${esc(g.bild)}')"` : ''}></span><span class="rh-namn">${esc(namn)}</span></span></u>`
+        : '<u><span class="rh-vem du"><span class="rh-namn">Du</span></span></u>';
+    }
+    return `<div class="rh-kol" aria-hidden="true">${hans}${din}</div>`;
+  }
+  // Huvudet lika brett som raderna (en rullningslist tar plats i listan), och namnen bara när de
+  // får plats bredvid varandra: först går ditt (du vet hur du ser ut), sedan hans.
+  function passaSpalter() {
+    const k = $('.rh-kol');
+    const l = $('.rh-lista');
+    if (!k || !l || !k.offsetWidth) return;
+    k.style.paddingRight = `${l.offsetWidth - l.clientWidth}px`;
+    k.classList.remove('trangt', 'trangare');
+    const [a, b] = k.querySelectorAll('.rh-vem');
+    const krock = () => a && b && a.getBoundingClientRect().right + 14 > b.getBoundingClientRect().left;
+    if (krock()) k.classList.add('trangt');
+    if (krock()) k.classList.add('trangare');
   }
   function forstaRad(lista, fragat, forst) {
     const r = REP();
