@@ -4,15 +4,15 @@
 // väggen under tv:n, med lappar på nålar. Lapparna har det på sajten som
 // rummet annars inte visar, om lagen i omgången:
 //   Formen         registerkort, maskinskrivet: de fem senaste före matchen i
-//                  alla tävlingar, med Europacuperna när matchens fil har hämtats
+//                  alla tävlingar med Europacuperna (matchens fil)
 //   Skadelistan    genomslag: skadade, avstängda och osäkra (matchens fil)
 //   Starkast       polaroid med skölden; på baksidan modellens starkaste och
 //                  svagaste i omgången (data/teams/<division>.json)
 //   Kryssar gärna  gul lapp: chansen till oavgjort i lagets matcher (xG)
 //   Tur & otur     rutat papper: poäng mot chanserna (xG), med staplar
 //   Mot oddsen     tidningsurklipp: poäng mot vad oddsen väntade sig
-//   Vilan          almanacksblad: dagar sedan förra matchen i alla tävlingar,
-//                  med Europacuperna när matchens fil har hämtats
+//   Vilan          almanacksblad: dagar sedan förra matchen i alla tävlingar
+//                  med Europacuperna (matchens fil)
 //   Motståndet     anteckningsblock: de som har mött svårast och lättast
 //                  motstånd hittills (modellens styrka, som på Statistik)
 // Mötena och lagen ett och ett står i kortregistret på disken (rum-register.js).
@@ -154,8 +154,8 @@ window.RumAnslag = (() => {
     return (list || []).filter((m) => m.completed && Date.parse(m.kickoff) < before).slice(0, 5)
       .map((m) => (hidden(m) ? '?' : letter(m, team)));
   }
-  // Lagets fem senaste i matchen: ur matchens fil, med Europacuperna, när den
-  // har hämtats (tavlan tas fram), annars ur matcherna.
+  // Lagets fem senaste i matchen: ur matchens fil, med Europacuperna, och ur
+  // matcherna tills den har hämtats (eller om den inte gick att hämta).
   function formOf(D, m, side) {
     const d = D.match.get(m.id);
     const T = d && d.teams && d.teams[side];
@@ -163,8 +163,8 @@ window.RumAnslag = (() => {
     return form(D.teams.get(m[side]), m[side], Date.parse(m.kickoff));
   }
   // Dagar sedan lagets förra match före avspark: ur matchens fil, i alla
-  // tävlingar med Europacuperna, när den har hämtats (som formen), annars ur
-  // matcherna.
+  // tävlingar med Europacuperna, och som formen ur matcherna tills den har
+  // hämtats.
   function rest(D, m, side) {
     const d = D.match.get(m.id);
     const S = d && d.teams && d.teams[side] && d.teams[side].schedule;
@@ -571,8 +571,9 @@ window.RumAnslag = (() => {
       });
       return A.loading;
     }
-    // matchernas filer (formen, skadorna) hämtas när tavlan tas fram, och de
-    // som kommer nära varandra ritas tillsammans
+    // matchernas filer (formen, vilan, skadorna) hämtas med rummet, så att
+    // lapparna på väggen räknar med Europacuperna redan innan tavlan tas fram,
+    // och de som kommer nära varandra ritas tillsammans
     function rita() {
       if (A.ritT) return;
       A.ritT = setTimeout(() => {
@@ -1425,7 +1426,7 @@ window.RumAnslag = (() => {
           A.all = all || [];
           A.byTeam = byTeam(A.all);
         }
-        if (A.on) loadMatches();
+        loadMatches();
         loadTeams();
         if (window.Skoldar && Skoldar.ready && !A.crests) {
           A.crests = true;
