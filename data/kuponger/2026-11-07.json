@@ -1,0 +1,20 @@
+{
+  "namn": "Näten på City Ground håller fint",
+  "spel": "Stryktipset",
+  "skapad": "2026-11-07T14:15:04.769Z",
+  "matcher": [
+    { "id": "401878757", "match": "Nottingham Forest – Manchester City", "tecken": "2" },
+    { "id": "401878760", "match": "Arsenal – Hull City", "tecken": "1X" },
+    { "id": "401879241", "match": "Fulham – Newcastle United", "tecken": "1" },
+    { "id": "401880171", "match": "Blackburn Rovers – West Ham United", "tecken": "X2" },
+    { "id": "401880172", "match": "Birmingham City – Swansea City", "tecken": "1" },
+    { "id": "401880169", "match": "Cardiff City – Burnley", "tecken": "1" },
+    { "id": "401880168", "match": "Charlton Athletic – Sheffield United", "tecken": "1X2" },
+    { "id": "401880165", "match": "Preston North End – Southampton", "tecken": "X2" },
+    { "id": "401880164", "match": "Queens Park Rangers – Lincoln City", "tecken": "1X" },
+    { "id": "401880163", "match": "Watford – Middlesbrough", "tecken": "1X2" },
+    { "id": "401880162", "match": "West Bromwich Albion – Millwall", "tecken": "1X2" },
+    { "id": "401931120", "match": "Crewe Alexandra – AFC Wimbledon", "tecken": "1X2" },
+    { "id": "401931121", "match": "Oxford United – Stevenage", "tecken": "1X" }
+  ]
+}
