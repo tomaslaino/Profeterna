@@ -1082,6 +1082,7 @@ window.RumHasse = (() => {
     const r = x.lista[x.i];
     const n = x.lista[x.i + 1];
     if (!n) return 250;
+    if (r.paus) return r.paus;
     if (n.ny !== false) return 850;
     // en paus innan poängen
     return n.text.length < 30 || /…$/.test(r.text) ? 800 : 400;
@@ -1382,6 +1383,7 @@ window.RumHasse = (() => {
     if (forstaText) rad(forstaText);
     const dag = spelstopp(lista);
     H.prat = lista.length && forsta ? { rader: medDag(REP().ledig, dag), i: 0, nasta: performance.now() + 24000, gang: 24000 } : null;
+    if (lista.length && !lista.some((m) => Date.parse(m.avspark) > nu)) efterat(lista, fragat);
     klick();
   }
   // Det han sa om matchen, på dess rad: rutorna 1 X 2 som på kupongen med hans tecken ifyllda,
@@ -1436,7 +1438,7 @@ window.RumHasse = (() => {
     if (!lista.length) return r.ingenKupong;
     const nu = Date.now();
     const oppna = lista.filter((m) => Date.parse(m.avspark) > nu);
-    // när alla matcher har börjat säger han inget
+    // när alla matcher har börjat säger han hur det gick (efterat)
     if (!oppna.length) return null;
     const n = lista.filter((m) => fragat[m.id]).length;
     const namn = dittNamn();
@@ -1449,6 +1451,82 @@ window.RumHasse = (() => {
     if (oppna.length - n === 1) return r.enKvar;
     if (n === Math.ceil(oppna.length / 2)) return lott(r.halva);
     return lott(r.antal[n] || r.nasta);
+  }
+
+  // ---------- hur det gick ----------
+  //
+  // När alla matcher har börjat säger han hur det gick för honom, på sitt sätt (efter i
+  // rum-hasse-repliker.js). Det som räknas är hans kupong i tävlingen om han spelade omgången
+  // (data/tippare.json), annars det han har sagt till dig, alltså raderna i listan. Rättningen är
+  // poängtavlans (tpRows i tippare.js), så om matcher du har valt att dölja säger han inget. Hur det gick
+  // följer poängen, antal rätt mot vad chanserna var värda (i standardavvikelser): på en hel kupong med
+  // garderingar är nio rätt av tretton dåligt, och på sex ensamma tecken är fyra rätt bra. Bra kräver också
+  // fler rätt än fel, även när skrällarna satt.
+  const BRA = 0.6;
+  // Hans tecken i tävlingen i de här matcherna: {matchens id: tecken}.
+  function hansKupong(lista) {
+    const t = typeof TP !== 'undefined' && TP.season;
+    if (!t || typeof Tippoang === 'undefined') return {};
+    const alla = { ...t.hasse };
+    for (const r of t.rounds || []) for (const m of r.matches || []) if (m.tips && m.tips[Tippoang.HASSE.id]) alla[m.id] = m.tips[Tippoang.HASSE.id];
+    return Object.fromEntries(lista.filter((m) => alla[m.id]).map((m) => [m.id, alla[m.id]]));
+  }
+  // Hans plats i gänget när omgången är klar: 'best', 'worst' eller inget.
+  function hansPlats(lista) {
+    const ids = new Set(lista.map((m) => m.id));
+    const r = ((TP.season && TP.season.rounds) || []).find((x) => (x.matches || []).some((m) => ids.has(String(m.id))));
+    const nu = TP.round && TP.round.matcher && TP.round.matcher.some((m) => ids.has(String(m.id)));
+    const folk = r ? r.people : nu && typeof tpScore === 'function' ? tpScore(TP.round, Date.now()).ranked : null;
+    const han = (folk || []).find((p) => p.id === Tippoang.HASSE.id);
+    return han ? han.award : null;
+  }
+  // Resultatet i någon av raderna i listan som han sa exakt, eller null. Matcher du döljer räknas inte.
+  function sagtExakt(lista, fragat) {
+    for (const m of lista) {
+      const res = String(fragat[m.id] || '').split(' ')[1];
+      if (!res) continue;
+      const r = gradeRow({ id: m.id, sign: '1X2', label: m.namn }, Date.now());
+      const s = r.state === 'final' && ((r.m && r.m.score90) || r.score);
+      if (s && `${s.home}–${s.away}` === res) return res;
+    }
+    return null;
+  }
+  // → { lage: en av listorna i efter, ok, n, plats, exakt } eller null om det inte går att säga något.
+  function hurDetGick(lista, fragat) {
+    if (typeof tpRows !== 'function' || typeof Tippoang === 'undefined') return null;
+    const kupong = hansKupong(lista);
+    const spelade = Object.keys(kupong).length > 0;
+    const tecken = spelade ? kupong : Object.fromEntries(lista.filter((m) => fragat[m.id]).map((m) => [m.id, fragat[m.id].split(' ')[0]]));
+    if (!Object.keys(tecken).length) return { lage: 'ofragad' };
+    const rader = tpRows({ matcher: lista.map((m) => ({ id: m.id, match: m.namn })) }, tecken, Date.now())
+      .filter((r) => r && r.state !== 'off' && r.state !== 'missing');
+    if (!rader.length) return null;
+    if (rader.some((r) => r.state === 'hidden')) return { lage: 'dolt' };
+    if (rader.some((r) => r.pts == null)) return { lage: 'pagar' };
+    const { n, ok, pts } = Tippoang.tally(rader);
+    const spridning = Math.sqrt(rader.reduce((a, r) => a + r.prob * (1 - r.prob), 0));
+    const z = spridning ? pts / spridning : 0;
+    const lage = n >= 3 && !ok ? 'inget' : n >= 3 && ok === n && spridning ? 'alla' : z >= BRA && ok * 2 > n ? 'bra' : z <= -BRA ? 'daligt' : 'mitten';
+    return { lage, n, ok, plats: spelade ? hansPlats(lista) : null, exakt: sagtExakt(lista, fragat) };
+  }
+  // Vad han gör när han har sagt sitt.
+  const EFTER_GEST = { alla: 'skrocka', bra: 'skrocka', mitten: 'brynet', daligt: 'suck', inget: 'suck', pagar: 'smacka', dolt: 'brynet', ofragad: 'notan' };
+  function efterat(lista, fragat) {
+    const e = REP().efter;
+    // (en äldre rum-hasse-repliker.js i cachen har inga rader om det)
+    const g = e && hurDetGick(lista, fragat);
+    if (!g) return;
+    const rader = e[g.lage];
+    const plats = g.plats === 'best' ? e.forst : g.plats === 'worst' ? e.sist : null;
+    const sagt = [];
+    // (en stund att läsa hur många rätt han hade, innan poängen kommer)
+    if (g.ok != null) sagt.push({ text: fyll(e.ratt, { ratt: REP().tal[g.ok], av: REP().tal[g.n] }), paus: 1500 });
+    sagt.push({ text: lott(plats || rader) });
+    repliker(sagt, { i: $('.rh-sagt'), rad: true, direkt: calm(), sen: () => gest(EFTER_GEST[g.lage]) });
+    // och efter en stund: det exakta resultatet, om han sa något, och mer om hur det gick
+    const sedan = g.exakt ? [fyll(lott(e.exakt), { res: g.exakt })] : [];
+    for (let i = plats ? 3 : 2; i > 0; i--) sedan.push(lott(rader));
+    H.prat = { rader: sedan, i: 0, nasta: performance.now() + 24000, gang: 24000 };
   }
 
   // Du pekar ut en match och han frågar tillbaka. Först när du ber om det kommer analysen

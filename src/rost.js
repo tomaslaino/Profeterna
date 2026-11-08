@@ -4,7 +4,8 @@
 // det hörs (public/rum-hasse.js). Han säger två slags saker:
 //   - de färdiga replikerna i public/rum-hasse-repliker.js, med fälten ifyllda
 //     ({namn} efternamnen i gänget, {dag} när spelstoppet är, {du} och {Bada}
-//     tecken i ord, {res} resultatet 0–0 till 4–4), och
+//     tecken i ord, {res} resultatet 0–0 till 4–4, {ratt} och {av} hur många rätt
+//     han hade av hur många), och
 //   - sin text till varje analys i data/analyser.json (hasse.stycken), mening för
 //     mening, delad som sidan delar den (public/rum-hasse-meningar.js).
 //
@@ -55,8 +56,10 @@ const stor = (t) => t.replace(/^./, (c) => c.toUpperCase());
 const DAGAR = ['i dag', 'i morgon', ...['måndag', 'tisdag', 'onsdag', 'torsdag', 'fredag', 'lördag', 'söndag'].map((d) => `på ${d}`)];
 // Resultaten han kan säga: modellens resultatmatris har 0–4 mål per lag (resultatet i rum-hasse.js).
 const RESULTAT = [0, 1, 2, 3, 4].flatMap((h) => [0, 1, 2, 3, 4].map((b) => `${h}–${b}`));
-// Knapparna (lar) och tecknen i ord sägs inte, och inte heller att han har tappat rösten.
-const TYSTA = new Set(['lar', 'tecken', 'utanRost']);
+// Hur många rätt han kan ha haft av hur många: en till tretton matcher (efterat i rum-hasse.js).
+const RATT = repliker.tal.slice(1).flatMap((av, i) => repliker.tal.slice(0, i + 2).map((ratt) => [ratt, av]));
+// Knapparna (lar), tecknen och talen i ord sägs inte, och inte heller att han har tappat rösten.
+const TYSTA = new Set(['lar', 'tecken', 'tal', 'utanRost']);
 
 function mallar(o, ut = [], nyckel = '') {
   if (TYSTA.has(nyckel)) return ut;
@@ -77,6 +80,7 @@ function repliktexter(gang = []) {
     if (falt.has('namn')) med(namn, (o, v) => ({ ...o, namn: v }));
     if (falt.has('dag')) med(DAGAR, (o, v) => ({ ...o, dag: v }));
     if (falt.has('res')) med(RESULTAT, (o, v) => ({ ...o, res: v }));
+    if (falt.has('ratt')) med(RATT, (o, [ratt, av]) => ({ ...o, ratt, av }));
     if (falt.has('Bada')) {
       // ni har två tecken var och ett gemensamt, i bestämd form: "Ettan kan du behålla"
       const par = MANGDER.filter((du) => du.length === 2).flatMap((du) => du.map((b) => [du, b]));

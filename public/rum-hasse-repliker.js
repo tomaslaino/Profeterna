@@ -13,7 +13,8 @@
 // läggs till där.
 //
 // {namn} ditt efternamn, {dag} när spelstoppet är (på lördag, i morgon, i dag),
-// {du} dina tecken (etta och kryss), {Bada} tecknet ni båda har (Ettan), {res} resultatet (2–1).
+// {du} dina tecken (etta och kryss), {Bada} tecknet ni båda har (Ettan), {res} resultatet (2–1),
+// {ratt} och {av} hur många rätt han hade av hur många, i ord (två, sex).
 //
 // Raderna hörs: Macen tar fram ljudet till dem med fälten ifyllda
 // (src/rost.js), så filen är både ett skript i sidan
@@ -24,6 +25,8 @@
 })({
   // Tecknen i ord, för sidan och rösten: du som i "etta och kryss", bestamd som i "Ettan kan du behålla".
   tecken: { 1: { du: 'etta', bestamd: 'ettan' }, X: { du: 'kryss', bestamd: 'krysset' }, 2: { du: 'tvåa', bestamd: 'tvåan' } },
+  // Talen i ord, för {ratt} och {av}.
+  tal: ['noll', 'en', 'två', 'tre', 'fyra', 'fem', 'sex', 'sju', 'åtta', 'nio', 'tio', 'elva', 'tolv', 'tretton'],
 
   // När man kommer till honom.
   oppning: ['Vilken match ska jag hjälpa dig med?', 'Vilken match har du kört fast på?'],
@@ -45,6 +48,110 @@
   // ... när alla är klara, nyss och när man kommer tillbaka.
   alla: 'Nu är hela kupongen klar. Lämna in den.',
   allaIgen: ['Du har redan fått svar på alla matcher.', 'Du har redan fått svar på alla matcher. Du kunde ha lyssnat.', 'Alla matcher har du fått svar på. Du får lyssna nästa gång.'],
+
+  // När alla matcher har börjat: hur det gick för honom (efterat i rum-hasse.js). Han tvivlar aldrig:
+  // går det bra hade han rätt, och går det dåligt var det matcherna som hade fel. Först säger han ratt,
+  // och sedan en rad ur listan för hur det gick. Efter en stund säger han fler rader ur samma lista.
+  // Varje rad ska också gå att förstå ensam, och den ska kunna följa efter "Jag hade två rätt av sex."
+  efter: {
+    ratt: 'Jag hade {ratt} rätt av {av}.',
+    // Allt satt.
+    alla: [
+      'Så här ska en kupong se ut.',
+      'Alla matcher slutade som jag sa. Jag är inte förvånad.',
+      'Jag har inget att tillägga om den här omgången.',
+      'Nu har du sett hur det går till.',
+      'Du behöver inte tacka mig för tipsen.',
+    ],
+    // Fler rätt än chanserna var värda.
+    bra: [
+      'Vad var det jag sa?',
+      'Facit stämde med mig. Det var bra för facit.',
+      'Matcherna slutade som jag sa. Det brukar de göra.',
+      'Jag sa hur det skulle gå. Det vill jag bara ha sagt.',
+      'Den här omgången var inte svårare än så.',
+      'Spelbolagen borde ha frågat mig.',
+      'Spelbolagen hade fel, som vanligt.',
+      'De matcher jag missade spelades fel.',
+      'Nu vet du vem du ska fråga nästa gång.',
+      'Det är orsak och verkan. Mer än så är det inte.',
+    ],
+    // Ungefär som chanserna var värda.
+    mitten: [
+      'Allt blev som jag sa, utom det som blev något annat.',
+      'Där jag hade fel var det matchen som hade fel.',
+      'Jag hade rätt där det gick att ha rätt.',
+      'Några av lagen hade inte lyssnat på mig.',
+      'De matcher jag missade spelades fel.',
+      'Jag hade rätt, och några av lagen hade fel.',
+      'Det går inte att gardera sig mot domarna.',
+      'Jag räknar inte de matcher som spelades fel.',
+    ],
+    // Färre rätt än chanserna var värda.
+    daligt: [
+      'Analysen står jag för. Resultaten får lagen stå för.',
+      'Tipsen var rätt. Det var matcherna som slutade fel.',
+      'Spelarna hade inte läst mina analyser.',
+      'Det är orsak och verkan, och orsaken är inte jag.',
+      'Jag har haft fel en gång förut. Det här räknar jag inte.',
+      'Lagen har en del att förklara efter den här omgången.',
+      'Jag hade rätt. Verkligheten hade en dålig dag.',
+      'Det var inget fel på mina tips. Det var fel på målen.',
+      'Man måste låta spelbolagen vinna ibland.',
+      'Jag gav lagen en chans, men de tog den inte.',
+      'Jag sa hur det skulle gå, men lagen lyssnade inte.',
+      'Fotbollen hade fel den här omgången.',
+      'Efteråt är alla kloka. Jag var det redan före.',
+      'Tipsen var rätt tänkta, och det är det som räknas.',
+    ],
+    // Inget satt.
+    inget: [
+      'Alla matcher slutade fel. Det är mycket ovanligt.',
+      'Noll rätt säger mer om matcherna än om mig.',
+      'Noll rätt är svårare än man tror.',
+      'Inte ett enda lag spelade som jag sa.',
+      'Jag har aldrig sett en så felspelad omgång.',
+    ],
+    // I tävlingen, när omgången är klar: bäst och sämst i gänget. Säger han i stället för första raden ovan.
+    forst: [
+      'Jag slog hela gänget. Det är inget att orda om.',
+      'Gänget kan skriva av mig nästa gång. Det är ingen skam.',
+      'Nu har gänget sett hur det går till.',
+    ],
+    sist: [
+      'Att jag kom sist i gänget beror på matcherna.',
+      'Jag kom sist i gänget, men jag tippade rätt.',
+      'Någon måste komma sist i gänget. Jag ställde upp.',
+    ],
+    // Han sa det exakta resultatet i en av matcherna i listan: det säger han efter en stund.
+    exakt: [
+      'Jag sa {res}, och matchen slutade {res}. Så är det bara.',
+      'En match slutade {res}, precis som jag sa.',
+    ],
+    // Matcherna som räknas har inte slutat än.
+    pagar: [
+      'Matcherna pågår, men jag behöver inte titta.',
+      'Jag vet redan hur matcherna slutar.',
+      'Lagen spelar, och jag dricker mitt kaffe.',
+      'Matcherna är bara en formsak nu.',
+      'Du behöver inte titta. Jag har redan sagt hur det går.',
+    ],
+    // Du har valt att dölja resultat: inget här får avslöja hur det gick.
+    dolt: [
+      'Jag vet hur det gick, men du har valt att inte veta.',
+      'Du har dolt resultaten, så jag säger ingenting.',
+      'Hur det gick får du inte veta av mig.',
+      'Jag säger inget om omgången. Jag ser alltid ut så här.',
+    ],
+    // Du frågade inte om någon match, och han spelade inte själv.
+    ofragad: [
+      'Alla matcher har börjat. Du kunde ha frågat mig i tid.',
+      'Du frågade inte om en enda match. Så kan man också göra.',
+      'Nu är det för sent att fråga om den här omgången.',
+      'Nästa omgång får du fråga mig i tid.',
+      'Du klarade dig utan mig den här omgången. Hur gick det?',
+    ],
+  },
 
   // Om man bara står där och inte frågar.
   ledig: ['Jag sitter kvar här.', 'Välj vilken match du vill. Alla är lätta.', 'Spelstoppet är {dag}.'],
