@@ -45,7 +45,8 @@ const KAMP_MODELL = '#9d9383';
 
 // ---------- omgångarna ----------
 
-// Gänget i tjänstens ordning, och den som bara finns i en gammal omgång sist.
+// Gänget i tjänstens ordning, den som bara finns i en gammal omgång och sist Hasse
+// Backe, som också är med innan han har tippat.
 function kampGang(rounds) {
   const list = (((KP.data && KP.data.samtal && KP.data.samtal.gang) || [])).map((g) => ({ id: g.id, name: g.namn || g.id, bild: g.bild }));
   for (const r of rounds) {
@@ -55,6 +56,7 @@ function kampGang(rounds) {
   if (!list.length && typeof KRONAN_KROPPAR !== 'undefined') {
     for (const [id, k] of Object.entries(KRONAN_KROPPAR)) list.push({ id, name: k.namn || id });
   }
+  if (!list.some((g) => g.id === Tippoang.HASSE.id)) list.push({ id: Tippoang.HASSE.id, name: Tippoang.HASSE.namn });
   return list.map(({ bild, ...g }, i) => ({ ...g, color: KAMP_FARG[i % KAMP_FARG.length], deep: KAMP_DJUP[i % KAMP_DJUP.length], img: bild || KAMP_BILD[g.id] || null }));
 }
 

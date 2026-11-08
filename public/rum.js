@@ -1484,7 +1484,8 @@ ${window.RumRegister ? RumRegister.nara() : ''}
   // Skårtavlan: Tipsligan, säsongens ställning i gänget – samma poäng som
   // ställningen i Olympen (kampRounds i kampen.js, med omgången som pågår),
   // lika placering vid lika poäng och antal rätt. Efternamnen, och Dogge för
-  // Johansson. Före första omgången står bara namnen där.
+  // Johansson. Före första omgången står bara namnen där, och den som inte har
+  // tippat än (Hasse Backe före sin första omgång) står sist utan poäng.
   // En plastbokstav per tecken, var och en lite sned i sitt spår (samma frö
   // varje gång, så att inget flyttar sig när tavlan fylls om). Lådan har
   // fyra O – sedan får det bli nollor.
@@ -1496,11 +1497,13 @@ ${window.RumRegister ? RumRegister.nara() : ''}
     if (people.length) {
       let rank = 0;
       let prev = null;
-      return people.map((p, i) => {
+      const rader = people.map((p, i) => {
         const key = Tippoang.key(p);
         if (key !== prev) { rank = i + 1; prev = key; }
         return { name: tavelnamn(p), rank, pts: tpPts(p.pts) };
       });
+      const utan = typeof kampGang === 'function' ? kampGang(rounds).filter((g) => !people.some((p) => p.id === g.id)) : [];
+      return [...rader, ...utan.map((g) => ({ name: tavelnamn(g), rank: people.length + 1 }))];
     }
     return (typeof kampGang === 'function' ? kampGang(rounds) : []).map((g) => ({ name: tavelnamn(g) }));
   }
