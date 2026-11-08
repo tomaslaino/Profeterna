@@ -187,6 +187,8 @@
 .rh-kupong { position: absolute; left: 0; top: 0; width: 660px; height: 470px; box-sizing: border-box; padding: 0 22px 0 46px; transform-origin: 0 0; background: linear-gradient(180deg, #f3e9d4, #e7dbc0); color: #2b241b; box-shadow: 0 3px 5px rgba(0, 0, 0, 0.55), 0 14px 24px rgba(0, 0, 0, 0.32); text-shadow: none; line-height: normal; cursor: pointer; pointer-events: auto; outline: none; -webkit-tap-highlight-color: transparent; }
 .rh-kupong.ror { will-change: transform; pointer-events: none; }
 .rh-kupong.over { z-index: 5; box-shadow: 0 30px 60px rgba(0, 0, 0, 0.55); }
+/* På natten ligger kupongen i samma mörker som pulten (natten i rum-hasse-arm.js), men går att läsa */
+.rh-kupong::before { content: ""; position: absolute; inset: 0; z-index: 20; pointer-events: none; background: #080608; opacity: calc(0.42 * var(--natt, 0)); }
 .rum.smal .rh-kupong { width: 420px; height: 620px; padding: 0 16px 0 36px; }
 /* Hans kryss: samma blyerts med mer tryck, ut över rutans kanter (slarv i rum.js) */
 .rum-kup .kryss.hasse path { stroke-width: 2.8; opacity: 0.92; }

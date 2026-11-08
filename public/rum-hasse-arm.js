@@ -24,10 +24,17 @@ export const ATLAS = { W: 1372, H: 1350, X0: 280, Y0: 130, TW: 860, TH: 1350, rx
 // Riktningarna är i figurens värld; VY är riktningen mot kameran (rum-hasse-scen.js).
 // fotoLjus() är ljuset som fotot redan har, så att en vriden yta får rätt skillnad.
 const VY = kamera().bak.map((x) => x.toFixed(3)).join(', ');
-export const LJUS = `
+// Natten: lysröret är släckt och det är inte ljust ute (i baren, uButik). Då är bara neonen, gatan och
+// cigarrens glöd kvar, som i rummet (.natt .rum-mork i rum-folk.css). ton() mörkar allt till 42 %. Inte lika
+// mörkt som rummet (en fjärdedel), så att man fortfarande ser honom när man pratar.
+const NATT_GLSL = `
 uniform float uButik;
 uniform vec4 uDag;
 uniform vec4 uLys;
+float nattGrad() { return uButik * (1. - step(.01, uLys.w)) * (1. - uDag.w); }
+float natten() { return mix(1., .42, nattGrad()); }
+`;
+export const LJUS = `${NATT_GLSL}
 const vec3 NYCKEL = vec3(-.449, .549, .699);
 const vec3 NEON = vec3(.702, .12, .702);
 const vec3 GATA = vec3(.54, .19, .82);
@@ -49,9 +56,10 @@ vec3 ljus(vec3 n) {
   float f = clamp(dot(ns, FONSTER) * .6 + .4, 0., 1.);
   float dag = uDag.w;
   float lys = uLys.w;
+  float natt = nattGrad();
   vec3 b = l * vec3(.95, .93, .92) * (1. + .16 * lys) * (1. - .5 * dag)
-    + vec3(.27, .027, .022) * r * r * r * (1. - .55 * lys) * (1. - .7 * dag)
-    + vec3(.06, .085, .14) * g * g * (1. - lys) * (1. - dag)
+    + vec3(.27, .027, .022) * r * r * r * (1. - .55 * lys) * (1. - .7 * dag) * (1. + .4 * natt)
+    + vec3(.06, .085, .14) * g * g * (1. - lys) * (1. - dag) * (1. + 1.6 * natt)
     + uLys.rgb * (.1 + .62 * d * d) * (1. - .5 * dag)
     + uDag.rgb * (.08 + .95 * f * f);
   return mix(l, b, uButik);
@@ -63,7 +71,7 @@ vec3 kant(vec3 n, float styrka) {
   return vec3(1., .74, .50) * styrka * f * f * f * max(0., dot(n, bak) + .25)
     + vec3(1., .12, .08) * styrka * uButik * f * f * max(0., dot(n, NEON)) * .8;
 }
-vec3 ton(vec3 c) { return c * (1.03 - .15 * c); }
+vec3 ton(vec3 c) { c *= natten(); return c * (1.03 - .15 * c); }
 `;
 
 // Disken (rum-hasse-3d.js, rum-hasse-scen.js): dess bakre plan n·(x, z) = c (uBord.xy och z) och
@@ -812,7 +820,7 @@ void main() {
   float glod = exp(-pow((y - G0 + .8) / 2.4, 2.)) * (.45 + .55 * f);
   glod += smoothstep(L - 1.5, L, y) * smoothstep(.55, .8, f) * uGlod * .8;
   glod += exp(-pow((y - G0 - 4.) / 4., 2.)) * smoothstep(.62, .85, f) * uGlod * .5;
-  ut += vec3(1., .3, .05) * glod * (.22 + 1.5 * uGlod);
+  ut += vec3(1., .3, .05) * glod * (.22 + 1.5 * uGlod) / natten();
   gl_FragColor = vec4(ton(ut), 1.);
 }`;
 export function byggCigarr(bord = ingenBord()) {
@@ -860,7 +868,7 @@ void main() {
 export function byggPenna(bord = ingenBord()) {
   const { L, R, TRA } = PENNA;
   const g = new THREE.LatheGeometry(V2([[0, 0], [0.9, 0.6], [R, TRA], [R, L - 1], [R - 2, L], [0, L + 0.2]]), 12);
-  const U = { uBord: bord, uButik: bord.butik || BUTIK_AV };
+  const U = { uBord: bord, uButik: bord.butik || BUTIK_AV, uDag: DAG, uLys: LYS };
   const mesh = new THREE.Mesh(g, new THREE.ShaderMaterial({ uniforms: U, vertexShader: CIG_V, fragmentShader: PEN_F, transparent: true, blending: THREE.CustomBlending, blendSrc: THREE.OneFactor, blendDst: THREE.OneMinusSrcAlphaFactor }));
   mesh.renderOrder = 6;
   mesh.frustumCulled = false;
@@ -970,6 +978,7 @@ const ROK_V = `attribute vec4 aP; attribute vec3 aR; varying vec2 vH; varying ve
 void main() { vH = position.xy; vR = aR; vW = aP.xyz; vec4 c = viewMatrix * vec4(aP.xyz, 1.); c.xy += position.xy * aP.w; gl_Position = projectionMatrix * c; }`;
 const ROK_F = `precision highp float;
 varying vec2 vH; varying vec3 vR; varying vec3 vW;
+${NATT_GLSL}
 ${BORD_GLSL}
 ${BRUS_GLSL}
 void main() {
@@ -980,7 +989,7 @@ void main() {
   float b = brus(q) * .6 + brus(q * 2.3 + 4.1) * .4;
   float a = vR.x * (1. - smoothstep(.15, 1., r)) * (.35 + 1.1 * b);
   // blå rök från glöden, grå när han blåser ut
-  vec3 c = mix(vec3(.6, .64, .74), vec3(.8, .77, .73), vR.z);
+  vec3 c = mix(vec3(.6, .64, .74), vec3(.8, .77, .73), vR.z) * natten();
   gl_FragColor = vec4(c * a, a);
 }`;
 export function byggRok(N = 240, bord = ingenBord()) {

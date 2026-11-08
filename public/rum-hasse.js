@@ -195,6 +195,7 @@ window.RumHasse = (() => {
     const l = ljuset();
     H.ljus = l;
     H.vy.classList.toggle('lys', l.lys);
+    H.vy.style.setProperty('--natt', l.lys ? '0' : (1 - l.dag).toFixed(2));
     if (H.m && H.m.DAG) {
       // fönstret i figurens ljus (rum-hasse-arm.js), och lysröret som förut
       H.m.DAG.value.set(...l.c.map((x) => x * l.f * 0.8), l.dag);

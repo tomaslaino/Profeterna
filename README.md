@@ -4582,7 +4582,7 @@ Från sex på morgonen till midnatt är lysröret i affärens tak tänt, som i r
 är då en egen bild spårad med röret framför baren och affären i dess sken till höger
 (`hasse-bak-lys.webp`), och figuren, disken och koppen får ett brett ljus från affären och lite mer
 ljus överallt (`uLys` i `LJUS`, `LYS`), medan neonen och gatans kalla ljus syns mindre. Mellan midnatt
-och sex är lysröret släckt och väggen ligger i neonskyltens och gatans svaga sken (`hasse-bak.webp`).
+och sex är lysröret släckt och väggen ligger i neonskyltens och gatans svaga sken (`hasse-bak.webp`). Då mörknar också han, pulten, kaffet, notan, röken och din kupong till ungefär 40 % (`natten` i `LJUS`, `--natt` på kupongen), inte lika mörkt som rummet så att man ser honom när man pratar, och bara cigarrens glöd lyser som vanligt. När det ljusnar ute på sommaren kommer ljuset tillbaka gradvis.
 
 Dagsljuset faller in genom affärens stora fönster till höger, efter samma klocka och väder som utsikten
 i rummet (`RumUte.light`): så starkt som det är ljust ute, och i himlens färg nere vid taken, men vitare,
