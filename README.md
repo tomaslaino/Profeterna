@@ -4430,7 +4430,7 @@ Den är en låda i CSS 3D – framsidan, sidorna med springor, taket och skuggan
 disken – i rummets eget perspektiv (1000 bildpunkter från flyktpunkten 760, 400, som högra
 väggen), vriden 112 grader mot gänget mitt i rummet och så långt in längs väggen att den
 ryms i bilden; i det perspektivet ser en tv som bara är vriden lite ut att stå rakt mot en.
-Under rutan sitter kassettfacket, displayen och knapparna ◀◀ ▶ ▶▶ ❚❚ ■ ⏏. Repriserna på VHS,
+Under rutan sitter kassettfacket och displayen, och till höger om rutan en spalt med knapparna ◀◀ ▶ ▶▶ ❚❚ ■ ⏏ under varandra, med högtalargaller över och under. Repriserna på VHS,
 också de lådor (ryggen, taket och ändarna), står i en fruktlåda i furu bredvid, lite längre
 in längs väggen: två fack med en mellanvägg (`MV`), tretton kassetter höga, med en tejpbit
 över varje fack – dagen för förra omgången (*LÖR 24/10*) och *INFÖR 31/10* – och ÄPPLEN ·
@@ -4468,8 +4468,8 @@ de står kvar vända mot gänget – utan det är kameran som rör sig (se *Kame
 Kassetterna glider ut en bit när man pekar på dem. I telefonen på höjden går kameran bara
 fram till lådan (`LADAN`), så att etiketterna går att läsa; där tar en kassett (eller ett
 tryck på kanten av tv:n bredvid lådan) kameran vidare till rutan. I telefonen, på höjden och på bredden, spelas en kassett alltid med rutan i hela fönstret. Ett klick på rutan (eller hjulet framåt)
-går ännu närmare, så att bilden i rutan nästan fyller fönstret (med en smal svart kant runt
-om, så att bildens gräns syns; i telefonen på höjden syns knapparna under den), och kameran
+går ännu närmare, så att bilden i rutan och spalten med knapparna nästan fyller fönstret (med en smal kant
+runt om, så att bildens gräns syns; knapparna står inom bildens höjd och går att trycka på också här), och kameran
 svänger och går rakt framför tv:n, så att rutan syns rakt framifrån. Texten i rutan (*STOPP*,
 *▶ SPELA*) står inne i bilden, så att den syns där. Ett klick till, hjulet bakåt eller Esc går
 tillbaka till tv:n och lådan, och V,
@@ -4524,7 +4524,7 @@ rum-video.js): spelaren följer efter.
 I telefonen på höjden räknas kameran så att hela knappraden får plats (`TATH`), med rutan lite
 mindre än fönstret, och ett tryck en bit under en knapp räknas också.
 
-**Tangenterna.** Nära (och när rutan fyller fönstret, där knapparna inte syns) styrs videon
+**Tangenterna.** Nära (och när rutan fyller fönstret) styrs videon också
 med tangentbordet: ← och → som ◀◀ och ▶▶, mellanslaget pausar när den spelar och spelar annars,
 S stoppar som ■, ↑/↓ byter kassett och Esc går tillbaka; en nedtryckt tangent räknas som ett tryck;
 utan kassett flyttar ↑/↓ markeringen i listan och ←/→ byter sida.

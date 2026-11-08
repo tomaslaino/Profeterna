@@ -12,7 +12,8 @@
 // matchens höjdpunkter i rutan (samma klipp som spelaren på sajten,
 // hojdpunkter.js).
 //
-// Knapparna under rutan, ◀◀ ▶ ▶▶ ❚❚ ■ ⏏, gör det de gör på en riktig video:
+// Knapparna i spalten till höger om rutan, ◀◀ ▶ ▶▶ ❚❚ ■ ⏏, gör det de gör på en
+// riktig video (de går att nå också när bilden är inzoomad, TAT):
 //
 //              ▶            ❚❚        ◀◀ ▶▶                ■       ⏏
 //   stopp      spelar       –         spolar (blå bild)    –       matas ut
@@ -88,14 +89,19 @@ window.RumVideo = (() => {
   const pts = (list) => list.map(([x, y]) => `${r2(x)},${r2(y)}`).join(' ');
 
   // Måtten i hörnets enheter (scenens pixlar från O): tv:ns front, rutan,
-  // kassettfacket, displayen och knapparna, lådans front och kassetterna.
-  const TV = { x: 31, y: 41, w: 82, h: 75 };
-  const GLAS = { x: 38.5, y: 47, w: 67, h: 50.25 };
+  // kassettfacket, displayen, spalten med knapparna, lådans front och kassetterna.
+  const TV = { x: 31, y: 41, w: 84.8, h: 75 };
+  const GLAS = { x: 37, y: 47, w: 67, h: 50.25 };
   // den 16:9-stora bilden mitt i den 4:3-stora rutan
   const BILD = { x: GLAS.x, y: GLAS.y + (GLAS.h - GLAS.w * 9 / 16) / 2, w: GLAS.w, h: GLAS.w * 9 / 16 };
   const FACK = { x: 36, y: 103.2, w: 43, h: 6.6 };
-  const VFD = { x: 82, y: 102.6, w: 27, h: 5.2 };
-  const KNAPP = { x: 82, y: 109, w: 4.2, h: 3.6, d: 4.56 };
+  const VFD = { x: 87.4, y: 103.9, w: 27, h: 5.2 };
+  // Spalten till höger om rutan, lika hög som rutans ram. Knapparna står inom
+  // bildens höjd (BILD), mitt för den, så att de syns när bilden är inzoomad
+  // också i ett brett fönster (TAT), och så tätt (d, från en knapp till nästa)
+  // att ⏏ går fri från Tillbaka i ett lågt fönster.
+  const SPALT = { x: 108, y: GLAS.y - 3, w: 6.4, h: GLAS.h + 6 };
+  const KNAPP = { x: 108.9, y: 56.425, w: 4.6, h: 4.4, d: 5.4 };
   // tv:ns djup, och kassetternas (de ligger med ryggen åt samma håll som rutan)
   const DJUP = 40;
   const KAS = { w: 41, h: 5.67, d: 22.4 };
@@ -159,7 +165,8 @@ window.RumVideo = (() => {
   ];
   const CAP = 2 * FACKEN;
   // det kameran ska få med: tv:n och lådan – i telefonen på höjden bara
-  // lådan (LADAN), och närmare bilden i rutan, som fyller fönstret (fyll) –
+  // lådan (LADAN), och närmare bilden i rutan och spalten med knapparna, som
+  // fyller fönstret (fyll) –
   // i scenens mått, med kameran svängd; sv: rummets vridning, mitt: där
   // tv:n står i scenen (x), och kant: hörnets vänstra kant (lådan) hur
   // kameran än står
@@ -168,10 +175,7 @@ window.RumVideo = (() => {
   const HORN = { mitt: O[0] + syns(MITT)[0], kant: Math.min(...[{ horn: 0 }, SVANG.nara, SVANG.tat].map((s) => ruta(ALLT, 0, s.horn, s.oga).x0)) };
   const FOCUS = { ...ruta(ALLT, 6, SVANG.nara.horn), ...HORN, sv: SVANG.nara.rum };
   const LADAN = { ...FOCUS, ...ruta(LADORNA, 3, SVANG.nara.horn) };
-  const TAT = { ...ruta(horn(BILD.x, BILD.y, BILD.x + BILD.w, BILD.y + BILD.h, 0, 0), 0, SVANG.tat.horn, SVANG.tat.oga), z: 32, fyll: true, ...HORN, sv: SVANG.tat.rum };
-  // i telefonen på höjden syns knapparna under rutan: så att ⏏ också får plats
-  const TATK = KNAPP.x + 5 * KNAPP.d + KNAPP.w - (BILD.x + BILD.w / 2);
-  const TATH = { ...TAT, ...ruta(horn(BILD.x + BILD.w / 2 - TATK, BILD.y, BILD.x + BILD.w / 2 + TATK, BILD.y + BILD.h, 0, 0), 0, SVANG.tat.horn, SVANG.tat.oga) };
+  const TAT = { ...ruta(horn(BILD.x, BILD.y, SPALT.x + SPALT.w, BILD.y + BILD.h, 0, 0), 0, SVANG.tat.horn, SVANG.tat.oga), z: 32, fyll: true, ...HORN, sv: SVANG.tat.rum };
 
   const hash = (s) => {
     let a = 7;
@@ -195,7 +199,13 @@ window.RumVideo = (() => {
   const TRINITRON = { w: 496, d: 'M0 0H58M29 0V100M76 30V100M76 62C76 40 88 30 108 31M126 30V100M126 7v.1M152 30V100M152 62C152 40 164 30 180 30S206 40 206 60V100M230 30V100M230 7v.1M262 8V84C262 96 270 100 286 99M248 34H284M306 30V100M306 62C306 40 318 30 338 31M353 65A30 35 0 1 0 413 65A30 35 0 1 0 353 65M436 30V100M436 62C436 40 448 30 464 30S490 40 490 60V100' };
 
   // Framsidan: höljet, rutans ram med SONY mitt ovanför rutan och Trinitron
-  // under, kassettfacket, displayen och fötterna.
+  // under, spalten med högtalargaller över och under knapparna, kassettfacket,
+  // displayen och fötterna.
+  function galler(y0, y1) {
+    let d = '';
+    for (let y = y0; y < y1 - 0.2; y += 1.15) d += `M${r2(SPALT.x + 1.2)} ${r2(y)}H${r2(SPALT.x + SPALT.w - 1.2)}`;
+    return d;
+  }
   function tvSvg() {
     const { x, y, w, h } = TV;
     const g = GLAS;
@@ -208,8 +218,10 @@ window.RumVideo = (() => {
     <rect x="${x}" y="${y}" width="${w}" height="${h}" rx="2.4" fill="url(#vhs-dager)"/>
     <rect x="${g.x - 3}" y="${g.y - 3}" width="${g.w + 6}" height="${g.h + 6}" rx="3.4" fill="#0b0a0a" stroke="#34312d" stroke-width=".45"/>
     <rect x="${g.x - 0.8}" y="${g.y - 0.8}" width="${g.w + 1.6}" height="${g.h + 1.6}" rx="5.6" fill="#040404"/>
-    <path d="${SONY.d}" transform="translate(${r2(x + w / 2 - SONY.w * k / 2)} ${r2((y + g.y - 3) / 2 - 50 * k)}) scale(${k})" fill="url(#vhs-silver)"/>
+    <path d="${SONY.d}" transform="translate(${r2(g.x + g.w / 2 - SONY.w * k / 2)} ${r2((y + g.y - 3) / 2 - 50 * k)}) scale(${k})" fill="url(#vhs-silver)"/>
     <path d="${TRINITRON.d}" transform="translate(${r2(g.x + g.w / 2 - TRINITRON.w * kt / 2)} ${r2(g.y + g.h + 1.8 - 50 * kt)}) scale(${kt})" fill="none" stroke="#bdb8ae" stroke-width="15" stroke-linecap="round" stroke-linejoin="round"/>
+    <rect x="${SPALT.x}" y="${SPALT.y}" width="${SPALT.w}" height="${SPALT.h}" rx="2" fill="#100f0e" stroke="#34312d" stroke-width=".45"/>
+    <path d="${galler(SPALT.y + 2.2, KNAPP.y - 1.6)}${galler(KNAPP.y + 5 * KNAPP.d + KNAPP.h + 1.8, SPALT.y + SPALT.h - 1.8)}" fill="none" stroke="#2b2925" stroke-width=".5" stroke-linecap="round"/>
     <line x1="${x + 2}" y1="${f.y - 1.5}" x2="${x + w - 2}" y2="${f.y - 1.5}" stroke="#8a857b" stroke-width=".3" opacity=".55"/>
     <rect x="${f.x - 0.6}" y="${f.y - 0.6}" width="${f.w + 1.2}" height="${f.h + 1.2}" rx="1" fill="#4c4944"/>
     <rect x="${f.x}" y="${f.y}" width="${f.w}" height="${f.h}" rx=".7" fill="#030303"/>
@@ -417,7 +429,7 @@ window.RumVideo = (() => {
     if (part === 'pult') return pultSvg();
     // knapparna, med tangenterna som gör samma sak nära (key i mount)
     const knappar = [['bak', '◀◀', 'Spola tillbaka', 'ArrowLeft'], ['spela', '▶', 'Spela', 'Space'], ['fram', '▶▶', 'Spola fram', 'ArrowRight'], ['paus', '❚❚', 'Paus', 'Space'], ['stopp', '■', 'Stopp', 'S'], ['ut', '⏏', 'Mata ut']]
-      .map(([k, t, l, tg], i) => `<button type="button" class="vhs-k" data-vhs="${k}" aria-label="${l}"${tg ? ` aria-keyshortcuts="${tg}"` : ''} style="${at({ x: KNAPP.x + i * KNAPP.d, y: KNAPP.y, w: KNAPP.w, h: KNAPP.h })}">${t}</button>`).join('');
+      .map(([k, t, l, tg], i) => `<button type="button" class="vhs-k" data-vhs="${k}" aria-label="${l}"${tg ? ` aria-keyshortcuts="${tg}"` : ''} style="${at({ x: KNAPP.x, y: KNAPP.y + i * KNAPP.d, w: KNAPP.w, h: KNAPP.h })}">${t}</button>`).join('');
     // en kassett: ryggen med etiketten (kupongnumret, matchen och
     // resultatet), och taket och ändarna bakåt
     const kas = (a, b) => Array.from({ length: b - a }, (_, i) => `<div class="vhs-band" data-i="${a + i}" hidden>` +
@@ -649,8 +661,8 @@ window.RumVideo = (() => {
     const rutor = [...box.querySelectorAll('.vhs-sok img')];
     const vfd = box.querySelector('.vhs-vfd');
     // Tangenterna, med tangentbord och mus: nära står de i rummets fot
-    // (rum-video.css) – rutan fyller fönstret och knapparna syns inte – och
-    // knapparna säger sin när man pekar på dem, som sakerna i rummet (title).
+    // (rum-video.css), och knapparna säger sin när man pekar på dem, som
+    // sakerna i rummet (title).
     if (matchMedia('(hover: hover)').matches) {
       const fot = root.querySelector('.rum-ft');
       if (fot) fot.insertAdjacentHTML('afterbegin', '<span class="vhs-tangenter"><b>← →</b> spola · <b>mellanslag</b> spela/paus · <b>S</b> stopp · <b>↑ ↓</b> kassett</span>');
@@ -1620,9 +1632,10 @@ window.RumVideo = (() => {
       if (on) skarp(true);
       else V.skarpT = setTimeout(() => { if (!V.tat && !smal()) skarp(false); }, 900);
       box.classList.toggle('vhs-tat', on);
+      root.classList.toggle('vid-tat', on);
       runt(!on);
       sving(on ? SVANG.tat : SVANG.nara);
-      if (o.aim) o.aim(on ? (smal() ? TATH : TAT) : nara());
+      if (o.aim) o.aim(on ? TAT : nara());
       utanLada(on && V.cur != null);
       // i telefonen spelar den bara här
       if (!TELEFON.matches) return;
@@ -1782,6 +1795,7 @@ window.RumVideo = (() => {
         if (window.RumBak) RumBak.bort('rutan');
         if (on) tavlor();
         box.classList.remove('vhs-tat');
+        root.classList.remove('vid-tat');
         sving(on ? SVANG.nara : null);
         for (const s of styr) s.inert = !on;
         haller(on);
