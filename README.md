@@ -3408,7 +3408,7 @@ Därför:
   sidan slipper telefonen alltså rita gänget 30 gånger i sekunden (1920 × 840 bildpunkter
   med mjuka skuggor). Utan rörelser och i en fast bild ritas allt som förut.
 - **3D-delarna** (gänget, sakerna, inredningen och kortlådan) ritas i telefonen med 1,5
-  bildpunkter per punkt, utan kantutjämning och med skuggkartor på 1024 i stället för 2048
+  bildpunkter per punkt, och med skuggkartor på 1024 i stället för 2048
   (`LATT`). Gängets ansikten ritas där i halva storleken (512 × 576), och gänget sparar
   ingen extra kopia av bilden (`preserveDrawingBuffer`). Telefonen börjar dessutom på steg 1
   (se [När datorn inte hinner med](#när-datorn-inte-hinner-med)), där gänget och sakerna
@@ -3450,7 +3450,7 @@ var tionde bild längre än 50 ms (75 ms på steg 1).
 - **Steg 3:** samma takt, hälften av bildpunkterna på ledden, ungefär 190 000 trianglar och det
   enkla ljuset (`enkeltLjus` i rum-3d.js och rum-saker.js): ingen skuggkarta, ingen miljö, bara
   huvudlampan, neonen och fönstret plus mer ljus från himlen, och tygerna utan knottror och lack.
-  Figurerna på gatan rör sig i färre steg (`ute` i `KVAL`).
+  Figurerna på gatan rör sig i färre steg i datorn (`ute` i `KVAL`; i telefonen är gatan en duk, se nedan).
 
 Från steg 1 är det i datorn som i telefonen: ljuset utan blandningslägen, inget korn, och föremålen
 lyser upp direkt i stället för med en övergång av filtret (`.enkel` i rum.css).
@@ -3460,7 +3460,8 @@ och det är det som hackar mest. Med 4 GB minne eller 4 kärnor börjar det ett 
 eller 2 kärnor och med mjukvarugrafik på steg 3, och äldre grafikkretsar (Mali, Adreno, PowerVR, Intel
 HD/UHD) börjar på steg 1 eller 2. Safari säger inget om sådant, där får `kanna` känna efter. Går det under
 45 % av takten hoppar `kanna` direkt till steg 3. Kantutjämningen går inte att stänga av när
-grafiken väl har startat, så den är av när rummet börjar på steg 1 eller lägre.
+grafiken väl har startat, så i datorn är den av när rummet börjar på steg 1 eller lägre (i telefonen
+på steg 2 eller lägre, `kantutjamning` i rum.js).
 
 Steget sparas i webbläsaren (`rum-kval` i localStorage), så att nästa besök börjar där, i tre
 dagar. I telefonen börjar rummet på steg 1. `?rum-kval=0` (`1`, `2`, `3`) väljer steget och låser
@@ -3727,6 +3728,47 @@ neonen är desamma och skenet lika, och dagsljuset i telefonen är lite mattare 
 Prövat utan effekt: planen som `preserve-3d` (fyra pass mindre, men kupongen skär genom pulten, eftersom den lutar i
 rummet), och delar under grupper som ingen flyttar (inga fler ihopslagningar). Inte mätt i en riktig telefon. Kvar:
 vägen fram till videon i telefonen är tyngst (ungefär 40 bilder i sekunden med processorn fyra gånger långsammare, som förut).
+
+### Flyt och flimmer på svaga telefoner
+
+Mätt som telefon i Chrome (412 punkter bred, täthet 2,625) med 128 MB ritminne (`--force-gpu-mem-available-mb`,
+det som framkallar flimret) och med mjukvarugrafik och processorn fyra gånger långsammare (`--use-angle=swiftshader`,
+det som framkallar en svag grafikkrets), gammal och ny kod om vartannat. Tre saker stod för det mesta:
+
+- **Hela rummet ritades om 60 gånger i sekunden fast gänget rör sig 15–20 gånger.** Grafikkortet flyttade ett par
+  dussin små dukar på gatan var för sig, regnbanden, ångan ur kaffet och dropparna på rutan, och varje sådan rörelse
+  är en bildruta där alla rummets lager läggs igen, ungefär elva skärmytor över varandra. I telefonen är hela gatan nu
+  en enda duk (`gatduk` och `ritaGatan` i rum-ute.js, stor som det man ser genom fönstret och dörren, utan
+  genomskinlighet): himlen, molnen, fåglarna, husen, de som går förbi, flaggan, löven, regnet och snön ritas där i
+  gängets takt. Gatan ritas i samma bildruta som gänget, och sakerna på pulten varannan gång (`frame` i rum.js).
+  Ångan, dropparna, strålarna bakom oraklet, skimret på glaset och tv:ns ljusband står still från steg 1
+  (`.enkel`). I datorn gäller samma sak från steg 1, annars som förut.
+- **Tre ljuslager över hela skärmen** (värmen, dagsljuset och vinjetten) är en bild i telefonen i Chrome (`ljusIhop` i
+  rum.js), och det svagaste skenet från neonen är borta där. Det syns inte, men grafikkortet lägger ett lager i
+  stället för tre i varje bildruta.
+- **Ritminnet tog slut i närbilderna.** Vid anslagstavlan ville rummet ha 151 MB och vid kortregistret 142 MB (hemma 65
+  MB), och med mindre än så försvann bitar och kom tillbaka: toningen saknades på halva skärmen, en lapp på tavlan var
+  tom. Toningen är en liten duk i telefonen (`tonaDuk`, 10 MB mindre), glansen på tavlan i närbilden är borta där (7 MB),
+  tv:ns baksida, som aldrig syns, är borttagen (5 MB), och gängets kuponger på pulten (`hogenBort`, 30 MB) tas bort medan
+  kameran står vid tavlan eller registret, där de bara skymtar i ett hörn under toningen, och kommer tillbaka när
+  kameran har kommit hem. Nu 97 respektive 111 MB.
+
+Mindre saker: gänget har kantutjämning i telefoner som börjar på steg 1 (`kantutjamning` i rum.js), för trappstegen
+som kröp längs ansikten och armar såg ut som flimmer. Det kostar ungefär en fjärdedel av gängets tid på grafikkortet
+(4,0 → 5,2 ms på Apple-grafik, som ritar i små rutor som telefonerna), men inte på PowerVR, vars drivrutin redan har
+kraschat av skuggkartan. När steget byts töms inte gängets och sakernas dukar längre till nästa bild (de blinkade
+bort). Spegelbilden i Hasse Backes disk blev tom på kvällen: three läste bildens storlek i sidan i stället för dess egen,
+med ett grafikfel som följd.
+
+Mätt före och efter: hemma 60 → 22–26 omritningar av hela rummet per sekund, med fingret som drar lika jämnt som förut
+(60 bilder i sekunden). Med 128 MB ritminne bildrutor med hål vid tavlan 164 av 182 → 26 av 122 (bara i början,
+saknade rutor 1 359 → 250–500), vid registret 160 av 181 → 4 av 116 (855 → 14), på väg tillbaka från tavlan 718 → 110–180
+saknade rutor och från registret 53 → 0–1. Med mjukvarugrafik på steg 3: gängets bilder 12 → 14–15 i sekunden (15 är
+takten) och 600 → 460 ms arbete i grafikprocessen per bild; på steg 2 8–9 → 10–11. Närbilderna, dag, kväll, regn och
+snö är jämförda bild för bild i Chrome som telefon och som dator, och rummet är provat i WebKit i telefonstorlek. Inte
+provat i en riktig gammal telefon: `matchfixarna.se/?rum-mat` ger siffrorna där. Kvar: hål när man drar snabbt till en
+del av rummet som inte har ritats än (gängets kuponger och tavlan på väggen, Chrome ritar inte det som ligger långt
+utanför bilden i förväg) och på väg tillbaka från videon (ungefär lika många som förut, men inte synliga på en snabb dator).
 
 ### När något går fel i rummet
 

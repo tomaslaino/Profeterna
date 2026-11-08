@@ -843,21 +843,13 @@ window.RumUte = (() => {
     return KLADD;
   }
 
-  // figuren f i ställningen efter t ms
-  function rita(f, t) {
-    const g = f.bakad ? kladd(f.bw, f.bh) : f.x;
-    g.setTransform(1, 0, 0, 1, 0, 0);
-    g.globalAlpha = 1;
-    g.clearRect(0, 0, f.bw, f.bh);
-    g.save();
-    g.beginPath();
-    g.rect(f.P * f.s, f.P * f.s, f.w * f.s, f.h * f.s);
-    g.clip();
+  // figurens delar i duken g, med figurens läge och skala i bas
+  function delarna(g, f, t, bas) {
     const { N, W, A } = f;
     for (let i = 0; i < N.length; i++) {
       const n = N[i];
       const L = n.r && n.r.m !== 'op' ? las(n.r, t) : n.m || ETT;
-      if (n.p < 0) mul(f.B, 0, L, W, i * 6);
+      if (n.p < 0) mul(bas, 0, L, W, i * 6);
       else mul(W, n.p * 6, L, W, i * 6);
       A[i] = (n.p < 0 ? 1 : A[n.p]) * n.al * (n.r && n.r.m === 'op' ? las(n.r, t) : 1);
       const o = n.op;
@@ -885,6 +877,19 @@ window.RumUte = (() => {
         g.stroke(o.f);
       }
     }
+  }
+
+  // figuren f i ställningen efter t ms
+  function rita(f, t) {
+    const g = f.bakad ? kladd(f.bw, f.bh) : f.x;
+    g.setTransform(1, 0, 0, 1, 0, 0);
+    g.globalAlpha = 1;
+    g.clearRect(0, 0, f.bw, f.bh);
+    g.save();
+    g.beginPath();
+    g.rect(f.P * f.s, f.P * f.s, f.w * f.s, f.h * f.s);
+    g.clip();
+    delarna(g, f, t, f.B);
     g.restore();
     if (f.bakad) {
       f.x.clearRect(0, 0, f.bw, f.bh);
@@ -893,8 +898,9 @@ window.RumUte = (() => {
   }
 
   // Byter lagrets SVG:er som rör sig inuti eller är suddiga mot dukar.
-  // s: duken i bildpunkter per px.
-  function duka(lager, s) {
+  // s: duken i bildpunkter per px. samla: figurerna ritas i gatans gemensamma
+  // duk (ritaGatan), och hamnar inte alls i sidan.
+  function duka(lager, s, samla = false) {
     const ut = [];
     for (const svg of [...lager.querySelectorAll(':scope > svg')]) {
       const ror = svg.querySelector('.gung, .ben, .arm, .hjul, .blink, .snurr, .vinge, .vaj');
@@ -909,7 +915,7 @@ window.RumUte = (() => {
       const steg = (parseFloat(st.getPropertyValue('--steg')) || 0.9) * 1000;
       // molnen är så suddiga att det räcker med en bildpunkt per px
       const sk = LATT ? (blur >= 3 ? 0.2 : 0.5) : blur >= 3 ? Math.min(1, s) : s;
-      const bakad = FILTER && blur > 0;
+      const bakad = FILTER && blur > 0 && !(samla && ror);
       const P = bakad ? Math.ceil(blur * 3) : 0;
       const c = document.createElement('canvas');
       c.setAttribute('class', `${svg.getAttribute('class')} duk${bakad ? ' bakad' : ''}`);
@@ -917,9 +923,12 @@ window.RumUte = (() => {
       c.style.cssText = `${svg.getAttribute('style') || ''}; width:${w + 2 * P}px; height:${h + 2 * P}px; margin:${-P}px 0 0 ${-P}px`;
       const bw = Math.ceil((w + 2 * P) * sk);
       const bh = Math.ceil((h + 2 * P) * sk);
-      c.width = bw;
-      c.height = bh;
-      const x = c.getContext('2d');
+      // (det som rör sig ritas direkt i gatans duk)
+      const x = samla && ror ? null : c.getContext('2d');
+      if (x) {
+        c.width = bw;
+        c.height = bh;
+      }
       if (bakad) x.filter = `blur(${r1(blur * sk * 10) / 10}px)`;
       const N = delar(svg, steg);
       const sx = (w / vb[2]) * sk;
@@ -933,6 +942,23 @@ window.RumUte = (() => {
         till: svg.classList.contains('rum-lov') ? parseFloat(st.getPropertyValue('--x1')) || 0 : parseFloat(st.getPropertyValue('--till')) || 0,
         glid: /rum-(gar|fagel|moln|lov)/.test(svg.getAttribute('class')),
       };
+      if (samla) {
+        const lov = svg.classList.contains('rum-lov');
+        Object.assign(f, {
+          mx: w / vb[2], my: h / vb[3], vx: vb[0], vy: vb[1], lov,
+          y0: lov ? parseFloat(st.getPropertyValue('--y0')) || 0 : parseFloat(st.top) || 0,
+          y1: lov ? parseFloat(st.getPropertyValue('--y1')) || 0 : 0,
+          al: st.opacity === '' ? 1 : parseFloat(st.opacity),
+          dur: (parseFloat(st.animationDuration) || 0) * 1000,
+          fore: -(parseFloat(st.animationDelay) || 0) * 1000,
+          bas: [0, 0, 0, 0, 0, 0],
+        });
+        // (det som bara är suddigt, molnen, ritas en gång och läggs ut som bild)
+        if (!f.ror) rita(f, 0);
+        svg.remove();
+        ut.push(f);
+        continue;
+      }
       rita(f, 0);
       svg.replaceWith(c);
       if (f.ror) ut.push(f);
@@ -947,10 +973,12 @@ window.RumUte = (() => {
   // det som är utanför bilden medan kameran står nära och ritar om gatan, med
   // filtret, varje gång. En duk ritas inte om.
   const GATA = 0.4;
-  async function bakaGata(x) {
+  async function bakaGata(x, klar) {
     const gen = (x._gen = (x._gen || 0) + 1);
     const xs = new XMLSerializer();
-    for (const svg of [...x.querySelectorAll(':scope > svg:not(.skylt)')]) {
+    const dukar = [];
+    const svgs = [...x.querySelectorAll(':scope > svg:not(.skylt)')];
+    for (const svg of svgs) {
       const k = svg.cloneNode(true);
       k.removeAttribute('style');
       k.removeAttribute('class');
@@ -973,17 +1001,22 @@ window.RumUte = (() => {
         c.height = 1000 * GATA;
         c.getContext('2d').drawImage(img, 0, 0, c.width, c.height);
         img.src = '';
-        svg.replaceWith(c);
+        if (klar) dukar.push(c);
+        else svg.replaceWith(c);
       } catch { /* då står SVG:n kvar, utan oskärpa */ } finally {
         URL.revokeObjectURL(url);
       }
+    }
+    if (klar && x._gen === gen && dukar.length === svgs.length) {
+      klar(dukar);
+      for (const svg of svgs) svg.style.display = 'none';
     }
   }
 
   // Himlen på samma sätt i telefonen: en gradient som täcker hela utsikten tog 10 MB
   // av ritminnet, fast den bara syns genom fönstret. SVG:n ligger kvar, dold, så att
   // nästa ändring (paint) har något att skriva i.
-  async function bakaHimmel(x) {
+  async function bakaHimmel(x, klar) {
     const gen = (x._gen = (x._gen || 0) + 1);
     const k = x.cloneNode(true);
     k.removeAttribute('style');
@@ -1006,12 +1039,140 @@ window.RumUte = (() => {
       c.height = 1000 * GATA;
       c.getContext('2d').drawImage(img, 0, 0, c.width, c.height);
       img.src = '';
-      if (!x._duk) x.after(c);
+      if (klar) klar(c);
+      else if (!x._duk) x.after(c);
       x._duk = c;
       x.style.display = 'none';
     } catch { /* då står SVG:n kvar */ } finally {
       URL.revokeObjectURL(url);
     }
+  }
+
+  // ---------- hela gatan i en duk ----------
+  //
+  // I telefonen ritas allt på gatan i en och samma duk, stor som det som syns
+  // genom fönstret och dörren: himlen, molnen, fåglarna, husen och de som går
+  // förbi, i gängets takt. Förut gled ett par dussin små dukar var för sig på
+  // grafikkortet, och då måste hela scenen, med husen och himlen över varandra,
+  // ritas om 60 gånger i sekunden fast gänget bara rör sig 15–20 gånger. En
+  // ofärgad duk (alpha: false) gör dessutom att det bakom den inte ritas alls.
+  const GAT_S = 0.5;
+  function gatduk(el, rects) {
+    if (el._gat || !rects || !rects.length) return;
+    const x = Math.min(...rects.map((r) => r.x));
+    const y = Math.min(...rects.map((r) => r.y));
+    const b = { x, y, w: Math.max(...rects.map((r) => r.x + r.w)) - x, h: Math.max(...rects.map((r) => r.y + r.h)) - y };
+    const c = document.createElement('canvas');
+    c.className = 'rum-gatduk';
+    c.setAttribute('aria-hidden', 'true');
+    c.style.cssText = `left:${b.x}px; top:${b.y}px; width:${b.w}px; height:${b.h}px`;
+    c.width = Math.ceil(b.w * GAT_S);
+    c.height = Math.ceil(b.h * GAT_S);
+    el._gat = { c, g: c.getContext('2d', { alpha: false }), b, himmel: null, gata: null };
+    el.classList.add('samlad');
+    el.prepend(c);
+  }
+  function ritaGatan(el, t) {
+    const G = el._gat;
+    if (!G || !G.himmel || !G.gata) return;
+    const { g, b } = G;
+    // (i en stillbild står klockan still, också när bilderna blir klara efteråt)
+    if (t != null) el._fast = t;
+    const nu = el._fast != null ? el._fast : performance.now();
+    const bakgrund = (d) => {
+      g.setTransform(1, 0, 0, 1, 0, 0);
+      g.globalAlpha = 1;
+      g.drawImage(d, b.x * GATA, b.y * GATA, b.w * GATA, b.h * GATA, 0, 0, g.canvas.width, g.canvas.height);
+    };
+    const figurer = (lista) => {
+      if (RORELSE_AV.matches) return;
+      for (let i = 0; i < lista.length; i++) {
+        const f = lista[i];
+        let x = f.x0;
+        let y = f.y0;
+        if (f.glid && f.dur > 0) {
+          const q = (nu + f.fore) / f.dur;
+          const p = q - Math.floor(q);
+          x += f.fran + (f.till - f.fran) * p;
+          if (f.lov) y += (f.y1 - f.y0) * p;
+        }
+        if (x + f.w < b.x || x > b.x + b.w) continue;
+        if (!f.ror) {
+          g.setTransform(1, 0, 0, 1, 0, 0);
+          g.globalAlpha = f.al;
+          g.drawImage(f.c, (x - b.x - f.P) * GAT_S, (y - b.y - f.P) * GAT_S, (f.w + 2 * f.P) * GAT_S, (f.h + 2 * f.P) * GAT_S);
+          continue;
+        }
+        const B = f.bas;
+        B[0] = f.mx * GAT_S;
+        B[3] = f.my * GAT_S;
+        B[4] = (x - b.x - f.vx * f.mx) * GAT_S;
+        B[5] = (y - b.y - f.vy * f.my) * GAT_S;
+        delarna(g, f, nu, B);
+      }
+    };
+    bakgrund(G.himmel);
+    figurer(el._dukar.himliv || []);
+    for (const d of G.gata) bakgrund(d);
+    figurer(el._dukar.liv || []);
+    // regnet och snön: banden faller (och snön driver) i samma takt
+    if (G.fall) {
+      g.setTransform(1, 0, 0, 1, 0, 0);
+      for (const f of G.fall) {
+        const q = RORELSE_AV.matches ? 0.5 : nu / f.dur;
+        const p = q - Math.floor(q);
+        let x = FALL.x + f.dx;
+        if (f.sd && !RORELSE_AV.matches) {
+          const s = (nu + f.sf) / f.sd;
+          const i = Math.floor(s);
+          x += f.sway * (IO(i % 2 ? 1 - (s - i) : s - i) - 0.5);
+        }
+        g.globalAlpha = f.al;
+        g.drawImage(f.c, (x - b.x) * GAT_S, (FALL.y - (f.h / 2) * (1 - p) - b.y) * GAT_S, f.w * GAT_S, f.h * GAT_S);
+      }
+      g.globalAlpha = 1;
+    }
+  }
+  const RORELSE_AV = matchMedia('(prefers-reduced-motion: reduce)');
+
+  // Regnets och snöns band (fall) som bilder, en gång, i gatans duk: som egna lager gled de över hela
+  // utsikten på grafikkortet, och då ritades hela rummet om 60 gånger i sekunden medan det regnade.
+  const FALL = { x: 36, y: 120 };
+  async function bakaFall(x, el) {
+    const G = el._gat;
+    const gen = (x._gen = (x._gen || 0) + 1);
+    x.style.display = '';
+    G.fall = null;
+    const ut = [];
+    for (const e of x.querySelectorAll('.rum-regn-b')) {
+      const svg = e.querySelector('svg');
+      const w = parseFloat(svg.getAttribute('width'));
+      const h = parseFloat(svg.getAttribute('height'));
+      const url = URL.createObjectURL(new Blob([new XMLSerializer().serializeToString(svg)], { type: 'image/svg+xml' }));
+      try {
+        const img = new Image();
+        img.src = url;
+        await img.decode();
+        if (x._gen !== gen) return;
+        const c = document.createElement('canvas');
+        c.width = Math.ceil(w * GAT_S);
+        c.height = Math.ceil(h * GAT_S);
+        c.getContext('2d').drawImage(img, 0, 0, c.width, c.height);
+        img.src = '';
+        const sv = e.parentElement.classList.contains('rum-sno-v') ? e.parentElement : null;
+        ut.push({
+          c, w, h, dur: (parseFloat(e.style.animationDuration) || 0.7) * 1000, al: e.classList.contains('fjarr') ? 0.8 : 1,
+          dx: sv ? -60 : 0, sway: sv ? parseFloat(sv.style.getPropertyValue('--sway')) || 0 : 0,
+          sd: sv ? (parseFloat(sv.style.animationDuration) || 0) * 1000 : 0, sf: sv ? -(parseFloat(sv.style.animationDelay) || 0) * 1000 : 0,
+        });
+      } catch { return; /* då får regnet glida som förut */ } finally {
+        URL.revokeObjectURL(url);
+      }
+    }
+    if (!ut.length) return;
+    G.fall = ut;
+    x.style.display = 'none';
+    ritaGatan(el);
   }
 
   // Ställningarna efter t ms (rum.js: i gängets takt, eller den fasta
@@ -1021,6 +1182,7 @@ window.RumUte = (() => {
   // något har ändrats. Däremellan räknas läget fram ur farten.
   let tur = 0;
   function takt(el, t, glesa = true) {
+    if (el && el._gat) return ritaGatan(el, t);
     if (!el || !el._duk) return;
     const [X0, X1] = el._x || [-Infinity, Infinity];
     const nu = performance.now();
@@ -1100,6 +1262,11 @@ window.RumUte = (() => {
       }
       el._sig = {};
     }
+    const SAMLA = LATT || el._samla;
+    if (SAMLA && !el._gat) {
+      gatduk(el, rects);
+      el._sig = {};
+    }
     const sig = sigs(v, L);
     sig.blixt = String(v.slag === 'aska');
     const draw = { himmel: () => himmel(v, L), himliv: () => himmelsliv(v, L), gata: () => gata(v, L), liv: () => gatliv(v, L), fall: () => fall(v), glas: () => glas(v, rects), blixt: () => (v.slag === 'aska' ? '<i></i><i class="b2"></i>' : '') };
@@ -1115,12 +1282,15 @@ window.RumUte = (() => {
       el._sig[k] = sig[k];
       const x = el.querySelector(`[data-lager="${k}"]`);
       x.innerHTML = ['himmel', 'gata', 'liv', 'himliv'].includes(k) ? kall(draw[k](), L, k === 'himmel') : draw[k]();
-      if (k === 'liv' || k === 'himliv') el._dukar[k] = duka(x, s);
-      if (k === 'gata' && LATT) bakaGata(x);
-      if (k === 'himmel' && LATT) bakaHimmel(x);
+      if (k === 'liv' || k === 'himliv') el._dukar[k] = duka(x, s, Boolean(el._gat));
+      const G = el._gat;
+      if (k === 'gata' && SAMLA) bakaGata(x, G && ((d) => { G.gata = d; ritaGatan(el); }));
+      if (k === 'himmel' && SAMLA) bakaHimmel(x, G && ((d) => { G.himmel = d; ritaGatan(el); }));
+      if (k === 'fall' && G) bakaFall(x, el);
       changed = true;
     }
     el._duk = [...(el._dukar.liv || []), ...(el._dukar.himliv || [])];
+    if (el._gat && changed) ritaGatan(el);
     return changed;
   }
 

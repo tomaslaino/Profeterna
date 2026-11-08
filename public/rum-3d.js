@@ -293,7 +293,7 @@ function dress(key, v) {
 export async function figurer(canvas, opt = {}) {
   const W = canvas.clientWidth || 1440;
   const H = canvas.clientHeight || 560;
-  // i telefonen färre bildpunkter, ingen kantutjämning och mindre skuggkartor,
+  // i telefonen färre bildpunkter och mindre skuggkartor,
   // så att minnet räcker
   const LATT = matchMedia('(max-width: 700px), (max-height: 500px)').matches;
   const SKUGGA = LATT ? 1024 : 2048;
@@ -306,9 +306,8 @@ export async function figurer(canvas, opt = {}) {
   // drygt 700 000 trianglar, två gånger per bild med skuggorna
   let DET = opt.detalj || 1;
   const seg = (n, min) => Math.max(min, Math.round(n * DET));
-  // (kantutjämning bara när datorn hinner med från början, kant i rum.js: den går
-  // inte att stänga av sedan, och den är dyr på en svag grafikkrets)
-  const r = new THREE.WebGLRenderer({ canvas, alpha: true, antialias: !LATT && opt.kant !== false });
+  // (kantutjämning efter vad enheten klarar, kantutjamning i rum.js)
+  const r = new THREE.WebGLRenderer({ canvas, alpha: true, antialias: opt.kant !== false });
   // (i telefonen på höjden står rummet längre bort, fit i rum.js: gänget är mindre på skärmen och blir
   // lika skarpt med färre bildpunkter)
   const PR = LATT ? (innerWidth < 600 && innerHeight > innerWidth ? 1.2 : 1.5) : Math.min(window.devicePixelRatio || 1, 2);
@@ -5761,6 +5760,8 @@ export async function figurer(canvas, opt = {}) {
       if (!NARA) {
         r.setPixelRatio(p);
         r.setSize(W, H, false);
+        // (en duk som får ny storlek är tom: annars blinkar gänget bort till nästa bild)
+        r.render(scene, cam);
       }
     }
     Q.skugga = skugga;

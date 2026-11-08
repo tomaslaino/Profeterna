@@ -489,7 +489,7 @@ window.Rum = (() => {
   <g stroke="#cfc6b0" stroke-opacity=".45" stroke-width="1.6"><line x1="300" y1="${S + 10}" x2="342" y2="${S + 10}"/><line x1="610" y1="${S + 10}" x2="628" y2="${S + 10}"/><line x1="880" y1="${S + 10}" x2="930" y2="${S + 10}"/></g>
   <rect x="236" y="${S + 22}" width="748" height="6" fill="#000" opacity=".3" filter="url(#rum-b4)"/>`, '', [220, 540, 780, 75]) +
       // det svaga skenet från neonen för sig, med en fjärdedel av bildpunkterna i telefonen
-      svg(`<ellipse cx="560" cy="${S - 150}" rx="360" ry="150" fill="#ff3a2a" opacity=".05" filter="url(#rum-b40)"/>`, 'rum-sken', [40, 120, 1040, 600], 0.25) +
+      (LATT ? '' : svg(`<ellipse cx="560" cy="${S - 150}" rx="360" ry="150" fill="#ff3a2a" opacity=".05" filter="url(#rum-b40)"/>`, 'rum-sken', [40, 120, 1040, 600], 0.25)) +
       '<canvas id="rum-3d" class="rum-3d" width="1440" height="560"></canvas>';
   }
 
@@ -1201,6 +1201,45 @@ window.Rum = (() => {
       const n = R.el.querySelector(sel);
       if (n) n.style.setProperty('--sken', r1(dag + (kv - dag) * kvall));
     }
+    ljusIhop();
+  }
+
+  // I telefonen i Chrome slås ljusets tre lager över hela skärmen (värmen, dagsljuset och vinjetten) ihop
+  // till en bild. Det är samma ljus, men grafikkortet behöver bara lägga ett lager i stället för tre i
+  // varje bildruta. (Källorna ligger kvar, dolda: de skrivs över när ljuset ändras.)
+  function ljusIhop() {
+    if (!LATT || !R.ljusKlar || !R.el.classList.contains('chromium')) return;
+    const v = R.el.querySelector('.rum-vign');
+    const a = R.el.querySelector('.rum-warm');
+    const d = document.getElementById('rum-dagsljus');
+    const kv = v && v.querySelector('canvas');
+    const ka = a && a.querySelector('canvas');
+    const kd = d && d.querySelector('canvas');
+    if (!kv || !ka) return;
+    let c = v.querySelector('canvas.ihop');
+    if (!c) {
+      c = document.createElement('canvas');
+      c.className = 'ihop';
+      c.width = kv.width;
+      c.height = kv.height;
+      c.style.cssText = kv.style.cssText;
+      kv.style.display = 'none';
+      v.append(c);
+      a.style.visibility = 'hidden';
+      if (d) d.style.visibility = 'hidden';
+    }
+    const [y0, h] = R.smal ? [-300, 1800] : [0, H];
+    const g = c.getContext('2d');
+    const y = (u) => ((u - y0) / h) * c.height;
+    g.clearRect(0, 0, c.width, c.height);
+    g.drawImage(ka, 0, y(0), c.width, y(R.smal ? 1500 : H) - y(0));
+    const styrka = d ? (parseFloat(d.style.getPropertyValue('--dagsljus')) || 0) * 0.2 : 0;
+    if (kd && styrka > 0.004) {
+      g.globalAlpha = styrka;
+      g.drawImage(kd, 0, y(0), c.width, y(H) - y(0));
+      g.globalAlpha = 1;
+    }
+    g.drawImage(kv, 0, 0, c.width, c.height);
   }
 
   // Tangenterna står inte i foten utan när man pekar på saken (title), och
@@ -1266,6 +1305,7 @@ ${window.RumRegister ? RumRegister.nara() : ''}
     }
     R.video = window.RumVideo ? RumVideo.mount(el, { calm, sedan, short, kort: (n) => BOARD[n] || short(n), aim: (f) => { R.vf = f; aimVideo(calm() ? null : 'glid'); }, latt: () => { if (R.vnara) lattVideo(R.vniva); } }) : null;
     R.reg = window.RumRegister ? RumRegister.mount(el, { calm, kort: (n) => BOARD[n] || short(n), close: () => register(false), tur: (fn) => tur(fn, 3) }) : null;
+    if (LATT) for (const e of el.querySelectorAll('.ans-bak, .reg-bak')) tonaDuk(e);
     paintUte();
     R.bakat = baka().then(ljusDukar).catch((err) => console.warn('Rummet: ljuset kunde inte bakas', err)).then(() => {
       R.ljusKlar = true;
@@ -1281,6 +1321,40 @@ ${window.RumRegister ? RumRegister.nara() : ''}
     // dörrens övre del, med Stängt-skylten och namnet: kameran går fram dit
     // när man klickar på namnet (närbilderna, sak)
     syn(el.querySelector('#rum-ute').parentElement, DORR.x, DORR.y, DORR.w, 200).id = 'rum-dorrglas';
+  }
+
+  // Toningen bakom anslagstavlan och kortregistret som en liten duk i telefonen,
+  // med samma övergång från mitten mot kanterna. Som CSS-bakgrund tar den 10 MB av
+  // ritminnet (och med svagt minne saknades en del av den, så att rummet var mörkt
+  // upptill och ljust nedtill): en duk ligger utanför ritminnet och ritas aldrig om.
+  function tonaDuk(e) {
+    const c = document.createElement('canvas');
+    c.className = e.className;
+    c.width = c.height = 48;
+    c.style.cssText = 'width:100%; height:100%; background:none';
+    const g = c.getContext('2d');
+    g.setTransform(48, 0, 0, 48, 0, 0);
+    const t = g.createRadialGradient(0.5, 0.48, 0, 0.5, 0.48, 0.75);
+    t.addColorStop(0, 'rgba(10, 8, 6, 0.55)');
+    t.addColorStop(1, 'rgba(10, 8, 6, 0.88)');
+    g.fillStyle = t;
+    g.fillRect(0, 0, 1, 1);
+    e.replaceWith(c);
+  }
+
+  // Gängets kuponger på pulten är tre lager på 10 MB var. I telefonen tas de bort
+  // medan kameran står vid anslagstavlan eller kortregistret, där de bara skymtar i
+  // hörnet under toningen: annars räcker inte ritminnet till det man tittar på, och
+  // bitar av tavlan försvinner och kommer tillbaka.
+  // (Tillbaka först när kameran har kommit hem, där de ligger utanför bilden i telefonen: annars ska
+  // de ritas medan kameran är på väg, och då saknas bitar av annat i stället.)
+  function hogenBort(borta) {
+    if (!LATT) return;
+    clearTimeout(R.hogenT);
+    R.hogenT = setTimeout(() => {
+      const h = document.getElementById('rum-hogen');
+      if (h) h.style.visibility = borta ? 'hidden' : '';
+    }, calm() ? 0 : borta ? 450 : 800);
   }
 
   // en osynlig ruta som sikt följer i stället för något större (först, så
@@ -2308,10 +2382,16 @@ ${window.RumRegister ? RumRegister.nara() : ''}
     // telefonen också i Chrome: fingret får inte vänta på att allt ritas.)
     // Sakerna och gatan turas om, så att de ritas i halva takten och var tredje
     // bildruta är tom: Chrome räknar om stilen i varje bildruta där något ritas.
+    // I telefonen är gatan en enda duk (gatduk i rum-ute.js) som ritas tillsammans med gänget:
+    // varje duk som ändras är en bildruta som grafikkortet måste rita hela rummet i, så det som
+    // kan komma i samma bildruta gör det. Sakerna rör sig minst och ritas varannan gång.
     if ((WEBKIT || LATT) && !calm()) {
       while (R.ko.length) R.ko.shift()();
       R.turUte = !R.turUte;
-      R.ko.push(gang, R.turUte ? ute : saker);
+      if (LATT) {
+        R.ko.push(() => { gang(); ute(); });
+        if (R.turUte) R.ko.push(saker);
+      } else R.ko.push(gang, R.turUte ? ute : saker);
     } else {
       gang();
       saker();
@@ -2396,9 +2476,12 @@ ${window.RumRegister ? RumRegister.nara() : ''}
   ];
   // (i telefonen räknas skuggorna om var tredje bild, och dammet, en stor duk
   // som ritas om, får vara: det syns knappt så litet)
+  // (och gatan, en enda duk, ritas i gängets takt på alla steg: i färre steg skulle de
+  // som går förbi hacka fram)
   if (LATT) {
     KVAL[1].skugga = 3;
     KVAL[1].damm = false;
+    KVAL[2].ute = KVAL[3].ute = 1;
   }
   const KVAL_NYCKEL = 'rum-kval2';
   // Där rummet börjar, efter vad enheten säger om sig själv: kommer rummet upp på
@@ -2410,18 +2493,31 @@ ${window.RumRegister ? RumRegister.nara() : ''}
     const karnor = navigator.hardwareConcurrency || 8;
     if (minne <= 4 || karnor <= 4) k = Math.max(k, LATT ? 2 : 1);
     if (minne <= 2 || karnor <= 2) k = KVAL.length - 1;
+    const namn = gpuNamn();
+    if (/SwiftShader|llvmpipe|softpipe|Software|Basic Render/i.test(namn)) k = KVAL.length - 1;
+    else if (/Mali-(T\d|4\d\d|G[1-5]\d\b)|Adreno \(TM\) ([1-5]\d\d|6[0-2]\d)\b|PowerVR (SGX|Rogue G)|VideoCore|Intel.*(HD Graphics|GMA)/i.test(namn)) k = Math.max(k, 2);
+    else if (/Mali-G[67]\d|Adreno \(TM\) 6[3-9]\d|Intel.*UHD/i.test(namn)) k = Math.max(k, 1);
+    return k;
+  }
+  // grafikkortets namn (tomt om det inte går att få veta)
+  function gpuNamn() {
+    if (R.gpuNamn != null) return R.gpuNamn;
+    R.gpuNamn = '';
     try {
       const g = document.createElement('canvas').getContext('webgl');
       const d = g && g.getExtension('WEBGL_debug_renderer_info');
-      const namn = d ? String(g.getParameter(d.UNMASKED_RENDERER_WEBGL)) : '';
-      if (/SwiftShader|llvmpipe|softpipe|Software|Basic Render/i.test(namn)) k = KVAL.length - 1;
-      else if (/Mali-(T\d|4\d\d|G[1-5]\d\b)|Adreno \(TM\) ([1-5]\d\d|6[0-2]\d)\b|PowerVR (SGX|Rogue G)|VideoCore|Intel.*(HD Graphics|GMA)/i.test(namn)) k = Math.max(k, 2);
-      else if (/Mali-G[67]\d|Adreno \(TM\) 6[3-9]\d|Intel.*UHD/i.test(namn)) k = Math.max(k, 1);
+      if (d) R.gpuNamn = String(g.getParameter(d.UNMASKED_RENDERER_WEBGL));
       const av = g && g.getExtension('WEBGL_lose_context');
       if (av) av.loseContext();
     } catch (err) { /* utan WebGL gör det inget */ }
-    return k;
+    return R.gpuNamn;
   }
+  // Kantutjämning i gänget och sakerna: den kan inte stängas av sedan, och på en svag grafikkrets i
+  // en dator är den dyr, så där bara på steg 0. Telefonernas grafik ritar i små rutor, där den kostar
+  // lite (mätt på Apple-grafik: ungefär en fjärdedel av gängets tid på grafikkortet), och utan den
+  // kryper trappstegen längs ansikten och armar när gänget rör sig, vilket ser ut som flimmer.
+  // På steg 1. (Inte på PowerVR, vars drivrutin redan kraschar av skuggkartan, rum-gpu.js.)
+  const kantutjamning = () => R.kval === 0 || (LATT && R.kval === 1 && !/PowerVR/i.test(gpuNamn()));
   R.kval = 0;
   if (R.q.has('rum-kval')) {
     R.kval = Math.max(0, Math.min(KVAL.length - 1, Math.round(Number(R.q.get('rum-kval'))) || 0));
@@ -2476,6 +2572,12 @@ ${window.RumRegister ? RumRegister.nara() : ''}
     for (const x of [R.fig, R.saker]) if (x && x.kval) x.kval(K);
     // (som i telefonen: ljuset utan blandningslägen, inget korn, rum.css)
     if (R.el && k >= 1 && !R.el.classList.contains('enkel')) R.el.classList.add('enkel');
+    // (och gatan i en enda duk, rum-ute.js)
+    const gatan = R.el && document.getElementById('rum-ute');
+    if (gatan && k >= 1 && !gatan._samla) {
+      gatan._samla = true;
+      if (!LATT && R.vader) paintUte(R.vader);
+    }
     const damm = document.getElementById('rum-damm');
     if (damm && damm.hidden === K.damm) {
       damm.hidden = !K.damm;
@@ -2499,8 +2601,8 @@ ${window.RumRegister ? RumRegister.nara() : ''}
     K.n++;
     K.sum += dt;
     // (i Chrome väcks huvudtråden bara till gängets bilder, loop, och i
-    // telefonen en gång till för sakerna eller gatan)
-    const takt = KVAL[R.kval].takt * (LATT && TOMMA ? 2 : 1);
+    // telefonen en gång till varannan bild, för sakerna)
+    const takt = KVAL[R.kval].takt * (LATT && TOMMA ? 1.5 : 1);
     if (dt > (TOMMA ? Math.max(50, 1500 / KVAL[R.kval].takt) : 50)) K.hack++;
     if (K.sum < 2000) return;
     // (stadiga 30 bilder i sekunden är en telefon i strömsparläge – det blir
@@ -2571,6 +2673,7 @@ ${window.RumRegister ? RumRegister.nara() : ''}
     d.style.setProperty('--dag-farg', L.sky[2]);
     if (R.dagFarg) dagDuk();
     ljusKlockan();
+    ljusIhop();
     R.el.classList.toggle('aska', v.slag === 'aska');
     // lysröret släckt på natten (rum-folk.js)
     if (window.RumFolk) RumFolk.ute(v);
@@ -2659,7 +2762,7 @@ ${window.RumRegister ? RumRegister.nara() : ''}
     if (R.fig || R.loading) return;
     R.loading = true;
     // askkoppen, snusdosan, fläkten och löpsedlarna (rum-saker.js, rum-affischer.js)
-    tur(() => import('./rum-saker.js').then((m) => m.saker(R.el, { calm: calm(), short, namn: tavelnamn, kant: R.kval === 0, enkel: Boolean(KVAL[R.kval].enkel) })).then((x) => { R.saker = x; R.sakDuk = R.el.querySelector('canvas.rum-saker'); sikt(R.sakDuk); kval(R.kval); frame(); }), 2)
+    tur(() => import('./rum-saker.js').then((m) => m.saker(R.el, { calm: calm(), short, namn: tavelnamn, kant: kantutjamning(), enkel: Boolean(KVAL[R.kval].enkel) })).then((x) => { R.saker = x; R.sakDuk = R.el.querySelector('canvas.rum-saker'); sikt(R.sakDuk); kval(R.kval); frame(); }), 2)
       .catch((err) => console.warn('Rummet: sakerna kunde inte ritas', err));
     // lysröret, neonen, skyltarna, skivan, uret, ramarna, paketen och kupongstället (rum-inredning.js)
     tur(() => import('./rum-inredning.js').then((m) => m.inredning(R.el, { calm: calm(), still, vagg: VAGG })).then((x) => { R.inr = x; x.namn(R.ramNamn); x.stopp(R.stopp); if (window.RumFolk && RumFolk.natt()) x.natt(true); if (R.sak) sak(R.sak, null); frame(); }), 1)
@@ -2668,7 +2771,7 @@ ${window.RumRegister ? RumRegister.nara() : ''}
       await tur(async () => {
         const mod = await import('./rum-3d.js');
         // (ansiktena efter hur det går och gick för kupongen redan från början: spel, senast)
-        R.fig = await mod.figurer(document.getElementById('rum-3d'), { calm: calm(), vader: R.vader, detalj: KVAL[R.kval].detalj, kant: R.kval === 0, enkel: Boolean(KVAL[R.kval].enkel), spel: R.spel, senast: window.RumFolk ? RumFolk.senast() : null, rita: () => frame() });
+        R.fig = await mod.figurer(document.getElementById('rum-3d'), { calm: calm(), vader: R.vader, detalj: KVAL[R.kval].detalj, kant: kantutjamning(), enkel: Boolean(KVAL[R.kval].enkel), spel: R.spel, senast: window.RumFolk ? RumFolk.senast() : null, rita: () => frame() });
         lappa();
         kval(R.kval);
         if (R.vem) R.fig.inne(R.vem, now());
@@ -3297,12 +3400,14 @@ ${window.RumRegister ? RumRegister.nara() : ''}
       if (R.vnara) zoomVideo(false);
       if (R.reg && R.reg.on()) register(false);
       R.ans.open(true, R.ans.quad());
+      hogenBort(true);
       vrid(R.tx, R.ty);
       const p = centerOf(document.getElementById('rum-ans'));
       const c = mid();
       aim(p, 1.25, [p[0] + (c[0] - p[0]) * 0.5, p[1] + (c[1] - p[1]) * 0.5], calm() ? null : 'glid');
       return;
     }
+    hogenBort(false);
     const w = document.getElementById('rum-kamera');
     const cam = w.style.cssText;
     // (med världen vriden dit den vrids, vridHem)
@@ -3332,12 +3437,14 @@ ${window.RumRegister ? RumRegister.nara() : ''}
       if (R.ans && R.ans.on()) board(false);
       const r = R.reg.at();
       R.reg.open(true, r);
+      hogenBort(true);
       vrid(R.tx, R.ty);
       const p = centerOf(r);
       const c = mid();
       aim(p, 1.25, [p[0] + (c[0] - p[0]) * 0.5, p[1] + (c[1] - p[1]) * 0.5], calm() ? null : 'glid');
       return;
     }
+    hogenBort(false);
     const w = document.getElementById('rum-kamera');
     const cam = w.style.cssText;
     const fran = synlig();

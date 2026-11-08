@@ -3,7 +3,8 @@
    står still med prefers-reduced-motion och ?rum-t (rum.js fryser klockan).
    De som går förbi, löven, fåglarna och flaggan är dukar (.duk) som glider
    här; benen, armarna, hjulen och vingarna ritas i dem (takt i rum-ute.js),
-   och oskärpan också när webbläsaren kan (.bakad). */
+   och oskärpan också när webbläsaren kan (.bakad). I telefonen och när datorn
+   inte hinner med ritas i stället allt i en enda duk (.samlad, gatduk). */
 
 .rum-ute { position: absolute; left: 0; top: 0; width: 1600px; height: 1000px; pointer-events: none; }
 .rum-ute-himmel, .rum-ute-gata { filter: blur(1.3px); }
@@ -56,6 +57,13 @@
   .rum-ute canvas.duk, .rum-ute-himmel, .rum-ute-gata { filter: none; }
   .rum-ute-gata > svg.skylt { filter: blur(0.8px); }
 }
+
+/* hela gatan i en duk (gatduk i rum-ute.js): det som syns genom fönstret och dörren */
+.rum-gatduk { position: absolute; }
+.rum-ute.samlad .rum-ute-himmel, .rum-ute.samlad .rum-ute-gata { filter: none; }
+.rum-ute.samlad .rum-ute-gata > svg.skylt { filter: blur(0.8px); }
+/* (blixten är ett lager över husen här, inte bara över himlen) */
+.rum-ute.samlad .rum-blixt { opacity: 0.45; }
 
 /* snön driver i sidled medan den faller */
 .rum-sno-v { position: absolute; left: -60px; top: 0; width: calc(100% + 120px); height: 100%; animation: rum-sway ease-in-out infinite alternate; }

@@ -344,7 +344,8 @@
 .ans-tavla.stor.hog .ans-botten { top: 1070px; width: 598px; }
 .ans-tavla.stor.hog .ans-vanster { height: 1070px; }
 .ans-tavla.stor.hog .ans-hoger { left: 598px; height: 1070px; }
-@media (max-width: 700px), (max-height: 500px) { .ans-tavla.stor.hog .ans-glans { width: 150px; height: 268px; } }
+/* (i telefonen utan glans i närbilden: den ritades i över dubbel storlek och tog 7 MB av ritminnet) */
+@media (max-width: 700px), (max-height: 500px) { .ans-tavla.stor .ans-glans { display: none; } }
 .ans-luta { position: absolute; inset: 0; transform-style: preserve-3d; transform: rotateX(0deg) rotateY(0deg); transition: transform 0.4s ease-out; }
 .ans-tavla.stor .ans-yta { box-shadow: 0 34px 70px rgba(0, 0, 0, 0.6), inset 0 1.5px 0 rgba(255, 230, 190, 0.35), inset 0 -2px 0 rgba(0, 0, 0, 0.45), inset 1.5px 0 0 rgba(255, 230, 190, 0.18), inset -2px 0 0 rgba(0, 0, 0, 0.35); }
 .ans-tavla.stor:focus { outline: none; }

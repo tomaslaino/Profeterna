@@ -776,15 +776,28 @@ export async function figuren(duk, { hog = false, latt = false, pr = 1 } = {}) {
     return notaKlar;
   }
   let bakTex = null;
+  let bakKalla = null;
   // Disken i fönstret (v som kamera), från dess bakre kant ned till fönstrets underkant, på duken ut.
   // bak: väggens bild { bild, px, py, S, W, H } (scripts/hasse/bak.html).
   async function diskBild(ut, v, bak) {
     await ritaNota();
     // dagens ringar efter glas, samma som i rummet (rum-pult.js)
     ringar().forEach(([x, z, rr, a], i) => ringU[i].set(x, z, rr, a));
-    if (!bakTex || bakTex.image !== bak.bild || bak.ny) {
+    if (!bakTex || bakKalla !== bak.bild || bak.ny) {
       if (bakTex) bakTex.dispose();
-      bakTex = new THREE.Texture(bak.bild);
+      bakKalla = bak.bild;
+      // (three läser en bilds storlek ur width och height, som är dess storlek i sidan och inte
+      // bildens: på kvällen, med bilden direkt, blev texturen för liten och förblev tom)
+      let kalla = bak.bild;
+      if (kalla instanceof HTMLImageElement && kalla.naturalWidth) {
+        const k = Math.min(1, 1024 / kalla.naturalWidth);
+        const c = document.createElement('canvas');
+        c.width = Math.round(kalla.naturalWidth * k);
+        c.height = Math.round(kalla.naturalHeight * k);
+        c.getContext('2d').drawImage(kalla, 0, 0, c.width, c.height);
+        kalla = c;
+      }
+      bakTex = new THREE.Texture(kalla);
       bakTex.colorSpace = THREE.NoColorSpace;
       bakTex.generateMipmaps = true;
       bakTex.minFilter = THREE.LinearMipmapLinearFilter;

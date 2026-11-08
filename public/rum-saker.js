@@ -182,11 +182,11 @@ async function props(pult, opt) {
   Object.assign(canvas.style, { left: `${BOX.x}px`, top: `${BOX.y}px`, width: `${BOX.w}px`, height: `${BOX.h}px` });
   pult.append(canvas);
 
-  // i telefonen färre bildpunkter, ingen kantutjämning och mindre skuggkartor,
+  // i telefonen färre bildpunkter och mindre skuggkartor,
   // så att minnet räcker
   const LATT = matchMedia('(max-width: 700px), (max-height: 500px)').matches;
   const SKUGGA = LATT ? 1024 : 2048;
-  const r = new THREE.WebGLRenderer({ canvas, alpha: true, antialias: !LATT && opt.kant !== false });
+  const r = new THREE.WebGLRenderer({ canvas, alpha: true, antialias: opt.kant !== false });
   const PR = LATT ? 1.5 : Math.min((window.devicePixelRatio || 1) * 1.25, 2.5);
   r.setPixelRatio(PR);
   r.setSize(BOX.w, BOX.h, false);
@@ -967,6 +967,8 @@ async function props(pult, opt) {
     if (p !== r.getPixelRatio()) {
       r.setPixelRatio(p);
       r.setSize(BOX.w, BOX.h, false);
+      // (en duk som får ny storlek är tom: annars blinkar sakerna bort till nästa bild)
+      r.render(scene, cam);
     }
     Q.skugga = skugga;
     r.shadowMap.autoUpdate = skugga <= 1;
