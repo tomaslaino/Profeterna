@@ -4591,7 +4591,7 @@ sol gyllene, den blå timmen blå, och mulet, regn och dimma grått och svagare;
 På figuren, disken och koppen är det ett brett, mjukt ljus från höger och lite framifrån (`uDag` i
 `LJUS`, `DAG`), så att hans vänstra sida är ljus och den andra faller av mjukt, och när det är dag ger
 lamporna, neonen och gatans ljus vika. Skuggorna på disken faller då åt vänster, bort från fönstret,
-och disken är ljusast närmast affären. Väggen har fönsterljuset spårat för sig, i vitt, från samma
+och disken är ljusast närmast affären, och lika ljus som pulten i rummet. Väggen har fönsterljuset spårat för sig, i vitt, från samma
 fönster och med hans skugga (`hasse-bak-dag.webp`, `?dag=1` i [scripts/hasse/bak.html](scripts/hasse/bak.html)),
 och sidan lägger det på väggens bild i fönstrets färg och styrka, som ljus läggs till ljus, på en duk
 som disken också speglar (`vagg`). Förut var baren alltid en mörk kvällsbar, också mitt på dagen när

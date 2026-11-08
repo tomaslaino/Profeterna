@@ -655,9 +655,11 @@ export async function figuren(duk, { hog = false, latt = false, pr = 1 } = {}) {
         tra *= 1. - .22 * smoothstep(.55, .75, fl);
         // geringssnittet: en mörk fog
         if (vB.x > xi - 2. && vB.z < zf + 2.) tra *= 1. - .45 * exp(-geri * geri / 9.);
-        // (på dagen lyser fönstret till höger upp hela disken, mest närmast affären, och neonen syns mindre)
+        // (på dagen lyser fönstret till höger upp hela disken, mest närmast affären, och neonen syns mindre.
+        // Pulten i rummet är lika ljus dag som kväll, så den här ska vara det också; förut var den mörkare
+        // på dagen än på natten)
         float dag = uDag.w;
-        vec3 l = ljus(n) * mix(.32 + .9 * pol, .5 + .55 * hoger, .6 * dag) + (vec3(.5, .06, .04) * hoger * .35 + vec3(.16, .2, .3) * hoger * .2) * (1. - .75 * dag);
+        vec3 l = ljus(n) * mix(.32 + .9 * pol, 1.15 + .7 * hoger, .6 * dag) + (vec3(.5, .06, .04) * hoger * .35 + vec3(.16, .2, .3) * hoger * .2) * (1. - .75 * dag);
         ut = tra * l;
         vec3 R = reflect(V, n);
         float grov = .006 + .01 * fbm(vB.xz * vec2(.004, .03));
