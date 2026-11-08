@@ -16,8 +16,10 @@
 // telefonen gör ett tryck på figuren samma sak en stund. Ett klick på en
 // figur går inte vidare till det som står bakom.
 //
-// Håller hen upp sin lapp efter omgången läggs den ner av klicket (lappNer i
-// rum.js), och den ligger nere på enheten för den omgången.
+// När omgången är spelad och fram till måndagen kl. 16 har gänget sina skyltar:
+// då lägger klicket ner hens skylt på bordet eller tar upp den igen (lappKlick i
+// rum.js), och inget annat, så att man inte byter vem man är av att lägga ner
+// någon annans. Läget gäller på enheten för den omgången.
 //
 // Annars ger ett klick på någon i gänget ett tecken tillbaka (tecken i rum-3d.js):
 // hang loose, tummen upp och så vidare, ett nytt varje gång. Går kupongen att
@@ -43,7 +45,7 @@
 // senaste gick (senastAv, rum-3d.js senast och rum-uttryck.js) – om det
 // blev vinst och efter betyget – utom med dolda resultat.
 //
-//   RumFolk.mount(el, { fig, inr, now, nara, fokus, teckna, lappNer, visa, ta })  när gänget har laddats
+//   RumFolk.mount(el, { fig, inr, now, nara, fokus, teckna, lappKlick, visa, ta })  när gänget har laddats
 //   RumFolk.on(true | false)                           rummet visas eller inte
 //   RumFolk.ute(v)                                     klockan (Vader.nu())
 //   RumFolk.fyll(old, seen)                            de färdiga kupongerna och omgångarna
@@ -325,8 +327,8 @@ window.RumFolk = (() => {
       if (!k) return;
       e.preventDefault();
       e.stopPropagation();
-      // (med lappen uppe läggs den ner, och inget annat)
-      if (F.o.lappNer && F.o.lappNer(k)) return;
+      // (skylten ner på bordet eller upp igen, och inget annat)
+      if (F.o.lappKlick && F.o.lappKlick(k)) return;
       F.o.teckna(k);
       // du, nu eller sedan förut: kupongen i handen när namnet är skrivet,
       // annars när tecknet syns

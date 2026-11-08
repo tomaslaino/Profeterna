@@ -2443,7 +2443,7 @@ ${window.RumRegister ? RumRegister.nara() : ''}
         if (R.lage) R.fig.lage(R.lage, now());
         if (R.spel) R.fig.spel(R.spel, now());
         // de andra i gänget, natten och dagen efter (rum-folk.js)
-        if (window.RumFolk) RumFolk.mount(R.el, { fig: () => R.fig, inr: () => R.inr, now, nara, fokus, teckna, lappNer, visa, ta: taKupong });
+        if (window.RumFolk) RumFolk.mount(R.el, { fig: () => R.fig, inr: () => R.inr, now, nara, fokus, teckna, lappKlick, visa, ta: taKupong });
         provMal();
         provAkt();
         provLapp();
@@ -2628,8 +2628,8 @@ ${window.RumRegister ? RumRegister.nara() : ''}
     if (R.video && R.video.datorn) R.video.datorn(R.summa ? R.summa.dator.ok : null);
     lappa();
   }
-  // Lapparna är uppe till måndagen efter omgången kl. 16 (RumBlock.lappar). Den man har klickat
-  // bort ligger nere på den här enheten för den omgången.
+  // Lapparna finns till måndagen efter omgången kl. 16 (RumBlock.lappar). Den man har lagt ner ligger
+  // på bordet, på den här enheten för den omgången.
   const LAGDA_LAPPAR = 'profeterna.rum.lappar';
   function lagdaLappar(id) {
     if (!R.lagda || R.lagda.id !== id) {
@@ -2646,25 +2646,34 @@ ${window.RumRegister ? RumRegister.nara() : ''}
     if (!R.fig || !R.fig.lappar) return;
     const sam = window.Samtal && Samtal.pult;
     const st = sam && sam.state();
-    const o = window.RumBlock && RumBlock.lappar && sam && sam.forra ? RumBlock.lappar([st && st.s, sam.forra()]) : null;
+    // (den förra omgångens står kvar också när nästa ligger på pulten, men inte sedan den har börjat)
+    const t = Date.now();
+    const borjat = st && Math.min(...st.s.matcher.map((x) => Date.parse(x.avspark))) <= t;
+    const o = window.RumBlock && RumBlock.lappar && sam && sam.forra ? RumBlock.lappar(borjat ? [st.s] : [st && st.s, sam.forra()], t) : null;
     R.lappar = o;
-    const vem = o ? Object.fromEntries(Object.entries(o.vem).filter(([k]) => !lagdaLappar(o.id).includes(k))) : null;
+    const vem = o ? Object.fromEntries(Object.entries(o.vem).map(([k, v]) => [k, { ...v, ner: lagdaLappar(o.id).includes(k) }])) : null;
     const nyckel = (R.lappNyckel = JSON.stringify(vem));
     const klar = () => { if (R.lappNyckel === nyckel && R.fig) R.fig.lappar(vem, calm() ? now() - 10 : now()); };
     // (Caveat måste vara inläst innan siffrorna ritas på lapparna)
     if (vem && document.fonts && document.fonts.load) document.fonts.load('700 200px Caveat').then(klar, klar);
     else klar();
   }
-  // Ett klick på någon i gänget med lappen uppe: hen lägger ner den. → om klicket gick åt till det.
-  function lappNer(k) {
+  // Ett klick på någon i gänget som har en lapp: hen lägger ner den på bordet eller tar upp den igen.
+  // → om klicket gick åt till det.
+  function lappKlick(k) {
     const o = R.lappar;
-    // (den som sover har ingen lapp uppe just nu: den finns kvar när hen vaknar)
-    if (!o || !o.vem[k] || !R.fig || !R.fig.lappUppe(k, now())) return false;
+    if (!o || !o.vem[k] || !R.fig || !R.fig.lappVand) return false;
+    if (Date.now() >= o.slut) {
+      lappa();
+      return false;
+    }
     const bort = lagdaLappar(o.id);
-    bort.push(k);
+    const ner = !bort.includes(k);
+    // (den som sover rör den inte: den ligger som den låg när hen vaknar)
+    if (!R.fig.lappVand(k, ner, calm() ? now() - 10 : now())) return false;
+    if (ner) bort.push(k);
+    else bort.splice(bort.indexOf(k), 1);
     try { localStorage.setItem(LAGDA_LAPPAR, JSON.stringify({ id: o.id, bort })); } catch (e) { /* då är den uppe igen nästa gång */ }
-    R.lappNyckel = null;
-    R.fig.lappar(Object.fromEntries(Object.entries(o.vem).filter(([x]) => !bort.includes(x))), calm() ? now() - 10 : now());
     // (i ett rum som står still syns det när gänget ritas om)
     if (calm()) frame();
     return true;

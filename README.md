@@ -5252,8 +5252,11 @@ klick utanför lägger tillbaka det (`protokollet` i rum.js). Ett klick på
 löpsedeln i fönstret öppnar tidningen med samma rubrik som sedeln, betygen, skrällen och hans krönika (`tidningen` i
 rum.js). Gänget håller upp skyltar med sina rätt (`lappar` i rum-3d.js), medan resten av figuren lever som
 vanligt. Skyltarna står kvar till måndagen efter omgången kl. 16, också när nästa Stryktips redan har tagit över
-(`lappar` i rum-block.js läser då den förra omgången, `forra` i GET /samtal). Ett klick på någon i gänget med skylten
-uppe lägger ner den, och den ligger nere på enheten för den omgången (`lappNer` i rum.js). Modellens siffra står på
+(`lappar` i rum-block.js läser då den förra omgången, `forra` i GET /samtal), men inte sedan den har börjat. Så länge
+lägger ett klick på någon i gänget ner hens skylt på bordet, och ett klick till på hen eller skylten tar upp den igen
+(`lappKlick` i rum.js, `lappVand` och `PLATSER[].skylt` i rum-3d.js). Klicket gör inget annat: inget tecken, och man
+byter inte vem man är. Läget gäller på enheten för den omgången. Den som somnar eller går iväg lägger ner sin och tar
+upp den igen när hen är tillbaka. Modellens siffra står på
 videons blå ruta på håll.
 
 **Hur skylten hålls** (2026-11-08, användarens önskemål: "lite olika hålla upp skylt-rörelser så att det inte blir så

@@ -134,7 +134,7 @@ export function blanda(a, b, k) {
 // bildens axlar: x utåt från figuren på armens sida, y uppåt, z mot den som tittar.
 // Skylten hålls mellan tummen framför och fingrarna bakom, så att handflatan sticker
 // fram under den. De turas om: en hållning i taget, och ibland något man gör med den.
-// (Ett klick på figuren lägger ner skylten, lappNer i rum.js.)
+// (Ett klick på figuren lägger ner skylten på bordet eller tar upp den igen, lappKlick i rum.js.)
 //
 //   LAPP_HALL: hur den hålls. lage(t) →
 //     p     handleden från axeln, i armens längd (tva: från mitten mellan axlarna)

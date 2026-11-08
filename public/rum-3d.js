@@ -88,7 +88,7 @@
 // lage({ tv, nag }, t), mal({ dl: 1, dt: -1, dj: 0 }, t, sätt), spel({ lage, rank, ansikte }, t),
 // senast(lage), uttryck(),
 // prova(vem, påhitt, at), ga(vem, t, l), pekar(vem, [x, y, z] | null, t),
-// hej(vem, t, ut), vald(vem, t), tecken(vem, t, namn), lappar(vem, t), lappUppe(vem, t), lappProva(vem, hållning, gör, at), natt(på, t), efter({ lage, krona }), under(nx, ny), huvud(vem) }: neon säger om
+// hej(vem, t, ut), vald(vem, t), tecken(vem, t, namn), lappar(vem, t), lappVand(vem, ner, t), lappProva(vem, hållning, gör, at), natt(på, t), efter({ lage, krona }), under(nx, ny), huvud(vem) }: neon säger om
 // neonskylten lyser (false när den glappar), ute klär om gänget
 // efter vädret (dress) och sätter ljuset från fönstret, lage säger om
 // matcherna pågår (tv) och hur nära spelstoppet är (nag 0–1), mal ett mål
@@ -137,13 +137,15 @@ const KOPP = { x: -88, z: 30, r: 11 };
 // handen som vilar på bordet (vila) och DT:s extraflaska (flaska); tomma: DJ:s
 // tomflaskor på fönsterbänken (x och z i rummet och vinkeln, 0 = står) – bakom
 // honom på sidorna och längst till höger när han sitter bakom bordet, där de syns.
+// skylt: var skylten ligger på bordet när den är nere (lappar), i bordets axlar som
+// KOPP, och hur den är vriden i grader.
 const PLATSER = [
   { x: -338, z: 194, turn: 46, inre: 1, kupong: 1, sak: [47, 46], aska: [50, 62], cigg: [8, 58], lagg: [27.5, 52, 1.25], flaska: [80, 72],
-    tomma: [[-412, 16, 0], [-442, 30, -1.45]] },
+    tomma: [[-412, 16, 0], [-442, 30, -1.45]], skylt: [-50, -2, 5] },
   { x: -186, z: 106, turn: 2, inre: 0, kupong: 1, sak: [-27, 47], aska: [-29.7, 45], cigg: [4, 58], vila: [24.3, 48.3], lagg: [28.4, 47.4, -0.25], flaska: [54.5, 56.1],
-    tomma: [[40, 16, 0], [70, 30, 1.45]] },
+    tomma: [[40, 16, 0], [70, 30, 1.45]], skylt: [2, -52, -4] },
   { x: -38, z: 194, turn: -46, inre: 0, kupong: 0, sak: [-44.5, 43.2], aska: [-50, 62], cigg: [-2.1, 55.6], lagg: [-21, 52, 0.3], flaska: [-80, 72],
-    tomma: [[40, 16, 0], [70, 30, 1.45]] },
+    tomma: [[40, 16, 0], [70, 30, 1.45]], skylt: [52, -4, -6] },
 ];
 // Vem som sitter var: FIGS[i] sitter på PLATSER[(i + n) % 3]. De byter var
 // tredje dag (dagen i Stockholm ur Vader.nu(), räknat från den 25 oktober
@@ -2568,13 +2570,18 @@ export async function figurer(canvas, opt = {}) {
     }
     // skylten: huvudet mot den eller från den (LAPP_HALL)
     const lk = lappNu(o, t);
-    if (lk) {
+    if (lk && lk.w > 0) {
       const b = lk.kropp;
-      lean += b.lean * lk.w;
-      pitch += b.pitch * lk.w;
-      roll -= lk.A.s * b.roll * lk.w;
-      yaw += lk.A.s * b.titta * lk.w;
-      twist += b.twist * lk.w;
+      const w = lk.w * lk.lyft;
+      lean += b.lean * w;
+      pitch += b.pitch * w;
+      roll -= lk.A.s * b.roll * w;
+      yaw += lk.A.s * b.titta * w;
+      twist += b.twist * w;
+      // ner till bordet och upp igen: man böjer sig fram och tittar ner
+      const ned = lk.w * (1 - lk.lyft);
+      lean += 0.2 * ned;
+      pitch += 0.16 * ned;
     }
     breath -= 0.05 * sink;
     pitch -= 0.38 * drink - 0.06 * drag;
@@ -2751,25 +2758,41 @@ export async function figurer(canvas, opt = {}) {
     return { x, T, w: (x.w0 + (1 - x.w0) * sm(0, TK_IN, T)) * (1 - sm(L, L + TK_UT, T)), A: o.arms[x.i] };
   }
   const teckenW = (o, t) => { const g = teckenNu(o, t); return g ? g.w : 0; };
-  // Lapparna (lappar): vem som håller upp hur många rätt ({ tal, ink, at, ut, i: armen, meny, forst }).
-  // Armarna är upptagna, men resten av figuren lever som vanligt. Var och en byter hållning
+  // Lapparna (lappar): vem som har hur många rätt ({ tal, ink, ner: ligger på bordet, p0, at: var
+  // skylten var när den började röra sig och när, ut, i: armen, meny, forst }). Vägen är en enda:
+  // 0 ligger på bordet och armen vilar, LP_BORD handen är framme vid skylten, 1 uppe. Den som går
+  // iväg eller somnar lägger ner den på samma väg, och när tiden är ute tonar den bort på bordet.
+  // Uppe är armarna upptagna, men resten av figuren lever som vanligt. Var och en byter hållning
   // var trettionde sekund, med en tredjedels period emellan, och gör ibland något med skylten
   // (LAPP_GOR) i två luckor i varje hållning. Luckorna ligger förskjutna (2 s per person), så
   // att två sällan gör något samtidigt.
   const LP = {};
-  const LP_IN = 0.7;
+  const LP_TID = 1.35;
+  const LP_BORD = 0.42;
+  const LP_VILA = { tva: 0 };
   const LAPP_P = 30;
   const LAPP_BYT = 1.3;
   const LAPP_LUCKA = [6, 17];
   const LPV = {};
+  function lappVag(x, t) {
+    const mal = x.ner ? 0 : 1;
+    const tid = LP_TID * Math.abs(mal - x.p0);
+    const d = t - x.at;
+    if (d <= 0) return x.p0;
+    return d >= tid ? mal : x.p0 + ((mal - x.p0) * d) / tid;
+  }
+  // → { w: hur mycket armen är med, lyft: 0 på bordet, 1 uppe, ton: 1 utom när tiden är ute, … }, null: ingen skylt
   function lappNu(o, t) {
     const x = LP[o.F.key];
-    if (!x || t < x.at) return null;
-    const ner = x.ut == null ? 1 : 1 - sm(x.ut, x.ut + TK_UT, t);
-    if (ner <= 0) return null;
-    const w = sm(0, LP_IN, t - x.at) * ner * (1 - sovW(o, t)) * (1 - (o.st ? o.st.w : 0));
-    if (w <= 0.001) return null;
-    if (x.nu && x.nu.t === t && x.nu.x === x) { x.nu.w = w; return x.nu; }
+    if (!x) return null;
+    const bort = x.ut == null ? 0 : Math.max(0, t - x.ut) / LP_TID;
+    if (bort >= 1) return null;
+    const p = lappVag(x, t) * (1 - sm(0, 0.7, bort)) * (1 - sovW(o, t)) * (1 - (o.st ? o.st.w : 0));
+    const w = sm(0, LP_BORD, p);
+    const lyft = sm(LP_BORD, 1, p);
+    const ton = 1 - sm(0.7, 1, bort);
+    if (w <= 0.001) return { t, x, w: 0, lyft: 0, ton, A: o.arms[x.i], L: LP_VILA };
+    if (x.nu && x.nu.t === t && x.nu.x === x) { x.nu.w = w; x.nu.lyft = lyft; x.nu.ton = ton; return x.nu; }
     const i = figs.indexOf(o);
     const c = (t + (i * LAPP_P) / 3) / LAPP_P;
     const n = Math.floor(c);
@@ -2793,7 +2816,7 @@ export async function figurer(canvas, opt = {}) {
     const tt = t + o.phase;
     const L = lappBlanda(ha.lage(tt), hb.lage(tt), k, d);
     const A = o.arms[x.i];
-    x.nu = { t, x, w, A, B: o.arms.find((b) => b !== A), L, kropp: lappKropp(ha.kropp(tt), hb.kropp(tt), k, d && d.kropp) };
+    x.nu = { t, x, w, lyft, ton, A, B: o.arms.find((b) => b !== A), L, kropp: lappKropp(ha.kropp(tt), hb.kropp(tt), k, d && d.kropp) };
     return x.nu;
   }
   // Raden man skriver på: 0,75 sekunder per rad, och den sista sjättedelen
@@ -4076,6 +4099,7 @@ export async function figurer(canvas, opt = {}) {
     const ks = korsFingrar(o, t);
     const lp = lappNu(o, t);
     if (o.lapp && !lp) o.lapp.visible = false;
+    if (lp && lp.lyft <= 0) lappStall(o, lp);
     // (handen som håller skylten först: den andra tar tag i den, lappAndra)
     for (const A of lp && lp.L.tva > 0 && lp.A !== o.arms[0] ? [o.arms[1], o.arms[0]] : o.arms) {
       const taken = u >= 0.55;
@@ -4087,11 +4111,14 @@ export async function figurer(canvas, opt = {}) {
       if (A.wHand !== A.hand) { A.wHand.visible = useW; A.hand.visible = !useW; }
       let H = useW ? A.wHand : A.hand;
       let hp = handPose(o, A, t);
-      const iLapp = lp && lp.A === A && !(ks && ks.A === A);
-      const iAndra = lp && lp.B === A && lp.L.tva > 0 && lp.kort && !(ks && ks.A === A);
-      if (iLapp) hp = lerpPose(hp, lappLage(o, A, lp), lp.w);
-      else if (iAndra) hp = lerpPose(hp, lappAndra(o, A, lp), lp.w * lp.L.tva);
-      const grepp = iLapp ? lp.w : iAndra ? lp.w * lp.L.tva : 0;
+      const iLapp = lp && lp.A === A && lp.w > 0 && !(ks && ks.A === A);
+      const iAndra = lp && lp.B === A && lp.L.tva > 0 && lp.lyft > 0 && lp.kort && !(ks && ks.A === A);
+      if (iLapp) {
+        const upp = lp.lyft > 0 ? lappLage(o, A, lp) : null;
+        if (lp.lyft < 1) lp.bord = lappBord(o, A);
+        hp = lerpPose(hp, !upp ? lp.bord : lp.lyft < 1 ? lappBage(o, lerpPose(lp.bord, upp, lp.lyft), lp.lyft) : upp, lp.w);
+      } else if (iAndra) hp = lerpPose(hp, lappAndra(o, A, lp), lp.L.tva * sm(0.25, 0.9, lp.lyft));
+      const grepp = iLapp ? lp.w : iAndra ? lp.L.tva * sm(0.25, 0.9, lp.lyft) : 0;
       if (tk && tk.A === A) hp = lerpPose(hp, teckenPose(o, A, tk), tk.w);
       if (o.st.w > 0) hp = lerpPose(hp, gaHand(o, A, t, o.st), o.st.w);
       if (A.fist) {
@@ -4104,7 +4131,7 @@ export async function figurer(canvas, opt = {}) {
       // cigarett ligger på bordet så länge.
       if (A.fingerHand) A.fingerHand.visible = false;
       // (eller korstecknet: flaskan står på bordet så länge)
-      const fg = tk && tk.A === A && tk.w > TK_BYT ? { form: teckenHand(tk), stor: 1 + (TK_STOR - 1) * sm(TK_BYT, 0.8, tk.w) } : grepp > TK_BYT ? { form: blanda(LOS, LAPP_GREPP, sm(TK_BYT, 0.85, grepp)), stor: 1 + (TK_STOR - 1) * sm(TK_BYT, 0.8, grepp) } : ks && ks.A === A ? ks : null;
+      const fg = tk && tk.A === A && tk.w > TK_BYT ? { form: teckenHand(tk), stor: 1 + (TK_STOR - 1) * sm(TK_BYT, 0.8, tk.w) } : grepp > TK_BYT ? { form: blanda(LOS, LAPP_GREPP, sm(TK_BYT, 0.85, grepp)), stor: 1 + (TK_STOR - 1) * sm(TK_BYT, 0.8, grepp) * sm(0.05, 0.9, lp.lyft) } : ks && ks.A === A ? ks : null;
       if (fg) {
         if (!A.fingerHand) A.fingerHand = fingerHand(o.F.arm, o.hud, o.fig, A.s);
         // (den vanliga handen följer med osynlig: röken räknas ur cigaretten i den)
@@ -4119,7 +4146,7 @@ export async function figurer(canvas, opt = {}) {
         if (iLapp && A.cig) A.cig.visible = false;
       }
       orient(H, hp.p, hp.y, hp.z);
-      if (iLapp) { H.updateMatrix(); lappStall(o, lp, H, fg && (!tk || tk.A !== A)); }
+      if (iLapp && lp.lyft > 0) { H.updateMatrix(); lappStall(o, lp, H, fg && (!tk || tk.A !== A)); }
       // näven: handleden där den öppna handens handled var
       if (H === A.fist) H.position.sub(H.userData.wrist.clone().applyQuaternion(H.quaternion));
       H.updateMatrix();
@@ -4243,9 +4270,44 @@ export async function figurer(canvas, opt = {}) {
     }
     return lappTex.get(k);
   }
+  // Skylten på bordet (PLATSER, skylt): i figurens axlar när hen sitter på stolen, siffran uppåt och
+  // överkanten bort från kameran. Var och en på sin höjd, så att två som ligger omlott inte flimrar.
+  function lappVila(o) {
+    if (o.lappPlats) return o.lappPlats;
+    const F = o.F;
+    const [x, z, v] = F.plats.skylt;
+    const vrid = -F.turn * DEG;
+    const p = new THREE.Vector3(BORD.x + x - F.x, BORD.y + 0.6 + 0.25 * PLATSER.indexOf(F.plats), BORD.z + z - F.z).applyAxisAngle(UP, vrid);
+    const upp = new THREE.Vector3(Math.sin(v * DEG), 0, -Math.cos(v * DEG)).applyAxisAngle(UP, vrid);
+    const n = new THREE.Vector3(0, 1, 0);
+    const q = new THREE.Quaternion().setFromRotationMatrix(new THREE.Matrix4().makeBasis(new THREE.Vector3().crossVectors(upp, n), upp, n));
+    o.lappPlats = { p, q };
+    return o.lappPlats;
+  }
+  // Handen vid skylten på bordet, handflatan neråt: på väg från axeln mot skyltens mitt, vid
+  // kanten eller så långt armen når (armarna töjs inte).
+  function lappBord(o, A) {
+    const { p: mitt } = lappVila(o);
+    const S = shoulder(o, A);
+    const y = BORD.y + 5;
+    const mot = new THREE.Vector3(mitt.x - S.x, 0, mitt.z - S.z);
+    const d = mot.length();
+    mot.divideScalar(d);
+    const n = (o.F.a + o.F.b) * 0.97;
+    const r = Math.min(d - LAPP_V * 0.4, Math.sqrt(Math.max(0, n * n - (S.y - y) * (S.y - y))));
+    return { p: new THREE.Vector3(S.x + mot.x * r, y, S.z + mot.z * r), y: mot.clone().setY(-0.12), z: new THREE.Vector3(0, 1, 0.05), pole: new THREE.Vector3(A.s, -0.3, -0.6) };
+  }
+  // På vägen mellan bordet och uppe går handen framför hakan, inte genom huvudet.
+  function lappBage(o, P, lyft) {
+    P.p.add(new THREE.Vector3(0, 0, 0.3 * (o.F.a + o.F.b) * Math.sin(Math.PI * lyft)).applyAxisAngle(UP, -o.F.turn * DEG));
+    return P;
+  }
+  const lappUt = new THREE.Vector3();
   const lappRz = new THREE.Quaternion();
   const lappRy = new THREE.Quaternion().setFromAxisAngle(UP, Math.PI);
   const LAPP_Z = new THREE.Vector3(0, 0, 1);
+  // Utan H ligger skylten på bordet (lappVila). I handen sitter den som hållningen säger, och på väg
+  // ner tippar överkanten bakåt tills den ligger där.
   function lappStall(o, lp, H, syns) {
     let m = o.lapp;
     const k = `${lp.x.tal}|${lp.x.ink}`;
@@ -4269,9 +4331,23 @@ export async function figurer(canvas, opt = {}) {
       o.fig.add(m);
       o.lapp = m;
     }
+    // (tonar bort när tiden är ute)
+    m.material.opacity = m.children[0].material.opacity = lp.ton;
+    if (!H) {
+      m.visible = true;
+      if (m.userData.ligger) return;
+      m.userData.ligger = true;
+      const v = lappVila(o);
+      m.position.copy(v.p);
+      m.quaternion.copy(v.q);
+      // (går hen iväg just nu ligger skylten kvar på bordet, gaFlytta)
+      if (o.borta) m.userData.hem = { p: v.p.clone(), q: v.q.clone(), s: m.scale.clone() };
+      m.updateMatrix();
+      return;
+    }
+    m.userData.ligger = false;
+    delete m.userData.hem;
     m.visible = Boolean(syns);
-    // (tonar fram och bort när armen går upp och ner; var den andra handen tar tag, också innan den syns)
-    m.material.opacity = m.children[0].material.opacity = sm(TK_BYT, 0.62, lp.w);
     const L = lp.L;
     const s = lp.A.s;
     const q = o.F.arm * H.scale.x;
@@ -4284,6 +4360,16 @@ export async function figurer(canvas, opt = {}) {
     m.position.set((-sa * e + ca * xs) * (1 - L.sida), (ca * e + sa * xs) * (1 - L.sida) + e * L.sida, -(q * 0.6 + 0.5)).applyQuaternion(H.quaternion).add(H.position);
     lappRz.setFromAxisAngle(LAPP_Z, a);
     m.quaternion.copy(H.quaternion).multiply(lappRz).multiply(lappRy);
+    if (lp.lyft < 1) {
+      const v = lappVila(o);
+      // (skylten på samma avstånd från handen hela vägen, så att handen inte går igenom den)
+      const fran = v.p.clone().sub(lp.bord.p);
+      const till = m.position.clone().sub(H.position);
+      const langd = fran.length() + (till.length() - fran.length()) * lp.lyft;
+      lappUt.copy(fran).lerp(till, lp.lyft).setLength(langd);
+      m.position.copy(H.position).add(lappUt);
+      m.quaternion.slerpQuaternions(v.q, m.quaternion.clone(), lp.lyft);
+    }
     m.updateMatrix();
     lp.kort = { p: m.position, q: m.quaternion, hp: H.position, hq: H.quaternion };
   }
@@ -4336,7 +4422,7 @@ export async function figurer(canvas, opt = {}) {
         // ingen rök medan cigaretten ligger släckt och man väntar på kupongen
         if (src === 'glod') {
           const tk = teckenNu(o, tb);
-          alpha = 0.8 * (1 - dragW(o, tb) * 0.7) * sm(0.55, 0.62, uOf(o, tb)) * (1 - Math.max(slumW(o, tb), sovW(o, tb))) * (tk && tk.A === sk.A ? 1 - tk.w : 1) * (sk.A === o.arms[0] ? 1 - korsK(o, tb) : 1) * (LP[o.F.key] && o.arms[LP[o.F.key].i] === sk.A && LP[o.F.key].ut == null ? 0 : 1);
+          alpha = 0.8 * (1 - dragW(o, tb) * 0.7) * sm(0.55, 0.62, uOf(o, tb)) * (1 - Math.max(slumW(o, tb), sovW(o, tb))) * (tk && tk.A === sk.A ? 1 - tk.w : 1) * (sk.A === o.arms[0] ? 1 - korsK(o, tb) : 1) * (LP[o.F.key] && o.arms[LP[o.F.key].i] === sk.A && LP[o.F.key].ut == null && !LP[o.F.key].ner ? 0 : 1);
         }
         else {
           // utandningen: strax efter blosset (och det första efter inlämningen)
@@ -4643,14 +4729,12 @@ export async function figurer(canvas, opt = {}) {
     if (!o) return;
     const g = teckenNu(o, t);
     if (g && g.T < 0.3) return;
-    // (armen som lägger ner sin lapp är den som gör tecknet)
-    const lapp = lappNu(o, t);
     const val = namn && TECKEN[namn] ? namn : sovW(o, t) > 0.5 ? 'tumme' : nastaTecken();
-    const A = lapp ? lapp.A : g ? g.A : uOf(o, t) < 0.55 ? o.pen : fri(o);
+    const A = g ? g.A : uOf(o, t) < 0.55 ? o.pen : fri(o);
     TK[k] = { namn: val, at: t, i: o.arms.indexOf(A), w0: g ? g.w : 0, fran: g ? { namn: g.x.namn, T: g.T } : null };
   }
-  // Hur många rätt var och en håller upp ({ dl: { tal, ink }, … }, null: inget). Första gången
-  // sitter de så, sedan går armen upp eller ner på en stund. Med den yttre armen, så att
+  // Hur många rätt var och en håller upp ({ dl: { tal, ink, ner: ligger på bordet }, … }, null:
+  // inget). Första gången sitter de så, sedan tas skylten upp från bordet på en stund. Med den yttre armen, så att
   // skylten inte hamnar framför grannen; den i mitten håller upp sin mellan huvudena, med en
   // eventuell cigarett i askkoppen så länge. Annars släpper den som röker inte cigaretten,
   // så båda händerna på skylten är inget för den.
@@ -4663,26 +4747,41 @@ export async function figurer(canvas, opt = {}) {
     for (const o of figs) {
       const key = o.F.key;
       const v = x && x[key];
+      const g = LP[key];
       if (!v) {
-        if (LP[key] && LP[key].ut == null) LP[key].ut = t;
+        if (g && g.ut == null) g.ut = t;
         continue;
       }
-      // (den som redan håller upp samma lapp sitter kvar när någon annan lägger ner sin)
-      if (LP[key] && LP[key].ut == null && LP[key].tal === v.tal && LP[key].ink === v.ink) continue;
+      const ner = Boolean(v.ner);
+      // (den som redan har sin skylt sitter kvar när någon annan lägger ner sin)
+      if (g && g.ut == null) {
+        g.tal = v.tal;
+        g.ink = v.ink;
+        lappVand(key, ner, t);
+        continue;
+      }
       const sida = o.F.plats === PLATSER[2] ? 1 : -1;
       const A = o.arms.find((a) => Math.sign(a.s) === sida) || o.arms[0];
       const plats = PLATSER.indexOf(o.F.plats);
       const andra = o.arms.find((a) => a !== A);
       const meny = LAPP_MENY[plats].filter((h) => !LAPP_HALL[h].lage(0).tva || !andra || andra.kind !== 'cigg');
       // (borta på de två sidorna: de har aldrig samma hållning samtidigt)
-      LP[key] = { tal: v.tal, ink: v.ink, at: forsta ? t - 10 : t, ut: null, i: o.arms.indexOf(A), meny, forst: Math.floor(KORS_FRO) + (plats === 2 ? 2 : 0) };
+      LP[key] = { tal: v.tal, ink: v.ink, ner, p0: forsta && !ner ? 1 : 0, at: t, ut: null, i: o.arms.indexOf(A), meny, forst: Math.floor(KORS_FRO) + (plats === 2 ? 2 : 0) };
     }
   }
-  // Håller vem upp sin lapp just nu? (inte den som sover eller redan lägger ner den)
-  function lappUppe(vem, t) {
-    const o = figs.find((f) => f.F.key === String(vem).toLowerCase());
-    const l = o && lappNu(o, t);
-    return Boolean(l && l.x.ut == null);
+  // Vem lägger ner sin skylt eller tar upp den. Den som sover rör den inte, och ett klick på hen ska
+  // inte ändra något i smyg. → om det blev så.
+  function lappVand(vem, ner, t) {
+    const k = String(vem).toLowerCase();
+    const x = LP[k];
+    const o = figs.find((f) => f.F.key === k);
+    if (!x || !o || x.ut != null || sovW(o, t) > 0.5) return false;
+    if (x.ner !== ner) {
+      x.p0 = lappVag(x, t);
+      x.at = t;
+      x.ner = ner;
+    }
+    return true;
   }
   // Hur vem håller skylten och vad hen gör med den från at, för bilder (?rum-lapp).
   function lappProva(vem, hall, gor, at = 0) {
@@ -4757,5 +4856,5 @@ export async function figurer(canvas, opt = {}) {
     await r.compileAsync(scene, cam);
   } catch (err) { /* då byggs de när gänget ritas, som förut */ }
   ANS.ute = true;
-  return { draw, inne, ute, lage, mal, spel, senast, uttryck: () => ANS.p, prova, ga, pekar, hej, vald, tecken, lappar, lappUppe, lappProva, natt, efter, under, huvud, kval };
+  return { draw, inne, ute, lage, mal, spel, senast, uttryck: () => ANS.p, prova, ga, pekar, hej, vald, tecken, lappar, lappVand, lappProva, natt, efter, under, huvud, kval };
 }

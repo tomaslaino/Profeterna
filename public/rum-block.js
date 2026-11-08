@@ -189,12 +189,13 @@
   // Vad gänget håller upp: när en omgång är spelad står allas rätt kvar till måndagen efter kl. 16,
   // också när nästa omgång redan har tagit över (Svenska Spel öppnar den senast måndag morgon).
   // omgangar: de att välja bland, den senaste först. Dolda resultat ger inget (tpScore).
-  // → { id: omgången, vem: { dl: { tal, ink }, … } }, eller null.
+  // → { id: omgången, slut: när tiden är ute, vem: { dl: { tal, ink }, … } }, eller null.
   function lappar(omgangar, now = Date.now()) {
     if (typeof tpScore !== 'function') return null;
     for (const round of omgangar) {
       if (!round || !round.matcher || !round.matcher.length) continue;
-      if (!(now < mandagEfter(Math.max(...round.matcher.map((x) => Date.parse(x.avspark)))))) continue;
+      const slut = mandagEfter(Math.max(...round.matcher.map((x) => Date.parse(x.avspark))));
+      if (!(now < slut)) continue;
       const score = tpScore(round, now);
       if (!score.done) continue;
       const vem = {};
@@ -202,7 +203,7 @@
         if (p.none || p.id === HASSE) continue;
         vem[p.id.toLowerCase()] = { tal: p.ok || 0, ink: INK[Math.max(0, (round.gang || []).findIndex((g) => g.id === p.id))] };
       }
-      if (Object.keys(vem).length) return { id: round.id, vem };
+      if (Object.keys(vem).length) return { id: round.id, slut, vem };
     }
     return null;
   }
