@@ -97,6 +97,9 @@ window.RumMatchblad = (() => {
   const fmt = (o) => (g('fmtOdds') ? fmtOdds(o) : o >= 100 ? String(Math.round(o)) : o.toFixed(2).replace('.', ','));
   const ur = (v) => (v ? fmt(100 / v) : '–');
   const tom = (t) => `<p class="rb-tom">${esc(t)}</p>`;
+  // Laget i bladets snäva rader: i telefonen på höjden det kortare namnet, som på den smala
+  // kupongen (.kort i rum-matchblad.css). form = till exempel genitiv, på båda namnen.
+  const lagnamn = (n, form = (x) => x) => `<span class="lang">${esc(form(n))}</span><span class="kort">${esc(form(window.Papper ? Papper.kort(n) : n))}</span>`;
 
   // Bladets alla sidor är byggda av samma delar (rum-matchblad.css): en del börjar med
   // rubriken till vänster och det den säger till höger, och en hårlinje skiljer delarna åt.
@@ -226,8 +229,8 @@ window.RumMatchblad = (() => {
     const rader = st.slice(1).map((x, k) => {
       const p = pulls[k + 1];
       let label = esc(x.label);
-      if (x.label === 'Hemmaplan') label = `${esc(m.home)} spelar hemma`;
-      else if (x.label === m.home || x.label === m.away) label = `${esc(gen(x.label))} anfall och försvar`;
+      if (x.label === 'Hemmaplan') label = `${lagnamn(m.home)} spelar hemma`;
+      else if (x.label === m.home || x.label === m.away) label = `${lagnamn(x.label, gen)} anfall och försvar`;
       let spar = '<i class="rb-mitt"></i>';
       if (p.v >= 1) {
         const bredd = (p.v / skala) * 38;
@@ -239,7 +242,7 @@ window.RumMatchblad = (() => {
     }).join('');
     return del(rubrad('Vad drog åt vilket håll') +
       `<span class="rb-steg start"><span>Startpunkt</span><span class="tug-stack">${start.map((v, i) => `<span class="s${i}" style="flex:${v} 1 0">${v >= 14 ? ur(v) : ''}</span>`).join('')}</span></span>` +
-      `<span class="rb-steg axel"><span></span><span class="rb-sidor"><span>← hjälper ${esc(m.home)}</span><span>hjälper ${esc(m.away)} →</span></span></span>${rader}`, 'rb-drar');
+      `<span class="rb-steg axel"><span></span><span class="rb-sidor"><span>← hjälper ${lagnamn(m.home)}</span><span>hjälper ${lagnamn(m.away)} →</span></span></span>${rader}`, 'rb-drar');
   }
 
   // ---------- Analys ----------
@@ -381,10 +384,10 @@ window.RumMatchblad = (() => {
     const rows = list.map(({ x, when, comp, hide }) => {
       const res = letter(x);
       if (!hide) n[res]++;
-      return `<span class="rb-mote"><span class="nar">${esc(ar(when))}</span><span class="tav">${esc(comp || '')}</span><span class="h"><span>${esc(x.home)}</span>${lag(x.home)}</span>` +
-        `<b class="${hide ? 'sp' : res}">${hide ? '?' : `${x.score.home}–${x.score.away}`}</b><span class="a">${lag(x.away)}<span>${esc(x.away)}</span></span></span>`;
+      return `<span class="rb-mote"><span class="nar">${esc(ar(when))}</span><span class="tav">${esc(comp || '')}</span><span class="h"><span>${lagnamn(x.home)}</span>${lag(x.home)}</span>` +
+        `<b class="${hide ? 'sp' : res}">${hide ? '?' : `${x.score.home}–${x.score.away}`}</b><span class="a">${lag(x.away)}<span>${lagnamn(x.away)}</span></span></span>`;
     }).join('');
-    return `<div class="rb-moten">${rubrad('Tidigare möten', `${prick('h')}${esc(m.home)} <b>${n.V} V · ${n.O} O · ${n.F} F</b>`)}${rows}</div>`;
+    return `<div class="rb-moten">${rubrad('Tidigare möten', `${prick('h')}${lagnamn(m.home)} <b>${n.V} V · ${n.O} O · ${n.F} F</b>`)}${rows}</div>`;
   }
 
   // ---------- bladet ----------
@@ -402,8 +405,8 @@ window.RumMatchblad = (() => {
     const { m, nr, kupong } = ctx;
     return `<span class="band"><small>MATCHFIXARNA · ${esc(kupong ? kupong.toUpperCase() : 'KUPONG')}</small><b>Match ${nr}</b>` +
       `<button type="button" class="rl-stang" data-ut aria-label="${esc(`Tillbaka till ${ctx.tillbaka}`)}" title="${esc(`Tillbaka till ${ctx.tillbaka}`)}"><svg viewBox="0 0 12 12" aria-hidden="true"><path d="M1.5 1.5l9 9M10.5 1.5l-9 9"/></svg></button></span>` +
-      `<div class="rl-topp"><span class="rl-t h">${crest(m.home)}<b>${esc(m.home)}</b></span>` +
-      `<span class="rl-nar">${mellan(m)}</span><span class="rl-t a"><b>${esc(m.away)}</b>${crest(m.away)}</span></div>` +
+      `<div class="rl-topp"><span class="rl-t h">${crest(m.home)}<b>${lagnamn(m.home)}</b></span>` +
+      `<span class="rl-nar">${mellan(m)}</span><span class="rl-t a"><b>${lagnamn(m.away)}</b>${crest(m.away)}</span></div>` +
       `<div class="rb-flikar" role="tablist" aria-label="Matchbladet">${SIDOR.map(([id, namn]) =>
         `<button type="button" role="tab" data-flik="${id}" aria-selected="${id === flik}"${id === flik ? '' : ' tabindex="-1"'}>${namn}</button>`).join('')}</div>` +
       '<div class="rb-sida" role="tabpanel" tabindex="-1"></div>';
@@ -549,7 +552,9 @@ window.RumMatchblad = (() => {
     const passa = () => {
       const sm = typeof smal === 'function' ? smal() : smal;
       const [w, h] = sm ? [420, 620] : [660, 470];
-      const z = Math.min(2.2, (innerHeight - (sm ? 154 : 162)) / h, (innerWidth * (sm ? 0.94 : 0.8)) / w);
+      // (i telefonen på bredden får bladet hela höjden, som kupongen i handen: R.lag och held i rum.js)
+      const lag = innerHeight < 500 && innerWidth > innerHeight;
+      const z = Math.min(2.2, (innerHeight - (lag ? 28 : sm ? 154 : 162)) / h, (innerWidth * (sm ? 0.94 : 0.8)) / w);
       Object.assign(hand.style, { width: `${w}px`, height: `${h}px`, transform: `translate(-50%, -50%) scale(${z.toFixed(4)})` });
     };
     passa();
@@ -568,7 +573,8 @@ window.RumMatchblad = (() => {
     };
     lager.addEventListener('click', (e) => {
       e.stopPropagation();
-      if (!e.target.closest('.rum-blad')) ut();
+      // klickets väg, inte var målet sitter nu: Visa ändå ritar om sidan under klicket
+      if (!e.composedPath().some((n) => n instanceof Element && n.matches('.rum-blad'))) ut();
     });
     const inre = oppna({ host: hand, matcher, id, kupong, tillbaka, ut: () => ut(), calm });
     B = {

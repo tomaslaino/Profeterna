@@ -1025,7 +1025,9 @@ canvas.rum-neonhalo { opacity: 0.28; }
 .rum.smal .rum-hand { flex-wrap: wrap; row-gap: 14px; }
 .rum.smal .rum-hand .hoger { margin-left: auto; }
 .rum.smal .rum-hand .msg { position: absolute; left: 0; right: 0; bottom: calc(100% + var(--upp, 0px)); }
-.rum.smal.i-handen .rum-hdr { opacity: 0; }
+/* namnet är borta medan kupongen är i handen, och tar då inte heller emot tryck:
+   på bredden ligger det annars över kupongens band och matchbladets kryss */
+.rum.smal.i-handen .rum-hdr, .rum.lag.i-handen .rum-hdr { opacity: 0; pointer-events: none; }
 /* kupongen fyller nederkanten: Vanlig sida står uppe till höger, mitt emot
    namnet, i stället för över kupongen */
 .rum.smal .rum-ft { top: 18px; bottom: auto; height: 36px; align-items: center; }

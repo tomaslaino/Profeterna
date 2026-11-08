@@ -3854,9 +3854,10 @@ matchbladet ovanpå kupongen, på samma papper och i samma mått, så att det st
 glider upp över den och lägger sig lite snett, med kupongen synlig i kanten (`lagen` i rum.js,
 [public/rum-matchblad.js](public/rum-matchblad.js) och [public/rum-matchblad.css](public/rum-matchblad.css)).
 *Matchbladet* hos Hasse Backe och matchens rad på tv:ns matchsida lägger fram samma blad mitt i
-fönstret, lika stort som kupongen i handen, med det bakom mörkt (`RumMatchblad.fram`); där står
-*← Hasse* eller *← Tv:n* längst ner i stället för *← Kupongen*, och man är kvar där man var när bladet
-läggs bort. Förut fanns två olika blad: bladet med lagen på kupongen och matchrutan från den vanliga
+fönstret, lika stort som kupongen i handen, med det bakom mörkt (`RumMatchblad.fram`); där leder krysset
+i bandet tillbaka till Hasse eller tv:n i stället för till kupongen, och man är kvar där man var när bladet
+läggs bort. I telefonen på höjden står lagen med de kortare namnen, som på den smala kupongen, där raderna
+är snäva (bandet, *Vad drog åt vilket håll* och Mötena). Förut fanns två olika blad: bladet med lagen på kupongen och matchrutan från den vanliga
 sajten, som *Matchbladet →* på bladet, *Matchbladet* hos Hasse och matchens rad på tv:n öppnade. Matchrutan
 öppnas inte längre från rummet (jfr *Inga länkar ut ur tobaksaffären* under [Beslut](#beslut)).
 

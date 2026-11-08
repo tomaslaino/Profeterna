@@ -90,6 +90,7 @@
 .rl-t { display: flex; align-items: center; gap: 8px; min-width: 0; }
 .rl-t.a { justify-content: flex-end; }
 .rl-t b { min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; font: 650 20px/1.1 var(--display); letter-spacing: -0.01em; }
+.rum-blad .kort { display: none; }
 .rl-t .skold { width: 26px; height: 26px; }
 .rl-nar { display: grid; justify-items: center; white-space: nowrap; }
 .rl-nar b { font: 700 19px/1.05 var(--display); font-variant-numeric: tabular-nums; }
@@ -244,6 +245,9 @@
 .rum-blad .mr-halvor + .mr-teams { margin-top: 8px; padding-top: 0; border-top: 1px solid var(--pp-line); }
 .rum-blad .mr-team { padding: 0; font-size: 12px; background: none; border: 0; border-radius: 0; }
 .rum-blad .mr-team h4 { margin: 7px 0 2px; font: 600 13px/17px var(--display); letter-spacing: 0; text-transform: none; color: var(--pp-ink); }
+/* (lagets namn över listorna när elvorna inte har några platser på planen: pricken som på bladets övriga sidor) */
+.rum-blad .mr-team h4::before { content: ""; display: inline-block; width: 8px; height: 8px; margin-right: 6px; border-radius: 50%; background: var(--o-home); }
+.rum-blad .mr-team.a h4::before { background: var(--o-away); }
 .rum-blad .mr-team h5 { margin: 7px 0 2px; font-size: 10px; font-weight: 700; line-height: 13px; letter-spacing: 0.16em; text-transform: uppercase; color: var(--pp-print); }
 .rum-blad .mr-names li, .rum-blad .mr-out li { padding: 0; font-size: 12px; line-height: 16px; }
 .rum-blad .mr-out li .muted { font-size: 11px; }
@@ -318,6 +322,8 @@
 .rum.smal .rl-nar { grid-column: 1 / -1; grid-row: 2; display: flex; align-items: baseline; justify-content: center; gap: 7px; }
 .rum.smal .rl-nar b { font-size: 16px; }
 .rum.smal .rl-t b { font-size: 17px; }
+.rum.smal .rum-blad .lang { display: none; }
+.rum.smal .rum-blad .kort { display: inline; }
 .rum.smal .rl-t .skold { width: 22px; height: 22px; }
 .rum.smal .rb-flikar { justify-content: space-between; gap: 0; height: 32px; }
 .rum.smal .rb-flikar button { font-size: 10.5px; line-height: 32px; letter-spacing: 0.03em; }
@@ -336,7 +342,7 @@
 .rum.smal .rb-rutor { gap: 7px; }
 .rum.smal .rb-ruta { gap: 6px; }
 .rum.smal .rb-ruta b { font-size: 21px; }
-.rum.smal .rb-steg { grid-template-columns: 128px minmax(0, 1fr); gap: 6px; font-size: 11px; }
+.rum.smal .rb-steg { grid-template-columns: 158px minmax(0, 1fr); gap: 6px; font-size: 11px; }
 .rum.smal .rb-tabell .sm { display: none; }
 .rum.smal .rb-mote { grid-template-columns: 68px minmax(0, 1fr) 38px minmax(0, 1fr); column-gap: 4px; }
 .rum.smal .rb-mote > span { gap: 4px; }
@@ -345,9 +351,16 @@
 /* planhalvorna under varandra */
 .rum.smal .mr-halvor { grid-template-columns: minmax(0, 1fr); gap: 8px 0; }
 .rum.smal .mr-halva.a .rl-namn { flex-direction: row; }
-.rum.smal .mr-halva.a .rl-namn b { margin: 0 0 0 auto; }
+.rum.smal .mr-halva .rl-namn b { margin: 0 0 0 auto; }
 .rum.smal .mr-plan { height: 184px; }
 .rum.smal .rum-blad .mr-plan .mr-nm { max-width: min(96px, calc(var(--g) * 2.8px)); }
 .rum.smal .mr-halvor .mr-stamp { top: -2px; left: auto; right: 54px; transform: rotate(-7deg); }
-.rum.smal .mr-halvor.tomma .mr-stamp { top: 50%; left: 50%; right: auto; transform: translate(-50%, -50%) rotate(-7deg); }
+/* (mellan planerna står bortalagets namn till vänster: stämpeln står till höger om det) */
+.rum.smal .mr-halvor.tomma .mr-stamp { top: 50%; left: 72%; right: auto; transform: translate(-50%, -50%) rotate(-7deg); }
+/* i den smala spalten: betyget står kvar på raden, och ett långt namn får ge sig */
+.rum.smal .rum-blad .mr-team h4 { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.rum.smal .rum-blad .mr-team h4 .hint { display: none; }
+.rum.smal .rum-blad .mr-names li { flex-wrap: nowrap; }
+.rum.smal .rum-blad .mr-names .mr-card { min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.rum.smal .rum-blad .mr-names .mr-rt { padding-left: 4px; }
 

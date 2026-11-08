@@ -3203,7 +3203,8 @@ ${window.RumRegister ? RumRegister.nara() : ''}
     el.addEventListener('click', (e) => {
       if (k.closing) return;
       // matchbladet sköter sig självt (rum-matchblad.js), och lagen i en rad lägger det på kupongen
-      if (e.target.closest('.rum-blad')) return;
+      // (klickets väg, inte var målet sitter nu: Visa ändå ritar om sidan under klicket)
+      if (e.composedPath().some((n) => n instanceof Element && n.matches('.rum-blad'))) return;
       const t = e.target.closest('button[data-lagen]');
       if (t) {
         lagen(t.closest('.row').dataset.id);
@@ -4207,7 +4208,8 @@ ${window.RumRegister ? RumRegister.nara() : ''}
     const frac = (d, o) => (o > 1 ? d / o : 0);
     el.addEventListener('pointerdown', (e) => {
       R.pek = e.pointerType;
-      if (!e.isPrimary || e.button !== 0 || e.target.closest('#rum-vhs, input, .rum-hdr, .rum-ft')) return;
+      // (matchbladet på kupongen sköter sig självt: ett svep på det är inget drag, och trycket efter det gäller)
+      if (!e.isPrimary || e.button !== 0 || e.target.closest('#rum-vhs, input, .rum-hdr, .rum-ft, .rum-blad')) return;
       cancelAnimationFrame(P.raf);
       Object.assign(P, { id: e.pointerId, x: e.clientX, y: e.clientY, px: R.px, py: R.py, drar: false, spar: [[e.timeStamp, e.clientX, e.clientY]] });
     });

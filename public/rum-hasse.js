@@ -94,6 +94,8 @@ window.RumHasse = (() => {
     document.addEventListener('keydown', (e) => {
       if (e.metaKey || e.ctrlKey || e.altKey) return;
       if (!H.on) return;
+      // spelarkortet ovanpå bladets startelvor sköter sig självt: Esc stänger bara det, som i rummet
+      if (document.querySelector('dialog[open]')) return;
       e.stopPropagation();
       // med matchbladet framme: Esc lägger bort det, och pilarna byter sida
       if (H.blad) {
@@ -541,7 +543,7 @@ window.RumHasse = (() => {
 
   // Matchbladet i samtalet lägger fram samma blad som ett klick på lagen på kupongen i rummet
   // (RumMatchblad.fram i rum-matchblad.js): i kupongens mått, lika stort som kupongen i handen,
-  // över baren som mörknar bakom. Det läggs bort med Hasse längst ner, Esc eller ett klick utanför,
+  // över baren som mörknar bakom. Det läggs bort med krysset i bandet, Esc eller ett klick utanför,
   // och man är kvar hos honom.
   function bladet(id) {
     if (H.blad) return;
