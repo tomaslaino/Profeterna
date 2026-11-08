@@ -3850,7 +3850,7 @@ sajten, som *Matchbladet →* på bladet, *Matchbladet* hos Hasse och matchens r
 Överst står bandet med kupongens namn och *Match 3* och lagen med sköldarna, dag, tid och tävling
 mellan dem (och över dem resultatet när matchen är spelad och resultaten inte är dolda), och under
 dem flikarna – bladets sidor, i den ordning man behöver dem inför ett tecken. Alla flikar står alltid
-där, över hela bladets bredd, så att de står still när man bläddrar.
+där, över hela bladets bredd, så att de står still.
 
 Sidorna är byggda av samma delar, så att man känner igen sig (2026-11-08, "få det konkordant"): samma
 luft under flikarna och samma hårlinje mellan delarna; en del börjar med en rubrik i små spärrade
@@ -3894,11 +3894,11 @@ tredjedelar (1 X 2) eller halvor (hemma och borta).
   senaste, med lagens prickar och ställningen i formens rutor sedd från hemmalaget på bladet, och
   hemmalagets V–O–F till höger om rubriken.
 
-En sida som inte ryms flyttas med hjulet eller fingret inom bladet (*Analys* och *Startelvor* i
-telefonen). Sidan man har framme följer med när man bläddrar mellan matcherna och nästa gång bladet tas
-fram under besöket. I foten står *← Kupongen* och pilarna med *3 av 13*. Pilarna, ← → och ett svep i
-sidled byter match i kupongens ordning (nästa blad läggs ovanpå det förra från det hållet), ↑ ↓ byter
-sida; *Kupongen*, Esc eller ett klick utanför tar bort bladet, och K lägger tillbaka kupongen. Det man
+En sida som inte ryms flyttas med hjulet eller fingret inom bladet och tonar bort mot papperet nederst.
+Bladet gäller en match: man bläddrar inte mellan matcherna (2026-11-08: "Man gör inte det"), utan lägger
+bort bladet och tar fram ett annat, och bladet har ingen fot. Sidan man har framme följer med nästa gång
+bladet tas fram under besöket. Piltangenterna byter sida; det runda krysset i bandet, Esc eller ett klick
+utanför tar bort bladet, och K lägger tillbaka kupongen. Det man
 gör med kupongen under den (*Spara*, *Lämna in* …) tar bort bladet först. Matchens fil hämtas när
 bladet läggs fram (*Hämtar …* för hand så länge) och sparas medan sidan är öppen. Dolda resultat står
 som ? i rutorna, och har ett lag en dold match står dess *Mål* och *xG* också som ?.

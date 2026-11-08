@@ -35,18 +35,20 @@
 // Lagets siffror först, motståndarnas sedan, som på resten av sajten. Dolda
 // resultat (Spoiler) står som ?.
 //
-// Sidan man har framme följer med när man bläddrar mellan matcherna och nästa
-// gång bladet tas fram under besöket.
+// Bladet gäller en match: man bläddrar inte mellan matcherna, utan lägger bort det och
+// tar fram ett annat. Sidan man har framme följer med nästa gång bladet tas fram under
+// besöket.
 //
 // RumMatchblad.load(id) → Promise med matchens fil (null om den inte går att hämta)
 // RumMatchblad.fram({ inom, matcher, id, kupong, tillbaka, smal, calm, nar }) → blad: bladet för sig,
 //   mitt i fönstret (hos Hasse Backe och från tv:n), se fram nedan
 // RumMatchblad.oppna({ host, matcher, id, kupong, tillbaka, ut, calm }) → blad
 //   host      där bladet läggs (kupongen i handen, eller lagret över baren)
-//   matcher   omgångens matcher i kupongens ordning ({ id, home, away, kickoff, comp })
-//   tillbaka  ordet längst ner till vänster (Kupongen, Hasse); ut() när man trycker på det
-//   blad.steg(n)  nästa (1) eller förra (−1) match, blad.flik(n)  nästa eller förra sida,
-//   blad.ut(nu)  tar bort bladet, blad.el  bladet som ligger överst, blad.id  dess match
+//   matcher   omgångens matcher i kupongens ordning ({ id, home, away, kickoff, comp }),
+//             för matchens nummer i bandet
+//   tillbaka  dit krysset i bandet leder (kupongen, Hasse), ut() när man trycker på det
+//   blad.flik(n)  nästa eller förra sida, blad.ut(nu)  tar bort bladet, blad.el  bladet,
+//   blad.id  dess match
 
 window.RumMatchblad = (() => {
   const esc = (s) => String(s == null ? '' : s).replace(/[&<>"']/g, (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
@@ -61,7 +63,7 @@ window.RumMatchblad = (() => {
   const TZ = 'Europe/Stockholm';
   const fNar = new Intl.DateTimeFormat('sv-SE', { timeZone: TZ, weekday: 'short', hour: '2-digit', minute: '2-digit' });
   const fSkriven = new Intl.DateTimeFormat('sv-SE', { timeZone: TZ, weekday: 'short', day: 'numeric', month: 'short', hour: '2-digit', minute: '2-digit' });
-  // Sidorna, i bladets ordning. Alla står alltid där, så att flikarna står still när man bläddrar.
+  // Sidorna, i bladets ordning. Alla står alltid där, så att flikarna står still.
   const SIDOR = [['lagen', 'Lagen'], ['prognos', 'Prognos'], ['analys', 'Analys'], ['elvor', 'Startelvor'], ['tabellen', 'Tabellen'], ['moten', 'Mötena']];
   // möten på sidan, som kortet i kortregistret (MOTEN i rum-register.js)
   const MOTEN = 11;
@@ -397,16 +399,14 @@ window.RumMatchblad = (() => {
   }
 
   function topp(ctx) {
-    const { m, nr, av, kupong } = ctx;
-    return `<span class="band"><small>MATCHFIXARNA · ${esc(kupong ? kupong.toUpperCase() : 'KUPONG')}</small><b>Match ${nr}</b></span>` +
+    const { m, nr, kupong } = ctx;
+    return `<span class="band"><small>MATCHFIXARNA · ${esc(kupong ? kupong.toUpperCase() : 'KUPONG')}</small><b>Match ${nr}</b>` +
+      `<button type="button" class="rl-stang" data-ut aria-label="${esc(`Tillbaka till ${ctx.tillbaka}`)}" title="${esc(`Tillbaka till ${ctx.tillbaka}`)}"><svg viewBox="0 0 12 12" aria-hidden="true"><path d="M1.5 1.5l9 9M10.5 1.5l-9 9"/></svg></button></span>` +
       `<div class="rl-topp"><span class="rl-t h">${crest(m.home)}<b>${esc(m.home)}</b></span>` +
       `<span class="rl-nar">${mellan(m)}</span><span class="rl-t a"><b>${esc(m.away)}</b>${crest(m.away)}</span></div>` +
       `<div class="rb-flikar" role="tablist" aria-label="Matchbladet">${SIDOR.map(([id, namn]) =>
         `<button type="button" role="tab" data-flik="${id}" aria-selected="${id === flik}"${id === flik ? '' : ' tabindex="-1"'}>${namn}</button>`).join('')}</div>` +
-      `<div class="rb-sida" role="tabpanel" tabindex="-1"></div>` +
-      `<div class="rl-fot"><button type="button" class="rl-vag tillbaka" data-ut>${esc(ctx.tillbaka)}</button>` +
-      `<span class="rl-steg"><button type="button" class="rl-pil" data-steg="-1" aria-label="Förra matchen"${nr > 1 ? '' : ' disabled'}>‹</button>` +
-      `<span>${nr} av ${av}</span><button type="button" class="rl-pil" data-steg="1" aria-label="Nästa match"${nr < av ? '' : ' disabled'}>›</button></span></div>`;
+      '<div class="rb-sida" role="tabpanel" tabindex="-1"></div>';
   }
 
   // Sidan som är framme: först det som finns (Hämtar … medan matchens fil kommer),
@@ -459,12 +459,11 @@ window.RumMatchblad = (() => {
 
   function oppna({ host, matcher, id, kupong, tillbaka, ut, calm = () => false }) {
     const B = { el: null, id: null, ctx: null };
-    function lagg(id2, steg = 0) {
-      const i = matcher.findIndex((x) => String(x.id) === String(id2));
+    function lagg() {
+      const i = matcher.findIndex((x) => String(x.id) === String(id));
       const m = matcher[i];
       if (!m) return;
-      const ctx = { m, nr: i + 1, av: matcher.length, kupong, tillbaka, d: undefined };
-      const gammal = B.el;
+      const ctx = { m, nr: i + 1, kupong, tillbaka, d: undefined };
       const el = document.createElement('div');
       el.className = 'rum-blad';
       el.tabIndex = -1;
@@ -482,41 +481,13 @@ window.RumMatchblad = (() => {
         ctx.d = d;
         rita(el, ctx);
       });
-      const vila = getComputedStyle(el).transform;
-      if (gammal) {
-        // nästa blad läggs ovanpå det förra, från det håll man bläddrar
-        if (calm()) gammal.remove();
-        else {
-          el.animate([{ opacity: 0, transform: `translate(${steg * 46}px, 10px) rotate(${steg * 1.6}deg)` }, { opacity: 1, transform: vila }],
-            { duration: 300, easing: 'cubic-bezier(0.2, 0.7, 0.2, 1)' }).finished.then(() => gammal.remove(), () => gammal.remove());
-        }
-      } else if (!calm()) {
+      if (!calm()) {
+        const vila = getComputedStyle(el).transform;
         el.animate([{ opacity: 0, transform: 'translate(0, 64px) rotate(2.4deg)' }, { opacity: 1, offset: 0.45 }, { opacity: 1, transform: vila }],
           { duration: 440, easing: 'cubic-bezier(0.2, 0.7, 0.2, 1)' });
       }
     }
     function koppla(el, ctx) {
-      // ett svep i sidled byter match, som pilarna (som på anslagstavlan och i kortregistret),
-      // och klicket efter svepet gör ingenting
-      const P = { id: null, svep: 0 };
-      el.addEventListener('pointerdown', (e) => {
-        if (e.isPrimary) Object.assign(P, { id: e.pointerId, x: e.clientX, y: e.clientY });
-      });
-      el.addEventListener('pointerup', (e) => {
-        if (e.pointerId !== P.id) return;
-        P.id = null;
-        const dx = e.clientX - P.x;
-        const dy = e.clientY - P.y;
-        if (Math.abs(dx) < 40 || Math.abs(dx) < Math.abs(dy) * 1.5) return;
-        P.svep = e.timeStamp;
-        if (B.el === el) B.steg(dx < 0 ? 1 : -1);
-      });
-      el.addEventListener('click', (e) => {
-        if (P.svep && e.timeStamp - P.svep < 500) {
-          e.preventDefault();
-          e.stopPropagation();
-        }
-      }, true);
       el.addEventListener('click', (e) => {
         if (B.el !== el) return;
         const f = e.target.closest('[data-flik]');
@@ -525,11 +496,6 @@ window.RumMatchblad = (() => {
             flik = f.dataset.flik;
             rita(el, ctx);
           }
-          return;
-        }
-        const s = e.target.closest('button[data-steg]');
-        if (s) {
-          if (!s.disabled) B.steg(Number(s.dataset.steg));
           return;
         }
         if (e.target.closest('[data-ut]')) {
@@ -544,23 +510,18 @@ window.RumMatchblad = (() => {
         }
       });
     }
-    // ↑ ↓ (rum.js och rum-hasse.js): förra eller nästa sida
+    // piltangenterna (rum.js och rum-hasse.js): förra eller nästa sida
     B.flik = (n) => {
-      const i = SIDOR.findIndex(([id]) => id === flik) + n;
+      const i = SIDOR.findIndex(([s]) => s === flik) + n;
       if (!B.el || i < 0 || i >= SIDOR.length) return;
       flik = SIDOR[i][0];
       rita(B.el, B.ctx);
-    };
-    B.steg = (n) => {
-      const i = matcher.findIndex((x) => String(x.id) === B.id) + n;
-      if (i >= 0 && i < matcher.length) lagg(matcher[i].id, n);
     };
     B.ut = (nu = false) => {
       const el = B.el;
       B.el = null;
       slappElvor();
       if (!el) return;
-      for (const x of host.querySelectorAll('.rum-blad')) if (x !== el) x.remove();
       if (nu || calm()) {
         el.remove();
         return;
@@ -568,13 +529,13 @@ window.RumMatchblad = (() => {
       el.animate([{ opacity: 1, transform: getComputedStyle(el).transform }, { opacity: 0, transform: 'translate(0, 48px) rotate(2deg)' }],
         { duration: 240, easing: 'ease-in', fill: 'forwards' }).finished.then(() => el.remove(), () => el.remove());
     };
-    lagg(id);
+    lagg();
     return B;
   }
 
   // Bladet för sig, när ingen kupong är i handen (Matchbladet hos Hasse Backe, matchens rad på
   // tv:n): i kupongens mått (KUP i rum.js) och lika stort som kupongen i handen (held i rum.js),
-  // mitt i fönstret över ett mörker. Det läggs bort med ordet längst ner, Esc eller ett klick
+  // mitt i fönstret över ett mörker. Det läggs bort med krysset i bandet, Esc eller ett klick
   // utanför, och då är man kvar där man var. Klick och pekare stannar i lagret.
   //   inom      där lagret läggs (hans vy, rummet), smal()  kupongen är den smala (telefonen på höjden)
   //   nar ut    efter att bladet har lagts bort (till exempel för att flytta fokus)
@@ -611,7 +572,6 @@ window.RumMatchblad = (() => {
     });
     const inre = oppna({ host: hand, matcher, id, kupong, tillbaka, ut: () => ut(), calm });
     B = {
-      steg: (n) => inre.steg(n),
       flik: (n) => inre.flik(n),
       ut,
       get id() { return inre.id; },

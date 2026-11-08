@@ -3287,14 +3287,14 @@ ${window.RumRegister ? RumRegister.nara() : ''}
   //
   // Ett klick på lagen i en rad lägger matchbladet på kupongen, på samma papper
   // och i samma mått, så att det står där kupongen står. Det glider upp över
-  // kupongen och lägger sig lite snett; flikarna är bladets sidor, pilarna
-  // (‹ ›, ← →) byter match i kupongens ordning, och Kupongen, Esc eller ett
-  // klick utanför tar bort det igen. Samma blad som Matchbladet hos Hasse Backe.
+  // kupongen och lägger sig lite snett; flikarna är bladets sidor, och krysset,
+  // Esc eller ett klick utanför tar bort det igen. Samma blad som Matchbladet hos
+  // Hasse Backe.
   function lagen(id) {
     const k = R.kup;
     if (!k || k.closing || !window.RumMatchblad) return;
     if (k.lapp) return;
-    k.lapp = RumMatchblad.oppna({ host: k.el, matcher: k.matcher, id, kupong: k.kupong, tillbaka: 'Kupongen', ut: () => lagenUt(), calm });
+    k.lapp = RumMatchblad.oppna({ host: k.el, matcher: k.matcher, id, kupong: k.kupong, tillbaka: 'kupongen', ut: () => lagenUt(), calm });
   }
   function lagenUt(now = false) {
     const k = R.kup;
@@ -3306,10 +3306,6 @@ ${window.RumRegister ? RumRegister.nara() : ''}
     const t = k.el.querySelector(`.row[data-id="${CSS.escape(id)}"] button[data-lagen]`);
     if (t && !now) t.focus({ preventScroll: true });
     else if (!now) k.el.focus({ preventScroll: true });
-  }
-  function lagenSteg(n) {
-    const k = R.kup;
-    if (k && k.lapp) k.lapp.steg(n);
   }
 
   function closeCoupon(now = false) {
@@ -4367,7 +4363,7 @@ ${window.RumRegister ? RumRegister.nara() : ''}
       const tvMatch = R.zoom && e.target.closest('#rum-tv3 a[href^="#match/"]');
       if (tvMatch && window.RumMatchblad) {
         e.preventDefault();
-        bladFram(tvMatch.getAttribute('href').slice(7), 'Tv:n');
+        bladFram(tvMatch.getAttribute('href').slice(7), 'tv:n');
         return;
       }
       if (R.zoom && e.target.closest('#rum-tv3')) return;
@@ -4407,14 +4403,13 @@ ${window.RumRegister ? RumRegister.nara() : ''}
       }
       const k = e.key.toLowerCase();
       const fore = R.sak;
-      // matchbladet för sig (bladFram): Esc lägger bort det, ← → byter match och ↑ ↓ sida
+      // matchbladet för sig (bladFram): Esc lägger bort det, och pilarna byter sida
+      const pil = { arrowleft: -1, arrowright: 1, arrowup: -1, arrowdown: 1 }[k];
       if (R.blad) {
-        const n = { arrowleft: -1, arrowright: 1, arrowup: -1, arrowdown: 1 }[k];
         if (k === 'escape') R.blad.ut();
-        else if (n) {
+        else if (pil) {
           e.preventDefault();
-          if (k === 'arrowleft' || k === 'arrowright') R.blad.steg(n);
-          else R.blad.flik(n);
+          R.blad.flik(pil);
         }
         return;
       }
@@ -4427,15 +4422,12 @@ ${window.RumRegister ? RumRegister.nara() : ''}
         if (/^[ktarvh]$/.test(k)) sak(null, null);
       }
       if (R.kup && R.kup.lapp) {
-        // matchbladet: Esc tar bort det, ← → byter match och ↑ ↓ sida
+        // matchbladet: Esc tar bort det, och pilarna byter sida
         if (k === 'escape') lagenUt();
         else if (k === 'k') closeCoupon();
-        else if (k === 'arrowleft' || k === 'arrowright') {
+        else if (pil) {
           e.preventDefault();
-          lagenSteg(k === 'arrowleft' ? -1 : 1);
-        } else if (k === 'arrowup' || k === 'arrowdown') {
-          e.preventDefault();
-          R.kup.lapp.flik(k === 'arrowup' ? -1 : 1);
+          R.kup.lapp.flik(pil);
         }
       } else if (R.kup) {
         if (k === 'k' || k === 'escape') closeCoupon();

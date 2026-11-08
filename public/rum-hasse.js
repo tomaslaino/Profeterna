@@ -95,14 +95,13 @@ window.RumHasse = (() => {
       if (e.metaKey || e.ctrlKey || e.altKey) return;
       if (!H.on) return;
       e.stopPropagation();
-      // med matchbladet framme: Esc lägger bort det, ← → byter match och ↑ ↓ sida
+      // med matchbladet framme: Esc lägger bort det, och pilarna byter sida
       if (H.blad) {
         const n = { ArrowLeft: -1, ArrowRight: 1, ArrowUp: -1, ArrowDown: 1 }[e.key];
         if (e.key === 'Escape') bladetUt();
         else if (n) {
           e.preventDefault();
-          if (/Left|Right/.test(e.key)) H.blad.steg(n);
-          else H.blad.flik(n);
+          H.blad.flik(n);
         }
         return;
       }
