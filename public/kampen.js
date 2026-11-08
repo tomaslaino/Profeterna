@@ -34,10 +34,11 @@
 const KAMP = { html: null, width: 0, hk: null, coupons: null, wait: null };
 // Spelkassan: så mycket på varje match.
 const KAMP_INSATS = 10;
-const KAMP_BILD = { DL: 'profeterna/laino.jpg', DT: 'profeterna/teijder.jpg', DJ: 'profeterna/johansson.jpg' };
+const KAMP_BILD = { DL: 'profeterna/laino.jpg', DT: 'profeterna/teijder.jpg', DJ: 'profeterna/johansson.jpg', HB: 'profeterna/hasse.jpg' };
 // En färg per tippare i kurvan och vid porträtten, i gängets ordning – samma
-// som på kupongen (.sm-p0–2 i samtal.css): blått, grönt och lila. Den mörkare
-// tonen är för papperet (betyg.js).
+// som på kupongen (.sm-p0–2 i samtal.css): blått, grönt och lila. Hasse Backe,
+// som kommer efter gänget, blir guld som hans tips i baren. Den mörkare tonen
+// är för papperet (betyg.js).
 const KAMP_FARG = ['#b3cffb', '#97e0bd', '#d6bcf7', '#f0d699', '#f2b8a0'];
 const KAMP_DJUP = ['#4d8ff0', '#3db37c', '#a069e6', '#c9973f', '#c8643a'];
 const KAMP_MODELL = '#9d9383';
@@ -70,10 +71,10 @@ function kampLive(frozen, now) {
     if (st.state === 'off' || st.state === 'missing') return null;
     const model = st.m && (st.m.j && st.m.j.p ? st.m.j.p : st.m.f ? st.m.f.p : null);
     const tips = {};
-    for (const g of round.gang || []) {
-      const t = round.tips[g.id] && round.tips[g.id].tecken;
+    for (const p of s.people) {
+      const t = s.tecken[p.id];
       const sign = Tippoang.sign(t && t[x.id]);
-      if (sign) tips[g.id] = sign;
+      if (sign) tips[p.id] = sign;
     }
     const res = st.state === 'final' && st.res != null ? Tippoang.SIGNS[st.res] : null;
     return { id: x.id, match: teamsOf(st), ...(res ? { res } : {}), ...(model ? { model } : {}), tips };

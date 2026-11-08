@@ -1,0 +1,62 @@
+<!doctype html><meta charset="utf-8"><body style="margin:0;background:#888">
+<canvas id="k" width="640" height="840"></canvas><canvas id="p" width="400" height="400"></canvas>
+<script>
+// Hasses kropp till pallen och kröningen: kostymfotot ur atlasen (armen speglad), byxor och skor ritade i samma tyg.
+// Ritas dubbelt så stort och skalas ner sist. Samma mått som de andra kropparna: 320 × 420.
+window.klar = (async () => {
+  const a = new Image(); a.src = 'atlas.png'; await a.decode();
+  const c = document.getElementById('k').getContext('2d');
+  const K = 2, s = 0.155 * K;              // fotot: 1 bildpunkt i atlasen → s på duken
+  const m = 405;                           // kroppens mitt i fotot
+  const cx = 160 * K, top = 2 * K;         // kroppens mitt och hårets översta punkt
+  const X = (x) => cx + (x - m) * s, Y = (y) => top + (y - 40) * s;
+  const tyg = (x0, x1) => { const g = c.createLinearGradient(X(x0), 0, X(x1), 0); g.addColorStop(0, '#343437'); g.addColorStop(0.5, '#2a2a2d'); g.addColorStop(1, '#17171a'); return g; };
+  const form = (pts, fill) => { c.beginPath(); c.moveTo(X(pts[0][0]), Y(pts[0][1])); for (let i = 1; i < pts.length; i++) { const p = pts[i]; if (p.length === 2) c.lineTo(X(p[0]), Y(p[1])); else c.bezierCurveTo(X(p[0]), Y(p[1]), X(p[2]), Y(p[3]), X(p[4]), Y(p[5])); } c.closePath(); c.fillStyle = fill; c.fill(); };
+
+  // Byxorna: två ben i kostymens tyg, lite isär, med ett pressveck.
+  const FOTLED = 2500, HOFT = 1380;
+  const ben = (d) => {
+    const x = (v) => m + d * v;
+    form([[x(4), HOFT], [x(262), HOFT], [x(268), HOFT + 380, x(222), FOTLED - 400, x(210), FOTLED], [x(72), FOTLED], [x(58), FOTLED - 500, x(22), HOFT + 320, x(4), HOFT]],
+      d < 0 ? tyg(m - 240, m) : tyg(m, m + 240));
+    c.strokeStyle = 'rgba(255,255,255,.08)'; c.lineWidth = 1.1 * K;
+    c.beginPath(); c.moveTo(X(x(135)), Y(HOFT + 120)); c.lineTo(X(x(140)), Y(FOTLED - 8)); c.stroke();
+    // skon
+    form([[x(70), FOTLED - 6], [x(200), FOTLED - 6], [x(255), FOTLED + 30, x(300), FOTLED + 62, x(292), FOTLED + 96], [x(280), FOTLED + 112, x(120), FOTLED + 112, x(66), FOTLED + 100]], '#0b0b0c');
+    c.fillStyle = 'rgba(255,255,255,.3)';
+    c.beginPath(); c.ellipse(X(x(235)), Y(FOTLED + 62), 5 * K, 1.5 * K, d * 0.4, 0, 7); c.fill();
+  };
+  ben(-1); ben(1);
+
+  // Händerna, nedanför ärmarna.
+  const hand = (x0) => {
+    c.fillStyle = '#d9a68c';
+    c.beginPath(); c.ellipse(X(x0), Y(1496), 42 * s, 62 * s, 0, 0, 7); c.fill();
+    c.fillStyle = 'rgba(120,70,50,.28)';
+    c.beginPath(); c.ellipse(X(x0 + 8), Y(1506), 30 * s, 50 * s, 0, 0, 7); c.fill();
+  };
+  hand(72); hand(740);
+
+  // Kavajens nederdel under fotot, och armen som saknas: ärmen går från axeln till handen.
+  form([[66, 1320], [690, 1320], [700, 1452], [420, 1462], [86, 1452]], '#27272a');
+  form([[690, 640], [786, 650], [796, 760, 806, 1100, 792, 1440], [690, 1450], [696, 1200, 672, 900, 690, 640]], '#232326');
+  form([[64, 1200], [172, 1200], [160, 1320, 140, 1400, 132, 1450], [20, 1440], [30, 1340, 60, 1260, 64, 1200]], tyg(30, 170));
+  // manschetterna
+  c.fillStyle = '#eee9e2';
+  c.save(); c.translate(X(741), Y(1446)); c.fillRect(-55 * s, 0, 110 * s, 16 * s); c.restore();
+  c.save(); c.translate(X(76), Y(1444)); c.fillRect(-55 * s, 0, 110 * s, 16 * s); c.restore();
+
+  // Fotot själv, utan klädbitarna till höger i atlasen. Sömmen mellan ärmen och kroppen.
+  c.drawImage(a, 0, 0, 800, 1346, X(0), Y(0), 800 * s, 1346 * s);
+  c.strokeStyle = 'rgba(0,0,0,.45)'; c.lineWidth = 1 * K;
+  c.beginPath(); c.moveTo(X(672), Y(790)); c.bezierCurveTo(X(690), Y(1000), X(700), Y(1200), X(694), Y(1450)); c.stroke();
+
+  // Porträttet, som de andras: fyrkantigt med bakgrund.
+  const p = document.getElementById('p').getContext('2d');
+  const g = p.createRadialGradient(200, 150, 40, 200, 200, 300);
+  g.addColorStop(0, '#6d5a43'); g.addColorStop(1, '#2a2118');
+  p.fillStyle = g; p.fillRect(0, 0, 400, 400);
+  p.drawImage(a, 150, 20, 480, 480, 0, 0, 400, 400);
+  return true;
+})();
+</script>

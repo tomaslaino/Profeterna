@@ -22,11 +22,34 @@
   const SIGNS = ['1', 'X', '2'];
   const BASE = { 1: 0.45, 2: 0.75, 3: 1 };
 
+  // Hasse Backe (fiktiv) tävlar med gänget under samma regel, med en kupong byggd
+  // på det han säger vid disken (src/tippare.js), men hör inte till laget: han lämnar
+  // inget in, är inte med när tipsen jämförs inför gängets kupong och räknas inte in i den.
+  const HASSE = { id: 'HB', namn: 'Hasse Backe' };
+
   // "x1" → "1X"; tomt om inget tecken.
   const sign = (s) => {
     const t = String(s || '').toUpperCase();
     return SIGNS.filter((x) => t.includes(x)).join('');
   };
+
+  // ---------- regeln ----------
+  //
+  // Vad en kupong får innehålla (regel i config/kupong.js) – samma för alla som
+  // tippar: på kupongen (samtal.js), på pulten (rum-hasse-kupong.js) och för Hasse
+  // Backe (hasseKupong i src/tippare.js). Nya förutsättningar läggs här: en kupong
+  // som inte klarar regelKlar spelar han inte.
+
+  const SLAG = ['spik', 'halv', 'hel'];
+  // Regeln som gäller en omgång med n matcher (lika många som regeln), eller null.
+  const regelFor = (r, n) => (r && r.spik + r.halv + r.hel === n ? r : null);
+  // Hur många spikar, halvgarderingar och helgarderingar tecknen har. Tomma räknas inte.
+  const slag = (signs) => Object.fromEntries(SLAG.map((k, i) => [k, signs.filter((t) => String(t || '').length === i + 1).length]));
+  // Slagen som det är för många av. Med alla matcher tippade är det samma sak
+  // som att inte ha precis regelns; medan några är tomma går resten att fylla i.
+  const regelOver = (r, signs) => { const n = slag(signs); return SLAG.filter((k) => n[k] > r[k]); };
+  // En färdig kupong: tecken i varje match och inget för mycket.
+  const regelKlar = (r, signs) => signs.every(Boolean) && !regelOver(r, signs).length;
 
   // Modellens chans för tecknet i hela procent, ur prognosen [1, X, 2]
   // (hela procent) – eller null om prognosen saknas.
@@ -98,5 +121,5 @@
     return { people: [...by.values()].sort((a, b) => key(b) - key(a)), model };
   }
 
-  return { SIGNS, BASE, sign, pct, chance, modelSign, points, tally, key, rank, season };
+  return { SIGNS, BASE, HASSE, SLAG, regelFor, slag, regelOver, regelKlar, sign, pct, chance, modelSign, points, tally, key, rank, season };
 });

@@ -386,15 +386,15 @@ window.RumHasseKupong = (ctx) => {
 
   // Gängets regel (config/kupong.js, som brott i samtal.js): så många spikar, halvgarderingar och
   // helgarderingar. Det som är för många och det som fattas i t, eller null när t följer den.
-  const SLAG = ['spik', 'halv', 'hel'];
   function regeln(t) {
     const p = pult();
     // (KP är en const i kupong.js, inte window.KP)
-    const r = typeof KP !== 'undefined' && KP.data && KP.data.samtal && KP.data.samtal.regel;
-    if (!p || !r || r.spik + r.halv + r.hel !== p.s.matcher.length) return null;
-    const n = SLAG.map((k, i) => p.s.matcher.filter((x) => String(t[x.id] || '').length === i + 1).length);
-    const for_ = SLAG.find((k, i) => n[i] > r[k]);
-    return for_ ? { for: for_, till: SLAG.find((k, i) => n[i] < r[k]) || null } : null;
+    const r = p && typeof KP !== 'undefined' && KP.data && KP.data.samtal && Tippoang.regelFor(KP.data.samtal.regel, p.s.matcher.length);
+    if (!r) return null;
+    const tecken = p.s.matcher.map((x) => t[x.id]);
+    const n = Tippoang.slag(tecken);
+    const for_ = Tippoang.regelOver(r, tecken)[0];
+    return for_ ? { for: for_, till: Tippoang.SLAG.find((k) => n[k] < r[k]) || null } : null;
   }
   // Vad han säger när han har skrivit en ändring i din inlämnade kupong: följer den inte regeln lämnar han
   // inte in den, och säger vad som behövs; går den ihop efter det (vantade: den gjorde inte det förut)

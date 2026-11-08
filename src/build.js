@@ -279,7 +279,7 @@ function writeSite(outDir = OUT, { journal = false, couponEndpoint, samtal = nul
     console.error('[build] tipparna:', err);
     tippare = { rounds: [], errors: [String(err.message || err)], added: [], frozen: [] };
   }
-  write('tippare.json', { rounds: tippare.rounds, errors: tippare.errors });
+  write('tippare.json', { rounds: tippare.rounds, hasse: tippare.hasse || {}, errors: tippare.errors });
 
   // En trasig match får inte stoppa bygget – den saknar då bara sin sida.
   const failed = [];

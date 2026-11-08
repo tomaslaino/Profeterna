@@ -92,16 +92,13 @@
   // Gängets regel (config/kupong.js): så många spikar, halvgarderingar och
   // helgarderingar har en kupong – på Stryktipsets tretton 4, 5 och 4. Gäller
   // omgångar med lika många matcher som regeln. → {spik, halv, hel} | null.
-  const regel = (s) => {
-    const r = info() && info().regel;
-    return r && s && r.spik + r.halv + r.hel === s.matcher.length ? r : null;
-  };
+  const regel = (s) => (s && info() ? Tippoang.regelFor(info().regel, s.matcher.length) : null);
   // [nyckel, antal tecken, ett, flera, etiketten i foten (gängets ord)]
   const SLAG = [['spik', 1, 'spik', 'spikar', 'Spikar'], ['halv', 2, 'halvgardering', 'halvgarderingar', 'Halvgard'],
     ['hel', 3, 'helgardering', 'helgarderingar', 'Helgard']];
   // Hur många spikar, halvgarderingar och helgarderingar tecknen i t
   // ({matchens id: tecken}) har.
-  const slag = (s, t) => Object.fromEntries(SLAG.map(([k, n]) => [k, s.matcher.filter((x) => (t[x.id] || '').length === n).length]));
+  const slag = (s, t) => Tippoang.slag(s.matcher.map((x) => t[x.id]));
   const och = (xs) => (xs.length > 1 ? `${xs.slice(0, -1).join(', ')} och ${xs[xs.length - 1]}` : xs[0]);
   const regelText = (r) => och(SLAG.map(([k, , one, many]) => plural(r[k], one, many)));
   // Det i t som bryter mot regeln: fler spikar eller garderingar än den
@@ -112,7 +109,8 @@
     const r = regel(s);
     if (!r) return '';
     const n = slag(s, t);
-    const over = SLAG.filter(([k]) => n[k] > r[k]);
+    const for_ = Tippoang.regelOver(r, s.matcher.map((x) => t[x.id]));
+    const over = SLAG.filter(([k]) => for_.includes(k));
     return over.length ? `${och(over.map(([k, , one, many]) => plural(n[k], one, many)))} – regeln är ${regelText(r)}.` : '';
   }
   const kicks = (s) => s.matcher.map((x) => Date.parse(x.avspark)).filter(Number.isFinite);

@@ -211,9 +211,10 @@ window.Betyg = (() => {
       for (const m of settled) {
         if (m.kickoff && (!last || m.kickoff > last)) last = m.kickoff;
         const tips = Object.entries(m.tips || {}).map(([id, t]) => [id, Tippoang.sign(t)]).filter(([, t]) => t);
+        // Hasse Backe tävlar men hör inte till laget, så Lagkänsla gäller inte honom.
         const teamOk = coupon
           ? Boolean(coupon.get(String(m.id)) && coupon.get(String(m.id)).includes(m.res))
-          : tips.some(([, t]) => t.includes(m.res));
+          : tips.some(([id, t]) => id !== Tippoang.HASSE.id && t.includes(m.res));
         for (const [id, sign] of tips) {
           const s = by.get(id);
           if (!s) continue;
@@ -223,11 +224,13 @@ window.Betyg = (() => {
           s.prob += prob;
           if (hit) { s.ok += 1; s.back += INSATS / prob; }
           s.pts += Tippoang.points(hit, prob);
-          if (teamOk) { s.team += 1; if (hit) s.gave += 1; }
+          if (teamOk && id !== Tippoang.HASSE.id) { s.team += 1; if (hit) s.gave += 1; }
         }
       }
       for (const s of by.values()) {
-        if (took((r.people || []).find((p) => p.id === s.g.id))) s.came += 1;
+        if (!took((r.people || []).find((p) => p.id === s.g.id))) continue;
+        s.came += 1;
+        if (s.forsta == null) s.forsta = counted;
       }
     }
     return { people: [...by.values()].filter((s) => s.n), rounds: counted, matches, last };
@@ -244,7 +247,8 @@ window.Betyg = (() => {
     const st = stats(rounds, gang);
     if (!st.people.length) return null;
     const people = st.people.map((s) => {
-      s.rounds = st.rounds;
+      // Hasse Backe kom med senare: Närvaro räknas från hans första omgång.
+      s.rounds = s.g.id === Tippoang.HASSE.id ? st.rounds - s.forsta + 1 : st.rounds;
       const grades = {};
       for (const sub of SUBJECTS) {
         const v = sub.value(s);
@@ -303,7 +307,7 @@ window.Betyg = (() => {
       `<span>${b.matches} ${b.matches === 1 ? 'match' : 'matcher'}</span>` +
       `<span class="pp-stamp${b.final ? '' : ' wait'}">${b.final ? 'Slutbetyg' : 'Preliminärt'}</span></p></div>` +
       '<div class="pp-band" aria-hidden="true"></div>' +
-      `<div class="bg-scroll"><table class="bg-table"><thead><tr><th scope="col">Ämne</th>${head}</tr></thead>` +
+      `<div class="bg-scroll"><table class="bg-table n${cols.length}"><thead><tr><th scope="col">Ämne</th>${head}</tr></thead>` +
       `<tbody>${body}</tbody>` +
       `<tfoot><tr><th scope="row" title="Summan av betygen: A 20, B 17,5, C 15, D 12,5, E 10, F 0 – högst ${max}">Meritvärde</th>${foot}</tr></tfoot></table></div>` +
       `<p class="bg-label">Omdöme</p><ul class="bg-notes">${notes}</ul>` +

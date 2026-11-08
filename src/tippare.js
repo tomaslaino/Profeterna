@@ -45,17 +45,28 @@
 // Filen skrivs bara av bygget på GitHub Actions (--journal), som också
 // committar den. Lokalt visas en omgång vars matcher är spelade ändå, bara
 // inte fryst. Poängen räknas med public/tippoang.js, samma som sidan.
+//
+// Hasse Backe tävlar också, under samma regel som alla (regel i config/kupong.js,
+// Tippoang.regelFor). Hans kupong byggs av det han säger vid disken (hasse.tecken
+// och hasse.resultat i data/analyser.json, hasseKupong nedan) och skrivs in här, som
+// en tippare till i omgångens gang och tips. Den följer analyserna fram till omgångens
+// första avspark, då var och ens egna tips också stänger, och står sedan kvar. I
+// tjänsten (worker/samtal.mjs, gang i config/kupong.js) finns han inte, så inlämningen,
+// när tipsen visas, jämförelsen inför gängets kupong och kupongen själv går som förut.
+// Omgångar som var klara innan han kom med ändras inte.
 
 const fs = require('fs');
 const path = require('path');
 const Tippoang = require('../public/tippoang.js');
+const kupongCfg = require('../config/kupong.js');
 
 const NAMES_FILE = path.join(__dirname, '..', 'data', 'omgangsnamn.json');
+const ANALYSER_FILE = path.join(__dirname, '..', 'data', 'analyser.json');
 const FILE = process.env.TIPPAR_HISTORIK
   ? path.resolve(process.env.TIPPAR_HISTORIK)
   : path.join(__dirname, '..', 'data', 'tippar-historik.json');
 
-const { SIGNS } = Tippoang;
+const { SIGNS, HASSE } = Tippoang;
 const DAY = 86400000;
 const NOTE_MAX = 140; // som motiveringarna och kommentarerna i tjänsten (worker/samtal.mjs)
 const OFF = /POSTPONED|CANCEL|ABANDON|SUSPEND/;
@@ -160,6 +171,77 @@ function entryFromSamtal(s, prev = null) {
     ...(last !== first ? { till: last } : {}),
     gang,
     matcher,
+  };
+}
+
+// Vad Hasse Backe säger per match ({matchens id: {tecken: "2", resultat: "1–3"}}) ur
+// analyserna: bara det han sa före avspark, så att en analys som skrivs om efteråt
+// inte räknas.
+function readHasse(file = ANALYSER_FILE) {
+  let list;
+  try {
+    list = JSON.parse(fs.readFileSync(file, 'utf8')).analyser;
+  } catch {
+    return {};
+  }
+  const out = {};
+  for (const a of Array.isArray(list) ? list : []) {
+    const h = a && a.hasse;
+    if (!h || !Array.isArray(h.tecken) || !(Date.parse(h.writtenAt) < Date.parse(a.avspark))) continue;
+    const tecken = Tippoang.sign(h.tecken.map((n) => SIGNS[n]).join(''));
+    if (tecken) out[String(a.id)] = { tecken, resultat: h.resultat };
+  }
+  return out;
+}
+
+// Hasses kupong för en omgång – samma regel som alla, men hans egna bedömningar:
+// hans tecken finns alltid med. Säkrast är ett ensamt tecken med störst målskillnad i
+// hans resultat (3–0 före 2–1 före 1–1), sedan det modellen tror mest på. De säkraste
+// blir spikar, de nästa halvgarderingar (hans tecken och det troligaste av de andra)
+// och de osäkraste helgarderingar. Ändras antalen i regeln följer kupongen med.
+// rows: [{id, sagt: {tecken, resultat} | undefined, modell: [1, X, 2] | null}]. En match
+// han inte har analyserat får det modellen tror mest på och läggs sist. Utan regel
+// (ett annat antal matcher) gäller bara det han har sagt.
+// → {matchens id: tecken}, eller null om han har sagt för lite för att spela.
+function hasseKupong(rows, regel) {
+  const sagda = rows.filter((x) => x.sagt);
+  const r = Tippoang.regelFor(regel, rows.length);
+  if (!r) return sagda.length ? Object.fromEntries(sagda.map((x) => [x.id, x.sagt.tecken])) : null;
+  if (sagda.length * 2 < rows.length) return null;
+  const tro = (x, s) => (x.modell ? x.modell[SIGNS.indexOf(s)] : s === 'X' ? 1 : 0);
+  const rankade = rows.map((x) => {
+    const egna = SIGNS.filter((s) => x.sagt && x.sagt.tecken.includes(s)).sort((a, b) => tro(x, b) - tro(x, a));
+    const andra = SIGNS.filter((s) => !egna.includes(s)).sort((a, b) => tro(x, b) - tro(x, a) || (b === 'X') - (a === 'X'));
+    const mal = x.sagt && parseScore(x.sagt.resultat);
+    return {
+      id: x.id,
+      ordning: [...egna, ...andra],
+      sakerhet: !x.sagt ? -1 : egna.length > 1 ? 0 : 1 + (mal ? Math.abs(mal.home - mal.away) : 0),
+      modell: x.sagt && x.modell ? tro(x, egna[0]) : 0,
+    };
+  }).sort((a, b) => b.sakerhet - a.sakerhet || b.modell - a.modell || a.id.localeCompare(b.id));
+  const out = {};
+  rankade.forEach((x, i) => {
+    const antal = i < r.spik ? 1 : i < r.spik + r.halv ? 2 : 3;
+    out[x.id] = Tippoang.sign(x.ordning.slice(0, antal).join(''));
+  });
+  return Tippoang.regelKlar(r, Object.values(out)) ? out : null;
+}
+
+// Omgången med Hasse som tippare. Kupongen följer analyserna (sagt) fram till första
+// avspark och står sedan kvar (prev: omgången från förra bygget), också när nästa
+// omgångs analyser har tagit över. Spelar han inte ändras inget.
+function withHasse(f, { sagt, prev, regel, modellAv, now }) {
+  const forst = Math.min(...f.matcher.map((row) => Date.parse(row.avspark)).filter(Number.isFinite));
+  const was = Object.fromEntries(((prev && prev.matcher) || [])
+    .filter((row) => row.tips && row.tips[HASSE.id]).map((row) => [String(row.id), row.tips[HASSE.id]]));
+  const kupong = now >= forst && Object.keys(was).length ? was
+    : hasseKupong(f.matcher.map((row) => ({ id: row.id, sagt: sagt[row.id], modell: modellAv(row.id) })), regel);
+  if (!kupong) return f;
+  return {
+    ...f,
+    gang: [...f.gang, { id: HASSE.id, namn: HASSE.namn }],
+    matcher: f.matcher.map((row) => (kupong[row.id] ? { ...row, tips: { ...row.tips, [HASSE.id]: kupong[row.id] } } : row)),
   };
 }
 
@@ -283,17 +365,25 @@ function summarize(r) {
 // samtal: omgången ur GET …/samtal, eller en lista med den och den förra
 // (fetchSamtal), eller null. Med freeze (bygget på GitHub Actions) skrivs nya
 // omgångar och färdiga resultat in i filen. Tillbaka: de avslutade
-// omgångarna för sidan, nyaste först.
-function buildTippare({ samtal = null, matches = [], freeze = false, file = FILE, now = Date.now() } = {}) {
+// omgångarna för sidan, nyaste först, och Hasse Backes kupong (hasse) i omgångarna
+// som tjänsten visar, som sidan lägger till i tävlingen (tpScore i public/tippare.js).
+function buildTippare({ samtal = null, matches = [], freeze = false, file = FILE, now = Date.now(), hasseFile = ANALYSER_FILE, regel = kupongCfg.regel } = {}) {
   const h = readRounds(file);
+  const sagt = readHasse(hasseFile);
   const byId = new Map(matches.map((m) => [String(m.id), m]));
+  const modellAv = (id) => {
+    const m = byId.get(String(id));
+    return (m && (m.j && m.j.p ? m.j.p : m.f ? m.f.p : null)) || null;
+  };
   const known = new Set(h.raw.map((r) => r && String(r.id || '')));
   const stored = new Map(h.raw.filter((r) => r && r.id).map((r) => [String(r.id), r]));
   const fresh = new Map();
   const added = [];
   for (const s of [].concat(samtal || [])) {
-    const f = entryFromSamtal(s, s && stored.get(String(s.id)));
-    if (!f) continue;
+    const was = s && stored.get(String(s.id));
+    const utan = entryFromSamtal(s, was);
+    if (!utan) continue;
+    const f = withHasse(utan, { sagt, prev: was, regel, modellAv, now });
     fresh.set(f.id, f);
     if (!known.has(f.id)) {
       known.add(f.id);
@@ -331,8 +421,14 @@ function buildTippare({ samtal = null, matches = [], freeze = false, file = FILE
     .filter((r) => r && r.klar && Array.isArray(r.matcher) && Array.isArray(r.gang))
     .map(summarize)
     .sort((a, b) => String(b.from).localeCompare(String(a.from)) || b.id.localeCompare(a.id));
+  const hasse = {};
+  for (const r of list) {
+    if (!r || !fresh.has(String(r.id)) || !Array.isArray(r.matcher)) continue;
+    for (const row of r.matcher) if (row.tips && row.tips[HASSE.id]) hasse[row.id] = row.tips[HASSE.id];
+  }
   return {
     rounds,
+    hasse,
     errors: h.errors,
     added: written ? added.map((r) => r.id) : [],
     changed: written ? changed : [],
@@ -411,4 +507,4 @@ function roundNotes({ samtal = null, file = FILE } = {}) {
   });
 }
 
-module.exports = { FILE, readRounds, writeRounds, serialize, entryFromSamtal, finish, summarize, buildTippare, fetchSamtal, roundNames, roundNotes };
+module.exports = { FILE, readRounds, writeRounds, serialize, entryFromSamtal, hasseKupong, finish, summarize, buildTippare, fetchSamtal, roundNames, roundNotes };

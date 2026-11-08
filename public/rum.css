@@ -301,7 +301,8 @@ canvas.rum-neonhalo { opacity: 0.28; }
 .rum-skar, .rum-kork { position: absolute; left: 1140px; display: block; transform-origin: 0 0; box-sizing: border-box; }
 /* svart filt med spår var 9,6:e px i en aluminiumram; bokstäverna (b) står i spåren.
    Tipsligan: rubriken, ett tomt spår och de tre i gänget – fem spår, med lika mycket
-   filt över det första spåret som under det sista */
+   filt över det första spåret som under det sista. Tävlar fyra (Hasse Backe) går det
+   tomma spåret åt, så att tavlan är lika stor (.tat) */
 .rum-skar {
   padding: 5px;
   background: linear-gradient(135deg, #d9d6cc, #8d8a80 55%, #5e5b54);
@@ -327,6 +328,7 @@ canvas.rum-neonhalo { opacity: 0.28; }
 .rum-skar-in .sp { width: 0.32em; }
 /* rubriken fyller bredden: första och sista bokstaven står rakt över raderna */
 .rum-skar-in .h { display: flex; justify-content: space-between; height: 9.6px; margin-bottom: 9.6px; font-size: 8.6px; font-weight: 700; }
+.rum-skar-in .h.tat { margin-bottom: 0; }
 /* placering, namn och poäng i var sin spalt; poängen slutar lika långt från kanten som placeringen börjar */
 .rum-skar-in .rad { display: grid; grid-template-columns: 1.7em 1fr auto; height: 9.6px; line-height: 10.4px; font-size: 7.4px; letter-spacing: 0.08em; white-space: nowrap; }
 .rum-skar-in .rad > :nth-child(2) { overflow: hidden; }

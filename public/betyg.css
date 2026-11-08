@@ -168,6 +168,11 @@
   .pp.bg { padding: 24px 16px 20px; }
   .bg-table thead th:first-child { width: 31%; }
   .bg-table thead th > span:last-child { font-size: 9px; letter-spacing: 0.06em; }
+  /* fyra spalter (Hasse Backe): Johansson får inte gå ihop med namnet bredvid */
+  .bg-table.n4 thead th:first-child { width: 27%; }
+  .bg-table.n4 tbody th { padding-right: 2px; font-size: 12px; }
+  .bg-table.n4 tfoot th { padding-right: 2px; font-size: 8.5px; letter-spacing: 0.04em; }
+  .bg-table.n4 thead th > span:last-child { font-size: 8px; letter-spacing: 0; }
   .bg-face { width: 30px; height: 30px; }
   .bg-table tbody th { padding: 9px 4px 8px 6px; font-size: 13px; }
   .bg-grade { font-size: 33px; }

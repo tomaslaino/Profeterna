@@ -1907,6 +1907,9 @@ omgångar med lika många matcher som regeln (tretton); `regel: null` stänger a
   något slag än regeln säger sidan det, och ett tryck till sparar ändå – gängets kupong ska vara
   den som spelades (sedan 2026-11-03; förut gick den inte att spara).
 - Regeln kontrolleras på sidan, inte i tjänsten, som litar på gänget (se [Säkerhet](#säkerhet)).
+- Regeln gäller också Hasse Backe när han tävlar (se [Hasse Backe tävlar](#hasse-backe-tävlar)). All
+  kontroll av den står i [public/tippoang.js](public/tippoang.js) (`regelFor`, `slag`, `regelOver`,
+  `regelKlar`), som kupongen, pulten och bygget delar. Nya förutsättningar läggs där.
 
 **Tjänsten** är samma som sparar kupongen (*profeterna-kupong*, adressen i
 [config/kupong.js](config/kupong.js) med `/samtal` i stället för `/kupong`; bygget skriver
@@ -2152,6 +2155,40 @@ ur tipsen, resultaten efter 90 minuter, modellens prognos före avspark och gän
 - Bilderna använder kröningens kroppar (`KRONAN_KROPPAR`); var vänstra handen, ögonen och
   midjan sitter och vem som redan har hjälm står i `KROPP` i utmarkelser.js. Utan rörelse
   (prefers-reduced-motion) står allt stilla.
+
+### Hasse Backe tävlar
+
+Hasse Backe (fiktiv) tävlar med gänget från och med omgången efter 2026-11-07 men hör inte till
+laget. Han står med i Omgångens tippare, ställningen, kröningen, utmärkelserna, betyget, kurvan,
+inbördes möten, spelkassan och Tipsligan i tobaksaffären, med guld som färg. Han lämnar inget in,
+finns inte i `gang` i [config/kupong.js](config/kupong.js) och syns inte när tipsen jämförs inför
+gängets kupong, så att spelet går som förut: inlämningen, när tipsen visas, *Alla inne*, förslaget och
+gängets kupong. *Lagkänsla* och *Den oumbärlige* gäller inte honom, och *Närvaro* räknas från hans
+första omgång.
+
+Han spelar under samma regel som alla (`regel` i [config/kupong.js](config/kupong.js), 4 spikar,
+5 halvgarderingar och 4 helgarderingar). Kupongen byggs vid bygget (`hasseKupong` i
+[src/tippare.js](src/tippare.js)) av det han säger vid disken (`hasse.tecken` och `hasse.resultat` i
+`data/analyser.json`), utan något extra anrop till Claude:
+
+- Hans tecken finns alltid med.
+- De säkraste matcherna blir spikar: ensamt tecken och störst målskillnad i hans resultat (3–0 före
+  2–1 före 1–1), vid lika det modellen tror mest på. De nästa blir halvgarderingar (hans tecken och
+  det troligaste av de andra), och de osäkraste helgarderingar.
+- En match han inte har analyserat får det modellen tror mest på och läggs sist. Har han analyserat
+  under hälften av matcherna spelar han inte omgången.
+- Ändras antalen i regeln följer kupongen med. Klarar en kupong inte `regelKlar` spelar han inte, hellre
+  än att bryta mot regeln. **Läggs en ny förutsättning in i `regelKlar` ska `hasseKupong` lära sig den
+  samtidigt**, annars står han över tills den gör det.
+- Kupongen följer analyserna fram till omgångens första avspark, när var och ens egna tips också
+  stänger, och står sedan kvar. Bara det han sa före matchens avspark räknas.
+- Omgångar med ett annat antal matcher har ingen regel: då gäller bara det han har sagt.
+
+Kupongen står i `data/tippar-historik.json` som en tippare till (`HB`), och för omgången som pågår
+i `hasse` i `data/tippare.json`, som sidan lägger till i poängen (`tpScore` i
+[public/tippare.js](public/tippare.js)). `TP.round`, som rummet och kupongen läser, ändras inte.
+Kroppen och porträttet (`public/profeterna/kropp-hasse.png`, `hasse.jpg`) ritas av
+[scripts/hasse/kropp.html](scripts/hasse/kropp.html). Omgångar som var klara innan han kom med ändras inte.
 
 ### Säsongens tippare
 

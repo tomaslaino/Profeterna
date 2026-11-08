@@ -86,6 +86,17 @@ function tpRows(round, signs, now) {
 const tpTally = Tippoang.tally;
 const tpKey = Tippoang.key;
 
+// Hasse Backes kupong i omgången (data/tippare.json, src/tippare.js), eller null.
+// Han läggs till i poängen här och aldrig i TP.round, som rummet och kupongen
+// också läser: i inlämningen och jämförelsen finns han inte.
+function tpHasse(round) {
+  const t = TP.season && TP.season.hasse;
+  if (!t) return null;
+  const out = {};
+  for (const x of round.matcher) if (t[x.id]) out[x.id] = t[x.id];
+  return Object.keys(out).length ? out : null;
+}
+
 function tpScore(round, now) {
   // Omgångens läge, oberoende av tecknen.
   const status = round.matcher.map((x) => gradeRow({ id: x.id, sign: '1X2', label: x.match }, now));
@@ -99,12 +110,21 @@ function tpScore(round, now) {
   };
   s.done = s.n > 0 && s.played === s.n;
   const tips = round.tips || {};
+  // Var och ens tecken per match: {person: {matchens id: tecken}}.
+  s.tecken = {};
   s.people = (round.gang || []).map((g) => {
     const signs = tips[g.id] && tips[g.id].tecken;
     if (!signs) return { id: g.id, name: g.namn || g.id, none: true };
+    s.tecken[g.id] = signs;
     const rows = tpRows(round, signs, now);
     return { id: g.id, name: g.namn || g.id, rows, ...tpTally(rows) };
   });
+  const hasse = tpHasse(round);
+  if (hasse) {
+    s.tecken[Tippoang.HASSE.id] = hasse;
+    const rows = tpRows(round, hasse, now);
+    s.people.push({ id: Tippoang.HASSE.id, name: Tippoang.HASSE.namn, rows, ...tpTally(rows) });
+  }
   const rows = tpRows(round, tpModelSigns(round), now);
   s.model = { id: 'modellen', name: 'Modellen', model: true, rows, ...tpTally(rows) };
   // Bäst och sämst bara när det finns någon skillnad (delat vid lika).

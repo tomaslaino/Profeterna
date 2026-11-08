@@ -12,8 +12,8 @@
 // som står i rutorna på kupongen och i underlaget i stället för initialerna.
 //
 // regel = hur många spikar (ett tecken), halvgarderingar (två) och
-// helgarderingar (alla tre) en kupong har – var och ens när hen lämnar in och
-// gängets. Gäller omgångar med lika många matcher som regeln (Stryktipsets
+// helgarderingar (alla tre) en kupong har – var och ens när hen lämnar in, Hasse
+// Backes i tävlingen (src/tippare.js) och gängets. Gäller omgångar med lika många matcher som regeln (Stryktipsets
 // tretton); null = ingen regel. Gängets kupong styrs av den men stoppas inte:
 // följer den inte regeln frågar sidan först (gänget kan ha spelat något annat).
 //

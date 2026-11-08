@@ -8,6 +8,8 @@
 
 Ändras kameran, baren eller pulten (`DISK`, `HORN`) i `rum-hasse-scen.js` ska väggen bakas om. Pulten framför honom bakas inte: sidan ritar den en gång i hans värld (`diskBild` i `public/rum-hasse-3d.js`), med väggens bild svagt speglad i träet. I bakningen finns den och han själv bara som något som skuggar och kastar ljus.
 
+- `public/profeterna/kropp-hasse.png` och `hasse.jpg`: kroppen till pallen och kröningen i Olympen (320 × 420 som de andras) och porträttet. `kropp.html` ritar dem ur `hasse-atlas.webp` (uppackad till `atlas.png` i samma mapp, `dwebp`): fotot, ärmen som saknas, byxor och skor. Hämta duken med `toDataURL` i headless Chrome, skalad till halva storleken.
+
 `atlas.html` läser `c2013.png` i samma mapp: *Hasse Backe 2013-03-26 001.jpg* (C More Entertainment, CC BY 3.0, Wikimedia Commons) i 1280 bildpunkters bredd, urklippt med `klipp.swift`. Den ligger inte i repot.
 
 Provservern ska servera `public/` i roten och den här mappen under `/skiss/bake/` (bak.html läser `/rum-hasse-scen.js`).

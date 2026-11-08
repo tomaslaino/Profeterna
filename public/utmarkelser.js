@@ -113,8 +113,13 @@ window.Utmarkelser = (() => {
     oumbarlig: {
       title: 'Den oumbärlige',
       tone: 'pos',
-      // Lika många till laget: flest rätt, sedan poängen.
-      value: (x, r) => { const v = r.coupon ? x.gave : x.ok; return v >= 2 ? v + x.ok / 100 + x.pts / 10000 : null; },
+      // Lika många till laget: flest rätt, sedan poängen. Hasse Backe tävlar men
+      // hör inte till laget.
+      value: (x, r) => {
+        if (x.g.id === Tippoang.HASSE.id) return null;
+        const v = r.coupon ? x.gave : x.ok;
+        return v >= 2 ? v + x.ok / 100 + x.pts / 10000 : null;
+      },
       line: (x, r) => (!r.coupon ? `${x.ok} rätt av ${x.n}`
         : x.gave === r.teamOk ? `Alla lagets ${r.teamOk} rätt` : `${x.gave} av lagets ${r.teamOk} rätt`),
     },
@@ -319,14 +324,13 @@ window.Utmarkelser = (() => {
 
   // Omgången ur GET …/samtal med tpScore (tippare.js), när den är klar.
   function fromLive(round, s) {
-    const tips = round.tips || {};
     const matches = round.matcher.map((x, i) => {
       const st = s.status[i];
       if (!st || st.state === 'off' || st.state === 'missing') return null;
       const m = st.m || {};
       const t = {};
       for (const p of s.people) {
-        const sign = Tippoang.sign(tips[p.id] && tips[p.id].tecken && tips[p.id].tecken[x.id]);
+        const sign = Tippoang.sign(s.tecken[p.id] && s.tecken[p.id][x.id]);
         if (sign) t[p.id] = sign;
       }
       return {

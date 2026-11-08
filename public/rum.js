@@ -67,7 +67,7 @@ window.Rum = (() => {
   const at = (x, yb) => VP[1] + (yb - VP[1]) * (x - VP[0]) / (1140 - VP[0]);
   const sc = (x) => (x - VP[0]) / (1140 - VP[0]);
   const r1 = (x) => Math.round(x * 10) / 10;
-  const GANG = { DL: '#4d8ff0', DT: '#3db37c', DJ: '#a069e6' };
+  const GANG = { DL: '#4d8ff0', DT: '#3db37c', DJ: '#a069e6', HB: '#d9ac4e' };
   // Skyltfönstrets och dörrens glas: där har väggen hål (masken rum-hal) och
   // utsikten bakom (rum-ute.js) syns.
   const WIN = { x: 272, y: 132, w: 676, h: 426 };
@@ -1513,8 +1513,8 @@ ${window.RumRegister ? RumRegister.nara() : ''}
       return `<b style="transform: translateY(${r1((R0() - 0.5) * 0.4)}px) rotate(${r1((R0() - 0.5) * 3)}deg)">${esc(c)}</b>`;
     };
     const word = (t) => [...String(t).toUpperCase()].map(ch).join('');
-    return `<span class="h">${word('Tipsligan')}</span>` +
-      rows.slice(0, 3).map((x) => (x.rank
+    return `<span class="h${rows.length > 3 ? ' tat' : ''}">${word('Tipsligan')}</span>` +
+      rows.slice(0, 4).map((x) => (x.rank
         ? `<span class="rad"><span>${word(`${x.rank}.`)}</span><span>${word(x.name)}</span><span>${x.pts ? word(x.pts) : ''}</span></span>`
         : `<span class="rad bara"><span>${word(x.name)}</span></span>`)).join('');
   }
