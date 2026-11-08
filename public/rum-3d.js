@@ -2145,7 +2145,7 @@ export async function figurer(canvas, opt = {}) {
     const kraftLed = lampa('#ff4a36', '#3a0d0a');
     fint(del(new THREE.CircleGeometry(0.42, 16), kraftLed)).position.set(K0.x, K0.y + K0.h / 2 + 1.05, F + 0.36);
     // spakarna: krom med en kula i änden, framåt (+z) från vridpunkten
-    const kula = mat('#d2481c', { roughness: 0.2, clearcoat: 0.8, clearcoatRoughness: 0.14 });
+    const kula = mat('#d2481c', { roughness: 0.34, envMapIntensity: 0.25 });
     const spakDelar = (p, len, r) => {
       const stam = new THREE.CylinderGeometry(r * 0.26, r * 0.4, len, 12);
       stam.rotateX(Math.PI / 2);
