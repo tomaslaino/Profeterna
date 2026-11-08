@@ -43,7 +43,8 @@
 // kortregistret (=Arsenal … med det kortet i handen). ?rum-stopp=<timmar> som
 // om det var så långt kvar till spelstoppet, ?rum-tittar som om matcherna
 // pågick och ?rum-mal=dl:1,dt:-1,dj:0 som om det blev mål (rätt, fel, ingen
-// skillnad), ?rum-akt=dl:skamt@6 ett påhitt, ?rum-lapp=dl:kinden:kolla@2 hur skylten
+// skillnad), ?rum-akt=dl:skamt@6 ett påhitt, ?rum-radio radion på (=4: sedan fyra sekunder) och
+// ?rum-radio-modell=bakelit hur den ser ut, ?rum-lapp=dl:kinden:kolla@2 hur skylten
 // hålls och vad man gör med den (två sekunder in), ?rum-ga=dl:5 att DL går iväg
 // (fem sekunder in), ?rum-video videon nära och
 // ?rum-sak=ur|skar|ram|kort|pokal|kork|vm94|ifk|nacional|lopsedel|chelsea|dorr|kupong en närbild.
@@ -1989,6 +1990,13 @@ ${window.RumRegister ? RumRegister.nara() : ''}
     }
   }
 
+  // ?rum-radio: radion på fönsterbänken är på (=4: sedan fyra sekunder, med ?rum-t);
+  // ?rum-radio-modell=transistor|bakelit|bergsprangare|fotboll hur den ser ut (rum-3d.js).
+  function provRadio() {
+    if (!R.q.has('rum-radio') || !R.fig || !R.fig.radio) return;
+    R.fig.radio(true, now() - (Number(R.q.get('rum-radio')) || 0));
+  }
+
   // ?rum-lapp=dl:kinden:kolla@2: hur skylten hålls, för bilder (rum-3d.js, LAPP_HALL i rum-tecken.js).
   function provLapp() {
     const v = R.q.get('rum-lapp');
@@ -2651,6 +2659,7 @@ ${window.RumRegister ? RumRegister.nara() : ''}
         provAkt();
         provLapp();
         provGa();
+        provRadio();
         frame();
       });
     } catch (err) {
