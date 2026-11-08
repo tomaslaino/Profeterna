@@ -131,7 +131,7 @@ window.RumHasse = (() => {
     if (!plan) return;
     try {
       const a = await import('./rum-hasse-hand.js');
-      H.pulten = await a.armen(plan, { hand: { x: 18, y: 732 }, kopp: { x: 268, y: 708 }, pr: Math.min(devicePixelRatio || 1, [2, 1.5, 1.25, 1][steg()]) * 1.25 });
+      H.pulten = await a.armen(plan, { hand: { x: 70, y: 738 }, kopp: { x: 268, y: 708 }, pr: Math.min(devicePixelRatio || 1, [2, 1.5, 1.25, 1][steg()]) * 1.25 });
       const b = document.createElement('button');
       b.type = 'button';
       b.className = 'rum-hasse-knapp';
@@ -735,7 +735,7 @@ window.RumHasse = (() => {
     if (spana()) return;
     if (!SMATT_L.length) SMATT_L.push('trumma', 'trumma', ...grupp('smatt'));
     const namn = lott(SMATT_L);
-    if (namn === 'trumma') H.fig.trumma(TRUMSATT[Math.floor(Math.random() * TRUMSATT.length)], Math.random() < 0.65 ? 'A' : 'B');
+    if (namn === 'trumma') H.fig.trumma(TRUMSATT[Math.floor(Math.random() * TRUMSATT.length)], 'B');
     else gest(namn);
   }
   // Måste spelas: väntar på sin tur. vid: [T, gör] när tidslinjen når T.

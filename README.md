@@ -861,6 +861,12 @@ bara lokalt. Analyserna visas som de ligger i `data/analyser.json`; hur de skriv
 - **Hasse Backe spanar på din kupong (2026-11-08, användarens val):** ibland går blicken ned på kupongen,
   med sex olika miner, och när han har sagt vad han tycker om den passar minen orden. Se
   [Hasse Backe](#hasse-backe), *Vilan*.
+- **Hasse Backe sitter nära pulten och bekvämt (2026-11-08, användarens önskemål):** i baren har han armen
+  alldeles vid pultens kant, men i rummet "ser han ut att vara väldigt långt ifrån pulten", och händerna
+  och armen in vid koppen såg "ganska obekväma" ut. I rummet går armen nu över pultens bakre kant, som i
+  baren, och i baren vilar underarmarna snett in mot mitten med den vänstra handen över den högra, fritt
+  från fatet. Slagen i disken landar en bit åt sidan. Se [Hasse Backe](#hasse-backe), *Bilden* och
+  *Kaffet i rummet*.
 - **Hasses händer avslappnade och som fotot (2026-11-08, användarens val):** "Det viktiga är att de är
   bekväma o passar med den vanliga animationsbilden." Användaren valde bland renderade varianter
   (hållning B och justering 1–4): händerna vilar med handlederna lite upp, fingrarna böjda ned mot
@@ -4515,14 +4521,16 @@ Figuren skuggar det som är under disken eller skyms av den (`BORD_GLSL` i
 ovansidan, bakom den det som strålen från kameran bara når genom disken. Kroppen slutar alltså vid
 kanten, och armbågar, händer och fat trycks mot disken utan att något sticker igenom. Armarna vilar
 med armbågarna på disken och armens riktiga längder (`paDisken`), och gesterna börjar och slutar
-där. Han sitter bekvämt: armbågarna nästan rakt framför axlarna, så att överarmarna faller som på
-fotot, och underarmarna lite in mot mitten i ett lugnt V. Händerna ligger i underarmarnas förlängning,
-bara lite vinklade mot lillfingret som en hand som vilar, avslappnade: handlederna lite upp och
-fingrarna böjda ned mot disken och samlade, och händerna en bit isär: den vänstra bredvid koppen, med
-en bit disk mellan handen och fatet, och den högra mellan den och askkoppen, lite rullad mot
-lillfingret. Tummarna ligger intill händerna, så att händerna inte når varandra och den vänstra tummen
-inte går ned i disken (`SAMLA`, `TUMME_VILA`); det tonar bort när handen tar kaffet, cigarren eller
-pennan. Askkoppen står så långt till vänster att cigarren i den går fri från handen. Fatet står
+där. Han sitter bekvämt: armbågarna lite ute, underarmarna vilande på disken snett in mot mitten och den
+vänstra handen över den högra, så att armen går fri från fatet. Händerna ligger i underarmarnas
+förlängning, med handlederna lite upp och fingrarna lätt böjda ned mot disken och samlade. Den högra
+handens fingrar är mer böjda, så att de slutar under den vänstra hand och inte sticker fram mellan dess
+fingrar. Slår han i disken landar handen en bit åt sidan
+(`SLAG_A`, `SLAG_B`), annars skulle slaget hamna på hans egen hand, och den högra handen dras ut bakåt
+längs sig själv när den lyfts ur vilan, och skjuts in igen på samma sätt, så att fingrarna inte går genom
+den vänstra (`UTDRAG`). Det är bara den vänstra som trummar i vilan. Tummarna ligger intill händerna, så
+att den vänstra tummen inte går ned i disken (`SAMLA`, `TUMME_VILA`); det tonar bort när handen tar
+kaffet, cigarren eller pennan. Askkoppen står så långt till vänster att cigarren i den går fri från handen. Fatet står
 på hörnet och notan på pultens arm. Fingrarna lägger sig på disken: ett finger vars två yttre leder skulle nå under
 ovansidan böjs mindre, tills den lägsta punkten ligger på ytan (`golv` i
 [public/rum-hasse-arm.js](public/rum-hasse-arm.js)), så att fingertopparna aldrig går ned i disken,
@@ -4534,6 +4542,8 @@ den vänstras handled, vinklad nästan 20° mot tummen, och den vänstra var vri
 50° mot underarmen, med armbågarna ute: händerna låg på varandra och såg krampaktiga ut, och de liknade
 inte den lugna handen på pulten i rummet (ändrat 2026-11-07). Sedan låg händerna platta med nästan
 raka fingrar, och den vänstra tummen gick ned i disken och skars av i en rak kant (ändrat 2026-11-08).
+Sedan låg underarmarna nästan rakt fram med händerna isär och den vänstra armen tätt intill fatet, som i
+givakt (ändrat samma dag).
 
 Han fyller höjden från hjässan nära överkanten, och pultens inre hörn ligger nära underkanten, så att
 man ser att pulten går vidare mot en; mitten av honom står vid 60 % av bredden och samtalet i en spalt
@@ -4590,10 +4600,11 @@ vänstra hand vid koppen i baren ([public/rum-hasse-hand.js](public/rum-hasse-ha
 som hans i vila (`VILA` där, efter `VILA_B` i rum-hasse-3d.js): fingrarna lätt krökta och samlade med
 topparna vilande på pulten, tummen in mot handen och handen lite vinklad mot lillfingret. Pulten är
 vågrät i figurens värld som disken i baren, så att fingrarna och ljuset beter sig som där, och kameran
-lutas i stället. Armen kommer in från bildens vänstra kant snett uppifrån, från hörnet där han sitter,
-så att handen pekar snett ned mot en och handryggen och knogarna syns som i baren; ärmen går in i
-bildkanten en bit framför pultens bakre kant, så att pulten syns fortsätta bakom armen och han inte
-ser ut att hålla i kanten. Koppen ritas i handens duk med en egen kamera. Handen och koppen ses 33°
+lutas i stället. Armen kommer snett uppifrån, tvärs över pultens bakre kant och ut genom bildens vänstra
+kant, så att handen pekar snett ned mot en, handryggen och knogarna syns som i baren och det syns att
+han sitter alldeles intill pulten. Förut kom armen nästan vågrätt in mitt på pulten, och han såg ut att
+sitta långt borta och sträcka sig. Handen är inte rullad upp mot tummen som i baren, där den pekar åt
+andra hållet i bilden: här skulle den se ut att stå på sidan med fingrarna hängande i luften. Koppen ritas i handens duk med en egen kamera. Handen och koppen ses 33°
 uppifrån (`LUT`), som i baren där ögat ser dem ungefär 31° uppifrån, och koppen rakt framifrån,
 eftersom handens kamera ser hörnet långt från sin mitt och en kopp där skulle luta. Den är lite mindre
 än i baren (`KOPP_SKALA`), där handen pekar rakt mot en och ser kortare ut. Duken tonar in när den är klar, och den ritade koppen i

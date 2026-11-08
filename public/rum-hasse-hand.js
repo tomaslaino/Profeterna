@@ -1,8 +1,8 @@
-// Hasse Backes hand och kaffe på pulten i tobaksaffären (rum-hasse.js), i three.js: handen ligger längst ut
-// till vänster, med manschetten, och armen kommer in från bildens vänstra kant. Till höger om handen står
-// koppen på sitt fat, och fatet står på notans övre vänstra hörn (rum.js), som i baren. Det är en ledtråd: han
-// sitter vid pultens hörn utanför bilden (rum-hasse-3d.js). Duken är en liten i pultens plan och ritas bara
-// när fingrarna trummar.
+// Hasse Backes hand och kaffe på pulten i tobaksaffären (rum-hasse.js), i three.js: handen vilar längst ut
+// till vänster, och armen kommer snett uppifrån, över pultens bakre kant och ut genom bildens vänstra kant,
+// så att man ser att han sitter precis där, vid pultens hörn utanför bilden (rum-hasse-3d.js). Till höger om
+// handen står koppen på sitt fat, och fatet står på notans övre vänstra hörn (rum.js), som i baren. Duken är
+// en liten i pultens plan och ritas bara när fingrarna trummar.
 //
 // Armen, handen och koppen är figurens (rum-hasse-arm.js), och världen och kameran likaså, så att koppen
 // ses från samma håll och i samma ljus som handen och är samma kopp som i baren.
@@ -17,14 +17,13 @@ const DEG = Math.PI / 180;
 const D = 3900;
 const CY = KAMERA.CY;
 
-// Handen ligger som hans vänstra hand i vila i baren (VILA_B i rum-hasse-3d.js), så att det syns att det är
-// samma hand: fingrarna lätt krökta och samlade, tummen in mot handen, handen 14° mot lillfingret från
-// underarmen och lite rullad upp mot tummen, och handleden hojd över pulten med fingertopparna vilande på den
-// (golvet i rum-hasse-arm.js). F och P är fingrarnas riktning och handflatan i baren uttryckta i underarmens
-// mått: längs underarmen, upp ur pulten och mot tummen; lyft: hur mycket underarmen stiger mot armbågen.
-// (Förut låg handen platt med raka, utspärrade fingrar. Sedan 2026-11-08 är vilan i baren mer avslappnad,
-// med handleden högre och fingrarna mer böjda, och den här följer med.)
-const VILA = { F: [0.97, -0.05, -0.242], P: [0.121, -0.97, 0.167], krok: 0.5, spar: 0.75, tumme: 0.4, hojd: 61, lyft: 0.077 };
+// Handen vilar som hans vänstra hand i baren (VILA_B i rum-hasse-3d.js), så att det syns att det är samma
+// hand: fingrarna lätt krökta och samlade, tummen in mot handen, handen lite mot lillfingret från underarmen,
+// och handleden hojd över pulten med fingertopparna vilande på den (golvet i rum-hasse-arm.js). F och P är
+// fingrarnas riktning och handflatan i underarmens mått: längs underarmen, upp ur pulten och mot tummen; lyft:
+// hur mycket underarmen stiger mot armbågen. Den är inte rullad upp mot tummen som i baren: här pekar den åt
+// andra hållet i bilden, och rullad ser den ut att stå på sidan med fingrarna hängande i luften.
+const VILA = { F: [0.97, -0.05, -0.24], P: [0.1, -0.95, -0.1], krok: 0.45, spar: 0.9, tumme: 0.4, hojd: 58, lyft: 0.05 };
 // Pulten ses LUT grader uppifrån, både handen och koppen, som i baren där ögat ser hans hand och kopp ungefär
 // 31° uppifrån (rum-hasse-scen.js). Förut sågs handen 52° och koppen 44° uppifrån, så att de såg ut som
 // andra saker än i baren.
@@ -132,12 +131,11 @@ export async function armen(plan, { hand: HAND, kopp: KOPP, pr = 1.5 }) {
   // ---------- i vila ----------
 
   // skala: rummets bildpunkter på en av figurens enheter, mot: en punkt i rummet som armen pekar mot
-  // (snett upp till vänster ut ur bilden, mot hörnet där han sitter framför en till vänster, så att handen
-  // pekar snett ned mot en och man ser handryggen och knogarna som i baren, där han sitter mitt emot och
-  // handen pekar mot en; förut pekade den rakt åt höger mot fatet och sågs från sidan). Ärmen går in i
-  // bildkanten en bit framför pultens bakre kant, så att pulten syns fortsätta bakom armen: när den låg
-  // på kanten såg pulten ut att ta slut där.
-  const opt = { skala: 0.6, mot: [-400, 500] };
+  // (snett upp till vänster ut ur bilden, så att handen pekar snett ned mot en och man ser handryggen och
+  // knogarna som i baren). Ärmen går tvärs över pultens bakre kant, som i baren: han sitter alldeles intill
+  // pulten och lutar armen på den. Förut kom armen nästan vågrätt in från bildkanten, mitt på pulten, så att
+  // det såg ut som att han satt långt borta och sträckte sig.
+  const opt = { skala: 0.6, mot: [-60, 600] };
   const vila = { s: 1, W: new THREE.Vector3(), N: new THREE.Vector3(), F: new THREE.Vector3(), P: new THREE.Vector3(), D0: new THREE.Vector3() };
   const RH = new THREE.Vector3(1, 0, 0);
   let box = { x: 0, y: 0, w: 1, h: 1 };
@@ -290,7 +288,8 @@ export async function armen(plan, { hand: HAND, kopp: KOPP, pr = 1.5 }) {
     // duken i planet: från rummets vänstra kant (och lite till) till fingrarna och koppen med skuggan
     const fot = 390 * opt.skala;
     const kr = koppRuta();
-    box = { x: Math.floor(Math.min(HAND.x - fot, -60)), y: Math.floor(Math.min(HAND.y - fot * 0.72, kr.y0 - 6)), w: 0, h: 0 };
+    // (uppåt till ärmen, som går över pultens kant nära bildkanten)
+    box = { x: Math.floor(Math.min(HAND.x - fot, -60)), y: Math.floor(Math.min(HAND.y - fot * 0.9, kr.y0 - 6)), w: 0, h: 0 };
     box.w = Math.ceil(Math.max(HAND.x + fot, kr.x1 + 24) - box.x);
     box.h = Math.ceil(Math.max(HAND.y + fot * 0.6, kr.y1 + 24) - box.y);
     Object.assign(c.style, { left: `${box.x}px`, top: `${box.y}px`, width: `${box.w}px`, height: `${box.h}px` });
@@ -303,8 +302,8 @@ export async function armen(plan, { hand: HAND, kopp: KOPP, pr = 1.5 }) {
     // (koppen här ersätter den ritade i rummet, rum.css)
     if (kaffe) kaffe.classList.add('tre');
     c.classList.add('klar');
-    // det man trycker på: handen och manschetten
-    if (knapp) Object.assign(knapp.style, { left: `${HAND.x - 40}px`, top: `${HAND.y - fot * 0.5}px`, width: `${40 + fot * 0.8}px`, height: `${fot * 0.8}px` });
+    // det man trycker på: handen och ärmen ut till bildkanten
+    if (knapp) Object.assign(knapp.style, { left: `${HAND.x - 110}px`, top: `${HAND.y - fot * 0.6}px`, width: `${110 + fot * 0.6}px`, height: `${fot * 0.95}px` });
   }
 
   // ---------- fingrarna trummar: från lillfingret till pekfingret, två varv ----------
