@@ -446,8 +446,8 @@ canvas.rum-neonhalo { opacity: var(--sken, 0.28); }
   box-sizing: border-box;
   padding: 0 22px 0 46px;
   transform: perspective(1300px) rotateX(44deg) rotateZ(-2deg);
-  background: linear-gradient(180deg, #f3e9d4, #e7dbc0);
-  color: #2b241b;
+  background: var(--pp-grain), var(--pp-kant), linear-gradient(180deg, #f3e9d4, #e7dbc0);
+  color: var(--pp-ink);
   box-shadow: 0 0 0 3px #f0d699, 0 0 80px rgba(240, 214, 153, 0.45), 0 26px 34px rgba(0, 0, 0, 0.55);
 }
 .rum-kup::after {
@@ -459,25 +459,25 @@ canvas.rum-neonhalo { opacity: var(--sken, 0.28); }
               linear-gradient(98deg, rgba(0, 0, 0, 0) 58%, rgba(90, 60, 20, 0.08) 58.4%, rgba(0, 0, 0, 0) 59.2%);
 }
 /* Samma kupong som papperet under Kupong (papper.css, samtal.css): samma
-   färger, stämpel, spelstopp, porträtt, rader och fält, i kupongens mått */
-.rum-kup {
-  --pp-paper: #f1e8d5;
-  --pp-ink: #2a231d;
-  --pp-ink-soft: rgba(42, 35, 29, 0.66);
-  --pp-box: #fbf7ec;
-  --pp-band: #c35f36;
-  --pp-rule: #9a876a;
-  --pp-faint: #a08f74;
-  --pp-line: rgba(90, 70, 40, 0.22);
-  --pp-dots: rgba(90, 70, 40, 0.4);
-  --pp-ok: #17824a;
-  --pp-no: #cf2a20;
-  font-family: var(--sans);
+   färger, tryck, stämpel, spelstopp, porträtt, rader och fält, i kupongens mått */
+/* tryckeriets rad längs högerkanten */
+.rum-kup::before {
+  content: "Matchfixarna AB · Blankett 13 · Eftertryck förbjudes";
+  position: absolute;
+  right: 5px;
+  bottom: 18px;
+  writing-mode: vertical-rl;
+  font: 600 7px/1 var(--tryck);
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+  color: var(--pp-print);
+  opacity: 0.72;
+  pointer-events: none;
 }
 .rum-kup > span { display: block; }
-.rum-kup .band { margin: 0 -22px 0 -46px; padding: 0 22px 0 46px; height: 46px; background: #c8643a; color: #f6ecd9; display: flex; justify-content: space-between; align-items: center; }
-.rum-kup .band small { font-size: 11px; letter-spacing: 0.3em; font-weight: 700; }
-.rum-kup .band b { font-family: var(--display); font-size: 27px; font-weight: 800; letter-spacing: -0.01em; }
+.rum-kup .band { margin: 0 -22px 0 -46px; padding: 0 22px 0 46px; height: 46px; background: var(--pp-grain), #c8643a; color: #f6ecd9; display: flex; justify-content: space-between; align-items: center; box-shadow: 0 2px 0 #f1e8d5, 0 3.5px 0 #c8643a; }
+.rum-kup .band small { font-family: var(--tryck); font-size: 11px; letter-spacing: 0.3em; font-weight: 700; }
+.rum-kup .band b { font-family: var(--tryck); font-size: 27px; font-weight: 800; letter-spacing: -0.01em; }
 /* under bandet: stämpeln till vänster, spelstoppet till höger */
 .rum-kup .topp { display: flex; align-items: center; justify-content: space-between; gap: 14px; height: 38px; }
 .rum-kup .topp .pp-stamp { padding: 2px 7px 1px; font-size: 10px; border-width: 2px; border-radius: 5px; white-space: nowrap; }
@@ -485,8 +485,8 @@ canvas.rum-neonhalo { opacity: var(--sken, 0.28); }
 .rum-kup .pp-stop b, .rum-kup .pp-field b { font-size: 14px; }
 /* porträtten och 1 X 2 överst, raderna under */
 .rum-kup .hd, .rum-kup .row { display: grid; grid-template-columns: 22px minmax(0, 1fr) 40px 40px 40px; column-gap: 6px; align-items: center; }
-.rum-kup .hd { height: 26px; box-sizing: border-box; border-bottom: 1px solid var(--pp-dots); font-size: 10px; font-weight: 700; letter-spacing: 0.16em; text-transform: uppercase; color: var(--pp-faint); }
-.rum-kup .hd > span:nth-child(n+3) { text-align: center; font-family: var(--display); font-size: 13px; font-weight: 600; letter-spacing: 0; }
+.rum-kup .hd { height: 26px; box-sizing: border-box; border-bottom: 1px solid var(--pp-dots); font-family: var(--tryck); font-size: 10px; font-weight: 700; letter-spacing: 0.16em; text-transform: uppercase; color: var(--pp-print); }
+.rum-kup .hd > span:nth-child(n+3) { text-align: center; font-size: 13px; font-weight: 600; letter-spacing: 0; }
 .rum-kup .hd .m { display: flex; align-items: center; justify-content: space-between; gap: 10px; min-width: 0; }
 .rum-kup .hd .sm-q { font-size: 10px; white-space: nowrap; }
 /* namnet, skrivet för hand i personens bläck och handstil. Alla tre står där
@@ -505,14 +505,16 @@ canvas.rum-neonhalo { opacity: var(--sken, 0.28); }
 /* synkmarkeringen i vänsterkanten, en per rad (kupongen är närmaste
    positionerade förälder, så att rutorna mäts mot den i rum.js) */
 .rum-kup .row::before { content: ""; position: absolute; left: 12px; width: 16px; height: 6px; margin-top: 7px; background: #1e1a15; }
+/* varannan rad i tryckets svaga ton, som på en gammal blankett */
+.rum-kup .row:nth-child(even) { background: var(--pp-print-tint); }
 .rum-kup .row .pp-nr { width: 22px; height: 21px; font-size: 13px; }
 .rum-kup .row .m { display: flex; align-items: baseline; gap: 8px; min-width: 0; }
 .rum-kup .row .pp-tm { min-width: 0; overflow: hidden; text-overflow: ellipsis; font-size: 14px; line-height: 21px; }
 /* lagnamnen i två längder (couponHtml i rum.js): de korta på den smala kupongen */
 .rum-kup .pp-tm .kort { display: none; }
 .rum-kup .row .pp-small { flex: none; margin: 0; font-size: 10px; }
-.rum-kup .box { position: relative; box-sizing: border-box; height: 19px; border: 1.4px solid var(--pp-rule); border-radius: 3px; font: 600 10px/16px var(--display); color: var(--pp-faint); text-align: center; background: color-mix(in srgb, var(--pp-box) 45%, transparent); }
-.rum-kup .box i { font-style: normal; opacity: 0.75; }
+.rum-kup .box { position: relative; box-sizing: border-box; height: 19px; border: 1.2px solid var(--pp-rule); border-radius: 2px; font: 600 10px/16px var(--tryck); color: var(--pp-print); text-align: center; background: color-mix(in srgb, var(--pp-box) 45%, transparent); }
+.rum-kup .box i { font-style: normal; opacity: 0.62; }
 /* kryssen med blyerts (rum.js, crossSvg) */
 .rum-kup .kryss { position: absolute; left: -1.4px; top: -1.4px; width: 40px; height: 19px; overflow: visible; pointer-events: none; }
 .rum-kup .kryss path { fill: none; stroke: #3a3632; stroke-width: 2.3; stroke-linecap: round; stroke-dasharray: 1 2; opacity: 0.88; }
@@ -529,8 +531,8 @@ canvas.rum-neonhalo { opacity: var(--sken, 0.28); }
   left: 290px;
   top: 50px;
   padding: 5px 11px 4px;
-  font: 800 15px/1 -apple-system, "Helvetica Neue", Arial, sans-serif;
-  letter-spacing: 0.16em;
+  font: 400 15px/1 var(--skriv);
+  letter-spacing: 0.12em;
   text-transform: uppercase;
   color: #17824a;
   border: 3px solid #17824a;
@@ -645,7 +647,7 @@ canvas.rum-neonhalo { opacity: var(--sken, 0.28); }
 /* ---------- kupongen i handen (rum.js, openCoupon) ---------- */
 
 .rum-handen { pointer-events: auto; cursor: default; outline: none; }
-.rum-handen button.box { margin: 0; padding: 0; font-family: var(--display); background: none; cursor: pointer; transition: background-color 0.15s; }
+.rum-handen button.box { margin: 0; padding: 0; font-family: var(--tryck); background: none; cursor: pointer; transition: background-color 0.15s; }
 .rum-handen button.box:hover { background: rgba(200, 100, 58, 0.1); }
 .rum-handen button.box:focus-visible { outline: 2px solid #2146a6; outline-offset: 2px; }
 /* rutan som någon annan just kryssade, i hens färg en stund (gangLive i rum.js) */
@@ -738,7 +740,7 @@ canvas.rum-neonhalo { opacity: var(--sken, 0.28); }
   width: 660px;
   height: 470px;
   box-sizing: border-box;
-  background: linear-gradient(180deg, #ece2cb, #ddd0b3);
+  background: var(--pp-grain), var(--pp-kant), linear-gradient(180deg, #ece2cb, #ddd0b3);
   color: #2b241b;
   box-shadow: 0 22px 30px rgba(0, 0, 0, 0.55);
 }
@@ -753,7 +755,7 @@ canvas.rum-neonhalo { opacity: var(--sken, 0.28); }
 .rum-bak .gem path { fill: none; stroke: #c9c9c2; stroke-width: 5; stroke-linecap: round; filter: drop-shadow(0 2px 2px rgba(0, 0, 0, 0.45)); }
 .rum-bak .namn { left: 266px; top: 44px; font: 700 160px/1 Caveat, cursive; letter-spacing: -2px; transform: rotate(-4deg); }
 .rum-bak .stampel { left: auto; right: 52px; top: 214px; padding: 9px 16px 7px; font-size: 28px; border-width: 5px; border-radius: 12px; }
-.rum-bak .regler { left: 58px; right: 58px; top: 318px; bottom: 44px; border-top: 2px solid rgba(90, 70, 40, 0.22); padding-top: 12px; font: 700 14px/1 Fraunces, Georgia, serif; letter-spacing: 4px; text-transform: uppercase; color: #9a8a70;
+.rum-bak .regler { left: 58px; right: 58px; top: 318px; bottom: 44px; border-top: 2px solid rgba(90, 70, 40, 0.22); padding-top: 12px; font: 400 14px/1 var(--skriv); letter-spacing: 4px; text-transform: uppercase; color: #9a8a70;
   background: repeating-linear-gradient(180deg, rgba(90, 70, 40, 0.16) 0 5px, rgba(0, 0, 0, 0) 5px 17px) 0 40px / 100% calc(100% - 40px) no-repeat; }
 
 /* ---------- gängets kupong med baksidan upp (rum.js, vandHtml) ---------- */
@@ -783,7 +785,8 @@ canvas.rum-neonhalo { opacity: var(--sken, 0.28); }
   box-sizing: border-box;
   padding: 10px 11px 0 15px;
   transform: perspective(1100px) rotateX(40deg) rotateZ(-6deg);
-  background: repeating-linear-gradient(180deg, rgba(0, 0, 0, 0) 0 22px, rgba(70, 100, 170, 0.2) 22px 23px) 0 13px / 100% calc(100% - 13px) no-repeat,
+  background: var(--pp-grain),
+              repeating-linear-gradient(180deg, rgba(0, 0, 0, 0) 0 22px, rgba(70, 100, 170, 0.2) 22px 23px) 0 13px / 100% calc(100% - 13px) no-repeat,
               linear-gradient(180deg, #f3efe3, #e2dbc8);
   color: #25336f;
   font: 600 19px/23px Caveat, cursive;

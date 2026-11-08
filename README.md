@@ -322,9 +322,23 @@ blir mer ansträngt för datorer o mobiler").
   skickar – Chrome, Safari i iPhone och Firefox får samma filer därifrån (kontrollerat 2026-11-07).
   Förut låg de som `@import` i theme.css, papper.css, rum.css, rum-anslag.css och rum-register.css:
   sidan → stilmallen → Googles stilmall → typsnittet, och två egna uppkopplingar
-  (fonts.googleapis.com, fonts.gstatic.com). Alla har SIL Open Font License. Ett nytt typsnitt: hämta
-  Googles stilmall med en webbläsares User-Agent, lägg filerna i typsnitt/ och reglerna i
-  typsnitt.css med de lokala adresserna.
+  (fonts.googleapis.com, fonts.gstatic.com). Alla har SIL Open Font License utom Skrivmaskin (nedan).
+  Ett nytt typsnitt: hämta Googles stilmall med en webbläsares User-Agent, lägg filerna i typsnitt/
+  och reglerna i typsnitt.css med de lokala adresserna.
+- **Papperets tre röster:** allt papper (kupongen, matchbladet, protokollet, kortregistret,
+  anslagstavlan) har samma pappersstruktur och samma tre röster, så att det ser ut att komma ur samma
+  låda: det förtryckta (`--tryck`, Fraunces i terrakotta: band, rubriker, rutor, nummer), det
+  maskinskrivna (`--skriv`: lag, tider, värden) och pennan (`--pp-hand`). Färgerna står på ett ställe,
+  i [public/papper.css](public/papper.css), som också pekar om `--display` och `--sans` till
+  skrivmaskinen på papperet. En skrivmaskin har inget fetstilt: det som ska framhållas stryks under.
+- **Skrivmaskin** är Special Elite (Apache 2.0) ombyggd av
+  [scripts/typsnitt/skrivmaskin.py](scripts/typsnitt/skrivmaskin.py): alla tecken lika breda, och sju
+  anslag av varje tecken (högre, lägre, snett, svagt, ojämnt, dubbelslag) som OpenType-funktionen
+  `calt` byter mellan, plus ett fel som alltid sitter kvar på varje tecken, som en sned typarm. Ingen
+  bokstav blir den andra lik utan att sidan gör något, också på en duk i three.js och utan fler
+  element i rummet. `ss01`–`ss06` börjar raden på ett annat anslag; papper.css använder dem (`--anslag`)
+  där samma text står på flera rader. Originalen ligger i scripts/typsnitt/kalla/.
+  Pappersstrukturen bakas av [scripts/rum/papper.mjs](scripts/rum/papper.mjs).
 - **Rummets 3D-filer redan i `<head>`:** står tobaksaffären (klassen `rum-vantar`) lägger ett skript
   efter importmapen `modulepreload` för three.js och dess tre tillägg, rum-3d.js och de moduler den
   läser (samma lista som `forhamta`), sakerna, inredningen, löpsedlarna, neonen och kortlådan – samma filer som `forhamta` i rum.js

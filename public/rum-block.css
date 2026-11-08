@@ -5,7 +5,7 @@
 /* ---------- blocket ---------- */
 /* Tre saker att se: facit, allas tecken, och det som satt (en överstrykning). Ingen färg betyder
    något annat än vems det är, och ingen ring utom vinnarens. */
-.rum-block { --c: 62px; --fa: 38px; --rad: 33px; --linje: #c6d3e0; --ratt: #d3e8ba; --bort: #857a6b; display: block; box-sizing: border-box; width: 664px; padding: 19px 18px 18px; color: #26211a; background: #f6f3e8; white-space: nowrap; text-align: left; box-shadow: 0 18px 28px rgba(0, 0, 0, 0.5), 0 2px 2px rgba(0, 0, 0, 0.25); font: 500 14px/1 Fraunces, Georgia, serif; }
+.rum-block { --c: 62px; --fa: 38px; --rad: 33px; --linje: #c6d3e0; --ratt: #d3e8ba; --bort: #857a6b; display: block; box-sizing: border-box; width: 664px; padding: 19px 18px 18px; color: #26211a; white-space: nowrap; text-align: left; box-shadow: 0 18px 28px rgba(0, 0, 0, 0.5), 0 2px 2px rgba(0, 0, 0, 0.25); font: 400 14px/1 var(--skriv); font-synthesis: none; background: var(--pp-grain), var(--pp-kant), #f6f3e8; }
 .rum-block.n6 { --c: 53px; }
 .rum-block.n6 .rb-nm.h2 { font-size: 16px; }
 .rum-block::before { content: ""; position: absolute; left: 0; right: 0; top: 0; height: 12px; background: #b9352a; }
@@ -15,15 +15,15 @@
 .rb-g { display: grid; grid-template-columns: minmax(0, 1fr) var(--fa) repeat(var(--n), var(--c)); }
 .rb-g > span { box-sizing: border-box; display: flex; align-items: center; justify-content: center; position: relative; border-bottom: 1px solid var(--linje); }
 /* matchen */
-.rb-m { justify-content: flex-start !important; gap: 6px; height: var(--rad); font: 500 15px/1 Fraunces, Georgia, serif; overflow: hidden; }
-.rb-m u { flex: none; width: 18px; text-align: right; text-decoration: none; color: #8b7d68; font-weight: 700; font-size: 13px; }
+.rb-m { justify-content: flex-start !important; gap: 6px; height: var(--rad); font: 400 14px/1 var(--skriv); overflow: hidden; }
+.rb-m u { flex: none; width: 18px; text-align: right; text-decoration: none; color: #b9352a; font: 700 13px/1 var(--tryck); }
 .rb-m > span { flex: 1; min-width: 0; overflow: hidden; line-height: 1.5; }
-.rb-m em { flex: none; padding-left: 4px; margin-right: 8px; font: 600 13.5px/1 Inter, "Helvetica Neue", sans-serif; font-style: normal; color: #4d4438; font-variant-numeric: tabular-nums; }
+.rb-m em { flex: none; padding-left: 4px; margin-right: 8px; font: 400 13.5px/1 var(--skriv); font-style: normal; color: #4d4438; }
 /* facit: tryckt, det enda på raden som inte är någons gissning */
-.rb-fa { font: 800 18px/1 Fraunces, Georgia, serif; color: #26211a; }
+.rb-fa { font: 400 18px/1 var(--skriv); color: #26211a; }
 /* spalthuvudena */
 .rb-g > .rb-sp { flex-direction: column; gap: 4px; min-height: 68px; padding: 4px 0 5px; border-top: 2px solid #26211a; border-bottom: 2px solid #26211a; }
-.rb-g > .rb-sp.la { align-items: flex-start; justify-content: flex-end; padding: 0 0 6px 4px; color: #8b7d68; font: 700 11px/1 Inter, sans-serif; letter-spacing: 0.08em; text-transform: uppercase; }
+.rb-g > .rb-sp.la { align-items: flex-start; justify-content: flex-end; padding: 0 0 6px 4px; color: #b9352a; font: 700 10.5px/1 var(--tryck); letter-spacing: 0.12em; text-transform: uppercase; }
 .rb-g > .rb-sp.la.fa { align-items: center; padding-left: 0; letter-spacing: 0.04em; }
 .rb-sp img { display: block; box-sizing: border-box; width: 38px; height: 38px; border-radius: 50%; object-fit: cover; border: 2.5px solid var(--i); }
 .rb-ik { display: grid; place-items: center; box-sizing: border-box; width: 38px; height: 38px; border-radius: 50%; color: #fff; font: 800 18px/1 Fraunces, serif; }
@@ -35,7 +35,7 @@
 .rb-lag img + img { margin-left: -8px; }
 .rb-g > .k { background: #ebe6d5; }
 .rb-nm { color: inherit; line-height: 1; }
-.rb-nm.kup { font: 700 12px/1 Fraunces, serif; color: #26211a; }
+.rb-nm.kup { font: 400 12px/1 var(--skriv); color: #26211a; }
 .rb-nm.h0 { color: #2146a6; font: 400 13px/1 "Cedarville Cursive", Caveat, cursive; }
 .rb-nm.h1 { color: #16784b; font: 400 16px/1 "Mr Dafoe", Caveat, cursive; }
 .rb-nm.h2 { color: #6d3aa8; font: 400 19px/1 "Reenie Beanie", Caveat, cursive; }
@@ -46,8 +46,8 @@
 .rb-g > .rb-c.ratt.k { background-color: #ebe6d5; }
 .rb-c b { font-weight: 700; color: var(--i); }
 /* summorna */
-.rb-g > .rb-su { font: 700 15px/1 Inter, sans-serif; }
-.rb-g > .rb-su.la { grid-column: span 2; justify-content: flex-start; padding-left: 4px; font: 700 11px/1 Inter, sans-serif; letter-spacing: 0.08em; text-transform: uppercase; color: #26211a; }
+.rb-g > .rb-su { font: 400 15px/1 var(--skriv); }
+.rb-g > .rb-su.la { grid-column: span 2; justify-content: flex-start; padding-left: 4px; font: 700 10.5px/1 var(--tryck); letter-spacing: 0.12em; text-transform: uppercase; color: #b9352a; }
 .rb-g > .rb-su.tot:not(.la) { height: 44px; font: 700 34px/1 Caveat, cursive; }
 .rb-g > .rb-su.tot { border-top: 2px solid #26211a; }
 .rb-g > .rb-su.po:not(.la) { height: 30px; font: 700 20px/1 Caveat, cursive; font-variant-numeric: tabular-nums; }
@@ -63,7 +63,7 @@
 .tat .rb-hu { gap: 7px; margin: 0 0 3px 3px; }
 .tat .rb-hu b { font-size: 20px; }
 .tat .rb-hu span { font-size: 15px; }
-.tat .rb-m { gap: 3px; font-size: 11.2px; }
+.tat .rb-m { gap: 3px; font-size: 10.5px; }
 .tat .rb-m u { width: 13px; font-size: 10px; }
 .tat .rb-m em { font-size: 10px; margin-right: 3px; padding-left: 2px; }
 .tat .rb-fa { font-size: 14px; }

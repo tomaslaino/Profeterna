@@ -15,19 +15,6 @@
 
 dialog.mr-modal {
   /* papperets tokens, desamma som .pp i papper.css */
-  --pp-paper: #f1e8d5;
-  --pp-ink: #2a231d;
-  --pp-ink-soft: rgba(42, 35, 29, 0.66);
-  --pp-print: #a9452b;
-  --pp-print-line: rgba(169, 69, 43, 0.28);
-  --pp-print-tint: rgba(169, 69, 43, 0.055);
-  --pp-box: #fbf7ec;
-  --pp-pen: #2146a6;
-  --pp-ok: #17824a;
-  --pp-no: #cf2a20;
-  --pp-pencil: #6f6c69;
-  --pp-hand: "Caveat", "Bradley Hand", "Segoe Print", cursive;
-  --pp-grain: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='180' height='180'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.85' numOctaves='2' stitchTiles='stitch'/%3E%3CfeColorMatrix values='0 0 0 0 .35 0 0 0 0 .27 0 0 0 0 .18 0 0 0 .09 0'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
   --pp-hole: 5px;
 
   /* sajtens tokens i tryck */
@@ -77,7 +64,6 @@ dialog.mr-modal {
 dialog.mr-modal #match-detail-view {
   background:
     var(--pp-grain),
-    linear-gradient(170deg, rgba(255, 255, 255, 0.42), rgba(255, 255, 255, 0) 38%, rgba(120, 90, 50, 0.06)),
     var(--pp-paper);
   -webkit-mask:
     radial-gradient(circle at 50% 0, transparent var(--pp-hole), #000 calc(var(--pp-hole) + 0.5px)) 0 0 / 15px 51% repeat-x,
@@ -207,7 +193,7 @@ dialog.mr-modal .mr-tabs {
   padding: 0;
   border-bottom: 1.5px solid var(--pp-print);
 }
-dialog.mr-modal .mr-tabs button { padding: 13px 0 11px; font-size: 15px; color: var(--pp-ink-soft); }
+dialog.mr-modal .mr-tabs button { padding: 13px 0 11px; }
 dialog.mr-modal .mr-tabs button:hover,
 dialog.mr-modal .mr-tabs button[aria-selected="true"] { color: var(--pp-ink); }
 dialog.mr-modal .mr-tabs button[aria-selected="true"]::after {

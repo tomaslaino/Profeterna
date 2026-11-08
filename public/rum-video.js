@@ -874,7 +874,7 @@ window.RumVideo = (() => {
         delete el.dataset.passa;
       }
     }
-    if (document.fonts) document.fonts.load('20px "Special Elite"').then(() => { for (const el of kas) el.dataset.passa = ''; passa(); }, () => {});
+    if (document.fonts) document.fonts.load('20px "Skrivmaskin"').then(() => { for (const el of kas) el.dataset.passa = ''; passa(); }, () => {});
 
     // Kassetten åker från sin plats in i facket (eller tillbaka): lyfts upp
     // och fram, ställs framför facket och skjuts in. Ur lådan dras den först

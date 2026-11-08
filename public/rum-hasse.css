@@ -20,7 +20,7 @@
    en duk ovanpå. Allt läggs i fönstrets bildpunkter (passa i rum-hasse.js). */
 .rum-hasse-vy { position: absolute; inset: 0; overflow: hidden; pointer-events: auto; color: #f6efdc; font-family: Fraunces, Georgia, serif; background: #120c07;
   /* papperets fibrer, som på kupongen (papper.css) */
-  --korn: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='180' height='180'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.85' numOctaves='2' stitchTiles='stitch'/%3E%3CfeColorMatrix values='0 0 0 0 .35 0 0 0 0 .27 0 0 0 0 .18 0 0 0 .09 0'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E"); }
+  --korn: var(--pp-grain);
 .rum-hasse-vy[hidden] { display: none; }
 .rh-scen { position: absolute; inset: 0; overflow: hidden; }
 .rh-scen .rh-bak { position: absolute; left: 0; top: 0; display: block; max-width: none; }
@@ -162,7 +162,7 @@
   position: relative; display: inline-flex; align-items: center; justify-content: center; box-sizing: border-box;
   min-height: 48px; margin: 0; padding: 0 1.3em; border: 0; border-radius: 3px;
   background: var(--korn), linear-gradient(172deg, #f8f1e1, #efe5cf 55%, #e1d2b3);
-  color: #2a231d; font: 650 1.04em/1.1 Fraunces, Georgia, serif; letter-spacing: 0.005em;
+  color: #221f1b; font: 400 1em/1.1 var(--skriv); letter-spacing: 0;
   text-decoration: none; text-shadow: none; white-space: nowrap; cursor: pointer;
   box-shadow: 0 2px 0 rgba(0, 0, 0, 0.5), 0 8px 16px rgba(0, 0, 0, 0.42);
   -webkit-tap-highlight-color: transparent; transition: transform 0.12s, box-shadow 0.12s, filter 0.12s, background-color 0.12s;
