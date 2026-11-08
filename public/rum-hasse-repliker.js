@@ -29,27 +29,65 @@
   tal: ['noll', 'en', 'två', 'tre', 'fyra', 'fem', 'sex', 'sju', 'åtta', 'nio', 'tio', 'elva', 'tolv', 'tretton'],
 
   // När man kommer till honom.
-  oppning: ['Vilken match ska jag hjälpa dig med?', 'Vilken match har du kört fast på?'],
-  oppningNamn: ['Vilken match ska jag hjälpa dig med?', 'Vilken match har du kört fast på?'],
+  oppning: [
+    'Vilken match ska jag hjälpa dig med?',
+    'Vilken match har du kört fast på?',
+    'Vilken match begriper du dig inte på?',
+    'Peka på en match, så säger jag hur den slutar.',
+    'Jag kan hela kupongen. Vilken match vill du börja med?',
+    'Det här är en lätt kupong. Vilken match tar vi först?',
+  ],
+  oppningNamn: [
+    'Vilken match ska jag hjälpa dig med?',
+    'Vilken match har du kört fast på?',
+    'Vilken match begriper du dig inte på?',
+    'Peka på en match, så säger jag hur den slutar.',
+    'Jag kan hela kupongen. Vilken match vill du börja med?',
+    'Det här är en lätt kupong. Vilken match tar vi först?',
+  ],
   // När man har varit här förut.
-  tillbaka: ['Har du kört fast igen?', 'Vilken match vill du ha hjälp med nu då?', 'Är du här igen?'],
-  tillbakaNamn: ['Har du kört fast igen, {namn}?', 'Vilken match vill du ha hjälp med nu då, {namn}?', 'Är du här igen, {namn}?'],
+  tillbaka: [
+    'Har du kört fast igen?',
+    'Vilken match vill du ha hjälp med nu då?',
+    'Är du här igen?',
+    'Jag visste att du skulle komma tillbaka.',
+    'Det gick väl inte så bra på egen hand.',
+    'Jag sitter där jag satt.',
+  ],
+  tillbakaNamn: [
+    'Har du kört fast igen, {namn}?',
+    'Vilken match vill du ha hjälp med nu då, {namn}?',
+    'Är du här igen, {namn}?',
+    'Jag visste att du skulle komma tillbaka, {namn}.',
+    'Det gick väl inte så bra på egen hand, {namn}.',
+    'Jag sitter där jag satt, {namn}.',
+  ],
 
   // Efter en analys.
-  nasta: ['Vilken match tar vi nu?', 'Vi tar nästa match.', 'Är det någon mer match du undrar över?', 'Vilken match är nästa?'],
+  nasta: [
+    'Vilken match tar vi nu?',
+    'Vi tar nästa match.',
+    'Är det någon mer match du undrar över?',
+    'Vilken match är nästa?',
+    'Så enkelt var det. Vilken match tar vi nu?',
+    'Ge mig en svårare match, om du har någon.',
+    'Jag har knappt hunnit bli varm. Vilken match tar vi nu?',
+    'Då går vi vidare. Vilken match ska jag reda ut nu?',
+  ],
   // ... när man har frågat om just så många matcher.
   antal: {
-    3: ['Du har frågat om tre matcher. Kupongen börjar likna något.', 'Du har frågat om tre matcher. Du börjar lära dig.', 'Du har frågat om tre matcher. Det börjar sitta.'],
-    5: ['Du har frågat om fem matcher. Du är nyfiken av dig.'],
-    10: ['Du har frågat om tio matcher. Du kan ta över min stol.'],
+    3: ['Du har frågat om tre matcher. Kupongen börjar likna något.', 'Du har frågat om tre matcher. Du börjar lära dig.', 'Du har frågat om tre matcher. Det börjar sitta.', 'Du har frågat om tre matcher. Du ser redan klokare ut.'],
+    5: ['Du har frågat om fem matcher. Du är nyfiken av dig.', 'Du har frågat om fem matcher. Jag borde ta betalt.'],
+    8: ['Du har frågat om åtta matcher. Kaffet är varmt än.', 'Du har frågat om åtta matcher. Jag har inte tänkt än.'],
+    10: ['Du har frågat om tio matcher. Du kan ta över min stol.', 'Du har frågat om tio matcher. Nu är det min kupong.'],
   },
-  halva: ['Nu är halva kupongen klar.', 'Halva matcherna är klara. Resten är också enkla.'],
-  enKvar: 'Nu är det en match kvar. Den är lika lätt som de andra.',
+  halva: ['Nu är halva kupongen klar.', 'Halva matcherna är klara. Resten är också enkla.', 'Vi har tagit halva kupongen. Det var den svåra halvan.', 'Nu är det halvlek på kupongen. Jag gör inga byten.'],
+  enKvar: ['Nu är det en match kvar. Den är lika lätt som de andra.', 'Nu är det en match kvar. Den tar jag med vänster hand.', 'Nu är det en match kvar. Du har sparat den lättaste till sist.'],
   // ... när alla är klara, nyss och när man kommer tillbaka.
-  alla: 'Nu är hela kupongen klar. Lämna in den.',
+  alla: ['Nu är hela kupongen klar. Lämna in den.', 'Nu har vi tagit hela kupongen. Resten är en formsak.', 'Nu har vi tagit hela kupongen. Det var inte svårare än så.'],
   // ... när några matcher redan har börjat och du har frågat om alla de andra.
-  allaKvar: 'Nu har du fått svar på alla matcher som återstår.',
-  allaIgen: ['Du har redan fått svar på alla matcher.', 'Du har redan fått svar på alla matcher. Du kunde ha lyssnat.', 'Alla matcher har du fått svar på. Du får lyssna nästa gång.'],
+  allaKvar: ['Nu har du fått svar på alla matcher som återstår.', 'Nu vet du hur alla matcher som återstår slutar.'],
+  allaIgen: ['Du har redan fått svar på alla matcher.', 'Du har redan fått svar på alla matcher. Du kunde ha lyssnat.', 'Alla matcher har du fått svar på. Du får lyssna nästa gång.', 'Du har redan frågat om alla matcher. Svaren står sig.'],
 
   // När alla matcher har börjat: hur det gick för honom (efterat i rum-hasse.js). Han tvivlar aldrig:
   // går det bra hade han rätt, och går det dåligt var det matcherna som hade fel. Först säger han ratt,
@@ -64,6 +102,8 @@
       'Jag har inget att tillägga om den här omgången.',
       'Nu har du sett hur det går till.',
       'Du behöver inte tacka mig för tipsen.',
+      'Den här omgången tänker jag rama in.',
+      'Ingen av matcherna överraskade mig.',
     ],
     // Fler rätt än chanserna var värda.
     bra: [
@@ -77,6 +117,9 @@
       'De matcher jag missade spelades fel.',
       'Nu vet du vem du ska fråga nästa gång.',
       'Det är orsak och verkan. Mer än så är det inte.',
+      'Jag brukar inte skryta. Jag brukar inte behöva det.',
+      'Det är ingen konst när man vet hur det ska gå.',
+      'Det var jävligt bra tippat, om jag får säga det själv.',
     ],
     // Ungefär som chanserna var värda.
     mitten: [
@@ -88,6 +131,9 @@
       'Jag hade rätt, och några av lagen hade fel.',
       'Det går inte att gardera sig mot domarna.',
       'Jag räknar inte de matcher som spelades fel.',
+      'Jag hade rätt även där det inte syntes.',
+      'Facit och jag är inte helt överens än.',
+      'Ett par av matcherna borde spelas om.',
     ],
     // Färre rätt än chanserna var värda.
     daligt: [
@@ -105,6 +151,11 @@
       'Fotbollen hade fel den här omgången.',
       'Efteråt är alla kloka. Jag var det redan före.',
       'Tipsen var rätt tänkta, och det är det som räknas.',
+      'Mina tips var bättre än matcherna.',
+      'Jag tänker inte be om ursäkt för andras misstag.',
+      'Det är lagen som får förklara sig, inte jag.',
+      'Domaren och gräsmattan har mycket att svara för.',
+      'Omgången var ett blodbad. Jag var inte inblandad.',
     ],
     // Inget satt.
     inget: [
@@ -113,22 +164,28 @@
       'Noll rätt är svårare än man tror.',
       'Inte ett enda lag spelade som jag sa.',
       'Jag har aldrig sett en så felspelad omgång.',
+      'Noll rätt ska ingen försöka göra efter mig.',
+      'Tippa tvärtemot mig nästa gång, om du vågar.',
     ],
     // I tävlingen, när omgången är klar: bäst och sämst i gänget. Säger han i stället för första raden ovan.
     forst: [
       'Jag slog hela gänget. Det är inget att orda om.',
       'Gänget kan skriva av mig nästa gång. Det är ingen skam.',
       'Nu har gänget sett hur det går till.',
+      'Gänget får gärna fråga hur jag bar mig åt.',
     ],
     sist: [
       'Att jag kom sist i gänget beror på matcherna.',
       'Jag kom sist i gänget, men jag tippade rätt.',
       'Någon måste komma sist i gänget. Jag ställde upp.',
+      'Jag kom sist i gänget. Det säger mer om gänget.',
+      'Gänget hade tur, och jag hade rätt.',
     ],
     // Han sa det exakta resultatet i en av matcherna i listan: det säger han efter en stund.
     exakt: [
       'Jag sa {res}, och matchen slutade {res}. Så är det bara.',
       'En match slutade {res}, precis som jag sa.',
+      'En match slutade {res}. Jag sa det redan före avspark.',
     ],
     // Matcherna som räknas har inte slutat än.
     pagar: [
@@ -137,6 +194,8 @@
       'Lagen spelar, och jag dricker mitt kaffe.',
       'Matcherna är bara en formsak nu.',
       'Du behöver inte titta. Jag har redan sagt hur det går.',
+      'Matcherna spelas nu, men för mig är det repriser.',
+      'Lagen spelar nu. Vi får se om de har lyssnat på mig.',
     ],
     // Du har valt att dölja resultat: inget här får avslöja hur det gick.
     dolt: [
@@ -144,6 +203,7 @@
       'Du har dolt resultaten, så jag säger ingenting.',
       'Hur det gick får du inte veta av mig.',
       'Jag säger inget om omgången. Jag ser alltid ut så här.',
+      'Jag har lovat att hålla tyst om omgången.',
     ],
     // Du frågade inte om någon match, och han spelade inte själv.
     ofragad: [
@@ -152,15 +212,23 @@
       'Nu är det för sent att fråga om den här omgången.',
       'Nästa omgång får du fråga mig i tid.',
       'Du klarade dig utan mig den här omgången. Hur gick det?',
+      'Jag satt här hela omgången. Det var bara att fråga.',
     ],
   },
 
   // Om man bara står där och inte frågar.
-  ledig: ['Jag sitter kvar här.', 'Välj vilken match du vill. Alla är lätta.', 'Spelstoppet är {dag}.'],
+  ledig: [
+    'Jag sitter kvar här.',
+    'Välj vilken match du vill. Alla är lätta.',
+    'Ta god tid på dig. Jag har redan alla svaren.',
+    'Spelstoppet är {dag}.',
+    'Det kostar inget att fråga.',
+    'Kaffet har kallnat. Svaren står sig.',
+  ],
 
   // När man har valt en match: han svarar och frågar tillbaka. valLasa när analysen finns
   // och val när den inte finns. Han har alltid svaret, också när han inte har det.
-  val: ['Den är solklar.', 'Den kan jag i sömnen.', 'Glöm allt du har läst.'],
+  val: ['Den är solklar.', 'Den kan jag i sömnen.', 'Glöm allt du har läst.', 'Den är lättare än den ser ut.', 'Tur att du frågade.', 'Den ska du inte chansa på.'],
   valLasa: [
     'Den är solklar.',
     'Den kan jag i sömnen.',
@@ -171,12 +239,18 @@
     'Den har jag räknat på.',
     'Den knäckte jag i morse.',
     'Den har jag på en lapp här.',
+    'Den är lättare än den ser ut.',
+    'Tur att du frågade.',
+    'Den ska du inte chansa på.',
+    'Den tog en halv kopp kaffe.',
+    'Där frågade du rätt man.',
+    'Den där är jävligt enkel.',
   ],
-  fragaTillbaka: ['Vill du veta, eller ska du gissa?', 'Vill du ha svaret, eller gissar du?', 'Ska jag säga hur det går, eller gissar du?'],
+  fragaTillbaka: ['Vill du veta, eller ska du gissa?', 'Vill du ha svaret, eller gissar du?', 'Ska jag säga hur det går, eller gissar du?', 'Vill du ha rätt, eller vill du gissa?', 'Vill du veta hur den slutar, eller vill du bli överraskad?'],
   // Knappen som tar fram analysen: ditt svar, bredvid Jag fyller i själv (Jag gissar om kupongen inte går att fylla i).
-  lar: ['Jag är idel öra', 'Tala om det för mig'],
+  lar: ['Jag är idel öra', 'Tala om det för mig', 'Låt höra', 'Upplys mig'],
   // Trycker man på Jag fyller i själv eller Jag gissar.
-  gissar: ['Då får du skylla dig själv.', 'Gissa du, det har gått förr.'],
+  gissar: ['Då får du skylla dig själv.', 'Gissa du, det har gått förr.', 'Jag sitter kvar här när det har gått åt skogen.', 'Gör som du vill. Jag har rätt ändå.', 'Så där blir man av med pengar.'],
 
   // En match man redan har frågat om: det han sa står direkt, och han erbjuder sig att
   // titta på den igen, ödmjukt på sitt sätt (han tvivlar ju aldrig). erbjudNytt när
@@ -185,10 +259,13 @@
     'Jag kan titta på den igen, om du vill. Jag är inte för fin för det.',
     'Ska jag titta på den en gång till? Det blir samma svar, men jag gör det gärna.',
     'Jag har haft fel en gång förut. Ska jag titta på den igen, för säkerhets skull?',
+    'Jag kan titta på matchen igen, men jag brukar inte behöva det.',
+    'Ska jag titta på matchen en gång till? Det blir lika rätt.',
   ],
   erbjudNytt: [
     'Tidningarna har skrivit mer om den sedan dess. Ska jag titta på den igen?',
     'Det har kommit nytt om den sedan jag sa det här. Vill du att jag tittar igen?',
+    'Tidningarna har hunnit ikapp mig. Ska jag titta på matchen igen?',
   ],
 
   // Direkt efter domen, när han har helgarderat: han har ju alltid svar.
@@ -203,15 +280,22 @@
     'Jag säger {res}. Mer än så är det inte.',
     'Jag säger {res}. Så är det bara.',
     'Jag säger {res}. Glöm allt annat.',
+    'Det slutar {res}, det kan du skriva upp.',
+    'Matchen slutar {res}. Du behöver inte ens titta.',
   ],
 
   // Sist, om din egen kupong.
   kupong: {
-    samma: ['På din kupong har du samma tecken som jag. Det är klokt.', 'På din kupong har du samma tecken som jag. Du har lärt dig något.'],
-    farre: ['På din kupong har du bara {du}. Det var kaxigt.'],
-    fler: ['På din kupong har du {du}. Så många tecken behövs inte.'],
-    korsar: ['{Bada} kan du behålla på din kupong, men stryk resten.', 'På din kupong har du {du}. {Bada} får du behålla.'],
-    skilda: ['På din kupong har du {du}, och det kan du glömma.'],
+    samma: ['På din kupong har du samma tecken som jag. Det är klokt.', 'På din kupong har du samma tecken som jag. Du har lärt dig något.', 'På din kupong har du samma tecken som jag. Då är vi två som har rätt.'],
+    farre: ['På din kupong har du bara {du}. Det var kaxigt.', 'På din kupong har du bara {du}. Det kallar jag mod.'],
+    fler: ['På din kupong har du {du}. Så många tecken behövs inte.', 'På din kupong har du {du}. Du garderar dig mot något som inte händer.'],
+    korsar: ['{Bada} kan du behålla på din kupong, men stryk resten.', 'På din kupong har du {du}. {Bada} får du behålla.', 'På din kupong har du {du}. Hälften av det är rätt.'],
+    skilda: [
+      'På din kupong har du {du}, och det kan du glömma.',
+      'På din kupong har du {du}. Den raden hade jag suddat.',
+      'På din kupong har du {du}. Skriv av mig, det är ingen skam.',
+      'På din kupong har du {du}. Där är vi inte överens, och du har fel.',
+    ],
   },
 
   // Din kupong: han tar den och fyller i den (rum-hasse-kupong.js), antingen det du väljer eller det han
@@ -223,20 +307,31 @@
       'Så ska det stå på din kupong. Ska jag fylla i den?',
       'Jag skulle fylla i den direkt. Ska jag göra det åt dig?',
       'Nu vet du svaret. Ska jag fylla i den på din kupong?',
+      'Nu har du facit. Ska jag fylla i raden åt dig?',
+      'Jag har pennan här. Ska jag fylla i raden åt dig?',
+      'Du har inte hunnit göra fel på den raden än. Ska jag fylla i den?',
     ],
-    hit: ['Ge hit kupongen.', 'Ge mig kupongen.', 'Ge hit, så tar jag det.'],
+    hit: ['Ge hit kupongen.', 'Ge mig kupongen.', 'Ge hit, så tar jag det.', 'Ge hit kupongen, så blir det rätt.'],
     // när kupongen inte vet vem du är: efternamnen står i rutornas ställe
     vem: 'Vems kupong ska jag fylla i?',
     skriver: {
-      1: ['Det blir etta. Så är det bara.', 'Etta, det är självklart.', 'Hemmalaget vinner den. Mer än så är det inte.'],
-      X: ['Det blir kryss. Så är det bara.', 'Kryss, det är självklart.', 'Ingen vinner den. Mer än så är det inte.'],
-      2: ['Det blir tvåa. Så är det bara.', 'Tvåa, det är självklart.', 'Bortalaget vinner den. Mer än så är det inte.'],
+      1: ['Det blir etta. Så är det bara.', 'Etta, det är självklart.', 'Hemmalaget vinner den. Mer än så är det inte.', 'Etta, och det är inget att diskutera.', 'Hemmalaget vinner matchen. Det ser ju en blind.'],
+      X: ['Det blir kryss. Så är det bara.', 'Kryss, det är självklart.', 'Ingen vinner den. Mer än så är det inte.', 'Kryss, och det är inget att diskutera.', 'Det blir oavgjort. Det ser ju en blind.'],
+      2: ['Det blir tvåa. Så är det bara.', 'Tvåa, det är självklart.', 'Bortalaget vinner den. Mer än så är det inte.', 'Tvåa, och det är inget att diskutera.', 'Bortalaget vinner matchen. Det ser ju en blind.'],
     },
-    gardera: ['Nu är den garderad. Det är också ett svar.', 'Där har du den. Det är solklart.'],
+    gardera: ['Nu är den garderad. Det är också ett svar.', 'Där har du den. Det är solklart.', 'Nu är raden garderad. Det gör jag för din skull.'],
     // du väljer det han sa, och du väljer något annat: då säger han emot, men kryssar det ändå
-    medhall: ['Bra, du börjar lära dig.', 'Vad var det jag sa?', 'Där ser du.'],
-    emot: ['Jag håller inte med, men det är din kupong.', 'Fel tecken, men jag kryssar det.', 'Jag kryssar, du betalar.', 'Det är dina pengar, inte mina.'],
-    suddar: ['Då suddar vi det.', 'Som om det aldrig hänt.'],
+    medhall: ['Bra, du börjar lära dig.', 'Vad var det jag sa?', 'Där ser du.', 'Det är ett bra tecken. Jag valde det själv.', 'Det där är det klokaste du har gjort i dag.'],
+    emot: [
+      'Jag håller inte med, men det är din kupong.',
+      'Fel tecken, men jag kryssar det.',
+      'Jag kryssar, du betalar.',
+      'Det är dina pengar, inte mina.',
+      'Nej, nej, nej. Men det är din kupong, så jag fyller i det.',
+      'Jag fyller i det, men du får säga att du gjorde det själv.',
+      'Jag har inget med det där tecknet att göra.',
+    ],
+    suddar: ['Då suddar vi det.', 'Som om det aldrig hänt.', 'Då suddar jag det, så har ingen sett något.'],
     // Din inlämnade kupong: ändringen lämnas in när den följer gängets regel (4 spikar, 5 halvgarderingar
     // och 4 helgarderingar). Gör den inte det säger han vad som är för många och vad som fattas
     // (för-fattas, eller bara för när en match saknar tecken), och väntar med att lämna in den.
@@ -259,7 +354,7 @@
 
   // När något inte går.
   ingenKupong: 'Det finns ingen kupong än.',
-  ejKlar: ['Den har jag inte kommit till än.', 'Den tar jag sen.'],
+  ejKlar: ['Den har jag inte kommit till än.', 'Den tar jag sen.', 'Den tar jag när jag har druckit upp kaffet.', 'Den sparar jag till sist.'],
   utanRost: 'Jag har tappat rösten. Läs här.',
 
   // Anslagstavlan (rum-anslag.js): med en lapp i handen ropar man till honom (Hasse, vad
@@ -268,7 +363,7 @@
   // förklaringen och rad (vad han själv gör med det) kommer ett exempel ur lappen som sidan
   // räknar fram; det ändras med datan och har därför inget ljud. Talen förklaras som under
   // Statistik → Lagen (divisioner.js): ändras en lapp ska hans svar följa med.
-  anslagSvar: ['Det ska jag tala om för dig.', 'Det är enklare än det ser ut.', 'Hör här, så ska jag förklara.'],
+  anslagSvar: ['Det ska jag tala om för dig.', 'Det är enklare än det ser ut.', 'Hör här, så ska jag förklara.', 'Där frågade du rätt man.', 'Det ska jag förklara så att till och med du förstår.'],
   anslag: {
     form: {
       forklaring: [[

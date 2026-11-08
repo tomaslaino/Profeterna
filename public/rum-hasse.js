@@ -1496,6 +1496,8 @@ window.RumHasse = (() => {
   }
   function forstaRad(lista, fragat, forst) {
     const r = REP();
+    // (en äldre rum-hasse-repliker.js i cachen har en enda rad i stället för en lista)
+    const enAv = (x) => (Array.isArray(x) ? lott(x) : x);
     if (!lista.length) return r.ingenKupong;
     const nu = Date.now();
     const oppna = lista.filter((m) => Date.parse(m.avspark) > nu);
@@ -1508,12 +1510,12 @@ window.RumHasse = (() => {
     const hela = oppna.length === lista.length;
     const namn = dittNamn();
     if (forst) {
-      if (!kvar) return hela || !r.allaKvar ? lott(r.allaIgen) : r.allaKvar;
+      if (!kvar) return hela || !r.allaKvar ? lott(r.allaIgen) : enAv(r.allaKvar);
       if (n) return fyll(lott(namn ? r.tillbakaNamn : r.tillbaka), { namn });
       return fyll(lott(namn ? r.oppningNamn : r.oppning), { namn });
     }
-    if (!kvar) return hela || !r.allaKvar ? r.alla : r.allaKvar;
-    if (kvar === 1) return r.enKvar;
+    if (!kvar) return enAv(hela || !r.allaKvar ? r.alla : r.allaKvar);
+    if (kvar === 1) return enAv(r.enKvar);
     if (hela && n === Math.ceil(oppna.length / 2)) return lott(r.halva);
     return lott(r.antal[n] || r.nasta);
   }
