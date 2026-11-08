@@ -573,7 +573,7 @@ function rita(el, r, vagg) {
     `<span class="rub">${rad.map(([t, s]) => `<b${stil(t, s)}>${esc(t)}</b>`).join('')}</span>` +
     `<span class="under">${esc(r.under)}</span>` +
     (r.plus ? `<span class="plus"><b>+</b>${esc(r.plus)}</span>` : '') +
-    '<span class="tryck"></span></span>' +
+    '<span class="blad"></span><span class="veck"></span><span class="tryck"></span></span>' +
     `<span class="hund"></span>${vagg ? '<i class="nal a"></i><i class="nal b"></i>' : '<i class="tejp a"></i><i class="tejp b"></i>'}`;
   // namnet, vinjetten och den andra nyheten så stora som ryms (sp: spärren
   // mellan bokstäverna och kanterna i em, som i CSS:en)
@@ -608,6 +608,31 @@ function slit(el, w, seed) {
   el.style.setProperty('--sep', (0.05 + 0.15 * w).toFixed(2));
   el.style.setProperty('--sat', (1 - 0.15 * w).toFixed(2));
   el.style.setProperty('--blek', (0.04 + 0.12 * w).toFixed(2));
+}
+
+// Löpsedeln är klippt med sax (en ny varje vecka): varje kant i tre till fem
+// raka klipp, som slutar en bit in och går åt lite olika håll, och hörnet
+// som släpper (--curl) nere till höger. Papperet är 100 × 140.
+function klipp(fro) {
+  let k = 0;
+  const r = () => hash(fro * 7.31 + ++k * 1.913);
+  const p = [];
+  const pt = (x, y) => p.push(`${x.toFixed(2)}px ${y.toFixed(2)}px`);
+  // från (ax, ay) mot (bx, by), inåt längs (nx, ny)
+  const kant = (ax, ay, bx, by, nx, ny) => {
+    const n = 3 + Math.floor(r() * 3);
+    for (let i = 0; i < n; i++) {
+      const t = i / n + (i ? (r() - 0.5) * 0.1 : 0);
+      const d = r() * 0.9;
+      pt(ax + (bx - ax) * t + nx * d, ay + (by - ay) * t + ny * d);
+    }
+  };
+  kant(0, 0, 100, 0, 0, 1);
+  kant(100, 0, 100, 130, -1, 0);
+  p.push('100px calc(140px - var(--curl))', 'calc(100px - var(--curl)) 140px');
+  kant(90, 140, 0, 140, 0, -1);
+  kant(0, 140, 0, 0, 1, 0);
+  return `polygon(${p.join(', ')})`;
 }
 
 export function affischer(back, { short = (x) => x, namn = null } = {}) {
@@ -651,6 +676,8 @@ export function affischer(back, { short = (x) => x, namn = null } = {}) {
       l.style.left = `${Math.round(p.x + (hash(fro + 3) - 0.5) * (vagg ? 4 : 10))}px`;
       l.style.top = `${Math.round(p.y + (hash(fro + 4) - 0.5) * (vagg ? 4 : 8))}px`;
       l.style.setProperty('--vrid', `${(p.rot + (hash(fro + 5) - 0.5) * 1.2).toFixed(2)}deg`);
+      l.style.setProperty('--klipp', klipp(fro));
+      l.style.setProperty('--vy', `${(46 + hash(fro + 6) * 7).toFixed(1)}%`);
       let r;
       try {
         r = rubrik({ rows, old, short, fro });

@@ -51,13 +51,17 @@
   background: linear-gradient(315deg, rgba(0, 0, 0, 0) 50%, #e4dac0 50%, #c9bc9a 100%);
   filter: drop-shadow(-1px -1px 1.5px rgba(0, 0, 0, 0.35));
 }
+/* maskeringstejp: kräppat papper, nästan täckande, med avslitna ändar */
 .rum-aff .tejp {
   position: absolute;
   top: -5px;
   width: 30px;
   height: 11px;
-  background: rgba(232, 220, 160, 0.62);
-  box-shadow: inset 0 0 0 0.5px rgba(160, 140, 80, 0.4);
+  background:
+    repeating-linear-gradient(90deg, rgba(120, 96, 44, 0.09) 0 0.35px, rgba(0, 0, 0, 0) 0.35px 0.9px, rgba(255, 248, 220, 0.12) 0.9px 1.15px, rgba(0, 0, 0, 0) 1.15px 1.7px),
+    linear-gradient(180deg, rgba(255, 250, 230, 0.18), rgba(0, 0, 0, 0) 45%, rgba(90, 70, 30, 0.12)),
+    rgba(226, 212, 166, 0.86);
+  clip-path: polygon(1px 0, 29.2px 0, 30px 1.4px, 29.1px 2.9px, 29.9px 4.5px, 29px 6.1px, 30px 7.7px, 29.2px 9.3px, 29.8px 11px, 0.7px 11px, 0 9.6px, 0.9px 8.1px, 0.1px 6.5px, 1px 4.9px, 0.2px 3.3px, 0.9px 1.7px);
 }
 .rum-aff .tejp.a { left: -9px; transform: rotate(-33deg); }
 .rum-aff .tejp.b { right: -9px; transform: rotate(29deg); }
@@ -207,9 +211,13 @@
    och den andra nyheten sätts i rum-affischer.js, så att de fyller bredden. */
 .rum-lop { width: 100px; transform: rotate(calc(var(--vrid, 0deg) + var(--rot))); }
 /* på väggen: mindre, så att den ryms mellan fönstret och bardisken */
-.rum-lop.pa-vagg { transform: rotate(calc(var(--vrid, 0deg) + var(--rot))) scale(0.78); transform-origin: 1.5px 1.5px; filter: drop-shadow(0 2px 2.5px rgba(0, 0, 0, 0.55)); }
-.rum-lop.tid-sb { --papper: #f4c5cf; --papper2: #eebac6; --rod: #d0141d; --kick: #191716; }
-.rum-lop.tid-ex { --papper: #f8f6f0; --papper2: #eeebe1; --rod: #d5141b; --kick: #d5141b; }
+/* (två skuggor: papperet ligger an mot furun, men buktar ut lite nertill) */
+.rum-lop.pa-vagg { transform: rotate(calc(var(--vrid, 0deg) + var(--rot))) scale(0.78); transform-origin: 1.5px 1.5px; filter: drop-shadow(0 0.5px 0.6px rgba(0, 0, 0, 0.5)) drop-shadow(0.6px 2.6px 2.6px rgba(0, 0, 0, 0.32)); }
+/* Tidningspapper, inte vitt: gråaktigt eller blekrosa och matt. Det vita i
+   tryckt text är papperet (ingen vit färg på en tidning), svärtan är inte
+   helt svart och det röda är tryckfärgens, inte skärmens. */
+.rum-lop.tid-sb { --papper: #ebbcc4; --papper2: #e3b1bb; --rod: #c4222b; --kick: #23201e; }
+.rum-lop.tid-ex { --papper: #ece8dc; --papper2: #e4ddcd; --rod: #c6262c; --kick: #c6262c; }
 .rum-lop .ark {
   display: flex;
   flex-direction: column;
@@ -217,14 +225,17 @@
   height: 140px;
   padding: 3px 4px 3.5px;
   background: linear-gradient(180deg, var(--papper, #f6f3ea), var(--papper2, #eeeadf));
-  color: #191716;
+  color: #23201e;
+  /* klippt med sax (--klipp, rum-affischer.js): raka klipp i lite olika
+     riktning, inte en skuren kant */
+  clip-path: var(--klipp, polygon(0 0, 100% 0, 100% calc(100% - var(--curl)), calc(100% - var(--curl)) 100%, 0 100%));
 }
 .rum-lop .huvud {
   display: flex;
   justify-content: center;
   align-items: center;
   height: 17px;
-  border-bottom: 1px solid #191716;
+  border-bottom: 1px solid currentColor;
   overflow: hidden;
 }
 .rum-lop .namn { white-space: nowrap; line-height: 1; font-weight: 400; }
@@ -234,7 +245,7 @@
 .rum-lop .kick {
   padding: 0.28em 0.42em 0.2em;
   background: var(--kick, #191716);
-  color: #fff;
+  color: var(--papper);
   font: 400 6px/1 Anton, Impact, sans-serif;
   letter-spacing: 0.06em;
   white-space: nowrap;
@@ -254,20 +265,67 @@
 .rum-lop .rub b { display: block; font-family: Anton, Impact, "Arial Narrow", sans-serif; font-weight: 400; line-height: 0.94; white-space: nowrap; letter-spacing: 0.2px; }
 .rum-lop .rub b.rod { color: var(--rod); }
 .rum-lop .rub b.prick { margin-top: 0.2em; }
-.rum-lop .rub b.inv { align-self: flex-start; padding: 0.06em 0.12em 0.02em; background: var(--rod); color: #fff; }
+.rum-lop .rub b.inv { align-self: flex-start; padding: 0.06em 0.12em 0.02em; background: var(--rod); color: var(--papper); }
 .rum-lop .under { margin-top: 2.5px; font: 700 4.6px/1.2 "Helvetica Neue", Arial, sans-serif; }
 /* den andra nyheten, under ett streck */
 .rum-lop .plus {
   margin-top: 3px;
   padding-top: 2.2px;
-  border-top: 1.2px solid #191716;
+  border-top: 1.2px solid currentColor;
   font: 400 5.4px/1 Anton, Impact, sans-serif;
   letter-spacing: 0.02em;
   white-space: nowrap;
   overflow: hidden;
 }
 .rum-lop .plus b { margin-right: 0.3em; color: var(--rod); font-weight: 400; }
-.rum-lop .tryck { inset: 0; }
+/* Trycket och papperet ovanpå texten, i tre lager (inga filter på texten:
+   den blir suddig i närbilden):
+   .blad   tryckfärgen har inte täckt överallt: papperet lyser igenom i
+           små prickar och fläckar i det svarta och röda
+   .veck   den har legat vikt på mitten (--vy)
+   .tryck  papperets fibrer, ojämna ton och buktor från fukten, ljuset
+           som faller snett in, kanterna som har smutsats ner och gulnat
+           (--sep), och gropen runt häftstiften */
+.rum-lop {
+  --fiber: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='160' height='160'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.8 .5' numOctaves='3' seed='7' stitchTiles='stitch'/%3E%3CfeColorMatrix values='0 0 0 0 .3  0 0 0 0 .25  0 0 0 0 .19  .7 0 0 0 -.27'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
+  --bukt: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='200' height='280'%3E%3Cfilter id='m' x='0' y='0' width='100%25' height='100%25'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.012 .03' numOctaves='3' seed='3'/%3E%3CfeColorMatrix values='0 0 0 0 .3  0 0 0 0 .23  0 0 0 0 .14  .7 0 0 0 -.31'/%3E%3C/filter%3E%3Crect width='200' height='280' filter='url(%23m)'/%3E%3C/svg%3E");
+  --bukt-ljus: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='200' height='280'%3E%3Cfilter id='m' x='0' y='0' width='100%25' height='100%25'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.012 .03' numOctaves='3' seed='3'/%3E%3CfeColorMatrix values='0 0 0 0 1  0 0 0 0 .97  0 0 0 0 .9  -.9 0 0 0 .4'/%3E%3C/filter%3E%3Crect width='200' height='280' filter='url(%23m)'/%3E%3C/svg%3E");
+  --prickar: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='120' height='120'%3E%3Cfilter id='s'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.9' numOctaves='2' seed='11' stitchTiles='stitch'/%3E%3CfeColorMatrix values='0 0 0 0 0  0 0 0 0 0  0 0 0 0 0  5 0 0 0 -3.65'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23s)'/%3E%3C/svg%3E");
+  --flackar: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='160' height='160'%3E%3Cfilter id='f'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.08' numOctaves='3' seed='5' stitchTiles='stitch'/%3E%3CfeColorMatrix values='0 0 0 0 0  0 0 0 0 0  0 0 0 0 0  .45 0 0 0 -.17'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23f)'/%3E%3C/svg%3E");
+}
+.rum-lop .blad, .rum-lop .veck { position: absolute; inset: 0; pointer-events: none; }
+.rum-lop .blad {
+  background: inherit;
+  -webkit-mask: var(--prickar) 0 0 / 50px 50px, var(--flackar) 0 0 / 80px 80px;
+  mask: var(--prickar) 0 0 / 50px 50px, var(--flackar) 0 0 / 80px 80px;
+}
+.rum-lop .veck {
+  background:
+    linear-gradient(180deg, rgba(0, 0, 0, 0) calc(var(--vy, 50%) - 1.6px), rgba(255, 251, 238, 0.3) calc(var(--vy, 50%) - 0.4px), rgba(48, 34, 16, 0.2) calc(var(--vy, 50%) + 0.4px), rgba(0, 0, 0, 0) calc(var(--vy, 50%) + 2px)),
+    linear-gradient(180deg, rgba(255, 251, 238, 0.06), rgba(255, 251, 238, 0) var(--vy, 50%), rgba(48, 34, 16, 0.07) var(--vy, 50%), rgba(48, 34, 16, 0.02));
+}
+.rum-lop .tryck {
+  inset: 0;
+  background:
+    var(--fiber) 0 0 / 80px 80px,
+    var(--bukt) 0 0 / 100% 100%,
+    linear-gradient(160deg, rgba(0, 0, 0, 0) 30%, rgba(70, 48, 22, 0.1));
+  box-shadow: inset 0 0 3px rgba(150, 112, 50, calc(0.12 + var(--sep, 0.1))), inset 0 0 0.6px rgba(90, 64, 30, 0.35);
+}
+.rum-lop.pa-vagg .tryck {
+  background:
+    radial-gradient(circle at 1.5px 1.6px, rgba(50, 34, 14, 0.3), rgba(50, 34, 14, 0) 5px),
+    radial-gradient(circle at calc(100% - 1.5px) 1.6px, rgba(50, 34, 14, 0.3), rgba(50, 34, 14, 0) 5px),
+    var(--fiber) 0 0 / 80px 80px,
+    var(--bukt) 0 0 / 100% 100%,
+    linear-gradient(160deg, rgba(0, 0, 0, 0) 30%, rgba(70, 48, 22, 0.1));
+}
+/* inget blänk, papperet är matt; buktornas ljusa sidor (i .veck: inuti
+   .tryck hade de bara tagit bort av skuggan) */
+.rum-lop .tryck::after { content: none; }
+/* hörnet som släpper är samma papper (rosa på Sportbladet), mörkare mot vecket */
+.rum-lop .hund { background: linear-gradient(315deg, rgba(0, 0, 0, 0) 50%, rgba(60, 40, 16, 0) 50%, rgba(60, 40, 16, 0.2)), linear-gradient(315deg, rgba(0, 0, 0, 0) 50%, var(--papper2) 50%); }
+.rum-lop .veck::after { content: ""; position: absolute; inset: 0; background: var(--bukt-ljus) 0 0 / 100% 100%; mix-blend-mode: screen; opacity: 0.5; }
 
 /* ---------- Chelsea 2021: löpsedeln på väggen, gulnad och vikt ---------- */
 
