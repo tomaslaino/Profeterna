@@ -168,7 +168,8 @@ function kampFace(g, size = '') {
 
 // Ställningen som en prispall uppe på Olympen: kropparna från kröningen
 // (KRONAN_KROPPAR i kronan.js) på marmorsocklar, ettan i mitten med strålar
-// bakom sig. Lika placering står lika högt. Modellen står nedanför. Före
+// bakom sig. Lika placering står lika högt. Pallen har tre platser: den som
+// kommer efter dem står i soptunnan bredvid. Modellen står nedanför. Före
 // första omgången står de utnämnda på förhand där (kampEmpty).
 
 // Berget bakom pallen: en dimmig kam längst bak, Olympen framför med snö på
@@ -178,6 +179,13 @@ const KAMP_BERG = '<svg class="km-berg" viewBox="0 0 400 120" preserveAspectRati
   '<path class="f" d="M0 120V97l48-12 40 4 40-27 30-17 26-15 16-9 14 10 18-7 24 23 30 15 34 12 40 8 40 8v28z"/>' +
   '<path class="s" d="M166 45l18-15 16-9 14 10 18-7 11 11-9-1-10 7-10-5-10 7-10-6-12 8z"/></svg>';
 const KAMP_MOLN = '<div class="km-moln" aria-hidden="true"><i></i><i></i><i></i><i></i><i></i></div>';
+
+// Soptunnan bredvid pallen.
+const KAMP_TUNNA = '<svg class="km-tunna" viewBox="0 0 100 106" aria-hidden="true"><defs><linearGradient id="km-tunna-g" x1="0" y1="0" x2="1" y2="0">' +
+  '<stop offset="0" stop-color="#3c7a4a"/><stop offset=".55" stop-color="#2d6239"/><stop offset="1" stop-color="#1d4426"/></linearGradient></defs>' +
+  '<path d="M12 12H88L80 92H20Z" fill="url(#km-tunna-g)"/><rect x="6" y="6" width="88" height="9" rx="2.5" fill="#347044"/><rect x="6" y="13" width="88" height="2" fill="#17371f"/>' +
+  '<rect x="31" y="34" width="38" height="26" rx="1.5" fill="#efeadb"/><path d="M40 42h20M38 47h24M42 52h16" stroke="#6a665a" stroke-width="1.5"/>' +
+  '<circle cx="27" cy="96" r="9" fill="#17171a"/><circle cx="27" cy="96" r="3.4" fill="#6c6c6e"/><circle cx="73" cy="96" r="9" fill="#17171a"/><circle cx="73" cy="96" r="3.4" fill="#6c6c6e"/></svg>';
 
 // Tvåan till vänster, ettan i mitten, trean till höger – resten efter.
 const kampPallOrder = (list) => (list.length >= 3 ? [list[1], list[0], list[2], ...list.slice(3)] : list);
@@ -192,14 +200,19 @@ function kampFig(g) {
 // cols: [{g, rank, cap}] i placeringsordning. flat: alla lika högt i gängets
 // ordning, med 0 på sockeln.
 function kampPall(cols, flat = false) {
+  const utanfor = (rank) => !flat && rank > 3;
   const steps = (flat ? cols : kampPallOrder(cols)).map(({ g, rank, cap }) => {
+    if (utanfor(rank)) {
+      return `<li class="km-step km-ute" style="--km-c:${g.color}"><div class="km-stand">${kampFig(g)}${KAMP_TUNNA}</div>` +
+        `<div class="km-cap">${cap}</div></li>`;
+    }
     const r = flat ? 3 : Math.min(rank, 3);
     return `<li class="km-step km-r${r}${!flat && rank === 1 ? ' is-lead' : ''}" style="--km-c:${g.color}">` +
       `<div class="km-stand">${!flat && rank === 1 ? '<div class="km-rays"></div>' : ''}${kampFig(g)}` +
       `<div class="km-plinth"><span>${flat ? 0 : rank}</span></div></div>` +
       `<div class="km-cap">${cap}</div></li>`;
   }).join('');
-  return `<div class="km-pall n${cols.length}"><div class="km-sky">${KAMP_BERG}${KAMP_MOLN}</div><ol class="km-steps">${steps}</ol></div>`;
+  return `<div class="km-pall n${cols.length}${cols.some((c) => utanfor(c.rank)) ? ' med-ute' : ''}"><div class="km-sky">${KAMP_BERG}${KAMP_MOLN}</div><ol class="km-steps">${steps}</ol></div>`;
 }
 
 function kampStanding(rounds, live, gang) {
@@ -223,6 +236,11 @@ function kampStanding(rounds, live, gang) {
       (badges ? `<span class="km-badges">${badges}</span>` : '');
     return { g, rank, cap };
   });
+  // Den som inte har tippat än (Hasse Backe före sin första omgång) står sist, utan poäng.
+  for (const g of gang) {
+    if (s.people.some((p) => p.id === g.id)) continue;
+    cols.push({ g, rank: s.people.length + 1, cap: `<b class="km-name" title="${esc(g.name)}">${esc(kampSurname(g.name))}</b><span class="km-pts">–</span>` });
+  }
   const m = s.model;
   const model = m.n
     ? '<p class="km-pall-model"><span class="km-face km-face-txt km-face-model" aria-hidden="true">M</span>' +

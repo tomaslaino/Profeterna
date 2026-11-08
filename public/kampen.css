@@ -156,6 +156,24 @@
 .km-r3 { --ph: 34px; --pn: 18px; }
 .km-r1.is-lead .km-plinth { box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.5), inset 0 -8px 14px -10px rgba(80, 60, 30, 0.5), 0 -10px 24px -8px rgba(240, 214, 153, 0.35); }
 
+/* utanför pallen: i soptunnan bredvid, från midjan och upp. Pallen står kvar i mitten
+   (en tom spalt till vänster) när det finns plats. */
+.km-ute .km-fig {
+  position: absolute;
+  z-index: 1;
+  left: 50%;
+  bottom: calc(var(--fh) * 0.3);
+  height: calc(var(--fh) * 0.62);
+  overflow: hidden;
+  translate: -50% 0;
+}
+.km-ute .km-fig img { height: var(--fh); filter: none; }
+.km-tunna { position: relative; z-index: 2; display: block; width: auto; height: calc(var(--fh) * 0.5); filter: drop-shadow(0 6px 8px rgba(0, 0, 0, 0.5)); }
+@media (min-width: 700px) {
+  .km-pall.med-ute .km-steps { max-width: 800px; grid-template-columns: repeat(5, minmax(0, 1fr)); grid-auto-flow: row; }
+  .km-pall.med-ute .km-step:first-child { grid-column: 2; }
+}
+
 /* under pallen: namnet, poängen och rätt */
 .km-cap { display: grid; justify-items: center; align-content: start; gap: 2px; padding: 12px 6px 16px; text-align: center; min-width: 0; }
 .km-name {

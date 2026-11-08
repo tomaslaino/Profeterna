@@ -2195,6 +2195,10 @@ Kroppen och porträttet (`public/profeterna/kropp-hasse.png`, `hasse.jpg`) ritas
 
 ### Säsongens tippare
 
+Pallen har tre platser. Den som kommer efter dem står i en soptunna bredvid pallen (`KAMP_TUNNA`
+och `.km-ute`), med namn och poäng under som de andra. Den som inte har tippat än (Hasse Backe
+före sin första omgång) står där utan poäng, och på Tipsligan i tobaksaffären som *4. BACKE*.
+
 Säsongen står i Olympen ([public/kampen.js](public/kampen.js)): ställningen som en
 prispall med summan av omgångarnas poäng, antal rätt av de spelade matcherna och antal
 gånger som *Omgångens orakel* (bäst) och *Omgångens Ikaros* (sämst), som märken under
