@@ -161,7 +161,7 @@ window.RumHasse = (() => {
   }
 
   // väggen bakom honom (scripts/hasse/bak.html), med sina mått i rum-hasse-scen.js (BAK): på natten bara
-  // barens lampor, annars också i lysrörets ljus (ljuset nedan); dagsljuset genom fönstret är en egen bild
+  // neonskyltens och gatans sken, annars också i lysrörets ljus (ljuset nedan); dagsljuset genom fönstret är en egen bild
   const hogt = () => (hog() ? '-hog' : '');
   const bakbild = (lys = false) => `rum/hasse-bak${lys ? '-lys' : ''}${hogt()}.webp`;
   const dagbild = () => `rum/hasse-bak-dag${hogt()}.webp`;

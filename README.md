@@ -4485,8 +4485,9 @@ längst ut på pulten står hans kaffe vid notan, och där ligger hans hand. Ett
 och kameran slår snabbt åt vänster till honom. Där sitter han vid pultens hörn: samma pult som man
 står vid, som går fram längs ens högra sida och viker av åt vänster förbi honom. Han sitter på andra
 sidan om den, vänd mot en, med underarmarna på pulten, kaffet och notan vid den vänstra handen i hörnet
-och cigarren i askkoppen vid den högra. Bakom honom är barens vägg med hyllorna,
-cigarettpaketen och lamporna. Samtalet står i en spalt till vänster om honom (på höjden under honom)
+och cigarren i askkoppen vid den högra. Bakom honom är samma slitna affär som gänget sitter i: furupanelen
+med paketen på en hylla, skylten *Kredit ges ej* (notan vid hans hand säger *Skrivs på Notts County*), och
+bardisken med tidningsbunten, kaffebryggaren och kassan. Samtalet står i en spalt till vänster om honom (på höjden under honom)
 och kommer när kameran har stannat. Ett klick på bilden utanför samtalet går tillbaka, liksom Esc. Medan han väntar på att man ska välja gör han något litet då och då – trummar med fingrarna,
 tittar bort, nickar för sig själv, suckar (se *Vilan*) – och ibland njuter han av kaffet (på ett av sex
 sätt) eller av cigarren (på ett av elva), varannan gång. I rummet ligger kaffet, notan och
@@ -4577,7 +4578,7 @@ Från sex på morgonen till midnatt är lysröret i affärens tak tänt, som i r
 är då en egen bild spårad med röret framför baren och affären i dess sken till höger
 (`hasse-bak-lys.webp`), och figuren, disken och koppen får ett brett ljus från affären och lite mer
 ljus överallt (`uLys` i `LJUS`, `LYS`), medan neonen och gatans kalla ljus syns mindre. Mellan midnatt
-och sex är lysröret släckt och baren lyses bara av sina egna lampor (`hasse-bak.webp`).
+och sex är lysröret släckt och väggen ligger i neonskyltens och gatans svaga sken (`hasse-bak.webp`).
 
 Dagsljuset faller in genom affärens stora fönster till höger, efter samma klocka och väder som utsikten
 i rummet (`RumUte.light`): så starkt som det är ljust ute, och i himlens färg nere vid taken, men vitare,

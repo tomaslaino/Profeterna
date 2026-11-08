@@ -1,5 +1,6 @@
 <!doctype html><meta charset="utf-8"><body style="margin:0;background:#222"><canvas id="ut" style="width:900px"></canvas><script type="module">
-// Väggen bakom Hasse Backe i baren: hyllorna, lamporna, flaskorna och bakdisken, spårat med riktigt ljus
+// Väggen bakom Hasse Backe: samma slitna affär som gänget sitter i (rum.js, rum-inredning.js), furupanelen med
+// paketen på en hylla, bardisken med tidningsbunten, kaffebryggaren och kassan, spårat med riktigt ljus
 // (mjuka skuggor, ljus som studsar, blanka ytor, skärpedjup) från figurens kamera (public/rum-hasse-scen.js):
 // framför honom, där han sitter vid pultens hörn. Skarpt där han sitter. Han själv och pulten framför
 // honom syns inte men skuggar och kastar ljus (sidan ritar dem, rum-hasse-3d.js).
@@ -25,7 +26,7 @@ const MARKE = {
 };
 const NAMN = Object.keys(MARKE);
 const CELL = [128, 204];
-const atlas = document.createElement('canvas'); atlas.width = CELL[0] * 8; atlas.height = CELL[1] * 2;
+const atlas = document.createElement('canvas'); atlas.width = 2048; atlas.height = 1024;
 const ax = atlas.getContext('2d');
 NAMN.forEach((n, i) => {
   const [a, b, c, t] = MARKE[n];
@@ -46,11 +47,55 @@ NAMN.forEach((n, i) => {
   for (let r = 0; r < 2; r++) for (let k = 0; k < 6 - r; k++) { const px = x + 12 + (k + r / 2) * 19; const py = CELL[1] * (0.48 + r * 0.17); ax.fillStyle = '#3a3026'; ax.fillRect(px, py, 14, 26); ax.fillStyle = '#d8c4a4'; ax.beginPath(); ax.arc(px + 7, py - 6, 6, 0, 7); ax.fill(); }
 }
 
+// skyltar, lappar och annat som hänger i rummet: [u0, v0, u1, v1] i atlasen
+const region = (x, y, w, h, rita) => { ax.save(); ax.beginPath(); ax.rect(x, y, w, h); ax.clip(); ax.translate(x, y); rita(ax, w, h); ax.restore(); return [x / atlas.width, y / atlas.height, (x + w) / atlas.width, (y + h) / atlas.height]; };
+const KREDIT = region(0, 210, 620, 230, (a, w, h) => {
+  a.fillStyle = '#e2d6b4'; a.fillRect(0, 0, w, h);
+  a.strokeStyle = '#7a1b16'; a.lineWidth = 9; a.strokeRect(16, 16, w - 32, h - 32);
+  a.fillStyle = '#7a1b16'; a.textAlign = 'center'; a.textBaseline = 'middle';
+  a.font = '700 92px Georgia, serif'; a.fillText('KREDIT', w / 2, h * 0.34);
+  a.font = '700 70px Georgia, serif'; a.fillText('GES EJ', w / 2, h * 0.7);
+  a.fillStyle = 'rgba(70,45,10,.22)'; for (let i = 0; i < 26; i++) { const x = (i * 197) % w, y = (i * 83) % h; a.fillRect(x, y, 3 + (i % 5) * 7, 2); }
+});
+const KALENDER = region(630, 210, 340, 480, (a, w, h) => {
+  a.fillStyle = '#e8e0cc'; a.fillRect(0, 0, w, h);
+  a.fillStyle = '#7d2f22'; a.fillRect(0, 0, w, 70);
+  a.fillStyle = '#efe6d2'; a.font = '700 40px Georgia, serif'; a.textAlign = 'center'; a.textBaseline = 'middle'; a.fillText('NOVEMBER', w / 2, 36);
+  a.font = '600 30px Georgia, serif';
+  for (let r = 0; r < 5; r++) for (let k = 0; k < 7; k++) { const n = r * 7 + k + 1; if (n > 30) continue; a.fillStyle = k === 6 ? '#a3271f' : '#2a241c'; a.fillText(String(n), 28 + k * 47, 112 + r * 58); }
+  a.strokeStyle = '#c23a2a'; a.lineWidth = 4; a.beginPath(); a.arc(28 + 5 * 47, 112 + 58, 22, 0, 7); a.stroke();
+  a.fillStyle = 'rgba(70,45,10,.5)'; a.fillRect(0, h - 58, w, 58);
+});
+const lapp = (x, y, f = '#efe8d6') => region(x, y, 230, 310, (a, w, h) => {
+  a.fillStyle = f; a.fillRect(0, 0, w, h);
+  a.fillStyle = '#c0553a'; a.fillRect(0, 0, w, 26);
+  a.strokeStyle = '#27324a'; a.lineWidth = 3;
+  for (let i = 0; i < 11; i++) { a.beginPath(); a.moveTo(16, 50 + i * 22); let px = 16; for (let k = 0; k < 7; k++) { px += 8 + ((x + i * 7 + k * 13) % 26); a.lineTo(px, 50 + i * 22 + ((k * 7 + i) % 5) - 2); } a.stroke(); }
+});
+const LAPP = lapp(980, 210);
+const KASSA = region(0, 450, 440, 300, (a, w, h) => {
+  a.fillStyle = '#a7a08c'; a.fillRect(0, 0, w, h);
+  for (let r = 0; r < 5; r++) for (let k = 0; k < 7; k++) { a.fillStyle = k > 4 ? (r % 2 ? '#7d2f22' : '#3a3a34') : '#e0d8c2'; a.fillRect(20 + k * 58, 24 + r * 54, 44, 42); }
+});
+const PRIS = region(0, 760, 1024, 34, (a, w, h) => {
+  a.fillStyle = '#b5ab90'; a.fillRect(0, 0, w, h);
+  a.fillStyle = '#26221c'; a.font = '600 20px Georgia, serif'; a.textBaseline = 'middle';
+  for (let i = 0; i < 16; i++) { a.fillStyle = '#26221c'; a.fillText(`${17 + (i * 5) % 9}:50`, 6 + i * 64, h / 2); a.fillStyle = '#8a8270'; a.fillRect(60 + i * 64, 2, 2, h - 4); }
+});
+const TIDNING = region(1560, 530, 300, 300, (a, w, h) => {
+  a.fillStyle = '#d6cfba'; a.fillRect(0, 0, w, h);
+  a.fillStyle = '#a3271f'; a.fillRect(14, 12, w - 28, 44);
+  a.fillStyle = '#efe6d2'; a.font = '700 30px Georgia, serif'; a.textAlign = 'center'; a.textBaseline = 'middle'; a.fillText('EXTRA', w / 2, 35);
+  a.fillStyle = '#1e1a15'; a.fillRect(14, 68, w - 28, 26); a.fillRect(14, 102, w - 90, 26);
+  a.fillStyle = '#6a6455'; a.fillRect(14, 140, 150, 110);
+  a.fillStyle = 'rgba(30,26,21,.55)'; for (let i = 0; i < 8; i++) a.fillRect(176, 142 + i * 14, w - 192, 5);
+});
+
 // ---------- scenen ----------
 const P = [];
 let slump = 4711; const rnd = () => (slump = (slump * 16807) % 2147483647) / 2147483647;
 const RGB = (h) => [parseInt(h.slice(1, 3), 16) / 255, parseInt(h.slice(3, 5), 16) / 255, parseInt(h.slice(5, 7), 16) / 255].map((v) => v ** 2.2);
-// typ: 0 låda, 1 stående cylinder, 2 ellipsoid, 3 liggande cylinder (x). mat: 0 färg, 1 furu, 2 mahogny blank, 3 etikett, 4 glas, 5 mässing, 6 lyser, 7 osynlig för kameran, 8 mörkt trä, 9 blank färg
+// typ: 0 låda, 1 stående cylinder, 2 ellipsoid, 3 liggande cylinder (x). mat: 0 färg, 1 furu, 3 etikett, 4 glas, 5 mässing, 6 lyser, 7 osynlig för kameran, 8 bardiskens front, 10 pulten, 11 bardiskens skiva, 12 aluminium, 13 krom, 15 papper, 16 vinyl, 17 tidning
 const box = (c, h, mat, col = [1, 1, 1], uv = [0, 0, 0, 0]) => P.push({ t: 0, c, h, mat, col, uv });
 const cyl = (c, r, hh, mat, col = [1, 1, 1]) => P.push({ t: 1, c, h: [r, hh, r], mat, col, uv: [0, 0, 0, 0] });
 const ell = (c, h, mat, col = [1, 1, 1]) => P.push({ t: 2, c, h, mat, col, uv: [0, 0, 0, 0] });
@@ -71,72 +116,121 @@ grupp(() => {
   box([8000, 0, 2000], [20, 4000, 3000], 0, RGB('#3a2a1c'));
   box([0, 0, 5200], [9000, 4000, 20], 0, RGB('#2a2018'));
 });
-// hyllorna
-const HYLLA = [800, 980];
-const hylla = (y) => {
-  box([0, y - 7, VAGG + 96], [7000, 7, 96], 8);
-  box([0, y - 7, VAGG + 196], [7000, 8, 3], 8);
-  let x = -5000;
-  const rad = [];
-  let sv = 0;
-  while (x < 2400) {
+const T = -300; // bakdiskens ovansida, så som bardisken i rummet: skiva, fronten med fyllningar i ramar, mässingskrokar
+const TJ = 70, DJ = 560, FR = 340;
+const hylla = (y, x0, x1, ram = 8) => {
+  box([(x0 + x1) / 2, y - 12, VAGG + 110], [(x1 - x0) / 2, 12, 110], ram);
+  box([(x0 + x1) / 2, y - 22, VAGG + 222], [(x1 - x0) / 2, 22, 3], 3, [1, 1, 1], PRIS);
+  let x = x0 + 40;
+  while (x < x1 - 60) {
     if (rnd() < 0.09) { x += 40 + rnd() * 70; continue; }
     const n = 2 + Math.floor(rnd() * 5);
     const m = NAMN[Math.floor(rnd() * NAMN.length)];
-    for (let i = 0; i < n; i++) { rad.push([x, m]); x += 99; }
-    x += 2 + rnd() * 3;
-    sv++;
-  }
-  for (const [px, m] of rad) {
     const i = NAMN.indexOf(m);
-    const fram = 150 + rnd() * 26;
-    const hh = 79;
-    const a = MARKE[m];
-    box([px, y + hh, VAGG + fram / 2], [47, hh, fram / 2], 3, RGB(a[0]), [i * CELL[0] / atlas.width, 0, (i + 1) * CELL[0] / atlas.width, CELL[1] / atlas.height]);
+    for (let k = 0; k < n && x < x1 - 60; k++) {
+      const fram = 150 + rnd() * 26, hh = 79;
+      box([x, y + hh, VAGG + fram / 2], [47, hh, fram / 2], 3, RGB(MARKE[m][0]), [i * CELL[0] / atlas.width, 0, (i + 1) * CELL[0] / atlas.width, CELL[1] / atlas.height]);
+      x += 99;
+    }
+    x += 2 + rnd() * 3;
   }
 };
-grupp(() => hylla(HYLLA[0]));
-grupp(() => hylla(HYLLA[1]));
-// ljuslisten under nedre hyllan
-grupp(() => { box([0, HYLLA[0] - 19, VAGG + 60], [7000, 3, 6], 6, [1.5, 1.05, .62]); });
-// bakdisken
+// en lapp, skylt eller tavla på väggen
+const papper = (x, y, hx, hy, uv, z = VAGG + 4, mat = 15) => box([x, y, z], [hx, hy, 1.5], mat, [1, 1, 1], uv);
+
+// bardisken
 grupp(() => {
-  const T = -300;
-  box([0, T - 15, VAGG + 130], [7000, 15, 130], 8);
-  box([0, (T - 30 + GOLV) / 2, VAGG + 110], [7000, (T - 30 - GOLV) / 2, 110], 8);
-  // lådfronterna
-  for (let x = -2900; x < 3000; x += 410) { box([x, T - 92, VAGG + 222], [195, 58, 3], 8); xcyl([x, T - 92, VAGG + 230], 7, 26, 5, [0.75, 0.56, 0.3]); }
+  box([0, T - TJ / 2, VAGG + DJ / 2], [7000, TJ / 2, DJ / 2], 11);
+  box([0, (T - TJ + GOLV) / 2, VAGG + FR / 2], [7000, (T - TJ - GOLV) / 2, FR / 2], 8);
 });
-// flaskor, radion och sakerna på bakdisken
-const flaska = (x, z, col, h = 1, etikett = '#e6dcc0') => {
-  const T = -300;
-  cyl([x, T + 92 * h, z], 37, 92 * h, 4, col);
-  ell([x, T + 184 * h, z], [37, 30, 37], 4, col);
-  cyl([x, T + 232 * h, z], 13, 34 * h, 4, col);
-  cyl([x, T + 270 * h, z], 14.5, 11, 5, [0.55, 0.42, 0.24]);
-  cyl([x, T + 88 * h, z], 38, 40 * h, 0, RGB(etikett));
-  cyl([x, T + 96 * h, z], 38.4, 11 * h, 0, col.map((v) => Math.min(1, v * 3 + 0.05)));
+grupp(() => {
+  const z = VAGG + FR + 8, y0 = T - TJ;
+  box([0, y0 - 80, z], [7000, 80, 8], 8);
+  box([0, y0 - 1300, z], [7000, 80, 8], 8);
+  for (let x = -4200; x < 4000; x += 900) box([x, y0 - 700, z], [55, 680, 8], 8);
+});
+grupp(() => {
+  const z = VAGG + FR + 18, y = T - TJ - 215;
+  for (let x = -3750; x < 3400; x += 900) {
+    box([x, y, z], [13, 34, 3], 0, RGB('#b08c48'));
+    box([x, y - 16, z + 30], [5, 5, 30], 0, RGB('#b08c48'));
+    ell([x, y - 2, z + 58], [6, 17, 6], 0, RGB('#b08c48'));
+  }
+});
+// konsolerna i järn under skivan
+grupp(() => {
+  for (let x = -3300; x < 3400; x += 1800) box([x, T - TJ - 60, VAGG + FR + 90], [9, 50, 80], 0, RGB('#1d1611'));
+});
+// en barstol som gängets, längst till höger
+const stol = (x, z) => {
+  const Y = -1050;
+  cyl([x, Y, z], 262, 44, 16, RGB('#6e2320'));
+  ell([x, Y + 44, z], [262, 34, 262], 16, RGB('#6e2320'));
+  cyl([x, Y - 56, z], 175, 12, 13, [0.72, 0.72, 0.7]);
+  for (const [a, b] of [[-1, -1], [1, -1], [-1, 1], [1, 1]]) cyl([x + a * 130, Y - 620, z + b * 130], 18, 560, 13, [0.72, 0.72, 0.7]);
 };
+grupp(() => { stol(2240, VAGG + 700); });
+
+// flaskor som gängets, i verklig storlek
+const flaska = (x, z, col, h = 1, etikett = '#e6dcc0') => {
+  cyl([x, T + 120 * h, z], 50, 120 * h, 4, col);
+  ell([x, T + 240 * h, z], [50, 44, 50], 4, col);
+  cyl([x, T + 310 * h, z], 17, 58 * h, 4, col);
+  cyl([x, T + 372 * h, z], 19, 8, 13, [0.7, 0.68, 0.6]);
+  cyl([x, T + 118 * h, z], 51, 52 * h, 0, RGB(etikett));
+};
+// tre flaskor mellan matchlistan och hans axel (bakom listan ska det vara lugnt)
 grupp(() => {
-  const Z = VAGG + 150;
-  [[640, '#5a2a10'], [730, '#20402a'], [818, '#6a3a12'], [910, '#2a1a0c'], [1008, '#70541c'], [1090, '#20402a']].forEach(([x, c], i) => flaska(x, Z + (i % 2) * 40, RGB(c), 0.92 + (i % 3) * 0.08, i % 2 ? '#e6dcc0' : '#cfc09a'));
-  [[-1300, '#5a2a10'], [-1212, '#70541c'], [-1124, '#2a1a0c']].forEach(([x, c], i) => flaska(x, Z + (i % 2) * 40, RGB(c), 0.95 + (i % 2) * 0.1, '#d8ccac'));
-  // radion
-  const rx = -2050, ry = -300, rz = VAGG + 150;
-  box([rx, ry + 88, rz], [150, 88, 62], 8);
-  box([rx - 54, ry + 88, rz + 63], [80, 66, 2], 0, RGB('#b8a070'));
-  for (let k = 0; k < 6; k++) box([rx - 54, ry + 40 + k * 20, rz + 66], [76, 2.4, 1], 8);
-  xcyl([rx + 84, ry + 128, rz + 66], 20, 5, 5, [0.7, 0.52, 0.28]);
-  xcyl([rx + 84, ry + 58, rz + 66], 20, 5, 5, [0.7, 0.52, 0.28]);
-  // tidningar och kuponger
-  box([-430, -293, VAGG + 140], [110, 7, 80], 0, RGB('#d8d0bc'));
-  box([-422, -279, VAGG + 140], [104, 7, 76], 0, RGB('#c8bfa8'));
-  box([1560, -285, VAGG + 140], [120, 15, 80], 0, RGB('#b0a890'));
+  const Z = VAGG + 300;
+  [[-1010, 0], [-900, 60], [-780, -10]].forEach(([x, dz]) => flaska(x, Z + dz, RGB('#2c4a2c'), 1));
 });
-// lagfotot i ram
+// tidningsbunten: returerna, med snöre
 grupp(() => {
-  box([830, 300, VAGG + 8], [122, 168, 8], 8);
-  box([830, 300, VAGG + 17], [104, 150, 1], 3, [1, 1, 1], [7 * CELL[0] / atlas.width, 0, 8 * CELL[0] / atlas.width, CELL[1] / atlas.height]);
+  const x = 1120, z = VAGG + 320;
+  const ton = ['#a79f88', '#8f8873', '#b0a890', '#98907a', '#a79f88', '#8f8873', '#b5ad96'];
+  ton.forEach((c, i) => {
+    const o = [[0, 0], [9, -6], [-7, 5], [11, 3], [-4, -7], [6, 6], [-3, 0]][i];
+    const y = T + 15 + i * 30;
+    box([x + o[0], y, z + o[1]], [262, 15, 188], i === ton.length - 1 ? 17 : 0, RGB(c), TIDNING);
+  });
+  const hojd = 7 * 15 + 2;
+  box([x, T + hojd, z], [5, hojd + 1, 195], 0, RGB('#5c4e34'));
+  box([x, T + hojd, z], [268, hojd + 1, 5], 0, RGB('#5c4e34'));
+});
+// kaffebryggaren: påtår ×4
+grupp(() => {
+  const x = 1640, z = VAGG + 290;
+  box([x, T + 22, z], [150, 22, 135], 0, RGB('#2c2a25'));
+  box([x, T + 270, z - 92], [130, 270, 40], 0, RGB('#2c2a25'));
+  cyl([x, T + 520, z - 10], 142, 52, 0, RGB('#2c2a25'));
+  cyl([x, T + 150, z + 25], 104, 104, 4, [0.5, 0.5, 0.48]);
+  cyl([x, T + 92, z + 25], 100, 46, 0, RGB('#1a0d06'));
+  box([x, T + 262, z + 25], [108, 8, 108], 0, RGB('#2c2a25'));
+  box([x + 118, T + 150, z + 25], [12, 58, 14], 0, RGB('#2c2a25'));
+  box([x + 90, T + 22, z + 136], [12, 7, 2], 6, [2.2, 0.2, 0.12]);
+});
+// kassaapparaten
+grupp(() => {
+  const x = 2130, z = VAGG + 300;
+  box([x, T + 85, z], [300, 85, 230], 0, RGB('#7c7562'));
+  box([x, T + 255, z - 60], [285, 90, 160], 0, RGB('#857e6a'));
+  box([x, T + 262, z + 102], [280, 80, 3], 3, [1, 1, 1], KASSA);
+  box([x + 40, T + 405, z - 120], [190, 62, 60], 0, RGB('#2e2e2a'));
+  box([x + 40, T + 408, z - 58], [158, 36, 2], 6, [0.025, 0.13, 0.055]);
+});
+
+// Paketen på en hylla över hans huvud (hjässan står ungefär vid y = 600, och bilden slutar strax över 800).
+grupp(() => hylla(640, -3800, 2900));
+// lagfotot, och furan runt det som inte har mörknat lika mycket där en större tavla har hängt (furu)
+grupp(() => {
+  box([-640, 330, VAGG + 8], [122, 168, 8], 8);
+  box([-640, 330, VAGG + 17], [104, 150, 1], 3, [1, 1, 1], [7 * CELL[0] / atlas.width, 0, 8 * CELL[0] / atlas.width, CELL[1] / atlas.height]);
+});
+// det som sitter på panelen: skylten (notan på pulten säger annat), kalendern och en lapp
+grupp(() => {
+  papper(1040, 330, 250, 92, KREDIT);
+  papper(1540, 410, 150, 212, KALENDER);
+  papper(1940, 440, 90, 124, LAPP);
 });
 // han själv och pulten framför honom: syns inte, men skuggar och kastar ljus
 const HAN = G.length;
@@ -164,19 +258,10 @@ grupp(() => {
 const LJ = q.get('dag') ? [
   { p: [4700, 760, 3100], r: 1050, e: [1, 1, 1].map((v) => v * +(q.get('ds') || 30)) },
 ] : [
-  // nyckel: framifrån till vänster, varm (samma riktning som figurens ljus, rum-hasse-arm.js)
-  { p: [-700, 1450, 2100], r: 460, e: [1.0, 0.86, 0.68].map((v) => v * 13) },
-  // lampan bakom honom: en varm gloria på väggen
-  { p: [-260, 520, -800], r: 90, e: [1.0, 0.72, 0.42].map((v) => v * 9) },
-  // ljuslisten
-  { p: [-1100, HYLLA[0] - 26, VAGG + 66], r: 26, e: [1.0, 0.74, 0.46].map((v) => v * 12) },
-  { p: [-200, HYLLA[0] - 26, VAGG + 66], r: 26, e: [1.0, 0.74, 0.46].map((v) => v * 14) },
-  { p: [700, HYLLA[0] - 26, VAGG + 66], r: 26, e: [1.0, 0.74, 0.46].map((v) => v * 8) },
-  { p: [1600, HYLLA[0] - 26, VAGG + 66], r: 26, e: [1.0, 0.74, 0.46].map((v) => v * 4) },
-  // en lampa längre bort längs baren, så att den fortsätter in i mörkret
-  { p: [-3300, 560, VAGG + 300], r: 80, e: [1.0, 0.7, 0.4].map((v) => v * 7) },
+  // svagt från gatan och lamporna i affären (nyckeln i figurens riktning, rum-hasse-arm.js)
+  { p: [-700, 1450, 2100], r: 460, e: [1.0, 0.9, 0.76].map((v) => v * 4.5) },
   // neonskylten i affärens fönster till höger: rött
-  { p: [2600, 650, 1500], r: 260, e: [1.0, 0.16, 0.1].map((v) => v * 12) },
+  { p: [2600, 650, 1500], r: 260, e: [1.0, 0.16, 0.1].map((v) => v * 9) },
   // gatan genom fönstret till höger: kallt
   { p: [3800, 1300, 3400], r: 620, e: [0.55, 0.68, 1.0].map((v) => v * 3.6) },
   // ?lys=1: lysröret i affärens tak är tänt, som i rummet från sex på morgonen till midnatt (rum-folk.js):
@@ -245,7 +330,6 @@ Hit skarning(vec3 ro, vec3 rd, bool kamera) {
 bool skymd(vec3 ro, vec3 rd, float mx) {
   vec3 ird = 1. / rd;
   for (int g = 0; g < ${G.length}; g++) {
-    if (g == 3) continue; // ljuslisten skymmer inget
     if (!slab(ro, ird, uG0[g].xyz, uG1[g].xyz, mx)) continue;
     for (int i = uGi[g].x; i < uGi[g].y; i++) { if (int(data(i, 1).w) == 4 || int(data(i, 1).w) == 6) continue; Hit h; h.t = mx; h.id = -1; prova(i, ro, rd, ird, h); if (h.id >= 0) return true; }
   }
@@ -255,23 +339,40 @@ float h1(float x) { return fract(sin(x * 91.17) * 43758.5453); }
 float h2(vec2 p) { return fract(sin(dot(p, vec2(127.1, 311.7))) * 43758.5453); }
 float nz(vec2 p) { vec2 i = floor(p), f = fract(p); f = f * f * (3. - 2. * f); return mix(mix(h2(i), h2(i + vec2(1, 0)), f.x), mix(h2(i + vec2(0, 1)), h2(i + vec2(1, 1)), f.x), f.y); }
 float fbm(vec2 p) { float a = .5, s = 0.; for (int i = 0; i < 4; i++) { s += a * nz(p); p = p * 2.03 + 11.; a *= .5; } return s; }
+// Furupanelen som i rummet (furu i rum.js): breda bräder med mörka fogar, kvistar och ådring, mörkare av
+// röken upptill och med fläckar.
 vec3 furu(vec3 p) {
-  float bb = 92., bx = floor(p.x / bb), fx = p.x / bb - bx;
+  float bb = 233., bx = floor(p.x / bb), fx = p.x / bb - bx;
   float s = h1(bx + 3.);
-  vec2 g = vec2(p.x * .12 + s * 40., p.y * .006 + s * 91.);
-  float a = fbm(g), b = fbm(g * vec2(3.2, 1.2) + 7.);
-  vec3 c = mix(vec3(.46, .26, .11), vec3(.68, .43, .20), a * .55 + .35 * s);
-  c *= .78 + .3 * smoothstep(.3, .7, b);
-  c *= 1. - .18 * smoothstep(.48, .62, fbm(vec2(p.x * .4 + s * 13., p.y * .02)));
-  float spar = smoothstep(.0, .022, fx) * smoothstep(.0, .022, 1. - fx);
-  return c * .7 * (.12 + .88 * spar);
+  vec3 ton = mix(vec3(.34, .205, .09), vec3(.46, .29, .125), s);
+  vec2 g = vec2(p.x * .045 + s * 40., p.y * .0032 + s * 91.);
+  float a = fbm(g), b = fbm(g * vec2(3.4, 1.5) + 7.);
+  vec3 c = ton * (.7 + .55 * a) * (.84 + .28 * smoothstep(.3, .7, b));
+  for (int i = 0; i < 3; i++) {
+    float fi = float(i);
+    float ky = (h1(bx * 7.3 + fi * 3.1) - .5) * 2600., kx = (.22 + .56 * h1(bx * 5.1 + fi)) * bb;
+    float rs = 15. + 14. * h1(bx + fi * 9.);
+    if (h1(bx * 2.7 + fi * 5.) < .4) continue;
+    vec2 d = vec2((p.x - bx * bb - kx) / rs, (p.y - ky) / (rs * 1.5));
+    float r = length(d);
+    c *= 1. - .34 * smoothstep(3.2, 1., r);
+    c = mix(c, vec3(.05, .021, .007), smoothstep(1.05, .65, r) * .92);
+  }
+  float rok = smoothstep(120., 1050., p.y + 420. * (fbm(vec2(p.x * .0014, 3.)) - .5));
+  c *= mix(1., .5, rok);
+  c *= 1. - .32 * smoothstep(.42, .72, fbm(p.xy * vec2(.0021, .0033) + 5.));
+  if (abs(p.x + 640.) < 215. && abs(p.y - 300.) < 275.) c *= 1.26; // där en större tavla har hängt
+  float spar = smoothstep(0., .014, fx) * smoothstep(0., .014, 1. - fx);
+  return c * .62 * (.07 + .93 * spar);
 }
-vec3 mahogny(vec3 p, float mork) {
-  vec2 g = vec2(p.x * .0035 + p.y * .002, p.z * .05 + p.y * .03);
+// bardisken som i rummet: brun mahogny, skivan ljusare och med plankor (mahogny i rum-inredning.js)
+vec3 barTra(vec3 p, bool skiva) {
+  vec2 g = skiva ? vec2(p.x * .0035, p.z * .05) : vec2(p.y * .0032, p.x * .05);
   float a = fbm(g * vec2(1., 2.)), b = fbm(g * vec2(.6, 7.) + 3.);
-  vec3 c = mix(vec3(.13, .035, .016), vec3(.30, .095, .04), a);
-  c *= .78 + .36 * b;
-  return c * mork;
+  vec3 c = skiva ? mix(vec3(.13, .048, .018), vec3(.21, .08, .032), a) : mix(vec3(.058, .021, .008), vec3(.105, .037, .015), a);
+  c *= .78 + .4 * b;
+  if (skiva) { float f = fract(p.z / 186.); c *= .55 + .45 * smoothstep(0., .02, f) * smoothstep(0., .02, 1. - f); }
+  return c;
 }
 // pultens trä: samma bruna som i rummet, med ådringen längs pulten
 vec3 pultTra(vec3 p) {
@@ -300,8 +401,12 @@ vec3 spara(vec3 ro, vec3 rd) {
     float gloss = 0.; float grov = .04;
     if (m == 6) { L += T * c; break; }
     if (m == 1) c = furu(p);
-    if (m == 2) { c = mahogny(p, 1.); gloss = 1.; grov = .05 + .03 * fbm(p.xz * .02); n = normalize(n + .012 * vec3(fbm(p.xz * .03) - .5, 0., fbm(p.xz * .03 + 9.) - .5)); }
-    if (m == 8) { c = mahogny(p.yxz, .56); gloss = .42; grov = .2; }
+    if (m == 8) { c = barTra(p, false); gloss = .3; grov = .3; }
+    if (m == 11) { c = barTra(p, true); gloss = .55; grov = .22; }
+    if (m == 17) { vec3 lc = p - data(h.id, 0).xyz; if (h.n.y > .5) { vec2 uv = lc.xz / d1.xz * .5 + .5; c = textureLod(uA, vec2(mix(d3.x, d3.z, uv.x), mix(d3.y, d3.w, uv.y)), 0.).rgb * .62; } }
+    if (m == 16) { gloss = .6; grov = .18; }
+    if (m == 13) { vec3 r = reflect(rd, n); rd = normalize(r + (vec3(rn(), rn(), rn()) - .5) * .18); ro = p + n * .5; T *= c; spec = true; forsta = false; continue; }
+    if (m == 15) { if (abs(h.n.z) > .5) { vec3 lc = p - data(h.id, 0).xyz; vec2 uv = lc.xy / d1.xy * .5 + .5; c = textureLod(uA, vec2(mix(d3.x, d3.z, uv.x), mix(d3.w, d3.y, uv.y)), 0.).rgb * .62; } else c = vec3(.3); }
     if (m == 10) { c = pultTra(p); gloss = .5; grov = .34; }
     if (m == 12 && rn() < .4) { // listen i aluminium: lite blank, annars sin egen färg
       vec3 r = reflect(rd, n); rd = normalize(r + (vec3(rn(), rn(), rn()) - .5) * .5); ro = p + n * .5; T *= c; spec = true; forsta = false; continue;
@@ -353,7 +458,7 @@ void main() {
   // tunn lins: skarpt där han sitter
   float tf = ${(D - 120).toFixed(1)} / -dc.z;
   vec3 mal = dc * tf;
-  float a = rn() * 2. * PI, r = sqrt(rn()) * 30.;
+  float a = rn() * 2. * PI, r = sqrt(rn()) * 20.;
   vec3 o = vec3(r * cos(a), r * sin(a), 0.);
   vec3 rc = normalize(mal - o);
   vec3 ro = ${v3(KP)} + o.x * ${v3(KR)} + o.y * ${v3(KU)};
