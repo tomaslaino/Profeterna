@@ -1716,10 +1716,11 @@ export async function figurer(canvas, opt = {}) {
   // En kassettradio (80-tal) på fönsterbänkens högra ände, under löpsedlarna (RADIO_PLATS): där står
   // inget annat hur de än sitter (DJ:s tomflaskor står till vänster om den). Ett klick går fram till
   // den (sak i rum.js), och där ställer man in FM och AM (rum-radio.js, som säger vad som gäller med
-  // radioLage). Stationsskalan lyser med en glödlampa, visaren och rattarna följer varandra,
-  // tangenterna går in, lysdioderna och högtalarna följer det som hörs och stationerna man har hittat
-  // står för hand på maskeringstejpen vid skalan (radioEtiketter, radioSkriv). Så länge det är musik
-  // sjunger gänget (radioSang) och noter stiger ur den (radioRita).
+  // radioLage). Stationsskalan lyser med en glödlampa, stationsspaken sitter på samma ställe som visaren
+  // under skalan, bandspaken slår över mellan FM och AM, POWER-knappen går in, lysdioderna och högtalarna
+  // följer det som hörs och stationerna man har hittat står för hand på maskeringstejpen vid skalan
+  // (radioEtiketter, radioSkriv). Så länge det är musik sjunger gänget (radioSang) och noter stiger ur
+  // den (radioRita).
   const RADIO_PLATS = { x: 127, z: 8, vrid: -0.38 };
   // en lampa: mellan släckt och tänd (lys), utan tonkurvan, som annars gör starkt ljus vitt
   const lampa = (pa, av) => {
@@ -1743,16 +1744,19 @@ export async function figurer(canvas, opt = {}) {
   // Måtten i modellens enheter, med botten i y = 0 och fronten mot +z. SK: lika bred som den alltid har
   // varit i rummet. Visaren går mellan sx0 (p = 0) och sx1 (p = 1).
   const RM = {
-    W: 60, H: 36, D: 11, F: 5.5, SK: 0.87,
-    gx0: -28, gx1: 28, gy0: 23.9, gy1: 30.7,
-    sx0: -24.2, sx1: 26.2,
-    tf: [30.95, 33.75], ta: [21.05, 23.75],
-    ratt: { x: 8.75, y: 5.2, r: 2.85 },
-    tang: { y: 5.2, w: 3.3, h: 5.6, x: { av: -3.75, fm: 0, am: 3.75 } },
+    W: 64, H: 39.8, D: 11, F: 5.5, SK: 0.816,
+    gx0: -30, gx1: 30, gy0: 27.4, gy1: 33.8,
+    sx0: -25.8, sx1: 28.2,
+    tf: [33.95, 37.35], ta: [23.85, 27.25],
+    skena: { y: 22.65, h: 1.05 },
+    hog: 21.5,
+    ratt: { x: -9, y: 5, r: 2.85 },
+    kraft: { x: 0, y: 4.5, w: 5.4, h: 4.8 },
+    bspak: { x: 9, y: 5, w: 6.4, h: 7.4 },
   };
-  // RL: det som rum-radio.js säger (band, p: visaren 0–1, vol, s: hur väl stationen tas in, lampa,
-  // niva: det som hörs) och där delarna är just nu.
-  const RL = { band: 'av', sist: 'fm', p: 0.14, vol: 0.55, s: 0, lampa: 0, niva: null, lampaNu: 0, sNu: 0, ledNu: 0, sen: null, in: { av: 1, fm: 0, am: 0 }, fin: 0, bytt: false };
+  // RL: det som rum-radio.js säger (band, sist: bandspaken, p: visaren 0–1, vol, s: hur väl stationen tas
+  // in, lampa, niva: det som hörs) och där delarna är just nu (in: POWER, bV: bandspaken).
+  const RL = { band: 'av', sist: 'fm', p: 0.14, vol: 0.55, s: 0, lampa: 0, niva: null, lampaNu: 0, sNu: 0, ledNu: 0, sen: null, in: 0, bV: -1, nara: false, naraV: 0, fin: 0, bytt: false };
   const FONT = 'Arial, Helvetica, sans-serif';
   // Dukar som ritas om större när kameran går fram (radioFin): rita(c, w, h) ska rita efter måtten.
   const RDUKAR = [];
@@ -1765,7 +1769,7 @@ export async function figurer(canvas, opt = {}) {
   };
   // Stationsskalan. lys: det som lyser (den valda bandraden starkast), annars tryckfärgen.
   function ritaSkala(c, w, h, lys) {
-    const band = RL.band === 'av' ? RL.sist : RL.band;
+    const band = RL.sist;
     const B = (window.RumRadio && RumRadio.BAND) || { fm: { fran: 87.5, till: 108.5 }, am: { fran: 520, till: 1620 } };
     const X = (b, f) => (((RM.sx0 + ((f - B[b].fran) / (B[b].till - B[b].fran)) * (RM.sx1 - RM.sx0)) - RM.gx0) / (RM.gx1 - RM.gx0)) * w;
     c.fillStyle = lys ? '#000' : '#0a0a0c';
@@ -1815,24 +1819,34 @@ export async function figurer(canvas, opt = {}) {
       c.font = `600 ${Math.round(h * 0.09)}px ${FONT}`;
       c.fillText(b === 'fm' ? 'MHz' : '×100 kHz', w * 0.012, h * y + h * 0.1);
     }
+    // lampan som säger att stationen stämmer (tuneLed) sitter längst till höger
+    c.textAlign = 'center';
+    c.fillStyle = lys ? '#6a4a22' : '#8c887e';
+    c.font = `600 ${Math.round(h * 0.085)}px ${FONT}`;
+    c.fillText('TUNE', w * 0.984, h * 0.66);
   }
   const SKALA = rduk(512, 62, (c, w, h) => ritaSkala(c, w, h, false));
   const SKALA_LYS = rduk(512, 62, (c, w, h) => ritaSkala(c, w, h, true));
   SKALA_LYS.colorSpace = THREE.SRGBColorSpace;
-  // Tejpen vid skalan: FM ovanför, AM under, med stationerna för hand. Varje station har sin plats från
-  // början (tejpPlats), så att det som redan står inte flyttar sig när en ny skrivs dit.
+  // Tejpen vid skalan: FM ovanför, AM under, med stationerna för hand i två rader, varannan närmast
+  // skalan. Varje station har sin plats från början (tejpPlats), så att det som redan står inte flyttar
+  // sig när en ny skrivs dit.
   const TEJP = { rutor: { fm: [], am: [] }, hittade: new Set(), skrivs: null };
   function tejpPlats(band, c, w, h) {
     const l = TEJP.rutor[band];
-    const fs = Math.round(h * 0.6);
+    const fs = Math.round(h * 0.47);
     c.font = `700 ${fs}px Caveat, cursive`;
     const utx = (p) => (((RM.sx0 + p * (RM.sx1 - RM.sx0)) - RM.gx0) / (RM.gx1 - RM.gx0)) * w;
-    const lucka = fs * 0.26;
+    const lucka = fs * 0.32;
     const rad = l.map((e) => ({ e, x: utx(e.p), b: c.measureText(e.kort).width })).sort((a, b) => a.x - b.x);
-    let v = w * 0.012;
-    for (const a of rad) { a.c = Math.max(a.x, v + a.b / 2); v = a.c + a.b / 2 + lucka; }
-    let h1 = w * 0.988;
-    for (const a of [...rad].reverse()) { a.c = Math.min(a.c, h1 - a.b / 2); h1 = a.c - a.b / 2 - lucka; }
+    rad.forEach((a, i) => { a.r = i % 2; });
+    for (const r of [0, 1]) {
+      const denna = rad.filter((a) => a.r === r);
+      let v = w * 0.012;
+      for (const a of denna) { a.c = Math.max(a.x, v + a.b / 2); v = a.c + a.b / 2 + lucka; }
+      let h1 = w * 0.988;
+      for (const a of [...denna].reverse()) { a.c = Math.min(a.c, h1 - a.b / 2); h1 = a.c - a.b / 2 - lucka; }
+    }
     return { rad, fs };
   }
   function ritaTejp(band, c, w, h) {
@@ -1846,9 +1860,9 @@ export async function figurer(canvas, opt = {}) {
     for (let i = 7; i >= 0; i--) c.lineTo(w * (0.994 + 0.004 * hash(i * f + 9)), h * (0.06 + 0.11 * i));
     c.closePath();
     const g = c.createLinearGradient(0, 0, 0, h);
-    g.addColorStop(0, '#e9dfc4');
-    g.addColorStop(0.5, '#e2d6b6');
-    g.addColorStop(1, '#d9ccaa');
+    g.addColorStop(0, '#f1e7cc');
+    g.addColorStop(0.5, '#ebdfbf');
+    g.addColorStop(1, '#e2d5b1');
     c.fillStyle = g;
     c.fill();
     // fibrer, och där tummen har varit
@@ -1857,26 +1871,32 @@ export async function figurer(canvas, opt = {}) {
     c.globalAlpha = 0.06;
     c.fillStyle = '#6a5a3a';
     for (let i = 0; i < 90; i++) c.fillRect(hash(i + f) * w, hash(i * 2.1 + f) * h, w * 0.01 * (0.3 + hash(i)), Math.max(1, h * 0.02));
-    c.globalAlpha = 0.09;
-    for (let i = 0; i < 3; i++) { c.beginPath(); c.ellipse(hash(i * 3.3 + f) * w, hash(i * 1.7 + f) * h, w * 0.022, h * 0.7, 0, 0, 7); c.fill(); }
+    c.globalAlpha = 0.035;
+    for (let i = 0; i < 3; i++) { c.beginPath(); c.ellipse(hash(i * 3.3 + f) * w, hash(i * 1.7 + f) * h, w * 0.03, h * 0.7, 0, 0, 7); c.fill(); }
     c.restore();
     const { rad, fs } = tejpPlats(band, c, w, h);
     c.textAlign = 'center';
     c.textBaseline = 'middle';
     c.lineCap = 'round';
     const penna = band === 'fm' ? '#1b2a66' : '#7a1f1a';
+    // (y uppifrån: r 0 närmast skalan, som ligger under FM-tejpen och över AM-tejpen)
+    const upp = band === 'fm';
+    const radY = (r) => (upp === (r === 0) ? h * 0.74 : h * 0.29);
     for (const a of rad) {
       if (!TEJP.hittade.has(a.e.id)) continue;
       const nu = TEJP.skrivs && TEJP.skrivs.id === a.e.id ? TEJP.skrivs.u : 1;
-      // strecket ner mot skalan, sedan namnet från vänster till höger
-      const fot = band === 'fm' ? h * 0.96 : h * 0.04;
-      const hals = band === 'fm' ? h * 0.8 : h * 0.2;
+      // strecket mot skalan, sedan namnet från vänster till höger. Står namnet nära sin frekvens och
+      // det är fritt går strecket fram till det, annars är det bara en liten bock vid kanten.
+      const fot = upp ? h * 0.98 : h * 0.02;
+      const dx = Math.max(-fs * 0.8, Math.min(fs * 0.8, a.c - a.x));
+      const fritt = a.r === 1 && Math.abs(a.c - a.x) < fs * 0.8 && !rad.some((n) => n.r === 0 && Math.abs(n.c - a.x - dx / 2) < n.b / 2 + 2 && TEJP.hittade.has(n.e.id));
+      const hals = upp ? (fritt ? h * 0.47 : h * 0.93) : (fritt ? h * 0.53 : h * 0.07);
       c.strokeStyle = penna;
-      c.lineWidth = Math.max(1, h * 0.035);
+      c.lineWidth = Math.max(1, h * 0.03);
       const u1 = Math.min(1, nu * 4);
       c.beginPath();
       c.moveTo(a.x, fot);
-      c.lineTo(a.x + (a.c - a.x) * u1, fot + (hals - fot) * u1);
+      c.lineTo(a.x + (fritt ? dx : Math.sign(dx) * Math.min(fs * 0.3, Math.abs(dx))) * u1, fot + (hals - fot) * u1);
       c.stroke();
       if (nu <= 0.25) continue;
       c.save();
@@ -1885,12 +1905,12 @@ export async function figurer(canvas, opt = {}) {
       c.clip();
       c.fillStyle = penna;
       c.font = `700 ${fs}px Caveat, cursive`;
-      c.fillText(a.e.kort, a.c, h * 0.47 + (hash(a.x) - 0.5) * h * 0.08);
+      c.fillText(a.e.kort, a.c, radY(a.r) + (hash(a.x) - 0.5) * h * 0.06);
       c.restore();
     }
   }
-  const TEJPF = rduk(512, 26, (c, w, h) => ritaTejp('fm', c, w, h));
-  const TEJPA = rduk(512, 26, (c, w, h) => ritaTejp('am', c, w, h));
+  const TEJPF = rduk(512, 29, (c, w, h) => ritaTejp('fm', c, w, h));
+  const TEJPA = rduk(512, 29, (c, w, h) => ritaTejp('am', c, w, h));
   // Kassetten bakom luckan: grå med handskriven etikett, två spolar och bandet som syns i fönstret.
   const KASSETT = rduk(128, 56, (c, w, h) => {
     c.fillStyle = '#34353a';
@@ -2005,6 +2025,55 @@ export async function figurer(canvas, opt = {}) {
       c.fill();
     }
   });
+  // Borstad aluminium runt skalan.
+  const BORSTAT = canvasTex(512, 256, (c, w, h) => {
+    c.fillStyle = '#afb2b7';
+    c.fillRect(0, 0, w, h);
+    for (let i = 0; i < 1400; i++) {
+      c.fillStyle = i % 2 ? 'rgba(255,255,255,0.06)' : 'rgba(30,32,38,0.05)';
+      c.fillRect(hash(i * 2.11) * w - 40, hash(i * 1.37) * h, 60 + hash(i * 3.3) * 260, 1);
+    }
+  });
+  // Högtalargallret: svart plåt med hål i förband.
+  const GALLER = canvasTex(512, 512, (c, w, h) => {
+    c.clearRect(0, 0, w, h);
+    c.fillStyle = '#25262a';
+    c.beginPath();
+    c.arc(w / 2, h / 2, w / 2, 0, 7);
+    c.fill();
+    c.globalCompositeOperation = 'destination-out';
+    const s = w / 44;
+    let rad = 0;
+    for (let y = s / 2; y < h; y += s * 0.866) {
+      for (let x = rad % 2 ? s / 2 : 0; x < w; x += s) {
+        c.beginPath();
+        c.arc(x, y, s * 0.33, 0, 7);
+        c.fill();
+      }
+      rad++;
+    }
+    c.globalCompositeOperation = 'source-over';
+  });
+  // Spakens mjuka skugga på fronten.
+  const SPAKSKUGGA = canvasTex(64, 64, (c, w, h) => {
+    const v = c.createRadialGradient(w / 2, h / 2, 0, w / 2, h / 2, w / 2);
+    v.addColorStop(0, 'rgba(0,0,0,0.6)');
+    v.addColorStop(0.5, 'rgba(0,0,0,0.28)');
+    v.addColorStop(1, 'rgba(0,0,0,0)');
+    c.fillStyle = v;
+    c.fillRect(0, 0, w, h);
+  });
+  // En avlång spalt med runda ändar.
+  function pille(w, h) {
+    const r = h / 2;
+    const s = new THREE.Shape();
+    s.moveTo(-w / 2 + r, -r);
+    s.lineTo(w / 2 - r, -r);
+    s.absarc(w / 2 - r, 0, r, -Math.PI / 2, Math.PI / 2, false);
+    s.lineTo(-w / 2 + r, r);
+    s.absarc(-w / 2 + r, 0, r, Math.PI / 2, Math.PI * 1.5, false);
+    return new THREE.ShapeGeometry(s, 8);
+  }
   function kassettradio() {
     const g = new THREE.Group();
     const k = new THREE.Group();
@@ -2016,10 +2085,15 @@ export async function figurer(canvas, opt = {}) {
     // det som inte syns på håll ritas bara på väg fram och nära (radioDetalj): radion är några tiotal
     // bildpunkter bred i rummet, och varje del är en ritning till i varje bild
     const fint = (x) => { x.visible = false; RFINT.push(x); return x; };
-    const silver = mat('#c6c9cd', { metalness: 0.75, roughness: 0.32 });
-    const svart = mat('#1a1a1c', { roughness: 0.45 });
+    const silver = mat('#c6c9cd', { metalness: 0.4, roughness: 0.46, envMapIntensity: 0.3 });
+    const svart = mat('#141417', { roughness: 0.5 });
+    const plast = mat('#2a2b30', { metalness: 0.5, roughness: 0.4 });
     const kropp = mesh(RB3(W, H, Dd, 2.5), silver, k);
     kropp.position.y = H / 2;
+    // den borstade plåten runt skalan, och en kromlist mot fronten
+    const plat = fint(del(new THREE.PlaneGeometry(W - 5.2, H - 2.5 - 20.9), mat('#ffffff', { map: BORSTAT, metalness: 0.55, roughness: 0.46 })));
+    plat.position.set(0, (20.9 + H - 2.5) / 2, F + 0.012);
+    fint(del(new THREE.BoxGeometry(W - 3.4, 0.28, 0.14), krom)).position.set(0, 20.95, F + 0.32);
     // den svarta fronten med högtalarna och kassettdelen
     del(RB3(W - 3, 19.6, 1, 0.6), svart).position.set(0, 11, F - 0.2);
     const pump = [];
@@ -2028,8 +2102,10 @@ export async function figurer(canvas, opt = {}) {
     });
     const konMat = mat('#ffffff', { map: koner, roughness: 0.85, side: THREE.DoubleSide });
     const kapMat = mat('#37373b', { roughness: 0.28, metalness: 0.45 });
-    for (const x of [-20, 20]) {
-      // en kromring som står ut, med membranet och dammkåpan i (membranet går i takten)
+    const gallerMat = mat('#ffffff', { map: GALLER, transparent: true, depthWrite: false, metalness: 0.55, roughness: 0.5 });
+    for (const x of [-21.5, 21.5]) {
+      // en kromring som står ut, med gallret, membranet och dammkåpan i (membranet går i takten)
+      fint(del(new THREE.CircleGeometry(7.5, 40), gallerMat)).position.set(x, 11, F + 1.4);
       const ring = vrid(del(new THREE.TorusGeometry(8.1, 0.82, 10, 40), krom));
       ring.position.set(x, 11, F + 1.05);
       const kant = vrid(del(new THREE.TorusGeometry(7.3, 0.42, 6, 36), mat('#141416', { roughness: 0.7 })));
@@ -2050,26 +2126,74 @@ export async function figurer(canvas, opt = {}) {
     lucka.position.set(0, 14.7, F + 0.6);
     fint(tryck(k, 'SHARP', -6.3, 19.55, F + 0.54, 1.25, { vikt: 800 }));
     fint(tryck(k, 'STEREO RADIO CASSETTE', 3.6, 19.55, F + 0.54, 0.72, { vikt: 600, farg: '#a8a59c' }));
-    // lysdioderna: gröna, sedan gula och en röd
+    // lysdioderna i en svart ränna: gröna, sedan gula och en röd
+    fint(del(RB3(11.6, 1.08, 0.2, 0.08, 1), mat('#050506', { roughness: 0.55 }))).position.set(0, 9.55, F + 0.3);
     const led = ['#35f068', '#35f068', '#35f068', '#35f068', '#35f068', '#ffc832', '#ffc832', '#ff3a2e'].map((c, i) => lampa(c, i < 5 ? '#0d2a16' : i < 7 ? '#2e2408' : '#30100c'));
-    led.forEach((m, i) => { del(new THREE.BoxGeometry(1, 0.62, 0.3), m).position.set(-4.55 + i * 1.3, 9.55, F + 0.34); });
-    // rattarna: volymen till vänster, stationerna till höger
+    led.forEach((m, i) => { fint(del(new THREE.BoxGeometry(1.08, 0.66, 0.3), m)).position.set(-4.75 + i * 1.357, 9.55, F + 0.34); });
+    // volymratten till vänster
     const R0 = RM.ratt;
-    const vol = ratt(k, -R0.x, R0.y, R0.r, RATT_SKALA);
-    const tune = ratt(k, R0.x, R0.y, R0.r, null);
-    fint(tryck(k, 'VOLUME', -R0.x, 9.5, F + 0.34, 0.72, { vikt: 700, farg: '#a8a59c' }));
-    fint(tryck(k, 'TUNING', R0.x, 9.5, F + 0.34, 0.72, { vikt: 700, farg: '#a8a59c' }));
-    // tangenterna
-    const tang = {};
-    const T = RM.tang;
-    for (const [namn, x] of Object.entries(T.x)) {
-      const m = new THREE.Group();
-      m.position.set(x, T.y, F);
-      k.add(m);
-      del(RB3(T.w, T.h, 2, 0.35, 2), namn === 'av' ? mat('#7a1b1b', { roughness: 0.42 }) : mat('#2c2d31', { roughness: 0.4, metalness: 0.3 }), m).position.z = 0;
-      m.userData.text = fint(tryck(m, namn.toUpperCase(), 0, 0.1, 1.03, 1.15, { vikt: 800, farg: '#ffffff' }));
-      tang[namn] = m;
-    }
+    const vol = ratt(k, R0.x, R0.y, R0.r, RATT_SKALA);
+    fint(tryck(k, 'VOLUME', R0.x, 9.42, F + 0.34, 0.72, { vikt: 700, farg: '#a8a59c' }));
+    // POWER i mitten, med en lampa över: knappen stannar inne när radion är på
+    const K0 = RM.kraft;
+    fint(del(RB3(K0.w + 0.7, K0.h + 0.7, 0.5, 0.24, 2), plast)).position.set(K0.x, K0.y, F + 0.42);
+    const kraft = new THREE.Group();
+    kraft.position.set(K0.x, K0.y, F + 0.72);
+    k.add(kraft);
+    del(RB3(K0.w, K0.h, 2, 0.42, 2), mat('#8e1c19', { roughness: 0.36 }), kraft);
+    const kraftText = fint(tryck(kraft, 'POWER', 0, 0.05, 1.03, 1.05, { vikt: 800, farg: '#ffffff' }));
+    const kraftLed = lampa('#ff4a36', '#3a0d0a');
+    fint(del(new THREE.CircleGeometry(0.42, 16), kraftLed)).position.set(K0.x, K0.y + K0.h / 2 + 1.05, F + 0.36);
+    // spakarna: krom med en kula i änden, framåt (+z) från vridpunkten
+    const kula = mat('#d2481c', { roughness: 0.2, clearcoat: 0.8, clearcoatRoughness: 0.14 });
+    const spakDelar = (p, len, r) => {
+      const stam = new THREE.CylinderGeometry(r * 0.26, r * 0.4, len, 12);
+      stam.rotateX(Math.PI / 2);
+      stam.translate(0, 0, len / 2);
+      fint(del(stam, krom, p));
+      const krage = fint(del(new THREE.CylinderGeometry(r * 0.46, r * 0.46, r * 0.36, 16), krom, p));
+      krage.rotation.x = Math.PI / 2;
+      krage.position.z = len + r * 0.1;
+      fint(del(new THREE.SphereGeometry(r, 28, 20), kula, p)).position.z = len + r * 0.86;
+    };
+    // bandspaken till höger: FM upp och AM ner, i en lodrät spalt
+    const B0 = RM.bspak;
+    fint(del(RB3(B0.w, B0.h, 0.5, 0.24, 2), plast)).position.set(B0.x, B0.y, F + 0.42);
+    const BX = B0.x - 1.1;
+    const spalt = fint(del(pille(4.2, 1), mat('#050506', { roughness: 0.7 })));
+    spalt.rotation.z = Math.PI / 2;
+    spalt.position.set(BX, B0.y, F + 0.68);
+    const bandSkugga = fint(del(new THREE.PlaneGeometry(3.4, 3.4), new THREE.MeshBasicMaterial({ map: SPAKSKUGGA, transparent: true, depthWrite: false })));
+    bandSkugga.position.set(BX + 0.25, B0.y, F + 0.69);
+    const bsp = new THREE.Group();
+    bsp.position.set(BX, B0.y, F + 0.6);
+    k.add(bsp);
+    spakDelar(bsp, 3.1, 0.95);
+    const fmT = fint(tryck(k, 'FM', BX + 2.75, B0.y + 1.85, F + 0.7, 1.15, { vikt: 800, farg: '#ffffff' }));
+    const amT = fint(tryck(k, 'AM', BX + 2.75, B0.y - 1.85, F + 0.7, 1.15, { vikt: 800, farg: '#ffffff' }));
+    fint(tryck(k, 'BAND', B0.x, 9.42, F + 0.34, 0.72, { vikt: 700, farg: '#a8a59c' }));
+    // stationsspaken: en skena under skalan och en spak på samma ställe som visaren, som lutar ner mot fronten
+    const S0 = RM.skena;
+    const sL = RM.sx0 - 1.9;
+    const sR = RM.sx1 + 1.9;
+    // (kanten är en hel yta bakom spalten: tunna lister blir streckade i telefonen)
+    fint(del(pille(sR - sL + 0.46, S0.h + 0.46), mat('#8f9195', { metalness: 0.7, roughness: 0.38 }))).position.set((sL + sR) / 2, S0.y, F + 0.02);
+    del(pille(sR - sL, S0.h), mat('#08080a', { roughness: 0.65 })).position.set((sL + sR) / 2, S0.y, F + 0.03);
+    fint(tryck(k, 'TUNING', sL + 2.1, RM.hog, F + 0.04, 0.72, { vikt: 700, farg: '#3a3b40' }));
+    const spak = new THREE.Group();
+    spak.position.set(0, S0.y, F + 0.06);
+    k.add(spak);
+    // (skuggan ligger på fronten nedanför kulan)
+    const spakSkugga = fint(del(new THREE.PlaneGeometry(5.2, 5.2), new THREE.MeshBasicMaterial({ map: SPAKSKUGGA, transparent: true, depthWrite: false }), spak));
+    spakSkugga.position.set(0.5, -3.7, 0.52);
+    // vagnen i skenan och ett streck upp mot skalan, i visarens färg
+    fint(del(RB3(3.4, S0.h + 0.42, 0.7, 0.2, 2), plast, spak)).position.z = 0.26;
+    const stamV = new THREE.Group();
+    stamV.rotation.x = 0.62;
+    stamV.position.z = 0.3;
+    spak.add(stamV);
+    spakDelar(stamV, 4.4, 1.4);
+    fint(del(new THREE.PlaneGeometry(0.3, 0.72), new THREE.MeshBasicMaterial({ color: '#ff5a1c', toneMapped: false }), spak)).position.set(0, S0.h / 2 + 0.42, 0.04);
     // skalan: ram, tryck, visare, glas
     del(RB3(RM.gx1 - RM.gx0 + 1.2, RM.gy1 - RM.gy0 + 0.8, 0.8, 0.35), mat('#141416', { roughness: 0.4 })).position.set(0, (RM.gy0 + RM.gy1) / 2, F);
     const skalaM = mat('#ffffff', { map: SKALA, roughness: 0.32, emissive: new THREE.Color('#ffffff'), emissiveMap: SKALA_LYS, emissiveIntensity: 0, envMapIntensity: 0.2 });
@@ -2100,7 +2224,7 @@ export async function figurer(canvas, opt = {}) {
     k.add(sken);
     // stationen stämmer: en liten röd lampa längst till höger i skalan
     const tuneLed = lampa('#ff2a18', '#3a0d0a');
-    del(new THREE.CircleGeometry(0.42, 14), tuneLed).position.set(27.05, 27.3, F + 0.48);
+    fint(del(new THREE.CircleGeometry(0.42, 14), tuneLed)).position.set(29.05, (RM.gy0 + RM.gy1) / 2 + 0.25, F + 0.48);
     // tejpen
     const remsa = (duk, [y0, y1], vr) => {
       const m = del(new THREE.PlaneGeometry(RM.gx1 - RM.gx0, y1 - y0), mat('#ffffff', { map: duk, roughness: 0.78, alphaTest: 0.5, envMapIntensity: 0.25 }));
@@ -2110,13 +2234,16 @@ export async function figurer(canvas, opt = {}) {
     };
     remsa(TEJPF, RM.tf, 0.0016);
     remsa(TEJPA, RM.ta, -0.0012);
-    // kassettdelens tangenter ovanpå, handtaget och antennen
-    for (let i = 0; i < 6; i++) del(new THREE.BoxGeometry(2.6, 1.4, 3.2), i === 0 ? mat('#c4232c') : svart).position.set(-7.6 + i * 3, H + 0.5, 1);
+    // kassettdelens tangenter ovanpå, handtaget med sitt grepp och antennen
+    const tangent = (i) => { const b = new THREE.BoxGeometry(2.6, 1.4, 3.2); b.translate(-7.6 + i * 3, H + 0.5, 1); return b; };
+    del(tangent(0), mat('#c4232c'));
+    del(mergeGeometries([1, 2, 3, 4, 5].map(tangent)), svart);
     const stolpar = [-18, 18].map((x) => { const m = mesh(new THREE.CylinderGeometry(0.9, 0.9, 6, 8), krom, k); m.position.set(x, H + 3, -1.5); return m; });
     const handtag = vrid(mesh(new THREE.CylinderGeometry(1.3, 1.3, 37, 10), krom, k), 0, 0, Math.PI / 2);
     handtag.position.set(0, H + 6, -1.5);
+    fint(vrid(del(new THREE.CylinderGeometry(1.62, 1.62, 21, 18), mat('#141417', { roughness: 0.82 })), 0, 0, Math.PI / 2)).position.set(0, H + 6, -1.5);
     antenn(k, [W / 2 - 4, H, -3], 32, -0.35, 0.1);
-    return { g, k, led, pump, vol, tune, tang, nal, nalM, skalaM, sken, tuneLed, traff: [kropp, handtag, ...stolpar] };
+    return { g, k, led, pump, vol, spak, bsp, fmT, amT, kraft, kraftText, kraftLed, nal, nalM, skalaM, sken, tuneLed, traff: [kropp, handtag, ...stolpar] };
   }
   const RADIO = kassettradio();
   RADIO.g.position.set(RADIO_PLATS.x, SILL, RADIO_PLATS.z);
@@ -2125,6 +2252,7 @@ export async function figurer(canvas, opt = {}) {
   for (const m of RADIO.pump) m.userData.z0 = m.position.z;
   // (på väg fram till radion och nära)
   function radioDetalj(pa) {
+    RL.nara = Boolean(pa);
     for (const x of RFINT) x.visible = Boolean(pa);
     if (opt.calm && opt.rita) opt.rita();
   }
@@ -2225,22 +2353,26 @@ export async function figurer(canvas, opt = {}) {
     RADIO.skalaM.emissiveIntensity = RL.lampaNu * (1.25 + 0.03 * Math.sin(t * 2.7));
     lys(RADIO.nalM, RL.lampaNu);
     RADIO.sken.material.opacity = RL.lampaNu * 0.55;
-    // visaren och rattarna (tre varv över hela skalan)
+    // visaren och stationsspaken, som sitter ihop, och volymratten
     const x = RM.sx0 + RL.p * (RM.sx1 - RM.sx0);
     RADIO.nal.position.x = x;
     RADIO.sken.position.x = x;
-    RADIO.tune.rotation.z = -RL.p * Math.PI * 6;
+    RADIO.spak.position.x = x;
     RADIO.vol.rotation.z = -(RL.vol - 0.5) * Math.PI * 1.5;
     // stationen stämmer (och flämtar lite med fadingen)
     RL.sNu = mot(RL.sNu, RL.s, 10);
     lys(RADIO.tuneLed, RL.lampaNu * RL.sNu);
-    // tangenterna går in, den intryckta står längre in
-    for (const [namn, m] of Object.entries(RADIO.tang)) {
-      const inne = RL.band === namn ? 1 : 0;
-      RL.in[namn] = mot(RL.in[namn], inne, 26);
-      m.position.z = RM.F + 0.72 - 0.62 * RL.in[namn];
-      m.userData.text.material.color.setRGB(0.62 + 0.38 * RL.in[namn], 0.6 + 0.26 * RL.in[namn], 0.56 + 0.02 * RL.in[namn]);
-    }
+    // POWER går in och stannar där, och lampan över den lyser
+    RL.in = mot(RL.in, RL.band !== 'av' ? 1 : 0, 26);
+    RADIO.kraft.position.z = RM.F + 0.72 - 0.62 * RL.in;
+    RADIO.kraftText.material.color.setRGB(0.72 + 0.28 * RL.in, 0.66 + 0.26 * RL.in, 0.62 + 0.14 * RL.in);
+    lys(RADIO.kraftLed, RL.in);
+    // bandspaken slår över, och bandet den står på lyser upp
+    RL.bV = mot(RL.bV, RL.sist === 'fm' ? -1 : 1, 22);
+    RADIO.bsp.rotation.x = 0.56 * RL.bV;
+    const fmV = (1 - RL.bV) / 2;
+    RADIO.fmT.material.color.setRGB(0.42 + 0.58 * fmV, 0.41 + 0.56 * fmV, 0.38 + 0.5 * fmV);
+    RADIO.amT.material.color.setRGB(1 - 0.58 * fmV, 0.97 - 0.56 * fmV, 0.88 - 0.5 * fmV);
     // lysdioderna (toppen faller sakta) och högtalarna
     RL.ledNu = Math.max(tot, RL.ledNu - dt * 1.5);
     const tanda = RL.ledNu * RADIO.led.length;
@@ -2255,14 +2387,17 @@ export async function figurer(canvas, opt = {}) {
     // (matrisen räknas annars först när scenen ritas, och en fast bild ritas en gång)
     RADIO.g.updateMatrix();
     const topp = new THREE.Vector3(0, 36, 0).applyMatrix4(RADIO.g.matrix);
+    // (noterna ska synas från andra sidan rummet: nära är de små, annars täcker de radion)
+    RL.naraV = mot(RL.naraV, RL.nara ? 1 : 0, 2.5);
+    const notSk = 1 - 0.74 * RL.naraV;
     for (const sp of NOTER) {
       const i = sp.userData.i;
       // (med minskad rörelse står de stilla)
       const u = opt.calm ? (i + 0.6) / (NOTER.length + 1) : (((t - R.fran) * 0.32 + i / NOTER.length) % 1 + 1) % 1;
       sp.visible = w > 0.01;
       if (!sp.visible) continue;
-      sp.position.set(topp.x + 14 * Math.sin(u * 4 + i * 2.4) + (i % 2 ? 8 : -8) * u, topp.y + u * 80, topp.z + 4);
-      sp.scale.setScalar(19 + 7 * u);
+      sp.position.set(topp.x + notSk * (14 * Math.sin(u * 4 + i * 2.4) + (i % 2 ? 8 : -8) * u), topp.y + notSk * u * 80, topp.z + 4);
+      sp.scale.setScalar(notSk * (19 + 7 * u));
       sp.material.opacity = w * bump(u, 0, 0.12, 0.65, 1);
       sp.material.rotation = 0.25 * Math.sin(u * 7 + i);
     }
@@ -5582,18 +5717,20 @@ export async function figurer(canvas, opt = {}) {
   function radioDelar() {
     scene.updateMatrixWorld(true);
     cam.updateMatrixWorld();
-    const { x: tx, y: ty, w: tw, h: th } = RM.tang;
     const ruta = (x, y, w, h) => rProj([x - w / 2, y - h / 2, x + w / 2, y + h / 2, RM.F + 0.8]);
     const R0 = RM.ratt;
+    const K0 = RM.kraft;
+    const B0 = RM.bspak;
+    const S0 = RM.skena;
     const d = 2 * R0.r + 1.2;
     return {
       kropp: rProj([-RM.W / 2, 0, RM.W / 2, RM.H, RM.F]),
       skala: rProj([RM.sx0 - 1.5, RM.ta[0], RM.sx1 + 1.5, RM.tf[1], RM.F + 0.4]),
-      vol: ruta(-R0.x, R0.y, d, d),
-      tune: ruta(R0.x, R0.y, d, d),
-      av: ruta(tx.av, ty, tw + 0.45, th),
-      fm: ruta(tx.fm, ty, tw + 0.45, th),
-      am: ruta(tx.am, ty, tw + 0.45, th),
+      // (skenan, och kulan som hänger ner framför fronten)
+      spak: rProj([RM.sx0 - 2.5, S0.y - 5, RM.sx1 + 2.5, S0.y + 1.05, RM.F + 0.4]),
+      vol: ruta(R0.x, R0.y, d, d),
+      kraft: ruta(K0.x, K0.y, K0.w + 0.7, K0.h + 0.7),
+      band: ruta(B0.x, B0.y, B0.w, B0.h),
     };
   }
   const rPlan = new THREE.Plane();

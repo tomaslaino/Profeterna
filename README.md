@@ -701,8 +701,13 @@ bara lokalt. Analyserna visas som de ligger i `data/analyser.json`; hur de skriv
   riktig radio med olika radiokanaler", "en kassettradio – men där man kan ställa in FM- och AM-banden",
   "snyggt animerat/visualiserat" och "välja på olika kanaler som är med där och som man lyckas hitta". Bland
   annat italiensk disco, engelsk fotboll, P4 och Sport 890 på AM, och gubbarna dansar på musikkanalerna. Ett klick
-  går fram till radion, och där ställer man in banden med ratten, och det man hittar skrivs på tejpen vid
+  går fram till radion, och där ställer man in banden, och det man hittar skrivs på tejpen vid
   skalan. Se [Tobaksaffären](#tobaksaffären), *Radion*.
+- **Spakar, POWER-knapp och fler stationer på radion (2026-11-08, användarens önskemål):** "lägga till
+  radiokanaler", "göra radion bättre/snyggare", "FM- och AM-bandet med en spak istället för en ratt" och "en av-
+  och på-knapp". Stationsratten och tangenterna är borta: en spak under skalan sitter på samma ställe som
+  visaren, en liten spak slår över mellan FM och AM, och POWER sätter på och stänger av. 50 stationer i stället
+  för 22. Se [Tobaksaffären](#tobaksaffären), *Radion*.
 - **Man väljer sig själv med ett klick på sin figur (2026-11-03, användarens önskemål):**
   ett klick på sin egen figur vid bordet gör en till den som fyller i kupongen – samma val
   som porträtten på kupongen – och figuren räcker upp handen med pennan, lyfter kupongen mot
@@ -2848,22 +2853,26 @@ ingen sång. Prova med `?rum-mal=dl:1,dt:-1,dj:0&rum-t=6`.
 
 **Radion** (2026-11-08, [public/rum-radio.js](public/rum-radio.js) för band, stationer, ljud och reglage, och
 `kassettradio`, `radioRita`, `radioSang` och `narbild` i rum-3d.js för apparaten): en kassettradio i
-leksaksstorlek – silver med två högtalare i kromringar, kassett bakom glas, stationsskala, åtta lysdioder,
-tangenterna AV, FM och AM, volym- och stationsratt, handtag och antenn – står på fönsterbänkens högra ände,
-under löpsedlarna, där inget annat står hur de än sitter (DJ:s tomflaskor står till vänster om den). Den
-valdes bland fyra utseenden (transistorradio, bakelitradio, bergsprängare och fotbollsradio). Ett klick på
-den går fram till den (`SAKER.radio` i rum.js), och där sitter genomskinliga reglage över delarna:
-tangenterna, stationsratten (runt med musen, längs med eller upp och ner med fingret, tre varv över hela
-skalan), skalan själv (visaren följer fingret), volymen, hjulet och piltangenterna. Radion står på AV när man kommer.
+leksaksstorlek – borstad aluminium och svart front, två högtalare med galler i kromringar, kassett bakom glas,
+stationsskala, åtta lysdioder, volymratt, POWER-knapp, bandspak, stationsspak, handtag med grepp och antenn – står
+på fönsterbänkens högra ände, under löpsedlarna, där inget annat står hur de än sitter (DJ:s tomflaskor står till
+vänster om den). Den valdes bland fyra utseenden (transistorradio, bakelitradio, bergsprängare och fotbollsradio).
+Ett klick på den går fram till den (`SAKER.radio` i rum.js), och där sitter genomskinliga reglage över delarna:
+POWER (sätter på och stänger av, går in och stannar där, och en lampa över den lyser), bandspaken (ett tryck slår
+över den, och den går också att dra upp till FM och ner till AM; är radion av flyttas bara spaken),
+stationsspaken (sitter under skalan på samma ställe som visaren: griper man om kulan stannar den där man tog tag i
+den, och trycker man på skenan går den dit), skalan själv (visaren följer fingret), volymratten, hjulet och
+piltangenterna. Radion är av när man kommer, och POWER sätter på den där den stod.
 
 Skalan lyser med en glödlampa som tänds mjukt, och den valda bandraden lyser starkast. Samma visare går över
 båda banden, som på en riktig radio, så ett byte av band hamnar sällan på en station. Släpper man nära en
 station drar radion in den, och en liten röd lampa säger att den stämmer. Mellan stationerna hörs brus, på AM
 också knaster och en pipton som sjunker tills man står rätt. AM låter dessutom som AM: smalt band och långsam
 fading, som också syns på lampan. Lysdioderna och högtalarna följer det som faktiskt hörs (en analysator i
-Web Audio), och tangenterna går in. En station man har hört en stund är hittad: den skrivs för hand på
-maskeringstejpen vid skalan (FM ovanför i blått, AM under i rött, `radioSkriv`, varje station har sin plats från
-början så att inget flyttar sig) och står som ett ord under radion, och ett klick på ordet vrider dit. Italo
+Web Audio). En station man har hört en stund är hittad: den skrivs för hand på maskeringstejpen vid skalan (FM
+ovanför i blått, AM under i rött, två rader där varannan står närmast skalan, `radioSkriv`, varje station har sin
+plats från början så att inget flyttar sig) och står som ett ord under radion, och ett klick på ordet går dit och
+sätter på radion. Orden visar bara bandet som spaken står på: med alla 50 hittade blir det annars en hel spalt. Italo
 Disco är hittad från början, och visaren står där första gången. Visaren, volymen och det man har hittat sparas i
 webbläsaren, och radion är var och ens egen: den syns inte hos de andra och stängs av när man lämnar rummet.
 
@@ -2916,7 +2925,7 @@ Adresserna går direkt till servrarna, eftersom ljudet går genom Web Audio och 
 inte går att spela (`live1.sr.se`, `stream.laut.fm`). Slutar en adress svara provas reservadressen (där det
 finns en) och sedan samma adress utan Web Audio, utan AM-ljud och med lysdioderna i dansens takt. Därefter är det
 brus och ett nytt försök om en stund. Alla spelade i Chrome 2026-11-08 på Mac (`A.klar` och att tiden gick). Ljudet
-måste sättas igång av ett tryck, och det gör tangenterna och orden. Stationerna hämtas först när visaren står på
+måste sättas igång av ett tryck, och det gör reglagen och orden. Stationerna hämtas först när visaren står på
 dem, och släpps fem sekunder efter att den har lämnat dem. Låtarna är kanalernas; sajten visar inte vad som spelas.
 
 Skämtet, grälet och tv:n kommer bara när alla tre har lämnat in och är vakna och matcherna
