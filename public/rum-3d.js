@@ -63,7 +63,8 @@
 //
 // Efter ett mål som gick någons väg sjunger de (malSang), och den som tappade
 // raden sitter med armarna i kors. På fönsterbänken står en bergsprängare (radion):
-// ett klick sätter på den, och så länge den spelar sjunger de (radioSang).
+// ett klick sätter på den, och så länge den spelar (italiensk disco, rum-folk.js)
+// sjunger de (radioSang).
 //
 // Inför matcherna korsar de sig ibland (KORS i rum-tecken.js, korsHand), oftare
 // ju närmare nästa avspark det är: på sju olika sätt med högerhanden, och någon
