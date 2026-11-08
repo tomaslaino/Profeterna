@@ -47,6 +47,8 @@
   enKvar: 'Nu är det en match kvar. Den är lika lätt som de andra.',
   // ... när alla är klara, nyss och när man kommer tillbaka.
   alla: 'Nu är hela kupongen klar. Lämna in den.',
+  // ... när några matcher redan har börjat och du har frågat om alla de andra.
+  allaKvar: 'Nu har du fått svar på alla matcher som återstår.',
   allaIgen: ['Du har redan fått svar på alla matcher.', 'Du har redan fått svar på alla matcher. Du kunde ha lyssnat.', 'Alla matcher har du fått svar på. Du får lyssna nästa gång.'],
 
   // När alla matcher har börjat: hur det gick för honom (efterat i rum-hasse.js). Han tvivlar aldrig:

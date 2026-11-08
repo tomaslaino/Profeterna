@@ -1499,15 +1499,19 @@ window.RumHasse = (() => {
     // när alla matcher har börjat säger han hur det gick (efterat)
     if (!oppna.length) return null;
     const n = lista.filter((m) => fragat[m.id]).length;
+    // (det som är kvar räknas bara på matcher som går att fråga om: de som har börjat är inte kvar, och
+    // har någon börjat är det inte hela kupongen längre)
+    const kvar = oppna.filter((m) => !fragat[m.id]).length;
+    const hela = oppna.length === lista.length;
     const namn = dittNamn();
     if (forst) {
-      if (n && n === oppna.length) return lott(r.allaIgen);
+      if (!kvar) return hela || !r.allaKvar ? lott(r.allaIgen) : r.allaKvar;
       if (n) return fyll(lott(namn ? r.tillbakaNamn : r.tillbaka), { namn });
       return fyll(lott(namn ? r.oppningNamn : r.oppning), { namn });
     }
-    if (n >= oppna.length) return r.alla;
-    if (oppna.length - n === 1) return r.enKvar;
-    if (n === Math.ceil(oppna.length / 2)) return lott(r.halva);
+    if (!kvar) return hela || !r.allaKvar ? r.alla : r.allaKvar;
+    if (kvar === 1) return r.enKvar;
+    if (hela && n === Math.ceil(oppna.length / 2)) return lott(r.halva);
     return lott(r.antal[n] || r.nasta);
   }
 
