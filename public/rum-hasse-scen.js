@@ -17,12 +17,14 @@ const DEG = Math.PI / 180;
 
 export const SCEN = {
   // kameran: D från axeln, svängd VRID grader mot hans vänstra sida, ögat HOJD över hans ögonhöjd CY
-  // och lutad LUT grader nedåt (han sitter, man står vid pulten)
+  // och lutad LUT grader nedåt (han sitter, man står vid pulten). Så högt att pultens arm, som går fram
+  // förbi kamerans högra sida, ses uppifrån och ligger vågrät (med ögat 31 cm över hans och 10° lutning såg
+  // den ut som en ramp som steg mot hörnet, ändrat 2026-11-08).
   D: 3000,
   CY: 500,
   VRID: 0,
-  HOJD: 520,
-  LUT: 10,
+  HOJD: 750,
+  LUT: 14,
   // baren: positivt vriden, så att benets högra del går bort från en och pultens arm går fram förbi
   // kamerans högra sida (man har vänt sig lite mindre än en rät vinkel)
   BAR: 8,

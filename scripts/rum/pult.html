@@ -1,78 +1,107 @@
-<!doctype html><meta charset="utf-8"><canvas id="c" width="1620" height="690"></canvas>
-<script>
-// Pultens trä i tobaksaffären, bakat till public/rum/pult.webp och pult-mer.webp (scripts/rum/pult.mjs).
-// Duken är pulten från y = 650 till 1340 i scenens mått; plankorna går mot betraktaren, så de vidgas nedåt.
-// Ringarna och brännmärkena ritas inte här: de skiftar med dagen (table i rum.js).
+<!doctype html><meta charset="utf-8"><body style="margin:0;background:#222"><canvas id="c"></canvas><script type="module">
+// Pultens trä i tobaksaffären, bakat till public/rum/pult.webp, pult-mer.webp och pult-kant.webp
+// (scripts/rum/pult.mjs). Samma pult som framför Hasse Backe i hans bild (rum-pult.js): samma trä (PULT_GLSL),
+// som ådras längs pulten och, längst till vänster där den viker av mot en förbi honom, längs benet, med
+// geringssnittet mellan dem; sett genom rummets kamera (RUM). Ringarna efter glas och metallisten längs den
+// bortre kanten ritas ovanpå i rummet (table i rum.js), eftersom ringarna skiftar med dagen.
+//
+// Duken är scenens x −10…1610 (och till höger om bilden 1600…2140, hoger) och y 650…1340: pulten från den bortre kanten (y 650) och nedåt. Ovansidan går
+// ned till y 1340 som om pulten fortsatte mot en (i telefonen på höjden står rummet längre bort och pult-mer.webp
+// syns, utan framkant). Framkanten, där pulten slutar mot en vid y ≈ 984, är en egen remsa (kant): den tjocka,
+// rundade kanten med samma trä.
+import { PULT_GLSL, RUM, L, SKIVA } from '/rum-pult.js';
+const X0 = -10, Y0 = 650, W = 1620, H = 690;
+const KANT = { y: 940, h: 70 };
 const c = document.getElementById('c');
-const g = c.getContext('2d');
-const W = c.width, H = c.height;
-let frö = 4242;
-const s = () => { frö = (frö * 16807) % 2147483647; return (frö - 1) / 2147483646; };
-const pX = (x, y) => 810 + (x - 810) * (0.62 + 0.38 * y / 352);
-const planks = [-620, -340, -60, 190, 455, 720, 980, 1245, 1490, 1760, 2040, 2320];
-planks.forEach((x0, i) => {
-  const x1 = planks[i + 1];
-  if (x1 == null) return;
-  g.fillStyle = `hsl(${22 + s() * 5},${40 + s() * 10}%,${28 + s() * 22}%)`;
-  g.beginPath(); g.moveTo(pX(x0, 0), 0); g.lineTo(pX(x1, 0), 0); g.lineTo(pX(x1, H), H); g.lineTo(pX(x0, H), H); g.closePath(); g.fill();
-  // ådringen
-  for (let k = 0; k < 420; k++) {
-    const x = x0 + s() * (x1 - x0);
-    g.strokeStyle = `${s() < 0.62 ? 'rgba(30,14,5,' : 'rgba(226,170,110,'}${0.05 + s() * 0.2})`;
-    g.lineWidth = 0.25 + s() * 1.1;
-    g.beginPath();
-    let y = s() * -60, off = 0;
-    g.moveTo(pX(x, y), y);
-    for (let j = 1; j <= 14; j++) { const yy = y + (820 * j) / 14; off += (s() - 0.5) * 5; g.lineTo(pX(x + off, yy), yy); }
-    g.stroke();
-  }
-  // kvistar
-  if (s() < 0.8) {
-    const xk = x0 + (0.2 + s() * 0.6) * (x1 - x0), yk = 30 + s() * 600;
-    g.save(); g.translate(pX(xk, yk), yk); g.scale(1, 0.34);
-    for (let r = 26; r > 0; r -= 3) { g.strokeStyle = `rgba(28,12,4,${0.1 + 0.5 * (1 - r / 26)})`; g.lineWidth = 1; g.beginPath(); g.ellipse(0, 0, r * 0.8, r * 1.5, 0, 0, 7); g.stroke(); }
-    g.restore();
-  }
-  // fogen
-  g.strokeStyle = 'rgba(16,7,2,.8)'; g.lineWidth = 1.7; g.beginPath(); g.moveTo(pX(x1, 0), 0); g.lineTo(pX(x1, H), H); g.stroke();
-  g.strokeStyle = 'rgba(240,200,150,.14)'; g.lineWidth = 1; g.beginPath(); g.moveTo(pX(x1, 0) + 2, 0); g.lineTo(pX(x1, H) + 2, H); g.stroke();
-});
-// repor
-for (let i = 0; i < 150; i++) {
-  const x = s() * W, y = s() * H, l = 20 + s() * 160, a = (s() - 0.5) * 1.1;
-  g.strokeStyle = `rgba(250,220,180,${0.05 + s() * 0.18})`; g.lineWidth = 0.5 + s() * 0.6;
-  g.beginPath(); g.moveTo(x, y); g.lineTo(x + Math.cos(a) * l, y + Math.sin(a) * l * 0.4); g.stroke();
+const gl = c.getContext('webgl2', { preserveDrawingBuffer: true, antialias: false });
+const VS = `#version 300 es
+in vec2 a; void main() { gl_Position = vec4(a, 0., 1.); }`;
+const FS = `#version 300 es
+precision highp float;
+out vec4 ut;
+uniform vec2 uRes; uniform vec2 uOrigo; uniform float uKant; uniform float uK;
+${PULT_GLSL}
+const float F = ${RUM.F.toFixed(2)}, CX = ${RUM.cx.toFixed(2)}, CY = ${RUM.cy.toFixed(2)}, KZ = ${RUM.Z.toFixed(2)}, KH = ${RUM.H.toFixed(2)}, KX = ${RUM.X.toFixed(2)};
+const float Y = ${L.Y.toFixed(1)}, R1 = ${(SKIVA.RADIE * 0.75).toFixed(2)}, T = ${SKIVA.TJOCK.toFixed(1)}, R2 = ${(SKIVA.TJOCK - SKIVA.RADIE * 0.75 - 26).toFixed(2)};
+// ljuset i rummet: lysröret och fönstren bakom gänget, högt och bortom pulten; ögat står vid pulten. Ljuset är
+// lysrörets och dagens, svalare än barens lampor, så att pulten har samma dämpade bruna som framför Hasse Backe
+// (inte orange) och är lite ljusare. Rummets egna lager ovanpå (rum-warm, vinjetten) är räknade med.
+const vec3 LJ = normalize(vec3(.5, .86, -.1));
+const vec3 FARG = vec3(1.41, 1.46, 1.67);
+// ljuset faller av mot en (som pultens bild alltid har gjort, bakom gänget är det ljusast)
+float fall(float sy) { float t = clamp((sy - 650.) / 690., 0., 1.); return mix(1., .36, pow(t, .8)); }
+vec3 skugga(vec3 p, vec3 n, vec3 v, vec2 b, float sy) {
+  vec3 tra = pultTra(b);
+  float dif = .34 + .66 * max(0., dot(n, LJ));
+  vec3 h = normalize(LJ + v);
+  float sp = pow(max(0., dot(n, h)), 40.) * .05;
+  return (tra * dif + vec3(1., .93, .84) * sp) * fall(sy) * FARG;
 }
-// Samma ljusstyrka som pulten har haft, rad för rad (#6e4a30 till #3b2619, och Hasses pult i rum-hasse-3d.js
-// är målad efter den): varje rad skalas till gradienten, med träets mönster kvar.
-const stopp = [[0, [110, 74, 48]], [180, [90, 59, 38]], [360, [59, 38, 25]], [690, [38, 24, 15]]];
-const mal = (y) => {
-  for (let i = 1; i < stopp.length; i++) if (y <= stopp[i][0]) {
-    const t = (y - stopp[i - 1][0]) / (stopp[i][0] - stopp[i - 1][0]);
-    return stopp[i - 1][1].map((v, k) => v + (stopp[i][1][k] - v) * t);
+// en punkt i duken (scenens x, y) → färgen: strålen från ögat, mot ovansidan eller framkanten
+vec3 punkt(vec2 s) {
+  float k = (s.y - CY) / F;
+  vec3 o = vec3(-KZ, Y + KH, KX);
+  vec3 d = vec3(1., -k, (s.x - CX) / F);
+  vec3 v = -normalize(d);
+  float t = KH / k;
+  vec3 p = o + d * t;
+  if (uKant < .5 || p.x >= PULT_XI + R1) return skugga(p, vec3(0., 1., 0.), v, p.xz, s.y);
+  // framkanten (barens x mot en): en kvartscirkel överst, en rak bit och en mindre rundning nedtill
+  vec2 o2 = vec2(o.x, o.y), d2 = vec2(1., -k);
+  vec2 cc = vec2(PULT_XI + R1, Y - R1);
+  vec2 oc = o2 - cc;
+  float bq = dot(oc, d2), cq = dot(oc, oc) - R1 * R1, aq = dot(d2, d2);
+  float disk = bq * bq - aq * cq;
+  if (disk > 0.) {
+    float th = (-bq - sqrt(disk)) / aq;
+    vec2 q = o2 + d2 * th;
+    if (q.x <= cc.x && q.y >= cc.y) { vec3 n = vec3((q - cc) / R1, 0.); return skugga(vec3(q, o.z + d.z * th), n, v, vec2(q.x, o.z + d.z * th), s.y) * (.75 + .25 * n.y); }
   }
-  return stopp[stopp.length - 1][1];
-};
-const bild = g.getImageData(0, 0, W, H);
-const d = bild.data;
-for (let y = 0; y < H; y++) {
-  let r = 0, gr = 0, b = 0;
-  for (let x = 0; x < W; x++) { const i = (y * W + x) * 4; r += d[i]; gr += d[i + 1]; b += d[i + 2]; }
-  r /= W; gr /= W; b /= W;
-  const m = mal(y);
-  for (let x = 0; x < W; x++) {
-    const i = (y * W + x) * 4;
-    d[i] = Math.min(255, d[i] * m[0] / r);
-    d[i + 1] = Math.min(255, d[i + 1] * m[1] / gr);
-    d[i + 2] = Math.min(255, d[i + 2] * m[2] / b);
+  // den raka biten
+  float tf = PULT_XI - o.x;
+  float yf = o.y - k * tf;
+  if (yf <= Y - R1 && yf >= Y - T + R2) return skugga(vec3(PULT_XI, yf, o.z + d.z * tf), vec3(-1., 0., 0.), v, vec2(PULT_XI, o.z + d.z * tf), s.y) * .75;
+  // nedre rundningen och under skivan: i skugga
+  vec2 c2 = vec2(PULT_XI + R2, Y - T + R2);
+  oc = o2 - c2; bq = dot(oc, d2); cq = dot(oc, oc) - R2 * R2; disk = bq * bq - aq * cq;
+  if (disk > 0.) {
+    float th = (-bq - sqrt(disk)) / aq;
+    vec2 q = o2 + d2 * th;
+    if (q.x <= c2.x && q.y <= c2.y) { vec2 n = (q - c2) / R2; return skugga(vec3(q, o.z + d.z * th), vec3(n, 0.), v, vec2(q.x, o.z + d.z * th), s.y) * (.5 + .25 * (1. + n.y)); }
   }
+  // framsidan under skivan, indragen och i skugga
+  return vec3(.11, .07, .045) * fall(s.y) * .5 * FARG;
 }
-g.putImageData(bild, 0, 0);
-window.dela = (y0, h, q) => {
-  const u = document.createElement('canvas');
-  u.width = W; u.height = h;
-  u.getContext('2d').drawImage(c, 0, y0, W, h, 0, 0, W, h);
-  return u.toDataURL('image/webp', q);
-};
+void main() {
+  vec2 px = vec2(gl_FragCoord.x, uRes.y - gl_FragCoord.y);
+  vec3 sum = vec3(0.);
+  // (16 strålar i varje bildpunkt: ådringen är finare än bildpunkterna längst bort)
+  for (int i = 0; i < 4; i++) for (int j = 0; j < 4; j++) sum += punkt(uOrigo + (px + (vec2(i, j) + .5) / 4. - .5) / uK);
+  ut = vec4(sum / 16., 1.);
+}`;
+const prog = (v, f) => { const p = gl.createProgram(); for (const [t, s] of [[gl.VERTEX_SHADER, v], [gl.FRAGMENT_SHADER, f]]) { const o = gl.createShader(t); gl.shaderSource(o, s); gl.compileShader(o); if (!gl.getShaderParameter(o, gl.COMPILE_STATUS)) console.error(gl.getShaderInfoLog(o)); gl.attachShader(p, o); } gl.bindAttribLocation(p, 0, 'a'); gl.linkProgram(p); if (!gl.getProgramParameter(p, gl.LINK_STATUS)) console.error(gl.getProgramInfoLog(p)); return p; };
+const p = prog(VS, FS);
+gl.useProgram(p);
+const vb = gl.createBuffer(); gl.bindBuffer(gl.ARRAY_BUFFER, vb); gl.bufferData(gl.ARRAY_BUFFER, new Float32Array([-1, -1, 3, -1, -1, 3]), gl.STATIC_DRAW);
+gl.enableVertexAttribArray(0); gl.vertexAttribPointer(0, 2, gl.FLOAT, false, 0, 0);
+// en bit av scenen (x0, y0, b, h) på duken, med eller utan framkanten → webp, med K bildpunkter på scenens
+// (ådringen syns då också på skärmar med dubbel täthet)
+const K = 2;
+function rita(x0, y0, b, h, kant, q) {
+  c.width = Math.round(b * K); c.height = Math.round(h * K);
+  gl.viewport(0, 0, c.width, c.height);
+  gl.uniform2f(gl.getUniformLocation(p, 'uRes'), c.width, c.height);
+  gl.uniform2f(gl.getUniformLocation(p, 'uOrigo'), x0, y0);
+  gl.uniform1f(gl.getUniformLocation(p, 'uK'), K);
+  gl.uniform1f(gl.getUniformLocation(p, 'uKant'), kant ? 1 : 0);
+  gl.drawArrays(gl.TRIANGLES, 0, 3);
+  gl.finish();
+  return c.toDataURL('image/webp', q);
+}
+window.dela = (y, h, q) => rita(X0, Y0 + y, W, h, false, q);
+window.kant = (q) => rita(X0, KANT.y, W, KANT.h, true, q);
+// pulten till höger om bilden, där kameran går till videon (pultSvg i rum-video.js), med framkanten
+window.hoger = (q) => rita(1599.5, 650, 541, 360, true, q);
+window.KANT = KANT;
 window.klar = true;
 </script>

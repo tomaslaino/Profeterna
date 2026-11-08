@@ -18,8 +18,9 @@
 // tidslinjen (KLIPP): fler sätt att slå domen i disken, kaffet (sex sätt), cigarren, småsakerna medan han
 // väntar och händerna medan han pratar (talet).
 import * as THREE from 'three';
-import { ATLAS, LJUS, ARM, HAND, KAMERA, BORD_GLSL, CIGARR, ASKKOPP, DAG, LYS, laddaFoto, laddaHand, byggArm, byggKopp, byggCigarr, byggAskkopp, byggRok, byggPenna, PENNA } from './rum-hasse-arm.js';
+import { ATLAS, LJUS, ARM, HAND, KAMERA, BORD_GLSL, CIGARR, ASKKOPP, DAG, LYS, VILOHOJD, VILAN, paDisken, inat, laddaFoto, laddaHand, byggArm, byggKopp, byggCigarr, byggAskkopp, byggRok, byggPenna, byggSkugga, PENNA } from './rum-hasse-arm.js';
 import { SCEN, BAK, kamera as scenKamera, iKamera, disken, franBaren } from './rum-hasse-scen.js';
+import { PULT_GLSL, SKIVA, ringar, NRING } from './rum-pult.js';
 
 const DEG = Math.PI / 180;
 const clamp = (x, a = 0, b = 1) => Math.min(b, Math.max(a, x));
@@ -166,8 +167,8 @@ const DK = disken();
 const kantZ = (x) => (DK.c - DK.n[0] * x) / DK.n[1];
 // Disken: ovansidan (y), och den bakre kanten (z) mitt framför honom.
 export const BORD = { Y: DK.Y, Z: kantZ(0) };
-// Armarna på disken: armbågens och handledens höjd.
-export const VILA = { EH: BORD.Y + 78, WH: BORD.Y + 45 };
+// Armarna på disken: armbågens och handledens höjd (rum-hasse-arm.js).
+export const VILA = VILOHOJD;
 // Koppen på sitt fat och notan under fatet, till höger om hans vänstra hand och fritt från armen: en bit
 // disk mellan fatet och handen (handen i VILA_B); askkoppen till vänster om hans högra hand, så långt ut
 // att cigarren i den går fri från handen. På disken, i figurens värld. (Koppen stod 50 längre fram, och
@@ -480,8 +481,6 @@ export async function figuren(duk, { hog = false, latt = false, pr = 1 } = {}) {
   S.add(ask.mesh, cig.mesh, rok.mesh);
   // skuggorna på disken: kapslar som faller bakåt och bort från ljuset, ingen skuggkarta
   const NK = 9;
-  const kapA = Array.from({ length: NK }, () => new THREE.Vector4());
-  const kapH = Array.from({ length: NK }, () => new THREE.Vector2());
   const skuggGeo = new THREE.BufferGeometry();
   {
     // pultens ovansida: benet framför honom och armen mot en
@@ -493,37 +492,8 @@ export async function figuren(duk, { hog = false, latt = false, pr = 1 } = {}) {
     skuggGeo.setAttribute('position', new THREE.BufferAttribute(new Float32Array(h), 3));
     skuggGeo.setIndex([0, 2, 1, 1, 2, 3, 4, 6, 5, 5, 6, 7]);
   }
-  const skugga = new THREE.Mesh(skuggGeo, new THREE.ShaderMaterial({
-    uniforms: { uKap: { value: kapA }, uKapH: { value: kapH }, uDag: DAG, uRuta: { value: new THREE.Vector3(1e4, 1e4, 1) } }, transparent: true, depthWrite: false, depthTest: false, blending: THREE.CustomBlending, blendSrc: THREE.OneFactor, blendDst: THREE.OneMinusSrcAlphaFactor,
-    vertexShader: 'varying vec3 vP; void main() { vec4 w = modelMatrix * vec4(position, 1.); vP = w.xyz; gl_Position = projectionMatrix * viewMatrix * w; }',
-    fragmentShader: `precision highp float; uniform vec4 uKap[${NK}]; uniform vec2 uKapH[${NK}]; uniform vec4 uDag; uniform vec3 uRuta; varying vec3 vP;
-    float seg(vec2 p, vec2 a, vec2 b) { vec2 ab = b - a; return length(p - a - ab * clamp(dot(p - a, ab) / max(dot(ab, ab), 1.), 0., 1.)); }
-    void main() {
-      float ljus = 1.;
-      for (int i = 0; i < ${NK}; i++) {
-        float r = uKapH[i].x, h = uKapH[i].y;
-        if (r <= 0.) continue;
-        float d = max(0., seg(vP.xz, uKap[i].xy, uKap[i].zw) - r * .4);
-        float rd = r * .72 + h * .34;
-        ljus *= 1. - .78 * exp(-d * d / (rd * rd)) / (1. + h * .012);
-        // händerna (0 och 2): en tät, mörk skugga där de ligger an mot disken, borta när handen lyfts, så att
-        // de inte ser ut att sväva (ändrat 2026-11-08)
-        if (i == 0 || i == 2) {
-          float dc = max(0., seg(vP.xz, uKap[i].xy, uKap[i].zw) - r * .72);
-          float rc = r * .55;
-          ljus *= 1. - .6 * exp(-dc * dc / (rc * rc)) * (1. - smoothstep(50., 110., h));
-        }
-        // (bort från ljuset: lamporna framifrån till vänster, på dagen fönstret till höger)
-        vec2 of = mix(vec2(.42, -.55), vec2(-.62, -.36), uDag.w) * (h + r);
-        d = max(0., seg(vP.xz - of, uKap[i].xy, uKap[i].zw) - r * .3);
-        rd = r * .85 + h * .55;
-        ljus *= 1. - .34 * exp(-d * d / (rd * rd)) / (1. + h * .006);
-      }
-      // (tonar ut mot dukens kanter: en skugga som går utanför duken slutar annars i en rak kant på disken)
-      vec2 e = min(gl_FragCoord.xy, uRuta.xy - gl_FragCoord.xy);
-      gl_FragColor = vec4(0., 0., 0., (1. - ljus) * smoothstep(0., 36. * uRuta.z, min(e.x, e.y)));
-    }`,
-  }));
+  // (samma skuggor som under handen på pulten i rummet, rum-hasse-arm.js)
+  const { mesh: skugga, kapA, kapH } = byggSkugga(skuggGeo, NK);
   // (först: kroppen slutar vid diskens kant, och skuggorna ligger framför den)
   skugga.renderOrder = 0.5;
   skugga.frustumCulled = false;
@@ -533,18 +503,31 @@ export async function figuren(duk, { hog = false, latt = false, pr = 1 } = {}) {
   kapH[6].set(64, 26);
   // ---------- disken (diskBild) ----------
   // Pulten från rummet, vid hörnet: geometri i barens mått (x längs benet), vriden som baren. Benet framför
-  // honom och armen som går mot en (SCEN.HORN) har samma ovansida som pulten i rummet (rum.js, table):
-  // brunt, matt trä som ådras längs pulten och möts i ett geringssnitt i hörnet, en smal list i aluminium
-  // längs de bortre kanterna och en rundad list i aluminium längs kanterna mot en, som pultens
-  // framkant, med framsidan nedanför. Den ritas en gång på en egen duk under figuren. Träet speglar
+  // honom och armen som går mot en (SCEN.HORN) är samma skiva som pulten i rummet (rum-pult.js): samma trä,
+  // som ådras längs benet och längs armen och möts i ett geringssnitt i hörnet, samma ringar efter glas, en
+  // smal list i aluminium längs de bortre kanterna, och en tjock, mjukt rundad framkant mot en (SKIVA), med
+  // framsidan indragen i skugga under den. Den ritas en gång på en egen duk under figuren. Träet speglar
   // väggen bakom honom svagt: den speglade strålen träffar väggen, och där hämtas färgen ur väggens bild
   // (samma kamera), suddigare ju längre strålen går. Han själv speglas som en mörk form.
   const SD = new THREE.Scene();
-  const LR = 17;
+  // framkantens profil [ut, ned] från skivans framkant och ovansida, med normalen: en kvartscirkel överst
+  // (RADIE), en kort rak bit och en mindre rundning nedtill, så att skivan ser tjock och tung ut
+  const R1 = SKIVA.RADIE * 0.75;
+  const R2 = SKIVA.TJOCK - R1 - 26;
+  const PROFIL = [];
+  for (let i = 0; i <= 10; i++) {
+    const a = (Math.PI / 2) * (1 - i / 10);
+    PROFIL.push([-R1 + R1 * Math.cos(a), -R1 + R1 * Math.sin(a), Math.cos(a), Math.sin(a)]);
+  }
+  for (let i = 0; i <= 6; i++) {
+    const a = -(Math.PI / 2) * (i / 6);
+    PROFIL.push([-R2 + R2 * Math.cos(a), -(SKIVA.TJOCK - R2) + R2 * Math.sin(a), Math.cos(a), Math.sin(a)]);
+  }
+  const ringU = Array.from({ length: NRING }, () => new THREE.Vector4());
   const diskU = {
     uBak: { value: null }, uBakRam: { value: new THREE.Vector4(0, 0, 1, 1) }, uBakSt: { value: new THREE.Vector2(1, 1) },
     uKr: { value: new THREE.Vector3(...KAM.hoger) }, uKu: { value: new THREE.Vector3(...KAM.upp) }, uKb: { value: new THREE.Vector3(...KAM.bak) }, uD: { value: D },
-    uNb: { value: new THREE.Vector2(DK.n[0], DK.n[1]) }, uVagg: { value: SCEN.VAGG + 180 }, uButik: bord.butik, uDag: DAG, uLys: LYS,
+    uNb: { value: new THREE.Vector2(DK.n[0], DK.n[1]) }, uVagg: { value: SCEN.VAGG + 180 }, uButik: bord.butik, uDag: DAG, uLys: LYS, uRing: { value: ringU },
   };
   const diskG = new THREE.BufferGeometry();
   {
@@ -564,37 +547,35 @@ export async function figuren(duk, { hog = false, latt = false, pr = 1 } = {}) {
     const xi = SCEN.HORN.X;
     const xo = xi + SCEN.HORN.B;
     const zl = 6000;
-    // ovansidan: benet med hörnet, och armen (utom listerna mot en)
-    quad([-X, Y, Z], [xo, Y, Z], [-X, Y, zf - LR], [xo, Y, zf - LR], [0, 1, 0], 0);
-    quad([xi + LR, Y, zf - LR], [xo, Y, zf - LR], [xi + LR, Y, zl], [xo, Y, zl], [0, 1, 0], 0);
-    // listerna mot en, halva cylindrar: längs benets framkant (fram till hörnet) och längs armens vänstra
-    // kant. I hörnet går de in i varandra, och djupet ger snittet.
-    const N = 14;
-    const list = (langs) => {
-      for (let i = 0; i < N; i++) {
-        const a0 = Math.PI / 2 - (i / N) * Math.PI;
-        const a1 = Math.PI / 2 - ((i + 1) / N) * Math.PI;
+    // ovansidan: benet med hörnet, och armen (utom framkanterna)
+    quad([-X, Y, Z], [xo, Y, Z], [-X, Y, zf - R1], [xo, Y, zf - R1], [0, 1, 0], 0);
+    quad([xi + R1, Y, zf - R1], [xo, Y, zf - R1], [xi + R1, Y, zl], [xo, Y, zl], [0, 1, 0], 0);
+    // framkanterna: profilen längs benets framkant (fram till hörnet) och längs armens vänstra kant. I hörnet
+    // går de in i varandra, och djupet ger snittet.
+    const kant = (langs) => {
+      for (let i = 0; i < PROFIL.length - 1; i++) {
         const o = pos.length / 3;
-        for (const a of [a0, a0, a1, a1]) {
-          const ny = Math.sin(a);
-          const nu = Math.cos(a);
-          if (langs) nor.push(-nu, ny, 0);
-          else nor.push(0, ny, nu);
+        for (const [u, v, nu, nv] of [PROFIL[i], PROFIL[i], PROFIL[i + 1], PROFIL[i + 1]]) {
+          if (langs) nor.push(-nu, nv, 0);
+          else nor.push(0, nv, nu);
         }
-        const p = (a) => [Math.cos(a) * LR, Y - LR + Math.sin(a) * LR];
-        const [u0, y0] = p(a0);
-        const [u1, y1] = p(a1);
-        if (langs) pos.push(xi + LR - u0, y0, zf - LR, xi + LR - u0, y0, zl, xi + LR - u1, y1, zf - LR, xi + LR - u1, y1, zl);
-        else pos.push(-X, y0, zf - LR + u0, xi + LR, y0, zf - LR + u0, -X, y1, zf - LR + u1, xi + LR, y1, zf - LR + u1);
+        const [u0, v0] = PROFIL[i];
+        const [u1, v1] = PROFIL[i + 1];
+        if (langs) pos.push(xi - u0, Y + v0, zf - R1, xi - u0, Y + v0, zl, xi - u1, Y + v1, zf - R1, xi - u1, Y + v1, zl);
+        else pos.push(-X, Y + v0, zf + u0, xi + R1, Y + v0, zf + u0, -X, Y + v1, zf + u1, xi + R1, Y + v1, zf + u1);
         del.push(1, 1, 1, 1);
         idx.push(o, o + 2, o + 1, o + 1, o + 2, o + 3);
       }
     };
-    list(false);
-    list(true);
-    // framsidan under listerna: benets mot en och armens vänstra sida
-    quad([-X, Y - 2 * LR, zf - LR], [xi + LR, Y - 2 * LR, zf - LR], [-X, Y - 2400, zf - LR], [xi + LR, Y - 2400, zf - LR], [0, 0, 1], 2);
-    quad([xi + LR, Y - 2 * LR, zf - LR], [xi + LR, Y - 2 * LR, zl], [xi + LR, Y - 2400, zf - LR], [xi + LR, Y - 2400, zl], [-1, 0, 0], 2);
+    kant(false);
+    kant(true);
+    // skivans undersida in till framsidan, och framsidan indragen under den: benets mot en och armens vänstra
+    const T = SKIVA.TJOCK;
+    const ui = -R2 - SKIVA.INDRAG;
+    quad([-X, Y - T, zf - R2], [xi + R2, Y - T, zf - R2], [-X, Y - T, zf + ui], [xi - ui, Y - T, zf + ui], [0, -1, 0], 3);
+    quad([xi + R2, Y - T, zf - R2], [xi + R2, Y - T, zl], [xi - ui, Y - T, zf + ui], [xi - ui, Y - T, zl], [0, -1, 0], 3);
+    quad([-X, Y - T, zf + ui], [xi - ui, Y - T, zf + ui], [-X, Y - 2400, zf + ui], [xi - ui, Y - 2400, zf + ui], [0, 0, 1], 2);
+    quad([xi - ui, Y - T, zf + ui], [xi - ui, Y - T, zl], [xi - ui, Y - 2400, zf + ui], [xi - ui, Y - 2400, zl], [-1, 0, 0], 2);
     diskG.setAttribute('position', new THREE.BufferAttribute(new Float32Array(pos), 3));
     diskG.setAttribute('normal', new THREE.BufferAttribute(new Float32Array(nor), 3));
     diskG.setAttribute('aDel', new THREE.BufferAttribute(new Float32Array(del), 1));
@@ -608,6 +589,7 @@ export async function figuren(duk, { hog = false, latt = false, pr = 1 } = {}) {
     uniform sampler2D uBak; uniform vec4 uBakRam; uniform vec2 uBakSt; uniform vec3 uKr, uKu, uKb; uniform float uD, uVagg; uniform vec2 uNb;
     varying vec3 vB, vW, vN, vNb; varying float vDel;
     ${LJUS}
+    ${PULT_GLSL}
     float h2(vec2 p) { return fract(sin(dot(p, vec2(127.1, 311.7))) * 43758.5453); }
     float nz(vec2 p) { vec2 i = floor(p), f = fract(p); f = f * f * (3. - 2. * f); return mix(mix(h2(i), h2(i + vec2(1, 0)), f.x), mix(h2(i + vec2(0, 1)), h2(i + vec2(1, 1)), f.x), f.y); }
     float fbm(vec2 p) { float a = .5, s = 0.; for (int i = 0; i < 4; i++) { s += a * nz(p); p = p * 2.03 + 11.; a *= .5; } return s; }
@@ -638,59 +620,47 @@ export async function figuren(duk, { hog = false, latt = false, pr = 1 } = {}) {
       float pol = exp(-pow((vB.x + 250.) / 2600., 2.)) * (.55 + .45 * exp(-pow((vB.z - 300.) / 900., 2.)));
       // neonen och gatan från höger, där affären ligger
       float hoger = smoothstep(-200., 2600., vB.x);
+      float dag = uDag.w;
+      vec3 l = ljus(n) * mix(.32 + .9 * pol, 1.15 + .7 * hoger, .6 * dag) + (vec3(.5, .06, .04) * hoger * .35 + vec3(.16, .2, .3) * hoger * .2) * (1. - .75 * dag);
       if (vDel < .5) {
-        // pultens trä som i rummet (rum.js: #6e4a30 till #3b2619, ådrat och fläckigt), ådrat längs benet
-        // och längs armen; de möts i ett geringssnitt från det inre hörnet till det yttre
-        float xi = ${SCEN.HORN.X.toFixed(1)}, xo = ${(SCEN.HORN.X + SCEN.HORN.B).toFixed(1)}, zf = ${(SCEN.DISK.Z + SCEN.DISK.DJUP).toFixed(1)};
-        float geri = (vB.x - xi) - (zf - vB.z);
-        bool arm = vB.x > xi && geri > 0.;
-        vec2 pl = arm ? vec2(vB.z, xo - vB.x) : vec2(vB.x, vB.z);
-        vec2 g = vec2(pl.x * .0026, pl.y * .02);
-        float a = fbm(g * vec2(1., 2.2)), b = fbm(g * vec2(.7, 8.) + 3.), c2 = fbm(pl * vec2(.012, .06) + 17.);
-        vec3 tra = mix(vec3(.35, .25, .17), vec3(.49, .36, .25), a);
-        tra *= .85 + .26 * b;
-        tra *= .92 + .12 * c2;
-        // fläckar och slitage, som pultens
-        float fl = fbm(vB.xz * vec2(.0042, .0061) + 41.);
-        tra *= 1. - .22 * smoothstep(.55, .75, fl);
-        // geringssnittet: en mörk fog
-        if (vB.x > xi - 2. && vB.z < zf + 2.) tra *= 1. - .45 * exp(-geri * geri / 9.);
-        // (på dagen lyser fönstret till höger upp hela disken, mest närmast affären, och neonen syns mindre.
-        // Pulten i rummet är lika ljus dag som kväll, så den här ska vara det också; förut var den mörkare
-        // på dagen än på natten)
-        float dag = uDag.w;
-        vec3 l = ljus(n) * mix(.32 + .9 * pol, 1.15 + .7 * hoger, .6 * dag) + (vec3(.5, .06, .04) * hoger * .35 + vec3(.16, .2, .3) * hoger * .2) * (1. - .75 * dag);
-        ut = tra * l;
+        // pultens trä (rum-pult.js), som i rummet. (På dagen lyser fönstret till höger upp hela disken, mest
+        // närmast affären, och neonen syns mindre. Pulten i rummet är lika ljus dag som kväll, så den här ska
+        // vara det också; förut var den mörkare på dagen än på natten.)
+        ut = pultTra(vB.xz) * l;
         vec3 R = reflect(V, n);
         float grov = .006 + .01 * fbm(vB.xz * vec2(.004, .03));
         // matt som pulten: bara en svag glans
         ut = mix(ut, spegel(vW, R, grov) * 1.1, min(1., F * 1.3) * .32);
         // de bortre kanterna (bakom honom och armens högra): en smal list i aluminium, som pultens bortre
         // kant i rummet, med en ljus kant där lamporna fångas
-        float ytter = min(vB.z - ${SCEN.DISK.Z.toFixed(1)}, vB.x > xi ? xo - vB.x : 1e4);
-        float al = 1. - smoothstep(10., 12., ytter);
+        float ytter = pultKant(vB.xz);
+        float al = 1. - smoothstep(${(SKIVA.ALU - 1).toFixed(1)}, ${(SKIVA.ALU + 1).toFixed(1)}, ytter);
         vec3 alu = vec3(.42, .42, .4) * ljus(n) * (.35 + .6 * pol) + spegel(vW, R, .03) * .35;
         alu += vec3(1., .78, .52) * exp(-pow((ytter - 2.) / 2.5, 2.)) * .3 * (.4 + pol);
         ut = mix(ut, alu, al);
         // (och en mörk fog där listen möter träet)
-        ut *= 1. - .35 * exp(-pow((ytter - 12.5) / 1.6, 2.));
+        ut *= 1. - .35 * exp(-pow((ytter - ${(SKIVA.ALU + 1.5).toFixed(1)}) / 1.6, 2.));
       } else if (vDel < 1.5) {
-        // listen: borstad aluminium som pultens, speglar suddigt, rött från neonen till höger
+        // framkanten: samma trä, rundat ned mot en; där den vänder sig mot lamporna fångar den ljuset i en
+        // mjuk, ljus rand, och längre ned mot framsidan mörknar den
+        vec2 b = vB.xz;
+        ut = pultTra(b) * l * (.62 + .38 * smoothstep(-.6, .7, n.y));
         vec3 R = reflect(V, n);
-        vec3 sp = R.y > 0. ? spegel(vW, R, .04) : vec3(.05, .04, .035);
-        vec3 l = ljus(n) * (.25 + .6 * pol);
-        ut = vec3(.36, .36, .35) * l * .55 + sp * .75;
-        ut += vec3(1., .2, .12) * hoger * pow(max(0., dot(n, normalize(vec3(.7, .5, .5)))), 4.) * .35 * (1. - .75 * uDag.w);
-        ut += vec3(1., .9, .75) * pow(max(0., dot(R, NYCKEL)), 30.) * .35;
-      } else {
-        // framsidan: mörkt trä i fält, i skugga under kanten (benets längs x, armens längs z)
+        ut = mix(ut, spegel(vW, R, .02) * 1.1, min(1., F * 1.3) * .22 * step(0., R.y));
+        ut += vec3(1., .86, .7) * pow(max(0., dot(R, NYCKEL)), 14.) * .07 * (.5 + pol);
+      } else if (vDel < 2.5) {
+        // framsidan: mörkt trä i fält, indragen under skivan och i dess skugga (benets längs x, armens längs z)
         float x = (abs(vNb.x) > .5 ? vB.z : vB.x) / 520.;
         float spar = smoothstep(0., .015, fract(x)) * smoothstep(0., .015, 1. - fract(x));
         vec2 g = vec2(vB.x * .02, vB.y * .0026);
         vec3 tra = mix(vec3(.16, .085, .045), vec3(.25, .14, .075), fbm(g * vec2(1.6, 1.)));
         float ned = exp((vB.y - ${SCEN.DISK.Y.toFixed(1)}) / 380.);
-        ut = tra * (ljus(n) * (.2 + .5 * pol) * (.25 + .75 * ned)) * (.55 + .45 * spar);
-        ut += vec3(.5, .06, .04) * hoger * .08 * ned * (1. - .75 * uDag.w);
+        float under = .3 + .7 * smoothstep(0., 140., ${(SCEN.DISK.Y - SKIVA.TJOCK).toFixed(1)} - vB.y);
+        ut = tra * (ljus(n) * (.2 + .5 * pol) * (.25 + .75 * ned)) * (.55 + .45 * spar) * under;
+        ut += vec3(.5, .06, .04) * hoger * .08 * ned * under * (1. - .75 * uDag.w);
+      } else {
+        // skivans undersida: i skugga
+        ut = pultTra(vB.xz) * ljus(n) * .22 * (.4 + .6 * pol);
       }
       gl_FragColor = vec4(ton(ut), 1.);
     }`,
@@ -810,6 +780,8 @@ export async function figuren(duk, { hog = false, latt = false, pr = 1 } = {}) {
   // bak: väggens bild { bild, px, py, S, W, H } (scripts/hasse/bak.html).
   async function diskBild(ut, v, bak) {
     await ritaNota();
+    // dagens ringar efter glas, samma som i rummet (rum-pult.js)
+    ringar().forEach(([x, z, rr, a], i) => ringU[i].set(x, z, rr, a));
     if (!bakTex || bakTex.image !== bak.bild || bak.ny) {
       if (bakTex) bakTex.dispose();
       bakTex = new THREE.Texture(bak.bild);
@@ -857,25 +829,15 @@ export async function figuren(duk, { hog = false, latt = false, pr = 1 } = {}) {
   // att sitta obekvämt (ändrat 2026-11-08). Den högra handens fingrar är böjda och den vänstras samlade, så
   // att den undre handens fingrar inte sticker fram. Han slår i disken där händerna låg då, en bit isär
   // (SLAG_A, SLAG_B): i vilan skulle slaget hamna på hans egen hand.
-  const { EH, WH } = VILA;
-  function paDisken(s, sida, a, b, lyft = 0) {
-    const S0 = new THREE.Vector3(s.x + 2 * sida, s.y - 8, s.z);
-    const h1 = Math.sqrt(LA * LA - (S0.y - EH) ** 2);
-    const E = new THREE.Vector3(S0.x - sida * h1 * Math.sin(a * DEG), EH, S0.z + h1 * Math.cos(a * DEG));
-    const h2 = Math.sqrt(LB * LB - (EH - WH - lyft) ** 2);
-    const W = new THREE.Vector3(E.x + sida * h2 * Math.sin(b * DEG), WH + lyft, E.z + h2 * Math.cos(b * DEG));
-    return { W: W.toArray(), pol: E.clone().sub(S0).toArray() };
-  }
-  // fingrarnas riktning när handen pekar g grader in mot mitten
-  const inat = (sida, g) => [sida * Math.sin(g * DEG), -0.05, Math.cos(g * DEG)];
+  // (paDisken och inat i rum-hasse-arm.js, och vilan själv: VILAN)
   // (den högra handen lite rullad mot lillfingret, med handleden lite högre så att den inte går ned i disken)
-  const va = paDisken(SA, 1, 20, 42, 18);
-  const vb = paDisken(SB, -1, 10, 38, 26);
+  const va = VILAN.A;
+  const vb = VILAN.B;
   const slagAr = paDisken(SA, 1, 10, 30, 22);
   const slagBr = paDisken(SB, -1, 0, 22, 16);
   // [handled, armbågens riktning, fingrarna, handflatan, krok, peka]
-  const VILA_A = [va.W, va.pol, inat(1, 42), [0.45, -0.88, 0.15], 1, 0];
-  const VILA_B = [vb.W, vb.pol, inat(-1, 34), [-0.5, -0.85, 0.12], 0.6, 0];
+  const VILA_A = [va.W, va.pol, va.F, va.P, va.krok, 0];
+  const VILA_B = [vb.W, vb.pol, vb.F, vb.P, vb.krok, 0];
   const SLAG_A = [slagAr.W, slagAr.pol, inat(1, 18), [0.45, -0.88, 0.1], 0.55, 0];
   const SLAG_B = [slagBr.W, slagBr.pol, inat(-1, 8), [-0.2, -0.97, 0.05], 0.5, 0];
   // [t, handled, armbågens riktning, fingrarna, handflatan, krok, peka, slag]. slag: på vägen dit går
@@ -955,8 +917,8 @@ export async function figuren(duk, { hog = false, latt = false, pr = 1 } = {}) {
   // den vänstra tummen intill handen, så att händerna inte når varandra. Det tonar bort när handen tar
   // något (bortA, bortB: 0–1, från cigarren, pennan och kaffet) och när han skrattar med armarna uppe, och
   // klippen börjar och slutar med det (form).
-  const SAMLA = { A: 0.75, B: 0.9 };
-  const TUMME_VILA = { A: TUMME, B: 0.4 };
+  const SAMLA = { A: VILAN.A.spar, B: VILAN.B.spar };
+  const TUMME_VILA = { A: VILAN.A.tumme, B: VILAN.B.tumme };
   let bortA = 0;
   let bortB = 0;
   // kaffet: handen till koppens öra och tillbaka (mot) och fingrarna runt örat (krok), när koppen står

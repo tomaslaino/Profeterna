@@ -341,13 +341,14 @@ window.RumVideo = (() => {
     ${disk ? disk(a, z) : ''}
   </svg>`;
   }
-  // Pulten (table i rum.js) förlängd åt höger, i planet -60.
+  // Pulten (table i rum.js) förlängd åt höger, i planet -60: samma trä och framkant, bakade för sig
+  // (pult-hoger.webp, scripts/rum/pult.mjs), och metallisten längs bortre kanten.
   function pultSvg() {
     const [a, z] = [1599.5, 2140];
     const r = `x="${a}" y="650" width="${z - a}" height="360"`;
     return `<svg class="vhs-pult" viewBox="${a} 640 ${z - a} 380" aria-hidden="true">
-    <rect ${r} fill="url(#rum-pult)"/><rect ${r} filter="url(#rum-grainwood)"/><rect ${r} filter="url(#rum-flack)" opacity=".35"/>
-    <rect x="${a}" y="647" width="${z - a}" height="6" fill="url(#rum-alu)"/><rect x="${a}" y="984" width="${z - a}" height="20" fill="url(#rum-alu)"/>
+    <rect ${r} fill="url(#rum-pult)"/><image href="rum/pult-hoger.webp" ${r} preserveAspectRatio="none"/>
+    <rect x="${a}" y="647" width="${z - a}" height="6" fill="url(#rum-alu)"/>
   </svg>`;
   }
 

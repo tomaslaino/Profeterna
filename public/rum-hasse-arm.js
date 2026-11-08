@@ -8,6 +8,9 @@
 // laddaFoto() → THREE.Texture, laddaHand() → modellen (båda hämtas en gång)
 // byggHand(modell, sida, foto, bord) → { mesh, satt(W, F, P, krok, peka) }
 // byggArm(scen, sida, foto, modell, vidd, bord) → { satt(S, E, W, F, P, krok, peka), del('allt' | 'under'), visible, hand }
+// bord: disken (BORD_GLSL), och butik, dag och lys för ljuset (annars rummets ljus utan baren, DAG och LYS)
+// VILAN: hur han sitter i vilan, med underarmarna på disken (samma i baren och på pulten i rummet)
+// byggSkugga(geo, n, dag) → { mesh, kap(i, p, q, r, h) }: skuggorna på disken, n kapslar
 // byggKopp(bord) → { kopp, fat, ORA }
 // byggCigarr(bord) → { mesh, U, FOT }, byggAskkopp(bord) → { mesh }, byggRok(N, bord) → { mesh, slapp, steg }
 import * as THREE from 'three';
@@ -88,6 +91,10 @@ bool underBord(vec3 w) {
 `;
 // (utan disk döljs ingenting, och det är rummets ljus utan baren)
 const BUTIK_AV = { value: 0 };
+// Ljuset räknas mot figurens kamera (VY). Ses samma sak från ett annat håll, som hans händer från rummet
+// (rum-hasse-hand.js), ger bord.vy riktningen mot det ögat, så att kantljuset hamnar där det ska.
+const VY_RAD = /const vec3 VY = vec3\([^)]*\);/;
+const medVy = (fs, bord) => (bord.vy ? fs.replace(VY_RAD, `const vec3 VY = vec3(${bord.vy.map((x) => x.toFixed(3)).join(', ')});`) : fs);
 // Fönstret och lysröret i affären (uDag och uLys i LJUS): ljusets färg gånger styrka, och hur mycket dag
 // det är (0–1) respektive om röret är tänt. Sidan sätter dem efter klockan och vädret, som i rummet
 // (ljuset i rum-hasse.js).
@@ -269,9 +276,9 @@ export function byggHand(modell, sida, foto, bord = ingenBord()) {
     foto: { value: foto },
     uB: { value: ut },
     uHud: { value: new THREE.Vector4((a.hx + 0.5) / a.W, 1 - (a.hy + a.hh - 0.5) / a.H, (a.hw - 1) / a.W, (a.hh - 1) / a.H) },
-    uBord: bord, uButik: bord.butik || BUTIK_AV, uDag: DAG, uLys: LYS,
+    uBord: bord, uButik: bord.butik || BUTIK_AV, uDag: bord.dag || DAG, uLys: bord.lys || LYS,
   };
-  const mesh = new THREE.Mesh(modell.g, new THREE.ShaderMaterial({ uniforms: U, vertexShader: HUD_V, fragmentShader: HUD_F, transparent: true, depthWrite: true, blending: THREE.CustomBlending, blendSrc: THREE.OneFactor, blendDst: THREE.OneMinusSrcAlphaFactor }));
+  const mesh = new THREE.Mesh(modell.g, new THREE.ShaderMaterial({ uniforms: U, vertexShader: HUD_V, fragmentShader: medVy(HUD_F, bord), transparent: true, depthWrite: true, blending: THREE.CustomBlending, blendSrc: THREE.OneFactor, blendDst: THREE.OneMinusSrcAlphaFactor }));
   mesh.frustumCulled = false;
   mesh.matrixAutoUpdate = false;
   // Fingrarnas två yttre leder: de punkter i modellen som ska ligga ovanpå disken (golv nedan).
@@ -506,13 +513,13 @@ export function byggArm(scen, sida, foto, modell, vidd = 1, bord = ingenBord()) 
   g.setAttribute('aVeck', new THREE.BufferAttribute(vk, 1));
   g.setIndex(ix);
   // (dubbelsidig: genom ärmslutet syns insidan)
-  const rorM = new THREE.ShaderMaterial({ uniforms: { foto: { value: foto }, uBord: bord, uButik: bord.butik || BUTIK_AV, uDag: DAG, uLys: LYS }, vertexShader: ARM_V, fragmentShader: ARM_F, transparent: true, depthWrite: true, side: THREE.DoubleSide, blending: THREE.CustomBlending, blendSrc: THREE.OneFactor, blendDst: THREE.OneMinusSrcAlphaFactor });
+  const rorM = new THREE.ShaderMaterial({ uniforms: { foto: { value: foto }, uBord: bord, uButik: bord.butik || BUTIK_AV, uDag: bord.dag || DAG, uLys: bord.lys || LYS }, vertexShader: ARM_V, fragmentShader: medVy(ARM_F, bord), transparent: true, depthWrite: true, side: THREE.DoubleSide, blending: THREE.CustomBlending, blendSrc: THREE.OneFactor, blendDst: THREE.OneMinusSrcAlphaFactor });
   const ror = new THREE.Mesh(g, rorM);
   ror.frustumCulled = false;
   // skjortans manschett: ett rör med en rundad kant, lite plattare som handleden (handflatan åt z)
   const manG = new THREE.LatheGeometry(MANSCHETT.map(([r, y]) => new THREE.Vector2(r * HAND.MAN, y)), 28);
   manG.scale(1, 1, 0.74);
-  const man = new THREE.Mesh(manG, new THREE.ShaderMaterial({ uniforms: { uBord: bord, uButik: bord.butik || BUTIK_AV, uDag: DAG, uLys: LYS }, vertexShader: SKJ_V, fragmentShader: SKJ_F, transparent: true, side: THREE.DoubleSide }));
+  const man = new THREE.Mesh(manG, new THREE.ShaderMaterial({ uniforms: { uBord: bord, uButik: bord.butik || BUTIK_AV, uDag: bord.dag || DAG, uLys: bord.lys || LYS }, vertexShader: SKJ_V, fragmentShader: medVy(SKJ_F, bord), transparent: true, side: THREE.DoubleSide }));
   man.frustumCulled = false;
   man.matrixAutoUpdate = false;
   const hand = byggHand(modell, sida, foto, bord);
@@ -724,8 +731,8 @@ void main() {
 }`;
 function kerM(rand, kaffe, band, bord) {
   return new THREE.ShaderMaterial({
-    uniforms: { uRand: { value: rand }, uKaffe: { value: kaffe }, uBand: { value: band.map((b) => new THREE.Vector2(b[0], b[1])) }, uBord: bord, uButik: bord.butik || BUTIK_AV, uDag: DAG, uLys: LYS },
-    vertexShader: KER_V, fragmentShader: KER_F, transparent: true, blending: THREE.CustomBlending, blendSrc: THREE.OneFactor, blendDst: THREE.OneMinusSrcAlphaFactor,
+    uniforms: { uRand: { value: rand }, uKaffe: { value: kaffe }, uBand: { value: band.map((b) => new THREE.Vector2(b[0], b[1])) }, uBord: bord, uButik: bord.butik || BUTIK_AV, uDag: bord.dag || DAG, uLys: bord.lys || LYS },
+    vertexShader: KER_V, fragmentShader: medVy(KER_F, bord), transparent: true, blending: THREE.CustomBlending, blendSrc: THREE.OneFactor, blendDst: THREE.OneMinusSrcAlphaFactor,
   });
 }
 const V2 = (a) => a.map(([x, y]) => new THREE.Vector2(x, y));
@@ -827,7 +834,7 @@ export function byggCigarr(bord = ingenBord()) {
   const { L, R, ASKA } = CIGARR;
   const prof = [[0, 0], [4.5, 0.5], [8, 1.9], [10.6, 4.2], [12, 7.2], [R, 11], [R, 40], [R, L - ASKA - 6], [R - 0.15, L - ASKA - 1], [R - 0.5, L - ASKA + 1], [R - 0.3, L - 12], [R - 0.8, L - 4], [R - 2.6, L - 1.1], [R - 6, L - 0.1], [0, L + 0.2]];
   const g = new THREE.LatheGeometry(V2(prof), 24);
-  const U = { uGlod: { value: 0 }, uTid: { value: 0 }, uBord: bord, uButik: bord.butik || BUTIK_AV, uDag: DAG, uLys: LYS };
+  const U = { uGlod: { value: 0 }, uTid: { value: 0 }, uBord: bord, uButik: bord.butik || BUTIK_AV, uDag: bord.dag || DAG, uLys: bord.lys || LYS };
   const mesh = new THREE.Mesh(g, new THREE.ShaderMaterial({ uniforms: U, vertexShader: CIG_V, fragmentShader: CIG_F, transparent: true, blending: THREE.CustomBlending, blendSrc: THREE.OneFactor, blendDst: THREE.OneMinusSrcAlphaFactor }));
   mesh.renderOrder = 6;
   mesh.frustumCulled = false;
@@ -868,7 +875,7 @@ void main() {
 export function byggPenna(bord = ingenBord()) {
   const { L, R, TRA } = PENNA;
   const g = new THREE.LatheGeometry(V2([[0, 0], [0.9, 0.6], [R, TRA], [R, L - 1], [R - 2, L], [0, L + 0.2]]), 12);
-  const U = { uBord: bord, uButik: bord.butik || BUTIK_AV, uDag: DAG, uLys: LYS };
+  const U = { uBord: bord, uButik: bord.butik || BUTIK_AV, uDag: bord.dag || DAG, uLys: bord.lys || LYS };
   const mesh = new THREE.Mesh(g, new THREE.ShaderMaterial({ uniforms: U, vertexShader: CIG_V, fragmentShader: PEN_F, transparent: true, blending: THREE.CustomBlending, blendSrc: THREE.OneFactor, blendDst: THREE.OneMinusSrcAlphaFactor }));
   mesh.renderOrder = 6;
   mesh.frustumCulled = false;
@@ -965,7 +972,7 @@ export function byggAskkopp(bord = ingenBord()) {
     const b = (na * np + j) * 3;
     for (let k = 0; k < 3; k++) nr[a + k] = nr[b + k] = (nr[a + k] + nr[b + k]) / 2;
   }
-  const mesh = new THREE.Mesh(g, new THREE.ShaderMaterial({ uniforms: { uBord: bord, uButik: bord.butik || BUTIK_AV, uDag: DAG, uLys: LYS }, vertexShader: ASK_V, fragmentShader: ASK_F, transparent: true, blending: THREE.CustomBlending, blendSrc: THREE.OneFactor, blendDst: THREE.OneMinusSrcAlphaFactor }));
+  const mesh = new THREE.Mesh(g, new THREE.ShaderMaterial({ uniforms: { uBord: bord, uButik: bord.butik || BUTIK_AV, uDag: bord.dag || DAG, uLys: bord.lys || LYS }, vertexShader: ASK_V, fragmentShader: ASK_F, transparent: true, blending: THREE.CustomBlending, blendSrc: THREE.OneFactor, blendDst: THREE.OneMinusSrcAlphaFactor }));
   mesh.renderOrder = 6;
   mesh.frustumCulled = false;
   return { mesh, borta() { g.dispose(); mesh.material.dispose(); } };
@@ -1005,7 +1012,7 @@ export function byggRok(N = 240, bord = ingenBord()) {
   quad.setAttribute('aP', iP);
   quad.setAttribute('aR', iR);
   quad.instanceCount = 0;
-  const mesh = new THREE.Mesh(quad, new THREE.ShaderMaterial({ uniforms: { uBord: bord, uButik: bord.butik || BUTIK_AV, uDag: DAG, uLys: LYS }, vertexShader: ROK_V, fragmentShader: ROK_F, transparent: true, depthWrite: false, blending: THREE.CustomBlending, blendSrc: THREE.OneFactor, blendDst: THREE.OneMinusSrcAlphaFactor }));
+  const mesh = new THREE.Mesh(quad, new THREE.ShaderMaterial({ uniforms: { uBord: bord, uButik: bord.butik || BUTIK_AV, uDag: bord.dag || DAG, uLys: bord.lys || LYS }, vertexShader: ROK_V, fragmentShader: ROK_F, transparent: true, depthWrite: false, blending: THREE.CustomBlending, blendSrc: THREE.OneFactor, blendDst: THREE.OneMinusSrcAlphaFactor }));
   mesh.renderOrder = 8;
   mesh.frustumCulled = false;
   // partiklarna: läge, fart, ålder, livslängd, storlek från och till, täthet, frö, sort (0 blå, 1 grå),
@@ -1062,4 +1069,81 @@ export function byggRok(N = 240, bord = ingenBord()) {
     iR.needsUpdate = true;
   }
   return { mesh, slapp, steg, bord, get antal() { return n; }, borta() { quad.dispose(); mesh.material.dispose(); } };
+}
+
+// ---------- vilan ----------
+// Han har lagt underarmarna på disken, med armbågarna lite ute och underarmarna snett in mot mitten, och den
+// vänstra handen (B) vilar över den högra (A). Samma vila i baren (rum-hasse-3d.js) och på pulten i rummet
+// (rum-hasse-hand.js), där man ser samma händer från andra hållet. I figurens värld (rum-hasse-3d.js).
+const DY = SCEN.DISK.Y;
+// armbågens och handledens höjd när armarna vilar på disken
+export const VILOHOJD = { EH: DY + 78, WH: DY + 45 };
+// axlarna, ur fotot (x − 660, 900 − y)
+export const AXEL = { A: [352 - 660, 900 - 792, -52], B: [987 - 660, 900 - 800, 8] };
+// Ur axeln (s), armbågens vinkel ut från rakt fram (a) och underarmens vinkel in (b): armbågen och handleden
+// ligger på disken, med armens längder (lyft: handleden lite högre). → { S, E, W, pol }
+export function paDisken(s, sida, a, b, lyft = 0) {
+  const [sx, sy, sz] = Array.isArray(s) ? s : [s.x, s.y, s.z];
+  const S0 = [sx + 2 * sida, sy - 8, sz];
+  const { LA, LB } = ARM;
+  const { EH, WH } = VILOHOJD;
+  const g = Math.PI / 180;
+  const h1 = Math.sqrt(LA * LA - (S0[1] - EH) ** 2);
+  const E = [S0[0] - sida * h1 * Math.sin(a * g), EH, S0[2] + h1 * Math.cos(a * g)];
+  const h2 = Math.sqrt(LB * LB - (EH - WH - lyft) ** 2);
+  const W = [E[0] + sida * h2 * Math.sin(b * g), WH + lyft, E[2] + h2 * Math.cos(b * g)];
+  return { S: S0, E, W, pol: [E[0] - S0[0], E[1] - S0[1], E[2] - S0[2]] };
+}
+// fingrarnas riktning när handen pekar g grader in mot mitten
+export const inat = (sida, g) => [sida * Math.sin((g * Math.PI) / 180), -0.05, Math.cos((g * Math.PI) / 180)];
+// Handen pekar några grader mindre in än underarmen, som en hand som vilar (handleden lite vinklad mot
+// lillfingret), med fingrarna lätt krökta. Den högra handens fingrar är böjda och den vänstras samlade, så att
+// den undre handens fingrar inte sticker fram. (Den högra handen lite rullad mot lillfingret, med handleden
+// lite högre så att den inte går ned i disken.) F: mot fingrarna, P: ut ur handflatan, spar: fingrarna
+// samlade (1 raka bredvid varandra), tumme: 0 mot handen.
+export const VILAN = {
+  A: { ...paDisken(AXEL.A, 1, 20, 42, 18), F: inat(1, 42), P: [0.45, -0.88, 0.15], krok: 1, spar: 0.75, tumme: 0.45 },
+  B: { ...paDisken(AXEL.B, -1, 10, 38, 26), F: inat(-1, 34), P: [-0.5, -0.85, 0.12], krok: 0.6, spar: 0.9, tumme: 0.4 },
+};
+
+// ---------- skuggorna på disken ----------
+// Kapslar som faller bakåt och bort från ljuset, ingen skuggkarta: n kapslar (p–q, radien r, höjden h över
+// disken), på ytan geo. Händerna (kapsel 0 och 2) har dessutom en tät, mörk skugga där de ligger an mot disken,
+// borta när handen lyfts, så att de inte ser ut att sväva. Samma i baren och på pulten i rummet.
+export function byggSkugga(geo, NK, dag = DAG) {
+  const kapA = Array.from({ length: NK }, () => new THREE.Vector4());
+  const kapH = Array.from({ length: NK }, () => new THREE.Vector2());
+  const mesh = new THREE.Mesh(geo, new THREE.ShaderMaterial({
+    uniforms: { uKap: { value: kapA }, uKapH: { value: kapH }, uDag: dag, uRuta: { value: new THREE.Vector3(1e4, 1e4, 1) } }, transparent: true, depthWrite: false, depthTest: false, blending: THREE.CustomBlending, blendSrc: THREE.OneFactor, blendDst: THREE.OneMinusSrcAlphaFactor,
+    vertexShader: 'varying vec3 vP; void main() { vec4 w = modelMatrix * vec4(position, 1.); vP = w.xyz; gl_Position = projectionMatrix * viewMatrix * w; }',
+    fragmentShader: `precision highp float; uniform vec4 uKap[${NK}]; uniform vec2 uKapH[${NK}]; uniform vec4 uDag; uniform vec3 uRuta; varying vec3 vP;
+    float seg(vec2 p, vec2 a, vec2 b) { vec2 ab = b - a; return length(p - a - ab * clamp(dot(p - a, ab) / max(dot(ab, ab), 1.), 0., 1.)); }
+    void main() {
+      float ljus = 1.;
+      for (int i = 0; i < ${NK}; i++) {
+        float r = uKapH[i].x, h = uKapH[i].y;
+        if (r <= 0.) continue;
+        float d = max(0., seg(vP.xz, uKap[i].xy, uKap[i].zw) - r * .4);
+        float rd = r * .72 + h * .34;
+        ljus *= 1. - .78 * exp(-d * d / (rd * rd)) / (1. + h * .012);
+        // händerna (0 och 2): en tät, mörk skugga där de ligger an mot disken, som en mörk kant längs fingrarna
+        // och handens ytterkant, borta när handen lyfts, så att de inte ser ut att sväva
+        if (i == 0 || i == 2) {
+          float dc = max(0., seg(vP.xz, uKap[i].xy, uKap[i].zw) - r * .74);
+          float rc = r * .36;
+          ljus *= 1. - .88 * exp(-dc * dc / (rc * rc)) * (1. - smoothstep(50., 110., h));
+        }
+        // (bort från ljuset: lamporna framifrån till vänster, på dagen fönstret till höger)
+        vec2 of = mix(vec2(.42, -.55), vec2(-.62, -.36), uDag.w) * (h + r);
+        d = max(0., seg(vP.xz - of, uKap[i].xy, uKap[i].zw) - r * .3);
+        rd = r * .85 + h * .55;
+        ljus *= 1. - .34 * exp(-d * d / (rd * rd)) / (1. + h * .006);
+      }
+      // (tonar ut mot dukens kanter: en skugga som går utanför duken slutar annars i en rak kant på disken)
+      vec2 e = min(gl_FragCoord.xy, uRuta.xy - gl_FragCoord.xy);
+      gl_FragColor = vec4(0., 0., 0., (1. - ljus) * smoothstep(0., 36. * uRuta.z, min(e.x, e.y)));
+    }`,
+  }));
+  mesh.frustumCulled = false;
+  return { mesh, kapA, kapH, U: mesh.material.uniforms, kap(i, p, q, r, h) { kapA[i].set(p.x, p.z, q.x, q.z); kapH[i].set(r, Math.max(0, h)); } };
 }
