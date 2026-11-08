@@ -51,7 +51,7 @@
 // deras hjälpare (state, KP, TP, gradeRow, couponNumber, currentCoupon,
 // Kronan.holders, Kronan.scene, Historik.coupons …) och tv:n i rum-tv.js
 // (RumTv, läses före den här), anslagstavlan i rum-anslag.js (RumAnslag,
-// också före) och kortregistret i rum-register.js (RumRegister, också före). rum-3d.js (gänget), rum-saker.js (med affischerna i rum-affischer.js) och rum-inredning.js (lysröret,
+// också före), kortregistret i rum-register.js (RumRegister, också före) och sammanställningen efter omgången i rum-block.js (RumBlock, också före). rum-3d.js (gänget), rum-saker.js (med affischerna i rum-affischer.js) och rum-inredning.js (lysröret,
 // neonskylten, uret, orakelramen, paketen, kupongstället …) hämtas
 // först när rummet visas, med three.js från jsdelivr (importmap i
 // index.html); utan WebGL står rummet kvar utan dem.
@@ -1297,7 +1297,9 @@ ${window.RumRegister ? RumRegister.nara() : ''}
       `<span class="fot">${v ? Samtal.pult.fields(signs, slag === 'gang') : ''}${id ? Papper.code(id) : ''}</span>` +
       (slag === 'din' || slag === 'las' ? '<span class="stampel">Inlämnad</span>' : '') +
       // gängets kupong på pulten ligger med baksidan upp tills den vänds
-      (slag === 'gang' && !hand && p && !vand(p) ? vandHtml(band + hd + list, top) : '') +
+      (slag === 'gang' && !hand && p && !vand(p) ? vandHtml(band + hd + list, R.summa ? null : top) : '') +
+      // omgången är spelad: Hasse Backes protokoll ligger över kupongen (rum-block.js)
+      (slag === 'gang' && !hand && R.summa ? RumBlock.html(R.summa, { tat: Boolean(R.smal) }) : '') +
       `<span class="pencil${slag === 'gang' || (!v && order.some((x) => x.sign)) ? ' kula' : ''}" style="${penStyle(PEN_PULT)}"><i></i></span>`;
   }
 
@@ -1581,6 +1583,7 @@ ${window.RumRegister ? RumRegister.nara() : ''}
     // videon: förra omgången och nästa ur rd och kupongerna som har spelats
     if (R.video) R.video.fill((state.all && state.all.matches) || [], { rd, old: [...(R.old || []), ...(typeof allCoupons === 'function' ? allCoupons() : [])] });
     const p = pult(rd);
+    summera(rd, p, t);
     // har du lämnat in ligger din kupong i högen, och på pulten en ny – eller
     // gängets kupong, när du ser de andras tips (uppgörelsen)
     set('rum-kupong', couponHtml(rd, rows, p && p.gang ? view(p, 'gang') : p && !p.inne ? view(p, 'fyll') : null));
@@ -2422,6 +2425,7 @@ ${window.RumRegister ? RumRegister.nara() : ''}
         const mod = await import('./rum-3d.js');
         // (ansiktena efter hur det går och gick för kupongen redan från början: spel, senast)
         R.fig = await mod.figurer(document.getElementById('rum-3d'), { calm: calm(), vader: R.vader, detalj: KVAL[R.kval].detalj, kant: R.kval === 0, enkel: Boolean(KVAL[R.kval].enkel), spel: R.spel, senast: window.RumFolk ? RumFolk.senast() : null, rita: () => frame() });
+        lappa();
         kval(R.kval);
         if (R.vem) R.fig.inne(R.vem, now());
         if (R.lage) R.fig.lage(R.lage, now());
@@ -2448,6 +2452,7 @@ ${window.RumRegister ? RumRegister.nara() : ''}
     if (R.vnara) return 'video';
     if (R.ans && R.ans.on()) return 'anslag';
     if (R.reg && R.reg.on()) return 'register';
+    if (R.tidning) return 'lopsedel';
     return R.sak || null;
   }
 
@@ -2578,15 +2583,71 @@ ${window.RumRegister ? RumRegister.nara() : ''}
   function go(a, e) {
     e.preventDefault();
     if (a.id === 'rum-hasse') tillHasse(a);
+    else if (a.dataset.sak === 'lopsedel' && R.summa && tidningen()) return;
     else if (a.dataset.sak) sak(a.dataset.sak);
     else if (a.dataset.nav === 'tv') zoomTv(!R.zoom);
     else if (a.dataset.nav === 'video') zoomVideo(!R.vnara);
     else if (a.id === 'rum-ans') board(true);
     else if (a.id === 'rum-reg') register(true);
     else if (a.id === 'rum-kupong') {
-      if (a.querySelector('.rum-vand')) vandKupong(a);
+      if (R.summa && e.target.closest && e.target.closest('.rum-block') && window.RumHasse && RumHasse.blocket) RumHasse.blocket(RumBlock.html(R.summa, { tat: innerWidth / innerHeight < 1.15 }));
+      else if (a.querySelector('.rum-vand')) vandKupong(a);
       else if (!openCoupon()) sak('kupong');
     } else if (a.classList.contains('rum-bak') && !(a.dataset.ta != null && openCoupon(a))) nudge(a);
+  }
+
+  // ---------- sammanställningen ----------
+  //
+  // När omgången är spelad och syns (rum-block.js): blocket över kupongen, gängets lappar i 3D
+  // och datorns siffra på videons ruta. Dolda resultat ger inget (tpScore).
+  function summera(rd, p, t) {
+    const g = p && p.gang && rd && !rd.next ? Samtal.pult.gang() : null;
+    R.summa = g && window.RumBlock ? RumBlock.rakna({
+      round: p.s, val: g.val, namn: rd.name || ((R.old || []).find((c) => (c.rows || []).some((r) => rd.ids.includes(String(r.id)))) || {}).name, nr: typeof couponNumber === 'function' ? couponNumber(rd.ids) : null,
+      info: (KP.data && KP.data.samtal && KP.data.samtal.gang) || [], kort: short, now: t,
+    }) : null;
+    if (R.video && R.video.datorn) R.video.datorn(R.summa ? R.summa.dator.ok : null);
+    lappa();
+  }
+  // (Caveat måste vara inläst innan siffrorna ritas på lapparna)
+  function lappa() {
+    if (!R.fig || !R.fig.lappar) return;
+    const s = R.summa;
+    if (!s) { R.fig.lappar(null, now()); return; }
+    const vem = Object.fromEntries(s.folk.filter((x) => !x.none && x.id !== 'HB').map((x) => [x.id.toLowerCase(), { tal: x.ok, ink: x.ink }]));
+    const klar = () => { if (R.summa === s && R.fig) R.fig.lappar(vem, now()); };
+    if (document.fonts && document.fonts.load) document.fonts.load('700 200px Caveat').then(klar, klar);
+    else klar();
+  }
+
+  // Tidningen bakom löpsedeln: läggs fram över rummet, som står still så länge. Esc, Lägg tillbaka
+  // eller ett klick utanför lägger bort den. → den öppnades.
+  function tidningen(pa = true) {
+    if (!pa) {
+      if (!R.tidning) return false;
+      R.tidning.remove();
+      R.tidning = null;
+      R.vilar = false;
+      lagerUt('tidningen');
+      return false;
+    }
+    if (R.tidning) return true;
+    const r = R.saker && R.saker.rubrik && R.saker.rubrik();
+    if (!r || !R.summa) return false;
+    const el = document.createElement('div');
+    el.className = 'rum-tidningen';
+    el.innerHTML = RumBlock.tidning(R.summa, r) + '<button type="button" class="rt-tillbaka">Lägg tillbaka</button>';
+    for (const n of ['pointerdown', 'pointerup', 'pointermove', 'mouseover', 'wheel', 'touchstart', 'touchmove']) el.addEventListener(n, (e) => e.stopPropagation());
+    el.addEventListener('click', (e) => {
+      e.stopPropagation();
+      if (!e.target.closest('.rt-blad') || e.target.closest('.rt-tillbaka')) tidningen(false);
+    });
+    R.el.append(el);
+    R.tidning = el;
+    R.vilar = true;
+    lager('tidningen', () => tidningen(false));
+    RumBlock.rastrera(el);
+    return true;
   }
 
   // Gängets kupong med baksidan upp vänds på pulten: den lyfts och vänds
@@ -4432,6 +4493,10 @@ ${window.RumRegister ? RumRegister.nara() : ''}
       }
       const k = e.key.toLowerCase();
       const fore = R.sak;
+      if (R.tidning) {
+        if (k === 'escape') tidningen(false);
+        return;
+      }
       // matchbladet för sig (bladFram): Esc lägger bort det, och pilarna byter sida
       const pil = { arrowleft: -1, arrowright: 1, arrowup: -1, arrowdown: 1 }[k];
       if (R.blad) {

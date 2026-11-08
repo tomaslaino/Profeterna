@@ -154,6 +154,7 @@ export async function saker(el, opt = {}) {
     }
   }
   return {
+    rubrik: () => (aff ? aff.rubrik() : null),
     draw(t, mx, my, rows, old, syns = true) {
       if ((update(rows, old) || !sliten) && three) {
         sliten = true;

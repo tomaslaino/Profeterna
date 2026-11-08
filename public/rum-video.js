@@ -441,6 +441,7 @@ window.RumVideo = (() => {
       // texten i bilden, så att den syns när bilden fyller fönstret:
       // läget och räkneverket uppe och bandmätaren nere
       `<span class="vhs-osd" style="top:${px(BILD.y - GLAS.y + 3)}">STOPP</span>` +
+      `<span class="vhs-dator" style="top:${px(BILD.y - GLAS.y + 3)}"></span>` +
       `<span class="vhs-tid" style="top:${px(BILD.y - GLAS.y + 3)}">0:00:00</span>` +
       `<span class="vhs-ljud" style="bottom:${px(GLAS.y + GLAS.h - BILD.y - BILD.h + 3)}">TRYCK FÖR LJUD</span>` +
       // (bandmätaren lika långt in nedifrån som bokstäverna uppifrån)
@@ -1765,8 +1766,16 @@ window.RumVideo = (() => {
       spelare: () => Boolean(P.frame || P.ledig),
       // Nära: kassetterna och knapparna går att trycka på, och videon spelar
       // vidare om den gjorde det när man gick. Svarar med hörnet i scenen.
+      // Hur många rätt datorn fick, på den blå rutan när omgången är spelad (null: inget). Den står
+      // i listans ställe på håll och försvinner när man går fram, så att kassetterna går att välja.
+      datorn(n) {
+        const e = box.querySelector('.vhs-dator');
+        if (e) e.textContent = n == null ? '' : String(n);
+        box.classList.toggle('har-dator', n != null);
+      },
       zoom(on) {
         V.near = on;
+        box.classList.toggle('vhs-narma', on);
         runt(V.tat && !on, true);
         V.tat = false;
         if (window.RumBak) RumBak.bort('rutan');

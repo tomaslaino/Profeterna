@@ -14,6 +14,7 @@
 //   - att rösten får exakt de meningar sidan säger.
 
 const repliker = require('../../public/rum-hasse-repliker.js');
+const block = require('../../public/rum-block.js');
 const { repliktexter } = require('../../src/rost.js');
 
 // Underkänt av Tomas, med det som ska stå i stället.
@@ -102,6 +103,14 @@ for (const t of tal) if (/\b(etta|kryss|tvåa|Etta|Kryss|Tvåa) (får|kan) du be
 for (const [vag, t] of alla) {
   if (INTE_MENINGAR.includes(vag.split('.')[0]) || vag === 'utanRost' || /\{/.test(t)) continue;
   if (!tal.includes(t.replace(/\s+/g, ' ').trim())) fel.push(`rösten saknar "${t}"`);
+}
+
+// Det han skriver i protokollet och tidningen (public/rum-block.js) sägs inte, och där får en
+// anteckning vara ett ord, men det som är underkänt gäller också där.
+const blockTexter = (o) => (typeof o === 'string' ? [o] : typeof o === 'function' ? [o(9, 11, '1–0', 18)] : Array.isArray(o) ? o.flatMap(blockTexter) : Object.values(o).flatMap(blockTexter));
+for (const t of blockTexter(block.TEXT)) {
+  for (const [re, istallet] of UNDERKANT) if (re.test(t)) fel.push(`protokollet: "${t}" är underkänt. Skriv: ${istallet}`);
+  if (!/[.?!]$/.test(t) && !/^[A-ZÅÄÖ][a-zåäö]+( [a-zåäö]+){1,4}$/.test(t)) fel.push(`protokollet: "${t}" saknar punkt`);
 }
 
 if (fel.length) {

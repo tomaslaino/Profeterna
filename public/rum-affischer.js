@@ -627,12 +627,15 @@ export function affischer(back, { short = (x) => x, namn = null } = {}) {
   let ritad = null;
   let fonter = false;
   let senast = { rows: null, old: null };
+  let senastR = null;
   // Anton måste vara inläst innan raderna mäts: då mäts de om
   if (document.fonts && document.fonts.load) {
     const klar = () => { fonter = true; passa(f, GP); passa(c, CHELSEA); api.data(senast.rows, senast.old); };
     Promise.all([document.fonts.load('400 30px Anton'), document.fonts.load('400 30px "Alfa Slab One"')]).then(klar, klar);
   }
   const api = {
+    // det som står på löpsedeln just nu (tidningen i rum.js)
+    rubrik: () => senastR,
     slit(w, seed) {
       for (const el of [f, n, v, c]) bleks(el, w);
       slit(l, w, seed + 5);
@@ -655,6 +658,7 @@ export function affischer(back, { short = (x) => x, namn = null } = {}) {
         console.warn('Rummet: löpsedeln', err);
         r = { ...GUIDEN.v[0], typ: 'guide', tidning: 'sb', plus: PLUS[0], datum: datum(Date.now()) };
       }
+      senastR = r;
       const k = JSON.stringify([r.tidning, r.kick, r.rad, r.under, r.plus, r.datum, fonter, vagg]);
       if (k === ritad) return;
       ritad = k;

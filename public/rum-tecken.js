@@ -33,6 +33,30 @@ const INB = 0.55;
 const studs = (T) => 0.035 * Math.exp(-4.5 * Math.max(0, T - 0.32)) * Math.sin(13 * Math.max(0, T - 0.32));
 
 export const TECKEN = {
+  // Lappen: när omgången är spelad håller var och en upp hur många rätt det blev
+  // (lappar i rum-3d.js). lapp2: den som sitter i mitten, där lappen får plats
+  // mellan huvudena. Pappret hålls i en lös näve. lappVift: den man klickar på viftar med den.
+  lapp: {
+    lapp: true,
+    langd: 1e6,
+    lage: () => ({ p: [0.5, 0.66, 0.34], y: [0.02, 1, 0.08], z: [0.05, 0, -1], pole: POLE }),
+    hand: () => ({ f: [0.62, 0.62, 0.62, 0.62], sp: [0, 0, 0, 0], tu: IN, tb: INB }),
+    kropp: () => ({ pitch: -0.02 }),
+  },
+  lapp2: {
+    lapp: true,
+    langd: 1e6,
+    lage: () => ({ p: [0.38, 1, 0.2], y: [0.02, 1, 0.08], z: [0.05, 0, -1], pole: POLE }),
+    hand: () => ({ f: [0.62, 0.62, 0.62, 0.62], sp: [0, 0, 0, 0], tu: IN, tb: INB }),
+    kropp: () => ({ pitch: -0.02 }),
+  },
+  lappVift: {
+    lapp: true,
+    langd: 1.5,
+    lage: (T, mitten) => ({ p: mitten ? [0.38, 1 + 0.05 * Math.sin(T * 12) * sm(0.1, 0.3, T), 0.2] : [0.5, 0.68 + 0.06 * Math.sin(T * 12) * sm(0.1, 0.3, T), 0.34], y: [0.02, 1, 0.08], z: [0.05, 0, -1], pole: POLE, vink: 0.22 * Math.sin(T * 12) * sm(0.1, 0.3, T) }),
+    hand: () => ({ f: [0.62, 0.62, 0.62, 0.62], sp: [0, 0, 0, 0], tu: IN, tb: INB }),
+    kropp: (T) => ({ pitch: -0.02 + 0.03 * Math.sin(T * 12), roll: 0.03 }),
+  },
   // Hang loose: tummen och lillfingret ut, och hela handen vaggar i handleden.
   hang: {
     langd: 2.5,
@@ -273,7 +297,7 @@ let kvar = FORST.slice();
 let senast = null;
 export function nasta() {
   if (!kvar.length) {
-    kvar = Object.keys(TECKEN);
+    kvar = Object.keys(TECKEN).filter((k) => !TECKEN[k].lapp);
     for (let i = kvar.length - 1; i > 0; i--) {
       const j = Math.floor(Math.random() * (i + 1));
       [kvar[i], kvar[j]] = [kvar[j], kvar[i]];

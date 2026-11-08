@@ -5229,6 +5229,27 @@ att kupongen ligger orörd fem sekunder efteråt, *Fyll i den* med och utan att 
 tecken mot hans och guldet när man kommer tillbaka till matchen. Inte provat i Safari eller i en riktig telefon,
 och de nya raderna har Tomas röst först när iMacen har läst upp dem (till dess Azures).
 
+### Sammanställningen efter omgången
+
+När alla matcher i omgången är spelade ligger Hasse Backes protokoll över kupongen på pulten
+([public/rum-block.js](public/rum-block.js), [public/rum-block.css](public/rum-block.css)): ett Yatzy-block med en
+spalt för kupongen, var och en i gänget, Hasse själv när han har tippat och datorn. Rätt tecken står i var och ens
+bläck, fel är ett streck, och den som ensam hade rätt är inringad. Under står summan, *Ensam om rätt* och poängen, med
+vinnaren inringad. Hasse har rättat det: högst fyra anteckningar i marginalen, en dom per person längst ner och hans
+namnteckning. I telefonen får marginalen inte plats, så där står bara domarna.
+
+Ett klick på blocket tar fram det hos honom, i stället för matchlistan (`blocket` i rum-hasse.js). Ett klick på
+löpsedeln i fönstret öppnar tidningen med samma rubrik som sedeln, betygen, skrällen och hans krönika (`tidningen` i
+rum.js). Gänget håller upp lappar med sina rätt (`lappar` i rum-3d.js): bara armen är upptagen, så de lever som
+vanligt, och den man klickar på viftar med lappen. Datorns siffra står på videons blå ruta på håll.
+
+Allt räknas ur omgångens data och ser likadant ut på alla enheter. Med dolda resultat (Dölj resultat) syns inget av det,
+utan stämpeln *Alla inne* ligger kvar. Texterna står i `TEXT` i rum-block.js och inte i replikfilen, eftersom de inte
+sägs högt; `npm run repliker` kollar dem mot det som är underkänt.
+
+Kostnad, mätt i Chrome som telefon med processorn ×4: en bild av gänget 5,0 → 5,4 ms och 342 → 382 ritanrop, samma
+antal trianglar. Blocket och tidningen är platt papper som ritas en gång, och medan tidningen är framme står rummet still.
+
 ### Närbilderna
 
 Uret, skårtavlan, Omgångens orakel, visitkortet, pokalhyllan, korktavlan, löpsedlarna i fönstret (IFK 1982,
@@ -5261,7 +5282,7 @@ Bakåtgesten i telefonen och bakåtknappen i datorn lägger bort det översta so
 i rummet ([public/rum-bak.js](public/rum-bak.js)). Lagren, från det översta: spelarkortet, matchbladet,
 Hasses svar om en lapp, en lapp på anslagstavlan eller ett kort i registret, kupongen i handen (också
 hos Hasse), rutan i hela fönstret på videon, och sist tv:n, videon, en närbild, anslagstavlan,
-kortregistret eller Hasses vy. Med inget framme lämnar bakåt sajten, som vanligt.
+kortregistret, tidningen eller Hasses vy. Med inget framme lämnar bakåt sajten, som vanligt.
 
 Varje lager har en osynlig rad i webbläsarens historik: samma adress, med antalet lager i
 `history.state.rum`. Bakåt ger `popstate`, och det som ligger över raden man kom till läggs bort, samma
