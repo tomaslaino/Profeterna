@@ -7,7 +7,7 @@
 // tobaksaffären: Yatzy-blocket med en spalt för kupongen, var och en i gänget,
 // Hasse själv när han har tippat och datorn. Han har rättat det, med anteckningar
 // i marginalen, en dom per person längst ner och sin namnteckning. Ett klick på
-// blocket tar det fram hos honom (blocket i rum-hasse.js), och ett klick på
+// blocket lyfter det och lägger fram det stort (protokollet i rum.js), och ett klick på
 // löpsedeln i fönstret öppnar tidningen (tidningen i rum.js). Gänget håller upp
 // sina lappar (lappar här och i rum-3d.js), och datorns siffra står på videons blå ruta.
 //

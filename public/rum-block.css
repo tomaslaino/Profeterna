@@ -91,14 +91,12 @@
 #rum-kupong:has(> .rum-block) > .pencil { visibility: hidden; }
 #rum-kupong > .rum-block { position: absolute; left: 150px; top: 0; z-index: 5; transform: rotate(-2deg) scale(0.53); transform-origin: 0 0; }
 .rum.smal #rum-kupong > .rum-block { left: 42px; top: 8px; transform: rotate(0.8deg) scale(0.9); }
-/* hos Hasse: framför honom på disken (passaBlock i rum-hasse.js) */
-.rum-hasse-vy > .rum-block, .rum-hasse-vy > .rb-tillbaka { transition: opacity 0.32s ease-out; }
-.rum-hasse-vy > .rum-block { position: absolute; left: 0; top: 0; z-index: 4; transform-origin: 0 0; cursor: default; box-shadow: 0 24px 50px rgba(0, 0, 0, 0.55), 0 2px 3px rgba(0, 0, 0, 0.3); }
-.rum-hasse-vy.block .rh-samtal { display: none; }
-.rum-hasse-vy.block:not(.hog) .rh-mork { width: min(46%, 700px); }
-.rum.hasse-pan .rum-hasse-vy > .rum-block, .rum.hasse-pan .rb-tillbaka { opacity: 0; }
-.rum-hasse-vy > .rb-tillbaka { position: absolute; right: 22px; bottom: 12px; z-index: 5; min-height: 40px; padding: 0 2px; border: 0; background: none; color: #a9c8fb; font: 500 17px/40px Fraunces, Georgia, serif; text-decoration: underline; text-underline-offset: 4px; text-decoration-thickness: 1px; cursor: pointer; }
-@media (hover: hover) { .rum-hasse-vy > .rb-tillbaka:hover { color: #d3e3ff; } }
+/* framme: lyft från pulten och stort över rummet (protokollet i rum.js) */
+.rum.protokoll-uppe #rum-kupong > .rum-block { visibility: hidden; }
+.rum-protokoll-mork { position: absolute; inset: 0; z-index: 60; background: rgba(9, 6, 3, 0.76); }
+.rum-protokoll { position: absolute; inset: 0; z-index: 61; display: flex; flex-direction: column; align-items: center; overflow: hidden auto; overscroll-behavior: contain; touch-action: pan-y; padding: 12px 12px 4px; box-sizing: border-box; outline: none; }
+.rum-protokoll > .rum-block { flex: none; position: relative; margin-top: auto; cursor: default; box-shadow: 0 30px 70px rgba(0, 0, 0, 0.6); }
+.rum-protokoll > .rt-tillbaka { margin-bottom: auto; }
 
 /* ---------- tidningen ---------- */
 .rum-tidningen { position: absolute; inset: 0; z-index: 60; display: flex; flex-direction: column; align-items: center; overflow: hidden auto; overscroll-behavior: contain; touch-action: pan-y; padding: 16px 12px 10px; box-sizing: border-box; background: rgba(9, 6, 3, 0.76); animation: rt-in 0.22s ease-out; }

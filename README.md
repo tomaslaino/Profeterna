@@ -5238,7 +5238,8 @@ bläck, fel är ett streck, och den som ensam hade rätt är inringad. Under st�
 vinnaren inringad. Hasse har rättat det: högst fyra anteckningar i marginalen, en dom per person längst ner och hans
 namnteckning. I telefonen får marginalen inte plats, så där står bara domarna.
 
-Ett klick på blocket tar fram det hos honom, i stället för matchlistan (`blocket` i rum-hasse.js). Ett klick på
+Ett klick på blocket lyfter det från pulten och lägger fram det stort över rummet, och *Lägg tillbaka*, Esc eller ett
+klick utanför lägger tillbaka det (`protokollet` i rum.js). Ett klick på
 löpsedeln i fönstret öppnar tidningen med samma rubrik som sedeln, betygen, skrällen och hans krönika (`tidningen` i
 rum.js). Gänget håller upp lappar med sina rätt (`lappar` i rum-3d.js): bara armen är upptagen, så de lever som
 vanligt. Lapparna står kvar till måndagen efter omgången kl. 16, också när nästa Stryktips redan har tagit över
@@ -5251,7 +5252,7 @@ utan stämpeln *Alla inne* ligger kvar. Texterna står i `TEXT` i rum-block.js o
 sägs högt; `npm run repliker` kollar dem mot det som är underkänt.
 
 Kostnad, mätt i Chrome som telefon med processorn ×4: en bild av gänget 5,0 → 5,4 ms och 342 → 382 ritanrop, samma
-antal trianglar. Blocket och tidningen är platt papper som ritas en gång, och medan tidningen är framme står rummet still.
+antal trianglar. Blocket och tidningen är platt papper som ritas en gång, och medan de är framme står rummet still.
 
 ### Närbilderna
 

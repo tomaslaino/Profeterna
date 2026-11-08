@@ -2447,7 +2447,7 @@ ${window.RumRegister ? RumRegister.nara() : ''}
   // Det du har framme i rummet, för din figur (rum-folk.js): kupongen i
   // handen, tv:n, videon, anslagstavlan, kortregistret eller närbilden.
   function fokus() {
-    if (R.kup) return 'kupong';
+    if (R.kup || R.protokoll) return 'kupong';
     if (R.zoom) return 'tv';
     if (R.vnara) return 'video';
     if (R.ans && R.ans.on()) return 'anslag';
@@ -2590,7 +2590,7 @@ ${window.RumRegister ? RumRegister.nara() : ''}
     else if (a.id === 'rum-ans') board(true);
     else if (a.id === 'rum-reg') register(true);
     else if (a.id === 'rum-kupong') {
-      if (R.summa && e.target.closest && e.target.closest('.rum-block') && window.RumHasse && RumHasse.blocket) RumHasse.blocket(RumBlock.html(R.summa, { tat: innerWidth / innerHeight < 1.15 }));
+      if (R.summa && e.target.closest && e.target.closest('.rum-block')) protokollet();
       else if (a.querySelector('.rum-vand')) vandKupong(a);
       else if (!openCoupon()) sak('kupong');
     } else if (a.classList.contains('rum-bak') && !(a.dataset.ta != null && openCoupon(a))) nudge(a);
@@ -2649,6 +2649,105 @@ ${window.RumRegister ? RumRegister.nara() : ''}
     // (i ett rum som står still syns det när gänget ritas om)
     if (calm()) frame();
     return true;
+  }
+
+  // Protokollet på pulten: det lyfts och läggs fram stort över rummet, som står still så länge, och går
+  // tillbaka samma väg. Esc, Lägg tillbaka eller ett klick utanför lägger tillbaka det. I smala fönster
+  // är det den smala versionen, och ryms det inte på höjden går det att rulla, i stället för att bli oläsligt.
+  function protokollet(pa = true, nu = false) {
+    const p = R.protokoll;
+    if (!pa) {
+      if (!p || p.ut) return;
+      p.ut = true;
+      lagerUt('protokollet');
+      const klar = () => {
+        p.mork.remove();
+        p.el.remove();
+        R.el.classList.remove('protokoll-uppe');
+        R.protokoll = null;
+        R.vilar = false;
+      };
+      const bilder = !nu && !calm() && !p.lyft && lyftBilder(p);
+      if (p.lyft && !nu && !calm()) {
+        // på väg upp: det vänder där det är
+        p.lyft.reverse();
+        p.tona.reverse();
+      } else if (bilder) {
+        p.el.style.overflowY = 'hidden';
+        p.lyft = p.b.animate(bilder, { duration: 640, direction: 'reverse', fill: 'both' });
+        p.tona = p.mork.animate([{ opacity: 0 }, { opacity: 1 }], { duration: 640, easing: 'ease', direction: 'reverse', fill: 'both' });
+      } else {
+        klar();
+        return;
+      }
+      p.lyft.finished.then(klar, klar);
+      return;
+    }
+    if (p || !R.summa) return;
+    const mork = document.createElement('div');
+    mork.className = 'rum-protokoll-mork';
+    const el = document.createElement('div');
+    el.className = 'rum-protokoll';
+    el.tabIndex = -1;
+    el.setAttribute('role', 'dialog');
+    el.setAttribute('aria-modal', 'true');
+    el.setAttribute('aria-label', 'Protokoll');
+    el.innerHTML = RumBlock.html(R.summa, { tat: innerWidth < 555 }) + '<button type="button" class="rt-tillbaka">Lägg tillbaka</button>';
+    for (const n of ['pointerdown', 'pointerup', 'pointermove', 'mouseover', 'wheel', 'touchstart', 'touchmove']) el.addEventListener(n, (e) => e.stopPropagation());
+    el.addEventListener('click', (e) => {
+      e.stopPropagation();
+      if (!e.target.closest('.rum-block') || e.target.closest('.rt-tillbaka')) protokollet(false);
+    });
+    R.el.append(mork, el);
+    const q = R.protokoll = { el, mork, b: el.querySelector('.rum-block') };
+    passaProtokoll();
+    R.vilar = true;
+    lager('protokollet', (ut) => protokollet(false, ut));
+    const bilder = !calm() && lyftBilder(q);
+    R.el.classList.add('protokoll-uppe');
+    el.focus({ preventScroll: true });
+    if (!bilder) return;
+    // (medan det är på väg ska fönstret inte kunna rullas av att det ligger långt ner)
+    el.style.overflowY = 'hidden';
+    q.lyft = q.b.animate(bilder, { duration: 760, fill: 'both' });
+    q.tona = mork.animate([{ opacity: 0 }, { opacity: 1 }], { duration: 520, easing: 'ease', fill: 'both' });
+    q.lyft.finished.then(() => {
+      if (q.ut) return;
+      // framme: inget eget lager, så att texten står skarp och inget ritas om
+      q.lyft.cancel();
+      q.lyft = null;
+      q.tona.cancel();
+      el.style.overflowY = '';
+    }, () => {});
+  }
+  // Så stort som ryms, men inte så litet att det inte går att läsa.
+  function passaProtokoll() {
+    const p = R.protokoll;
+    if (!p) return;
+    p.b.style.zoom = 1;
+    const k = Math.min((p.el.clientWidth - 24) / p.b.offsetWidth, 1.5, Math.max((innerHeight - 74) / p.b.offsetHeight, 0.8));
+    p.b.style.zoom = k.toFixed(3);
+  }
+  // Vägen mellan pulten och fönstret: bladet ligger i pultens lutning och lossnar uppåt. → bildrutorna,
+  // eller null om blocket inte ligger på pulten (kupongen i handen, omgången har bytts).
+  function lyftBilder(p) {
+    const kalla = R.el.querySelector('#rum-kupong > .rum-block');
+    const a = kalla && kalla.getBoundingClientRect();
+    if (!a || !a.width) return null;
+    const b = p.b.getBoundingClientRect();
+    const k = (a.width * 0.9) / b.width;
+    const vrid = R.smal ? -1.2 : -4;
+    // (lutningen gör att bladets mitt inte är rutans mitt: den ligger högre, och vridningen drar den åt sidan)
+    const dx = a.left + a.width * (0.5 + vrid * 0.0085) - b.left - b.width / 2;
+    const dy = a.top + a.height * 0.45 - b.top - b.height / 2;
+    // (bladets zoom förstorar också längderna i dess transform)
+    const z = Number(p.b.style.zoom) || 1;
+    const t = (x, y, rx, rz, s) => `translate(${r1(x / z)}px, ${r1(y / z)}px) perspective(${r1(1340 / z)}px) rotateX(${rx}deg) rotate(${rz}deg) scale(${s.toFixed(3)})`;
+    return [
+      { offset: 0, transform: t(dx, dy, 41, vrid, k), easing: 'cubic-bezier(0.3, 0, 0.5, 1)' },
+      { offset: 0.24, transform: t(dx * 0.96, dy - 42, 35, vrid - 1, k * 1.04), easing: 'cubic-bezier(0.25, 0.55, 0.3, 1)' },
+      { offset: 1, transform: t(0, 0, 0, 0, 1) },
+    ];
   }
 
   // Tidningen bakom löpsedeln: läggs fram över rummet, som står still så länge. Esc, Lägg tillbaka
@@ -4528,6 +4627,10 @@ ${window.RumRegister ? RumRegister.nara() : ''}
         if (k === 'escape') tidningen(false);
         return;
       }
+      if (R.protokoll) {
+        if (k === 'escape') protokollet(false);
+        return;
+      }
       // matchbladet för sig (bladFram): Esc lägger bort det, och pilarna byter sida
       const pil = { arrowleft: -1, arrowright: 1, arrowup: -1, arrowdown: 1 }[k];
       if (R.blad) {
@@ -4576,6 +4679,7 @@ ${window.RumRegister ? RumRegister.nara() : ''}
       else if (k === 'escape' && R.vnara) zoomVideo(false);
     });
     addEventListener('resize', fit);
+    addEventListener('resize', passaProtokoll);
     if (window.Spoiler && Spoiler.onChange) Spoiler.onChange(() => { if (R.on) fill(); });
   }
 
@@ -4729,6 +4833,7 @@ ${window.RumRegister ? RumRegister.nara() : ''}
     if (!R.on) return;
     if (R.blad) R.blad.ut(true);
     closeCoupon(true);
+    protokollet(false, true);
     board(false);
     register(false);
     if (R.video) R.video.stop();

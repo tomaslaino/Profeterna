@@ -342,7 +342,6 @@ window.RumHasse = (() => {
     }
     if (H.kupong) H.kupong.passa();
     passaSpalter();
-    passaBlock();
     return disk;
   }
 
@@ -431,8 +430,6 @@ window.RumHasse = (() => {
     H.oppnar = true;
     H.utSen = false;
     if (window.RumBak) RumBak.fram('hasse', bak);
-    const block = H.blockHtml;
-    H.blockHtml = null;
     vakna();
     clearTimeout(H.ner);
     try {
@@ -451,8 +448,7 @@ window.RumHasse = (() => {
       slappSen();
       return;
     }
-    if (block) framBlock(block);
-    else fraga();
+    fraga();
     H.on = true;
     H.oppnar = false;
     H.T = 0;
@@ -553,7 +549,6 @@ window.RumHasse = (() => {
 
   function hemma() {
     H.svanger = false;
-    bortBlock();
     if (window.Rum && Rum.vila) Rum.vila(false);
     H.world.style.transition = '';
     H.rum.classList.remove('hasse-pan', 'hasse-framme');
@@ -564,61 +559,6 @@ window.RumHasse = (() => {
   function slappSen() {
     clearTimeout(H.ner);
     H.ner = setTimeout(() => { if (!H.on && H.fig) borta(); }, latt() ? 20000 : 90000);
-  }
-
-  // ---------- protokollet ----------
-
-  // Hans protokoll från pulten (rum-block.js): samma block, framför honom på disken, i stället för
-  // listan. Han sitter och väntar på vad man har att säga om det, och gör sina småsaker under tiden.
-  // Ett klick utanför, Esc eller Lägg tillbaka tar en tillbaka.
-  function blocket(html) {
-    if (H.on || H.oppnar || H.svanger) return;
-    H.blockHtml = html;
-    oppna();
-  }
-  function framBlock(html) {
-    H.klipp = null;
-    H.ko = [];
-    H.spana = null;
-    H.tal = 0;
-    H.talMal = 0;
-    H.mun = 0;
-    H.munMal = null;
-    H.T = 0;
-    H.fraga = {};
-    H.fas = 'fraga';
-    H.prat = null;
-    bortBlock();
-    H.vy.classList.add('block');
-    H.vy.insertAdjacentHTML('beforeend', `${html}<button type="button" class="rb-tillbaka">Lägg tillbaka</button>`);
-    H.block = H.vy.querySelector(':scope > .rum-block');
-    H.block.addEventListener('click', (e) => e.stopPropagation());
-    passaBlock();
-    if (document.fonts) document.fonts.ready.then(passaBlock);
-  }
-  function bortBlock() {
-    if (!H.block) return;
-    H.vy.classList.remove('block');
-    H.block.remove();
-    H.block = null;
-    const t = H.vy.querySelector(':scope > .rb-tillbaka');
-    if (t) t.remove();
-  }
-  // Så stort som ryms: till vänster om honom på bredden, och under huvudet på höjden.
-  function passaBlock() {
-    const b = H.block;
-    const v = H.v;
-    if (!b || !v) return;
-    const w = b.offsetWidth;
-    const h = b.offsetHeight;
-    if (H.hog) {
-      const topp = Math.max(56, v.H * 0.15);
-      const k = Math.min(1.15, (v.W - 12) / w, (v.H - topp - 54) / h);
-      b.style.transform = `translate(${((v.W - w * k) / 2).toFixed(1)}px, ${topp.toFixed(1)}px) rotate(0.5deg) scale(${k.toFixed(4)})`;
-    } else {
-      const k = Math.min(1.15, (Math.max(v.vanster, 300) + 10) / w, (v.H - 52) / h);
-      b.style.transform = `translate(14px, ${((v.H - h * k) / 2).toFixed(1)}px) rotate(-1deg) scale(${k.toFixed(4)})`;
-    }
   }
 
   // ---------- matchbladet ----------
@@ -2001,5 +1941,5 @@ window.RumHasse = (() => {
   if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', vanta);
   else vanta();
 
-  return { oppna, blocket, stang, repliker, framat, hoppa, gester: GEST, fjarran };
+  return { oppna, stang, repliker, framat, hoppa, gester: GEST, fjarran };
 })();
