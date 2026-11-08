@@ -88,7 +88,7 @@
 // lage({ tv, nag }, t), mal({ dl: 1, dt: -1, dj: 0 }, t, sätt), spel({ lage, rank, ansikte }, t),
 // senast(lage), uttryck(),
 // prova(vem, påhitt, at), ga(vem, t, l), pekar(vem, [x, y, z] | null, t),
-// hej(vem, t, ut), vald(vem, t), tecken(vem, t, namn), lappar(vem, t), lappUppe(vem, t), natt(på, t), efter({ lage, krona }), under(nx, ny), huvud(vem) }: neon säger om
+// hej(vem, t, ut), vald(vem, t), tecken(vem, t, namn), lappar(vem, t), lappUppe(vem, t), lappProva(vem, hållning, gör, at), natt(på, t), efter({ lage, krona }), under(nx, ny), huvud(vem) }: neon säger om
 // neonskylten lyser (false när den glappar), ute klär om gänget
 // efter vädret (dress) och sätter ljuset från fönstret, lage säger om
 // matcherna pågår (tv) och hur nära spelstoppet är (nag 0–1), mal ett mål
@@ -115,7 +115,7 @@ import { RoundedBoxGeometry } from 'three/addons/geometries/RoundedBoxGeometry.j
 import { mergeGeometries } from 'three/addons/utils/BufferGeometryUtils.js';
 import { ol } from './rum-fika.js';
 import { festen, drakt, festklader } from './rum-fest.js';
-import { TECKEN, LOS, blanda, nasta as nastaTecken, KORS, KORS_MENY, korsChans } from './rum-tecken.js';
+import { TECKEN, LOS, blanda, nasta as nastaTecken, KORS, KORS_MENY, korsChans, LAPP_HALL, LAPP_GOR, LAPP_MENY, LAPP_GREPP, lappBlanda, lappKropp } from './rum-tecken.js';
 import { uttryck, skaggUttryck, ansiktsLage } from './rum-uttryck.js';
 
 const DEG = Math.PI / 180;
@@ -2566,6 +2566,16 @@ export async function figurer(canvas, opt = {}) {
       pitch += (b.pitch || 0) * vak;
       roll -= tk.A.s * (b.roll || 0) * vak;
     }
+    // skylten: huvudet mot den eller från den (LAPP_HALL)
+    const lk = lappNu(o, t);
+    if (lk) {
+      const b = lk.kropp;
+      lean += b.lean * lk.w;
+      pitch += b.pitch * lk.w;
+      roll -= lk.A.s * b.roll * lk.w;
+      yaw += lk.A.s * b.titta * lk.w;
+      twist += b.twist * lk.w;
+    }
     breath -= 0.05 * sink;
     pitch -= 0.38 * drink - 0.06 * drag;
     // på väg från stolen och tillbaka (gaKropp): i stället för allt det andra
@@ -2741,17 +2751,50 @@ export async function figurer(canvas, opt = {}) {
     return { x, T, w: (x.w0 + (1 - x.w0) * sm(0, TK_IN, T)) * (1 - sm(L, L + TK_UT, T)), A: o.arms[x.i] };
   }
   const teckenW = (o, t) => { const g = teckenNu(o, t); return g ? g.w : 0; };
-  // Lapparna (lappar): vem som håller upp hur många rätt ({ tal, ink, at, ut, i: armen, namn }).
-  // Bara armen är upptagen: resten av figuren lever som vanligt, och den andra handen har kvar sitt.
+  // Lapparna (lappar): vem som håller upp hur många rätt ({ tal, ink, at, ut, i: armen, meny, forst }).
+  // Armarna är upptagna, men resten av figuren lever som vanligt. Var och en byter hållning
+  // var trettionde sekund, med en tredjedels period emellan, och gör ibland något med skylten
+  // (LAPP_GOR) i två luckor i varje hållning. Luckorna ligger förskjutna (2 s per person), så
+  // att två sällan gör något samtidigt.
   const LP = {};
   const LP_IN = 0.7;
+  const LAPP_P = 30;
+  const LAPP_BYT = 1.3;
+  const LAPP_LUCKA = [6, 17];
+  const LPV = {};
   function lappNu(o, t) {
     const x = LP[o.F.key];
     if (!x || t < x.at) return null;
     const ner = x.ut == null ? 1 : 1 - sm(x.ut, x.ut + TK_UT, t);
     if (ner <= 0) return null;
     const w = sm(0, LP_IN, t - x.at) * ner * (1 - sovW(o, t)) * (1 - (o.st ? o.st.w : 0));
-    return w > 0.001 ? { x, w, A: o.arms[x.i] } : null;
+    if (w <= 0.001) return null;
+    if (x.nu && x.nu.t === t && x.nu.x === x) { x.nu.w = w; return x.nu; }
+    const i = figs.indexOf(o);
+    const c = (t + (i * LAPP_P) / 3) / LAPP_P;
+    const n = Math.floor(c);
+    const l = (c - n) * LAPP_P;
+    const len = x.meny.length;
+    const pv = LPV[o.F.key];
+    const ha = LAPP_HALL[pv ? pv.hall : x.meny[(n + x.forst) % len]];
+    const hb = LAPP_HALL[pv ? pv.hall : x.meny[(n + 1 + x.forst) % len]];
+    const k = sm(LAPP_P - LAPP_BYT, LAPP_P, l);
+    // vad man gör: en lucka i taget, och inte i varje
+    let d = null;
+    if (pv && pv.gor) d = LAPP_GOR[pv.gor].f(Math.min(t - pv.at, LAPP_GOR[pv.gor].len));
+    else if (!pv) {
+      for (let j = 0; j < LAPP_LUCKA.length; j++) {
+        if (hash(n * 1.71 + i * 3.1 + j * 5.3 + KORS_FRO) > 0.72) continue;
+        const g = LAPP_GOR[ha.gor[Math.floor(hash(n * 2.37 + i * 1.9 + j * 7.7 + KORS_FRO) * ha.gor.length)]];
+        const dl = l - LAPP_LUCKA[j] - 2 * i;
+        if (dl >= 0 && dl < g.len) d = g.f(dl);
+      }
+    }
+    const tt = t + o.phase;
+    const L = lappBlanda(ha.lage(tt), hb.lage(tt), k, d);
+    const A = o.arms[x.i];
+    x.nu = { t, x, w, A, B: o.arms.find((b) => b !== A), L, kropp: lappKropp(ha.kropp(tt), hb.kropp(tt), k, d && d.kropp) };
+    return x.nu;
   }
   // Raden man skriver på: 0,75 sekunder per rad, och den sista sjättedelen
   // tillbaka till början av nästa med pennan lyft. → { n: radens nummer, x:
@@ -3966,6 +4009,45 @@ export async function figurer(canvas, opt = {}) {
     if (L.vink) y.applyAxisAngle(z, L.vink * A.s);
     return { p: S0.addScaledVector(d, n), y, z, pole: V(L.pole) };
   }
+  // Bildens axlar i figurens (x åt höger, y uppåt, z mot kameran): skylten vänds mot den
+  // som tittar. Räknas när figuren sitter, sedan står de kvar (kameran rör sig bara lite).
+  const bildQ = new THREE.Quaternion();
+  function bildAxlar(o) {
+    if (!o.bild || (o.bild.gar && !(o.st && o.st.w > 0))) {
+      o.fig.getWorldQuaternion(bildQ);
+      bildQ.invert().multiply(cam.quaternion);
+      o.bild = { gar: Boolean(o.st && o.st.w > 0), x: new THREE.Vector3(1, 0, 0).applyQuaternion(bildQ), y: new THREE.Vector3(0, 1, 0).applyQuaternion(bildQ), z: new THREE.Vector3(0, 0, 1).applyQuaternion(bildQ) };
+    }
+    return o.bild;
+  }
+  // Handen som håller skylten, i figurens axlar (rum-tecken.js, LAPP_HALL).
+  function lappLage(o, A, lp) {
+    const L = lp.L;
+    const B = bildAxlar(o);
+    const V = (a) => B.x.clone().multiplyScalar(A.s * a[0]).addScaledVector(B.y, a[1]).addScaledVector(B.z, a[2]);
+    const n = o.F.a + o.F.b;
+    const S0 = shoulder(o, A);
+    if (L.tva > 0) S0.lerp(shoulder(o, lp.B), L.tva * 0.5);
+    const d = V(L.p);
+    if (L.tva < 0.5 && d.length() > 0.95) d.setLength(0.95);
+    const y = V(L.y).normalize();
+    const z = V(L.z);
+    z.addScaledVector(y, -z.dot(y)).normalize();
+    if (L.vrid) z.applyAxisAngle(y, L.vrid * A.s);
+    if (L.vink) y.applyAxisAngle(z, L.vink * A.s);
+    return { p: S0.addScaledVector(d, n), y, z, pole: V(L.pole) };
+  }
+  // Den andra handen i skyltens andra hörn: den första speglad i skyltens mittlinje (lappStall).
+  function lappAndra(o, A, lp) {
+    const c = lp.kort;
+    const r = new THREE.Vector3(1, 0, 0).applyQuaternion(c.q);
+    const p = c.hp.clone().addScaledVector(r, 2 * c.p.clone().sub(c.hp).dot(r));
+    const y = new THREE.Vector3(0, 1, 0).applyQuaternion(c.hq);
+    y.addScaledVector(r, -2 * y.dot(r));
+    const B = bildAxlar(o);
+    const pole = B.x.clone().multiplyScalar(A.s * lp.L.pole[0]).addScaledVector(B.y, lp.L.pole[1]).addScaledVector(B.z, lp.L.pole[2]);
+    return { p, y, z: new THREE.Vector3(0, 0, 1).applyQuaternion(c.hq), pole };
+  }
   // Handen och armen i tecknet just nu – från det förra tecknet om det pågick.
   function teckenPose(o, A, g) {
     const { x, T } = g;
@@ -3994,7 +4076,8 @@ export async function figurer(canvas, opt = {}) {
     const ks = korsFingrar(o, t);
     const lp = lappNu(o, t);
     if (o.lapp && !lp) o.lapp.visible = false;
-    for (const A of o.arms) {
+    // (handen som håller skylten först: den andra tar tag i den, lappAndra)
+    for (const A of lp && lp.L.tva > 0 && lp.A !== o.arms[0] ? [o.arms[1], o.arms[0]] : o.arms) {
       const taken = u >= 0.55;
       if (A.pen) A.pen.visible = u < 0.28;
       if (A.kup) A.kup.visible = u < 0.3;
@@ -4005,7 +4088,10 @@ export async function figurer(canvas, opt = {}) {
       let H = useW ? A.wHand : A.hand;
       let hp = handPose(o, A, t);
       const iLapp = lp && lp.A === A && !(ks && ks.A === A);
-      if (iLapp) hp = lerpPose(hp, teckenLage(o, A, lp.x.namn, 0), lp.w);
+      const iAndra = lp && lp.B === A && lp.L.tva > 0 && lp.kort && !(ks && ks.A === A);
+      if (iLapp) hp = lerpPose(hp, lappLage(o, A, lp), lp.w);
+      else if (iAndra) hp = lerpPose(hp, lappAndra(o, A, lp), lp.w * lp.L.tva);
+      const grepp = iLapp ? lp.w : iAndra ? lp.w * lp.L.tva : 0;
       if (tk && tk.A === A) hp = lerpPose(hp, teckenPose(o, A, tk), tk.w);
       if (o.st.w > 0) hp = lerpPose(hp, gaHand(o, A, t, o.st), o.st.w);
       if (A.fist) {
@@ -4018,7 +4104,7 @@ export async function figurer(canvas, opt = {}) {
       // cigarett ligger på bordet så länge.
       if (A.fingerHand) A.fingerHand.visible = false;
       // (eller korstecknet: flaskan står på bordet så länge)
-      const fg = tk && tk.A === A && tk.w > TK_BYT ? { form: teckenHand(tk), stor: 1 + (TK_STOR - 1) * sm(TK_BYT, 0.8, tk.w) } : iLapp && lp.w > TK_BYT ? { form: blanda(LOS, TECKEN.lapp.hand(), sm(TK_BYT, 0.85, lp.w)), stor: 1 + (TK_STOR - 1) * sm(TK_BYT, 0.8, lp.w) } : ks && ks.A === A ? ks : null;
+      const fg = tk && tk.A === A && tk.w > TK_BYT ? { form: teckenHand(tk), stor: 1 + (TK_STOR - 1) * sm(TK_BYT, 0.8, tk.w) } : grepp > TK_BYT ? { form: blanda(LOS, LAPP_GREPP, sm(TK_BYT, 0.85, grepp)), stor: 1 + (TK_STOR - 1) * sm(TK_BYT, 0.8, grepp) } : ks && ks.A === A ? ks : null;
       if (fg) {
         if (!A.fingerHand) A.fingerHand = fingerHand(o.F.arm, o.hud, o.fig, A.s);
         // (den vanliga handen följer med osynlig: röken räknas ur cigaretten i den)
@@ -4033,7 +4119,7 @@ export async function figurer(canvas, opt = {}) {
         if (iLapp && A.cig) A.cig.visible = false;
       }
       orient(H, hp.p, hp.y, hp.z);
-      if (iLapp) lappStall(o, lp, H, fg && (!tk || tk.A !== A || TECKEN[tk.x.namn].lapp));
+      if (iLapp) { H.updateMatrix(); lappStall(o, lp, H, fg && (!tk || tk.A !== A)); }
       // näven: handleden där den öppna handens handled var
       if (H === A.fist) H.position.sub(H.userData.wrist.clone().applyQuaternion(H.quaternion));
       H.updateMatrix();
@@ -4084,63 +4170,122 @@ export async function figurer(canvas, opt = {}) {
     }
   }
 
-  // Lappen i handen: ett papper strax ovanför näven, vänt mot kameran. Det ligger i figurens axlar
-  // och följer med handen, och ljuset faller på det som på kupongen.
+  // Skylten i handen: en bit kartong, lite välvd, med handen under och tummen framför.
+  // Hörnen och kanten är genomskinliga i bilden (lappMask), så att de är mjuka också
+  // utan kantutjämning. Baksidan är brun, och den syns när någon vänder på skylten.
   const LAPP_V = 56;
   const LAPP_H = 70;
-  const lappGeo = new THREE.PlaneGeometry(LAPP_V, LAPP_H);
+  const lappGeo = new THREE.PlaneGeometry(LAPP_V, LAPP_H, 8, 1);
+  {
+    const p = lappGeo.attributes.position;
+    for (let i = 0; i < p.count; i++) p.setZ(i, -2.2 * (p.getX(i) / (LAPP_V / 2)) ** 2);
+    lappGeo.computeVertexNormals();
+  }
+  let lappMask = null;
+  let lappBak = null;
+  function rundRekt(g, x, y, w, h, r) {
+    g.beginPath();
+    g.moveTo(x + r, y);
+    g.arcTo(x + w, y, x + w, y + h, r);
+    g.arcTo(x + w, y + h, x, y + h, r);
+    g.arcTo(x, y + h, x, y, r);
+    g.arcTo(x, y, x + w, y, r);
+    g.closePath();
+  }
+  function lappMaskBild() {
+    if (lappMask) return lappMask;
+    lappMask = canvasTex(128, 160, (g, w, h) => {
+      g.fillStyle = '#000';
+      g.fillRect(0, 0, w, h);
+      g.fillStyle = '#fff';
+      rundRekt(g, 2, 2, w - 4, h - 4, 7);
+      g.fill();
+    });
+    lappMask.colorSpace = THREE.NoColorSpace;
+    return lappMask;
+  }
   const lappTex = new Map();
+  // Kartongens yta: små fibrer och en ton som mörknar mot kanterna.
+  function kartong(g, w, h, bas, fiber) {
+    g.fillStyle = bas;
+    g.fillRect(0, 0, w, h);
+    let f = 7;
+    const r = () => { f = (f * 16807) % 2147483647; return f / 2147483647; };
+    for (let i = 0; i < 260; i++) {
+      g.fillStyle = r() < 0.5 ? fiber : 'rgba(255,255,255,.07)';
+      g.fillRect(r() * w, r() * h, 1 + r() * 7, 1);
+    }
+    const gr = g.createRadialGradient(w / 2, h * 0.45, h * 0.3, w / 2, h * 0.5, h * 0.72);
+    gr.addColorStop(0, 'rgba(80,50,15,0)');
+    gr.addColorStop(1, 'rgba(80,50,15,.2)');
+    g.fillStyle = gr;
+    g.fillRect(0, 0, w, h);
+  }
   function lappBild(tal, ink) {
     const k = `${tal}|${ink}`;
     if (!lappTex.has(k)) {
       lappTex.set(k, canvasTex(256, 320, (g, w, h) => {
-        g.fillStyle = '#f6f1e2';
-        g.fillRect(0, 0, w, h);
-        const gr = g.createLinearGradient(0, 0, 0, h);
-        gr.addColorStop(0, 'rgba(0,0,0,0)');
-        gr.addColorStop(1, 'rgba(90,60,20,0.16)');
-        g.fillStyle = gr;
-        g.fillRect(0, 0, w, h);
-        g.strokeStyle = 'rgba(40,30,20,0.28)';
-        g.lineWidth = 3;
-        g.strokeRect(3, 3, w - 6, h - 6);
-        const stort = String(tal).length > 1 ? 200 : 280;
+        kartong(g, w, h, '#f8f3e4', 'rgba(110,85,45,.08)');
+        g.strokeStyle = 'rgba(70,50,25,.34)';
+        g.lineWidth = 2.5;
+        rundRekt(g, 14, 14, w - 28, h - 28, 12);
+        g.stroke();
+        const stort = String(tal).length > 1 ? 196 : 276;
         g.fillStyle = g.strokeStyle = ink;
-        g.lineWidth = 7;
+        g.lineWidth = 8;
         g.lineJoin = 'round';
         g.font = `700 ${stort}px Caveat, cursive`;
         g.textAlign = 'center';
         g.textBaseline = 'middle';
-        g.fillText(tal, w / 2, h * 0.52);
-        g.strokeText(tal, w / 2, h * 0.52);
+        g.fillText(tal, w / 2, h * 0.47);
+        g.strokeText(tal, w / 2, h * 0.47);
       }));
     }
     return lappTex.get(k);
   }
-  const lappQ = new THREE.Quaternion();
+  const lappRz = new THREE.Quaternion();
+  const lappRy = new THREE.Quaternion().setFromAxisAngle(UP, Math.PI);
+  const LAPP_Z = new THREE.Vector3(0, 0, 1);
   function lappStall(o, lp, H, syns) {
     let m = o.lapp;
     const k = `${lp.x.tal}|${lp.x.ink}`;
     if (!m || m.userData.k !== k) {
       if (m) o.fig.remove(m);
-      m = new THREE.Mesh(lappGeo, new THREE.MeshStandardMaterial({ map: lappBild(lp.x.tal, lp.x.ink), roughness: 0.9, metalness: 0, side: THREE.DoubleSide, envMapIntensity: 0.3, emissive: '#ffffff', emissiveMap: lappBild(lp.x.tal, lp.x.ink), emissiveIntensity: 0.16 }));
+      const bild = lappBild(lp.x.tal, lp.x.ink);
+      const mask = lappMaskBild();
+      m = new THREE.Mesh(lappGeo, new THREE.MeshStandardMaterial({ map: bild, alphaMap: mask, transparent: true, alphaTest: 0.04, roughness: 0.88, metalness: 0, envMapIntensity: 0.3, emissive: '#ffffff', emissiveMap: bild, emissiveIntensity: 0.14 }));
+      if (!lappBak) {
+        lappBak = canvasTex(128, 160, (g, w, h) => kartong(g, w, h, '#b79b70', 'rgba(70,48,20,.18)'));
+      }
+      const bak = new THREE.Mesh(lappGeo, new THREE.MeshStandardMaterial({ map: lappBak, alphaMap: mask, transparent: true, alphaTest: 0.04, roughness: 0.92, metalness: 0, envMapIntensity: 0.2, side: THREE.BackSide, emissive: '#ffffff', emissiveMap: lappBak, emissiveIntensity: 0.3 }));
+      bak.receiveShadow = true;
+      bak.userData.lapp = true;
+      m.add(bak);
+      m.castShadow = m.receiveShadow = true;
       m.userData.k = k;
+      m.userData.lapp = true;
       m.userData.fast = true;
       m.matrixAutoUpdate = false;
-      // vänd mot kameran, i figurens axlar (kameran rör sig bara lite)
-      o.fig.getWorldQuaternion(lappQ);
-      m.userData.q = lappQ.clone().invert().multiply(cam.quaternion);
-      m.userData.upp = new THREE.Vector3(0, 1, 0).applyQuaternion(m.userData.q);
-      m.userData.bak = new THREE.Vector3(0, 0, -1).applyQuaternion(m.userData.q);
-      m.userData.lut = new THREE.Quaternion().setFromAxisAngle(new THREE.Vector3(0, 0, 1), ((o.F.key.charCodeAt(1) % 3) - 1) * 0.05);
       o.fig.add(m);
       o.lapp = m;
     }
     m.visible = Boolean(syns);
-    if (!syns) return;
-    m.position.copy(H.position).addScaledVector(m.userData.upp, LAPP_H * 0.62).addScaledVector(m.userData.bak, (o.F.a + o.F.b) * 0.02);
-    m.quaternion.copy(m.userData.q).multiply(m.userData.lut);
+    // (tonar fram och bort när armen går upp och ner; var den andra handen tar tag, också innan den syns)
+    m.material.opacity = m.children[0].material.opacity = sm(TK_BYT, 0.62, lp.w);
+    const L = lp.L;
+    const s = lp.A.s;
+    const q = o.F.arm * H.scale.x;
+    const a = s * L.rot;
+    const sa = Math.sin(a);
+    const ca = Math.cos(a);
+    const e = q * LAPP_GREPP.under + Math.abs(ca) * (LAPP_H / 2) + Math.abs(sa) * (LAPP_V / 2);
+    const xs = s * L.x * LAPP_V;
+    // (handen under skylten: den vrids kring handen; i dess sida: ute i fingrarnas riktning)
+    m.position.set((-sa * e + ca * xs) * (1 - L.sida), (ca * e + sa * xs) * (1 - L.sida) + e * L.sida, -(q * 0.6 + 0.5)).applyQuaternion(H.quaternion).add(H.position);
+    lappRz.setFromAxisAngle(LAPP_Z, a);
+    m.quaternion.copy(H.quaternion).multiply(lappRz).multiply(lappRy);
     m.updateMatrix();
+    lp.kort = { p: m.position, q: m.quaternion, hp: H.position, hq: H.quaternion };
   }
 
   // ---------- röken ----------
@@ -4191,7 +4336,7 @@ export async function figurer(canvas, opt = {}) {
         // ingen rök medan cigaretten ligger släckt och man väntar på kupongen
         if (src === 'glod') {
           const tk = teckenNu(o, tb);
-          alpha = 0.8 * (1 - dragW(o, tb) * 0.7) * sm(0.55, 0.62, uOf(o, tb)) * (1 - Math.max(slumW(o, tb), sovW(o, tb))) * (tk && tk.A === sk.A ? 1 - tk.w : 1) * (sk.A === o.arms[0] ? 1 - korsK(o, tb) : 1);
+          alpha = 0.8 * (1 - dragW(o, tb) * 0.7) * sm(0.55, 0.62, uOf(o, tb)) * (1 - Math.max(slumW(o, tb), sovW(o, tb))) * (tk && tk.A === sk.A ? 1 - tk.w : 1) * (sk.A === o.arms[0] ? 1 - korsK(o, tb) : 1) * (LP[o.F.key] && o.arms[LP[o.F.key].i] === sk.A && LP[o.F.key].ut == null ? 0 : 1);
         }
         else {
           // utandningen: strax efter blosset (och det första efter inlämningen)
@@ -4506,7 +4651,9 @@ export async function figurer(canvas, opt = {}) {
   }
   // Hur många rätt var och en håller upp ({ dl: { tal, ink }, … }, null: inget). Första gången
   // sitter de så, sedan går armen upp eller ner på en stund. Med den yttre armen, så att
-  // lappen inte hamnar framför grannen; den i mitten håller upp sin mellan huvudena.
+  // skylten inte hamnar framför grannen; den i mitten håller upp sin mellan huvudena, med en
+  // eventuell cigarett i askkoppen så länge. Annars släpper den som röker inte cigaretten,
+  // så båda händerna på skylten är inget för den.
   let lappSist = undefined;
   function lappar(x, t) {
     const k = JSON.stringify(x || null);
@@ -4523,9 +4670,12 @@ export async function figurer(canvas, opt = {}) {
       // (den som redan håller upp samma lapp sitter kvar när någon annan lägger ner sin)
       if (LP[key] && LP[key].ut == null && LP[key].tal === v.tal && LP[key].ink === v.ink) continue;
       const sida = o.F.plats === PLATSER[2] ? 1 : -1;
-      let A = o.arms.find((a) => Math.sign(a.s) === sida);
-      if (!A || A.kind === 'cigg') A = o.arms.find((a) => a !== A) || A;
-      LP[key] = { tal: v.tal, ink: v.ink, at: forsta ? t - 10 : t, ut: null, i: o.arms.indexOf(A), namn: o.F.plats === PLATSER[1] ? 'lapp2' : 'lapp' };
+      const A = o.arms.find((a) => Math.sign(a.s) === sida) || o.arms[0];
+      const plats = PLATSER.indexOf(o.F.plats);
+      const andra = o.arms.find((a) => a !== A);
+      const meny = LAPP_MENY[plats].filter((h) => !LAPP_HALL[h].lage(0).tva || !andra || andra.kind !== 'cigg');
+      // (borta på de två sidorna: de har aldrig samma hållning samtidigt)
+      LP[key] = { tal: v.tal, ink: v.ink, at: forsta ? t - 10 : t, ut: null, i: o.arms.indexOf(A), meny, forst: Math.floor(KORS_FRO) + (plats === 2 ? 2 : 0) };
     }
   }
   // Håller vem upp sin lapp just nu? (inte den som sover eller redan lägger ner den)
@@ -4533,6 +4683,13 @@ export async function figurer(canvas, opt = {}) {
     const o = figs.find((f) => f.F.key === String(vem).toLowerCase());
     const l = o && lappNu(o, t);
     return Boolean(l && l.x.ut == null);
+  }
+  // Hur vem håller skylten och vad hen gör med den från at, för bilder (?rum-lapp).
+  function lappProva(vem, hall, gor, at = 0) {
+    const k = String(vem).toLowerCase();
+    if (hall && LAPP_HALL[hall]) LPV[k] = { hall, gor: gor && LAPP_GOR[gor] ? gor : null, at };
+    else delete LPV[k];
+    if (LP[k]) LP[k].nu = null;
   }
   // Någon pekar på vem i gänget (ut = när hen slutade).
   function hej(vem, t, ut = Infinity) {
@@ -4574,7 +4731,7 @@ export async function figurer(canvas, opt = {}) {
       // (den som går iväg klickar man igenom)
       if (o.st && o.st.w > 0.2) continue;
       o.fig.traverseVisible((x) => {
-        if (!x.isMesh || !x.material || x.material.transparent) return;
+        if (!x.isMesh || !x.material || (x.material.transparent && !x.userData.lapp)) return;
         const g = x.geometry;
         if (!g.boundingBox) g.computeBoundingBox();
         delRay.copy(ray.ray).applyMatrix4(delInv.copy(x.matrixWorld).invert());
@@ -4600,5 +4757,5 @@ export async function figurer(canvas, opt = {}) {
     await r.compileAsync(scene, cam);
   } catch (err) { /* då byggs de när gänget ritas, som förut */ }
   ANS.ute = true;
-  return { draw, inne, ute, lage, mal, spel, senast, uttryck: () => ANS.p, prova, ga, pekar, hej, vald, tecken, lappar, lappUppe, natt, efter, under, huvud, kval };
+  return { draw, inne, ute, lage, mal, spel, senast, uttryck: () => ANS.p, prova, ga, pekar, hej, vald, tecken, lappar, lappUppe, lappProva, natt, efter, under, huvud, kval };
 }

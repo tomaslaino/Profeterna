@@ -5249,18 +5249,30 @@ namnteckning. I telefonen försvinner namnen under porträtten och namnteckninge
 Ett klick på blocket lyfter det från pulten och lägger fram det stort över rummet, och *Lägg tillbaka*, Esc eller ett
 klick utanför lägger tillbaka det (`protokollet` i rum.js). Ett klick på
 löpsedeln i fönstret öppnar tidningen med samma rubrik som sedeln, betygen, skrällen och hans krönika (`tidningen` i
-rum.js). Gänget håller upp lappar med sina rätt (`lappar` i rum-3d.js): bara armen är upptagen, så de lever som
-vanligt. Lapparna står kvar till måndagen efter omgången kl. 16, också när nästa Stryktips redan har tagit över
-(`lappar` i rum-block.js läser då den förra omgången, `forra` i GET /samtal). Ett klick på någon i gänget med lappen
+rum.js). Gänget håller upp skyltar med sina rätt (`lappar` i rum-3d.js), medan resten av figuren lever som
+vanligt. Skyltarna står kvar till måndagen efter omgången kl. 16, också när nästa Stryktips redan har tagit över
+(`lappar` i rum-block.js läser då den förra omgången, `forra` i GET /samtal). Ett klick på någon i gänget med skylten
 uppe lägger ner den, och den ligger nere på enheten för den omgången (`lappNer` i rum.js). Modellens siffra står på
 videons blå ruta på håll.
+
+**Hur skylten hålls** (2026-11-08, användarens önskemål: "lite olika hålla upp skylt-rörelser så att det inte blir så
+enformigt"). Skylten är en bit lite välvd kartong med brun baksida, och den hålls mellan tummen framför och fingrarna
+bakom, med handflatan under den. Var och en byter hållning var trettionde sekund, en i taget: så högt armen når, intill
+kinden med huvudet på sned, framför ansiktet med ögonen över kanten, med båda händerna framför bröstet, slappt och på sned,
+och rakt ut åt sidan (`LAPP_HALL` och `LAPP_MENY` i rum-tecken.js). På sidorna har de aldrig samma hållning samtidigt, och
+ordningen är vald så att handen inte går genom huvudet på vägen. Däremellan stöter de upp skylten, viftar, skakar den,
+kontrollerar vad det står, har råkat vända den fel eller tröttnar i armen tills de kommer på sig (`LAPP_GOR`). Den som
+röker släpper inte cigaretten och håller därför skylten med en hand, utom i mitten, där cigaretten ligger i askkoppen
+så länge. Skyltens hörn och kant är genomskinliga i bilden, så att de är mjuka också utan kantutjämning. För bilder:
+`?rum-lapp=dl:kinden:kolla@2` (hållningen, vad hen gör och hur långt in).
 
 Allt räknas ur omgångens data och ser likadant ut på alla enheter. Med dolda resultat (Dölj resultat) syns inget av det,
 utan stämpeln *Alla inne* ligger kvar. Texterna står i `TEXT` i rum-block.js och inte i replikfilen, eftersom de inte
 sägs högt; `npm run repliker` kollar dem mot det som är underkänt.
 
 Kostnad, mätt i Chrome som telefon med processorn ×4: en bild av gänget 5,0 → 5,4 ms och 342 → 382 ritanrop, samma
-antal trianglar. Blocket och tidningen är platt papper som ritas en gång, och medan de är framme står rummet still.
+antal trianglar. Med hållningarna: 327–339 ritanrop med en hand och 355–371 med båda, mot 376–399 i samma mätning
+förut, och inte fler trianglar. Blocket och tidningen är platt papper som ritas en gång, och medan de är framme står rummet still.
 
 ### Närbilderna
 

@@ -43,7 +43,8 @@
 // kortregistret (=Arsenal … med det kortet i handen). ?rum-stopp=<timmar> som
 // om det var så långt kvar till spelstoppet, ?rum-tittar som om matcherna
 // pågick och ?rum-mal=dl:1,dt:-1,dj:0 som om det blev mål (rätt, fel, ingen
-// skillnad), ?rum-akt=dl:skamt@6 ett påhitt, ?rum-ga=dl:5 att DL går iväg
+// skillnad), ?rum-akt=dl:skamt@6 ett påhitt, ?rum-lapp=dl:kinden:kolla@2 hur skylten
+// hålls och vad man gör med den (två sekunder in), ?rum-ga=dl:5 att DL går iväg
 // (fem sekunder in), ?rum-video videon nära och
 // ?rum-sak=ur|skar|ram|kort|pokal|kork|vm94|ifk|nacional|lopsedel|chelsea|dorr|kupong en närbild.
 //
@@ -1786,6 +1787,17 @@ ${window.RumRegister ? RumRegister.nara() : ''}
     }
   }
 
+  // ?rum-lapp=dl:kinden:kolla@2: hur skylten hålls, för bilder (rum-3d.js, LAPP_HALL i rum-tecken.js).
+  function provLapp() {
+    const v = R.q.get('rum-lapp');
+    if (!v || !R.fig || !R.fig.lappProva) return;
+    for (const x of v.split(',')) {
+      const [k, hall, g] = x.split(':').map((z) => z.trim());
+      const [gor, at] = (g || '').split('@');
+      if (k && hall) R.fig.lappProva(k, hall, gor, now() - (at ? Number(at) || 0 : 0));
+    }
+  }
+
   // ?rum-ga=dl: DL går iväg och kommer tillbaka (rum-3d.js, gaNu) – nu och
   // sedan var fyrtionde sekund, eller med ?rum-t så långt in (dl:5: fem sekunder).
   function provGa() {
@@ -2434,6 +2446,7 @@ ${window.RumRegister ? RumRegister.nara() : ''}
         if (window.RumFolk) RumFolk.mount(R.el, { fig: () => R.fig, inr: () => R.inr, now, nara, fokus, teckna, lappNer, visa, ta: taKupong });
         provMal();
         provAkt();
+        provLapp();
         provGa();
         frame();
       });
