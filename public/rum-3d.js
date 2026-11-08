@@ -55,9 +55,11 @@
 // och i påhitten (AKTER, MENY): korta
 // rörelser som var och en gör då och då – händerna i nacken, naglarna, hakan i
 // handen, armarna i kors, pannan i bordet … – och ibland tillsammans (GRUPP):
-// skålar över bordet, gungar i takt, skrattar åt ett skämt (med ögonen
-// hopknipna och munnen öppen, skrattar), grälar medan den tredje tittar på,
-// eller tittar upp på tv:n när någon pekar.
+// skålar över bordet, sjunger (på fem sätt: gungar i takt, faller in efter en
+// försångare, trummar i bordet, gör vågen och vajar med armarna, eller mot tv:n
+// när matcherna pågår), skrattar åt ett skämt (med ögonen hopknipna och munnen
+// öppen, skrattar), grälar medan den tredje tittar på, eller tittar upp på tv:n
+// när någon pekar.
 //
 // Inför matcherna korsar de sig ibland (KORS i rum-tecken.js, korsHand), oftare
 // ju närmare nästa avspark det är: på sju olika sätt med högerhanden, och någon
@@ -3188,8 +3190,8 @@ export async function figurer(canvas, opt = {}) {
   // blicken ner i flaskan. Den som leder omgången lutar sig oftare bakåt med
   // händerna i nacken, och den som ligger sist sitter oftare med armarna i
   // kors. Gänget gör också saker tillsammans (grupp, GRUPP), oftast när det går
-  // bra: skålar över bordet och tar en klunk (DT ett bloss), gungar i takt med
-  // ölen i luften som på läktaren, skrattar åt ett skämt (skamt), grälar om
+  // bra: skålar över bordet och tar en klunk (DT ett bloss), sjunger allsång
+  // som på läktaren (allsången nedan), skrattar åt ett skämt (skamt), grälar om
   // något medan den tredje tittar på (gral) eller tittar upp på tv:n när någon
   // pekar (titta). Inget påhitt medan man väntar på kupongen,
   // sover, reagerar på ett mål eller skålar med den som pekar på en (vaken).
@@ -3225,6 +3227,8 @@ export async function figurer(canvas, opt = {}) {
     let acc = 0;
     for (const [k, p] of GRUPP[humAt(t0) || 'lugn']) if (!namn && r < (acc += p)) namn = k;
     if (hash(n * 3.19 + KORS_FRO) < 1.5 * korsChansAt(t0)) namn = 'korsaSmitta';
+    // (allsången på ett av sina sätt)
+    if (namn === 'allsang') namn = sangVal(n, t0);
     if (!namn || (ALLA.has(namn) && !allaVakna(t0))) return null;
     const l = t - t0;
     return l < AKTER[namn].len ? { namn, l, t0, n } : null;
@@ -3325,7 +3329,37 @@ export async function figurer(canvas, opt = {}) {
       ? { p, y: new THREE.Vector3(s * 0.25, 1, 0.05), z: new THREE.Vector3(-s * 0.55, -0.75, -0.3), pole: new THREE.Vector3(s, -0.6, -0.3) }
       : { p, y: new THREE.Vector3(s * 0.3, 1, -0.1), z: new THREE.Vector3(s * 0.15, 0.1, -1), pole: new THREE.Vector3(s, -0.5, -0.4) };
   }
-  const TAKT = (2 * Math.PI) / 1.7;
+  // takten när de gungar (en gungning åt varje håll på SLAG sekunder)
+  const SLAG = 1.7;
+  const TAKT = (2 * Math.PI) / SLAG;
+  // armen med ölen (DT den lediga handen) uppe och gungar i takten (x: påhittet,
+  // samma takt för alla från början)
+  const sangArm = (o) => (skalArm(o).thing ? skalArm(o) : fri(o));
+  function gungHand(o, A, t, x) {
+    const w = Math.sin((t - x.t0) * TAKT);
+    const h = upp(o, A, 0.3, 0.5, 0.38);
+    h.p.x += 6 * w;
+    h.p.y += 2 * Math.abs(w);
+    h.y.x += 0.2 * w;
+    return h;
+  }
+  function gungKropp(t, x) {
+    const w = Math.sin((t - x.t0) * TAKT);
+    return { side: 0.09 * w, roll: 0.06 * w, pitch: -0.08 + 0.05 * Math.sin((t - x.t0) * TAKT * 2), lean: -0.05 };
+  }
+  // Ölen (DT cigaretten) fram mot bordets mitt, med en stöt framåt (stot 0–1) när det klirrar.
+  function motMitten(o, A, stot = 0) {
+    const mitt = iFig(o, new THREE.Vector3(BORD.x, SILL + BORD.y + 62, BORD.z));
+    const S0 = shoulder(o, A);
+    const n = o.F.a + o.F.b;
+    const dir = mitt.clone().sub(S0);
+    const len = dir.length();
+    dir.normalize();
+    const p = S0.clone().addScaledVector(dir, Math.min(len - 12, n * 0.95) + 3 * stot);
+    return A.thing
+      ? { p, y: new THREE.Vector3(0, 1, 0).addScaledVector(dir, 0.35), z: new THREE.Vector3(A.s * 0.8, 0, 0).addScaledVector(dir, -0.4), pole: new THREE.Vector3(A.s, -0.6, -0.4) }
+      : { p, y: dir.clone().add(new THREE.Vector3(0, 0.8, 0)), z: new THREE.Vector3(A.s * 0.85, 0.4, 0), pole: new THREE.Vector3(A.s, -0.6, -0.4) };
+  }
 
   const AKTER = {
     // sträcker på sig: armarna upp och ut, huvudet bakåt (en gäspning)
@@ -3453,35 +3487,15 @@ export async function figurer(canvas, opt = {}) {
     // gungar i takt med ölen i luften (DT med handen)
     gung: {
       len: 7, in: 1, ut: 1,
-      hand: (o, A, t, l, x) => {
-        if (A !== (skalArm(o).thing ? skalArm(o) : fri(o))) return null;
-        const w = Math.sin((t - x.t0) * TAKT);
-        const h = upp(o, A, 0.3, 0.5, 0.38);
-        h.p.x += 6 * w;
-        h.p.y += 2 * Math.abs(w);
-        h.y.x += 0.2 * w;
-        return h;
-      },
-      kropp: (o, t, l, x) => {
-        const w = Math.sin((t - x.t0) * TAKT);
-        return { side: 0.09 * w, roll: 0.06 * w, pitch: -0.08 + 0.05 * Math.sin((t - x.t0) * TAKT * 2), lean: -0.05 };
-      },
+      hand: (o, A, t, l, x) => (A === sangArm(o) ? gungHand(o, A, t, x) : null),
+      kropp: (o, t, l, x) => gungKropp(t, x),
     },
     // skålar över bordet och tar en klunk (DT ett bloss)
     skal: {
       len: 7.5, in: 0.9, ut: 1.1,
       hand: (o, A, t, l) => {
         if (A !== skalArm(o)) return null;
-        const mitt = iFig(o, new THREE.Vector3(BORD.x, SILL + BORD.y + 62, BORD.z));
-        const S0 = shoulder(o, A);
-        const n = o.F.a + o.F.b;
-        const dir = mitt.clone().sub(S0);
-        const len = dir.length();
-        dir.normalize();
-        const p = S0.clone().addScaledVector(dir, Math.min(len - 12, n * 0.95) + 3 * bump(l, 1.5, 1.7, 1.9, 2.3));
-        const ut = A.thing
-          ? { p, y: new THREE.Vector3(0, 1, 0).addScaledVector(dir, 0.35), z: new THREE.Vector3(A.s * 0.8, 0, 0).addScaledVector(dir, -0.4), pole: new THREE.Vector3(A.s, -0.6, -0.4) }
-          : { p, y: dir.clone().add(new THREE.Vector3(0, 0.8, 0)), z: new THREE.Vector3(A.s * 0.85, 0.4, 0), pole: new THREE.Vector3(A.s, -0.6, -0.4) };
+        const ut = motMitten(o, A, bump(l, 1.5, 1.7, 1.9, 2.3));
         const dw = bump(l, 3.0, 3.8, 5.0, 5.8);
         return dw > 0 ? lerpPose(ut, A.thing ? supAt(o, A, t, dw) : blossAt(o, A), dw) : ut;
       },
@@ -3491,9 +3505,6 @@ export async function figurer(canvas, opt = {}) {
       },
     },
   };
-  // allsången: alla gungar i samma takt
-  AKTER.allsang = { ...AKTER.gung, len: 8.5 };
-
   // ---------- gänget tillsammans: skämtet, grälet och tv:n ----------
   // Rollerna i ett gemensamt påhitt (x: { n, t0 }, samma för alla tre): a
   // börjar (berättar skämtet, grälar, pekar på tv:n), b svarar och c tittar
@@ -3658,6 +3669,229 @@ export async function figurer(canvas, opt = {}) {
       if (i === R.b) return { se: huvudPa(R.a), pitch: 0.12 * (bump(l, 5.4, 5.6, 5.8, 6.1) + bump(l, 6.1, 6.3, 6.5, 6.8)) };
       return { se: huvudPa(R.a), lift: 2.5 * bump(l, 5.3, 5.6, 6.3, 6.8), roll: 0.08 * bump(l, 5.3, 5.6, 6.3, 6.8) };
     },
+  };
+
+  // ---------- allsången ----------
+  // När det går bra (GRUPP, glad) sjunger gänget tillsammans, på ett av fem sätt
+  // (sangVal): gungar i takt med ölen i luften och håller ut den sista tonen
+  // (allsang); en börjar och de andra faller in, och det slutar med en skål
+  // (allsangFor); trummar i bordet allt fortare tills alla vrålar med armarna i
+  // luften (allsangTrumma); vågen runt bordet och sedan armarna i luften som vajar
+  // (allsangArmar); och – bara när matcherna pågår – vända mot tv:n och pekar på
+  // den i takt (allsangTv). De sjunger med munnen öppen och ögonen hopknipna
+  // (skratt): en fras per gungning, med ett andetag emellan.
+  const SANGER = ['allsang', 'allsangFor', 'allsangTrumma', 'allsangArmar'];
+  // (försångaren behöver alla tre: de andra tittar på hen innan de faller in)
+  const allaUppe = (t) => figs.every((o) => ready(o, t) > 0.99 && sovW(o, t) < 0.01 && slumW(o, t) < 0.01);
+  function sangVal(n, t0) {
+    const val = tvW(t0) > 0.5 ? [...SANGER, 'allsangTv', 'allsangTv'] : SANGER;
+    const v = val[Math.floor(hash(n * 6.37 + 1.1) * val.length)];
+    return v !== 'allsangFor' || allaUppe(t0) ? v : 'allsang';
+  }
+  // munnen (1 öppen) mellan a och b, med ett andetag i slutet av varje gungning
+  const sjunger = (l, a, b) => (l >= a && l < b && l % SLAG > 0.08 && l % SLAG < SLAG - 0.3 ? 1 : 0);
+  // båda armarna rakt upp (huvudena är stora: snett utåt), och skakar (skak 0–1)
+  function armarUpp(o, A, l, skak = 0) {
+    const h = upp(o, A, 0.42, 0.62, 0.1);
+    h.p.y += 2.2 * Math.sin(l * 15) * skak;
+    return h;
+  }
+
+  // Gungar: alla gungar i takt med ölen i luften och tittar på varandra, och
+  // den sista tonen hålls ut med ölen högre upp och huvudet bakåt.
+  const GUNG = { ton: 6.6, slut: 8.6 };
+  const gungTon = (l) => bump(l, GUNG.ton, GUNG.ton + 0.5, GUNG.slut - 0.4, GUNG.slut + 0.3);
+  AKTER.allsang = {
+    len: 9.5, in: 1, ut: 1.1,
+    hand: (o, A, t, l, x) => (A === sangArm(o) ? lerpPose(gungHand(o, A, t, x), upp(o, A, 0.34, 0.68, 0.22), gungTon(l)) : null),
+    kropp: (o, t, l, x) => {
+      const k = gungTon(l);
+      const g = gungKropp(t, x);
+      // (blicken på grannarna, en i taget, två gungningar var)
+      const i = FI(o);
+      const vem = (i + 1 + (Math.floor(l / (2 * SLAG)) % 2)) % 3;
+      return { side: g.side * (1 - k), roll: g.roll * (1 - k), pitch: g.pitch * (1 - k) - 0.28 * k, lean: g.lean - 0.05 * k, breath: 0.05 * k, se: huvudPa(vem), seW: 0.55 * (1 - k) };
+    },
+    skratt: (o, t, l) => Math.max(sjunger(l, 0.7, GUNG.ton), l >= GUNG.ton && l < GUNG.slut ? 1 : 0),
+  };
+
+  // Försångaren: a lutar sig in och börjar sjunga, slår takten med ölen och
+  // tittar på de andra, en i taget; b och c tittar på hen och faller in, och
+  // när alla gungar i takt en stund möts ölen över bordet – skål, och en klunk
+  // (DT ett bloss). (roller)
+  const FOR = { b: 2.1, c: 3.5, skal: 8.2, klirr: 9.0, klunk: 9.6, slut: 11.6 };
+  const forIn = (R, i) => (i === R.a ? 0 : i === R.b ? FOR.b : FOR.c);
+  // a slår takten: ölen (DT handen) upp och ner två gånger per gungning
+  function dirigent(o, A, t, x) {
+    return upp(o, A, 0.24, 0.36 + 0.06 * Math.cos((t - x.t0) * TAKT * 2), 0.5);
+  }
+  AKTER.allsangFor = {
+    len: 12.4, in: 0.7, ut: 0.9,
+    hand: (o, A, t, l, x) => {
+      const R = roller(x);
+      const i = FI(o);
+      const ska = skalArm(o);
+      const vila = handRest(o, A, t);
+      let p = null;
+      if (A === sangArm(o)) {
+        const ino = forIn(R, i);
+        const k = sm(ino, ino + 0.7, l) * (A === ska ? 1 : 1 - sm(FOR.skal - 0.2, FOR.skal + 0.5, l));
+        if (k > 0) {
+          const g = gungHand(o, A, t, x);
+          p = lerpPose(vila, i === R.a ? lerpPose(dirigent(o, A, t, x), g, sm(FOR.c, FOR.c + 0.8, l)) : g, k);
+        }
+      }
+      if (A === ska) {
+        const k = sm(FOR.skal, FOR.skal + 0.7, l);
+        if (k > 0) {
+          const ut = motMitten(o, A, bump(l, FOR.klirr, FOR.klirr + 0.15, FOR.klirr + 0.25, FOR.klirr + 0.5));
+          const dw = bump(l, FOR.klunk, FOR.klunk + 0.6, FOR.slut - 0.6, FOR.slut);
+          p = lerpPose(p || vila, dw > 0 ? lerpPose(ut, A.thing ? supAt(o, A, t, dw) : blossAt(o, A), dw) : ut, k);
+        }
+      }
+      return p;
+    },
+    kropp: (o, t, l, x) => {
+      const R = roller(x);
+      const i = FI(o);
+      const ino = forIn(R, i);
+      const k = sm(ino, ino + 0.7, l) * (1 - sm(FOR.skal - 0.2, FOR.skal + 0.5, l));
+      const g = gungKropp(t, x);
+      const leder = i === R.a ? 1 - sm(FOR.c, FOR.c + 0.8, l) : 0;
+      const fram = bump(l, FOR.skal, FOR.skal + 0.8, FOR.klirr + 0.4, FOR.klunk + 0.4);
+      const dw = bump(l, FOR.klunk, FOR.klunk + 0.6, FOR.slut - 0.6, FOR.slut);
+      const kropp = {
+        side: g.side * k,
+        roll: g.roll * k,
+        pitch: g.pitch * k * (1 - leder) + 0.06 * Math.cos((t - x.t0) * TAKT * 2) * leder + (skalArm(o).thing ? -0.38 : 0.06) * dw,
+        lean: g.lean * k * (1 - leder) + 0.13 * leder + 0.14 * fram,
+        mitt: leder > 0.5,
+      };
+      // blicken: på de andra (a) eller på a (b och c) tills alla är med
+      if (i === R.a) return { ...kropp, se: huvudPa(l < FOR.b + 0.4 ? R.b : R.c), seW: bump(l, 0.3, 0.8, FOR.c + 0.6, FOR.c + 1.3) };
+      return { ...kropp, se: huvudPa(R.a), seW: bump(l, 0.3, 0.9, ino + 0.6, ino + 1.4) };
+    },
+    skratt: (o, t, l, x) => {
+      const R = roller(x);
+      const ino = forIn(R, FI(o));
+      // (och ett "skål!" när det klirrar)
+      return Math.max(sjunger(l, ino + 0.3, FOR.skal), bump(l, FOR.klirr - 0.35, FOR.klirr - 0.3, FOR.klirr + 0.3, FOR.klirr + 0.35));
+    },
+  };
+
+  // Trumman: den lediga handen slår i bordet i takt, allt fortare, med huvudet
+  // som nickar med slagen och benen som sparkar – och sedan åker båda armarna upp
+  // och alla vrålar och studsar på stolen.
+  const TRUMMA = { start: 1.2, a: 2.8, b: 6.6, f0: 1 / 0.85, f1: 4.4, slut: 7.2, upp: 7.6, ner: 9.4 };
+  // slagen: ett i varje heltal (slaget i bordet), med takten som ökar från f0 till f1 mellan a och b
+  function trumFas(l) {
+    const T = TRUMMA;
+    if (l < T.a) return (l - T.start) * T.f0;
+    const u = Math.min(l, T.b) - T.a;
+    return (T.a - T.start) * T.f0 + T.f0 * u + (T.f1 - T.f0) * u * u / (2 * (T.b - T.a)) + Math.max(0, l - T.b) * T.f1;
+  }
+  const trumUpp = (l) => sm(TRUMMA.slut, TRUMMA.upp, l);
+  AKTER.allsangTrumma = {
+    len: 11, in: 0.8, ut: 1.6,
+    hand: (o, A, t, l) => {
+      const T = TRUMMA;
+      const vila = handRest(o, A, t);
+      const fi = trumFas(l);
+      const slagW = Math.abs(Math.sin(Math.PI * fi));
+      const kt = sm(T.start - 0.9, T.start - 0.4, l);
+      let p = vila;
+      if (A === fri(o)) p = lerpPose(vila, paBordet(o, A, 18, 12, (22 - 12 * sm(T.a, T.b, l)) * slagW ** 0.8), kt);
+      else if (A.thing) {
+        // ölen i den andra handen, uppe och studsar med slagen
+        const h = upp(o, A, 0.3, 0.42, 0.4);
+        h.p.y += 3 * slagW;
+        p = lerpPose(vila, h, kt);
+      }
+      return lerpPose(p, armarUpp(o, A, l, bump(l, T.upp, T.upp + 0.2, T.ner - 0.5, T.ner)), trumUpp(l));
+    },
+    kropp: (o, t, l) => {
+      const T = TRUMMA;
+      const kd = bump(l, T.start - 0.9, T.start - 0.4, T.slut, T.upp);
+      const kv = trumUpp(l);
+      const fi = trumFas(l);
+      const slag = (1 - Math.abs(Math.sin(Math.PI * fi))) ** 4;
+      const studs = Math.abs(Math.sin(l * 7)) * bump(l, T.upp, T.upp + 0.3, T.ner, T.ner + 0.6);
+      return {
+        lean: 0.08 * kd - 0.12 * kv,
+        pitch: (0.06 + 0.12 * slag) * kd - 0.3 * kv,
+        lift: 4 * studs,
+        breath: 0.05 * kv,
+        knee: [0, 1].map((j) => (0.22 * Math.sin(Math.PI * fi + j * 1.6) * kd) + 0.3 * studs),
+      };
+    },
+    // ett "hej!" vid varje slag, i ett enda vrål när det går fort och armarna är uppe
+    skratt: (o, t, l) => {
+      const T = TRUMMA;
+      if (l >= T.b - 1 && l < T.ner) return 1;
+      if (l < T.start - 0.1 || l >= T.ner) return 0;
+      return ((trumFas(l) % 1) + 1) % 1 < 0.4 ? 1 : 0;
+    },
+  };
+
+  // Armarna: vågen går två varv runt bordet – var och en upp med båda armarna,
+  // från vänster till höger – och sedan är alla armarna uppe och vajar i takt
+  // medan de sjunger, tills den sista tonen hålls ut med armarna som skakar.
+  const ARMAR = { vag: [0.5, 2.1], steg: 0.45, upp: 3.9, ton: 8.6, slut: 9.9 };
+  function vagW(o, l) {
+    const k = PLATSER.indexOf(o.F.plats);
+    let w = 0;
+    for (const v of ARMAR.vag) {
+      const s = v + ARMAR.steg * k;
+      w = Math.max(w, bump(l, s, s + 0.25, s + 0.55, s + 0.9));
+    }
+    return w;
+  }
+  AKTER.allsangArmar = {
+    len: 11.4, in: 0.6, ut: 1.4,
+    hand: (o, A, t, l, x) => {
+      const w = Math.sin((t - x.t0) * TAKT) * (1 - sm(ARMAR.ton - 0.3, ARMAR.ton + 0.2, l));
+      const h = armarUpp(o, A, l, bump(l, ARMAR.ton, ARMAR.ton + 0.2, ARMAR.slut - 0.3, ARMAR.slut));
+      // (åt samma håll med båda händerna)
+      h.p.x += 9 * w;
+      h.y.x += 0.25 * w;
+      return lerpPose(handRest(o, A, t), h, Math.max(vagW(o, l), sm(ARMAR.upp, ARMAR.upp + 0.8, l)));
+    },
+    kropp: (o, t, l, x) => {
+      const v = vagW(o, l);
+      const k = sm(ARMAR.upp, ARMAR.upp + 0.8, l);
+      const ton = bump(l, ARMAR.ton, ARMAR.ton + 0.4, ARMAR.slut - 0.3, ARMAR.slut + 0.4);
+      const w = Math.sin((t - x.t0) * TAKT) * k * (1 - ton);
+      return { lift: 5 * v, side: 0.1 * w, roll: 0.07 * w, pitch: -0.14 * v - 0.08 * k - 0.2 * ton, lean: -0.05 * Math.max(v, k), breath: 0.05 * ton };
+    },
+    skratt: (o, t, l) => Math.max(vagW(o, l) > 0.5 ? 1 : 0, sjunger(l, ARMAR.upp + 0.4, ARMAR.ton), l >= ARMAR.ton && l < ARMAR.slut ? 1 : 0),
+  };
+
+  // Mot tv:n (bara när matcherna pågår): alla vänder sig mot tv:n och sjunger
+  // åt planen, framåtlutade med ölen uppe, och den lediga handen pekar på rutan i
+  // varje slag – och till sist båda armarna upp mot tv:n.
+  const TVS = { in: 0.6, slut: 8.0, upp: 8.4, ner: 9.4 };
+  AKTER.allsangTv = {
+    len: 10.6, in: 0.8, ut: 1.2,
+    hand: (o, A, t, l, x) => {
+      const slag = Math.max(0, Math.cos((t - x.t0) * TAKT * 2)) ** 3;
+      const vila = handRest(o, A, t);
+      const k = sm(TVS.in, TVS.in + 0.6, l);
+      let p = vila;
+      if (A === fri(o)) p = lerpPose(vila, pekaPa(o, A, TV, 0.62 + 0.26 * slag, 3 * slag), k);
+      else if (A.thing) {
+        const h = upp(o, A, 0.3, 0.52, 0.34);
+        h.p.y += 3 * slag;
+        p = lerpPose(vila, h, k);
+      }
+      return lerpPose(p, armarUpp(o, A, l, bump(l, TVS.upp, TVS.upp + 0.2, TVS.ner - 0.3, TVS.ner)), sm(TVS.slut, TVS.upp, l));
+    },
+    kropp: (o, t, l, x) => {
+      const slag = Math.max(0, Math.cos((t - x.t0) * TAKT * 2)) ** 3;
+      const k = bump(l, TVS.in, TVS.in + 0.6, TVS.slut, TVS.upp);
+      const upp = sm(TVS.slut, TVS.upp, l);
+      return { lean: 0.1 * k - 0.08 * upp, pitch: 0.06 * slag * k - 0.2 * upp, lift: 3 * Math.abs(Math.sin(l * 7)) * bump(l, TVS.upp, TVS.upp + 0.3, TVS.ner, TVS.ner + 0.5), se: TV };
+    },
+    skratt: (o, t, l) => Math.max(sjunger(l, TVS.in + 0.2, TVS.slut), l >= TVS.slut && l < TVS.ner ? 1 : 0),
   };
 
   // ---------- korstecknet ----------

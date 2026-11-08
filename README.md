@@ -666,6 +666,14 @@ bara lokalt. Analyserna visas som de ligger i `data/analyser.json`; hur de skriv
   pekfingret mot himlen, tre gånger, med fel axel först, med tummen som i Sydamerika och med
   flaskan eller cigaretten i handen. Någon gång smittar det, och de andra hänger på. Inte på
   klick. Se [Tobaksaffären](#tobaksaffären), *Korstecknet*.
+- **Allsången på fem sätt, och gänget sjunger för full hals (2026-11-08, användarens önskemål):**
+  "Kan du göra olika sekvenser när vi t ex sjunger alla tillsammans … Och vi är engagerade."
+  Förut gungade alla likadant med ölen i luften. Nu blir det ett av fem sätt: gungar och håller
+  ut den sista tonen, en börjar och de andra faller in och det slutar med en skål, trummar i
+  bordet allt fortare tills alla vrålar med armarna i luften, vågen runt bordet och sedan
+  armarna i luften som vajar, och – när matcherna pågår – mot tv:n och pekar på den i takt.
+  De sjunger med munnen öppen och ögonen hopknipna. Se [Tobaksaffären](#tobaksaffären),
+  *Gänget gör saker tillsammans*.
 - **Man väljer sig själv med ett klick på sin figur (2026-11-03, användarens önskemål):**
   ett klick på sin egen figur vid bordet gör en till den som fyller i kupongen – samma val
   som porträtten på kupongen – och figuren räcker upp handen med pennan, lyfter kupongen mot
@@ -2729,7 +2737,27 @@ kupongen är död. Vem som börjar, vem som svarar och hur var och en skrattar r
   kors och tittar bort, och den tredje skrattar eller skakar på huvudet.
 - **Tv:n** (som vanligt och nervös): en pekar upp på tv:n, de andra vänder sig dit en efter en
   och tittar en stund; sedan nickar den ena och den andra rycker på axlarna.
-- **Skålen** (som vanligt och glad) och **allsången** (glad) som förut.
+- **Skålen** (som vanligt och glad) som förut.
+- **Allsången** (glad, 2026-11-08, `SANGER`, `sangVal` och `AKTER.allsang…` i rum-3d.js): de
+  sjunger för full hals med munnen öppen och ögonen hopknipna (skrattbilderna), en fras per
+  gungning med ett andetag emellan, på ett av fem sätt som lottas ur luckan:
+  - *Gungar* (`allsang`): alla gungar i takt med ölen i luften (DT med handen) och tittar på
+    varandra, och den sista tonen hålls ut med ölen högre upp och huvudet bakåt.
+  - *Försångaren* (`allsangFor`, bara när alla tre är vakna och har lämnat in): en lutar sig in,
+    börjar sjunga och slår takten med ölen medan hen tittar på de andra; de tittar på hen och
+    faller in en i taget. När alla har gungat en stund möts ölen över bordet – skål! – och de
+    tar en klunk (DT ett bloss).
+  - *Trumman* (`allsangTrumma`): den lediga handen slår i bordet i takt, allt fortare, med
+    huvudet som nickar och benen som sparkar och ett "hej!" vid varje slag; sedan åker båda
+    armarna upp, alla vrålar och studsar på stolen.
+  - *Armarna* (`allsangArmar`): vågen går två varv runt bordet från vänster, och sedan har alla
+    armarna i luften och vajar i takt tills den sista tonen hålls ut med armarna som skakar.
+  - *Mot tv:n* (`allsangTv`, bara när matcherna pågår, och då oftare än de andra): alla vänder
+    sig mot tv:n och sjunger åt planen, framåtlutade med ölen uppe och den lediga handen som
+    pekar på rutan i varje slag – och till sist båda armarna upp.
+
+  Prova med `?rum-akt=dl:allsangTrumma,dt:allsangTrumma,dj:allsangTrumma` (alla tre, som de
+  andra påhitten som gänget gör tillsammans).
 
 Skämtet, grälet och tv:n kommer bara när alla tre har lämnat in och är vakna och matcherna
 inte pågår, och inte medan någon är borta (nedan). Ingen gör något eget påhitt samtidigt.
@@ -3063,7 +3091,7 @@ väljer sättet: `a` som förut, `b` båda armarna eller händerna på huvudet, 
 bordet), `?rum-humor=glad` (`nerv`, `deppig`) humöret, `?rum-rank=dl:1,dj:-1` vem som
 leder och ligger sist i omgången, `?rum-akt=dl:kors,dj:dunk` ett påhitt om och om igen
 (mitt i det med `?rum-t`, `dl:skamt@6` sex sekunder in; namnen står i `AKTER` i rum-3d.js, och
-gängets påhitt `skamt`, `gral` och `titta` ges alla tre), `?rum-ga=dl` att DL går iväg och
+gängets påhitt `skamt`, `gral`, `titta` och allsångerna ges alla tre), `?rum-ga=dl` att DL går iväg och
 kommer tillbaka (var fyrtionde sekund; `dl:5` fem sekunder in med `?rum-t`),
 `?rum-pekar=dt:tv,dl:dj` som om de pekade (på en sak eller någon i gänget),
 `?rum-ansikte=jublar` (`glad`, `nojd`, `sur`, `deppig`, `orolig`) ansiktena (med `?rum-humor=`
