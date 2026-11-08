@@ -227,7 +227,7 @@
     // Över listan med gänget: första gången, när man har hört om några och när man har hört om alla.
     fraga: ['Jag har rättat omgången. Vem ska jag börja med?', 'Protokollet är klart. Vem vill du höra om först?', 'Jag har gått igenom gängets kuponger. Vem tar vi först?'],
     igen: ['Vem vill du höra om nu?', 'Vem i gänget ska jag ta nu?'],
-    alla: ['Nu har du hört om hela gänget.', 'Där har du hela gänget. Mer än så finns inte att säga.'],
+    alla: ['Nu har du hört om hela gänget.', 'Det var hela gänget. Mer än så finns det inte att säga.'],
     // Över matcherna, med det han sa och hur de slutade.
     matcherna: ['Här är matcherna och hur de slutade.'],
     // Inledningen, efter hur det gick i gänget (forsakring har forst).
@@ -235,8 +235,8 @@
       forst: ['{namn} var bäst i gänget, och det kommer vi att få höra.', '{namn} slog resten av gänget den här gången.'],
       alla: ['{namn} hade alla rätt.', '{namn} hade varenda match rätt.'],
       mitten: ['{namn} hamnade mitt i gänget, och ingen märkte det.', '{namn} kom varken först eller sist, och det är också en konst.'],
-      sist: ['{namn} kom sist i gänget.', '{namn} kom sist i gänget den här gången.'],
-      sistLika: ['{namn} hade lika många rätt som en annan i gänget och kom ändå sist.'],
+      sist: ['{namn} kom sist i gänget.', '{namn} var sämst i gänget.'],
+      sistLika: ['{namn} hade lika många rätt som någon annan i gänget och kom ändå sist.'],
       inget: ['{namn} lämnade inte in någon kupong.'],
     },
     // Sakerna ur kupongen. Helgarderingarna sätts bara när alla satt.
@@ -244,7 +244,7 @@
       en: ['Det fanns en helgardering på kupongen, och den satt.'],
       fler: ['Det fanns {antal} helgarderingar på kupongen, och alla satt.'],
     },
-    forsakring: ['Där ingen annan i gänget hade rätt var det helgarderat.'],
+    forsakring: ['Där de andra hade fel var det helgarderat.'],
     spik: {
       ingen: ['Det fanns inte en enda spik på kupongen.'],
       enda: ['Den enda spiken satt.'],
@@ -255,23 +255,23 @@
       fler: ['{Antal} av spikarna satt.'],
     },
     ensam: {
-      ingen: ['Allt som satt hade någon annan i gänget också.'],
-      en: ['I en match var det ingen annan i gänget som hade rätt.'],
-      fler: ['I {antal} matcher var det ingen annan i gänget som hade rätt.'],
+      ingen: ['Allt som satt hade någon av de andra också.'],
+      en: ['I en match hade ingen av de andra rätt.'],
+      fler: ['I {antal} matcher hade ingen av de andra rätt.'],
     },
     // Slutet.
     ut: {
-      forsakring: ['Det är försäkring, inte kunskap.'],
-      forst: ['Jag kallar det flyt, men det får man inte säga högt.', 'Det kommer att låta om det vid pulten hela veckan.'],
-      alla: ['Det var precis vad jag hade sagt.', 'Jag hade sagt samma sak.'],
-      mitten: ['Det är ingen skam, men det är ingen ära heller.', 'Mitt i gänget syns man inte, och det är kanske lika bra.'],
-      sist: ['Det krävs en viss talang.', 'Någon måste komma sist, och den här gången ställde {namn} upp.'],
+      forsakring: ['Det kallas gardering, inte kunskap.'],
+      forst: ['Jag kallar det hela flyt, men det får man inte säga högt.', 'Det kommer att låta om segern vid pulten hela veckan.'],
+      alla: ['Den kupongen hade jag kunnat fylla i själv.', 'Jag hade tippat likadant.'],
+      mitten: ['En mittenplats är ingen skam, men ingen ära heller.', 'I mitten syns man inte, och det är nog lika bra.'],
+      sist: ['Det krävs en viss talang för att komma sist.', 'Någon måste komma sist, och den här gången ställde {namn} upp.'],
       sistLika: ['Man måste ha rätt i rätt matcher, inte bara i många.'],
       inget: ['Den som inte tippar kan inte ha fel.'],
     },
   },
   // Ordet han slår i disken när han dömer någon i gänget, som domen över en match. Sägs inte.
-  domord: { forsakring: 'Försäkring', forst: 'Flyt', alla: 'Felfritt', mitten: 'Osynlig', sist: 'Talang', sistLika: 'Ändå sist', inget: 'Klokt' },
+  domord: { forsakring: 'Garderat', forst: 'Flyt', alla: 'Felfritt', mitten: 'Osynlig', sist: 'Talang', sistLika: 'Snöpligt', inget: 'Klokt' },
 
   // Om man bara står där och inte frågar.
   ledig: [

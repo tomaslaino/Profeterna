@@ -5177,7 +5177,7 @@ tills nästa Stryktips kommer måndagen efter kl. 16 (`Rum.summa`), dömer han g
 Han frågar vem han ska börja med, och listan har var och en i gänget med porträttet i sin färg, namnet i sin handstil och
 rätt och poäng som i protokollet, bäst först och med ringen kring den bästas poäng (`gangLista` i
 [public/rum-hasse.js](public/rum-hasse.js)). Den man väljer får sin dom slagen i disken i guld, som domen över en match
-(*Försäkring*, *Flyt*, *Felfritt*, *Osynlig*, *Talang*, *Ändå sist*, *Klokt*), och under den några meningar: en inledning
+(*Garderat*, *Flyt*, *Felfritt*, *Osynlig*, *Talang*, *Snöpligt*, *Klokt*), och under den några meningar: en inledning
 efter hur det gick i gänget, en eller två saker ur kupongen och ett slut (`doma`). Sakerna är räknade ur protokollet:
 helgarderingarna, hur många spikar som satt och i hur många matcher ingen annan i gänget hade rätt (läget i `gang` i
 [public/rum-block.js](public/rum-block.js), raderna i `domar` i rum-hasse-repliker.js). Raderna väljs efter omgången och

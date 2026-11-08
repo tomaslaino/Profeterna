@@ -39,6 +39,9 @@ const UNDERKANT = [
   [/\bgick du bet på\b/i, 'Vilken match har du kört fast på?'],
   [/\bDet ska gå till så här\b/i, 'Man ska inte stressa fram ett tips.'],
   [/\b(live|online|playoff|spoiler)\b/i, 'pågår, på nätet, kval, dölj resultat'],
+  [/\bförsäkring\b/i, 'gardering: på en kupong garderar man sig'],
+  [/\bDär har du hela\b/i, 'Det var hela gänget.'],
+  [/\bfinns inte att säga\b/i, 'Mer än så finns det inte att säga.'],
 ];
 
 // Korta meningar som Tomas själv har valt eller som har ett verb.
