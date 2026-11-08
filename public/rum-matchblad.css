@@ -3,7 +3,16 @@
    baren hos Hasse Backe. Färgerna är matchbladets (matchblad.css): hemmalaget
    blått, oavgjort grått och bortalaget terrakotta, formens stämplade rutor i
    grönt, grått och rött, och tryck i terrakotta. Flikarna är tryckta ord på
-   en linje, den valda med terrakotta under, som i matchbladet. */
+   en linje, den valda med terrakotta under, som i matchbladet.
+
+   Alla sidor är byggda av samma delar, så att man känner igen sig när man bläddrar:
+   - samma luft under flikarna, och delarna (.rl-del) skilda åt av samma hårlinje;
+   - en del börjar med rubriken (.rl-rub) till vänster och det den säger till höger;
+   - hemmalaget är blått och står till vänster, bortalaget är terrakotta och står till
+     höger, och pricken (.rl-prick) visar vilket som är vilket;
+   - 1 X 2 är kupongens tre rutor (.rb-ruta) med chansen i stapeln under, och en
+     ställning står i formens stämplade ruta (.rl-m b, .rb-mote b);
+   - sidan delas i tredjedelar (1 X 2) eller halvor (hemma och borta, .rl-halvor). */
 
 .rum-blad {
   --pp-paper: #f1e8d5;
@@ -40,6 +49,8 @@
   --down: var(--pp-no);
   --gold: var(--pp-print);
   --gold-hi: var(--pp-print);
+  --glass: none;
+  --eyebrow: var(--pp-print);
   position: absolute;
   z-index: 4;
   left: 0;
@@ -72,63 +83,62 @@
 .rl-t.a { justify-content: flex-end; }
 .rl-t b { min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; font: 650 20px/1.1 var(--display); letter-spacing: -0.01em; }
 .rl-t .skold { width: 26px; height: 26px; }
-.rl-nar { font-size: 11px; color: var(--pp-faint); white-space: nowrap; }
+.rl-nar { display: grid; justify-items: center; white-space: nowrap; }
+.rl-nar b { font: 700 19px/1.05 var(--display); font-variant-numeric: tabular-nums; }
+.rl-nar small { font-size: 11px; color: var(--pp-faint); }
 
 /* flikarna: bladets sidor, tryckta ord på en linje och den valda med terrakotta under */
-.rb-flikar { flex: none; display: flex; gap: 20px; height: 26px; border-bottom: 1.5px solid var(--pp-print); }
+.rb-flikar { flex: none; display: flex; justify-content: space-between; height: 26px; border-bottom: 1.5px solid var(--pp-print); }
 .rb-flikar button { position: relative; flex: none; margin: 0; padding: 0; border: 0; background: none; color: var(--pp-faint); font: 700 10px/26px Fraunces, Georgia, serif; letter-spacing: 0.15em; text-transform: uppercase; white-space: nowrap; cursor: pointer; -webkit-tap-highlight-color: transparent; transition: color 0.12s; }
 .rb-flikar button:hover, .rb-flikar button[aria-selected="true"] { color: var(--pp-ink); }
 .rb-flikar button[aria-selected="true"]::after { content: ""; position: absolute; left: 0; right: 0.15em; bottom: -1.5px; height: 3px; background: var(--pp-print); }
 .rb-flikar button:focus-visible { outline: 2px solid #2146a6; outline-offset: 1px; }
 
 /* sidan: det som inte ryms flyttas med hjulet eller fingret, inom bladet */
-.rb-sida { flex: 1 1 auto; min-height: 0; display: flex; flex-direction: column; overflow-y: auto; overscroll-behavior: contain; touch-action: pan-y; outline: none; scrollbar-width: thin; scrollbar-color: rgba(169, 69, 43, 0.4) transparent; }
-.rb-sida > :last-child:not(.rb-tom, .rl-vant, .rb-dolt, .rl-form) { margin-bottom: 8px; }
+.rb-sida { flex: 1 1 auto; min-height: 0; display: flex; flex-direction: column; margin: 0 -3px; padding: 9px 3px 0; overflow: hidden auto; overscroll-behavior: contain; touch-action: pan-y; outline: none; scrollbar-width: thin; scrollbar-color: rgba(169, 69, 43, 0.4) transparent; }
+.rb-sida > :last-child:not(.rb-tom, .rl-vant, .rb-dolt) { margin-bottom: 8px; }
 .rb-tom { margin: auto 0; padding: 0 30px; font-size: 12.5px; line-height: 1.5; color: var(--pp-faint); text-align: center; text-wrap: balance; }
+.rb-inga { margin: 0; padding: 8px 0; font-size: 12px; color: var(--pp-faint); text-align: center; }
 
-/* rubrikerna i små spärrade versaler, som kupongens överst */
-.rl-rub { display: block; font-size: 10px; font-weight: 700; letter-spacing: 0.16em; text-transform: uppercase; color: var(--pp-print); }
+/* delarna: samma luft och samma hårlinje på alla sidor */
+.rl-del { flex: none; }
+.rl-del + .rl-del { margin-top: 7px; padding-top: 6px; border-top: 1px solid var(--pp-line); }
+/* rubriken i små spärrade versaler, som kupongens överst, och det den säger till höger */
+.rl-rubrad { display: flex; align-items: baseline; justify-content: space-between; gap: 12px; margin-bottom: 3px; }
+.rl-rub { display: block; flex: none; font-size: 10px; font-weight: 700; line-height: 13px; letter-spacing: 0.16em; text-transform: uppercase; color: var(--pp-print); }
+.rl-hoger { min-width: 0; overflow: hidden; font-size: 11px; line-height: 13px; color: var(--pp-ink-soft); text-overflow: ellipsis; white-space: nowrap; font-variant-numeric: tabular-nums; }
+.rl-hoger b { font-weight: 650; color: var(--pp-ink); }
+.rl-hoger .rl-prick { margin-right: 5px; vertical-align: 0; }
+/* pricken: hemmalaget blått, bortalaget terrakotta */
+.rl-prick { flex: none; display: inline-block; width: 8px; height: 8px; border-radius: 50%; background: var(--o-home); }
+.rl-prick.a { background: var(--o-away); }
+/* halvorna: hemmalaget till vänster, bortalaget till höger */
+.rl-halvor { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 0 24px; }
+/* tal mot tal runt ett ord i mitten */
+.rl-spegel { display: grid; grid-template-columns: minmax(0, 1fr) 44px minmax(0, 1fr); align-items: baseline; }
+.rl-spegel .h { text-align: right; }
+.rl-spegel .mid { text-align: center; font-size: 10px; font-weight: 700; letter-spacing: 0.16em; text-transform: uppercase; color: var(--pp-faint); }
+.rl-spegel .h, .rl-spegel .a, .rl-tal { font: 600 17px/1.2 var(--display); font-variant-numeric: tabular-nums; }
+.rl-tal { display: block; }
+/* laget: pricken och namnet */
+.rl-namn { display: flex; align-items: center; gap: 6px; font: 600 13px/17px var(--display); }
+
+/* 1 X 2: kupongens tre rutor med oddset stort, chansen i stapeln under */
+.rb-rutor { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 12px; }
+.rb-ruta { display: flex; align-items: baseline; justify-content: center; gap: 8px; min-width: 0; padding: 3px 4px 2px; background: var(--pp-box); border: 1.5px solid var(--pp-print); border-radius: 3px; }
+.rb-ruta i { font: 700 12px/1 var(--display); font-style: normal; color: var(--pp-print); }
+.rb-ruta b { font: 700 23px/1.1 var(--display); color: var(--pp-ink); font-variant-numeric: tabular-nums; }
+.rum-blad .tug-stack { height: 13px; margin-top: 4px; border-radius: 2px; }
+.rum-blad .tug-stack span { overflow: hidden; font: 600 9px/13px var(--sans); color: #fff; text-align: center; font-variant-numeric: tabular-nums; }
 
 /* ---------- Lagen ---------- */
 
-/* oddsen: chansen i procent över stapeln, oddsen under */
-.rl-odds { flex: none; padding: 7px 0 4px; }
-.rl-chans { display: grid; grid-template-columns: 1fr 1fr 1fr; margin-bottom: 4px; font-variant-numeric: tabular-nums; }
-.rl-chans span { display: flex; align-items: baseline; gap: 6px; }
-.rl-chans .c1 { justify-content: center; }
-.rl-chans .c2 { justify-content: flex-end; }
-.rl-chans i { font: 600 11px/1 var(--display); font-style: normal; color: var(--pp-faint); }
-.rl-chans b { font: 650 19px/1 var(--display); }
-.rl-chans .c0 b { color: var(--o-home); }
-.rl-chans .c1 b { color: var(--o-draw); }
-.rl-chans .c2 b { color: var(--o-away); }
-.rum-blad .tug-stack { height: 10px; border-radius: 2px; }
-.rl-bolag { margin: 5px 0 0; font-size: 11px; color: var(--pp-ink-soft); text-align: center; }
-.rl-bolag b { font-weight: 600; color: var(--pp-ink); font-variant-numeric: tabular-nums; }
-.rl-odds.tom p { margin: 0; padding: 10px 0; font-size: 12px; color: var(--pp-faint); text-align: center; }
-
-/* ligan hittills: lagets siffror först, motståndarnas sedan, sida vid sida */
-.rl-ligan { flex: none; display: grid; grid-template-columns: minmax(0, 1fr) 84px minmax(0, 1fr); align-items: baseline; padding: 4px 0 2px; border-top: 1px solid var(--pp-line); }
-.rl-ligan .rl-rub { grid-column: 1 / -1; text-align: center; margin-bottom: 1px; }
-.rl-ligan > span:not(.rl-rub) { padding: 1px 0; }
-.rl-ligan .h { text-align: right; }
-.rl-ligan .mid { text-align: center; font-size: 10px; font-weight: 700; letter-spacing: 0.16em; text-transform: uppercase; color: var(--pp-faint); }
-.rl-ligan .h, .rl-ligan .a { font: 600 17px/1.2 var(--display); font-variant-numeric: tabular-nums; }
-.rl-ligan small { display: block; font: 400 10px/1.2 var(--sans); color: var(--pp-faint); }
-
 /* formen: tio kolumner, nyast till vänster, hemma uppe och borta nere */
-.rl-form { flex: 1 0 auto; padding: 5px 0 0; border-top: 1px solid var(--pp-line); }
-.rl-form > .rl-rub { margin-bottom: 1px; text-align: center; }
-.rl-lag + .rl-lag { margin-top: 3px; }
-.rl-namn { display: flex; align-items: center; gap: 6px; font: 600 13px/17px var(--display); }
-.rl-namn i { flex: none; width: 8px; height: 8px; border-radius: 50%; background: var(--o-home); }
-.rl-lag.a .rl-namn i { background: var(--o-away); }
-.rl-banor { display: grid; grid-template-columns: 50px repeat(10, minmax(0, 1fr)); grid-template-rows: 31px 31px; column-gap: 5px; align-items: start; }
+.rl-banor { display: grid; grid-template-columns: 50px repeat(10, minmax(0, 1fr)); grid-template-rows: 30px 30px; column-gap: 5px; align-items: start; }
 .rl-bana { grid-column: 1; align-self: start; height: 22px; font-size: 9px; line-height: 22px; font-weight: 700; letter-spacing: 0.14em; text-transform: uppercase; color: var(--pp-faint); }
-.rl-banor::before { content: ""; grid-column: 1 / -1; grid-row: 1; align-self: end; height: 0; border-bottom: 1px dashed var(--pp-line); margin-bottom: 1px; }
 .rl-m { display: flex; flex-direction: column; align-items: center; gap: 1px; min-width: 0; }
 /* formens stämplade rutor (matchblad.css): grön vinst, grå oavgjort, röd förlust */
-.rl-m b {
+.rl-m b, .rb-mote b {
   display: block;
   box-sizing: border-box;
   width: 100%;
@@ -142,39 +152,21 @@
   color: var(--pp-pencil);
   background: var(--pp-box);
 }
-.rl-m b.V { color: var(--pp-ok); background: color-mix(in srgb, var(--pp-ok) 13%, var(--pp-box)); }
-.rl-m b.F { color: var(--pp-no); background: color-mix(in srgb, var(--pp-no) 10%, var(--pp-box)); }
-.rl-m b.sp { color: var(--pp-faint); border-style: dashed; background: none; }
+.rl-m b.V, .rb-mote b.V { color: var(--pp-ok); background: color-mix(in srgb, var(--pp-ok) 13%, var(--pp-box)); }
+.rl-m b.F, .rb-mote b.F { color: var(--pp-no); background: color-mix(in srgb, var(--pp-no) 10%, var(--pp-box)); }
+.rl-m b.sp, .rb-mote b.sp { color: var(--pp-faint); border-style: dashed; background: none; }
 .rl-m small { font-size: 9.5px; line-height: 10px; color: var(--pp-pencil); white-space: nowrap; font-variant-numeric: tabular-nums; }
 .rl-inga { grid-column: 1 / -1; grid-row: 1; font-size: 12px; color: var(--pp-faint); }
 
 /* ---------- Prognos ---------- */
 
-.rb-sida[data-sida="prognos"] > .rl-rub { margin: 9px 0 0; }
-/* 1 X 2 i kupongens rutor, med oddset stort */
-.rb-rutor { flex: none; display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 12px; margin: 5px 0 0; }
-.rb-ruta { display: grid; gap: 3px; min-width: 0; text-align: center; }
-.rb-ruta small { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; font-size: 9px; font-weight: 800; letter-spacing: 0.16em; text-transform: uppercase; color: var(--pp-print); }
-.rb-ruta > span { display: flex; align-items: baseline; justify-content: center; gap: 8px; padding: 4px 4px 3px; background: var(--pp-box); border: 1.5px solid var(--pp-print); border-radius: 3px; }
-.rb-ruta i { font: 700 12px/1 var(--display); font-style: normal; color: var(--pp-print); }
-.rb-ruta b { font: 700 25px/1.1 var(--display); color: var(--pp-ink); font-variant-numeric: tabular-nums; }
-/* målen och de troligaste resultaten bredvid varandra */
-.rb-tva { flex: none; display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); gap: 28px; margin: 9px 0 0; padding: 7px 0 0; border-top: 1px solid var(--pp-line); }
-.rb-lista { display: flex; align-items: baseline; gap: 6px; margin: 7px 0 0; font-size: 12.5px; }
-.rb-lista i { flex: 1; border-bottom: 1px dotted var(--pp-dots); }
-.rb-lista b { font-weight: 650; font-variant-numeric: tabular-nums; }
-.rb-topp { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 6px; margin-top: 4px; }
-.rb-topp > span { display: grid; justify-items: center; padding: 2px 0 1px; background: var(--pp-box); border: 1.5px solid var(--pp-print-line); border-radius: 3px; }
-.rb-topp b { font: 700 15px/1.15 var(--display); font-variant-numeric: tabular-nums; }
-.rb-topp small { font-size: 9.5px; color: var(--pp-ink-soft); font-variant-numeric: tabular-nums; }
+/* de troligaste resultaten i formens rutor, med oddset under som xG i formen */
+.rb-topp { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 6px; }
 /* Vad drog åt vilket håll: en stapel per del av modellen, från mitten åt laget den hjälper */
-.rb-drar { flex: none; margin: 9px 0 0; padding: 7px 0 0; border-top: 1px solid var(--pp-line); }
-.rb-drar > .rl-rub { margin-bottom: 3px; }
-.rb-steg { display: grid; grid-template-columns: 222px minmax(0, 1fr); align-items: center; gap: 10px; min-height: 17px; font-size: 11.5px; }
+.rb-steg { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); align-items: center; gap: 24px; min-height: 17px; font-size: 11.5px; }
 .rb-steg > span:first-child { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; color: var(--pp-ink-soft); }
 .rb-steg.none > span:first-child { color: var(--pp-faint); }
-.rb-steg.start .tug-stack { display: flex; height: 13px; }
-.rb-steg.start .tug-stack span { overflow: hidden; font: 600 9px/13px var(--sans); color: #fff; text-align: center; font-variant-numeric: tabular-nums; }
+.rb-steg.start .tug-stack { margin-top: 0; }
 .rb-steg.axel { min-height: 14px; }
 .rb-sidor { display: flex; justify-content: space-between; font-size: 9.5px; color: var(--pp-faint); }
 .rb-sidor span { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
@@ -187,9 +179,7 @@
 
 /* ---------- Analys ---------- */
 
-.rb-art { flex: none; padding: 9px 4px 0 0; }
-.rb-skriven { margin: 0; font-size: 10.5px; color: var(--pp-faint); }
-.rb-art h3 { margin: 3px 0 5px; font: 700 19px/1.18 var(--display); letter-spacing: -0.01em; color: var(--pp-ink); text-wrap: balance; }
+.rb-art h3 { margin: 0 0 5px; font: 700 19px/1.18 var(--display); letter-spacing: -0.01em; color: var(--pp-ink); text-wrap: balance; }
 .rb-art p, .rb-tipset p { margin: 0 0 7px; font-size: 12.5px; line-height: 1.5; color: var(--pp-ink); }
 .rb-art p.rb-ingress { font-weight: 600; }
 .rb-art sup, .rb-tipset sup { margin-left: 1px; font-size: 8.5px; font-weight: 700; color: var(--pp-print); cursor: default; }
@@ -197,7 +187,6 @@
 .rb-kallor li::marker { font-weight: 700; color: var(--pp-print); }
 .rb-kallor span { color: var(--pp-faint); }
 /* tipset: kupongens rutor med tecknen inringade och raden i marginalen, som i matchbladet */
-.rb-tipset { flex: none; margin: 10px 0 0; padding: 8px 4px 0 0; border-top: 1.5px solid var(--pp-print-line); }
 .rb-tecken { display: flex; gap: 14px; margin: 18px 0 9px 6px; }
 .rb-tecknet { position: relative; display: grid; place-items: center; width: 40px; height: 26px; background: var(--pp-box); border: 1.5px solid var(--pp-print); border-radius: 3px; }
 .rb-tecknet b { font: 700 15px/1 var(--display); color: var(--pp-ink); }
@@ -207,50 +196,90 @@
 
 /* ---------- Startelvor (matchruta.js, tryckt som i matchbladet) ---------- */
 
-.rb-sida[data-sida="elvor"] { padding-top: 9px; font-size: 12.5px; }
 .rum-blad .mr-lu-head { margin-bottom: 8px; }
-.rum-blad .mr-pitch-wrap { max-width: 390px; margin: 0 auto; }
 .rum-blad .mr-stamp { font-size: 11px; white-space: nowrap; }
-.rum-blad .mr-pitch.empty .mr-stamp { padding: 5px 12px 4px; font-size: 12px; }
-.rum-blad .mr-leg { font-size: 11.5px; }
-.rum-blad .mr-nm { font-size: 9.5px; }
-.rum-blad .mr-teams { gap: 0 24px; margin-top: 8px; }
-.rum-blad .mr-team { padding: 8px 0 4px; border-top: 1.5px solid var(--pp-print-line); }
-.rum-blad .mr-team h4 { margin: 0 0 4px; font-family: var(--display); font-size: 15px; font-weight: 700; letter-spacing: 0; text-transform: none; color: var(--pp-ink); }
-.rum-blad .mr-team h5 { margin: 8px 0 2px; font-size: 9.5px; font-weight: 700; letter-spacing: 0.14em; text-transform: uppercase; color: var(--pp-print); }
-.rum-blad .mr-names li, .rum-blad .mr-out li { padding: 1px 0; font-size: 12px; }
+
+/* en planhalva per lag, sida vid sida, med målet nederst */
+.mr-halvor { flex: none; position: relative; display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 0 24px; }
+.mr-halva { min-width: 0; }
+.mr-halva .rl-namn { margin-bottom: 3px; }
+.mr-halva .n { min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.mr-halva .rl-namn b { flex: none; margin-left: 3px; font: 650 11.5px/17px var(--sans); color: var(--pp-ink-soft); font-variant-numeric: tabular-nums; }
+.mr-halva.a .rl-namn { flex-direction: row-reverse; }
+.mr-halva.a .rl-namn b { margin: 0 3px 0 0; }
+.mr-plan {
+  position: relative;
+  height: 190px;
+  background: repeating-linear-gradient(0deg, rgba(169, 69, 43, 0.075) 0 12.5%, rgba(169, 69, 43, 0.03) 12.5% 25%), var(--pp-box);
+  border: 1.5px solid var(--pp-print);
+  border-radius: 3px;
+}
+.rum-blad .mr-plan .mr-lines { stroke: rgba(169, 69, 43, 0.34); }
+.rum-blad .mr-plan .mr-pl { left: calc(11% + var(--s) * 0.78%); top: calc(89% - var(--l) * 0.77%); gap: 0; transform: translate(-50%, -50%); }
+.rum-blad .mr-plan .mr-dot { width: 20px; height: 20px; font-size: 10.5px; border-width: 1.5px; box-shadow: none; }
+/* namnet får som mest avståndet till grannen på samma linje (--g, matchruta.js), så att namnen aldrig krockar */
+.rum-blad .mr-plan .mr-nm { max-width: min(96px, calc(var(--g) * 2.2px)); font-size: 9.5px; line-height: 10.5px; text-shadow: none; }
+/* betyget i hörnet till vänster om markeringen, målen, korten och bytet till höger; matchens högsta ifyllt */
+.rum-blad .mr-plan .mr-dot .mr-rt { top: -5px; right: calc(100% - 3px); padding: 0 2px; font-size: 9px; font-weight: 650; line-height: 11px; color: var(--pp-ink); background: var(--pp-box); border-radius: 2px; box-shadow: 0 0 0 1px var(--pp-rule); }
+.rum-blad .mr-plan .mr-dot .mr-rt.top { color: #fff; background: var(--pp-print); box-shadow: none; }
+.rum-blad .mr-plan .mr-badges { top: -5px; left: calc(100% - 2px); align-items: center; gap: 1px; white-space: nowrap; }
+.rum-blad .mr-plan .mr-b.goal { width: 10px; height: 10px; background-image: radial-gradient(circle, #1a1814 0 1.8px, transparent 2.1px); }
+.rum-blad .mr-plan .mr-b.yc, .rum-blad .mr-plan .mr-b.rc { width: 7px; height: 10px; }
+.rum-blad .mr-plan .mr-off { margin: 0; font-size: 9px; font-weight: 650; line-height: 11px; }
+/* stämpeln mellan lagens namn, och på tomma planer mitt över dem */
+.mr-halvor .mr-stamp { top: -4px; }
+.mr-halvor.tomma .mr-stamp { top: 54%; padding: 5px 12px 4px; font-size: 12px; transform: translate(-50%, -50%) rotate(-7deg); }
+
+/* under planerna: varje lag under sin halva */
+.rum-blad .mr-teams { grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 0 24px; }
+.rum-blad .mr-halvor + .mr-teams { margin-top: 8px; padding-top: 0; border-top: 1px solid var(--pp-line); }
+.rum-blad .mr-team { padding: 0; font-size: 12px; background: none; border: 0; border-radius: 0; }
+.rum-blad .mr-team h4 { margin: 7px 0 2px; font: 600 13px/17px var(--display); letter-spacing: 0; text-transform: none; color: var(--pp-ink); }
+.rum-blad .mr-team h5 { margin: 7px 0 2px; font-size: 10px; font-weight: 700; line-height: 13px; letter-spacing: 0.16em; text-transform: uppercase; color: var(--pp-print); }
+.rum-blad .mr-names li, .rum-blad .mr-out li { padding: 0; font-size: 12px; line-height: 16px; }
+.rum-blad .mr-out li .muted { font-size: 11px; }
+.rum-blad .mr-nr { width: 1.7em; font-size: 11px; }
+.rum-blad .mr-names .mr-rt { font-size: 11.5px; }
+.rum-blad .mr-flod { margin: 0; font-size: 12px; line-height: 16px; color: var(--pp-ink-soft); }
+.rum-blad .mr-flod .mr-card { color: inherit; }
+.rum-blad .mr-coach { margin: 7px 0 0; font-size: 12px; line-height: 16px; }
+.rum-blad .mr-coach span, .rb-domare span { margin-right: 6px; font-size: 10px; font-weight: 700; letter-spacing: 0.16em; text-transform: uppercase; color: var(--pp-print); }
 .rum-blad .mr-wait, .rum-blad .unknown, .rum-blad .muted { color: var(--pp-faint); }
-.rb-domare { margin: 8px 0 0; padding: 6px 0 0; border-top: 1px solid var(--pp-line); font-size: 12.5px; }
-.rb-domare span { margin-right: 6px; font-size: 10px; font-weight: 700; letter-spacing: 0.16em; text-transform: uppercase; color: var(--pp-print); }
+.rb-domare { flex: none; margin: 8px 0 0; padding: 6px 0 0; border-top: 1px solid var(--pp-line); font-size: 12px; line-height: 16px; }
 
 /* ---------- Tabellen ---------- */
 
-.rb-tabell { flex: none; width: 100%; margin: 6px 0 0; border-collapse: collapse; font-size: 12.5px; font-variant-numeric: tabular-nums; }
+/* rubriken är tabellens huvud; raderna går lite utanför texten, så att texten står där allt annat står */
+.rb-tabell { flex: none; width: calc(100% + 6px); margin: 0 -3px; border-collapse: collapse; font-size: 12.5px; font-variant-numeric: tabular-nums; }
 .rb-tabell + .rb-tabell { margin-top: 12px; }
-.rb-tabell th { padding: 5px 5px 4px; border-bottom: 1.5px solid var(--pp-print-line); font-size: 9.5px; font-weight: 700; letter-spacing: 0.12em; text-transform: uppercase; color: var(--pp-print); text-align: right; }
+.rb-tabell th { padding: 0 5px 4px; border-bottom: 1px solid var(--pp-line); font-size: 10px; font-weight: 700; line-height: 13px; letter-spacing: 0.12em; text-transform: uppercase; color: var(--pp-print); text-align: right; }
 .rb-tabell td { padding: 3.5px 5px; border-bottom: 1px solid rgba(42, 35, 29, 0.08); text-align: right; white-space: nowrap; }
-.rb-tabell .c { width: 22px; text-align: center; color: var(--pp-ink-soft); }
+.rb-tabell td:first-child { padding-left: 3px; }
+.rb-tabell td:nth-child(2) { padding-left: 2px; }
+.rb-tabell td:last-child { padding-right: 3px; }
+.rb-tabell .c { width: 18px; text-align: left; color: var(--pp-ink-soft); }
 .rb-tabell .lag { width: 100%; max-width: 0; overflow: hidden; text-overflow: ellipsis; text-align: left; }
-.rb-tabell th.lag { letter-spacing: 0.16em; }
+.rb-tabell .lag .rl-prick { margin-right: 6px; vertical-align: 0; }
+.rb-tabell th.lag { padding-left: 3px; letter-spacing: 0.16em; }
+.rb-tabell th:last-child { padding-right: 3px; }
 .rb-tabell .p { font-weight: 700; }
-.rb-tabell tr.mine td { font-weight: 700; background: rgba(47, 111, 214, 0.09); }
-.rb-tabell tr.mine.a td { background: rgba(208, 100, 44, 0.1); }
+.rb-tabell tr.mine td { font-weight: 700; background: rgba(47, 111, 214, 0.13); }
+.rb-tabell tr.mine.a td { background: rgba(208, 100, 44, 0.13); }
 .rb-tabell tr.gap td { padding: 0; height: 15px; font-size: 11px; line-height: 15px; text-align: center; color: var(--pp-faint); }
 .rb-dolt { margin: auto 0; text-align: center; }
 .rb-dolt p { margin: 0 0 8px; padding: 0 30px; font-size: 12.5px; color: var(--pp-faint); text-wrap: balance; }
 
 /* ---------- Mötena ---------- */
 
-.rb-moten { flex: none; margin: 6px 0 0; font-size: 12.5px; font-variant-numeric: tabular-nums; }
-.rb-mote { display: grid; grid-template-columns: 92px 36px minmax(0, 1fr) 46px minmax(0, 1fr); align-items: baseline; padding: 4px 0 3px; border-bottom: 1px solid rgba(42, 35, 29, 0.08); }
-.rb-mote > span { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.rb-moten { flex: none; font-size: 12.5px; font-variant-numeric: tabular-nums; }
+.rb-moten .rl-rubrad { margin: 0; padding-bottom: 4px; border-bottom: 1px solid var(--pp-line); }
+.rb-mote { display: grid; grid-template-columns: 76px 34px minmax(0, 1fr) 44px minmax(0, 1fr); align-items: center; column-gap: 6px; height: 23px; border-bottom: 1px solid rgba(42, 35, 29, 0.08); }
+.rb-mote > span { display: flex; align-items: center; gap: 6px; min-width: 0; white-space: nowrap; }
+.rb-mote > span > span { min-width: 0; overflow: hidden; text-overflow: ellipsis; }
 .rb-mote .nar { font-size: 11px; color: var(--pp-ink-soft); }
 .rb-mote .tav { font-size: 10px; font-weight: 700; letter-spacing: 0.1em; color: var(--pp-faint); }
-.rb-mote .h { text-align: right; }
-.rb-mote .egen { font-weight: 650; }
-.rb-mote b { font: 650 14px/1 var(--display); text-align: center; }
-.rb-mote .q { font-style: normal; color: var(--pp-faint); }
-.rb-summa { flex: none; margin: 7px 0 0; font: 600 17px/1.2 Caveat, cursive; color: var(--pp-pencil); text-align: right; }
+.rb-mote .h { justify-content: flex-end; }
+.rb-mote b { height: 19px; line-height: 16px; }
 
 /* ---------- foten: tillbaka och bläddra ---------- */
 
@@ -284,16 +313,18 @@
 .rum.smal .rum-blad .band { margin: 0 -16px 0 -36px; padding: 0 16px 0 36px; }
 .rum.smal .rum-blad .band small { letter-spacing: 0.18em; }
 .rum.smal .rl-topp { grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); grid-template-rows: auto auto; height: auto; padding: 6px 0; gap: 2px 10px; }
-.rum.smal .rl-nar { grid-column: 1 / -1; grid-row: 2; text-align: center; }
+.rum.smal .rl-nar { grid-column: 1 / -1; grid-row: 2; display: flex; align-items: baseline; justify-content: center; gap: 7px; }
+.rum.smal .rl-nar b { font-size: 16px; }
 .rum.smal .rl-t b { font-size: 17px; }
 .rum.smal .rl-t .skold { width: 22px; height: 22px; }
 .rum.smal .rb-flikar { justify-content: space-between; gap: 0; height: 32px; }
 .rum.smal .rb-flikar button { font-size: 10.5px; line-height: 32px; letter-spacing: 0.03em; }
-.rum.smal .rl-odds { padding: 12px 0 10px; }
-.rum.smal .rl-ligan { padding: 12px 0 10px; grid-template-columns: minmax(0, 1fr) 64px minmax(0, 1fr); }
-.rum.smal .rl-form { padding-top: 10px; }
-.rum.smal .rl-lag + .rl-lag { margin-top: 18px; }
+.rum.smal .rl-del + .rl-del { margin-top: 10px; padding-top: 9px; }
+.rum.smal .rl-lag + .rl-lag { margin-top: 8px; }
 .rum.smal .rl-namn { font-size: 14px; line-height: 22px; }
+.rum.smal .rl-halvor, .rum.smal .rum-blad .mr-teams { gap: 0 14px; }
+.rum.smal .rl-spegel { grid-template-columns: minmax(0, 1fr) 32px minmax(0, 1fr); }
+.rum.smal .rl-spegel .h, .rum.smal .rl-spegel .a, .rum.smal .rl-tal { font-size: 15px; }
 .rum.smal .rl-banor { grid-template-columns: 14px repeat(10, minmax(0, 1fr)); grid-template-rows: 48px 48px; column-gap: 3px; }
 .rum.smal .rl-bana { height: 30px; font-size: 0; line-height: 30px; letter-spacing: 0; }
 .rum.smal .rl-bana::first-letter { font-size: 10px; }
@@ -301,11 +332,20 @@
 .rum.smal .rl-m b { height: 30px; font-size: 12.5px; line-height: 27px; border-width: 1.3px; }
 .rum.smal .rl-m small { font-size: 8.5px; letter-spacing: -0.03em; }
 .rum.smal .rb-rutor { gap: 7px; }
+.rum.smal .rb-ruta { gap: 6px; }
 .rum.smal .rb-ruta b { font-size: 21px; }
-.rum.smal .rb-tva { grid-template-columns: 1fr; gap: 10px; }
 .rum.smal .rb-steg { grid-template-columns: 128px minmax(0, 1fr); gap: 6px; font-size: 11px; }
 .rum.smal .rb-tabell .sm { display: none; }
-.rum.smal .rb-mote { grid-template-columns: 70px minmax(0, 1fr) 40px minmax(0, 1fr); }
+.rum.smal .rb-mote { grid-template-columns: 68px minmax(0, 1fr) 38px minmax(0, 1fr); column-gap: 4px; }
+.rum.smal .rb-mote > span { gap: 4px; }
 .rum.smal .rb-mote .nar { font-size: 10px; }
 .rum.smal .rb-mote .tav { display: none; }
+/* planhalvorna under varandra */
+.rum.smal .mr-halvor { grid-template-columns: minmax(0, 1fr); gap: 8px 0; }
+.rum.smal .mr-halva.a .rl-namn { flex-direction: row; }
+.rum.smal .mr-halva.a .rl-namn b { margin: 0 0 0 auto; }
+.rum.smal .mr-plan { height: 184px; }
+.rum.smal .rum-blad .mr-plan .mr-nm { max-width: min(96px, calc(var(--g) * 2.8px)); }
+.rum.smal .mr-halvor .mr-stamp { top: -2px; left: auto; right: 54px; transform: rotate(-7deg); }
+.rum.smal .mr-halvor.tomma .mr-stamp { top: 50%; left: 50%; right: auto; transform: translate(-50%, -50%) rotate(-7deg); }
 .rum.smal .rl-fot { height: 44px; }

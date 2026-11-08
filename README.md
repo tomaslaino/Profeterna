@@ -3848,35 +3848,51 @@ sajten, som *Matchbladet →* på bladet, *Matchbladet* hos Hasse och matchens r
 öppnas inte längre från rummet (jfr *Inga länkar ut ur tobaksaffären* under [Beslut](#beslut)).
 
 Överst står bandet med kupongens namn och *Match 3* och lagen med sköldarna, dag, tid och tävling
-mellan dem, och under dem flikarna – bladets sidor, i den ordning man behöver dem inför ett tecken.
-Alla flikar står alltid där, så att de står still när man bläddrar:
+mellan dem (och över dem resultatet när matchen är spelad och resultaten inte är dolda), och under
+dem flikarna – bladets sidor, i den ordning man behöver dem inför ett tecken. Alla flikar står alltid
+där, över hela bladets bredd, så att de står still när man bläddrar.
+
+Sidorna är byggda av samma delar, så att man känner igen sig (2026-11-08, "få det konkordant"): samma
+luft under flikarna och samma hårlinje mellan delarna; en del börjar med en rubrik i små spärrade
+versaler till vänster och det den säger till höger; hemmalaget är blått och står till vänster,
+bortalaget är terrakotta och står till höger, med en prick där det behövs; 1, X och 2 är kupongens tre
+rutor med chansen i stapeln under; en ställning står i formens stämplade ruta; och sidan delas i
+tredjedelar (1 X 2) eller halvor (hemma och borta).
 
 - **Lagen** – det som stod på bladet med lagen (2026-11-07):
-  - *Chansen ur oddsen* – 1, X och 2 i hela procent, en stapel delad efter chansen, och oddsen
-    under den. Chansen är spelbolagens odds med marginalen bortdragen i proportion.
+  - *Spelbolagen* – oddsen för 1, X och 2 i kupongens rutor, och under dem en stapel delad efter
+    chansen i hela procent. Chansen är spelbolagens odds med marginalen bortdragen i proportion.
   - *Ligan hittills* – *Mål* och *xG*, lagets först och motståndarnas sedan, hemmalaget till
     vänster. xG är summerat över säsongen; har källan inte hunnit med den senaste omgången står
-    antalet matcher det gäller under (*10 matcher*). Spelar lagen i olika ligor står ligan överst.
+    antalet matcher det gäller till höger om rubriken (*xG: 10 matcher*). Spelar lagen i olika ligor
+    står ligan överst.
   - *Form* – de tio senaste matcherna i alla tävlingar för vart lag, nyast till vänster, en kolumn
     per match: hemmamatcherna i den övre raden och bortamatcherna i den undre, så att det syns direkt
     om ett lag är starkt hemma. Rutan är grön vid vinst, röd vid förlust och grå vid oavgjort (efter
     90 minuter), med ställningen i rutan, lagets först, och lagets och motståndarnas xG i mindre stil
     under. Cupmatcher har inget xG. Datum, tävling, motståndare och xG står i rutans title.
-- **Prognos** – sajtens prognos som i matchrutans flik Prognos: 1, X och 2 som odds i kupongens
-  rutor, *Förväntade mål*, de tre troligaste resultaten och *Vad drog åt vilket håll*. För en spelad
-  match prognosen före avspark.
+- **Prognos** – sajtens prognos som i matchrutans flik Prognos: 1, X och 2 på samma sätt som på
+  Lagen, *Förväntade mål*, de tre troligaste resultaten i formens rutor och *Vad drog åt vilket håll*
+  med staplarna i bladets högra halva. För en spelad match prognosen före avspark.
 - **Analys** – den färdiga analysen med rubrik, ingress, stycken och källor, och tipset under med
   tecknen inringade och raden i marginalen, som matchrutans flik Analysera. Källorna står som text
   (källan och rubriken när man pekar på numret), utan länkar ut ur rummet. Finns ingen analys än står
   samma rad som i matchrutan.
-- **Startelvor** – matchrutans startelvor ([public/matchruta.js](public/matchruta.js)): planen tryckt
-  på papperet, 365Scores eller den beräknade elvan, avbytarna och vilka som saknas, och domaren.
-  När resultatet är dolt står bara *Visa ändå*, eftersom elvorna visar målen.
+- **Startelvor** – matchrutans startelvor ([public/matchruta.js](public/matchruta.js)), 365Scores eller
+  den beräknade elvan, med en planhalva per lag sida vid sida (under varandra i telefonen) och målet
+  nederst: laget, uppställningen och stämpeln över planerna, på planen numret och namnet, betyget i
+  hörnet till vänster och målen, korten och bytet till höger. Ett namn får som mest avståndet till
+  grannen på samma linje, så att namnen aldrig krockar. Under varje halva lagets frånvaro före matchen
+  (bara orsaken; när spelaren väntas tillbaka står i title) och avbytare som en rad namn, efter matchen
+  de inbytta med minut och betyg och resten som en rad, och tränaren; domaren står sist. När resultatet
+  är dolt står bara *Visa ändå*, eftersom elvorna visar målen. På den vanliga sajten är planen kvar som
+  en gemensam plan.
 - **Tabellen** – ligatabellen runt lagen: två lag på var sida om vart och ett, och ligger de långt
   ifrån varandra ett utdrag kring vart och ett, med ⋯ där tabellen fortsätter. Har divisionen dolda
   resultat står *Visa ändå* i stället, som i matchrutan.
 - **Mötena** – samma möten som kortet i kortregistret: säsongens och tidigare säsongers, de elva
-  senaste, och hemmalagets V–O–F i dem med blyerts.
+  senaste, med lagens prickar och ställningen i formens rutor sedd från hemmalaget på bladet, och
+  hemmalagets V–O–F till höger om rubriken.
 
 En sida som inte ryms flyttas med hjulet eller fingret inom bladet (*Analys* och *Startelvor* i
 telefonen). Sidan man har framme följer med när man bläddrar mellan matcherna och nästa gång bladet tas

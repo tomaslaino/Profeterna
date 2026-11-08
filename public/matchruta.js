@@ -285,13 +285,14 @@
 
   const POS_SV = { Goalkeeper: 'målvakt', Defender: 'back', Midfielder: 'mittfältare', Attacker: 'anfallare' };
 
-  function badges(e) {
+  function badges(e, mer = '') {
     if (!e) return '';
     let h = '';
     for (let i = 0; i < e.goals; i++) h += '<i class="mr-b goal" title="Mål"></i>';
     for (let i = 0; i < e.own; i++) h += '<i class="mr-b goal own" title="Självmål"></i>';
     if (e.rc) h += `<i class="mr-b rc" title="${e.yc ? 'Andra gula kortet' : 'Rött kort'}"></i>`;
     else if (e.yc) h += '<i class="mr-b yc" title="Gult kort"></i>';
+    h += mer;
     return h ? `<span class="mr-badges">${h}</span>` : '';
   }
 
@@ -303,14 +304,18 @@
       `${p.rt.toFixed(1).replace('.', ',')}</span>`;
   }
 
-  function spots(t, cls, top, ix) {
+  // blad = matchbladet i tobaksaffären: bytesminuten står intill markeringen, med målen
+  // och korten, så att bara namnet står under den.
+  function spots(t, cls, top, ix, blad) {
+    // avståndet till närmaste granne på samma linje, som namnet får breda ut sig på
+    const gap = (p) => Math.min(100, ...t.starters.filter((q) => q !== p && q.line === p.line).map((q) => Math.abs(q.side - p.side)));
     return t.starters.map((p) => {
       const off = p.ev && p.ev.off != null ? `<span class="mr-off" title="Utbytt">${p.ev.off}′</span>` : '';
       const c = cardOf(p, ix, cls);
       const tag = c ? 'button' : 'div';
-      return `<${tag} class="mr-pl ${cls}"${c ? cardAttr(c) : ''} style="--l:${p.line};--s:${p.side}" title="${esc(p.name)}${POS_SV[p.pos] ? `, ${POS_SV[p.pos]}` : ''}">` +
-        `<span class="mr-dot">${p.nr == null ? '' : p.nr}${rating(p, top)}${badges(p.ev)}</span>` +
-        `<span class="mr-nm">${esc(p.short)}${off}</span></${tag}>`;
+      return `<${tag} class="mr-pl ${cls}"${c ? cardAttr(c) : ''} style="--l:${p.line};--s:${p.side}${blad ? `;--g:${gap(p)}` : ''}" title="${esc(p.name)}${POS_SV[p.pos] ? `, ${POS_SV[p.pos]}` : ''}">` +
+        `<span class="mr-dot">${p.nr == null ? '' : p.nr}${rating(p, top)}${badges(p.ev, blad ? off : '')}</span>` +
+        `<span class="mr-nm">${esc(p.short)}${blad ? '' : off}</span></${tag}>`;
     }).join('');
   }
 
@@ -333,11 +338,12 @@
     }).join('') + '</ul>';
   }
 
-  function outList(t, ix, side) {
+  // kort = bara orsaken på raden; när spelaren väntas tillbaka står i title.
+  function outList(t, ix, side, kort) {
     const row = (x) => {
       const c = cardOf(x, ix, side);
       const name = c ? `<button class="n mr-card"${cardAttr(c)}>${esc(x.name)}</button>` : `<span class="n">${esc(x.name)}</span>`;
-      return `<li${x.raw ? ` title="${esc(x.raw)}"` : ''}>${name} <span class="muted">${esc([x.why, x.back].filter(Boolean).join(' · '))}</span></li>`;
+      return `<li${x.raw ? ` title="${esc(x.raw)}"` : ''}>${name} <span class="muted">${esc(kort ? x.why : [x.why, x.back].filter(Boolean).join(' · '))}</span></li>`;
     };
     const gone = t.out.filter((x) => !x.doubtful);
     const unsure = t.out.filter((x) => x.doubtful);
@@ -347,6 +353,22 @@
     // Frånvaron är känd (FPL) men tom.
     if (!h && t.outKnown) h = '<h5>Saknas</h5><p class="muted">ingen</p>';
     return h;
+  }
+
+  // Laget under sin planhalva i matchbladet i tobaksaffären: de inbytta med minut och betyg
+  // och resten som en rad namn, och före matchen de som saknas först.
+  function teamUnder(t, played, cls, top, ix) {
+    const brief = (p) => {
+      const c = cardOf(p, ix, cls);
+      return c ? `<button class="mr-card" title="${esc(p.name)}"${cardAttr(c)}>${esc(p.short || p.name)}</button>` : `<span title="${esc(p.name)}">${esc(p.short || p.name)}</span>`;
+    };
+    const on = played ? t.bench.filter((p) => p.ev && p.ev.on != null).sort((a, b) => a.ev.on - b.ev.on) : [];
+    const rest = t.bench.filter((p) => !on.includes(p));
+    const inbytta = on.length ? `<h5>Inbytta</h5>${playerList(on, played, top, ix, cls)}` : '';
+    const ovriga = rest.length ? `<h5>${played ? 'Ej inbytta' : 'Avbytare'}</h5><p class="mr-flod">${rest.map(brief).join(', ')}</p>` : '';
+    const ut = outList(t, ix, cls, true);
+    const coach = t.coach ? `<p class="mr-coach"><span>Tränare</span> ${esc(t.coach)}</p>` : '';
+    return `<div class="mr-team ${cls}">${played ? inbytta + ovriga + ut : ut + ovriga}${coach}</div>`;
   }
 
   function teamBlock(name, t, played, cls, top, ix) {
@@ -372,6 +394,19 @@
       `${t && t.formation ? `<b>${esc(t.formation)}</b>` : ''}</div>`;
     return `<div class="mr-pitch-wrap">${leg(m.home, home, 'h')}${leg(m.away, away, 'a')}${inner ? mark : ''}` +
       `<div class="mr-pitch${inner ? '' : ' empty'}">${LINES_WIDE}${LINES_TALL}${inner}${inner ? '' : mark}</div></div>`;
+  }
+
+  // Matchbladet i tobaksaffären: en planhalva per lag sida vid sida, under lagets namn på
+  // bladet och med målet nederst, så att hemmalaget står till vänster och bortalaget till
+  // höger som på bladets övriga sidor. Stämpeln sitter mellan lagens namn, och på tomma
+  // planer mitt över dem. Målområdet är ritat grundare än i verkligheten, så att backlinjen inte står på dess linje.
+  const LINES_HALF = '<svg class="mr-lines halv" viewBox="0 0 68 52.5" preserveAspectRatio="none" aria-hidden="true">' +
+    '<path d="M24.85 0a9.15 9.15 0 0 0 18.3 0M13.84 52.5V42.5h40.32v10"/></svg>';
+
+  function halvor(m, home, away, sh, sa, mark) {
+    const halva = (name, t, cls, inne) => `<div class="mr-halva ${cls}"><span class="rl-namn"><i class="rl-prick ${cls}"></i><span class="n">${esc(name)}</span>` +
+      `${t && t.formation ? `<b>${esc(t.formation)}</b>` : ''}</span><div class="mr-plan">${LINES_HALF}${inne}</div></div>`;
+    return `<div class="mr-halvor${sh || sa ? '' : ' tomma'}">${halva(m.home, home, 'h', sh)}${halva(m.away, away, 'a', sa)}${mark}</div>`;
   }
 
   // ---------- den beräknade startelvan ----------
@@ -431,8 +466,8 @@
   }
 
   // ix = spelarkorten (cards), saknas tills de är inlästa. E = den beräknade
-  // startelvans plan (d.elva), null utan.
-  function renderLineups(m, r, alt, ix, E) {
+  // startelvans plan (d.elva), null utan. blad = matchbladet i tobaksaffären.
+  function renderLineups(m, r, alt, ix, E, blad) {
     if (!r) return '<p class="mr-wait">Hämtar startelvorna …</p>';
     const L = r.data || null;
     const blank = { status: '', formation: null, starters: [], placed: false, bench: [], coach: null, out: [] };
@@ -456,23 +491,30 @@
     const at = `365Scores, hämtat ${fClock.format(new Date(r.at))}`;
     const confirmed = (t) => /^confirmed$/i.test(t.status);
     const any = home.starters.length || away.starters.length;
+    // Planen: en gemensam, eller en halva per lag i matchbladet i tobaksaffären.
+    const plan = (a, b, kryss, mark) => {
+      const sh = a ? spots(a, 'h', kryss, ix, blad) : '';
+      const sa = b ? spots(b, 'a', kryss, ix, blad) : '';
+      return blad ? halvor(m, a, b, sh, sa, mark) : pitch(m, a, b, sh + sa, mark);
+    };
     let h = '';
     if (calc) {
-      h += pitch(m, home, away, spots(home, 'h', null, ix) + spots(away, 'a', null, ix), stamp('Beräknad elva', 'calc', calcTitle(m, E)));
+      h += plan(home, away, null, stamp('Beräknad elva', 'calc', calcTitle(m, E)));
     } else if (both) {
       const mark = played ? ''
         : confirmed(home) && confirmed(away) ? stamp('Bekräftad', 'ok', at)
           : stamp('Trolig elva', 'prob', `Bedömd av 365Scores · bekräftad ungefär en timme före avspark · ${at}`);
-      h += pitch(m, home, away, spots(home, 'h', top, ix) + spots(away, 'a', top, ix), mark);
+      h += plan(home, away, top, mark);
     } else if (!any) {
       const when = PROBABLE.has(m.comp) ? 'Trolig elva några dagar före, bekräftad ungefär en timme före avspark' : 'Bekräftad ungefär en timme före avspark';
-      h += pitch(m, null, null, '', stamp('Ingen startelva än', 'none', r.error ? `Kunde inte hämta från 365Scores (${r.error})` : when));
+      h += plan(null, null, null, stamp('Ingen startelva än', 'none', r.error ? `Kunde inte hämta från 365Scores (${r.error})` : when));
     } else if (!played) {
       h += `<div class="mr-lu-head">${stamp(confirmed(home) && confirmed(away) ? 'Bekräftad' : 'Trolig elva', 'inline', at)}</div>`;
     }
     // Elvan på planen står inte en gång till under den.
     const some = (t) => (!t.placedBoth && t.starters.length) || t.bench.length || t.out.length || t.coach || t.outKnown;
-    if (some(home) || some(away)) h += `<div class="mr-teams">${teamBlock(m.home, home, played, 'h', top, ix)}${teamBlock(m.away, away, played, 'a', top, ix)}</div>`;
+    const under = (name, t, cls) => (blad && (t.placedBoth || !t.starters.length) ? teamUnder(t, played, cls, top, ix) : teamBlock(name, t, played, cls, top, ix));
+    if (some(home) || some(away)) h += `<div class="mr-teams">${under(m.home, home, 'h')}${under(m.away, away, 'a')}</div>`;
     return h;
   }
 
@@ -598,7 +640,7 @@
     const { root, m } = current;
     if (kind === 'lineups') {
       const el = root.querySelector('[data-mr-lineups]');
-      if (el && el.dataset.mrLineups === m.id) el.innerHTML = renderLineups(m, lineups.get(m.id), absent.get(m.id), cards.get(m.id), plans.get(m.id));
+      if (el && el.dataset.mrLineups === m.id) el.innerHTML = renderLineups(m, lineups.get(m.id), absent.get(m.id), cards.get(m.id), plans.get(m.id), Boolean(root.closest('.rum-blad')));
     } else {
       const el = root.querySelector('[data-mr-events]');
       if (el && el.dataset.mrEvents === m.id) el.innerHTML = renderEvents(m, summaries.get(m.id));

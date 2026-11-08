@@ -8,11 +8,11 @@
 // fram det mitt i fönstret (fram).
 //
 // Flikarna under lagen är bladets sidor, i den ordning man behöver dem inför
-// ett tecken. Allt är samma tal under samma namn som på resten av sajten, ur
-// samma filer:
-//   Lagen       chansen för 1, X och 2 ur spelbolagens odds utan marginalen,
-//               i stapeln från Vad drog åt vilket håll (.tug-stack), och under
-//               den oddsen som matchbladet visar dem (bookOdds i app.js); Mål
+// ett tecken, och alla är byggda av samma delar (rum-matchblad.css överst). Allt
+// är samma tal under samma namn som på resten av sajten, ur samma filer:
+//   Lagen       oddsen som matchbladet visar dem (bookOdds i app.js) i kupongens
+//               rutor, med chansen utan marginalen i stapeln under (.tug-stack),
+//               som på Prognos; Mål
 //               och xG i ligan hittills som i Lagen sida vid sida (ESPN, och xG
 //               ur samma källa som raden xG där: Understat i Premier League,
 //               annars football-data.co.uk); och de tio senaste matcherna i
@@ -21,14 +21,17 @@
 //               hemmamatcherna i övre raden och bortamatcherna i den undre, med
 //               ställningen i rutan och lagets och motståndarnas xG under
 //   Prognos     sajtens prognos som i matchbladets flik Prognos: 1 X 2 i
-//               kupongens rutor, förväntade mål, de tre troligaste resultaten
-//               och Vad drog åt vilket håll
+//               kupongens rutor med chansen i stapeln under, som på Lagen,
+//               förväntade mål, de tre troligaste resultaten och Vad drog åt
+//               vilket håll
 //   Analys      den färdiga analysen (data/analyser.json) med tipset under,
 //               som fliken Analysera; källorna står som text, utan länkar ut
 //   Startelvor  matchrutans startelvor (matchruta.js): 365Scores, annars den
-//               beräknade elvan
+//               beräknade elvan, här med en planhalva per lag sida vid sida och
+//               varje lags avbytare och frånvaro under sin halva
 //   Tabellen    ligatabellen (data/teams/<division>.json) runt de två lagen
-//   Mötena      samma möten som kortet i kortregistret (rum-register.js)
+//   Mötena      samma möten som kortet i kortregistret (rum-register.js), med
+//               ställningen i formens rutor sedd från hemmalaget på bladet
 // Lagets siffror först, motståndarnas sedan, som på resten av sajten. Dolda
 // resultat (Spoiler) står som ?.
 //
@@ -91,8 +94,21 @@ window.RumMatchblad = (() => {
   // Odds som i matchbladet (fmtOdds och pctOdds i app.js).
   const fmt = (o) => (g('fmtOdds') ? fmtOdds(o) : o >= 100 ? String(Math.round(o)) : o.toFixed(2).replace('.', ','));
   const ur = (v) => (v ? fmt(100 / v) : '–');
-  const rub = (t) => `<span class="rl-rub">${esc(t)}</span>`;
   const tom = (t) => `<p class="rb-tom">${esc(t)}</p>`;
+
+  // Bladets alla sidor är byggda av samma delar (rum-matchblad.css): en del börjar med
+  // rubriken till vänster och det den säger till höger, och en hårlinje skiljer delarna åt.
+  const rubrad = (t, hoger = '', title = '') => `<div class="rl-rubrad"><span class="rl-rub"${title ? ` title="${esc(title)}"` : ''}>${esc(t)}</span>` +
+    `${hoger ? `<span class="rl-hoger">${hoger}</span>` : ''}</div>`;
+  const del = (inne, cls = '') => `<section class="rl-del${cls ? ` ${cls}` : ''}">${inne}</section>`;
+  const prick = (cls) => `<i class="rl-prick ${cls}"></i>`;
+
+  // 1 X 2 ser likadant ut på Lagen och Prognos: kupongens tre rutor med oddset stort,
+  // och under dem chansen i procent i stapeln.
+  function trio(lab, tal, p) {
+    return `<div class="rb-rutor">${tal.map((v, i) => `<span class="rb-ruta" title="${esc(`${lab[i]}: ${p[i]} %`)}"><i>${'1X2'[i]}</i><b>${v}</b></span>`).join('')}</div>` +
+      `<div class="tug-stack">${p.map((v, i) => `<span class="s${i}" style="flex:${v} 1 0">${v >= 6 ? `${v}&nbsp;%` : ''}</span>`).join('')}</div>`;
+  }
 
   // ---------- Lagen ----------
 
@@ -102,22 +118,18 @@ window.RumMatchblad = (() => {
     const b = g('bookOdds') ? bookOdds(d) : null;
     if (!b || !b.x || !b.x.every((x) => x > 1)) {
       const note = d.odds && d.odds.note;
-      return `<div class="rl-odds tom"><p>${esc(note || 'Inga odds för matchen.')}</p></div>`;
+      return del(`${rubrad('Spelbolagen')}<p class="rb-inga">${esc(note || 'Inga odds för matchen.')}</p>`);
     }
     const inv = b.x.map((x) => 1 / x);
     const sum = inv[0] + inv[1] + inv[2];
     const p = hela(inv.map((x) => x / sum));
-    const lab = [m.home, 'Oavgjort', m.away];
     const odd = (x) => (g('odds') ? odds(x) : dec(x, 2));
-    return '<div class="rl-odds">' +
-      `<div class="rl-chans">${p.map((v, i) => `<span class="c${i}" title="${esc(`${lab[i]}: ${v} %`)}"><i>${'1X2'[i]}</i><b>${v} %</b></span>`).join('')}</div>` +
-      `<div class="tug-stack">${p.map((v, i) => `<span class="s${i}" style="flex:${v} 1 0"></span>`).join('')}</div>` +
-      `<p class="rl-bolag"${b.title ? ` title="${esc(b.title)}"` : ''}>${esc(b.name)} ${b.x.map((x) => `<b>${odd(x)}</b>`).join(' · ')}</p></div>`;
+    return del(rubrad(b.name, '', b.title) + trio([m.home, 'Oavgjort', m.away], b.x.map(odd), p));
   }
 
   // Mål och xG i ligan hittills, sida vid sida: lagets först, motståndarnas sedan.
   // xG kan sakna den senaste omgången (football-data.co.uk släpar), och då står
-  // antalet matcher det gäller under.
+  // antalet matcher det gäller till höger om rubriken.
   function ligan(d, veil) {
     const T = [d.teams.home, d.teams.away];
     const rec = (t) => t.record && t.record.all;
@@ -129,18 +141,22 @@ window.RumMatchblad = (() => {
     const xg = (t, i) => {
       const x = t.xg;
       if (!x || !x.n) return '–';
-      if (veil[i]) return '?';
-      const r = rec(t);
-      const n = r && r.n !== x.n ? `<small>${x.n} matcher</small>` : '';
-      return `${dec(x.f)}–${dec(x.a)}${n}`;
+      return veil[i] ? '?' : `${dec(x.f)}–${dec(x.a)}`;
     };
-    const rad = (label, f) => `<span class="h">${f(T[0], 0)}</span><span class="mid">${label}</span><span class="a">${f(T[1], 1)}</span>`;
+    const kort = T.map((t, i) => {
+      const r = rec(t);
+      return t.xg && t.xg.n && !veil[i] && r && r.n !== t.xg.n ? t.xg.n : null;
+    });
+    const n = kort.filter(Boolean);
+    const efter = !n.length ? ''
+      : n.length === 1 ? `xG för ${esc(kort[0] ? d.match.home : d.match.away)}: ${n[0]} matcher`
+        : n[0] === n[1] ? `xG: ${n[0]} matcher` : `xG: ${n[0]} och ${n[1]} matcher`;
+    const rad = (label, f) => `<span class="rl-spegel"><span class="h">${f(T[0], 0)}</span><span class="mid">${label}</span><span class="a">${f(T[1], 1)}</span></span>`;
     const lg = T.map((t) => (t.league ? t.league.name : null));
     const liga = lg[0] !== lg[1] ? rad('Liga', (t) => esc(t.league ? t.league.name : 'okänd')) : '';
     const src = T.map((t) => t.xg && t.xg.source && t.xg.source.provider).filter(Boolean);
     const title = src.length ? ` title="${esc(`xG: ${[...new Set(src)].join(' och ')}`)}"` : '';
-    return `<div class="rl-ligan">${rub('Ligan hittills')}${liga}${rad('Mål', mal)}` +
-      rad(`<span${title}>xG</span>`, xg) + '</div>';
+    return del(rubrad('Ligan hittills', efter) + liga + `<div class="rl-halvor">${rad('Mål', mal)}${rad(`<span${title}>xG</span>`, xg)}</div>`);
   }
 
   // Formen: en kolumn per match, nyast till vänster; hemmamatcherna i övre
@@ -161,14 +177,13 @@ window.RumMatchblad = (() => {
     const banor = list.length
       ? '<span class="rl-bana" style="grid-row:1">Hemma</span><span class="rl-bana" style="grid-row:2">Borta</span>' + list.map(ruta).join('')
       : '<span class="rl-inga">Inga tidigare matcher</span>';
-    return `<div class="rl-lag ${cls}"><span class="rl-namn"><i></i>${esc(name)}</span><div class="rl-banor">${banor}</div></div>`;
+    return `<div class="rl-lag ${cls}"><span class="rl-namn">${prick(cls)}${esc(name)}</span><div class="rl-banor">${banor}</div></div>`;
   }
 
   function lagen(d, m) {
     const T = [d.teams.home, d.teams.away];
     const veil = T.map((t) => (t.senaste || []).some((x) => hides(x.date)));
-    return oddsen(d, m) + ligan(d, veil) +
-      `<div class="rl-form">${rub('Form')}${form(m.home, T[0], 'h')}${form(m.away, T[1], 'a')}</div>`;
+    return oddsen(d, m) + ligan(d, veil) + del(rubrad('Form') + form(m.home, T[0], 'h') + form(m.away, T[1], 'a'));
   }
 
   // ---------- Prognos ----------
@@ -182,15 +197,14 @@ window.RumMatchblad = (() => {
     if (!p) return tom('Prognosmotorn gav ingen prognos för matchen.');
     if (p.status !== 'ok') return tom((p.reasons && p.reasons[0]) || 'Prognosen är okänd för matchen.');
     const w = hela(p.p);
-    const lab = [m.home, 'Oavgjort', m.away];
-    const rutor = `<div class="rb-rutor">${w.map((v, i) => `<span class="rb-ruta${i === 1 ? ' x' : ''}"><small>${esc(lab[i])}</small><span><i>${'1X2'[i]}</i><b>${ur(v)}</b></span></span>`).join('')}</div>`;
     const goals = p.goals ? `${dec(p.goals[0])}–${dec(p.goals[1])}` : '–';
     const top = p.scores && p.scores.top ? p.scores.top.slice(0, 3) : [];
-    const tva = '<div class="rb-tva">' +
-      `<div>${rub('Målen')}<p class="rb-lista"><span>Förväntade mål</span><i></i><b>${goals}</b></p></div>` +
-      (top.length ? `<div>${rub('Troligast')}<span class="rb-topp">${top.map((t) => `<span><b>${t.home}–${t.away}</b><small>${fmt(1 / t.p)}</small></span>`).join('')}</span></div>` : '') +
+    const tva = '<div class="rl-halvor">' +
+      `<div>${rubrad('Förväntade mål')}<b class="rl-tal">${goals}</b></div>` +
+      (top.length ? `<div>${rubrad('Troligast')}<span class="rb-topp">${top.map((t) => `<span class="rl-m"><b>${t.home}–${t.away}</b><small>${fmt(1 / t.p)}</small></span>`).join('')}</span></div>` : '') +
       '</div>';
-    return `${rub(fore ? 'Prognos före avspark' : 'Prognos efter 90 minuter')}${rutor}${tva}${fore ? '' : steg(d, m)}`;
+    return del(rubrad(fore ? 'Prognos före avspark' : 'Prognos efter 90 minuter') + trio([m.home, 'Oavgjort', m.away], w.map(ur), w)) +
+      del(tva) + (fore ? '' : steg(d, m));
   }
 
   // Vad drog åt vilket håll: startläget och sedan en stapel per del av modellen
@@ -221,9 +235,9 @@ window.RumMatchblad = (() => {
       } else spar += '<b class="noll">±0</b>';
       return `<span class="rb-steg${p.v >= 1 ? '' : ' none'}"><span>${label}</span><span class="rb-spar">${spar}</span></span>`;
     }).join('');
-    return `<div class="rb-drar">${rub('Vad drog åt vilket håll')}` +
+    return del(rubrad('Vad drog åt vilket håll') +
       `<span class="rb-steg start"><span>Startpunkt</span><span class="tug-stack">${start.map((v, i) => `<span class="s${i}" style="flex:${v} 1 0">${v >= 14 ? ur(v) : ''}</span>`).join('')}</span></span>` +
-      `<span class="rb-steg axel"><span></span><span class="rb-sidor"><span>← hjälper ${esc(m.home)}</span><span>hjälper ${esc(m.away)} →</span></span></span>${rader}</div>`;
+      `<span class="rb-steg axel"><span></span><span class="rb-sidor"><span>← hjälper ${esc(m.home)}</span><span>hjälper ${esc(m.away)} →</span></span></span>${rader}`, 'rb-drar');
   }
 
   // ---------- Analys ----------
@@ -265,11 +279,11 @@ window.RumMatchblad = (() => {
       const at = alla ? 1 : t.signs && t.signs.length ? Math.min(...t.signs) : -1;
       const rutor = `<span class="rb-tecken">${[0, 1, 2].map((i) => `<span class="rb-tecknet"><b>${'1X2'[i]}</b>${ring(i)}${i === at && t.note ? `<em>${esc(t.note)}</em>` : ''}</span>`).join('')}</span>`;
       const text = t.text.split(/\n\s*\n/).filter((x) => x.trim()).map((x) => `<p>${refs(x.trim(), t.sources)}</p>`).join('');
-      tips = `<div class="rb-tipset">${rub('Tipset')}${t.signs && t.signs.length ? rutor : ''}${text}</div>`;
+      tips = del(rubrad('Tipset') + (t.signs && t.signs.length ? rutor : '') + text, 'rb-tipset');
     }
-    return `<article class="rb-art"><p class="rb-skriven">${skriven ? `Skriven ${esc(skriven)}` : ''}${a.author ? ` av ${esc(a.author)}` : ''}</p>` +
+    return del(rubrad(a.author ? `Av ${a.author}` : 'Analysen', skriven ? esc(skriven) : '') +
       `<h3>${esc(a.title)}</h3>${a.lead ? `<p class="rb-ingress">${refs(a.lead, a.sources)}</p>` : ''}` +
-      (a.paragraphs || []).map((x) => `<p>${refs(x, a.sources)}</p>`).join('') + kallor + '</article>' + tips;
+      (a.paragraphs || []).map((x) => `<p>${refs(x, a.sources)}</p>`).join('') + kallor, 'rb-art') + tips;
   }
 
   // ---------- Startelvor ----------
@@ -310,13 +324,13 @@ window.RumMatchblad = (() => {
       for (const r of rows.slice(a, b)) {
         const mine = keys.indexOf(r.key);
         const gd = r.gd > 0 ? `+${r.gd}` : r.gd < 0 ? `−${-r.gd}` : '0';
-        body += `<tr${mine >= 0 ? ` class="mine ${mine ? 'a' : 'h'}"` : ''}><td class="c">${r.rank}</td><td class="lag">${esc(r.name)}</td>` +
+        body += `<tr${mine >= 0 ? ` class="mine ${mine ? 'a' : 'h'}"` : ''}><td class="c">${r.rank}</td><td class="lag">${mine >= 0 ? prick(mine ? 'a' : 'h') : ''}${esc(r.name)}</td>` +
           `<td>${r.m}</td><td class="sm">${r.w}</td><td class="sm">${r.d}</td><td class="sm">${r.l}</td><td class="sm">${r.gf}–${r.ga}</td><td>${gd}</td>` +
           `<td class="p">${r.pts}${r.ded ? `<sup title="${r.ded} poängs avdrag">*</sup>` : ''}</td></tr>`;
       }
     });
     if (spann[spann.length - 1][1] < rows.length) body += gap;
-    return `<table class="rb-tabell"><thead><tr><th class="c">#</th><th class="lag">${esc(T.name)}</th><th title="Spelade">S</th><th class="sm" title="Vunna">V</th>` +
+    return `<table class="rb-tabell"><thead><tr><th class="lag" colspan="2">${esc(T.name)}</th><th title="Spelade">S</th><th class="sm" title="Vunna">V</th>` +
       `<th class="sm" title="Oavgjorda">O</th><th class="sm" title="Förlorade">F</th><th class="sm">Mål</th><th title="Målskillnad">+/−</th><th title="Poäng">P</th></tr></thead><tbody>${body}</tbody></table>`;
   }
   async function tabellen(d) {
@@ -327,7 +341,7 @@ window.RumMatchblad = (() => {
       const files = await Promise.all(ids.map((id) => (g('loadTable') ? loadTable(id) : Promise.reject(new Error('saknas')))));
       const ms = window.Spoiler && Spoiler.on() ? await Spoiler.matches() : null;
       return files.map((T, i) => {
-        if (T.unknown || !T.teams) return `${rub(T.name || ids[i])}${tom('Tabellen är okänd.')}`;
+        if (T.unknown || !T.teams) return `${rubrad(T.name || ids[i])}${tom('Tabellen är okänd.')}`;
         if (ms) {
           const recent = ms.filter((x) => x.comp === T.comp && Spoiler.hides(x.kickoff));
           const n = recent.filter(Spoiler.hidden).length;
@@ -360,23 +374,33 @@ window.RumMatchblad = (() => {
       const [f, a] = x.home === m.home ? [s.home, s.away] : [s.away, s.home];
       return f > a ? 'V' : f < a ? 'F' : 'O';
     };
+    // Laget i lagens färg, och ställningen i formens stämplade ruta sedd från hemmalaget på bladet.
+    const lag = (namn) => (namn === m.home ? prick('h') : namn === m.away ? prick('a') : '');
     const rows = list.map(({ x, when, comp, hide }) => {
-      if (!hide) n[letter(x)]++;
-      return `<span class="rb-mote"><span class="nar">${esc(ar(when))}</span><span class="tav">${esc(comp || '')}</span><span class="h${x.home === m.home ? ' egen' : ''}">${esc(x.home)}</span>` +
-        `<b>${hide ? '<i class="q">?</i>' : `${x.score.home}–${x.score.away}`}</b><span class="a${x.away === m.home ? ' egen' : ''}">${esc(x.away)}</span></span>`;
+      const res = letter(x);
+      if (!hide) n[res]++;
+      return `<span class="rb-mote"><span class="nar">${esc(ar(when))}</span><span class="tav">${esc(comp || '')}</span><span class="h"><span>${esc(x.home)}</span>${lag(x.home)}</span>` +
+        `<b class="${hide ? 'sp' : res}">${hide ? '?' : `${x.score.home}–${x.score.away}`}</b><span class="a">${lag(x.away)}<span>${esc(x.away)}</span></span></span>`;
     }).join('');
-    return `<div class="rb-moten">${rows}</div><p class="rb-summa">${esc(m.home)}: ${n.V} V · ${n.O} O · ${n.F} F</p>`;
+    return `<div class="rb-moten">${rubrad('Tidigare möten', `${prick('h')}${esc(m.home)} <b>${n.V} V · ${n.O} O · ${n.F} F</b>`)}${rows}</div>`;
   }
 
   // ---------- bladet ----------
 
-  function topp(ctx) {
-    const { m, nr, av, kupong } = ctx;
+  // Mellan lagen: tiden och tävlingen, och över dem resultatet när matchen är spelad
+  // (inte när resultaten är dolda), som i biljetten överst i matchbladet.
+  function mellan(m) {
     const comp = g('compOf') ? compOf(m.comp) : null;
     const nar = `${fNar.format(new Date(m.kickoff))}${comp && comp.short ? ` · ${comp.short}` : ''}`;
+    const klart = m.completed && m.score && !(window.Spoiler && Spoiler.hidden(m));
+    return `${klart ? `<b>${m.score.home}–${m.score.away}</b>` : ''}<small>${esc(nar)}</small>`;
+  }
+
+  function topp(ctx) {
+    const { m, nr, av, kupong } = ctx;
     return `<span class="band"><small>MATCHFIXARNA · ${esc(kupong ? kupong.toUpperCase() : 'KUPONG')}</small><b>Match ${nr}</b></span>` +
       `<div class="rl-topp"><span class="rl-t h">${crest(m.home)}<b>${esc(m.home)}</b></span>` +
-      `<span class="rl-nar">${esc(nar)}</span><span class="rl-t a"><b>${esc(m.away)}</b>${crest(m.away)}</span></div>` +
+      `<span class="rl-nar">${mellan(m)}</span><span class="rl-t a"><b>${esc(m.away)}</b>${crest(m.away)}</span></div>` +
       `<div class="rb-flikar" role="tablist" aria-label="Matchbladet">${SIDOR.map(([id, namn]) =>
         `<button type="button" role="tab" data-flik="${id}" aria-selected="${id === flik}"${id === flik ? '' : ' tabindex="-1"'}>${namn}</button>`).join('')}</div>` +
       `<div class="rb-sida" role="tabpanel" tabindex="-1"></div>` +
@@ -393,6 +417,7 @@ window.RumMatchblad = (() => {
     const m = ctx.m;
     sida.dataset.sida = nu;
     sida.scrollTop = 0;
+    el.querySelector('.rl-nar').innerHTML = mellan(m);
     for (const b of el.querySelectorAll('[data-flik]')) {
       const on = b.dataset.flik === nu;
       b.setAttribute('aria-selected', String(on));
