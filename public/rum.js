@@ -3024,11 +3024,12 @@ ${window.RumRegister ? RumRegister.nara() : ''}
       return false;
     }
     if (R.tidning) return true;
-    const r = R.saker && R.saker.rubrik && R.saker.rubrik();
-    if (!r || !R.summa) return false;
+    const sedel = R.saker && R.saker.sedel && R.saker.sedel();
+    if (!sedel || !R.summa) return false;
     const el = document.createElement('div');
     el.className = 'rum-tidningen';
-    el.innerHTML = RumBlock.tidning(R.summa, r) + '<button type="button" class="rt-tillbaka">Lägg tillbaka</button>';
+    el.innerHTML = RumBlock.tidning(R.summa, sedel.classList.contains('tid-ex') ? 'ex' : 'sb') + '<button type="button" class="rt-tillbaka">Lägg tillbaka</button>';
+    el.querySelector('.rt-blad').prepend(sedel);
     for (const n of ['pointerdown', 'pointerup', 'pointermove', 'mouseover', 'wheel', 'touchstart', 'touchmove']) el.addEventListener(n, (e) => e.stopPropagation());
     el.addEventListener('click', (e) => {
       e.stopPropagation();
@@ -3038,8 +3039,18 @@ ${window.RumRegister ? RumRegister.nara() : ''}
     R.tidning = el;
     R.vilar = true;
     lager('tidningen', () => tidningen(false));
+    passaTidning();
     RumBlock.rastrera(el);
     return true;
+  }
+  // Sedeln så stor som ryms med början av nästa rubrik under sig, så att det syns att tidningen fortsätter.
+  // Den är 100 × 140 i rummet, och resten av bladet får samma bredd (--k).
+  function passaTidning() {
+    const t = R.tidning;
+    if (!t) return;
+    const k = Math.min((t.clientWidth - (R.smal ? 20 : 24)) / 100, 6.6, Math.max((t.clientHeight - 86) / 140, 3.6));
+    t.querySelector('.rt-blad').style.setProperty('--k', k.toFixed(3));
+    t.querySelector('.rt-sedel').style.zoom = k.toFixed(3);
   }
 
   // Gängets kupong med baksidan upp vänds på pulten: den lyfts och vänds
@@ -5056,6 +5067,7 @@ ${window.RumRegister ? RumRegister.nara() : ''}
     });
     addEventListener('resize', fit);
     addEventListener('resize', passaProtokoll);
+    addEventListener('resize', passaTidning);
     if (window.Spoiler && Spoiler.onChange) Spoiler.onChange(() => { if (R.on) fill(); });
   }
 

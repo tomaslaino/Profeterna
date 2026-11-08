@@ -100,19 +100,15 @@
 /* ---------- tidningen ---------- */
 .rum-tidningen { position: absolute; inset: 0; z-index: 60; display: flex; flex-direction: column; align-items: center; overflow: hidden auto; overscroll-behavior: contain; touch-action: pan-y; padding: 16px 12px 10px; box-sizing: border-box; background: rgba(9, 6, 3, 0.76); animation: rt-in 0.22s ease-out; }
 @keyframes rt-in { from { opacity: 0; } to { opacity: 1; } }
-.rt-blad { --p: #eee8da; --rod: #d21f26; flex: none; box-sizing: border-box; width: min(660px, 100%); padding: 12px 24px 18px; color: #17130e; background: var(--p); box-shadow: 0 30px 70px rgba(0, 0, 0, 0.6); font-family: "Helvetica Neue", Arial, sans-serif; cursor: default; animation: rt-upp 0.28s cubic-bezier(0.2, 0.7, 0.3, 1); }
+/* överst löpsedeln (sedel i rum-affischer.js) med sin zoom --k, och resten på samma papper */
+.rt-blad { --k: 6; --p: #eeebe1; --rod: #d5141b; flex: none; box-sizing: border-box; width: calc(var(--k) * 100px); padding: 0 0 18px; color: #17130e; background: radial-gradient(circle at 50% 50%, rgba(40, 24, 8, 0.14) 0 0.6px, rgba(0, 0, 0, 0) 0.8px) 0 0 / 2.6px 2.6px, var(--p); box-shadow: 0 30px 70px rgba(0, 0, 0, 0.6); font-family: "Helvetica Neue", Arial, sans-serif; cursor: default; animation: rt-upp 0.28s cubic-bezier(0.2, 0.7, 0.3, 1); }
 @keyframes rt-upp { from { transform: translateY(18px); } to { transform: none; } }
 @media (prefers-reduced-motion: reduce) { .rum-tidningen, .rt-blad { animation: none; } }
-.rt-blad.tid-sb { --p: #f4c5cf; --rod: #d0141d; }
-.rt-topp { display: flex; align-items: flex-end; justify-content: space-between; gap: 12px; border-bottom: 3px solid #17130e; padding-bottom: 6px; }
-.rt-logga { font: 400 42px/1.08 "Alfa Slab One", Georgia, serif; color: var(--rod); transform: skewX(-11deg); transform-origin: 0 100%; letter-spacing: -0.01em; }
-.tid-sb .rt-logga { font: 900 42px/1.08 "Helvetica Neue", Arial, sans-serif; letter-spacing: -0.04em; color: #17130e; transform: none; }
-.rt-dat { font-size: 12px; font-weight: 700; text-align: right; line-height: 1.25; letter-spacing: 0.02em; }
-.rt-kick { display: inline-block; margin: 11px 0 22px; padding: 3px 8px; background: var(--rod); color: #fff; font-size: 14px; font-weight: 800; letter-spacing: 0.06em; }
-.rt-rub { margin: 0; font: 400 112px/1.02 Anton, Impact, sans-serif; text-transform: uppercase; letter-spacing: 0.002em; overflow-wrap: anywhere; }
-.rt-rub .rod { color: var(--rod); }
-.rt-rub .inv { background: var(--rod); color: #fff; padding: 0 0.1em; }
-.rt-under { margin: 9px 0 0; font: 700 18px/1.2 "Helvetica Neue", Arial, sans-serif; }
+.rt-blad.tid-sb { --p: #eebac6; --rod: #d0141d; }
+.rt-blad .rt-sedel { position: relative; transform: none; filter: none; pointer-events: none; }
+/* samma täta raster som i rummet: sedeln är förstorad, men inte prickarna (de går vidare i bladets bakgrund) */
+.rt-blad .rt-sedel .tryck { background: linear-gradient(118deg, rgba(255, 246, 222, var(--blek, 0.15)), rgba(255, 246, 222, 0) 62%), radial-gradient(circle at 50% 50%, rgba(40, 24, 8, 0.14) 0 calc(0.6px / var(--k)), rgba(0, 0, 0, 0) calc(0.8px / var(--k))) 0 0 / calc(2.6px / var(--k)) calc(2.6px / var(--k)); }
+.rt-inne { padding: 0 calc(var(--k) * 4px); }
 .rt-sep { display: flex; justify-content: space-between; gap: 10px; margin: 15px 0 9px; padding-top: 7px; border-top: 3px solid #17130e; font: 800 13px/1 "Helvetica Neue", Arial, sans-serif; letter-spacing: 0.08em; white-space: nowrap; }
 .rt-betyg { display: grid; grid-template-columns: repeat(var(--n), minmax(0, 1fr)); column-gap: 14px; }
 .rt-foto { display: block; width: 100%; aspect-ratio: 1 / 0.96; background: #cfc8b8; }
@@ -129,13 +125,7 @@
 .rt-kr strong { display: block; margin-bottom: 4px; font: 400 22px/1.02 Anton, Impact, sans-serif; font-style: normal; text-transform: uppercase; letter-spacing: 0.02em; }
 .rt-tillbaka { flex: none; margin-top: 8px; min-height: 40px; padding: 0 10px; border: 0; background: none; color: #bcd0f5; font: 500 17px/40px Fraunces, Georgia, serif; text-decoration: underline; text-underline-offset: 4px; text-decoration-thickness: 1px; cursor: pointer; }
 @media (hover: hover) { .rt-tillbaka:hover { color: #d3e3ff; } }
-.rum.smal .rt-blad { padding: 8px 13px 16px; }
 .rum.smal .rum-tidningen { padding: 8px 10px 6px; }
-.rum.smal .rt-logga { font-size: 32px; }
-.rum.smal .rt-rub { font-size: 58px; }
-.rum.smal .rt-kick { margin: 8px 0 15px; font-size: 12px; }
-.rum.smal .rt-under { font-size: 15px; }
-.rum.smal .rt-dat { font-size: 10px; }
 .rum.smal .rt-betyg { column-gap: 8px; }
 .rum.smal .rt-nm { font-size: 15px; flex-direction: column; align-items: flex-start; gap: 4px; }
 .rum.smal .rt-bt { font-size: 11.5px; }

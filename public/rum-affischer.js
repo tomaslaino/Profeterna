@@ -634,8 +634,17 @@ export function affischer(back, { short = (x) => x, namn = null } = {}) {
     Promise.all([document.fonts.load('400 30px Anton'), document.fonts.load('400 30px "Alfa Slab One"')]).then(klar, klar);
   }
   const api = {
-    // det som står på löpsedeln just nu (tidningen i rum.js)
-    rubrik: () => senastR,
+    // Löpsedeln som den sitter, utan tejpen: tidningen i rum.js lägger fram samma papper,
+    // med samma storlekar på raderna, så att de inte kan bli olika. → elementet, eller null
+    sedel() {
+      const ark = l.querySelector('.ark');
+      if (!ark || !senastR) return null;
+      const el = document.createElement('div');
+      el.className = `rum-aff rum-lop tid-${senastR.tidning} rt-sedel`;
+      el.style.setProperty('--blek', l.style.getPropertyValue('--blek'));
+      el.append(ark.cloneNode(true));
+      return el;
+    },
     slit(w, seed) {
       for (const el of [f, n, v, c]) bleks(el, w);
       slit(l, w, seed + 5);

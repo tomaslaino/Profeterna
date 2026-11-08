@@ -5556,8 +5556,8 @@ person längst ner (ändrat 2026-11-08). I telefonen försvinner namnen under po
 
 Ett klick på blocket, guldordet *Läs protokollet* eller K lyfter det från pulten och lägger fram det stort över rummet, och *Lägg tillbaka*, Esc eller ett
 klick utanför lägger tillbaka det (`protokollet` i rum.js). Ett klick på
-löpsedeln i fönstret öppnar tidningen med samma rubrik som sedeln, betygen, skrällen och hans krönika (`tidningen` i
-rum.js). Gänget håller upp skyltar med sina rätt (`lappar` i rum-3d.js), medan resten av figuren lever som
+löpsedeln i fönstret öppnar tidningen: överst samma sedel som i fönstret, förstorad (`sedel` i rum-affischer.js kopierar
+papperet, så att de inte kan bli olika), och under den betygen, skrällen och hans krönika (`tidningen` i rum.js). Gänget håller upp skyltar med sina rätt (`lappar` i rum-3d.js), medan resten av figuren lever som
 vanligt. Skyltarna står kvar till måndagen efter omgången kl. 16, också om någon har valt matcher till en ny omgång för hand före det
 (`lappar` i rum-block.js läser då den förra omgången, `forra` i GET /samtal), men inte sedan den har börjat. Så länge
 lägger ett klick på någon i gänget ner hens skylt på bordet, och ett klick till på hen eller skylten tar upp den igen

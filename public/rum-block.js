@@ -311,26 +311,21 @@
     const vem = !ratt.length ? T.ingen : ratt.length === folk.length ? T.alla : ratt.length === 1 ? T.en(ratt[0].namn) : T.fler(`${ratt.slice(0, -1).map((x) => x.namn).join(', ')} och ${ratt.at(-1).namn}`);
     return { text: `${forsta} ${vem}`, sida: r.res === 1 ? 'OAVGJORT' : (r.res === 0 ? r.h : r.b).toUpperCase() };
   }
-  const slutPunkt = (s) => (/[.!?”]$/.test(s) ? s : `${s}.`);
 
-  // → html för den öppna tidningen. r: löpsedelns rubrik (rubrik i rum-affischer.js), så att
-  // tidningen är samma som löpsedeln.
-  function tidning(sum, r) {
+  // → html för det som står under löpsedeln i den öppna tidningen. Själva sedeln läggs överst i
+  // bladet av tidningen i rum.js (sedel i rum-affischer.js), så att det är samma papper. tid: 'ex' eller 'sb'.
+  function tidning(sum, tid) {
     const folk = sum.folk.filter((p) => !p.none);
     const ok = new Set(folk.map((p) => p.ok));
     const bast = folk.find((p) => p.award === 'best');
     const hoger = ok.size === 1 ? `${ordet(folk[0].ok)} rätt, allihop`.toUpperCase() : bast ? `BÄST: ${bast.namn.toUpperCase()}` : '';
     const sk = skrall(sum);
     const kr = kronika(sum);
-    const rub = (r.rad || []).map(([t, s]) => `<span class="${s === 1 ? 'rod' : s === 2 ? 'inv' : ''}">${esc(t)}</span>`).join(' ');
-    const namn = { ex: 'EXPRESSEN', sb: 'Sportbladet' }[r.tidning] || 'Sportbladet';
-    return `<div class="rt-blad tid-${esc(r.tidning || 'sb')}" role="document">` +
-      `<div class="rt-topp"><b class="rt-logga">${namn}</b><span class="rt-dat">${esc(r.datum || '')}<br>SPORT · PRIS: ÄRAN</span></div>` +
-      `<span class="rt-kick">${esc(r.kick || '')}</span><h2 class="rt-rub">${rub}</h2><p class="rt-under">${esc(slutPunkt(r.under || ''))}</p>` +
+    return `<div class="rt-blad tid-${esc(tid)}" role="document"><div class="rt-inne">` +
       `<div class="rt-sep"><span>BETYGEN</span><span>${esc(hoger)}</span></div>` +
       `<div class="rt-betyg" style="--n:${folk.length}">${folk.map((p) => `<div>${p.bild ? `<canvas class="rt-foto" width="360" height="346" data-bild="${esc(p.bild)}"></canvas>` : '<span class="rt-foto"></span>'}<div class="rt-nm"><span>${esc(p.namn)}</span>${bollar(p.betyg)}</div><p class="rt-bt">${esc(betygText(p))}</p></div>`).join('')}</div>` +
       `<div class="rt-nedre"><div>${sk ? `<div class="rt-sep"><span>SKRÄLLEN</span><span>${esc(sk.sida)}</span></div><p class="rt-skr">${esc(sk.text)}</p>` : ''}</div>` +
-      `<div><div class="rt-sep"><span>KRÖNIKAN</span><span>HASSE BACKE</span></div><div class="rt-kr"><canvas class="rt-hasse" width="168" height="220" data-bild="profeterna/hasse.jpg"></canvas><p><strong>${esc(kr.rubrik)}</strong>${esc(kr.text)}</p></div></div></div></div>`;
+      `<div><div class="rt-sep"><span>KRÖNIKAN</span><span>HASSE BACKE</span></div><div class="rt-kr"><canvas class="rt-hasse" width="168" height="220" data-bild="profeterna/hasse.jpg"></canvas><p><strong>${esc(kr.rubrik)}</strong>${esc(kr.text)}</p></div></div></div></div></div>`;
   }
 
   // Tidningsbilderna: svartvita och rastrerade, ritade en gång på dukar (CSS-blandning kostar i telefonen).
