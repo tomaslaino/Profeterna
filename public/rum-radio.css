@@ -1,0 +1,56 @@
+/* Kassettradion nära (rum-radio.js): genomskinliga reglage över delarna i 3D, och orden under radion. */
+/* rutan runt radion i rummet, som ger handen: det kameran siktar på (radioRuta i rum.js) */
+.rum-pl > #rum-radio { visibility: visible; pointer-events: auto; cursor: pointer; }
+.rum.sak-nara .rum-pl > #rum-radio { pointer-events: none; }
+/* (fingret: lite större än radion, som är liten på håll) */
+.rum-pl > #rum-radio::after { content: ""; position: absolute; inset: -6px; }
+/* nära radion: rummets varma sken ligger ovanpå allt och tvättar ur det svarta på fronten */
+.rum.radio-nara .rum-warm { opacity: 0; }
+.rum-radio-reglage { position: absolute; inset: 0; z-index: 3; pointer-events: none; }
+.rum-radio-reglage[hidden] { display: none; }
+.rum-radio-reglage .r-del {
+  position: absolute;
+  margin: 0;
+  padding: 0;
+  border: 0;
+  background: none;
+  pointer-events: auto;
+  touch-action: none;
+  -webkit-tap-highlight-color: transparent;
+  outline-offset: 2px;
+  cursor: pointer;
+}
+.rum-radio-reglage .r-kropp { cursor: default; touch-action: auto; }
+.rum-radio-reglage .r-skala { cursor: ew-resize; }
+.rum-radio-reglage .r-ratt { cursor: grab; border-radius: 50%; }
+.rum-radio-reglage .r-ratt:active { cursor: grabbing; }
+.rum-radio-reglage .r-del:focus { outline: none; }
+.rum-radio-reglage .r-del:focus-visible { outline: 2px solid rgba(255, 214, 140, 0.7); }
+
+/* kanalerna man har hittat: ord med streck under den som hörs */
+.rum-sakfot:has(.radio-fot) { width: min(980px, calc(100% - 20px)); }
+.radio-fot { display: flex; flex-direction: column; gap: 6px; align-items: center; }
+.radio-fot .r-rad { display: flex; flex-wrap: wrap; justify-content: center; align-items: baseline; gap: 2px 16px; }
+.radio-fot .r-rad[hidden] { display: none; }
+.radio-fot .r-bandord { font: 700 12px/1 Inter, system-ui, sans-serif; letter-spacing: 0.12em; color: #a89f8c; text-shadow: 0 1px 6px #000; }
+.radio-fot .r-ord {
+  padding: 2px 0 3px;
+  border: 0;
+  border-bottom: 2px solid transparent;
+  background: none;
+  font: 600 17px/1.25 Fraunces, Georgia, serif;
+  color: #e9dfc8;
+  text-shadow: 0 1px 8px #000;
+  cursor: pointer;
+  transition: color 0.2s;
+}
+.radio-fot .r-ord:hover { color: #fff; }
+.radio-fot .r-ord.nu { color: #f6d58a; border-bottom-color: #f6d58a; }
+.radio-fot .r-ord.ny { animation: radio-ny 1.1s ease-out both; }
+@keyframes radio-ny { from { opacity: 0; color: #f6d58a; } }
+@media (max-width: 560px) {
+  .radio-fot { gap: 4px; }
+  .radio-fot .r-rad { gap: 0 12px; }
+  .radio-fot .r-ord { font-size: 15px; }
+}
+@media (prefers-reduced-motion: reduce) { .radio-fot .r-ord.ny { animation: none; } }

@@ -697,6 +697,12 @@ bara lokalt. Analyserna visas som de ligger i `data/analyser.json`; hur de skriv
   italiensk discokanal? … Med italienska discohits." När radion sätts på spelar den en riktig
   webbradiokanal med italo disco, ur den fria katalogen radio-browser, och tar nästa om en inte går
   att spela. Se [Tobaksaffären](#tobaksaffären), *Radion*.
+- **Kassettradio med FM och AM (2026-11-08, användarens önskemål):** "kan du ordna så att det här blir en
+  riktig radio med olika radiokanaler", "en kassettradio – men där man kan ställa in FM- och AM-banden",
+  "snyggt animerat/visualiserat" och "välja på olika kanaler som är med där och som man lyckas hitta". Bland
+  annat italiensk disco, engelsk fotboll, P4 och Sport 890 på AM, och gubbarna dansar på musikkanalerna. Ett klick
+  går fram till radion, och där ställer man in banden med ratten, och det man hittar skrivs på tejpen vid
+  skalan. Se [Tobaksaffären](#tobaksaffären), *Radion*.
 - **Man väljer sig själv med ett klick på sin figur (2026-11-03, användarens önskemål):**
   ett klick på sin egen figur vid bordet gör en till den som fyller i kupongen – samma val
   som porträtten på kupongen – och figuren räcker upp handen med pennan, lyfter kupongen mot
@@ -2839,25 +2845,45 @@ som tappade raden sjunger inte med utan sitter med armarna i kors. Det går för
 pågår tonar bort, och inget annat börjar så länge (`tvingStart`). Ett mål som bara sänkte någon ger
 ingen sång. Prova med `?rum-mal=dl:1,dt:-1,dj:0&rum-t=6`.
 
-**Radion** (2026-11-08, `bergsprangare`, `radioSang` och `radioRita` i rum-3d.js, klicket i
-rum-folk.js): en bergsprängare i leksaksstorlek – silver med två högtalare i kromringar,
-kassettfack, lysdioder, handtag och antenn – står på fönsterbänkens högra ände, under löpsedlarna,
-där inget annat står hur de än sitter (DJ:s tomflaskor står till vänster om den). Den valdes bland
-fyra utseenden (transistorradio, bakelitradio, bergsprängare och fotbollsradio). Ett klick på den sätter på den
-eller stänger av den, som ett klick på någon i gänget (ingen hand, och klicket går inte vidare till
-löpsedeln bakom). Så länge den spelar studsar lysdioderna, högtalarna pumpar i sångens takt, noter
-stiger ur den – stilla med minskad rörelse – och
-grabbarna dansar och sjunger: något nytt var fjortonde sekund, två danser och en sång om vartannat,
-var för sig i en ordning som blandas om varje varv (mot tv:n bara när matcherna pågår, försångaren och
-tv-studion bara när alla tre är vakna och har lämnat in). Den som väntar på kupongen, sover eller är
-borta är inte med, och på natten är ingen det. Ett mål går före radion. Radion är var och ens egen:
-den sparas inte och syns inte hos de andra. `?rum-radio` sätter på den (`=4` sedan fyra sekunder,
-med `?rum-t`), utan ljud.
+**Radion** (2026-11-08, [public/rum-radio.js](public/rum-radio.js) för band, stationer, ljud och reglage, och
+`kassettradio`, `radioRita`, `radioSang` och `narbild` i rum-3d.js för apparaten): en kassettradio i
+leksaksstorlek – silver med två högtalare i kromringar, kassett bakom glas, stationsskala, åtta lysdioder,
+tangenterna AV, FM och AM, volym- och stationsratt, handtag och antenn – står på fönsterbänkens högra ände,
+under löpsedlarna, där inget annat står hur de än sitter (DJ:s tomflaskor står till vänster om den). Den
+valdes bland fyra utseenden (transistorradio, bakelitradio, bergsprängare och fotbollsradio). Ett klick på
+den går fram till den (`SAKER.radio` i rum.js), och där sitter genomskinliga reglage över delarna:
+tangenterna, stationsratten (runt med musen, längs med eller upp och ner med fingret, tre varv över hela
+skalan), skalan själv (visaren följer fingret), volymen, hjulet och piltangenterna. Radion står på AV när man kommer.
+
+Skalan lyser med en glödlampa som tänds mjukt, och den valda bandraden lyser starkast. Samma visare går över
+båda banden, som på en riktig radio, så ett byte av band hamnar sällan på en station. Släpper man nära en
+station drar radion in den, och en liten röd lampa säger att den stämmer. Mellan stationerna hörs brus, på AM
+också knaster och en pipton som sjunker tills man står rätt. AM låter dessutom som AM: smalt band och långsam
+fading, som också syns på lampan. Lysdioderna och högtalarna följer det som faktiskt hörs (en analysator i
+Web Audio), och tangenterna går in. En station man har hört en stund är hittad: den skrivs för hand på
+maskeringstejpen vid skalan (FM ovanför i blått, AM under i rött, `radioSkriv`, varje station har sin plats från
+början så att inget flyttar sig) och står som ett ord under radion, och ett klick på ordet vrider dit. Italo
+Disco är hittad från början, och visaren står där första gången. Visaren, volymen och det man har hittat sparas i
+webbläsaren, och radion är var och ens egen: den syns inte hos de andra och stängs av när man lämnar rummet.
+
+Gänget dansar och sjunger bara till musik (`musik` i `KANALER`), inte till brus eller prat: något nytt var
+fjortonde sekund, två danser och en sång om vartannat, var för sig i en ordning som blandas om varje varv
+(mot tv:n bara när matcherna pågår, försångaren och tv-studion bara när alla tre är vakna och har lämnat in).
+De slutar först fyra sekunder efter att musiken har försvunnit, så att den som vrider på ratten inte får dem att
+börja om. Noter stiger ur radion så länge, stilla med minskad rörelse. Den som väntar på kupongen, sover eller är
+borta är inte med, och på natten är ingen det. Ett mål går före radion.
+
+Radion står i gängets duk, som är ritad för hela rummet. När kameran är framme ritas bara det som syns av duken,
+i närbildens skärpa (`narbild`), och duken läggs över just den delen: gänget står kvar och rör sig, och rummet
+kostar mindre än på håll (en fjärdedel av trianglarna, uppmätt 2026-11-08). Skalans, tejpens och
+kassettens dukar ritas om större första gången (`radioFin`), och de små delarna ritas bara på väg fram och nära
+(`radioDetalj`). Radion kostar 2 % fler ritningar i rummet än bergsprängaren. `?rum-sak=radio` visar närbilden
+och `?rum-radio-lage=fm:104.3` hur den står inställd, utan ljud (`&rum-radio-alla`: allt är hittat); `?rum-radio`
+sätter på gänget och lysdioderna (`=4` sedan fyra sekunder, med `?rum-t`), också det utan ljud.
 
 **Dansen** (2026-11-08, `DANSER` i rum-dans.js, `dansPose`, `dansHand` och `dansFingrar` i rum-3d.js):
 italodisco som i de italienska tv-programmen runt 1980, sittande på barstolen, i 120 slag i minuten
-(högtalarna och lysdioderna pumpar i dansens takt; kanalen är en vanlig ljudström, så takten är
-genrens och inte låtens). Det som är i händerna ställs på bordet och
+(takten är genrens och inte låtens: högtalarna och lysdioderna följer ljudet, men dansen följer inte en ljudström). Det som är i händerna ställs på bordet och
 tas upp igen, som i korstecknet, och skyltarna läggs på bordet så länge radion spelar.
 - *Härmleken* (`italoLek`): sex av nio påhittade gester, två sekunder var och i en ny ordning varje
   gång: sover, vinkar, liftar, simmar, åker skidor, sprejar deodorant, spänner musklerna, kör bil och
@@ -2877,18 +2903,20 @@ Allt står i bildens axlar (`bildAxlar`), så att dansen ser likadan ut var de �
 `?rum-akt=dl:italoPek,dt:italoPek,dj:italoPek`, och i en fast bild `?rum-t=5&rum-akt=dl:italoRobot@3` (tre
 sekunder in).
 
-Den spelar en riktig webbradiokanal med italiensk disco (2026-11-08, `ljud` i rum-folk.js).
-Kanalerna hämtas i webbläsaren när musen går över radion eller den sätts på, ur den fria katalogen
-[radio-browser](https://www.radio-browser.info/): taggen *italo disco*, de mest lyssnade först, och
-bara de som sänder mp3 eller aac över https (sajten är https) och fungerade vid katalogens senaste
-kontroll. Sist i listan står laut.fm:s Italo Disco (`RADIO_RESERV`). Ljudet måste sättas igång i
-själva klicket – Safari, och Chrome innan man har klickat på sidan, spelar annars inget – så hinner
-listan inte komma börjar den med laut.fm. Går en kanal inte att spela (fel, slut eller inget ljud
-inom åtta sekunder) tas nästa, och nästa gång börjar den på den som spelade sist. Går ingen att
-spela är radion tyst, men gänget sjunger ändå. Volymen är halv (`RADIO_VOLYM`), och radion stängs
-av när man lämnar rummet. Det är det enda i rummet som hämtar något från andra än sajten utan att
-man har bett om det: katalogen och kanalen, och bara när man pekar på radion eller sätter på den.
-Låtarna är kanalens; sajten visar inte vad som spelas.
+Stationerna är riktiga webbradiokanaler (`KANALER` i rum-radio.js). De svenska ligger på sina frekvenser i
+Stockholm och Göteborg där de har några, AM-bandets på mellanvågen där de sänder eller har sänt:
+- *FM:* Dansbandskanalen 88,7, Italo Disco 90,4 (laut.fm), P1 92,4, Guldkanalen 80-tal 93,7, Gamla Favoriter 95,1,
+  P2 96,2, Rockklassiker 97,7, P3 99,3, Disco 54 100,6, P4 Göteborg 101,9, P4 Stockholm 103,3, Mix Megapol 104,3,
+  Bandit Rock 106,3, Rix FM 106,7 och Star FM 107,1.
+- *AM:* Sarandí 690 och Radio Carve 850 (Montevideo), Sport 890 (Montevideo, DL:s Nacional), Rai Radio 1 900,
+  talkSPORT 1053 och talkSPORT 2 1089 (engelsk fotboll) och Radio Caroline 1159.
+
+Adresserna går direkt till servrarna, eftersom ljudet går genom Web Audio och en omdirigering utan CORS-svar då
+inte går att spela (`live1.sr.se`, `stream.laut.fm`). Slutar en adress svara provas reservadressen (där det
+finns en) och sedan samma adress utan Web Audio, utan AM-ljud och med lysdioderna i dansens takt. Därefter är det
+brus och ett nytt försök om en stund. Alla spelade i Chrome 2026-11-08 på Mac (`A.klar` och att tiden gick). Ljudet
+måste sättas igång av ett tryck, och det gör tangenterna och orden. Stationerna hämtas först när visaren står på
+dem, och släpps fem sekunder efter att den har lämnat dem. Låtarna är kanalernas; sajten visar inte vad som spelas.
 
 Skämtet, grälet och tv:n kommer bara när alla tre har lämnat in och är vakna och matcherna
 inte pågår, och inte medan någon är borta (nedan). Ingen gör något eget påhitt samtidigt.
@@ -5580,7 +5608,7 @@ Esc eller ett klick (också på saken) går tillbaka,
 och K, T, A, R och V går direkt till kupongen, tv:n, anslagstavlan, kortregistret och videon
 (K nära kupongen på pulten går tillbaka). Föremålen lyser inte när man
 pekar på dem på nära håll. Med `prefers-reduced-motion` går kameran direkt.
-`?rum-sak=ur|skar|ram|kort|pokal|kork|vm94|ifk|nacional|lopsedel|chelsea|dorr|kupong` visar en närbild i en fast bild (med `?rum-t`).
+`?rum-sak=ur|skar|ram|kort|pokal|kork|vm94|ifk|nacional|lopsedel|chelsea|dorr|kupong|radio` visar en närbild i en fast bild (med `?rum-t`).
 
 ### Bakåt
 
