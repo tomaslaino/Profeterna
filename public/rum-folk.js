@@ -235,8 +235,10 @@ window.RumFolk = (() => {
   }
 
   // Vem i gänget syns under punkten (x, y) i fönstret?
-  function vemUnder(x, y) {
+  function vemUnder(x, y, mal = null) {
     const f = fig();
+    // (guldordet och det som ligger på pulten är framför gängets ben, som står bakom pulten)
+    if (mal && mal.closest && mal.closest('.rum-tag, #rum-kupong')) return null;
     const c = F.el && F.el.querySelector('#rum-3d');
     if (!f || !f.under || !c || F.o.nara()) return null;
     const r = c.getBoundingClientRect();
@@ -306,7 +308,7 @@ window.RumFolk = (() => {
       const ms = performance.now();
       if (ms - F.rorAt < 60) return;
       F.rorAt = ms;
-      const k = vemUnder(e.clientX, e.clientY);
+      const k = vemUnder(e.clientX, e.clientY, e.target);
       pa(k);
       markor(k ? e.target.closest('.rum-sak, .rum-tag') : null);
     });
@@ -321,7 +323,7 @@ window.RumFolk = (() => {
       // (inte klicket efter ett drag, som rum.js redan har stoppat, och inte i
       // Hasses vy, som står framför gänget)
       if (e.defaultPrevented || e.target.closest('.rum-hasse-vy')) return;
-      const k = vemUnder(e.clientX, e.clientY);
+      const k = vemUnder(e.clientX, e.clientY, e.target);
       // (ett klick på något annat: kupongen tas inte i handen)
       clearTimeout(F.taT);
       if (!k) return;

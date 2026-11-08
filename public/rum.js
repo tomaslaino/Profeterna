@@ -1435,6 +1435,9 @@ ${window.RumRegister ? RumRegister.nara() : ''}
   // pennorna är knappar och fält – på din kupong och gängets så länge de går
   // att ändra.
   function couponHtml(rd, rows, v = null, hand = false) {
+    // omgången är spelad: bara Hasse Backes protokoll ligger på pulten (rum-block.js), tills nästa
+    // kupong kommer måndagen efter kl. 16 (autoRound i worker/samtal.mjs)
+    if (v && v.slag === 'gang' && !hand && R.summa) return RumBlock.html(R.summa, { tat: Boolean(R.smal) });
     const nr = rd && !rd.next && typeof couponNumber === 'function' && rd.ids.length ? couponNumber(rd.ids) : null;
     const first = rows.length ? Math.min(...rows.map((x) => Date.parse(x.m.kickoff))) : null;
     const order = rd ? rd.ids.map((id) => rows.find((x) => x.id === id)).filter(Boolean) : rows;
@@ -1494,9 +1497,7 @@ ${window.RumRegister ? RumRegister.nara() : ''}
       `<span class="fot">${v ? Samtal.pult.fields(signs, slag === 'gang') : ''}${id ? Papper.code(id) : ''}</span>` +
       (slag === 'din' || slag === 'las' ? '<span class="stampel">Inlämnad</span>' : '') +
       // gängets kupong på pulten ligger med baksidan upp tills den vänds
-      (slag === 'gang' && !hand && p && !vand(p) ? vandHtml(band + hd + list, R.summa ? null : top) : '') +
-      // omgången är spelad: Hasse Backes protokoll ligger över kupongen (rum-block.js)
-      (slag === 'gang' && !hand && R.summa ? RumBlock.html(R.summa, { tat: Boolean(R.smal) }) : '') +
+      (slag === 'gang' && !hand && p && !vand(p) ? vandHtml(band + hd + list, top) : '') +
       `<span class="pencil${slag === 'gang' || (!v && order.some((x) => x.sign)) ? ' kula' : ''}" style="${penStyle(PEN_PULT)}"><i></i></span>`;
   }
 
@@ -1784,6 +1785,11 @@ ${window.RumRegister ? RumRegister.nara() : ''}
     // har du lämnat in ligger din kupong i högen, och på pulten en ny – eller
     // gängets kupong, när du ser de andras tips (uppgörelsen)
     set('rum-kupong', couponHtml(rd, rows, p && p.gang ? view(p, 'gang') : p && !p.inne ? view(p, 'fyll') : null));
+    const pa = document.getElementById('rum-kupong');
+    if (pa) {
+      pa.setAttribute('aria-label', R.summa ? 'Protokollet' : 'Kupong');
+      if (pa.title) pa.title = `${R.summa ? 'Protokollet' : 'Kupongen'} · K`;
+    }
     pile(rd, p);
     // gänget vid barbordet: den som inte har lämnat in sitter med kupongen
     R.vem = vemInne(rd, rows, t, p);
@@ -1792,7 +1798,7 @@ ${window.RumRegister ? RumRegister.nara() : ''}
     const started = rows.length && Math.min(...rows.map((x) => Date.parse(x.m.kickoff))) <= t;
     const tag = document.getElementById('rum-tag');
     if (tag) {
-      const go = p ? p.go : started ? 'Följ kupongen' : '';
+      const go = R.summa ? 'Läs protokollet' : p ? p.go : started ? 'Följ kupongen' : '';
       // till uppgörelsen står pingklockan där i stället för guldordet
       if (tag.dataset.go !== go) {
         const klocka = go === 'Till uppgörelsen';
@@ -2800,15 +2806,14 @@ ${window.RumRegister ? RumRegister.nara() : ''}
     else if (a.id === 'rum-ans') board(true);
     else if (a.id === 'rum-reg') register(true);
     else if (a.id === 'rum-kupong') {
-      if (R.summa && e.target.closest && e.target.closest('.rum-block')) protokollet();
-      else if (a.querySelector('.rum-vand')) vandKupong(a);
+      if (a.querySelector('.rum-vand')) vandKupong(a);
       else if (!openCoupon()) sak('kupong');
     } else if (a.classList.contains('rum-bak') && !(a.dataset.ta != null && openCoupon(a))) nudge(a);
   }
 
   // ---------- sammanställningen ----------
   //
-  // När omgången är spelad och syns (rum-block.js): blocket över kupongen, gängets lappar i 3D
+  // När omgången är spelad och syns (rum-block.js): blocket i kupongens ställe, gängets lappar i 3D
   // och datorns siffra på videons ruta. Dolda resultat ger inget (tpScore).
   function summera(rd, p, t) {
     const g = p && p.gang && rd && !rd.next ? Samtal.pult.gang() : null;
@@ -3542,6 +3547,11 @@ ${window.RumRegister ? RumRegister.nara() : ''}
   // klickar. Ur högen tas din kupong och de vars tips du ser. → om den togs.
   function openCoupon(from = null) {
     if (R.kup) return true;
+    // (omgången är spelad: på pulten ligger bara protokollet)
+    if (!from && R.summa) {
+      protokollet();
+      return true;
+    }
     const p = pult();
     if (!p || !R.el) return false;
     let slag = null;

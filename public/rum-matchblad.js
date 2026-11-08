@@ -269,7 +269,7 @@ window.RumMatchblad = (() => {
     if (!a) {
       const kommer = !m.completed && Date.parse(m.kickoff) > Date.now();
       return tom(kommer
-        ? 'Analysen är inte klar än. Nya analyser skrivs måndag 08, onsdag 16, fredag 16 och lördag 11, så titta in igen då.'
+        ? 'Analysen är inte klar än. Nya analyser skrivs måndag 17, onsdag 16, fredag 16 och lördag 11, så titta in igen då.'
         : 'Ingen analys av matchen.');
     }
     const skriven = a.writtenAt ? fSkriven.format(new Date(a.writtenAt)) : null;

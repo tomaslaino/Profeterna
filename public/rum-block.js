@@ -3,8 +3,8 @@
 // ---------- sammanställningen efter omgången ----------
 //
 // När alla matcher i omgången är spelade (och syns: Dölj resultat följs genom
-// tpScore i tippare.js) ligger Hasse Backes protokoll över kupongen på pulten i
-// tobaksaffären: Yatzy-blocket med facit och en spalt för kupongen, var och en i
+// tpScore i tippare.js) ligger bara Hasse Backes protokoll på pulten i
+// tobaksaffären, tills nästa kupong kommer måndagen efter kl. 16: Yatzy-blocket med facit och en spalt för kupongen, var och en i
 // gänget och Hasse. Allas tecken står kvar, och det som satt är markerat, så att
 // raderna går att läsa utan förklaring. Han har rättat det, med en dom per person
 // längst ner och sin namnteckning. Ett klick på blocket lyfter det och lägger fram det
@@ -187,7 +187,8 @@
   }
 
   // Vad gänget håller upp: när en omgång är spelad står allas rätt kvar till måndagen efter kl. 16,
-  // också när nästa omgång redan har tagit över (Svenska Spel öppnar den senast måndag morgon).
+  // då nästa kupong kommer (autoRound i worker/samtal.mjs), också om någon har valt matcher till en
+  // ny omgång för hand före det.
   // omgangar: de att välja bland, den senaste först. Dolda resultat ger inget (tpScore).
   // → { id: omgången, slut: när tiden är ute, vem: { dl: { tal, ink }, … } }, eller null.
   function lappar(omgangar, now = Date.now()) {

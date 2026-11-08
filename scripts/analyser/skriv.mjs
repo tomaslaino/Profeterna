@@ -5,7 +5,7 @@
 // slutar direkt.
 //
 //   - Omgångens matcher och namn: så snart gängets omgång finns (oftast
-//     Stryktipset, måndag kl. 07) skrivs matcherna i data/analyser.json och namnet
+//     Stryktipset, måndag kl. 16) skrivs matcherna i data/analyser.json och namnet
 //     i data/omgangsnamn.json.
 //   - Analyserna: på varje tid i config/analyser.js (tider) skrivs en ny analys per
 //     match som inte har börjat, och Hasse Backes text ur den. Misslyckas en match

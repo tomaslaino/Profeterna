@@ -94,6 +94,12 @@ const AUTO = 'samtal:auto';
 // Så länge efter sista avsparken står en omgång kvar innan veckans
 // Stryktips tar över – matcherna hinner spelas färdigt.
 const AUTO_AFTER_MS = 3 * 3600000;
+// Nästa kupong kommer tidigast måndagen efter omgången kl. 16 i Sverige: fram till
+// dess ligger protokollet på pulten, också om Svenska Spel redan har öppnat nästa
+// Stryktips. Bara efter en omgång som slutar så här nära måndagen, så att en omgång
+// mitt i veckan inte stoppar helgens Stryktips.
+const NY_KUPONG_KL = 16;
+const NY_KUPONG_NARA_MS = 3 * 24 * 3600000;
 // Fanns inte alla Stryktipsets matcher på sajten prövas det igen efter en
 // timme (spelprogrammet byggs om under dagen).
 const AUTO_RETRY_MS = 3600000;
@@ -117,6 +123,31 @@ function gameOf(x) {
 // Första avsparken – senast då visas tipsen.
 const firstKick = (round) => Math.min(...round.matcher.map((m) => Date.parse(m.avspark)).filter(Number.isFinite));
 const lastKick = (round) => Math.max(...round.matcher.map((m) => Date.parse(m.avspark)).filter(Number.isFinite));
+
+const fmtKlockan = new Intl.DateTimeFormat('en-GB', { timeZone: 'Europe/Stockholm', weekday: 'short', year: 'numeric', month: 'numeric', day: 'numeric', hour: 'numeric', minute: 'numeric', second: 'numeric', hourCycle: 'h23' });
+const klockan = (ms) => Object.fromEntries(fmtKlockan.formatToParts(ms).map((x) => [x.type, x.value]));
+
+// Första måndagen kl. 16 i Sverige efter tiden ms (samma som mandagEfter i public/rum-block.js).
+function mandagEfter(ms) {
+  for (let d = 0; d < 9; d += 1) {
+    const p = klockan(ms + d * 864e5);
+    if (p.weekday !== 'Mon') continue;
+    // (klockslaget som om det vore UTC, minus skillnaden mot svensk tid just då)
+    const g = Date.UTC(+p.year, +p.month - 1, +p.day, NY_KUPONG_KL);
+    const q = klockan(g);
+    const t = g - (Date.UTC(+q.year, +q.month - 1, +q.day, +q.hour, +q.minute, +q.second) - g);
+    if (t > ms) return t;
+  }
+  return NaN;
+}
+
+// När nästa kupong får komma efter omgången: måndagen efter kl. 16, eller 0 om den inte
+// behöver vänta på någon måndag (omgången slutade mitt i veckan).
+function nyKupongFran(round) {
+  const sista = lastKick(round);
+  const mandag = mandagEfter(sista);
+  return mandag - sista <= NY_KUPONG_NARA_MS ? mandag : 0;
+}
 
 async function loadTips(store, round, gang) {
   const list = await Promise.all(gang.map((g) => store.get(tipsKey(round.id, g.id))));
@@ -211,8 +242,9 @@ async function replaceRound(store, round, tips, gang, ms, next) {
 
 // Veckans Stryktips blir omgångens kupong av sig själv, i Stryktipsets
 // ordning, när ingen omgång pågår: den förra har spelats färdigt (sista
-// avsparken för AUTO_AFTER_MS sedan) eller tagits bort, och Svenska Spel har
-// öppnat en ny omgång (måndagar kl. 07). Matcherna går att ändra som vanligt
+// avsparken för AUTO_AFTER_MS sedan, och måndagen efter kl. 16 har kommit,
+// nyKupongFran) eller tagits bort, och Svenska Spel har öppnat en ny omgång
+// (senast måndag kl. 07). Matcherna går att ändra som vanligt
 // tills någon har lämnat in. Varje Stryktipsomgång startas bara en gång
 // (samtal:auto), så en som tas bort eller ersätts kommer inte tillbaka. Finns
 // inte alla matcherna på sajten (andra ligor) eller har någon startat blir
@@ -224,7 +256,7 @@ async function replaceRound(store, round, tips, gang, ms, next) {
 //        (som replaceRound), eller null.
 async function autoRound(round, { store, gang, auto, t }) {
   const ms = t.getTime();
-  if (round && ms < lastKick(round) + AUTO_AFTER_MS) return null;
+  if (round && ms < Math.max(lastKick(round) + AUTO_AFTER_MS, nyKupongFran(round))) return null;
   const draw = await auto.draw();
   if (!draw || !Number.isInteger(draw.nr) || !(Date.parse(draw.stang) > ms)) return null;
   if (round && round.spel && round.spel.nr === draw.nr) return null;

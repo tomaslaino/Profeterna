@@ -1238,7 +1238,7 @@ function analysPane(d) {
   if (a) return articlePane(a) + tipCard(d, a);
   const waiting = notReady.has(id) && !(analyserData && analyserData.per.has(id));
   return '<article class="card artikel" id="artikel-card">' + (waiting
-    ? '<p class="unknown">Analysen är inte klar än. Nya analyser skrivs måndag 08, onsdag 16, fredag 16 och lördag 11, så titta in igen då.</p>'
+    ? '<p class="unknown">Analysen är inte klar än. Nya analyser skrivs måndag 17, onsdag 16, fredag 16 och lördag 11, så titta in igen då.</p>'
     : `<button type="button" class="analyze" data-artikel="${esc(id)}" title="Artikeln om matchen och tecknen som ringas in">Analysera</button>`) + '</article>';
 }
 

@@ -134,7 +134,8 @@ ingen falsk precision · sidan kraschar aldrig av en död källa · endast fria 
   *Svenska folket* i foten är borttagna – under rutorna står bara modellens odds. *Hämta
   Stryktipset* finns kvar
 - [x] **Stryktipset som veckans kupong (2026-10-20):** när Svenska Spel öppnar veckans
-  Stryktips (måndagar kl. 07) och förra omgången är färdigspelad blir dess tretton matcher
+  Stryktips (senast måndag kl. 07) och förra omgången är färdigspelad, sedan 2026-11-08 tidigast
+  måndagen efter omgången kl. 16, blir dess tretton matcher
   omgångens kupong av sig själv, utan att någon väljer. *Ändra matcherna* går som förut
   tills någon har lämnat in, och *Välj matcher* börjar med Stryktipset ifyllt. Gängets
   kupong behåller Stryktipsets ordning 1–13 – också när den sparas, ändras och hamnar i
@@ -535,7 +536,7 @@ bara lokalt. Analyserna visas som de ligger i `data/analyser.json`; hur de skriv
 - **Analyserna i förväg på datorn (2026-11-04, användarens beslut):** sajten ska bara visa
   färdiga texter, och allt AI-skrivande ska gå på användarens Claude-konto på en dator som står
   på dygnet runt, inte på en API-nyckel. Bara omgångens matcher skrivs, oftast Stryktipsets
-  tretton, måndag 08, onsdag 16, fredag 16 och lördag 11. Claude får söka och läsa på nätet (`WebSearch`, `WebFetch`) men inget annat, eftersom
+  tretton, måndag 17, onsdag 16, fredag 16 och lördag 11. Claude får söka och läsa på nätet (`WebSearch`, `WebFetch`) men inget annat, eftersom
   underlaget i dag är just det Claude hittar. En påhittad tränare skriver analysen, medan Hasse
   Backe ligger kvar i tobaksaffären och låtsas analysera. DeepSeek är borta helt: omgångens namn
   och kupongernas kommentarer skrivs också på datorn.
@@ -867,6 +868,16 @@ bara lokalt. Analyserna visas som de ligger i `data/analyser.json`; hur de skriv
 - **Hasse Backe spanar på din kupong (2026-11-08, användarens val):** ibland går blicken ned på kupongen,
   med sex olika miner, och när han har sagt vad han tycker om den passar minen orden. Se
   [Hasse Backe](#hasse-backe), *Vilan*.
+- **Bara protokollet på pulten, och nästa kupong måndag kl. 16 (2026-11-08, användarens önskemål):** "Ta bort
+  kupong 3 där nu när allt är klart - ha bara protokollet", och "Den nya kupongen kan dyka upp från och med
+  måndagen efter tippningsdagen", "Måndag kl 16". Kupongen låg kvar under protokollet och Stryktipset tog över redan
+  när Svenska Spel öppnade det, senast måndag kl. 07. Nu ritas bara bladet på pulten (`couponHtml`), och guldordet,
+  K och klick som tog kupongen i handen tar fram protokollet (`openCoupon`). Tjänsten väntar med veckans Stryktips
+  till måndagen efter omgången kl. 16 (`nyKupongFran`), så att hela sajten byter samtidigt. Bara efter en omgång som slutar
+  högst tre dygn före den måndagen: en omgång mitt i veckan stoppar inte helgens Stryktips. Eftersom en analystid bara gäller
+  omgångar som fanns när klockan slog flyttades måndagens analyser från 08 till 17. Högen med allas inlämnade kuponger
+  ligger kvar, och matcher som väljs för hand startar som förut direkt. Dolda resultat ger inget protokoll, och då ligger
+  kupongen kvar som förut.
 - **Hasse Backe sitter nära pulten och bekvämt (2026-11-08, användarens önskemål):** i baren har han armen
   alldeles vid pultens kant, men i rummet "ser han ut att vara väldigt långt ifrån pulten", och händerna
   och armen in vid koppen såg "ganska obekväma" ut. I rummet går armen nu över pultens bakre kant, som i
@@ -1383,8 +1394,8 @@ launchd               →  scripts/analyser/skriv.mjs  →  claude -p (en gång 
 tretton matcher. Jobbet startar på analysernas tider och kontrollerar dessutom var 15:e minut, men
 de flesta körningar har inget att göra och anropar inte Claude.
 
-- **Namnet på omgången** så snart omgången finns, oftast måndag strax efter 07.00.
-- **Analyserna** måndag 08.00, onsdag 16.00, fredag 16.00 och lördag 11.00, svensk tid (`tider` i
+- **Namnet på omgången** så snart omgången finns, oftast måndag strax efter 16.00.
+- **Analyserna** måndag 17.00, onsdag 16.00, fredag 16.00 och lördag 11.00, svensk tid (`tider` i
   [config/analyser.js](config/analyser.js) och `StartCalendarInterval` i
   [plist-filen](scripts/analyser/se.matchfixarna.analyser.plist); användarens önskan 2026-11-04). Varje
   tid skriver nya analyser för omgångens matcher som inte har börjat, och den nya texten ersätter den
@@ -1744,8 +1755,9 @@ under omgången.
 
 1. **Skapa kupong** (*Kupong → Skapa kupong* eller *+ Ny kupong*, `#kupong/samtal/ny`):
    någon väljer kupongens tretton matcher (samma sökning och tävlingsfilter som Ny kupong).
-   Oftast behövs det inte: när Svenska Spel öppnar veckans Stryktips (måndagar kl. 07) och
-   förra omgången är färdigspelad – tre timmar efter sista avsparken – blir Stryktipsets
+   Oftast behövs det inte: när Svenska Spel har öppnat veckans Stryktips (senast måndag kl. 07) och
+   måndagen efter förra omgången kl. 16 har kommit (`nyKupongFran` i worker/samtal.mjs; en omgång som
+   slutar mitt i veckan väntar bara tre timmar efter sista avsparken) blir Stryktipsets
    matcher omgångens kupong av sig själv, och *Ändra matcherna* (steg 1) byter ut dem man
    vill. Det händer bara om alla tretton finns på sajten och ingen har startat, och bara en
    gång per Stryktipsomgång – en som tas bort eller ersätts kommer inte tillbaka.
@@ -5286,8 +5298,8 @@ och de nya raderna har Tomas röst först när iMacen har läst upp dem (till de
 
 ### Sammanställningen efter omgången
 
-När alla matcher i omgången är spelade ligger Hasse Backes protokoll över kupongen på pulten
-([public/rum-block.js](public/rum-block.js), [public/rum-block.css](public/rum-block.css)): ett Yatzy-block med
+När alla matcher i omgången är spelade ligger bara Hasse Backes protokoll på pulten, i kupongens ställe, tills
+nästa kupong kommer måndagen efter kl. 16 ([public/rum-block.js](public/rum-block.js), [public/rum-block.css](public/rum-block.css)): ett Yatzy-block med
 resultat och facit för varje match, och en spalt för kupongen (gängets tre ansikten), var och en i gänget och Hasse.
 Allas tecken står kvar, så att man ser vad var och en spelade: det som satt är överstruket med grön penna, och i en
 gardering är tecknet som satt starkast. Under står *Rätt av 13* och poängen. Vinnaren är inringad, både på porträttet
@@ -5296,11 +5308,11 @@ namnteckning. I telefonen försvinner namnen under porträtten och namnteckninge
 (han tävlar från omgången efter 2026-11-07) står det han sa vid disken i hans spalt, utanför tävlingen
 (`Tippoang.hasseSagt`, samma regel som hans kupong: det ska vara skrivet före avspark).
 
-Ett klick på blocket lyfter det från pulten och lägger fram det stort över rummet, och *Lägg tillbaka*, Esc eller ett
+Ett klick på blocket, guldordet *Läs protokollet* eller K lyfter det från pulten och lägger fram det stort över rummet, och *Lägg tillbaka*, Esc eller ett
 klick utanför lägger tillbaka det (`protokollet` i rum.js). Ett klick på
 löpsedeln i fönstret öppnar tidningen med samma rubrik som sedeln, betygen, skrällen och hans krönika (`tidningen` i
 rum.js). Gänget håller upp skyltar med sina rätt (`lappar` i rum-3d.js), medan resten av figuren lever som
-vanligt. Skyltarna står kvar till måndagen efter omgången kl. 16, också när nästa Stryktips redan har tagit över
+vanligt. Skyltarna står kvar till måndagen efter omgången kl. 16, också om någon har valt matcher till en ny omgång för hand före det
 (`lappar` i rum-block.js läser då den förra omgången, `forra` i GET /samtal), men inte sedan den har börjat. Så länge
 lägger ett klick på någon i gänget ner hens skylt på bordet, och ett klick till på hen eller skylten tar upp den igen
 (`lappKlick` i rum.js, `lappVand` och `PLATSER[].skylt` i rum-3d.js). Klicket gör inget annat: inget tecken, och man

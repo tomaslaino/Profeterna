@@ -37,9 +37,11 @@ module.exports = {
   // skriver nya analyser för omgångens matcher som inte har börjat, och den nya texten
   // ersätter den gamla. dag: 0 = söndag, 1 = måndag … 6 = lördag. launchd-jobbet
   // (scripts/analyser/se.matchfixarna.analyser.plist) startar på samma klockslag för
-  // att komma i tid; ändras tiderna bara här kommer de högst en kvart sent.
+  // att komma i tid; ändras tiderna bara här kommer de högst en kvart sent. Måndagens tid
+  // ligger efter kl. 16, då veckans kupong kommer (nyKupongFran i worker/samtal.mjs): en tid
+  // gäller bara omgångar som fanns när klockan slog (attSkriva i src/analyser/tider.mjs).
   tider: [
-    { dag: 1, kl: '08:00' },
+    { dag: 1, kl: '17:00' },
     { dag: 3, kl: '16:00' },
     { dag: 5, kl: '16:00' },
     { dag: 6, kl: '11:00' },
