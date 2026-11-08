@@ -62,7 +62,7 @@
 // när någon pekar.
 //
 // Efter ett mål som gick någons väg sjunger de (malSang), och den som tappade
-// raden sitter med armarna i kors. På fönsterbänken står en radio (RADIO_BYGG):
+// raden sitter med armarna i kors. På fönsterbänken står en bergsprängare (radion):
 // ett klick sätter på den, och så länge den spelar sjunger de (radioSang).
 //
 // Inför matcherna korsar de sig ibland (KORS i rum-tecken.js, korsHand), oftare
@@ -1598,8 +1598,7 @@ export async function figurer(canvas, opt = {}) {
   mesh(new THREE.CylinderGeometry(4.5, 4.5, 320, 24), krom, bord).position.y = -170;
   bord.add(pennkopp());
 
-  // Fotbollens yta mellan polvinklarna t0 och t0 + tl (pennkoppen, fotbollsradion),
-  // w × h bildpunkter.
+  // Fotbollens yta mellan polvinklarna t0 och t0 + tl (pennkoppen), w × h bildpunkter.
   function bollTex(t0, tl, w, h) {
     // bollen ritas punkt för punkt ur ytan den hamnar på: femhörningarna
     // runt ikosaederns hörn, sexhörningarna runt dodekaederns, och sömmar där
@@ -1711,66 +1710,13 @@ export async function figurer(canvas, opt = {}) {
   }
 
   // ---------- radion ----------
-  // En liten radio på fönsterbänkens högra ände, under löpsedlarna (RADIO_PLATS):
-  // där står inget annat hur de än sitter (DJ:s tomflaskor står till vänster om
-  // den). Ett klick sätter på den eller stänger av den (radio, rum-folk.js), och
-  // så länge den spelar sjunger gänget (radioSang), skalan lyser och noter stiger
-  // ur den (radioRita). Fyra utseenden att välja bland, ?rum-radio-modell=…
-  // (RADIOR): transistorradion i läderfodral, bakelitradion med tygklädd högtalare
-  // och magiskt öga, bergsprängaren och fotbollsradion.
+  // En liten bergsprängare (80-tal) på fönsterbänkens högra ände, under
+  // löpsedlarna (RADIO_PLATS): där står inget annat hur de än sitter (DJ:s
+  // tomflaskor står till vänster om den). Ett klick sätter på den eller stänger av
+  // den (radio, rum-folk.js), och så länge den spelar sjunger gänget (radioSang),
+  // lysdioderna studsar, högtalarna pumpar i takten och noter stiger ur den (radioRita).
   const RADIO_PLATS = { x: 127, z: 8, vrid: -0.38 };
-  const RADIOR = ['transistor', 'bakelit', 'bergsprangare', 'fotboll'];
-  const radioModell = (() => {
-    const q = new URLSearchParams(location.search).get('rum-radio-modell');
-    return RADIOR.includes(q) ? q : RADIOR[0];
-  })();
-  // skalan: frekvenserna på krämvit botten (lyser när radion är på)
-  function skalTex(tal, w = 256, h = 72, botten = '#efe2c2') {
-    return canvasTex(w, h, (c) => {
-      c.fillStyle = botten;
-      c.fillRect(0, 0, w, h);
-      c.strokeStyle = '#3a2a1a';
-      c.fillStyle = '#3a2a1a';
-      c.lineWidth = 2;
-      c.beginPath();
-      c.moveTo(10, h * 0.62);
-      c.lineTo(w - 10, h * 0.62);
-      c.stroke();
-      for (let i = 0; i <= 40; i++) {
-        const x = 10 + (i / 40) * (w - 20);
-        c.lineWidth = i % 5 ? 1.2 : 2.2;
-        c.beginPath();
-        c.moveTo(x, h * 0.62);
-        c.lineTo(x, h * (i % 5 ? 0.72 : 0.8));
-        c.stroke();
-      }
-      c.font = `bold ${Math.round(h * 0.3)}px sans-serif`;
-      c.textAlign = 'center';
-      tal.forEach((n, i) => c.fillText(String(n), 10 + (i / (tal.length - 1)) * (w - 20), h * 0.45));
-      c.fillStyle = '#b8322a';
-      c.font = `bold ${Math.round(h * 0.17)}px sans-serif`;
-      c.fillText('FM', w - 18, h * 0.96);
-      c.fillText('MW', 18, h * 0.96);
-    });
-  }
-  // högtalargallret: hål i en ljus plåt
-  const gallerTex = (ljus = '#d9d6cf', hal = '#2a2622') => canvasTex(128, 128, (c, w, h) => {
-    c.fillStyle = ljus;
-    c.fillRect(0, 0, w, h);
-    c.fillStyle = hal;
-    for (let y = 4; y < h; y += 8) for (let x = 4 + ((y / 8) % 2) * 4; x < w; x += 8) { c.beginPath(); c.arc(x, y, 2.3, 0, 2 * Math.PI); c.fill(); }
-  });
-  // tyget i bakelitradion: vävt, beige med guldtråd
-  const tygTex = () => canvasTex(128, 128, (c, w, h) => {
-    c.fillStyle = '#b9a47a';
-    c.fillRect(0, 0, w, h);
-    for (let i = 0; i < w; i += 3) {
-      c.fillStyle = i % 6 ? 'rgba(80,60,30,.25)' : 'rgba(255,230,160,.25)';
-      c.fillRect(i, 0, 1.5, h);
-      c.fillRect(0, i, w, 1.5);
-    }
-  });
-  // det som lyser när radion är på: emissive som tänds (glod, i radioRita)
+  // lysdioderna tänds när radion är på (emissive, i radioRita)
   const glod = (farg, o = {}) => mat('#ffffff', Object.assign({ emissive: new THREE.Color(farg), emissiveIntensity: 0, roughness: 0.3, clearcoat: 0.6 }, o));
   const vrid = (m, x = 0, y = 0, z = 0) => { m.rotation.set(x, y, z); return m; };
   const RB3 = (w, h, d, r, n = 3) => new RoundedBoxGeometry(w, h, d, n, r);
@@ -1783,126 +1729,40 @@ export async function figurer(canvas, opt = {}) {
     [[0.75, 0], [0.6, len * 0.4], [0.45, len * 0.75]].forEach(([r, y0], i) => { mesh(new THREE.CylinderGeometry(r, r, len * (i ? 0.4 : 0.45), 8), krom, ant).position.y = y0 + len * 0.2; });
     mesh(new THREE.SphereGeometry(1, 10, 6), krom, ant).position.y = len * 1.1;
   }
-
-  // Varje modell: { g, glod: [material som lyser], pump: [det som pumpar i takten] }, med botten i y = 0 och fronten mot +z.
-  const RADIO_BYGG = {
-    // Transistorradion (60-tal): läderfodral med rem, krämvit front, kromat galler,
-    // skalan och tumhjulet till höger och antennen snett upp.
-    transistor() {
-      const g = new THREE.Group();
-      const W = 44, H = 27, Dd = 11;
-      const lader = mat('#7a3d1f', { roughness: 0.55, clearcoat: 0.35, clearcoatRoughness: 0.35 });
-      mesh(RB3(W, H, Dd, 3), lader, g).position.y = H / 2;
-      mesh(RB3(W - 4.4, H - 4.4, 1.4, 1), mat('#ece2cc', { roughness: 0.32, clearcoat: 0.7 }), g).position.set(0, H / 2, Dd / 2 - 0.3);
-      const gal = mesh(new THREE.PlaneGeometry(20, 17), mat('#ffffff', { map: gallerTex(), metalness: 0.75, roughness: 0.28 }), g);
-      gal.position.set(-8, H / 2 - 0.5, Dd / 2 + 0.45);
-      const sk = glod('#ffb24a', { map: skalTex([54, 60, 70, 90, 120, 160]), emissiveMap: skalTex([54, 60, 70, 90, 120, 160]) });
-      mesh(new THREE.PlaneGeometry(14, 8), sk, g).position.set(11, H / 2 + 3.2, Dd / 2 + 0.45);
-      mesh(new THREE.BoxGeometry(0.5, 6.4, 0.3), mat('#c4232c'), g).position.set(9, H / 2 + 3.2, Dd / 2 + 0.7);
-      mesh(RB3(12, 3.2, 0.6, 0.5), mat('#c9a646', { metalness: 0.9, roughness: 0.25 }), g).position.set(11, H / 2 - 4.5, Dd / 2 + 0.5);
-      // tumhjulet i högra sidan
-      vrid(mesh(new THREE.CylinderGeometry(5.5, 5.5, 2.2, 24), mat('#3a2a20', { roughness: 0.4 }), g), 0, 0, Math.PI / 2).position.set(W / 2 + 0.2, H / 2 + 4, 0.5);
-      // remmen över toppen
-      const rem = new THREE.CatmullRomCurve3([[-W / 2 + 3, H - 2, 0], [-W / 2 + 1, H + 6, 0], [0, H + 10, 0], [W / 2 - 1, H + 6, 0], [W / 2 - 3, H - 2, 0]].map((v) => new THREE.Vector3(...v)));
-      const rg = new THREE.TubeGeometry(rem, 24, 1.1, 6);
-      rg.scale(1, 1, 1.9);
-      mesh(rg, mat('#5c2c14', { roughness: 0.6 }), g);
-      antenn(g, [-W / 2 + 5, H - 1, -2], 34, 0.42, 0.12);
-      return { g, glod: [sk], pump: [gal] };
-    },
-    // Bakelitradion (50-tal): brun bakelit med välvd topp, tyget bakom spjälorna,
-    // skalan och två rattar nedtill och det gröna magiska ögat som lyser när den är på.
-    bakelit() {
-      const g = new THREE.Group();
-      const W = 38, Hb = 16, Dd = 16, R = W / 2;
-      const bak = mat('#3b1d0e', { roughness: 0.42, clearcoat: 0.35, clearcoatRoughness: 0.45, envMapIntensity: 0.18 });
-      // kroppen: en båge (rak nedtill, halvcirkel upptill) med rundade kanter
-      const form = new THREE.Shape();
-      form.moveTo(-R, 0);
-      form.lineTo(R, 0);
-      form.lineTo(R, Hb);
-      form.absarc(0, Hb, R, 0, Math.PI, false);
-      form.lineTo(-R, 0);
-      const kg = new THREE.ExtrudeGeometry(form, { depth: Dd - 2, bevelEnabled: true, bevelThickness: 1, bevelSize: 1, bevelSegments: 3, curveSegments: 40 });
-      kg.translate(0, 1, -(Dd - 2) / 2);
-      mesh(kg, bak, g);
-      // tyget i en mindre båge, och spjälorna framför det
-      const r = R - 4, y0 = 12;
-      const tf = new THREE.Shape();
-      tf.moveTo(-r, y0);
-      tf.lineTo(r, y0);
-      tf.lineTo(r, Hb + 1);
-      tf.absarc(0, Hb + 1, r, 0, Math.PI, false);
-      tf.lineTo(-r, y0);
-      const tt = tygTex();
-      tt.wrapS = tt.wrapT = THREE.RepeatWrapping;
-      tt.repeat.set(1 / 14, 1 / 14);
-      const tyg = mesh(new THREE.ShapeGeometry(tf, 40), mat('#ffffff', { map: tt, roughness: 0.9 }), g);
-      tyg.position.z = Dd / 2 + 0.1;
-      for (const x of [-9, -4.5, 0, 4.5, 9]) {
-        const h = Hb + 1 + Math.sqrt(r * r - x * x) - y0;
-        mesh(RB3(1.5, h, 1.2, 0.5, 2), bak, g).position.set(x, y0 + h / 2, Dd / 2 + 0.5);
-      }
-      // skalan och rattarna nedtill, och det magiska ögat mellan skalan och tyget
-      const sk = glod('#ffaa3a', { map: skalTex([55, 70, 90, 120, 160], 256, 72, '#e9d3a2'), emissiveMap: skalTex([55, 70, 90, 120, 160], 256, 72, '#e9d3a2') });
-      mesh(new THREE.PlaneGeometry(18, 5.2), sk, g).position.set(0, 5.6, Dd / 2 + 0.1);
-      for (const x of [-14, 14]) vrid(mesh(new THREE.CylinderGeometry(2.5, 2.9, 2.6, 20), mat('#efe4c8', { roughness: 0.3, clearcoat: 0.7 }), g), Math.PI / 2).position.set(x, 5.6, Dd / 2 + 1.2);
-      const oga = glod('#58ff8a', { color: new THREE.Color('#1d3b26') });
-      mesh(new THREE.CircleGeometry(1.4, 20), oga, g).position.set(0, 9.9, Dd / 2 + 0.1);
-      return { g, glod: [sk, oga], pump: [tyg] };
-    },
-    // Bergsprängaren (80-tal), i leksaksstorlek: silver med svart front, två högtalare
-    // med kromringar, kassettfacket i mitten, lysdioderna under och handtaget och antennen uppe.
-    bergsprangare() {
-      const g = new THREE.Group();
-      const W = 52, H = 26, Dd = 10;
-      const silver = mat('#c6c9cd', { metalness: 0.75, roughness: 0.32 });
-      const svart = mat('#1a1a1c', { roughness: 0.45 });
-      mesh(RB3(W, H, Dd, 2.5), silver, g).position.y = H / 2;
-      mesh(RB3(W - 3, H - 5, 1, 0.6), svart, g).position.set(0, H / 2 - 1, Dd / 2 - 0.2);
-      const pump = [];
-      for (const x of [-16, 16]) {
-        vrid(mesh(new THREE.TorusGeometry(8.2, 0.9, 8, 32), krom, g)).position.set(x, H / 2 - 1, Dd / 2 + 0.5);
-        const kon = vrid(mesh(new THREE.CylinderGeometry(7.6, 2.5, 3, 28, 1, true), mat('#2a2a2c', { roughness: 0.8, side: THREE.DoubleSide }), g), -Math.PI / 2);
-        kon.position.set(x, H / 2 - 1, Dd / 2 - 1);
-        const mitt = mesh(new THREE.SphereGeometry(2.4, 14, 8), mat('#3a3a3e', { roughness: 0.3, metalness: 0.4 }), g);
-        mitt.position.set(x, H / 2 - 1, Dd / 2 - 1.2);
-        pump.push(kon, mitt);
-      }
-      // kassettfacket med de två spolarna
-      mesh(new THREE.PlaneGeometry(13, 8), mat('#2c3036', { roughness: 0.1, metalness: 0.3 }), g).position.set(0, H / 2 + 2, Dd / 2 + 0.35);
-      for (const x of [-3.2, 3.2]) mesh(new THREE.CircleGeometry(1.6, 12), mat('#e8e4da'), g).position.set(x, H / 2 + 2, Dd / 2 + 0.4);
-      // lysdioderna: gröna, sedan gul och röd
-      const led = ['#3cff6a', '#3cff6a', '#3cff6a', '#ffd23c', '#ff3c3c'].map((c) => glod(c, { color: new THREE.Color('#202a20') }));
-      led.forEach((m, i) => mesh(new THREE.BoxGeometry(1.6, 1, 0.4), m, g).position.set(-4 + i * 2, H / 2 - 4.4, Dd / 2 + 0.4));
-      // tangenterna, handtaget och antennen
-      for (let i = 0; i < 6; i++) mesh(new THREE.BoxGeometry(2.4, 1.4, 3), i === 0 ? mat('#c4232c') : svart, g).position.set(-7 + i * 2.8, H + 0.5, 1);
-      for (const x of [-16, 16]) mesh(new THREE.CylinderGeometry(0.9, 0.9, 6, 8), krom, g).position.set(x, H + 3, -1.5);
-      vrid(mesh(new THREE.CylinderGeometry(1.3, 1.3, 33, 10), krom, g), 0, 0, Math.PI / 2).position.set(0, H + 6, -1.5);
-      antenn(g, [W / 2 - 4, H, -3], 32, -0.35, 0.1);
-      return { g, glod: led, pump, led };
-    },
-    // Fotbollsradion (VM-prylen): en boll på en liten fot, med ett galler i en kromring,
-    // en röd lampa, ratten på sidan och antennen uppe.
-    fotboll() {
-      const g = new THREE.Group();
-      const r = 15;
-      mesh(new THREE.CylinderGeometry(9, 11, 3, 28), mat('#16161a', { roughness: 0.35, clearcoat: 0.6 }), g).position.y = 1.5;
-      vrid(mesh(new THREE.TorusGeometry(9, 0.6, 6, 28), krom, g), Math.PI / 2).position.y = 3;
-      const boll = mesh(new THREE.SphereGeometry(r, 32, 20), mat('#ffffff', { map: bollTex(0, Math.PI, 256, 128), roughness: 0.32, clearcoat: 0.7, clearcoatRoughness: 0.15 }), g);
-      boll.position.y = 3 + r - 1;
-      const gal = mesh(new THREE.CircleGeometry(6, 28), mat('#ffffff', { map: gallerTex('#2a2a2e', '#0c0c0e'), roughness: 0.5 }), g);
-      gal.position.set(0, 3 + r - 3, Math.sqrt(r * r - 36) + 0.6);
-      gal.rotation.x = -Math.asin(2 / r);
-      mesh(new THREE.TorusGeometry(6.2, 0.7, 8, 28), krom, g).position.copy(gal.position).add(new THREE.Vector3(0, 0, 0.1));
-      const lampa = glod('#ff3a2a', { color: new THREE.Color('#4a0c08') });
-      mesh(new THREE.SphereGeometry(1, 10, 6), lampa, g).position.set(7.5, 3 + r + 6.5, Math.sqrt(r * r - 7.5 ** 2 - 7.5 ** 2) + 0.3);
-      vrid(mesh(new THREE.CylinderGeometry(3, 3, 2.4, 18), mat('#c4232c', { roughness: 0.35 }), g), 0, 0, Math.PI / 2).position.set(r + 0.4, 3 + r - 1, 0);
-      antenn(g, [-3, 3 + 2 * r - 1.5, -3], 30, 0.3, 0.15);
-      return { g, glod: [lampa], pump: [gal] };
-    },
-  };
-  const RADIO = RADIO_BYGG[radioModell]();
+  // Bergsprängaren i leksaksstorlek, med botten i y = 0 och fronten mot +z: silver med
+  // svart front, två högtalare med kromringar, kassettfacket i mitten, lysdioderna
+  // under och handtaget och antennen uppe → { g, led: lysdiodernas material, pump: det
+  // som pumpar i takten }.
+  function bergsprangare() {
+    const g = new THREE.Group();
+    const W = 52, H = 26, Dd = 10;
+    const silver = mat('#c6c9cd', { metalness: 0.75, roughness: 0.32 });
+    const svart = mat('#1a1a1c', { roughness: 0.45 });
+    mesh(RB3(W, H, Dd, 2.5), silver, g).position.y = H / 2;
+    mesh(RB3(W - 3, H - 5, 1, 0.6), svart, g).position.set(0, H / 2 - 1, Dd / 2 - 0.2);
+    const pump = [];
+    for (const x of [-16, 16]) {
+      vrid(mesh(new THREE.TorusGeometry(8.2, 0.9, 8, 32), krom, g)).position.set(x, H / 2 - 1, Dd / 2 + 0.5);
+      const kon = vrid(mesh(new THREE.CylinderGeometry(7.6, 2.5, 3, 28, 1, true), mat('#2a2a2c', { roughness: 0.8, side: THREE.DoubleSide }), g), -Math.PI / 2);
+      kon.position.set(x, H / 2 - 1, Dd / 2 - 1);
+      const mitt = mesh(new THREE.SphereGeometry(2.4, 14, 8), mat('#3a3a3e', { roughness: 0.3, metalness: 0.4 }), g);
+      mitt.position.set(x, H / 2 - 1, Dd / 2 - 1.2);
+      pump.push(kon, mitt);
+    }
+    // kassettfacket med de två spolarna
+    mesh(new THREE.PlaneGeometry(13, 8), mat('#2c3036', { roughness: 0.1, metalness: 0.3 }), g).position.set(0, H / 2 + 2, Dd / 2 + 0.35);
+    for (const x of [-3.2, 3.2]) mesh(new THREE.CircleGeometry(1.6, 12), mat('#e8e4da'), g).position.set(x, H / 2 + 2, Dd / 2 + 0.4);
+    // lysdioderna: gröna, sedan gul och röd
+    const led = ['#3cff6a', '#3cff6a', '#3cff6a', '#ffd23c', '#ff3c3c'].map((c) => glod(c, { color: new THREE.Color('#202a20') }));
+    led.forEach((m, i) => mesh(new THREE.BoxGeometry(1.6, 1, 0.4), m, g).position.set(-4 + i * 2, H / 2 - 4.4, Dd / 2 + 0.4));
+    // tangenterna, handtaget och antennen
+    for (let i = 0; i < 6; i++) mesh(new THREE.BoxGeometry(2.4, 1.4, 3), i === 0 ? mat('#c4232c') : svart, g).position.set(-7 + i * 2.8, H + 0.5, 1);
+    for (const x of [-16, 16]) mesh(new THREE.CylinderGeometry(0.9, 0.9, 6, 8), krom, g).position.set(x, H + 3, -1.5);
+    vrid(mesh(new THREE.CylinderGeometry(1.3, 1.3, 33, 10), krom, g), 0, 0, Math.PI / 2).position.set(0, H + 6, -1.5);
+    antenn(g, [W / 2 - 4, H, -3], 32, -0.35, 0.1);
+    return { g, led, pump };
+  }
+  const RADIO = bergsprangare();
   RADIO.g.position.set(RADIO_PLATS.x, SILL, RADIO_PLATS.z);
   RADIO.g.rotation.y = RADIO_PLATS.vrid;
   root.add(RADIO.g);
@@ -1939,8 +1799,7 @@ export async function figurer(canvas, opt = {}) {
     // (pumpar i sångens takt, två gånger per gungning)
     const sang = radioSang(t);
     const slag = Math.max(0, Math.cos((t - (sang ? sang.t0 : R.fran)) * TAKT * 2)) ** 4 * w;
-    for (const m of RADIO.glod) m.emissiveIntensity = (RADIO.led ? 0 : 1.1) * w;
-    if (RADIO.led) RADIO.led.forEach((m, i) => { m.emissiveIntensity = w * (slag * 5 + 0.6 * Math.sin(t * 9 + i) > i ? 1.6 : 0.05); });
+    RADIO.led.forEach((m, i) => { m.emissiveIntensity = w * (slag * 5 + 0.6 * Math.sin(t * 9 + i) > i ? 1.6 : 0.05); });
     for (const m of RADIO.pump) m.position.z = m.userData.z0 + 0.6 * slag;
     // (matrisen räknas annars först när scenen ritas, och en fast bild ritas en gång)
     RADIO.g.updateMatrix();

@@ -677,10 +677,11 @@ bara lokalt. Analyserna visas som de ligger i `data/analyser.json`; hur de skriv
 - **Grabbarna sjunger vid mål, och en radio på fönsterbänken (2026-11-08, användarens önskemål):**
   "Lägg till att de sjunger vid mål. Lägg till en radio … som man kan sätta på och att de då börjar
   sjunga." Efter ett mål som gick någons väg sjunger de när jublet har ebbat ut, och den som tappade
-  raden sitter med armarna i kors. Radion står på fönsterbänkens högra ände; ett klick sätter på den,
-  och så länge den spelar sjunger de den ena sången efter den andra, skalan lyser och noter stiger ur
-  den. Fyra utseenden att välja bland (`?rum-radio-modell=`). Se [Tobaksaffären](#tobaksaffären),
-  *Sången efter ett mål* och *Radion*.
+  raden sitter med armarna i kors. Radion är en liten bergsprängare på fönsterbänkens högra ände
+  (vald bland fyra utseenden: transistorradio, bakelitradio, bergsprängare och fotbollsradio); ett
+  klick sätter på den, och så länge den spelar sjunger de den ena sången efter den andra,
+  lysdioderna studsar och noter stiger ur den. Se [Tobaksaffären](#tobaksaffären), *Sången efter ett
+  mål* och *Radion*.
 - **Man väljer sig själv med ett klick på sin figur (2026-11-03, användarens önskemål):**
   ett klick på sin egen figur vid bordet gör en till den som fyller i kupongen – samma val
   som porträtten på kupongen – och figuren räcker upp handen med pennan, lyfter kupongen mot
@@ -2773,21 +2774,19 @@ som tappade raden sjunger inte med utan sitter med armarna i kors. Det går för
 pågår tonar bort, och inget annat börjar så länge (`tvingStart`). Ett mål som bara sänkte någon ger
 ingen sång. Prova med `?rum-mal=dl:1,dt:-1,dj:0&rum-t=6`.
 
-**Radion** (2026-11-08, `RADIO_BYGG`, `radioSang` och `radioRita` i rum-3d.js, klicket i
-rum-folk.js): en liten radio står på fönsterbänkens högra ände, under löpsedlarna, där inget annat
-står hur de än sitter (DJ:s tomflaskor står till vänster om den). Ett klick på den sätter på den
+**Radion** (2026-11-08, `bergsprangare`, `radioSang` och `radioRita` i rum-3d.js, klicket i
+rum-folk.js): en bergsprängare i leksaksstorlek – silver med två högtalare i kromringar,
+kassettfack, lysdioder, handtag och antenn – står på fönsterbänkens högra ände, under löpsedlarna,
+där inget annat står hur de än sitter (DJ:s tomflaskor står till vänster om den). Den valdes bland
+fyra utseenden (transistorradio, bakelitradio, bergsprängare och fotbollsradio). Ett klick på den sätter på den
 eller stänger av den, som ett klick på någon i gänget (ingen hand, och klicket går inte vidare till
-löpsedeln bakom). Så länge den spelar lyser skalan (lysdioderna, lampan eller det magiska ögat), det
-som är högtalare pumpar i sångens takt, noter stiger ur den – stilla med minskad rörelse – och
+löpsedeln bakom). Så länge den spelar studsar lysdioderna, högtalarna pumpar i sångens takt, noter
+stiger ur den – stilla med minskad rörelse – och
 grabbarna sjunger den ena sången efter den andra, en ny var fjortonde sekund i en ordning som blandas
 om varje varv (mot tv:n bara när matcherna pågår, och försångaren bara när alla tre är vakna och har
 lämnat in). Den som väntar på kupongen, sover eller är borta sjunger inte, och på natten sjunger
 ingen. Ett mål går före radion. Radion är var och ens egen: den sparas inte och syns inte hos de
-andra. Utseendet väljs med `?rum-radio-modell=`: `transistor` (transistorradio i läderfodral med rem
-och antenn, 60-tal; som standard), `bakelit` (brun bakelit med välvd topp, tyg bakom spjälorna och ett
-grönt magiskt öga, 50-tal), `bergsprangare` (silver med två högtalare, kassettfack och lysdioder,
-80-tal) eller `fotboll` (fotbollsradio på en liten fot). `?rum-radio` sätter på den (`=4` sedan fyra
-sekunder, med `?rum-t`).
+andra. `?rum-radio` sätter på den (`=4` sedan fyra sekunder, med `?rum-t`).
 
 Skämtet, grälet och tv:n kommer bara när alla tre har lämnat in och är vakna och matcherna
 inte pågår, och inte medan någon är borta (nedan). Ingen gör något eget påhitt samtidigt.
@@ -3122,7 +3121,7 @@ bordet), `?rum-humor=glad` (`nerv`, `deppig`) humöret, `?rum-rank=dl:1,dj:-1` v
 leder och ligger sist i omgången, `?rum-akt=dl:kors,dj:dunk` ett påhitt om och om igen
 (mitt i det med `?rum-t`, `dl:skamt@6` sex sekunder in; namnen står i `AKTER` i rum-3d.js, och
 gängets påhitt `skamt`, `gral`, `titta` och allsångerna ges alla tre), `?rum-radio` radion på
-(`=4` sedan fyra sekunder) och `?rum-radio-modell=bakelit` hur den ser ut, `?rum-ga=dl` att DL går iväg och
+(`=4` sedan fyra sekunder), `?rum-ga=dl` att DL går iväg och
 kommer tillbaka (var fyrtionde sekund; `dl:5` fem sekunder in med `?rum-t`),
 `?rum-pekar=dt:tv,dl:dj` som om de pekade (på en sak eller någon i gänget),
 `?rum-ansikte=jublar` (`glad`, `nojd`, `sur`, `deppig`, `orolig`) ansiktena (med `?rum-humor=`
