@@ -1355,14 +1355,58 @@ window.RumHasse = (() => {
     const lista = kupongen();
     const fragat = minns(lista);
     const nu = Date.now();
-    s.innerHTML = `<h2 class="rh-sagt"></h2>${spalter(lista, fragat)}<div class="rh-lista"></div>`;
+    s.innerHTML = '<h2 class="rh-sagt"></h2><div class="rh-lista"></div>';
+    const forsta = listan(lista, fragat);
+    const forstaText = forstaRad(lista, fragat, forst);
+    if (forstaText) rad(forstaText);
+    const dag = spelstopp(lista);
+    H.prat = lista.length && forsta ? { rader: medDag(REP().ledig, dag), i: 0, nasta: performance.now() + 24000, gang: 24000 } : null;
+    // När alla matcher har börjat säger han hur det gick. Öppnar man honom medan rummet laddas kan
+    // matcherna och säsongen komma efter samtalet: då ritas listan om, och han säger det först då.
+    const borjat = lista.length && !lista.some((m) => Date.parse(m.avspark) > nu);
+    const vem = H.fraga;
+    const vanta = datan(borjat);
+    if (vanta) {
+      vanta.then(() => {
+        if (H.fraga !== vem || H.fas !== 'fraga') return;
+        const l = $('.rh-lista');
+        const topp = l.scrollTop;
+        listan(lista, fragat);
+        l.scrollTop = topp;
+        if (borjat) efterat(lista, fragat);
+      });
+    } else if (borjat) efterat(lista, fragat);
+    klick();
+  }
+  // Det som hämtas medan rummet laddas: matcherna (Facit) och, när det behövs, säsongen (hans kupong).
+  // → Promise tills det är framme, eller null om det redan är det.
+  function datan(sasong) {
+    const v = [];
+    if (typeof state !== 'undefined' && !state.all && !state.matchesForsokt && typeof whenMatches === 'function') v.push(whenMatches());
+    if (sasong && typeof TP !== 'undefined' && !TP.season && typeof tpLoadSeason === 'function') v.push(tpLoadSeason());
+    return v.length ? Promise.all(v) : null;
+  }
+  // Raderna och spalthuvudet, med Facit så snart någon match har slutat. → nästa match du inte har frågat om.
+  function listan(lista, fragat) {
+    const s = $('.rh-samtal');
     const l = s.querySelector('.rh-lista');
+    const nu = Date.now();
+    const facit = new Map(lista.map((m) => [m.id, slutade(m, nu)]));
+    const medFacit = [...facit.values()].some(Boolean);
+    // (med din spalt också blir det trångt: då står spalterna tätare)
+    s.classList.toggle('tre', medFacit && K().kan());
+    const kol = s.querySelector('.rh-kol');
+    if (kol) kol.remove();
+    l.insertAdjacentHTML('beforebegin', spalter(lista, fragat, medFacit));
+    l.textContent = '';
     let forsta = null;
     lista.forEach((m, i) => {
       const b = document.createElement('button');
       b.type = 'button';
+      const f = facit.get(m.id);
       // (det du har på raden står för hand längst ut, i en egen spalt)
-      b.innerHTML = `<i>${i + 1}</i><span>${esc(m.namn)}</span>${hansTips(fragat[m.id])}${K().kan() ? `<u>${esc(K().din(m.id))}</u>` : ''}`;
+      b.innerHTML = `<i>${i + 1}</i><span>${esc(m.namn)}</span>${hansTips(fragat[m.id], f)}${medFacit ? facitRuta(f) : ''}${K().kan() ? `<u>${esc(K().din(m.id))}</u>` : ''}`;
+      b.classList.toggle('spelad', Boolean(f));
       b.disabled = Date.parse(m.avspark) <= nu;
       b.dataset.id = m.id;
       // har du redan fått svaret står det direkt, och han erbjuder sig att titta igen
@@ -1379,32 +1423,45 @@ window.RumHasse = (() => {
     if (document.fonts) document.fonts.ready.then(passaSpalter);
     // nästa match man inte har frågat om syns utan att man rullar
     if (forsta) l.scrollTop = Math.max(0, forsta.offsetTop - l.offsetTop - 40);
-    const forstaText = forstaRad(lista, fragat, forst);
-    if (forstaText) rad(forstaText);
-    const dag = spelstopp(lista);
-    H.prat = lista.length && forsta ? { rader: medDag(REP().ledig, dag), i: 0, nasta: performance.now() + 24000, gang: 24000 } : null;
-    if (lista.length && !lista.some((m) => Date.parse(m.avspark) > nu)) efterat(lista, fragat);
-    klick();
+    return forsta;
   }
   // Det han sa om matchen, på dess rad: rutorna 1 X 2 som på kupongen med hans tecken ifyllda,
   // och resultatet. Rutorna och resultatet har fast bredd och strecket i resultatet står mitt i
-  // sin spalt (siffrorna är olika breda i Fraunces), så att allt står i raka spalter.
-  function hansTips(minne) {
+  // sin spalt (siffrorna är olika breda i Fraunces), så att allt står i raka spalter. När matchen har
+  // slutat (f, slutade) lyser tecknet som kom in: i guld om han hade det, annars med vit ram (kom).
+  // Det han hade i onödan tonas ned (av), och resultatet står i guld om han sa det exakta.
+  function hansTips(minne, f = null) {
     const [tecken, res] = String(minne || '').split(' ');
     if (!tecken) return '';
-    const rutor = KORT.map((k) => `<em${tecken.includes(k) ? ' class="pa"' : ''}>${k}</em>`).join('');
+    const rutor = KORT.map((k, n) => {
+      const pa = tecken.includes(k);
+      const klass = [pa && 'pa', f && pa && n !== f.utfall && 'av', f && !pa && n === f.utfall && 'kom'].filter(Boolean).join(' ');
+      return `<em${klass ? ` class="${klass}"` : ''}>${k}</em>`;
+    }).join('');
     const [h, b] = String(res || '').split('–');
     const mal = b === undefined ? '' : `<i>${esc(h)}</i>–<i>${esc(b)}</i>`;
-    return `<b class="rh-tips"><span class="rh-vh">${esc(tecken)}</span><span class="rh-rutor" aria-hidden="true">${rutor}</span><small>${mal}</small></b>`;
+    const exakt = f && res === `${f.h}–${f.b}`;
+    return `<b class="rh-tips"><span class="rh-vh">${esc(tecken)}</span><span class="rh-rutor" aria-hidden="true">${rutor}</span><small${exakt ? ' class="exakt"' : ''}>${mal}</small></b>`;
   }
+  // Hur matchen slutade efter 90 minuter, som tipsen rättas: { h, b, utfall: 0–2 }. null om den inte har
+  // slutat, eller om du har valt att dölja den (gradeRow i kupong.js).
+  function slutade(m, nu = Date.now()) {
+    if (typeof gradeRow !== 'function') return null;
+    const r = gradeRow({ id: m.id, sign: '1X2', label: m.namn }, nu);
+    const s = r.state === 'final' && r.res != null && ((r.m && r.m.score90) || r.score);
+    return s ? { h: s.home, b: s.away, utfall: r.res } : null;
+  }
+  // Rutan i spalten Facit, med strecket mitt i spalten som i hans resultat. Tom på rader som inte har slutat.
+  const facitRuta = (f) => `<b class="rh-facit">${f ? `<span class="rh-vh">Slutade </span><i>${esc(f.h)}</i>–<i>${esc(f.b)}</i>` : ''}</b>`;
   // Vem som säger vad, överst i listan: Hasse (porträtt och namn i guld) över hans rutor och
   // resultat, du (porträtt i din färg och namnet i din handstil, som på kupongen) över det du har.
   // Huvudet är byggt som en rad, med osynliga rutor som håller bredden, så att det står mitt över
-  // spalterna i alla storlekar. Spalterna som inte syns på någon rad får inget huvud.
-  function spalter(lista, fragat) {
+  // spalterna i alla storlekar. Mellan dem står Facit, när någon match har slutat. Spalterna som inte syns
+  // på någon rad får inget huvud.
+  function spalter(lista, fragat, medFacit = false) {
     const han = lista.some((m) => fragat[m.id]);
     const du = K().kan();
-    if (!han && !du) return '';
+    if (!han && !du && !medFacit) return '';
     const hans = han ? `<b class="rh-tips"><span class="rh-rutor">${KORT.map((k) => `<em>${k}</em>`).join('')}</span><small></small><span class="rh-vem hasse"><span class="rh-ans"></span><span class="rh-namn">Hasse</span></span></b>` : '';
     let din = '';
     if (du) {
@@ -1418,7 +1475,8 @@ window.RumHasse = (() => {
         ? `<u><span class="rh-vem du k${i}"><span class="rh-ans"${g.bild ? ` style="background-image: url('${esc(g.bild)}')"` : ''}></span><span class="rh-namn">${esc(namn)}</span></span></u>`
         : '<u><span class="rh-vem du"><span class="rh-namn">Du</span></span></u>';
     }
-    return `<div class="rh-kol" aria-hidden="true">${hans}${din}</div>`;
+    const slut = medFacit ? '<b class="rh-facit"><span class="rh-vem facit">Facit</span></b>' : '';
+    return `<div class="rh-kol" aria-hidden="true">${hans}${slut}${din}</div>`;
   }
   // Huvudet lika brett som raderna (en rullningslist tar plats i listan), och namnen bara när de
   // får plats bredvid varandra: först går ditt (du vet hur du ser ut), sedan hans.
@@ -1428,8 +1486,8 @@ window.RumHasse = (() => {
     if (!k || !l || !k.offsetWidth) return;
     k.style.paddingRight = `${l.offsetWidth - l.clientWidth}px`;
     k.classList.remove('trangt', 'trangare');
-    const [a, b] = k.querySelectorAll('.rh-vem');
-    const krock = () => a && b && a.getBoundingClientRect().right + 14 > b.getBoundingClientRect().left;
+    const v = [...k.querySelectorAll('.rh-vem')];
+    const krock = () => v.some((x, i) => i && v[i - 1].getBoundingClientRect().right + 14 > x.getBoundingClientRect().left);
     if (krock()) k.classList.add('trangt');
     if (krock()) k.classList.add('trangare');
   }
@@ -1484,10 +1542,8 @@ window.RumHasse = (() => {
   function sagtExakt(lista, fragat) {
     for (const m of lista) {
       const res = String(fragat[m.id] || '').split(' ')[1];
-      if (!res) continue;
-      const r = gradeRow({ id: m.id, sign: '1X2', label: m.namn }, Date.now());
-      const s = r.state === 'final' && ((r.m && r.m.score90) || r.score);
-      if (s && `${s.home}–${s.away}` === res) return res;
+      const f = res ? slutade(m) : null;
+      if (f && `${f.h}–${f.b}` === res) return res;
     }
     return null;
   }

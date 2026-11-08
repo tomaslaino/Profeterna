@@ -68,6 +68,17 @@
 .rh-tips small { display: grid; grid-template-columns: 1fr auto 1fr; gap: 0.12em; width: 2.4em; font-size: inherit; font-weight: 700; color: #f6efdc; white-space: nowrap; }
 .rh-tips small i { font-style: normal; text-align: right; }
 .rh-tips small i + i { text-align: left; }
+/* Hur matchen slutade (facitRuta och hansTips i rum-hasse.js): en spalt längst ut, lika bred som hans
+   resultat. På en spelad rad lyser resultatet och tecknet som kom in, resten är nedtonat. */
+.rh-facit { flex: none; align-self: center; display: grid; grid-template-columns: 1fr auto 1fr; gap: 0.12em; width: 2.4em; margin-left: 0.75em; font-weight: 700; color: #f6efdc; white-space: nowrap; }
+.rh-facit i { font-style: normal; text-align: right; }
+.rh-facit i + i { text-align: left; }
+.rh-lista button.spelad:disabled { opacity: 1; }
+.rh-lista button.spelad > i, .rh-lista button.spelad > span { color: rgba(246, 239, 220, 0.62); }
+.rh-lista button.spelad .rh-tips small { color: rgba(246, 239, 220, 0.62); }
+.rh-lista button.spelad .rh-tips small.exakt { color: #ffd86b; }
+.rh-rutor em.pa.av { border-color: rgba(255, 216, 107, 0.34); background: rgba(255, 216, 107, 0.16); color: rgba(255, 216, 107, 0.62); box-shadow: none; }
+.rh-rutor em.kom { border: 1.5px solid #f6efdc; color: #f6efdc; }
 /* Vem som säger vad (spalter i rum-hasse.js): porträtt och namn mitt över hans spalt och över din.
    Raden har osynliga rutor som håller samma bredd som på raderna under. */
 .rh-kol { flex: none; display: flex; justify-content: flex-end; height: 30px; margin-bottom: 0.3em; }
@@ -77,6 +88,10 @@
 .rh-vem { --a: 26px; position: absolute; top: 50%; translate: 0 -50%; display: flex; align-items: center; gap: 7px; font: 700 11px/1 Fraunces, Georgia, serif; letter-spacing: 0.17em; text-transform: uppercase; color: rgba(246, 239, 220, 0.82); white-space: nowrap; }
 .rh-vem.hasse { left: 50%; translate: -50% -50%; color: #ffd86b; }
 .rh-vem.du { right: 0; }
+.rh-kol .rh-facit { position: relative; align-self: stretch; }
+/* (ordet är bredare än spalten: längst ut slutar det där strecken slutar, och mellan två spalter står det mitt över) */
+.rh-vem.facit { right: 0; }
+.rh-samtal.tre .rh-vem.facit { right: auto; left: 50%; translate: -50% -50%; }
 .rh-ans { flex: none; width: var(--a); height: var(--a); border-radius: 50%; background: #3a2c20 no-repeat center / cover; box-shadow: 0 0 0 1.5px var(--ring, rgba(246, 239, 220, 0.6)), 0 2px 6px rgba(0, 0, 0, 0.6); }
 .rh-vem.hasse .rh-ans { --ring: #ffd86b; background-image: url(rum/hasse-atlas.webp); background-size: calc(var(--a) * 4.15) auto; background-position: calc(var(--a) * -0.65) calc(var(--a) * -0.23); }
 /* ditt namn i din handstil och porträttet i din färg, som på kupongen (rum.css .sm-k0–2) */
@@ -160,6 +175,7 @@
 .rum-hasse-vy.hog .rh-dom.lang { font-size: 34px; }
 .rum-hasse-vy.hog .rh-match { font-size: 0.86em; }
 .rum-hasse-vy.hog .rh-tips { gap: 0.5em; margin-left: 0.6em; }
+.rum-hasse-vy.hog .rh-facit { margin-left: 0.5em; }
 .rum-hasse-vy.hog .rh-rutor em { width: 1.8em; }
 .rum-hasse-vy.hog .rh-kol { height: 26px; margin-bottom: 0.2em; }
 .rum-hasse-vy.hog .rh-vem { --a: 24px; }
@@ -201,6 +217,10 @@
 /* det du själv har på raden, i listan */
 .rh-lista button u, .rh-kol u { flex: none; width: 2em; margin-left: 0.6em; text-align: right; color: #f6efdc; font: 600 1.3em/1 Caveat, cursive; text-decoration: none; }
 .rh-lista button u { align-self: center; opacity: 0.92; }
+/* hans spalt, Facit och din: tätare, så att lagnamnen får plats */
+.rh-samtal.tre .rh-tips { gap: 0.45em; margin-left: 0.55em; }
+.rh-samtal.tre .rh-facit { margin-left: 0.4em; }
+.rh-samtal.tre .rh-lista button u, .rh-samtal.tre .rh-kol u { width: 1.6em; margin-left: 0.25em; }
 .rum-hasse-vy.hog .rh-ruta { height: 52px; font-size: 28px; max-width: none; }
 .rum-hasse-vy.hog .rh-tecken { margin-top: 0.5em; }
 /* lågt fönster (telefonen på bredden): rutorna och svaren lite mindre, så att allt ryms ovanför foten */
