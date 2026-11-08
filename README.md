@@ -1818,46 +1818,49 @@ under omgången.
    garderingar, rader och (när matcher spelats) antal rätt. Varje match har rutorna
    1, X och 2 med porträtten på dem som tippat tecknet – utan tomma ringar för de andra
    (2026-10-22) – (streckad ram = del av en gardering), hur många av gänget som har med det och modellens chans. Motiveringarna står
-   under lagen. Matcherna sorteras efter hur oeniga vi är:
-   - *Alla olika* – inget tecken har mer än en
-   - *Två mot en* – den som avviker förklarar
-   - *Samma grund, olika säkerhet* – alla har med samma tecken, men någon har garderat, och
-     förslaget till gängets kupong (punkt 5) lämnar något av det utanför
-   - *Alla får med sitt* – som ovan, men förslaget har med allt vi har tippat (sedan 2026-11-07;
-     förut stod de under *Samma grund, olika säkerhet*, och med regeln var det nästan alla matcher)
-   - *Eniga mot modellen* – alla har samma tecken, och modellens troligaste är inte med
-   - *Eniga* – klubbas utan snack
+   på lappen (se *Högarna*). Matcherna står i högar efter hur oeniga vi är (`hog` i samtal.js),
+   i kupongens ordning inom varje hög:
+   - *Inget gemensamt* – inget tecken finns hos alla (t.ex. 1, 1X och 2)
+   - *Olika modiga* – alla har med samma tecken, men garderar olika mycket (t.ex. 1, 1X och 1X)
+   - *Överens* – alla har samma tecken
+   - *Saknar tips* – bara en (eller ingen) har tippat matchen
 
    **De omtvistade matcherna** (2026-11-07) är märkta som på kupongen i tobaksaffären, med samma
    kod (`strid` i `analyse`, se *Pennan visar vägen* under [Kupongen i handen](#kupongen-i-handen)):
-   numret är inringat med pennan, gängets kryss där är bleka – ett förslag – och så länge någon
-   omtvistad match återstår träder de andra matcherna tillbaka. Ett klick på raden utanför
-   rutorna, lagen och pennan klubbar matchen, liksom en ändring av gängets tecken i den: bocken
-   dras vid ringen och kryssen fylls i. Det klubbade delas med rummet på enheten
+   numret är inringat med pennan och gängets kryss där är bleka – ett förslag. *Klubba* på lappen
+   klubbar matchen, liksom en ändring av gängets tecken i den: bocken dras vid ringen och kryssen
+   fylls i. Det klubbade delas med rummet på enheten
    (`profeterna.rum.klubbat`), och *Börja om* tar bort det.
 
-   **Dagordningen** (2026-11-07): uppgörelsen sker i telefon, så papperet säger det som ska
-   sägas. Överst, under stämpeln, står *Dagordning* med hur många omtvistade matcher som är
-   kvar (*Sex matcher att prata om*, *Fyra kvar att prata om*, *Allt är klubbat*) och under
-   den en mening per person för hand, med porträttet och namnet i sitt bläck: *Johansson
-   förklarar Bournemouth–Nott'm Forest och Norwich–Cardiff*, *Du har inget att förklara* (eller
-   *har inte lämnat in än*). Sedan det som avgörs i luren, det som alla tippar emot modellen
-   och *Vi är överens om …*. Matcherna står i kupongens ordning med de korta namnen; ett tryck
-   bläddrar till matchen, som lyser upp en stund som med en överstrykningspenna. I varje
-   omtvistad match står samma sak i blyerts under lagen, med tecknet: *Du och Laino förklarar
-   ettan och krysset*, *Tejder förklarar krysset och Johansson tvåan*, *Alla olika – avgörs i
-   luren*, *Ingen ger sig – förslaget helgarderar*, och i matcher där alla går emot modellen
-   *Alla har krysset – modellen tror på ettan*. Den som förklarar är den vars tecken förslaget
-   lämnar utanför – eller, när förslaget får med allt, den som är ensam om ett tecken. Allt
-   utgår från allas tips och förslaget, inte från gängets kryss, så att inget skrivs om medan
-   pennan rör sig; det som klubbas stryks med pennan, på dagordningen och i matchen
-   (`dagordning` och `punkt` i samtal.js). Följer gängets tecken inte regeln står det med
-   rött ovanför knappen i raden längst ner – *En spik för lite och en halvgardering för
-   mycket* – så att det syns var man än är på papperet.
+   **Högarna** (2026-11-08, ersätter en dagordning i löptext som fyllde hela första skärmen i
+   telefonen): uppgörelsen sker i telefon, så medan någon match går att fylla i står hela kupongen
+   tätt (.sm-hog i samtal.css). Raderna har de korta lagnamnen och bara kryss och porträtt i
+   rutorna, med 1 X 2 överst, så att alla tretton nästan ryms på en skärm i telefonen, och papperet bläddras
+   fram direkt när man öppnar sidan under uppgörelsen. Högarna kommer ur allas tips och inte ur
+   gängets kryss, så att ingen rad flyttar sig medan pennan rör sig. Överst står för hand hur många
+   omtvistade matcher som är kvar: *Sex kvar*, *Allt klubbat*, *Inget att prata om*. Det vi är
+   eniga om och det klubbade träder tillbaka, men inte det vi är eniga om mot modellen.
+
+   **Lappen** (`lapp`, `fraga` och `visaLapp` i samtal.js): ett tryck på en match tar fram allt som bara behövs
+   när man pratar om den, längst ner på skärmen och ovanpå det som står där, så att inget på
+   papperet flyttar sig: lagen (länk till matchrutan), avspark, oddsen, vad som ska sägas,
+   motiveringarna och kommentaren i efterhand (ett ” vid lagen betyder att någon har skrivit
+   något). Vad som ska sägas är en fråga till var och en vars tecken förslaget lämnar utanför –
+   eller, när förslaget får med allt, till den som är ensam om ett tecken: *Tvåan, Johansson?*,
+   *Din etta?*. Är ingen särskild att fråga står det *Alla olika*, *Ettan eller krysset?* eller
+   *Helgardera?*, och annars *Alla har krysset – modellen tror på ettan*, *Ingen behöver backa* eller
+   *Klubbas utan snack*. När sidan öppnas är lappen framme för den första omtvistade matchen, och
+   *Klubba* tar fram nästa; *Nästa* hoppar över till nästa ej klubbade, och krysset eller ett
+   tryck till på raden stänger lappen. *Spara gängets kupong* blir huvudknappen först när inget är
+   kvar att klubba, och foten – Spikar, Halvgard, Helgard och Odds – står i raden längst ner.
+   Regeln visas där och stoppar inget (se *Regeln*).
+
+   När ingen match längre går att fylla i står matcherna luftigt i samma högar, med tiden, oddsen,
+   motiveringarna, kommentarerna och resultaten direkt på raden.
 5. **Gängets kupong** (så fort man ser de andras tips, också om någon inte har lämnat in):
    man trycker på rutorna (två rutor =
    gardering). Den börjar som förslaget – med regeln ett som följer den (se *Regeln*), annars
-   tecknen som fler än hälften har med och *Alla olika* tomma – och sparas bara på enheten, så en håller i pennan under uppgörelsen (*Börja
+   tecknen som fler än hälften har med och matcher där alla tippat olika tomma – och sparas bara på enheten, så en håller i pennan under uppgörelsen (*Börja
    om* går tillbaka till förslaget). Nederst syns kupongen som rutor med antal rader.
    Gängets tecken går att kryssa i till 30 minuter efter matchens avspark (sedan 2026-11-03),
    så att kupongen som spelades hos Svenska Spel i sista stund kan föras in efteråt; därefter
@@ -3797,8 +3800,8 @@ början, eller gängets kupong om den redan är sparad, och ett tryck kryssar i 
 sparat på enheten som på papperet).
 
 **Pennan visar vägen** (2026-11-07). Numren på de omtvistade matcherna är inringade med
-kulspetspennan: de som går att fylla i där vi inte har något tecken gemensamt (*Alla olika*
-och *Två mot en* på papperet), där förslaget lämnar matchen tom eller där förslaget lämnar ett
+kulspetspennan: de som går att fylla i där vi inte har något tecken gemensamt (*Inget gemensamt*
+på papperet), där förslaget lämnar matchen tom eller där förslaget lämnar ett
 tecken som någon av oss har med utanför – till exempel en spik där två har helgarderat (`strid` i
 `Samtal.pult.gang`). Eniga matcher, och matcher där förslaget får med allt vi har tippat, är inte
 omtvistade. Tills en omtvistad match är klubbad står gängets kryss där blekt, som ett förslag,
