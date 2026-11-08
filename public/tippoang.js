@@ -58,6 +58,14 @@
   // Chansen som räknas (0–1): modellens, annars schablonen.
   const chance = (s, p) => (p != null ? p / 100 : BASE[s.length]);
 
+  // Tecknen Hasse Backe sa om en match i analysen (data/analyser.json), när det är skrivet
+  // före avspark: det är det han står för, både på sin kupong och i protokollet. Annars tomt.
+  const hasseSagt = (a) => {
+    const h = a && a.hasse;
+    if (!h || !Array.isArray(h.tecken) || !(Date.parse(h.writtenAt) < Date.parse(a.avspark))) return '';
+    return sign(h.tecken.map((n) => SIGNS[n]).join(''));
+  };
+
   // Modellens tips: det troligaste utfallet.
   const modelSign = (model) => (model ? SIGNS[model.indexOf(Math.max(...model))] : null);
 
@@ -129,5 +137,5 @@
     return { people: [...by.values()].sort((a, b) => key(b) - key(a)), model };
   }
 
-  return { SIGNS, BASE, HASSE, SLAG, regelFor, slag, regelOver, regelKlar, sign, pct, chance, modelSign, points, tally, runda, key, rank, season };
+  return { SIGNS, BASE, HASSE, SLAG, regelFor, slag, regelOver, regelKlar, sign, hasseSagt, pct, chance, modelSign, points, tally, runda, key, rank, season };
 });

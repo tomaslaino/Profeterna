@@ -5243,8 +5243,9 @@ resultat och facit för varje match, och en spalt för kupongen (gängets tre an
 Allas tecken står kvar, så att man ser vad var och en spelade: det som satt är överstruket med grön penna, och i en
 gardering är tecknet som satt starkast. Under står *Rätt av 13* och poängen. Vinnaren är inringad, både på porträttet
 och runt poängen, och det är de enda ringarna på blocket. Hasse har rättat det: en dom per person längst ner och hans
-namnteckning. I telefonen försvinner namnen under porträtten och namnteckningen. Har Hasse inte tippat i omgången
-(han tävlar från omgången efter 2026-11-07) står det troligaste utfallet i hans spalt, utanför tävlingen.
+namnteckning. I telefonen försvinner namnen under porträtten och namnteckningen. Har Hasse ingen kupong i omgången
+(han tävlar från omgången efter 2026-11-07) står det han sa vid disken i hans spalt, utanför tävlingen
+(`Tippoang.hasseSagt`, samma regel som hans kupong: det ska vara skrivet före avspark).
 
 Ett klick på blocket lyfter det från pulten och lägger fram det stort över rummet, och *Lägg tillbaka*, Esc eller ett
 klick utanför lägger tillbaka det (`protokollet` i rum.js). Ett klick på

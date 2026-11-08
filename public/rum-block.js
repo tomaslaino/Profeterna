@@ -31,10 +31,10 @@
   const KUPONG = { id: 'K', namn: 'Kupong', ink: '#26211a' };
   const HASSE = 'HB';
   const HASSE_BILD = 'profeterna/hasse.jpg';
-  // Hasses spalt i en omgång där han inte har tippat själv: det troligaste utfallet (kol.D),
-  // det han har att gå på. Den räknas inte i tävlingen.
-  const BACKE = { id: 'D', namn: 'Backe', ink: INK[3], hand: 3, bild: HASSE_BILD };
-  const medBacke = (sum) => sum.dator.n > 0 && !sum.folk.some((p) => p.id === HASSE);
+  // Hasses spalt i en omgång utan kupong från honom: det han sa vid disken (kol.B). Den räknas
+  // inte i tävlingen.
+  const BACKE = { id: 'B', namn: 'Backe', ink: INK[3], hand: 3, bild: HASSE_BILD };
+  const medBacke = (sum) => Boolean(sum.backe);
   const poang = (x) => {
     const v = Tippoang.runda(x);
     const t = String(Math.abs(v)).replace('.', ',');
@@ -86,8 +86,8 @@
 
   // score: tpScore(round, now), round: omgången ur Samtal, val: gängets tecken per match,
   // info: gängets uppgifter (bild), namn: omgångens namn, nr: kupongens nummer, kort: lagens korta namn,
-  // kupongRader: tpRows för gängets tecken.
-  function bygg({ score, round, kupongRader, info = [], namn = null, nr = null, kort = (x) => x }) {
+  // kupongRader: tpRows för gängets tecken, backeRader: tpRows för det Hasse sa (null när han har en kupong).
+  function bygg({ score, round, kupongRader, backeRader = null, info = [], namn = null, nr = null, kort = (x) => x }) {
     if (!score || !score.done || !round || !round.matcher) return null;
     const vilka = score.people.filter((p) => !p.none);
     if (!vilka.length) return null;
@@ -107,11 +107,11 @@
       const st = score.status[i] || {};
       const m = st.m || {};
       const res = st.res != null ? st.res : null;
-      const kol = { K: { t: '', ok: false, ensam: false }, D: { t: '', ok: false, ensam: false } };
+      const kol = { K: { t: '', ok: false, ensam: false }, B: { t: '', ok: false, ensam: false } };
       const k = kupongRader && kupongRader[i];
       if (k) kol.K = { t: k.sign, ok: k.hit === true, ensam: false };
-      const d = score.model && score.model.rows && score.model.rows[i];
-      if (d) kol.D = { t: d.sign, ok: d.hit === true, ensam: false };
+      const b = backeRader && backeRader[i];
+      if (b) kol.B = { t: b.sign, ok: b.hit === true, ensam: false };
       const ratt = folk.filter((p) => p.rows[i] && p.rows[i].hit === true);
       for (const p of folk) {
         const r = p.rows[i];
@@ -129,6 +129,7 @@
       id: round.id, nr, namn: namn || null, n: score.n, folk,
       kupong: { ok: kup.filter((r) => r.kol.K.ok).length, n: kup.length },
       dator: { ok: (score.model && score.model.ok) || 0, pts: (score.model && score.model.pts) || 0, n: (score.model && score.model.n) || 0 },
+      backe: backeRader ? Tippoang.tally(backeRader) : null,
       rader,
     };
     for (const p of folk) p.betyg = betyg(p);
@@ -145,16 +146,22 @@
 
   // Det som går att räkna i rummet (rum.js): omgången, gängets tecken och samma rättning som
   // poängtavlan. Samma läge ger samma svar utan ny räkning. → sammanställningen, eller null.
+  // analyser: match-id → analysen, null så länge de inte är hämtade (då är Hasses spalt tom).
+  // En match han inte har sagt något om får det troligaste, som på hans kupong.
   let minne = { k: null, sum: null };
-  function rakna({ round, val, namn, nr, info, kort, now = Date.now() }) {
+  function rakna({ round, val, namn, nr, info, kort, analyser = null, now = Date.now() }) {
     if (!round || !round.matcher || !round.matcher.length) return null;
     if (typeof tpScore !== 'function') return null;
     const score = tpScore(round, now);
     if (!score.done) { minne = { k: null, sum: null }; return null; }
-    const k = JSON.stringify([round.id, namn, nr, score.status.map((r) => [r.res, r.score]), val, score.people.map((p) => [p.id, p.ok, p.pts])]);
+    const utanKupong = !score.people.some((p) => p.id === HASSE);
+    const modell = utanKupong && analyser && typeof tpModelSigns === 'function' ? tpModelSigns(round) : {};
+    const sagt = utanKupong && analyser ? Object.fromEntries(round.matcher.map((x) => [x.id, Tippoang.hasseSagt(analyser.get(String(x.id))) || modell[x.id] || ''])) : null;
+    const k = JSON.stringify([round.id, namn, nr, score.status.map((r) => [r.res, r.score]), val, score.people.map((p) => [p.id, p.ok, p.pts]), utanKupong, sagt]);
     if (k === minne.k) return minne.sum;
     const kupongRader = val && typeof tpRows === 'function' ? tpRows(round, val, now) : null;
-    const sum = bygg({ score, round, kupongRader, info, namn, nr, kort });
+    const backeRader = !utanKupong ? null : sagt && typeof tpRows === 'function' ? tpRows(round, sagt, now) : [];
+    const sum = bygg({ score, round, kupongRader, backeRader, info, namn, nr, kort });
     minne = { k, sum };
     return sum;
   }
@@ -218,7 +225,7 @@
     });
     for (const p of sum.folk) if (p.none) ut.push({ id: p.id, namn: p.namn, ink: p.ink, text: T.inget });
     if (!medBacke(sum)) return ut;
-    const hasseBast = folk.length && folk.every((p) => p.ok < sum.dator.ok);
+    const hasseBast = sum.backe.n && folk.length && folk.every((p) => p.ok < sum.backe.ok);
     return [...ut, { id: BACKE.id, namn: BACKE.namn, ink: BACKE.ink, text: hasseBast ? T.hasseForst : T.hasse }];
   }
 
@@ -255,17 +262,17 @@
     const rader = sum.rader.map((r) => `<span class="rb-m"><u>${r.nr}</u><span>${esc(r.h)} – ${esc(r.b)}</span><em>${esc(r.mal)}</em></span><span class="rb-fa">${r.tecken}</span>` +
       kol.map((s) => cell(r, s)).join('')).join('');
     const rad = (cls, la, varden) => `<span class="rb-su la ${cls}">${la}</span>` + kol.map((s, i) => `<span class="rb-su ${cls}${s.id === 'K' ? ' k' : ''}" style="color:${s.ink}">${varden[i]}</span>`).join('');
-    const ratt = rad('tot', `Rätt av ${sum.n}`, kol.map((s) => (s.id === 'K' ? sum.kupong.ok : s.id === 'D' ? sum.dator.ok : P(s.id).none ? '–' : P(s.id).ok)));
+    const ratt = rad('tot', `Rätt av ${sum.n}`, kol.map((s) => (s.id === 'K' ? sum.kupong.ok : s.id === 'B' ? (sum.backe.n ? sum.backe.ok : '') : P(s.id).none ? '–' : P(s.id).ok)));
     const pts = rad('po', 'Poäng', kol.map((s) => {
       if (s.id === 'K') return '';
-      if (s.id === 'D') return poang(sum.dator.pts);
+      if (s.id === 'B') return sum.backe.n ? poang(sum.backe.pts) : '';
       const p = P(s.id);
       if (p.none) return '';
       return p.award === 'best' ? `<span class="rb-vann">${poang(p.pts)}${RING(70, 30)}</span>` : poang(p.pts);
     }));
     const dom = domar(sum).map((d) => `<span class="rb-dom"><b>${esc(d.namn)}:</b>${esc(d.text)}</span>`).join('');
     const rub = sum.namn || (sum.nr ? `Kupong ${sum.nr}` : '');
-    const bakom = kol.filter((s) => s.id !== 'K' && !(P(s.id) && P(s.id).none)).map((s) => `${s.namn} ${s.id === 'D' ? sum.dator.ok : P(s.id).ok}`).join(', ');
+    const bakom = kol.filter((s) => s.id !== 'K' && !(P(s.id) && P(s.id).none)).map((s) => `${s.namn} ${s.id === 'B' ? sum.backe.ok : P(s.id).ok}`).join(', ');
     const label = `Hasse Backes protokoll: kupongen ${sum.kupong.ok} rätt, ${bakom}`;
     return `<span class="rum-block n${kol.length}${tat ? ' tat' : ''}" style="--n:${kol.length}" role="img" aria-label="${esc(label)}">` +
       `<span class="rb-hu"><b>PROTOKOLL</b><span>${esc(rub)}</span></span>` +

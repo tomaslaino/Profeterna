@@ -186,10 +186,8 @@ function readHasse(file = ANALYSER_FILE) {
   }
   const out = {};
   for (const a of Array.isArray(list) ? list : []) {
-    const h = a && a.hasse;
-    if (!h || !Array.isArray(h.tecken) || !(Date.parse(h.writtenAt) < Date.parse(a.avspark))) continue;
-    const tecken = Tippoang.sign(h.tecken.map((n) => SIGNS[n]).join(''));
-    if (tecken) out[String(a.id)] = { tecken, resultat: h.resultat };
+    const tecken = Tippoang.hasseSagt(a);
+    if (tecken) out[String(a.id)] = { tecken, resultat: a.hasse.resultat };
   }
   return out;
 }

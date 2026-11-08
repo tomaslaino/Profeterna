@@ -2618,7 +2618,13 @@ ${window.RumRegister ? RumRegister.nara() : ''}
     R.summa = g && window.RumBlock ? RumBlock.rakna({
       round: p.s, val: g.val, namn: rd.name || ((R.old || []).find((c) => (c.rows || []).some((r) => rd.ids.includes(String(r.id)))) || {}).name, nr: typeof couponNumber === 'function' ? couponNumber(rd.ids) : null,
       info: (KP.data && KP.data.samtal && KP.data.samtal.gang) || [], kort: short, now: t,
+      analyser: analyserData ? analyserData.per : null,
     }) : null;
+    // det Hasse sa står i analyserna, som hämtas först när protokollet behöver dem
+    if (R.summa && R.summa.backe && !analyserData && !R.summaHamtar) {
+      R.summaHamtar = true;
+      loadAnalyser().then(() => { if (R.on) fill(); });
+    }
     if (R.video && R.video.datorn) R.video.datorn(R.summa ? R.summa.dator.ok : null);
     lappa();
   }
