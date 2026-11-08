@@ -1223,6 +1223,7 @@ window.RumAnslag = (() => {
       A.hkAnim = null;
     };
     function hkUt(now) {
+      if (window.RumBak) RumBak.bort('hasse-svar');
       tyst();
       hkStopp();
       ov.classList.remove('hasse');
@@ -1251,6 +1252,7 @@ window.RumAnslag = (() => {
         return;
       }
       hkStopp();
+      if (window.RumBak) RumBak.fram('hasse-svar', () => hasse(false));
       svara(n);
       for (const el of hkDelar) el.classList.add('on');
       ov.classList.add('hasse');
@@ -1308,6 +1310,7 @@ window.RumAnslag = (() => {
       if (A.matt !== A.html) measure();
       const len = A.len[id] || n.h;
       A.lyft = { id, vand: n.paper === 'polaroid', len, pan: 0 };
+      if (window.RumBak) RumBak.fram('lappen', () => drop());
       if (!A.fotot) (A.fotot = new Image()).src = 'rum/hasse-atlas.webp';
       ov.classList.add('lyft');
       lyftEl.innerHTML = `<div class="ans-lapp i-handen" data-lapp="${id}" style="width:${n.w}px; height:${len}px; transform-origin:50% ${n.h / 2}px">${sheetsHtml(n, A.inner[id], A.sheets, A.top, len)}</div>`;
@@ -1330,6 +1333,7 @@ window.RumAnslag = (() => {
       if (!A.lyft) return;
       const n = A.W.notes.find((x) => x.id === A.lyft.id);
       A.lyft = null;
+      if (window.RumBak) RumBak.bort('lappen');
       // Hasse tystnar när lappen sätts tillbaka
       if (A.hk) {
         A.hk = false;

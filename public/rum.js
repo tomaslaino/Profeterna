@@ -78,7 +78,11 @@ window.Rum = (() => {
   const R = { built: false, on: false, el: null, q: new URLSearchParams(location.search), t0: performance.now(), frozen: null,
     mx: 0.5, my: -0.25, tx: 0.5, ty: -0.25, raf: 0, fig: null, zoom: null, last: 0, px: 0.5, py: 0.5, pek: 'mouse', dold: new Set() };
   const still = () => R.frozen != null;
-  const calm = () => still() || matchMedia('(prefers-reduced-motion: reduce)').matches;
+  // (RumBak.snabbt: bakåt med svepet i telefonen, då läggs det översta bort utan rörelse, rum-bak.js)
+  const calm = () => still() || Boolean(window.RumBak && RumBak.snabbt) || matchMedia('(prefers-reduced-motion: reduce)').matches;
+  // det som läggs fram är ett lager för bakåt
+  const lager = (namn, ut) => { if (window.RumBak) RumBak.fram(namn, ut); };
+  const lagerUt = (namn) => { if (window.RumBak) RumBak.bort(namn); };
   const now = () => (still() ? R.frozen : (performance.now() - R.t0) / 1000);
   // kupongen i handen, tv:n, videon, en närbild (sak), anslagstavlan eller kortregistret nära
   const nara = () => Boolean(R.kup || R.zoom || R.vnara || R.sak || (R.ans && R.ans.on()) || (R.reg && R.reg.on()));
@@ -2637,6 +2641,8 @@ ${window.RumRegister ? RumRegister.nara() : ''}
     if (on && R.vnara) zoomVideo(false);
     if (on && R.reg && R.reg.on()) register(false);
     R.zoom = on;
+    if (on) lager('tv', () => zoomTv(false));
+    else lagerUt('tv');
     R.el.classList.toggle('tv-nara', on);
     // kameran ställer sig rakt framför, så att tv:n står rak (som med kupongen i handen)
     if (on) {
@@ -2671,6 +2677,8 @@ ${window.RumRegister ? RumRegister.nara() : ''}
     if (on && R.ans && R.ans.on()) board(false);
     if (on && R.reg && R.reg.on()) register(false);
     R.vnara = on;
+    if (on) lager('video', () => zoomVideo(false));
+    else lagerUt('video');
     // hörnet ritas skarpt bara när rutan fyller bilden (tat i rum-video.js),
     // och i halva storleken igen när tv:n har vridits bort
     clearTimeout(R.vskarp);
@@ -2818,6 +2826,8 @@ ${window.RumRegister ? RumRegister.nara() : ''}
   // kameran där en kort stund, innan den glider dit.
   function board(on) {
     if (!R.ans || on === R.ans.on()) return;
+    if (on) lager('tavlan', () => board(false));
+    else lagerUt('tavlan');
     if (on) {
       if (R.zoom) zoomTv(false);
       if (R.vnara) zoomVideo(false);
@@ -2850,6 +2860,8 @@ ${window.RumRegister ? RumRegister.nara() : ''}
   // kameran där den står när den har gått tillbaka, som anslagstavlan.
   function register(on) {
     if (!R.reg || !R.reg.ready() || on === R.reg.on()) return;
+    if (on) lager('registret', () => register(false));
+    else lagerUt('registret');
     if (on) {
       if (R.zoom) zoomTv(false);
       if (R.vnara) zoomVideo(false);
@@ -2947,6 +2959,7 @@ ${window.RumRegister ? RumRegister.nara() : ''}
     if (duk && was !== namn && R.inr) R.inr.skarp(duk, 0);
     R.sak = namn || null;
     if (!namn) {
+      lagerUt('sak');
       R.el.classList.remove('sak-nara');
       tvBort(false, cls);
       vridHem();
@@ -2958,6 +2971,7 @@ ${window.RumRegister ? RumRegister.nara() : ''}
     const mal = S && S.mal ? R.el.querySelector(S.mal) : a;
     // (uret finns först när inredningen är ritad, och då frågar three() igen)
     if (!a || !mal) return;
+    lager('sak', () => sak(null));
     if (R.zoom) zoomTv(false);
     if (R.vnara) zoomVideo(false);
     board(false);
@@ -3150,6 +3164,7 @@ ${window.RumRegister ? RumRegister.nara() : ''}
       efter: { ...(v.efter || {}) }, fram,
       // matcherna i kupongens ordning, till matchbladet (lagen)
       matcher: rd.ids.map((id) => rows.find((x) => x.id === id)).filter(Boolean).map((x) => x.m), kupong: nr ? `Kupong ${nr}` : 'Kupong' };
+    lager('kupong', () => closeCoupon());
     k.msg = k.rad.querySelector('.msg');
     // gängets kupong: guldordet och, när den är sparad, Spela hos Svenska Spel
     // bredvid (gangState ritar om dem tillsammans)
@@ -3298,7 +3313,7 @@ ${window.RumRegister ? RumRegister.nara() : ''}
     const k = R.kup;
     if (!k || k.closing || !window.RumMatchblad) return;
     if (k.lapp) return;
-    k.lapp = RumMatchblad.oppna({ host: k.el, matcher: k.matcher, id, kupong: k.kupong, tillbaka: 'kupongen', ut: () => lagenUt(), calm });
+    k.lapp = RumMatchblad.oppna({ host: k.el, matcher: k.matcher, id, kupong: k.kupong, tillbaka: 'kupongen', ut: (nu) => lagenUt(nu), calm });
   }
   function lagenUt(now = false) {
     const k = R.kup;
@@ -3321,6 +3336,7 @@ ${window.RumRegister ? RumRegister.nara() : ''}
       k.later = true;
       return;
     }
+    lagerUt('kupong');
     // en kommentar i efterhand som du skriver sparas när fältet lämnas
     const f = k.el.querySelector('input.pen-in:focus');
     if (f) f.blur();
@@ -4348,6 +4364,14 @@ ${window.RumRegister ? RumRegister.nara() : ''}
       hot(a ? a.dataset.nav : null);
     });
     el.addEventListener('click', (e) => {
+      // Namnet leder till rummet, där man redan är. Som länk blev det en rad i historiken som nästa
+      // bakåt stannade på (rum-bak.js).
+      if (e.target.closest('.rum-brand')) {
+        e.preventDefault();
+        zoomTv(false);
+        zoomVideo(false);
+        return;
+      }
       // kupongen i handen: ett klick utanför den lägger tillbaka den
       if (R.kup) {
         // klickets väg, inte var målet sitter nu: ett matchblad som klicket
@@ -4614,6 +4638,7 @@ ${window.RumRegister ? RumRegister.nara() : ''}
     if (R.video) R.video.stop();
     zoomVideo(false);
     sak(null, null);
+    if (window.RumBak) RumBak.rensa();
     R.on = false;
     document.documentElement.classList.remove('rum-pa');
     if (window.RumFolk) RumFolk.on(false);

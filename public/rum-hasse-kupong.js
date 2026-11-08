@@ -251,6 +251,7 @@ window.RumHasseKupong = (ctx) => {
   }
   // Kupongen hos honom: den kommer underifrån, står en stund så att man ser vilken det är och glider
   // in under hans händer.
+  const lagerUt = () => { if (window.RumBak) RumBak.bort('hasses-kupong'); };
   async function fram() {
     if (K.fas === 'disk') return true;
     if (K.fas === 'fram') return K.framP;
@@ -259,6 +260,7 @@ window.RumHasseKupong = (ctx) => {
       if (!K.el) bygg();
       else { K.g = matt(); K.l = lagen(); }
       K.fas = 'fram';
+      lagerUt();
       const { disk, fore, hand, ner } = K.l;
       if (calm()) {
         K.el.classList.remove('over');
@@ -286,14 +288,15 @@ window.RumHasseKupong = (ctx) => {
     const { disk, fore, hand } = K.l;
     await kor([disk, fore, 240, ease.mjuk, false], [fore, hand, 460, ease.ut, true]);
   }
-  async function bort() {
+  async function bort(snabbt = false) {
     if (!K.el) return;
+    lagerUt();
     const el = K.el;
     const { disk, fore, hand, ner } = K.l;
     const fran = K.fas;
     K.fas = 'ut';
     pennaPa(false);
-    if (fran === 'fram' && !calm()) {
+    if (fran === 'fram' && !calm() && !snabbt) {
       // mitt i luften: därifrån den är, nedåt
       const nu = getComputedStyle(el).transform;
       const min = ++K.id;
@@ -303,7 +306,7 @@ window.RumHasseKupong = (ctx) => {
       K.anim = el.animate([{ transform: nu }, { transform: form(ner) }], { duration: 320, easing: 'ease-in', fill: 'forwards' });
       try { await K.anim.finished; } catch (x) { return; }
       if (min !== K.id) return;
-    } else if (!calm()) {
+    } else if (!calm() && !snabbt) {
       const steg = fran === 'hand' ? [[hand, ner, 300, ease.in, true]] : [[disk, fore, 240, ease.mjuk, false], [fore, ner, 420, ease.in, true]];
       if (!await kor(...steg)) return;
     }
@@ -313,8 +316,11 @@ window.RumHasseKupong = (ctx) => {
     e.stopPropagation();
     if (K.jobb || K.ko.length) return;
     if (K.visar) { if (K.visarKlar) K.visarKlar(); return; }
-    if (K.fas === 'disk') iHanden();
-    else if (K.fas === 'hand') bort();
+    if (K.fas === 'disk') {
+      iHanden();
+      // bakåt (rum-bak.js) tar den med sig, som ett klick
+      if (window.RumBak) RumBak.fram('hasses-kupong', (nu) => bort(nu));
+    } else if (K.fas === 'hand') bort();
   }
   // Har man kupongen i handen är ett klick var som helst att ta den med sig. Är det han som visar upp
   // den lägger ett klick tillbaka den.
@@ -654,6 +660,7 @@ window.RumHasseKupong = (ctx) => {
   // Man går härifrån. Det man själv valde står kvar; det han skulle skriva åt en och inte hann börja med
   // blir inte av.
   function stang() {
+    lagerUt();
     K.vems = null;
     K.ko.length = 0;
     K.id++;

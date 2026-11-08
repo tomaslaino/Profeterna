@@ -385,6 +385,7 @@ window.RumRegister = (() => {
       if (A.lyft) drop(true);
       const me = { id: c.id };
       A.lyft = me;
+      if (window.RumBak) RumBak.fram('kortet', () => drop());
       ov.classList.add('lyft');
       ov.style.cursor = '';
       A.L.hover(null);
@@ -415,6 +416,7 @@ window.RumRegister = (() => {
       if (!A.lyft) return;
       const { id, framme } = A.lyft;
       A.lyft = null;
+      if (window.RumBak) RumBak.bort('kortet');
       const card = lyftEl.firstElementChild;
       const back = () => {
         A.L.hide(id, false);

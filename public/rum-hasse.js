@@ -428,6 +428,8 @@ window.RumHasse = (() => {
   async function oppna() {
     if (H.on || H.oppnar || H.svanger) return;
     H.oppnar = true;
+    H.utSen = false;
+    if (window.RumBak) RumBak.fram('hasse', bak);
     vakna();
     clearTimeout(H.ner);
     try {
@@ -436,6 +438,14 @@ window.RumHasse = (() => {
     } catch (e) {
       H.vy.hidden = true;
       H.oppnar = false;
+      if (window.RumBak) RumBak.bort('hasse');
+      return;
+    }
+    // bakåt medan han hämtades: man hann aldrig vända sig
+    if (H.utSen) {
+      H.vy.hidden = true;
+      H.oppnar = false;
+      slappSen();
       return;
     }
     fraga();
@@ -463,6 +473,12 @@ window.RumHasse = (() => {
     H.trum = H.t0 + 4000 + Math.random() * 5000;
     H.vanaT = H.t0 + VANA[0] * 0.4 + Math.random() * VANA[0] * 0.3;
     loop();
+    if (H.utSen) stang();
+  }
+  // Bakåt (rum-bak.js): på väg dit vänder man när man är framme, annars går man tillbaka (nu: direkt).
+  function bak(nu) {
+    if (H.oppnar || H.svanger) H.utSen = true;
+    else stang(nu);
   }
 
   function loop() {
@@ -509,8 +525,9 @@ window.RumHasse = (() => {
     H.raf = requestAnimationFrame(tick);
   }
 
-  async function stang() {
+  async function stang(nu = false) {
     if (!H.on || H.svanger) return;
+    if (window.RumBak) RumBak.bort('hasse');
     bladetUt(true);
     H.on = false;
     H.fraga = null;
@@ -525,6 +542,7 @@ window.RumHasse = (() => {
     H.svanger = true;
     H.rum.classList.remove('hasse-framme');
     H.rum.classList.add('hasse-pan');
+    if (nu) { hemma(); return; }
     if (calm()) { tona(0, hemma); return; }
     requestAnimationFrame(() => panorera(0, hemma));
   }
@@ -535,7 +553,10 @@ window.RumHasse = (() => {
     H.world.style.transition = '';
     H.rum.classList.remove('hasse-pan', 'hasse-framme');
     H.vy.hidden = true;
-    // figuren lämnas tillbaka efter en stund, så att den inte tar minne i onödan
+    slappSen();
+  }
+  // figuren lämnas tillbaka efter en stund, så att den inte tar minne i onödan
+  function slappSen() {
     clearTimeout(H.ner);
     H.ner = setTimeout(() => { if (!H.on && H.fig) borta(); }, latt() ? 20000 : 90000);
   }

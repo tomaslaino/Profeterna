@@ -1027,6 +1027,8 @@ function dialog() {
     d = document.createElement('dialog');
     d.id = 'dv-modal';
     d.className = 'dv-modal';
+    // spelarkortet i rummet är ett lager för bakåt (rum-bak.js), hur det än stängs
+    d.addEventListener('close', () => { if (window.RumBak) RumBak.bort('spelarkort'); });
     d.addEventListener('click', (e) => {
       if (e.target === d || e.target.closest('[data-close]')) d.close();
       const t = e.target.closest('[data-mtab]');
@@ -1054,7 +1056,10 @@ function dialog() {
 function showModal(html) {
   const d = dialog();
   d.innerHTML = `<div class="dv-mbox"><button type="button" class="dv-mclose" data-close aria-label="Stäng">×</button>${html}</div>`;
-  if (!d.open) d.showModal();
+  if (!d.open) {
+    d.showModal();
+    if (window.RumBak) RumBak.fram('spelarkort', () => d.close());
+  }
   d.scrollTop = 0;
   const box = d.querySelector('.dv-mbox');
   if (!box) return;

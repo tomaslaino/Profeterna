@@ -961,6 +961,11 @@ bara lokalt. Analyserna visas som de ligger i `data/analyser.json`; hur de skriv
   din handstil över din, som spalthuvuden. Av tre skisser i den riktiga vyn (två spalter, samma
   rutor med ditt kryss över hans guld, din kupong med hans ringar i guld) valde användaren två
   spalter. Se [Hasse Backe](#hasse-backe), *Samtalet*.
+- **Bakåt lägger bort det översta (2026-11-08):** Androids bakåtgest och webbläsarens bakåtknapp lämnade
+  sajten också med matchbladet, kupongen i handen eller en närbild framme, eftersom rummet inte låg i
+  historiken. Nu tar bakåt bort ett lager i taget och lämnar sajten först när inget är framme. Namnet
+  Matchfixarna i rummet är inte längre en länk, eftersom den bara lade till en rad som nästa bakåt
+  stannade på. Se [Bakåt](#bakåt) under Tobaksaffären.
 - **Kuponghistoriken flyttar till Olympen (2026-10-20, användarens önskemål):** Kupong
   handlar bara om nästa kupong – växlaren Omgången | Historik försvinner. De färdigspelade
   kupongerna står sist i Olympen under rubriken *Grupparbetena* (`#olympen/kuponger`, en
@@ -5249,6 +5254,29 @@ och K, T, A, R och V går direkt till kupongen, tv:n, anslagstavlan, kortregistr
 (K nära kupongen på pulten går tillbaka). Föremålen lyser inte när man
 pekar på dem på nära håll. Med `prefers-reduced-motion` går kameran direkt.
 `?rum-sak=ur|skar|ram|kort|pokal|kork|vm94|ifk|nacional|lopsedel|chelsea|dorr|kupong` visar en närbild i en fast bild (med `?rum-t`).
+
+### Bakåt
+
+Bakåtgesten i telefonen och bakåtknappen i datorn lägger bort det översta som ligger framme och stannar
+i rummet ([public/rum-bak.js](public/rum-bak.js)). Lagren, från det översta: spelarkortet, matchbladet,
+Hasses svar om en lapp, en lapp på anslagstavlan eller ett kort i registret, kupongen i handen (också
+hos Hasse), rutan i hela fönstret på videon, och sist tv:n, videon, en närbild, anslagstavlan,
+kortregistret eller Hasses vy. Med inget framme lämnar bakåt sajten, som vanligt.
+
+Varje lager har en osynlig rad i webbläsarens historik: samma adress, med antalet lager i
+`history.state.rum`. Bakåt ger `popstate`, och det som ligger över raden man kom till läggs bort, samma
+väg som krysset eller Esc. Stängs ett lager på annat sätt tar `stam()` bort raden med `history.go`, så
+att nästa bakåt inte stannar på en tom rad. Lager som byts i samma klick (K från en närbild) återanvänder
+raden, och en rad som blir över (en länk ut ur ett lager, en omladdning, framåtknappen) räknas som fel
+läge och rättas utan att något syns. Adressen ändras aldrig, så `route` i
+[public/app.js](public/app.js) märker inget, och matchrutan (`#match/<id>`) ovanpå rummet sköter sina
+rader som förut.
+
+Chrome hoppar över alla rader i ett dokument som lägger till en rad innan någon har tryckt på sidan
+(`chrome.tabs.goBack` går samma väg som gesten och visar det, `history.back` gör det inte). Därför får
+lager utan tryck, som `?rum-sak`, ingen rad. Sveper man bakåt i telefonen visar Chrome själv en bild av
+raden under (`hasUAVisualTransition`), och då läggs lagret bort utan rörelse (`RumBak.snabbt`). På Android
+stänger Chrome spelarkortet utan att historiken rör sig, och då säger dialogens `close` till.
 
 ## Statusmärkning
 

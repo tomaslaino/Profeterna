@@ -521,6 +521,7 @@ window.RumMatchblad = (() => {
       rita(B.el, B.ctx);
     };
     B.ut = (nu = false) => {
+      if (window.RumBak) RumBak.bort('blad');
       const el = B.el;
       B.el = null;
       slappElvor();
@@ -533,6 +534,8 @@ window.RumMatchblad = (() => {
         { duration: 240, easing: 'ease-in', fill: 'forwards' }).finished.then(() => el.remove(), () => el.remove());
     };
     lagg();
+    // bakåt (rum-bak.js) lägger bort bladet, som krysset
+    if (window.RumBak) RumBak.fram('blad', (nu) => ut(nu));
     return B;
   }
 
@@ -576,7 +579,7 @@ window.RumMatchblad = (() => {
       // klickets väg, inte var målet sitter nu: Visa ändå ritar om sidan under klicket
       if (!e.composedPath().some((n) => n instanceof Element && n.matches('.rum-blad'))) ut();
     });
-    const inre = oppna({ host: hand, matcher, id, kupong, tillbaka, ut: () => ut(), calm });
+    const inre = oppna({ host: hand, matcher, id, kupong, tillbaka, ut: (nu) => ut(nu), calm });
     B = {
       flik: (n) => inre.flik(n),
       ut,

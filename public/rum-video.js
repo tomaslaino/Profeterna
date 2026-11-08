@@ -1609,6 +1609,8 @@ window.RumVideo = (() => {
     function tat(on) {
       if (!V.near || on === V.tat) return;
       V.tat = on;
+      if (window.RumBak && on) RumBak.fram('rutan', () => tat(false));
+      else if (window.RumBak) RumBak.bort('rutan');
       // hörnet ritas skarpt bara här, där rutan fyller bilden: innan
       // kameran går fram, och i halva storleken igen när den har gått
       // tillbaka (i telefonen på höjden inte, vid lådan)
@@ -1767,6 +1769,7 @@ window.RumVideo = (() => {
         V.near = on;
         runt(V.tat && !on, true);
         V.tat = false;
+        if (window.RumBak) RumBak.bort('rutan');
         if (on) tavlor();
         box.classList.remove('vhs-tat');
         sving(on ? SVANG.nara : null);
