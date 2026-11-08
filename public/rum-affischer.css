@@ -210,9 +210,10 @@
    namnet (tid-sb, tid-ex). Storlekarna på namnet, vinjetten, rubrikens rader
    och den andra nyheten sätts i rum-affischer.js, så att de fyller bredden. */
 .rum-lop { width: 100px; transform: rotate(calc(var(--vrid, 0deg) + var(--rot))); }
-/* på väggen: mindre, så att den ryms mellan fönstret och bardisken */
+/* på väggen: mindre (70 %), så att den ryms mellan fönsterbänkens ände och
+   bardiskens kant; disken och barstolarna står framför den (rum-affischer.js) */
 /* (två skuggor: papperet ligger an mot furun, men buktar ut lite nertill) */
-.rum-lop.pa-vagg { transform: rotate(calc(var(--vrid, 0deg) + var(--rot))) scale(0.78); transform-origin: 1.5px 1.5px; filter: drop-shadow(0 0.5px 0.6px rgba(0, 0, 0, 0.5)) drop-shadow(0.6px 2.6px 2.6px rgba(0, 0, 0, 0.32)); }
+.rum-lop.pa-vagg { transform: rotate(calc(var(--vrid, 0deg) + var(--rot))) scale(0.7); transform-origin: 1.5px 1.5px; filter: drop-shadow(0 0.5px 0.6px rgba(0, 0, 0, 0.5)) drop-shadow(0.6px 2.6px 2.6px rgba(0, 0, 0, 0.32)); }
 /* Tidningspapper, inte vitt: gråaktigt eller blekrosa och matt. Det vita i
    tryckt text är papperet (ingen vit färg på en tidning), svärtan är inte
    helt svart och det röda är tryckfärgens, inte skärmens. */

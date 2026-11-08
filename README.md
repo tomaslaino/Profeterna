@@ -920,8 +920,10 @@ bara lokalt. Analyserna visas som de ligger i `data/analyser.json`; hur de skriv
   blank och osannolik ut: kritvitt papper med ett jämnt prickraster över allt (som tyg eller en skärm),
   ett blänk snett uppifrån, raka kanter och helt jämn svärta. Nu är den matt tidningspapper med fibrer
   och buktor, svärtan och det röda täcker inte överallt, den har legat vikt på mitten och är klippt med
-  sax; det vita i texten är papperet, och tejpen i fönstret är maskeringstejp med avslitna ändar. Se
-  [Tobaksaffären](#tobaksaffären), *Affischerna*.
+  sax; det vita i texten är papperet, och tejpen i fönstret är maskeringstejp med avslitna ändar. På
+  väggen ritades den dessutom framför bardisken och barstolarna när kameran följde musen åt vänster;
+  nu hänger den bakom dem, och den är lite mindre (70 % i stället för 78 %), så att den går fri från
+  diskens kant. Se [Tobaksaffären](#tobaksaffären), *Affischerna*.
 - **Domarens kort i stället för kvittot (2026-11-06, användarens önskemål):** kvittot på pulten
   tillförde inget – vilka som har lämnat in syns redan på högen – och var ett tredje papper
   bredvid notan och kupongen. Där ligger nu domarens gula och röda kort och visselpipan med
@@ -2954,7 +2956,9 @@ aldrig vad en riktig person har sagt. Varje slags rubrik har två eller tre vari
 veckan väljer bland dem. Den är den enda som byts och är uppsatt för hand: varannan vecka (veckan i
 Stockholm, måndag till söndag) med tejp i skyltfönstrets nedre vänstra hörn, varannan med två
 häftstift på furupanelen till höger om fönstret, under oraklets skylt och till vänster om
-bardisken, där den är mindre (78 %, så att den ryms mellan fönsterkarmen och bardisken). I
+bardisken, där den är mindre (70 %, så att den ryms mellan fönsterbänkens ände och diskens kant)
+och hänger bakom disken och barstolarna, som står framför väggen (löpsedeln ligger före diskens duk
+i bakväggens plan). I
 telefonen på höjden sitter den alltid på väggen, som syns utan att man drar. (Först satt den
 ibland under dörrens handtag och sedan i fönstrets högra hörn: dörren hamnade utanför bilden i
 telefonen, och hörnet är nu skivans. Till och med 2026-11-05 var den från den påhittade

@@ -72,7 +72,7 @@ export const SKIVA = {
 // Löpsedeln: med tejp i fönstrets nedre vänstra hörn, eller med häftstift på
 // väggen mellan fönsterkarmen (x 958; fönsterbänkens ände når x 984 i y 554–596)
 // och bardisken (x 1060), under oraklets skylt (y 483).
-const LOPPLATS = [{ x: 286, y: 404, rot: 1.4 }, { x: 992, y: 487, rot: 0.9, vagg: true }];
+const LOPPLATS = [{ x: 286, y: 404, rot: 1.4 }, { x: 989, y: 487, rot: 0.9, vagg: true }];
 // på höjden (telefonen) syns bara mitten och högra delen av rummet från början
 const smal = () => innerWidth / innerHeight < 1.2;
 // Platsen för skivan (rum-saker.js och rum-inredning.js startar i valfri
@@ -648,7 +648,12 @@ export function affischer(back, { short = (x) => x, namn = null } = {}) {
   const l = lopsedel();
   const c = chelsea();
   const n = nacional();
-  back.append(skivPlats(back), f, n, v, c, l);
+  back.append(skivPlats(back), f, n, v, c);
+  // Löpsedeln på väggen hänger bakom bardisken och barstolarna, som står
+  // framför väggen: före diskens duk (rum-inredning.js lägger den före
+  // tavlorna på högra väggen, .rum-hv, så den hamnar efter löpsedeln om den
+  // kommer sist).
+  back.insertBefore(l, back.querySelector(':scope > canvas[data-bit="disk"]') || back.querySelector(':scope > .rum-hv'));
   let ritad = null;
   let fonter = false;
   let senast = { rows: null, old: null };
@@ -673,7 +678,7 @@ export function affischer(back, { short = (x) => x, namn = null } = {}) {
       const p = smal() ? LOPPLATS[1] : LOPPLATS[((fro % 2) + 2) % 2];
       const vagg = Boolean(p.vagg);
       l.classList.toggle('pa-vagg', vagg);
-      l.style.left = `${Math.round(p.x + (hash(fro + 3) - 0.5) * (vagg ? 4 : 10))}px`;
+      l.style.left = `${Math.round(p.x + (hash(fro + 3) - 0.5) * (vagg ? 3 : 10))}px`;
       l.style.top = `${Math.round(p.y + (hash(fro + 4) - 0.5) * (vagg ? 4 : 8))}px`;
       l.style.setProperty('--vrid', `${(p.rot + (hash(fro + 5) - 0.5) * 1.2).toFixed(2)}deg`);
       l.style.setProperty('--klipp', klipp(fro));
