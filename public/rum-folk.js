@@ -309,7 +309,8 @@ window.RumFolk = (() => {
       if (ms - F.rorAt < 60) return;
       F.rorAt = ms;
       const k = vemUnder(e.clientX, e.clientY, e.target);
-      pa(k);
+      // (radion på fönsterbänken som gänget: ingen hand, och ett klick sätter på den)
+      pa(k === 'radio' ? null : k);
       markor(k ? e.target.closest('.rum-sak, .rum-tag') : null);
     });
     el.addEventListener('mouseleave', () => {
@@ -318,7 +319,8 @@ window.RumFolk = (() => {
       markor(null);
     });
     // ett klick (eller tryck) på en figur: ett tecken, namnet på kupongen
-    // (valj) och i telefonen ett hej en stund – och inget annat
+    // (valj) och i telefonen ett hej en stund – och inget annat; på radion på
+    // fönsterbänken: på eller av
     el.addEventListener('click', (e) => {
       // (inte klicket efter ett drag, som rum.js redan har stoppat, och inte i
       // Hasses vy, som står framför gänget)
@@ -329,6 +331,12 @@ window.RumFolk = (() => {
       if (!k) return;
       e.preventDefault();
       e.stopPropagation();
+      // radion på fönsterbänken: på eller av (och då sjunger gänget, rum-3d.js)
+      if (k === 'radio') {
+        const f = fig();
+        if (f && f.radio) f.radio(!f.radioPa(), F.o.now());
+        return;
+      }
       // (skylten ner på bordet eller upp igen, och inget annat)
       if (F.o.lappKlick && F.o.lappKlick(k)) return;
       F.o.teckna(k);
