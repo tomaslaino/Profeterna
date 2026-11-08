@@ -134,25 +134,29 @@ window.RumVideo = (() => {
   // (perspektivets mitt, oga) flyttat från VP till rakt framför rutan:
   // kameran går fram och förstorar en del av bilden, och vänd mot VP blev
   // rutan sned som i kanten av ett vidvinkelfoto, och från VP skymde lådan
-  // rutans vänstra kant.
-  const SVANG = { nara: { rum: 30, horn: 30 }, tat: { rum: 34, horn: VRID, oga: [GLAS.x + GLAS.w / 2 + PLATS[0], GLAS.y + GLAS.h / 2] } };
+  // rutans vänstra kant. Nära går hörnet längre runt än rummet (som inte går att
+  // vrida hur långt som helst, då kommer gänget och radion in i bild), så att
+  // etiketterna står mer framifrån och går att läsa. Lådans bortre ände kommer
+  // då mot en, så hörnet flyttas upp (lyft) tills lådan står på disken igen.
+  const SVANG = { nara: { rum: 34, horn: 46, lyft: 12 }, tat: { rum: 34, horn: VRID, oga: [GLAS.x + GLAS.w / 2 + PLATS[0], GLAS.y + GLAS.h / 2] } };
   // Var en punkt på tv:n eller lådan (i tv:ns mått, z framåt från tv:ns
   // front) syns i hörnet: vriden kring MITT, flyttad till PLATS och i
-  // rummets perspektiv, med kameran v grader runt och ögat i e. ruta: det
-  // minsta i scenen som rymmer punkterna, med kanten k.
-  function syns([x, y, z], v = 0, e = VP) {
-    const a = RAD - v * Math.PI / 180;
+  // rummets perspektiv, med kameran där s säger (SVANG). ruta: det minsta i
+  // scenen som rymmer punkterna, med kanten k.
+  function syns([x, y, z], s = {}) {
+    const e = s.oga || VP;
+    const a = RAD - (s.horn || 0) * Math.PI / 180;
     const [dx, dz] = [x - MITT[0], z - MITT[2]];
     const wx = MITT[0] + PLATS[0] + dx * Math.cos(a) - dz * Math.sin(a);
     const wz = MITT[2] + PLATS[1] + dx * Math.sin(a) + dz * Math.cos(a);
     const f = 1000 / (1000 - wz);
-    return [e[0] + (wx - e[0]) * f, e[1] + (y - e[1]) * f];
+    return [e[0] + (wx - e[0]) * f, e[1] + (y - (s.lyft || 0) - e[1]) * f];
   }
   const horn = (x0, y0, x1, y1, z0, z1) => [x0, x1].flatMap((x) => [y0, y1].flatMap((y) => [z0, z1].map((z) => [x, y, z])));
-  function ruta(p, k, v, e) {
-    const s = p.map((q) => syns(q, v, e));
-    const xs = s.map((q) => q[0]);
-    const ys = s.map((q) => q[1]);
+  function ruta(p, k, s) {
+    const q = p.map((a) => syns(a, s));
+    const xs = q.map((a) => a[0]);
+    const ys = q.map((a) => a[1]);
     return { x0: O[0] + Math.min(...xs) - k, y0: O[1] + Math.min(...ys) - k, x1: O[0] + Math.max(...xs) + k, y1: O[1] + Math.max(...ys) + k };
   }
   // lådans två fack, nerifrån och upp (den första överst): förra omgången
@@ -164,18 +168,20 @@ window.RumVideo = (() => {
     { x: LADA.x + 49.3, y: LADA.y + LADA.h - LADA.t - 0.2, ix: [25, 24, 23, 22, 21, 20, 19, 18, 17, 16, 15, 14, 13], j: 0.25, r: 0.3 },
   ];
   const CAP = 2 * FACKEN;
-  // det kameran ska få med: tv:n och lådan – i telefonen på höjden bara
-  // lådan (LADAN), och närmare bilden i rutan och spalten med knapparna, som
+  // det kameran ska få med: tv:ns och lådans framsidor (utan sidorna, som bara
+  // tar plats från etiketterna) – i telefonen på höjden bara lådans
+  // (LADAN), och närmare bilden i rutan och spalten med knapparna, som
   // fyller fönstret (fyll) –
   // i scenens mått, med kameran svängd; sv: rummets vridning, mitt: där
   // tv:n står i scenen (x), och kant: hörnets vänstra kant (lådan) hur
   // kameran än står
   const LADORNA = horn(LADA.x, LADA.y, LADA.x + LADA.w, LADA.y + LADA.h, LADA.z, LADA.z - LADA.d);
   const ALLT = [...horn(TV.x, TV.y - 2, TV.x + TV.w, TV.y + TV.h, 0, -DJUP), ...LADORNA];
-  const HORN = { mitt: O[0] + syns(MITT)[0], kant: Math.min(...[{ horn: 0 }, SVANG.nara, SVANG.tat].map((s) => ruta(ALLT, 0, s.horn, s.oga).x0)) };
-  const FOCUS = { ...ruta(ALLT, 6, SVANG.nara.horn), ...HORN, sv: SVANG.nara.rum };
-  const LADAN = { ...FOCUS, ...ruta(LADORNA, 3, SVANG.nara.horn) };
-  const TAT = { ...ruta(horn(BILD.x, BILD.y, SPALT.x + SPALT.w, BILD.y + BILD.h, 0, 0), 0, SVANG.tat.horn, SVANG.tat.oga), z: 32, fyll: true, ...HORN, sv: SVANG.tat.rum };
+  const HORN = { mitt: O[0] + syns(MITT)[0], kant: Math.min(...[{ horn: 0 }, SVANG.nara, SVANG.tat].map((s) => ruta(ALLT, 0, s).x0)) };
+  const LADFRAM = horn(LADA.x, LADA.y, LADA.x + LADA.w, LADA.y + LADA.h, LADA.z, LADA.z);
+  const FOCUS = { ...ruta([...horn(TV.x, TV.y - 2, TV.x + TV.w, TV.y + TV.h, 0, 0), ...LADFRAM], 1, SVANG.nara), z: 10, ...HORN, sv: SVANG.nara.rum };
+  const LADAN = { ...FOCUS, ...ruta(LADFRAM, 3, SVANG.nara) };
+  const TAT = { ...ruta(horn(BILD.x, BILD.y, SPALT.x + SPALT.w, BILD.y + BILD.h, 0, 0), 0, SVANG.tat), z: 32, fyll: true, ...HORN, sv: SVANG.tat.rum };
 
   const hash = (s) => {
     let a = 7;
@@ -1615,7 +1621,7 @@ window.RumVideo = (() => {
       // (samtidigt som kameran och rummet, när det nya har ritats: sedan i rum.js)
       (o.sedan || ((k, f) => f()))('hornet', () => {
         for (const e of [kam, inn]) e.classList.toggle('glid', !o.calm());
-        kam.style.transform = `rotateY(${s ? s.horn : 0}deg)`;
+        kam.style.transform = `translate3d(0px, ${px(s && s.lyft ? -s.lyft : 0)}, 0px) rotateY(${s ? s.horn : 0}deg)`;
         inn.style.perspectiveOrigin = `${px(oga[0])} ${px(oga[1])}`;
       }, !o.calm());
     }

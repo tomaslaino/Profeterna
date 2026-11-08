@@ -4512,9 +4512,10 @@ rubriken byter sida, och ett klick på en rad, mellanslaget eller ▶ spelar den
 bildens 16:9, så att den syns hel när rutan fyller fönstret. När kassetten matas ut kommer
 listan tillbaka på samma sida, med den markerad.
 
-**Nära** (klick eller V) går kameran fram tills tv:n och lådan ryms mellan namnet och
-foten (högst sex gånger), och svänger samtidigt runt tv:n in mot rummet, så att man ser
-rutan snett framifrån i stället för från sidan. Tv:n och lådan vrids inte och flyttas inte –
+**Nära** (klick eller V) går kameran fram tills tv:ns och lådans framsidor fyller bilden över
+raden med tangenterna, så att etiketterna på kassetterna går att läsa (tv:ns sida får skäras
+bort), och svänger samtidigt runt tv:n in mot rummet, så att man ser rutan snett framifrån i
+stället för från sidan. Tv:n och lådan vrids inte och flyttas inte –
 de står kvar vända mot gänget – utan det är kameran som rör sig (se *Kamerans sväng* och
 *Rummet runt tv:n* nedan).
 Kassetterna glider ut en bit när man pekar på dem. I telefonen på höjden går kameran bara
@@ -4671,10 +4672,12 @@ bara med när de lyfts eller när man pekar på dem.
 
 **Kamerans sväng.** Rummet är målat på platta plan, så kameran kan inte gå runt i det på
 riktigt. Svängen är i stället två saker som sker samtidigt, på 0,6 sekunder som
-förstoringen: rummets plan vrids 30 grader i 3D kring tv:n (34 när bilden fyller fönstret;
-`sving` i rum.js), och hörnet – tv:n, högen och lådan, som är lådor i 3D i rummets eget
-perspektiv – ritas från samma håll, 30 grader runt tv:ns mitt (`SVANG` och `.vhs-kam` i
-rum-video.js). När bilden fyller fönstret ritas hörnet 112 grader runt (`VRID`), så att rutan
+förstoringen: rummets plan vrids 34 grader i 3D kring tv:n (`sving` i rum.js), och hörnet –
+tv:n, högen och lådan, som är lådor i 3D i rummets eget perspektiv – ritas nästan från samma
+håll, 46 grader runt tv:ns mitt (`SVANG` och `.vhs-kam` i rum-video.js). De tolv graderna
+extra ställer etiketterna mer framifrån, så att de går att läsa; mer än så går inte rummet
+att vrida utan att gänget och radion kommer in i bild. Lådans bortre ände kommer då mot en,
+så hörnet flyttas också lite uppåt (`lyft`), annars skulle lådan hänga utanför disken. När bilden fyller fönstret ritas hörnet 112 grader runt (`VRID`), så att rutan
 står parallellt med bilden, och ögat (perspektivets mitt i hörnet, `perspective-origin` på
 `.vhs-in`) flyttas rakt framför rutan: kameran går fram genom att förstora en del av bilden,
 så vänd mot det vanliga ögat blev rutan sned som i kanten av ett vidvinkelfoto, och därifrån

@@ -3114,8 +3114,8 @@ ${window.RumRegister ? RumRegister.nara() : ''}
   }
 
   // V: videon nära. Kameran går fram till hörnet på disken – tv:n, högen
-  // på den och lådan bredvid – och förstorar så mycket som ryms mellan
-  // namnet och foten.
+  // på den och lådan bredvid – och förstorar så mycket som ryms över raden
+  // med tangenterna.
   function zoomVideo(on) {
     if (!R.video || (!on && !R.vnara)) return;
     if (!on) lattVideo(0);
@@ -3188,15 +3188,15 @@ ${window.RumRegister ? RumRegister.nara() : ''}
   }
   function aimVideo(cls) {
     // hörnet i planet -598 (1,035 gånger), och det som syns av scenen;
-    // förstoringen högst f.z (rutan nära, rum-video.js), annars sex. Ska
-    // bilden fylla fönstret (f.fyll) räknas hela fönstret, med en smal kant
-    // så att bildens gräns syns runt om
+    // förstoringen högst f.z (rum-video.js), annars sex. Ska bilden fylla
+    // fönstret (f.fyll) räknas hela fönstret, med en smal kant så att bildens
+    // gräns syns runt om, och annars allt utom raden med tangenterna längst ner
     const f = R.vf;
     const [x0, x1] = [f.x0, f.x1].map((x) => 800 + (x - 800) * 1.035);
     const [y0, y1] = [f.y0, f.y1].map((y) => 500 + (y - 500) * 1.035);
     const [vx0, vx1] = [-R.ox / R.k, (innerWidth - R.ox) / R.k];
-    const [vy0, vy1] = f.fyll ? [-R.oy / R.k, (innerHeight - R.oy) / R.k] : [(64 - R.oy) / R.k, (innerHeight - 56 - R.oy) / R.k];
-    const m = f.fyll ? 0.96 : 0.92;
+    const [vy0, vy1] = f.fyll ? [-R.oy / R.k, (innerHeight - R.oy) / R.k] : [(8 - R.oy) / R.k, (innerHeight - 52 - R.oy) / R.k];
+    const m = f.fyll ? 0.96 : 0.98;
     const z = Math.min(f.z || 6, ((vx1 - vx0) * m) / (x1 - x0), ((vy1 - vy0) * m) / (y1 - y0));
     // Hörnet ska ligga framför den vridna väggen ända ut till bildens
     // vänstra kant, inte bara lådans: på vägen till rutan fyller rummet runt
