@@ -680,6 +680,11 @@ bara lokalt. Analyserna visas som de ligger i `data/analyser.json`; hur de skriv
   armarna i luften som vajar, och – när matcherna pågår – mot tv:n och pekar på den i takt.
   De sjunger med munnen öppen och ögonen hopknipna. Se [Tobaksaffären](#tobaksaffären),
   *Gänget gör saker tillsammans*.
+- **Gänget dansar italodisco när radion spelar (2026-11-08, användarens önskemål):** "Kan du ge dem
+  fler dansmoves när man drar igång radion … Det får gärna ha med italiensk discodance att göra." Nio
+  danser i tv-programmens anda runt 1980: härmleken, fingret, armrullen, synten, robotten, axlarna,
+  armarna i kors, tv-studion och barstolssnurren. Två danser och en sång om vartannat, och skyltarna
+  ligger på bordet så länge. Se [Tobaksaffären](#tobaksaffären), *Dansen*.
 - **Grabbarna sjunger vid mål, och en radio på fönsterbänken (2026-11-08, användarens önskemål):**
   "Lägg till att de sjunger vid mål. Lägg till en radio … som man kan sätta på och att de då börjar
   sjunga." Efter ett mål som gick någons väg sjunger de när jublet har ebbat ut, och den som tappade
@@ -2842,11 +2847,35 @@ fyra utseenden (transistorradio, bakelitradio, bergsprängare och fotbollsradio)
 eller stänger av den, som ett klick på någon i gänget (ingen hand, och klicket går inte vidare till
 löpsedeln bakom). Så länge den spelar studsar lysdioderna, högtalarna pumpar i sångens takt, noter
 stiger ur den – stilla med minskad rörelse – och
-grabbarna sjunger den ena sången efter den andra, en ny var fjortonde sekund i en ordning som blandas
-om varje varv (mot tv:n bara när matcherna pågår, och försångaren bara när alla tre är vakna och har
-lämnat in). Den som väntar på kupongen, sover eller är borta sjunger inte, och på natten sjunger
-ingen. Ett mål går före radion. Radion är var och ens egen: den sparas inte och syns inte hos de
-andra. `?rum-radio` sätter på den (`=4` sedan fyra sekunder, med `?rum-t`), utan ljud.
+grabbarna dansar och sjunger: något nytt var fjortonde sekund, två danser och en sång om vartannat,
+var för sig i en ordning som blandas om varje varv (mot tv:n bara när matcherna pågår, försångaren och
+tv-studion bara när alla tre är vakna och har lämnat in). Den som väntar på kupongen, sover eller är
+borta är inte med, och på natten är ingen det. Ett mål går före radion. Radion är var och ens egen:
+den sparas inte och syns inte hos de andra. `?rum-radio` sätter på den (`=4` sedan fyra sekunder,
+med `?rum-t`), utan ljud.
+
+**Dansen** (2026-11-08, `DANSER` i rum-dans.js, `dansPose`, `dansHand` och `dansFingrar` i rum-3d.js):
+italodisco som i de italienska tv-programmen runt 1980, sittande på barstolen, i 120 slag i minuten
+(högtalarna och lysdioderna pumpar i dansens takt; kanalen är en vanlig ljudström, så takten är
+genrens och inte låtens). Det som är i händerna ställs på bordet och
+tas upp igen, som i korstecknet, och skyltarna läggs på bordet så länge radion spelar.
+- *Härmleken* (`italoLek`): sex av nio påhittade gester, två sekunder var och i en ny ordning varje
+  gång: sover, vinkar, liftar, simmar, åker skidor, sprejar deodorant, spänner musklerna, kör bil och
+  tutar, och kastar en kyss. Den tredje är alltid ett slag efter.
+- *Fingret* (`italoPek`): upp i luften och ner över kroppen, höger, vänster och om vartannat.
+- *Armrullen* (`italoRull`): underarmarna runt varandra, i mitten och åt båda hållen, och fingrarna upp.
+- *Synten* (`italoSynt`): tangenter ingen annan ser, med stängda ögon och ett långt finger uppifrån.
+- *Robotten* (`italoRobot`): stel i kroppen, ett läge i varje slag och huvudet som knycker.
+- *Axlarna* (`italoAxlar`): knäpper med fingrarna och skakar på axlarna, och ibland samlade
+  fingertoppar framför sig, som om någon just har sagt något dumt.
+- *Armarna i kors* (`italoTuca`): axeln, axeln, huvudet, huvudet, fram, fram och två klappar.
+- *Tv-studion* (`italoStudio`): en sjunger i flaskan med handen på hjärtat, de andra klappar och
+  pekar till sist på sångaren.
+- *Barstolen* (`italoSnurr`): ett varv på stolen, en i taget och sist alla tre.
+
+Allt står i bildens axlar (`bildAxlar`), så att dansen ser likadan ut var de än sitter. Prova en dans med
+`?rum-akt=dl:italoPek,dt:italoPek,dj:italoPek`, och i en fast bild `?rum-t=5&rum-akt=dl:italoRobot@3` (tre
+sekunder in).
 
 Den spelar en riktig webbradiokanal med italiensk disco (2026-11-08, `ljud` i rum-folk.js).
 Kanalerna hämtas i webbläsaren när musen går över radion eller den sätts på, ur den fria katalogen

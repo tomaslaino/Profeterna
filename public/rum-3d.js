@@ -64,7 +64,8 @@
 // Efter ett mål som gick någons väg sjunger de (malSang), och den som tappade
 // raden sitter med armarna i kors. På fönsterbänken står en bergsprängare (radion):
 // ett klick sätter på den, och så länge den spelar (italiensk disco, rum-folk.js)
-// sjunger de (radioSang).
+// dansar de (DANSER i rum-dans.js) och sjunger om vartannat (radioSang, radioNamn),
+// med skyltarna på bordet.
 //
 // Inför matcherna korsar de sig ibland (KORS i rum-tecken.js, korsHand), oftare
 // ju närmare nästa avspark det är: på sju olika sätt med högerhanden, och någon
@@ -125,6 +126,7 @@ import { ol } from './rum-fika.js';
 import { festen, drakt, festklader } from './rum-fest.js';
 import { TECKEN, LOS, blanda, nasta as nastaTecken, KORS, KORS_MENY, korsChans, LAPP_HALL, LAPP_GOR, LAPP_MENY, LAPP_GREPP, lappBlanda, lappKropp } from './rum-tecken.js';
 import { uttryck, skaggUttryck, ansiktsLage } from './rum-uttryck.js';
+import { DANSER, DANS_SLAG, DANS_IN, formen } from './rum-dans.js';
 
 const DEG = Math.PI / 180;
 const D = 1400;
@@ -1797,9 +1799,9 @@ export async function figurer(canvas, opt = {}) {
   function radioRita(t) {
     const w = radioW(t);
     const R = SJUNG.radio;
-    // (pumpar i sångens takt, två gånger per gungning)
+    // (pumpar i sångens takt, två gånger per gungning, eller dansens)
     const sang = radioSang(t);
-    const slag = Math.max(0, Math.cos((t - (sang ? sang.t0 : R.fran)) * TAKT * 2)) ** 4 * w;
+    const slag = Math.max(0, Math.cos((t - (sang ? sang.t0 : R.fran)) * (sang && AKTER[sang.namn].per ? (2 * Math.PI) / AKTER[sang.namn].per : TAKT * 2))) ** 4 * w;
     RADIO.led.forEach((m, i) => { m.emissiveIntensity = w * (slag * 5 + 0.6 * Math.sin(t * 9 + i) > i ? 1.6 : 0.05); });
     for (const m of RADIO.pump) m.position.z = m.userData.z0 + 0.6 * slag;
     // (matrisen räknas annars först när scenen ritas, och en fast bild ritas en gång)
@@ -2896,6 +2898,8 @@ export async function figurer(canvas, opt = {}) {
   const LAPP_BYT = 1.3;
   const LAPP_LUCKA = [6, 17];
   const LPV = {};
+  // (så länge radion spelar ligger skylten på bordet: de behöver båda händerna)
+  const radioLapp = (t) => { const R = SJUNG.radio; const k = sm(R.at, R.at + LP_TID, t); return R.pa ? k : 1 - k; };
   function lappVag(x, t) {
     const mal = x.ner ? 0 : 1;
     const tid = LP_TID * Math.abs(mal - x.p0);
@@ -2909,7 +2913,7 @@ export async function figurer(canvas, opt = {}) {
     if (!x) return null;
     const bort = x.ut == null ? 0 : Math.max(0, t - x.ut) / LP_TID;
     if (bort >= 1) return null;
-    const p = lappVag(x, t) * (1 - sm(0, 0.7, bort)) * (1 - sovW(o, t)) * (1 - (o.st ? o.st.w : 0));
+    const p = lappVag(x, t) * (1 - sm(0, 0.7, bort)) * (1 - sovW(o, t)) * (1 - (o.st ? o.st.w : 0)) * (1 - radioLapp(t));
     const w = sm(0, LP_BORD, p);
     const lyft = sm(LP_BORD, 1, p);
     const ton = 1 - sm(0.7, 1, bort);
@@ -3819,6 +3823,7 @@ export async function figurer(canvas, opt = {}) {
   // efter den andra (radioSang), en ny var RADIO_SLOT:e sekund i en ordning som
   // blandas om varje varv. Målets sång går före radions. Det som pågår när sången
   // börjar tonar bort (av i aktNu), och inget annat börjar så länge (tvingStart).
+  // Radions sånger är oftast danser (radioNamn, rum-dans.js).
   const SJUNG = { mal: null, radio: { pa: false, at: -1e9, fran: -1e9, till: -1e9 } };
   const MAL_SANG = 3.2;
   const RADIO_IN = 1.5;
@@ -3833,13 +3838,28 @@ export async function figurer(canvas, opt = {}) {
     SJUNG.mal = { namn: val[Math.floor(hash(t * 2.17 + 0.4) * val.length)], at: t, t0: t + MAL_SANG, ute };
   }
   const malSlut = (m) => m.t0 + AKTER[m.namn].len;
-  // radions k:te sång
+  // Radions k:te: två danser och en sång (rum-dans.js), om och om igen, var för sig i en
+  // ordning som blandas om varje varv. Sparas (RADIO_K, töms när radion sätts på): det frågas
+  // många gånger i varje bild, och det som har börjat ska inte bytas när någon lämnar in.
+  const RADIO_K = new Map();
+  const blandad = (val, fro) => val.map((x, i) => [hash(fro + i * 0.77), x]).sort((a, b) => a[0] - b[0]).map((x) => x[1]);
   function radioNamn(k, t0) {
-    const val = tvW(t0) > 0.5 ? [...SANGER, 'allsangTv'] : SANGER;
-    const n = val.length;
-    const fro = (SJUNG.radio.fran * 7.3) % 97 + Math.floor(k / n) * 3.1;
-    const v = val.map((x, i) => [hash(fro + i * 0.77), x]).sort((a, b) => a[0] - b[0])[k % n][1];
-    return v !== 'allsangFor' || allaUppe(t0) ? v : 'allsang';
+    if (RADIO_K.has(k)) return RADIO_K.get(k);
+    const fro = (SJUNG.radio.fran * 7.3) % 97;
+    const tre = Math.floor(k / 3);
+    let v;
+    if (k % 3 < 2) {
+      const val = Object.keys(DANSER);
+      const j = tre * 2 + k % 3;
+      v = blandad(val, fro + 1.7 + Math.floor(j / val.length) * 3.1)[j % val.length];
+      if (DANSER[v].alla && !allaUppe(t0)) v = 'italoPek';
+    } else {
+      const val = tvW(t0) > 0.5 ? [...SANGER, 'allsangTv'] : SANGER;
+      v = blandad(val, fro + Math.floor(tre / val.length) * 3.1)[tre % val.length];
+      if (v === 'allsangFor' && !allaUppe(t0)) v = 'allsang';
+    }
+    RADIO_K.set(k, v);
+    return v;
   }
   function radioSang(t) {
     const R = SJUNG.radio;
@@ -4222,6 +4242,112 @@ export async function figurer(canvas, opt = {}) {
     blund: (o, x) => FI(o) === roller(x).a && KORS.korsa.blund(x.l),
   };
 
+  // ---------- dansen ----------
+  // När radion spelar dansar de (DANSER i rum-dans.js): ner med det som är i händerna, som i
+  // korstecknet, och upp med händerna med fingrar. Den som håller upp sin skylt dansar med
+  // den i handen (pose). Allt står i bildens axlar (bildAxlar), utom det som rör kroppen.
+  const DANS_STOR = 1.12;
+  const dansUpp = (d, l) => bump(l, 0.45, DANS_IN, d.len - DANS_IN, d.len - 0.45);
+  const dansB = (l) => (l - DANS_IN) / DANS_SLAG;
+  function dansV(o, A, x) {
+    const R = roller(x);
+    const i = FI(o);
+    return { rol: i === R.a ? 0 : i === R.b ? 1 : 2, a: R.a, sang: A && A === sangArm(o), t0: x.t0 };
+  }
+  function dansPose(o, A, L, v) {
+    if (L.till) return lerpPose(dansPose(o, A, L.fran, v), dansPose(o, A, L.till, v), L.k);
+    const s = A.s;
+    const n = o.F.a + o.F.b;
+    const S = shoulder(o, A);
+    // flaskan (eller näven) som mikrofon, framför munnen
+    if (L.mik) {
+      const h = huvudAxlar(o);
+      const m = mouthIn(o).addScaledVector(h(0, 0, 1), 7).addScaledVector(h(0, 1, 0), -7);
+      const y = new THREE.Vector3(s * 0.14, 0.9, 0.42).normalize();
+      if (A.thing) return { p: m.addScaledVector(y, -A.thing.userData.top), y, z: new THREE.Vector3(-s * 0.55, -0.75, -0.3), pole: new THREE.Vector3(s, -0.6, -0.2) };
+      return { p: m.addScaledVector(y, -o.F.arm * DANS_STOR * 2.4), y, z: new THREE.Vector3(s * 0.8, -0.2, 0.3), pole: new THREE.Vector3(s, -0.6, -0.2) };
+    }
+    if (L.mot) return pekaPa(o, A, huvudPa(v.a), 0.82, 0);
+    const B = bildAxlar(o);
+    const V = (a) => B.x.clone().multiplyScalar(s * a[0]).addScaledVector(B.y, a[1]).addScaledVector(B.z, a[2]);
+    // handflatan mot kroppen eller huvudet
+    if (L.bal || L.hu) {
+      const P = L.bal
+        ? iBal(o, new THREE.Vector3(s * o.F.w * L.bal[0], o.T * L.bal[1], o.F.depth * L.bal[2]))
+        : inHead(o, new THREE.Vector3(s * o.F.head.rx * L.hu[0], o.F.head.ry * L.hu[1], o.F.head.rz * L.hu[2]));
+      const d = L.bal ? balAxlar(o) : huvudAxlar(o);
+      const e = handflata(o, P, d(s * L.y[0], L.y[1], L.y[2]), d(s * L.z[0], L.z[1], L.z[2]), new THREE.Vector3(s * L.pole[0], L.pole[1], L.pole[2]));
+      const ut = e.p.clone().sub(S);
+      if (ut.length() > n * 0.97) e.p.copy(S).addScaledVector(ut.normalize(), n * 0.97);
+      return e;
+    }
+    const y = V(L.y).normalize();
+    const z = V(L.z);
+    z.addScaledVector(y, -z.dot(y)).normalize();
+    const P = (L.m ? S.clone().lerp(shoulder(o, o.arms.find((b) => b !== A)), 0.5) : S.clone()).addScaledVector(V(L.p), n);
+    if (L.mun > 0) P.lerp(mouthIn(o).add(new THREE.Vector3(0, -2, 3)).addScaledVector(y, -o.F.arm * DANS_STOR * 3.2), L.mun);
+    // (armen töjs inte: dit den når)
+    const ut = P.clone().sub(S);
+    if (ut.length() > n * 0.97) P.copy(S).addScaledVector(ut.normalize(), n * 0.97);
+    if (L.vrid) z.applyAxisAngle(y, L.vrid * s);
+    if (L.vink) y.applyAxisAngle(z, L.vink * s);
+    return { p: P, y, z, pole: V(L.pole || [1, -0.7, -0.3]) };
+  }
+  function dansHand(o, A, t, l, x, d) {
+    const v = dansV(o, A, x);
+    const L = d.lage(dansB(l), A.s, v);
+    if (!L) return null;
+    const k = dansUpp(d, l);
+    let ner = handRest(o, A, t);
+    // (först ner med det som är i handen, och upp igen med det efteråt)
+    if (A.bench && !L.sak) ner = lerpPose(ner, grip(A.bench.matrix, (A.thing || A.cig).matrix, new THREE.Vector3(A.s, -0.4, -0.6)), bump(l, 0, 0.45, d.len - 0.45, d.len));
+    return k > 0 ? lerpPose(ner, dansPose(o, A, L, v), k) : ner;
+  }
+  // (bara när radion spelar eller nyss har spelat: annars kostar det ingenting)
+  const dansKan = (o, t) => t >= SJUNG.radio.fran && (t < SJUNG.radio.till + 2 || SJUNG.radio.pa) || PROV[o.F.key];
+  // Handen med fingrar just nu (null: den vanliga, med det som är i den), för pose.
+  function dansFingrar(o, A, t) {
+    const x = dansKan(o, t) && aktNu(o, t);
+    if (!x || !x.a.dans) return null;
+    const d = x.a.dans;
+    const L = d.lage(dansB(x.l), A.s, dansV(o, A, x));
+    if (!L || (L.sak && (A.thing || A.cig))) return null;
+    const k = dansUpp(d, x.l) * x.w;
+    return k > 0.02 ? { form: blanda(LOS, formen(L), sm(0.1, 0.7, k)), stor: 1 + (DANS_STOR - 1) * sm(0, 0.6, k) } : null;
+  }
+  // Hur högt armen är (glöden i cigaretten som ligger).
+  function dansK(o, A, t) {
+    const x = dansKan(o, t) && aktNu(o, t);
+    if (!x || !x.a.dans) return 0;
+    const L = x.a.dans.lage(dansB(x.l), A.s, dansV(o, A, x));
+    return L && !L.sak ? dansUpp(x.a.dans, x.l) * x.w : 0;
+  }
+  // Varvet på barstolen, i grader.
+  function dansSnurr(o, t) {
+    const x = dansKan(o, t) && aktNu(o, t);
+    if (!x || !x.a.dans || !x.a.dans.snurr) return 0;
+    return x.a.dans.snurr(dansB(x.l), dansV(o, null, x)) * x.w;
+  }
+  for (const namn of Object.keys(DANSER)) {
+    const d = DANSER[namn];
+    AKTER[namn] = {
+      len: d.len, in: 0.3, ut: 0.3, per: DANS_SLAG,
+      dans: d,
+      hand: (o, A, t, l, x) => dansHand(o, A, t, l, x, d),
+      kropp: (o, t, l, x) => {
+        const v = dansV(o, null, x);
+        const b = d.kropp(dansB(l), v);
+        const k = dansUpp(d, l);
+        const ut = { mitt: true };
+        for (const y of Object.keys(b)) ut[y] = y === 'knee' ? b.knee.map((q) => q * k) : y === 'se' ? b.se : b[y] * k;
+        if (b.se === 'sangaren') { ut.se = huvudPa(v.a); ut.seW = b.seW * k; }
+        return ut;
+      },
+      skratt: (o, t, l, x) => (d.sjung && d.sjung(dansB(l), dansV(o, null, x)) ? dansUpp(d, l) : 0),
+      blund: (o, x) => Boolean(d.blund && dansUpp(d, x.l) > 0.5 && d.blund(dansB(x.l), dansV(o, null, x))),
+    };
+  }
+
   // Hur mycket vem skrattar just nu (ansiktet med hopknipna ögon, draw).
   function skrattW(o, t) {
     const x = aktNu(o, t);
@@ -4312,7 +4438,7 @@ export async function figurer(canvas, opt = {}) {
   // sitta, gar: hur mycket den tar steg, fas: stegen, l och T }).
   function stalle(o, t) {
     const F = o.F;
-    const hem = { x: F.x, y: SILL, z: F.z, turn: F.turn, w: 0, gar: 0, fas: 0 };
+    const hem = { x: F.x, y: SILL, z: F.z, turn: F.turn + dansSnurr(o, t), w: 0, gar: 0, fas: 0 };
     const g = gaNu(t);
     if (!g || g.o !== o || g.l >= g.T.e) return hem;
     const { k, len } = vag(o);
@@ -4456,14 +4582,15 @@ export async function figurer(canvas, opt = {}) {
     if (L.vink) y.applyAxisAngle(z, L.vink * A.s);
     return { p: S0.addScaledVector(d, n), y, z, pole: V(L.pole) };
   }
-  // Bildens axlar i figurens (x åt höger, y uppåt, z mot kameran): skylten vänds mot den
-  // som tittar. Räknas när figuren sitter, sedan står de kvar (kameran rör sig bara lite).
+  // Bildens axlar i figurens (x åt höger, y uppåt, z mot kameran): skylten och dansen vänds
+  // mot den som tittar. Räknas ur stolen, för figuren kan vara på väg eller mitt i ett snurr,
+  // och står sedan kvar (kameran rör sig bara lite).
   const bildQ = new THREE.Quaternion();
   function bildAxlar(o) {
-    if (!o.bild || (o.bild.gar && !(o.st && o.st.w > 0))) {
-      o.fig.getWorldQuaternion(bildQ);
+    if (!o.bild) {
+      o.fig.parent.getWorldQuaternion(bildQ).multiply(QY.setFromAxisAngle(UP, o.F.turn * DEG));
       bildQ.invert().multiply(cam.quaternion);
-      o.bild = { gar: Boolean(o.st && o.st.w > 0), x: new THREE.Vector3(1, 0, 0).applyQuaternion(bildQ), y: new THREE.Vector3(0, 1, 0).applyQuaternion(bildQ), z: new THREE.Vector3(0, 0, 1).applyQuaternion(bildQ) };
+      o.bild = { x: new THREE.Vector3(1, 0, 0).applyQuaternion(bildQ), y: new THREE.Vector3(0, 1, 0).applyQuaternion(bildQ), z: new THREE.Vector3(0, 0, 1).applyQuaternion(bildQ) };
     }
     return o.bild;
   }
@@ -4532,7 +4659,9 @@ export async function figurer(canvas, opt = {}) {
       if (A.bench) A.bench.visible = !taken;
       if (A.cig) A.cig.visible = taken;
       const useW = A.wHand !== A.hand && !taken;
-      if (A.wHand !== A.hand) { A.wHand.visible = useW; A.hand.visible = !useW; }
+      // (också när det är samma hand: efter tecknet och dansen ska den fram igen)
+      A.wHand.visible = useW;
+      A.hand.visible = !useW;
       let H = useW ? A.wHand : A.hand;
       let hp = handPose(o, A, t);
       const iLapp = lp && lp.A === A && lp.w > 0 && !(ks && ks.A === A);
@@ -4555,7 +4684,7 @@ export async function figurer(canvas, opt = {}) {
       // cigarett ligger på bordet så länge.
       if (A.fingerHand) A.fingerHand.visible = false;
       // (eller korstecknet: flaskan står på bordet så länge)
-      const fg = tk && tk.A === A && tk.w > TK_BYT ? { form: teckenHand(tk), stor: 1 + (TK_STOR - 1) * sm(TK_BYT, 0.8, tk.w) } : grepp > TK_BYT ? { form: blanda(LOS, LAPP_GREPP, sm(TK_BYT, 0.85, grepp)), stor: 1 + (TK_STOR - 1) * sm(TK_BYT, 0.8, grepp) * sm(0.05, 0.9, lp.lyft) } : ks && ks.A === A ? ks : null;
+      const fg = tk && tk.A === A && tk.w > TK_BYT ? { form: teckenHand(tk), stor: 1 + (TK_STOR - 1) * sm(TK_BYT, 0.8, tk.w) } : grepp > TK_BYT ? { form: blanda(LOS, LAPP_GREPP, sm(TK_BYT, 0.85, grepp)), stor: 1 + (TK_STOR - 1) * sm(TK_BYT, 0.8, grepp) * sm(0.05, 0.9, lp.lyft) } : ks && ks.A === A ? ks : dansFingrar(o, A, t);
       if (fg) {
         if (!A.fingerHand) A.fingerHand = fingerHand(o.F.arm, o.hud, o.fig, A.s);
         // (den vanliga handen följer med osynlig: röken räknas ur cigaretten i den)
@@ -4846,7 +4975,7 @@ export async function figurer(canvas, opt = {}) {
         // ingen rök medan cigaretten ligger släckt och man väntar på kupongen
         if (src === 'glod') {
           const tk = teckenNu(o, tb);
-          alpha = 0.8 * (1 - dragW(o, tb) * 0.7) * sm(0.55, 0.62, uOf(o, tb)) * (1 - Math.max(slumW(o, tb), sovW(o, tb))) * (tk && tk.A === sk.A ? 1 - tk.w : 1) * (sk.A === o.arms[0] ? 1 - korsK(o, tb) : 1) * (LP[o.F.key] && o.arms[LP[o.F.key].i] === sk.A && LP[o.F.key].ut == null && !LP[o.F.key].ner ? 0 : 1);
+          alpha = 0.8 * (1 - dragW(o, tb) * 0.7) * sm(0.55, 0.62, uOf(o, tb)) * (1 - Math.max(slumW(o, tb), sovW(o, tb))) * (tk && tk.A === sk.A ? 1 - tk.w : 1) * (sk.A === o.arms[0] ? 1 - korsK(o, tb) : 1) * (1 - dansK(o, sk.A, tb)) * (LP[o.F.key] && o.arms[LP[o.F.key].i] === sk.A && LP[o.F.key].ut == null && !LP[o.F.key].ner ? 0 : 1);
         }
         else {
           // utandningen: strax efter blosset (och det första efter inlämningen)
@@ -5084,6 +5213,7 @@ export async function figurer(canvas, opt = {}) {
     if (R.pa) {
       R.fran = t;
       R.till = Infinity;
+      RADIO_K.clear();
     } else R.till = t;
   }
 
