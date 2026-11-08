@@ -59,6 +59,10 @@
 // hopknipna och munnen öppen, skrattar), grälar medan den tredje tittar på,
 // eller tittar upp på tv:n när någon pekar.
 //
+// Inför matcherna korsar de sig ibland (KORS i rum-tecken.js, korsHand), oftare
+// ju närmare nästa avspark det är: på sju olika sätt med högerhanden, och någon
+// gång smittar det (korsaSmitta).
+//
 // Ibland går någon iväg (gaNu, stalle): kliver ner från barstolen, går ut ur
 // bilden till vänster mot baren och kommer tillbaka och klättrar upp. Golvet
 // ligger bakom pulten, så man ser bara överkroppen; stolen och det som står på
@@ -111,7 +115,7 @@ import { RoundedBoxGeometry } from 'three/addons/geometries/RoundedBoxGeometry.j
 import { mergeGeometries } from 'three/addons/utils/BufferGeometryUtils.js';
 import { ol } from './rum-fika.js';
 import { festen, drakt, festklader } from './rum-fest.js';
-import { TECKEN, LOS, blanda, nasta as nastaTecken } from './rum-tecken.js';
+import { TECKEN, LOS, blanda, nasta as nastaTecken, KORS, KORS_MENY, korsChans } from './rum-tecken.js';
 import { uttryck, skaggUttryck, ansiktsLage } from './rum-uttryck.js';
 
 const DEG = Math.PI / 180;
@@ -2596,6 +2600,10 @@ export async function figurer(canvas, opt = {}) {
   // är (nag 0–1); M: det senaste målet för var och en ({ k: 1|-1|0, at }).
   const S = { tv: false, tvAt: -1e9, tvFrom: 0, nag: 0 };
   const M = {};
+  // AV: när nästa avspark är (i t; lage), den förra och när den ändrades, så att
+  // ett påhitt som redan har börjat inte försvinner när bollen rullar.
+  const AV = { t: Infinity, fran: Infinity, at: -1e9 };
+  const korsChansAt = (t) => korsChans(((t >= AV.at ? AV.t : AV.fran) - t) / 3600);
   // tv:ns ruta (rum.js: uppe till höger på högra väggen, planet −470)
   const TV = new THREE.Vector3(490, 250, -140);
   const tvW = (t) => S.tvFrom + ((S.tv ? 1 : 0) - S.tvFrom) * sm(S.tvAt, S.tvAt + 1.6, t);
@@ -3126,7 +3134,7 @@ export async function figurer(canvas, opt = {}) {
     nerv: [['gral', 0.14], ['titta', 0.06]],
     deppig: [['skamt', 0.07]],
   };
-  const ALLA = new Set(['skamt', 'gral', 'titta']);
+  const ALLA = new Set(['skamt', 'gral', 'titta', 'korsaSmitta']);
   const allaVakna = (t) => nattW(t) < 0.01 && tvW(t) < 0.01 && figs.every((o) => ready(o, t) > 0.99);
   // (utan hänsyn till den som går iväg, gaNu)
   function grupp0(t) {
@@ -3136,6 +3144,7 @@ export async function figurer(canvas, opt = {}) {
     let namn = null;
     let acc = 0;
     for (const [k, p] of GRUPP[humAt(t0) || 'lugn']) if (!namn && r < (acc += p)) namn = k;
+    if (hash(n * 3.19 + KORS_FRO) < 1.5 * korsChansAt(t0)) namn = 'korsaSmitta';
     if (!namn || (ALLA.has(namn) && !allaVakna(t0))) return null;
     const l = t - t0;
     return l < AKTER[namn].len ? { namn, l, t0, n } : null;
@@ -3155,12 +3164,13 @@ export async function figurer(canvas, opt = {}) {
     const t0 = n * AKT_SLOT - fas + 0.5;
     const l = t - t0;
     const meny = MENY[humAt(t0) || 'lugn'];
-    if (l < 0 || hash(n * 7.31 + i * 13.7 + 0.5) > meny.chans) return null;
+    const ks = hash(n * 2.93 + i * 7.7 + KORS_FRO) < korsChansAt(t0) ? korsaVal(o, n, i) : null;
+    if (l < 0 || (!ks && hash(n * 7.31 + i * 13.7 + 0.5) > meny.chans)) return null;
     const val = meny[o.F.key].slice();
     const r = rankAt(o.F.key, t0);
     if (r > 0) val.push('nacke', 'nacke');
     if (r < 0) val.push('kors', 'kors');
-    const namn = val[Math.floor(hash(n * 3.17 + i * 5.3 + 0.25) * val.length)];
+    const namn = ks || val[Math.floor(hash(n * 3.17 + i * 5.3 + 0.25) * val.length)];
     const len = AKTER[namn].len;
     if (l >= len || grupp(t0) || grupp(t0 + len / 2) || grupp(t0 + len)) return null;
     return { namn, l, t0 };
@@ -3186,6 +3196,7 @@ export async function figurer(canvas, opt = {}) {
   // utandningen efter blosset i skålen (DT)
   const blasW = (o, t) => {
     const x = aktNu(o, t);
+    if (x && x.namn === 'korsaSak' && !skalArm(o).thing) return bump(x.l, 5, 5.3, 6, 6.4) * vaken(o, t);
     return x && x.namn === 'skal' && !skalArm(o).thing ? bump(x.l, 5.4, 5.7, 6.6, 7.3) * vaken(o, t) : 0;
   };
 
@@ -3569,6 +3580,146 @@ export async function figurer(canvas, opt = {}) {
     },
   };
 
+  // ---------- korstecknet ----------
+  // Inför matcherna (AV, korsChans) korsar sig var och en ibland, på något av
+  // sätten i KORS (rum-tecken.js) med högerhanden och handen med fingrar (pose).
+  // Det som är i högerhanden blir kvar på bordet så länge. KORS_FRO är nytt för
+  // varje gång sidan öppnas: t börjar om från noll, så annars skulle det komma vid
+  // samma tid varje gång, eller aldrig för den som tittar in en kort stund.
+  const KORS_FRO = Math.random() * 97;
+  const KORS_STOR = 1.05;
+  const korsUpp = (d, l) => { const [a, b] = d.upp || [0.45, 1]; return bump(l, a, b, d.len - b, d.len - a); };
+  // Vilket av sätten (med flaskan bara när flaskan är i högerhanden).
+  function korsaVal(o, n, i) {
+    const m = KORS_MENY[o.F.key];
+    const namn = m[Math.floor(hash(n * 1.77 + i * 3.1 + KORS_FRO) * m.length)];
+    return namn === 'korsaSak' && skalArm(o) !== o.arms[0] ? 'korsaKvickt' : namn;
+  }
+  // Var fingertopparna är på ett ställe i banan, och hur handen är vänd.
+  function korsStalle(o, A, namn) {
+    const s = A.s;
+    const { w: W, head: P } = o.F;
+    // (utanpå halsduken, som hänger framför bröstet)
+    const Dp = o.F.depth + (o.F.halsduk ? 9 : 0);
+    const T = o.T;
+    const b = balAxlar(o);
+    const tvars = (x) => (x * s > 0 ? { y: b(-s * 0.22, 0.88, -0.42), z: b(s * 0.1, 0.4, 1) } : { y: b(-s * 0.78, 0.55, -0.3), z: b(-s * 0.1, 0.3, 1) });
+    const pa = (x, y, z, r) => ({ c: iBal(o, new THREE.Vector3(x, y, z)), ...r });
+    const framfor = { y: b(-s * 0.5, 0.82, -0.25), z: b(0, 0.2, 1) };
+    switch (namn) {
+      // (huvudet är stort: armarna når inte runt det till pannan, så handen stannar
+      // framför ansiktet, så högt som armen räcker)
+      case 'panna': {
+        const h = huvudAxlar(o);
+        const f = -0.3 + 0.022 * (o.F.a + o.F.b - 74);
+        return { c: inHead(o, new THREE.Vector3(s * 3, P.ry * f, P.rz * Math.sqrt(1 - f * f) + o.F.arm * 1.5)), y: h(-s * 0.22, 0.92, -0.2), z: h(0, 0.2, 1) };
+      }
+      case 'mun': { const h = huvudAxlar(o); return { c: mouthIn(o).add(new THREE.Vector3(0, -1, 2)), y: h(-s * 0.35, 0.7, -0.6), z: h(0, 0.6, 0.8) }; }
+      case 'brost': return pa(0, T * 0.8, Dp + 5, { y: b(-s * 0.6, 0.78, -0.15), z: b(0, 0.1, 1) });
+      case 'vanster': return pa(W * 0.7, T * 0.98, Dp * 0.85, tvars(1));
+      case 'hoger': return pa(-W * 0.7, T * 0.98, Dp * 0.85, tvars(-1));
+      case 'upp': return pa(0, T * 1, Dp + 16, framfor);
+      case 'ner': return pa(0, T * 0.6, Dp + 16, framfor);
+      case 'vl': return pa(W * 0.62, T * 0.84, Dp + 16, tvars(1));
+      case 'hl': return pa(-W * 0.62, T * 0.84, Dp + 16, tvars(-1));
+      default: { const n = o.F.a + o.F.b; return { c: shoulder(o, A).add(new THREE.Vector3(s * n * 0.2, n * 1.05, n * 0.34)), y: new THREE.Vector3(-s * 0.06, 1, 0.1), z: new THREE.Vector3(s * 0.1, 0, -1) }; }
+    }
+  }
+  const korsBlund = (o, t) => { const x = aktNu(o, t); return Boolean(x && x.a.blund && x.a.blund(o, x)); };
+  // Handen i banan vid l: mellan två ställen en båge ut från ansiktet.
+  function korsBana(o, A, d, l) {
+    const B = d.bana;
+    let i = 0;
+    while (i < B.length - 1 && l >= B[i + 1][0]) i++;
+    const f = B[i];
+    const g = B[Math.min(i + 1, B.length - 1)];
+    const k = g[0] > f[0] ? sm(f[0], g[0], l) : 1;
+    const a = korsStalle(o, A, f[1]);
+    const c = f[1] === g[1] || k <= 0 ? a : korsStalle(o, A, g[1]);
+    const P = a.c.clone().lerp(c.c, k);
+    const y = a.y.clone().lerp(c.y, k);
+    const z = a.z.clone().lerp(c.z, k);
+    const b = balAxlar(o);
+    if ((f[1] === 'panna' || f[1] === 'mun' || g[1] === 'panna' || g[1] === 'mun') && f[1] !== g[1]) P.addScaledVector(b(0, 0, 1), 16 * Math.sin(Math.PI * k));
+    if (d.litet) { const [x, v] = d.litet(l); P.addScaledVector(b(1, 0, 0), x * o.F.arm * 1.1).addScaledVector(b(0, 1, 0), v * o.F.arm * 1.1); }
+    if (d.vrid) z.applyAxisAngle(y.clone().normalize(), A.s * d.vrid);
+    P.addScaledVector(y.clone().normalize(), -o.F.arm * KORS_STOR * d.topp);
+    // (armen töjs inte: dit den når)
+    const S0 = shoulder(o, A);
+    const ut = P.clone().sub(S0);
+    const n = o.F.a + o.F.b - 1;
+    if (ut.length() > n) P.copy(S0).addScaledVector(ut.normalize(), n);
+    return { p: P, y, z, pole: new THREE.Vector3(A.s * 0.8, -1, 0) };
+  }
+  // Armen i korstecknet (d, l sekunder in), eller null om det inte är den.
+  function korsHand(o, A, d, l, t) {
+    const k = korsUpp(d, l);
+    if (d.sak) {
+      if (A !== skalArm(o) || k <= 0) return null;
+      const s = A.s;
+      const P = korsBana(o, A, d, l);
+      // (det som är i handen står upp: handleden under korset)
+      P.p.y -= o.T * 0.3;
+      Object.assign(P, A.thing ? { y: new THREE.Vector3(s * 0.1, 1, 0.1), z: new THREE.Vector3(-s * 0.55, -0.75, -0.3) } : { y: new THREE.Vector3(s * 0.25, 1, 0.35), z: new THREE.Vector3(0, 0.1, 1) });
+      P.pole = new THREE.Vector3(s, -0.6, -0.2);
+      const m = d.munnen;
+      const v = bump(l, m[0], m[1], m[2], m[3]);
+      return lerpPose(handRest(o, A, t), v > 0 ? lerpPose(P, A.thing ? supAt(o, A, t, 0.8) : blossAt(o, A), v) : P, k);
+    }
+    if (A !== o.arms[0]) return null;
+    // (först ner med det som är i handen, och upp igen med det efteråt)
+    const [a] = d.upp || [0.45];
+    let ner = handRest(o, A, t);
+    if (A.bench) ner = lerpPose(ner, grip(A.bench.matrix, (A.thing || A.cig).matrix, new THREE.Vector3(A.s, -0.4, -0.6)), bump(l, 0, a, d.len - a, d.len));
+    return k > 0 ? lerpPose(ner, korsBana(o, A, d, l), k) : ner;
+  }
+  // Var det pågår (AKTER): { d, l } för vem, eller null.
+  const korsDel = (o, x) => (x && x.a.kors ? x.a.kors(o, x) : null);
+  // Hur högt armen är (för handen med fingrar, och glöden i cigaretten som ligger).
+  function korsK(o, t) {
+    const x = aktNu(o, t);
+    const v = korsDel(o, x);
+    return v && !v.d.sak ? korsUpp(v.d, v.l) * x.w : 0;
+  }
+  // Handen med fingrar just nu, för pose.
+  function korsFingrar(o, t) {
+    const x = aktNu(o, t);
+    const v = korsDel(o, x);
+    if (!v || v.d.sak) return null;
+    const k = korsUpp(v.d, v.l) * x.w;
+    return k > 0.02 ? { A: o.arms[0], form: blanda(LOS, v.d.hand(v.l), sm(0.1, 0.7, k)), stor: 1 + (KORS_STOR - 1) * sm(0, 0.6, k) } : null;
+  }
+  for (const namn of Object.keys(KORS)) {
+    const d = KORS[namn];
+    AKTER[namn] = {
+      len: d.len, in: 0.3, ut: 0.3,
+      kors: (o, x) => ({ d, l: x.l }),
+      hand: (o, A, t, l) => korsHand(o, A, d, l, t),
+      kropp: (o, t, l) => (d.kropp ? d.kropp(l) : {}),
+      blund: (o, x) => Boolean(d.blund && d.blund(x.l)),
+    };
+  }
+  // Det smittar: a korsar sig ordentligt, de andra tittar på hen och gör det
+  // sedan själva, en efter en, fort och utan att se på någon. (roller)
+  const SMITTA = (i, R) => (i === R.b ? 3 : 4.3);
+  AKTER.korsaSmitta = {
+    len: 8.4, in: 0.3, ut: 0.3,
+    kors: (o, x) => {
+      const R = roller(x);
+      const i = FI(o);
+      return i === R.a ? { d: KORS.korsa, l: x.l } : { d: KORS.korsaKvickt, l: x.l - SMITTA(i, R) };
+    },
+    hand: (o, A, t, l, x) => { const v = AKTER.korsaSmitta.kors(o, x); return korsHand(o, A, v.d, v.l, t); },
+    kropp: (o, t, l, x) => {
+      const R = roller(x);
+      const i = FI(o);
+      if (i === R.a) return KORS.korsa.kropp(l);
+      const sen = SMITTA(i, R);
+      return { se: huvudPa(R.a), seW: bump(l, 1.1 + 0.3 * (i === R.c), 1.6 + 0.3 * (i === R.c), sen - 0.1, sen + 0.4), lean: 0.04 * bump(l, 1.1, 1.6, sen + 2, sen + 2.5) };
+    },
+    blund: (o, x) => FI(o) === roller(x).a && KORS.korsa.blund(x.l),
+  };
+
   // Hur mycket vem skrattar just nu (ansiktet med hopknipna ögon, draw).
   function skrattW(o, t) {
     const x = aktNu(o, t);
@@ -3828,6 +3979,7 @@ export async function figurer(canvas, opt = {}) {
     o.earPen.visible = u >= 0.28;
     o.kupBench.visible = u >= 0.3;
     const tk = teckenNu(o, t);
+    const ks = korsFingrar(o, t);
     for (const A of o.arms) {
       const taken = u >= 0.55;
       if (A.pen) A.pen.visible = u < 0.28;
@@ -3849,17 +4001,19 @@ export async function figurer(canvas, opt = {}) {
       // tecknet: handen med fingrar. Pennan har gått bakom örat och DJ:s
       // cigarett ligger på bordet så länge.
       if (A.fingerHand) A.fingerHand.visible = false;
-      if (tk && tk.A === A && tk.w > TK_BYT) {
+      // (eller korstecknet: flaskan står på bordet så länge)
+      const fg = tk && tk.A === A && tk.w > TK_BYT ? { form: teckenHand(tk), stor: 1 + (TK_STOR - 1) * sm(TK_BYT, 0.8, tk.w) } : ks && ks.A === A ? ks : null;
+      if (fg) {
         if (!A.fingerHand) A.fingerHand = fingerHand(o.F.arm, o.hud, o.fig, A.s);
         // (den vanliga handen följer med osynlig: röken räknas ur cigaretten i den)
         orient(A.hand, hp.p, hp.y, hp.z);
         for (const x of [A.hand, A.wHand, A.fist]) if (x) x.visible = false;
         H = A.fingerHand;
         H.visible = true;
-        H.scale.setScalar(1 + (TK_STOR - 1) * sm(TK_BYT, 0.8, tk.w));
-        fingrar(H, teckenHand(tk));
+        H.scale.setScalar(fg.stor);
+        fingrar(H, fg.form);
         if (A.pen) o.earPen.visible = true;
-        if (A.cig && A.bench) A.bench.visible = true;
+        if (A.bench) A.bench.visible = true;
       }
       orient(H, hp.p, hp.y, hp.z);
       // näven: handleden där den öppna handens handled var
@@ -3960,7 +4114,7 @@ export async function figurer(canvas, opt = {}) {
         // ingen rök medan cigaretten ligger släckt och man väntar på kupongen
         if (src === 'glod') {
           const tk = teckenNu(o, tb);
-          alpha = 0.8 * (1 - dragW(o, tb) * 0.7) * sm(0.55, 0.62, uOf(o, tb)) * (1 - Math.max(slumW(o, tb), sovW(o, tb))) * (tk && tk.A === sk.A ? 1 - tk.w : 1);
+          alpha = 0.8 * (1 - dragW(o, tb) * 0.7) * sm(0.55, 0.62, uOf(o, tb)) * (1 - Math.max(slumW(o, tb), sovW(o, tb))) * (tk && tk.A === sk.A ? 1 - tk.w : 1) * (sk.A === o.arms[0] ? 1 - korsK(o, tb) : 1);
         }
         else {
           // utandningen: strax efter blosset (och det första efter inlämningen)
@@ -4034,7 +4188,7 @@ export async function figurer(canvas, opt = {}) {
       const sk = skrattW(o, t) > 0.3;
       const a = ansiktet(o.F.key);
       const skratt = o.skratt || (a.bas !== tex[o.F.key] ? tex[o.F.key] : null);
-      o.face.material.map = sk && skratt ? skratt : a.blund && ((!opt.calm && blinkar(o, t)) || sovW(o, t) > 0.5) ? a.blund : a.bas;
+      o.face.material.map = sk && skratt ? skratt : a.blund && ((!opt.calm && blinkar(o, t)) || sovW(o, t) > 0.5 || korsBlund(o, t)) ? a.blund : a.bas;
       if (o.skagg) o.skagg.material.map = sk && tex.dj_skagg_skratt ? tex.dj_skagg_skratt : tex.ans_skagg || tex.dj_skagg;
     }
     // neonen bakom dem slocknar när skylten glappar, och tv:n lyser i
@@ -4168,6 +4322,8 @@ export async function figurer(canvas, opt = {}) {
       S.tv = on;
     }
     S.nag = Math.max(0, Math.min(1, (x && x.nag) || 0));
+    const av = x && x.avspark > 0 ? t + x.avspark * 3600 : Infinity;
+    if (av !== AV.t && !(Math.abs(av - AV.t) < 60)) { AV.fran = AV.t; AV.at = t; AV.t = av; }
     toldTv = true;
   }
   // Ett mål ({ dl: 1, dt: -1, dj: 0 }): rätt, fel eller ingen skillnad – och

@@ -1655,7 +1655,10 @@ ${window.RumRegister ? RumRegister.nara() : ''}
     const first = rows.length ? Math.min(...rows.map((x) => Date.parse(x.m.kickoff))) : 0;
     const h = q.has('rum-stopp') ? parseFloat(q.get('rum-stopp')) : (first - t) / 3600000;
     const nag = !rd || rd.next || !(h > 0) || h > 24 ? 0 : h <= 1 ? 1 : 0.25 + (0.6 * (24 - h)) / 23;
-    R.lage = { tv, nag };
+    // nästa avspark (timmar), för korstecknet (rum-3d.js); ?rum-stopp också här
+    const kvar = rows.map((x) => Date.parse(x.m.kickoff)).filter((k) => k > t);
+    const avspark = q.has('rum-stopp') ? h : kvar.length ? (Math.min(...kvar) - t) / 3600000 : null;
+    R.lage = { tv, nag, avspark };
     // uret visar dagarna och de sista tolv timmarna till spelstoppet
     // (rum-inredning.js); ?rum-stopp räknas från urets tid
     R.stopp = rd && !rd.next && first ? (q.has('rum-stopp') ? (window.Vader ? Vader.nu().t : t) + h * 3600000 : first) : null;

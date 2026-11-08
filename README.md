@@ -659,6 +659,12 @@ bara lokalt. Analyserna visas som de ligger i `data/analyser.json`; hur de skriv
   tummen upp, peace, pistolfingrar, rock, honnör, knogarna, kockens kyss eller vinkning, ett
   nytt varje gång. Det ersätter att bara den egna figuren väljer. Se
   [Tobaksaffären](#tobaksaffären), *Klicka på någon i gänget*.
+- **Gänget korsar sig ibland inför matcherna (2026-11-08, användarens önskemål):** från ett
+  dygn före nästa avspark och oftare ju närmare den det är. Sju sätt, alltid med högerhanden:
+  det vanliga med huvudet böjt och ögonen stängda, kvickt som på väg in på plan, med kyss och
+  pekfingret mot himlen, tre gånger, med fel axel först, med tummen som i Sydamerika och med
+  flaskan eller cigaretten i handen. Någon gång smittar det, och de andra hänger på. Inte på
+  klick. Se [Tobaksaffären](#tobaksaffären), *Korstecknet*.
 - **Man väljer sig själv med ett klick på sin figur (2026-11-03, användarens önskemål):**
   ett klick på sin egen figur vid bordet gör en till den som fyller i kupongen – samma val
   som porträtten på kupongen – och figuren räcker upp handen med pennan, lyfter kupongen mot
@@ -2739,6 +2745,17 @@ tittar hen på en och skålar: lyfter flaskan (DL, DJ) eller cigaretten (DT) mot
 och nickar, och tittar kvar tills man slutar peka. I telefonen gör ett tryck på figuren
 samma sak en stund. Den som väntar på kupongen tittar bara, och ett klick på en figur går
 inte vidare till det som står bakom.
+
+**Korstecknet** (2026-11-08, `KORS`, `KORS_MENY` och `korsChans` i rum-tecken.js, `korsHand`
+i rum-3d.js, `avspark` i `gangTv` i rum.js): inför matcherna korsar sig gänget ibland. Var och en
+kan alla sju sätten (`korsa`, `korsaKvickt`, `korsaKyss`, `korsaTre`, `korsaVilsen`, `korsaTumme`,
+`korsaSak`), men DL gör det oftast ordentligt, DT slarvar och DJ är osäker på axlarna. Ibland
+smittar det (`korsaSmitta`): en börjar, de andra tittar och gör det fort efteråt. Chansen följer
+timmarna till nästa avspark i omgången: inget tidigare än ett dygn före, sedan ett kors ungefär var
+fjortonde minut, var fjärde de sista tre timmarna och var tredje den sista kvarten. Det är alltid
+högerhanden, och en flaska eller cigarett i den blir kvar på bordet så länge. Armarna töjs inte och
+når inte runt det stora huvudet, så handen stannar framför ansiktet i stället för på pannan. Prova
+med `?rum-akt=dl:korsaKyss` (`?rum-stopp=0.2` låtsas att avsparken är om tolv minuter).
 
 **Klicka på någon i gänget** (`valj` i rum-folk.js, `tecken` och `vald` i rum-3d.js,
 [public/rum-tecken.js](public/rum-tecken.js)): ett klick eller tryck på en figur ger två saker.
