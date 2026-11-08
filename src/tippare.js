@@ -199,16 +199,15 @@ function readHasse(file = ANALYSER_FILE) {
 // hans resultat (3–0 före 2–1 före 1–1), sedan det modellen tror mest på. De säkraste
 // blir spikar, de nästa halvgarderingar (hans tecken och det troligaste av de andra)
 // och de osäkraste helgarderingar. Ändras antalen i regeln följer kupongen med.
-// rows: [{id, sagt: {tecken, resultat} | undefined, modell: [1, X, 2] | null}]. En match
-// han inte har analyserat får det modellen tror mest på och läggs sist. Utan regel
-// (ett annat antal matcher) gäller bara det han har sagt.
-// → {matchens id: tecken}, eller null om han har sagt för lite för att spela.
+// rows: [{id, sagt: {tecken, resultat} | undefined, modell: [1, X, 2] | null}]. Han tippar
+// alla matcher: en match han inte har analyserat får det modellen tror mest på och läggs
+// sist. Utan regel (ett annat antal matcher) gäller det han har sagt, och annars modellen.
+// → {matchens id: tecken}, eller null om varken han eller modellen har något att gå på.
 function hasseKupong(rows, regel) {
-  const sagda = rows.filter((x) => x.sagt);
-  const r = Tippoang.regelFor(regel, rows.length);
-  if (!r) return sagda.length ? Object.fromEntries(sagda.map((x) => [x.id, x.sagt.tecken])) : null;
-  if (sagda.length * 2 < rows.length) return null;
+  if (!rows.some((x) => x.sagt || x.modell)) return null;
   const tro = (x, s) => (x.modell ? x.modell[SIGNS.indexOf(s)] : s === 'X' ? 1 : 0);
+  const r = Tippoang.regelFor(regel, rows.length);
+  if (!r) return Object.fromEntries(rows.map((x) => [x.id, x.sagt ? x.sagt.tecken : [...SIGNS].sort((a, b) => tro(x, b) - tro(x, a))[0]]));
   const rankade = rows.map((x) => {
     const egna = SIGNS.filter((s) => x.sagt && x.sagt.tecken.includes(s)).sort((a, b) => tro(x, b) - tro(x, a));
     const andra = SIGNS.filter((s) => !egna.includes(s)).sort((a, b) => tro(x, b) - tro(x, a) || (b === 'X') - (a === 'X'));
@@ -217,7 +216,7 @@ function hasseKupong(rows, regel) {
       id: x.id,
       ordning: [...egna, ...andra],
       sakerhet: !x.sagt ? -1 : egna.length > 1 ? 0 : 1 + (mal ? Math.abs(mal.home - mal.away) : 0),
-      modell: x.sagt && x.modell ? tro(x, egna[0]) : 0,
+      modell: x.modell ? tro(x, egna[0] || andra[0]) : 0,
     };
   }).sort((a, b) => b.sakerhet - a.sakerhet || b.modell - a.modell || a.id.localeCompare(b.id));
   const out = {};

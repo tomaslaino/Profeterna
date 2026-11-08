@@ -352,7 +352,9 @@ async function kommentarerna() {
   }
 }
 
-async function enAnalys(id, namn, gammal, roster, nyckel = `analys:${id}`) {
+// hasseNyckel: försöken med Hasses text. borjad: omgången har börjat, så att det han redan
+// har sagt står fast.
+async function enAnalys(id, namn, gammal, roster, nyckel = `analys:${id}`, { hasseNyckel, borjad = false } = {}) {
   try {
     const d = await fardata(`match/${id}.json`);
     if (!d) throw new Error('matchen finns inte på sajten');
@@ -360,11 +362,11 @@ async function enAnalys(id, namn, gammal, roster, nyckel = `analys:${id}`) {
     if (!r.ok) throw new Error(r.error);
     const entry = r.entry;
     logg(`analys: ${entry.match} (${metaText(r.meta)})${r.tipError ? ` – utan tips: ${r.tipError}` : ''}`);
-    // Hasses text ur den nya analysen. Blir den inte av sparas analysen ändå.
-    if (entry.tip) {
-      const t = await hasseText(id, entry, roster, d);
-      if (t) entry.hasse = t;
-    }
+    // Hasses text ur den nya analysen. Blir den inte av sparas analysen ändå, och det han sa
+    // senast ligger kvar: han ska ha tippat alla matcher när omgången börjar.
+    const gamla = gammal && gammal.hasse;
+    const ny = entry.tip && !(borjad && gamla) ? await hasseText(id, entry, roster, d, hasseNyckel) : null;
+    if (ny || gamla) entry.hasse = ny || gamla;
     vantande.analyser[id] = entry;
     lyckat(nyckel);
     spara(`Analys: ${entry.match}`);
@@ -377,8 +379,7 @@ async function enAnalys(id, namn, gammal, roster, nyckel = `analys:${id}`) {
 
 // d: matchens fil på sajten, för oddsen han får (hämtas om den saknas; går den inte att
 // hämta skriver han utan oddsen).
-async function hasseText(id, entry, roster, d = null) {
-  const nyckel = `hasse:${id}`;
+async function hasseText(id, entry, roster, d = null, nyckel = `hasse:${id}`) {
   try {
     const match = d || await fardata(`match/${id}.json`).catch(() => null);
     const h = await skrivHasse(id, entry, { persona: roster.hasse, match });
@@ -397,11 +398,15 @@ async function analyserna(round, roster) {
   for (const [id, a] of Object.entries(vantande.analyser)) per.set(id, a);
   const v = attSkriva(round, per, { now: Date.now(), tider: ac.tider, forhandTimmar: ac.forhandTimmar, version: ac.promptVersion, tvinga: TVINGA });
   const nyckel = (x) => `analys:${x.id}:${v.tid}`;
+  // (Hasses försök räknas per tid, som analysernas: tre misslyckade får inte stänga av honom i en vecka)
+  const hasseNyckel = (x) => `hasse:${x.id}:${v.tid}`;
   const att = v.att.filter((x) => far(nyckel(x)));
+  // När omgången har börjat står hans tips fast, också för matcher som inte har startat (18:30-matchen).
+  const borjad = round.matcher.some((x) => Date.parse(x.avspark) <= Date.now());
   // Analyser som fick sin text men inte Hasses.
   const hasse = v.kvar.filter((x) => {
     const a = per.get(String(x.id));
-    return a && a.version === ac.promptVersion && a.tip && !v.att.includes(x) && !hasseKlar(a.hasse, a) && far(`hasse:${x.id}`);
+    return a && a.version === ac.promptVersion && a.tip && !v.att.includes(x) && !(borjad && a.hasse) && !hasseKlar(a.hasse, a) && far(hasseNyckel(x));
   });
   const nasta = v.nasta ? new Date(v.nasta).toISOString() : 'okänt';
   if (!att.length && !hasse.length) {
@@ -415,12 +420,12 @@ async function analyserna(round, roster) {
   }
   for (const x of att) {
     if (lage.stoppad) return;
-    await enAnalys(String(x.id), x.match, per.get(String(x.id)), roster, nyckel(x));
+    await enAnalys(String(x.id), x.match, per.get(String(x.id)), roster, nyckel(x), { hasseNyckel: hasseNyckel(x), borjad });
   }
   for (const x of hasse) {
     if (lage.stoppad) return;
     const a = per.get(String(x.id));
-    const t = await hasseText(String(x.id), a, roster);
+    const t = await hasseText(String(x.id), a, roster, null, hasseNyckel(x));
     if (t) {
       vantande.hasse[String(x.id)] = t;
       spara(`Hasse Backe: ${a.match}`);

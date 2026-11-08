@@ -1385,21 +1385,23 @@ window.RumHasse = (() => {
     if (forstaText) rad(forstaText);
     const dag = spelstopp(lista);
     H.prat = lista.length && forsta ? { rader: medDag(REP().ledig, dag), i: 0, nasta: performance.now() + 24000, gang: 24000 } : null;
-    // När alla matcher har börjat säger han hur det gick. Öppnar man honom medan rummet laddas kan
-    // matcherna och säsongen komma efter samtalet: då ritas listan om, och han säger det först då.
+    // När omgången har börjat står alla hans tips på raderna (hansRader), och när alla matcher har börjat
+    // säger han hur det gick. Öppnar man honom medan rummet laddas kan matcherna och säsongen komma
+    // efter samtalet: då ritas listan om, och han säger det först då.
+    const igang = lista.some((m) => Date.parse(m.avspark) <= nu);
     const borjat = lista.length && !lista.some((m) => Date.parse(m.avspark) > nu);
     const vem = H.fraga;
-    const vanta = datan(borjat);
-    if (vanta) {
-      vanta.then(() => {
-        if (H.fraga !== vem || H.fas !== 'fraga') return;
-        const l = $('.rh-lista');
-        const topp = l.scrollTop;
-        listan(lista, fragat);
-        l.scrollTop = topp;
-        if (borjat) efterat(lista, fragat);
-      });
-    } else if (borjat) efterat(lista, fragat);
+    const vanta = datan(igang);
+    const fram = (tips) => {
+      if (H.fraga !== vem || H.fas !== 'fraga') return;
+      const l = $('.rh-lista');
+      const topp = l.scrollTop;
+      listan(lista, fragat, tips);
+      l.scrollTop = topp;
+      if (borjat) efterat(lista, tips);
+    };
+    if (igang) Promise.resolve(vanta).then(() => hansRader(lista, fragat)).then(fram);
+    else if (vanta) vanta.then(() => fram(fragat));
     klick();
   }
   // Det som hämtas medan rummet laddas: matcherna (Facit) och, när det behövs, säsongen (hans kupong).
@@ -1410,8 +1412,30 @@ window.RumHasse = (() => {
     if (sasong && typeof TP !== 'undefined' && !TP.season && typeof tpLoadSeason === 'function') v.push(tpLoadSeason());
     return v.length ? Promise.all(v) : null;
   }
-  // Raderna och spalthuvudet, med Facit så snart någon match har slutat. → nästa match du inte har frågat om.
-  function listan(lista, fragat) {
+  // Raderna när omgången har börjat. Före första avspark syns bara det du själv har frågat om, men sedan
+  // är tipsen ingen hemlighet (också var och ens egna har stängt): alla matcher står ifyllda, också de som
+  // inte har startat än, som 18:30-matchen. Tecknen är hans kupong i tävlingen om han spelar den, annars
+  // det han säger i sin text. Resultatet är hans eget, och har han inget (eller inget som stämmer med
+  // tecknen) det troligaste i modellen. → Promise med {matchens id: "X2 0–2"}, som minnet (fragat).
+  async function hansRader(lista, fragat) {
+    const kupong = hansKupong(lista);
+    const ut = { ...fragat };
+    await Promise.all(lista.map(async (m) => {
+      const a = await analysen(m.id);
+      const egna = a && (hans(a) || a.tip) ? [...hansTecken(a)].sort().map((n) => KORT[n]).join('') : '';
+      const tecken = kupong[m.id] || egna;
+      if (!tecken) return;
+      const signs = KORT.map((k, n) => (tecken.includes(k) ? n : -1)).filter((n) => n >= 0);
+      const sagt = a ? resultatet(null, signs, a) : null;
+      const [h, b] = String(sagt).split('–').map(Number);
+      const res = sagt && signs.includes(h > b ? 0 : h === b ? 1 : 2) ? sagt : resultatet(await prognosen(m.id), signs, {});
+      ut[m.id] = tecken + (res ? ` ${res}` : '');
+    }));
+    return ut;
+  }
+  // Raderna och spalthuvudet, med Facit så snart någon match har slutat. tips: det som står på raderna
+  // (hansRader), annars det du har frågat om. → nästa match du inte har frågat om.
+  function listan(lista, fragat, tips = fragat) {
     const s = $('.rh-samtal');
     const l = s.querySelector('.rh-lista');
     const nu = Date.now();
@@ -1421,7 +1445,7 @@ window.RumHasse = (() => {
     s.classList.toggle('tre', medFacit && K().kan());
     const kol = s.querySelector('.rh-kol');
     if (kol) kol.remove();
-    l.insertAdjacentHTML('beforebegin', spalter(lista, fragat, medFacit));
+    l.insertAdjacentHTML('beforebegin', spalter(lista, tips, medFacit));
     l.textContent = '';
     let forsta = null;
     lista.forEach((m, i) => {
@@ -1429,9 +1453,10 @@ window.RumHasse = (() => {
       b.type = 'button';
       const f = facit.get(m.id);
       // (det du har på raden står för hand längst ut, i en egen spalt)
-      b.innerHTML = `<i>${i + 1}</i><span>${esc(m.namn)}</span>${hansTips(fragat[m.id], f)}${medFacit ? facitRuta(f) : ''}${K().kan() ? `<u>${esc(K().din(m.id))}</u>` : ''}`;
-      b.classList.toggle('spelad', Boolean(f));
+      b.innerHTML = `<i>${i + 1}</i><span>${esc(m.namn)}</span>${hansTips(tips[m.id], f)}${medFacit ? facitRuta(f) : ''}${K().kan() ? `<u>${esc(K().din(m.id))}</u>` : ''}`;
       b.disabled = Date.parse(m.avspark) <= nu;
+      // (en match som har börjat går inte att fråga om, men hans tips ska gå att läsa)
+      b.classList.toggle('spelad', Boolean(f) || b.disabled);
       b.dataset.id = m.id;
       // har du redan fått svaret står det direkt, och han erbjuder sig att titta igen
       b.addEventListener('click', (e) => {
@@ -1482,8 +1507,8 @@ window.RumHasse = (() => {
   // Huvudet är byggt som en rad, med osynliga rutor som håller bredden, så att det står mitt över
   // spalterna i alla storlekar. Mellan dem står Facit, när någon match har slutat. Spalterna som inte syns
   // på någon rad får inget huvud.
-  function spalter(lista, fragat, medFacit = false) {
-    const han = lista.some((m) => fragat[m.id]);
+  function spalter(lista, tips, medFacit = false) {
+    const han = lista.some((m) => tips[m.id]);
     const du = K().kan();
     if (!han && !du && !medFacit) return '';
     const hans = han ? `<b class="rh-tips"><span class="rh-rutor">${KORT.map((k) => `<em>${k}</em>`).join('')}</span><small></small><span class="rh-vem hasse"><span class="rh-ans"></span><span class="rh-namn">Hasse</span></span></b>` : '';
@@ -1545,7 +1570,7 @@ window.RumHasse = (() => {
   //
   // När alla matcher har börjat säger han hur det gick för honom, på sitt sätt (efter i
   // rum-hasse-repliker.js). Det som räknas är hans kupong i tävlingen om han spelade omgången
-  // (data/tippare.json), annars det han har sagt till dig, alltså raderna i listan. Rättningen är
+  // (data/tippare.json), annars det han sa om matcherna, alltså raderna i listan. Rättningen är
   // poängtavlans (tpRows i tippare.js), så om matcher du har valt att dölja säger han inget. Hur det gick
   // följer poängen, antal rätt mot vad chanserna var värda (i standardavvikelser): på en hel kupong med
   // garderingar är nio rätt av tretton dåligt, och på sex ensamma tecken är fyra rätt bra. Bra kräver också
@@ -1569,20 +1594,20 @@ window.RumHasse = (() => {
     return han ? han.award : null;
   }
   // Resultatet i någon av raderna i listan som han sa exakt, eller null. Matcher du döljer räknas inte.
-  function sagtExakt(lista, fragat) {
+  function sagtExakt(lista, tips) {
     for (const m of lista) {
-      const res = String(fragat[m.id] || '').split(' ')[1];
+      const res = String(tips[m.id] || '').split(' ')[1];
       const f = res ? slutade(m) : null;
       if (f && `${f.h}–${f.b}` === res) return res;
     }
     return null;
   }
   // → { lage: en av listorna i efter, ok, n, plats, exakt } eller null om det inte går att säga något.
-  function hurDetGick(lista, fragat) {
+  function hurDetGick(lista, tips) {
     if (typeof tpRows !== 'function' || typeof Tippoang === 'undefined') return null;
     const kupong = hansKupong(lista);
     const spelade = Object.keys(kupong).length > 0;
-    const tecken = spelade ? kupong : Object.fromEntries(lista.filter((m) => fragat[m.id]).map((m) => [m.id, fragat[m.id].split(' ')[0]]));
+    const tecken = spelade ? kupong : Object.fromEntries(lista.filter((m) => tips[m.id]).map((m) => [m.id, tips[m.id].split(' ')[0]]));
     if (!Object.keys(tecken).length) return { lage: 'ofragad' };
     const rader = tpRows({ matcher: lista.map((m) => ({ id: m.id, match: m.namn })) }, tecken, Date.now())
       .filter((r) => r && r.state !== 'off' && r.state !== 'missing');
@@ -1593,14 +1618,14 @@ window.RumHasse = (() => {
     const spridning = Math.sqrt(rader.reduce((a, r) => a + r.prob * (1 - r.prob), 0));
     const z = spridning ? pts / spridning : 0;
     const lage = n >= 3 && !ok ? 'inget' : n >= 3 && ok === n && spridning ? 'alla' : z >= BRA && ok * 2 > n ? 'bra' : z <= -BRA ? 'daligt' : 'mitten';
-    return { lage, n, ok, plats: spelade ? hansPlats(lista) : null, exakt: sagtExakt(lista, fragat) };
+    return { lage, n, ok, plats: spelade ? hansPlats(lista) : null, exakt: sagtExakt(lista, tips) };
   }
   // Vad han gör när han har sagt sitt.
   const EFTER_GEST = { alla: 'skrocka', bra: 'skrocka', mitten: 'brynet', daligt: 'suck', inget: 'suck', pagar: 'smacka', dolt: 'brynet', ofragad: 'notan' };
-  function efterat(lista, fragat) {
+  function efterat(lista, tips) {
     const e = REP().efter;
     // (en äldre rum-hasse-repliker.js i cachen har inga rader om det)
-    const g = e && hurDetGick(lista, fragat);
+    const g = e && hurDetGick(lista, tips);
     if (!g) return;
     const rader = e[g.lage];
     const plats = g.plats === 'best' ? e.forst : g.plats === 'worst' ? e.sist : null;

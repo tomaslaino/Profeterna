@@ -2198,14 +2198,17 @@ Han spelar under samma regel som alla (`regel` i [config/kupong.js](config/kupon
 - De säkraste matcherna blir spikar: ensamt tecken och störst målskillnad i hans resultat (3–0 före
   2–1 före 1–1), vid lika det modellen tror mest på. De nästa blir halvgarderingar (hans tecken och
   det troligaste av de andra), och de osäkraste helgarderingar.
-- En match han inte har analyserat får det modellen tror mest på och läggs sist. Har han analyserat
-  under hälften av matcherna spelar han inte omgången.
+- Han tippar alla matcher. En match han inte har analyserat får det modellen tror mest på och läggs
+  sist, och det gäller också om datorn som skriver analyserna inte har hunnit med någon alls.
+  Misslyckas en omskrivning ligger det han sa senast kvar, och när omgången har börjat skrivs det
+  han har sagt inte om ([scripts/analyser/skriv.mjs](scripts/analyser/skriv.mjs)).
 - Ändras antalen i regeln följer kupongen med. Klarar en kupong inte `regelKlar` spelar han inte, hellre
   än att bryta mot regeln. **Läggs en ny förutsättning in i `regelKlar` ska `hasseKupong` lära sig den
   samtidigt**, annars står han över tills den gör det.
 - Kupongen följer analyserna fram till omgångens första avspark, när var och ens egna tips också
   stänger, och står sedan kvar. Bara det han sa före matchens avspark räknas.
-- Omgångar med ett annat antal matcher har ingen regel: då gäller bara det han har sagt.
+- Omgångar med ett annat antal matcher har ingen regel: då gäller det han har sagt, och annars det
+  modellen tror mest på.
 
 Kupongen står i `data/tippar-historik.json` som en tippare till (`HB`), och för omgången som pågår
 i `hasse` i `data/tippare.json`, som sidan lägger till i poängen (`tpScore` i
@@ -4880,8 +4883,11 @@ kupongen (*På din kupong har du bara etta. Det var kaxigt.*); har du inget på 
 fylla i den (se *Din kupong*). Han minns på enheten vad du har
 frågat om: på matchens rad står hans tecken ifyllda i guld i rutorna 1 X 2, som på kupongen, med
 resultatet bredvid i en rak spalt. *Alla matcher* tar en tillbaka till listan, och där räknar han
-(*Nu är halva kupongen klar*). Bara tecken du själv har bett om syns, så att listan inte blir ett
-automatiskt tips.
+(*Nu är halva kupongen klar*). Före omgångens första avspark syns bara tecken du själv har bett om, så
+att listan inte blir ett automatiskt tips. När omgången har börjat, och var och ens egna tips har
+stängt, står alla hans rader ifyllda, också matcher som inte har startat än, som 18:30-matchen
+(`hansRader` i [public/rum-hasse.js](public/rum-hasse.js)): hans kupong i tävlingen om han spelar den,
+annars tecknen i hans text, med hans resultat.
 Överst i listan står vem som säger vad, utan förklarande text: Hasses porträtt och namn i guld mitt över hans rutor och resultat, och ditt porträtt i din färg med namnet i din handstil (som på kupongen) över din spalt. Får namnen inte plats bredvid varandra, som i telefonen, går ditt namn först och sedan hans, så att porträtten står kvar. En spalt som inte syns på någon rad får inget huvud.
 Går hans röst inte att få säger han det och visar analysen i skrift. Allt han säger runt omkring är
 färdiga rader, utan AI, i [public/rum-hasse-repliker.js](public/rum-hasse-repliker.js). `npm run repliker`
