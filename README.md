@@ -4670,7 +4670,9 @@ framkanten `pult-kant.webp`, inte i telefonen på höjden där pulten fortsätte
 rummets kamera ([scripts/rum/pult.mjs](scripts/rum/pult.mjs)), och ringarna ritas ovanpå när rum-pult.js är
 hämtad (`ringar` i rum.js). Rummets kamera är ett öga vid pulten som ser mot fönstren, med horisonten och
 flyktpunkten där pultens bild alltid har haft dem: bortre kanten ligger kvar på y = 650 och kanten mot en på
-984, och hörnet hamnar längst till vänster, där kaffet står på hörnet som i hans bild. I rummet är ljuset
+984, och hörnet hamnar längst till vänster, där kaffet står på hörnet som i hans bild. Framkanten ligger alltså
+precis vid rummets nedre kant: i ett fönster med scenens form (16:10) hamnar den strax nedanför och syns först i
+högre fönster. I rummet är ljuset
 lysrörets och dagens, svalare än barens lampor och lite ljusare, och rummets egna lager ovanpå är räknade med,
 så att träet har samma dämpade bruna som framför honom och inte är orange. Förut var pulten i rummet en målad bild
 med plankor som gick mot en, mer orange, utan hörn, med ringarna utspridda för sig, en list i aluminium mot en och
@@ -4727,7 +4729,9 @@ också läser), i figurens värld och med samma disk, så att fingrarna lägger 
 manschett och hud, och samma ljus som i baren (lysröret tänt och dagsljuset efter klockan och vädret; på natten
 mörknar rummet självt). De ses i rummets blickriktning, mot fönstren, lika långt bort och lika mycket uppifrån
 (33°) som från ögat i rummet (`RUM` i rum-pult.js), och kantljuset räknas mot det ögat (`vy`), inte mot
-barens kamera: annars blev ärmarnas sidor varmt bruna. Bilden flyttas dit där kaffet och notan ligger, så
+barens kamera: annars blev ärmarnas sidor varmt bruna. Från rummet ses också ärmarnas sida bort från barens
+lampor, och den blev nästan svart; ärmens tyg får därför mer ljus i rummet (`bord.tyg`, 1,35 mot 1 i baren), så
+att det är samma koksgråa kavaj som framifrån. Underarmarna är lika vida som i baren. Bilden flyttas dit där kaffet och notan ligger, så
 att underarmarna kommer in från bildens vänstra kant, den vänstra snett uppifrån över pultens bakre kant och den
 högra under den, med armbågarna och axlarna utanför bilden. Under händerna och underarmarna ligger samma skuggor
 som i baren (`byggSkugga`), med en tät, mörk kontaktskugga där händerna ligger an mot pulten. Det är bara den
@@ -5322,8 +5326,8 @@ pennan i 1440 × 900, vilan, klunken och talet i telefonen (412 × 915), och han
 Samma pult och samma armar (2026-11-08) är provade i headless Chromium med mjukvarugrafik, i hela sidan med
 `?rum-kval=0` (rummets fulla steg, som på en Mac): rummet och hans bild i 1440 × 900 med täthet 1 och 2, och
 telefonen på höjden (390 × 844). Färgerna är mätta i bilderna: pulten i rummet längst bak 24° nyans, 25 % mättnad
-och 37 % ljushet, och disken framför honom 24–25°, 30 % och 36 %; ärmen, manschetten och huden i rummet mätta i
-handens duk före rummets lager. Kamerahöjden valdes bland fyra renderade varianter (ögat 31, 39, 45 och 54 cm över
+och 37 % ljushet, och disken framför honom 24–25°, 30 % och 36 %; ärmens tyg på skärmen i rummet (54, 50, 47)
+mot i baren (59, 53, 48), och huden (211, 154, 126) mot (219, 153, 124). Kamerahöjden valdes bland fyra renderade varianter (ögat 31, 39, 45 och 54 cm över
 hans), och väggbildens täckning är räknad för fönster från 844 × 390 till 3440 × 1440 och på höjden från 360 × 780
 till 1000 × 1000 (minst 11 bildpunkter till godo). Inte provat i Safari eller på en riktig telefon.
 

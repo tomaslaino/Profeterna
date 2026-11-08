@@ -68,6 +68,8 @@ export async function armen(plan, { hand: HAND, kopp: KOPP, pr = 1.5, ljus = nul
   const bord = {
     value: new THREE.Vector4(DK.n[0], DK.n[1], DK.c, DK.Y), butik: { value: 1 },
     dag: { value: new THREE.Vector4(...l.c.map((x) => x * l.f * 0.8), l.dag) }, lys: { value: new THREE.Vector4(0.587, 0.593, 0.606, 0.75) },
+    // (ärmarna ses från sidan bort från barens lampor: samma gråa kavaj som i baren, rum-hasse-arm.js)
+    tyg: { value: 1.35 },
   };
   const S = new THREE.Scene();
   // Skuggorna på pulten under händerna och underarmarna, som i baren (byggSkugga): på diskens ovansida runt dem.
@@ -97,7 +99,7 @@ export async function armen(plan, { hand: HAND, kopp: KOPP, pr = 1.5, ljus = nul
   cam.position.copy(OGA);
   // (ljuset ses från det ögat, rum-hasse-arm.js)
   bord.vy = OGA.clone().sub(MITT).normalize().toArray();
-  const A = byggArm(S, 1, foto, modell, 1, bord);
+  const A = byggArm(S, 1, foto, modell, 0.94, bord);
   const B = byggArm(S, -1, foto, modell, 1, bord);
   lage.A.X = A;
   lage.B.X = B;

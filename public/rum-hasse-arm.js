@@ -91,6 +91,9 @@ bool underBord(vec3 w) {
 `;
 // (utan disk döljs ingenting, och det är rummets ljus utan baren)
 const BUTIK_AV = { value: 0 };
+// Kavajens tyg i ljuset (uTyg i ARM_F): 1 i baren. Från rummet ses ärmarnas sida bort från lamporna, och då
+// sätter bord.tyg tonen, så att det är samma gråa kavaj som framifrån.
+const TYG = { value: 1 };
 // Ljuset räknas mot figurens kamera (VY). Ses samma sak från ett annat håll, som hans händer från rummet
 // (rum-hasse-hand.js), ger bord.vy riktningen mot det ögat, så att kantljuset hamnar där det ska.
 const VY_RAD = /const vec3 VY = vec3\([^)]*\);/;
@@ -415,6 +418,7 @@ varying vec2 vUv; varying vec3 vN, vN0, vW; varying float vS, vI, vVeck;
 void main() { vUv = uv; vN = normal; vN0 = aN0; vS = aS; vI = aI; vVeck = aVeck; vW = position; gl_Position = projectionMatrix * viewMatrix * vec4(position, 1.); }`;
 const ARM_F = `precision highp float;
 uniform sampler2D foto;
+uniform float uTyg;
 varying vec2 vUv; varying vec3 vN, vN0, vW; varying float vS, vI, vVeck;
 ${LJUS}
 ${BORD_GLSL}
@@ -428,7 +432,7 @@ void main() {
   // remsan är utjämnad: skuggorna kommer från ljuset, vecken från formen och fotot (mjukare, för armen
   // ligger inte som i fotot)
   c.rgb = .135 + (c.rgb - .135) * .62;
-  vec3 ut = c.rgb * ljus(n) * 1.14;
+  vec3 ut = c.rgb * ljus(n) * 1.14 * uTyg;
   vec3 e = normalize(cameraPosition - vW);
   // ylle: ljuset fastnar i luddet där tyget vänder sig bort, och vecken skuggar sig själva
   float gr = 1. - clamp(dot(n, e), 0., 1.);
@@ -513,7 +517,7 @@ export function byggArm(scen, sida, foto, modell, vidd = 1, bord = ingenBord()) 
   g.setAttribute('aVeck', new THREE.BufferAttribute(vk, 1));
   g.setIndex(ix);
   // (dubbelsidig: genom ärmslutet syns insidan)
-  const rorM = new THREE.ShaderMaterial({ uniforms: { foto: { value: foto }, uBord: bord, uButik: bord.butik || BUTIK_AV, uDag: bord.dag || DAG, uLys: bord.lys || LYS }, vertexShader: ARM_V, fragmentShader: medVy(ARM_F, bord), transparent: true, depthWrite: true, side: THREE.DoubleSide, blending: THREE.CustomBlending, blendSrc: THREE.OneFactor, blendDst: THREE.OneMinusSrcAlphaFactor });
+  const rorM = new THREE.ShaderMaterial({ uniforms: { foto: { value: foto }, uTyg: bord.tyg || TYG, uBord: bord, uButik: bord.butik || BUTIK_AV, uDag: bord.dag || DAG, uLys: bord.lys || LYS }, vertexShader: ARM_V, fragmentShader: medVy(ARM_F, bord), transparent: true, depthWrite: true, side: THREE.DoubleSide, blending: THREE.CustomBlending, blendSrc: THREE.OneFactor, blendDst: THREE.OneMinusSrcAlphaFactor });
   const ror = new THREE.Mesh(g, rorM);
   ror.frustumCulled = false;
   // skjortans manschett: ett rör med en rundad kant, lite plattare som handleden (handflatan åt z)
