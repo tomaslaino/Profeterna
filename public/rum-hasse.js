@@ -719,7 +719,19 @@ window.RumHasse = (() => {
     if (t - nu > 6 * 86400000) return '';
     return `på ${new Intl.DateTimeFormat('sv-SE', { timeZone: 'Europe/Stockholm', weekday: 'long' }).format(t)}`;
   }
-  const medDag = (rader, dagen) => rader.filter((r) => dagen || !r.includes('{dag}')).map((r) => fyll(r, { dag: dagen }));
+  // Det han säger då och då medan han väntar på en (pratSteg): n rader ur listan, den första efter forst ms
+  // och sedan en var 20:e sekund. De lottas när de sägs, så att han inte upprepar sig förrän alla har varit
+  // med, också om man går och kommer tillbaka. Utan dag hoppar han över raderna med {dag}.
+  // (en äldre rum-hasse-repliker.js i cachen kan sakna listan)
+  function vantar(lista, n, forst, dag = '') {
+    if (!lista || !lista.length) return null;
+    const nasta = () => {
+      let t = lott(lista);
+      for (let i = lista.length; !dag && t.includes('{dag}') && i > 0; i--) t = lott(lista);
+      return fyll(t, { dag });
+    };
+    return { rader: Array(n).fill(nasta), i: 0, nasta: performance.now() + forst, gang: 20000 };
+  }
 
   // Rörelserna: klipp på tidslinjen (KLIPP i rum-hasse-3d.js, hit när figuren hämtas). fran: var det
   // börjar (måste vara där han står, utom fri), till: var det slutar, vila: där han står sedan, grupp:
@@ -1240,7 +1252,8 @@ window.RumHasse = (() => {
     const v = H.prat;
     if (!v || ms < v.nasta || H.klipp || H.ko.length || (H.sagt && !H.sagt.klar)) return;
     if (v.i >= v.rader.length) { H.prat = null; return; }
-    rad(v.rader[v.i++]);
+    const r = v.rader[v.i++];
+    rad(typeof r === 'function' ? r() : r);
     v.nasta = ms + v.gang;
   }
 
@@ -1389,7 +1402,7 @@ window.RumHasse = (() => {
     const forstaText = sum ? lott(REP().domar.matcherna) : forstaRad(lista, fragat, forst);
     if (forstaText) rad(forstaText);
     const dag = spelstopp(lista);
-    H.prat = lista.length && forsta ? { rader: medDag(REP().ledig, dag), i: 0, nasta: performance.now() + 24000, gang: 24000 } : null;
+    H.prat = lista.length && forsta ? vantar(REP().ledig, 8, 14000, dag) : null;
     // När omgången har börjat står alla hans tips på raderna (hansRader), och när alla matcher har börjat
     // säger han hur det gick. Öppnar man honom medan rummet laddas kan matcherna och säsongen komma
     // efter samtalet: då ritas listan om, och han säger det först då.
@@ -1642,8 +1655,8 @@ window.RumHasse = (() => {
     repliker(sagt, { i: $('.rh-sagt'), rad: true, direkt: calm(), sen: () => gest(EFTER_GEST[g.lage]) });
     // och efter en stund: det exakta resultatet, om han sa något, och mer om hur det gick
     const sedan = g.exakt ? [fyll(lott(e.exakt), { res: g.exakt })] : [];
-    for (let i = plats ? 3 : 2; i > 0; i--) sedan.push(lott(rader));
-    H.prat = { rader: sedan, i: 0, nasta: performance.now() + 24000, gang: 24000 };
+    for (let i = plats ? 4 : 3; i > 0; i--) sedan.push(lott(rader));
+    H.prat = { rader: sedan, i: 0, nasta: performance.now() + 20000, gang: 20000 };
   }
 
   // ---------- domarna efter omgången ----------
@@ -1711,6 +1724,7 @@ window.RumHasse = (() => {
     s.querySelector('.rh-tillmatcher').addEventListener('click', () => { H.matcher = true; fraga(); });
     const n = folk.filter((p) => h.includes(p.id)).length;
     rad(lott(n === folk.length ? r.domar.alla : n ? r.domar.igen : r.domar.fraga));
+    H.prat = vantar(r.domar.ledig, 4, 20000);
     klick();
     return true;
   }
@@ -1813,6 +1827,7 @@ window.RumHasse = (() => {
       K().kopplaRutor(t, m, (sign) => {
         // han är inte längre i färd med frågan
         H.fraga = {};
+        H.prat = null;
         tystna();
         H.sagt = null;
         H.talMal = 0;
@@ -1837,6 +1852,8 @@ window.RumHasse = (() => {
         if (H.fraga !== vem) return;
         repliker([{ text: fragan }], { i: s.querySelector('.rh-fragan'), rad: true }).tid = performance.now() + 450;
       });
+      // och svarar du inte säger han något om det
+      H.prat = vantar(r.valVanta, 3, 18000);
     });
   }
   // Du gissar själv: tillbaka till listan, där du var.

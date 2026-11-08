@@ -5197,11 +5197,14 @@ går tillbaka till listan, där ordet i guld står efter namnet på dem man har 
 i gänget avgörs, och efter omgången säger han inte heller hur det gick för honom. *Matcherna* under listan visar hans rader
 och facit som förut, med *Gänget* tillbaka. Med dolda resultat finns inget protokoll, och då är allt som förut.
 Går hans röst inte att få säger han det och visar analysen i skrift. Allt han säger runt omkring är
-färdiga rader, utan AI, i [public/rum-hasse-repliker.js](public/rum-hasse-repliker.js). `npm run repliker`
+färdiga rader, utan AI, i [public/rum-hasse-repliker.js](public/rum-hasse-repliker.js). Står man kvar säger han något då och då:
+över matchlistan (`ledig`), över listan med gänget (`domar.ledig`) och när man inte svarar på hans fråga (`valVanta`). Raderna
+lottas när de sägs (`vantar` i rum-hasse.js), så att han inte upprepar sig förrän alla har varit med. `npm run repliker`
 ([scripts/hasse/kolla-repliker.js](scripts/hasse/kolla-repliker.js)) kontrollerar filen, och GitHub kör den
 när filen ändras (ett kryss på ändringen, publiceringen stoppas inte): uttryck som redan har underkänts,
 avhuggna meningar på ett eller två ord, rader om kupongen som börjar med ett Det som låter som resultatet,
-fält som inte går att fylla, listor som blivit strängar och att rösten får samma meningar som sidan. Vad
+fält som inte går att fylla, listor som blivit strängar, rader under en vald match som inte får plats på en rad
+(högst 31 tecken) och att rösten får samma meningar som sidan. Vad
 som är bra svenska kan koden inte avgöra, så de underkända uttrycken läggs till där när det händer. Med minskad
 rörelse i systemet står allt direkt, utan gester.
 

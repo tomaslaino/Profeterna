@@ -39,6 +39,7 @@ const UNDERKANT = [
   [/\bgick du bet på\b/i, 'Vilken match har du kört fast på?'],
   [/\bDet ska gå till så här\b/i, 'Man ska inte stressa fram ett tips.'],
   [/\b(live|online|playoff|spoiler)\b/i, 'pågår, på nätet, kval, dölj resultat'],
+  [/\bvinner den\b/i, 'vinner matchen: efter "Ge hit kupongen" är den kupongen'],
   [/\bförsäkring\b/i, 'gardering: på en kupong garderar man sig'],
   [/\bDär har du hela\b/i, 'Det var hela gänget.'],
   [/\bfinns inte att säga\b/i, 'Mer än så finns det inte att säga.'],
@@ -58,13 +59,13 @@ const FALT = {
   domar: ['namn', 'antal', 'Antal'],
 };
 // Sidan lottar bland de här, så de måste vara listor.
-const LISTOR = ['oppning', 'oppningNamn', 'tillbaka', 'tillbakaNamn', 'nasta', 'halva', 'enKvar', 'alla', 'allaKvar', 'allaIgen', 'ledig', 'val', 'valLasa',
+const LISTOR = ['oppning', 'oppningNamn', 'tillbaka', 'tillbakaNamn', 'nasta', 'halva', 'enKvar', 'alla', 'allaKvar', 'allaIgen', 'ledig', 'val', 'valLasa', 'valVanta',
   'fragaTillbaka', 'lar', 'gissar', 'erbjud', 'erbjudNytt', 'resultat', 'ejKlar', 'anslagSvar',
   'fyller.foreslar', 'fyller.hit', 'fyller.skriver.1', 'fyller.skriver.X', 'fyller.skriver.2', 'fyller.gardera', 'fyller.medhall', 'fyller.emot',
   'fyller.suddar', 'fyller.inne', 'fyller.fel',
   'kupong.samma', 'kupong.farre', 'kupong.fler', 'kupong.korsar', 'kupong.skilda',
   'efter.alla', 'efter.bra', 'efter.mitten', 'efter.daligt', 'efter.inget', 'efter.forst', 'efter.sist', 'efter.exakt', 'efter.pagar', 'efter.dolt', 'efter.ofragad',
-  'domar.fraga', 'domar.igen', 'domar.alla', 'domar.matcherna', 'domar.forsakring',
+  'domar.fraga', 'domar.igen', 'domar.alla', 'domar.ledig', 'domar.matcherna', 'domar.forsakring',
   ...['forst', 'alla', 'mitten', 'sist', 'sistLika', 'inget'].map((k) => `domar.in.${k}`),
   ...['forsakring', 'forst', 'alla', 'mitten', 'sist', 'sistLika', 'inget'].map((k) => `domar.ut.${k}`),
   'domar.hel.en', 'domar.hel.fler', 'domar.ensam.ingen', 'domar.ensam.en', 'domar.ensam.fler',
@@ -96,6 +97,8 @@ for (const [vag, t] of alla) {
 
 for (const vag of LISTOR) if (!Array.isArray(varde(vag))) fel.push(`${vag} måste vara en lista: sidan lottar bland raderna`);
 for (const [n, v] of Object.entries(repliker.antal || {})) if (!Array.isArray(v)) fel.push(`antal.${n} måste vara en lista`);
+// Raderna under en vald match ska få plats på en rad, annars flyttar sig knapparna under dem.
+for (const vag of ['val', 'valLasa', 'valVanta']) for (const t of varde(vag) || []) if (t.length > 31) fel.push(`${vag}: "${t}" är för lång: högst 31 tecken, annars flyttar sig knapparna`);
 for (const vag of LISTOR) {
   const l = varde(vag);
   if (Array.isArray(l) && new Set(l).size !== l.length) fel.push(`${vag} har samma rad två gånger`);
@@ -105,7 +108,7 @@ for (const k of ['forsakring', 'forst', 'alla', 'mitten', 'sist', 'sistLika', 'i
   if (!(repliker.domord && repliker.domord[k])) fel.push(`domord.${k} saknas`);
   if (!(k === 'forsakring' || (repliker.domar && repliker.domar.in && repliker.domar.in[k]))) fel.push(`domar.in.${k} saknas`);
 }
-for (const [vag, t] of alla) if (vag.startsWith('domar.') && t.split(/(?<=[.?!])\s+/).length > 1 && !['domar.fraga', 'domar.alla'].includes(vag)) fel.push(`${vag}: "${t}" är två meningar. Domen läses upp mening för mening, så skriv en.`);
+for (const [vag, t] of alla) if (vag.startsWith('domar.') && t.split(/(?<=[.?!])\s+/).length > 1 && !['domar.fraga', 'domar.alla', 'domar.matcherna'].includes(vag)) fel.push(`${vag}: "${t}" är två meningar. Domen läses upp mening för mening, så skriv en.`);
 for (const k of ['1', 'X', '2']) {
   const t = repliker.tecken && repliker.tecken[k];
   if (!t || !t.du || !t.bestamd) fel.push(`tecken.${k} saknar du eller bestamd`);
