@@ -688,6 +688,10 @@ bara lokalt. Analyserna visas som de ligger i `data/analyser.json`; hur de skriv
   klick sätter på den, och så länge den spelar sjunger de den ena sången efter den andra,
   lysdioderna studsar och noter stiger ur den. Se [Tobaksaffären](#tobaksaffären), *Sången efter ett
   mål* och *Radion*.
+- **Bergsprängaren spelar italiensk disco (2026-11-08, användarens önskemål):** "Kan du köra nån
+  italiensk discokanal? … Med italienska discohits." När radion sätts på spelar den en riktig
+  webbradiokanal med italo disco, ur den fria katalogen radio-browser, och tar nästa om en inte går
+  att spela. Se [Tobaksaffären](#tobaksaffären), *Radion*.
 - **Man väljer sig själv med ett klick på sin figur (2026-11-03, användarens önskemål):**
   ett klick på sin egen figur vid bordet gör en till den som fyller i kupongen – samma val
   som porträtten på kupongen – och figuren räcker upp handen med pennan, lyfter kupongen mot
@@ -2836,7 +2840,20 @@ grabbarna sjunger den ena sången efter den andra, en ny var fjortonde sekund i 
 om varje varv (mot tv:n bara när matcherna pågår, och försångaren bara när alla tre är vakna och har
 lämnat in). Den som väntar på kupongen, sover eller är borta sjunger inte, och på natten sjunger
 ingen. Ett mål går före radion. Radion är var och ens egen: den sparas inte och syns inte hos de
-andra. `?rum-radio` sätter på den (`=4` sedan fyra sekunder, med `?rum-t`).
+andra. `?rum-radio` sätter på den (`=4` sedan fyra sekunder, med `?rum-t`), utan ljud.
+
+Den spelar en riktig webbradiokanal med italiensk disco (2026-11-08, `ljud` i rum-folk.js).
+Kanalerna hämtas i webbläsaren när musen går över radion eller den sätts på, ur den fria katalogen
+[radio-browser](https://www.radio-browser.info/): taggen *italo disco*, de mest lyssnade först, och
+bara de som sänder mp3 eller aac över https (sajten är https) och fungerade vid katalogens senaste
+kontroll. Sist i listan står laut.fm:s Italo Disco (`RADIO_RESERV`). Ljudet måste sättas igång i
+själva klicket – Safari, och Chrome innan man har klickat på sidan, spelar annars inget – så hinner
+listan inte komma börjar den med laut.fm. Går en kanal inte att spela (fel, slut eller inget ljud
+inom åtta sekunder) tas nästa, och nästa gång börjar den på den som spelade sist. Går ingen att
+spela är radion tyst, men gänget sjunger ändå. Volymen är halv (`RADIO_VOLYM`), och radion stängs
+av när man lämnar rummet. Det är det enda i rummet som hämtar något från andra än sajten utan att
+man har bett om det: katalogen och kanalen, och bara när man pekar på radion eller sätter på den.
+Låtarna är kanalens; sajten visar inte vad som spelas.
 
 Skämtet, grälet och tv:n kommer bara när alla tre har lämnat in och är vakna och matcherna
 inte pågår, och inte medan någon är borta (nedan). Ingen gör något eget påhitt samtidigt.
