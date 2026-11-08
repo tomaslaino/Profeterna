@@ -4,12 +4,13 @@
 //
 // När alla matcher i omgången är spelade (och syns: Dölj resultat följs genom
 // tpScore i tippare.js) ligger Hasse Backes protokoll över kupongen på pulten i
-// tobaksaffären: Yatzy-blocket med en spalt för kupongen, var och en i gänget,
-// Hasse själv när han har tippat och datorn. Han har rättat det, med anteckningar
-// i marginalen, en dom per person längst ner och sin namnteckning. Ett klick på
-// blocket lyfter det och lägger fram det stort (protokollet i rum.js), och ett klick på
-// löpsedeln i fönstret öppnar tidningen (tidningen i rum.js). Gänget håller upp
-// sina lappar (lappar här och i rum-3d.js), och datorns siffra står på videons blå ruta.
+// tobaksaffären: Yatzy-blocket med facit och en spalt för kupongen, var och en i
+// gänget och Hasse. Allas tecken står kvar, och det som satt är markerat, så att
+// raderna går att läsa utan förklaring. Han har rättat det, med en dom per person
+// längst ner och sin namnteckning. Ett klick på blocket lyfter det och lägger fram det
+// stort (protokollet i rum.js), och ett klick på löpsedeln i fönstret öppnar tidningen
+// (tidningen i rum.js). Gänget håller upp sina lappar (lappar här och i rum-3d.js), och
+// modellens siffra står på videons blå ruta.
 //
 // Allt räknas ur omgångens data, och samma omgång ger samma text på alla enheter.
 // Texterna här sägs inte högt, så de hör inte till rösten (rum-hasse-repliker.js),
@@ -25,11 +26,15 @@
   const stor = (s) => s.charAt(0).toUpperCase() + s.slice(1);
   const esc = (s) => String(s == null ? '' : s).replace(/[&<>"]/g, (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c]));
   const efternamn = (s) => String(s || '').trim().split(/\s+/).pop();
-  // gängets bläck på papper och handstil (som namnen på kupongen), Hasse och datorn sist
+  // gängets bläck på papper och handstil (som namnen på kupongen), Hasse sist
   const INK = ['#2146a6', '#16784b', '#6d3aa8', '#8a6a0c', '#a0306a'];
-  const DATORN = { id: 'D', namn: 'Datorn', ink: '#55606b' };
   const KUPONG = { id: 'K', namn: 'Kupong', ink: '#26211a' };
   const HASSE = 'HB';
+  const HASSE_BILD = 'profeterna/hasse.jpg';
+  // Hasses spalt i en omgång där han inte har tippat själv: det troligaste utfallet (kol.D),
+  // det han har att gå på. Den räknas inte i tävlingen.
+  const BACKE = { id: 'D', namn: 'Backe', ink: INK[3], hand: 3, bild: HASSE_BILD };
+  const medBacke = (sum) => sum.dator.n > 0 && !sum.folk.some((p) => p.id === HASSE);
   const poang = (x) => {
     const v = Tippoang.runda(x);
     const t = String(Math.abs(v)).replace('.', ',');
@@ -40,15 +45,6 @@
 
   // ---------- texterna ----------
   const TEXT = {
-    noter: {
-      ingen: ['Här hade matchen fel.', 'Den här hade också fel.', 'Den borde spelas om.', 'Inte heller den.'],
-      hel: ['Försäkring.', 'Försäkring igen.', 'Och en försäkring till.'],
-      helAndra: 'Tur.',
-      halv: ['Halv försäkring.', 'Halv försäkring igen.'],
-      spik: ['Det hade jag sagt.', 'Det hade jag också sagt.', 'Och det.', 'Även det.'],
-      kupong: ['Ingen lyssnade.', 'Ingen lyssnade här heller.'],
-      mal: (m) => `${stor(ordet(m))} mål. Ingen försvarade sig.`,
-    },
     dom: {
       alla: 'alla rätt. Jag hade sagt samma sak.',
       forsakring: 'försäkring, inte kunskap.',
@@ -59,10 +55,6 @@
       inget: 'lämnade inte in. Det var klokt.',
       hasseForst: 'precis som jag sa.',
       hasse: 'matcherna hade fel.',
-      datornOrt: (ort) => `har aldrig varit i ${ort}.`,
-      datornUtan: 'har aldrig sett en match.',
-      datornBast: 'hade tur. Det kallas statistik.',
-      datorn: 'räknar. Det är allt den gör.',
     },
     kronika: {
       rubrik: 'Matcherna hade fel',
@@ -90,9 +82,6 @@
     },
   };
 
-  // Datorn har aldrig varit på orten, men det går inte att säga om allt som står på en kupong.
-  const INTE_ORT = /^(Forest|Spurs|Villa|Aston Villa|Palace|Crystal Palace|Wolves|Arsenal|QPR|Man City|Man Utd|Sheff Utd|Sheff Wed|MK Dons|Inter|Real|Atlético|Lazio|Roma|Milan|Juventus|Celtic|Rangers)\b/i;
-
   // ---------- räkningen ----------
 
   // score: tpScore(round, now), round: omgången ur Samtal, val: gängets tecken per match,
@@ -111,7 +100,7 @@
       return {
         id: p.id, namn: efternamn(p.name), none: Boolean(p.none), ok: p.ok || 0, n: p.n || 0, pts: p.pts || 0, award: award[p.id] || null,
         rows: p.rows || [], ink: hasse ? INK[3] : INK[Math.max(0, i)], hand: hasse ? 3 : Math.max(0, i),
-        bild: hasse ? 'profeterna/hasse.jpg' : (g && g.bild) || null,
+        bild: hasse ? HASSE_BILD : (g && g.bild) || null,
       };
     });
     const rader = round.matcher.map((x, i) => {
@@ -211,44 +200,9 @@
     return null;
   }
 
-  // ---------- anteckningarna ----------
+  // ---------- domarna ----------
 
-  // I marginalen: högst fyra, de viktigaste, i radernas ordning. → { [radens index]: text }
-  function noter(sum) {
-    const T = TEXT.noter;
-    const folk = sum.folk.filter((p) => !p.none);
-    const hel = {};
-    let forstaHel = null;
-    let ingen = 0;
-    const antal = { halv: 0, spik: 0, kupong: 0 };
-    // (samma rad två gånger i marginalen ser ut som en stämpel: listorna tas i tur och ordning)
-    const nasta = (k) => T[k][Math.min(antal[k]++, T[k].length - 1)];
-    const alla = [];
-    sum.rader.forEach((r, i) => {
-      if (r.res == null) return;
-      if (!r.ratt.length && folk.length) {
-        alla.push({ i, vikt: 3 - ingen * 0.5, text: T.ingen[Math.min(ingen, T.ingen.length - 1)] });
-        ingen += 1;
-      } else if (r.ratt.length === 1 && folk.length > 1) {
-        const id = r.ratt[0];
-        const t = r.kol[id].t;
-        if (t.length === 3) {
-          const n = (hel[id] = (hel[id] || 0) + 1);
-          if (forstaHel == null) forstaHel = id;
-          alla.push({ i, vikt: 2, text: id === forstaHel ? T.hel[Math.min(n - 1, T.hel.length - 1)] : n === 1 ? T.helAndra : T.hel[Math.min(n - 1, T.hel.length - 1)] });
-        } else if (t.length === 2) alla.push({ i, vikt: 1.5, text: nasta('halv') });
-        else alla.push({ i, vikt: 2.5, text: nasta('spik') });
-      } else if (r.kol.K.t && !r.kol.K.ok) {
-        alla.push({ i, vikt: 1.2, text: nasta('kupong') });
-      } else if (r.goals >= 7) {
-        alla.push({ i, vikt: 0.8, text: T.mal(r.goals) });
-      }
-    });
-    const val = alla.sort((a, b) => b.vikt - a.vikt || a.i - b.i).slice(0, 4);
-    return Object.fromEntries(val.map((x) => [x.i, x.text]));
-  }
-
-  // Domarna längst ner, en per person i omgångens ordning, datorn sist. → [{ id, namn, text }]
+  // Domarna längst ner, en per person med den bästa först, Hasse sist när han inte tävlar. → [{ id, namn, text }]
   function domar(sum) {
     const T = TEXT.dom;
     const folk = sum.folk.filter((p) => !p.none).sort((a, b) => (a.award === 'best' ? -1 : a.award === 'worst' ? 1 : 0) - (b.award === 'best' ? -1 : b.award === 'worst' ? 1 : 0));
@@ -263,61 +217,60 @@
       return { id: p.id, namn: p.namn, ink: p.ink, text };
     });
     for (const p of sum.folk) if (p.none) ut.push({ id: p.id, namn: p.namn, ink: p.ink, text: T.inget });
-    return [...ut, { id: DATORN.id, namn: DATORN.namn, ink: DATORN.ink, text: domDator(sum) }];
-  }
-  function domDator(sum) {
-    const T = TEXT.dom;
-    const folk = sum.folk.filter((p) => !p.none);
-    const d = sum.dator.ok;
-    if (folk.length && folk.every((p) => p.ok < d)) return T.datornBast;
-    if (folk.length && !folk.every((p) => p.ok > d)) return T.datorn;
-    // där den hade fel och trodde minst på det som hände, på en plats som går att resa till
-    const miss = sum.rader.filter((r) => r.res != null && r.pr && r.kol.D.t && !r.kol.D.ok && !INTE_ORT.test(r.h))
-      .sort((a, b) => a.pr[a.res] - b.pr[b.res]);
-    return miss.length ? T.datornOrt(miss[0].h) : T.datornUtan;
+    if (!medBacke(sum)) return ut;
+    const hasseBast = folk.length && folk.every((p) => p.ok < sum.dator.ok);
+    return [...ut, { id: BACKE.id, namn: BACKE.namn, ink: BACKE.ink, text: hasseBast ? T.hasseForst : T.hasse }];
   }
 
   // ---------- blocket ----------
 
   const RING = (w, h) => `<svg class="rb-ring" viewBox="0 0 ${w} ${h}" fill="none" aria-hidden="true"><path d="M${w * 0.16} ${h * 0.2}C${w * 0.42} ${h * 0.01} ${w * 0.93} ${h * 0.03} ${w * 0.975} ${h * 0.44}C${w * 1.01} ${h * 0.86} ${w * 0.38} ${h * 1.02} ${w * 0.1} ${h * 0.79}C${w * -0.1} ${h * 0.6} ${w * 0.05} ${h * 0.2} ${w * 0.42} ${h * 0.09}C${w * 0.56} ${h * 0.05} ${w * 0.68} ${h * 0.05} ${w * 0.76} ${h * 0.08}"/></svg>`;
 
-  // Spalterna: kupongen, var och en i gänget (och Hasse när han har tippat) och datorn.
-  const spalter = (sum) => [KUPONG, ...sum.folk.map((p) => ({ id: p.id, namn: p.namn, ink: p.ink, hand: p.hand, bild: p.bild })), DATORN];
+  // Spalterna: kupongen, var och en i gänget och Hasse.
+  const spalter = (sum) => {
+    const folk = sum.folk.map((p) => ({ id: p.id, namn: p.namn, ink: p.ink, hand: p.hand, bild: p.bild }));
+    return [KUPONG, ...folk, ...(medBacke(sum) ? [BACKE] : [])];
+  };
 
-  // → html för blocket. tat: den smala versionen (telefonen), utan marginal.
+  // → html för blocket. tat: den smala versionen (telefonen).
   function html(sum, { tat = false } = {}) {
     const kol = spalter(sum);
-    const not = noter(sum);
-    const huvud = (s) => {
-      if (s.id === 'K') return '<span class="rb-sp"><span class="rb-ik k">K</span><span class="rb-nm kup">Kupong</span></span>';
-      if (s.id === 'D') return '<span class="rb-sp"><span class="rb-ik d">C:\\&gt;</span><span class="rb-nm dat">Datorn</span></span>';
-      return `<span class="rb-sp" style="--i:${s.ink}">${s.bild ? `<img src="${esc(s.bild)}" alt="" draggable="false">` : `<span class="rb-ik" style="background:${s.ink}">${esc(s.namn.charAt(0))}</span>`}<span class="rb-nm h${s.hand}">${esc(s.namn)}</span></span>`;
-    };
-    const cell = (r, s, i) => {
-      const c = r.kol[s.id] || {};
-      if (!c.ok) return `<span class="rb-c fel" style="--r:${-13 + ((i * 7 + s.id.charCodeAt(0)) % 7)}deg"></span>`;
-      return `<span class="rb-c ${s.id === 'D' ? 'dat' : ''}" style="color:${s.ink}">${esc(c.t)}${c.ensam ? RING(62, 30) : ''}</span>`;
-    };
-    const rader = sum.rader.map((r, i) => `<span class="rb-m"><u>${r.nr}</u><span>${esc(r.h)} – ${esc(r.b)}</span><em>${esc(r.mal)}</em></span>` +
-      kol.map((s) => cell(r, s, i)).join('') + `<span class="rb-not">${not[i] ? `<i>${esc(not[i])}</i>` : ''}</span>`).join('');
-    const rad = (cls, la, varden, sist) => `<span class="rb-su la ${cls}">${la}</span>` + varden.map(([v, ink]) => `<span class="rb-su ${cls}" style="color:${ink}">${v}</span>`).join('') + sist;
     const P = (id) => sum.folk.find((p) => p.id === id);
-    const summa = rad('tot', 'Summa', kol.map((s) => [s.id === 'K' ? sum.kupong.ok : s.id === 'D' ? sum.dator.ok : P(s.id).none ? '–' : P(s.id).ok, s.ink]), '<span class="rb-not rb-sign"><i>H. Backe</i></span>');
-    const ensam = rad('n', 'Ensam om rätt', kol.map((s) => [s.id === 'K' || s.id === 'D' ? '' : P(s.id).none ? '' : P(s.id).ensam.length || '–', s.ink]), '');
+    const huvud = (s) => {
+      if (s.id === 'K') {
+        // kupongen är gängets: deras tre ansikten
+        const lag = sum.folk.filter((p) => p.id !== HASSE && p.bild).map((p) => `<img src="${esc(p.bild)}" alt="" draggable="false" style="--i:${p.ink}">`).join('');
+        return `<span class="rb-sp k"><span class="rb-lag">${lag}</span><span class="rb-nm kup">Kupong</span></span>`;
+      }
+      // vinnaren: samma ring som runt poängen, så att det syns redan uppifrån
+      const vann = P(s.id) && P(s.id).award === 'best';
+      return `<span class="rb-sp" style="--i:${s.ink}"><span class="rb-bild">${s.bild ? `<img src="${esc(s.bild)}" alt="" draggable="false">` : `<span class="rb-ik" style="background:${s.ink}">${esc(s.namn.charAt(0))}</span>`}${vann ? RING(50, 50) : ''}</span><span class="rb-nm h${s.hand}">${esc(s.namn)}</span></span>`;
+    };
+    // Allas tecken står kvar. Det som satt är markerat, och i en gardering är tecknet som satt starkast.
+    const cell = (r, s) => {
+      const c = r.kol[s.id] || {};
+      const tecken = String(c.t || '').split('').map((x) => (x === r.tecken ? `<b>${x}</b>` : x)).join('');
+      return `<span class="rb-c${c.ok ? ' ratt' : ''}${s.id === 'K' ? ' k' : ''}" style="--i:${s.ink}">${tecken}</span>`;
+    };
+    const rader = sum.rader.map((r) => `<span class="rb-m"><u>${r.nr}</u><span>${esc(r.h)} – ${esc(r.b)}</span><em>${esc(r.mal)}</em></span><span class="rb-fa">${r.tecken}</span>` +
+      kol.map((s) => cell(r, s)).join('')).join('');
+    const rad = (cls, la, varden) => `<span class="rb-su la ${cls}">${la}</span>` + kol.map((s, i) => `<span class="rb-su ${cls}${s.id === 'K' ? ' k' : ''}" style="color:${s.ink}">${varden[i]}</span>`).join('');
+    const ratt = rad('tot', `Rätt av ${sum.n}`, kol.map((s) => (s.id === 'K' ? sum.kupong.ok : s.id === 'D' ? sum.dator.ok : P(s.id).none ? '–' : P(s.id).ok)));
     const pts = rad('po', 'Poäng', kol.map((s) => {
-      if (s.id === 'K') return ['', s.ink];
-      if (s.id === 'D') return [poang(sum.dator.pts), s.ink];
+      if (s.id === 'K') return '';
+      if (s.id === 'D') return poang(sum.dator.pts);
       const p = P(s.id);
-      if (p.none) return ['', s.ink];
-      return [p.award === 'best' ? `<span class="rb-vann">${poang(p.pts)}${RING(70, 30)}</span>` : poang(p.pts), s.ink];
-    }), '');
+      if (p.none) return '';
+      return p.award === 'best' ? `<span class="rb-vann">${poang(p.pts)}${RING(70, 30)}</span>` : poang(p.pts);
+    }));
     const dom = domar(sum).map((d) => `<span class="rb-dom"><b>${esc(d.namn)}:</b>${esc(d.text)}</span>`).join('');
     const rub = sum.namn || (sum.nr ? `Kupong ${sum.nr}` : '');
-    const label = `Hasse Backes protokoll: kupongen ${sum.kupong.ok} rätt, ${sum.folk.filter((p) => !p.none).map((p) => `${p.namn} ${p.ok}`).join(', ')}, datorn ${sum.dator.ok}`;
+    const bakom = kol.filter((s) => s.id !== 'K' && !(P(s.id) && P(s.id).none)).map((s) => `${s.namn} ${s.id === 'D' ? sum.dator.ok : P(s.id).ok}`).join(', ');
+    const label = `Hasse Backes protokoll: kupongen ${sum.kupong.ok} rätt, ${bakom}`;
     return `<span class="rum-block n${kol.length}${tat ? ' tat' : ''}" style="--n:${kol.length}" role="img" aria-label="${esc(label)}">` +
       `<span class="rb-hu"><b>PROTOKOLL</b><span>${esc(rub)}</span></span>` +
-      `<span class="rb-g"><span class="rb-sp la">Match</span>${kol.map(huvud).join('')}<span class="rb-not"></span>${rader}${summa}${ensam}${pts}</span>` +
-      `<span class="rb-omd">${dom}</span></span>`;
+      `<span class="rb-g"><span class="rb-sp la">Match</span><span class="rb-sp la fa">Facit</span>${kol.map(huvud).join('')}${rader}${ratt}${pts}</span>` +
+      `<span class="rb-omd">${dom}<span class="rb-sign"><i>H. Backe</i></span></span></span>`;
   }
 
   // ---------- tidningen ----------
@@ -403,5 +356,5 @@
     }
   }
 
-  return { rakna, lappar, mandagEfter, bygg, noter, domar, html, tidning, rastrera, kronika, skrall, betyg, TEXT };
+  return { rakna, lappar, mandagEfter, bygg, domar, html, tidning, rastrera, kronika, skrall, betyg, TEXT };
 });

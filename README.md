@@ -5232,11 +5232,13 @@ och de nya raderna har Tomas röst först när iMacen har läst upp dem (till de
 ### Sammanställningen efter omgången
 
 När alla matcher i omgången är spelade ligger Hasse Backes protokoll över kupongen på pulten
-([public/rum-block.js](public/rum-block.js), [public/rum-block.css](public/rum-block.css)): ett Yatzy-block med en
-spalt för kupongen, var och en i gänget, Hasse själv när han har tippat och datorn. Rätt tecken står i var och ens
-bläck, fel är ett streck, och den som ensam hade rätt är inringad. Under står summan, *Ensam om rätt* och poängen, med
-vinnaren inringad. Hasse har rättat det: högst fyra anteckningar i marginalen, en dom per person längst ner och hans
-namnteckning. I telefonen får marginalen inte plats, så där står bara domarna.
+([public/rum-block.js](public/rum-block.js), [public/rum-block.css](public/rum-block.css)): ett Yatzy-block med
+resultat och facit för varje match, och en spalt för kupongen (gängets tre ansikten), var och en i gänget och Hasse.
+Allas tecken står kvar, så att man ser vad var och en spelade: det som satt är överstruket med grön penna, och i en
+gardering är tecknet som satt starkast. Under står *Rätt av 13* och poängen. Vinnaren är inringad, både på porträttet
+och runt poängen, och det är de enda ringarna på blocket. Hasse har rättat det: en dom per person längst ner och hans
+namnteckning. I telefonen försvinner namnen under porträtten och namnteckningen. Har Hasse inte tippat i omgången
+(han tävlar från omgången efter 2026-11-07) står det troligaste utfallet i hans spalt, utanför tävlingen.
 
 Ett klick på blocket lyfter det från pulten och lägger fram det stort över rummet, och *Lägg tillbaka*, Esc eller ett
 klick utanför lägger tillbaka det (`protokollet` i rum.js). Ett klick på
@@ -5244,7 +5246,7 @@ löpsedeln i fönstret öppnar tidningen med samma rubrik som sedeln, betygen, s
 rum.js). Gänget håller upp lappar med sina rätt (`lappar` i rum-3d.js): bara armen är upptagen, så de lever som
 vanligt. Lapparna står kvar till måndagen efter omgången kl. 16, också när nästa Stryktips redan har tagit över
 (`lappar` i rum-block.js läser då den förra omgången, `forra` i GET /samtal). Ett klick på någon i gänget med lappen
-uppe lägger ner den, och den ligger nere på enheten för den omgången (`lappNer` i rum.js). Datorns siffra står på
+uppe lägger ner den, och den ligger nere på enheten för den omgången (`lappNer` i rum.js). Modellens siffra står på
 videons blå ruta på håll.
 
 Allt räknas ur omgångens data och ser likadant ut på alla enheter. Med dolda resultat (Dölj resultat) syns inget av det,

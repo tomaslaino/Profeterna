@@ -3,89 +3,97 @@
    skuggfilter och blandning, och inget ritas om medan kameran står still. */
 
 /* ---------- blocket ---------- */
-.rum-block { --c: 51px; --not: 118px; --rad: 33px; display: block; box-sizing: border-box; width: 664px; padding: 19px 16px 12px 20px; color: #26211a; background: #f6f3e8; white-space: nowrap; text-align: left; box-shadow: 0 18px 28px rgba(0, 0, 0, 0.5), 0 2px 2px rgba(0, 0, 0, 0.25); font: 500 14px/1 Fraunces, Georgia, serif; }
-.rum-block.n6 { --c: 45px; }
-.rum-block.n6 .rb-m { font-size: 13.2px; }
-.rum-block.n6 .rb-c { font-size: 23px; }
+/* Tre saker att se: facit, allas tecken, och det som satt (en överstrykning). Ingen färg betyder
+   något annat än vems det är, och ingen ring utom vinnarens. */
+.rum-block { --c: 62px; --fa: 38px; --rad: 33px; --linje: #c6d3e0; --ratt: #d3e8ba; --bort: #857a6b; display: block; box-sizing: border-box; width: 664px; padding: 19px 18px 13px; color: #26211a; background: #f6f3e8; white-space: nowrap; text-align: left; box-shadow: 0 18px 28px rgba(0, 0, 0, 0.5), 0 2px 2px rgba(0, 0, 0, 0.25); font: 500 14px/1 Fraunces, Georgia, serif; }
+.rum-block.n6 { --c: 53px; }
 .rum-block.n6 .rb-nm.h2 { font-size: 16px; }
 .rum-block::before { content: ""; position: absolute; left: 0; right: 0; top: 0; height: 12px; background: #b9352a; }
-.rum-block .rb-hu { display: flex; align-items: baseline; gap: 14px; margin: 2px 0 4px; }
+.rum-block .rb-hu { display: flex; align-items: baseline; gap: 14px; margin: 2px 0 7px; }
 .rb-hu b { color: #b9352a; font: 400 29px/1 "Alfa Slab One", Fraunces, serif; letter-spacing: 0.04em; }
-.rb-hu span { min-width: 0; overflow: hidden; font: 700 22px/1.1 Caveat, cursive; color: #2d2a26; }
-.rb-g { display: grid; grid-template-columns: minmax(0, 1fr) repeat(var(--n), var(--c)) var(--not); }
-.rb-g > span { box-sizing: border-box; display: flex; align-items: center; justify-content: center; position: relative; }
-/* linjerna: alla rutor utom marginalen */
-.rb-g > :not(.rb-not) { border-bottom: 1px solid #a9bfd6; border-left: 1px solid #a9bfd6; }
-.rb-g > .rb-m, .rb-g > .la { border-left: 0; }
-.rb-m { justify-content: flex-start !important; gap: 5px; height: var(--rad); font: 500 14.2px/1 Fraunces, Georgia, serif; overflow: hidden; }
+.rb-hu span { min-width: 0; overflow: hidden; padding-right: 6px; font: 700 22px/1.1 Caveat, cursive; color: #2d2a26; }
+.rb-g { display: grid; grid-template-columns: minmax(0, 1fr) var(--fa) repeat(var(--n), var(--c)); }
+.rb-g > span { box-sizing: border-box; display: flex; align-items: center; justify-content: center; position: relative; border-bottom: 1px solid var(--linje); }
+/* matchen */
+.rb-m { justify-content: flex-start !important; gap: 6px; height: var(--rad); font: 500 15px/1 Fraunces, Georgia, serif; overflow: hidden; }
 .rb-m u { flex: none; width: 18px; text-align: right; text-decoration: none; color: #8b7d68; font-weight: 700; font-size: 13px; }
-.rb-m > span { flex: 1; min-width: 0; overflow: hidden; }
-.rb-m em { flex: none; padding-left: 4px; margin-right: 7px; font: 500 13px/1 Inter, "Helvetica Neue", sans-serif; font-style: normal; color: #6b6052; font-variant-numeric: tabular-nums; }
-.rb-sp { flex-direction: column; gap: 3px; min-height: 66px; padding: 4px 0; border-top: 2px solid #26211a; border-bottom: 2px solid #26211a !important; }
-.rb-sp.la { align-items: flex-start; justify-content: flex-end; padding: 0 0 5px 4px; color: #8b7d68; font: 700 12px/1 Inter, sans-serif; letter-spacing: 0.08em; text-transform: uppercase; }
-.rb-sp img { display: block; box-sizing: border-box; width: 35px; height: 35px; border-radius: 50%; object-fit: cover; border: 2.5px solid var(--i); }
-.rb-ik { display: grid; place-items: center; box-sizing: border-box; width: 35px; height: 35px; border-radius: 4px; }
-.rb-ik.k { background: #c35f36; color: #fff4e4; font: 800 20px/1 Fraunces, serif; }
-.rb-ik.d { background: #1c2fa8; color: #e8eeff; border: 2.5px solid #6d7686; border-radius: 6px; font: 400 14px/1 VT323, monospace; }
+.rb-m > span { flex: 1; min-width: 0; overflow: hidden; line-height: 1.5; }
+.rb-m em { flex: none; padding-left: 4px; margin-right: 8px; font: 600 13.5px/1 Inter, "Helvetica Neue", sans-serif; font-style: normal; color: #4d4438; font-variant-numeric: tabular-nums; }
+/* facit: tryckt, det enda på raden som inte är någons gissning */
+.rb-fa { font: 800 18px/1 Fraunces, Georgia, serif; color: #26211a; }
+/* spalthuvudena */
+.rb-g > .rb-sp { flex-direction: column; gap: 4px; min-height: 68px; padding: 4px 0 5px; border-top: 2px solid #26211a; border-bottom: 2px solid #26211a; }
+.rb-g > .rb-sp.la { align-items: flex-start; justify-content: flex-end; padding: 0 0 6px 4px; color: #8b7d68; font: 700 11px/1 Inter, sans-serif; letter-spacing: 0.08em; text-transform: uppercase; }
+.rb-g > .rb-sp.la.fa { align-items: center; padding-left: 0; letter-spacing: 0.04em; }
+.rb-sp img { display: block; box-sizing: border-box; width: 38px; height: 38px; border-radius: 50%; object-fit: cover; border: 2.5px solid var(--i); }
+.rb-ik { display: grid; place-items: center; box-sizing: border-box; width: 38px; height: 38px; border-radius: 50%; color: #fff; font: 800 18px/1 Fraunces, serif; }
+/* kupongen: gängets tre ansikten, och spalten en aning mörkare än de andra */
+.rb-bild { position: relative; display: block; }
+.rb-bild .rb-ring { inset: -5px; width: calc(100% + 10px); height: calc(100% + 10px); }
+.rb-lag { display: flex; height: 38px; align-items: center; }
+.rb-lag img { width: 24px; height: 24px; border-width: 2px; }
+.rb-lag img + img { margin-left: -8px; }
+.rb-g > .k { background: #ebe6d5; }
 .rb-nm { color: inherit; line-height: 1; }
-.rb-nm.kup { font: 700 10px/1 Fraunces, serif; }
-.rb-nm.dat { color: #55606b; font: 400 11px/1 "Special Elite", monospace; }
-.rb-nm.h0 { color: #2146a6; font: 400 12px/1 "Cedarville Cursive", Caveat, cursive; }
-.rb-nm.h1 { color: #16784b; font: 400 15px/1 "Mr Dafoe", Caveat, cursive; }
-.rb-nm.h2 { color: #6d3aa8; font: 400 18px/1 "Reenie Beanie", Caveat, cursive; }
-.rb-nm.h3 { color: #8a6a0c; font: 700 14px/1 Caveat, cursive; }
-.rb-c { height: var(--rad); font: 700 25px/1 Caveat, cursive; }
-.rb-c.dat { font: 400 16px/1 "Special Elite", monospace; }
-.rb-c.fel::before { content: ""; width: 58%; height: 1.8px; border-radius: 1px; background: rgba(70, 62, 50, 0.46); transform: rotate(var(--r, -10deg)); }
+.rb-nm.kup { font: 700 12px/1 Fraunces, serif; color: #26211a; }
+.rb-nm.h0 { color: #2146a6; font: 400 13px/1 "Cedarville Cursive", Caveat, cursive; }
+.rb-nm.h1 { color: #16784b; font: 400 16px/1 "Mr Dafoe", Caveat, cursive; }
+.rb-nm.h2 { color: #6d3aa8; font: 400 19px/1 "Reenie Beanie", Caveat, cursive; }
+.rb-nm.h3 { color: #8a6a0c; font: 700 17px/1 Caveat, cursive; }
+/* tecknen: allas står kvar, det som satt är överstruket och starkast */
+.rb-c { height: var(--rad); color: var(--bort); font: 700 25px/1 Caveat, cursive; }
+.rb-g > .rb-c.ratt { color: color-mix(in srgb, var(--i) 50%, var(--ratt)); background: linear-gradient(var(--ratt), var(--ratt)) center / calc(100% - 8px) calc(100% - 7px) no-repeat; }
+.rb-g > .rb-c.ratt.k { background-color: #ebe6d5; }
+.rb-c b { font-weight: 700; color: var(--i); }
+/* summorna */
+.rb-g > .rb-su { font: 700 15px/1 Inter, sans-serif; }
+.rb-g > .rb-su.la { grid-column: span 2; justify-content: flex-start; padding-left: 4px; font: 700 11px/1 Inter, sans-serif; letter-spacing: 0.08em; text-transform: uppercase; color: #26211a; }
+.rb-g > .rb-su.tot:not(.la) { height: 44px; font: 700 34px/1 Caveat, cursive; }
+.rb-g > .rb-su.tot { border-top: 2px solid #26211a; }
+.rb-g > .rb-su.po:not(.la) { height: 30px; font: 700 20px/1 Caveat, cursive; font-variant-numeric: tabular-nums; }
 .rb-ring { position: absolute; inset: 3px 5px; width: calc(100% - 10px); height: calc(100% - 6px); overflow: visible; pointer-events: none; }
 .rb-ring path { stroke: #c8281e; stroke-width: 2.4; stroke-linecap: round; }
-.rb-su { font: 700 15px/1 Inter, sans-serif; }
-.rb-g > .rb-su.la { justify-content: flex-start !important; padding-left: 4px; font: 700 11px/1 Inter, sans-serif; letter-spacing: 0.08em; text-transform: uppercase; color: #26211a !important; }
-.rb-su.tot { height: 44px; border-top: 2px solid #26211a; font: 700 33px/1 Caveat, cursive; }
-.rb-su.n { height: 28px; font: 700 22px/1 Caveat, cursive; }
-.rb-su.po { height: 28px; font: 700 19px/1 Caveat, cursive; font-variant-numeric: tabular-nums; }
-.rb-vann { position: relative; display: inline-block; padding: 3px 7px; }
+.rb-vann { position: relative; display: inline-block; padding: 3px 8px; }
 .rb-vann .rb-ring { inset: 0; width: 100%; height: 100%; }
-/* marginalen: i Hasses penna, samma som på notan */
-.rb-g > .rb-not { height: 0; align-self: start; justify-content: flex-start; align-items: flex-start; overflow: visible; padding-left: 8px; }
-.rb-not i { position: relative; display: block; width: 112px; padding-left: 4px; color: #27408b; font: 700 20.5px/0.98 Caveat, cursive; white-space: normal; transform: rotate(-2.5deg); transform-origin: 0 50%; }
-.rb-not i::before { content: ""; position: absolute; left: -7px; top: 9px; width: 8px; height: 1.8px; background: #27408b; }
-.rb-g > .rb-sign { grid-row: span 3; height: auto; align-self: center; align-items: center; }
-.rb-sign i { width: auto; padding: 0 4px 2px 0; border-bottom: 2px solid #27408b; font-size: 31px; line-height: 1; white-space: nowrap; transform: rotate(-5deg); }
-.rb-sign i::before { display: none; }
-.rb-omd { display: block; margin-top: 9px; color: #27408b; font: 700 22px/1 Caveat, cursive; }
-.rb-dom { display: flex; align-items: flex-end; box-sizing: border-box; height: 27px; padding-bottom: 2px; border-bottom: 1px solid #a9bfd6; overflow: hidden; }
+/* domarna och namnteckningen: i Hasses penna, samma som på notan */
+.rb-omd { position: relative; display: block; margin-top: 8px; color: #27408b; font: 700 22px/1 Caveat, cursive; }
+.rb-dom { display: flex; align-items: flex-end; box-sizing: border-box; height: 27px; padding-bottom: 2px; border-bottom: 1px solid var(--linje); overflow: hidden; }
 .rb-dom b { flex: none; width: 94px; font-weight: 700; }
+.rb-sign { position: absolute; right: 8px; bottom: 5px; }
+.rb-sign i { display: block; padding: 0 4px 2px 0; border-bottom: 2px solid #27408b; color: #27408b; font: 700 31px/1 Caveat, cursive; transform: rotate(-5deg); }
 
-/* den smala: telefonen, utan marginal */
-.rum-block.tat { --c: 37px; --not: 0px; --rad: 28px; width: 374px; padding: 16px 8px 8px; }
-.rum-block.tat.n6 { --c: 31px; }
-.rum-block.tat.n6 .rb-m { font-size: 10.6px; gap: 2px; }
-.rum-block.tat.n6 .rb-m u { width: 11px; }
-.rum-block.tat.n6 .rb-c { font-size: 19px; }
-.tat .rb-g { grid-template-columns: minmax(0, 1fr) repeat(var(--n), var(--c)); }
-.tat .rb-not:not(.rb-sign), .tat .rb-sign { display: none; }
+/* den smala: telefonen, med ansiktena som spalthuvuden */
+.rum-block.tat { --c: 33px; --fa: 24px; --rad: 28px; width: 374px; padding: 16px 8px 8px; }
+.rum-block.tat.n6 { --c: 28px; }
+.rum-block.tat.n6 .rb-c { font-size: 18px; }
 .tat .rb-hu { gap: 7px; margin: 0 0 3px 3px; }
 .tat .rb-hu b { font-size: 20px; }
 .tat .rb-hu span { font-size: 15px; }
-.tat .rb-m { gap: 3px; font-size: 11.6px; }
+.tat .rb-m { gap: 3px; font-size: 11.2px; }
 .tat .rb-m u { width: 13px; font-size: 10px; }
 .tat .rb-m em { font-size: 10px; margin-right: 3px; padding-left: 2px; }
-.tat .rb-sp { min-height: 34px; padding: 3px 0; }
+.tat .rb-fa { font-size: 14px; }
+.rb-g > .rb-sp { min-width: 0; }
+.tat .rb-g > .rb-sp { min-height: 34px; padding: 3px 0; }
+.tat .rb-g > .rb-sp.la { padding: 0 0 4px 3px; font-size: 9px; }
+.tat .rb-g > .rb-sp.la.fa { padding-left: 0; font-size: 8px; letter-spacing: 0; }
 .tat .rb-sp img, .tat .rb-ik { width: 27px; height: 27px; }
-.tat .rb-ik.k { font-size: 15px; }
-.tat .rb-ik.d { font-size: 11px; }
+.tat .rb-lag { height: 27px; }
+.tat .rb-lag img { width: 15px; height: 15px; border-width: 1.5px; }
+.tat .rb-lag img + img { margin-left: -5px; }
 .tat .rb-nm { display: none; }
-.tat .rb-c { font-size: 21px; }
-.tat .rb-c.dat { font-size: 12px; }
-.tat .rb-su.tot { height: 34px; font-size: 26px; }
-.tat .rb-su.n { height: 22px; font-size: 16px; }
-.tat .rb-su.po { height: 22px; font-size: 13.5px; }
-.tat .rb-su.la { font-size: 9.5px; letter-spacing: 0.04em; }
-.tat .rb-vann { padding: 2px 4px; }
+.tat .rb-c { font-size: 19.5px; }
+.tat .rb-g > .rb-c.ratt { background-size: calc(100% - 2px) calc(100% - 5px); }
+.tat .rb-g > .rb-su.tot:not(.la) { height: 34px; font-size: 26px; }
+.tat .rb-g > .rb-su.po:not(.la) { height: 24px; font-size: 13.5px; }
+.tat .rb-g > .rb-su.la { padding-left: 3px; font-size: 9.5px; letter-spacing: 0.04em; }
+.tat .rb-vann { padding: 2px 3px; }
+.tat .rb-vann .rb-ring { inset: -1px -2px; width: calc(100% + 4px); height: calc(100% + 2px); }
+.tat .rb-vann .rb-ring path { stroke-width: 1.5; }
 .tat .rb-omd { margin: 6px 3px 0; font-size: 19px; }
 .tat .rb-dom { height: 23px; }
 .tat .rb-dom b { width: 80px; }
+.tat .rb-sign { display: none; }
 
 /* på pulten: över kupongen, i kupongens plan */
 #rum-kupong:has(> .rum-block) > .pencil { visibility: hidden; }
