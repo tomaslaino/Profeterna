@@ -135,10 +135,10 @@ function tpScore(round, now) {
 // ---------- rutan ----------
 
 const tpPts = (x) => {
-  const v = Math.round(x * 10) / 10;
+  const v = Tippoang.runda(x);
   return v > 0 ? `+${kpNum(v)}` : v < 0 ? `−${kpNum(-v)}` : kpNum(0);
 };
-const tpTone = (x) => (Math.round(x * 10) > 0 ? 'pos' : Math.round(x * 10) < 0 ? 'neg' : '');
+const tpTone = (x) => (Tippoang.runda(x) > 0 ? 'pos' : Tippoang.runda(x) < 0 ? 'neg' : '');
 const tpInitials = (p) => (p.model ? 'Mod.' : p.id);
 
 function tpBadge(p, done) {

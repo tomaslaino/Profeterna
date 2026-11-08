@@ -123,7 +123,7 @@ window.Kronan = (() => {
   const FEATHER = '<svg viewBox="0 0 10 30" aria-hidden="true"><path d="M5 0C9 7 9 20 5 30C1 20 1 7 5 0z" fill="#f3ead9" stroke="#9c8a68" stroke-width=".6"/><path d="M5 3V29" stroke="#9c8a68" stroke-width=".6"/></svg>';
 
   const esc2 = (s) => (typeof esc === 'function' ? esc(s) : String(s));
-  const tone = (x) => (Math.round(x * 10) > 0 ? 'pos' : Math.round(x * 10) < 0 ? 'neg' : '');
+  const tone = (x) => (Tippoang.runda(x) > 0 ? 'pos' : Tippoang.runda(x) < 0 ? 'neg' : '');
 
   // Bara efternamnet syns – alla i gänget heter Daniel.
   function name(p) {

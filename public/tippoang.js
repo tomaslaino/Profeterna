@@ -70,8 +70,16 @@
     return { n: done.length, ok: done.filter((r) => r.hit).length, pts: done.reduce((a, r) => a + r.pts, 0) };
   }
 
+  // Poängen med en decimal, som den skrivs ut: en femma avrundas bort från noll, så att
+  // −0,75 blir −0,8 precis som +0,75 blir +0,8. Math.round ensamt ger −0,7, och
+  // summor av hundradelar kan landa en aning bredvid femman, därav tillägget.
+  const runda = (x) => {
+    const v = Math.round(Math.abs(x) * 10 + 1e-9) / 10;
+    return x < 0 && v ? -v : v;
+  };
+
   // Placeringen följer det som syns: poängen med en decimal, sedan antal rätt.
-  const key = (t) => Math.round(t.pts * 10) * 1000 + t.ok;
+  const key = (t) => Math.round(runda(t.pts) * 10) * 1000 + t.ok;
 
   // Tipparna i placeringsordning. Med played (någon match avgjord) får högst
   // award 'best' och lägst 'worst' – bara när det finns en skillnad, och
@@ -121,5 +129,5 @@
     return { people: [...by.values()].sort((a, b) => key(b) - key(a)), model };
   }
 
-  return { SIGNS, BASE, HASSE, SLAG, regelFor, slag, regelOver, regelKlar, sign, pct, chance, modelSign, points, tally, key, rank, season };
+  return { SIGNS, BASE, HASSE, SLAG, regelFor, slag, regelOver, regelKlar, sign, pct, chance, modelSign, points, tally, runda, key, rank, season };
 });

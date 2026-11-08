@@ -37,7 +37,7 @@ window.Betyg = (() => {
   const esc2 = (s) => (typeof esc === 'function' ? esc(s) : String(s));
   const num1 = (x) => x.toLocaleString('sv-SE', { minimumFractionDigits: 1, maximumFractionDigits: 1 });
   const signed = (x) => {
-    const v = Math.round(x * 10) / 10;
+    const v = Tippoang.runda(x);
     return v > 0 ? `+${num1(v)}` : v < 0 ? `−${num1(-v)}` : num1(0);
   };
   const odds = (o) => (typeof fmtOdds === 'function' ? fmtOdds(o) : o.toFixed(2).replace('.', ','));

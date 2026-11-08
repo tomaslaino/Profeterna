@@ -31,7 +31,7 @@
   const KUPONG = { id: 'K', namn: 'Kupong', ink: '#26211a' };
   const HASSE = 'HB';
   const poang = (x) => {
-    const v = Math.round(x * 10) / 10;
+    const v = Tippoang.runda(x);
     const t = String(Math.abs(v)).replace('.', ',');
     return v > 0 ? `+${t}` : v < 0 ? `−${t}` : t;
   };
