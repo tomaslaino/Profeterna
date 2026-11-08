@@ -1,6 +1,6 @@
 # Tobaksaffären tillsammans (worker/rummet.mjs): vilka i gänget som har
 # rummet öppet och vad de pekar på, genom en websocket till ett Durable
-# Object. Egen tjänst, skild från kupongtjänsten (kupong.toml). Driftsätts för
+# Object – och gängets kupong i realtid (worker/kupongen.mjs). Egen tjänst, skild från kupongtjänsten (kupong.toml). Driftsätts för
 # hand från en dator:
 #
 #   npx wrangler@4.147.0 deploy --config worker/rummet.toml
@@ -18,3 +18,11 @@ class_name = "Rummet"
 [[migrations]]
 tag = "v1"
 new_sqlite_classes = ["Rummet"]
+
+[[durable_objects.bindings]]
+name = "KUPONGEN"
+class_name = "Kupongen"
+
+[[migrations]]
+tag = "v2"
+new_sqlite_classes = ["Kupongen"]

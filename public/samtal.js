@@ -38,8 +38,9 @@
 //
 // Omgången och tipsen ligger i tjänsten profeterna-kupong (worker/samtal.mjs,
 // GET/POST …/samtal; lokalt /api/samtal), som håller tipsen dolda. Den som
-// har lämnat in ser de andras tips, på alla sina enheter. Vem man är och
-// gängets tecken under uppgörelsen sparas bara på enheten.
+// har lämnat in ser de andras tips, på alla sina enheter. Vem man är sparas bara
+// på enheten. Gängets tecken under uppgörelsen och vilka matcher som är klubbade
+// delas i realtid mellan alla som ser kupongen (se Gängets kupong i realtid nedan).
 //
 // Läses efter app.js och kupong.js och använder deras hjälpare (KP, SIGNS,
 // matchById, isOpen, pickable, gradeRow, roundSteps …). kupong.js ritar vyerna
@@ -149,6 +150,7 @@
   const bytVem = (s, id) => {
     if (s && !s.visas && submitted(s, me())) Object.assign(s, { tips: null, efter: null });
     kpStore(VEM, id);
+    liveKoll();
   };
   // Dina inlämnade tips går att ändra tills matcherna startar, på vilken av
   // dina enheter som helst – på papperet, så länge det bara visar dina.
@@ -183,6 +185,7 @@
     if (SM.data && !SM.data.visas && submitted(SM.data, v)) {
       await send({ gor: 'se', id: SM.data.id, vem: v, ...oldKey(SM.data) });
     }
+    liveKoll();
   }
 
   async function send(body) {
@@ -194,6 +197,7 @@
     } catch { /* ingen kontakt */ }
     if (res && res.ok && out.ok) {
       if ('samtal' in out) SM.data = out.samtal;
+      liveKoll();
       return out;
     }
     // 409: omgången har bytts, du har redan lämnat in eller tipsen visas
@@ -516,9 +520,10 @@
   // En match klubbas – eller alla omtvistade (id = null), när gängets kupong sparas.
   function klubba(s, id, rows = null) {
     const k = klar(s, rows || analyse(s));
-    if (id) k.add(id);
-    else for (const r of rows || analyse(s)) if (r.strid) k.add(r.x.id);
+    const nya = id ? [id] : (rows || analyse(s)).filter((r) => r.strid).map((r) => r.x.id);
+    for (const x of nya) k.add(x);
     sparaKlubbat(s.id, k);
+    dela(s, { klubba: nya });
   }
 
   // Förslaget efter regeln, ur allas tips: varje tecken får det gänget har
@@ -669,12 +674,16 @@
       const b = r.querySelector('[data-valj]');
       if (b) b.setAttribute('aria-expanded', String(r.dataset.id === id));
     }
-    const el = $('#sm-lapp');
-    if (el) el.innerHTML = id ? lapp(s, rows, done, id) : '';
+    // (bara det som har ändrats, så att det som är framme står kvar när någon annan kryssar)
+    const skriv = (e, html) => {
+      if (!e || e.skrivet === html) return;
+      e.skrivet = html;
+      e.innerHTML = html;
+    };
+    skriv($('#sm-lapp'), id ? lapp(s, rows, done, id) : '');
     const k = $('#sm-kvar');
     if (k) k.textContent = kvarText(rows, done);
-    const act = $('#sm-act-in');
-    if (act) act.innerHTML = boardActions(s, rows, decisions(s, rows));
+    skriv($('#sm-act-in'), boardActions(s, rows, decisions(s, rows)));
   }
 
   // Gängets tecken under uppgörelsen, på enheten. Tills man själv har tryckt på
@@ -684,11 +693,162 @@
   const proposal = (rows) => Object.fromEntries(rows.filter((r) => r.proposal).map((r) => [r.x.id, r.proposal]));
   function decisions(s, rows) {
     const saved = kpLoad(DECIDE);
-    if (saved && saved.id === s.id && saved.val && saved.own) return saved.val;
     const c = existing(s);
-    return c
-      ? Object.fromEntries(c.matches.filter((x) => rows.some((r) => r.x.id === x.id)).map((x) => [x.id, x.sign]))
-      : proposal(rows);
+    const sparat = c && Object.fromEntries(c.matches.filter((x) => rows.some((r) => r.x.id === x.id)).map((x) => [x.id, x.sign]));
+    if (saved && saved.id === s.id && saved.val && saved.own) {
+      if (!c) return saved.val;
+      // Kryssen delas med alla, men en match som har låsts står som den sparades.
+      const val = { ...saved.val };
+      for (const r of rows) {
+        if (r.open) continue;
+        if (sparat[r.x.id]) val[r.x.id] = sparat[r.x.id];
+        else delete val[r.x.id];
+      }
+      return val;
+    }
+    return c ? sparat : proposal(rows);
+  }
+
+  // Börja om: tecknen som fler än hälften har med, och inget är klubbat.
+  function borjaOm(s) {
+    const val = proposal(analyse(s));
+    kpStore(DECIDE, { id: s.id, val, own: true });
+    sparaKlubbat(s.id, []); // förslaget igen: inget är klubbat
+    dela(s, { satt: { val, klar: [] } });
+  }
+
+  // ---------- gängets kupong i realtid ----------
+
+  // Den som kryssar i uppgörelsen – på papperet här eller på pulten i tobaksaffären
+  // – gör det på allas kupong: varje ändring går genom tjänsten profeterna-rummet
+  // (worker/kupongen.mjs, public/samtal-live.js) till alla som ser kupongen, och
+  // ritas där utan att något annat på sidan rör sig. Läget står kvar i tjänsten,
+  // så att den som kommer in sent ser samma kupong, och skrivs på enheten som
+  // förut (DECIDE, KLUBBAT), så att allt annat här ritas som det alltid har
+  // gjorts – också utan tjänsten, då var och en bara ser sin kupong. Uppkopplingen
+  // finns bara när du får se de andras tips, medan någon match går att fylla i.
+  // Den som har kryssat syns i sin färg en stund runt rutan.
+  const liveAdress = () => {
+    const r = info() && info().rummet;
+    return r ? r.replace(/\/rum$/, '/kupong') : null;
+  };
+  function liveKoll() {
+    if (!window.SamtalLive) return;
+    const s = SM.data;
+    const url = liveAdress();
+    const ser = s && s.tips && Object.keys(s.tips).length >= (s.visas ? 1 : 2);
+    const min = (KP.data && KP.data.efterAvspark) || 0;
+    if (url && ser && !document.hidden && Date.now() < Math.max(...kicks(s)) + min * 60000) SamtalLive.folj(url, s.id, me(), tagEmot);
+    else SamtalLive.slapp();
+  }
+  document.addEventListener('visibilitychange', liveKoll);
+  // En ändring till de andra. bas: vad den här enheten utgår från, som gäller när
+  // ingen har kryssat än (förslaget, eller kupongen om den redan är sparad).
+  function dela(s, op) {
+    if (!window.SamtalLive) return;
+    const rows = analyse(s);
+    SamtalLive.skicka({ ...op, bas: { val: decisions(s, rows), klar: [...klar(s, rows)] } });
+  }
+  // Läget i tjänsten ändrades: någon har kryssat, eller du, när svaret skiljer
+  // sig från det du ser.
+  function tagEmot(lage, egen) {
+    const s = SM.data;
+    if (!s) return;
+    if (!lage) {
+      // Ingen har kryssat än i tjänsten, men här: de andra ska se det.
+      const saved = kpLoad(DECIDE);
+      if (saved && saved.id === s.id && saved.own) dela(s, {});
+      return;
+    }
+    if (lage.id !== s.id) return;
+    const rows = analyse(s);
+    const forr = decisions(s, rows);
+    const forrK = klar(s, rows);
+    kpStore(DECIDE, { id: s.id, val: lage.val, own: true });
+    sparaKlubbat(s.id, lage.klar);
+    const sparad = Boolean(lage.sparad && addPendingFrom(lage.sparad.coupon, lage.sparad.older));
+    const nu = decisions(s, rows);
+    const nuK = klar(s, rows);
+    const andrat = rows.filter((r) => (forr[r.x.id] || '') !== (nu[r.x.id] || '')).map((r) => r.x.id);
+    const klubbat = rows.filter((r) => forrK.has(r.x.id) !== nuK.has(r.x.id)).map((r) => r.x.id);
+    if (!andrat.length && !klubbat.length && !sparad) return;
+    const av = egen ? null : lage.av;
+    SM.again = false;
+    if (here('')) ritaLive(s, rows, av, andrat);
+    else if (onHome() && (klubbat.length || sparad)) redraw();
+    else if (sparad && KP.view && KP.view.mode === 'show') redraw();
+    // kupongen på pulten och i handen i tobaksaffären (rum.js)
+    dispatchEvent(new CustomEvent('gangets-kupong', { detail: { andrat, av: av && pnum(av) } }));
+  }
+  // Papperet i uppgörelsen ritas om där något har ändrats: rutorna, bocken och
+  // foten. Porträtten blinkar inte, och det du skriver eller läser står kvar.
+  function ritaLive(s, rows, av, andrat) {
+    const blad = $('#sm-sheet');
+    if (!blad || !blad.classList.contains('sm-up')) return;
+    // en match som har börjat har sin rättning på raden
+    if (andrat.some((id) => rows.some((r) => r.x.id === id && r.g.res != null))) {
+      renderRound();
+      return;
+    }
+    const val = decisions(s, rows);
+    const done = klar(s, rows);
+    for (const r of rows) {
+      const id = r.x.id;
+      const rad = blad.querySelector(`.sm-r[data-id="${CSS.escape(id)}"]`);
+      if (!rad) continue;
+      const sign = val[id] || '';
+      for (const b of rad.querySelectorAll('button[data-s]')) {
+        const on = sign.includes(b.dataset.s);
+        if ((b.getAttribute('aria-pressed') === 'true') === on) continue;
+        b.setAttribute('aria-pressed', String(on));
+        const i = b.querySelector('.sm-bx > i');
+        const x = i && i.querySelector('.pp-x');
+        if (on && i && !x) i.insertAdjacentHTML('beforeend', Papper.cross(`${id}${b.dataset.s}`));
+        else if (!on && x) x.remove();
+        const odds = b.querySelector('small');
+        if (odds) odds.classList.toggle('on', on);
+        if (av) markera(b, pnum(av));
+      }
+      rad.classList.toggle('unsigned', r.open && !sign);
+      const sr = rad.querySelector('.pp-sr');
+      if (sr) sr.textContent = sr.textContent.replace(/^[^.]*\./, `${srSign(sign, null)}.`);
+      if (r.strid) {
+        const k = done.has(id);
+        if (k !== rad.classList.contains('klubbad')) {
+          rad.classList.toggle('klubbad', k);
+          const bo = rad.querySelector('.sm-bock');
+          if (k && !bo) rad.querySelector('.pp-nr').insertAdjacentHTML('beforeend', bock(id, true));
+          else if (!k && bo) bo.remove();
+        }
+      }
+    }
+    const fot = blad.querySelector('.sm-foot');
+    if (fot) fot.innerHTML = fieldList(footFields(s, val, s.gang.length));
+    if (blad.classList.contains('need') && !rows.some((r) => r.open && !val[r.x.id])) blad.classList.remove('need');
+    const msg = $('#sm-msg');
+    if (msg) msg.textContent = '';
+    keepFocus(() => visaLapp(s));
+  }
+  // Rutan som någon annan just kryssade, i hens färg en stund.
+  function markera(b, n) {
+    const x = b.querySelector('.sm-bx');
+    const K = ['sm-andrad', 'sm-k0', 'sm-k1', 'sm-k2', 'sm-k3', 'sm-k4'];
+    clearTimeout(x.andradT);
+    x.classList.remove(...K);
+    void x.offsetWidth;
+    x.classList.add('sm-andrad', `sm-k${n}`);
+    x.andradT = setTimeout(() => x.classList.remove(...K), 1900);
+  }
+  // Gängets kupong har sparats härifrån (postCoupon i kupong.js, också från Ny
+  // kupong, Ändra och Ladda upp system): kryssen blir kupongens, och knappen Sparad hos alla.
+  function sparadKupong(c, older) {
+    const s = SM.data;
+    if (!window.SamtalLive || !SamtalLive.foljer() || !s || !covers(c)) return;
+    const ids = new Set(s.matcher.map((x) => x.id));
+    const rows = analyse(s);
+    const val = Object.fromEntries(c.matches.filter((x) => ids.has(x.id)).map((x) => [x.id, x.sign]));
+    kpStore(DECIDE, { id: s.id, val, own: true });
+    SamtalLive.skicka({ satt: { val, klar: [...klar(s, rows)] }, sparad: { coupon: c, older } });
   }
 
   // Uppgörelsen (steg 3): samma papper som när alla tippar, med allas
@@ -867,7 +1027,7 @@
     const tick = cls === 'ok' || cls === 'no' ? Papper.tick(id, cls === 'ok') : '';
     const res = g.state === 'upcoming' || g.state === 'missing' ? ''
       : `<span class="sm-res"><span class="sm-res-s">${Papper.result(g)}</span>${tick}</span>`;
-    const sr = `${sign ? `Gängets tecken ${sign}${hit === true ? ', rätt' : hit === false ? ', fel' : ''}` : 'Inget tecken'}. ` +
+    const sr = `${srSign(sign, hit)}. ` +
       ids.map((k) => `${k}: ${SIGNS.filter((sg, i) => who[i].includes(k)).join('') || 'inget'}`).join(', ');
     return `<div class="sm-r s-${cls.replace(' ', ' s-')}${pick && open && !sign ? ' unsigned' : ''}${out ? ' sm-out' : ''}${strid ? ' strid' : ''}${klubbad ? ' klubbad' : ''}${vald ? ' vald' : ''}${tat && lugn ? ' lugn' : ''}" data-id="${esc(id)}">` +
       `<span class="pp-nr">${nr}${strid ? Papper.ring(`s${id}`, 'sm-strid', 25) + (klubbad ? bock(id, SM.nyBock === id) : '') : ''}</span>` +
@@ -888,6 +1048,8 @@
           ` aria-label="${esc(`${label}, ${sg}: ${who[i].length ? who[i].join(', ') : 'ingen'}`)}">${b}${odds}</button>`;
       }).join('') + '</div>';
   }
+
+  const srSign = (sign, hit) => (sign ? `Gängets tecken ${sign}${hit === true ? ', rätt' : hit === false ? ', fel' : ''}` : 'Inget tecken');
 
   // Bocken vid ringen när en omtvistad match är klubbad (ny: den dras nu).
   const bock = (id, ny = false) => Papper.tick(`k${id}`, true).replace('class="pp-tick"', `class="sm-bock${ny ? ' ny' : ''}"`).replace('<path ', '<path pathLength="1" ');
@@ -1114,8 +1276,7 @@
       }
       // Börja om: tecknen som fler än hälften har med.
       if (e.target.closest('#sm-reset')) {
-        kpStore(DECIDE, { id: s.id, val: proposal(analyse(s)), own: true });
-        sparaKlubbat(s.id, []); // förslaget igen: inget är klubbat
+        borjaOm(s);
         SM.again = false;
         SM.vald = undefined;
         renderRound();
@@ -1152,6 +1313,7 @@
       if (next) saved.val[id] = next;
       else delete saved.val[id];
       kpStore(DECIDE, saved);
+      dela(s, { match: id, tecken: next });
       SM.again = false;
       renderRound();
     });
@@ -2174,14 +2336,14 @@
       const s = SM.data;
       if (!s) return;
       if (id == null) {
-        kpStore(DECIDE, { id: s.id, val: proposal(analyse(s)), own: true });
-        sparaKlubbat(s.id, []);
+        borjaOm(s);
         return;
       }
       const saved = { id: s.id, val: { ...decisions(s, analyse(s)) }, own: true };
       if (tecken) saved.val[id] = tecken;
       else delete saved.val[id];
       kpStore(DECIDE, saved);
+      dela(s, { match: id, tecken });
     },
     // En omtvistad match är klubbad, som ett klick på raden här (klubba).
     klubba(id) {
@@ -2236,5 +2398,5 @@
   const made = () => (SM.data && SM.data.visas ? existing(SM.data) : null);
   const watch = () => { if (active() && !SM.data.visas) poll(); };
 
-  window.Samtal = { show, load, active, covers, teaser, ids, visible, made, watch, paper, title, pult, keep: keepFocus, name: () => nameOf(SM.data), redraw: () => { if (here('')) renderRound(); } };
+  window.Samtal = { show, load, active, covers, teaser, ids, visible, made, watch, paper, title, pult, sparadKupong, keep: keepFocus, name: () => nameOf(SM.data), redraw: () => { if (here('')) renderRound(); } };
 })();

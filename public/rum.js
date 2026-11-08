@@ -3971,7 +3971,7 @@ ${window.RumRegister ? RumRegister.nara() : ''}
   }
 
   // Uppgörelsen: en ruta kryssas i eller ur för gängets tecken, med
-  // kulspetspennan, och tecknen sparas på enheten som på papperet
+  // kulspetspennan, och tecknen sparas och delas med de andra som på papperet
   // (Samtal.pult.besluta).
   function tickGang(b) {
     const k = R.kup;
@@ -4130,6 +4130,62 @@ ${window.RumRegister ? RumRegister.nara() : ''}
     k.idle = setTimeout(() => vanta(k, row), 900);
   }
 
+  // Någon annan kryssade på gängets kupong (gängets kupong i realtid, samtal.js):
+  // kryssen, bockarna och foten följer med, på kupongen i handen och den på pulten.
+  // I handen syns den som kryssade i sin färg en stund runt rutan, och pennan går
+  // vidare när en match har klubbats.
+  addEventListener('gangets-kupong', (e) => {
+    if (!R.el || !R.on) return;
+    const k = R.kup;
+    if (k && k.slag === 'gang' && !k.closing) gangLive(k, e.detail);
+    else if (!k) gangPult();
+  });
+  function gangLive(k, { av }) {
+    const g = Samtal.pult.gang();
+    if (!g) return;
+    const andrade = setSigns(g.val, true);
+    let klubbat = false;
+    for (const row of k.el.querySelectorAll('.row.strid')) {
+      const id = row.dataset.id;
+      const sk = row.querySelector('.skal');
+      if (sk) sk.innerHTML = skal(g, id, g.val);
+      const pa = g.klar.includes(id);
+      if (pa === row.classList.contains('klubbad')) continue;
+      klubbat = true;
+      row.classList.toggle('klubbad', pa);
+      const nr = row.querySelector('.pp-nr');
+      const b = nr.querySelector('.rum-bock');
+      if (pa && !b) nr.insertAdjacentHTML('beforeend', bockSvg(id));
+      else if (!pa && b) b.remove();
+    }
+    if (av != null && !calm()) {
+      for (const b of andrade) {
+        b.style.setProperty('--ink-andrad', INK[av % INK.length]);
+        clearTimeout(b.andradT);
+        b.classList.remove('rum-andrad');
+        void b.offsetWidth;
+        b.classList.add('rum-andrad');
+        b.andradT = setTimeout(() => b.classList.remove('rum-andrad'), 1900);
+      }
+    }
+    k.next = null;
+    if (!k.busy) gangState();
+    if (klubbat) {
+      clearTimeout(k.idle);
+      k.idle = setTimeout(() => vanta(k), 1800);
+    }
+  }
+  function gangPult() {
+    const rd = round();
+    const p = pult(rd);
+    const e = document.getElementById('rum-kupong');
+    if (!rd || !p || !p.gang || !e || !R.rows) return;
+    const html = couponHtml(rd, R.rows, view(p, 'gang'));
+    if (e.skrivet === html) return;
+    e.skrivet = html;
+    e.innerHTML = html;
+  }
+
   // Spela hos Svenska Spel: länken öppnar Stryktipset med gängets tecken i en
   // ny flik, och kupongen skjuts över disken – den sjunker ner mot disken och
   // glider bort – och ligger sedan på pulten igen.
@@ -4177,16 +4233,19 @@ ${window.RumRegister ? RumRegister.nara() : ''}
     k.msg.textContent = msg;
   }
 
-  // Rutorna ställs som tecknen i want (Ångra, Börja om): kryss som inte ska
-  // stå där suddas ut, och de som saknas dras igen, ett i taget.
+  // Rutorna ställs som tecknen i want (Ångra, Börja om, någon annan kryssade):
+  // kryss som inte ska stå där suddas ut, och de som saknas dras igen, ett i
+  // taget. → rutorna som ändrades.
   function setSigns(want, kula = false) {
     let n = 0;
+    const andrade = [];
     for (const row of R.kup.el.querySelectorAll('.row')) {
       const w = want[row.dataset.id] || '';
       const boxes = row.querySelectorAll('button.box');
       for (const b of boxes) {
         const on = w.includes(b.dataset.s);
         if ((b.getAttribute('aria-pressed') === 'true') === on) continue;
+        andrade.push(b);
         b.setAttribute('aria-pressed', String(on));
         b.classList.toggle('x', on);
         if (!on) {
@@ -4202,6 +4261,7 @@ ${window.RumRegister ? RumRegister.nara() : ''}
       }
       if (boxes.length) row.classList.toggle('tom', !w);
     }
+    return andrade;
   }
 
   // Börja om: tecknen som fler än hälften har med, som på papperet.

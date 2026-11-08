@@ -98,6 +98,16 @@ function setPending(coupon, base, removed = false) {
   const older = [...new Set([base, pub && pub.sha, ...((all[coupon.id] && all[coupon.id].older) || [])].filter(Boolean))];
   kpStore(KP_PENDING, { ...all, [coupon.id]: { savedAt: new Date().toISOString(), ...(removed ? { removed: true } : { coupon }), older } });
 }
+// Någon annan i gänget sparade den just (samtal.js, gängets kupong i realtid):
+// den visas här också tills bygget har publicerat den. → om något ändrades.
+function addPendingFrom(coupon, older) {
+  const all = pendingCoupons();
+  const had = all[coupon.id];
+  const pub = KP.data ? KP.data.coupons.find((c) => c.id === coupon.id) : null;
+  if ((had && had.coupon && had.coupon.sha === coupon.sha) || (pub && (pub.sha === coupon.sha || !(older || []).includes(pub.sha)))) return false;
+  kpStore(KP_PENDING, { ...all, [coupon.id]: { savedAt: new Date().toISOString(), coupon, older: older || [] } });
+  return true;
+}
 function clearPending(id) {
   const all = pendingCoupons();
   delete all[id];
@@ -1056,6 +1066,7 @@ async function postCoupon(ctx) {
   if (res && res.ok && body.ok) {
     const coupon = { ...ctx.coupon, id: body.id || ctx.id, created: body.skapad || ctx.coupon.created, sha: body.sha || null };
     setPending(coupon, ctx.edit ? ctx.base : null);
+    if (window.Samtal) Samtal.sparadKupong(coupon, (pendingCoupons()[coupon.id] || {}).older || []);
     return { ok: true, coupon, commit: body.commit || null };
   }
   const other = res && res.status === 409 ? fromStored(body.kupong) : null;

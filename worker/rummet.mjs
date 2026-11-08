@@ -12,7 +12,13 @@
 //     senaste)
 //   "ping" → "pong" (svaras utan att rummet väcks)
 //
+// Samma tjänst håller gängets kupong i realtid (GET /kupong, worker/kupongen.mjs).
+//
 // Driftsätts för hand: npx wrangler@4.147.0 deploy --config worker/rummet.toml
+
+import { giltigOmgang } from './kupongen.mjs';
+
+export { Kupongen } from './kupongen.mjs';
 
 const GANG = new Set(['DL', 'DT', 'DJ']);
 const MOT = /^[a-z0-9]{1,16}$/;
@@ -23,10 +29,14 @@ const ORIGIN = /^(https:\/\/(www\.)?matchfixarna\.se|https:\/\/tomaslaino\.githu
 export default {
   async fetch(req, env) {
     const url = new URL(req.url);
-    if (url.pathname !== '/rum') return new Response('Inte här', { status: 404 });
+    if (url.pathname !== '/rum' && url.pathname !== '/kupong') return new Response('Inte här', { status: 404 });
     if (req.headers.get('Upgrade') !== 'websocket') return new Response('Bara websocket', { status: 426 });
     const origin = req.headers.get('Origin') || '';
     if (!ORIGIN.test(origin)) return new Response('Fel ursprung', { status: 403 });
+    if (url.pathname === '/kupong') {
+      if (!giltigOmgang(url.searchParams.get('id'))) return new Response('Fel omgång', { status: 400 });
+      return env.KUPONGEN.get(env.KUPONGEN.idFromName('gangets-kupong')).fetch(req);
+    }
     const rum = env.RUMMET.get(env.RUMMET.idFromName('tobaksaffaren'));
     return rum.fetch(req);
   },

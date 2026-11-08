@@ -648,6 +648,9 @@ canvas.rum-neonhalo { opacity: var(--sken, 0.28); }
 .rum-handen button.box { margin: 0; padding: 0; font-family: var(--display); background: none; cursor: pointer; transition: background-color 0.15s; }
 .rum-handen button.box:hover { background: rgba(200, 100, 58, 0.1); }
 .rum-handen button.box:focus-visible { outline: 2px solid #2146a6; outline-offset: 2px; }
+/* rutan som någon annan just kryssade, i hens färg en stund (gangLive i rum.js) */
+.rum-handen button.box.rum-andrad { animation: rum-andrad 1.8s ease-out; }
+@keyframes rum-andrad { from, 35% { box-shadow: 0 0 0 2px var(--ink-andrad); } to { box-shadow: 0 0 0 2px transparent; } }
 .rum-handen.need .row.tom button.box { border-color: #cf2a20; box-shadow: 0 0 0 1px #cf2a20; }
 /* startade matcher står kvar som de var (som .sm-locked på papperet) */
 /* (pennan för kommentaren i efterhand är kvar som den är) */

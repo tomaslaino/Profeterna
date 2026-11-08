@@ -27,7 +27,9 @@
 // rummet = websocketen till tjänsten profeterna-rummet (worker/rummet.mjs,
 // driftsätts med worker/rummet.toml): vilka i gänget som har tobaksaffären
 // öppen och vad de pekar på, så att deras figurer tittar dit hos de andra
-// (public/rum-folk.js). null = bara din egen figur.
+// (public/rum-folk.js). null = bara din egen figur. Samma tjänst delar gängets
+// kupong i realtid (…/kupong, worker/kupongen.mjs, public/samtal.js); utan den
+// ser var och en bara sina egna kryss tills kupongen sparas.
 
 module.exports = {
   enabled: true,

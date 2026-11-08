@@ -232,6 +232,12 @@ ingen falsk precision · sidan kraschar aldrig av en död källa · endast fria 
   förlust. Rummet klart i Chrome som telefon på långsamt nät efter 17,0 → 14,3 sekunder, på 4G
   8,5 → 8,1 (11,4 → 10,8 med en långsammare processor), i datorn oförändrat ungefär 2 sekunder; bilden jämförd bildpunkt för bildpunkt (se
   [Mindre filer](#mindre-filer))
+- [x] **Gängets kupong i realtid (2026-11-08, användarens önskemål):** den som fyller i gängets
+  kupong i uppgörelsen – på papperet eller på pulten i tobaksaffären – gör det på allas kupong.
+  Kryssen, det klubbade och *Börja om* syns direkt hos alla som ser kupongen, och knappen blir
+  *Sparad* hos alla när någon har sparat. Förut såg var och en bara sina egna kryss tills kupongen
+  sparades och sajten hade byggts om (se *Gängets kupong i realtid* under
+  [Inför uppgörelsen](#inför-uppgörelsen))
 
 ## Publicering
 
@@ -1047,7 +1053,9 @@ server:
 - **Inför uppgörelsen:** [worker/samtal.mjs](worker/samtal.mjs) håller omgången och gängets
   egna tips (Cloudflare KV, i tjänsten profeterna-kupong; lokalt filer via
   [server.js](server.js)); vyerna under Kupong (steg 1–3) finns i
-  [public/samtal.js](public/samtal.js) och [public/samtal.css](public/samtal.css). Se
+  [public/samtal.js](public/samtal.js) och [public/samtal.css](public/samtal.css). Gängets kryss
+  delas i realtid genom [worker/kupongen.mjs](worker/kupongen.mjs) (i tjänsten profeterna-rummet)
+  och [public/samtal-live.js](public/samtal-live.js). Se
   [Inför uppgörelsen](#inför-uppgörelsen).
 - **Kuponghistoriken:** [src/history.js](src/history.js) rättar färdiga kuponger, räknar
   betyget, fryser in dem i `data/kupong-historik.json` och skriver `data/historik.json`.
@@ -1781,7 +1789,7 @@ under omgången.
    som inte lämnade in; när gängets kupong är gjord tar den över. Porträtt står inte där –
    gänget syns redan på polaroiderna (2026-10-22). **När allas tips visas** (2026-11-07) står
    de omtvistade matcherna under raden, som på papperet och i rummet (punkt 4): numret inringat i
-   guld, med en bock när matchen är klubbad på enheten, lagen med de korta namnen (`Papper.kort`,
+   guld, med en bock när matchen är klubbad, lagen med de korta namnen (`Papper.kort`,
    samma som på kupongen i rummet; de öppnar matchrutan) och vad var och en har tippat i sin färg
    (`--gang-0–2`), under små porträtt (`strider` i samtal.js). Matcherna som inte är omtvistade
    står inte där. Knappen heter *Till kupongen*, som i
@@ -1852,8 +1860,36 @@ under omgången.
    kod (`strid` i `analyse`, se *Pennan visar vägen* under [Kupongen i handen](#kupongen-i-handen)):
    numret är inringat med pennan och gängets kryss där är bleka – ett förslag. *Klubba* på lappen
    klubbar matchen, liksom en ändring av gängets tecken i den: bocken dras vid ringen och kryssen
-   fylls i. Det klubbade delas med rummet på enheten
-   (`profeterna.rum.klubbat`), och *Börja om* tar bort det.
+   fylls i. Det klubbade är detsamma på papperet och i rummet (`profeterna.rum.klubbat` på enheten,
+   och hos de andra genom tjänsten, se nedan), och *Börja om* tar bort det.
+
+   **Gängets kupong i realtid** (2026-11-08): det finns bara en kupong. Den som kryssar på papperet
+   eller på pulten i tobaksaffären gör det på allas, och ändringen syns på ett ögonblick hos alla som
+   ser kupongen: kryssen, bocken vid en klubbad match, antalet kvar, foten och *Börja om*. Inget annat
+   på sidan rör sig (bara det som har ändrats ritas om, `ritaLive` i samtal.js och `gangLive` i
+   rum.js), och det man själv läser eller skriver på lappen står kvar. Rutan som någon annan just
+   kryssade har en ram i hens färg i knappt två sekunder. Var och en har sin egen lapp framme.
+   Vägen går genom tjänsten profeterna-rummet ([worker/kupongen.mjs](worker/kupongen.mjs), en
+   websocket till ett Durable Object, adressen är `rummet` i config/kupong.js med `/kupong` i stället
+   för `/rum`). Tjänsten håller läget för omgången, så att den som kommer in sent ser samma kupong,
+   och [public/samtal-live.js](public/samtal-live.js) håller uppkopplingen. Läget skrivs också på
+   enheten som förut (`profeterna.samtal.beslut`, `profeterna.rum.klubbat`), så att allt annat ritas
+   som det alltid har gjorts.
+   - **Vem som kopplas upp:** bara den som får se de andras tips, medan någon match går att fylla i.
+     Kryssen avslöjar vad de andra har tippat, så den som inte har lämnat in ser dem inte.
+   - **Två samtidigt:** ett tecken gäller per match och den senaste vinner, så två som kryssar i olika
+     matcher skriver inte över varandra. Alla hamnar på samma kupong (tjänsten bestämmer ordningen).
+   - **När nätet går ner:** det man kryssar under tiden står kvar hos en själv och skickas när
+     uppkopplingen är tillbaka; efter fem minuter gäller det de andra har gjort i stället. Fliken
+     stänger uppkopplingen när den döljs och hämtar läget när den visas. Utan tjänsten ser var och en
+     sina egna kryss, som förut.
+   - **Spara:** kupongen som spelas sparas som förut som fil (`postCoupon`). Tjänsten får en kopia av
+     den, så att knappen blir *Sparad* hos alla direkt och nästa ändring blir en ändring av den
+     (`addPendingFrom` i kupong.js) – sajten visar den för övriga när bygget är klart. Det gäller också
+     en kupong som sparas i *Ny kupong*, *Ändra* eller *Ladda upp system*; då blir kryssen dess. Själva
+     sidorna *Ny kupong* och *Ändra* delas inte medan de fylls i.
+   - **Låsta matcher:** en match som har låsts (`fillable`) visas som den sparades, också om någon har
+     kryssat om den utan att spara.
 
    **Högarna** (2026-11-08, ersätter en dagordning i löptext som fyllde hela första skärmen i
    telefonen): uppgörelsen sker i telefon, så medan någon match går att fylla i står hela kupongen
@@ -1883,7 +1919,7 @@ under omgången.
 5. **Gängets kupong** (så fort man ser de andras tips, också om någon inte har lämnat in):
    man trycker på rutorna (två rutor =
    gardering). Den börjar som förslaget – med regeln ett som följer den (se *Regeln*), annars
-   tecknen som fler än hälften har med och matcher där alla tippat olika tomma – och sparas bara på enheten, så en håller i pennan under uppgörelsen (*Börja
+   tecknen som fler än hälften har med och matcher där alla tippat olika tomma – och delas i realtid, så en kan hålla i pennan under uppgörelsen medan de andra ser kupongen växa fram (*Börja
    om* går tillbaka till förslaget). Nederst syns kupongen som rutor med antal rader.
    Gängets tecken går att kryssa i till 30 minuter efter matchens avspark (sedan 2026-11-03),
    så att kupongen som spelades hos Svenska Spel i sista stund kan föras in efteråt; därefter
@@ -3904,7 +3940,9 @@ gängets tecken i den ändras, eller med ett klick på raden – numret, tiden e
 medan lagen lägger matchbladet på kupongen som förut – och pennan drar bocken; då får
 ringen en bock och pennan går vidare till nästa, och när alla är klubbade lägger den sig vid
 sidan. Klubbat sparas på enheten för omgången (`profeterna.rum.klubbat`, `klubba` och `klar` i
-samtal.js), samma i rummet och på papperet, och *Börja om* tar bort bockarna. Är gängets kupong
+samtal.js) och delas med de andra, samma i rummet och på papperet, och *Börja om* tar bort bockarna.
+Kupongen i handen och på pulten följer med när någon annan kryssar (*Gängets kupong i realtid* under
+[Inför uppgörelsen](#inför-uppgörelsen)). Är gängets kupong
 redan sparad och inget klubbat på enheten är alla klubbade (`klar` i `Samtal.pult.gang`), och när
 gängets kupong sparas klubbas det som återstår – en sparad kupong står aldrig med bleka kryss. **Första gången** gängets kupong tas i handen på enheten under omgången
 (`profeterna.rum.lagda`) läggs de tre kupongerna ur högen på den, en i taget och
@@ -5534,4 +5572,8 @@ själv på enheten, så tjänsten litar på gänget (sedan 2026-10-22, så att d
 på alla ens enheter): den som inte har lämnat in kan se tipsen genom att säga att hen är
 någon som har det, eller ändra någon annans tips. Sidan hindrar bara att det sker av
 misstag – en enhet byter inte till någon som redan har lämnat in. Kommentarerna i
-efterhand döljs som tipsen, och vem som helst kan skriva en i någons namn.
+efterhand döljs som tipsen, och vem som helst kan skriva en i någons namn. Gängets kryss i
+realtid ([worker/kupongen.mjs](worker/kupongen.mjs)) litar på gänget på samma sätt: tjänsten släpper bara in
+sajtens egna ursprung, men vem som helst därifrån kan läsa och ändra dem, och sidan kopplar
+upp sig först när man får se de andras tips, så att ingen ser dem av misstag. Det är ett
+utkast: kupongen som spelas ändras bara genom *Spara*, med sina vanliga kontroller.
