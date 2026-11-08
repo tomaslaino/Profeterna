@@ -88,7 +88,7 @@
 // lage({ tv, nag }, t), mal({ dl: 1, dt: -1, dj: 0 }, t, sätt), spel({ lage, rank, ansikte }, t),
 // senast(lage), uttryck(),
 // prova(vem, påhitt, at), ga(vem, t, l), pekar(vem, [x, y, z] | null, t),
-// hej(vem, t, ut), vald(vem, t), tecken(vem, t, namn), lappar(vem, t), natt(på, t), efter({ lage, krona }), under(nx, ny), huvud(vem) }: neon säger om
+// hej(vem, t, ut), vald(vem, t), tecken(vem, t, namn), lappar(vem, t), lappUppe(vem, t), natt(på, t), efter({ lage, krona }), under(nx, ny), huvud(vem) }: neon säger om
 // neonskylten lyser (false när den glappar), ute klär om gänget
 // efter vädret (dress) och sätter ljuset från fönstret, lage säger om
 // matcherna pågår (tv) och hur nära spelstoppet är (nag 0–1), mal ett mål
@@ -4498,9 +4498,9 @@ export async function figurer(canvas, opt = {}) {
     if (!o) return;
     const g = teckenNu(o, t);
     if (g && g.T < 0.3) return;
-    // (med lappen i handen viftar man med den)
+    // (armen som lägger ner sin lapp är den som gör tecknet)
     const lapp = lappNu(o, t);
-    const val = namn && TECKEN[namn] ? namn : lapp ? 'lappVift' : sovW(o, t) > 0.5 ? 'tumme' : nastaTecken();
+    const val = namn && TECKEN[namn] ? namn : sovW(o, t) > 0.5 ? 'tumme' : nastaTecken();
     const A = lapp ? lapp.A : g ? g.A : uOf(o, t) < 0.55 ? o.pen : fri(o);
     TK[k] = { namn: val, at: t, i: o.arms.indexOf(A), w0: g ? g.w : 0, fran: g ? { namn: g.x.namn, T: g.T } : null };
   }
@@ -4520,11 +4520,19 @@ export async function figurer(canvas, opt = {}) {
         if (LP[key] && LP[key].ut == null) LP[key].ut = t;
         continue;
       }
+      // (den som redan håller upp samma lapp sitter kvar när någon annan lägger ner sin)
+      if (LP[key] && LP[key].ut == null && LP[key].tal === v.tal && LP[key].ink === v.ink) continue;
       const sida = o.F.plats === PLATSER[2] ? 1 : -1;
       let A = o.arms.find((a) => Math.sign(a.s) === sida);
       if (!A || A.kind === 'cigg') A = o.arms.find((a) => a !== A) || A;
       LP[key] = { tal: v.tal, ink: v.ink, at: forsta ? t - 10 : t, ut: null, i: o.arms.indexOf(A), namn: o.F.plats === PLATSER[1] ? 'lapp2' : 'lapp' };
     }
+  }
+  // Håller vem upp sin lapp just nu? (inte den som sover eller redan lägger ner den)
+  function lappUppe(vem, t) {
+    const o = figs.find((f) => f.F.key === String(vem).toLowerCase());
+    const l = o && lappNu(o, t);
+    return Boolean(l && l.x.ut == null);
   }
   // Någon pekar på vem i gänget (ut = när hen slutade).
   function hej(vem, t, ut = Infinity) {
@@ -4592,5 +4600,5 @@ export async function figurer(canvas, opt = {}) {
     await r.compileAsync(scene, cam);
   } catch (err) { /* då byggs de när gänget ritas, som förut */ }
   ANS.ute = true;
-  return { draw, inne, ute, lage, mal, spel, senast, uttryck: () => ANS.p, prova, ga, pekar, hej, vald, tecken, lappar, natt, efter, under, huvud, kval };
+  return { draw, inne, ute, lage, mal, spel, senast, uttryck: () => ANS.p, prova, ga, pekar, hej, vald, tecken, lappar, lappUppe, natt, efter, under, huvud, kval };
 }

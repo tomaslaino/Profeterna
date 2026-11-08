@@ -9,7 +9,7 @@
 // i marginalen, en dom per person längst ner och sin namnteckning. Ett klick på
 // blocket tar det fram hos honom (blocket i rum-hasse.js), och ett klick på
 // löpsedeln i fönstret öppnar tidningen (tidningen i rum.js). Gänget håller upp
-// sina lappar (lappar i rum-3d.js), och datorns siffra står på videons blå ruta.
+// sina lappar (lappar här och i rum-3d.js), och datorns siffra står på videons blå ruta.
 //
 // Allt räknas ur omgångens data, och samma omgång ger samma text på alla enheter.
 // Texterna här sägs inte högt, så de hör inte till rösten (rum-hasse-repliker.js),
@@ -168,6 +168,47 @@
     const sum = bygg({ score, round, kupongRader, info, namn, nr, kort });
     minne = { k, sum };
     return sum;
+  }
+
+  // ---------- lapparna ----------
+
+  const fKl = new Intl.DateTimeFormat('en-GB', { timeZone: 'Europe/Stockholm', weekday: 'short', year: 'numeric', month: 'numeric', day: 'numeric', hour: 'numeric', minute: 'numeric', second: 'numeric', hourCycle: 'h23' });
+  const klDelar = (ms) => Object.fromEntries(fKl.formatToParts(ms).map((x) => [x.type, x.value]));
+  const LAPP_KL = 16;
+
+  // Första måndagen kl. 16 i Sverige efter tiden ms.
+  function mandagEfter(ms) {
+    for (let d = 0; d < 9; d += 1) {
+      const p = klDelar(ms + d * 864e5);
+      if (p.weekday !== 'Mon') continue;
+      // (klockslaget som om det vore UTC, minus skillnaden mot svensk tid just då)
+      const g = Date.UTC(+p.year, +p.month - 1, +p.day, LAPP_KL);
+      const q = klDelar(g);
+      const t = g - (Date.UTC(+q.year, +q.month - 1, +q.day, +q.hour, +q.minute, +q.second) - g);
+      if (t > ms) return t;
+    }
+    return NaN;
+  }
+
+  // Vad gänget håller upp: när en omgång är spelad står allas rätt kvar till måndagen efter kl. 16,
+  // också när nästa omgång redan har tagit över (Svenska Spel öppnar den senast måndag morgon).
+  // omgangar: de att välja bland, den senaste först. Dolda resultat ger inget (tpScore).
+  // → { id: omgången, vem: { dl: { tal, ink }, … } }, eller null.
+  function lappar(omgangar, now = Date.now()) {
+    if (typeof tpScore !== 'function') return null;
+    for (const round of omgangar) {
+      if (!round || !round.matcher || !round.matcher.length) continue;
+      if (!(now < mandagEfter(Math.max(...round.matcher.map((x) => Date.parse(x.avspark)))))) continue;
+      const score = tpScore(round, now);
+      if (!score.done) continue;
+      const vem = {};
+      for (const p of score.people) {
+        if (p.none || p.id === HASSE) continue;
+        vem[p.id.toLowerCase()] = { tal: p.ok || 0, ink: INK[Math.max(0, (round.gang || []).findIndex((g) => g.id === p.id))] };
+      }
+      if (Object.keys(vem).length) return { id: round.id, vem };
+    }
+    return null;
   }
 
   // ---------- anteckningarna ----------
@@ -362,5 +403,5 @@
     }
   }
 
-  return { rakna, bygg, noter, domar, html, tidning, rastrera, kronika, skrall, betyg, TEXT };
+  return { rakna, lappar, mandagEfter, bygg, noter, domar, html, tidning, rastrera, kronika, skrall, betyg, TEXT };
 });

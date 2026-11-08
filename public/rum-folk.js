@@ -16,7 +16,10 @@
 // telefonen gör ett tryck på figuren samma sak en stund. Ett klick på en
 // figur går inte vidare till det som står bakom.
 //
-// Ett klick på någon i gänget ger ett tecken tillbaka (tecken i rum-3d.js):
+// Håller hen upp sin lapp efter omgången läggs den ner av klicket (lappNer i
+// rum.js), och den ligger nere på enheten för den omgången.
+//
+// Annars ger ett klick på någon i gänget ett tecken tillbaka (tecken i rum-3d.js):
 // hang loose, tummen upp och så vidare, ett nytt varje gång. Går kupongen att
 // fylla i och hen inte har lämnat in blir man också hen (valj, samma val som
 // namnen på kupongen, Samtal.pult.vem): namnet skrivs för hand på kupongen på
@@ -40,7 +43,7 @@
 // senaste gick (senastAv, rum-3d.js senast och rum-uttryck.js) – om det
 // blev vinst och efter betyget – utom med dolda resultat.
 //
-//   RumFolk.mount(el, { fig, inr, now, nara, fokus, teckna, visa, ta })  när gänget har laddats
+//   RumFolk.mount(el, { fig, inr, now, nara, fokus, teckna, lappNer, visa, ta })  när gänget har laddats
 //   RumFolk.on(true | false)                           rummet visas eller inte
 //   RumFolk.ute(v)                                     klockan (Vader.nu())
 //   RumFolk.fyll(old, seen)                            de färdiga kupongerna och omgångarna
@@ -322,6 +325,8 @@ window.RumFolk = (() => {
       if (!k) return;
       e.preventDefault();
       e.stopPropagation();
+      // (med lappen uppe läggs den ner, och inget annat)
+      if (F.o.lappNer && F.o.lappNer(k)) return;
       F.o.teckna(k);
       // du, nu eller sedan förut: kupongen i handen när namnet är skrivet,
       // annars när tecknet syns

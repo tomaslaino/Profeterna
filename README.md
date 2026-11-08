@@ -5241,7 +5241,10 @@ namnteckning. I telefonen får marginalen inte plats, så där står bara domarn
 Ett klick på blocket tar fram det hos honom, i stället för matchlistan (`blocket` i rum-hasse.js). Ett klick på
 löpsedeln i fönstret öppnar tidningen med samma rubrik som sedeln, betygen, skrällen och hans krönika (`tidningen` i
 rum.js). Gänget håller upp lappar med sina rätt (`lappar` i rum-3d.js): bara armen är upptagen, så de lever som
-vanligt, och den man klickar på viftar med lappen. Datorns siffra står på videons blå ruta på håll.
+vanligt. Lapparna står kvar till måndagen efter omgången kl. 16, också när nästa Stryktips redan har tagit över
+(`lappar` i rum-block.js läser då den förra omgången, `forra` i GET /samtal). Ett klick på någon i gänget med lappen
+uppe lägger ner den, och den ligger nere på enheten för den omgången (`lappNer` i rum.js). Datorns siffra står på
+videons blå ruta på håll.
 
 Allt räknas ur omgångens data och ser likadant ut på alla enheter. Med dolda resultat (Dölj resultat) syns inget av det,
 utan stämpeln *Alla inne* ligger kvar. Texterna står i `TEXT` i rum-block.js och inte i replikfilen, eftersom de inte

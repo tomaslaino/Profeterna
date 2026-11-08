@@ -49,6 +49,7 @@
 (function () {
   const SM = {
     data: undefined, // omgången som tjänsten visar den; null = ingen, undefined = inte hämtad
+    forra: null, // omgången före den, när dess tips visas (GET: forra)
     error: null,
     timer: null,
     pick: null, // skapa kupongen / ändra matcherna: {ids: Set, spel}
@@ -171,6 +172,7 @@
       const body = await res.json().catch(() => ({}));
       if (!res.ok || !body.ok) throw new Error(body.error || `HTTP ${res.status}`);
       SM.data = body.samtal || null;
+      SM.forra = body.forra || null;
       SM.error = null;
     } catch (err) {
       SM.error = err.message || 'ingen kontakt';
@@ -1978,6 +1980,8 @@
     return d && d.id === s.id && !d.inne && (!d.vem || d.vem === v) ? d : null;
   };
   const pult = {
+    // Omgången före den aktuella, med allas tips (gängets lappar i rummet), eller null.
+    forra: () => SM.forra,
     state() {
       const s = SM.data;
       if (!info() || !s) return null;
