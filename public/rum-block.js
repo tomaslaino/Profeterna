@@ -280,8 +280,7 @@
     const label = `Hasse Backes protokoll: kupongen ${sum.kupong.ok} rätt, ${bakom}`;
     return `<span class="rum-block n${kol.length}${tat ? ' tat' : ''}" style="--n:${kol.length}" role="img" aria-label="${esc(label)}">` +
       `<span class="rb-hu"><b>PROTOKOLL</b><span>${esc(rub)}</span></span>` +
-      `<span class="rb-g"><span class="rb-sp la">Match</span><span class="rb-sp la fa">Facit</span>${kol.map(huvud).join('')}${rader}${ratt}${pts}</span>` +
-      '<span class="rb-omd"><span class="rb-sign"><i>H. Backe</i></span></span></span>';
+      `<span class="rb-g"><span class="rb-sp la">Match</span><span class="rb-sp la fa">Facit</span>${kol.map(huvud).join('')}${rader}${ratt}${pts}</span></span>`;
   }
 
   // ---------- tidningen ----------
