@@ -915,6 +915,19 @@ bara lokalt. Analyserna visas som de ligger i `data/analyser.json`; hur de skriv
   händerna lagda över varandra (den undre handens fingrar stack fram), en löst knuten näve (såg ut som
   tummen ned) och händerna vilande på lillfingersidan (såg ut som klor). Se [Hasse Backe](#hasse-backe),
   *Bilden* och *Armarna och händerna*.
+- **Samma pult och samma armar i rummet och hos Hasse Backe (2026-11-08, användarens önskemål):** vyn mot fönstren och
+  vyn mot Hasse skulle "upplevas som samma rum och samma ögonblick, men pulpeten och Hasses arm hänger inte ihop".
+  Pulten i rummet var en målad bild med plankor åt en, orange, och utan hörn, medan disken framför honom var
+  dämpat brun, ådrad längs L:et och med ett geringssnitt; i rummet låg en ensam hand, i baren korslagda händer.
+  Nu är det samma skiva ([public/rum-pult.js](public/rum-pult.js)): samma trä och samma bruna i båda (rummets
+  bilder bakas med samma skuggare genom rummets kamera, lite ljusare men inte varmare), ådrad längs pulten och längst
+  till vänster, där hörnet med geringssnittet nu syns, längs benet mot en; samma ringar efter glas i båda, samma
+  metallist längs bortre kanten och en tjock, mjukt rundad framkant av trä. I rummet ligger hans underarmar
+  korslagda på pulten, den vänstra handen över den högra som i baren, med samma ärm, manschett och hud i samma ljus,
+  och båda bilderna har samma skuggor under händerna, med en tät kontaktskugga där de ligger an. I baren står kameran
+  14 cm högre och lutar 14° i stället för 10°, så att pultens arm till höger ligger vågrät i stället för att se ut som
+  en ramp; väggen bakom honom är ombakad. Se [Hasse Backe](#hasse-backe), *Bilden*, *Pulten* och *Kaffet i
+  rummet*.
 - **Hasse Backe minns vad han sa (2026-11-06, användarens önskemål):** klickade man på en match
   man redan hade frågat om slog han domen i disken en gång till, och efter en omladdning gjorde han
   om allt, med 15–25 sekunders väntan. Nu står det han sa direkt, sparat på enheten så att det
@@ -2535,8 +2548,9 @@ Enter och mellanslag klickar på dem. En match på text-tv:n lägger fram matchb
   *Inlämnad*, men inga tecken. Din egen tas i handen, och de andras när du ser deras tips
   (se nedan). Innan dess lyfts en annans kupong bara lite i ena kanten och faller tillbaka.
 - **Hasses kaffe** längst till vänster på pulten → Hasse Backe, som sitter i baren
-  utanför bilden till vänster. Hans hand ligger på pulten, med armen in från bildens kant, och tätt
-  till höger om den står koppen med blå ränder och ryker på sitt fat nära pultens bakre kant. Fatet
+  utanför bilden till vänster, där pulten viker av i ett hörn. Hans händer ligger korslagda på pulten, med
+  underarmarna in från bildens kant, och tätt till höger om dem står koppen med blå ränder och ryker på sitt
+  fat nära pultens bakre kant. Fatet
   står på hans nota, som i baren: kaffe, fyra påtår och en kanelbulle, Skrivs på Notts County
   (klubben han lämnade efter sju veckor 2009, när lönen inte kom; notan har nummer 0007). Ett klick på kaffet eller notan,
   Enter eller H och man vänder sig mot honom (`hasseHtml`, `tillHasse`, se
@@ -4688,18 +4702,19 @@ vänster förbi honom (benet framför honom). Han sitter på andra sidan om bene
 hörnet, där kaffet och notan står, som handen, kaffet och notan på pulten i rummet. Bakom honom är
 affärens vägg med hyllorna. Kameran är ens öga: 1,8 m framför honom, rakt framifrån (kroppen är ett
 foto taget framifrån, djupet i [public/rum-hasse-3d.js](public/rum-hasse-3d.js), och tål inte mycket
-från sidan), 31 cm högre än hans ögon och lutad 10° nedåt, som när man står och han sitter. Det gör
-att pulten ses uppifrån som i rummet: koppen ungefär 31° uppifrån och det inre hörnet 34°, mot 17°
-när han satt längre bort bakom en bardisk (ändrat 2026-11-07, se nedan). Benet är vridet 8° (`BAR`),
+från sidan), 45 cm högre än hans ögon och lutad 14° nedåt, som när man står och han sitter. Det gör
+att pulten ses uppifrån som i rummet: koppen ungefär 34° uppifrån och det inre hörnet 38°, mot 17°
+när han satt längre bort bakom en bardisk (ändrat 2026-11-07, se nedan). Pultens arm går fram förbi
+kamerans högra sida, och med ögat 31 cm över hans och 10° lutning såg den ut som en ramp som steg mot
+hörnet; 14 cm högre och 4° mer nedåt ligger den vågrät (ändrat 2026-11-08, väggen ombakad). Benet är vridet 8° (`BAR`),
 så att pultens arm går fram förbi kamerans högra sida, som när man har vänt sig lite mindre än en rät
 vinkel.
 
 Han sitter så att fotot inte behöver något under sig: disken framför honom döljer allt nedanför
 magen, så det finns inga ben och ingen stol. Pulten är geometri i hans värld, vriden som benet, och
 ritas en gång på en egen duk under figuren (`diskBild`): benet framför honom och armen mot en
-(`SCEN.HORN`), i pultens matta bruna trä som i rummet, ådrat längs benet och längs armen med ett
-geringssnitt i hörnet, en smal list i aluminium längs de bortre kanterna och en rundad längs kanterna
-mot en, som pultens, och framsidan i fält nedanför. Träet speglar väggen bakom honom svagt: den
+(`SCEN.HORN`), samma skiva som i rummet (se *Pulten* nedan), och framsidan i fält nedanför, indragen
+i skugga under den tjocka skivan. Träet speglar väggen bakom honom svagt: den
 speglade strålen träffar väggen, och där hämtas färgen ur väggens bild, suddigare ju längre strålen
 går; han själv speglas som en mörk form. Notan ligger under fatet,
 samma nota som på pulten (ritad på en duk med samma typsnitt), med den främre änden lite uppböjd.
@@ -4738,6 +4753,27 @@ till vänster, och får samtalet inte plats blir han mindre (`matt` i [public/ru
 i smala fönster. På höjden står han överst och samtalet under notan. Ändras fönstret medan han syns
 räknas det om; vrids telefonen sitter han på det andra sättet.
 
+**Pulten** är samma i rummet och i hans bild ([public/rum-pult.js](public/rum-pult.js)): formen (L:et i barens
+mått, `L`), träet (`PULT_GLSL`), framkanten (`SKIVA`), ringarna efter glas (`ringar`) och rummets kamera mot
+pulten (`RUM`). Brunt, matt trä som ådras längs pulten och, längst till vänster i rummet där den viker av mot
+en förbi honom, längs benet, så att de möts i ett geringssnitt från det inre hörnet till det yttre; fläckigt och
+slitet, med samma ringar efter glas i båda bilderna (de skiftar med dagen: en vid armens bortre kant strax till
+höger om hörnet, som syns i båda, en på hörnet, fyra längre bort på armen och två på benet framför honom). En smal
+list i aluminium längs de bortre kanterna, och mot en en tjock, mjukt rundad kant av samma trä (6,6 cm skiva, en
+rundning överst, en rak bit och en mindre rundning nedtill) med framsidan indragen under den. Hans bild ritar
+pulten som geometri med `PULT_GLSL`; rummet visar den som färdiga bilder (`rum/pult.webp`, `pult-mer.webp` och
+framkanten `pult-kant.webp`, inte i telefonen på höjden där pulten fortsätter), bakade med samma skuggare genom
+rummets kamera ([scripts/rum/pult.mjs](scripts/rum/pult.mjs)), och ringarna ritas ovanpå när rum-pult.js är
+hämtad (`ringar` i rum.js). Rummets kamera är ett öga vid pulten som ser mot fönstren, med horisonten och
+flyktpunkten där pultens bild alltid har haft dem: bortre kanten ligger kvar på y = 650 och kanten mot en på
+984, och hörnet hamnar längst till vänster, där kaffet står på hörnet som i hans bild. Framkanten ligger alltså
+precis vid rummets nedre kant: i ett fönster med scenens form (16:10) hamnar den strax nedanför och syns först i
+högre fönster. I rummet är ljuset
+lysrörets och dagens, svalare än barens lampor och lite ljusare, och rummets egna lager ovanpå är räknade med,
+så att träet har samma dämpade bruna som framför honom och inte är orange. Förut var pulten i rummet en målad bild
+med plankor som gick mot en, mer orange, utan hörn, med ringarna utspridda för sig, en list i aluminium mot en och
+inga ringar i hans bild (ändrat 2026-11-08).
+
 **Panoreringen.** Rummet och hans bild ligger bredvid varandra, med hans till vänster och en bit
 vägg emellan, och allt glider åt höger på 0,42 s, som när kameran slås åt vänster: fort i början,
 fortast när bilderna byter plats och mjukt på slutet (`ryck`). Oskärpan följer farten och är vågrät,
@@ -4757,7 +4793,7 @@ neonskyltens röda sken och gatans kalla ljus från höger, där affären är (`
 [public/rum-hasse-arm.js](public/rum-hasse-arm.js); väggen är spårad med samma ljus). På dagen kommer
 dagsljuset genom affärens stora fönster till höger (nedan). Över hela
 bilden mörknar hörnen, och ett lätt korn rör sig (`.rh-ton`, `.rh-korn`), inte på rummets lägre steg
-och inte i telefonen. Handen på pulten i rummet har rummets ljus utan baren.
+och inte i telefonen. Händerna på pulten i rummet har samma ljus (se *Kaffet i rummet*).
 
 Baren har samma tid på dygnet som rummet (`ljuset` och `tand` i [public/rum-hasse.js](public/rum-hasse.js)).
 Från sex på morgonen till midnatt är lysröret i affärens tak tänt, som i rummet (`RumFolk.natt`): väggen
@@ -4780,20 +4816,23 @@ som disken också speglar (`vagg`). Förut var baren alltid en mörk kvällsbar,
 rummet bredvid var ljust, och sedan låg ett dis i himlens färg över hela bilden, också över honom, medan
 ljuset på honom nästan var detsamma dag som kväll (ändrat 2026-11-06).
 
-**Kaffet i rummet.** Handen, koppen och notan på pulten är samma som i hans bild, så att man känner
+**Kaffet i rummet.** Händerna, koppen och notan på pulten är samma som i hans bild, så att man känner
 igen dem när kameran slår över: koppen är bardiskens modell (`byggKopp`) med samma ljus, fatet står
-på notans övre vänstra hörn så att namnet syns, och handen ligger till vänster om fatet, som hans
-vänstra hand vid koppen i baren ([public/rum-hasse-hand.js](public/rum-hasse-hand.js)). Handen ligger
-som hans i vila (`VILA` där, efter `VILA_B` i rum-hasse-3d.js): fingrarna lätt krökta och samlade med
-topparna vilande på pulten, tummen in mot handen och handen lite vinklad mot lillfingret. Pulten är
-vågrät i figurens värld som disken i baren, så att fingrarna och ljuset beter sig som där, och kameran
-lutas i stället. Armen kommer snett uppifrån, tvärs över pultens bakre kant och ut genom bildens vänstra
-kant, så att handen pekar snett ned mot en, handryggen och knogarna syns som i baren och det syns att
-han sitter alldeles intill pulten. Förut kom armen nästan vågrätt in mitt på pulten, och han såg ut att
-sitta långt borta och sträcka sig. Handen är inte rullad upp mot tummen som i baren, där den pekar åt
-andra hållet i bilden: här skulle den se ut att stå på sidan med fingrarna hängande i luften. Koppen ritas i handens duk med en egen kamera. Handen och koppen ses 33°
-uppifrån (`LUT`), som i baren där ögat ser dem ungefär 31° uppifrån, och koppen rakt framifrån,
-eftersom handens kamera ser hörnet långt från sin mitt och en kopp där skulle luta. Den är lite mindre
+på notans övre vänstra hörn så att namnet syns, och till vänster om fatet ligger hans underarmar korslagda på
+pulten, den vänstra handen över den högra, som i baren ([public/rum-hasse-hand.js](public/rum-hasse-hand.js)).
+Det är samma armar i samma vila (`VILAN` i [public/rum-hasse-arm.js](public/rum-hasse-arm.js), som baren
+också läser), i figurens värld och med samma disk, så att fingrarna lägger sig på pulten som där; samma ärm,
+manschett och hud, och samma ljus som i baren (lysröret tänt och dagsljuset efter klockan och vädret; på natten
+mörknar rummet självt). De ses i rummets blickriktning, mot fönstren, lika långt bort och lika mycket uppifrån
+(33°) som från ögat i rummet (`RUM` i rum-pult.js), och kantljuset räknas mot det ögat (`vy`), inte mot
+barens kamera: annars blev ärmarnas sidor varmt bruna. Från rummet ses också ärmarnas sida bort från barens
+lampor, och den blev nästan svart; ärmens tyg får därför mer ljus i rummet (`bord.tyg`, 1,35 mot 1 i baren), så
+att det är samma koksgråa kavaj som framifrån. Underarmarna är lika vida som i baren. Bilden flyttas dit där kaffet och notan ligger, så
+att underarmarna kommer in från bildens vänstra kant, den vänstra snett uppifrån över pultens bakre kant och den
+högra under den, med armbågarna och axlarna utanför bilden. Under händerna och underarmarna ligger samma skuggor
+som i baren (`byggSkugga`), med en tät, mörk kontaktskugga där händerna ligger an mot pulten. Det är bara den
+vänstra handen, överst, som trummar. Koppen ritas i handens duk med en egen kamera, 33° uppifrån som pulten och
+rakt framifrån, eftersom ögat ser hörnet långt från sin mitt och en kopp där skulle luta. Den är lite mindre
 än i baren (`KOPP_SKALA`), där handen pekar rakt mot en och ser kortare ut. Duken tonar in när den är klar, och den ritade koppen i
 `hasseHtml` tonar då bort; den står kvar utan WebGL. Bardiskens trä har pultens bruna, inte rödare.
 Förut stod en platt ritad kopp, sedd nästan från sidan, bredvid notan, och handen låg under fatet så
@@ -4802,7 +4841,8 @@ med fingrarna mot fatet, medan den i baren låg en bit från koppen (ändrat 202
 snett uppifrån, och ärmen låg på pultens bakre kant, så att pulten såg ut att ta slut vid armen (ändrat
 2026-11-06). Sedan låg handen platt med raka, utspärrade fingrar rakt åt höger mot fatet och sågs 52°
 uppifrån, koppen 44°, och i baren stod fatet mitt på notans överkant och täckte namnet (ändrat
-2026-11-07).
+2026-11-07). Sedan låg bara den vänstra handen på pulten, med rummets ljus utan baren, medan han i baren
+satt med händerna korslagda, och ärmen var mörkare och brunare än i baren (ändrat 2026-11-08).
 
 Tre tidigare försök: först satt han på en barstol vid pultens ände med en arm som ett gummiband över
 hörnet till handen långt nere på pulten (armen, benen, hörnet och koppen såg konstiga ut). Sedan gled
@@ -5378,6 +5418,14 @@ tiden: de räknas nu i den större handens skala, handen går upp och över kopp
 pulten ligger 20 bildpunkter till vänster om mains nya läge. Provat i headless Chrome mot main bild för
 bild: vilan, talet, slaget, gesterna, klunken (tätt när handen tar och ställer koppen), cigarren och
 pennan i 1440 × 900, vilan, klunken och talet i telefonen (412 × 915), och handen på pulten i rummet.
+
+Samma pult och samma armar (2026-11-08) är provade i headless Chromium med mjukvarugrafik, i hela sidan med
+`?rum-kval=0` (rummets fulla steg, som på en Mac): rummet och hans bild i 1440 × 900 med täthet 1 och 2, och
+telefonen på höjden (390 × 844). Färgerna är mätta i bilderna: pulten i rummet längst bak 24° nyans, 25 % mättnad
+och 37 % ljushet, och disken framför honom 24–25°, 30 % och 36 %; ärmens tyg på skärmen i rummet (54, 50, 47)
+mot i baren (59, 53, 48), och huden (211, 154, 126) mot (219, 153, 124). Kamerahöjden valdes bland fyra renderade varianter (ögat 31, 39, 45 och 54 cm över
+hans), och väggbildens täckning är räknad för fönster från 844 × 390 till 3440 × 1440 och på höjden från 360 × 780
+till 1000 × 1000 (minst 11 bildpunkter till godo). Inte provat i Safari eller på en riktig telefon.
 
 Kaffet på sex sätt (2026-11-05) är provat i headless Chromium med mjukvarugrafik, figuren ensam i
 1440 × 900 och 412 × 915: varje klipp bild för bild, ångan i följd (med förstärkt ånga, för att se att

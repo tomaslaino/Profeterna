@@ -435,22 +435,16 @@ window.Rum = (() => {
   // ---------- lagren ----------
 
   function table() {
-    // Dagens ringar och brännmärken: kaffet och flaskorna har stått på olika ställen olika dagar.
-    // Träet självt är en färdig bild (scripts/rum/pult.mjs), gradienten under syns tills den är hämtad.
-    let h = (Math.floor(Date.now() / 86400000) * 7 + 11) % 2147483647 || 1;
+    // Träet är färdiga bilder (scripts/rum/pult.mjs): samma pult som framför Hasse Backe (rum-pult.js), med
+    // hörnet och geringssnittet längst till vänster. Gradienten under syns tills de är hämtade. Ringarna efter
+    // glas är desamma som i hans bild och ritas när rum-pult.js är hämtad (ringar nedan). Brännmärkena skiftar
+    // med dagen, mest vid askkoppen.
+    let h = (Math.floor(Date.now() / 86400000) * 13 + 5) % 2147483647 || 1;
     const R0 = () => { h = (h * 16807) % 2147483647; return (h - 1) / 2147483646; };
     let spar = '';
     for (let i = 0; i < 6; i++) {
-      const x = r1(40 + R0() * 1520);
-      const y = r1(668 + R0() * 310);
-      const rx = r1(22 + R0() * 14);
-      const a = r1(0.22 + R0() * 0.2);
-      spar += `<ellipse cx="${x}" cy="${y}" rx="${rx}" ry="${r1(rx * 0.34)}" fill="none" stroke="#160a03" stroke-opacity="${a}" stroke-width="2.6"/><ellipse cx="${x}" cy="${y}" rx="${r1(rx - 3)}" ry="${r1(rx * 0.34 - 1.5)}" fill="none" stroke="#160a03" stroke-opacity="${r1(a / 2)}"/>`;
-    }
-    // brännmärkena, mest vid askkoppen
-    for (let i = 0; i < 6; i++) {
       const vid = i < 4;
-      const x = r1(vid ? 1360 + R0() * 170 : 60 + R0() * 1200);
+      const x = r1(vid ? 1360 + R0() * 170 : 380 + R0() * 1000);
       const y = r1(vid ? 690 + R0() * 110 : 700 + R0() * 260);
       spar += `<ellipse cx="${x}" cy="${y}" rx="14" ry="4.6" fill="#0c0602" opacity=".32"/><ellipse cx="${x}" cy="${y}" rx="8" ry="2.8" fill="#0c0602" opacity=".82"/>`;
     }
@@ -460,8 +454,30 @@ window.Rum = (() => {
   <g stroke="#e8e0cc" stroke-opacity=".35" stroke-width="1.2"><line x1="210" y1="649" x2="268" y2="649"/><line x1="720" y1="650" x2="742" y2="650"/><line x1="1302" y1="649" x2="1380" y2="649"/></g>
   <ellipse cx="800" cy="840" rx="580" ry="160" fill="#ffd9a6" opacity=".10" filter="url(#rum-b40)"/>
   <ellipse cx="460" cy="700" rx="320" ry="50" fill="#ff4a30" opacity=".10" filter="url(#rum-b40)"/>
-  ${spar}
-  <rect class="pult-kant" x="-10" y="984" width="1620" height="20" fill="url(#rum-alu)"/>`, '', [0, 510, W, H - 510], 2 / 3);
+  <g class="rum-ringar"></g>${spar}
+  <image class="pult-kant" href="rum/pult-kant.webp" x="-10" y="940" width="1620" height="70" preserveAspectRatio="none"/>`, '', [0, 510, W, H - 510], 2 / 3);
+  }
+  // Ringarna efter glas på pulten: samma som i Hasse Backes bild (rum-pult.js), genom rummets kamera.
+  function ringar(el) {
+    import('./rum-pult.js').then(({ ringar: lista, iRum, L }) => {
+      const d = (x, z, r) => {
+        let s = '';
+        for (let i = 0; i < 36; i++) {
+          const a = (i / 36) * 2 * Math.PI;
+          const [px, py] = iRum(x + r * Math.cos(a), L.Y, z + r * Math.sin(a));
+          s += `${i ? 'L' : 'M'}${r1(px)} ${r1(py)}`;
+        }
+        return `${s}Z`;
+      };
+      let ut = '';
+      for (const [x, z, r, a] of lista()) {
+        const [cx, cy] = iRum(x, L.Y, z);
+        if (cx < -60 || cx > 1660 || cy < 640 || cy > 1000) continue;
+        ut += `<path d="${d(x, z, r)}" fill="none" stroke="#160a03" stroke-opacity="${a.toFixed(2)}" stroke-width="2.6"/>` +
+          `<path d="${d(x, z, r - 5.5)}" fill="none" stroke="#160a03" stroke-opacity="${(a / 2).toFixed(2)}"/>`;
+      }
+      for (const g of el.querySelectorAll('.rum-ringar')) g.innerHTML = ut;
+    }).catch(() => { /* utan moduler: pulten utan ringar */ });
   }
 
   function sill() {
@@ -1226,6 +1242,7 @@ ${window.RumRegister ? RumRegister.nara() : ''}
     document.querySelector('main').prepend(el);
     R.el = el;
     R.built = true;
+    ringar(el);
     wire();
     // kort: högst elva tecken
     R.tv = window.RumTv ? RumTv.mount(el, { calm, sedan, short, kort: (n) => BOARD[n] || short(n), wd, hm, matches: () => (state.all && state.all.matches) || [] }) : null;

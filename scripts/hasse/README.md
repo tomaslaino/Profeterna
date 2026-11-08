@@ -8,6 +8,12 @@
 
 Ändras kameran, baren eller pulten (`DISK`, `HORN`) i `rum-hasse-scen.js` ska väggen bakas om. Pulten framför honom bakas inte: sidan ritar den en gång i hans värld (`diskBild` i `public/rum-hasse-3d.js`), med väggens bild svagt speglad i träet. I bakningen finns den och han själv bara som något som skuggar och kastar ljus.
 
+Alla sex väggbilderna bakades om 2026-11-08 när kameran flyttades upp (`HOJD` 750, `LUT` 14), med mjukvarugrafik i Chromium (`CHROME=…`, se nedan): 160 varv för de breda och 240 för telefonen på höjden, i stället för 400. De har något mer brus än förut; med grafikkort på Macen går det att baka om dem med 400 varv som ovan.
+
+Pultens bilder i rummet (`public/rum/pult.webp`, `pult-mer.webp` och framkanten `pult-kant.webp`) är samma pult som framför honom, med samma trä och form (`public/rum-pult.js`), och bakas med `node scripts/rum/pult.mjs`. Ändras träet, formen eller rummets kamera (`RUM`) där ska de bakas om.
+
+`cdp.mjs` startar Google Chrome på Macen. Med `CHROME=<sökväg>` startar den en annan Chrome eller Chromium, med mjukvarugrafik (SwiftShader), till exempel på Linux.
+
 - `public/profeterna/kropp-hasse.png` och `hasse.jpg`: kroppen till pallen och kröningen i Olympen (320 × 420 som de andras) och porträttet. `kropp.html` ritar dem ur `hasse-atlas.webp` (uppackad till `atlas.png` i samma mapp, `dwebp`): fotot, ärmen som saknas, byxor och skor. Hämta duken med `toDataURL` i headless Chrome, skalad till halva storleken.
 
 `atlas.html` läser `c2013.png` i samma mapp: *Hasse Backe 2013-03-26 001.jpg* (C More Entertainment, CC BY 3.0, Wikimedia Commons) i 1280 bildpunkters bredd, urklippt med `klipp.swift`. Den ligger inte i repot.

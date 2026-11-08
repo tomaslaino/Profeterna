@@ -6,7 +6,8 @@ const ledig = () => new Promise((ok) => { const s = net.createServer(); s.listen
 export const sov = (ms) => new Promise((ok) => setTimeout(ok, ms));
 export async function oppna({ W = 1440, H = 900, D = 1, mobil = false, tid = 280000 } = {}) {
   const dbg = await ledig(); const prof = path.join(HERE, 'chrome-' + dbg);
-  const ch = spawn('/Applications/Google Chrome.app/Contents/MacOS/Google Chrome', ['--headless=new', '--use-angle=metal', '--enable-unsafe-webgl', '--disable-gpu-watchdog', `--remote-debugging-port=${dbg}`, `--user-data-dir=${prof}`, '--no-first-run', '--hide-scrollbars', 'about:blank'], { stdio: 'ignore' });
+  // (CHROME=… för en annan Chrome, t.ex. utan Mac: då med mjukvarugrafik)
+  const ch = spawn(process.env.CHROME || '/Applications/Google Chrome.app/Contents/MacOS/Google Chrome', ['--headless=new', ...(process.env.CHROME ? ['--use-angle=swiftshader', '--no-sandbox'] : ['--use-angle=metal']), '--enable-unsafe-swiftshader', '--enable-unsafe-webgl', '--disable-gpu-watchdog', `--remote-debugging-port=${dbg}`, `--user-data-dir=${prof}`, '--no-first-run', '--hide-scrollbars', 'about:blank'], { stdio: 'ignore' });
   const stang = () => { try { ch.kill('SIGKILL'); } catch {} try { fs.rmSync(prof, { recursive: true, force: true }); } catch {} };
   const tg = setTimeout(() => { console.error('tidsgräns'); stang(); process.exit(2); }, tid);
   let tabs; for (let i = 0; i < 80; i++) { try { tabs = await (await fetch(`http://127.0.0.1:${dbg}/json/list`)).json(); if (tabs.length) break; } catch {} await sov(400); }
