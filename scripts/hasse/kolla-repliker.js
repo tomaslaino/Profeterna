@@ -52,6 +52,7 @@ const FALT = {
   resultat: ['res'],
   'kupong.farre': ['du'], 'kupong.fler': ['du'], 'kupong.skilda': ['du'], 'kupong.korsar': ['du', 'Bada'],
   'efter.ratt': ['ratt', 'av'], 'efter.exakt': ['res'],
+  domar: ['namn', 'antal', 'Antal'],
 };
 // Sidan lottar bland de här, så de måste vara listor.
 const LISTOR = ['oppning', 'oppningNamn', 'tillbaka', 'tillbakaNamn', 'nasta', 'halva', 'enKvar', 'alla', 'allaKvar', 'allaIgen', 'ledig', 'val', 'valLasa',
@@ -59,9 +60,14 @@ const LISTOR = ['oppning', 'oppningNamn', 'tillbaka', 'tillbakaNamn', 'nasta', '
   'fyller.foreslar', 'fyller.hit', 'fyller.skriver.1', 'fyller.skriver.X', 'fyller.skriver.2', 'fyller.gardera', 'fyller.medhall', 'fyller.emot',
   'fyller.suddar', 'fyller.inne', 'fyller.fel',
   'kupong.samma', 'kupong.farre', 'kupong.fler', 'kupong.korsar', 'kupong.skilda',
-  'efter.alla', 'efter.bra', 'efter.mitten', 'efter.daligt', 'efter.inget', 'efter.forst', 'efter.sist', 'efter.exakt', 'efter.pagar', 'efter.dolt', 'efter.ofragad'];
+  'efter.alla', 'efter.bra', 'efter.mitten', 'efter.daligt', 'efter.inget', 'efter.forst', 'efter.sist', 'efter.exakt', 'efter.pagar', 'efter.dolt', 'efter.ofragad',
+  'domar.fraga', 'domar.igen', 'domar.alla', 'domar.matcherna', 'domar.forsakring',
+  ...['forst', 'alla', 'mitten', 'sist', 'sistLika', 'inget'].map((k) => `domar.in.${k}`),
+  ...['forsakring', 'forst', 'alla', 'mitten', 'sist', 'sistLika', 'inget'].map((k) => `domar.ut.${k}`),
+  'domar.hel.en', 'domar.hel.fler', 'domar.ensam.ingen', 'domar.ensam.en', 'domar.ensam.fler',
+  ...['ingen', 'enda', 'endaInte', 'alla', 'inga', 'en', 'fler'].map((k) => `domar.spik.${k}`)];
 // Knappar och ord, inte meningar.
-const INTE_MENINGAR = ['lar', 'tecken', 'tal'];
+const INTE_MENINGAR = ['lar', 'tecken', 'tal', 'domord'];
 
 const fel = [];
 const varde = (vag) => vag.split('.').reduce((o, k) => (o == null ? o : o[k]), repliker);
@@ -91,6 +97,12 @@ for (const vag of LISTOR) {
   const l = varde(vag);
   if (Array.isArray(l) && new Set(l).size !== l.length) fel.push(`${vag} har samma rad två gånger`);
 }
+// Domarna: ett ord i guld för varje läge, och varje rad en mening (de läses upp mening för mening).
+for (const k of ['forsakring', 'forst', 'alla', 'mitten', 'sist', 'sistLika', 'inget']) {
+  if (!(repliker.domord && repliker.domord[k])) fel.push(`domord.${k} saknas`);
+  if (!(k === 'forsakring' || (repliker.domar && repliker.domar.in && repliker.domar.in[k]))) fel.push(`domar.in.${k} saknas`);
+}
+for (const [vag, t] of alla) if (vag.startsWith('domar.') && t.split(/(?<=[.?!])\s+/).length > 1 && !['domar.fraga', 'domar.alla'].includes(vag)) fel.push(`${vag}: "${t}" är två meningar. Domen läses upp mening för mening, så skriv en.`);
 for (const k of ['1', 'X', '2']) {
   const t = repliker.tecken && repliker.tecken[k];
   if (!t || !t.du || !t.bestamd) fel.push(`tecken.${k} saknar du eller bestamd`);

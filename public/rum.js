@@ -5236,7 +5236,8 @@ ${window.RumRegister ? RumRegister.nara() : ''}
     const nr = typeof couponNumber === 'function' ? couponNumber(rd.ids) : null;
     return { matcher: rd.ids.map((id) => rows.find((x) => x.id === id)).filter(Boolean).map((x) => x.m), kupong: nr ? `Kupong ${nr}` : 'Kupong' };
   }
-  return { fits, show, hide, kupong, bladet, smal: () => Boolean(R.smal), redraw: () => { if (R.on) fill(); }, skriv: skrivPult, kval: () => R.kval, vila: (v) => {
+  // summa: sammanställningen så länge protokollet ligger på pulten (Hasses domar i rum-hasse.js), annars null
+  return { fits, show, hide, kupong, bladet, summa: () => R.summa || null, smal: () => Boolean(R.smal), redraw: () => { if (R.on) fill(); }, skriv: skrivPult, kval: () => R.kval, vila: (v) => {
       R.vilar = Boolean(v);
       // (rummet kommer tillbaka rakt: rum-hasse.js rätar upp det på vägen dit)
       if (!v) { R.mx = R.my = 0; setCam(0, 0); }

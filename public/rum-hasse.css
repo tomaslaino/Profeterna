@@ -52,7 +52,7 @@
 .rh-samtal { position: absolute; top: 12%; bottom: 52px; z-index: 2; display: flex; flex-direction: column; font-size: clamp(15px, 1.22vw, 18px); line-height: 1.42; text-shadow: 0 1px 4px rgba(0, 0, 0, 0.9); }
 .rh-sagt { flex: none; min-height: 1.15em; font: 700 1.62em/1.15 Fraunces, Georgia, serif; margin: 0 0 0.4em; }
 /* över matchlistan alltid plats för två rader, så att listan står still vad han än säger */
-.rh-sagt:has(+ .rh-lista, + .rh-kol) { min-height: 2.3em; text-wrap: balance; }
+.rh-sagt:has(+ .rh-lista, + .rh-kol, + .rh-ghu) { min-height: 2.3em; text-wrap: balance; }
 .rh-o { visibility: hidden; }
 .rh-o.s { visibility: visible; }
 .rh-lista { flex: 1; min-height: 0; overflow-y: auto; overscroll-behavior: contain; touch-action: pan-y; }
@@ -104,6 +104,34 @@
 .rh-kol.trangt .du .rh-ans + .rh-namn, .rh-kol.trangare .rh-ans + .rh-namn { display: none; }
 .rh-vh { position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap; }
 @media (hover: hover) { .rh-lista button:hover:not(:disabled) { color: #ffd86b; border-bottom-color: #ffd86b; } }
+/* Gänget efter omgången (gangLista och doma i rum-hasse.js): porträtten i var och ens färg och namnen i
+   deras handstil, som på kupongen, rätt och poäng i raka spalter som i protokollet, och ringen kring den
+   bästas poäng. Ordet han har slagit i disken står i guld efter namnet, när man har hört domen. */
+.rh-ghu, .rh-gang button { display: grid; grid-template-columns: 2.1em minmax(0, 1fr) 2.4em 3.7em; column-gap: 0.45em; align-items: center; }
+.rh-ghu { flex: none; padding-bottom: 0.35em; }
+.rh-ghu span { font: 700 11px/1 Fraunces, Georgia, serif; letter-spacing: 0.17em; text-transform: uppercase; color: rgba(246, 239, 220, 0.7); text-align: right; }
+.rh-ghu span:first-child { grid-column: 3; }
+.rh-gang button { padding: 0.5em 0; }
+.rh-gang button > .rh-ans, .rh-gvem > .rh-ans { --a: 1.75em; }
+.rh-gang .k0 .rh-ans, .rh-gvem.k0 .rh-ans { --ring: var(--gang-0); }
+.rh-gang .k1 .rh-ans, .rh-gvem.k1 .rh-ans { --ring: var(--gang-1); }
+.rh-gang .k2 .rh-ans, .rh-gvem.k2 .rh-ans { --ring: var(--gang-2); }
+.rh-gnm { display: flex; align-items: baseline; gap: 0.7em; min-width: 0; overflow: hidden; }
+.rh-gnm em { flex: none; font: normal 700 0.68em/1 Fraunces, Georgia, serif; letter-spacing: 0.14em; text-transform: uppercase; color: #ffd86b; white-space: nowrap; }
+.rh-gang .rh-namn, .rh-gvem .rh-namn { flex: none; color: #f6efdc; white-space: nowrap; }
+.rh-gang .k0 .rh-namn, .rh-gvem.k0 .rh-namn { font: 400 1.05em/1.3 "Cedarville Cursive", Caveat, cursive; }
+.rh-gang .k1 .rh-namn, .rh-gvem.k1 .rh-namn { font: 400 1.2em/1.2 "Mr Dafoe", Caveat, cursive; }
+.rh-gang .k2 .rh-namn, .rh-gvem.k2 .rh-namn { font: 400 1.45em/1 "Reenie Beanie", Caveat, cursive; }
+.rh-gratt { text-align: right; font: 700 1.6em/1 Caveat, cursive; }
+.rh-gpo { justify-self: end; padding-right: 0.15em; font-weight: 700; font-variant-numeric: tabular-nums; white-space: nowrap; }
+.rh-vann { position: relative; display: inline-block; padding: 0.15em 0.35em; }
+.rh-vann .rb-ring { position: absolute; inset: -0.1em -0.25em; width: calc(100% + 0.5em); height: calc(100% + 0.2em); overflow: visible; pointer-events: none; }
+.rh-vann .rb-ring path { fill: none; stroke: #ff6a55; stroke-width: 2; stroke-linecap: round; }
+/* domen: vem det gäller överst, där matchen står när han svarar om en match */
+.rh-gvem { display: flex; align-items: center; gap: 0.55em; }
+.rh-gvem small { font-size: 0.86em; font-weight: 700; opacity: 0.85; }
+/* matcherna efter omgången: Gänget under listan */
+.rh-lista + .rh-slut { min-height: 0; }
 .rh-lista button:disabled { opacity: 1; cursor: default; }
 .rh-match { flex: none; font-weight: 600; opacity: 0.85; }
 .rh-dom { flex: none; margin: 0.06em 0 0.18em; font: 800 clamp(58px, 7vw, 104px)/1 Fraunces, Georgia, serif; color: #ffd86b; text-shadow: 0 3px 0 #6b4a10, 0 8px 18px rgba(0, 0, 0, 0.75); transform-origin: 12% 70%; animation: rh-dom 0.13s cubic-bezier(0.2, 0.7, 0.3, 1) both; }

@@ -6,8 +6,8 @@
 // tpScore i tippare.js) ligger bara Hasse Backes protokoll på pulten i
 // tobaksaffären, tills nästa kupong kommer måndagen efter kl. 16: Yatzy-blocket med facit och en spalt för kupongen, var och en i
 // gänget och Hasse. Allas tecken står kvar, och det som satt är markerat, så att
-// raderna går att läsa utan förklaring. Han har rättat det, med en dom per person
-// längst ner och sin namnteckning. Ett klick på blocket lyfter det och lägger fram det
+// raderna går att läsa utan förklaring. Han har rättat det och skrivit under, men
+// domarna över gänget säger han i baren (gang här, doma i rum-hasse.js). Ett klick på blocket lyfter det och lägger fram det
 // stort (protokollet i rum.js), och ett klick på löpsedeln i fönstret öppnar tidningen
 // (tidningen i rum.js). Gänget håller upp sina lappar (lappar här och i rum-3d.js), och
 // modellens siffra står på videons blå ruta.
@@ -45,17 +45,6 @@
 
   // ---------- texterna ----------
   const TEXT = {
-    dom: {
-      alla: 'alla rätt. Jag hade sagt samma sak.',
-      forsakring: 'försäkring, inte kunskap.',
-      forst: 'först, och det kommer vi att få höra.',
-      sistLika: (n) => `${ordet(n)} rätt, och ändå sist.`,
-      sist: (n) => `${ordet(n)} rätt. Det krävs en viss talang.`,
-      mitten: (n) => `${ordet(n)} rätt, och ingen märkte det.`,
-      inget: 'lämnade inte in. Det var klokt.',
-      hasseForst: 'precis som jag sa.',
-      hasse: 'matcherna hade fel.',
-    },
     kronika: {
       rubrik: 'Matcherna hade fel',
       rubrikAlla: 'Vad var det jag sa',
@@ -209,26 +198,40 @@
     return null;
   }
 
-  // ---------- domarna ----------
+  // ---------- gänget hos Hasse ----------
 
-  // Domarna längst ner, en per person med den bästa först, Hasse sist när han inte tävlar. → [{ id, namn, text }]
-  function domar(sum) {
-    const T = TEXT.dom;
-    const folk = sum.folk.filter((p) => !p.none).sort((a, b) => (a.award === 'best' ? -1 : a.award === 'worst' ? 1 : 0) - (b.award === 'best' ? -1 : b.award === 'worst' ? 1 : 0));
-    const ok = folk.map((p) => p.ok);
+  // Hur det gick för var och en i gänget, till hans domar i baren (doma i rum-hasse.js, raderna i domar i
+  // rum-hasse-repliker.js). Bara gänget räknas: Hasse själv står inte i listan och är inte med när bäst och
+  // sämst avgörs, så att han aldrig dömer sig själv. Läget:
+  //   alla       alla rätt
+  //   forsakring bäst i gänget, och där ingen annan hade rätt var det helgarderat
+  //   forst      bäst i gänget annars (också ensam om att ha lämnat in)
+  //   sist       sämst i gänget, sistLika med lika många rätt som någon annan
+  //   mitten     annars, och inget för den som inte lämnade in
+  // → [{ id, namn, bild, hand, none, ok, n, pts, bast, lage, hel, helRatt, spik, spikRatt, ensam }], bäst först.
+  function gang(sum) {
+    const folk = sum.folk.filter((p) => p.id !== HASSE);
+    const med = folk.filter((p) => !p.none);
+    const rankade = Tippoang.rank(med.map((p) => ({ id: p.id, ok: p.ok, pts: p.pts })), true);
+    const award = Object.fromEntries(rankade.map((p) => [p.id, med.length === 1 ? 'best' : p.award || null]));
+    const ratt = (r, id) => Boolean(r.kol[id] && r.kol[id].ok);
     const ut = folk.map((p) => {
-      let text;
-      if (p.id === HASSE) text = p.award === 'best' ? T.hasseForst : T.hasse;
-      else if (p.n && p.ok === p.n) text = T.alla;
-      else if (p.award === 'best') text = p.ensam.some((r) => r.kol[p.id].t.length === 3) ? T.forsakring : T.forst;
-      else if (p.award === 'worst') text = ok.filter((x) => x === p.ok).length > 1 ? T.sistLika(p.ok) : T.sist(p.ok);
-      else text = T.mitten(p.ok);
-      return { id: p.id, namn: p.namn, ink: p.ink, text };
+      const mina = sum.rader.map((r) => r.kol[p.id] || {}).filter((c) => c.t);
+      const hel = mina.filter((c) => c.t.length === 3);
+      const spik = mina.filter((c) => c.t.length === 1);
+      const ensam = p.none ? [] : sum.rader.filter((r) => ratt(r, p.id) && med.every((q) => q.id === p.id || !ratt(r, q.id)));
+      const a = award[p.id];
+      let lage = 'mitten';
+      if (p.none) lage = 'inget';
+      else if (p.n && p.ok === p.n) lage = 'alla';
+      else if (a === 'best') lage = ensam.length && ensam.every((r) => r.kol[p.id].t.length === 3) ? 'forsakring' : 'forst';
+      else if (a === 'worst') lage = med.some((q) => q.id !== p.id && q.ok === p.ok) ? 'sistLika' : 'sist';
+      return {
+        id: p.id, namn: p.namn, bild: p.bild, hand: p.hand, none: p.none, ok: p.ok, n: p.n, pts: p.pts, bast: a === 'best', lage,
+        hel: hel.length, helRatt: hel.filter((c) => c.ok).length, spik: spik.length, spikRatt: spik.filter((c) => c.ok).length, ensam: ensam.length,
+      };
     });
-    for (const p of sum.folk) if (p.none) ut.push({ id: p.id, namn: p.namn, ink: p.ink, text: T.inget });
-    if (!medBacke(sum)) return ut;
-    const hasseBast = sum.backe.n && folk.length && folk.every((p) => p.ok < sum.backe.ok);
-    return [...ut, { id: BACKE.id, namn: BACKE.namn, ink: BACKE.ink, text: hasseBast ? T.hasseForst : T.hasse }];
+    return ut.sort((a, b) => (a.none - b.none) || (b.none ? 0 : Tippoang.key(b) - Tippoang.key(a)));
   }
 
   // ---------- blocket ----------
@@ -272,14 +275,13 @@
       if (p.none) return '';
       return p.award === 'best' ? `<span class="rb-vann">${poang(p.pts)}${RING(70, 30)}</span>` : poang(p.pts);
     }));
-    const dom = domar(sum).map((d) => `<span class="rb-dom"><b>${esc(d.namn)}:</b>${esc(d.text)}</span>`).join('');
     const rub = sum.namn || (sum.nr ? `Kupong ${sum.nr}` : '');
     const bakom = kol.filter((s) => s.id !== 'K' && !(P(s.id) && P(s.id).none)).map((s) => `${s.namn} ${s.id === 'B' ? sum.backe.ok : P(s.id).ok}`).join(', ');
     const label = `Hasse Backes protokoll: kupongen ${sum.kupong.ok} rätt, ${bakom}`;
     return `<span class="rum-block n${kol.length}${tat ? ' tat' : ''}" style="--n:${kol.length}" role="img" aria-label="${esc(label)}">` +
       `<span class="rb-hu"><b>PROTOKOLL</b><span>${esc(rub)}</span></span>` +
       `<span class="rb-g"><span class="rb-sp la">Match</span><span class="rb-sp la fa">Facit</span>${kol.map(huvud).join('')}${rader}${ratt}${pts}</span>` +
-      `<span class="rb-omd">${dom}<span class="rb-sign"><i>H. Backe</i></span></span></span>`;
+      '<span class="rb-omd"><span class="rb-sign"><i>H. Backe</i></span></span></span>';
   }
 
   // ---------- tidningen ----------
@@ -365,5 +367,5 @@
     }
   }
 
-  return { rakna, lappar, mandagEfter, bygg, domar, html, tidning, rastrera, kronika, skrall, betyg, TEXT };
+  return { rakna, lappar, mandagEfter, bygg, gang, poang, RING, html, tidning, rastrera, kronika, skrall, betyg, TEXT };
 });

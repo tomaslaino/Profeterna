@@ -1,5 +1,5 @@
 /* Sammanställningen efter omgången (rum-block.js): Hasse Backes protokoll, ett Yatzy-block med hans
-   anteckningar, och tidningen bakom löpsedeln. Allt är platt papper som ritas en gång, utan
+   namnteckning, och tidningen bakom löpsedeln. Allt är platt papper som ritas en gång, utan
    skuggfilter och blandning, och inget ritas om medan kameran står still. */
 
 /* ---------- blocket ---------- */
@@ -55,11 +55,9 @@
 .rb-ring path { stroke: #c8281e; stroke-width: 2.4; stroke-linecap: round; }
 .rb-vann { position: relative; display: inline-block; padding: 3px 8px; }
 .rb-vann .rb-ring { inset: 0; width: 100%; height: 100%; }
-/* domarna och namnteckningen: i Hasses penna, samma som på notan */
-.rb-omd { position: relative; display: block; margin-top: 8px; color: #27408b; font: 700 22px/1 Caveat, cursive; }
-.rb-dom { display: flex; align-items: flex-end; box-sizing: border-box; height: 27px; padding-bottom: 2px; border-bottom: 1px solid var(--linje); overflow: hidden; }
-.rb-dom b { flex: none; width: 94px; font-weight: 700; }
-.rb-sign { position: absolute; right: 8px; bottom: 5px; }
+/* namnteckningen: i Hasses penna, samma som på notan (domarna säger han i baren) */
+.rb-omd { position: relative; display: block; height: 52px; margin-top: 4px; }
+.rb-sign { position: absolute; right: 10px; bottom: 8px; }
 .rb-sign i { display: block; padding: 0 4px 2px 0; border-bottom: 2px solid #27408b; color: #27408b; font: 700 31px/1 Caveat, cursive; transform: rotate(-5deg); }
 
 /* den smala: telefonen, med ansiktena som spalthuvuden */
@@ -90,10 +88,9 @@
 .tat .rb-vann { padding: 2px 3px; }
 .tat .rb-vann .rb-ring { inset: -1px -2px; width: calc(100% + 4px); height: calc(100% + 2px); }
 .tat .rb-vann .rb-ring path { stroke-width: 1.5; }
-.tat .rb-omd { margin: 6px 3px 0; font-size: 19px; }
-.tat .rb-dom { height: 23px; }
-.tat .rb-dom b { width: 80px; }
-.tat .rb-sign { display: none; }
+.tat .rb-omd { height: 36px; margin: 2px 3px 0; }
+.tat .rb-sign { right: 6px; bottom: 5px; }
+.tat .rb-sign i { font-size: 22px; border-bottom-width: 1.5px; }
 
 /* på pulten: i kupongens ställe och plan. Kupongens ruta är tom, så att bara bladet syns och går att klicka på */
 #rum-kupong:has(> .rum-block) { background: none; box-shadow: none; pointer-events: none; }

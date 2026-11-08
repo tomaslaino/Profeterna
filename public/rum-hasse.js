@@ -448,6 +448,7 @@ window.RumHasse = (() => {
       slappSen();
       return;
     }
+    H.matcher = false;
     fraga();
     H.on = true;
     H.oppnar = false;
@@ -1376,12 +1377,16 @@ window.RumHasse = (() => {
     H.fraga = {};
     H.fas = 'fraga';
     H.prat = null;
+    // efter omgången dömer han gänget, och matcherna står bakom Matcherna (domarna nedan)
+    const sum = summan();
+    if (sum && !H.matcher && gangLista(sum)) return;
     const lista = kupongen();
     const fragat = minns(lista);
     const nu = Date.now();
-    s.innerHTML = '<h2 class="rh-sagt"></h2><div class="rh-lista"></div>';
+    s.innerHTML = `<h2 class="rh-sagt"></h2><div class="rh-lista"></div>${sum ? '<div class="rh-slut"><button type="button" class="rh-vag rh-tillgang">Gänget</button></div>' : ''}`;
+    if (sum) s.querySelector('.rh-tillgang').addEventListener('click', () => { H.matcher = false; fraga(); });
     const forsta = listan(lista, fragat);
-    const forstaText = forstaRad(lista, fragat, forst);
+    const forstaText = sum ? lott(REP().domar.matcherna) : forstaRad(lista, fragat, forst);
     if (forstaText) rad(forstaText);
     const dag = spelstopp(lista);
     H.prat = lista.length && forsta ? { rader: medDag(REP().ledig, dag), i: 0, nasta: performance.now() + 24000, gang: 24000 } : null;
@@ -1398,7 +1403,8 @@ window.RumHasse = (() => {
       const topp = l.scrollTop;
       listan(lista, fragat, tips);
       l.scrollTop = topp;
-      if (borjat) efterat(lista, tips);
+      // (efter omgången säger han inget om hur det gick för honom: då dömer han gänget)
+      if (borjat && !summan()) efterat(lista, tips);
     };
     if (igang) Promise.resolve(vanta).then(() => hansRader(lista, fragat)).then(fram);
     else if (vanta) vanta.then(() => fram(fragat));
@@ -1638,6 +1644,137 @@ window.RumHasse = (() => {
     const sedan = g.exakt ? [fyll(lott(e.exakt), { res: g.exakt })] : [];
     for (let i = plats ? 3 : 2; i > 0; i--) sedan.push(lott(rader));
     H.prat = { rader: sedan, i: 0, nasta: performance.now() + 24000, gang: 24000 };
+  }
+
+  // ---------- domarna efter omgången ----------
+  //
+  // När omgången är spelad och protokollet ligger på pulten (Rum.summa, tills nästa Stryktips kommer
+  // måndagen efter kl. 16) dömer han gänget: listan har var och en med rätt och poäng, bäst först, och
+  // den man väljer får sin dom slagen i disken i guld, som domen över en match, och några meningar om sin
+  // kupong (domar och domord i rum-hasse-repliker.js, läget i RumBlock.gang). Om sig själv säger han inget
+  // här. Raderna väljs efter omgången och personen, så att domen är densamma varje gång och på alla
+  // enheter. Matcherna står kvar bakom Matcherna, utan det han säger om hur det gick för honom (efterat).
+  const summan = () => (window.Rum && Rum.summa && window.RumBlock && RumBlock.gang && REP().domar ? Rum.summa() : null);
+  // Samma rad för samma nyckel: ett tal ur nyckeln, inte slumpen.
+  function fast(lista, nyckel) {
+    let h = 7;
+    for (const c of nyckel) h = (h * 31 + c.charCodeAt(0)) >>> 0;
+    return lista[h % lista.length];
+  }
+  const versal = (t) => t.replace(/^./, (c) => c.toUpperCase());
+  // Vilka i gänget du har hört domen över, på enheten för den omgången: deras ord står i guld i listan.
+  const HORT = 'profeterna.hasse.domar';
+  function hort(id) {
+    if (!H.hort || H.hort.id !== id) {
+      let vem = [];
+      try {
+        const j = JSON.parse(localStorage.getItem(HORT));
+        if (j && j.id === id && Array.isArray(j.vem)) vem = j.vem;
+      } catch (e) { /* då har du inte hört någon */ }
+      H.hort = { id, vem };
+    }
+    return H.hort.vem;
+  }
+  function hora(id, vem) {
+    const v = hort(id);
+    if (v.includes(vem)) return;
+    v.push(vem);
+    try { localStorage.setItem(HORT, JSON.stringify({ id, vem: v })); } catch (e) { /* bara den här gången */ }
+  }
+  // Porträttet i personens färg (som på kupongen), och siffrorna som i protokollet.
+  const ansikte = (p) => `<span class="rh-ans"${p.bild ? ` style="background-image: url('${esc(p.bild)}')"` : ''}></span>`;
+  const siffror = (p) => (p.none ? '' : `${p.ok} rätt, ${RumBlock.poang(p.pts)}`);
+
+  // Listan: var och en i gänget, bäst först, med rätt och poäng som i protokollet och ringen kring den
+  // bästas poäng. → false om det inte finns någon att döma.
+  function gangLista(sum) {
+    const folk = RumBlock.gang(sum);
+    if (!folk.length) return false;
+    const s = $('.rh-samtal');
+    const r = REP();
+    const h = hort(sum.id);
+    s.innerHTML = '<h2 class="rh-sagt"></h2><div class="rh-ghu" aria-hidden="true"><span>Rätt</span><span>Poäng</span></div><div class="rh-lista rh-gang"></div>' +
+      '<div class="rh-slut"><button type="button" class="rh-vag rh-tillmatcher">Matcherna</button></div>';
+    const l = s.querySelector('.rh-gang');
+    for (const p of folk) {
+      const b = document.createElement('button');
+      b.type = 'button';
+      b.className = `k${p.hand}`;
+      const ord = h.includes(p.id) ? r.domord[p.lage] : '';
+      const po = p.none ? '' : RumBlock.poang(p.pts);
+      b.innerHTML = `${ansikte(p)}<span class="rh-gnm"><span class="rh-namn">${esc(p.namn)}</span>${ord ? `<em>${esc(ord)}</em>` : ''}</span>` +
+        `<b class="rh-gratt">${p.none ? '–' : p.ok}</b><b class="rh-gpo">${p.bast ? `<span class="rh-vann">${po}${RumBlock.RING(70, 30)}</span>` : po}</b>`;
+      b.setAttribute('aria-label', `${p.namn}${p.none ? '' : `, ${siffror(p)}`}`);
+      b.addEventListener('click', () => doma(p.id));
+      l.append(b);
+    }
+    s.querySelector('.rh-tillmatcher').addEventListener('click', () => { H.matcher = true; fraga(); });
+    const n = folk.filter((p) => h.includes(p.id)).length;
+    rad(lott(n === folk.length ? r.domar.alla : n ? r.domar.igen : r.domar.fraga));
+    klick();
+    return true;
+  }
+
+  // Domen: en inledning efter läget, en eller två saker ur kupongen och ett slut, en mening per rad.
+  function domText(p, sum) {
+    const d = REP().domar;
+    const tal = (n) => REP().tal[n] || String(n);
+    const mening = (lista, del, n = 0) => fyll(fast(lista, `${sum.id}:${p.id}:${del}`), { namn: p.namn, antal: tal(n), Antal: versal(tal(n)) });
+    const hel = () => (p.hel && p.helRatt === p.hel ? mening(p.hel === 1 ? d.hel.en : d.hel.fler, 'hel', p.hel) : null);
+    const spik = () => {
+      const k = d.spik;
+      if (!p.spik) return mening(k.ingen, 'spik');
+      if (p.spik === 1) return mening(p.spikRatt ? k.enda : k.endaInte, 'spik');
+      if (p.spikRatt === p.spik) return mening(k.alla, 'spik');
+      if (!p.spikRatt) return mening(k.inga, 'spik');
+      return mening(p.spikRatt === 1 ? k.en : k.fler, 'spik', p.spikRatt);
+    };
+    const ensam = () => mening(!p.ensam ? d.ensam.ingen : p.ensam === 1 ? d.ensam.en : d.ensam.fler, 'ensam', p.ensam);
+    const fakta = {
+      forsakring: [hel, () => mening(d.forsakring, 'forsakring')], forst: [ensam, spik], alla: [ensam],
+      mitten: [spik], sist: [spik, ensam], sistLika: [ensam], inget: [],
+    }[p.lage] || [];
+    return [mening(d.in[p.lage === 'forsakring' ? 'forst' : p.lage], 'in'), ...fakta.map((f) => f()), mening(d.ut[p.lage], 'ut')].filter(Boolean);
+  }
+
+  // Du väljer någon i gänget: domen slås i disken (som i svara), texten står direkt och går att läsa upp,
+  // och sedan nästa du inte har hört om, eller hela gänget.
+  function doma(id) {
+    const sum = summan();
+    const folk = sum ? RumBlock.gang(sum) : [];
+    const p = folk.find((x) => x.id === id);
+    if (!p) { fraga(); return; }
+    const s = $('.rh-samtal');
+    vakna();
+    tystna();
+    H.fraga = {};
+    H.fas = 'klar';
+    H.prat = null;
+    H.sagt = null;
+    H.talMal = 0;
+    hora(sum.id, p.id);
+    const h = hort(sum.id);
+    const i = folk.indexOf(p);
+    const nasta = [...folk.slice(i + 1), ...folk.slice(0, i)].find((q) => !h.includes(q.id));
+    const d = REP().domord[p.lage] || '';
+    s.innerHTML = `<div class="rh-match rh-gvem k${p.hand}">${ansikte(p)}<span class="rh-namn">${esc(p.namn)}</span><small>${esc(siffror(p))}</small></div>` +
+      `<div class="rh-dom vantar${d.length > 7 ? ' lang' : ''}">${esc(d)}</div><div class="rh-text"></div>` +
+      `<div class="rh-slut">${nasta ? `<button type="button" class="rh-knapp huvud rh-gnasta">Nästa: ${esc(nasta.namn)}</button>` : ''}<button type="button" class="rh-knapp${nasta ? '' : ' huvud'} rh-galla">Hela gänget</button></div>`;
+    const ruta = repliker(domText(p, sum).map((text, n) => ({ text, ny: n === 0 })), { i: s.querySelector('.rh-text'), direkt: true }).ruta;
+    ruta.scrollTop = 0;
+    const dom = s.querySelector('.rh-dom');
+    const visa = () => dom.classList.remove('vantar');
+    const slag = ettAv('dom', 'slag');
+    spela(slag, { vid: [(GEST[slag] ? GEST[slag].dom : 5) - 0.02, visa] });
+    // (har han något annat i händerna står domen där ändå efter en stund)
+    setTimeout(visa, 3000);
+    const sist = H.ko.length ? H.ko[H.ko.length - 1] : H.klipp;
+    if (Math.abs((sist ? sist.vila : H.T) - GEST.hem.vila) > 0.01) spela('hem');
+    const slut = s.querySelector('.rh-slut');
+    if (nasta) slut.querySelector('.rh-gnasta').addEventListener('click', () => doma(nasta.id));
+    slut.querySelector('.rh-galla').addEventListener('click', () => { H.matcher = false; fraga(); });
+    lasKnapp(slut, ruta);
+    klick();
   }
 
   // Du pekar ut en match och han frågar tillbaka. Först när du ber om det kommer analysen

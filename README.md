@@ -894,6 +894,12 @@ bara lokalt. Analyserna visas som de ligger i `data/analyser.json`; hur de skriv
 - **Hasse Backe spanar på din kupong (2026-11-08, användarens val):** ibland går blicken ned på kupongen,
   med sex olika miner, och när han har sagt vad han tycker om den passar minen orden. Se
   [Hasse Backe](#hasse-backe), *Vilan*.
+- **Hasse dömer gänget i baren, och protokollet har bara hans namnteckning (2026-11-08, användarens val):**
+  "protokollet ska ligga här utan att Hasse Backe kommenterar något speciellt - i hans vy ska han däremot göra det", "Jag
+  vill inte att han kommenterar sig själv här" och "Det här gör han tills att nästa stryktipsmatcher är uppe". Användaren
+  valde bland renderade alternativ: protokollet med bara namnteckningen (inte en stämpel eller fakta i tryck), och i baren
+  att man väljer vem han dömer (inte domarna uppradade, eller hans eget exemplar av protokollet på disken). Domarna gäller
+  så länge protokollet ligger på pulten. Se [Hasse Backe](#hasse-backe), *Domarna efter omgången*.
 - **Bara protokollet på pulten, och nästa kupong måndag kl. 16 (2026-11-08, användarens önskemål):** "Ta bort
   kupong 3 där nu när allt är klart - ha bara protokollet", och "Den nya kupongen kan dyka upp från och med
   måndagen efter tippningsdagen", "Måndag kl 16". Kupongen låg kvar under protokollet och Stryktipset tog över redan
@@ -5103,6 +5109,23 @@ stängt, står alla hans rader ifyllda, också matcher som inte har startat än,
 (`hansRader` i [public/rum-hasse.js](public/rum-hasse.js)): hans kupong i tävlingen om han spelar den,
 annars tecknen i hans text, med hans resultat.
 Överst i listan står vem som säger vad, utan förklarande text: Hasses porträtt och namn i guld mitt över hans rutor och resultat, och ditt porträtt i din färg med namnet i din handstil (som på kupongen) över din spalt. Får namnen inte plats bredvid varandra, som i telefonen, går ditt namn först och sedan hans, så att porträtten står kvar. En spalt som inte syns på någon rad får inget huvud.
+När alla matcher har börjat säger han hur det gick för honom (`efterat`), tills omgången är spelad.
+
+**Domarna efter omgången** (2026-11-08). Så länge protokollet ligger på pulten, alltså från att omgången är spelad
+tills nästa Stryktips kommer måndagen efter kl. 16 (`Rum.summa`), dömer han gänget i stället för att gå igenom matcherna.
+Han frågar vem han ska börja med, och listan har var och en i gänget med porträttet i sin färg, namnet i sin handstil och
+rätt och poäng som i protokollet, bäst först och med ringen kring den bästas poäng (`gangLista` i
+[public/rum-hasse.js](public/rum-hasse.js)). Den man väljer får sin dom slagen i disken i guld, som domen över en match
+(*Försäkring*, *Flyt*, *Felfritt*, *Osynlig*, *Talang*, *Ändå sist*, *Klokt*), och under den några meningar: en inledning
+efter hur det gick i gänget, en eller två saker ur kupongen och ett slut (`doma`). Sakerna är räknade ur protokollet:
+helgarderingarna, hur många spikar som satt och i hur många matcher ingen annan i gänget hade rätt (läget i `gang` i
+[public/rum-block.js](public/rum-block.js), raderna i `domar` i rum-hasse-repliker.js). Raderna väljs efter omgången och
+personen, inte på lott, så att domen är densamma varje gång och på alla enheter. Varje rad är en mening, så att domen står
+i ett stycke och *Läs upp* ändå kan läsa den mening för mening. *Nästa* tar den man inte har hört om än, och *Hela gänget*
+går tillbaka till listan, där ordet i guld står efter namnet på dem man har hört om (på enheten för den omgången,
+`profeterna.hasse.domar`). Om sig själv säger han inget här: han står inte i listan och räknas inte när bäst och sämst
+i gänget avgörs, och efter omgången säger han inte heller hur det gick för honom. *Matcherna* under listan visar hans rader
+och facit som förut, med *Gänget* tillbaka. Med dolda resultat finns inget protokoll, och då är allt som förut.
 Går hans röst inte att få säger han det och visar analysen i skrift. Allt han säger runt omkring är
 färdiga rader, utan AI, i [public/rum-hasse-repliker.js](public/rum-hasse-repliker.js). `npm run repliker`
 ([scripts/hasse/kolla-repliker.js](scripts/hasse/kolla-repliker.js)) kontrollerar filen, och GitHub kör den
@@ -5464,8 +5487,9 @@ nästa kupong kommer måndagen efter kl. 16 ([public/rum-block.js](public/rum-bl
 resultat och facit för varje match, och en spalt för kupongen (gängets tre ansikten), var och en i gänget och Hasse.
 Allas tecken står kvar, så att man ser vad var och en spelade: det som satt är överstruket med grön penna, och i en
 gardering är tecknet som satt starkast. Under står *Rätt av 13* och poängen. Vinnaren är inringad, både på porträttet
-och runt poängen, och det är de enda ringarna på blocket. Hasse har rättat det: en dom per person längst ner och hans
-namnteckning. I telefonen försvinner namnen under porträtten och namnteckningen. Har Hasse ingen kupong i omgången
+och runt poängen, och det är de enda ringarna på blocket. Hasse har rättat det och skrivit under, och mer står inte där:
+domarna över gänget säger han i baren (se [Hasse Backe](#hasse-backe), *Domarna efter omgången*). Förut stod en dom per
+person längst ner (ändrat 2026-11-08). I telefonen försvinner namnen under porträtten. Har Hasse ingen kupong i omgången
 (han tävlar från omgången efter 2026-11-07) står det han sa vid disken i hans spalt, utanför tävlingen
 (`Tippoang.hasseSagt`, samma regel som hans kupong: det ska vara skrivet före avspark).
 
@@ -5493,7 +5517,7 @@ så länge. Skyltens hörn och kant är genomskinliga i bilden, så att de är m
 `?rum-lapp=dl:kinden:kolla@2` (hållningen, vad hen gör och hur långt in).
 
 Allt räknas ur omgångens data och ser likadant ut på alla enheter. Med dolda resultat (Dölj resultat) syns inget av det,
-utan stämpeln *Alla inne* ligger kvar. Texterna står i `TEXT` i rum-block.js och inte i replikfilen, eftersom de inte
+utan stämpeln *Alla inne* ligger kvar. Tidningens texter står i `TEXT` i rum-block.js och inte i replikfilen, eftersom de inte
 sägs högt; `npm run repliker` kollar dem mot det som är underkänt.
 
 Kostnad, mätt i Chrome som telefon med processorn ×4: en bild av gänget 5,0 → 5,4 ms och 342 → 382 ritanrop, samma
