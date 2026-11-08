@@ -706,7 +706,7 @@ bara lokalt. Analyserna visas som de ligger i `data/analyser.json`; hur de skriv
 - **Spakar, POWER-knapp och fler stationer på radion (2026-11-08, användarens önskemål):** "lägga till
   radiokanaler", "göra radion bättre/snyggare", "FM- och AM-bandet med en spak istället för en ratt" och "en av-
   och på-knapp". Stationsratten och tangenterna är borta: en spak under skalan sitter på samma ställe som
-  visaren, en liten spak slår över mellan FM och AM, och POWER sätter på och stänger av. 50 stationer i stället
+  visaren, en liten spak slår över mellan FM och AM, och POWER sätter på och stänger av. 49 stationer i stället
   för 22. Se [Tobaksaffären](#tobaksaffären), *Radion*.
 - **Man väljer sig själv med ett klick på sin figur (2026-11-03, användarens önskemål):**
   ett klick på sin egen figur vid bordet gör en till den som fyller i kupongen – samma val
@@ -2872,7 +2872,7 @@ fading, som också syns på lampan. Lysdioderna och högtalarna följer det som 
 Web Audio). En station man har hört en stund är hittad: den skrivs för hand på maskeringstejpen vid skalan (FM
 ovanför i blått, AM under i rött, två rader där varannan står närmast skalan, `radioSkriv`, varje station har sin
 plats från början så att inget flyttar sig) och står som ett ord under radion, och ett klick på ordet går dit och
-sätter på radion. Orden visar bara bandet som spaken står på: med alla 50 hittade blir det annars en hel spalt. Italo
+sätter på radion. Orden visar bara bandet som spaken står på: med alla 49 hittade blir det annars en hel spalt. Italo
 Disco är hittad från början, och visaren står där första gången. Visaren, volymen och det man har hittat sparas i
 webbläsaren, och radion är var och ens egen: den syns inte hos de andra och stängs av när man lämnar rummet.
 
