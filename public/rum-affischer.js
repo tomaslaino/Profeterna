@@ -72,7 +72,7 @@ export const SKIVA = {
 // Löpsedeln: med tejp i fönstrets nedre vänstra hörn, eller med häftstift på
 // väggen mellan fönsterkarmen (x 958; fönsterbänkens ände når x 984 i y 554–596)
 // och bardisken (x 1060), under oraklets skylt (y 483).
-const LOPPLATS = [{ x: 286, y: 404, rot: 1.4 }, { x: 972, y: 491, rot: 0.9, vagg: true }];
+const LOPPLATS = [{ x: 286, y: 404, rot: 1.4 }, { x: 992, y: 487, rot: 0.9, vagg: true }];
 // på höjden (telefonen) syns bara mitten och högra delen av rummet från början
 const smal = () => innerWidth / innerHeight < 1.2;
 // Platsen för skivan (rum-saker.js och rum-inredning.js startar i valfri

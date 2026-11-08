@@ -652,7 +652,7 @@ window.RumVideo = (() => {
     // knapparna säger sin när man pekar på dem, som sakerna i rummet (title).
     if (matchMedia('(hover: hover)').matches) {
       const fot = root.querySelector('.rum-ft');
-      if (fot) fot.insertAdjacentHTML('afterbegin', '<span class="vhs-tangenter"><b>← →</b> spola · <b>mellanslag</b> spela/paus · <b>S</b> stopp · <b>↑ ↓</b> kassett · <b>Esc</b> tillbaka</span>');
+      if (fot) fot.insertAdjacentHTML('afterbegin', '<span class="vhs-tangenter"><b>← →</b> spola · <b>mellanslag</b> spela/paus · <b>S</b> stopp · <b>↑ ↓</b> kassett</span>');
       const NAMN = { ArrowLeft: '←', ArrowRight: '→', Space: 'mellanslag', S: 'S' };
       for (const b of box.querySelectorAll('.vhs-k[aria-keyshortcuts]')) b.title = `${b.getAttribute('aria-label')} · ${NAMN[b.getAttribute('aria-keyshortcuts')]}`;
     }

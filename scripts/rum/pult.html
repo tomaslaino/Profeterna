@@ -1,0 +1,78 @@
+<!doctype html><meta charset="utf-8"><canvas id="c" width="1620" height="690"></canvas>
+<script>
+// Pultens trä i tobaksaffären, bakat till public/rum/pult.webp och pult-mer.webp (scripts/rum/pult.mjs).
+// Duken är pulten från y = 650 till 1340 i scenens mått; plankorna går mot betraktaren, så de vidgas nedåt.
+// Ringarna och brännmärkena ritas inte här: de skiftar med dagen (table i rum.js).
+const c = document.getElementById('c');
+const g = c.getContext('2d');
+const W = c.width, H = c.height;
+let frö = 4242;
+const s = () => { frö = (frö * 16807) % 2147483647; return (frö - 1) / 2147483646; };
+const pX = (x, y) => 810 + (x - 810) * (0.62 + 0.38 * y / 352);
+const planks = [-620, -340, -60, 190, 455, 720, 980, 1245, 1490, 1760, 2040, 2320];
+planks.forEach((x0, i) => {
+  const x1 = planks[i + 1];
+  if (x1 == null) return;
+  g.fillStyle = `hsl(${22 + s() * 5},${40 + s() * 10}%,${28 + s() * 22}%)`;
+  g.beginPath(); g.moveTo(pX(x0, 0), 0); g.lineTo(pX(x1, 0), 0); g.lineTo(pX(x1, H), H); g.lineTo(pX(x0, H), H); g.closePath(); g.fill();
+  // ådringen
+  for (let k = 0; k < 420; k++) {
+    const x = x0 + s() * (x1 - x0);
+    g.strokeStyle = `${s() < 0.62 ? 'rgba(30,14,5,' : 'rgba(226,170,110,'}${0.05 + s() * 0.2})`;
+    g.lineWidth = 0.25 + s() * 1.1;
+    g.beginPath();
+    let y = s() * -60, off = 0;
+    g.moveTo(pX(x, y), y);
+    for (let j = 1; j <= 14; j++) { const yy = y + (820 * j) / 14; off += (s() - 0.5) * 5; g.lineTo(pX(x + off, yy), yy); }
+    g.stroke();
+  }
+  // kvistar
+  if (s() < 0.8) {
+    const xk = x0 + (0.2 + s() * 0.6) * (x1 - x0), yk = 30 + s() * 600;
+    g.save(); g.translate(pX(xk, yk), yk); g.scale(1, 0.34);
+    for (let r = 26; r > 0; r -= 3) { g.strokeStyle = `rgba(28,12,4,${0.1 + 0.5 * (1 - r / 26)})`; g.lineWidth = 1; g.beginPath(); g.ellipse(0, 0, r * 0.8, r * 1.5, 0, 0, 7); g.stroke(); }
+    g.restore();
+  }
+  // fogen
+  g.strokeStyle = 'rgba(16,7,2,.8)'; g.lineWidth = 1.7; g.beginPath(); g.moveTo(pX(x1, 0), 0); g.lineTo(pX(x1, H), H); g.stroke();
+  g.strokeStyle = 'rgba(240,200,150,.14)'; g.lineWidth = 1; g.beginPath(); g.moveTo(pX(x1, 0) + 2, 0); g.lineTo(pX(x1, H) + 2, H); g.stroke();
+});
+// repor
+for (let i = 0; i < 150; i++) {
+  const x = s() * W, y = s() * H, l = 20 + s() * 160, a = (s() - 0.5) * 1.1;
+  g.strokeStyle = `rgba(250,220,180,${0.05 + s() * 0.18})`; g.lineWidth = 0.5 + s() * 0.6;
+  g.beginPath(); g.moveTo(x, y); g.lineTo(x + Math.cos(a) * l, y + Math.sin(a) * l * 0.4); g.stroke();
+}
+// Samma ljusstyrka som pulten har haft, rad för rad (#6e4a30 till #3b2619, och Hasses pult i rum-hasse-3d.js
+// är målad efter den): varje rad skalas till gradienten, med träets mönster kvar.
+const stopp = [[0, [110, 74, 48]], [180, [90, 59, 38]], [360, [59, 38, 25]], [690, [38, 24, 15]]];
+const mal = (y) => {
+  for (let i = 1; i < stopp.length; i++) if (y <= stopp[i][0]) {
+    const t = (y - stopp[i - 1][0]) / (stopp[i][0] - stopp[i - 1][0]);
+    return stopp[i - 1][1].map((v, k) => v + (stopp[i][1][k] - v) * t);
+  }
+  return stopp[stopp.length - 1][1];
+};
+const bild = g.getImageData(0, 0, W, H);
+const d = bild.data;
+for (let y = 0; y < H; y++) {
+  let r = 0, gr = 0, b = 0;
+  for (let x = 0; x < W; x++) { const i = (y * W + x) * 4; r += d[i]; gr += d[i + 1]; b += d[i + 2]; }
+  r /= W; gr /= W; b /= W;
+  const m = mal(y);
+  for (let x = 0; x < W; x++) {
+    const i = (y * W + x) * 4;
+    d[i] = Math.min(255, d[i] * m[0] / r);
+    d[i + 1] = Math.min(255, d[i + 1] * m[1] / gr);
+    d[i + 2] = Math.min(255, d[i + 2] * m[2] / b);
+  }
+}
+g.putImageData(bild, 0, 0);
+window.dela = (y0, h, q) => {
+  const u = document.createElement('canvas');
+  u.width = W; u.height = h;
+  u.getContext('2d').drawImage(c, 0, y0, W, h, 0, 0, W, h);
+  return u.toDataURL('image/webp', q);
+};
+window.klar = true;
+</script>

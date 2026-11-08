@@ -2370,8 +2370,11 @@ och gled sedan jämnt (största steget 10–30 % av vägen). Minnet blev inte h�
 WebKit hade ritat, ge den en fördröjning, en mjukare början eller dölja det som ligger utanför
 bilden hela vägen hjälpte inte – WebKit ritar först när kameran rör sig. Chrome behöver inte
 den osynliga rörelsen och får den inte. Namnet
-och foten (*Vanlig sida*) ligger utanför scenen i fönstrets hörn;
-någon meny finns inte, och föremålen leder inte ut ur rummet – det gör bara *Vanlig sida*.
+och foten ligger utanför scenen i fönstrets hörn;
+någon meny finns inte, och föremålen leder inte ut ur rummet – det gör bara *Vanlig sida* i foten.
+Så fort något ligger framme (en närbild, tv:n, tavlan, registret, videon, Hasse) står *Tillbaka* där i
+stället, samma ord på samma ställe för alla saker, och lägger bort det översta som bakåtknappen (se
+[Bakåt](#bakåt)). Förut var *Vanlig sida* det enda ord som syntes nära något, och det leder bort från rummet.
 Tangenterna (K kupongen, T tv:n,
 A anslagstavlan, R kortregistret, V videon, H Hasse) står inte i foten – där låg de över kupongen i
 mindre fönster – utan när man pekar på saken (*Tv:n · T*, `tangenter` i rum.js), och bara
@@ -3064,6 +3067,19 @@ hämtas inget).
 
 ### I telefonen
 
+**Hela rummet på höjden (2026-11-08):** i en stående telefon (`.rum.smal`) syns alla tre i gänget, neonen,
+lysröret och hela kupongen med alla rader utan att man drar. Förut fyllde scenen fönstrets höjd, så att bara
+515 av scenens 1600 punkter fick plats på bredden: en i gänget var utanför bilden och kupongen skars av vid
+rad elva. Nu är förstoringen `max(bredd / 760, höjd / 1330)` (`fit` i rum.js), högst så mycket som fyller
+fönstret, och scenen räcker inte till fönstrets höjd. Därför är `.rum-stage` inte klippt där, och taket
+(`.rum-tak`) och pulten (`.rum-pult-mer`, resten av träet) fortsätter utanför scenen, lite tak över och mest pult
+under (`pan`); ljuset (`.rum-warm`, `.rum-vign`) och nattens mörker (rum-folk.css) räcker lika långt, och
+medan lysröret tänds täcker `.rum-mork-ut` det som är utanför. Man står vid gänget när man kommer in (`HEM_SMAL`,
+`R.pxHem`, som kameran också vrids från), kupongen ligger under dem (`kupX`) och guldordet ligger under
+kupongen, där tummen är. Pennan vilar nedanför raderna i stället för på rad 9–10. Gänget
+är ungefär en fjärdedel mindre på skärmen, och duken har därför färre bildpunkter med samma skärpa (`PR`
+i rum-3d.js, 1,2 i stället för 1,5). Vad det kostar: se *Mätt 2026-11-08* i [Ljuset efter klockan](#ljuset-efter-klockan).
+
 Rummet står i alla fönster utom de allra minsta (`Rum.fits`: minst 280 × 260 px), i
 telefonen också. Scenen täcker fönstret som på datorn, också på höjden i telefonen (en tid
 fyllde den 80 % av höjden, med svart över och under; det svarta ville vi inte ha, och mindre
@@ -3073,8 +3089,8 @@ står, som med musen (`swipe` och `pan` i rum.js; med musen nedtryckt går det l
 smalt fönster). I Chrome glider scenen till fingret på 50 ms (`.drar` i rum.css) i stället för
 att flyttas direkt, se [När datorn inte hinner med](#när-datorn-inte-hinner-med). Ett tryck på ett föremål gör samma sak som ett klick, och ett tryck efter
 ett drag öppnar ingenting. Föremålen lyser inte kvar efter ett tryck (`:hover` bara med
-mus), och foten har bara *Vanlig sida* – utan tangentbord står inga tangenter där. På höjden
-står *Vanlig sida* uppe till höger, mitt emot namnet, eftersom kupongen fyller nederkanten
+mus), och foten har bara *Vanlig sida* eller *Tillbaka* – utan tangentbord står inga tangenter där. På höjden
+står ordet uppe till höger, mitt emot namnet, eftersom kupongen fyller nederkanten
 (där låg ordet över kupongens rutor och över guldorden i närbilderna). Sidan
 zoomar och rullar inte i rummet (`touch-action: none`).
 
@@ -3669,6 +3685,34 @@ igenom sig självt på ungefär en minut – står still, dras med ett låtsasfi
 gatan och fram och tillbaka till närbilderna – och visar bildrutorna i en tabell att ta en
 skärmbild av, med hur lång tid gängets kod och grafik tar per bild.
 
+### Ljuset efter klockan
+
+Rummet var lika upplyst överallt. Nu faller eftermiddagssolen in genom skyltfönstret över pulten, och på kvällen
+lever rummet av sina egna lampor (`ljusKlockan` i rum.js, från `paintUte`). Inga nya lager, och inget ritas i varje
+bildruta: allt är färdiga bilder i det som redan finns, och de byts bara när ljuset har ändrats märkbart, högst
+var 15:e minut.
+
+- **Solen:** skyltfönstret vetter åt väster, så solen kommer in från lunch till solnedgången. Solens riktning
+  räknas ur klockan och höjden ur [public/vader.js](public/vader.js). Fläcken (`solBild`) har fönstrets två rutor,
+  spröjsen emellan och gängets skuggor, ligger snett efter var solen står och kortas av när solen står högt (över
+  44° når den inte fram till pulten). Den finns bara när solen lyser (`L.sol`), alltså inte när det är mulet.
+  Fläcken ritas i en fjärdedels upplösning och blandas in i pultens egen SVG (`.rum-sol`), så att träet syns i
+  ljuset. Rummet utanför solen blir lite mörkare (i `.rum-vign`), och i `.rum-dagsljus` står svaga strimmor.
+- **Kvällen:** när det är mörkt ute (`L.dag` under 0,45) blir rummet mörkare i `.rum-vign`, med hål kring neonen och
+  tv:n. Neonens färg faller på fönstret, gänget och väggen (`.rum-warm`, `--sken` på `.rum-neonglow`), tv:n färgar
+  väggen blå (tv:ns eget sken, som släcks med tv:n), det är varmt över disken och pulten, och gänget lyses rött
+  bakifrån (ljuset `win` i rum-3d.js). Nära något är `.rum-vign` svagare, så att det går att läsa.
+
+**Mätt 2026-11-08** med allt det här och [hela rummet i telefonen](#i-telefonen) mot versionen före: Chrome som telefon
+(412 × 780, täthet 2,625, processorn fyra gånger långsammare) på M5, `?rum-mat` i klart väder klockan 14, gammal och ny om
+vartannat, fem varv, median. Stilla 60 bilder/s i båda. Längsta bildrutan när man drar 47 → 30 ms, fram till videon 188 → 120,
+fram till kortregistret 65 → 29, fram till tavlan 60 → 71 och tillbaka 32 → 38 (lika inom bruset, två rutor över 25 ms i
+stället för en). Väntan på grafiken i gänget 4,4 → 3,6 ms per bild, eftersom duken har färre bildpunkter (1620 × 630 → 1295 × 503).
+Ritminnet hemma 120 → 63 MB, nära tv:n och tavlan oförändrat (63 och 125 MB; i ett fönster om 500 × 693, som är det smalaste
+Chrome ritar i rätt skala). Inte mätt i den riktiga telefonen: `?rum-mat` där visar det. I WKWebView (390 × 664) byggs rummet utan fel
+och bilden stämmer, men flytet är inte mätt där. Bakom videon nära syns trappor på kanterna av det som står längre bort: det är kvar,
+för att rita det skarpare tar flera gånger så mycket ritminne.
+
 ### Utsikten och vädret
 
 Tobaksaffären ligger i Stockholm, och genom skyltfönstret och dörren syns gatan som den är
@@ -3679,6 +3723,9 @@ på enheten), och [public/rum-ute.js](public/rum-ute.js) ritar gatan med
 fåglarna och flaggan ritas i små dukar (se [När datorn inte hinner med](#när-datorn-inte-hinner-med)).
 Utan nätet är det mulet och månadens vanliga temperatur.
 
+- **Kall gata, varmt rum (2026-11-08):** medan det är ljust går färgerna ute mot blågrått, så att gänget och det varma
+  rummet lyfter från gatan (`kall` i rum-ute.js). Det görs i färgerna när gatan ritas, också på dem som går förbi,
+  inte med ett filter, så det kostar inget sedan. På kvällen och natten står allt som förut.
 - **Ljuset:** himlen över de lägre taken går från natt via blå timme och solnedgång till
   dag, grå när det är mulet. Fasaderna mittemot (gul, terrakotta och ljus puts) är nästan
   svarta på natten, blåaktiga i skymningen och varma i låg sol, med skuggan från huset vi
@@ -4058,6 +4105,8 @@ siffror och pilar dit när den är nära.
 Under tv:n, i hörnet på högra väggen där pärmarna stod, hänger en anslagstavla: juteväv i
 en ram av lackad ek, byggd i CSS 3D på väggen bredvid skårtavlan
 ([public/rum-anslag.js](public/rum-anslag.js), [public/rum-anslag.css](public/rum-anslag.css)).
+I en stående telefon står tavlan framme på höjden, två spalter och fyra rader (`HW`, `HH`, `HOG`, `hogW`): lapparna blir
+ungefär 1,6 gånger så stora och går att läsa utan att lyftas. Tavlan på väggen ser ut som förut.
 Lapparna har det på sajten som rummet annars inte visar, om lagen i omgången (samma omgång
 som kupongen och fällbladstavlan):
 
@@ -5326,6 +5375,8 @@ Chrome hoppar över alla rader i ett dokument som lägger till en rad innan någ
 lager utan tryck, som `?rum-sak`, ingen rad. Sveper man bakåt i telefonen visar Chrome själv en bild av
 raden under (`hasUAVisualTransition`), och då läggs lagret bort utan rörelse (`RumBak.snabbt`). På Android
 stänger Chrome spelarkortet utan att historiken rör sig, och då säger dialogens `close` till.
+
+Ordet *Tillbaka* i rummets fot går samma väg (`RumBak.ned()`), och `RumBak.vid` säger till när det ska stå där.
 
 ## Statusmärkning
 

@@ -130,8 +130,8 @@ a.rum-sak, a.rum-sak:hover { color: inherit; text-decoration: none; }
 .rum-neon.av { opacity: 0.32; }
 .rum-neonhalo.av, .rum-neonglow.av { opacity: 0.04; }
 /* som duk i Chrome (ljusDukar i rum.js) */
-canvas.rum-neonglow { opacity: 0.08; }
-canvas.rum-neonhalo { opacity: 0.28; }
+canvas.rum-neonglow { opacity: var(--sken, 0.08); }
+canvas.rum-neonhalo { opacity: var(--sken, 0.28); }
 
 /* ---------- Omgångens orakel ---------- */
 
@@ -492,7 +492,7 @@ canvas.rum-neonhalo { opacity: 0.28; }
 /* namnet, skrivet för hand i personens bläck och handstil. Alla tre står där
    för att inget ska flytta sig, men bara det egna syns: alla på gängets kupong
    (.alla), och i handen när man väljer (.val), då de andra är bleka knappar */
-.rum-kup .sm-namnen { display: grid; grid-template-columns: repeat(3, auto); justify-content: end; align-content: end; align-items: end; column-gap: 10px; height: 0; margin-left: auto; letter-spacing: 0; text-transform: none; }
+.rum-kup .sm-namnen { display: grid; grid-template-columns: repeat(3, auto); justify-content: end; align-content: end; align-items: end; column-gap: 20px; height: 0; margin-left: auto; letter-spacing: 0; text-transform: none; }
 .rum-kup .sm-namn { display: block; visibility: hidden; margin: 0; padding: 0; border: 0; background: none; color: var(--ink); line-height: 1; white-space: nowrap; -webkit-text-stroke: 0.3px currentColor; transform: translateY(10px) rotate(-3deg); transform-origin: 0 100%; }
 .rum-kup .sm-namn.sm-k0 { font: 400 24px/1 "Cedarville Cursive", "Caveat", cursive; }
 .rum-kup .sm-namn.sm-k1 { font: 400 30px/1 "Mr Dafoe", "Caveat", cursive; }
@@ -720,6 +720,8 @@ canvas.rum-neonhalo { opacity: 0.28; }
 .rum.i-handen .rum-hdr { opacity: 0.35; }
 .rum.i-handen .rum-ft { opacity: 0; pointer-events: none; }
 .rum.i-handen .rum-warm, .rum.i-handen .rum-vign { opacity: 0.35; }
+/* nära något ska det gå att läsa, också på kvällen när rummet är mörkare (ljusKlockan) */
+.rum.tv-nara .rum-vign, .rum.vid-nara .rum-vign, .rum.sak-nara .rum-vign { opacity: 0.6; }
 /* pennan har följt med kupongen ur högen */
 .rum.i-handen #rum-kupong .pencil { visibility: hidden; }
 
@@ -828,22 +830,22 @@ canvas.rum-neonhalo { opacity: 0.28; }
 
 .rum-tag {
   position: absolute;
-  left: 252px;
-  top: 702px;
+  left: 338px;
+  top: 666px;
   color: #f0d699;
   font-size: 18px;
   font-weight: 600;
   text-decoration: underline;
   text-underline-offset: 5px;
   text-decoration-thickness: 1.5px;
-  text-shadow: 0 2px 10px rgba(0, 0, 0, 0.95);
+  text-shadow: 0 0 3px rgba(0, 0, 0, 0.9), 0 1px 2px rgba(0, 0, 0, 0.9), 0 2px 10px rgba(0, 0, 0, 0.95);
 }
 .rum-tag:hover { color: #fff1c8; }
 
 /* Till uppgörelsen: pingklockan i stället för guldordet. Den lyser som de
    andra sakerna när man pekar på den och plingar när gängets kupong tas i
    handen (pling i rum.js). */
-.rum-tag.rum-klocka { left: 248px; top: 650px; line-height: 0; text-decoration: none; text-shadow: none; transition: filter 0.25s ease; }
+.rum-tag.rum-klocka { left: 342px; top: 628px; line-height: 0; text-decoration: none; text-shadow: none; transition: filter 0.25s ease; }
 .rum-klocka svg { display: block; overflow: visible; }
 .rum-klocka:hover, .rum-klocka:focus-visible { filter: brightness(1.15) drop-shadow(0 0 10px rgba(240, 214, 153, 0.35)); outline: none; }
 .rum-klocka .kupa { transform-origin: 52px 63px; }
@@ -930,6 +932,8 @@ canvas.rum-neonhalo { opacity: 0.28; }
 .rum [data-to].hot { background: currentColor; -webkit-text-fill-color: #050505; text-shadow: none; }
 .rum-ft { position: absolute; right: 44px; bottom: 22px; display: flex; gap: 30px; align-items: baseline; z-index: 2; }
 .rum-ft a { font-family: Fraunces, Georgia, serif; font-size: 16px; color: #a9c8fb; text-decoration: underline; text-underline-offset: 4px; text-decoration-thickness: 1px; text-shadow: 0 1px 8px #000; }
+/* Nära något: samma ställe, samma ord för alla saker. Ligger över det man tittar på, så skuggan är tätare. */
+.rum-ft a.rum-tillbaka { cursor: pointer; padding: 10px 18px; margin: -10px -18px; background: radial-gradient(closest-side, rgba(8, 5, 2, 0.72), rgba(8, 5, 2, 0)); text-shadow: 0 0 3px #000, 0 1px 8px #000, 0 0 16px #000; }
 
 /* ---------- i telefonen ---------- */
 
@@ -985,7 +989,7 @@ canvas.rum-neonhalo { opacity: 0.28; }
    raderna har två våningar: lagen överst, dagen och motiveringen under.
    Mitten är densamma som den breda kupongens (760, 853), så att högen och
    handen ligger där de ligger (rum.js, KUP). */
-.rum.smal #rum-kupong, .rum.smal .rum-handen, .rum.smal .rum-bak { left: 550px; top: 543px; width: 420px; height: 620px; }
+.rum.smal #rum-kupong, .rum.smal .rum-handen, .rum.smal .rum-bak { left: 430px; top: 543px; width: 420px; height: 620px; }
 .rum.smal #rum-kupong, .rum.smal .rum-handen { padding: 0 16px 0 36px; }
 .rum.smal .rum-kup .band { margin: 0 -16px 0 -36px; padding: 0 16px 0 36px; }
 .rum.smal .rum-kup .band small { letter-spacing: 0.18em; }
@@ -1031,6 +1035,25 @@ canvas.rum-neonhalo { opacity: 0.28; }
 /* kupongen fyller nederkanten: Vanlig sida står uppe till höger, mitt emot
    namnet, i stället för över kupongen */
 .rum.smal .rum-ft { top: 18px; bottom: auto; height: 36px; align-items: center; }
+/* Rummet på höjden står längre bort än scenen är hög (fit i rum.js): taket och pulten fortsätter
+   utanför, och ljuset och mörkret med dem. */
+.rum.smal .rum-stage { overflow: visible; background: none; }
+.rum-tak, .rum-pult-mer, .rum-mork-ut { display: none; }
+.rum.smal .rum-tak { display: block; position: absolute; left: -200px; top: -400px; width: 2000px; height: 420px; background: linear-gradient(180deg, #17120c, #3a2f21); }
+.rum.smal .rum-pult-mer { display: block; position: absolute; left: -10px; top: 1000px; width: 1620px; height: 340px; background: #2b1b10; }
+.rum.smal .pult-kant { display: none; }
+.rum.smal .rum-vign { top: -1200px; height: 1800px; }
+.rum.smal .rum-warm { height: 1500px; }
+.rum.smal .rum-mork.start ~ .rum-mork-ut, .rum.smal .rum-mork.tands ~ .rum-mork-ut { display: block; position: absolute; left: 0; top: 0; width: 1600px; height: 1000px; box-shadow: 0 0 0 1400px #060504; pointer-events: none; }
+.rum.smal .rum-mork.tands ~ .rum-mork-ut { animation: rum-tands 1.2s steps(1, end) forwards; }
+/* guldordet under kupongen, där tummen är */
+.rum.smal .rum-tag { left: 640px; top: 1148px; transform: translateX(-50%); font-size: 26px; white-space: nowrap; }
+.rum.smal .rum-tag.rum-klocka { left: 640px; top: 1140px; }
+/* platta på höjden: rummet står mitt för kupongen, och kaffet är utanför bilden */
+@media (min-width: 600px) and (max-aspect-ratio: 1/1) {
+  .rum-tag { left: 690px; top: 664px; }
+  .rum-tag.rum-klocka { left: 700px; top: 624px; }
+}
 .rum.smal .rum-hand :is(button, a) { font-size: 17px; }
 .rum.smal .rum-hand .fin { font-size: 14px; }
 .rum.smal .rum-hand :is(.vanster, .hoger) { gap: 20px; }

@@ -299,7 +299,9 @@ export async function figurer(canvas, opt = {}) {
   // (kantutjämning bara när datorn hinner med från början, kant i rum.js: den går
   // inte att stänga av sedan, och den är dyr på en svag grafikkrets)
   const r = new THREE.WebGLRenderer({ canvas, alpha: true, antialias: !LATT && opt.kant !== false });
-  const PR = LATT ? 1.5 : Math.min(window.devicePixelRatio || 1, 2);
+  // (i telefonen på höjden står rummet längre bort, fit i rum.js: gänget är mindre på skärmen och blir
+  // lika skarpt med färre bildpunkter)
+  const PR = LATT ? (innerWidth < 600 && innerHeight > innerWidth ? 1.2 : 1.5) : Math.min(window.devicePixelRatio || 1, 2);
   r.setPixelRatio(PR);
   r.setSize(W, H, false);
   r.toneMapping = THREE.ACESFilmicToneMapping;
@@ -4584,7 +4586,10 @@ export async function figurer(canvas, opt = {}) {
     const L = v && window.RumUte ? window.RumUte.light(v) : null;
     const dag = L ? L.dag : 0;
     win.color.set('#ffb35c').lerp(new THREE.Color(L ? L.sky[2] : '#ffb35c'), dag);
-    win.intensity = 0.35 + 1.7 * dag;
+    // på kvällen lyser neonen dem bakifrån (ljusKlockan i rum.js)
+    const kv = 1 - Math.min(1, Math.max(0, (dag - 0.12) / 0.33));
+    win.color.lerp(new THREE.Color('#ff5a48'), 0.55 * kv);
+    win.intensity = 0.35 + 1.7 * dag + 0.25 * kv;
     hemiDag = 0.42 + 0.2 * dag;
     hemi.intensity = hemiDag;
     figs.forEach((o, i) => {

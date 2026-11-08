@@ -1046,6 +1046,46 @@ window.RumUte = (() => {
     });
   }
 
+  // Kall gata, varmt rum: ute går färgerna mot blågrått medan det är ljust, så att gänget och det varma
+  // rummet lyfter från gatan. Det görs i färgerna när gatan ritas (också de som går förbi), inte med
+  // ett filter, så det kostar inget sedan. På kvällen och natten står allt som det brukar.
+  function kall(svg, L, himlen) {
+    const t = Math.min(1, L.dag * 1.3);
+    if (t < 0.03) return svg;
+    const mat = (himlen ? 0.4 : 0.58) * t;
+    const kon = 1 - 0.16 * t;
+    const lju = 1 - 0.06 * t;
+    const bla = [110, 140, 175];
+    return svg.replace(/#[0-9a-f]{6}\b/gi, (c) => {
+      const [r, g, b] = rgb(c);
+      const y = 0.3 * r + 0.59 * g + 0.11 * b;
+      return hx([r, g, b].map((x, i) => {
+        const a = (128 + (y + (x - y) * (1 - mat) - 128) * kon) * lju;
+        return a + (bla[i] - a) * 0.2 * t;
+      }));
+    });
+  }
+
+  // Kall gata, varmt rum: ute går färgerna mot blågrått medan det är ljust, så att gänget och det varma
+  // rummet lyfter från gatan. Det görs i färgerna när gatan ritas (också de som går förbi), inte med
+  // ett filter, så det kostar inget sedan. På kvällen och natten står allt som det brukar.
+  function kall(svg, L, himlen) {
+    const t = Math.min(1, L.dag * 1.3);
+    if (t < 0.03) return svg;
+    const mat = (himlen ? 0.4 : 0.58) * t;
+    const kon = 1 - 0.16 * t;
+    const lju = 1 - 0.06 * t;
+    const bla = [110, 140, 175];
+    return svg.replace(/#[0-9a-f]{6}\b/gi, (c) => {
+      const [r, g, b] = rgb(c);
+      const y = 0.3 * r + 0.59 * g + 0.11 * b;
+      return hx([r, g, b].map((x, i) => {
+        const a = (128 + (y + (x - y) * (1 - mat) - 128) * kon) * lju;
+        return a + (bla[i] - a) * 0.2 * t;
+      }));
+    });
+  }
+
   // el: utsiktens lager i rum.js; rects: fönstrets och dörrens glas
   function paint(el, v, rects) {
     if (!el) return false;
@@ -1074,7 +1114,7 @@ window.RumUte = (() => {
       if (el._sig[k] === sig[k]) continue;
       el._sig[k] = sig[k];
       const x = el.querySelector(`[data-lager="${k}"]`);
-      x.innerHTML = draw[k]();
+      x.innerHTML = ['himmel', 'gata', 'liv', 'himliv'].includes(k) ? kall(draw[k](), L, k === 'himmel') : draw[k]();
       if (k === 'liv' || k === 'himliv') el._dukar[k] = duka(x, s);
       if (k === 'gata' && LATT) bakaGata(x);
       if (k === 'himmel' && LATT) bakaHimmel(x);

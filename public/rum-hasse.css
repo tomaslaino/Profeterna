@@ -158,7 +158,7 @@
 .rh-slag { animation: rh-slag 0.42s linear; }
 /* --slag: hur hårt han slår (rum-hasse.js) */
 @keyframes rh-slag { 0% { translate: 0 0; } 18% { translate: 0 var(--slag, 9px); } 42% { translate: 0 calc(var(--slag, 9px) * -0.55); } 70% { translate: 0 calc(var(--slag, 9px) * 0.22); } 100% { translate: 0 0; } }
-.rum.hasse-pan .rum-ft, .rum.hasse-pan .rum-hdr, .rum.hasse-framme .rum-ft, .rum.hasse-framme .rum-hdr { display: none; }
+.rum.hasse-pan .rum-ft, .rum.hasse-pan .rum-hdr, .rum.hasse-framme .rum-hdr { display: none; }
 .rh-fot { position: absolute; bottom: 14px; z-index: 2; display: flex; justify-content: flex-end; pointer-events: none; }
 .rh-ljud { flex: none; font-size: 12px; pointer-events: auto; }
 /* ljudet av och på, längst till vänster */

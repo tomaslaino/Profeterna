@@ -215,7 +215,7 @@
   line-height: 13px;
   text-shadow: 0 0 0.7px rgba(50, 46, 140, 0.85), 0.4px 0 0 rgba(50, 46, 140, 0.25);
 }
-.p-genomslag h4 { font-size: 14px; letter-spacing: 2px; text-transform: uppercase; border-bottom: 1px dashed rgba(61, 58, 134, 0.6); padding-bottom: 3px; margin-bottom: 6px; }
+.p-genomslag h4 { margin-top: 9px; font-size: 14px; letter-spacing: 2px; text-transform: uppercase; border-bottom: 1px dashed rgba(61, 58, 134, 0.6); padding-bottom: 3px; margin-bottom: 6px; }
 .p-genomslag .r { display: block; white-space: normal; margin-bottom: 3px; }
 .p-genomslag .r b { font-weight: 400; text-decoration: underline; text-decoration-color: rgba(61, 58, 134, 0.5); }
 .p-genomslag .r em { font-style: normal; opacity: 0.7; }
@@ -307,9 +307,9 @@
 .ans-blad small { font-size: 10px; line-height: 1; letter-spacing: 2.2px; text-transform: uppercase; }
 .ans-blad b { font-size: 38px; font-weight: 800; line-height: 1; color: #c2271c; }
 .ans-g3 { display: grid; grid-template-columns: 1fr auto auto 1fr; column-gap: 4px; }
-.ans-g3 .h { text-align: right; overflow: hidden; white-space: nowrap; text-overflow: ellipsis; }
+.ans-g3 .h { padding-right: 0.3em; text-align: right; overflow: hidden; white-space: nowrap; text-overflow: ellipsis; }
 .ans-g3 .a { overflow: hidden; white-space: nowrap; text-overflow: ellipsis; }
-.ans-g3 .n { text-align: center; padding: 0 2px; white-space: nowrap; }
+.ans-g3 .n { text-align: center; padding: 0 5px; white-space: nowrap; }
 .ans-g3 .trott { box-shadow: 0 0 0 1.4px #c2271c; border-radius: 50%; }
 
 /* anteckningsblocket: blå linjer, röd marginal, riven upptill */
@@ -336,6 +336,13 @@
 .rum-ansn.on .ans-bak { opacity: 1; }
 .rum-ansn.ute .ans-bak { opacity: 0; transition-duration: 0.5s; }
 .ans-flyg { position: absolute; left: 0; top: 0; width: 1000px; height: 568px; transform-origin: 0 0; perspective: 2400px; }
+/* på höjden i en stående telefon (HW, HH i rum-anslag.js) */
+.ans-flyg.hog, .ans-tavla.stor.hog { width: 598px; height: 1070px; }
+.ans-tavla.stor.hog .ans-topp { width: 598px; }
+.ans-tavla.stor.hog .ans-botten { top: 1070px; width: 598px; }
+.ans-tavla.stor.hog .ans-vanster { height: 1070px; }
+.ans-tavla.stor.hog .ans-hoger { left: 598px; height: 1070px; }
+@media (max-width: 700px), (max-height: 500px) { .ans-tavla.stor.hog .ans-glans { width: 150px; height: 268px; } }
 .ans-luta { position: absolute; inset: 0; transform-style: preserve-3d; transform: rotateX(0deg) rotateY(0deg); transition: transform 0.4s ease-out; }
 .ans-tavla.stor .ans-yta { box-shadow: 0 34px 70px rgba(0, 0, 0, 0.6), inset 0 1.5px 0 rgba(255, 230, 190, 0.35), inset 0 -2px 0 rgba(0, 0, 0, 0.45), inset 1.5px 0 0 rgba(255, 230, 190, 0.18), inset -2px 0 0 rgba(0, 0, 0, 0.35); }
 .ans-tavla.stor:focus { outline: none; }

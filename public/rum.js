@@ -434,17 +434,33 @@ window.Rum = (() => {
   // ---------- lagren ----------
 
   function table() {
+    // Dagens ringar och brännmärken: kaffet och flaskorna har stått på olika ställen olika dagar.
+    // Träet självt är en färdig bild (scripts/rum/pult.mjs), gradienten under syns tills den är hämtad.
+    let h = (Math.floor(Date.now() / 86400000) * 7 + 11) % 2147483647 || 1;
+    const R0 = () => { h = (h * 16807) % 2147483647; return (h - 1) / 2147483646; };
+    let spar = '';
+    for (let i = 0; i < 6; i++) {
+      const x = r1(40 + R0() * 1520);
+      const y = r1(668 + R0() * 310);
+      const rx = r1(22 + R0() * 14);
+      const a = r1(0.22 + R0() * 0.2);
+      spar += `<ellipse cx="${x}" cy="${y}" rx="${rx}" ry="${r1(rx * 0.34)}" fill="none" stroke="#160a03" stroke-opacity="${a}" stroke-width="2.6"/><ellipse cx="${x}" cy="${y}" rx="${r1(rx - 3)}" ry="${r1(rx * 0.34 - 1.5)}" fill="none" stroke="#160a03" stroke-opacity="${r1(a / 2)}"/>`;
+    }
+    // brännmärkena, mest vid askkoppen
+    for (let i = 0; i < 6; i++) {
+      const vid = i < 4;
+      const x = r1(vid ? 1360 + R0() * 170 : 60 + R0() * 1200);
+      const y = r1(vid ? 690 + R0() * 110 : 700 + R0() * 260);
+      spar += `<ellipse cx="${x}" cy="${y}" rx="14" ry="4.6" fill="#0c0602" opacity=".32"/><ellipse cx="${x}" cy="${y}" rx="8" ry="2.8" fill="#0c0602" opacity=".82"/>`;
+    }
     return svg(`<rect x="-10" y="650" width="1620" height="360" fill="url(#rum-pult)"/>
-  <rect x="-10" y="650" width="1620" height="360" filter="url(#rum-grainwood)"/>
-  <rect x="-10" y="650" width="1620" height="360" filter="url(#rum-flack)" opacity=".35"/>
+  <image href="rum/pult.webp" x="-10" y="650" width="1620" height="350" preserveAspectRatio="none"/><g class="rum-sol"></g>
   <rect x="-10" y="647" width="1620" height="6" fill="url(#rum-alu)"/>
   <g stroke="#e8e0cc" stroke-opacity=".35" stroke-width="1.2"><line x1="210" y1="649" x2="268" y2="649"/><line x1="720" y1="650" x2="742" y2="650"/><line x1="1302" y1="649" x2="1380" y2="649"/></g>
   <ellipse cx="800" cy="840" rx="580" ry="160" fill="#ffd9a6" opacity=".10" filter="url(#rum-b40)"/>
   <ellipse cx="460" cy="700" rx="320" ry="50" fill="#ff4a30" opacity=".10" filter="url(#rum-b40)"/>
-  <ellipse cx="1340" cy="930" rx="34" ry="12" fill="none" stroke="#2a160a" stroke-opacity=".35" stroke-width="3"/>
-  <ellipse cx="1120" cy="700" rx="30" ry="10" fill="none" stroke="#2a160a" stroke-opacity=".25" stroke-width="2.5"/>
-  <g fill="#1a0e06" opacity=".55"><ellipse cx="372" cy="760" rx="7" ry="3"/><ellipse cx="1452" cy="742" rx="6" ry="2.4"/><ellipse cx="1480" cy="870" rx="5" ry="2"/></g>
-  <rect x="-10" y="984" width="1620" height="20" fill="url(#rum-alu)"/>`, '', [0, 510, W, H - 510], 2 / 3);
+  ${spar}
+  <rect class="pult-kant" x="-10" y="984" width="1620" height="20" fill="url(#rum-alu)"/>`, '', [0, 510, W, H - 510], 2 / 3);
   }
 
   function sill() {
@@ -987,8 +1003,10 @@ window.Rum = (() => {
     const d = document.getElementById('rum-dagsljus');
     if (!d || !R.el.classList.contains('chromium')) return;
     const farg = getComputedStyle(d).getPropertyValue('--dag-farg').trim() || '#c4daec';
-    if (R.dagFarg === farg) return;
-    R.dagFarg = farg;
+    const sol = R.solNu || { s: 0 };
+    const nyckel = `${farg}|${sol.s}|${sol.vpx}`;
+    if (R.dagFarg === nyckel) return;
+    R.dagFarg = nyckel;
     let c = d.firstElementChild;
     if (!c) {
       c = document.createElement('canvas');
@@ -1008,6 +1026,163 @@ window.Rum = (() => {
     gr.addColorStop(0.72, 'rgba(196, 218, 236, 0)');
     g.fillStyle = gr;
     g.fillRect(-4, -4, 8, 8);
+    // solens strimmor genom röken, från fönstret mot pulten
+    if (sol.s > 0.02) {
+      g.setTransform(sx, 0, 0, sy, 0, 0);
+      if ('filter' in g) g.filter = 'blur(4px)';
+      const X = (a, y) => sol.vpx + (a - sol.vpx) * (y - 380) / 272;
+      g.fillStyle = `rgba(255, 214, 150, ${r1(0.5 * sol.s)})`;
+      for (const [a, b] of [[250, 430], [500, 590], [650, 900]]) {
+        g.beginPath();
+        g.moveTo(a, 130);
+        g.lineTo(b, 130);
+        g.lineTo(X(b, 780), 780);
+        g.lineTo(X(a, 780), 780);
+        g.closePath();
+        g.fill();
+      }
+      if ('filter' in g) g.filter = 'none';
+    }
+  }
+
+  // ---------- ljuset efter klockan ----------
+  //
+  // Rummet var lika upplyst överallt. Nu faller eftermiddagssolen in genom skyltfönstret över pulten, och
+  // på kvällen lever rummet av sina egna lampor: neonen färgar fönstret rött och tv:n väggen blå. Allt är
+  // färdiga bilder i lager som redan finns (pultens SVG, .rum-warm, .rum-vign och tv:ns sken), så att
+  // inget nytt ritas i varje bildruta: de byts när ljuset har ändrats märkbart, högst var 15:e minut
+  // (paintUte). Fönstret vetter åt väster, så solen kommer in från lunch till solnedgången, och när den
+  // står högt når den inte fram till pulten.
+  const sm = (a, b, x) => { const t = Math.min(1, Math.max(0, (x - a) / (b - a))); return t * t * (3 - 2 * t); };
+  const rad = (g, x, y, rx, ry, rgb, a) => {
+    if (a < 0.005) return;
+    g.save();
+    g.translate(x, y);
+    g.scale(rx, ry);
+    const gr = g.createRadialGradient(0, 0, 0, 0, 0, 1);
+    gr.addColorStop(0, `rgba(${rgb}, ${a})`);
+    gr.addColorStop(1, `rgba(${rgb}, 0)`);
+    g.fillStyle = gr;
+    g.fillRect(-1, -1, 2, 2);
+    g.restore();
+  };
+  // Ritar ovanpå lagrets grund (bakad i ljusDukar; i Safari finns bara CSS-bakgrunden under).
+  function ljusPa(el, y0, hojd, x0, bredd, rita) {
+    if (!el) return;
+    let c = el.querySelector('canvas');
+    if (!c) {
+      c = document.createElement('canvas');
+      c.width = 400;
+      c.height = 250;
+      c.style.cssText = 'position:absolute;left:0;top:0;width:100%;height:100%';
+      el.append(c);
+    }
+    const g = c.getContext('2d');
+    if (!c.grund) {
+      c.grund = document.createElement('canvas');
+      c.grund.width = c.width;
+      c.grund.height = c.height;
+      c.grund.getContext('2d').drawImage(c, 0, 0);
+    }
+    g.setTransform(1, 0, 0, 1, 0, 0);
+    g.clearRect(0, 0, c.width, c.height);
+    g.drawImage(c.grund, 0, 0);
+    g.setTransform(c.width / bredd, 0, 0, c.height / hojd, -x0 * c.width / bredd, -y0 * c.height / hojd);
+    rita(g);
+  }
+  // Solens fläck på pulten, i en fjärdedels upplösning (kanterna är mjuka): y 650–1338 i scenens mått.
+  function solBild(vpx, slut, guld) {
+    const c = document.createElement('canvas');
+    c.width = 405;
+    c.height = 172;
+    const g = c.getContext('2d');
+    g.scale(0.25, 0.25);
+    g.translate(10, -650);
+    const y0 = 652;
+    const X = (a, y) => vpx + (a - vpx) * (y - 380) / (y0 - 380);
+    const form = (a, b, ya, yb, k = 1) => {
+      g.beginPath();
+      g.moveTo(X(a, ya), ya);
+      g.lineTo(X(b, ya), ya);
+      g.lineTo(X(a + (b - a) * (1 - (1 - k) / 2), yb), yb);
+      g.lineTo(X(a + (b - a) * ((1 - k) / 2), yb), yb);
+      g.closePath();
+      g.fill();
+    };
+    g.fillStyle = guld > 0.4 ? '#ffd392' : '#ffe6b0';
+    form(240, 585, y0, slut);
+    form(612, 935, y0, slut);
+    // spröjsen är luckan mellan rutorna; gängets skuggor
+    g.globalCompositeOperation = 'destination-out';
+    if ('filter' in g) g.filter = 'blur(4px)';
+    g.fillStyle = 'rgba(0, 0, 0, 0.55)';
+    for (const [x, r] of [[380, 70], [560, 76], [730, 72]]) form(x - r, x + r, 690, 860, 0.9);
+    return c.toDataURL();
+  }
+  function ljusKlockan() {
+    const v = R.vader;
+    if (!v || !window.RumUte || !R.el || !R.ljusKlar) return;
+    const L = RumUte.light(v);
+    const h = v.timme + v.minut / 60;
+    const d = 180 + (h - (v.manad >= 4 && v.manad <= 10 ? 13.2 : 12.2)) * 15 - 270;
+    const s = Math.round(L.sol * sm(0.5, 4, v.sol) * (1 - sm(28, 44, v.sol)) * (1 - sm(70, 88, Math.abs(d))) * 20) / 20;
+    const vpx = Math.round(Math.max(-500, Math.min(2100, 800 + 470 * Math.tan(d * Math.PI / 180))) / 40) * 40;
+    const slut = Math.round((1338 - 686 * sm(18, 44, v.sol)) / 20) * 20;
+    const kvall = Math.round((1 - sm(0.12, 0.45, L.dag)) * 20) / 20;
+    const guld = Math.round(L.guld * 2) / 2;
+    const nyckel = [s, s ? vpx : 0, s ? slut : 0, kvall, s ? guld : 0, R.smal].join('|');
+    if (nyckel === R.ljusNyckel) return;
+    R.ljusNyckel = nyckel;
+    R.solNu = { s, vpx };
+    dagDuk();
+    // på pulten: i pultens egen bild, så att träet syns i ljuset och inget nytt lager behövs
+    const url = s > 0.02 ? solBild(vpx, slut, guld) : '';
+    const bild = (blend, a) => `<image href="${url}" x="-10" y="650" width="1620" height="688" preserveAspectRatio="none" opacity="${a}" style="mix-blend-mode:${blend}"/>`;
+    for (const g of R.el.querySelectorAll('.rum-sol')) g.innerHTML = url ? bild('overlay', r1(s)) + bild('soft-light', r1(s)) : '';
+    const [y0v, hv] = R.smal ? [-300, 1800] : [0, H];
+    // rummet lite mörkare runt solen, och på kvällen överallt: lamporna syns bättre då
+    ljusPa(R.el.querySelector('.rum-vign'), y0v, hv, 0, W, (g) => {
+      if (s > 0.02) {
+        const gr = g.createLinearGradient(0, 0, 0, H);
+        const a = (x) => `rgba(25, 12, 4, ${r1(x * s)})`;
+        gr.addColorStop(0, a(0.34));
+        gr.addColorStop(0.4, a(0.1));
+        gr.addColorStop(0.62, a(0.06));
+        gr.addColorStop(1, a(0.3));
+        g.fillStyle = gr;
+        g.fillRect(0, y0v, W, hv);
+      }
+      if (kvall > 0.02) {
+        // (mörkret går runt lamporna: neonen och tv:n ska lysa)
+        const m = document.createElement('canvas');
+        m.width = 200;
+        m.height = 125;
+        const q = m.getContext('2d');
+        q.fillStyle = `rgba(14, 8, 10, ${r1(0.34 * kvall)})`;
+        q.fillRect(0, 0, 200, 125);
+        q.globalCompositeOperation = 'destination-out';
+        q.setTransform(200 / W, 0, 0, 125 / hv, 0, -y0v * 125 / hv);
+        rad(q, 400, 130, 300, 120, '0, 0, 0', 0.9);
+        rad(q, 1232, 180, 230, 150, '0, 0, 0', 0.9);
+        g.drawImage(m, 0, y0v, W, hv);
+      }
+    });
+    // lampornas färger (i telefonen läggs ljuset ovanpå utan blandningsläge: svagare)
+    const f = kvall * (LATT ? 0.55 : 1);
+    ljusPa(R.el.querySelector('.rum-warm'), 0, R.smal ? 1500 : H, 0, W, (g) => {
+      rad(g, 400, 130, 416, 300, '255, 50, 40', r1(0.42 * f));
+      rad(g, 448, 460, 352, 260, '255, 60, 50', r1(0.2 * f));
+      rad(g, 1376, 560, 384, 160, '255, 190, 110', r1(0.3 * f));
+      rad(g, 784, 800, 544, 220, '255, 220, 160', r1(0.2 * f));
+    });
+    // tv:ns sken är ett eget lager som släcks med tv:n: starkare på kvällen
+    ljusPa(R.el.querySelector('#rum-tvsken'), -60, 480, 1000, 620, (g) => {
+      rad(g, 1310, 180, 310, 240, '70, 120, 255', r1(0.42 * f));
+    });
+    for (const [sel, dag, kv] of [['canvas.rum-neonglow', 0.08, 0.24], ['canvas.rum-neonhalo', 0.28, 0.34]]) {
+      const n = R.el.querySelector(sel);
+      if (n) n.style.setProperty('--sken', r1(dag + (kv - dag) * kvall));
+    }
   }
 
   // Tangenterna står inte i foten utan när man pekar på saken (title), och
@@ -1032,21 +1207,21 @@ window.Rum = (() => {
     el.className = navigator.userAgentData ? 'rum chromium' : 'rum';
     el.hidden = true;
     el.setAttribute('aria-label', 'Tobaksaffären');
-    el.innerHTML = `<div class="rum-stage" id="rum-stage"><div class="rum-kamera" id="rum-kamera"><div class="rum-world" id="rum-world">
+    el.innerHTML = `<div class="rum-stage" id="rum-stage"><i class="rum-tak"></i><div class="rum-kamera" id="rum-kamera"><div class="rum-world" id="rum-world">
 ${plane(-600, `<div class="rum-ute" id="rum-ute"></div>${bg()}${vid('vagg')}${rightWall()}${window.RumRegister ? RumRegister.html() : ''}${svg('<g id="rum-hyllor"></g>', '', [1300, 250, 150, 120])}${neon()}${frameHtml()}${kortHtml()}`, 1.035)}
 ${plane(-598, vid('horn'), 1.035, 'rum-pl3d')}
 ${plane(-470, `${tv()}`, 1.02, 'rum-pl3d')}
 ${plane(-330, `${sill()}${haze()}`)}
-${plane(-60, `${table()}${vid('pult')}`, 1.05)}
+${plane(-60, `${table()}<svg class="rum-pult-mer" viewBox="-10 1000 1620 340" aria-hidden="true"><image href="rum/pult-mer.webp" x="-10" y="1000" width="1620" height="340" preserveAspectRatio="none"/><g class="rum-sol"></g></svg>${vid('pult')}`, 1.05)}
 ${plane(0, paper() + hasseHtml())}
 </div></div>
-<div class="rum-layer rum-mork" id="rum-mork"><i class="a"></i><i class="b"></i></div>
+<div class="rum-layer rum-mork" id="rum-mork"><i class="a"></i><i class="b"></i></div><i class="rum-mork-ut"></i>
 <div class="rum-layer rum-warm"></div><div class="rum-layer rum-dagsljus" id="rum-dagsljus"></div><div class="rum-layer rum-vign"></div><div class="rum-layer rum-grain"></div>
 </div>
 ${window.RumAnslag ? RumAnslag.nara() : ''}
 ${window.RumRegister ? RumRegister.nara() : ''}
 <div class="rum-hdr"><a class="rum-brand" href="#">Matchfixarna</a></div>
-<div class="rum-ft"><a href="#hem">Vanlig sida</a></div>`;
+<div class="rum-ft"><a class="rum-vanlig" href="#hem">Vanlig sida</a><a class="rum-tillbaka" ${KNAPP} hidden>Tillbaka</a></div>`;
     document.querySelector('main').prepend(el);
     R.el = el;
     R.built = true;
@@ -1055,10 +1230,28 @@ ${window.RumRegister ? RumRegister.nara() : ''}
     R.tv = window.RumTv ? RumTv.mount(el, { calm, sedan, short, kort: (n) => BOARD[n] || short(n), wd, hm, matches: () => (state.all && state.all.matches) || [] }) : null;
     R.ans = window.RumAnslag ? RumAnslag.mount(el, { calm, kort: (n) => BOARD[n] || short(n), close: () => board(false) }) : null;
     tangenter();
+    // Foten: Vanlig sida i rummet på håll, och Tillbaka så fort något ligger framme. Det enda ordet
+    // som syntes nära något var annars Vanlig sida, som leder ut ur rummet.
+    if (window.RumBak && RumBak.vid) {
+      const tb = el.querySelector('.rum-tillbaka');
+      const vs = el.querySelector('.rum-vanlig');
+      tb.addEventListener('click', (e) => {
+        e.preventDefault();
+        e.stopPropagation();
+        RumBak.ned();
+      });
+      RumBak.vid((n) => {
+        tb.hidden = !n;
+        vs.hidden = Boolean(n);
+      });
+    }
     R.video = window.RumVideo ? RumVideo.mount(el, { calm, sedan, short, kort: (n) => BOARD[n] || short(n), aim: (f) => { R.vf = f; aimVideo(calm() ? null : 'glid'); }, latt: () => { if (R.vnara) lattVideo(R.vniva); } }) : null;
     R.reg = window.RumRegister ? RumRegister.mount(el, { calm, kort: (n) => BOARD[n] || short(n), close: () => register(false), tur: (fn) => tur(fn, 3) }) : null;
     paintUte();
-    R.bakat = baka().then(ljusDukar).catch((err) => console.warn('Rummet: ljuset kunde inte bakas', err));
+    R.bakat = baka().then(ljusDukar).catch((err) => console.warn('Rummet: ljuset kunde inte bakas', err)).then(() => {
+      R.ljusKlar = true;
+      ljusKlockan();
+    });
     // gatan syns genom fönstret och dörren, och gänget och röken står i
     // dukens vänstra del (utsikten och duken är större än det de visar)
     const ute = syn(el.querySelector('#rum-ute'), DORR.x, WIN.y, WIN.x + WIN.w - DORR.x, DORR.y + DORR.h - WIN.y);
@@ -1215,7 +1408,10 @@ ${window.RumRegister ? RumRegister.nara() : ''}
   // kupongens mått (rum.css), bred och smal (.rum.smal, i telefonen på höjden),
   // och pennan på pulten och i handen på dem (fit)
   const KUP = { bred: [660, 470], smal: [420, 620] };
-  const PENNOR = { bred: [{ x: 276.4, y: 340.6, a: -11 }, { x: 362, y: 440, a: -6 }], smal: [{ x: 196, y: 420, a: -11 }, { x: 268, y: 612, a: -2 }] };
+  // kupongens mitt i x på pulten, och var man står i telefonen på höjden (fit)
+  const HEM_SMAL = 625;
+  const kupX = () => (R.smal ? 640 : 760);
+  const PENNOR = { bred: [{ x: 276.4, y: 340.6, a: -11 }, { x: 362, y: 440, a: -6 }], smal: [{ x: 268, y: 610, a: -5 }, { x: 268, y: 612, a: -2 }] };
   const PEN_PULT = { ...PENNOR.bred[0] };
   const PEN_VILA = { ...PENNOR.bred[1] };
   const PEN_SKRIV = -38;
@@ -1447,7 +1643,7 @@ ${window.RumRegister ? RumRegister.nara() : ''}
   function slot(i) {
     const [x, y, a] = HOG.at[i % HOG.at.length];
     const n = Math.floor(i / HOG.at.length);
-    return { dx: x + 14 * n - 760, dy: y + 10 * n - 853, a };
+    return { dx: x + 14 * n - kupX(), dy: y + 10 * n - 853, a };
   }
   const restAt = (sl) => T(sl.dx, sl.dy, 0, 44, sl.a, HOG.s);
 
@@ -2016,7 +2212,7 @@ ${window.RumRegister ? RumRegister.nara() : ''}
   function kamera(dt) {
     // med fingret vrids kameran efter var i rummet man står (pan)
     if (R.pek !== 'mouse' && !nara()) {
-      if (R.k * W - innerWidth > 1) R.tx = R.px * 2 - 1;
+      if (R.k * W - innerWidth > 1) R.tx = Math.max(-1, Math.min(1, (R.px - (R.pxHem === undefined ? 0.5 : R.pxHem)) * 2));
       R.ty = R.k * H - innerHeight > 1 ? R.py * 2 - 1 : -0.25;
     }
     // (världen glider själv dit vrid satte den)
@@ -2339,6 +2535,7 @@ ${window.RumRegister ? RumRegister.nara() : ''}
     d.style.setProperty('--dagsljus', r1(L.dag * 0.9));
     d.style.setProperty('--dag-farg', L.sky[2]);
     if (R.dagFarg) dagDuk();
+    ljusKlockan();
     R.el.classList.toggle('aska', v.slag === 'aska');
     // lysröret släckt på natten (rum-folk.js)
     if (window.RumFolk) RumFolk.ute(v);
@@ -3274,7 +3471,7 @@ ${window.RumRegister ? RumRegister.nara() : ''}
     const cx = (innerWidth - sida) / 2;
     const cy = top + (innerHeight - top - foot) / 2;
     return {
-      dx: (cx - (R.ox || 0)) / k - 760, dy: (cy - (R.oy || 0)) / k - 853, z,
+      dx: (cx - (R.ox || 0)) / k - kupX(), dy: (cy - (R.oy || 0)) / k - 853, z,
       box: { left: cx - (w / 2) * z * k, top: cy - (h / 2) * z * k, width: w * z * k, height: h * z * k },
     };
   }
@@ -4533,7 +4730,8 @@ ${window.RumRegister ? RumRegister.nara() : ''}
     R.px = ow > 1 ? Math.min(1, Math.max(0, px)) : 0.5;
     R.py = oh > 1 ? Math.min(1, Math.max(0, py)) : 0.5;
     R.ox = -ow * R.px;
-    R.oy = -oh * R.py;
+    // (scenen är lägre än fönstret i telefonen på höjden: lite tak över, mest pult under)
+    R.oy = oh < -1 ? -oh * 0.24 : -oh * R.py;
     const s = R.el.querySelector('.rum-stage');
     const glid = drag && R.el.classList.contains('chromium') && !calm();
     if (glid) {
@@ -4720,11 +4918,21 @@ ${window.RumRegister ? RumRegister.nara() : ''}
       dispatchEvent(new HashChangeEvent('hashchange'));
       return;
     }
-    R.k = Math.max(innerWidth / W, innerHeight / H);
-    pan(R.px, R.py);
     // i telefonen på höjden: den smala kupongen, och på bredden orden
     // bredvid kupongen i handen
     const smal = innerWidth < 600 && innerHeight > innerWidth;
+    const fyller = Math.max(innerWidth / W, innerHeight / H);
+    // På höjden står rummet lite längre bort: alla tre i gänget, neonen och hela kupongen syns utan
+    // att man drar. Scenen räcker inte till fönstrets höjd då, så taket och pulten fortsätter utanför
+    // (.rum-tak, .rum-pult-mer).
+    R.k = smal ? Math.min(fyller, Math.max(innerWidth / 760, innerHeight / 1330)) : fyller;
+    // där man står när man kommer in: vid gänget, med kupongen under dem (HEM_SMAL). Har man inte
+    // dragit står man kvar där när fönstret ändras (adressraden i telefonen).
+    const ow = R.k * W - innerWidth;
+    const hem = smal && ow > 1 ? Math.min(1, Math.max(0, (HEM_SMAL * R.k - innerWidth / 2) / ow)) : 0.5;
+    if (smal !== Boolean(R.smal) || R.px === R.pxHem) R.px = hem;
+    R.pxHem = hem;
+    pan(R.px, R.py);
     R.lag = innerHeight < 500 && innerWidth > innerHeight;
     R.el.classList.toggle('lag', R.lag);
     if (smal !== Boolean(R.smal)) {

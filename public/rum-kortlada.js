@@ -32,7 +32,7 @@ const POS = { x: 1109, y: -490, z: 377 };
 // lådan: bredd, höjd, djup, väggarna och botten; korten (A6), flikarna och
 // avdelarna, som är lite högre
 const B = { w: 46, h: 24, d: 68, t: 2.2, b: 1.8 };
-const C = { w: 40.6, h: 28.8, th: 0.26, tab: 3.6, skilj: 1.4 };
+const C = { w: 40.6, h: 28.8, th: 0.26, tab: 3.6, skilj: 0.5 };
 const DV = { pl: '#2a78d6', ch: '#eb6834', l1: '#1baf7a', l2: '#eda100' };
 // etiketten fram på lådan, maskinskriven
 const ETIKETT = 'KARTOTEK';
@@ -266,7 +266,10 @@ export async function kortlada(o) {
     kort.clear();
     K.clear();
     const inner = B.d - 2 * B.t;
-    const gap = Math.min(2.6, inner / (cards.length + 1));
+    // lite luft bakom avdelarna: annars skymmer de flikarna på korten närmast bakom
+    const LUFT = 3.2;
+    const gap = Math.min(2.6, (inner - LUFT * cards.filter((c) => c.kind === 'skilj').length) / (cards.length + 1));
+    let luft = 0;
     const u = C.w / 5;
     cards.forEach((c, i) => {
       const w = (wear && wear.get(c.id)) || {};
@@ -274,7 +277,8 @@ export async function kortlada(o) {
       const hi = skilj ? C.skilj : 0;
       const th = skilj ? 0.5 : C.th;
       const g = new THREE.Group();
-      g.position.set(0, B.b, B.d / 2 - B.t - gap * (i + 0.8));
+      g.position.set(0, B.b, B.d / 2 - B.t - gap * (i + 0.8) - luft);
+      if (skilj) luft += LUFT;
       g.rotation.set(-(w.lut || 0) * DEG, 0, (w.vri || 0) * DEG);
       kort.add(g);
       const face = skilj ? M[c.cls] : c.kind === 'mote' ? M.bla : M.kort;
@@ -283,7 +287,7 @@ export async function kortlada(o) {
       made.push(bg);
       mesh(bg, [edge, edge, edge, edge, face, face], g).position.y = (C.h + hi) / 2;
       // fliken
-      const tabH = C.tab + (skilj ? 0.6 : 0);
+      const tabH = C.tab + (skilj ? 0.2 : 0);
       const tw = c.tab.span * u - 0.4;
       const tx = -C.w / 2 + c.tab.at * u + 0.2 + tw / 2;
       const ty = C.h + hi + tabH / 2 - 0.5;

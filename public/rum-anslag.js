@@ -65,6 +65,13 @@ window.RumAnslag = (() => {
   // tavlan ritas i 1000 × 568 och förminskas på väggen
   const BW = 1000;
   const BH = 568;
+  // I en stående telefon står närbilden på höjden, två spalter och fyra rader i stället för fyra
+  // spalter och två rader: telefonen har höjden, och lapparna blir ungefär 1,6 gånger så stora och går
+  // att läsa utan att lyftas. Tavlan på väggen är densamma, bara den framme har de här måtten.
+  const HW = 598;
+  const HH = 1070;
+  const hog = () => innerWidth < 600 && innerHeight > innerWidth * 1.2;
+  const HOG = { form: [8, 24], skador: [336, 12], styrka: [60, 272], kryss: [350, 276], tur: [40, 508], odds: [332, 512], vila: [40, 752], motstand: [342, 760] };
   const DAY = 86400000;
   const TZ = 'Europe/Stockholm';
   const DIVS = ['pl', 'ch', 'l1', 'l2'];
@@ -419,17 +426,31 @@ window.RumAnslag = (() => {
       y: n.y + Math.round((R0() - 0.5) * 6),
       fan: FAN.map(([a, x, y], i) => [i ? r1(a + (R0() - 0.5) * 0.8) : 0, x, y]),
     }));
+    const spar = (bw, bh) => {
     let marks = '';
-    for (let i = 0; i < 26; i++) marks += `<i class="ans-hal" style="left:${Math.round(40 + R0() * 920)}px; top:${Math.round(36 + R0() * 496)}px"></i>`;
+    for (let i = 0; i < 26; i++) marks += `<i class="ans-hal" style="left:${Math.round(40 + R0() * (bw - 80))}px; top:${Math.round(36 + R0() * (bh - 72))}px"></i>`;
     for (let i = 0; i < 4; i++) {
-      const x = Math.round(60 + R0() * 860);
-      const y = Math.round(40 + R0() * 480);
+      const x = Math.round(60 + R0() * (bw - 140));
+      const y = Math.round(40 + R0() * (bh - 88));
       const c = ['#f1ead6', '#f3e58a', '#ddd5c0', '#fbf7ec'][i % 4];
       marks += `<i class="ans-rest" style="left:${x}px; top:${y}px; background:${c}; transform: rotate(${Math.round((R0() - 0.5) * 60)}deg)"><b class="ans-nal" style="background:${['#c2271c', '#2a52a0', '#3db37c', '#d8b06a'][(R0() * 4) | 0]}"></b></i>`;
     }
     // där en stor affisch hängt länge är juten mindre gulnad
-    marks += `<i class="ans-blek" style="left:${Math.round(120 + R0() * 500)}px; top:${Math.round(60 + R0() * 200)}px; transform: rotate(${r1((R0() - 0.5) * 3)}deg)"></i>`;
-    return { notes, marks };
+    marks += `<i class="ans-blek" style="left:${Math.round(60 + R0() * (bw - 500))}px; top:${Math.round(60 + R0() * 200)}px; transform: rotate(${r1((R0() - 0.5) * 3)}deg)"></i>`;
+    return marks;
+    };
+    const marks = spar(1000, 568);
+    return { notes, marks, marksHog: spar(HW, HH) };
+  }
+  // Lapparna på den stående tavlan: dagens förskjutning (wear) från sin plats i spalterna.
+  function hogW(W) {
+    return {
+      marks: W.marksHog,
+      notes: W.notes.map((n) => {
+        const b = NOTES.find((x) => x.id === n.id);
+        return { ...n, x: HOG[n.id][0] + n.x - b.x, y: HOG[n.id][1] + n.y - b.y };
+      }),
+    };
   }
 
   // Nålens plats: mitt upptill på lappen, vriden med den.
@@ -623,6 +644,14 @@ window.RumAnslag = (() => {
         return;
       }
       fitWall();
+      // (telefonen har vänts: tavlan framme byggs om)
+      const staende = hog();
+      if (staende !== A.hog) {
+        A.hog = staende;
+        A.html = '';
+        stor.classList.toggle('hog', staende);
+        flyg.classList.toggle('hog', staende);
+      }
       const D = data();
       A.D = D;
       const seed = Math.floor(Date.now() / DAY);
@@ -638,7 +667,7 @@ window.RumAnslag = (() => {
       const nu = A.inner;
       A.inner = inner;
       stopFlip();
-      const hela = `${seed}|${A.sheets}`;
+      const hela = `${seed}|${A.sheets}|${staende}`;
       if (hela === A.hela) {
         for (const n of A.W.notes) {
           if (JSON.stringify(nu[n.id]) === JSON.stringify(inner[n.id])) continue;
@@ -650,7 +679,7 @@ window.RumAnslag = (() => {
       } else {
         A.hela = hela;
         vagg.innerHTML = board(A.W, inner, A.sheets, A.top, true);
-        stor.innerHTML = board(A.W, inner, A.sheets, A.top, false);
+        stor.innerHTML = board(staende ? hogW(A.W) : A.W, inner, A.sheets, A.top, false);
       }
       measure();
       if (A.lyft) {
@@ -771,6 +800,14 @@ window.RumAnslag = (() => {
     // Tavlans plats i fönstret: ryms mellan namnet och foten (i telefonen
     // med smalare kanter).
     function place() {
+      if (A.hog) {
+        // (namnet och Tillbaka står överst, och nedanför behövs inget utrymme)
+        const k = Math.min((innerWidth - 24) / HW, (innerHeight - 76) / HH);
+        const L = (innerWidth - HW * k) / 2;
+        const T = 64 + Math.max(0, (innerHeight - 64 - HH * k) / 2 - 6);
+        A.place = { k, L, T, q: [[L, T], [L + HW * k, T], [L + HW * k, T + HH * k], [L, T + HH * k]] };
+        return A.place;
+      }
       const k = Math.min((innerWidth - (innerWidth < 700 ? 24 : 120)) / BW, (innerHeight - (innerHeight < 500 ? 90 : 170)) / BH, 1.35);
       const L = (innerWidth - BW * k) / 2;
       const T = (innerHeight - BH * k) / 2 - 16;
@@ -819,7 +856,7 @@ window.RumAnslag = (() => {
       stopFly();
       A.flyger = true;
       const bana = (A.bana = { from, to, ms });
-      const at = (t) => warp(hornPa(bana, t), BW, BH);
+      const at = (t) => warp(hornPa(bana, t), A.hog ? HW : BW, A.hog ? HH : BH);
       const n = Math.max(12, Math.round(ms / 20));
       const vag = Array.from({ length: n + 1 }, (_, i) => ({ transform: at(i / n) }));
       return new Promise((done) => {
@@ -861,6 +898,7 @@ window.RumAnslag = (() => {
       A.on = on;
       if (on) {
         loadMatches();
+        if (hog() !== A.hog) draw();
         if (A.matt !== A.html) measure();
         place();
         // (var den på väg tillbaka vänder den där den är)
@@ -874,7 +912,7 @@ window.RumAnslag = (() => {
           ov.classList.add('framme');
           return Promise.resolve();
         }
-        flyg.style.transform = warp(from, BW, BH);
+        flyg.style.transform = warp(from, A.hog ? HW : BW, A.hog ? HH : BH);
         return fly(from, A.place.q, 680).then(() => {
           if (!A.on) return;
           rest();

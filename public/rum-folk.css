@@ -25,6 +25,21 @@
   mask-composite: intersect;
 }
 .rum.natt .rum-mork i { display: none; }
+/* telefonen på höjden: mörkret räcker över taket och pulten utanför scenen (samma ställen i rutan) */
+.rum.smal.natt .rum-mork {
+  top: -1200px;
+  height: 1800px;
+  -webkit-mask-image:
+    radial-gradient(ellipse 10% 7.2% at 78% 26.7%, rgba(0, 0, 0, 0.2), #000 100%),
+    radial-gradient(ellipse 29% 16.7% at 37% 36.1%, rgba(0, 0, 0, 0.42), rgba(0, 0, 0, 0.6) 60%, #000 100%),
+    radial-gradient(ellipse 9% 17.8% at 8% 40%, rgba(0, 0, 0, 0.5), #000 100%),
+    radial-gradient(ellipse 42% 13.3% at 48% 67.8%, rgba(0, 0, 0, 0.6), #000 100%);
+  mask-image:
+    radial-gradient(ellipse 10% 7.2% at 78% 26.7%, rgba(0, 0, 0, 0.2), #000 100%),
+    radial-gradient(ellipse 29% 16.7% at 37% 36.1%, rgba(0, 0, 0, 0.42), rgba(0, 0, 0, 0.6) 60%, #000 100%),
+    radial-gradient(ellipse 9% 17.8% at 8% 40%, rgba(0, 0, 0, 0.5), #000 100%),
+    radial-gradient(ellipse 42% 13.3% at 48% 67.8%, rgba(0, 0, 0, 0.6), #000 100%);
+}
 .rum.natt.tv-nara .rum-mork,
 .rum.natt.vid-nara .rum-mork,
 .rum.natt.sak-nara .rum-mork,

@@ -11,6 +11,8 @@
 //   RumBak.bort(namn)      lagret är borta, hur det än gick till (krysset, Esc, ett klick utanför)
 //   RumBak.rensa()         rummet har stängts (en länk): lagren är borta, och historiken är redan förbi
 //   RumBak.snabbt          sant medan ett lager läggs bort utan rörelse (calm i rum.js)
+//   RumBak.ned()           det översta läggs bort, som vid ordet Tillbaka i rummets fot
+//   RumBak.vid(f)          f(antal) när lagren ändras
 //
 // Fällorna:
 //   - Stängs ett lager med krysset, Esc eller ett klick utanför måste dess rad också bort, annars gör
@@ -31,6 +33,9 @@
 //     dialogens close som säger till (divisioner.js), och raden tas bort som vid krysset.
 window.RumBak = (() => {
   const lager = [];
+  const lyssnare = [];
+  // Någon vill veta när det ligger något framme (ordet Tillbaka i foten, rum.js).
+  const andrat = () => { for (const f of lyssnare) f(lager.length); };
   let planerad = false;
   let hopp = false;
   let hoppT = 0;
@@ -86,6 +91,7 @@ window.RumBak = (() => {
         }
       }
       snabbt = false;
+      andrat();
     }
     stam();
   });
@@ -102,17 +108,29 @@ window.RumBak = (() => {
         return;
       }
       lager.push({ namn, ut });
+      andrat();
       snart();
     },
     bort(namn) {
       const i = lager.findIndex((x) => x.namn === namn);
       if (i < 0) return;
       lager.splice(i, 1);
+      andrat();
       snart();
     },
     rensa() {
       lager.length = 0;
+      andrat();
       snart();
+    },
+    // ordet Tillbaka: det översta läggs bort, med rörelsen som vanligt (ut tar bort raden med bort)
+    ned() {
+      const l = lager[lager.length - 1];
+      if (l) l.ut(false);
+    },
+    vid(f) {
+      lyssnare.push(f);
+      f(lager.length);
     },
     get snabbt() { return snabbt; },
     // (för proven)
