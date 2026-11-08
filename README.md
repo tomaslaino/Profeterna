@@ -858,6 +858,9 @@ bara lokalt. Analyserna visas som de ligger i `data/analyser.json`; hur de skriv
   uppifrån, och i baren står koppen lite längre bak med fatet på notans övre vänstra hörn som i rummet,
   så att Hasse B. syns. Fingertopparna på hans vänstra hand skars av vid dukens underkant; nu ryms de.
   Se [Hasse Backe](#hasse-backe), *Kaffet i rummet*.
+- **Hasse Backe spanar på din kupong (2026-11-08, användarens val):** ibland går blicken ned på kupongen,
+  med sex olika miner, och när han har sagt vad han tycker om den passar minen orden. Se
+  [Hasse Backe](#hasse-backe), *Vilan*.
 - **Hasses händer avslappnade och som fotot (2026-11-08, användarens val):** "Det viktiga är att de är
   bekväma o passar med den vanliga animationsbilden." Användaren valde bland renderade varianter
   (hållning B och justering 1–4): händerna vilar med handlederna lite upp, fingrarna böjda ned mot
@@ -4631,6 +4634,20 @@ huvudet efter, som man gör:
 - `brynet`: hakan lite upp, ena brynet högt och ett brett leende, och en långsam nick: visst är det så?
 - `skrocka`: skrockar åt något han kommer att tänka på, med axlarna som hoppar.
 - `smacka`: tittar på kaffet, smackar och säger mm.
+
+Han spanar också på din kupong (gruppen `spana`). Ligger den på disken framför honom är det ungefär vart
+tredje tillfälle, med en lottad min. Har han sagt vad han tycker om den följer minen orden (`H.spana` i
+`omKupongen`), också när kupongen inte ligger där. Utan kupong på disken och utan ord om den tittar han
+inte ned, eftersom blicken då inte har något mål och bara går ned mot den som sitter framför honom.
+
+- `spanaNojd` (samma tecken som han): ett leende som växer och två små nickar.
+- `spanaBryn` (färre tecken än han): ett bryn åker upp, och han tittar på en: jaså.
+- `spanaSkaka` (fler tecken än han, eller delvis andra): skakar långsamt på huvudet och pustar ut.
+- `spanaBlund` (helt andra tecken): sluter ögonen en stund, i tyst besvikelse.
+- `spanaSmyg` (bara lottad): två snabba ögonkast utan att huvudet rör sig, och sedan tittar han oskyldigt bort.
+- `spanaKis` (bara lottad): lutar sig fram och kisar, och sätter sig tillbaka med ett oj.
+
+Hakan går inte ned mer än när han tittar på notan: med huvudet längre ned ser han arg ut.
 
 Börjar han prata mitt i ett av dem läggs det undan 2,5 gånger så fort. Kaffet och cigarren kommer som
 förut (se *Cigarren*), när han inte gör något annat. Med minskad rörelse gör han inget av det, men han

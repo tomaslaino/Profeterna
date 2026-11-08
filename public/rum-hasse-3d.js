@@ -138,6 +138,19 @@ export const KLIPP = {
   skriv1: { fran: 395, till: 395 + skrivTid(1), vila: 0, skynda: true },
   skriv2: { fran: 405, till: 405 + skrivTid(2), vila: 0, skynda: true },
   skriv3: { fran: 415, till: 415 + skrivTid(3), vila: 0, skynda: true },
+  // din kupong: han spanar på den (grupp spana, rum-hasse.js väljer när), med olika miner:
+  // höjer ett bryn åt det och tittar på en: jaså
+  spanaBryn: { fran: 425, till: 428.8, vila: 0, skynda: true, grupp: 'spana' },
+  // skakar långsamt på huvudet åt det, och pustar ut
+  spanaSkaka: { fran: 430, till: 434.6, vila: 0, skynda: true, grupp: 'spana' },
+  // ett leende som växer och två små nickar: det där var inte dumt
+  spanaNojd: { fran: 436, till: 439.6, vila: 0, skynda: true, grupp: 'spana' },
+  // sluter ögonen en stund, i tyst besvikelse
+  spanaBlund: { fran: 441, till: 445.4, vila: 0, skynda: true, grupp: 'spana' },
+  // bara ögonen, två snabba ögonkast, och sedan tittar han oskyldigt bort
+  spanaSmyg: { fran: 447, till: 451.2, vila: 0, skynda: true, grupp: 'spana' },
+  // lutar sig fram och kisar för att se vad det står, och sätter sig tillbaka med ett oj
+  spanaKis: { fran: 453, till: 457.4, vila: 0, skynda: true, grupp: 'spana' },
 };
 for (const k of Object.values(KLIPP)) {
   if (k.dunk) k.dom = k.fran + k.dunk.reduce((a, b) => (b[1] > a[1] ? b : a))[0];
@@ -1939,6 +1952,101 @@ export async function figuren(duk, { hog = false, latt = false, pr = 1 } = {}) {
       pen: { n },
     };
   }
+  // Din kupong (grupp spana): blicken går ned på den, ögonen först och huvudet efter, och det är minen som
+  // skiljer klippen åt. Kupongen ligger framför honom, så blicken stannar på disken mellan händerna. Hakan
+  // går inte ned mer än till notan (notan): lutar huvudet mer ser han arg ut, så det är ögonen och locken som
+  // visar vart han tittar. spanNed: ögonen ned vid a och upp igen vid b, spanLock: locken samtidigt,
+  // spanHuv: huvudet samtidigt.
+  const spanNed = (a, b) => ({
+    blickX: [[a, 0], [a + 0.12, -2], [b, -2], [b + 0.15, 0]],
+    blickY: [[a, 0], [a + 0.12, 6], [b, 6], [b + 0.15, 0]],
+  });
+  const spanLock = (a, b) => [[a + 0.1, 0], [a + 0.35, 0.42], [b, 0.42], [b + 0.15, 0]];
+  const SPAN_P = 0.5;
+  const SPAN_Y = -0.18;
+  Object.assign(RORELSER, {
+    // Ett bryn åker upp medan han läser, och det står kvar när han tittar upp på en med hakan lite upp.
+    spanaBryn: {
+      k: {
+        ...spanNed(0.1, 1.7),
+        blund: spanLock(0.1, 1.7),
+        pitch: [[0.15, 0], [0.6, SPAN_P], [1.65, SPAN_P], [2.05, -0.25], [3.0, -0.25]],
+        yaw: [[0.15, 0], [0.6, SPAN_Y], [1.65, SPAN_Y], [2.05, 0.12], [3.0, 0.12]],
+        brynX: [[0.9, 0], [1.25, 1.7], [3.0, 1.6], [3.7, 0]],
+        brynY: [[0.9, 0], [1.25, 0.1], [3.0, 0.1], [3.7, 0]],
+        le: [[2.0, 0], [2.5, 0.6], [3.0, 0.6], [3.7, 0]],
+      },
+    },
+    // Han läser, leendet viker undan lite, och huvudet går långsamt fram och tillbaka. Sedan pustar han ut
+    // och tittar upp.
+    spanaSkaka: {
+      k: {
+        ...spanNed(0.1, 3.1),
+        blund: spanLock(0.1, 3.1),
+        pitch: [[0.15, 0], [0.6, SPAN_P], [3.05, SPAN_P], [3.5, 0]],
+        yaw: [[0.15, 0], [0.6, SPAN_Y], [1.15, SPAN_Y], [1.6, -0.8], [2.1, 0.35], [2.6, -0.7], [3.05, SPAN_Y], [3.5, 0]],
+        brynX: [[0.6, 0], [1.0, -0.25], [3.0, -0.25], [3.6, 0]],
+        brynY: [[0.6, 0], [1.0, -0.3], [3.0, -0.3], [3.6, 0]],
+        andas: [[2.9, 0], [3.3, -7], [3.9, 0]],
+      },
+    },
+    // Leendet växer medan han läser, två små nickar, och han tittar upp med leendet i ögonen.
+    spanaNojd: {
+      k: {
+        ...spanNed(0.1, 2.1),
+        blund: spanLock(0.1, 2.1),
+        pitch: [[0.15, 0], [0.6, SPAN_P], [1.25, SPAN_P], [1.5, 0.2], [1.75, 0.65], [2.0, 0.25], [2.45, 0]],
+        yaw: [[0.15, 0], [0.6, SPAN_Y], [2.0, SPAN_Y], [2.45, 0]],
+        brynX: [[0.8, 0], [1.3, 0.35], [2.7, 0.35], [3.4, 0]],
+        brynY: [[0.8, 0], [1.3, 0.3], [2.7, 0.3], [3.4, 0]],
+        le: [[0.8, 0], [1.4, 0.8], [2.7, 0.85], [3.5, 0]],
+        kis: [[0.9, 0], [1.5, 0.45], [2.7, 0.45], [3.4, 0]],
+      },
+    },
+    // Han läser, ögonen sluts långsamt medan han andas in, och sedan andas han ut och tittar på en igen.
+    spanaBlund: {
+      k: {
+        ...spanNed(0.1, 2.95),
+        blund: [[0.2, 0], [0.45, 0.42], [1.3, 0.42], [1.8, 0.92], [2.8, 0.92], [3.1, 0]],
+        pitch: [[0.15, 0], [0.6, SPAN_P], [1.3, SPAN_P], [1.8, 0.35], [2.8, 0.3], [3.3, 0]],
+        yaw: [[0.15, 0], [0.6, SPAN_Y], [2.8, SPAN_Y], [3.3, 0]],
+        brynX: [[1.2, 0], [1.8, 0.5], [2.8, 0.5], [3.4, 0]],
+        brynY: [[1.2, 0], [1.8, 0.5], [2.8, 0.5], [3.4, 0]],
+        andas: [[1.2, 0], [1.7, 8], [2.0, 8], [2.9, -7], [3.6, 0]],
+        axV: [[1.2, 0], [1.7, 7], [2.0, 7], [2.9, -3], [3.6, 0]],
+        axH: [[1.2, 0], [1.7, 7], [2.0, 7], [2.9, -3], [3.6, 0]],
+      },
+    },
+    // Huvudet står nästan still och bara ögonen går ned, två gånger. Andra gången märker han att man ser
+    // det: brynen upp, blicken bort längs baren och hakan upp, som om inget har hänt.
+    spanaSmyg: {
+      k: {
+        blickX: [[0.3, 0], [0.4, -2], [0.95, -2], [1.05, 0], [1.5, 0], [1.6, -2], [2.1, -2], [2.2, 0], [2.3, -4.5], [3.2, -4.5], [3.32, 0]],
+        blickY: [[0.3, 0], [0.4, 6.5], [0.95, 6.5], [1.05, 0], [1.5, 0], [1.6, 6.5], [2.1, 6.5], [2.2, 0], [2.3, -2], [3.2, -2], [3.32, 0]],
+        blund: [[0.3, 0], [0.42, 0.3], [0.95, 0.3], [1.05, 0], [1.5, 0], [1.62, 0.3], [2.1, 0.3], [2.2, 0]],
+        pitch: [[0.3, 0], [0.5, 0.15], [2.1, 0.15], [2.6, -0.4], [3.3, -0.4], [4.0, 0]],
+        yaw: [[2.15, 0], [2.65, -0.3], [3.3, -0.3], [4.0, 0]],
+        brynX: [[2.1, 0], [2.3, 0.9], [3.2, 0.8], [3.9, 0]],
+        brynY: [[2.1, 0], [2.3, 0.9], [3.2, 0.8], [3.9, 0]],
+        le: [[3.1, 0], [3.5, 0.6], [4.1, 0]],
+      },
+    },
+    // Han lutar sig fram och kisar: vad står det där? Sedan sätter han sig tillbaka med brynen uppe, och
+    // munnen säger oj.
+    spanaKis: {
+      k: {
+        ...spanNed(0.1, 2.3),
+        pitch: [[0.15, 0], [0.8, 0.6], [2.25, 0.6], [2.7, -0.2], [3.5, -0.2]],
+        yaw: [[0.15, 0], [0.8, SPAN_Y], [2.25, SPAN_Y], [2.7, 0.1], [3.5, 0.1]],
+        lut: [[0.2, 0], [0.9, 0.05], [2.25, 0.05], [2.8, -0.015], [3.5, -0.015]],
+        kis: [[0.5, 0], [0.9, 0.75], [2.25, 0.75], [2.5, 0]],
+        brynX: [[2.25, 0], [2.55, 0.9], [3.4, 0.8], [4.1, 0]],
+        brynY: [[2.25, 0], [2.55, 0.9], [3.4, 0.8], [4.1, 0]],
+        rund: [[2.45, 0], [2.7, 0.45], [3.2, 0.4], [3.5, 0]],
+        munn: [[2.45, 0], [2.7, 0.04], [3.2, 0.04], [3.5, 0]],
+      },
+    },
+  });
   for (const [namn, o] of Object.entries(RORELSER)) {
     const m = KLIPP[namn];
     const { fran, till, vila = 0, start = 0 } = m;

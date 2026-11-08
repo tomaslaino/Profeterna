@@ -718,7 +718,22 @@ window.RumHasse = (() => {
   const SMATT = [5000, 11000];
   const TRUMSATT = ['varv', 'varv', 'fort', 'lugnt', 'peka'];
   const SMATT_L = [];
+  // Din kupong: när den ligger framför honom spanar han på den ibland (gruppen spana, med en lottad min),
+  // och när han har sagt vad han tycker om den tittar han på den med en min som passar (H.spana,
+  // omKupongen). Utan en kupong att titta på, eller ord om den, tittar han inte ned på en.
+  const SPANA_OFTA = 0.4;
+  function spana() {
+    const k = H.kupong;
+    // (bara från vilan: minen väntar om han står kvar där han pratade)
+    if (!k || k.skriver || k.fas === 'hand' || k.fas === 'fram' || k.fas === 'ut' || Math.abs(H.T) > 0.01) return false;
+    let namn = H.spana;
+    if (namn) H.spana = null;
+    else if (k.fas === 'disk' && Math.random() < SPANA_OFTA) namn = ettAv('spana');
+    if (namn) gest(namn);
+    return Boolean(namn);
+  }
   function smatt() {
+    if (spana()) return;
     if (!SMATT_L.length) SMATT_L.push('trumma', 'trumma', ...grupp('smatt'));
     const namn = lott(SMATT_L);
     if (namn === 'trumma') H.fig.trumma(TRUMSATT[Math.floor(Math.random() * TRUMSATT.length)], Math.random() < 0.65 ? 'A' : 'B');
@@ -751,7 +766,7 @@ window.RumHasse = (() => {
     // (det som ska undan går 2,5 gånger så fort när något annat väntar, och småsakerna också när han
     // börjar prata)
     // (och inför att han skriver på din kupong, och när han suddar ut det han skrev)
-    const fort = (k.skynda && (H.ko.length || (k.grupp === 'smatt' && H.sagt && !H.sagt.klar))) || (H.ko.length && H.ko[0].brad) || k.bort;
+    const fort = (k.skynda && (H.ko.length || ((k.grupp === 'smatt' || k.grupp === 'spana') && H.sagt && !H.sagt.klar))) || (H.ko.length && H.ko[0].brad) || k.bort;
     H.T = Math.min(k.till, H.T + dt * (fort ? 2.5 : 1));
     // slagen i disken och koppen på fatet: bilden rycker till, och det hörs
     for (const e of H.fig.handelser(T0, H.T)) hands(e);
@@ -1310,9 +1325,11 @@ window.RumHasse = (() => {
     const bada = du.filter((c) => han.includes(c));
     const sort = (a) => [...a].sort((x, y) => KORT.indexOf(x) - KORT.indexOf(y));
     const o = { du: iOrd(sort(du)) };
-    if (!bada.length) return fyll(lott(k.skilda), o);
-    if (bada.length === du.length && bada.length === han.length) return lott(k.samma);
-    if (bada.length === du.length) return fyll(lott(k.farre), o);
+    // (och efter orden tittar han på den med en min som passar: spana)
+    if (!bada.length) { H.spana = 'spanaBlund'; return fyll(lott(k.skilda), o); }
+    if (bada.length === du.length && bada.length === han.length) { H.spana = 'spanaNojd'; return lott(k.samma); }
+    if (bada.length === du.length) { H.spana = 'spanaBryn'; return fyll(lott(k.farre), o); }
+    H.spana = 'spanaSkaka';
     if (bada.length === han.length) return fyll(lott(k.fler), o);
     // två tecken var och ett gemensamt: "Ettan kan du behålla"
     return fyll(lott(k.korsar), { ...o, Bada: REP().tecken[bada[0]].bestamd.replace(/^./, (c) => c.toUpperCase()) });
@@ -1325,6 +1342,7 @@ window.RumHasse = (() => {
     if (forst) {
       H.klipp = null;
       H.ko = [];
+      H.spana = null;
       H.tal = 0;
       H.talMal = 0;
       H.mun = 0;
