@@ -49,8 +49,9 @@ const RAM = { x: 987, y: 302, w: 126, h: 152, b: 12 };
 // som fönstret (i bakväggens bild)
 const MAL = { x0: 262, x1: 958, y0: 92, y1: 121 };
 // bladet med radions stationer på fönsterkarmen till höger om radion, mellan radion (som står framför
-// karmen, på fönsterbänken) och veckans löpsedel, ovanför fönsterbänkens bakkant (radiolapp)
-const LAPP = { x: 951, y: 508, w: 33, h: 44 };
+// karmen, på fönsterbänken) och veckans löpsedel, ovanför fönsterbänkens bakkant (radiolapp): ett blad ur
+// ett litet block, lagom för tio stationer och fritt från antennen
+const LAPP = { x: 957, y: 518, w: 27, h: 34 };
 // Sakerna och dukarna (plan: 0 = väggen). Urets
 // och ramens dukar ligger i knappen och länken (i, med hörnet at).
 const BITAR = {
@@ -1283,8 +1284,8 @@ export async function inredning(el, opt = {}) {
   // Ett blad som har rivits ur ett spiralblock och tejpats på fönsterkarmen bredvid radion med två bitar
   // gulnad tejp: halva spiralhål överst, blå linjer och röd marginal, vikt en gång på mitten, och nedtill
   // släpper det från karmen, mest i hörnet. Radions stationer står där för hand (KANALER och rad i
-  // rum-radio.js), FM i blått och AM i rött i var sin spalt, och den station som hörs ringas in med samma
-  // penna (nu). Papperet har samma struktur som allt papper på sajten (rum/papper.webp), fibrer och en
+  // rum-radio.js) i en spalt: FM i blått och under det AM i rött, varje band med sin rubrik och frekvenserna
+  // under varandra, och den station som hörs ringas in med samma penna (nu). Papperet har samma struktur som allt papper på sajten (rum/papper.webp), fibrer och en
   // kaffering, och ritas en gång. rader() ger raderna som andelar av duken, så att rum-radio.js kan lägga
   // knappar över dem nära radion.
   function radiolapp(b) {
@@ -1297,11 +1298,21 @@ export async function inredning(el, opt = {}) {
     const s = 1000 / (1000 - Z);
     const W = EW / s;
     const H = EH / s;
-    const TOPP = 5.4;
-    const RAD = (EH - TOPP - 1) / 28;
-    const KOL = { fm: 2.9, am: 17.3 };
-    const KB = 14;
-    const FB = 3.2;
+    // Uppställningen, en rad per linje: bandets rubrik och dess stationer, och en tom rad mellan banden.
+    // Raderna står på linjerna (j: linjen, räknat från TOPP), och linjerna står så tätt som stationerna kräver.
+    const PLAN = [];
+    for (const band of ['fm', 'am']) {
+      const st = RR.KANALER.filter((k) => k.band === band);
+      if (!st.length) continue;
+      const j0 = PLAN.length ? PLAN[PLAN.length - 1].j + 2 : 0;
+      PLAN.push({ band, j: j0 });
+      st.forEach((k, i) => PLAN.push({ band, k, j: j0 + 1 + i }));
+    }
+    const TOPP = 4.4;
+    const RAD = Math.min(2.4, (EH - TOPP - 1.6) / Math.max(1, PLAN[PLAN.length - 1].j));
+    // marginalen, frekvensernas högerkant (FX, efter den bredaste) och namnen efter dem
+    const MARG = 2.2;
+    const KOL = MARG + 0.5;
     const BLAK = { fm: '#1b2c84', am: '#a11d1d' };
     const TW = LATT ? 720 : 1080;
     const TH = Math.round((TW * EH) / EW);
@@ -1374,7 +1385,7 @@ export async function inredning(el, opt = {}) {
       // linjerna och marginalen
       c.strokeStyle = 'rgba(84,130,200,0.42)';
       c.lineWidth = Math.max(1, 0.07 * u);
-      for (let j = -2; j <= 28; j++) {
+      for (let j = 0; TOPP + j * RAD < EH - 0.4; j++) {
         const y = (TOPP + j * RAD - 0.12) * u;
         c.beginPath();
         c.moveTo(0, y);
@@ -1384,8 +1395,8 @@ export async function inredning(el, opt = {}) {
       c.strokeStyle = 'rgba(214,90,90,0.55)';
       c.lineWidth = Math.max(1, 0.08 * u);
       c.beginPath();
-      c.moveTo(2.2 * u, 1.5 * u);
-      c.lineTo(2.2 * u, h);
+      c.moveTo(MARG * u, 1.5 * u);
+      c.lineTo(MARG * u, h);
       c.stroke();
       // vikningen, och en kaffering som nästan har torkat bort
       const vy = h * 0.52;
@@ -1415,35 +1426,36 @@ export async function inredning(el, opt = {}) {
         c.restore();
         return bb * k;
       };
-      const fs = RAD * 0.9 * u;
-      for (const band of ['fm', 'am']) {
-        const x = KOL[band] * u;
-        const farg = BLAK[band];
-        const B0 = RR.BAND[band];
-        // (rubriken en bit in, i höjd med frekvenserna)
-        const xr = x + 1.2 * u;
-        c.font = `700 ${RAD * 1.7 * u}px Caveat, cursive`;
-        const bb = c.measureText(B0.namn).width;
-        skriv(B0.namn, xr + 0.2 * u, (TOPP - 1.15) * u, RAD * 1.7 * u, farg, 0, band === 'fm' ? 90 : 91);
-        skriv(B0.enhet, xr + bb + 0.8 * u, (TOPP - 1.2) * u, RAD * 0.85 * u, farg, 0, band === 'fm' ? 95 : 96);
-        c.strokeStyle = farg;
-        c.globalAlpha = 0.8;
-        c.lineWidth = 0.14 * u;
-        c.beginPath();
-        c.moveTo(xr, (TOPP - 0.65) * u);
-        c.quadraticCurveTo(xr + bb * 0.6, (TOPP - 0.45) * u, xr + bb + 0.5 * u, (TOPP - 0.7) * u);
-        c.stroke();
-        c.globalAlpha = 1;
-        RR.KANALER.filter((k) => k.band === band).forEach((k, i) => {
-          const y = TOPP + (i + 1) * RAD - 0.3;
-          const [f, namn] = RR.rad(k);
-          c.font = `700 ${fs}px Caveat, cursive`;
-          const fw = Math.min(c.measureText(f).width, FB * u);
-          const j = i * 3 + (band === 'fm' ? 0 : 1);
-          skriv(f, x + FB * u - fw, y * u, fs, farg, FB * u, j);
-          const nb = skriv(namn, x + (FB + 0.55) * u, y * u, fs, farg, (KB - FB - 0.85) * u, j + 1);
-          rader.push({ id: k.id, band, x0: KOL[band], x1: KOL[band] + KB, topp: TOPP + i * RAD, ned: TOPP + (i + 1) * RAD, bas: y, slut: KOL[band] + FB + 0.55 + nb / u });
-        });
+      const fs = RAD * 0.86 * u;
+      c.font = `700 ${fs}px Caveat, cursive`;
+      const FX = KOL + Math.max(...PLAN.filter((x) => x.k).map((x) => c.measureText(RR.rad(x.k)[0]).width)) / u;
+      const NX = FX + 0.7;
+      for (const x of PLAN) {
+        const farg = BLAK[x.band];
+        const linje = TOPP + x.j * RAD;
+        const bas = linje - 0.3;
+        if (!x.k) {
+          // rubriken: bandet stort, enheten liten efter det, och ett streck under
+          const B0 = RR.BAND[x.band];
+          const n = x.band === 'fm' ? 90 : 91;
+          const bb = skriv(B0.namn, KOL * u, bas * u, RAD * 1.45 * u, farg, 0, n);
+          skriv(B0.enhet, (KOL + bb / u + 0.45) * u, (bas - 0.05) * u, RAD * 0.72 * u, farg, 0, n + 5);
+          c.strokeStyle = farg;
+          c.globalAlpha = 0.8;
+          c.lineWidth = 0.13 * u;
+          c.beginPath();
+          c.moveTo(KOL * u, (linje + 0.05) * u);
+          c.quadraticCurveTo((KOL + bb / u * 0.6) * u, (linje + 0.25) * u, (KOL + bb / u + 0.4) * u, linje * u);
+          c.stroke();
+          c.globalAlpha = 1;
+          continue;
+        }
+        const [f, namn] = RR.rad(x.k);
+        c.font = `700 ${fs}px Caveat, cursive`;
+        const fw = c.measureText(f).width;
+        skriv(f, FX * u - fw, bas * u, fs, farg, 0, x.j * 3);
+        const nb = skriv(namn, NX * u, bas * u, fs, farg, (EW - NX - 0.8) * u, x.j * 3 + 1);
+        rader.push({ id: x.k.id, band: x.band, x0: KOL, x1: EW - 0.6, topp: linje - RAD, ned: linje, bas, fran: FX - fw / u, slut: NX + nb / u });
       }
       // kanterna lite mörkare, som ljuset faller
       const v = c.createRadialGradient(w / 2, h * 0.4, Math.min(w, h) * 0.3, w / 2, h * 0.45, Math.max(w, h) * 0.75);
@@ -1456,12 +1468,18 @@ export async function inredning(el, opt = {}) {
     const karta = tex(TW, TH, rita);
     // papperets struktur, när den har laddats
     const bild = new Image();
-    bild.onload = () => {
+    // (och handstilen: utan den mäts raderna i reservtypsnittet)
+    const hand = document.fonts ? document.fonts.load('700 40px Caveat').catch(() => {}) : Promise.resolve();
+    bild.onload = () => hand.then(() => {
       korn = bild;
       rita(karta.image.getContext('2d'), TW, TH);
       karta.needsUpdate = true;
+      // (raderna mättes kanske i reservtypsnittet förra gången: ringen ritas om efter dem)
+      const id = nuId;
+      nuId = '';
+      nu(id);
       b.paint();
-    };
+    });
     bild.src = 'rum/papper.webp';
     // ytan: små ojämnheter som fångar ljuset
     const ytan = tex(128, 128, (c, w, h) => {
@@ -1563,16 +1581,18 @@ export async function inredning(el, opt = {}) {
       const r = rader.find((x) => x.id === id);
       ring.visible = Boolean(r);
       if (!r) return true;
-      const cx = (r.x0 + r.slut) / 2 + 0.1;
+      const cx = (r.fran + r.slut) / 2 + 0.1;
       const cy = r.bas - RAD * 0.29;
-      const a = (r.slut - r.x0) / 2 + 1;
-      const bb = RAD * 0.62;
+      const a = (r.slut - r.fran) / 2 + 1.2;
+      const bb = RAD * 0.64;
       const N = 72;
       const p = [];
       const ix = [];
+      // (lite fylligare än en ellips i ändarna, så att höga bokstäver som l och k ryms)
+      const fyll = (v) => Math.sign(v) * Math.abs(v) ** 0.8;
       const pt = (t) => {
         const th = Math.PI * 0.9 + t * Math.PI * 2.15;
-        return [cx + a * Math.cos(th) * (1 + 0.02 * Math.sin(t * 11)), cy + bb * Math.sin(th) - 0.025 * a * Math.cos(th)];
+        return [cx + a * fyll(Math.cos(th)) * (1 + 0.02 * Math.sin(t * 11)), cy + bb * fyll(Math.sin(th)) - 0.025 * a * Math.cos(th)];
       };
       for (let i = 0; i <= N; i++) {
         const t = i / N;
