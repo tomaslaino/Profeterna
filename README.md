@@ -930,6 +930,12 @@ bara lokalt. Analyserna visas som de ligger i `data/analyser.json`; hur de skriv
 - **Hasse Backe spanar på din kupong (2026-11-08, användarens val):** ibland går blicken ned på kupongen,
   med sex olika miner, och när han har sagt vad han tycker om den passar minen orden. Se
   [Hasse Backe](#hasse-backe), *Vilan*.
+- **Protokollet som ett äkta papper (2026-11-09, användarens önskemål):** "Jag tycker inte att protokoll-pappret ser
+  trovärdigt ut. Gör det snyggare och som att det ser ut som ett äkta papper. Det går gärna likna de vanliga kupongerna".
+  Bladet är nu en blankett som kupongen (se *Sammanställningen efter omgången*): de platta gröna rutorna är en grön
+  märkpenna, tecknen står kvar i var och ens bläck i stället för att blekna till grått när de var fel, och handstilen står
+  aldrig exakt likadant två gånger. Det som stod kvar sedan förut: allas tecken, facit, ringen kring vinnaren och att bladet
+  slutar med raden Poäng.
 - **Hasse dömer gänget i baren, och protokollet står utan omdömen (2026-11-08, användarens val):**
   "protokollet ska ligga här utan att Hasse Backe kommenterar något speciellt - i hans vy ska han däremot göra det", "Jag
   vill inte att han kommenterar sig själv här" och "Det här gör han tills att nästa stryktipsmatcher är uppe". Användaren
@@ -5631,10 +5637,14 @@ och de nya raderna har Tomas röst först när iMacen har läst upp dem (till de
 ### Sammanställningen efter omgången
 
 När alla matcher i omgången är spelade ligger bara Hasse Backes protokoll på pulten, i kupongens ställe, tills
-nästa kupong kommer måndagen efter kl. 16 ([public/rum-block.js](public/rum-block.js), [public/rum-block.css](public/rum-block.css)): ett Yatzy-block med
-resultat och facit för varje match, och en spalt för kupongen (gängets tre ansikten), var och en i gänget och Hasse.
-Allas tecken står kvar, så att man ser vad var och en spelade: det som satt är överstruket med grön penna, och i en
-gardering är tecknet som satt starkast. Under står *Rätt av 13* och poängen. Vinnaren är inringad, både på porträttet
+nästa kupong kommer måndagen efter kl. 16 ([public/rum-block.js](public/rum-block.js), [public/rum-block.css](public/rum-block.css)): en blankett ur
+samma tryckeri som kupongen – samma papper, bandet i terrakotta (*Protokoll*, med kupongens nummer), synkmarkeringarna i
+vänsterkanten, tryckta linjer, varannan rad tonad och tryckeriets rad längs högerkanten. Omgångens namn står för hand på
+en tryckt rad under bandet. Raderna har resultat och facit på skrivmaskin, och spalterna är kupongen (gängets tre
+ansikten), var och en i gänget och Hasse, med porträtten uppklistrade som foton. Allas tecken står kvar i var och ens
+bläck, så att man ser vad var och en spelade, och det som satt är överstruket med grön märkpenna. Handstilen och
+märkpennans drag är lite olika i varje ruta, men samma omgång ser likadan ut varje gång (slumpen utgår från omgången,
+raden och spalten). Under står *Rätt av 13* och poängen. Vinnaren är inringad, både på porträttet
 och runt poängen, och det är de enda ringarna på blocket. Hasse har rättat det och skrivit under, och mer står inte där:
 domarna över gänget säger han i baren (se [Hasse Backe](#hasse-backe), *Domarna efter omgången*). Förut stod en dom per
 person längst ner (ändrat 2026-11-08). I telefonen försvinner namnen under porträtten. Har Hasse ingen kupong i omgången
