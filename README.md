@@ -694,6 +694,14 @@ bara lokalt. Analyserna visas som de ligger i `data/analyser.json`; hur de skriv
   armarna i luften som vajar, och – när matcherna pågår – mot tv:n och pekar på den i takt.
   De sjunger med munnen öppen och ögonen hopknipna. Se [Tobaksaffären](#tobaksaffären),
   *Gänget gör saker tillsammans*.
+- **Zen-stunder vid bordet (2026-11-09, användarens önskemål):** "Ge oss som sitter här tillfällen
+  när vi bara befinner oss i nån form av zen-mode och chillar. Gör det på olika sätt så att det inte
+  blir så många likadana sekvenser." Fem sätt: andas med slutna ögon och tummen mot pekfingret (och
+  någon kikar), dagdrömmer med händerna i nacken (och någon slumrar till och vaknar med ett ryck),
+  blåser rökringar som de andra följer med blicken (och DL petar sönder den sista), vaggar sakta med
+  slutna ögon, och tittar ut i fjärran med en gemensam suck och en klunk var. Samma sätt kommer inte
+  tillbaka förrän tre andra har varit. Se [Tobaksaffären](#tobaksaffären), *Gänget gör saker
+  tillsammans*.
 - **Gänget dansar italodisco när radion spelar (2026-11-08, användarens önskemål):** "Kan du ge dem
   fler dansmoves när man drar igång radion … Det får gärna ha med italiensk discodance att göra." Nio
   danser i tv-programmens anda runt 1980: härmleken, fingret, armrullen, synten, robotten, axlarna,
@@ -2846,8 +2854,8 @@ Bilderna för läget byggs när det ändras (sju till som mest: ansiktena, deras
 skägget) och de förra släpps; skrattar de åt ett skämt är det de vanliga skrattbilderna.
 
 **Gänget gör saker tillsammans** (2026-11-06, `GRUPP` och `roller` i rum-3d.js): var 31:a
-sekund kan det bli något som alla tre gör, med chansen efter humöret – ungefär varannan gång
-som vanligt, fyra av fem när det går bra, en av fem när det är nervöst och sällan när
+sekund kan det bli något som alla tre gör, med chansen efter humöret – ungefär två gånger av tre
+som vanligt, nästan nio av tio när det går bra, tre av tio när det är nervöst och sällan när
 kupongen är död. Vem som börjar, vem som svarar och hur var och en skrattar räknas ur luckan:
 
 - **Skämtet** (alla lägen): en lutar sig in och berättar med handen och blicken på de andra,
@@ -2885,6 +2893,37 @@ kupongen är död. Vem som börjar, vem som svarar och hur var och en skrattar r
 
   Prova med `?rum-akt=dl:allsangTrumma,dt:allsangTrumma,dj:allsangTrumma` (alla tre, som de
   andra påhitten som gänget gör tillsammans).
+- **Zen-stunderna** (som vanligt och glad, och nervös bara andningen och tystnaden; 2026-11-09,
+  `ZEN`, `zenVal` och `AKTER.zen…` i rum-3d.js): de sitter bara och har det lugnt, på ett av fem
+  sätt. Samma sätt kommer inte tillbaka förrän tre andra har varit (`ZEN_K` minns vilket sätt
+  varje lucka fick), och vem som börjar, kikar eller somnar räknas ur luckan som i skämtet:
+  - *Andningen* (`zenAndas`): flaskan och cigaretten ställs ner, händerna läggs med handflatan
+    uppåt på bordet och tummen mot pekfingret, och med rak rygg och slutna ögon tar de tre djupa
+    andetag i takt – bröstet och axlarna upp och huvudet som lyfts. Mitt i öppnar en ögonen,
+    kikar på de andra och blundar igen.
+  - *Dagdrömmen* (`zenDrom`): bakåtlutade med händerna flätade i nacken, blicken som vandrar i
+    taket och benen som dinglar sakta. En slumrar till, huvudet sjunker, och hen vaknar med ett
+    ryck och tittar sig omkring; en annan tittar på hen och skakar på huvudet, och den tredje
+    blundar en stund.
+  - *Rökringarna* (`zenRingar`, `ringar` i rum-3d.js): DT och DJ tar ett djupt bloss var, med
+    glöden som lyser upp, och blåser tre rökringar, en i taget. Ringarna glider fram åt det håll
+    huvudet var vänt (den som sitter bakom bordet vrider huvudet åt sidan och bakåt, så att de inte
+    far över ansiktet), saktar in, stiger, vidgas och bleknar, och de andra följer den senaste med
+    blicken. DL, som inte röker, petar sönder den sista med pekfingret, och sedan tittar hen och
+    den som blåste den på varandra. En ring är en genomskinlig skiva vänd halvvägs mellan det håll
+    den far och betraktaren, så att den syns snett men aldrig från kanten; var munnen var när den
+    blåstes räknas en gång, som röken.
+  - *Vaggningen* (`zenVaggar`): sakta från sida till sida med slutna ögon, som till en låt bara de
+    hör, med huvudet på sned, benen med och den lediga handen som flyter i luften. En börjar, de
+    andra tittar på hen och faller in en i taget, och efteråt tittar de på varandra och nickar.
+  - *Tystnaden* (`zenTyst`): blicken ut i fjärran, var och en åt sitt håll förbi den som tittar,
+    en djup suck tillsammans med axlarna upp och ner, och en klunk var (DT ett bloss och röken ut),
+    en i taget.
+
+  Händerna med fingrar (tummen mot pekfingret, flätade i nacken, pekfingret) är samma hand som i
+  tecknen och dansen (`fing` i påhitten, `aktFingrar`), och det som var i handen står på bordet så
+  länge. I en fast bild (`?rum-t`) har bara DJ ett ansikte med slutna ögon, som annars. Prova med
+  `?rum-akt=dl:zenRingar,dt:zenRingar,dj:zenRingar`.
 
 **Sången efter ett mål** (2026-11-08, `malSang` och `tvingad` i rum-3d.js): när ett mål har gått
 någons väg (`mal` med någon som fick rätt) börjar grabbarna sjunga 3,2 sekunder efter målet, när
@@ -2970,8 +3009,8 @@ brus och ett nytt försök om en stund. Alla spelade i Chrome 2026-11-08 på Mac
 måste sättas igång av ett tryck, och det gör reglagen och orden. Stationerna hämtas först när visaren står på
 dem, och släpps fem sekunder efter att den har lämnat dem. Låtarna är kanalernas; sajten visar inte vad som spelas.
 
-Skämtet, grälet och tv:n kommer bara när alla tre har lämnat in och är vakna och matcherna
-inte pågår, och inte medan någon är borta (nedan). Ingen gör något eget påhitt samtidigt.
+Skämtet, grälet, tv:n och zen-stunderna kommer bara när alla tre har lämnat in och är vakna och
+matcherna inte pågår, och inte medan någon är borta (nedan). Ingen gör något eget påhitt samtidigt.
 
 **Någon går iväg** (2026-11-06, `gaNu`, `stalle` och `VAGAR` i rum-3d.js): ungefär var tredje
 minut kliver någon ner från barstolen och går ut ur bilden till vänster, mot baren där
@@ -3308,7 +3347,7 @@ väljer sättet: `a` som förut, `b` båda armarna eller händerna på huvudet, 
 bordet), `?rum-humor=glad` (`nerv`, `deppig`) humöret, `?rum-rank=dl:1,dj:-1` vem som
 leder och ligger sist i omgången, `?rum-akt=dl:kors,dj:dunk` ett påhitt om och om igen
 (mitt i det med `?rum-t`, `dl:skamt@6` sex sekunder in; namnen står i `AKTER` i rum-3d.js, och
-gängets påhitt `skamt`, `gral`, `titta` och allsångerna ges alla tre), `?rum-radio` radion på
+gängets påhitt `skamt`, `gral`, `titta`, allsångerna och zen-stunderna ges alla tre), `?rum-radio` radion på
 (`=4` sedan fyra sekunder), `?rum-ga=dl` att DL går iväg och
 kommer tillbaka (var fyrtionde sekund; `dl:5` fem sekunder in med `?rum-t`),
 `?rum-pekar=dt:tv,dl:dj` som om de pekade (på en sak eller någon i gänget),
