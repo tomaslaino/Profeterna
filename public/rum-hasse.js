@@ -1710,7 +1710,7 @@ window.RumHasse = (() => {
     const g = e && hurDetGick(lista, tips);
     if (!g) return;
     // har det gått dåligt läser han tidningen (tidningen nedan)
-    upptagen(g.lage === 'inget' ? 'inget' : g.plats === 'worst' ? 'sist' : g.lage === 'daligt' ? 'daligt' : null, g.ok, g.n, lista.map((m) => m.id).join(','));
+    upptagen(g.lage === 'inget' ? 'inget' : g.plats === 'worst' ? 'sist' : g.lage === 'daligt' ? 'daligt' : null);
     const rader = e[g.lage];
     const plats = g.plats === 'best' ? e.forst : g.plats === 'worst' ? e.sist : null;
     const sagt = [];
@@ -1728,18 +1728,20 @@ window.RumHasse = (() => {
   //
   // När det har gått dåligt för honom gömmer han sig bakom tidningen, skyldig men nöjd med sig själv: han
   // läser, tittar upp över den på en ibland och läser vidare (klippen lasa i rum-hasse-3d.js), och har man
-  // just kommit läser han redan. Rubriken handlar om hans omgång (rubrikOm i rum-hasse-tidning.js). Mellan
-  // gångerna gör han annat en stund (LAS_PAUS, ms), och behöver han händerna lägger han ned den direkt.
+  // just kommit läser han redan. Tidningen är dagens DN eller SvD (dagens i rum-hasse-tidning.js), med glasögonen
+  // på. Mellan gångerna gör han annat en stund (LAS_PAUS, ms), och behöver han händerna lägger han ned den direkt.
   // Dåligt: inte ett rätt (inget), sämst i gänget (sist) eller rätten långt under vad chanserna var värda
   // (daligt, som i hurDetGick). Med minskad rörelse läser han inte.
   const LAS_PAUS = [4000, 10000];
-  function upptagen(lage, ok, n, nyckel) {
-    H.upptagen = Boolean(lage) && !calm() && Boolean(H.fig && H.m && H.m.rubrikOm);
+  function upptagen(lage) {
+    H.upptagen = Boolean(lage) && !calm() && Boolean(H.fig && H.m && H.m.dagens);
     if (!H.upptagen) return;
-    const k = `${lage}:${ok}:${n}:${nyckel}`;
-    if (H.lasRubrik !== k) {
-      H.lasRubrik = k;
-      H.fig.tidning(H.m.rubrikOm({ lage, ok, n, nyckel }));
+    // (trycks en gång om dagen, och igen i en ny figur)
+    const d = H.m.dagens();
+    if (H.lasDag !== d.dag || H.lasFig !== H.fig) {
+      H.lasDag = d.dag;
+      H.lasFig = H.fig;
+      H.fig.tidning(d);
     }
     H.lasT = performance.now() + (H.on ? 1500 : 0);
   }
@@ -1832,7 +1834,7 @@ window.RumHasse = (() => {
     if (!folk.length) return false;
     // om sig själv säger han inget, men har det gått dåligt läser han tidningen (tidningen nedan)
     const han = hansOmgang(sum);
-    if (han) upptagen(han.lage, han.ok, han.n, sum.id);
+    if (han) upptagen(han.lage);
     const s = $('.rh-samtal');
     const r = REP();
     const h = hort(sum.id);
