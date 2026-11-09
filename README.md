@@ -133,6 +133,11 @@ ingen falsk precision · sidan kraschar aldrig av en död källa · endast fria 
 - [x] **Svenska folket borta från kupongen (2026-10-21):** procenten under oddsen och fältet
   *Svenska folket* i foten är borttagna – under rutorna står bara modellens odds. *Hämta
   Stryktipset* finns kvar
+- [x] **Talongen live (2026-11-09, gängets önskemål):** kupongen i handen visar minut och
+  ställning när matcherna är igång och uppdateras av sig själv, utan att man lägger tillbaka
+  den. Gängets kupong har allas kommentarer under raderna och, igen men bara där, Svenska
+  folket, oddsen och favoritskapet från Svenska Spel – var och ens egen kupong har dem inte,
+  som sedan 2026-10-21 (se [Kupongen i handen](#kupongen-i-handen))
 - [x] **Stryktipset som veckans kupong (2026-10-20):** när Svenska Spel öppnar veckans
   Stryktips (senast måndag kl. 07) och förra omgången är färdigspelad, sedan 2026-11-08 tidigast
   måndagen efter omgången kl. 16, blir dess tretton matcher
@@ -427,7 +432,7 @@ bara lokalt. Analyserna visas som de ligger i `data/analyser.json`; hur de skriv
 | Spelarbilder | 365Scores öppna webb-API (`/web/standings/?competitions=<id>` för lagen, `/web/squads/?competitors=<id,…>` för trupperna); bilden visas från `imagecache.365scores.com/…/v<imageVersion>/Athletes/<id>` i webbläsaren | ligorna | 24 h | Verifierat 2026-10-20: truppen per lag med id, namn, tröjnummer, födelsedatum, position och `imageVersion`; tränare och domare (`isStaff`) tas inte med. `imageVersion` 1 betyder att bild saknas (alla 13 med version 1 gav 404, alla 46 med högre version en bild). Alla 92 lag hittades på namnet som för betygen (Utd och Wed skrivs ut, så att Sheffieldlagen hålls isär); bild på 539 av 542 spelare i PL, 660 av 671 i CH, 649 av 651 i L1 och 540 av 663 i L2. Kopplas till ESPN-truppen inom laget på hela namnet, födelsedatum med ett gemensamt namn eller tröjnummer, efternamn med förnamnets initial och sist tröjnummer, bara vid entydig träff – 2 329 av 2 818 spelare i ESPN-trupperna fick bild; de övriga saknar bild hos 365Scores eller finns inte i deras trupp (oftast unga spelare och lån). Bilden står i spelarkortet med tröjnumret i hörnet; går den inte att ladda står tröjnumret som förut. ~25–30 kB per liga. Styr inte prognosen. |
 | Lagsköldar | ESPN:s bildtjänst (`a.espncdn.com/combiner/i?img=/i/teamlogos/soccer/500/<id>.png&h=96&w=96`, och `500-dark` för mörk botten) | alla sex | 7 d | Verifierat 2026-10-21: alla 92 ligalag har sköld, 67 av dem också en för mörk botten (Tottenhams tupp vit i stället för marinblå). Lagen tas ur spelprogrammen på ESPN:s lag-id, så att cupmotståndet kommer med; de flesta i National League har sköld, lag längre ner oftast inte (HTTP 404) och får en tom sköld. 96 × 96 px, ~1,5 MB för alla. Sparas i källcachen (`data/cache/skoldar/`) och läggs på sajten av bygget, i stället för att visas direkt från ESPN. Visas i Tabeller (den för mörk botten) och i matchbladets huvud (den vanliga – matchbladet är ljust). Styr inte prognosen. |
 | Matchhändelser och lagstatistik | ESPN matchsammanfattning (`summary?event=<id>`, samma som oddsen), hämtas **i webbläsaren** | alla sex | när matchrutan öppnas för en påbörjad match, varje minut medan den pågår | Verifierat 2026-10-19: `Access-Control-Allow-Origin: *`. Mål med assist, självmål och straff, kort, byten, halvtid, lagstatistik (bollinnehav, skott, hörnor, passningar m.m.) och publik. Passningsandelen räknas ur antalen (ESPN avrundar den till en decimal). ~400 kB per match. Styr inte prognosen. |
-| Stryktipset och Svenska folket | Svenska Spels öppna API (`api.spela.svenskaspel.se/draw/1/stryktipset/draws` och `…/draws/<nr>`), hämtas av tjänsten profeterna-kupong åt webbläsaren | omgångens kupong | när omgången startas eller man trycker på *Hämta Stryktipset* | Verifierat 2026-10-20: ingen nyckel, men inget `Access-Control-Allow-Origin` för andra sajter – därför via tjänsten, som sparar svaret en minut. Omgångens tretton matcher med nummer, lag (korta namn: *QPR*, *Wolves*, *Bristol C*), avspark och `svenskaFolket` i hela procent. Svenska Spel räknar om fördelningen ungefär varje minut och fryser den vid spelstoppet; `/draws/<nr>` ger den också efteråt. Inget matchid som ESPN:s – matchen hittas på lagen (början av namnet efter några smeknamn) och avspark inom 36 timmar: 13 av 13 i vecka 43. Styr inte prognosen. |
+| Stryktipset, Svenska folket, odds och favoritskap | Svenska Spels öppna API (`api.spela.svenskaspel.se/draw/1/stryktipset/draws` och `…/draws/<nr>`), hämtas av tjänsten profeterna-kupong åt webbläsaren | omgångens kupong | när omgången startas eller man trycker på *Hämta Stryktipset* | Verifierat 2026-10-20: ingen nyckel, men inget `Access-Control-Allow-Origin` för andra sajter – därför via tjänsten, som sparar svaret en minut. Omgångens tretton matcher med nummer, lag (korta namn: *QPR*, *Wolves*, *Bristol C*), avspark och `svenskaFolket` i hela procent. Svenska Spel räknar om fördelningen ungefär varje minut och fryser den vid spelstoppet; `/draws/<nr>` ger den också efteråt. Inget matchid som ESPN:s – matchen hittas på lagen (början av namnet efter några smeknamn) och avspark inom 36 timmar: 13 av 13 i vecka 43. `odds` och `favouriteOdds` (verifierat 2026-11-08 på en öppen omgång av Europatipset, samma gränssnitt) finns medan omgången är öppen men är borta när den är färdigspelad (omgång 4978), medan `svenskaFolket` och `startOdds` ligger kvar; tjänsten sparar därför sista läget (se [Inför uppgörelsen](#inför-uppgörelsen)). Styr inte prognosen. |
 | Liveställning | ESPN scoreboard (`site.api.espn.com/…/<liga>/scoreboard?dates=YYYYMMDD`), hämtas **i webbläsaren** | kupongens matcher | 1 min medan en kupongmatch pågår | Verifierat 2026-10-18: svarar med `Access-Control-Allow-Origin: *`, så sidan kan hämta direkt. Samma matchid som spelprogrammet. Status, matchminut och ställning; används bara av kupongen, inte av prognosen eller bygget. |
 | Höjdpunkter (sammandrag) | Viaplays öppna innehålls-API (`content.viaplay.se/pcdash-se/sport/fotboll/<tävling>`) | PL, CH, FA-cupen (sidorna för L1 och EFL-cupen svarar 404 sedan oktober 2026) | 30 min | Verifierat 2026-10-20: ingen nyckel, svarar även från USA (GitHub Actions). Viaplay har rättigheterna i Sverige och lägger ut sammandrag som spelas utloggad efter en kort reklamfilm. Listorna *Höjdpunkter* och *Utvalda klipp* per tävling, 40 klipp per sida; sammandragen känns igen på formatet (*Höjdpunkter från Premier League*, *Sporthöjdpunkter*). Premier Leagues femminutersklipp ligger ute en månad, övriga ett år; klipp som faller ur listorna behålls tills de går ut. Inget matchid – matchen hittas på tävling, båda lagen (alias eller ordens början, t.ex. *Bristol C*) och avspark 30 dagar före till 3 dagar efter att klippet lades ut: alla 212 sammandrag med två lag i titeln från säsongens start hittade exakt en match (170 matcher). League Two har inga. Länken går direkt till Viaplays spelare (`viaplay.se/player/default/sport/<guid>`, startar utan Börja titta) och öppnas i ett eget 16:9-fönster på datorn, i ny flik på telefonen – Viaplay tillåter inte att sidorna visas inuti andra sajter (`X-Frame-Options: DENY`, `frame-ancestors 'none'`), så klippen går inte att bädda in. Styr inte prognosen. |
 | Höjdpunkter (YouTube) | Kanalernas öppna flöden (`youtube.com/feeds/videos.xml?channel_id=<id>`, de 15 senaste klippen) och oEmbed (`youtube.com/oembed`) | alla sex | 30 min | Ingen nyckel. Kanalerna i [config/youtube.js](config/youtube.js): Premier League, Sky Sports Premier League, Sky Sports Football, EFL och FA-cupen, plus de 92 ligaklubbarnas egna kanaler (id ur Wikidata P2397 och länkarna på klubbarnas sajter, 2026-10-20). Bara klipp med *highlights* i titeln; damlag, ungdomslag, träningsmatcher, EFL Trophy och gamla matcher sorteras bort. oEmbed sorterar bort klipp som inte får bäddas in (401) eller är borta (404). Flödet har ingen landsspärr – spärrade klipp märks i spelaren, som tar nästa. Matchen hittas på lag och tid: utlagt 95 minuter till sex dygn efter avspark; i en klubbs kanal ska motståndaren stå i titeln, i en sändares båda lagen; ett resultat i titeln ska vara matchens. Spelas inbäddat från `youtube-nocookie.com`. Styr inte prognosen. |
@@ -936,9 +941,24 @@ bara lokalt. Analyserna visas som de ligger i `data/analyser.json`; hur de skriv
   uppifrån, och i baren står koppen lite längre bak med fatet på notans övre vänstra hörn som i rummet,
   så att Hasse B. syns. Fingertopparna på hans vänstra hand skars av vid dukens underkant; nu ryms de.
   Se [Hasse Backe](#hasse-backe), *Kaffet i rummet*.
+- **Samma papper på notan i rummet och i baren (2026-11-09, användarens önskemål):** "Kvittona ser lite
+  olika ut – pappret bland annat som här är lite mer rosa." I baren tog papperet neonskyltens röda färg,
+  och raderna från Kaffe och nedåt låg 17 px lägre än i rummet, utan pappersstrukturen. Nu ritas den efter
+  notan i rummet, med baslinjerna mätta där, och får bara ljusets styrka, inte dess färg. Se
+  [Hasse Backe](#hasse-backe).
 - **Hasse Backe spanar på din kupong (2026-11-08, användarens val):** ibland går blicken ned på kupongen,
   med sex olika miner, och när han har sagt vad han tycker om den passar minen orden. Se
   [Hasse Backe](#hasse-backe), *Vilan*.
+- **De gamla protokollen på korktavlan (2026-11-09, användarens önskemål):** "Man vill här kunna klicka in sig på de
+  tidigare bettingarna - och hur det gick för alla. Alltså tidigare protokoll." Varje färdigspelad kupong på korktavlan
+  tas nära ned från nålen med ett klick och blir omgångens protokoll, samma blad som på pulten med allas tecken, facit,
+  rätt och poäng. Se *Protokollen på korktavlan* under [Sammanställningen efter omgången](#sammanställningen-efter-omgången).
+- **Protokollet som ett äkta papper (2026-11-09, användarens önskemål):** "Jag tycker inte att protokoll-pappret ser
+  trovärdigt ut. Gör det snyggare och som att det ser ut som ett äkta papper. Det går gärna likna de vanliga kupongerna".
+  Bladet är nu en blankett som kupongen (se *Sammanställningen efter omgången*): de platta gröna rutorna är en grön
+  märkpenna, tecknen står kvar i var och ens bläck i stället för att blekna till grått när de var fel, och handstilen står
+  aldrig exakt likadant två gånger. Det som stod kvar sedan förut: allas tecken, facit, ringen kring vinnaren och att bladet
+  slutar med raden Poäng.
 - **Hasse dömer gänget i baren, och protokollet står utan omdömen (2026-11-08, användarens val):**
   "protokollet ska ligga här utan att Hasse Backe kommenterar något speciellt - i hans vy ska han däremot göra det", "Jag
   vill inte att han kommenterar sig själv här" och "Det här gör han tills att nästa stryktipsmatcher är uppe". Användaren
@@ -946,6 +966,13 @@ bara lokalt. Analyserna visas som de ligger i `data/analyser.json`; hur de skriv
   att man väljer vem han dömer (inte domarna uppradade, eller hans eget exemplar av protokollet på disken). Domarna gäller
   så länge protokollet ligger på pulten. Senare samma dag togs också namnteckningen bort på användarens önskemål, så
   bladet slutar med raden Poäng. Se [Hasse Backe](#hasse-backe), *Domarna efter omgången*.
+- **Gänget utan siffror och lappen under domen (2026-11-09, användarens önskemål):** "Kan du göra om det här snyggare
+  och ta bort länken 'Matcherna' som är meningslös. Utveckla gärna kring de olika personerna sen. Tycker inte att du behöver
+  ha poäng och antal rätt på den här sidan. Det tycker jag att du kan visualisera på nästa i så fall. Visualisera det och
+  annan relevant bettinginformation för den individen!" Listan hos Hasse är nu stora porträtt sida vid sida i gängets
+  ordning (inte bäst först, så att var och en står på samma plats varje omgång och listan inte avslöjar något), och under
+  domen ligger en lapp ur protokollet med kupongen rad för rad och siffrorna. Se [Hasse Backe](#hasse-backe), *Domarna
+  efter omgången*.
 - **Bara protokollet på pulten, och nästa kupong måndag kl. 16 (2026-11-08, användarens önskemål):** "Ta bort
   kupong 3 där nu när allt är klart - ha bara protokollet", och "Den nya kupongen kan dyka upp från och med
   måndagen efter tippningsdagen", "Måndag kl 16". Kupongen låg kvar under protokollet och Stryktipset tog över redan
@@ -1018,6 +1045,14 @@ bara lokalt. Analyserna visas som de ligger i `data/analyser.json`; hur de skriv
   avböjer att kommentera*). Varje slags rubrik har två eller tre varianter som veckan väljer mellan,
   och den näst största nyheten står längst ner, som på en riktig löpsedel. Se
   [Tobaksaffären](#tobaksaffären), *Affischerna*.
+- **Löpsedeln på riktigt tidningspapper (2026-11-08, användarens önskemål):** löpsedeln såg för
+  blank och osannolik ut: kritvitt papper med ett jämnt prickraster över allt (som tyg eller en skärm),
+  ett blänk snett uppifrån, raka kanter och helt jämn svärta. Nu är den matt tidningspapper med fibrer
+  och buktor, svärtan och det röda täcker inte överallt, den har legat vikt på mitten och är klippt med
+  sax; det vita i texten är papperet, och tejpen i fönstret är maskeringstejp med avslitna ändar. På
+  väggen ritades den dessutom framför bardisken och barstolarna när kameran följde musen åt vänster;
+  nu hänger den bakom dem, och den är lite mindre (70 % i stället för 78 %), så att den går fri från
+  diskens kant. Se [Tobaksaffären](#tobaksaffären), *Affischerna*.
 - **Domarens kort i stället för kvittot (2026-11-06, användarens önskemål):** kvittot på pulten
   tillförde inget – vilka som har lämnat in syns redan på högen – och var ett tredje papper
   bredvid notan och kupongen. Där ligger nu domarens gula och röda kort och visselpipan med
@@ -1699,7 +1734,8 @@ ställningen efter 90 minuter (samma utfall som prognosen).
   förlängning väntar rättningen på nästa bygge, som räknar fram ställningen efter 90
   minuter ur målminuterna. Svarar inte ESPN visas det, och kupongen rättas mot
   `matches.json` som vanligt. En match som ESPN anger som uppskjuten, inställd eller
-  avbruten visas så direkt (inte som slutspelad) och räknas inte, redan före nästa bygge.
+  avbruten visas så direkt (inte som slutspelad) och räknas inte, redan före nästa bygge. I
+  tobaksaffären följer också kupongen i handen med, rad för rad (*Kupongen i handen*).
 - **Spoilerskyddet:** en kupong där alla matcher är slut räknas som klar även när skyddet
   döljer resultaten – då visar förstasidan nästa kupong i stället för den gamla.
 
@@ -1999,7 +2035,10 @@ under omgången.
    kvar att klubba, och foten – Spikar, Halvgard, Helgard och Odds – står i raden längst ner.
    Regeln visas där och stoppar inget (se *Regeln*).
 
-   När ingen match längre går att fylla i står matcherna luftigt i samma högar, med tiden, oddsen,
+   På lappen står också Svenska folket, Svenska Spels odds och favoritskapet (`spelLapp`, 2026-11-09).
+   När ingen match längre går att fylla i står matcherna luftigt i samma högar, med flikar för vad
+   som står under rutorna: Modellen, Folket, Odds och Favoritskap (`underFlikar`, samma på gängets
+   kupong när matcherna spelas), med tiden, oddsen,
    motiveringarna, kommentarerna och resultaten direkt på raden.
 5. **Gängets kupong** (så fort man ser de andras tips, också om någon inte har lämnat in):
    man trycker på rutorna (två rutor =
@@ -2106,7 +2145,12 @@ Lokalt: med `KUPONG_LOKALT=1` i `.env` finns
 `GET /stryktipset?nr=<omgång>` ([worker/stryktipset.mjs](worker/stryktipset.mjs)) – Svenska
 Spel svarar inte på anrop direkt från sajten. Svaret sparas en minut i tjänsten. Sidan
 ([public/folket.js](public/folket.js)) knyter matcherna till sajtens på lagen och avsparken –
-tjänsten med samma regler när den startar omgången (`linkDraw`). Lokalt
+tjänsten med samma regler när den startar omgången (`linkDraw`). Svaret har också oddsen och
+favoritskapet för varje match. De finns hos Svenska Spel bara så länge omgången är öppen, så
+tjänsten sparar dem i KV (`stryktipset:sista:<nr>`, `sparaSista`) med ett schema var tionde minut
+(`[triggers]` i [worker/kupong.toml](worker/kupong.toml)): en gång i timmen, och var tionde minut de
+sista två timmarna före spelstopp. `oddsSlag` säger vad svaret innehåller: `nu`, `sista` (det sparade)
+eller `start` (startoddsen, med favoritskapet räknat ur dem, när inget är sparat). Lokalt
 `/api/stryktipset` (med `KUPONG_LOKALT=1`).
 
 **Omgångens namn** (2026-10-20): i stället för *Omgångens kupong* får varje omgång ett eget
@@ -2576,8 +2620,10 @@ Enter och mellanslag klickar på dem. En match på text-tv:n lägger fram matchb
   smal aluminiumram (3D). Varje bokstav sitter lite snett för sig (samma frö varje gång, så
   att inget flyttar sig), och lådan har bara fyra O – sedan blir det nollor.
 - **Korktavlan** (längst ut på högra väggen, hel i bild, i en träram i 3D) → närbild: de
-  färdigspelade kupongerna (`Historik.coupons`) rättade med röd penna, en med kaffering.
-  Tom tills den första är färdigspelad.
+  färdigspelade kupongerna (`Historik.coupons`, de fyra senaste) rättade med röd penna, en med kaffering.
+  Tom tills den första är färdigspelad. Nära lyfter en kupong från tavlan när man pekar på den, och ett
+  klick tar den från nålen och fram som omgångens protokoll (se *Protokollen på korktavlan* under
+  [Sammanställningen efter omgången](#sammanställningen-efter-omgången)).
 - **Kupongen**: kupongen tas i handen (se nedan), och när den inte går att ta i
   handen går kameran fram till den på pulten (också med K).
   Kupongen är samma kupong som papperet under Kupong, i
@@ -2588,7 +2634,16 @@ Enter och mellanslag klickar på dem. En match på text-tv:n lägger fram matchb
   *Kombinationer* (eller *Pris*) och *Odds* och streckkoden med omgångens id (`Samtal.pult.top`
   och `fields`, `Papper.code`). Efter tiden står motiveringen för hand med blyerts, och
   utfallet ringas in (grönt när kupongen hade det, annars rött, streckat medan matchen
-  pågår). På pulten ligger ditt utkast med dina kryss och motiveringar och ditt namn;
+  pågår). Kupongerna är inte likadana (2026-11-09, användarens önskemål): varje kupong är sliten
+  på sitt sätt – vikt på mitten, på tvären, i fyra eller med ett snett veck, en kaffering (ibland
+  två), några stänk, ett tumavtryck av blyerts, ett hörn som vikts in, mer eller mindre gulnad –
+  slumpat ur omgången och vems kupong det är (`slitage` och `kupNyckel` i rum.js). Ditt utkast och
+  din inlämnade är samma papper, så den ser likadan ut på pulten, i handen, i högen och hos Hasse;
+  gängets kupong och den nya som ligger på pulten när du har lämnat in är egna papper. På baksidan
+  i högen syns vecken, hörnet och kaffet igenom, spegelvända. Det tryckta – bandet,
+  synkmarkeringarna och tryckeriets rad – är likadant på alla, och slitaget är bara gradienter,
+  så att rummet inte får mer att rita (förut hade alla samma kaffering och samma veck).
+  På pulten ligger ditt utkast med dina kryss och motiveringar och ditt namn;
   har du lämnat in ligger din i högen bredvid och på pulten en ny – och när du
   ser de andras tips ligger gängets kupong där, med gängets kryss med kulspetspenna,
   allas porträtt i rutorna och allas namn överst (uppgörelsen). Allt man
@@ -3175,7 +3230,11 @@ det röda har bleknat och den har legat vikt på mitten.
 **Löpsedeln** är veckans, från en riktig kvällstidning som de andra (Tomas önskemål):
 **Sportbladet**, Aftonbladets sportdel, på sitt rosa papper, eller **Expressen** på vitt med det
 röda namnet, två veckor i taget (`TIDNINGAR` i rum-affischer.js). Namnen är skrivna som text,
-inte tidningarnas loggor, och rubrikerna är våra. Överst namnet så brett som papperet, under det
+inte tidningarnas loggor, och rubrikerna är våra. Papperet ska se ut som en riktig tidning (Tomas
+önskemål 2026-11-08): matt tidningspapper, gråaktigt eller blekrosa, med fibrer, ojämn ton och buktor
+från fukten, svärta och rött som inte har täckt överallt, ett veck på mitten och kanterna klippta med
+sax i några raka klipp (`klipp` i rum-affischer.js, ny varje vecka). Det vita i texten är papperet,
+och inget filter ligger på texten, som annars blir suddig i närbilden. Överst namnet så brett som papperet, under det
 vinjetten (*SPIKEN*, *KRISEN*, *BARA I SPORTBLADET*) och datumet, rubriken i Anton – varje rad
 så stor som ryms i bredden men ingen mer än 1,55 gånger den minsta, en av dem röd eller vit på
 rött, och rader med Å, Ä eller Ö med luft ovanför – raden under och, under ett streck, veckans
@@ -3189,7 +3248,9 @@ aldrig vad en riktig person har sagt. Varje slags rubrik har två eller tre vari
 veckan väljer bland dem. Den är den enda som byts och är uppsatt för hand: varannan vecka (veckan i
 Stockholm, måndag till söndag) med tejp i skyltfönstrets nedre vänstra hörn, varannan med två
 häftstift på furupanelen till höger om fönstret, under oraklets skylt och till vänster om
-bardisken, där den är mindre (78 %, så att den ryms mellan fönsterkarmen och bardisken). I
+bardisken, där den är mindre (70 %, så att den ryms mellan fönsterbänkens ände och diskens kant)
+och hänger bakom disken och barstolarna, som står framför väggen (löpsedeln ligger före diskens duk
+i bakväggens plan). I
 telefonen på höjden sitter den alltid på väggen, som syns utan att man drar. (Först satt den
 ibland under dörrens handtag och sedan i fönstrets högra hörn: dörren hamnade utanför bilden i
 telefonen, och hörnet är nu skivans. Till och med 2026-11-05 var den från den påhittade
@@ -4170,11 +4231,11 @@ tillbaka – de matcher som inte är omtvistade – så länge någon omtvistad 
 det mörka är det vi ska prata om; en klubbad match står kvar mörk med sin bock, så att den går
 att kryssa färdigt (en halvgardering är två tryck), och när den sista är klubbad står hela
 kupongen fram igen (`.strid` och `.klubbad` i rum.css). Papperet under Kupong märker samma
-matcher på samma sätt (*Inför uppgörelsen*, punkt 4). Efter tiden står där en förklaring i sitt bläck, med de korta lagnamnen
-och utan tiden så att den får plats (raden blir inte högre): den som avviker, annars den vars
-tips gängets tecken just nu lämnar mest utanför, annars den första som har skrivit något
-(`avvik` i `Samtal.pult.gang`, `skal` i rum.js); hela motiveringen när man pekar. Ändras
-gängets tecken i matchen byts förklaringen till den som nu blir utan. Pennan väntar till
+matcher på samma sätt (*Inför uppgörelsen*, punkt 4). På kupongen på pulten står efter tiden en
+förklaring i sitt bläck, med de korta lagnamnen och utan tiden så att den får plats: den som avviker,
+annars den vars tips gängets tecken just nu lämnar mest utanför, annars den första som har skrivit
+något (`avvik` i `Samtal.pult.gang`, `skal` i rum.js). I handen står i stället allas kommentarer under
+raden (*Talongen live* nedan). Pennan väntar till
 höger om rutorna vid den första omtvistade matchen som inte är klubbad. En match klubbas när
 gängets tecken i den ändras, eller med ett klick på raden – numret, tiden eller förklaringen,
 medan lagen lägger matchbladet på kupongen som förut – och pennan drar bocken; då får
@@ -4198,6 +4259,33 @@ den sparade) sparar den direkt med samma tjänst som papperet (`Samtal.pult.spar
 ändå* (en kupong till samma dag), och kan tjänsten inte spara *Spara via Ny kupong*. Utan
 tjänsten öppnas Ny kupong (eller Ändra) med tecknen ifyllda. Matcher som har startat går
 inte att ändra; där står pennan för kommentaren i efterhand.
+
+**Talongen live** (2026-11-09, gängets önskemål: "Jag skulle också vilja att den uppdateras live,
+utan att man behöver lägga tillbaka den, och sedan ta upp den igen"). Användaren valde utseendet bland
+flera alternativ: A2 Märkpennan, B4 En rad med tre flikar och C1 Under raden.
+
+- **Minut och ställning** (alla kuponger i rummet, `liveRad` i rum.js): när matchen är igång står minuten
+  och ställningen på raden i stället för tiden, i telefonen på andra raden. Bakom ställningen ligger en
+  märkpenna: grön när kupongen har tecknet just nu, annars röd. Ringen runt utfallet har samma färg och är
+  streckad medan matchen pågår. I förlängningen är märkpennan grå, eftersom det som rättas är ställningen
+  efter 90 minuter. Med spoilerskyddet står tiden kvar.
+- **Utan att läggas tillbaka** (`levande` i rum.js): kupongen i handen skrevs förut bara när den togs upp.
+  Nu byts minuten, ställningen, ringarna, de andras kommentarer och siffrorna rad för rad så fort sidan
+  har hämtat dem (varje minut, och `Rum.redraw` efter ESPN i `liveTick`). Kupongen skrivs inte om, så att
+  kryssen, pennan och det du skriver står kvar. Vid mål gör ställningen ett litet hopp, utom utan rörelser.
+- **Svenska folket, odds och favoritskap** (gängets kupong i handen, Stryktipset, `Folket` i folket.js): ett
+  tal under varje ruta och flikarna Folket, Odds och Favoritskap där det förut stod Match. Fliken
+  minns på enheten (`profeterna.spelflik`). Fet stil är det vi har kryssat. Svenska folket och oddsen ändras
+  ungefär varje minut fram till spelstopp, sedan står de still. Pekar man på Odds står det om det är sista
+  läget eller startoddsen. Svarar inte Svenska Spel eller tjänsten står kupongen som förut, utan flikar. Var och
+  ens egen kupong har inga sådana siffror.
+- **Allas kommentarer** (`komHtml` i rum.js): var och ens motivering från sin egen kupong och kommentar i
+  efterhand står under matchen, med porträtt och i eget bläck. Raden blir högre bara där någon har skrivit, och
+  din egen kommentar i efterhand står i fältet på raden, där du skriver den. Blir det så mycket att kupongen
+  skulle bli för liten står varje kommentar på en rad, och hela när man pekar (`.tat`).
+- **Kupongen blir högre** (`mattHand`): siffrorna och kommentarerna tar plats, så gängets kupong i handen är så
+  hög som den behöver vara, med samma mitt som på pulten, och görs så stor som får plats. Pennan vilar
+  i foten. På pulten är kupongen som förut, utan siffror och kommentarer under raderna.
 
 **Spela hos Svenska Spel** (2026-11-07, användarens beslut). När gängets kupong är sparad som den
 står och omgången är Stryktipset som går att spela, står *Sparad* släckt och guldordet blir *Spela hos
@@ -4905,7 +4993,10 @@ ritas en gång på en egen duk under figuren (`diskBild`): benet framför honom 
 i skugga under den tjocka skivan. Träet speglar väggen bakom honom svagt: den
 speglade strålen träffar väggen, och där hämtas färgen ur väggens bild, suddigare ju längre strålen
 går; han själv speglas som en mörk form. Notan ligger under fatet,
-samma nota som på pulten (ritad på en duk med samma typsnitt), med den främre änden lite uppböjd.
+samma nota som på pulten, med den främre änden lite uppböjd. Den ritas på en duk efter notan i rummet
+(`#rum-hasse .nota` i rum.css): samma typsnitt, rader, vinklar och pappersstruktur, med baslinjerna mätta
+där. Den får barens ljus, men bara dess styrka, så att papperet har samma färg som på pulten och inte
+blir rosa av neonskylten.
 Figuren skuggar det som är under disken eller skyms av den (`BORD_GLSL` i
 [public/rum-hasse-arm.js](public/rum-hasse-arm.js)): framför diskens bakre kant det som är under
 ovansidan, bakom den det som strålen från kameran bara når genom disken. Kroppen slutar alltså vid
@@ -5276,21 +5367,36 @@ annars tecknen i hans text, med hans resultat.
 Överst i listan står vem som säger vad, utan förklarande text: Hasses porträtt och namn i guld mitt över hans rutor och resultat, och ditt porträtt i din färg med namnet i din handstil (som på kupongen) över din spalt. Får namnen inte plats bredvid varandra, som i telefonen, går ditt namn först och sedan hans, så att porträtten står kvar. En spalt som inte syns på någon rad får inget huvud.
 När alla matcher har börjat säger han hur det gick för honom (`efterat`), tills omgången är spelad.
 
-**Domarna efter omgången** (2026-11-08). Så länge protokollet ligger på pulten, alltså från att omgången är spelad
-tills nästa Stryktips kommer måndagen efter kl. 16 (`Rum.summa`), dömer han gänget i stället för att gå igenom matcherna.
-Han frågar vem han ska börja med, och listan har var och en i gänget med porträttet i sin färg, namnet i sin handstil och
-rätt och poäng som i protokollet, bäst först och med ringen kring den bästas poäng (`gangLista` i
-[public/rum-hasse.js](public/rum-hasse.js)). Den man väljer får sin dom slagen i disken i guld, som domen över en match
-(*Garderat*, *Flyt*, *Felfritt*, *Osynlig*, *Talang*, *Snöpligt*, *Klokt*), och under den några meningar: en inledning
-efter hur det gick i gänget, en eller två saker ur kupongen och ett slut (`doma`). Sakerna är räknade ur protokollet:
-helgarderingarna, hur många spikar som satt och i hur många matcher ingen annan i gänget hade rätt (läget i `gang` i
-[public/rum-block.js](public/rum-block.js), raderna i `domar` i rum-hasse-repliker.js). Raderna väljs efter omgången och
-personen, inte på lott, så att domen är densamma varje gång och på alla enheter. Varje rad är en mening, så att domen står
-i ett stycke och *Läs upp* ändå kan läsa den mening för mening. *Nästa* tar den man inte har hört om än, och *Hela gänget*
-går tillbaka till listan, där ordet i guld står efter namnet på dem man har hört om (på enheten för den omgången,
-`profeterna.hasse.domar`). Om sig själv säger han inget här: han står inte i listan och räknas inte när bäst och sämst
-i gänget avgörs, och efter omgången säger han inte heller hur det gick för honom. *Matcherna* under listan visar hans rader
-och facit som förut, med *Gänget* tillbaka. Med dolda resultat finns inget protokoll, och då är allt som förut.
+**Domarna efter omgången** (2026-11-08, listan och lappen 2026-11-09). Så länge protokollet ligger på pulten, alltså från
+att omgången är spelad tills nästa Stryktips kommer måndagen efter kl. 16 (`Rum.summa`), dömer han gänget i stället för att
+gå igenom matcherna. Han frågar vem han ska börja med, och gänget står sida vid sida i sin ordning, som på kupongen: stora
+porträtt i var och ens färg och namnet i sin handstil, utan siffror (`gangLista` i [public/rum-hasse.js](public/rum-hasse.js)).
+Den man väljer får sin dom slagen i disken i guld, som domen över en match (*Garderat*, *Flyt*, *Felfritt*, *Osynlig*,
+*Talang*, *Snöpligt*, *Klokt*), och under den några meningar: en inledning efter hur det gick i gänget, en eller två saker ur
+kupongen och ett slut (`doma`). Sakerna är räknade ur protokollet: helgarderingarna, hur många spikar som satt och i hur
+många matcher ingen annan i gänget hade rätt (läget i `gang` i [public/rum-block.js](public/rum-block.js), raderna i `domar`
+i rum-hasse-repliker.js). Raderna väljs efter omgången och personen, inte på lott, så att domen är densamma varje gång och
+på alla enheter. Varje rad är en mening, så att domen står i ett stycke och *Läs upp* ändå kan läsa den mening för mening.
+
+Under meningarna ligger *lappen*, en remsa av protokollets blankett om just den kupongen, med samma papper, band och tryck
+(`lapp` i [public/rum-block.js](public/rum-block.js), stilen i [public/rum-block.css](public/rum-block.css)). Överst en spalt
+per match med rutorna 1, X och 2: kryssen i personens bläck, rutan som satt överstruken med den gröna märkpennan som i
+protokollet och facit maskinskrivet under. Rödpennans stjärna vid matchnumret betyder att ingen annan i gänget hade rätt där, och matchen och
+resultatet står i spaltens title. Under rutorna siffrorna med tryckta rubriker: *Rätt* av antalet matcher, *Poäng* (med
+ringen kring vinnarens, som i protokollet), *Plats* i gänget, *Spelkassan* för omgången (10 kr per match till modellens odds,
+garderingar delade som i Olympens spelkassa), *Spikar*, *Halvgarderingar* och *Helgarderingar* som satt av hur många och
+*Ensam rätt*. Sedan *Bästa träffen*, tipset med högst odds som satt, och *Största missen*, tipset med lägst odds som inte
+satt. Sist *Säsongen* när den är hämtad (`data/tippare.json`, samma som Olympen och utan omgångar som spoilerskyddet döljer,
+plus den här omgången om bygget inte har frusit in den än): en stapel per omgång uppåt för plus och nedåt för minus, den här
+överstruken, och poängen och platsen hittills. Den visas från andra omgången. Texten och lappen rullar tillsammans, så att
+man i telefonen rullar ned till lappen.
+
+*Nästa* tar den man inte har hört om än, i gängets ordning, och *Hela gänget* går tillbaka till listan, där ordet han slog i
+disken står som en stämpel i guld under namnet på dem man har hört om (på enheten för den omgången,
+`profeterna.hasse.domar`). Om sig själv säger han inget här: han står inte i listan och räknas inte när bäst och sämst i
+gänget avgörs, och efter omgången säger han inte heller hur det gick för honom. Förut hade listan rätt och poäng, bäst först,
+och länken *Matcherna* till hans rader och facit (borta 2026-11-09). Med dolda resultat finns inget protokoll, och då är allt
+som förut.
 Går hans röst inte att få säger han det och visar analysen i skrift. Allt han säger runt omkring är
 färdiga rader, utan AI, i [public/rum-hasse-repliker.js](public/rum-hasse-repliker.js). Står man kvar säger han något då och då:
 över matchlistan (`ledig`), över listan med gänget (`domar.ledig`) och när man inte svarar på hans fråga (`valVanta`). Raderna
@@ -5651,10 +5757,14 @@ och de nya raderna har Tomas röst först när iMacen har läst upp dem (till de
 ### Sammanställningen efter omgången
 
 När alla matcher i omgången är spelade ligger bara Hasse Backes protokoll på pulten, i kupongens ställe, tills
-nästa kupong kommer måndagen efter kl. 16 ([public/rum-block.js](public/rum-block.js), [public/rum-block.css](public/rum-block.css)): ett Yatzy-block med
-resultat och facit för varje match, och en spalt för kupongen (gängets tre ansikten), var och en i gänget och Hasse.
-Allas tecken står kvar, så att man ser vad var och en spelade: det som satt är överstruket med grön penna, och i en
-gardering är tecknet som satt starkast. Under står *Rätt av 13* och poängen. Vinnaren är inringad, både på porträttet
+nästa kupong kommer måndagen efter kl. 16 ([public/rum-block.js](public/rum-block.js), [public/rum-block.css](public/rum-block.css)): en blankett ur
+samma tryckeri som kupongen – samma papper, bandet i terrakotta (*Protokoll*, med kupongens nummer), synkmarkeringarna i
+vänsterkanten, tryckta linjer, varannan rad tonad och tryckeriets rad längs högerkanten. Omgångens namn står för hand på
+en tryckt rad under bandet. Raderna har resultat och facit på skrivmaskin, och spalterna är kupongen (gängets tre
+ansikten), var och en i gänget och Hasse, med porträtten uppklistrade som foton. Allas tecken står kvar i var och ens
+bläck, så att man ser vad var och en spelade, och det som satt är överstruket med grön märkpenna. Handstilen och
+märkpennans drag är lite olika i varje ruta, men samma omgång ser likadan ut varje gång (slumpen utgår från omgången,
+raden och spalten). Under står *Rätt av 13* och poängen. Vinnaren är inringad, både på porträttet
 och runt poängen, och det är de enda ringarna på blocket. Hasse har rättat det och skrivit under, och mer står inte där:
 domarna över gänget säger han i baren (se [Hasse Backe](#hasse-backe), *Domarna efter omgången*). Förut stod en dom per
 person längst ner (ändrat 2026-11-08). I telefonen försvinner namnen under porträtten. Har Hasse ingen kupong i omgången
@@ -5672,6 +5782,19 @@ lägger ett klick på någon i gänget ner hens skylt på bordet, och ett klick 
 byter inte vem man är. Läget gäller på enheten för den omgången. Den som somnar eller går iväg lägger ner sin och tar
 upp den igen när hen är tillbaka. Modellens siffra står på
 videons blå ruta på håll.
+
+**Protokollen på korktavlan** (2026-11-09, användarens önskemål). De färdigspelade kupongerna på korktavlan har var
+sitt protokoll: nära tavlan lyfter en kupong när man pekar på den (och lägger sig överst om den ligger under en annan),
+och ett klick tar den från nålen – nålen sitter kvar – och lägger fram omgångens protokoll som bladet från pulten.
+*Häng tillbaka*, Esc eller ett klick utanför sätter tillbaka den, och kameran står kvar vid tavlan (`korkProtokoll` och
+`nalBilder` i rum.js). Är det omgången vars protokoll ligger på pulten är det samma blad; annars räknas det ur den
+frysta omgången i `data/tippare.json` (`RumBlock.fryst`): resultatet efter 90 minuter, modellens chans före avspark och
+allas tecken står där, så att bladet går att räkna också när matcherna inte längre finns i spelprogrammet, och poängen
+blir desamma som i Olympen. Omgången är den med flest av kupongens matcher, minst hälften (som `roundOf` i
+src/history.js); en kupong utan omgång eller med dolda resultat har inget protokoll och går inte att ta ned. Matcherna
+står i kupongens ordning när den har dem alla (Stryktipsets), annars efter avsparken. Hasses spalt står bara när
+analyserna fortfarande har något han sa om omgångens matcher – `data/analyser.json` har bara den senaste omgången, så
+de äldre protokollen har ingen.
 
 **Hur skylten hålls** (2026-11-08, användarens önskemål: "lite olika hålla upp skylt-rörelser så att det inte blir så
 enformigt"). Skylten är en bit lite välvd kartong med brun baksida, och den hålls mellan tummen framför och fingrarna

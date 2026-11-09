@@ -137,6 +137,8 @@ export async function inredning(el, opt = {}) {
     const canvas = document.createElement('canvas');
     // neonen glappar som förut (rum-neon, .av i rum.css)
     canvas.className = `rum-inr${namn === 'neon' ? ' rum-neon' : ''}${BITAR[namn].cls ? ` ${BITAR[namn].cls}` : ''}`;
+    // (vilken sak: löpsedeln läggs under disken, rum-affischer.js)
+    canvas.dataset.bit = namn;
     // (neonens sken ritas i duken, utanför rören: medSken)
     const M = namn === 'neon' ? SKEN_M : 0;
     canvas.width = Math.round((box.w + 2 * M) * DPR);
