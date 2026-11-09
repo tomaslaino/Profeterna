@@ -5633,8 +5633,8 @@ När alla matcher har börjat säger han hur det gick för honom (`efterat`), ti
 att omgången är spelad tills nästa Stryktips kommer måndagen efter kl. 16 (`Rum.summa`), dömer han gänget i stället för att
 gå igenom matcherna. Han frågar vem han ska börja med, och gänget står sida vid sida i sin ordning, som på kupongen: stora
 porträtt i var och ens färg och namnet i sin handstil, utan siffror (`gangLista` i [public/rum-hasse.js](public/rum-hasse.js)).
-Den man väljer får sin dom slagen i disken i guld, som domen över en match (*Garderat*, *Flyt*, *Felfritt*, *Osynlig*,
-*Talang*, *Snöpligt*, *Klokt*), och under den några meningar: en inledning efter hur det gick i gänget, en eller två saker ur
+Den man väljer får sin dom slagen i disken i guld, som domen över en match (*Garderad*, *Turlig*, *Felfri*, *Osynlig*,
+*Generös*, *Snuvad*, *Klok*: ordet beskriver personen), och under den några meningar: en inledning efter hur det gick i gänget, en eller två saker ur
 kupongen och ett slut (`doma`). Sakerna är räknade ur protokollet: helgarderingarna, hur många spikar som satt och i hur
 många matcher ingen annan i gänget hade rätt (läget i `gang` i [public/rum-block.js](public/rum-block.js), raderna i `domar`
 i rum-hasse-repliker.js). Raderna väljs efter omgången och personen, inte på lott, så att domen är densamma varje gång och
