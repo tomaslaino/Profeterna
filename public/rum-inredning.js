@@ -829,9 +829,11 @@ export async function inredning(el, opt = {}) {
       x.rotation.x = 90 * DEG;
       x.position.y = y;
     };
-    for (const [z, vrid] of [[120, 8], [250, -14], [380, 21]]) {
+    // (den innersta är inskjuten ända in under skivan, så att sitsen går fri från
+    // löpsedeln på väggen, LOPPLATS i rum-affischer.js: den börjar vid x 1063 i bakväggens bild)
+    for (const [z, vrid, inne] of [[120, 8, 24], [250, -14, 0], [380, 21, 0]]) {
       const stol = new THREE.Group();
-      stol.position.set(D.kant - 18, SITS - 2 * k, z);
+      stol.position.set(D.kant - 18 + inne, SITS - 2 * k, z);
       stol.rotation.y = vrid * DEG;
       b.scene.add(stol);
       const sits = [[0, 0], [19, 0], [22, 1.2], [23, 4], [22.2, 7], [19, 8.4], [0, 8.6]].map(([a, q]) => new THREE.Vector2(a * k, q * k));
