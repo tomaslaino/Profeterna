@@ -1,7 +1,7 @@
 # Den hemliga tidningen – överlämning (2026-11-09)
 
 Arbetet flyttades från den bärbara datorn till iMacen mitt i bygget av en testtidning.
-Grenen `hemliga-tidningen` har mallen, exempeldata, en färdig anteckning och den här texten.
+Grenen `hemliga-tidningen` har mallen, testnumret, anteckningarna och den här texten.
 Inget är utlagt på main och inget i rummet är ändrat.
 
 ## Vad användaren vill
@@ -41,44 +41,53 @@ Testtidningen är till för att se hur det kan bli.
 
 - `scripts/tidning/tidning.mjs` gör en HTML-sida av en JSON-fil i sajtens papper: tryck i
   terrakotta (Fraunces), skrivmaskin och stämplarna *Bekräftat · Hört i korridoren ·
-  Önsketänkande*. Kör `node scripts/tidning/tidning.mjs scripts/tidning/exempel.json ut.html`.
+  Önsketänkande*. Kör `node scripts/tidning/tidning.mjs scripts/tidning/nr1.json ut.html`.
   Skärmbild: `"/Applications/Google Chrome.app/Contents/MacOS/Google Chrome" --headless=new
-  --hide-scrollbars --allow-file-access-from-files --window-size=1000,1400 --screenshot=ut.png file://$PWD/ut.html`.
-  JSON-formatet: se exempel.json. `s` är `b` (bekräftat), `h` (hört i korridoren) eller
-  `o` (önsketänkande), `t` är texten och `k` är källan.
-- `scripts/tidning/anteckningar/leicester-bradford.md`: färdiga anteckningar. Matchen är
-  dock **uppskjuten** (ESPN: STATUS_POSTPONED), så den blir bara en notis i testnumret.
-- Utskriften är provad: whisper.cpp med `ggml-large-v3-turbo-q5_0` tar ungefär 5 minuter per
-  timme ljud på en M5 när den kör ensam. Tre samtidiga utskrifter gick mycket långsammare.
+  --user-data-dir=<tom mapp> --hide-scrollbars --allow-file-access-from-files --window-size=1000,2340
+  --screenshot=ut.png file://$PWD/ut.html`.
+  JSON-formatet: se `nr1.json`. `s` är `b`, `h` eller `o`, `t` är texten och `k` är källan.
+  `notiser` (rubrik, t, k) ger en inramad notis under matcherna.
+- **Testnumret nr 1 (9 nov):** `nr1.json` med Sheffield Wednesday–Plymouth och Stockport–Reading
+  plus en notis om de sex uppskjutna matcherna. Skärmbilden `nr1.png` ligger bara lokalt.
+- **Anteckningar:** `anteckningar/wednesday-plymouth.md` och `anteckningar/stockport-reading.md`
+  (podd + webb, med källor och ungefärliga minuter), och `leicester-bradford.md` (matchen utgår).
+- **Utskriften på iMacen:** whisper.cpp (`brew install whisper-cpp`) och modellen ligger i
+  `~/Library/Application Support/Matchfixarna/Tidning/` tillsammans med `skriv-ut2.sh` (läser
+  `avsnitt.txt`: namn + ljudadress per rad, hämtar, tar 45 min, skriver ut, tar bort ljudet),
+  `perminut.mjs` (srt → ett stycke per minut, `[mm] text`) och `utskrifter/`. 45 minuter ljud tar
+  4–9 minuter på iMacen (M1). Utskrifterna ligger bara där, aldrig i repot.
 
-## Kvar, i ordning
+## Lärdomar från testnumret
 
-1. Installera utskriften på iMacen: `brew install whisper-cpp`, och modellen (574 MB):
-   `curl -L -o ggml-large-v3-turbo-q5_0.bin https://huggingface.co/ggerganov/whisper.cpp/resolve/main/ggml-large-v3-turbo-q5_0.bin`.
-   Lägg modellen utanför repot.
-2. Hämta om avsnitten nedan (iTunes Search API → `feedUrl` → avsnittet efter titel),
-   konvertera de första 45 minuterna (`ffmpeg -i in.mp3 -t 2700 -ar 16000 -ac 1 ut.wav`)
-   och skriv ut (`whisper-cli -m <modell> -f ut.wav -l en -otxt -of <namn>`). Kör **en i
-   taget**. Utskrifterna får **inte** läggas i repot, eftersom det är publikt och ljudet är
-   andras.
-3. Skriv anteckningar per lag i samma form som leicester-bradford.md: 3–7 punkter per lag
-   med stämpel och källa (podd, avsnitt, datum, ungefärlig minut), högst ett kort citat per
-   lag och inget påhittat. Lägg till motståndarens röst, ITK, U21 och oro i klubben från
-   webben.
-4. Fyll en JSON med Sheffield Wednesday–Plymouth, Stockport–Reading och notisen om
-   Leicester–Bradford. Kör mallen, ta en skärmbild och visa användaren. Har fler matcher
-   hunnit skjutas upp, eller har kupongen lagts, får användaren välja om matcherna ska bytas.
-5. Fortsätt frågorna (listan ovan), en i taget, och skriv sedan prompten för det riktiga bygget.
+- **Motståndarens röst finns som podd:** The Wednesday Week gör "Hello From the Other Side" med en
+  supporter till nästa motståndare inför varje match (Plymouth-avsnittet väntas ca 12–13 nov).
+  Sådana serier bör letas upp för alla lag.
+- **Fyra medhjälpare, en per klubb,** letade webbkällor parallellt (8–13 min, 65–95 hämtningar var).
+  De hittade mest i lokaltidningar (Plymouth Herald, Reading Chronicle), The72, klubbarnas sajter och
+  forumen (Owlstalk, Pasoti). The Star, Yorkshire Post, Manchester Evening News och Hob Nob Anyones
+  forum stoppar hämtning; stockportcounty.com och readingfc.co.uk kräver JavaScript.
+- **Webbsökningens sammanfattningar ljög igen:** de påstod att Challinor gick från Stockport i
+  november, men han gick i juni (McNulty är tränare). Kontrollera alltid datumet på själva sidan.
+- **Poddarna börjar med småprat** (Talking Wednesday: 15 min). 45 minuter räcker ibland inte.
+- **Pengarna som rör sig** kom inte med: spelbolagen är spärrade. Behöver en öppen oddskälla.
 
-## Avsnitt att hämta om
+## Kvar
+
+1. Visa testnumret för användaren och fortsätt frågorna (listan ovan), en i taget.
+2. Skriv sedan prompten för det riktiga bygget.
+
+## Avsnitten i testnumret
+
+Alla utom de två sista är utskrivna (45 min var). Flöden: Talking Wednesday och Tilehurst End på
+podbean, de andra på acast (adresserna via iTunes Search API).
 
 | Lag | Podd | Avsnitt | Längd |
 |---|---|---|---|
 | Sheffield Wednesday | Talking Wednesday | nr 278 (efter tränarbytet) | 63 min |
-| Sheffield Wednesday | The Wednesday Week | Hello From the Other Side 26/27 – Accrington Stanley (a) | 25 min (inte utskrivet) |
-| Plymouth Argyle | Green & White (Argyle Life, i talkSPORT:s fannätverk) | Evans Above The Church: Plymouth Argyle 4-0 Alvechurch | 86 min |
-| Stockport County | SK3 TV | #118: Cray Wanderers, Grammar School Scarves and Good Tinfoil | 69 min (avbrutet, inte utskrivet) |
-| Reading | Tilehurst End-podden | avsnitt 479 (efter 1–1 mot Plymouth, inför Oxford) | 76 min |
+| Sheffield Wednesday | The Wednesday Week | Hello From the Other Side 26/27 – Accrington Stanley (a) | 25 min (handlar om Accrington, inte med i numret) |
+| Plymouth Argyle | Green & White (Argyle Life, i talkSPORT:s fannätverk) | Evans Above The Church: Plymouth Argyle 4-0 Alvechurch | 85 min |
+| Stockport County | SK3 TV | #118: Cray Wanderers, Grammar School Scarves and Good Tinfoil | 69 min |
+| Reading | Tilehurst End-podden | avsnitt 479 "Proboscis" (efter 0–0 mot Plymouth, före 0–2 mot Oxford) | 76 min |
 | Leicester City | The Leicester City Pubcast | We can beat one Oxford then! (8 nov) | 60 min (redan sammanfattat) |
 | Bradford City | Chickens On The Loose | Bradford vs Huddersfield | 57 min (behövs inte om matchen utgår) |
 
@@ -92,6 +101,8 @@ Testtidningen är till för att se hur det kan bli.
   ihop säsonger, så räkna allt därifrån som obekräftat.
 - Medhjälpare som kör whisper i bakgrunden lämnar kvar processer när de stoppas. Kontrollera
   med `pgrep -x whisper-cli`.
+- I en `while read`-slinga läser ffmpeg och whisper-cli upp resten av listan från stdin. Kör
+  `ffmpeg -nostdin` och `whisper-cli … < /dev/null` (så gör `skriv-ut2.sh`).
 - Rör aldrig /etc/hosts och gå aldrig runt spärren (BBC, Reddit, YouTube med flera är spärrade
   på den bärbara datorn).
 - Användaren är inte van vid terminalen. Skriv på enkel svenska utan engelska ord och gör

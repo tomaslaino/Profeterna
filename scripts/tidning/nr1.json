@@ -1,0 +1,78 @@
+{
+  "titel": "Enligt uppgift",
+  "overrad": ["Nyhetsbrev för initierade", "Ej för spridning"],
+  "utgava": ["Nr 1 · inför lördagen 14 november", "Provnummer"],
+  "stampel": "KONFIDENTIELLT",
+  "matcher": [
+    {
+      "tid": "lör 16.00",
+      "hemma": {
+        "namn": "Sheffield Wednesday",
+        "citat": "Vi har ingen riktig nia. Det har vi bara inte.",
+        "citatKalla": "Talking Wednesday nr 278, 2 nov, ca 19 min in",
+        "rader": [
+          { "s": "h", "t": "Anfallaren Mason Burstow är borta fyra till sex veckor med en ljumskskada. Det stod i forumet direkt efter presskonferensen.", "k": "(Owlstalk, 8 nov)" },
+          { "s": "b", "t": "Tre spelare är borta med landslag: Morrison, Liongola och Fusire. Yan Valery togs inte ut av Tunisien och kan spela.", "k": "(Klubben, 3 och 5 nov)" },
+          { "s": "b", "t": "Målvakten Maynard-Brewer byttes ut efter 17 minuter och Liam Palmer efter 71 i cupförlusten mot Oldham.", "k": "(Klubbens matchrapport, 8 nov)" },
+          { "s": "h", "t": "Målvakten Joe Lumley, borta sedan oktober med en revbensskada, ska stå på lördag. Han vilades i cupen.", "k": "(Owlstalk, 9 nov)" },
+          { "s": "h", "t": "Mittbacken Sil Swinkels är avstängd tre matcher enligt podden men bara en enligt forumet. Är det tre missar han lördagen.", "k": "(Talking Wednesday, ca 17 min in; Owlstalk)" },
+          { "s": "b", "t": "Nye tränaren Dave Challinor om cupförlusten: första halvleken var ”som en avskedsmatch” och de billiga insläppta målen ”måste få ett slut”.", "k": "(Klubben, 8 nov)" },
+          { "s": "o", "t": "Seniorerna med Bannan i spetsen ska inte ha velat ha Challinor. Andra säger att de bara var arga på hur förre tränaren fick gå.", "k": "(Owlstalk, 30–31 okt)" }
+        ]
+      },
+      "borta": {
+        "namn": "Plymouth Argyle",
+        "citat": "Vem ska spela till höger om Edwards och Sorinola är borta på lördag?",
+        "citatKalla": "Green & White, 9 nov, ca 29 min in",
+        "rader": [
+          { "s": "b", "t": "Mittbacken Julio Pleguezuelo skadade vaden på träningen och är borta tre till fyra veckor.", "k": "(Plymouth Herald, 9 nov)" },
+          { "s": "b", "t": "Lagkaptenen Joe Edwards, 36, gick av efter en halvtimme i cupen med ömt baklår. Förra gången var han borta en vecka.", "k": "(Plymouth Herald, 8 nov)" },
+          { "s": "h", "t": "Utan en naturlig högerwingback tror podden att Tom Cleverley stannar i 4-4-2 på Hillsborough.", "k": "(Green & White, ca 30 min in)" },
+          { "s": "b", "t": "Det är oklart vem som står i mål. Murphy Cooper missade Reading av personliga skäl, och 22-årige James Storer har hållit nollan två gånger sedan dess.", "k": "(Plymouth Herald, 1 och 7 nov)" },
+          { "s": "h", "t": "Ronan Curtis var inblandad i tre mål på en halvtimme som inhoppare och har enligt podden spelat sig in i laget.", "k": "(Green & White, ca 23 min in)" },
+          { "s": "b", "t": "Klubben förlorade 11,5 miljoner pund förra säsongen. De nya investerarna som utlovades i augusti har inte kommit.", "k": "(Plymouth Herald, 14 aug)" },
+          { "s": "o", "t": "En kazakisk affärsman ska ha suttit i direktörslogen i oktober. Ryktet bygger på att gästen liknade honom på en bild.", "k": "(Pasoti, 11 okt och 6 nov)" }
+        ]
+      }
+    },
+    {
+      "tid": "lör 16.00",
+      "hemma": {
+        "namn": "Stockport County",
+        "citat": "Det kan vara den sämsta halvlek jag har sett oss spela.",
+        "citatKalla": "SK3 TV nr 118, 9 nov, ca 42 min in",
+        "rader": [
+          { "s": "b", "t": "Förstemålvakten Oliver Whatmuff, 19, är uttagen i Englands U20-landslag. Tränaren Jimmy McNulty: ”Jag tänker ringa U20-tränaren och tigga.”", "k": "(The72 och Stockport Express, 9 nov)" },
+          { "s": "b", "t": "Reservmålvakten Luca Ashby-Hammond är avstängd efter rött kort i cupen, och klubbens två andra målvakter är utlånade.", "k": "(KentOnline, 8 nov; The72, 9 nov)" },
+          { "s": "b", "t": "Åtta ordinarie, bland andra Jobe, Norwood och Bate, stannade hemma från cupen på grund av konstgräset och är utvilade till lördag.", "k": "(KentOnline, 8 nov)" },
+          { "s": "h", "t": "Anfallaren Adama Sidibeh har skadat baksida lår igen, och en operation övervägs.", "k": "(County Squad Tracker, 8 nov)" },
+          { "s": "h", "t": "Podden kallar McNulty ”en stämningsman” och undrar vad som händer den dag vänligheten inte räcker.", "k": "(SK3 TV, ca 39 min in)" }
+        ]
+      },
+      "borta": {
+        "namn": "Reading",
+        "citat": "Det är som ryska dockor: ur Rob Couhig kommer Leam Richardson, och ur Richardson kommer Andy Rinomhota.",
+        "citatKalla": "The Tilehurst End nr 479, 4 nov, ca 33 min in",
+        "rader": [
+          { "s": "b", "t": "Mittfältaren Andy Rinomhota är uttagen i Zimbabwes landslag och missar matchen.", "k": "(Reading Chronicle, 27 okt)" },
+          { "s": "h", "t": "Mittbacken Paudie O'Connor har fem gula kort och är avstängd enligt supportrarna. Ingen reporter har skrivit om det än.", "k": "(Hob Nob Anyone, 8 nov; ESPN)" },
+          { "s": "h", "t": "Podden kallar försvaret årets förbättring, 13 insläppta mål mot 19 i fjol, och lyfter just O'Connor.", "k": "(The Tilehurst End, ca 10 min in)" },
+          { "s": "h", "t": "Avsluten är ”usla utom när Marriott spelar”. Han är tillbaka efter skadan och gjorde mål i cupen.", "k": "(The Tilehurst End, ca 22 min in; Reading Chronicle, 7 nov)" },
+          { "s": "b", "t": "Lagkaptenen Lewis Wing petades i cupen, och Charlie Savage blev matchens lirare. Wing har inte gjort mål på 217 dagar.", "k": "(Reading Chronicle, 7 och 9 nov)" },
+          { "s": "h", "t": "Wing ska spela skadad, och tränaren ska ha antytt det.", "k": "(Hob Nob Anyone, 8 nov)" }
+        ]
+      }
+    }
+  ],
+  "notiser": [
+    { "rubrik": "Inställt", "t": "Leicester–Bradford och fem andra matcher i League One spelas inte på lördag. För många spelare är uttagna i landslag.", "k": "(ESPN, 9 nov)" }
+  ],
+  "kallor": [
+    "Talking Wednesday nr 278 – 2 nov, 45 av 63 min utskrivna",
+    "Green & White (Argyle Life) – 9 nov, 45 av 85 min utskrivna",
+    "SK3 TV nr 118 – 9 nov, 45 av 69 min utskrivna",
+    "The Tilehurst End nr 479 – 4 nov, 45 av 76 min utskrivna, inspelad före förlusten mot Oxford",
+    "Forumen Owlstalk, Pasoti och Hob Nob Anyone",
+    "Plymouth Herald, Reading Chronicle, The72, KentOnline, klubbarnas sajter och ESPN"
+  ]
+}

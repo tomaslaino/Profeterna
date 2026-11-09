@@ -44,8 +44,8 @@ const html = `<!doctype html>
   h1 { margin: 10px 0 6px; text-align: center; font: italic 800 74px/1 var(--tryck); letter-spacing: -.01em; color: var(--tryck-f); }
   .dubbel { border-top: 2px solid var(--tryck-f); border-bottom: 1px solid var(--tryck-f); height: 3px; }
   .utgava { display: flex; justify-content: space-between; padding: 7px 0 0; font-size: 13px; }
-  .stampel { position: absolute; top: 104px; right: 50px; transform: rotate(-7deg); padding: 4px 10px 3px; border: 2.5px solid rgba(196,38,30,.62); border-radius: 3px;
-    font: 800 15px/1 var(--tryck); letter-spacing: .2em; color: rgba(196,38,30,.62); mix-blend-mode: multiply; }
+  .stampel { position: absolute; top: 98px; right: 22px; transform: rotate(-8deg); padding: 4px 10px 3px; border: 2.5px solid rgba(196,38,30,.62); border-radius: 3px;
+    font: 800 13px/1 var(--tryck); letter-spacing: .18em; color: rgba(196,38,30,.62); mix-blend-mode: multiply; }
   .match { margin-top: 30px; }
   .match header { display: grid; grid-template-columns: 28px 1fr auto; align-items: baseline; gap: 10px; padding-bottom: 6px; border-bottom: 1px solid var(--tryck-f); }
   .match .nr { font: 700 15px/1 var(--tryck); color: var(--tryck-f); }
@@ -64,6 +64,10 @@ const html = `<!doctype html>
   .st-o { color: #6f6c69; border-style: dotted; }
   blockquote { margin: 0 0 12px; padding: 0 0 0 12px; border-left: 2px solid var(--linje); font: italic 500 17px/1.3 var(--tryck); color: var(--tryck-f); }
   blockquote cite { display: block; margin-top: 3px; font: 400 11px/1.3 var(--skriv); color: var(--mjuk); font-style: normal; }
+  .notis { margin: 30px auto 0; width: 62%; padding: 10px 16px 9px; border: 1px solid var(--tryck-f); outline: 1px solid var(--linje); outline-offset: 3px; text-align: center; }
+  .notis h4 { margin: 0 0 4px; font: 700 13px/1.2 var(--tryck); letter-spacing: .16em; text-transform: uppercase; color: var(--tryck-f); }
+  .notis p { margin: 0; }
+  .notis small { display: block; margin-top: 3px; font-size: 11px; color: var(--mjuk); }
   .kallor { margin-top: 34px; padding-top: 10px; border-top: 1px solid var(--tryck-f); font-size: 11px; line-height: 1.45; color: var(--mjuk); columns: 2; column-gap: 36px; }
   .kallor h4 { margin: 0 0 4px; font: 700 10px/1 var(--tryck); letter-spacing: .2em; text-transform: uppercase; color: var(--tryck-f); column-span: all; }
   .kallor p { margin: 0 0 5px; break-inside: avoid; }
@@ -75,6 +79,8 @@ const html = `<!doctype html>
   <div class="utgava"><span>${esc(d.utgava[0])}</span><span>${esc(d.utgava[1])}</span></div>
   ${d.stampel ? `<div class="stampel">${esc(d.stampel)}</div>` : ''}
   ${d.matcher.map(match).join('')}
+  ${(d.notiser || []).map((n) => `
+  <aside class="notis"><h4>${esc(n.rubrik)}</h4><p>${esc(n.t)}<small>${esc(n.k)}</small></p></aside>`).join('')}
   <div class="kallor"><h4>Källorna</h4>${d.kallor.map((k) => `<p>${esc(k)}</p>`).join('')}</div>
 </div></body></html>`;
 
