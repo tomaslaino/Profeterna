@@ -1954,9 +1954,47 @@ ${window.RumRegister ? RumRegister.nara() : ''}
     return list.slice(0, 4).map((c, i) => {
       const pos = [[6, 6, -5], [46, 12, 4], [10, 52, 3], [52, 56, -3]][i];
       const ticks = (c.rows || []).slice(0, 13).map((r) => `<i class="${r.hit ? 'ok' : 'no'}"></i>`).join('');
-      return `<span class="kup${i === 1 ? ' kaffe' : ''}" style="left:${pos[0]}%; top:${pos[1]}%; transform: rotate(${pos[2]}deg)">${pin(['#d42a1e', '#3d7bd9', '#e6c43a', '#3db37c'][i])}` +
+      // (en kupong vars omgång finns tar fram omgångens protokoll i närbilden: korkProtokoll)
+      const kup = korkOmgang(c) ? ` data-kup="${esc(c.id)}"` : '';
+      return `<span class="kup${i === 1 ? ' kaffe' : ''}"${kup} style="left:${pos[0]}%; top:${pos[1]}%; --rot:${pos[2]}deg">${pin(['#d42a1e', '#3d7bd9', '#e6c43a', '#3db37c'][i])}` +
         `<span class="kt">${esc(c.name || 'Kupong')}</span><span class="tk">${ticks}</span><span class="rr">${c.ok} rätt</span></span>`;
     }).join('');
+  }
+  // Omgången som en kupong på korktavlan gjordes ur (data/tippare.json): den med flest av kupongens matcher,
+  // minst hälften av dem (som roundOf i src/history.js). Dolda resultat ger ingen. → omgången, eller null.
+  function korkOmgang(c) {
+    const ids = new Set((c.rows || []).map((r) => String(r.id || '')).filter(Boolean));
+    let bast = null;
+    let mest = 0;
+    for (const r of (TP.season && TP.season.rounds) || []) {
+      const n = (r.matches || []).filter((m) => ids.has(String(m.id))).length;
+      if (n > mest) {
+        mest = n;
+        bast = r;
+      }
+    }
+    if (!bast || mest * 2 < ids.size) return null;
+    return typeof tpRoundHidden === 'function' && tpRoundHidden(bast) ? null : bast;
+  }
+  // Protokollet för kupongen på korktavlan: samma som på pulten om det är den omgången, annars räknat ur den
+  // frysta omgången (RumBlock.fryst). Hasses spalt kommer ur analyserna, som hämtas först. → om det togs fram.
+  function korkProtokoll(lapp) {
+    const c = (R.old || []).find((x) => x.id === lapp.dataset.kup);
+    const r = c && window.RumBlock && RumBlock.fryst ? korkOmgang(c) : null;
+    if (!r) return false;
+    const ids = (c.rows || []).map((x) => x.id).filter(Boolean);
+    const fram = () => {
+      if (R.sak !== 'kork' || R.protokoll || !lapp.isConnected) return;
+      const sum = R.summa && R.summa.id === r.id ? R.summa : RumBlock.fryst({
+        round: r, kupong: c, namn: c.name, nr: typeof couponNumber === 'function' ? couponNumber(ids) : null,
+        info: (KP.data && KP.data.samtal && KP.data.samtal.gang) || [], kort: short,
+        analyser: analyserData ? analyserData.per : null,
+      });
+      if (sum) protokollet(true, false, { sum, lapp });
+    };
+    if (analyserData || typeof loadAnalyser !== 'function') fram();
+    else loadAnalyser().then(fram, fram);
+    return true;
   }
 
   // Allt som hämtas: omgången, säsongens omgångar och kupongerna.
@@ -3128,7 +3166,9 @@ ${window.RumRegister ? RumRegister.nara() : ''}
   // Protokollet på pulten: det lyfts och läggs fram stort över rummet, som står still så länge, och går
   // tillbaka samma väg. Esc, Lägg tillbaka eller ett klick utanför lägger tillbaka det. I smala fönster
   // är det den smala versionen, och ryms det inte på höjden går det att rulla, i stället för att bli oläsligt.
-  function protokollet(pa = true, nu = false) {
+  // Från korktavlan (fran: { sum, lapp }, korkProtokoll) tas kupongen från nålen och blir omgångens protokoll,
+  // och Häng tillbaka sätter den tillbaka.
+  function protokollet(pa = true, nu = false, fran = null) {
     const p = R.protokoll;
     if (!pa) {
       if (!p || p.ut) return;
@@ -3138,6 +3178,7 @@ ${window.RumRegister ? RumRegister.nara() : ''}
         p.mork.remove();
         p.el.remove();
         R.el.classList.remove('protokoll-uppe');
+        if (p.lapp) p.lapp.classList.remove('nere');
         R.protokoll = null;
         R.vilar = false;
       };
@@ -3157,7 +3198,8 @@ ${window.RumRegister ? RumRegister.nara() : ''}
       p.lyft.finished.then(klar, klar);
       return;
     }
-    if (p || !R.summa) return;
+    const sum = fran ? fran.sum : R.summa;
+    if (p || !sum) return;
     const mork = document.createElement('div');
     mork.className = 'rum-protokoll-mork';
     const el = document.createElement('div');
@@ -3166,19 +3208,21 @@ ${window.RumRegister ? RumRegister.nara() : ''}
     el.setAttribute('role', 'dialog');
     el.setAttribute('aria-modal', 'true');
     el.setAttribute('aria-label', 'Protokoll');
-    el.innerHTML = RumBlock.html(R.summa, { tat: innerWidth < 555 }) + '<button type="button" class="rt-tillbaka">Lägg tillbaka</button>';
+    el.innerHTML = RumBlock.html(sum, { tat: innerWidth < 555 }) + `<button type="button" class="rt-tillbaka">${fran ? 'Häng tillbaka' : 'Lägg tillbaka'}</button>`;
     for (const n of ['pointerdown', 'pointerup', 'pointermove', 'mouseover', 'wheel', 'touchstart', 'touchmove']) el.addEventListener(n, (e) => e.stopPropagation());
     el.addEventListener('click', (e) => {
       e.stopPropagation();
       if (!e.target.closest('.rum-block') || e.target.closest('.rt-tillbaka')) protokollet(false);
     });
     R.el.append(mork, el);
-    const q = R.protokoll = { el, mork, b: el.querySelector('.rum-block') };
+    const q = R.protokoll = { el, mork, b: el.querySelector('.rum-block'), lapp: fran ? fran.lapp : null };
     passaProtokoll();
     R.vilar = true;
     lager('protokollet', (ut) => protokollet(false, ut));
     const bilder = !calm() && lyftBilder(q);
-    R.el.classList.add('protokoll-uppe');
+    // det som tas fram är borta där det låg: bladet på pulten, eller kupongen på nålen
+    if (q.lapp) q.lapp.classList.add('nere');
+    else R.el.classList.add('protokoll-uppe');
     el.focus({ preventScroll: true });
     if (!bilder) return;
     // (medan det är på väg ska fönstret inte kunna rullas av att det ligger långt ner)
@@ -3205,6 +3249,7 @@ ${window.RumRegister ? RumRegister.nara() : ''}
   // Vägen mellan pulten och fönstret: bladet ligger i pultens lutning och lossnar uppåt. → bildrutorna,
   // eller null om blocket inte ligger på pulten (kupongen i handen, omgången har bytts).
   function lyftBilder(p) {
+    if (p.lapp) return nalBilder(p);
     const kalla = R.el.querySelector('#rum-kupong > .rum-block');
     const a = kalla && kalla.getBoundingClientRect();
     if (!a || !a.width) return null;
@@ -3221,6 +3266,25 @@ ${window.RumRegister ? RumRegister.nara() : ''}
       { offset: 0, transform: t(dx, dy, 41, vrid, k), easing: 'cubic-bezier(0.3, 0, 0.5, 1)' },
       { offset: 0.24, transform: t(dx * 0.96, dy - 42, 35, vrid - 1, k * 1.04), easing: 'cubic-bezier(0.25, 0.55, 0.3, 1)' },
       { offset: 1, transform: t(0, 0, 0, 0, 1) },
+    ];
+  }
+  // Vägen mellan korktavlan och fönstret: kupongen lossnar från nålen, svänger lite och kommer fram som
+  // protokollet. → bildrutorna, eller null om kupongen inte syns (tavlan har ritats om).
+  function nalBilder(p) {
+    const a = p.lapp.isConnected && p.lapp.getBoundingClientRect();
+    if (!a || !a.width) return null;
+    const b = p.b.getBoundingClientRect();
+    const k = (a.width * 0.9) / b.width;
+    const vrid = parseFloat(p.lapp.style.getPropertyValue('--rot')) || 0;
+    const dx = a.left + a.width / 2 - b.left - b.width / 2;
+    const dy = a.top + a.height / 2 - b.top - b.height / 2;
+    // (bladets zoom förstorar också längderna i dess transform)
+    const z = Number(p.b.style.zoom) || 1;
+    const t = (x, y, rz, s) => `translate(${r1(x / z)}px, ${r1(y / z)}px) rotate(${r1(rz)}deg) scale(${s.toFixed(3)})`;
+    return [
+      { offset: 0, opacity: 0, transform: t(dx, dy, vrid, k), easing: 'cubic-bezier(0.3, 0, 0.5, 1)' },
+      { offset: 0.22, opacity: 1, transform: t(dx, dy + a.height * 0.15, vrid * -0.6, k * 1.08), easing: 'cubic-bezier(0.25, 0.55, 0.3, 1)' },
+      { offset: 1, opacity: 1, transform: t(0, 0, 0, 1) },
     ];
   }
 
@@ -5329,11 +5393,13 @@ ${window.RumRegister ? RumRegister.nara() : ''}
         }
         return;
       }
-      // nära en sak: ett klick går tillbaka (utom på namnet och foten)
+      // nära en sak: ett klick går tillbaka (utom på namnet och foten) – nära korktavlan tar ett klick
+      // på en kupong fram omgångens protokoll (korkProtokoll)
       if (R.sak) {
         if (e.target.closest('.rum-hdr, .rum-ft, [data-radio]')) return;
         e.preventDefault();
-        sak(null);
+        const lapp = R.sak === 'kork' && e.target.closest('.rum-kork .kup[data-kup]');
+        if (!(lapp && korkProtokoll(lapp))) sak(null);
         return;
       }
       // pingklockan: gängets kupong i handen, annars går kameran fram till den

@@ -935,6 +935,10 @@ bara lokalt. Analyserna visas som de ligger i `data/analyser.json`; hur de skriv
 - **Hasse Backe spanar på din kupong (2026-11-08, användarens val):** ibland går blicken ned på kupongen,
   med sex olika miner, och när han har sagt vad han tycker om den passar minen orden. Se
   [Hasse Backe](#hasse-backe), *Vilan*.
+- **De gamla protokollen på korktavlan (2026-11-09, användarens önskemål):** "Man vill här kunna klicka in sig på de
+  tidigare bettingarna - och hur det gick för alla. Alltså tidigare protokoll." Varje färdigspelad kupong på korktavlan
+  tas nära ned från nålen med ett klick och blir omgångens protokoll, samma blad som på pulten med allas tecken, facit,
+  rätt och poäng. Se *Protokollen på korktavlan* under [Sammanställningen efter omgången](#sammanställningen-efter-omgången).
 - **Protokollet som ett äkta papper (2026-11-09, användarens önskemål):** "Jag tycker inte att protokoll-pappret ser
   trovärdigt ut. Gör det snyggare och som att det ser ut som ett äkta papper. Det går gärna likna de vanliga kupongerna".
   Bladet är nu en blankett som kupongen (se *Sammanställningen efter omgången*): de platta gröna rutorna är en grön
@@ -2595,8 +2599,10 @@ Enter och mellanslag klickar på dem. En match på text-tv:n lägger fram matchb
   smal aluminiumram (3D). Varje bokstav sitter lite snett för sig (samma frö varje gång, så
   att inget flyttar sig), och lådan har bara fyra O – sedan blir det nollor.
 - **Korktavlan** (längst ut på högra väggen, hel i bild, i en träram i 3D) → närbild: de
-  färdigspelade kupongerna (`Historik.coupons`) rättade med röd penna, en med kaffering.
-  Tom tills den första är färdigspelad.
+  färdigspelade kupongerna (`Historik.coupons`, de fyra senaste) rättade med röd penna, en med kaffering.
+  Tom tills den första är färdigspelad. Nära lyfter en kupong från tavlan när man pekar på den, och ett
+  klick tar den från nålen och fram som omgångens protokoll (se *Protokollen på korktavlan* under
+  [Sammanställningen efter omgången](#sammanställningen-efter-omgången)).
 - **Kupongen**: kupongen tas i handen (se nedan), och när den inte går att ta i
   handen går kameran fram till den på pulten (också med K).
   Kupongen är samma kupong som papperet under Kupong, i
@@ -5712,6 +5718,19 @@ lägger ett klick på någon i gänget ner hens skylt på bordet, och ett klick 
 byter inte vem man är. Läget gäller på enheten för den omgången. Den som somnar eller går iväg lägger ner sin och tar
 upp den igen när hen är tillbaka. Modellens siffra står på
 videons blå ruta på håll.
+
+**Protokollen på korktavlan** (2026-11-09, användarens önskemål). De färdigspelade kupongerna på korktavlan har var
+sitt protokoll: nära tavlan lyfter en kupong när man pekar på den (och lägger sig överst om den ligger under en annan),
+och ett klick tar den från nålen – nålen sitter kvar – och lägger fram omgångens protokoll som bladet från pulten.
+*Häng tillbaka*, Esc eller ett klick utanför sätter tillbaka den, och kameran står kvar vid tavlan (`korkProtokoll` och
+`nalBilder` i rum.js). Är det omgången vars protokoll ligger på pulten är det samma blad; annars räknas det ur den
+frysta omgången i `data/tippare.json` (`RumBlock.fryst`): resultatet efter 90 minuter, modellens chans före avspark och
+allas tecken står där, så att bladet går att räkna också när matcherna inte längre finns i spelprogrammet, och poängen
+blir desamma som i Olympen. Omgången är den med flest av kupongens matcher, minst hälften (som `roundOf` i
+src/history.js); en kupong utan omgång eller med dolda resultat har inget protokoll och går inte att ta ned. Matcherna
+står i kupongens ordning när den har dem alla (Stryktipsets), annars efter avsparken. Hasses spalt står bara när
+analyserna fortfarande har något han sa om omgångens matcher – `data/analyser.json` har bara den senaste omgången, så
+de äldre protokollen har ingen.
 
 **Hur skylten hålls** (2026-11-08, användarens önskemål: "lite olika hålla upp skylt-rörelser så att det inte blir så
 enformigt"). Skylten är en bit lite välvd kartong med brun baksida, och den hålls mellan tummen framför och fingrarna
