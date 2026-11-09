@@ -86,6 +86,20 @@ jobs:
             echo "Grenen rost finns inte: Azure-rösten."
           fi
 
+      # Bilderna i tidningen inför omgången (src/analyser/tidning-bilder.mjs): iMacen
+      # lägger dem i grenen tidning-bilder, en enda commit som skrivs över. Bygget
+      # kopierar dem till sajten; utan grenen visar tidningen lagens sköldar.
+      - name: Hämta tidningens bilder
+        run: |
+          rm -rf data/tidning-bilder
+          if git fetch -q --depth=1 origin +refs/heads/tidning-bilder:refs/remotes/origin/tidning-bilder 2>/dev/null; then
+            mkdir -p data/tidning-bilder
+            git archive refs/remotes/origin/tidning-bilder | tar -x -C data/tidning-bilder
+            echo "Grenen tidning-bilder: $(find data/tidning-bilder -name '*.jpg' | wc -l | tr -d ' ') bilder."
+          else
+            echo "Grenen tidning-bilder finns inte: sköldarna."
+          fi
+
       # Hasse Backes röst (src/rost.js): nyckeln till Azures talsyntes på den fria
       # nivån, för det som inte finns med egen röst. Saknas hemligheten blir han tyst
       # där, och bygget går som förut.
