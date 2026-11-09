@@ -1637,8 +1637,10 @@ window.RumHasse = (() => {
     const namn = dittNamn();
     if (forst) {
       if (!kvar) return hela || !r.allaKvar ? lott(r.allaIgen) : enAv(r.allaKvar);
-      if (n) return fyll(lott(namn ? r.tillbakaNamn : r.tillbaka), { namn });
-      return fyll(lott(namn ? r.oppningNamn : r.oppning), { namn });
+      // (ibland säger han ett namn som nästan stämmer)
+      const kallad = namn && Math.random() < 0.25 ? kallar(namn, String(Math.random()), 1) : namn;
+      if (n) return fyll(lott(namn ? r.tillbakaNamn : r.tillbaka), { namn: kallad });
+      return fyll(lott(namn ? r.oppningNamn : r.oppning), { namn: kallad });
     }
     if (!kvar) return enAv(hela || !r.allaKvar ? r.alla : r.allaKvar);
     if (kvar === 1) return enAv(r.enKvar);
@@ -1784,6 +1786,14 @@ window.RumHasse = (() => {
     return lista[h % lista.length];
   }
   const versal = (t) => t.replace(/^./, (c) => c.toUpperCase());
+  // Namnen sitter inte riktigt: var chans:e gång säger han ett som nästan stämmer (felnamn i
+  // rum-hasse-repliker.js), och samma nyckel ger samma namn. Han rättar sig aldrig.
+  function kallar(namn, nyckel, chans = 3) {
+    const ord = String(namn).trim().split(/\s+/);
+    const fel = (REP().felnamn || {})[ord[ord.length - 1]];
+    if (!fel || !fel.length || fast([...Array(chans).keys()], `${nyckel}:fel`) !== 0) return namn;
+    return [...ord.slice(0, -1), fast(fel, `${nyckel}:namn`)].join(' ');
+  }
   // Vilka i gänget du har hört domen över, på enheten för den omgången: deras ord står i guld i listan.
   const HORT = 'profeterna.hasse.domar';
   function hort(id) {
@@ -1840,7 +1850,11 @@ window.RumHasse = (() => {
     }
     const n = folk.filter((p) => h.includes(p.id)).length;
     rad(lott(n === folk.length ? r.domar.alla : n ? r.domar.igen : r.domar.fraga));
-    H.prat = vantar(r.domar.ledig, 4, 20000);
+    // (Revisorn och Semesterfiraren bara när det finns någon de kan vara)
+    const extra = [folk.some((p) => p.lage === 'forsakring') && r.domar.revisorn, folk.some((p) => p.none) && r.domar.borta].filter(Boolean);
+    const prat = extra.length ? (H.domPrat && H.domPrat.id === `${sum.id}:${extra.length}` ? H.domPrat.lista : [...r.domar.ledig, ...extra.flat()]) : r.domar.ledig;
+    if (extra.length) H.domPrat = { id: `${sum.id}:${extra.length}`, lista: prat };
+    H.prat = vantar(prat, 4, 20000);
     klick();
     return true;
   }
@@ -1849,7 +1863,9 @@ window.RumHasse = (() => {
   function domText(p, sum) {
     const d = REP().domar;
     const tal = (n) => REP().tal[n] || String(n);
-    const mening = (lista, del, n = 0) => fyll(fast(lista, `${sum.id}:${p.id}:${del}`), { namn: p.namn, antal: tal(n), Antal: versal(tal(n)) });
+    // (den som vann kan han; de andra kallar han ibland nästan rätt, samma i hela domen)
+    const namn = p.bast ? p.namn : kallar(p.namn, `${sum.id}:${p.id}`);
+    const mening = (lista, del, n = 0) => fyll(fast(lista, `${sum.id}:${p.id}:${del}`), { namn, antal: tal(n), Antal: versal(tal(n)) });
     const hel = () => (p.hel && p.helRatt === p.hel ? mening(p.hel === 1 ? d.hel.en : d.hel.fler, 'hel', p.hel) : null);
     const spik = () => {
       const k = d.spik;
