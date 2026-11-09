@@ -2,8 +2,8 @@
 // underarmarna på pulten, kaffet och notan vid den vänstra handen i hörnet och cigarren i askkoppen vid den
 // högra. Kameran står framför honom, lite högre, och pulten går fram förbi dess högra sida (rum-hasse-scen.js).
 // Kostymfotot (C More Entertainment, CC BY 3.0, Wikimedia Commons) ligger på en formad yta, så att huvudet vrids på riktigt runt nacken och kroppen lutar sig
-// fram. Ögon, bryn och mun rör sig i skuggaren. Armarna, händerna, koppen, askkoppen, cigarren och röken
-// finns i rum-hasse-arm.js.
+// fram. Ögon, bryn och mun rör sig i skuggaren. Armarna, händerna, koppen, askkoppen, cigarren, röken och
+// läsglasögonen finns i rum-hasse-arm.js.
 //
 // Disken är pulten vid hörnet, geometri i hans värld, och ritas en gång på en egen duk under figuren
 // (diskBild): pultens trä som speglar väggen bakom honom svagt (bilden från scripts/hasse/bak.html), lister
@@ -17,13 +17,13 @@
 // Klipp: T 0–12,4 (vila, skrattet, domen, gesterna, hem), och sedan ett klipp i taget på var sin bit av
 // tidslinjen (KLIPP): fler sätt att slå domen i disken, kaffet (sex sätt), cigarren, småsakerna medan han
 // väntar, händerna medan han pratar (talet) och tidningen när det har gått dåligt för honom (lasa, papperet i
-// rum-hasse-tidning.js).
+// rum-hasse-tidning.js), med glasögonen på.
 import * as THREE from 'three';
-import { ATLAS, LJUS, ARM, HAND, KAMERA, BORD_GLSL, CIGARR, ASKKOPP, DAG, LYS, VILOHOJD, VILAN, paDisken, inat, laddaFoto, laddaHand, byggArm, byggKopp, byggCigarr, byggAskkopp, byggRok, byggPenna, byggSkugga, PENNA } from './rum-hasse-arm.js';
+import { ATLAS, LJUS, ARM, HAND, KAMERA, BORD_GLSL, CIGARR, ASKKOPP, DAG, LYS, VILOHOJD, VILAN, paDisken, inat, laddaFoto, laddaHand, byggArm, byggKopp, byggCigarr, byggAskkopp, byggRok, byggPenna, byggSkugga, byggGlasogon, GLAS, PENNA } from './rum-hasse-arm.js';
 import { SCEN, BAK, kamera as scenKamera, iKamera, disken, franBaren, franPulten } from './rum-hasse-scen.js';
 import { PULT_GLSL, SKIVA, ringar, NRING } from './rum-pult.js';
 import { byggTidning, ytan } from './rum-hasse-tidning.js';
-export { rubrikOm } from './rum-hasse-tidning.js';
+export { dagens } from './rum-hasse-tidning.js';
 
 const DEG = Math.PI / 180;
 const clamp = (x, a = 0, b = 1) => Math.min(b, Math.max(a, x));
@@ -43,11 +43,11 @@ function skrivTid(n) { return skrivSlut(n) + SKRIV.HALL + SKRIV.TILLBAKA + SKRIV
 
 // ---------- tidningen ----------
 // När det har gått dåligt för honom i tippningen gömmer han sig bakom tidningen (rum-hasse.js väljer när,
-// rum-hasse-tidning.js är papperet): han tar upp den bakom disken, slår upp den och läser, och emellanåt
-// tittar han upp över den på en, skyldig men nöjd med sig själv, och gömmer sig igen. Klippen byggs av
+// rum-hasse-tidning.js är papperet): han sätter på sig glasögonen, tar upp den bakom disken, slår upp den och läser, och
+// emellanåt tittar han upp över den på en, skyldig men nöjd med sig själv, och gömmer sig igen. Klippen byggs av
 // bitar (LASBIT) som alla börjar och slutar i samma läsande läge (LAS för huvudet, LAS_T för tidningen),
-// utom upp och ned. Då kan han hoppa från gränsen mellan två bitar (slag) direkt till ned när något annat
-// väntar, utan att något rycker.
+// utom pa och upp före och ned och av efter. Då kan han hoppa från gränsen mellan två bitar (slag) direkt till ned
+// (och av) när något annat väntar, utan att något rycker.
 // Huvudet och ansiktet som i de andra klippen (skillnad mot vilan); tidningen: ryggens nedre ände (x, y, z),
 // lutningen mot honom (tilt), vridningen (yaw, roll), halvornas vinkel mot planet (beta), hur mjukt den
 // faller bakåt (buk), vågen (vag), händerna från vilan till kanterna (mot) och greppets höjd (gy).
@@ -60,7 +60,87 @@ const LAS_T = { x: 0, y: LY, z: LZ, tilt: 0.26, yaw: 0, roll: 0, beta: 0.12, buk
 // I knät bakom disken, uppslagen och stående mellan honom och diskens kant, med överkanten under det man
 // ser: där tar han den och dit lägger han den. Han håller den högt upp (gy), annars når han inte.
 const KNA_T = { x: 0, y: -985, z: 140, tilt: 0, yaw: 0, roll: 0, beta: 0.3, buk: 0, vag: 0, mot: 0, gy: 0.82 };
+// Med glasögonen i höger hand håller han tidningen med den vänstra (t0–t1 i biten): den lutar ned åt den högra
+// sidan som ingen håller, glider åt den vänstra handen och sjunker (ned, mer när han ska synas bakom den).
+function enHand(t0, t1, ned = 12) {
+  const k = (v0, v) => [[t0, v0], [t0 + 0.45, v], [t1 - 0.45, v], [t1, v0]];
+  return { roll: k(0, 0.07), x: k(0, 24), y: k(LY, LY - ned), beta: k(LAS_T.beta, 0.2), buk: k(LAS_T.buk, 0.14) };
+}
+// Glasögonen (läget gk i figurens GLASLAGE, och när det ändras: [tid, läge, båge uppåt]): de bitar som inte säger
+// något har dem på näsan. Höger hand håller dem när motA är 1: med tummen och pekfingret om bågens högra hörn (framifrån,
+// eller från sidan bakom tidningen: sido 1), eller med pekfingret på bryggan (finger 1, peka). fall: skalmarna (1
+// utfällda), krok: fingrarna.
 const LASBIT = {
+  // Glasögonen ur bröstfickan med höger hand, upp framför ansiktet där skalmarna fälls ut med en knyck, och på. Han
+  // tittar ned efter dem och på dem, blinkar när de kommer på och rynkar näsan tills de sitter. Tidningen är kvar i knät.
+  pa: {
+    dur: 5.6, fran: null, till: null,
+    k: {
+      pitch: [[0.2, 0], [0.8, 1.1], [1.5, 1.0], [2.2, 0.35], [3.4, 0.3], [4.1, 0.05], [4.8, -0.12], [5.6, 0]],
+      blickY: [[0.2, 0], [0.7, 7], [1.6, 7], [2.2, 4], [3.5, 4], [4.0, 0]], blickX: [[0.2, 0], [0.7, 2.5], [1.6, 2.5], [2.2, -1], [3.5, -1], [4.0, 0]],
+      blund: [[4.1, 0], [4.35, 0.6], [4.6, 0.6], [4.8, 0]], kis: [[4.7, 0], [4.95, 0.35], [5.3, 0]],
+      brynX: [[3.9, 0], [4.4, 0.5], [5.0, 0.45], [5.6, 0]], brynY: [[3.9, 0], [4.4, 0.5], [5.0, 0.45], [5.6, 0]],
+    },
+    t: { tf: KNA_T, tt: KNA_T },
+    g: {
+      fran: { fall: 0 }, gk: [[0, 'ficka'], [0.95, 'ficka'], [1.55, 'ute'], [2.4, 'oppna', 40], [3.5, 'oppna'], [4.2, 'fore'], [4.85, 'pa']],
+      fall: [[2.6, 0], [3.1, 1]], motA: [[0.1, 0], [0.95, 1], [4.9, 1], [5.5, 0]], krok: [[0.7, 0.2], [0.95, 0.62], [4.85, 0.62], [5.15, 0.25]],
+    },
+  },
+  // Av: tar dem i bågens hörn och drar av dem framåt, fäller ihop skalmarna framför bröstet och stoppar dem i fickan.
+  av: {
+    dur: 4.6, fran: null, till: null,
+    k: {
+      blund: [[0.6, 0], [0.85, 0.55], [1.05, 0]], brynX: [[0.5, 0], [0.9, 0.45], [1.8, 0.3], [2.4, 0]], brynY: [[0.5, 0], [0.9, 0.45], [1.8, 0.3], [2.4, 0]],
+      pitch: [[1.8, 0], [2.4, 0.4], [3.0, 1.05], [3.8, 1.0], [4.5, 0]], blickY: [[1.8, 0], [2.3, 4], [3.0, 7], [3.8, 7], [4.3, 0]], blickX: [[2.6, 0], [3.0, 2.5], [3.8, 2.5], [4.3, 0]],
+    },
+    t: { tf: KNA_T, tt: KNA_T },
+    g: {
+      till: { fall: 0 }, gk: [[0, 'pa'], [0.75, 'pa'], [1.35, 'fore'], [2.0, 'oppna'], [2.7, 'oppna'], [3.35, 'ute', 30], [3.85, 'ficka']],
+      fall: [[2.05, 1], [2.6, 0]], motA: [[0.05, 0], [0.7, 1], [3.9, 1], [4.5, 0]], krok: [[0.45, 0.2], [0.7, 0.62], [3.85, 0.62], [4.1, 0.25]],
+    },
+  },
+  // De har glidit ned lite: han skjuter upp dem med pekfingret på bryggan, med hakan upp och en grimas.
+  skjut: {
+    dur: 2.6,
+    k: { pitch: [[0.9, 0.55], [1.15, 0.36], [1.7, 0.55]], kis: [[0.85, 0.06], [1.05, 0.32], [1.45, 0.06]], brynX: [[0.9, -0.12], [1.1, 0.2], [1.7, -0.12]], brynY: [[0.9, -0.08], [1.1, 0.25], [1.7, -0.08]] },
+    t: enHand(0.15, 2.45, 35),
+    g: { gk: [[0, 'pa'], [0.75, 'glid'], [1.0, 'glid'], [1.25, 'pa']], motA: [[0.15, 0], [0.8, 1], [1.4, 1], [2.2, 0]], peka: [[0.3, 0], [0.75, 1], [1.5, 1], [1.9, 0]], finger: [[0, 1], [2.45, 1]] },
+  },
+  // Över glasögonen: drar ned dem på näsan med pekfingret, tittar på en över dem med höjda bryn (jaså?) och skjuter
+  // upp dem igen. Handen är tillbaka på tidningen medan han tittar, och tidningen sjunker lite.
+  over: {
+    dur: 5.6,
+    k: {
+      pitch: [[0.8, 0.55], [1.3, 0.85], [3.7, 0.85], [4.3, 0.55]], blickY: [[1.2, 6], [1.45, -2.5], [3.6, -2.5], [3.85, 6]], blund: [[1.2, 0.38], [1.4, 0.02], [3.6, 0.02], [3.8, 0.38]],
+      blickX: [[1.4, 0], [1.6, 1.2], [3.5, 1.2], [3.7, 0]], brynX: [[1.3, -0.3], [1.6, 0.85], [3.5, 0.8], [4.0, -0.12]], brynY: [[1.3, -0.25], [1.6, 1.0], [3.5, 0.95], [4.0, -0.08]],
+      le: [[1.9, 0], [2.5, 0.35], [3.4, 0.3], [3.9, 0]],
+    },
+    t: enHand(0.2, 5.4, 60),
+    g: {
+      gk: [[0, 'pa'], [0.9, 'pa'], [1.25, 'nasa'], [3.95, 'nasa'], [4.25, 'pa']], finger: [[0, 1], [5.4, 1]],
+      motA: [[0.2, 0], [0.85, 1], [1.3, 1], [1.95, 0], [3.25, 0], [3.9, 1], [4.3, 1], [4.95, 0]], peka: [[0.4, 0], [0.8, 1], [1.4, 1], [1.8, 0], [3.4, 0], [3.8, 1], [4.4, 1], [4.8, 0]],
+    },
+  },
+  // Tar av dem och tittar på en med ett menande leende, pekar på en med dem, för skalmen till läpparna och tänker
+  // efter en stund med blicken uppåt, nickar och sätter på dem igen. Tidningen sänks så att man ser.
+  lyft: {
+    dur: 8.4,
+    k: {
+      pitch: [[0.6, 0.5], [1.4, 0.05], [3.3, 0.05], [3.9, 0.15], [5.4, 0.15], [5.65, 0.32], [5.9, 0.12], [6.2, 0.3], [6.8, 0.5]],
+      blickY: [[0.6, 6], [1.3, 0], [3.3, 0], [3.8, -3], [5.2, -3], [5.7, 2], [6.6, 6]], blickX: [[3.6, 0], [3.9, -3], [5.2, -3], [5.5, 0]],
+      blund: [[0.6, 0.38], [1.2, 0.05], [3.3, 0.05], [3.8, 0.2], [5.3, 0.2], [6.5, 0.38]],
+      brynX: [[0.8, -0.12], [1.5, 0.7], [3.2, 0.6], [3.8, 0.35], [5.3, 0.3], [6.6, -0.12]], brynY: [[0.8, -0.08], [1.5, 0.45], [3.2, 0.4], [3.8, 0.75], [5.3, 0.7], [6.6, -0.08]],
+      le: [[1.4, 0], [2.0, 0.55], [3.2, 0.45], [3.8, 0.1], [5.3, 0.1], [5.8, 0.4], [6.4, 0]],
+      rund: [[3.9, 0], [4.2, 0.35], [5.1, 0.35], [5.3, 0]], munn: [[3.9, 0], [4.2, 0.06], [5.1, 0.06], [5.3, 0]],
+      yaw: [[3.6, -0.1], [4.1, 0.2], [5.2, 0.2], [5.8, -0.1]],
+    },
+    t: enHand(0.15, 8.2, 110),
+    g: {
+      gk: [[0, 'pa'], [0.8, 'pa'], [1.35, 'fore'], [2.0, 'hall'], [2.45, 'visa'], [2.85, 'hall'], [3.3, 'hall'], [3.95, 'tanka'], [5.2, 'tanka'], [5.8, 'hall'], [6.7, 'fore'], [7.2, 'pa']],
+      motA: [[0.1, 0], [0.75, 1], [7.25, 1], [7.85, 0]], krok: [[0.45, 0.2], [0.75, 0.62], [7.2, 0.62], [7.5, 0.25]], sido: [[0, 1], [8.2, 1]],
+    },
+  },
   // ned bakom disken efter den, rakt upp med den ur knät och fram över disken, och ett ryck så att den står rak
   upp: {
     dur: 2.7, fran: null, till: LAS,
@@ -137,15 +217,34 @@ function lasKlipp(bitar) {
   let ner = 0;
   const kanK = new Set(bitar.flatMap((b) => [...Object.keys(LASBIT[b].k), ...Object.keys(LAS)]));
   const kanT = Object.keys(LAS_T);
+  // glasögonen: lägena, och kanalerna med sina värden där inget sägs
+  const G_KAN = { fall: 1, motA: 0, peka: 0, krok: 0.55, finger: 0, sido: 0 };
+  const g = { gk: [] };
   const lagg = (ut, x, v) => {
     const l = (ut.k = ut.k || []);
     if (l.length && Math.abs(l[l.length - 1][0] - x[0]) < 1e-6) l[l.length - 1][1] = v;
     else l.push([x[0], v]);
   };
+  let forra = null;
   for (const namn of bitar) {
     const b = LASBIT[namn];
     if (namn === 'ned') ner = at;
-    else if (at > 0) slag.push(at);
+    // (bara där han läser: inte före upp eller efter ned)
+    else if (at > 0 && forra.till !== null && b.fran !== null) slag.push(at);
+    forra = b;
+    const bg = b.g || {};
+    for (const [tt, l, h] of bg.gk || [[0, 'pa'], [b.dur, 'pa']]) {
+      const x = [at + tt, l, h || 0];
+      const sist = g.gk[g.gk.length - 1];
+      if (sist && Math.abs(sist[0] - x[0]) < 1e-6) g.gk[g.gk.length - 1] = x;
+      else g.gk.push(x);
+    }
+    for (const x of Object.keys(G_KAN)) {
+      const ut = (g[x] = g[x] || { k: [] });
+      lagg(ut, [at], bg.fran && x in bg.fran ? bg.fran[x] : G_KAN[x]);
+      for (const [tt, v] of bg[x] || []) lagg(ut, [at + tt], v);
+      lagg(ut, [at + b.dur], bg.till && x in bg.till ? bg.till[x] : G_KAN[x]);
+    }
     for (const x of kanK) {
       const ut = (k[x] = k[x] || { k: [] });
       const a = b.fran === null ? 0 : (LAS[x] || 0);
@@ -165,15 +264,16 @@ function lasKlipp(bitar) {
     at += b.dur;
   }
   const ut = (o) => Object.fromEntries(Object.entries(o).map(([x, v]) => [x, v.k]));
-  return { dur: at, k: ut(k), t: ut(t), slag, ner };
+  const { gk, ...gn } = g;
+  return { dur: at, k: ut(k), t: ut(t), g: { gk, ...ut(gn) }, slag, ner };
 }
-// Två ordningar, så att det inte blir samma varje gång.
+// Två ordningar, så att det inte blir samma varje gång, och glasögonen på före och av efter.
 export const LASA = {
-  lasa: lasKlipp(['upp', 'las', 'glimt', 'las', 'gom', 'nick', 'las', 'titta', 'las', 'ned']),
-  lasa2: lasKlipp(['upp', 'ryck', 'las', 'nick', 'titta', 'las', 'glimt', 'las', 'gom', 'las', 'ned']),
+  lasa: lasKlipp(['pa', 'upp', 'las', 'glimt', 'las', 'skjut', 'gom', 'nick', 'las', 'over', 'las', 'titta', 'las', 'ned', 'av']),
+  lasa2: lasKlipp(['pa', 'upp', 'ryck', 'las', 'nick', 'lyft', 'las', 'glimt', 'las', 'gom', 'skjut', 'las', 'ned', 'av']),
 };
-// var läsandet börjar (efter upp): dit hoppar sidan när han redan läser när man kommer
-export const LAS_START = LASBIT.upp.dur;
+// var läsandet börjar (med glasögonen på, efter upp): dit hoppar sidan när han redan läser när man kommer
+export const LAS_START = LASBIT.pa.dur + LASBIT.upp.dur;
 
 // ---------- klippen ----------
 // Rörelserna är klipp på en tidslinje (rum-hasse.js spelar dem): fran–till, och där han står efteråt
@@ -291,8 +391,9 @@ export const KLIPP = {
   spanaKis: { fran: 453, till: 457.4, vila: 0, skynda: true, grupp: 'spana' },
   // tidningen (LASA ovan): tar upp den, läser och lägger ned den. slag: där han kan sluta läsa, ner: där
   // han lägger ned den (båda i klippets tid)
-  lasa: { fran: 500, till: 500 + LASA.lasa.dur, vila: 0, skynda: true, grupp: 'lasa', slag: LASA.lasa.slag, ner: LASA.lasa.ner },
-  lasa2: { fran: 545, till: 545 + LASA.lasa2.dur, vila: 0, skynda: true, grupp: 'lasa', slag: LASA.lasa2.slag, ner: LASA.lasa2.ner },
+  // (han läser Dagens Nyheter eller Svenska Dagbladet, rum-hasse-tidning.js)
+  lasa: { fran: 500, till: 500 + LASA.lasa.dur, vila: 0, skynda: true, grupp: 'lasa', tidning: 'dn', slag: LASA.lasa.slag, ner: LASA.lasa.ner },
+  lasa2: { fran: 570, till: 570 + LASA.lasa2.dur, vila: 0, skynda: true, grupp: 'lasa', tidning: 'svd', slag: LASA.lasa2.slag, ner: LASA.lasa2.ner },
 };
 for (const k of Object.values(KLIPP)) {
   if (k.dunk) k.dom = k.fran + k.dunk.reduce((a, b) => (b[1] > a[1] ? b : a))[0];
@@ -470,7 +571,7 @@ export async function figuren(duk, { hog = false, latt = false, pr = 1 } = {}) {
   }
   const U = {
     foto: { value: foto }, uHuvud: { value: new THREE.Matrix3() }, uPiv: { value: W_(650, 650, 40) }, uKropp: { value: new THREE.Matrix4() }, uAx: { value: new THREE.Vector2() }, uAndas: { value: 0 },
-    blund: { value: 0 }, kis: { value: 0 }, munn: { value: 0 }, rund: { value: 0 }, le: { value: 0 }, bryn: { value: new THREE.Vector2() }, blick: { value: new THREE.Vector2() },
+    blund: { value: 0 }, kis: { value: 0 }, munn: { value: 0 }, rund: { value: 0 }, le: { value: 0 }, bryn: { value: new THREE.Vector2() }, blick: { value: new THREE.Vector2() }, uLins: { value: new THREE.Vector2(0, 400) },
     uArm: { value: [new THREE.Vector3(), new THREE.Vector3(), new THREE.Vector3(), new THREE.Vector3(), new THREE.Vector3(), new THREE.Vector3()] },
     uBord: bord, uButik: bord.butik, uDag: DAG, uLys: LYS,
   };
@@ -493,7 +594,7 @@ export async function figuren(duk, { hog = false, latt = false, pr = 1 } = {}) {
       float dB = min(seg3(w.xyz, uArm[3], uArm[4]), seg3(w.xyz, uArm[4], uArm[5]));
       vAo = exp(-pow(max(0., dA - 80.) / 80., 2.)) * .3 + exp(-pow(max(0., dB - 80.) / 80., 2.)) * .3;
       gl_Position = projectionMatrix * viewMatrix * w; }`,
-    fragmentShader: `precision highp float; uniform sampler2D foto; uniform float blund, kis, munn, rund, le; uniform vec2 bryn, blick; varying vec2 vQ; varying vec3 vN, vN0, vW; varying float vAo, vHuv;
+    fragmentShader: `precision highp float; uniform sampler2D foto; uniform float blund, kis, munn, rund, le; uniform vec2 bryn, blick, uLins; varying vec2 vQ; varying vec3 vN, vN0, vW; varying float vAo, vHuv;
     ${LJUS}
     ${BORD_GLSL}
     const vec2 O0 = vec2(${X0}., ${Y0}.), TS = vec2(${ATLAS.W}., ${ATLAS.H}.);
@@ -526,6 +627,16 @@ export async function figuren(duk, { hog = false, latt = false, pr = 1 } = {}) {
       // bara där det finns ett ansikte
       bool ansikte = q.y > 300. && q.y < 700. && abs(q.x - 660.) < 215.;
       if (ansikte) {
+      // läsglasögonen förstorar ögonen lite där glasen är (uLins: hur mycket de sitter på näsan, och glasens mitt i
+      // fotot på höjden)
+      if (uLins.x > 0.) {
+        for (int i = 0; i < 2; i++) {
+          vec2 c = vec2(${(662.75 - GLAS.C).toFixed(2)} + float(i) * ${(2 * GLAS.C).toFixed(2)}, uLins.y);
+          vec2 d = (q - c) / vec2(${GLAS.A}., ${GLAS.B}.);
+          float inne = 1. - smoothstep(.85, 1., pow(pow(abs(d.x), 4.) + pow(abs(d.y), 4.), .25));
+          q = mix(q, c + (q - c) / (1. + .08 * uLins.x), inne);
+        }
+      }
       // leendet: mungiporna ut och upp, kinderna följer med (förut ungefär två tredjedelar så mycket, och
       // då syntes ett leende knappt)
       q += le * vec2(10., 15.) * g(q, vec2(613., 505.), vec2(40.));
@@ -2202,7 +2313,7 @@ export async function figuren(duk, { hog = false, latt = false, pr = 1 } = {}) {
     },
   });
   // tidningen (LASA): huvudet och ansiktet som i de andra klippen, händerna räknas ur tidningen (tidningArm)
-  for (const [namn, l] of Object.entries(LASA)) RORELSER[namn] = { k: l.k, las: l.t };
+  for (const [namn, l] of Object.entries(LASA)) RORELSER[namn] = { k: l.k, las: l.t, glas: l.g };
   for (const [namn, o] of Object.entries(RORELSER)) {
     const m = KLIPP[namn];
     const { fran, till, vila = 0, start = 0 } = m;
@@ -2214,7 +2325,7 @@ export async function figuren(duk, { hog = false, latt = false, pr = 1 } = {}) {
     const d = {};
     for (const x of KANAL) d[x] = abs(o.k && o.k[x], Sa[x] - S0[x], Sb[x] - S0[x], Sa[x] - S0[x]);
     for (const x of ANSIKTE) if (o.k && o.k[x]) d[x] = abs(o.k[x]);
-    const k = { namn, fran, till, d, kaffe: o.kaffe, cig: o.cig, pen: o.pen, dunk: (m.dunk || []).map(([t, s, sort]) => [fran + t, s, sort]) };
+    const k = { namn, fran, till, d, kaffe: o.kaffe, cig: o.cig, pen: o.pen, tidning: m.tidning, dunk: (m.dunk || []).map(([t, s, sort]) => [fran + t, s, sort]) };
     // armarna: mellan klippen i vilan
     const armar = (K, nycklar, vila_, pol) => {
       if (!nycklar) return;
@@ -2254,6 +2365,7 @@ export async function figuren(duk, { hog = false, latt = false, pr = 1 } = {}) {
       };
     }
     if (o.las) k.las = Object.fromEntries(Object.entries(o.las).map(([x, kk]) => [x, tid(kk)]));
+    if (o.glas) k.glas = Object.fromEntries(Object.entries(o.glas).map(([x, kk]) => [x, tid(kk)]));
     KL.push(k);
   }
   KL.sort((a, b) => a.fran - b.fran);
@@ -2967,6 +3079,175 @@ export async function figuren(duk, { hog = false, latt = false, pr = 1 } = {}) {
     return mot;
   }
 
+  // ---------- glasögonen ----------
+  // Läsglasögonen (rum-hasse-arm.js) styr som cigarren: deras läge räknas ur klippets nycklar (glas.gk) mellan de
+  // namngivna lägena i GL, och höger hand räknas ur greppet: tummen och pekfingret om bågens högra hörn (bakom
+  // och framför), eller pekfingertoppen på bryggan (finger). Lägena på näsan och framför ansiktet följer huvudet
+  // (h), de andra kroppen. Utanför läsningen sitter de i bröstfickan, där bara det översta hörnet sticker upp.
+  const glas = byggGlasogon(bord);
+  S.add(glas.grupp);
+  const ETT3 = new THREE.Vector3(1, 1, 1);
+  const lagM = (p, rx, ry = 0, rz = 0) => new THREE.Matrix4().compose(p, new THREE.Quaternion().setFromEuler(new THREE.Euler(rx, ry, rz, 'YXZ')), ETT3);
+  // Punkterna som ska gå fria från ansiktet (glasens kanter, bryggan) och näsdynorna som vilar på näsan, i bågens
+  // mått: [punkt, luft]
+  const PROV = [];
+  for (const s of [-1, 1]) {
+    for (let i = 0; i < 24; i++) {
+      const a = (i / 24) * Math.PI * 2;
+      PROV.push([V3(s * GLAS.C + Math.cos(a) * GLAS.A, Math.sin(a) * GLAS.B, 0), 7]);
+    }
+    PROV.push([V3(s * 11, -6, -7), 0.5]);
+  }
+  // på näsan, med glasens mitt på höjden fy i fotot och lutade tilt: så nära ansiktet som det går (djup)
+  function paNasan(fy, tilt) {
+    const R = new THREE.Matrix4().makeRotationX(tilt);
+    const q = v();
+    let z = -1e9;
+    for (const [p, luft] of PROV) {
+      q.copy(p).applyMatrix4(R);
+      z = Math.max(z, djup(662.75 + q.x, fy - q.y) + luft - q.z);
+    }
+    return lagM(W_(662.75, fy, z), tilt);
+  }
+  // bröstfickan: på hans vänstra sida, öppningen vid (752, 928) i fotot
+  const FICKA = W_(752, 928, djup(752, 928));
+  const GL = {
+    // på näsan, lite lägre (glid) och längst ned, så att han ser över dem (nasa); framför ansiktet på väg på och av
+    pa: { h: true, m: paNasan(403, 0.14) },
+    glid: { h: true, m: paNasan(410, 0.16) },
+    nasa: { h: true, m: paNasan(426, 0.24) },
+    // i fickan: hopfällda och på högkant med det högra hörnet uppåt, och resten nere i fickan bakom kavajen
+    ficka: { m: new THREE.Matrix4().makeBasis(V3(0, -1, -0.1).normalize(), V3(0.99, 0, -0.14).normalize(), V3(0.14, -0.1, 0.98).normalize()).setPosition(FICKA.x - 4, FICKA.y - 32, FICKA.z - 3) },
+    // uppdragna ur fickan
+    ute: { m: new THREE.Matrix4().makeBasis(V3(0.15, -0.95, 0.25).normalize(), V3(0.98, 0.15, 0).normalize(), V3(-0.05, 0.25, 0.97).normalize()).setPosition(FICKA.x - 20, FICKA.y + 90, FICKA.z + 70) },
+    // framför hakan, framsidan bort från honom (skalmarna mot honom): där fälls de ut och ihop
+    oppna: { m: lagM(V3(-20, 390, 520), -0.35, 0.1, 0.05) },
+    // i handen framför bröstet när han har tagit av dem, och en knyck mot en
+    hall: { m: lagM(V3(-180, 390, 500), -0.15, -0.55, 0.12) },
+    visa: { m: lagM(V3(-160, 430, 540), -0.1, -0.3, 0.05) },
+  };
+  GL.fore = { h: true, m: GL.pa.m.clone().premultiply(new THREE.Matrix4().makeTranslation(0, -14, 120)) };
+  // Skalmens ände i munnen (tanka): bågen vänd så att den högra skalmen pekar in mot mungipan.
+  {
+    const R = lagM(V3(), -0.15, -1.3, 0.2);
+    const ande = glas.ande(-1, 1).applyMatrix4(R);
+    const mun = W_(628, 506, djup(628, 506) - 4);
+    GL.tanka = { h: true, m: R.setPosition(mun.sub(ande)) };
+  }
+  // greppet i bågens mått: tummen och pekfingret om det högra hörnet (punkten, riktningen genom bågen och
+  // handflatan in mot ansiktet), och pekfingertoppen på bryggan med fingret uppåt och handflatan mot honom
+  const NYP = { p: V3(-(GLAS.C + GLAS.A - 6), 6, 0), A: V3(0, 0, 1), P: V3(1, 0, 0) };
+  // (bakom tidningen: om gångjärnet från sidan, med fingrarna framåt och handen bakom och under, så att underarmen
+  // går bakom tidningen; sido 1)
+  const SIDO = { p: V3(-(GLAS.C + GLAS.A - 1), 7, -4), F: V3(0.15, 0.8, 0.58).normalize(), P: V3(1, 0, 0) };
+  SIDO.P.addScaledVector(SIDO.F, -SIDO.P.dot(SIDO.F)).normalize();
+  SIDO.A = new THREE.Vector3().crossVectors(SIDO.P, SIDO.F);
+  const FINGER = { p: V3(0, 14, 3), F: V3(0.35, 0.8, -0.48).normalize(), P: V3(0, -0.5, -0.85), L: 250 * HAND.SK, U: 16 * HAND.SK };
+  FINGER.P.addScaledVector(FINGER.F, -FINGER.P.dot(FINGER.F)).normalize();
+  const HM = new THREE.Matrix4();
+  const hm3 = new THREE.Matrix4();
+  const hT = new THREE.Matrix4();
+  // huvudets matris (som i skuggaren: runt PIV, sedan kroppen)
+  function huvudM() {
+    hm3.setFromMatrix3(U.uHuvud.value);
+    HM.copy(mk).multiply(hT.makeTranslation(PIV.x, PIV.y, PIV.z)).multiply(hm3).multiply(hT.makeTranslation(-PIV.x, -PIV.y, -PIV.z));
+    return HM;
+  }
+  const gA = { p: v(), q: new THREE.Quaternion(), s: v() };
+  const gB = { p: v(), q: new THREE.Quaternion(), s: v() };
+  const gW = new THREE.Matrix4();
+  const gM = new THREE.Matrix4();
+  const iVarld = (namn, ut) => gM.multiplyMatrices(GL[namn].h ? HM : mk, GL[namn].m).decompose(ut.p, ut.q, ut.s);
+  const PA_ANSIKTET = new Set(['pa', 'glid', 'nasa']);
+  // glasen över ögonen (förstorar dem i skuggaren): hur mycket, och glasens mitt i fotot (y)
+  const LINS = { styrka: 0, y: 400 };
+  const linsY = (namn) => 900 - GL[namn].m.elements[13];
+  // bågens läge i världen (gW) vid t; → hur mycket den sitter i fickan (0–1)
+  function glasLage(t, G) {
+    huvudM();
+    const gk = G && G.gk;
+    let a = 'ficka';
+    let b = 'ficka';
+    let f = 0;
+    let h = 0;
+    if (gk && t > gk[0][0] && t < gk[gk.length - 1][0]) {
+      let i = 1;
+      while (t > gk[i][0]) i++;
+      f = ss(gk[i - 1][0], gk[i][0], t);
+      a = gk[i - 1][1];
+      b = gk[i][1];
+      h = gk[i][2] || 0;
+    } else if (gk) a = b = t <= gk[0][0] ? gk[0][1] : gk[gk.length - 1][1];
+    iVarld(a, gA);
+    iVarld(b, gB);
+    gA.p.lerp(gB.p, f);
+    gA.p.y += h * Math.sin(f * Math.PI);
+    gA.q.slerp(gB.q, f);
+    gW.compose(gA.p, gA.q, ETT3);
+    const pa = (PA_ANSIKTET.has(a) ? 1 - f : 0) + (PA_ANSIKTET.has(b) ? f : 0);
+    LINS.styrka = pa;
+    LINS.y = PA_ANSIKTET.has(a) && PA_ANSIKTET.has(b) ? linsY(a) + (linsY(b) - linsY(a)) * f : linsY(PA_ANSIKTET.has(a) ? a : PA_ANSIKTET.has(b) ? b : 'pa');
+    return (a === 'ficka' ? 1 - f : 0) + (b === 'ficka' ? f : 0);
+  }
+  const gp = nyPose();
+  const gq = v();
+  const gF = v();
+  const gP = v();
+  const gH = v();
+  // (armbågen ut åt sidan och bakåt: underarmen går bakom tidningen, inte framför den)
+  const POL_G = V3(-0.55, -0.8, -0.25).normalize();
+  const EXTRA_G = [0, 0.05, 0.4, 0.5];
+  const extraG = [0, 0, 0, 0];
+  // Glasögonen på sin plats vid t, och höger hand i dem när han håller dem (motA). → fingrarnas extra, eller null
+  function glasArm(t, kl, Sk, a) {
+    const G = kl && kl.glas;
+    const iFickan = glasLage(t, G);
+    const s = (x, d) => (G && G[x] ? spar(G[x], t) : d);
+    const fall = s('fall', G ? 1 : 0);
+    glas.satt(gW, fall, clamp(fall * 1.15 - 0.15), 1 - iFickan);
+    const mot = s('motA', 0);
+    if (mot <= 0) return null;
+    if (s('finger', 0) > 0.5) {
+      // pekfingertoppen på bryggan
+      gq.copy(FINGER.p).applyMatrix4(gW);
+      gF.copy(FINGER.F).transformDirection(gW);
+      gP.copy(FINGER.P).transformDirection(gW);
+      gH.copy(gq).addScaledVector(gF, -FINGER.L).addScaledVector(gP, -FINGER.U);
+    } else if (s('sido', 0) > 0.5) {
+      gq.copy(SIDO.p).applyMatrix4(gW);
+      cA.copy(SIDO.A).transformDirection(gW);
+      gF.copy(SIDO.F).transformDirection(gW);
+      gP.copy(SIDO.P).transformDirection(gW);
+      gH.copy(gq).addScaledVector(cA, GREPP.x).addScaledVector(gF, -GREPP.y).addScaledVector(gP, -GREPP.z);
+    } else {
+      // tummen och pekfingret om hörnet (som cigarren, cigarrSatt)
+      gq.copy(NYP.p).applyMatrix4(gW);
+      pose(gp, gq, gF.copy(NYP.A).transformDirection(gW), gP.copy(NYP.P).transformDirection(gW));
+      cA.set(0, 1, 0).applyQuaternion(gp.q);
+      gF.set(1, 0, 0).applyQuaternion(gp.q);
+      gP.set(0, 0, 1).applyQuaternion(gp.q);
+      gH.copy(gp.p).addScaledVector(cA, GREPP.x).addScaledVector(gF, -GREPP.y).addScaledVector(gP, -GREPP.z);
+    }
+    cPol.fromArray(VILA_A[1]).normalize().lerp(POL_G, mot);
+    naturlig(Sk, gH, gF, gP, 1, cPol, cPol);
+    // på vägen dit: bakåt först, sedan in och upp, så att handen går bakom tidningen och längs disken
+    const fz = ss(0, 0.45, mot);
+    const fx = ss(0.25, 0.9, mot);
+    const fy = ss(0.3, 1, mot);
+    a.w.set(a.w.x + (cW.x - a.w.x) * fx, a.w.y + (cW.y - a.w.y) * fy, a.w.z + (cW.z - a.w.z) * fz);
+    // (handen vänds tidigt, så att fingrarna inte går genom tidningen medan handen går in bakom den)
+    const fv = ss(0, 0.5, mot);
+    a.pol.normalize().lerp(cPol, fv);
+    a.F.lerp(gF, fv);
+    a.P.lerp(gP, fv);
+    a.krok += (s('krok', 0.55) - a.krok) * mot;
+    a.peka += (s('peka', 0) - a.peka) * mot;
+    bortA = Math.max(bortA, mot);
+    const g = mot * (1 - s('peka', 0));
+    for (let i = 0; i < 4; i++) extraG[i] = EXTRA_G[i] * g;
+    return extraG;
+  }
+
   // ---------- kaffet ----------
   // Det är koppen som styr, som med cigarren: dess läge räknas fram och handen sitter i örat med samma
   // grepp hela vägen, fingrarna mot koppen, pekfingret genom örat, tummen ovanpå och handflatan mot
@@ -3320,8 +3601,15 @@ export async function figuren(duk, { hog = false, latt = false, pr = 1 } = {}) {
     const kaffe = kl && kl.kaffe;
     const extraB = kaffe ? kaffeArm(t, b, kaffe) : null;
     // tidningen: i hans händer under klippen lasa, annars borta
-    if (kl && kl.las) tidningArm(t, n, kl, a, b);
+    if (kl && kl.las) {
+      tidning.visa(kl.tidning);
+      tidningArm(t, n, kl, a, b);
+    }
     else tidning.mesh.visible = false;
+    // glasögonen: i fickan, på näsan eller i höger hand
+    const gx = glasArm(t, kl, sa, a);
+    if (gx) extraA = gx;
+    U.uLins.value.set(LINS.styrka, LINS.y);
     const isar = ss(2.5, 3, t) * (1 - ss(4.3, 4.8, t));
     if (t > 5.95 && t < 8.15) {
       const k = Math.sin(n * 6.6) * ss(5.95, 6.15, t) * (1 - ss(7.95, 8.15, t));
@@ -3445,8 +3733,8 @@ export async function figuren(duk, { hog = false, latt = false, pr = 1 } = {}) {
       return { klipp: `skriv${kryss.length}`, tider };
     },
     ror: () => sistaN - trumT < trumS[0] + 0.05,
-    // Trycker tidningen han läser (rum-hasse-tidning.js): { tidning, kick, rad, under, datum }
-    tidning: (rb) => tidning.tryck(rb),
+    // Trycker dagens tidningar som han läser (dagens() i rum-hasse-tidning.js)
+    tidning: (d) => tidning.tryck(d),
     info: () => ({ trianglar: r.info.render.triangles, ritanrop: r.info.render.calls, texturer: r.info.memory.textures }),
     ctx: r.getContext(),
     borta() {
@@ -3457,6 +3745,7 @@ export async function figuren(duk, { hog = false, latt = false, pr = 1 } = {}) {
       cig.borta();
       pen.borta();
       tidning.borta();
+      glas.borta();
       rok.borta();
       A.borta();
       B.borta();

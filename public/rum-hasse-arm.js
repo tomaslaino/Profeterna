@@ -928,6 +928,168 @@ export function byggPenna(bord = ingenBord()) {
   return { mesh, borta() { g.dispose(); mesh.material.dispose(); } };
 }
 
+// ---------- glasögonen ----------
+// Hans läsglasögon (rum-hasse-3d.js sätter på och tar av dem): bågen i mörk sköldpadd, två rektangulära glas med
+// rundade hörn, bryggan och skalmarna som fälls ut i gångjärnen. Mitt mellan glasen i bågens plan är origo, x åt
+// hans vänstra sida (åt höger i bild), y uppåt och z framåt (bort från ansiktet). Glasen: halva bredden A och höjden
+// B och mitten C från origo; bågens tjocklek T, gångjärnen (GANG) och hur långt skalmarna går ut åt sidan (UT, radianer).
+// Måtten i världens enheter (0,62 mm): glasen är 47 × 26 mm.
+export const GLAS = { A: 38, B: 21, C: 54.5, T: 2.3, GANG: [95, 8, -5], UT: 0.24 };
+// glasets kontur, runt (cx, 0)
+function glasKontur(cx, n = 64) {
+  const { A, B } = GLAS;
+  const pts = [];
+  for (let i = 0; i < n; i++) {
+    const t = (i / n) * Math.PI * 2;
+    const c = Math.cos(t);
+    const s = Math.sin(t);
+    // en superellips: nästan raka kanter och runda hörn, lite smalare nedtill
+    const x = Math.sign(c) * Math.abs(c) ** 0.4 * A;
+    const y = Math.sign(s) * Math.abs(s) ** 0.4 * B;
+    pts.push(new THREE.Vector3(cx + x * (y < 0 ? 0.96 : 1), y, 0));
+  }
+  return pts;
+}
+const GLAS_F = `precision highp float;
+varying vec3 vN, vP, vL;
+${LJUS}
+${BORD_GLSL}
+${BRUS_GLSL}
+void main() {
+  if (underBord(vP)) discard;
+  vec3 n = normalize(vN);
+  // sköldpadd: mörkbrunt med flammor i bärnsten, nästan svart på kanterna
+  float b = brus(vL.xy * .09 + vL.z * .05) * .65 + brus(vL.xy * .27) * .35;
+  vec3 c = mix(vec3(.06, .035, .02), vec3(.36, .19, .07), smoothstep(.35, .8, b));
+  vec3 ut = c * ljus(n);
+  vec3 e = normalize(cameraPosition - vP);
+  vec3 h = normalize(NYCKEL + e);
+  // blank acetat: en skarp glans och lite av baren i kanten
+  ut += vec3(1., .95, .88) * pow(max(0., dot(n, h)), 60.) * .55;
+  ut += kant(n, .25);
+  gl_FragColor = vec4(ton(ut), 1.);
+}`;
+// glasen: nästan osynliga, utom en svag spegling av baren och ljuset som blänker i dem
+const LINS_F = `precision highp float;
+uniform float uSyn;
+varying vec3 vN, vP, vL;
+${LJUS}
+${BORD_GLSL}
+void main() {
+  if (underBord(vP)) discard;
+  vec3 n = normalize(vN);
+  vec3 e = normalize(cameraPosition - vP);
+  if (dot(n, e) < 0.) n = -n;
+  vec3 rf = reflect(-e, n);
+  vec3 om = mix(vec3(.05, .035, .03), vec3(.55, .42, .3), smoothstep(-.2, .6, rf.y));
+  om += vec3(1.2, 1.1, .95) * smoothstep(.9, .99, dot(rf, NYCKEL));
+  float f = .06 + .94 * pow(1. - clamp(dot(n, e), 0., 1.), 5.);
+  // (en svag ton i glaset, och blänket)
+  float a = (.05 + .5 * f + .4 * smoothstep(.95, .995, dot(rf, NYCKEL))) * uSyn;
+  gl_FragColor = vec4(ton(om) * a, a);
+}`;
+// geometrier med läge och normal → en
+function slaIhop(lista) {
+  let n = 0;
+  let m = 0;
+  for (const g of lista) { n += g.attributes.position.count; m += g.index.count; }
+  const pos = new Float32Array(n * 3);
+  const nor = new Float32Array(n * 3);
+  const idx = new Uint32Array(m);
+  let o = 0;
+  let oi = 0;
+  for (const g of lista) {
+    pos.set(g.attributes.position.array, o * 3);
+    nor.set(g.attributes.normal.array, o * 3);
+    const ix = g.index.array;
+    for (let i = 0; i < ix.length; i++) idx[oi + i] = ix[i] + o;
+    o += g.attributes.position.count;
+    oi += ix.length;
+  }
+  const ut = new THREE.BufferGeometry();
+  ut.setAttribute('position', new THREE.BufferAttribute(pos, 3));
+  ut.setAttribute('normal', new THREE.BufferAttribute(nor, 3));
+  ut.setIndex(new THREE.BufferAttribute(idx, 1));
+  return ut;
+}
+// → { grupp, U, satt(matris, fallH, fallV, syn), ande(s, fall), borta() }; fall: skalmarna (0 hopfällda, 1 utfällda)
+export function byggGlasogon(bord = ingenBord()) {
+  const { C, T, GANG, UT } = GLAS;
+  const U = { uBord: bord, uButik: bord.butik || BUTIK_AV, uDag: bord.dag || DAG, uLys: bord.lys || LYS };
+  const mat = new THREE.ShaderMaterial({ uniforms: U, vertexShader: CIG_V, fragmentShader: GLAS_F });
+  const UL = { ...U, uSyn: { value: 1 } };
+  const lmat = new THREE.ShaderMaterial({ uniforms: UL, vertexShader: CIG_V, fragmentShader: LINS_F, transparent: true, depthWrite: false, side: THREE.DoubleSide, blending: THREE.CustomBlending, blendSrc: THREE.OneFactor, blendDst: THREE.OneMinusSrcAlphaFactor });
+  const geos = [];
+  const tub = (pts, r, slut = false, n = 64) => {
+    const g = new THREE.TubeGeometry(new THREE.CatmullRomCurve3(pts, slut, 'centripetal'), n, r, 7, slut);
+    geos.push(g);
+    return g;
+  };
+  const grupp = new THREE.Group();
+  grupp.matrixAutoUpdate = false;
+  const del = (g, m = mat) => { const x = new THREE.Mesh(g, m); x.frustumCulled = false; return x; };
+  // bågen fram i en enda geometri och glasen i en (färre ritanrop)
+  const bage = [];
+  const glasen = [];
+  for (const s of [-1, 1]) {
+    const k = glasKontur(s * C);
+    bage.push(tub(k, T, true, 96));
+    // överkanten lite kraftigare
+    bage.push(tub(k.filter((p) => p.y > GLAS.B * 0.55).sort((a, b) => a.x - b.x), T * 1.35, false, 24));
+    const lg = new THREE.ShapeGeometry(new THREE.Shape(k.map((p) => new THREE.Vector2(p.x, p.y))), 8);
+    lg.translate(0, 0, 0.6);
+    glasen.push(lg);
+    // gångjärnet: från glasets yttre övre hörn bakåt
+    bage.push(tub([new THREE.Vector3(s * (C + GLAS.A - 2), GANG[1] + 2, 0), new THREE.Vector3(s * (GANG[0] + 1), GANG[1], -1), new THREE.Vector3(s * GANG[0], GANG[1], GANG[2])], T * 1.2, false, 8));
+  }
+  // bryggan över näsan, och näsdynorna
+  bage.push(tub([new THREE.Vector3(-C + GLAS.A - 3, 9, 0), new THREE.Vector3(-8, 13, 1.5), new THREE.Vector3(8, 13, 1.5), new THREE.Vector3(C - GLAS.A + 3, 9, 0)], T * 1.1, false, 16));
+  for (const s of [-1, 1]) bage.push(tub([new THREE.Vector3(s * 12, 6, -1), new THREE.Vector3(s * 11, -6, -7)], 2.2, false, 4));
+  const fram = del(slaIhop(bage));
+  const lins = del(slaIhop(glasen), lmat);
+  for (const g of [...bage, ...glasen]) g.dispose();
+  geos.length = 0;
+  geos.push(fram.geometry, lins.geometry);
+  grupp.add(fram, lins);
+  // skalmarna: raka bakåt från gångjärnet och böjda nedåt bakom örat; vridna runt gångjärnet (y)
+  // (kortare än en riktig: resten är bakom örat, och där är huvudet bara en platt yta som inte döljer den)
+  const skalmPts = [[0, 0, 0], [0, 0, -60], [0, -1, -112], [0, -6, -145], [0, -22, -166], [0, -42, -178]].map((p) => new THREE.Vector3(...p));
+  const skalmar = [-1, 1].map((s) => {
+    const p = new THREE.Group();
+    p.position.set(s * GANG[0], GANG[1], GANG[2]);
+    p.add(del(tub(skalmPts, T * 0.95, false, 32)));
+    grupp.add(p);
+    return p;
+  });
+  // vinkeln runt gångjärnet: utfälld lite utåt (UT), hopfälld in bakom glasen (den vänstra lite mer, så att de
+  // inte går genom varandra)
+  const vinkel = (s, f) => {
+    const oppen = -s * UT;
+    const ihop = s * (Math.PI / 2 - (s > 0 ? 0.03 : 0.07));
+    return ihop + (oppen - ihop) * f;
+  };
+  // Bågen ritas före kroppen (ogenomskinlig, och kroppen döljer det som är bakom huvudet och i fickan), glasen efter
+  // den (genomskinliga; djupet börjar om efter kroppen, så de ritas över allt som är bakom dem)
+  grupp.traverse((o) => { if (o.isMesh) o.renderOrder = o.material === lmat ? 1.5 : 0.9; });
+  grupp.visible = false;
+  // skalmens ände (bakom örat) i bågens mått, med skalmen utfälld
+  const ande = (s, f, ut = new THREE.Vector3()) => ut.copy(skalmPts[skalmPts.length - 1]).applyAxisAngle(new THREE.Vector3(0, 1, 0), vinkel(s, f)).add(new THREE.Vector3(s * GANG[0], GANG[1], GANG[2]));
+  return {
+    grupp, U, UL, ande,
+    // bågens läge (matris), skalmarna (höger s = −1, vänster s = 1) och hur mycket glasen syns
+    satt(m, fallH, fallV, syn = 1) {
+      grupp.matrix.copy(m);
+      grupp.matrixWorldNeedsUpdate = true;
+      skalmar[0].rotation.y = vinkel(-1, fallH);
+      skalmar[1].rotation.y = vinkel(1, fallV);
+      UL.uSyn.value = syn;
+      lins.visible = syn > 0.01;
+      grupp.visible = true;
+    },
+    borta() { for (const g of geos) g.dispose(); mat.dispose(); lmat.dispose(); },
+  };
+}
+
 // ---------- askkoppen ----------
 // Rund och tung, av samma glaserade gods som koppen, med två urtag för cigarren mitt emot
 // varandra (urtaget pekar åt +x). Botten i origo, y uppåt.
