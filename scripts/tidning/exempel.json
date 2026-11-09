@@ -1,0 +1,4 @@
+{"titel":"Enligt uppgift","overrad":["Nyhetsbrev för initierade","Ej för spridning"],"utgava":["Nr 1 · inför lördagen 14 november","Provnummer"],"stampel":"KONFIDENTIELLT",
+"matcher":[{"tid":"lör 16.00","hemma":{"namn":"Hemmalaget","citat":"Platshållare för ett citat från podden.","citatKalla":"Podden, avsnitt, 7 nov","rader":[{"s":"b","t":"Platshållare för en rad som är bekräftad av klubben.","k":"(Källa, datum)"},{"s":"h","t":"Platshållare för något som en supporter sagt i podden, en eller två meningar lång.","k":"(Podden, 7 nov, ca 12 min in)"},{"s":"o","t":"Platshållare för ett rykte från forumet.","k":"(Forumet, 8 nov)"}]},
+"borta":{"namn":"Bortalaget","rader":[{"s":"h","t":"Platshållare för något som en supporter sagt i podden, en eller två meningar lång.","k":"(Podden, 7 nov)"},{"s":"b","t":"Platshållare för en bekräftad rad.","k":"(Källa)"}]}}],
+"kallor":["Podden A – avsnitt, 7 nov, 45 min utskrivna","Podden B – avsnitt, 8 nov, 45 min utskrivna"]}
