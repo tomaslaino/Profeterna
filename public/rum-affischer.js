@@ -26,7 +26,9 @@
 // med tejp i fönstrets nedre vänstra hörn, där gänget inte skymmer den, och
 // varannan med häftstift på väggen till höger om fönstret, under oraklet och
 // till vänster om bardisken. I telefonen på höjden alltid på väggen, som syns
-// utan att man drar (vänstra hörnet ligger utanför bilden där).
+// utan att man drar (vänstra hörnet ligger utanför bilden där). På väggen
+// sitter den fritt från disken och barstolarna och ligger under bardiskens duk
+// (rum-inredning.js), så att det som står framför väggen står framför sedeln.
 // Slitaget följer tippningen som sakerna på pulten; löpsedeln blir bara lite
 // böjd.
 //
@@ -71,8 +73,10 @@ export const SKIVA = {
 };
 // Löpsedeln: med tejp i fönstrets nedre vänstra hörn, eller med häftstift på
 // väggen mellan fönsterkarmen (x 958; fönsterbänkens ände når x 984 i y 554–596)
-// och bardisken (x 1060), under oraklets skylt (y 483).
-const LOPPLATS = [{ x: 286, y: 404, rot: 1.4 }, { x: 992, y: 487, rot: 0.9, vagg: true }];
+// och bardisken (x 1060; den innersta barstolens sits börjar vid x 1063 i y 570),
+// under oraklets skylt (y 483). På väggen är den 72 % stor (72 × 101, CSS:en
+// .pa-vagg) och sitter med två häftstift, så den hänger nästan rak.
+const LOPPLATS = [{ x: 286, y: 404, rot: 1.4 }, { x: 986, y: 488, rot: 0.3, vagg: true }];
 // på höjden (telefonen) syns bara mitten och högra delen av rummet från början
 const smal = () => innerWidth / innerHeight < 1.2;
 // Platsen för skivan (rum-saker.js och rum-inredning.js startar i valfri
@@ -160,13 +164,22 @@ function ifk() {
 // ingen rad mer än så många gånger större än den minsta (QPR ska inte ta
 // hela papperet). Med prick får en rad med Å, Ä eller Ö så mycket mer luft
 // ovanför (i em, CSS:en .prick), så att prickarna inte når raden ovanför.
+// Med drag dras en rad som blivit smalare än papperet (för att alla ska rymmas
+// på höjden) ut på bredden, högst så många gånger, som på en riktig löpsedel
+// där rubriken går från kant till kant (spärren mellan bokstäverna, sp px, räknas med).
 const PRICK = /[ÅÄÖ]/i;
-function passa(el, { rad, bred, hog, max, topp = Infinity, prick = 0 }) {
-  let px = rad.map(([t, s]) => Math.min(max, bred / Math.max(0.3, bredd(String(t).toUpperCase()) + (s === 2 ? 0.24 : 0))));
+function passa(el, { rad, bred, hog, max, topp = Infinity, prick = 0, drag = 1, sp = 0 }) {
+  const em = rad.map(([t, s]) => bredd(String(t).toUpperCase()) + (s === 2 ? 0.24 : 0));
+  const spar = rad.map(([t]) => sp * String(t).length);
+  let px = em.map((e, i) => Math.min(max, (bred - spar[i]) / Math.max(0.3, e)));
   px = px.map((x) => Math.min(x, Math.min(...px) * topp));
   const h = px.reduce((a, x, i) => a + x * (0.94 + (PRICK.test(rad[i][0]) ? prick : 0)), 0) + (rad.length - 1) * 1.5;
   if (h > hog) px = px.map((x) => x * (hog / h));
-  el.querySelectorAll('.rub b').forEach((b, i) => { b.style.fontSize = `${px[i].toFixed(1)}px`; });
+  el.querySelectorAll('.rub b').forEach((b, i) => {
+    b.style.fontSize = `${px[i].toFixed(1)}px`;
+    const d = Math.min(drag, bred / (px[i] * em[i] + spar[i]));
+    b.style.transform = d > 1.01 ? `scaleX(${d.toFixed(3)})` : '';
+  });
 }
 
 // ---------- Chelsea 2021 ----------
@@ -569,11 +582,11 @@ function rita(el, r, vagg) {
     return k ? ` class="${k}"` : '';
   };
   el.innerHTML = `<span class="ark"><span class="huvud"><b class="namn">${esc(T.namn)}</b></span>` +
-    `<span class="linje"><span class="kick">${esc(r.kick)}</span><small>${esc(r.datum)}</small></span>` +
+    `<span class="linje"><span class="kick${PRICK.test(r.kick) ? ' prick' : ''}">${esc(r.kick)}</span><small>${esc(r.datum)}</small></span>` +
     `<span class="rub">${rad.map(([t, s]) => `<b${stil(t, s)}>${esc(t)}</b>`).join('')}</span>` +
     `<span class="under">${esc(r.under)}</span>` +
     (r.plus ? `<span class="plus"><b>+</b>${esc(r.plus)}</span>` : '') +
-    '<span class="tryck"></span></span>' +
+    '<span class="blad"></span><span class="veck"></span><span class="tryck"></span></span>' +
     `<span class="hund"></span>${vagg ? '<i class="nal a"></i><i class="nal b"></i>' : '<i class="tejp a"></i><i class="tejp b"></i>'}`;
   // namnet, vinjetten och den andra nyheten så stora som ryms (sp: spärren
   // mellan bokstäverna och kanterna i em, som i CSS:en)
@@ -589,7 +602,7 @@ function rita(el, r, vagg) {
   // luft för ringen och prickarna över Å, Ä och Ö (rub, 5) och en pixel att ta av
   const underRader = Math.max(1, Math.ceil((bredd(r.under, UNDER) * 4.6) / BRED));
   const hog = 140 - 6.5 - 18 - 12 - (underRader * 5.52 + 2.5) - (r.plus ? 11.8 : 0) - 5 - 1;
-  passa(el, { rad, bred: BRED, hog, max: MAX, topp: 1.55, prick: 0.2 });
+  passa(el, { rad, bred: BRED, hog, max: MAX, topp: 1.55, prick: 0.2, drag: 1.42, sp: 0.2 });
 }
 
 // ---------- slitaget och platserna ----------
@@ -610,6 +623,31 @@ function slit(el, w, seed) {
   el.style.setProperty('--blek', (0.04 + 0.12 * w).toFixed(2));
 }
 
+// Löpsedeln är klippt med sax (en ny varje vecka): varje kant i tre till fem
+// raka klipp, som slutar en bit in och går åt lite olika håll, och hörnet
+// som släpper (--curl) nere till höger. Papperet är 100 × 140.
+function klipp(fro) {
+  let k = 0;
+  const r = () => hash(fro * 7.31 + ++k * 1.913);
+  const p = [];
+  const pt = (x, y) => p.push(`${x.toFixed(2)}px ${y.toFixed(2)}px`);
+  // från (ax, ay) mot (bx, by), inåt längs (nx, ny)
+  const kant = (ax, ay, bx, by, nx, ny) => {
+    const n = 3 + Math.floor(r() * 3);
+    for (let i = 0; i < n; i++) {
+      const t = i / n + (i ? (r() - 0.5) * 0.1 : 0);
+      const d = r() * 0.9;
+      pt(ax + (bx - ax) * t + nx * d, ay + (by - ay) * t + ny * d);
+    }
+  };
+  kant(0, 0, 100, 0, 0, 1);
+  kant(100, 0, 100, 130, -1, 0);
+  p.push('100px calc(140px - var(--curl))', 'calc(100px - var(--curl)) 140px');
+  kant(90, 140, 0, 140, 0, -1);
+  kant(0, 140, 0, 0, 1, 0);
+  return `polygon(${p.join(', ')})`;
+}
+
 export function affischer(back, { short = (x) => x, namn = null } = {}) {
   if (namn) namnAv = namn;
   if (!document.querySelector('link[href="rum-affischer.css"]')) {
@@ -623,7 +661,12 @@ export function affischer(back, { short = (x) => x, namn = null } = {}) {
   const l = lopsedel();
   const c = chelsea();
   const n = nacional();
-  back.append(skivPlats(back), f, n, v, c, l);
+  back.append(skivPlats(back), f, n, v, c);
+  // Löpsedeln på väggen hänger bakom bardisken och barstolarna, som står
+  // framför väggen: före diskens duk (rum-inredning.js lägger den före
+  // tavlorna på högra väggen, .rum-hv, så den hamnar efter löpsedeln om den
+  // kommer sist).
+  back.insertBefore(l, back.querySelector(':scope > canvas[data-bit="disk"]') || back.querySelector(':scope > .rum-hv'));
   let ritad = null;
   let fonter = false;
   let senast = { rows: null, old: null };
@@ -657,9 +700,11 @@ export function affischer(back, { short = (x) => x, namn = null } = {}) {
       const p = smal() ? LOPPLATS[1] : LOPPLATS[((fro % 2) + 2) % 2];
       const vagg = Boolean(p.vagg);
       l.classList.toggle('pa-vagg', vagg);
-      l.style.left = `${Math.round(p.x + (hash(fro + 3) - 0.5) * (vagg ? 4 : 10))}px`;
-      l.style.top = `${Math.round(p.y + (hash(fro + 4) - 0.5) * (vagg ? 4 : 8))}px`;
-      l.style.setProperty('--vrid', `${(p.rot + (hash(fro + 5) - 0.5) * 1.2).toFixed(2)}deg`);
+      l.style.left = `${(p.x + (hash(fro + 3) - 0.5) * (vagg ? 1.6 : 10)).toFixed(1)}px`;
+      l.style.top = `${(p.y + (hash(fro + 4) - 0.5) * (vagg ? 2 : 8)).toFixed(1)}px`;
+      l.style.setProperty('--vrid', `${(p.rot + (hash(fro + 5) - 0.5) * (vagg ? 0.5 : 1.2)).toFixed(2)}deg`);
+      l.style.setProperty('--klipp', klipp(fro));
+      l.style.setProperty('--vy', `${(46 + hash(fro + 6) * 7).toFixed(1)}%`);
       let r;
       try {
         r = rubrik({ rows, old, short, fro });

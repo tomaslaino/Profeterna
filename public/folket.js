@@ -12,6 +12,11 @@
 //
 // Läses efter kupong.js och använder dess hjälpare (KP, fold) och app.js
 // (state).
+//
+// Samma omgång ger siffrorna på gängets kupong: Svenska folket, oddsen och
+// favoritskapet för varje match (info, hamta), en sort åt gången med flikar
+// (flik, flikar, tal). Bara gängets kupong, i rummet (rum.js) och på papperet
+// (samtal.js) – var och ens egen kupong ska inte styras av vad folket spelar.
 
 window.Folket = (() => {
   const endpoint = () => {
@@ -81,5 +86,88 @@ window.Folket = (() => {
     return omgang ? { omgang, rows: link(omgang) } : null;
   }
 
-  return { open };
+  // ---------- Svenska folket, oddsen och favoritskapet ----------
+
+  const SORT = ['folket', 'odds', 'fav'];
+  const FLIK = 'profeterna.spelflik';
+  const INFO = new Map(); // omgångens nr → {at, stang, tid, slag, rader: {matchens id: {folket, odds, fav}}}
+
+  let valdFlik = null;
+
+  const info = (nr) => INFO.get(Number(nr)) || null;
+
+  // Hämtar omgången nr, högst en gång i minuten och var kvart efter spelstoppet,
+  // när siffrorna står still. → true om siffrorna har ändrats.
+  async function hamta(nr) {
+    const n = Number(nr);
+    const url = endpoint();
+    const had = INFO.get(n);
+    const t = Date.now();
+    if (!url || !n || (had && t - had.at < (had.stang && Date.parse(had.stang) < t ? 900000 : 60000))) return false;
+    if (had) had.at = t;
+    let om = null;
+    try {
+      const res = await fetch(`${url}?nr=${n}`, { cache: 'no-store' });
+      const body = await res.json().catch(() => ({}));
+      om = res.ok && body.ok ? body.omgang : null;
+    } catch {
+      om = null;
+    }
+    if (!om) {
+      if (!had) INFO.set(n, { at: t, rader: {} });
+      return false;
+    }
+    const rader = {};
+    for (const x of link(om)) if (x.m && (x.folket || x.odds)) rader[String(x.m.id)] = { folket: x.folket || null, odds: x.odds || null, fav: x.fav || null, slag: x.oddsSlag || null };
+    const ny = !had || JSON.stringify(had.rader) !== JSON.stringify(rader);
+    INFO.set(n, { at: t, stang: om.stang || null, tid: om.folketTid || null, oddsTid: om.oddsTid || null, rader });
+    return ny;
+  }
+
+  // Vilken sort som står under rutorna: 0 Svenska folket, 1 odds, 2 favoritskap.
+  function flik() {
+    if (valdFlik == null) {
+      try {
+        valdFlik = Number(localStorage.getItem(FLIK));
+      } catch {
+        valdFlik = 0;
+      }
+    }
+    return SORT[valdFlik] ? valdFlik : 0;
+  }
+  function valjFlik(n) {
+    valdFlik = n;
+    try {
+      localStorage.setItem(FLIK, String(n));
+    } catch {
+      /* då gäller den tills sidan laddas om */
+    }
+  }
+
+  // Talet för tecknet j i en match (en rad ur info), som det står på kupongen.
+  function tal(rad, j, f = flik()) {
+    const v = rad && rad[SORT[f]];
+    if (!v || v[j] == null) return '–';
+    return f === 1 ? v[j].toFixed(2).replace('.', ',') : `${Math.round(v[j])}%`;
+  }
+
+  // Säger var oddsen kommer från, när man pekar på fliken: efter spelstoppet är
+  // de sista läget eller, om det saknas, startoddsen.
+  function oddsTitel(i) {
+    const slag = Object.values((i && i.rader) || {}).map((r) => r.slag);
+    return slag.includes('start') ? 'Startoddsen från Svenska Spel: sista läget före spelstopp finns inte'
+      : slag.includes('sista') ? 'Svenska Spels odds, sista läget före spelstopp' : 'Svenska Spels odds';
+  }
+  const titlar = (i) => ['Svenska folket: hur stor del av raderna som har med tecknet', oddsTitel(i), 'Favoritskap: chansen enligt oddsen'];
+  const NAMN = ['Folket', 'Odds', 'Favoritskap'];
+  // Knapparna, med sort i data-spelflik – de sorter som finns. Saknas den valda
+  // (tjänsten har inga odds) står den första som finns där.
+  const finns = (i) => [0, 1, 2].filter((k) => Object.values((i && i.rader) || {}).some((r) => r[SORT[k]]));
+  const vald = (i) => {
+    const lista = finns(i);
+    return lista.includes(flik()) || !lista.length ? flik() : lista[0];
+  };
+  const flikar = (i, f = vald(i)) => finns(i).map((k) => `<button type="button" data-spelflik="${k}" aria-pressed="${k === f}" title="${titlar(i)[k]}">${NAMN[k]}</button>`).join('');
+
+  return { open, info, hamta, vald, valjFlik, tal, flikar, NAMN };
 })();

@@ -62,6 +62,7 @@
     again: false, // Spara gängets kupong trots matcher utan tecken, regeln eller låsta matcher
     names: new Map(), // omgång och matcher → {namn, syftar} | null (inget namn) | 'loading'
     writing: {}, // din kommentar i efterhand som inte är sparad än: matchens id → texten
+    under: null, // siffrorna under rutorna på gängets kupong: null = modellens odds, annars sorten i Folket
     failed: {}, // matchens id → varför kommentaren inte gick att spara
     sending: new Set(), // matcher vars kommentar sparas just nu
     lyft: null, // vems tips som lyfts fram på papperet (ett tryck på porträttet överst)
@@ -641,6 +642,30 @@
   // Lappen: ett tryck på en match tar fram allt som bara behövs när man pratar
   // om den – vad som ska sägas, motiveringarna, oddsen och Klubba – längst ner
   // på skärmen, ovanpå det som står där, så att inget på papperet flyttar sig.
+  // Svenska folket, oddsen och favoritskapet från Svenska Spel (Folket i
+  // folket.js), bara på gängets kupong: under rutorna med flikarna (SM.under:
+  // null = modellens odds, som förut) och på lappen.
+  const spelInfo = (s) => (window.Folket && s && s.spel && s.spel.nr ? Folket.info(s.spel.nr) : null);
+  const harSpel = (i) => Boolean(i && Object.keys(i.rader).length);
+  function hamtaSpel(s) {
+    if (!window.Folket || !s || !s.spel || !s.spel.nr) return;
+    const forut = harSpel(spelInfo(s));
+    Folket.hamta(s.spel.nr).then((ny) => { if (ny && (!forut || SM.under != null)) redraw(); });
+  }
+  function underFlikar(s) {
+    const i = spelInfo(s);
+    if (!harSpel(i)) return '';
+    return '<div class="sm-under" role="group" aria-label="Siffrorna under rutorna">' +
+      `<button type="button" data-spelflik="m" aria-pressed="${SM.under == null}" title="Modellens odds">Modellen</button>${Folket.flikar(i, SM.under)}</div>`;
+  }
+  function spelLapp(s, id) {
+    const i = spelInfo(s);
+    const rad = i && i.rader[id];
+    if (!rad) return '';
+    return '<div class="sm-lapp-spel"><span></span>' + SIGNS.map((sg) => `<i>${sg}</i>`).join('') +
+      Folket.NAMN.map((n, f) => `<span>${n}</span>${SIGNS.map((sg, j) => `<b>${esc(Folket.tal(rad, j, f))}</b>`).join('')}`).join('') + '</div>';
+  }
+
   function lapp(s, rows, done, id) {
     const r = rows.find((x) => x.x.id === id);
     if (!r) return '';
@@ -657,7 +682,7 @@
       : nasta ? '<button type="button" class="kp-btn" id="sm-nasta">Nästa</button>' : '';
     return `<div class="sm-lapp${klubbad ? ' klubbad' : ''}" data-id="${esc(id)}"><button type="button" class="sm-lapp-x" id="sm-lapp-x" aria-label="Stäng">×</button>` +
       `<p class="sm-lapp-m"><b>${s.matcher.findIndex((x) => x.id === id) + 1}</b>${namn}</p><p class="sm-lapp-i">${when}` +
-      (r.g.pr ? `<span class="sm-lapp-odds">${SIGNS.map((sg, i) => `<span><i>${sg}</i>${pctOdds(r.g.pr[i])}</span>`).join('')}</span>` : '') + '</p>' +
+      (r.g.pr ? `<span class="sm-lapp-odds">${SIGNS.map((sg, i) => `<span><i>${sg}</i>${pctOdds(r.g.pr[i])}</span>`).join('')}</span>` : '') + '</p>' + spelLapp(s, id) +
       (fr || go ? `<div class="sm-lapp-g"><p class="sm-lapp-q">${fr}</p>${go}</div>` : '') +
       [...r.notes, ...afterOf(s, id, w)].map((o) => `<span class="sm-said sm-k${pnum(o.k)}">${face(o.k)}<span>${esc(o.text)}</span></span>`).join('') +
       (pen ? `<span class="sm-meta">${penField(pen, id, label)}</span>` : '') + '</div>';
@@ -874,8 +899,9 @@
     // resten på lappen. Sedan står matcherna med resultat och kommentarer.
     const tat = rows.some((r) => r.open);
     const vald = tat ? valdRad(rows, done) : null;
+    hamtaSpel(s);
     html += paperTop(stopBox(s), tat ? ' sm-up sm-hog' : ' sm-up', tat && s.visas ? `<p class="sm-sheet-kvar" id="sm-kvar">${esc(kvarText(rows, done))}</p>` : stamp(s)) +
-      upHead(s, ids, rows.filter((r) => r.g.res != null).map((r) => [r.x.id, r.g.res]));
+      (tat ? '' : underFlikar(s)) + upHead(s, ids, rows.filter((r) => r.g.res != null).map((r) => [r.x.id, r.g.res]));
     const w = writer(s);
     HOGAR.forEach((namn, k) => {
       const list = rows.filter((r) => hog(r) === k);
@@ -1040,7 +1066,9 @@
       SIGNS.map((sg, i) => {
         const on = sign.includes(sg);
         const b = box(sg, who[i], ids, on ? `${id}${sg}` : null, g.res === i ? `${id}${sg}` : null);
-        const odds = tat ? '' : `<small${on ? ' class="on"' : ''}>${g.pr ? pctOdds(g.pr[i]) : '–'}</small>`;
+        const spel = SM.under != null && spelInfo(SM.data);
+        const rad = spel ? spel.rader[id] : null;
+        const odds = tat ? '' : `<small${on ? ' class="on"' : ''}>${rad ? esc(Folket.tal(rad, i, SM.under)) : g.pr ? pctOdds(g.pr[i]) : '–'}</small>`;
         if (!pick) return `<span class="sm-c" aria-hidden="true">${b}${odds}</span>`;
         // Gängets tecken väljs i matcher som går att fylla i – till en stund
         // efter avspark (fillable).
@@ -1069,7 +1097,8 @@
     const rows = [...g.rows, ...s.matcher.filter((x) => !on.has(x.id)).map((x) => ({ ...gradeRow({ id: x.id, sign: '', label: x.match }, now), out: true }))]
       .sort((a, b) => nr.get(a.id) - nr.get(b.id));
     const stamp = c.pending ? '<span class="pp-stamp wait">Väntar på GitHub</span>' : g.done && !g.hidden ? '<span class="pp-stamp">Rättad</span>' : '';
-    let html = paperTop(Papper.grade(c, g), ' sm-up', stamp) + upHead(s, ids, rows.filter((r) => r.res != null).map((r) => [r.id, r.res]));
+    hamtaSpel(s);
+    let html = paperTop(Papper.grade(c, g), ' sm-up', stamp) + underFlikar(s) + upHead(s, ids, rows.filter((r) => r.res != null).map((r) => [r.id, r.res]));
     const days = Papper.inDayOrder(rows, (r) => r.m && r.m.kickoff);
     const w = writer(s);
     let day = null;
@@ -2395,6 +2424,13 @@
   const visible = () => Boolean(SM.data && SM.data.visas);
   const made = () => (SM.data && SM.data.visas ? existing(SM.data) : null);
   const watch = () => { if (active() && !SM.data.visas) poll(); };
+
+  document.addEventListener('click', (e) => {
+    const b = e.target.closest('.sm-under [data-spelflik]');
+    if (!b) return;
+    SM.under = b.dataset.spelflik === 'm' ? null : Number(b.dataset.spelflik);
+    redraw();
+  });
 
   window.Samtal = { show, load, active, covers, teaser, ids, visible, made, watch, paper, title, pult, sparadKupong, keep: keepFocus, name: () => nameOf(SM.data), redraw: () => { if (here('')) renderRound(); } };
 })();

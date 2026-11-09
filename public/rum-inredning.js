@@ -62,8 +62,9 @@ const BITAR = {
   // ligger under tavlorna på högra väggen och kortlådan (fore)
   disk: { plan: 0, box: { x: 990, y: 470, w: 1110, h: 400 }, fore: '.rum-hv' },
   // kupongstället på disken: det står framför anslagstavlan och ligger över
-  // den, men under kortlådan (z-index i rum-register.css)
-  stall: { plan: 0, box: { x: 1150, y: 440, w: 110, h: 95 } },
+  // den, men under kortlådan (z-index i rum-register.css); duken lyser när man
+  // pekar på stället (.rum-stall-duk i rum.css)
+  stall: { plan: 0, box: { x: 1150, y: 414, w: 110, h: 121 }, cls: 'rum-stall-duk' },
 };
 // närbilden: högst så många bildpunkter på dukens längsta led
 const SKARP = 2600;
@@ -72,7 +73,7 @@ export async function inredning(el, opt = {}) {
   const THREE = await import('three');
   const { RoomEnvironment } = await import('three/addons/environments/RoomEnvironment.js');
   const { RoundedBoxGeometry: RB } = await import('three/addons/geometries/RoundedBoxGeometry.js');
-  await Promise.all(['italic 600 68px Fraunces', '700 40px Fraunces', '800 60px Fraunces', '700 40px Caveat', '400 40px "Alfa Slab One"']
+  await Promise.all(['italic 600 68px Fraunces', '600 40px Fraunces', '700 40px Fraunces', '800 60px Fraunces', '700 40px Caveat', '400 40px "Alfa Slab One"']
     .map((f) => document.fonts.load(f).catch(() => null)));
 
   // i telefonen färre bildpunkter, ingen kantutjämning och mindre skuggkartor,
@@ -135,7 +136,9 @@ export async function inredning(el, opt = {}) {
     const { box } = BITAR[namn];
     const canvas = document.createElement('canvas');
     // neonen glappar som förut (rum-neon, .av i rum.css)
-    canvas.className = `rum-inr${namn === 'neon' ? ' rum-neon' : ''}`;
+    canvas.className = `rum-inr${namn === 'neon' ? ' rum-neon' : ''}${BITAR[namn].cls ? ` ${BITAR[namn].cls}` : ''}`;
+    // (vilken sak: löpsedeln läggs under disken, rum-affischer.js)
+    canvas.dataset.bit = namn;
     // (neonens sken ritas i duken, utanför rören: medSken)
     const M = namn === 'neon' ? SKEN_M : 0;
     canvas.width = Math.round((box.w + 2 * M) * DPR);
@@ -826,9 +829,11 @@ export async function inredning(el, opt = {}) {
       x.rotation.x = 90 * DEG;
       x.position.y = y;
     };
-    for (const [z, vrid] of [[120, 8], [250, -14], [380, 21]]) {
+    // (den innersta är inskjuten ända in under skivan, så att sitsen går fri från
+    // löpsedeln på väggen, LOPPLATS i rum-affischer.js: den börjar vid x 1063 i bakväggens bild)
+    for (const [z, vrid, inne] of [[120, 8, 24], [250, -14, 0], [380, 21, 0]]) {
       const stol = new THREE.Group();
-      stol.position.set(D.kant - 18, SITS - 2 * k, z);
+      stol.position.set(D.kant - 18 + inne, SITS - 2 * k, z);
       stol.rotation.y = vrid * DEG;
       b.scene.add(stol);
       const sits = [[0, 0], [19, 0], [22, 1.2], [23, 4], [22.2, 7], [19, 8.4], [0, 8.6]].map(([a, q]) => new THREE.Vector2(a * k, q * k));
@@ -868,17 +873,146 @@ export async function inredning(el, opt = {}) {
   // Kupongstället på bardisken, under anslagstavlan mellan barstolarna och
   // kortlådan (rum-kortlada.js): ett fack av plexiglas, lågt fram och högt bak,
   // med blanka kuponger som lutar bakåt, butikens pennor i ett rör och lappen
-  // på plexit. Det står in mot väggen, vänt ut mot rummet och lite mot den som
-  // står vid pulten. Stället är ritat i millimeter, k enheter per mm (disken
-  // har 0,237; stället är lite större, som kortlådan), och står på skivan i
-  // (x, z) vridet vrid grader.
+  // på plexit. Kupongerna är kupongen på pulten i telefonens smala form
+  // (blankett), och överst sitter en tryckt skylt i bandets färg: Nästa
+  // omgång. Ett klick på stället tar en kupong för nästa omgång i handen
+  // (länken #rum-stall, openStall i rum.js). Det står in mot väggen, vänt ut
+  // mot rummet och lite mot den som står vid pulten. Stället är ritat i
+  // millimeter, k enheter per mm (disken har 0,237; stället är lite större,
+  // som kortlådan), och står på skivan i (x, z) vridet vrid grader.
   const STALL = { x: 1104, z: 225, vrid: -66, k: 0.3 };
+  // Kupongen på pulten i telefonen (.rum.smal i rum.css, 420 × 620): bandet,
+  // spelstoppet, Nr och Match, tretton rader med synkmarkeringen i kanten och
+  // rutorna 1 X 2, och tryckeriets rad längs högerkanten. Samma färger och tryck.
+  function blankett(x, w, h) {
+    const s = w / 420;
+    x.scale(s, s);
+    const W = 420;
+    const H = h / s;
+    const g = x.createLinearGradient(0, 0, 0, H);
+    g.addColorStop(0, '#f3e9d4');
+    g.addColorStop(1, '#e7dbc0');
+    x.fillStyle = g;
+    x.fillRect(0, 0, W, H);
+    const tryck = '#a9452b';
+    const spar = (t, px) => { x.letterSpacing = `${px}px`; return t; };
+    // bandet
+    x.fillStyle = '#c8643a';
+    x.fillRect(0, 0, W, 46);
+    x.fillStyle = '#f1e8d5';
+    x.fillRect(0, 46, W, 2);
+    x.fillStyle = '#c8643a';
+    x.fillRect(0, 48, W, 1.5);
+    x.fillStyle = '#f6ecd9';
+    x.textBaseline = 'middle';
+    x.font = '700 11px Fraunces';
+    x.fillText(spar('MATCHFIXARNA · TIPSKUPONG', 2), 36, 24);
+    x.font = '800 27px Fraunces';
+    x.textAlign = 'right';
+    x.fillText(spar('Kupong', -0.3), 404, 24);
+    // spelstoppet till höger, på en prickad rad
+    x.fillStyle = tryck;
+    x.textAlign = 'left';
+    x.font = '700 10.5px Fraunces';
+    x.fillText(spar('SPELSTOPP', 1.6), 236, 66);
+    x.textAlign = 'right';
+    x.fillStyle = '#221f1b';
+    x.font = '400 16px Fraunces';
+    x.fillText(spar('–', 0), 404, 66);
+    x.strokeStyle = 'rgba(169,69,43,.45)';
+    x.lineWidth = 1;
+    x.setLineDash([1, 2]);
+    x.beginPath();
+    x.moveTo(236, 77.5);
+    x.lineTo(404, 77.5);
+    x.stroke();
+    // Nr och Match, med prickar under
+    x.fillStyle = tryck;
+    x.textAlign = 'left';
+    x.font = '700 10px Fraunces';
+    x.fillText(spar('NR', 1.6), 36, 97);
+    x.fillText(spar('MATCH', 1.6), 64, 97);
+    x.beginPath();
+    x.moveTo(36, 109.5);
+    x.lineTo(404, 109.5);
+    x.stroke();
+    x.setLineDash([]);
+    // raderna: lagen och dagen skrivs inte på en blankett
+    for (let i = 0; i < 13; i++) {
+      const y = 110 + i * 34;
+      if (i % 2) {
+        x.fillStyle = 'rgba(169,69,43,.055)';
+        x.fillRect(36, y, 368, 34);
+      }
+      x.fillStyle = '#1e1a15';
+      x.fillRect(10, y + 14, 16, 6);
+      x.strokeStyle = 'rgba(169,69,43,.25)';
+      x.beginPath();
+      x.moveTo(36, y + 33.5);
+      x.lineTo(404, y + 33.5);
+      x.stroke();
+      x.fillStyle = tryck;
+      x.textAlign = 'center';
+      x.font = '700 13px Fraunces';
+      x.fillText(spar(String(i + 1), 0), 47, y + 17);
+      ['1', 'X', '2'].forEach((t, j) => {
+        const bx = 260 + j * 50;
+        x.fillStyle = 'rgba(251,247,236,.45)';
+        x.strokeStyle = '#b4664a';
+        x.lineWidth = 1.2;
+        x.beginPath();
+        if (x.roundRect) x.roundRect(bx + 0.6, y + 4.6, 42.8, 24.8, 2);
+        else x.rect(bx + 0.6, y + 4.6, 42.8, 24.8);
+        x.fill();
+        x.stroke();
+        x.globalAlpha = 0.62;
+        x.fillStyle = tryck;
+        x.font = '600 11px Fraunces';
+        x.fillText(t, bx + 22, y + 17.5);
+        x.globalAlpha = 1;
+      });
+    }
+    // tryckeriets rad längs högerkanten, nerifrån och upp
+    x.save();
+    x.translate(W - 8.5, H - 18);
+    x.rotate(-Math.PI / 2);
+    x.globalAlpha = 0.72;
+    x.fillStyle = tryck;
+    x.textAlign = 'left';
+    x.font = '600 7px Fraunces';
+    x.fillText(spar('MATCHFIXARNA AB · BLANKETT 13 · EFTERTRYCK FÖRBJUDES', 1.1), 0, 0);
+    x.restore();
+    x.letterSpacing = '0px';
+  }
+  // Skylten överst: tryckt kartong i bandets färg, med en ljus ram innanför kanten.
+  function skylten(x, w, h) {
+    x.fillStyle = '#c8643a';
+    x.fillRect(0, 0, w, h);
+    x.strokeStyle = '#f1e8d5';
+    x.lineWidth = w * 0.012;
+    x.strokeRect(w * 0.03, w * 0.03, w - w * 0.06, h - w * 0.06);
+    x.fillStyle = '#f6ecd9';
+    x.textAlign = 'center';
+    x.textBaseline = 'alphabetic';
+    const rad = (t, y) => {
+      let px = h * 0.4;
+      x.font = `800 ${px}px Fraunces`;
+      const b = x.measureText(t).width;
+      if (b > w * 0.84) {
+        px *= (w * 0.84) / b;
+        x.font = `800 ${px}px Fraunces`;
+      }
+      x.fillText(t, w / 2, y);
+    };
+    rad('NÄSTA', h * 0.47);
+    rad('OMGÅNG', h * 0.86);
+  }
   function stall(b) {
     const { mesh } = b;
     const D = DISK;
     // skuggan på skivan (inte utanför kanten) och på väggen strax ovanför
     catcher(b, new THREE.PlaneGeometry(D.vagg - D.kant - 6, 240), [-90 * DEG, 0, 0], [(D.kant + 6 + D.vagg) / 2, D.top + 0.05, STALL.z - 40]);
-    catcher(b, new THREE.PlaneGeometry(240, 60), [0, -90 * DEG, 0], [D.vagg - 0.05, D.top + 30, STALL.z - 40], 0.3);
+    catcher(b, new THREE.PlaneGeometry(240, 80), [0, -90 * DEG, 0], [D.vagg - 0.05, D.top + 40, STALL.z - 40], 0.3);
     const g = new THREE.Group();
     g.position.set(STALL.x, D.top, STALL.z);
     g.scale.setScalar(STALL.k);
@@ -915,33 +1049,22 @@ export async function inredning(el, opt = {}) {
     panel(118, 136, -18, 74, -15);
     panel(30, 62, -77, 37, 0, 90 * DEG);
     panel(30, 62, 41, 37, 0, 90 * DEG);
-    const blank = tex(200, 256, (x, w, h) => {
-      x.fillStyle = '#e9dfc6';
-      x.fillRect(0, 0, w, h);
-      x.fillStyle = '#c8643a';
-      x.fillRect(0, 0, w, 30);
-      x.fillStyle = '#f6ecd9';
-      x.font = '700 8px Fraunces';
-      x.fillText('MATCHFIXARNA', 10, 19);
-      x.font = '800 18px Fraunces';
-      x.textAlign = 'right';
-      x.fillText('Kupong', w - 10, 22);
-      for (let i = 0; i < 16; i++) {
-        const ry = 44 + i * 13;
-        x.strokeStyle = 'rgba(138,106,74,.45)';
-        x.beginPath();
-        x.moveTo(12, ry + 8);
-        x.lineTo(96, ry + 8);
-        x.stroke();
-        x.strokeStyle = '#a87650';
-        for (const bx of [112, 140, 168]) x.strokeRect(bx, ry, 20, 9);
-      }
-    });
-    const kup = mat('#fff', { map: blank, roughness: 0.85, side: THREE.DoubleSide });
-    [[-20, -9, -3], [-16, -6, 2], [-18, -3, 0]].forEach(([x, z, rz], i) => {
-      const m = mesh(new THREE.PlaneGeometry(100, 128), kup, g);
-      m.position.set(x, 68 + i * 2, z);
+    // skylten står i en skåra i bakstyckets överkant, med kartongen grå baktill
+    const sk = { w: 150, h: 64 };
+    const skylt = mesh(new THREE.BoxGeometry(sk.w, sk.h, 1.2), [
+      ...Array(4).fill(mat('#a9532f', { roughness: 0.8 })),
+      mat('#fff', { map: tex(600, 256, skylten), roughness: 0.6 }),
+      mat('#9a8f7c', { roughness: 0.9 }),
+    ], g);
+    skylt.position.set(-18, 142 + sk.h / 2 - 5, -15);
+    // kupongerna har smala kupongens mått (420 × 620)
+    const kup = mat('#fff', { map: tex(LATT ? 280 : 420, LATT ? 413 : 620, blankett), roughness: 0.85, side: THREE.DoubleSide });
+    const KH = 122;
+    const kuponger = [[-20, -9, -3], [-16, -6, 2], [-18, -3, 0]].map(([x, z, rz], i) => {
+      const m = mesh(new THREE.PlaneGeometry((KH * 420) / 620, KH), kup, g);
+      m.position.set(x, 66 + i * 2, z);
       m.rotation.set(-10 * DEG, 0, rz * DEG);
+      return m;
     });
     const ror = new THREE.Mesh(new THREE.CylinderGeometry(13, 13, 46, 32, 1, true), plexi);
     ror.position.set(60, 26, 2);
@@ -977,6 +1100,34 @@ export async function inredning(el, opt = {}) {
     tejp.position.set(-17, 48, 16.4);
     tejp.rotation.z = -4 * DEG;
     g.add(tejp);
+
+    // Länken över stället (knappen, som uret): rutan kring kupongerna, skylten
+    // och bakstycket i bild, i planets px. Ett klick tar en kupong för nästa
+    // omgång i handen (go och openStall i rum.js), och duken lyser när man pekar.
+    g.updateMatrixWorld(true);
+    const ram = new THREE.Box3();
+    for (const m of [skylt, ...kuponger]) ram.expandByObject(m);
+    ram.expandByPoint(new THREE.Vector3(-77, 6, 15).applyMatrix4(g.matrixWorld));
+    ram.expandByPoint(new THREE.Vector3(41, 6, 15).applyMatrix4(g.matrixWorld));
+    const { box } = BITAR.stall;
+    let [x0, y0, x1, y1] = [Infinity, Infinity, -Infinity, -Infinity];
+    for (let i = 0; i < 8; i++) {
+      const v = new THREE.Vector3(i & 1 ? ram.max.x : ram.min.x, i & 2 ? ram.max.y : ram.min.y, i & 4 ? ram.max.z : ram.min.z).project(b.cam);
+      const px = box.x + ((v.x + 1) / 2) * box.w;
+      const py = box.y + ((1 - v.y) / 2) * box.h;
+      x0 = Math.min(x0, px);
+      x1 = Math.max(x1, px);
+      y0 = Math.min(y0, py);
+      y1 = Math.max(y1, py);
+    }
+    const lank = document.createElement('a');
+    lank.className = 'rum-stall rum-sak';
+    lank.id = 'rum-stall';
+    lank.setAttribute('role', 'button');
+    lank.tabIndex = 0;
+    lank.setAttribute('aria-label', 'Nästa omgång');
+    Object.assign(lank.style, { left: `${Math.floor(x0)}px`, top: `${Math.floor(y0)}px`, width: `${Math.ceil(x1 - x0)}px`, height: `${Math.ceil(y1 - y0)}px` });
+    planes[0].append(lank);
   }
 
   // ---------- skivan med löpsedlarna ----------
