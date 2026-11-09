@@ -979,6 +979,11 @@ bara lokalt. Analyserna visas som de ligger i `data/analyser.json`; hur de skriv
   och raderna från Kaffe och nedåt låg 17 px lägre än i rummet, utan pappersstrukturen. Nu ritas den efter
   notan i rummet, med baslinjerna mätta där, och får bara ljusets styrka, inte dess färg. Se
   [Hasse Backe](#hasse-backe).
+- **Vitt porslin på pulten och i baren (2026-11-09, användarens önskemål):** "Gör samma sak med fatet och
+  koppen också." Koppen och fatet är samma modell i rummet och i baren, men tog barens ljus med
+  neonskyltens röda och blev persikofärgade bredvid den vita notan. Nu får de, som notan, bara ljusets
+  styrka. (I rummet ser de gråare ut än i baren: det är rummets vinjett, som mörkar hörnet med notan också.)
+  Askkoppen är som förut. Se [Hasse Backe](#hasse-backe), *Kaffet i rummet*.
 - **Hasse Backe spanar på din kupong (2026-11-08, användarens val):** ibland går blicken ned på kupongen,
   med sex olika miner, och när han har sagt vad han tycker om den passar minen orden. Se
   [Hasse Backe](#hasse-backe), *Vilan*.
@@ -5265,7 +5270,8 @@ rummet bredvid var ljust, och sedan låg ett dis i himlens färg över hela bild
 ljuset på honom nästan var detsamma dag som kväll (ändrat 2026-11-06).
 
 **Kaffet i rummet.** Händerna, koppen och notan på pulten är samma som i hans bild, så att man känner
-igen dem när kameran slår över: koppen är bardiskens modell (`byggKopp`) med samma ljus, fatet står
+igen dem när kameran slår över: koppen är bardiskens modell (`byggKopp`) med samma ljus, fast bara dess
+styrka, så att porslinet är vitt som notan och den ritade koppen och inte rosa av neonskylten. Fatet står
 på notans övre vänstra hörn så att namnet syns, och till vänster om fatet ligger hans underarmar korslagda på
 pulten, den vänstra handen över den högra, som i baren ([public/rum-hasse-hand.js](public/rum-hasse-hand.js)).
 Det är samma armar i samma vila (`VILAN` i [public/rum-hasse-arm.js](public/rum-hasse-arm.js), som baren
