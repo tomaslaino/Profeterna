@@ -14,7 +14,7 @@
 // hand: var händerna vilar, kopp: fatets mitt, i rummets mått (1600 × 1000); ljus: baren ljus just nu
 // (ljuset i rum-hasse.js: dag, c, f)
 import * as THREE from 'three';
-import { HAND as HM, VILAN, byggArm, byggKopp, byggSkugga, laddaFoto, laddaHand } from './rum-hasse-arm.js';
+import { HAND as HM, VILAN, byggArm, byggKopp, byggSkugga, laddaFoto, laddaHand, vittTon } from './rum-hasse-arm.js';
 import { disken, franBaren } from './rum-hasse-scen.js';
 import { RUM, L } from './rum-pult.js';
 
@@ -126,7 +126,13 @@ export async function armen(plan, { hand: HAND, kopp: KOPP, pr = 1.5, ljus = nul
   // Fatets skugga faller bort från ljuset, som kommer framifrån till vänster.
   const tex = flack();
   const S2 = new THREE.Scene();
-  const K = byggKopp({ value: new THREE.Vector4(0, 1, -1e9, -1e9), butik: bord.butik, dag: bord.dag, lys: bord.lys, vy: [0, Math.sin(33 * DEG), Math.cos(33 * DEG)] });
+  const KB = { value: new THREE.Vector4(0, 1, -1e9, -1e9), butik: bord.butik, dag: bord.dag, lys: bord.lys, vy: [0, Math.sin(33 * DEG), Math.cos(33 * DEG)] };
+  const K = byggKopp(KB);
+  // Notan under fatet (rum.css) i samma ljus som koppen: papperet tonas som något vitt där (vittTon), så att
+  // det skiftar med dagsljuset som koppen. Bara när koppen här syns (tre); annars är notan som den är ritad.
+  const vit = vittTon(r, KB);
+  const nota = kaffe && kaffe.querySelector('.nota');
+  const tona = (hex) => `rgb(${[1, 3, 5].map((i, k) => Math.round(parseInt(hex.slice(i, i + 2), 16) * vit[k])).join(', ')})`;
   S2.add(K.kopp, K.fat);
   const fs = new THREE.Mesh(new THREE.PlaneGeometry(1, 1), new THREE.MeshBasicMaterial({ map: tex, opacity: 0.85, transparent: true, depthWrite: false, depthTest: false }));
   fs.renderOrder = -1;
@@ -230,6 +236,10 @@ export async function armen(plan, { hand: HAND, kopp: KOPP, pr = 1.5, ljus = nul
     anga();
     // (koppen här ersätter den ritade i rummet, rum.css)
     if (kaffe) kaffe.classList.add('tre');
+    if (nota) {
+      nota.style.setProperty('--nota-a', tona('#f3efe3'));
+      nota.style.setProperty('--nota-b', tona('#e2dbc8'));
+    }
     c.classList.add('klar');
     // det man trycker på: händerna och underarmarna ut till bildkanten
     const hh = hr.hand;
@@ -269,6 +279,6 @@ export async function armen(plan, { hand: HAND, kopp: KOPP, pr = 1.5, ljus = nul
     trumma,
     placera,
     knapp(el) { knapp = el; placera(); },
-    borta() { cancelAnimationFrame(raf); A.borta(); B.borta(); K.borta(); sg.dispose(); r.dispose(); r.forceContextLoss(); c.remove(); if (kaffe) kaffe.classList.remove('tre'); },
+    borta() { cancelAnimationFrame(raf); A.borta(); B.borta(); K.borta(); sg.dispose(); r.dispose(); r.forceContextLoss(); c.remove(); if (kaffe) kaffe.classList.remove('tre'); if (nota) { nota.style.removeProperty('--nota-a'); nota.style.removeProperty('--nota-b'); } },
   };
 }
