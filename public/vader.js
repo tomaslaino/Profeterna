@@ -10,6 +10,7 @@
 //
 //   Vader.hamta() → Promise, klar när vädret är hämtat (eller gissat)
 //   Vader.nu(ms)  → läget just nu, se nu() nedan
+//   Vader.tid()   → klockan i ms (samma som Vader.nu().t, utan vädret)
 //
 // För bilder och prov: ?rum-klocka=2026-12-13T16:00 (eller bara 16:00),
 // ?rum-vader=klart|halvklart|mulet|dimma|dugg|regn|skurar|snoblandat|sno|aska,
@@ -91,7 +92,13 @@ window.Vader = (() => {
   }
   const fixed = klocka();
   const t0 = Date.now();
-  const clock = (ms) => (fixed != null ? fixed + (ms ?? Date.now()) - t0 : ms ?? Date.now());
+  // I en fast bild (?rum-t) står klockan still på ?rum-klocka, annars när sidan laddades:
+  // uret, text-tv:n och utsikten visar samma tid i varje bild.
+  const stilla = q.has('rum-t');
+  const clock = (ms) => {
+    const t = ms ?? (stilla ? t0 : Date.now());
+    return fixed != null ? fixed + t - t0 : t;
+  };
 
   async function hamta() {
     if (q.has('rum-vader') && q.has('rum-grader')) return nu();
@@ -186,5 +193,5 @@ window.Vader = (() => {
     };
   }
 
-  return { hamta, nu, sol };
+  return { hamta, nu, sol, tid: () => clock() };
 })();
