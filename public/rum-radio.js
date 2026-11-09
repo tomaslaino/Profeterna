@@ -11,9 +11,10 @@
 // ren och AM har bara ett svagt sus och något enstaka knäpp. Samma visare går över
 // båda banden, som på en riktig radio, så ett byte av band hamnar sällan på en station.
 //
-// Alla stationer står för hand på tejpen vid skalan (FM ovanför, AM under), och bredvid radion ligger en
-// handskriven lapp med frekvenserna för bandet som spaken står på (lappen: den vänds när spaken slås om).
-// Ett klick på en rad på lappen går dit och sätter på radion. Första gången står visaren på Italo Disco.
+// Alla stationer står för hand på tejpen vid skalan (FM ovanför, AM under), och med frekvenserna på ett
+// blad ur ett spiralblock som är tejpat på fönsterkarmen bredvid radion (lappen, och radiolapp i
+// rum-inredning.js). Ett klick på en rad på bladet går dit och sätter på radion. Första gången står
+// visaren på Italo Disco.
 //
 // Ljudet går genom Web Audio (allt är CORS-öppet, kontrollerat 2026-11-08): AM låter som AM (smalt band
 // och långsam fading), och lysdioderna och högtalarna följer det som faktiskt hörs. Slutar en adress
@@ -22,9 +23,11 @@
 // brus eller prat, och slutar inte förrän fyra sekunder efter att musiken har försvunnit: den som drar i
 // spaken ska inte få dem att börja om. Radion stängs av när man lämnar rummet (av).
 //
-//   RumRadio.mount({ el, fig, now })     när gänget har laddats
+//   RumRadio.mount({ el, fig, now, inr, sak })  när gänget har laddats (inr: inredningen med bladet,
+//                                        sak(namn): kameran går fram till något)
 //   RumRadio.nara(på)                    reglagen läggs över radion (kameran är framme) eller tas bort
-//   RumRadio.ram(b, h, topp, hojd)       närbilden: radion (b × h utan zoom) och lappen bredvid den i fönstret
+//   RumRadio.ram(r, topp, hojd, m, bara) närbilden: radion (r) och bladet (m) i fönstret, eller bara bladet
+//   RumRadio.rad(kanal)                  [frekvensen, namnet] som de står på bladet
 //   RumRadio.kraft()                     POWER: på med bandet som spaken står på, eller av
 //   RumRadio.bandspak('fm' | 'am')       bandspaken (är radion av flyttas bara spaken)
 //   RumRadio.av()                        stäng av
@@ -475,7 +478,6 @@ window.RumRadio = (() => {
     till3d({ band, sist: S.sist, lampa: band === 'av' ? 0 : 1 });
     lyssna();
     knappar();
-    lappBand();
     spara();
   }
   const KLONK = [820, 0.055, 0.65];
@@ -492,7 +494,6 @@ window.RumRadio = (() => {
     S.sist = band;
     till3d({ sist: band });
     knappar();
-    lappBand();
     spara();
   }
   function volym(v) {
@@ -529,7 +530,8 @@ window.RumRadio = (() => {
       + '<div class="r-del r-ratt r-vol" role="slider" tabindex="0" aria-label="Volymen" aria-valuemin="0" aria-valuemax="100"></div>'
       + '<button type="button" class="r-del r-kraft" aria-label="På och av"></button>'
       + '<button type="button" class="r-del r-band"></button>'
-      + `<div class="r-lapp"><div class="r-vand">${lappSida('fm')}${lappSida('am')}</div></div>`;
+      + '<button type="button" class="r-lapp" aria-label="Gå fram till lappen med stationerna" hidden></button>'
+      + `<div class="r-rader" hidden>${KANALER.map((k) => `<button type="button" class="r-st" data-k="${k.id}" aria-pressed="false">${rad(k).join(' ')}</button>`).join('')}</div>`;
     O.el.append(d);
     U.el = d;
     // (reglagen är inget drag i rummet: svepet i rum.js ska inte se dem, och inte stoppa nästa klick)
@@ -541,11 +543,16 @@ window.RumRadio = (() => {
     U.kraft = d.querySelector('.r-kraft');
     U.band = d.querySelector('.r-band');
     U.lapp = d.querySelector('.r-lapp');
-    U.lapp.addEventListener('click', (e) => {
+    U.rader = d.querySelector('.r-rader');
+    U.st = {};
+    for (const b of U.rader.querySelectorAll('.r-st')) U.st[b.dataset.k] = b;
+    U.rader.addEventListener('click', (e) => {
       const b = e.target.closest('.r-st');
       if (b) valj(b.dataset.k);
     });
-    lappBand();
+    // (raderna är för små här: kameran går fram till bladet)
+    U.lapp.addEventListener('click', () => { if (!U.lapp.classList.contains('las') && O.sak) O.sak('radiolapp'); });
+    U.nu = null;
     lappNu();
     U.kraft.addEventListener('click', kraft);
     // bandspaken: upp är FM och ner är AM, och ett tryck slår över den
@@ -685,78 +692,81 @@ window.RumRadio = (() => {
   }
 
   // ---------- lappen ----------
-  // En handskriven lapp bredvid radion med frekvenserna för bandet som spaken står på: FM på framsidan och AM
-  // på baksidan, med samma pennor som på tejpen, och den vänds när spaken slås om. Den står bland reglagen och
-  // syns när kameran är framme. ram() ger närbilden plats för den: bredvid radion eller under, i en, två eller
-  // tre spalter, det som ger den största radion. Ett klick på en rad går dit och sätter på radion, och den
-  // station som hörs är inringad.
+  // Ett blad ur ett spiralblock, tejpat på fönsterkarmen till höger om radion (radiolapp i rum-inredning.js):
+  // stationerna för hand, FM i blått och AM i rött i var sin spalt, och den station som hörs är inringad
+  // (lappNu). Det sitter där från början, och nära radion kommer det med i bilden (ram). Över raderna ligger
+  // genomskinliga knappar när de är stora nog att läsa (LASBAR): ett klick går dit och sätter på radion.
+  // Annars är bladet en knapp som går fram till det (SAKER.radiolapp i rum.js), och där räcker det.
   const frekvens = (k) => (BAND[k.band].steg < 1 ? k.f.toFixed(1).replace('.', ',') : String(k.f));
   // (frekvensen står redan framför namnet: Sport 890 blir Sport och RTL 102.5 blir RTL)
   const lappNamn = (k) => k.namn.split(' ').filter((o) => o.replace(',', '.') !== String(k.f)).join(' ') || k.namn;
-  function lappSida(band) {
-    const rader = KANALER.filter((k) => k.band === band).map((k) => `<li><button type="button" class="r-st" data-k="${k.id}"><span class="r-f">${frekvens(k)}</span>${lappNamn(k)}</button></li>`);
-    return `<div class="r-sida r-${band}"><p class="r-rubrik">${BAND[band].namn}<small>${BAND[band].enhet}</small></p><ol>${rader.join('')}</ol></div>`;
-  }
-  function lappSpalter(n) {
-    for (const ol of U.lapp.querySelectorAll('ol')) ol.style.setProperty('--rader', String(Math.ceil(ol.children.length / n)));
-  }
-  // Närbilden: b × h är rutan runt radion (#rum-radio) utan zoom, och topp och hojd den del av fönstret som
-  // den och lappen får. → zoomen och var radions mitt ska stå i fönstret.
-  function ram(b, h, topp, hojd) {
-    bygg();
+  // en rad på bladet: frekvensen och namnet
+  const rad = (k) => [frekvens(k), lappNamn(k)];
+  // (så här höga måste raderna vara i bilden för att gå att läsa och träffa)
+  const LASBAR = 14;
+  const lapp = () => {
+    const L = O.inr && O.inr() && O.inr().lapp;
+    // (bladet blev klart efter att stationen hittades)
+    if (L && L.sagt !== U.nu) {
+      L.sagt = U.nu;
+      L.nu(U.nu);
+    }
+    return L || null;
+  };
+  // Närbilden: r är rutan runt radion och m bladet, utan zoom och med rummet rakt, och topp och hojd den del
+  // av fönstret som de får. Radion och bladet tillsammans, eller bara bladet (bara: SAKER.radiolapp) när
+  // raderna blir för små bredvid radion. → zoomen och var radions mitt ska stå i fönstret.
+  function ram(r, topp, hojd, m, bara) {
+    if (!r || !m || !m.width) return null;
     const W = innerWidth;
-    const kant = 10;
-    const lucka = Math.round(Math.min(40, Math.max(14, W * 0.022)));
-    const dold = U.el.hidden;
-    U.el.style.visibility = 'hidden';
-    U.el.hidden = false;
-    U.lapp.hidden = false;
-    Object.assign(U.lapp.style, { left: '0px', top: '0px' });
-    let bast = null;
-    // (fler spalter eller lappen under radion bara om radion blir tydligt större av det)
-    const prova = (z, sida, n, m) => { if (z > 0 && (!bast || z > bast.z * 1.03)) bast = { z, sida, n, m }; };
-    for (const n of [1, 2, 3]) {
-      lappSpalter(n);
-      const m = { w: U.lapp.offsetWidth, h: U.lapp.offsetHeight };
-      if (m.h <= hojd) prova(Math.min((W - 2 * kant - lucka - m.w) / b, (hojd * 0.98) / h), true, n, m);
-      if (m.w <= W - 2 * kant) prova(Math.min((W * 0.9) / b, (hojd - lucka - m.h) / h), false, n, m);
+    const kant = 12;
+    const U0 = { left: Math.min(r.left, m.left), top: Math.min(r.top, m.top), right: Math.max(r.right, m.right), bottom: Math.max(r.bottom, m.bottom) };
+    const passa = (q) => Math.min((W - 2 * kant) / (q.right - q.left), (hojd * 0.97) / (q.bottom - q.top));
+    let q = U0;
+    let z = passa(U0);
+    const L = lapp();
+    if (bara && z * m.height * (L ? L.rad : 1 / 33) < LASBAR) {
+      q = m;
+      z = passa(m);
     }
-    U.el.hidden = dold;
-    U.el.style.visibility = '';
-    if (!bast) {
-      U.ram = null;
-      return { zoom: Math.min((W * 0.9) / b, (hojd * 0.98) / h), x: W / 2, y: topp + hojd / 2 };
-    }
-    lappSpalter(bast.n);
-    const { z, m } = bast;
-    U.ram = { sida: bast.sida, m, kant, lucka, topp, hojd };
-    if (bast.sida) return { zoom: z, x: (W - (b * z + lucka + m.w)) / 2 + (b * z) / 2, y: topp + hojd / 2 };
-    return { zoom: z, x: W / 2, y: topp + (hojd - (h * z + lucka + m.h)) / 2 + (h * z) / 2 };
+    const mitt = (x) => [(x.left + x.right) / 2, (x.top + x.bottom) / 2];
+    const [rx, ry] = mitt(r);
+    const [qx, qy] = mitt(q);
+    return { zoom: z, x: W / 2 + (rx - qx) * z, y: topp + hojd / 2 + (ry - qy) * z };
   }
-  // (när kameran är framme: bredvid eller under radion, som ram() har bestämt)
+  // (när kameran är framme: knapparna över raderna, eller över hela bladet)
   function lappPlats() {
-    const q = U.ram;
-    const rr = O.el.querySelector('#rum-radio');
-    U.lapp.hidden = !q || !rr;
-    if (U.lapp.hidden) return;
-    const a = rr.getBoundingClientRect();
-    let x = q.sida ? a.right + q.lucka : (a.left + a.right - q.m.w) / 2;
-    let y = q.sida ? (a.top + a.bottom - q.m.h) / 2 : a.bottom + q.lucka;
-    x = Math.max(q.kant, Math.min(innerWidth - q.kant - q.m.w, x));
-    if (q.sida) y = Math.max(q.topp, Math.min(q.topp + q.hojd - q.m.h, y));
-    Object.assign(U.lapp.style, { left: `${x.toFixed(1)}px`, top: `${y.toFixed(1)}px` });
-  }
-  function lappBand() {
-    if (!U.lapp) return;
-    U.lapp.dataset.band = S.sist;
-    for (const b of Object.keys(BAND)) U.lapp.querySelector(`.r-${b}`).inert = b !== S.sist;
+    const L = lapp();
+    if (!U.rader || !L) {
+      if (U.rader) U.rader.hidden = U.lapp.hidden = true;
+      return;
+    }
+    const c = L.canvas.getBoundingClientRect();
+    const ruta = (el, [l, t, h, b]) => Object.assign(el.style, { left: `${(c.left + l * c.width).toFixed(1)}px`, top: `${(c.top + t * c.height).toFixed(1)}px`, width: `${((h - l) * c.width).toFixed(1)}px`, height: `${((b - t) * c.height).toFixed(1)}px` });
+    let minst = Infinity;
+    for (const { id, r } of L.rader()) {
+      const b = U.st[id];
+      if (!b) continue;
+      ruta(b, r);
+      minst = Math.min(minst, (r[3] - r[1]) * c.height);
+    }
+    // (bladet ligger under raderna: ett tryck bredvid dem lämnar inte närbilden)
+    const las = minst >= LASBAR;
+    U.rader.hidden = !las;
+    U.lapp.hidden = false;
+    U.lapp.classList.toggle('las', las);
+    U.lapp.tabIndex = las ? -1 : 0;
+    U.lapp.setAttribute('aria-hidden', String(las));
+    ruta(U.lapp, L.sida());
   }
   function lappNu() {
-    if (!U.lapp) return;
     const nu = S.band !== 'av' && A.narmast && A.s > 0.5 ? A.narmast.id : '';
+    // (bladet kan ha blivit klart sedan förra gången)
+    lapp();
     if (U.nu === nu) return;
     U.nu = nu;
-    for (const b of U.lapp.querySelectorAll('.r-st')) b.classList.toggle('nu', b.dataset.k === nu);
+    lapp();
+    if (U.st) for (const [id, b] of Object.entries(U.st)) b.setAttribute('aria-pressed', String(id === nu));
   }
 
   function mount(o) {
@@ -798,5 +808,5 @@ window.RumRadio = (() => {
     ctx: A.ctx && A.ctx.state,
   });
 
-  return { BAND, KANALER, mount, nara, placera, ram, av, prova, lage, valj, kraft, bandspak, volym };
+  return { BAND, KANALER, rad, mount, nara, placera, ram, av, prova, lage, valj, kraft, bandspak, volym };
 })();

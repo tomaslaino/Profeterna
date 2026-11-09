@@ -752,6 +752,13 @@ bara lokalt. Analyserna visas som de ligger i `data/analyser.json`; hur de skriv
   bandspaken slås om. Ett klick på en rad går dit, och den som hörs är inringad. Orden under radion är borta.
   Frekvenserna fick inte plats på tejpen: där trängs AM-stationerna 610–999 (14 av 21) på en tredjedel av
   skalan, och namnen står redan långt från sina frekvenser. Se [Tobaksaffären](#tobaksaffären), *Radion*.
+- **Lappen blir ett blad ur ett spiralblock på fönsterkarmen (2026-11-09, användarens önskemål):** "Kan du göra
+  det här betydligt snyggare – inklusive var den är placerad. Kanske som nån post-it vid stereon eller nåt?" och
+  "Gör det också tydligt att det är papperskvalitet". Av tre skisser på karmen bredvid radion (post-it, blad ur
+  spiralblock, en bit av en cigarettlimpa) valdes spiralblocket: ett rivet blad i 3D med halva spiralhål, blå
+  linjer, röd marginal, vikning, gulnad tejp och en skugga där det släpper från karmen, med FM i blått och AM i
+  rött i var sin spalt. Det sitter där hela tiden och vänds inte längre. Se [Tobaksaffären](#tobaksaffären),
+  *Radion*.
 - **Man väljer sig själv med ett klick på sin figur (2026-11-03, användarens önskemål):**
   ett klick på sin egen figur vid bordet gör en till den som fyller i kupongen – samma val
   som porträtten på kupongen – och figuren räcker upp handen med pennan, lyfter kupongen mot
@@ -3073,13 +3080,19 @@ station drar radion in den, och en liten röd lampa säger att den stämmer. Mel
 också knaster och en pipton som sjunker tills man står rätt. AM låter dessutom som AM: smalt band och långsam
 fading, som också syns på lampan. Lysdioderna och högtalarna följer det som faktiskt hörs (en analysator i
 Web Audio). Alla stationer står för hand på maskeringstejpen vid skalan (FM ovanför i blått, AM under i rött, två
-rader där varannan står närmast skalan, `tejpPlats`). Där trängs de, så frekvenserna står på en handskriven lapp
-bredvid radion (`lappen` i rum-radio.js): bandet som spaken står på, med tejpens penna på linjerat papper, FM på
-framsidan och AM på baksidan, och den vänds när spaken slås om. Namnet står som stationen heter, utan frekvensen
-en gång till (*890 Sport*, *102,5 RTL*). Ett klick på en rad går dit och sätter på radion, och den station som hörs
-är inringad. Lappen syns när kameran är framme, och närbilden ger plats åt den (`RumRadio.ram`, `ram` i `SAKER` i
-rum.js): bredvid radion eller under den, i en, två eller tre spalter, det som ger den största radion (en spalt
-bredvid i en stor datorskärm, två under på telefonen på höjden och tre bredvid på tvären). Första gången står
+rader där varannan står närmast skalan, `tejpPlats`). Där trängs de, så frekvenserna står på ett blad ur ett
+spiralblock som är tejpat på fönsterkarmen till höger om radion, mellan radion och veckans löpsedel (`radiolapp` i
+rum-inredning.js, en egen duk i bakväggens plan, så att det sitter fast på karmen när rummet vrids). Bladet är i
+3D: rivet ur spiralen med halva hål, blå linjer och röd marginal, vikt en gång, två bitar gulnad tejp överst, och
+nedtill släpper det från karmen (mest i hörnet) med en skugga under. Papperet har samma struktur som allt papper
+på sajten (rum/papper.webp), fibrer och en kaffering, och mörknar med rummet när lysröret släcks. FM står i blått
+och AM i rött, i var sin spalt, med samma penna som på tejpen. Namnet står som stationen heter, utan frekvensen en
+gång till (*890 Sport*, *102,5 RTL*), och den station som hörs ringas in med pennan (ett streck i 3D, `nu`). Nära
+radion kommer bladet med i bilden (`RumRadio.ram`, `med` i `SAKER` i rum.js: radion och bladet mäts med rummet
+rakt). Där ligger genomskinliga knappar över raderna (`lappen` i rum-radio.js) när de är minst 14 px höga: ett
+klick går dit och sätter på radion. Är de mindre (telefonen) går ett tryck på bladet fram till det
+(`SAKER.radiolapp`: bara bladet, och Tillbaka går till radion igen). Ett klick på bladet i rummet går också dit,
+vilket på en datorskärm är samma bild som radion. Första gången står
 visaren på Italo Disco. Visaren och volymen sparas i webbläsaren, och radion är var och ens egen: den syns inte
 hos de andra och stängs av när man lämnar rummet.
 
