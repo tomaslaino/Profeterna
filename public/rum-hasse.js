@@ -560,6 +560,11 @@ window.RumHasse = (() => {
         H.vanaT = ms + VANA[0] + Math.random() * (VANA[1] - VANA[0]);
         vana();
       }
+      // mitt i omgången: har ställningen ändrats sedan sist (stallningSteg)
+      if (ms > (H.stallningT || 0)) {
+        H.stallningT = ms + 5000;
+        stallningSteg();
+      }
       const ror = H.klipp || H.ko.length || (H.sagt && !H.sagt.klar) || H.fig.ror();
       if (ms - last < takt(ror)) return;
       const dt = last ? Math.min(0.1, (ms - last) / 1000) : 0;
@@ -758,6 +763,15 @@ window.RumHasse = (() => {
     const g = p && p.vem && p.s.gang && p.s.gang.find((x) => x.id === p.vem);
     return g && g.namn ? g.namn.trim().split(/\s+/).pop() : '';
   }
+  // Vad klockan säger när man kommer: 'bradskar' när det är mindre än 90 minuter till första avsparken,
+  // 'natt' 00–05, 'morgon' 05–08, 'kvall' 22–24 (i Stockholm), annars null.
+  function tidNu(lista) {
+    const nu = Date.now();
+    const forsta = Math.min(...lista.map((m) => Date.parse(m.avspark)));
+    if (forsta > nu && forsta - nu < 90 * 60000) return 'bradskar';
+    const h = Number(new Intl.DateTimeFormat('sv-SE', { timeZone: 'Europe/Stockholm', hour: '2-digit', hourCycle: 'h23' }).format(nu));
+    return h < 5 ? 'natt' : h < 8 ? 'morgon' : h >= 22 ? 'kvall' : null;
+  }
   // När spelstoppet är: på lördag, i morgon, i dag. Tomt om det är passerat.
   function spelstopp(lista) {
     const nu = Date.now();
@@ -820,6 +834,13 @@ window.RumHasse = (() => {
   }
   function smatt() {
     if (spana()) return;
+    // när radion spelar musik trummar han med fingrarna eller nickar med oftare
+    const r = radioNu();
+    if (r && r.musik && Math.random() < 0.6) {
+      if (Math.random() < 0.7) H.fig.trumma(Math.random() < 0.5 ? 'varv' : 'lugnt', 'B');
+      else gest('nicka');
+      return;
+    }
     if (!SMATT_L.length) SMATT_L.push('trumma', 'trumma', ...grupp('smatt'));
     const namn = lott(SMATT_L);
     if (namn === 'trumma') H.fig.trumma(TRUMSATT[Math.floor(Math.random() * TRUMSATT.length)], 'B');
@@ -1310,13 +1331,54 @@ window.RumHasse = (() => {
   // En rad överst: det han frågar eller säger mellan analyserna.
   const rad = (text, sen) => repliker([{ text }], { i: $('.rh-sagt'), sen, rad: true, direkt: calm() });
   // Rader som kommer med jämna mellanrum medan han väntar på en.
+  // En rad kan vara en funktion, som tar fram texten när den sägs: en text, eller { lista, gest } med flera
+  // repliker efter varandra och en gest efteråt (ställningen nedan), eller null om det inte finns något att
+  // säga just då. Ett mål medan man sitter där (H.malKo) går före, så snart han har sagt klart.
   function pratSteg(ms) {
+    if (H.klipp || H.ko.length || (H.sagt && !H.sagt.klar)) return;
     const v = H.prat;
-    if (!v || ms < v.nasta || H.klipp || H.ko.length || (H.sagt && !H.sagt.klar)) return;
+    if (H.malKo && H.malKo.length) {
+      sagRader(H.malKo.shift());
+      if (v) v.nasta = Math.max(v.nasta, ms + v.gang);
+      return;
+    }
+    if (!v || ms < v.nasta) return;
     if (v.i >= v.rader.length) { H.prat = null; return; }
+    // (går radion i rummet säger han något om den, en gång per station, i stället för nästa rad)
+    const radio = omRadion();
+    if (radio) {
+      sagRader(radio);
+      v.nasta = ms + v.gang;
+      return;
+    }
     const r = v.rader[v.i++];
-    rad(typeof r === 'function' ? r() : r);
-    v.nasta = ms + v.gang;
+    const x = typeof r === 'function' ? r() : r;
+    if (x) sagRader(x);
+    v.nasta = ms + (x ? v.gang : 500);
+  }
+  // Radion på fönsterbänken (rum-radio.js) hörs också här. Står den på en station säger han något om den
+  // (radio i rum-hasse-repliker.js) och nickar med, och mellan stationerna något om bruset; en gång per
+  // station så länge sidan är öppen. → { lista, gest } eller null
+  function radioNu() {
+    const R = window.RumRadio;
+    const l = R && R.lage ? R.lage() : null;
+    if (!l || l.band === 'av') return null;
+    if (!l.kanal) return { id: 'brus', musik: false };
+    const k = (R.KANALER || []).find((x) => x.id === l.kanal);
+    return l.hors && k ? { id: k.id, musik: Boolean(k.musik) } : null;
+  }
+  function omRadion() {
+    const r = radioNu();
+    const rader = r && REP().radio && REP().radio[r.id];
+    if (!rader || !rader.length) return null;
+    H.radioSagt = H.radioSagt || new Set();
+    if (H.radioSagt.has(r.id)) return null;
+    H.radioSagt.add(r.id);
+    return { lista: [{ text: lott(rader) }], gest: r.musik ? 'nicka' : 'brynet' };
+  }
+  function sagRader(x) {
+    if (typeof x === 'string') { rad(x); return; }
+    repliker(x.lista, { i: $('.rh-sagt'), rad: true, direkt: calm(), sen: x.gest ? () => gest(x.gest) : null });
   }
 
   // ---------- en match i taget ----------
@@ -1458,18 +1520,23 @@ window.RumHasse = (() => {
     const lista = kupongen();
     const fragat = minns(lista);
     const nu = Date.now();
+    const igang = lista.some((m) => Date.parse(m.avspark) <= nu);
+    const borjat = lista.length && !lista.some((m) => Date.parse(m.avspark) > nu);
     s.innerHTML = '<h2 class="rh-sagt"></h2><div class="rh-lista"></div>';
     const forsta = listan(lista, fragat);
-    const forstaText = forstaRad(lista, fragat, forst);
+    // Mitt i omgången, när det finns en ställning att tala om, säger han hur det står (stallningen nedan) i
+    // stället för att be en välja match. Spelstoppet har då varit: Stryktipset stänger vid första avsparken.
+    const iSpel = igang && !borjat && pagarNagot(lista);
+    const forstaText = iSpel ? null : forstaRad(lista, fragat, forst);
     if (forstaText) rad(forstaText);
-    const dag = spelstopp(lista);
-    H.prat = lista.length && forsta ? vantar(REP().ledig, 8, 14000, dag) : null;
+    const dag = igang ? '' : spelstopp(lista);
+    const ledigt = () => (lista.length && forsta ? vantar(REP().ledig, 8, 14000, dag) : null);
+    H.prat = iSpel ? null : ledigt();
     // När omgången har börjat står alla hans tips på raderna (hansRader), och när alla matcher har börjat
     // säger han hur det gick. Öppnar man honom medan rummet laddas kan matcherna och säsongen komma
     // efter samtalet: då ritas listan om, och han säger det först då.
-    const igang = lista.some((m) => Date.parse(m.avspark) <= nu);
-    const borjat = lista.length && !lista.some((m) => Date.parse(m.avspark) > nu);
     const vem = H.fraga;
+    H.listan = null;
     const vanta = datan(igang);
     const fram = (tips) => {
       if (H.fraga !== vem || H.fas !== 'fraga') return;
@@ -1477,8 +1544,17 @@ window.RumHasse = (() => {
       const topp = l.scrollTop;
       listan(lista, fragat, tips);
       l.scrollTop = topp;
+      // (ställningen följs medan han sitter där: stallningSteg)
+      if (igang) {
+        H.listan = { vem, lista, fragat, tips, borjat };
+        stallningSteg();
+      }
       // (efter omgången säger han inget om hur det gick för honom: då dömer han gänget)
       if (borjat && !summan()) efterat(lista, tips);
+      else if (iSpel && !lagetNu(lista, tips)) {
+        rad(forstaRad(lista, fragat, forst));
+        H.prat = ledigt();
+      }
     };
     if (igang) Promise.resolve(vanta).then(() => hansRader(lista, fragat)).then(fram);
     else if (vanta) vanta.then(() => fram(fragat));
@@ -1519,8 +1595,9 @@ window.RumHasse = (() => {
     const s = $('.rh-samtal');
     const l = s.querySelector('.rh-lista');
     const nu = Date.now();
-    const facit = new Map(lista.map((m) => [m.id, slutade(m, nu)]));
-    const medFacit = [...facit.values()].some(Boolean);
+    // (i matcher som pågår står ställningen i samma spalt, och spalten heter Ställning så länge)
+    const facit = new Map(lista.map((m) => [m.id, slutade(m, nu) || star(m, nu)]));
+    const medFacit = [...facit.values()].some((f) => f && f.star) ? 'star' : [...facit.values()].some(Boolean);
     // (med din spalt också blir det trångt: då står spalterna tätare)
     s.classList.toggle('tre', medFacit && K().kan());
     const kol = s.querySelector('.rh-kol');
@@ -1533,7 +1610,7 @@ window.RumHasse = (() => {
       b.type = 'button';
       const f = facit.get(m.id);
       // (det du har på raden står för hand längst ut, i en egen spalt)
-      b.innerHTML = `<i>${i + 1}</i><span>${esc(m.namn)}</span>${hansTips(tips[m.id], f)}${medFacit ? facitRuta(f) : ''}${K().kan() ? `<u>${esc(K().din(m.id))}</u>` : ''}`;
+      b.innerHTML = `<i>${i + 1}</i><span>${esc(m.namn)}</span>${hansTips(tips[m.id], f && !f.star ? f : null)}${medFacit ? facitRuta(f) : ''}${K().kan() ? `<u>${esc(K().din(m.id))}</u>` : ''}`;
       b.disabled = Date.parse(m.avspark) <= nu;
       // (en match som har börjat går inte att fråga om, men hans tips ska gå att läsa)
       b.classList.toggle('spelad', Boolean(f) || b.disabled);
@@ -1580,8 +1657,15 @@ window.RumHasse = (() => {
     const s = r.state === 'final' && r.res != null && ((r.m && r.m.score90) || r.score);
     return s ? { h: s.home, b: s.away, utfall: r.res } : null;
   }
+  // Ställningen i en match som pågår: { h, b, star: true }, eller null (inte i gång, slut eller dold).
+  function star(m, nu = Date.now()) {
+    if (typeof gradeRow !== 'function') return null;
+    const r = gradeRow({ id: m.id, sign: '1X2', label: m.namn }, nu);
+    return r.state === 'live' && r.score ? { h: r.score.home, b: r.score.away, star: true } : null;
+  }
   // Rutan i spalten Facit, med strecket mitt i spalten som i hans resultat. Tom på rader som inte har slutat.
-  const facitRuta = (f) => `<b class="rh-facit">${f ? `<span class="rh-vh">Slutade </span><i>${esc(f.h)}</i>–<i>${esc(f.b)}</i>` : ''}</b>`;
+  // En match som pågår har sin ställning där, i kursiv (star).
+  const facitRuta = (f) => `<b class="rh-facit${f && f.star ? ' star' : ''}">${f ? `<span class="rh-vh">${f.star ? 'Står ' : 'Slutade '}</span><i>${esc(f.h)}</i>–<i>${esc(f.b)}</i>` : ''}</b>`;
   // Vem som säger vad, överst i listan: Hasse (porträtt och namn i guld) över hans rutor och
   // resultat, du (porträtt i din färg och namnet i din handstil, som på kupongen) över det du har.
   // Huvudet är byggt som en rad, med osynliga rutor som håller bredden, så att det står mitt över
@@ -1604,7 +1688,7 @@ window.RumHasse = (() => {
         ? `<u><span class="rh-vem du k${i}"><span class="rh-ans"${g.bild ? ` style="background-image: url('${esc(g.bild)}')"` : ''}></span><span class="rh-namn">${esc(namn)}</span></span></u>`
         : '<u><span class="rh-vem du"><span class="rh-namn">Du</span></span></u>';
     }
-    const slut = medFacit ? '<b class="rh-facit"><span class="rh-vem facit">Facit</span></b>' : '';
+    const slut = medFacit ? `<b class="rh-facit"><span class="rh-vem facit">${medFacit === 'star' ? 'Ställning' : 'Facit'}</span></b>` : '';
     return `<div class="rh-kol" aria-hidden="true">${hans}${slut}${din}</div>`;
   }
   // Huvudet lika brett som raderna (en rullningslist tar plats i listan), och namnen bara när de
@@ -1637,6 +1721,9 @@ window.RumHasse = (() => {
     const namn = dittNamn();
     if (forst) {
       if (!kvar) return hela || !r.allaKvar ? lott(r.allaIgen) : enAv(r.allaKvar);
+      // (vad klockan är: strax före spelstopp alltid, annars ibland)
+      const tid = hela && tidNu(oppna);
+      if (tid && r.tid && r.tid[tid] && (tid === 'bradskar' || Math.random() < 0.5)) return lott(r.tid[tid]);
       // (ibland säger han ett namn som nästan stämmer)
       const kallad = namn && Math.random() < 0.25 ? kallar(namn, String(Math.random()), 1) : namn;
       if (n) return fyll(lott(namn ? r.tillbakaNamn : r.tillbaka), { namn: kallad });
@@ -1709,6 +1796,11 @@ window.RumHasse = (() => {
     // (en äldre rum-hasse-repliker.js i cachen har inga rader om det)
     const g = e && hurDetGick(lista, tips);
     if (!g) return;
+    // medan matcherna pågår säger han hur det står (ställningen nedan)
+    if (g.lage === 'pagar' && lagetNu(lista, tips, e.pagar)) {
+      H.upptagen = false;
+      return;
+    }
     // har det gått dåligt läser han tidningen (tidningen nedan)
     upptagen(g.lage === 'inget' ? 'inget' : g.plats === 'worst' ? 'sist' : g.lage === 'daligt' ? 'daligt' : null);
     const rader = e[g.lage];
@@ -1722,6 +1814,150 @@ window.RumHasse = (() => {
     const sedan = g.exakt ? [fyll(lott(e.exakt), { res: g.exakt })] : [];
     for (let i = plats ? 4 : 3; i > 0; i--) sedan.push(lott(rader));
     H.prat = { rader: sedan, i: 0, nasta: performance.now() + 20000, gang: 20000 };
+  }
+
+  // ---------- ställningen ----------
+  //
+  // Medan matcherna pågår (liveställningen, KP.live i kupong.js) står ställningen i listan, och han säger hur
+  // många av hans tecken som sitter just nu och vad han tycker om det (stallning.ratt och läget), och sedan
+  // då och då ställningen i en match i taget med en kommentar. Går det emot honom är det matchen som har
+  // fel. Blir det mål i någon av hans matcher medan man sitter där säger han det så snart han har pratat
+  // klart (malKo i pratSteg). Ställningen i ord står med korta lagnamn och sägs tyst (rösten kan inte ha alla
+  // lag och ställningar); kommentaren efter hörs. Har du valt att dölja resultat säger han inget om det.
+  const SAGT_KORT = { "Nott'm Forest": 'Forest', 'Man City': 'City', 'Man Utd': 'United', 'Sheff Utd': 'Sheffield United', 'Sheff Wed': 'Sheffield Wednesday' };
+  const lagKort = (n) => {
+    const k = window.Papper && Papper.kort ? Papper.kort(n) : String(n || '');
+    return SAGT_KORT[k] || k;
+  };
+  // (Birmingham–Swansea, men West Brom – Millwall; ordfogarna runt strecket håller ihop raden)
+  const matchNamn = (h, b) => (/\s/.test(h + b) ? `${h} – ${b}` : `${h}\u2060–\u2060${b}`);
+  // Har någon match i listan en ställning (pågår eller har slutat) som inte är dold?
+  function pagarNagot(lista) {
+    if (typeof gradeRow !== 'function') return false;
+    const nu = Date.now();
+    return lista.some((m) => {
+      const r = gradeRow({ id: m.id, sign: '1X2', label: m.namn }, nu);
+      return (r.state === 'live' || r.state === 'final') && r.score;
+    });
+  }
+  // Hans rader med en ställning: { rader: [{ m, r, pa, live }], ratt, av, live }, { dolt: true } om någon
+  // av dem är dold, eller null.
+  function levande(lista, tips) {
+    if (typeof gradeRow !== 'function') return null;
+    const nu = Date.now();
+    const rader = [];
+    for (const m of lista) {
+      const tecken = String(tips[m.id] || '').split(' ')[0];
+      if (!tecken) continue;
+      const r = gradeRow({ id: m.id, sign: tecken, label: m.namn }, nu);
+      if (r.state === 'hidden') return { dolt: true };
+      if ((r.state === 'live' || r.state === 'final') && r.score && r.res != null && r.m) rader.push({ m, r, pa: Boolean(r.hit), live: r.state === 'live' });
+    }
+    return { rader, ratt: rader.filter((x) => x.pa).length, av: rader.length, live: rader.filter((x) => x.live) };
+  }
+  // Hur det står till, som i hurDetGick: rätten mot vad chanserna var värda.
+  function stallningsLage(l) {
+    if (l.av >= 2 && l.ratt === l.av) return 'alla';
+    const p = l.rader.map((x) => Math.min(0.99, Math.max(0.01, (x.r.p == null ? 50 : x.r.p) / 100)));
+    const spridning = Math.sqrt(p.reduce((a, q) => a + q * (1 - q), 0));
+    const z = spridning ? (l.ratt - p.reduce((a, q) => a + q, 0)) / spridning : 0;
+    return z >= BRA && l.ratt * 2 > l.av ? 'bra' : z <= -BRA ? 'daligt' : 'mitten';
+  }
+  // Ställningen i en match och hans kommentar. → { lista, gest }
+  function omMatchen(x) {
+    const S = REP().stallning;
+    const s = x.r.score;
+    const h = lagKort(x.r.m.home);
+    const b = lagKort(x.r.m.away);
+    const lika = s.home === s.away;
+    const o = {
+      match: matchNamn(h, b), lag: s.home > s.away ? h : b, mot: s.home > s.away ? b : h,
+      // (den som leder först: Burnley leder med 2–0)
+      res: lika ? `${s.home}–${s.away}` : `${Math.max(s.home, s.away)}–${Math.min(s.home, s.away)}`,
+    };
+    const dom = x.pa ? (lika && x.r.sign.length === 1 ? [...S.haller, ...S.hallerLika] : S.haller) : lika ? S.emotLika : S.emot;
+    return { lista: [{ text: fyll(lott(lika ? S.lika : S.leder), o), paus: 1400 }, { text: lott(dom) }] };
+  }
+  // En match i taget, helst en som pågår och som han inte har tagit nyss. → { lista } eller null
+  function enMatch(lista, tips) {
+    const l = levande(lista, tips);
+    if (!l || l.dolt || !l.av) return null;
+    const val = l.live.length ? l.live : l.rader;
+    H.stallningSagt = H.stallningSagt || new Set();
+    let kvar = val.filter((x) => !H.stallningSagt.has(x.m.id));
+    if (!kvar.length) {
+      H.stallningSagt.clear();
+      kvar = val;
+    }
+    const x = kvar[Math.floor(Math.random() * kvar.length)];
+    H.stallningSagt.add(x.m.id);
+    return omMatchen(x);
+  }
+  // Han säger hur det står och pratar sedan om en match i taget, med extra (efter.pagar) emellan.
+  // → false om det inte finns någon ställning att tala om.
+  function lagetNu(lista, tips, extra = null) {
+    const S = REP().stallning;
+    // (en äldre rum-hasse-repliker.js i cachen har inga rader om det)
+    const l = S && levande(lista, tips);
+    if (!l || l.dolt || !l.av) return false;
+    const lage = stallningsLage(l);
+    const tal = REP().tal;
+    // (med en enda match att räkna blir det "en rätt av en": då tar han den matchen direkt)
+    if (l.av < 2) sagRader(enMatch(lista, tips));
+    else {
+      repliker([{ text: fyll(lott(S.ratt), { ratt: tal[l.ratt], av: tal[l.av] }), paus: 1500 }, { text: lott(S[lage]) }],
+        { i: $('.rh-sagt'), rad: true, direkt: calm(), sen: () => gest({ alla: 'skrocka', bra: 'skrocka', mitten: 'brynet', daligt: 'suck' }[lage]) });
+    }
+    const match = () => enMatch(lista, tips) || (extra ? lott(extra) : null);
+    const rader = [match, match, extra ? () => lott(extra) : match, match, match, match];
+    H.prat = { rader, i: 0, nasta: performance.now() + 20000, gang: 20000 };
+    return true;
+  }
+  // Var femte sekund medan listan syns mitt i omgången: har något ändrats ritas listan om, och har det blivit
+  // mål i någon av hans matcher säger han det. När den sista matchen har slutat säger han hur det gick.
+  function stallningSteg() {
+    const v = H.listan;
+    if (!v || !H.on || H.fraga !== v.vem || H.fas !== 'fraga' || !REP().stallning) return;
+    const l = levande(v.lista, v.tips);
+    if (!l || l.dolt) return;
+    const ny = new Map(l.rader.map((x) => [x.m.id, { h: x.r.score.home, b: x.r.score.away, live: x.live }]));
+    const forut = v.stand;
+    v.stand = ny;
+    if (!forut) return;
+    let andrat = ny.size !== forut.size;
+    let mal = null;
+    for (const x of l.rader) {
+      const a = forut.get(x.m.id);
+      const b = ny.get(x.m.id);
+      if (!a || a.h !== b.h || a.b !== b.b || a.live !== b.live) andrat = true;
+      // (mål i en match som har hunnit sluta säger han inget om: då säger han hur det gick)
+      if (a && b.live && b.h + b.b > a.h + a.b) mal = { x, a, b };
+    }
+    if (!andrat) return;
+    const lst = $('.rh-lista');
+    if (lst) {
+      const topp = lst.scrollTop;
+      listan(v.lista, v.fragat, v.tips);
+      lst.scrollTop = topp;
+    }
+    if (mal) {
+      // Hur många mål som fattas till hans tecken (in) och till något annat (ut), före och efter målet: för
+      // honom när det fattas färre till hans tecken eller fler till något annat, lugn när tecknet sitter ändå,
+      // och fel annars.
+      const S = REP().stallning;
+      const { x, a, b } = mal;
+      const avstand = (s, o) => (o === 0 ? Math.max(0, s.b - s.h + 1) : o === 1 ? Math.abs(s.h - s.b) : Math.max(0, s.h - s.b + 1));
+      const fattas = (s, hans) => Math.min(Infinity, ...[0, 1, 2].filter((o) => x.r.sign.includes(KORT[o]) === hans).map((o) => avstand(s, o)));
+      const hur = fattas(b, true) < fattas(a, true) || (!fattas(b, true) && fattas(b, false) > fattas(a, false)) ? 'malBra' : !fattas(b, true) ? 'malLugn' : 'malFel';
+      const match = matchNamn(lagKort(x.r.m.home), lagKort(x.r.m.away));
+      H.malKo = [{ lista: [{ text: fyll(lott(S.mal), { match, res: `${b.h}–${b.b}` }), paus: 1400 }, { text: lott(S[hur]) }], gest: { malBra: 'skrocka', malLugn: 'smacka', malFel: 'brynet' }[hur] }];
+    }
+    // den sista matchen har slutat: hur det gick (efterat), en gång
+    const pagade = [...forut.values()].some((x) => x.live);
+    if (v.borjat && pagade && !l.live.length && !summan()) {
+      H.malKo = null;
+      efterat(v.lista, v.tips);
+    }
   }
 
   // ---------- tidningen ----------

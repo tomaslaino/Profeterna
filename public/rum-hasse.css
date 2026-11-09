@@ -73,6 +73,9 @@
 .rh-facit { flex: none; align-self: center; display: grid; grid-template-columns: 1fr auto 1fr; gap: 0.12em; width: 2.4em; margin-left: 0.75em; font-weight: 700; color: #f6efdc; white-space: nowrap; }
 .rh-facit i { font-style: normal; text-align: right; }
 .rh-facit i + i { text-align: left; }
+/* ställningen i en match som pågår: kursiv och lite svagare, för den är inte facit än */
+.rh-facit.star { font-weight: 500; color: rgba(246, 239, 220, 0.74); }
+.rh-facit.star i { font-style: italic; }
 .rh-lista button.spelad > i, .rh-lista button.spelad > span { color: rgba(246, 239, 220, 0.62); }
 .rh-lista button.spelad .rh-tips small { color: rgba(246, 239, 220, 0.62); }
 .rh-lista button.spelad .rh-tips small.exakt { color: #ffd86b; }
