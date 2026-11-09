@@ -496,10 +496,12 @@ window.RumHasse = (() => {
     H.on = true;
     H.oppnar = false;
     H.T = 0;
+    // (har det gått dåligt för honom läser han redan när man kommer)
+    if (H.upptagen) lasNu();
     // rummet står still medan man tittar åt hans håll, och rätar upp sig efter musen på vägen
     if (window.Rum && Rum.vila) Rum.vila(true);
     Object.assign(H.world.style, { transition: 'transform 0.2s ease-out, translate 0.2s ease-out, rotate 0.2s ease-out', translate: 'none', rotate: 'none', transform: 'translateZ(-330px) rotateX(0deg) rotateY(0deg) translateZ(330px)' });
-    H.fig.rita(0, performance.now() / 1000);
+    H.fig.rita(H.T, performance.now() / 1000);
     H.svanger = true;
     H.rum.classList.add('hasse-pan');
     if (calm()) { tona(1, framme); return; }
@@ -547,6 +549,11 @@ window.RumHasse = (() => {
       if (ms > H.trum) {
         H.trum = ms + SMATT[0] + Math.random() * (SMATT[1] - SMATT[0]);
         if (!calm() && !H.klipp && !H.ko.length && !H.fig.ror() && (!H.sagt || H.sagt.klar) && ['fraga', 'val', 'klar'].includes(H.fas)) smatt();
+      }
+      // och när det har gått dåligt för honom tar han fram tidningen igen efter en stund (upptagen)
+      if (H.upptagen && ms > H.lasT && !H.klipp && !H.ko.length && !H.fig.ror() && (!H.sagt || H.sagt.klar) && ['fraga', 'val', 'klar'].includes(H.fas)) {
+        H.lasT = ms + 1e9;
+        gest(ettAv('lasa', 'lasa'));
       }
       // och ibland njuter han av kaffet eller tar cigarren ur askkoppen, varannan gång
       if (ms > H.vanaT && !H.klipp && !H.ko.length && !H.fig.ror() && (!H.sagt || H.sagt.klar) && ['fraga', 'val', 'klar'].includes(H.fas)) {
@@ -847,6 +854,15 @@ window.RumHasse = (() => {
     // (och inför att han skriver på din kupong, och när han suddar ut det han skrev)
     const fort = (k.skynda && (H.ko.length || ((k.grupp === 'smatt' || k.grupp === 'spana') && H.sagt && !H.sagt.klar))) || (H.ko.length && H.ko[0].brad) || k.bort;
     H.T = Math.min(k.till, H.T + dt * (fort ? 2.5 : 1));
+    // Tidningen: väntar något annat lägger han ned den vid nästa gräns mellan bitarna (slag), där han läser
+    // som vanligt, och hoppar direkt till ned (lasa i rum-hasse-3d.js).
+    if (k.slag && H.ko.length && !k.nerNu) {
+      const a = T0 - k.fran;
+      const b = H.T - k.fran;
+      const g = k.slag.find((s) => s > a && s <= b);
+      if (g != null) H.T = k.fran + k.ner + (b - g);
+      if (g != null || b >= k.ner) k.nerNu = true;
+    }
     // slagen i disken och koppen på fatet: bilden rycker till, och det hörs
     for (const e of H.fig.handelser(T0, H.T)) hands(e);
     if (k.vid && H.T >= k.vid[0]) {
@@ -857,6 +873,7 @@ window.RumHasse = (() => {
     if (H.T >= k.till) {
       H.T = k.vila;
       H.klipp = null;
+      if (k.grupp === 'lasa') H.lasT = performance.now() + LAS_PAUS[0] + Math.random() * (LAS_PAUS[1] - LAS_PAUS[0]);
       if (k.sen) k.sen();
     }
   }
@@ -1435,6 +1452,7 @@ window.RumHasse = (() => {
     H.fraga = {};
     H.fas = 'fraga';
     H.prat = null;
+    H.upptagen = false;
     // efter omgången dömer han gänget (domarna nedan)
     if (gangLista(summan())) return;
     const lista = kupongen();
@@ -1689,6 +1707,8 @@ window.RumHasse = (() => {
     // (en äldre rum-hasse-repliker.js i cachen har inga rader om det)
     const g = e && hurDetGick(lista, tips);
     if (!g) return;
+    // har det gått dåligt läser han tidningen (tidningen nedan)
+    upptagen(g.lage === 'inget' ? 'inget' : g.plats === 'worst' ? 'sist' : g.lage === 'daligt' ? 'daligt' : null, g.ok, g.n, lista.map((m) => m.id).join(','));
     const rader = e[g.lage];
     const plats = g.plats === 'best' ? e.forst : g.plats === 'worst' ? e.sist : null;
     const sagt = [];
@@ -1700,6 +1720,52 @@ window.RumHasse = (() => {
     const sedan = g.exakt ? [fyll(lott(e.exakt), { res: g.exakt })] : [];
     for (let i = plats ? 4 : 3; i > 0; i--) sedan.push(lott(rader));
     H.prat = { rader: sedan, i: 0, nasta: performance.now() + 20000, gang: 20000 };
+  }
+
+  // ---------- tidningen ----------
+  //
+  // När det har gått dåligt för honom gömmer han sig bakom tidningen, skyldig men nöjd med sig själv: han
+  // läser, tittar upp över den på en ibland och läser vidare (klippen lasa i rum-hasse-3d.js), och har man
+  // just kommit läser han redan. Rubriken handlar om hans omgång (rubrikOm i rum-hasse-tidning.js). Mellan
+  // gångerna gör han annat en stund (LAS_PAUS, ms), och behöver han händerna lägger han ned den direkt.
+  // Dåligt: inte ett rätt (inget), sämst i gänget (sist) eller rätten långt under vad chanserna var värda
+  // (daligt, som i hurDetGick). Med minskad rörelse läser han inte.
+  const LAS_PAUS = [4000, 10000];
+  function upptagen(lage, ok, n, nyckel) {
+    H.upptagen = Boolean(lage) && !calm() && Boolean(H.fig && H.m && H.m.rubrikOm);
+    if (!H.upptagen) return;
+    const k = `${lage}:${ok}:${n}:${nyckel}`;
+    if (H.lasRubrik !== k) {
+      H.lasRubrik = k;
+      H.fig.tidning(H.m.rubrikOm({ lage, ok, n, nyckel }));
+    }
+    H.lasT = performance.now() + (H.on ? 1500 : 0);
+  }
+  // han läser redan (efter upp)
+  function lasNu() {
+    const k = GEST[ettAv('lasa', 'lasa')];
+    if (!k || calm()) return;
+    H.klipp = { ...k };
+    H.T = k.fran + H.m.LAS_START;
+  }
+  // Hans omgång i sammanställningen: tävlingskupongen om han spelade, annars det han sa. → { lage, ok, n }
+  // (lage null när det inte gick dåligt), eller null.
+  function hansOmgang(sum) {
+    const p = (sum.folk || []).find((x) => x.id === 'HB' && !x.none && x.n);
+    let ok;
+    let n;
+    let z;
+    let sist = false;
+    if (p) {
+      ({ ok, n } = p);
+      const s = Math.sqrt((p.rows || []).reduce((a, r) => a + (r && r.prob != null ? r.prob * (1 - r.prob) : 0), 0));
+      z = s ? p.pts / s : 0;
+      sist = p.award === 'worst';
+    } else if (sum.backe && sum.backe.n) {
+      ({ ok, n } = sum.backe);
+      z = sum.backe.pts / Math.sqrt(n * 0.2);
+    } else return null;
+    return { lage: n >= 3 && !ok ? 'inget' : sist ? 'sist' : z <= -BRA ? 'daligt' : null, ok, n };
   }
 
   // ---------- domarna efter omgången ----------
@@ -1754,6 +1820,9 @@ window.RumHasse = (() => {
   function gangLista(sum) {
     const folk = sum ? iOrdning(sum) : [];
     if (!folk.length) return false;
+    // om sig själv säger han inget, men har det gått dåligt läser han tidningen (tidningen nedan)
+    const han = hansOmgang(sum);
+    if (han) upptagen(han.lage, han.ok, han.n, sum.id);
     const s = $('.rh-samtal');
     const r = REP();
     const h = hort(sum.id);

@@ -5659,6 +5659,19 @@ disken står som en stämpel i guld under namnet på dem man har hört om (på e
 gänget avgörs, och efter omgången säger han inte heller hur det gick för honom. Förut hade listan rätt och poäng, bäst först,
 och länken *Matcherna* till hans rader och facit (borta 2026-11-09). Med dolda resultat finns inget protokoll, och då är allt
 som förut.
+
+**Tidningen** (2026-11-09). Har det gått dåligt för honom i tippningen låtsas han vara upptagen: han gömmer sig bakom
+veckans kvällstidning, samma som löpsedeln i rummet (Sportbladet eller Expressen, `veckansTidning` i
+[public/rum-affischer.js](public/rum-affischer.js)), skyldig men nöjd med sig själv. Har man just kommit läser han redan; han
+läser rad för rad, tittar upp över kanten på en med höjda bryn och ler sedan belåtet, lyfter tidningen så att bara ögonen
+syns, nickar åt det som står, rycker den rak och tittar längs baren, och mellan gångerna lägger han den i knät bakom disken
+en stund (klippen `lasa` och `lasa2`, byggda av bitarna i `LASBIT` i [public/rum-hasse-3d.js](public/rum-hasse-3d.js)).
+Behöver han händerna, som när han slår en dom i disken, läser han klart raden och lägger ned den direkt. Förstasidan vänder
+sig mot en med en rubrik om hans egen omgång och hans porträtt rastrerat, och baksidan är tipsguiden (`RUBRIKER` och
+papperet i [public/rum-hasse-tidning.js](public/rum-hasse-tidning.js), samma rubrik för samma omgång). Dåligt är inte ett
+rätt, sämst i gänget, eller rätten långt under vad chanserna var värda, med tävlingskupongen om han spelade och annars det han
+sa (`hansOmgang` och `efterat` i [public/rum-hasse.js](public/rum-hasse.js)); det gäller både när han säger hur det gick och
+när han dömer gänget. Med minskad rörelse läser han inte.
 Går hans röst inte att få säger han det och visar analysen i skrift. Allt han säger runt omkring är
 färdiga rader, utan AI, i [public/rum-hasse-repliker.js](public/rum-hasse-repliker.js). Står man kvar säger han något då och då:
 över matchlistan (`ledig`), över listan med gänget (`domar.ledig`) och när man inte svarar på hans fråga (`valVanta`). Raderna

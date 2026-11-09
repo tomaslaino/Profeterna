@@ -16,11 +16,14 @@
 // figuren(duk, { hog, latt, pr }) → { kamera(v), diskBild(duk2d, v, bak), rita(T, n, tal, mun), handelser(T0, T1), info(), borta() }
 // Klipp: T 0–12,4 (vila, skrattet, domen, gesterna, hem), och sedan ett klipp i taget på var sin bit av
 // tidslinjen (KLIPP): fler sätt att slå domen i disken, kaffet (sex sätt), cigarren, småsakerna medan han
-// väntar och händerna medan han pratar (talet).
+// väntar, händerna medan han pratar (talet) och tidningen när det har gått dåligt för honom (lasa, papperet i
+// rum-hasse-tidning.js).
 import * as THREE from 'three';
 import { ATLAS, LJUS, ARM, HAND, KAMERA, BORD_GLSL, CIGARR, ASKKOPP, DAG, LYS, VILOHOJD, VILAN, paDisken, inat, laddaFoto, laddaHand, byggArm, byggKopp, byggCigarr, byggAskkopp, byggRok, byggPenna, byggSkugga, PENNA } from './rum-hasse-arm.js';
 import { SCEN, BAK, kamera as scenKamera, iKamera, disken, franBaren, franPulten } from './rum-hasse-scen.js';
 import { PULT_GLSL, SKIVA, ringar, NRING } from './rum-pult.js';
+import { byggTidning, ytan } from './rum-hasse-tidning.js';
+export { rubrikOm } from './rum-hasse-tidning.js';
 
 const DEG = Math.PI / 180;
 const clamp = (x, a = 0, b = 1) => Math.min(b, Math.max(a, x));
@@ -37,6 +40,140 @@ const SKRIV = { MOT: 0.85, LYFT: 0.6, NED: 0.09, DRAG: 0.17, UPP: 0.06, OVER: 0.
 SKRIV.KRYSS = SKRIV.NED + SKRIV.DRAG + SKRIV.UPP + SKRIV.OVER + SKRIV.NED2 + SKRIV.DRAG2 + SKRIV.EFTER;
 function skrivSlut(n) { return SKRIV.MOT + SKRIV.LYFT + n * SKRIV.KRYSS + (n - 1) * SKRIV.MELLAN; }
 function skrivTid(n) { return skrivSlut(n) + SKRIV.HALL + SKRIV.TILLBAKA + SKRIV.HEM; }
+
+// ---------- tidningen ----------
+// När det har gått dåligt för honom i tippningen gömmer han sig bakom tidningen (rum-hasse.js väljer när,
+// rum-hasse-tidning.js är papperet): han tar upp den bakom disken, slår upp den och läser, och emellanåt
+// tittar han upp över den på en, skyldig men nöjd med sig själv, och gömmer sig igen. Klippen byggs av
+// bitar (LASBIT) som alla börjar och slutar i samma läsande läge (LAS för huvudet, LAS_T för tidningen),
+// utom upp och ned. Då kan han hoppa från gränsen mellan två bitar (slag) direkt till ned när något annat
+// väntar, utan att något rycker.
+// Huvudet och ansiktet som i de andra klippen (skillnad mot vilan); tidningen: ryggens nedre ände (x, y, z),
+// lutningen mot honom (tilt), vridningen (yaw, roll), halvornas vinkel mot planet (beta), hur mjukt den
+// faller bakåt (buk), vågen (vag), händerna från vilan till kanterna (mot) och greppets höjd (gy).
+// I läget LAS tittar han ned i den, med brynen lite nere (då ler han mindre: NOJD i rita) och axlarna uppe.
+const LAS = { pitch: 0.8, yaw: -0.1, lut: 0.03, axV: 10, axH: 10, brynX: -0.12, brynY: -0.08, blund: 0.52, blickY: 8, kis: 0.06 };
+// (ryggens nedre ände strax ovanför disken, och så långt fram att hakan syns över kanten)
+const LY = -283;
+const LZ = 600;
+const LAS_T = { x: 0, y: LY, z: LZ, tilt: 0.26, yaw: 0, roll: 0, beta: 0.12, buk: 0.1, vag: 0, mot: 1, gy: 0.42 };
+// I knät bakom disken, uppslagen och stående mellan honom och diskens kant, med överkanten under det man
+// ser: där tar han den och dit lägger han den. Han håller den högt upp (gy), annars når han inte.
+const KNA_T = { x: 0, y: -985, z: 140, tilt: 0, yaw: 0, roll: 0, beta: 0.3, buk: 0, vag: 0, mot: 0, gy: 0.82 };
+const LASBIT = {
+  // ned bakom disken efter den, rakt upp med den ur knät och fram över disken, och ett ryck så att den står rak
+  upp: {
+    dur: 2.7, fran: null, till: LAS,
+    k: { pitch: [[0.15, 0.1], [0.55, 0.62], [1.4, 0.58], [2.1, 0.46]], yaw: [[0.5, -0.04]], blickY: [[0.15, 0], [0.4, 7]], blund: [[0.2, 0], [0.45, 0.45]], lut: [[0.5, 0.07], [1.5, 0.04]], axV: [[0.5, -6], [1.6, 12]], axH: [[0.5, -6], [1.6, 12]], brynX: [[1.3, 0], [2.2, -0.3]], brynY: [[1.3, 0], [2.2, -0.25]] },
+    t: { tf: KNA_T, mot: [[0.12, 0], [0.8, 1]], gy: [[0.9, 0.82], [1.7, 0.42]], y: [[0.8, -985], [1.6, LY + 12], [1.8, LY]], z: [[1.45, 140], [2.1, LZ]], tilt: [[1.45, 0], [2.0, 0.3], [2.2, 0.26]], beta: [[0.9, 0.3], [1.7, 0.08], [1.95, 0.03], [2.3, 0.14]], vag: [[1.95, 0], [2.07, 12], [2.55, 0]] },
+  },
+  // läser: blicken går rad för rad, huvudet sjunker lite längs spalten
+  las: {
+    dur: 4.4,
+    k: { blickX: [[0.3, -3], [0.7, -1.2], [1.1, 0.6], [1.5, 2.6], [1.62, -3], [2.0, -1.2], [2.4, 0.6], [2.8, 2.6], [2.92, -3], [3.3, -1.2], [3.7, 0.6], [4.05, 2]], pitch: [[0.3, 0.5], [1.6, 0.54], [2.9, 0.58], [4.0, 0.53]], yaw: [[1.0, -0.14], [3.0, -0.08]], andas: [[3.3, 0], [3.7, -4], [4.2, 0]] },
+    t: { y: [[2.0, LY + 4]], roll: [[2.0, 0.012]] },
+  },
+  // Ögonen upp på en över tidningen medan huvudet står kvar: ertappad. Brynen upp, och sedan ett leende som
+  // växer och en liten nick (jajamän), och tillbaka till tidningen.
+  glimt: {
+    dur: 4.6,
+    k: {
+      blickY: [[0.5, 6], [0.62, -1.5], [1.6, -1.5], [1.75, 6]], blund: [[0.5, 0.38], [0.6, 0.04], [1.6, 0.04], [1.75, 0.38]], blickX: [[0.5, 0], [0.62, 1.5], [1.6, 1.5], [1.75, 0]],
+      brynX: [[0.5, -0.3], [0.75, 0.55], [1.7, 0.5], [2.6, 0.15], [4.0, -0.3]], brynY: [[0.5, -0.25], [0.75, 0.75], [1.7, 0.7], [2.6, 0.2], [4.0, -0.25]],
+      le: [[0.9, 0], [1.5, 0.78], [3.2, 0.62], [4.1, 0]], kis: [[1.3, 0.06], [1.7, 0.35], [3.2, 0.3], [4.0, 0.06]],
+      pitch: [[0.5, 0.5], [0.7, 0.42], [1.6, 0.42], [1.9, 0.6], [2.15, 0.46], [2.4, 0.56], [2.7, 0.5]], roll: [[0.7, 0.05], [1.8, 0.05], [2.6, 0]],
+    },
+    t: { y: [[0.5, LY], [0.7, LY - 14], [1.7, LY - 14], [2.0, LY]] },
+  },
+  // Han lyfter tidningen så att den gömmer ansiktet och kikar över kanten, åt ena hållet och åt det andra,
+  // och sänker den igen.
+  gom: {
+    dur: 5.4,
+    k: {
+      pitch: [[0.3, 0.5], [1.0, 0.05], [4.0, 0.05], [4.7, 0.5]], blickY: [[0.3, 6], [0.9, 0], [1.4, -1], [2.5, -1], [2.65, 3], [3.0, 3], [3.15, -1], [4.0, -1], [4.6, 6]],
+      blund: [[0.3, 0.38], [0.9, 0.1], [4.0, 0.1], [4.6, 0.38]], blickX: [[1.4, 0], [1.6, 2], [2.4, 2], [2.6, -2.5], [3.5, -2.5], [3.7, 0]],
+      brynX: [[0.6, -0.3], [1.2, 0.65], [4.0, 0.6], [4.7, -0.3]], brynY: [[0.6, -0.25], [1.2, 0.85], [4.0, 0.8], [4.7, -0.25]], lut: [[0.8, -0.01], [4.2, -0.01]],
+    },
+    t: { y: [[0.3, LY], [1.0, LY + 170], [4.0, LY + 170], [4.7, LY]], z: [[1.0, LZ - 50], [4.0, LZ - 50]], tilt: [[1.0, 0.12], [4.0, 0.12]] },
+  },
+  // läser, håller med det som står och nickar belåtet för sig själv
+  nick: {
+    dur: 3.9,
+    k: {
+      blickX: [[0.3, -2.5], [0.8, 0], [1.2, 2]], pitch: [[1.4, 0.5], [1.65, 0.66], [1.9, 0.52], [2.15, 0.64], [2.4, 0.52]],
+      brynX: [[1.3, -0.3], [1.6, 0.3], [3.0, 0.25], [3.7, -0.3]], brynY: [[1.3, -0.25], [1.6, 0.35], [3.0, 0.3], [3.7, -0.25]], le: [[1.3, 0], [1.8, 0.55], [3.0, 0.45], [3.8, 0]],
+    },
+    t: {},
+  },
+  // rycker tidningen rak med ett knäpp, som om något i den kräver hans fulla uppmärksamhet
+  ryck: {
+    dur: 2.6,
+    k: { brynX: [[0.3, -0.3], [0.5, -0.55], [1.4, -0.45], [2.2, -0.3]], brynY: [[0.3, -0.25], [0.5, -0.5], [1.4, -0.4], [2.2, -0.25]], pitch: [[0.3, 0.5], [0.55, 0.44], [0.9, 0.55]] },
+    t: { beta: [[0.3, 0.12], [0.5, 0.32], [0.68, 0.02], [1.0, 0.13]], y: [[0.3, LY], [0.5, LY - 16], [0.68, LY + 16], [1.0, LY]], vag: [[0.62, 0], [0.72, 14], [1.6, 0]] },
+  },
+  // tittar längs baren över tidningen, som om något där är mer intressant, och tillbaka
+  titta: {
+    dur: 4.2,
+    k: {
+      yaw: [[0.4, -0.1], [1.0, -0.9], [2.6, -0.9], [3.3, -0.1]], pitch: [[0.4, 0.5], [1.0, 0.14], [2.6, 0.14], [3.3, 0.5]], blickY: [[0.4, 6], [0.9, 0], [2.6, 0], [3.2, 6]],
+      blund: [[0.4, 0.38], [0.9, 0.08], [2.6, 0.08], [3.2, 0.38]], blickX: [[0.8, 0], [1.0, -4], [2.6, -4], [2.8, 0]],
+      brynX: [[0.9, -0.3], [1.3, 0.3], [2.5, 0.3], [3.2, -0.3]], brynY: [[0.9, -0.25], [1.3, 0.3], [2.5, 0.3], [3.2, -0.25]],
+    },
+    t: { yaw: [[0.8, 0], [1.4, 0.06], [2.6, 0.06], [3.2, 0]] },
+  },
+  // tillbaka över diskens kant, ned i knät, och händerna tillbaka på disken
+  ned: {
+    dur: 2.1, fran: LAS, till: null,
+    k: { pitch: [[0.3, 0.55], [0.9, 0.6], [1.6, 0.12]], blickY: [[0.2, 6], [1.2, 7], [1.7, 0]], blund: [[1.2, 0.45], [1.7, 0]], brynX: [[0.5, -0.2], [1.6, 0]], brynY: [[0.5, -0.15], [1.6, 0]], axV: [[0.7, 12], [1.6, 0]], axH: [[0.7, 12], [1.6, 0]] },
+    t: { tt: KNA_T, z: [[0.15, LZ], [0.6, 140]], y: [[0.55, LY], [1.2, -985]], tilt: [[0.15, 0.26], [0.6, 0]], beta: [[0.15, 0.12], [0.9, 0.3]], gy: [[0.5, 0.42], [1.1, 0.82]], mot: [[1.2, 1], [1.95, 0]] },
+  },
+};
+// Ett klipp ur bitarna: nycklarna i klippets tid, och gränserna mellan bitarna (slag) och var ned börjar.
+function lasKlipp(bitar) {
+  const k = {};
+  const t = {};
+  const slag = [];
+  let at = 0;
+  let ner = 0;
+  const kanK = new Set(bitar.flatMap((b) => [...Object.keys(LASBIT[b].k), ...Object.keys(LAS)]));
+  const kanT = Object.keys(LAS_T);
+  const lagg = (ut, x, v) => {
+    const l = (ut.k = ut.k || []);
+    if (l.length && Math.abs(l[l.length - 1][0] - x[0]) < 1e-6) l[l.length - 1][1] = v;
+    else l.push([x[0], v]);
+  };
+  for (const namn of bitar) {
+    const b = LASBIT[namn];
+    if (namn === 'ned') ner = at;
+    else if (at > 0) slag.push(at);
+    for (const x of kanK) {
+      const ut = (k[x] = k[x] || { k: [] });
+      const a = b.fran === null ? 0 : (LAS[x] || 0);
+      const e = b.till === null ? 0 : (LAS[x] || 0);
+      lagg(ut, [at], a);
+      for (const [tt, v] of b.k[x] || []) lagg(ut, [at + tt], v);
+      lagg(ut, [at + b.dur], e);
+    }
+    for (const x of kanT) {
+      const ut = (t[x] = t[x] || { k: [] });
+      const a = (b.t.tf || LAS_T)[x];
+      const e = (b.t.tt || LAS_T)[x];
+      lagg(ut, [at], a);
+      for (const [tt, v] of b.t[x] || []) lagg(ut, [at + tt], v);
+      lagg(ut, [at + b.dur], e);
+    }
+    at += b.dur;
+  }
+  const ut = (o) => Object.fromEntries(Object.entries(o).map(([x, v]) => [x, v.k]));
+  return { dur: at, k: ut(k), t: ut(t), slag, ner };
+}
+// Två ordningar, så att det inte blir samma varje gång.
+export const LASA = {
+  lasa: lasKlipp(['upp', 'las', 'glimt', 'las', 'gom', 'nick', 'las', 'titta', 'las', 'ned']),
+  lasa2: lasKlipp(['upp', 'ryck', 'las', 'nick', 'titta', 'las', 'glimt', 'las', 'gom', 'las', 'ned']),
+};
+// var läsandet börjar (efter upp): dit hoppar sidan när han redan läser när man kommer
+export const LAS_START = LASBIT.upp.dur;
 
 // ---------- klippen ----------
 // Rörelserna är klipp på en tidslinje (rum-hasse.js spelar dem): fran–till, och där han står efteråt
@@ -152,6 +289,10 @@ export const KLIPP = {
   spanaSmyg: { fran: 447, till: 451.2, vila: 0, skynda: true, grupp: 'spana' },
   // lutar sig fram och kisar för att se vad det står, och sätter sig tillbaka med ett oj
   spanaKis: { fran: 453, till: 457.4, vila: 0, skynda: true, grupp: 'spana' },
+  // tidningen (LASA ovan): tar upp den, läser och lägger ned den. slag: där han kan sluta läsa, ner: där
+  // han lägger ned den (båda i klippets tid)
+  lasa: { fran: 500, till: 500 + LASA.lasa.dur, vila: 0, skynda: true, grupp: 'lasa', slag: LASA.lasa.slag, ner: LASA.lasa.ner },
+  lasa2: { fran: 545, till: 545 + LASA.lasa2.dur, vila: 0, skynda: true, grupp: 'lasa', slag: LASA.lasa2.slag, ner: LASA.lasa2.ner },
 };
 for (const k of Object.values(KLIPP)) {
   if (k.dunk) k.dom = k.fran + k.dunk.reduce((a, b) => (b[1] > a[1] ? b : a))[0];
@@ -503,7 +644,7 @@ export async function figuren(duk, { hog = false, latt = false, pr = 1 } = {}) {
   const rok = byggRok(latt ? 200 : 280, bord);
   S.add(ask.mesh, cig.mesh, rok.mesh);
   // skuggorna på disken: kapslar som faller bakåt och bort från ljuset, ingen skuggkarta
-  const NK = 9;
+  const NK = 10;
   const skuggGeo = new THREE.BufferGeometry();
   {
     // pultens ovansida: benet framför honom och armen mot en (i pultens mått)
@@ -2060,6 +2201,8 @@ export async function figuren(duk, { hog = false, latt = false, pr = 1 } = {}) {
       },
     },
   });
+  // tidningen (LASA): huvudet och ansiktet som i de andra klippen, händerna räknas ur tidningen (tidningArm)
+  for (const [namn, l] of Object.entries(LASA)) RORELSER[namn] = { k: l.k, las: l.t };
   for (const [namn, o] of Object.entries(RORELSER)) {
     const m = KLIPP[namn];
     const { fran, till, vila = 0, start = 0 } = m;
@@ -2110,6 +2253,7 @@ export async function figuren(duk, { hog = false, latt = false, pr = 1 } = {}) {
         rok: rokTid(c.rok),
       };
     }
+    if (o.las) k.las = Object.fromEntries(Object.entries(o.las).map(([x, kk]) => [x, tid(kk)]));
     KL.push(k);
   }
   KL.sort((a, b) => a.fran - b.fran);
@@ -2719,6 +2863,110 @@ export async function figuren(duk, { hog = false, latt = false, pr = 1 } = {}) {
     return extraC;
   }
 
+  // ---------- tidningen ----------
+  // Tidningen styr som cigarren och pennan: dess läge räknas ur klippets nycklar (las), och händerna håller
+  // i kanterna på höjden gy. Handen sitter utanför kanten med handflatan in mot ryggen och fingrarna böjda
+  // runt kanten, så att fingertopparna ligger på utsidan (mot en), och underarmen kommer bakifrån utanför
+  // papperet. (Med handen på utsidan gick underarmen genom papperet.) På vägen mellan vilan och kanterna går
+  // handen först bakåt och sedan ned (eller upp och sedan fram), så att den inte går genom disken.
+  const tidning = byggTidning(bord);
+  S.add(tidning.mesh);
+  const TS = { beta: 0, buk: 0, vag: 0, fas: 0 };
+  // greppet: handflatan så långt utanför kanten, handens origo så långt bakom papperet (längs fingrarna),
+  // fingrarnas vinkel uppåt och deras krok
+  const TG = { UT: 24, BAK: 64, UPP: 22 * DEG, KROK: 0.62 };
+  const tM = new THREE.Matrix4();
+  const tQ = new THREE.Quaternion();
+  const tE = new THREE.Euler();
+  const tPos = v();
+  const ETT = new THREE.Vector3(1, 1, 1);
+  const tg0 = v();
+  const tg1 = v();
+  const tg2 = v();
+  const tgX = v();
+  const tgY = v();
+  const tgN = v();
+  const tH = v();
+  const tF = v();
+  const tP = v();
+  const tW = [v(), v()];
+  const tPl = [v(), v()];
+  const tFs = [v(), v()];
+  const tPs = [v(), v()];
+  // handen vid kanten på sidan sida (1 hans högra, till vänster i bild): tH, tF och tP i världen
+  function tGrepp(sida, gy) {
+    const qx = -sida;
+    const e = 0.01;
+    ytan(qx, gy, TS, tg0).applyMatrix4(tM);
+    ytan(qx + e, gy, TS, tg1).applyMatrix4(tM);
+    ytan(qx - e, gy, TS, tg2).applyMatrix4(tM);
+    tgX.subVectors(tg1, tg2).normalize();
+    ytan(qx, gy + e, TS, tg1).applyMatrix4(tM);
+    ytan(qx, gy - e, TS, tg2).applyMatrix4(tM);
+    tgY.subVectors(tg1, tg2).normalize();
+    tgN.crossVectors(tgX, tgY).normalize();
+    // fingrarna fram mot en (utsidan) och lite uppåt, handflatan in mot ryggen (+x för den högra handen)
+    tF.copy(tgN).multiplyScalar(Math.cos(TG.UPP)).addScaledVector(tgY, Math.sin(TG.UPP)).normalize();
+    tP.copy(tgX).multiplyScalar(sida);
+    tH.copy(tg0).addScaledVector(tP, -TG.UT).addScaledVector(tF, -TG.BAK);
+  }
+  // → hur mycket händerna håller den (0–1)
+  function tidningArm(t, n, kl, a, b) {
+    const L = kl.las;
+    const s = (x) => spar(L[x], t);
+    TS.beta = s('beta');
+    TS.buk = s('buk');
+    TS.vag = s('vag');
+    TS.fas = n * 15;
+    const U_ = tidning.U;
+    U_.uBeta.value = TS.beta;
+    U_.uBuk.value = TS.buk;
+    U_.uVag.value = TS.vag;
+    U_.uFas.value = TS.fas;
+    tE.set(-s('tilt'), s('yaw'), s('roll'), 'YXZ');
+    tQ.setFromEuler(tE);
+    tM.compose(tPos.set(s('x'), s('y'), s('z')), tQ, ETT);
+    tidning.mesh.matrix.copy(tM);
+    tidning.mesh.matrixWorldNeedsUpdate = true;
+    tidning.mesh.visible = true;
+    const mot = s('mot');
+    const gy = s('gy');
+    for (let i = 0; i < 2; i++) {
+      const sida = i ? -1 : 1;
+      const vila = i ? VILA_B : VILA_A;
+      tGrepp(sida, gy);
+      // armbågen ut åt sidan och bakåt (aldrig framåt: då hamnar den framför papperet; och inte nedåt längs
+      // armen när den är hopvikt i knät: då vänder den sig uppåt)
+      cPol.set(-sida * 0.62, -0.3, -0.72).normalize();
+      // (en fast riktning för armbågen, inte naturlig: med handen given av papperet valde den ibland armbågen
+      // uppe vid örat medan tidningen kom upp)
+      vristTill(i ? sb : sa, tH, cPol, cU);
+      tPl[i].copy(cPol);
+      tW[i].copy(cW);
+      tFs[i].copy(tF);
+      tPs[i].copy(tP);
+    }
+    for (let i = 0; i < 2; i++) {
+      const h = i ? b : a;
+      const w0 = (i ? VILA_B : VILA_A)[0];
+      if (mot >= 1) h.w.copy(tW[i]);
+      else {
+        // bakåt först och sedan ned (z före y), med ett litet lyft
+        const fz = ss(0, 0.6, mot);
+        const fy = ss(0.4, 1, mot);
+        h.w.set(w0[0] + (tW[i].x - w0[0]) * mot, w0[1] + (tW[i].y - w0[1]) * fy + 70 * Math.sin(Math.PI * mot), w0[2] + (tW[i].z - w0[2]) * fz);
+      }
+      h.pol.normalize().lerp(tPl[i], mot);
+      h.F.lerp(tFs[i], mot);
+      h.P.lerp(tPs[i], mot);
+      h.krok += (TG.KROK - h.krok) * mot;
+      h.peka *= 1 - mot;
+    }
+    bortA = Math.max(bortA, mot);
+    bortB = Math.max(bortB, mot);
+    return mot;
+  }
+
   // ---------- kaffet ----------
   // Det är koppen som styr, som med cigarren: dess läge räknas fram och handen sitter i örat med samma
   // grepp hela vägen, fingrarna mot koppen, pekfingret genom örat, tummen ovanpå och handflatan mot
@@ -3071,6 +3319,9 @@ export async function figuren(duk, { hog = false, latt = false, pr = 1 } = {}) {
     cig.U.uTid.value = n;
     const kaffe = kl && kl.kaffe;
     const extraB = kaffe ? kaffeArm(t, b, kaffe) : null;
+    // tidningen: i hans händer under klippen lasa, annars borta
+    if (kl && kl.las) tidningArm(t, n, kl, a, b);
+    else tidning.mesh.visible = false;
     const isar = ss(2.5, 3, t) * (1 - ss(4.3, 4.8, t));
     if (t > 5.95 && t < 8.15) {
       const k = Math.sin(n * 6.6) * ss(5.95, 6.15, t) * (1 - ss(7.95, 8.15, t));
@@ -3122,6 +3373,14 @@ export async function figuren(duk, { hog = false, latt = false, pr = 1 } = {}) {
     skk(5, K.fat.position, K.fat.position, 96, 1 + HOPP.fat);
     skk(7, ASKV3, ASKV3, 92, 1 + HOPP.ask);
     skk(8, cX, fot, 14, Math.min(ah(cX), ah(fot)));
+    // tidningens nederkant, när han håller den ovanför disken
+    kapH[9].set(0, 0);
+    if (tidning.mesh.visible) {
+      ytan(-1, 0, TS, tg0).applyMatrix4(tM);
+      ytan(1, 0, TS, tg1).applyMatrix4(tM);
+      const h = Math.min(ah(tg0), ah(tg1));
+      if (h > -5) skk(9, tg0, tg1, 38, h);
+    }
     roken(n, t, glod, kl);
     r.render(S, C);
   }
@@ -3186,6 +3445,8 @@ export async function figuren(duk, { hog = false, latt = false, pr = 1 } = {}) {
       return { klipp: `skriv${kryss.length}`, tider };
     },
     ror: () => sistaN - trumT < trumS[0] + 0.05,
+    // Trycker tidningen han läser (rum-hasse-tidning.js): { tidning, kick, rad, under, datum }
+    tidning: (rb) => tidning.tryck(rb),
     info: () => ({ trianglar: r.info.render.triangles, ritanrop: r.info.render.calls, texturer: r.info.memory.textures }),
     ctx: r.getContext(),
     borta() {
@@ -3195,6 +3456,7 @@ export async function figuren(duk, { hog = false, latt = false, pr = 1 } = {}) {
       ask.borta();
       cig.borta();
       pen.borta();
+      tidning.borta();
       rok.borta();
       A.borta();
       B.borta();
