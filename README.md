@@ -2579,7 +2579,16 @@ Enter och mellanslag klickar på dem. En match på text-tv:n lägger fram matchb
   *Kombinationer* (eller *Pris*) och *Odds* och streckkoden med omgångens id (`Samtal.pult.top`
   och `fields`, `Papper.code`). Efter tiden står motiveringen för hand med blyerts, och
   utfallet ringas in (grönt när kupongen hade det, annars rött, streckat medan matchen
-  pågår). På pulten ligger ditt utkast med dina kryss och motiveringar och ditt namn;
+  pågår). Kupongerna är inte likadana (2026-11-09, användarens önskemål): varje kupong är sliten
+  på sitt sätt – vikt på mitten, på tvären, i fyra eller med ett snett veck, en kaffering (ibland
+  två), några stänk, ett tumavtryck av blyerts, ett hörn som vikts in, mer eller mindre gulnad –
+  slumpat ur omgången och vems kupong det är (`slitage` och `kupNyckel` i rum.js). Ditt utkast och
+  din inlämnade är samma papper, så den ser likadan ut på pulten, i handen, i högen och hos Hasse;
+  gängets kupong och den nya som ligger på pulten när du har lämnat in är egna papper. På baksidan
+  i högen syns vecken, hörnet och kaffet igenom, spegelvända. Det tryckta – bandet,
+  synkmarkeringarna och tryckeriets rad – är likadant på alla, och slitaget är bara gradienter,
+  så att rummet inte får mer att rita (förut hade alla samma kaffering och samma veck).
+  På pulten ligger ditt utkast med dina kryss och motiveringar och ditt namn;
   har du lämnat in ligger din i högen bredvid och på pulten en ny – och när du
   ser de andras tips ligger gängets kupong där, med gängets kryss med kulspetspenna,
   allas porträtt i rutorna och allas namn överst (uppgörelsen). Allt man

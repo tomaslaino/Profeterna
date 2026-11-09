@@ -450,14 +450,10 @@ canvas.rum-neonhalo { opacity: var(--sken, 0.28); }
   color: var(--pp-ink);
   box-shadow: 0 0 0 3px #f0d699, 0 0 80px rgba(240, 214, 153, 0.45), 0 26px 34px rgba(0, 0, 0, 0.55);
 }
-.rum-kup::after {
-  content: "";
-  position: absolute;
-  inset: 0;
-  pointer-events: none;
-  background: radial-gradient(60px 46px at 82% 74%, rgba(0, 0, 0, 0) 64%, rgba(120, 72, 24, 0.22) 70%, rgba(0, 0, 0, 0) 76%),
-              linear-gradient(98deg, rgba(0, 0, 0, 0) 58%, rgba(90, 60, 20, 0.08) 58.4%, rgba(0, 0, 0, 0) 59.2%);
-}
+/* slitaget, olika på varje kupong (slitage i rum.js): över trycket och blyertsen,
+   under stämpeln och pennan; på baksidan det som syns igenom, spegelvänt */
+.rum-kup .slit, .rum-bak .slit { position: absolute; inset: 0; display: block; pointer-events: none; }
+.rum-bak .slit, .rum-vand .slit { transform: scaleX(-1); }
 /* Samma kupong som papperet under Kupong (papper.css, samtal.css): samma
    färger, tryck, stämpel, spelstopp, porträtt, rader och fält, i kupongens mått */
 /* tryckeriets rad längs högerkanten */
