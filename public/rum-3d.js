@@ -6057,18 +6057,60 @@ export async function figurer(canvas, opt = {}) {
   for (const o of figs) for (const A of o.arms) if (A.cig) smokers.push({ o, A });
   const SM = { every: 0.09, life: 5.5, n: 0 };
   SM.n = Math.ceil(SM.life / SM.every) + 2;
+  // Puffarna är en enda mesh som ritas på en gång, vända mot kameran som
+  // spritar (som röken på pulten, ROK i rum-saker.js). Förut en sprite med
+  // eget material per puff: ungefär 160 ritningar i varje bild av gänget, mer
+  // än allt annat i gänget tillsammans på de lägre stegen, och det är
+  // huvudtråden i en gammal telefon som betalar för dem. mitt: puffens mitt i
+  // root; puff: storleken, genomskinligheten och hur den är vriden.
   const puffs = [];
-  for (const sk of smokers) {
-    for (const src of ['glod', 'mun']) {
-      const list = [];
-      for (let i = 0; i < SM.n; i++) {
-        const sp = new THREE.Sprite(new THREE.SpriteMaterial({ map: smokeTex, transparent: true, depthWrite: false, opacity: 0, color: '#e4e6ea', toneMapped: false }));
-        root.add(sp);
-        list.push(sp);
-      }
-      puffs.push({ sk, src, list, born: new Map() });
-    }
-  }
+  for (const sk of smokers) for (const src of ['glod', 'mun']) puffs.push({ sk, src, i0: puffs.length * SM.n, born: new Map() });
+  const ROK = (() => {
+    const n = Math.max(1, puffs.length * SM.n);
+    const q = new THREE.PlaneGeometry(1, 1);
+    const g = new THREE.InstancedBufferGeometry();
+    g.index = q.index;
+    g.setAttribute('position', q.attributes.position);
+    g.setAttribute('uv', q.attributes.uv);
+    const attr = () => new THREE.InstancedBufferAttribute(new Float32Array(n * 3), 3).setUsage(THREE.DynamicDrawUsage);
+    g.setAttribute('mitt', attr());
+    g.setAttribute('puff', attr());
+    g.instanceCount = n;
+    const m = new THREE.ShaderMaterial({
+      uniforms: { map: { value: smokeTex }, color: { value: new THREE.Color('#e4e6ea') } },
+      vertexShader: `
+        attribute vec3 mitt;
+        attribute vec3 puff;
+        varying vec2 vUv;
+        varying float vA;
+        void main() {
+          vUv = uv;
+          vA = puff.y;
+          vec4 mv = modelViewMatrix * vec4(mitt, 1.0);
+          vec2 p = position.xy * vec2(length(modelMatrix[0].xyz), length(modelMatrix[1].xyz)) * puff.x;
+          float s = sin(puff.z);
+          float c = cos(puff.z);
+          mv.xy += vec2(c * p.x - s * p.y, s * p.x + c * p.y);
+          gl_Position = projectionMatrix * mv;
+        }`,
+      fragmentShader: `
+        uniform sampler2D map;
+        uniform vec3 color;
+        varying vec2 vUv;
+        varying float vA;
+        void main() {
+          vec4 t = texture2D(map, vUv);
+          gl_FragColor = vec4(color * t.rgb, t.a * vA);
+          #include <colorspace_fragment>
+        }`,
+      transparent: true,
+      depthWrite: false,
+    });
+    const mesh = new THREE.Mesh(g, m);
+    mesh.frustumCulled = false;
+    root.add(mesh);
+    return { mesh, mitt: g.attributes.mitt, puff: g.attributes.puff };
+  })();
   const fp = new THREE.Vector3();
   function emitter(sk, src, t) {
     pose(sk.o, t);
@@ -6079,12 +6121,16 @@ export async function figurer(canvas, opt = {}) {
     return sk.A.cig.userData.end.clone().applyMatrix4(sk.A.cig.matrix).applyMatrix4(sk.A.hand.matrix).applyMatrix4(sk.o.fig.matrix);
   }
   function smoke(t) {
-    for (const { sk, src, list, born } of puffs) {
+    const M = ROK.mitt.array;
+    const P = ROK.puff.array;
+    let syns = false;
+    for (const { sk, src, i0, born } of puffs) {
       const o = sk.o;
       const base = Math.floor(t / SM.every);
       // var glöden (munnen) var när varje bloss föddes räknas en gång
       for (const k of born.keys()) if (k < base - SM.n || k > base) born.delete(k);
-      list.forEach((sp, i) => {
+      for (let i = 0; i < SM.n; i++) {
+        const j = (i0 + i) * 3;
         const k = base - i;
         const tb = k * SM.every;
         const age = t - tb;
@@ -6101,7 +6147,7 @@ export async function figurer(canvas, opt = {}) {
           const out = o.F.key === 'dt' ? bump(tb % 12, 6.0, 6.3, 7.4, 8.6) : bump((tb + 5) % 16, 4.4, 4.7, 5.8, 7);
           alpha = 0.85 * Math.max(ready(o, tb) * out * (1 - aktW(o, tb - 2)), after(o, tb, 3.0, 3.3, 4.4, 5.6), blasW(o, tb));
         }
-        if (alpha < 0.01 || age < 0 || age > SM.life) { sp.material.opacity = 0; sp.visible = false; return; }
+        if (alpha < 0.01 || age < 0 || age > SM.life) { P[j] = P[j + 1] = 0; continue; }
         let e = born.get(k);
         if (!e) { e = emitter(sk, src, tb); born.set(k, e); }
         const life = age / SM.life;
@@ -6112,14 +6158,18 @@ export async function figurer(canvas, opt = {}) {
         fp.y += rise * age + 0.9 * age * age;
         fp.x += curl + age * 3.6;
         fp.z += (src === 'mun' ? 18 * (1 - Math.exp(-age * 1.6)) : 0) + Math.cos(age * 0.9 + tb) * age * 1.5;
-        sp.position.copy(fp);
-        const size = src === 'glod' ? 3.2 + age * 5.5 + age * age * 0.7 : 9 + age * 14;
-        sp.scale.set(size, size, 1);
-        sp.material.opacity = alpha * Math.min(1, age * 4) * (1 - life) ** (src === 'glod' ? 1.8 : 1.3);
-        sp.material.rotation = hash(seed + 2) * 6 + age * 0.3;
-        sp.visible = true;
-      });
+        M[j] = fp.x;
+        M[j + 1] = fp.y;
+        M[j + 2] = fp.z;
+        P[j] = src === 'glod' ? 3.2 + age * 5.5 + age * age * 0.7 : 9 + age * 14;
+        P[j + 1] = alpha * Math.min(1, age * 4) * (1 - life) ** (src === 'glod' ? 1.8 : 1.3);
+        P[j + 2] = hash(seed + 2) * 6 + age * 0.3;
+        syns = true;
+      }
     }
+    // (ingen som röker just nu: inget att rita)
+    ROK.mesh.visible = syns;
+    ROK.mitt.needsUpdate = ROK.puff.needsUpdate = true;
   }
 
   // ---------- rökringarna ----------
@@ -6393,9 +6443,40 @@ export async function figurer(canvas, opt = {}) {
     tvLjus.intensity = tv > 0 ? TVLJUS * tv * (0.86 + 0.08 * Math.sin(t * 2.3) + 0.06 * Math.sin(t * 13.1 + Math.sin(t * 3.7))) : 0;
     pivot.rotation.y = mx * 4.5 * DEG;
     pivot.rotation.x = my * 2.6 * DEG;
-    if (Q.skugga > 1) r.shadowMap.needsUpdate = Q.n++ % Q.skugga === 0;
     r.render(scene, cam);
+    if (Q.skugga > 1 && Q.n++ % Q.skugga === 0) skuggaSen();
     if (ombyggda.length) slappOmbyggda();
+  }
+
+  // Skuggorna för sig, när de räknas om mer sällan än gänget ritas (skugga i KVAL
+  // i rum.js). Förut räknades de om i samma bild som gänget, så att var tredje
+  // eller fjärde bild var dubbelt så tung som de andra – alla delar ritade en
+  // gång till – och det är den bilden som blir för lång i en svag telefon: rummet
+  // rycker till i jämn takt. Nu ritas skuggkartan för sig, två bildrutor efter
+  // gänget, där inget annat ritas (frame i rum.js): lika mycket arbete, men
+  // ingen bild bär allt. Skuggorna är från den ställning gänget just ritades i
+  // och syns från nästa bild – de var redan upp till tre bilder gamla.
+  // three räknar bara om skuggkartan inifrån render, så scenen ritas en gång
+  // till, men med en kamera som ser åt ett annat håll (inget är i bild, så
+  // inget ritas utöver skuggkartan) och till en duk på en bildpunkt i stället
+  // för den som syns.
+  const skuggDuk = new THREE.WebGLRenderTarget(1, 1, { depthBuffer: false });
+  const skuggKam = new THREE.PerspectiveCamera(1, 1, 1, 2);
+  skuggKam.position.set(0, 1e7, 0);
+  skuggKam.lookAt(0, 2e7, 0);
+  skuggKam.updateMatrixWorld();
+  let skuggVantar = false;
+  function skuggaSen() {
+    if (skuggVantar || !r.shadowMap.enabled) return;
+    skuggVantar = true;
+    requestAnimationFrame(() => requestAnimationFrame(() => {
+      skuggVantar = false;
+      if (!r.shadowMap.enabled || Q.skugga <= 1) return;
+      r.shadowMap.needsUpdate = true;
+      r.setRenderTarget(skuggDuk);
+      r.render(scene, skuggKam);
+      r.setRenderTarget(null);
+    }));
   }
 
   // Hur fint gänget ritas, när datorn inte hinner med (KVAL i rum.js): pr

@@ -2724,12 +2724,22 @@ ${window.RumRegister ? RumRegister.nara() : ''}
     } catch (err) { /* utan WebGL gör det inget */ }
     return R.gpuNamn;
   }
-  // Kantutjämning i gänget och sakerna: den kan inte stängas av sedan, och på en svag grafikkrets i
-  // en dator är den dyr, så där bara på steg 0. Telefonernas grafik ritar i små rutor, där den kostar
-  // lite (mätt på Apple-grafik: ungefär en fjärdedel av gängets tid på grafikkortet), och utan den
-  // kryper trappstegen längs ansikten och armar när gänget rör sig, vilket ser ut som flimmer.
-  // På steg 1. (Inte på PowerVR, vars drivrutin redan kraschar av skuggkartan, rum-gpu.js.)
-  const kantutjamning = () => R.kval === 0 || (LATT && R.kval === 1 && !/PowerVR/i.test(gpuNamn()));
+  // Kantutjämning i gänget och sakerna. Den kan inte stängas av sedan, och den kostar efter dukens yta,
+  // så förut var den bara på på steg 0 (och steg 1 i telefonen). Men det är på de lägre stegen den
+  // behövs: där är duken en bildpunkt per punkt eller glesare, två–tre av skärmens bildpunkter i en
+  // telefon, och utan utjämning kryper trappstegen längs ansikten och armar när gänget rör sig, vilket
+  // ser ut som flimmer. Där är duken också liten (en fjärdedel av ytan på steg 0 med täthet 2), så att
+  // den kostar lite. Alltså: på steg 0, och annars där duken har högst 1,15 bildpunkter per punkt –
+  // alla steg i telefonen, alla steg på en skärm med täthet 1, och från steg 2 med täthet 2. Inte med
+  // mjukvarugrafik, där processorn räknar varje prov, och inte på PowerVR, vars drivrutin redan
+  // kraschar av skuggkartan (rum-gpu.js). Mätt: se README, Jämnare kanter och jämnare takt.
+  const kantutjamning = () => {
+    if (R.kval === 0) return true;
+    if (/SwiftShader|llvmpipe|softpipe|Software|Basic Render|PowerVR/i.test(gpuNamn())) return false;
+    // (dukens täthet som i figurer i rum-3d.js)
+    const tathet = LATT ? 1.5 : Math.min(window.devicePixelRatio || 1, 2);
+    return Math.max(0.75, tathet * KVAL[R.kval].pr) <= 1.15;
+  };
   R.kval = 0;
   if (R.q.has('rum-kval')) {
     R.kval = Math.max(0, Math.min(KVAL.length - 1, Math.round(Number(R.q.get('rum-kval'))) || 0));
