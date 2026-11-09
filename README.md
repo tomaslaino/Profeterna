@@ -748,6 +748,15 @@ bara lokalt. Analyserna visas som de ligger i `data/analyser.json`; hur de skriv
   en ny flik, så att rummet står kvar. Samma dag lades de tre kupongerna på varandra i
   uppgörelsen, gängets penna blev svart och pennan ringar in de omtvistade matcherna. Se
   *Kupongen i handen* under [Tobaksaffären](#tobaksaffären).
+- **Nästa kupong ur kupongstället (2026-11-09, användarens önskemål):** "Kan du ordna så att man
+  ständigt - om man vill - har möjlighet att titta på nästa kupong genom att klicka på kupongstället
+  och då ta upp kupongen till nästa omgång", "Använd kuponggrafiken som vi använder oss av på
+  hemsidan" och "Där ska det såklart inte att gå att klicka fram matcherna". Ett klick på kupongstället
+  (eller N) tar en blank kupong för veckans Stryktips i handen, samma kupong som på pulten men bara
+  att titta på: inga kryss, ingen penna och inget matchblad. Kupongerna i stället ritas som sajtens
+  kupong i den smala formen, och användaren bad om något skrivet på stället: en tryckt skylt *Nästa
+  omgång* i bandets färg överst. Skylten är en del av stället och inga ord bredvid det, som beslutet
+  nedan säger. Se *Nästa omgång ur kupongstället* under [Kupongen i handen](#kupongen-i-handen).
 - **Inga förklarande ord i tobaksaffären (2026-11-09, användarens beslut):** rummet ska vara
   intuitivt. Guldordet bredvid kupongen på pulten (*Läs protokollet*, *Fyll i resten*, *Följ
   kupongen*) är borta: kupongen och protokollet tas fram med ett klick på dem eller K. Kvar
@@ -2500,7 +2509,7 @@ Så fort något ligger framme (en närbild, tv:n, tavlan, registret, videon, Has
 stället, samma ord på samma ställe för alla saker, och lägger bort det översta som bakåtknappen (se
 [Bakåt](#bakåt)). Förut var *Vanlig sida* det enda ord som syntes nära något, och det leder bort från rummet.
 Tangenterna (K kupongen, T tv:n,
-A anslagstavlan, R kortregistret, V videon, H Hasse) står inte i foten – där låg de över kupongen i
+A anslagstavlan, R kortregistret, V videon, H Hasse, N nästa omgång ur kupongstället) står inte i foten – där låg de över kupongen i
 mindre fönster – utan när man pekar på saken (*Tv:n · T*, `tangenter` i rum.js), och bara
 med mus. [public/rum.js](public/rum.js)
 ritar rummet och fyller det med sajtens data, [public/rum.css](public/rum.css) ger det utseendet och
@@ -2625,15 +2634,23 @@ kortregistret står under Tipsligan, fritt från anslagstavlans nederkant, och v
 lådan med kassetter under korktavlan. Tv:ns sladd går i en kort båge till ett uttag strax
 under väggplattan, ovanför korktavlan.
 
-**Kupongstället** står på bardisken under anslagstavlan, mellan barstolarna och kortregistret,
-och leder ingenstans: ett fack av plexiglas, lågt fram och högt bak, med blanka kuponger (samma
-terrakottaband som kupongen på pulten) som lutar bakåt, butikens pennor i ett rör bredvid och en
-lapp på plexit: *Pennorna är räknade*. Det är byggt i three.js och ses med samma kamera och ljus
-som disken (`stall` och `STALL` i rum-inredning.js: platsen, vridningen och storleken), står in
-mot väggen och är vänt ut mot rummet och lite mot pulten. Ljuset kommer ungefär därifrån man ser
-det, så skuggan faller bakom; en mjuk skugga under foten håller det på skivan, också utan
-skuggkarta. Duken ligger över tavlorna på högra väggen, eftersom stället står framför
-anslagstavlan, men under kortlådan.
+**Kupongstället** står på bardisken under anslagstavlan, mellan barstolarna och kortregistret:
+ett fack av plexiglas, lågt fram och högt bak, med blanka kuponger som lutar bakåt, butikens
+pennor i ett rör bredvid och en lapp på plexit: *Pennorna är räknade*. Kupongerna är sajtens
+kupong i telefonens smala form, som en blankett (`blankett` i rum-inredning.js): bandet med
+*Matchfixarna · Tipskupong* och *Kupong*, spelstoppet, *Nr* och *Match*, tretton rader med
+synkmarkeringen i kanten och rutorna 1 X 2, och tryckeriets rad längs högerkanten – samma färger
+och tryck som kupongen på pulten. I en skåra i bakstyckets överkant står en tryckt skylt i
+bandets färg: *Nästa omgång*. Ett klick på stället (eller N) tar en kupong för nästa omgång i
+handen (se *Nästa omgång ur kupongstället* under [Kupongen i handen](#kupongen-i-handen)), och
+stället lyser när man pekar på det, som de andra sakerna. Det är byggt i three.js och ses med
+samma kamera och ljus som disken (`stall` och `STALL` i rum-inredning.js: platsen, vridningen
+och storleken), står in mot väggen och är vänt ut mot rummet och lite mot pulten. Ljuset kommer
+ungefär därifrån man ser det, så skuggan faller bakom; en mjuk skugga under foten håller det på
+skivan, också utan skuggkarta. Duken ligger över tavlorna på högra väggen, eftersom stället står
+framför anslagstavlan, men under kortlådan. Länken över stället (`#rum-stall`) räknas ut ur
+stället i 3D – rutan kring skylten, kupongerna och foten i bild – och ligger över kortregistrets
+länk där de möts, så att bara stället leder dit. Utan WebGL finns varken stället eller länken.
 
 **Stationsuret** sitter på bakväggen till höger om fönstret och leder bara till en närbild: ett
 svarvat hölje i mörk metall från väggen fram till ett glas som buktar lite, vit tavla med
@@ -4278,6 +4295,23 @@ sätt:
 | Tabellen | Matchrutans *Tabellen* (`leagueTable`): samma kolumner och rader, men bara utdraget runt lagen | `data/teams/<division>.json` |
 | Mötena | Kortregistrets kort om mötet (`motet` i rum-register.js) | `meetings`, `pastMeetings` |
 
+**Nästa omgång ur kupongstället** (2026-11-09, användarens önskemål). Nästa kupong går alltid att
+titta på: ett klick på kupongstället på disken eller N tar en blank kupong för nästa omgång i
+handen. Det är veckans Stryktips som Svenska Spel har öppet för spel – samma som *Hämta
+Stryktipset* (`Folket.open` i folket.js) –, med sajtens matcher i Stryktipsets ordning, och
+kupongen är samma kupong i samma mått som den på pulten: numret (*Kupong 8*), spelstoppet, lagen,
+dagen och tävlingen. En match som inte finns på sajten står med lagen och tiden från Svenska Spel.
+Den är bara att titta på: rutorna är inga knappar, det finns ingen penna, och lagen lägger inte
+fram matchbladet. Den lyfts ur stället, liten och vriden som stället, och kommer fram till mitten
+som kupongen från pulten; under den står bara *Lägg tillbaka*, och den, Esc, N, K eller ett klick
+utanför sätter tillbaka den samma väg (`openStall`, `stallFrames` och `closeCoupon` i rum.js).
+Medan protokollet ligger på pulten (efter en spelad omgång, fram till måndagen kl. 16) är det
+nästa veckas Stryktips; när det har blivit omgångens kupong är det samma matcher som på pulten,
+med samma nummer och streckkod. Är ingen omgång öppen hos Svenska Spel (mellan spelstoppet och
+nästa omgång) är kupongen blank, med tretton tomma rader. Omgången hämtas när rummet läser in sina
+data och när kupongen tas, högst var femte minut (`stallHamta`), och står den inte klar när
+kupongen tas fylls kupongen i när den kommer.
+
 Rummet läser om omgången från tjänsten varje minut (`Samtal.load`), så att högen, gängets
 kupong och de andras kuponger följer med när någon lämnar in. Med `prefers-reduced-motion`
 (och med `?rum-t=`) står kupongen direkt i handen, kryssen direkt på papperet och pennan
@@ -5679,8 +5713,8 @@ uret går som vanligt, med sekundvisaren.
 
 Ingen närbild leder ut ur rummet. Under pokalhyllan står hur många pokaler var och en har.
 Esc eller ett klick (också på saken) går tillbaka,
-och K, T, A, R och V går direkt till kupongen, tv:n, anslagstavlan, kortregistret och videon
-(K nära kupongen på pulten går tillbaka). Föremålen lyser inte när man
+och K, T, A, R, V och N går direkt till kupongen, tv:n, anslagstavlan, kortregistret, videon och
+kupongen ur kupongstället (K nära kupongen på pulten går tillbaka). Föremålen lyser inte när man
 pekar på dem på nära håll. Med `prefers-reduced-motion` går kameran direkt.
 `?rum-sak=ur|skar|ram|kort|pokal|kork|vm94|ifk|nacional|lopsedel|chelsea|dorr|kupong|radio` visar en närbild i en fast bild (med `?rum-t`).
 
