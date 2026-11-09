@@ -932,9 +932,18 @@ bara lokalt. Analyserna visas som de ligger i `data/analyser.json`; hur de skriv
   uppifrån, och i baren står koppen lite längre bak med fatet på notans övre vänstra hörn som i rummet,
   så att Hasse B. syns. Fingertopparna på hans vänstra hand skars av vid dukens underkant; nu ryms de.
   Se [Hasse Backe](#hasse-backe), *Kaffet i rummet*.
+- **Samma papper på notan i rummet och i baren (2026-11-09, användarens önskemål):** "Kvittona ser lite
+  olika ut – pappret bland annat som här är lite mer rosa." I baren tog papperet neonskyltens röda färg,
+  och raderna från Kaffe och nedåt låg 17 px lägre än i rummet, utan pappersstrukturen. Nu ritas den efter
+  notan i rummet, med baslinjerna mätta där, och får bara ljusets styrka, inte dess färg. Se
+  [Hasse Backe](#hasse-backe).
 - **Hasse Backe spanar på din kupong (2026-11-08, användarens val):** ibland går blicken ned på kupongen,
   med sex olika miner, och när han har sagt vad han tycker om den passar minen orden. Se
   [Hasse Backe](#hasse-backe), *Vilan*.
+- **De gamla protokollen på korktavlan (2026-11-09, användarens önskemål):** "Man vill här kunna klicka in sig på de
+  tidigare bettingarna - och hur det gick för alla. Alltså tidigare protokoll." Varje färdigspelad kupong på korktavlan
+  tas nära ned från nålen med ett klick och blir omgångens protokoll, samma blad som på pulten med allas tecken, facit,
+  rätt och poäng. Se *Protokollen på korktavlan* under [Sammanställningen efter omgången](#sammanställningen-efter-omgången).
 - **Protokollet som ett äkta papper (2026-11-09, användarens önskemål):** "Jag tycker inte att protokoll-pappret ser
   trovärdigt ut. Gör det snyggare och som att det ser ut som ett äkta papper. Det går gärna likna de vanliga kupongerna".
   Bladet är nu en blankett som kupongen (se *Sammanställningen efter omgången*): de platta gröna rutorna är en grön
@@ -957,6 +966,13 @@ bara lokalt. Analyserna visas som de ligger i `data/analyser.json`; hur de skriv
   att man väljer vem han dömer (inte domarna uppradade, eller hans eget exemplar av protokollet på disken). Domarna gäller
   så länge protokollet ligger på pulten. Senare samma dag togs också namnteckningen bort på användarens önskemål, så
   bladet slutar med raden Poäng. Se [Hasse Backe](#hasse-backe), *Domarna efter omgången*.
+- **Gänget utan siffror och lappen under domen (2026-11-09, användarens önskemål):** "Kan du göra om det här snyggare
+  och ta bort länken 'Matcherna' som är meningslös. Utveckla gärna kring de olika personerna sen. Tycker inte att du behöver
+  ha poäng och antal rätt på den här sidan. Det tycker jag att du kan visualisera på nästa i så fall. Visualisera det och
+  annan relevant bettinginformation för den individen!" Listan hos Hasse är nu stora porträtt sida vid sida i gängets
+  ordning (inte bäst först, så att var och en står på samma plats varje omgång och listan inte avslöjar något), och under
+  domen ligger en lapp ur protokollet med kupongen rad för rad och siffrorna. Se [Hasse Backe](#hasse-backe), *Domarna
+  efter omgången*.
 - **Bara protokollet på pulten, och nästa kupong måndag kl. 16 (2026-11-08, användarens önskemål):** "Ta bort
   kupong 3 där nu när allt är klart - ha bara protokollet", och "Den nya kupongen kan dyka upp från och med
   måndagen efter tippningsdagen", "Måndag kl 16". Kupongen låg kvar under protokollet och Stryktipset tog över redan
@@ -2604,8 +2620,10 @@ Enter och mellanslag klickar på dem. En match på text-tv:n lägger fram matchb
   smal aluminiumram (3D). Varje bokstav sitter lite snett för sig (samma frö varje gång, så
   att inget flyttar sig), och lådan har bara fyra O – sedan blir det nollor.
 - **Korktavlan** (längst ut på högra väggen, hel i bild, i en träram i 3D) → närbild: de
-  färdigspelade kupongerna (`Historik.coupons`) rättade med röd penna, en med kaffering.
-  Tom tills den första är färdigspelad.
+  färdigspelade kupongerna (`Historik.coupons`, de fyra senaste) rättade med röd penna, en med kaffering.
+  Tom tills den första är färdigspelad. Nära lyfter en kupong från tavlan när man pekar på den, och ett
+  klick tar den från nålen och fram som omgångens protokoll (se *Protokollen på korktavlan* under
+  [Sammanställningen efter omgången](#sammanställningen-efter-omgången)).
 - **Kupongen**: kupongen tas i handen (se nedan), och när den inte går att ta i
   handen går kameran fram till den på pulten (också med K).
   Kupongen är samma kupong som papperet under Kupong, i
@@ -4952,7 +4970,10 @@ ritas en gång på en egen duk under figuren (`diskBild`): benet framför honom 
 i skugga under den tjocka skivan. Träet speglar väggen bakom honom svagt: den
 speglade strålen träffar väggen, och där hämtas färgen ur väggens bild, suddigare ju längre strålen
 går; han själv speglas som en mörk form. Notan ligger under fatet,
-samma nota som på pulten (ritad på en duk med samma typsnitt), med den främre änden lite uppböjd.
+samma nota som på pulten, med den främre änden lite uppböjd. Den ritas på en duk efter notan i rummet
+(`#rum-hasse .nota` i rum.css): samma typsnitt, rader, vinklar och pappersstruktur, med baslinjerna mätta
+där. Den får barens ljus, men bara dess styrka, så att papperet har samma färg som på pulten och inte
+blir rosa av neonskylten.
 Figuren skuggar det som är under disken eller skyms av den (`BORD_GLSL` i
 [public/rum-hasse-arm.js](public/rum-hasse-arm.js)): framför diskens bakre kant det som är under
 ovansidan, bakom den det som strålen från kameran bara når genom disken. Kroppen slutar alltså vid
@@ -5323,21 +5344,36 @@ annars tecknen i hans text, med hans resultat.
 Överst i listan står vem som säger vad, utan förklarande text: Hasses porträtt och namn i guld mitt över hans rutor och resultat, och ditt porträtt i din färg med namnet i din handstil (som på kupongen) över din spalt. Får namnen inte plats bredvid varandra, som i telefonen, går ditt namn först och sedan hans, så att porträtten står kvar. En spalt som inte syns på någon rad får inget huvud.
 När alla matcher har börjat säger han hur det gick för honom (`efterat`), tills omgången är spelad.
 
-**Domarna efter omgången** (2026-11-08). Så länge protokollet ligger på pulten, alltså från att omgången är spelad
-tills nästa Stryktips kommer måndagen efter kl. 16 (`Rum.summa`), dömer han gänget i stället för att gå igenom matcherna.
-Han frågar vem han ska börja med, och listan har var och en i gänget med porträttet i sin färg, namnet i sin handstil och
-rätt och poäng som i protokollet, bäst först och med ringen kring den bästas poäng (`gangLista` i
-[public/rum-hasse.js](public/rum-hasse.js)). Den man väljer får sin dom slagen i disken i guld, som domen över en match
-(*Garderat*, *Flyt*, *Felfritt*, *Osynlig*, *Talang*, *Snöpligt*, *Klokt*), och under den några meningar: en inledning
-efter hur det gick i gänget, en eller två saker ur kupongen och ett slut (`doma`). Sakerna är räknade ur protokollet:
-helgarderingarna, hur många spikar som satt och i hur många matcher ingen annan i gänget hade rätt (läget i `gang` i
-[public/rum-block.js](public/rum-block.js), raderna i `domar` i rum-hasse-repliker.js). Raderna väljs efter omgången och
-personen, inte på lott, så att domen är densamma varje gång och på alla enheter. Varje rad är en mening, så att domen står
-i ett stycke och *Läs upp* ändå kan läsa den mening för mening. *Nästa* tar den man inte har hört om än, och *Hela gänget*
-går tillbaka till listan, där ordet i guld står efter namnet på dem man har hört om (på enheten för den omgången,
-`profeterna.hasse.domar`). Om sig själv säger han inget här: han står inte i listan och räknas inte när bäst och sämst
-i gänget avgörs, och efter omgången säger han inte heller hur det gick för honom. *Matcherna* under listan visar hans rader
-och facit som förut, med *Gänget* tillbaka. Med dolda resultat finns inget protokoll, och då är allt som förut.
+**Domarna efter omgången** (2026-11-08, listan och lappen 2026-11-09). Så länge protokollet ligger på pulten, alltså från
+att omgången är spelad tills nästa Stryktips kommer måndagen efter kl. 16 (`Rum.summa`), dömer han gänget i stället för att
+gå igenom matcherna. Han frågar vem han ska börja med, och gänget står sida vid sida i sin ordning, som på kupongen: stora
+porträtt i var och ens färg och namnet i sin handstil, utan siffror (`gangLista` i [public/rum-hasse.js](public/rum-hasse.js)).
+Den man väljer får sin dom slagen i disken i guld, som domen över en match (*Garderat*, *Flyt*, *Felfritt*, *Osynlig*,
+*Talang*, *Snöpligt*, *Klokt*), och under den några meningar: en inledning efter hur det gick i gänget, en eller två saker ur
+kupongen och ett slut (`doma`). Sakerna är räknade ur protokollet: helgarderingarna, hur många spikar som satt och i hur
+många matcher ingen annan i gänget hade rätt (läget i `gang` i [public/rum-block.js](public/rum-block.js), raderna i `domar`
+i rum-hasse-repliker.js). Raderna väljs efter omgången och personen, inte på lott, så att domen är densamma varje gång och
+på alla enheter. Varje rad är en mening, så att domen står i ett stycke och *Läs upp* ändå kan läsa den mening för mening.
+
+Under meningarna ligger *lappen*, en remsa av protokollets blankett om just den kupongen, med samma papper, band och tryck
+(`lapp` i [public/rum-block.js](public/rum-block.js), stilen i [public/rum-block.css](public/rum-block.css)). Överst en spalt
+per match med rutorna 1, X och 2: kryssen i personens bläck, rutan som satt överstruken med den gröna märkpennan som i
+protokollet och facit maskinskrivet under. Rödpennans stjärna vid matchnumret betyder att ingen annan i gänget hade rätt där, och matchen och
+resultatet står i spaltens title. Under rutorna siffrorna med tryckta rubriker: *Rätt* av antalet matcher, *Poäng* (med
+ringen kring vinnarens, som i protokollet), *Plats* i gänget, *Spelkassan* för omgången (10 kr per match till modellens odds,
+garderingar delade som i Olympens spelkassa), *Spikar*, *Halvgarderingar* och *Helgarderingar* som satt av hur många och
+*Ensam rätt*. Sedan *Bästa träffen*, tipset med högst odds som satt, och *Största missen*, tipset med lägst odds som inte
+satt. Sist *Säsongen* när den är hämtad (`data/tippare.json`, samma som Olympen och utan omgångar som spoilerskyddet döljer,
+plus den här omgången om bygget inte har frusit in den än): en stapel per omgång uppåt för plus och nedåt för minus, den här
+överstruken, och poängen och platsen hittills. Den visas från andra omgången. Texten och lappen rullar tillsammans, så att
+man i telefonen rullar ned till lappen.
+
+*Nästa* tar den man inte har hört om än, i gängets ordning, och *Hela gänget* går tillbaka till listan, där ordet han slog i
+disken står som en stämpel i guld under namnet på dem man har hört om (på enheten för den omgången,
+`profeterna.hasse.domar`). Om sig själv säger han inget här: han står inte i listan och räknas inte när bäst och sämst i
+gänget avgörs, och efter omgången säger han inte heller hur det gick för honom. Förut hade listan rätt och poäng, bäst först,
+och länken *Matcherna* till hans rader och facit (borta 2026-11-09). Med dolda resultat finns inget protokoll, och då är allt
+som förut.
 Går hans röst inte att få säger han det och visar analysen i skrift. Allt han säger runt omkring är
 färdiga rader, utan AI, i [public/rum-hasse-repliker.js](public/rum-hasse-repliker.js). Står man kvar säger han något då och då:
 över matchlistan (`ledig`), över listan med gänget (`domar.ledig`) och när man inte svarar på hans fråga (`valVanta`). Raderna
@@ -5745,6 +5781,19 @@ lägger ett klick på någon i gänget ner hens skylt på bordet, och ett klick 
 byter inte vem man är. Läget gäller på enheten för den omgången. Den som somnar eller går iväg lägger ner sin och tar
 upp den igen när hen är tillbaka. Modellens siffra står på
 videons blå ruta på håll.
+
+**Protokollen på korktavlan** (2026-11-09, användarens önskemål). De färdigspelade kupongerna på korktavlan har var
+sitt protokoll: nära tavlan lyfter en kupong när man pekar på den (och lägger sig överst om den ligger under en annan),
+och ett klick tar den från nålen – nålen sitter kvar – och lägger fram omgångens protokoll som bladet från pulten.
+*Häng tillbaka*, Esc eller ett klick utanför sätter tillbaka den, och kameran står kvar vid tavlan (`korkProtokoll` och
+`nalBilder` i rum.js). Är det omgången vars protokoll ligger på pulten är det samma blad; annars räknas det ur den
+frysta omgången i `data/tippare.json` (`RumBlock.fryst`): resultatet efter 90 minuter, modellens chans före avspark och
+allas tecken står där, så att bladet går att räkna också när matcherna inte längre finns i spelprogrammet, och poängen
+blir desamma som i Olympen. Omgången är den med flest av kupongens matcher, minst hälften (som `roundOf` i
+src/history.js); en kupong utan omgång eller med dolda resultat har inget protokoll och går inte att ta ned. Matcherna
+står i kupongens ordning när den har dem alla (Stryktipsets), annars efter avsparken. Hasses spalt står bara när
+analyserna fortfarande har något han sa om omgångens matcher – `data/analyser.json` har bara den senaste omgången, så
+de äldre protokollen har ingen.
 
 **Hur skylten hålls** (2026-11-08, användarens önskemål: "lite olika hålla upp skylt-rörelser så att det inte blir så
 enformigt"). Skylten är en bit lite välvd kartong med brun baksida, och den hålls mellan tummen framför och fingrarna

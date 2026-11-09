@@ -685,13 +685,15 @@ export async function figuren(duk, { hog = false, latt = false, pr = 1 } = {}) {
     }
     notaG.computeVertexNormals();
   }
+  // I barens ljus, men bara dess styrka: färgen är papperets, som på pulten i rummet. (Med ljusets färg,
+  // neonskyltens röda, och ett rött tillägg blev papperet rosa, 2026-11-09.)
   const nota = new THREE.Mesh(notaG, new THREE.ShaderMaterial({
     uniforms: { uT: { value: notaTex }, uButik: bord.butik, uDag: DAG, uLys: LYS },
     transparent: true,
     vertexShader: 'varying vec2 vUv; varying vec3 vN; void main() { vUv = uv; vN = mat3(modelMatrix) * normal; gl_Position = projectionMatrix * viewMatrix * modelMatrix * vec4(position, 1.); }',
     fragmentShader: `precision highp float; uniform sampler2D uT; varying vec2 vUv; varying vec3 vN;
     ${LJUS}
-    void main() { vec4 c = texture2D(uT, vUv); if (c.a < .02) discard; vec3 n = normalize(vN); gl_FragColor = vec4(ton(c.rgb * (ljus(n) * .78 + vec3(.12, .02, .015))), c.a); }`,
+    void main() { vec4 c = texture2D(uT, vUv); if (c.a < .02) discard; vec3 n = normalize(vN); gl_FragColor = vec4(c.rgb * ton(vec3(dot(ljus(n), vec3(.2126, .7152, .0722)))), c.a); }`,
   }));
   // På pultens arm, fritt från dess kant mot en, och fatet på notans övre vänstra hörn som i rummet (rum.css):
   // fatets mitt FAT[0] från notans vänstra kant och FAT[1] bortom dess överkant, så långt ut att namnet
@@ -708,7 +710,12 @@ export async function figuren(duk, { hog = false, latt = false, pr = 1 } = {}) {
   function ritaNota() {
     if (!notaKlar) {
       notaKlar = (async () => {
-        try { await Promise.all(['600 19px Caveat', '700 27px Caveat', '700 10px Fraunces', '14px VT323'].map((f) => document.fonts.load(f))); } catch (e) { /* då med reservtypsnitten */ }
+        // Samma som notan i rummet (#rum-hasse .nota i rum.css), i dess mått: raderna, vinklarna och
+        // baslinjerna är mätta där, och pappersstrukturen (--pp-grain) ligger överst som där.
+        try { await Promise.all(['600 19px Caveat', '700 27px Caveat', '900 10px Fraunces', '14px VT323'].map((f) => document.fonts.load(f))); } catch (e) { /* då med reservtypsnitten */ }
+        let korn = new Image();
+        korn.src = 'rum/papper.webp';
+        try { await korn.decode(); } catch (e) { korn = null; }
         const k = 3;
         notaDuk.width = 148 * k;
         notaDuk.height = 236 * k;
@@ -730,45 +737,51 @@ export async function figuren(duk, { hog = false, latt = false, pr = 1 } = {}) {
         x.clip();
         x.fillStyle = 'rgba(70, 100, 170, 0.2)';
         for (let y = 13 + 22; y < 236; y += 23) x.fillRect(0, y, 148, 1);
+        if (korn) {
+          const m = x.createPattern(korn, 'repeat');
+          m.setTransform(new DOMMatrix().scale(320 / korn.naturalWidth));
+          x.fillStyle = m;
+          x.fillRect(0, 0, 148, 236);
+        }
         x.restore();
         x.textBaseline = 'alphabetic';
-        x.fillStyle = '#a8402c';
-        x.font = '700 10px Fraunces, Georgia, serif';
-        x.letterSpacing = '2.6px';
         x.textAlign = 'right';
         x.fillStyle = '#c0392b';
         x.font = '14px VT323, monospace';
         x.letterSpacing = '0.5px';
-        x.fillText('NR 0007', 137, 26);
+        x.fillText('NR 0007', 137, 25);
         const nr = x.measureText('NR 0007').width;
         x.fillStyle = '#a8402c';
-        x.font = '700 10px Fraunces, Georgia, serif';
+        x.font = '900 10px Fraunces, Georgia, serif';
         x.letterSpacing = '2.6px';
-        x.fillText('NOTA', 137 - nr - 8, 26);
+        x.fillText('NOTA', 137 - nr - 8, 25);
         x.letterSpacing = '0px';
         x.fillStyle = '#25336f';
-        const text = (t, px, py, vinkel = 0, font = '600 19px Caveat, cursive', hoger = false) => {
+        // en rad med baslinjen bas, vriden vinkel grader kring o (transform-origin i rum.css)
+        const text = (t, px, bas, { vinkel = 0, o = [px, bas], font = '600 19px Caveat, cursive', hoger = false } = {}) => {
           x.save();
-          x.translate(px, py);
-          x.rotate(vinkel);
+          x.translate(o[0], o[1]);
+          x.rotate(vinkel * DEG);
           x.font = font;
           x.textAlign = hoger ? 'right' : 'left';
-          x.fillText(t, 0, 0);
+          x.fillText(t, px - o[0], bas - o[1]);
+          const b = x.measureText(t).width;
           x.restore();
+          return b;
         };
-        text('Hasse B.', 15, 50, -3 * DEG, '700 27px Caveat, cursive');
-        const rad = [['Kaffe', '32:–'], ['Påtår ×4', '–'], ['Kanelbulle', '28:–'], ['S:a', '60:–']];
-        rad.forEach(([a, b], i) => { text(a, 15, 73 + 23 * i + 23 - 6); text(b, 137, 73 + 23 * i + 23 - 6, 0, undefined, true); });
-        x.fillRect(15, 73 + 23 * 3 + 1, 126, 1.5);
-        text('Skrivs på', 15, 182, -4 * DEG);
-        text('Notts County', 13, 208, -5 * DEG, '700 24px Caveat, cursive');
+        text('Hasse B.', 15, 53, { vinkel: -3, o: [15, 44.5], font: '700 27px Caveat, cursive' });
+        const rad = [['Kaffe', '32:–', 73], ['Påtår ×4', '–', 96], ['Kanelbulle', '28:–', 119], ['S:a', '60:–', 143]];
+        rad.forEach(([a, b, y], i) => { text(a, 15, y); text(b, i === 3 ? 141 : 137, y, { hoger: true }); });
+        x.fillRect(15, 125, 126, 1.5);
+        text('Skrivs på', 15, 167, { vinkel: -4, o: [76, 161.5] });
+        const o = [11, 184.5];
+        const b = text('Notts County', 11, 192, { vinkel: -5, o, font: '700 24px Caveat, cursive' });
+        // dubbelt understruken, som text-decoration: underline double
         x.save();
-        x.translate(13, 208);
+        x.translate(o[0], o[1]);
         x.rotate(-5 * DEG);
-        x.font = '700 24px Caveat, cursive';
-        const b = x.measureText('Notts County').width;
-        x.fillRect(0, 4, b, 1.5);
-        x.fillRect(0, 7.5, b, 1.5);
+        x.fillRect(0, 192 - o[1] + 4, b, 1.5);
+        x.fillRect(0, 192 - o[1] + 7.5, b, 1.5);
         x.restore();
         notaTex.needsUpdate = true;
       })();

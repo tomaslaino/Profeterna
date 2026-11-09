@@ -348,8 +348,6 @@
       'Jag dömer rättvist, och det är det som gör ont.',
       'Nästa kupong blir lika lätt som den här var.',
     ],
-    // Över matcherna, med det han sa och hur de slutade.
-    matcherna: ['Här är matcherna och hur de slutade.', 'Här är matcherna. Där facit och jag är oense har facit fel.'],
     // Inledningen, efter hur det gick i gänget (forsakring har forst).
     in: {
       forst: ['{namn} var bäst i gänget, och det kommer vi att få höra.', '{namn} slog resten av gänget den här gången.', '{namn} vann omgången, och ingen är mer förvånad än {namn}.'],
