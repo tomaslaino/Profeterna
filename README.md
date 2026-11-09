@@ -764,6 +764,13 @@ bara lokalt. Analyserna visas som de ligger i `data/analyser.json`; hur de skriv
   svaga suset och de enstaka knäpparna på AM-stationerna är borta, och en station som har hörts och hackar till blir
   tyst i stället för att spraka. Medan man letar och medan stationen laddas låter det som förut. Se
   [Tobaksaffären](#tobaksaffären), *Radion*.
+- **Tio stationer, en tydligare tejp och ett mindre blad (2026-11-09, användarens önskemål):** "Gör radion
+  snyggare/bättre och minska antalet radiostationer till de essentiella" och "Gör radiostationspappret
+  snyggare/mer anpassat också. Just nu är det lite oklart hur det är uppsatt". 49 stationer blev tio: Italo Disco,
+  P1, Guldkanalen 80-tal, Rockklassiker, P3, P4 Göteborg och Rix FM på FM, Sport 890, talkSPORT och Radio Caroline
+  på AM. Tejpen har fått större handstil, och varje namn står över sin frekvens; ett tryck på ett namn går dit.
+  Bladet är mindre och sitter fritt från antennen, med allt i en spalt: FM med sin rubrik överst, AM under, och
+  frekvenserna rakt under varandra. Se [Tobaksaffären](#tobaksaffären), *Radion*.
 - **Man väljer sig själv med ett klick på sin figur (2026-11-03, användarens önskemål):**
   ett klick på sin egen figur vid bordet gör en till den som fyller i kupongen – samma val
   som porträtten på kupongen – och figuren räcker upp handen med pennan, lyfter kupongen mot
@@ -3084,15 +3091,20 @@ station drar radion in den, och en liten röd lampa säger att den stämmer. Mel
 också knaster och en pipton som sjunker tills man står rätt. När stationen väl hörs är det rent, också på AM och
 också om strömmen hackar till (då blir det tyst en stund, `A.fick`). AM låter dessutom som AM: smalt band och långsam
 fading, som också syns på lampan. Lysdioderna och högtalarna följer det som faktiskt hörs (en analysator i
-Web Audio). Alla stationer står för hand på maskeringstejpen vid skalan (FM ovanför i blått, AM under i rött, två
-rader där varannan står närmast skalan, `tejpPlats`). Där trängs de, så frekvenserna står på ett blad ur ett
+Web Audio). Stationerna står för hand på maskeringstejpen vid skalan (FM ovanför i blått, AM under i rött): varje
+namn mitt över sin frekvens, närmast skalan, och bara när grannen står för nära i raden längre ut, med ett streck
+ned till frekvensen (`tejpPlats`). Ett tryck på ett namn går dit, byter band om det behövs och sätter på radion
+(`radioEtikett` i rum-3d.js, som hittar namnet under fingret). Frekvenserna står på ett blad ur ett litet
 spiralblock som är tejpat på fönsterkarmen till höger om radion, mellan radion och veckans löpsedel (`radiolapp` i
 rum-inredning.js, en egen duk i bakväggens plan, så att det sitter fast på karmen när rummet vrids). Bladet är i
 3D: rivet ur spiralen med halva hål, blå linjer och röd marginal, vikt en gång, två bitar gulnad tejp överst, och
 nedtill släpper det från karmen (mest i hörnet) med en skugga under. Papperet har samma struktur som allt papper
-på sajten (rum/papper.webp), fibrer och en kaffering, och mörknar med rummet när lysröret släcks. FM står i blått
-och AM i rött, i var sin spalt, med samma penna som på tejpen. Namnet står som stationen heter, utan frekvensen en
-gång till (*890 Sport*, *102,5 RTL*), och den station som hörs ringas in med pennan (ett streck i 3D, `nu`). Nära
+på sajten (rum/papper.webp), fibrer och en kaffering, och mörknar med rummet när lysröret släcks. Bladet är lagom
+för tio stationer och sitter fritt från antennen. Allt står i en spalt, en rad per linje: *FM MHz* med ett streck
+under och FM-stationerna i blått, en tom rad, och *AM kHz* med AM-stationerna i rött, med samma pennor som på tejpen.
+Frekvenserna står till höger i en egen kolumn, så att de står rakt under varandra, och linjerna står så tätt som
+stationerna kräver (`PLAN` i `radiolapp`). Namnet står som stationen heter, utan frekvensen en gång till
+(*890 Sport*), och den station som hörs ringas in med pennan (ett streck i 3D, `nu`). Nära
 radion kommer bladet med i bilden (`RumRadio.ram`, `med` i `SAKER` i rum.js: radion och bladet mäts med rummet
 rakt). Där ligger genomskinliga knappar över raderna (`lappen` i rum-radio.js) när de är minst 14 px höga: ett
 klick går dit och sätter på radion. Är de mindre (telefonen) går ett tryck på bladet fram till det
@@ -3114,7 +3126,7 @@ i närbildens skärpa (`narbild`), och duken läggs över just den delen: gänge
 kostar mindre än på håll (en fjärdedel av trianglarna, uppmätt 2026-11-08). Skalans, tejpens och
 kassettens dukar ritas om större första gången (`radioFin`), och de små delarna ritas bara på väg fram och nära
 (`radioDetalj`). Radion kostar 2 % fler ritningar i rummet än bergsprängaren. `?rum-sak=radio` visar närbilden
-och `?rum-radio-lage=fm:104.3` hur den står inställd, utan ljud; `?rum-radio`
+och `?rum-radio-lage=fm:90.4` hur den står inställd, utan ljud; `?rum-radio`
 sätter på gänget och lysdioderna (`=4` sedan fyra sekunder, med `?rum-t`), också det utan ljud.
 
 **Dansen** (2026-11-08, `DANSER` i rum-dans.js, `dansPose`, `dansHand` och `dansFingrar` i rum-3d.js):
@@ -3139,13 +3151,15 @@ Allt står i bildens axlar (`bildAxlar`), så att dansen ser likadan ut var de �
 `?rum-akt=dl:italoPek,dt:italoPek,dj:italoPek`, och i en fast bild `?rum-t=5&rum-akt=dl:italoRobot@3` (tre
 sekunder in).
 
-Stationerna är riktiga webbradiokanaler (`KANALER` i rum-radio.js). De svenska ligger på sina frekvenser i
-Stockholm och Göteborg där de har några, AM-bandets på mellanvågen där de sänder eller har sänt:
-- *FM:* Dansbandskanalen 88,7, Italo Disco 90,4 (laut.fm), P1 92,4, Guldkanalen 80-tal 93,7, Gamla Favoriter 95,1,
-  P2 96,2, Rockklassiker 97,7, P3 99,3, Disco 54 100,6, P4 Göteborg 101,9, P4 Stockholm 103,3, Mix Megapol 104,3,
-  Bandit Rock 106,3, Rix FM 106,7 och Star FM 107,1.
-- *AM:* Sarandí 690 och Radio Carve 850 (Montevideo), Sport 890 (Montevideo, DL:s Nacional), Rai Radio 1 900,
-  talkSPORT 1053 och talkSPORT 2 1089 (engelsk fotboll) och Radio Caroline 1159.
+Stationerna är riktiga webbradiokanaler (`KANALER` i rum-radio.js), tio stycken: de som hör hemma i
+tobaksaffären (italodiscon som gänget dansar till, svensk radio, IFK:s Göteborg, DL:s Nacional och engelsk
+fotboll). De svenska ligger på sina frekvenser i Stockholm och Göteborg, AM-bandets på mellanvågen där de sänder
+eller har sänt:
+- *FM:* Italo Disco 90,4 (laut.fm), P1 92,4, Guldkanalen 80-tal 93,7, Rockklassiker 97,7, P3 99,3,
+  P4 Göteborg 101,9 och Rix FM 106,7.
+- *AM:* Sport 890 (Montevideo, DL:s Nacional), talkSPORT 1053 (engelsk fotboll) och Radio Caroline 1159.
+
+Stod visaren på en station som inte finns kvar (den sparas i webbläsaren) börjar den på Italo Disco igen.
 
 Adresserna går direkt till servrarna, eftersom ljudet går genom Web Audio och en omdirigering utan CORS-svar då
 inte går att spela (`live1.sr.se`, `stream.laut.fm`). Slutar en adress svara provas reservadressen (där det

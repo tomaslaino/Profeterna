@@ -1836,17 +1836,23 @@ export async function figurer(canvas, opt = {}) {
   const SKALA = rduk(512, 62, (c, w, h) => ritaSkala(c, w, h, false));
   const SKALA_LYS = rduk(512, 62, (c, w, h) => ritaSkala(c, w, h, true));
   SKALA_LYS.colorSpace = THREE.SRGBColorSpace;
-  // Tejpen vid skalan: FM ovanför, AM under, med alla stationer för hand i två rader, varannan närmast
-  // skalan (tejpPlats). Frekvenserna står på lappen bredvid radion (rum-radio.js).
-  const TEJP = { rutor: { fm: [], am: [] } };
+  // Tejpen vid skalan: FM ovanför, AM under, med stationerna för hand. Ett namn står närmast skalan, mitt
+  // över sin frekvens, och bara när det inte får plats där i raden längre ut (tejpPlats). Frekvenserna står
+  // på lappen bredvid radion (rum-radio.js), och ett tryck på ett namn går dit (radioEtikett, TEJP.hit).
+  const TEJP = { rutor: { fm: [], am: [] }, hit: { fm: [], am: [] } };
   function tejpPlats(band, c, w, h) {
     const l = TEJP.rutor[band];
-    const fs = Math.round(h * 0.47);
+    const fs = Math.round(h * 0.52);
     c.font = `700 ${fs}px Caveat, cursive`;
     const utx = (p) => (((RM.sx0 + p * (RM.sx1 - RM.sx0)) - RM.gx0) / (RM.gx1 - RM.gx0)) * w;
-    const lucka = fs * 0.32;
+    // (så mycket luft mellan två namn att de inte läses som ett)
+    const lucka = fs * 0.7;
     const rad = l.map((e) => ({ e, x: utx(e.p), b: c.measureText(e.kort).width })).sort((a, b) => a.x - b.x);
-    rad.forEach((a, i) => { a.r = i % 2; });
+    let slut = -Infinity;
+    for (const a of rad) {
+      a.r = a.x - a.b / 2 < slut + lucka ? 1 : 0;
+      if (!a.r) slut = a.x + a.b / 2;
+    }
     for (const r of [0, 1]) {
       const denna = rad.filter((a) => a.r === r);
       let v = w * 0.012;
@@ -1905,6 +1911,7 @@ export async function figurer(canvas, opt = {}) {
       c.fillStyle = penna;
       c.fillText(a.e.kort, a.c, radY(a.r) + (hash(a.x) - 0.5) * h * 0.06);
     }
+    TEJP.hit[band] = rad.map((a) => ({ id: a.e.id, x0: (a.c - a.b / 2) / w, x1: (a.c + a.b / 2) / w, y: radY(a.r) / h }));
   }
   const TEJPF = rduk(512, 29, (c, w, h) => ritaTejp('fm', c, w, h));
   const TEJPA = rduk(512, 29, (c, w, h) => ritaTejp('am', c, w, h));
@@ -6472,7 +6479,8 @@ export async function figurer(canvas, opt = {}) {
     };
   }
   const rPlan = new THREE.Plane();
-  function radioP(nx, ny) {
+  // punkten (nx, ny) i duken på radions front, i modellens enheter (eller null)
+  function rPunkt(nx, ny) {
     scene.updateMatrixWorld(true);
     cam.updateMatrixWorld();
     ray.setFromCamera(new THREE.Vector2(nx, ny), cam);
@@ -6481,9 +6489,33 @@ export async function figurer(canvas, opt = {}) {
     const n = new THREE.Vector3(0, 0, 1).transformDirection(K);
     rPlan.setFromNormalAndCoplanarPoint(n, o);
     const u = ray.ray.intersectPlane(rPlan, new THREE.Vector3());
-    if (!u) return RL.p;
-    u.applyMatrix4(delInv.copy(K).invert());
-    return Math.min(1, Math.max(0, (u.x - RM.sx0) / (RM.sx1 - RM.sx0)));
+    return u ? u.applyMatrix4(delInv.copy(K).invert()) : null;
+  }
+  function radioP(nx, ny) {
+    const u = rPunkt(nx, ny);
+    return u ? Math.min(1, Math.max(0, (u.x - RM.sx0) / (RM.sx1 - RM.sx0))) : RL.p;
+  }
+  // Stationen vars namn på tejpen är vid punkten (nx, ny), eller null
+  function radioEtikett(nx, ny) {
+    const u = rPunkt(nx, ny);
+    if (!u) return null;
+    const x = (u.x - RM.gx0) / (RM.gx1 - RM.gx0);
+    for (const [band, [y0, y1]] of [['fm', RM.tf], ['am', RM.ta]]) {
+      if (u.y < y0 - 0.3 || u.y > y1 + 0.3) continue;
+      const y = (y1 - u.y) / (y1 - y0);
+      let bast = null;
+      let d = Infinity;
+      for (const e of TEJP.hit[band]) {
+        const dx = Math.max(0, e.x0 - x, x - e.x1);
+        const dy = Math.abs(y - e.y);
+        if (dx < 0.015 && dy < 0.32 && dx * 20 + dy < d) {
+          d = dx * 20 + dy;
+          bast = e.id;
+        }
+      }
+      return bast;
+    }
+    return null;
   }
 
   function kval({ pr = 1, skugga = 1, detalj = 1, enkel = false } = {}) {
@@ -6893,5 +6925,5 @@ export async function figurer(canvas, opt = {}) {
     await r.compileAsync(scene, cam);
   } catch (err) { /* då byggs de när gänget ritas, som förut */ }
   ANS.ute = true;
-  return { draw, inne, ute, lage, mal, radio, radioPa: () => SJUNG.radio.pa, radioLage, radioEtiketter, radioDetalj, narbild, radioRuta, radioDelar, radioP, spel, senast, uttryck: () => ANS.p, prova, ga, pekar, hej, vald, tecken, lappar, lappVand, lappProva, natt, somn, vakna: vakna1, efter, under, huvud, kval };
+  return { draw, inne, ute, lage, mal, radio, radioPa: () => SJUNG.radio.pa, radioLage, radioEtiketter, radioDetalj, narbild, radioRuta, radioDelar, radioP, radioEtikett, spel, senast, uttryck: () => ANS.p, prova, ga, pekar, hej, vald, tecken, lappar, lappVand, lappProva, natt, somn, vakna: vakna1, efter, under, huvud, kval };
 }
