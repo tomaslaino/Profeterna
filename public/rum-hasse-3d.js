@@ -53,23 +53,26 @@ function skrivTid(n) { return skrivSlut(n) + SKRIV.HALL + SKRIV.TILLBAKA + SKRIV
 // Huvudet och ansiktet som i de andra klippen (skillnad mot vilan); tidningen: ryggens nedre ände (x, y, z),
 // lutningen mot honom (tilt), vridningen (yaw, roll), halvornas vinkel mot planet (beta), hur mjukt den
 // faller bakåt (buk), vågen (vag), händerna från vilan till kanterna (mot) och greppets höjd (gy).
-// Han håller den åt sin vänstra sida, ut mot kaffet, lågt, lutad bakåt och vriden mot sig, inte mitt framför sig: det
-// är han man ska se, inte tidningen (Tomas önskemål 2026-11-09). I läget LAS tittar han ned i den, med huvudet vridet
-// och böjt mot den och blicken ned åt den (blickX åt hans vänstra sida, blickY nedåt), brynen lite nere (då ler han
+// Han håller den åt sin högra sida, ut mot askkoppen, lågt, lutad bakåt, vriden mot sig och halvt hopvikt, inte
+// utbredd mitt framför sig: det är han man ska se, inte tidningen, och av den ser man förstasidan snett från sidan och
+// baksidan bara som en kant (Tomas önskemål 2026-11-09 och 2026-11-10; åt hans vänstra sida vändes baksidan med vädret
+// mot en). I läget LAS tittar han ned i den, med huvudet vridet
+// och böjt mot den och blicken ned åt den (blickX åt hans högra sida, blickY nedåt), brynen lite nere (då ler han
 // mindre: NOJD i rita) och axlarna uppe. Bitarna utgår från LAS (L) och LAS_T, så att han läser där tidningen är och
 // inte tittar in i kameran; där han ser på en är blicken satt för sig (EN_X med huvudet kvar mot tidningen).
-const LAS = { pitch: 1.1, yaw: 0.9, lut: 0.03, axV: 10, axH: 10, brynX: -0.12, brynY: -0.08, blund: 0.66, blickY: 10.5, blickX: 7, kis: 0.06 };
+const LAS = { pitch: 1.1, yaw: -0.85, lut: 0.03, axV: 10, axH: 10, brynX: -0.12, brynY: -0.08, blund: 0.66, blickY: 10.5, blickX: -7, kis: 0.06 };
 const L = (x, d = 0) => LAS[x] + d;
 // blicken längs raderna: d åt vänster (−) eller höger (+) om mitten av spalten
 const rad = (d) => L('blickX', 0.6 * d);
 // ögonen på en medan huvudet är kvar vridet mot tidningen (glimt), och med huvudet halvvägs mot en (over)
-const EN_X = -5;
-const OVER_X = -1;
-// (ryggens nedre ände strax ovanför disken, åt hans vänstra sida och vriden mot honom)
-const LX = 320;
-const LY = -278;
-const LZ = 650;
-const LAS_T = { x: LX, y: LY, z: LZ, tilt: 0.58, yaw: 0.3, roll: 0, beta: 0.35, buk: 0.1, vag: 0, mot: 1, gy: 0.42 };
+const EN_X = 5;
+const OVER_X = 1;
+// (ryggens nedre ände strax ovanför disken, åt hans högra sida och vriden mot honom; halvorna vikta mot varandra
+// (beta), och händerna en bit ned på kanterna (gy): högre upp står den högra armbågen ut i axelhöjd)
+const LX = -240;
+const LY = -300;
+const LZ = 720;
+const LAS_T = { x: LX, y: LY, z: LZ, tilt: 0.58, yaw: -0.75, roll: 0, beta: 0.65, buk: 0.1, vag: 0, mot: 1, gy: 0.32 };
 // I knät bakom disken, uppslagen och stående mellan honom och diskens kant, med överkanten under det man
 // ser: där tar han den och dit lägger han den. Han håller den en bit ned (gy), med armarna nästan raka: högt upp,
 // strax under diskens kant, stod armbågarna ut som vingar i axelhöjd.
@@ -126,7 +129,7 @@ const LASBIT = {
   over: {
     dur: 5.6,
     k: {
-      pitch: [[0.8, L('pitch', 0.05)], [1.3, L('pitch', 0.2)], [3.7, L('pitch', 0.2)], [4.3, L('pitch', 0.05)]], yaw: [[0.8, L('yaw')], [1.3, 0.3], [3.7, 0.3], [4.3, L('yaw')]],
+      pitch: [[0.8, L('pitch', 0.05)], [1.3, L('pitch', 0.2)], [3.7, L('pitch', 0.2)], [4.3, L('pitch', 0.05)]], yaw: [[0.8, L('yaw')], [1.3, -0.3], [3.7, -0.3], [4.3, L('yaw')]],
       blickY: [[1.2, L('blickY')], [1.45, -2.5], [3.6, -2.5], [3.85, L('blickY')]], blund: [[1.2, L('blund')], [1.4, 0.02], [3.6, 0.02], [3.8, L('blund')]],
       blickX: [[1.2, L('blickX')], [1.45, OVER_X], [3.6, OVER_X], [3.85, L('blickX')]], brynX: [[1.3, -0.3], [1.6, 0.85], [3.5, 0.8], [4.0, -0.12]], brynY: [[1.3, -0.25], [1.6, 1.0], [3.5, 0.95], [4.0, -0.08]],
       le: [[1.9, 0], [2.5, 0.35], [3.4, 0.3], [3.9, 0]],
@@ -167,11 +170,11 @@ const LASBIT = {
       blickX: [[1.3, 0], [1.9, L('blickX')]], blund: [[0.2, 0], [0.45, 0.45], [2.1, L('blund')]], lut: [[0.5, 0.07], [1.5, 0.04]], axV: [[0.5, -6], [1.6, 12]], axH: [[0.5, -6], [1.6, 12]],
       brynX: [[1.3, 0], [2.2, -0.3]], brynY: [[1.3, 0], [2.2, -0.25]],
     },
-    // (fram över disken framför honom, och sedan åt sidan och vriden mot honom: annars går hörnet genom hans vänstra arm)
+    // (fram över disken framför honom, halvt hopvikt hela vägen, och sedan åt sidan och vriden mot honom: annars går hörnet genom hans högra arm)
     t: {
-      tf: KNA_T, mot: [[0.12, 0], [0.8, 1]], gy: [[0.8, 0.38], [1.15, 0.12], [1.85, 0.12], [2.3, 0.42]], y: [[0.8, -985], [1.3, -560], [1.85, LY + 12], [2.0, LY]], z: [[1.3, 140], [1.85, LZ]],
-      x: [[1.75, 0], [2.25, LX]], yaw: [[1.75, 0], [2.25, LAS_T.yaw]], tilt: [[1.3, 0], [1.8, 0.3], [2.0, 0.26], [2.3, LAS_T.tilt]],
-      beta: [[0.9, 0.3], [1.6, 0.08], [1.95, 0.03], [2.3, LAS_T.beta + 0.02]], vag: [[2.3, 0], [2.4, 12], [2.68, 0]],
+      tf: KNA_T, mot: [[0.12, 0], [0.8, 1]], gy: [[0.8, 0.38], [1.15, 0.12], [1.85, 0.12], [2.3, LAS_T.gy]], y: [[0.8, -985], [1.3, -560], [1.85, LY + 12], [2.0, LY]], z: [[1.3, 140], [1.85, LZ]],
+      x: [[1.35, 0], [2.25, LX]], yaw: [[1.35, 0], [2.25, LAS_T.yaw]], tilt: [[1.3, 0], [1.8, 0.3], [2.0, 0.26], [2.3, LAS_T.tilt]],
+      beta: [[0.9, 0.3], [1.5, 0.42], [2.3, LAS_T.beta + 0.02]], vag: [[2.3, 0], [2.4, 12], [2.68, 0]],
     },
   },
   // läser: blicken går rad för rad, huvudet sjunker lite längs spalten
@@ -206,10 +209,10 @@ const LASBIT = {
       blund: [[0.3, L('blund')], [0.9, 0.1], [4.0, 0.1], [4.6, L('blund')]], blickX: [[0.3, L('blickX')], [0.9, 0], [1.4, 0], [1.6, 2], [2.4, 2], [2.6, -2.5], [3.5, -2.5], [3.7, 0], [4.0, 0], [4.6, L('blickX')]],
       brynX: [[0.6, -0.3], [1.2, 0.65], [4.0, 0.6], [4.7, -0.3]], brynY: [[0.6, -0.25], [1.2, 0.85], [4.0, 0.8], [4.7, -0.25]], lut: [[0.8, -0.01], [4.2, -0.01]],
     },
-    // (han för den framför ansiktet, och sedan tillbaka åt sidan)
+    // (han för den framför ansiktet, fortfarande halvt hopvikt och lite vriden, och sedan tillbaka åt sidan)
     t: {
       y: [[0.3, LY], [1.0, LY + 170], [4.0, LY + 170], [4.7, LY]], z: [[0.3, LZ], [1.0, 550], [4.0, 550], [4.7, LZ]], tilt: [[0.3, LAS_T.tilt], [1.0, 0.12], [4.0, 0.12], [4.7, LAS_T.tilt]],
-      x: [[0.3, LX], [1.0, 0], [4.0, 0], [4.7, LX]], yaw: [[0.3, LAS_T.yaw], [1.0, 0], [4.0, 0], [4.7, LAS_T.yaw]], beta: [[0.3, LAS_T.beta], [1.0, 0.12], [4.0, 0.12], [4.7, LAS_T.beta]],
+      x: [[0.3, LX], [1.0, -70], [4.0, -70], [4.7, LX]], yaw: [[0.3, LAS_T.yaw], [1.0, -0.3], [4.0, -0.3], [4.7, LAS_T.yaw]], beta: [[0.3, LAS_T.beta], [1.0, 0.42], [4.0, 0.42], [4.7, LAS_T.beta]],
     },
   },
   // läser, håller med det som står och nickar belåtet för sig själv
@@ -231,12 +234,12 @@ const LASBIT = {
   titta: {
     dur: 4.2,
     k: {
-      yaw: [[0.4, L('yaw')], [1.0, -0.9], [2.6, -0.9], [3.3, L('yaw')]], pitch: [[0.4, L('pitch')], [1.0, 0.14], [2.6, 0.14], [3.3, L('pitch')]],
+      yaw: [[0.4, L('yaw')], [1.1, 0.8], [2.6, 0.8], [3.4, L('yaw')]], pitch: [[0.4, L('pitch')], [1.0, 0.14], [2.6, 0.14], [3.3, L('pitch')]],
       blickY: [[0.4, L('blickY')], [0.9, 0], [2.6, 0], [3.2, L('blickY')]], blund: [[0.4, L('blund')], [0.9, 0.08], [2.6, 0.08], [3.2, L('blund')]],
-      blickX: [[0.45, L('blickX')], [0.9, -4], [2.6, -4], [3.1, L('blickX')]],
+      blickX: [[0.45, L('blickX')], [0.9, 4], [2.6, 4], [3.1, L('blickX')]],
       brynX: [[0.9, -0.3], [1.3, 0.3], [2.5, 0.3], [3.2, -0.3]], brynY: [[0.9, -0.25], [1.3, 0.3], [2.5, 0.3], [3.2, -0.25]],
     },
-    t: { yaw: [[0.8, LAS_T.yaw], [1.4, LAS_T.yaw + 0.06], [2.6, LAS_T.yaw + 0.06], [3.2, LAS_T.yaw]] },
+    t: { yaw: [[0.8, LAS_T.yaw], [1.4, LAS_T.yaw - 0.06], [2.6, LAS_T.yaw - 0.06], [3.2, LAS_T.yaw]] },
   },
   // händerna ned längs kanterna, tillbaka över diskens kant och ned i knät på samma gång, och händerna tillbaka på
   // disken (lågt, som när han tar upp den)
@@ -246,10 +249,10 @@ const LASBIT = {
       pitch: [[0.3, L('pitch')], [0.9, L('pitch')], [1.6, 0.12]], yaw: [[0.3, L('yaw')], [1.5, 0]], blickY: [[0.2, L('blickY')], [1.2, L('blickY')], [1.7, 0]], blickX: [[0.3, L('blickX')], [1.3, 0]],
       blund: [[1.2, L('blund')], [1.7, 0]], brynX: [[0.5, -0.2], [1.6, 0]], brynY: [[0.5, -0.15], [1.6, 0]], axV: [[0.7, 12], [1.6, 0]], axH: [[0.7, 12], [1.6, 0]],
     },
-    // (först in framför honom och rak, och sedan bakåt: annars går hörnet genom hans vänstra arm)
+    // (först in framför honom och rak, och sedan bakåt: annars går hörnet genom hans högra arm)
     t: {
-      tt: KNA_T, gy: [[0.05, 0.42], [0.4, 0.12], [1.0, 0.12], [1.3, 0.38]], z: [[0.3, LZ], [0.85, 140]], y: [[0.3, LY], [0.85, -560], [1.3, -985]], x: [[0.05, LX], [0.45, 0]],
-      yaw: [[0.05, LAS_T.yaw], [0.45, 0]], tilt: [[0.05, LAS_T.tilt], [0.45, 0.26], [0.85, 0]], beta: [[0.05, LAS_T.beta], [0.45, 0.14], [1.0, 0.3]], mot: [[1.3, 1], [1.95, 0]],
+      tt: KNA_T, gy: [[0.05, LAS_T.gy], [0.4, 0.12], [1.0, 0.12], [1.3, 0.38]], z: [[0.3, LZ], [0.85, 140]], y: [[0.3, LY], [0.85, -560], [1.3, -985]], x: [[0.05, LX], [0.7, 0]],
+      yaw: [[0.05, LAS_T.yaw], [0.7, 0]], tilt: [[0.05, LAS_T.tilt], [0.45, 0.26], [0.85, 0]], beta: [[0.05, LAS_T.beta], [0.5, 0.45], [1.0, 0.3]], mot: [[1.3, 1], [1.95, 0]],
     },
   },
 };
@@ -3879,6 +3882,7 @@ export async function figuren(duk, { hog = false, latt = false, pr = 1 } = {}) {
     tH.copy(tg0).addScaledVector(tP, -TG.UT).addScaledVector(tF, -TG.BAK);
   }
   // → hur mycket händerna håller den (0–1)
+  const POL_SIDA = new THREE.Vector3(-0.7, -1, 0).normalize();
   function tidningArm(t, n, kl, a, b) {
     const L = kl.las;
     const s = (x) => spar(L[x], t);
@@ -3908,6 +3912,8 @@ export async function figuren(duk, { hog = false, latt = false, pr = 1 } = {}) {
       // nedåt längs sidorna (lag).
       const lag = 1 - ss(200, LZ - 60, s('z'));
       cPol.set(-sida * (0.62 - 0.22 * lag), -0.3 - 0.6 * lag, -0.72 + 0.77 * lag).normalize();
+      // (åt sidan har den högra handen kanten nära axeln: armbågen ned och ut, inte bakåt, där den hamnar i axelhöjd)
+      if (!i) cPol.lerp(POL_SIDA, ss(0, 1, s('x') / LX)).normalize();
       // (en fast riktning för armbågen, inte naturlig: med handen given av papperet valde den ibland armbågen
       // uppe vid örat medan tidningen kom upp)
       vristTill(i ? sb : sa, tH, cPol, cU);

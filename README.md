@@ -5911,9 +5911,12 @@ rycker den rak och tittar längs baren, och mellan gångerna lägger han den i k
 `lasa2`, byggda av bitarna i `LASBIT` i [public/rum-hasse-3d.js](public/rum-hasse-3d.js)). Ur knät lyfter han den med
 händerna lågt, för den fram över disken medan den stiger och flyttar sedan upp händerna; i knät hänger armarna nedåt (håller
 han den högt medan den är nära honom måste armarna vikas, och armbågarna står ut som vingar). Framme över disken för han den
-åt sin vänstra sida, ut mot kaffet, och håller den lågt, lutad bakåt och vriden mot sig, inte mitt framför sig: det är han man
-ska se, inte tidningen, och han tittar ned i den med huvudet vridet och böjt mot den i stället för in i kameran (Tomas
-önskemål 2026-11-09; `LAS` och `LAS_T`, och bitarna utgår från dem). Bara när han gömmer sig för han den framför ansiktet,
+åt sin högra sida, ut mot askkoppen, och håller den lågt, lutad bakåt, vriden mot sig och halvt hopvikt, inte utbredd mitt
+framför sig: det är han man ska se, inte tidningen, och av den ser man förstasidan snett från sidan och baksidan bara som en
+kant. Han tittar ned i den med huvudet vridet och böjt mot den i stället för in i kameran (Tomas önskemål 2026-11-09 och
+2026-11-10; `LAS` och `LAS_T`, och bitarna utgår från dem. Åt hans vänstra sida vändes baksidan med vädret mot en, därför
+den högra; den högra armbågen pekar då ned och ut, `POL_SIDA`). Den är halvt hopvikt också när han tar upp den, gömmer sig
+bakom den och lägger ned den. Bara när han gömmer sig för han den framför ansiktet,
 och innan han lägger ned den för han in den framför sig igen, så att hörnet inte går genom armen (provat i headless Chrome i
 1280 × 800 och i telefonen, 412 × 915, med bilder genom `lasa` och `lasa2`). Behöver han händerna, som när han
 slår en dom i disken, läser han klart raden och lägger ned den direkt. Dåligt är inte ett rätt, sämst i gänget, eller rätten
