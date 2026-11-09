@@ -5672,6 +5672,13 @@ gänget avgörs, och efter omgången säger han inte heller hur det gick för ho
 och länken *Matcherna* till hans rader och facit (borta 2026-11-09). Med dolda resultat finns inget protokoll, och då är allt
 som förut.
 
+Till er säger han ni och er, aldrig gänget, eftersom det bara är ni som använder sidan (`npm run repliker` säger till om
+ordet). Namnen sitter inte riktigt: ungefär var tredje dom säger han ett namn som nästan stämmer (*Tejler*, *Johanson*;
+`felnamn` i rum-hasse-repliker.js, `kallar` i rum-hasse.js), samma i hela domen och på alla enheter, men aldrig om den som
+vann. Ungefär var fjärde gång han hälsar på dig händer samma sak. Han rättar sig aldrig och säger inget om det. Står man kvar
+vid listan kan han nämna *Revisorn* när någon vann på helgarderingar och *Semesterfiraren* när någon inte lämnade in,
+utan att säga vem han menar (`domar.revisorn`, `domar.borta`).
+
 **Tidningen** (2026-11-09). Har det gått dåligt för honom i tippningen låtsas han vara upptagen: han gömmer sig bakom
 veckans kvällstidning, samma som löpsedeln i rummet (Sportbladet eller Expressen, `veckansTidning` i
 [public/rum-affischer.js](public/rum-affischer.js)), skyldig men nöjd med sig själv. Har man just kommit läser han redan; han

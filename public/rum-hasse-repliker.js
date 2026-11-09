@@ -270,21 +270,21 @@
     ],
     // I tävlingen, när omgången är klar: bäst och sämst i gänget. Säger han i stället för första raden ovan.
     forst: [
-      'Jag slog hela gänget. Det är inget att orda om.',
-      'Gänget kan skriva av mig nästa gång. Det är ingen skam.',
-      'Nu har gänget sett hur det går till.',
-      'Gänget får gärna fråga hur jag bar mig åt.',
-      'Gänget tog i, och jag vann ändå.',
-      'Gänget har mycket att lära, men jag har tid.',
+      'Jag slog er allihop. Det är inget att orda om.',
+      'Ni kan skriva av mig nästa gång. Det är ingen skam.',
+      'Nu har ni sett hur det går till.',
+      'Ni får gärna fråga hur jag bar mig åt.',
+      'Ni tog i, och jag vann ändå.',
+      'Ni har mycket att lära, men jag har tid.',
     ],
     sist: [
-      'Att jag kom sist i gänget beror på matcherna.',
-      'Jag kom sist i gänget, men jag tippade rätt.',
-      'Någon måste komma sist i gänget. Jag ställde upp.',
-      'Jag kom sist i gänget. Det säger mer om gänget.',
-      'Gänget hade tur, och jag hade rätt.',
-      'Jag kom sist i gänget för att det skulle bli spännande.',
-      'Jag kom sist i gänget, och jag är ensam om att ha tänkt.',
+      'Att jag kom efter er beror på matcherna.',
+      'Jag kom sist, men jag tippade rätt.',
+      'Någon av oss måste komma sist. Jag ställde upp.',
+      'Jag kom sist. Det säger mer om er.',
+      'Ni hade tur, och jag hade rätt.',
+      'Jag släppte förbi er för att det skulle bli spännande.',
+      'Jag kom efter er, och jag är ensam om att ha tänkt.',
     ],
     // Han sa det exakta resultatet i en av matcherna i listan: det säger han efter en stund.
     exakt: [
@@ -333,28 +333,35 @@
   // han inget här. En dom är en inledning med namnet, en eller två saker ur kupongen och ett slut, och
   // raderna väljs efter omgången och personen, så att domen är densamma varje gång och på alla enheter.
   // Varje rad är en mening, så att domen står i ett stycke och ändå går att läsa upp mening för mening. Inget
-  // han eller hon: skriv namnet, eller om kupongen. Ordet i guld står i domord.
+  // han eller hon: skriv namnet, eller om kupongen. Till gruppen säger han ni och er, aldrig gänget: det är
+  // bara ni som använder sidan. Ordet i guld står i domord, och namnen han nästan kan i felnamn.
   domar: {
     // Över listan med gänget: första gången, när man har hört om några och när man har hört om alla.
-    fraga: ['Jag har rättat omgången. Vem ska jag börja med?', 'Protokollet är klart. Vem vill du höra om först?', 'Jag har gått igenom gängets kuponger. Vem tar vi först?', 'Jag har rödpennan framme. Vem i gänget tar vi först?', 'Omgången är spelad. Vem i gänget ska jag ta först?'],
-    igen: ['Vem vill du höra om nu?', 'Vem i gänget ska jag ta nu?', 'Vem i gänget ska få sin dom nu?', 'Vem i gänget är nästa på tur?'],
-    alla: ['Nu har du hört om hela gänget.', 'Nu har alla i gänget fått sitt.', 'Nu har du hört om hela gänget. Jag har sett bättre kuponger.', 'Det var hela gänget. Mer än så finns det inte att säga.'],
+    fraga: ['Jag har rättat omgången. Vem av er ska jag börja med?', 'Protokollet är klart. Vem vill du höra om först?', 'Jag har gått igenom era kuponger. Vem tar vi först?', 'Jag har rödpennan framme. Vem av er tar vi först?', 'Omgången är spelad. Vem av er ska jag ta först?'],
+    igen: ['Vem vill du höra om nu?', 'Vem av er ska jag ta nu?', 'Vem av er ska få sin dom nu?', 'Vem av er står på tur?'],
+    alla: ['Nu har ni fått höra allihop.', 'Nu har var och en av er fått sitt.', 'Nu har ni fått höra allihop. Jag har sett bättre kuponger.', 'Det var ni allihop. Mer än så finns det inte att säga.'],
     // Om man står kvar vid listan med gänget och inte väljer någon.
     ledig: [
-      'Ingen i gänget har bett om ursäkt än.',
-      'Gänget brukar inte vilja höra mina domar.',
+      'Ingen av er har bett om ursäkt än.',
+      'Ni brukar inte vilja höra mina domar.',
+      'Jag har dömt bättre tippare än er.',
+      'Trean har fortfarande inte bett om ursäkt.',
       'Protokollet ligger här, om någon vill överklaga.',
       'Mina domar går inte att överklaga.',
       'Jag dömer rättvist, och det är det som gör ont.',
       'Nästa kupong blir lika lätt som den här var.',
     ],
+    // Med i ledig när någon vann på helgarderingar (forsakring), och när någon inte lämnade in. Vem han
+    // menar säger han inte.
+    revisorn: ['Revisorn har inte sagt ett ord i dag.', 'Revisorn har redan gått hem.'],
+    borta: ['Semesterfiraren har inte hört av sig.'],
     // Inledningen, efter hur det gick i gänget (forsakring har forst).
     in: {
-      forst: ['{namn} var bäst i gänget, och det kommer vi att få höra.', '{namn} slog resten av gänget den här gången.', '{namn} vann omgången, och ingen är mer förvånad än {namn}.'],
+      forst: ['{namn} var bäst av er, och det kommer vi att få höra.', '{namn} slog resten av er den här gången.', '{namn} vann omgången, och ingen är mer förvånad än {namn}.'],
       alla: ['{namn} hade alla rätt.', '{namn} hade varenda match rätt.', '{namn} hade inte ett enda fel på kupongen.'],
-      mitten: ['{namn} hamnade mitt i gänget, och ingen märkte det.', '{namn} kom varken först eller sist, och det är också en konst.', '{namn} låg mitt i gänget, där det är lä.'],
-      sist: ['{namn} kom sist i gänget.', '{namn} var sämst i gänget.', '{namn} hade hela gänget framför sig den här omgången.'],
-      sistLika: ['{namn} kom sist trots lika många rätt som någon annan i gänget.', '{namn} hade lika många rätt som någon annan i gänget och kom ändå sist.'],
+      mitten: ['{namn} hamnade i mitten, och ingen av er märkte det.', '{namn} kom varken först eller sist, och det är också en konst.', '{namn} låg i mitten, där det är lä.'],
+      sist: ['{namn} kom sist av er.', '{namn} var sämst av er.', '{namn} hade resten av er framför sig den här omgången.'],
+      sistLika: ['{namn} kom sist trots lika många rätt som någon av er andra.', '{namn} hade lika många rätt som någon av er andra och kom ändå sist.'],
       inget: ['{namn} lämnade inte in någon kupong.', '{namn} stod över den här omgången.'],
     },
     // Sakerna ur kupongen. Helgarderingarna sätts bara när alla satt.
@@ -382,7 +389,7 @@
       forsakring: ['Så kan man också köpa sig en seger.', 'Det kallas gardering, inte kunskap.'],
       forst: ['Jag kallar det hela flyt, men det får man inte säga högt.', 'Det kommer att låta om segern vid pulten hela veckan.', 'Att vinna ska {namn} inte vänja sig vid.', 'Nästa omgång ser vi vad segern var värd.'],
       alla: ['Den kupongen hade jag kunnat fylla i själv.', 'Jag hade tippat likadant.', 'En kupong ska ha alla rätt, det har jag alltid sagt.'],
-      mitten: ['En mittenplats är ingen skam, men ingen ära heller.', 'I mitten syns man inte, och det är nog lika bra.', 'Mitt i gänget kan man sitta länge utan att någon frågar något.'],
+      mitten: ['En mittenplats är ingen skam, men ingen ära heller.', 'I mitten syns man inte, och det är nog lika bra.', 'I mitten kan man sitta länge utan att någon frågar något.'],
       sist: ['Det krävs en viss talang för att komma sist.', 'Någon måste komma sist, och den här gången ställde {namn} upp.', 'Nästa omgång kan bara bli bättre, och det är det bästa jag kan säga.', 'Den kupongen ska vi inte prata mer om.'],
       sistLika: ['Man måste ha rätt i rätt matcher, inte bara i många.', 'Lätta rätt ger få poäng, och det vet alla utom {namn}.'],
       inget: ['Den som inte tippar kan inte ha fel.', 'Att inte lämna in är det säkraste jag har sett.', 'Att stå över är också ett sätt att spara pengar.'],
@@ -391,6 +398,10 @@
   // Ordet han slår i disken när han dömer någon i gänget, som domen över en match. Sägs inte. Det står
   // också ensamt under namnet i listan och ska därför beskriva personen: Garderad, inte Garderat.
   domord: { forsakring: 'Garderad', forst: 'Turlig', alla: 'Felfri', mitten: 'Osynlig', sist: 'Generös', sistLika: 'Snuvad', inget: 'Klok' },
+  // Namnen han nästan kan. Ibland säger han ett av dem i stället för det riktiga, i domen (aldrig om den som
+  // vann) och när han hälsar på dig (kallar i rum-hasse.js). Han rättar sig aldrig och säger inget om det.
+  // Efternamnen i gänget; rösten får dem också (src/rost.js). Sägs inte som egna rader.
+  felnamn: { Laino: ['Lainio', 'Leino'], Tejder: ['Tejler', 'Teider'], Johansson: ['Johanson', 'Johansen'] },
 
   // Om man bara står där och inte frågar: han lottar bland raderna och säger en då och då, så de ska gå
   // att säga i vilken ordning som helst, och när det finns en match kvar att fråga om.
