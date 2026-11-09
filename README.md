@@ -993,6 +993,11 @@ bara lokalt. Analyserna visas som de ligger i `data/analyser.json`; hur de skriv
   så att siffrorna går att läsa på håll, varannan rad är tonad hela vägen över och kupongens spalt har en linje mot de
   andras. Under bladet står *Hasse, hur räknas poängen?*, och han svarar från baren som vid anslagstavlan; det som båda
   använder ligger i [public/rum-hasse-svar.js](public/rum-hasse-svar.js). Se *Sammanställningen efter omgången*.
+- **Kupongens rätt som omgångens betyg i protokollet (2026-11-09, användarens önskemål):** "Går det att göra totalpoängen
+  för oss alla - vår gemensamma rad - ännu tydligare? Kanske ringa in nån siffra eller annat. Jag är öppen för förslag - men
+  gör det tydligare!" Kupongens rätt skrivs nu som kupongens betyg på papperet under Kupong: *10/13* med rödpennan, inringat
+  och lite snett, och var och ens rätt står i det egna bläcket i stället för i rött, så att betyget är det enda röda på raden
+  och syns först, också på håll på pulten. Se *Sammanställningen efter omgången*.
 - **Hasse dömer gänget i baren, och protokollet står utan omdömen (2026-11-08, användarens val):**
   "protokollet ska ligga här utan att Hasse Backe kommenterar något speciellt - i hans vy ska han däremot göra det", "Jag
   vill inte att han kommenterar sig själv här" och "Det här gör han tills att nästa stryktipsmatcher är uppe". Användaren
@@ -5873,10 +5878,12 @@ en tryckt rad under bandet. Raderna har resultat och facit på skrivmaskin, och 
 ansikten), var och en i gänget och Hasse, med porträtten uppklistrade som foton. Allas tecken står kvar i var och ens
 bläck, så att man ser vad var och en spelade, och det som satt är överstruket med grön märkpenna. Handstilen och
 märkpennans drag är lite olika i varje ruta, men samma omgång ser likadan ut varje gång (slumpen utgår från omgången,
-raden och spalten). Överst, direkt under porträtten, står *Rätt av 13* stort med Hasses röda rättningspenna, och kupongens
-siffra är störst eftersom den är allas: det ska synas också på håll, när bladet ligger på pulten, och där är det bladets
-nederkant som hamnar utanför bilden (bladet ligger i skala 0,76 på pulten). Sist står poängen. Vinnaren är inringad, både på porträttet
-och runt poängen, och det är de enda ringarna på blocket. Hasse har rättat det och skrivit under, och mer står inte där:
+raden och spalten). Överst, direkt under porträtten, står *Rätt av 13* stort: det ska synas också på håll, när bladet ligger
+på pulten, och där är det bladets nederkant som hamnar utanför bilden (bladet ligger i skala 0,76 på pulten). Kupongen är allas,
+och dess rätt är omgångens betyg, skrivet som kupongens betyg på papperet under Kupong (*10/13* med Hasses röda rättningspenna,
+inringat och lite snett, `betygRing` i rum-block.js som `ring` i papper.js). Det sticker ut åt vänster, in i den tomma delen av
+raden, och är det enda röda på raden: var och ens rätt står i det egna bläcket. Sist står poängen. Vinnaren är inringad, både på
+porträttet och runt poängen; utöver betyget är det de enda ringarna på blocket. Hasse har rättat det och skrivit under, och mer står inte där:
 domarna över gänget säger han i baren (se [Hasse Backe](#hasse-backe), *Domarna efter omgången*). Förut stod en dom per
 person längst ner (ändrat 2026-11-08). I telefonen försvinner namnen under porträtten. Har Hasse ingen kupong i omgången
 (han tävlar från omgången efter 2026-11-07) står det han sa vid disken i hans spalt, utanför tävlingen
