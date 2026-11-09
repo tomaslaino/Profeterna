@@ -93,6 +93,33 @@
     'Du ser inte klokare ut än sist, {namn}.',
     'Jag har inte ändrat mig medan du var borta, {namn}.',
   ],
+  // När man kommer och klockan säger något (tidNu i rum-hasse.js): strax före spelstopp (bradskar, alltid),
+  // mitt i natten (natt), tidigt på morgonen (morgon) och sent på kvällen (kvall), då ibland i stället för
+  // de vanliga. Raden står ovanför listan och får ta högst två rader (cirka 50 tecken).
+  tid: {
+    bradskar: [
+      'Spelstoppet är snart. Vilken match tar vi först?',
+      'Du har bråttom, inte jag. Vilken match gäller det?',
+      'Du kommer i sista stund. Vilken match tar vi?',
+      'Spelstoppet närmar sig. Vilken match tar vi?',
+    ],
+    natt: [
+      'Du kan inte sova, ser jag. Vilken match gäller det?',
+      'Svaren sover aldrig. Vilken match tar vi?',
+      'Affären har stängt, men för dig sitter jag kvar.',
+      'Jag sover inte när det finns en kupong kvar.',
+    ],
+    morgon: [
+      'Du är tidigt ute. Vilken match har du vaknat med?',
+      'Första koppen är den bästa. Vilken match tar vi?',
+      'Jag har läst morgontidningen. Den har fel.',
+    ],
+    kvall: [
+      'Det är sent. Vilken match håller dig vaken?',
+      'Vi stänger snart. Vilken match vill du hinna med?',
+      'På kvällen tippar man bäst. Vilken match tar vi?',
+    ],
+  },
 
   // Efter en analys.
   nasta: [
@@ -363,7 +390,7 @@
       'Domarna har inte sin bästa dag.',
       'Det är inte jag som spelar, det är lagen.',
       'Lagen har inte förstått vad som gäller än.',
-      'Jag har sett sådana här ställningar förut. De brukar inte hålla.',
+      'Sådana här ställningar brukar inte hålla.',
     ],
     leder: ['{lag} leder med {res} mot {mot}.', '{lag} leder mot {mot} med {res}.'],
     lika: ['Det står {res} i {match}.', 'I {match} står det {res}.'],
@@ -414,52 +441,53 @@
   // Radion på fönsterbänken hörs också hos honom (omRadion i rum-hasse.js): en gång per station säger han
   // något om den, i stället för en rad medan han väntar, och nickar med när det är musik. brus är när radion
   // står mellan stationerna. Varje rad sägs ensam, efter det han sa förut, så den ska säga vad den handlar om.
-  // Inget om honom själv som inte går att veta: han är en riktig person.
+  // Inget om honom själv som inte går att veta: han är en riktig person. Högst två rader ovanför listan
+  // (cirka 50 tecken).
   radio: {
     italo: [
       'Italodisco är bra musik att tippa till.',
-      'Jag förstår inte texterna i italodiscon, men takten håller i nittio minuter.',
-      'Den här musiken har samma takt hela vägen. Så ska ett lag också spela.',
+      'Italodiscon håller takten i nittio minuter.',
+      'Ett lag ska spela som italodisco, i samma takt.',
     ],
     guld: [
-      'Det spelas åttiotal på radion. Då hade lagen ordning på backlinjen.',
-      'På åttiotalet tippade man med penna och sunt förnuft.',
+      'När den här låten kom hade lagen en backlinje.',
+      'Åttiotalsmusik påminner mig om sunt förnuft.',
     ],
     rock: [
-      'Rockklassiker har för mycket gitarr och för lite organisation.',
-      'Rocken på radion låter som en engelsk match i november.',
+      'Rocken har för mycket gitarr och för lite ordning.',
+      'Rocken låter som en engelsk match i november.',
     ],
     p1: [
       'P1 pratar om allt utom det som är viktigt.',
-      'Lyssna du på P1, jag har redan alla svaren.',
+      'Lyssna du på P1. Jag har redan alla svaren.',
     ],
     p3: [
       'P3 spelar musik för folk som inte tippar.',
-      'Det är P3 på radion. Jag föredrar ljudet av en ifylld kupong.',
+      'Jag lyssnar hellre på pennan mot kupongen än på P3.',
     ],
     p4g: [
-      'I Göteborg vet de vad organisation är, också på radion.',
-      'Göteborgsradion är på. I Göteborg tippar man hemmaseger i alla väder.',
+      'Göteborgsradion vet vad organisation är.',
+      'I Göteborg tippar man hemmaseger i alla väder.',
     ],
     rix: [
       'Rix FM är lika lättsmält som en etta på favoriten.',
-      'Rix FM spelar musik som aldrig överraskar, och det gillar jag.',
+      'Rix FM överraskar aldrig. Det gillar jag.',
     ],
     sport: [
-      'I Montevideo pratar de fotboll på riktigt, också på radion.',
-      'I Montevideo pratar de om intensidá och verticalidá … Ursäkta. Back to basis.',
-      'Jag förstår varje ord på den här kanalen som handlar om organisation.',
+      'Radion i Montevideo pratar fotboll på riktigt.',
+      'Intensidá, verticalidá … Ursäkta. Back to basis.',
+      'Organización förstår jag utan översättning.',
     ],
     talksport: [
       'I engelsk sportradio gissar de, men jag vet.',
-      'De pratar om sin egen liga på talkSPORT, och de har fortfarande inte förstått den.',
+      'På talkSPORT har de inte förstått sin egen liga.',
     ],
     caroline: [
-      'Radio Caroline var piratradio en gång, och det hörs fortfarande.',
-      'Radio Caroline spelar musik för folk som helgarderar.',
+      'Radio Caroline låter fortfarande som piratradio.',
+      'Caroline sände utan tillstånd. Så ska man spika.',
     ],
     brus: [
-      'Ställ in en station, eller stäng av den. Bruset stör inte mig.',
+      'Radion står mitt emellan, och det blir aldrig bra.',
       'Det där bruset låter som spelbolagens analyser.',
     ],
   },

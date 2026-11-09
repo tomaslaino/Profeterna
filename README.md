@@ -5701,6 +5701,17 @@ ställningar; raden om hur många rätt han har och kommentarerna hörs när iMa
 `stallning` i [public/rum-hasse-repliker.js](public/rum-hasse-repliker.js). Har du valt att dölja resultat står ingen
 ställning i listan och han säger inget om den.
 
+**Radion och klockan** (2026-11-09). Radion på fönsterbänken hörs också hos honom, och står den på en station säger han
+något om den en gång (per station och besök på sidan) i stället för nästa rad han säger medan han väntar, och nickar med
+(*Italodisco är bra musik att tippa till.*, *På talkSPORT har de inte förstått sin egen liga.*); mellan stationerna säger
+han något om bruset. Spelar radion musik trummar han med fingrarna eller nickar oftare än annars (`radioNu`, `omRadion`
+och `smatt` i [public/rum-hasse.js](public/rum-hasse.js), `RumRadio.lage()` i [public/rum-radio.js](public/rum-radio.js)).
+När man kommer märker han också vad klockan är (`tidNu`): mindre än 90 minuter före första avsparken har han alltid
+bråttom på sitt sätt (*Du har bråttom, inte jag. Vilken match gäller det?*), och mitt i natten (00–05), tidigt på morgonen
+(05–08) och sent på kvällen (22–24) säger han ibland något om det i stället för den vanliga öppningen. Raderna står under
+`radio` och `tid` i [public/rum-hasse-repliker.js](public/rum-hasse-repliker.js) och är högst cirka 50 tecken, så att de
+ryms på två rader ovanför listan också i den smalaste telefonen.
+
 **Domarna efter omgången** (2026-11-08, listan och lappen 2026-11-09). Så länge protokollet ligger på pulten, alltså från
 att omgången är spelad tills nästa Stryktips kommer måndagen efter kl. 16 (`Rum.summa`), dömer han gänget i stället för att
 gå igenom matcherna. Han frågar vem han ska börja med, och gänget står sida vid sida i sin ordning, som på kupongen: stora

@@ -763,6 +763,15 @@ window.RumHasse = (() => {
     const g = p && p.vem && p.s.gang && p.s.gang.find((x) => x.id === p.vem);
     return g && g.namn ? g.namn.trim().split(/\s+/).pop() : '';
   }
+  // Vad klockan säger när man kommer: 'bradskar' när det är mindre än 90 minuter till första avsparken,
+  // 'natt' 00–05, 'morgon' 05–08, 'kvall' 22–24 (i Stockholm), annars null.
+  function tidNu(lista) {
+    const nu = Date.now();
+    const forsta = Math.min(...lista.map((m) => Date.parse(m.avspark)));
+    if (forsta > nu && forsta - nu < 90 * 60000) return 'bradskar';
+    const h = Number(new Intl.DateTimeFormat('sv-SE', { timeZone: 'Europe/Stockholm', hour: '2-digit', hourCycle: 'h23' }).format(nu));
+    return h < 5 ? 'natt' : h < 8 ? 'morgon' : h >= 22 ? 'kvall' : null;
+  }
   // När spelstoppet är: på lördag, i morgon, i dag. Tomt om det är passerat.
   function spelstopp(lista) {
     const nu = Date.now();
@@ -1712,6 +1721,9 @@ window.RumHasse = (() => {
     const namn = dittNamn();
     if (forst) {
       if (!kvar) return hela || !r.allaKvar ? lott(r.allaIgen) : enAv(r.allaKvar);
+      // (vad klockan är: strax före spelstopp alltid, annars ibland)
+      const tid = hela && tidNu(oppna);
+      if (tid && r.tid && r.tid[tid] && (tid === 'bradskar' || Math.random() < 0.5)) return lott(r.tid[tid]);
       // (ibland säger han ett namn som nästan stämmer)
       const kallad = namn && Math.random() < 0.25 ? kallar(namn, String(Math.random()), 1) : namn;
       if (n) return fyll(lott(namn ? r.tillbakaNamn : r.tillbaka), { namn: kallad });
