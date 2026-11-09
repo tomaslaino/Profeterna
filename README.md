@@ -951,7 +951,7 @@ bara lokalt. Analyserna visas som de ligger i `data/analyser.json`; hur de skriv
   pulten men en bit från den i baren, fingrarna gick ned i bardisken, handen på pulten låg tryckt mot
   bakkanten, och baren var mörk som en kväll fast det var dag i rummet. Nu ligger den vänstra handen
   tätt intill fatet på båda ställena, fingrarna lägger sig på disken, och baren har rummets tid på
-  dygnet: lysröret tänt från halv sju till halv tolv på kvällen (till midnatt före 2026-11-09) och dagsljuset efter klockan och vädret. Se
+  dygnet: lysröret tänt som i rummet (sedan 2026-11-09 dämpat från 23 till midnatt och tänt från sex till sju) och dagsljuset efter klockan och vädret. Se
   [Hasse Backe](#hasse-backe), *Bilden*, *Ljuset* och *Kaffet i rummet*.
 - **Hasse Backe vid pultens hörn (2026-11-07, användarens önskemål):** "ser det här och det här ut som
   samma bänk?", "Det ser ju ut som helt olika vinklar" och "Hasse ska ju sitta vid ett hörn". I baren
@@ -5257,12 +5257,15 @@ bilden mörknar hörnen, och ett lätt korn rör sig (`.rh-ton`, `.rh-korn`), in
 och inte i telefonen. Händerna på pulten i rummet har samma ljus (se *Kaffet i rummet*).
 
 Baren har samma tid på dygnet som rummet (`ljuset` och `tand` i [public/rum-hasse.js](public/rum-hasse.js)).
-Från halv sju på morgonen till halv tolv på kvällen är lysröret i affärens tak tänt, som i rummet (`RumFolk.natt`:
-mitt i rummets timslånga toning, eftersom baren bara har bilderna med och utan lysrör): väggen
-är då en egen bild spårad med röret framför baren och affären i dess sken till höger
+Lysröret i affärens tak är tänt och släckt som i rummet (`RumFolk.nattGrad`): från 23 dämpas det under en
+timme, från midnatt till sex är det släckt, och från sex tänds det under en timme. När det är tänt
+är väggen en egen bild spårad med röret framför baren och affären i dess sken till höger
 (`hasse-bak-lys.webp`), och figuren, disken och koppen får ett brett ljus från affären och lite mer
-ljus överallt (`uLys` i `LJUS`, `LYS`), medan neonen och gatans kalla ljus syns mindre. Mellan halv tolv på kvällen
-och halv sju är lysröret släckt och väggen ligger i neonskyltens och gatans svaga sken (`hasse-bak.webp`). Då mörknar också han, pulten, kaffet, notan, röken och din kupong till ungefär 40 % (`natten` i `LJUS`, `--natt` på kupongen), inte lika mörkt som rummet så att man ser honom när man pratar, och bara cigarrens glöd lyser som vanligt. När det ljusnar ute på sommaren kommer ljuset tillbaka gradvis.
+ljus överallt (`uLys` i `LJUS`, `LYS`), medan neonen och gatans kalla ljus syns mindre. Släckt ligger väggen
+i neonskyltens och gatans svaga sken (`hasse-bak.webp`). Medan röret dämpas och tänds hämtas båda bilderna, och
+väggen ritas på duken med den tända ovanpå den släckta så tänd som röret är (`vagg`, `blandar`); `LYS` och
+`--natt` följer samma grad, och nattens mörker i figuren (`nattGrad` i rum-hasse-arm.js) går steglöst. Sitter man
+hos honom följer ljuset klockan varje minut (`ljusNu`), och väggen och disken ritas om. Då mörknar också han, pulten, kaffet, notan, röken och din kupong till ungefär 40 % (`natten` i `LJUS`, `--natt` på kupongen), inte lika mörkt som rummet så att man ser honom när man pratar, och bara cigarrens glöd lyser som vanligt. När det ljusnar ute på sommaren kommer ljuset tillbaka gradvis.
 
 Dagsljuset faller in genom affärens stora fönster till höger, efter samma klocka och väder som utsikten
 i rummet (`RumUte.light`): så starkt som det är ljust ute, och i himlens färg nere vid taken, men vitare,

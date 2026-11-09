@@ -109,6 +109,8 @@ window.RumHasse = (() => {
       }
       if (e.key === 'Escape') stang();
     }, true);
+    // ljuset medan man sitter hos honom (ljusNu)
+    setInterval(() => { if (H.on && !H.svanger && !document.hidden) ljusNu(); }, 60000);
     addEventListener('resize', () => {
       if (!H.on) return;
       // (vriden telefon: han sitter på ett annat sätt, och bygg byter figuren och bilden)
@@ -167,18 +169,20 @@ window.RumHasse = (() => {
   const hogt = () => (hog() ? '-hog' : '');
   const bakbild = (lys = false) => `rum/hasse-bak${lys ? '-lys' : ''}${hogt()}.webp`;
   const dagbild = () => `rum/hasse-bak-dag${hogt()}.webp`;
-  // Ljuset i baren som i rummet (rum.js, rum-folk.js, rum-ute.js): lysröret i affärens tak är tänt utom
-  // mellan halv tolv på kvällen och halv sju (RumFolk.natt: mitt i rummets timslånga toning, för baren har
-  // bara bilderna med och utan lysrör), och dagsljuset faller in genom affärens stora fönster till höger efter klockan
-  // och vädret. lys: lysröret, dag: hur ljust det är ute (0–1), f: fönsterljusets styrka, c: dess färg.
+  // Ljuset i baren som i rummet (rum.js, rum-folk.js, rum-ute.js): lysröret i affärens tak dämpas långsamt
+  // från elva på kvällen, är släckt från midnatt och tänds lika långsamt från sex till sju (RumFolk.nattGrad),
+  // och dagsljuset faller in genom affärens stora fönster till höger efter klockan och vädret. k: hur tänt
+  // lysröret är (0–1), lys: mer tänt än släckt, dag: hur ljust det är ute (0–1), f: fönsterljusets styrka,
+  // c: dess färg.
   // Färgen är himlens nere vid taken, men vitare, som ögat ser dagsljus inne; solen gör den varmare och
   // starkare, låg sol gyllene, och i den blå timmen blåare. Mulet blir den grå och svagare, i regn mer.
   const hex = (h) => [1, 3, 5].map((i) => parseInt(h.slice(i, i + 2), 16) / 255);
   function ljuset() {
     const v = window.Vader ? Vader.nu() : null;
     const L = v && window.RumUte ? RumUte.light(v) : null;
-    const natt = window.RumFolk ? RumFolk.natt() : false;
-    const ut = { lys: !natt, dag: L ? L.dag : 0, f: 0, c: [1, 1, 1] };
+    const R = window.RumFolk;
+    const k = R ? 1 - (R.nattGrad ? R.nattGrad() : R.natt() ? 1 : 0) : 1;
+    const ut = { lys: k >= 0.5, k, dag: L ? L.dag : 0, f: 0, c: [1, 1, 1] };
     if (!L || L.dag < 0.01) return ut;
     const a = hex(L.sky[1]);
     const b = hex(L.sky[2]);
@@ -196,47 +200,82 @@ window.RumHasse = (() => {
     const l = ljuset();
     H.ljus = l;
     H.vy.classList.toggle('lys', l.lys);
-    H.vy.style.setProperty('--natt', l.lys ? '0' : (1 - l.dag).toFixed(2));
+    H.vy.style.setProperty('--natt', ((1 - l.k) * (1 - l.dag)).toFixed(3));
     if (H.m && H.m.DAG) {
-      // fönstret i figurens ljus (rum-hasse-arm.js), och lysröret som förut
+      // fönstret i figurens ljus (rum-hasse-arm.js), och lysröret så tänt som det är
       H.m.DAG.value.set(...l.c.map((x) => x * l.f * 0.8), l.dag);
-      if (l.lys) H.m.LYS.value.set(0.587, 0.593, 0.606, 0.75);
-      else H.m.LYS.value.set(0, 0, 0, 0);
+      H.m.LYS.value.set(0.587 * l.k, 0.593 * l.k, 0.606 * l.k, 0.75 * l.k);
     }
     return l;
   }
-  // Väggen med dagsljuset: bilden i lysrörets eller nattens ljus, och fönsterljuset (bakat för sig i vitt)
-  // ovanpå i fönstrets färg och styrka, som ljus läggs till ljus, på en duk. Disken speglar samma duk.
-  // Ritas när han öppnas. Utan dagsljus syns bilden som den är.
+  // (medan lysröret dämpas eller tänds behövs båda bilderna av väggen)
+  const blandar = (l) => l.k > 0.002 && l.k < 0.998;
+  // väggens bilder: den som syns, och båda medan lysröret tonas (bara de som inte redan är där)
+  function bilder(l) {
+    const satt = (sel, u) => { const i = $(sel); if (!i.src || !i.src.endsWith(u)) i.src = u; };
+    if (l.lys || blandar(l)) satt('img.rh-lys', bakbild(true));
+    if (!l.lys || blandar(l)) satt('img.rh-bak:not(.rh-lys)', bakbild(false));
+  }
+  // Medan man sitter hos honom följer ljuset klockan (en gång i minuten, som rummet): lysröret dämpas
+  // och tänds långsamt, och dagsljuset ändras. Väggen och disken ritas om när det har ändrats.
+  async function ljusNu() {
+    const forr = H.ljus;
+    const l = ljuset();
+    if (forr && Math.abs(l.k - forr.k) < 0.004 && Math.abs(l.f - forr.f) < 0.01 && Math.abs(l.dag - forr.dag) < 0.01) return;
+    tand();
+    bilder(H.ljus);
+    const v = await vagg();
+    if (!H.on || H.svanger) return;
+    H.vaggBild = v;
+    // (disken speglar väggen: ritas om med den nya)
+    H.vaggNr = (H.vaggNr || 0) + 1;
+    passa();
+  }
+  // Väggen: bilden i lysrörets eller nattens ljus – medan lysröret dämpas eller tänds båda, den tända
+  // ovanpå så tänd som röret är – och fönsterljuset (bakat för sig i vitt) ovanpå i fönstrets färg och
+  // styrka, som ljus läggs till ljus, på en duk. Disken speglar samma duk. Ritas när han öppnas och när
+  // ljuset ändras (ljusNu). Utan dagsljus och toning syns bilden som den är.
   async function vagg() {
     const l = H.ljus;
-    const bas = $(l.lys ? 'img.rh-lys' : 'img.rh-bak:not(.rh-lys)');
+    const tant = $('img.rh-lys');
+    const mork = $('img.rh-bak:not(.rh-lys)');
+    const bas = l.lys ? tant : mork;
     await bas.decode().catch(() => {});
+    const blanda = blandar(l) && (await (l.lys ? mork : tant).decode().then(() => true, () => false));
     H.vy.classList.remove('vagg');
-    if (l.f < 0.02 || !bas.naturalWidth) return bas;
-    if (!H.dag || H.dag.src.indexOf(dagbild()) < 0) {
+    const dag = l.f >= 0.02;
+    if ((!dag && !blanda) || !bas.naturalWidth) return bas;
+    if (dag && (!H.dag || H.dag.src.indexOf(dagbild()) < 0)) {
       H.dag = new Image();
       H.dag.src = dagbild();
     }
-    try { await H.dag.decode(); } catch (e) { return bas; }
+    const medDag = dag && (await H.dag.decode().then(() => true, () => false));
+    if (!medDag && !blanda) return bas;
     const W = bas.naturalWidth;
     const Hh = bas.naturalHeight;
     const t = H.dagDuk || (H.dagDuk = document.createElement('canvas'));
-    t.width = W;
-    t.height = Hh;
-    const tx = t.getContext('2d');
-    tx.drawImage(H.dag, 0, 0, W, Hh);
-    tx.globalCompositeOperation = 'multiply';
-    tx.fillStyle = `rgb(${l.c.map((x) => Math.round(x * 255)).join(',')})`;
-    tx.fillRect(0, 0, W, Hh);
-    tx.globalCompositeOperation = 'source-over';
+    if (medDag) {
+      t.width = W;
+      t.height = Hh;
+      const tx = t.getContext('2d');
+      tx.drawImage(H.dag, 0, 0, W, Hh);
+      tx.globalCompositeOperation = 'multiply';
+      tx.fillStyle = `rgb(${l.c.map((x) => Math.round(x * 255)).join(',')})`;
+      tx.fillRect(0, 0, W, Hh);
+      tx.globalCompositeOperation = 'source-over';
+    }
     const c = $('.rh-vagg');
     c.width = W;
     c.height = Hh;
     const x = c.getContext('2d');
-    x.drawImage(bas, 0, 0);
+    if (blanda) {
+      x.drawImage(mork, 0, 0, W, Hh);
+      x.globalAlpha = l.k;
+      x.drawImage(tant, 0, 0, W, Hh);
+      x.globalAlpha = 1;
+    } else x.drawImage(bas, 0, 0);
     x.globalCompositeOperation = 'lighter';
-    for (let k = l.f * 0.45; k > 0.005; k -= 1) {
+    for (let k = medDag ? l.f * 0.45 : 0; k > 0.005; k -= 1) {
       x.globalAlpha = Math.min(1, k);
       x.drawImage(t, 0, 0);
     }
@@ -250,7 +289,7 @@ window.RumHasse = (() => {
   function forladda() {
     if (!H.bilder) {
       const l = ljuset();
-      H.bilder = [bakbild(l.lys), 'rum/hasse-atlas.webp', ...(l.f >= 0.02 ? [dagbild()] : [])].map((u) => { const i = new Image(); i.src = u; return i.decode().catch(() => {}); });
+      H.bilder = [bakbild(l.lys), ...(blandar(l) ? [bakbild(!l.lys)] : []), 'rum/hasse-atlas.webp', ...(l.f >= 0.02 ? [dagbild()] : [])].map((u) => { const i = new Image(); i.src = u; return i.decode().catch(() => {}); });
       H.bilder.push(import('./rum-hasse-3d.js').then((m) => { H.m = m; }));
     }
     return H.bilder;
@@ -352,9 +391,9 @@ window.RumHasse = (() => {
     await Promise.all(forladda());
     H.m = H.m || await import('./rum-hasse-3d.js');
     Object.assign(GEST, H.m.KLIPP);
-    // väggen i lysrörets ljus, eller i nattens (bara den som syns hämtas)
+    // väggen i lysrörets ljus, eller i nattens (bara den som syns hämtas, båda medan lysröret tonas)
     const l = tand();
-    $(l.lys ? 'img.rh-lys' : 'img.rh-bak:not(.rh-lys)').src = bakbild(l.lys);
+    bilder(l);
     // och dagsljuset genom fönstret på den
     H.vaggBild = await vagg();
     // (fönstret har vridits sedan sist: han sitter på ett annat sätt)

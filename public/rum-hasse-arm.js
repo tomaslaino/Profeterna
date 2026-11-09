@@ -21,7 +21,8 @@ export const ATLAS = { W: 1372, H: 1350, X0: 280, Y0: 130, TW: 860, TH: 1350, rx
 
 // Samma ljus på allt: varmt framifrån till vänster (NYCKEL), ett varmt kantljus bakifrån från barens
 // lampor, och i baren (uButik) neonskyltens röda sken och gatans kalla ljus från affären till höger.
-// Där lyser också lysröret i affärens tak (uLys, tänt från halv sju till halv tolv på kvällen) och dagsljuset genom
+// Där lyser också lysröret i affärens tak (uLys, w 0,75 när det är tänt; det dämpas från 23 och tänds från sex, en timme
+// åt gången, rum-hasse.js) och dagsljuset genom
 // affärens stora fönster (uDag): ett brett, mjukt ljus från höger och lite framifrån, i himlens färg och
 // så starkt som det är ljust ute. När det är dag tar fönstret över: lamporna, neonen och gatan syns mindre.
 // Riktningarna är i figurens värld; VY är riktningen mot kameran (rum-hasse-scen.js).
@@ -29,12 +30,13 @@ export const ATLAS = { W: 1372, H: 1350, X0: 280, Y0: 130, TW: 860, TH: 1350, rx
 const VY = kamera().bak.map((x) => x.toFixed(3)).join(', ');
 // Natten: lysröret är släckt och det är inte ljust ute (i baren, uButik). Då är bara neonen, gatan och
 // cigarrens glöd kvar, som i rummet (.natt .rum-mork i rum-folk.css). ton() mörkar allt till 42 %. Inte lika
-// mörkt som rummet (en fjärdedel), så att man fortfarande ser honom när man pratar.
+// mörkt som rummet (en fjärdedel), så att man fortfarande ser honom när man pratar. Medan lysröret dämpas
+// eller tänds (uLys.w mellan 0 och 0,75) är det natt i samma grad.
 const NATT_GLSL = `
 uniform float uButik;
 uniform vec4 uDag;
 uniform vec4 uLys;
-float nattGrad() { return uButik * (1. - step(.01, uLys.w)) * (1. - uDag.w); }
+float nattGrad() { return uButik * (1. - clamp(uLys.w / .75, 0., 1.)) * (1. - uDag.w); }
 float natten() { return mix(1., .42, nattGrad()); }
 `;
 export const LJUS = `${NATT_GLSL}
