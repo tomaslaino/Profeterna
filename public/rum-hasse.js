@@ -260,7 +260,7 @@ window.RumHasse = (() => {
   // till vänster om honom; på höjden står han överst och samtalet under händerna. Kaffet och notan till
   // höger får gärna hamna utanför bilden i smala fönster.
   function matt() {
-    const { MATT, BORD, KOPP, iBild } = H.m;
+    const { MATT, BORD, NOTAN, iBild } = H.m;
     const W = innerWidth;
     const Hj = innerHeight;
     const o = { cx: 0, ey: 0, s: 1 };
@@ -286,8 +286,8 @@ window.RumHasse = (() => {
     }
     v.kant = iBild(v, 0, BORD.Y, BORD.Z)[1];
     v.vanster = iBild(v, ...MATT.vanster)[0];
-    // händerna, och notan framför kaffet, på disken
-    v.hand = Math.max(iBild(v, 0, BORD.Y, 900)[1], iBild(v, KOPP[0] + 60, BORD.Y, KOPP[2] + 450)[1]);
+    // händerna, och notan framför dem, på disken (utan NOTAN: en äldre rum-hasse-3d.js i cachen)
+    v.hand = Math.max(iBild(v, 0, BORD.Y, 900)[1], ...(NOTAN ? NOTAN.horn : []).map((q) => iBild(v, ...q)[1]));
     // duken: det han gör ska rymmas, inom fönstret
     const p = MATT.ram(H.hog).map((q) => iBild(v, ...q));
     v.x = Math.max(0, Math.floor(Math.min(...p.map((q) => q[0]))));

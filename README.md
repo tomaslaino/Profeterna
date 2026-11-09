@@ -969,6 +969,16 @@ bara lokalt. Analyserna visas som de ligger i `data/analyser.json`; hur de skriv
   14 cm högre och lutar 14° i stället för 10°, så att pultens arm till höger ligger vågrät i stället för att se ut som
   en ramp; väggen bakom honom är ombakad. Se [Hasse Backe](#hasse-backe), *Bilden*, *Pulten* och *Kaffet i
   rummet*.
+- **Hasse Backe längre ut mot pultens hörn, och notan på samma håll (2026-11-09, användarens önskemål):** "Kvittot och
+  bänken ser ju inte riktigt ut att passa ihop på bilderna. Kvittot ser ut att vara på olika håll", och Hasse "verkar
+  sitta närmre L-kanten" i rummet än i baren: "Kan du ordna så att han sitter längre ut på kanten på bordet så att
+  bilderna matchar bättre. Kaffekoppen och kvittot behöver då självklart följa med!" I rummet ligger händerna vid
+  geringssnittet, men i baren satt han 27 cm längre in på benet, och notan låg rättvänd mot en på båda ställena fast
+  man har vänt sig nästan ett kvarts varv. Nu sitter han vid hörnet i baren (`PLATS` i
+  [public/rum-hasse-scen.js](public/rum-hasse-scen.js)), med händerna vid geringssnittet och pultens arm tätt intill en;
+  kaffet följer med, 5 cm längre fram, och notan ligger på tvären framför hans händer, vänd som i rummet, med fatet
+  på dess övre vänstra hörn. Rummet är oförändrat. Väggen bakom honom är ombakad. Se [Hasse Backe](#hasse-backe),
+  *Bilden* och *Kaffet i rummet*.
 - **Hasse Backe minns vad han sa (2026-11-06, användarens önskemål):** klickade man på en match
   man redan hade frågat om slog han domen i disken en gång till, och efter en omladdning gjorde han
   om allt, med 15–25 sekunders väntan. Nu står det han sa direkt, sparat på enheten så att det
@@ -4847,17 +4857,18 @@ ibland ändå.
 väggen, disken, kaffet, notan och han själv har samma kamera
 ([public/rum-hasse-scen.js](public/rum-hasse-scen.js)). Han sitter vid pultens hörn: pulten man står
 vid i rummet går fram längs ens högra sida när man har vänt sig åt vänster, och viker i hörnet av åt
-vänster förbi honom (benet framför honom). Han sitter på andra sidan om benet med vänsterarmen över
-hörnet, där kaffet och notan står, som handen, kaffet och notan på pulten i rummet. Bakom honom är
+vänster förbi honom (benet framför honom). Han sitter på andra sidan om benet, så långt ut mot hörnet att
+händerna ligger vid geringssnittet, med kaffet och notan på hörnet bredvid, som händerna, kaffet och notan på
+pulten i rummet (`PLATS`: han sitter 27 cm längre ut än förut, ändrat 2026-11-09). Bakom honom är
 affärens vägg med hyllorna. Kameran är ens öga: 1,8 m framför honom, rakt framifrån (kroppen är ett
 foto taget framifrån, djupet i [public/rum-hasse-3d.js](public/rum-hasse-3d.js), och tål inte mycket
 från sidan), 45 cm högre än hans ögon och lutad 14° nedåt, som när man står och han sitter. Det gör
-att pulten ses uppifrån som i rummet: koppen ungefär 34° uppifrån och det inre hörnet 38°, mot 17°
+att pulten ses uppifrån som i rummet: koppen ungefär 35° uppifrån och det inre hörnet 39°, mot 17°
 när han satt längre bort bakom en bardisk (ändrat 2026-11-07, se nedan). Pultens arm går fram förbi
 kamerans högra sida, och med ögat 31 cm över hans och 10° lutning såg den ut som en ramp som steg mot
 hörnet; 14 cm högre och 4° mer nedåt ligger den vågrät (ändrat 2026-11-08, väggen ombakad). Benet är vridet 8° (`BAR`),
 så att pultens arm går fram förbi kamerans högra sida, som när man har vänt sig lite mindre än en rät
-vinkel.
+vinkel. Eftersom han sitter vid hörnet går armen fram tätt intill en, som pulten man står vid.
 
 Han sitter så att fotot inte behöver något under sig: disken framför honom döljer allt nedanför
 magen, så det finns inga ben och ingen stol. Pulten är geometri i hans värld, vriden som benet, och
@@ -4882,7 +4893,7 @@ längs sig själv när den lyfts ur vilan, och skjuts in igen på samma sätt, s
 den vänstra (`UTDRAG`). Det är bara den vänstra som trummar i vilan. Tummarna ligger intill händerna, så
 att den vänstra tummen inte går ned i disken (`SAMLA`, `TUMME_VILA`); det tonar bort när handen tar
 kaffet, cigarren eller pennan. Askkoppen står så långt till vänster att cigarren i den går fri från handen. Fatet står
-på hörnet och notan på pultens arm. Fingrarna lägger sig på disken: ett finger vars två yttre leder skulle nå under
+på hörnet, och notan ligger på tvären framför hans händer, vänd som i rummet (se *Kaffet i rummet*). Fingrarna lägger sig på disken: ett finger vars två yttre leder skulle nå under
 ovansidan böjs mindre, tills den lägsta punkten ligger på ytan (`golv` i
 [public/rum-hasse-arm.js](public/rum-hasse-arm.js)), så att fingertopparna aldrig går ned i disken,
 inte heller när han trummar eller slår i den. Förut var fingrarna krökta som klor i vilan, topparna
@@ -4984,6 +4995,11 @@ vänstra handen, överst, som trummar. Koppen ritas i handens duk med en egen ka
 rakt framifrån, eftersom ögat ser hörnet långt från sin mitt och en kopp där skulle luta. Den är lite mindre
 än i baren (`KOPP_SKALA`), där handen pekar rakt mot en och ser kortare ut. Duken tonar in när den är klar, och den ritade koppen i
 `hasseHtml` tonar då bort; den står kvar utan WebGL. Bardiskens trä har pultens bruna, inte rödare.
+Notan ligger på samma håll på båda ställena: i rummet rättvänd mot en, med raderna längs pulten och överkanten mot
+dess bortre kant, och i baren, där man har vänt sig nästan ett kvarts varv, alltså på tvären framför hans händer
+med raderna mot en (`NOTAN` och `NV` i [public/rum-hasse-3d.js](public/rum-hasse-3d.js)); i båda står fatet på
+dess övre vänstra hörn och händerna ligger vid geringssnittet. Rummets bild av händerna ses som förut, från där han
+satt innan han flyttade ut mot hörnet, så att de ses lika mycket uppifrån som koppen.
 Förut stod en platt ritad kopp, sedd nästan från sidan, bredvid notan, och handen låg under fatet så
 att det såg ut som om den bar det (ändrat 2026-11-05). Sedan låg handen tryckt mot pultens bakre kant
 med fingrarna mot fatet, medan den i baren låg en bit från koppen (ändrat 2026-11-06). Sedan kom armen
@@ -4991,7 +5007,9 @@ snett uppifrån, och ärmen låg på pultens bakre kant, så att pulten såg ut 
 2026-11-06). Sedan låg handen platt med raka, utspärrade fingrar rakt åt höger mot fatet och sågs 52°
 uppifrån, koppen 44°, och i baren stod fatet mitt på notans överkant och täckte namnet (ändrat
 2026-11-07). Sedan låg bara den vänstra handen på pulten, med rummets ljus utan baren, medan han i baren
-satt med händerna korslagda, och ärmen var mörkare och brunare än i baren (ändrat 2026-11-08).
+satt med händerna korslagda, och ärmen var mörkare och brunare än i baren (ändrat 2026-11-08). Sedan satt han i
+baren 27 cm längre in på benet än händerna i rummet, och notan låg rättvänd mot en där också, alltså ett kvarts
+varv vriden mot rummets (ändrat 2026-11-09).
 
 Tre tidigare försök: först satt han på en barstol vid pultens ände med en arm som ett gummiband över
 hörnet till handen långt nere på pulten (armen, benen, hörnet och koppen såg konstiga ut). Sedan gled

@@ -19,7 +19,7 @@
 // väntar och händerna medan han pratar (talet).
 import * as THREE from 'three';
 import { ATLAS, LJUS, ARM, HAND, KAMERA, BORD_GLSL, CIGARR, ASKKOPP, DAG, LYS, VILOHOJD, VILAN, paDisken, inat, laddaFoto, laddaHand, byggArm, byggKopp, byggCigarr, byggAskkopp, byggRok, byggPenna, byggSkugga, PENNA } from './rum-hasse-arm.js';
-import { SCEN, BAK, kamera as scenKamera, iKamera, disken, franBaren } from './rum-hasse-scen.js';
+import { SCEN, BAK, kamera as scenKamera, iKamera, disken, franBaren, franPulten } from './rum-hasse-scen.js';
 import { PULT_GLSL, SKIVA, ringar, NRING } from './rum-pult.js';
 
 const DEG = Math.PI / 180;
@@ -169,12 +169,35 @@ const kantZ = (x) => (DK.c - DK.n[0] * x) / DK.n[1];
 export const BORD = { Y: DK.Y, Z: kantZ(0) };
 // Armarna på disken: armbågens och handledens höjd (rum-hasse-arm.js).
 export const VILA = VILOHOJD;
-// Koppen på sitt fat och notan under fatet, till höger om hans vänstra hand och fritt från armen: en bit
-// disk mellan fatet och handen (handen i VILA_B); askkoppen till vänster om hans högra hand, så långt ut
-// att cigarren i den går fri från handen. På disken, i figurens värld. (Koppen stod 50 längre fram, och
-// fatet täckte då namnet på notan, 2026-11-07.)
-export const KOPP = [375, BORD.Y, 780];
+// Koppen på sitt fat, till höger om hans vänstra hand och fritt från armen: en bit disk mellan fatet och
+// handen (handen i VILA_B); askkoppen till vänster om hans högra hand, så långt ut att cigarren i den går
+// fri från handen. På disken, i figurens värld. (Koppen stod 50 längre fram, och fatet täckte då namnet på
+// notan, 2026-11-07; sedan stod den 35 längre åt vänster och 80 längre bak, med notan rättvänd mot en,
+// 2026-11-09.)
+export const KOPP = [410, BORD.Y, 860];
 export const ASK = [-420, BORD.Y, 690];
+// Notan under fatet, vänd som i rummet (rum.css): raderna längs pultens arm och överkanten mot armens bortre
+// kant, så att den ligger på tvären framför hans händer och läses uppifrån och ned. Samma lapp som man ser
+// rättvänd från rummet, alltså vriden nästan ett kvarts varv här (NV), när man har vänt sig mot honom (BAR).
+// Fatet står på notans övre vänstra hörn som i rummet: fatets mitt FAT[0] från notans vänstra kant och FAT[1]
+// bortom dess överkant, så långt ut att namnet (Hasse B.) syns bredvid fatet. Förut låg notan rättvänd mot
+// en med fatet på överkanten, raderna tvärs över armen (ändrat 2026-11-09).
+const NOTA = { B: 270, L: 430 };
+const FAT = [40, 42];
+const NV = -76 * DEG;
+// notans mitt och hörn i figurens värld (hörnen till samtalet under den i telefonen, rum-hasse.js)
+export const NOTAN = (() => {
+  const c = Math.cos(NV);
+  const s = Math.sin(NV);
+  const ut = (x, z) => [x * c + z * s, -x * s + z * c];
+  const [fx, fz] = ut(FAT[0] - NOTA.B / 2, -NOTA.L / 2 - FAT[1]);
+  const mitt = [KOPP[0] - fx, BORD.Y, KOPP[2] - fz];
+  const horn = [[-1, -1], [1, -1], [-1, 1], [1, 1]].map(([a, b]) => {
+    const [x, z] = ut((a * NOTA.B) / 2, (b * NOTA.L) / 2);
+    return [mitt[0] + x, BORD.Y, mitt[2] + z];
+  });
+  return { mitt, horn };
+})();
 // En punkt i världen i fönstret: (cx, ey) är där kamerans axel träffar fönstret och s bildpunkter på en
 // enhet på avståndet D.
 export function iBild(v, x, y, z = 0) {
@@ -186,7 +209,7 @@ export function iBild(v, x, y, z = 0) {
 export const MATT = {
   topp: [0, 772, 120],
   // pultens inre hörn, där armen mot en börjar: ska synas
-  horn: franBaren([SCEN.HORN.X, BORD.Y, SCEN.DISK.Z + SCEN.DISK.DJUP]),
+  horn: franPulten([SCEN.HORN.X, BORD.Y, SCEN.DISK.Z + SCEN.DISK.DJUP]),
   // hans bredd i vila (ärmarna), till samtalet bredvid honom
   vanster: [-500, -200, 300],
   hoger: [480, -200, 340],
@@ -483,12 +506,12 @@ export async function figuren(duk, { hog = false, latt = false, pr = 1 } = {}) {
   const NK = 9;
   const skuggGeo = new THREE.BufferGeometry();
   {
-    // pultens ovansida: benet framför honom och armen mot en
+    // pultens ovansida: benet framför honom och armen mot en (i pultens mått)
     const z0 = SCEN.DISK.Z;
     const z1 = z0 + SCEN.DISK.DJUP;
     const { X: xi, B } = SCEN.HORN;
     const xo = xi + B;
-    const h = [[-3000, z0], [xo, z0], [-3000, z1], [xo, z1], [xi, z1], [xo, z1], [xi, 5000], [xo, 5000]].flatMap(([x, z]) => franBaren([x, BORD.Y, z]));
+    const h = [[-3000, z0], [xo, z0], [-3000, z1], [xo, z1], [xi, z1], [xo, z1], [xi, 5000], [xo, 5000]].flatMap(([x, z]) => franPulten([x, BORD.Y, z]));
     skuggGeo.setAttribute('position', new THREE.BufferAttribute(new Float32Array(h), 3));
     skuggGeo.setIndex([0, 2, 1, 1, 2, 3, 4, 6, 5, 5, 6, 7]);
   }
@@ -502,7 +525,8 @@ export async function figuren(duk, { hog = false, latt = false, pr = 1 } = {}) {
   kapA[6].set(-330, kantZ(-330) + 10, 330, kantZ(330) + 10);
   kapH[6].set(64, 26);
   // ---------- disken (diskBild) ----------
-  // Pulten från rummet, vid hörnet: geometri i barens mått (x längs benet), vriden som baren. Benet framför
+  // Pulten från rummet, vid hörnet: geometri i pultens mått (x längs benet), vriden som baren och flyttad så att
+  // han sitter vid SCEN.PLATS, med händerna vid geringssnittet. Benet framför
   // honom och armen som går mot en (SCEN.HORN) är samma skiva som pulten i rummet (rum-pult.js): samma trä,
   // som ådras längs benet och längs armen och möts i ett geringssnitt i hörnet, samma ringar efter glas, en
   // smal list i aluminium längs de bortre kanterna, och en tjock, mjukt rundad framkant mot en (SKIVA), med
@@ -666,6 +690,7 @@ export async function figuren(duk, { hog = false, latt = false, pr = 1 } = {}) {
     }`,
   }));
   diskM.rotation.y = SCEN.BAR * DEG;
+  diskM.position.fromArray(franBaren([-SCEN.PLATS, 0, 0]));
   diskM.frustumCulled = false;
   SD.add(diskM);
   // Notan under fatet, samma som i rummet (rum.js), ritad på en duk.
@@ -673,7 +698,6 @@ export async function figuren(duk, { hog = false, latt = false, pr = 1 } = {}) {
   const notaTex = new THREE.CanvasTexture(notaDuk);
   notaTex.colorSpace = THREE.NoColorSpace;
   notaTex.anisotropy = 8;
-  const NOTA = { B: 270, L: 430 };
   const notaG = new THREE.PlaneGeometry(NOTA.B, NOTA.L, 1, 8);
   {
     // liggande, med den nedre änden lite uppböjd
@@ -693,14 +717,8 @@ export async function figuren(duk, { hog = false, latt = false, pr = 1 } = {}) {
     ${LJUS}
     void main() { vec4 c = texture2D(uT, vUv); if (c.a < .02) discard; vec3 n = normalize(vN); gl_FragColor = vec4(ton(c.rgb * (ljus(n) * .78 + vec3(.12, .02, .015))), c.a); }`,
   }));
-  // På pultens arm, fritt från dess kant mot en, och fatet på notans övre vänstra hörn som i rummet (rum.css):
-  // fatets mitt FAT[0] från notans vänstra kant och FAT[1] bortom dess överkant, så långt ut att namnet
-  // (Hasse B.) syns framför fatet. Förut stod fatet mitt på överkanten och täckte namnet.
-  const FAT = [70, 28];
-  const NV = 0.22;
-  const fx = FAT[0] - NOTA.B / 2;
-  const fz = -NOTA.L / 2 - FAT[1];
-  nota.position.set(KOPP[0] - fx * Math.cos(NV) - fz * Math.sin(NV), BORD.Y, KOPP[2] + fx * Math.sin(NV) - fz * Math.cos(NV));
+  // på pulten, med fatet på dess övre vänstra hörn (NOTAN ovan)
+  nota.position.fromArray(NOTAN.mitt);
   nota.rotation.y = NV;
   nota.renderOrder = 1;
   SD.add(nota);
@@ -807,8 +825,8 @@ export async function figuren(duk, { hog = false, latt = false, pr = 1 } = {}) {
     diskU.uBakRam.value.set(bak.px, bak.py, bak.S, 0);
     diskU.uBakSt.value.set(bak.W, bak.H);
     // den bakre kanten i fönstret: dess högsta punkt där den syns
-    const ka = iBild(v, ...franBaren([-9000, BORD.Y, SCEN.DISK.Z]));
-    const kb = iBild(v, ...franBaren([SCEN.HORN.X + SCEN.HORN.B, BORD.Y, SCEN.DISK.Z]));
+    const ka = iBild(v, ...franPulten([-9000, BORD.Y, SCEN.DISK.Z]));
+    const kb = iBild(v, ...franPulten([SCEN.HORN.X + SCEN.HORN.B, BORD.Y, SCEN.DISK.Z]));
     const yVid = (x) => ka[1] + ((kb[1] - ka[1]) * (x - ka[0])) / (kb[0] - ka[0]);
     const y0 = Math.max(0, Math.floor(Math.min(yVid(0), yVid(v.W)) - 4));
     const box = { x: 0, y: y0, w: v.W, h: Math.max(1, v.H - y0) };
