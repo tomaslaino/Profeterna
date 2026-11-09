@@ -491,7 +491,8 @@ window.Rum = (() => {
   <g stroke="#cfc6b0" stroke-opacity=".45" stroke-width="1.6"><line x1="300" y1="${S + 10}" x2="342" y2="${S + 10}"/><line x1="610" y1="${S + 10}" x2="628" y2="${S + 10}"/><line x1="880" y1="${S + 10}" x2="930" y2="${S + 10}"/></g>
   <rect x="236" y="${S + 22}" width="748" height="6" fill="#000" opacity=".3" filter="url(#rum-b4)"/>`, '', [220, 540, 780, 75]) +
       // det svaga skenet från neonen för sig, med en fjärdedel av bildpunkterna i telefonen
-      (LATT ? '' : svg(`<ellipse cx="560" cy="${S - 150}" rx="360" ry="150" fill="#ff3a2a" opacity=".05" filter="url(#rum-b40)"/>`, 'rum-sken', [40, 120, 1040, 600], 0.25)) +
+      // (inte i telefonen och inte från steg 1, .rum-svag i rum.css)
+      (LATT ? '' : svg(`<ellipse cx="560" cy="${S - 150}" rx="360" ry="150" fill="#ff3a2a" opacity=".05" filter="url(#rum-b40)" class="rum-svag"/>`, 'rum-sken', [40, 120, 1040, 600], 0.25)) +
       '<canvas id="rum-3d" class="rum-3d" width="1440" height="560"></canvas>';
   }
 
@@ -1208,9 +1209,11 @@ window.Rum = (() => {
 
   // I telefonen i Chrome slås ljusets tre lager över hela skärmen (värmen, dagsljuset och vinjetten) ihop
   // till en bild. Det är samma ljus, men grafikkortet behöver bara lägga ett lager i stället för tre i
-  // varje bildruta. (Källorna ligger kvar, dolda: de skrivs över när ljuset ändras.)
+  // varje bildruta. (Källorna ligger kvar, dolda: de skrivs över när ljuset ändras.) I datorn från steg 1
+  // också, där ljuset redan är utan blandningslägen som i telefonen (.enkel): i ett fönster på 2880 × 1800
+  // bildpunkter är varje sådant lager 5 miljoner bildpunkter att blanda in i varje bildruta.
   function ljusIhop() {
-    if (!LATT || !R.ljusKlar || !R.el.classList.contains('chromium')) return;
+    if (!(LATT || R.el.classList.contains('enkel')) || !R.ljusKlar || !R.el.classList.contains('chromium')) return;
     const v = R.el.querySelector('.rum-vign');
     const a = R.el.querySelector('.rum-warm');
     const d = document.getElementById('rum-dagsljus');
@@ -1285,6 +1288,7 @@ ${window.RumRegister ? RumRegister.nara() : ''}
     document.querySelector('main').prepend(el);
     R.el = el;
     R.built = true;
+    takDuk(el.querySelector('.rum-tak'));
     ringar(el);
     wire();
     // kort: högst elva tecken
@@ -1324,6 +1328,25 @@ ${window.RumRegister ? RumRegister.nara() : ''}
     // dörrens övre del, med Stängt-skylten och namnet: kameran går fram dit
     // när man klickar på namnet (närbilderna, sak)
     syn(el.querySelector('#rum-ute').parentElement, DORR.x, DORR.y, DORR.w, 200).id = 'rum-dorrglas';
+  }
+
+  // Taket ovanför scenen i telefonen på höjden (.rum.smal i rum.css) som en duk en bildpunkt bred, med
+  // samma övergång uppifrån och ner. Som bakgrund ritades det i rutor över 2000 px bredd, och de längst ut
+  // hann inte ritas när man drog snabbt åt sidan: det syntes som svarta hål i taket. En duk ritas aldrig om.
+  function takDuk(e) {
+    if (!e) return;
+    const c = document.createElement('canvas');
+    c.width = 1;
+    c.height = 64;
+    const g = c.getContext('2d');
+    const t = g.createLinearGradient(0, 0, 0, 64);
+    t.addColorStop(0, '#17120c');
+    t.addColorStop(1, '#3a2f21');
+    g.fillStyle = t;
+    g.fillRect(0, 0, 1, 64);
+    c.style.cssText = 'position:absolute;left:0;top:0;width:100%;height:100%';
+    e.style.background = 'none';
+    e.append(c);
   }
 
   // Toningen bakom anslagstavlan och kortregistret som en liten duk i telefonen,
@@ -2759,8 +2782,11 @@ ${window.RumRegister ? RumRegister.nara() : ''}
     R.kval = k;
     const K = KVAL[k];
     for (const x of [R.fig, R.saker]) if (x && x.kval) x.kval(K);
-    // (som i telefonen: ljuset utan blandningslägen, inget korn, rum.css)
-    if (R.el && k >= 1 && !R.el.classList.contains('enkel')) R.el.classList.add('enkel');
+    // (som i telefonen: ljuset utan blandningslägen och i ett lager, inget korn, rum.css)
+    if (R.el && k >= 1 && !R.el.classList.contains('enkel')) {
+      R.el.classList.add('enkel');
+      ljusIhop();
+    }
     // (och gatan i en enda duk, rum-ute.js)
     const gatan = R.el && document.getElementById('rum-ute');
     if (gatan && k >= 1 && !gatan._samla) {

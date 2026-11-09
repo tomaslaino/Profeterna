@@ -3702,7 +3702,7 @@ var tionde bild längre än 50 ms (75 ms på steg 1).
 
 Gatan utanför glider lika jämnt på alla steg (se *Bilarna och de som går förbi glider jämnt* nedan).
 
-Från steg 1 är det i datorn som i telefonen: ljuset utan blandningslägen, inget korn, och föremålen
+Från steg 1 är det i datorn som i telefonen: ljuset utan blandningslägen och i ett lager (`ljusIhop`), inget korn, och föremålen
 lyser upp direkt i stället för med en övergång av filtret (`.enkel` i rum.css).
 
 Rummet börjar på rätt steg (`startSteg` i rum.js): i ett svep byggs gänget om för varje steg ner,
@@ -4053,6 +4053,44 @@ Gatans duk är densamma vid samma tidpunkt (62–109 av 126 000 bildpunkter skil
 höstlöv och paraplyer. Gänget går inte att mäta i en dator utan grafikkort (1–2 bilder i sekunden med båda); i en
 riktig telefon ger `?rum-mat` siffrorna. Hinner telefonen inte med går rummet ner ett steg som förut, men gatan glider
 lika jämnt.
+
+### Färre lager att lägga ihop (2026-11-09)
+
+Varje bildruta där något i rummet har ändrats lägger grafikkortet alla rummets lager över varandra (medan något far
+förbi utanför 60 gånger i sekunden, se ovan), och på en svag grafikkrets och en skärm med hög täthet är det ytan som kostar: i ett fönster på 2880 × 1800 bildpunkter är varje lager
+över hela skärmen 5 miljoner bildpunkter att blanda in. Räknat ur Chromes lagerträd (`LayerTreeHostImpl:snapshot`, hur
+mycket av fönstret varje lager som ritar något täcker) låg rummet hemma på ungefär 7 skärmytor i telefonen och 9,4 i datorn
+på steg 1, där svagare datorer börjar (sidans och scenens bakgrund under scenen oräknade). En del av det var tomt:
+
+- **Utsikten.** När gatan är en enda duk (`gatduk`, i telefonen och i datorn från steg 1) låg himlens liv, blixten,
+  gatans lager, livet på gatan, nederbörden och glaset kvar som tomma eller nästan tomma lager i hela utsiktens storlek
+  ovanpå duken. Eftersom de ligger över duken blev de tillsammans med skyltarna ett lager i hela utsiktens storlek, 0,8
+  skärmytor i telefonen och 1 i datorn. Nu syns de tomma inte, gatans och glasets lager har ingen egen storlek (det som
+  står kvar i dem har sin egen), rännilarna är borta där (dropparna rinner inte från steg 1) och glasets SVG är bara så
+  stor som fönstret och dörren (`glas` i rum-ute.js, rum-ute.css). I telefonen är dropparna, snön och frosten på rutan en
+  bild i duken (`bakaGlas`; utsikten ritas där ändå med 0,4 bildpunkter per px), i datorn ett lager över glaset som förut,
+  i full skärpa.
+- **Blixten** vid åska var två lager i hela utsiktens storlek som tonade upp och ner på grafikkortet hela tiden, och
+  rummet ville sättas ihop 60 gånger i sekunden för deras skull. Med gatan i en duk blinkar den nu i duken när gatan
+  ritas, med samma nyckelbilder (`blixtA`). Mätt före *Bilarna och de som går förbi glider jämnt* ovan, som telefon på
+  steg 1 utan 3D: 15 sammansättningar i sekunden med grafikprocessen full → 19–20, gängets takt. (Nu ritas gatan i varje
+  bildruta medan det regnar, och åskan har regn: där är vinsten de två lagren.)
+- **Ljuset** (värmen, dagsljuset och vinjetten) är en bild i datorn från steg 1 också, som redan i telefonen (`ljusIhop`).
+  Där värmen ska vara borta, nära radion och med videon inzoomad, syns vinjetten för sig (rum.css): med ljuset i en bild
+  låg värmen förut kvar där i telefonen och tvättade ur det svarta.
+- **Det svagaste skenet från neonen** (5 % täckning, över halva rummet) är borta i datorn från steg 1, som i telefonen
+  (`.rum-svag`).
+- **Taket** ovanför scenen i telefonen på höjden är en duk en bildpunkt bred (`takDuk`). Som bakgrund ritades det i rutor
+  över 2000 px bredd, och det var det som oftast fattades när man drog snabbt åt sidan med lite ritminne.
+
+Mätt i Chrome 153 med mjukvarugrafik (SwiftShader) som telefon (412 × 870, täthet 2,625) och som dator (1440 × 900), gammal
+och ny kod: skärmytor per bild i telefonen 7,99 → 7,31, också i regn och snö (förut lika mycket), i datorn på steg 1 11,36 →
+8,99 och i regn 11,36 → 9,31 (sidans bakgrund, som scenen döljer, räknad: utan den ungefär −10 % i telefonen och −25 % i
+datorn). Mjukvarugrafiken visar inte ytan så mycket som ett riktigt grafikkort (den har en fast kostnad för varje lager): i
+datorn på steg 1 utan 3D 8,5 → 9,1 sammansättningar i sekunden. Med 128 MB ritminne och fingret som drar snabbt fram och
+tillbaka saknas inga rutor i taket längre; det som ibland fattas är tv:ns sidor och anslagstavlan, gammal och ny kod lika.
+Bilderna (dag, kväll, regn, åska, frost och snö, telefon och dator på steg 0 och 1) är jämförda punkt för punkt: 48–67 dB,
+där det som skiljer är uret, Hasses hand och enstaka kanter. Inte provat i en riktig telefon.
 
 ### När något går fel i rummet
 

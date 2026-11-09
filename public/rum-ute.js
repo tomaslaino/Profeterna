@@ -651,7 +651,14 @@ window.RumUte = (() => {
       }
     });
     const defs = '<defs><radialGradient id="rum-ute-frost" cx=".5" cy=".5" r=".5"><stop offset="0" stop-color="#eef6ff" stop-opacity=".55"/><stop offset=".6" stop-color="#eef6ff" stop-opacity=".18"/><stop offset="1" stop-color="#eef6ff" stop-opacity="0"/></radialGradient></defs>';
-    return `<svg class="rum-layer" viewBox="0 0 1600 1000" aria-hidden="true">${defs}${s}</svg>${html}`;
+    // (bara så stor som fönstret och dörren, och ingen alls utan droppar, snö och frost: annars lade
+    // grafikkortet ett tomt lager över hela utsikten i varje bildruta. Utanför glaset är väggen.)
+    if (!s) return html;
+    const x0 = Math.min(...rects.map((p) => p.x));
+    const y0 = Math.min(...rects.map((p) => p.y));
+    const w = Math.max(...rects.map((p) => p.x + p.w)) - x0;
+    const h = Math.max(...rects.map((p) => p.y + p.h)) - y0;
+    return `<svg class="rum-layer" viewBox="${x0} ${y0} ${w} ${h}" style="left:${x0}px; top:${y0}px; width:${w}px; height:${h}px" aria-hidden="true">${defs}${s}</svg>${html}`;
   }
 
   // ---------- att rita ----------
@@ -1190,10 +1197,39 @@ window.RumUte = (() => {
       }
     }
     g.globalAlpha = 1;
+    // blixten (åska) över hela gatan, som lagret .rum-blixt med sina två ljus
+    if (G.blixt && !RORELSE_AV.matches) {
+      const a = 1 - (1 - blixtA(nu / 17000)) * (1 - blixtA((nu + 11000) / 29000));
+      if (a > 0.004) {
+        g.setTransform(1, 0, 0, 1, 0, 0);
+        g.globalAlpha = 0.45 * a;
+        g.fillStyle = '#eef3ff';
+        g.fillRect(0, 0, g.canvas.width, g.canvas.height);
+        g.globalAlpha = 1;
+      }
+    }
+    // dropparna, snön och frosten på rutan (bakaGlas)
+    if (G.glas) {
+      const q = G.glas;
+      g.setTransform(1, 0, 0, 1, 0, 0);
+      g.drawImage(q.c, (q.x - b.x) * GAT_S, (q.y - b.y) * GAT_S, q.w * GAT_S, q.h * GAT_S);
+    }
     el._fort = fort;
     return fort;
   }
   const RORELSE_AV = matchMedia('(prefers-reduced-motion: reduce)');
+  // blixtens styrka efter q varv (nyckelbilderna rum-blixt i rum-ute.css, rakt mellan dem)
+  const BLIXT = [[0, 0], [0.9, 0], [0.906, 0.85], [0.912, 0.08], [0.92, 0.6], [0.94, 0], [1, 0]];
+  function blixtA(q) {
+    const p = q - Math.floor(q);
+    for (let i = 1; i < BLIXT.length; i++) {
+      const [x1, y1] = BLIXT[i];
+      if (p > x1) continue;
+      const [x0, y0] = BLIXT[i - 1];
+      return y0 + ((y1 - y0) * (p - x0)) / (x1 - x0);
+    }
+    return 0;
+  }
 
   // I varje bildruta från rum.js (ms: bildrutans tid), medan gatan syns och rör
   // sig: gatan läggs ut på nytt bara när något som far förbi syns, annars i
@@ -1241,6 +1277,40 @@ window.RumUte = (() => {
     G.fall = ut;
     x.style.display = 'none';
     ritaGatan(el);
+  }
+
+  // Dropparna, snön och frosten på rutan (glas) som en bild i gatans duk i telefonen, en gång. Som eget
+  // lager över fönstret och dörren lade grafikkortet dem över rummet i varje bildruta (0,4 skärmytor),
+  // fast de står still. Där ritas utsikten ändå med 0,4 bildpunkter per px (rum.css).
+  async function bakaGlas(x, el) {
+    const G = el._gat;
+    const gen = (x._gen = (x._gen || 0) + 1);
+    G.glas = null;
+    const svg = x.querySelector(':scope > svg');
+    if (!svg) return ritaGatan(el);
+    const vb = svg.viewBox.baseVal;
+    const k = svg.cloneNode(true);
+    k.removeAttribute('style');
+    k.removeAttribute('class');
+    k.setAttribute('width', vb.width);
+    k.setAttribute('height', vb.height);
+    const url = URL.createObjectURL(new Blob([new XMLSerializer().serializeToString(k)], { type: 'image/svg+xml' }));
+    try {
+      const img = new Image();
+      img.src = url;
+      await img.decode();
+      if (x._gen !== gen || el._gat !== G) return;
+      const c = document.createElement('canvas');
+      c.width = Math.ceil(vb.width * GAT_S);
+      c.height = Math.ceil(vb.height * GAT_S);
+      c.getContext('2d').drawImage(img, 0, 0, c.width, c.height);
+      img.src = '';
+      G.glas = { c, x: vb.x, y: vb.y, w: vb.width, h: vb.height };
+      svg.style.display = 'none';
+      ritaGatan(el);
+    } catch { /* då står SVG:n kvar */ } finally {
+      URL.revokeObjectURL(url);
+    }
   }
 
   // Ställningarna efter t ms (rum.js: i gängets takt, eller den fasta
@@ -1345,7 +1415,10 @@ window.RumUte = (() => {
     }
     const sig = sigs(v, L);
     sig.blixt = String(v.slag === 'aska');
-    const draw = { himmel: () => himmel(v, L), himliv: () => himmelsliv(v, L), gata: () => gata(v, L), liv: () => gatliv(v, L), fall: () => fall(v), glas: () => glas(v, rects), blixt: () => (v.slag === 'aska' ? '<i></i><i class="b2"></i>' : '') };
+    // (med gatan i en duk blinkar blixten där, ritaGatan: två lager i hela utsiktens storlek som
+    // tonade upp och ner på grafikkortet gjorde att hela rummet ritades om 60 gånger i sekunden)
+    if (el._gat) el._gat.blixt = v.slag === 'aska';
+    const draw = { himmel: () => himmel(v, L), himliv: () => himmelsliv(v, L), gata: () => gata(v, L), liv: () => gatliv(v, L), fall: () => fall(v), glas: () => glas(v, rects), blixt: () => (v.slag === 'aska' && !el._gat ? '<i></i><i class="b2"></i>' : '') };
     let changed = false;
     // dukarna: bildpunkter per px som utsikten syns (högst 2), och det som
     // syns genom fönstret och dörren (med marginal)
@@ -1363,6 +1436,8 @@ window.RumUte = (() => {
       if (k === 'gata' && SAMLA) bakaGata(x, G && ((d) => { G.gata = d; ritaGatan(el); }));
       if (k === 'himmel' && SAMLA) bakaHimmel(x, G && ((d) => { G.himmel = d; ritaGatan(el); }));
       if (k === 'fall' && G) bakaFall(x, el);
+      // (i datorn står de kvar i full skärpa: gatans duk har en halv bildpunkt per px)
+      if (k === 'glas' && G && LATT) bakaGlas(x, el);
       changed = true;
     }
     el._duk = [...(el._dukar.liv || []), ...(el._dukar.himliv || [])];

@@ -1016,6 +1016,14 @@ canvas.rum-neonhalo { opacity: var(--sken, 0.28); }
 .rum.enkel .rum-dagsljus { opacity: calc(var(--dagsljus, 0) * 0.2); }
 .rum.enkel.aska .rum-dagsljus { animation: none; }
 .rum.enkel .rum-grain { display: none; }
+/* Med ljuset i en bild (ljusIhop i rum.js) syns vinjetten för sig där värmen ska vara borta: nära radion
+   och med videon inzoomad (rum-radio.css, rum-video.css), annars tvättade den ur det svarta där. */
+.rum.radio-nara .rum-vign > canvas.ihop, .rum.vid-tat .rum-vign > canvas.ihop { display: none; }
+.rum.radio-nara .rum-vign > canvas:not(.ihop), .rum.vid-tat .rum-vign > canvas:not(.ihop) { display: block !important; }
+/* det svagaste skenet från neonen (rum.js, sill) syns knappt men låg som ett eget lager över halva rummet */
+canvas.rum-svag { opacity: 0.05; }
+.rum.enkel .rum-svag { display: none; }
+.rum.enkel svg:has(> .rum-svag) { display: none; }
 .rum.enkel .rum-rok i { animation: none; }
 .rum.enkel .rum-sak { transition: none; }
 /* (ångan ur kaffet står still: en rörelse på grafikkortet gör att hela rummet ritas om 60 gånger i sekunden) */
