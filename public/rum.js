@@ -1512,6 +1512,79 @@ ${window.RumRegister ? RumRegister.nara() : ''}
   const PEN_SKRIV = -38;
   const penStyle = (p) => { const s = penAt(p); return `transform: ${s.transform}; filter: ${s.filter}`; };
 
+  // Slitaget på kupongen. Varje kupong har haft sitt eget liv: vikt på mitten,
+  // på tvären, i fyra eller med ett snett veck, en kaffekopp ställd på den
+  // (ibland två gånger), några stänk, ett tumavtryck av blyerts, ett hörn som
+  // vikts in, mer eller mindre gulnad och ibland mörkare från ena sidan. Allt
+  // slumpas ur omgången och vems kupong det är (kupNyckel), så att samma kupong
+  // ser likadan ut på pulten, i handen, i högen och hos Hasse – utkastet och den
+  // inlämnade är samma papper – men ingen är den andra lik (förut hade alla
+  // samma kaffering och samma veck). Det tryckta – bandet, synkmarkeringarna,
+  // tryckeriets rad – är likadant på alla. Bara gradienter, inga bilder eller
+  // filter, så att rummet inte får mer att rita. Allt slumpas i samma ordning
+  // på båda sidor; bak (högen, gängets kupong med baksidan upp) visar bara det
+  // som syns igenom, spegelvänt (rum.css): vecken, hörnet och kaffet.
+  const kupNyckel = (omg, vem) => `${omg || ''}|${vem || '?'}`;
+  const KAFFE = '112, 66, 22';
+  const LJUS = '255, 250, 238';
+  const VECK = '90, 58, 22';
+  function slitage(key, bak = false) {
+    const r = rng(seed(`slitage:${key}`));
+    const sp = (a, b) => a + r() * (b - a);
+    const o = (x) => x.toFixed(3);
+    const pc = (x) => `${r1(x)}%`;
+    const at = (x, y, dx = 0, dy = 0) => `calc(${pc(x)} + ${r1(dx)}px) calc(${pc(y)} + ${r1(dy)}px)`;
+    // gulnat, och ibland mörkare från en sida (solen, en låda)
+    const gul = sp(0, 0.16);
+    const kant = [sp(38, 62), sp(34, 54), sp(0, 0.18)];
+    const sida = r() < 0.4 ? [['right', 'left', 'bottom', 'top'][Math.floor(r() * 4)], sp(0.08, 0.2)] : null;
+    // vecken: ingen, på mitten, på tvären, i fyra eller ett snett; åt vilket
+    // håll vecket gick (vilken sida skuggan hamnar på) och hur hårt det drogs
+    const typ = r();
+    const veck = [];
+    if (typ >= 0.15 && typ < 0.7) veck.push([90 + sp(-2.5, 2.5), sp(45, 55)]);
+    if (typ >= 0.5 && typ < 0.88) veck.push([180 + sp(-2, 2), sp(43, 57)]);
+    if (typ >= 0.88) veck.push([sp(76, 114), sp(22, 78)]);
+    const vk = veck.map(([deg, x]) => (r() < 0.5 ? [deg, x] : [deg + 180, 100 - x]).concat(sp(0.1, 0.2)));
+    // kaffet: koppen ställd en gång, ibland två
+    const kopp = r() < 0.55 ? { x: sp(12, 88), y: sp(22, 88), rad: sp(36, 54), oval: sp(0.95, 1.04), s: sp(0.18, 0.32), igen: r() < 0.35 ? [sp(0, 2 * Math.PI), sp(9, 24), sp(0.4, 0.7)] : null } : null;
+    // stänk i en eller två klungor
+    const stank = [];
+    for (let n = r() < 0.5 ? 1 + Math.floor(r() * 2) : 0; n > 0; n--) {
+      const [x, y] = [sp(6, 94), sp(16, 95)];
+      for (let m = 2 + Math.floor(r() * 5); m > 0; m--) stank.push([x, y, (r() + r() - 1) * 20, (r() + r() - 1) * 20, sp(1, 3.2), sp(0.1, 0.3)]);
+    }
+    // tumavtryck av blyerts, och ett hörn som vikts in och slätats ut igen
+    const tumme = r() < 0.35 ? [sp(8, 92), sp(50, 95), sp(10, 15), sp(13, 20), sp(0.05, 0.1)] : null;
+    const horn = r() < 0.3 ? { c: Math.floor(r() * 4), a: sp(28, 70), b: sp(0.75, 1.3), s: sp(0.1, 0.18), ljus: sp(0.06, 0.16) } : null;
+
+    const lag = [];
+    if (horn) {
+      const [dir, pos] = [['to bottom right', 'left top'], ['to bottom left', 'right top'], ['to top right', 'left bottom'], ['to top left', 'right bottom']][horn.c];
+      lag.push(`linear-gradient(${dir}, rgba(${LJUS}, ${o(horn.ljus)}) 0 calc(50% - 1px), rgba(${VECK}, ${o(horn.s)}) 50%, rgba(${LJUS}, ${o(horn.s * 2)}) calc(50% + 1px), rgba(${LJUS}, 0) calc(50% + 2.5px))` +
+        ` ${pos} / ${r1(horn.a)}px ${r1(horn.a * horn.b)}px no-repeat`);
+    }
+    for (const [deg, x, s] of vk) {
+      lag.push(`linear-gradient(${r1(deg)}deg, rgba(${VECK}, 0) calc(${pc(x)} - 7px), rgba(${VECK}, ${o(s * 0.3)}) calc(${pc(x)} - 1px), rgba(${VECK}, ${o(s)}) ${pc(x)},` +
+        ` rgba(${LJUS}, ${o(s * 2.2)}) calc(${pc(x)} + 1px), rgba(${LJUS}, 0) calc(${pc(x)} + 3px))`);
+    }
+    if (kopp) {
+      const ring = (dx, dy, s) => `radial-gradient(${r1(kopp.rad)}px ${r1(kopp.rad * kopp.oval)}px at ${at(kopp.x, kopp.y, dx, dy)}, rgba(${KAFFE}, ${o(s * 0.12)}) 0 78%,` +
+        ` rgba(${KAFFE}, ${o(s * 0.5)}) 88%, rgba(${KAFFE}, ${o(s)}) 95%, rgba(${KAFFE}, 0) 100%)`;
+      const s = kopp.s * (bak ? 0.45 : 1);
+      lag.push(ring(0, 0, s));
+      if (kopp.igen) lag.push(ring(Math.cos(kopp.igen[0]) * kopp.igen[1], Math.sin(kopp.igen[0]) * kopp.igen[1], s * kopp.igen[2]));
+    }
+    if (!bak) {
+      for (const [x, y, dx, dy, rad, s] of stank) lag.push(`radial-gradient(${r1(rad)}px at ${at(x, y, dx, dy)}, rgba(${KAFFE}, ${o(s)}) 0 55%, rgba(${KAFFE}, 0) 100%)`);
+      if (tumme) lag.push(`radial-gradient(${r1(tumme[2])}px ${r1(tumme[3])}px at ${at(tumme[0], tumme[1])}, rgba(70, 68, 66, ${o(tumme[4])}), rgba(70, 68, 66, 0))`);
+    }
+    if (sida) lag.push(`linear-gradient(to ${sida[0]}, rgba(196, 150, 86, ${o(sida[1])}), rgba(196, 150, 86, 0) 45%)`);
+    lag.push(`radial-gradient(130% 120% at ${pc(kant[0])} ${pc(kant[1])}, rgba(122, 86, 40, 0) 55%, rgba(122, 86, 40, ${o(kant[2])}))`,
+      `linear-gradient(rgba(196, 160, 106, ${o(gul)}), rgba(196, 160, 106, ${o(gul)}))`);
+    return `<span class="slit${bak ? ' bak' : ''}" aria-hidden="true" style="background: ${lag.join(', ')}"></span>`;
+  }
+
   // Kupongen på pulten och i handen: samma kupong som papperet under Kupong
   // (samtal.js), i kupongens mått. Bandet, under det stämpeln (vem omgången
   // väntar på) och spelstoppet, namnet för hand och 1 X 2 överst, en rad per match
@@ -1583,6 +1656,10 @@ ${window.RumRegister ? RumRegister.nara() : ''}
     const p = v ? pult(rd) : null;
     const top = p ? Samtal.pult.top(hand && slag === 'fyll' && p.fyll, slag === 'las' ? v.vem : null) : null;
     const id = rd && !rd.next ? rd.id || (rd.coupon && rd.coupon.id) : null;
+    // slitaget: samma papper för samma omgång och person – ditt utkast och din
+    // inlämnade är ett, gängets kupong ett annat, och den nya på pulten när du
+    // har lämnat in ännu ett
+    const nyckel = kupNyckel(rd ? rd.id || (rd.coupon && rd.coupon.id) || rd.ids.join(',') : '', !v ? 'ny' : slag === 'gang' ? 'gang' : v.vem);
     const band = `<span class="band"><small>MATCHFIXARNA · TIPSKUPONG</small><b>${nr ? `Kupong ${nr}` : 'Kupong'}</b></span>`;
     const hd = `<span class="hd"><span>Nr</span><span class="m">${top && top.vem && hand && slag === 'fyll' ? '<span class="sm-q">Vem är du?</span>' : '<span>Match</span>'}` +
       `${top ? `<span class="sm-namnen${slag === 'gang' ? ' alla' : top.vem && hand && slag === 'fyll' ? ' val' : ''}">${top.namn}</span>` : ''}</span><span>1</span><span>X</span><span>2</span></span>`;
@@ -1590,9 +1667,10 @@ ${window.RumRegister ? RumRegister.nara() : ''}
       `<span class="topp">${top ? top.stamp : ''}<span class="pp-stop"><span>Spelstopp</span><b>${first ? esc(fWeekdayTime.format(new Date(first))) : '–'}</b></span></span>` +
       hd + list +
       `<span class="fot">${v ? Samtal.pult.fields(signs, slag === 'gang') : ''}${id ? Papper.code(id) : ''}</span>` +
+      slitage(nyckel) +
       (slag === 'din' || slag === 'las' ? '<span class="stampel">Inlämnad</span>' : '') +
       // gängets kupong på pulten ligger med baksidan upp tills den vänds
-      (slag === 'gang' && !hand && p && !vand(p) ? vandHtml(band + hd + list, top) : '') +
+      (slag === 'gang' && !hand && p && !vand(p) ? vandHtml(band + hd + list, top, slitage(nyckel, true)) : '') +
       `<span class="pencil${slag === 'gang' || (!v && order.some((x) => x.sign)) ? ' kula' : ''}" style="${penStyle(PEN_PULT)}"><i></i></span>`;
   }
 
@@ -1700,8 +1778,8 @@ ${window.RumRegister ? RumRegister.nara() : ''}
     R.vand = vandNyckel(p);
     try { localStorage.setItem(VAND, R.vand); } catch (e) { /* då ligger den vänd tills sidan laddas om */ }
   }
-  const vandHtml = (fram, top) => '<span class="rum-vand" aria-hidden="true">' +
-    `<span class="genom">${fram.replace(/ title="[^"]*"/g, '')}</span>` +
+  const vandHtml = (fram, top, slit) => '<span class="rum-vand" aria-hidden="true">' +
+    `<span class="genom">${fram.replace(/ title="[^"]*"/g, '')}</span>${slit}` +
     `${top && top.stamp ? `<span class="st">${top.stamp.replace(/ title="[^"]*"/g, '')}</span>` : ''}</span>`;
 
   const nrRing = (id, klar) =>Papper.ring(`s${id}`, 'rum-strid', 22).replace('<path ', '<path pathLength="1" ') + (klar ? bockSvg(id) : '');
@@ -1748,10 +1826,11 @@ ${window.RumRegister ? RumRegister.nara() : ''}
     return g && g.bild ? g.bild : null;
   }
 
-  // Baksidan: bandet och markeringarna lyser svagt igenom, spegelvända.
-  function backHtml(id, ix) {
+  // Baksidan: bandet och markeringarna lyser svagt igenom, spegelvända, och
+  // slitaget från framsidan (omg: omgångens id, som kupongens nyckel).
+  function backHtml(id, ix, omg) {
     const src = photoOf(id);
-    return '<span class="genom"></span>' +
+    return `<span class="genom"></span>${slitage(kupNyckel(omg, id), true)}` +
       (src ? `<span class="foto"><img src="${esc(src)}" alt="" draggable="false"></span>` +
         '<svg class="gem" viewBox="0 0 30 92" aria-hidden="true"><path d="M8 84V14a8 8 0 0 1 16 0v62a5 5 0 0 1-10 0V24"/></svg>' : '') +
       `<b class="namn" style="color: ${INK[ix] || INK[0]}">${esc(id)}</b><span class="stampel">Inlämnad</span>` +
@@ -1771,7 +1850,7 @@ ${window.RumRegister ? RumRegister.nara() : ''}
       const ta = du || Boolean(p && p.se.includes(g.id));
       const label = du ? `Din kupong (${g.id}), inlämnad${p.andra ? ' – ändra' : ''}` : ta ? `${g.id}:s kupong, inlämnad` : `${g.id}:s kupong, inlämnad – syns när du har lämnat in`;
       return `<a class="rum-flat rum-bak rum-sak" ${KNAPP} data-nav="kupong" data-vem="${esc(g.id)}" data-i="${i}"${ta ? ' data-ta' : ''}` +
-        ` style="transform: ${restAt(slot(i))}" aria-label="${esc(label)}"${ta ? '' : ` title="${esc(label)}"`}>${backHtml(g.id, gang.findIndex((x) => x.id === g.id))}</a>`;
+        ` style="transform: ${restAt(slot(i))}" aria-label="${esc(label)}"${ta ? '' : ` title="${esc(label)}"`}>${backHtml(g.id, gang.findIndex((x) => x.id === g.id), (p && p.s.id) || (rd && rd.id))}</a>`;
     }).join('');
     if (el.dataset.html !== html) {
       el.innerHTML = html;
@@ -4876,7 +4955,7 @@ ${window.RumRegister ? RumRegister.nara() : ''}
     // baksidan med ditt namn, som kupongen visar i högen
     if (!k.vem) {
       k.vem = p.vem;
-      k.bak = backHtml(p.vem, p.s.gang.findIndex((g) => g.id === p.vem));
+      k.bak = backHtml(p.vem, p.s.gang.findIndex((g) => g.id === p.vem), p.s.id);
     }
     // omgången läses om, så att gänget vid barbordet ser att du är inne
     if (typeof tpLoad === 'function') tpLoad(true).then(() => { if (R.on) fill(); });
