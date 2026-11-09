@@ -3599,7 +3599,7 @@ ${window.RumRegister ? RumRegister.nara() : ''}
     const samma = t.omgang === rd.id || (t.matcher || []).filter((id) => ids.has(String(id))).length * 2 >= rd.ids.length;
     if (!samma) return [];
     return t.notiser.filter((n) => n && n.rubrik && n.text && (!n.id || ids.has(String(n.id))))
-      .map((n) => ({ nr: n.nr, id: n.id, match: n.match, rubrik: n.rubrik, text: n.text, kallor: n.kallor || n.källor || [] }));
+      .map((n) => ({ nr: n.nr, id: n.id, match: n.match, rubrik: n.rubrik, text: n.text, kallor: n.kallor || n.källor || [], lag: n.lag, bilder: n.bilder }));
   }
   // Tipsligan: säsongens omgångar som syns (kampRounds, som skårtavlan), utan och med omgången id.
   // → { fore, efter, omg } eller null
@@ -3620,6 +3620,7 @@ ${window.RumRegister ? RumRegister.nara() : ''}
       tid: sedel.classList.contains('tid-ex') ? 'ex' : 'sb',
       datumText: rub && rub.datum ? String(rub.datum).toLowerCase() : '',
       namnAv: (id, namn) => tavelnamn({ id, name: namn }),
+      skold: (lag) => (window.Skoldar && Skoldar.src ? Skoldar.src(lag) : ''),
     };
     if (R.summa) {
       const g = window.Samtal && Samtal.pult && Samtal.pult.gang ? Samtal.pult.gang() : null;

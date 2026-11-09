@@ -248,6 +248,37 @@
     };
   }
 
+  // Lagen i notisen (lag ur filen, annars ur "Hemma – Borta") och veckans bild för var och en (data/tidning-bilder/,
+  // som iMacen hämtar med tidningen), med skölden som reserv (u.skold). → [{ src, reserv, lag, foto }] eller []
+  const lagI = (n) => (Array.isArray(n.lag) && n.lag.length === 2 ? n.lag : String(n.match || '').split(/\s+[–-]\s+/).slice(0, 2));
+  // Fotografen eller sajten, så kort som under en tidningsbild (Getty Images, Sky Sports).
+  function fotograf(b) {
+    const f = String(b.foto || '');
+    if (/getty/i.test(f)) return 'Getty Images';
+    if (f) return f.split('/').pop().replace(/^\s*\(?photo by\s*/i, '').replace(/[()]/g, '').trim() || null;
+    return String(b.kalla || '').split(/\s+[-–|]\s+/)[0].trim() || null;
+  }
+  const fotoText = (l) => {
+    const f = [...new Set(l.filter(Boolean))];
+    return f.length ? `Foto: ${f.join(', ')}` : '';
+  };
+  function notisBilder(u, n) {
+    const skold = (lag) => (lag && typeof u.skold === 'function' ? u.skold(lag) || '' : '');
+    const ut = lagI(n).map((lag, i) => {
+      const b = n.bilder && n.bilder[i];
+      if (b && b.fil) return { src: `data/tidning-bilder/${b.fil}`, reserv: skold(lag), lag, foto: fotograf(b) };
+      const s = skold(lag);
+      return s ? { src: s, skold: true, lag } : null;
+    });
+    return ut.some((x) => x && !x.skold) ? ut : [];
+  }
+  // Två bilder bredvid varandra, hemma och borta, med lagets namn i underkanten.
+  function bildrad(bilder, namn) {
+    if (!bilder.length) return '';
+    return `<div class="tn-bilder">${bilder.map((b, i) => `<figure>${b ? `<canvas class="tn-foto${b.skold ? ' skold' : ''}" width="320" height="200" data-bild="${esc(b.src)}"${b.reserv ? ` data-reserv="${esc(b.reserv)}"` : ''}${b.foto ? ` data-foto="${esc(b.foto)}"` : ''}></canvas>` : '<span class="tn-foto tom"></span>'}` +
+      `<figcaption>${esc(namn[i] || (b && b.lag) || '')}</figcaption></figure>`).join('')}</div>`;
+  }
+
   function notiser(u) {
     const l = (u.notiser || []).filter((n) => n && n.rubrik && n.text);
     if (!l.length) return null;
@@ -258,8 +289,10 @@
       const m = match(n);
       const kicker = m ? matchNamn(m.h, m.b) : esc(n.match || '');
       const k = kallorna(n.kallor);
-      return `<article class="tn-notis"><p class="tn-kick"><b>${m ? m.nr : n.nr}</b>${kicker}</p><h4>${esc(n.rubrik)}</h4><p>${esc(utanRef(n.text))}</p>` +
-        (k.length ? `<p class="tn-kalla">${esc(k.join(', '))}</p>` : '') + '</article>';
+      const bilder = notisBilder(u, n);
+      const foto = fotoText(bilder.filter((x) => x && !x.skold).map((x) => x.foto));
+      return `<article class="tn-notis">${bildrad(bilder, m ? [m.h, m.b] : lagI(n))}<p class="tn-kick"><b>${m ? m.nr : n.nr}</b>${kicker}</p><h4>${esc(n.rubrik)}</h4><p>${esc(utanRef(n.text))}</p>` +
+        (k.length || bilder.length ? `<p class="tn-kalla">${esc(k.join(', '))}${k.length && foto ? '. ' : ''}<span class="tn-fotoav">${esc(foto)}</span></p>` : '') + '</article>';
     }).join('');
     return {
       namn: TEXT.sidor.notiser,
@@ -501,11 +534,36 @@
   function rastrera(rot) {
     for (const c of rot.querySelectorAll('canvas[data-bild]')) {
       const img = new Image();
+      // ett foto som inte går att hämta ger lagets sköld (data-reserv), som står hel på papperet
+      img.onerror = () => {
+        if (!c.dataset.reserv || img.src.endsWith(c.dataset.reserv)) return;
+        c.classList.add('skold');
+        img.src = c.dataset.reserv;
+        // och fotografen står inte längre under notisen
+        const n = c.closest('.tn-notis');
+        const av = n && n.querySelector('.tn-fotoav');
+        if (av) {
+          av.textContent = fotoText([...n.querySelectorAll('canvas[data-foto]:not(.skold)')].map((x) => x.dataset.foto));
+          const k = av.previousSibling;
+          if (!av.textContent && k && k.nodeType === 3) k.textContent = k.textContent.replace(/\. $/, '');
+        }
+      };
       img.onload = () => {
         const x = c.getContext('2d', { willReadFrequently: true });
         const { width: W, height: H } = c;
-        const k = Math.max(W / img.naturalWidth, H / img.naturalHeight);
-        x.drawImage(img, (W - img.naturalWidth * k) / 2, c.classList.contains('hasse') ? 0 : (H - img.naturalHeight * k) / 2, img.naturalWidth * k, img.naturalHeight * k);
+        const iw = img.naturalWidth;
+        const ih = img.naturalHeight;
+        if (c.classList.contains('skold')) {
+          const k = (Math.min(W / iw, H / ih) * 0.78);
+          x.fillStyle = '#fff';
+          x.fillRect(0, 0, W, H);
+          x.drawImage(img, (W - iw * k) / 2, (H - ih * k) / 2, iw * k, ih * k);
+        } else {
+          const k = Math.max(W / iw, H / ih);
+          // Hasse från toppen, så att ansiktet kommer med, och veckans bilder med lite mer av överkanten
+          const y = c.classList.contains('hasse') ? 0 : (H - ih * k) * (W > H * 1.3 ? 0.35 : 0.5);
+          x.drawImage(img, (W - iw * k) / 2, y, iw * k, ih * k);
+        }
         let d;
         try { d = x.getImageData(0, 0, W, H); } catch (e) { return; }
         const p = d.data;

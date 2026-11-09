@@ -1707,7 +1707,7 @@ lag. `sips` förminskar den till 320 bildpunkter (15–35 kB). Provat på omgån
 15–20 sekunder, och de flesta visar rätt lag. Bilderna läggs i grenen `tidning-bilder`, en enda commit som skrivs över
 (som rösten i `rost`), så att main inte växer och förra veckans bilder försvinner; workflowen hämtar den till
 `data/tidning-bilder/` och bygget kopierar den till sajten. Går grenen inte att pusha blir det inga bilder och sidan
-visar lagens sköldar. `node scripts/analyser/skriv.mjs --tidning-bilder` hämtar bilderna på nytt till tidningen som
+visar lagens sköldar. Tidningen bakom löpsedeln trycker samma bilder i notiserna (se [Tidningen](#tidningen)). `node scripts/analyser/skriv.mjs --tidning-bilder` hämtar bilderna på nytt till tidningen som
 finns, utan Claude (med `--ut <mapp>` hamnar de i `<mapp>/tidning-bilder/`).
 
 **Rösten** står i [prompts/analys-rost.md](prompts/analys-rost.md): Sixten Bråvall, en påhittad
@@ -6303,7 +6303,10 @@ rum.js).
   Ingen annans tips står där: de syns först i uppgörelsen.
 - *Så mår tipslagen*: notiserna inför omgången ur `data/tidning.json` (se *Tidningen inför omgången* under
   [Analyserna](#analyserna)), en per match med numret, lagen, rubriken, texten och källornas namn – samma som på
-  baksidan av Hasses tidning. Sidan finns när filen är skriven för omgången (samma id eller minst hälften av matcherna)
+  baksidan av Hasses tidning. Överst i notisen står veckans bilder av lagen (`bilder` i `data/tidning.json`, se *Veckans
+  bilder i tidningen*), hemma och borta bredvid varandra, rastrerade i svartvitt som tidningens andra bilder och med
+  lagets namn på en mörk list, och fotograferna efter källorna. Saknas en bild, eller går den inte att hämta, står lagets
+  sköld där (`Skoldar.src` i [public/skoldar.js](public/skoldar.js)); utan en enda bild står notisen utan bilder. Sidan finns när filen är skriven för omgången (samma id eller minst hälften av matcherna)
   och är högst tio dagar gammal.
 - *Veckans analys*: Sixten Bråvalls artikel om matchen som löpsedeln handlar om (`id` i `rubrik` i rum-affischer.js,
   när rubriken gäller en match), annars den jämnaste matchen som inte har börjat: rubriken, ingressen, texten med
