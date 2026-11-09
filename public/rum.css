@@ -509,6 +509,42 @@ canvas.rum-neonhalo { opacity: var(--sken, 0.28); }
 /* lagnamnen i två längder (couponHtml i rum.js): de korta på den smala kupongen */
 .rum-kup .pp-tm .kort { display: none; }
 .rum-kup .row .pp-small { flex: none; margin: 0; font-size: 10px; }
+/* minut och ställning när matchen är igång (liveRad i rum.js), i stället för
+   tiden: en märkpenna bakom ställningen, grön när kupongen har tecknet just nu
+   och annars röd */
+.rum-kup .row.startad .pp-small { display: none; }
+.rum-kup .lv { flex: none; margin-left: auto; align-self: center; display: inline-flex; align-items: center; gap: 6px; font-variant-numeric: tabular-nums; }
+.rum-kup .lv:empty { display: none; }
+.rum-kup .lv .min { font: 500 11px/1 var(--sans); color: #5f5648; white-space: nowrap; }
+.rum-kup .lv .res { position: relative; isolation: isolate; min-width: 34px; padding: 0 6px; box-sizing: border-box; text-align: center; font: 800 14px/20px var(--display); color: var(--pp-ink); }
+.rum-kup .lv .res::before { content: ""; position: absolute; z-index: -1; inset: 1px -3px 0 -3px; transform: rotate(-1.6deg) skewX(-9deg); border-radius: 2px 7px 3px 8px; background: rgba(90, 70, 40, 0.16); }
+.rum-kup .lv .res.ok::before { background: linear-gradient(90deg, rgba(92, 214, 120, 0.45), rgba(88, 214, 116, 0.85) 10%, rgba(88, 214, 116, 0.72) 88%, rgba(92, 214, 120, 0.4)); }
+.rum-kup .lv .res.no::before { background: linear-gradient(90deg, rgba(255, 112, 92, 0.45), rgba(255, 106, 88, 0.85) 10%, rgba(255, 106, 88, 0.72) 88%, rgba(255, 112, 92, 0.4)); }
+.rum-kup .row.mal .lv .res { animation: rum-mal 2.2s ease-out; }
+@keyframes rum-mal { 0%, 30% { transform: scale(1.25); } 100% { transform: none; } }
+/* gängets kupong i handen: Svenska folket, oddsen eller favoritskapet under
+   rutorna, en sort åt gången (flikarna överst, Folket i folket.js) */
+.rum-handen.hog { height: auto; min-height: 470px; padding-bottom: 74px; }
+.rum-kup .hd .flikar { display: none; align-items: center; gap: 2px; letter-spacing: 0; text-transform: none; }
+.rum-kup .hd.medflik .flikar { display: inline-flex; }
+.rum-kup .hd.medflik .hd-match { display: none; }
+.rum-kup .flikar button { margin: 0; padding: 2px 5px; border: 0; border-radius: 3px; background: none; cursor: pointer; font: 600 10.5px/1.2 var(--sans); color: var(--pp-faint); white-space: nowrap; }
+.rum-kup .flikar button:hover { color: var(--pp-ink); }
+.rum-kup .flikar button[aria-pressed="true"] { background: var(--pp-ink); color: #f3e9d4; }
+.rum-kup .flikar button:focus-visible { outline: 2px solid #2146a6; outline-offset: 1px; }
+.rum-kup .tal { display: none; position: absolute; left: 0; right: 0; top: 20px; pointer-events: none; font: 500 10.5px/12px var(--sans); color: #6d6355; text-align: center; font-variant-numeric: tabular-nums; }
+.rum-kup .row.talrad { height: 35px; align-items: start; padding-top: 1px; }
+.rum-kup .row.talrad .tal { display: block; }
+.rum-kup .box.x .tal { color: var(--pp-ink); font-weight: 750; }
+/* vad var och en har skrivit på sin kupong, under raden (komHtml i rum.js) */
+.rum-kup .kom { margin-left: 28px; padding: 1px 0 3px; border-bottom: 1px solid var(--pp-line); }
+.rum-kup .kom:empty { display: none; }
+.rum-kup .row:has(+ .kom:not(:empty)) { border-bottom: 0; }
+.rum-kup .kom p { display: flex; align-items: flex-start; gap: 5px; min-width: 0; margin: 0; color: var(--ink); font: 600 15.5px/16px Caveat, cursive; }
+.rum-kup .kom p + p { margin-top: 1px; }
+.rum-kup .kom img { flex: none; width: 14px; height: 14px; margin-top: 1px; border-radius: 50%; object-fit: cover; box-shadow: 0 0 0 1px var(--ink); }
+.rum-kup .kom span { min-width: 0; }
+.rum-handen.tat .kom span { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
 .rum-kup .box { position: relative; box-sizing: border-box; height: 19px; border: 1.2px solid var(--pp-rule); border-radius: 2px; font: 600 10px/16px var(--tryck); color: var(--pp-print); text-align: center; background: color-mix(in srgb, var(--pp-box) 45%, transparent); }
 .rum-kup .box i { font-style: normal; opacity: 0.62; }
 /* kryssen med blyerts (rum.js, crossSvg) */
@@ -632,13 +668,15 @@ canvas.rum-neonhalo { opacity: var(--sken, 0.28); }
 /* i handen träder de matcher som inte är omtvistade tillbaka så länge någon
    omtvistad match återstår – det mörka är det vi ska prata om; en klubbad
    match står kvar mörk med sin bock, så att den går att kryssa färdigt */
-.rum-handen .row > * { transition: opacity 0.5s ease; }
-.rum-handen:has(.row.strid:not(.klubbad)) .row:not(.strid) > * { opacity: 0.4; }
+.rum-handen .row > *, .rum-handen .kom { transition: opacity 0.5s ease; }
+.rum-handen:has(.row.strid:not(.klubbad)) .row:not(.strid) > *, .rum-handen:has(.row.strid:not(.klubbad)) .row:not(.strid) + .kom { opacity: 0.4; }
 /* utfallet: en ring runt rutan – grön när kupongen hade det, annars röd,
    streckad i blyerts medan matchen pågår */
 .rum-kup .rum-ring { position: absolute; left: -7px; top: -5px; width: calc(100% + 14px); height: calc(100% + 10px); overflow: visible; fill: none; stroke: var(--pp-no); stroke-width: 2; stroke-linecap: round; pointer-events: none; }
 .rum-kup .rum-ring.ok { stroke: var(--pp-ok); }
 .rum-kup .rum-ring.live { stroke: #6f6c69; stroke-dasharray: 4 3; }
+.rum-kup .rum-ring.live.ok { stroke: var(--pp-ok); }
+.rum-kup .rum-ring.live.no { stroke: var(--pp-no); }
 
 /* ---------- kupongen i handen (rum.js, openCoupon) ---------- */
 
@@ -1000,6 +1038,15 @@ canvas.rum-neonhalo { opacity: var(--sken, 0.28); }
 .rum.smal .rum-kup .pp-tm .lang { display: none; }
 .rum.smal .rum-kup .pp-tm .kort { display: inline; }
 .rum.smal .rum-kup .row .pp-small { line-height: 14px; }
+.rum.smal .rum-kup .row .pp-tm { order: -1; }
+.rum.smal .rum-kup .lv { margin-left: 0; gap: 5px; }
+.rum.smal .rum-kup .lv .res { min-width: 30px; font-size: 13px; line-height: 14px; }
+.rum.smal .rum-handen.hog { height: auto; min-height: 620px; padding-bottom: 68px; }
+.rum.smal .rum-kup .row.talrad { height: 47px; }
+.rum.smal .rum-kup .tal { top: 27px; font-size: 11px; line-height: 14px; }
+.rum.smal .rum-kup .hd.medflik { height: 54px; align-items: end; padding-bottom: 3px; }
+.rum.smal .rum-kup .hd.medflik .m { flex-wrap: wrap; justify-content: flex-start; row-gap: 12px; }
+.rum.smal .rum-kup .hd.medflik .sm-namnen { order: -1; flex: 0 0 100%; }
 .rum.smal .rum-kup .row .not { line-height: 14px; }
 .rum.smal .rum-kup .pen { height: 15px; }
 .rum.smal .rum-kup .pen-in { height: 14px; }
