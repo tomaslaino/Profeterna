@@ -271,6 +271,10 @@ window.RumHasse = (() => {
     const v = { W, H: Hj };
     if (H.hog) {
       v.s = Math.min((0.36 * Hj) / (kant - topp), W / 1080);
+      // Samtalet börjar under händerna och notan, men högst vid 60 % av höjden (sa.top nedan). Når notan längre
+      // ned blir bilden så mycket mindre att den slutar ovanför samtalet, i stället för att texten står på den.
+      const lagst = Math.max(iBild(o, 0, BORD.Y, 900)[1], ...(NOTAN ? NOTAN.horn : []).map((q) => iBild(o, ...q)[1]));
+      v.s = Math.min(v.s, (Hj * 0.57 - 10) / (lagst - topp));
       v.cx = W * 0.5 - mitt * v.s;
       v.ey = Hj * 0.03 - topp * v.s;
     } else {
