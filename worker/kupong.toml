@@ -14,6 +14,11 @@ compatibility_date = "2026-10-01"
 
 # Gängets egna tips (worker/samtal.mjs) ligger i samma KV-namnrymd som
 # analysens cache (nycklar "samtal:…").
+# Var tionde minut: sparar oddsen för den öppna Stryktipsomgången, eftersom
+# Svenska Spel tar bort dem efter spelstoppet (sparaSista i worker/stryktipset.mjs).
+[triggers]
+crons = ["*/10 * * * *"]
+
 [[kv_namespaces]]
 binding = "KUPONG"
 id = "d890672594e449589f9f3cd97ca6e6de"
