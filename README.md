@@ -3455,7 +3455,8 @@ var tionde bild längre än 50 ms (75 ms på steg 1).
 - **Steg 3:** samma takt, hälften av bildpunkterna på ledden, ungefär 190 000 trianglar och det
   enkla ljuset (`enkeltLjus` i rum-3d.js och rum-saker.js): ingen skuggkarta, ingen miljö, bara
   huvudlampan, neonen och fönstret plus mer ljus från himlen, och tygerna utan knottror och lack.
-  Figurerna på gatan rör sig i färre steg i datorn (`ute` i `KVAL`; i telefonen är gatan en duk, se nedan).
+
+Gatan utanför glider lika jämnt på alla steg (se *Bilarna och de som går förbi glider jämnt* nedan).
 
 Från steg 1 är det i datorn som i telefonen: ljuset utan blandningslägen, inget korn, och föremålen
 lyser upp direkt i stället för med en övergång av filtret (`.enkel` i rum.css).
@@ -3744,8 +3745,9 @@ det som framkallar en svag grafikkrets), gammal och ny kod om vartannat. Tre sak
   dussin små dukar på gatan var för sig, regnbanden, ångan ur kaffet och dropparna på rutan, och varje sådan rörelse
   är en bildruta där alla rummets lager läggs igen, ungefär elva skärmytor över varandra. I telefonen är hela gatan nu
   en enda duk (`gatduk` och `ritaGatan` i rum-ute.js, stor som det man ser genom fönstret och dörren, utan
-  genomskinlighet): himlen, molnen, fåglarna, husen, de som går förbi, flaggan, löven, regnet och snön ritas där i
-  gängets takt. Gatan ritas i samma bildruta som gänget, och sakerna på pulten varannan gång (`frame` i rum.js).
+  genomskinlighet): himlen, molnen, fåglarna, husen, de som går förbi, flaggan, löven, regnet och snön ritas där.
+  Ställningarna ritas i samma bildruta som gänget, och sakerna på pulten varannan gång (`frame` i rum.js). Först
+  ritades också gatan bara i gängets takt; se nästa avsnitt.
   Ångan, dropparna, strålarna bakom oraklet, skimret på glaset och tv:ns ljusband står still från steg 1
   (`.enkel`). I datorn gäller samma sak från steg 1, annars som förut.
 - **Tre ljuslager över hela skärmen** (värmen, dagsljuset och vinjetten) är en bild i telefonen i Chrome (`ljusIhop` i
@@ -3774,6 +3776,39 @@ snö är jämförda bild för bild i Chrome som telefon och som dator, och rumme
 provat i en riktig gammal telefon: `matchfixarna.se/?rum-mat` ger siffrorna där. Kvar: hål när man drar snabbt till en
 del av rummet som inte har ritats än (gängets kuponger och tavlan på väggen, Chrome ritar inte det som ligger långt
 utanför bilden i förväg) och på väg tillbaka från videon (ungefär lika många som förut, men inte synliga på en snabb dator).
+
+### Bilarna och de som går förbi glider jämnt
+
+2026-11-09, användarens önskemål: "kan du ordna så att bilar etc utanför fönstret inte längre hackar fram … i
+värsta fall justera ner grafiken", och "det gäller självklart även fotgängare". Sedan gatan blev en enda duk (ovan)
+ritades den bara när gänget ritades: 20 gånger i sekunden i telefonen och på datorns steg 1, och på datorns steg 2 och
+3 bara var andra eller tredje gång, 7,5 respektive 5 gånger i sekunden. En bil kör 150–240 px i sekunden, så den
+hoppade 8–12 px åt gången, och på de lägsta stegen 20–48 px.
+
+Nu skiljs ställningen från platsen. Benen, armarna, hjulen, vingarna, löven och flaggan ritas som förut i gängets takt,
+men i en ruta per figur i ett gemensamt ark (`stall` och `ark` i rum-ute.js). Var figurerna är på gatan räknas om i
+varje bildruta, högst 60 gånger i sekunden, och då läggs bara himlen, husen och rutorna ut i gatans duk (`glid` i
+rum-ute.js, `gatan` i rum.js) – ett par dussin kopieringar, 0,1 ms. Arket ligger i processorn: som ett tjugotal egna
+små dukar blev figurerna lika många ytor på grafikkortet (i processorn lika många uppladdningar i varje bildruta), och
+att rita figurerna direkt i gatans duk i varje bildruta tog för lång tid i grafikprocessen (40 bilder i sekunden som
+telefon). Det görs bara medan något som far förbi syns genom fönstret eller dörren
+(de som går, cyklar och kör, fåglarna, löven, regnet och snön); syns bara molnen, som driver några px i sekunden, ritas
+gatan i gängets takt som förut, och huvudtråden får sova mellan gängets bilder i Chrome. Ställningarna ritas med
+varje bild av gänget på alla steg (`ute` i `KVAL`, som gjorde gatan glesare i datorn, är borta). I Chrome räknar
+`kanna` nu bara gängets bilder, eftersom huvudtråden väcks i varje bildruta medan något far förbi.
+
+Mätt i Chrome som telefon (412 × 780, täthet 2,625, processorn fyra gånger långsammare, grafikkortets vägar med
+SwiftShader, utan gänget), gammal och ny kod om vartannat, tre varv: gatan 20 → 60 gånger i sekunden, en bil flyttar sig
+3,3–3,6 px mellan två bildrutor och de som går 0,6 px, rummet lika jämnt (60 bilder i sekunden, 95:e percentilen
+16,7–16,8 ms, ingen bildruta över 25 ms i någon). Priset är huvudtråden: 131–156 → 271–300 ms per sekund, mest för att
+rummets lager lämnas över till grafikkortet i varje bildruta (`Commit`), och grafikkortet lägger ihop hela rummet 60
+gånger i sekunden igen medan något far förbi, som före 2026-11-08 men med en duk i stället för ett par dussin. I
+datorstorlek (1300 × 800) hinner SwiftShader inte det, varken med den nya koden eller med den gamla tvingad till 60
+gånger i sekunden (25–50 bilder i sekunden); ett riktigt grafikkort gjorde det i datorn på alla steg före 2026-11-08.
+Gatans duk är densamma vid samma tidpunkt (62–109 av 126 000 bildpunkter skiljer, i figurernas kanter), dag, regn,
+höstlöv och paraplyer. Gänget går inte att mäta i en dator utan grafikkort (1–2 bilder i sekunden med båda); i en
+riktig telefon ger `?rum-mat` siffrorna. Hinner telefonen inte med går rummet ner ett steg som förut, men gatan glider
+lika jämnt.
 
 ### När något går fel i rummet
 
