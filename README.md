@@ -250,7 +250,8 @@ ingen falsk precision · sidan kraschar aldrig av en död källa · endast fria 
   ett klick på någon väcker dem på ett av tre sätt (med ett ryck, sakta med en gäspning eller
   bakfull med handen mot pannan och en återställare); först är de groggy med tunga ögonlock och
   påsar under ögonen, sedan kommer de igång, och efter en stund utan musik eller klick somnar de
-  om. Lysröret släcks som förut vid midnatt (se *Sömnen* under [Tobaksaffären](#tobaksaffären))
+  om. Lysröret släcks klockan 23 (förut vid midnatt) och tänds klockan sex (se *Natten* och *Sömnen* under
+  [Tobaksaffären](#tobaksaffären))
 
 ## Publicering
 
@@ -950,7 +951,7 @@ bara lokalt. Analyserna visas som de ligger i `data/analyser.json`; hur de skriv
   pulten men en bit från den i baren, fingrarna gick ned i bardisken, handen på pulten låg tryckt mot
   bakkanten, och baren var mörk som en kväll fast det var dag i rummet. Nu ligger den vänstra handen
   tätt intill fatet på båda ställena, fingrarna lägger sig på disken, och baren har rummets tid på
-  dygnet: lysröret tänt från sex till midnatt och dagsljuset efter klockan och vädret. Se
+  dygnet: lysröret tänt från sex till elva på kvällen (till midnatt före 2026-11-09) och dagsljuset efter klockan och vädret. Se
   [Hasse Backe](#hasse-backe), *Bilden*, *Ljuset* och *Kaffet i rummet*.
 - **Hasse Backe vid pultens hörn (2026-11-07, användarens önskemål):** "ser det här och det här ut som
   samma bänk?", "Det ser ju ut som helt olika vinklar" och "Hasse ska ju sitta vid ett hörn". I baren
@@ -3192,8 +3193,8 @@ egna figuren, men nu är det klicket man byter med. Har du lämnat in, eller har
 blir det bara ett tecken.
 
 **Natten** (`natt` i rum-3d.js och rum-inredning.js, `.natt` i
-[public/rum-folk.css](public/rum-folk.css)): mellan midnatt och sex, Stockholms tid, är
-lysröret släckt. Rummet är mörkt utom där gatan lyser in genom fönstret och dörren, från
+[public/rum-folk.css](public/rum-folk.css)): mellan elva på kvällen och sex, Stockholms tid, är
+lysröret släckt (före 2026-11-09 från midnatt; ändrat på användarens önskemål, så att gänget sover i mörkret). Rummet är mörkt utom där gatan lyser in genom fönstret och dörren, från
 tv:n och lite över pulten (samma lager som när lysröret tänds, med en annan mask), och
 rören och reflektorn i taket är grå, och text-tv:n lyser svagt blått på gänget (som sover, se
 nedan; den som är vaken tittar på den). Nära tv:n, videon,
@@ -3202,7 +3203,7 @@ lysrör som tänds; är sidan öppen klockan sex blinkar det igång som när man
 
 **Sömnen** (2026-11-09, användarens önskemål; `somn`, `SO`, `VAK`, `sovStil`, `sovKropp`, `VAKNA` och
 `groggW` i rum-3d.js, `arSomn` i rum-folk.js): mellan 22.30 och sju, Stockholms tid, sover gänget – också
-före midnatt och efter sex, när lysröret är tänt. Står sidan öppen klockan 22.30 somnar de en i taget
+den första halvtimmen och efter sex, när lysröret är tänt. Står sidan öppen klockan 22.30 somnar de en i taget
 (DL först, sedan DJ och sist DT): ögonlocken blir tunga, huvudet faller och rycker till några gånger, och
 sedan sover de. Var och en sover på sitt sätt och rör sig nästan inte, men andas i sin takt och gör något
 eget då och då:
@@ -5252,10 +5253,10 @@ bilden mörknar hörnen, och ett lätt korn rör sig (`.rh-ton`, `.rh-korn`), in
 och inte i telefonen. Händerna på pulten i rummet har samma ljus (se *Kaffet i rummet*).
 
 Baren har samma tid på dygnet som rummet (`ljuset` och `tand` i [public/rum-hasse.js](public/rum-hasse.js)).
-Från sex på morgonen till midnatt är lysröret i affärens tak tänt, som i rummet (`RumFolk.natt`): väggen
+Från sex på morgonen till elva på kvällen är lysröret i affärens tak tänt, som i rummet (`RumFolk.natt`): väggen
 är då en egen bild spårad med röret framför baren och affären i dess sken till höger
 (`hasse-bak-lys.webp`), och figuren, disken och koppen får ett brett ljus från affären och lite mer
-ljus överallt (`uLys` i `LJUS`, `LYS`), medan neonen och gatans kalla ljus syns mindre. Mellan midnatt
+ljus överallt (`uLys` i `LJUS`, `LYS`), medan neonen och gatans kalla ljus syns mindre. Mellan elva på kvällen
 och sex är lysröret släckt och väggen ligger i neonskyltens och gatans svaga sken (`hasse-bak.webp`). Då mörknar också han, pulten, kaffet, notan, röken och din kupong till ungefär 40 % (`natten` i `LJUS`, `--natt` på kupongen), inte lika mörkt som rummet så att man ser honom när man pratar, och bara cigarrens glöd lyser som vanligt. När det ljusnar ute på sommaren kommer ljuset tillbaka gradvis.
 
 Dagsljuset faller in genom affärens stora fönster till höger, efter samma klocka och väder som utsikten
