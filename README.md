@@ -1023,6 +1023,14 @@ bara lokalt. Analyserna visas som de ligger i `data/analyser.json`; hur de skriv
   Hasses askkopp tar, som notan och porslinet, bara ljusets styrka och dagsljusets färg, och kantljuset
   bakifrån bara som styrka, så att täckbladet inte får neonskyltens röda. Glöden är som förut. Se
   [Hasse Backe](#hasse-backe).
+- **Hasse tar cigarren bekvämt (2026-11-09, användarens önskemål):** "Kan du förbättra hur Hasse tar upp
+  cigarren - byt plats på askkoppen o cigarren om det behövs för att det ska se mer bekvämt o avslappnat
+  ut" Han sträckte ut armen åt sidan, vred handen 60° utåt från vilan och dök ned på cigarren ovanifrån med
+  handleden högt och raka, utspärrade fingrar, efter en hög båge. Nu står askkoppen en bit framför handen
+  och cigarren ligger vänd in mot honom, tvärs över fingrarna när han sträcker fram handen, så att han når
+  den med underarmen rakt fram från armbågen. Handen går lågt över disken, nyper cigarren med flack hand och
+  rak handled, och pek- och långfingret ligger lite samlade. Handen går fri från cigarren när han slår i
+  disken, och askkoppen syns hel i telefonen. Se [Hasse Backe](#hasse-backe), *Cigarren*.
 - **Hasse Backe spanar på din kupong (2026-11-08, användarens val):** ibland går blicken ned på kupongen,
   med sex olika miner, och när han har sagt vad han tycker om den passar minen orden. Se
   [Hasse Backe](#hasse-backe), *Vilan*.
@@ -5358,7 +5366,7 @@ fingrar. Slår han i disken landar handen en bit åt sidan
 längs sig själv när den lyfts ur vilan, och skjuts in igen på samma sätt, så att fingrarna inte går genom
 den vänstra (`UTDRAG`). Det är bara den vänstra som trummar i vilan. Tummarna ligger intill händerna, så
 att den vänstra tummen inte går ned i disken (`SAMLA`, `TUMME_VILA`); det tonar bort när handen tar
-kaffet, cigarren eller pennan. Askkoppen står så långt till vänster att cigarren i den går fri från handen. Fatet står
+kaffet, cigarren eller pennan. Askkoppen står till vänster om den högra handen och en bit framför den, så långt ut att handen går fri från cigarren när han slår i disken. Fatet står
 på hörnet, och notan ligger på tvären framför hans händer, vänd som i rummet (se *Kaffet i rummet*). Fingrarna lägger sig på disken: ett finger vars två yttre leder skulle nå under
 ovansidan böjs mindre, tills den lägsta punkten ligger på ytan (`golv` i
 [public/rum-hasse-arm.js](public/rum-hasse-arm.js)), så att fingertopparna aldrig går ned i disken,
@@ -5597,10 +5605,13 @@ sidan, och armbågen inte upp över axeln eller in framför magen. Förut pekade
 håll, och då kunde handen sitta nästan i rät vinkel mot underarmen och sticka ut ur manschettens sida,
 så att man såg in i den (ändrat 2026-11-06).
 
-**Cigarren.** Till vänster om hans högra hand står en tung askkopp av samma gods som koppen, med två
-urtag. I det ena ligger cigarren: huvudet på disken, ringen (guld och rött) synlig och glöden över
-askkoppens mitt, där en tunn rökslinga stiger. Då och då tar han den och njuter av den en stund, på ett
-av elva sätt som lottas (nedan). Han tittar ned och tar den ovanifrån, och han håller den löst i
+**Cigarren.** Till vänster om hans högra hand och en bit framför den står en tung askkopp av samma gods
+som koppen, med två urtag. I det ena ligger cigarren: huvudet på disken och vänt lite in mot honom, ringen
+(guld och rött) synlig och glöden över askkoppens mitt, där en tunn rökslinga stiger. Då och då tar han den
+och njuter av den en stund, på ett av elva sätt som lottas (nedan). Han tittar ned, för handen lågt över
+disken med underarmen rakt fram från armbågen och nyper cigarren med flack hand och rak handled, med
+handflatan nedåt och lite framåt (`P_VILA`); förut sträckte han ut armen åt sidan, vred handen 60° utåt och
+dök ned på den ovanifrån med raka, utspärrade fingrar (ändrat 2026-11-09). Han håller den löst i
 fingertopparna, tummen under och pek- och långfingret ovanpå, med ring- och lillfingret böjda in mot
 handflatan; vid munnen sitter handen under den vid käken, med fingrarna uppåt i underarmens förlängning
 och armbågen nere (förut satt den vid kinden, och då knäcktes handleden åt sidan). Det är cigarren som

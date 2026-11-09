@@ -443,12 +443,13 @@ export const BORD = { Y: DK.Y, Z: kantZ(0) };
 // Armarna på disken: armbågens och handledens höjd (rum-hasse-arm.js).
 export const VILA = VILOHOJD;
 // Koppen på sitt fat, till höger om hans vänstra hand och fritt från armen: en bit disk mellan fatet och
-// handen (handen i VILA_B); askkoppen till vänster om hans högra hand, så långt ut att cigarren i den går
-// fri från handen. På disken, i figurens värld. (Koppen stod 50 längre fram, och fatet täckte då namnet på
+// handen (handen i VILA_B); askkoppen till vänster om hans högra hand och en bit framför den, där han når
+// cigarren med underarmen rakt fram från armbågen, och så långt ut att handen går fri från cigarren när han
+// slår i disken. På disken, i figurens värld. (Koppen stod 50 längre fram, och fatet täckte då namnet på
 // notan, 2026-11-07; sedan stod den 35 längre åt vänster och 80 längre bak, med notan rättvänd mot en,
-// 2026-11-09.)
+// 2026-11-09. Askkoppen stod 190 längre bak och 20 längre ut, vid armbågen, 2026-11-09.)
 export const KOPP = [410, BORD.Y, 860];
-export const ASK = [-420, BORD.Y, 690];
+export const ASK = [-400, BORD.Y, 880];
 // Notan under fatet, vänd som i rummet (rum.css): raderna längs pultens arm och överkanten mot armens bortre
 // kant, så att den ligger på tvären framför hans händer och läses uppifrån och ned. Samma lapp som man ser
 // rättvänd från rummet, alltså vriden nästan ett kvarts varv här (NV), när man har vänt sig mot honom (BAR).
@@ -774,9 +775,11 @@ export async function figuren(duk, { hog = false, latt = false, pr = 1 } = {}) {
   kopp.rotation.y = -0.5;
   K.fat.position.set(KOPP[0], KOPP[1] + 0.5, KOPP[2]);
   S.add(kopp, K.fat);
-  // askkoppen till vänster om hans högra hand, med cigarren i urtaget som pekar åt höger och lite
-  // mot en: huvudet ligger på disken, glöden över askkoppens mitt och röken stiger därifrån
-  const ASKV = 0.35;
+  // askkoppen till vänster om hans högra hand, med cigarren i urtaget som pekar åt höger och lite in mot
+  // honom, tvärs över fingrarna när han sträcker fram handen: huvudet ligger på disken, glöden över
+  // askkoppens mitt och röken stiger därifrån. (Förut pekade den lite mot en, och då måste handen vridas
+  // 60° utåt från vilan för att ta den, med armbågen ute.)
+  const ASKV = -0.25;
   const ask = byggAskkopp(bord);
   ask.mesh.position.fromArray(ASK);
   const ASKV3 = ask.mesh.position;
@@ -1421,7 +1424,7 @@ export async function figuren(duk, { hog = false, latt = false, pr = 1 } = {}) {
       cig: {
         // [t, läge, båge uppåt på vägen dit]
         ck: [[1.0, 'vila'], [2.1, 'mun', 70], [3.9, 'mun'], [4.35, 'bort'], [4.95, 'hall'], [6.25, 'hall'], [6.9, 'se'], [7.6, 'se'], [8.45, 'vila', 90]],
-        krok: [[0, VILA_A[4]], [0.5, 0.12], [0.8, 0.12], [1.0, KG], [8.4, KG], [8.6, 0.14], [9.1, 0.2], [9.6, VILA_A[4]]],
+        krok: [[0, VILA_A[4]], [0.5, 0.3], [0.8, 0.2], [1.0, KG], [8.4, KG], [8.6, 0.14], [9.1, 0.2], [9.6, VILA_A[4]]],
         // fram till askkoppen och tillbaka, upp mot ansiktet och ned, och när fingrarna har den
         mot: [0.05, 0.85, 8.5, 9.4],
         upp: [1.0, 1.9, 7.7, 8.4],
@@ -1509,7 +1512,7 @@ export async function figuren(duk, { hog = false, latt = false, pr = 1 } = {}) {
       },
       cig: {
         ck: [[1.0, 'vila'], [2.1, 'mun', 70], [3.3, 'mun'], [3.7, 'bort'], [4.3, 'hall'], [5.9, 'hall'], [6.85, 'vila', 90]],
-        krok: [[0, VILA_A[4]], [0.5, 0.12], [0.8, 0.12], [1.0, KG], [6.75, KG], [6.95, 0.14], [7.45, 0.2], [7.9, VILA_A[4]]],
+        krok: [[0, VILA_A[4]], [0.5, 0.3], [0.8, 0.2], [1.0, KG], [6.75, KG], [6.95, 0.14], [7.45, 0.2], [7.9, VILA_A[4]]],
         mot: [0.05, 0.85, 6.9, 7.75],
         upp: [1.0, 1.9, 6.0, 6.75],
         grepp: [0.8, 1.0, 6.75, 6.95],
@@ -1540,7 +1543,7 @@ export async function figuren(duk, { hog = false, latt = false, pr = 1 } = {}) {
       },
       cig: {
         ck: [[1.0, 'vila'], [2.1, 'mun', 70], [3.5, 'mun'], [3.9, 'bort'], [4.5, 'hall'], [8.4, 'hall'], [8.9, 'se'], [9.3, 'se'], [9.95, 'vila', 90]],
-        krok: [[0, VILA_A[4]], [0.5, 0.12], [0.8, 0.12], [1.0, KG], [9.9, KG], [10.1, 0.14], [10.6, 0.2], [10.95, VILA_A[4]]],
+        krok: [[0, VILA_A[4]], [0.5, 0.3], [0.8, 0.2], [1.0, KG], [9.9, KG], [10.1, 0.14], [10.6, 0.2], [10.95, VILA_A[4]]],
         mot: [0.05, 0.85, 10.0, 10.85],
         upp: [1.0, 1.9, 9.2, 9.9],
         grepp: [0.8, 1.0, 9.9, 10.1],
@@ -1568,7 +1571,7 @@ export async function figuren(duk, { hog = false, latt = false, pr = 1 } = {}) {
       },
       cig: {
         ck: [[1.0, 'vila'], [1.85, 'knack', 45], [2.08, 'knackN'], [2.22, 'knack'], [2.46, 'knackN'], [2.6, 'knack'], [3.2, 'se'], [3.8, 'se'], [4.6, 'mun', 40], [5.7, 'mun'], [6.1, 'bort'], [6.7, 'hall'], [8.6, 'hall'], [9.5, 'vila', 90]],
-        krok: [[0, VILA_A[4]], [0.5, 0.12], [0.8, 0.12], [1.0, KG], [9.4, KG], [9.6, 0.14], [10.1, 0.2], [10.6, VILA_A[4]]],
+        krok: [[0, VILA_A[4]], [0.5, 0.3], [0.8, 0.2], [1.0, KG], [9.4, KG], [9.6, 0.14], [10.1, 0.2], [10.6, VILA_A[4]]],
         mot: [0.05, 0.85, 9.55, 10.4],
         upp: [3.0, 3.8, 8.7, 9.4],
         grepp: [0.8, 1.0, 9.4, 9.6],
@@ -1689,7 +1692,7 @@ export async function figuren(duk, { hog = false, latt = false, pr = 1 } = {}) {
       cig: {
         ...cig,
         ck: [[1.0, 'vila'], ...cig.ck, [E, 'vila', 90]],
-        krok: cig.krok || [[0, VILA_A[4]], [0.5, 0.12], [0.8, 0.12], [1.0, KG], [E - 0.05, KG], [E + 0.15, 0.14], [E + 0.65, 0.2], [E + 1.15, VILA_A[4]]],
+        krok: cig.krok || [[0, VILA_A[4]], [0.5, 0.3], [0.8, 0.2], [1.0, KG], [E - 0.05, KG], [E + 0.15, 0.14], [E + 0.65, 0.2], [E + 1.15, VILA_A[4]]],
         mot: cig.mot || [0.05, 0.85, E + 0.05, E + 0.9],
         upp: cig.upp || [1.0, 1.9, E - 0.75, E - 0.05],
         grepp: cig.grepp || [0.8, 1.0, E - 0.05, E + 0.15],
@@ -1763,7 +1766,7 @@ export async function figuren(duk, { hog = false, latt = false, pr = 1 } = {}) {
       mot: [[0.05, 0], [0.85, 1], [3.4, 1], [4.3, 0], [11.3, 0], [12.1, 1], [15.05, 1], [15.9, 0]],
       upp: [[1.0, 0], [1.9, 1], [3.4, 1], [4.3, 0], [11.3, 0], [12.0, 1], [14.25, 1], [14.95, 0]],
       grepp: [[0.8, 0], [1.0, 1], [3.35, 1], [3.55, 0], [11.95, 0], [12.1, 1], [14.95, 1], [15.15, 0]],
-      krok: [[0, VILA_A[4]], [0.5, 0.12], [0.8, 0.12], [1.0, KG], [3.35, KG], [3.6, 0.15], [4.3, VILA_A[4]], [11.3, VILA_A[4]], [11.6, 0.12], [11.95, 0.12], [12.1, KG], [14.95, KG], [15.15, 0.14], [15.65, 0.2], [16.15, VILA_A[4]]],
+      krok: [[0, VILA_A[4]], [0.5, 0.3], [0.8, 0.2], [1.0, KG], [3.35, KG], [3.6, 0.15], [4.3, VILA_A[4]], [11.3, VILA_A[4]], [11.6, 0.12], [11.95, 0.12], [12.1, KG], [14.95, KG], [15.15, 0.14], [15.65, 0.2], [16.15, VILA_A[4]]],
       glod: [[2.2, 0], [2.5, 1], [2.95, 0.2], [3.4, 0.12], [5.3, 0.12], [5.6, 0.9], [6.0, 0.15], [7.6, 0.15], [7.9, 0.9], [8.3, 0.15], [9.7, 0.15], [10.0, 0.85], [10.4, 0.12], [12.0, 0.1], [12.5, 0]],
       iMun: [[1.95, 0], [2.15, 1], [3.0, 1], [3.3, 0]],
       blaser: [[12.65, 0], [12.85, 0.6], [13.9, 0.5], [14.2, 0]],
@@ -2857,7 +2860,9 @@ export async function figuren(duk, { hog = false, latt = false, pr = 1 } = {}) {
     return ut;
   }
   // I askkoppen: huvudet på disken, cigarren över urtagets yttre kant och glöden över mitten.
-  // Han tar den ovanifrån, med handflatan nedåt.
+  // Han nyper den med handflatan nedåt och lite framåt (P_VILA: vriden 30° runt cigarren), så att handen
+  // ligger lågt och flackt och handleden är rak. (Förut tog han den rakt ovanifrån, med handleden högt och
+  // fingrarna rakt ned som en klo.)
   const CU = new THREE.Vector3(Math.cos(ASKV), 0, Math.sin(ASKV));
   const SN = 105;
   const sinA = (ASKKOPP.URTAG + 0.2) / SN;
@@ -2865,7 +2870,7 @@ export async function figuren(duk, { hog = false, latt = false, pr = 1 } = {}) {
   A_VILA.y = sinA;
   const HUV_C = new THREE.Vector3(...ASK).addScaledVector(CU, ASKKOPP.R + SN * Math.sqrt(1 - sinA * sinA));
   HUV_C.y += CIGARR.R + 0.4;
-  const NED_ = new THREE.Vector3(0, -1, 0);
+  const P_VILA = new THREE.Vector3(0, -1, 0).applyAxisAngle(A_VILA.clone().normalize(), 0.52);
   // läget ur handen: handens origo H, fingrarnas riktning F och handflatans P
   const fA = v();
   function fraHand(ut, H, F, P) {
@@ -2873,7 +2878,7 @@ export async function figuren(duk, { hog = false, latt = false, pr = 1 } = {}) {
     return pose(ut, H.clone().addScaledVector(fA, -GREPP.x).addScaledVector(F, GREPP.y).addScaledVector(P, GREPP.z), fA, P);
   }
   const PV = {
-    vila: pose(nyPose(), HUV_C.clone().addScaledVector(A_VILA, SG), A_VILA, NED_),
+    vila: pose(nyPose(), HUV_C.clone().addScaledVector(A_VILA, SG), A_VILA, P_VILA),
     // armbågen på disken och handen uppe vid axeln, cigarren tvärs över och glöden utåt och lite uppåt
     hall: fraHand(nyPose(), V3(-310, 165, 540), V3(0.4, 0.82, 0.42).normalize(), V3(0.25, -0.45, 0.86).normalize()),
     // lite högre och vriden, glöden uppåt: han tittar på den
@@ -2940,7 +2945,7 @@ export async function figuren(duk, { hog = false, latt = false, pr = 1 } = {}) {
   const posen = (namn) => PM[namn] || PV[namn];
   function cigarrLage(t, ut, c) {
     const CK = c && c.ck;
-    if (!CK || t <= CK[0][0] || t >= CK[CK.length - 1][0]) return pose(ut, PV.vila.p, A_VILA, NED_);
+    if (!CK || t <= CK[0][0] || t >= CK[CK.length - 1][0]) return pose(ut, PV.vila.p, A_VILA, P_VILA);
     let i = 1;
     while (t > CK[i][0]) i++;
     const f = ss(CK[i - 1][0], CK[i][0], t);
@@ -3077,15 +3082,17 @@ export async function figuren(duk, { hog = false, latt = false, pr = 1 } = {}) {
       rq.copy(cp.q).multiply(rq2.setFromAxisAngle(UPP, rull));
       cig.mesh.matrix.makeRotationFromQuaternion(rq).setPosition(cX);
     }
-    // fram till askkoppen och tillbaka i en båge; däremellan håller han den (eller har den i munnen)
+    // fram till askkoppen och tillbaka i en låg båge, nära disken; däremellan håller han den (eller har den
+    // i munnen). Pek- och långfingret ligger lite samlade medan han håller den. (Förut for handen upp i en
+    // hög båge med raka, utspärrade fingrar och dök sedan ned på cigarren.)
     const mot = bump(c.mot, t);
-    bortA = mot;
+    bortA = mot * 0.5;
     const upp = bump(c.upp, t);
     // (vilans riktning är armbågens hela längd: båda som enhetsvektorer, annars tar den nya över först på slutet)
     cPol.fromArray(VILA_A[1]).normalize().lerp(POL_UPP, upp);
     naturlig(Sk, cH, cF, cP, 1, cPol, cPol);
     a.w.lerp(cW, mot);
-    a.w.y += 220 * mot * (1 - mot);
+    a.w.y += 110 * mot * (1 - mot);
     a.pol.normalize().lerp(cPol, mot);
     a.F.lerp(cF, mot);
     a.P.lerp(cP, mot);
