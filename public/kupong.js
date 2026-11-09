@@ -357,7 +357,11 @@ async function liveTick() {
   try {
     const need = liveNeeded();
     if (need.length && !document.hidden) await fetchLive(need);
-    if (need.length || KP.wasLive) redraw();
+    if (need.length || KP.wasLive) {
+      redraw();
+      // tobaksaffären: också kupongen i handen (levande i rum.js)
+      if (window.Rum && Rum.redraw) Rum.redraw();
+    }
     KP.wasLive = need.length > 0;
   } finally {
     KP.timer = setTimeout(liveTick, LIVE_EVERY_MS);

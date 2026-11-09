@@ -8,8 +8,12 @@
 //   POST /kupong {"bort", "bas"}                       ta bort en kupong
 //   GET  /samtal · POST /samtal {"gor", …}             (se worker/samtal.mjs; GET startar
 //                                                      veckans Stryktips som omgång)
-//   GET  /stryktipset[?nr=…]                           veckans Stryktips och Svenska
-//                                                      folket (se worker/stryktipset.mjs)
+//   GET  /stryktipset[?nr=…]                           veckans Stryktips, Svenska folket,
+//                                                      oddsen och favoritskapet (se
+//                                                      worker/stryktipset.mjs)
+//
+// Schemat i worker/kupong.toml sparar oddsen för den öppna omgången, eftersom
+// Svenska Spel tar bort dem efter spelstoppet (sparaSista).
 //
 // Driftsätts för hand med worker/kupong.toml; hemligheten GITHUB_TOKEN läggs
 // in med "wrangler secret put" (README, avsnittet Kupongen).
@@ -21,7 +25,7 @@
 import kupongCfg from '../config/kupong.js';
 import { saveCoupon, githubWriter } from './kupong.mjs';
 import { getRound, postRound, kvStore } from './samtal.mjs';
-import { getStryktipset } from './stryktipset.mjs';
+import { getStryktipset, sparaSista } from './stryktipset.mjs';
 
 // Frågeparametern går förbi CDN-cachen, så att det senaste bygget läses.
 async function siteMatches(site) {
@@ -43,11 +47,14 @@ function json(status, body) {
 }
 
 export default {
+  async scheduled(event, env, ctx) {
+    if (env.KUPONG) ctx.waitUntil(sparaSista(kvStore(env.KUPONG)).catch((err) => console.error('[stryktipset]', err)));
+  },
   async fetch(request, env) {
     if (request.method === 'OPTIONS') return new Response(null, { status: 204, headers: CORS });
     const url = new URL(request.url);
     if (url.pathname === '/stryktipset' && request.method === 'GET') {
-      const r = await getStryktipset(url.searchParams.get('nr'));
+      const r = await getStryktipset(url.searchParams.get('nr'), { store: env.KUPONG ? kvStore(env.KUPONG) : null });
       return json(r.status, r.body);
     }
     const samtal = url.pathname === '/samtal';

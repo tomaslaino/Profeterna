@@ -133,6 +133,11 @@ ingen falsk precision · sidan kraschar aldrig av en död källa · endast fria 
 - [x] **Svenska folket borta från kupongen (2026-10-21):** procenten under oddsen och fältet
   *Svenska folket* i foten är borttagna – under rutorna står bara modellens odds. *Hämta
   Stryktipset* finns kvar
+- [x] **Talongen live (2026-11-09, gängets önskemål):** kupongen i handen visar minut och
+  ställning när matcherna är igång och uppdateras av sig själv, utan att man lägger tillbaka
+  den. Gängets kupong har allas kommentarer under raderna och, igen men bara där, Svenska
+  folket, oddsen och favoritskapet från Svenska Spel – var och ens egen kupong har dem inte,
+  som sedan 2026-10-21 (se [Kupongen i handen](#kupongen-i-handen))
 - [x] **Stryktipset som veckans kupong (2026-10-20):** när Svenska Spel öppnar veckans
   Stryktips (senast måndag kl. 07) och förra omgången är färdigspelad, sedan 2026-11-08 tidigast
   måndagen efter omgången kl. 16, blir dess tretton matcher
@@ -427,7 +432,7 @@ bara lokalt. Analyserna visas som de ligger i `data/analyser.json`; hur de skriv
 | Spelarbilder | 365Scores öppna webb-API (`/web/standings/?competitions=<id>` för lagen, `/web/squads/?competitors=<id,…>` för trupperna); bilden visas från `imagecache.365scores.com/…/v<imageVersion>/Athletes/<id>` i webbläsaren | ligorna | 24 h | Verifierat 2026-10-20: truppen per lag med id, namn, tröjnummer, födelsedatum, position och `imageVersion`; tränare och domare (`isStaff`) tas inte med. `imageVersion` 1 betyder att bild saknas (alla 13 med version 1 gav 404, alla 46 med högre version en bild). Alla 92 lag hittades på namnet som för betygen (Utd och Wed skrivs ut, så att Sheffieldlagen hålls isär); bild på 539 av 542 spelare i PL, 660 av 671 i CH, 649 av 651 i L1 och 540 av 663 i L2. Kopplas till ESPN-truppen inom laget på hela namnet, födelsedatum med ett gemensamt namn eller tröjnummer, efternamn med förnamnets initial och sist tröjnummer, bara vid entydig träff – 2 329 av 2 818 spelare i ESPN-trupperna fick bild; de övriga saknar bild hos 365Scores eller finns inte i deras trupp (oftast unga spelare och lån). Bilden står i spelarkortet med tröjnumret i hörnet; går den inte att ladda står tröjnumret som förut. ~25–30 kB per liga. Styr inte prognosen. |
 | Lagsköldar | ESPN:s bildtjänst (`a.espncdn.com/combiner/i?img=/i/teamlogos/soccer/500/<id>.png&h=96&w=96`, och `500-dark` för mörk botten) | alla sex | 7 d | Verifierat 2026-10-21: alla 92 ligalag har sköld, 67 av dem också en för mörk botten (Tottenhams tupp vit i stället för marinblå). Lagen tas ur spelprogrammen på ESPN:s lag-id, så att cupmotståndet kommer med; de flesta i National League har sköld, lag längre ner oftast inte (HTTP 404) och får en tom sköld. 96 × 96 px, ~1,5 MB för alla. Sparas i källcachen (`data/cache/skoldar/`) och läggs på sajten av bygget, i stället för att visas direkt från ESPN. Visas i Tabeller (den för mörk botten) och i matchbladets huvud (den vanliga – matchbladet är ljust). Styr inte prognosen. |
 | Matchhändelser och lagstatistik | ESPN matchsammanfattning (`summary?event=<id>`, samma som oddsen), hämtas **i webbläsaren** | alla sex | när matchrutan öppnas för en påbörjad match, varje minut medan den pågår | Verifierat 2026-10-19: `Access-Control-Allow-Origin: *`. Mål med assist, självmål och straff, kort, byten, halvtid, lagstatistik (bollinnehav, skott, hörnor, passningar m.m.) och publik. Passningsandelen räknas ur antalen (ESPN avrundar den till en decimal). ~400 kB per match. Styr inte prognosen. |
-| Stryktipset och Svenska folket | Svenska Spels öppna API (`api.spela.svenskaspel.se/draw/1/stryktipset/draws` och `…/draws/<nr>`), hämtas av tjänsten profeterna-kupong åt webbläsaren | omgångens kupong | när omgången startas eller man trycker på *Hämta Stryktipset* | Verifierat 2026-10-20: ingen nyckel, men inget `Access-Control-Allow-Origin` för andra sajter – därför via tjänsten, som sparar svaret en minut. Omgångens tretton matcher med nummer, lag (korta namn: *QPR*, *Wolves*, *Bristol C*), avspark och `svenskaFolket` i hela procent. Svenska Spel räknar om fördelningen ungefär varje minut och fryser den vid spelstoppet; `/draws/<nr>` ger den också efteråt. Inget matchid som ESPN:s – matchen hittas på lagen (början av namnet efter några smeknamn) och avspark inom 36 timmar: 13 av 13 i vecka 43. Styr inte prognosen. |
+| Stryktipset, Svenska folket, odds och favoritskap | Svenska Spels öppna API (`api.spela.svenskaspel.se/draw/1/stryktipset/draws` och `…/draws/<nr>`), hämtas av tjänsten profeterna-kupong åt webbläsaren | omgångens kupong | när omgången startas eller man trycker på *Hämta Stryktipset* | Verifierat 2026-10-20: ingen nyckel, men inget `Access-Control-Allow-Origin` för andra sajter – därför via tjänsten, som sparar svaret en minut. Omgångens tretton matcher med nummer, lag (korta namn: *QPR*, *Wolves*, *Bristol C*), avspark och `svenskaFolket` i hela procent. Svenska Spel räknar om fördelningen ungefär varje minut och fryser den vid spelstoppet; `/draws/<nr>` ger den också efteråt. Inget matchid som ESPN:s – matchen hittas på lagen (början av namnet efter några smeknamn) och avspark inom 36 timmar: 13 av 13 i vecka 43. `odds` och `favouriteOdds` (verifierat 2026-11-08 på en öppen omgång av Europatipset, samma gränssnitt) finns medan omgången är öppen men är borta när den är färdigspelad (omgång 4978), medan `svenskaFolket` och `startOdds` ligger kvar; tjänsten sparar därför sista läget (se [Inför uppgörelsen](#inför-uppgörelsen)). Styr inte prognosen. |
 | Liveställning | ESPN scoreboard (`site.api.espn.com/…/<liga>/scoreboard?dates=YYYYMMDD`), hämtas **i webbläsaren** | kupongens matcher | 1 min medan en kupongmatch pågår | Verifierat 2026-10-18: svarar med `Access-Control-Allow-Origin: *`, så sidan kan hämta direkt. Samma matchid som spelprogrammet. Status, matchminut och ställning; används bara av kupongen, inte av prognosen eller bygget. |
 | Höjdpunkter (sammandrag) | Viaplays öppna innehålls-API (`content.viaplay.se/pcdash-se/sport/fotboll/<tävling>`) | PL, CH, FA-cupen (sidorna för L1 och EFL-cupen svarar 404 sedan oktober 2026) | 30 min | Verifierat 2026-10-20: ingen nyckel, svarar även från USA (GitHub Actions). Viaplay har rättigheterna i Sverige och lägger ut sammandrag som spelas utloggad efter en kort reklamfilm. Listorna *Höjdpunkter* och *Utvalda klipp* per tävling, 40 klipp per sida; sammandragen känns igen på formatet (*Höjdpunkter från Premier League*, *Sporthöjdpunkter*). Premier Leagues femminutersklipp ligger ute en månad, övriga ett år; klipp som faller ur listorna behålls tills de går ut. Inget matchid – matchen hittas på tävling, båda lagen (alias eller ordens början, t.ex. *Bristol C*) och avspark 30 dagar före till 3 dagar efter att klippet lades ut: alla 212 sammandrag med två lag i titeln från säsongens start hittade exakt en match (170 matcher). League Two har inga. Länken går direkt till Viaplays spelare (`viaplay.se/player/default/sport/<guid>`, startar utan Börja titta) och öppnas i ett eget 16:9-fönster på datorn, i ny flik på telefonen – Viaplay tillåter inte att sidorna visas inuti andra sajter (`X-Frame-Options: DENY`, `frame-ancestors 'none'`), så klippen går inte att bädda in. Styr inte prognosen. |
 | Höjdpunkter (YouTube) | Kanalernas öppna flöden (`youtube.com/feeds/videos.xml?channel_id=<id>`, de 15 senaste klippen) och oEmbed (`youtube.com/oembed`) | alla sex | 30 min | Ingen nyckel. Kanalerna i [config/youtube.js](config/youtube.js): Premier League, Sky Sports Premier League, Sky Sports Football, EFL och FA-cupen, plus de 92 ligaklubbarnas egna kanaler (id ur Wikidata P2397 och länkarna på klubbarnas sajter, 2026-10-20). Bara klipp med *highlights* i titeln; damlag, ungdomslag, träningsmatcher, EFL Trophy och gamla matcher sorteras bort. oEmbed sorterar bort klipp som inte får bäddas in (401) eller är borta (404). Flödet har ingen landsspärr – spärrade klipp märks i spelaren, som tar nästa. Matchen hittas på lag och tid: utlagt 95 minuter till sex dygn efter avspark; i en klubbs kanal ska motståndaren stå i titeln, i en sändares båda lagen; ett resultat i titeln ska vara matchens. Spelas inbäddat från `youtube-nocookie.com`. Styr inte prognosen. |
@@ -930,6 +935,12 @@ bara lokalt. Analyserna visas som de ligger i `data/analyser.json`; hur de skriv
 - **Hasse Backe spanar på din kupong (2026-11-08, användarens val):** ibland går blicken ned på kupongen,
   med sex olika miner, och när han har sagt vad han tycker om den passar minen orden. Se
   [Hasse Backe](#hasse-backe), *Vilan*.
+- **Protokollet som ett äkta papper (2026-11-09, användarens önskemål):** "Jag tycker inte att protokoll-pappret ser
+  trovärdigt ut. Gör det snyggare och som att det ser ut som ett äkta papper. Det går gärna likna de vanliga kupongerna".
+  Bladet är nu en blankett som kupongen (se *Sammanställningen efter omgången*): de platta gröna rutorna är en grön
+  märkpenna, tecknen står kvar i var och ens bläck i stället för att blekna till grått när de var fel, och handstilen står
+  aldrig exakt likadant två gånger. Det som stod kvar sedan förut: allas tecken, facit, ringen kring vinnaren och att bladet
+  slutar med raden Poäng.
 - **Hasse dömer gänget i baren, och protokollet står utan omdömen (2026-11-08, användarens val):**
   "protokollet ska ligga här utan att Hasse Backe kommenterar något speciellt - i hans vy ska han däremot göra det", "Jag
   vill inte att han kommenterar sig själv här" och "Det här gör han tills att nästa stryktipsmatcher är uppe". Användaren
@@ -1705,7 +1716,8 @@ ställningen efter 90 minuter (samma utfall som prognosen).
   förlängning väntar rättningen på nästa bygge, som räknar fram ställningen efter 90
   minuter ur målminuterna. Svarar inte ESPN visas det, och kupongen rättas mot
   `matches.json` som vanligt. En match som ESPN anger som uppskjuten, inställd eller
-  avbruten visas så direkt (inte som slutspelad) och räknas inte, redan före nästa bygge.
+  avbruten visas så direkt (inte som slutspelad) och räknas inte, redan före nästa bygge. I
+  tobaksaffären följer också kupongen i handen med, rad för rad (*Kupongen i handen*).
 - **Spoilerskyddet:** en kupong där alla matcher är slut räknas som klar även när skyddet
   döljer resultaten – då visar förstasidan nästa kupong i stället för den gamla.
 
@@ -2005,7 +2017,10 @@ under omgången.
    kvar att klubba, och foten – Spikar, Halvgard, Helgard och Odds – står i raden längst ner.
    Regeln visas där och stoppar inget (se *Regeln*).
 
-   När ingen match längre går att fylla i står matcherna luftigt i samma högar, med tiden, oddsen,
+   På lappen står också Svenska folket, Svenska Spels odds och favoritskapet (`spelLapp`, 2026-11-09).
+   När ingen match längre går att fylla i står matcherna luftigt i samma högar, med flikar för vad
+   som står under rutorna: Modellen, Folket, Odds och Favoritskap (`underFlikar`, samma på gängets
+   kupong när matcherna spelas), med tiden, oddsen,
    motiveringarna, kommentarerna och resultaten direkt på raden.
 5. **Gängets kupong** (så fort man ser de andras tips, också om någon inte har lämnat in):
    man trycker på rutorna (två rutor =
@@ -2112,7 +2127,12 @@ Lokalt: med `KUPONG_LOKALT=1` i `.env` finns
 `GET /stryktipset?nr=<omgång>` ([worker/stryktipset.mjs](worker/stryktipset.mjs)) – Svenska
 Spel svarar inte på anrop direkt från sajten. Svaret sparas en minut i tjänsten. Sidan
 ([public/folket.js](public/folket.js)) knyter matcherna till sajtens på lagen och avsparken –
-tjänsten med samma regler när den startar omgången (`linkDraw`). Lokalt
+tjänsten med samma regler när den startar omgången (`linkDraw`). Svaret har också oddsen och
+favoritskapet för varje match. De finns hos Svenska Spel bara så länge omgången är öppen, så
+tjänsten sparar dem i KV (`stryktipset:sista:<nr>`, `sparaSista`) med ett schema var tionde minut
+(`[triggers]` i [worker/kupong.toml](worker/kupong.toml)): en gång i timmen, och var tionde minut de
+sista två timmarna före spelstopp. `oddsSlag` säger vad svaret innehåller: `nu`, `sista` (det sparade)
+eller `start` (startoddsen, med favoritskapet räknat ur dem, när inget är sparat). Lokalt
 `/api/stryktipset` (med `KUPONG_LOKALT=1`).
 
 **Omgångens namn** (2026-10-20): i stället för *Omgångens kupong* får varje omgång ett eget
@@ -2594,7 +2614,16 @@ Enter och mellanslag klickar på dem. En match på text-tv:n lägger fram matchb
   *Kombinationer* (eller *Pris*) och *Odds* och streckkoden med omgångens id (`Samtal.pult.top`
   och `fields`, `Papper.code`). Efter tiden står motiveringen för hand med blyerts, och
   utfallet ringas in (grönt när kupongen hade det, annars rött, streckat medan matchen
-  pågår). På pulten ligger ditt utkast med dina kryss och motiveringar och ditt namn;
+  pågår). Kupongerna är inte likadana (2026-11-09, användarens önskemål): varje kupong är sliten
+  på sitt sätt – vikt på mitten, på tvären, i fyra eller med ett snett veck, en kaffering (ibland
+  två), några stänk, ett tumavtryck av blyerts, ett hörn som vikts in, mer eller mindre gulnad –
+  slumpat ur omgången och vems kupong det är (`slitage` och `kupNyckel` i rum.js). Ditt utkast och
+  din inlämnade är samma papper, så den ser likadan ut på pulten, i handen, i högen och hos Hasse;
+  gängets kupong och den nya som ligger på pulten när du har lämnat in är egna papper. På baksidan
+  i högen syns vecken, hörnet och kaffet igenom, spegelvända. Det tryckta – bandet,
+  synkmarkeringarna och tryckeriets rad – är likadant på alla, och slitaget är bara gradienter,
+  så att rummet inte får mer att rita (förut hade alla samma kaffering och samma veck).
+  På pulten ligger ditt utkast med dina kryss och motiveringar och ditt namn;
   har du lämnat in ligger din i högen bredvid och på pulten en ny – och när du
   ser de andras tips ligger gängets kupong där, med gängets kryss med kulspetspenna,
   allas porträtt i rutorna och allas namn överst (uppgörelsen). Allt man
@@ -4174,11 +4203,11 @@ tillbaka – de matcher som inte är omtvistade – så länge någon omtvistad 
 det mörka är det vi ska prata om; en klubbad match står kvar mörk med sin bock, så att den går
 att kryssa färdigt (en halvgardering är två tryck), och när den sista är klubbad står hela
 kupongen fram igen (`.strid` och `.klubbad` i rum.css). Papperet under Kupong märker samma
-matcher på samma sätt (*Inför uppgörelsen*, punkt 4). Efter tiden står där en förklaring i sitt bläck, med de korta lagnamnen
-och utan tiden så att den får plats (raden blir inte högre): den som avviker, annars den vars
-tips gängets tecken just nu lämnar mest utanför, annars den första som har skrivit något
-(`avvik` i `Samtal.pult.gang`, `skal` i rum.js); hela motiveringen när man pekar. Ändras
-gängets tecken i matchen byts förklaringen till den som nu blir utan. Pennan väntar till
+matcher på samma sätt (*Inför uppgörelsen*, punkt 4). På kupongen på pulten står efter tiden en
+förklaring i sitt bläck, med de korta lagnamnen och utan tiden så att den får plats: den som avviker,
+annars den vars tips gängets tecken just nu lämnar mest utanför, annars den första som har skrivit
+något (`avvik` i `Samtal.pult.gang`, `skal` i rum.js). I handen står i stället allas kommentarer under
+raden (*Talongen live* nedan). Pennan väntar till
 höger om rutorna vid den första omtvistade matchen som inte är klubbad. En match klubbas när
 gängets tecken i den ändras, eller med ett klick på raden – numret, tiden eller förklaringen,
 medan lagen lägger matchbladet på kupongen som förut – och pennan drar bocken; då får
@@ -4202,6 +4231,33 @@ den sparade) sparar den direkt med samma tjänst som papperet (`Samtal.pult.spar
 ändå* (en kupong till samma dag), och kan tjänsten inte spara *Spara via Ny kupong*. Utan
 tjänsten öppnas Ny kupong (eller Ändra) med tecknen ifyllda. Matcher som har startat går
 inte att ändra; där står pennan för kommentaren i efterhand.
+
+**Talongen live** (2026-11-09, gängets önskemål: "Jag skulle också vilja att den uppdateras live,
+utan att man behöver lägga tillbaka den, och sedan ta upp den igen"). Användaren valde utseendet bland
+flera alternativ: A2 Märkpennan, B4 En rad med tre flikar och C1 Under raden.
+
+- **Minut och ställning** (alla kuponger i rummet, `liveRad` i rum.js): när matchen är igång står minuten
+  och ställningen på raden i stället för tiden, i telefonen på andra raden. Bakom ställningen ligger en
+  märkpenna: grön när kupongen har tecknet just nu, annars röd. Ringen runt utfallet har samma färg och är
+  streckad medan matchen pågår. I förlängningen är märkpennan grå, eftersom det som rättas är ställningen
+  efter 90 minuter. Med spoilerskyddet står tiden kvar.
+- **Utan att läggas tillbaka** (`levande` i rum.js): kupongen i handen skrevs förut bara när den togs upp.
+  Nu byts minuten, ställningen, ringarna, de andras kommentarer och siffrorna rad för rad så fort sidan
+  har hämtat dem (varje minut, och `Rum.redraw` efter ESPN i `liveTick`). Kupongen skrivs inte om, så att
+  kryssen, pennan och det du skriver står kvar. Vid mål gör ställningen ett litet hopp, utom utan rörelser.
+- **Svenska folket, odds och favoritskap** (gängets kupong i handen, Stryktipset, `Folket` i folket.js): ett
+  tal under varje ruta och flikarna Folket, Odds och Favoritskap där det förut stod Match. Fliken
+  minns på enheten (`profeterna.spelflik`). Fet stil är det vi har kryssat. Svenska folket och oddsen ändras
+  ungefär varje minut fram till spelstopp, sedan står de still. Pekar man på Odds står det om det är sista
+  läget eller startoddsen. Svarar inte Svenska Spel eller tjänsten står kupongen som förut, utan flikar. Var och
+  ens egen kupong har inga sådana siffror.
+- **Allas kommentarer** (`komHtml` i rum.js): var och ens motivering från sin egen kupong och kommentar i
+  efterhand står under matchen, med porträtt och i eget bläck. Raden blir högre bara där någon har skrivit, och
+  din egen kommentar i efterhand står i fältet på raden, där du skriver den. Blir det så mycket att kupongen
+  skulle bli för liten står varje kommentar på en rad, och hela när man pekar (`.tat`).
+- **Kupongen blir högre** (`mattHand`): siffrorna och kommentarerna tar plats, så gängets kupong i handen är så
+  hög som den behöver vara, med samma mitt som på pulten, och görs så stor som får plats. Pennan vilar
+  i foten. På pulten är kupongen som förut, utan siffror och kommentarer under raderna.
 
 **Spela hos Svenska Spel** (2026-11-07, användarens beslut). När gängets kupong är sparad som den
 står och omgången är Stryktipset som går att spela, står *Sparad* släckt och guldordet blir *Spela hos
@@ -5653,10 +5709,14 @@ och de nya raderna har Tomas röst först när iMacen har läst upp dem (till de
 ### Sammanställningen efter omgången
 
 När alla matcher i omgången är spelade ligger bara Hasse Backes protokoll på pulten, i kupongens ställe, tills
-nästa kupong kommer måndagen efter kl. 16 ([public/rum-block.js](public/rum-block.js), [public/rum-block.css](public/rum-block.css)): ett Yatzy-block med
-resultat och facit för varje match, och en spalt för kupongen (gängets tre ansikten), var och en i gänget och Hasse.
-Allas tecken står kvar, så att man ser vad var och en spelade: det som satt är överstruket med grön penna, och i en
-gardering är tecknet som satt starkast. Under står *Rätt av 13* och poängen. Vinnaren är inringad, både på porträttet
+nästa kupong kommer måndagen efter kl. 16 ([public/rum-block.js](public/rum-block.js), [public/rum-block.css](public/rum-block.css)): en blankett ur
+samma tryckeri som kupongen – samma papper, bandet i terrakotta (*Protokoll*, med kupongens nummer), synkmarkeringarna i
+vänsterkanten, tryckta linjer, varannan rad tonad och tryckeriets rad längs högerkanten. Omgångens namn står för hand på
+en tryckt rad under bandet. Raderna har resultat och facit på skrivmaskin, och spalterna är kupongen (gängets tre
+ansikten), var och en i gänget och Hasse, med porträtten uppklistrade som foton. Allas tecken står kvar i var och ens
+bläck, så att man ser vad var och en spelade, och det som satt är överstruket med grön märkpenna. Handstilen och
+märkpennans drag är lite olika i varje ruta, men samma omgång ser likadan ut varje gång (slumpen utgår från omgången,
+raden och spalten). Under står *Rätt av 13* och poängen. Vinnaren är inringad, både på porträttet
 och runt poängen, och det är de enda ringarna på blocket. Hasse har rättat det och skrivit under, och mer står inte där:
 domarna över gänget säger han i baren (se [Hasse Backe](#hasse-backe), *Domarna efter omgången*). Förut stod en dom per
 person längst ner (ändrat 2026-11-08). I telefonen försvinner namnen under porträtten. Har Hasse ingen kupong i omgången
