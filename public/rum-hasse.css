@@ -24,7 +24,7 @@
 .rum-hasse-vy[hidden] { display: none; }
 .rh-scen { position: absolute; inset: 0; overflow: hidden; }
 .rh-scen .rh-bak { position: absolute; left: 0; top: 0; display: block; max-width: none; }
-/* väggen i lysrörets ljus (tänt utom mellan midnatt och sex, som i rummet), annars i nattens */
+/* väggen i lysrörets ljus (tänt utom mellan elva på kvällen och sex, som i rummet), annars i nattens */
 .rh-scen img.rh-lys, .rum-hasse-vy.lys .rh-scen img.rh-bak:not(.rh-lys) { display: none; }
 .rum-hasse-vy.lys .rh-scen img.rh-lys { display: block; }
 /* på dagen: väggen med dagsljuset genom affärens fönster, ritad på en duk (vagg i rum-hasse.js) */

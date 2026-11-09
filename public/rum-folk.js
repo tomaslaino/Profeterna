@@ -32,7 +32,7 @@
 // förut – tas kupongen sedan i handen att fylla i eller ändra (ta i rum.js),
 // när namnet är skrivet eller tecknet syns.
 //
-// Natten: mellan midnatt och sex (Stockholms tid, Vader.nu()) är lysröret
+// Natten: mellan elva på kvällen och sex (Stockholms tid, Vader.nu()) är lysröret
 // släckt – rummet mörkt utom gatan, neonen och tv:n (.natt, rum-folk.css),
 // gänget och lysröret i 3D – och på morgonen blinkar det igång igen. Nära
 // tv:n, videon, en sak eller med kupongen i handen är det ljust.
@@ -367,7 +367,7 @@ window.RumFolk = (() => {
 
   function arNatt(v) {
     if (q.has('rum-natt')) return q.get('rum-natt') !== '0';
-    return Boolean(v && v.timme < 6);
+    return Boolean(v && (v.timme >= 23 || v.timme < 6));
   }
   // gänget sover från 22.30 till sju
   function arSomn(v) {
