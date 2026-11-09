@@ -7,7 +7,8 @@
 // Stationerna ligger på sina frekvenser (KANALER, de svenska på sina frekvenser i Stockholm och
 // Göteborg, AM-bandets på mellanvågen där de sänder eller har sänt, som talkSPORT och Sport 890) och är
 // riktiga webbradiokanaler. Mellan dem hörs brus
-// (på AM dessutom knaster och den pipton som sjunker när man närmar sig stationen). Samma visare går över
+// (på AM dessutom knaster och den pipton som sjunker när man närmar sig stationen). På en station är FM
+// ren och AM har bara ett svagt sus och något enstaka knäpp. Samma visare går över
 // båda banden, som på en riktig radio, så ett byte av band hamnar sällan på en station.
 //
 // Alla stationer står för hand på tejpen vid skalan (FM ovanför, AM under), och bredvid radion ligger en
@@ -151,7 +152,15 @@ window.RumRadio = (() => {
     A.el = el;
     A.utv = c.createGain();
     A.utv.gain.value = S.vol ** 1.6;
-    A.utv.connect(c.destination);
+    // (ett tak: starka stationer på hög volym slår annars i botten och sprakar)
+    A.tak = c.createDynamicsCompressor();
+    A.tak.threshold.value = -1;
+    A.tak.knee.value = 0;
+    A.tak.ratio.value = 20;
+    A.tak.attack.value = 0.002;
+    A.tak.release.value = 0.12;
+    A.utv.connect(A.tak);
+    A.tak.connect(c.destination);
     A.mix = c.createGain();
     A.mix.connect(A.utv);
     A.an = c.createAnalyser();
@@ -177,18 +186,21 @@ window.RumRadio = (() => {
     A.lp.connect(A.topp);
     A.topp.connect(A.stn);
     A.stn.connect(A.mix);
-    // bruset, knastret på AM och piptonen mellan AM-stationerna
+    // bruset, knastret på AM (tätt mellan stationerna, glest på dem) och piptonen mellan AM-stationerna
     const vit = c.createBuffer(1, c.sampleRate * 3, c.sampleRate);
     const v = vit.getChannelData(0);
     for (let i = 0; i < v.length; i++) v[i] = Math.random() * 2 - 1;
-    const pop = c.createBuffer(1, c.sampleRate * 5, c.sampleRate);
-    const q = pop.getChannelData(0);
-    for (let n = 0; n < 34; n++) {
-      const at = Math.floor(Math.random() * (q.length - 800));
-      const st = 0.25 + Math.random() * 0.75;
-      const len = 40 + Math.floor(Math.random() * 500);
-      for (let i = 0; i < len; i++) q[at + i] += st * (Math.random() * 2 - 1) * (1 - i / len) ** 2;
-    }
+    const knaster = (sek, antal) => {
+      const b = c.createBuffer(1, Math.floor(c.sampleRate * sek), c.sampleRate);
+      const q = b.getChannelData(0);
+      for (let n = 0; n < antal; n++) {
+        const at = Math.floor(Math.random() * (q.length - 800));
+        const st = 0.25 + Math.random() * 0.75;
+        const len = 40 + Math.floor(Math.random() * 500);
+        for (let i = 0; i < len; i++) q[at + i] += st * (Math.random() * 2 - 1) * (1 - i / len) ** 2;
+      }
+      return b;
+    };
     const slinga = (b) => { const s = c.createBufferSource(); s.buffer = b; s.loop = true; s.start(); return s; };
     A.bHp = c.createBiquadFilter();
     A.bHp.type = 'highpass';
@@ -200,14 +212,18 @@ window.RumRadio = (() => {
     A.bHp.connect(A.bLp);
     A.bLp.connect(A.brus);
     A.brus.connect(A.mix);
-    A.pop = c.createGain();
-    A.pop.gain.value = 0;
     const popLp = c.createBiquadFilter();
     popLp.type = 'lowpass';
     popLp.frequency.value = 2600;
-    slinga(pop).connect(popLp);
-    popLp.connect(A.pop);
-    A.pop.connect(A.mix);
+    popLp.connect(A.mix);
+    A.pop = c.createGain();
+    A.pop.gain.value = 0;
+    slinga(knaster(5, 34)).connect(A.pop);
+    A.pop.connect(popLp);
+    A.gles = c.createGain();
+    A.gles.gain.value = 0;
+    slinga(knaster(9.7, 6)).connect(A.gles);
+    A.gles.connect(popLp);
     A.viss = c.createOscillator();
     A.viss.type = 'sine';
     A.visG = c.createGain();
@@ -260,7 +276,7 @@ window.RumRadio = (() => {
     // (fadingen på AM och att den ibland hänger sig efter en dold flik)
     setInterval(() => {
       if (S.band === 'am' && A.klar) {
-        A.fade = 0.68 + Math.random() * 0.32;
+        A.fade = 0.82 + Math.random() * 0.18;
         lyssna();
       } else if (A.fade !== 1) A.fade = 1;
     }, 1400);
@@ -329,14 +345,18 @@ window.RumRadio = (() => {
       }
       const am = S.band === 'am';
       const ren = hors ? s : 0;
+      // Bruset tystnar när visaren står på stationen, också medan den laddas eller hackar till (bara en
+      // station som inte svarar ger brus). Där är FM ren, och AM har kvar ett svagt sus och något enstaka knäpp.
+      const bar = hors ? s : k && A.kanal === k ? s * 0.9 : 0;
       param(A.stn.gain, hors && !A.friPa ? ren * (am ? A.fade : 1) : 0, am ? 0.35 : 0.04);
       if (A.friPa) A.fri.volume = kl(ren * S.vol ** 1.6);
-      param(A.brus.gain, (am ? 0.32 : 0.3) * (1 - ren * (am ? 0.72 : 0.97)) * (am ? 2 - A.fade : 1), 0.04);
-      param(A.pop.gain, am ? 0.34 * (1 - 0.65 * ren) : 0, 0.05);
+      param(A.brus.gain, am ? 0.32 * (1 - 0.95 * bar) * (2 - A.fade) : 0.3 * (1 - bar), 0.04);
+      param(A.pop.gain, am ? 0.34 * (1 - bar) : 0, 0.05);
+      param(A.gles.gain, am ? 0.06 * bar : 0, 0.05);
       // (AM: tonen mellan stationerna, som sjunker tills man står rätt)
       if (am && d > B.lasa * 0.7 && d < B.tappa * 1.6) {
         param(A.viss.frequency, 120 + d * 340, 0.02);
-        param(A.visG.gain, 0.022 * (1 - ren), 0.04);
+        param(A.visG.gain, 0.022 * (1 - bar), 0.04);
       } else param(A.visG.gain, 0, 0.04);
     } else if (A.ctx) {
       clearTimeout(A.las);
@@ -344,6 +364,7 @@ window.RumRadio = (() => {
       param(A.stn.gain, 0, 0.02);
       param(A.brus.gain, 0, 0.02);
       param(A.pop.gain, 0, 0.02);
+      param(A.gles.gain, 0, 0.02);
       param(A.visG.gain, 0, 0.02);
       if (!pa && A.kanal) slapp();
     }
