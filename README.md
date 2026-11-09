@@ -937,6 +937,13 @@ bara lokalt. Analyserna visas som de ligger i `data/analyser.json`; hur de skriv
   att man väljer vem han dömer (inte domarna uppradade, eller hans eget exemplar av protokollet på disken). Domarna gäller
   så länge protokollet ligger på pulten. Senare samma dag togs också namnteckningen bort på användarens önskemål, så
   bladet slutar med raden Poäng. Se [Hasse Backe](#hasse-backe), *Domarna efter omgången*.
+- **Gänget utan siffror och lappen under domen (2026-11-09, användarens önskemål):** "Kan du göra om det här snyggare
+  och ta bort länken 'Matcherna' som är meningslös. Utveckla gärna kring de olika personerna sen. Tycker inte att du behöver
+  ha poäng och antal rätt på den här sidan. Det tycker jag att du kan visualisera på nästa i så fall. Visualisera det och
+  annan relevant bettinginformation för den individen!" Listan hos Hasse är nu stora porträtt sida vid sida i gängets
+  ordning (inte bäst först, så att var och en står på samma plats varje omgång och listan inte avslöjar något), och under
+  domen ligger en lapp ur protokollet med kupongen rad för rad och siffrorna. Se [Hasse Backe](#hasse-backe), *Domarna
+  efter omgången*.
 - **Bara protokollet på pulten, och nästa kupong måndag kl. 16 (2026-11-08, användarens önskemål):** "Ta bort
   kupong 3 där nu när allt är klart - ha bara protokollet", och "Den nya kupongen kan dyka upp från och med
   måndagen efter tippningsdagen", "Måndag kl 16". Kupongen låg kvar under protokollet och Stryktipset tog över redan
@@ -5256,21 +5263,36 @@ annars tecknen i hans text, med hans resultat.
 Överst i listan står vem som säger vad, utan förklarande text: Hasses porträtt och namn i guld mitt över hans rutor och resultat, och ditt porträtt i din färg med namnet i din handstil (som på kupongen) över din spalt. Får namnen inte plats bredvid varandra, som i telefonen, går ditt namn först och sedan hans, så att porträtten står kvar. En spalt som inte syns på någon rad får inget huvud.
 När alla matcher har börjat säger han hur det gick för honom (`efterat`), tills omgången är spelad.
 
-**Domarna efter omgången** (2026-11-08). Så länge protokollet ligger på pulten, alltså från att omgången är spelad
-tills nästa Stryktips kommer måndagen efter kl. 16 (`Rum.summa`), dömer han gänget i stället för att gå igenom matcherna.
-Han frågar vem han ska börja med, och listan har var och en i gänget med porträttet i sin färg, namnet i sin handstil och
-rätt och poäng som i protokollet, bäst först och med ringen kring den bästas poäng (`gangLista` i
-[public/rum-hasse.js](public/rum-hasse.js)). Den man väljer får sin dom slagen i disken i guld, som domen över en match
-(*Garderat*, *Flyt*, *Felfritt*, *Osynlig*, *Talang*, *Snöpligt*, *Klokt*), och under den några meningar: en inledning
-efter hur det gick i gänget, en eller två saker ur kupongen och ett slut (`doma`). Sakerna är räknade ur protokollet:
-helgarderingarna, hur många spikar som satt och i hur många matcher ingen annan i gänget hade rätt (läget i `gang` i
-[public/rum-block.js](public/rum-block.js), raderna i `domar` i rum-hasse-repliker.js). Raderna väljs efter omgången och
-personen, inte på lott, så att domen är densamma varje gång och på alla enheter. Varje rad är en mening, så att domen står
-i ett stycke och *Läs upp* ändå kan läsa den mening för mening. *Nästa* tar den man inte har hört om än, och *Hela gänget*
-går tillbaka till listan, där ordet i guld står efter namnet på dem man har hört om (på enheten för den omgången,
-`profeterna.hasse.domar`). Om sig själv säger han inget här: han står inte i listan och räknas inte när bäst och sämst
-i gänget avgörs, och efter omgången säger han inte heller hur det gick för honom. *Matcherna* under listan visar hans rader
-och facit som förut, med *Gänget* tillbaka. Med dolda resultat finns inget protokoll, och då är allt som förut.
+**Domarna efter omgången** (2026-11-08, listan och lappen 2026-11-09). Så länge protokollet ligger på pulten, alltså från
+att omgången är spelad tills nästa Stryktips kommer måndagen efter kl. 16 (`Rum.summa`), dömer han gänget i stället för att
+gå igenom matcherna. Han frågar vem han ska börja med, och gänget står sida vid sida i sin ordning, som på kupongen: stora
+porträtt i var och ens färg och namnet i sin handstil, utan siffror (`gangLista` i [public/rum-hasse.js](public/rum-hasse.js)).
+Den man väljer får sin dom slagen i disken i guld, som domen över en match (*Garderat*, *Flyt*, *Felfritt*, *Osynlig*,
+*Talang*, *Snöpligt*, *Klokt*), och under den några meningar: en inledning efter hur det gick i gänget, en eller två saker ur
+kupongen och ett slut (`doma`). Sakerna är räknade ur protokollet: helgarderingarna, hur många spikar som satt och i hur
+många matcher ingen annan i gänget hade rätt (läget i `gang` i [public/rum-block.js](public/rum-block.js), raderna i `domar`
+i rum-hasse-repliker.js). Raderna väljs efter omgången och personen, inte på lott, så att domen är densamma varje gång och
+på alla enheter. Varje rad är en mening, så att domen står i ett stycke och *Läs upp* ändå kan läsa den mening för mening.
+
+Under meningarna ligger *lappen*, en sida ur protokollet om just den kupongen på samma papper (`lapp` i
+[public/rum-block.js](public/rum-block.js), stilen i [public/rum-block.css](public/rum-block.css)). Överst en spalt per match
+med rutorna 1, X och 2: kryssen i personens bläck, rutan som satt överstruken med grön penna som i protokollet och facit
+maskinskrivet under. Rödpennans stjärna vid matchnumret betyder att ingen annan i gänget hade rätt där, och matchen och
+resultatet står i spaltens title. Under rutorna siffrorna med tryckta rubriker: *Rätt* av antalet matcher, *Poäng* (med
+ringen kring vinnarens, som i protokollet), *Plats* i gänget, *Spelkassan* för omgången (10 kr per match till modellens odds,
+garderingar delade som i Olympens spelkassa), *Spikar*, *Halvgarderingar* och *Helgarderingar* som satt av hur många och
+*Ensam rätt*. Sedan *Bästa träffen*, tipset med högst odds som satt, och *Största missen*, tipset med lägst odds som inte
+satt. Sist *Säsongen* när den är hämtad (`data/tippare.json`, samma som Olympen och utan omgångar som spoilerskyddet döljer,
+plus den här omgången om bygget inte har frusit in den än): en stapel per omgång uppåt för plus och nedåt för minus, den här
+överstruken, och poängen och platsen hittills. Den visas från andra omgången. Texten och lappen rullar tillsammans, så att
+man i telefonen rullar ned till lappen.
+
+*Nästa* tar den man inte har hört om än, i gängets ordning, och *Hela gänget* går tillbaka till listan, där ordet han slog i
+disken står som en stämpel i guld under namnet på dem man har hört om (på enheten för den omgången,
+`profeterna.hasse.domar`). Om sig själv säger han inget här: han står inte i listan och räknas inte när bäst och sämst i
+gänget avgörs, och efter omgången säger han inte heller hur det gick för honom. Förut hade listan rätt och poäng, bäst först,
+och länken *Matcherna* till hans rader och facit (borta 2026-11-09). Med dolda resultat finns inget protokoll, och då är allt
+som förut.
 Går hans röst inte att få säger han det och visar analysen i skrift. Allt han säger runt omkring är
 färdiga rader, utan AI, i [public/rum-hasse-repliker.js](public/rum-hasse-repliker.js). Står man kvar säger han något då och då:
 över matchlistan (`ledig`), över listan med gänget (`domar.ledig`) och när man inte svarar på hans fråga (`valVanta`). Raderna

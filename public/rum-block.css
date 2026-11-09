@@ -97,6 +97,59 @@
 .rum-protokoll > .rum-block { flex: none; position: relative; margin-top: auto; cursor: default; box-shadow: 0 30px 70px rgba(0, 0, 0, 0.6); }
 .rum-protokoll > .rt-tillbaka { margin-bottom: auto; }
 
+/* ---------- lappen under domen ---------- */
+/* (RumBlock.lapp, hos Hasse i baren): samma papper och samma tre saker som i blocket – kryssen i personens bläck,
+   det som satt överstruket och facit maskinskrivet – och under dem siffrorna, med tryckta rubriker och värdena
+   med pennan. Storlekarna följer samtalets text, så att lappen fyller spalten i datorn och i telefonen. */
+.rd-lapp { --linje: #c6d3e0; --ratt: #d3e8ba; --rod: #b9352a; position: relative; box-sizing: border-box; margin: 0.25em 0 0.9em; padding: 1.25em 0.9em 0.55em; color: #26211a; line-height: 1.25; text-shadow: none; font-synthesis: none; background: var(--pp-grain), var(--pp-kant), #f6f3e8; box-shadow: 0 14px 26px rgba(0, 0, 0, 0.5), 0 2px 2px rgba(0, 0, 0, 0.3); cursor: default; }
+.rd-lapp::before { content: ""; position: absolute; left: 0; right: 0; top: 0; height: 0.45em; background: var(--rod); }
+/* det förtryckta: rubrikerna och rutornas nummer */
+.rd-kol u, .rd-kol.la i, .rd-kol.la b, .rd-f small, .rd-rad small, .rd-sas > small { color: var(--rod); font: 700 0.62em/1.15 var(--tryck); letter-spacing: 0.1em; text-transform: uppercase; text-decoration: none; }
+/* rutorna: en spalt per match */
+.rd-rutor { display: grid; grid-template-columns: auto repeat(var(--n), minmax(0, 1fr)); }
+.rd-kol { display: grid; grid-template-rows: 1.25em repeat(3, 1.4em) 1.6em; min-width: 0; }
+.rd-kol u { position: relative; display: flex; align-items: flex-end; justify-content: center; padding-bottom: 0.35em; font-size: 0.66em; letter-spacing: 0; }
+.rd-kol i { position: relative; margin: 1.5px; border: 1px solid rgba(185, 53, 42, 0.42); border-radius: 1px; background: #fcfaf3; }
+.rd-kol i.ratt { border-color: rgba(23, 130, 74, 0.45); background: var(--ratt); }
+.rd-kol b { display: flex; align-items: center; justify-content: center; margin-top: 0.15em; border-top: 2px solid #26211a; font: 400 1.05em/1 var(--skriv); }
+.rd-kol.la i, .rd-kol.la b { display: flex; align-items: center; justify-content: flex-end; margin: 0; padding: 0 0.6em 0 0; border: 0; border-radius: 0; background: none; letter-spacing: 0.08em; }
+.rd-kol.la b { border-top: 2px solid #26211a; margin-top: 0.15em; font-size: 0.56em; }
+.rd-kryss { position: absolute; left: 4%; top: 6%; width: 92%; height: 88%; overflow: visible; }
+.rd-kryss path { fill: none; stroke: var(--i); stroke-width: 1.9; stroke-linecap: round; }
+/* rödpennans stjärna: ingen annan i gänget hade rätt */
+.rd-stj { width: 0.95em; height: 0.95em; overflow: visible; vertical-align: -0.1em; }
+.rd-stj path { fill: none; stroke: #c8281e; stroke-width: 1.7; stroke-linecap: round; }
+.rd-kol u .rd-stj { position: absolute; left: 50%; bottom: 1.45em; width: 1.35em; height: 1.35em; translate: -50% 0; }
+.rd-f small .rd-stj { margin-left: 0.35em; width: 1.25em; height: 1.25em; }
+/* siffrorna */
+.rd-falt { display: grid; grid-template-columns: minmax(0, 0.8fr) minmax(0, 1.2fr) minmax(0, 1.15fr) minmax(0, 0.95fr); margin-top: 0.7em; border-top: 1px solid var(--linje); }
+.rd-f { display: flex; flex-direction: column; justify-content: space-between; gap: 0.2em; min-width: 0; padding: 0.45em 0.35em 0.2em; border-bottom: 1px solid var(--linje); }
+.rd-f small { letter-spacing: 0.06em; -webkit-hyphens: manual; hyphens: manual; }
+/* värdet nederst, så att siffrorna står på samma linje fast en rubrik bryts */
+.rd-f > span { display: flex; align-items: baseline; gap: 0.3em; }
+.rd-f b { position: relative; color: var(--i); font: 700 1.7em/1 Caveat, cursive; font-variant-numeric: tabular-nums; white-space: nowrap; }
+.rd-f em { font: 400 0.82em/1 var(--skriv); font-style: normal; color: #4d4438; white-space: nowrap; }
+.rd-f .rb-vann { padding: 0.05em 0.3em; }
+.rd-f .rb-vann .rb-ring { inset: -0.12em -0.2em; width: calc(100% + 0.4em); height: calc(100% + 0.24em); }
+/* tipset med högst odds som satt och det med lägst odds som inte satt */
+.rd-rad { margin: 0; padding: 0.5em 0.35em 0.35em; border-bottom: 1px solid var(--linje); }
+.rd-rad small { display: block; margin-bottom: 0.3em; letter-spacing: 0.07em; }
+.rd-rad span { display: block; font: 400 0.9em/1.3 var(--skriv); }
+.rd-rad i, .rd-rad em { font-style: normal; white-space: nowrap; }
+.rd-rad em { margin-left: 0.6em; color: #4d4438; }
+/* säsongen: en stapel per omgång, den här överstruken */
+.rd-sas { display: flex; flex-wrap: wrap; align-items: center; column-gap: 1em; row-gap: 0.3em; padding: 0.5em 0.35em 0.2em; }
+.rd-sas > small { flex-basis: 100%; letter-spacing: 0.07em; }
+.rd-staplar { flex: 0 1 auto; width: calc(var(--n) * 1.25em); min-width: 0; height: 2.2em; overflow: visible; }
+.rd-staplar rect { fill: var(--i); }
+.rd-staplar rect.nu { fill: var(--ratt); }
+.rd-staplar path { stroke: #26211a; stroke-width: 1; vector-effect: non-scaling-stroke; }
+.rd-sas .rd-f { flex: none; padding: 0; border: 0; }
+/* telefonen: lite tätare */
+.rum-hasse-vy.hog .rd-lapp { padding: 1.1em 0.6em 0.45em; }
+.rum-hasse-vy.hog .rd-f { padding: 0.45em 0.2em 0.25em; }
+.rum-hasse-vy.hog .rd-f small { letter-spacing: 0.04em; }
+
 /* ---------- tidningen ---------- */
 .rum-tidningen { position: absolute; inset: 0; z-index: 60; display: flex; flex-direction: column; align-items: center; overflow: hidden auto; overscroll-behavior: contain; touch-action: pan-y; padding: 16px 12px 10px; box-sizing: border-box; background: rgba(9, 6, 3, 0.76); animation: rt-in 0.22s ease-out; }
 @keyframes rt-in { from { opacity: 0; } to { opacity: 1; } }

@@ -448,7 +448,6 @@ window.RumHasse = (() => {
       slappSen();
       return;
     }
-    H.matcher = false;
     fraga();
     H.on = true;
     H.oppnar = false;
@@ -1099,7 +1098,9 @@ window.RumHasse = (() => {
     if (f) f();
   }
   // Meningen han läser syns i rutan: rutan rullar bara när den inte gör det.
-  function synas(ruta, el) {
+  function synas(text, el) {
+    // (under en dom rullar texten med lappen under den)
+    const ruta = text.closest('.rh-rull') || text;
     const r = el.getBoundingClientRect();
     const b = ruta.getBoundingClientRect();
     if (r.bottom > b.bottom) ruta.scrollTop += r.bottom - b.bottom + 8;
@@ -1390,16 +1391,14 @@ window.RumHasse = (() => {
     H.fraga = {};
     H.fas = 'fraga';
     H.prat = null;
-    // efter omgången dömer han gänget, och matcherna står bakom Matcherna (domarna nedan)
-    const sum = summan();
-    if (sum && !H.matcher && gangLista(sum)) return;
+    // efter omgången dömer han gänget (domarna nedan)
+    if (gangLista(summan())) return;
     const lista = kupongen();
     const fragat = minns(lista);
     const nu = Date.now();
-    s.innerHTML = `<h2 class="rh-sagt"></h2><div class="rh-lista"></div>${sum ? '<div class="rh-slut"><button type="button" class="rh-vag rh-tillgang">Gänget</button></div>' : ''}`;
-    if (sum) s.querySelector('.rh-tillgang').addEventListener('click', () => { H.matcher = false; fraga(); });
+    s.innerHTML = '<h2 class="rh-sagt"></h2><div class="rh-lista"></div>';
     const forsta = listan(lista, fragat);
-    const forstaText = sum ? lott(REP().domar.matcherna) : forstaRad(lista, fragat, forst);
+    const forstaText = forstaRad(lista, fragat, forst);
     if (forstaText) rad(forstaText);
     const dag = spelstopp(lista);
     H.prat = lista.length && forsta ? vantar(REP().ledig, 8, 14000, dag) : null;
@@ -1662,11 +1661,11 @@ window.RumHasse = (() => {
   // ---------- domarna efter omgången ----------
   //
   // När omgången är spelad och protokollet ligger på pulten (Rum.summa, tills nästa Stryktips kommer
-  // måndagen efter kl. 16) dömer han gänget: listan har var och en med rätt och poäng, bäst först, och
-  // den man väljer får sin dom slagen i disken i guld, som domen över en match, och några meningar om sin
-  // kupong (domar och domord i rum-hasse-repliker.js, läget i RumBlock.gang). Om sig själv säger han inget
-  // här. Raderna väljs efter omgången och personen, så att domen är densamma varje gång och på alla
-  // enheter. Matcherna står kvar bakom Matcherna, utan det han säger om hur det gick för honom (efterat).
+  // måndagen efter kl. 16) dömer han gänget. Listan har var och ens porträtt och namn i gängets ordning, som
+  // på kupongen, utan siffror. Den man väljer får sin dom slagen i disken i guld, som domen över en match,
+  // några meningar om sin kupong (domar och domord i rum-hasse-repliker.js, läget i RumBlock.gang) och lappen
+  // ur protokollet med kupongen och siffrorna (RumBlock.lapp). Om sig själv säger han inget här. Raderna väljs
+  // efter omgången och personen, så att domen är densamma varje gång och på alla enheter.
   const summan = () => (window.Rum && Rum.summa && window.RumBlock && RumBlock.gang && REP().domar ? Rum.summa() : null);
   // Samma rad för samma nyckel: ett tal ur nyckeln, inte slumpen.
   function fast(lista, nyckel) {
@@ -1694,34 +1693,38 @@ window.RumHasse = (() => {
     v.push(vem);
     try { localStorage.setItem(HORT, JSON.stringify({ id, vem: v })); } catch (e) { /* bara den här gången */ }
   }
-  // Porträttet i personens färg (som på kupongen), och siffrorna som i protokollet.
+  // Porträttet i personens färg (som på kupongen).
   const ansikte = (p) => `<span class="rh-ans"${p.bild ? ` style="background-image: url('${esc(p.bild)}')"` : ''}></span>`;
-  const siffror = (p) => (p.none ? '' : `${p.ok} rätt, ${RumBlock.poang(p.pts)}`);
+  // Gänget i sin ordning, så att var och en står på samma plats varje omgång.
+  const iOrdning = (sum) => RumBlock.gang(sum).sort((a, b) => a.hand - b.hand);
+  // Säsongen till lappen (data/tippare.json, som Olympen läser) utan omgångar som spoilerskyddet döljer, eller
+  // null så länge den inte är hämtad.
+  function sasong() {
+    if (typeof TP === 'undefined' || !TP.season) return null;
+    const dold = typeof tpRoundHidden === 'function' ? tpRoundHidden : () => false;
+    return (TP.season.rounds || []).filter((r) => !dold(r));
+  }
 
-  // Listan: var och en i gänget, bäst först, med rätt och poäng som i protokollet och ringen kring den
-  // bästas poäng. → false om det inte finns någon att döma.
+  // Listan: var och ens porträtt och namn, och ordet i guld under dem man har hört om. → false om det inte finns
+  // någon att döma.
   function gangLista(sum) {
-    const folk = RumBlock.gang(sum);
+    const folk = sum ? iOrdning(sum) : [];
     if (!folk.length) return false;
     const s = $('.rh-samtal');
     const r = REP();
     const h = hort(sum.id);
-    s.innerHTML = '<h2 class="rh-sagt"></h2><div class="rh-ghu" aria-hidden="true"><span>Rätt</span><span>Poäng</span></div><div class="rh-lista rh-gang"></div>' +
-      '<div class="rh-slut"><button type="button" class="rh-vag rh-tillmatcher">Matcherna</button></div>';
+    s.innerHTML = '<h2 class="rh-sagt"></h2><div class="rh-gang"></div>';
     const l = s.querySelector('.rh-gang');
     for (const p of folk) {
       const b = document.createElement('button');
       b.type = 'button';
-      b.className = `k${p.hand}`;
-      const ord = h.includes(p.id) ? r.domord[p.lage] : '';
-      const po = p.none ? '' : RumBlock.poang(p.pts);
-      b.innerHTML = `${ansikte(p)}<span class="rh-gnm"><span class="rh-namn">${esc(p.namn)}</span>${ord ? `<em>${esc(ord)}</em>` : ''}</span>` +
-        `<b class="rh-gratt">${p.none ? '–' : p.ok}</b><b class="rh-gpo">${p.bast ? `<span class="rh-vann">${po}${RumBlock.RING(70, 30)}</span>` : po}</b>`;
-      b.setAttribute('aria-label', `${p.namn}${p.none ? '' : `, ${siffror(p)}`}`);
+      b.className = `k${p.hand}${p.none ? ' inget' : ''}`;
+      const ord = h.includes(p.id) ? r.domord[p.lage] || '' : '';
+      b.innerHTML = `${ansikte(p)}<span class="rh-namn">${esc(p.namn)}</span><em>${esc(ord)}</em>`;
+      b.setAttribute('aria-label', ord ? `${p.namn}, ${ord}` : p.namn);
       b.addEventListener('click', () => doma(p.id));
       l.append(b);
     }
-    s.querySelector('.rh-tillmatcher').addEventListener('click', () => { H.matcher = true; fraga(); });
     const n = folk.filter((p) => h.includes(p.id)).length;
     rad(lott(n === folk.length ? r.domar.alla : n ? r.domar.igen : r.domar.fraga));
     H.prat = vantar(r.domar.ledig, 4, 20000);
@@ -1751,17 +1754,18 @@ window.RumHasse = (() => {
     return [mening(d.in[p.lage === 'forsakring' ? 'forst' : p.lage], 'in'), ...fakta.map((f) => f()), mening(d.ut[p.lage], 'ut')].filter(Boolean);
   }
 
-  // Du väljer någon i gänget: domen slås i disken (som i svara), texten står direkt och går att läsa upp,
-  // och sedan nästa du inte har hört om, eller hela gänget.
+  // Du väljer någon i gänget: domen slås i disken (som i svara), texten står direkt och går att läsa upp, och
+  // under den ligger lappen. Sedan nästa du inte har hört om, eller hela gänget.
   function doma(id) {
     const sum = summan();
-    const folk = sum ? RumBlock.gang(sum) : [];
+    const folk = sum ? iOrdning(sum) : [];
     const p = folk.find((x) => x.id === id);
     if (!p) { fraga(); return; }
     const s = $('.rh-samtal');
     vakna();
     tystna();
-    H.fraga = {};
+    const vem = {};
+    H.fraga = vem;
     H.fas = 'klar';
     H.prat = null;
     H.sagt = null;
@@ -1771,11 +1775,20 @@ window.RumHasse = (() => {
     const i = folk.indexOf(p);
     const nasta = [...folk.slice(i + 1), ...folk.slice(0, i)].find((q) => !h.includes(q.id));
     const d = REP().domord[p.lage] || '';
-    s.innerHTML = `<div class="rh-match rh-gvem k${p.hand}">${ansikte(p)}<span class="rh-namn">${esc(p.namn)}</span><small>${esc(siffror(p))}</small></div>` +
-      `<div class="rh-dom vantar${d.length > 7 ? ' lang' : ''}">${esc(d)}</div><div class="rh-text"></div>` +
+    s.innerHTML = `<div class="rh-match rh-gvem k${p.hand}">${ansikte(p)}<span class="rh-namn">${esc(p.namn)}</span></div>` +
+      `<div class="rh-dom vantar${d.length > 7 ? ' lang' : ''}">${esc(d)}</div>` +
+      `<div class="rh-rull"><div class="rh-text"></div>${RumBlock.lapp(sum, p.id, { sasong: sasong() })}</div>` +
       `<div class="rh-slut">${nasta ? `<button type="button" class="rh-knapp huvud rh-gnasta">Nästa: ${esc(nasta.namn)}</button>` : ''}<button type="button" class="rh-knapp${nasta ? '' : ' huvud'} rh-galla">Hela gänget</button></div>`;
     const ruta = repliker(domText(p, sum).map((text, n) => ({ text, ny: n === 0 })), { i: s.querySelector('.rh-text'), direkt: true }).ruta;
-    ruta.scrollTop = 0;
+    s.querySelector('.rh-rull').scrollTop = 0;
+    // säsongen kommer på lappen när den är hämtad
+    const vanta = !p.none && !sasong() ? datan(true) : null;
+    if (vanta) {
+      vanta.then(() => {
+        const l = H.fraga === vem && sasong() && s.querySelector('.rd-lapp');
+        if (l) l.outerHTML = RumBlock.lapp(sum, p.id, { sasong: sasong() });
+      });
+    }
     const dom = s.querySelector('.rh-dom');
     const visa = () => dom.classList.remove('vantar');
     const slag = ettAv('dom', 'slag');
@@ -1786,7 +1799,7 @@ window.RumHasse = (() => {
     if (Math.abs((sist ? sist.vila : H.T) - GEST.hem.vila) > 0.01) spela('hem');
     const slut = s.querySelector('.rh-slut');
     if (nasta) slut.querySelector('.rh-gnasta').addEventListener('click', () => doma(nasta.id));
-    slut.querySelector('.rh-galla').addEventListener('click', () => { H.matcher = false; fraga(); });
+    slut.querySelector('.rh-galla').addEventListener('click', () => fraga());
     lasKnapp(slut, ruta);
     klick();
   }
@@ -1861,6 +1874,8 @@ window.RumHasse = (() => {
     if (H.kupong && H.kupong.paDisken) H.kupong.borta();
     fraga();
     const l = $('.rh-lista');
+    // (har omgången hunnit bli spelad står gänget där i stället)
+    if (!l) return;
     l.scrollTop = H.listaTopp || 0;
     rad(lott(REP().gissar));
     if (!e.detail) {
@@ -2095,7 +2110,8 @@ window.RumHasse = (() => {
     H.vy.addEventListener('click', (e) => {
       // kupongen i handen: ett klick tar den med sig
       if (H.kupong && H.kupong.klickUtanfor(e)) { e.stopImmediatePropagation(); return; }
-      if (H.fas === 'fraga' || e.target.closest('a, button, .rh-kupong') || !e.target.closest('.rh-samtal')) return;
+      // (lappen under en dom är till för att titta på)
+      if (H.fas === 'fraga' || e.target.closest('a, button, .rh-kupong, .rd-lapp') || !e.target.closest('.rh-samtal')) return;
       e.stopImmediatePropagation();
       framat();
     }, true);
