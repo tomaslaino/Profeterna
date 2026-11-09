@@ -2968,7 +2968,7 @@ ${window.RumRegister ? RumRegister.nara() : ''}
     tur(() => import('./rum-saker.js').then((m) => m.saker(R.el, { calm: calm(), short, namn: tavelnamn, kant: kantutjamning(), enkel: Boolean(KVAL[R.kval].enkel) })).then((x) => { R.saker = x; R.sakDuk = R.el.querySelector('canvas.rum-saker'); sikt(R.sakDuk); kval(R.kval); frame(); }), 2)
       .catch((err) => console.warn('Rummet: sakerna kunde inte ritas', err));
     // lysröret, neonen, skyltarna, skivan, uret, ramarna, paketen och kupongstället (rum-inredning.js)
-    tur(() => import('./rum-inredning.js').then((m) => m.inredning(R.el, { calm: calm(), still, vagg: VAGG })).then((x) => { R.inr = x; tangenter(); x.namn(R.ramNamn); x.stopp(R.stopp); if (window.RumFolk && RumFolk.natt()) x.natt(true); if (R.sak) sak(R.sak, null); frame(); }), 1)
+    tur(() => import('./rum-inredning.js').then((m) => m.inredning(R.el, { calm: calm(), still, vagg: VAGG })).then((x) => { R.inr = x; tangenter(); x.namn(R.ramNamn); x.stopp(R.stopp); if (window.RumFolk && RumFolk.nattGrad) x.natt(RumFolk.nattGrad()); if (R.sak) sak(R.sak, null); frame(); }), 1)
       .catch((err) => console.warn('Rummet: inredningen kunde inte ritas', err));
     try {
       await tur(async () => {
@@ -5921,7 +5921,7 @@ ${window.RumRegister ? RumRegister.nara() : ''}
   // och sedan blinkar det igång (.rum-mork i rum.css).
   function tand(ready) {
     const m = document.getElementById('rum-mork');
-    if (!m || R.tant || calm() || (window.RumFolk && RumFolk.natt())) return;
+    if (!m || R.tant || calm() || (window.RumFolk && RumFolk.nattGrad && RumFolk.nattGrad() > 0)) return;
     R.tant = true;
     const t0 = performance.now();
     m.classList.add('start');
