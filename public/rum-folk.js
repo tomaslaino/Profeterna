@@ -37,6 +37,9 @@
 // gänget och lysröret i 3D – och på morgonen blinkar det igång igen. Nära
 // tv:n, videon, en sak eller med kupongen i handen är det ljust.
 //
+// Sömnen: mellan 22.30 och sju (Stockholms tid) sover gänget (somn i rum-3d.js),
+// och radion, matcherna eller ett klick på någon väcker dem.
+//
 // Dagen efter: dagen efter och dagen därpå efter att gängets kupong spelats
 // färdigt syns det hur det gick, efter betyget i historiken (4–5 bra, 1–2
 // illa; rum-3d.js efter) – utom med dolda resultat.
@@ -53,10 +56,13 @@
 //   RumFolk.ute(v)                                     klockan (Vader.nu())
 //   RumFolk.fyll(old, seen)                            de färdiga kupongerna och omgångarna
 //   RumFolk.natt()                                     är det natt?
+//   RumFolk.somn()                                     sover gänget (22.30–07)?
 //   RumFolk.senast()                                   hur den senaste kupongen gick (ansiktena)
 //   RumFolk.ansikte(betyg, n, fel)                     ansiktena efter en färdig kupong
 //
-// För bilder: ?rum-natt (=0 dag), ?rum-efter=bra|illa (=inget),
+// För bilder: ?rum-natt (=0 dag; gänget sover då också), ?rum-somn (=0 vakna)
+// gänget sover (utan att lysröret släcks), ?rum-vakna=dl:ryck:3 (DL vaknade med
+// ett ryck för tre sekunder sedan; strack, bakis), ?rum-efter=bra|illa (=inget),
 // ?rum-ansikte=jublar|glad|nojd|sur|deppig|orolig (=inget),
 // ?rum-pekar=dt:tv,dl:dj (som om de pekade), ?rum-hej=dl (som om man
 // pekade på DL), ?rum-vald=dl (som om man just hade blivit DL; dl:3 tre
@@ -78,7 +84,7 @@ window.RumFolk = (() => {
   const F = {
     el: null, o: null, on: false, ws: null, timer: 0, ping: 0, retry: 0, loop: 0,
     over: null, pa: null, mot: undefined, sent: undefined, sentAt: 0, sendT: 0, inne: {},
-    natt: null, efter: undefined, pek: null, typ: 'mouse', hejAt: -1, rorAt: 0, vem: null,
+    natt: null, somn: null, efter: undefined, pek: null, typ: 'mouse', hejAt: -1, rorAt: 0, vem: null,
   };
   const fig = () => (F.o && F.o.fig()) || null;
 
@@ -363,7 +369,18 @@ window.RumFolk = (() => {
     if (q.has('rum-natt')) return q.get('rum-natt') !== '0';
     return Boolean(v && v.timme < 6);
   }
+  // gänget sover från 22.30 till sju
+  function arSomn(v) {
+    if (q.has('rum-somn')) return q.get('rum-somn') !== '0';
+    if (q.has('rum-natt')) return q.get('rum-natt') !== '0';
+    return Boolean(v && (v.timme < 7 || v.timme * 60 + (v.minut || 0) >= 22 * 60 + 30));
+  }
   function ute(v) {
+    const s = arSomn(v);
+    if (s !== F.somn) {
+      F.somn = s;
+      somnTill();
+    }
     const on = arNatt(v);
     if (on === F.natt) return;
     const forr = F.natt;
@@ -389,6 +406,10 @@ window.RumFolk = (() => {
     if (f && f.natt) f.natt(F.natt, F.o.now());
     const inr = F.o && F.o.inr();
     if (inr && inr.natt) inr.natt(F.natt);
+  }
+  function somnTill() {
+    const f = fig();
+    if (f && f.somn && F.somn != null) f.somn(F.somn, F.o.now());
   }
 
   // ---------- dagen efter ----------
@@ -477,6 +498,16 @@ window.RumFolk = (() => {
       }
     }
     nattTill();
+    // (sömnen redan nu efter klockan, också innan vädret är hämtat)
+    if (F.somn == null) F.somn = arSomn(window.Vader ? Vader.nu() : null);
+    somnTill();
+    // ?rum-vakna=dl:ryck:3 (efter sömnen, så att hen sov)
+    if (f && f.vakna && q.has('rum-vakna')) {
+      for (const x of q.get('rum-vakna').toLowerCase().split(',')) {
+        const [k, satt, sek] = x.split(':');
+        if (GANG.includes(k)) f.vakna(k, o.now() - (parseFloat(sek) || 0), satt);
+      }
+    }
     andra();
     on(F.on || !el.hidden);
   }
@@ -498,5 +529,5 @@ window.RumFolk = (() => {
     }, 250);
   }
 
-  return { mount, on, ute, fyll, natt: () => Boolean(F.natt), senast: () => (F.senast !== undefined ? F.senast : senastAv(null)), ansikte: ansikteAv };
+  return { mount, on, ute, fyll, natt: () => Boolean(F.natt), somn: () => Boolean(F.somn), senast: () => (F.senast !== undefined ? F.senast : senastAv(null)), ansikte: ansikteAv };
 })();

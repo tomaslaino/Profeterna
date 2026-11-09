@@ -243,6 +243,14 @@ ingen falsk precision · sidan kraschar aldrig av en död källa · endast fria 
   *Sparad* hos alla när någon har sparat. Förut såg var och en bara sina egna kryss tills kupongen
   sparades och sajten hade byggts om (se *Gängets kupong i realtid* under
   [Inför uppgörelsen](#inför-uppgörelsen))
+- [x] **Gänget sover på natten (2026-11-09, användarens önskemål):** mellan 22.30 och sju sover
+  gänget i tobaksaffären, var och en på sitt sätt och nästan stilla – DL med huvudet bakåt och
+  flaskan i famnen, DT med hakan mot bröstet och huvudet som sjunker och rycker till, DJ med
+  huvudet på armarna på bordet – med små z som stiger i var och ens takt. Radion, matcherna eller
+  ett klick på någon väcker dem på ett av tre sätt (med ett ryck, sakta med en gäspning eller
+  bakfull med handen mot pannan och en återställare); först är de groggy med tunga ögonlock och
+  påsar under ögonen, sedan kommer de igång, och efter en stund utan musik eller klick somnar de
+  om. Lysröret släcks som förut vid midnatt (se *Sömnen* under [Tobaksaffären](#tobaksaffären))
 
 ## Publicering
 
@@ -2894,7 +2902,7 @@ påhitt och hur ofta beror på humöret (`MENY`):
 Den som leder omgången på sina egna tips lutar sig oftare bakåt med handen i nacken, och den
 som ligger sist sitter oftare med armarna i kors (när allas tips syns och minst tre matcher
 är avgjorda; delad ledning eller jumboplats räknas inte). Inga påhitt medan man väntar på
-kupongen, på natten, vid ett mål eller när man skålar med den som pekar på en, och det som
+kupongen, i sömnen och medan man vaknar, vid ett mål eller när man skålar med den som pekar på en, och det som
 pågår när humöret ändras gör färdigt sitt. Samma tid ger samma bild: luckorna och valen
 räknas ur klockan, och humöret minns när det ändrades.
 
@@ -3040,8 +3048,9 @@ Gänget dansar och sjunger bara till musik (`musik` i `KANALER`), inte till brus
 fjortonde sekund, två danser och en sång om vartannat, var för sig i en ordning som blandas om varje varv
 (mot tv:n bara när matcherna pågår, försångaren och tv-studion bara när alla tre är vakna och har lämnat in).
 De slutar först fyra sekunder efter att musiken har försvunnit, så att den som vrider på ratten inte får dem att
-börja om. Noter stiger ur radion så länge, stilla med minskad rörelse. Den som väntar på kupongen, sover eller är
-borta är inte med, och på natten är ingen det. Ett mål går före radion.
+börja om. Noter stiger ur radion så länge, stilla med minskad rörelse. Den som väntar på kupongen eller är borta
+är inte med. Den som sover vaknar av musiken (se *Sömnen* nedan) och kommer med allt eftersom hen piggnar till.
+Ett mål går före radion.
 
 Radion står i gängets duk, som är ritad för hela rummet. När kameran är framme ritas bara det som syns av duken,
 i närbildens skärpa (`narbild`), och duken läggs över just den delen: gänget står kvar och rör sig, och rummet
@@ -3102,7 +3111,7 @@ till vänster, och från höger bakom den som sitter bakom bordet och sedan för
 Stolen och det som står på bordet står kvar (`gaFlytta` flyttar tillbaka allt som har
 `userData.fast`), de andra tittar efter hen och när hen kommer tillbaka, och ett klick där hen
 går går igenom. Gänget gör inget tillsammans medan någon är borta, och ingen går medan någon
-väntar på kupongen, på natten, när matcherna pågår, medan gänget gör något tillsammans eller med
+väntar på kupongen, sover eller just har vaknat, när matcherna pågår, medan gänget gör något tillsammans eller med
 minskad rörelse. Duken som gänget ritas i går därför ända ut till scenens vänsterkant (1440 ×
 560 från vänster, `.rum-3d` i rum.css), så att man går ut ur bilden och inte ut ur duken
 framför dörren; kameran ritar den del av en bild med mitten i scenens mitt som duken täcker
@@ -3152,7 +3161,7 @@ tecknet pågår, drygt två sekunder. Medan man väntar är det handen med penna
 bakom örat så länge; annars är det den lediga handen, och DJ:s cigarett ligger på bordet så
 länge. Ett klick till medan det pågår byter tecken utan hopp. Figuren tittar på en,
 påhitten vilar, och flaskan skålar som förut när man pekar. Den som sover
-vaknar inte, men tummen kommer upp. Med minskad rörelse står tecknet som en bild en stund.
+vaknar i stället (se *Sömnen* nedan). Med minskad rörelse står tecknet som en bild en stund.
 I telefonen glider rummet så att den man tryckte på hamnar mitt i bild om hen stod långt ut
 (`visa` i rum.js), annars kunde handen hamna utanför.
 
@@ -3173,12 +3182,49 @@ blir det bara ett tecken.
 [public/rum-folk.css](public/rum-folk.css)): mellan midnatt och sex, Stockholms tid, är
 lysröret släckt. Rummet är mörkt utom där gatan lyser in genom fönstret och dörren, från
 tv:n och lite över pulten (samma lager som när lysröret tänds, med en annan mask), och
-rören och reflektorn i taket är grå. DJ sover med huvudet på bordet och ögonen stängda
-(armarna i kors under), DT:s cigarett har brunnit ner – ingen glöd, ingen rök – och han
-nickar till ibland, och DL tittar på text-tv, som lyser svagt blått på dem. Matcher på
-tv:n väcker dem, och den som inte har lämnat in är vaken med kupongen. Nära tv:n, videon,
+rören och reflektorn i taket är grå, och text-tv:n lyser svagt blått på gänget (som sover, se
+nedan; den som är vaken tittar på den). Nära tv:n, videon,
 en sak och med kupongen i handen är mörkret borta. Den som kommer in på natten får inget
 lysrör som tänds; är sidan öppen klockan sex blinkar det igång som när man kommer in.
+
+**Sömnen** (2026-11-09, användarens önskemål; `somn`, `SO`, `VAK`, `sovStil`, `sovKropp`, `VAKNA` och
+`groggW` i rum-3d.js, `arSomn` i rum-folk.js): mellan 22.30 och sju, Stockholms tid, sover gänget – också
+före midnatt och efter sex, när lysröret är tänt. Står sidan öppen klockan 22.30 somnar de en i taget
+(DL först, sedan DJ och sist DT): ögonlocken blir tunga, huvudet faller och rycker till några gånger, och
+sedan sover de. Var och en sover på sitt sätt och rör sig nästan inte, men andas i sin takt och gör något
+eget då och då:
+- **DL** sitter med huvudet bakåt och armarna i kors över magen, flaskan i famnen; huvudet rullar ibland
+  sakta åt sidan och ligger där en stund, och en fot rycker till.
+- **DT** sitter med hakan mot bröstet. Huvudet sjunker sakta i knappt tjugo sekunder tills han rycker till
+  och det kommer upp en bit, och kroppen vajar lite. Cigaretten har brunnit ner – ingen glöd, ingen rök.
+- **DJ** ligger fram över bordet med huvudet på armarna, vänt utåt, och flaskan ställd på bordet. Ryggen
+  häver sig när han andas, och ungefär var tredje minut rättar han till sig: axlarna upp och huvudet som
+  vrider sig och lägger sig igen. En hög högtidsbonad tar han av sig.
+- Den som inte har lämnat in har somnat med kupongen i handen: hen håller den löst framför magen, lite
+  lägre och mer lutad än vaken, med pennan kvar på den, och sitter med hakan mot bröstet som DT.
+
+Ögonen är stängda, och ansiktena är trötta och bakfulla: tunga ögonlock, påsar under ögonen, blek och
+munnen lite nedåt (`trott` i rum-uttryck.js; DT får då öppna ögon, som han annars inte har). Ur var och en
+stiger små z, ett per utandning: DT:s större och tätare (han snarkar), DJ:s långsamt och DL:s små (`zRita`).
+Bilderna av de trötta ansiktena byggs första gången någon sover eller vaknar och släpps en minut efter att
+ingen behöver dem (`TROTT`).
+
+**Det som väcker dem** är radion (alla, en i taget), matcher på tv:n (alla), ett klick på någon (bara hen;
+i stället för ett tecken), en kupong som lämnas in mitt i natten (den som lämnade in) och morgonen klockan
+sju (alla, en i taget). Var och en vaknar på ett av tre sätt, olika när de vaknar samtidigt:
+- *Med ett ryck* (`ryck`): sätter sig upp med ett skutt, tittar sig förvirrat omkring med öppna ögon,
+  gnuggar sig i ögonen och skakar liv i huvudet.
+- *Sakta* (`strack`): lyfter huvudet, sträcker på sig med armarna i luften och gäspar stort med munnen
+  vidöppen och ögonen hopknipna, och skakar på huvudet.
+- *Bakfull* (`bakis`): lyfter sakta huvudet och håller handen mot pannan en lång stund med ögonen stängda
+  (DJ den kalla flaskan), och tar sedan en återställare ur flaskan (DT ett bloss på den slocknade cigaretten).
+
+Efter uppvaknandet (åtta sekunder) är de groggy i drygt tjugo sekunder: framåtlutade med tunga ögonlock och långsamma
+blinkningar, huvudet som sjunker och rycker upp allt mer sällan och slappa ben. Under tiden växer det vanliga
+fram – klunkarna, blossen, pratet, påhitten och dansen till radion – tills de är som vanligt. De håller sig
+vakna så länge radion spelar eller matcherna pågår och två och en halv minut efter det senaste (eller efter
+klicket), och somnar sedan om på samma sätt som klockan 22.30. Ett nytt klick håller den vakne vaken längre.
+Den som sover tittar inte dit man pekar och skålar inte. Med minskad rörelse är de vakna direkt.
 
 **Dagen efter** (`efter` i rum-3d.js): dagen efter och dagen därpå att gängets kupong
 spelades färdigt (Stockholms dag) syns det vid bordet hur det gick, efter betyget i
@@ -3437,7 +3483,9 @@ kommer tillbaka (var fyrtionde sekund; `dl:5` fem sekunder in med `?rum-t`),
 `?rum-ansikte=jublar` (`glad`, `nojd`, `sur`, `deppig`, `orolig`) ansiktena (med `?rum-humor=`
 utan värde, så att omgången som spelas inte går före),
 `?rum-hej=dl` som om man pekade på DL, `?rum-vald=dl` som om man just hade klickat på
-DL (`dl:3` tre sekunder sedan; med `?rum-t` och den som inte har lämnat in), `?rum-natt` (`=0` dag) natten och
+DL (`dl:3` tre sekunder sedan; med `?rum-t` och den som inte har lämnat in), `?rum-natt` (`=0` dag) natten
+(gänget sover då också), `?rum-somn` (`=0` vakna) att gänget sover utan att lysröret släcks,
+`?rum-vakna=dl:ryck:3` att DL vaknade med ett ryck för tre sekunder sedan (`strack`, `bakis`; flera med komma) och
 `?rum-efter=bra` (`illa`, `inget`) dagen efter. Sidan
 sätter `data-rum-klar` på `body` när allt är ritat. Vädret och klockan utanför:
 `?rum-klocka=2026-12-13T16:00` (eller bara `16:00`, Stockholms tid), `?rum-vader=klart`,
