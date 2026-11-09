@@ -58,8 +58,10 @@
 // skålar över bordet, sjunger (på fem sätt: gungar i takt, faller in efter en
 // försångare, trummar i bordet, gör vågen och vajar med armarna, eller mot tv:n
 // när matcherna pågår), skrattar åt ett skämt (med ögonen hopknipna och munnen
-// öppen, skrattar), grälar medan den tredje tittar på, eller tittar upp på tv:n
-// när någon pekar.
+// öppen, skrattar), grälar medan den tredje tittar på, tittar upp på tv:n
+// när någon pekar, eller sitter bara och har det lugnt (zen-stunderna, på fem
+// sätt: andas med slutna ögon, dagdrömmer med händerna i nacken, blåser
+// rökringar, vaggar sakta eller tittar ut i fjärran).
 //
 // Efter ett mål som gick någons väg sjunger de (malSang), och den som tappade
 // raden sitter med armarna i kors. På fönsterbänken står en kassettradio: ett klick går
@@ -3661,7 +3663,7 @@ export async function figurer(canvas, opt = {}) {
   const dragW = (o, t) => Math.max(o.F.key === 'dt' ? gaKlunk(o, t) : 0, ready(o, t) * (1 - sovW(o, t) - slumW(o, t)) * (1 - aktW(o, t)) * (o.F.key === 'dt' ? bump(t % 12, 3, 4.2, 5.4, 6.6) : o.F.key === 'dj' ? bump((t + 5) % 16, 1, 2.2, 3.2, 4.4) : 0),
     o.F.key === 'dl' ? 0 : after(o, t, 0, 1.0, 2.6, 3.6));
   const talkW = (o, t) => (o.F.key === 'dj' ? ready(o, t) * (1 - dragW(o, t)) * (1 - sovW(o, t)) * (1 - aktW(o, t)) : 0);
-  const glowAt = (o, t) => Math.max(ready(o, t) * (1 - sovW(o, t) - slumW(o, t)) * (1 - aktW(o, t)) * (o.F.key === 'dt' ? bump(t % 12, 4, 4.4, 5.2, 5.8) : bump((t + 5) % 16, 2.1, 2.5, 3.0, 3.6)), after(o, t, 1.0, 1.4, 2.2, 2.8));
+  const glowAt = (o, t) => Math.max(ready(o, t) * (1 - sovW(o, t) - slumW(o, t)) * (1 - aktW(o, t)) * (o.F.key === 'dt' ? bump(t % 12, 4, 4.4, 5.2, 5.8) : bump((t + 5) % 16, 2.1, 2.5, 3.0, 3.6)), after(o, t, 1.0, 1.4, 2.2, 2.8), aktGlod(o, t));
 
   const mouthIn = (o) => {
     o.fig.updateMatrix(); o.torso.updateMatrix(); o.hg.updateMatrix(); o.hc.updateMatrix();
@@ -3884,16 +3886,17 @@ export async function figurer(canvas, opt = {}) {
   // PROV: ett påhitt som var och en gör om och om igen från at (prova, ?rum-akt)
   const PROV = {};
   // Gänget tillsammans: i var GRUPP_SLOT:e sekund ett påhitt ur GRUPP efter
-  // humöret, med chansen efter namnet (fyra gånger av fem när det går bra,
-  // varannan som vanligt, sällan när kupongen är död). Skämtet, grälet och tv:n kräver
-  // att alla tre är vakna och har lämnat in, och att matcherna inte pågår (ALLA).
+  // humöret, med chansen efter namnet (nästan nio gånger av tio när det går bra,
+  // två av tre som vanligt, sällan när kupongen är död). Skämtet, grälet, tv:n och
+  // zen-stunderna kräver att alla tre är vakna och har lämnat in, och att matcherna
+  // inte pågår (ALLA).
   const GRUPP = {
-    lugn: [['skamt', 0.18], ['gral', 0.12], ['titta', 0.1], ['skal', 0.06]],
-    glad: [['skal', 0.33], ['allsang', 0.27], ['skamt', 0.2]],
-    nerv: [['gral', 0.14], ['titta', 0.06]],
+    lugn: [['skamt', 0.18], ['gral', 0.12], ['titta', 0.1], ['skal', 0.06], ['zen', 0.2]],
+    glad: [['skal', 0.33], ['allsang', 0.27], ['skamt', 0.2], ['zen', 0.08]],
+    nerv: [['gral', 0.14], ['titta', 0.06], ['zen', 0.1]],
     deppig: [['skamt', 0.07]],
   };
-  const ALLA = new Set(['skamt', 'gral', 'titta', 'korsaSmitta']);
+  const ALLA = new Set(['skamt', 'gral', 'titta', 'korsaSmitta', 'zenAndas', 'zenDrom', 'zenRingar', 'zenVaggar', 'zenTyst']);
   const allaVakna = (t) => nattW(t) < 0.01 && tvW(t) < 0.01 && figs.every((o) => ready(o, t) > 0.99);
   // (utan hänsyn till den som går iväg, gaNu)
   function grupp0(t) {
@@ -3906,6 +3909,8 @@ export async function figurer(canvas, opt = {}) {
     if (hash(n * 3.19 + KORS_FRO) < 1.5 * korsChansAt(t0)) namn = 'korsaSmitta';
     // (allsången på ett av sina sätt)
     if (namn === 'allsang') namn = sangVal(n, t0);
+    // (och zen-stunderna på sina)
+    if (namn === 'zen') namn = zenVal(n, t0);
     if (!namn || (ALLA.has(namn) && !allaVakna(t0))) return null;
     const l = t - t0;
     return l < AKTER[namn].len ? { namn, l, t0, n } : null;
@@ -3964,6 +3969,7 @@ export async function figurer(canvas, opt = {}) {
   // utandningen efter blosset i skålen (DT)
   const blasW = (o, t) => {
     const x = aktNu(o, t);
+    if (x && x.a.blas) return x.a.blas(o, x.l, x) * vaken(o, t);
     if (x && x.namn === 'korsaSak' && !skalArm(o).thing) return bump(x.l, 5, 5.3, 6, 6.4) * vaken(o, t);
     return x && x.namn === 'skal' && !skalArm(o).thing ? bump(x.l, 5.4, 5.7, 6.6, 7.3) * vaken(o, t) : 0;
   };
@@ -4657,6 +4663,328 @@ export async function figurer(canvas, opt = {}) {
     skratt: (o, t, l) => Math.max(sjunger(l, TVS.in + 0.2, TVS.slut), l >= TVS.slut && l < TVS.ner ? 1 : 0),
   };
 
+  // ---------- zen-stunderna ----------
+  // Ibland sitter gänget bara och har det lugnt (GRUPP: oftast som vanligt, ibland
+  // när det går bra, och när det är nervöst andas de eller tittar ut i fjärran), på
+  // ett av fem sätt (zenVal):
+  //   zenAndas: ner med det som är i händerna, händerna uppåt på bordet med tummen
+  //     mot pekfingret, ryggen rak och ögonen stängda – djupa andetag i takt, och
+  //     mitt i kikar en på de andra och blundar igen;
+  //   zenDrom: bakåtlutade med händerna i nacken och blicken i taket, benen som
+  //     dinglar sakta – en slumrar till och vaknar med ett ryck, och en annan
+  //     skakar på huvudet åt hen;
+  //   zenRingar: de som röker blåser rökringar, en i taget (rökringarna nedan), och
+  //     de andra följer dem med blicken – den som inte röker petar sönder den sista;
+  //   zenVaggar: vaggar sakta med slutna ögon som till en låt bara de hör – en
+  //     börjar och de andra faller in – och nickar till varandra efteråt;
+  //   zenTyst: tittar ut i fjärran, suckar tillsammans och tar en klunk var (DT
+  //     ett bloss), en i taget.
+  // Samma sätt kommer inte tillbaka förrän tre andra har varit (ZEN_K).
+  const ZEN = ['zenAndas', 'zenDrom', 'zenRingar', 'zenVaggar', 'zenTyst'];
+  // Luckan → sättet. Sparas, så att det som har börjat inte byts (som RADIO_K), och
+  // sätten i de tre närmaste luckorna med zen kommer inte nu.
+  const ZEN_K = new Map();
+  function zenVal(n, t0) {
+    if (ZEN_K.has(n)) return ZEN_K.get(n);
+    const nara = [...ZEN_K].sort((a, b) => Math.abs(a[0] - n) - Math.abs(b[0] - n)).slice(0, 3).map((x) => x[1]);
+    const val = humAt(t0) === 'nerv' ? ['zenAndas', 'zenTyst'] : ZEN;
+    const fria = val.filter((v) => !nara.includes(v));
+    const av = fria.length ? fria : val;
+    const v = av[Math.floor(hash(n * 4.13 + 0.7) * av.length)];
+    ZEN_K.set(n, v);
+    return v;
+  }
+  // Händerna med fingrar: tummen mot pekfingret, flätade i nacken och pekfingret.
+  const MUDRA = { f: [0.6, 0.08, 0.14, 0.2], sp: [0.04, 0, 0.06, 0.12], tu: [0.15, 0.85, -0.5], tb: 0.25 };
+  const FLATAD = { f: [0.45, 0.48, 0.52, 0.55], sp: [0, 0, 0, 0], tu: [0.3, 0.85, -0.3], tb: 0.3 };
+  const PEK = { f: [0, 0.95, 1, 1], sp: [0, 0, 0, 0], tu: [-0.62, 0.5, -0.72], tb: 0.55 };
+  const ZEN_STOR = 1.08;
+  // Ner med det som är i handen på bordet (ner 0–1, som i dansen) och upp med handen till mal (k 0–1).
+  function zenHand(o, A, t, ner, mal, k) {
+    let p = handRest(o, A, t);
+    if (A.bench && ner > 0) p = lerpPose(p, grip(A.bench.matrix, (A.thing || A.cig).matrix, new THREE.Vector3(A.s, -0.4, -0.6)), ner);
+    return k > 0 ? lerpPose(p, mal, k) : p;
+  }
+  // Handen med handflatan uppåt på bordet, d in från kanten och x åt sin sida.
+  function handUpp(o, A, d, x) {
+    const { mot, kant, tvar } = motBord(o);
+    const p = mot.clone().multiplyScalar(kant + d).addScaledVector(tvar, A.s * x);
+    p.y = BORD.y + 4.5;
+    return { p, y: mot.clone().addScaledVector(tvar, A.s * 0.3).add(new THREE.Vector3(0, 0.04, 0)), z: new THREE.Vector3(0, -1, 0.05), pole: new THREE.Vector3(A.s, -0.4, -0.5) };
+  }
+  // Handen bakom huvudet (som nacke), för båda armarna.
+  function iNacken(o, A) {
+    const s = A.s;
+    const P = o.F.head;
+    const d = huvudAxlar(o);
+    return handflata(o, inHead(o, new THREE.Vector3(s * P.rx * 0.8, -P.ry * 0.16, -P.rz * 0.52)), d(-s * 0.42, 0.45, -0.8), d(s * 0.85, 0.1, -0.5), new THREE.Vector3(s, 0.6, 0.1));
+  }
+  // Fingrarna i ett påhitt (AKTER[…].fing → { form, k }), för pose; aktFingK hur mycket.
+  function aktFing(o, A, t) {
+    const x = aktNu(o, t);
+    const f = x && x.a.fing ? x.a.fing(o, A, x.l, x) : null;
+    return f ? { form: f.form, k: f.k * x.w } : null;
+  }
+  function aktFingrar(o, A, t) {
+    const f = aktFing(o, A, t);
+    return f && f.k > 0.02 ? { form: blanda(LOS, f.form, sm(0.1, 0.7, f.k)), stor: 1 + (ZEN_STOR - 1) * sm(0, 0.6, f.k) } : null;
+  }
+  const aktFingK = (o, A, t) => { const f = aktFing(o, A, t); return f ? f.k : 0; };
+  // Glöden i ett bloss i ett påhitt (AKTER[…].glod), för glowAt.
+  function aktGlod(o, t) {
+    const x = aktNu(o, t);
+    return x && x.a.glod ? x.a.glod(o, x.l, x) * x.w : 0;
+  }
+  // Var och ens plats i rollerna (a börjar, b och c följer efter).
+  const rollNr = (R, i) => (i === R.a ? 0 : i === R.b ? 1 : 2);
+  const rollVem = (R, j) => [R.a, R.b, R.c][j];
+
+  // Andas: tre djupa andetag i takt (andasIn 0 → 1 → 0 på ANDAS.per sekunder).
+  const ANDAS = { ner: 0.3, bord: 1.1, upp: 2.0, start: 2.5, per: 4.6, n: 3, kik: [6.6, 9.6], len: 18.6 };
+  ANDAS.slut = ANDAS.start + ANDAS.n * ANDAS.per;
+  const andasIn = (l) => { const f = (l - ANDAS.start) / ANDAS.per; return f < 0 || f > ANDAS.n ? 0 : 0.5 - 0.5 * Math.cos(2 * Math.PI * f); };
+  const andasK = (l) => bump(l, ANDAS.bord, ANDAS.upp, ANDAS.slut + 0.1, ANDAS.slut + 1.0);
+  AKTER.zenAndas = {
+    len: ANDAS.len, in: 0.4, ut: 0.4,
+    hand: (o, A, t, l) => {
+      const mal = handUpp(o, A, 9, 15);
+      mal.p.y += 0.8 * andasIn(l);
+      return zenHand(o, A, t, bump(l, ANDAS.ner, ANDAS.bord, ANDAS.len - 1.4, ANDAS.len - 0.5), mal, andasK(l));
+    },
+    fing: (o, A, l) => ({ form: MUDRA, k: andasK(l) }),
+    kropp: (o, t, l, x) => {
+      const e = bump(l, 0.8, 2.2, ANDAS.slut, ANDAS.slut + 1.2);
+      const a = andasIn(l);
+      const ut = { lean: -0.04 * e, pitch: (0.12 - 0.17 * a) * e, lift: 2.4 * a, breath: 0.08 * a - 0.02 * e, knee: [-0.05 * e, -0.05 * e] };
+      // c kikar: på a, sedan på b, med huvudet lite upp
+      const R = roller(x);
+      if (FI(o) !== R.c) return ut;
+      const [k0, k1] = ANDAS.kik;
+      return { ...ut, pitch: ut.pitch - 0.08 * bump(l, k0, k0 + 0.4, k1 - 0.4, k1), se: huvudPa(l < (k0 + k1) / 2 ? R.a : R.b), seW: 0.5 * bump(l, k0 + 0.1, k0 + 0.5, k1 - 0.5, k1 - 0.1) };
+    },
+    blund: (o, x) => x.l > ANDAS.upp && x.l < ANDAS.slut + 0.3 && !(FI(o) === roller(x).c && x.l > ANDAS.kik[0] && x.l < ANDAS.kik[1]),
+  };
+
+  // Dagdrömmen: händerna i nacken, bakåtlutad, blicken som vandrar i taket och benen
+  // som dinglar sakta. a slumrar till (huvudet sjunker), vaknar med ett ryck och
+  // tittar sig omkring; b tittar på hen och skakar på huvudet; c blundar en stund.
+  const DROM = { ner: 0.3, bord: 1.1, upp: 2.2, somn: [5.8, 9.4], ryck: 9.6, slut: 15.4, len: 17.4 };
+  const dromK = (l) => bump(l, DROM.bord, DROM.upp, DROM.slut, DROM.slut + 1.0);
+  AKTER.zenDrom = {
+    len: DROM.len, in: 0.4, ut: 0.4,
+    hand: (o, A, t, l) => zenHand(o, A, t, bump(l, DROM.ner, DROM.bord, DROM.len - 1.4, DROM.len - 0.5), iNacken(o, A), dromK(l)),
+    fing: (o, A, l) => ({ form: FLATAD, k: dromK(l) }),
+    kropp: (o, t, l, x) => {
+      const R = roller(x);
+      const i = FI(o);
+      const e = bump(l, 1.0, 2.6, DROM.slut - 0.4, DROM.slut + 1.0);
+      const g = 0.5 + i * 1.9;
+      const ut = {
+        lean: -0.16 * e,
+        pitch: (-0.26 + 0.05 * Math.sin(l * 0.47 + g)) * e,
+        yaw: 0.22 * Math.sin(l * 0.29 + g) * e,
+        knee: [0.2 * Math.sin(l * 1.2 + g) * e, 0.2 * Math.sin(l * 1.2 + g + 1.5) * e],
+      };
+      if (i === R.a) {
+        // somnar: huvudet sjunker framåt, och rycket: bakåt och upp, och blicken på de andra
+        const [s0, s1] = DROM.somn;
+        const sov = sm(s0, s1, l) * (1 - sm(DROM.ryck, DROM.ryck + 0.12, l));
+        const ryck = bump(l, DROM.ryck, DROM.ryck + 0.1, DROM.ryck + 0.25, DROM.ryck + 0.7);
+        const r = DROM.ryck;
+        ut.pitch += 0.62 * sov - 0.12 * ryck;
+        ut.yaw *= 1 - Math.max(sov, sm(r, r + 0.3, l) * (1 - sm(r + 2.6, r + 3.4, l)));
+        ut.lift = 3.5 * ryck;
+        ut.knee = ut.knee.map((k) => k * (1 - sov) + 0.25 * ryck);
+        return { ...ut, se: huvudPa(l < r + 1.4 ? R.b : R.c), seW: 0.6 * bump(l, r + 0.3, r + 0.6, r + 2.6, r + 3.4) };
+      }
+      if (i === R.b) {
+        const r = DROM.ryck;
+        const kv = bump(l, r + 0.3, r + 0.7, r + 2.8, r + 3.5);
+        return { ...ut, yaw: ut.yaw * (1 - kv) + 0.14 * Math.sin((l - r) * 7) * bump(l, r + 1.0, r + 1.3, r + 2.2, r + 2.6), se: huvudPa(R.a), seW: 0.85 * kv };
+      }
+      return ut;
+    },
+    blund: (o, x) => {
+      const R = roller(x);
+      const i = FI(o);
+      if (i === R.a) return x.l > DROM.somn[0] - 0.4 && x.l < DROM.ryck;
+      return i === R.c && x.l > 4.0 && x.l < 12.6;
+    },
+  };
+
+  // Rökringarna: den ena som röker (DT eller DJ, efter rollerna) tar ett djupt bloss,
+  // lutar huvudet bakåt och blåser tre ringar, en åt gången; en stund senare gör den
+  // andra likadant. De andra följer den senaste ringen med blicken, och den som inte
+  // röker (DL) petar sönder den sista med pekfingret – och de två tittar på varandra.
+  const RINGAR = { s: [0.5, 5.6], blas: [2.4, 3.15, 3.9], pet: 2.0, len: 16.6 };
+  const rokArm = (o) => o.arms.find((A) => A.cig);
+  function rokOrdning(x) {
+    const r = figs.filter(rokArm);
+    return roller(x).a % 2 ? [r[1], r[0]] : r;
+  }
+  const ringTider = (j) => RINGAR.blas.map((b) => RINGAR.s[j] + b);
+  const ringPet = () => ringTider(1)[2] + RINGAR.pet;
+  // Den yngsta ringen som syns ({ p, … } ur ringLage), för blickarna.
+  function nyssRing(x, t) {
+    let bast = null;
+    rokOrdning(x).forEach((o, j) => ringTider(j).forEach((b, i) => {
+      const L = ringLage(o, x, i, t);
+      if (L && L.age < 3.8 && L.brist < 0.5 && (!bast || L.age < bast.age)) bast = L;
+    }));
+    return bast;
+  }
+  AKTER.zenRingar = {
+    len: RINGAR.len, in: 0.6, ut: 1.0,
+    ringar: (o, x) => { const j = rokOrdning(x).indexOf(o); return j < 0 ? null : ringTider(j); },
+    stick: (o, x, i) => (rokOrdning(x).indexOf(o) === 1 && i === 2 ? ringPet() : null),
+    hand: (o, A, t, l, x) => {
+      const j = rokOrdning(x).indexOf(o);
+      if (j >= 0) {
+        if (A !== rokArm(o)) return null;
+        const s = RINGAR.s[j];
+        const dw = bump(l, s, s + 0.8, s + 1.6, s + 2.2);
+        return dw > 0 ? lerpPose(handRest(o, A, t), blossAt(o, A), dw) : null;
+      }
+      // den som inte röker: pekfingret till där den sista ringen är när den brister
+      if (A !== fri(o)) return null;
+      const pt = ringPet();
+      const pk = bump(l, pt - 0.9, pt - 0.1, pt + 0.4, pt + 1.2);
+      const L = pk > 0 ? ringLage(rokOrdning(x)[1], x, 2, x.t0 + pt) : null;
+      if (!L) return null;
+      const S0 = shoulder(o, A);
+      const P = iFig(o, L.p);
+      const dir = P.clone().sub(S0);
+      const n = o.F.a + o.F.b;
+      const len = dir.length();
+      dir.normalize();
+      const z = new THREE.Vector3(0, 1, 0).addScaledVector(dir, -dir.y).normalize();
+      const mal = { p: S0.clone().addScaledVector(dir, Math.min(len - o.F.arm * ZEN_STOR * 3.4, n * 0.95)), y: dir, z, pole: new THREE.Vector3(A.s, -0.6, -0.3) };
+      return lerpPose(handRest(o, A, t), mal, pk);
+    },
+    fing: (o, A, l, x) => {
+      if (rokOrdning(x).includes(o) || A !== fri(o)) return null;
+      const pt = ringPet();
+      return { form: PEK, k: bump(l, pt - 0.9, pt - 0.1, pt + 0.4, pt + 1.2) };
+    },
+    glod: (o, l, x) => {
+      const j = rokOrdning(x).indexOf(o);
+      if (j < 0) return 0;
+      const s = RINGAR.s[j];
+      return bump(l, s + 0.7, s + 1.0, s + 1.6, s + 1.9);
+    },
+    kropp: (o, t, l, x) => {
+      const ro = rokOrdning(x);
+      const j = ro.indexOf(o);
+      const pt = ringPet();
+      const ut = { lean: -0.04 * bump(l, 0.4, 1.4, RINGAR.len - 1.6, RINGAR.len - 0.6) };
+      const r = nyssRing(x, t);
+      if (j >= 0) {
+        const s = RINGAR.s[j];
+        const tider = ringTider(j);
+        // huvudet bakåt efter blosset, och en liten stöt framåt för varje ring
+        ut.pitch = -0.3 * bump(l, s + 1.8, s + 2.3, tider[2] + 0.4, tider[2] + 1.2)
+          + tider.reduce((a, b) => a + 0.07 * bump(l, b - 0.16, b - 0.05, b + 0.04, b + 0.3), 0);
+        // (bakom bordet vänd mot betraktaren: huvudet åt sidan, så att ringarna inte far över ansiktet)
+        ut.yaw = (o.F.plats === PLATSER[1] ? 0.6 : 0) * bump(l, s + 1.6, s + 2.2, tider[2] + 0.4, tider[2] + 1.2);
+        const blaser = l > s + 1.8 && l < tider[2] + 0.3;
+        if (j === 1 && l > pt + 0.2) {
+          const k = bump(l, pt + 0.3, pt + 0.7, pt + 2.4, pt + 3.0);
+          return { ...ut, se: huvudPa(FI(figs.find((q) => !ro.includes(q)))), seW: 0.6 * k };
+        }
+        if (!blaser && r) return { ...ut, se: r.p, seW: 0.75 };
+        if (l < s && j === 1) return { ...ut, se: huvudPa(FI(ro[0])), seW: 0.6 * bump(l, s - 4.6, s - 4.2, s - 0.6, s) };
+        return ut;
+      }
+      // den som inte röker: följer ringarna, lutar sig fram när hen petar och tittar sedan på den som blåste
+      const pk = bump(l, pt - 0.9, pt - 0.1, pt + 0.4, pt + 1.2);
+      ut.lean += 0.08 * pk;
+      ut.mitt = true;
+      if (l > pt + 0.2) return { ...ut, se: huvudPa(FI(ro[1])), seW: 0.6 * bump(l, pt + 0.3, pt + 0.7, pt + 2.4, pt + 3.0) };
+      if (r) return { ...ut, se: r.p, seW: 0.8 };
+      return { ...ut, se: huvudPa(FI(ro[0])), seW: 0.6 * bump(l, 0.3, 0.8, RINGAR.s[0] + 2, RINGAR.s[0] + 2.5) };
+    },
+  };
+
+  // Vaggar: sakta från sida till sida med slutna ögon (VAGG.per sekunder fram och
+  // tillbaka, i samma takt för alla), huvudet på sned med vaggningen, benen med och
+  // den lediga handen som flyter i luften. a börjar, b och c tittar på hen och faller
+  // in, och efteråt öppnar de ögonen, tittar på varandra och nickar.
+  const VAGG = { per: 3.8, in: [0.6, 2.6, 4.4], slut: 12.6, len: 16.4 };
+  const vaggW = (l, j) => sm(VAGG.in[j], VAGG.in[j] + 1.4, l) * (1 - sm(VAGG.slut, VAGG.slut + 1.2, l));
+  AKTER.zenVaggar = {
+    len: VAGG.len, in: 0.6, ut: 1.0,
+    hand: (o, A, t, l, x) => {
+      if (A !== fri(o)) return null;
+      const j = rollNr(roller(x), FI(o));
+      const w = vaggW(l, j);
+      if (w <= 0) return null;
+      const s = Math.sin((2 * Math.PI * l) / VAGG.per);
+      const n = o.F.a + o.F.b;
+      const { mot, tvar } = motBord(o);
+      const p = shoulder(o, A).addScaledVector(mot, n * 0.4).addScaledVector(tvar, A.s * (n * 0.12 + 4 * s)).add(new THREE.Vector3(0, -n * 0.24 + 2.5 * Math.sin((4 * Math.PI * l) / VAGG.per), 0));
+      const y = mot.clone().addScaledVector(tvar, 0.25 * s).add(new THREE.Vector3(0, -0.1 + 0.12 * s, 0));
+      return lerpPose(handRest(o, A, t), { p, y, z: new THREE.Vector3(0.12 * s, 1, 0.05), pole: new THREE.Vector3(A.s, -0.6, -0.4) }, w);
+    },
+    kropp: (o, t, l, x) => {
+      const R = roller(x);
+      const i = FI(o);
+      const j = rollNr(R, i);
+      const w = vaggW(l, j);
+      const s = Math.sin((2 * Math.PI * l) / VAGG.per);
+      const ut = { side: 0.08 * s * w, roll: 0.17 * s * w, twist: 0.03 * s * w, lean: -0.03 * w, pitch: 0.05 * w, knee: [0.14 * s * w, -0.14 * s * w] };
+      // efteråt: blicken på nästa, och en nick
+      const efter = bump(l, VAGG.slut + 0.3, VAGG.slut + 0.8, VAGG.len - 1.4, VAGG.len - 0.8);
+      if (efter > 0) return { ...ut, pitch: ut.pitch + 0.12 * bump(l, VAGG.slut + 1.3, VAGG.slut + 1.6, VAGG.slut + 1.8, VAGG.slut + 2.3), se: huvudPa(rollVem(R, (j + 1) % 3)), seW: 0.6 * efter };
+      // innan man faller in: blicken på den som har börjat
+      if (j > 0 && l < VAGG.in[j] + 0.4) return { ...ut, se: huvudPa(R.a), seW: 0.75 * bump(l, 0.9, 1.3, VAGG.in[j] - 0.1, VAGG.in[j] + 0.4) };
+      return ut;
+    },
+    blund: (o, x) => {
+      const j = rollNr(roller(x), FI(o));
+      return x.l > VAGG.in[j] + 0.6 && x.l < VAGG.slut + 0.3;
+    },
+  };
+
+  // Tystnaden: blicken ut i fjärran (var och en åt sitt håll, förbi den som tittar),
+  // en djup suck tillsammans – axlarna upp och ner – och en klunk var (DT ett bloss),
+  // en i taget, och sedan bakåtlutad en stund.
+  const TYST = { blick: [0.6, 2.2], suck: 3.8, klunk: [6.6, 8.6, 10.6], slut: 13.0, len: 15.2 };
+  const tystKlunk = (l, j) => { const s = TYST.klunk[j]; return bump(l, s, s + 0.7, s + 1.5, s + 2.2); };
+  AKTER.zenTyst = {
+    len: TYST.len, in: 0.6, ut: 1.0,
+    hand: (o, A, t, l, x) => {
+      if (A !== skalArm(o)) return null;
+      const dw = tystKlunk(l, rollNr(roller(x), FI(o)));
+      return dw > 0 ? lerpPose(handRest(o, A, t), A.thing ? supAt(o, A, t, dw) : blossAt(o, A), dw) : null;
+    },
+    glod: (o, l, x) => {
+      if (skalArm(o).thing) return 0;
+      const s = TYST.klunk[rollNr(roller(x), FI(o))];
+      return bump(l, s + 0.7, s + 1.0, s + 1.5, s + 1.8);
+    },
+    blas: (o, l, x) => {
+      if (skalArm(o).thing) return 0;
+      const s = TYST.klunk[rollNr(roller(x), FI(o))];
+      return bump(l, s + 2.0, s + 2.3, s + 3.0, s + 3.6);
+    },
+    kropp: (o, t, l, x) => {
+      const i = FI(o);
+      const dw = tystKlunk(l, rollNr(roller(x), i));
+      const su = TYST.suck;
+      const e = bump(l, TYST.blick[0], TYST.blick[1], TYST.slut, TYST.slut + 1.4);
+      const fjarran = new THREE.Vector3(BORD.x + 320 * (i - 1), 420, 2800);
+      return {
+        lean: -0.07 * e - (skalArm(o).thing ? 0.12 * dw : 0),
+        pitch: 0.08 * bump(l, su + 1.2, su + 1.8, su + 2.6, su + 3.6) - 0.06 * bump(l, su, su + 1.0, su + 1.2, su + 1.8) + (skalArm(o).thing ? -0.38 * dw : 0.06 * dw),
+        lift: 2.6 * bump(l, su, su + 1.0, su + 1.2, su + 2.0),
+        breath: 0.08 * bump(l, su, su + 1.0, su + 1.2, su + 1.9) - 0.04 * bump(l, su + 1.4, su + 2.0, su + 2.6, su + 3.4),
+        knee: [0.1 * Math.sin(l * 1.05 + i) * e, 0.1 * Math.sin(l * 1.05 + i + 1.8) * e],
+        se: fjarran,
+        seW: 0.8 * e * (1 - dw),
+      };
+    },
+  };
+
   // ---------- korstecknet ----------
   // Inför matcherna (AV, korsChans) korsar sig var och en ibland, på något av
   // sätten i KORS (rum-tecken.js) med högerhanden och handen med fingrar (pose).
@@ -5239,7 +5567,7 @@ export async function figurer(canvas, opt = {}) {
       // cigarett ligger på bordet så länge.
       if (A.fingerHand) A.fingerHand.visible = false;
       // (eller korstecknet: flaskan står på bordet så länge)
-      const fg = tk && tk.A === A && tk.w > TK_BYT ? { form: teckenHand(tk), stor: 1 + (TK_STOR - 1) * sm(TK_BYT, 0.8, tk.w) } : grepp > TK_BYT ? { form: blanda(LOS, LAPP_GREPP, sm(TK_BYT, 0.85, grepp)), stor: 1 + (TK_STOR - 1) * sm(TK_BYT, 0.8, grepp) * sm(0.05, 0.9, lp.lyft) } : ks && ks.A === A ? ks : dansFingrar(o, A, t);
+      const fg = tk && tk.A === A && tk.w > TK_BYT ? { form: teckenHand(tk), stor: 1 + (TK_STOR - 1) * sm(TK_BYT, 0.8, tk.w) } : grepp > TK_BYT ? { form: blanda(LOS, LAPP_GREPP, sm(TK_BYT, 0.85, grepp)), stor: 1 + (TK_STOR - 1) * sm(TK_BYT, 0.8, grepp) * sm(0.05, 0.9, lp.lyft) } : ks && ks.A === A ? ks : dansFingrar(o, A, t) || aktFingrar(o, A, t);
       if (fg) {
         if (!A.fingerHand) A.fingerHand = fingerHand(o.F.arm, o.hud, o.fig, A.s);
         // (den vanliga handen följer med osynlig: röken räknas ur cigaretten i den)
@@ -5530,7 +5858,7 @@ export async function figurer(canvas, opt = {}) {
         // ingen rök medan cigaretten ligger släckt och man väntar på kupongen
         if (src === 'glod') {
           const tk = teckenNu(o, tb);
-          alpha = 0.8 * (1 - dragW(o, tb) * 0.7) * sm(0.55, 0.62, uOf(o, tb)) * (1 - Math.max(slumW(o, tb), sovW(o, tb))) * (tk && tk.A === sk.A ? 1 - tk.w : 1) * (sk.A === o.arms[0] ? 1 - korsK(o, tb) : 1) * (1 - dansK(o, sk.A, tb)) * (LP[o.F.key] && o.arms[LP[o.F.key].i] === sk.A && LP[o.F.key].ut == null && !LP[o.F.key].ner ? 0 : 1);
+          alpha = 0.8 * (1 - dragW(o, tb) * 0.7) * sm(0.55, 0.62, uOf(o, tb)) * (1 - Math.max(slumW(o, tb), sovW(o, tb))) * (tk && tk.A === sk.A ? 1 - tk.w : 1) * (sk.A === o.arms[0] ? 1 - korsK(o, tb) : 1) * (1 - dansK(o, sk.A, tb)) * (1 - aktFingK(o, sk.A, tb)) * (LP[o.F.key] && o.arms[LP[o.F.key].i] === sk.A && LP[o.F.key].ut == null && !LP[o.F.key].ner ? 0 : 1);
         }
         else {
           // utandningen: strax efter blosset (och det första efter inlämningen)
@@ -5556,6 +5884,103 @@ export async function figurer(canvas, opt = {}) {
         sp.material.rotation = hash(seed + 2) * 6 + age * 0.3;
         sp.visible = true;
       });
+    }
+  }
+
+  // ---------- rökringarna ----------
+  // Ringar som blåses i ett påhitt (AKTER[…].ringar: när, i sekunder in i det, för
+  // den som röker; zenRingar). Var och en föds vid munnen och glider fram åt det
+  // håll huvudet var vänt, saktar in, stiger, vidgas och bleknar – en skiva vänd
+  // halvvägs mellan det håll den far och betraktaren, så att den syns snett men
+  // aldrig från kanten. Var munnen var och hur
+  // huvudet var vänt räknas en gång per ring (ringFodd, som emitter för röken), i
+  // den ordning de föds, så att samma tid ger samma bild. En ring som petas
+  // (AKTER[…].stick: när) brister: vidgas och försvinner.
+  const RING = { liv: 5.6, n: 3, fart: 42, broms: 0.45 };
+  const ringTex = canvasTex(128, 128, (g) => {
+    const gr = g.createRadialGradient(64, 64, 0, 64, 64, 64);
+    gr.addColorStop(0, 'rgba(228,230,234,0)');
+    gr.addColorStop(0.42, 'rgba(228,230,234,0.08)');
+    gr.addColorStop(0.6, 'rgba(232,234,238,0.75)');
+    gr.addColorStop(0.74, 'rgba(238,240,244,1)');
+    gr.addColorStop(0.88, 'rgba(228,231,235,0.45)');
+    gr.addColorStop(1, 'rgba(220,224,228,0)');
+    g.fillStyle = gr;
+    g.fillRect(0, 0, 128, 128);
+  });
+  const ringGeo = new THREE.PlaneGeometry(2, 2);
+  const RING_Z = new THREE.Vector3(0, 0, 1);
+  const RINGM = new Map();
+  for (const o of figs) {
+    if (!o.arms.some((A) => A.cig)) continue;
+    RINGM.set(o, Array.from({ length: RING.n }, () => {
+      const m = new THREE.Mesh(ringGeo, new THREE.MeshBasicMaterial({ map: ringTex, transparent: true, depthWrite: false, side: THREE.DoubleSide, opacity: 0, color: '#e4e6ea', toneMapped: false }));
+      m.visible = false;
+      root.add(m);
+      return m;
+    }));
+  }
+  const RING_F = new Map();
+  const ringNyckel = (o, tb) => `${o.F.key}${tb.toFixed(3)}`;
+  // Munnen och huvudets riktning när ringen föddes (i rummets axlar), och om
+  // påhittet var i gång då (ok).
+  function ringFodd(o, tb) {
+    const k = ringNyckel(o, tb);
+    if (RING_F.has(k)) return RING_F.get(k);
+    pose(o, tb);
+    o.fig.updateMatrix();
+    const h = huvudAxlar(o);
+    const x = aktNu(o, tb);
+    const dir = h(0, 0.85, 1).transformDirection(o.fig.matrix).normalize();
+    const f = { tb, p: mouthIn(o).addScaledVector(h(0, -0.1, 1), 3).applyMatrix4(o.fig.matrix), dir, vand: dir.clone().add(RING_Z).normalize(), ok: Boolean(x && x.w > 0.5) };
+    RING_F.set(k, f);
+    return f;
+  }
+  // Ring i av dem som o blåser i påhittet x, vid t: { p, r, age, brist, vand } eller
+  // null. Räknar bara med ringar som redan är födda (ringFodd i ringar): blickarna
+  // och handen frågar mitt i en ställning.
+  function ringLage(o, x, i, t) {
+    const a = x.a.ringar ? x.a.ringar(o, x) : null;
+    const b = a ? a[i] : null;
+    if (b == null) return null;
+    const tb = x.t0 + b;
+    const age = t - tb;
+    const f = RING_F.get(ringNyckel(o, tb));
+    if (age < 0 || age > RING.liv || !f || !f.ok) return null;
+    const p = f.p.clone().addScaledVector(f.dir, (RING.fart / RING.broms) * (1 - Math.exp(-RING.broms * age)));
+    p.y += 7 * age + 0.8 * age * age;
+    p.x += 1.6 * Math.sin(age * 1.3 + tb) * age;
+    const st = x.a.stick ? x.a.stick(o, x, i) : null;
+    return { p, age, vand: f.vand, r: 4 + 13 * (1 - Math.exp(-0.6 * age)), brist: st == null ? 0 : sm(st, st + 0.35, t - x.t0) };
+  }
+  function ringar(t) {
+    for (const [k, f] of RING_F) if (f.tb < t - 30 || f.tb > t + 30) RING_F.delete(k);
+    const fodda = [];
+    for (const [o, ms] of RINGM) {
+      const r = aktRa(o, t);
+      const x = r && AKTER[r.namn].ringar ? { ...r, a: AKTER[r.namn] } : null;
+      const a = x ? x.a.ringar(o, x) : null;
+      // (alla som är födda, också de som har bleknat: blickarna när en ring föds kan gå
+      // till en tidigare, så att samma tid ger samma bild)
+      ms.forEach((m, i) => {
+        const b = a ? a[i] : null;
+        if (b == null || t < x.t0 + b) m.visible = false;
+        else fodda.push({ o, m, i, x, tb: x.t0 + b });
+      });
+    }
+    if (!fodda.length) return;
+    fodda.sort((p, q) => p.tb - q.tb);
+    for (const r of fodda) ringFodd(r.o, r.tb);
+    for (const r of fodda) {
+      const L = ringLage(r.o, r.x, r.i, t);
+      if (!L || L.brist >= 1) { r.m.visible = false; continue; }
+      r.m.position.copy(L.p);
+      r.m.quaternion.setFromUnitVectors(RING_Z, L.vand);
+      const sc = L.r * (1 + 0.6 * L.brist);
+      const wob = 0.07 * Math.sin(L.age * 4.2 + r.tb);
+      r.m.scale.set(sc * (1 + wob), sc * (1 - wob), 1);
+      r.m.material.opacity = 0.9 * Math.min(1, L.age * 5) * (1 - L.age / RING.liv) ** 0.9 * (1 - L.brist);
+      r.m.visible = true;
     }
   }
 
@@ -5589,6 +6014,7 @@ export async function figurer(canvas, opt = {}) {
     lastMx = mx;
     // (röken först: den ställer figuren när blosset föddes, emitter)
     smoke(t);
+    ringar(t);
     for (const o of figs) pose(o, t);
     radioRita(t);
     // högtidens huvudbonad: lågorna i luciakronan fladdrar, och en hög bonad

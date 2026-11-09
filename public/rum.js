@@ -2230,7 +2230,7 @@ ${window.RumRegister ? RumRegister.nara() : ''}
 
   // ?rum-akt=dl:kors,dj:dunk: ett påhitt för bilder (rum-3d.js, AKTER) – mitt
   // i det med ?rum-t (dl:skamt@6: sex sekunder in), annars om och om igen från
-  // nu. Gängets påhitt (skamt, gral, titta, allsångerna) ges alla tre.
+  // nu. Gängets påhitt (skamt, gral, titta, allsångerna, zen-stunderna) ges alla tre.
   function provAkt() {
     const v = R.q.get('rum-akt');
     if (!v || !R.fig || !R.fig.prova) return;
