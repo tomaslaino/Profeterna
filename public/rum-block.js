@@ -241,8 +241,8 @@
   // ---------- lappen under domen ----------
   //
   // När Hasse dömer någon i gänget (doma i rum-hasse.js) lägger han fram en lapp ur protokollet om just den
-  // kupongen, på samma papper: en spalt per match med kryssen i personens bläck i rutorna 1, X och 2, det som
-  // satt överstruket som i protokollet och facit maskinskrivet under. Rödpennans stjärna står vid matchnumret
+  // kupongen, på protokollets blankett: en spalt per match med kryssen i personens bläck i rutorna 1, X och 2, det
+  // som satt överstruket med märkpennan som i protokollet och facit maskinskrivet under. Rödpennans stjärna står vid matchnumret
   // där ingen annan i gänget hade rätt. Under rutorna det som går att räkna ur kupongen: rätt, poäng (med
   // ringen kring vinnarens, som i protokollet), platsen i gänget, spelkassan (10 kr per match till modellens
   // odds, som i Olympen, kampKassa i kampen.js), spikarna och garderingarna, tipset med högst odds som satt
@@ -326,7 +326,8 @@
     const spalt = ({ r, t, ok, ensam }) => {
       const rutor = SIGNS.map((s) => {
         const x = t.includes(s);
-        return `<i${x ? ` class="x${s === r.tecken ? ' ratt' : ''}"` : ''}>${x ? kryss(`${sum.id}:${id}:${r.id}:${s}`) : ''}</i>`;
+        const key = `${sum.id}:${id}:${r.id}:${s}`;
+        return `<i${x ? ` class="x${s === r.tecken ? ' ratt' : ''}"` : ''}>${x && s === r.tecken ? strykning(key) : ''}${x ? kryss(key) : ''}</i>`;
       }).join('');
       const titel = `${r.nr}. ${r.h} – ${r.b}${r.mal ? ` ${r.mal}` : ''}${t ? ` · ${t}` : ''}`;
       return `<span class="rd-kol${ok ? ' ok' : ''}" title="${esc(titel)}"><u>${ensam ? STJARNA : ''}${r.nr}</u>${rutor}<b>${r.tecken}</b></span>`;
@@ -336,7 +337,7 @@
     // det som går att räkna
     const avgjorda = rader.filter((x) => x.t && x.prob != null);
     const kassa = avgjorda.reduce((a, x) => a + (x.ok ? KASSA / x.prob : 0), 0) - avgjorda.length * KASSA;
-    const falt = (la, v, av = '') => `<span class="rd-f"><small>${la}</small><span><b>${v}</b>${av ? `<em>${av}</em>` : ''}</span></span>`;
+    const falt = (la, v, av = '') => `<span class="rd-f"><small>${la}</small><span><b style="${hand(`${sum.id}:${id}:${la}`, 0.6)}">${v}</b>${av ? `<em>${av}</em>` : ''}</span></span>`;
     const po = poang(p.pts);
     const falten = [
       falt('Rätt', p.ok, `av ${p.n}`),
