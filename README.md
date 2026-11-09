@@ -722,6 +722,14 @@ bara lokalt. Analyserna visas som de ligger i `data/analyser.json`; hur de skriv
   och på-knapp". Stationsratten och tangenterna är borta: en spak under skalan sitter på samma ställe som
   visaren, en liten spak slår över mellan FM och AM, och POWER sätter på och stänger av. 49 stationer i stället
   för 22. Se [Tobaksaffären](#tobaksaffären), *Radion*.
+- **Alla stationer på tejpen, och frekvenserna på en lapp (2026-11-09, användarens önskemål):** "Kan du ordna
+  radiokanalerna så att de står redan från början", "gärna sett vilken nivå de ska vara på (exvis 890 för Sport
+  890 - annars blir det otydligt)" och "I värsta fall får du ha en handskriven lapp med information men absolut
+  inte den lilla texten där nere". Alla 49 stationer står på tejpen från början (man hittar dem inte längre), och
+  frekvenserna står på en handskriven lapp bredvid radion: FM på framsidan, AM på baksidan, och den vänds när
+  bandspaken slås om. Ett klick på en rad går dit, och den som hörs är inringad. Orden under radion är borta.
+  Frekvenserna fick inte plats på tejpen: där trängs AM-stationerna 610–999 (14 av 21) på en tredjedel av
+  skalan, och namnen står redan långt från sina frekvenser. Se [Tobaksaffären](#tobaksaffären), *Radion*.
 - **Man väljer sig själv med ett klick på sin figur (2026-11-03, användarens önskemål):**
   ett klick på sin egen figur vid bordet gör en till den som fyller i kupongen – samma val
   som porträtten på kupongen – och figuren räcker upp handen med pennan, lyfter kupongen mot
@@ -2883,12 +2891,16 @@ båda banden, som på en riktig radio, så ett byte av band hamnar sällan på e
 station drar radion in den, och en liten röd lampa säger att den stämmer. Mellan stationerna hörs brus, på AM
 också knaster och en pipton som sjunker tills man står rätt. AM låter dessutom som AM: smalt band och långsam
 fading, som också syns på lampan. Lysdioderna och högtalarna följer det som faktiskt hörs (en analysator i
-Web Audio). En station man har hört en stund är hittad: den skrivs för hand på maskeringstejpen vid skalan (FM
-ovanför i blått, AM under i rött, två rader där varannan står närmast skalan, `radioSkriv`, varje station har sin
-plats från början så att inget flyttar sig) och står som ett ord under radion, och ett klick på ordet går dit och
-sätter på radion. Orden visar bara bandet som spaken står på: med alla 49 hittade blir det annars en hel spalt. Italo
-Disco är hittad från början, och visaren står där första gången. Visaren, volymen och det man har hittat sparas i
-webbläsaren, och radion är var och ens egen: den syns inte hos de andra och stängs av när man lämnar rummet.
+Web Audio). Alla stationer står för hand på maskeringstejpen vid skalan (FM ovanför i blått, AM under i rött, två
+rader där varannan står närmast skalan, `tejpPlats`). Där trängs de, så frekvenserna står på en handskriven lapp
+bredvid radion (`lappen` i rum-radio.js): bandet som spaken står på, med tejpens penna på linjerat papper, FM på
+framsidan och AM på baksidan, och den vänds när spaken slås om. Namnet står som stationen heter, utan frekvensen
+en gång till (*890 Sport*, *102,5 RTL*). Ett klick på en rad går dit och sätter på radion, och den station som hörs
+är inringad. Lappen syns när kameran är framme, och närbilden ger plats åt den (`RumRadio.ram`, `ram` i `SAKER` i
+rum.js): bredvid radion eller under den, i en, två eller tre spalter, det som ger den största radion (en spalt
+bredvid i en stor datorskärm, två under på telefonen på höjden och tre bredvid på tvären). Första gången står
+visaren på Italo Disco. Visaren och volymen sparas i webbläsaren, och radion är var och ens egen: den syns inte
+hos de andra och stängs av när man lämnar rummet.
 
 Gänget dansar och sjunger bara till musik (`musik` i `KANALER`), inte till brus eller prat: något nytt var
 fjortonde sekund, två danser och en sång om vartannat, var för sig i en ordning som blandas om varje varv
@@ -2902,7 +2914,7 @@ i närbildens skärpa (`narbild`), och duken läggs över just den delen: gänge
 kostar mindre än på håll (en fjärdedel av trianglarna, uppmätt 2026-11-08). Skalans, tejpens och
 kassettens dukar ritas om större första gången (`radioFin`), och de små delarna ritas bara på väg fram och nära
 (`radioDetalj`). Radion kostar 2 % fler ritningar i rummet än bergsprängaren. `?rum-sak=radio` visar närbilden
-och `?rum-radio-lage=fm:104.3` hur den står inställd, utan ljud (`&rum-radio-alla`: allt är hittat); `?rum-radio`
+och `?rum-radio-lage=fm:104.3` hur den står inställd, utan ljud; `?rum-radio`
 sätter på gänget och lysdioderna (`=4` sedan fyra sekunder, med `?rum-t`), också det utan ljud.
 
 **Dansen** (2026-11-08, `DANSER` i rum-dans.js, `dansPose`, `dansHand` och `dansFingrar` i rum-3d.js):
@@ -2939,7 +2951,7 @@ Adresserna går direkt till servrarna, eftersom ljudet går genom Web Audio och 
 inte går att spela (`live1.sr.se`, `stream.laut.fm`). Slutar en adress svara provas reservadressen (där det
 finns en) och sedan samma adress utan Web Audio, utan AM-ljud och med lysdioderna i dansens takt. Därefter är det
 brus och ett nytt försök om en stund. Alla spelade i Chrome 2026-11-08 på Mac (`A.klar` och att tiden gick). Ljudet
-måste sättas igång av ett tryck, och det gör reglagen och orden. Stationerna hämtas först när visaren står på
+måste sättas igång av ett tryck, och det gör reglagen och lappen. Stationerna hämtas först när visaren står på
 dem, och släpps fem sekunder efter att den har lämnat dem. Låtarna är kanalernas; sajten visar inte vad som spelas.
 
 Skämtet, grälet och tv:n kommer bara när alla tre har lämnat in och är vakna och matcherna

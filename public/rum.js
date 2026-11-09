@@ -48,7 +48,7 @@
 // hålls och vad man gör med den (två sekunder in), ?rum-ga=dl:5 att DL går iväg
 // (fem sekunder in), ?rum-video videon nära och
 // ?rum-sak=ur|skar|ram|kort|pokal|kork|vm94|ifk|nacional|lopsedel|chelsea|dorr|kupong|radio en närbild,
-// ?rum-radio-lage=fm:104.3 hur kassettradion står inställd (utan ljud), &rum-radio-alla med alla stationer hittade.
+// ?rum-radio-lage=fm:104.3 hur kassettradion står inställd (utan ljud).
 //
 // Läses efter kupong.js, samtal.js, tippare.js och kronan.js och använder
 // deras hjälpare (state, KP, TP, gradeRow, couponNumber, currentCoupon,
@@ -2086,7 +2086,7 @@ ${window.RumRegister ? RumRegister.nara() : ''}
 
   // ?rum-radio: radion på fönsterbänken är på (=4: sedan fyra sekunder, med ?rum-t; rum-3d.js).
   function provRadio() {
-    if (R.q.has('rum-radio-lage') && window.RumRadio) RumRadio.prova(R.q.get('rum-radio-lage'), R.q.has('rum-radio-alla'));
+    if (R.q.has('rum-radio-lage') && window.RumRadio) RumRadio.prova(R.q.get('rum-radio-lage'));
     if (R.q.get('rum-sak') === 'radio') sak('radio', null);
     if (!R.q.has('rum-radio') || !R.fig || !R.fig.radio) return;
     R.fig.radio(true, now() - (Number(R.q.get('rum-radio')) || 0));
@@ -3469,7 +3469,8 @@ ${window.RumRegister ? RumRegister.nara() : ''}
   // pokaler var och en har. Ingen av
   // dem leder ut ur rummet: Esc eller ett klick går tillbaka.
   //   el saken, mal det kameran siktar på (annars saken), h hur mycket av
-  //   höjden den får, duk duken i 3D, fot under den, pult saken ligger på
+  //   höjden den får, duk duken i 3D, fot under den, ram(rutan, topp, höjd) zoomen
+  //   och var sakens mitt står (det som står bredvid den), pult saken ligger på
   //   pulten (inget tonar bort), tv tv:n står framför den (och tonar bort),
   //   under foten står så här mycket av sakens höjd längre ner (remsan på skivan)
   const SAKER = {
@@ -3489,8 +3490,9 @@ ${window.RumRegister ? RumRegister.nara() : ''}
     chelsea: { el: '#rum-chelsea', h: 0.86, duk: 'skiva' },
     // (en hel tidningssida: hög, så att rubriken och fotot blir stora)
     nacional: { el: '#rum-nacional', h: 0.94, duk: 'skiva' },
-    // kassettradion (rum-radio.js): gänget står kvar, och skalan och reglagen kommer när kameran är framme
-    radio: { el: '#rum-radio', h: 0.98, duk: 'skiva', radio: true, fot: () => (window.RumRadio ? RumRadio.fot() : '') },
+    // kassettradion (rum-radio.js): gänget står kvar, och skalan, reglagen och lappen med frekvenserna
+    // bredvid radion kommer när kameran är framme
+    radio: { el: '#rum-radio', h: 0.98, duk: 'skiva', radio: true, ram: (r, top, h) => (window.RumRadio ? RumRadio.ram(r.width, r.height, top, h) : null) },
   };
   // Pokalerna per person (fill), flest först, i var och ens färg.
   function pokalFot() {
@@ -3584,12 +3586,12 @@ ${window.RumRegister ? RumRegister.nara() : ''}
     const html = S.fot ? S.fot(a) : '';
     const top = 64;
     const h = innerHeight - top - (html ? 112 : 64);
-    const zoom = Math.min((innerWidth * 0.9) / r.width, (h * S.h) / r.height);
-    const cy = top + h / 2;
+    const ram = (S.ram && S.ram(r, top, h)) || { zoom: Math.min((innerWidth * 0.9) / r.width, (h * S.h) / r.height), x: innerWidth / 2, y: top + h / 2 };
+    const { zoom } = ram;
     fot.innerHTML = html;
-    fot.style.top = `${r1(cy + r.height * zoom * (0.5 + (S.under || 0)) + 14)}px`;
+    fot.style.top = `${r1(ram.y + r.height * zoom * (0.5 + (S.under || 0)) + 14)}px`;
     if (html) fot.classList.add('on');
-    aim(p, zoom, [(innerWidth / 2 - R.ox) / R.k, (cy - R.oy) / R.k], cls);
+    aim(p, zoom, [(ram.x - R.ox) / R.k, (ram.y - R.oy) / R.k], cls);
     // duken i 3D ritas skarpare när kameran är framme
     if (S.duk) R.skarp = setTimeout(() => { if (R.sak === namn && R.inr) R.inr.skarp(S.duk, zoom * R.k * 1.035 * (devicePixelRatio || 1)); }, cls ? 620 : 0);
     if (S.radio) R.rSkarp = setTimeout(() => { if (R.sak === namn) radioNara(true); }, cls ? 640 : 0);

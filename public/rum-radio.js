@@ -10,25 +10,25 @@
 // (på AM dessutom knaster och den pipton som sjunker när man närmar sig stationen). Samma visare går över
 // båda banden, som på en riktig radio, så ett byte av band hamnar sällan på en station.
 //
-// En station som man har hört en stund är hittad: den skrivs på tejpen vid skalan och står som ett ord
-// under radion (bara bandet som spaken står på), och ett klick på ordet går dit (hittade, sparas i
-// webbläsaren). Italo Disco är hittad från början, och visaren står där första gången.
+// Alla stationer står för hand på tejpen vid skalan (FM ovanför, AM under), och bredvid radion ligger en
+// handskriven lapp med frekvenserna för bandet som spaken står på (lappen: den vänds när spaken slås om).
+// Ett klick på en rad på lappen går dit och sätter på radion. Första gången står visaren på Italo Disco.
 //
 // Ljudet går genom Web Audio (allt är CORS-öppet, kontrollerat 2026-11-08): AM låter som AM (smalt band
 // och långsam fading), och lysdioderna och högtalarna följer det som faktiskt hörs. Slutar en adress
 // svara provas reservadressen och sedan samma adress utan Web Audio (A.fri), så att en station som
-// har bytt server ändå hörs. Ljudet måste sättas igång av ett tryck, och det gör reglagen och orden. Gänget sjunger och dansar till musik (fig.radio), inte till
+// har bytt server ändå hörs. Ljudet måste sättas igång av ett tryck, och det gör reglagen och lappen. Gänget sjunger och dansar till musik (fig.radio), inte till
 // brus eller prat, och slutar inte förrän fyra sekunder efter att musiken har försvunnit: den som drar i
 // spaken ska inte få dem att börja om. Radion stängs av när man lämnar rummet (av).
 //
 //   RumRadio.mount({ el, fig, now })     när gänget har laddats
 //   RumRadio.nara(på)                    reglagen läggs över radion (kameran är framme) eller tas bort
-//   RumRadio.fot()                       orden under radion
+//   RumRadio.ram(b, h, topp, hojd)       närbilden: radion (b × h utan zoom) och lappen bredvid den i fönstret
 //   RumRadio.kraft()                     POWER: på med bandet som spaken står på, eller av
 //   RumRadio.bandspak('fm' | 'am')       bandspaken (är radion av flyttas bara spaken)
 //   RumRadio.av()                        stäng av
-//   RumRadio.prova('fm:104.3', alla)     för bilder, utan ljud (?rum-radio-lage, ?rum-radio-alla)
-//   RumRadio.lage()                      hur det står till (band, frekvens, kanal, hörs, hittade)
+//   RumRadio.prova('fm:104.3')           för bilder, utan ljud (?rum-radio-lage)
+//   RumRadio.lage()                      hur det står till (band, frekvens, kanal, hörs)
 window.RumRadio = (() => {
   // lasa: så här nära är stationen ren, tappa: så här långt bort har den försvunnit i bruset
   const BAND = {
@@ -39,7 +39,7 @@ window.RumRadio = (() => {
   // (direkt till servrarna: live1.sr.se och flera andra skickar vidare utan CORS, och då spelas inget)
   const sr = (x) => ({ url: `https://edge1.sr.se/${x}-mp3-96`, reserv: `https://edge2.sr.se/${x}-mp3-96` });
   const rai = (x) => `https://icecdn-19d24861e90342cc8decb03c24c8a419.msvdn.net/icecastRelay/${x}/icecast`;
-  // (i frekvensordning: orden under radion står som de står här)
+  // (i frekvensordning: lappen står som de står här)
   const KANALER = [
     { id: 'skargard', band: 'fm', f: 88.1, namn: 'Skärgårdsradion', kort: 'Skärgård', url: khz('fm06'), musik: true },
     { id: 'dansband', band: 'fm', f: 88.7, namn: 'Dansbandskanalen', kort: 'Dansband', url: 'https://stream.dbmedia.se/dbkMP3', musik: true },
@@ -97,23 +97,22 @@ window.RumRadio = (() => {
   const kl = (x, a = 0, b = 1) => Math.min(b, Math.max(a, x));
   const mjuk = (a, b, x) => { const t = kl((x - a) / (b - a)); return t * t * (3 - 2 * t); };
 
-  // Det som sparas: visaren, volymen och vad man har hittat (och radion är av när man kommer tillbaka)
+  // Det som sparas: visaren och volymen (och radion är av när man kommer tillbaka)
   const NYCKEL = 'rum-radio';
-  const S = { band: 'av', sist: 'fm', p: pAv('fm', 90.4), vol: 0.55, hittade: ['italo'] };
+  const S = { band: 'av', sist: 'fm', p: pAv('fm', 90.4), vol: 0.55 };
   try {
     const x = JSON.parse(localStorage.getItem(NYCKEL) || 'null');
     if (x) {
       if (Number.isFinite(x.p)) S.p = kl(x.p);
       if (Number.isFinite(x.vol)) S.vol = kl(x.vol);
       if (BAND[x.sist]) S.sist = x.sist;
-      if (Array.isArray(x.hittade)) S.hittade = [...new Set(['italo', ...x.hittade.filter((i) => kanal(i))])];
     }
   } catch (err) { /* då börjar den från början */ }
   let sparaT = 0;
   function spara() {
     clearTimeout(sparaT);
     sparaT = setTimeout(() => {
-      try { localStorage.setItem(NYCKEL, JSON.stringify({ p: S.p, vol: S.vol, sist: S.sist, hittade: S.hittade })); } catch (err) { /* bara den här gången */ }
+      try { localStorage.setItem(NYCKEL, JSON.stringify({ p: S.p, vol: S.vol, sist: S.sist })); } catch (err) { /* bara den här gången */ }
     }, 400);
   }
 
@@ -122,7 +121,7 @@ window.RumRadio = (() => {
   // visaren: den går mot mal (N.mal) med lite tröghet, och ljudet följer den
   const N = { mal: S.p, raf: 0, sen: 0, drag: false };
   // ljudet (A.ctx först efter ett tryck)
-  const A = { ctx: null, el: null, fri: null, friPa: false, steg: 0, kanal: null, klar: false, narmast: null, s: 0, fade: 1, las: 0, slapp: 0, hittaT: 0, gangT: 0, gang: false, omT: 0, fel: {}, basSn: 0 };
+  const A = { ctx: null, el: null, fri: null, friPa: false, steg: 0, kanal: null, klar: false, narmast: null, s: 0, fade: 1, las: 0, slapp: 0, gangT: 0, gang: false, omT: 0, fel: {}, basSn: 0 };
 
   function narmast(band, f) {
     let bast = null;
@@ -348,9 +347,6 @@ window.RumRadio = (() => {
       param(A.visG.gain, 0, 0.02);
       if (!pa && A.kanal) slapp();
     }
-    // hittad: den som har hörts en stund på rätt ställe
-    clearTimeout(A.hittaT);
-    if (k && hors && s > 0.7 && !S.hittade.includes(k.id)) A.hittaT = setTimeout(() => hittad(k), 900);
     // gänget: musik sätter igång dem direkt, och de slutar först en stund efter att musiken är borta
     const musik = Boolean(pa && k && k.musik && hors && s > 0.5);
     if (musik || !pa) {
@@ -361,7 +357,7 @@ window.RumRadio = (() => {
       A.gangT = setTimeout(() => { A.gangT = 0; gangSatt(false); }, 4000);
     }
     till3d({ s: hors ? s * (S.band === 'am' ? 0.45 + 0.55 * A.fade : 1) : s * 0.12 });
-    fotNu();
+    lappNu();
   }
   // Hur mycket som hörs just nu, till lysdioderna och högtalarna (rum-3d.js, radioRita).
   function niva() {
@@ -405,15 +401,7 @@ window.RumRadio = (() => {
     const g = fig();
     if (!g || !g.radioLage) return;
     g.radioLage({ band: S.band, sist: S.sist, p: S.p, vol: S.vol, lampa: S.band === 'av' ? 0 : 1, niva });
-    g.radioEtiketter(KANALER.map((k) => ({ id: k.id, band: k.band, p: pAv(k.band, k.f), kort: k.kort })), S.hittade);
-  }
-  function hittad(k) {
-    if (O.tyst || S.hittade.includes(k.id)) return;
-    S.hittade.push(k.id);
-    spara();
-    const g = fig();
-    if (g && g.radioSkriv) g.radioSkriv(k.id, O.now());
-    fotOm(k.id);
+    g.radioEtiketter(KANALER.map((k) => ({ id: k.id, band: k.band, p: pAv(k.band, k.f), kort: k.kort })));
   }
 
   // ---------- visaren ----------
@@ -466,7 +454,7 @@ window.RumRadio = (() => {
     till3d({ band, sist: S.sist, lampa: band === 'av' ? 0 : 1 });
     lyssna();
     knappar();
-    fotBand();
+    lappBand();
     spara();
   }
   const KLONK = [820, 0.055, 0.65];
@@ -483,7 +471,7 @@ window.RumRadio = (() => {
     S.sist = band;
     till3d({ sist: band });
     knappar();
-    fotBand();
+    lappBand();
     spara();
   }
   function volym(v) {
@@ -504,7 +492,8 @@ window.RumRadio = (() => {
 
   // ---------- reglagen ----------
   // Genomskinliga knappar över delarna i 3D, placerade när kameran är framme. Fingret når dem också
-  // när radion är liten (MINST), och i bilden ser man den riktiga delen röra sig under.
+  // när radion är liten (MINST), och i bilden ser man den riktiga delen röra sig under. Lappen med
+  // frekvenserna (nedan) står bland dem.
   const U = { el: null, pa: false };
   const MINST = 42;
   function bygg() {
@@ -518,7 +507,8 @@ window.RumRadio = (() => {
       + '<div class="r-del r-spak" role="slider" tabindex="0" aria-label="Stationsspaken" aria-valuemin="0" aria-valuemax="100"></div>'
       + '<div class="r-del r-ratt r-vol" role="slider" tabindex="0" aria-label="Volymen" aria-valuemin="0" aria-valuemax="100"></div>'
       + '<button type="button" class="r-del r-kraft" aria-label="På och av"></button>'
-      + '<button type="button" class="r-del r-band"></button>';
+      + '<button type="button" class="r-del r-band"></button>'
+      + `<div class="r-lapp"><div class="r-vand">${lappSida('fm')}${lappSida('am')}</div></div>`;
     O.el.append(d);
     U.el = d;
     // (reglagen är inget drag i rummet: svepet i rum.js ska inte se dem, och inte stoppa nästa klick)
@@ -529,6 +519,13 @@ window.RumRadio = (() => {
     U.vol = d.querySelector('.r-vol');
     U.kraft = d.querySelector('.r-kraft');
     U.band = d.querySelector('.r-band');
+    U.lapp = d.querySelector('.r-lapp');
+    U.lapp.addEventListener('click', (e) => {
+      const b = e.target.closest('.r-st');
+      if (b) valj(b.dataset.k);
+    });
+    lappBand();
+    lappNu();
     U.kraft.addEventListener('click', kraft);
     // bandspaken: upp är FM och ner är AM, och ett tryck slår över den
     let y0 = null;
@@ -654,6 +651,7 @@ window.RumRadio = (() => {
     satt(U.vol, d.vol);
     satt(U.kraft, d.kraft);
     satt(U.band, d.band);
+    lappPlats();
   }
   function nara(pa) {
     bygg();
@@ -665,51 +663,83 @@ window.RumRadio = (() => {
     }
   }
 
-  // ---------- orden under radion ----------
-  // Bara bandet som spaken står på: med alla stationer hittade är det annars en hel spalt ord.
-  const ordHtml = (k) => `<button type="button" class="r-ord" data-k="${k.id}">${k.namn}</button>`;
-  const ordLista = (band) => KANALER.filter((k) => k.band === band && S.hittade.includes(k.id)).map(ordHtml).join('');
-  const fot = () => `<div class="radio-fot" data-radio data-band="${S.sist}">${ordLista(S.sist)}</div>`;
-  function fotBand() {
-    const f = document.querySelector('.radio-fot');
-    if (!f || f.dataset.band === S.sist) return;
-    f.dataset.band = S.sist;
-    f.innerHTML = ordLista(S.sist);
-    f.dataset.nu = '\u0000';
-    fotNu();
+  // ---------- lappen ----------
+  // En handskriven lapp bredvid radion med frekvenserna för bandet som spaken står på: FM på framsidan och AM
+  // på baksidan, med samma pennor som på tejpen, och den vänds när spaken slås om. Den står bland reglagen och
+  // syns när kameran är framme. ram() ger närbilden plats för den: bredvid radion eller under, i en, två eller
+  // tre spalter, det som ger den största radion. Ett klick på en rad går dit och sätter på radion, och den
+  // station som hörs är inringad.
+  const frekvens = (k) => (BAND[k.band].steg < 1 ? k.f.toFixed(1).replace('.', ',') : String(k.f));
+  // (frekvensen står redan framför namnet: Sport 890 blir Sport och RTL 102.5 blir RTL)
+  const lappNamn = (k) => k.namn.split(' ').filter((o) => o.replace(',', '.') !== String(k.f)).join(' ') || k.namn;
+  function lappSida(band) {
+    const rader = KANALER.filter((k) => k.band === band).map((k) => `<li><button type="button" class="r-st" data-k="${k.id}"><span class="r-f">${frekvens(k)}</span>${lappNamn(k)}</button></li>`);
+    return `<div class="r-sida r-${band}"><p class="r-rubrik">${BAND[band].namn}<small>${BAND[band].enhet}</small></p><ol>${rader.join('')}</ol></div>`;
   }
-  function fotNu() {
-    const f = document.querySelector('.radio-fot');
-    if (!f) return;
-    const nu = S.band !== 'av' && A.narmast && A.s > 0.5 ? A.narmast.id : null;
-    if (f.dataset.nu === (nu || '')) return;
-    f.dataset.nu = nu || '';
-    for (const b of f.querySelectorAll('.r-ord')) b.classList.toggle('nu', b.dataset.k === nu);
+  function lappSpalter(n) {
+    for (const ol of U.lapp.querySelectorAll('ol')) ol.style.setProperty('--rader', String(Math.ceil(ol.children.length / n)));
   }
-  // (ett nytt ord kommer på sin plats i frekvensordning och tonar fram; de som står flyttar sig så lite det går)
-  function fotOm(id) {
-    const f = document.querySelector('.radio-fot');
-    if (!f) return;
-    const k = kanal(id);
-    if (k.band !== f.dataset.band) return;
-    const t = document.createElement('template');
-    t.innerHTML = ordHtml(k);
-    const b = t.content.firstChild;
-    b.classList.add('ny');
-    const fore = [...f.querySelectorAll('.r-ord')].find((x) => kanal(x.dataset.k).f > k.f);
-    f.insertBefore(b, fore || null);
-    f.dataset.nu = '\u0000';
-    fotNu();
+  // Närbilden: b × h är rutan runt radion (#rum-radio) utan zoom, och topp och hojd den del av fönstret som
+  // den och lappen får. → zoomen och var radions mitt ska stå i fönstret.
+  function ram(b, h, topp, hojd) {
+    bygg();
+    const W = innerWidth;
+    const kant = 10;
+    const lucka = Math.round(Math.min(40, Math.max(14, W * 0.022)));
+    const dold = U.el.hidden;
+    U.el.style.visibility = 'hidden';
+    U.el.hidden = false;
+    U.lapp.hidden = false;
+    Object.assign(U.lapp.style, { left: '0px', top: '0px' });
+    let bast = null;
+    // (fler spalter eller lappen under radion bara om radion blir tydligt större av det)
+    const prova = (z, sida, n, m) => { if (z > 0 && (!bast || z > bast.z * 1.03)) bast = { z, sida, n, m }; };
+    for (const n of [1, 2, 3]) {
+      lappSpalter(n);
+      const m = { w: U.lapp.offsetWidth, h: U.lapp.offsetHeight };
+      if (m.h <= hojd) prova(Math.min((W - 2 * kant - lucka - m.w) / b, (hojd * 0.98) / h), true, n, m);
+      if (m.w <= W - 2 * kant) prova(Math.min((W * 0.9) / b, (hojd - lucka - m.h) / h), false, n, m);
+    }
+    U.el.hidden = dold;
+    U.el.style.visibility = '';
+    if (!bast) {
+      U.ram = null;
+      return { zoom: Math.min((W * 0.9) / b, (hojd * 0.98) / h), x: W / 2, y: topp + hojd / 2 };
+    }
+    lappSpalter(bast.n);
+    const { z, m } = bast;
+    U.ram = { sida: bast.sida, m, kant, lucka, topp, hojd };
+    if (bast.sida) return { zoom: z, x: (W - (b * z + lucka + m.w)) / 2 + (b * z) / 2, y: topp + hojd / 2 };
+    return { zoom: z, x: W / 2, y: topp + (hojd - (h * z + lucka + m.h)) / 2 + (h * z) / 2 };
+  }
+  // (när kameran är framme: bredvid eller under radion, som ram() har bestämt)
+  function lappPlats() {
+    const q = U.ram;
+    const rr = O.el.querySelector('#rum-radio');
+    U.lapp.hidden = !q || !rr;
+    if (U.lapp.hidden) return;
+    const a = rr.getBoundingClientRect();
+    let x = q.sida ? a.right + q.lucka : (a.left + a.right - q.m.w) / 2;
+    let y = q.sida ? (a.top + a.bottom - q.m.h) / 2 : a.bottom + q.lucka;
+    x = Math.max(q.kant, Math.min(innerWidth - q.kant - q.m.w, x));
+    if (q.sida) y = Math.max(q.topp, Math.min(q.topp + q.hojd - q.m.h, y));
+    Object.assign(U.lapp.style, { left: `${x.toFixed(1)}px`, top: `${y.toFixed(1)}px` });
+  }
+  function lappBand() {
+    if (!U.lapp) return;
+    U.lapp.dataset.band = S.sist;
+    for (const b of Object.keys(BAND)) U.lapp.querySelector(`.r-${b}`).inert = b !== S.sist;
+  }
+  function lappNu() {
+    if (!U.lapp) return;
+    const nu = S.band !== 'av' && A.narmast && A.s > 0.5 ? A.narmast.id : '';
+    if (U.nu === nu) return;
+    U.nu = nu;
+    for (const b of U.lapp.querySelectorAll('.r-st')) b.classList.toggle('nu', b.dataset.k === nu);
   }
 
   function mount(o) {
     Object.assign(O, o);
-    O.el.addEventListener('click', (e) => {
-      const b = e.target.closest && e.target.closest('.radio-fot .r-ord');
-      if (!b) return;
-      e.preventDefault();
-      valj(b.dataset.k);
-    });
     allt3d();
   }
   function av() {
@@ -720,10 +750,9 @@ window.RumRadio = (() => {
     lyssna();
     knappar();
   }
-  // För bilder: 'fm:104.3' eller 'av', utan ljud. alla: allt är hittat.
-  function prova(lage, alla) {
+  // För bilder: 'fm:104.3' eller 'av', utan ljud.
+  function prova(lage) {
     O.tyst = true;
-    if (alla) S.hittade = KANALER.map((k) => k.id);
     const [band, f] = String(lage || 'fm').split(':');
     if (BAND[band]) {
       S.band = band;
@@ -743,11 +772,10 @@ window.RumRadio = (() => {
     hors: Boolean(A.klar),
     laddad: A.kanal && A.kanal.id,
     s: A.s,
-    hittade: S.hittade.slice(),
     gang: A.gang,
     tid: A.el ? A.el.currentTime : 0,
     ctx: A.ctx && A.ctx.state,
   });
 
-  return { BAND, KANALER, mount, nara, placera, fot, av, prova, lage, valj, kraft, bandspak, volym };
+  return { BAND, KANALER, mount, nara, placera, ram, av, prova, lage, valj, kraft, bandspak, volym };
 })();
