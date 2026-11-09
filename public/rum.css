@@ -833,9 +833,10 @@ canvas.rum-neonhalo { opacity: var(--sken, 0.28); }
   box-sizing: border-box;
   padding: 10px 11px 0 15px;
   transform: perspective(1100px) rotateX(40deg) rotateZ(-6deg);
+  /* papperet tonas i koppens ljus när koppen är ritad (--nota-a och --nota-b, rum-hasse-hand.js) */
   background: var(--pp-grain),
               repeating-linear-gradient(180deg, rgba(0, 0, 0, 0) 0 22px, rgba(70, 100, 170, 0.2) 22px 23px) 0 13px / 100% calc(100% - 13px) no-repeat,
-              linear-gradient(180deg, #f3efe3, #e2dbc8);
+              linear-gradient(180deg, var(--nota-a, #f3efe3), var(--nota-b, #e2dbc8));
   color: #25336f;
   font: 600 19px/23px Caveat, cursive;
   box-shadow: 0 16px 18px rgba(0, 0, 0, 0.5);

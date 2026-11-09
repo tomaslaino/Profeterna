@@ -46,6 +46,12 @@ const vec3 GATA = vec3(.54, .19, .82);
 const vec3 ROR = vec3(.72, .42, .55);
 const vec3 FONSTER = vec3(.62, .2, .76);
 const vec3 VY = vec3(${VY});
+// dagsljuset genom fönstret (en del av ljus()): stort, så ljuset sveper långt runt (mjuka skuggor), och
+// himlen ger lite ljus överallt
+vec3 dagsljus(vec3 n) {
+  float f = clamp(dot(normalize(n + .6 * VY), FONSTER) * .6 + .4, 0., 1.);
+  return uDag.rgb * (.08 + .95 * f * f) * uButik;
+}
 vec3 ljus(vec3 n) {
   float k = max(0., dot(n, NYCKEL) * .86 + .14);
   vec3 a = mix(vec3(.28, .225, .19), vec3(.43, .395, .36), .5 + .5 * n.y);
@@ -57,18 +63,18 @@ vec3 ljus(vec3 n) {
   float g = clamp(dot(ns, GATA) * .5 + .5, 0., 1.);
   // lysröret: ett brett sken från affären och lite mer ljus överallt
   float d = clamp(dot(ns, ROR) * .55 + .45, 0., 1.);
-  // fönstret: stort, så ljuset sveper långt runt (mjuka skuggor), och himlen ger lite ljus överallt
-  float f = clamp(dot(ns, FONSTER) * .6 + .4, 0., 1.);
   float dag = uDag.w;
   float lys = uLys.w;
   float natt = nattGrad();
   vec3 b = l * vec3(.95, .93, .92) * (1. + .16 * lys) * (1. - .5 * dag)
     + vec3(.27, .027, .022) * r * r * r * (1. - .55 * lys) * (1. - .7 * dag) * (1. + .4 * natt)
     + vec3(.06, .085, .14) * g * g * (1. - lys) * (1. - dag) * (1. + 1.6 * natt)
-    + uLys.rgb * (.1 + .62 * d * d) * (1. - .5 * dag)
-    + uDag.rgb * (.08 + .95 * f * f);
-  return mix(l, b, uButik);
+    + uLys.rgb * (.1 + .62 * d * d) * (1. - .5 * dag);
+  return mix(l, b, uButik) + dagsljus(n);
 }
+// Det vita på disken (notan, koppen, fatet och askkoppen): ljusets styrka, men färgen bara dagsljusets, så
+// att det skiftar med det som i rummet men inte blir rosa av neonskylten och barens lampor.
+vec3 ljusVitt(vec3 n) { vec3 d = dagsljus(n); return vec3(dot(ljus(n) - d, vec3(.2126, .7152, .0722))) + d; }
 float fotoLjus(vec3 n) { return max(.3, .42 + .58 * dot(n, vec3(-.249, .549, .798))); }
 vec3 kant(vec3 n, float styrka) {
   vec3 bak = mix(vec3(.62, .62, -.48), vec3(-.55, .62, -.56), uButik);
@@ -105,6 +111,36 @@ const medVy = (fs, bord) => (bord.vy ? fs.replace(VY_RAD, `const vec3 VY = vec3(
 // (ljuset i rum-hasse.js).
 export const DAG = { value: new THREE.Vector4(0, 0, 0, 0) };
 export const LYS = { value: new THREE.Vector4(0, 0, 0, 0) };
+
+// Färgen på något vitt som ligger på disken i ljuset (ljusVitt), med den starkaste kanalen 1: för det som
+// inte ritas med three, som notan på pulten i rummet (rum.css), så att det tonas som koppen bredvid.
+// Räknas av grafikkortet med samma kod, på en bildpunkt.
+export function vittTon(r, bord) {
+  const mal = new THREE.WebGLRenderTarget(1, 1);
+  const g = new THREE.PlaneGeometry(2, 2);
+  const m = new THREE.ShaderMaterial({
+    uniforms: { uButik: bord.butik || BUTIK_AV, uDag: bord.dag || DAG, uLys: bord.lys || LYS },
+    depthTest: false,
+    depthWrite: false,
+    vertexShader: 'void main() { gl_Position = vec4(position.xy, 0., 1.); }',
+    // (halva, eftersom ljuset kan vara starkare än 1)
+    fragmentShader: medVy(`precision highp float;\n${LJUS}\nvoid main() { gl_FragColor = vec4(ljusVitt(vec3(0., 1., 0.)) * .5, 1.); }`, bord),
+  });
+  const s = new THREE.Scene();
+  s.add(new THREE.Mesh(g, m));
+  const px = new Uint8Array(4);
+  const forr = r.getRenderTarget();
+  r.setRenderTarget(mal);
+  r.render(s, new THREE.Camera());
+  r.readRenderTargetPixels(mal, 0, 0, 1, 1, px);
+  r.setRenderTarget(forr);
+  mal.dispose();
+  g.dispose();
+  m.dispose();
+  const c = [px[0], px[1], px[2]];
+  const max = Math.max(...c, 1);
+  return c.map((x) => x / max);
+}
 export const ingenBord = () => ({ value: new THREE.Vector4(0, 1, -1e9, -1e9) });
 
 // figurens kamera (rum-hasse-3d.js): ögat på höjden CY, CZ framför fotots plan
@@ -722,9 +758,8 @@ void main() {
   float y = uRand > .5 ? vL.x : vL.y;
   for (int i = 0; i < 3; i++) { float m = smoothstep(uBand[i].x - .8, uBand[i].x + .8, y) * (1. - smoothstep(uBand[i].y - .8, uBand[i].y + .8, y)); c = mix(c, vec3(.22, .34, .6), m); }
   if (uKaffe > .5) c = vec3(.11, .055, .03);
-  // ljusets styrka men inte dess färg, som notan (rum-hasse-3d.js): porslinet är vitt som den ritade koppen i
-  // rummet (rum.js), inte rosa av neonskylten
-  vec3 ut = c * dot(ljus(n), vec3(.2126, .7152, .0722)) * .9;
+  // vitt porslin, som den ritade koppen i rummet (rum.js), i dagsljusets färg (ljusVitt)
+  vec3 ut = c * ljusVitt(n) * .9;
   // nära bordet blir det mörkare, och det är en blank yta
   ut *= uRand > .5 ? 1. : .62 + .38 * smoothstep(0., 34., vL.y);
   // (mot kameran, som står snett och lite högre i baren)
@@ -916,7 +951,8 @@ void main() {
   float inne = (1. - smoothstep(70., 78., r)) * (1. - smoothstep(13., 18., y));
   float ab = brus(vL.xz * .09) * .6 + brus(vL.xz * .31) * .4;
   c = mix(c, vec3(.58, .56, .53) * (.7 + .5 * ab), inne * smoothstep(.3, .6, ab + .2 * (1. - r / 70.)));
-  vec3 ut = c * ljus(n) * .9;
+  // vitt porslin som koppen (ljusVitt)
+  vec3 ut = c * ljusVitt(n) * .9;
   // mörkare mot disken och inne i skålen
   ut *= .64 + .36 * smoothstep(0., 20., y);
   ut *= 1. - .18 * (1. - smoothstep(60., 82., r)) * smoothstep(20., 30., 40. - y);
