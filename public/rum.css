@@ -361,6 +361,12 @@ canvas.rum-neonhalo { opacity: var(--sken, 0.28); }
   font-size: 5px;
   line-height: 1.2;
 }
+.rum-kork .kup { transform: rotate(var(--rot, 0deg)); transform-origin: 50% 0; transition: transform 0.2s, box-shadow 0.2s; }
+/* nära lyfter kupongen från tavlan när man pekar på den, överst om den ligger under en annan, och medan
+   protokollet är framme (korkProtokoll i rum.js) är den borta från nålen */
+.rum.sak-nara .rum-kork .kup[data-kup]:hover { z-index: 2; transform: rotate(var(--rot, 0deg)) scale(1.05); box-shadow: 2px 6px 8px rgba(0, 0, 0, 0.45); }
+.rum-kork .kup.nere { visibility: hidden; }
+.rum-kork .kup.nere > .nal { visibility: visible; }
 .rum-kork .kup::before { content: ""; display: block; height: 4px; margin: -3px -3px 2px; background: #c8643a; }
 .rum-kork .kt { display: block; font-weight: 800; font-size: 5.5px; }
 .rum-kork .tk { display: grid; grid-template-columns: repeat(5, 1fr); gap: 1px 2px; margin-top: 2px; }
@@ -400,6 +406,14 @@ canvas.rum-neonhalo { opacity: var(--sken, 0.28); }
   border-radius: 50%;
   background: none;
 }
+/* Kupongstället på disken: länken ligger över stället (rum-inredning.js, före
+   kortregistrets länk där de möts), och duken i 3D lyser som saken när man
+   pekar på länken. Ett klick tar en kupong för nästa omgång i handen. */
+.rum-stall { position: absolute; display: block; z-index: 2; }
+.rum-pl:has(> .rum-stall:focus-visible) > .rum-stall-duk { filter: brightness(1.18) drop-shadow(0 0 10px rgba(240, 214, 153, 0.35)); }
+@media (hover: hover) { .rum-pl:has(> .rum-stall:hover) > .rum-stall-duk { filter: brightness(1.18) drop-shadow(0 0 10px rgba(240, 214, 153, 0.35)); } }
+.rum.sak-nara .rum-pl > .rum-stall-duk { filter: none; }
+.rum-stall-duk { transition: filter 0.25s ease; }
 /* rummet vrids rakt medan kameran går fram till en sak */
 .rum.sak-nara .rum-world { transition: transform 0.6s cubic-bezier(0.3, 0, 0.2, 1); }
 /* och vrids med kameran fram till tv:n, videon, anslagstavlan och kortregistret (vrid) */

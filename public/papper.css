@@ -20,7 +20,7 @@
    inte är förtryckt blir maskinskrivet av sig självt. En skrivmaskin har inget
    fetstilt, så inget får tjockas till (font-synthesis): det som ska framhållas
    stryks under. */
-.pp, .rum-kup, .rum-blad, .rum-block, dialog.mr-modal {
+.pp, .rum-kup, .rum-blad, .rum-block, .rd-lapp, dialog.mr-modal {
   --display: var(--skriv);
   --sans: var(--skriv);
   --serif: var(--skriv);
