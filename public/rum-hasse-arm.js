@@ -720,7 +720,9 @@ void main() {
   float y = uRand > .5 ? vL.x : vL.y;
   for (int i = 0; i < 3; i++) { float m = smoothstep(uBand[i].x - .8, uBand[i].x + .8, y) * (1. - smoothstep(uBand[i].y - .8, uBand[i].y + .8, y)); c = mix(c, vec3(.22, .34, .6), m); }
   if (uKaffe > .5) c = vec3(.11, .055, .03);
-  vec3 ut = c * ljus(n) * .9;
+  // ljusets styrka men inte dess färg, som notan (rum-hasse-3d.js): porslinet är vitt som den ritade koppen i
+  // rummet (rum.js), inte rosa av neonskylten
+  vec3 ut = c * dot(ljus(n), vec3(.2126, .7152, .0722)) * .9;
   // nära bordet blir det mörkare, och det är en blank yta
   ut *= uRand > .5 ? 1. : .62 + .38 * smoothstep(0., 34., vL.y);
   // (mot kameran, som står snett och lite högre i baren)
