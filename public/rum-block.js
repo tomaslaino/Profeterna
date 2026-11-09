@@ -470,8 +470,32 @@
     return `<svg class="rb-mp" viewBox="0 0 60 30" preserveAspectRatio="none" aria-hidden="true" style="opacity:${(0.86 + r() * 0.14).toFixed(2)}"><path d="${d}"/><path class="ned" d="${ned}"/><path class="rand" d="${rand}"/></svg>`;
   }
 
-  // Hasses röda penna: ringen kring vinnaren och summan av rätt
+  // Hasses röda penna: ringen kring vinnaren och kupongens betyg
   const ROD = '#c8281e';
+  // Betygets ring, som kupongens betyg på papperet (ring i papper.js): ett varv och lite till, som inte
+  // möts där pennan sattes ned, olika i varje omgång.
+  function betygRing(key) {
+    const r = rng(`o${key}`);
+    const rx = 26.5 + jit(r, 1.2);
+    const ry = 24.5 + jit(r, 1.2);
+    const tilt = jit(r, 0.3);
+    const a0 = r() * Math.PI * 2;
+    const sweep = Math.PI * 2 * (1.1 + r() * 0.12);
+    const pts = [];
+    for (let i = 0; i <= 14; i++) {
+      const t = a0 + (sweep * i) / 14;
+      const k = 1 + jit(r, 0.04) + (i / 14) * 0.07;
+      const x = rx * k * Math.cos(t);
+      const y = ry * k * Math.sin(t);
+      pts.push([30 + x * Math.cos(tilt) - y * Math.sin(tilt), 30 + x * Math.sin(tilt) + y * Math.cos(tilt)]);
+    }
+    let d = `M${f1(pts[0][0])} ${f1(pts[0][1])}`;
+    for (let i = 0; i < pts.length - 1; i++) {
+      const [p0, p1, p2, p3] = [pts[i - 1] || pts[i], pts[i], pts[i + 1], pts[i + 2] || pts[i + 1]];
+      d += `C${f1(p1[0] + (p2[0] - p0[0]) / 6)} ${f1(p1[1] + (p2[1] - p0[1]) / 6)} ${f1(p2[0] - (p3[0] - p1[0]) / 6)} ${f1(p2[1] - (p3[1] - p1[1]) / 6)} ${f1(p2[0])} ${f1(p2[1])}`;
+    }
+    return `<svg class="rb-bring" viewBox="0 0 60 60" preserveAspectRatio="none" aria-hidden="true"><path d="${d}"/></svg>`;
+  }
   const RING = (w, h) => `<svg class="rb-ring" viewBox="0 0 ${w} ${h}" fill="none" aria-hidden="true"><path d="M${w * 0.16} ${h * 0.2}C${w * 0.42} ${h * 0.01} ${w * 0.93} ${h * 0.03} ${w * 0.975} ${h * 0.44}C${w * 1.01} ${h * 0.86} ${w * 0.38} ${h * 1.02} ${w * 0.1} ${h * 0.79}C${w * -0.1} ${h * 0.6} ${w * 0.05} ${h * 0.2} ${w * 0.42} ${h * 0.09}C${w * 0.56} ${h * 0.05} ${w * 0.68} ${h * 0.05} ${w * 0.76} ${h * 0.08}"/></svg>`;
 
   // Spalterna: kupongen, var och en i gänget och Hasse.
@@ -517,10 +541,12 @@
     }).join('');
     const rad = (cls, la, varden, farg = (s) => s.ink) => `<span class="rb-su la ${cls}">${la}</span>` + kol.map((s, i) => `<span class="rb-su ${cls}${s.id === 'K' ? ' k' : ''}" style="color:${farg(s)}">` +
       (varden[i] === '' ? '' : `<i style="${hand(`${nyckel}${cls}${s.id}`, 0.8)}">${varden[i]}</i>`) + '</span>').join('');
-    // Rätt står överst, direkt under porträtten, med Hasses röda rättningspenna: det är det man vill se
-    // först, och det syns också när bladet ligger på pulten (där nederkanten kan vara utanför bilden).
-    // Kupongen är allas, och dess siffra är störst.
-    const ratt = rad('tot', `Rätt av ${sum.n}`, kol.map((s) => (s.id === 'K' ? sum.kupong.ok : s.id === 'B' ? (sum.backe.n ? sum.backe.ok : '') : P(s.id).none ? '–' : P(s.id).ok)), () => ROD);
+    // Rätt står överst, direkt under porträtten: det är det man vill se först, och det syns också när bladet
+    // ligger på pulten (där nederkanten kan vara utanför bilden). Kupongen är allas, och dess rätt är omgångens
+    // betyg: störst, med Hasses röda rättningspenna och inringat, som kupongens betyg på papperet (papper.js).
+    // Var och ens rätt står i det egna bläcket, så att betyget är det enda rödringade på raden.
+    const betyg = `<span class="rb-betyg">${sum.kupong.ok}<small>/${sum.kupong.n || sum.n}</small>${betygRing(`${nyckel}betyg`)}</span>`;
+    const ratt = rad('tot', `Rätt av ${sum.n}`, kol.map((s) => (s.id === 'K' ? betyg : s.id === 'B' ? (sum.backe.n ? sum.backe.ok : '') : P(s.id).none ? '–' : P(s.id).ok)), (s) => (s.id === 'K' ? ROD : s.ink));
     const pts = rad('po', 'Poäng', kol.map((s) => {
       if (s.id === 'K') return '';
       if (s.id === 'B') return sum.backe.n ? poang(sum.backe.pts) : '';
