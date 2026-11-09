@@ -91,7 +91,9 @@ export async function armen(plan, { hand: HAND, kopp: KOPP, pr = 1.5, ljus = nul
   }
   // händernas mitt: där underarmarna korsar, en bit fram mot fingrarna
   const MITT = lage.A.W.clone().add(lage.B.W).multiplyScalar(0.5).addScaledVector(lage.A.F.clone().add(lage.B.F).normalize(), 70);
-  // ögat: i rummets blickriktning, lika långt bort och lika högt som rummets öga (barens mått → figurens värld)
+  // ögat: i rummets blickriktning, lika långt bort och lika högt som rummets öga (barens mått → figurens värld).
+  // (Räknat från där han satt innan han flyttade ut mot hörnet, utan SCEN.PLATS: så ses händerna lika mycket
+  // uppifrån som koppen bredvid, och rummet ser ut som förut.)
   const oga = V3(franBaren([-RUM.Z, L.Y + RUM.H, RUM.X]));
   const avst = oga.distanceTo(MITT);
   const lut = Math.asin((oga.y - MITT.y) / avst);
