@@ -1083,9 +1083,8 @@ bara lokalt. Analyserna visas som de ligger i `data/analyser.json`; hur de skriv
   [public/rum-hasse-scen.js](public/rum-hasse-scen.js)), med händerna vid geringssnittet och pultens arm tätt intill en;
   kaffet följer med, 5 cm längre fram, och notan ligger på tvären framför hans händer, vänd som i rummet, med fatet
   på dess övre vänstra hörn. Rummet är oförändrat. I telefonen blir bilden lite mindre när notan annars skulle
-  hamna under samtalets text (`matt` i [public/rum-hasse.js](public/rum-hasse.js)). Väggen bakom honom är inte
-  ombakad för den nya platsen än: i bakningen syns pulten bara som skugga och ljus på väggen, och den bakas om
-  på Macen (scripts/hasse/README.md). Se [Hasse Backe](#hasse-backe),
+  hamna under samtalets text (`matt` i [public/rum-hasse.js](public/rum-hasse.js)). Väggen bakom honom är
+  ombakad för den nya platsen (i bakningen syns pulten bara som skugga och ljus på väggen). Se [Hasse Backe](#hasse-backe),
   *Bilden* och *Kaffet i rummet*.
 - **Hasse Backe minns vad han sa (2026-11-06, användarens önskemål):** klickade man på en match
   man redan hade frågat om slog han domen i disken en gång till, och efter en omladdning gjorde han
