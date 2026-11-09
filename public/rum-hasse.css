@@ -20,7 +20,7 @@
    en duk ovanpå. Allt läggs i fönstrets bildpunkter (passa i rum-hasse.js). */
 .rum-hasse-vy { position: absolute; inset: 0; overflow: hidden; pointer-events: auto; color: #f6efdc; font-family: Fraunces, Georgia, serif; background: #120c07;
   /* papperets fibrer, som på kupongen (papper.css) */
-  --korn: var(--pp-grain);
+  --korn: var(--pp-grain); }
 .rum-hasse-vy[hidden] { display: none; }
 .rh-scen { position: absolute; inset: 0; overflow: hidden; }
 .rh-scen .rh-bak { position: absolute; left: 0; top: 0; display: block; max-width: none; }
