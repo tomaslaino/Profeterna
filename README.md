@@ -1009,6 +1009,14 @@ bara lokalt. Analyserna visas som de ligger i `data/analyser.json`; hur de skriv
   avböjer att kommentera*). Varje slags rubrik har två eller tre varianter som veckan väljer mellan,
   och den näst största nyheten står längst ner, som på en riktig löpsedel. Se
   [Tobaksaffären](#tobaksaffären), *Affischerna*.
+- **Löpsedeln på riktigt tidningspapper (2026-11-08, användarens önskemål):** löpsedeln såg för
+  blank och osannolik ut: kritvitt papper med ett jämnt prickraster över allt (som tyg eller en skärm),
+  ett blänk snett uppifrån, raka kanter och helt jämn svärta. Nu är den matt tidningspapper med fibrer
+  och buktor, svärtan och det röda täcker inte överallt, den har legat vikt på mitten och är klippt med
+  sax; det vita i texten är papperet, och tejpen i fönstret är maskeringstejp med avslitna ändar. På
+  väggen ritades den dessutom framför bardisken och barstolarna när kameran följde musen åt vänster;
+  nu hänger den bakom dem, och den är lite mindre (70 % i stället för 78 %), så att den går fri från
+  diskens kant. Se [Tobaksaffären](#tobaksaffären), *Affischerna*.
 - **Domarens kort i stället för kvittot (2026-11-06, användarens önskemål):** kvittot på pulten
   tillförde inget – vilka som har lämnat in syns redan på högen – och var ett tredje papper
   bredvid notan och kupongen. Där ligger nu domarens gula och röda kort och visselpipan med
@@ -3158,7 +3166,11 @@ det röda har bleknat och den har legat vikt på mitten.
 **Löpsedeln** är veckans, från en riktig kvällstidning som de andra (Tomas önskemål):
 **Sportbladet**, Aftonbladets sportdel, på sitt rosa papper, eller **Expressen** på vitt med det
 röda namnet, två veckor i taget (`TIDNINGAR` i rum-affischer.js). Namnen är skrivna som text,
-inte tidningarnas loggor, och rubrikerna är våra. Överst namnet så brett som papperet, under det
+inte tidningarnas loggor, och rubrikerna är våra. Papperet ska se ut som en riktig tidning (Tomas
+önskemål 2026-11-08): matt tidningspapper, gråaktigt eller blekrosa, med fibrer, ojämn ton och buktor
+från fukten, svärta och rött som inte har täckt överallt, ett veck på mitten och kanterna klippta med
+sax i några raka klipp (`klipp` i rum-affischer.js, ny varje vecka). Det vita i texten är papperet,
+och inget filter ligger på texten, som annars blir suddig i närbilden. Överst namnet så brett som papperet, under det
 vinjetten (*SPIKEN*, *KRISEN*, *BARA I SPORTBLADET*) och datumet, rubriken i Anton – varje rad
 så stor som ryms i bredden men ingen mer än 1,55 gånger den minsta, en av dem röd eller vit på
 rött, och rader med Å, Ä eller Ö med luft ovanför – raden under och, under ett streck, veckans
@@ -3172,7 +3184,9 @@ aldrig vad en riktig person har sagt. Varje slags rubrik har två eller tre vari
 veckan väljer bland dem. Den är den enda som byts och är uppsatt för hand: varannan vecka (veckan i
 Stockholm, måndag till söndag) med tejp i skyltfönstrets nedre vänstra hörn, varannan med två
 häftstift på furupanelen till höger om fönstret, under oraklets skylt och till vänster om
-bardisken, där den är mindre (78 %, så att den ryms mellan fönsterkarmen och bardisken). I
+bardisken, där den är mindre (70 %, så att den ryms mellan fönsterbänkens ände och diskens kant)
+och hänger bakom disken och barstolarna, som står framför väggen (löpsedeln ligger före diskens duk
+i bakväggens plan). I
 telefonen på höjden sitter den alltid på väggen, som syns utan att man drar. (Först satt den
 ibland under dörrens handtag och sedan i fönstrets högra hörn: dörren hamnade utanför bilden i
 telefonen, och hörnet är nu skivans. Till och med 2026-11-05 var den från den påhittade
