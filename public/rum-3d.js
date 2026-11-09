@@ -1717,8 +1717,8 @@ export async function figurer(canvas, opt = {}) {
   // den (sak i rum.js), och där ställer man in FM och AM (rum-radio.js, som säger vad som gäller med
   // radioLage). Stationsskalan lyser med en glödlampa, stationsspaken sitter på samma ställe som visaren
   // under skalan, bandspaken slår över mellan FM och AM, POWER-knappen går in, lysdioderna och högtalarna
-  // följer det som hörs och stationerna man har hittat står för hand på maskeringstejpen vid skalan
-  // (radioEtiketter, radioSkriv). Så länge det är musik sjunger gänget (radioSang) och noter stiger ur
+  // följer det som hörs och alla stationer står för hand på maskeringstejpen vid skalan
+  // (radioEtiketter). Så länge det är musik sjunger gänget (radioSang) och noter stiger ur
   // den (radioRita).
   const RADIO_PLATS = { x: 127, z: 8, vrid: -0.38 };
   // en lampa: mellan släckt och tänd (lys), utan tonkurvan, som annars gör starkt ljus vitt
@@ -1827,10 +1827,9 @@ export async function figurer(canvas, opt = {}) {
   const SKALA = rduk(512, 62, (c, w, h) => ritaSkala(c, w, h, false));
   const SKALA_LYS = rduk(512, 62, (c, w, h) => ritaSkala(c, w, h, true));
   SKALA_LYS.colorSpace = THREE.SRGBColorSpace;
-  // Tejpen vid skalan: FM ovanför, AM under, med stationerna för hand i två rader, varannan närmast
-  // skalan. Varje station har sin plats från början (tejpPlats), så att det som redan står inte flyttar
-  // sig när en ny skrivs dit.
-  const TEJP = { rutor: { fm: [], am: [] }, hittade: new Set(), skrivs: null };
+  // Tejpen vid skalan: FM ovanför, AM under, med alla stationer för hand i två rader, varannan närmast
+  // skalan (tejpPlats). Frekvenserna står på lappen bredvid radion (rum-radio.js).
+  const TEJP = { rutor: { fm: [], am: [] } };
   function tejpPlats(band, c, w, h) {
     const l = TEJP.rutor[band];
     const fs = Math.round(h * 0.47);
@@ -1882,30 +1881,20 @@ export async function figurer(canvas, opt = {}) {
     const upp = band === 'fm';
     const radY = (r) => (upp === (r === 0) ? h * 0.74 : h * 0.29);
     for (const a of rad) {
-      if (!TEJP.hittade.has(a.e.id)) continue;
-      const nu = TEJP.skrivs && TEJP.skrivs.id === a.e.id ? TEJP.skrivs.u : 1;
       // strecket mot skalan, sedan namnet från vänster till höger. Står namnet nära sin frekvens och
       // det är fritt går strecket fram till det, annars är det bara en liten bock vid kanten.
       const fot = upp ? h * 0.98 : h * 0.02;
       const dx = Math.max(-fs * 0.8, Math.min(fs * 0.8, a.c - a.x));
-      const fritt = a.r === 1 && Math.abs(a.c - a.x) < fs * 0.8 && !rad.some((n) => n.r === 0 && Math.abs(n.c - a.x - dx / 2) < n.b / 2 + 2 && TEJP.hittade.has(n.e.id));
+      const fritt = a.r === 1 && Math.abs(a.c - a.x) < fs * 0.8 && !rad.some((n) => n.r === 0 && Math.abs(n.c - a.x - dx / 2) < n.b / 2 + 2);
       const hals = upp ? (fritt ? h * 0.47 : h * 0.93) : (fritt ? h * 0.53 : h * 0.07);
       c.strokeStyle = penna;
       c.lineWidth = Math.max(1, h * 0.03);
-      const u1 = Math.min(1, nu * 4);
       c.beginPath();
       c.moveTo(a.x, fot);
-      c.lineTo(a.x + (fritt ? dx : Math.sign(dx) * Math.min(fs * 0.3, Math.abs(dx))) * u1, fot + (hals - fot) * u1);
+      c.lineTo(a.x + (fritt ? dx : Math.sign(dx) * Math.min(fs * 0.3, Math.abs(dx))), hals);
       c.stroke();
-      if (nu <= 0.25) continue;
-      c.save();
-      c.beginPath();
-      c.rect(a.c - a.b / 2 - 2, 0, (a.b + 4) * Math.min(1, (nu - 0.25) / 0.75), h);
-      c.clip();
       c.fillStyle = penna;
-      c.font = `700 ${fs}px Caveat, cursive`;
       c.fillText(a.e.kort, a.c, radY(a.r) + (hash(a.x) - 0.5) * h * 0.06);
-      c.restore();
     }
   }
   const TEJPF = rduk(512, 29, (c, w, h) => ritaTejp('fm', c, w, h));
@@ -2271,21 +2260,11 @@ export async function figurer(canvas, opt = {}) {
     d.userData.rita(d.image.getContext('2d'), d.image.width, d.image.height);
     d.needsUpdate = true;
   };
-  // alla: { id, band, p, kort } för varje station, hittade: id:n
-  function radioEtiketter(alla, hittade) {
+  // alla: { id, band, p, kort } för varje station
+  function radioEtiketter(alla) {
     TEJP.rutor = { fm: alla.filter((e) => e.band === 'fm'), am: alla.filter((e) => e.band === 'am') };
-    TEJP.hittade = new Set(hittade);
     tejpOm('fm');
     tejpOm('am');
-  }
-  // en ny station skrivs dit, med pennan
-  function radioSkriv(id, t) {
-    if (TEJP.skrivs) tejpOm(TEJP.skrivs.band);
-    const band = TEJP.rutor.fm.some((e) => e.id === id) ? 'fm' : 'am';
-    TEJP.hittade.add(id);
-    TEJP.skrivs = { id, band, at: t, u: opt.calm ? 1 : 0 };
-    tejpOm(band);
-    if (opt.calm) TEJP.skrivs = null;
   }
   // Dukarna ritas om så stora som närbilden visar dem (px: radions bredd i bildpunkter), en gång.
   async function radioFin(px) {
@@ -2377,12 +2356,6 @@ export async function figurer(canvas, opt = {}) {
     const tanda = RL.ledNu * RADIO.led.length;
     RADIO.led.forEach((m, i) => lys(m, RL.lampaNu * (tanda > i + 0.15 ? 1 : 0)));
     for (const m of RADIO.pump) m.position.z = m.userData.z0 + 0.5 * bas;
-    // tejpen: den nya stationen skrivs
-    if (TEJP.skrivs) {
-      TEJP.skrivs.u = Math.min(1, TEJP.skrivs.u + dt / 0.85);
-      tejpOm(TEJP.skrivs.band);
-      if (TEJP.skrivs.u >= 1) TEJP.skrivs = null;
-    }
     // (matrisen räknas annars först när scenen ritas, och en fast bild ritas en gång)
     RADIO.g.updateMatrix();
     const topp = new THREE.Vector3(0, 36, 0).applyMatrix4(RADIO.g.matrix);
@@ -6114,5 +6087,5 @@ export async function figurer(canvas, opt = {}) {
     await r.compileAsync(scene, cam);
   } catch (err) { /* då byggs de när gänget ritas, som förut */ }
   ANS.ute = true;
-  return { draw, inne, ute, lage, mal, radio, radioPa: () => SJUNG.radio.pa, radioLage, radioEtiketter, radioSkriv, radioDetalj, narbild, radioRuta, radioDelar, radioP, spel, senast, uttryck: () => ANS.p, prova, ga, pekar, hej, vald, tecken, lappar, lappVand, lappProva, natt, efter, under, huvud, kval };
+  return { draw, inne, ute, lage, mal, radio, radioPa: () => SJUNG.radio.pa, radioLage, radioEtiketter, radioDetalj, narbild, radioRuta, radioDelar, radioP, spel, senast, uttryck: () => ANS.p, prova, ga, pekar, hej, vald, tecken, lappar, lappVand, lappProva, natt, efter, under, huvud, kval };
 }
