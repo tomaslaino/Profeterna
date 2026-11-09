@@ -1106,7 +1106,9 @@ bara lokalt. Analyserna visas som de ligger i `data/analyser.json`; hur de skriv
   påhittade och tidlösa, utan riktiga personer och utan sport. Hans läsglasögon sitter i bröstfickan: han tar fram dem,
   fäller ut skalmarna och sätter på sig dem innan han tar upp tidningen, och efteråt tar han av dem och stoppar tillbaka
   dem. Medan han läser skjuter han upp dem med pekfingret, drar ned dem på näsan och tittar på en över dem, eller tar av
-  dem, pekar på en med dem och biter tankfullt i skalmen. Se [Hasse Backe](#hasse-backe), *Tidningen* och *Glasögonen*.
+  dem, pekar på en med dem och biter tankfullt i skalmen. När han tog upp tidningen ur knät och lade tillbaka den stod
+  armbågarna en stund ut som vingar i axelhöjd ("Rätta armbågarna också"): nu håller han den lågt tills den är framme,
+  och i knät hänger armarna nedåt. Se [Hasse Backe](#hasse-backe), *Tidningen* och *Glasögonen*.
 - **Hasse Backe minns vad han sa (2026-11-06, användarens önskemål):** klickade man på en match
   man redan hade frågat om slog han domen i disken en gång till, och efter en omladdning gjorde han
   om allt, med 15–25 sekunders väntan. Nu står det han sa direkt, sparat på enheten så att det
