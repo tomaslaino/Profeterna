@@ -1611,7 +1611,7 @@ och anropar aldrig någon språkmodell. (Fram till 2026-11-04 skrevs texterna vi
 ```
 launchd               →  scripts/analyser/skriv.mjs  →  claude -p (en gång per match)
                                      ↓
-       data/analyser.json, data/omgangsnamn.json, data/kupong-historik.json
+       data/analyser.json, data/omgangsnamn.json, data/kupong-historik.json, data/tidning.json
                                      ↓
           commit och push till main  →  GitHub Actions  →  matchfixarna.se
 ```
@@ -1629,6 +1629,7 @@ de flesta körningar har inget att göra och anropar inte Claude.
   slog: en omgång som skapas senare väntar till nästa tid, men en match utan analys skrivs ändå när
   det är högst 24 timmar kvar till avspark. Har matcherna ändrats skrivs de nya vid nästa kontroll.
 - **Hasse Backes text** direkt efter varje analys.
+- **Tidningen inför omgången** så snart omgången finns, och sedan måndag 17.00 och fredag 16.00 (se nedan).
 - **Kommentaren till en färdig kupong** när kupongen finns i den publicerade historiken.
 
 **En analys** är ett anrop till `claude -p`: Claude söker och läser på nätet (högst 6 sökningar och
@@ -1643,6 +1644,29 @@ texten skrevs vid klick: en källa följer bara med om adressen kom upp i en sö
 läst sida, varje tal ska stå i underlaget eller i det Claude läste, artikeln får inga tipsord och
 tecknen ska vara ett till tre av 1, X och 2. Klarar svaret inte det får Claude skriva om det en
 gång, utan verktyg men med det den läste. Klarar artikeln sig men inte tipset sparas artikeln utan tips.
+
+**Tidningen inför omgången** (2026-11-09, användarens önskan): en notis per match i omgången om hur lagen har
+det just nu – skador, tränarens ord, sviter, det som har hänt i klubben – i en svensk morgontidnings sakliga ton,
+till tidningen som Hasse Backe läser. Den skrivs på iMacen som allt annat här, med `claude -p` på Claude-kontot och
+inte med API-nycklar: ett anrop för hela omgången ([src/analyser/tidning.mjs](src/analyser/tidning.mjs), prompten och
+gränserna i [config/tidning.js](config/tidning.js)). Claude får högst 12 sökningar och 4 sidor, samma underlag som
+namnet (tabelläget, formen, schemat och möten) och skadelistan, men inga odds, och skriver en rubrik på högst sju ord
+och 40–70 ord per match. Kontrollerna är analysernas: en källa följer bara med om adressen kom upp, varje tal ska stå
+i underlaget eller i det Claude läste, och notisen får inget tipsspråk (spik, gardering, odds, favorit). En notis som
+inte klarar det skrivs om en gång utan verktyg; går den inte igenom då står matchen utan notis, och klarar mindre än
+60 % av matcherna sig ligger den gamla sidan kvar. En ny omgång får sin tidning direkt, och den skrivs om på tiderna i
+config/tidning.js om sidan är äldre än tiden och minst tolv timmar gammal; när alla matcher har börjat står den kvar.
+`node scripts/analyser/skriv.mjs --tidning --ut /tmp/prov` skriver den för omgången som pågår, oavsett tid.
+`data/tidning.json`, som bygget kopierar till sajten:
+
+```json
+{ "omgang": "2026-11-14-st4979", "matcher": ["401878757"], "skriven": "…", "model": "…", "version": "…",
+  "notiser": [ { "nr": 1, "id": "401878757", "match": "…", "avspark": "…", "rubrik": "…", "text": "…",
+                 "kallor": [ { "source": "…", "title": "…", "url": "…", "publishedAt": null } ] } ] }
+```
+
+`nr` är matchens nummer på kupongen. Tidningen som Hasse Backe läser trycker notiserna på baksidan (se *Tidningen*
+under [Hasse Backe](#hasse-backe)).
 
 **Rösten** står i [prompts/analys-rost.md](prompts/analys-rost.md): Sixten Bråvall, en påhittad
 tränare med egen bakgrund i klubbar som inte finns och egna stående uttryck. Filen går att
@@ -1676,7 +1700,7 @@ av värdet. Användningen delas med annat arbete i Claude. Är extra användning
 på kontot kan det som går över gränsen kosta pengar, så håll den avstängd.
 
 **Verktygen.** `claude -p` körs i en tom tillfällig mapp med `--tools WebSearch,WebFetch` för
-analysen, `WebSearch` för namnet och inga alls för Hasse och kommentaren, utan inställningar,
+analysen och tidningen, `WebSearch` för namnet och inga alls för Hasse och kommentaren, utan inställningar,
 tillägg och MCP-servrar. Den kan alltså inte läsa eller ändra filer eller köra kommandon, och
 webbsidornas innehåll når bara texten, som går genom kontrollerna.
 
@@ -5706,8 +5730,11 @@ läser rad för rad, tittar upp över kanten på en med höjda bryn och ler seda
 syns, nickar åt det som står, rycker den rak och tittar längs baren, och mellan gångerna lägger han den i knät bakom disken
 en stund (klippen `lasa` och `lasa2`, byggda av bitarna i `LASBIT` i [public/rum-hasse-3d.js](public/rum-hasse-3d.js)).
 Behöver han händerna, som när han slår en dom i disken, läser han klart raden och lägger ned den direkt. Förstasidan vänder
-sig mot en med en rubrik om hans egen omgång och hans porträtt rastrerat, och baksidan är tipsguiden (`RUBRIKER` och
-papperet i [public/rum-hasse-tidning.js](public/rum-hasse-tidning.js), samma rubrik för samma omgång). Dåligt är inte ett
+sig mot en med en rubrik om hans egen omgång och hans porträtt rastrerat (`RUBRIKER` och papperet i
+[public/rum-hasse-tidning.js](public/rum-hasse-tidning.js), samma rubrik för samma omgång). Baksidan är *Så mår
+tipslagen* (2026-11-09, användarens önskan): notiserna inför omgången ur `data/tidning.json`, som iMacen skriver med
+Claude-kontot (se *Tidningen inför omgången* under [Analyserna](#analyserna)), i två spalter och så stort som alla ryms
+(`notisSida`). Utan notiser, eller med en sida som är äldre än tio dagar, är baksidan tipsguiden som förut. Dåligt är inte ett
 rätt, sämst i gänget, eller rätten långt under vad chanserna var värda, med tävlingskupongen om han spelade och annars det han
 sa (`hansOmgang` och `efterat` i [public/rum-hasse.js](public/rum-hasse.js)); det gäller både när han säger hur det gick och
 när han dömer gänget. Med minskad rörelse läser han inte.

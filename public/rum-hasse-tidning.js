@@ -1,7 +1,8 @@
 // Tidningen som Hasse Backe gömmer sig bakom när det har gått dåligt för honom (rum-hasse-3d.js, klippet
 // lasa): veckans kvällstidning, samma som löpsedeln i rummet (rum-affischer.js), uppslagen med
 // förstasidan mot en. Där står en rubrik om hans egen omgång i kvällstidningens tonläge (rum-hasse.js
-// väljer den), med hans eget porträtt rastrerat under, och på baksidan tipsguiden.
+// väljer den), med hans eget porträtt rastrerat under, och på baksidan notiserna inför omgången
+// (data/tidning.json, skrivna på iMacen: scripts/analyser/skriv.mjs) eller, utan dem, tipsguiden.
 //
 // Papperet är ett rutnät som böjs i skuggaren: två sidor vikta mot honom kring ryggen (uBeta), mjukt
 // så att det faller bakåt ovanför händerna (uBuk), och en våg när han rycker i det (uVag). ytan() räknar
@@ -306,9 +307,85 @@ function forsta(x, x0, rb, f, bild) {
   spalt(x, x0 + 22 + bw + 14 + (SB - 44 - bw - 14) / 2 + 5, y + 2, (SB - 44 - bw - 14 - 10) / 2, y + bh + 14, 11, 7);
 }
 
-// Baksidan: tipsguiden, som på löpsedeln när det inte finns något att skriva om, och tretton rader att tippa.
+// Notiserna inför omgången (data/tidning.json): en per match, skrivna på iMacen med Claude Code. Läses en
+// gång per sidvisning; en sida som är äldre än NOTIS_DAGAR trycks inte.
+const NOTIS_DAGAR = 10;
+let notiser = null;
+let notisLadd = null;
+function laddaNotiser() {
+  if (!notisLadd) {
+    notisLadd = fetch('data/tidning.json', { cache: 'no-cache' })
+      .then((r) => (r.ok ? r.json() : null))
+      .then((t) => {
+        const farsk = t && Array.isArray(t.notiser) && Date.now() - Date.parse(t.skriven) < NOTIS_DAGAR * 864e5;
+        notiser = farsk ? t.notiser.filter((n) => n && n.rubrik && n.text).sort((a, b) => a.nr - b.nr) : null;
+      })
+      .catch(() => {});
+  }
+  return notisLadd;
+}
+
+// Notiserna i två spalter, i den största storleken där alla ryms: matchen, rubriken och texten.
+function notisSida(x, x0, y0, lista, f) {
+  const G = 14;
+  const W = (SB - 44 - G) / 2;
+  const Y1 = SH - 20;
+  const satt = (px) => {
+    const block = lista.map((n) => {
+      const rader = [];
+      rader.push({ t: `${n.nr}  ${n.match || ''}`.trim(), font: HELV(px * 0.85, 700), farg: f.rod, h: px * 1.1 });
+      for (const r of radbryt(x, n.rubrik, HELV(px * 1.3, 700), W)) rader.push({ t: r, font: HELV(px * 1.3, 700), farg: SVART, h: px * 1.35 });
+      for (const r of radbryt(x, n.text, HELV(px, 400), W)) rader.push({ t: r, font: HELV(px, 400), farg: SVART, h: px * 1.2 });
+      return { rader, h: rader.reduce((a, r) => a + r.h, 0) + px * 0.9 };
+    });
+    // spalterna fylls uppifrån, och nästa notis går till spalten med mest plats kvar
+    const sp = [y0, y0];
+    const plats = block.map((b) => {
+      const k = sp[0] <= sp[1] ? 0 : 1;
+      const p = { k, y: sp[k] };
+      sp[k] += b.h;
+      return p;
+    });
+    return { block, plats, ryms: Math.max(...sp) <= Y1 };
+  };
+  let px = 11;
+  let s = satt(px);
+  while (!s.ryms && px > 5.5) { px -= 0.25; s = satt(px); }
+  x.textBaseline = 'alphabetic';
+  s.block.forEach((b, i) => {
+    const { k, y } = s.plats[i];
+    let ry = y;
+    for (const r of b.rader) {
+      ry += r.h;
+      if (ry > Y1) break;
+      x.font = r.font;
+      x.fillStyle = r.farg;
+      x.fillText(r.t, x0 + 22 + k * (W + G), ry - r.h * 0.18);
+    }
+  });
+  x.fillStyle = 'rgba(35, 32, 30, .5)';
+  x.fillRect(x0 + 22 + W + G / 2 - 0.5, y0 + 4, 1, Math.min(Y1, Math.max(...s.plats.map((p, i) => p.y + s.block[i].h))) - y0 - 8);
+}
+
+// Baksidan: notiserna inför omgången, och utan dem tipsguiden, som på löpsedeln när det inte finns något att
+// skriva om, och tretton rader att tippa.
 function baksida(x, x0, rb, f) {
   papper(x, x0, f);
+  if (notiser && notiser.length) {
+    x.font = HELV(12);
+    x.fillStyle = SVART;
+    x.fillText(NAMN[rb.tidning] ? NAMN[rb.tidning].namn : '', x0 + 22, 30);
+    x.textAlign = 'right';
+    x.fillText('48', x0 + SB - 22, 30);
+    x.textAlign = 'left';
+    x.fillRect(x0 + 22, 38, SB - 44, 1.5);
+    const y = kick(x, x0, 52, 'INFÖR OMGÅNGEN', '', f);
+    rubriken(x, [['SÅ MÅR TIPSLAGEN', 1]], x0 + 22, SB - 44, y + 22, 50, f);
+    x.fillStyle = SVART;
+    x.fillRect(x0 + 22, y + 82, SB - 44, 1.5);
+    notisSida(x, x0, y + 88, notiser, f);
+    return;
+  }
   x.font = HELV(12);
   x.fillStyle = SVART;
   x.fillText(NAMN[rb.tidning] ? NAMN[rb.tidning].namn : '', x0 + 22, 30);
@@ -424,7 +501,7 @@ export function byggTidning(bord) {
     const fonter = document.fonts && document.fonts.load
       ? Promise.race([Promise.all([document.fonts.load(ANTON(30)), document.fonts.load(NAMN.ex.font(30))]), new Promise((ok) => setTimeout(ok, 2500))])
       : null;
-    const [img] = await Promise.all([laddaPortratt(), fonter]);
+    const [img] = await Promise.all([laddaPortratt(), fonter, laddaNotiser()]);
     rita(img ? rastrera(img, 196, 240) : null);
   }
   return {
