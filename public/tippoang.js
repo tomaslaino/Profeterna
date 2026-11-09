@@ -14,6 +14,9 @@
 // visar hur mycket bättre (plus) eller sämre (minus) än modellen man tippade.
 // Saknas modellen för en match används kuponghistorikens schablon
 // (src/history.js): 45 % för ett tecken, 75 % för två.
+//
+// Hasse Backe förklarar regeln vid protokollet i tobaksaffären (protokoll i
+// rum-hasse-repliker.js): ändras den ska hans svar följa med.
 
 (function (root, factory) {
   if (typeof module === 'object' && module.exports) module.exports = factory();

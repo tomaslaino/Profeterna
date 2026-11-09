@@ -6,7 +6,8 @@
 // tpScore i tippare.js) ligger bara Hasse Backes protokoll på pulten i
 // tobaksaffären, tills nästa kupong kommer måndagen efter kl. 16: en blankett som kupongen, med facit och en spalt för
 // kupongen, var och en i gänget och Hasse. Allas tecken står kvar, och det som satt är överstruket, så att
-// raderna går att läsa utan förklaring. Han har rättat det och skrivit under, men
+// raderna går att läsa utan förklaring. Rätt står överst med hans röda penna, så att det syns också på håll.
+// Han har rättat det, och raden Poäng förklarar han om man ropar till honom (protHasse i rum.js), men
 // domarna över gänget säger han i baren (gang här, doma i rum-hasse.js). Ett klick på blocket lyfter det och lägger fram det
 // stort (protokollet i rum.js), och ett klick på löpsedeln i fönstret öppnar tidningen
 // (tidningen i rum.js). Gänget håller upp sina lappar (lappar här och i rum-3d.js), och
@@ -26,6 +27,7 @@
   const stor = (s) => s.charAt(0).toUpperCase() + s.slice(1);
   const esc = (s) => String(s == null ? '' : s).replace(/[&<>"]/g, (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c]));
   const efternamn = (s) => String(s || '').trim().split(/\s+/).pop();
+  const lista = (l) => (l.length < 2 ? l.join('') : `${l.slice(0, -1).join(', ')} och ${l.at(-1)}`);
   // gängets bläck på papper och handstil (som namnen på kupongen), Hasse sist
   const INK = ['#2146a6', '#16784b', '#6d3aa8', '#8a6a0c', '#a0306a'];
   const KUPONG = { id: 'K', namn: 'Kupong', ink: '#26211a' };
@@ -60,6 +62,11 @@
       ensamMer: (n) => `Ensam om rätt i ${ordet(n)} matcher.`,
       ingen: 'Ensam om ingenting.',
       sist: 'Sist.',
+    },
+    // exemplet i Hasses svar om poängen (exempel här, protokollet i rum.js)
+    exempel: {
+      lika: (vilka, antal, bast) => `${vilka} hade ${antal} rätt var, men ${bast} fick mest poäng, eftersom datorn trodde minst på just de tecknen.`,
+      mest: (vem, tecken, h, b, chans, pts) => `Mest för ett enda tips fick ${vem}, med ${tecken} i ${h}–${b}. Datorn gav det ${chans} %, så det blev ${pts} poäng.`,
     },
     skrall: {
       vann: (v, f, s, p) => `${v} slog ${f} ${s}. Datorn gav det ${p} %.`,
@@ -463,6 +470,8 @@
     return `<svg class="rb-mp" viewBox="0 0 60 30" preserveAspectRatio="none" aria-hidden="true" style="opacity:${(0.86 + r() * 0.14).toFixed(2)}"><path d="${d}"/><path class="ned" d="${ned}"/><path class="rand" d="${rand}"/></svg>`;
   }
 
+  // Hasses röda penna: ringen kring vinnaren och summan av rätt
+  const ROD = '#c8281e';
   const RING = (w, h) => `<svg class="rb-ring" viewBox="0 0 ${w} ${h}" fill="none" aria-hidden="true"><path d="M${w * 0.16} ${h * 0.2}C${w * 0.42} ${h * 0.01} ${w * 0.93} ${h * 0.03} ${w * 0.975} ${h * 0.44}C${w * 1.01} ${h * 0.86} ${w * 0.38} ${h * 1.02} ${w * 0.1} ${h * 0.79}C${w * -0.1} ${h * 0.6} ${w * 0.05} ${h * 0.2} ${w * 0.42} ${h * 0.09}C${w * 0.56} ${h * 0.05} ${w * 0.68} ${h * 0.05} ${w * 0.76} ${h * 0.08}"/></svg>`;
 
   // Spalterna: kupongen, var och en i gänget och Hasse.
@@ -492,19 +501,26 @@
         `<span class="rb-nm h${s.hand}" style="${hand(`${nyckel}n${s.id}`, 0.5)}">${esc(s.namn)}</span></span>`;
     };
     // Allas tecken står kvar i sitt bläck, och det som satt är överstruket.
-    const cell = (r, s) => {
+    const cell = (r, s, j) => {
       const c = r.kol[s.id] || {};
       const key = `${nyckel}${r.nr}${s.id}`;
       const tecken = esc(c.t || '');
-      return `<span class="rb-c${c.ok ? ' ratt' : ''}${s.id === 'K' ? ' k' : ''}" style="--i:${s.ink}">${c.ok ? strykning(key, String(c.t).length) : ''}` +
+      return `<span class="rb-c${j}${c.ok ? ' ratt' : ''}${s.id === 'K' ? ' k' : ''}" style="--i:${s.ink}">${c.ok ? strykning(key, String(c.t).length) : ''}` +
         (tecken ? `<i style="${hand(key)}">${tecken}</i>` : '') + '</span>';
     };
-    const rader = sum.rader.map((r, i) => `<span class="rb-m" style="font-feature-settings:'${ANSLAG[i % 7]}'"><u>${r.nr}</u><span>${esc(r.h)} – ${esc(r.b)}</span><em>${esc(r.mal)}</em></span>` +
-      `<span class="rb-fa" style="font-feature-settings:'${ANSLAG[(i + 3) % 7]}'">${r.tecken}</span>` +
-      kol.map((s) => cell(r, s)).join('')).join('');
-    const rad = (cls, la, varden) => `<span class="rb-su la ${cls}">${la}</span>` + kol.map((s, i) => `<span class="rb-su ${cls}${s.id === 'K' ? ' k' : ''}" style="color:${s.ink}">` +
+    // varannan rad tonad hela vägen över, så att ögat hittar från matchen till var och ens tecken
+    const rader = sum.rader.map((r, i) => {
+      const j = i % 2 ? ' j' : '';
+      return `<span class="rb-m${j}" style="font-feature-settings:'${ANSLAG[i % 7]}'"><u>${r.nr}</u><span>${esc(r.h)} – ${esc(r.b)}</span><em>${esc(r.mal)}</em></span>` +
+        `<span class="rb-fa${j}" style="font-feature-settings:'${ANSLAG[(i + 3) % 7]}'">${r.tecken}</span>` +
+        kol.map((s) => cell(r, s, j)).join('');
+    }).join('');
+    const rad = (cls, la, varden, farg = (s) => s.ink) => `<span class="rb-su la ${cls}">${la}</span>` + kol.map((s, i) => `<span class="rb-su ${cls}${s.id === 'K' ? ' k' : ''}" style="color:${farg(s)}">` +
       (varden[i] === '' ? '' : `<i style="${hand(`${nyckel}${cls}${s.id}`, 0.8)}">${varden[i]}</i>`) + '</span>').join('');
-    const ratt = rad('tot', `Rätt av ${sum.n}`, kol.map((s) => (s.id === 'K' ? sum.kupong.ok : s.id === 'B' ? (sum.backe.n ? sum.backe.ok : '') : P(s.id).none ? '–' : P(s.id).ok)));
+    // Rätt står överst, direkt under porträtten, med Hasses röda rättningspenna: det är det man vill se
+    // först, och det syns också när bladet ligger på pulten (där nederkanten kan vara utanför bilden).
+    // Kupongen är allas, och dess siffra är störst.
+    const ratt = rad('tot', `Rätt av ${sum.n}`, kol.map((s) => (s.id === 'K' ? sum.kupong.ok : s.id === 'B' ? (sum.backe.n ? sum.backe.ok : '') : P(s.id).none ? '–' : P(s.id).ok)), () => ROD);
     const pts = rad('po', 'Poäng', kol.map((s) => {
       if (s.id === 'K') return '';
       if (s.id === 'B') return sum.backe.n ? poang(sum.backe.pts) : '';
@@ -518,7 +534,36 @@
     const band = `<span class="rb-band"><small>Matchfixarna${sum.nr ? ` · Kupong ${esc(sum.nr)}` : ''}</small><b>Protokoll</b></span>`;
     const omg = `<span class="rb-omg"><span>Omgång</span><b>${sum.namn ? `<i style="${hand(`${nyckel}omg`, 0.3)}">${esc(sum.namn)}</i>` : ''}</b></span>`;
     return `<span class="rum-block n${kol.length}${tat ? ' tat' : ''}" style="--n:${kol.length}" role="img" aria-label="${esc(label)}">${band}${omg}` +
-      `<span class="rb-g"><span class="rb-sp la">Nr · Match</span><span class="rb-sp la fa">Facit</span>${kol.map(huvud).join('')}${rader}${ratt}${pts}</span></span>`;
+      `<span class="rb-g"><span class="rb-sp la">Nr · Match</span><span class="rb-sp la fa">Facit</span>${kol.map(huvud).join('')}${ratt}${rader}${pts}</span></span>`;
+  }
+
+  // ---------- Hasses exempel ----------
+
+  // Ett exempel ur omgången till hans svar om poängen (protokollet i rum.js): hade flera i gänget lika
+  // många rätt men olika poäng fick den mest som datorn trodde minst på (poängen är rätt minus datorns
+  // chanser för alla ens tecken), annars det enskilda tips som gav mest. Bara gänget, så att han aldrig
+  // talar om sig själv. → en mening, eller null.
+  function exempel(sum) {
+    const T = TEXT.exempel;
+    const med = sum.folk.filter((p) => p.id !== HASSE && !p.none && p.n);
+    const grupper = new Map();
+    for (const p of med) grupper.set(p.ok, [...(grupper.get(p.ok) || []), p]);
+    const lika = [...grupper.values()].filter((g) => g.length > 1).sort((a, b) => b[0].ok - a[0].ok);
+    for (const g of lika) {
+      const v = g.map((p) => Tippoang.runda(p.pts));
+      const topp = Math.max(...v);
+      if (v.filter((x) => x === topp).length !== 1) continue;
+      return T.lika(lista(g.map((p) => p.namn)), ordet(g[0].ok), g[v.indexOf(topp)].namn);
+    }
+    let bast = null;
+    for (const r of sum.rader) {
+      for (const p of med) {
+        const c = p.rows[r.nr - 1];
+        if (c && c.hit && c.pts != null && (!bast || c.pts > bast.pts)) bast = { p, r, pts: c.pts, sign: c.sign };
+      }
+    }
+    if (!bast || Tippoang.runda(bast.pts) <= 0) return null;
+    return T.mest(bast.p.namn, bast.sign, bast.r.h, bast.r.b, Math.round((1 - bast.pts) * 100), poang(bast.pts).replace('+', ''));
   }
 
   // ---------- tidningen ----------
@@ -599,5 +644,5 @@
     }
   }
 
-  return { rakna, fryst, lappar, mandagEfter, bygg, gang, lapp, poang, RING, html, tidning, rastrera, kronika, skrall, betyg, TEXT };
+  return { rakna, fryst, lappar, mandagEfter, bygg, gang, lapp, poang, RING, html, exempel, tidning, rastrera, kronika, skrall, betyg, TEXT };
 });

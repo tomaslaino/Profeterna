@@ -976,6 +976,15 @@ bara lokalt. Analyserna visas som de ligger i `data/analyser.json`; hur de skriv
   märkpenna, tecknen står kvar i var och ens bläck i stället för att blekna till grått när de var fel, och handstilen står
   aldrig exakt likadant två gånger. Det som stod kvar sedan förut: allas tecken, facit, ringen kring vinnaren och att bladet
   slutar med raden Poäng.
+- **Protokollet tydligare, och Hasse förklarar poängen (2026-11-09, användarens önskemål):** "Går det att göra
+  protokollet tydligare, mer överblickbart och snyggare. Lägg till en "Hasse-förklaring" av poängen som du har där längst
+  ner. Alltså att man kan ropa till honom - precis som anslagstavlan", och "det ska vara tydligt hur många rätt det var
+  totalt på protokollet - så att man ser det även när man inte zoomar in på det - och då tänker jag för alla tillsammans".
+  Rätt står nu överst, direkt under porträtten, stort med Hasses röda rättningspenna och kupongens (allas) störst, eftersom
+  det är bladets nederkant som hamnar utanför bilden på pulten. Bladet ligger större på pulten (0,76 i stället för 0,53),
+  så att siffrorna går att läsa på håll, varannan rad är tonad hela vägen över och kupongens spalt har en linje mot de
+  andras. Under bladet står *Hasse, hur räknas poängen?*, och han svarar från baren som vid anslagstavlan; det som båda
+  använder ligger i [public/rum-hasse-svar.js](public/rum-hasse-svar.js). Se *Sammanställningen efter omgången*.
 - **Hasse dömer gänget i baren, och protokollet står utan omdömen (2026-11-08, användarens val):**
   "protokollet ska ligga här utan att Hasse Backe kommenterar något speciellt - i hans vy ska han däremot göra det", "Jag
   vill inte att han kommenterar sig själv här" och "Det här gör han tills att nästa stryktipsmatcher är uppe". Användaren
@@ -4605,7 +4614,8 @@ lappen flyttad åt höger, eller över lappen när de inte ryms bredvid varandra
 smala fönster). Bubblan täcker aldrig hans ansikte (håret får den): står den ovanför honom slutar
 den ovanför pannan och rullar om svaret inte ryms, och spetsen går ner till höger om ansiktet. I
 telefonen står knapparna under bubblan till höger om spetsen, och i en hög telefon står bubblan
-nära honom så att spetsen inte blir lång (`figur` och `hkPlats` i rum-anslag.js). Han lutar sig
+nära honom så att spetsen inte blir lång (`hkPlats` i rum-anslag.js; figuren, bubblan, spetsen och talet i
+[public/rum-hasse-svar.js](public/rum-hasse-svar.js), som protokollet också använder). Han lutar sig
 in på knappa halvsekunden, och med minskad rörelse står allt direkt. Med ljudet på (knappen i baren) hörs han från
 vänster och lite dovt, som från andra sidan affären, och orden kommer i takt med rösten
 (`fjarran` i [public/rum-hasse.js](public/rum-hasse.js)). Han säger vad talen är och hur de räknas
@@ -4980,7 +4990,8 @@ en fast bild.
 
 *Hasse Backe (fiktiv)* analyserar matcherna på stryktipskupongen och fyller i din kupong (se
 *Din kupong*), och det är allt man kan be honom om i baren: inga följdfrågor och ingen textruta. (Vid anslagstavlan kan man också ropa till
-honom om en lapp, och han svarar från baren, se [Anslagstavlan](#anslagstavlan).) Han sitter i baren till vänster utanför bilden, och
+honom om en lapp, och vid protokollet om poängen, och han svarar från baren, se [Anslagstavlan](#anslagstavlan) och
+*Sammanställningen efter omgången*.) Han sitter i baren till vänster utanför bilden, och
 längst ut på pulten står hans kaffe vid notan, och där ligger hans hand. Ett klick på dem, eller H,
 och kameran slår snabbt åt vänster till honom. Där sitter han vid pultens hörn: samma pult som man
 står vid, som går fram längs ens högra sida och viker av åt vänster förbi honom. Han sitter på andra
@@ -5783,12 +5794,14 @@ och de nya raderna har Tomas röst först när iMacen har läst upp dem (till de
 När alla matcher i omgången är spelade ligger bara Hasse Backes protokoll på pulten, i kupongens ställe, tills
 nästa kupong kommer måndagen efter kl. 16 ([public/rum-block.js](public/rum-block.js), [public/rum-block.css](public/rum-block.css)): en blankett ur
 samma tryckeri som kupongen – samma papper, bandet i terrakotta (*Protokoll*, med kupongens nummer), synkmarkeringarna i
-vänsterkanten, tryckta linjer, varannan rad tonad och tryckeriets rad längs högerkanten. Omgångens namn står för hand på
+vänsterkanten, tryckta linjer, varannan rad tonad hela vägen över och tryckeriets rad längs högerkanten. Omgångens namn står för hand på
 en tryckt rad under bandet. Raderna har resultat och facit på skrivmaskin, och spalterna är kupongen (gängets tre
 ansikten), var och en i gänget och Hasse, med porträtten uppklistrade som foton. Allas tecken står kvar i var och ens
 bläck, så att man ser vad var och en spelade, och det som satt är överstruket med grön märkpenna. Handstilen och
 märkpennans drag är lite olika i varje ruta, men samma omgång ser likadan ut varje gång (slumpen utgår från omgången,
-raden och spalten). Under står *Rätt av 13* och poängen. Vinnaren är inringad, både på porträttet
+raden och spalten). Överst, direkt under porträtten, står *Rätt av 13* stort med Hasses röda rättningspenna, och kupongens
+siffra är störst eftersom den är allas: det ska synas också på håll, när bladet ligger på pulten, och där är det bladets
+nederkant som hamnar utanför bilden (bladet ligger i skala 0,76 på pulten). Sist står poängen. Vinnaren är inringad, både på porträttet
 och runt poängen, och det är de enda ringarna på blocket. Hasse har rättat det och skrivit under, och mer står inte där:
 domarna över gänget säger han i baren (se [Hasse Backe](#hasse-backe), *Domarna efter omgången*). Förut stod en dom per
 person längst ner (ändrat 2026-11-08). I telefonen försvinner namnen under porträtten. Har Hasse ingen kupong i omgången
@@ -5796,7 +5809,27 @@ person längst ner (ändrat 2026-11-08). I telefonen försvinner namnen under po
 (`Tippoang.hasseSagt`, samma regel som hans kupong: det ska vara skrivet före avspark).
 
 Ett klick på blocket eller K lyfter det från pulten och lägger fram det stort över rummet, och *Lägg tillbaka*, Esc eller ett
-klick utanför lägger tillbaka det (`protokollet` i rum.js). Ett klick på
+klick utanför lägger tillbaka det (`protokollet` i rum.js).
+
+**Hasse om poängen** (2026-11-09, användarens önskemål). Under bladet står *Hasse, hur räknas poängen?*: ett klick eller H,
+så lutar han sig in från baren och svarar som vid anslagstavlan (*Ropa till Hasse* under [Anslagstavlan](#anslagstavlan);
+delarna, talet och hans plats i [public/rum-hasse-svar.js](public/rum-hasse-svar.js)). Han säger att antalet rätt inte säger
+hur svårt det var, hur poängen räknas (samma regel som i [public/tippoang.js](public/tippoang.js), se
+[Omgångens tippare](#omgångens-tippare)), ger ett exempel ur omgången och säger vad han själv gör med det. Exemplet
+(`RumBlock.exempel`) handlar bara om gänget, aldrig om honom själv: hade flera lika många rätt men olika poäng fick den mest
+som datorn trodde minst på, annars tar han det enskilda tips som gav mest. Svaret står till vänster om bladet, som glider
+åt höger så långt som behövs (bubblan upp till 520 px bred när det finns plats, så att svaret ryms ovanför hans huvud),
+eller över bladet med knapparna under bubblan när det inte ryms bredvid, i telefonen och i smala fönster (`protHasse` och
+`protHassePlats` i rum.js). *Tack, Hasse*, Esc eller ett klick utanför tystar honom, och sedan lägger Esc och ett klick
+utanför tillbaka bladet; han tystnar också när bladet läggs tillbaka. Meningarna står under `protokoll` i
+[public/rum-hasse-repliker.js](public/rum-hasse-repliker.js) och får hans röst när Macen har läst in dem (till dess säger
+han dem tyst); exemplet ändras med omgången och sägs alltid tyst. Ändras poängen ska hans svar följa med.
+Provat i headless Chromium i hela sidan (utan 3D-figurerna, och med en påhittad spelad omgång inlagd för hand) i 1440 × 900,
+1024 × 768 och 412 × 915, med och utan minskad rörelse: bredvid och över bladet, Tack, Hasse, Esc, H, ett klick utanför och
+Lägg tillbaka mitt i svaret. Anslagstavlans svar ser pixel för pixel likadant ut före och efter flytten till
+rum-hasse-svar.js. Inte provat i Safari eller i en riktig telefon.
+
+Ett klick på
 löpsedeln i fönstret öppnar tidningen: överst samma sedel som i fönstret, förstorad (`sedel` i rum-affischer.js kopierar
 papperet, så att de inte kan bli olika), och under den betygen, skrällen och hans krönika (`tidningen` i rum.js). Gänget håller upp skyltar med sina rätt (`lappar` i rum-3d.js), medan resten av figuren lever som
 vanligt. Skyltarna står kvar till måndagen efter omgången kl. 16, också om någon har valt matcher till en ny omgång för hand före det

@@ -6,7 +6,8 @@
 /* En blankett ur samma tryckeri som kupongen på pulten (rum.css, .rum-kup): samma papper, bandet och de
    tryckta linjerna i terrakotta, synkmarkeringarna i vänsterkanten och tryckeriets rad längs högerkanten.
    Ovanpå det förtryckta: facit och resultaten på skrivmaskin, allas tecken för hand i var och ens bläck,
-   det som satt överstruket med grön märkpenna, och Hasses röda ring kring vinnaren (den enda ringen). */
+   det som satt överstruket med grön märkpenna, och Hasses röda penna: rätt överst, under porträtten, så att det
+   syns på håll när bladet ligger på pulten, och ringen kring vinnaren (den enda ringen). */
 .rum-block { --c: 62px; --fa: 38px; --rad: 31px; --vg: 42px; --hg: 24px; --mp: #8fd14f; display: block; box-sizing: border-box; width: 692px; padding: 0 var(--hg) 22px var(--vg); color: var(--pp-ink); white-space: nowrap; text-align: left; font: 400 14px/1 var(--skriv); font-synthesis: none; box-shadow: 0 18px 28px rgba(0, 0, 0, 0.5), 0 2px 2px rgba(0, 0, 0, 0.25);
   background:
     /* vikningen tvärs över bladet, och lite ljusare där papperet buktar */
@@ -30,11 +31,12 @@
 .rb-g > span { box-sizing: border-box; display: flex; align-items: center; justify-content: center; position: relative; border-bottom: 1px solid var(--pp-line); }
 /* var och ens spalt mellan tryckta linjer, och kupongens spalt tonad i trycket */
 .rb-g > .rb-c, .rb-g > .rb-sp:not(.la), .rb-g > .rb-su:not(.la) { border-left: 1px solid var(--pp-line); }
-.rb-g > .k { background: rgba(169, 69, 43, 0.06); }
+.rb-g > .k { background-color: rgba(169, 69, 43, 0.06); box-shadow: inset -1px 0 0 var(--pp-rule); }
 /* matchen, med en synkmarkering ute i kanten och varannan rad i tryckets svaga ton */
 .rb-m { justify-content: flex-start !important; gap: 6px; height: var(--rad); font: 400 14px/1 var(--skriv); overflow: visible; }
 .rb-m::before { content: ""; position: absolute; left: calc(12px - var(--vg)); top: 50%; width: 16px; height: 6px; margin-top: -3px; background: #1e1a15; }
-.rb-g > .rb-m:nth-child(2n of .rb-m), .rb-g > .rb-m:nth-child(2n of .rb-m) + .rb-fa { background: var(--pp-print-tint); }
+/* (tonen ligger över kupongens spalt, som har sin egen) */
+.rb-g > .j { background-image: linear-gradient(var(--pp-print-tint), var(--pp-print-tint)); }
 .rb-m u { flex: none; width: 20px; text-align: right; text-decoration: none; color: var(--pp-print); font: 700 13px/1 var(--tryck); font-variant-numeric: tabular-nums; }
 .rb-m > span { flex: 1; min-width: 0; overflow: hidden; line-height: 1.5; }
 .rb-m em { flex: none; padding-left: 4px; margin-right: 8px; font: 400 13px/1 var(--skriv); font-style: normal; color: var(--pp-ink-soft); }
@@ -68,13 +70,15 @@
 .rb-mp path:first-child { stroke: #74b83c; stroke-width: 0.9; stroke-linejoin: round; vector-effect: non-scaling-stroke; }
 .rb-mp .ned { opacity: 0.3; }
 .rb-mp .rand { fill: none; stroke: #f3ecd6; stroke-width: 1.4; stroke-linecap: round; opacity: 0.22; }
-/* summorna */
+/* summorna: rätt överst, under porträtten, med Hasses röda penna (kupongens störst), och poängen sist */
 .rb-g > .rb-su { font: 400 15px/1 var(--skriv); }
 .rb-g > .rb-su.la { grid-column: span 2; justify-content: flex-start; padding-left: 28px; font: 700 10px/1 var(--tryck); letter-spacing: 0.16em; text-transform: uppercase; color: var(--pp-print); }
 .rb-su i { display: block; font-style: normal; }
-.rb-g > .rb-su.tot:not(.la) { height: 46px; font: 700 34px/1 Caveat, cursive; }
-.rb-g > .rb-su.tot { border-top: 1.5px solid var(--pp-rule); }
-.rb-g > .rb-su.po:not(.la) { height: 32px; font: 700 20px/1 Caveat, cursive; font-variant-numeric: tabular-nums; }
+.rb-g > .rb-su.tot:not(.la) { height: 58px; padding-top: 4px; font: 700 50px/1 Caveat, cursive; }
+.rb-g > .rb-su.tot.k { font-size: 60px; }
+.rb-g > .rb-su.tot { border-bottom: 1.5px solid var(--pp-rule); }
+.rb-g > .rb-su.po { border-top: 1.5px solid var(--pp-rule); }
+.rb-g > .rb-su.po:not(.la) { height: 36px; font: 700 23px/1 Caveat, cursive; font-variant-numeric: tabular-nums; }
 .rb-ring { position: absolute; inset: 3px 5px; width: calc(100% - 10px); height: calc(100% - 6px); overflow: visible; pointer-events: none; }
 .rb-ring path { stroke: #c8281e; stroke-width: 2.4; stroke-linecap: round; }
 .rb-vann { position: relative; display: inline-block; padding: 3px 8px; }
@@ -107,8 +111,9 @@
 .tat .rb-lag img + img { margin-left: -5px; }
 .tat .rb-nm { display: none; }
 .tat .rb-c { font-size: 19.5px; }
-.tat .rb-g > .rb-su.tot:not(.la) { height: 36px; font-size: 26px; }
-.tat .rb-g > .rb-su.po:not(.la) { height: 26px; font-size: 13.5px; }
+.tat .rb-g > .rb-su.tot:not(.la) { height: 40px; padding-top: 2px; font-size: 32px; }
+.tat .rb-g > .rb-su.tot.k { font-size: 37px; }
+.tat .rb-g > .rb-su.po:not(.la) { height: 28px; font-size: 14.5px; }
 .tat .rb-g > .rb-su.la { padding-left: 17px; font-size: 8.5px; letter-spacing: 0.06em; }
 .tat .rb-vann { padding: 2px 3px; }
 .tat .rb-vann .rb-ring { inset: -1px -2px; width: calc(100% + 4px); height: calc(100% + 2px); }
@@ -117,14 +122,19 @@
 /* på pulten: i kupongens ställe och plan. Kupongens ruta är tom, så att bara bladet syns och går att klicka på */
 #rum-kupong:has(> .rum-block) { background: none; box-shadow: none; pointer-events: none; }
 #rum-kupong:has(> .rum-block)::before, #rum-kupong:has(> .rum-block)::after { content: none; }
-#rum-kupong > .rum-block { position: absolute; left: 150px; top: 0; z-index: 5; pointer-events: auto; transform: rotate(-2deg) scale(0.53); transform-origin: 0 0; }
+#rum-kupong > .rum-block { position: absolute; left: 70px; top: 0; z-index: 5; pointer-events: auto; transform: rotate(-2deg) scale(0.76); transform-origin: 0 0; }
 .rum.smal #rum-kupong > .rum-block { left: 42px; top: 8px; transform: rotate(0.8deg) scale(0.9); }
 /* framme: lyft från pulten och stort över rummet (protokollet i rum.js) */
 .rum.protokoll-uppe #rum-kupong > .rum-block { visibility: hidden; }
 .rum-protokoll-mork { position: absolute; inset: 0; z-index: 60; background: rgba(9, 6, 3, 0.76); }
 .rum-protokoll { position: absolute; inset: 0; z-index: 61; display: flex; flex-direction: column; align-items: center; overflow: hidden auto; overscroll-behavior: contain; touch-action: pan-y; padding: 12px 12px 4px; box-sizing: border-box; outline: none; }
 .rum-protokoll > .rum-block { flex: none; position: relative; margin-top: auto; cursor: default; box-shadow: 0 30px 70px rgba(0, 0, 0, 0.6); }
-.rum-protokoll > .rt-tillbaka { margin-bottom: auto; }
+/* raden under bladet: ropet till Hasse och Lägg tillbaka. När Hasse svarar över bladet står den under
+   svaret (fast, protHassePlats i rum.js), och Hasse och bubblan står i fönstret också när bladet rullas. */
+.rum-protokoll > .rp-rad { flex: none; display: flex; flex-wrap: wrap; justify-content: center; align-items: center; column-gap: 28px; margin: 8px 0 auto; }
+.rp-rad .rt-tillbaka { margin-top: 0; }
+.rum-protokoll > .rp-rad.fast { position: fixed; left: 0; right: 0; margin: 0; padding: 0 16px; }
+.rum-protokoll > :is(.hs-mork, .hs-fig, .hs-bubbla, .hs-svans) { position: fixed; }
 
 /* ---------- lappen under domen ---------- */
 /* (RumBlock.lapp, hos Hasse i baren): en remsa av protokollets blankett, med samma papper, band och tryck – kryssen i
