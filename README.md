@@ -877,6 +877,10 @@ bara lokalt. Analyserna visas som de ligger i `data/analyser.json`; hur de skriv
   anslagstavlan, kameran ser snett längs baren, och disken, kaffet och notan hör till hans värld. Kaffet,
   notan och handen ligger kvar på pulten som en ledtråd. Förslaget att han i stället skulle sitta i tv:n som
   expert sades nej till. Se [Hasse Backe](#hasse-backe), *Bilden* och *Panoreringen*.
+- **Rummet och Hasse Backe är samma sida (2026-11-09, användarens önskemål):** "få det bättre o tydligare att
+  vanliga animationssidan och den med Hasse Backe hör ihop". Namnet och foten står kvar när kameran slår och
+  hos honom, neonskyltens sken faller in från affären till höger, och man vänder sig dit och tillbaka med
+  samma drag som man ser sig omkring med (eller pilarna). Se [Hasse Backe](#hasse-backe), *Samma sida*.
 - **Svaren till Hasse Backe i kupongens tryck (2026-11-04, användarens önskemål):** guldpillren
   och de understrukna länkarna i samtalet var webbknappar som inte hörde hemma i tobaksaffären.
   Svaren är nu lappar i tipskupongens terrakotta och krämvita papper, och det som går härifrån
@@ -5456,6 +5460,18 @@ rörelse tonar hans bild in och ut på 0,26 s. Rummet rätar upp sig efter musen
 han syns (`Rum.vila`), och då ritas det inte alls (`visibility: hidden`), men det står kvar som det
 var, så att vägen tillbaka inte behöver bygga om något. I vila har omslagen ingen transform och inget
 filter. `?rum-hasse-pan=0.5` fryser panoreringen på vägen (för bilder).
+
+**Samma sida.** Rummet och hans bild ska läsas som ett ställe där man bara har vänt sig. Namnet
+(*Matchfixarna*, i fönster smalare än 8:5) och foten står därför stilla medan kameran slår och är kvar hos
+honom, med *Tillbaka* där *Vanlig sida* stod; samtalet börjar under namnet, namnet leder tillbaka till
+rummet, och det tonas bort bakom matchbladet och kupongen i handen. Förut försvann båda i panoreringen och
+namnet var borta hos honom, så att det såg ut som en annan sida. Neonskylten i affärens fönster sitter strax
+utanför hans bild till höger, och dess röda sken faller in därifrån som över gänget i rummet (`.rh-ton::before`,
+`--neon` i `tand`): starkast på natten, tydligt på kvällen och nästan borta i dagsljus; en färdig toning utan
+blandning. Man vänder sig med samma drag som man ser sig omkring med i telefonen: när rummets vänstra kant
+redan syns och man drar vidare åt höger (minst 64 bildpunkter, mest i sidled) slår kameran till honom, och
+hos honom drar man åt vänster för att vända sig tillbaka (inte på kupongen eller matchbladet). Med
+tangentbord är det pilen åt vänster i rummet, när inget ligger framme, och pilen åt höger hos honom.
 
 **Ljuset.** Samma ljus på allt i hans bild, på fotot, armarna, händerna, koppen, askkoppen, cigarren
 och disken: varmt framifrån till vänster, ett varmt kantljus bakifrån från barens lampor, och

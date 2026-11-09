@@ -11,6 +11,11 @@
 // 3D-värld (.rh-pan). Hans bild är en egen värld där rummet inte syns: kameran står framför honom vid
 // pulten (rum-hasse-scen.js), och kaffet, notan och handen på pulten i rummet är samma som i hörnet.
 //
+// Samma sida: det är bara kameran som svänger. Namnet och foten står kvar på vägen och hos honom
+// (Tillbaka där Vanlig sida stod), neonskyltens röda sken faller in från affären till höger som över
+// gänget i rummet (--neon), och man vänder sig med samma drag som man ser sig omkring med: i rummet
+// åt höger från dess vänstra kant (swipe i rum.js) eller pilen åt vänster, hos honom åt andra hållet.
+//
 // Grafiken: panoreringen är färdiga mellanbilder som grafikprocessen spelar upp själv. Väggen bakom
 // honom är en färdig bild, disken ritas en gång på en egen duk och figuren på en duk som bara är så
 // stor som han och det han gör. Figuren finns bara medan man tittar på honom; då står rummet still och
@@ -85,6 +90,21 @@ window.RumHasse = (() => {
       e.stopPropagation();
       stang();
     });
+    // Samma drag som i rummet (swipe i rum.js): där drar man bilden åt höger för att se åt vänster, och
+    // längst till vänster sitter han. Här drar man den åt vänster och vänder sig tillbaka mot rummet.
+    let drag = null;
+    vy.addEventListener('pointerdown', (e) => { drag = e.isPrimary && e.pointerType !== 'mouse' && !e.target.closest('.rh-kupong, .rum-blad, input') ? { id: e.pointerId, x: e.clientX, y: e.clientY } : null; });
+    vy.addEventListener('pointercancel', () => { drag = null; });
+    vy.addEventListener('pointerup', (e) => {
+      const d = drag;
+      drag = null;
+      if (!d || e.pointerId !== d.id || H.blad) return;
+      const dx = e.clientX - d.x;
+      if (dx <= -64 && -dx > 1.5 * Math.abs(e.clientY - d.y)) stang();
+    });
+    // namnet står kvar hos honom (rum-hasse.css) och leder som i rummet dit: tillbaka
+    const namn = rum.querySelector('.rum-brand');
+    if (namn) namn.addEventListener('click', () => { if (H.on) stang(); });
     // ljudet av och på: stannar hos honom
     vy.querySelector('.rh-ljud').addEventListener('click', (e) => {
       e.stopPropagation();
@@ -107,7 +127,8 @@ window.RumHasse = (() => {
         }
         return;
       }
-      if (e.key === 'Escape') stang();
+      // Esc, eller pilen åt höger: man vänder sig tillbaka mot rummet (dit kom man med pilen åt vänster, rum.js)
+      if (e.key === 'Escape' || (e.key === 'ArrowRight' && !e.repeat && !(e.target instanceof Element && e.target.closest('input, textarea, select')))) stang();
     }, true);
     // ljuset medan man sitter hos honom (ljusNu)
     setInterval(() => { if (H.on && !H.svanger && !document.hidden) ljusNu(); }, 60000);
@@ -201,6 +222,9 @@ window.RumHasse = (() => {
     H.ljus = l;
     H.vy.classList.toggle('lys', l.lys);
     H.vy.style.setProperty('--natt', ((1 - l.k) * (1 - l.dag)).toFixed(3));
+    // neonskyltens sken från affären till höger (.rh-ton i rum-hasse.css): som i rummet starkast när det är
+    // mörkt ute och lysröret är släckt, och nästan borta i dagsljus
+    H.vy.style.setProperty('--neon', ((1 - 0.85 * l.dag) * (1 - 0.4 * l.k)).toFixed(3));
     if (H.m && H.m.DAG) {
       // fönstret i figurens ljus (rum-hasse-arm.js), och lysröret så tänt som det är
       H.m.DAG.value.set(...l.c.map((x) => x * l.f * 0.8), l.dag);

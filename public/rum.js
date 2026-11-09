@@ -5815,6 +5815,13 @@ ${window.RumRegister ? RumRegister.nara() : ''}
         else if (R.reg && R.reg.on() && el.querySelector('.rum-regn.lyft')) R.reg.key(k);
         return;
       }
+      // Hasse Backe sitter till vänster om det man ser: börjar draget där rummets vänstra kant redan
+      // syns och går vidare åt det hållet vänder man sig till honom (hos honom drar man tillbaka åt
+      // andra hållet, rum-hasse.js)
+      if (e.pointerType !== 'mouse' && (R.k * W - innerWidth <= 1 || P.px <= 0.002) && dx >= 64 && dx > 1.5 * Math.abs(dy) && !R.sak && !R.protokoll && !R.kup) {
+        tillHasse();
+        return;
+      }
       // farten de sista bildpunkterna, i bildpunkter per millisekund
       const [t0, x0, y0] = P.spar[0];
       const dt = Math.max(16, e.timeStamp - t0);
@@ -6039,6 +6046,8 @@ ${window.RumRegister ? RumRegister.nara() : ''}
       else if (k === 'n') openStall();
       else if (k === 'v') zoomVideo(!R.vnara);
       else if (k === 'h' && !R.zoom && !R.vnara) tillHasse();
+      // (han sitter till vänster: pilen dit vänder en också, när inget ligger framme)
+      else if (k === 'arrowleft' && !e.repeat && !R.zoom && !R.vnara && !R.sak && !R.protokoll) tillHasse();
       else if (k === 'escape' && R.zoom) zoomTv(false);
       else if (k === 'escape' && R.vnara) zoomVideo(false);
     });
