@@ -155,6 +155,58 @@
     return sum;
   }
 
+  // Protokollet för en omgång som är fryst (data/tippare.json, src/tippare.js): de som hänger på korktavlan.
+  // Samma blad som på pulten, men allt står redan i omgången – resultatet efter 90 minuter, modellens chans
+  // före avspark och allas tecken – så att det går att räkna också när matcherna inte finns i spelprogrammet.
+  // round: omgången som säsongen har den ({ id, name, matches, people }), kupong: gängets kupong ur
+  // kuponghistoriken (Historik.coupons) eller null. Matcherna står i kupongens ordning när den har dem alla,
+  // annars efter avsparken. Hasses spalt utan egen kupong står bara när analyserna har något han sa i omgången.
+  // → sammanställningen, eller null.
+  function fryst({ round, kupong = null, info = [], namn = null, nr = null, kort = (x) => x, analyser = null }) {
+    if (!round || !Array.isArray(round.matches) || !round.matches.length || !Array.isArray(round.people)) return null;
+    const plats = new Map(((kupong && kupong.rows) || []).map((r, i) => [String(r.id), i]));
+    const matcher = round.matches.every((m) => plats.has(String(m.id)))
+      ? round.matches.slice().sort((a, b) => plats.get(String(a.id)) - plats.get(String(b.id)))
+      : round.matches;
+    const resOf = (m) => (m.off || !SIGNS.includes(m.res) ? null : SIGNS.indexOf(m.res));
+    const rader = (tecken) => matcher.map((m) => {
+      const sign = Tippoang.sign(tecken(m));
+      if (!sign) return null;
+      const res = resOf(m);
+      const prob = Tippoang.chance(sign, Tippoang.pct(sign, m.model || null));
+      if (res == null) return { sign, hit: null, prob, pts: null };
+      const hit = sign.includes(SIGNS[res]);
+      return { sign, hit, prob, pts: Tippoang.points(hit, prob) };
+    });
+    const status = matcher.map((m) => {
+      const [hemma, borta] = String(m.match || '').split(' – ');
+      const s = /^(\d+)\s*[-–]\s*(\d+)$/.exec(String(m.score || '').trim());
+      return { m: { home: hemma || '', away: borta || '' }, res: resOf(m), score: s ? { home: +s[1], away: +s[2] } : null, pr: m.model || null };
+    });
+    const people = round.people.map((p) => {
+      const rows = rader((m) => m.tips && m.tips[p.id]);
+      if (rows.every((r) => !r)) return { id: p.id, name: p.name || p.id, none: true };
+      return { id: p.id, name: p.name || p.id, rows, ...Tippoang.tally(rows) };
+    });
+    const n = status.filter((s) => s.res != null).length;
+    const score = {
+      done: true, n, status, people,
+      ranked: Tippoang.rank(people.filter((p) => !p.none), n > 0),
+      model: Tippoang.tally(rader((m) => Tippoang.modelSign(m.model || null))),
+    };
+    const kupongRader = kupong && kupong.rows ? rader((m) => (kupong.rows.find((r) => String(r.id) === String(m.id)) || {}).sign) : null;
+    let backeRader = null;
+    if (!people.some((p) => p.id === HASSE) && analyser) {
+      const sagt = Object.fromEntries(matcher.map((m) => [m.id, Tippoang.hasseSagt(analyser.get(String(m.id)))]));
+      if (Object.values(sagt).some(Boolean)) backeRader = rader((m) => sagt[m.id] || Tippoang.modelSign(m.model || null));
+    }
+    const gang = people.filter((p) => p.id !== HASSE).map((p) => ({ id: p.id, namn: p.name }));
+    return bygg({
+      score, round: { id: round.id, matcher: matcher.map((m) => ({ id: String(m.id) })), gang },
+      kupongRader, backeRader, info, namn: namn || round.name || null, nr, kort,
+    });
+  }
+
   // ---------- lapparna ----------
 
   const fKl = new Intl.DateTimeFormat('en-GB', { timeZone: 'Europe/Stockholm', weekday: 'short', year: 'numeric', month: 'numeric', day: 'numeric', hour: 'numeric', minute: 'numeric', second: 'numeric', hourCycle: 'h23' });
@@ -547,5 +599,5 @@
     }
   }
 
-  return { rakna, lappar, mandagEfter, bygg, gang, lapp, poang, RING, html, tidning, rastrera, kronika, skrall, betyg, TEXT };
+  return { rakna, fryst, lappar, mandagEfter, bygg, gang, lapp, poang, RING, html, tidning, rastrera, kronika, skrall, betyg, TEXT };
 });
