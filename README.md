@@ -993,6 +993,10 @@ bara lokalt. Analyserna visas som de ligger i `data/analyser.json`; hur de skriv
   är då likadant i rummet och i baren: svalt vitt mitt på dagen, varmare i den gyllene timmen, grått när det
   är mulet. På kvällen och natten mörknar rummet mer än baren, som förut. Se [Hasse Backe](#hasse-backe),
   *Kaffet i rummet*.
+- **Cigarren i samma ljus (2026-11-09, användarens önskemål):** "Gör cigarren likadan också." Cigarren i
+  Hasses askkopp tar, som notan och porslinet, bara ljusets styrka och dagsljusets färg, och kantljuset
+  bakifrån bara som styrka, så att täckbladet inte får neonskyltens röda. Glöden är som förut. Se
+  [Hasse Backe](#hasse-backe).
 - **Hasse Backe spanar på din kupong (2026-11-08, användarens val):** ibland går blicken ned på kupongen,
   med sex olika miner, och när han har sagt vad han tycker om den passar minen orden. Se
   [Hasse Backe](#hasse-backe), *Vilan*.
@@ -5237,10 +5241,10 @@ speglade strålen träffar väggen, och där hämtas färgen ur väggens bild, s
 går; han själv speglas som en mörk form. Notan ligger under fatet,
 samma nota som på pulten, med den främre änden lite uppböjd. Den ritas på en duk efter notan i rummet
 (`#rum-hasse .nota` i rum.css): samma typsnitt, rader, vinklar och pappersstruktur, med baslinjerna mätta
-där. Notan, koppen, fatet och askkoppen är vita och får barens ljus, men bara dess styrka och
-dagsljusets färg (`ljusVitt` i [public/rum-hasse-arm.js](public/rum-hasse-arm.js)): de skiftar med dagsljuset
-som han och disken, svalt vita mitt på dagen och varmare i den gyllene timmen, men blir inte rosa av
-neonskylten och barens lampor.
+där. Notan, koppen, fatet, askkoppen och cigarren får barens ljus, men bara dess styrka och dagsljusets
+färg (`ljusDag` i [public/rum-hasse-arm.js](public/rum-hasse-arm.js)): de skiftar med dagsljuset som han och
+disken, det vita svalt vitt mitt på dagen och varmare i den gyllene timmen, men blir inte rosa av neonskylten
+och barens lampor. Cigarrens kantljus är också bara styrka; glöden är dess egen.
 Figuren skuggar det som är under disken eller skyms av den (`BORD_GLSL` i
 [public/rum-hasse-arm.js](public/rum-hasse-arm.js)): framför diskens bakre kant det som är under
 ovansidan, bakom den det som strålen från kameran bara når genom disken. Kroppen slutar alltså vid
@@ -5345,7 +5349,7 @@ ljuset på honom nästan var detsamma dag som kväll (ändrat 2026-11-06).
 
 **Kaffet i rummet.** Händerna, koppen och notan på pulten är samma som i hans bild, så att man känner
 igen dem när kameran slår över: koppen är bardiskens modell (`byggKopp`) med samma ljus, vit som i baren
-(`ljusVitt`). Notan under fatet tonas i samma ljus: när koppen är ritad räknar grafikkortet ut färgen på något
+(`ljusDag`). Notan under fatet tonas i samma ljus: när koppen är ritad räknar grafikkortet ut färgen på något
 vitt som ligger där (`vittTon`), och notans papper tar den färgen (`--nota-a` och `--nota-b` i rum.css), så att
 notan skiftar med dagsljuset som koppen. Fatet står
 på notans övre vänstra hörn så att namnet syns, och till vänster om fatet ligger hans underarmar korslagda på
