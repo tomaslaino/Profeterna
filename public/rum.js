@@ -2291,7 +2291,7 @@ ${window.RumRegister ? RumRegister.nara() : ''}
   // ?rum-radio: radion på fönsterbänken är på (=4: sedan fyra sekunder, med ?rum-t; rum-3d.js).
   function provRadio() {
     if (R.q.has('rum-radio-lage') && window.RumRadio) RumRadio.prova(R.q.get('rum-radio-lage'));
-    if (R.q.get('rum-sak') === 'radio') sak('radio', null);
+    if (['radio', 'radiolapp'].includes(R.q.get('rum-sak'))) sak(R.q.get('rum-sak'), null);
     if (!R.q.has('rum-radio') || !R.fig || !R.fig.radio) return;
     R.fig.radio(true, now() - (Number(R.q.get('rum-radio')) || 0));
   }
@@ -3008,7 +3008,7 @@ ${window.RumRegister ? RumRegister.nara() : ''}
         if (R.spel) R.fig.spel(R.spel, now());
         // de andra i gänget, natten och dagen efter (rum-folk.js)
         if (window.RumFolk) RumFolk.mount(R.el, { fig: () => R.fig, inr: () => R.inr, now, nara, fokus, teckna, lappKlick, visa, ta: taKupong, radio: () => sak('radio') });
-        if (window.RumRadio) RumRadio.mount({ el: R.el, fig: () => R.fig, now });
+        if (window.RumRadio) RumRadio.mount({ el: R.el, fig: () => R.fig, now, inr: () => R.inr, sak: (n) => sak(n) });
         radioRuta();
         provMal();
         provAkt();
@@ -3923,10 +3923,12 @@ ${window.RumRegister ? RumRegister.nara() : ''}
   // pokaler var och en har. Ingen av
   // dem leder ut ur rummet: Esc eller ett klick går tillbaka.
   //   el saken, mal det kameran siktar på (annars saken), h hur mycket av
-  //   höjden den får, duk duken i 3D, fot under den, ram(rutan, topp, höjd) zoomen
-  //   och var sakens mitt står (det som står bredvid den), pult saken ligger på
+  //   höjden den får, duk duken i 3D (eller flera), fot under den, ram(rutan, topp, höjd, med)
+  //   zoomen och var sakens mitt står (det som står bredvid den, med: rutan kring det
+  //   som ska med i bilden, mätt som saken), pult saken ligger på
   //   pulten (inget tonar bort), tv tv:n står framför den (och tonar bort),
-  //   under foten står så här mycket av sakens höjd längre ner (remsan på skivan)
+  //   under foten står så här mycket av sakens höjd längre ner (remsan på skivan),
+  //   radio radions reglage, bak tillbaka går hit om man kom härifrån
   const SAKER = {
     ur: { el: '.rum-ur', h: 0.78, duk: 'ur' },
     // (skårtavlan är låg: lite mer än halva höjden, ungefär lika nära som de andra)
@@ -3944,9 +3946,12 @@ ${window.RumRegister ? RumRegister.nara() : ''}
     chelsea: { el: '#rum-chelsea', h: 0.86, duk: 'skiva' },
     // (en hel tidningssida: hög, så att rubriken och fotot blir stora)
     nacional: { el: '#rum-nacional', h: 0.94, duk: 'skiva' },
-    // kassettradion (rum-radio.js): gänget står kvar, och skalan, reglagen och lappen med frekvenserna
-    // bredvid radion kommer när kameran är framme
-    radio: { el: '#rum-radio', h: 0.98, duk: 'skiva', radio: true, ram: (r, top, h) => (window.RumRadio ? RumRadio.ram(r.width, r.height, top, h) : null) },
+    // kassettradion (rum-radio.js): gänget står kvar, skalan och reglagen kommer när kameran är framme, och
+    // bladet med stationerna på fönsterkarmen bredvid den kommer med i bilden
+    radio: { el: '#rum-radio', h: 0.98, duk: ['skiva', 'radiolapp'], radio: true, med: '.rum-radiolapp', ram: (r, top, h, m) => (window.RumRadio ? RumRadio.ram(r, top, h, m) : null) },
+    // bladet (radiolapp i rum-inredning.js): som radion, men bara bladet när raderna blir för små att läsa
+    // bredvid radion (i telefonen), och tillbaka till radion om man kom därifrån
+    radiolapp: { el: '#rum-radio', h: 0.98, duk: ['skiva', 'radiolapp'], radio: true, bak: 'radio', med: '.rum-radiolapp', ram: (r, top, h, m) => (window.RumRadio ? RumRadio.ram(r, top, h, m, true) : null) },
   };
   // Pokalerna per person (fill), flest först, i var och ens färg.
   function pokalFot() {
@@ -3986,13 +3991,15 @@ ${window.RumRegister ? RumRegister.nara() : ''}
     // den förra saken ritas som vanligt igen
     const duk = was && SAKER[was] && SAKER[was].duk;
     if (duk && was !== namn && R.inr) R.inr.skarp(duk, 0);
-    if (was === 'radio') {
+    // (radion och bladet bredvid den)
+    const radio = (n) => Boolean(n && SAKER[n] && SAKER[n].radio);
+    if (radio(was)) {
       radioNara(false);
       // (det fina försvinner när kameran är tillbaka)
       clearTimeout(R.rDetalj);
-      if (namn !== 'radio') R.rDetalj = setTimeout(() => { if (R.sak !== 'radio' && R.fig) R.fig.radioDetalj(false); }, cls ? 700 : 0);
+      if (!radio(namn)) R.rDetalj = setTimeout(() => { if (!radio(R.sak) && R.fig) R.fig.radioDetalj(false); }, cls ? 700 : 0);
     }
-    R.el.classList.toggle('radio-nara', namn === 'radio');
+    R.el.classList.toggle('radio-nara', radio(namn));
     R.sak = namn || null;
     if (!namn) {
       lagerUt('sak');
@@ -4009,7 +4016,8 @@ ${window.RumRegister ? RumRegister.nara() : ''}
     const mal = S && S.mal ? R.el.querySelector(S.mal) : a;
     // (uret finns först när inredningen är ritad, och då frågar three() igen)
     if (!a || !mal) return;
-    lager('sak', () => sak(null));
+    const bak = S.bak && was === S.bak ? S.bak : null;
+    lager('sak', () => sak(bak));
     if (R.zoom) zoomTv(false);
     if (R.vnara) zoomVideo(false);
     board(false);
@@ -4020,6 +4028,8 @@ ${window.RumRegister ? RumRegister.nara() : ''}
     setCam(0, 0);
     const r = mal.getBoundingClientRect();
     const p = centerOf(r);
+    const med = S.med && R.el.querySelector(S.med);
+    const m = med ? med.getBoundingClientRect() : null;
     setCam(R.mx, R.my);
     w.style.cssText = cam;
     void w.offsetWidth;
@@ -4040,7 +4050,7 @@ ${window.RumRegister ? RumRegister.nara() : ''}
     const html = S.fot ? S.fot(a) : '';
     const top = 64;
     const h = innerHeight - top - (html ? 112 : 64);
-    const ram = (S.ram && S.ram(r, top, h)) || { zoom: Math.min((innerWidth * 0.9) / r.width, (h * S.h) / r.height), x: innerWidth / 2, y: top + h / 2 };
+    const ram = (S.ram && S.ram(r, top, h, m)) || { zoom: Math.min((innerWidth * 0.9) / r.width, (h * S.h) / r.height), x: innerWidth / 2, y: top + h / 2 };
     const { zoom } = ram;
     fot.innerHTML = html;
     fot.style.top = `${r1(ram.y + r.height * zoom * (0.5 + (S.under || 0)) + 14)}px`;

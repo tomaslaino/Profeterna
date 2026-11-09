@@ -338,7 +338,7 @@
     // Över listan med gänget: första gången, när man har hört om några och när man har hört om alla.
     fraga: ['Jag har rättat omgången. Vem ska jag börja med?', 'Protokollet är klart. Vem vill du höra om först?', 'Jag har gått igenom gängets kuponger. Vem tar vi först?', 'Jag har rödpennan framme. Vem i gänget tar vi först?', 'Omgången är spelad. Vem i gänget ska jag ta först?'],
     igen: ['Vem vill du höra om nu?', 'Vem i gänget ska jag ta nu?', 'Vem i gänget ska få sin dom nu?', 'Vem i gänget är nästa på tur?'],
-    alla: ['Nu har du hört om hela gänget.', 'Nu har alla i gänget fått sitt.', 'Nu har du hört om hela gänget. Det var inte upplyftande.', 'Det var hela gänget. Mer än så finns det inte att säga.'],
+    alla: ['Nu har du hört om hela gänget.', 'Nu har alla i gänget fått sitt.', 'Nu har du hört om hela gänget. Jag har sett bättre kuponger.', 'Det var hela gänget. Mer än så finns det inte att säga.'],
     // Om man står kvar vid listan med gänget och inte väljer någon.
     ledig: [
       'Ingen i gänget har bett om ursäkt än.',
@@ -362,7 +362,7 @@
       en: ['Det fanns en helgardering på kupongen, och den satt.', 'Helgarderingen satt, och det är inte så konstigt.'],
       fler: ['Det fanns {antal} helgarderingar på kupongen, och alla satt.', 'Alla {antal} helgarderingarna satt, och det är inte så konstigt.'],
     },
-    forsakring: ['Där de andra hade fel var det helgarderat.'],
+    forsakring: ['Där de andra hade fel hade {namn} helgarderat.'],
     spik: {
       ingen: ['Det fanns inte en enda spik på kupongen.', 'Inte en enda match vågade {namn} spika.'],
       enda: ['Den enda spiken satt.', 'Kupongen hade en spik, och den satt.'],
@@ -388,8 +388,9 @@
       inget: ['Den som inte tippar kan inte ha fel.', 'Att inte lämna in är det säkraste jag har sett.', 'Att stå över är också ett sätt att spara pengar.'],
     },
   },
-  // Ordet han slår i disken när han dömer någon i gänget, som domen över en match. Sägs inte.
-  domord: { forsakring: 'Garderat', forst: 'Flyt', alla: 'Felfritt', mitten: 'Osynlig', sist: 'Talang', sistLika: 'Snöpligt', inget: 'Klokt' },
+  // Ordet han slår i disken när han dömer någon i gänget, som domen över en match. Sägs inte. Det står
+  // också ensamt under namnet i listan och ska därför beskriva personen: Garderad, inte Garderat.
+  domord: { forsakring: 'Garderad', forst: 'Turlig', alla: 'Felfri', mitten: 'Osynlig', sist: 'Generös', sistLika: 'Snuvad', inget: 'Klok' },
 
   // Om man bara står där och inte frågar: han lottar bland raderna och säger en då och då, så de ska gå
   // att säga i vilken ordning som helst, och när det finns en match kvar att fråga om.

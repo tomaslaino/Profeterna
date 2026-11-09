@@ -1,4 +1,4 @@
-/* Kassettradion nära (rum-radio.js): genomskinliga reglage över delarna i 3D, och lappen med frekvenserna. */
+/* Kassettradion nära (rum-radio.js): genomskinliga reglage över delarna i 3D, och över bladet med stationerna. */
 /* rutan runt radion i rummet, som ger handen: det kameran siktar på (radioRuta i rum.js) */
 .rum-pl > #rum-radio { visibility: visible; pointer-events: auto; cursor: pointer; }
 .rum.sak-nara .rum-pl > #rum-radio { pointer-events: none; }
@@ -29,95 +29,25 @@
 .rum-radio-reglage .r-del:focus { outline: none; }
 .rum-radio-reglage .r-del:focus-visible { outline: 2px solid rgba(255, 214, 140, 0.7); }
 
-/* Lappen bredvid radion (lappen i rum-radio.js): frekvenserna för bandet som spaken står på, FM på framsidan och AM
-   på baksidan med tejpens pennor, på linjerat papper. Den vänds när spaken slås om, raderna är knappar och den
-   station som hörs är inringad. */
-.rum-radio-reglage .r-lapp {
-  --rad: 21px;
+/* Bladet med stationerna på fönsterkarmen (radiolapp i rum-inredning.js): knappen kring duken i rummet, som
+   uret. Nära radion ligger genomskinliga knappar över bladet och raderna (lappen i rum-radio.js): raderna går
+   att trycka på när de är stora nog att läsa, annars går ett tryck på bladet fram till det. */
+.rum-radiolapp { position: absolute; display: block; padding: 0; border: 0; background: none; }
+.rum-radio-reglage .r-lapp,
+.rum-radio-reglage .r-st {
   position: absolute;
-  left: 0;
-  top: 0;
-  pointer-events: auto;
-  perspective: 1600px;
-  font: 700 20px/1 Caveat, "Bradley Hand", "Segoe Print", cursive;
-  animation: r-lapp-in 0.45s ease-out both;
-}
-.rum-radio-reglage .r-lapp[hidden] { display: none; }
-@keyframes r-lapp-in { from { opacity: 0; transform: translateY(8px); } }
-.r-lapp .r-vand { display: grid; transform-style: preserve-3d; transition: transform 0.6s cubic-bezier(0.45, 0, 0.2, 1); }
-.r-lapp[data-band="am"] .r-vand { transform: rotateY(180deg); }
-.r-lapp .r-sida {
-  grid-area: 1 / 1;
-  padding: 12px 20px 16px 14px;
-  background: var(--pp-grain), #f3ebd6;
-  color: #1b2a66;
-  box-shadow: 0 1px 1px rgba(0, 0, 0, 0.3), 0 12px 28px rgba(0, 0, 0, 0.55);
-  -webkit-backface-visibility: hidden;
-  backface-visibility: hidden;
-  transform: rotate(1deg);
-}
-.r-lapp .r-am { color: #7a1f1a; transform: rotateY(180deg) rotate(-1deg); }
-.r-lapp .r-rubrik {
-  margin: 0 0 3px 4px;
-  font-size: 1.7em;
-  line-height: 1.15;
-  text-decoration: underline;
-  text-decoration-thickness: 2px;
-  text-underline-offset: 4px;
-}
-.r-lapp .r-rubrik small { display: inline-block; margin-left: 6px; font-size: 0.5em; opacity: 0.8; }
-.r-lapp ol {
-  display: grid;
-  grid-template-rows: repeat(var(--rader, 30), var(--rad));
-  grid-auto-flow: column;
-  column-gap: 26px;
   margin: 0;
   padding: 0;
-  list-style: none;
-  /* linjerna på papperet */
-  background: repeating-linear-gradient(to bottom, transparent 0 calc(var(--rad) - 1px), rgba(64, 98, 170, 0.2) calc(var(--rad) - 1px) var(--rad));
-}
-.r-lapp .r-st {
-  position: relative;
-  display: flex;
-  align-items: baseline;
-  gap: 8px;
-  height: var(--rad);
-  margin: 0;
-  padding: 0 4px;
   border: 0;
   background: none;
-  color: inherit;
-  font: inherit;
-  line-height: var(--rad);
-  white-space: nowrap;
-  text-align: left;
-  cursor: pointer;
+  pointer-events: auto;
   -webkit-tap-highlight-color: transparent;
+  cursor: zoom-in;
 }
-.r-lapp .r-f { min-width: 2.15em; text-align: right; }
-.r-lapp .r-st:hover { text-decoration: underline; text-decoration-thickness: 1px; text-underline-offset: 3px; }
-.r-lapp .r-st:focus { outline: none; }
-.r-lapp .r-st:focus-visible { outline: 2px solid currentColor; outline-offset: 1px; border-radius: 3px; }
-/* den som hörs: inringad med pennan */
-.r-lapp .r-st.nu::after {
-  content: "";
-  position: absolute;
-  inset: 0 -6px -1px -3px;
-  border: 2px solid currentColor;
-  border-radius: 50%;
-  opacity: 0.8;
-  transform: rotate(-1.5deg);
-  pointer-events: none;
-}
-/* telefonen */
-@media (max-width: 560px), (max-height: 480px) {
-  .rum-radio-reglage .r-lapp { --rad: 17px; font-size: 16px; }
-  .r-lapp .r-sida { padding: 8px 12px 11px 8px; }
-  .r-lapp ol { column-gap: 14px; }
-  .r-lapp .r-st { gap: 6px; }
-}
-@media (prefers-reduced-motion: reduce) {
-  .rum-radio-reglage .r-lapp { animation: none; }
-  .r-lapp .r-vand { transition: none; }
-}
+.rum-radio-reglage .r-lapp.las { cursor: default; }
+.rum-radio-reglage .r-st { cursor: pointer; }
+.rum-radio-reglage .r-lapp[hidden], .rum-radio-reglage .r-rader[hidden] { display: none; }
+/* (texten står på papperet: den här är till för skärmläsaren) */
+.rum-radio-reglage .r-st { overflow: hidden; color: transparent; font-size: 1px; white-space: nowrap; border-radius: 3px; }
+.rum-radio-reglage .r-st:focus, .rum-radio-reglage .r-lapp:focus { outline: none; }
+.rum-radio-reglage .r-st:focus-visible, .rum-radio-reglage .r-lapp:focus-visible { outline: 2px solid rgba(255, 214, 140, 0.7); }

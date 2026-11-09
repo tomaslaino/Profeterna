@@ -266,6 +266,8 @@ function tidning(fro) {
   if (v && TIDNINGAR[v]) return v;
   return ((Math.floor(fro / 2) % 2) + 2) % 2 ? 'ex' : 'sb';
 }
+// Veckans tidning ('sb' eller 'ex'): samma som löpsedeln, också den Hasse läser (rum-hasse-tidning.js).
+export const veckansTidning = (t = Date.now()) => tidning(veckaFro(t));
 
 const fDatum = new Intl.DateTimeFormat('sv-SE', { timeZone: 'Europe/Stockholm', weekday: 'long', day: 'numeric', month: 'long' });
 const fDag = new Intl.DateTimeFormat('sv-SE', { timeZone: 'Europe/Stockholm', weekday: 'short' });

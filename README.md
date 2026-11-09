@@ -752,6 +752,13 @@ bara lokalt. Analyserna visas som de ligger i `data/analyser.json`; hur de skriv
   bandspaken slås om. Ett klick på en rad går dit, och den som hörs är inringad. Orden under radion är borta.
   Frekvenserna fick inte plats på tejpen: där trängs AM-stationerna 610–999 (14 av 21) på en tredjedel av
   skalan, och namnen står redan långt från sina frekvenser. Se [Tobaksaffären](#tobaksaffären), *Radion*.
+- **Lappen blir ett blad ur ett spiralblock på fönsterkarmen (2026-11-09, användarens önskemål):** "Kan du göra
+  det här betydligt snyggare – inklusive var den är placerad. Kanske som nån post-it vid stereon eller nåt?" och
+  "Gör det också tydligt att det är papperskvalitet". Av tre skisser på karmen bredvid radion (post-it, blad ur
+  spiralblock, en bit av en cigarettlimpa) valdes spiralblocket: ett rivet blad i 3D med halva spiralhål, blå
+  linjer, röd marginal, vikning, gulnad tejp och en skugga där det släpper från karmen, med FM i blått och AM i
+  rött i var sin spalt. Det sitter där hela tiden och vänds inte längre. Se [Tobaksaffären](#tobaksaffären),
+  *Radion*.
 - **Man väljer sig själv med ett klick på sin figur (2026-11-03, användarens önskemål):**
   ett klick på sin egen figur vid bordet gör en till den som fyller i kupongen – samma val
   som porträtten på kupongen – och figuren räcker upp handen med pennan, lyfter kupongen mot
@@ -993,6 +1000,10 @@ bara lokalt. Analyserna visas som de ligger i `data/analyser.json`; hur de skriv
   är då likadant i rummet och i baren: svalt vitt mitt på dagen, varmare i den gyllene timmen, grått när det
   är mulet. På kvällen och natten mörknar rummet mer än baren, som förut. Se [Hasse Backe](#hasse-backe),
   *Kaffet i rummet*.
+- **Cigarren i samma ljus (2026-11-09, användarens önskemål):** "Gör cigarren likadan också." Cigarren i
+  Hasses askkopp tar, som notan och porslinet, bara ljusets styrka och dagsljusets färg, och kantljuset
+  bakifrån bara som styrka, så att täckbladet inte får neonskyltens röda. Glöden är som förut. Se
+  [Hasse Backe](#hasse-backe).
 - **Hasse Backe spanar på din kupong (2026-11-08, användarens val):** ibland går blicken ned på kupongen,
   med sex olika miner, och när han har sagt vad han tycker om den passar minen orden. Se
   [Hasse Backe](#hasse-backe), *Vilan*.
@@ -3068,13 +3079,19 @@ station drar radion in den, och en liten röd lampa säger att den stämmer. Mel
 också knaster och en pipton som sjunker tills man står rätt. AM låter dessutom som AM: smalt band och långsam
 fading, som också syns på lampan. Lysdioderna och högtalarna följer det som faktiskt hörs (en analysator i
 Web Audio). Alla stationer står för hand på maskeringstejpen vid skalan (FM ovanför i blått, AM under i rött, två
-rader där varannan står närmast skalan, `tejpPlats`). Där trängs de, så frekvenserna står på en handskriven lapp
-bredvid radion (`lappen` i rum-radio.js): bandet som spaken står på, med tejpens penna på linjerat papper, FM på
-framsidan och AM på baksidan, och den vänds när spaken slås om. Namnet står som stationen heter, utan frekvensen
-en gång till (*890 Sport*, *102,5 RTL*). Ett klick på en rad går dit och sätter på radion, och den station som hörs
-är inringad. Lappen syns när kameran är framme, och närbilden ger plats åt den (`RumRadio.ram`, `ram` i `SAKER` i
-rum.js): bredvid radion eller under den, i en, två eller tre spalter, det som ger den största radion (en spalt
-bredvid i en stor datorskärm, två under på telefonen på höjden och tre bredvid på tvären). Första gången står
+rader där varannan står närmast skalan, `tejpPlats`). Där trängs de, så frekvenserna står på ett blad ur ett
+spiralblock som är tejpat på fönsterkarmen till höger om radion, mellan radion och veckans löpsedel (`radiolapp` i
+rum-inredning.js, en egen duk i bakväggens plan, så att det sitter fast på karmen när rummet vrids). Bladet är i
+3D: rivet ur spiralen med halva hål, blå linjer och röd marginal, vikt en gång, två bitar gulnad tejp överst, och
+nedtill släpper det från karmen (mest i hörnet) med en skugga under. Papperet har samma struktur som allt papper
+på sajten (rum/papper.webp), fibrer och en kaffering, och mörknar med rummet när lysröret släcks. FM står i blått
+och AM i rött, i var sin spalt, med samma penna som på tejpen. Namnet står som stationen heter, utan frekvensen en
+gång till (*890 Sport*, *102,5 RTL*), och den station som hörs ringas in med pennan (ett streck i 3D, `nu`). Nära
+radion kommer bladet med i bilden (`RumRadio.ram`, `med` i `SAKER` i rum.js: radion och bladet mäts med rummet
+rakt). Där ligger genomskinliga knappar över raderna (`lappen` i rum-radio.js) när de är minst 14 px höga: ett
+klick går dit och sätter på radion. Är de mindre (telefonen) går ett tryck på bladet fram till det
+(`SAKER.radiolapp`: bara bladet, och Tillbaka går till radion igen). Ett klick på bladet i rummet går också dit,
+vilket på en datorskärm är samma bild som radion. Första gången står
 visaren på Italo Disco. Visaren och volymen sparas i webbläsaren, och radion är var och ens egen: den syns inte
 hos de andra och stängs av när man lämnar rummet.
 
@@ -5236,10 +5253,10 @@ speglade strålen träffar väggen, och där hämtas färgen ur väggens bild, s
 går; han själv speglas som en mörk form. Notan ligger under fatet,
 samma nota som på pulten, med den främre änden lite uppböjd. Den ritas på en duk efter notan i rummet
 (`#rum-hasse .nota` i rum.css): samma typsnitt, rader, vinklar och pappersstruktur, med baslinjerna mätta
-där. Notan, koppen, fatet och askkoppen är vita och får barens ljus, men bara dess styrka och
-dagsljusets färg (`ljusVitt` i [public/rum-hasse-arm.js](public/rum-hasse-arm.js)): de skiftar med dagsljuset
-som han och disken, svalt vita mitt på dagen och varmare i den gyllene timmen, men blir inte rosa av
-neonskylten och barens lampor.
+där. Notan, koppen, fatet, askkoppen och cigarren får barens ljus, men bara dess styrka och dagsljusets
+färg (`ljusDag` i [public/rum-hasse-arm.js](public/rum-hasse-arm.js)): de skiftar med dagsljuset som han och
+disken, det vita svalt vitt mitt på dagen och varmare i den gyllene timmen, men blir inte rosa av neonskylten
+och barens lampor. Cigarrens kantljus är också bara styrka; glöden är dess egen.
 Figuren skuggar det som är under disken eller skyms av den (`BORD_GLSL` i
 [public/rum-hasse-arm.js](public/rum-hasse-arm.js)): framför diskens bakre kant det som är under
 ovansidan, bakom den det som strålen från kameran bara når genom disken. Kroppen slutar alltså vid
@@ -5344,7 +5361,7 @@ ljuset på honom nästan var detsamma dag som kväll (ändrat 2026-11-06).
 
 **Kaffet i rummet.** Händerna, koppen och notan på pulten är samma som i hans bild, så att man känner
 igen dem när kameran slår över: koppen är bardiskens modell (`byggKopp`) med samma ljus, vit som i baren
-(`ljusVitt`). Notan under fatet tonas i samma ljus: när koppen är ritad räknar grafikkortet ut färgen på något
+(`ljusDag`). Notan under fatet tonas i samma ljus: när koppen är ritad räknar grafikkortet ut färgen på något
 vitt som ligger där (`vittTon`), och notans papper tar den färgen (`--nota-a` och `--nota-b` i rum.css), så att
 notan skiftar med dagsljuset som koppen. Fatet står
 på notans övre vänstra hörn så att namnet syns, och till vänster om fatet ligger hans underarmar korslagda på
@@ -5628,8 +5645,8 @@ När alla matcher har börjat säger han hur det gick för honom (`efterat`), ti
 att omgången är spelad tills nästa Stryktips kommer måndagen efter kl. 16 (`Rum.summa`), dömer han gänget i stället för att
 gå igenom matcherna. Han frågar vem han ska börja med, och gänget står sida vid sida i sin ordning, som på kupongen: stora
 porträtt i var och ens färg och namnet i sin handstil, utan siffror (`gangLista` i [public/rum-hasse.js](public/rum-hasse.js)).
-Den man väljer får sin dom slagen i disken i guld, som domen över en match (*Garderat*, *Flyt*, *Felfritt*, *Osynlig*,
-*Talang*, *Snöpligt*, *Klokt*), och under den några meningar: en inledning efter hur det gick i gänget, en eller två saker ur
+Den man väljer får sin dom slagen i disken i guld, som domen över en match (*Garderad*, *Turlig*, *Felfri*, *Osynlig*,
+*Generös*, *Snuvad*, *Klok*: ordet beskriver personen), och under den några meningar: en inledning efter hur det gick i gänget, en eller två saker ur
 kupongen och ett slut (`doma`). Sakerna är räknade ur protokollet: helgarderingarna, hur många spikar som satt och i hur
 många matcher ingen annan i gänget hade rätt (läget i `gang` i [public/rum-block.js](public/rum-block.js), raderna i `domar`
 i rum-hasse-repliker.js). Raderna väljs efter omgången och personen, inte på lott, så att domen är densamma varje gång och
@@ -5654,6 +5671,19 @@ disken står som en stämpel i guld under namnet på dem man har hört om (på e
 gänget avgörs, och efter omgången säger han inte heller hur det gick för honom. Förut hade listan rätt och poäng, bäst först,
 och länken *Matcherna* till hans rader och facit (borta 2026-11-09). Med dolda resultat finns inget protokoll, och då är allt
 som förut.
+
+**Tidningen** (2026-11-09). Har det gått dåligt för honom i tippningen låtsas han vara upptagen: han gömmer sig bakom
+veckans kvällstidning, samma som löpsedeln i rummet (Sportbladet eller Expressen, `veckansTidning` i
+[public/rum-affischer.js](public/rum-affischer.js)), skyldig men nöjd med sig själv. Har man just kommit läser han redan; han
+läser rad för rad, tittar upp över kanten på en med höjda bryn och ler sedan belåtet, lyfter tidningen så att bara ögonen
+syns, nickar åt det som står, rycker den rak och tittar längs baren, och mellan gångerna lägger han den i knät bakom disken
+en stund (klippen `lasa` och `lasa2`, byggda av bitarna i `LASBIT` i [public/rum-hasse-3d.js](public/rum-hasse-3d.js)).
+Behöver han händerna, som när han slår en dom i disken, läser han klart raden och lägger ned den direkt. Förstasidan vänder
+sig mot en med en rubrik om hans egen omgång och hans porträtt rastrerat, och baksidan är tipsguiden (`RUBRIKER` och
+papperet i [public/rum-hasse-tidning.js](public/rum-hasse-tidning.js), samma rubrik för samma omgång). Dåligt är inte ett
+rätt, sämst i gänget, eller rätten långt under vad chanserna var värda, med tävlingskupongen om han spelade och annars det han
+sa (`hansOmgang` och `efterat` i [public/rum-hasse.js](public/rum-hasse.js)); det gäller både när han säger hur det gick och
+när han dömer gänget. Med minskad rörelse läser han inte.
 Går hans röst inte att få säger han det och visar analysen i skrift. Allt han säger runt omkring är
 färdiga rader, utan AI, i [public/rum-hasse-repliker.js](public/rum-hasse-repliker.js). Står man kvar säger han något då och då:
 över matchlistan (`ledig`), över listan med gänget (`domar.ledig`) och när man inte svarar på hans fråga (`valVanta`). Raderna

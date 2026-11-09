@@ -4,7 +4,8 @@
 // skyltfönstret, Stängt-skylten på dörrens glas, skivan med löpsedlarna i
 // fönstret, stationsuret och orakelramen med mässingsskylten på bakväggen,
 // cigarettpaketen uppe på högra väggen, ramarna kring skårtavlan och
-// korktavlan, bardisken med barstolarna och kupongstället på disken.
+// korktavlan, bardisken med barstolarna, kupongstället på disken och bladet
+// med radions stationer på fönsterkarmen bredvid radion.
 //
 // Allt ritas med en och samma WebGL-duk utanför sidan och kopieras till en
 // vanlig duk per sak, i det plan där den platta saken låg, så att den följer
@@ -30,8 +31,8 @@
 // På natten är lysröret släckt (natt, från rum-folk.js, 0–1 medan det dämpas och tänds): rören och
 // reflektorn mörka, och det målade bandet mörknar.
 //
-// inredning(el, { calm, still, vagg }) → { draw(), namn(html), skarp(namn, px), natt(0–1), stopp(ms) } (namnet som Kronan.names, ms spelstoppet eller null;
-// vagg: tavlornas mått på högra väggen, VAGG i rum.js)
+// inredning(el, { calm, still, vagg }) → { draw(), namn(html), skarp(namn eller [namn], px), natt(0–1), stopp(ms), lapp } (namnet som Kronan.names, ms spelstoppet eller null;
+// vagg: tavlornas mått på högra väggen, VAGG i rum.js; lapp: bladet vid radion för rum-radio.js, radiolapp)
 
 import { SKIVA, skivPlats } from './rum-affischer.js';
 import { ROR as NEON_ROR } from './rum-neon.js';
@@ -47,6 +48,9 @@ const RAM = { x: 987, y: 302, w: 126, h: 152, b: 12 };
 // det målade bandet på bakväggen, mellan taket och fönsterkarmen och lika brett
 // som fönstret (i bakväggens bild)
 const MAL = { x0: 262, x1: 958, y0: 92, y1: 121 };
+// bladet med radions stationer på fönsterkarmen till höger om radion, mellan radion (som står framför
+// karmen, på fönsterbänken) och veckans löpsedel, ovanför fönsterbänkens bakkant (radiolapp)
+const LAPP = { x: 951, y: 508, w: 33, h: 44 };
 // Sakerna och dukarna (plan: 0 = väggen). Urets
 // och ramens dukar ligger i knappen och länken (i, med hörnet at).
 const BITAR = {
@@ -65,6 +69,9 @@ const BITAR = {
   // den, men under kortlådan (z-index i rum-register.css); duken lyser när man
   // pekar på stället (.rum-stall-duk i rum.css)
   stall: { plan: 0, box: { x: 1150, y: 414, w: 110, h: 121 }, cls: 'rum-stall-duk' },
+  // bladet med radions stationer (radiolapp): duken ligger i knappen kring bladet, med plats för tejpen
+  // och skuggan, och ett klick går fram till det (SAKER.radiolapp i rum.js)
+  radiolapp: { plan: 0, box: { x: LAPP.x - 7, y: LAPP.y - 7, w: LAPP.w + 15, h: LAPP.h + 13 }, i: '.rum-radiolapp', at: LAPP },
 };
 // närbilden: högst så många bildpunkter på dukens längsta led
 const SKARP = 2600;
@@ -1272,6 +1279,348 @@ export async function inredning(el, opt = {}) {
     b.mesh(new THREE.BoxGeometry(19.6, 3.6, 0.2), mat('#fff', { map: ror, roughness: 0.15, envMapIntensity: 0.7 })).position.set(px + pw / 2, -(py + ph / 2), 1.15);
   }
 
+  // ---------- bladet vid radion ----------
+  // Ett blad som har rivits ur ett spiralblock och tejpats på fönsterkarmen bredvid radion med två bitar
+  // gulnad tejp: halva spiralhål överst, blå linjer och röd marginal, vikt en gång på mitten, och nedtill
+  // släpper det från karmen, mest i hörnet. Radions stationer står där för hand (KANALER och rad i
+  // rum-radio.js), FM i blått och AM i rött i var sin spalt, och den station som hörs ringas in med samma
+  // penna (nu). Papperet har samma struktur som allt papper på sajten (rum/papper.webp), fibrer och en
+  // kaffering, och ritas en gång. rader() ger raderna som andelar av duken, så att rum-radio.js kan lägga
+  // knappar över dem nära radion.
+  function radiolapp(b) {
+    const RR = window.RumRadio;
+    if (!RR || !RR.KANALER || !RR.rad) return null;
+    // bladet i bakväggens bild (EW × EH, och raderna i samma enheter), och i 3D på djupet Z
+    const EW = LAPP.w;
+    const EH = LAPP.h;
+    const Z = WZ + 0.6;
+    const s = 1000 / (1000 - Z);
+    const W = EW / s;
+    const H = EH / s;
+    const TOPP = 5.4;
+    const RAD = (EH - TOPP - 1) / 28;
+    const KOL = { fm: 2.9, am: 17.3 };
+    const KB = 14;
+    const FB = 3.2;
+    const BLAK = { fm: '#1b2c84', am: '#a11d1d' };
+    const TW = LATT ? 720 : 1080;
+    const TH = Math.round((TW * EH) / EW);
+    const rader = [];
+    // (fibrerna är desamma varje gång)
+    let fro = 7;
+    const slump = () => { fro = (fro * 16807) % 2147483647; return fro / 2147483647; };
+    let korn = null;
+    function rita(c, w, h) {
+      const u = w / EW;
+      fro = 7;
+      rader.length = 0;
+      c.clearRect(0, 0, w, h);
+      c.save();
+      // riven ur spiralen: halva hål och fransar längs överkanten
+      const form = new Path2D();
+      const y0 = 1.15 * u;
+      form.moveTo(0, y0);
+      const n = 16;
+      for (let i = 0; i < n; i++) {
+        const cx = (i + 0.5) * (w / n);
+        const r = 0.44 * u;
+        form.lineTo(cx - r - 0.12 * u * hash(i), y0 + 0.08 * u * hash(i + 3));
+        form.arc(cx, y0 - 0.15 * u, r, Math.PI * 0.95, Math.PI * 0.05, true);
+        form.lineTo(cx + r + 0.3 * u * hash(i + 7), y0 - 0.1 * u * hash(i + 11));
+      }
+      form.lineTo(w, y0);
+      form.lineTo(w, h);
+      form.lineTo(0, h);
+      form.closePath();
+      c.clip(form);
+      const g = c.createLinearGradient(0, 0, 0, h);
+      g.addColorStop(0, '#f8f7f2');
+      g.addColorStop(0.25, '#f2f0e9');
+      g.addColorStop(1, '#eeebe2');
+      c.fillStyle = g;
+      c.fillRect(0, 0, w, h);
+      if (korn) {
+        c.globalCompositeOperation = 'multiply';
+        c.globalAlpha = 0.55;
+        const t = 12 * u;
+        for (let y = 0; y < h; y += t) for (let x = 0; x < w; x += t) c.drawImage(korn, x, y, t, t);
+        c.globalAlpha = 1;
+        c.globalCompositeOperation = 'source-over';
+      }
+      // fibrer, och moln i massan
+      c.lineCap = 'round';
+      c.lineWidth = Math.max(0.6, 0.035 * u);
+      for (let i = 0; i < 900; i++) {
+        const x = slump() * w;
+        const y = slump() * h;
+        const l = (0.2 + 0.8 * slump()) * u;
+        const a = slump() * Math.PI;
+        c.strokeStyle = slump() < 0.5 ? `rgba(110,95,70,${(0.04 + 0.05 * slump()).toFixed(3)})` : `rgba(255,255,255,${(0.1 + 0.15 * slump()).toFixed(3)})`;
+        c.beginPath();
+        c.moveTo(x, y);
+        c.quadraticCurveTo(x + l * 0.5 * Math.cos(a + 0.6), y + l * 0.5 * Math.sin(a + 0.6), x + l * Math.cos(a), y + l * Math.sin(a));
+        c.stroke();
+      }
+      for (let i = 0; i < 16; i++) {
+        const x = slump() * w;
+        const y = slump() * h;
+        const r = (3 + 6 * slump()) * u;
+        const m = c.createRadialGradient(x, y, 0, x, y, r);
+        m.addColorStop(0, slump() < 0.5 ? 'rgba(255,255,252,0.08)' : 'rgba(150,125,80,0.05)');
+        m.addColorStop(1, 'rgba(0,0,0,0)');
+        c.fillStyle = m;
+        c.fillRect(x - r, y - r, 2 * r, 2 * r);
+      }
+      // linjerna och marginalen
+      c.strokeStyle = 'rgba(84,130,200,0.42)';
+      c.lineWidth = Math.max(1, 0.07 * u);
+      for (let j = -2; j <= 28; j++) {
+        const y = (TOPP + j * RAD - 0.12) * u;
+        c.beginPath();
+        c.moveTo(0, y);
+        c.lineTo(w, y);
+        c.stroke();
+      }
+      c.strokeStyle = 'rgba(214,90,90,0.55)';
+      c.lineWidth = Math.max(1, 0.08 * u);
+      c.beginPath();
+      c.moveTo(2.2 * u, 1.5 * u);
+      c.lineTo(2.2 * u, h);
+      c.stroke();
+      // vikningen, och en kaffering som nästan har torkat bort
+      const vy = h * 0.52;
+      c.fillStyle = 'rgba(255,255,255,0.4)';
+      c.fillRect(0, vy - 0.1 * u, w, 0.08 * u);
+      c.fillStyle = 'rgba(90,80,60,0.16)';
+      c.fillRect(0, vy, w, 0.1 * u);
+      c.strokeStyle = 'rgba(120,70,20,0.1)';
+      c.lineWidth = 0.35 * u;
+      c.beginPath();
+      c.ellipse(w * 0.9, h * 0.94, 4.2 * u, 4 * u, 0.2, Math.PI * 0.95, Math.PI * 1.75);
+      c.stroke();
+      // handstilen: lite mer bläck där pennan tar i, och varje rad lite olika (→ bredden)
+      const skriv = (txt, x, y, px, farg, max, i) => {
+        c.save();
+        c.translate(x, y + (hash(i * 4.1) - 0.5) * 0.14 * u);
+        c.rotate((hash(i * 2.9) - 0.5) * 0.02);
+        c.font = `700 ${px}px Caveat, cursive`;
+        const bb = c.measureText(txt).width;
+        const k = max && bb > max ? max / bb : 1;
+        c.scale(k, 1);
+        c.fillStyle = farg;
+        c.globalAlpha = 0.9;
+        c.fillText(txt, 0, 0);
+        c.globalAlpha = 0.25;
+        c.fillText(txt, 0.03 * u, 0.02 * u);
+        c.restore();
+        return bb * k;
+      };
+      const fs = RAD * 0.9 * u;
+      for (const band of ['fm', 'am']) {
+        const x = KOL[band] * u;
+        const farg = BLAK[band];
+        const B0 = RR.BAND[band];
+        // (rubriken en bit in, i höjd med frekvenserna)
+        const xr = x + 1.2 * u;
+        c.font = `700 ${RAD * 1.7 * u}px Caveat, cursive`;
+        const bb = c.measureText(B0.namn).width;
+        skriv(B0.namn, xr + 0.2 * u, (TOPP - 1.15) * u, RAD * 1.7 * u, farg, 0, band === 'fm' ? 90 : 91);
+        skriv(B0.enhet, xr + bb + 0.8 * u, (TOPP - 1.2) * u, RAD * 0.85 * u, farg, 0, band === 'fm' ? 95 : 96);
+        c.strokeStyle = farg;
+        c.globalAlpha = 0.8;
+        c.lineWidth = 0.14 * u;
+        c.beginPath();
+        c.moveTo(xr, (TOPP - 0.65) * u);
+        c.quadraticCurveTo(xr + bb * 0.6, (TOPP - 0.45) * u, xr + bb + 0.5 * u, (TOPP - 0.7) * u);
+        c.stroke();
+        c.globalAlpha = 1;
+        RR.KANALER.filter((k) => k.band === band).forEach((k, i) => {
+          const y = TOPP + (i + 1) * RAD - 0.3;
+          const [f, namn] = RR.rad(k);
+          c.font = `700 ${fs}px Caveat, cursive`;
+          const fw = Math.min(c.measureText(f).width, FB * u);
+          const j = i * 3 + (band === 'fm' ? 0 : 1);
+          skriv(f, x + FB * u - fw, y * u, fs, farg, FB * u, j);
+          const nb = skriv(namn, x + (FB + 0.55) * u, y * u, fs, farg, (KB - FB - 0.85) * u, j + 1);
+          rader.push({ id: k.id, band, x0: KOL[band], x1: KOL[band] + KB, topp: TOPP + i * RAD, ned: TOPP + (i + 1) * RAD, bas: y, slut: KOL[band] + FB + 0.55 + nb / u });
+        });
+      }
+      // kanterna lite mörkare, som ljuset faller
+      const v = c.createRadialGradient(w / 2, h * 0.4, Math.min(w, h) * 0.3, w / 2, h * 0.45, Math.max(w, h) * 0.75);
+      v.addColorStop(0, 'rgba(0,0,0,0)');
+      v.addColorStop(1, 'rgba(60,40,10,0.12)');
+      c.fillStyle = v;
+      c.fillRect(0, 0, w, h);
+      c.restore();
+    }
+    const karta = tex(TW, TH, rita);
+    // papperets struktur, när den har laddats
+    const bild = new Image();
+    bild.onload = () => {
+      korn = bild;
+      rita(karta.image.getContext('2d'), TW, TH);
+      karta.needsUpdate = true;
+      b.paint();
+    };
+    bild.src = 'rum/papper.webp';
+    // ytan: små ojämnheter som fångar ljuset
+    const ytan = tex(128, 128, (c, w, h) => {
+      const d = c.createImageData(w, h);
+      for (let i = 0; i < d.data.length; i += 4) {
+        const x = 128 + (slump() - 0.5) * 90;
+        d.data[i] = d.data[i + 1] = d.data[i + 2] = x;
+        d.data[i + 3] = 255;
+      }
+      c.putImageData(d, 0, 0);
+    });
+    ytan.wrapS = ytan.wrapT = THREE.RepeatWrapping;
+    ytan.repeat.set(EW / 6, EH / 6);
+    // Böjen (x, y: 0–1 från övre vänstra hörnet): överst håller tejpen, nedtill släpper bladet från
+    // karmen, mest i hörnet, och vikningen står ut lite.
+    const bojd = (x, y) => 1.3 * Math.max(0, (y - 0.14) / 0.86) ** 2.4 * (0.35 + 0.65 * x * x)
+      + 2 * Math.max(0, (x + y - 1.5) / 0.5) ** 2
+      + 0.3 * Math.sin(Math.PI * x) * Math.sin(Math.PI * Math.min(1, y * 1.1))
+      + 0.8 * Math.max(0, 1 - Math.abs(y - 0.52) / 0.5) - 0.4
+      + 0.07 * Math.sin(x * 9 + y * 5);
+    const geo = new THREE.PlaneGeometry(W, H, 24, 32);
+    const pos = geo.attributes.position;
+    for (let i = 0; i < pos.count; i++) pos.setZ(i, bojd(pos.getX(i) / W + 0.5, 0.5 - pos.getY(i) / H));
+    geo.computeVertexNormals();
+    const papp = mat('#ffffff', { map: karta, bumpMap: ytan, bumpScale: 0.5, roughness: 0.9, sheen: 0.3, sheenRoughness: 0.8, sheenColor: new THREE.Color('#ffffff'), side: THREE.DoubleSide, alphaTest: 0.5, envMapIntensity: 0.35 });
+    const grupp = new THREE.Group();
+    grupp.position.set(760 + (LAPP.x + LAPP.w / 2 - 760) / s, -(400 + (LAPP.y + LAPP.h / 2 - 400) / s), Z);
+    grupp.rotation.z = 0.02;
+    b.scene.add(grupp);
+    const blad = new THREE.Mesh(geo, papp);
+    grupp.add(blad);
+    // skuggan på karmen: tät där tejpen håller, längre ner och mjukare där bladet släpper (ritad, så att
+    // den också finns utan skuggkarta)
+    const skugga = new THREE.Mesh(new THREE.PlaneGeometry(W * 1.45, H * 1.38), new THREE.MeshBasicMaterial({
+      map: tex(128, 176, (c, w, h) => {
+        const sx = w / 1.45;
+        const sy = h / 1.38;
+        const x0 = (w - sx) / 2 - 4 * w;
+        const y0 = (h - sy) / 2;
+        c.shadowOffsetX = 4 * w;
+        c.shadowColor = 'rgba(0,0,0,0.5)';
+        c.shadowBlur = 4;
+        c.fillRect(x0, y0 + sy * 0.03, sx, sy * 0.96);
+        c.shadowColor = 'rgba(0,0,0,0.75)';
+        c.shadowBlur = 12;
+        c.beginPath();
+        c.moveTo(x0 + sx * 0.06, y0 + sy * 0.45);
+        c.lineTo(x0 + sx * 1.03, y0 + sy * 0.45);
+        c.lineTo(x0 + sx * 1.08, y0 + sy * 1.05);
+        c.lineTo(x0 + sx * 0.09, y0 + sy * 1.03);
+        c.fill();
+      }),
+      transparent: true,
+      opacity: 0.7,
+      depthWrite: false,
+    }));
+    skugga.position.set(0.6, -1, -0.5);
+    grupp.add(skugga);
+    // tejpen i de övre hörnen
+    const tejpMat = mat('#ffffff', {
+      map: tex(128, 48, (c, w, h) => {
+        c.fillStyle = 'rgba(236,222,170,0.62)';
+        c.beginPath();
+        c.moveTo(0, 2);
+        for (let i = 0; i <= 6; i++) c.lineTo(3 * hash(i), (h / 6) * i);
+        c.lineTo(w - 3 * hash(9), h);
+        for (let i = 6; i >= 0; i--) c.lineTo(w - 3 * hash(i + 4), (h / 6) * i);
+        c.fill();
+        c.fillStyle = 'rgba(255,255,255,0.14)';
+        c.fillRect(0, h * 0.2, w, h * 0.12);
+      }),
+      transparent: true,
+      roughness: 0.38,
+      clearcoat: 0.6,
+      depthWrite: false,
+      envMapIntensity: 0.6,
+    });
+    for (const [x, y, r] of [[-W / 2 + 2.5, H / 2 - 1.2, 0.5], [W / 2 - 2.5, H / 2 - 1.1, -0.42]]) {
+      const t = new THREE.Mesh(new THREE.PlaneGeometry(8.5, 3.2), tejpMat);
+      t.position.set(x, y, 0.3);
+      t.rotation.z = r;
+      grupp.add(t);
+    }
+    // ringen kring den station som hörs: ett pennstreck runt raden som går lite om sig själv
+    const ringMat = {
+      fm: mat(BLAK.fm, { roughness: 0.7, transparent: true, opacity: 0.85, depthTest: false, depthWrite: false, side: THREE.DoubleSide }),
+      am: mat(BLAK.am, { roughness: 0.7, transparent: true, opacity: 0.85, depthTest: false, depthWrite: false, side: THREE.DoubleSide }),
+    };
+    const ring = new THREE.Mesh(new THREE.BufferGeometry(), ringMat.fm);
+    ring.renderOrder = 3;
+    ring.visible = false;
+    grupp.add(ring);
+    const lokal = (ex, ey, dz = 0) => [(ex / EW - 0.5) * W, (0.5 - ey / EH) * H, bojd(ex / EW, ey / EH) + dz];
+    let nuId = '';
+    function nu(id) {
+      id = id || '';
+      if (id === nuId) return false;
+      nuId = id;
+      const r = rader.find((x) => x.id === id);
+      ring.visible = Boolean(r);
+      if (!r) return true;
+      const cx = (r.x0 + r.slut) / 2 + 0.1;
+      const cy = r.bas - RAD * 0.29;
+      const a = (r.slut - r.x0) / 2 + 1;
+      const bb = RAD * 0.62;
+      const N = 72;
+      const p = [];
+      const ix = [];
+      const pt = (t) => {
+        const th = Math.PI * 0.9 + t * Math.PI * 2.15;
+        return [cx + a * Math.cos(th) * (1 + 0.02 * Math.sin(t * 11)), cy + bb * Math.sin(th) - 0.025 * a * Math.cos(th)];
+      };
+      for (let i = 0; i <= N; i++) {
+        const t = i / N;
+        const [x, y] = pt(t);
+        const [x1, y1] = pt(Math.min(1, t + 0.004));
+        const [x2, y2] = pt(Math.max(0, t - 0.004));
+        const l = Math.hypot(x1 - x2, y1 - y2) || 1;
+        // (tunnare i ändarna, där pennan sätts i och lyfts)
+        const b2 = 0.07 * (0.55 + 0.45 * Math.sin(Math.PI * t));
+        const nx = (-(y1 - y2) / l) * b2;
+        const ny = ((x1 - x2) / l) * b2;
+        p.push(...lokal(x + nx, y + ny, 0.15), ...lokal(x - nx, y - ny, 0.15));
+        if (i) ix.push(2 * i - 2, 2 * i - 1, 2 * i, 2 * i - 1, 2 * i + 1, 2 * i);
+      }
+      const g = new THREE.BufferGeometry();
+      g.setAttribute('position', new THREE.Float32BufferAttribute(p, 3));
+      g.setIndex(ix);
+      g.computeVertexNormals();
+      ring.geometry.dispose();
+      ring.geometry = g;
+      ring.material = ringMat[r.band];
+      return true;
+    }
+    // raderna och bladet som andelar av duken ([vänster, topp, höger, botten])
+    const v = new THREE.Vector3();
+    const ut = (ex, ey) => {
+      v.set(...lokal(ex, ey)).applyMatrix4(blad.matrixWorld).project(b.cam);
+      return [(v.x + 1) / 2, (1 - v.y) / 2];
+    };
+    const ruta = (x0, y0, x1, y1) => {
+      const q = [ut(x0, y0), ut(x1, y0), ut(x0, y1), ut(x1, y1)];
+      return [Math.min(...q.map((x) => x[0])), Math.min(...q.map((x) => x[1])), Math.max(...q.map((x) => x[0])), Math.max(...q.map((x) => x[1]))];
+    };
+    const mats = [papp, tejpMat, ringMat.fm, ringMat.am];
+    for (const m of mats) m.userData.dag = m.color.clone();
+    // (radion kan redan spela)
+    const nu0 = RR.lage ? RR.lage() : null;
+    if (nu0 && nu0.band !== 'av' && nu0.kanal) nu(nu0.kanal);
+    return {
+      rader: () => { grupp.updateMatrixWorld(true); return rader.map((r) => ({ id: r.id, r: ruta(r.x0 - 0.5, r.topp, r.x1, r.ned) })); },
+      sida: () => { grupp.updateMatrixWorld(true); return ruta(0, 1, EW, EH); },
+      nu,
+      // en rad i bladets höjd
+      rad: RAD / EH,
+      mats,
+    };
+  }
+
   // ---------- allt ----------
 
   // knappen kring uret: ett klick går fram till det (närbilden i rum.js)
@@ -1281,12 +1630,25 @@ export async function inredning(el, opt = {}) {
   knapp.dataset.sak = 'ur';
   knapp.setAttribute('aria-label', 'Uret');
   planes[0].append(knapp);
+  // knappen kring bladet vid radion: ett klick går fram till det (SAKER.radiolapp i rum.js), och
+  // veckans löpsedel sitter över dess kant
+  const lappKnapp = window.RumRadio && window.RumRadio.rad ? document.createElement('button') : null;
+  if (lappKnapp) {
+    lappKnapp.type = 'button';
+    lappKnapp.className = 'rum-radiolapp rum-sak';
+    lappKnapp.dataset.sak = 'radiolapp';
+    lappKnapp.setAttribute('aria-label', 'Lappen med radiostationerna');
+    Object.assign(lappKnapp.style, { left: `${LAPP.x}px`, top: `${LAPP.y}px`, width: `${LAPP.w}px`, height: `${LAPP.h}px` });
+    planes[0].append(lappKnapp);
+  }
   skivPlats(planes[0]);
   const B = {};
   for (const [k, { box, i }] of Object.entries(BITAR)) {
+    if (k === 'radiolapp' && !lappKnapp) continue;
     // uret och ramen ligger i knappen och länken, så att de lyser när man pekar på dem
     B[k] = bit(k, wallCam(box), i ? el.querySelector(i) : null);
-    wallLights(B[k], box, !['tak', 'neon'].includes(k));
+    // (bladet vid radion har sin skugga ritad)
+    wallLights(B[k], box, !['tak', 'neon', 'radiolapp'].includes(k));
   }
   lysror(B.tak);
   malat(B.tak);
@@ -1316,6 +1678,7 @@ export async function inredning(el, opt = {}) {
   stall(B.stall);
   bardisk(B.disk);
   skiva(B.skiva);
+  const LP = B.radiolapp ? radiolapp(B.radiolapp) : null;
 
   // Uret går efter Stockholms tid, med samma klocka som utsikten (Vader.nu()
   // i vader.js, annars datorns klocka). Med ?rum-t står det på den tid det
@@ -1361,7 +1724,8 @@ export async function inredning(el, opt = {}) {
   // allt på en gång höll huvudtråden medan grafikkortet arbetade, och rummet svarade
   // inte på fingret så länge.
   const paus = () => new Promise((r) => setTimeout(r));
-  for (const k of ['ram', 'ur', 'tak', 'neon', 'hogra', 'skiva', 'stall', 'disk']) {
+  for (const k of ['ram', 'ur', 'tak', 'neon', 'hogra', 'skiva', 'stall', 'disk', 'radiolapp']) {
+    if (!B[k]) continue;
     try {
       await gl.compileAsync(B[k].scene, B[k].cam);
     } catch (err) { /* då byggs de när saken ritas */ }
@@ -1388,6 +1752,21 @@ export async function inredning(el, opt = {}) {
     B.tak.paint();
     for (const m of skivMat) m.color.copy(m.userData.dag).multiplyScalar(1 - 0.6 * g);
     B.skiva.paint();
+    if (LP) {
+      for (const m of LP.mats) m.color.copy(m.userData.dag).multiplyScalar(1 - 0.6 * g);
+      B.radiolapp.paint();
+    }
   }
-  return { draw: tick, namn: setNamn, skarp: (k, px) => B[k] && B[k].skarp(px), natt, stopp };
+  // (k: en duk eller flera, som skivan och bladet vid radion)
+  const skarp = (k, px) => { for (const n of [].concat(k)) if (B[n]) B[n].skarp(px); };
+  // bladet vid radion (rum-radio.js): raderna och bladet som andelar av duken, ringen kring den station
+  // som hörs, och hur hög en rad är i bladet
+  const lapp = LP && {
+    canvas: B.radiolapp.canvas,
+    rader: LP.rader,
+    sida: LP.sida,
+    rad: LP.rad,
+    nu(id) { if (LP.nu(id)) B.radiolapp.paint(); },
+  };
+  return { draw: tick, namn: setNamn, skarp, natt, stopp, lapp };
 }
