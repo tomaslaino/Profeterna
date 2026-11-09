@@ -5685,6 +5685,22 @@ annars tecknen i hans text, med hans resultat.
 Överst i listan står vem som säger vad, utan förklarande text: Hasses porträtt och namn i guld mitt över hans rutor och resultat, och ditt porträtt i din färg med namnet i din handstil (som på kupongen) över din spalt. Får namnen inte plats bredvid varandra, som i telefonen, går ditt namn först och sedan hans, så att porträtten står kvar. En spalt som inte syns på någon rad får inget huvud.
 När alla matcher har börjat säger han hur det gick för honom (`efterat`), tills omgången är spelad.
 
+**Ställningen** (2026-11-09). Medan matcherna pågår står ställningen i spalten där facit står efteråt, i kursiv och lite
+svagare, och spalten heter *Ställning* så länge någon match pågår (`star` och `facitRuta` i
+[public/rum-hasse.js](public/rum-hasse.js), liveställningen ur `KP.live` i [public/kupong.js](public/kupong.js), som hämtas
+varje minut). Han ber en inte längre välja match när omgången har börjat (spelstoppet har ju varit), utan säger hur många av
+hans tecken som sitter just nu och vad han tycker om det (*Just nu har jag fyra rätt av sju.* *Fotboll spelas i nittio
+minuter. Jag tippar på slutresultatet.*), och sedan var 20:e sekund ställningen i en match i taget med en kommentar: sitter
+tecknet var det väntat, och gör det inte det är det matchen som har fel (*Burnley leder med 2–0 mot Cardiff.* *Domaren har
+inte förstått matchen.*). Var femte sekund ser han efter om något har ändrats (`stallningSteg`): då ritas listan om, och
+har det blivit mål i en av hans matcher säger han det så snart han har pratat klart, med en kommentar efter om målet var för
+honom, emot men tecknet sitter ändå, eller emot så att det inte gör det (räknat i hur många mål som fattas till hans tecken
+och till något annat, före och efter målet). När den sista matchen har slutat säger han hur det gick, som när man öppnar
+honom efteråt. Ställningen i ord står med korta lagnamn och sägs tyst, eftersom rösten inte kan ha alla lag och
+ställningar; raden om hur många rätt han har och kommentarerna hörs när iMacen har läst in dem. Raderna står under
+`stallning` i [public/rum-hasse-repliker.js](public/rum-hasse-repliker.js). Har du valt att dölja resultat står ingen
+ställning i listan och han säger inget om den.
+
 **Domarna efter omgången** (2026-11-08, listan och lappen 2026-11-09). Så länge protokollet ligger på pulten, alltså från
 att omgången är spelad tills nästa Stryktips kommer måndagen efter kl. 16 (`Rum.summa`), dömer han gänget i stället för att
 gå igenom matcherna. Han frågar vem han ska börja med, och gänget står sida vid sida i sin ordning, som på kupongen: stora

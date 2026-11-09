@@ -328,6 +328,90 @@
     ],
   },
 
+  // Medan matcherna pågår och ställningen syns (stallning i rum-hasse.js): först ratt, hur många av hans tecken
+  // som sitter just nu, och sedan en rad för läget (alla, bra, mitten, daligt), som ska kunna följa efter
+  // "Just nu har jag fyra rätt av sju." Sedan, då och då, ställningen i en match (leder eller lika) och en
+  // kommentar: haller när hans tecken sitter (hallerLika också när det är hans kryss), emot och emotLika när
+  // det inte gör det. Han tvivlar aldrig: står det fel är det matchen som har fel. Blir det mål medan man
+  // sitter där säger han mal och sedan malBra (för honom, också när det fattas ett mål till), malLugn (emot, men
+  // tecknet sitter ändå) eller malFel (tecknet sitter inte, och det fattas mer än förut). Kommentarerna sägs alltid efter ställningen.
+  // {lag} är laget som leder, {mot} det andra, och {res} ställningen med ledarens mål först; i lika och mal
+  // är {match} matchen med korta lagnamn och {res} som på kupongen. Ställningen sägs tyst.
+  stallning: {
+    ratt: ['Just nu har jag {ratt} rätt av {av}.'],
+    alla: [
+      'Allt går som jag har sagt.',
+      'Lagen har läst min analys.',
+      'Jag har inte behövt titta en enda gång.',
+      'Så ser det ut när man har gjort hemläxan.',
+      'Spelbolagen har börjat svettas.',
+    ],
+    bra: [
+      'Resten är bara en tidsfråga.',
+      'Det går som planerat, med några små undantag.',
+      'Resten av lagen kommer i gång snart.',
+      'Det ser ut som vanligt.',
+    ],
+    mitten: [
+      'Matcherna är inte slut än.',
+      'Det jämnar ut sig till slut.',
+      'Jag tippar inte på ställningen mitt i matchen.',
+      'Det är slutresultatet som räknas, inte ställningen.',
+    ],
+    daligt: [
+      'Fotboll spelas i nittio minuter. Jag tippar på slutresultatet.',
+      'Domarna har inte sin bästa dag.',
+      'Det är inte jag som spelar, det är lagen.',
+      'Lagen har inte förstått vad som gäller än.',
+      'Jag har sett sådana här ställningar förut. De brukar ändra sig.',
+    ],
+    leder: ['{lag} leder med {res} mot {mot}.', '{lag} leder mot {mot} med {res}.'],
+    lika: ['Det står {res} i {match}.', 'I {match} står det {res}.'],
+    haller: [
+      'Precis som jag sa.',
+      'Det var inte svårt att räkna ut.',
+      'Det är orsak och verkan.',
+      'Ingen här är förvånad.',
+      'Det står i min analys.',
+      'Så ser det ut när man har läst på.',
+    ],
+    hallerLika: ['Krysset sitter som det ska.', 'Där sitter krysset.'],
+    emot: [
+      'Matchen är inte slut än.',
+      'Det har ingen bett dem om.',
+      'Det räknas inte förrän domaren blåser av.',
+      'Domaren har inte förstått matchen.',
+      'Jag tippar inte på ställningen mitt i matchen.',
+      'De har inte läst min analys.',
+    ],
+    emotLika: [
+      'Matchen är inte slut än.',
+      'Någon gör mål till slut, och jag vet vem.',
+      'Lagen har inte kommit i gång än.',
+      'Jag tippar inte på ställningen mitt i matchen.',
+    ],
+    mal: ['Mål i {match}. Det står {res}.'],
+    malBra: [
+      'Där kom målet jag väntade på.',
+      'Det var bara en tidsfråga.',
+      'Det gick som jag hade räknat ut.',
+      'Målet kom när det skulle.',
+      'Nu börjar matchen likna min analys.',
+    ],
+    malLugn: [
+      'Det gör ingenting.',
+      'Det målet hade jag räknat med.',
+      'Ett mål hit eller dit spelar ingen roll.',
+      'Det får de gärna göra. Tecknet sitter ändå.',
+    ],
+    malFel: [
+      'Det ändrar ingenting.',
+      'Det målet räknar jag inte med.',
+      'Matchen är inte slut än.',
+      'Jag låtsas att jag inte såg det.',
+    ],
+  },
+
   // Efter omgången, så länge protokollet ligger på pulten (tills nästa Stryktips kommer): han dömer var och
   // en i gänget, en i taget (gangLista och doma i rum-hasse.js, läget i RumBlock.gang). Om sig själv säger
   // han inget här. En dom är en inledning med namnet, en eller två saker ur kupongen och ett slut, och
