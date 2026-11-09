@@ -1116,6 +1116,19 @@ bara lokalt. Analyserna visas som de ligger i `data/analyser.json`; hur de skriv
   hamna under samtalets text (`matt` i [public/rum-hasse.js](public/rum-hasse.js)). Väggen bakom honom är
   ombakad för den nya platsen (i bakningen syns pulten bara som skugga och ljus på väggen). Se [Hasse Backe](#hasse-backe),
   *Bilden* och *Kaffet i rummet*.
+- **Hasse läser DN och SvD, med läsglasögon (2026-11-09, användarens önskemål):** "Kan du göra tidningarna bättre som
+  hasse läser - han läser SVD och DN. Det ska verka vara riktiga tidningar och det behöver inte vara någon sportdel", och
+  "Han får sätta på sig och ta av sig glasögonen när han läser tidningarna - ordna olika animeringar kopplat till detta".
+  Tidningen var veckans kvällstidning med en rubrik om hans egen omgång och tipsguiden på baksidan. Nu är den dagens
+  Dagens Nyheter eller Svenska Dagbladet, en i varje läsklipp: namnet i tidningens stil, datum, nummer och pris, tre
+  puffar, en stor bild och dagens nyhet, och på baksidan notiserna inför omgången (*Så mår tipslagen*) eller, utan dem,
+  vädret med Sverigekartan och kvällens tv. Nyheterna på förstasidan är påhittade och tidlösa, utan riktiga personer och
+  utan sport. Hans läsglasögon sitter i bröstfickan: han tar fram dem,
+  fäller ut skalmarna och sätter på sig dem innan han tar upp tidningen, och efteråt tar han av dem och stoppar tillbaka
+  dem. Medan han läser skjuter han upp dem med pekfingret, drar ned dem på näsan och tittar på en över dem, eller tar av
+  dem, pekar på en med dem och biter tankfullt i skalmen. När han tog upp tidningen ur knät och lade tillbaka den stod
+  armbågarna en stund ut som vingar i axelhöjd ("Rätta armbågarna också"): nu håller han den lågt tills den är framme,
+  och i knät hänger armarna nedåt. Se [Hasse Backe](#hasse-backe), *Tidningen* och *Glasögonen*.
 - **Hasse Backe minns vad han sa (2026-11-06, användarens önskemål):** klickade man på en match
   man redan hade frågat om slog han domen i disken en gång till, och efter en omladdning gjorde han
   om allt, med 15–25 sekunders väntan. Nu står det han sa direkt, sparat på enheten så att det
@@ -5732,20 +5745,46 @@ vid listan kan han nämna *Revisorn* när någon vann på helgarderingar och *Se
 utan att säga vem han menar (`domar.revisorn`, `domar.borta`).
 
 **Tidningen** (2026-11-09). Har det gått dåligt för honom i tippningen låtsas han vara upptagen: han gömmer sig bakom
-veckans kvällstidning, samma som löpsedeln i rummet (Sportbladet eller Expressen, `veckansTidning` i
-[public/rum-affischer.js](public/rum-affischer.js)), skyldig men nöjd med sig själv. Har man just kommit läser han redan; han
-läser rad för rad, tittar upp över kanten på en med höjda bryn och ler sedan belåtet, lyfter tidningen så att bara ögonen
-syns, nickar åt det som står, rycker den rak och tittar längs baren, och mellan gångerna lägger han den i knät bakom disken
-en stund (klippen `lasa` och `lasa2`, byggda av bitarna i `LASBIT` i [public/rum-hasse-3d.js](public/rum-hasse-3d.js)).
-Behöver han händerna, som när han slår en dom i disken, läser han klart raden och lägger ned den direkt. Förstasidan vänder
-sig mot en med en rubrik om hans egen omgång och hans porträtt rastrerat (`RUBRIKER` och papperet i
-[public/rum-hasse-tidning.js](public/rum-hasse-tidning.js), samma rubrik för samma omgång). Baksidan är *Så mår
-tipslagen* (2026-11-09, användarens önskan): notiserna inför omgången ur `data/tidning.json`, som iMacen skriver med
-Claude-kontot (se *Tidningen inför omgången* under [Analyserna](#analyserna)), i två spalter och så stort som alla ryms
-(`notisSida`). Utan notiser, eller med en sida som är äldre än tio dagar, är baksidan tipsguiden som förut. Dåligt är inte ett
-rätt, sämst i gänget, eller rätten långt under vad chanserna var värda, med tävlingskupongen om han spelade och annars det han
-sa (`hansOmgang` och `efterat` i [public/rum-hasse.js](public/rum-hasse.js)); det gäller både när han säger hur det gick och
-när han dömer gänget. Med minskad rörelse läser han inte.
+dagens morgontidning, skyldig men nöjd med sig själv. Har man just kommit läser han redan; han läser rad för rad, tittar upp
+över kanten på en med höjda bryn och ler sedan belåtet, lyfter tidningen så att bara ögonen syns, nickar åt det som står,
+rycker den rak och tittar längs baren, och mellan gångerna lägger han den i knät bakom disken en stund (klippen `lasa` och
+`lasa2`, byggda av bitarna i `LASBIT` i [public/rum-hasse-3d.js](public/rum-hasse-3d.js)). Ur knät lyfter han den med
+händerna lågt, för den fram över disken medan den stiger och flyttar sedan upp händerna; i knät hänger armarna nedåt (håller
+han den högt medan den är nära honom måste armarna vikas, och armbågarna står ut som vingar). Behöver han händerna, som när han
+slår en dom i disken, läser han klart raden och lägger ned den direkt. Dåligt är inte ett rätt, sämst i gänget, eller rätten
+långt under vad chanserna var värda, med tävlingskupongen om han spelade och annars det han sa (`hansOmgang` och `efterat` i
+[public/rum-hasse.js](public/rum-hasse.js)); det gäller både när han säger hur det gick och när han dömer gänget. Med
+minskad rörelse läser han inte.
+
+Han läser Dagens Nyheter (`lasa`) eller Svenska Dagbladet (`lasa2`), och de ska se ut som de riktiga (Tomas önskemål
+2026-11-09): tabloid på grått tidningspapper, med namnet i tidningens stil (skrivet som text, inte loggan: DN:s i en Bodoni,
+Playfair Display i [public/typsnitt.css](public/typsnitt.css), SvD:s i spärrade versaler), dagens datum, nummer, årgång och pris,
+tre puffar med små bilder, en stor bild och dagens nyhet med vinjett, rubrik, ingress och sidhänvisning, och innehållet längst
+ned. SvD har rubriken över bilden och puffarna i en spalt bredvid ingressen. Baksidan är sporten, *Så mår tipslagen*
+(2026-11-09, användarens önskan): notiserna inför omgången ur `data/tidning.json`, som iMacen skriver med Claude-kontot (se
+*Tidningen inför omgången* under [Analyserna](#analyserna)), i två spalter i tidningens typsnitt och så stort som alla ryms
+(`notisSida`). Utan notiser, eller med en sida som är äldre än tio dagar, är baksidan vädret, med Sverigekartan, symboler
+och grader, prognosen för Stockholm och kvällens tv i SVT1, SVT2 och TV4. Nyheterna och puffarna på förstasidan
+(`NYHETER`, `PUFFAR` i [public/rum-hasse-tidning.js](public/rum-hasse-tidning.js)) är påhittade och tidlösa, utan namn på
+riktiga personer och utan sport, och dagen väljer dem (`dagens`): samma hela dagen, och aldrig samma nyhet i båda. Bilderna är målade
+där (`MALA`: en stad i skymningen, snö på en gata, granskog och en röd stuga vid en sjö, skärgården med färjan, hyreshus och
+en julgata) och sedan blekta och korniga som i tryck. Tidningen trycks en gång om dagen (`upptagen` i rum-hasse.js) och
+trycks om när han tar upp den andra (`visa`).
+
+**Glasögonen** (2026-11-09). Han läser med läsglasögon i mörk sköldpadd (`byggGlasogon` i
+[public/rum-hasse-arm.js](public/rum-hasse-arm.js)), som annars sitter i bröstfickan med det översta hörnet uppstickande.
+Före tidningen tar han fram dem med höger hand, håller upp dem framför hakan, fäller ut skalmarna med en knyck och sätter
+på sig dem framifrån, blinkar och rynkar näsan tills de sitter (biten `pa`); efter tidningen tar han av dem i hörnet,
+fäller ihop dem framför bröstet och stoppar dem i fickan (`av`). Medan han läser håller han tidningen med vänster hand
+när den högra behövs (den lutar och sjunker, `enHand`), och han skjuter upp dem med pekfingret på bryggan när de har glidit
+(`skjut`), drar ned dem på näsan och tittar på en över dem med höjda bryn och skjuter upp dem igen (`over`), eller tar av
+dem, pekar på en med dem, för skalmen till mungipan och tänker efter med blicken uppåt, och sätter på dem igen (`lyft`).
+Glasögonen styr som cigarren: deras läge räknas mellan lägena i `GL` i rum-hasse-3d.js (på näsan, längre ned på näsan och
+framför ansiktet följer huvudet, fickan och handen kroppen), och handen räknas ur greppet: om bågens hörn framifrån eller
+från sidan bakom tidningen, eller med pekfingertoppen på bryggan (`glasArm`). På näsan sitter de så nära ansiktet som
+formen tillåter (`paNasan`), och genom glasen ser ögonen lite större ut (`uLins` i ansiktets skuggare). Bågen ritas före
+kroppen, så att huvudet och kavajen döljer skalmarna och det som är nere i fickan.
+
 Går hans röst inte att få säger han det och visar analysen i skrift. Allt han säger runt omkring är
 färdiga rader, utan AI, i [public/rum-hasse-repliker.js](public/rum-hasse-repliker.js). Står man kvar säger han något då och då:
 över matchlistan (`ledig`), över listan med gänget (`domar.ledig`) och när man inte svarar på hans fråga (`valVanta`). Raderna
