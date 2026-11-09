@@ -1114,8 +1114,9 @@ bara lokalt. Analyserna visas som de ligger i `data/analyser.json`; hur de skriv
   "Han får sätta på sig och ta av sig glasögonen när han läser tidningarna - ordna olika animeringar kopplat till detta".
   Tidningen var veckans kvällstidning med en rubrik om hans egen omgång och tipsguiden på baksidan. Nu är den dagens
   Dagens Nyheter eller Svenska Dagbladet, en i varje läsklipp: namnet i tidningens stil, datum, nummer och pris, tre
-  puffar, en stor bild och dagens nyhet, och på baksidan vädret med Sverigekartan och kvällens tv. Nyheterna är
-  påhittade och tidlösa, utan riktiga personer och utan sport. Hans läsglasögon sitter i bröstfickan: han tar fram dem,
+  puffar, en stor bild och dagens nyhet, och på baksidan notiserna inför omgången (*Så mår tipslagen*) eller, utan dem,
+  vädret med Sverigekartan och kvällens tv. Nyheterna på förstasidan är påhittade och tidlösa, utan riktiga personer och
+  utan sport. Hans läsglasögon sitter i bröstfickan: han tar fram dem,
   fäller ut skalmarna och sätter på sig dem innan han tar upp tidningen, och efteråt tar han av dem och stoppar tillbaka
   dem. Medan han läser skjuter han upp dem med pekfingret, drar ned dem på näsan och tittar på en över dem, eller tar av
   dem, pekar på en med dem och biter tankfullt i skalmen. När han tog upp tidningen ur knät och lade tillbaka den stod
@@ -1623,7 +1624,7 @@ och anropar aldrig någon språkmodell. (Fram till 2026-11-04 skrevs texterna vi
 ```
 launchd               →  scripts/analyser/skriv.mjs  →  claude -p (en gång per match)
                                      ↓
-       data/analyser.json, data/omgangsnamn.json, data/kupong-historik.json
+       data/analyser.json, data/omgangsnamn.json, data/kupong-historik.json, data/tidning.json
                                      ↓
           commit och push till main  →  GitHub Actions  →  matchfixarna.se
 ```
@@ -1641,6 +1642,7 @@ de flesta körningar har inget att göra och anropar inte Claude.
   slog: en omgång som skapas senare väntar till nästa tid, men en match utan analys skrivs ändå när
   det är högst 24 timmar kvar till avspark. Har matcherna ändrats skrivs de nya vid nästa kontroll.
 - **Hasse Backes text** direkt efter varje analys.
+- **Tidningen inför omgången** så snart omgången finns, och sedan måndag 17.00 och fredag 16.00 (se nedan).
 - **Kommentaren till en färdig kupong** när kupongen finns i den publicerade historiken.
 
 **En analys** är ett anrop till `claude -p`: Claude söker och läser på nätet (högst 6 sökningar och
@@ -1655,6 +1657,29 @@ texten skrevs vid klick: en källa följer bara med om adressen kom upp i en sö
 läst sida, varje tal ska stå i underlaget eller i det Claude läste, artikeln får inga tipsord och
 tecknen ska vara ett till tre av 1, X och 2. Klarar svaret inte det får Claude skriva om det en
 gång, utan verktyg men med det den läste. Klarar artikeln sig men inte tipset sparas artikeln utan tips.
+
+**Tidningen inför omgången** (2026-11-09, användarens önskan): en notis per match i omgången om hur lagen har
+det just nu – skador, tränarens ord, sviter, det som har hänt i klubben – i en svensk morgontidnings sakliga ton,
+till tidningen som Hasse Backe läser. Den skrivs på iMacen som allt annat här, med `claude -p` på Claude-kontot och
+inte med API-nycklar: ett anrop för hela omgången ([src/analyser/tidning.mjs](src/analyser/tidning.mjs), prompten och
+gränserna i [config/tidning.js](config/tidning.js)). Claude får högst 12 sökningar och 4 sidor, samma underlag som
+namnet (tabelläget, formen, schemat och möten) och skadelistan, men inga odds, och skriver en rubrik på högst sju ord
+och 40–70 ord per match. Kontrollerna är analysernas: en källa följer bara med om adressen kom upp, varje tal ska stå
+i underlaget eller i det Claude läste, och notisen får inget tipsspråk (spik, gardering, odds, favorit). En notis som
+inte klarar det skrivs om en gång utan verktyg; går den inte igenom då står matchen utan notis, och klarar mindre än
+60 % av matcherna sig ligger den gamla sidan kvar. En ny omgång får sin tidning direkt, och den skrivs om på tiderna i
+config/tidning.js om sidan är äldre än tiden och minst tolv timmar gammal; när alla matcher har börjat står den kvar.
+`node scripts/analyser/skriv.mjs --tidning --ut /tmp/prov` skriver den för omgången som pågår, oavsett tid.
+`data/tidning.json`, som bygget kopierar till sajten:
+
+```json
+{ "omgang": "2026-11-14-st4979", "matcher": ["401878757"], "skriven": "…", "model": "…", "version": "…",
+  "notiser": [ { "nr": 1, "id": "401878757", "match": "…", "avspark": "…", "rubrik": "…", "text": "…",
+                 "kallor": [ { "source": "…", "title": "…", "url": "…", "publishedAt": null } ] } ] }
+```
+
+`nr` är matchens nummer på kupongen. Tidningen som Hasse Backe läser trycker notiserna på baksidan (se *Tidningen*
+under [Hasse Backe](#hasse-backe)).
 
 **Rösten** står i [prompts/analys-rost.md](prompts/analys-rost.md): Sixten Bråvall, en påhittad
 tränare med egen bakgrund i klubbar som inte finns och egna stående uttryck. Filen går att
@@ -1688,7 +1713,7 @@ av värdet. Användningen delas med annat arbete i Claude. Är extra användning
 på kontot kan det som går över gränsen kosta pengar, så håll den avstängd.
 
 **Verktygen.** `claude -p` körs i en tom tillfällig mapp med `--tools WebSearch,WebFetch` för
-analysen, `WebSearch` för namnet och inga alls för Hasse och kommentaren, utan inställningar,
+analysen och tidningen, `WebSearch` för namnet och inga alls för Hasse och kommentaren, utan inställningar,
 tillägg och MCP-servrar. Den kan alltså inte läsa eller ändra filer eller köra kommandon, och
 webbsidornas innehåll når bara texten, som går genom kontrollerna.
 
@@ -5727,10 +5752,13 @@ Han läser Dagens Nyheter (`lasa`) eller Svenska Dagbladet (`lasa2`), och de ska
 2026-11-09): tabloid på grått tidningspapper, med namnet i tidningens stil (skrivet som text, inte loggan: DN:s i en Bodoni,
 Playfair Display i [public/typsnitt.css](public/typsnitt.css), SvD:s i spärrade versaler), dagens datum, nummer, årgång och pris,
 tre puffar med små bilder, en stor bild och dagens nyhet med vinjett, rubrik, ingress och sidhänvisning, och innehållet längst
-ned. SvD har rubriken över bilden och puffarna i en spalt bredvid ingressen. Baksidan är vädret, med Sverigekartan,
-symboler och grader, prognosen för Stockholm och kvällens tv i SVT1, SVT2 och TV4. Ingen sport. Nyheterna och puffarna
+ned. SvD har rubriken över bilden och puffarna i en spalt bredvid ingressen. Baksidan är sporten, *Så mår tipslagen*
+(2026-11-09, användarens önskan): notiserna inför omgången ur `data/tidning.json`, som iMacen skriver med Claude-kontot (se
+*Tidningen inför omgången* under [Analyserna](#analyserna)), i två spalter i tidningens typsnitt och så stort som alla ryms
+(`notisSida`). Utan notiser, eller med en sida som är äldre än tio dagar, är baksidan vädret, med Sverigekartan, symboler
+och grader, prognosen för Stockholm och kvällens tv i SVT1, SVT2 och TV4. Nyheterna och puffarna på förstasidan
 (`NYHETER`, `PUFFAR` i [public/rum-hasse-tidning.js](public/rum-hasse-tidning.js)) är påhittade och tidlösa, utan namn på
-riktiga personer, och dagen väljer dem (`dagens`): samma hela dagen, och aldrig samma nyhet i båda. Bilderna är målade
+riktiga personer och utan sport, och dagen väljer dem (`dagens`): samma hela dagen, och aldrig samma nyhet i båda. Bilderna är målade
 där (`MALA`: en stad i skymningen, snö på en gata, granskog och en röd stuga vid en sjö, skärgården med färjan, hyreshus och
 en julgata) och sedan blekta och korniga som i tryck. Tidningen trycks en gång om dagen (`upptagen` i rum-hasse.js) och
 trycks om när han tar upp den andra (`visa`).
@@ -5748,6 +5776,7 @@ framför ansiktet följer huvudet, fickan och handen kroppen), och handen räkna
 från sidan bakom tidningen, eller med pekfingertoppen på bryggan (`glasArm`). På näsan sitter de så nära ansiktet som
 formen tillåter (`paNasan`), och genom glasen ser ögonen lite större ut (`uLins` i ansiktets skuggare). Bågen ritas före
 kroppen, så att huvudet och kavajen döljer skalmarna och det som är nere i fickan.
+
 Går hans röst inte att få säger han det och visar analysen i skrift. Allt han säger runt omkring är
 färdiga rader, utan AI, i [public/rum-hasse-repliker.js](public/rum-hasse-repliker.js). Står man kvar säger han något då och då:
 över matchlistan (`ledig`), över listan med gänget (`domar.ledig`) och när man inte svarar på hans fråga (`valVanta`). Raderna

@@ -11,6 +11,8 @@
 //     match som inte har börjat, och Hasse Backes text ur den. Misslyckas en match
 //     sparas de andra, en gammal analys ligger kvar tills en ny finns, och nästa
 //     körning försöker igen med högst perMatch försök per tid.
+//   - Tidningen inför omgången (Hasse Backe läser den): en notis per match i
+//     data/tidning.json, när omgången kommer och sedan på tiderna i config/tidning.js.
 //   - Kommentarerna till färdiga kuponger: i data/kupong-historik.json.
 //
 // Publicering: varje färdig text sparas först i vantande.json utanför repot, sedan
@@ -25,6 +27,7 @@
 //   node scripts/analyser/skriv.mjs --ut <mapp>          filerna där i stället för i data/
 //   node scripts/analyser/skriv.mjs --torrt              visar vad som skulle göras
 //   node scripts/analyser/skriv.mjs --tvinga             skriver om omgångens analyser
+//   node scripts/analyser/skriv.mjs --tidning            bara tidningen, oavsett tid
 
 import { createRequire } from 'node:module';
 import { execFileSync } from 'node:child_process';
@@ -40,6 +43,7 @@ import { skrivAnalys } from '../../src/analyser/artikel.mjs';
 import { skrivHasse, hasseKlar } from '../../src/analyser/hasse.mjs';
 import { skrivNamn, namnNyckel } from '../../src/analyser/namn.mjs';
 import { skrivKommentar } from '../../src/analyser/kommentar.mjs';
+import { skrivTidning, attSkrivaTidning } from '../../src/analyser/tidning.mjs';
 import { attSkriva } from '../../src/analyser/tider.mjs';
 
 const require = createRequire(import.meta.url);
@@ -54,6 +58,7 @@ const PUBLICERA = flagga('--publicera');
 const TORRT = flagga('--torrt');
 const TVINGA = flagga('--tvinga');
 const EN_MATCH = varde('--en-match');
+const BARA_TIDNING = flagga('--tidning');
 const UT = varde('--ut');
 
 const HEM = os.homedir();
@@ -69,6 +74,7 @@ const FIL = {
   analyser: path.join(dataDir, 'analyser.json'),
   namn: path.join(dataDir, 'omgangsnamn.json'),
   historik: path.join(dataDir, 'kupong-historik.json'),
+  tidning: path.join(dataDir, 'tidning.json'),
 };
 
 const H = 3600000;
@@ -142,7 +148,7 @@ function rensaForsok() {
 
 // Får saken försökas nu? Högst perMatch försök, med nyttForsokMinuter emellan.
 function far(nyckel) {
-  if (EN_MATCH || TVINGA) return true;
+  if (EN_MATCH || TVINGA || BARA_TIDNING) return true;
   const f = forsok.poster[nyckel];
   return !f || (f.n < ac.perMatch && Date.now() - Date.parse(f.senast) >= ac.nyttForsokMinuter * MINUT);
 }
@@ -179,10 +185,10 @@ const fardata = (p) => hamta(`${site}/data/${p}?t=${Date.now()}`);
 
 // ---------- det som väntar på att sparas ----------
 
-const tomtVantande = () => ({ analyser: {}, hasse: {}, namn: {}, kommentarer: {}, omgang: null });
+const tomtVantande = () => ({ analyser: {}, hasse: {}, namn: {}, kommentarer: {}, omgang: null, tidning: null });
 let vantande = { ...tomtVantande(), ...lasJson(VANTANDE, {}) };
 const sparaVantande = () => skrivJson(VANTANDE, vantande);
-const finnsVantande = () => Boolean(vantande.omgang) || ['analyser', 'hasse', 'namn', 'kommentarer'].some((k) => Object.keys(vantande[k]).length);
+const finnsVantande = () => Boolean(vantande.omgang || vantande.tidning) || ['analyser', 'hasse', 'namn', 'kommentarer'].some((k) => Object.keys(vantande[k]).length);
 
 function lasAnalyser() {
   const d = lasJson(FIL.analyser, null) || {};
@@ -215,6 +221,8 @@ function laggIn() {
     const lista = lasNamn().filter((n) => !nyaNamn.some((x) => x.key === n.key));
     skrivJson(FIL.namn, { namn: [...lista, ...nyaNamn] });
   }
+
+  if (vantande.tidning) skrivJson(FIL.tidning, vantande.tidning);
 
   const ids = Object.keys(vantande.kommentarer);
   if (ids.length) {
@@ -253,7 +261,8 @@ function spara(vad) {
       // Har main ändrats (botens journal, ny kod) läggs texten ovanpå det senaste.
       tillMain();
       laggIn();
-      git('add', '--', 'data/analyser.json', 'data/omgangsnamn.json', 'data/kupong-historik.json');
+      // (tidning.json finns inte förrän den första tidningen är skriven)
+      git('add', '--', ...['analyser.json', 'omgangsnamn.json', 'kupong-historik.json', 'tidning.json'].map((f) => `data/${f}`).filter((f) => fs.existsSync(path.join(ROOT, f))));
       if (git('status', '--porcelain', '--', 'data').trim()) {
         git('commit', '-q', '-m', vad);
         git('push', '-q', 'origin', 'HEAD:main');
@@ -318,6 +327,27 @@ async function namnet(round) {
     spara(`Omgångens namn: ${r.entry.namn}`);
   } catch (err) {
     hanteraFel(err, `namn:${key}`, `namnet på ${round.id}`);
+  }
+}
+
+// Tidningen inför omgången: en gång när omgången kommer och sedan på tidningens tider.
+async function tidningen(round) {
+  const nu = vantande.tidning || lasJson(FIL.tidning, null);
+  const v = attSkrivaTidning(round, nu, { now: Date.now(), tvinga: BARA_TIDNING });
+  const nyckel = `tidning:${round.id}:${v.tid}`;
+  if (!v.skriv || !far(nyckel)) return;
+  if (TORRT) { logg(`skulle skriva tidningen för ${round.id} (${v.varfor})`); return; }
+  try {
+    const list = await Promise.all(round.matcher.map((x) => fardata(`match/${x.id}.json`).catch(() => null)));
+    const details = Object.fromEntries(round.matcher.map((x, i) => [String(x.id), list[i]]).filter(([, d]) => d));
+    const r = await skrivTidning(round, { details });
+    if (!r.ok) throw new Error(r.error);
+    vantande.tidning = r.tidning;
+    lyckat(nyckel);
+    logg(`tidning: ${round.id}, ${r.tidning.notiser.length} notiser${r.saknas.length ? ` (utan ${r.saknas.join(', ')})` : ''} (${metaText(r.meta)}; ${v.varfor})`);
+    spara(`Tidningen inför omgången ${round.id}`);
+  } catch (err) {
+    hanteraFel(err, nyckel, `tidningen för ${round.id}`);
   }
 }
 
@@ -505,9 +535,19 @@ async function main() {
     return;
   }
 
+  if (BARA_TIDNING) {
+    if (!round) { logg('ingen omgång just nu, så ingen tidning'); return; }
+    await tidningen(round);
+    if (lage.stoppad) process.exit(1);
+    const t = vantande.tidning || lasJson(FIL.tidning, null);
+    if (t && t.omgang === round.id) for (const n of t.notiser) console.log(`\n${n.nr}. ${n.rubrik}\n${n.text}${n.kallor.length ? `\n   (${n.kallor.map((k) => k.source).join(', ')})` : ''}`);
+    return;
+  }
+
   if (round) {
     await namnet(round);
     if (!lage.stoppad) await analyserna(round, roster);
+    if (!lage.stoppad) await tidningen(round);
   } else {
     logg('kontroll: ingen omgång just nu');
   }

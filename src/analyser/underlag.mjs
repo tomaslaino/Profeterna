@@ -193,7 +193,7 @@ function formOf(t) {
   return f.map((x) => `${x.result || '?'} ${x.date} ${x.comp} ${x.home ? 'hemma' : 'borta'}${x.opponent ? ` mot ${x.opponent}` : ''} ${x.gf}–${x.ga}${x.decided ? ` (${x.decided})` : ''}`);
 }
 
-function squadOf(s) {
+export function squadOf(s) {
   if (s.unknown) return `okänt – ${s.reason}`;
   if (!s.players.length) return 'inga skador eller avstängningar rapporterade';
   return s.players.map((p) => `${p.name}${p.pos ? ` (${p.pos})` : ''} ${p.status}` +

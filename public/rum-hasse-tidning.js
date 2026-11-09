@@ -1,8 +1,9 @@
 // Tidningen som Hasse Backe läser när det har gått dåligt för honom (rum-hasse-3d.js, klippen lasa): dagens
 // morgontidning, Dagens Nyheter eller Svenska Dagbladet, uppslagen med förstasidan mot en. Den ska se ut som en
-// riktig tidning: tidningens namn, datumet och numret, puffar, en stor bild och dagens nyhet, och på baksidan vädret
-// och kvällens tv. Nyheterna är påhittade och tidlösa, utan namn på riktiga personer, och ingen sport (dagens
-// i NYHETER och PUFFAR, valda efter datumet). Bilderna målas här, som fotografier i tryck (MALA).
+// riktig tidning: tidningens namn, datumet och numret, puffar, en stor bild och dagens nyhet, och på baksidan
+// sporten inför omgången (notiserna i data/tidning.json, skrivna på iMacen: scripts/analyser/skriv.mjs) eller, utan
+// dem, vädret och kvällens tv. Nyheterna på förstasidan är påhittade och tidlösa, utan namn på riktiga personer
+// (dagens i NYHETER och PUFFAR, valda efter datumet). Bilderna målas här, som fotografier i tryck (MALA).
 //
 // Papperet är ett rutnät som böjs i skuggaren: två sidor vikta mot honom kring ryggen (uBeta), mjukt
 // så att det faller bakåt ovanför händerna (uBuk), och en våg när han rycker i det (uVag). ytan() räknar
@@ -682,10 +683,82 @@ function symbol(x, typ, cx, cy, s) {
     for (const dx of [-0.3, 0, 0.3]) { x.beginPath(); x.arc(cx + dx * s, cy + s * 0.6, s * 0.08, 0, 7); x.fill(); }
   }
 }
-// Baksidan: vädret med kartan och prognosen, och kvällens tv
+// Notiserna inför omgången (data/tidning.json): en per match, skrivna på iMacen med Claude Code. Läses en gång per
+// sidvisning; en sida som är äldre än NOTIS_DAGAR trycks inte.
+const NOTIS_DAGAR = 10;
+let notiser = null;
+let notisLadd = null;
+function laddaNotiser() {
+  if (!notisLadd) {
+    notisLadd = fetch('data/tidning.json', { cache: 'no-cache' })
+      .then((r) => (r.ok ? r.json() : null))
+      .then((t) => {
+        const farsk = t && Array.isArray(t.notiser) && Date.now() - Date.parse(t.skriven) < NOTIS_DAGAR * 864e5;
+        notiser = farsk ? t.notiser.filter((n) => n && n.rubrik && n.text).sort((a, b) => a.nr - b.nr) : null;
+      })
+      .catch(() => {});
+  }
+  return notisLadd;
+}
+
+// Sportsidan inför omgången: notiserna i två spalter, i den största storleken där alla ryms (matchen, rubriken i
+// tidningens rubriktypsnitt och texten som brödtext).
+function notisSida(x, x0, y0, lista, T) {
+  const G = 14;
+  const W = (SB - 2 * M - G) / 2;
+  const Y1 = SH - 20;
+  const satt = (px) => {
+    const block = lista.map((n) => {
+      const rader = [];
+      rader.push({ t: `${n.nr}  ${n.match || ''}`.trim(), font: SANS(px * 0.82, 700), farg: T.vinjett, h: px * 1.15 });
+      for (const r of radbryt(x, n.rubrik, T.rubrik(px * 1.3, 700), W)) rader.push({ t: r, font: T.rubrik(px * 1.3, 700), farg: SVART, h: px * 1.35 });
+      for (const r of radbryt(x, n.text, BROD(px), W)) rader.push({ t: r, font: BROD(px), farg: SVART, h: px * 1.22 });
+      return { rader, h: rader.reduce((a, r) => a + r.h, 0) + px * 0.9 };
+    });
+    // spalterna fylls uppifrån, och nästa notis går till spalten med mest plats kvar
+    const sp = [y0, y0];
+    const plats = block.map((b) => {
+      const k = sp[0] <= sp[1] ? 0 : 1;
+      const p = { k, y: sp[k] };
+      sp[k] += b.h;
+      return p;
+    });
+    return { block, plats, ryms: Math.max(...sp) <= Y1 };
+  };
+  let px = 14;
+  let s = satt(px);
+  while (!s.ryms && px > 5.5) { px -= 0.25; s = satt(px); }
+  s.block.forEach((b, i) => {
+    const { k, y } = s.plats[i];
+    let ry = y;
+    for (const r of b.rader) {
+      ry += r.h;
+      if (ry > Y1) break;
+      x.font = r.font;
+      x.fillStyle = r.farg;
+      x.fillText(r.t, x0 + M + k * (W + G), ry - r.h * 0.18);
+    }
+  });
+  x.fillStyle = GRA;
+  x.fillRect(x0 + M + W + G / 2 - 0.5, y0 + 4, 1, Math.min(Y1, Math.max(...s.plats.map((p, i) => p.y + s.block[i].h))) - y0 - 8);
+}
+
+// Baksidan: sporten inför omgången när det finns notiser (data/tidning.json), annars vädret med kartan och
+// prognosen, och kvällens tv
 function baksida(x, x0, d, namn) {
   const T = TIDNINGAR[namn];
   papper(x, x0);
+  if (notiser && notiser.length) {
+    skriv(x, `${T.kort === 'DN' ? 'DN' : 'SvD'} · ${d.datum}`, x0 + M, 20, SANS(9.5, 400));
+    skriv(x, '38', x0 + SB - M, 20, SANS(11), { lin: 'h' });
+    linje(x, x0 + M, 27, SB - 2 * M, 1.5);
+    skriv(x, 'SPORT', x0 + M, 50, SANS(11.5), { sp: 0.08, farg: T.vinjett });
+    skriv(x, 'Så mår tipslagen', x0 + M, 88, T.rubrik(38, 800), { max: SB - 2 * M });
+    skriv(x, 'Inför omgången: läget i lagen, match för match', x0 + M, 108, SANS(11, 400));
+    linje(x, x0 + M, 118, SB - 2 * M, 1);
+    notisSida(x, x0, 122, notiser, T);
+    return;
+  }
   skriv(x, `${T.kort === 'DN' ? 'DN' : 'SvD'} · ${d.datum}`, x0 + M, 20, SANS(9.5, 400));
   skriv(x, '40', x0 + SB - M, 20, SANS(11), { lin: 'h' });
   linje(x, x0 + M, 27, SB - 2 * M, 1.5);
@@ -833,7 +906,7 @@ export function byggTidning(bord) {
     fonter = fonter || (document.fonts && document.fonts.load
       ? Promise.race([Promise.all([document.fonts.load(PLAY(30, 900)), document.fonts.load(PLAY(30, 700)), document.fonts.load(FRA(30, 600)), document.fonts.load(FRA(30, 700))]), new Promise((ok) => setTimeout(ok, 2500))])
       : Promise.resolve());
-    await fonter;
+    await Promise.all([fonter, laddaNotiser()]);
     if (mitt === nr) rita();
   }
   return {
