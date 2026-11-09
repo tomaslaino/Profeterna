@@ -24,7 +24,6 @@
   const SIGNS = ['1', 'X', '2'];
   const TAL = ['noll', 'en', 'två', 'tre', 'fyra', 'fem', 'sex', 'sju', 'åtta', 'nio', 'tio', 'elva', 'tolv', 'tretton'];
   const ordet = (n) => TAL[n] || String(n);
-  const stor = (s) => s.charAt(0).toUpperCase() + s.slice(1);
   const esc = (s) => String(s == null ? '' : s).replace(/[&<>"]/g, (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c]));
   const efternamn = (s) => String(s || '').trim().split(/\s+/).pop();
   const lista = (l) => (l.length < 2 ? l.join('') : `${l.slice(0, -1).join(', ')} och ${l.at(-1)}`);
@@ -47,34 +46,10 @@
 
   // ---------- texterna ----------
   const TEXT = {
-    kronika: {
-      rubrik: 'Matcherna hade fel',
-      rubrikAlla: 'Vad var det jag sa',
-      namn: (namn) => `${namn}, stod det på kupongen. Jag sa redan då att det var fel, men ingen lyssnar i den här baren.`,
-      utanNamn: 'Jag sa redan före avspark hur det skulle gå, men ingen lyssnar i den här baren.',
-      alla: (a) => `${stor(ordet(a))} rätt. Det var precis vad jag sa.`,
-      bra: (a, b) => `${stor(ordet(a))} rätt är bra. ${stor(ordet(b))} hade varit bättre.`,
-      mitten: (a) => `${stor(ordet(a))} rätt är inget att skriva hem om, men det gör jag ändå.`,
-      lite: (a) => `${stor(ordet(a))} rätt. Jag har sett bättre på en lottsedel.`,
-    },
-    betyg: {
-      ensam: (lag) => `Ensam om rätt i ${lag}.`,
-      ensamMer: (n) => `Ensam om rätt i ${ordet(n)} matcher.`,
-      ingen: 'Ensam om ingenting.',
-      sist: 'Sist.',
-    },
     // exemplet i Hasses svar om poängen (exempel här, protokollet i rum.js)
     exempel: {
       lika: (vilka, antal, bast) => `${vilka} hade ${antal} rätt var, men ${bast} fick mest poäng, eftersom datorn trodde minst på just de tecknen.`,
       mest: (vem, tecken, h, b, chans, pts) => `Mest för ett enda tips fick ${vem}, med ${tecken} i ${h}–${b}. Datorn gav det ${chans} %, så det blev ${pts} poäng.`,
-    },
-    skrall: {
-      vann: (v, f, s, p) => `${v} slog ${f} ${s}. Datorn gav det ${p} %.`,
-      lika: (h, b, s, p) => `${h} och ${b} spelade ${s}. Datorn gav det ${p} %.`,
-      ingen: 'Ingen i gänget hade det.',
-      alla: 'Alla i gänget hade det.',
-      en: (n) => `Bara ${n} hade det.`,
-      fler: (l) => `${l} hade det.`,
     },
   };
 
@@ -592,83 +567,5 @@
     return T.mest(bast.p.namn, bast.sign, bast.r.h, bast.r.b, Math.round((1 - bast.pts) * 100), poang(bast.pts).replace('+', ''));
   }
 
-  // ---------- tidningen ----------
-
-  const bollar = (n) => `<span class="rt-boll">${[0, 1, 2, 3, 4].map((i) => `<i class="${i < n ? 'on' : ''}"></i>`).join('')}</span>`;
-  function betygText(p) {
-    const T = TEXT.betyg;
-    const lag = p.ensam.map((r) => r.h);
-    const ens = !lag.length ? T.ingen : lag.length <= 2 ? T.ensam(lag.join(' och ')) : T.ensamMer(lag.length);
-    return !lag.length && p.award === 'worst' ? `${ens} ${T.sist}` : ens;
-  }
-  function kronika(sum) {
-    const T = TEXT.kronika;
-    const { ok, n } = sum.kupong;
-    const alla = n && ok === n;
-    const del2 = alla ? T.alla(ok) : ok * 13 >= n * 9 ? T.bra(ok, Math.min(n, ok + 2)) : ok * 13 >= n * 6 ? T.mitten(ok) : T.lite(ok);
-    return { rubrik: alla ? T.rubrikAlla : T.rubrik, text: `${sum.namn ? T.namn(sum.namn.replace(/[.!?…]+$/, '')) : T.utanNamn} ${del2}` };
-  }
-  // Omgångens skräll: det modellen trodde minst på. → { text, vem }, eller null
-  function skrall(sum) {
-    const T = TEXT.skrall;
-    const r = sum.rader.filter((x) => x.res != null && x.pr).sort((a, b) => a.pr[a.res] - b.pr[b.res])[0];
-    if (!r) return null;
-    const p = Math.round(r.pr[r.res]);
-    const forsta = r.res === 1 ? T.lika(r.h, r.b, r.mal, p) : r.res === 0 ? T.vann(r.h, r.b, r.mal, p) : T.vann(r.b, r.h, r.mal.split('–').reverse().join('–'), p);
-    const folk = sum.folk.filter((x) => !x.none);
-    const ratt = folk.filter((x) => r.ratt.includes(x.id));
-    const vem = !ratt.length ? T.ingen : ratt.length === folk.length ? T.alla : ratt.length === 1 ? T.en(ratt[0].namn) : T.fler(`${ratt.slice(0, -1).map((x) => x.namn).join(', ')} och ${ratt.at(-1).namn}`);
-    return { text: `${forsta} ${vem}`, sida: r.res === 1 ? 'OAVGJORT' : (r.res === 0 ? r.h : r.b).toUpperCase() };
-  }
-
-  // → html för det som står under löpsedeln i den öppna tidningen. Själva sedeln läggs överst i
-  // bladet av tidningen i rum.js (sedel i rum-affischer.js), så att det är samma papper. tid: 'ex' eller 'sb'.
-  function tidning(sum, tid) {
-    const folk = sum.folk.filter((p) => !p.none);
-    const ok = new Set(folk.map((p) => p.ok));
-    const bast = folk.find((p) => p.award === 'best');
-    const hoger = ok.size === 1 ? `${ordet(folk[0].ok)} rätt, allihop`.toUpperCase() : bast ? `BÄST: ${bast.namn.toUpperCase()}` : '';
-    const sk = skrall(sum);
-    const kr = kronika(sum);
-    return `<div class="rt-blad tid-${esc(tid)}" role="document"><div class="rt-inne">` +
-      `<div class="rt-sep"><span>BETYGEN</span><span>${esc(hoger)}</span></div>` +
-      `<div class="rt-betyg" style="--n:${folk.length}">${folk.map((p) => `<div>${p.bild ? `<canvas class="rt-foto" width="360" height="346" data-bild="${esc(p.bild)}"></canvas>` : '<span class="rt-foto"></span>'}<div class="rt-nm"><span>${esc(p.namn)}</span>${bollar(p.betyg)}</div><p class="rt-bt">${esc(betygText(p))}</p></div>`).join('')}</div>` +
-      `<div class="rt-nedre"><div>${sk ? `<div class="rt-sep"><span>SKRÄLLEN</span><span>${esc(sk.sida)}</span></div><p class="rt-skr">${esc(sk.text)}</p>` : ''}</div>` +
-      `<div><div class="rt-sep"><span>KRÖNIKAN</span><span>HASSE BACKE</span></div><div class="rt-kr"><canvas class="rt-hasse" width="168" height="220" data-bild="profeterna/hasse.jpg"></canvas><p><strong>${esc(kr.rubrik)}</strong>${esc(kr.text)}</p></div></div></div></div></div>`;
-  }
-
-  // Tidningsbilderna: svartvita och rastrerade, ritade en gång på dukar (CSS-blandning kostar i telefonen).
-  function rastrera(rot) {
-    for (const c of rot.querySelectorAll('canvas[data-bild]')) {
-      const img = new Image();
-      img.onload = () => {
-        const x = c.getContext('2d', { willReadFrequently: true });
-        const { width: W, height: H } = c;
-        const k = Math.max(W / img.naturalWidth, H / img.naturalHeight);
-        x.drawImage(img, (W - img.naturalWidth * k) / 2, c.classList.contains('rt-hasse') ? 0 : (H - img.naturalHeight * k) / 2, img.naturalWidth * k, img.naturalHeight * k);
-        let d;
-        try { d = x.getImageData(0, 0, W, H); } catch (e) { return; }
-        const p = d.data;
-        const ruta = 5;
-        for (let y = 0; y < H; y++) {
-          for (let i = 0; i < W; i++) {
-            const o = (y * W + i) * 4;
-            const g = Math.min(1, Math.max(0, ((0.3 * p[o] + 0.59 * p[o + 1] + 0.11 * p[o + 2]) / 255 - 0.5) * 1.25 + 0.55));
-            // punkternas storlek efter hur mörkt det är: 45 grader, med tonen kvar under
-            const u = ((i + y) / ruta) % 1;
-            const v = ((i - y + 4 * H) / ruta) % 1;
-            const r = Math.hypot(u - 0.5, v - 0.5) / 0.71;
-            const v2 = g * 0.72 + (r < 1 - g ? 0 : 0.28);
-            p[o] = 28 + v2 * 208;
-            p[o + 1] = 24 + v2 * 208;
-            p[o + 2] = 18 + v2 * 200;
-          }
-        }
-        x.putImageData(d, 0, 0);
-      };
-      img.src = c.dataset.bild;
-    }
-  }
-
-  return { rakna, fryst, lappar, mandagEfter, bygg, gang, lapp, poang, RING, html, exempel, tidning, rastrera, kronika, skrall, betyg, TEXT };
+  return { rakna, fryst, lappar, mandagEfter, bygg, gang, lapp, poang, RING, html, exempel, betyg, TEXT };
 });

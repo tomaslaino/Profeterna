@@ -3163,8 +3163,10 @@ ${window.RumRegister ? RumRegister.nara() : ''}
   // finns (tillHasse).
   function go(a, e) {
     e.preventDefault();
+    // ett nytt klick medan tidningen väntar på notiserna gäller i stället (oppnaTidning)
+    R.tidningVantar = false;
     if (a.id === 'rum-hasse') tillHasse(a);
-    else if (a.dataset.sak === 'lopsedel' && R.summa && tidningen()) return;
+    else if (a.dataset.sak === 'lopsedel') oppnaTidning();
     else if (a.dataset.sak) sak(a.dataset.sak);
     else if (a.dataset.nav === 'tv') zoomTv(!R.zoom);
     else if (a.dataset.nav === 'video') zoomVideo(!R.vnara);
@@ -3569,8 +3571,116 @@ ${window.RumRegister ? RumRegister.nara() : ''}
     }, () => {});
   }
 
-  // Tidningen bakom löpsedeln: läggs fram över rummet, som står still så länge. Esc, Lägg tillbaka
-  // eller ett klick utanför lägger bort den. → den öppnades.
+  // ---------- tidningen ----------
+  //
+  // Tidningen bakom löpsedeln (rum-tidning.js): ett klick på sedeln lägger fram veckans tidning över
+  // rummet, som står still så länge. Efter omgången (R.summa) handlar den om omgången som är spelad, och
+  // före den om omgången som kommer: matcherna, notiserna ur data/tidning.json och Veckans analys ur
+  // data/analyser.json. Mellan omgångarna finns ingen tidning, och då går kameran fram till sedeln som förut.
+  // Esc, Lägg tillbaka, bakåt eller ett klick utanför lägger bort den.
+  const NOTIS_DAGAR = 10;
+  let notisData = null;
+  let notisAt = 0;
+  let notisReq = null;
+  // data/tidning.json, högst var femte minut. → { omgang, matcher, notiser, skriven } eller null
+  function hamtaNotiser() {
+    if (notisReq && Date.now() - notisAt < 5 * 60000) return notisReq;
+    notisAt = Date.now();
+    notisReq = fetch('data/tidning.json', { cache: 'no-cache' }).then((r) => (r.ok ? r.json() : null)).catch(() => null)
+      .then((t) => { notisData = t && Array.isArray(t.notiser) ? t : null; return notisData; });
+    return notisReq;
+  }
+  // Notiserna för omgången rd, om sidan är skriven för den (samma id, eller minst hälften av matcherna)
+  // och inte är äldre än tio dagar.
+  function notiserFor(rd) {
+    const t = notisData;
+    if (!t || !rd || !(Date.now() - Date.parse(t.skriven) < NOTIS_DAGAR * 864e5)) return [];
+    const ids = new Set(rd.ids);
+    const samma = t.omgang === rd.id || (t.matcher || []).filter((id) => ids.has(String(id))).length * 2 >= rd.ids.length;
+    if (!samma) return [];
+    return t.notiser.filter((n) => n && n.rubrik && n.text && (!n.id || ids.has(String(n.id))))
+      .map((n) => ({ nr: n.nr, id: n.id, match: n.match, rubrik: n.rubrik, text: n.text, kallor: n.kallor || n.källor || [] }));
+  }
+  // Tipsligan: säsongens omgångar som syns (kampRounds, som skårtavlan), utan och med omgången id.
+  // → { fore, efter, omg } eller null
+  function tidningsLiga(id, medDen) {
+    if (typeof kampRounds !== 'function' || typeof Tippoang === 'undefined') return null;
+    const alla = kampRounds().list.filter((r) => r.people && r.done);
+    const fore = alla.filter((r) => r.id !== id);
+    const efter = medDen ? alla : fore;
+    if (!efter.length) return null;
+    const med = medDen && efter.length > fore.length;
+    return { fore: med && fore.length ? Tippoang.season(fore).people : null, efter: Tippoang.season(efter).people, omg: efter.length };
+  }
+  const tecknen = (signs) => (Array.isArray(signs) ? signs.map((n) => ['1', 'X', '2'][n]).filter(Boolean).join('') : '');
+  // Det som står i tidningen: efter omgången ur sammanställningen, före den ur omgången. → upplagan, eller null
+  function upplaga(sedel) {
+    const rub = R.saker && R.saker.rubrik ? R.saker.rubrik() : null;
+    const u = {
+      tid: sedel.classList.contains('tid-ex') ? 'ex' : 'sb',
+      datumText: rub && rub.datum ? String(rub.datum).toLowerCase() : '',
+      namnAv: (id, namn) => tavelnamn({ id, name: namn }),
+    };
+    if (R.summa) {
+      const g = window.Samtal && Samtal.pult && Samtal.pult.gang ? Samtal.pult.gang() : null;
+      return { ...u, efter: R.summa, citat: g ? { notes: g.notes || {}, efter: g.efter || {} } : null, liga: tidningsLiga(R.summa.id, true) };
+    }
+    const rd = round();
+    if (!rd || rd.next || typeof matchById !== 'function') return null;
+    const per = analyserData ? analyserData.per : new Map();
+    const matcher = rd.ids.map((id, i) => {
+      const m = matchById(id);
+      if (!m) return null;
+      const a = per.get(String(id));
+      return { nr: i + 1, id: String(id), h: short(m.home), b: short(m.away), avspark: m.kickoff, pr: m.j && m.j.p ? m.j.p : m.f ? m.f.p : null, expert: a && a.tip ? tecknen(a.tip.signs) : '', klar: Boolean(m.completed) };
+    }).filter(Boolean);
+    // en omgång som är färdigspelad utan sammanställning (dolda resultat) har ingen tidning inför sig
+    if (!matcher.length || matcher.every((x) => x.klar)) return null;
+    // Veckans analys: om matchen som löpsedeln handlar om, annars den jämnaste som inte har börjat
+    const med = matcher.filter((x) => { const a = per.get(x.id); return a && a.title && (a.paragraphs || []).length; });
+    const kvar = med.filter((x) => !(Date.parse(x.avspark) <= Date.now()));
+    const jamn = (l) => l.filter((x) => x.pr).sort((a, b) => Math.max(...a.pr) - Math.max(...b.pr))[0] || l[0];
+    const vald = (rub && med.find((x) => x.id === String(rub.id))) || jamn(kvar) || jamn(med);
+    const a = vald ? per.get(vald.id) : null;
+    return {
+      ...u,
+      nr: typeof couponNumber === 'function' ? couponNumber(rd.ids) : null,
+      matcher,
+      notiser: notiserFor(rd),
+      liga: tidningsLiga(rd.id, false),
+      analys: a ? { nr: vald.nr, h: vald.h, b: vald.b, avspark: a.avspark, title: a.title, lead: a.lead, paragraphs: a.paragraphs, author: a.author, sources: a.sources,
+        tip: a.tip && tecknen(a.tip.signs) ? { sign: tecknen(a.tip.signs), note: a.tip.note, text: a.tip.text } : null } : null,
+    };
+  }
+  // Notiserna och analyserna till tidningen före omgången, så att de finns när den öppnas.
+  function forberedTidning() {
+    if (R.summa || R.tidning) return;
+    const rd = round();
+    if (!rd || rd.next) return;
+    hamtaNotiser();
+    if (typeof loadAnalyser === 'function') loadAnalyser();
+  }
+  // Ett klick på löpsedeln: tidningen om det finns en, annars närbilden. Före omgången hämtas notiserna
+  // och analyserna först (högst ett par sekunder), så att de kommer med.
+  function oppnaTidning() {
+    if (R.summa || !window.RumTidning) {
+      if (!tidningen()) sak('lopsedel');
+      return;
+    }
+    const rd = round();
+    if (!rd || rd.next) {
+      sak('lopsedel');
+      return;
+    }
+    const vanta = Promise.all([hamtaNotiser(), typeof loadAnalyser === 'function' ? loadAnalyser() : null]);
+    const gans = new Promise((ok) => setTimeout(ok, 2500));
+    R.tidningVantar = true;
+    Promise.race([vanta, gans]).catch(() => {}).then(() => {
+      if (!R.tidningVantar) return;
+      R.tidningVantar = false;
+      if (R.on && !R.tidning && !tidningen()) sak('lopsedel');
+    });
+  }
   function tidningen(pa = true) {
     if (!pa) {
       if (!R.tidning) return false;
@@ -3582,31 +3692,48 @@ ${window.RumRegister ? RumRegister.nara() : ''}
     }
     if (R.tidning) return true;
     const sedel = R.saker && R.saker.sedel && R.saker.sedel();
-    if (!sedel || !R.summa) return false;
+    if (!sedel || !window.RumTidning) return false;
+    const u = upplaga(sedel);
+    const t = u && RumTidning.html(u);
+    if (!t) return false;
     const el = document.createElement('div');
     el.className = 'rum-tidningen';
-    el.innerHTML = RumBlock.tidning(R.summa, sedel.classList.contains('tid-ex') ? 'ex' : 'sb') + '<button type="button" class="rt-tillbaka">Lägg tillbaka</button>';
-    el.querySelector('.rt-blad').prepend(sedel);
+    el.tabIndex = -1;
+    const namn = u.tid === 'ex' ? 'Expressen' : 'Sportbladet';
+    el.innerHTML = `<div class="tn tid-${u.tid}" role="document" aria-label="${esc(namn)}"><div class="tn-ark tn-forsta">${t.inne}</div>${t.blad}</div>` +
+      '<button type="button" class="tn-tillbaka">Lägg tillbaka</button>';
+    el.querySelector('.tn-forsta').prepend(sedel);
     for (const n of ['pointerdown', 'pointerup', 'pointermove', 'mouseover', 'wheel', 'touchstart', 'touchmove']) el.addEventListener(n, (e) => e.stopPropagation());
     el.addEventListener('click', (e) => {
       e.stopPropagation();
-      if (!e.target.closest('.rt-blad') || e.target.closest('.rt-tillbaka')) tidningen(false);
+      // I tidningen: till sidan
+      const b = e.target.closest('.tn-inne button[data-sida]');
+      const s = b && el.querySelector(`#tn-sida-${b.dataset.sida}`);
+      if (s) {
+        el.scrollTo({ top: s.offsetTop - 8, behavior: calm() ? 'auto' : 'smooth' });
+        return;
+      }
+      if (!e.target.closest('.tn-ark') || e.target.closest('.tn-tillbaka')) tidningen(false);
     });
     R.el.append(el);
     R.tidning = el;
     R.vilar = true;
     lager('tidningen', () => tidningen(false));
     passaTidning();
-    RumBlock.rastrera(el);
+    RumTidning.rastrera(el);
+    // pilarna, mellanslag och Page Down bläddrar i tidningen
+    el.focus({ preventScroll: true });
     return true;
   }
-  // Sedeln så stor som ryms med början av nästa rubrik under sig, så att det syns att tidningen fortsätter.
-  // Den är 100 × 140 i rummet, och resten av bladet får samma bredd (--k).
+  // Sedeln så stor som ryms med början av nästa rad under sig, så att det syns att tidningen fortsätter.
+  // Den är 100 × 140 i rummet, och sidorna under får samma bredd (--k); under 470 px står allt i en spalt.
   function passaTidning() {
     const t = R.tidning;
     if (!t) return;
     const k = Math.min((t.clientWidth - (R.smal ? 20 : 24)) / 100, 6.6, Math.max((t.clientHeight - 86) / 140, 3.6));
-    t.querySelector('.rt-blad').style.setProperty('--k', k.toFixed(3));
+    const tn = t.querySelector('.tn');
+    tn.style.setProperty('--k', k.toFixed(3));
+    tn.classList.toggle('smal', k * 100 < 470);
     t.querySelector('.rt-sedel').style.zoom = k.toFixed(3);
   }
 
@@ -5763,7 +5890,10 @@ ${window.RumRegister ? RumRegister.nara() : ''}
     el.addEventListener('mouseover', (e) => {
       const a = !R.kup && e.target.closest('.rum-sak, .rum-tag');
       hot(a ? a.dataset.nav : null);
+      if (a && a.dataset.sak === 'lopsedel') forberedTidning();
     });
+    // tidningen hämtar notiserna och analyserna redan när fingret sätts på löpsedeln
+    el.addEventListener('pointerdown', (e) => { if (e.target.closest('[data-sak="lopsedel"]')) forberedTidning(); }, { passive: true });
     el.addEventListener('click', (e) => {
       // Namnet leder till rummet, där man redan är. Som länk blev det en rad i historiken som nästa
       // bakåt stannade på (rum-bak.js).

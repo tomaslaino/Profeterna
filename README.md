@@ -252,6 +252,13 @@ ingen falsk precision · sidan kraschar aldrig av en död källa · endast fria 
   påsar under ögonen, sedan kommer de igång, och efter en stund utan musik eller klick somnar de
   om. Lysröret dämpas långsamt från 23 till midnatt (förut släcktes det vid midnatt) och tänds lika
   långsamt från sex till sju (se *Natten* och *Sömnen* under [Tobaksaffären](#tobaksaffären))
+- [x] **Tidningen (2026-11-09, användarens önskemål: "förbättra tidningen otroligt mycket"):** löpsedeln i
+  tobaksaffären öppnar veckans tidning också före omgången, och den är en riktig tidning: sedeln som framsida,
+  *I tidningen* med sidorna, och sidor med sidhuvud, avdelningar, spalter och tabeller. Före omgången *Tipset*
+  (matcherna, datorns procent, Sixten Bråvalls tecken och Tipsligan), *Så mår tipslagen* (notiserna inför
+  omgången) och *Veckans analys*; efter den *Omgången* (resultaten, rätt rad och siffrorna), *Betygen*,
+  *Skrällen* med det ni skrev på kupongen, och Hasse Backes krönika med Tipsligan. Förut fanns den bara efter
+  omgången, med betygen, skrällen och två meningar från Hasse (se *Tidningen* under [Tobaksaffären](#tidningen))
 
 ## Publicering
 
@@ -1666,7 +1673,7 @@ config/tidning.js om sidan är äldre än tiden och minst tolv timmar gammal; n�
 ```
 
 `nr` är matchens nummer på kupongen. Tidningen som Hasse Backe läser trycker notiserna på baksidan (se *Tidningen*
-under [Hasse Backe](#hasse-backe)).
+under [Hasse Backe](#hasse-backe)), och tidningen bakom löpsedeln på sidan *Så mår tipslagen* (se [Tidningen](#tidningen)).
 
 **Rösten** står i [prompts/analys-rost.md](prompts/analys-rost.md): Sixten Bråvall, en påhittad
 tränare med egen bakgrund i klubbar som inte finns och egna stående uttryck. Filen går att
@@ -3496,9 +3503,10 @@ Förra omgångens väger fullt tre dagar efter sista avsparken, sedan 55 % och e
 30 %; nästa omgångs 90 %. Omgångar och kuponger som spoilerskyddet döljer räknas inte.
 Utan något att skriva om står tipsguiden (*STORA TIPSGUIDEN*, *SÅ BLIR DU RIK PÅ TIPSET* – *8
 enkla knep – nummer 5 gör alla fel*). Tidningen är från dagen det hände (tre timmar efter sista
-avsparken), och för nästa omgång från idag. Ett klick går fram till löpsedeln, som till de andra
-affischerna; som inget annat i rummet leder den ut ur det. För bilder: `?rum-tidning=sb|ex`,
-`?rum-rubrik=<typ>` och `?rum-variant=<tal>`.
+avsparken), och för nästa omgång från idag. Ett klick öppnar tidningen (se [Tidningen](#tidningen)), och
+mellan omgångarna, när det inte finns någon, går kameran fram till löpsedeln som till de andra affischerna; som
+inget annat i rummet leder den ut ur det. För bilder: `?rum-tidning=sb|ex`, `?rum-rubrik=<typ>` och
+`?rum-variant=<tal>`.
 
 **Fikat** står på pulten vissa dagar, i three.js som sakerna
 ([public/rum-fika.js](public/rum-fika.js)): två semlor i pappersform med mandelmassa,
@@ -6138,8 +6146,7 @@ Lägg tillbaka mitt i svaret. Anslagstavlans svar ser pixel för pixel likadant 
 rum-hasse-svar.js. Inte provat i Safari eller i en riktig telefon.
 
 Ett klick på
-löpsedeln i fönstret öppnar tidningen: överst samma sedel som i fönstret, förstorad (`sedel` i rum-affischer.js kopierar
-papperet, så att de inte kan bli olika), och under den betygen, skrällen och hans krönika (`tidningen` i rum.js). Gänget håller upp skyltar med sina rätt (`lappar` i rum-3d.js), medan resten av figuren lever som
+löpsedeln i fönstret öppnar tidningen om omgången (se [Tidningen](#tidningen)). Gänget håller upp skyltar med sina rätt (`lappar` i rum-3d.js), medan resten av figuren lever som
 vanligt. Skyltarna står kvar till måndagen efter omgången kl. 16, också om någon har valt matcher till en ny omgång för hand före det
 (`lappar` i rum-block.js läser då den förra omgången, `forra` i GET /samtal), men inte sedan den har börjat. Så länge
 lägger ett klick på någon i gänget ner hens skylt på bordet, och ett klick till på hen eller skylten tar upp den igen
@@ -6178,12 +6185,72 @@ så länge. Skyltens hörn och kant är genomskinliga i bilden, så att de är m
 `?rum-lapp=dl:kinden:kolla@2` (hållningen, vad hen gör och hur långt in).
 
 Allt räknas ur omgångens data och ser likadant ut på alla enheter. Med dolda resultat (Dölj resultat) syns inget av det,
-utan stämpeln *Alla inne* ligger kvar. Tidningens texter står i `TEXT` i rum-block.js och inte i replikfilen, eftersom de inte
-sägs högt; `npm run repliker` kollar dem mot det som är underkänt.
+utan stämpeln *Alla inne* ligger kvar. Protokollets texter står i `TEXT` i rum-block.js och tidningens i rum-tidning.js, och
+inte i replikfilen, eftersom de inte sägs högt; `npm run repliker` kollar dem mot det som är underkänt.
 
 Kostnad, mätt i Chrome som telefon med processorn ×4: en bild av gänget 5,0 → 5,4 ms och 342 → 382 ritanrop, samma
 antal trianglar. Med hållningarna: 327–339 ritanrop med en hand och 355–371 med båda, mot 376–399 i samma mätning
 förut, och inte fler trianglar. Blocket och tidningen är platt papper som ritas en gång, och medan de är framme står rummet still.
+
+### Tidningen
+
+Ett klick på veckans löpsedel lägger fram tidningen över rummet (2026-11-09, användarens önskemål: "förbättra tidningen
+otroligt mycket"; förut fanns den bara efter omgången, med betygen, skrällen och två meningar från Hasse). Den är samma
+tidning som löpsedeln, Sportbladet eller Expressen, på samma papper, och överst ligger sedeln själv, förstorad, som
+framsida (`sedel` i rum-affischer.js kopierar papperet, så att de inte kan bli olika). Under den står *I tidningen* med
+sidorna och deras nummer, och ett klick där rullar fram till sidan. Sidorna ligger under varandra som ark, var och en med
+sidnumret ytterst, tidningens namn och datumet (löpsedelns) i huvudet, en avdelning i svart och rubriker i Anton,
+brödtext med rak högerkant och avstavning och porträtten rastrerade i svartvitt. I datorn står texten i två spalter och
+i telefonen (smalare än 470 bildpunkter) i en. Allt står i [public/rum-tidning.js](public/rum-tidning.js) och
+[public/rum-tidning.css](public/rum-tidning.css); rummet samlar ihop det som ska stå där (`upplaga` och `tidningen` i
+rum.js).
+
+**Före omgången** (omgången finns och är inte spelad):
+
+- *Tipset*: omgångens matcher med numret på kupongen och avsparken, datorns procent för 1, X och 2 (det troligaste i
+  fetstil) och Sixten Bråvalls tecken ur analysen, och under dem Tipsligan efter de omgångar som är spelade och syns.
+  Ingen annans tips står där: de syns först i uppgörelsen.
+- *Så mår tipslagen*: notiserna inför omgången ur `data/tidning.json` (se *Tidningen inför omgången* under
+  [Analyserna](#analyserna)), en per match med numret, lagen, rubriken, texten och källornas namn – samma som på
+  baksidan av Hasses tidning. Sidan finns när filen är skriven för omgången (samma id eller minst hälften av matcherna)
+  och är högst tio dagar gammal.
+- *Veckans analys*: Sixten Bråvalls artikel om matchen som löpsedeln handlar om (`id` i `rubrik` i rum-affischer.js,
+  när rubriken gäller en match), annars den jämnaste matchen som inte har börjat: rubriken, ingressen, texten med
+  anfang och utan källhänvisningarna i klamrar, och i en ruta hans tecken, marginalen och motiveringen. Källorna står
+  sist.
+
+Notiserna och analyserna hämtas när man pekar på eller trycker på löpsedeln, och klicket väntar på dem i högst två och en
+halv sekund. Mellan omgångarna (ingen omgång, bara de närmaste matcherna) finns ingen tidning, och då går kameran fram
+till löpsedeln som förut.
+
+**Efter omgången** (sammanställningen finns, se [Sammanställningen efter omgången](#sammanställningen-efter-omgången)):
+
+- *Omgången*: resultaten med rätt tecken, datorns chans för det som hände (rött under 25 %) och hur många av er som
+  hade rätt, *Rätt rad* i rutor som i tidningarnas tipsspalt och *Siffrorna*: målen, hemmasegrar, oavgjorda och
+  bortasegrar, flest mål i en match, gängets kupong, datorns rad och flest rätt.
+- *Betygen*: var och en med porträtt, en till fem bollar (`RumBlock.betyg`), rätt, poäng och plats, och två meningar:
+  ensam om rätt i vilka matcher, bäst eller sist, och den bästa träffen (datorn gav den högst 45 %) eller den värsta
+  missen (minst 60 %).
+- *Skrällen*: det datorn trodde minst på, när det var högst 40 %, med en rubrik som löpsedelns (*FOREST FÄLLDE
+  MANCHESTER*, *… SÄNKTE …*, *… SNUBBLADE*) och vilka som hade det. Under den *Det ni skrev*: högst fyra av era
+  motiveringar och kommentarer efteråt, helst från olika personer och först om skrällen och där någon var ensam om
+  rätt, med porträttet, matchen och hur det slutade.
+- *Krönikan*: Hasse Backes, med hans porträtt. Han tar omgångens namn, er kupong, skrällen (högst 30 %), vinnaren
+  (på poängen när fler hade lika många rätt), den som kom sist, datorn när den slog er allihop eller kom sist, sig
+  själv och en avslutning – han har alltid haft rätt, och det som gick fel var matcherna. Bredvid står Tipsligan
+  efter omgången, med pilar för den som har klättrat eller fallit.
+
+Samma omgång ger samma tidning på alla enheter: där texten kan variera väljer omgångens id. Namnen är skårtavlans
+(Dogge för Johansson), som på löpsedeln. Inget anropar en språkmodell: notiserna och analysen är skrivna i förväg på
+iMacen, och resten är mallar i `TEXT` i rum-tidning.js, som `npm run repliker` kollar mot det som är underkänt (i
+krönikan säger Hasse ni och er). Med dolda resultat finns ingen sammanställning, och då är tidningen den före omgången.
+Esc, *Lägg tillbaka*, bakåt eller ett klick utanför lägger bort den, pilarna och mellanslag rullar, och medan den är
+framme står rummet still.
+
+Provat i headless Chromium med en påhittad sida (omgången 2026-11-07 ur `data/tippar-historik.json`,
+`data/kupong-historik.json` och `data/analyser.json`, och påhittade notiser) i 1440 × 900 och 412 × 915, och
+kantfallen (Hasse vann och kom sist, någon utan kupong, inga porträtt, ingen notis och ingen analys) med Node. Inte
+provat i hela rummet, i Safari eller i en riktig telefon.
 
 ### Närbilderna
 

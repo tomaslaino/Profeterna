@@ -459,7 +459,7 @@ function framat(rows, alla, short) {
     const pj = jamn.g.pr.map(Math.round);
     if (Math.max(...pj) <= 42) {
       const [h, a] = [short(jamn.m.home), short(jamn.m.away)];
-      out.push({ typ: 'rysaren', poang: 0.42 + (42 - Math.max(...pj)) / 40, t, framat: true, v: [
+      out.push({ typ: 'rysaren', poang: 0.42 + (42 - Math.max(...pj)) / 40, t, framat: true, mid: jamn.m.id, v: [
         { kick: 'RYSAREN', rad: [['DATORN'], ['GER UPP', 1]], under: `${h}–${a}: ${pj.join('–')} %. Nu får du välja själv` },
         { kick: 'NERVKRIGET', rad: [['RYSAREN', 1], [h], [`– ${a}`]], under: `Datorn kan inte välja: ${pj.join('–')} %. Avspark ${nar(jamn.m.kickoff)}` },
       ] });
@@ -469,7 +469,7 @@ function framat(rows, alla, short) {
     const pf = Math.round(fav.g.pr[k]);
     if (pf >= 68) {
       const [v, f] = (k === 0 ? [fav.m.home, fav.m.away] : [fav.m.away, fav.m.home]).map(short);
-      out.push({ typ: 'spiken', poang: 0.4 + (pf - 68) / 60, t, framat: true, v: [
+      out.push({ typ: 'spiken', poang: 0.4 + (pf - 68) / 60, t, framat: true, mid: fav.m.id, v: [
         { kick: 'SPIKEN', rad: [[v], ['KAN INTE'], ['FÖRLORA', 1]], under: `${pf} % mot ${f} enligt datorn. Vad kan gå fel?` },
         { kick: 'OMGÅNGENS SPIK', rad: [['GARANTERAT!', 2], [v], ['VINNER']], under: `Mot ${f}. (${pf} procent enligt datorn)` },
         { kick: 'SÄKRA PENGAR', rad: [['SPIKA'], [`${v}!`, 1]], under: `${pf} % mot ${f} enligt datorn. Vi lovar ingenting` },
@@ -503,7 +503,8 @@ const radText = (rad) => rad.map(([t]) => String(t).toUpperCase()).join(' ').rep
 // Veckans rubrik: förra omgångens nyheter väger fullt tre dagar, sedan
 // mindre; nästa omgångs bara innan den har startat. Den näst största nyheten
 // (helst av ett annat slag) står längst ner. Samma vecka och samma data ger
-// samma löpsedel. → { typ, tidning, kick, rad, under, plus, datum }
+// samma löpsedel. → { typ, tidning, kick, rad, under, plus, datum, id }, där id är matchen rubriken handlar om
+// (tidningen i rum.js lägger Veckans analys om den)
 export function rubrik({ rows, old, short = (x) => x, namn = null, now = Date.now(), fro = veckaFro(now), tid = tidning(fro) }) {
   if (namn) namnAv = namn;
   const alla = omgangar();
@@ -544,7 +545,7 @@ export function rubrik({ rows, old, short = (x) => x, namn = null, now = Date.no
   const plus = andra ? radText(valj(andra, 1).rad) : PLUS[Math.floor(hash(fro + 9.3) * PLUS.length) % PLUS.length];
   // tidningen är från dagen det hände (en sen match: dagen efter), eller idag
   const t = val === GUIDEN || val.framat ? now : Math.min(now, val.t + 3 * 3600e3);
-  return { typ: val.typ, tidning: tid, ...valj(val, 0), plus, datum: datum(t) };
+  return { typ: val.typ, tidning: tid, ...valj(val, 0), plus, datum: datum(t), id: val.id || val.mid || null };
 }
 
 // ---------- löpsedeln: papperet ----------
@@ -679,6 +680,8 @@ export function affischer(back, { short = (x) => x, namn = null } = {}) {
     Promise.all([document.fonts.load('400 30px Anton'), document.fonts.load('400 30px "Alfa Slab One"')]).then(klar, klar);
   }
   const api = {
+    // Veckans rubrik (rubrik ovan), som tidningen i rum.js utgår från. → { typ, tidning, datum, id … }, eller null
+    rubrik: () => senastR,
     // Löpsedeln som den sitter, utan tejpen: tidningen i rum.js lägger fram samma papper,
     // med samma storlekar på raderna, så att de inte kan bli olika. → elementet, eller null
     sedel() {

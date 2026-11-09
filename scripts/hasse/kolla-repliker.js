@@ -15,6 +15,7 @@
 
 const repliker = require('../../public/rum-hasse-repliker.js');
 const block = require('../../public/rum-block.js');
+const tidning = require('../../public/rum-tidning.js');
 const { repliktexter } = require('../../src/rost.js');
 
 // Underkänt av Tomas, med det som ska stå i stället.
@@ -131,6 +132,16 @@ const blockTexter = (o) => (typeof o === 'string' ? [o] : typeof o === 'function
 for (const t of blockTexter(block.TEXT)) {
   for (const [re, istallet] of UNDERKANT) if (re.test(t)) fel.push(`protokollet: "${t}" är underkänt. Skriv: ${istallet}`);
   if (!/[.?!]$/.test(t) && !/^[A-ZÅÄÖ][a-zåäö]+( [a-zåäö]+){1,4}$/.test(t)) fel.push(`protokollet: "${t}" saknar punkt`);
+}
+
+// Tidningen bakom löpsedeln (public/rum-tidning.js) sägs inte heller. Det som är underkänt gäller, en mening ska
+// sluta med punkt (rubrikerna har ingen, och orden i tabellerna är kortare än fem ord), och i krönikan säger Hasse ni och er.
+const tidningsTexter = (o, vag = '') => (typeof o === 'string' ? [[vag, o]] : typeof o === 'function' ? [[vag, o(9, 11, '1–0', 18)]]
+  : Array.isArray(o) ? o.flatMap((x) => tidningsTexter(x, vag)) : Object.entries(o).flatMap(([k, v]) => tidningsTexter(v, vag ? `${vag}.${k}` : k)));
+for (const [vag, t] of tidningsTexter(tidning.TEXT)) {
+  for (const [re, istallet] of UNDERKANT) if (re.test(t)) fel.push(`tidningen ${vag}: "${t}" är underkänt. Skriv: ${istallet}`);
+  if (!/\.rubrik\b/.test(vag) && t.split(/\s+/).length >= 5 && !/[.?!]$/.test(t)) fel.push(`tidningen ${vag}: "${t}" saknar punkt`);
+  if (vag.startsWith('kronika.') && /\bgäng/i.test(t)) fel.push(`tidningen ${vag}: "${t}" säger gänget. Hasse skriver ni, er eller allihop.`);
 }
 
 if (fel.length) {
