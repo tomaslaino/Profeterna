@@ -21,7 +21,7 @@ export const ATLAS = { W: 1372, H: 1350, X0: 280, Y0: 130, TW: 860, TH: 1350, rx
 
 // Samma ljus på allt: varmt framifrån till vänster (NYCKEL), ett varmt kantljus bakifrån från barens
 // lampor, och i baren (uButik) neonskyltens röda sken och gatans kalla ljus från affären till höger.
-// Där lyser också lysröret i affärens tak (uLys, tänt från sex till elva på kvällen) och dagsljuset genom
+// Där lyser också lysröret i affärens tak (uLys, tänt från halv sju till halv tolv på kvällen) och dagsljuset genom
 // affärens stora fönster (uDag): ett brett, mjukt ljus från höger och lite framifrån, i himlens färg och
 // så starkt som det är ljust ute. När det är dag tar fönstret över: lamporna, neonen och gatan syns mindre.
 // Riktningarna är i figurens värld; VY är riktningen mot kameran (rum-hasse-scen.js).

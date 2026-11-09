@@ -27,10 +27,10 @@
 // kanten vid klockslaget och de sista tolv timmarna en röd sektor från
 // timvisaren fram till spetsen.
 //
-// På natten är lysröret släckt (natt, från rum-folk.js): rören och
+// På natten är lysröret släckt (natt, från rum-folk.js, 0–1 medan det dämpas och tänds): rören och
 // reflektorn mörka, och det målade bandet mörknar.
 //
-// inredning(el, { calm, still, vagg }) → { draw(), namn(html), skarp(namn, px), natt(på), stopp(ms) } (namnet som Kronan.names, ms spelstoppet eller null;
+// inredning(el, { calm, still, vagg }) → { draw(), namn(html), skarp(namn, px), natt(0–1), stopp(ms) } (namnet som Kronan.names, ms spelstoppet eller null;
 // vagg: tavlornas mått på högra väggen, VAGG i rum.js)
 
 import { SKIVA, skivPlats } from './rum-affischer.js';
@@ -1376,16 +1376,17 @@ export async function inredning(el, opt = {}) {
     if (x.isMesh && !x.material.isMeshBasicMaterial && !x.material.isShadowMaterial) for (const m of [x.material].flat()) skivMat.add(m);
   });
   for (const m of skivMat) m.userData.dag = m.color.clone();
-  let morkt = false;
-  function natt(on) {
-    on = Boolean(on);
-    if (on === morkt) return;
-    morkt = on;
-    rorLjus.color.set(on ? ROR.av : ROR.ljus);
-    rorRefl.color.set(on ? ROR.reflAv : ROR.refl);
-    malMat.color.copy(malMat.userData.dag).multiplyScalar(on ? 0.4 : 1);
+  // (hur släckt lysröret är, 0–1: rören grånar och väggen och skivan mörknar i takt)
+  let morkt = 0;
+  function natt(g) {
+    g = typeof g === 'number' ? Math.max(0, Math.min(1, g)) : g ? 1 : 0;
+    if (g === morkt) return;
+    morkt = g;
+    rorLjus.color.set(ROR.ljus).lerp(new THREE.Color(ROR.av), g);
+    rorRefl.color.set(ROR.refl).lerp(new THREE.Color(ROR.reflAv), g);
+    malMat.color.copy(malMat.userData.dag).multiplyScalar(1 - 0.6 * g);
     B.tak.paint();
-    for (const m of skivMat) m.color.copy(m.userData.dag).multiplyScalar(on ? 0.4 : 1);
+    for (const m of skivMat) m.color.copy(m.userData.dag).multiplyScalar(1 - 0.6 * g);
     B.skiva.paint();
   }
   return { draw: tick, namn: setNamn, skarp: (k, px) => B[k] && B[k].skarp(px), natt, stopp };

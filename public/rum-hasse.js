@@ -168,7 +168,8 @@ window.RumHasse = (() => {
   const bakbild = (lys = false) => `rum/hasse-bak${lys ? '-lys' : ''}${hogt()}.webp`;
   const dagbild = () => `rum/hasse-bak-dag${hogt()}.webp`;
   // Ljuset i baren som i rummet (rum.js, rum-folk.js, rum-ute.js): lysröret i affärens tak är tänt utom
-  // mellan elva på kvällen och sex, och dagsljuset faller in genom affärens stora fönster till höger efter klockan
+  // mellan halv tolv på kvällen och halv sju (RumFolk.natt: mitt i rummets timslånga toning, för baren har
+  // bara bilderna med och utan lysrör), och dagsljuset faller in genom affärens stora fönster till höger efter klockan
   // och vädret. lys: lysröret, dag: hur ljust det är ute (0–1), f: fönsterljusets styrka, c: dess färg.
   // Färgen är himlens nere vid taken, men vitare, som ögat ser dagsljus inne; solen gör den varmare och
   // starkare, låg sol gyllene, och i den blå timmen blåare. Mulet blir den grå och svagare, i regn mer.
