@@ -2526,9 +2526,8 @@ ${window.RumRegister ? RumRegister.nara() : ''}
     const ute = () => {
       const damm = document.getElementById('rum-damm');
       if ((!calm() || still()) && syns(damm) && !damm.hidden) dust(t);
-      // (på de lägsta stegen rör sig figurerna på gatan i färre steg, KVAL)
-      R.uteN = (R.uteN || 0) + 1;
-      if (!calm() && R.uteN % KVAL[R.kval].ute === 0) uteTakt();
+      // (ställningarna på gatan; var figurerna är räknas i varje bildruta, gatan i loop)
+      if (!calm()) uteTakt();
     };
     // I Safari väntar bildrutan på att grafiken ska hinna rita klart det som
     // har ritats i 3D, så i en telefon blev var tredje bildruta för lång – det
@@ -2539,9 +2538,10 @@ ${window.RumRegister ? RumRegister.nara() : ''}
     // telefonen också i Chrome: fingret får inte vänta på att allt ritas.)
     // Sakerna och gatan turas om, så att de ritas i halva takten och var tredje
     // bildruta är tom: Chrome räknar om stilen i varje bildruta där något ritas.
-    // I telefonen är gatan en enda duk (gatduk i rum-ute.js) som ritas tillsammans med gänget:
-    // varje duk som ändras är en bildruta som grafikkortet måste rita hela rummet i, så det som
-    // kan komma i samma bildruta gör det. Sakerna rör sig minst och ritas varannan gång.
+    // I telefonen är gatan en enda duk (gatduk i rum-ute.js) vars ställningar ritas tillsammans med
+    // gänget: varje duk som ändras är en bildruta som grafikkortet måste rita hela rummet i, så det som
+    // kan komma i samma bildruta gör det. Sakerna rör sig minst och ritas varannan gång. (Var figurerna
+    // på gatan är läggs ut i varje bildruta medan något far förbi, gatan i loop.)
     if ((WEBKIT || LATT) && !calm()) {
       while (R.ko.length) R.ko.shift()();
       R.turUte = !R.turUte;
@@ -2569,11 +2569,13 @@ ${window.RumRegister ? RumRegister.nara() : ''}
     clearTimeout(R.vila);
     let prev = 0;
     let dt = 0;
+    R.kannaSist = 0;
     const tick = (ms) => {
       if (!R.on) return;
       // man har vänt sig mot Hasse (rum-hasse.js): rummet står still och syns inte
       if (R.vilar) {
         prev = 0;
+        R.kannaSist = 0;
         R.vila = setTimeout(() => { R.raf = requestAnimationFrame(tick); }, 250);
         return;
       }
@@ -2585,7 +2587,8 @@ ${window.RumRegister ? RumRegister.nara() : ''}
       // alltid: där kostar vridningen lite, och i gängets takt ryckte
       // rummet efter fingret och när kameran gled på plats efter en närbild)
       const K = KVAL[R.kval];
-      if (ms - R.last > 1000 / K.takt - 4) {
+      const bild = ms - R.last > 1000 / K.takt - 4;
+      if (bild) {
         R.last = ms;
         frame(Math.min(100, dt));
         dt = 0;
@@ -2593,16 +2596,25 @@ ${window.RumRegister ? RumRegister.nara() : ''}
         kamera(Math.min(100, dt));
         dt = 0;
       }
-      if (raw) kanna(ms, raw);
+      gatan(ms);
+      // (i Chrome räknas gängets bilder: huvudtråden väcks bara till dem, och till
+      // gatan medan något far förbi)
+      if (!TOMMA) {
+        if (raw) kanna(ms, raw);
+      } else if (bild) {
+        if (R.kannaSist) kanna(ms, ms - R.kannaSist);
+        R.kannaSist = ms;
+      }
       if (R.ko.length) efterBild.port2.postMessage(0);
-      // Mellan gängets bilder har huvudtråden inget att göra i Chrome i datorn:
-      // grafikkortet flyttar allt annat, och kameran glider själv (folj). Varje
+      // Mellan gängets bilder har huvudtråden inget att göra i Chrome i datorn
+      // (utom gatan medan något far förbi, gatan): grafikkortet flyttar allt
+      // annat, och kameran glider själv (folj). Varje
       // väckning kostar ändå en omräkning av stilen för allt som är animerat,
       // så den väcks först bildrutan före nästa bild (8 ms före: rätt ruta
       // i 60 Hz och högst en ruta för mycket i 120 Hz).
       const kvar = R.last + 1000 / K.takt - 4 - performance.now();
       // (det sista i kön ritas direkt efter den här bildrutan, efterBild)
-      if (TOMMA && kvar > 12 && R.ko.length <= 1 && !(K.vrid && R.bildVis)) {
+      if (TOMMA && kvar > 12 && R.ko.length <= 1 && !(K.vrid && R.bildVis) && !R.gatGlid) {
         R.vila = setTimeout(() => { R.raf = requestAnimationFrame(tick); }, kvar - 8);
       } else R.raf = requestAnimationFrame(tick);
     };
@@ -2614,31 +2626,27 @@ ${window.RumRegister ? RumRegister.nara() : ''}
   // Rummet känner av om datorn eller telefonen hinner med (kanna): kommer
   // det färre än 45 bilder i sekunden (i Chrome i datorn färre än 80 % av
   // gängets takt), eller hackar det, går det ner ett steg – gänget och sakerna i 3D ritas glesare och med färre bildpunkter,
-  // skuggorna räknas om mer sällan, gatan utanför rör sig i färre steg och
-  // dammet i ljuset försvinner. Steget sparas, så att nästa besök börjar där
+  // skuggorna räknas om mer sällan och dammet i ljuset försvinner (gatan utanför
+  // glider lika jämnt på alla steg, glid i rum-ute.js). Steget sparas, så att nästa besök börjar där
   // (i tre dagar). I telefonen börjar rummet på steg 1. ?rum-kval=0|1|2
   // väljer steget och låser det; en fast bild (?rum-t) har annars allt.
-  // takt: bilder i sekunden för 3D-delarna och gatan, pr: bildpunkterna i
+  // takt: bilder i sekunden för 3D-delarna och ställningarna på gatan, pr: bildpunkterna i
   // 3D (gånger de vanliga), skugga: skuggorna räknas om var så många bilder,
   // detalj: gänget byggs av så många trianglar (gånger de vanliga), vrid:
   // kameran vrids efter musen i varje bildruta (annars i takten – Chrome
-  // räknar om alla rummets lager varje gång världen vrids)
-  // ute: gatans figurer ritas om var så många bilder; enkel: gänget och
+  // räknar om alla rummets lager varje gång världen vrids), enkel: gänget och
   // sakerna utan skuggkarta, miljö och de svaga lamporna (enkeltLjus i rum-3d.js)
   const KVAL = [
-    { takt: 30, pr: 1, skugga: 1, detalj: 1, damm: true, vrid: true, ute: 1 },
-    { takt: 20, pr: 0.75, skugga: 2, detalj: 0.6, damm: true, vrid: false, ute: 1 },
-    { takt: 15, pr: 0.55, skugga: 4, detalj: 0.45, damm: false, vrid: false, ute: 2 },
-    { takt: 15, pr: 0.5, skugga: 0, detalj: 0.35, damm: false, vrid: false, ute: 3, enkel: true },
+    { takt: 30, pr: 1, skugga: 1, detalj: 1, damm: true, vrid: true },
+    { takt: 20, pr: 0.75, skugga: 2, detalj: 0.6, damm: true, vrid: false },
+    { takt: 15, pr: 0.55, skugga: 4, detalj: 0.45, damm: false, vrid: false },
+    { takt: 15, pr: 0.5, skugga: 0, detalj: 0.35, damm: false, vrid: false, enkel: true },
   ];
   // (i telefonen räknas skuggorna om var tredje bild, och dammet, en stor duk
   // som ritas om, får vara: det syns knappt så litet)
-  // (och gatan, en enda duk, ritas i gängets takt på alla steg: i färre steg skulle de
-  // som går förbi hacka fram)
   if (LATT) {
     KVAL[1].skugga = 3;
     KVAL[1].damm = false;
-    KVAL[2].ute = KVAL[3].ute = 1;
   }
   const KVAL_NYCKEL = 'rum-kval2';
   // Där rummet börjar, efter vad enheten säger om sig själv: kommer rummet upp på
@@ -2757,9 +2765,8 @@ ${window.RumRegister ? RumRegister.nara() : ''}
     if (ms < K.fran) return;
     K.n++;
     K.sum += dt;
-    // (i Chrome väcks huvudtråden bara till gängets bilder, loop, och i
-    // telefonen en gång till varannan bild, för sakerna)
-    const takt = KVAL[R.kval].takt * (LATT && TOMMA ? 1.5 : 1);
+    // (i Chrome är dt tiden mellan gängets bilder, loop)
+    const takt = KVAL[R.kval].takt;
     if (dt > (TOMMA ? Math.max(50, 1500 / KVAL[R.kval].takt) : 50)) K.hack++;
     if (K.sum < 2000) return;
     // (stadiga 30 bilder i sekunden är en telefon i strömsparläge – det blir
@@ -2801,6 +2808,21 @@ ${window.RumRegister ? RumRegister.nara() : ''}
     }
     for (const a of R.uteAnim) a.currentTime = ms + a.bas;
     if (window.RumUte && RumUte.takt) RumUte.takt(ute, null, R.kval >= 2);
+  }
+
+  // Gatan i en duk (rum-ute.js): medan något far förbi läggs den ut i varje
+  // bildruta, högst 60 gånger i sekunden (ms: bildrutans tid), så att bilarna
+  // och de som går förbi glider jämnt; ställningarna ritas i gängets takt
+  // (uteTakt). Annars, och när gatan inte syns, ingenting här.
+  function gatan(ms) {
+    R.gatGlid = false;
+    if (R.vlatt || calm() || !window.RumUte || !RumUte.glid) return;
+    const ute = document.getElementById('rum-ute');
+    if (!ute || !ute._gat || ute.classList.contains('vila') || !syns(ute)) return;
+    R.gatGlid = Boolean(ute._fort);
+    if (ms - (R.gatSist || 0) < 1000 / 60 - 4) return;
+    R.gatSist = ms;
+    R.gatGlid = RumUte.glid(ute, ms);
   }
 
   // CSS-animationerna (regnet, röken, hörnet) står still på samma tid som klockan.
