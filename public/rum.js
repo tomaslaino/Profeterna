@@ -3128,10 +3128,13 @@ ${window.RumRegister ? RumRegister.nara() : ''}
   // Protokollet på pulten: det lyfts och läggs fram stort över rummet, som står still så länge, och går
   // tillbaka samma väg. Esc, Lägg tillbaka eller ett klick utanför lägger tillbaka det. I smala fönster
   // är det den smala versionen, och ryms det inte på höjden går det att rulla, i stället för att bli oläsligt.
+  // Under bladet kan man ropa till Hasse om poängen (protHasse).
   function protokollet(pa = true, nu = false) {
     const p = R.protokoll;
     if (!pa) {
       if (!p || p.ut) return;
+      // Hasse tystnar, och bladet står där det står utan honom innan det läggs tillbaka
+      if (p.hk) protHasse(false, true);
       p.ut = true;
       lagerUt('protokollet');
       const klar = () => {
@@ -3166,14 +3169,25 @@ ${window.RumRegister ? RumRegister.nara() : ''}
     el.setAttribute('role', 'dialog');
     el.setAttribute('aria-modal', 'true');
     el.setAttribute('aria-label', 'Protokoll');
-    el.innerHTML = RumBlock.html(R.summa, { tat: innerWidth < 555 }) + '<button type="button" class="rt-tillbaka">Lägg tillbaka</button>';
+    el.innerHTML = RumBlock.html(R.summa, { tat: innerWidth < 555 }) +
+      `<div class="rp-rad"><button type="button" class="hs-ropa" data-rp="hasse" aria-expanded="false">${PROT_ROP}</button>` +
+      '<button type="button" class="rt-tillbaka">Lägg tillbaka</button></div>';
     for (const n of ['pointerdown', 'pointerup', 'pointermove', 'mouseover', 'wheel', 'touchstart', 'touchmove']) el.addEventListener(n, (e) => e.stopPropagation());
+    R.el.append(mork, el);
+    const rad = el.querySelector('.rp-rad');
+    // Hasse, pratbubblan och spetsen: över bladet och under raden (rum-hasse-svar.js)
+    const q = R.protokoll = { el, mork, b: el.querySelector('.rum-block'), rad, hs: RumHasseSvar.mount(el, { fore: rad, calm }), hk: false, dx: 0 };
     el.addEventListener('click', (e) => {
       e.stopPropagation();
-      if (!e.target.closest('.rum-block') || e.target.closest('.rt-tillbaka')) protokollet(false);
+      if (e.target.closest('[data-rp="hasse"]')) protHasse(!q.hk);
+      // ett klick på svaret: resten direkt
+      else if (q.hs.i(e)) q.hs.hoppa();
+      else if (e.target.closest('.rt-tillbaka')) protokollet(false);
+      else if (e.target.closest('.rum-block, .rp-rad')) return;
+      // utanför: först tystnar Hasse, sedan läggs bladet tillbaka
+      else if (q.hk) protHasse(false);
+      else protokollet(false);
     });
-    R.el.append(mork, el);
-    const q = R.protokoll = { el, mork, b: el.querySelector('.rum-block') };
     passaProtokoll();
     R.vilar = true;
     lager('protokollet', (ut) => protokollet(false, ut));
@@ -3200,7 +3214,109 @@ ${window.RumRegister ? RumRegister.nara() : ''}
     if (!p) return;
     p.b.style.zoom = 1;
     const k = Math.min((p.el.clientWidth - 24) / p.b.offsetWidth, 1.5, Math.max((innerHeight - 74) / p.b.offsetHeight, 0.8));
+    p.bredd = p.b.offsetWidth * Number(k.toFixed(3));
     p.b.style.zoom = k.toFixed(3);
+    protHassePlats();
+  }
+
+  // ---------- Hasse om poängen ----------
+  //
+  // Under protokollet ropar man till Hasse om raden Poäng (Hasse, hur räknas poängen?, eller H), och han
+  // lutar sig in från baren nere till vänster och svarar, som vid anslagstavlan (rum-hasse-svar.js): vad
+  // rätt och poäng är, ett exempel ur omgången (RumBlock.exempel, sägs tyst) och vad han själv gör med det.
+  // Svaret står till vänster om bladet, som då glider åt höger så långt som behövs, eller över bladet när
+  // det inte ryms bredvid (i telefonen och i smala fönster), med raden under svaret. Tack, Hasse, Esc eller
+  // ett klick utanför tystar honom, och han tystnar när bladet läggs tillbaka.
+  const PROT_ROP = 'Hasse, hur räknas poängen?';
+  const PROT_TACK = 'Tack, Hasse';
+  function protSvaret() {
+    const H = window.HasseRepliker;
+    const rep = H && H.protokoll;
+    if (!rep) return [];
+    const ex = R.summa ? RumBlock.exempel(R.summa) : null;
+    const forst = H.ropSvar[Math.floor(Math.random() * H.ropSvar.length)];
+    return [[forst], ...rep.forklaring, ...(ex ? [[ex]] : []), ...rep.rad];
+  }
+  // on: ropar till honom, annars tackar man. nu: utan rörelse (bladet läggs tillbaka).
+  function protHasse(on, nu = false) {
+    const p = R.protokoll;
+    if (!p || p.ut || on === p.hk) return;
+    p.hk = on;
+    const ropa = p.rad.querySelector('[data-rp="hasse"]');
+    ropa.textContent = on ? PROT_TACK : PROT_ROP;
+    ropa.setAttribute('aria-expanded', String(on));
+    if (!on) {
+      lagerUt('protokollet-hasse');
+      p.hs.ut(nu);
+      protRad(p, false);
+      protFlytt(p, 0, !nu);
+      return;
+    }
+    lager('protokollet-hasse', () => protHasse(false));
+    p.hs.svara(protSvaret());
+    p.hs.fram();
+    protHassePlats(true);
+  }
+  // Bladet och raden under det står mitt i fönstret och glider dx åt höger (paddingen till vänster
+  // om dem; bladets egen transform hör till lyftet).
+  function protFlytt(p, dx, anim) {
+    if (Math.abs(dx - p.dx) < 0.5) return;
+    const fran = `${r1(12 + 2 * p.dx)}px`;
+    const till = `${r1(12 + 2 * dx)}px`;
+    p.dx = dx;
+    p.el.style.paddingLeft = dx ? till : '';
+    if (anim && !calm()) p.el.animate([{ paddingLeft: fran }, { paddingLeft: till }], { duration: 460, easing: 'cubic-bezier(0.3, 0, 0.2, 1)' });
+  }
+  // Raden under bladet, eller (fast) under svaret när det står över bladet.
+  function protRad(p, fast) {
+    p.rad.classList.toggle('fast', fast);
+    if (!fast) p.rad.style.cssText = '';
+  }
+  // Svarets plats, som vid anslagstavlan (hkPlats i rum-anslag.js): bredvid bladet med överkanten vid
+  // bladets, eller mitt över det. Bubblan täcker aldrig hans ansikte: står den ovanför honom slutar den
+  // ovanför hans hår, och ryms svaret inte rullar det.
+  function protHassePlats(anim = false) {
+    const p = R.protokoll;
+    if (!p || !p.hk) return;
+    const hs = p.hs;
+    const min = 24;
+    const bw = p.bredd || p.b.getBoundingClientRect().width;
+    // bredvid bladet när bubblan får minst sin vanliga bredd där, och bredare när det finns plats (så att
+    // svaret ryms ovanför hans huvud); annars över bladet
+    const ledigt = innerWidth - 12 - bw - 28 - 16;
+    const over = ledigt < 400;
+    hs.bubbla.style.width = over ? '' : `${r1(Math.min(520, ledigt))}px`;
+    const w = hs.bubbla.offsetWidth;
+    // där bladet börjar när svaret står bredvid
+    const vanster = 16 + w + 28;
+    protRad(p, over);
+    let F = hs.figur(over);
+    // raden under bubblan ska få plats på en rad till höger om spetsen; i ett smalt fönster blir han
+    // så mycket mindre som behövs
+    if (over) {
+      const barn = [...p.rad.children].filter((e) => e.offsetWidth);
+      const bredd = barn.reduce((sum, e) => sum + e.offsetWidth, 0) + 16 * (barn.length - 1);
+      const plats = innerWidth - 16 - bredd - 10 - 28 - 4;
+      if (F.hoger > plats) F = hs.figur(over, F.H * Math.max(0.7, plats / F.hoger));
+    }
+    const mitt = (p.el.clientWidth - bw) / 2;
+    const dx = over ? 0 : Math.max(0, vanster - mitt);
+    protFlytt(p, dx, anim);
+    const x = over ? (innerWidth - w) / 2 : mitt + dx - 28 - w;
+    const golv = over ? F.topp - 56 : x < F.hoger + 12 ? F.topp - 14 : innerHeight - 24;
+    hs.bubbla.style.maxHeight = `${r1(Math.max(160, golv - min))}px`;
+    const H = hs.bubbla.offsetHeight;
+    const my = F.mun[1];
+    const top = p.lyft ? min : p.b.getBoundingClientRect().top;
+    const y = Math.max(min, over ? Math.min(golv - H, Math.max((min + golv - H) / 2, my - 170 - H)) : Math.min(top, golv - H));
+    const { f2, under } = hs.placera(F, x, y, over, x + w + 40);
+    if (over) {
+      p.rad.style.top = `${r1(y + H + 8)}px`;
+      if (under) {
+        p.rad.style.paddingLeft = `${r1(f2[0] + 10)}px`;
+        p.rad.style.columnGap = '16px';
+      }
+    }
   }
   // Vägen mellan pulten och fönstret: bladet ligger i pultens lutning och lossnar uppåt. → bildrutorna,
   // eller null om blocket inte ligger på pulten (kupongen i handen, omgången har bytts).
@@ -5361,7 +5477,11 @@ ${window.RumRegister ? RumRegister.nara() : ''}
         return;
       }
       if (R.protokoll) {
-        if (k === 'escape') protokollet(false);
+        // Esc tystar Hasse och lägger sedan tillbaka bladet, och H ropar till honom
+        if (k === 'escape') {
+          if (R.protokoll.hk) protHasse(false);
+          else protokollet(false);
+        } else if (k === 'h' && !e.repeat) protHasse(!R.protokoll.hk);
         return;
       }
       // matchbladet för sig (bladFram): Esc lägger bort det, och pilarna byter sida

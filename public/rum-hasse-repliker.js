@@ -621,13 +621,14 @@
   ejKlar: ['Den har jag inte kommit till än.', 'Den tar jag sen.', 'Den tar jag när jag har druckit upp kaffet.', 'Den sparar jag till sist.', 'Den är så lätt att jag inte har brytt mig om den än.', 'Den ska jag titta på när tidningarna har slutat gissa.', 'Den får ligga till sig en stund.'],
   utanRost: 'Jag har tappat rösten. Läs här.',
 
-  // Anslagstavlan (rum-anslag.js): med en lapp i handen ropar man till honom (Hasse, vad
-  // betyder procenten?), och han svarar från baren, utanför bilden. Först en rad ur svar, sedan
-  // förklaringen i stycken med en mening i taget, så att varje mening får sitt ljud. Mellan
-  // förklaringen och rad (vad han själv gör med det) kommer ett exempel ur lappen som sidan
-  // räknar fram; det ändras med datan och har därför inget ljud. Talen förklaras som under
-  // Statistik → Lagen (divisioner.js): ändras en lapp ska hans svar följa med.
-  anslagSvar: ['Det ska jag tala om för dig.', 'Det är enklare än det ser ut.', 'Hör här, så ska jag förklara.', 'Där frågade du rätt man.', 'Det ska jag förklara så att till och med du förstår.', 'Det trodde jag att alla visste.', 'Jag trodde att du skulle fråga något svårt.', 'Det där frågar bara den som aldrig har tippat.'],
+  // Anslagstavlan (rum-anslag.js) och protokollet (rum.js): med en lapp eller protokollet framme
+  // ropar man till honom (Hasse, vad betyder procenten?), och han svarar från baren, utanför bilden
+  // (rum-hasse-svar.js). Först en rad ur ropSvar, sedan förklaringen i stycken med en mening i taget,
+  // så att varje mening får sitt ljud. Mellan förklaringen och rad (vad han själv gör med det) kommer
+  // ett exempel som sidan räknar fram; det ändras med datan och har därför inget ljud. Talen på
+  // lapparna förklaras som under Statistik → Lagen (divisioner.js), och poängen som i tippoang.js:
+  // ändras en lapp eller poängen ska hans svar följa med.
+  ropSvar: ['Det ska jag tala om för dig.', 'Det är enklare än det ser ut.', 'Hör här, så ska jag förklara.', 'Där frågade du rätt man.', 'Det ska jag förklara så att till och med du förstår.', 'Det trodde jag att alla visste.', 'Jag trodde att du skulle fråga något svårt.', 'Det där frågar bara den som aldrig har tippat.'],
   anslag: {
     form: {
       forklaring: [[
@@ -722,5 +723,25 @@
         'För den som har haft det tufft gäller det omvända.',
       ]],
     },
+  },
+  // Protokollet (Hasse, hur räknas poängen?): raden Poäng längst ner, som i tippoang.js. Exemplet
+  // (RumBlock.exempel) står mellan förklaringen och rad.
+  protokoll: {
+    forklaring: [[
+      'Antalet rätt säger bara hur ofta du hade rätt, inte hur svårt det var.',
+      'Det är det poängen gör.',
+    ], [
+      'För varje match får du en poäng om tipset satt, och från den drar jag datorns chans för det du tippade.',
+      'En favorit på 70 % ger alltså 0,3 om den vinner och kostar 0,7 om den inte gör det.',
+      'En skräll på 20 % ger 0,8 om den sitter och kostar bara 0,2 om den spricker.',
+      'Garderar du läggs chanserna ihop, så en helgardering ger alltid noll.',
+    ], [
+      'Den som inte vet mer än datorn hamnar runt noll, vad den än tippar.',
+      'Plus betyder att du tippade bättre än datorn, och minus att du tippade sämre.',
+    ]],
+    rad: [[
+      'Rätt kan vem som helst få med tillräckligt många garderingar.',
+      'Poängen visar vem som faktiskt kan tippa, och därför ringar jag in den som har högst.',
+    ]],
   },
 });
