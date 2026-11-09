@@ -825,6 +825,13 @@ window.RumHasse = (() => {
   }
   function smatt() {
     if (spana()) return;
+    // när radion spelar musik trummar han med fingrarna eller nickar med oftare
+    const r = radioNu();
+    if (r && r.musik && Math.random() < 0.6) {
+      if (Math.random() < 0.7) H.fig.trumma(Math.random() < 0.5 ? 'varv' : 'lugnt', 'B');
+      else gest('nicka');
+      return;
+    }
     if (!SMATT_L.length) SMATT_L.push('trumma', 'trumma', ...grupp('smatt'));
     const namn = lott(SMATT_L);
     if (namn === 'trumma') H.fig.trumma(TRUMSATT[Math.floor(Math.random() * TRUMSATT.length)], 'B');
@@ -1328,10 +1335,37 @@ window.RumHasse = (() => {
     }
     if (!v || ms < v.nasta) return;
     if (v.i >= v.rader.length) { H.prat = null; return; }
+    // (går radion i rummet säger han något om den, en gång per station, i stället för nästa rad)
+    const radio = omRadion();
+    if (radio) {
+      sagRader(radio);
+      v.nasta = ms + v.gang;
+      return;
+    }
     const r = v.rader[v.i++];
     const x = typeof r === 'function' ? r() : r;
     if (x) sagRader(x);
     v.nasta = ms + (x ? v.gang : 500);
+  }
+  // Radion på fönsterbänken (rum-radio.js) hörs också här. Står den på en station säger han något om den
+  // (radio i rum-hasse-repliker.js) och nickar med, och mellan stationerna något om bruset; en gång per
+  // station så länge sidan är öppen. → { lista, gest } eller null
+  function radioNu() {
+    const R = window.RumRadio;
+    const l = R && R.lage ? R.lage() : null;
+    if (!l || l.band === 'av') return null;
+    if (!l.kanal) return { id: 'brus', musik: false };
+    const k = (R.KANALER || []).find((x) => x.id === l.kanal);
+    return l.hors && k ? { id: k.id, musik: Boolean(k.musik) } : null;
+  }
+  function omRadion() {
+    const r = radioNu();
+    const rader = r && REP().radio && REP().radio[r.id];
+    if (!rader || !rader.length) return null;
+    H.radioSagt = H.radioSagt || new Set();
+    if (H.radioSagt.has(r.id)) return null;
+    H.radioSagt.add(r.id);
+    return { lista: [{ text: lott(rader) }], gest: r.musik ? 'nicka' : 'brynet' };
   }
   function sagRader(x) {
     if (typeof x === 'string') { rad(x); return; }
@@ -1856,8 +1890,12 @@ window.RumHasse = (() => {
     if (!l || l.dolt || !l.av) return false;
     const lage = stallningsLage(l);
     const tal = REP().tal;
-    repliker([{ text: fyll(lott(S.ratt), { ratt: tal[l.ratt], av: tal[l.av] }), paus: 1500 }, { text: lott(S[lage]) }],
-      { i: $('.rh-sagt'), rad: true, direkt: calm(), sen: () => gest({ alla: 'skrocka', bra: 'skrocka', mitten: 'brynet', daligt: 'suck' }[lage]) });
+    // (med en enda match att räkna blir det "en rätt av en": då tar han den matchen direkt)
+    if (l.av < 2) sagRader(enMatch(lista, tips));
+    else {
+      repliker([{ text: fyll(lott(S.ratt), { ratt: tal[l.ratt], av: tal[l.av] }), paus: 1500 }, { text: lott(S[lage]) }],
+        { i: $('.rh-sagt'), rad: true, direkt: calm(), sen: () => gest({ alla: 'skrocka', bra: 'skrocka', mitten: 'brynet', daligt: 'suck' }[lage]) });
+    }
     const match = () => enMatch(lista, tips) || (extra ? lott(extra) : null);
     const rader = [match, match, extra ? () => lott(extra) : match, match, match, match];
     H.prat = { rader, i: 0, nasta: performance.now() + 20000, gang: 20000 };

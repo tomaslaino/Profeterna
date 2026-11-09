@@ -342,20 +342,20 @@
     alla: [
       'Allt går som jag har sagt.',
       'Lagen har läst min analys.',
-      'Jag har inte behövt titta en enda gång.',
+      'Ingen match har överraskat mig än.',
       'Så ser det ut när man har gjort hemläxan.',
       'Spelbolagen har börjat svettas.',
     ],
     bra: [
       'Resten är bara en tidsfråga.',
-      'Det går som planerat, med några små undantag.',
-      'Resten av lagen kommer i gång snart.',
+      'Det går som planerat. Undantagen rättar sig.',
+      'De andra matcherna rättar sig snart.',
       'Det ser ut som vanligt.',
     ],
     mitten: [
       'Matcherna är inte slut än.',
-      'Det jämnar ut sig till slut.',
-      'Jag tippar inte på ställningen mitt i matchen.',
+      'Det reder ut sig före slutsignalen.',
+      'De svåra matcherna avgörs alltid sent.',
       'Det är slutresultatet som räknas, inte ställningen.',
     ],
     daligt: [
@@ -363,7 +363,7 @@
       'Domarna har inte sin bästa dag.',
       'Det är inte jag som spelar, det är lagen.',
       'Lagen har inte förstått vad som gäller än.',
-      'Jag har sett sådana här ställningar förut. De brukar ändra sig.',
+      'Jag har sett sådana här ställningar förut. De brukar inte hålla.',
     ],
     leder: ['{lag} leder med {res} mot {mot}.', '{lag} leder mot {mot} med {res}.'],
     lika: ['Det står {res} i {match}.', 'I {match} står det {res}.'],
@@ -372,10 +372,10 @@
       'Det var inte svårt att räkna ut.',
       'Det är orsak och verkan.',
       'Ingen här är förvånad.',
-      'Det står i min analys.',
+      'Det kunde du ha läst i min analys.',
       'Så ser det ut när man har läst på.',
     ],
-    hallerLika: ['Krysset sitter som det ska.', 'Där sitter krysset.'],
+    hallerLika: ['Krysset sitter som det ska.', 'Där sitter krysset.', 'Kryss, som jag sa.', 'Båda lagen vet att det ska bli kryss.'],
     emot: [
       'Matchen är inte slut än.',
       'Det har ingen bett dem om.',
@@ -385,16 +385,15 @@
       'De har inte läst min analys.',
     ],
     emotLika: [
-      'Matchen är inte slut än.',
+      'Det här blir inget kryss.',
       'Någon gör mål till slut, och jag vet vem.',
-      'Lagen har inte kommit i gång än.',
-      'Jag tippar inte på ställningen mitt i matchen.',
+      'Lagen har inte bestämt sig än.',
     ],
     mal: ['Mål i {match}. Det står {res}.'],
     malBra: [
       'Där kom målet jag väntade på.',
       'Det var bara en tidsfråga.',
-      'Det gick som jag hade räknat ut.',
+      'Det går som jag har räknat ut.',
       'Målet kom när det skulle.',
       'Nu börjar matchen likna min analys.',
     ],
@@ -402,13 +401,66 @@
       'Det gör ingenting.',
       'Det målet hade jag räknat med.',
       'Ett mål hit eller dit spelar ingen roll.',
-      'Det får de gärna göra. Tecknet sitter ändå.',
+      'Det målet bjuder jag på. Tecknet sitter ändå.',
     ],
     malFel: [
       'Det ändrar ingenting.',
-      'Det målet räknar jag inte med.',
-      'Matchen är inte slut än.',
+      'Det målet godkänner inte jag.',
+      'Det målet hade inte jag dömt.',
       'Jag låtsas att jag inte såg det.',
+    ],
+  },
+
+  // Radion på fönsterbänken hörs också hos honom (omRadion i rum-hasse.js): en gång per station säger han
+  // något om den, i stället för en rad medan han väntar, och nickar med när det är musik. brus är när radion
+  // står mellan stationerna. Varje rad sägs ensam, efter det han sa förut, så den ska säga vad den handlar om.
+  // Inget om honom själv som inte går att veta: han är en riktig person.
+  radio: {
+    italo: [
+      'Italodisco är bra musik att tippa till.',
+      'Jag förstår inte texterna i italodiscon, men takten håller i nittio minuter.',
+      'Den här musiken har samma takt hela vägen. Så ska ett lag också spela.',
+    ],
+    guld: [
+      'Det spelas åttiotal på radion. Då hade lagen ordning på backlinjen.',
+      'På åttiotalet tippade man med penna och sunt förnuft.',
+    ],
+    rock: [
+      'Rockklassiker har för mycket gitarr och för lite organisation.',
+      'Rocken på radion låter som en engelsk match i november.',
+    ],
+    p1: [
+      'P1 pratar om allt utom det som är viktigt.',
+      'Lyssna du på P1, jag har redan alla svaren.',
+    ],
+    p3: [
+      'P3 spelar musik för folk som inte tippar.',
+      'Det är P3 på radion. Jag föredrar ljudet av en ifylld kupong.',
+    ],
+    p4g: [
+      'I Göteborg vet de vad organisation är, också på radion.',
+      'Göteborgsradion är på. I Göteborg tippar man hemmaseger i alla väder.',
+    ],
+    rix: [
+      'Rix FM är lika lättsmält som en etta på favoriten.',
+      'Rix FM spelar musik som aldrig överraskar, och det gillar jag.',
+    ],
+    sport: [
+      'I Montevideo pratar de fotboll på riktigt, också på radion.',
+      'I Montevideo pratar de om intensidá och verticalidá … Ursäkta. Back to basis.',
+      'Jag förstår varje ord på den här kanalen som handlar om organisation.',
+    ],
+    talksport: [
+      'I engelsk sportradio gissar de, men jag vet.',
+      'De pratar om sin egen liga på talkSPORT, och de har fortfarande inte förstått den.',
+    ],
+    caroline: [
+      'Radio Caroline var piratradio en gång, och det hörs fortfarande.',
+      'Radio Caroline spelar musik för folk som helgarderar.',
+    ],
+    brus: [
+      'Ställ in en station, eller stäng av den. Bruset stör inte mig.',
+      'Det där bruset låter som spelbolagens analyser.',
     ],
   },
 
