@@ -1035,6 +1035,15 @@ bara lokalt. Analyserna visas som de ligger i `data/analyser.json`; hur de skriv
   den med underarmen rakt fram från armbågen. Handen går lågt över disken, nyper cigarren med flack hand och
   rak handled, och pek- och långfingret ligger lite samlade. Handen går fri från cigarren när han slår i
   disken, och askkoppen syns hel i telefonen. Se [Hasse Backe](#hasse-backe), *Cigarren*.
+- **Hasse tänder cigarren när den har slocknat (2026-11-10, användarens önskemål):** "Kan du göra olika
+  sekvenser när cigarren är otänd och Hasse tar upp den, tänder den o njuter på olika sätt. Det kan hända då
+  o då i logiska sekvenser med annat". Cigarren brann alltid. Nu slocknar den om han låter den ligga några
+  minuter (glöden och röken tonar ut), och nästa gång han tar den tänder han den i stället för att röka, på
+  ett av fyra sätt: en tändsticka ur ett ställ i samma porslin som askkoppen, en kaxig sticka mot disken som
+  inte tar, tändaren som strejkar en gång och tändaren i en enda rörelse, och varje gång njuter han på sitt
+  sätt efteråt. Stickorna blir kvar i askkoppen, och är stället tomt tar han tändaren. Den slocknade cigarren
+  han låtsas röka (`slocknad`) kommer bara när den verkligen har slocknat, och har han just sagt sitt om en
+  match tänder han den gärna. Lågan lyser upp handen och ansiktet. Se [Hasse Backe](#hasse-backe), *Elden*.
 - **Hasse Backe spanar på din kupong (2026-11-08, användarens val):** ibland går blicken ned på kupongen,
   med sex olika miner, och när han har sagt vad han tycker om den passar minen orden. Se
   [Hasse Backe](#hasse-backe), *Vilan*.
@@ -5713,6 +5722,45 @@ Sätten (`KLIPP` i [public/rum-hasse-3d.js](public/rum-hasse-3d.js); de sju sist
 - `smaka`: han håller röken i munnen och smakar på den med slutna ögon och höjda bryn, och släpper sedan
   ut den långsamt.
 
+**Elden.** Cigarren slocknar om han låter den ligga: 2,5–4,7 minuter efter att han rökte sist tonar glöden
+och rökslingan ut på en halv minut (`CIG_LIV`, `slocknar` i [public/rum-hasse.js](public/rum-hasse.js)), och
+när man kommer har den slocknat ungefär varannan gång (`CIG_SLOCKNAD`); man kan ha varit borta. När vanan
+sedan kommer till cigarren tänder han den i stället för att röka (gruppen `tanda`, `cigarrGest`), och efteråt
+brinner den. Har han just sagt sitt om en match och den har slocknat tänder han den gärna strax efter. Den
+slocknade cigarren han låtsas röka när han verkar upptagen (`slocknad`) kommer bara när den verkligen har
+slocknat; har man just kommit kan den ha slocknat då. Med minskad rörelse brinner den.
+
+Bakom askkoppen, mot honom, står ett tändsticksställ i askkoppens porslin, med det blå bandet och en
+oglaserad, räfflad plån runt om, med nio långa tändstickor (rödbrun tändsats), och längre ut ligger hans
+tändare i borstat stål (allt i [public/rum-hasse-eld.js](public/rum-hasse-eld.js)). De står där han når
+dem med höger hand och där underarmen går fri från dem i de andra rörelserna, och syns också i telefonen.
+Stickorna han tänder med hamnar brända i askkoppen (högst fyra syns), och stället blir tommare; när det är
+tomt tar han tändaren, och det fylls på när man inte tittar (`H.cig`). Lågan står alltid upp, dras mot glöden
+när han drar och släpar efter när handen rör sig, flammar upp när stickan tar, och lyser upp handen,
+ärmen, ansiktet och cigarren i sitt varma sken (`eldsken` i [public/rum-hasse-arm.js](public/rum-hasse-arm.js)),
+också på natten. Det hörs (rum-hasse-ljud.js): stickan mot plånen, blossen, när han skakar ut den, locket och
+hjulet.
+
+Han biter om cigarren i mungipan och har höger hand fri. Det är stickan och tändaren som styr, som med
+cigarren (`eldArm`, `eldLage` i [public/rum-hasse-3d.js](public/rum-hasse-3d.js)): stickan hålls i
+fingertopparna längs fingrarna och snett ut mot tummen, så att underarmen står upp med armbågen nere när
+han tänder; där han sträcker sig efter den har handen sin egen riktning med fingrarna snett ned. Handen vrids
+den kortaste vägen mellan lägena och armbågen ligger åt ett bestämt håll per läge (`POL_E`), annars slog den
+om mellan två lägen. Sätten:
+
+- `tanda`: han drar, men ingenting, och tittar på den med rynkad panna; biter om den, tar en sticka och drar
+  den mot plånen så att den flammar upp, låter svavlet brinna av och tittar på lågan, tänder med tre bloss
+  och röken ur andra mungipan, skakar ut stickan och släpper den i askkoppen, och tittar nöjt på glöden.
+- `disken`: en sticka i ett långt, säkert drag mot disken, med en gest. Ingenting. Han tittar på stickan och
+  stelt på en, drar den mot plånen som vanligt och låtsas som ingenting, tänder, och lutar sig bakåt och
+  blåser ut ett stort moln.
+- `tandaren`: tändaren, locket upp med tummen, och hjulet ger bara gnistor; han tittar misstänksamt på den,
+  drar igen, och då tar det. Han slår igen locket så att lågan dör, lägger tillbaka tändaren och blåser tre
+  rökringar.
+- `tandare2`: locket upp och hjulet på samma gång på vägen upp, och han tittar på en med ett höjt bryn medan
+  han tänder (så gör man), slår igen locket med en knyck, ställer ned tändaren med en liten smäll och visar
+  cigarren för en.
+
 **Händerna när han pratar.** Han är nöjd med det han säger: han ler medan han pratar (se *Minen*), och händerna
 hjälper till på ett av tio sätt (gruppen `tal`). Förut hade han bara ett (`armar`: fingret, handen som
 hackar och armen ut åt sidan), och det blev samma rörelse om och om igen (2026-11-06). Nu lottas:
@@ -6239,6 +6287,14 @@ Cigarrens elva sätt (2026-11-05) är provade med figuren ensam i headless Chrom
 släpper cigarren i mungipan och tar den igen; slaget, gesterna och klunken ser ut som förut. I hela
 sidan (1440 × 900) finns alla elva i lotten, och `tand` och `ringar` spelades utan fel. Inte provade i
 Safari eller i en riktig telefon.
+
+Elden (2026-11-10) är provad i headless Chrome (Metal) med provserver mot sajten: varje klipp bild för bild,
+närbilder av handen, stickan, tändaren och lågan, i dag- och nattljus och i 390 × 844; armbågens förflyttning
+mellan varje tjugondels sekund (inga hopp utom korta när han lyfter handen), och avståndet mellan underarmen och
+stället i alla klipp (som minst 108 enheter i de gamla, när han knackar av askan). Logiken i
+en levande sida: släckt cigarr, vanan, tändaren, och tänd efteråt utan att en sticka gick åt. Ljuden är
+räknade fram utan fel (OfflineAudioContext), men ingen har lyssnat på dem. Inte provad i Safari eller i en
+riktig telefon.
 
 Slagen, kaffet, cigarren och ljuden (2026-11-05) är provade i headless Chrome med mjukvarugrafik: figuren
 ensam i 1440 × 900 och 412 × 915, varje klipp bild för bild och de med rök och ånga i följd, och

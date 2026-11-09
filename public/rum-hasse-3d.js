@@ -24,6 +24,7 @@ import { ATLAS, LJUS, ARM, HAND, KAMERA, BORD_GLSL, CIGARR, ASKKOPP, DAG, LYS, V
 import { SCEN, BAK, kamera as scenKamera, iKamera, disken, franBaren, franPulten } from './rum-hasse-scen.js';
 import { PULT_GLSL, SKIVA, ringar, NRING } from './rum-pult.js';
 import { byggTidning, ytan } from './rum-hasse-tidning.js';
+import { byggStall, byggSticka, byggBranda, byggTandare, byggLaga, brandLage, STALL, STICKA, TANDARE, BRANDA } from './rum-hasse-eld.js';
 export { dagens } from './rum-hasse-tidning.js';
 
 const DEG = Math.PI / 180;
@@ -425,6 +426,23 @@ export const KLIPP = {
   vissla: { fran: 730, till: 740.8, vila: 0, skynda: true, grupp: 'lasa', fram: 2.4, ljud: VISSLA },
   // synar naglarna, putsar dem på slaget, och pekar sedan på en: har jag fel?
   naglar: { fran: 745, till: 755.4, vila: 0, skynda: true, grupp: 'lasa', fram: 4.6, ljud: [[2.4, { typ: 'anda', sort: 'blas', ms: 300 }], [2.85, { typ: 'anda', sort: 'blas', ms: 260 }]] },
+  // Cigarren har slocknat (grupp tanda, rum-hasse.js väljer när), och han tänder den, på olika sätt (tander: med
+  // en sticka ur stället eller med tändaren, rum-hasse-eld.js), och njuter sedan av den:
+  // drar, men den har slocknat; biter om den, tar en sticka och drar den mot plånen, låter svavlet brinna av,
+  // tänder den med tre bloss, skakar ut stickan och lägger den i askkoppen, och tittar nöjt på glöden
+  tanda: { fran: 760, till: 777.8, vila: 0, skynda: true, grupp: 'tanda', tander: 'sticka', ljud: [[6.6, { typ: 'fras' }], [8.85, { typ: 'puff' }], [9.5, { typ: 'puff' }], [10.15, { typ: 'puff' }], [11.2, { typ: 'skak' }]] },
+  // tändaren: fäller upp locket, hjulet ger bara gnistor första gången, tänder den, slår igen locket och
+  // lägger tillbaka den, och blåser tre rökringar som han tittar efter
+  tandaren: { fran: 780, till: 796.8, vila: 0, skynda: true, grupp: 'tanda', tander: 'tandare',
+    ljud: [[4.5, { typ: 'lock' }], [5.0, { typ: 'hjul' }], [5.9, { typ: 'hjul', tar: true }], [6.95, { typ: 'puff' }], [7.6, { typ: 'puff' }], [8.25, { typ: 'puff' }], [9.15, { typ: 'lock', upp: false }]] },
+  // tändsticka mot disken, med en gest: ingenting; han tittar på stickan och på en, och drar den mot plånen som
+  // vanligt, tänder, och lutar sig bakåt och blåser ut ett stort moln
+  disken: { fran: 800, till: 818.8, vila: 0, skynda: true, grupp: 'tanda', tander: 'sticka',
+    ljud: [[4.07, { typ: 'skrap', styrka: 1, ms: 240 }], [6.75, { typ: 'fras' }], [8.85, { typ: 'puff' }], [9.5, { typ: 'puff' }], [10.15, { typ: 'puff' }], [11.05, { typ: 'skak' }]] },
+  // tändaren i en enda rörelse: upp med locket och hjulet på samma gång, och han tittar på en medan han tänder,
+  // slår igen locket med en knyck, ställer ned tändaren med en smäll, och visar cigarren för en
+  tandare2: { fran: 820, till: 834.0, vila: 0, skynda: true, grupp: 'tanda', tander: 'tandare',
+    ljud: [[3.6, { typ: 'lock' }], [3.82, { typ: 'hjul', tar: true }], [5.0, { typ: 'puff' }], [5.6, { typ: 'puff' }], [6.4, { typ: 'lock', upp: false }]], dunk: [[7.0, 0.25, 'hand']] },
 };
 for (const k of Object.values(KLIPP)) {
   if (k.dunk) k.dom = k.fran + k.dunk.reduce((a, b) => (b[1] > a[1] ? b : a))[0];
@@ -450,6 +468,12 @@ export const VILA = VILOHOJD;
 // 2026-11-09. Askkoppen stod 190 längre bak och 20 längre ut, vid armbågen, 2026-11-09.)
 export const KOPP = [410, BORD.Y, 860];
 export const ASK = [-400, BORD.Y, 880];
+// Tändsticksstället och tändaren (rum-hasse-eld.js) till vänster om askkoppen och lite bakom den, där han når
+// dem med höger hand när han sträcker ut armen: stället närmast, tändaren liggande på disken längre ut, vriden
+// TANDARE_V från att peka mot en.
+export const STALL_P = [-515, BORD.Y, 640];
+export const TANDARE_P = [-650, BORD.Y, 560];
+const TANDARE_V = 0.75;
 // Notan under fatet, vänd som i rummet (rum.css): raderna längs pultens arm och överkanten mot armens bortre
 // kant, så att den ligger på tvären framför hans händer och läses uppifrån och ned. Samma lapp som man ser
 // rättvänd från rummet, alltså vriden nästan ett kvarts varv här (NV), när man har vänt sig mot honom (BAR).
@@ -547,7 +571,8 @@ export async function figuren(duk, { hog = false, latt = false, pr = 1 } = {}) {
   C.rotation.set(KAM.euler[0], KAM.euler[1], 0, 'YXZ');
   C.updateMatrixWorld();
   // disken i skuggarna: dess bakre plan och ovansidan
-  const bord = { value: new THREE.Vector4(DK.n[0], DK.n[1], DK.c, DK.Y), butik: { value: 1 } };
+  // (eld: lågan när han tänder cigarren, eldsken i rum-hasse-arm.js)
+  const bord = { value: new THREE.Vector4(DK.n[0], DK.n[1], DK.c, DK.Y), butik: { value: 1 }, eld: { value: new THREE.Vector4() } };
   const [foto, handModell] = await Promise.all([laddaFoto(), laddaHand()]);
   // ytan: tätare kring huvudet, och bara ned till disken
   const nx = latt ? 88 : 128;
@@ -605,7 +630,7 @@ export async function figuren(duk, { hog = false, latt = false, pr = 1 } = {}) {
     foto: { value: foto }, uHuvud: { value: new THREE.Matrix3() }, uPiv: { value: W_(650, 650, 40) }, uKropp: { value: new THREE.Matrix4() }, uAx: { value: new THREE.Vector2() }, uAndas: { value: 0 },
     blund: { value: 0 }, kis: { value: 0 }, munn: { value: 0 }, rund: { value: 0 }, le: { value: 0 }, bryn: { value: new THREE.Vector2() }, blick: { value: new THREE.Vector2() }, uLins: { value: new THREE.Vector2(0, 400) },
     uArm: { value: [new THREE.Vector3(), new THREE.Vector3(), new THREE.Vector3(), new THREE.Vector3(), new THREE.Vector3(), new THREE.Vector3()] },
-    uBord: bord, uButik: bord.butik, uDag: DAG, uLys: LYS,
+    uBord: bord, uButik: bord.butik, uDag: DAG, uLys: LYS, uEld: bord.eld,
   };
   const yta = new THREE.Mesh(G, new THREE.ShaderMaterial({
     uniforms: U, transparent: true, blending: THREE.CustomBlending, blendSrc: THREE.OneFactor, blendDst: THREE.OneMinusSrcAlphaFactor, side: THREE.DoubleSide,
@@ -756,7 +781,7 @@ export async function figuren(duk, { hog = false, latt = false, pr = 1 } = {}) {
       // Ansiktet: fotot är redan ljust där, så det får bli högst lite ljusare än fotot (annars fräts huden
       // ut och blir blekare än händerna). Hela huvudet lika mycket, så att kontrasten är fotots.
       r /= mix(1., max(1., dot(r, vec3(.3, .59, .11)) / 1.12), vHuv);
-      vec3 ut = c.rgb * r;
+      vec3 ut = c.rgb * (r + eldsken(vW, n));
       ut *= 1. - min(.5, vAo);
       ut += kant(n, .3) * c.a;
       gl_FragColor = vec4(ton(ut), c.a); }`,
@@ -788,8 +813,26 @@ export async function figuren(duk, { hog = false, latt = false, pr = 1 } = {}) {
   cig.mesh.matrixAutoUpdate = false;
   const rok = byggRok(latt ? 200 : 280, bord);
   S.add(ask.mesh, cig.mesh, rok.mesh);
+  // Elden (rum-hasse-eld.js): tändsticksstället och tändaren på disken, stickan han tänder med, de brända i
+  // askkoppen och lågan. ELD: cigarren tänd (tand, 0–1, mot mal: den slocknar sakta) när den ligger i
+  // askkoppen, och hur många stickor som är kvar i stället och brända i askkoppen (cigarr() nedan).
+  const ELD = { tand: 1, mal: 1, n: null, kvar: STALL.ANTAL, branda: 0 };
+  const stall = byggStall(bord);
+  stall.mesh.position.fromArray(STALL_P);
+  stall.mesh.updateMatrixWorld();
+  const sticka = byggSticka(bord);
+  const branda = byggBranda(bord);
+  ask.mesh.add(branda.mesh);
+  const tand = byggTandare(bord);
+  const laga = byggLaga();
+  S.add(stall.mesh, sticka.mesh, tand.mesh, laga.mesh);
+  // tändaren liggande på rygg på disken: höjden längs disken, locket bort från honom
+  const TV = new THREE.Vector3(Math.sin(TANDARE_V), 0, Math.cos(TANDARE_V));
+  const TAND_VILA = new THREE.Matrix4().makeBasis(new THREE.Vector3().crossVectors(TV, new THREE.Vector3(0, 1, 0)), TV, new THREE.Vector3(0, 1, 0))
+    .setPosition(TANDARE_P[0] - TV.x * TANDARE.H / 2, BORD.Y + TANDARE.D / 2 + 0.3, TANDARE_P[2] - TV.z * TANDARE.H / 2);
+  tand.mesh.matrix.copy(TAND_VILA);
   // skuggorna på disken: kapslar som faller bakåt och bort från ljuset, ingen skuggkarta
-  const NK = 10;
+  const NK = 13;
   const skuggGeo = new THREE.BufferGeometry();
   {
     // pultens ovansida: benet framför honom och armen mot en (i pultens mått)
@@ -810,6 +853,9 @@ export async function figuren(duk, { hog = false, latt = false, pr = 1 } = {}) {
   // kroppen nära disken skuggar dess bakre kant
   kapA[6].set(-330, kantZ(-330) + 10, 330, kantZ(330) + 10);
   kapH[6].set(64, 26);
+  // tändsticksstället (10), och tändaren (11) och stickan (12) sätts i rita
+  kapA[10].set(STALL_P[0], STALL_P[2], STALL_P[0], STALL_P[2]);
+  kapH[10].set(30, 1);
   // ---------- disken (diskBild) ----------
   // Pulten från rummet, vid hörnet: geometri i pultens mått (x längs benet), vriden som baren och flyttad så att
   // han sitter vid SCEN.PLATS, med händerna vid geringssnittet. Benet framför
@@ -1862,6 +1908,180 @@ export async function figuren(duk, { hog = false, latt = false, pr = 1 } = {}) {
       rok: [{ fran: 6.9, till: 9.0, sort: 'blas', styrka: 45, avtag: 0.3, fart: 0.75, broms: 1.0, lyft: 46 }],
     }),
   });
+  // Elden (grupp tanda): cigarrklipp där cigarren har slocknat och han tänder den, med cigarren mellan tänderna
+  // och höger hand fri för stickan eller tändaren (eld, se eldArm). Den tänds (tand) när han drar med lågan vid
+  // glöden.
+  Object.assign(RORELSER, {
+    // Den riktiga: han drar, men ingenting; tittar på den med rynkad panna, biter om den och tar en sticka ur
+    // stället, drar den mot plånen så att den flammar upp och håller den upp en stund medan svavlet brinner av,
+    // och tittar på lågan. Han tänder cigarren med tre bloss, med blicken på glöden och röken ur andra
+    // mungipan, skakar ut stickan och släpper den i askkoppen, tar ut cigarren och tittar nöjt på glöden och
+    // nickar, och blåser ut röken i en stråle.
+    tanda: Object.assign(cigarrKlipp(16.4, {
+      yaw: [[2.0, 0.05], [2.9, 0.05], [3.4, -0.5], [4.2, -0.55], [4.7, 0.05], [5.0, 0.0], [5.5, -0.75], [6.8, -0.72], [7.3, -0.4], [8.0, -0.38], [8.5, -0.15], [10.7, -0.15],
+        [11.0, -0.35], [11.6, -0.4], [12.0, -0.55], [12.4, -0.5], [12.9, 0.05], [13.4, -0.5], [14.2, -0.55], [14.5, 0.3], [15.4, 0.35]],
+      pitch: [[2.0, 0.25], [2.9, 0.25], [3.4, 0.7], [4.2, 0.75], [4.7, 0.25], [5.0, 0.3], [5.5, 0.95], [6.8, 0.95], [7.3, 0.55], [8.0, 0.5], [8.5, 0.6], [10.7, 0.6],
+        [11.0, 0.45], [11.6, 0.45], [12.0, 0.9], [12.4, 0.85], [12.9, 0.25], [13.4, 0.75], [13.75, 0.95], [14.0, 0.7], [14.2, 0.8], [14.5, -0.1], [15.4, -0.15]],
+      lut: [[2.0, 0], [5.0, 0], [5.6, 0.04], [6.8, 0.04], [7.4, 0.01], [8.5, 0.02], [10.7, 0.02], [11.4, 0], [12.0, 0.03], [12.5, 0.01], [14.4, 0], [14.8, -0.02]],
+      vrid: [[2.0, 0], [5.0, -0.02], [5.6, -0.08], [6.8, -0.08], [7.4, -0.03], [11.4, -0.03], [12.0, -0.06], [12.6, -0.02], [14.4, -0.03]],
+      axV: [[2.0, 20], [2.9, 26], [3.4, 14], [4.7, 18], [5.6, 10], [6.8, 10], [7.4, 18], [8.5, 22], [8.9, 28], [9.15, 22], [9.55, 30], [9.8, 24], [10.2, 32], [10.6, 22], [11.4, 16], [12.0, 8], [12.9, 18], [14.4, 14]],
+      brynX: [[2.2, 0.2], [2.9, 0.3], [3.4, -0.35], [4.2, -0.45], [4.7, -0.1], [5.6, 0.1], [6.6, 0.1], [6.75, 0.7], [7.3, 0.55], [8.0, 0.3], [8.5, -0.15], [10.7, -0.15], [11.4, 0.2], [13.4, 0.2], [13.8, 0.6], [14.4, 0.45], [15.2, 0.3]],
+      brynY: [[2.2, 0.2], [2.9, 0.25], [3.4, -0.5], [4.2, -0.6], [4.7, -0.15], [5.6, 0.08], [6.6, 0.08], [6.75, 0.6], [7.3, 0.45], [8.0, 0.25], [8.5, -0.1], [10.7, -0.1], [11.4, 0.16], [13.4, 0.16], [13.8, 0.5], [14.4, 0.38], [15.2, 0.24]],
+      blickX: [[2.0, 0], [2.9, 0], [3.3, -3.5], [4.3, -3.5], [4.7, 0], [5.3, -5], [6.8, -5], [7.2, -3], [8.2, -3], [8.5, -2], [10.7, -2], [11.0, -3], [11.8, -3], [12.0, -4], [12.5, -4], [12.9, 0], [13.3, -3], [14.3, -3], [14.6, 0]],
+      blickY: [[2.0, 0], [2.9, 0], [3.3, 2], [4.3, 2], [4.7, 0], [5.3, 4], [6.8, 4], [7.2, 1.5], [8.2, 1.5], [8.5, 5], [10.7, 5], [11.0, 2], [11.8, 2], [12.0, 4.5], [12.5, 4.5], [12.9, 0], [13.3, 3.5], [14.3, 3.5], [14.6, 0]],
+      blund: [[2.15, 0], [2.4, 0.45], [2.9, 0.4], [3.2, 0], [5.3, 0.3], [6.8, 0.3], [7.0, 0], [8.5, 0.35], [10.7, 0.35], [11.0, 0], [12.0, 0.3], [12.5, 0.3], [12.8, 0], [13.4, 0.2], [14.3, 0.2], [14.6, 0.5], [15.3, 0.45], [15.6, 0]],
+      kis: [[3.3, 0], [3.6, 0.35], [4.3, 0.35], [4.6, 0], [6.75, 0], [7.0, 0.4], [7.6, 0.3], [8.5, 0.4], [10.7, 0.45], [11.1, 0], [13.7, 0], [14.0, 0.3], [14.4, 0.2]],
+      le: [[2.9, 0.1], [3.4, 0], [6.8, 0], [7.4, 0.2], [8.2, 0.15], [8.5, 0], [10.7, 0], [11.3, 0.2], [13.4, 0.15], [13.8, 0.45], [14.4, 0.4], [15.2, 0.3]],
+      munn: [[4.75, 0], [4.9, 0.03], [8.75, 0.03], [8.85, 0.1], [9.05, 0.03], [9.4, 0.03], [9.5, 0.1], [9.7, 0.03], [10.05, 0.03], [10.15, 0.1], [10.35, 0.03], [12.9, 0.03], [13.05, 0]],
+    }, {
+      ck: [[2.1, 'mun', 70], [2.9, 'mun'], [3.3, 'bort'], [3.75, 'se'], [4.25, 'se'], [4.6, 'mun', 20], [4.9, 'tand'], [12.9, 'tand'], [13.3, 'bort'], [13.8, 'se'], [14.3, 'se'], [14.6, 'hall'], [15.2, 'hall']],
+      // slocknad tills lågan har tagit (tand), och glöden när han drar med lågan vid den
+      tand: [[8.7, 0], [10.4, 1]],
+      glod: [[2.2, 0], [8.7, 0], [8.95, 0.45], [9.2, 0.2], [9.6, 0.7], [9.85, 0.35], [10.25, 1], [10.6, 0.5], [11.2, 0.25], [13.5, 0.15], [13.9, 0.6], [14.3, 0.2]],
+      iMun: [[1.95, 0], [2.15, 1], [2.9, 1], [3.05, 0], [4.55, 0], [4.7, 1], [4.85, 0]],
+      blaser: [[14.45, 0], [14.6, 0.55], [15.4, 0.5], [15.7, 0]],
+      rok: [{ fran: 9.0, till: 9.2, sort: 'pust' }, { fran: 9.65, till: 9.85, sort: 'pust' }, { fran: 10.3, till: 10.5, sort: 'pust' }, { fran: 14.5, till: 15.6, sort: 'strale', styrka: 55, avtag: 0.9 }],
+    }), {
+      eld: {
+        sort: 'sticka',
+        ek: [[4.9, 'stall'], [5.75, 'stall'], [6.15, 'lyft', 10], [6.45, 'stryk0', 15], [6.62, 'stryk1'], [6.9, 'stryk2'], [7.45, 'se', 20], [8.0, 'se'], [8.55, 'fot', 25], [10.75, 'fot'], [11.05, 'skak'],
+          [11.17, 'skak1'], [11.3, 'skak2'], [11.43, 'skak1'], [11.6, 'skak'], [12.05, 'ask', 30], [12.3, 'ask']],
+        mot: [[4.85, 0], [5.75, 1], [12.25, 1], [13.0, 0]],
+        krok: [[4.9, 0.2], [5.55, 0.14], [5.75, 0.3], [12.2, 0.3], [12.35, 0.12], [12.9, 0.2]],
+        ta: 5.75,
+        slapp: 12.3,
+        laga: [[6.6, 0], [6.64, 1.7], [6.9, 1.45], [7.3, 1.05], [7.6, 1], [11.15, 1], [11.22, 0]],
+        sug: [[8.7, 0], [8.95, 0.9], [9.2, 0.2], [9.6, 0.9], [9.85, 0.2], [10.25, 1], [10.6, 0.2], [10.75, 0]],
+        brand: [[6.62, 0], [11.2, 0.75]],
+        glo: [[11.18, 0], [11.25, 1], [11.9, 0.4], [12.6, 0]],
+        ryk: [[11.18, 0], [11.25, 1], [12.4, 0.5], [13.4, 0]],
+        rok: [{ t: 6.66 }],
+      },
+    }),
+    // Tändaren: han biter om cigarren, tar tändaren från disken och fäller upp locket med tummen, drar på hjulet
+    // men det blir bara gnistor, tittar misstänksamt på den och drar igen, och då tar det. Han tänder cigarren
+    // med tre bloss, slår igen locket så att lågan dör, och lägger tillbaka tändaren. Sedan tar han ut cigarren
+    // och blåser tre rökringar och tittar efter dem, nöjd.
+    tandaren: Object.assign(cigarrKlipp(15.4, {
+      yaw: [[2.0, 0.05], [2.5, 0.0], [3.0, -0.85], [4.0, -0.82], [4.4, -0.35], [5.0, -0.32], [5.3, -0.42], [5.6, -0.3], [6.2, -0.32], [6.6, -0.15], [8.7, -0.15], [9.0, -0.3], [9.3, -0.3],
+        [9.7, -0.82], [10.2, -0.8], [10.7, 0.05], [11.3, 0.05], [11.8, 0.55], [13.9, 0.6], [14.3, 0.35]],
+      pitch: [[2.0, 0.25], [2.5, 0.3], [3.0, 1.0], [4.0, 0.95], [4.4, 0.6], [5.0, 0.6], [5.3, 0.7], [5.6, 0.55], [6.2, 0.6], [6.6, 0.6], [8.7, 0.6], [9.0, 0.55], [9.3, 0.55],
+        [9.7, 1.0], [10.2, 0.95], [10.7, 0.25], [11.3, 0.2], [11.8, -0.35], [13.9, -0.45], [14.3, -0.2]],
+      lut: [[2.0, 0], [2.6, 0], [3.1, 0.04], [4.0, 0.04], [4.5, 0.01], [9.5, 0.01], [9.9, 0.04], [10.3, 0.03], [10.8, 0], [11.8, -0.03], [13.9, -0.04]],
+      vrid: [[2.0, 0], [2.6, -0.02], [3.1, -0.09], [4.0, -0.09], [4.5, -0.03], [9.5, -0.03], [9.9, -0.08], [10.3, -0.07], [10.8, -0.02], [11.8, 0.02], [13.9, 0.02]],
+      axV: [[2.0, 20], [2.6, 14], [3.1, 8], [4.0, 10], [4.6, 16], [6.6, 20], [6.95, 28], [7.2, 22], [7.6, 30], [7.85, 24], [8.25, 32], [8.6, 22], [9.4, 14], [10.0, 6], [10.8, 16], [11.8, 26], [13.9, 14]],
+      brynX: [[2.2, 0.2], [2.8, 0.1], [4.4, 0.15], [5.05, 0.15], [5.25, -0.4], [5.75, -0.45], [5.95, 0.45], [6.4, 0.3], [6.6, -0.1], [8.7, -0.1], [9.2, 0.2], [11.8, 0.3], [12.4, 0.6], [13.9, 0.55], [14.4, 0.3]],
+      brynY: [[2.2, 0.2], [2.8, 0.08], [4.4, 0.12], [5.05, 0.12], [5.25, -0.55], [5.75, -0.6], [5.95, 0.35], [6.4, 0.25], [6.6, -0.08], [8.7, -0.08], [9.2, 0.16], [11.8, 0.24], [12.4, 0.5], [13.9, 0.45], [14.4, 0.24]],
+      blickX: [[2.0, 0], [2.4, 0], [2.9, -5.5], [4.0, -5.5], [4.4, -3], [6.3, -3], [6.6, -2], [8.7, -2], [9.0, -3], [9.4, -3], [9.7, -5.5], [10.3, -5.5], [10.7, 0], [11.8, 3.5], [13.9, 3.5], [14.3, 0]],
+      blickY: [[2.0, 0], [2.4, 0], [2.9, 4.5], [4.0, 4.5], [4.4, 3], [6.3, 3], [6.6, 5], [8.7, 5], [9.0, 3], [9.4, 3], [9.7, 4.5], [10.3, 4.5], [10.7, 0], [11.8, -3], [13.9, -3], [14.3, 0]],
+      blund: [[2.15, 0], [2.9, 0.3], [4.0, 0.3], [4.3, 0.1], [6.6, 0.35], [8.7, 0.35], [9.0, 0.1], [9.7, 0.3], [10.3, 0.3], [10.6, 0]],
+      kis: [[5.2, 0], [5.4, 0.45], [5.8, 0.45], [6.0, 0.1], [6.6, 0.4], [8.7, 0.45], [9.0, 0], [12.4, 0], [12.8, 0.3], [13.9, 0.25]],
+      le: [[2.5, 0.05], [5.2, 0.05], [5.3, 0], [5.9, 0], [6.3, 0.15], [6.6, 0], [8.7, 0], [9.3, 0.25], [11.3, 0.2], [12.8, 0.4], [13.9, 0.5], [14.5, 0.35]],
+      munn: [[2.35, 0], [2.5, 0.03], [6.85, 0.03], [6.95, 0.1], [7.15, 0.03], [7.5, 0.03], [7.6, 0.1], [7.8, 0.03], [8.15, 0.03], [8.25, 0.1], [8.45, 0.03], [10.9, 0.03], [11.05, 0],
+        [12.2, 0], [12.35, 0.3], [12.5, 0.4], [12.62, 0.18], [12.9, 0.3], [13.05, 0.4], [13.17, 0.18], [13.45, 0.3], [13.6, 0.4], [13.72, 0.18], [13.95, 0]],
+      rund: [[12.1, 0], [12.3, 1], [13.85, 1], [14.1, 0]],
+    }, {
+      ck: [[2.1, 'mun', 70], [2.4, 'mun'], [2.65, 'tand'], [10.9, 'tand'], [11.3, 'bort'], [11.9, 'hall'], [14.4, 'hall']],
+      tand: [[6.8, 0], [8.5, 1]],
+      glod: [[2.2, 0], [6.8, 0], [7.05, 0.45], [7.3, 0.2], [7.7, 0.7], [7.95, 0.35], [8.35, 1], [8.7, 0.5], [9.2, 0.25], [11.4, 0.15], [11.9, 0]],
+      iMun: [[1.95, 0], [2.15, 1], [2.4, 1], [2.55, 0]],
+      rok: [{ fran: 7.1, till: 7.3, sort: 'pust' }, { fran: 7.75, till: 7.95, sort: 'pust' }, { fran: 8.4, till: 8.6, sort: 'pust' }, { t: 12.45, sort: 'ring' }, { t: 13.0, sort: 'ring' }, { t: 13.55, sort: 'ring' }, { fran: 13.7, till: 14.6, sort: 'blas', styrka: 14, avtag: 1.2 }],
+    }), {
+      eld: {
+        sort: 'tandare',
+        ek: [[2.6, 'disk'], [3.4, 'disk'], [3.9, 'lyft', 20], [4.4, 'se'], [6.3, 'se'], [6.7, 'fot', 20], [8.8, 'fot'], [9.2, 'se'], [9.5, 'lyft'], [10.05, 'disk', 15]],
+        mot: [[2.55, 0], [3.4, 1], [10.05, 1], [10.85, 0]],
+        krok: [[2.6, 0.2], [3.3, 0.2], [3.45, 0.7], [10.0, 0.7], [10.15, 0.2]],
+        lock: [[4.45, 0], [4.62, 1], [9.1, 1], [9.2, 0]],
+        gnista: [5.0],
+        laga: [[5.89, 0], [5.95, 1], [9.1, 1], [9.15, 0]],
+        sug: [[6.85, 0], [7.05, 0.9], [7.3, 0.2], [7.7, 0.9], [7.95, 0.2], [8.35, 1], [8.7, 0.2], [8.8, 0]],
+      },
+    }),
+    // Disken: han biter om cigarren, tar en sticka och drar den i ett långt, säkert drag mot disken, med en
+    // gest. Ingenting händer. Han tittar på stickan, och sedan på en, stel och utan leende (ertappad), drar den
+    // mot plånen som vanligt och låtsas som ingenting. Han tänder cigarren, skakar ut stickan och släpper den i
+    // askkoppen, tar ut cigarren och lutar sig bakåt och blåser ut röken i ett stort moln, och nickar nöjt.
+    disken: Object.assign(cigarrKlipp(17.4, {
+      yaw: [[2.0, 0.05], [2.5, 0.0], [3.0, -0.75], [3.7, -0.72], [4.1, -0.55], [4.35, -0.45], [4.7, -0.35], [5.4, -0.35], [5.8, 0.15], [6.3, 0.2], [6.5, -0.7], [6.9, -0.7], [7.4, -0.4], [8.1, -0.38],
+        [8.5, -0.15], [10.7, -0.15], [11.0, -0.35], [11.5, -0.4], [11.9, -0.55], [12.3, -0.5], [12.8, 0.05], [13.4, 0.05], [14.0, 0.3], [15.6, 0.3], [16.1, -0.45], [16.8, -0.45]],
+      pitch: [[2.0, 0.25], [2.5, 0.3], [3.0, 0.95], [3.7, 0.95], [4.1, 0.9], [4.35, 0.85], [4.7, 0.55], [5.4, 0.6], [5.8, 0.05], [6.3, 0.05], [6.5, 0.95], [6.9, 0.95], [7.4, 0.55], [8.1, 0.5],
+        [8.5, 0.6], [10.7, 0.6], [11.0, 0.45], [11.5, 0.45], [11.9, 0.9], [12.3, 0.85], [12.8, 0.25], [13.4, 0.2], [14.0, -0.95], [15.6, -1.0], [16.1, 0.6], [16.4, 0.85], [16.8, 0.7]],
+      lut: [[2.0, 0], [2.6, 0], [3.1, 0.04], [4.0, 0.05], [4.4, 0.02], [5.8, 0], [6.4, 0.04], [6.9, 0.04], [7.4, 0.01], [8.5, 0.02], [10.7, 0.02], [11.4, 0], [12.0, 0.03], [12.5, 0.01], [13.4, 0], [14.0, -0.06], [15.6, -0.06], [16.2, 0]],
+      vrid: [[2.0, 0], [2.6, -0.02], [3.1, -0.08], [4.0, -0.1], [4.4, -0.04], [5.8, 0], [6.4, -0.08], [6.9, -0.08], [7.4, -0.03], [11.4, -0.03], [12.0, -0.06], [12.6, -0.02], [14.0, 0.02], [15.6, 0.02], [16.2, 0]],
+      axV: [[2.0, 20], [2.6, 14], [3.1, 8], [4.0, 4], [4.4, 14], [5.4, 14], [5.8, 22], [6.3, 22], [6.6, 10], [6.9, 10], [7.4, 18], [8.5, 22], [8.9, 28], [9.15, 22], [9.55, 30], [9.8, 24], [10.2, 32], [10.6, 22],
+        [11.4, 16], [12.0, 8], [12.9, 18], [13.4, 30], [14.2, 34], [15.4, 8], [16.0, 12]],
+      brynX: [[2.2, 0.2], [3.0, 0.3], [3.9, 0.55], [4.3, 0.6], [4.6, -0.2], [5.4, -0.4], [5.75, 0.95], [6.3, 0.9], [6.5, 0.1], [6.9, 0.1], [7.0, 0.5], [7.5, 0.3], [8.5, -0.15], [10.7, -0.15], [11.4, 0.2], [13.4, 0.3], [14.0, 0.15], [15.4, 0.2], [15.9, 0.65], [16.6, 0.4]],
+      brynY: [[2.2, 0.2], [3.0, 0.25], [3.9, 0.45], [4.3, 0.5], [4.6, -0.3], [5.4, -0.55], [5.75, 0.85], [6.3, 0.8], [6.5, 0.08], [6.9, 0.08], [7.0, 0.4], [7.5, 0.25], [8.5, -0.1], [10.7, -0.1], [11.4, 0.16], [13.4, 0.24], [14.0, 0.12], [15.4, 0.16], [15.9, 0.55], [16.6, 0.32]],
+      blickX: [[2.0, 0], [2.4, 0], [2.9, -5], [4.3, -4.5], [4.7, -3], [5.4, -3], [5.7, 0], [6.3, 0], [6.5, -5], [6.9, -5], [7.2, -3], [8.2, -3], [8.5, -2], [10.7, -2], [11.0, -3], [11.8, -3], [12.0, -4], [12.5, -4], [12.9, 0], [15.9, 0], [16.2, -3], [16.8, -3]],
+      blickY: [[2.0, 0], [2.4, 0], [2.9, 4.5], [4.3, 4.5], [4.7, 2.5], [5.4, 2.5], [5.7, -0.5], [6.3, -0.5], [6.5, 4.5], [6.9, 4.5], [7.2, 1.5], [8.2, 1.5], [8.5, 5], [10.7, 5], [11.0, 2], [11.8, 2], [12.0, 4.5], [12.5, 4.5], [12.9, 0], [15.9, 0], [16.2, 3.5], [16.8, 3.5]],
+      blund: [[2.15, 0], [2.9, 0.3], [4.0, 0.2], [4.3, 0], [8.5, 0.35], [10.7, 0.35], [11.0, 0], [12.0, 0.3], [12.5, 0.3], [12.8, 0], [13.6, 0.4], [14.2, 0.85], [15.5, 0.85], [15.9, 0.1]],
+      kis: [[4.6, 0], [4.9, 0.4], [5.4, 0.4], [5.6, 0], [6.75, 0], [7.0, 0.4], [7.6, 0.3], [8.5, 0.4], [10.7, 0.45], [11.1, 0], [15.8, 0], [16.2, 0.3], [16.8, 0.25]],
+      stel: [[5.6, 0], [5.7, 1], [6.35, 1], [6.8, 0]],
+      le: [[2.5, 0.05], [3.6, 0.2], [4.1, 0.35], [4.4, 0.1], [4.7, 0], [6.8, 0], [7.4, 0.2], [8.2, 0.1], [8.5, 0], [10.7, 0], [11.3, 0.2], [13.4, 0.2], [14.2, 0.15], [15.5, 0.25], [15.9, 0.6], [16.8, 0.45]],
+      munn: [[2.35, 0], [2.5, 0.03], [8.75, 0.03], [8.85, 0.1], [9.05, 0.03], [9.4, 0.03], [9.5, 0.1], [9.7, 0.03], [10.05, 0.03], [10.15, 0.1], [10.35, 0.03], [12.9, 0.03], [13.05, 0]],
+    }, {
+      ck: [[2.1, 'mun', 70], [2.4, 'mun'], [2.65, 'tand'], [12.9, 'tand'], [13.3, 'bort'], [13.9, 'hall'], [16.2, 'hall']],
+      tand: [[8.7, 0], [10.4, 1]],
+      glod: [[2.2, 0], [8.7, 0], [8.95, 0.45], [9.2, 0.2], [9.6, 0.7], [9.85, 0.35], [10.25, 1], [10.6, 0.5], [11.2, 0.25], [13.0, 0.15], [13.4, 0.8], [13.8, 0.3]],
+      iMun: [[1.95, 0], [2.15, 1], [2.4, 1], [2.55, 0]],
+      blaser: [[13.55, 0], [13.8, 0.8], [15.2, 0.7], [15.6, 0]],
+      rok: [{ fran: 9.0, till: 9.2, sort: 'pust' }, { fran: 9.65, till: 9.85, sort: 'pust' }, { fran: 10.3, till: 10.5, sort: 'pust' }, { fran: 13.6, till: 15.6, sort: 'blas', styrka: 95, avtag: 0.5, fart: 0.8 }],
+    }), {
+      eld: {
+        sort: 'sticka',
+        ek: [[2.6, 'stall'], [3.4, 'stall'], [3.75, 'lyft', 10], [4.05, 'disk0', 40], [4.3, 'disk1'], [4.65, 'disk2', 20], [5.1, 'se'], [6.15, 'se'], [6.55, 'stryk0', 20], [6.72, 'stryk1'],
+          [6.95, 'stryk2'], [7.5, 'se', 20], [8.05, 'se'], [8.55, 'fot', 25], [10.75, 'fot'], [10.95, 'skak'], [11.07, 'skak1'], [11.2, 'skak2'], [11.33, 'skak1'], [11.5, 'skak'], [11.95, 'ask', 30], [12.2, 'ask']],
+        mot: [[2.55, 0], [3.4, 1], [12.15, 1], [12.9, 0]],
+        krok: [[2.6, 0.2], [3.25, 0.14], [3.4, 0.3], [12.1, 0.3], [12.25, 0.12], [12.8, 0.2]],
+        ta: 3.4,
+        slapp: 12.2,
+        laga: [[6.7, 0], [6.74, 1.7], [7.0, 1.45], [7.4, 1.05], [7.7, 1], [11.05, 1], [11.12, 0]],
+        sug: [[8.7, 0], [8.95, 0.9], [9.2, 0.2], [9.6, 0.9], [9.85, 0.2], [10.25, 1], [10.6, 0.2], [10.75, 0]],
+        brand: [[6.72, 0], [11.1, 0.75]],
+        glo: [[11.08, 0], [11.15, 1], [11.8, 0.4], [12.5, 0]],
+        ryk: [[11.08, 0], [11.15, 1], [12.3, 0.5], [13.3, 0]],
+        rok: [{ t: 6.76 }],
+      },
+    }),
+    // Tändaren i en enda rörelse: han biter om cigarren, tar tändaren och fäller upp locket och drar på hjulet på
+    // vägen upp, och lågan tar direkt; han tittar på en med ett höjt bryn medan han tänder (så gör man), slår
+    // igen locket med en knyck och ställer ned tändaren med en liten smäll. Han tar ut cigarren, blåser ut röken
+    // och visar den för en: det här, det är livet.
+    tandare2: Object.assign(cigarrKlipp(12.6, {
+      yaw: [[2.0, 0.05], [2.5, 0.0], [2.9, -0.85], [3.4, -0.8], [3.8, -0.3], [4.3, 0.15], [6.2, 0.2], [6.6, -0.3], [6.85, -0.75], [7.2, -0.7], [7.6, 0.05], [8.3, 0.05], [8.8, 0.4], [9.4, 0.35],
+        [9.8, 0.2], [10.9, 0.2], [11.6, -0.45], [12.2, -0.45]],
+      pitch: [[2.0, 0.25], [2.5, 0.3], [2.9, 1.0], [3.4, 0.95], [3.8, 0.5], [4.3, 0.15], [6.2, 0.15], [6.6, 0.4], [6.85, 0.95], [7.2, 0.9], [7.6, 0.25], [8.3, 0.2], [8.8, -0.25], [9.4, -0.2],
+        [9.8, 0.1], [10.1, 0.35], [10.4, 0.1], [10.9, 0], [11.6, 0.5], [11.9, 0.75], [12.2, 0.55]],
+      lut: [[2.0, 0], [2.6, 0], [3.0, 0.04], [3.4, 0.04], [3.9, 0], [4.4, -0.02], [6.2, -0.02], [6.8, 0.04], [7.2, 0.03], [7.7, 0], [9.6, 0.03], [10.6, 0.03], [11.2, 0]],
+      axV: [[2.0, 20], [2.6, 14], [3.1, 8], [3.6, 12], [4.3, 22], [4.95, 30], [5.2, 22], [5.55, 32], [5.9, 22], [6.6, 14], [7.0, 4], [7.6, 16], [8.3, 26], [9.4, 12], [10.4, 14]],
+      brynX: [[2.2, 0.2], [3.4, 0.2], [3.9, 0.3], [4.3, 0.9], [6.0, 0.8], [6.5, 0.3], [7.2, 0.4], [8.3, 0.3], [9.4, 0.4], [9.8, 0.85], [10.9, 0.75], [11.5, 0.3]],
+      brynY: [[2.2, 0.2], [3.4, 0.16], [3.9, 0.2], [4.3, 0.15], [6.0, 0.15], [6.5, 0.24], [7.2, 0.32], [8.3, 0.24], [9.4, 0.32], [9.8, 0.7], [10.9, 0.6], [11.5, 0.24]],
+      blickX: [[2.0, 0], [2.4, 0], [2.8, -5.5], [3.4, -5.5], [3.9, 0], [6.3, 0], [6.7, -5.5], [7.2, -5.5], [7.6, 0], [11.2, 0], [11.6, -3], [12.2, -3]],
+      blickY: [[2.0, 0], [2.4, 0], [2.8, 4.5], [3.4, 4.5], [3.9, 0], [6.3, 0], [6.7, 4.5], [7.2, 4.5], [7.6, 0], [11.2, 0], [11.6, 3.5], [12.2, 3.5]],
+      blund: [[2.15, 0], [2.8, 0.3], [3.4, 0.3], [3.8, 0], [8.4, 0], [8.7, 0.5], [9.3, 0.45], [9.6, 0]],
+      kis: [[4.0, 0], [4.4, 0.35], [6.0, 0.3], [6.4, 0], [9.8, 0.2], [10.6, 0.4], [11.2, 0.2]],
+      le: [[2.5, 0.05], [3.8, 0.2], [4.3, 0.55], [6.0, 0.5], [6.5, 0.3], [7.4, 0.35], [8.3, 0.3], [9.8, 0.55], [10.9, 0.65], [11.6, 0.4]],
+      munn: [[2.35, 0], [2.5, 0.03], [4.9, 0.03], [5.0, 0.1], [5.2, 0.03], [5.5, 0.03], [5.6, 0.1], [5.8, 0.03], [7.7, 0.03], [7.85, 0], [10.2, 0], [10.3, 0.1], [10.45, 0.03], [10.6, 0.08], [10.75, 0]],
+    }, {
+      ck: [[2.1, 'mun', 70], [2.4, 'mun'], [2.65, 'tand'], [7.8, 'tand'], [8.2, 'bort'], [8.7, 'hall'], [9.6, 'hall'], [10.0, 'vift'], [10.25, 'vift2'], [10.5, 'vift'], [11.0, 'hall'], [11.6, 'se'], [12.1, 'se']],
+      tand: [[4.7, 0], [5.9, 1]],
+      glod: [[2.2, 0], [4.7, 0], [5.0, 0.6], [5.3, 0.3], [5.65, 1], [6.0, 0.4], [6.5, 0.25], [8.3, 0.15], [8.6, 0.5], [9.0, 0.2]],
+      iMun: [[1.95, 0], [2.15, 1], [2.4, 1], [2.55, 0]],
+      blaser: [[8.3, 0], [8.5, 0.7], [9.3, 0.6], [9.6, 0]],
+      rok: [{ fran: 5.1, till: 5.3, sort: 'pust' }, { fran: 5.7, till: 5.9, sort: 'pust' }, { fran: 8.35, till: 9.6, sort: 'blas', styrka: 85, avtag: 1.0 }],
+    }), {
+      eld: {
+        sort: 'tandare',
+        ek: [[2.6, 'disk'], [3.3, 'disk'], [3.8, 'lyft', 15], [4.4, 'fot', 30], [6.1, 'fot'], [6.4, 'se'], [6.65, 'lyft'], [6.98, 'disk', 25]],
+        mot: [[2.55, 0], [3.3, 1], [7.0, 1], [7.75, 0]],
+        krok: [[2.6, 0.2], [3.2, 0.2], [3.35, 0.7], [6.95, 0.7], [7.1, 0.2]],
+        lock: [[3.55, 0], [3.68, 1], [6.35, 1], [6.43, 0]],
+        laga: [[3.81, 0], [3.86, 1], [6.35, 1], [6.4, 0]],
+        sug: [[4.85, 0], [5.0, 0.9], [5.3, 0.2], [5.6, 1], [5.9, 0.2], [6.1, 0]],
+      },
+    }),
+  });
   // Småsakerna (grupp smatt): bara huvudet, kroppen och ansiktet, med händerna kvar på disken. Han
   // tittar med ögonen först och vrider huvudet efter, som man gör; blickX åt hans vänstra sida (mot
   // affären), blickY nedåt. andas läggs till andningen (bröstet).
@@ -2635,7 +2855,16 @@ export async function figuren(duk, { hog = false, latt = false, pr = 1 } = {}) {
       k.cig = {
         ck: tid(c.ck), krok: tid(c.krok), mot: tb(c.mot), upp: tb(c.upp), grepp: tb(c.grepp), rull: c.rull ? tid(c.rull) : tom(),
         glod: tid(c.glod), iMun: tid(c.iMun), blaser: c.blaser ? tid(c.blaser) : tom(), pust: c.pust ? tid(c.pust) : tom(),
-        rok: rokTid(c.rok), ute: Boolean(c.ute),
+        rok: rokTid(c.rok), ute: Boolean(c.ute), tand: c.tand ? tid(c.tand) : null,
+      };
+    }
+    if (o.eld) {
+      const e = o.eld;
+      const kan_ = (x, a = 0) => (e[x] ? tid(e[x]) : tom(a, a));
+      k.eld = {
+        sort: e.sort, ek: tid(e.ek), mot: tid(e.mot), krok: tid(e.krok), laga: kan_('laga'), brand: kan_('brand'), glo: kan_('glo'),
+        lock: kan_('lock'), sug: kan_('sug'), ryk: kan_('ryk'), skak: kan_('skak'), tumme: kan_('tumme'), hojd: kan_('hojd'),
+        ta: fran + (e.ta ?? -1e3), slapp: fran + (e.slapp ?? 1e3), gnista: (e.gnista || []).map((x) => fran + x), rok: rokTid(e.rok),
       };
     }
     if (o.las) k.las = Object.fromEntries(Object.entries(o.las).map(([x, kk]) => [x, tid(kk)]));
@@ -3010,7 +3239,7 @@ export async function figuren(duk, { hog = false, latt = false, pr = 1 } = {}) {
   const nT = v();
   const nE = v();
   const nU = v();
-  function naturlig(Sk, H, F, P, sida, pol, polUt) {
+  function naturlig(Sk, H, F, P, sida, pol, polUt, polVikt = NAT.POL) {
     const LH = LB + 26;
     nD.subVectors(H, Sk);
     const d = nD.length();
@@ -3040,7 +3269,7 @@ export async function figuren(duk, { hog = false, latt = false, pr = 1 } = {}) {
       const tum = Math.atan2(-nU.dot(nT), fram) + NAT.ULNAR;
       const hojd = Math.max(0, (nE.y - Sk.y) / LA + NAT.HOJD0);
       const inn = Math.max(0, (sida * (nE.x - Sk.x)) / LA - NAT.INN0);
-      return (boj / (boj > 0 ? NAT.BOJ : NAT.BAKAT)) ** 2 + (tum / (tum > 0 ? NAT.TUM : NAT.LILL)) ** 2 + NAT.POL * (1 - Math.cos(th)) + NAT.HOJD * hojd * hojd + NAT.INN * inn * inn;
+      return (boj / (boj > 0 ? NAT.BOJ : NAT.BAKAT)) ** 2 + (tum / (tum > 0 ? NAT.TUM : NAT.LILL)) ** 2 + polVikt * (1 - Math.cos(th)) + NAT.HOJD * hojd * hojd + NAT.INN * inn * inn;
     };
     let bast = 0;
     let bk = Infinity;
@@ -3101,6 +3330,314 @@ export async function figuren(duk, { hog = false, latt = false, pr = 1 } = {}) {
     const g = bump(c.grepp, t);
     for (let i = 0; i < 4; i++) extraC[i] = EXTRA_C[i] * g;
     return extraC;
+  }
+  // ---------- elden ----------
+  // Han tänder cigarren med en tändsticka ur stället eller med tändaren, med cigarren mellan tänderna (ck
+  // 'tand') och höger hand fri. Det är stickan och tändaren som styr, som med cigarren: läget räknas fram och
+  // handen ur greppet. Klippets eld: lägena (ek: [t, läge, båge]), när handen går dit och tillbaka (mot),
+  // fingrarna (krok), lågan (laga, över 1 när stickan flammar upp) och hur den dras mot cigarren när han drar
+  // (sug), hur långt stickan har brunnit (brand), glöden (glo) och röken (ryk) när han har skakat ut den;
+  // tändarens lock (lock); när han tar stickan ur stället (ta), släpper den i askkoppen (slapp), och gnistorna
+  // när hjulet inte tar (gnista).
+  // Stickan hålls i fingertopparna längs fingrarna, mellan tummen och pekfingret och snett ut mot tummen
+  // (VS), med toppen bortom fingertopparna (langs): då står underarmen upp med armbågen nere när han tänder.
+  // Där han sträcker sig efter den, drar den mot plånen och släpper den har handen sin egen riktning (fri),
+  // med fingrarna snett ned. (Tvärs över fingrarna som cigarren gick armbågen upp i axelhöjd.) SG_E: var på
+  // stickan han håller, från änden; GS: nypet i handens mått (mot tummen, längs fingrarna, ut ur handflatan).
+  const SG_E = 84;
+  const GS = new THREE.Vector3(34, 166, 62).multiplyScalar(HAND.SK / 0.92);
+  const VS = 37 * DEG;
+  const EXTRA_E = [0, 0.06, 0.5, 0.62];
+  const extraE = [0, 0, 0, 0];
+  const E_UPP = new THREE.Vector3(0, 1, 0);
+  const eM = new THREE.Matrix4();
+  const eV = Array.from({ length: 8 }, () => new THREE.Vector3());
+  const ePose = nyPose();
+  const eH = new THREE.Vector3();
+  const eF = new THREE.Vector3();
+  const eP = new THREE.Vector3();
+  const eX = new THREE.Vector3();
+  const eY = new THREE.Vector3();
+  const eZ = new THREE.Vector3();
+  const eTopp = new THREE.Vector3();
+  const eTopp0 = new THREE.Vector3();
+  const eLagaUpp = new THREE.Vector3();
+  const ePol = new THREE.Vector3();
+  let eT0 = null;
+  // Stickans lägen: greppets punkt och stickans ram (y mot toppen, z åt handflatan), och greppet (g).
+  const PE = {};
+  const peUr = (namn, end, dir, P, g = 'langs') => {
+    eV[7].copy(dir).normalize();
+    const ut = pose(PE[namn] || (PE[namn] = nyPose()), eV[6].copy(end).addScaledVector(eV[7], SG_E), eV[7], P);
+    ut.g = g;
+    return ut;
+  };
+  // (fri: handen vänd åt ett eget håll, fingrarna hF och handflatan hP, med nypet om stickan)
+  const fri = (ps, hF, hP) => { ps.g = 'fri'; ps.hF = hF; ps.hP = hP; return ps; };
+  const peGrepp = (namn, gp, dir, P, g) => peUr(namn, eV[4].copy(gp).addScaledVector(eV[3].copy(dir).normalize(), -SG_E), dir, P, g);
+  const peTopp = (namn, topp, dir, P, g) => peUr(namn, eV[4].copy(topp).addScaledVector(eV[3].copy(dir).normalize(), -(STICKA.L - 2)), dir, P, g);
+  // Handens ram i stickans (qRel, per läge): fingrarna (x), handflatan (y) och tummen (z = x × y). Längs
+  // fingrarna (langs) är den fast (i stickans ram: x, y mot toppen, z åt handflatan); fri räknas ur handens
+  // riktning i världen (hF, hP) och stickans läge.
+  const qRelLangs = new THREE.Quaternion();
+  {
+    const F = V3(-Math.sin(VS), Math.cos(VS), 0);
+    const P = V3(0, 0, 1);
+    qRelLangs.setFromRotationMatrix(eM.makeBasis(F, P, new THREE.Vector3().crossVectors(F, P)));
+  }
+  const eQi = new THREE.Quaternion();
+  function relUr(l) {
+    if (l.g === 'fri') {
+      eM.makeBasis(l.hF, l.hP, eV[5].crossVectors(l.hF, l.hP));
+      l.qRel = (l.qRel || new THREE.Quaternion()).setFromRotationMatrix(eM).premultiply(eQi.copy(l.q).invert());
+    } else l.qRel = l.g === 'hand' ? qRelTand : qRelLangs;
+    // (handens ram i världen)
+    l.qH = (l.qH || new THREE.Quaternion()).copy(l.q).multiply(l.qRel);
+    return l;
+  }
+  const eQh = new THREE.Quaternion();
+  // stickans läge vid t (ut), och handen ur det (eH, eF, eP): handen vrids den kortaste vägen från det ena
+  // lägets ram till det andras (med samma grepp följer den stickan), och nypet sitter kvar om stickan
+  const stickLage = (t, E, ut) => eldLage(t, E.ek, PE, GS, ut);
+  // (M: lägena, stickans eller tändarens, och G: greppet i handens mått)
+  function eldLage(t, K, M, G, ut) {
+    let i = 1;
+    while (i < K.length - 1 && t > K[i][0]) i++;
+    const a = M[K[i - 1][1]];
+    const b = M[K[i][1]];
+    const f = ss(K[i - 1][0], K[i][0], t);
+    ut.p.lerpVectors(a.p, b.p, f);
+    ut.p.y += (K[i][2] || 0) * Math.sin(f * Math.PI);
+    ut.q.slerpQuaternions(a.q, b.q, f);
+    eQh.slerpQuaternions(a.qH, b.qH, f);
+    ePol.copy(a.pol).lerp(b.pol, f).normalize();
+    eF.set(1, 0, 0).applyQuaternion(eQh);
+    eP.set(0, 1, 0).applyQuaternion(eQh);
+    eV[5].set(0, 0, 1).applyQuaternion(eQh);
+    eH.copy(ut.p).addScaledVector(eF, -G.y).addScaledVector(eP, -G.z).addScaledVector(eV[5], -G.x);
+    return ut;
+  }
+  // (handflatan: mot stället från hans sida; mot hans vänstra sida och lite bakåt när han håller den upp; mot
+  // stället när han drar den mot plånen; nedåt mot disken; fram över askkoppen)
+  const P_STALL = V3(-0.55, 0, 0.83);
+  // (handen när han nyper stickan i stället ovanifrån: fingrarna snett ned mot den, handflatan nedåt och
+  // tummen mot hans vänstra sida; och när han drar upp den, lite mer upprätt)
+  const vinkelratt = (F, h) => { const f = F.clone().normalize(); return [f, h.clone().addScaledVector(f, -h.dot(f)).normalize()]; };
+  const [F_STALL, P_STALL_H] = vinkelratt(V3(-0.45, -0.42, 0.79), V3(0, -1, 0));
+  const [F_STALL2, P_STALL_H2] = vinkelratt(V3(-0.3, -0.25, 0.92), V3(0.2, -1, 0));
+  const [F_STRYK, P_STRYK_H] = vinkelratt(V3(-0.5, -0.42, 0.76), V3(0.1, -1, -0.2));
+  const [F_ASK, P_ASK_H] = vinkelratt(V3(-0.2, -0.5, 0.84), V3(0, -1, 0));
+  const P_SE = V3(0.85, 0, -0.5);
+  const P_STRYK = V3(-0.55, 0, 0.83);
+  const P_DISK = V3(0.3, 0, 0.95);
+  const P_ASK = V3(-0.3, 0, 0.95);
+  // plånen: på stället, på sidan mot honom och hans hand (nS), och han drar stickan snett nedåt längs den
+  const nS = V3(0.55, 0, -0.83).normalize();
+  const tS = new THREE.Vector3().crossVectors(E_UPP, nS);
+  const D_STRYK = V3(0, 0, 0).addScaledVector(nS, -0.3).addScaledVector(E_UPP, -0.92).addScaledVector(tS, 0.15).normalize();
+  const D_DISK = V3(-0.6, -0.6, 0.3).normalize();
+  const D_SE = V3(0.12, 1, 0.08).normalize();
+  const D_ASK = V3(-0.15, -1, 0.12).normalize();
+  // Armbågen: ned och bakåt ut åt sidan när han sträcker sig mot stället och disken, och rakt ned när han
+  // håller stickan upp framför sig (upp), bakåt över askkoppen. (Den väger tyngre än i naturlig annars, så att
+  // den inte slår om mellan två lägen.)
+  const POL_NA = V3(-0.55, -0.7, -0.45).normalize();
+  const POL_E = { stall: POL_NA, lyft: POL_NA, stryk0: POL_NA, stryk1: POL_NA, disk0: POL_NA, disk1: POL_NA, upp: V3(-0.42, -0.88, -0.2).normalize(), ask: V3(-0.4, -0.75, -0.5).normalize() };
+  const POL_VIKT_E = 20;
+  // i handen framför bröstet, där han tittar på lågan, och där han skakar den
+  const G_SE = V3(-235, 60, 560);
+  const G_SKAK = V3(-245, 20, 560);
+  function stickLagen() {
+    // i stället: den sista som står kvar (stallets mått → världen), och uppdragen ur det
+    eM.multiplyMatrices(stall.mesh.matrixWorld, stall.lage(Math.max(0, ELD.kvar - 1)));
+    eV[0].setFromMatrixColumn(eM, 1).normalize();
+    eV[1].setFromMatrixPosition(eM);
+    fri(peUr('stall', eV[1], eV[0], P_STALL), F_STALL, P_STALL_H);
+    fri(peUr('lyft', eV[2].copy(eV[1]).addScaledVector(E_UPP, 100), eV[0], P_STALL), F_STALL2, P_STALL_H2);
+    // mot plånen: toppen överst och nederst på den
+    const C = eV[1].fromArray(STALL_P);
+    const r = STALL.R + STICKA.HR;
+    fri(peTopp('stryk0', eV[2].copy(C).addScaledVector(nS, r).addScaledVector(E_UPP, STALL.PLAN[1] - 4).addScaledVector(tS, -8), D_STRYK, P_STRYK), F_STRYK, P_STRYK_H);
+    fri(peTopp('stryk1', eV[2].copy(C).addScaledVector(nS, r + 1).addScaledVector(E_UPP, STALL.PLAN[0] + 6).addScaledVector(tS, 6), D_STRYK, P_STRYK), F_STRYK, P_STRYK_H);
+    // och efter draget: ut och upp från stället, toppen uppåt
+    peTopp('stryk2', eV[2].copy(C).addScaledVector(nS, r + 60).addScaledVector(E_UPP, 120), D_SE, P_SE);
+    // mot disken: ett långt drag i sidled precis bakom askkoppen (framför stället skulle armen gå genom det)
+    fri(peTopp('disk0', eV[2].set(-420, BORD.Y + STICKA.HR, 692), D_DISK, P_DISK), F_STRYK, P_STRYK_H);
+    fri(peTopp('disk1', eV[2].set(-245, BORD.Y + STICKA.HR, 650), D_DISK, P_DISK), F_STRYK, P_STRYK_H);
+    peTopp('disk2', eV[2].set(-290, BORD.Y + 110, 600), D_SE, P_SE);
+    peGrepp('se', G_SE, D_SE, P_SE);
+    // vid cigarrens glöd: toppen under den och lite utanför, så att lågan når den
+    peTopp('fot', eV[2].copy(fot).addScaledVector(cA, 10).addScaledVector(E_UPP, -26), D_SE, P_SE);
+    // skakar ut den: handen vrids fram och tillbaka
+    peGrepp('skak', G_SKAK, D_SE, P_SE);
+    peGrepp('skak1', G_SKAK, eV[2].set(0.5, 0.86, -0.05), P_SE);
+    peGrepp('skak2', G_SKAK, eV[2].set(-0.38, 0.92, 0.05), P_SE);
+    // över askkoppen, toppen ned
+    fri(peTopp('ask', eV[2].set(ASK[0] + 8, BORD.Y + 46, ASK[2] - 6), D_ASK, P_ASK), F_ASK, P_ASK_H);
+    for (const [namn, l] of Object.entries(PE)) {
+      relUr(l);
+      l.pol = POL_E[namn] || POL_E.upp;
+    }
+  }
+  // stickan på plats ur läget (änden i origo, toppen längs y), och toppen i eTopp
+  function stickSatt(ps) {
+    eX.set(1, 0, 0).applyQuaternion(ps.q);
+    eY.set(0, 1, 0).applyQuaternion(ps.q);
+    eZ.set(0, 0, 1).applyQuaternion(ps.q);
+    eV[0].copy(ps.p).addScaledVector(eY, -SG_E);
+    sticka.mesh.matrix.makeBasis(eX, eY, eZ).setPosition(eV[0]);
+    sticka.mesh.matrixWorldNeedsUpdate = true;
+    eTopp.copy(eV[0]).addScaledVector(eY, STICKA.L - 1);
+  }
+  // den släppta stickan faller ned i askkoppen, på plats i (BRANDA)
+  const eFall = new THREE.Matrix4();
+  const eQ0 = new THREE.Quaternion();
+  const eQ1 = new THREE.Quaternion();
+  const eS = new THREE.Vector3();
+  function stickFall(t, E) {
+    const f = clamp((t - E.slapp) / 0.32);
+    stickLage(E.slapp, E, ePose);
+    stickSatt(ePose);
+    eM.copy(sticka.mesh.matrix);
+    eFall.multiplyMatrices(ask.mesh.matrixWorld, brandLage(Math.min(ELD.branda, BRANDA.length - 1)));
+    eQ0.setFromRotationMatrix(eM);
+    eQ1.setFromRotationMatrix(eFall);
+    eV[0].setFromMatrixPosition(eM);
+    eV[1].setFromMatrixPosition(eFall);
+    const g = f * f;
+    eQ0.slerp(eQ1, ss(0.1, 1, f));
+    eV[0].lerp(eV[1], g);
+    sticka.mesh.matrix.compose(eV[0], eQ0, eS.set(1, 1, 1));
+    sticka.mesh.matrixWorldNeedsUpdate = true;
+  }
+  // ---------- tändaren ----------
+  // Tändarens lägen (ram: origo i greppet T_GY upp på kroppen, x mot gångjärnet, y uppåt längs höjden, z ut
+  // ur framsidan): på disken som den ligger, där han tar den ovanifrån (fri), och upprätt i handen (hand):
+  // handflatan mot framsidan, fingrarna om sidan utan gångjärn och tummen ovanpå, vid locket och hjulet. Han
+  // håller den framför bröstet med framsidan mot sin vänstra sida (TZ), och med veken under cigarrens glöd.
+  const T_GY = 30;
+  const GT = new THREE.Vector3(24, 104, 40).multiplyScalar(HAND.SK / 0.92);
+  const PT = {};
+  const qRelTand = new THREE.Quaternion().setFromRotationMatrix(new THREE.Matrix4().makeBasis(V3(-1, 0, 0), V3(0, 0, 1), V3(0, 1, 0)));
+  const tPose = nyPose();
+  const tX = new THREE.Vector3();
+  const tY = new THREE.Vector3();
+  const tZ = new THREE.Vector3();
+  const tO = new THREE.Vector3();
+  const TZ = V3(0.97, 0, 0.25).normalize();
+  const TXu = new THREE.Vector3().crossVectors(E_UPP, TZ);
+  const [F_TDISK, P_TDISK] = vinkelratt(V3(-0.25, -0.5, 0.83), V3(0, -1, 0));
+  const POL_T = { disk: POL_NA, lyft: POL_NA };
+  function ptUr(namn, o, x, y, z) {
+    eM.makeBasis(x, y, z);
+    const ut = PT[namn] || (PT[namn] = nyPose());
+    ut.q.setFromRotationMatrix(eM);
+    ut.p.copy(o).addScaledVector(y, T_GY);
+    ut.g = 'hand';
+    return ut;
+  }
+  function tandLagen() {
+    tX.setFromMatrixColumn(TAND_VILA, 0);
+    tY.setFromMatrixColumn(TAND_VILA, 1);
+    tZ.setFromMatrixColumn(TAND_VILA, 2);
+    tO.setFromMatrixPosition(TAND_VILA);
+    fri(ptUr('disk', tO, tX, tY, tZ), F_TDISK, P_TDISK);
+    ptUr('lyft', eV[0].set(-500, -170, 640), TXu, E_UPP, TZ);
+    ptUr('se', eV[0].set(-300, -30, 560), TXu, E_UPP, TZ);
+    // veken under glöden: origo = veken − ramen · VEKE
+    eV[1].copy(fot).addScaledVector(cA, 8).addScaledVector(E_UPP, -34);
+    eV[0].copy(eV[1]).addScaledVector(TXu, -TANDARE.VEKE[0]).addScaledVector(E_UPP, -TANDARE.VEKE[1]).addScaledVector(TZ, -TANDARE.VEKE[2]);
+    ptUr('fot', eV[0], TXu, E_UPP, TZ);
+    for (const [namn, l] of Object.entries(PT)) {
+      relUr(l);
+      l.pol = POL_T[namn] || POL_E.upp;
+    }
+  }
+  // tändaren där den ligger på disken, med locket stängt
+  function tandVilar() {
+    tand.mesh.matrix.copy(TAND_VILA);
+    tand.mesh.matrixWorldNeedsUpdate = true;
+    tand.U.uLock.value = 0;
+  }
+  function eldArm(t, n, Sk, a, E, ex0) {
+    const mot = spar(E.mot, t);
+    const harSticka = E.sort === 'sticka' && t >= E.ta;
+    sticka.mesh.visible = harSticka;
+    stall.antal(ELD.kvar - (harSticka ? 1 : 0));
+    // lågan: hur stark (l), hur hög och bred, och om det är stickans (0) eller tändarens (1)
+    let l = 0;
+    let lh = 30;
+    let lb = 10.5;
+    let lsort = 0;
+    if (E.sort === 'sticka') {
+      // stickan: i handen, eller släppt i askkoppen
+      stickLagen();
+      tandVilar();
+      if (t < E.slapp) {
+        stickLage(t, E, ePose);
+        stickSatt(ePose);
+      } else stickFall(t, E);
+      sticka.U.uBrand.value = spar(E.brand, t);
+      sticka.U.uGlo.value = spar(E.glo, t);
+      sticka.U.uTid.value = n;
+      l = t < E.slapp ? spar(E.laga, t) : 0;
+      const flamma = Math.max(0, l - 1);
+      lh = 30 * (1 + 1.3 * flamma);
+      lb = 10.5 * (1 + 1.6 * flamma);
+    } else {
+      // tändaren: lyft ur sitt läge på disken, locket uppfällt (lock) och lågan när hjulet tar; gnistorna när
+      // det inte tar
+      tandLagen();
+      eldLage(t, E.ek, PT, GT, tPose);
+      tX.set(1, 0, 0).applyQuaternion(tPose.q);
+      tY.set(0, 1, 0).applyQuaternion(tPose.q);
+      tZ.set(0, 0, 1).applyQuaternion(tPose.q);
+      tO.copy(tPose.p).addScaledVector(tY, -T_GY);
+      tand.mesh.matrix.makeBasis(tX, tY, tZ).setPosition(tO);
+      tand.mesh.matrixWorldNeedsUpdate = true;
+      const lk = spar(E.lock, t);
+      tand.U.uLock.value = lk;
+      eTopp.copy(tO).addScaledVector(tX, TANDARE.VEKE[0]).addScaledVector(tY, TANDARE.VEKE[1] + 1).addScaledVector(tZ, TANDARE.VEKE[2]);
+      l = spar(E.laga, t) * ss(0.5, 0.8, lk);
+      lh = 44;
+      lb = 11;
+      lsort = 1;
+      for (const g of E.gnista) {
+        if (t > g && t < g + 0.09 && l < 0.3) {
+          l = 0.6 * (1 - (t - g) / 0.09);
+          lh = 15;
+          lb = 9;
+        }
+      }
+    }
+    // lågan: står upp, dras mot cigarrens glöd när han drar (sug), och släpar efter när handen rör sig
+    if (l > 0.004) {
+      eLagaUpp.copy(E_UPP).lerp(eV[0].subVectors(fot, eTopp).normalize(), 0.75 * spar(E.sug, t));
+      const dt = eT0 === null ? 0 : t - eT0;
+      if (dt > 1e-3 && dt < 0.1) eLagaUpp.addScaledVector(eV[1].subVectors(eTopp, eTopp0), -0.012 / dt).normalize();
+      laga.satt(eTopp, eLagaUpp, lh, lb, Math.min(1.25, l), lsort, n);
+      // skenet: lite över toppen, och fladdrar med lågan
+      bord.eld.value.set(eTopp.x, eTopp.y + 14, eTopp.z, Math.min(1.6, l) * (0.9 + 0.1 * Math.sin(n * 31) * Math.sin(n * 17.3)));
+    } else {
+      laga.satt(eTopp, E_UPP, 0, 0, 0, 0, n);
+      bord.eld.value.w = 0;
+    }
+    eTopp0.copy(eTopp);
+    eT0 = t;
+    if (mot <= 0) return null;
+    // handen ur greppet (eldLage), och armbågen där handleden ser naturlig ut
+    if (E.sort === 'sticka' && t >= E.slapp) stickLage(E.slapp, E, ePose);
+    naturlig(Sk, eH, eF, eP, 1, ePol, ePol, POL_VIKT_E);
+    a.w.lerp(cW, mot);
+    a.w.y += 70 * mot * (1 - mot);
+    a.pol.normalize().lerp(ePol, mot);
+    a.F.lerp(eF, mot);
+    a.P.lerp(eP, mot);
+    a.krok += (spar(E.krok, t) - a.krok) * mot;
+    a.peka *= 1 - mot;
+    bortA = Math.max(bortA, mot);
+    for (let i = 0; i < 4; i++) extraE[i] = (ex0 ? ex0[i] : 0) * (1 - mot) + EXTRA_E[i] * mot;
+    return extraE;
   }
   // ---------- pennan ----------
   // Din kupong ligger på disken (rum-hasse-kupong.js säger var), med pennan på sig. Det är pennan som
@@ -3686,6 +4223,7 @@ export async function figuren(duk, { hog = false, latt = false, pr = 1 } = {}) {
   const rj = v();
   let rokN = null;
   let rokSkuld = 0;
+  let eldSkuld = 0;
   const skuld = new Map();
   // (snett uppåt åt hans vänstra sida och fram, så att den far förbi ansiktet och inte stannar framför det)
   const BLAS = new THREE.Vector3(0.9, 0.32, 0.3).normalize();
@@ -3720,7 +4258,7 @@ export async function figuren(duk, { hog = false, latt = false, pr = 1 } = {}) {
     }
   }
   const slump = () => Math.random() - 0.5;
-  function roken(n, t, glod, kl) {
+  function roken(n, t, glod, kl, tand = 1) {
     const dt = rokN === null ? 0 : clamp(n - rokN, 0, 0.1);
     rokN = n;
     const t0 = rokT === null ? t : rokT;
@@ -3728,12 +4266,23 @@ export async function figuren(duk, { hog = false, latt = false, pr = 1 } = {}) {
     const c = kl && kl.cig;
     if (dt > 0) {
       // en tunn tråd ur glöden, utspridd längs vägen om cigarren rör sig (inte när den har slocknat: ute)
-      rokSkuld += c && c.ute ? 0 : dt * (14 + 34 * glod);
+      rokSkuld += c && c.ute ? 0 : dt * (14 * tand + 34 * glod);
       const k = Math.floor(rokSkuld);
       rokSkuld -= k;
       for (let i = 0; i < k; i++) {
         rm.lerpVectors(fot0, fot, (i + 1) / k);
         rok.slapp(rm, rv.set(slump() * 4, 26 + slump() * 8, slump() * 4), { liv: 3.4, r0: 1.7, r1: 22, a: 0.2, lyft: 16 });
+      }
+      // stickan som ryker när han har skakat ut den, och svavelröken när den flammar upp
+      const el = kl && kl.eld;
+      if (el && t < el.slapp + 2) {
+        const ry = spar(el.ryk, t);
+        eldSkuld += dt * 26 * ry;
+        for (; eldSkuld >= 1; eldSkuld--) rok.slapp(eTopp, rv.set(slump() * 5, 20 + slump() * 8, slump() * 5), { liv: 2.2, r0: 1.2, r1: 12, a: 0.22, lyft: 14, sort: 1, virv: 0.5 });
+        for (const r of el.rok) {
+          if (r.t <= t0 || r.t > t) continue;
+          for (let i = 0; i < 9; i++) rok.slapp(eTopp, rv.set(slump() * 60, 30 + slump() * 40, slump() * 60), { liv: 1.3, r0: 3, r1: 26, a: 0.16, broms: 1.6, lyft: 30, sort: 1, virv: 0.6 });
+        }
       }
       const listor = [c && c.rok, kl && kl.kaffe && kl.kaffe.rok];
       for (const l of listor) if (l) for (const r of l) {
@@ -3888,6 +4437,25 @@ export async function figuren(duk, { hog = false, latt = false, pr = 1 } = {}) {
       cigarrSatt(cp);
     }
     ask.mesh.position.y = ASK[1] + HOPP.ask;
+    // elden: stickan eller tändaren i handen, och lågan
+    const el = kl && kl.eld;
+    if (el) extraA = eldArm(t, n, sa, a, el, extraA) || extraA;
+    else {
+      sticka.mesh.visible = false;
+      tandVilar();
+      laga.satt(eTopp, E_UPP, 0, 0, 0, 0, n);
+      bord.eld.value.w = 0;
+      stall.antal(ELD.kvar);
+      eT0 = null;
+    }
+    branda.antal(ELD.branda);
+    // tänd eller slocknad: när han tänder den följer det klippet, annars tonar glöden och röken sakta ut när
+    // den slocknar (ELD.mal 0)
+    const dn = ELD.n === null ? 0 : clamp(n - ELD.n, 0, 0.5);
+    ELD.n = n;
+    ELD.tand += clamp(ELD.mal - ELD.tand, -dn / 25, dn / 25);
+    const tandNu = cc && cc.tand ? spar(cc.tand, t) : cc && cc.ute ? 0 : ELD.tand;
+    cig.U.uTand.value = tandNu;
     cig.U.uGlod.value = glod;
     cig.U.uTid.value = n;
     const kaffe = kl && kl.kaffe;
@@ -3953,6 +4521,8 @@ export async function figuren(duk, { hog = false, latt = false, pr = 1 } = {}) {
     skk(5, K.fat.position, K.fat.position, 96, 1 + HOPP.fat);
     skk(7, ASKV3, ASKV3, 92, 1 + HOPP.ask);
     skk(8, cX, fot, 14, Math.min(ah(cX), ah(fot)));
+    eV[0].set(0, TANDARE.H / 2, 0).applyMatrix4(tand.mesh.matrix);
+    skk(11, eV[0], eV[0], 30, ah(eV[0]) - TANDARE.D / 2 + 1);
     // tidningens nederkant, när han håller den ovanför disken
     kapH[9].set(0, 0);
     if (tidning.mesh.visible) {
@@ -3961,7 +4531,7 @@ export async function figuren(duk, { hog = false, latt = false, pr = 1 } = {}) {
       const h = Math.min(ah(tg0), ah(tg1));
       if (h > -5) skk(9, tg0, tg1, 38, h);
     }
-    roken(n, t, glod, kl);
+    roken(n, t, glod, kl, tandNu);
     r.render(S, C);
   }
 
@@ -4026,6 +4596,16 @@ export async function figuren(duk, { hog = false, latt = false, pr = 1 } = {}) {
       return { klipp: `skriv${kryss.length}`, tider };
     },
     ror: () => sistaN - trumT < trumS[0] + 0.05,
+    // Cigarren och elden (rum-hasse.js håller reda på dem): tand (true/false: tänd när den ligger i askkoppen;
+    // slocknar den tonar glöden och röken ut, utom med direkt), kvar (stickor i stället) och branda (i askkoppen)
+    cigarr(o) {
+      if ('tand' in o) {
+        ELD.mal = o.tand ? 1 : 0;
+        if (o.direkt) ELD.tand = ELD.mal;
+      }
+      if (o.kvar != null) ELD.kvar = o.kvar;
+      if (o.branda != null) ELD.branda = o.branda;
+    },
     // Trycker dagens tidningar som han läser (dagens() i rum-hasse-tidning.js)
     tidning: (d) => tidning.tryck(d),
     info: () => ({ trianglar: r.info.render.triangles, ritanrop: r.info.render.calls, texturer: r.info.memory.textures }),
@@ -4036,6 +4616,11 @@ export async function figuren(duk, { hog = false, latt = false, pr = 1 } = {}) {
       K.borta();
       ask.borta();
       cig.borta();
+      stall.borta();
+      sticka.borta();
+      branda.borta();
+      tand.borta();
+      laga.borta();
       pen.borta();
       tidning.borta();
       glas.borta();
