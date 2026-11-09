@@ -3496,7 +3496,12 @@ ${window.RumRegister ? RumRegister.nara() : ''}
   function bladdra(steg) {
     const p = R.protokoll;
     const k = p && p.kork;
-    if (!k || p.ut || p.lyft || p.vand) return;
+    if (!k || p.ut || p.lyft) return;
+    // (ett tryck medan bladet glider väntar tills det har kommit fram)
+    if (p.vand) {
+      p.nasta = steg;
+      return;
+    }
     const x = k.lista[k.i - steg];
     const sum = x && korkSumma(x);
     if (!sum) return;
@@ -3529,7 +3534,12 @@ ${window.RumRegister ? RumRegister.nara() : ''}
       if (p.ut) return;
       byt();
       p.vand = p.b.animate([{ transform: sida(steg), opacity: 0 }, { transform: 'none', opacity: 1 }], { duration: 210, easing: 'cubic-bezier(0.2, 0.6, 0.3, 1)' });
-      p.vand.finished.then(() => { p.vand = null; }, () => {});
+      p.vand.finished.then(() => {
+        p.vand = null;
+        const n = p.nasta;
+        p.nasta = 0;
+        if (n) bladdra(n);
+      }, () => {});
     }, () => {});
   }
 
