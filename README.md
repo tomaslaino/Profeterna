@@ -1658,7 +1658,8 @@ config/tidning.js om sidan är äldre än tiden och minst tolv timmar gammal; n�
                  "kallor": [ { "source": "…", "title": "…", "url": "…", "publishedAt": null } ] } ] }
 ```
 
-`nr` är matchens nummer på kupongen. Tidningen i tobaksaffären trycker inte notiserna än.
+`nr` är matchens nummer på kupongen. Tidningen som Hasse Backe läser trycker notiserna på baksidan (se *Tidningen*
+under [Hasse Backe](#hasse-backe)).
 
 **Rösten** står i [prompts/analys-rost.md](prompts/analys-rost.md): Sixten Bråvall, en påhittad
 tränare med egen bakgrund i klubbar som inte finns och egna stående uttryck. Filen går att
@@ -5715,8 +5716,11 @@ läser rad för rad, tittar upp över kanten på en med höjda bryn och ler seda
 syns, nickar åt det som står, rycker den rak och tittar längs baren, och mellan gångerna lägger han den i knät bakom disken
 en stund (klippen `lasa` och `lasa2`, byggda av bitarna i `LASBIT` i [public/rum-hasse-3d.js](public/rum-hasse-3d.js)).
 Behöver han händerna, som när han slår en dom i disken, läser han klart raden och lägger ned den direkt. Förstasidan vänder
-sig mot en med en rubrik om hans egen omgång och hans porträtt rastrerat, och baksidan är tipsguiden (`RUBRIKER` och
-papperet i [public/rum-hasse-tidning.js](public/rum-hasse-tidning.js), samma rubrik för samma omgång). Dåligt är inte ett
+sig mot en med en rubrik om hans egen omgång och hans porträtt rastrerat (`RUBRIKER` och papperet i
+[public/rum-hasse-tidning.js](public/rum-hasse-tidning.js), samma rubrik för samma omgång). Baksidan är *Så mår
+tipslagen* (2026-11-09, användarens önskan): notiserna inför omgången ur `data/tidning.json`, som iMacen skriver med
+Claude-kontot (se *Tidningen inför omgången* under [Analyserna](#analyserna)), i två spalter och så stort som alla ryms
+(`notisSida`). Utan notiser, eller med en sida som är äldre än tio dagar, är baksidan tipsguiden som förut. Dåligt är inte ett
 rätt, sämst i gänget, eller rätten långt under vad chanserna var värda, med tävlingskupongen om han spelade och annars det han
 sa (`hansOmgang` och `efterat` i [public/rum-hasse.js](public/rum-hasse.js)); det gäller både när han säger hur det gick och
 när han dömer gänget. Med minskad rörelse läser han inte.
