@@ -3821,8 +3821,8 @@ och det är det som hackar mest. Med 4 GB minne eller 4 kärnor börjar det ett 
 eller 2 kärnor och med mjukvarugrafik på steg 3, och äldre grafikkretsar (Mali, Adreno, PowerVR, Intel
 HD/UHD) börjar på steg 1 eller 2. Safari säger inget om sådant, där får `kanna` känna efter. Går det under
 45 % av takten hoppar `kanna` direkt till steg 3. Kantutjämningen går inte att stänga av när
-grafiken väl har startat, så i datorn är den av när rummet börjar på steg 1 eller lägre (i telefonen
-på steg 2 eller lägre, `kantutjamning` i rum.js).
+grafiken väl har startat; den är på där duken är så gles att trappstegen syns (`kantutjamning` i rum.js,
+se *Jämnare kanter och jämnare takt* nedan).
 
 Steget sparas i webbläsaren (`rum-kval` i localStorage), så att nästa besök börjar där, i tre
 dagar. I telefonen börjar rummet på steg 1. `?rum-kval=0` (`1`, `2`, `3`) väljer steget och låser
@@ -4202,6 +4202,42 @@ datorn på steg 1 utan 3D 8,5 → 9,1 sammansättningar i sekunden. Med 128 MB r
 tillbaka saknas inga rutor i taket längre; det som ibland fattas är tv:ns sidor och anslagstavlan, gammal och ny kod lika.
 Bilderna (dag, kväll, regn, åska, frost och snö, telefon och dator på steg 0 och 1) är jämförda punkt för punkt: 48–67 dB,
 där det som skiljer är uret, Hasses hand och enstaka kanter. Inte provat i en riktig telefon.
+
+### Jämnare kanter och jämnare takt (2026-11-09)
+
+Användarens önskemål: "Förbättra grafiken på animationssidan … men att det flyter, flimrar och hackar mindre på
+begränsade grafikkort och äldre mobiler." Gänget i 3D är det som både ser sämst ut och kostar mest på en svag
+enhet, så de tre ändringarna gäller det:
+
+- **Kantutjämning där den behövs.** På steg 2 och 3 (och steg 1 i datorn) ritades gänget utan kantutjämning i en duk
+  med en bildpunkt per punkt eller glesare, i en telefon två–tre av skärmens bildpunkter: trappsteg längs huvuden,
+  armar och bordskanten, som kryper när gänget rör sig. Nu är den på på steg 0 och överallt där duken har högst 1,15
+  bildpunkter per punkt (`kantutjamning` i rum.js): alla steg i telefonen, alla steg på en skärm med täthet 1 och från
+  steg 2 med täthet 2. På steg 1 med täthet 2 är duken tät nog och stor nog att den kostar mer än den ger (där som
+  förut). Inte med mjukvarugrafik och inte på PowerVR. Den kostar efter dukens yta, och där är duken liten: mätt på
+  Apple M1 (som ritar i små rutor som telefonerna) 1080 × 420 bildpunkter 3,2–3,9 → 4,8–4,9 ms per bild på steg 2 och
+  1,5–1,8 → 2,3–2,4 ms på steg 3, 15 gånger i sekunden; på steg 1 med täthet 2 (2160 × 840) hade det varit 6,1–6,5 →
+  9,4–9,6 ms.
+- **Röken ur cigaretterna är en enda mesh** (`ROK` i rum-3d.js, som röken på pulten redan var): förut en sprite med
+  eget material per puff, ungefär 145 ritanrop i varje bild av gänget – på steg 3 mer än en tredjedel av alla (382 →
+  238), på steg 0 755 → 611 med skuggorna. I en svag telefon är det anropen som tar tiden, på huvudtråden och i
+  webbläsarens grafikprocess. Bilden är densamma (56,5 respektive 52,4 dB mot förut i två lägen, där det som skiljer är
+  uret och enstaka kanter).
+- **Skuggorna ritas i en egen bildruta.** Där skuggorna räknas om var andra–fjärde bild (steg 1 och 2) gjordes det i
+  samma bild som gänget, så att den bilden bar alla delar två gånger: 427–458 ritanrop mot 248–279 i de andra, i
+  jämn takt, och det är den bilden som blir för lång i en svag telefon. Nu räknas skuggkartan om för sig två
+  bildrutor senare, där inget annat ritas (`skuggaSen` i rum-3d.js): tyngsta bildrutan 458 → 249 anrop, skuggkartan
+  180 för sig. Lika mycket arbete totalt, men ingen bildruta bär allt. Skuggorna är från ställningen gänget just
+  ritades i och syns från nästa bild; de var redan upp till tre bilder gamla.
+
+Mätt i Chrome som telefon (412 × 870, täthet 2,625) med Apple M1:s grafik, gammal och ny kod om vartannat.
+Ritanropen är räknade i grafikanropen och är säkra. Tiderna på huvudtråden med processorn fyra gånger långsammare
+pekar åt samma håll (gängets bild på steg 1 i median ungefär 9,5 → 8,6 ms, 95:e percentilen 11,5–18,5 → 8,7–14,3) men
+datorn var belastad av annat under mätningen, så de är ungefärliga. Rummet och närbilderna (tv:n, tavlan, registret,
+videon) går utan fel som telefon på höjden och på tvären på steg 1–3 och som dator (1440 × 900 täthet 2, 1366 × 768
+täthet 1 på steg 1 och 2). Inte provat i WebKit och inte i en riktig gammal telefon: `matchfixarna.se/?rum-mat` ger
+siffrorna där. Prövat utan effekt: enklare filtrering av skuggorna (`PCFShadowMap`, samma tid på grafikkortet), och
+att slå ihop fler av gängets delar (de som är kvar rör sig var för sig eller har olika material).
 
 ### När något går fel i rummet
 
