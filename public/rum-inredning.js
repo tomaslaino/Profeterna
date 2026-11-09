@@ -1319,7 +1319,8 @@ export async function inredning(el, opt = {}) {
 
   // Uret går efter Stockholms tid, med samma klocka som utsikten (Vader.nu()
   // i vader.js, annars datorns klocka). Med ?rum-t står det på den tid det
-  // visade först.
+  // visade först, och den klockan står då still (på ?rum-klocka, annars när
+  // sidan laddades).
   const fUr = new Intl.DateTimeFormat('sv-SE', { timeZone: 'Europe/Stockholm', hour: 'numeric', minute: 'numeric', second: 'numeric', hourCycle: 'h23' });
   let off = null;
   let sekund = null;

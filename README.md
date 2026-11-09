@@ -2745,8 +2745,8 @@ länk där de möts, så att bara stället leder dit. Utan WebGL finns varken st
 svarvat hölje i mörk metall från väggen fram till ett glas som buktar lite, vit tavla med
 svarta streck, gulnad av röken, och visarna i var sitt lager – den röda sekundvisaren
 hoppar varje sekund. Det går efter Stockholms tid, med samma klocka som
-utsikten (`Vader.nu()` i vader.js, annars datorns klocka). Med `?rum-t` står det på den
-tid det visade först, och med `prefers-reduced-motion` syns inte sekundvisaren.
+utsikten (`Vader.nu()` i vader.js, annars datorns klocka). Med `?rum-t` står det still, på
+`?rum-klocka` eller när sidan laddades, och med `prefers-reduced-motion` syns inte sekundvisaren.
 
 Uret visar också hur länge det är kvar till spelstoppet, alltså den första avsparken i
 omgången som gänget tippar (`stopp`, från rum.js). I ett fönster vid sexan, som
@@ -3413,7 +3413,8 @@ ställningen och resultaten rättas med `gradeRow` (kupong.js), också med Dölj
 Rummet läser om datan varje minut medan det står öppet.
 
 **Bilder:** `?rum-t=<sekunder>` fryser klockan (figurerna, röken och CSS-animationerna
-står på samma tid), `?rum-mx=&rum-my=` (−1…1) kamerans läge,
+står på samma tid, och Stockholms klocka – uret, text-tv:n och utsikten – står på `?rum-klocka`,
+annars på när sidan laddades), `?rum-mx=&rum-my=` (−1…1) kamerans läge,
 `?rum-slit=0…1` slitaget, `?rum-dag=<tal>` dagen för sakerna och affischerna,
 `?rum-vecka=<tal>` veckan för löpsedelns plats och `?rum-rubrik=<typ>` en viss rubrik om den
 finns (`bast`, `samst`, `datorn`, `ledare`, `skrall`, `kross`, `kupong`, `rysaren`, `spiken`,
@@ -3443,6 +3444,12 @@ sätter `data-rum-klar` på `body` när allt är ritat. Vädret och klockan utan
 `halvklart`, `mulet`, `dimma`, `dugg`, `regn`, `skurar`, `snoblandat`, `sno` eller `aska`,
 `?rum-grader=<°C>`, `?rum-vind=<m/s>` och `?rum-snodjup=<cm>` (med både vädret och graderna
 hämtas inget).
+
+Samma adress med `?rum-t` och `?rum-klocka` ger samma bild, också med gänget: två laddningar är lika
+bildpunkt för bildpunkt när `data-rum-klar` är satt (provat 2026-11-09 i datorn och som telefon). Förut
+skilde text-tv:ns klocka, som gick på datorns tid också med `?rum-klocka` och inte stod still. Gatan
+står på den fasta tiden först när rummet är klart (upp till nio sekunder, medan vädret hämtas); en bild
+som tas före det visar gatan i rörelse.
 
 ### I telefonen
 
@@ -4535,7 +4542,7 @@ nisch: en grön sifferdisplay med sidnumret, knappsatsen med runda grå knappar 
 lampan, och under den FASTEXT – snabbvalen i fyra färger.
 
 **Text-tv som SVT:s:** 40 × 25 tecken (VT323, utan ligaturer), rubrikraden med sidnumret,
-*Matchfix Text*, datumet och klockan som tickar, ett blått band med rubriken i mosaikgrafik
+*Matchfix Text*, datumet och klockan som tickar (Stockholms klocka som uret och utsikten, `Vader.tid()`), ett blått band med rubriken i mosaikgrafik
 (gula klossar), sju färger, dubbelhöga rader och snabbvalen i rött, grönt, gult och
 cyanblått längst ner – samma fyra på alla sidor: *Matcher* (331), *Tabeller* (371),
 *Skyttar* (381) och *Innehåll* (300). Det som ett föremål har för ämne tänds när man pekar på
