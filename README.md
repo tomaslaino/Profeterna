@@ -932,6 +932,11 @@ bara lokalt. Analyserna visas som de ligger i `data/analyser.json`; hur de skriv
   uppifrån, och i baren står koppen lite längre bak med fatet på notans övre vänstra hörn som i rummet,
   så att Hasse B. syns. Fingertopparna på hans vänstra hand skars av vid dukens underkant; nu ryms de.
   Se [Hasse Backe](#hasse-backe), *Kaffet i rummet*.
+- **Samma papper på notan i rummet och i baren (2026-11-09, användarens önskemål):** "Kvittona ser lite
+  olika ut – pappret bland annat som här är lite mer rosa." I baren tog papperet neonskyltens röda färg,
+  och raderna från Kaffe och nedåt låg 17 px lägre än i rummet, utan pappersstrukturen. Nu ritas den efter
+  notan i rummet, med baslinjerna mätta där, och får bara ljusets styrka, inte dess färg. Se
+  [Hasse Backe](#hasse-backe).
 - **Hasse Backe spanar på din kupong (2026-11-08, användarens val):** ibland går blicken ned på kupongen,
   med sex olika miner, och när han har sagt vad han tycker om den passar minen orden. Se
   [Hasse Backe](#hasse-backe), *Vilan*.
@@ -4941,7 +4946,10 @@ ritas en gång på en egen duk under figuren (`diskBild`): benet framför honom 
 i skugga under den tjocka skivan. Träet speglar väggen bakom honom svagt: den
 speglade strålen träffar väggen, och där hämtas färgen ur väggens bild, suddigare ju längre strålen
 går; han själv speglas som en mörk form. Notan ligger under fatet,
-samma nota som på pulten (ritad på en duk med samma typsnitt), med den främre änden lite uppböjd.
+samma nota som på pulten, med den främre änden lite uppböjd. Den ritas på en duk efter notan i rummet
+(`#rum-hasse .nota` i rum.css): samma typsnitt, rader, vinklar och pappersstruktur, med baslinjerna mätta
+där. Den får barens ljus, men bara dess styrka, så att papperet har samma färg som på pulten och inte
+blir rosa av neonskylten.
 Figuren skuggar det som är under disken eller skyms av den (`BORD_GLSL` i
 [public/rum-hasse-arm.js](public/rum-hasse-arm.js)): framför diskens bakre kant det som är under
 ovansidan, bakom den det som strålen från kameran bara når genom disken. Kroppen slutar alltså vid
