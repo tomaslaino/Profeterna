@@ -1,0 +1,165 @@
+/* Tidningen bakom löpsedeln (rum-tidning.js, tidningen i rum.js): sedeln överst som framsida och sidorna
+   under, en under en, på samma papper. Platt papper som ritas en gång, utan skuggfilter och utan
+   blandningslägen, och medan den är framme står rummet still. Smal (under 470 px): en spalt. */
+.rum-tidningen { position: absolute; inset: 0; z-index: 60; display: flex; flex-direction: column; align-items: center; overflow: hidden auto; overscroll-behavior: contain; touch-action: pan-y; padding: 16px 12px 10px; box-sizing: border-box; background: rgba(9, 6, 3, 0.76); animation: tn-in 0.22s ease-out; }
+@keyframes tn-in { from { opacity: 0; } to { opacity: 1; } }
+.rum.smal .rum-tidningen { padding: 8px 10px 6px; }
+
+.tn { --k: 6; --p: #eeebe1; --rod: #d5141b; --svart: #17130e; --gra: #5b5248; --streck: rgba(23, 19, 14, 0.28); --serif: Georgia, Fraunces, "Times New Roman", serif; --sans: "Helvetica Neue", Arial, sans-serif;
+  flex: none; display: flex; flex-direction: column; gap: 14px; width: calc(var(--k) * 100px); color: var(--svart); font-family: var(--sans); cursor: default; animation: tn-upp 0.28s cubic-bezier(0.2, 0.7, 0.3, 1); }
+@keyframes tn-upp { from { transform: translateY(18px); } to { transform: none; } }
+@media (prefers-reduced-motion: reduce) { .rum-tidningen, .tn { animation: none; } }
+.tn.tid-sb { --p: #eebac6; --rod: #d0141d; --gra: #5e4a4e; }
+.tn-ark { position: relative; box-sizing: border-box; background: radial-gradient(circle at 50% 50%, rgba(40, 24, 8, 0.14) 0 0.6px, rgba(0, 0, 0, 0) 0.8px) 0 0 / 2.6px 2.6px, var(--p); box-shadow: 0 30px 70px rgba(0, 0, 0, 0.6); }
+.tn-sida { padding: 10px calc(var(--k) * 4px) 22px; scroll-margin-top: 10px; }
+.tn p { margin: 0; }
+/* sajtens egna stilar för rubriker, tabeller och knappar (style.css, theme.css) gäller inte på papperet */
+.tn h3, .tn h4 { margin: 0; padding: 0; border: 0; color: inherit; }
+.tn th, .tn td { border: 0; text-transform: none; letter-spacing: 0; vertical-align: middle; }
+.tn button:hover { border-color: transparent; color: inherit; }
+
+/* framsidan: löpsedeln (sedel i rum-affischer.js) med sin zoom, och innehållet under den */
+.tn .rt-sedel { position: relative; transform: none; filter: none; pointer-events: none; }
+/* samma täta raster som i rummet: sedeln är förstorad, men inte prickarna (de går vidare i papperet) */
+.tn .rt-sedel .tryck { background: linear-gradient(118deg, rgba(255, 246, 222, var(--blek, 0.15)), rgba(255, 246, 222, 0) 62%), radial-gradient(circle at 50% 50%, rgba(40, 24, 8, 0.14) 0 calc(0.6px / var(--k)), rgba(0, 0, 0, 0) calc(0.8px / var(--k))) 0 0 / calc(2.6px / var(--k)) calc(2.6px / var(--k)); }
+.tn-inne { display: flex; flex-wrap: wrap; align-items: center; gap: 4px 14px; margin: 0 calc(var(--k) * 4px); padding: 9px 0 13px; border-top: 3px solid var(--svart); font: 800 12px/1 var(--sans); letter-spacing: 0.08em; }
+.tn-inne > b { margin-right: 4px; }
+.tn-inne button { display: inline-flex; align-items: center; gap: 6px; min-height: 30px; padding: 0; border: 0; background: none; color: inherit; font: 700 14px/1 var(--serif); letter-spacing: 0; cursor: pointer; }
+.tn-inne button i { display: inline-grid; place-items: center; min-width: 19px; height: 19px; padding: 0 3px; box-sizing: border-box; background: var(--rod); color: #fff; font: 800 11px/1 var(--sans); font-style: normal; }
+@media (hover: hover) { .tn-inne button:hover span { text-decoration: underline; text-underline-offset: 3px; } }
+
+/* sidhuvudet: sidnumret ytterst, tidningens namn och datumet */
+.tn-folio { display: flex; align-items: baseline; gap: 10px; padding-bottom: 5px; border-bottom: 1px solid var(--svart); font: 600 10.5px/1 var(--sans); letter-spacing: 0.06em; text-transform: uppercase; color: var(--gra); }
+.tn-folio b { color: var(--svart); font: 400 17px/1 Anton, Impact, sans-serif; }
+.tn-folio span:last-child { margin-left: auto; }
+.tn-folio.h { flex-direction: row-reverse; }
+.tn-folio.h span:last-child { margin: 0 auto 0 0; }
+
+/* vinjetten: avdelningen i svart och det som gäller hela sidan till höger */
+.tn-vinjett { display: flex; align-items: center; justify-content: space-between; gap: 10px; margin: 12px 0 10px; border-bottom: 3px solid var(--svart); }
+.tn-vinjett b { padding: 5px 9px 3px; background: var(--svart); color: var(--p); font: 400 25px/1 Anton, Impact, sans-serif; letter-spacing: 0.03em; }
+.tn-vinjett span { font: 800 11.5px/1.2 var(--sans); letter-spacing: 0.08em; text-transform: uppercase; text-align: right; }
+.tn .tn-rub { margin: 4px 0 8px; font: 400 32px/1.02 Anton, Impact, sans-serif; text-transform: uppercase; letter-spacing: 0.01em; }
+.tn-rub.stor { font-size: 38px; text-transform: none; }
+.tn-rub.jatte { font-size: 54px; line-height: 0.96; }
+.tn-rub .rod, .tn .rod { color: var(--rod); }
+.tn-omgnamn { margin: -4px 0 10px; font: italic 400 15px/1.25 var(--serif); }
+.tn-ingress { margin: 0 0 10px !important; font: 400 15px/1.35 var(--serif); }
+.tn-ingress + .tn-spalter { padding-top: 10px; border-top: 1px solid var(--svart); }
+.tn-ingress.fet { font-weight: 700; font-size: 16px; }
+.tn-byline { margin: 0 0 10px; padding: 4px 0; border-top: 1px solid var(--streck); border-bottom: 1px solid var(--streck); font: 700 11.5px/1.2 var(--sans); letter-spacing: 0.04em; text-transform: uppercase; }
+.tn-kalla { margin-top: 4px; font: italic 400 11.5px/1.3 var(--serif); color: var(--gra); }
+.tn-kick { margin: 0 0 3px; font: 800 11px/1.3 var(--sans); letter-spacing: 0.06em; text-transform: uppercase; }
+.tn-kick b { display: inline-block; margin-right: 6px; padding: 1px 5px 0; background: var(--svart); color: var(--p); }
+.tn-rad-rub { display: flex; justify-content: space-between; gap: 10px; margin: 0 0 6px; padding-top: 6px; border-top: 3px solid var(--svart); font: 800 12.5px/1 var(--sans); letter-spacing: 0.08em; white-space: nowrap; }
+.tn-rad-rub span { font-weight: 600; letter-spacing: 0.03em; color: var(--gra); }
+
+/* Tipsligan under matcherna, så smal som den behöver */
+.tn-under { margin-top: 16px; max-width: 320px; }
+.tn.smal .tn-under { max-width: none; }
+
+/* två delar bredvid varandra, den första bredast */
+.tn-delad { display: grid; grid-template-columns: minmax(0, 1.6fr) minmax(0, 1fr); column-gap: 18px; row-gap: 16px; align-items: start; }
+.tn-delad.en { grid-template-columns: minmax(0, 1fr); }
+
+/* brödtexten: rak högerkant och avstavning, som i tidningen, och anfang i början */
+.tn-artikel { column-count: 2; column-gap: 18px; column-rule: 1px solid var(--streck); }
+.tn-artikel p { margin: 0 0 8px; font: 400 14.5px/1.4 var(--serif); text-align: justify; hyphens: auto; -webkit-hyphens: auto; }
+.tn-artikel:not(.kursiv) > p:first-child::first-letter { float: left; margin: 4px 6px 0 0; color: var(--rod); font: 400 3.15em/0.82 Anton, Impact, sans-serif; }
+.tn-artikel.kursiv p { font-style: italic; }
+.tn-tipsruta { break-inside: avoid; margin: 4px 0 8px; padding: 0 9px 8px; background: rgba(255, 255, 255, 0.28); border-bottom: 1px solid var(--streck); }
+.tn-tipsruta .tn-rad-rub { border-top-color: var(--rod); color: var(--rod); }
+.tn-tecken { display: flex; align-items: baseline; gap: 9px; margin: 2px 0 6px !important; }
+.tn-tecken b { font: 400 44px/1 Anton, Impact, sans-serif; }
+.tn-tecken em { font: italic 400 14px/1.2 var(--serif); }
+.tn-tipsruta p:last-child { font: 400 13px/1.38 var(--serif); text-align: left; }
+
+/* tabellerna: matcherna och Tipsligan */
+.tn-tabell, .tn-liga table { width: 100%; border-collapse: collapse; font: 400 13px/1.2 var(--sans); font-variant-numeric: tabular-nums; }
+.tn .tn-tabell th, .tn .tn-liga th { padding: 0 3px 4px; font: 800 10.5px/1.1 var(--sans); letter-spacing: 0.05em; text-transform: uppercase; text-align: center; color: var(--gra); white-space: nowrap; }
+.tn-tabell tr.sm th { padding-top: 0; }
+.tn .tn-tabell td, .tn .tn-liga td { padding: 4px 3px; border-top: 1px dotted rgba(23, 19, 14, 0.45); text-align: center; vertical-align: middle; }
+.tn .tn-tabell td.tn-nr { width: 1.4em; padding-left: 0; font-weight: 800; text-align: left; }
+.tn .tn-tabell td.tn-match { text-align: left; }
+.tn-match span { font-weight: 700; }
+.tn-match small { display: block; margin-top: 1px; font-size: 11px; color: var(--gra); }
+.tn-p { width: 2.3em; }
+.tn-p.max { font-weight: 800; }
+.tn .tn-tabell td.tn-tk { width: 2.4em; font: 400 18px/1 Anton, Impact, sans-serif; }
+.tn-res { width: 2.6em; font-weight: 800; white-space: nowrap; }
+.tn-ratt { width: 2.2em; color: var(--gra); }
+.tn-rattrad { display: flex; flex-wrap: wrap; align-items: center; gap: 6px 10px; margin-top: 10px; padding-top: 8px; border-top: 3px solid var(--svart); }
+.tn-rattrad b { font: 800 12.5px/1 var(--sans); letter-spacing: 0.08em; }
+.tn-rattrad span { display: flex; flex-wrap: wrap; gap: 3px; }
+.tn-rattrad i { display: inline-grid; place-items: center; width: 20px; height: 24px; border: 1.5px solid var(--svart); font: 400 16px/1 Anton, Impact, sans-serif; font-style: normal; }
+.tn .tn-liga td { padding: 3px 3px; }
+.tn .tn-liga td.tn-plac { width: 1.4em; padding-left: 0; font-weight: 800; text-align: left; }
+.tn .tn-liga td.tn-namn { font-weight: 700; text-align: left; white-space: nowrap; }
+.tn-liga td.tn-pts { font-weight: 800; }
+.tn-liga i { margin-left: 5px; font-size: 9px; font-style: normal; vertical-align: 1px; }
+.tn-liga i.upp { color: #1d7a3f; }
+.tn-liga i.ned { color: var(--rod); }
+
+/* faktarutan: i två spalter där det finns plats */
+.tn-fakta { margin-top: 14px; padding: 0 10px 9px; background: rgba(23, 19, 14, 0.07); }
+.tn-fakta > div { column-count: 2; column-gap: 18px; }
+.tn.smal .tn-fakta > div { column-count: 1; }
+.tn-fakta > b { display: block; margin: 0 -10px 7px; padding: 6px 10px 5px; background: var(--rod); color: #fff; font: 800 12.5px/1 var(--sans); letter-spacing: 0.08em; }
+.tn-fakta p { break-inside: avoid; margin: 0 0 6px; font: 400 13px/1.32 var(--sans); }
+.tn-fakta p:last-child { margin-bottom: 0; }
+
+/* notiserna: två spalter med streck emellan */
+.tn-spalter { column-count: 2; column-gap: 18px; column-rule: 1px solid var(--streck); }
+.tn-notis { break-inside: avoid; margin: 0 0 13px; padding-bottom: 11px; border-bottom: 1px solid var(--streck); }
+.tn .tn-notis h4 { margin: 0 0 4px; font: 700 18px/1.12 var(--serif); }
+.tn-notis > p:not(.tn-kick):not(.tn-kalla) { font: 400 14px/1.38 var(--serif); text-align: justify; hyphens: auto; -webkit-hyphens: auto; }
+
+/* veckans bilder i notisen: hemma och borta bredvid varandra, lagets namn på en mörk list i underkanten */
+.tn-bilder { display: grid; grid-template-columns: 1fr 1fr; gap: 3px; margin: 0 0 7px; }
+.tn-bilder figure { position: relative; margin: 0; }
+.tn-bilder .tn-foto { aspect-ratio: 16 / 10; }
+.tn-bilder .tn-foto.skold { background: #fff; }
+.tn-bilder figcaption { position: absolute; left: 0; bottom: 0; max-width: 100%; box-sizing: border-box; padding: 2px 6px 1px; overflow: hidden; background: rgba(23, 19, 14, 0.82); color: #fff; font: 800 10px/1.3 var(--sans); letter-spacing: 0.05em; text-transform: uppercase; white-space: nowrap; text-overflow: ellipsis; }
+
+/* betygen */
+.tn-betygen { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); column-gap: 18px; row-gap: 14px; }
+.tn-betyg-kort { display: grid; grid-template-columns: 88px minmax(0, 1fr); column-gap: 10px; align-items: start; padding-bottom: 12px; border-bottom: 1px solid var(--streck); }
+.tn-foto { display: block; width: 100%; aspect-ratio: 1; background: #cfc8b8; }
+.tn-nm { display: flex; align-items: center; justify-content: space-between; gap: 6px; font: 400 23px/1 Anton, Impact, sans-serif; text-transform: uppercase; letter-spacing: 0.02em; }
+.tn-boll { display: inline-grid; grid-auto-flow: column; grid-auto-columns: 12px; flex: none; }
+.tn-boll i { display: block; box-sizing: border-box; width: 10px; height: 10px; border-radius: 50%; border: 1.4px solid var(--svart); }
+.tn-boll i.on { background: var(--rod); border-color: var(--rod); }
+.tn-stat { display: flex; flex-wrap: wrap; gap: 0 9px; margin: 5px 0 4px !important; font: 400 12.5px/1.2 var(--sans); }
+.tn-stat b { font-weight: 800; }
+.tn-om { font: 400 13.5px/1.3 var(--serif); }
+
+/* skrällen och citaten */
+.tn-skrall { margin-bottom: 14px; }
+.tn-citat { display: grid; grid-template-columns: 44px minmax(0, 1fr); column-gap: 10px; margin: 0 0 12px; }
+.tn-citat .tn-foto { grid-row: span 2; width: 44px; border-radius: 50%; }
+.tn-citat p { font: italic 400 18px/1.25 var(--serif); }
+.tn-cit-fot { margin-top: 3px; font: 400 12px/1.3 var(--sans); color: var(--gra); }
+.tn-cit-fot b { color: var(--svart); }
+
+/* krönikan */
+.tn-kronika .tn-foto.hasse { float: left; width: 76px; height: auto; aspect-ratio: 200 / 260; margin: 4px 12px 6px 0; }
+.tn-kronika .tn-rub { margin-top: 2px; }
+.tn-kronika .tn-artikel { column-count: 1; clear: both; }
+.tn-kronika .tn-byline { margin-bottom: 8px; }
+
+.tn-tillbaka { flex: none; margin-top: 8px; min-height: 40px; padding: 0 10px; border: 0; background: none; color: #bcd0f5; font: 500 17px/40px Fraunces, Georgia, serif; text-decoration: underline; text-underline-offset: 4px; text-decoration-thickness: 1px; cursor: pointer; }
+@media (hover: hover) { .tn-tillbaka:hover { color: #d3e3ff; } }
+
+/* smalt (telefonen): en spalt, och lite mindre rubriker */
+.tn.smal { gap: 10px; }
+.tn.smal .tn-sida { padding: 8px 14px 18px; }
+.tn.smal .tn-inne { margin: 0 14px; }
+.tn.smal .tn-delad, .tn.smal .tn-betygen { grid-template-columns: minmax(0, 1fr); }
+.tn.smal .tn-artikel, .tn.smal .tn-spalter { column-count: 1; }
+.tn.smal .tn-rub { font-size: 27px; }
+.tn.smal .tn-rub.stor { font-size: 31px; }
+.tn.smal .tn-rub.jatte { font-size: 42px; }
+.tn.smal .tn-vinjett b { font-size: 21px; }
+.tn.smal .tn-tabell { font-size: 12.5px; }
+.tn.smal .tn-p { width: 2em; }
+.tn.smal .tn-betyg-kort { grid-template-columns: 76px minmax(0, 1fr); }
