@@ -709,7 +709,7 @@ export async function figuren(duk, { hog = false, latt = false, pr = 1 } = {}) {
     }
     notaG.computeVertexNormals();
   }
-  // I barens ljus, men bara dess styrka och dagsljusets färg (ljusVitt i rum-hasse-arm.js): papperet är vitt
+  // I barens ljus, men bara dess styrka och dagsljusets färg (ljusDag i rum-hasse-arm.js): papperet är vitt
   // som på pulten i rummet och skiftar med dagsljuset som där. (Med neonskyltens röda och ett rött tillägg
   // blev papperet rosa, 2026-11-09.)
   const nota = new THREE.Mesh(notaG, new THREE.ShaderMaterial({
@@ -718,7 +718,7 @@ export async function figuren(duk, { hog = false, latt = false, pr = 1 } = {}) {
     vertexShader: 'varying vec2 vUv; varying vec3 vN; void main() { vUv = uv; vN = mat3(modelMatrix) * normal; gl_Position = projectionMatrix * viewMatrix * modelMatrix * vec4(position, 1.); }',
     fragmentShader: `precision highp float; uniform sampler2D uT; varying vec2 vUv; varying vec3 vN;
     ${LJUS}
-    void main() { vec4 c = texture2D(uT, vUv); if (c.a < .02) discard; vec3 n = normalize(vN); gl_FragColor = vec4(c.rgb * ton(ljusVitt(n)), c.a); }`,
+    void main() { vec4 c = texture2D(uT, vUv); if (c.a < .02) discard; vec3 n = normalize(vN); gl_FragColor = vec4(c.rgb * ton(ljusDag(n)), c.a); }`,
   }));
   // på pulten, med fatet på dess övre vänstra hörn (NOTAN ovan)
   nota.position.fromArray(NOTAN.mitt);
