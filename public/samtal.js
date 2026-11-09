@@ -2135,8 +2135,7 @@
   // de andras tips och kan göra gängets kupong, som uppgörelsen här (board),
   // efter = dina kommentarer i efterhand ({matchens id: text}),
   // bort och matcher = Ta bort och Ändra matcherna går (finstilen här), och
-  // go = guldordet bredvid ('' när du har lämnat in och inte ser någon
-  // annans tips – din kupong i högen tas i handen med ett klick).
+  // klocka = pingklockan står bredvid kupongen i tobaksaffären (till uppgörelsen).
   const draftOf = (s, v) => {
     const d = kpLoad(TIPS);
     return d && d.id === s.id && !d.inne && (!d.vem || d.vem === v) ? d : null;
@@ -2170,8 +2169,7 @@
         efter: Object.fromEntries(Object.entries((v && s.efter && s.efter[v]) || {}).map(([m, x]) => [m, x.text])),
         bort: !s.visas && !s.gang.some((g) => g.inne && g.id !== v),
         matcher: !s.visas && !s.gang.some((g) => g.inne),
-        go: !open ? (s.visas && before ? 'Till uppgörelsen' : 'Följ kupongen')
-          : inne ? (gang ? 'Till uppgörelsen' : '') : n ? 'Fyll i resten' : '',
+        klocka: !open ? Boolean(s.visas && before) : Boolean(inne && gang),
       };
     },
     // Du kryssar för vem du är; kryssen och motiveringarna på kupongen följer med.

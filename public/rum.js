@@ -499,7 +499,7 @@ window.Rum = (() => {
   // som ritar disken där med disk).
   const vid = (part) => (window.RumVideo ? RumVideo.html(part, { disk }) : '');
 
-  // Pingklockan på pulten, där guldordet annars står: till uppgörelsen ringer
+  // Pingklockan på pulten bredvid kupongen: till uppgörelsen ringer
   // man in gänget. Kupan i mässing speglar lysröret och lite av neonskylten.
   const bell = () => `<svg width="104" height="88" viewBox="0 0 104 88" aria-hidden="true"><defs>
     <radialGradient id="rum-kl-kupa" cx=".34" cy=".28" r=".85"><stop offset="0" stop-color="#fff7dc"/><stop offset=".16" stop-color="#f3d488"/><stop offset=".45" stop-color="#c8963a"/><stop offset=".78" stop-color="#7a5216"/><stop offset="1" stop-color="#3c2706"/></radialGradient>
@@ -531,7 +531,7 @@ window.Rum = (() => {
   function paper() {
     return '<span id="rum-hogen"></span>' +
       `<a id="rum-kupong" class="rum-flat rum-kup rum-sak" ${KNAPP} data-nav="kupong" aria-label="Kupong"></a>` +
-      `<a class="rum-tag" ${KNAPP} data-nav="kupong" id="rum-tag" hidden></a>`;
+      `<a class="rum-tag rum-klocka" ${KNAPP} data-nav="kupong" id="rum-tag" aria-label="Till uppgörelsen" hidden>${bell()}</a>`;
   }
 
   // Hasse Backe sitter i baren utanför bilden till vänster: längst ut på
@@ -1890,27 +1890,10 @@ ${window.RumRegister ? RumRegister.nara() : ''}
     R.vem = vemInne(rd, rows, t, p);
     if (R.fig && R.fig.inne) R.fig.inne(R.vem, now());
     gangTv(rd, rows, t, p);
-    const started = rows.length && Math.min(...rows.map((x) => Date.parse(x.m.kickoff))) <= t;
+    // bredvid kupongen står bara pingklockan, till uppgörelsen – inga ord som
+    // säger vad man ska göra: kupongen och protokollet tas med ett klick på dem
     const tag = document.getElementById('rum-tag');
-    if (tag) {
-      const go = R.summa ? 'Läs protokollet' : p ? p.go : started ? 'Följ kupongen' : '';
-      // till uppgörelsen står pingklockan där i stället för guldordet
-      if (tag.dataset.go !== go) {
-        const klocka = go === 'Till uppgörelsen';
-        tag.dataset.go = go;
-        tag.className = klocka ? 'rum-tag rum-klocka' : 'rum-tag';
-        if (klocka) {
-          tag.innerHTML = bell();
-          tag.setAttribute('aria-label', go);
-          tag.title = go;
-        } else {
-          tag.textContent = go;
-          tag.removeAttribute('aria-label');
-          tag.removeAttribute('title');
-        }
-      }
-      tag.hidden = !go;
-    }
+    if (tag) tag.hidden = !(p && p.klocka && !R.summa);
     set('rum-skar', skarHtml(liga()));
     const seen = ((TP.season && TP.season.rounds) || []).filter((r) => typeof tpRoundHidden !== 'function' || !tpRoundHidden(r));
     // dagen efter: hur det gick i den senaste kupongen (rum-folk.js)
@@ -5097,7 +5080,7 @@ ${window.RumRegister ? RumRegister.nara() : ''}
         sak(null);
         return;
       }
-      // guldordet: kupongen i handen, annars går kameran fram till den
+      // pingklockan: gängets kupong i handen, annars går kameran fram till den
       if (e.target.closest('.rum-tag')) {
         e.preventDefault();
         if (!openCoupon()) sak('kupong');

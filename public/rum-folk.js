@@ -240,7 +240,7 @@ window.RumFolk = (() => {
   // Vem i gänget syns under punkten (x, y) i fönstret?
   function vemUnder(x, y, mal = null) {
     const f = fig();
-    // (guldordet och det som ligger på pulten är framför gängets ben, som står bakom pulten)
+    // (pingklockan och det som ligger på pulten är framför gängets ben, som står bakom pulten)
     if (mal && mal.closest && mal.closest('.rum-tag, #rum-kupong')) return null;
     const c = F.el && F.el.querySelector('#rum-3d');
     if (!f || !f.under || !c || F.o.nara()) return null;
@@ -262,7 +262,7 @@ window.RumFolk = (() => {
     if (!p || !(p.byt || []).includes(g.id) || !Samtal.pult.vem(g.id)) return null;
     const f = fig();
     if (f && f.vald) f.vald(k, F.o.now());
-    // kupongen på pulten, namnet, stämpeln och guldordet efter vem du är
+    // kupongen på pulten, namnet, stämpeln och pingklockan efter vem du är
     const ms = window.Rum && Rum.skriv ? Rum.skriv() : 0;
     vemKoll();
     egen();

@@ -748,6 +748,12 @@ bara lokalt. Analyserna visas som de ligger i `data/analyser.json`; hur de skriv
   en ny flik, så att rummet står kvar. Samma dag lades de tre kupongerna på varandra i
   uppgörelsen, gängets penna blev svart och pennan ringar in de omtvistade matcherna. Se
   *Kupongen i handen* under [Tobaksaffären](#tobaksaffären).
+- **Inga förklarande ord i tobaksaffären (2026-11-09, användarens beslut):** rummet ska vara
+  intuitivt. Guldordet bredvid kupongen på pulten (*Läs protokollet*, *Fyll i resten*, *Följ
+  kupongen*) är borta: kupongen och protokollet tas fram med ett klick på dem eller K. Kvar
+  bredvid kupongen är bara pingklockan till uppgörelsen, som är en sak i rummet och inte en
+  text. Inga nya ord eller länkar läggs bredvid sakerna för att säga vad de gör. Se
+  [Tobaksaffären](#tobaksaffären).
 - **Uppgörelsen visar det vi är oeniga om (2026-11-07, användarens önskemål):** "Här är det ju
   meningen att vi ska diskutera de matcher som vi är oense om. Det ser ut som att du redan har
   ordnat med allt." Pennan ringade bara in matcher där vi inte hade något tecken gemensamt, och med
@@ -934,7 +940,7 @@ bara lokalt. Analyserna visas som de ligger i `data/analyser.json`; hur de skriv
 - **Bara protokollet på pulten, och nästa kupong måndag kl. 16 (2026-11-08, användarens önskemål):** "Ta bort
   kupong 3 där nu när allt är klart - ha bara protokollet", och "Den nya kupongen kan dyka upp från och med
   måndagen efter tippningsdagen", "Måndag kl 16". Kupongen låg kvar under protokollet och Stryktipset tog över redan
-  när Svenska Spel öppnade det, senast måndag kl. 07. Nu ritas bara bladet på pulten (`couponHtml`), och guldordet,
+  när Svenska Spel öppnade det, senast måndag kl. 07. Nu ritas bara bladet på pulten (`couponHtml`), och
   K och klick som tog kupongen i handen tar fram protokollet (`openCoupon`). Tjänsten väntar med veckans Stryktips
   till måndagen efter omgången kl. 16 (`nyKupongFran`), så att hela sajten byter samtidigt. Bara efter en omgång som slutar
   högst tre dygn före den måndagen: en omgång mitt i veckan stoppar inte helgens Stryktips. Eftersom en analystid bara gäller
@@ -2564,7 +2570,7 @@ Enter och mellanslag klickar på dem. En match på text-tv:n lägger fram matchb
   färdigspelade kupongerna (`Historik.coupons`) rättade med röd penna, en med kaffering.
   Tom tills den första är färdigspelad.
 - **Kupongen**: kupongen tas i handen (se nedan), och när den inte går att ta i
-  handen går kameran fram till den på pulten (också med K och guldordet).
+  handen går kameran fram till den på pulten (också med K).
   Kupongen är samma kupong som papperet under Kupong, i
   kupongens mått (660 × 470): bandet, under det stämpeln (vem omgången väntar på) och
   spelstoppet, namnet för hand och 1 X 2 överst, en rad per
@@ -2578,10 +2584,9 @@ Enter och mellanslag klickar på dem. En match på text-tv:n lägger fram matchb
   ser de andras tips ligger gängets kupong där, med gängets kryss med kulspetspenna,
   allas porträtt i rutorna och allas namn överst (uppgörelsen). Allt man
   gör med kupongen tas i handen, utan att man lämnar rummet (se
-  [Kupongen i handen](#kupongen-i-handen)). Guldordet bredvid säger vad som väntar: *Fyll i
-  resten* när du har börjat kryssa, *Följ kupongen* när matcherna har börjat och annars
-  inget alls – en tom kupong tas i handen med ett klick på den, och har du lämnat in tas
-  din kupong i högen på samma sätt. När du ser de andras tips står en pingklocka i mässing där i stället för ordet:
+  [Kupongen i handen](#kupongen-i-handen)). Inget ord bredvid säger vad man ska göra: kupongen
+  tas i handen med ett klick på den, och har du lämnat in tas din kupong i högen på samma sätt.
+  När du ser de andras tips innan matcherna har börjat står en pingklocka i mässing bredvid:
   man ringer in gänget till uppgörelsen.
 - **Högen** till höger om kupongen: de som har lämnat in har lagt sin kupong där med
   baksidan upp, i den ordning de lämnade in (den senaste överst) – porträttet under ett gem,
@@ -3015,7 +3020,7 @@ namnen på kupongen (`Samtal.pult.vem`), och utkastet följer med. Pennan på pu
 namnet på kupongen på pulten (`Rum.skriv`, `skrivNamn` i rum.js), i personens bläck och egen
 handstil: Laino i Cedarville Cursive, Tejder i Mr Dafoe och Johansson i Reenie Beanie. Det
 ersätter porträtten överst på kupongen här i rummet; på papperet under Kupong är de kvar.
-Stämpeln och guldordet ritas om efter vem du är. Den som valdes lyfter kupongen mot en och
+Stämpeln och pingklockan ritas om efter vem du är. Den som valdes lyfter kupongen mot en och
 sprattlar med benen medan de andra vänder sig mot hen, och efter två sekunder lutar hen sig
 över kupongen och skriver ivrigt, rad för rad, innan hen efter knappt sex sekunder är
 tillbaka i väntan. Sidan kopplar upp sig mot profeterna-rummet på nytt, så att de andra ser
@@ -3299,7 +3304,7 @@ fönstret, och scenen räcker inte till fönstrets höjd. Därför är `.rum-sta
 (`.rum-tak`) och pulten (`.rum-pult-mer`, resten av träet) fortsätter utanför scenen, lite tak över och mest pult
 under (`pan`); ljuset (`.rum-warm`, `.rum-vign`) och nattens mörker (rum-folk.css) räcker lika långt, och
 medan lysröret tänds täcker `.rum-mork-ut` det som är utanför. Man står vid gänget när man kommer in (`HEM_SMAL`,
-`R.pxHem`, som kameran också vrids från), kupongen ligger under dem (`kupX`) och guldordet ligger under
+`R.pxHem`, som kameran också vrids från), kupongen ligger under dem (`kupX`) och pingklockan står under
 kupongen, där tummen är. Pennan vilar nedanför raderna i stället för på rad 9–10. Gänget
 är ungefär en fjärdedel mindre på skärmen, och duken har därför färre bildpunkter med samma skärpa (`PR`
 i rum-3d.js, 1,2 i stället för 1,5). Vad det kostar: se *Mätt 2026-11-08* i [Ljuset efter klockan](#ljuset-efter-klockan).
@@ -4040,7 +4045,7 @@ handen: fylla i, skriva motiveringar, spara, lämna in, ändra och ångra, läsa
 kuponger, skriva kommentarer i efterhand, göra gängets kupong i uppgörelsen, ändra
 matcherna och ta bort omgången – med samma kod och samma tjänst som papperet
 (`Samtal.pult` i [public/samtal.js](public/samtal.js)). Kupongen på pulten tas i handen med
-ett klick på den, på guldordet eller K. Den lossnar från pulten,
+ett klick på den eller K. Den lossnar från pulten,
 lyfter, vänds upp mot betraktaren och förstoras till mitten av fönstret (så stor som får
 plats mellan namnet och orden under den), svänger en aning förbi och stannar; rummet mörknar
 bakom, kameran ställer sig rakt framför, och pennan följer med och rullar undan till
@@ -4088,7 +4093,7 @@ kryssat och skrivit står kvar på pulten och där; ett utkast utan namn blir di
 säger vem du är.
 
 **Din kupong ur högen.** Har du redan lämnat in tas din kupong ur högen i stället – med ett
-klick på den, på kupongen på pulten, på guldordet eller K (så länge du bara ser dina egna
+klick på den, på kupongen på pulten eller K (så länge du bara ser dina egna
 tips): den lyfts, vänds över långsidan på vägen upp (innehållet byts när den står på kant)
 och stannar i handen med dina kryss och motiveringar, ditt porträtt inringat och stämpeln
 *Inlämnad* bredvid stämpeln om vem omgången väntar på. *Lägg tillbaka* och inlämningen
@@ -4118,8 +4123,8 @@ kommentarer i efterhand, hens porträtt inringat och stämpeln *Inlämnad*, men 
 ändra – bara *Lägg tillbaka*. Innan dess går den inte att vända (se Högen ovan).
 
 **Uppgörelsen.** När du ser de andras tips (som när papperet visar underlaget) ligger gängets
-kupong på pulten, och pingklockan där guldordet annars står (eller *Följ kupongen* när
-matcherna har börjat), kupongen eller K tar den i handen – klockan lyser när man pekar på
+kupong på pulten, och innan matcherna har börjat står pingklockan bredvid. Klockan, kupongen
+eller K tar den i handen – klockan lyser när man pekar på
 den och plingar när kupongen tas upp (`bell` och `pling` i rum.js). Gängets kupong är de tre
 kupongerna lagda på varandra (2026-11-07): i varje ruta står var och ens kryss kvar, litet och
 i ens bläck (blått Laino, grönt Tejder, lila Johansson, som namnen överst), på sin plats i
@@ -5622,7 +5627,7 @@ person längst ner (ändrat 2026-11-08). I telefonen försvinner namnen under po
 (han tävlar från omgången efter 2026-11-07) står det han sa vid disken i hans spalt, utanför tävlingen
 (`Tippoang.hasseSagt`, samma regel som hans kupong: det ska vara skrivet före avspark).
 
-Ett klick på blocket, guldordet *Läs protokollet* eller K lyfter det från pulten och lägger fram det stort över rummet, och *Lägg tillbaka*, Esc eller ett
+Ett klick på blocket eller K lyfter det från pulten och lägger fram det stort över rummet, och *Lägg tillbaka*, Esc eller ett
 klick utanför lägger tillbaka det (`protokollet` i rum.js). Ett klick på
 löpsedeln i fönstret öppnar tidningen: överst samma sedel som i fönstret, förstorad (`sedel` i rum-affischer.js kopierar
 papperet, så att de inte kan bli olika), och under den betygen, skrällen och hans krönika (`tidningen` i rum.js). Gänget håller upp skyltar med sina rätt (`lappar` i rum-3d.js), medan resten av figuren lever som
