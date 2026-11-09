@@ -12,7 +12,9 @@
 //     sparas de andra, en gammal analys ligger kvar tills en ny finns, och nästa
 //     körning försöker igen med högst perMatch försök per tid.
 //   - Tidningen inför omgången (Hasse Backe läser den): en notis per match i
-//     data/tidning.json, när omgången kommer och sedan på tiderna i config/tidning.js.
+//     data/tidning.json, när omgången kommer och sedan på tiderna i config/tidning.js,
+//     med en bild från veckan per lag (src/analyser/tidning-bilder.mjs, utan Claude).
+//     Bilderna läggs i grenen tidning-bilder, en enda commit som skrivs över.
 //   - Kommentarerna till färdiga kuponger: i data/kupong-historik.json.
 //
 // Publicering: varje färdig text sparas först i vantande.json utanför repot, sedan
@@ -28,6 +30,8 @@
 //   node scripts/analyser/skriv.mjs --torrt              visar vad som skulle göras
 //   node scripts/analyser/skriv.mjs --tvinga             skriver om omgångens analyser
 //   node scripts/analyser/skriv.mjs --tidning            bara tidningen, oavsett tid
+//   node scripts/analyser/skriv.mjs --tidning-bilder     bara veckans bilder till tidningen
+//                                                        som finns, utan Claude
 
 import { createRequire } from 'node:module';
 import { execFileSync } from 'node:child_process';
@@ -44,6 +48,7 @@ import { skrivHasse, hasseKlar } from '../../src/analyser/hasse.mjs';
 import { skrivNamn, namnNyckel } from '../../src/analyser/namn.mjs';
 import { skrivKommentar } from '../../src/analyser/kommentar.mjs';
 import { skrivTidning, attSkrivaTidning } from '../../src/analyser/tidning.mjs';
+import { veckansBilder, lagenI } from '../../src/analyser/tidning-bilder.mjs';
 import { attSkriva } from '../../src/analyser/tider.mjs';
 
 const require = createRequire(import.meta.url);
@@ -59,6 +64,7 @@ const TORRT = flagga('--torrt');
 const TVINGA = flagga('--tvinga');
 const EN_MATCH = varde('--en-match');
 const BARA_TIDNING = flagga('--tidning');
+const BARA_BILDER = flagga('--tidning-bilder');
 const UT = varde('--ut');
 
 const HEM = os.homedir();
@@ -330,6 +336,77 @@ async function namnet(round) {
   }
 }
 
+// ---------- tidningens bilder ----------
+
+// Grenen med bilderna: en enda commit med filerna, som skrivs över varje gång (som rösten i
+// grenen rost), så att main inte växer och förra veckans bilder inte ligger kvar. Workflowen
+// hämtar den till data/tidning-bilder/. → commitens id
+const BILDGREN = 'tidning-bilder';
+function bildGrenen(mapp, filer, vad) {
+  const kor = (args, { env, input } = {}) => execFileSync('git', args, {
+    cwd: ROOT, encoding: 'utf8', timeout: 180000, input, maxBuffer: 64 * 1024 * 1024,
+    env: env ? { ...process.env, ...env } : process.env,
+    stdio: [input == null ? 'ignore' : 'pipe', 'pipe', 'pipe'],
+  }).trim();
+  const index = path.join(TILLSTAND, `bild-index${process.pid}`);
+  fs.rmSync(index, { force: true });
+  try {
+    const ider = kor(['hash-object', '-w', '--stdin-paths'], { input: `${filer.map((f) => path.join(mapp, f)).join('\n')}\n` }).split('\n');
+    kor(['update-index', '--add', '--index-info'], { env: { GIT_INDEX_FILE: index }, input: filer.map((f, i) => `100644 ${ider[i]}\t${f}\n`).join('') });
+    const trad = kor(['write-tree'], { env: { GIT_INDEX_FILE: index } });
+    const commit = kor(['commit-tree', trad, '-m', vad]);
+    kor(['push', '-q', '-f', 'origin', `${commit}:refs/heads/${BILDGREN}`]);
+    return commit;
+  } finally {
+    fs.rmSync(index, { force: true });
+  }
+}
+
+// Omgångens matchfiler ur den publicerade sajten: match-id → data/match/<id>.json.
+async function matchfilerna(round) {
+  const list = await Promise.all(round.matcher.map((x) => fardata(`match/${x.id}.json`).catch(() => null)));
+  return Object.fromEntries(round.matcher.map((x, i) => [String(x.id), list[i]]).filter(([, d]) => d));
+}
+
+// En bild från veckan per lag i tidningen (src/analyser/tidning-bilder.mjs): lagen i
+// notiserna (lag: [hemma, borta]) och bilderna (bilder: [{fil, kalla, foto, sida} | null, …]).
+// Med --publicera hamnar filerna i grenen tidning-bilder; går den inte att pusha blir det inga
+// bilder, och sidan visar lagens sköldar.
+async function tidningensBilder(t, details) {
+  const par = t.notiser.map((n) => lagenI(n, details));
+  t.notiser.forEach((n, i) => { n.lag = par[i]; delete n.bilder; });
+  if (TORRT) return;
+  const mot = {};
+  const kallor = {};
+  for (const [i, [a, b]] of par.entries()) {
+    if (!a || !b) continue;
+    mot[a] = b;
+    mot[b] = a;
+    kallor[a] = kallor[b] = t.notiser[i].kallor || [];
+  }
+  try {
+    const skoldar = await fardata('skoldar.json').catch(() => null);
+    const espnId = Object.fromEntries(Object.entries((skoldar && skoldar.lag) || {}).map(([k, v]) => [k, v[0]]));
+    const mapp = path.join(PUBLICERA ? TILLSTAND : dataDir, 'tidning-bilder');
+    fs.rmSync(mapp, { recursive: true, force: true });
+    const t0 = Date.now();
+    const bilder = await veckansBilder(par.flat(), { mapp, espnId, kallor, mot, logg: PUBLICERA ? () => {} : logg });
+    const lag = par.flat().filter(Boolean).length;
+    if (!bilder.size) { logg(`bilder: inga av ${lag} lag fick en bild`); return; }
+    if (PUBLICERA) {
+      const commit = bildGrenen(mapp, [...bilder.values()].map((b) => b.fil), `Tidningens bilder: ${t.omgang}, ${bilder.size} lag`);
+      logg(`grenen ${BILDGREN} pushad (${commit.slice(0, 7)})`);
+    }
+    t.notiser.forEach((n, i) => {
+      n.bilder = par[i].map((x) => { const b = bilder.get(x); return b ? { fil: b.fil, kalla: b.kalla, foto: b.foto, sida: b.sida } : null; });
+    });
+    logg(`bilder: ${bilder.size} av ${lag} lag (${Math.round((Date.now() - t0) / 1000)} s)`);
+  } catch (err) {
+    t.notiser.forEach((n) => { delete n.bilder; });
+    logg(`bilder: ${String(err.stderr || err.message).trim().slice(0, 300)}`);
+  }
+}
+
 // Tidningen inför omgången: en gång när omgången kommer och sedan på tidningens tider.
 async function tidningen(round) {
   const nu = vantande.tidning || lasJson(FIL.tidning, null);
@@ -338,10 +415,10 @@ async function tidningen(round) {
   if (!v.skriv || !far(nyckel)) return;
   if (TORRT) { logg(`skulle skriva tidningen för ${round.id} (${v.varfor})`); return; }
   try {
-    const list = await Promise.all(round.matcher.map((x) => fardata(`match/${x.id}.json`).catch(() => null)));
-    const details = Object.fromEntries(round.matcher.map((x, i) => [String(x.id), list[i]]).filter(([, d]) => d));
+    const details = await matchfilerna(round);
     const r = await skrivTidning(round, { details });
     if (!r.ok) throw new Error(r.error);
+    await tidningensBilder(r.tidning, details);
     vantande.tidning = r.tidning;
     lyckat(nyckel);
     logg(`tidning: ${round.id}, ${r.tidning.notiser.length} notiser${r.saknas.length ? ` (utan ${r.saknas.join(', ')})` : ''} (${metaText(r.meta)}; ${v.varfor})`);
@@ -514,6 +591,17 @@ async function main() {
       return;
     }
     if (round) omgangenIFilen(round);
+  }
+
+  // Bara bilderna till tidningen som finns: utan Claude, så inloggningen behövs inte.
+  if (BARA_BILDER) {
+    const t = vantande.tidning || lasJson(FIL.tidning, null);
+    if (!round || !t || t.omgang !== round.id) { logg('ingen tidning för omgången, så inga bilder'); return; }
+    await tidningensBilder(t, await matchfilerna(round));
+    vantande.tidning = t;
+    spara(`Tidningen inför omgången ${round.id}: veckans bilder`);
+    for (const n of t.notiser) console.log(`${n.nr}. ${(n.lag || []).map((x, i) => `${x}: ${n.bilder && n.bilder[i] ? `${n.bilder[i].fil} (${n.bilder[i].foto || n.bilder[i].kalla})` : '–'}`).join(', ')}`);
+    return;
   }
 
   // Inloggningen först: den kostar inget, och utan den blir det inga texter.

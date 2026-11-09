@@ -1675,11 +1675,33 @@ config/tidning.js om sidan är äldre än tiden och minst tolv timmar gammal; n�
 ```json
 { "omgang": "2026-11-14-st4979", "matcher": ["401878757"], "skriven": "…", "model": "…", "version": "…",
   "notiser": [ { "nr": 1, "id": "401878757", "match": "…", "avspark": "…", "rubrik": "…", "text": "…",
-                 "kallor": [ { "source": "…", "title": "…", "url": "…", "publishedAt": null } ] } ] }
+                 "kallor": [ { "source": "…", "title": "…", "url": "…", "publishedAt": null } ],
+                 "lag": ["Nottingham Forest", "Manchester City"],
+                 "bilder": [ { "fil": "nottingham-forest-4f5f237f.jpg", "kalla": "Sky Sports", "foto": null, "sida": "…" },
+                             null ] } ] }
 ```
 
 `nr` är matchens nummer på kupongen. Tidningen som Hasse Backe läser trycker notiserna på baksidan (se *Tidningen*
 under [Hasse Backe](#hasse-backe)).
+
+**Veckans bilder i tidningen** (2026-11-09, användarens önskan: *bilder från veckan i tipsguiden, för de olika
+lagen*): när tidningen är skriven hämtar samma jobb en bild från den senaste veckan per lag, med vanliga hämtningar på
+iMacen och utan någon språkmodell ([src/analyser/tidning-bilder.mjs](src/analyser/tidning-bilder.mjs)). Premier
+League-lagen har egna artiklar hos ESPN (`site.api.espn.com/…/news?team=<id>`, id:t ur `data/skoldar.json`) med bild och
+fotograf; för de lägre divisionerna är det delningsbilden (`og:image`) i notisens egna källor och i Bing News sökningar
+`<lag> FC` och `<lag> football` (lokaltidningarna och klubbarnas sidor). Rubriken ska nämna laget och handla om
+fotboll (*Southampton communities gather* är inte Southampton), inte damlaget, akademin eller ungdomslagen, och
+ingen liveblogg; en rubrik som också nämner motståndaren eller ett annat av omgångens lag, en förhandstitt och ett
+värvningsrykte (spelaren i den andra klubbens tröja) kommer sist. Bilden ska vara från de senaste åtta dagarna,
+liggande, minst 480 bildpunkter bred och inte en logga (adressen) eller en grafik (en jämn bild packas hårt: under
+0,15 byte per bildpunkt). Sajter vars delningsbild är en grafik med text och sköldar (GOAL, OneFootball, Football
+Insider, Football League World m.fl.) och sajterna som är spärrade på datorn läses inte. Samma bild används inte för två
+lag. `sips` förminskar den till 320 bildpunkter (15–35 kB). Provat på omgången 2026-11-07: 25 av 26 lag fick en bild på
+15–20 sekunder, och de flesta visar rätt lag. Bilderna läggs i grenen `tidning-bilder`, en enda commit som skrivs över
+(som rösten i `rost`), så att main inte växer och förra veckans bilder försvinner; workflowen hämtar den till
+`data/tidning-bilder/` och bygget kopierar den till sajten. Går grenen inte att pusha blir det inga bilder och sidan
+visar lagens sköldar. `node scripts/analyser/skriv.mjs --tidning-bilder` hämtar bilderna på nytt till tidningen som
+finns, utan Claude (med `--ut <mapp>` hamnar de i `<mapp>/tidning-bilder/`).
 
 **Rösten** står i [prompts/analys-rost.md](prompts/analys-rost.md): Sixten Bråvall, en påhittad
 tränare med egen bakgrund i klubbar som inte finns och egna stående uttryck. Filen går att
@@ -5754,8 +5776,11 @@ Playfair Display i [public/typsnitt.css](public/typsnitt.css), SvD:s i spärrade
 tre puffar med små bilder, en stor bild och dagens nyhet med vinjett, rubrik, ingress och sidhänvisning, och innehållet längst
 ned. SvD har rubriken över bilden och puffarna i en spalt bredvid ingressen. Baksidan är sporten, *Så mår tipslagen*
 (2026-11-09, användarens önskan): notiserna inför omgången ur `data/tidning.json`, som iMacen skriver med Claude-kontot (se
-*Tidningen inför omgången* under [Analyserna](#analyserna)), i två spalter i tidningens typsnitt och så stort som alla ryms
-(`notisSida`). Utan notiser, eller med en sida som är äldre än tio dagar, är baksidan vädret, med Sverigekartan, symboler
+*Tidningen inför omgången* under [Analyserna](#analyserna)), som en tipssida: en rad per match med numret i tidningens
+färg, lagens bilder från veckan bredvid varandra med namnet på en mörk list i underkanten (lagets sköld där bilden
+saknas), rubriken i tidningens rubriktypsnitt och texten, så stort som alla ryms, och fotograferna och sajterna längst ned
+(*Foto: Getty Images, Sky Sports …*; `notisRader`). Bilderna trycks som tidningens egna (`tryckt`: blekare, svärtan grå
+och korn). Utan notiser, eller med en sida som är äldre än tio dagar, är baksidan vädret, med Sverigekartan, symboler
 och grader, prognosen för Stockholm och kvällens tv i SVT1, SVT2 och TV4. Nyheterna och puffarna på förstasidan
 (`NYHETER`, `PUFFAR` i [public/rum-hasse-tidning.js](public/rum-hasse-tidning.js)) är påhittade och tidlösa, utan namn på
 riktiga personer och utan sport, och dagen väljer dem (`dagens`): samma hela dagen, och aldrig samma nyhet i båda. Bilderna är målade
