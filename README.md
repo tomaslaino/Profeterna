@@ -754,6 +754,16 @@ bara lokalt. Analyserna visas som de ligger i `data/analyser.json`; hur de skriv
   bredvid kupongen är bara pingklockan till uppgörelsen, som är en sak i rummet och inte en
   text. Inga nya ord eller länkar läggs bredvid sakerna för att säga vad de gör. Se
   [Tobaksaffären](#tobaksaffären).
+- **Veckans löpsedel ser äkta ut, och barstolarna står framför den (2026-11-09, användarens
+  önskemål):** "snygga till den här löpsedeln så att den ser mer äkta ut". Den liknade inte den man
+  ser nära, och den låg över barstolen och bardiskens ände. Prickrastret gjorde papperet grått och
+  brusigt när sedeln var liten men syntes inte nära; nu är papperet slätt, med ljus, ett veck och
+  häftstiftens gropar, likadant i rummet och nära. Rubriken går från kant till kant och står mitt
+  på papperet, som på en riktig löpsedel, långa rader klipps inte längre i kanten, och prickarna
+  över Å, Ä och Ö syns i vinjetten. På väggen är den lite mindre och sitter fritt mellan
+  fönsterbänken, bardisken och den innersta barstolen, som är inskjuten under skivan, och den ligger
+  under bardiskens duk, så att det som står framför väggen står framför sedeln. Se
+  [Tobaksaffären](#tobaksaffären), *Affischerna*.
 - **Uppgörelsen visar det vi är oeniga om (2026-11-07, användarens önskemål):** "Här är det ju
   meningen att vi ska diskutera de matcher som vi är oense om. Det ser ut som att du redan har
   ordnat med allt." Pennan ringade bara in matcher där vi inte hade något tecken gemensamt, och med
@@ -3159,10 +3169,15 @@ det röda har bleknat och den har legat vikt på mitten.
 **Sportbladet**, Aftonbladets sportdel, på sitt rosa papper, eller **Expressen** på vitt med det
 röda namnet, två veckor i taget (`TIDNINGAR` i rum-affischer.js). Namnen är skrivna som text,
 inte tidningarnas loggor, och rubrikerna är våra. Överst namnet så brett som papperet, under det
-vinjetten (*SPIKEN*, *KRISEN*, *BARA I SPORTBLADET*) och datumet, rubriken i Anton – varje rad
-så stor som ryms i bredden men ingen mer än 1,55 gånger den minsta, en av dem röd eller vit på
-rött, och rader med Å, Ä eller Ö med luft ovanför – raden under och, under ett streck, veckans
-näst största nyhet (helst av ett annat slag) efter ett rött plustecken. Utan någon står något ur
+vinjetten (*SPIKEN*, *KRISEN*, *BARA I SPORTBLADET*) och datumet, rubriken i Anton, mitt på
+papperet och från kant till kant – varje rad så stor som ryms i bredden men ingen mer än 1,55
+gånger den minsta, och har raderna fått krympa för att rymmas på höjden dras de ut på bredden
+igen (högst 1,42 gånger), en av dem röd eller vit på rött, och rader med Å, Ä eller Ö med luft
+ovanför – raden under och, under ett streck, veckans näst största nyhet (helst av ett annat
+slag) efter ett rött plustecken. Papperet är slätt och varmt vitt, utan raster (det blev ett grått
+brus när sedeln är liten), med lysrörets ljus uppifrån vänster, ett veck på mitten där den legat
+vikt i tidningsbunten, små gropar vid häftstiften och en kort skugga som är lite längre nedtill;
+nära och i tidningen är det samma papper. Utan någon står något ur
 kvällstidningens vanliga utbud där (*HOROSKOPET: TIPPA X*, *BÄST I TEST: TIPSPENNOR*). Tonen är
 kvällstidningens, stora ord och allvar på ytan, men torr: modellen heter *datorn* och *avböjer
 att kommentera* när den har fel, *GARANTERAT!* står ovanför *(74 procent enligt datorn)*, och
@@ -3172,7 +3187,9 @@ aldrig vad en riktig person har sagt. Varje slags rubrik har två eller tre vari
 veckan väljer bland dem. Den är den enda som byts och är uppsatt för hand: varannan vecka (veckan i
 Stockholm, måndag till söndag) med tejp i skyltfönstrets nedre vänstra hörn, varannan med två
 häftstift på furupanelen till höger om fönstret, under oraklets skylt och till vänster om
-bardisken, där den är mindre (78 %, så att den ryms mellan fönsterkarmen och bardisken). I
+bardisken, där den är mindre (72 %, så att den ryms mellan fönsterbänken, bardisken och den
+innersta barstolen) och nästan rak. Där ligger den under bardiskens duk (rum-inredning.js), så att
+disken och stolarna, som står framför väggen, aldrig hamnar bakom den. I
 telefonen på höjden sitter den alltid på väggen, som syns utan att man drar. (Först satt den
 ibland under dörrens handtag och sedan i fönstrets högra hörn: dörren hamnade utanför bilden i
 telefonen, och hörnet är nu skivans. Till och med 2026-11-05 var den från den påhittade
@@ -3247,7 +3264,8 @@ tavla har hängt runt ramen. Disken längs högra väggen är en bardisk som i e
 sticker ut en dryg decimeter över den indragna fronten, så att man har plats för benen. Under
 kanten bär konsoler i järn upp skivan, och på fronten sitter en krok i mässing i varje fält.
 Fronten har fyllningar i ramar, en halv meter isär. Framför står tre barstolar likadana som gängets (röd vinyl med söm, krom, fotring),
-med sitsen 75 cm över golvet och inskjutna under kanten; den närmaste syns bara till hälften
+med sitsen 75 cm över golvet och inskjutna under kanten – den innersta ända in under skivan, så
+att sitsen går fri från löpsedeln på väggen; den närmaste syns bara till hälften
 över pulten. Skivan skuggar fronten och stolarna skuggar fronten och bakväggen under skivan –
 det är skuggorna och stolarna som visar att det är tomt under skivan, eftersom man ser disken
 lite uppifrån. Disken ritas en gång, som inredningen, i en duk från disken in i videons hörn
