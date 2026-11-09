@@ -5837,6 +5837,32 @@ från sidan bakom tidningen, eller med pekfingertoppen på bryggan (`glasArm`). 
 formen tillåter (`paNasan`), och genom glasen ser ögonen lite större ut (`uLins` i ansiktets skuggare). Bågen ritas före
 kroppen, så att huvudet och kavajen döljer skalmarna och det som är nere i fickan.
 
+**Sysslorna** (2026-11-09, användarens önskan: fler saker än tidningen, *ertappad men låtsas som att det inte har hänt
+och gå vidare*, som John Goodman i *The Big Lebowski*). Har det gått dåligt har han sex andra sätt att verka upptagen,
+och de lottas med tidningen (samma grupp `lasa`, klippen `raknar`, `tomKopp`, `slocknad`, `putsa`, `vissla` och
+`naglar` i [public/rum-hasse-3d.js](public/rum-hasse-3d.js)). I alla märker han mitt i att man tittar: ögonen kommer
+upp på en medan huvudet står kvar, brynen åker upp och leendet han alltid har försvinner (nyckeln `stel`), och han
+håller andan en dryg sekund. Sedan låtsas han som ingenting, med eftertryck, som en man som vet att han har rätt också
+när han inte har det: hakan upp, brynen ned, en bestämd nick, och leendet tillbaka.
+
+- `raknar`: räknar sina rätt på fingrarna med en nick för varje, ett, två, tre; lillfingret tvekar och fälls ned igen.
+  Ertappad med tre fingrar i luften knyter han handen och slår näven i disken.
+- `tomKopp`: dricker ur en tom kopp, lutar den mer och mer och skakar ur de sista dropparna, och tittar ned i den.
+  Ertappad över koppen tar han en klunk som inte finns, *ah*, och ställer ned den med en smäll.
+- `slocknad`: cigarren har slocknat (ingen glöd och ingen rök, `ute`). Han drar, tittar misstänksamt på den, drar
+  hårdare och blåser på glöden. Ertappad med läpparna i ett o drar han ett nöjt bloss och blåser ut rök som inte finns.
+- `putsa`: andas på läsglasögonen, putsar dem mot skjortan i små cirklar (`gnid`, läget `putsa` i `GL`) och håller upp
+  dem mot ljuset (`kika`). Ertappad sätter han på sig dem med en knyck, tittar strängt på en genom dem och nickar.
+- `vissla`: visslar en egen liten slinga upp i taket med pekfingret som knackar i takt (`LAT`). Tonen dör när han ser
+  en; sedan visslar han vidare längs baren, gladare än förut.
+- `naglar`: synar naglarna, blåser på dem och putsar dem mot kavajen. Ertappad blir handen ett pekfinger mot en, två
+  stötar: har jag fel?
+
+Har man just kommit håller han redan på, strax före det man ertappar honom med (`fram` i `KLIPP`, `lasNu` i
+[public/rum-hasse.js](public/rum-hasse.js)). Visslingen och andetagen räknas fram med Web Audio som de andra ljuden
+(`vissla` och `anda` i [public/rum-hasse-ljud.js](public/rum-hasse-ljud.js), `ljud` i `KLIPP`) och hörs bara med ljudet
+på.
+
 Går hans röst inte att få säger han det och visar analysen i skrift. Allt han säger runt omkring är
 färdiga rader, utan AI, i [public/rum-hasse-repliker.js](public/rum-hasse-repliker.js). Står man kvar säger han något då och då:
 över matchlistan (`ledig`), över listan med gänget (`domar.ledig`) och när man inte svarar på hans fråga (`valVanta`). Raderna

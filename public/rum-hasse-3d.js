@@ -17,7 +17,8 @@
 // Klipp: T 0–12,4 (vila, skrattet, domen, gesterna, hem), och sedan ett klipp i taget på var sin bit av
 // tidslinjen (KLIPP): fler sätt att slå domen i disken, kaffet (sex sätt), cigarren, småsakerna medan han
 // väntar, händerna medan han pratar (talet) och tidningen när det har gått dåligt för honom (lasa, papperet i
-// rum-hasse-tidning.js), med glasögonen på.
+// rum-hasse-tidning.js), med glasögonen på, och de andra sysslorna då (raknar, tomKopp, slocknad, putsa, vissla,
+// naglar), där han blir ertappad och låtsas som ingenting.
 import * as THREE from 'three';
 import { ATLAS, LJUS, ARM, HAND, KAMERA, BORD_GLSL, CIGARR, ASKKOPP, DAG, LYS, VILOHOJD, VILAN, paDisken, inat, laddaFoto, laddaHand, byggArm, byggKopp, byggCigarr, byggAskkopp, byggRok, byggPenna, byggSkugga, byggGlasogon, GLAS, PENNA } from './rum-hasse-arm.js';
 import { SCEN, BAK, kamera as scenKamera, iKamera, disken, franBaren, franPulten } from './rum-hasse-scen.js';
@@ -279,6 +280,16 @@ export const LASA = {
 // var läsandet börjar (med glasögonen på, efter upp): dit hoppar sidan när han redan läser när man kommer
 export const LAS_START = LASBIT.pa.dur + LASBIT.upp.dur;
 
+// Visslingen (klippet vissla, ljudet i rum-hasse-ljud.js): [tid, Hz, ms, Hz i slutet]. En egen liten slinga,
+// lugn och oskyldig; den sista tonen glider ned och dör när han ser en, och sedan en glad fortsättning, lite
+// för hög.
+const LAT = [
+  [0.9, 880, 330], [1.28, 1175, 300], [1.63, 1480, 560], [2.28, 1319, 240], [2.57, 1175, 240], [2.86, 988, 560],
+  [3.52, 1175, 300], [3.88, 880, 300], [4.24, 988, 260], [4.56, 1109, 300, 1319], [4.88, 1319, 420, 620],
+  [6.3, 1175, 200], [6.55, 1480, 200], [6.8, 1760, 460], [7.34, 1568, 200], [7.6, 1480, 200], [7.86, 1319, 200], [8.12, 1175, 560, 1109],
+];
+const VISSLA = LAT.map(([t, f, ms, f1], i) => [t, { typ: 'vissla', f, f1: f1 || f, ms, styrka: i < 10 ? 0.75 : i === 10 ? 0.55 : 0.95 }]);
+
 // ---------- klippen ----------
 // Rörelserna är klipp på en tidslinje (rum-hasse.js spelar dem): fran–till, och där han står efteråt
 // (vila: 0 är vilan, 5,5 när han pratar). fri: får börja var som helst, skynda: läggs undan fortare
@@ -398,6 +409,22 @@ export const KLIPP = {
   // (han läser Dagens Nyheter eller Svenska Dagbladet, rum-hasse-tidning.js)
   lasa: { fran: 500, till: 500 + LASA.lasa.dur, vila: 0, skynda: true, grupp: 'lasa', tidning: 'dn', slag: LASA.lasa.slag, ner: LASA.lasa.ner },
   lasa2: { fran: 570, till: 570 + LASA.lasa2.dur, vila: 0, skynda: true, grupp: 'lasa', tidning: 'svd', slag: LASA.lasa2.slag, ner: LASA.lasa2.ner },
+  // Det andra han gör när det har gått dåligt (grupp lasa, som tidningen; sysslorna i figuren): han håller
+  // på med något för att verka upptagen, märker att man tittar och fryser (ertappad, utan leende: stel),
+  // och sedan låtsas han att inget har hänt, med eftertryck. fram: där sidan börjar när han redan håller på
+  // när man kommer (strax före det man ertappar honom med). ljud: [tid, ljud] (rum-hasse-ljud.js).
+  // räknar sina rätt på fingrarna, kommer inte längre än till tre och slår näven i disken
+  raknar: { fran: 650, till: 659.4, vila: 0, skynda: true, grupp: 'lasa', fram: 1.3, dunk: [[6.5, 1.1, 'nave']] },
+  // dricker ur en tom kopp, skakar ur de sista dropparna och tittar ned i den, och låtsas sedan att det var gott
+  tomKopp: { fran: 670, till: 682.4, vila: 0, skynda: true, grupp: 'lasa', fram: 2.6, ned: [[11.4, 0.62]] },
+  // cigarren har slocknat: han drar och drar, tittar på den och blåser på glöden, och blåser sedan ut rök som inte finns
+  slocknad: { fran: 690, till: 706.6, vila: 0, skynda: true, grupp: 'lasa', fram: 5.6 },
+  // putsar läsglasögonen och håller upp dem mot ljuset, och sätter sedan på sig dem och tittar strängt på en
+  putsa: { fran: 710, till: 727.6, vila: 0, skynda: true, grupp: 'lasa', fram: 3.6, ljud: [[2.45, { typ: 'anda', sort: 'ha', ms: 420 }], [3.05, { typ: 'anda', sort: 'ha', ms: 380 }]] },
+  // visslar oskyldigt upp i taket, tystnar mitt i en ton och visslar vidare åt andra hållet
+  vissla: { fran: 730, till: 740.8, vila: 0, skynda: true, grupp: 'lasa', fram: 2.4, ljud: VISSLA },
+  // synar naglarna, putsar dem på slaget, och pekar sedan på en: har jag fel?
+  naglar: { fran: 745, till: 755.4, vila: 0, skynda: true, grupp: 'lasa', fram: 4.6, ljud: [[2.4, { typ: 'anda', sort: 'blas', ms: 300 }], [2.85, { typ: 'anda', sort: 'blas', ms: 260 }]] },
 };
 for (const k of Object.values(KLIPP)) {
   if (k.dunk) k.dom = k.fran + k.dunk.reduce((a, b) => (b[1] > a[1] ? b : a))[0];
@@ -1187,7 +1214,8 @@ export async function figuren(duk, { hog = false, latt = false, pr = 1 } = {}) {
   const KANAL = Object.keys(HUV);
   // ansiktet i klippen: läggs till som det största av det som rör sig (blicken läggs till: blickX åt hans
   // vänstra sida, blickY nedåt, i fotots bildpunkter; andas läggs till andningen)
-  const ANSIKTE = ['le', 'kis', 'blund', 'munn', 'rund', 'dricker', 'blickX', 'blickY', 'andas'];
+  // (stel: 0–1, tar bort leendet han alltid har, när han blir ertappad)
+  const ANSIKTE = ['le', 'kis', 'blund', 'munn', 'rund', 'dricker', 'blickX', 'blickY', 'andas', 'stel'];
   const lage = (T) => Object.fromEntries(KANAL.map((x) => [x, spar(HUV[x], T)]));
   const S0 = lage(0);
 
@@ -2316,6 +2344,245 @@ export async function figuren(duk, { hog = false, latt = false, pr = 1 } = {}) {
       },
     },
   });
+  // ---------- sysslorna (KLIPP raknar …) ----------
+  // Ertappad: ögonen upp på en medan huvudet står kvar, brynen upp, locken öppna och inget leende (stel tar
+  // bort det han alltid har, NOJD i rita), och han håller andan. Sedan låtsas han som ingenting, med
+  // eftertryck: hakan upp, brynen ned, en bestämd nick, och leendet tillbaka. Han rör sig som en man som
+  // vet att han har rätt, också när han inte har det.
+  Object.assign(RORELSER, {
+    // Fingrarna: knuten hand upp bredvid sig, och han räknar sina rätt med en nick för varje: ett, två,
+    // tre. Lillfingret är på väg upp men tvekar och fälls ned igen, och han tittar på handen med huvudet på
+    // sned. Då ser han en. Han fryser med tre fingrar i luften, och sedan knyts handen, han tittar en i
+    // ögonen och slår näven i disken: så är det. Hakan upp och ett höjt bryn: något mer?
+    raknar: {
+      k: {
+        yaw: [[0.4, -0.3], [4.3, -0.32], [5.5, -0.3], [5.85, 0.25], [6.45, 0.3], [7.3, 0.15], [8.6, 0]],
+        pitch: [[0.4, 0.3], [1.0, 0.25], [1.15, 0.5], [1.4, 0.25], [1.7, 0.25], [1.85, 0.5], [2.1, 0.25], [2.45, 0.25], [2.6, 0.5], [2.85, 0.28], [3.4, 0.35], [4.3, 0.35], [4.42, 0.18], [4.7, 0.24], [5.5, 0.25],
+          [5.85, -0.05], [6.4, 0.1], [6.5, 0.1], [6.6, 1.2], [6.85, 0.4], [7.05, 0.75], [7.3, 0.2], [7.6, -0.35], [8.4, -0.3], [9.2, 0]],
+        roll: [[0.5, 0.03], [3.3, 0.03], [3.7, 0.1], [4.3, 0.1], [5.5, 0.1], [5.85, 0], [7.6, 0.03], [8.6, 0]],
+        lut: [[0.5, 0.03], [4.3, 0.04], [4.42, 0.01], [5.5, 0.02], [6.2, 0.06], [6.52, 0.13], [6.9, 0.05], [7.6, -0.02], [8.6, 0]],
+        vrid: [[0.5, -0.05], [5.5, -0.05], [6.4, -0.08], [6.55, 0.05], [7.2, 0.02], [8.6, 0]],
+        axV: [[0.5, 12], [4.3, 14], [5.5, 14], [6.0, 28], [6.4, 38], [6.52, 4], [6.8, 8], [7.6, 4], [8.6, 0]],
+        brynX: [[0.5, 0.2], [1.2, 0.35], [2.6, 0.5], [3.4, 0.55], [3.8, 0.35], [4.25, 0.3], [4.4, 1.15], [5.4, 1.05], [5.75, -0.6], [6.45, -0.75], [6.6, 0.4], [7.0, 0.2], [7.6, 1.2], [8.4, 1.1], [9.1, 0]],
+        brynY: [[0.5, 0.2], [1.2, 0.3], [2.6, 0.45], [3.4, -0.25], [3.8, -0.3], [4.25, -0.2], [4.4, 1.1], [5.4, 1.0], [5.75, -0.85], [6.45, -0.95], [6.6, -0.3], [7.0, -0.4], [7.6, 0.15], [8.4, 0.15], [9.1, 0]],
+        blickX: [[0.3, 0], [0.5, -3.2], [4.3, -3.2], [4.42, 1.8], [5.45, 1.8], [5.7, 0]],
+        blickY: [[0.3, 0], [0.5, 3.5], [4.3, 3.5], [4.42, -1.2], [5.45, -1.2], [5.7, 0]],
+        blund: [[0.3, 0], [0.5, 0.3], [4.3, 0.3], [4.4, 0], [6.5, 0], [6.55, 0.85], [6.7, 0]],
+        stel: [[4.3, 0], [4.4, 1], [5.6, 1], [6.2, 0]],
+        kis: [[5.6, 0], [6.0, 0.4], [6.5, 0.45], [6.8, 0.2], [7.6, 0.3], [8.4, 0.3], [9.0, 0]],
+        munn: [[1.08, 0], [1.16, 0.05], [1.3, 0], [1.78, 0], [1.86, 0.06], [2.0, 0], [2.53, 0], [2.61, 0.05], [2.75, 0], [4.35, 0], [4.45, 0.05], [5.5, 0.04], [5.6, 0], [6.5, 0], [6.58, 0.08], [6.75, 0]],
+        rund: [[3.4, 0], [3.65, 0.35], [4.2, 0.3], [4.4, 0]],
+        andas: [[3.9, 0], [4.15, -5], [4.3, -2], [4.45, 4], [5.4, 4], [5.9, 0]],
+        le: [[0.5, 0.25], [2.6, 0.35], [3.3, 0.05], [7.6, 0.35], [8.4, 0.4], [9.4, 0]],
+      },
+      A: [
+        [0.55, [-300, 40, 520], [-0.85, -0.5, 0.15], [0.12, 0.96, 0.25], [0.35, -0.05, 0.93], 0.95, 0],
+        [0.9, [-330, 88, 520], [-0.85, -0.5, 0.15], [0.12, 0.96, 0.25], [0.35, -0.05, 0.93], 0.95, 0],
+        [1.15, [-326, 98, 534], [-0.85, -0.5, 0.15], [0.12, 0.96, 0.25], [0.35, -0.05, 0.93], 0.95, 1],
+        [1.7, [-330, 90, 522], [-0.85, -0.5, 0.15], [0.12, 0.96, 0.25], [0.35, -0.05, 0.93], 0.95, 1],
+        [1.85, [-326, 99, 535], [-0.85, -0.5, 0.15], [0.12, 0.96, 0.25], [0.35, -0.05, 0.93], 0.95, 1],
+        [2.45, [-330, 91, 523], [-0.85, -0.5, 0.15], [0.12, 0.96, 0.25], [0.35, -0.05, 0.93], 0.95, 1],
+        [2.6, [-326, 100, 536], [-0.85, -0.5, 0.15], [0.12, 0.96, 0.25], [0.35, -0.05, 0.93], 0.95, 1],
+        [3.5, [-332, 94, 524], [-0.85, -0.5, 0.15], [0.1, 0.96, 0.28], [0.4, -0.05, 0.91], 0.95, 1],
+        [4.3, [-334, 92, 520], [-0.85, -0.5, 0.15], [0.1, 0.96, 0.28], [0.4, -0.05, 0.91], 0.95, 1],
+        [5.5, [-334, 92, 520], [-0.85, -0.5, 0.15], [0.1, 0.96, 0.28], [0.4, -0.05, 0.91], 0.95, 1],
+        [5.75, [-300, 95, 515], [-0.8, -0.6, 0.2], [0.1, 0.95, 0.3], [0.95, -0.1, 0.2], 1, 0],
+        [6.05, [-262, 125, 505], [-0.8, -0.6, 0.2], [0.08, 0.95, 0.3], [0.45, -0.1, -0.88], 1, 0],
+        [6.3, [-258, 140, 500], [-0.8, -0.6, 0.2], [0.08, 0.95, 0.3], [0.45, -0.1, -0.88], 1, 0],
+        [6.5, [-175, -232, 575], PA, [0.55, -0.05, 0.83], [0.83, 0.05, -0.55], 1, 0, true],
+        [6.58, [-175, -214, 575], PA, [0.55, -0.05, 0.83], [0.83, 0.05, -0.55], 1, 0],
+        [6.73, [-175, -232, 575], PA, [0.55, -0.05, 0.83], [0.83, 0.05, -0.55], 1, 0],
+        [7.6, [-175, -232, 575], PA, [0.55, -0.05, 0.83], [0.83, 0.05, -0.55], 0.95, 0],
+        [8.2, [-150, -240, 590], PA, [0.75, -0.08, 0.65], [0.4, -0.9, -0.1], 0.5, 0],
+      ],
+      // (ett, två och tre: pekfingret med armens peka, långfingret e1 och ringfingret e2; lillfingret e3
+      // tvekar; tummen in mot handen)
+      fA: {
+        tumme: [[0.5, 0.1], [5.5, 0.1], [5.8, 0.05], [8.2, 0.1], [8.9, TUMME]],
+        e1: [[1.7, 0], [1.85, -0.98], [5.5, -0.98], [5.68, 0]],
+        e2: [[2.45, 0], [2.6, -0.97], [5.5, -0.97], [5.7, 0]],
+        e3: [[3.15, 0], [3.5, -0.55], [3.75, -0.5], [4.0, 0]],
+        e5: [[1.7, 0], [1.85, 4], [5.5, 4], [5.7, 0]],
+        e6: [[2.45, 0], [2.6, 6], [5.5, 6], [5.7, 0]],
+      },
+    },
+    // Koppen är tom: han dricker, lutar den mer och mer med huvudet bakåt och armbågen ute, och skakar ur
+    // de sista dropparna. Han sänker den till bröstet, tittar ned i den och snurrar den. Då ser han en, med
+    // huvudet kvar över koppen och bara ögonen uppe. Han lyfter den igen och tar en klunk som inte finns, ah,
+    // med slutna ögon och höjda bryn, nickar bestämt mot en och ställer ned den med en smäll.
+    tomKopp: {
+      k: {
+        dricker: [[2.0, 0], [2.35, 1], [3.3, 1], [3.5, 0.6], [4.2, 0.6], [4.45, 0], [8.0, 0], [8.3, 1], [8.8, 1], [9.0, 0]],
+        pitch: [[2.3, -0.2], [3.0, -0.75], [3.5, -1.1], [4.15, -1.1], [4.6, 0.4], [5.0, 1.45], [6.3, 1.45], [6.42, 1.38], [7.4, 1.4], [7.9, -0.2], [8.8, -0.2],
+          [9.2, -0.55], [9.9, -0.6], [10.15, -0.25], [10.3, 0.45], [10.5, -0.05], [10.65, 0.35], [10.85, -0.1], [11.3, 0.1], [12.0, 0]],
+        yaw: [[2.0, 0], [4.4, 0.05], [5.0, 0.2], [6.3, 0.2], [7.4, 0.18], [7.9, 0.05], [10.1, 0], [10.3, 0.12], [11.2, 0.1], [12.0, 0]],
+        roll: [[3.4, 0], [3.6, 0.05], [3.8, -0.03], [4.0, 0.05], [4.3, 0], [5.0, 0.04], [7.4, 0.04], [7.9, 0]],
+        lut: [[3.0, -0.02], [3.6, -0.05], [4.2, -0.05], [4.8, 0.04], [7.4, 0.04], [7.9, 0], [9.2, -0.03], [9.9, -0.03], [10.3, 0.03], [11.0, 0]],
+        axH: [[2.8, 0], [3.5, 16], [4.2, 16], [4.6, 0], [9.1, 0], [9.4, 10], [9.9, 8], [10.3, 0]],
+        axV: [[9.1, 0], [9.4, 8], [9.9, 6], [10.3, 0]],
+        brynX: [[3.4, 0], [3.7, -0.35], [4.2, -0.4], [4.8, 0.2], [5.2, 0.75], [6.3, 0.7], [6.42, 1.15], [7.3, 1.05], [7.8, -0.35], [8.8, -0.3], [9.2, 1.0], [9.9, 0.9], [10.2, -0.25], [10.9, -0.3], [11.5, 0.8], [12.2, 0]],
+        brynY: [[3.4, 0], [3.7, -0.5], [4.2, -0.55], [4.8, 0.1], [5.2, 0.6], [6.3, 0.55], [6.42, 1.1], [7.3, 1.0], [7.8, -0.45], [8.8, -0.4], [9.2, 0.4], [9.9, 0.35], [10.2, -0.4], [10.9, -0.45], [11.5, 0.1], [12.2, 0]],
+        blickY: [[3.5, 0], [3.7, 3], [4.3, 3], [4.6, 0], [4.8, 4], [6.3, 4], [6.42, -3.2], [7.4, -3.2], [7.9, 0]],
+        blickX: [[4.8, 0], [5.0, 1.5], [6.3, 1.5], [6.42, -0.6], [7.4, -0.6], [7.9, 0]],
+        blund: [[3.45, 0], [3.6, 0], [4.8, 0], [5.0, 0.3], [6.3, 0.3], [6.4, 0], [9.0, 0], [9.2, 0.85], [9.9, 0.85], [10.1, 0]],
+        stel: [[6.35, 0], [6.45, 1], [7.5, 1], [8.0, 0]],
+        rund: [[5.3, 0], [5.45, 0.4], [5.8, 0.35], [5.95, 0], [9.1, 0], [9.25, 0.3], [9.9, 0.3], [10.05, 0]],
+        munn: [[5.3, 0], [5.45, 0.04], [5.8, 0.03], [5.95, 0], [6.4, 0], [6.5, 0.04], [7.4, 0.04], [7.55, 0], [9.1, 0], [9.25, 0.12], [9.9, 0.1], [10.05, 0]],
+        andas: [[6.3, 0], [6.5, 5], [7.4, 5], [7.8, 0], [9.0, 0], [9.3, 8], [9.9, -4], [10.3, 0]],
+        kis: [[10.1, 0], [10.3, 0.45], [10.9, 0.4], [11.4, 0.2], [12.0, 0]],
+        le: [[9.2, 0], [9.6, 0.6], [10.1, 0.4], [10.9, 0.35], [11.6, 0.55], [12.4, 0]],
+      },
+      kaffe: {
+        kk: [[1.1, 'fat'], [2.0, 'mun', 60], [4.3, 'mun'], [4.95, 'brost', 10], [7.4, 'brost'], [8.0, 'mun', 20], [8.85, 'mun'], [9.3, 'ah'], [10.8, 'ah'], [11.4, 'fat', 20]],
+        tipp: [[2.0, 0], [2.35, 0.5], [2.8, 0.75], [3.2, 0.95], [3.5, 1.15], [3.65, 1.05], [3.8, 1.2], [3.95, 1.07], [4.1, 1.18], [4.4, 0], [8.0, 0], [8.3, 0.5], [8.75, 0.55], [8.95, 0]],
+        snurr: [[5.35, 0], [5.55, 1], [6.1, 1], [6.3, 0]],
+        arm: [[2.8, 0], [3.5, 0.45], [4.2, 0.45], [4.7, 0]],
+        ...grepp(11.4),
+      },
+    },
+    // Cigarren har slocknat: han drar ett bloss, men ingenting. Han tittar misstänksamt på den, drar
+    // hårdare, och tittar igen, och blåser på glöden med runda läppar. Då ser han en, med läpparna kvar i ett
+    // o. Han stoppar den i munnen, drar ett nöjt bloss med slutna ögon och blåser ut röken, som inte finns,
+    // länge och med huvudet bakåt, nickar mot en och lägger tillbaka den.
+    slocknad: cigarrKlipp(15.2, {
+      yaw: [[2.0, 0.05], [3.7, 0.05], [4.2, -0.3], [4.7, -0.5], [5.9, -0.5], [6.4, 0.05], [7.9, 0.05], [8.35, -0.3], [8.9, -0.55], [10.0, -0.55], [11.0, -0.5], [11.4, 0.05],
+        [12.4, 0.05], [12.9, 0.3], [13.9, 0.3], [14.2, 0.05], [14.6, 0.1]],
+      pitch: [[2.0, 0.25], [3.7, 0.25], [4.7, 0.4], [5.9, 0.4], [6.4, 0.2], [7.0, 0.1], [7.9, 0.1], [8.9, 0.45], [10.0, 0.45], [10.12, 0.32], [11.0, 0.35], [11.4, -0.25], [12.4, -0.25],
+        [12.9, -0.95], [13.8, -1.0], [14.15, 0], [14.3, 0.45], [14.45, 0.05], [14.6, 0.35]],
+      roll: [[4.4, 0], [4.8, 0.06], [5.9, 0.06], [6.3, 0], [8.9, 0.05], [10.0, 0.05], [11.2, 0]],
+      lut: [[2.0, 0], [3.4, -0.01], [6.4, 0], [7.2, -0.04], [7.9, -0.04], [8.4, 0], [10.12, -0.02], [11.0, -0.02], [12.9, -0.05], [13.8, -0.05], [14.4, 0.02]],
+      axV: [[2.0, 20], [3.0, 26], [3.7, 22], [4.6, 14], [6.4, 20], [7.6, 36], [7.9, 34], [8.6, 16], [10.0, 16], [11.4, 20], [12.3, 28], [13.6, 8], [14.4, 12]],
+      brynX: [[2.2, 0.2], [3.5, 0.3], [4.4, -0.35], [5.8, -0.5], [6.6, 0.6], [7.8, 0.7], [8.6, -0.1], [9.2, 0.3], [10.0, 0.3], [10.12, 1.15], [11.0, 1.05], [11.4, -0.3], [12.3, 0.4], [13.8, 0.3], [14.1, -0.2], [14.6, 0.3]],
+      brynY: [[2.2, 0.2], [3.5, 0.25], [4.4, -0.5], [5.8, -0.65], [6.6, 0.6], [7.8, 0.7], [8.6, -0.1], [9.2, 0.3], [10.0, 0.3], [10.12, 1.1], [11.0, 1.0], [11.4, -0.4], [12.3, 0.4], [13.8, 0.3], [14.1, -0.3], [14.6, 0.1]],
+      blickX: [[2.0, 0], [4.2, 0], [4.6, -3.5], [5.9, -3.5], [6.3, 0], [8.4, 0], [8.8, -4], [10.0, -4], [10.12, 2.4], [11.0, 2.4], [11.3, 0]],
+      blickY: [[2.0, 0], [4.2, 0], [4.6, 1.5], [5.9, 1.5], [6.3, 0], [8.4, 0], [8.8, 1.8], [10.0, 1.8], [10.12, -1.6], [11.0, -1.6], [11.3, 0]],
+      blund: [[2.15, 0], [2.5, 0.55], [3.2, 0.5], [3.5, 0], [6.5, 0], [6.9, 0.45], [7.8, 0.45], [8.0, 0], [11.6, 0], [11.9, 0.6], [12.3, 0.6], [12.9, 0.85], [13.8, 0.85], [14.0, 0]],
+      kis: [[4.4, 0], [4.7, 0.4], [5.9, 0.4], [6.2, 0], [8.9, 0.2], [9.9, 0.2], [10.1, 0], [14.0, 0], [14.2, 0.45], [14.7, 0.35]],
+      stel: [[10.05, 0], [10.15, 1], [11.0, 1], [11.6, 0]],
+      rund: [[9.15, 0], [9.3, 1], [10.9, 1], [11.1, 0]],
+      munn: [[9.15, 0], [9.3, 0.12], [9.9, 0.1], [10.12, 0.06], [10.9, 0.06], [11.1, 0]],
+      andas: [[9.2, 0], [9.9, -6], [10.15, 4], [11.0, 4], [11.4, 0]],
+      le: [[3.4, 0.1], [4.4, 0], [11.4, 0], [12.3, 0.35], [13.8, 0.45], [14.2, 0.6], [14.8, 0.4]],
+    }, {
+      ck: [[2.1, 'mun', 70], [3.7, 'mun'], [4.15, 'bort'], [4.7, 'se'], [5.9, 'se'], [6.4, 'mun', 20], [7.9, 'mun'], [8.35, 'bort'], [8.9, 'se'], [11.0, 'se'], [11.5, 'mun', 15],
+        [12.3, 'mun'], [12.7, 'bort'], [13.2, 'hall'], [14.3, 'hall']],
+      // (ingen glöd och ingen rök: ute)
+      ute: true,
+      glod: [[2.0, 0], [14.0, 0]],
+      iMun: [[1.95, 0], [2.15, 1], [3.7, 1], [3.85, 0], [6.3, 0], [6.45, 1], [7.9, 1], [8.05, 0], [11.4, 0], [11.55, 1], [12.3, 1], [12.45, 0]],
+      blaser: [[12.6, 0], [12.85, 1], [13.8, 1], [14.1, 0]],
+      rok: [],
+    }),
+    // Glasögonen: upp ur fickan, hopfällda, och han andas på dem två gånger, putsar dem mot skjortan i små
+    // cirklar och håller upp dem mot ljuset med huvudet bakåt och kisar. Då ser han en under dem. Han fäller ut
+    // skalmarna med en knyck och sätter på sig dem, tittar strängt på en genom dem (de förstorar ögonen) och
+    // nickar, tar av dem igen och stoppar dem i fickan.
+    putsa: {
+      k: {
+        pitch: [[0.2, 0], [0.8, 1.1], [1.5, 1.0], [2.2, 0.15], [3.5, 0.15], [4.0, 1.0], [6.1, 1.0], [6.9, -0.7], [7.9, -0.75], [8.05, -0.6], [9.1, -0.6],
+          [9.6, 0.1], [10.5, -0.12], [11.2, -0.3], [11.4, 0.35], [11.6, -0.2], [11.75, 0.25], [11.95, -0.25], [12.6, -0.2], [13.6, 0], [14.2, 0.4], [14.8, 1.05], [15.6, 1.0], [16.3, 0]],
+        yaw: [[0.4, 0.1], [2.2, 0], [4.0, 0.05], [6.1, 0.05], [6.9, -0.25], [8.0, -0.25], [9.1, -0.2], [9.6, 0], [16.3, 0]],
+        lut: [[2.0, 0.02], [3.5, 0.02], [4.0, 0.05], [6.1, 0.05], [6.9, -0.04], [9.1, -0.04], [10.0, 0], [11.2, -0.03], [12.6, -0.02], [13.4, 0]],
+        axV: [[4.0, 8], [6.1, 10], [6.9, 22], [9.1, 22], [9.6, 6], [11.2, 0], [12.6, 4], [13.4, 0]],
+        brynX: [[2.2, 0.2], [3.5, 0.3], [4.0, 0], [6.1, 0.1], [6.9, -0.25], [7.9, -0.3], [8.05, 1.15], [9.0, 1.05], [9.5, 0.2], [10.6, 0.4], [11.0, -0.45], [12.4, -0.5], [13.2, 0.6], [14.2, 0.4], [15.2, 0]],
+        brynY: [[2.2, 0.2], [3.5, 0.3], [4.0, 0], [6.1, 0.1], [6.9, -0.25], [7.9, -0.3], [8.05, 1.1], [9.0, 1.0], [9.5, 0.2], [10.6, 0.4], [11.0, -0.6], [12.4, -0.65], [13.2, 0.2], [14.2, 0.3], [15.2, 0]],
+        blickY: [[0.2, 0], [0.7, 7], [1.6, 7], [2.2, 1], [3.5, 1], [4.0, 5], [6.1, 5], [6.8, -3.5], [7.9, -3.5], [8.05, 1.2], [9.0, 1.2], [9.4, 5], [10.2, 2], [10.6, 0], [14.0, 0], [14.6, 7], [15.6, 7], [16.1, 0]],
+        blickX: [[0.2, 0], [0.7, 2.5], [1.6, 2.5], [2.2, 0], [6.1, 0], [6.8, -2.5], [7.9, -2.5], [8.05, 1.8], [9.0, 1.8], [9.5, 0], [14.6, 2.5], [15.6, 2.5], [16.1, 0]],
+        blund: [[0.2, 0], [2.2, 0], [2.4, 0.4], [3.4, 0.4], [3.6, 0], [4.0, 0.35], [6.1, 0.35], [6.6, 0], [10.4, 0], [10.6, 0.6], [10.8, 0], [13.6, 0], [13.85, 0.55], [14.05, 0]],
+        kis: [[6.5, 0], [6.9, 0.7], [7.9, 0.7], [8.05, 0], [10.8, 0], [11.1, 0.35], [12.4, 0.35], [12.8, 0]],
+        stel: [[8.0, 0], [8.1, 1], [9.1, 1], [9.6, 0]],
+        munn: [[2.4, 0], [2.5, 0.22], [2.85, 0.18], [2.95, 0], [3.05, 0.22], [3.4, 0.18], [3.5, 0], [6.9, 0], [7.1, 0.03], [7.9, 0.03], [8.1, 0.05], [9.0, 0.04], [9.2, 0]],
+        rund: [[2.4, 0], [2.5, 0.35], [3.4, 0.35], [3.5, 0]],
+        andas: [[2.2, 0], [2.4, 6], [2.9, -5], [3.0, 5], [3.45, -5], [3.7, 0], [8.0, 0], [8.2, 5], [9.0, 5], [9.4, 0]],
+        le: [[11.0, 0], [12.4, 0.1], [13.0, 0.55], [14.0, 0.45], [15.0, 0.2]],
+      },
+      glas: {
+        gk: [[0, 'ficka'], [0.95, 'ficka'], [1.55, 'ute'], [2.25, 'oppna', 30], [3.55, 'oppna'], [4.05, 'putsa'], [6.15, 'putsa'], [6.95, 'kika', 40], [9.1, 'kika'], [9.7, 'oppna'],
+          [10.25, 'fore'], [10.7, 'pa'], [13.4, 'pa'], [13.95, 'fore'], [14.55, 'oppna'], [15.2, 'oppna'], [15.8, 'ute', 30], [16.3, 'ficka']],
+        fall: [[0, 0], [9.45, 0], [9.65, 1], [14.6, 1], [15.1, 0]],
+        motA: [[0.1, 0], [0.95, 1], [10.75, 1], [11.3, 0], [12.8, 0], [13.35, 1], [16.35, 1], [16.95, 0]],
+        krok: [[0.7, 0.2], [0.95, 0.62], [10.7, 0.62], [11.0, 0.25], [13.1, 0.2], [13.35, 0.62], [16.3, 0.62], [16.6, 0.25]],
+        gnid: [[4.1, 0], [4.35, 1], [5.9, 1], [6.15, 0]],
+      },
+    },
+    // Visslingen (LAT ovan): blicken upp i taket, läpparna i ett o och huvudet som vaggar i takt, och
+    // pekfingret knackar på disken. Ögonen kommer ned på en, och tonen dör. Han håller läpparna kvar en
+    // stund, tittar sedan längs baren och visslar vidare, gladare än förut, smackar och nickar för sig själv,
+    // och tittar till sist på en med ett höjt bryn.
+    vissla: {
+      k: {
+        pitch: [[0.3, 0], [0.8, -0.35], ...LAT.slice(0, 10).flatMap(([t]) => [[t, -0.35], [t + 0.12, -0.2], [t + 0.26, -0.35]]), [4.88, -0.35], [5.0, -0.25], [6.0, -0.25],
+          [6.25, -0.15], ...LAT.slice(11).flatMap(([t]) => [[t, -0.15], [t + 0.1, 0.05], [t + 0.22, -0.15]]), [8.8, -0.1], [9.0, 0.25], [9.25, 0], [9.5, 0.2], [9.8, -0.15], [10.6, 0]],
+        yaw: [[0.3, 0], [0.8, 0.25], [4.9, 0.25], [6.0, 0.22], [6.4, -0.45], [8.7, -0.45], [9.4, 0.05], [10.4, 0.1]],
+        roll: [[0.8, 0], [1.6, 0.05], [2.6, -0.04], [3.6, 0.05], [4.6, -0.03], [4.9, 0], [6.4, 0], [7.0, -0.06], [7.6, 0.05], [8.2, -0.05], [8.8, 0], [9.6, 0.05], [10.4, 0]],
+        lut: [[0.5, 0], [1.0, -0.02], [4.9, -0.02], [5.0, 0.01], [6.0, 0.01], [6.5, -0.03], [8.6, -0.03], [9.2, 0]],
+        brynX: [[0.6, 0.3], ...LAT.slice(0, 10).map(([t], i) => [t + 0.1, i % 2 ? 0.35 : 0.65]), [4.88, 0.5], [5.0, 1.15], [6.0, 1.05], [6.3, 0.6], ...LAT.slice(11).map(([t], i) => [t + 0.08, i % 2 ? 0.55 : 0.95]),
+          [8.9, 0.3], [9.7, 1.25], [10.3, 1.1], [10.8, 0]],
+        brynY: [[0.6, 0.3], ...LAT.slice(0, 10).map(([t], i) => [t + 0.1, i % 2 ? 0.3 : 0.6]), [4.88, 0.45], [5.0, 1.1], [6.0, 1.0], [6.3, 0.55], ...LAT.slice(11).map(([t], i) => [t + 0.08, i % 2 ? 0.5 : 0.9]),
+          [8.9, 0.3], [9.7, 0.15], [10.3, 0.15], [10.8, 0]],
+        blickX: [[0.3, 0], [0.6, 2.5], [4.88, 2.5], [5.0, -1.4], [6.0, -1.4], [6.3, -5], [8.7, -5], [9.2, -2], [9.5, 0]],
+        blickY: [[0.3, 0], [0.6, -5.5], [4.88, -5.5], [5.0, -0.6], [6.0, -0.6], [6.3, -4], [8.7, -4], [9.2, 0]],
+        blund: [[0.3, 0], [0.6, 0], [4.88, 0], [6.0, 0], [8.8, 0], [9.0, 0.3], [9.3, 0.3], [9.45, 0]],
+        stel: [[0.6, 0], [0.85, 0.85], [4.88, 0.85], [5.0, 1], [6.0, 1], [6.25, 0.85], [8.7, 0.85], [9.0, 0]],
+        rund: [[0.6, 0], [0.85, 1], [5.6, 1], [5.9, 0], [6.15, 0], [6.25, 1], [8.7, 1], [8.85, 0]],
+        munn: [[0.6, 0], [0.85, 0.13], [4.85, 0.13], [5.0, 0.1], [5.6, 0.08], [5.9, 0], [6.15, 0], [6.25, 0.13], [8.7, 0.13], [8.85, 0],
+          [8.95, 0.06], [9.05, 0], [9.17, 0.07], [9.27, 0]],
+        andas: [[0.5, 0], [0.8, 6], [4.8, -4], [5.0, 4], [6.0, 4], [6.2, 7], [8.7, -5], [9.2, 0]],
+        le: [[8.8, 0], [9.2, 0.45], [10.3, 0.6], [10.8, 0.3]],
+        kis: [[9.4, 0], [9.7, 0.3], [10.3, 0.3], [10.8, 0]],
+      },
+      // (pekfingret knackar i takt: lyfts och slår ned)
+      fA: {
+        e0: [[0.7, 0], ...LAT.slice(0, 10).flatMap(([t]) => [[t - 0.16, -0.4], [t, 0.05], [t + 0.08, 0]]), [4.9, 0], [6.1, 0],
+          ...LAT.slice(11).flatMap(([t]) => [[t - 0.12, -0.45], [t, 0.05], [t + 0.07, 0]]), [8.6, 0]],
+      },
+    },
+    // Naglarna: höger hand upp framför bröstet med handflatan mot honom och fingrarna krökta, och han tittar
+    // ned på naglarna, blåser på dem och putsar dem mot slaget på kavajen, och tittar igen, nöjd. Då ser han
+    // en över handen. Han fryser, och sedan blir handen ett pekfinger mot en, två stötar och brynen nere, hakan
+    // upp: har jag fel? Handen tillbaka, och ett belåtet leende.
+    naglar: {
+      k: {
+        pitch: [[0.3, 0], [0.9, 0.5], [2.2, 0.5], [2.5, 0.35], [3.0, 0.35], [3.4, 0.6], [4.6, 0.6], [5.0, 0.45], [5.9, 0.4], [6.02, 0.3], [7.1, 0.32],
+          [7.5, -0.25], [7.85, -0.1], [8.0, -0.3], [8.3, -0.1], [8.45, -0.3], [9.0, -0.25], [9.3, 0.2], [9.5, 0], [10.2, 0]],
+        yaw: [[0.3, 0], [0.9, -0.2], [2.9, -0.2], [3.4, 0.2], [4.6, 0.2], [5.0, -0.2], [7.1, -0.2], [7.5, 0.05], [9.0, 0.05], [10.0, 0]],
+        roll: [[0.6, 0], [1.2, 0.07], [2.2, 0.07], [3.0, 0], [5.0, 0.06], [5.9, 0.08], [7.1, 0.08], [7.5, 0], [9.6, 0]],
+        lut: [[0.6, 0.02], [2.2, 0.02], [3.4, 0.05], [4.6, 0.05], [5.2, 0.02], [7.1, 0.02], [7.6, 0.08], [7.85, 0.05], [8.0, 0.09], [8.3, 0.05], [8.45, 0.09], [9.0, 0.04], [9.8, 0]],
+        axV: [[0.5, 10], [7.1, 12], [7.6, 22], [9.0, 18], [9.8, 0]],
+        brynX: [[0.6, 0.2], [1.3, 0.5], [2.2, 0.45], [3.4, 0.2], [4.6, 0.2], [5.2, 0.8], [5.9, 0.75], [6.02, 1.15], [7.0, 1.05], [7.45, -0.55], [8.9, -0.6], [9.3, 0.9], [9.9, 0.8], [10.4, 0]],
+        brynY: [[0.6, 0.2], [1.3, 0.3], [2.2, 0.3], [3.4, 0.2], [4.6, 0.2], [5.2, 0.55], [5.9, 0.5], [6.02, 1.1], [7.0, 1.0], [7.45, -0.75], [8.9, -0.8], [9.3, 0.1], [9.9, 0.1], [10.4, 0]],
+        blickX: [[0.3, 0], [0.7, -2.5], [2.9, -2.5], [3.3, 3], [4.6, 3], [5.0, -2.5], [5.9, -2.5], [6.02, 1.0], [7.0, 1.0], [7.4, 0]],
+        blickY: [[0.3, 0], [0.7, 5], [2.9, 5], [3.3, 4], [4.6, 4], [5.0, 5], [5.9, 5], [6.02, -1.6], [7.0, -1.6], [7.4, 0]],
+        blund: [[0.3, 0], [0.7, 0.35], [2.2, 0.35], [2.5, 0.2], [2.95, 0.2], [3.3, 0.35], [5.9, 0.35], [6.0, 0]],
+        stel: [[5.95, 0], [6.05, 1], [7.1, 1], [7.6, 0]],
+        kis: [[1.0, 0], [1.4, 0.3], [2.2, 0.3], [2.5, 0], [5.2, 0], [5.6, 0.25], [5.9, 0.2], [6.0, 0], [7.3, 0], [7.6, 0.5], [8.9, 0.5], [9.3, 0.3], [9.9, 0.3], [10.4, 0]],
+        rund: [[2.3, 0], [2.4, 0.9], [2.7, 0.8], [2.8, 0.9], [3.05, 0.8], [3.15, 0]],
+        munn: [[2.3, 0], [2.4, 0.06], [3.05, 0.05], [3.15, 0], [6.0, 0], [6.1, 0.04], [7.1, 0.04], [7.2, 0], [7.8, 0], [7.88, 0.06], [8.0, 0], [8.25, 0], [8.33, 0.06], [8.45, 0]],
+        andas: [[2.2, 0], [2.35, 6], [2.7, -2], [2.8, 4], [3.1, -3], [3.4, 0], [5.95, 0], [6.15, 5], [7.0, 5], [7.4, 0]],
+        le: [[1.2, 0.35], [2.2, 0.3], [5.2, 0.4], [5.9, 0.45], [6.0, 0], [9.3, 0.3], [9.9, 0.6], [10.6, 0.3]],
+      },
+      A: [
+        [0.7, [-190, 175, 585], [-0.85, -0.5, 0.15], [0.3, 0.9, 0.3], [0.55, 0.2, -0.8], 0.95, 0],
+        [2.2, [-186, 178, 590], [-0.85, -0.5, 0.15], [0.3, 0.9, 0.3], [0.55, 0.2, -0.8], 0.95, 0],
+        [2.4, [-195, 205, 640], [-0.85, -0.5, 0.15], [0.3, 0.9, 0.3], [0.55, 0.2, -0.8], 0.95, 0],
+        [3.0, [-195, 205, 640], [-0.85, -0.5, 0.15], [0.3, 0.9, 0.3], [0.55, 0.2, -0.8], 0.95, 0],
+        [3.4, [-20, 150, 420], [-0.9, -0.4, 0.1], [0.6, 0.8, 0.05], [0.05, -0.05, 1], 0.9, 0],
+        [4.6, [-20, 150, 420], [-0.9, -0.4, 0.1], [0.6, 0.8, 0.05], [0.05, -0.05, 1], 0.9, 0],
+        [5.0, [-190, 178, 585], [-0.85, -0.5, 0.15], [0.3, 0.9, 0.3], [0.55, 0.2, -0.8], 0.95, 0],
+        [5.9, [-192, 182, 588], [-0.85, -0.5, 0.15], [0.3, 0.9, 0.3], [0.55, 0.2, -0.8], 0.95, 0],
+        [7.1, [-192, 182, 588], [-0.85, -0.5, 0.15], [0.3, 0.9, 0.3], [0.55, 0.2, -0.8], 0.95, 0],
+        [7.4, [-250, 245, 640], [-0.85, -0.5, 0.15], [0.3, 0.35, 0.89], [0.35, -0.9, 0.25], 0.95, 1],
+        [7.8, [-245, 250, 690], [-0.85, -0.5, 0.15], [0.3, 0.35, 0.89], [0.35, -0.9, 0.25], 0.95, 1],
+        [7.95, [-250, 245, 645], [-0.85, -0.5, 0.15], [0.3, 0.35, 0.89], [0.35, -0.9, 0.25], 0.95, 1],
+        [8.25, [-245, 250, 695], [-0.85, -0.5, 0.15], [0.3, 0.35, 0.89], [0.35, -0.9, 0.25], 0.95, 1],
+        [8.4, [-250, 245, 650], [-0.85, -0.5, 0.15], [0.3, 0.35, 0.89], [0.35, -0.9, 0.25], 0.95, 1],
+        [9.0, [-252, 243, 648], [-0.85, -0.5, 0.15], [0.3, 0.35, 0.89], [0.35, -0.9, 0.25], 0.95, 1],
+        [9.6, [-200, -150, 560], PA, [0.6, 0.2, 0.75], [0.2, -0.9, 0.35], 0.3, 0],
+      ],
+      // (gnider dem mot slaget: handen fram och tillbaka)
+      fA: { sv: { amp: [[3.45, 0], [3.6, 1], [4.4, 1], [4.55, 0]], f: 3.2, x: [18, -9, 0] } },
+    },
+  });
   // tidningen (LASA): huvudet och ansiktet som i de andra klippen, händerna räknas ur tidningen (tidningArm)
   for (const [namn, l] of Object.entries(LASA)) RORELSER[namn] = { k: l.k, las: l.t, glas: l.g };
   for (const [namn, o] of Object.entries(RORELSER)) {
@@ -2365,7 +2632,7 @@ export async function figuren(duk, { hog = false, latt = false, pr = 1 } = {}) {
       k.cig = {
         ck: tid(c.ck), krok: tid(c.krok), mot: tb(c.mot), upp: tb(c.upp), grepp: tb(c.grepp), rull: c.rull ? tid(c.rull) : tom(),
         glod: tid(c.glod), iMun: tid(c.iMun), blaser: c.blaser ? tid(c.blaser) : tom(), pust: c.pust ? tid(c.pust) : tom(),
-        rok: rokTid(c.rok),
+        rok: rokTid(c.rok), ute: Boolean(c.ute),
       };
     }
     if (o.las) k.las = Object.fromEntries(Object.entries(o.las).map(([x, kk]) => [x, tid(kk)]));
@@ -2379,6 +2646,8 @@ export async function figuren(duk, { hog = false, latt = false, pr = 1 } = {}) {
   // Slagen i disken: [T, styrka, sort]; och när koppen ställs ned på fatet [T, styrka]
   const DUNK = Object.values(KLIPP).flatMap((m) => (m.dunk || []).map(([t, s, sort]) => [m.fran + t, s, sort]));
   const NED = Object.values(KLIPP).flatMap((m) => (m.ned || []).map(([t, s]) => [m.fran + t, s]));
+  // Det andra som hörs i sysslorna (ljud: [tid, ljud]), som han visslar
+  const LJUD = Object.values(KLIPP).flatMap((m) => (m.ljud || []).map(([t, e]) => [m.fran + t, e]));
 
   // Det som står på disken hoppar när han slår i den: koppen studsar på fatet, lägre för varje gång,
   // fatet lite, askkoppen knappt och cigarren i urtaget. Höjden (i världens enheter) vid dt efter slaget.
@@ -3131,6 +3400,10 @@ export async function figuren(duk, { hog = false, latt = false, pr = 1 } = {}) {
     // i handen framför bröstet när han har tagit av dem, och en knyck mot en
     hall: { m: lagM(V3(-180, 390, 500), -0.15, -0.55, 0.12) },
     visa: { m: lagM(V3(-160, 430, 540), -0.1, -0.3, 0.05) },
+    // hopfällda mot skjortan och slipsen, där han putsar dem (gnid i klippet: små cirklar), och uppe mot
+    // ljuset på armlängds avstånd, där han tittar genom dem (putsa)
+    putsa: { m: lagM(W_(690, 800, djup(690, 800) + 22), 0.3, -0.1, 0.15) },
+    kika: { m: lagM(V3(-95, 640, 540), -0.75, -0.2, 0.1) },
   };
   GL.fore = { h: true, m: GL.pa.m.clone().premultiply(new THREE.Matrix4().makeTranslation(0, -14, 120)) };
   // Skalmens ände i munnen (tanka): bågen vänd så att den högra skalmen pekar in mot mungipan.
@@ -3188,6 +3461,12 @@ export async function figuren(duk, { hog = false, latt = false, pr = 1 } = {}) {
     iVarld(b, gB);
     gA.p.lerp(gB.p, f);
     gA.p.y += h * Math.sin(f * Math.PI);
+    // (gnid: han putsar dem i små cirklar)
+    const gn = G && G.gnid ? spar(G.gnid, t) : 0;
+    if (gn) {
+      gA.p.x += 12 * gn * Math.cos(t * 17);
+      gA.p.y += 8 * gn * Math.sin(t * 17);
+    }
     gA.q.slerp(gB.q, f);
     gW.compose(gA.p, gA.q, ETT3);
     const pa = (PA_ANSIKTET.has(a) ? 1 - f : 0) + (PA_ANSIKTET.has(b) ? f : 0);
@@ -3441,8 +3720,8 @@ export async function figuren(duk, { hog = false, latt = false, pr = 1 } = {}) {
     rokT = t;
     const c = kl && kl.cig;
     if (dt > 0) {
-      // en tunn tråd ur glöden, utspridd längs vägen om cigarren rör sig
-      rokSkuld += dt * (14 + 34 * glod);
+      // en tunn tråd ur glöden, utspridd längs vägen om cigarren rör sig (inte när den har slocknat: ute)
+      rokSkuld += c && c.ute ? 0 : dt * (14 + 34 * glod);
       const k = Math.floor(rokSkuld);
       rokSkuld -= k;
       for (let i = 0; i < k; i++) {
@@ -3553,7 +3832,7 @@ export async function figuren(duk, { hog = false, latt = false, pr = 1 } = {}) {
     U.bryn.value.set(kan('brynX') + lyft, kan('brynY') + lyft);
     // (nöjd, utom när brynen dras ned)
     const allvar = clamp(-(d('brynX') + d('brynY')) * 0.7);
-    U.le.value = Math.max(NOJD * (1 - allvar), skratt, 0.6 * ss(10, 10.5, t) * (1 - ss(11.6, 12.4, t)), d('le'));
+    U.le.value = Math.max(NOJD * (1 - allvar) * (1 - d('stel')), skratt, 0.6 * ss(10, 10.5, t) * (1 - ss(11.6, 12.4, t)), d('le'));
     // talet: stavelser med små pauser, ibland rundare läppar; läpparna skiljs åt hela tiden han pratar och
     // öppnas upp till en dryg centimeter (förut knappt en halv, så att han såg ut att mumla)
     const stav = Math.abs(Math.sin(n * 7.3)) * (0.42 + 0.58 * ss(-0.35, 0.5, Math.sin(n * 2.3 + 0.7))) * (0.72 + 0.28 * Math.sin(n * 17.3));
@@ -3689,6 +3968,7 @@ export async function figuren(duk, { hog = false, latt = false, pr = 1 } = {}) {
       for (const [dl, h] of landar(s)) if (i(td + dl)) ut.push({ typ: 'klirr', styrka: h });
     }
     for (const [tn, s] of NED) if (i(tn)) ut.push({ typ: 'klirr', styrka: s, mjuk: true });
+    for (const [tl, e] of LJUD) if (i(tl)) ut.push({ ...e });
     return ut;
   }
 

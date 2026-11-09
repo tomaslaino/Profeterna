@@ -1966,6 +1966,8 @@ window.RumHasse = (() => {
   // läser, tittar upp över den på en ibland och läser vidare (klippen lasa i rum-hasse-3d.js), och har man
   // just kommit läser han redan. Tidningen är dagens DN eller SvD (dagens i rum-hasse-tidning.js), med glasögonen
   // på. Mellan gångerna gör han annat en stund (LAS_PAUS, ms), och behöver han händerna lägger han ned den direkt.
+  // Han har fler sätt att verka upptagen (samma grupp lasa: raknar, tomKopp, slocknad, putsa, vissla, naglar),
+  // och i dem blir han ertappad och låtsas som ingenting; har man just kommit håller han redan på (fram).
   // Dåligt: inte ett rätt (inget), sämst i gänget (sist) eller rätten långt under vad chanserna var värda
   // (daligt, som i hurDetGick). Med minskad rörelse läser han inte.
   const LAS_PAUS = [4000, 10000];
@@ -1981,12 +1983,12 @@ window.RumHasse = (() => {
     }
     H.lasT = performance.now() + (H.on ? 1500 : 0);
   }
-  // han läser redan (efter upp)
+  // han läser redan (efter upp), eller håller redan på med något annat, strax innan man ertappar honom (fram)
   function lasNu() {
     const k = GEST[ettAv('lasa', 'lasa')];
     if (!k || calm()) return;
     H.klipp = { ...k };
-    H.T = k.fran + H.m.LAS_START;
+    H.T = k.fran + (k.fram ?? H.m.LAS_START);
   }
   // Hans omgång i sammanställningen: tävlingskupongen om han spelade, annars det han sa. → { lage, ok, n }
   // (lage null när det inte gick dåligt), eller null.

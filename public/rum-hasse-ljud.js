@@ -2,9 +2,10 @@
 // fatet när den landar efter slaget eller när han ställer ned den. Allt räknas fram med Web Audio när
 // det hörs, utan ljudfiler, och lite olika varje gång.
 //
-// spela(ctx, { typ: 'dunk' | 'klirr' | 'skrap', styrka, sort, mjuk, ms }), från figurens händelser
+// spela(ctx, { typ: 'dunk' | 'klirr' | 'skrap' | 'vissla' | 'anda', styrka, sort, mjuk, ms, f, f1 }), från figurens händelser
 // (handelser i rum-hasse-3d.js) och pennan på din kupong (rum-hasse-kupong.js). sort: 'hand' (handflatan), 'nave' (lillfingersidan av näven) eller
-// 'bada' (båda händerna). mjuk: koppen ställs ned, inte tappas.
+// 'bada' (båda händerna). mjuk: koppen ställs ned, inte tappas. vissla: en ton han visslar, f till f1 Hz under ms;
+// anda: han andas på glasögonen (sort 'ha') eller blåser på naglarna ('blas').
 
 const brus = new WeakMap();
 // en sekund vitt brus per ljudsammanhang
@@ -152,6 +153,70 @@ function skrap(ctx, mal, t, s, ms) {
   }
 }
 
+// Han visslar (klippet vissla): en ren ton som glider upp i tonen i början, med lite vibrato och luften
+// som hörs i den, mjukt in och ut.
+function vissla(ctx, mal, t, e) {
+  const o = ut(ctx, mal, 0);
+  const lang = Math.max(0.15, (e.ms || 300) / 1000);
+  const s = Math.min(1, e.styrka ?? 0.8);
+  const f0 = e.f;
+  const f1 = e.f1 || f0;
+  const osc = ctx.createOscillator();
+  osc.frequency.setValueAtTime(f0 * 0.94, t);
+  osc.frequency.exponentialRampToValueAtTime(f0, t + 0.045);
+  if (f1 !== f0) osc.frequency.exponentialRampToValueAtTime(f1, t + lang);
+  const lfo = ctx.createOscillator();
+  lfo.frequency.value = slump(5, 6.2);
+  const lg = ctx.createGain();
+  lg.gain.value = f0 * 0.012;
+  lfo.connect(lg).connect(osc.frequency);
+  const topp = 0.11 * s;
+  const g = ctx.createGain();
+  g.gain.setValueAtTime(0, t);
+  g.gain.linearRampToValueAtTime(topp, t + 0.035);
+  g.gain.setValueAtTime(topp, t + lang - 0.07);
+  g.gain.linearRampToValueAtTime(0, t + lang);
+  osc.connect(g).connect(o);
+  // luften
+  const b = ctx.createBufferSource();
+  b.buffer = bruset(ctx);
+  const fl = ctx.createBiquadFilter();
+  fl.type = 'bandpass';
+  fl.frequency.setValueAtTime(f0, t);
+  if (f1 !== f0) fl.frequency.exponentialRampToValueAtTime(f1, t + lang);
+  fl.Q.value = 6;
+  const bg = ctx.createGain();
+  bg.gain.setValueAtTime(0, t);
+  bg.gain.linearRampToValueAtTime(0.05 * s, t + 0.03);
+  bg.gain.linearRampToValueAtTime(0, t + lang);
+  b.connect(fl).connect(bg).connect(o);
+  osc.start(t);
+  lfo.start(t);
+  b.start(t, Math.random() * 0.3, lang + 0.05);
+  osc.stop(t + lang + 0.05);
+  lfo.stop(t + lang + 0.05);
+}
+// Ett andetag: ett varmt, dovt ha på glasögonen, eller en tunnare pust på naglarna.
+function anda(ctx, mal, t, e) {
+  const o = ut(ctx, mal, -0.05);
+  const lang = Math.max(0.1, (e.ms || 400) / 1000);
+  const ha = e.sort === 'ha';
+  const b = ctx.createBufferSource();
+  b.buffer = bruset(ctx);
+  const fl = ctx.createBiquadFilter();
+  fl.type = 'bandpass';
+  fl.frequency.value = ha ? slump(650, 800) : slump(1800, 2400);
+  fl.Q.value = ha ? 0.9 : 1.4;
+  const topp = ha ? 0.22 : 0.12;
+  const g = ctx.createGain();
+  g.gain.setValueAtTime(0, t);
+  g.gain.linearRampToValueAtTime(topp, t + lang * 0.25);
+  g.gain.linearRampToValueAtTime(topp * 0.6, t + lang * 0.7);
+  g.gain.linearRampToValueAtTime(0, t + lang);
+  b.connect(fl).connect(g).connect(o);
+  b.start(t, Math.random() * 0.4, lang + 0.05);
+}
+
 export function spela(ctx, e) {
   if (!ctx || ctx.state !== 'running') return;
   const t = ctx.currentTime + 0.01;
@@ -160,4 +225,6 @@ export function spela(ctx, e) {
   if (e.typ === 'dunk') dunk(ctx, mal, t, s, e.sort);
   else if (e.typ === 'klirr' && s > 0.02) klirr(ctx, mal, t, s, e.mjuk);
   else if (e.typ === 'skrap') skrap(ctx, mal, t, s, e.ms);
+  else if (e.typ === 'vissla' && e.f) vissla(ctx, mal, t, e);
+  else if (e.typ === 'anda') anda(ctx, mal, t, e);
 }
