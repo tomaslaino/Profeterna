@@ -64,6 +64,15 @@
 .rum-ute.samlad .rum-ute-gata > svg.skylt { filter: blur(0.8px); }
 /* (blixten är ett lager över husen här, inte bara över himlen) */
 .rum-ute.samlad .rum-blixt { opacity: 0.45; }
+/* De tomma lagren syns inte, och gatans lager har ingen egen storlek (bara skyltarna, som har sin
+   egen, står kvar där). Annars blev de, eftersom de ligger över duken, ett lager i hela utsiktens
+   storlek som grafikkortet lade över rummet i varje bildruta, 0,8 skärmytor i telefonen. Glaset
+   likaså: dropparna, snön och frosten (en SVG så stor som fönstret och dörren) och rännilarna har
+   egna mått. */
+.rum-ute.samlad > div.rum-layer:empty { display: none; }
+.rum-ute.samlad > .rum-ute-gata, .rum-ute > .rum-glas { width: 0; height: 0; }
+/* (dropparna på rutan är en bild i duken där, bakaGlas, och de som rinner står still: rännilarna är tomma) */
+.rum-ute.samlad .rum-rinner { display: none; }
 
 /* snön driver i sidled medan den faller */
 .rum-sno-v { position: absolute; left: -60px; top: 0; width: calc(100% + 120px); height: 100%; animation: rum-sway ease-in-out infinite alternate; }
