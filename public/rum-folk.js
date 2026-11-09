@@ -32,10 +32,11 @@
 // förut – tas kupongen sedan i handen att fylla i eller ändra (ta i rum.js),
 // när namnet är skrivet eller tecknet syns.
 //
-// Natten: mellan elva på kvällen och sex (Stockholms tid, Vader.nu()) är lysröret
-// släckt – rummet mörkt utom gatan, neonen och tv:n (.natt, rum-folk.css),
-// gänget och lysröret i 3D – och på morgonen blinkar det igång igen. Nära
-// tv:n, videon, en sak eller med kupongen i handen är det ljust.
+// Natten: lysröret dämpas långsamt från elva på kvällen och är släckt från
+// midnatt (Stockholms tid, Vader.nu()) – rummet mörkt utom gatan, neonen och tv:n
+// (.natt och --natt-grad, rum-folk.css), gänget och lysröret i 3D – och från sex
+// tänds det lika långsamt, tills det lyser fullt klockan sju (nattGrad, 0–1, en
+// gång i minuten). Nära tv:n, videon, en sak eller med kupongen i handen är det ljust.
 //
 // Sömnen: mellan 22.30 och sju (Stockholms tid) sover gänget (somn i rum-3d.js),
 // och radion, matcherna eller ett klick på någon väcker dem.
@@ -55,12 +56,13 @@
 //   RumFolk.on(true | false)                           rummet visas eller inte
 //   RumFolk.ute(v)                                     klockan (Vader.nu())
 //   RumFolk.fyll(old, seen)                            de färdiga kupongerna och omgångarna
-//   RumFolk.natt()                                     är det natt?
+//   RumFolk.natt()                                     är det natt (lysröret mer än halvvägs släckt)?
+//   RumFolk.nattGrad()                                 hur släckt lysröret är (0 tänt – 1 släckt)
 //   RumFolk.somn()                                     sover gänget (22.30–07)?
 //   RumFolk.senast()                                   hur den senaste kupongen gick (ansiktena)
 //   RumFolk.ansikte(betyg, n, fel)                     ansiktena efter en färdig kupong
 //
-// För bilder: ?rum-natt (=0 dag; gänget sover då också), ?rum-somn (=0 vakna)
+// För bilder: ?rum-natt (=0 dag, =0.5 halvvägs; gänget sover då också), ?rum-somn (=0 vakna)
 // gänget sover (utan att lysröret släcks), ?rum-vakna=dl:ryck:3 (DL vaknade med
 // ett ryck för tre sekunder sedan; strack, bakis), ?rum-efter=bra|illa (=inget),
 // ?rum-ansikte=jublar|glad|nojd|sur|deppig|orolig (=inget),
@@ -84,7 +86,7 @@ window.RumFolk = (() => {
   const F = {
     el: null, o: null, on: false, ws: null, timer: 0, ping: 0, retry: 0, loop: 0,
     over: null, pa: null, mot: undefined, sent: undefined, sentAt: 0, sendT: 0, inne: {},
-    natt: null, somn: null, efter: undefined, pek: null, typ: 'mouse', hejAt: -1, rorAt: 0, vem: null,
+    natt: null, grad: null, somn: null, efter: undefined, pek: null, typ: 'mouse', hejAt: -1, rorAt: 0, vem: null,
   };
   const fig = () => (F.o && F.o.fig()) || null;
 
@@ -365,9 +367,18 @@ window.RumFolk = (() => {
 
   // ---------- natten ----------
 
-  function arNatt(v) {
-    if (q.has('rum-natt')) return q.get('rum-natt') !== '0';
-    return Boolean(v && (v.timme >= 23 || v.timme < 6));
+  // hur släckt lysröret är: dämpas från 23 till midnatt, släckt till sex och tänds till sju
+  function nattGrad(v) {
+    if (q.has('rum-natt')) {
+      const x = parseFloat(q.get('rum-natt'));
+      return Number.isFinite(x) ? Math.max(0, Math.min(1, x)) : 1;
+    }
+    if (!v) return 0;
+    const m = v.timme * 60 + (v.minut || 0);
+    if (m >= 23 * 60) return (m - 23 * 60) / 60;
+    if (m < 6 * 60) return 1;
+    if (m < 7 * 60) return 1 - (m - 6 * 60) / 60;
+    return 0;
   }
   // gänget sover från 22.30 till sju
   function arSomn(v) {
@@ -381,31 +392,25 @@ window.RumFolk = (() => {
       F.somn = s;
       somnTill();
     }
-    const on = arNatt(v);
-    if (on === F.natt) return;
-    const forr = F.natt;
-    F.natt = on;
+    const g = Math.round(nattGrad(v) * 1000) / 1000;
+    if (g === F.grad) return;
+    F.grad = g;
+    F.natt = g >= 0.5;
     const el = F.el || document.getElementById('rum-section');
     if (el) {
-      el.classList.toggle('natt', on);
-      // på morgonen blinkar lysröret igång (.rum-mork.tands i rum.css)
+      el.classList.toggle('natt', g > 0);
+      // (mörkrets styrka på mörkret självt, inte på hela rummet: en variabel ärvs av allt i det)
       const m = el.querySelector('#rum-mork');
-      if (forr && !on && m && !matchMedia('(prefers-reduced-motion: reduce)').matches) {
-        m.classList.add('tands');
-        m.addEventListener('animationend', function slut(e) {
-          if (e.animationName !== 'rum-tands') return;
-          m.classList.remove('tands');
-          m.removeEventListener('animationend', slut);
-        });
-      }
+      if (m) m.style.setProperty('--natt-grad', String(g));
     }
     nattTill();
   }
   function nattTill() {
+    if (F.grad == null) return;
     const f = fig();
-    if (f && f.natt) f.natt(F.natt, F.o.now());
+    if (f && f.natt) f.natt(F.grad, F.o.now());
     const inr = F.o && F.o.inr();
-    if (inr && inr.natt) inr.natt(F.natt);
+    if (inr && inr.natt) inr.natt(F.grad);
   }
   function somnTill() {
     const f = fig();
@@ -529,5 +534,5 @@ window.RumFolk = (() => {
     }, 250);
   }
 
-  return { mount, on, ute, fyll, natt: () => Boolean(F.natt), somn: () => Boolean(F.somn), senast: () => (F.senast !== undefined ? F.senast : senastAv(null)), ansikte: ansikteAv };
+  return { mount, on, ute, fyll, natt: () => Boolean(F.natt), nattGrad: () => F.grad || 0, somn: () => Boolean(F.somn), senast: () => (F.senast !== undefined ? F.senast : senastAv(null)), ansikte: ansikteAv };
 })();

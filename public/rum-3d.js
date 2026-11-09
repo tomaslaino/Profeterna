@@ -120,7 +120,7 @@
 // hej att man pekar på vem (ut = när man slutade, Infinity = pekar fortfarande),
 // vald att vem just valdes som den som fyller i kupongen, tecken att man
 // klickade på vem (namn: vilket tecken, annars nästa),
-// natt om lysröret är släckt, somn om gänget sover (22.30–07), vakna att vem väcktes
+// natt hur släckt lysröret är (0–1), somn om gänget sover (22.30–07), vakna att vem väcktes
 // vid t (för bilder; sätt 'ryck' | 'strack' | 'bakis'), efter dagen efter (lage 'bra' | 'illa' | null,
 // krona = oraklen, 'dl' …), under vem i gänget (eller 'radio') som syns i punkten
 // och kval({ pr, skugga, detalj }) hur fint gänget ritas (KVAL i rum.js; detalj
@@ -3402,9 +3402,9 @@ export async function figurer(canvas, opt = {}) {
   const hejW = (o, t) => { const h = HEJ[o.F.key]; return h ? sm(h.at, h.at + 0.35, t) * (1 - sm(h.ut, h.ut + 0.6, t)) * (1 - sovW(o, t)) * (1 - vaknaW(o, t)) : 0; };
   // flaskan eller cigaretten lyfts en stund (inte medan man väntar)
   const skalW = (o, t) => { const h = HEJ[o.F.key]; return h ? bump(t - h.at, 0.15, 0.7, 2.4, 3.2) * (1 - sm(h.ut, h.ut + 0.5, t)) * ready(o, t) * (1 - sovW(o, t)) * (1 - vaknaW(o, t)) : 0; };
-  // N: natten (lysröret släckt), som tonar in och ut på 2,5 sekunder
-  const N = { on: false, at: -1e9, fran: 0 };
-  const nattW = (t) => N.fran + ((N.on ? 1 : 0) - N.fran) * sm(N.at, N.at + 2.5, t);
+  // N: natten (hur släckt lysröret är, 0–1, mal), som glider dit på 2,5 sekunder
+  const N = { mal: 0, at: -1e9, fran: 0 };
+  const nattW = (t) => N.fran + (N.mal - N.fran) * sm(N.at, N.at + 2.5, t);
 
   // ---------- sömnen ----------
   // Mellan 22.30 och sju (somn, från rum-folk.js) sover gänget, var och en på sitt sätt
@@ -6806,14 +6806,14 @@ export async function figurer(canvas, opt = {}) {
     }
     HEJ[k] = { at: t, ut };
   }
-  // Natten (lysröret släckt): första gången som det är, sedan på en stund.
+  // Natten (hur släckt lysröret är, 0–1, eller på/av): första gången som det är, sedan på en stund.
   let toldNatt = false;
-  function natt(on, t) {
-    on = Boolean(on);
-    if (on === N.on && toldNatt) return;
-    N.fran = toldNatt ? nattW(t) : on ? 1 : 0;
+  function natt(g, t) {
+    g = typeof g === 'number' ? Math.max(0, Math.min(1, g)) : g ? 1 : 0;
+    if (g === N.mal && toldNatt) return;
+    N.fran = toldNatt ? nattW(t) : g;
     N.at = toldNatt ? t : -1e9;
-    N.on = on;
+    N.mal = g;
     toldNatt = true;
   }
   // Sömnen (22.30–07): första gången som det är. Sedan somnar de en i taget (SOMN_FORE) –
