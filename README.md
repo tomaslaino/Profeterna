@@ -990,7 +990,9 @@ bara lokalt. Analyserna visas som de ligger i `data/analyser.json`; hur de skriv
 - **De gamla protokollen på korktavlan (2026-11-09, användarens önskemål):** "Man vill här kunna klicka in sig på de
   tidigare bettingarna - och hur det gick för alla. Alltså tidigare protokoll." Varje färdigspelad kupong på korktavlan
   tas nära ned från nålen med ett klick och blir omgångens protokoll, samma blad som på pulten med allas tecken, facit,
-  rätt och poäng. Se *Protokollen på korktavlan* under [Sammanställningen efter omgången](#sammanställningen-efter-omgången).
+  rätt och poäng. Samma dag, på frågan om de äldre kupongerna som inte ryms på tavlan: "Ja, gör så att man kan bläddra med
+  pilarna" – ←/→, pilarna under bladet eller ett svep i sidled går till omgången före och efter, genom hela säsongen.
+  Se *Protokollen på korktavlan* under [Sammanställningen efter omgången](#sammanställningen-efter-omgången).
 - **Protokollet som ett äkta papper (2026-11-09, användarens önskemål):** "Jag tycker inte att protokoll-pappret ser
   trovärdigt ut. Gör det snyggare och som att det ser ut som ett äkta papper. Det går gärna likna de vanliga kupongerna".
   Bladet är nu en blankett som kupongen (se *Sammanställningen efter omgången*): de platta gröna rutorna är en grön
@@ -2674,7 +2676,8 @@ Enter och mellanslag klickar på dem. En match på text-tv:n lägger fram matchb
 - **Korktavlan** (längst ut på högra väggen, hel i bild, i en träram i 3D) → närbild: de
   färdigspelade kupongerna (`Historik.coupons`, de fyra senaste) rättade med röd penna, en med kaffering.
   Tom tills den första är färdigspelad. Nära lyfter en kupong från tavlan när man pekar på den, och ett
-  klick tar den från nålen och fram som omgångens protokoll (se *Protokollen på korktavlan* under
+  klick tar den från nålen och fram som omgångens protokoll, där pilarna bläddrar till omgången före och efter –
+  också de äldre som inte längre hänger på tavlan (se *Protokollen på korktavlan* under
   [Sammanställningen efter omgången](#sammanställningen-efter-omgången)).
 - **Kupongen**: kupongen tas i handen (se nedan), och när den inte går att ta i
   handen går kameran fram till den på pulten (också med K).
@@ -5986,7 +5989,12 @@ videons blå ruta på håll.
 sitt protokoll: nära tavlan lyfter en kupong när man pekar på den (och lägger sig överst om den ligger under en annan),
 och ett klick tar den från nålen – nålen sitter kvar – och lägger fram omgångens protokoll som bladet från pulten.
 *Häng tillbaka*, Esc eller ett klick utanför sätter tillbaka den, och kameran står kvar vid tavlan (`korkProtokoll` och
-`nalBilder` i rum.js). Är det omgången vars protokoll ligger på pulten är det samma blad; annars räknas det ur den
+`nalBilder` i rum.js). Med ←/→, pilarna på var sin sida om *Häng tillbaka* eller ett svep i sidled (fingret åt vänster:
+omgången efter) bläddrar man mellan säsongens alla protokoll (`korkLista` och `bladdra`): bladet glider ut åt sidan och
+nästa in från andra hållet, och en pil syns bara åt det håll där det finns en omgång. Listan är omgångarna i
+`data/tippare.json`, så också de äldre än de fyra som hänger på tavlan, och en omgång utan gängets kupong (spalten
+Kupong är då tom). Den kupong på tavlan som hör till bladet som är framme är borta från nålen; en omgång som inte hänger
+där tonar bara bort när man sätter tillbaka den. Är det omgången vars protokoll ligger på pulten är det samma blad; annars räknas det ur den
 frysta omgången i `data/tippare.json` (`RumBlock.fryst`): resultatet efter 90 minuter, modellens chans före avspark och
 allas tecken står där, så att bladet går att räkna också när matcherna inte längre finns i spelprogrammet, och poängen
 blir desamma som i Olympen. Omgången är den med flest av kupongens matcher, minst hälften (som `roundOf` i

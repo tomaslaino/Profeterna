@@ -143,6 +143,13 @@
 .rp-rad .rt-tillbaka { margin-top: 0; }
 .rum-protokoll > .rp-rad.fast { position: fixed; left: 0; right: 0; margin: 0; padding: 0 16px; }
 .rum-protokoll > :is(.hs-mork, .hs-fig, .hs-bubbla, .hs-svans) { position: fixed; }
+/* från korktavlan: Häng tillbaka mellan pilarna till omgången före och efter (bladdra i rum.js), som håller ihop
+   när raden bryts, och en pil bara åt det håll där det finns en omgång */
+.rp-blad { display: inline-flex; align-items: center; column-gap: 6px; white-space: nowrap; }
+.rt-pil { flex: none; min-width: 44px; min-height: 40px; padding: 0 8px; border: 0; background: none; color: #bcd0f5; font: 500 24px/40px Fraunces, Georgia, serif; cursor: pointer; }
+.rt-pil:disabled { visibility: hidden; }
+@media (hover: hover) { .rt-pil:hover { color: #d3e3ff; } }
+.rum-protokoll > .rum-block { user-select: none; -webkit-user-select: none; }
 
 /* ---------- lappen under domen ---------- */
 /* (RumBlock.lapp, hos Hasse i baren): en remsa av protokollets blankett, med samma papper, band och tryck – kryssen i
