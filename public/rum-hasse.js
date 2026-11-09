@@ -1829,8 +1829,8 @@ window.RumHasse = (() => {
     const k = window.Papper && Papper.kort ? Papper.kort(n) : String(n || '');
     return SAGT_KORT[k] || k;
   };
-  // (Birmingham–Swansea, men West Brom – Millwall)
-  const matchNamn = (h, b) => (/\s/.test(h + b) ? `${h} – ${b}` : `${h}–${b}`);
+  // (Birmingham–Swansea, men West Brom – Millwall; ordfogarna runt strecket håller ihop raden)
+  const matchNamn = (h, b) => (/\s/.test(h + b) ? `${h} – ${b}` : `${h}\u2060–\u2060${b}`);
   // Har någon match i listan en ställning (pågår eller har slutat) som inte är dold?
   function pagarNagot(lista) {
     if (typeof gradeRow !== 'function') return false;
