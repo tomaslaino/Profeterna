@@ -62,7 +62,7 @@ const RATT = repliker.tal.slice(1).flatMap((av, i) => repliker.tal.slice(0, i + 
 const ANTAL = repliker.tal.slice(2);
 // Knapparna (lar), tecknen, talen i ord och ordet i guld i domarna sägs inte, och inte heller att han har
 // tappat rösten.
-const TYSTA = new Set(['lar', 'tecken', 'tal', 'domord', 'utanRost']);
+const TYSTA = new Set(['lar', 'tecken', 'tal', 'domord', 'felnamn', 'utanRost']);
 
 function mallar(o, ut = [], nyckel = '') {
   if (TYSTA.has(nyckel)) return ut;
@@ -74,7 +74,9 @@ function mallar(o, ut = [], nyckel = '') {
 
 // Varje replik med fälten ifyllda på alla sätt som sidan kan fylla dem.
 function repliktexter(gang = []) {
-  const namn = [...new Set(gang.map((g) => String(g.namn || '').trim().split(/\s+/).pop()).filter(Boolean))];
+  // (och namnen han nästan kan: felnamn)
+  const namn = [...new Set(gang.map((g) => String(g.namn || '').trim().split(/\s+/).pop()).filter(Boolean)
+    .flatMap((n) => [n, ...((repliker.felnamn || {})[n] || [])]))];
   const ut = new Set();
   for (const mall of mallar(repliker)) {
     const falt = new Set([...mall.matchAll(/\{(\w+)\}/g)].map((m) => m[1]));

@@ -759,6 +759,11 @@ bara lokalt. Analyserna visas som de ligger i `data/analyser.json`; hur de skriv
   linjer, röd marginal, vikning, gulnad tejp och en skugga där det släpper från karmen, med FM i blått och AM i
   rött i var sin spalt. Det sitter där hela tiden och vänds inte längre. Se [Tobaksaffären](#tobaksaffären),
   *Radion*.
+- **Inget sprak när AM-stationen hörs (2026-11-09, användarens önskemål):** "Jag vill inte att det ska spraka något
+  när vi har fått in AM-radio-kanalerna. Dessförinnan får det spraka om du tänker att det är realistiskt." Det
+  svaga suset och de enstaka knäpparna på AM-stationerna är borta, och en station som har hörts och hackar till blir
+  tyst i stället för att spraka. Medan man letar och medan stationen laddas låter det som förut. Se
+  [Tobaksaffären](#tobaksaffären), *Radion*.
 - **Tio stationer, en tydligare tejp och ett mindre blad (2026-11-09, användarens önskemål):** "Gör radion
   snyggare/bättre och minska antalet radiostationer till de essentiella" och "Gör radiostationspappret
   snyggare/mer anpassat också. Just nu är det lite oklart hur det är uppsatt". 49 stationer blev tio: Italo Disco,
@@ -3083,7 +3088,8 @@ piltangenterna. Radion är av när man kommer, och POWER sätter på den där de
 Skalan lyser med en glödlampa som tänds mjukt, och den valda bandraden lyser starkast. Samma visare går över
 båda banden, som på en riktig radio, så ett byte av band hamnar sällan på en station. Släpper man nära en
 station drar radion in den, och en liten röd lampa säger att den stämmer. Mellan stationerna hörs brus, på AM
-också knaster och en pipton som sjunker tills man står rätt. AM låter dessutom som AM: smalt band och långsam
+också knaster och en pipton som sjunker tills man står rätt. När stationen väl hörs är det rent, också på AM och
+också om strömmen hackar till (då blir det tyst en stund, `A.fick`). AM låter dessutom som AM: smalt band och långsam
 fading, som också syns på lampan. Lysdioderna och högtalarna följer det som faktiskt hörs (en analysator i
 Web Audio). Stationerna står för hand på maskeringstejpen vid skalan (FM ovanför i blått, AM under i rött): varje
 namn mitt över sin frekvens, närmast skalan, och bara när grannen står för nära i raden längre ut, med ett streck
@@ -5685,6 +5691,13 @@ disken står som en stämpel i guld under namnet på dem man har hört om (på e
 gänget avgörs, och efter omgången säger han inte heller hur det gick för honom. Förut hade listan rätt och poäng, bäst först,
 och länken *Matcherna* till hans rader och facit (borta 2026-11-09). Med dolda resultat finns inget protokoll, och då är allt
 som förut.
+
+Till er säger han ni och er, aldrig gänget, eftersom det bara är ni som använder sidan (`npm run repliker` säger till om
+ordet). Namnen sitter inte riktigt: ungefär var tredje dom säger han ett namn som nästan stämmer (*Tejler*, *Johanson*;
+`felnamn` i rum-hasse-repliker.js, `kallar` i rum-hasse.js), samma i hela domen och på alla enheter, men aldrig om den som
+vann. Ungefär var fjärde gång han hälsar på dig händer samma sak. Han rättar sig aldrig och säger inget om det. Står man kvar
+vid listan kan han nämna *Revisorn* när någon vann på helgarderingar och *Semesterfiraren* när någon inte lämnade in,
+utan att säga vem han menar (`domar.revisorn`, `domar.borta`).
 
 **Tidningen** (2026-11-09). Har det gått dåligt för honom i tippningen låtsas han vara upptagen: han gömmer sig bakom
 veckans kvällstidning, samma som löpsedeln i rummet (Sportbladet eller Expressen, `veckansTidning` i
