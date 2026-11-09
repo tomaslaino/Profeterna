@@ -83,6 +83,17 @@ vec3 kant(vec3 n, float styrka) {
     + vec3(1., .12, .08) * styrka * uButik * f * f * max(0., dot(n, NEON)) * .8;
 }
 vec3 ton(vec3 c) { c *= natten(); return c * (1.03 - .15 * c); }
+// Lågan när han tänder cigarren (rum-hasse-eld.js, uEld: var den är och hur stark, 0 när det inte brinner): ett
+// varmt sken som avtar med avståndet, mest på det som vänder sig mot den, och lika starkt på natten (natten()
+// i ton dämpar annars allt).
+uniform vec4 uEld;
+vec3 eldsken(vec3 p, vec3 n) {
+  if (uEld.w <= 0.) return vec3(0.);
+  vec3 d = uEld.xyz - p;
+  float r = length(d);
+  float f = min(1.6, uEld.w * 9000. / (r * r + 6000.));
+  return vec3(1., .6, .28) * f * (.3 + .7 * max(0., dot(n, d / max(r, 1.)))) / natten();
+}
 `;
 
 // Disken (rum-hasse-3d.js, rum-hasse-scen.js): dess bakre plan n·(x, z) = c (uBord.xy och z) och
@@ -99,6 +110,8 @@ bool underBord(vec3 w) {
 `;
 // (utan disk döljs ingenting, och det är rummets ljus utan baren)
 const BUTIK_AV = { value: 0 };
+// (utan låga)
+export const ELD_AV = { value: new THREE.Vector4() };
 // Kavajens tyg i ljuset (uTyg i ARM_F): 1 i baren. Från rummet ses ärmarnas sida bort från lamporna, och då
 // sätter bord.tyg tonen, så att det är samma gråa kavaj som framifrån.
 const TYG = { value: 1 };
@@ -286,7 +299,7 @@ void main() {
   nc = mix(nc, vec3(.9, .86, .8), .8 * smoothstep(.7, .95, vNagel.y));
   c = mix(c, nc, nagel * .75);
   c *= 1. - .12 * rygg * exp(-rd * rd * 160.);
-  vec3 l = ljus(n);
+  vec3 l = ljus(n) + eldsken(vP, n);
   // ljuset som går igenom huden: varmare där ljuset tar slut
   float ter = max(0., dot(n, NYCKEL) + .3);
   l += vec3(.16, .045, .025) * ter * (1. - ter) * 1.7;
@@ -317,7 +330,7 @@ export function byggHand(modell, sida, foto, bord = ingenBord()) {
     foto: { value: foto },
     uB: { value: ut },
     uHud: { value: new THREE.Vector4((a.hx + 0.5) / a.W, 1 - (a.hy + a.hh - 0.5) / a.H, (a.hw - 1) / a.W, (a.hh - 1) / a.H) },
-    uBord: bord, uButik: bord.butik || BUTIK_AV, uDag: bord.dag || DAG, uLys: bord.lys || LYS,
+    uBord: bord, uButik: bord.butik || BUTIK_AV, uDag: bord.dag || DAG, uLys: bord.lys || LYS, uEld: bord.eld || ELD_AV,
   };
   const mesh = new THREE.Mesh(modell.g, new THREE.ShaderMaterial({ uniforms: U, vertexShader: HUD_V, fragmentShader: medVy(HUD_F, bord), transparent: true, depthWrite: true, blending: THREE.CustomBlending, blendSrc: THREE.OneFactor, blendDst: THREE.OneMinusSrcAlphaFactor }));
   mesh.frustumCulled = false;
@@ -470,7 +483,7 @@ void main() {
   // remsan är utjämnad: skuggorna kommer från ljuset, vecken från formen och fotot (mjukare, för armen
   // ligger inte som i fotot)
   c.rgb = .135 + (c.rgb - .135) * .62;
-  vec3 ut = c.rgb * ljus(n) * 1.14 * uTyg;
+  vec3 ut = c.rgb * (ljus(n) + .8 * eldsken(vW, n)) * 1.14 * uTyg;
   vec3 e = normalize(cameraPosition - vW);
   // ylle: ljuset fastnar i luddet där tyget vänder sig bort, och vecken skuggar sig själva
   float gr = 1. - clamp(dot(n, e), 0., 1.);
@@ -555,7 +568,7 @@ export function byggArm(scen, sida, foto, modell, vidd = 1, bord = ingenBord()) 
   g.setAttribute('aVeck', new THREE.BufferAttribute(vk, 1));
   g.setIndex(ix);
   // (dubbelsidig: genom ärmslutet syns insidan)
-  const rorM = new THREE.ShaderMaterial({ uniforms: { foto: { value: foto }, uTyg: bord.tyg || TYG, uBord: bord, uButik: bord.butik || BUTIK_AV, uDag: bord.dag || DAG, uLys: bord.lys || LYS }, vertexShader: ARM_V, fragmentShader: medVy(ARM_F, bord), transparent: true, depthWrite: true, side: THREE.DoubleSide, blending: THREE.CustomBlending, blendSrc: THREE.OneFactor, blendDst: THREE.OneMinusSrcAlphaFactor });
+  const rorM = new THREE.ShaderMaterial({ uniforms: { foto: { value: foto }, uTyg: bord.tyg || TYG, uBord: bord, uButik: bord.butik || BUTIK_AV, uDag: bord.dag || DAG, uLys: bord.lys || LYS, uEld: bord.eld || ELD_AV }, vertexShader: ARM_V, fragmentShader: medVy(ARM_F, bord), transparent: true, depthWrite: true, side: THREE.DoubleSide, blending: THREE.CustomBlending, blendSrc: THREE.OneFactor, blendDst: THREE.OneMinusSrcAlphaFactor });
   const ror = new THREE.Mesh(g, rorM);
   ror.frustumCulled = false;
   // skjortans manschett: ett rör med en rundad kant, lite plattare som handleden (handflatan åt z)
@@ -817,7 +830,7 @@ float brus(vec2 p) { vec2 i = floor(p), f = fract(p); f = f * f * (3. - 2. * f);
 const CIG_V = `varying vec3 vN, vP, vL;
 void main() { vL = position; vec4 w = modelMatrix * vec4(position, 1.); vP = w.xyz; vN = normalize(mat3(modelMatrix) * normal); gl_Position = projectionMatrix * viewMatrix * w; }`;
 const CIG_F = `precision highp float;
-uniform float uGlod, uTid;
+uniform float uGlod, uTid, uTand;
 varying vec3 vN, vP, vL;
 ${LJUS}
 ${BORD_GLSL}
@@ -862,23 +875,23 @@ void main() {
   c = mix(c, ac, aska);
   glans *= 1. - aska;
   // i dagsljusets färg som koppen (ljusDag), och kantljuset bara som styrka: inte rosa av neonskylten
-  vec3 ut = c * ljusDag(n);
+  vec3 ut = c * (ljusDag(n) + eldsken(vP, n));
   vec3 h = normalize(NYCKEL + normalize(cameraPosition - vP));
   ut += vec3(1., .92, .8) * pow(max(0., dot(n, h)), mix(18., 60., ring)) * glans;
   ut += vec3(dot(kant(n, .2), vec3(.2126, .7152, .0722))) * (1. - aska * .5);
-  // glöden: en ring under askan, och fläckar i änden när han drar
+  // glöden: en ring under askan (inte när den har slocknat: uTand), och fläckar i änden när han drar
   float f = brus(q * .45 + vec2(uTid * 2.3, 0.)) * .6 + brus(q * 1.3 - vec2(0., uTid * 3.1)) * .4;
   float glod = exp(-pow((y - G0 + .8) / 2.4, 2.)) * (.45 + .55 * f);
   glod += smoothstep(L - 1.5, L, y) * smoothstep(.55, .8, f) * uGlod * .8;
   glod += exp(-pow((y - G0 - 4.) / 4., 2.)) * smoothstep(.62, .85, f) * uGlod * .5;
-  ut += vec3(1., .3, .05) * glod * (.22 + 1.5 * uGlod) / natten();
+  ut += vec3(1., .3, .05) * glod * (.22 * uTand + 1.5 * uGlod) / natten();
   gl_FragColor = vec4(ton(ut), 1.);
 }`;
 export function byggCigarr(bord = ingenBord()) {
   const { L, R, ASKA } = CIGARR;
   const prof = [[0, 0], [4.5, 0.5], [8, 1.9], [10.6, 4.2], [12, 7.2], [R, 11], [R, 40], [R, L - ASKA - 6], [R - 0.15, L - ASKA - 1], [R - 0.5, L - ASKA + 1], [R - 0.3, L - 12], [R - 0.8, L - 4], [R - 2.6, L - 1.1], [R - 6, L - 0.1], [0, L + 0.2]];
   const g = new THREE.LatheGeometry(V2(prof), 24);
-  const U = { uGlod: { value: 0 }, uTid: { value: 0 }, uBord: bord, uButik: bord.butik || BUTIK_AV, uDag: bord.dag || DAG, uLys: bord.lys || LYS };
+  const U = { uGlod: { value: 0 }, uTid: { value: 0 }, uTand: { value: 1 }, uBord: bord, uButik: bord.butik || BUTIK_AV, uDag: bord.dag || DAG, uLys: bord.lys || LYS, uEld: bord.eld || ELD_AV };
   const mesh = new THREE.Mesh(g, new THREE.ShaderMaterial({ uniforms: U, vertexShader: CIG_V, fragmentShader: CIG_F, transparent: true, blending: THREE.CustomBlending, blendSrc: THREE.OneFactor, blendDst: THREE.OneMinusSrcAlphaFactor }));
   mesh.renderOrder = 6;
   mesh.frustumCulled = false;

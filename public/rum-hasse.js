@@ -11,6 +11,11 @@
 // 3D-värld (.rh-pan). Hans bild är en egen värld där rummet inte syns: kameran står framför honom vid
 // pulten (rum-hasse-scen.js), och kaffet, notan och handen på pulten i rummet är samma som i hörnet.
 //
+// Samma sida: det är bara kameran som svänger. Namnet och foten står kvar på vägen och hos honom
+// (Tillbaka där Vanlig sida stod), neonskyltens röda sken faller in från affären till höger som över
+// gänget i rummet (--neon), och man vänder sig med samma drag som man ser sig omkring med: i rummet
+// åt höger från dess vänstra kant (swipe i rum.js) eller pilen åt vänster, hos honom åt andra hållet.
+//
 // Grafiken: panoreringen är färdiga mellanbilder som grafikprocessen spelar upp själv. Väggen bakom
 // honom är en färdig bild, disken ritas en gång på en egen duk och figuren på en duk som bara är så
 // stor som han och det han gör. Figuren finns bara medan man tittar på honom; då står rummet still och
@@ -85,6 +90,21 @@ window.RumHasse = (() => {
       e.stopPropagation();
       stang();
     });
+    // Samma drag som i rummet (swipe i rum.js): där drar man bilden åt höger för att se åt vänster, och
+    // längst till vänster sitter han. Här drar man den åt vänster och vänder sig tillbaka mot rummet.
+    let drag = null;
+    vy.addEventListener('pointerdown', (e) => { drag = e.isPrimary && e.pointerType !== 'mouse' && !e.target.closest('.rh-kupong, .rum-blad, input') ? { id: e.pointerId, x: e.clientX, y: e.clientY } : null; });
+    vy.addEventListener('pointercancel', () => { drag = null; });
+    vy.addEventListener('pointerup', (e) => {
+      const d = drag;
+      drag = null;
+      if (!d || e.pointerId !== d.id || H.blad) return;
+      const dx = e.clientX - d.x;
+      if (dx <= -64 && -dx > 1.5 * Math.abs(e.clientY - d.y)) stang();
+    });
+    // namnet står kvar hos honom (rum-hasse.css) och leder som i rummet dit: tillbaka
+    const namn = rum.querySelector('.rum-brand');
+    if (namn) namn.addEventListener('click', () => { if (H.on) stang(); });
     // ljudet av och på: stannar hos honom
     vy.querySelector('.rh-ljud').addEventListener('click', (e) => {
       e.stopPropagation();
@@ -107,7 +127,8 @@ window.RumHasse = (() => {
         }
         return;
       }
-      if (e.key === 'Escape') stang();
+      // Esc, eller pilen åt höger: man vänder sig tillbaka mot rummet (dit kom man med pilen åt vänster, rum.js)
+      if (e.key === 'Escape' || (e.key === 'ArrowRight' && !e.repeat && !(e.target instanceof Element && e.target.closest('input, textarea, select')))) stang();
     }, true);
     // ljuset medan man sitter hos honom (ljusNu)
     setInterval(() => { if (H.on && !H.svanger && !document.hidden) ljusNu(); }, 60000);
@@ -201,6 +222,9 @@ window.RumHasse = (() => {
     H.ljus = l;
     H.vy.classList.toggle('lys', l.lys);
     H.vy.style.setProperty('--natt', ((1 - l.k) * (1 - l.dag)).toFixed(3));
+    // neonskyltens sken från affären till höger (.rh-ton i rum-hasse.css): som i rummet starkast när det är
+    // mörkt ute och lysröret är släckt, och nästan borta i dagsljus
+    H.vy.style.setProperty('--neon', ((1 - 0.85 * l.dag) * (1 - 0.4 * l.k)).toFixed(3));
     if (H.m && H.m.DAG) {
       // fönstret i figurens ljus (rum-hasse-arm.js), och lysröret så tänt som det är
       H.m.DAG.value.set(...l.c.map((x) => x * l.f * 0.8), l.dag);
@@ -406,6 +430,8 @@ window.RumHasse = (() => {
       H.figHog = H.hog;
       H.fig = await H.m.figuren($('.rh-duk'), { hog: H.hog, latt: latt() || steg() >= 2, pr: pixlar() });
     }
+    // cigarren som den var, eller slocknad om han har låtit den ligga sedan sist
+    cigarrIgen();
     H.vy.classList.toggle('enkel', steg() >= 1 || latt());
     // (disken hinner ritas innan kameran slår dit, men den väntar man inte länge på)
     await Promise.race([passa(), new Promise((ok) => setTimeout(ok, 1500))]);
@@ -553,13 +579,15 @@ window.RumHasse = (() => {
       // och när det har gått dåligt för honom tar han fram tidningen igen efter en stund (upptagen)
       if (H.upptagen && ms > H.lasT && !H.klipp && !H.ko.length && !H.fig.ror() && (!H.sagt || H.sagt.klar) && ['fraga', 'val', 'klar'].includes(H.fas)) {
         H.lasT = ms + 1e9;
-        gest(ettAv('lasa', 'lasa'));
+        gest(lasaNamn());
       }
       // och ibland njuter han av kaffet eller tar cigarren ur askkoppen, varannan gång
       if (ms > H.vanaT && !H.klipp && !H.ko.length && !H.fig.ror() && (!H.sagt || H.sagt.klar) && ['fraga', 'val', 'klar'].includes(H.fas)) {
         H.vanaT = ms + VANA[0] + Math.random() * (VANA[1] - VANA[0]);
         vana();
       }
+      // cigarren slocknar om han låter den ligga
+      slocknar(ms);
       // mitt i omgången: har ställningen ändrats sedan sist (stallningSteg)
       if (ms > (H.stallningT || 0)) {
         H.stallningT = ms + 5000;
@@ -807,7 +835,77 @@ window.RumHasse = (() => {
   // kaffet och cigarren varannan gång, kaffet först
   function vana() {
     H.vana = (H.vana + 1) % 2;
-    gest(H.vana ? ettAv('kaffe', 'klunk') : ettAv('cigarr', 'cigarr'));
+    gest(H.vana ? ettAv('kaffe', 'klunk') : cigarrGest());
+  }
+  // Cigarren (H.cig): tänd eller slocknad i askkoppen, när han rökte den sist (rokT, ms) och hur länge den
+  // brinner av sig själv sedan (liv, ms), och tändstickorna kvar i stället och de brända i askkoppen
+  // (rum-hasse-eld.js). Låter han den ligga slocknar den (CIG_LIV), och nästa gång han tar den tänder han den
+  // (gruppen tanda i rum-hasse-3d.js, med stickorna eller tändaren) i stället för att röka; den slocknade drar
+  // han bara på när den verkligen har slocknat (slocknad, när han verkar upptagen). När man kommer har den
+  // ibland slocknat (CIG_SLOCKNAD); med minskad rörelse brinner den. Stället fylls på när man inte tittar.
+  const CIG_LIV = [150000, 280000];
+  const CIG_SLOCKNAD = 0.45;
+  const CIG_ANTAL = 9;
+  const cigLiv = () => CIG_LIV[0] + Math.random() * (CIG_LIV[1] - CIG_LIV[0]);
+  function cigarren() {
+    if (!H.cig) {
+      const tand = calm() || Math.random() >= CIG_SLOCKNAD;
+      H.cig = { tand, rokT: performance.now() - (tand ? Math.random() * CIG_LIV[0] * 0.6 : 0), liv: cigLiv(), kvar: CIG_ANTAL - Math.floor(Math.random() * 3), branda: Math.floor(Math.random() * 3) };
+    }
+    return H.cig;
+  }
+  // till figuren: som den är, direkt (när han har hämtats, och när man kommer tillbaka)
+  function cigarrIgen() {
+    const c = cigarren();
+    if (c.tand && !calm() && performance.now() - c.rokT > c.liv) c.tand = false;
+    if (c.kvar < 3 && !H.on) c.kvar = CIG_ANTAL;
+    if (H.fig && H.fig.cigarr) H.fig.cigarr({ tand: c.tand, direkt: true, kvar: c.kvar, branda: c.branda });
+  }
+  // den slocknar sakta medan man tittar (glöden och röken tonar ut)
+  function slocknar(ms) {
+    const c = cigarren();
+    if (!c.tand || calm() || H.klipp || ms - c.rokT < c.liv) return;
+    c.tand = false;
+    if (H.fig && H.fig.cigarr) H.fig.cigarr({ tand: false });
+  }
+  // efter ett cigarrklipp: han har rökt, och har han tänt den brinner den (en sticka till i askkoppen)
+  function rokt(k) {
+    const c = cigarren();
+    c.rokT = performance.now();
+    c.liv = cigLiv();
+    if (!k.tander) return;
+    c.tand = true;
+    if (k.tander === 'sticka') {
+      c.kvar = Math.max(0, c.kvar - 1);
+      c.branda = Math.min(4, c.branda + 1);
+    }
+    cigarrIgen();
+  }
+  // röker den, eller tänder den om den har slocknat: med tändaren när stickorna är slut
+  function cigarrGest() {
+    const c = cigarren();
+    if (c.tand) return ettAv('cigarr', 'cigarr');
+    const alla = grupp('tanda');
+    if (!alla.length) return 'cigarr';
+    for (let i = 0; i < alla.length; i++) {
+      const namn = ettAv('tanda');
+      if (c.kvar > 0 || GEST[namn].tander !== 'sticka') return namn;
+    }
+    return alla.find((n) => GEST[n].tander !== 'sticka') || alla[0];
+  }
+  // Det han gör när han verkar upptagen (gruppen lasa), men han drar inte på cigarren som om den har slocknat
+  // när den brinner (slocknad); när man just kommer (forst) kan den ha slocknat.
+  function lasaNamn(forst = false) {
+    const c = cigarren();
+    let namn = ettAv('lasa', 'lasa');
+    if (namn !== 'slocknad' || !c.tand) return namn;
+    if (forst && !calm()) {
+      c.tand = false;
+      cigarrIgen();
+      return namn;
+    }
+    namn = ettAv('lasa', 'lasa');
+    return namn === 'slocknad' ? 'lasa' : namn;
   }
   // Medan han väntar på en tar han kaffet och cigarren varannan gång då och då (minst och längst i ms
   // mellan gångerna). Ska något spelas medan han håller cigarren (skynda) lägger han tillbaka den fortare.
@@ -894,6 +992,7 @@ window.RumHasse = (() => {
     if (H.T >= k.till) {
       H.T = k.vila;
       H.klipp = null;
+      if (k.grupp === 'cigarr' || k.tander) rokt(k);
       if (k.grupp === 'lasa') H.lasT = performance.now() + LAS_PAUS[0] + Math.random() * (LAS_PAUS[1] - LAS_PAUS[0]);
       if (k.sen) k.sen();
     }
@@ -1966,6 +2065,8 @@ window.RumHasse = (() => {
   // läser, tittar upp över den på en ibland och läser vidare (klippen lasa i rum-hasse-3d.js), och har man
   // just kommit läser han redan. Tidningen är dagens DN eller SvD (dagens i rum-hasse-tidning.js), med glasögonen
   // på. Mellan gångerna gör han annat en stund (LAS_PAUS, ms), och behöver han händerna lägger han ned den direkt.
+  // Han har fler sätt att verka upptagen (samma grupp lasa: raknar, tomKopp, slocknad, putsa, vissla, naglar),
+  // och i dem blir han ertappad och låtsas som ingenting; har man just kommit håller han redan på (fram).
   // Dåligt: inte ett rätt (inget), sämst i gänget (sist) eller rätten långt under vad chanserna var värda
   // (daligt, som i hurDetGick). Med minskad rörelse läser han inte.
   const LAS_PAUS = [4000, 10000];
@@ -1981,12 +2082,12 @@ window.RumHasse = (() => {
     }
     H.lasT = performance.now() + (H.on ? 1500 : 0);
   }
-  // han läser redan (efter upp)
+  // han läser redan (efter upp), eller håller redan på med något annat, strax innan man ertappar honom (fram)
   function lasNu() {
-    const k = GEST[ettAv('lasa', 'lasa')];
+    const k = GEST[lasaNamn(true)];
     if (!k || calm()) return;
     H.klipp = { ...k };
-    H.T = k.fran + H.m.LAS_START;
+    H.T = k.fran + (k.fram ?? H.m.LAS_START);
   }
   // Hans omgång i sammanställningen: tävlingskupongen om han spelade, annars det han sa. → { lage, ok, n }
   // (lage null när det inte gick dåligt), eller null.
@@ -2374,6 +2475,11 @@ window.RumHasse = (() => {
     const s = $('.rh-samtal');
     const vem = H.fraga;
     H.fas = 'klar';
+    // har cigarren slocknat tänder han den gärna när han har sagt sitt
+    if (!cigarren().tand && Math.random() < 0.5) {
+      H.vana = 1;
+      H.vanaT = Math.min(H.vanaT, performance.now() + 2500 + Math.random() * 4000);
+    }
     // tillbaka till vilan efter det han håller på med, om det inte slutar där
     const sist = H.ko.length ? H.ko[H.ko.length - 1] : H.klipp;
     if (Math.abs((sist ? sist.vila : H.T) - GEST.hem.vila) > 0.01) spela('hem');
