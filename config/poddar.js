@@ -24,6 +24,18 @@ module.exports = {
   effort: 'medium',
   timeoutMs: 420000,
 
+  // När genomgången körs, i svensk tid (dag: 0 = söndag, 1 = måndag …; användarens beslut
+  // 2026-11-10, före det varje natt): natten mot tisdag för helgens efterhandsavsnitt, natten
+  // mot fredag för veckans presskonferenser och lördag morgon för förhandsavsnitten som kom på
+  // fredagen. launchd startar skriptet varje natt kl. 02.15 och lördag kl. 08.00 (plist-filen),
+  // och skriptet går bara när en av tiderna här har slagit sedan förra gången, så tiderna kan
+  // ändras här utan att jobbet installeras om – men bara till de klockslagen.
+  tider: [
+    { dag: 2, kl: '02:15' },
+    { dag: 5, kl: '02:15' },
+    { dag: 6, kl: '08:00' },
+  ],
+
   // Mappen utanför repot, under ~/Library/Application Support/Matchfixarna/.
   mapp: 'Tidning',
   whisper: 'whisper-cli',

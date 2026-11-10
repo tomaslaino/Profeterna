@@ -372,7 +372,7 @@ export function sidansUnderlag(fil, lagen, { avspark = null } = {}) {
     const med = (x, a) => x.id && x.vikt >= pc.minstVikt && (!fran || dagAv(x, a) >= fran);
     const alla = ((post && post.avsnitt) || []).filter((a) => (a.uppgifter || []).some((x) => med(x, a)))
       .sort((a, b) => b.datum.localeCompare(a.datum));
-    // Forumet och medierna läses varje natt: de räknas för sig, så att poddarna står kvar.
+    // Forumet och medierna läses vid varje genomgång: de räknas för sig, så att poddarna står kvar.
     const avsnitt = [...alla.filter(arPodd).slice(0, pc.sidan.avsnitt), ...alla.filter((a) => a.typ === 'forum').slice(0, fc.tillSidan), ...alla.filter((a) => a.typ === 'media').slice(0, mc.tillSidan)];
     ut.lag[lag] = avsnitt.flatMap((a) => a.uppgifter.filter((x) => med(x, a)).map((x) => ({ id: x.id, a: x.a || 'match', s: x.s, vikt: x.vikt, t: x.t, sagt: x.sagt || null, vem: x.vem || null, podd: a.podd, typ: a.typ || 'podd', datum: dagAv(x, a) })));
     ut.kallor[lag] = avsnitt.map((a) => ({ podd: a.podd, avsnitt: a.titel, datum: a.datum.slice(0, 10), adress: a.sida || a.apple || null, typ: a.typ || 'podd' }));

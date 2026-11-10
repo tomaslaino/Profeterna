@@ -22,20 +22,20 @@ module.exports = {
   tools: ['WebSearch', 'WebFetch'],
   timeoutMs: 600000,
 
-  // När sidan skrivs om, i svensk tid (dag: 0 = söndag, 1 = måndag …): måndag när
-  // veckans omgång har kommit och fredag inför helgen. Samma klockslag som
-  // analysernas, så att launchd-jobbet redan startar då. En ny omgång utan tidning
-  // får sin direkt.
+  // När sidan skrivs om, i svensk tid (dag: 0 = söndag, 1 = måndag …). En ny omgång utan
+  // tidning får sin direkt, oftast måndag strax efter 16, och sedan skrivs den om en gång,
+  // fredag inför helgen: två gånger per omgång (användarens beslut 2026-11-10; före det
+  // också måndag 17). Samma klockslag som analysernas, så att launchd-jobbet redan startar då.
   tider: [
-    { dag: 1, kl: '17:00' },
     { dag: 5, kl: '16:00' },
   ],
-  // En tid skriver inte om en sida som är yngre än så här (en omgång som kom
-  // kl. 16 och fick sin tidning då skrivs inte om redan kl. 17).
+  // En tid skriver inte om en sida som är yngre än så här (en omgång som kom fredag
+  // förmiddag och fick sin tidning då skrivs inte om redan kl. 16).
   minstTimmar: 12,
-  // Har supporterpoddarna gett nya uppgifter (scripts/tidning/poddar.mjs, varje natt) skrivs
-  // sidan om, men inte oftare än så här.
-  poddTimmar: 6,
+  // Har supporterpoddarna gett nya uppgifter (scripts/tidning/poddar.mjs) skrivs sidan om,
+  // men inte oftare än så här. null: aldrig för poddarnas skull, bara på tiderna ovan, och
+  // då följer uppgifterna med (användarens beslut 2026-11-10; före det 6).
+  poddTimmar: null,
 
   // Gränserna i prompten.
   sokningar: 12,

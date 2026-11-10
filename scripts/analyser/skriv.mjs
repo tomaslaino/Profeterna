@@ -433,7 +433,7 @@ async function tidningen(round) {
   }
 }
 
-// Informationssidorna ur supporterpoddarna (scripts/tidning/poddar.mjs skriver dem varje natt):
+// Informationssidorna ur supporterpoddarna (scripts/tidning/poddar.mjs skriver dem på poddarnas tider):
 // läggs ut när de har ändrats. Inget anrop till Claude här.
 function poddsidorna(round) {
   const ny = poddsidor(lasJson(path.join(TILLSTAND, 'Tidning', 'omgang.json'), null), round);

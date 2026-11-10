@@ -49,8 +49,9 @@ export function attSkrivaTidning(round, nu, { now = Date.now(), tvinga = false, 
   const skriven = Date.parse(nu.skriven) || 0;
   const galler = tid >= (Date.parse(round.skapad) || 0);
   if (galler && skriven < tid && now - skriven >= tc.minstTimmar * H) return { skriv: true, tid, varfor: 'ny tid' };
-  // Nya uppgifter ur supporterpoddarna sedan sidan skrevs (poddar: omgångens poddfil).
-  if (poddar && poddar.omgang === round.id && poddNyckel(poddar) && poddNyckel(poddar) !== (nu.poddar || '') && now - skriven >= tc.poddTimmar * H) return { skriv: true, tid, varfor: 'nya poddar' };
+  // Nya uppgifter ur supporterpoddarna sedan sidan skrevs (poddar: omgångens poddfil), om
+  // poddTimmar inte är null.
+  if (tc.poddTimmar != null && poddar && poddar.omgang === round.id && poddNyckel(poddar) && poddNyckel(poddar) !== (nu.poddar || '') && now - skriven >= tc.poddTimmar * H) return { skriv: true, tid, varfor: 'nya poddar' };
   return { skriv: false, tid, varfor: 'aktuell' };
 }
 

@@ -620,7 +620,8 @@ bara lokalt. Analyserna visas som de ligger i `data/analyser.json`; hur de skriv
 - **Analyserna i förväg på datorn (2026-11-04, användarens beslut):** sajten ska bara visa
   färdiga texter, och allt AI-skrivande ska gå på användarens Claude-konto på en dator som står
   på dygnet runt, inte på en API-nyckel. Bara omgångens matcher skrivs, oftast Stryktipsets
-  tretton, måndag 17, onsdag 16, fredag 16 och lördag 11. Claude får söka och läsa på nätet (`WebSearch`, `WebFetch`) men inget annat, eftersom
+  tretton, måndag 17, onsdag 16, fredag 16 och lördag 11 (sedan 2026-11-10 bara måndag 17 och fredag 16,
+  användarens beslut). Claude får söka och läsa på nätet (`WebSearch`, `WebFetch`) men inget annat, eftersom
   underlaget i dag är just det Claude hittar. En påhittad tränare skriver analysen, medan Hasse
   Backe ligger kvar i tobaksaffären och låtsas analysera. DeepSeek är borta helt: omgångens namn
   och kupongernas kommentarer skrivs också på datorn.
@@ -1898,16 +1899,18 @@ tretton matcher. Jobbet startar på analysernas tider och kontrollerar dessutom 
 de flesta körningar har inget att göra och anropar inte Claude.
 
 - **Namnet på omgången** så snart omgången finns, oftast måndag strax efter 16.00.
-- **Analyserna** måndag 17.00, onsdag 16.00, fredag 16.00 och lördag 11.00, svensk tid (`tider` i
-  [config/analyser.js](config/analyser.js) och `StartCalendarInterval` i
-  [plist-filen](scripts/analyser/se.matchfixarna.analyser.plist); användarens önskan 2026-11-04). Varje
+- **Analyserna** måndag 17.00 och fredag 16.00, svensk tid (`tider` i [config/analyser.js](config/analyser.js)
+  och `StartCalendarInterval` i [plist-filen](scripts/analyser/se.matchfixarna.analyser.plist); användarens
+  beslut 2026-11-10, från 2026-11-04 också onsdag 16.00 och lördag 11.00). En äldre installerad plist-fil
+  kan ha kvar fler starttider; de gör inget, eftersom skriptet går efter `tider`. Varje
   tid skriver nya analyser för omgångens matcher som inte har börjat, och den nya texten ersätter den
-  gamla, så hela omgången ger upp till 52 analyser i veckan. En tid gäller omgångar som fanns när klockan
+  gamla, så hela omgången ger upp till 26 analyser i veckan. En tid gäller omgångar som fanns när klockan
   slog: en omgång som skapas senare väntar till nästa tid, men en match utan analys skrivs ändå när
   det är högst 24 timmar kvar till avspark. Har matcherna ändrats skrivs de nya vid nästa kontroll.
 - **Hasse Backes text** direkt efter varje analys.
-- **Tidningen inför omgången** så snart omgången finns, och sedan måndag 17.00 och fredag 16.00, och när
-  supporterpoddarna, supporterforumen eller de insatta medierna har gett nya uppgifter (se nedan).
+- **Tidningen inför omgången** så snart omgången finns och en gång till fredag 16.00, med det
+  supporterpoddarna, supporterforumen och de insatta medierna har gett sedan dess (se nedan; användarens
+  beslut 2026-11-10, före det också måndag 17.00 och efter varje genomgång med nya uppgifter).
 - **Kommentaren till en färdig kupong** när kupongen finns i den publicerade historiken.
 
 **En analys** är ett anrop till `claude -p`: Claude söker och läser på nätet (högst 6 sökningar och
@@ -1972,10 +1975,15 @@ visar lagens sköldar. Tidningen bakom löpsedeln trycker samma bilder i notiser
 finns, utan Claude (med `--ut <mapp>` hamnar de i `<mapp>/tidning-bilder/`).
 
 **Supporterpoddarna** (2026-11-10, användarens önskan: *transkribera lagens poddar inför nästa stryktips så att
-man får initierad info – det mest intressanta ska med*): varje natt kl. 02.15, och lördag kl. 08.00, lyssnar iMacen
+man får initierad info – det mest intressanta ska med*): natten mot tisdag och natten mot fredag kl. 02.15 och lördag kl. 08.00 (användarens beslut 2026-11-10, före det
+varje natt) lyssnar iMacen
 igenom veckans avsnitt av supporterpoddarna för lagen i omgången ([scripts/tidning/poddar.mjs](scripts/tidning/poddar.mjs),
 launchd-jobbet `se.matchfixarna.poddar`; logiken i [src/analyser/poddar.mjs](src/analyser/poddar.mjs), gränserna och
-prompterna i [config/poddar.js](config/poddar.js)).
+prompterna i [config/poddar.js](config/poddar.js)). launchd startar jobbet varje natt kl. 02.15 och lördag kl. 08.00,
+men skriptet går bara när en av tiderna (`tider` i config/poddar.js) har slagit sedan den senaste lyckade
+körningen (`tider.json` i mappen) och slutar annars direkt, så tiderna ändras där utan att jobbet installeras om.
+En tid som missas medan datorn sover körs när den vaknar, och en körning som stoppas försöks igen vid nästa start.
+`--nu` kör oavsett tid.
 
 ```
 omgångens lag → registret (lagets poddar) → veckans avsnitt → whisper.cpp → claude -p → omgang.json
@@ -2015,7 +2023,7 @@ omgångens lag → registret (lagets poddar) → veckans avsnitt → whisper.cpp
   som löptext, ett stycke per ämne (`textUtan`). Citatet tas ur uppgiften, aldrig ur svaret. Under laget sparas
   också de åtta tyngsta uppgifterna (`grupper`), med `datum` bredvid `podd`, en dag per källa: foruminläggets, annars
   avsnittets eller artikelns. Går svaret inte att läsa blir bladet uppgifterna som löptext (`sidaUtan`), och det
-  skrivs om nästa natt. Inga tips. Byts `sidan.version` skrivs bladen om nästa natt utan att avsnitten tas ut på
+  skrivs om vid nästa genomgång. Inga tips. Byts `sidan.version` skrivs bladen om vid nästa genomgång utan att avsnitten tas ut på
   nytt. Med `sidan.baraVeckan` tas bara uppgifter från kupongens vecka med (måndag till matchen, `veckansMandag`);
   det är avslaget medan vi provar (användarens beslut 2026-11-10).
 - **Ut på sajten:** analysjobbet (scripts/analyser/skriv.mjs, var 15:e minut) lägger sidorna i `data/poddsidor.json`
@@ -2023,8 +2031,8 @@ omgångens lag → registret (lagets poddar) → veckans avsnitt → whisper.cpp
   match (se [Tidningen](#tidningen)).
 - **Notiserna** (*Så mår tipslagen*) får fortfarande de bästa uppgifterna per lag (högst fyra) under *ur
   supporterpoddarna* i sitt underlag, och den mest intressanta ska bära notisen, med *enligt supporterpodden …*.
-  Har det kommit nya uppgifter sedan sidan skrevs skrivs den om vid nästa kontroll (`poddTimmar` i config/tidning.js,
-  högst var sjätte timme).
+  Nya uppgifter kommer med när sidan skrivs om fredag 16.00 (`poddTimmar: null` i config/tidning.js, användarens
+  beslut 2026-11-10; före det skrevs den om efter varje genomgång med nya uppgifter, högst var sjätte timme).
 
 ```json
 { "omgang": "…", "uppdaterad": "…", "amnen": { "trupp": "Skador och trupp" },

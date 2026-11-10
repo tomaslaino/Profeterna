@@ -33,7 +33,8 @@ module.exports = {
   tools: ['WebSearch', 'WebFetch'],
   timeoutMs: 420000,
 
-  // När analyserna skrivs, i svensk tid (användarens önskan 2026-11-04). Varje tid
+  // När analyserna skrivs, i svensk tid: måndag och fredag (användarens beslut 2026-11-10;
+  // från 2026-11-04 också onsdag och lördag). Varje tid
   // skriver nya analyser för omgångens matcher som inte har börjat, och den nya texten
   // ersätter den gamla. dag: 0 = söndag, 1 = måndag … 6 = lördag. launchd-jobbet
   // (scripts/analyser/se.matchfixarna.analyser.plist) startar på samma klockslag för
@@ -42,9 +43,7 @@ module.exports = {
   // gäller bara omgångar som fanns när klockan slog (attSkriva i src/analyser/tider.mjs).
   tider: [
     { dag: 1, kl: '17:00' },
-    { dag: 3, kl: '16:00' },
     { dag: 5, kl: '16:00' },
-    { dag: 6, kl: '11:00' },
   ],
   // En match utan analys skrivs ändå när det är högst så här många timmar kvar, om
   // omgången skapades efter den senaste tiden.

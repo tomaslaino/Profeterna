@@ -1,7 +1,7 @@
 #!/usr/bin/env node
 // Supporterpoddarna, supporterforumen och de insatta medierna till tidningen inför omgången
 // (config/poddar.js, config/forum.js, config/media.js, src/analyser/poddar.mjs, forum.mjs och
-// media.mjs). Körs på iMacen av launchd (se.matchfixarna.poddar) varje natt: läser lagens forum,
+// media.mjs). Körs på iMacen av launchd (se.matchfixarna.poddar) på tiderna i config/poddar.js: läser lagens forum,
 // letar upp och läser veckans artiklar i de insatta medierna, hittar poddarna för lagen i gängets
 // omgång, skriver ut veckans avsnitt med whisper.cpp och låter Claude Code (claude -p på
 // Claude-kontot) ta ut det mest intressanta inför matcherna.
@@ -13,7 +13,8 @@
 //   utskrifter/     utskrifterna, ett stycke per minut; tas bort efter tre veckor
 // Skriptet rör aldrig git. Ljudet tas bort så snart det är utskrivet.
 //
-//   node scripts/tidning/poddar.mjs                      omgångens lag
+//   node scripts/tidning/poddar.mjs                      omgångens lag, bara på tiderna (som launchd)
+//   node scripts/tidning/poddar.mjs --nu                 omgångens lag, oavsett tid
 //   node scripts/tidning/poddar.mjs --torrt              visar vilka avsnitt som skulle skrivas ut
 //   node scripts/tidning/poddar.mjs --visa               visar det som är uttaget för omgången
 //   node scripts/tidning/poddar.mjs --lag "Reading" --mot "Stockport County"
@@ -38,6 +39,7 @@ import kupongCfg from '../../config/kupong.js';
 import { betalvagar, inloggning, Stopp } from '../../src/analyser/claude.mjs';
 import { lasForum, taUtForum, lasningsNyckel, forumPost, provaForum, fragaEfterForum, forumSkaLetas, Sparrad } from '../../src/analyser/forum.mjs';
 import { letaArtiklar, lasArtikel, nyaArtiklar, taUtMedia, mediaPoster, laggTill, Sparrad as MediaSparrad } from '../../src/analyser/media.mjs';
+import { senasteTid, nastaTid } from '../../src/analyser/tider.mjs';
 import { appleKandidater, fragaEfterPoddar, levandePoddar, skaLetas, hamtaFlode, valjAvsnitt, skrivUt, taUt, whisperLedtrad, poddUnderlag, forumUnderlag, mediaUnderlag, sidansUnderlag, sidNyckel, skrivSida } from '../../src/analyser/poddar.mjs';
 
 const ARGV = process.argv.slice(2);
@@ -54,6 +56,9 @@ const BARA_FORUM = flagga('--bara-forum');
 const UTAN_FORUM = flagga('--utan-forum');
 const BARA_MEDIA = flagga('--bara-media');
 const UTAN_MEDIA = flagga('--utan-media');
+// Utan val är det launchd: då går skriptet bara på tiderna (config/poddar.js, tider). --nu
+// eller något annat val kör oavsett tid.
+const PA_TID = !ARGV.length;
 // Vad som körs: forumen, de insatta medierna och poddarna (informationssidorna skrivs alltid).
 const MED_FORUM = !UTAN_FORUM && !BARA_SIDOR && !BARA_MEDIA;
 const MED_MEDIA = !UTAN_MEDIA && !BARA_SIDOR && !BARA_FORUM;
@@ -66,6 +71,7 @@ const REGISTER = path.join(MAPP, 'register.json');
 const FORUMREG = path.join(MAPP, 'forum.json');
 const OMGANG = path.join(MAPP, FIL_UT || (ETT_LAG || PROV ? 'prov.json' : 'omgang.json'));
 const LAS = path.join(MAPP, 'las');
+const TIDER = path.join(MAPP, 'tider.json');
 const DAG = 86400000;
 const site = String(process.env.ANALYSER_SAJT || kupongCfg.site).replace(/\/+$/, '');
 const samtalUrl = kupongCfg.endpoint.replace(/kupong$/, 'samtal');
@@ -111,6 +117,20 @@ for (const s of ['SIGTERM', 'SIGINT']) process.on(s, () => { logg(`avbruten (${s
 function annanUtskrift() {
   try { return execFileSync('pgrep', ['-x', path.basename(pc.whisper)], { encoding: 'utf8' }).trim() !== ''; } catch { return false; }
 }
+
+// Är det dags (config/poddar.js, tider)? launchd startar skriptet varje natt och lördag morgon,
+// och en körning går bara när en tid har slagit sedan den senaste lyckade (tider.json: den
+// tiden). En tid som missas medan datorn sover körs när den vaknar, och en körning som stoppas
+// försöks igen vid nästa start. Saknas filen räknas den senaste tiden som körd, så att ett nytt
+// schema inte ger en extra körning. → {dags, tid, nasta}
+function schemat(now = Date.now()) {
+  const tid = senasteTid(now, pc.tider || []);
+  const nasta = nastaTid(now, pc.tider || []);
+  const fil = lasJson(TIDER, null);
+  if (!fil) { skrivJson(TIDER, { senast: new Date(tid).toISOString() }); return { dags: false, tid, nasta }; }
+  return { dags: tid > (Date.parse(fil.senast) || 0), tid, nasta };
+}
+const klockan = (ms) => (ms ? new Date(ms).toLocaleString('sv-SE', { timeZone: 'Europe/Stockholm', weekday: 'long', hour: '2-digit', minute: '2-digit' }) : '–');
 
 // Lagen som har en match kvar i omgången. → [{lag, mot, avspark, spelare}]
 async function omgangensLag(round) {
@@ -319,6 +339,8 @@ async function sidorna(fil, matcher) {
 
 async function main() {
   if (VISA) { visa(lasJson(OMGANG, {})); return; }
+  const schema = PA_TID ? schemat() : null;
+  if (schema && !schema.dags) { logg(`inte dags, nästa gång ${klockan(schema.nasta)}`); return; }
   const fel = betalvagar();
   if (fel.length) { logg(`STOPP: ${fel.join(', ')} är satt. Då skulle Claude Code kunna debiteras som API. Ta bort variabeln.`); process.exit(1); }
   if (!tagLas()) { logg('en körning pågår redan'); return; }
@@ -434,6 +456,7 @@ async function main() {
     throw err;
   }
   if (!TORRT) logg(`klart: ${id}, ${gjorda} avsnitt, ${nya} nya uppgifter ur poddarna, ${nyaForum} ur forumen, ${nyaMedia} ur de insatta medierna, ${sidor} sidor`);
+  if (schema) skrivJson(TIDER, { senast: new Date(schema.tid).toISOString() });
   if ((ETT_LAG || PROV) && !TORRT) visa(fil);
 }
 
