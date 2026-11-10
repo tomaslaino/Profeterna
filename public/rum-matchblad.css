@@ -187,22 +187,27 @@
 
 /* ---------- Analys ---------- */
 
-.rb-art h3 { margin: 0 0 5px; font: 700 19px/1.18 var(--display); letter-spacing: -0.01em; color: var(--pp-ink); text-wrap: balance; }
-.rb-art p, .rb-tipset p { margin: 0 0 7px; font-size: 12.5px; line-height: 1.5; color: var(--pp-ink); }
+/* löptexten på samma maskin med jämna anslag (--renskrift, typsnitt.css): i en lång text gör hoppen och de
+   svaga anslagen att man läser bokstav för bokstav */
+.rb-art h3, .rb-art p, .rb-tipset p, .rb-kallor { font-family: var(--renskrift); }
+.rb-art h3 { margin: 0 0 5px; font-size: 19px; font-weight: 400; line-height: 1.18; letter-spacing: -0.01em; color: var(--pp-ink); text-wrap: balance; }
+.rb-art p, .rb-tipset p { margin: 0 0 8px; font-size: 13.5px; line-height: 1.55; color: var(--pp-ink); }
 .rb-art p.rb-ingress { font-weight: 600; }
 .rb-art sup, .rb-tipset sup { margin-left: 1px; font-size: 8.5px; font-weight: 700; color: var(--pp-print); cursor: default; }
-.rb-kallor { margin: 8px 0 0; padding: 6px 0 0 18px; border-top: 1px solid var(--pp-line); font-size: 10.5px; line-height: 1.45; color: var(--pp-ink-soft); }
+.rb-kallor { margin: 8px 0 0; padding: 6px 0 0 18px; border-top: 1px solid var(--pp-line); font-size: 11px; line-height: 1.45; color: var(--pp-ink-soft); }
 .rb-kallor li::marker { font-weight: 700; color: var(--pp-print); }
 .rb-kallor span { color: var(--pp-faint); }
-/* tipset: kupongens rutor med tecknen inringade och raden i marginalen, som i matchbladet */
-.rb-tecken { display: flex; gap: 14px; margin: 18px 0 9px 6px; }
-.rb-tecknet { position: relative; display: grid; place-items: center; width: 40px; height: 26px; background: var(--pp-box); border: 1.5px solid var(--pp-print); border-radius: 3px; }
+/* tipset: kupongens rutor med tecknen inringade och raden i marginalen efter dem, som i matchbladet */
+.rb-tecken { display: flex; align-items: flex-end; gap: 14px; margin: 18px 0 9px 6px; }
+.rb-tecknet { position: relative; flex: none; display: grid; place-items: center; width: 40px; height: 26px; background: var(--pp-box); border: 1.5px solid var(--pp-print); border-radius: 3px; }
 .rb-tecknet b { font: 700 15px/1 var(--display); color: var(--pp-ink); }
 .rb-ring { position: absolute; top: -26%; left: -18%; width: 136%; height: 152%; overflow: visible; fill: none; stroke: var(--pp-pen); stroke-width: 1.8; stroke-linecap: round; pointer-events: none; }
 .rb-ring path { vector-effect: non-scaling-stroke; }
 /* (samma penna som raden i marginalen: protokollets röda penna, .rb-ring path i rum-block.css, är Hasses) */
 .rb-tecknet .rb-ring path { stroke: var(--pp-pen); stroke-width: 1.8; }
-.rb-tecknet em { position: absolute; left: calc(100% + 10px); bottom: 7px; font: 700 21px/1 var(--pp-hand); font-style: normal; white-space: nowrap; color: var(--pp-pen); transform: rotate(-5deg); transform-origin: left bottom; pointer-events: none; }
+/* (efter alla tre rutorna, så att den inte hamnar under en inringad ruta när tipset har två tecken; i telefonen på
+   två rader när den inte ryms) */
+.rb-tecken em { flex: 0 1 auto; min-width: 0; margin: 0 0 7px -2px; font: 700 21px/0.95 var(--pp-hand); font-style: normal; text-wrap: balance; color: var(--pp-pen); transform: rotate(-5deg); transform-origin: left bottom; pointer-events: none; }
 
 /* ---------- Startelvor (matchruta.js, tryckt som i matchbladet) ---------- */
 

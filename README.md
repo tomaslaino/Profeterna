@@ -363,7 +363,8 @@ blir mer ansträngt för datorer o mobiler").
 - **Papperets tre röster:** allt papper (kupongen, matchbladet, protokollet, kortregistret,
   anslagstavlan) har samma pappersstruktur och samma tre röster, så att det ser ut att komma ur samma
   låda: det förtryckta (`--tryck`, Fraunces i terrakotta: band, rubriker, rutor, nummer), det
-  maskinskrivna (`--skriv`: lag, tider, värden) och pennan (`--pp-hand`). Färgerna står på ett ställe,
+  maskinskrivna (`--skriv`: lag, tider, värden; löptext som analysen i `--renskrift`, se nedan) och pennan
+  (`--pp-hand`). Färgerna står på ett ställe,
   i [public/papper.css](public/papper.css), som också pekar om `--display` och `--sans` till
   skrivmaskinen på papperet. En skrivmaskin har inget fetstilt: det som ska framhållas stryks under.
 - **Skrivmaskin** är Special Elite (Apache 2.0) ombyggd av
@@ -373,6 +374,9 @@ blir mer ansträngt för datorer o mobiler").
   bokstav blir den andra lik utan att sidan gör något, också på en duk i three.js och utan fler
   element i rummet. `ss01`–`ss06` börjar raden på ett annat anslag; papper.css använder dem (`--anslag`)
   där samma text står på flera rader. Originalen ligger i scripts/typsnitt/kalla/.
+  **Renskrift** kommer ur samma skript: samma maskin och samma bredd, men med ett normalt anslag av varje
+  tecken, utan hopp och fel (`--renskrift`). Den är till löptext – analysen och tipset i matchbladet, i
+  rummet och på sajten – där hoppen och de svaga anslagen gör att ögat får läsa bokstav för bokstav.
   Pappersstrukturen bakas av [scripts/rum/papper.mjs](scripts/rum/papper.mjs).
 - **Rummets 3D-filer redan i `<head>`:** står tobaksaffären (klassen `rum-vantar`) lägger ett skript
   efter importmapen `modulepreload` för three.js och dess tre tillägg, rum-3d.js och de moduler den
@@ -1170,6 +1174,14 @@ bara lokalt. Analyserna visas som de ligger i `data/analyser.json`; hur de skriv
   blå penna som raden i marginalen – de var röda, eftersom protokollets röda penna (`.rb-ring path` i rum-block.css) tog över
   också i matchbladet före matchen. Samma dag, på användarens önskemål: "ta bort den röda stjärnan också" – rödpennans
   stjärna för ensam rätt står inte längre i *Rättningen* (på lappen under domen finns den kvar).
+- **Analysen i matchbladet går att läsa (2026-11-10, användarens önskemål):** "det blev av någon anledning lite svårt
+  att läsa det här. Kan du ordna", och "Det handlar inte om svenskan/språket i sig utan om annat". Sedan allt papper kom på
+  skrivmaskin (2026-11-08) stod analysen i samma typsnitt som lagen och tiderna, där varje bokstav hoppar, lutar och slår
+  olika hårt – det som gör en tid levande gör en lång text tröttsam. Löptexten står nu på samma maskin med jämna anslag
+  (*Renskrift*, ur samma byggskript), lite större (13,5 i stället för 12,5 px i rummets blad); också analysen i
+  matchbladet på sajten. Raden i marginalen (*Boro, men skakigt*) stod till höger om den första inringade rutan och
+  hamnade under nästa ruta när tipset hade två tecken bredvid varandra; nu står den efter alla tre rutorna. Provat i
+  headless Chromium i den breda och den smala versionen.
 - **Kupongens rätt som omgångens betyg i protokollet (2026-11-09, användarens önskemål):** "Går det att göra totalpoängen
   för oss alla - vår gemensamma rad - ännu tydligare? Kanske ringa in nån siffra eller annat. Jag är öppen för förslag - men
   gör det tydligare!" Kupongens rätt skrivs nu som kupongens betyg på papperet under Kupong: *10/13* med rödpennan, inringat
@@ -5121,7 +5133,8 @@ tredjedelar (1 X 2) eller halvor (hemma och borta).
   Lagen, *Förväntade mål*, de tre troligaste resultaten i formens rutor och *Vad drog åt vilket håll*
   med staplarna i bladets högra halva. För en spelad match prognosen före avspark.
 - **Analys** – den färdiga analysen med rubrik, ingress, stycken och källor, och tipset under med
-  tecknen inringade och raden i marginalen, som matchrutans flik Analysera. Källorna står som text
+  tecknen inringade och raden i marginalen efter rutorna, som matchrutans flik Analysera. Texten står på
+  skrivmaskinen med jämna anslag (*Renskrift*, se *Skrivmaskin* under [Mindre filer](#mindre-filer)). Källorna står som text
   (källan och rubriken när man pekar på numret), utan länkar ut ur rummet. Finns ingen analys än står
   samma rad som i matchrutan.
 - **Startelvor** – matchrutans startelvor ([public/matchruta.js](public/matchruta.js)), 365Scores eller
