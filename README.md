@@ -7263,7 +7263,12 @@ ligalag; en artikel i lagets eget flöde får ett poäng till), de insatta medie
 minst 480 bildpunkter bred, inga loggor, ingen grafik och inte samma bild för två lag. Till skillnad från tidningen
 tas bara artiklar som handlar om laget självt (`MIN_POANG`): inte en där motståndaren eller en annan klubb står först i
 rubriken, en förhandstitt med odds, ett övergångsrykte eller en minnesartikel, eftersom bilden då oftast visar fel lag.
-Hellre lagets sköld än fel lag. Bing News frågas också efter *<lag> boss* (tränaren är oftast i klubbens kläder, hos
+Hellre lagets sköld än fel lag. Ett lag som blir utan får ett andra försök (2026-11-10, användarens önskemål: "Fixa
+bilder åt Wimbledon och Newport också"): då duger allt i lagets eget BBC-flöde utom rykten och minnesartiklar, också en
+matchrapport där motståndaren står först, och artiklar upp till två veckor gamla. Samma bild används aldrig för två
+lag, inte heller mellan försöken, och för ett lag som blir utan står de bästa kandidaterna i loggen. BBC:s bilder tas
+i 976 bildpunkters bredd i alla adressformat (`bbcBild`: …/ace/standard/240/…, …/news/240/… och
+…/images/ic/240x135/…; det sista gav Newport en för liten bild). Bing News frågas också efter *<lag> boss* (tränaren är oftast i klubbens kläder, hos
 lokaltidningen), och det gäller tidningens bilder också. Har bara det ena laget en bild står den över hela bredden med
 lagets namn. Bilden förminskas till 800
 bildpunkter med ImageMagick (på iMacen med `sips` som förut); en jämn grafik känns igen på under 0,10 byte per
@@ -7325,7 +7330,10 @@ att se härifrån. Reglerna för rätt lag provades med Node på rubrikerna frå
 14 av 24 lag en bild, och flera lokaltidningar svarade HTTP 403 på GitHubs servrar (wigantoday.net, expressandstar.com,
 shropshirestar.com, Substack). Sedan frågas också efter tränaren, och en ensam bild står över hela bredden (provat i
 390 × 844 och 1280 bredd); det gav 13 av 24. Därefter lades BBC Sports flöde för laget till (provat med ett
-låtsasflöde: bilden i 976 bildpunkters bredd och en matchrapport i lagets eget flöde godtas).
+låtsasflöde: bilden i 976 bildpunkters bredd och en matchrapport i lagets eget flöde godtas). Det gav 22 av 24; AFC
+Wimbledon (inget som klarade reglerna) och Newport (BBC-bilden i fel format) blev utan. Det andra försöket och de nya
+adressformaten provades med ett låtsasnät: Newport fick sin bild i första försöket och Wimbledon i det andra, ur
+cupförlusten mot Crewe.
 
 ### Närbilderna
 

@@ -4,6 +4,7 @@
 // tidningens bilder på iMacen (src/analyser/tidning-bilder.mjs: de insatta mediernas artiklar om laget och Bing
 // News, sidans delningsbild från den senaste veckan, inga loggor eller grafik), förminskad med ImageMagick. Bara
 // artiklar som handlar om laget självt räknas (MIN_POANG): inte en annan klubbs sajt eller artikel, inte ett rykte.
+// Ett lag som blir utan får ett andra försök: lagets eget BBC-flöde, med artiklar upp till två veckor gamla.
 //
 // Bilderna sparas i källcachen (data/cache/matchbilder/), som workflowen behåller mellan körningarna, så att de
 // hämtas en gång per omgång; ett lag utan bild prövas igen efter FORSOK_TIMMAR. Ut: data/matchbilder/<fil>.jpg och
@@ -32,7 +33,10 @@ const BREDD = 800;
 // en minnesstund, så att bilden hellre saknas än visar fel lag (2026-11-10, efter den första hämtningen).
 const MIN_POANG = 0;
 // Byts den väljs bilderna om (cachen gäller bara samma version).
-const VERSION = 4;
+const VERSION = 5;
+// Andra försöket för ett lag utan bild: allt i lagets eget BBC-flöde duger utom rykten och minnesord (en
+// matchrapport där motståndaren står först, cupförlusten), och artiklar upp till så här många dagar gamla.
+const ANDRA_DAGAR = 14;
 const BEHOVER = process.argv.includes('--behover');
 
 const las = (f, d) => { try { return JSON.parse(fs.readFileSync(f, 'utf8')); } catch { return d; } };
@@ -73,7 +77,16 @@ if (saknas.length && !bildverktyg()) {
   console.log('matchbilder: varken sips eller ImageMagick finns, inga nya bilder');
 } else if (saknas.length) {
   console.log(`matchbilder: hämtar bilder för ${saknas.length} lag (omgången ${omgang})`);
-  const hittade = await veckansBilder(saknas, { mapp: CACHE, mot, kallor, bredd: BREDD, minPoang: MIN_POANG, now, logg: (t) => console.log(`  ${t}`) });
+  // samma bild används inte för två lag, inte heller mellan försöken
+  const tagna = new Set();
+  const opts = { mapp: CACHE, mot, kallor, bredd: BREDD, minPoang: MIN_POANG, alla: lagen, tagna, now, logg: (t) => console.log(`  ${t}`) };
+  const hittade = await veckansBilder(saknas, opts);
+  const kvar = saknas.filter((lag) => !hittade.get(lag));
+  if (kvar.length) {
+    console.log(`matchbilder: andra försöket för ${kvar.join(', ')}`);
+    const fler = await veckansBilder(kvar, { ...opts, egnaBbc: true, dagar: ANDRA_DAGAR });
+    for (const [lag, x] of fler) hittade.set(lag, x);
+  }
   for (const lag of saknas) index.lag[lag] = hittade.get(lag) || { forsokt: new Date(now).toISOString() };
 }
 
