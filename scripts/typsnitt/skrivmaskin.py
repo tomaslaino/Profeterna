@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Bygger typsnittet Skrivmaskin ur Special Elite (Astigmatic, Apache 2.0).
+"""Bygger typsnitten Skrivmaskin och Renskrift ur Special Elite (Astigmatic, Apache 2.0).
 
 Ändringar mot originalet, som licensen kräver att de anges:
 - alla tecken står i samma bredd (CELL), som på en riktig skrivmaskin; breda tecken trycks ihop;
@@ -9,6 +9,10 @@
 - GSUB-funktionen calt byter variant för varje tecken i raden, så att ingen bokstav blir den andra lik
   utan att sidan behöver göra något. ss01–ss06 börjar raden på ett annat anslag, så att samma ord på
   två rader (lör 16:00) inte blir likadant.
+
+Renskrift är samma maskin med jämna anslag, för löptext (analysen): samma bredd och samma tecken, men
+varje bokstav står där den ska, utan felen ovan. I en lång text gör varje hopp och svagt anslag att ögat
+får läsa bokstav för bokstav; i lagen, tiderna och värdena är de det som gör papperet levande.
 
 Varianterna är sammansatta glyfer (en hänvisning + förflyttning), så filen växer måttligt: bara de svaga
 och ojämna anslagen är egna konturer.
@@ -205,7 +209,10 @@ def ojamn(gs, namn, r, box):
     return skar(ut, prick, pathops.PathOp.DIFFERENCE)
 
 
-def bygg(kalla, ut):
+def bygg(kalla, ut, ren=False):
+    """ren: Renskrift, ett anslag av varje tecken, utan hopp, fel och svaga anslag."""
+    anslag = 1 if ren else ANSLAG
+    namn = 'Renskrift' if ren else 'Skrivmaskin'
     f = TTFont(kalla)
     glyf = f['glyf']
     hmtx = f['hmtx']
@@ -237,6 +244,8 @@ def bygg(kalla, ut):
         g.recalcBounds(glyf)
         box = (g.xMin, g.yMin, g.xMax, g.yMax)
         hel = yta(tillPath(gs, n))
+        if ren:  # Renskrift slår bara normalt
+            continue
         # bara bokstäver och siffror får egna svaga anslag: det är där de syns, och filen blir mindre
         if n not in anslagna:
             nya[f'{n}.l'] = nya[f'{n}.u'] = nya[f'{n}.o']
@@ -266,6 +275,9 @@ def bygg(kalla, ut):
         dx = fx + r.uniform(-SIDA, SIDA)
         v = math.radians(fv + r.uniform(-VRID, VRID))
         slag = r.choices('oluh', weights=(48, 26, 12, 14))[0]
+        if ren:
+            dy = dx = v = 0
+            slag = 'o'
         x0, x1 = box_for(g)
         bredd = x1 - x0
         sx = min(1.0, (CELL - 70) / bredd) if bredd else 1.0
@@ -306,7 +318,7 @@ def bygg(kalla, ut):
             continue
         if hmtx[g][0] == 0:
             continue
-        for i in range(ANSLAG):
+        for i in range(anslag):
             varianter[(g, i)] = sammansatt(g, i)
 
     # Nu byts allt ut: tecknen blir hänvisningar, konturerna ligger i .o/.l/.u.
@@ -345,7 +357,7 @@ def bygg(kalla, ut):
     nyordning += alt
     # mellanslaget och andra tomma tecken räknar också, så att raden fortsätter genom dem
     for g in tomma:
-        for i in range(1, ANSLAG):
+        for i in range(1, anslag):
             n = namn_for(g, i)
             tom = Glyph()
             tom.numberOfContours = 0
@@ -383,7 +395,29 @@ def bygg(kalla, ut):
     if 'gasp' in f:
         del f['gasp']
 
-    # calt: varje tecken får nästa anslag efter det förra
+    # calt: varje tecken får nästa anslag efter det förra (Renskrift har bara ett)
+    if not ren:
+        anslagen(f, tecken, varianter, tomma, namn_for)
+
+    # namnen
+    for rec in f['name'].names:
+        if rec.nameID in (1, 16):
+            rec.string = namn
+        elif rec.nameID == 4:
+            rec.string = f'{namn} Regular'
+        elif rec.nameID == 6:
+            rec.string = f'{namn}-Regular'
+        elif rec.nameID == 3:
+            rec.string = f'{namn}; bygger pa Special Elite'
+    f['name'].setName('Modifierad version av Special Elite: en bredd' + ('' if ren else ', varierande anslag') +
+                      ' (scripts/typsnitt/skrivmaskin.py).', 10, 3, 1, 0x409)
+
+    f.flavor = 'woff2'
+    f.save(ut)
+    print(Path(ut).name, Path(ut).stat().st_size, 'byte,', len(nyordning), 'glyfer')
+
+
+def anslagen(f, tecken, varianter, tomma, namn_for):
     cykel = [g for g in tecken if (g, 0) in varianter or g in tomma]
     kl = {i: ' '.join(g if i == 0 else namn_for(g, i) for g in cykel) for i in range(ANSLAG)}
     fea = ''.join(f'@s{i} = [{kl[i]}];\n' for i in range(ANSLAG))
@@ -399,23 +433,8 @@ def bygg(kalla, ut):
     fea += '} calt;\n'
     addOpenTypeFeaturesFromString(f, fea)
 
-    # namnen
-    for rec in f['name'].names:
-        if rec.nameID in (1, 16):
-            rec.string = 'Skrivmaskin'
-        elif rec.nameID == 4:
-            rec.string = 'Skrivmaskin Regular'
-        elif rec.nameID == 6:
-            rec.string = 'Skrivmaskin-Regular'
-        elif rec.nameID == 3:
-            rec.string = 'Skrivmaskin; bygger pa Special Elite'
-    f['name'].setName('Modifierad version av Special Elite: en bredd, varierande anslag (scripts/typsnitt/skrivmaskin.py).', 10, 3, 1, 0x409)
-
-    f.flavor = 'woff2'
-    f.save(ut)
-    print(Path(ut).name, Path(ut).stat().st_size, 'byte,', len(nyordning), 'glyfer')
-
 
 if __name__ == '__main__':
     for del_ in ('latin', 'latin-ext'):
         bygg(KALLA / f'special-elite-{del_}.woff2', ROT / f'skrivmaskin-{del_}.woff2')
+        bygg(KALLA / f'special-elite-{del_}.woff2', ROT / f'renskrift-{del_}.woff2', ren=True)

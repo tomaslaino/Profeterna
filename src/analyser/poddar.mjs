@@ -345,41 +345,64 @@ const SAKERHET = ['b', 'h', 'o'];
 
 // Det sidan bygger på: lagets senaste poddavsnitt, forumläsningar (src/analyser/forum.mjs) och
 // artiklar i de insatta medierna (src/analyser/media.mjs), och deras uppgifter med vikt nog.
-// typ: 'podd', 'forum' eller 'media'; podd är poddens, forumets eller källans namn.
-// → {lag: {namn: [{id, a, s, vikt, t, sagt, vem, podd, typ}]}, kallor: {namn: [{podd, avsnitt, datum, adress, typ}]}}
+// typ: 'podd', 'forum' eller 'media'; podd är poddens, forumets eller källans namn. datum är uppgiftens dag:
+// foruminläggets, annars avsnittets eller artikelns.
+// → {lag: {namn: [{id, a, s, vikt, t, sagt, vem, podd, typ, datum}]}, kallor: {namn: [{podd, avsnitt, datum, adress, typ}]}}
 const arPodd = (a) => !a.typ || a.typ === 'podd';
 
-export function sidansUnderlag(fil, lagen) {
+// Måndagen i veckan då matchen spelas (svensk tid), som 'YYYY-MM-DD': kupongens vecka börjar då.
+const ymd = new Intl.DateTimeFormat('en-CA', { timeZone: 'Europe/Stockholm', year: 'numeric', month: '2-digit', day: '2-digit' });
+export function veckansMandag(avspark) {
+  const t = Date.parse(avspark);
+  if (!Number.isFinite(t)) return null;
+  const [y, m, d] = ymd.format(new Date(t)).split('-').map(Number);
+  const dag = new Date(Date.UTC(y, m - 1, d));
+  dag.setUTCDate(d - ((dag.getUTCDay() + 6) % 7));
+  return dag.toISOString().slice(0, 10);
+}
+
+// avspark: matchens avspark. Med pc.sidan.baraVeckan tas bara avsnitt, artiklar och foruminlägg från kupongens
+// vecka (måndag till matchen) med; utan står det som förut (provperioden, användarens beslut 2026-11-10).
+export function sidansUnderlag(fil, lagen, { avspark = null } = {}) {
   const ut = { lag: {}, kallor: {} };
+  const fran = pc.sidan.baraVeckan ? veckansMandag(avspark) : null;
+  const dagAv = (x, a) => String(x.tid || a.datum).slice(0, 10);
   for (const lag of lagen) {
     const post = fil && fil.lag && fil.lag[lag];
-    const alla = ((post && post.avsnitt) || []).filter((a) => (a.uppgifter || []).some((x) => x.id && x.vikt >= pc.minstVikt))
+    const med = (x, a) => x.id && x.vikt >= pc.minstVikt && (!fran || dagAv(x, a) >= fran);
+    const alla = ((post && post.avsnitt) || []).filter((a) => (a.uppgifter || []).some((x) => med(x, a)))
       .sort((a, b) => b.datum.localeCompare(a.datum));
     // Forumet och medierna läses varje natt: de räknas för sig, så att poddarna står kvar.
     const avsnitt = [...alla.filter(arPodd).slice(0, pc.sidan.avsnitt), ...alla.filter((a) => a.typ === 'forum').slice(0, fc.tillSidan), ...alla.filter((a) => a.typ === 'media').slice(0, mc.tillSidan)];
-    ut.lag[lag] = avsnitt.flatMap((a) => a.uppgifter.filter((x) => x.id && x.vikt >= pc.minstVikt).map((x) => ({ id: x.id, a: x.a || 'match', s: x.s, vikt: x.vikt, t: x.t, sagt: x.sagt || null, vem: x.vem || null, podd: a.podd, typ: a.typ || 'podd', datum: (x.tid || a.datum).slice(0, 10) })));
+    ut.lag[lag] = avsnitt.flatMap((a) => a.uppgifter.filter((x) => med(x, a)).map((x) => ({ id: x.id, a: x.a || 'match', s: x.s, vikt: x.vikt, t: x.t, sagt: x.sagt || null, vem: x.vem || null, podd: a.podd, typ: a.typ || 'podd', datum: dagAv(x, a) })));
     ut.kallor[lag] = avsnitt.map((a) => ({ podd: a.podd, avsnitt: a.titel, datum: a.datum.slice(0, 10), adress: a.sida || a.apple || null, typ: a.typ || 'podd' }));
   }
   return ut;
 }
 
-// Uppgifterna sidan bygger på, som en nyckel: ändras den skrivs sidan om.
-export const sidNyckel = (u) => `${pc.promptVersion}|${Object.values(u.lag).flat().map((x) => x.id).sort().join(',')}`;
+// Uppgifterna sidan bygger på, som en nyckel: ändras den skrivs sidan om. pc.sidan.version skriver om sidorna
+// utan att avsnitten tas ut på nytt.
+export const sidNyckel = (u) => `${pc.promptVersion}|${pc.sidan.version}|${Object.values(u.lag).flat().map((x) => x.id).sort().join(',')}`;
 
-// En punkt på sidan av en eller flera uppgifter (ur) och, om den håller, redaktörens text.
+// En punkt på sidan av en eller flera uppgifter (ur) och, om den håller, redaktörens text. datum står bredvid
+// podd, ett per källa: dagen då källan sa det (den senaste när den sa det flera gånger), så att tidningen kan
+// skriva källan med datum.
 function punkt(ur, text) {
   const kalla = ur.slice().sort((p, q) => q.vikt - p.vikt);
   const eget = `${kalla.map((x) => x.t).join('\n')}`;
   const t0 = typeof text === 'string' ? text.trim() : '';
-  const hall = t0 && antalOrd(t0) <= 65 && !TIPS_RE.test(t0) && !unknownNumbers([t0], [eget]).length;
+  const hall = t0 && antalOrd(t0) <= pc.sidan.punktOrd + 15 && !TIPS_RE.test(t0) && !unknownNumbers([t0], [eget]).length;
   const med = kalla.find((x) => x.sagt);
   const typer = [...new Set(kalla.map((x) => x.typ || 'podd'))];
+  const podd = [...new Set(kalla.map((x) => x.podd))];
+  const datum = podd.map((n) => kalla.filter((x) => x.podd === n).map((x) => x.datum || '').sort().at(-1) || null);
   return {
     t: hall ? t0 : kalla[0].t,
     // det minst säkra slaget gäller
     s: SAKERHET[Math.max(...kalla.map((x) => SAKERHET.indexOf(x.s)))] || 'h',
     vikt: kalla[0].vikt,
-    podd: [...new Set(kalla.map((x) => x.podd))],
+    podd,
+    ...(datum.some(Boolean) ? { datum } : {}),
     typ: typer.length > 1 ? 'blandat' : typer[0],
     ...(med ? { citat: { sagt: med.sagt, vem: med.vem || null, podd: med.podd, typ: med.typ || 'podd' } } : {}),
   };
@@ -453,13 +476,13 @@ export function sidaAv(content, underlag, lagen) {
 // → {rubrik, ingress, delar: [{lag, kallor, grupper: [{amne, punkter: [{t, s, podd, citat}]}]}], nyckel, redigerad, sekunder}
 // eller null om inget lag har något. Fel från Claude Code (Stopp) kastas; annars blir sidan oredigerad.
 export async function skrivSida(fil, lagen, { avspark = null, now = () => new Date(), claude = claudeSvar, logg = () => {} } = {}) {
-  const underlag = sidansUnderlag(fil, lagen);
+  const underlag = sidansUnderlag(fil, lagen, { avspark });
   if (!Object.values(underlag.lag).some((l) => l.length)) return null;
   const nyckel = sidNyckel(underlag);
   let sida = null;
   let sekunder = 0;
   try {
-    const system = pc.sidaPrompt.replace('{punkter}', pc.sidan.punkterPerLag).replace('{rubrikOrd}', pc.sidan.rubrikOrd).replace('{ingressOrd}', pc.sidan.ingressOrd);
+    const system = pc.sidaPrompt.replace('{punkter}', pc.sidan.punkterPerLag).replace('{punktOrd}', pc.sidan.punktOrd).replace('{rubrikOrd}', pc.sidan.rubrikOrd).replace('{ingressOrd}', pc.sidan.ingressOrd);
     const data = { match: lagen.join(' – '), ...(avspark ? { avspark: nowFmt.format(new Date(avspark)) } : {}), lag: Object.fromEntries(lagen.map((lag) => [lag, underlag.lag[lag].map((x) => ({ id: x.id, amne: x.a, slag: x.s, vikt: x.vikt, [x.typ === 'forum' ? 'forum' : x.typ === 'media' ? 'insatta' : 'podd']: x.podd, datum: x.datum, uppgift: x.t }))])) };
     const r = await claude({ system, prompt: `Idag är det ${nowFmt.format(now())}.\n\nUnderlaget (JSON):\n${JSON.stringify(data)}`, tools: [], model: pc.model, effort: pc.sidan.effort, timeoutMs: pc.timeoutMs });
     sekunder = r.seconds;

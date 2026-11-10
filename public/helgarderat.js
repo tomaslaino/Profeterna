@@ -4,33 +4,32 @@
 //
 // Tidningen med det supportrarna vet inför lördagens matcher: det intressanta ur lagens supporterpoddar, forum
 // och insatta medier (fansajter, fanzines, nyhetsbrev och oberoende lokala reportrar), en sida per match (samma
-// uppgifter som Supportrarna i tidningen bakom löpsedeln, rum-tidning.js).
-// Sidan visar veckans omgång ur data/poddsidor.json, som nattjobbet på iMacen skriver inför varje omgång, så länge
+// uppgifter som Supportrarna i tidningen på pulten i rummet, rum-tidning.js, som också heter Helgarderat).
+// Sidan visar veckans nummer ur data/poddsidor.json, som nattjobbet på iMacen skriver inför varje omgång, så länge
 // omgångens sista match är högst tre dagar gammal. Annars visar den provnumret: provomgången som poddjobbet gjorde
-// 2026-11-10 (helgarderat/utkast.json, i samma form). Var i rummet tidningen ska ligga är inte bestämt.
+// 2026-11-10 (helgarderat/utkast.json, i samma form). Det första numret (Nr 1, inför lördagen den 14 november 2026)
+// lades i data/poddsidor.json för hand ur samma material, innan nattjobbet hade kört.
 //
 //   Framsidan   namnet med tre ikryssade rutor (1, X och 2: helgarderat), numret, datumet och priset (tre rader,
 //               tre kronor), etta (matchen med mest i), Lördagens matcher med sidnumren, Hört bland
 //               supportrarna (tre uppgifter som är supportrarnas egna, ur andra matcher) och De insatta skriver
 //               (tre uppgifter ur de insatta medierna, ur ännu andra matcher när det går)
-//   Sidorna     en per match: lagen bredvid varandra, uppgifterna under sina ämnen med slaget som stämpel och
-//               citaten med vem som säger det
-//   Baksidan    källorna, avsnitt, forumtrådar och artiklar med datum, och stämplarna
+//   Sidorna     en per match: lagen bredvid varandra, under laget källorna med datum, och sedan ämnena med ett
+//               ord i en smal spalt och punkterna bredvid, var och en med en liten markör för slaget. Högst ett
+//               citat på sidan, och nyckeln till markörerna längst ner (användarens önskemål 2026-11-10: "betydligt
+//               mer organiserat/snyggt och överblickbart … kortfattad och snygg information")
+//   Baksidan    källorna, avsnitt, forumtrådar och artiklar med datum, och markörerna
 //
-// Texterna för slagen och ämnena kommer från RumTidning.TEXT.poddar, så att det står samma sak i båda tidningarna.
+// Texterna för slagen och ämnena och uppställningen av lagets punkter (poddLaget, poddCitat, poddUr) kommer från
+// RumTidning, så att det står samma sak på samma sätt i båda tidningarna.
 
 (function () {
   const rot = document.getElementById('hg');
   if (!rot) return;
   const RT = window.RumTidning;
   const T = RT.TEXT.poddar;
-  const poddNamn = RT.poddNamn;
 
   const esc = (s) => String(s == null ? '' : s).replace(/[&<>"]/g, (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c]));
-  const lista = (l0) => {
-    const l = [].concat(l0);
-    return l.length < 2 ? l.join('') : `${l.slice(0, -1).join(', ')} och ${l.at(-1)}`;
-  };
   // resultat och årtal (3–1, 2025–26) bryts inte vid tankstrecket
   const hel = (s) => String(s).replace(/(\d)–(\d)/g, '$1⁠–⁠$2');
   const stor = (s) => String(s).charAt(0).toUpperCase() + String(s).slice(1);
@@ -67,26 +66,30 @@
   };
 
   // Rutorna 1, X och 2 som på kupongen, tecknet tryckt ovanför och ett kryss i kulspetspenna i varje: helgarderat.
-  // Varje kryss är draget lite olika och går en bit utanför rutan.
-  const KRYSS = [
-    'M4.5 6.2 C13 14.6 24 25.8 35.6 35.1 M34.2 4.6 C25.8 14.1 15.6 25.2 5.3 36.4',
-    'M5.6 4.9 C14.6 14.2 23.4 23.6 34.6 36.2 M36.1 6.4 C26.6 15 15.2 26 3.9 34.6',
-    'M3.8 7.1 C12.8 15.2 25.4 24.4 36.3 34 M33.4 3.9 C26.3 13.5 17 26.1 7.2 37.1',
-  ];
-  const rutor = () => `<svg class="hg-rutor" viewBox="0 0 134 64" aria-hidden="true">${['1', 'X', '2'].map((t, i) => `<g transform="translate(${i * 46.5 + 0.8} 0)">` +
-    `<text x="19.5" y="15" text-anchor="middle">${t}</text><g transform="translate(0 23.2)"><rect width="39" height="39" class="r"/><path d="${KRYSS[i]}" class="k"/></g></g>`).join('')}</svg>`;
+  // Samma som på tidningen och löpsedeln i rummet (RumTidning.rutor).
+  const rutor = () => RT.rutor('hg-rutor');
 
-  const STAMPEL = (s, typ = 'podd') => {
+  // Markören för slaget: bekräftat en svart fyrkant, en egen uppgift eller ett rykte en röd prick, en åsikt en ring.
+  const MARK = (s) => {
     const k = T.slag[s] ? s : 'h';
-    return `<i class="hg-slag s-${k}${typ === 'media' ? ' t-media' : ''}">${esc(k === 'h' ? (T.egen[typ] || T.slag.h) : T.slag[k])}</i>`;
+    return `<i class="hg-mark s-${k}" role="img" aria-label="${esc(T.nyckel[k])}" title="${esc(T.nyckel[k])}"></i>`;
   };
-  const amne = (u, a) => T.amnen[a] || (u.amnen && u.amnen[a]) || T.amnen.match;
-  // Vem som säger det: namnet när det framgår, annars podden, forumet eller de insatta.
-  const vem = (c) => {
-    const kalla = T.kalla(c);
-    return c.vem ? `${c.vem}, ${kalla}` : stor(kalla);
+  const amneKort = (a) => T.kort[a] || T.kort.match;
+  // Källan och datumet under en uppgift på framsidan: SK3 TV, 9 nov. Datumet är uppgiftens eget, annars källans
+  // när den bara har ett.
+  const kallaRad = (d, p) => {
+    const kallor = RT.poddLaget(d).kallor;
+    const namn = [].concat(p.podd || []).filter(Boolean);
+    const egna = Array.isArray(p.datum) ? p.datum : namn.map(() => p.datum);
+    const l = namn.map((n, i) => {
+      const k = kallor.find((y) => y.podd === n) || { podd: n, typ: ['forum', 'media'].includes(p.typ) ? p.typ : 'podd', datum: [] };
+      const dt = (typeof egna[i] === 'string' && egna[i]) || (k.datum.length === 1 ? k.datum[0] : '');
+      return [stor(T.kalla(k)), kortDatum(dt)].filter(Boolean).join(', ');
+    });
+    return l.length ? `<p class="hg-kallrad">${esc(l.join(' · '))}</p>` : '';
   };
-  const citat = (c, kl = '') => `<blockquote class="hg-citat${kl ? ` ${kl}` : ''}"><p>”${esc(hel(c.sagt))}”</p><cite>${esc(vem(c))}</cite></blockquote>`;
+  // c: { sagt, vem } där vem är namnet, källan och datumet (RumTidning.poddCitat)
+  const citat = (c, kl = '') => `<blockquote class="hg-citat${kl ? ` ${kl}` : ''}"><p>”${esc(hel(c.sagt))}”</p><cite>${esc(c.vem)}</cite></blockquote>`;
   // Forumet läses varje natt: det står en gång. Artiklarna ur samma insatta medium står en gång under laget
   // (alla), men var för sig på baksidan.
   const kallorna = (d, alla = false) => {
@@ -102,12 +105,6 @@
   function storst(sidor) {
     const vikt = (s) => s.delar.reduce((a, d) => a + punkter(d).length, 0) + (s.delar.filter(harInnehall).length > 1 ? 6 : 0);
     return sidor.slice().sort((a, b) => vikt(b) - vikt(a) || a.nr - b.nr);
-  }
-  // Det stora citatet på framsidan: helst om truppen och med ett namn, och inte för långt.
-  function stortCitat(s) {
-    const l = s.delar.flatMap((d) => punkter(d).filter((p) => p.citat && p.citat.sagt).map((p) => ({ c: p.citat, amne: p.amne })));
-    const poang = (x) => (x.c.vem ? 2 : 0) + (['trupp', 'elva'].includes(x.amne) ? 1 : 0) - (x.c.sagt.length > 170 ? 4 : 0) - (x.c.sagt.length < 45 ? 2 : 0);
-    return l.sort((a, b) => poang(b) - poang(a))[0] || null;
   }
   // Hört bland supportrarna: en egen uppgift (slaget h) ur poddarna eller forumen, var ur tre andra matcher, helst
   // om truppen. De insatta skriver: en uppgift ur de insatta medierna (bekräftad eller deras egen), var ur tre
@@ -141,15 +138,22 @@
   // ---------- sidorna ----------
 
   const sidnr = (s) => s.nr + 1;
-  // Numret: provnumret är Nr 1, veckans nummer har veckan.
-  const numret = (u, lordag) => [u.prov ? 'Nr 1' : '', lordag ? `Vecka ${vecka(lordag)}` : ''].filter(Boolean).join(' · ');
+  // Numret: det första numret är veckan med lördagen den 14 november 2026 (Nr 1), och sedan ett nummer i veckan,
+  // räknat på veckorna (måndag–söndag) där omgången börjar – samma som tidningen på pulten i rummet
+  // (RumTidning.nummer). Provnumret är ett nollnummer (Nr 0). Båda har veckan.
+  const nummer = RT.nummer;
+  const numret = (u, lordag) => {
+    const nr = u.prov ? 0 : lordag ? nummer(lordag) : null;
+    return [nr != null ? `Nr ${nr}` : '', lordag ? `Vecka ${vecka(lordag)}` : ''].filter(Boolean).join(' · ');
+  };
   const folio = (u, nr) => `<div class="hg-folio${nr % 2 ? ' h' : ''}"><b>${nr}</b><a href="#forsta">Helgarderat</a><span>${esc(u.datumText)}</span></div>`;
 
   function forstasidan(u) {
     const sidor = u.sidor;
     const [s1, s2] = storst(sidor);
     const lag1 = s1.lag || [];
-    const c = stortCitat(s1);
+    // det stora citatet: samma som på matchens sida (helst om truppen eller elvan, sedan med ett namn)
+    const c = RT.poddCitat(s1.delar);
     const lordag = sidor.map((s) => s.avspark).filter(giltig).sort()[0];
     const lor = lordag ? `Inför ${fVdagLang.format(new Date(lordag))}en den ${fDagMan.format(new Date(lordag))}` : '';
     const huvud = `<header class="hg-huvud">` +
@@ -160,7 +164,7 @@
       `<p class="hg-kick"><b>${s1.nr}</b><span>${skold(lag1[0], 'liten')}${esc(lag1[0])}–${skold(lag1[1], 'liten')}${esc(lag1[1])}</span><em>${esc(avspark(s1.avspark))}</em></p>` +
       `<h2><a href="#sida-${sidnr(s1)}">${esc(hel(s1.rubrik || T.rubrik(lag1[0], lag1[1])))}</a></h2>` +
       (s1.ingress ? `<p class="hg-ingress">${esc(hel(s1.ingress))}</p>` : '') +
-      (c ? citat(c.c, 'stort') : '') +
+      (c ? citat(c, 'stort') : '') +
       `<p class="hg-vidare"><a href="#sida-${sidnr(s1)}">Mer på sidan ${sidnr(s1)}</a></p></article>`;
     const lag2 = s2 ? s2.lag || [] : [];
     const tvaan = s2 ? `<article class="hg-tvaa">` +
@@ -174,11 +178,11 @@
         `<small>${esc(hel(s.rubrik || ''))}</small></a></li>`;
     }).join('')}</ol></nav>`;
     const h = hort(sidor, [s1, s2]);
+    // Varje uppgift med källan och datumet under, som på sidan.
     const rutan = (namn, l, kl = '') => (l.length ? `<section class="hg-hort${kl}" aria-label="${esc(namn)}"><h3>${esc(namn)}</h3><div class="hg-hort-l">${l.map((x) => {
       const lag = (x.s.lag || [])[x.i];
-      const kalla = x.p.typ === 'media' && (x.p.podd || []).length ? `<small>${esc(lista(x.p.podd))}</small>` : '';
-      return `<article><p class="hg-kick"><b>${x.s.nr}</b><span>${skold(lag, 'liten')}${esc(lag)}</span></p>${STAMPEL(x.p.s, x.p.typ)}${kalla}<p>${esc(hel(x.p.t))}</p>` +
-        `<p class="hg-vidare"><a href="#sida-${sidnr(x.s)}">Sidan ${sidnr(x.s)}</a></p></article>`;
+      return `<article><p class="hg-kick"><b>${x.s.nr}</b><span>${skold(lag, 'liten')}${esc(lag)}</span></p><p>${esc(hel(x.p.t))}</p>` +
+        `${kallaRad(x.s.delar[x.i], x.p)}<p class="hg-vidare"><a href="#sida-${sidnr(x.s)}">Sidan ${sidnr(x.s)}</a></p></article>`;
     }).join('')}</div></section>` : '');
     const i = insatta(sidor, [s1, s2, ...h.map((x) => x.s)]);
     return `<section class="hg-ark hg-forsta" id="forsta" aria-label="Framsidan">${huvud}<div class="hg-front"><div class="hg-vanster">${ettan}${tvaan}</div>${matcher}</div>` +
@@ -188,22 +192,24 @@
   function matchsidan(u, s) {
     const nr = sidnr(s);
     const lag = s.lag || [];
+    const cit = RT.poddCitat(s.delar);
     const delar = s.delar.map((d, i) => {
-      const k = kallorna(d);
-      const ur = k.length ? `<p class="hg-ur">Ur ${k.map((x, j) => `${j && j === k.length - 1 ? 'och ' : ''}${x.adress ? `<a href="${esc(x.adress)}" target="_blank" rel="noopener">` : ''}${esc(T.kalla(x))}${x.adress ? '</a>' : ''}${kortDatum(x.datum) ? ` (${kortDatum(x.datum)})` : ''}`).join(', ').replace(/, och /, ' och ')}</p>` : '';
-      const flera = new Set(k.map((x) => x.podd)).size > 1;
-      const grupper = (d.grupper || []).filter((g) => (g.punkter || []).some((p) => p && p.t)).map((g) => `<div class="hg-grupp"><h4>${esc(amne(u, g.amne))}</h4>${g.punkter.filter((p) => p && p.t).map((p) =>
-        `<div class="hg-punkt">${STAMPEL(p.s, p.typ)}${flera && (p.podd || []).length ? `<small>${esc(lista(p.podd.map(poddNamn)))}</small>` : ''}<p>${esc(hel(p.t))}</p>${p.citat && p.citat.sagt ? citat(p.citat) : ''}</div>`).join('')}</div>`).join('');
-      return `<section class="hg-lag${grupper ? '' : ' tom'}"><h3>${skold(lag[i] || d.lag)}<span>${esc(lag[i] || d.lag || '')}</span></h3>${ur}${grupper || `<p class="hg-ingen">${esc(T.ingen)}</p>`}</section>`;
+      const l = RT.poddLaget(d);
+      const ur = RT.poddUr(l.kallor, true);
+      const rader = l.rader.map((r) => `<div class="hg-rad"><b>${esc(amneKort(r.amne))}</b><ul>${r.punkter.map((p) =>
+        `<li>${MARK(p.s)}${esc(hel(p.t))}${p.ref ? ` <small>${esc(p.ref)}</small>` : ''}</li>`).join('')}</ul></div>`).join('');
+      return `<section class="hg-lag${rader ? '' : ' tom'}"><h3>${skold(lag[i] || d.lag)}<span>${esc(lag[i] || d.lag || '')}</span></h3>${ur ? `<p class="hg-ur">${ur}</p>` : ''}` +
+        `${rader ? `<div class="hg-rader">${rader}</div>` : `<p class="hg-ingen">${esc(T.ingen)}</p>`}${cit && cit.i === i ? citat(cit, 'sida') : ''}</section>`;
     }).join('');
     const en = s.delar.filter(harInnehall).length < 2;
+    const nyckel = `<p class="hg-nyckel">${['b', 'h', 'o'].map((k) => `<span>${MARK(k)}${esc(T.nyckel[k])}</span>`).join('')}</p>`;
     return `<section class="hg-ark hg-sida" id="sida-${nr}" aria-label="Sidan ${nr}: ${esc(lag.join('–'))}">${folio(u, nr)}` +
       `<div class="hg-vinjett"><b>${s.nr}</b><span>${esc(kort(lag[0]))}–${esc(kort(lag[1]))}</span><em>${esc(avspark(s.avspark, true))}</em></div>` +
       `<h2 class="hg-rub">${esc(hel(s.rubrik || T.rubrik(lag[0], lag[1])))}</h2>` + (s.ingress ? `<p class="hg-ingress">${esc(hel(s.ingress))}</p>` : '') +
-      `<div class="hg-lagen${en ? ' en' : ''}">${delar}</div></section>`;
+      `<div class="hg-lagen${en ? ' en' : ''}">${delar}</div>${nyckel}</section>`;
   }
 
-  // Baksidan: källorna per match och stämplarna.
+  // Baksidan: källorna per match och markörerna.
   function baksidan(u) {
     const nr = u.sidor.length + 2;
     const kallor = u.sidor.map((s) => {
@@ -212,8 +218,7 @@
       return `<div class="hg-kalla"><h4><b>${s.nr}</b>${esc(kort(s.lag[0]))}–${esc(kort(s.lag[1]))}</h4><ul>${l.map((k) => `<li><b>${esc(stor(T.kalla(k)))}</b> ` +
         `${k.adress ? `<a href="${esc(k.adress)}" target="_blank" rel="noopener">${esc(k.avsnitt || k.adress)}</a>` : esc(k.avsnitt || '')}${kortDatum(k.datum) ? `, ${esc(kortDatum(k.datum))}` : ''}</li>`).join('')}</ul></div>`;
     }).join('');
-    const egna = ['podd', 'forum', 'media', 'blandat'];
-    const stamplar = [['b', 'podd'], ...egna.map((t) => ['h', t]), ['o', 'podd']].map(([k, t]) => `<p>${STAMPEL(k, t)} ${esc(stor(T.forklaring[k === 'h' ? t : k]))}</p>`).join('');
+    const stamplar = ['b', 'h', 'o'].map((k) => `<p>${MARK(k)}<b>${esc(T.nyckel[k])}:</b> ${esc(T.forklaring[k])}</p>`).join('');
     return `<section class="hg-ark hg-sida hg-baksida" id="sida-${nr}" aria-label="Sidan ${nr}: Källorna">${folio(u, nr)}` +
       `<div class="hg-vinjett enkel"><b>Källorna</b></div><div class="hg-kallor">${kallor}</div>` +
       `<div class="hg-stamplar">${stamplar}</div>` +
