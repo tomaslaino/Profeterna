@@ -735,14 +735,15 @@
     return { tecken: SIGNS[p.indexOf(max)], max };
   };
 
-  // Rutorna 1, X och 2 framför namnet, som på kupongen, alla ikryssade med kulspetspenna: helgarderat. Samma kryss
-  // som på utkastet (helgarderat.js), dragna lite olika och en bit utanför rutan.
+  // Rutorna 1, X och 2 framför namnet, som på kupongen, alla ikryssade med kulspetspenna: helgarderat. Kryssen är
+  // dragna lite olika och går en bit utanför rutan. Samma rutor på löpsedeln (rum-affischer.js) och på Helgarderats
+  // egen sida (helgarderat.js), med sin klass (kl).
   const KRYSS = [
     'M4.5 6.2 C13 14.6 24 25.8 35.6 35.1 M34.2 4.6 C25.8 14.1 15.6 25.2 5.3 36.4',
     'M5.6 4.9 C14.6 14.2 23.4 23.6 34.6 36.2 M36.1 6.4 C26.6 15 15.2 26 3.9 34.6',
     'M3.8 7.1 C12.8 15.2 25.4 24.4 36.3 34 M33.4 3.9 C26.3 13.5 17 26.1 7.2 37.1',
   ];
-  const rutor = () => `<svg class="hf-rutor" viewBox="0 0 134 64" aria-hidden="true">${SIGNS.map((t, i) => `<g transform="translate(${i * 46.5 + 0.8} 0)">` +
+  const rutor = (kl = 'hf-rutor') => `<svg class="${kl}" viewBox="0 0 134 64" aria-hidden="true">${SIGNS.map((t, i) => `<g transform="translate(${i * 46.5 + 0.8} 0)">` +
     `<text x="19.5" y="15" text-anchor="middle">${t}</text><g transform="translate(0 23.2)"><rect width="39" height="39" class="r"/><path d="${KRYSS[i]}" class="k"/></g></g>`).join('')}</svg>`;
 
   // Framsidan, 100 × 140 (zoom i rum.js): numret, datumet och priset, namnet, en rubrik, kupongen och puffarna.
@@ -800,7 +801,7 @@
       `<div class="hf-linje"><b>${esc(numret)}</b><span>${esc(dag)}</span><span>${esc(G.pris)}</span></div>` +
       `<div class="hf-namn">${rutor()}<b>${NAMN.toUpperCase()}</b></div>` +
       `<h2 class="hf-rub"><b>${esc(r1)}</b><b class="gron">${esc(r2)}</b></h2><p class="hf-under">${esc(underRad)}</p>` +
-      innehall + '</div>';
+      innehall + '<span class="hf-blad"></span><span class="hf-yta"></span></div>';
   }
 
   // Åtta knep, som alltid står sist: tidningens råd, och nummer 5 är det alla gör fel.
@@ -901,5 +902,5 @@
     }
   }
 
-  return { tidning, forsta, rastrera, nummer, kronika, skrall, citaten, omdome, poddNamn, poddLaget, poddCitat, poddUr, kortDatum, TEXT };
+  return { tidning, forsta, rastrera, nummer, rutor, kronika, skrall, citaten, omdome, poddNamn, poddLaget, poddCitat, poddUr, kortDatum, TEXT };
 });

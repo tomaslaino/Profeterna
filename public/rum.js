@@ -3961,7 +3961,10 @@ ${window.RumRegister ? RumRegister.nara() : ''}
     const tn = t.querySelector('.tn');
     tn.style.setProperty('--k', k.toFixed(3));
     tn.classList.toggle('smal', k * 100 < 470);
-    t.querySelector('.hf-forsta').style.zoom = k.toFixed(3);
+    const f = t.querySelector('.hf-forsta');
+    f.style.zoom = k.toFixed(3);
+    // (papperets mönster delas med förstoringen, så att de är lika fina som på pulten)
+    f.style.setProperty('--zz', k.toFixed(3));
   }
 
   // Gängets kupong med baksidan upp vänds på pulten: den lyfts och vänds
