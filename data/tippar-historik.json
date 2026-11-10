@@ -2,8 +2,8 @@
   "omgangar": [
     {
       "id": "2026-10-24-mk9c2t",
-      "namn": "Oxford och Cambridge i samma båt",
-      "syftar": "Rivalerna från det klassiska båtracet spelar båda hemma i League One samtidigt och ligger båda topp sju, så de sitter verkligen i samma båt.",
+      "namn": "Oxford och Cambridge ror i takt",
+      "syftar": "Rivalerna från det klassiska båtracet spelar båda hemma i League One samtidigt och ligger båda topp sju – de ror i takt.",
       "datum": "2026-10-24",
       "gang": [
         { "id": "DL", "namn": "Daniel Laino" },
@@ -29,7 +29,7 @@
     },
     {
       "id": "2026-10-31-st4977",
-      "namn": "Bournemouth slår helst uppåt",
+      "namn": "Bournemouth sparkar hellre uppåt",
       "syftar": "Bournemouth ligger sjuttonde men har just kört över både Manchester United och AC Milan med 3–0, så de verkar bara bry sig om lag som ligger högre upp.",
       "datum": "2026-10-31",
       "gang": [
@@ -56,8 +56,8 @@
     },
     {
       "id": "2026-11-07-st4978",
-      "namn": "Näten på City Ground håller fint",
-      "syftar": "Forest har inte gjort ett enda mål hemma den här säsongen, så näten på City Ground är fortfarande som nya – och på lördag kommer Manchester City dit.",
+      "namn": "Forest sparar målen till City",
+      "syftar": "Forest har inte gjort ett enda mål hemma den här säsongen – kanske sparar de dem till Manchester City, som kommer till City Ground på lördag.",
       "datum": "2026-11-07",
       "gang": [
         { "id": "DL", "namn": "Daniel Laino" },
