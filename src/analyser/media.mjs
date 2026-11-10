@@ -3,6 +3,10 @@
 // bloggar, oberoende lokala reportrar. Körs av scripts/tidning/poddar.mjs på iMacen, i samma jobb
 // som supporterpoddarna och forumen, och uppgifterna hamnar på samma informationssidor.
 //
+// Samma kod läser klubben, lokaltidningen och motståndarens intervju med en supporter
+// (config/lokal.js): varje funktion tar då den konfigurationen som cfg. Utan cfg gäller de
+// insattas (config/media.js).
+//
 //   1. Claude Code söker fram artiklarna (bara sökningen, inga sidor). En adress räknas bara om den
 //      kom upp i en sökning och inte hör till de stora mediehusen, spelsajterna, aggregatorerna,
 //      sociala medier eller poddarnas värdar (mc.utesluten).
@@ -19,6 +23,8 @@ import crypto from 'node:crypto';
 import mc from '../../config/media.js';
 import { jsonOf } from './kontroller.mjs';
 import { claudeSvar } from './claude.mjs';
+import newsCfg from '../../config/news.js';
+import { parseRss } from '../news.mjs';
 import { citatStar, vemStar } from './poddar.mjs';
 import { lasSida, tillText, avkoda, elementVid, Sparrad } from './forum.mjs';
 
@@ -53,8 +59,9 @@ export function utesluten(url, lista = mc.utesluten) {
 }
 
 // Claudes svar på sökningen → artiklarna som håller: adressen kom upp i en sökning (found) och hör
-// inte till en utesluten sajt. Samma artikel tas en gång. → [{kalla, titel, adress, datum, varfor}]
-export function artiklarAv(content, found = [], { flest = mc.artiklar } = {}) {
+// inte till en utesluten sajt. Samma artikel tas en gång. Har konfigurationen slag (config/lokal.js)
+// följer artikelns slag med, och en artikel med ett okänt slag stryks. → [{kalla, titel, adress, datum, varfor, slag?}]
+export function artiklarAv(content, found = [], { cfg = mc, flest = cfg.artiklar } = {}) {
   let j;
   try { j = jsonOf(content); } catch { return null; }
   if (!j || !Array.isArray(j.artiklar)) return null;
@@ -64,23 +71,86 @@ export function artiklarAv(content, found = [], { flest = mc.artiklar } = {}) {
   for (const x of j.artiklar) {
     const adress = x && typeof x.adress === 'string' ? x.adress.trim() : '';
     const ren = renAdress(adress);
-    if (!ren || tagna.has(ren) || !sedda.has(ren) || utesluten(adress)) continue;
+    if (!ren || tagna.has(ren) || !sedda.has(ren) || utesluten(adress, cfg.utesluten)) continue;
+    const slag = cfg.slag ? (x && typeof x.slag === 'string' ? x.slag.trim().toLowerCase() : '') : null;
+    if (cfg.slag && !cfg.slag[slag]) continue;
     tagna.add(ren);
     const datum = x && typeof x.datum === 'string' && /^\d{4}-\d\d-\d\d$/.test(x.datum) ? x.datum : null;
-    ut.push({ kalla: typeof x.kalla === 'string' && x.kalla.trim() ? x.kalla.trim().slice(0, 80) : null, titel: typeof x.titel === 'string' ? x.titel.trim().slice(0, 200) : null, adress, datum, varfor: typeof x.varfor === 'string' ? x.varfor.trim().slice(0, 300) : null });
+    // Källans namn utan en förklaring inom parentes sist ("Plymouth Live (Plymouth Herald)"): datumet står inom parentes på sidan.
+    const kalla = typeof x.kalla === 'string' ? x.kalla.trim().replace(/\s*\([^()]*\)$/, '').trim() : '';
+    ut.push({ kalla: kalla ? kalla.slice(0, 80) : null, titel: typeof x.titel === 'string' ? x.titel.trim().slice(0, 200) : null, adress, datum, varfor: typeof x.varfor === 'string' ? x.varfor.trim().slice(0, 300) : null, ...(slag ? { slag } : {}) });
     if (ut.length >= flest) break;
   }
   return ut;
 }
 
-// Söker fram veckans artiklar om laget. → [{kalla, titel, adress, datum, varfor}]
-export async function letaArtiklar({ lag, mot = null, avspark = null, now = () => new Date(), claude = claudeSvar } = {}) {
+// ---------- Bing News ----------
+//
+// Sökmotorn bakom WebSearch hittar sällan veckans artiklar i lokaltidningarna, men Bing News har dem
+// samma dag (provat 2026-11-10: Manchester Evening News om Stockport, Plymouth Live om Plymouth). Med
+// cfg.bing (config/lokal.js) hämtar jobbet lagets nyheter från de senaste cfg.dagar dagarna ur Bing News
+// RSS och ger dem till Claude som träffar att välja bland. Bing är ett tillskott: går det inte att nå
+// söker Claude som vanligt.
+
+const escRe = (s) => String(s).replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+// Lagets namn som de står i en rubrik: söknamnen i config/news.js och ESPN-namnet.
+const lagetsNamn = (lag) => [...new Set([...((newsCfg.names && newsCfg.names[lag]) || []), lag])];
+// Nämner rubriken laget? Med stor bokstav och på ordgräns: "Reading" ska inte träffa "reading".
+export function namnerLaget(titel, lag) {
+  const re = new RegExp(`(?<![\\p{L}\\d])(${lagetsNamn(lag).map(escRe).sort((a, b) => b.length - a.length).join('|')})(?![\\p{L}\\d])`, 'u');
+  return re.test(String(titel || ''));
+}
+
+// Bing News RSS → veckans nyheter om laget på sajter som inte är uteslutna. → [{kalla, titel, adress, datum}]
+export function bingNyheter(xml, lag, { cfg = mc, now = Date.now() } = {}) {
+  const ut = [];
+  for (const x of parseRss(xml)) {
+    let adress = x.link;
+    try { const u = new URL(x.link); if (/(^|\.)bing\.com$/.test(u.hostname) && u.searchParams.get('url')) adress = u.searchParams.get('url'); } catch { continue; }
+    const t = Date.parse(x.pubDate);
+    if (!Number.isFinite(t) || now - t > cfg.dagar * DAG || t - now > DAG || !namnerLaget(x.title, lag) || !renAdress(adress) || utesluten(adress, cfg.utesluten)) continue;
+    ut.push({ kalla: String(x.source || new URL(adress).hostname.replace(/^www\./, '')).slice(0, 80), titel: String(x.title || '').trim().slice(0, 200), adress, datum: new Date(t).toISOString() });
+  }
+  return ut;
+}
+
+// Lagets nyheter i Bing News, alla cfg.bing.fragor, samma artikel en gång, de nyaste först. → [{kalla, titel, adress, datum}]
+export async function bingTraffar(lag, { cfg = mc, now = Date.now(), fetchImpl = globalThis.fetch } = {}) {
+  if (!cfg.bing) return [];
+  const namn = lagetsNamn(lag)[0];
+  const sett = new Set();
+  const ut = [];
+  for (const f of cfg.bing.fragor) {
+    const q = f.replace('{namn}', namn);
+    let xml;
+    try {
+      const res = await fetchImpl(`https://www.bing.com/news/search?q=${encodeURIComponent(q)}&format=rss&setlang=en-GB&cc=GB`, { headers: { 'user-agent': 'Matchfixarna/1.0 (forumlasare)' }, signal: AbortSignal.timeout(20000) });
+      if (!res.ok) continue;
+      xml = await res.text();
+    } catch { continue; }
+    for (const x of bingNyheter(xml, lag, { cfg, now })) {
+      const ren = renAdress(x.adress);
+      if (sett.has(ren)) continue;
+      sett.add(ren);
+      ut.push(x);
+    }
+  }
+  return ut.sort((a, b) => b.datum.localeCompare(a.datum)).slice(0, cfg.bing.flest);
+}
+
+// Söker fram veckans artiklar om laget, med lagets nyheter i Bing News som träffar när cfg.bing finns.
+// → [{kalla, titel, adress, datum, varfor, slag?}]
+export async function letaArtiklar({ lag, mot = null, avspark = null, now = () => new Date(), claude = claudeSvar, cfg = mc, fetchImpl = globalThis.fetch } = {}) {
+  const bing = cfg.bing ? await bingTraffar(lag, { cfg, now: now().getTime(), fetchImpl }).catch(() => []) : [];
   const r = await claude({
-    system: mc.letaPrompt.replace('{dagar}', mc.dagar).replace('{sokningar}', mc.sokningar).replace('{artiklar}', mc.artiklar),
-    prompt: [`Idag är det ${nowFmt.format(now())}.`, `Klubben: ${lag}.${mot ? ` Nästa match: mot ${mot}${avspark ? `, ${nowFmt.format(new Date(avspark))}` : ''}.` : ''}`].join('\n'),
-    tools: ['WebSearch'], model: mc.model, effort: mc.letaEffort, timeoutMs: mc.timeoutMs,
+    system: cfg.letaPrompt.replace('{dagar}', cfg.dagar).replace('{sokningar}', cfg.sokningar).replace('{artiklar}', cfg.artiklar),
+    prompt: [
+      `Idag är det ${nowFmt.format(now())}.`, `Klubben: ${lag}.${mot ? ` Nästa match: mot ${mot}${avspark ? `, ${nowFmt.format(new Date(avspark))}` : ''}.` : ''}`,
+      bing.length ? `\nVeckans nyheter om klubben i Bing News (de räknas som träffar i dina sökningar):\n${bing.map((b) => `- ${b.datum.slice(0, 10)} ${b.kalla}: "${b.titel}" ${b.adress}`).join('\n')}` : '',
+    ].filter(Boolean).join('\n'),
+    tools: ['WebSearch'], model: cfg.model, effort: cfg.letaEffort, timeoutMs: cfg.timeoutMs,
   });
-  const l = r.refused ? null : artiklarAv(r.content, r.found);
+  const l = r.refused ? null : artiklarAv(r.content, [...(r.found || []), ...bing.map((b) => ({ url: b.adress }))], { cfg });
   if (!l) throw new Error(r.refused ? 'Claude avböjde' : 'svaret på sökningen gick inte att läsa');
   return l;
 }
@@ -157,32 +227,39 @@ export function artikelAv(html) {
 
 const kortad = (text, flest) => (text.length > flest ? `${text.slice(0, flest).replace(/\s+\S*$/, '')} …` : text);
 
-// Läser en artikel som sökningen gav. → {kalla, titel, adress, datum, forfattare, text, nyckel} eller kastar
+// Läser en artikel som sökningen gav. → {kalla, titel, adress, datum, forfattare, text, nyckel, slag?} eller kastar
 // (Sparrad när sidan inte får eller kan läsas, Error när den är för gammal eller för kort).
-export async function lasArtikel(a, { now = Date.now(), ...opts } = {}) {
+export async function lasArtikel(a, { now = Date.now(), cfg = mc, ...opts } = {}) {
   const { url, html } = await lasSida(a.adress, opts);
   const art = artikelAv(html);
   const datum = art.datum || (a.datum ? `${a.datum}T12:00:00.000Z` : null);
-  if (datum && now - Date.parse(datum) > mc.dagar * DAG) throw new Error(`för gammal (${datum.slice(0, 10)})`);
-  if (art.text.length < mc.minstTecken) throw new Error(`för kort (${art.text.length} tecken)`);
-  const text = kortad(art.text, mc.teckenPerArtikel);
-  return { kalla: a.kalla || art.sajt || new URL(url).hostname.replace(/^www\./, ''), titel: art.titel || a.titel, adress: url || a.adress, datum, forfattare: art.forfattare, text, nyckel: hash(text) };
+  if (datum && now - Date.parse(datum) > cfg.dagar * DAG) throw new Error(`för gammal (${datum.slice(0, 10)})`);
+  if (art.text.length < cfg.minstTecken) throw new Error(`för kort (${art.text.length} tecken)`);
+  const text = kortad(art.text, cfg.teckenPerArtikel);
+  return { kalla: a.kalla || art.sajt || new URL(url).hostname.replace(/^www\./, ''), titel: art.titel || a.titel, adress: url || a.adress, datum, forfattare: art.forfattare, text, nyckel: hash(text), ...(a.slag ? { slag: a.slag } : {}) };
 }
 
-// Artikelns id: adressen. Samma artikel får samma id varje natt.
-export const artikelId = (adress) => `m${hash(renAdress(adress) || adress).slice(0, 11)}`;
+// Artikelns id: adressen. Samma artikel får samma id varje natt. De insattas börjar på m, klubbens och
+// lokaltidningens på l (cfg.idBorjan).
+export const artikelId = (adress, cfg = mc) => `${cfg.idBorjan || 'm'}${hash(renAdress(adress) || adress).slice(0, 11)}`;
+
+// Källans slag i omgångens fil: konfigurationens (media, lokal), eller sökningens slag översatt (motstand).
+export const typAv = (a, cfg = mc) => (cfg.slag && a && cfg.slag[a.slag]) || cfg.typ || 'media';
+// Alla slag som en konfiguration ger: ['media'] eller ['lokal', 'motstand'].
+export const typerAv = (cfg = mc) => [...new Set([cfg.typ || 'media', ...Object.values(cfg.slag || {})])];
 
 // ---------- urvalet ----------
 
-// Artiklarna som de ges till Claude: numrerade, med källan, rubriken, datumet och skribenten.
-// → {text, artiklar: [{nr, …}]}
-export function mediaText(artiklar, { flestTecken = mc.flestTecken } = {}) {
+// Artiklarna som de ges till Claude: numrerade, med källan (och vad det är för källa, cfg.slagText),
+// rubriken, datumet och skribenten. → {text, artiklar: [{nr, …}]}
+export function mediaText(artiklar, { cfg = mc, flestTecken = cfg.flestTecken } = {}) {
   const ut = [];
   const delar = [];
   let langd = 0;
   for (const a of artiklar) {
     const nr = ut.length + 1;
-    const huvud = `[${nr}] ${a.kalla}: "${a.titel || 'utan rubrik'}"${a.datum ? `, ${dagFmt.format(new Date(a.datum))}` : ''}${a.forfattare ? `, av ${a.forfattare}` : ''}`;
+    const slag = cfg.slagText && a.slag && cfg.slagText[a.slag] ? ` (${cfg.slagText[a.slag]})` : '';
+    const huvud = `[${nr}] ${a.kalla}${slag}: "${a.titel || 'utan rubrik'}"${a.datum ? `, ${dagFmt.format(new Date(a.datum))}` : ''}${a.forfattare ? `, av ${a.forfattare}` : ''}`;
     const rest = flestTecken - langd - huvud.length;
     if (rest < 400) break;
     const text = kortad(a.text, rest);
@@ -196,7 +273,7 @@ export function mediaText(artiklar, { flestTecken = mc.flestTecken } = {}) {
 // Claudes svar → uppgifterna som håller: rätt form, citatet står i artikeln (eller i exakt en
 // annan av dem), inga tipsord. Vem som säger det följer bara med om namnet står i artikeln.
 // → {handlarOm, uppgifter: [{a, t, s, artikel, vikt, citat, sagt, vem}], strukna}
-export function mediaUppgifterAv(content, artiklar) {
+export function mediaUppgifterAv(content, artiklar, { flest = mc.uppgifter } = {}) {
   let j;
   try { j = jsonOf(content); } catch { return null; }
   if (!j || !Array.isArray(j.uppgifter)) return null;
@@ -221,12 +298,12 @@ export function mediaUppgifterAv(content, artiklar) {
     uppgifter.push({ a, t, s, artikel: art.nr, vikt, citat, sagt, vem });
   }
   uppgifter.sort((p, q) => q.vikt - p.vikt);
-  return { handlarOm: typeof j.handlar_om === 'string' ? j.handlar_om.trim() : null, uppgifter: uppgifter.slice(0, mc.uppgifter), strukna };
+  return { handlarOm: typeof j.handlar_om === 'string' ? j.handlar_om.trim() : null, uppgifter: uppgifter.slice(0, flest), strukna };
 }
 
 // Tar ut det intressanta ur veckans artiklar. → {handlarOm, uppgifter, strukna, sekunder, artiklar}
-export async function taUtMedia(artiklar0, { lag, mot = null, avspark = null, spelare = [], now = () => new Date(), claude = claudeSvar } = {}) {
-  const { text, artiklar } = mediaText(artiklar0);
+export async function taUtMedia(artiklar0, { lag, mot = null, avspark = null, spelare = [], now = () => new Date(), claude = claudeSvar, cfg = mc } = {}) {
+  const { text, artiklar } = mediaText(artiklar0, { cfg });
   if (!artiklar.length) return { handlarOm: null, uppgifter: [], strukna: 0, sekunder: 0, artiklar };
   const fraga = [
     `Idag är det ${nowFmt.format(now())}.`,
@@ -234,21 +311,21 @@ export async function taUtMedia(artiklar0, { lag, mot = null, avspark = null, sp
     spelare.length ? `Spelare i de två lagens trupper (för stavningen): ${spelare.join(', ')}.` : '',
     `\nArtiklarna:\n\n${text}`,
   ].filter(Boolean).join('\n');
-  const r = await claude({ system: mc.urvalPrompt.replace('{flest}', mc.uppgifter).replace('{dagar}', mc.dagar), prompt: fraga, tools: [], model: mc.model, effort: mc.effort, timeoutMs: mc.timeoutMs });
-  const u = r.refused ? null : mediaUppgifterAv(r.content, artiklar);
+  const r = await claude({ system: cfg.urvalPrompt.replace('{flest}', cfg.uppgifter).replace('{dagar}', cfg.dagar), prompt: fraga, tools: [], model: cfg.model, effort: cfg.effort, timeoutMs: cfg.timeoutMs });
+  const u = r.refused ? null : mediaUppgifterAv(r.content, artiklar, { flest: cfg.uppgifter });
   if (!u) throw new Error(r.refused ? 'Claude avböjde' : 'svaret gick inte att läsa');
   return { ...u, sekunder: r.seconds, artiklar };
 }
 
 // Artiklarna som de sparas i omgångens fil, en post per artikel bredvid poddavsnitten och
 // forumläsningarna. Uppgiftens id är artikelns och platsen i listan.
-export function mediaPoster(artiklar, u, { version = mc.promptVersion, now = new Date() } = {}) {
+export function mediaPoster(artiklar, u, { cfg = mc, version = cfg.promptVersion, now = new Date() } = {}) {
   return artiklar.map((a) => {
-    const id = artikelId(a.adress);
+    const id = artikelId(a.adress, cfg);
     const uppgifter = u.uppgifter.filter((x) => x.artikel === a.nr).map(({ artikel, ...x }, i) => ({ ...x, id: `${id}-${i + 1}` }));
     return {
       id,
-      typ: 'media',
+      typ: typAv(a, cfg),
       podd: a.kalla,
       titel: a.titel,
       datum: a.datum || now.toISOString(),
@@ -264,19 +341,29 @@ export function mediaPoster(artiklar, u, { version = mc.promptVersion, now = new
 }
 
 // Lagets nya artiklar: de som inte redan är lästa med samma text och samma prompt.
-export function nyaArtiklar(lasta, post) {
-  const gamla = new Map(((post && post.avsnitt) || []).filter((a) => a.typ === 'media').map((a) => [a.id, a]));
+export function nyaArtiklar(lasta, post, { cfg = mc } = {}) {
+  const typer = typerAv(cfg);
+  const gamla = new Map(((post && post.avsnitt) || []).filter((a) => typer.includes(a.typ)).map((a) => [a.id, a]));
   return lasta.filter((a) => {
-    const g = gamla.get(artikelId(a.adress));
-    return !g || g.nyckel !== a.nyckel || g.version !== mc.promptVersion;
+    const g = gamla.get(artikelId(a.adress, cfg));
+    return !g || g.nyckel !== a.nyckel || g.version !== cfg.promptVersion;
   });
 }
 
-// Lägger lagets nya poster i omgångens fil: samma artikel ersätts, och de mc.behall nyaste står kvar.
-export function laggTill(post, poster) {
+// Artiklarna som den andra läsningen (de insatta, eller klubben och lokaltidningen) redan har i lagets
+// post: samma artikel läses bara i en av dem. → Set med rena adresser
+export function lastaAvAndra(post, { cfg = mc } = {}) {
+  const typer = typerAv(cfg);
+  return new Set(((post && post.avsnitt) || []).filter((a) => ['media', 'lokal', 'motstand'].includes(a.typ) && !typer.includes(a.typ) && a.sida)
+    .map((a) => renAdress(a.sida)).filter(Boolean));
+}
+
+// Lägger lagets nya poster i omgångens fil: samma artikel ersätts, och de cfg.behall nyaste står kvar.
+export function laggTill(post, poster, { cfg = mc } = {}) {
+  const typer = typerAv(cfg);
   const ids = new Set(poster.map((p) => p.id));
-  const media = [...post.avsnitt.filter((a) => a.typ === 'media' && !ids.has(a.id)), ...poster]
-    .sort((a, b) => String(b.datum).localeCompare(String(a.datum))).slice(0, mc.behall);
-  post.avsnitt = [...post.avsnitt.filter((a) => a.typ !== 'media'), ...media];
+  const media = [...post.avsnitt.filter((a) => typer.includes(a.typ) && !ids.has(a.id)), ...poster]
+    .sort((a, b) => String(b.datum).localeCompare(String(a.datum))).slice(0, cfg.behall);
+  post.avsnitt = [...post.avsnitt.filter((a) => !typer.includes(a.typ)), ...media];
   return post;
 }

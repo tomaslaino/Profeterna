@@ -3,8 +3,10 @@
 // ---------- Helgarderat ----------
 //
 // Tidningen med det supportrarna vet inför lördagens matcher: ett matchblad per match ur lagens supporterpoddar,
-// forum och insatta medier (fansajter, fanzines, nyhetsbrev och oberoende lokala reportrar), samma som Supportrarna i
-// tidningen på pulten i rummet (rum-tidning.js), som också heter Helgarderat.
+// forum och insatta medier (fansajter, fanzines, nyhetsbrev och oberoende lokala reportrar), klubbens egen sajt och
+// lokaltidningen (tränarens presskonferens, skadebesked, lokaltidningens reporter) och motståndarens intervju med en av
+// lagets supportrar, samma som Supportrarna i tidningen på pulten i rummet (rum-tidning.js), som också heter
+// Helgarderat.
 // Sidan visar veckans nummer ur data/poddsidor.json, som nattjobbet på iMacen skriver inför varje omgång, så länge
 // omgångens sista match är högst tre dagar gammal. Annars visar den provnumret: provomgången som poddjobbet gjorde
 // 2026-11-10 (helgarderat/utkast.json, i samma form). Det första numret (Nr 1, inför lördagen den 14 november 2026)

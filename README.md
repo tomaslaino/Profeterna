@@ -309,6 +309,13 @@ ingen falsk precision · sidan kraschar aldrig av en död källa · endast fria 
   lag med ett var), och 19 lag har mer än ett. Claude tar ut det intressanta ur alla forumen i ett anrop per lag,
   varje forum står som källa för sig i matchbladet, och det som sägs i flera forum väger tyngre (se *Supporterforumen*
   under [Analyserna](#analyserna))
+- [x] **Klubben, lokaltidningen och motståndarens intervju (2026-11-10, användarens önskemål: "Om du kan komma på andra
+  relevanta källor än forum och poddar till informationen på 'Helgarderat' än vad det är nu för lagen lägg till
+  det!"):** nattjobbet läser också klubbens egen sajt (tränarens presskonferens, skadebesked, U21-lagets matcher),
+  lokaltidningens reporter (truppnyheter, väntad elva, vad tränaren sa) och motståndarens intervju med en av lagets
+  supportrar inför matchen. Lagets nyheter i Bing News från veckan ges till sökningen, eftersom den annars sällan hittar
+  dem. I matchbladet står de som *Plymouth Live (8 nov)* och *intervjun i Owls Online (12 nov)* (se *Klubben,
+  lokaltidningen och motståndarens intervju* under [Analyserna](#analyserna))
 
 ## Publicering
 
@@ -2229,6 +2236,66 @@ stryks när de inte kom upp eller hör till en utesluten sajt, att rubrik, datum
 robots.txt, en för gammal artikel och ett citat som inte står i artikeln stoppar, och att artiklarna når
 informationssidan, tidningens underlag och nyckeln som skriver om tidningen. Inte provat på iMacen med riktiga
 sökningar: den första riktiga körningen är natten efter att ändringen kommit till main.
+
+**Klubben, lokaltidningen och motståndarens intervju** (2026-11-10, användarens önskan: *"Om du kan komma på andra
+relevanta källor än forum och poddar till informationen på 'Helgarderat' än vad det är nu för lagen lägg till
+det!"*): samma nattjobb letar, efter de insatta medierna, upp tre källor till för varje lag, med samma kod
+([src/analyser/media.mjs](src/analyser/media.mjs) med [config/lokal.js](config/lokal.js) som `cfg`):
+
+- **Klubben:** klubbens egen sajt, med tränarens presskonferens inför matchen, skadebesked, U21- och reservlagets
+  matcher där spelare ur a-truppen fick speltid (vem är tillbaka efter en skada) och klubbens uttalanden om ägarna,
+  pengarna, köpstopp eller poängavdrag. Det är det säkraste beskedet om truppen.
+- **Lokaltidningen:** reportern som följer klubben, också i Reach och National World (som de insatta inte räknar):
+  truppnyheter, väntad elva, vad tränaren sa på presskonferensen och iakttagelser från träningen.
+- **Motståndarens intervju:** inför matchen intervjuar motståndarlagets fansajt eller lokaltidning ofta en supporter
+  till laget (*opposition view*, *Q&A*). Ur den tas bara det supportern säger om sitt eget lag. Den valdes redan
+  2026-11-09 till den hemliga tidningen (*motståndarens röst*) men byggdes inte då.
+
+```
+omgångens lag → Bing News (veckans nyheter om laget) → claude -p söker (WebSearch) → artiklarna läses av jobbet själv → claude -p tar ut → omgang.json
+```
+
+- **Sökningen** ger varje artikel ett slag, `klubben`, `tidningen` eller `intervju`; en artikel utan känt slag stryks.
+  Sökmotorn bakom WebSearch hittade i provet sällan veckans lokala artiklar (sju sökningar om Stockport gav bara
+  aggregatorer och gamla sidor), men Bing News har dem samma dag. Därför hämtar jobbet först lagets nyheter från de
+  senaste sju dagarna ur Bing News RSS (`bing.fragor`: lagets söknamn, *… boss* och *… injury*, högst 20 träffar,
+  rubriken ska nämna laget med stor bokstav, inga uteslutna sajter) och ger dem till Claude, där de räknas som
+  sökträffar. Går Bing inte att nå söker Claude som vanligt.
+- **Uteslutet:** samma sajter som hos de insatta utom lokaltidningarna (`lokaltidningar` i config/media.js), och
+  Newsquests tidningar (Reading Chronicle, Oxford Mail, The Bolton News, Northern Echo, EADT, EDP och 26 till), som alla
+  säger nej till AI-assistenters läsning i robots.txt (Claude-User, kontrollerat 2026-11-10) och aldrig skulle läsas.
+  Reach, National World, Express & Star, Shropshire Star och KentOnline släpper in. Klubbarnas nya EFL-sajter (samma
+  plattform hos Sheffield Wednesday och Reading) visar texten först i webbläsaren och ger 0 tecken; deras
+  interna nyhets-API används inte. Sökningen tar därför hellre lokaltidningens referat av presskonferensen.
+- **Läsningen och uppgifterna** är de insattas, med samma ämnen, slag och vikt, utom: artiklar från de senaste sju
+  dagarna och minst 400 tecken (klubbens besked kan vara några stycken under en video). Claude får veta vad varje
+  artikel är för källa (`slagText`). En artikel som den andra läsningen redan har läses inte igen (`lastaAvAndra`),
+  och källans namn tappar en förklaring inom parentes sist (*Plymouth Live (Plymouth Herald)* → *Plymouth Live*).
+  Klubben och lokaltidningen sparas som `typ: 'lokal'`, intervjun som `typ: 'motstand'`, och artiklarnas id börjar på
+  `l` (de insattas på `m`). Två anrop till Claude per lag och körning, som de insatta.
+- **Sidan och tidningen:** sidan tar lagets tre senaste av dem, utöver poddarnas, forumens och de insattas, och
+  redaktören får dem som `lokalt` och `intervju` (`sidan.version` 2026-11-10.7 skriver om bladen). I källspalten står
+  klubben och lokaltidningen med sitt eget namn och intervjun som *intervjun i …*, samma i tidningen på pulten
+  (`typord` och `kalla` i rum-tidning.js). Tidningens notiser får de två senaste under *ur klubben och lokaltidningen*.
+
+```
+node scripts/tidning/poddar.mjs --bara-lokal                          bara klubben, lokaltidningen och intervjun
+node scripts/tidning/poddar.mjs --utan-lokal                          utan dem
+node scripts/tidning/poddar.mjs --prov 401880747 --bara-lokal         en match på prov (prov.json)
+```
+
+Provat 2026-11-10 på den bärbara datorn med riktiga sökningar (Claude Code 2.1.321 ur skrivbordsappen via
+`ANALYSER_CLAUDE`: den i ~/.local/bin, 2.1.220, är för gammal för modellen) och en egen mapp (`PODDAR_MAPP`), för
+Stockport–Reading och Sheffield Wednesday–Plymouth. Sheffield Wednesday fick sex uppgifter ur The Star (Max Lowes
+känning, Harry Grays höftskada, målvakten, tränaren Dave Challinor om orken), Plymouth tre ur Plymouth Live (Michael
+Baidoo tillbaka efter hamstringsskadan) och matchbladet skrevs med lokaltidningen som källa och tränarens citat.
+Stockport och Reading fick inget: veckans presskonferens hölls inte förrän torsdag, Reading Chronicle säger nej i
+robots.txt och The Star svarade ibland HTTP 403. Körningen natten mot fredag (efter presskonferenserna) är den som
+ska bära källan. Med Node: sökningens svar med slag, Newsquest och påhittade adresser, Bing-träffarna (veckan, laget i
+rubriken, uteslutna sajter), att de står i frågan och räknas som träffar, poster och id, att de insattas och de nya
+inte rör varandras poster, sidans och tidningens underlag och redaktörens nycklar. Helgarderat med ett av provets
+blad och en påhittad intervju, i webbläsarpanelen i 1280 bredd och 375 × 812: källspalten, citatet och baksidan,
+inget som sticker ut åt sidan. Inte provat på iMacen eller med en riktig intervju i motståndarens medier.
 
 **Rösten** står i [prompts/analys-rost.md](prompts/analys-rost.md): Sixten Bråvall, en påhittad
 tränare med egen bakgrund i klubbar som inte finns och egna stående uttryck. Filen går att
@@ -7333,7 +7400,7 @@ Helgarderat är namnet på tidningen med det supportrarna vet (2026-11-10: "Kall
 ligger på sajten som en egen sida, [matchfixarna.se/helgarderat.html](https://matchfixarna.se/helgarderat.html)
 ("gör ett utkast av tidningen Helgarderat så att man får se hur den ser ut. Lägg ut på sajten"), och visar veckans
 omgång av sig själv: informationssidorna i `data/poddsidor.json`, som nattjobbet på iMacen skriver inför varje omgång
-ur poddarna, forumen och de insatta medierna (se [Analyserna](#analyserna)), så länge omgångens sista match är högst
+ur poddarna, forumen, de insatta medierna, klubben, lokaltidningen och motståndarens intervju (se [Analyserna](#analyserna)), så länge omgångens sista match är högst
 tre dagar gammal (2026-11-10: "Ordnas det här automatiskt inför varje omgång nu? Det ska det ju"). Då står numret
 och veckan i huvudet (*Nr 1 · Vecka 46*) och ingen stämpel. Annars visar den provnumret, ett nollnummer (*Nr 0*, med
 stämpeln *Provnummer*). Numret räknas på veckorna: Nr 1 är veckan med lördagen den 14 november 2026, och sedan

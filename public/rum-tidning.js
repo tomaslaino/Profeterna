@@ -117,19 +117,23 @@
     analys: {
       tipset: 'Sixtens tips',
     },
-    // Matchbladen ur supportrarnas poddar, forum och insatta medier (samma i helgarderat.html).
+    // Matchbladen ur supportrarnas poddar, forum och insatta medier, klubben, lokaltidningen och motståndarens
+    // intervju med en av lagets supportrar (samma i helgarderat.html).
     poddar: {
       amnen: { trupp: 'Skador och trupp', elva: 'Väntad uppställning', spel: 'Så spelar laget', klubb: 'Tränaren och klubben', match: 'Inför matchen' },
-      // Källans slag framför namnet: podden …, forumet … och (de insatta) bara namnet.
-      typord: { podd: 'podden', forum: 'forumet', media: '' },
+      // Källans slag framför namnet: podden …, forumet …, intervjun i … (motståndarens medier) och (de insatta,
+      // klubben och lokaltidningen) bara namnet.
+      typord: { podd: 'podden', forum: 'forumet', media: '', lokal: '', motstand: 'intervjun i' },
       rubrik: (h, b) => `${h}–${b}: det supportrarna vet`,
-      ingen: 'Ingen supporterpodd, inget forum och inget från de insatta att hämta något ur den här veckan.',
+      ingen: 'Ingen supporterpodd, inget forum och inget från de insatta, klubben eller lokaltidningen att hämta något ur den här veckan.',
       sammanfattning: 'Sammanfattning',
       kallorna: 'Källorna',
       matchen: 'Matchen',
       // Källans namn som det står på sidan: forumet med ordet forumet framför, poddens namn utan
-      // undertiteln och de insatta medierna med sitt eget namn.
-      kalla: (k) => (k.typ === 'forum' ? `forumet ${k.podd}` : k.typ === 'media' ? String(k.podd || '') : poddNamn(k.podd)),
+      // undertiteln, motståndarens intervju med intervjun i framför och de insatta medierna, klubben och
+      // lokaltidningen med sitt eget namn.
+      kalla: (k) => (k.typ === 'forum' ? `forumet ${k.podd}` : k.typ === 'motstand' ? `intervjun i ${k.podd}`
+        : ['media', 'lokal'].includes(k.typ) ? String(k.podd || '') : poddNamn(k.podd)),
       citaten: 'Citaten är översatta från engelska.',
     },
     omgangen: {
@@ -388,12 +392,12 @@
     if (d && Array.isArray(d.text) && d.text.some((x) => x && String(x).trim())) return d.text.map((x) => String(x || '').trim()).filter(Boolean);
     return ((d && d.grupper) || []).map((g) => (g.punkter || []).filter((p) => p && p.t).map((p) => String(p.t).trim()).join(' ')).filter(Boolean);
   }
-  // Lagets källor i underlagets ordning (poddarna, forumet, de insatta), var och en en gång med alla sina datum och
-  // länken till den senaste. → [{podd, typ, adress, datum: [...]}]
+  // Lagets källor i underlagets ordning (poddarna, forumet, de insatta, klubben och lokaltidningen, intervjun), var
+  // och en en gång med alla sina datum och länken till den senaste. → [{podd, typ, adress, datum: [...]}]
   function poddKallor(d) {
     const kallor = [];
     for (const k of ((d && d.kallor) || []).filter((y) => y && y.podd)) {
-      const typ = ['forum', 'media'].includes(k.typ) ? k.typ : 'podd';
+      const typ = ['forum', 'media', 'lokal', 'motstand'].includes(k.typ) ? k.typ : 'podd';
       let x = kallor.find((y) => y.typ === typ && y.podd === k.podd);
       if (!x) kallor.push((x = { podd: k.podd, typ, adress: null, datum: [], senast: '' }));
       const dt = iso(k.datum);

@@ -68,7 +68,7 @@ module.exports = {
   // punkter under ämnen, med stämplar och citat). Källorna och datumen står bredvid i tidningen.
   sidan: {
     // Byts den skrivs bladen om nästa natt, utan att avsnitten tas ut på nytt.
-    version: '2026-11-10.6',
+    version: '2026-11-10.7',
     // Lagets senaste avsnitt som bladet bygger på, och så många av uppgifterna som sparas
     // under laget (och blir löptext när redaktörens text inte håller).
     avsnitt: 3,
@@ -247,14 +247,14 @@ Handlar podden uppenbart om en annan klubb än laget ovan (tidningen kan ha fåt
 Svara bara med JSON, utan något före eller efter:
 {"ratt_klubb": true, "handlar_om": "en mening om vad avsnittet handlar om", "uppgifter": [{"a": "trupp", "t": "…", "s": "b", "min": 12, "citat": "…", "sagt": "…", "vem": null, "vikt": 4}]}`,
 
-  sidaPrompt: `Du skriver ett matchblad i en svensk tipstidning: en kort artikel inför en match, byggd på det som supportrarna och de som följer lagen varje vecka säger i sina poddar, forum och insatta medier. Läsaren tippar Stryktipset och vill förstå läget i båda lagen.
+  sidaPrompt: `Du skriver ett matchblad i en svensk tipstidning: en kort artikel inför en match, byggd på det som supportrarna och de som följer lagen varje vecka säger i sina poddar, forum och insatta medier, och på det klubben och lokaltidningen säger. Läsaren tippar Stryktipset och vill förstå läget i båda lagen.
 
-Du får matchen och, för varje lag, uppgifter som tidningen har tagit ut ur lagets supporterpoddar, supporterforum och insatta medier (artiklar i fansajter, fanzines, klubbnära nyhetsbrev och hos oberoende lokala reportrar) den här veckan. Varje uppgift har ett id, ett ämne, ett slag (b = bekräftat, h = källans egen uppgift eller ett rykte, o = supportrarnas eller skribentens åsikt), en vikt 1–5, källans namn (podd, forum eller insatta), dagen då det sades och ibland ett citat.
+Du får matchen och, för varje lag, uppgifter som tidningen har tagit ut den här veckan ur lagets supporterpoddar, supporterforum och insatta medier (artiklar i fansajter, fanzines, klubbnära nyhetsbrev och hos oberoende lokala reportrar), ur klubbens egen sajt och lokaltidningen (tränarens presskonferens, klubbens skadebesked, lokaltidningens reporter) och ur motståndarlagets intervju med en av lagets supportrar inför matchen. Varje uppgift har ett id, ett ämne, ett slag (b = bekräftat, h = källans egen uppgift eller ett rykte, o = supportrarnas eller skribentens åsikt), en vikt 1–5, källans namn (podd, forum, insatta, lokalt = klubben eller lokaltidningen, eller intervju = motståndarens intervju med en av lagets supportrar), dagen då det sades och ibland ett citat.
 
 Skriv så här:
 - rubrik: högst {rubrikOrd} ord, om det viktigaste inför matchen.
 - ingress: introduktionen, två eller tre meningar, högst {ingressOrd} ord, om det viktigaste i båda lagen (om bara det ena laget har uppgifter: om det).
-- lag: ett avsnitt per lag, hemmalaget först. Ett till {stycken} stycken löptext, sammanlagt högst {lagOrd} ord. Börja med det som väger tyngst (skador, avstängningar, väntad elva), sedan hur laget spelar och sist klubben och matchen. Skriv sammanhängande och lättläst, som en reporter, inte som en lista, och utan upprepningar. Säg varifrån något kommer där det spelar roll ("enligt podden …", "på forumet … menar flera"), och håll isär det bekräftade, rykten och supportrarnas åsikter. Ta med det viktigaste ur alla tre slagen av källor, och stryk det som är svagt eller rör en tredje klubb. Säger flera källor samma sak (till exempel två av lagets forum, eller podden och ett forum) väger det tyngre: skriv det en gång och säg att det sägs på flera håll. Ange i "ur" id för uppgifterna avsnittet bygger på. Har laget inga uppgifter blir texten en tom lista.
+- lag: ett avsnitt per lag, hemmalaget först. Ett till {stycken} stycken löptext, sammanlagt högst {lagOrd} ord. Börja med det som väger tyngst (skador, avstängningar, väntad elva), sedan hur laget spelar och sist klubben och matchen. Skriv sammanhängande och lättläst, som en reporter, inte som en lista, och utan upprepningar. Säg varifrån något kommer där det spelar roll ("enligt podden …", "på forumet … menar flera", "tränaren sa på presskonferensen …", "lokaltidningen skriver …"), och håll isär det bekräftade, rykten och supportrarnas åsikter. Ta med det viktigaste ur alla slagen av källor, och stryk det som är svagt eller rör en tredje klubb. Säger flera källor samma sak (till exempel två av lagets forum, eller podden och ett forum) väger det tyngre: skriv det en gång och säg att det sägs på flera håll. Ange i "ur" id för uppgifterna avsnittet bygger på. Har laget inga uppgifter blir texten en tom lista.
 - summering: sammanfattningen, två eller tre meningar, högst {summeringOrd} ord, om läget i båda lagen inför matchen.
 - citat: id för en uppgift vars citat är talande och värt att trycka, eller null. Hellre inget än ett svagt.
 

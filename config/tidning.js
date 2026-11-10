@@ -62,6 +62,8 @@ På samma sätt kan underlaget ha uppgifter ur lagets supporterforum (ett eller 
 
 Underlaget kan också ha uppgifter ur de insatta medierna, under "ur insatta medier": artiklar den här veckan i oberoende medier som följer laget på nära håll (fansajter, fanzines, klubbnära nyhetsbrev och bloggar, oberoende lokala reportrar), som tidningen har läst. Det som är "de insattas egen uppgift" skrivs så, med källans namn ("enligt fansajten …", "enligt nyhetsbrevet …"), och "de insattas åsikt" är en åsikt. Säger de insatta och supportrarna samma sak väger det tyngre. Ange artikeln bland källorna, med adressen ur underlaget.
 
+Underlaget kan också ha uppgifter från klubben och lokaltidningen, under "ur klubben och lokaltidningen": tränarens presskonferens, klubbens skadebesked och lokaltidningens reporter den här veckan, och ibland motståndarlagets intervju med en av lagets supportrar inför matchen (kalltyp). Det som är "bekräftat" är klubbens eller tränarens besked och får stå som det är, "lokaltidningens egen uppgift" skrivs så ("enligt lokaltidningen …") och det supportern säger i intervjun är en supporters uppgift eller åsikt. Ange artikeln bland källorna, med adressen ur underlaget.
+
 Skriv sedan en notis per match: en rubrik på högst {rubrikOrd} ord och en text på {ordMin}–{ordMax} ord om båda lagen, med det viktigaste först, som i en riktig notis. Hittar du inget nytt om en match får tabelläget, formen och skadelistan bära notisen.
 
 Inga tips: skriv inte vem som är favorit, hur matchen slutar eller vilka tecken man ska välja, och inga odds.

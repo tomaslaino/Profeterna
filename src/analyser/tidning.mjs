@@ -16,7 +16,7 @@ import { squadOf } from './underlag.mjs';
 import { citer, see, jsonOf, unknownNumbers } from './kontroller.mjs';
 import { senasteTid } from './tider.mjs';
 import { claudeSvar } from './claude.mjs';
-import { poddUnderlag, forumUnderlag, mediaUnderlag, poddNyckel } from './poddar.mjs';
+import { poddUnderlag, forumUnderlag, mediaUnderlag, lokalUnderlag, poddNyckel } from './poddar.mjs';
 
 const H = 3600000;
 const REF_RE = /\[(\d+(?:\s*[,;]\s*\d+)*)\]/g;
@@ -77,6 +77,9 @@ export function tidningsUnderlag(round, details = {}, poddar = null) {
     // Och ur de insatta medierna (src/analyser/media.mjs): veckans artiklar som tidningen har läst.
     const media = Object.fromEntries(par.map((lag) => [lag, mediaUnderlag(poddar, lag)]).filter(([, l]) => l.length));
     if (Object.keys(media).length) rad['ur insatta medier'] = media;
+    // Och från klubben, lokaltidningen och motståndarens intervju med en av lagets supportrar (config/lokal.js).
+    const lokal = Object.fromEntries(par.map((lag) => [lag, lokalUnderlag(poddar, lag)]).filter(([, l]) => l.length));
+    if (Object.keys(lokal).length) rad['ur klubben och lokaltidningen'] = lokal;
     return { nr: i + 1, ...rad };
   });
   return { matcher };

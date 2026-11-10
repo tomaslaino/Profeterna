@@ -14,6 +14,7 @@ import path from 'node:path';
 import pc from '../../config/poddar.js';
 import fc from '../../config/forum.js';
 import mc from '../../config/media.js';
+import lc from '../../config/lokal.js';
 import newsCfg from '../../config/news.js';
 import { jsonOf, unknownNumbers } from './kontroller.mjs';
 import { claudeSvar, Stopp } from './claude.mjs';
@@ -343,12 +344,17 @@ export async function taUt(a, utskrift, { lag, mot = null, avspark = null, spela
 
 const SAKERHET = ['b', 'h', 'o'];
 
-// Det sidan bygger på: lagets senaste poddavsnitt, forumläsningar (src/analyser/forum.mjs) och
-// artiklar i de insatta medierna (src/analyser/media.mjs), och deras uppgifter med vikt nog.
-// typ: 'podd', 'forum' eller 'media'; podd är poddens, forumets eller källans namn. datum är uppgiftens dag:
+// Det sidan bygger på: lagets senaste poddavsnitt, forumläsningar (src/analyser/forum.mjs),
+// artiklar i de insatta medierna och hos klubben, i lokaltidningen och i motståndarens intervju
+// (src/analyser/media.mjs, config/lokal.js), och deras uppgifter med vikt nog.
+// typ: 'podd', 'forum', 'media', 'lokal' (klubben eller lokaltidningen) eller 'motstand' (intervjun i
+// motståndarens medier); podd är poddens, forumets eller källans namn. datum är uppgiftens dag:
 // foruminläggets, annars avsnittets eller artikelns.
 // → {lag: {namn: [{id, a, s, vikt, t, sagt, vem, podd, typ, datum}]}, kallor: {namn: [{podd, avsnitt, datum, adress, typ}]}}
 const arPodd = (a) => !a.typ || a.typ === 'podd';
+const LOKALA = ['lokal', 'motstand'];
+// Källans slag som redaktören får det (skrivSida, pc.sidaPrompt).
+const KALLNYCKEL = { forum: 'forum', media: 'insatta', lokal: 'lokalt', motstand: 'intervju' };
 
 // Måndagen i veckan då matchen spelas (svensk tid), som 'YYYY-MM-DD': kupongens vecka börjar då.
 const ymd = new Intl.DateTimeFormat('en-CA', { timeZone: 'Europe/Stockholm', year: 'numeric', month: '2-digit', day: '2-digit' });
@@ -375,7 +381,8 @@ export function sidansUnderlag(fil, lagen, { avspark = null } = {}) {
     // Forumen och medierna läses vid varje genomgång: de räknas för sig, så att poddarna står kvar,
     // och varje forum för sig (de senaste läsningarna av vart och ett av lagets forum).
     const forum = alla.filter((a) => a.typ === 'forum');
-    const avsnitt = [...alla.filter(arPodd).slice(0, pc.sidan.avsnitt), ...forum.filter((a, i) => forum.slice(0, i).filter((x) => x.podd === a.podd).length < fc.tillSidan), ...alla.filter((a) => a.typ === 'media').slice(0, mc.tillSidan)];
+    const avsnitt = [...alla.filter(arPodd).slice(0, pc.sidan.avsnitt), ...forum.filter((a, i) => forum.slice(0, i).filter((x) => x.podd === a.podd).length < fc.tillSidan), ...alla.filter((a) => a.typ === 'media').slice(0, mc.tillSidan),
+      ...alla.filter((a) => LOKALA.includes(a.typ)).slice(0, lc.tillSidan)];
     ut.lag[lag] = avsnitt.flatMap((a) => a.uppgifter.filter((x) => med(x, a)).map((x) => ({ id: x.id, a: x.a || 'match', s: x.s, vikt: x.vikt, t: x.t, sagt: x.sagt || null, vem: x.vem || null, podd: a.podd, typ: a.typ || 'podd', datum: dagAv(x, a) })));
     ut.kallor[lag] = avsnitt.map((a) => ({ podd: a.podd, avsnitt: a.titel, datum: a.datum.slice(0, 10), adress: a.sida || a.apple || null, typ: a.typ || 'podd' }));
   }
@@ -489,7 +496,7 @@ export async function skrivSida(fil, lagen, { avspark = null, now = () => new Da
   try {
     const system = pc.sidaPrompt.replace('{rubrikOrd}', pc.sidan.rubrikOrd).replace('{ingressOrd}', pc.sidan.ingressOrd).replace('{stycken}', pc.sidan.stycken)
       .replace('{lagOrd}', pc.sidan.lagOrd).replace('{summeringOrd}', pc.sidan.summeringOrd);
-    const data = { match: lagen.join(' – '), ...(avspark ? { avspark: nowFmt.format(new Date(avspark)) } : {}), lag: Object.fromEntries(lagen.map((lag) => [lag, underlag.lag[lag].map((x) => ({ id: x.id, amne: x.a, slag: x.s, vikt: x.vikt, [x.typ === 'forum' ? 'forum' : x.typ === 'media' ? 'insatta' : 'podd']: x.podd, datum: x.datum, uppgift: x.t, ...(x.sagt ? { citat: x.sagt } : {}) }))])) };
+    const data = { match: lagen.join(' – '), ...(avspark ? { avspark: nowFmt.format(new Date(avspark)) } : {}), lag: Object.fromEntries(lagen.map((lag) => [lag, underlag.lag[lag].map((x) => ({ id: x.id, amne: x.a, slag: x.s, vikt: x.vikt, [KALLNYCKEL[x.typ] || 'podd']: x.podd, datum: x.datum, uppgift: x.t, ...(x.sagt ? { citat: x.sagt } : {}) }))])) };
     const r = await claude({ system, prompt: `Idag är det ${nowFmt.format(now())}.\n\nUnderlaget (JSON):\n${JSON.stringify(data)}`, tools: [], model: pc.model, effort: pc.sidan.effort, timeoutMs: pc.timeoutMs });
     sekunder = r.seconds;
     sida = r.refused ? null : sidaAv(r.content, underlag, lagen);
@@ -509,6 +516,8 @@ export async function skrivSida(fil, lagen, { avspark = null, now = () => new Da
 const SLAG = { b: 'bekräftat', h: 'hört i podden', o: 'supportrarnas åsikt' };
 const FORUMSLAG = { b: 'bekräftat', h: 'skrivet på forumet', o: 'supportrarnas åsikt' };
 const MEDIASLAG = { b: 'bekräftat', h: 'de insattas egen uppgift', o: 'de insattas åsikt' };
+const LOKALSLAG = { b: 'bekräftat', h: 'lokaltidningens egen uppgift', o: 'en åsikt' };
+const INTERVJUSLAG = { b: 'bekräftat', h: 'supporterns egen uppgift', o: 'supporterns åsikt' };
 
 // Det tidningen får om ett lag ur omgångens poddfil (scripts/tidning/poddar.mjs):
 // de senaste avsnittens bästa uppgifter. → [{podd, avsnitt, datum, adress, uppgifter: [{uppgift, slag}]}]
@@ -543,21 +552,38 @@ export function forumUnderlag(fil, lag) {
     .map((a) => ({ forum: a.podd, tradar: (a.tradar || []).map((t) => t.titel), datum: a.datum.slice(0, 10), adress: a.sida || null, uppgifter: basta.filter((b) => b.a === a).map(({ x }) => ({ uppgift: x.t, slag: FORUMSLAG[x.s] || FORUMSLAG.h })) }));
 }
 
-// Det tidningen får ur de insatta medierna: de senaste artiklarnas bästa uppgifter.
-// → [{kalla, titel, datum, adress, uppgifter: [{uppgift, slag}]}]
-export function mediaUnderlag(fil, lag) {
+// Lagets artiklar av slagen typer, de senaste flest med uppgifter, och deras bästa uppgifter.
+// slag: (artikeln) → {b, h, o} med uppgifternas slag i ord. extra: (artikeln) → fler fält.
+function artikelUnderlag(fil, lag, { typer, flest, slag, extra = () => ({}) }) {
   const post = fil && fil.lag && fil.lag[lag];
   if (!post || !Array.isArray(post.avsnitt)) return [];
   let kvar = pc.uppgifterPerLag;
   const ut = [];
-  for (const a of post.avsnitt.filter((x) => x.typ === 'media' && (x.uppgifter || []).some((u) => u.vikt >= pc.minstVikt)).sort((p, q) => String(q.datum).localeCompare(String(p.datum))).slice(0, mc.tillTidningen)) {
+  for (const a of post.avsnitt.filter((x) => typer.includes(x.typ) && (x.uppgifter || []).some((u) => u.vikt >= pc.minstVikt)).sort((p, q) => String(q.datum).localeCompare(String(p.datum))).slice(0, flest)) {
     const u = a.uppgifter.filter((x) => x.vikt >= pc.minstVikt).slice(0, kvar);
     if (!u.length) continue;
     kvar -= u.length;
-    ut.push({ kalla: a.podd, titel: a.titel, datum: String(a.datum).slice(0, 10), adress: a.sida || null, uppgifter: u.map((x) => ({ uppgift: x.t, slag: MEDIASLAG[x.s] || MEDIASLAG.h })) });
+    const ord = slag(a);
+    ut.push({ kalla: a.podd, ...extra(a), titel: a.titel, datum: String(a.datum).slice(0, 10), adress: a.sida || null, uppgifter: u.map((x) => ({ uppgift: x.t, slag: ord[x.s] || ord.h })) });
     if (kvar <= 0) break;
   }
   return ut;
+}
+
+// Det tidningen får ur de insatta medierna: de senaste artiklarnas bästa uppgifter.
+// → [{kalla, titel, datum, adress, uppgifter: [{uppgift, slag}]}]
+export function mediaUnderlag(fil, lag) {
+  return artikelUnderlag(fil, lag, { typer: ['media'], flest: mc.tillTidningen, slag: () => MEDIASLAG });
+}
+
+// Det tidningen får från klubben, lokaltidningen och motståndarens intervju med en av lagets supportrar
+// (config/lokal.js): de senaste artiklarnas bästa uppgifter. → [{kalla, kalltyp, titel, datum, adress, uppgifter: [{uppgift, slag}]}]
+export function lokalUnderlag(fil, lag) {
+  return artikelUnderlag(fil, lag, {
+    typer: LOKALA, flest: lc.tillTidningen,
+    slag: (a) => (a.typ === 'motstand' ? INTERVJUSLAG : LOKALSLAG),
+    extra: (a) => ({ kalltyp: a.typ === 'motstand' ? 'motståndarens intervju med en av lagets supportrar' : 'klubben eller lokaltidningen' }),
+  });
 }
 
 // Avsnitten (forumläsningarna och artiklarna) som ligger i poddfilen, som en nyckel: ändras den har det kommit nytt.
