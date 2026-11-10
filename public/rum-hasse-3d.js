@@ -264,12 +264,121 @@ const LASBIT = {
       yaw: [[0.05, LAS_T.yaw], [0.7, 0]], tilt: [[0.05, LAS_T.tilt], [0.8, -0.35], [1.15, 0]], beta: [[0.05, LAS_T.beta], [0.5, 0.3], [1.0, 0.3]], mot: [[1.3, 1], [1.95, 0]],
     },
   },
+  // ---- När det står något i tidningen som säger att han hade fel (lasa3–lasa5, Tomas önskemål 2026-11-10: läser men
+  // låtsas lite, som Walter i The Big Lebowski, att han inte hade fel). Han medger ingenting: det är tidningen som har
+  // fel, eller så har inget hänt, och det säger han med eftertryck. ljud: [tid, ljud] (rum-hasse-ljud.js).
+  // Det stämmer inte: blicken stannar mitt i raden, brynen dras ihop och han skakar långsamt på huvudet åt det som står,
+  // fnyser och ger tidningen en liten knäpp. Sedan tittar han upp på en med höjda bryn och ett snett leende (har du
+  // sett, vilket trams?) och en nick, och läser vidare.
+  skaka: {
+    dur: 6.2,
+    k: {
+      blickX: [[0.3, rad(-3)], [0.7, rad(-1.2)], [1.05, rad(0.4)], [3.55, rad(0.4)], [3.8, EN_X + 1], [4.9, EN_X + 1], [5.2, L('blickX')]],
+      blickY: [[3.55, L('blickY')], [3.8, -1.5], [4.9, -1.5], [5.2, L('blickY')]],
+      blund: [[1.1, L('blund')], [1.4, 0.5], [3.5, 0.5], [3.75, 0.05], [4.9, 0.05], [5.2, L('blund')]],
+      kis: [[1.1, 0.06], [1.4, 0.4], [3.4, 0.35], [3.8, 0.15], [4.9, 0.2], [5.4, 0.06]],
+      brynX: [[1.0, -0.12], [1.4, -0.75], [3.4, -0.7], [3.8, 0.7], [4.8, 0.65], [5.4, -0.12]],
+      brynY: [[1.0, -0.08], [1.4, -0.9], [3.4, -0.85], [3.8, 0.85], [4.8, 0.8], [5.4, -0.08]],
+      yaw: [[1.5, L('yaw')], [1.85, L('yaw', 0.22)], [2.25, L('yaw', -0.22)], [2.65, L('yaw', 0.17)], [3.05, L('yaw', -0.1)], [3.45, L('yaw')], [3.8, L('yaw', 0.12)], [4.9, L('yaw', 0.12)], [5.4, L('yaw')]],
+      pitch: [[1.4, L('pitch')], [1.6, L('pitch', 0.05)], [3.4, L('pitch', 0.05)], [3.8, L('pitch', -0.14)], [4.12, L('pitch', 0.04)], [4.4, L('pitch', -0.12)], [4.9, L('pitch', -0.12)], [5.4, L('pitch')]],
+      rund: [[1.3, 0], [1.42, 0.3], [1.7, 0]], andas: [[1.3, 0], [1.42, -5], [1.8, 0]],
+      le: [[3.75, 0], [4.15, 0.32], [4.9, 0.28], [5.5, 0]], roll: [[3.75, 0], [4.15, 0.04], [4.9, 0.04], [5.4, 0]],
+    },
+    t: { vag: [[1.42, 0], [1.52, 11], [2.3, 0]], y: [[1.4, LY], [1.52, LY + 7], [1.85, LY], [3.6, LY], [3.9, LY - 6], [4.9, LY - 6], [5.2, LY]] },
+    ljud: [[1.42, { typ: 'fnys' }]],
+  },
+  // Så gick det: blicken stannar, leendet försvinner (stel) och han stirrar på raden med uppspärrade ögon och håller
+  // andan, blinkar två gånger, och tidningen sjunker ihop lite. Så rycker han den rak med ett prassel, sträcker på sig
+  // med hakan upp och blicken rakt fram förbi en, nickar bestämt och ler igen, som om inget har hänt, och läser vidare.
+  resultat: {
+    dur: 6.6,
+    k: {
+      blickX: [[0.3, rad(-3)], [0.75, rad(-1)], [1.15, rad(0.8)], [2.55, rad(0.8)], [2.8, -3], [4.4, -3], [4.8, L('blickX')]],
+      blickY: [[1.15, L('blickY')], [1.3, L('blickY', 0.6)], [2.55, L('blickY', 0.6)], [2.8, -2], [4.4, -2], [4.8, L('blickY')]],
+      blund: [[1.15, L('blund')], [1.3, 0.2], [1.95, 0.2], [2.0, 0.9], [2.08, 0.2], [2.22, 0.9], [2.3, 0.2], [2.55, 0.2], [2.8, 0.15], [4.4, 0.15], [4.8, L('blund')]],
+      stel: [[1.15, 0], [1.3, 1], [3.3, 1], [3.9, 0]],
+      brynX: [[1.15, -0.12], [1.3, 0.9], [2.4, 0.85], [2.7, -0.55], [3.6, -0.5], [4.4, 0.1], [5.0, -0.12]],
+      brynY: [[1.15, -0.08], [1.3, 0.95], [2.4, 0.9], [2.7, -0.65], [3.6, -0.6], [4.4, 0.05], [5.0, -0.08]],
+      andas: [[1.1, 0], [1.3, -5], [2.45, -4], [2.7, 4], [3.6, 2], [4.2, 0]],
+      pitch: [[1.15, L('pitch')], [1.3, L('pitch', 0.04)], [2.45, L('pitch', 0.06)], [2.8, L('pitch', -0.75)], [3.2, L('pitch', -0.72)], [3.42, L('pitch', -0.42)], [3.7, L('pitch', -0.72)], [4.4, L('pitch', -0.7)], [5.0, L('pitch')], [5.5, L('pitch', 0.1)], [5.8, L('pitch')]],
+      lut: [[2.45, 0.03], [2.8, -0.03], [4.3, -0.02], [5.0, 0.03]], axV: [[2.45, 10], [2.75, 20], [4.2, 16], [5.0, 10]], axH: [[2.45, 10], [2.75, 18], [4.2, 14], [5.0, 10]],
+      le: [[3.3, 0], [3.9, 0.4], [4.6, 0.3], [5.4, 0.15], [6.2, 0]], kis: [[3.4, 0.06], [3.9, 0.3], [4.6, 0.25], [5.3, 0.06]],
+    },
+    t: {
+      y: [[1.3, LY], [2.3, LY - 9], [2.5, LY - 9], [2.62, LY + 14], [2.8, LY]], beta: [[1.3, LAS_T.beta], [2.3, LAS_T.beta + 0.14], [2.5, LAS_T.beta + 0.2], [2.64, LAS_T.beta - 0.1], [2.95, LAS_T.beta]],
+      buk: [[1.3, LAS_T.buk], [2.3, 0.06], [2.6, LAS_T.buk]], vag: [[2.58, 0], [2.68, 14], [3.6, 0]],
+    },
+    ljud: [[2.6, { typ: 'prassel' }]],
+  },
+  // Har jag fel? Ögonen upp på en över tidningen och huvudet halvvägs upp, brynen ned och inget leende, och två korta,
+  // bestämda nickar mot en. Han håller blicken en stund, pustar belåtet (nej, just det), och läser vidare.
+  harJagFel: {
+    dur: 6.4,
+    k: {
+      blickX: [[0.35, L('blickX')], [0.55, EN_X], [0.9, OVER_X], [4.3, OVER_X], [4.7, L('blickX')]],
+      blickY: [[0.35, L('blickY')], [0.55, -1.5], [0.9, -0.8], [4.3, -0.8], [4.7, L('blickY')]],
+      blund: [[0.35, L('blund')], [0.55, 0.12], [3.6, 0.15], [4.0, 0.25], [4.7, L('blund')]],
+      yaw: [[0.5, L('yaw')], [0.95, L('yaw', 0.2)], [4.3, L('yaw', 0.2)], [4.9, L('yaw')]],
+      pitch: [[0.5, L('pitch')], [0.95, L('pitch', -0.5)], [1.45, L('pitch', -0.5)], [1.62, L('pitch', -0.28)], [1.85, L('pitch', -0.5)], [2.1, L('pitch', -0.5)], [2.27, L('pitch', -0.28)], [2.5, L('pitch', -0.5)], [4.3, L('pitch', -0.48)], [4.9, L('pitch')]],
+      brynX: [[0.5, -0.12], [0.85, -0.6], [3.6, -0.55], [4.0, 0.25], [4.5, 0.2], [5.0, -0.12]],
+      brynY: [[0.5, -0.08], [0.85, -0.75], [3.6, -0.7], [4.0, 0.2], [4.5, 0.15], [5.0, -0.08]],
+      kis: [[0.5, 0.06], [0.85, 0.3], [3.6, 0.3], [4.0, 0.35], [4.6, 0.06]], stel: [[0.5, 0], [0.8, 0.8], [3.6, 0.8], [3.95, 0]],
+      andas: [[3.55, 0], [3.7, -5], [4.1, 0]], le: [[3.7, 0], [4.05, 0.3], [4.6, 0.25], [5.3, 0]],
+    },
+    t: { y: [[0.4, LY], [0.9, LY - 10], [4.3, LY - 10], [4.9, LY]], tilt: [[0.4, LAS_T.tilt], [0.9, LAS_T.tilt - 0.08], [4.3, LAS_T.tilt - 0.08], [4.9, LAS_T.tilt]] },
+    ljud: [[3.68, { typ: 'anda', sort: 'pust', ms: 450 }]],
+  },
+  // Lugnare än man själv: han sänker tidningen lite, drar ett djupt andetag med slutna ögon och axlarna uppe, andas ut
+  // länge, och öppnar ögonen mot en med ett alldeles för lugnt leende och en långsam nick. Sedan läser han vidare.
+  lugn: {
+    dur: 6.8,
+    k: {
+      blund: [[0.4, L('blund')], [1.2, 1], [2.85, 1], [3.3, 0.35], [4.6, 0.35], [5.2, L('blund')]],
+      blickX: [[2.8, L('blickX')], [3.0, EN_X + 0.5], [4.6, EN_X + 0.5], [5.0, L('blickX')]], blickY: [[2.8, L('blickY')], [3.0, -1.6], [4.6, -1.6], [5.0, L('blickY')]],
+      pitch: [[0.4, L('pitch')], [1.5, L('pitch', -0.25)], [2.9, L('pitch', -0.2)], [3.5, L('pitch', -0.12)], [3.95, L('pitch', 0.06)], [4.4, L('pitch', -0.12)], [4.7, L('pitch', -0.12)], [5.3, L('pitch')]],
+      yaw: [[2.8, L('yaw')], [3.3, L('yaw', 0.1)], [4.6, L('yaw', 0.1)], [5.2, L('yaw')]],
+      andas: [[0.4, 0], [1.6, 8], [2.0, 8], [2.9, -5], [3.5, 0]], axV: [[0.4, 10], [1.6, 20], [2.0, 20], [2.9, 4], [4.6, 6], [5.4, 10]], axH: [[0.4, 10], [1.6, 18], [2.0, 18], [2.9, 4], [4.6, 6], [5.4, 10]],
+      brynX: [[0.6, -0.12], [1.5, 0.35], [2.9, 0.3], [3.3, 0.45], [4.6, 0.4], [5.2, -0.12]], brynY: [[0.6, -0.08], [1.5, 0.3], [2.9, 0.25], [3.3, 0.35], [4.6, 0.3], [5.2, -0.08]],
+      le: [[1.6, 0], [2.6, 0.15], [3.4, 0.55], [4.6, 0.5], [5.3, 0]], kis: [[3.0, 0.06], [3.4, 0.35], [4.6, 0.3], [5.2, 0.06]],
+      rund: [[1.95, 0], [2.15, 0.35], [2.8, 0.3], [2.95, 0]],
+    },
+    t: { y: [[0.4, LY], [1.4, LY - 8], [4.6, LY - 8], [5.3, LY]], buk: [[0.4, LAS_T.buk], [1.4, 0], [4.6, 0], [5.3, LAS_T.buk]] },
+    ljud: [[2.05, { typ: 'anda', sort: 'pust', ms: 900 }]],
+  },
+  // Viker undan det: blicken stannar och leendet försvinner, och han viker ihop tidningen till hälften med ett prassel
+  // (som ett V, och mer upprätt), sträcker på sig och tittar rakt fram med hakan upp och brynen ned och nickar bestämt
+  // (så, det var det). Leendet kommer tillbaka, han slår upp den igen och läser vidare som om inget har hänt. (Helt
+  // hopvikt hamnade händerna tätt ihop framför bröstet, och armarna syntes inte.)
+  vika: {
+    dur: 7.0,
+    k: {
+      blickX: [[0.3, rad(-3)], [0.7, rad(-1)], [1.0, rad(0.5)], [1.6, rad(0.5)], [2.0, -1], [4.3, -1], [4.8, L('blickX')]],
+      blickY: [[1.6, L('blickY')], [2.0, -1.2], [4.3, -1.2], [4.8, L('blickY')]],
+      blund: [[1.0, L('blund')], [1.12, 0.2], [1.6, 0.2], [2.0, 0.12], [4.3, 0.12], [4.8, L('blund')]],
+      stel: [[1.0, 0], [1.12, 1], [3.2, 1], [3.8, 0]],
+      brynX: [[1.0, -0.12], [1.15, 0.8], [1.6, 0.7], [2.0, -0.5], [3.2, -0.45], [3.8, 0.15], [4.6, 0.1], [5.2, -0.12]],
+      brynY: [[1.0, -0.08], [1.15, 0.85], [1.6, 0.75], [2.0, -0.6], [3.2, -0.55], [3.8, 0.1], [4.6, 0.05], [5.2, -0.08]],
+      pitch: [[1.5, L('pitch')], [2.1, L('pitch', -0.85)], [2.75, L('pitch', -0.82)], [2.95, L('pitch', -0.5)], [3.2, L('pitch', -0.82)], [4.3, L('pitch', -0.8)], [5.0, L('pitch')], [5.9, L('pitch', 0.08)], [6.2, L('pitch')]],
+      yaw: [[1.5, L('yaw')], [2.1, L('yaw', 0.15)], [4.3, L('yaw', 0.15)], [5.0, L('yaw')]],
+      lut: [[1.5, 0.03], [2.1, -0.03], [4.3, -0.02], [5.0, 0.03]], axV: [[1.5, 10], [2.1, 20], [4.3, 16], [5.0, 10]], axH: [[1.5, 10], [2.1, 18], [4.3, 14], [5.0, 10]],
+      andas: [[1.0, 0], [1.15, -4], [1.6, -3], [2.0, 4], [3.2, 0]],
+      le: [[3.2, 0], [3.8, 0.4], [4.6, 0.3], [5.6, 0]], kis: [[3.3, 0.06], [3.8, 0.3], [4.6, 0.25], [5.4, 0.06]],
+    },
+    t: {
+      beta: [[1.55, LAS_T.beta], [2.05, 1.0], [4.3, 1.0], [4.9, LAS_T.beta - 0.08], [5.2, LAS_T.beta]], tilt: [[1.55, LAS_T.tilt], [2.05, -0.55], [4.3, -0.55], [4.9, LAS_T.tilt]],
+      y: [[1.55, LY], [2.05, LY + 10], [4.3, LY + 10], [4.9, LY]],
+      vag: [[1.6, 0], [1.75, 10], [2.4, 0], [4.5, 0], [4.65, 12], [5.6, 0]],
+    },
+    ljud: [[1.65, { typ: 'prassel' }], [4.55, { typ: 'prassel', mjuk: true }]],
+  },
 };
-// Ett klipp ur bitarna: nycklarna i klippets tid, och gränserna mellan bitarna (slag) och var ned börjar.
+// Ett klipp ur bitarna: nycklarna i klippets tid, och gränserna mellan bitarna (slag) och var ned börjar, och
+// ljuden (ljud: [tid, ljud] i klippets tid).
 function lasKlipp(bitar) {
   const k = {};
   const t = {};
   const slag = [];
+  const ljud = [];
   let at = 0;
   let ner = 0;
   const kanK = new Set(bitar.flatMap((b) => [...Object.keys(LASBIT[b].k), ...Object.keys(LAS)]));
@@ -289,6 +398,7 @@ function lasKlipp(bitar) {
     // (bara där han läser: inte före upp eller efter ned)
     else if (at > 0 && forra.till !== null && b.fran !== null) slag.push(at);
     forra = b;
+    for (const [tt, e] of b.ljud || []) ljud.push([at + tt, e]);
     const bg = b.g || {};
     for (const [tt, l, h] of bg.gk || [[0, 'pa'], [b.dur, 'pa']]) {
       const x = [at + tt, l, h || 0];
@@ -322,12 +432,16 @@ function lasKlipp(bitar) {
   }
   const ut = (o) => Object.fromEntries(Object.entries(o).map(([x, v]) => [x, v.k]));
   const { gk, ...gn } = g;
-  return { dur: at, k: ut(k), t: ut(t), g: { gk, ...ut(gn) }, slag, ner };
+  return { dur: at, k: ut(k), t: ut(t), g: { gk, ...ut(gn) }, slag, ner, ljud };
 }
-// Två ordningar, så att det inte blir samma varje gång, och glasögonen på före och av efter.
+// Fem ordningar, så att det inte blir samma varje gång, och glasögonen på före och av efter. I de tre sista står det
+// något i tidningen som säger att han hade fel, och han låtsas som ingenting (skaka, resultat, harJagFel, lugn, vika).
 export const LASA = {
   lasa: lasKlipp(['pa', 'upp', 'las', 'glimt', 'las', 'skjut', 'gom', 'nick', 'las', 'over', 'las', 'titta', 'las', 'ned', 'av']),
   lasa2: lasKlipp(['pa', 'upp', 'ryck', 'las', 'nick', 'lyft', 'las', 'glimt', 'las', 'gom', 'skjut', 'las', 'ned', 'av']),
+  lasa3: lasKlipp(['pa', 'upp', 'las', 'skaka', 'las', 'harJagFel', 'las', 'nick', 'resultat', 'las', 'lugn', 'las', 'ned', 'av']),
+  lasa4: lasKlipp(['pa', 'upp', 'ryck', 'las', 'resultat', 'las', 'glimt', 'las', 'vika', 'las', 'skaka', 'las', 'ned', 'av']),
+  lasa5: lasKlipp(['pa', 'upp', 'las', 'harJagFel', 'las', 'skjut', 'vika', 'las', 'lugn', 'las', 'titta', 'las', 'ned', 'av']),
 };
 // var läsandet börjar (med glasögonen på, efter upp): dit hoppar sidan när han redan läser när man kommer
 export const LAS_START = LASBIT.pa.dur + LASBIT.upp.dur;
@@ -461,6 +575,10 @@ export const KLIPP = {
   // (han läser Dagens Nyheter eller Svenska Dagbladet, rum-hasse-tidning.js)
   lasa: { fran: 500, till: 500 + LASA.lasa.dur, vila: 0, skynda: true, grupp: 'lasa', tidning: 'dn', slag: LASA.lasa.slag, ner: LASA.lasa.ner },
   lasa2: { fran: 570, till: 570 + LASA.lasa2.dur, vila: 0, skynda: true, grupp: 'lasa', tidning: 'svd', slag: LASA.lasa2.slag, ner: LASA.lasa2.ner },
+  // (och där han låtsas att han inte hade fel; ljud: fnysningar, andetag och prassel)
+  lasa3: { fran: 840, till: 840 + LASA.lasa3.dur, vila: 0, skynda: true, grupp: 'lasa', tidning: 'dn', slag: LASA.lasa3.slag, ner: LASA.lasa3.ner, ljud: LASA.lasa3.ljud },
+  lasa4: { fran: 910, till: 910 + LASA.lasa4.dur, vila: 0, skynda: true, grupp: 'lasa', tidning: 'svd', slag: LASA.lasa4.slag, ner: LASA.lasa4.ner, ljud: LASA.lasa4.ljud },
+  lasa5: { fran: 980, till: 980 + LASA.lasa5.dur, vila: 0, skynda: true, grupp: 'lasa', tidning: 'dn', slag: LASA.lasa5.slag, ner: LASA.lasa5.ner, ljud: LASA.lasa5.ljud },
   // Det andra han gör när det har gått dåligt (grupp lasa, som tidningen; sysslorna i figuren): han håller
   // på med något för att verka upptagen, märker att man tittar och fryser (ertappad, utan leende: stel),
   // och sedan låtsas han att inget har hänt, med eftertryck. fram: där sidan börjar när han redan håller på
