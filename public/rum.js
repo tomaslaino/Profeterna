@@ -23,8 +23,8 @@
 //   fram till den på pulten.
 //   högen bredvid: de inlämnade kupongerna med baksidan upp; din egen tas i
 //   handen därifrån när du har lämnat in, de andras när du ser deras tips.
-//   Helgarderat bakom högen (L): veckans tidning, hopvikt; den tas upp och
-//   läses (tidningen, rum-tidning.js).
+//   Helgarderat bakom högen (L): veckans tidning, med namnet och rubriken
+//   ovanför kupongerna; den tas upp och läses (tidningen, rum-tidning.js).
 //   kupongstället på disken (N): en blank kupong för nästa omgång – veckans
 //   Stryktips – tas i handen, bara att titta på (openStall).
 //   kaffet och notan längst till vänster på pulten → Hasse Backe, som sitter
@@ -542,19 +542,31 @@ window.Rum = (() => {
   // Fönsterbänken: skivan ovanifrån (en trapets, bredare framtill) och kanten framför. Prickarna i stenen
   // klipps efter skivan: bruset fyller annars filtrets hela rektangel, och trianglarna utanför de sneda
   // ändarna låg som en halvgenomskinlig ruta på väggen (syns nära radion, under bladet vid den).
-  function sill() {
+  // Bänken ligger i bakväggens plan (-600, 1,035 gånger), så att den, radion och tomflaskorna (OGA_Z i
+  // rum-3d.js) följer väggen och fönstret när rummet vrids; i gängets plan (-330) gled de upp till 15 px mot
+  // fönstret. Den är ritad i scenens mått och görs lika mycket mindre som planet förstorar, så att den står
+  // där den stod, och ligger över det andra i planet (.rum-bank i rum.css), som när den låg framför det.
+  function bank() {
     const S = 568;
     const yta = `262,${S - 14} 958,${S - 14} 984,${S + 10} 236,${S + 10}`;
     return svg(`<clipPath id="rum-sill-yta"><polygon points="${yta}"/></clipPath>
+  <g transform="translate(800 500) scale(${(1 / 1.035).toFixed(5)}) translate(-800 -500)">
   <polygon points="${yta}" fill="url(#rum-sill)"/>
   <polygon points="${yta}" filter="url(#rum-prick)" opacity=".6" clip-path="url(#rum-sill-yta)"/>
   <rect x="236" y="${S + 10}" width="748" height="12" fill="#4a453c"/>
   <g stroke="#cfc6b0" stroke-opacity=".45" stroke-width="1.6"><line x1="300" y1="${S + 10}" x2="342" y2="${S + 10}"/><line x1="610" y1="${S + 10}" x2="628" y2="${S + 10}"/><line x1="880" y1="${S + 10}" x2="930" y2="${S + 10}"/></g>
-  <rect x="236" y="${S + 22}" width="748" height="6" fill="#000" opacity=".3" filter="url(#rum-b4)"/>`, '', [220, 540, 780, 75]) +
+  <rect x="236" y="${S + 22}" width="748" height="6" fill="#000" opacity=".3" filter="url(#rum-b4)"/></g>`, 'rum-bank', [220, 540, 780, 75]);
+  }
+
+  // Skenet från neonen över fönsterbänken och gängets duk (rum-3d.js), i planet -330.
+  function sill() {
+    const S = 568;
+    return (
       // det svaga skenet från neonen för sig, med en fjärdedel av bildpunkterna i telefonen
       // (inte i telefonen och inte från steg 1, .rum-svag i rum.css)
       (LATT ? '' : svg(`<ellipse cx="560" cy="${S - 150}" rx="360" ry="150" fill="#ff3a2a" opacity=".05" filter="url(#rum-b40)" class="rum-svag"/>`, 'rum-sken', [40, 120, 1040, 600], 0.25)) +
-      '<canvas id="rum-3d" class="rum-3d" width="1440" height="560"></canvas>';
+      '<canvas id="rum-3d" class="rum-3d" width="1440" height="560"></canvas>'
+    );
   }
 
   // Tv:n i hörnet (rum-tv.js).
@@ -638,8 +650,8 @@ window.Rum = (() => {
       `${kopp}<span class="anga" aria-hidden="true"><i></i><i></i></span></a>`;
   }
 
-  // Helgarderat ligger hopvikt till höger om kupongen, bakom högen, som lägger sig över den: ett klick, eller L,
-  // och man tar upp den och läser (tidningen). Framsidan skrivs i fill (tidningPult).
+  // Helgarderat ligger till höger om kupongen, bakom högen, som ligger på dess nedre del: ett klick, eller L, och
+  // man tar upp den och läser (tidningen). Framsidan skrivs i fill (tidningPult).
   const tidningHtml = () => `<a class="rum-sak" id="rum-helgarderat" ${KNAPP} aria-label="Helgarderat"></a>`;
 
   // Ett klick på kaffet eller H: man vänder sig mot honom (rum-hasse.js).
@@ -1337,7 +1349,7 @@ window.Rum = (() => {
     el.hidden = true;
     el.setAttribute('aria-label', 'Tobaksaffären');
     el.innerHTML = `<div class="rum-stage" id="rum-stage"><div class="rum-kamera" id="rum-kamera"><div class="rum-world" id="rum-world">
-${plane(-600, `<div class="rum-ute" id="rum-ute"></div>${tak()}${bg()}${vid('vagg')}${rightWall()}${window.RumRegister ? RumRegister.html() : ''}${svg('<g id="rum-hyllor"></g>', '', [1300, 250, 150, 120])}${neon()}${frameHtml()}${kortHtml()}`, 1.035)}
+${plane(-600, `<div class="rum-ute" id="rum-ute"></div>${tak()}${bg()}${vid('vagg')}${rightWall()}${window.RumRegister ? RumRegister.html() : ''}${svg('<g id="rum-hyllor"></g>', '', [1300, 250, 150, 120])}${neon()}${frameHtml()}${kortHtml()}${bank()}`, 1.035)}
 ${plane(-598, vid('horn'), 1.035, 'rum-pl3d')}
 ${plane(-470, `${tv()}`, 1.02, 'rum-pl3d')}
 ${plane(-330, `${sill()}${haze()}`)}
@@ -1961,13 +1973,17 @@ ${window.RumRegister ? RumRegister.nara() : ''}
   const T = (dx, dy, z, rx, rz, s, ry = 0) => `translate(${r1(dx)}px, ${r1(dy)}px) perspective(1300px) translateZ(${z}px) rotateX(${rx}deg) rotateY(${ry}deg) rotateZ(${rz}deg) scale(${s.toFixed(4)})`;
   const glow = (a, drop) => `0 0 0 3px rgba(240, 214, 153, ${a}), 0 0 80px rgba(240, 214, 153, ${(0.45 * a).toFixed(2)}), ${drop}`;
   // mitten (x, y) och vridningen för den första, andra och tredje i högen
-  // (askkoppen och dosan står till höger om den, i rum-saker.js: HOGEN där)
-  const HOG = { s: 0.3, at: [[1204, 790, 5], [1196, 836, -4], [1208, 882, 2]], skugga: '0 22px 30px rgba(0, 0, 0, 0.55)' };
+  // (askkoppen och dosan står till höger om den, i rum-saker.js: HOGEN där).
+  // Bakom högen ligger kvällstidningen, och högen ligger så långt fram, och
+  // kupongerna så tätt att namnen nätt och jämnt syns, att tidningens rubrik
+  // syns ovanför den; på höjden är kupongerna högre (420 × 620), och där
+  // ligger den ännu lite längre fram (smal).
+  const HOG = { s: 0.3, at: [[1204, 874, 5], [1196, 910, -4], [1208, 946, 2]], smal: 18, skugga: '0 22px 30px rgba(0, 0, 0, 0.55)' };
   const INK = ['#2146a6', '#16784b', '#6d3aa8', '#8a6a0c', '#a0306a'];
   function slot(i) {
     const [x, y, a] = HOG.at[i % HOG.at.length];
     const n = Math.floor(i / HOG.at.length);
-    return { dx: x + 14 * n - kupX(), dy: y + 10 * n - kupY(), a };
+    return { dx: x + 14 * n - kupX(), dy: y + 10 * n + (R.smal ? HOG.smal : 0) - kupY(), a };
   }
   const restAt = (sl) => T(sl.dx, sl.dy, 0, 44, sl.a, HOG.s);
 
@@ -3168,6 +3184,8 @@ ${window.RumRegister ? RumRegister.nara() : ''}
     const w = document.getElementById('rum-kamera');
     const dx = r1(to[0] - 800 - z * (p[0] - 800));
     const dy = r1(to[1] - 500 - z * (p[1] - 500));
+    // (dit kameran går, för närbilden av radion: radioNara)
+    R.kamMal = { dx, dy, z };
     const borta = Boolean(dx || dy || z !== 1);
     const satt = () => {
       w.classList.remove('glid');
@@ -3704,14 +3722,14 @@ ${window.RumRegister ? RumRegister.nara() : ''}
 
   // ---------- tidningen ----------
   //
-  // Helgarderat (rum-tidning.js) ligger hopvikt på pulten till höger om kupongen, bakom högen: ett klick, eller L,
-  // och den lyfts och läggs fram över rummet, som står still så länge. Efter omgången (R.summa) handlar den om
-  // omgången som är spelad, och före den om omgången som kommer: matcherna, notiserna ur data/tidning.json och
-  // Veckans analys ur data/analyser.json. Numret gäller omgången som rummet visar, också när den är spelad utan
-  // sammanställning (dolda resultat) – det gamla numret ligger kvar tills nästa kupong kommer –, och mellan
-  // omgångarna den senaste kupongen; utan någon kupong står knepen på framsidan. Esc, Lägg tillbaka, bakåt eller ett
-  // klick utanför lägger tillbaka den. (Förut låg Tipsguiden till vänster om kupongen och kvällstidningen, med
-  // löpsedeln som förstasida, till höger. De slogs ihop till Helgarderat 2026-11-10.)
+  // Helgarderat (rum-tidning.js) ligger på pulten till höger om kupongen, bakom högen: ett klick, eller L, och den
+  // lyfts och läggs fram över rummet, som står still så länge. Efter omgången (R.summa) handlar den om omgången som
+  // är spelad, och före den om omgången som kommer: matcherna, notiserna ur data/tidning.json och Veckans analys ur
+  // data/analyser.json. Numret gäller omgången som rummet visar, också när den är spelad utan sammanställning (dolda
+  // resultat) – det gamla numret ligger kvar tills nästa kupong kommer –, och mellan omgångarna den senaste kupongen;
+  // utan någon kupong står knepen på framsidan. Esc, Lägg tillbaka, bakåt eller ett klick utanför lägger tillbaka den.
+  // (Förut låg Tipsguiden till vänster om kupongen och kvällstidningen, med löpsedeln som förstasida, till höger. De
+  // slogs ihop till Helgarderat 2026-11-10.)
   const NOTIS_DAGAR = 10;
   let notisData = null;
   let notisAt = 0;
@@ -3834,7 +3852,8 @@ ${window.RumRegister ? RumRegister.nara() : ''}
     hamtaPoddsidor();
     if (typeof loadAnalyser === 'function') loadAnalyser();
   }
-  // Framsidan på pulten, när den har ändrats (set i fill).
+  // Framsidan på pulten, när den har ändrats (set i fill). Den är så stor (--z i rum-tidning.css) att namnet,
+  // rubriken och kupongens första rader syns ovanför kupongerna i högen (HOG).
   function tidningPult(set) {
     if (!window.RumTidning || !RumTidning.forsta) return;
     set('rum-helgarderat', `<span class="hf-pult">${RumTidning.forsta(upplaga())}</span>`);
@@ -3865,7 +3884,7 @@ ${window.RumRegister ? RumRegister.nara() : ''}
 
   // Tidningen lyfts från pulten mot en och syns inte där medan den är framme; bort: den läggs tillbaka. (UPPE: samma
   // funktioner i samma ordning som --vila i rum-tidning.css, så att den glider dit)
-  const UPPE = 'perspective(1100px) translate3d(-240px, -150px, 260px) rotateX(4deg) rotateZ(0deg) scale(1.1)';
+  const UPPE = 'perspective(1100px) translate3d(-240px, -60px, 260px) rotateX(4deg) rotateZ(0deg) scale(1.3)';
   function lyft(a, bort) {
     for (const x of a.getAnimations()) x.cancel();
     if (bort) a.classList.remove('uppe');
@@ -4418,16 +4437,23 @@ ${window.RumRegister ? RumRegister.nara() : ''}
     }
     const c = R.el.querySelector('#rum-3d');
     R.fig.narbild(null);
-    const r = c.getBoundingClientRect();
+    // Det som syns av duken när kameran har kommit fram, räknat ur dit den går (aim) och inte mätt: medan
+    // kameran och rummet fortfarande rörde sig (i Safari börjar kameran några bildrutor sent, och en
+    // långsam dator hinner inte fram på 640 ms) mättes en annan del än den som syns sedan, och radion
+    // skars av i kanten. Nära radion står rummet rakt (sak), så duken ligger som i scenen: scenen ligger i
+    // fönstret förskjuten R.ox, R.oy och R.k gånger så stor (pan), och kameran förstorar z gånger kring
+    // scenens mitt och flyttar dx, dy.
+    const { dx, dy, z } = R.kamMal;
     const W = c.offsetWidth;
     const H = c.offsetHeight;
-    const k = r.width / W;
-    const pad = 8 / k;
-    const x0 = Math.max(0, -r.left / k - pad);
-    const y0 = Math.max(0, -r.top / k - pad);
-    const x1 = Math.min(W, (innerWidth - r.left) / k + pad);
-    const y1 = Math.min(H, (innerHeight - r.top) / k + pad);
-    R.fig.narbild({ x: x0, y: y0, w: x1 - x0, h: y1 - y0, pr: k * Math.min(devicePixelRatio || 1, 2), bred: r.width * Math.min(devicePixelRatio || 1, 2) });
+    const k = R.k * z;
+    const ix = (x) => 800 + ((x - R.ox) / R.k - 800 - dx) / z - c.offsetLeft;
+    const iy = (y) => 500 + ((y - R.oy) / R.k - 500 - dy) / z - R.cTop;
+    const x0 = Math.max(0, ix(-8));
+    const y0 = Math.max(0, iy(-8));
+    const x1 = Math.min(W, ix(innerWidth + 8));
+    const y1 = Math.min(H, iy(innerHeight + 8));
+    R.fig.narbild({ x: x0, y: y0, w: x1 - x0, h: y1 - y0, pr: k * Math.min(devicePixelRatio || 1, 2), bred: W * k * Math.min(devicePixelRatio || 1, 2) });
     if (window.RumRadio) RumRadio.nara(true);
   }
 

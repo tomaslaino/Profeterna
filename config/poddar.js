@@ -55,9 +55,10 @@ module.exports = {
   sidan: {
     // Lagets senaste avsnitt som sidan bygger på, och högst så många punkter per lag.
     avsnitt: 3,
-    punkterPerLag: 9,
+    // Med de insatta medierna (2026-11-10) finns det mer att välja bland: tolv per lag.
+    punkterPerLag: 12,
     // Högst så många av punkterna får sitt citat tryckt.
-    citatPerLag: 5,
+    citatPerLag: 6,
     rubrikOrd: 9,
     ingressOrd: 45,
     effort: 'medium',
@@ -224,13 +225,13 @@ Handlar podden uppenbart om en annan klubb än laget ovan (tidningen kan ha fåt
 Svara bara med JSON, utan något före eller efter:
 {"ratt_klubb": true, "handlar_om": "en mening om vad avsnittet handlar om", "uppgifter": [{"a": "trupp", "t": "…", "s": "b", "min": 12, "citat": "…", "sagt": "…", "vem": null, "vikt": 4}]}`,
 
-  sidaPrompt: `Du redigerar en informationssida i en svensk tipstidning: allt det intressanta ur supporterpoddarna och supporterforumet inför en match, samlat så att läsaren kan hämta kunskap ur det.
+  sidaPrompt: `Du redigerar en informationssida i en svensk tipstidning: allt det intressanta ur supporterpoddarna, supporterforumet och de insatta medierna inför en match, samlat så att läsaren kan hämta kunskap ur det.
 
-Du får matchen och, för varje lag, uppgifter som tidningen har tagit ut ur lagets supporterpoddar och supporterforum den här veckan. Varje uppgift har ett id, ett ämne, ett slag (b = bekräftat, h = poddens eller forumets egen uppgift, o = supportrarnas åsikt), en vikt 1–5 och podden eller forumet den kommer ur.
+Du får matchen och, för varje lag, uppgifter som tidningen har tagit ut ur lagets supporterpoddar, supporterforum och insatta medier (artiklar i fansajter, fanzines, klubbnära nyhetsbrev och hos oberoende lokala reportrar) den här veckan. Varje uppgift har ett id, ett ämne, ett slag (b = bekräftat, h = källans egen uppgift, o = supportrarnas eller skribentens åsikt), en vikt 1–5 och podden, forumet eller de insatta (källans namn) den kommer ur. Ta med det bästa ur alla tre slagen av källor.
 
 Gör så här:
 - Välj det mest intressanta, högst {punkter} punkter per lag. Stryk det som är svagt, det som en annan uppgift redan säger och det som varken rör laget eller matchen (en nyhet om en tredje klubb).
-- Säger två uppgifter samma sak (ur två avsnitt, två poddar eller podden och forumet) blir de EN punkt, med bådas id i "ur". Slå aldrig ihop en bekräftad uppgift med en åsikt.
+- Säger två uppgifter samma sak (ur två avsnitt, två poddar, podden och forumet eller en artikel) blir de EN punkt, med bådas id i "ur". Slå aldrig ihop en bekräftad uppgift med en åsikt.
 - Gruppera punkterna per lag under ämnena, och ställ den viktigaste först i varje grupp. Flytta en uppgift till ett annat ämne om den passar bättre där.
 - Texten i en punkt är en till två meningar, högst 45 ord. Du får skriva om den så att den blir rak och lättläst, men bara med det som står i uppgifterna: inga nya fakta, namn eller tal.
 - Skriv en rubrik för sidan på högst {rubrikOrd} ord, om det som är viktigast att veta inför matchen, och en ingress på högst {ingressOrd} ord som säger det viktigaste om båda lagen (om bara det ena laget har uppgifter: om det). Rubriken och ingressen får bara säga det som står i punkterna, och inte göra en gammal sak till en nyhet. Skriv tal i ingressen precis som de står i uppgifterna.

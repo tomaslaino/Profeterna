@@ -16,8 +16,8 @@
 //
 // De fyra gamla sitter på Skivan i högra delen av skyltfönstret: en plywoodskiva
 // i två kedjor, i årsordning, lika stora, med en skruv i varje hörn och en
-// Dymo-remsa under. Det ska synas att en person har hand om det. Skivan,
-// kedjorna, remsorna och vattenpasset ritas i 3D (rum-inredning.js, en gång);
+// Dymo-remsa under. Det ska synas att en person har hand om det, och skivan
+// är färdig. Skivan, kedjorna och remsorna ritas i 3D (rum-inredning.js, en gång);
 // här finns sedlarna, som knappar i #rum-skiva:s plan, och skruvarna, som
 // följer med i sedlarnas lager. Skuggorna är bakade i skivan, inga filter.
 // Sedlarna sitter alltid på samma ställe, raka; slitaget (rum-saker.js) bleker

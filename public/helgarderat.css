@@ -135,11 +135,13 @@ body.hg-bord { margin: 0; padding: 28px 0 56px; min-height: 100vh; box-sizing: b
 .hg-lagen.en .hg-grupp h4 { break-after: avoid; }
 .hg-lagen.en .hg-lag.tom { order: 2; margin-top: 16px; }
 
-/* stämplarna: bekräftat i svart, egna uppgifter i rött, åsikter streckade */
+/* stämplarna: bekräftat i svart, egna uppgifter i rött (de insattas i grönt), åsikter streckade */
 .hg-slag { display: inline-block; box-sizing: border-box; padding: 2px 5px 1px; border: 1.2px solid var(--svart); font: 800 9.5px/1.15 var(--sans); font-style: normal; letter-spacing: 0.07em; text-transform: uppercase; white-space: nowrap; vertical-align: 1px; }
 .hg-slag.s-b { background: var(--svart); color: var(--p); }
 .hg-slag.s-h { border-color: var(--rod); color: var(--rod); }
 .hg-slag.s-o { border-style: dashed; border-color: var(--gra); color: var(--gra); }
+.hg-slag.s-h.t-media { border-color: var(--gron); color: var(--gron); }
+.hg-hort-l article > small { margin-left: 6px; font: italic 400 11.5px/1.2 var(--serif); color: var(--gra); }
 
 /* ---------- baksidan ---------- */
 

@@ -42,7 +42,7 @@ const O = { x: 1418, y: 665 };
 const BOX = { x: 1110, y: 400, w: 426, h: 570 };
 // Högen med de inlämnade kupongerna till höger om kupongen (HOG i rum.js),
 // i pultens px. Där låg domarens kort och visselpipa förut.
-const HOGEN = { x0: 1080, x1: 1322, y0: 732, y1: 948 };
+const HOGEN = { x0: 1080, x1: 1322, y0: 816, y1: 1014 };
 // Platserna på pulten (pultens px), en per dag: fläkten med det håll den
 // svänger kring (grader, 90 = mot betraktaren, 180 = åt vänster),
 // askkoppen och snusdosan. Locket och prisen läggs där det finns plats.

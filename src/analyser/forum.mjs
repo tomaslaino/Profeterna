@@ -105,7 +105,7 @@ async function farLasas(url, opts = {}) {
   return robotsCache.get(u.origin)(url);
 }
 
-async function lasSida(url, opts) {
+export async function lasSida(url, opts = {}) {
   if (!(await farLasas(url, opts))) throw new Sparrad('robots.txt säger nej');
   return hamtaSida(url, opts);
 }

@@ -253,20 +253,22 @@
 
 /* ---------- på pulten (tidningPult i rum.js) ---------- */
 
-/* Vikt på mitten med förstasidan upp, förstorad 2,5 gånger, och den övre halvan syns: numret, namnet och rubriken.
-   Den ligger till höger om kupongen bakom högen, som lägger sig över den, lite snett och platt i pultens perspektiv,
-   i rummets ljus och mörkare mot vecket. --vila är läget där den ligger, och lyft i rum.js lyfter den därifrån
-   (UPPE, samma funktioner). Samma tidning ligger på pulten hos Hasse Backe (.rh-pa-hg, pultPapper i rum-hasse.js). */
+/* Förstasidan upp, förstorad --z gånger. Den ligger till höger om kupongen, med överkanten vid pultens bakkant, och
+   högen ligger på dess nedre del: --z gör att numret, namnet, rubriken och kupongens första rader syns ovanför
+   kupongerna (HOG i rum.js). Lite snett och platt i pultens perspektiv, i rummets ljus och med ett veck på mitten,
+   vriden kring överkanten. --vila är läget där den ligger, och lyft i rum.js lyfter den därifrån (UPPE, samma
+   funktioner). Samma tidning ligger på pulten hos Hasse Backe (.rh-pa-hg, pultPapper i rum-hasse.js). */
+#rum-helgarderat, .rh-pa-hg { --z: 1.75; }
 #rum-helgarderat {
-  --vila: perspective(1100px) translate3d(0px, 0px, 0px) rotateX(41deg) rotateZ(5deg) scale(1);
-  position: absolute; left: 1088px; top: 648px; width: 250px; height: 175px; overflow: hidden;
-  transform: var(--vila); transform-origin: 50% 50%;
-  box-shadow: 0 1.5px 0 rgba(214, 205, 186, 0.85), 0 14px 18px rgba(0, 0, 0, 0.5), 0 2px 3px rgba(0, 0, 0, 0.35);
+  --vila: perspective(1100px) translate3d(0px, 0px, 0px) rotateX(41deg) rotateZ(4deg) scale(1);
+  position: absolute; left: calc(1222px - var(--z) * 50px); top: 660px; width: calc(var(--z) * 100px); height: calc(var(--z) * 140px); overflow: hidden;
+  transform: var(--vila); transform-origin: 50% 0;
+  box-shadow: 0 14px 18px rgba(0, 0, 0, 0.5), 0 2px 3px rgba(0, 0, 0, 0.35);
 }
 #rum-helgarderat.uppe { visibility: hidden; }
 #rum-helgarderat.lyfts { z-index: 4; }
-#rum-helgarderat .hf-pult, .rh-pa-hg .hf-pult { position: relative; display: block; zoom: 2.5; }
-/* ljuset uppifrån och lite skugga mot kanterna, och papperet rundar av mot vecket nertill */
+#rum-helgarderat .hf-pult, .rh-pa-hg .hf-pult { position: relative; display: block; zoom: var(--z); }
+/* ljuset uppifrån och lite skugga mot kanterna, och vecket på mitten */
 #rum-helgarderat::after, .rh-pa-hg::after { content: ""; position: absolute; inset: 0; pointer-events: none;
-  background: linear-gradient(180deg, rgba(0, 0, 0, 0) 84%, rgba(40, 22, 6, 0.16) 95%, rgba(255, 246, 225, 0.12) 99%),
-              linear-gradient(170deg, rgba(255, 240, 205, 0.08), rgba(40, 22, 6, 0.22) 70%, rgba(20, 10, 2, 0.34)); }
+  background: linear-gradient(180deg, rgba(0, 0, 0, 0) 49%, rgba(40, 22, 6, 0.14) 50%, rgba(255, 246, 225, 0.1) 51%, rgba(0, 0, 0, 0) 52.5%),
+              linear-gradient(170deg, rgba(255, 240, 205, 0.08), rgba(40, 22, 6, 0.2) 60%, rgba(20, 10, 2, 0.3)); }
