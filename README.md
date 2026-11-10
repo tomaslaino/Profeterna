@@ -907,6 +907,11 @@ bara lokalt. Analyserna visas som de ligger i `data/analyser.json`; hur de skriv
   stora, med skruv i hörnen, Dymo-remsor, blyertsmåtten kvar och vattenpasset ovanpå. Det får
   inte tynga grafiken. Veckans löpsedel är kvar för hand, men i telefonen på väggen, där
   Chelsea satt. Se [Tobaksaffären](#tobaksaffären), *Affischerna*.
+- **Skivan är färdig: inget vattenpass och inga blyertsmått (2026-11-10, användarens beslut):** "Du kan ta bort den
+  där vattenpasset (eller vad det är?) ovan plywoodskivan och dessutom ta bort den inritade 80 cm-grejen. Den ska vara
+  klar." Vattenpasset ovanpå och blyertsen på framsidan (strecken efter sedlarnas kanter, mittlinjen och måtten 80 och
+  93) är borta. Kvar är plywooden, kedjorna, skruvarna, remsorna och skuggorna under sedlarna. Se
+  [Tobaksaffären](#tobaksaffären), *Affischerna*.
 - **Chelseas löpsedel på väggen (2026-11-03, användarens önskemål):** till höger om
   skyltfönstret, under oraklet, sitter The Sun on Sundays löpsedel från dagen efter Chelseas
   seger i Champions League 2021, med Tomas foto av laget med pokalen. Den sitter med två
@@ -3700,10 +3705,10 @@ LÖSSNUS.
 dem): en plywoodskiva i två kedjor från karmen, i årsordning (IFK 1982 och Nacional 1988 överst,
 VM 94 och Chelsea 2021 under), lika stora (80 × 120), raka och alltid på samma ställe. Det ska
 synas att en person har hand om det: en skruv med bricka i varje hörn (stjärnspåret är en liten SVG, så att det är
-ett rent kryss också i närbilden), en Dymo-remsa under varje
-sedel, blyertsmåtten står kvar på skivan och vattenpasset ligger ovanpå, med bubblan mitt
-emellan strecken. Måtten (`SKIVA`) delas med rum-inredning.js, som ritar skivan, kedjorna, remsorna
-och passet i 3D en gång (`skiva`, duken `skiva` i `#rum-skiva`) och skarpare i närbilden. Sedlarna
+ett rent kryss också i närbilden) och en Dymo-remsa under varje
+sedel. Skivan är färdig: inga blyertsmått och inget vattenpass (de fanns till 2026-11-10). Måtten
+(`SKIVA`) delas med rum-inredning.js, som ritar skivan, kedjorna och remsorna i 3D en gång
+(`skiva`, duken `skiva` i `#rum-skiva`) och skarpare i närbilden. Sedlarna
 är knappar ovanpå, skruvarna följer med i sedlarnas lager (CSS) och skuggorna är bakade i skivan,
 så att sedlarna inte behöver något filter. Innan skivan är ritad är `#rum-skiva` en enda färg, så
 att sedlarna inte hänger i luften. Skivan ska inte tynga grafiken, och det gör den inte: mätt i Chrome
