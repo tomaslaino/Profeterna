@@ -555,8 +555,7 @@
   // spalter i samma ordning – kupongen, var och en i gänget och Hasse – och sedan datorns tecken (det troligaste
   // före avspark, som Modellen i Olympen) och tipset i analysen när det finns. Varje tips med datorns chans för
   // tecknet före avspark, poängen (samma regel som raden Poäng, tippoang.js) och spelkassan (10 kr till datorns
-  // odds, som i Olympen och på lappen under domen). Ensam rätt: ingen annan i gänget hade rätt (rödpennans
-  // stjärna, som på lappen).
+  // odds, som i Olympen och på lappen under domen). Ensam rätt: ingen annan i gänget hade rätt.
   // i: radens nummer från 0. analysen: tecknen i analysens tips ('1X'), skrivna före avspark, eller ''.
   // → { r, pr, tips: [{ id, namn, t, ok, fel, prob, schablon, pts, kassa, ensam, jmf }], ratt, av } eller null.
   function match(sum, i, { analysen = '' } = {}) {
@@ -623,5 +622,5 @@
     return T.mest(bast.p.namn, bast.sign, bast.r.h, bast.r.b, Math.round((1 - bast.pts) * 100), poang(bast.pts).replace('+', ''));
   }
 
-  return { rakna, fryst, lappar, mandagEfter, bygg, gang, lapp, poang, kr, RING, STJARNA, strykning, html, match, portratt, exempel, betyg, TEXT };
+  return { rakna, fryst, lappar, mandagEfter, bygg, gang, lapp, poang, kr, RING, strykning, html, match, portratt, exempel, betyg, TEXT };
 });
