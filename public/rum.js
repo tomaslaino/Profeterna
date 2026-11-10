@@ -260,6 +260,35 @@ window.Rum = (() => {
   // Bakgrunden: taket, väggarna (furupanelen och den nikotingula högra
   // väggen), dörren, skyltfönstret och disken. Lysröret, skyltarna och
   // paketen är i 3D (rum-inredning.js).
+  // Taket närmare betraktaren, i telefonen på höjden där scenen står långt ner i fönstret (pan): i
+  // bakväggens plan, så att det sitter ihop med bg() när kameran vrids. Plattorna går mot flyktpunkten
+  // och blir större ju närmare man kommer, lysrörets sken klingar av, och högerväggen fortsätter upp,
+  // över en list där hyllorna slutar.
+  function tak() {
+    const [X0, X1, Y0] = [-200, 1800, -340];
+    const hornX = 1250 + (-Y0 * 110) / 90;
+    const fly = (x, y) => r1(VP[0] + ((x - VP[0]) * (VP[1] - y)) / VP[1]);
+    const fog = [200, 560, 920].map((x) => `<line x1="${x}" y1="0" x2="${fly(x, Y0)}" y2="${Y0}"/>`).join('');
+    const tvars = [[-58, 1.5], [-142, 1.9], [-262, 2.4]].map(([y, b]) => {
+      const x1 = r1(1250 + (-y * 110) / 90);
+      return `<line x1="${X0}" y1="${y}" x2="${x1}" y2="${y}" stroke-width="${b}"/>`;
+    }).join('');
+    return svg(`<defs>
+    <linearGradient id="rum-tak-yta" gradientUnits="userSpaceOnUse" x1="0" y1="0" x2="0" y2="${Y0}"><stop offset="0" stop-color="#574532"/><stop offset=".34" stop-color="#463829"/><stop offset=".62" stop-color="#32281b"/><stop offset="1" stop-color="#1c160e"/></linearGradient>
+    <radialGradient id="rum-tak-sken" gradientUnits="userSpaceOnUse" cx="0" cy="0" r="1" gradientTransform="translate(620 0) scale(520 190)"><stop offset="0" stop-color="#a88a62" stop-opacity=".3"/><stop offset="1" stop-color="#a88a62" stop-opacity="0"/></radialGradient>
+    <linearGradient id="rum-tak-vagg" gradientUnits="userSpaceOnUse" x1="0" y1="${Y0}" x2="0" y2="0"><stop offset="0" stop-color="#0a0704" stop-opacity=".62"/><stop offset="1" stop-color="#0a0704" stop-opacity="0"/></linearGradient>
+    <radialGradient id="rum-tak-flack"><stop offset="0" stop-color="#140c04" stop-opacity=".34"/><stop offset=".7" stop-color="#140c04" stop-opacity=".14"/><stop offset="1" stop-color="#140c04" stop-opacity="0"/></radialGradient>
+  </defs>
+  <rect x="${X0}" y="${Y0}" width="${X1 - X0}" height="${4 - Y0}" fill="url(#rum-tak-yta)"/>
+  <rect x="${X0}" y="${Y0}" width="${X1 - X0}" height="${4 - Y0}" fill="url(#rum-tak-sken)"/>
+  <ellipse cx="318" cy="-96" rx="118" ry="30" fill="url(#rum-tak-flack)"/><ellipse cx="846" cy="-188" rx="150" ry="44" fill="url(#rum-tak-flack)"/>
+  <g stroke="#000" stroke-opacity=".2" stroke-width="1.2">${fog}${tvars}</g>
+  <polygon points="1250,4 ${r1(hornX)},${Y0} ${X1},${Y0} ${X1},4" fill="url(#rum-rwall)"/>
+  <polygon points="1250,4 ${r1(hornX)},${Y0} ${X1},${Y0} ${X1},4" fill="url(#rum-tak-vagg)"/>
+  <polygon points="1250,4 1265,-12 ${X1},-12 ${X1},4" fill="#160e08" fill-opacity=".8"/>
+  <line x1="1265" y1="-12" x2="${X1}" y2="-12" stroke="#b09a74" stroke-opacity=".22" stroke-width="1.4"/>`, 'rum-tak', [X0, Y0, X1 - X0, 4 - Y0], 0.25);
+  }
+
   function bg() {
     return svg(`${DEFS}
   <polygon points="0,0 1250,0 1140,90 0,90" fill="url(#rum-ceil)"/>
@@ -1186,7 +1215,7 @@ window.Rum = (() => {
     });
     // lampornas färger (i telefonen läggs ljuset ovanpå utan blandningsläge: svagare)
     const f = kvall * (LATT ? 0.55 : 1);
-    ljusPa(R.el.querySelector('.rum-warm'), 0, R.smal ? 1500 : H, 0, W, (g) => {
+    ljusPa(R.el.querySelector('.rum-warm'), R.smal ? -300 : 0, R.smal ? 1800 : H, 0, W, (g) => {
       rad(g, 400, 130, 416, 300, '255, 50, 40', r1(0.42 * f));
       rad(g, 448, 460, 352, 260, '255, 60, 50', r1(0.2 * f));
       rad(g, 1376, 560, 384, 160, '255, 190, 110', r1(0.3 * f));
@@ -1224,8 +1253,8 @@ window.Rum = (() => {
     el.className = navigator.userAgentData ? 'rum chromium' : 'rum';
     el.hidden = true;
     el.setAttribute('aria-label', 'Tobaksaffären');
-    el.innerHTML = `<div class="rum-stage" id="rum-stage"><i class="rum-tak"></i><div class="rum-kamera" id="rum-kamera"><div class="rum-world" id="rum-world">
-${plane(-600, `<div class="rum-ute" id="rum-ute"></div>${bg()}${vid('vagg')}${rightWall()}${window.RumRegister ? RumRegister.html() : ''}${svg('<g id="rum-hyllor"></g>', '', [1300, 250, 150, 120])}${neon()}${frameHtml()}${kortHtml()}`, 1.035)}
+    el.innerHTML = `<div class="rum-stage" id="rum-stage"><div class="rum-kamera" id="rum-kamera"><div class="rum-world" id="rum-world">
+${plane(-600, `<div class="rum-ute" id="rum-ute"></div>${tak()}${bg()}${vid('vagg')}${rightWall()}${window.RumRegister ? RumRegister.html() : ''}${svg('<g id="rum-hyllor"></g>', '', [1300, 250, 150, 120])}${neon()}${frameHtml()}${kortHtml()}`, 1.035)}
 ${plane(-598, vid('horn'), 1.035, 'rum-pl3d')}
 ${plane(-470, `${tv()}`, 1.02, 'rum-pl3d')}
 ${plane(-330, `${sill()}${haze()}`)}
@@ -1429,6 +1458,14 @@ ${window.RumRegister ? RumRegister.nara() : ''}
   // kupongens mitt i x på pulten, och var man står i telefonen på höjden (fit)
   const HEM_SMAL = 625;
   const kupX = () => (R.smal ? 640 : 760);
+  // På höjden är pulten låg (pan), så kupongen ligger mindre och närmare pultens kant, och i handen
+  // och högen räknas allt från den mitten och storleken (rum.css).
+  const kupY = () => (R.smal ? 819 : 853);
+  const kupLigg = () => (R.smal ? 0.8 : 1);
+  // hur stor del av det scenen inte fyller på höjden som hamnar över den (taket), och var i scenen
+  // guldordet under kupongen slutar, som måste rymmas i fönstret (pan)
+  const TAK_SMAL = 0.6;
+  const FOT_SMAL = 1090;
   const PENNOR = { bred: [{ x: 276.4, y: 340.6, a: -11 }, { x: 362, y: 440, a: -6 }], smal: [{ x: 268, y: 610, a: -5 }, { x: 268, y: 612, a: -2 }] };
   const PEN_PULT = { ...PENNOR.bred[0] };
   const PEN_VILA = { ...PENNOR.bred[1] };
@@ -1662,7 +1699,7 @@ ${window.RumRegister ? RumRegister.nara() : ''}
   function slot(i) {
     const [x, y, a] = HOG.at[i % HOG.at.length];
     const n = Math.floor(i / HOG.at.length);
-    return { dx: x + 14 * n - kupX(), dy: y + 10 * n - 853, a };
+    return { dx: x + 14 * n - kupX(), dy: y + 10 * n - kupY(), a };
   }
   const restAt = (sl) => T(sl.dx, sl.dy, 0, 44, sl.a, HOG.s);
 
@@ -3501,7 +3538,7 @@ ${window.RumRegister ? RumRegister.nara() : ''}
     const cx = (innerWidth - sida) / 2;
     const cy = top + (innerHeight - top - foot) / 2;
     return {
-      dx: (cx - (R.ox || 0)) / k - kupX(), dy: (cy - (R.oy || 0)) / k - 853, z,
+      dx: (cx - (R.ox || 0)) / k - kupX(), dy: (cy - (R.oy || 0)) / k - kupY(), z,
       box: { left: cx - (w / 2) * z * k, top: cy - (h / 2) * z * k, width: w * z * k, height: h * z * k },
     };
   }
@@ -3510,8 +3547,8 @@ ${window.RumRegister ? RumRegister.nara() : ''}
   // mot betraktaren, svänger en aning förbi och stannar.
   function handFrames(h) {
     return [
-      { offset: 0, transform: T(0, 0, 0, 44, -2, 1), boxShadow: glow(1, '0 26px 34px rgba(0, 0, 0, 0.55)'), easing: 'cubic-bezier(0.3, 0, 0.5, 1)' },
-      { offset: 0.24, transform: T(-10, -80, 70, 38, -5.5, 1.03), boxShadow: glow(0.4, '0 70px 60px rgba(0, 0, 0, 0.45)'), easing: 'cubic-bezier(0.25, 0.55, 0.3, 1)' },
+      { offset: 0, transform: T(0, 0, 0, 44, -2, kupLigg()), boxShadow: glow(1, '0 26px 34px rgba(0, 0, 0, 0.55)'), easing: 'cubic-bezier(0.3, 0, 0.5, 1)' },
+      { offset: 0.24, transform: T(-10, -80, 70, 38, -5.5, 1.03 * kupLigg()), boxShadow: glow(0.4, '0 70px 60px rgba(0, 0, 0, 0.45)'), easing: 'cubic-bezier(0.25, 0.55, 0.3, 1)' },
       { offset: 0.84, transform: T(h.dx, h.dy + 4, 0, -4, 1, h.z * 1.006), boxShadow: glow(0, '0 40px 90px rgba(0, 0, 0, 0.6)'), easing: 'ease-in-out' },
       { offset: 1, transform: T(h.dx, h.dy, 0, 0, 0, h.z), boxShadow: glow(0, '0 34px 80px rgba(0, 0, 0, 0.6)') },
     ];
@@ -4825,8 +4862,9 @@ ${window.RumRegister ? RumRegister.nara() : ''}
     R.px = ow > 1 ? Math.min(1, Math.max(0, px)) : 0.5;
     R.py = oh > 1 ? Math.min(1, Math.max(0, py)) : 0.5;
     R.ox = -ow * R.px;
-    // (scenen är lägre än fönstret i telefonen på höjden: lite tak över, mest pult under)
-    R.oy = oh < -1 ? -oh * 0.24 : -oh * R.py;
+    // (scenen är lägre än fönstret i telefonen på höjden: mest tak över och lite pult under, så att
+    // rummet får bilden och bordet ungefär en tredjedel, men aldrig så lågt att guldordet hamnar utanför)
+    R.oy = oh < -1 ? Math.max(0, Math.min(-oh * TAK_SMAL, innerHeight - 16 - FOT_SMAL * R.k)) : -oh * R.py;
     const s = R.el.querySelector('.rum-stage');
     const glid = drag && R.el.classList.contains('chromium') && !calm();
     if (glid) {

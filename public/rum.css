@@ -990,9 +990,10 @@ canvas.rum-neonhalo { opacity: var(--sken, 0.28); }
 
 /* På höjden är kupongen smal och hög, som en riktig stryktipskupong, och
    raderna har två våningar: lagen överst, dagen och motiveringen under.
-   Mitten är densamma som den breda kupongens (760, 853), så att högen och
-   handen ligger där de ligger (rum.js, KUP). */
-.rum.smal #rum-kupong, .rum.smal .rum-handen, .rum.smal .rum-bak { left: 430px; top: 543px; width: 420px; height: 620px; }
+   Pulten är låg där, så kupongen ligger mindre och med mitten i (640, 819)
+   (rum.js: KUP, kupX, kupY, kupLigg, som handen och högen räknar från). */
+.rum.smal #rum-kupong, .rum.smal .rum-handen, .rum.smal .rum-bak { left: 430px; top: 509px; width: 420px; height: 620px; }
+.rum.smal #rum-kupong, .rum.smal .rum-handen { transform: perspective(1300px) rotateX(44deg) rotateZ(-2deg) scale(0.8); }
 .rum.smal #rum-kupong, .rum.smal .rum-handen { padding: 0 16px 0 36px; }
 .rum.smal .rum-kup .band { margin: 0 -16px 0 -36px; padding: 0 16px 0 36px; }
 .rum.smal .rum-kup .band small { letter-spacing: 0.18em; }
@@ -1042,16 +1043,16 @@ canvas.rum-neonhalo { opacity: var(--sken, 0.28); }
    utanför, och ljuset och mörkret med dem. */
 .rum.smal .rum-stage { overflow: visible; background: none; }
 .rum-tak, .rum-pult-mer, .rum-mork-ut { display: none; }
-.rum.smal .rum-tak { display: block; position: absolute; left: -200px; top: -400px; width: 2000px; height: 420px; background: linear-gradient(180deg, #17120c, #3a2f21); }
+.rum.smal .rum-tak { display: block; }
 .rum.smal .rum-pult-mer { display: block; position: absolute; left: -10px; top: 1000px; width: 1620px; height: 340px; background: #2b1b10; }
 .rum.smal .pult-kant { display: none; }
 .rum.smal .rum-vign { top: -1200px; height: 1800px; }
-.rum.smal .rum-warm { height: 1500px; }
+.rum.smal .rum-warm { top: -1200px; height: 1800px; background: radial-gradient(900px 500px at 640px 340px, rgba(225, 240, 255, 0.1), rgba(225, 240, 255, 0) 70%), radial-gradient(800px 420px at 800px 1160px, rgba(255, 190, 120, 0.12), rgba(255, 190, 120, 0) 70%); }
 .rum.smal .rum-mork.start ~ .rum-mork-ut, .rum.smal .rum-mork.tands ~ .rum-mork-ut { display: block; position: absolute; left: 0; top: 0; width: 1600px; height: 1000px; box-shadow: 0 0 0 1400px #060504; pointer-events: none; }
 .rum.smal .rum-mork.tands ~ .rum-mork-ut { animation: rum-tands 1.2s steps(1, end) forwards; }
 /* guldordet under kupongen, där tummen är */
-.rum.smal .rum-tag { left: 640px; top: 1148px; transform: translateX(-50%); font-size: 26px; white-space: nowrap; }
-.rum.smal .rum-tag.rum-klocka { left: 640px; top: 1140px; }
+.rum.smal .rum-tag { left: 640px; top: 1054px; transform: translateX(-50%); font-size: 26px; white-space: nowrap; }
+.rum.smal .rum-tag.rum-klocka { left: 640px; top: 1046px; }
 /* platta på höjden: rummet står mitt för kupongen, och kaffet är utanför bilden */
 @media (min-width: 600px) and (max-aspect-ratio: 1/1) {
   .rum-tag { left: 690px; top: 664px; }

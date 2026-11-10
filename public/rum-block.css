@@ -96,7 +96,8 @@
 #rum-kupong:has(> .rum-block) { background: none; box-shadow: none; pointer-events: none; }
 #rum-kupong:has(> .rum-block)::after { content: none; }
 #rum-kupong > .rum-block { position: absolute; left: 150px; top: 0; z-index: 5; pointer-events: auto; transform: rotate(-2deg) scale(0.53); transform-origin: 0 0; }
-.rum.smal #rum-kupong > .rum-block { left: 42px; top: 8px; transform: rotate(0.8deg) scale(0.9); }
+/* (kupongens ruta är förminskad på den låga pulten, rum.js kupLigg: bladet fyller den) */
+.rum.smal #rum-kupong > .rum-block { left: 0; top: 4px; transform: rotate(0.8deg) scale(1.12); }
 /* framme: lyft från pulten och stort över rummet (protokollet i rum.js) */
 .rum.protokoll-uppe #rum-kupong > .rum-block { visibility: hidden; }
 .rum-protokoll-mork { position: absolute; inset: 0; z-index: 60; background: rgba(9, 6, 3, 0.76); }
