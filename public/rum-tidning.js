@@ -2,10 +2,10 @@
 
 // ---------- kvällstidningen ----------
 //
-// Veckans tidning – Sportbladet eller Expressen, samma som löpsedeln (rum-affischer.js) – ligger hopvikt på
-// pulten i tobaksaffären, och ett klick tar upp den och lägger fram den över rummet (tidningPult och
-// tidningen i rum.js). Överst ligger sedeln själv, förstorad, som tidningens framsida (på pulten syns dess övre
-// halva), och under den sidorna, en under en, med sidnummer,
+// Veckans tidning – Sportbladet eller Expressen, samma som löpsedeln (rum-affischer.js) – ligger på pulten i
+// tobaksaffären, och ett klick tar upp den och lägger fram den över rummet (tidningPult och tidningen i rum.js).
+// Överst ligger sedeln själv, förstorad, som tidningens framsida (på pulten syns den ner till rubrikens slut,
+// ovanför kupongerna i högen), och under den sidorna, en under en, med sidnummer,
 // tidningens namn och datumet i huvudet som i en riktig tidning. Vad som står i den beror på omgången:
 //
 //   inför omgången   Tipset (omgångens matcher med avsparken, datorns procent och Sixten Bråvalls tecken,
