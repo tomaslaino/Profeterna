@@ -657,6 +657,9 @@ bara lokalt. Analyserna visas som de ligger i `data/analyser.json`; hur de skriv
 - **Gänget byter plats vid bordet (2026-10-25, användarens önskemål):** var tredje dag
   sitter de på en ny plats, så att var och en får sin tur bakom bordet och på var sida –
   samma för alla som tittar, efter dagen i Stockholm. Se [Tobaksaffären](#tobaksaffären).
+- **Lägre bord i telefonen (2026-11-08, användarens önskemål):** på höjden tog bordet nästan halva
+  skärmen. Nu tar det ungefär en tredjedel, och rummet och ett ritat tak får resten; alla i gänget och
+  hela kupongen syns fortfarande utan att man drar. Se [I telefonen](#i-telefonen).
 - **Tobaksaffären också i telefonen (2026-10-24, användarens önskemål):** rummet står nu i
   alla fönster utom de allra minsta, i telefonen också, och den vanliga förstasidan finns
   kvar som *Vanlig sida*. Scenen fyller höjden, och man ser sig omkring med fingret – scenen
@@ -855,6 +858,12 @@ bara lokalt. Analyserna visas som de ligger i `data/analyser.json`; hur de skriv
   samma sak på förstasidans ruta"): under *Alla inne* de omtvistade matcherna med inringade nummer,
   bockarna och var och ens tecken i sin färg. Se *Kupongen i handen*, *Pennan visar vägen*, och
   [Inför uppgörelsen](#inför-uppgörelsen), punkt 1 och 4.
+- **Det syns vem som står till svars (2026-11-09, användarens önskemål):** "Organisera det vi ska
+  diskutera och det som nån ska stå till svars för på ett läckert sätt." Högarna och lappen tar en
+  match i taget, men det syns inte på ett ställe vem som ska svara för vad. En tabell med en rad per
+  match provades men blev drygt 1 100 punkter lång i telefonen, och användaren valde att behålla
+  högarna och lappen och lägga till raden *Till svars* och ringarna. Se *Till svars* under
+  [Inför uppgörelsen](#inför-uppgörelsen), punkt 4.
 - **Expressens löpsedel från VM 94 (2026-11-03, användarens önskemål):** VM 94-affischen med
   fotot från hemkomsten är utbytt mot en mer verklighetstrogen löpsedel, lite solblekt och
   sliten: *JAAAAAAAA! BRONS!* med Tomas foto från Rose Bowl. Den sitter på skivan som de andra.
@@ -1079,6 +1088,16 @@ bara lokalt. Analyserna visas som de ligger i `data/analyser.json`; hur de skriv
   så att siffrorna går att läsa på håll, varannan rad är tonad hela vägen över och kupongens spalt har en linje mot de
   andras. Under bladet står *Hasse, hur räknas poängen?*, och han svarar från baren som vid anslagstavlan; det som båda
   använder ligger i [public/rum-hasse-svar.js](public/rum-hasse-svar.js). Se *Sammanställningen efter omgången*.
+- **Protokollet på skrivmaskin, tydligt också i svartvitt (2026-11-10, användarens önskemål):** "kan du ordna så att
+  kolumnerna under rubriken där det står kupong, laino etc - där det står X2 osv i olika färger - att de görs om - antingen i en
+  snyggare font så att det blir tydligt eller på något annat sätt", "även för någon som har svart-vit skärm. Det är fortfarande
+  viktigast att kupongpoängen som vi alla delar på (i det här fallet 10/13) blir tydligast!", och om omgångens namn: "Det här kan
+  du f ö också skriva med skrivmaskinstext". Tecknen stod för hand i fem bläck, lite snett, och rätt syntes bara på den gröna
+  märkpennan, som i svartvitt blir nästan osynlig. Nu står allt ifyllt på skrivmaskin i samma svarta färgband – omgångens namn,
+  namnen under porträtten, tecknen, var och ens rätt och poängen – och det som inte satt står ljusgrått, så att det som satt
+  syns i ljushet och inte bara i färg. Var och ens rätt är mindre än förut, så att kupongens *10/13* med rödpennan, inringat,
+  är det enda handskrivna på raden och syns först. Provat i headless Chromium i färg och i gråskala, i den breda och den
+  smala versionen och med sex spalter. Se *Sammanställningen efter omgången*.
 - **Kupongens rätt som omgångens betyg i protokollet (2026-11-09, användarens önskemål):** "Går det att göra totalpoängen
   för oss alla - vår gemensamma rad - ännu tydligare? Kanske ringa in nån siffra eller annat. Jag är öppen för förslag - men
   gör det tydligare!" Kupongens rätt skrivs nu som kupongens betyg på papperet under Kupong: *10/13* med rödpennan, inringat
@@ -2359,6 +2378,15 @@ under omgången.
    gängets kryss, så att ingen rad flyttar sig medan pennan rör sig. Överst står för hand hur många
    omtvistade matcher som är kvar: *Sex kvar*, *Allt klubbat*, *Inget att prata om*. Det vi är
    eniga om och det klubbade träder tillbaka, men inte det vi är eniga om mot modellen.
+
+   **Till svars** (2026-11-09, `svarRad` och `tillSvars` i samtal.js): lappen tar en match i taget,
+   så överst på papperet, under antalet kvar, står var och en i ett svagt band av sitt bläck med hur
+   många matcher hen har kvar att svara för: *3 till svars*, *Klar*, *Går fri* eller *Inte inne än*.
+   I rutorna är porträttet ringat på det tecken man står till svars för, och de andra porträtten i
+   matchen träder tillbaka tills den är klubbad. Det är samma personer och tecken som frågan på
+   lappen. Ett tryck på ett porträtt, i raden eller överst, lyfter fram hens tips och tonar ner de
+   matcher hen inte svarar för. Raden står inte där när ingen särskild ska svara för något, och inte
+   när ingen match längre går att fylla i.
 
    **Lappen** (`lapp`, `fraga` och `visaLapp` i samtal.js): ett tryck på en match tar fram allt som bara behövs
    när man pratar om den, längst ner på skärmen och ovanpå det som står där, så att inget på
@@ -3823,13 +3851,24 @@ lysröret och hela kupongen med alla rader utan att man drar. Förut fyllde scen
 515 av scenens 1600 punkter fick plats på bredden: en i gänget var utanför bilden och kupongen skars av vid
 rad elva. Nu är förstoringen `max(bredd / 760, höjd / 1330)` (`fit` i rum.js), högst så mycket som fyller
 fönstret, och scenen räcker inte till fönstrets höjd. Därför är `.rum-stage` inte klippt där, och taket
-(`.rum-tak`) och pulten (`.rum-pult-mer`, resten av träet) fortsätter utanför scenen, lite tak över och mest pult
+(`.rum-tak`) och pulten (`.rum-pult-mer`, resten av träet) fortsätter utanför scenen, mest tak över och lite pult
 under (`pan`); ljuset (`.rum-warm`, `.rum-vign`) och nattens mörker (rum-folk.css) räcker lika långt, och
 medan lysröret tänds täcker `.rum-mork-ut` det som är utanför. Man står vid gänget när man kommer in (`HEM_SMAL`,
 `R.pxHem`, som kameran också vrids från), kupongen ligger under dem (`kupX`) och pingklockan står under
 kupongen, där tummen är. Pennan vilar nedanför raderna i stället för på rad 9–10. Gänget
 är ungefär en fjärdedel mindre på skärmen, och duken har därför färre bildpunkter med samma skärpa (`PR`
 i rum-3d.js, 1,2 i stället för 1,5). Vad det kostar: se *Mätt 2026-11-08* i [Ljuset efter klockan](#ljuset-efter-klockan).
+
+**Bordet på höjden (2026-11-08, användarens önskemål):** pulten tog 45 % av fönstrets höjd, och nedre delen av
+den var tomt trä. Rummet kan inte förstoras utan att någon i gänget hamnar utanför bilden, så scenen står i stället
+längre ner: 60 % av det scenen inte fyller på höjden ligger över den (`TAK_SMAL` i rum.js, förut 24 %), och pulten
+tar ungefär 36 %. Aldrig så långt ner att pingklockan hamnar utanför fönstret (`FOT_SMAL`), så i ett riktigt lågt
+fönster (375 × 553) tar den 42 %. Kupongen ligger förminskad till 80 % med mitten i (640, 819) (`kupLigg`, `kupY`
+och rum.css), så att hela kupongen fortfarande syns utan att man drar; handen och högen räknas från samma mått.
+Protokollet fyller kupongens ruta och är lika stort som förut. Taket som då syns är ritat (`tak` i rum.js): i
+bakväggens plan, så att det sitter ihop med `bg` när kameran vrids, med plattor mot flyktpunkten, lysrörets sken
+som klingar av och högerväggen som fortsätter upp över en list där hyllorna slutar. Färgerna är mätta mot `bg` i
+skarven, och `.rum-warm` räcker lika långt upp, annars syntes den.
 
 Rummet står i alla fönster utom de allra minsta (`Rum.fits`: minst 280 × 260 px), i
 telefonen också. Scenen täcker fönstret som på datorn, också på höjden i telefonen (en tid
@@ -3855,8 +3894,7 @@ svep uppåt eller neråt bladen i lapparna till nästa division.
 
 **Kupongen på höjden** (`.rum.smal`: smalare än 600 px och högre än bred): kupongen på
 pulten, i handen och i högen är smal och hög, 420 × 620 i stället för 660 × 470, som en
-riktig stryktipskupong, med samma mitt så att högen och handen ligger där de ligger (`KUP`
-i rum.js). Raderna har två våningar – lagen överst, dagen och motiveringen under – och
+riktig stryktipskupong (`KUP` i rum.js; på pulten förminskad, se *Bordet på höjden*). Raderna har två våningar – lagen överst, dagen och motiveringen under – och
 rutorna är större (44 × 26). Lagen har de korta namnen (*Tottenham –
 Crystal Palace*, *Southampton – QPR*; `short` i rum.js, där Bristol City, Bristol Rovers och
 Notts County behåller hela namnet och Milton Keynes Dons blir MK Dons), så att de ryms i
@@ -6508,16 +6546,19 @@ och de nya raderna har Tomas röst först när iMacen har läst upp dem (till de
 När alla matcher i omgången är spelade ligger bara Hasse Backes protokoll på pulten, i kupongens ställe, tills
 nästa kupong kommer måndagen efter kl. 16 ([public/rum-block.js](public/rum-block.js), [public/rum-block.css](public/rum-block.css)): en blankett ur
 samma tryckeri som kupongen – samma papper, bandet i terrakotta (*Protokoll*, med kupongens nummer), synkmarkeringarna i
-vänsterkanten, tryckta linjer, varannan rad tonad hela vägen över och tryckeriets rad längs högerkanten. Omgångens namn står för hand på
-en tryckt rad under bandet. Raderna har resultat och facit på skrivmaskin, och spalterna är kupongen (gängets tre
-ansikten), var och en i gänget och Hasse, med porträtten uppklistrade som foton. Allas tecken står kvar i var och ens
-bläck, så att man ser vad var och en spelade, och det som satt är överstruket med grön märkpenna. Handstilen och
-märkpennans drag är lite olika i varje ruta, men samma omgång ser likadan ut varje gång (slumpen utgår från omgången,
-raden och spalten). Överst, direkt under porträtten, står *Rätt av 13* stort: det ska synas också på håll, när bladet ligger
+vänsterkanten, tryckta linjer, varannan rad tonad hela vägen över och tryckeriets rad längs högerkanten. Allt ifyllt står på
+skrivmaskin utom Hasses röda penna: omgångens namn på en tryckt rad under bandet, resultaten och facit, och spalterna, som är
+kupongen (gängets tre ansikten), var och en i gänget och Hasse, med porträtten uppklistrade som foton och namnet under.
+Allas tecken står kvar i samma svarta färgband, så att man ser vad var och en spelade och kan läsa spalterna rakt ned;
+det som satt är överstruket med grön märkpenna och står i full svärta, och det som inte satt står ljusgrått. Rätt och fel
+skiljer sig alltså i ljushet och inte bara i färg, så att bladet går att läsa också på en svartvit skärm. Märkpennans drag är
+lite olika i varje ruta, men samma omgång ser likadan ut varje gång (slumpen utgår från omgången, raden och spalten).
+Överst, direkt under porträtten, står *Rätt av 13* stort: det ska synas också på håll, när bladet ligger
 på pulten, och där är det bladets nederkant som hamnar utanför bilden (bladet ligger i skala 0,76 på pulten). Kupongen är allas,
 och dess rätt är omgångens betyg, skrivet som kupongens betyg på papperet under Kupong (*10/13* med Hasses röda rättningspenna,
 inringat och lite snett, `betygRing` i rum-block.js som `ring` i papper.js). Det sticker ut åt vänster, in i den tomma delen av
-raden, och är det enda röda på raden: var och ens rätt står i det egna bläcket. Sist står poängen. Vinnaren är inringad, både på
+raden, och är det enda handskrivna och röda på raden: var och ens rätt står mindre på skrivmaskin. Sist står poängen, också på
+skrivmaskin. Vinnaren är inringad, både på
 porträttet och runt poängen; utöver betyget är det de enda ringarna på blocket. Hasse har rättat det och skrivit under, och mer står inte där:
 domarna över gänget säger han i baren (se [Hasse Backe](#hasse-backe), *Domarna efter omgången*). Förut stod en dom per
 person längst ner (ändrat 2026-11-08). I telefonen försvinner namnen under porträtten. Har Hasse ingen kupong i omgången
@@ -6691,6 +6732,35 @@ Provat i headless Chrome med det lokala bygget (omgången 2026-11-07, spelad) i 
 tidningen syns på pulten, ett klick träffar den, den lyfts över protokollet och läggs fram med alla sidor, och Esc lägger
 tillbaka den. *Så mår tipslagen* med en påhittad `data/tidning.json`, och framsidan utan matcher med Node. Inte provat
 i Safari eller i en riktig telefon.
+
+#### Helgarderat
+
+Helgarderat är namnet på tidningen med det supportrarna vet (2026-11-10: "Kalla tidningen för Helgarderat"). Ett utkast
+ligger på sajten som en egen sida, [matchfixarna.se/helgarderat.html](https://matchfixarna.se/helgarderat.html)
+("gör ett utkast av tidningen Helgarderat så att man får se hur den ser ut. Lägg ut på sajten"). Var namnet ska stå i
+rummet, på hela tidningen bakom löpsedeln, bara på poddsidorna eller på en egen tidning, är inte bestämt, så rummet är
+orört. Sidan har noindex och ingen länk från resten av sajten.
+
+Utkastet har ett eget utseende ([public/helgarderat.css](public/helgarderat.css)): tidningspapper med tryck i svart och
+flaskgrönt, namnet i Alfa Slab One och till vänster om det rutorna 1, X och 2, alla ikryssade med kulspetspenna. Priset
+är 3 kr, tre rader. Framsidan har en stämpel, *Provnummer*, och ettan och tvåan är matcherna med flest uppgifter, helst
+där båda lagen har något (`storst` i [public/helgarderat.js](public/helgarderat.js)). Ettan har ett stort citat, helst
+om truppen och med ett namn. Bredvid står *Lördagens matcher* med sidnumren och under *Hört bland supportrarna*, med en
+egen uppgift (slaget h) ur var och en av tre andra matcher. Sedan kommer en sida per match med lagen bredvid varandra,
+uppgifterna under sina ämnen, stämplarna och citaten. Har bara det ena laget något får det hela bredden i två spalter.
+Baksidan har källorna per match, med länkar till avsnitten och forumtrådarna, och stämplarna. Texterna för slagen,
+ämnena och förklaringarna kommer från `RumTidning.TEXT.poddar`, så att det står samma sak i båda tidningarna. Under
+720 px är allt en spalt.
+
+Innehållet är provomgången som poddjobbet gjorde på iMacen 2026-11-10 (`prov-omgang-forum.json`, tolv matcher i League
+One och Two den 14 november). Den ligger i [public/helgarderat/utkast.json](public/helgarderat/utkast.json) och är
+uttagen med `poddsidor` i src/analyser/poddar.mjs, samma uttag som `data/poddsidor.json`, så att varken utskrifterna
+eller de engelska citaten följer med. Numren är 1–12 i kupongens ordning, utan luckan efter matchen som saknade sida.
+
+Provat med en provserver (public/ ur arbetskopian och resten från matchfixarna.se) i webbläsarpanelen, i 1280 × 900 och
+375 × 812, och med huvudlös Chrome i 1280 bredd: framsidan, en sida där båda lagen har något, en där bara det ena har
+det (Wigan–Barnsley), baksidan och att inget sticker ut åt sidan i telefonen. Inte provat i Safari eller i en riktig
+telefon.
 
 ### Närbilderna
 

@@ -5,10 +5,12 @@
 /* ---------- blocket ---------- */
 /* En blankett ur samma tryckeri som kupongen på pulten (rum.css, .rum-kup): samma papper, bandet och de
    tryckta linjerna i terrakotta, synkmarkeringarna i vänsterkanten och tryckeriets rad längs högerkanten.
-   Ovanpå det förtryckta: facit och resultaten på skrivmaskin, allas tecken för hand i var och ens bläck,
-   det som satt överstruket med grön märkpenna, och Hasses röda penna: kupongens rätt som omgångens betyg, inringat
-   överst under porträtten så att det syns på håll när bladet ligger på pulten, och ringen kring vinnaren. */
-.rum-block { --c: 62px; --fa: 38px; --rad: 31px; --vg: 42px; --hg: 24px; --mp: #8fd14f; display: block; box-sizing: border-box; width: 692px; padding: 0 var(--hg) 22px var(--vg); color: var(--pp-ink); white-space: nowrap; text-align: left; font: 400 14px/1 var(--skriv); font-synthesis: none; box-shadow: 0 18px 28px rgba(0, 0, 0, 0.5), 0 2px 2px rgba(0, 0, 0, 0.25);
+   Ovanpå det förtryckta: omgången, namnen, facit, allas tecken och summorna på skrivmaskin i samma svarta färgband,
+   det som satt överstruket med grön märkpenna och i full svärta, det som inte satt svagare, och Hasses röda penna:
+   kupongens rätt som omgångens betyg, inringat överst under porträtten så att det syns på håll när bladet ligger på
+   pulten, och ringen kring vinnaren. Rätt och fel skiljer sig i ljushet och inte bara i färg, så att bladet går att
+   läsa också i svartvitt. */
+.rum-block { --c: 62px; --fa: 38px; --rad: 31px; --vg: 42px; --hg: 24px; --mp: #8fd14f; --rb-fel: rgba(34, 31, 27, 0.4); display: block; box-sizing: border-box; width: 692px; padding: 0 var(--hg) 22px var(--vg); color: var(--pp-ink); white-space: nowrap; text-align: left; font: 400 14px/1 var(--skriv); font-synthesis: none; box-shadow: 0 18px 28px rgba(0, 0, 0, 0.5), 0 2px 2px rgba(0, 0, 0, 0.25);
   background:
     /* vikningen tvärs över bladet, och lite ljusare där papperet buktar */
     linear-gradient(180deg, rgba(0, 0, 0, 0) 52.2%, rgba(96, 66, 30, 0.07) 52.9%, rgba(255, 252, 240, 0.28) 53.15%, rgba(0, 0, 0, 0) 54.2%),
@@ -17,7 +19,6 @@
 /* tryckeriets rad längs högerkanten, som på kupongen */
 .rum-block::before { content: "Matchfixarna AB · Blankett 14 · Eftertryck förbjudes"; position: absolute; right: 6px; bottom: 26px; writing-mode: vertical-rl; font: 600 7px/1 var(--tryck); letter-spacing: 0.16em; text-transform: uppercase; color: var(--pp-print); opacity: 0.72; pointer-events: none; }
 .rum-block.n6 { --c: 53px; }
-.rum-block.n6 .rb-nm.h2 { font-size: 16px; }
 /* bandet, som kupongens */
 .rum-block .rb-band { display: flex; justify-content: space-between; align-items: center; height: 46px; margin: 0 calc(-1 * var(--hg)) 0 calc(-1 * var(--vg)); padding: 0 var(--hg) 0 var(--vg); background: var(--pp-grain), var(--pp-band); color: #f6ecd9; box-shadow: 0 2px 0 #f1e8d5, 0 3.5px 0 var(--pp-band); }
 .rb-band small { font: 700 11px/1 var(--tryck); letter-spacing: 0.3em; text-transform: uppercase; }
@@ -25,8 +26,7 @@
 /* omgången: en tryckt rad som fyllts i för hand */
 .rum-block .rb-omg { display: flex; align-items: baseline; gap: 12px; height: 26px; margin: 12px 0 8px; border-bottom: 1px dotted var(--pp-dots); }
 .rb-omg > span { flex: none; font: 700 10.5px/1 var(--tryck); letter-spacing: 0.15em; text-transform: uppercase; color: var(--pp-print); }
-.rb-omg b { min-width: 0; overflow: hidden; padding: 0 6px 0 2px; font: 700 22px/1 Caveat, cursive; color: #2b2723; }
-.rb-omg i { display: inline-block; font-style: normal; transform-origin: 0 100%; }
+.rb-omg b { min-width: 0; overflow: hidden; text-overflow: ellipsis; padding: 0 6px 0 2px; font: 400 16px/1 var(--skriv); color: var(--pp-ink); }
 .rb-g { display: grid; grid-template-columns: minmax(0, 1fr) var(--fa) repeat(var(--n), var(--c)); }
 .rb-g > span { box-sizing: border-box; display: flex; align-items: center; justify-content: center; position: relative; border-bottom: 1px solid var(--pp-line); }
 /* var och ens spalt mellan tryckta linjer, och kupongens spalt tonad i trycket */
@@ -54,15 +54,14 @@
 .rb-lag { display: flex; height: 38px; align-items: center; }
 .rb-lag img { width: 22px; height: 26px; border-width: 1.5px; }
 .rb-lag img + img { margin-left: -7px; }
-.rb-nm { display: block; color: inherit; line-height: 1; }
-.rb-nm.kup { font: 400 12px/1 var(--skriv); color: var(--pp-ink); }
-.rb-nm.h0 { color: #2146a6; font: 400 13px/1 "Cedarville Cursive", Caveat, cursive; }
-.rb-nm.h1 { color: #16784b; font: 400 16px/1 "Mr Dafoe", Caveat, cursive; }
-.rb-nm.h2 { color: #6d3aa8; font: 400 19px/1 "Reenie Beanie", Caveat, cursive; }
-.rb-nm.h3 { color: #8a6a0c; font: 700 17px/1 Caveat, cursive; }
-/* tecknen, för hand i var och ens bläck */
-.rb-c { height: var(--rad); color: var(--i); font: 700 25px/1 Caveat, cursive; }
+/* namnen på skrivmaskin, som Kupong: samma storlek och samma svärta i alla spalter */
+.rb-nm { display: block; box-sizing: border-box; max-width: 100%; overflow: hidden; text-overflow: ellipsis; font: 400 11px/1.15 var(--skriv); color: var(--pp-ink); }
+.rum-block.n6 .rb-nm { font-size: 10px; letter-spacing: -0.03em; }
+/* tecknen på skrivmaskin, i samma färgband i alla spalter, så att de står rakt under varandra och går att jämföra.
+   Det som inte satt står kvar, men svagare: rätt och fel skiljer sig i ljushet, inte bara i märkpennans färg. */
+.rb-c { height: var(--rad); color: var(--pp-ink); font: 400 19px/1 var(--skriv); }
 .rb-c i { position: relative; display: block; font-style: normal; }
+.rb-c.fel { color: var(--rb-fel); }
 /* märkpennan över det som satt (strykning i rum-block.js) */
 .rb-mp { position: absolute; left: 1px; top: 1px; width: calc(100% - 2px); height: calc(100% - 2px); overflow: visible; pointer-events: none; }
 .rb-mp path { fill: var(--mp); opacity: 0.5; }
@@ -70,37 +69,38 @@
 .rb-mp path:first-child { stroke: #74b83c; stroke-width: 0.9; stroke-linejoin: round; vector-effect: non-scaling-stroke; }
 .rb-mp .ned { opacity: 0.3; }
 .rb-mp .rand { fill: none; stroke: #f3ecd6; stroke-width: 1.4; stroke-linecap: round; opacity: 0.22; }
-/* summorna: rätt överst, under porträtten (kupongens som omgångens betyg, inringat med rödpennan), och poängen sist */
-.rb-g > .rb-su { font: 400 15px/1 var(--skriv); }
+/* summorna på skrivmaskin: rätt överst, under porträtten (kupongens som omgångens betyg, för hand och inringat med
+   rödpennan, störst på bladet), och poängen sist */
+.rb-g > .rb-su { font: 400 15px/1 var(--skriv); color: var(--pp-ink); }
 .rb-g > .rb-su.la { grid-column: span 2; justify-content: flex-start; padding-left: 28px; font: 700 10px/1 var(--tryck); letter-spacing: 0.16em; text-transform: uppercase; color: var(--pp-print); }
 .rb-su i { display: block; font-style: normal; }
-.rb-g > .rb-su.tot:not(.la) { height: 64px; padding-top: 4px; font: 700 46px/1 Caveat, cursive; }
+.rb-g > .rb-su.tot:not(.la) { height: 76px; padding-top: 2px; font: 400 27px/1 var(--skriv); }
 /* kupongens betyg: inringat med rödpennan, som kupongens betyg på papperet (.pp-grade i papper.css). Det sticker ut
    åt vänster, in i den tomma delen av raden, så att grannens siffra står fri. */
-.rb-g > .rb-su.tot.k { z-index: 1; justify-content: flex-end; overflow: visible; font-size: 62px; }
-.rb-betyg { position: relative; display: flex; align-items: baseline; margin-right: 0; padding: 7px 17px 5px 14px; transform: rotate(-6deg); }
+.rb-g > .rb-su.tot.k { z-index: 1; justify-content: flex-end; overflow: visible; color: #c8281e; font: 700 62px/1 Caveat, cursive; }
+.rb-betyg { position: relative; display: flex; align-items: baseline; margin-right: 0; padding: 4px 17px 2px 14px; transform: rotate(-6deg); }
 .rb-betyg small { margin-left: 1px; font-size: 0.42em; font-weight: 600; }
 .rb-bring { position: absolute; inset: -3px; width: calc(100% + 6px); height: calc(100% + 6px); overflow: visible; fill: none; stroke: currentColor; stroke-width: 2.8; stroke-linecap: round; }
 .rb-bring path { vector-effect: non-scaling-stroke; }
 .rb-g > .rb-su.tot { border-bottom: 1.5px solid var(--pp-rule); }
 .rb-g > .rb-su.po { border-top: 1.5px solid var(--pp-rule); }
-.rb-g > .rb-su.po:not(.la) { height: 36px; font: 700 23px/1 Caveat, cursive; font-variant-numeric: tabular-nums; }
+.rb-g > .rb-su.po:not(.la) { height: 36px; font: 400 16px/1 var(--skriv); }
 .rb-ring { position: absolute; inset: 3px 5px; width: calc(100% - 10px); height: calc(100% - 6px); overflow: visible; pointer-events: none; }
 .rb-ring path { stroke: #c8281e; stroke-width: 2.4; stroke-linecap: round; }
-.rb-vann { position: relative; display: inline-block; padding: 3px 8px; }
+.rb-vann { position: relative; display: inline-block; padding: 6px 11px; }
 .rb-vann .rb-ring { inset: 0; width: 100%; height: 100%; }
 
 /* den smala: telefonen, med bilderna som spalthuvuden */
 .rum-block.tat { --c: 33px; --fa: 24px; --rad: 28px; --vg: 23px; --hg: 10px; width: 396px; padding-bottom: 12px; }
 .rum-block.tat.n6 { --c: 28px; }
-.rum-block.tat.n6 .rb-c { font-size: 18px; }
+.rum-block.tat.n6 .rb-c { font-size: 12.5px; }
 .tat::before { right: 2px; bottom: 14px; font-size: 5.5px; letter-spacing: 0.1em; }
 .tat .rb-band { height: 34px; }
 .tat .rb-band small { font-size: 8px; letter-spacing: 0.2em; }
 .tat .rb-band b { font-size: 20px; }
 .tat .rb-omg { gap: 8px; height: 22px; margin: 8px 0 5px; }
 .tat .rb-omg > span { font-size: 8.5px; letter-spacing: 0.1em; }
-.tat .rb-omg b { font-size: 17px; }
+.tat .rb-omg b { font-size: 12.5px; }
 .tat .rb-m { gap: 3px; font-size: 10.5px; }
 .tat .rb-m::before { left: calc(7px - var(--vg)); width: 12px; height: 5px; margin-top: -2.5px; }
 .tat .rb-m u { width: 12px; font-size: 10px; }
@@ -116,14 +116,14 @@
 .tat .rb-lag img { width: 14px; height: 17px; border-width: 1px; }
 .tat .rb-lag img + img { margin-left: -5px; }
 .tat .rb-nm { display: none; }
-.tat .rb-c { font-size: 19.5px; }
-.tat .rb-g > .rb-su.tot:not(.la) { height: 46px; padding-top: 2px; font-size: 29px; }
-.tat .rb-g > .rb-su.tot.k { font-size: 36px; }
-.tat .rb-betyg { margin-right: 0; padding: 4px 10px 3px 8px; }
+.tat .rb-c { font-size: 14px; }
+.tat .rb-g > .rb-su.tot:not(.la) { height: 50px; padding-top: 1px; font-size: 17px; }
+.tat .rb-g > .rb-su.tot.k { font-size: 38px; }
+.tat .rb-betyg { margin-right: 0; padding: 2px 10px 1px 8px; }
 .tat .rb-bring { stroke-width: 2; }
-.tat .rb-g > .rb-su.po:not(.la) { height: 28px; font-size: 14.5px; }
+.tat .rb-g > .rb-su.po:not(.la) { height: 28px; font-size: 10.5px; }
 .tat .rb-g > .rb-su.la { padding-left: 17px; font-size: 8.5px; letter-spacing: 0.06em; }
-.tat .rb-vann { padding: 2px 3px; }
+.tat .rb-vann { padding: 3px 4px; }
 .tat .rb-vann .rb-ring { inset: -1px -2px; width: calc(100% + 4px); height: calc(100% + 2px); }
 .tat .rb-vann .rb-ring path { stroke-width: 1.5; }
 
@@ -131,7 +131,8 @@
 #rum-kupong:has(> .rum-block) { background: none; box-shadow: none; pointer-events: none; }
 #rum-kupong:has(> .rum-block)::before, #rum-kupong:has(> .rum-block)::after { content: none; }
 #rum-kupong > .rum-block { position: absolute; left: 70px; top: 0; z-index: 5; pointer-events: auto; transform: rotate(-2deg) scale(0.76); transform-origin: 0 0; }
-.rum.smal #rum-kupong > .rum-block { left: 42px; top: 8px; transform: rotate(0.8deg) scale(0.9); }
+/* (kupongens ruta är förminskad på den låga pulten, rum.js kupLigg: bladet fyller den) */
+.rum.smal #rum-kupong > .rum-block { left: 0; top: 4px; transform: rotate(0.8deg) scale(1.12); }
 /* framme: lyft från pulten och stort över rummet (protokollet i rum.js) */
 .rum.protokoll-uppe #rum-kupong > .rum-block { visibility: hidden; }
 .rum-protokoll-mork { position: absolute; inset: 0; z-index: 60; background: rgba(9, 6, 3, 0.76); }

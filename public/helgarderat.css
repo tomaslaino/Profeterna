@@ -1,0 +1,195 @@
+/* Helgarderat (helgarderat.html, helgarderat.js): tidningen med det supportrarna vet, ark för ark på den mörka
+   disken. Eget utseende: tidningspapper med tryck i svart och flaskgrönt, namnet i Alfa Slab One och tre rutor
+   (1, X och 2) som är ikryssade med kulspetspenna. Stämplarna betyder samma sak som i tidningen bakom
+   löpsedeln (rum-tidning.css). Smalt (under 720 px): en spalt. */
+
+html { background: #1a1510; }
+body.hg-bord { margin: 0; padding: 28px 0 56px; min-height: 100vh; box-sizing: border-box;
+  background: radial-gradient(120% 70% at 50% 0%, #2c241b 0%, #1a1510 60%) fixed, #1a1510; font-synthesis: none; -webkit-text-size-adjust: 100%; }
+
+.hg { --p: #efebe0; --svart: #15120e; --gron: #1b5435; --rod: #c22a1f; --gra: #5c564c; --penna: #2347a8; --streck: rgba(21, 18, 14, 0.24);
+  --serif: Georgia, Fraunces, "Times New Roman", serif; --rubrik: Fraunces, Georgia, serif; --sans: "Helvetica Neue", Arial, sans-serif; --slab: "Alfa Slab One", Rockwell, Georgia, serif;
+  display: flex; flex-direction: column; align-items: center; gap: 18px; color: var(--svart); font-family: var(--serif); }
+.hg p { margin: 0; }
+.hg a { color: inherit; }
+
+/* ett ark: papper med prickraster, rak skugga mot disken */
+.hg-ark { position: relative; box-sizing: border-box; width: min(940px, calc(100% - 24px)); padding: 16px 36px 30px; scroll-margin-top: 14px;
+  background: radial-gradient(circle at 50% 50%, rgba(40, 30, 14, 0.13) 0 0.6px, rgba(0, 0, 0, 0) 0.8px) 0 0 / 2.6px 2.6px, var(--p);
+  box-shadow: 0 26px 60px rgba(0, 0, 0, 0.55), 0 2px 4px rgba(0, 0, 0, 0.35); }
+.hg-fel { padding: 40px; font: italic 400 17px/1.4 var(--serif); text-align: center; }
+
+.hg-skold { display: inline-block; width: 1.25em; height: 1.25em; object-fit: contain; vertical-align: -0.22em; filter: grayscale(1) contrast(1.25) brightness(0.92); mix-blend-mode: multiply; }
+.hg-skold.liten { width: 1.15em; height: 1.15em; margin-right: 0.3em; }
+
+/* ---------- framsidan ---------- */
+
+.hg-huvud { text-align: center; }
+.hg-overrad { display: flex; justify-content: space-between; align-items: baseline; gap: 12px; padding: 2px 0 7px; border-bottom: 1px solid var(--svart);
+  font: 700 11px/1 var(--sans); letter-spacing: 0.12em; text-transform: uppercase; color: var(--gra); }
+.hg-overrad span:first-child { color: var(--svart); }
+.hg .hg-namn { display: flex; align-items: center; justify-content: center; gap: 0.24em; margin: 12px 0 8px; padding: 0; border: 0;
+  color: var(--gron); font: 400 clamp(29px, 8.4vw, 82px)/1 var(--slab); letter-spacing: 0.01em; text-transform: uppercase; white-space: nowrap; }
+.hg-namn > span { transform: translateY(0.03em); }
+.hg-rutor { flex: none; width: 1.6em; height: auto; overflow: visible; transform: translateY(-0.04em); }
+.hg-rutor .r { fill: rgba(255, 255, 255, 0.4); stroke: var(--gron); stroke-width: 2.6; }
+.hg-rutor text { fill: var(--gron); font: 800 18px/1 var(--rubrik); }
+.hg-rutor .k { fill: none; stroke: var(--penna); stroke-width: 3.6; stroke-linecap: round; opacity: 0.9; }
+.hg-slogan { display: flex; justify-content: space-between; align-items: center; gap: 12px; padding: 7px 0 0; border-top: 4px double var(--svart);
+  font: italic 500 16px/1.2 var(--rubrik); }
+.hg-slogan span:last-child { font-style: normal; font: 700 11px/1 var(--sans); letter-spacing: 0.12em; text-transform: uppercase; }
+
+/* stämpeln mitt på raden under namnet: ett provnummer */
+.hg .hg-stampel { flex: none; margin: -2px 0 -4px; padding: 5px 10px 4px; border: 2.5px solid rgba(194, 42, 31, 0.78); border-radius: 3px; color: rgba(194, 42, 31, 0.84);
+  font: 800 12.5px/1 var(--sans); font-style: normal; letter-spacing: 0.2em; text-transform: uppercase; transform: rotate(-5deg); mix-blend-mode: multiply; }
+
+.hg-front { display: grid; grid-template-columns: minmax(0, 1.72fr) minmax(0, 1fr); margin-top: 18px; }
+.hg-vanster { padding-right: 24px; }
+/* tvåan under ettan, mindre */
+.hg-tvaa { margin-top: 20px; padding-top: 10px; border-top: 3px solid var(--svart); }
+.hg .hg-tvaa h3 { margin: 2px 0 7px; padding: 0; border: 0; font: 800 clamp(23px, 3vw, 28px)/1.06 var(--rubrik); letter-spacing: -0.008em; color: var(--svart); }
+.hg-tvaa h3 a { text-decoration: none; }
+.hg-tvaa > p:not(.hg-kick):not(.hg-vidare) { font: 400 15px/1.42 var(--serif); hyphens: auto; -webkit-hyphens: auto; }
+.hg-matcher { padding-left: 22px; border-left: 1px solid var(--streck); }
+
+/* raden över rubriken: numret, matchen och avsparken, som löpande text så att den bryts som text */
+.hg-kick { margin: 0 0 6px !important; font: 800 11.5px/1.55 var(--sans); letter-spacing: 0.06em; text-transform: uppercase; }
+.hg-kick b { display: inline-grid; place-items: center; min-width: 19px; height: 19px; margin-right: 7px; padding: 0 4px; box-sizing: border-box; vertical-align: 1px; background: var(--gron); color: #fff; font: 700 12px/1 var(--rubrik); letter-spacing: 0; }
+.hg-kick em { margin-left: 8px; font-style: normal; font-weight: 600; color: var(--gra); white-space: nowrap; }
+.hg .hg-etta h2 { margin: 2px 0 10px; padding: 0; border: 0; font: 800 clamp(29px, 4.6vw, 46px)/1.02 var(--rubrik); letter-spacing: -0.012em; color: var(--svart); }
+.hg-etta h2 a { text-decoration: none; }
+.hg-ingress { margin: 0 0 12px !important; font: 700 16.5px/1.42 var(--serif); hyphens: auto; -webkit-hyphens: auto; }
+.hg-vidare { margin-top: 8px !important; font: 800 11px/1 var(--sans); letter-spacing: 0.08em; text-transform: uppercase; }
+.hg-vidare a { color: var(--gron); text-decoration: none; }
+.hg-vidare a::after { content: " →"; }
+@media (hover: hover) { .hg-vidare a:hover, .hg-etta h2 a:hover, .hg-tvaa h3 a:hover { text-decoration: underline; text-underline-offset: 3px; text-decoration-thickness: 1px; } }
+
+/* citaten: vem som säger det under */
+.hg .hg-citat { margin: 7px 0 0; padding: 0 0 0 10px; border: 0; border-left: 3px solid var(--gron); background: none; }
+.hg-citat p { font: italic 400 15px/1.34 var(--serif); }
+.hg-citat cite { display: block; margin-top: 3px; font: 700 10.5px/1.3 var(--sans); font-style: normal; letter-spacing: 0.03em; color: var(--gra); }
+.hg-citat cite::before { content: "– "; }
+.hg .hg-citat.stort { margin: 16px 0 4px; padding: 12px 0 0; border-left: 0; border-top: 1px solid var(--streck); }
+.hg-citat.stort p { color: var(--gron); font: italic 500 clamp(21px, 2.9vw, 27px)/1.2 var(--rubrik); letter-spacing: -0.005em; }
+.hg-citat.stort cite { margin-top: 7px; font-size: 11.5px; }
+
+/* Lördagens matcher: numret, matchen och sidan, och sidans rubrik under */
+.hg .hg-matcher h3, .hg .hg-hort h3 { margin: 0 0 4px; padding: 6px 9px 5px; border: 0; background: var(--gron); color: #fff; font: 800 12px/1 var(--sans); letter-spacing: 0.1em; text-transform: uppercase; }
+.hg-matcher ol { margin: 0; padding: 0; list-style: none; }
+.hg-matcher li a { display: grid; grid-template-columns: 20px minmax(0, 1fr) auto; column-gap: 8px; align-items: baseline; padding: 6px 0 7px; border-bottom: 1px dotted rgba(21, 18, 14, 0.45); text-decoration: none; }
+.hg-matcher li:last-child a { border-bottom: 0; }
+.hg-matcher li b { font: 800 14px/1 var(--rubrik); color: var(--gron); }
+.hg-m { font: 700 14px/1.2 var(--sans); }
+.hg-matcher li i { font: 700 11px/1 var(--sans); font-style: normal; color: var(--gra); }
+.hg-matcher li small { grid-column: 2 / -1; margin-top: 2px; font: italic 400 12.5px/1.3 var(--serif); color: var(--gra); }
+@media (hover: hover) { .hg-matcher li a:hover .hg-m { text-decoration: underline; text-underline-offset: 3px; } }
+
+/* Hört bland supportrarna: tre spalter med streck emellan */
+.hg-hort { margin-top: 20px; padding-top: 2px; border-top: 3px solid var(--svart); }
+.hg .hg-hort h3 { display: inline-block; margin: 0 0 10px; }
+.hg-hort-l { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); }
+.hg-hort-l article { padding: 0 18px; border-left: 1px solid var(--streck); }
+.hg-hort-l article:first-child { padding-left: 0; border-left: 0; }
+.hg-hort-l article:last-child { padding-right: 0; }
+.hg-hort-l article > p:not(.hg-kick):not(.hg-vidare) { margin-top: 5px; font: 400 14.5px/1.4 var(--serif); hyphens: auto; -webkit-hyphens: auto; }
+
+/* ---------- matchens sida ---------- */
+
+.hg-folio { display: flex; align-items: baseline; gap: 10px; padding-bottom: 5px; border-bottom: 1px solid var(--svart); font: 600 10.5px/1 var(--sans); letter-spacing: 0.06em; text-transform: uppercase; color: var(--gra); }
+.hg-folio b { color: var(--svart); font: 800 18px/1 var(--rubrik); letter-spacing: 0; }
+.hg-folio a { color: var(--gron); font: 400 14px/1 var(--slab); letter-spacing: 0.04em; text-decoration: none; }
+.hg-folio span { margin-left: auto; }
+.hg-folio.h { flex-direction: row-reverse; }
+.hg-folio.h span { margin: 0 auto 0 0; }
+
+.hg-vinjett { display: flex; align-items: center; gap: 10px; margin: 14px 0 10px; padding-bottom: 7px; border-bottom: 3px solid var(--svart); }
+.hg-vinjett b { display: inline-grid; place-items: center; min-width: 30px; height: 30px; padding: 0 6px; box-sizing: border-box; background: var(--gron); color: #fff; font: 800 19px/1 var(--rubrik); }
+.hg-vinjett span { font: 400 25px/1 Anton, Impact, sans-serif; letter-spacing: 0.02em; text-transform: uppercase; }
+.hg-vinjett em { margin-left: auto; font: 700 11.5px/1.2 var(--sans); font-style: normal; letter-spacing: 0.08em; text-transform: uppercase; color: var(--gra); text-align: right; }
+.hg-vinjett.enkel b { height: auto; padding: 7px 10px 4px; font: 400 25px/1.1 Anton, Impact, sans-serif; letter-spacing: 0.03em; text-transform: uppercase; }
+.hg .hg-rub { margin: 2px 0 8px; padding: 0; border: 0; font: 800 clamp(27px, 4vw, 40px)/1.04 var(--rubrik); letter-spacing: -0.01em; color: var(--svart); }
+
+/* lagen bredvid varandra, hemma till vänster */
+.hg-lagen { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); align-items: start; padding-top: 4px; }
+.hg-lag { padding: 0 0 0 24px; border-left: 1px solid var(--streck); }
+.hg-lag:first-child { padding: 0 24px 0 0; border-left: 0; }
+.hg .hg-lag h3 { display: flex; align-items: center; gap: 8px; margin: 0; padding: 7px 0 5px; border: 0; border-top: 4px solid var(--gron); border-bottom: 1px solid var(--svart);
+  font: 400 24px/1 Anton, Impact, sans-serif; letter-spacing: 0.02em; text-transform: uppercase; color: var(--svart); }
+.hg-lag h3 .hg-skold { width: 28px; height: 28px; vertical-align: 0; }
+.hg-ur { margin-top: 5px !important; font: italic 400 12px/1.35 var(--serif); color: var(--gra); }
+.hg-ur a { text-decoration-color: rgba(92, 86, 76, 0.5); text-underline-offset: 2px; }
+.hg-grupp { margin-top: 12px; }
+.hg .hg-grupp h4 { margin: 0 0 7px; padding: 0; border: 0; color: var(--gron); font: 800 11.5px/1.2 var(--sans); letter-spacing: 0.08em; text-transform: uppercase; }
+.hg-punkt { margin: 0 0 10px; padding-bottom: 10px; border-bottom: 1px dotted rgba(21, 18, 14, 0.45); }
+.hg-grupp .hg-punkt:last-child { margin-bottom: 0; padding-bottom: 0; border-bottom: 0; }
+.hg-punkt > p { margin-top: 4px; font: 400 15px/1.42 var(--serif); hyphens: auto; -webkit-hyphens: auto; }
+.hg-punkt > small { margin-left: 6px; font: italic 400 11px/1.2 var(--serif); color: var(--gra); }
+.hg-ingen { margin-top: 10px !important; font: italic 400 13.5px/1.35 var(--serif); color: var(--gra); }
+
+/* bara det ena laget har något: det får hela bredden i två spalter, och det andra står sist */
+.hg-lagen.en { grid-template-columns: minmax(0, 1fr); }
+.hg-lagen.en .hg-lag { padding: 0; border-left: 0; }
+.hg-lagen.en .hg-lag:not(.tom) { column-count: 2; column-gap: 24px; column-rule: 1px solid var(--streck); }
+.hg-lagen.en .hg-lag h3, .hg-lagen.en .hg-lag > .hg-ur { column-span: all; }
+.hg-lagen.en .hg-punkt, .hg-lagen.en .hg-grupp h4 { break-inside: avoid; }
+.hg-lagen.en .hg-grupp h4 { break-after: avoid; }
+.hg-lagen.en .hg-lag.tom { order: 2; margin-top: 16px; }
+
+/* stämplarna: bekräftat i svart, egna uppgifter i rött, åsikter streckade */
+.hg-slag { display: inline-block; box-sizing: border-box; padding: 2px 5px 1px; border: 1.2px solid var(--svart); font: 800 9.5px/1.15 var(--sans); font-style: normal; letter-spacing: 0.07em; text-transform: uppercase; white-space: nowrap; vertical-align: 1px; }
+.hg-slag.s-b { background: var(--svart); color: var(--p); }
+.hg-slag.s-h { border-color: var(--rod); color: var(--rod); }
+.hg-slag.s-o { border-style: dashed; border-color: var(--gra); color: var(--gra); }
+
+/* ---------- baksidan ---------- */
+
+.hg-kallor { column-count: 3; column-gap: 24px; column-rule: 1px solid var(--streck); }
+.hg-kalla { break-inside: avoid; margin: 0 0 14px; }
+.hg .hg-kalla h4 { display: flex; align-items: center; gap: 7px; margin: 0 0 5px; padding: 0; border: 0; font: 800 12px/1.2 var(--sans); letter-spacing: 0.06em; text-transform: uppercase; }
+.hg-kalla h4 b { display: inline-grid; place-items: center; min-width: 18px; height: 18px; padding: 0 4px; box-sizing: border-box; background: var(--gron); color: #fff; font: 700 11.5px/1 var(--rubrik); letter-spacing: 0; }
+.hg-kalla ul { margin: 0; padding: 0; list-style: none; }
+.hg-kalla li { margin: 0 0 5px; font: 400 12.5px/1.35 var(--serif); color: var(--gra); overflow-wrap: anywhere; }
+.hg-kalla li b { color: var(--svart); font-weight: 700; }
+.hg-kalla li a { text-decoration-color: rgba(92, 86, 76, 0.5); text-underline-offset: 2px; }
+.hg-stamplar { display: grid; grid-template-columns: repeat(auto-fill, minmax(260px, 1fr)); gap: 8px 24px; margin-top: 10px; padding-top: 12px; border-top: 3px solid var(--svart); }
+.hg-stamplar p { font: 400 13px/1.4 var(--serif); color: var(--gra); }
+.hg-stamplar .hg-slag { margin-right: 4px; }
+.hg-kolofon { display: flex; flex-wrap: wrap; justify-content: center; align-items: baseline; gap: 4px 12px; margin-top: 22px !important; padding-top: 10px; border-top: 1px solid var(--svart);
+  font: 600 10.5px/1.3 var(--sans); letter-spacing: 0.06em; text-transform: uppercase; color: var(--gra); text-align: center; }
+.hg-litet { color: var(--gron); font: 400 17px/1 var(--slab); letter-spacing: 0.03em; }
+
+/* ---------- smalt: en spalt ---------- */
+
+@media (max-width: 720px) {
+  body.hg-bord { padding: 10px 0 36px; }
+  .hg { gap: 10px; }
+  .hg-ark { width: calc(100% - 16px); padding: 10px 16px 22px; }
+  .hg-overrad { font-size: 9.5px; letter-spacing: 0.08em; }
+  .hg-overrad span:nth-child(2) { display: none; }
+  .hg .hg-namn { margin: 10px 0 7px; }
+  .hg-slogan { flex-wrap: wrap; row-gap: 6px; font-size: 14px; }
+  .hg-slogan span:last-child { order: 3; width: 100%; font-size: 9.5px; letter-spacing: 0.08em; text-align: left; }
+  .hg .hg-stampel { padding: 3px 7px 2px; border-width: 2px; font-size: 10px; letter-spacing: 0.16em; }
+  .hg-front { grid-template-columns: minmax(0, 1fr); }
+  .hg-vanster { padding-right: 0; }
+  .hg-matcher { margin-top: 18px; padding-left: 0; border-left: 0; }
+  .hg-hort-l { grid-template-columns: minmax(0, 1fr); }
+  .hg-hort-l article, .hg-hort-l article:first-child { padding: 12px 0 0; margin-top: 12px; border-left: 0; border-top: 1px solid var(--streck); }
+  .hg-hort-l article:first-child { margin-top: 0; padding-top: 0; border-top: 0; }
+  .hg-vinjett span { min-width: 0; font-size: 19px; }
+  .hg-vinjett em { font-size: 10px; letter-spacing: 0.05em; white-space: nowrap; }
+  .hg-lagen { grid-template-columns: minmax(0, 1fr); }
+  .hg-lag, .hg-lag:first-child { padding: 0; border-left: 0; }
+  .hg-lag + .hg-lag { margin-top: 20px; }
+  .hg-lagen.en .hg-lag:not(.tom) { column-count: 1; }
+  .hg-kallor { column-count: 1; }
+}
+@media (min-width: 721px) and (max-width: 900px) {
+  .hg-kallor { column-count: 2; }
+}
+
+@media print {
+  html, body.hg-bord { background: none; padding: 0; }
+  .hg { gap: 0; }
+  .hg-ark { width: auto; box-shadow: none; break-after: page; }
+}
