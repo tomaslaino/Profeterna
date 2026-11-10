@@ -3020,7 +3020,7 @@ ${window.RumRegister ? RumRegister.nara() : ''}
     const m = document.querySelector('script[type="importmap"]');
     const im = m ? JSON.parse(m.textContent).imports : {};
     const fil = ['environments/RoomEnvironment.js', 'geometries/RoundedBoxGeometry.js', 'utils/BufferGeometryUtils.js'].map((f) => im['three/addons/'] + f);
-    for (const href of ['rum-3d.js', 'rum-gpu.js', 'rum-fika.js', 'rum-fest.js', 'rum-tecken.js', 'rum-dans.js', 'rum-uttryck.js', im.three, ...fil]) {
+    for (const href of ['rum-3d.js', 'rum-gpu.js', 'rum-fika.js', 'rum-fest.js', 'rum-tecken.js', 'rum-dans.js', 'rum-uttryck.js', 'rum-vaxter.js', im.three, ...fil]) {
       const l = document.createElement('link');
       l.rel = 'modulepreload';
       l.href = href;

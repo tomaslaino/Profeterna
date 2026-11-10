@@ -136,6 +136,7 @@ import { festen, drakt, festklader } from './rum-fest.js';
 import { TECKEN, LOS, blanda, nasta as nastaTecken, KORS, KORS_MENY, korsChans, LAPP_HALL, LAPP_GOR, LAPP_MENY, LAPP_GREPP, lappBlanda, lappKropp } from './rum-tecken.js';
 import { uttryck, skaggUttryck, ansiktsLage } from './rum-uttryck.js';
 import { DANSER, DANS_SLAG, DANS_IN, formen } from './rum-dans.js';
+import { vaxter } from './rum-vaxter.js';
 
 const DEG = Math.PI / 180;
 const D = 1400;
@@ -146,6 +147,15 @@ const BORD = { x: -186, z: 250, r: 118, y: 32 };
 // Pennkoppen på bordet (pennkopp): var den står i bordets axlar (x åt höger,
 // z mot betraktaren) och bollens radie.
 const KOPP = { x: -88, z: 30, r: 11 };
+// Växterna (rum-vaxter.js): ampelliljan bakåt på fönsterbänkens vänstra ände
+// (LILJA, i rummet), där inget annat står hur de än sitter (DJ:s tomflaskor står
+// till höger om den) och ingen går förbi, och pilean fram till vänster på bordet
+// (PILEA, i bordets axlar som KOPP), framför pennkoppen och vänster om tårtan:
+// bordets enda fläck där varken huvudet på den som sover eller dunkar pannan i
+// bordet, händerna, skyltarna eller tårtan kommer närmare växten än 13 (uppmätt
+// i alla tre placeringarna).
+const LILJA = { x: -535, z: -60 };
+const PILEA = { x: -62, z: 84 };
 // Platserna runt bordet – till vänster, bakom och till höger: var barstolen
 // står (x, z) och hur den är vriden in mot bordet (turn), armen mot bordet
 // (inre; bakom vilar båda på bordet, och arm 0 har flaskan eller
@@ -1607,7 +1617,12 @@ export async function figurer(canvas, opt = {}) {
   ring([0, 0.1, 0], [0, 1, 0], BORD.r + 0.4, 0.9, krom, bord);
   mesh(new THREE.CylinderGeometry(15, 6, 6, 32), krom, bord).position.y = -8;
   mesh(new THREE.CylinderGeometry(4.5, 4.5, 320, 24), krom, bord).position.y = -170;
+  // färgen i hörnen: pennkoppen och växterna (samma material, så att växterna
+  // inte kostar en egen shader)
+  const FARGER = mat('#ffffff', { vertexColors: true, roughness: 0.38, clearcoat: 0.5, clearcoatRoughness: 0.2 });
   bord.add(pennkopp());
+  // Växterna: båda i en geometri, ett ritanrop (rum-vaxter.js).
+  mesh(vaxter(new THREE.Vector3(LILJA.x, SILL, LILJA.z), new THREE.Vector3(BORD.x + PILEA.x, SILL + BORD.y, BORD.z + PILEA.z)), FARGER, root);
 
   // Fotbollens yta mellan polvinklarna t0 och t0 + tl (pennkoppen), w × h bildpunkter.
   function bollTex(t0, tl, w, h) {
@@ -1716,7 +1731,7 @@ export async function figurer(canvas, opt = {}) {
     pg.setAttribute('position', new THREE.Float32BufferAttribute(pos, 3));
     pg.setAttribute('normal', new THREE.Float32BufferAttribute(nor, 3));
     pg.setAttribute('color', new THREE.Float32BufferAttribute(col, 3));
-    mesh(pg, mat('#ffffff', { vertexColors: true, roughness: 0.38, clearcoat: 0.5, clearcoatRoughness: 0.2 }), g);
+    mesh(pg, FARGER, g);
     return g;
   }
 
