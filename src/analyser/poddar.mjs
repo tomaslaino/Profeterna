@@ -13,6 +13,7 @@ import fs from 'node:fs';
 import path from 'node:path';
 import pc from '../../config/poddar.js';
 import fc from '../../config/forum.js';
+import mc from '../../config/media.js';
 import newsCfg from '../../config/news.js';
 import { jsonOf, unknownNumbers } from './kontroller.mjs';
 import { claudeSvar, Stopp } from './claude.mjs';
@@ -342,17 +343,20 @@ export async function taUt(a, utskrift, { lag, mot = null, avspark = null, spela
 
 const SAKERHET = ['b', 'h', 'o'];
 
-// Det sidan bygger på: lagets senaste poddavsnitt och forumläsningar (src/analyser/forum.mjs)
-// och deras uppgifter med vikt nog. typ: 'podd' eller 'forum'; podd är poddens eller forumets namn.
+// Det sidan bygger på: lagets senaste poddavsnitt, forumläsningar (src/analyser/forum.mjs) och
+// artiklar i de insatta medierna (src/analyser/media.mjs), och deras uppgifter med vikt nog.
+// typ: 'podd', 'forum' eller 'media'; podd är poddens, forumets eller källans namn.
 // → {lag: {namn: [{id, a, s, vikt, t, sagt, vem, podd, typ}]}, kallor: {namn: [{podd, avsnitt, datum, adress, typ}]}}
+const arPodd = (a) => !a.typ || a.typ === 'podd';
+
 export function sidansUnderlag(fil, lagen) {
   const ut = { lag: {}, kallor: {} };
   for (const lag of lagen) {
     const post = fil && fil.lag && fil.lag[lag];
     const alla = ((post && post.avsnitt) || []).filter((a) => (a.uppgifter || []).some((x) => x.id && x.vikt >= pc.minstVikt))
       .sort((a, b) => b.datum.localeCompare(a.datum));
-    // Forumet läses varje natt: dess läsningar räknas för sig, så att poddarna står kvar.
-    const avsnitt = [...alla.filter((a) => a.typ !== 'forum').slice(0, pc.sidan.avsnitt), ...alla.filter((a) => a.typ === 'forum').slice(0, fc.tillSidan)];
+    // Forumet och medierna läses varje natt: de räknas för sig, så att poddarna står kvar.
+    const avsnitt = [...alla.filter(arPodd).slice(0, pc.sidan.avsnitt), ...alla.filter((a) => a.typ === 'forum').slice(0, fc.tillSidan), ...alla.filter((a) => a.typ === 'media').slice(0, mc.tillSidan)];
     ut.lag[lag] = avsnitt.flatMap((a) => a.uppgifter.filter((x) => x.id && x.vikt >= pc.minstVikt).map((x) => ({ id: x.id, a: x.a || 'match', s: x.s, vikt: x.vikt, t: x.t, sagt: x.sagt || null, vem: x.vem || null, podd: a.podd, typ: a.typ || 'podd', datum: (x.tid || a.datum).slice(0, 10) })));
     ut.kallor[lag] = avsnitt.map((a) => ({ podd: a.podd, avsnitt: a.titel, datum: a.datum.slice(0, 10), adress: a.sida || a.apple || null, typ: a.typ || 'podd' }));
   }
@@ -456,7 +460,7 @@ export async function skrivSida(fil, lagen, { avspark = null, now = () => new Da
   let sekunder = 0;
   try {
     const system = pc.sidaPrompt.replace('{punkter}', pc.sidan.punkterPerLag).replace('{rubrikOrd}', pc.sidan.rubrikOrd).replace('{ingressOrd}', pc.sidan.ingressOrd);
-    const data = { match: lagen.join(' – '), ...(avspark ? { avspark: nowFmt.format(new Date(avspark)) } : {}), lag: Object.fromEntries(lagen.map((lag) => [lag, underlag.lag[lag].map((x) => ({ id: x.id, amne: x.a, slag: x.s, vikt: x.vikt, [x.typ === 'forum' ? 'forum' : 'podd']: x.podd, datum: x.datum, uppgift: x.t }))])) };
+    const data = { match: lagen.join(' – '), ...(avspark ? { avspark: nowFmt.format(new Date(avspark)) } : {}), lag: Object.fromEntries(lagen.map((lag) => [lag, underlag.lag[lag].map((x) => ({ id: x.id, amne: x.a, slag: x.s, vikt: x.vikt, [x.typ === 'forum' ? 'forum' : x.typ === 'media' ? 'insatta' : 'podd']: x.podd, datum: x.datum, uppgift: x.t }))])) };
     const r = await claude({ system, prompt: `Idag är det ${nowFmt.format(now())}.\n\nUnderlaget (JSON):\n${JSON.stringify(data)}`, tools: [], model: pc.model, effort: pc.sidan.effort, timeoutMs: pc.timeoutMs });
     sekunder = r.seconds;
     sida = r.refused ? null : sidaAv(r.content, underlag, lagen);
@@ -475,13 +479,14 @@ export async function skrivSida(fil, lagen, { avspark = null, now = () => new Da
 
 const SLAG = { b: 'bekräftat', h: 'hört i podden', o: 'supportrarnas åsikt' };
 const FORUMSLAG = { b: 'bekräftat', h: 'skrivet på forumet', o: 'supportrarnas åsikt' };
+const MEDIASLAG = { b: 'bekräftat', h: 'de insattas egen uppgift', o: 'de insattas åsikt' };
 
 // Det tidningen får om ett lag ur omgångens poddfil (scripts/tidning/poddar.mjs):
 // de senaste avsnittens bästa uppgifter. → [{podd, avsnitt, datum, adress, uppgifter: [{uppgift, slag}]}]
 export function poddUnderlag(fil, lag) {
   const post = fil && fil.lag && fil.lag[lag];
   if (!post || !Array.isArray(post.avsnitt)) return [];
-  const avsnitt = post.avsnitt.filter((a) => a.typ !== 'forum' && a.uppgifter && a.uppgifter.length).sort((a, b) => b.datum.localeCompare(a.datum)).slice(0, pc.avsnittTillTidningen);
+  const avsnitt = post.avsnitt.filter((a) => arPodd(a) && a.uppgifter && a.uppgifter.length).sort((a, b) => b.datum.localeCompare(a.datum)).slice(0, pc.avsnittTillTidningen);
   let kvar = pc.uppgifterPerLag;
   const ut = [];
   for (const a of avsnitt) {
@@ -504,7 +509,24 @@ export function forumUnderlag(fil, lag) {
     .map((a) => ({ forum: a.podd, tradar: (a.tradar || []).map((t) => t.titel), datum: a.datum.slice(0, 10), adress: a.sida || null, uppgifter: a.uppgifter.filter((x) => x.vikt >= pc.minstVikt).slice(0, pc.uppgifterPerLag).map((x) => ({ uppgift: x.t, slag: FORUMSLAG[x.s] || FORUMSLAG.h })) }));
 }
 
-// Avsnitten (och forumläsningarna) som ligger i poddfilen, som en nyckel: ändras den har det kommit nytt.
+// Det tidningen får ur de insatta medierna: de senaste artiklarnas bästa uppgifter.
+// → [{kalla, titel, datum, adress, uppgifter: [{uppgift, slag}]}]
+export function mediaUnderlag(fil, lag) {
+  const post = fil && fil.lag && fil.lag[lag];
+  if (!post || !Array.isArray(post.avsnitt)) return [];
+  let kvar = pc.uppgifterPerLag;
+  const ut = [];
+  for (const a of post.avsnitt.filter((x) => x.typ === 'media' && (x.uppgifter || []).some((u) => u.vikt >= pc.minstVikt)).sort((p, q) => String(q.datum).localeCompare(String(p.datum))).slice(0, mc.tillTidningen)) {
+    const u = a.uppgifter.filter((x) => x.vikt >= pc.minstVikt).slice(0, kvar);
+    if (!u.length) continue;
+    kvar -= u.length;
+    ut.push({ kalla: a.podd, titel: a.titel, datum: String(a.datum).slice(0, 10), adress: a.sida || null, uppgifter: u.map((x) => ({ uppgift: x.t, slag: MEDIASLAG[x.s] || MEDIASLAG.h })) });
+    if (kvar <= 0) break;
+  }
+  return ut;
+}
+
+// Avsnitten (forumläsningarna och artiklarna) som ligger i poddfilen, som en nyckel: ändras den har det kommit nytt.
 export function poddNyckel(fil) {
   if (!fil || !fil.lag) return '';
   return Object.values(fil.lag).flatMap((p) => (p.avsnitt || []).filter((a) => a.uppgifter && a.uppgifter.some((x) => x.vikt >= pc.minstVikt)).map((a) => a.id)).sort().join(',');

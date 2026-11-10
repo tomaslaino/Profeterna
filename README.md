@@ -1782,7 +1782,7 @@ de flesta körningar har inget att göra och anropar inte Claude.
   det är högst 24 timmar kvar till avspark. Har matcherna ändrats skrivs de nya vid nästa kontroll.
 - **Hasse Backes text** direkt efter varje analys.
 - **Tidningen inför omgången** så snart omgången finns, och sedan måndag 17.00 och fredag 16.00, och när
-  supporterpoddarna eller supporterforumen har gett nya uppgifter (se nedan).
+  supporterpoddarna, supporterforumen eller de insatta medierna har gett nya uppgifter (se nedan).
 - **Kommentaren till en färdig kupong** när kupongen finns i den publicerade historiken.
 
 **En analys** är ett anrop till `claude -p`: Claude söker och läser på nätet (högst 6 sökningar och
@@ -1984,6 +1984,53 @@ forumen. 11 av de 26 lagen har ett forum, alla 11 lästes (tre trådar och 12–
 1–10 per lag, på 13–46 sekunder per lag. 8 sidor skrevs om; där både podden och forumet hade något (Newport, Colchester)
 står de bredvid varandra, och redaktören slog ihop det de båda sa. Inför provet prövades alla 92 lag: av forumen
 agenterna hittade gick 44 att läsa, och läsaren fick ut inlägg med namn och tid ur alla 44.
+
+**De insatta medierna** (2026-11-10, användarens önskan: *mer information om stryktipslagen än från lagforumen och
+de transkriberade poddavsnitten – den mest relevanta informationen som står i alternativa medier men som är
+initierade*): samma nattjobb letar, efter forumen och före poddarna, upp veckans artiklar om varje lag i omgången i de
+oberoende medier som följer laget på nära håll ([src/analyser/media.mjs](src/analyser/media.mjs), gränserna, de
+uteslutna sajterna och prompterna i [config/media.js](config/media.js)). Uppgifterna hamnar bredvid poddarnas och
+forumens: på informationssidan och, under *ur insatta medier*, i tidningens underlag.
+
+```
+omgångens lag → claude -p söker (WebSearch) → artiklarna läses av jobbet själv → claude -p tar ut (utan verktyg) → omgang.json
+```
+
+- **Vad som räknas:** fansajter och fanzines med egna skribenter, klubbnära nyhetsbrev (Substack o.d.) och bloggar,
+  oberoende lokala reportrar med egen sajt och supporterföreningens egna besked. Inte de stora mediehusen och deras
+  lokaltidningar (BBC, Sky, de nationella tidningarna, Reach, National World, Newsquest), klubbens och ligans sajter,
+  spelsajter, aggregatorer som skriver om alla klubbar (Football League World, TEAMtalk, GiveMeSport …), statistiksajter,
+  forum, sociala medier eller poddarnas värdar. Prompten säger det, och `utesluten` i config/media.js stryker de
+  sajterna ur svaret ändå.
+- **Sökningen:** ett anrop per lag, bara `WebSearch` (högst sex sökningar), som väljer högst fyra artiklar från de
+  senaste åtta dagarna, helst från olika källor och en förhandstitt på just nästa match först. En adress följer bara
+  med om den kom upp i en sökning, så att en påhittad adress faller bort av sig själv.
+- **Läsningen** görs av jobbet, som forumen: med namnet *Matchfixarna/1.0 (forumlasare)* och samma regler i robots.txt
+  (Claude-User; säger sajten nej till AI-assistenters läsning läses den inte). Artikelns rubrik, datum och skribent tas
+  ur sidans metadata och JSON-LD, texten ur `<article>` (annars `<main>`) utan meny, sidfot och inbäddat. En artikel
+  som är äldre än åtta dagar, kortare än 500 tecken (en puff eller en betalvägg) eller spärrad hoppas över.
+- **Uppgifterna:** Claude får artiklarna numrerade, med källa, rubrik, datum och skribent, och tar ut allt som är
+  intressant inför matchen, högst åtta per lag, med samma ämnen, slag och vikt som poddarnas. Citatet ska stå
+  ordagrant i artikeln (annars stryks uppgiften), och vem som säger det (tränaren, en spelare eller skribenten)
+  följer bara med om namnet står i artikeln. Varje artikel sparas som en egen post (`typ: 'media'`), och en artikel
+  som redan är läst med samma text läses inte av Claude igen; de sex nyaste per lag ligger kvar.
+- **Sidan och tidningen:** sidan tar lagets tre senaste artiklar (utöver de tre senaste poddavsnitten och de två
+  senaste forumläsningarna), och redaktören tar med det bästa ur alla tre slagen och slår ihop det som sägs på flera
+  håll. Sidan har nu plats för tolv punkter per lag, och sex citat. Tidningens notiser får de två senaste
+  artiklarnas bästa uppgifter, och artiklarna räknas som lästa källor. På sidorna står källans namn, och en
+  uppgift som är de insattas egen har stämpeln *Enligt insatta*.
+
+```
+node scripts/tidning/poddar.mjs --bara-media                          bara de insatta medierna, för omgångens lag
+node scripts/tidning/poddar.mjs --utan-media                          utan dem
+node scripts/tidning/poddar.mjs --lag "Blackpool" --mot "AFC Wimbledon" --bara-media --fil prov-media.json
+```
+
+Provat 2026-11-10 utan nät, i Node med påhittade sidor och påhittade svar från Claude: att sökningens adresser
+stryks när de inte kom upp eller hör till en utesluten sajt, att rubrik, datum, skribent och text tas ur sidan, att
+robots.txt, en för gammal artikel och ett citat som inte står i artikeln stoppar, och att artiklarna når
+informationssidan, tidningens underlag och nyckeln som skriver om tidningen. Inte provat på iMacen med riktiga
+sökningar: den första riktiga körningen är natten efter att ändringen kommit till main.
 
 **Rösten** står i [prompts/analys-rost.md](prompts/analys-rost.md): Sixten Bråvall, en påhittad
 tränare med egen bakgrund i klubbar som inte finns och egna stående uttryck. Filen går att
@@ -6925,12 +6972,13 @@ omgången (sammanställningen kräver tjänsten), att ta sin kupong ur högen, i
   när rubriken gäller en match), annars den jämnaste matchen som inte har börjat: rubriken, ingressen, texten med
   anfang och utan källhänvisningarna i klamrar, och i en ruta hans tecken, marginalen och motiveringen. Källorna står
   sist.
-- *Supportrarna*: en informationssida per match ur `data/poddsidor.json` (se *Supporterpoddarna* och
-  *Supporterforumen* under [Analyserna](#analyserna)), i kupongens ordning: rubrik och ingress, hemmalaget till
-  vänster och bortalaget till höger med poddarna och forumet de bygger på, och punkterna under sina ämnen. Varje punkt
-  har slaget som stämpel (*Bekräftat* i svart, poddens eller forumets egen uppgift i rött – *Hört i podden*, *Från
-  forumet* eller *Hört bland supportrarna* när båda säger det – och *Supportrarnas åsikt* streckad), och de tyngsta
-  har citatet under, med den som säger det och podden, eller användarnamnet och forumet. Har bara det ena laget något
+- *Supportrarna*: en informationssida per match ur `data/poddsidor.json` (se *Supporterpoddarna*,
+  *Supporterforumen* och *De insatta medierna* under [Analyserna](#analyserna)), i kupongens ordning: rubrik och
+  ingress, hemmalaget till vänster och bortalaget till höger med poddarna, forumet och de insatta medierna de bygger
+  på, och punkterna under sina ämnen. Varje punkt
+  har slaget som stämpel (*Bekräftat* i svart, källans egen uppgift i rött – *Hört i podden*, *Från forumet*,
+  *Enligt insatta* eller *Hört bland supportrarna* när flera säger det – och *Supportrarnas åsikt* streckad), och de
+  tyngsta har citatet under, med den som säger det och podden, användarnamnet och forumet, eller källans namn. Har bara det ena laget något
   får det hela bredden i två spalter. Slagen förklaras i sidfoten.
   *I tidningen* pekar på den första av sidorna.
 
@@ -6998,9 +7046,13 @@ i Safari eller i en riktig telefon.
 
 #### Helgarderat
 
-Helgarderat är namnet på tidningen med det supportrarna vet (2026-11-10: "Kalla tidningen för Helgarderat"). Ett utkast
+Helgarderat är namnet på tidningen med det supportrarna vet (2026-11-10: "Kalla tidningen för Helgarderat"). Den
 ligger på sajten som en egen sida, [matchfixarna.se/helgarderat.html](https://matchfixarna.se/helgarderat.html)
-("gör ett utkast av tidningen Helgarderat så att man får se hur den ser ut. Lägg ut på sajten"). Var namnet ska stå i
+("gör ett utkast av tidningen Helgarderat så att man får se hur den ser ut. Lägg ut på sajten"), och visar veckans
+omgång av sig själv: informationssidorna i `data/poddsidor.json`, som nattjobbet på iMacen skriver inför varje omgång
+ur poddarna, forumen och de insatta medierna (se [Analyserna](#analyserna)), så länge omgångens sista match är högst
+tre dagar gammal (2026-11-10: "Ordnas det här automatiskt inför varje omgång nu? Det ska det ju"). Då står veckan i
+huvudet och ingen stämpel. Annars visar den provnumret (*Nr 1*, med stämpeln *Provnummer*). Var namnet ska stå i
 rummet, på hela tidningen bakom löpsedeln, bara på poddsidorna eller på en egen tidning, är inte bestämt, så rummet är
 orört. Sidan har noindex och ingen länk från resten av sajten.
 
@@ -7009,9 +7061,12 @@ flaskgrönt, namnet i Alfa Slab One och till vänster om det rutorna 1, X och 2,
 är 3 kr, tre rader. Framsidan har en stämpel, *Provnummer*, och ettan och tvåan är matcherna med flest uppgifter, helst
 där båda lagen har något (`storst` i [public/helgarderat.js](public/helgarderat.js)). Ettan har ett stort citat, helst
 om truppen och med ett namn. Bredvid står *Lördagens matcher* med sidnumren och under *Hört bland supportrarna*, med en
-egen uppgift (slaget h) ur var och en av tre andra matcher. Sedan kommer en sida per match med lagen bredvid varandra,
+egen uppgift (slaget h) ur poddarna eller forumen, ur var och en av tre andra matcher, och *De insatta skriver*, med en
+uppgift ur de insatta medierna ur tre matcher som inte redan står på framsidan, när det finns. Sedan kommer en sida per match med lagen bredvid varandra,
 uppgifterna under sina ämnen, stämplarna och citaten. Har bara det ena laget något får det hela bredden i två spalter.
-Baksidan har källorna per match, med länkar till avsnitten och forumtrådarna, och stämplarna. Texterna för slagen,
+Baksidan har källorna per match, med länkar till avsnitten, forumtrådarna och artiklarna, och stämplarna. De
+insattas egna uppgifter har stämpeln *Enligt insatta* i grönt, och källans namn står vid punkten när laget har flera
+källor. Texterna för slagen,
 ämnena och förklaringarna kommer från `RumTidning.TEXT.poddar`, så att det står samma sak i båda tidningarna. Under
 720 px är allt en spalt.
 
@@ -7019,11 +7074,20 @@ Innehållet är provomgången som poddjobbet gjorde på iMacen 2026-11-10 (`prov
 One och Two den 14 november). Den ligger i [public/helgarderat/utkast.json](public/helgarderat/utkast.json) och är
 uttagen med `poddsidor` i src/analyser/poddar.mjs, samma uttag som `data/poddsidor.json`, så att varken utskrifterna
 eller de engelska citaten följer med. Numren är 1–12 i kupongens ordning, utan luckan efter matchen som saknade sida.
+De insatta medierna lades till för hand 2026-11-10, innan nattjobbet hade läst något: elva uppgifter om fem lag
+(Blackpool ur The Bloomfield Bulletin, Gillingham ur Gills Journal, Port Vale ur The Valiant, Salford ur SalfordNow,
+Shrewsbury ur A Large Grouse och Shropshire Live), alla från 4–9 november. De letades fram med sökningar i en
+molnmiljö där sidorna inte gick att öppna, så de bygger på det sökträffarna säger om artiklarna och har inga citat;
+nattjobbet läser artiklarna själv och tar citaten ordagrant ur dem. För de andra nitton lagen hittades inget från
+veckan i oberoende medier, eller så räckte sökningarna inte till.
 
 Provat med en provserver (public/ ur arbetskopian och resten från matchfixarna.se) i webbläsarpanelen, i 1280 × 900 och
 375 × 812, och med huvudlös Chrome i 1280 bredd: framsidan, en sida där båda lagen har något, en där bara det ena har
 det (Wigan–Barnsley), baksidan och att inget sticker ut åt sidan i telefonen. Inte provat i Safari eller i en riktig
-telefon.
+telefon. De insatta medierna och veckans omgång provades 2026-11-10 i huvudlös Chromium med public/ ur arbetskopian
+(utan sköldarna), i 1280 bredd och 390 × 844: rutan *De insatta skriver*, en sida där ett lag bara har de insatta
+(Blackpool), baksidan, inget fel i konsolen och inget som sticker ut åt sidan, och med en påhittad
+`data/poddsidor.json` att veckans omgång visas utan provstämpel och att provnumret kommer tillbaka utan den.
 
 ### Närbilderna
 
