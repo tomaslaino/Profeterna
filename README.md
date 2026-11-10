@@ -6117,8 +6117,8 @@ utan att säga vem han menar (`domar.revisorn`, `domar.borta`).
 **Tidningen** (2026-11-09). Har det gått dåligt för honom i tippningen låtsas han vara upptagen: han gömmer sig bakom
 dagens morgontidning, skyldig men nöjd med sig själv. Har man just kommit läser han redan; han läser rad för rad, tittar upp
 över kanten på en med höjda bryn och ler sedan belåtet, lyfter tidningen så att bara ögonen syns, nickar åt det som står,
-rycker den rak och tittar längs baren, och mellan gångerna lägger han den i knät bakom disken en stund (klippen `lasa` och
-`lasa2`, byggda av bitarna i `LASBIT` i [public/rum-hasse-3d.js](public/rum-hasse-3d.js)). Ur knät lyfter han den med
+rycker den rak och tittar längs baren, och mellan gångerna lägger han den i knät bakom disken en stund (klippen `lasa` till
+`lasa5`, byggda av bitarna i `LASBIT` i [public/rum-hasse-3d.js](public/rum-hasse-3d.js)). Ur knät lyfter han den med
 händerna lågt, rakt upp bakom diskens kant tills den är över den, och för den sedan fram över disken och flyttar upp
 händerna; i knät hänger armarna nedåt. Han läser den som man läser något i knät: lågt framför sig, strax över disken och
 lite åt sin högra sida, uppslagen och halvt hopvikt, och lutad framåt så att sidorna vänds upp mot hans ögon, med
@@ -6131,14 +6131,37 @@ som ett V med ryggen mot en och överkanten lite framåt, så att båda sidorna 
 önskemål 2026-11-10; vriden bara åt ena hållet vändes den andra halvan, förstasidan eller vädret, rakt mot en). Innan han
 lägger ned den för han in den framför sig igen och upp över diskens kant. Ingen del av tidningen går ned i disken i något av
 klippen (räknat var hundradels sekund: som lägst 14 enheter över skivan, när ryggen passerar diskens kant; provat i
-headless Chromium med mjukvarugrafik i 1280 × 800 och i telefonen, 412 × 915, med bilder genom `lasa` och `lasa2`, 2026-11-10).
+headless Chromium med mjukvarugrafik i 1280 × 800 och i telefonen, 412 × 915, med bilder genom alla fem klippen, 2026-11-10).
 Behöver han händerna, som när han
 slår en dom i disken, läser han klart raden och lägger ned den direkt. Dåligt är inte ett rätt, sämst i gänget, eller rätten
 långt under vad chanserna var värda, med tävlingskupongen om han spelade och annars det han sa (`hansOmgang` och `efterat` i
 [public/rum-hasse.js](public/rum-hasse.js)); det gäller både när han säger hur det gick och när han dömer gänget. Med
 minskad rörelse läser han inte.
 
-Han läser Dagens Nyheter (`lasa`) eller Svenska Dagbladet (`lasa2`), och de ska se ut som de riktiga (Tomas önskemål
+I tre av de fem klippen (`lasa3`, `lasa4` och `lasa5`, 2026-11-10, Tomas önskemål: han läser men låtsas lite, som Walter i
+*The Big Lebowski*, att han inte hade fel) står det något i tidningen som säger att han hade fel. Han medger ingenting:
+antingen är det tidningen som har fel, eller så har inget hänt, och det visar han med eftertryck. Det är fem nya bitar som
+blandas med de vanliga:
+
+- `skaka`: blicken stannar mitt i raden, brynen dras ihop och han skakar långsamt på huvudet åt det som står, fnyser och
+  ger tidningen en knäpp. Sedan tittar han upp på en med höjda bryn och ett snett leende (har du sett, vilket trams?).
+- `resultat`: leendet försvinner och han stirrar på raden och håller andan, blinkar två gånger, och tidningen sjunker
+  ihop. Så rycker han den rak med ett prassel, sträcker på sig med hakan upp och blicken rakt fram förbi en, nickar
+  bestämt och ler igen, som om inget har hänt.
+- `harJagFel`: ögonen upp på en och huvudet halvvägs upp, brynen ned och inget leende, och två korta, bestämda nickar mot
+  en. Han håller blicken en stund och pustar belåtet: nej, just det.
+- `lugn`: han sänker tidningen lite, drar ett djupt andetag med slutna ögon och axlarna uppe, andas ut länge och tittar
+  på en med ett alldeles för lugnt leende och en långsam nick.
+- `vika`: leendet försvinner och han viker ihop tidningen till hälften med ett prassel, sträcker på sig med hakan upp
+  och nickar bestämt (så, det var det). Sedan slår han upp den igen och läser vidare. Helt hopvikt hamnade händerna
+  tätt ihop framför bröstet och armarna syntes inte, därför bara till hälften.
+
+Fnysningen, utandningen och prasslet räknas fram med Web Audio som de andra ljuden (`fnys`, `anda` med `pust` och
+`prassel` i [public/rum-hasse-ljud.js](public/rum-hasse-ljud.js); `ljud` i bitarna) och hörs bara med ljudet på. De är
+räknade fram i en `OfflineAudioContext` (toppar 0,06–0,10, som andetaget på glasögonen) men inte lyssnade på. Bitarna är provade bild för bild i headless Chromium (1280 × 800), med närbilder av
+ansiktet, och tidningen går inte ned i disken i något av de nya klippen (samma räkning som ovan).
+
+Han läser Dagens Nyheter (`lasa`, `lasa3` och `lasa5`) eller Svenska Dagbladet (`lasa2` och `lasa4`), och de ska se ut som de riktiga (Tomas önskemål
 2026-11-09): tabloid på grått tidningspapper, med namnet i tidningens stil (skrivet som text, inte loggan: DN:s i en Bodoni,
 Playfair Display i [public/typsnitt.css](public/typsnitt.css), SvD:s i spärrade versaler), dagens datum, nummer, årgång och pris,
 tre puffar med små bilder, en stor bild och dagens nyhet med vinjett, rubrik, ingress och sidhänvisning, och innehållet längst
