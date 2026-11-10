@@ -76,7 +76,9 @@
 /* papperet är tryckt i sitt eget mått (--k ner till 80 × 120) */
 .rum-aff.pa-skivan .ark { transform: scale(var(--k)); transform-origin: 0 0; }
 /* en skruv i varje hörn: en bricka och ett stjärnspår, åt olika håll som
-   när man har skruvat dem för hand */
+   när man har skruvat dem för hand. Spåret är en liten SVG: två gradienter i
+   små rutor (background-size) avrundades till hela bildpunkter och hamnade
+   bredvid varandra, så att korset blev ett krokigt tecken nära. */
 .rum-aff .skruv {
   position: absolute;
   width: 5.2px;
@@ -92,8 +94,7 @@
   inset: 1px;
   border-radius: 50%;
   background:
-    linear-gradient(0deg, rgba(0, 0, 0, 0) 41%, #2c2b27 41% 59%, rgba(0, 0, 0, 0) 59%) center / 72% 100% no-repeat,
-    linear-gradient(90deg, rgba(0, 0, 0, 0) 41%, #2c2b27 41% 59%, rgba(0, 0, 0, 0) 59%) center / 100% 72% no-repeat,
+    url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 20 20'%3E%3Cpath d='M10 3.6v12.8M3.6 10h12.8' stroke='%23fbfaf3' stroke-opacity='.55' stroke-width='3.4' stroke-linecap='round' transform='translate(.45 .55)'/%3E%3Cpath d='M10 3.6v12.8M3.6 10h12.8' stroke='%232c2b27' stroke-width='3.4' stroke-linecap='round'/%3E%3Ccircle cx='10' cy='10' r='1.5' fill='%23171613'/%3E%3C/svg%3E") center / 100% 100% no-repeat,
     radial-gradient(circle at 38% 32%, #f4f3ea 0, #bdbcb0 60%, #8f8e82 100%);
   box-shadow: 0 0 0.3px rgba(0, 0, 0, 0.5);
 }

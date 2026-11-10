@@ -793,6 +793,14 @@ bara lokalt. Analyserna visas som de ligger i `data/analyser.json`; hur de skriv
   det helt på väggen mellan karmen och veckans löpsedel, en bit ovanför bänken och lite mindre (23 × 29 i stället för
   27 × 34), hänger rakt och ligger nästan plant, med två korta tejpbitar över överkanten. Se
   [Tobaksaffären](#tobaksaffären), *Radion*.
+- **Det går att förstå vad som är vad vid radion, och skruvarna är kryss (2026-11-10, användarens önskemål):**
+  "Alltså man förstår inte riktigt vad det är som händer här. Dessutom är det något konstigt med skruven som sätter
+  fast chelsea-löpsedeln." Under bladet låg en halvgenomskinlig ruta på väggen: prickarna i fönsterbänkens sten
+  fyllde filtrets hela rektangel, också trianglarna utanför bänkens sneda ändar. Nu klipps de efter bänken. Karmen
+  var en slät mörk platta nära; nu har den en ljus ytterkant och en fals i skugga mot glaset och mittposten, så att
+  den syns som en karm (i rummet på håll knappt märkbart). Skruvarnas stjärnspår var två gradienter i små rutor som
+  avrundades till hela bildpunkter, så att korset blev ett krokigt tecken nära; nu är spåret en liten SVG. Se
+  [Tobaksaffären](#tobaksaffären), *Radion* och *Affischerna*.
 - **Man väljer sig själv med ett klick på sin figur (2026-11-03, användarens önskemål):**
   ett klick på sin egen figur vid bordet gör en till den som fyller i kupongen – samma val
   som porträtten på kupongen – och figuren räcker upp handen med pennan, lyfter kupongen mot
@@ -3383,7 +3391,9 @@ ned till frekvensen (`tejpPlats`). Ett tryck på ett namn går dit, byter band o
 spiralblock som är tejpat på väggen till höger om radion (`radiolapp` i rum-inredning.js, en egen duk i bakväggens
 plan, så att det sitter fast på väggen när rummet vrids). Det sitter helt i väggremsan mellan fönsterkarmen och
 veckans löpsedel, med luft till båda och en bit ovanför fönsterbänken, så att det inte går över karmens kant eller
-ned till bänken (`LAPP`). Bladet är i 3D: rivet ur spiralen med halva hål, blå linjer och röd marginal och vikt en
+ned till bänken (`LAPP`). Nära, där det syns, ska omgivningen gå att förstå: karmen har en profil (ljus ytterkant
+och en fals i skugga mot glaset, `KARM` i rum.js) i stället för att vara en slät mörk platta, och fönsterbänken slutar
+med en ren sned kant under bladet (stenens prickar klipps efter bänken, `sill`). Bladet är i 3D: rivet ur spiralen med halva hål, blå linjer och röd marginal och vikt en
 gång. Det hänger rakt, med två korta bitar gulnad tejp över överkanten en bit in från hörnen, och ligger nästan
 plant mot väggen: nedtill står det ut en aning, med en tät skugga. Papperet har samma struktur som allt papper
 på sajten (rum/papper.webp), fibrer och en kaffering, och mörknar med rummet när lysröret släcks. Bladet är lagom
@@ -3647,7 +3657,8 @@ LÖSSNUS.
 ([public/rum-affischer.js](public/rum-affischer.js), rum-affischer.css; rum-saker.js sätter upp
 dem): en plywoodskiva i två kedjor från karmen, i årsordning (IFK 1982 och Nacional 1988 överst,
 VM 94 och Chelsea 2021 under), lika stora (80 × 120), raka och alltid på samma ställe. Det ska
-synas att en person har hand om det: en skruv med bricka i varje hörn, en Dymo-remsa under varje
+synas att en person har hand om det: en skruv med bricka i varje hörn (stjärnspåret är en liten SVG, så att det är
+ett rent kryss också i närbilden), en Dymo-remsa under varje
 sedel, blyertsmåtten står kvar på skivan och vattenpasset ligger ovanpå, med bubblan mitt
 emellan strecken. Måtten (`SKIVA`) delas med rum-inredning.js, som ritar skivan, kedjorna, remsorna
 och passet i 3D en gång (`skiva`, duken `skiva` i `#rum-skiva`) och skarpare i närbilden. Sedlarna

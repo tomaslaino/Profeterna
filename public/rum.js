@@ -294,6 +294,13 @@ window.Rum = (() => {
   <line x1="1265" y1="-12" x2="${X1}" y2="-12" stroke="#b09a74" stroke-opacity=".22" stroke-width="1.4"/>`, 'rum-tak', [X0, Y0, X1 - X0, 4 - Y0], 0.25);
   }
 
+  // Karmens profil: ljuset fångas i ytterkanten, och mot glaset (och mittposten) ligger en fals i skugga,
+  // så att karmen syns som en karm också nära (vid radion), där den annars var en slät mörk platta.
+  const KARM = `<g fill="none"><path d="M262.6 568 V122.6 H957.4 V568" stroke="#d8d0bc" stroke-opacity=".2" stroke-width="1.2"/>
+    <path d="M264.4 568 V124.4 H955.6 V568" stroke="#000" stroke-opacity=".18" stroke-width="1"/>
+    <g stroke="#000" stroke-opacity=".5" stroke-width="1.6"><rect x="${WIN.x - 0.8}" y="${WIN.y - 0.8}" width="${WIN.w + 1.6}" height="${WIN.h + 1.6}"/><path d="M603.2 132 V558 M616.8 132 V558"/></g>
+    <g stroke="#cfc8b6" stroke-opacity=".12" stroke-width="1"><path d="M610 132.5 V558"/></g></g>`;
+
   function bg() {
     return svg(`${DEFS}
   <polygon points="0,0 1250,0 1140,90 0,90" fill="url(#rum-ceil)"/>
@@ -334,6 +341,7 @@ window.Rum = (() => {
   </g>
   <rect x="604" y="132" width="12" height="426" fill="#3a3a3c"/>
   <rect x="262" y="558" width="696" height="12" fill="#2c2c2e"/>
+  ${KARM}
   <path d="M940 122 l18 0 l0 30 l-9 -6 l-4 10 l-5 -12 z" fill="#8e8064" opacity=".5"/>
 
   ${disk()}
@@ -515,10 +523,15 @@ window.Rum = (() => {
     }).catch(() => { /* utan moduler: pulten utan ringar */ });
   }
 
+  // Fönsterbänken: skivan ovanifrån (en trapets, bredare framtill) och kanten framför. Prickarna i stenen
+  // klipps efter skivan: bruset fyller annars filtrets hela rektangel, och trianglarna utanför de sneda
+  // ändarna låg som en halvgenomskinlig ruta på väggen (syns nära radion, under bladet vid den).
   function sill() {
     const S = 568;
-    return svg(`<polygon points="262,${S - 14} 958,${S - 14} 984,${S + 10} 236,${S + 10}" fill="url(#rum-sill)"/>
-  <polygon points="262,${S - 14} 958,${S - 14} 984,${S + 10} 236,${S + 10}" filter="url(#rum-prick)" opacity=".6"/>
+    const yta = `262,${S - 14} 958,${S - 14} 984,${S + 10} 236,${S + 10}`;
+    return svg(`<clipPath id="rum-sill-yta"><polygon points="${yta}"/></clipPath>
+  <polygon points="${yta}" fill="url(#rum-sill)"/>
+  <polygon points="${yta}" filter="url(#rum-prick)" opacity=".6" clip-path="url(#rum-sill-yta)"/>
   <rect x="236" y="${S + 10}" width="748" height="12" fill="#4a453c"/>
   <g stroke="#cfc6b0" stroke-opacity=".45" stroke-width="1.6"><line x1="300" y1="${S + 10}" x2="342" y2="${S + 10}"/><line x1="610" y1="${S + 10}" x2="628" y2="${S + 10}"/><line x1="880" y1="${S + 10}" x2="930" y2="${S + 10}"/></g>
   <rect x="236" y="${S + 22}" width="748" height="6" fill="#000" opacity=".3" filter="url(#rum-b4)"/>`, '', [220, 540, 780, 75]) +
