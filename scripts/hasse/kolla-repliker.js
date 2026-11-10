@@ -138,7 +138,7 @@ for (const t of blockTexter(block.TEXT)) {
   if (!/[.?!]$/.test(t) && !/^[A-ZÅÄÖ][a-zåäö]+( [a-zåäö]+){1,4}$/.test(t)) fel.push(`protokollet: "${t}" saknar punkt`);
 }
 
-// Tidningen bakom löpsedeln (public/rum-tidning.js) sägs inte heller. Det som är underkänt gäller, en mening ska
+// Kvällstidningen på pulten (public/rum-tidning.js) sägs inte heller. Det som är underkänt gäller, en mening ska
 // sluta med punkt (rubrikerna har ingen, och orden i tabellerna är kortare än fem ord), och i krönikan säger Hasse ni och er.
 const tidningsTexter = (o, vag = '') => (typeof o === 'string' ? [[vag, o]] : typeof o === 'function' ? [[vag, o(9, 11, '1–0', 18)]]
   : Array.isArray(o) ? o.flatMap((x) => tidningsTexter(x, vag)) : Object.entries(o).flatMap(([k, v]) => tidningsTexter(v, vag ? `${vag}.${k}` : k)));
