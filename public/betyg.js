@@ -47,11 +47,6 @@ window.Betyg = (() => {
     return v > 0 ? `+${t} kr` : v < 0 ? `−${t} kr` : '0 kr';
   };
   const merit = (x) => x.toLocaleString('sv-SE', { maximumFractionDigits: 1 });
-  const surname = (n) => {
-    const s = String(n || '');
-    const i = s.indexOf(' ');
-    return i > 0 ? s.slice(i + 1) : s;
-  };
   const took = (p) => p && !p.none && p.n > 0;
 
   // ---------- ämnena ----------
@@ -282,7 +277,7 @@ window.Betyg = (() => {
     if (!b) return '';
     const cols = b.people;
     const top = Math.max(...cols.map((p) => p.merit));
-    const head = cols.map((p) => `<th scope="col" title="${esc2(p.g.name)}">${face(p.g)}<span>${esc2(surname(p.g.name))}</span></th>`).join('');
+    const head = cols.map((p) => `<th scope="col" title="${esc2(p.g.name)}">${face(p.g)}<span>${esc2(Tippoang.kallas(p.g))}</span></th>`).join('');
     const body = SUBJECTS.filter((sub) => cols.some((p) => p.grades[sub.key])).map((sub) => {
       const cells = cols.map((p) => {
         const x = p.grades[sub.key];
@@ -295,7 +290,7 @@ window.Betyg = (() => {
     const foot = cols.map((p) => `<td><b class="bg-merit${p.merit === top && cols.length > 1 ? ' is-top' : ''}">${merit(p.merit)}` +
       `${p.merit === top && cols.length > 1 ? ring(`betyg-merit-${p.g.id}`, 'bg-ring bg-ring-merit') : ''}</b></td>`).join('');
     const max = Math.max(...cols.map((p) => p.max));
-    const notes = cols.map((p) => `<li>${face(p.g)}<span class="bg-who">${esc2(surname(p.g.name))}</span><span class="bg-note">${esc2(p.omdome)}</span></li>`).join('');
+    const notes = cols.map((p) => `<li>${face(p.g)}<span class="bg-who">${esc2(Tippoang.kallas(p.g))}</span><span class="bg-note">${esc2(p.omdome)}</span></li>`).join('');
     const when = b.last ? new Date(b.last) : new Date(now);
     const date = when.toLocaleDateString('sv-SE', { day: 'numeric', month: 'long', year: 'numeric' });
     return '<div class="pp-wrap bg-wrap"><article class="pp bg" aria-label="Betyg för säsongen">' +

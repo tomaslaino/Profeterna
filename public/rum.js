@@ -382,14 +382,15 @@ window.Rum = (() => {
   }
 
   // Visitkortet: fäst med ett mässingsstift på väggen mellan stationsuret och
-  // orakelramen, lite snett. Namnet, våra autografer – efternamnet i var och ens
-  // handstil och bläck, som på kupongen (samtal.css) – och devisen från Om oss.
-  // Ett klick går fram till det (närbilderna, sak). Kortet ritas i sina egna
-  // mått (440 × 285) och förminskas till scenens (rum.css).
-  const VISIT = [['Laino', 'M3 9 C30 14 70 13 116 4'], ['Tejder', 'M2 6 C28 15 64 3 92 10 S112 12 118 6'], ['Johansson', 'M4 11 C40 4 82 15 118 7']];
+  // orakelramen, lite snett. Namnet, våra autografer – det vi kallas
+  // (Tippoang.kallas: efternamnet, Dogge för Johansson) i var och ens handstil
+  // och bläck, som på kupongen (samtal.css), med hela namnet tryckt under – och
+  // devisen från Om oss. Ett klick går fram till det (närbilderna, sak). Kortet
+  // ritas i sina egna mått (440 × 285) och förminskas till scenens (rum.css).
+  const VISIT = [['Daniel Laino', 'M3 9 C30 14 70 13 116 4'], ['Daniel Tejder', 'M2 6 C28 15 64 3 92 10 S112 12 118 6'], ['Daniel Johansson', 'M4 11 C40 4 82 15 118 7']];
   function kortHtml() {
-    const gang = VISIT.map(([n, d], i) => `<span class="vk-k${i}"><i>${n}</i>` +
-      `<svg viewBox="0 0 120 18" aria-hidden="true"><path d="${d}"/></svg><small>Daniel ${n}</small></span>`).join('');
+    const gang = VISIT.map(([n, d], i) => `<span class="vk-k${i}"><i>${Tippoang.kallas(n)}</i>` +
+      `<svg viewBox="0 0 120 18" aria-hidden="true"><path d="${d}"/></svg><small>${n}</small></span>`).join('');
     return `<a class="rum-sak rum-kort" ${KNAPP} data-sak="kort" aria-label="Visitkortet" id="rum-kort"><span class="vk">` +
       '<span class="vk-namn"><img src="logo.svg" alt="" width="28" height="28" draggable="false"><b>Matchfixarna</b></span>' +
       `<span class="vk-gang">${gang}</span>` +
@@ -1980,14 +1981,14 @@ ${window.RumRegister ? RumRegister.nara() : ''}
 
   // Skårtavlan: Tipsligan, säsongens ställning i gänget – samma poäng som
   // ställningen i Olympen (kampRounds i kampen.js, med omgången som pågår),
-  // lika placering vid lika poäng och antal rätt. Efternamnen, och Dogge för
-  // Johansson. Före första omgången står bara namnen där, och den som inte har
+  // lika placering vid lika poäng och antal rätt. Namnen som överallt
+  // (Tippoang.kallas: efternamnet, Dogge för Johansson). Före första omgången
+  // står bara namnen där, och den som inte har
   // tippat än (Hasse Backe före sin första omgång) står sist utan poäng.
   // En plastbokstav per tecken, var och en lite sned i sitt spår (samma frö
   // varje gång, så att inget flyttar sig när tavlan fylls om). Lådan har
   // fyra O – sedan får det bli nollor.
-  const SMEKNAMN = { DJ: 'Dogge' };
-  const tavelnamn = (p) => SMEKNAMN[p.id] || (typeof kampSurname === 'function' ? kampSurname(p.name || p.id) : p.name || p.id);
+  const tavelnamn = (p) => Tippoang.kallas(p);
   function liga() {
     const rounds = typeof kampRounds === 'function' ? kampRounds().list : [];
     const people = typeof Tippoang !== 'undefined' ? Tippoang.season(rounds).people : [];

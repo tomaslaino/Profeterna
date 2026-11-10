@@ -26,7 +26,6 @@
   const TAL = ['noll', 'en', 'två', 'tre', 'fyra', 'fem', 'sex', 'sju', 'åtta', 'nio', 'tio', 'elva', 'tolv', 'tretton'];
   const ordet = (n) => TAL[n] || String(n);
   const esc = (s) => String(s == null ? '' : s).replace(/[&<>"]/g, (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c]));
-  const efternamn = (s) => String(s || '').trim().split(/\s+/).pop();
   const lista = (l) => (l.length < 2 ? l.join('') : `${l.slice(0, -1).join(', ')} och ${l.at(-1)}`);
   // gängets bläck på papper och handstil (som namnen på kupongen), Hasse sist
   const INK = ['#2146a6', '#16784b', '#6d3aa8', '#8a6a0c', '#a0306a'];
@@ -70,7 +69,7 @@
       const hasse = p.id === HASSE;
       const g = info.find((x) => x.id === p.id);
       return {
-        id: p.id, namn: efternamn(p.name), none: Boolean(p.none), ok: p.ok || 0, n: p.n || 0, pts: p.pts || 0, award: award[p.id] || null,
+        id: p.id, namn: Tippoang.kallas(p), none: Boolean(p.none), ok: p.ok || 0, n: p.n || 0, pts: p.pts || 0, award: award[p.id] || null,
         rows: p.rows || [], ink: hasse ? INK[3] : INK[Math.max(0, i)], hand: hasse ? 3 : Math.max(0, i),
         bild: hasse ? HASSE_BILD : (g && g.bild) || null,
       };

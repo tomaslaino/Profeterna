@@ -125,12 +125,9 @@ window.Kronan = (() => {
   const esc2 = (s) => (typeof esc === 'function' ? esc(s) : String(s));
   const tone = (x) => (Tippoang.runda(x) > 0 ? 'pos' : Tippoang.runda(x) < 0 ? 'neg' : '');
 
-  // Bara efternamnet syns – alla i gänget heter Daniel.
-  function name(p) {
-    const n = String(p.name || p.id);
-    const i = n.indexOf(' ');
-    return esc2(i > 0 ? n.slice(i + 1) : n);
-  }
+  // Namnet vi kallas (Tippoang.kallas): efternamnet – alla i gänget heter Daniel –
+  // och Dogge för Johansson.
+  const name = (p) => esc2(Tippoang.kallas(p));
 
   function fig(p, extra) {
     const k = KRONAN_KROPPAR[p.id];
