@@ -1104,6 +1104,14 @@ bara lokalt. Analyserna visas som de ligger i `data/analyser.json`; hur de skriv
   syns i ljushet och inte bara i färg. Var och ens rätt är mindre än förut, så att kupongens *10/13* med rödpennan, inringat,
   är det enda handskrivna på raden och syns först. Provat i headless Chromium i färg och i gråskala, i den breda och den
   smala versionen och med sex spalter. Se *Sammanställningen efter omgången*.
+- **Matcherna i protokollet går att ta fram (2026-11-10, användarens önskemål):** "Jag vill kunna klicka på matcherna för att
+  få någon form av redogörelse av hur det gick med bettningen och bettingrekommendationen som datorn gav. Använd samma
+  struktur som när man klickar på matcherna i en vanlig kupong - bara det att det är en efter-match-sammanfattning av matchen
+  inklusive en redogörelse av hur det gick." Ett klick på en rad i protokollet (framme, från pulten eller korktavlan) lägger
+  fram matchbladet efter matchen: samma blad som från kupongen, men med sidorna *Rättningen* (allas tips i matchen med
+  datorns chans, poäng och spelkassa, och datorns och analysens råd som jämförelse; datorn och spelbolagen före avspark med
+  facit överstruket), *Matchen* (mål, kort och statistik), *Prognos*, *Analys* (tipset rättat, först), *Startelvor* och
+  *Tabellen*. Se *Matchbladet efter matchen* under [Sammanställningen efter omgången](#sammanställningen-efter-omgången).
 - **Kupongens rätt som omgångens betyg i protokollet (2026-11-09, användarens önskemål):** "Går det att göra totalpoängen
   för oss alla - vår gemensamma rad - ännu tydligare? Kanske ringa in nån siffra eller annat. Jag är öppen för förslag - men
   gör det tydligare!" Kupongens rätt skrivs nu som kupongens betyg på papperet under Kupong: *10/13* med rödpennan, inringat
@@ -4987,6 +4995,9 @@ tredjedelar (1 X 2) eller halvor (hemma och borta).
   senaste, med lagens prickar och ställningen i formens rutor sedd från hemmalaget på bladet, och
   hemmalagets V–O–F till höger om rubriken.
 
+Efter matchen finns samma blad med andra sidor, från raderna i protokollet (se *Matchbladet efter matchen* under
+[Sammanställningen efter omgången](#sammanställningen-efter-omgången)).
+
 En sida som inte ryms flyttas med hjulet eller fingret inom bladet och tonar bort mot papperet nederst.
 Bladet gäller en match: man bläddrar inte mellan matcherna (2026-11-08: "Man gör inte det"), utan lägger
 bort bladet och tar fram ett annat, och bladet har ingen fot. Sidan man har framme följer med nästa gång
@@ -6630,6 +6641,38 @@ person längst ner (ändrat 2026-11-08). I telefonen försvinner namnen under po
 
 Ett klick på blocket eller K lyfter det från pulten och lägger fram det stort över rummet, och *Lägg tillbaka*, Esc eller ett
 klick utanför lägger tillbaka det (`protokollet` i rum.js).
+
+**Matchbladet efter matchen** (2026-11-10, användarens önskemål: "klicka på matcherna för att få någon form av redogörelse
+av hur det gick med bettningen och bettingrekommendationen som datorn gav"). När bladet är framme – från pulten eller
+korktavlan – är varje rad en väg in: ett klick var som helst på raden, eller på matchen, som är en knapp, lägger fram
+matchbladet för den matchen över protokollet (`protMatch` i rum.js, `efter` i [public/rum-matchblad.js](public/rum-matchblad.js)).
+Med musen tonas raden man pekar på hela vägen över och matchen stryks under. Det är samma blad som från kupongen i handen –
+bandet med kupongens nummer och *Match 3*, lagen med resultatet mellan sig och flikarna –, men med sidorna efter matchen, i
+den ordning man vill veta hur det gick:
+
+- **Rättningen** – allas tips i matchen, en rad var i protokollets ordning (kupongen, gänget och Hasse), och under en
+  streckad linje datorns tecken (det troligaste före avspark, som *Modellen* i Olympen) och tipset i analysen när det är
+  skrivet före avspark (Sixten Bråvalls, `tip` i `data/analyser.json`). Tecknet står på skrivmaskin som i protokollet,
+  överstruket med märkpennan när det satt och svagare när det inte satt, med rödpennans stjärna när ingen annan i gänget
+  hade rätt, och efter det datorns chans för tecknet före avspark, poängen (samma regel som raden Poäng: rätt minus
+  chansen) och spelkassan (10 kr till datorns odds, som i Olympen och på lappen under domen). Överst hur många som hade
+  rätt. Under tipsen datorn och spelbolagen före avspark sida vid sida (under varandra i telefonen) i kupongens rutor med
+  chansen i stapeln under, som på *Prognos* och *Lagen*, och facit överstruket med märkpennan: hur troligt datorn tyckte att
+  det var och vad det betalade. Allt räknas ur protokollets sammanställning (`RumBlock.match`), så att poängen per match
+  summerar till raden Poäng (kontrollerat för de tre frysta omgångarna); bara spelbolagen och analysen hämtas.
+- **Matchen** – matchrutans *Matchen* ([public/matchruta.js](public/matchruta.js)): målen, korten och bytena som en
+  tidslinje till vänster och statistiken till höger (under varandra i telefonen), och publiken, hämtade från ESPN när sidan
+  tas fram.
+- **Prognos** – som förut, med facit och resultatet bland de troligaste överstrukna.
+- **Analys** – det rättade tipset först (facit överstruket och om det satt till höger om rubriken), och artikeln under.
+- **Startelvor** och **Tabellen** – som förut.
+
+Sidan man har framme följer med till nästa match under besöket, för sig och skild från bladet före matchen. Krysset, Esc,
+bakåt eller ett klick utanför lägger bort bladet, och protokollet ligger kvar som det låg med fokus på raden; piltangenterna
+byter sida. Läggs protokollet tillbaka går bladet med. En match ur ett äldre protokoll som inte längre finns i spelprogrammet
+får lagen och resultatet ur protokollet. Provat i headless Chromium i hela sidan, med omgångens protokoll ur de frysta
+filerna (Kupong 3) och påhittade matchfiler och ESPN-svar, i 1440 × 900 och 412 × 915: alla sidor, Esc, ett klick utanför,
+piltangenterna och att det vanliga matchbladet före matchen är som förut. Inte provat i Safari eller i en riktig telefon.
 
 **Hasse om poängen** (2026-11-09, användarens önskemål). Under bladet står *Hasse, hur räknas poängen?*: ett klick eller H,
 så lutar han sig in från baren och svarar som vid anslagstavlan (*Ropa till Hasse* under [Anslagstavlan](#anslagstavlan);

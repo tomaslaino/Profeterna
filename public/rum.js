@@ -3327,14 +3327,16 @@ ${window.RumRegister ? RumRegister.nara() : ''}
   // är det den smala versionen, och ryms det inte på höjden går det att rulla, i stället för att bli oläsligt.
   // Från korktavlan (fran: { sum, lapp, kork }, korkProtokoll) tas kupongen från nålen och blir omgångens protokoll,
   // ←/→, pilarna bredvid Häng tillbaka eller ett svep i sidled bläddrar till omgången före och efter (bladdra), och
-  // Häng tillbaka sätter tillbaka den. Under bladet kan man ropa till Hasse om poängen (protHasse).
+  // Häng tillbaka sätter tillbaka den. Under bladet kan man ropa till Hasse om poängen (protHasse), och ett klick
+  // på en rad lägger fram matchbladet efter matchen (protMatch).
   function protokollet(pa = true, nu = false, fran = null) {
     const p = R.protokoll;
     if (!pa) {
       if (!p || p.ut) return;
-      // Hasse tystnar, och bladet står där det står utan honom innan det läggs tillbaka
+      // Hasse tystnar och matchbladet går: bladet står där det står utan dem innan det läggs tillbaka
       if (p.hk) protHasse(false, true);
       p.ut = true;
+      if (p.blad) p.blad.ut(true);
       lagerUt('protokollet');
       if (p.vand) p.vand.cancel();
       const klar = () => {
@@ -3374,7 +3376,7 @@ ${window.RumRegister ? RumRegister.nara() : ''}
     // från korktavlan står Häng tillbaka mellan pilarna till omgången före och efter (bladdra)
     const kork = fran && fran.kork ? fran.kork : null;
     const tillbaka = `<button type="button" class="rt-tillbaka">${fran ? 'Häng tillbaka' : 'Lägg tillbaka'}</button>`;
-    el.innerHTML = RumBlock.html(sum, { tat: innerWidth < 555 }) +
+    el.innerHTML = RumBlock.html(sum, { tat: innerWidth < 555, matcher: true }) +
       `<div class="rp-rad"><button type="button" class="hs-ropa" data-rp="hasse" aria-expanded="false">${PROT_ROP}</button>` +
       (kork ? `<span class="rp-blad"><button type="button" class="rt-pil" data-pil="-1" aria-label="Omgången före">←</button>${tillbaka}` +
         '<button type="button" class="rt-pil" data-pil="1" aria-label="Omgången efter">→</button></span>' : tillbaka) + '</div>';
@@ -3394,11 +3396,26 @@ ${window.RumRegister ? RumRegister.nara() : ''}
       // ett klick på svaret: resten direkt
       else if (q.hs.i(e)) q.hs.hoppa();
       else if (e.target.closest('.rt-tillbaka')) protokollet(false);
+      // en rad: matchbladet efter matchen
+      else if (e.target.closest('.rum-block [data-rad]')) protMatch(Number(e.target.closest('[data-rad]').dataset.rad));
       else if (e.target.closest('.rum-block, .rp-rad')) return;
       // utanför: först tystnar Hasse, sedan läggs bladet tillbaka
       else if (q.hk) protHasse(false);
       else protokollet(false);
     });
+    // med musen: raden man pekar på tonas hela vägen över, så att det syns att den går att ta fram
+    const pek = (rad) => {
+      if (rad === q.pek) return;
+      for (const c of q.b.querySelectorAll('.pek')) c.classList.remove('pek');
+      q.pek = rad;
+      if (rad != null) for (const c of q.b.querySelectorAll(`[data-rad="${rad}"]`)) c.classList.add('pek');
+    };
+    el.addEventListener('pointerover', (e) => {
+      const c = e.pointerType === 'mouse' && !q.lyft && !q.vand ? e.target.closest('.rum-block [data-rad]') : null;
+      pek(c ? c.dataset.rad : null);
+    });
+    el.addEventListener('pointerleave', () => pek(null));
+    q.pekUt = () => pek(null);
     if (kork) {
       // ett svep i sidled över bladet bläddrar, som pilarna (fingret åt vänster: omgången efter)
       let ned = null;
@@ -3436,6 +3453,34 @@ ${window.RumRegister ? RumRegister.nara() : ''}
       el.style.overflowY = '';
     }, () => {});
   }
+  // En rad i protokollet: matchbladet efter matchen (RumMatchblad.fram med efter) läggs fram över bladet, med
+  // omgångens matcher i protokollets ordning, så att numret i bandet är radens. Krysset, Esc eller ett klick
+  // utanför lägger bort det, och protokollet ligger kvar som det låg. En match ur ett gammalt protokoll som inte
+  // längre finns i spelprogrammet får lagen och resultatet ur protokollet.
+  function protMatch(i) {
+    const p = R.protokoll;
+    const sum = p && p.sum;
+    if (!sum || p.ut || p.blad || p.lyft || p.vand || !window.RumMatchblad || !sum.rader[i]) return;
+    const matcher = sum.rader.map((r) => {
+      const m = state.all ? state.all.matches.find((x) => String(x.id) === String(r.id)) : null;
+      if (m) return m;
+      const s = /^(\d+)–(\d+)$/.exec(r.mal || '');
+      return { id: String(r.id), home: r.hemma || r.h, away: r.borta || r.b, kickoff: null, comp: null, completed: true, status: 'STATUS_FULL_TIME', score: s ? { home: +s[1], away: +s[2] } : null };
+    });
+    if (p.hk) protHasse(false);
+    if (p.pekUt) p.pekUt();
+    p.blad = RumMatchblad.fram({
+      inom: R.el, matcher, id: String(sum.rader[i].id), kupong: sum.nr ? `Kupong ${sum.nr}` : 'Kupong', tillbaka: 'protokollet',
+      smal: () => Boolean(R.smal), calm, efter: sum,
+      nar: () => {
+        p.blad = null;
+        if (p.ut) return;
+        const k = p.b.querySelector(`.rb-mk[data-rad="${i}"]`);
+        (k || p.el).focus({ preventScroll: true });
+      },
+    });
+  }
+
   // Så stort som ryms, men inte så litet att det inte går att läsa.
   function passaProtokoll() {
     const p = R.protokoll;
@@ -3611,7 +3656,8 @@ ${window.RumRegister ? RumRegister.nara() : ''}
     if (p.hk) protHasse(false);
     const byt = () => {
       const ny = document.createElement('div');
-      ny.innerHTML = RumBlock.html(sum, { tat: innerWidth < 555 });
+      ny.innerHTML = RumBlock.html(sum, { tat: innerWidth < 555, matcher: true });
+      if (p.pekUt) p.pekUt();
       const blad = ny.firstElementChild;
       p.b.replaceWith(blad);
       p.b = blad;
@@ -6181,6 +6227,17 @@ ${window.RumRegister ? RumRegister.nara() : ''}
         return;
       }
       if (R.protokoll) {
+        // matchbladet efter matchen över protokollet: Esc lägger bort det, och pilarna byter sida
+        const blad = R.protokoll.blad;
+        if (blad) {
+          const steg = { arrowleft: -1, arrowright: 1, arrowup: -1, arrowdown: 1 }[k];
+          if (k === 'escape') blad.ut();
+          else if (steg) {
+            e.preventDefault();
+            blad.flik(steg);
+          }
+          return;
+        }
         // Esc tystar Hasse och lägger sedan tillbaka bladet, H ropar till honom, och från korktavlan
         // bläddrar ←/→ till omgången före och efter
         if (k === 'escape') {
