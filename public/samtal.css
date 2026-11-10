@@ -495,6 +495,59 @@ button.sm-who:focus-visible { outline: 2px solid var(--ink); outline-offset: 1px
 .sm-hog .sm-r.vald { background: rgba(255, 214, 10, 0.3); box-shadow: 0 0 0 3px rgba(255, 214, 10, 0.3); }
 .sm-hog .sm-r.vald > * { opacity: 1; }
 
+/* Raden Till svars (samtal.js, svarRad): var och en i ett svagt band av sitt
+   bläck, med hur många matcher hen har kvar att svara för. Ringen om porträttet
+   är samma som om det man ska försvara i rutorna. */
+.sm-svar { display: grid; grid-template-columns: repeat(auto-fit, minmax(0, 1fr)); gap: 6px; margin: 0 0 8px; }
+.sm-svar-p {
+  display: flex;
+  align-items: center;
+  gap: 9px;
+  min-width: 0;
+  padding: 6px 10px 6px 8px;
+  font: inherit;
+  text-align: left;
+  color: var(--ink);
+  background: color-mix(in srgb, var(--ink) 9%, transparent);
+  border: 0;
+  border-radius: 7px;
+  transition: background 0.15s ease;
+}
+button.sm-svar-p { cursor: pointer; }
+button.sm-svar-p:hover { background: color-mix(in srgb, var(--ink) 15%, transparent); }
+button.sm-svar-p:focus-visible { outline: 2px solid var(--pp-pen); outline-offset: 1px; }
+button.sm-svar-p[aria-pressed="true"] { background: color-mix(in srgb, var(--ink) 20%, transparent); box-shadow: inset 0 0 0 1.5px var(--ink); }
+.sm-svar-p .sm-fc { --fc: 26px; box-shadow: 0 0 0 1.5px var(--ink); }
+.sm-svar-p:not(.inne) .sm-fc img { filter: grayscale(1); opacity: 0.5; }
+.sm-svar-t { display: grid; min-width: 0; }
+.sm-svar-t > b { font-family: var(--pp-hand); font-size: 20px; font-weight: 700; line-height: 1; white-space: nowrap; }
+.sm-svar-t small { font-family: var(--pp-hand); font-size: 17px; font-weight: 600; line-height: 1; white-space: nowrap; color: var(--pp-pencil); }
+.sm-svar-t small b { font-size: 19px; font-weight: 700; line-height: 0.8; color: var(--ink); }
+.sm-svar-t small.fri { font-weight: 700; color: var(--pp-ok); }
+/* ringen om porträttet: i raden Till svars och i rutorna */
+.sm-svar-f { position: relative; display: flex; flex: none; }
+.sm-svar-o { position: absolute; left: -22%; top: -22%; width: 144%; height: 144%; overflow: visible; fill: none; stroke: var(--ink); stroke-width: 3.2; stroke-linecap: round; pointer-events: none; }
+.sm-svar-o path { vector-effect: non-scaling-stroke; stroke-width: 1.7; }
+/* i rutorna: ringen lite ifrån porträttet, och de andra i matchen träder tillbaka */
+.sm-hog .sm-seats > .sm-svar-f { z-index: 1; }
+.sm-bx .sm-svar-o { left: -31%; top: -31%; width: 162%; height: 162%; }
+.sm-hog .sm-r.svar:not(.klubbad) .sm-seats > .sm-fc { opacity: 0.4; }
+/* det hen inte står till svars för träder tillbaka; lappens rad står kvar */
+.sm-hog:has(.sm-svar[data-lyft="0"]) .sm-r:not(.sm-hd, .sv0, .vald) > *,
+.sm-hog:has(.sm-svar[data-lyft="1"]) .sm-r:not(.sm-hd, .sv1, .vald) > *,
+.sm-hog:has(.sm-svar[data-lyft="2"]) .sm-r:not(.sm-hd, .sv2, .vald) > *,
+.sm-hog:has(.sm-svar[data-lyft="3"]) .sm-r:not(.sm-hd, .sv3, .vald) > *,
+.sm-hog:has(.sm-svar[data-lyft="4"]) .sm-r:not(.sm-hd, .sv4, .vald) > * { opacity: 0.22; }
+@media (max-width: 640px) {
+  .sm-svar { gap: 4px; margin-bottom: 4px; }
+  .sm-svar-p { gap: 6px; padding: 5px 3px 5px 7px; }
+  .sm-svar-p .sm-fc { --fc: 20px; }
+  .sm-svar-t > b { font-size: 17px; }
+  .sm-svar-t small { font-size: 15px; }
+  .sm-svar-t small b { font-size: 17px; }
+  .sm-hog .sm-sheet-head { padding-bottom: 4px; }
+}
+
 /* Lappen: ovanpå det som står längst ner, så att inget på papperet flyttar sig.
    Luften över raden längst ner gör att sista raderna går att nå också när den
    är framme. */
@@ -620,6 +673,14 @@ button.sm-who[data-lyft][aria-pressed="true"] .sm-fc { box-shadow: 0 0 0 2px var
 .sm-hd[data-lyft="2"] ~ .sm-r :is(.sm-bx .sm-k2, .sm-said.sm-k2),
 .sm-hd[data-lyft="3"] ~ .sm-r :is(.sm-bx .sm-k3, .sm-said.sm-k3),
 .sm-hd[data-lyft="4"] ~ .sm-r :is(.sm-bx .sm-k4, .sm-said.sm-k4) { opacity: 1; }
+
+/* ringen om det någon står till svars för tonas ner med porträttet */
+.sm-hd[data-lyft] ~ .sm-r .sm-svar-o { opacity: 0.15; }
+.sm-hd[data-lyft="0"] ~ .sm-r .sm-k0 > .sm-svar-o,
+.sm-hd[data-lyft="1"] ~ .sm-r .sm-k1 > .sm-svar-o,
+.sm-hd[data-lyft="2"] ~ .sm-r .sm-k2 > .sm-svar-o,
+.sm-hd[data-lyft="3"] ~ .sm-r .sm-k3 > .sm-svar-o,
+.sm-hd[data-lyft="4"] ~ .sm-r .sm-k4 > .sm-svar-o { opacity: 1; }
 
 /* stämpeln (Väntar på GitHub, Rättad, Väntar på DL, Alla inne) mellan märket och betyget */
 .sm-sheet-head .pp-stamp { white-space: nowrap; }

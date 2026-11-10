@@ -589,6 +589,17 @@
   // Du först, sedan i gängets ordning – som på stämpeln.
   const duForst = (ids) => [...ids].sort((a, b) => (b === me()) - (a === me()) || pnum(a) - pnum(b));
 
+  // Vem som står till svars för vilka tecken i en omtvistad match: var och en
+  // vars tecken förslaget lämnar utanför – eller, när förslaget får med allt,
+  // den som är ensam om ett tecken. [[DJ, ['1', 'X']], …], du först. Tomt när
+  // ingen särskild ska svara.
+  function tillSvars(r) {
+    if (!r.strid || !r.proposal) return [];
+    const ut = (f) => duForst(Object.keys(r.t)).map((k) => [k, [...r.t[k]].filter(f)]).filter(([, t]) => t.length);
+    const vem = ut((sg) => !r.proposal.includes(sg));
+    return vem.length ? vem : ut((sg) => r.cov[SIGNS.indexOf(sg)].length === 1);
+  }
+
   // Det som ska sägas om en match, på lappen. Omtvistad: en fråga till var och
   // en vars tecken förslaget lämnar utanför – Tvåan, Johansson? eller Din etta?
   // – eller, när förslaget får med allt, till den som är ensam om ett tecken.
@@ -606,11 +617,35 @@
       const lika = SIGNS.filter((sg, i) => sup[i] > 0 && sup.filter((v) => v === sup[i]).length > 1).join('');
       return lika.length > 1 ? `${cap(ord(lika, 'eller'))}?` : 'Vad säger vi?';
     }
-    const ut = (f) => duForst(Object.keys(r.t)).map((k) => [k, [...r.t[k]].filter(f)]).filter(([, t]) => t.length);
-    let vem = ut((sg) => !r.proposal.includes(sg));
-    if (!vem.length) vem = ut((sg) => r.cov[SIGNS.indexOf(sg)].length === 1);
+    const vem = tillSvars(r);
     if (!vem.length) return r.proposal.length === 3 ? 'Helgardera?' : 'Halvgardera?';
     return vem.map(([k, t]) => `<b class="sm-k${pnum(k)}">${k === me() ? cap(lista(t.map((sg) => DITT[sg]))) : `${cap(lista(t.map((sg) => ORD[sg])))}, ${esc(surname(person(k)))}`}?</b>`).join('');
+  }
+
+  // Under namnet i raden Till svars: hur många matcher hen har kvar att svara för.
+  function svarKvar(s, rows, done, k) {
+    if (!(s.tips && s.tips[k])) return `<small>${s.visas ? 'Lämnade inte in' : 'Inte inne än'}</small>`;
+    const mina = rows.filter((r) => tillSvars(r).some(([v]) => v === k));
+    const kvar = mina.filter((r) => !done.has(r.x.id)).length;
+    if (!mina.length) return '<small class="fri">Går fri</small>';
+    return kvar ? `<small><b>${kvar}</b> till svars</small>` : '<small class="fri">Klar</small>';
+  }
+  // Raden överst på papperet: var och en, med hur mycket hen har kvar att svara
+  // för. Ringen om porträttet är samma som om det man ska försvara i högarna. Ett
+  // tryck tonar ner de matcher hen inte svarar för (SM.lyft). Tom när ingen
+  // särskild ska svara för något.
+  function svarRad(s, rows, done) {
+    if (!rows.some((r) => tillSvars(r).length)) return '';
+    const inne = (k) => Boolean(s.tips && s.tips[k]);
+    const lyft = inne(SM.lyft) ? SM.lyft : null;
+    const har = (k) => rows.some((r) => tillSvars(r).some(([v]) => v === k));
+    return `<div class="sm-svar" id="sm-svar"${lyft && har(lyft) ? ` data-lyft="${pnum(lyft)}"` : ''}>` + s.gang.map((g) => {
+      const namn = surname(person(g.id));
+      const attrs = inne(g.id) ? ` type="button" data-lyft="${esc(g.id)}" aria-pressed="${g.id === lyft}" aria-label="${esc(`Visa bara det ${namn} står till svars för`)}"` : '';
+      return `<${inne(g.id) ? 'button' : 'span'}${attrs} class="sm-svar-p sm-k${pnum(g.id)}${inne(g.id) ? ' inne' : ''}${har(g.id) ? ' har' : ''}">` +
+        `<span class="sm-svar-f">${face(g.id, false)}${har(g.id) ? Papper.ring(`svar${s.id}${g.id}`, 'sm-svar-o', 26) : ''}</span>` +
+        `<span class="sm-svar-t"><b>${esc(g.id === me() ? 'Du' : namn)}</b>${svarKvar(s, rows, done, g.id)}</span></${inne(g.id) ? 'button' : 'span'}>`;
+    }).join('') + '</div>';
   }
 
   // Hur många omtvistade matcher som återstår, för hand överst på papperet.
@@ -683,6 +718,11 @@
     skriv($('#sm-lapp'), id ? lapp(s, rows, done, id) : '');
     const k = $('#sm-kvar');
     if (k) k.textContent = kvarText(rows, done);
+    for (const b of document.querySelectorAll('#sm-svar [data-lyft]')) {
+      const html = svarKvar(s, rows, done, b.dataset.lyft);
+      const sm = b.querySelector('small');
+      if (sm && sm.outerHTML !== html) sm.outerHTML = html;
+    }
     skriv($('#sm-act-in'), boardActions(s, rows, decisions(s, rows)));
   }
 
@@ -875,7 +915,7 @@
     const tat = rows.some((r) => r.open);
     const vald = tat ? valdRad(rows, done) : null;
     html += paperTop(stopBox(s), tat ? ' sm-up sm-hog' : ' sm-up', tat && s.visas ? `<p class="sm-sheet-kvar" id="sm-kvar">${esc(kvarText(rows, done))}</p>` : stamp(s)) +
-      upHead(s, ids, rows.filter((r) => r.g.res != null).map((r) => [r.x.id, r.g.res]));
+      (tat ? svarRad(s, rows, done) : '') + upHead(s, ids, rows.filter((r) => r.g.res != null).map((r) => [r.x.id, r.g.res]));
     const w = writer(s);
     HOGAR.forEach((namn, k) => {
       const list = rows.filter((r) => hog(r) === k);
@@ -886,7 +926,7 @@
           id: r.x.id, m: r.m, label: r.m ? `${r.m.home} – ${r.m.away}` : r.x.match, g: r.g, nr: nr.get(r.x.id),
           who: r.cov, sign: val[r.x.id] || '', notes: r.notes, after: afterOf(s, r.x.id, w), pen: penOf(s, r.x.id, w),
           ids, pick: true, open: r.open, strid: r.strid, klubbad: r.strid && done.has(r.x.id),
-          tat, vald: r.x.id === vald, lugn: r.kind === 4,
+          tat, vald: r.x.id === vald, lugn: r.kind === 4, svar: tat ? tillSvars(r) : [],
         });
       }
     });
@@ -1014,8 +1054,9 @@
   // gängets kryss blekt som ett förslag tills den är klubbad (bocken vid ringen).
   // tat: raden i högarna – de korta namnen, som väljer matchen, och rutorna utan
   // tecken och odds; resten står på lappen. vald: lappen är framme, lugn: vi är
-  // eniga, och raden träder tillbaka.
-  function upRow({ id, m, label, g, nr, who, sign, notes = [], note = '', after = [], pen = null, ids, pick = false, open = false, day = false, out = false, strid = false, klubbad = false, tat = false, vald = false, lugn = false }) {
+  // eniga, och raden träder tillbaka. svar: vem som står till svars för vilka
+  // tecken (tillSvars) – de porträtten är ringade i rutorna.
+  function upRow({ id, m, label, g, nr, who, sign, notes = [], note = '', after = [], pen = null, ids, pick = false, open = false, day = false, out = false, strid = false, klubbad = false, tat = false, vald = false, lugn = false, svar = [] }) {
     const hit = g.res != null && sign ? sign.includes(SIGNS[g.res]) : null;
     const cls = rowClass({ ...g, hit });
     const comp = m ? compOf(m.comp) : null;
@@ -1029,7 +1070,7 @@
       : `<span class="sm-res"><span class="sm-res-s">${Papper.result(g)}</span>${tick}</span>`;
     const sr = `${srSign(sign, hit)}. ` +
       ids.map((k) => `${k}: ${SIGNS.filter((sg, i) => who[i].includes(k)).join('') || 'inget'}`).join(', ');
-    return `<div class="sm-r s-${cls.replace(' ', ' s-')}${pick && open && !sign ? ' unsigned' : ''}${out ? ' sm-out' : ''}${strid ? ' strid' : ''}${klubbad ? ' klubbad' : ''}${vald ? ' vald' : ''}${tat && lugn ? ' lugn' : ''}" data-id="${esc(id)}">` +
+    return `<div class="sm-r s-${cls.replace(' ', ' s-')}${pick && open && !sign ? ' unsigned' : ''}${out ? ' sm-out' : ''}${strid ? ' strid' : ''}${klubbad ? ' klubbad' : ''}${vald ? ' vald' : ''}${tat && lugn ? ' lugn' : ''}${svar.length ? ' svar' : ''}${svar.map(([k]) => ` sv${pnum(k)}`).join('')}" data-id="${esc(id)}">` +
       `<span class="pp-nr">${nr}${strid ? Papper.ring(`s${id}`, 'sm-strid', 25) + (klubbad ? bock(id, SM.nyBock === id) : '') : ''}</span>` +
       '<span class="sm-m"><span class="sm-mt">' +
       `<span class="pp-tm">${name}${tat && said.length ? `<span class="sm-har-sagt sm-k${pnum(said[0].k)}" aria-hidden="true">”</span>` : ''}</span>` +
@@ -1039,7 +1080,7 @@
       `<span class="pp-sr">${esc(sr)}</span></span>${res}</span>` +
       SIGNS.map((sg, i) => {
         const on = sign.includes(sg);
-        const b = box(sg, who[i], ids, on ? `${id}${sg}` : null, g.res === i ? `${id}${sg}` : null);
+        const b = box(sg, who[i], ids, on ? `${id}${sg}` : null, g.res === i ? `${id}${sg}` : null, svar.filter(([, t]) => t.includes(sg)).map(([k]) => k), id);
         const odds = tat ? '' : `<small${on ? ' class="on"' : ''}>${g.pr ? pctOdds(g.pr[i]) : '–'}</small>`;
         if (!pick) return `<span class="sm-c" aria-hidden="true">${b}${odds}</span>`;
         // Gängets tecken väljs i matcher som går att fylla i – till en stund
@@ -1381,10 +1422,13 @@
   // Rutan för ett tecken med porträtten för dem som har valt det. Var och en
   // har sin plats i rutan, i samma ordning som överst, så att tecknet och
   // porträtten står på samma ställe i varje rad. cross: nyckeln till gängets
-  // kryss över tecknet, ring: till ringen runt rutan (utfallet).
-  const box = (sg, who, ids, cross = null, ring = null) =>
+  // kryss över tecknet, ring: till ringen runt rutan (utfallet). svar: vilka
+  // som står till svars för tecknet, med en ring om porträttet (rad: matchens id).
+  const box = (sg, who, ids, cross = null, ring = null, svar = [], rad = '') =>
     `<span class="pp-box sm-bx${who.length ? ' on' : ''}"><i>${sg}${cross ? Papper.cross(cross) : ''}</i><span class="sm-seats">` +
-    ids.map((id) => (who.includes(id) ? face(id) : '<span class="sm-seat"></span>')).join('') + '</span>' +
+    ids.map((id) => (!who.includes(id) ? '<span class="sm-seat"></span>'
+      : svar.includes(id) ? `<span class="sm-svar-f sm-k${pnum(id)}">${face(id)}${Papper.ring(`svar${rad}${sg}${id}`, 'sm-svar-o', 26)}</span>`
+        : face(id))).join('') + '</span>' +
     `${ring ? Papper.ring(ring, 'pp-ring sm-ring', 27) : ''}</span>`;
 
   function sheetList() {
@@ -2100,15 +2144,23 @@
   // Ett tryck på någons porträtt överst – i uppgörelsen och på gängets
   // kupong – lyfter fram hens tips; ett tryck till visar allas igen. Papperet
   // ritas inte om: raden överst får data-lyft, och samtal.css tonar ner de
-  // andras porträtt i rutorna.
+  // andras porträtt i rutorna. I uppgörelsen är det samma tryck i raden Till
+  // svars, och de matcher hen inte står till svars för tonas ner också.
   document.addEventListener('click', (e) => {
     const b = e.target.closest ? e.target.closest('#coupon button[data-lyft]') : null;
     if (!b) return;
     SM.lyft = SM.lyft === b.dataset.lyft ? null : b.dataset.lyft;
-    const hd = b.closest('.sm-hd');
-    if (SM.lyft) hd.dataset.lyft = pnum(SM.lyft);
-    else delete hd.dataset.lyft;
-    for (const x of hd.querySelectorAll('button[data-lyft]')) x.setAttribute('aria-pressed', String(x.dataset.lyft === SM.lyft));
+    const papper = b.closest('.sm-sheet');
+    const hd = papper ? papper.querySelector('.sm-hd') : b.closest('.sm-hd');
+    const svar = papper && papper.querySelector('#sm-svar');
+    const n = SM.lyft ? pnum(SM.lyft) : null;
+    for (const el of [hd, svar]) {
+      if (!el) continue;
+      // raden Till svars tonar bara ner när hen har något att svara för
+      if (SM.lyft && (el === hd || papper.querySelector(`.sm-r.sv${n}`))) el.dataset.lyft = n;
+      else delete el.dataset.lyft;
+      for (const x of el.querySelectorAll('button[data-lyft]')) x.setAttribute('aria-pressed', String(x.dataset.lyft === SM.lyft));
+    }
   });
 
   // ---------- kupongen på pulten ----------

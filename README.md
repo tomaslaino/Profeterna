@@ -764,6 +764,12 @@ bara lokalt. Analyserna visas som de ligger i `data/analyser.json`; hur de skriv
   samma sak på förstasidans ruta"): under *Alla inne* de omtvistade matcherna med inringade nummer,
   bockarna och var och ens tecken i sin färg. Se *Kupongen i handen*, *Pennan visar vägen*, och
   [Inför uppgörelsen](#inför-uppgörelsen), punkt 1 och 4.
+- **Det syns vem som står till svars (2026-11-09, användarens önskemål):** "Organisera det vi ska
+  diskutera och det som nån ska stå till svars för på ett läckert sätt." Högarna och lappen tar en
+  match i taget, men det syns inte på ett ställe vem som ska svara för vad. En tabell med en rad per
+  match provades men blev drygt 1 100 punkter lång i telefonen, och användaren valde att behålla
+  högarna och lappen och lägga till raden *Till svars* och ringarna. Se *Till svars* under
+  [Inför uppgörelsen](#inför-uppgörelsen), punkt 4.
 - **Expressens löpsedel från VM 94 (2026-11-03, användarens önskemål):** VM 94-affischen med
   fotot från hemkomsten är utbytt mot en mer verklighetstrogen löpsedel, lite solblekt och
   sliten: *JAAAAAAAA! BRONS!* med Tomas foto från Rose Bowl. Den sitter på skivan som de andra.
@@ -1969,6 +1975,15 @@ under omgången.
    gängets kryss, så att ingen rad flyttar sig medan pennan rör sig. Överst står för hand hur många
    omtvistade matcher som är kvar: *Sex kvar*, *Allt klubbat*, *Inget att prata om*. Det vi är
    eniga om och det klubbade träder tillbaka, men inte det vi är eniga om mot modellen.
+
+   **Till svars** (2026-11-09, `svarRad` och `tillSvars` i samtal.js): lappen tar en match i taget,
+   så överst på papperet, under antalet kvar, står var och en i ett svagt band av sitt bläck med hur
+   många matcher hen har kvar att svara för: *3 till svars*, *Klar*, *Går fri* eller *Inte inne än*.
+   I rutorna är porträttet ringat på det tecken man står till svars för, och de andra porträtten i
+   matchen träder tillbaka tills den är klubbad. Det är samma personer och tecken som frågan på
+   lappen. Ett tryck på ett porträtt, i raden eller överst, lyfter fram hens tips och tonar ner de
+   matcher hen inte svarar för. Raden står inte där när ingen särskild ska svara för något, och inte
+   när ingen match längre går att fylla i.
 
    **Lappen** (`lapp`, `fraga` och `visaLapp` i samtal.js): ett tryck på en match tar fram allt som bara behövs
    när man pratar om den, längst ner på skärmen och ovanpå det som står där, så att inget på
