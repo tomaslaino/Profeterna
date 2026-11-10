@@ -6126,7 +6126,9 @@ armbågarna nedåt. Det är han man ska se, inte tidningen, och eftersom kameran
 så att sidorna inte går att läsa. Han tittar ned i den med huvudet böjt och lite vridet mot den i stället för in i kameran
 (Tomas önskemål 2026-11-09 och 2026-11-10; `LAS` och `LAS_T`, och bitarna utgår från dem). Förut höll han den lutad bakåt,
 mot sig: då vändes förstasidan rakt mot kameran, kanterna, som viks mot honom, sjönk ned i disken, och med den åt ena
-sidan och huvudet vridet dit såg han konstig ut. Bara när han gömmer sig för han den upp framför ansiktet, och innan han
+sidan och huvudet vridet dit såg han konstig ut. Bara när han gömmer sig för han den upp framför ansiktet, och då hopvikt
+som ett V med ryggen mot en och överkanten lite framåt, så att båda sidorna står snett och han kikar över vecket (Tomas
+önskemål 2026-11-10; vriden bara åt ena hållet vändes den andra halvan, förstasidan eller vädret, rakt mot en). Innan han
 lägger ned den för han in den framför sig igen och upp över diskens kant. Ingen del av tidningen går ned i disken i något av
 klippen (räknat var hundradels sekund: som lägst 14 enheter över skivan, när ryggen passerar diskens kant; provat i
 headless Chromium med mjukvarugrafik i 1280 × 800 och i telefonen, 412 × 915, med bilder genom `lasa` och `lasa2`, 2026-11-10).
