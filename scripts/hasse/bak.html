@@ -1,9 +1,11 @@
 <!doctype html><meta charset="utf-8"><body style="margin:0;background:#222"><canvas id="ut" style="width:900px"></canvas><script type="module">
-// Väggen bakom Hasse Backe: samma slitna affär som gänget sitter i (rum.js, rum-inredning.js), furupanelen med
-// paketen på en hylla, bardisken med tidningsbunten, kaffebryggaren och kassan, spårat med riktigt ljus
+// Väggen bakom Hasse Backe: samma slitna affär som gänget sitter i (rum.js, rum-inredning.js), med ett stort
+// glasparti ut mot S:t Eriksbron ovanför bardisken (flaskorna och en barstol), spårat med riktigt ljus
 // (mjuka skuggor, ljus som studsar, blanka ytor, skärpedjup) från figurens kamera (public/rum-hasse-scen.js):
 // framför honom, där han sitter vid pultens hörn. Skarpt där han sitter. Han själv och pulten framför
 // honom syns inte men skuggar och kastar ljus (sidan ritar dem, rum-hasse-3d.js).
+// Där kameran ser ut genom glaset (SCEN.FONSTER) är bilden genomskinlig, och sidan lägger utsikten bakom
+// (rum-hasse-ute.js). Ljuset utifrån kommer in genom fönstren (HIMMEL nedan).
 // Bilden har måtten i BAK (rum-hasse-scen.js). ?lage=bred|hog &n=antal varv
 import { SCEN, BAK, kamera } from '../../rum-hasse-scen.js';
 const q = new URLSearchParams(location.search);
@@ -19,77 +21,8 @@ const tillBar = (v) => [Math.cos(VB) * v[0] - Math.sin(VB) * v[2], v[1], Math.si
 const v3 = (v) => `vec3(${v.map((x) => x.toFixed(5)).join(', ')})`;
 const KP = tillBar(KAM.pos), KR = tillBar(KAM.hoger), KU = tillBar(KAM.upp), KB = tillBar(KAM.bak);
 
-// ---------- paket och etiketter ----------
-const MARKE = {
-  Kings: ['#6e1f1c', '#d8ad3e', '#2a0c0a', 'Kings'], Parti: ['#1e5a3a', '#e9e2cc', '#0d2c1b', 'Parti'], Prins: ['#1d3d78', '#e8e4d4', '#0c1c3c', 'Prins'],
-  Gul: ['#e8dfbf', '#1f6a43', '#1f6a43', 'Gul'], North: ['#efe9db', '#a3271f', '#7a1b16', 'North'], Blend: ['#e6dcc0', '#a32a24', '#7a1b16', 'Blend'], Royal: ['#b37a1c', '#3a2410', '#20120a', 'Royal'],
-};
-const NAMN = Object.keys(MARKE);
-const CELL = [128, 204];
-const atlas = document.createElement('canvas'); atlas.width = 2048; atlas.height = 1024;
-const ax = atlas.getContext('2d');
-NAMN.forEach((n, i) => {
-  const [a, b, c, t] = MARKE[n];
-  const x = i * CELL[0];
-  ax.fillStyle = a; ax.fillRect(x, 0, CELL[0], CELL[1]);
-  ax.fillStyle = b; ax.fillRect(x, CELL[1] * 0.36, CELL[0], CELL[1] * 0.3);
-  ax.fillStyle = c; ax.fillRect(x, CELL[1] * 0.34, CELL[0], 3); ax.fillRect(x, CELL[1] * 0.66, CELL[0], 3);
-  ax.fillStyle = a; ax.font = '700 30px Georgia, serif'; ax.textAlign = 'center'; ax.textBaseline = 'middle'; ax.fillText(t, x + CELL[0] / 2, CELL[1] * 0.52);
-  ax.fillStyle = b; ax.beginPath(); ax.arc(x + CELL[0] / 2, CELL[1] * 0.18, 15, 0, 7); ax.fill();
-  ax.fillStyle = c; ax.font = '600 10px Georgia, serif'; ax.fillStyle = b; ax.fillText('20 st', x + CELL[0] / 2, CELL[1] * 0.84);
-});
-// ett gammalt lagfoto i ram
-{
-  const x = 7 * CELL[0];
-  ax.fillStyle = '#c0ae8c'; ax.fillRect(x, 0, CELL[0], CELL[1]);
-  ax.fillStyle = '#a89870'; ax.fillRect(x, CELL[1] * 0.62, CELL[0], CELL[1] * 0.38);
-  ax.fillStyle = '#efe6d2'; ax.fillRect(x, 0, CELL[0], 9); ax.fillRect(x, CELL[1] - 22, CELL[0], 22); ax.fillRect(x, 0, 9, CELL[1]); ax.fillRect(x + CELL[0] - 9, 0, 9, CELL[1]);
-  for (let r = 0; r < 2; r++) for (let k = 0; k < 6 - r; k++) { const px = x + 12 + (k + r / 2) * 19; const py = CELL[1] * (0.48 + r * 0.17); ax.fillStyle = '#3a3026'; ax.fillRect(px, py, 14, 26); ax.fillStyle = '#d8c4a4'; ax.beginPath(); ax.arc(px + 7, py - 6, 6, 0, 7); ax.fill(); }
-}
-
-// skyltar, lappar och annat som hänger i rummet: [u0, v0, u1, v1] i atlasen
-const region = (x, y, w, h, rita) => { ax.save(); ax.beginPath(); ax.rect(x, y, w, h); ax.clip(); ax.translate(x, y); rita(ax, w, h); ax.restore(); return [x / atlas.width, y / atlas.height, (x + w) / atlas.width, (y + h) / atlas.height]; };
-const KREDIT = region(0, 210, 620, 230, (a, w, h) => {
-  a.fillStyle = '#e2d6b4'; a.fillRect(0, 0, w, h);
-  a.strokeStyle = '#7a1b16'; a.lineWidth = 9; a.strokeRect(16, 16, w - 32, h - 32);
-  a.fillStyle = '#7a1b16'; a.textAlign = 'center'; a.textBaseline = 'middle';
-  a.font = '700 92px Georgia, serif'; a.fillText('KREDIT', w / 2, h * 0.34);
-  a.font = '700 70px Georgia, serif'; a.fillText('GES EJ', w / 2, h * 0.7);
-  a.fillStyle = 'rgba(70,45,10,.22)'; for (let i = 0; i < 26; i++) { const x = (i * 197) % w, y = (i * 83) % h; a.fillRect(x, y, 3 + (i % 5) * 7, 2); }
-});
-const KALENDER = region(630, 210, 340, 480, (a, w, h) => {
-  a.fillStyle = '#e8e0cc'; a.fillRect(0, 0, w, h);
-  a.fillStyle = '#7d2f22'; a.fillRect(0, 0, w, 70);
-  a.fillStyle = '#efe6d2'; a.font = '700 40px Georgia, serif'; a.textAlign = 'center'; a.textBaseline = 'middle'; a.fillText('NOVEMBER', w / 2, 36);
-  a.font = '600 30px Georgia, serif';
-  for (let r = 0; r < 5; r++) for (let k = 0; k < 7; k++) { const n = r * 7 + k + 1; if (n > 30) continue; a.fillStyle = k === 6 ? '#a3271f' : '#2a241c'; a.fillText(String(n), 28 + k * 47, 112 + r * 58); }
-  a.strokeStyle = '#c23a2a'; a.lineWidth = 4; a.beginPath(); a.arc(28 + 5 * 47, 112 + 58, 22, 0, 7); a.stroke();
-  a.fillStyle = 'rgba(70,45,10,.5)'; a.fillRect(0, h - 58, w, 58);
-});
-const lapp = (x, y, f = '#efe8d6') => region(x, y, 230, 310, (a, w, h) => {
-  a.fillStyle = f; a.fillRect(0, 0, w, h);
-  a.fillStyle = '#c0553a'; a.fillRect(0, 0, w, 26);
-  a.strokeStyle = '#27324a'; a.lineWidth = 3;
-  for (let i = 0; i < 11; i++) { a.beginPath(); a.moveTo(16, 50 + i * 22); let px = 16; for (let k = 0; k < 7; k++) { px += 8 + ((x + i * 7 + k * 13) % 26); a.lineTo(px, 50 + i * 22 + ((k * 7 + i) % 5) - 2); } a.stroke(); }
-});
-const LAPP = lapp(980, 210);
-const KASSA = region(0, 450, 440, 300, (a, w, h) => {
-  a.fillStyle = '#a7a08c'; a.fillRect(0, 0, w, h);
-  for (let r = 0; r < 5; r++) for (let k = 0; k < 7; k++) { a.fillStyle = k > 4 ? (r % 2 ? '#7d2f22' : '#3a3a34') : '#e0d8c2'; a.fillRect(20 + k * 58, 24 + r * 54, 44, 42); }
-});
-const PRIS = region(0, 760, 1024, 34, (a, w, h) => {
-  a.fillStyle = '#b5ab90'; a.fillRect(0, 0, w, h);
-  a.fillStyle = '#26221c'; a.font = '600 20px Georgia, serif'; a.textBaseline = 'middle';
-  for (let i = 0; i < 16; i++) { a.fillStyle = '#26221c'; a.fillText(`${17 + (i * 5) % 9}:50`, 6 + i * 64, h / 2); a.fillStyle = '#8a8270'; a.fillRect(60 + i * 64, 2, 2, h - 4); }
-});
-const TIDNING = region(1560, 530, 300, 300, (a, w, h) => {
-  a.fillStyle = '#d6cfba'; a.fillRect(0, 0, w, h);
-  a.fillStyle = '#a3271f'; a.fillRect(14, 12, w - 28, 44);
-  a.fillStyle = '#efe6d2'; a.font = '700 30px Georgia, serif'; a.textAlign = 'center'; a.textBaseline = 'middle'; a.fillText('EXTRA', w / 2, 35);
-  a.fillStyle = '#1e1a15'; a.fillRect(14, 68, w - 28, 26); a.fillRect(14, 102, w - 90, 26);
-  a.fillStyle = '#6a6455'; a.fillRect(14, 140, 150, 110);
-  a.fillStyle = 'rgba(30,26,21,.55)'; for (let i = 0; i < 8; i++) a.fillRect(176, 142 + i * 14, w - 192, 5);
-});
+// (atlasen för etiketter och papper: sedan fönstren kom finns inga paket, skyltar eller tidningar på väggen)
+const atlas = document.createElement('canvas'); atlas.width = 64; atlas.height = 64;
 
 // ---------- scenen ----------
 const P = [];
@@ -107,37 +40,33 @@ const grupp = (fn) => {
   for (let i = a; i < b; i++) for (let k = 0; k < 3; k++) { mn[k] = Math.min(mn[k], P[i].c[k] - P[i].h[k]); mx[k] = Math.max(mx[k], P[i].c[k] + P[i].h[k]); }
   G.push({ mn: mn.map((v) => v - 1), mx: mx.map((v) => v + 1), a, b });
 };
-// väggen, golvet, taket och rummet runt om
+// väggen med fönstrens hål, golvet, taket och rummet runt om
+const FO = SCEN.FONSTER;
+const vagg = (x0, x1, y0, y1) => box([(x0 + x1) / 2, (y0 + y1) / 2, VAGG - FO.DJUP / 2], [(x1 - x0) / 2, (y1 - y0) / 2, FO.DJUP / 2], 1);
 grupp(() => {
-  box([0, 0, VAGG - 20], [9000, 4000, 20], 1);
+  vagg(-9000, 9000, -4000, FO.Y0);
+  vagg(-9000, 9000, FO.Y1, 4000);
+  vagg(-9000, FO.X[0][0], FO.Y0, FO.Y1);
+  vagg(FO.X.at(-1)[1], 9000, FO.Y0, FO.Y1);
   box([0, GOLV - 20, 2000], [9000, 20, 3200], 0, RGB('#2a1c12'));
   box([0, 1900, 2000], [9000, 20, 3200], 0, RGB('#4a3a2a'));
   box([-8000, 0, 2000], [20, 4000, 3000], 0, RGB('#3a2a1c'));
   box([8000, 0, 2000], [20, 4000, 3000], 0, RGB('#3a2a1c'));
   box([0, 0, 5200], [9000, 4000, 20], 0, RGB('#2a2018'));
 });
+// Karmarna: mörkgrå metall som skyltfönstret i rummet (#3a3a3c i rum.js), runt varje ruta en bit in i väggen,
+// så att posterna mellan rutorna blir dubbelt så breda som karmen.
+grupp(() => {
+  const K = FO.KARM, z0 = VAGG - FO.DJUP + 20, z1 = VAGG - 40, z = (z0 + z1) / 2, dz = (z1 - z0) / 2, M = RGB('#3a3a3c');
+  for (const [x0, x1] of FO.X) {
+    box([(x0 + x1) / 2, FO.Y1 - K / 2, z], [(x1 - x0) / 2, K / 2, dz], 12, M);
+    box([(x0 + x1) / 2, FO.Y0 + K / 2, z], [(x1 - x0) / 2, K / 2, dz], 12, M);
+    box([x0 + K / 2, (FO.Y0 + FO.Y1) / 2, z], [K / 2, (FO.Y1 - FO.Y0) / 2 - K, dz], 12, M);
+    box([x1 - K / 2, (FO.Y0 + FO.Y1) / 2, z], [K / 2, (FO.Y1 - FO.Y0) / 2 - K, dz], 12, M);
+  }
+});
 const T = -300; // bakdiskens ovansida, så som bardisken i rummet: skiva, fronten med fyllningar i ramar, mässingskrokar
 const TJ = 70, DJ = 560, FR = 340;
-const hylla = (y, x0, x1, ram = 8) => {
-  box([(x0 + x1) / 2, y - 12, VAGG + 110], [(x1 - x0) / 2, 12, 110], ram);
-  box([(x0 + x1) / 2, y - 22, VAGG + 222], [(x1 - x0) / 2, 22, 3], 3, [1, 1, 1], PRIS);
-  let x = x0 + 40;
-  while (x < x1 - 60) {
-    if (rnd() < 0.09) { x += 40 + rnd() * 70; continue; }
-    const n = 2 + Math.floor(rnd() * 5);
-    const m = NAMN[Math.floor(rnd() * NAMN.length)];
-    const i = NAMN.indexOf(m);
-    for (let k = 0; k < n && x < x1 - 60; k++) {
-      const fram = 150 + rnd() * 26, hh = 79;
-      box([x, y + hh, VAGG + fram / 2], [47, hh, fram / 2], 3, RGB(MARKE[m][0]), [i * CELL[0] / atlas.width, 0, (i + 1) * CELL[0] / atlas.width, CELL[1] / atlas.height]);
-      x += 99;
-    }
-    x += 2 + rnd() * 3;
-  }
-};
-// en lapp, skylt eller tavla på väggen
-const papper = (x, y, hx, hy, uv, z = VAGG + 4, mat = 15) => box([x, y, z], [hx, hy, 1.5], mat, [1, 1, 1], uv);
-
 // bardisken
 grupp(() => {
   box([0, T - TJ / 2, VAGG + DJ / 2], [7000, TJ / 2, DJ / 2], 11);
@@ -184,54 +113,6 @@ grupp(() => {
   const Z = VAGG + 300;
   [[-1010, 0], [-900, 60], [-780, -10]].forEach(([x, dz]) => flaska(x, Z + dz, RGB('#2c4a2c'), 1));
 });
-// tidningsbunten: returerna, med snöre
-grupp(() => {
-  const x = 1120, z = VAGG + 320;
-  const ton = ['#a79f88', '#8f8873', '#b0a890', '#98907a', '#a79f88', '#8f8873', '#b5ad96'];
-  ton.forEach((c, i) => {
-    const o = [[0, 0], [9, -6], [-7, 5], [11, 3], [-4, -7], [6, 6], [-3, 0]][i];
-    const y = T + 15 + i * 30;
-    box([x + o[0], y, z + o[1]], [262, 15, 188], i === ton.length - 1 ? 17 : 0, RGB(c), TIDNING);
-  });
-  const hojd = 7 * 15 + 2;
-  box([x, T + hojd, z], [5, hojd + 1, 195], 0, RGB('#5c4e34'));
-  box([x, T + hojd, z], [268, hojd + 1, 5], 0, RGB('#5c4e34'));
-});
-// kaffebryggaren: påtår ×4
-grupp(() => {
-  const x = 1640, z = VAGG + 290;
-  box([x, T + 22, z], [150, 22, 135], 0, RGB('#2c2a25'));
-  box([x, T + 270, z - 92], [130, 270, 40], 0, RGB('#2c2a25'));
-  cyl([x, T + 520, z - 10], 142, 52, 0, RGB('#2c2a25'));
-  cyl([x, T + 150, z + 25], 104, 104, 4, [0.5, 0.5, 0.48]);
-  cyl([x, T + 92, z + 25], 100, 46, 0, RGB('#1a0d06'));
-  box([x, T + 262, z + 25], [108, 8, 108], 0, RGB('#2c2a25'));
-  box([x + 118, T + 150, z + 25], [12, 58, 14], 0, RGB('#2c2a25'));
-  box([x + 90, T + 22, z + 136], [12, 7, 2], 6, [2.2, 0.2, 0.12]);
-});
-// kassaapparaten
-grupp(() => {
-  const x = 2130, z = VAGG + 300;
-  box([x, T + 85, z], [300, 85, 230], 0, RGB('#7c7562'));
-  box([x, T + 255, z - 60], [285, 90, 160], 0, RGB('#857e6a'));
-  box([x, T + 262, z + 102], [280, 80, 3], 3, [1, 1, 1], KASSA);
-  box([x + 40, T + 405, z - 120], [190, 62, 60], 0, RGB('#2e2e2a'));
-  box([x + 40, T + 408, z - 58], [158, 36, 2], 6, [0.025, 0.13, 0.055]);
-});
-
-// Paketen på en hylla över hans huvud (hjässan står ungefär vid y = 600, och bilden slutar strax över 800).
-grupp(() => hylla(640, -3800, 2900));
-// lagfotot, och furan runt det som inte har mörknat lika mycket där en större tavla har hängt (furu)
-grupp(() => {
-  box([-640, 330, VAGG + 8], [122, 168, 8], 8);
-  box([-640, 330, VAGG + 17], [104, 150, 1], 3, [1, 1, 1], [7 * CELL[0] / atlas.width, 0, 8 * CELL[0] / atlas.width, CELL[1] / atlas.height]);
-});
-// det som sitter på panelen: skylten (notan på pulten säger annat), kalendern och en lapp
-grupp(() => {
-  papper(1040, 330, 250, 92, KREDIT);
-  papper(1540, 410, 150, 212, KALENDER);
-  papper(1940, 440, 90, 124, LAPP);
-});
 // han själv och pulten framför honom: syns inte, men skuggar och kastar ljus
 const HAN = G.length;
 const hanEll = (c, h, col) => ell(tillBar(c), h, 7, col);
@@ -274,6 +155,10 @@ const LJ = q.get('dag') ? [
     { p: [5600, 1000, 3200], r: 1300, e: [0.95, 0.92, 0.86].map((v) => v * +(q.get('as') || 18)) },
   ] : []),
 ];
+// Det som kommer in genom fönstren: en stråle som går ut genom dem (bort från en, −z) hämtar det här. På
+// dagen (?dag=1) himlens ljus, vitt som fönsterljuset till höger (sidan färgar det); annars stadens och
+// brons lampor, svagt och kallt.
+const HIMMEL = q.get('dag') ? [1, 1, 1].map((v) => v * +(q.get('hs') || 1.6)) : [0.05, 0.06, 0.085].map((v) => v * +(q.get('hn') || 1));
 console.log('primitiver', P.length, 'grupper', G.length);
 
 // ---------- webgl ----------
@@ -292,6 +177,11 @@ const FS = `#version 300 es
 precision highp float; precision highp int; precision highp sampler2D;
 uniform sampler2D uP, uA, uPrev; uniform int uF; uniform vec4 uG0[${G.length}], uG1[${G.length}]; uniform ivec2 uGi[${G.length}];
 uniform vec4 uL[${LJ.length}], uLe[${LJ.length}]; uniform vec2 uRes;
+const vec3 HIMMEL = ${v3(HIMMEL)};
+// fönstrens hål (x0, x1, y0, y1) i väggens yttre plan: ljuset utifrån räknas som från en lampa (nedan)
+const int NF = ${FO.X.length};
+const vec4 FON[NF] = vec4[NF](${FO.X.map(([a, b]) => `vec4(${a.toFixed(1)}, ${b.toFixed(1)}, ${FO.Y0.toFixed(1)}, ${FO.Y1.toFixed(1)})`).join(', ')});
+const float ZF = ${(VAGG - FO.DJUP - 2).toFixed(1)};
 out vec4 ut;
 const float PI = 3.14159265;
 uint st;
@@ -362,7 +252,6 @@ vec3 furu(vec3 p) {
   float rok = smoothstep(120., 1050., p.y + 420. * (fbm(vec2(p.x * .0014, 3.)) - .5));
   c *= mix(1., .5, rok);
   c *= 1. - .32 * smoothstep(.42, .72, fbm(p.xy * vec2(.0021, .0033) + 5.));
-  if (abs(p.x + 640.) < 215. && abs(p.y - 300.) < 275.) c *= 1.26; // där en större tavla har hängt
   float spar = smoothstep(0., .014, fx) * smoothstep(0., .014, 1. - fx);
   return c * .62 * (.07 + .93 * spar);
 }
@@ -386,15 +275,23 @@ vec3 pultTra(vec3 p) {
 }
 vec3 himmel(vec3 d, bool syns) { return vec3(0.); }
 vec3 kosin(vec3 n) { float a = rn() * 2. * PI, z = rn() * 2. - 1.; float r = sqrt(1. - z * z); return normalize(n + vec3(r * cos(a), r * sin(a), z) * .9995); }
-vec3 spara(vec3 ro, vec3 rd) {
+// (färgen, och hur mycket av bildpunkten väggen täcker: noll där kameran ser rakt ut genom ett fönster,
+// och genom en flaska bara så mycket som glaset släpper igenom)
+vec4 spara(vec3 ro, vec3 rd) {
   vec3 L = vec3(0.), T = vec3(1.);
-  bool spec = true; bool forsta = true;
+  bool spec = true; bool forsta = true; bool kam = true; bool glans = false;
   for (int b = 0; b < 6; b++) {
     Hit h = skarning(ro, rd, forsta);
     // lampor: bara sedda i blanka ytor (i övrigt räknas de nedan)
     float tl = h.t;
-    if (spec && !forsta) for (int i = 0; i < ${LJ.length}; i++) { vec3 oc = ro - uL[i].xyz; float bb = dot(oc, rd), cc = dot(oc, oc) - uL[i].w * uL[i].w, dd = bb * bb - cc; if (dd > 0.) { float tt = -bb - sqrt(dd); if (tt > 1e-3 && tt < tl) { L += T * uLe[i].xyz; return L; } } }
-    if (h.id < 0) break;
+    if (spec && !forsta) for (int i = 0; i < ${LJ.length}; i++) { vec3 oc = ro - uL[i].xyz; float bb = dot(oc, rd), cc = dot(oc, oc) - uL[i].w * uL[i].w, dd = bb * bb - cc; if (dd > 0.) { float tt = -bb - sqrt(dd); if (tt > 1e-3 && tt < tl) { L += T * uLe[i].xyz; return vec4(L, 1.); } } }
+    if (h.id >= 0) glans = false;
+    if (h.id < 0) {
+      if (kam) return vec4(L, 1. - (T.r + T.g + T.b) / 3.);
+      // (genom ett fönster: bara sett i blanka ytor, annars räknat som direkt ljus nedan)
+      if (rd.z < 0. && spec && !glans) L += T * HIMMEL;
+      break;
+    }
     vec4 d1 = data(h.id, 1), d2 = data(h.id, 2), d3 = data(h.id, 3);
     int m = int(d1.w);
     vec3 p = ro + rd * h.t, n = h.n, c = d2.xyz;
@@ -406,6 +303,7 @@ vec3 spara(vec3 ro, vec3 rd) {
     if (m == 11) { c = barTra(p, true); gloss = .55; grov = .22; }
     if (m == 17) { vec3 lc = p - data(h.id, 0).xyz; if (h.n.y > .5) { vec2 uv = lc.xz / d1.xz * .5 + .5; c = textureLod(uA, vec2(mix(d3.x, d3.z, uv.x), mix(d3.y, d3.w, uv.y)), 0.).rgb * .62; } }
     if (m == 16) { gloss = .6; grov = .18; }
+    if (m != 4) kam = false;
     if (m == 13) { vec3 r = reflect(rd, n); rd = normalize(r + (vec3(rn(), rn(), rn()) - .5) * .18); ro = p + n * .5; T *= c; spec = true; forsta = false; continue; }
     if (m == 15) { if (abs(h.n.z) > .5) { vec3 lc = p - data(h.id, 0).xyz; vec2 uv = lc.xy / d1.xy * .5 + .5; c = textureLod(uA, vec2(mix(d3.x, d3.z, uv.x), mix(d3.w, d3.y, uv.y)), 0.).rgb * .62; } else c = vec3(.3); }
     if (m == 10) { c = pultTra(p); gloss = .5; grov = .34; }
@@ -422,14 +320,17 @@ vec3 spara(vec3 ro, vec3 rd) {
     if (m == 4) { // glas: speglar lite, annars rakt igenom med färg
       float cs = abs(dot(n, rd)); float F = .05 + .95 * pow(1. - cs, 5.);
       forsta = false;
-      if (rn() < F) { rd = reflect(rd, dot(n, rd) < 0. ? n : -n); ro = p + rd * .5; spec = true; }
+      if (rn() < F) { rd = reflect(rd, dot(n, rd) < 0. ? n : -n); ro = p + rd * .5; spec = true; kam = false; }
       else { T *= mix(vec3(1.), c * 1.8 + .02, .85); ro = p + rd * .6; spec = true; b--; if (T.r + T.g + T.b < .01) break; }
       continue;
     }
     forsta = false;
     if (gloss > 0.) {
       float F = (.045 + .955 * pow(1. - abs(dot(n, rd)), 5.)) * gloss;
-      if (rn() < F) { rd = normalize(reflect(rd, n) + (vec3(rn(), rn(), rn()) - .5) * grov * 2.); if (dot(rd, n) < 0.) rd = reflect(rd, n); ro = p + n * .5; spec = true; continue; }
+      vec3 rr = normalize(reflect(rd, n) + (vec3(rn(), rn(), rn()) - .5) * grov * 2.); if (dot(rr, n) < 0.) rr = reflect(rr, n);
+      // (fönstret i den blanka ytan räknas här med sin andel, så att det inte blir gnistor)
+      if (rr.z < 0. && skarning(p + n * .5, rr, false).id < 0) L += T * F * HIMMEL;
+      if (rn() < F) { rd = rr; ro = p + n * .5; spec = true; glans = true; continue; }
     }
     // direkt ljus från en slumpad lampa
     int li = int(rn() * float(${LJ.length})); if (li >= ${LJ.length}) li = ${LJ.length - 1};
@@ -443,11 +344,20 @@ vec3 spara(vec3 ro, vec3 rd) {
       // sfärlampa, jämt utspridd: ytan 4πr², cos på lampan ≈ 1/2 i snitt
       L += T * c / PI * uLe[li].xyz * ndl * (PI * lr * lr) / d2l * float(${LJ.length});
     }
+    // och ljuset utifrån, från en slumpad punkt i ett av fönstren
+    {
+      int fi = min(int(rn() * float(NF)), NF - 1);
+      vec4 F = FON[fi];
+      vec3 wp = vec3(mix(F.x, F.y, rn()), mix(F.z, F.w, rn()), ZF);
+      vec3 wd = wp - p; float w2 = dot(wd, wd), wl = sqrt(w2); wd /= wl;
+      float nw = dot(n, wd);
+      if (nw > 0. && wd.z < 0. && !skymd(p + n * .6, wd, wl - 1.)) L += T * c / PI * HIMMEL * nw * -wd.z * (F.y - F.x) * (F.w - F.z) / w2 * float(NF);
+    }
     T *= c; spec = false;
     rd = kosin(n); ro = p + n * .6;
     if (b > 2) { float q = max(max(T.r, T.g), T.b); if (rn() > q) break; T /= q; }
   }
-  return L;
+  return vec4(L, 1.);
 }
 void main() {
   ivec2 f = ivec2(gl_FragCoord.xy);
@@ -464,13 +374,14 @@ void main() {
   vec3 rc = normalize(mal - o);
   vec3 ro = ${v3(KP)} + o.x * ${v3(KR)} + o.y * ${v3(KU)};
   vec3 rd = normalize(rc.x * ${v3(KR)} + rc.y * ${v3(KU)} + rc.z * ${v3(KB)});
-  vec3 c = spara(ro, rd); c = min(c, vec3(3.5));
-  ut = texelFetch(uPrev, f, 0) + vec4(c, 1.);
+  vec4 c = spara(ro, rd);
+  ut = texelFetch(uPrev, f, 0) + vec4(min(c.rgb, vec3(3.5)), c.a);
 }`;
 const FS2 = `#version 300 es
 precision highp float; uniform sampler2D uT; uniform float uN, uRa; out vec4 ut;
 vec3 aces(vec3 x) { return clamp((x * (2.51 * x + .03)) / (x * (2.43 * x + .59) + .14), 0., 1.); }
-void main() { vec3 c = texelFetch(uT, ivec2(gl_FragCoord.xy), 0).rgb / uN; if (uRa < .5) { c = aces(c * .7); c = pow(c, vec3(1. / 2.2)); } ut = vec4(c, 1.); }`;
+// (genom fönstren genomskinligt: färgen räknas på det som väggen täcker, och duken vill ha den förmultiplicerad)
+void main() { vec4 s = texelFetch(uT, ivec2(gl_FragCoord.xy), 0) / uN; float a = clamp(s.a, 0., 1.); vec3 c = s.rgb / max(s.a, 1e-4); if (uRa < .5) { c = aces(c * .7); c = pow(c, vec3(1. / 2.2)); } ut = vec4(c * a, a); }`;
 const prog = (v, f) => { const p = gl.createProgram(); for (const [t, s] of [[gl.VERTEX_SHADER, v], [gl.FRAGMENT_SHADER, f]]) { const o = gl.createShader(t); gl.shaderSource(o, s); gl.compileShader(o); if (!gl.getShaderParameter(o, gl.COMPILE_STATUS)) console.error(gl.getShaderInfoLog(o)); gl.attachShader(p, o); } gl.linkProgram(p); if (!gl.getProgramParameter(p, gl.LINK_STATUS)) console.error(gl.getProgramInfoLog(p)); return p; };
 const p1 = prog(VS, FS), p2 = prog(VS, FS2);
 const vb = gl.createBuffer(); gl.bindBuffer(gl.ARRAY_BUFFER, vb); gl.bufferData(gl.ARRAY_BUFFER, new Float32Array([-1, -1, 3, -1, -1, 3]), gl.STATIC_DRAW);

@@ -1409,22 +1409,25 @@ window.RumUte = (() => {
   // rummet lyfter från gatan. Det görs i färgerna när gatan ritas (också de som går förbi), inte med
   // ett filter, så det kostar inget sedan. På kvällen och natten står allt som det brukar. mat0: hur
   // mycket färgen går ur – mindre i himlen, och i bron och husen så att hörnhuset är laxrosa och stan
-  // varm som från Bron, mer i dem som går förbi.
-  function kall(svg, L, mat0) {
+  // varm som från Bron, mer i dem som går förbi. kallFarg gör det med en färg (också utsikten bakom
+  // Hasse Backe, rum-hasse-ute.js).
+  function kallFarg(c, L, mat0) {
     const t = Math.min(1, L.dag * 1.3);
-    if (t < 0.03) return svg;
+    if (t < 0.03) return c;
     const mat = mat0 * t;
     const kon = 1 - 0.16 * t;
     const lju = 1 - 0.06 * t;
     const bla = [110, 140, 175];
-    return svg.replace(/#[0-9a-f]{6}\b/gi, (c) => {
-      const [r, g, b] = rgb(c);
-      const y = 0.3 * r + 0.59 * g + 0.11 * b;
-      return hx([r, g, b].map((x, i) => {
-        const a = (128 + (y + (x - y) * (1 - mat) - 128) * kon) * lju;
-        return a + (bla[i] - a) * 0.2 * t;
-      }));
-    });
+    const [r, g, b] = rgb(c);
+    const y = 0.3 * r + 0.59 * g + 0.11 * b;
+    return hx([r, g, b].map((x, i) => {
+      const a = (128 + (y + (x - y) * (1 - mat) - 128) * kon) * lju;
+      return a + (bla[i] - a) * 0.2 * t;
+    }));
+  }
+  function kall(svg, L, mat0) {
+    if (Math.min(1, L.dag * 1.3) < 0.03) return svg;
+    return svg.replace(/#[0-9a-f]{6}\b/gi, (c) => kallFarg(c, L, mat0));
   }
 
   const KALL = { himmel: 0.4, gata: 0.3, liv: 0.58, himliv: 0.58 };
@@ -1483,5 +1486,6 @@ window.RumUte = (() => {
     return changed;
   }
 
-  return { paint, light, takt, glid };
+  // (färgerna, för utsikten bakom Hasse Backe: samma ljus och samma kalla dag som här)
+  return { paint, light, takt, glid, farg: { mix, facade, kall: kallFarg, sno: snowC, KALL } };
 })();
