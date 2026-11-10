@@ -284,6 +284,11 @@ ingen falsk precision · sidan kraschar aldrig av en död källa · endast fria 
   ikryssade), och efter omgången står gängets rätt och rätt rad på den. Inuti står allt från båda: före omgången Tipset,
   notiserna, analysen och supportrarna, efter den resultaten, betygen, skrällen och krönikan, och *Åtta knep* sist (se
   [Tidningen](#tidningen))
+- [x] **Supportrarnas sidor kortare och ordnade (2026-11-10, användarens önskemål):** i Helgarderat och under
+  *Supportrarna* i tidningen på pulten står varje lags punkter i en tät uppställning – ämnet med ett ord till
+  vänster, punkterna till höger med en liten markör för slaget – källorna med datum, och högst ett citat per sida.
+  Nattjobbet skriver högst sex punkter per lag, en kort mening var, och sparar datumet för varje punkt. Bara veckans
+  källor är förberett men avslaget medan vi provar (se [Helgarderat](#helgarderat))
 - [x] **Löpsedeln är Helgarderats, och tidningen på riktigt tidningspapper (2026-11-10, användarens önskemål: "Döp om
   löpsedeln till Helgarderat också", "Kan du ordna så att tidningen ser mer 'äkta' ut - med riktigt papper"):** veckans
   löpsedel har Helgarderats namn och gröna tryck i stället för Sportbladets eller Expressens, och tidningen har löpsedelns
@@ -913,6 +918,21 @@ bara lokalt. Analyserna visas som de ligger i `data/analyser.json`; hur de skriv
   Att lägga tidningen över kupongerna gick inte: porträttet och namnet sitter överst på dem. Sedan ("Gör tidningen lite
   större") ligger kupongerna i högen tätare, så att namnen nätt och jämnt syns, och tidningen fick det som blev över.
   Se [Tidningen](#tidningen).
+- **Supportrarnas sidor: kort, ordnat och med datum (2026-11-10, användarens önskemål):** "Man vill ju att det ska
+  vara betydligt mer organiserat/snyggt och överblickbart än vad det är just nu med en massa citat, rubriker efter
+  varandra etc. Det kan väl vara något citat vid något tillfälle i texterna men jag vill att det ska vara kortfattad
+  och snygg information. Eventuella referenser ska finnas med datum från när podden släpptes t ex eller datum när
+  informationen skrevs på forumet t ex. … Helst ska ju poddarna och citaten vara från veckan när kupongen spelas -
+  men gör ett undantag nu när vi bara testar." Varje punkt hade en stämpel, nästan varje punkt ett citat, och
+  ämnena stod som rubriker under varandra. Nu står ämnet med ett ord i en smal spalt till vänster (*Truppen*,
+  *Elvan*, *Spelet*, *Klubben*, *Matchen*) och punkterna till höger, var och en med en liten markör i stället för
+  stämpeln (svart fyrkant: bekräftat, röd prick: egen uppgift eller rykte, ring: åsikt), och nyckeln står en gång
+  längst ner. Under laget står källorna med sina datum (*Ur podden SK3 TV (9 nov) och forumet Owlstalk (10 nov)*),
+  och vid punkten bara när laget har flera källor eller punkten har ett eget datum som inte syns där (ett
+  foruminlägg). Sidan har högst ett citat. Nattjobbet skriver högst sex punkter per lag, en mening på högst 22 ord
+  var, utan "värdarna säger att", och sparar dagen för varje punkt (foruminläggets, avsnittets eller artikelns).
+  Bara källor från kupongens vecka (måndag till matchen) finns som `sidan.baraVeckan` i config/poddar.js, avslaget
+  tills provperioden är slut. Se [Helgarderat](#helgarderat).
 - **Helgarderats första nummer nu, inte efter nattjobbet (2026-11-10, användarens önskemål):** "Jag vill att du gör
   första numret av Helgarderat nu och inte väntar på det". Nattjobbets första riktiga körning skulle bli natten
   efter. Provomgången från iMacen samma natt var redan lördagens matcher med veckans avsnitt, foruminlägg och
@@ -1939,14 +1959,19 @@ omgångens lag → registret (lagets poddar) → veckans avsnitt → whisper.cpp
 - **Kontrollen:** citatet på 8–30 ord ska gå att hitta i utskriften (`citatStar`), annars stryks uppgiften. Tipsord
   stryks också. Namnet på den som talar följer bara med om det står i utskriften (`vemStar`); maskinen skiljer inte
   på rösterna, så oftast står bara poddens namn under citatet.
-- **Informationssidan per match** (användarens önskan 2026-11-10: *längre informationssidor per match som man kan
-  hämta kunskap ur*, med citat och vem som säger det): när uppgifterna för en match har ändrats får Claude båda lagens
-  uppgifter (vikt 3 eller mer, ur lagets tre senaste avsnitt) och redigerar sidan, utan verktyg (`skrivSida`): väljer
-  högst nio punkter per lag, slår ihop det som sägs två gånger, grupperar under ämnena och skriver rubrik och ingress.
-  Varje punkt måste peka på uppgifter som finns (`ur`), och slaget, podden och citatet tas därifrån, inte ur svaret.
-  En text, rubrik eller ingress med tipsord eller tal som inte står i uppgifterna stryks: punkten får då uppgiftens
-  egen text och sidan en rubrik ur mallen. Högst fem citat per lag trycks, de tyngsta punkternas. Går svaret inte att
-  läsa står uppgifterna som de är, grupperade (`sidaUtan`), och sidan redigeras nästa natt. Inga tips.
+- **Informationssidan per match** (användarens önskan 2026-11-10: *informationssidor per match som man kan
+  hämta kunskap ur*, och samma dag: *kortfattad och snygg information*, källorna med datum): när uppgifterna för en
+  match har ändrats får Claude båda lagens uppgifter (vikt 3 eller mer, ur lagets tre senaste avsnitt) och redigerar
+  sidan, utan verktyg (`skrivSida`): väljer högst sex punkter per lag, en kort mening på högst 22 ord var, slår ihop
+  det som sägs två gånger, grupperar under ämnena och skriver rubrik och ingress (högst 32 ord).
+  Varje punkt måste peka på uppgifter som finns (`ur`), och slaget, podden, datumet och citatet tas därifrån, inte ur
+  svaret. `datum` står bredvid `podd`, en dag per källa: foruminläggets, annars avsnittets eller artikelns. En text,
+  rubrik eller ingress med tipsord eller tal som inte står i uppgifterna stryks: punkten får då uppgiftens egen text
+  och sidan en rubrik ur mallen. Den tyngsta punkten med citat per lag har det kvar, och tidningen trycker ett för hela
+  sidan. Går svaret inte att läsa står uppgifterna som de är, grupperade (`sidaUtan`), och sidan redigeras nästa natt.
+  Inga tips. Byts `sidan.version` skrivs sidorna om nästa natt utan att avsnitten tas ut på nytt. Med
+  `sidan.baraVeckan` tas bara uppgifter från kupongens vecka med (måndag till matchen, `veckansMandag`); det är
+  avslaget medan vi provar (användarens beslut 2026-11-10).
 - **Ut på sajten:** analysjobbet (scripts/analyser/skriv.mjs, var 15:e minut) lägger sidorna i `data/poddsidor.json`
   när de har ändrats, utan något anrop till Claude. Tidningen i rummet visar dem under *Supportrarna*, en sida per
   match (se [Tidningen](#tidningen)).
@@ -1959,7 +1984,7 @@ omgångens lag → registret (lagets poddar) → veckans avsnitt → whisper.cpp
 { "omgang": "…", "uppdaterad": "…", "amnen": { "trupp": "Skador och trupp" },
   "sidor": [ { "id": "401880745", "nr": 3, "match": "Stockport County – Reading", "lag": ["…", "…"], "rubrik": "…",
                "ingress": "…", "delar": [ { "lag": "…", "kallor": [ { "podd": "…", "avsnitt": "…", "datum": "…", "adress": "…" } ],
-                 "grupper": [ { "amne": "trupp", "punkter": [ { "t": "…", "s": "b", "podd": ["…"],
+                 "grupper": [ { "amne": "trupp", "punkter": [ { "t": "…", "s": "b", "podd": ["…"], "datum": ["2026-11-09"],
                                 "citat": { "sagt": "…", "vem": null, "podd": "…" } } ] } ] } ] } ] }
 ```
 
@@ -7077,12 +7102,14 @@ riktig omgång (sammanställningen kräver tjänsten), i Safari eller i en rikti
   sist.
 - *Supportrarna*: en informationssida per match ur `data/poddsidor.json` (se *Supporterpoddarna*,
   *Supporterforumen* och *De insatta medierna* under [Analyserna](#analyserna)), i kupongens ordning: rubrik och
-  ingress, hemmalaget till vänster och bortalaget till höger med poddarna, forumet och de insatta medierna de bygger
-  på, och punkterna under sina ämnen. Varje punkt
-  har slaget som stämpel (*Bekräftat* i svart, källans egen uppgift i rött – *Hört i podden*, *Från forumet*,
-  *Enligt insatta* eller *Hört bland supportrarna* när flera säger det – och *Supportrarnas åsikt* streckad), och de
-  tyngsta har citatet under, med den som säger det och podden, användarnamnet och forumet, eller källans namn. Har bara det ena laget något
-  får det hela bredden i två spalter. Slagen förklaras i sidfoten.
+  ingress, hemmalaget till vänster och bortalaget till höger med källorna och deras datum under namnet (*Ur podden
+  SK3 TV (9 nov) och forumet Owlstalk (10 nov)*), och punkterna i en tät uppställning: ämnet med ett ord till vänster
+  (*Truppen*, *Elvan*, *Spelet*, *Klubben*, *Matchen*) och punkterna till höger, var och en med en liten markör för
+  slaget (svart fyrkant: bekräftat, röd prick: egen uppgift eller rykte, ring: åsikt). Källan och datumet står vid
+  punkten när laget har flera källor, eller när punkten har ett eget datum som inte syns i raden. Sidan har högst ett
+  citat, under laget det gäller, med den som säger det, källan och datumet (`poddCitat`). Har bara det ena laget
+  något får det hela bredden i två spalter. Nyckeln till markörerna står i sidfoten. Samma uppställning som på
+  sajtens [Helgarderat](#helgarderat) (`poddLaget`, `poddUr` och `poddCitat` i rum-tidning.js).
   *I tidningen* pekar på den första av sidorna.
 
 Notiserna, supporterpoddarnas sidor och analyserna hämtas när man pekar på eller trycker på tidningen, och klicket väntar
@@ -7164,13 +7191,28 @@ flaskgrönt, namnet i Alfa Slab One och till vänster om det rutorna 1, X och 2,
 där båda lagen har något (`storst` i [public/helgarderat.js](public/helgarderat.js)). Ettan har ett stort citat, helst
 om truppen och med ett namn. Bredvid står *Lördagens matcher* med sidnumren och under *Hört bland supportrarna*, med en
 egen uppgift (slaget h) ur poddarna eller forumen, ur var och en av tre andra matcher, och *De insatta skriver*, med en
-uppgift ur de insatta medierna ur tre matcher som inte redan står på framsidan, när det finns. Sedan kommer en sida per match med lagen bredvid varandra,
-uppgifterna under sina ämnen, stämplarna och citaten. Har bara det ena laget något får det hela bredden i två spalter.
-Baksidan har källorna per match, med länkar till avsnitten, forumtrådarna och artiklarna, och stämplarna. De
-insattas egna uppgifter har stämpeln *Enligt insatta* i grönt, och källans namn står vid punkten när laget har flera
-källor. Texterna för slagen,
-ämnena och förklaringarna kommer från `RumTidning.TEXT.poddar`, så att det står samma sak i båda tidningarna. Under
-720 px är allt en spalt.
+uppgift ur de insatta medierna ur tre matcher som inte redan står på framsidan, när det finns, båda med källan och
+datumet under uppgiften. Sedan kommer en sida per match med lagen bredvid varandra.
+
+**Matchens sida** (2026-11-10, användarens önskemål: "betydligt mer organiserat/snyggt och överblickbart … kortfattad
+och snygg information", referenserna med datum): under lagets namn står källorna med datum och länk (*Ur podden SK3
+TV (9 nov) och forumet Owlstalk (10 nov)*; två avsnitt av samma podd: *(2 och 9 nov)*). Sedan kommer ämnena, ett i
+taget med ett tunt streck emellan: ämnet med ett ord i en smal grön spalt till vänster (*Truppen*, *Elvan*, *Spelet*,
+*Klubben*, *Matchen*) och punkterna till höger. Framför varje punkt står en liten markör för slaget i stället för
+stämpeln: en svart fyrkant för det bekräftade, en röd prick för en egen uppgift eller ett rykte och en ring för en
+åsikt, med ordet när man pekar på den. Källan och datumet står vid punkten i liten grå stil bara när laget har flera
+källor (*Owlstalk 8 nov*), eller när punkten har ett eget datum som inte syns i raden under laget (ett foruminlägg).
+Sidan har högst ett citat, det bästa (helst om truppen eller elvan, sedan med ett namn, inte för långt eller för
+kort), under laget det gäller, med den som säger det, källan och datumet; ettan på framsidan har samma. Längst ner
+står nyckeln till markörerna. Har bara det ena laget något får det hela bredden i två spalter. Baksidan har källorna
+per match, med länkar till avsnitten, forumtrådarna och artiklarna, och markörerna med förklaringen. Uppställningen
+av lagets punkter (`poddLaget`, `poddUr`, `poddCitat`) och texterna för slagen, ämnena och förklaringarna kommer från
+`RumTidning`, så att det står samma sak på samma sätt i båda tidningarna. Under 720 px är allt en spalt.
+
+Punkterna i det första numret är skrivna innan nattjobbet fick de kortare anvisningarna, och har en till två meningar
+och upp till tolv per lag. När nattjobbet skriver omgångens sidor (`sidan.version` i config/poddar.js) blir de högst
+sex per lag och en kort mening var, och varje punkt får sitt eget datum. Helst ska källorna vara från kupongens vecka,
+men inte medan vi provar: `sidan.baraVeckan` är förberett och avslaget (användarens beslut 2026-11-10).
 
 Provnumrets innehåll är provomgången som poddjobbet gjorde på iMacen 2026-11-10 (`prov-omgang-forum.json`, tolv matcher i League
 One och Two den 14 november). Den ligger i [public/helgarderat/utkast.json](public/helgarderat/utkast.json) och är
@@ -7192,7 +7234,13 @@ telefon. De insatta medierna och veckans omgång provades 2026-11-10 i huvudlös
 `data/poddsidor.json` att veckans omgång visas utan provstämpel och att provnumret kommer tillbaka utan den. Det första
 numret provades 2026-11-10 i huvudlös Chromium med public/ ur arbetskopian och `data/poddsidor.json` (utan sköldarna),
 i 1280 bredd och 390 × 844: *Nr 1 · Vecka 46* i huvudet och i kolofonen, ingen stämpel, tolv sidor och baksidan, och
-inget som sticker ut åt sidan; utan filen *Nr 0 · Vecka 46* med stämpeln.
+inget som sticker ut åt sidan; utan filen *Nr 0 · Vecka 46* med stämpeln. Den nya uppställningen av sidorna provades
+2026-11-10 i huvudlös Chromium med public/ ur arbetskopian och `data/poddsidor.json` (utan sköldarna och typsnitten),
+i 1280 bredd och 390 × 844: framsidan, en sida där båda lagen har något (Stockport–Reading), en där bara det ena har
+det (Wigan–Barnsley, med två källor och datum vid punkterna), Colchester–Gillingham i telefonen, inget fel i konsolen
+och inget som sticker ut åt sidan; *Supportrarna* i tidningen på pulten med samma data ritad för sig. Med Node:
+`sidansUnderlag` med och utan `baraVeckan`, `punkt` med datum per källa och `veckansMandag`. Inte provat i Safari, i
+en riktig telefon eller med nattjobbet själv.
 
 ### Närbilderna
 

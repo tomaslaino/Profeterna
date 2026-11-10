@@ -146,29 +146,34 @@
 .tn-pod.en .tn-pod-lag:not(.tom) { column-count: 2; column-gap: 20px; column-rule: 1px solid var(--streck); }
 .tn.smal .tn-pod.en .tn-pod-lag { column-count: 1; }
 .tn-pod.en .tn-pod-lag h4, .tn-pod.en .tn-pod-lag > .tn-kalla { column-span: all; }
-.tn-pod.en .tn-pod-grupp:first-of-type { margin-top: 8px; }
-.tn-pod.en .tn-pod-punkt, .tn-pod.en .tn-pod-grupp h5 { break-inside: avoid; break-after: avoid; }
-.tn-pod.en .tn-pod-punkt { break-after: auto; }
+.tn-pod.en .tn-pod-rad, .tn-pod.en .tn-pod-citat { break-inside: avoid; }
+.tn-pod.en .tn-pod-rad:first-child { padding-top: 7px; }
 .tn-pod.en .tn-pod-lag.tom { order: 2; }
 .tn .tn-pod-lag h4 { margin: 0 0 3px; padding: 5px 0 3px; border-top: 3px solid var(--svart); border-bottom: 1px solid var(--svart); font: 400 24px/1 Anton, Impact, sans-serif; letter-spacing: 0.02em; text-transform: uppercase; }
 .tn-pod-lag > .tn-kalla { margin: 4px 0 2px; }
-.tn-pod-grupp { margin-top: 11px; }
-.tn .tn-pod-grupp h5 { margin: 0 0 6px; padding: 0; color: var(--gron); font: 800 11.5px/1.2 var(--sans); letter-spacing: 0.08em; text-transform: uppercase; }
-.tn-pod-punkt { margin: 0 0 9px; padding-bottom: 9px; border-bottom: 1px dotted rgba(23, 19, 14, 0.45); }
-.tn-pod-grupp .tn-pod-punkt:last-child { border-bottom: 0; padding-bottom: 0; }
-.tn-pod-punkt > p { margin-top: 3px; font: 400 14px/1.38 var(--serif); hyphens: auto; -webkit-hyphens: auto; }
-.tn-pod-punkt > small { margin-left: 6px; font: italic 400 11px/1.2 var(--serif); color: var(--gra); }
-.tn-slag { display: inline-block; box-sizing: border-box; padding: 2px 5px 1px; border: 1.2px solid var(--svart); font: 800 9.5px/1.15 var(--sans); font-style: normal; letter-spacing: 0.07em; text-transform: uppercase; white-space: nowrap; vertical-align: 1px; }
-.tn-slag.s-b { background: var(--svart); color: var(--p); }
-.tn-slag.s-h { border-color: var(--rod); color: var(--rod); }
-.tn-slag.s-o { border-style: dashed; color: var(--gra); border-color: var(--gra); }
-.tn .tn-pod-punkt blockquote { margin: 6px 0 0; padding: 0 0 0 9px; border: 0; border-left: 3px solid var(--gron); background: none; }
-.tn-pod-punkt blockquote p { font: italic 400 14.5px/1.32 var(--serif); }
-.tn-pod-punkt cite { display: block; margin-top: 2px; font: 700 10.5px/1.3 var(--sans); font-style: normal; letter-spacing: 0.03em; color: var(--gra); }
-.tn-pod-punkt cite::before { content: "– "; }
+/* lagets punkter: ämnet med ett ord till vänster, punkterna bredvid med markören framför (som i Helgarderat) */
+.tn-pod-rader { margin-top: 6px; }
+.tn-pod-rad { display: grid; grid-template-columns: 62px minmax(0, 1fr); column-gap: 9px; padding: 7px 0; border-top: 1px solid var(--streck); }
+.tn-pod-rad:first-child { padding-top: 2px; border-top: 0; }
+.tn-pod-rad > b { padding-top: 3px; color: var(--gron); font: 800 10px/1.3 var(--sans); letter-spacing: 0.07em; text-transform: uppercase; }
+.tn-pod-rad ul { margin: 0; padding: 0; list-style: none; }
+.tn-pod-rad li { position: relative; padding-left: 13px; font: 400 14px/1.36 var(--serif); hyphens: auto; -webkit-hyphens: auto; }
+.tn-pod-rad li + li { margin-top: 5px; }
+.tn-pod-rad li small { font: 400 10.5px/1.2 var(--sans); color: var(--gra); hyphens: manual; -webkit-hyphens: manual; }
+/* markörerna: bekräftat en svart fyrkant, en egen uppgift eller ett rykte en röd prick, en åsikt en ring */
+.tn-mark { display: inline-block; width: 7px; height: 7px; box-sizing: border-box; }
+.tn-pod-rad .tn-mark { position: absolute; left: 0; top: 0.54em; }
+.tn-mark.s-b { background: var(--svart); }
+.tn-mark.s-h { border-radius: 50%; background: var(--rod); }
+.tn-mark.s-o { border: 1.4px solid var(--gra); border-radius: 50%; }
+/* sidans enda citat, under laget det gäller */
+.tn .tn-pod-citat { margin: 10px 0 0; padding: 1px 0 1px 9px; border: 0; border-left: 3px solid var(--gron); background: none; }
+.tn-pod-citat p { font: italic 400 15px/1.32 var(--serif); }
+.tn-pod-citat cite { display: block; margin-top: 3px; font: 700 10.5px/1.3 var(--sans); font-style: normal; letter-spacing: 0.03em; color: var(--gra); }
+.tn-pod-citat cite::before { content: "– "; }
 .tn-pod-ingen { margin-top: 10px !important; font: italic 400 13.5px/1.35 var(--serif); color: var(--gra); }
-.tn-pod-fot { margin-top: 14px !important; padding-top: 7px; border-top: 1px solid var(--streck); font: 400 11.5px/1.75 var(--sans); color: var(--gra); }
-.tn-pod-fot .tn-slag { font-size: 8.5px; }
+.tn-pod-fot { display: flex; flex-wrap: wrap; gap: 2px 14px; margin-top: 14px !important; padding-top: 7px; border-top: 1px solid var(--streck); font: 400 11.5px/1.6 var(--sans); color: var(--gra); }
+.tn-pod-fot .tn-mark { margin-right: 5px; vertical-align: 0.5px; }
 
 /* betygen */
 .tn-betygen { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); column-gap: 18px; row-gap: 14px; }
