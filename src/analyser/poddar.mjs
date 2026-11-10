@@ -384,96 +384,99 @@ export function sidansUnderlag(fil, lagen, { avspark = null } = {}) {
 // utan att avsnitten tas ut på nytt.
 export const sidNyckel = (u) => `${pc.promptVersion}|${pc.sidan.version}|${Object.values(u.lag).flat().map((x) => x.id).sort().join(',')}`;
 
-// En punkt på sidan av en eller flera uppgifter (ur) och, om den håller, redaktörens text. datum står bredvid
-// podd, ett per källa: dagen då källan sa det (den senaste när den sa det flera gånger), så att tidningen kan
-// skriva källan med datum.
-function punkt(ur, text) {
+// En punkt under laget (underlaget till matchbladet) av en eller flera uppgifter. datum står bredvid podd, ett per
+// källa: dagen då källan sa det (den senaste när den sa det flera gånger).
+function punkt(ur) {
   const kalla = ur.slice().sort((p, q) => q.vikt - p.vikt);
-  const eget = `${kalla.map((x) => x.t).join('\n')}`;
-  const t0 = typeof text === 'string' ? text.trim() : '';
-  const hall = t0 && antalOrd(t0) <= pc.sidan.punktOrd + 15 && !TIPS_RE.test(t0) && !unknownNumbers([t0], [eget]).length;
-  const med = kalla.find((x) => x.sagt);
   const typer = [...new Set(kalla.map((x) => x.typ || 'podd'))];
   const podd = [...new Set(kalla.map((x) => x.podd))];
   const datum = podd.map((n) => kalla.filter((x) => x.podd === n).map((x) => x.datum || '').sort().at(-1) || null);
   return {
-    t: hall ? t0 : kalla[0].t,
+    t: kalla[0].t,
     // det minst säkra slaget gäller
     s: SAKERHET[Math.max(...kalla.map((x) => SAKERHET.indexOf(x.s)))] || 'h',
     vikt: kalla[0].vikt,
     podd,
     ...(datum.some(Boolean) ? { datum } : {}),
     typ: typer.length > 1 ? 'blandat' : typer[0],
-    ...(med ? { citat: { sagt: med.sagt, vem: med.vem || null, podd: med.podd, typ: med.typ || 'podd' } } : {}),
   };
 }
 
-// Grupperna i ämnenas ordning, högst pc.sidan.punkterPerLag punkter och citat på de tyngsta.
-function delAv(lag, grupper, kallor) {
-  let kvar = pc.sidan.punkterPerLag;
-  const alla = grupper.flatMap((g) => g.punkter).sort((p, q) => q.vikt - p.vikt);
-  const behall = new Set(alla.slice(0, kvar));
-  const medCitat = new Set(alla.filter((p) => behall.has(p) && p.citat).slice(0, pc.sidan.citatPerLag));
-  const ut = [];
-  for (const amne of AMNEN) {
-    const punkter = grupper.filter((g) => g.amne === amne).flatMap((g) => g.punkter).filter((p) => behall.has(p))
-      .map((p) => { const { vikt, citat, ...r } = p; return medCitat.has(p) ? { ...r, citat } : r; });
-    if (punkter.length) ut.push({ amne, punkter });
-  }
-  return { lag, kallor, grupper: ut };
+// Lagets uppgifter som de är, grupperade i ämnenas ordning, högst pc.sidan.punkterPerLag med de tyngsta först.
+// De står under laget i data/poddsidor.json som underlag; tidningen trycker artikeltexten (text).
+function delAv(lag, uppgifter, kallor) {
+  const alla = uppgifter.slice().sort((p, q) => q.vikt - p.vikt).slice(0, pc.sidan.punkterPerLag);
+  const grupper = AMNEN.map((amne) => ({ amne, punkter: alla.filter((x) => x.a === amne).map((x) => { const { vikt, ...r } = punkt([x]); return r; }) })).filter((g) => g.punkter.length);
+  return { lag, kallor, grupper };
 }
 
-// Sidan utan redaktör: uppgifterna som de är, grupperade efter ämne och med de tyngsta först.
+// Lagets text utan redaktör: de tyngsta uppgifterna som löptext, ett stycke per ämne.
+function textUtan(uppgifter) {
+  const alla = uppgifter.slice().sort((p, q) => q.vikt - p.vikt).slice(0, pc.sidan.punkterPerLag);
+  return AMNEN.map((amne) => alla.filter((x) => x.a === amne).map((x) => x.t.trim()).join(' ')).filter(Boolean);
+}
+
+// Matchbladet utan redaktör: uppgifterna som löptext under laget, utan rubrik, introduktion och sammanfattning.
 export function sidaUtan(underlag, lagen) {
   return {
     rubrik: null,
     ingress: null,
-    delar: lagen.map((lag) => delAv(lag, AMNEN.map((amne) => ({ amne, punkter: underlag.lag[lag].filter((x) => x.a === amne).sort((p, q) => q.vikt - p.vikt).map((x) => punkt([x])) })), underlag.kallor[lag])),
+    summering: null,
+    citat: null,
+    delar: lagen.map((lag) => ({ ...delAv(lag, underlag.lag[lag], underlag.kallor[lag]), text: textUtan(underlag.lag[lag]) })),
   };
 }
 
 const RAKNEORD = /^(två|tre|fyra|fem|sex|sju|åtta|nio|tio|elva|tolv)$/i;
 
-// Redaktörens svar → sidan. Varje punkt måste bygga på uppgifter som finns för laget;
-// en text med nya tal eller tipsord byts mot uppgiftens egen. → sidan, eller null.
+// Redaktörens svar → matchbladet: rubrik, introduktion (ingress), ett till några stycken per lag, sammanfattning och
+// högst ett citat. En text med tipsord, för många ord eller tal som inte står i uppgifterna stryks: rubriken får
+// mallen, introduktionen och sammanfattningen faller bort och lagets text blir uppgifterna som löptext (textUtan).
+// Citatet tas ur uppgiften redaktören pekar på, aldrig ur svaret. → sidan, eller null om svaret inte går att läsa.
 export function sidaAv(content, underlag, lagen) {
   let j;
   try { j = jsonOf(content); } catch { return null; }
   if (!j || !j.lag || typeof j.lag !== 'object') return null;
-  const allt = Object.values(underlag.lag).flat().map((x) => `${x.t}\n${x.sagt || ''}`).join('\n');
+  const alla = Object.values(underlag.lag).flat();
+  const allt = alla.map((x) => `${x.t}\n${x.sagt || ''}`).join('\n');
   const fel = [];
-  const text = (v, flest, vad) => {
-    const t = typeof v === 'string' ? v.trim() : '';
+  const varfor = (t, flest) => {
     const tips = t.match(TIPS_RE);
     // Redaktören får räkna ihop (”fyra spelare borta”): små räkneord i bokstäver släpps.
     const tal = unknownNumbers([t], [allt, lagen.join(' ')]).filter((x) => !RAKNEORD.test(String(x)));
-    const why = !t ? 'saknas' : antalOrd(t) > flest ? `${antalOrd(t)} ord` : tips ? `tipsord (${tips[0]})` : tal.length ? `okända tal (${tal.join(', ')})` : null;
+    return !t ? 'saknas' : antalOrd(t) > flest ? `${antalOrd(t)} ord` : tips ? `tipsord (${tips[0]})` : tal.length ? `okända tal (${tal.join(', ')})` : null;
+  };
+  const text = (v, flest, vad) => {
+    const t = typeof v === 'string' ? v.trim() : '';
+    const why = varfor(t, flest);
     if (why) fel.push(`${vad}: ${why}`);
     return why ? null : t;
   };
   const delar = lagen.map((lag) => {
-    const per = new Map(underlag.lag[lag].map((x) => [x.id, x]));
-    const tagna = new Set();
-    const grupper = (Array.isArray(j.lag[lag]) ? j.lag[lag] : []).map((g) => ({
-      amne: g && AMNEN.includes(g.amne) ? g.amne : 'match',
-      punkter: (Array.isArray(g && g.punkter) ? g.punkter : []).map((p) => {
-        const ur = [...new Set(Array.isArray(p && p.ur) ? p.ur.map(String) : [])].filter((id) => per.has(id) && !tagna.has(id)).map((id) => per.get(id));
-        if (!ur.length) return null;
-        for (const x of ur) tagna.add(x.id);
-        // en bekräftad uppgift och en åsikt hör inte ihop: då gäller bara den första
-        const samma = ur.filter((x) => (x.s === 'o') === (ur[0].s === 'o'));
-        return punkt(samma, p.t);
-      }).filter(Boolean),
-    }));
-    return delAv(lag, grupper, underlag.kallor[lag]);
+    const egna = underlag.lag[lag];
+    const del = delAv(lag, egna, underlag.kallor[lag]);
+    if (!egna.length) return { ...del, text: [] };
+    const svar = j.lag[lag] && typeof j.lag[lag] === 'object' && !Array.isArray(j.lag[lag]) ? j.lag[lag] : {};
+    const stycken = (Array.isArray(svar.text) ? svar.text : [svar.text]).filter((t) => typeof t === 'string' && t.trim()).map((t) => t.trim());
+    const ord = stycken.reduce((a, t) => a + antalOrd(t), 0);
+    const why = !stycken.length ? 'saknas' : stycken.length > pc.sidan.stycken + 1 ? `${stycken.length} stycken` : ord > pc.sidan.lagOrd + 40 ? `${ord} ord`
+      : stycken.map((t) => varfor(t, Infinity)).find(Boolean) || null;
+    if (why) fel.push(`${lag}: ${why}`);
+    return { ...del, text: why ? textUtan(egna) : stycken };
   });
-  // Tappade redaktören bort ett lag som har uppgifter gäller inte svaret.
-  if (lagen.some((lag, i) => underlag.lag[lag].length && !delar[i].grupper.length)) return null;
-  return { rubrik: text(j.rubrik, pc.sidan.rubrikOrd + 3, 'rubriken'), ingress: text(j.ingress, pc.sidan.ingressOrd + 15, 'ingressen'), delar, fel };
+  const c = typeof j.citat === 'string' && alla.find((x) => x.id === j.citat && x.sagt);
+  return {
+    rubrik: text(j.rubrik, pc.sidan.rubrikOrd + 3, 'rubriken'),
+    ingress: text(j.ingress, pc.sidan.ingressOrd + 15, 'introduktionen'),
+    summering: text(j.summering, pc.sidan.summeringOrd + 15, 'sammanfattningen'),
+    citat: c ? { sagt: c.sagt, vem: c.vem || null, podd: c.podd, typ: c.typ || 'podd', datum: c.datum || null } : null,
+    delar,
+    fel,
+  };
 }
 
-// Skriver matchens informationssida av uppgifterna i poddfilen. lagen: [hemma, borta].
-// → {rubrik, ingress, delar: [{lag, kallor, grupper: [{amne, punkter: [{t, s, podd, citat}]}]}], nyckel, redigerad, sekunder}
+// Skriver matchbladet av uppgifterna i poddfilen. lagen: [hemma, borta].
+// → {rubrik, ingress, summering, citat, delar: [{lag, kallor, grupper, text: [stycken]}], nyckel, redigerad, sekunder}
 // eller null om inget lag har något. Fel från Claude Code (Stopp) kastas; annars blir sidan oredigerad.
 export async function skrivSida(fil, lagen, { avspark = null, now = () => new Date(), claude = claudeSvar, logg = () => {} } = {}) {
   const underlag = sidansUnderlag(fil, lagen, { avspark });
@@ -482,12 +485,13 @@ export async function skrivSida(fil, lagen, { avspark = null, now = () => new Da
   let sida = null;
   let sekunder = 0;
   try {
-    const system = pc.sidaPrompt.replace('{punkter}', pc.sidan.punkterPerLag).replace('{punktOrd}', pc.sidan.punktOrd).replace('{rubrikOrd}', pc.sidan.rubrikOrd).replace('{ingressOrd}', pc.sidan.ingressOrd);
-    const data = { match: lagen.join(' – '), ...(avspark ? { avspark: nowFmt.format(new Date(avspark)) } : {}), lag: Object.fromEntries(lagen.map((lag) => [lag, underlag.lag[lag].map((x) => ({ id: x.id, amne: x.a, slag: x.s, vikt: x.vikt, [x.typ === 'forum' ? 'forum' : x.typ === 'media' ? 'insatta' : 'podd']: x.podd, datum: x.datum, uppgift: x.t }))])) };
+    const system = pc.sidaPrompt.replace('{rubrikOrd}', pc.sidan.rubrikOrd).replace('{ingressOrd}', pc.sidan.ingressOrd).replace('{stycken}', pc.sidan.stycken)
+      .replace('{lagOrd}', pc.sidan.lagOrd).replace('{summeringOrd}', pc.sidan.summeringOrd);
+    const data = { match: lagen.join(' – '), ...(avspark ? { avspark: nowFmt.format(new Date(avspark)) } : {}), lag: Object.fromEntries(lagen.map((lag) => [lag, underlag.lag[lag].map((x) => ({ id: x.id, amne: x.a, slag: x.s, vikt: x.vikt, [x.typ === 'forum' ? 'forum' : x.typ === 'media' ? 'insatta' : 'podd']: x.podd, datum: x.datum, uppgift: x.t, ...(x.sagt ? { citat: x.sagt } : {}) }))])) };
     const r = await claude({ system, prompt: `Idag är det ${nowFmt.format(now())}.\n\nUnderlaget (JSON):\n${JSON.stringify(data)}`, tools: [], model: pc.model, effort: pc.sidan.effort, timeoutMs: pc.timeoutMs });
     sekunder = r.seconds;
     sida = r.refused ? null : sidaAv(r.content, underlag, lagen);
-    if (!sida) logg(`  sidan ${lagen.join(' – ')}: redaktörens svar höll inte, uppgifterna står som de är`);
+    if (!sida) logg(`  sidan ${lagen.join(' – ')}: redaktörens svar höll inte, uppgifterna står som löptext`);
     else if (sida.fel.length) logg(`  sidan ${lagen.join(' – ')}: ${sida.fel.join('; ')}`);
     if (sida) delete sida.fel;
   } catch (err) {
@@ -555,15 +559,16 @@ export function poddNyckel(fil) {
   return Object.values(fil.lag).flatMap((p) => (p.avsnitt || []).filter((a) => a.uppgifter && a.uppgifter.some((x) => x.vikt >= pc.minstVikt)).map((a) => a.id)).sort().join(',');
 }
 
-// Informationssidorna som de läggs ut (data/poddsidor.json): omgångens matcher i kupongens
-// ordning, bara de som har en sida. Citaten på engelska och utskrifterna följer aldrig med.
-// → {omgang, uppdaterad, sidor: [{id, nr, match, lag, rubrik, ingress, delar}]} eller null
+// Matchbladen som de läggs ut (data/poddsidor.json): omgångens matcher i kupongens ordning, bara de
+// som har ett blad. Citaten på engelska och utskrifterna följer aldrig med; sidans citat är på svenska.
+// → {omgang, uppdaterad, sidor: [{id, nr, match, lag, rubrik, ingress, summering, citat, delar}]} eller null
 export function poddsidor(fil, round) {
   if (!fil || !round || fil.omgang !== round.id || !fil.sidor) return null;
   const sidor = round.matcher.map((x, i) => {
     const s = fil.sidor[String(x.id)];
-    if (!s || !Array.isArray(s.delar) || !s.delar.some((d) => d.grupper.length)) return null;
-    return { id: String(x.id), nr: i + 1, match: s.match, lag: s.lag, avspark: x.avspark || s.avspark || null, skriven: s.skriven, rubrik: s.rubrik || null, ingress: s.ingress || null, delar: s.delar };
+    if (!s || !Array.isArray(s.delar) || !s.delar.some((d) => (d.grupper || []).length || (d.text || []).length)) return null;
+    return { id: String(x.id), nr: i + 1, match: s.match, lag: s.lag, avspark: x.avspark || s.avspark || null, skriven: s.skriven, rubrik: s.rubrik || null, ingress: s.ingress || null,
+      summering: s.summering || null, ...(s.citat ? { citat: s.citat } : {}), delar: s.delar };
   }).filter(Boolean);
   return sidor.length ? { omgang: round.id, uppdaterad: fil.uppdaterad, amnen: pc.amnen, sidor } : null;
 }
