@@ -1215,6 +1215,14 @@ bara lokalt. Analyserna visas som de ligger i `data/analyser.json`; hur de skriv
   den med underarmen rakt fram från armbågen. Handen går lågt över disken, nyper cigarren med flack hand och
   rak handled, och pek- och långfingret ligger lite samlade. Handen går fri från cigarren när han slår i
   disken, och askkoppen syns hel i telefonen. Se [Hasse Backe](#hasse-backe), *Cigarren*.
+- **Klicka på Hasses kaffe, askkopp och de andra sakerna (2026-11-10, användarens önskemål):** "kan du ordna så att
+  man kan klicka på kaffet, askkoppen osv och så gör Hasse de rörelserna - men att han annars gör dem så som han
+  känner för det". Ett klick var som helst i hans bild gick förut tillbaka till rummet. Nu går kaffet, askkoppen med
+  cigarren, tändsticksstället, tändaren och notan att klicka på (handen visas över dem): han dricker kaffet på ett av
+  sina sätt, röker cigarren eller tänder den med det man klickade på om den har slocknat, eller tittar på notan och
+  skakar på huvudet. Det han håller på med gör han färdigt först, och pratar han säger han det färdigt. Själv tar han
+  kaffet eller cigarren när han känner för det, oftast omväxlande men inte varannan gång som förut. Se
+  [Hasse Backe](#hasse-backe), *Sakerna på disken*.
 - **Hasse tänder cigarren när den har slocknat (2026-11-10, användarens önskemål):** "Kan du göra olika
   sekvenser när cigarren är otänd och Hasse tar upp den, tänder den o njuter på olika sätt. Det kan hända då
   o då i logiska sekvenser med annat". Cigarren brann alltid. Nu slocknar den om han låter den ligga några
@@ -5911,9 +5919,10 @@ sidan om den, vänd mot en, med underarmarna på pulten, kaffet och notan vid de
 och cigarren i askkoppen vid den högra. Bakom honom är samma slitna affär som gänget sitter i: furupanelen
 med paketen på en hylla, skylten *Kredit ges ej* (notan vid hans hand säger *Skrivs på Notts County*), och
 bardisken med tidningsbunten, kaffebryggaren och kassan. Samtalet står i en spalt till vänster om honom (på höjden under honom)
-och kommer när kameran har stannat. Ett klick på bilden utanför samtalet går tillbaka, liksom Esc. Medan han väntar på att man ska välja gör han något litet då och då – trummar med fingrarna,
+och kommer när kameran har stannat. Ett klick på bilden utanför samtalet går tillbaka, liksom Esc, utom på sakerna
+på disken (se *Sakerna på disken*). Medan han väntar på att man ska välja gör han något litet då och då – trummar med fingrarna,
 tittar bort, nickar för sig själv, suckar (se *Vilan*) – och ibland njuter han av kaffet (på ett av sex
-sätt) eller av cigarren (på ett av elva), varannan gång. I rummet ligger kaffet, notan och
+sätt) eller av cigarren (på ett av elva), när han känner för det. I rummet ligger kaffet, notan och
 handen kvar på pulten som en ledtråd, och handen trummar när man pekar på den eller kaffet, och
 ibland ändå.
 
@@ -6254,13 +6263,27 @@ krökta handen, så att fingrarna såg ut att hänga i den som i en stång, vred
 askkoppen att ansiktet förvreds, och röken stannade framför ögat som en blek fläck och kom ur näsan som
 en vit mustasch (ändrat 2026-11-05).
 
-Kaffet och cigarren kommer varannan gång, kaffet först: 18–32 sekunder efter att man har vänt sig
-mot honom, sedan var 45–80:e sekund (`VANA` i [public/rum-hasse.js](public/rum-hasse.js)), bara när
-han väntar på en och inte pratar eller trummar. Medan han väntar på en analys tar han också kaffet och
-cigarren varannan gång. Ska något annat spelas medan han har den (slaget med domen, vägen hem efter analysen) lägger han tillbaka den
+Kaffet eller cigarren, det han känner för: 18–32 sekunder efter att man har vänt sig mot honom, sedan
+var 45–80:e sekund (`VANA` i [public/rum-hasse.js](public/rum-hasse.js)), bara när han väntar på en och
+inte pratar eller trummar. Det som var längst sedan lockar mest (sedan han tog det själv eller man
+klickade på det, `vana`), så att det oftast blir omväxlande men ibland samma två gånger i rad; har han
+just sagt sitt och cigarren har slocknat tänder han den gärna (`vanaNasta`). (Förut kom de varannan
+gång, kaffet först, ändrat 2026-11-10.) Ska något annat spelas medan han har den (slaget med domen, vägen hem efter analysen) lägger han tillbaka den
 2,5 gånger så fort (`skynda`). Röken är partiklar i en gemensam luftström: lugn och rak nära glöden,
 slingrig högre upp (`byggRok` i [public/rum-hasse-arm.js](public/rum-hasse-arm.js)). Med minskad
 rörelse ligger cigarren kvar i askkoppen, men röken stiger, på samma sätt som han fortfarande andas.
+
+*Sakerna på disken.* Kaffet, askkoppen med cigarren, tändsticksstället, tändaren och notan går att klicka
+på (`sakVid`, `vill` och `villSteg` i [public/rum-hasse.js](public/rum-hasse.js)), och då gör han det: dricker kaffet på ett av
+sina sätt, röker cigarren, tänder den om den har slocknat (med en sticka om man klickade på stället, med
+tändaren om man klickade på den, och med tändaren när stället är tomt), eller tittar ned på notan, höjer
+brynen och skakar på huvudet (`notan`). Var sakerna står i bilden räknas ur deras lägen på disken
+(`KOPP`, `ASK`, `STALL_P`, `TANDARE_P` och `NOTAN` i [public/rum-hasse-3d.js](public/rum-hasse-3d.js))
+genom figurens kamera, som ett hölje runt varje sak, och med musen visas handen över dem. Han gör färdigt det han
+håller på med först (det som går att skynda på går fortare, tidningen läggs ned vid nästa gräns), pratar han säger
+han det färdigt, och med kupongen i handen väntar det; blir det inte av inom 25 sekunder glömmer han det. Det han
+redan gör (dricker han redan) gör han inte en gång till. Samtalets spalt når över tändaren i datorn: där spalten är
+tom gäller saken under. Med minskad rörelse går ett klick på sakerna tillbaka till rummet som förut.
 
 Sätten (`KLIPP` i [public/rum-hasse-3d.js](public/rum-hasse-3d.js); de sju sista byggs med
 `cigarrKlipp`, som fyller i hur han tar upp den och lägger tillbaka den):

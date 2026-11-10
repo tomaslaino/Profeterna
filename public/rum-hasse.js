@@ -721,6 +721,7 @@ window.RumHasse = (() => {
     H.klipp = null;
     H.ko.length = 0;
     H.vill = null;
+    H.vy.classList.remove('rh-pa-sak');
     // han sitter stilla med armarna på disken när man vänder sig bort
     H.T = 0;
     H.fig.rita(0, performance.now() / 1000);
