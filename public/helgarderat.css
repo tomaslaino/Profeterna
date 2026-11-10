@@ -106,7 +106,7 @@ body.hg-bord { margin: 0; padding: 28px 0 56px; min-height: 100vh; box-sizing: b
 .hg-foto img { display: block; width: 100%; height: 100%; object-fit: cover; object-position: 50% 30%; filter: grayscale(1) contrast(1.08) brightness(0.97); mix-blend-mode: multiply; }
 .hg-fotona { display: grid; grid-template-columns: 1fr 1fr; gap: 3px; }
 .hg-fotona .hg-foto { aspect-ratio: 3 / 2; }
-.hg-fotona .hg-foto > b { position: absolute; left: 0; bottom: 0; max-width: 100%; box-sizing: border-box; padding: 3px 8px 2px; overflow: hidden; background: rgba(21, 18, 14, 0.82); color: #fff;
+.hg-foto > b { position: absolute; left: 0; bottom: 0; max-width: 100%; box-sizing: border-box; padding: 3px 8px 2px; overflow: hidden; background: rgba(21, 18, 14, 0.82); color: #fff;
   font: 800 10.5px/1.3 var(--sans); letter-spacing: 0.06em; text-transform: uppercase; white-space: nowrap; text-overflow: ellipsis; }
 .hg-reserv { position: absolute; inset: 0; display: none; place-items: center; }
 .hg-foto.fel img { display: none; }

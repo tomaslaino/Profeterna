@@ -136,7 +136,7 @@ export function poang(titel, lag, { mot = null, alla = [] } = {}) {
   if (/\b(vs?\.?|versus)\b|\d+\s*-\s*\d+/.test(t)) p -= 1;
   if (/predict|preview|odds|tips\b|line-?ups?|player ratings/.test(t)) p -= 1;
   // ett rykte om en värvning eller en övergång har spelaren i den andra klubbens tröja
-  if (/\b(racing|race|target(s|ed|ing)?|eye(s|ing)?|linked|interest(ed)?|swoop|bid|chase|chasing|pursuit|rekindle[sd]?|monitor(s|ing)?|scout(s|ed|ing)?|joins|joined|signs for|january|transfer)\b/.test(t)) p -= 2;
+  if (/\b(racing|race|target(s|ed|ing)?|eye(s|ing)?|linked|interest(ed)?|swoop|bid|chase|chasing|pursuit|rekindle[sd]?|monitor(s|ing)?|scout(s|ed|ing)?|joins|joined|signs for|should have signed|could sign|wants? to sign|january|transfer)\b/.test(t)) p -= 2;
   // en annan klubb först i rubriken, och minnesord om en tidigare spelare
   if (annanKlubbForst(titel, lag)) p -= 2;
   if (/\b(tributes?|dies|died|death|funeral|passed away|obituary|rip)\b/.test(t)) p -= 2;
@@ -164,7 +164,8 @@ async function espn(lag, id, { fetchImpl, now, rang }) {
 
 // Bing News: de senaste fotbollsartiklarna som nämner laget i rubriken (lokaltidningarna).
 async function bing(lag, { fetchImpl, now, rang }) {
-  const fragor = [`${namnen(lag)[0]} FC`, `${lag} football`];
+  // och tränaren (bilden av honom är oftast i klubbens kläder, från lokaltidningen)
+  const fragor = [`${namnen(lag)[0]} FC`, `${lag} football`, `${namnen(lag)[0]} boss`];
   const sett = new Set();
   const ut = [];
   for (const q of fragor) {

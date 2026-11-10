@@ -7261,7 +7261,9 @@ mediernas artiklar om laget först, sedan Bing News, sidans delningsbild från d
 minst 480 bildpunkter bred, inga loggor, ingen grafik och inte samma bild för två lag. Till skillnad från tidningen
 tas bara artiklar som handlar om laget självt (`MIN_POANG`): inte en där motståndaren eller en annan klubb står först i
 rubriken, en förhandstitt med odds, ett övergångsrykte eller en minnesartikel, eftersom bilden då oftast visar fel lag.
-Hellre lagets sköld än fel lag. Bilden förminskas till 800
+Hellre lagets sköld än fel lag. Bing News frågas också efter *<lag> boss* (tränaren är oftast i klubbens kläder, hos
+lokaltidningen), och det gäller tidningens bilder också. Har bara det ena laget en bild står den över hela bredden med
+lagets namn. Bilden förminskas till 800
 bildpunkter med ImageMagick (på iMacen med `sips` som förut); en jämn grafik känns igen på under 0,10 byte per
 bildpunkt i 320 bildpunkters bredd (foton låg på 0,15–0,31 och en enfärgad grafik med text på 0,04; `sips` behåller
 färgprofilen och har kvar gränsen 0,15). Bilderna sparas i källcachen (`data/cache/matchbilder/`), som workflowen
@@ -7317,7 +7319,9 @@ från ImageMagick): 24 av 24 lag fick en bild (Gillingham ur de insattas artikel
 hämtade inget och tog bilderna ur cachen, bygget lade dem i alla tolv matchbladen och sidan visade dem i 1280 bredd och
 390 × 844. Gränsen för grafik mättes på fotona i public/ och en ritad grafik. Den första riktiga hämtningen
 (workflowen 2026-11-10 17.37) gav 21 av 24 lag en bild; källorna står i stegets logg, men bilderna själva gick inte
-att se härifrån. Reglerna för rätt lag provades med Node på rubrikerna från den hämtningen.
+att se härifrån. Reglerna för rätt lag provades med Node på rubrikerna från den hämtningen; körningen efter dem gav
+14 av 24 lag en bild, och flera lokaltidningar svarade HTTP 403 på GitHubs servrar. Sedan frågas också efter
+tränaren, och en ensam bild står över hela bredden (provat i 390 × 844 och 1280 bredd).
 
 ### Närbilderna
 
