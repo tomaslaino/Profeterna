@@ -657,6 +657,9 @@ bara lokalt. Analyserna visas som de ligger i `data/analyser.json`; hur de skriv
 - **Gänget byter plats vid bordet (2026-10-25, användarens önskemål):** var tredje dag
   sitter de på en ny plats, så att var och en får sin tur bakom bordet och på var sida –
   samma för alla som tittar, efter dagen i Stockholm. Se [Tobaksaffären](#tobaksaffären).
+- **Lägre bord i telefonen (2026-11-08, användarens önskemål):** på höjden tog bordet nästan halva
+  skärmen. Nu tar det ungefär en tredjedel, och rummet och ett ritat tak får resten; alla i gänget och
+  hela kupongen syns fortfarande utan att man drar. Se [I telefonen](#i-telefonen).
 - **Tobaksaffären också i telefonen (2026-10-24, användarens önskemål):** rummet står nu i
   alla fönster utom de allra minsta, i telefonen också, och den vanliga förstasidan finns
   kvar som *Vanlig sida*. Scenen fyller höjden, och man ser sig omkring med fingret – scenen
@@ -3838,13 +3841,24 @@ lysröret och hela kupongen med alla rader utan att man drar. Förut fyllde scen
 515 av scenens 1600 punkter fick plats på bredden: en i gänget var utanför bilden och kupongen skars av vid
 rad elva. Nu är förstoringen `max(bredd / 760, höjd / 1330)` (`fit` i rum.js), högst så mycket som fyller
 fönstret, och scenen räcker inte till fönstrets höjd. Därför är `.rum-stage` inte klippt där, och taket
-(`.rum-tak`) och pulten (`.rum-pult-mer`, resten av träet) fortsätter utanför scenen, lite tak över och mest pult
+(`.rum-tak`) och pulten (`.rum-pult-mer`, resten av träet) fortsätter utanför scenen, mest tak över och lite pult
 under (`pan`); ljuset (`.rum-warm`, `.rum-vign`) och nattens mörker (rum-folk.css) räcker lika långt, och
 medan lysröret tänds täcker `.rum-mork-ut` det som är utanför. Man står vid gänget när man kommer in (`HEM_SMAL`,
 `R.pxHem`, som kameran också vrids från), kupongen ligger under dem (`kupX`) och pingklockan står under
 kupongen, där tummen är. Pennan vilar nedanför raderna i stället för på rad 9–10. Gänget
 är ungefär en fjärdedel mindre på skärmen, och duken har därför färre bildpunkter med samma skärpa (`PR`
 i rum-3d.js, 1,2 i stället för 1,5). Vad det kostar: se *Mätt 2026-11-08* i [Ljuset efter klockan](#ljuset-efter-klockan).
+
+**Bordet på höjden (2026-11-08, användarens önskemål):** pulten tog 45 % av fönstrets höjd, och nedre delen av
+den var tomt trä. Rummet kan inte förstoras utan att någon i gänget hamnar utanför bilden, så scenen står i stället
+längre ner: 60 % av det scenen inte fyller på höjden ligger över den (`TAK_SMAL` i rum.js, förut 24 %), och pulten
+tar ungefär 36 %. Aldrig så långt ner att pingklockan hamnar utanför fönstret (`FOT_SMAL`), så i ett riktigt lågt
+fönster (375 × 553) tar den 42 %. Kupongen ligger förminskad till 80 % med mitten i (640, 819) (`kupLigg`, `kupY`
+och rum.css), så att hela kupongen fortfarande syns utan att man drar; handen och högen räknas från samma mått.
+Protokollet fyller kupongens ruta och är lika stort som förut. Taket som då syns är ritat (`tak` i rum.js): i
+bakväggens plan, så att det sitter ihop med `bg` när kameran vrids, med plattor mot flyktpunkten, lysrörets sken
+som klingar av och högerväggen som fortsätter upp över en list där hyllorna slutar. Färgerna är mätta mot `bg` i
+skarven, och `.rum-warm` räcker lika långt upp, annars syntes den.
 
 Rummet står i alla fönster utom de allra minsta (`Rum.fits`: minst 280 × 260 px), i
 telefonen också. Scenen täcker fönstret som på datorn, också på höjden i telefonen (en tid
@@ -3870,8 +3884,7 @@ svep uppåt eller neråt bladen i lapparna till nästa division.
 
 **Kupongen på höjden** (`.rum.smal`: smalare än 600 px och högre än bred): kupongen på
 pulten, i handen och i högen är smal och hög, 420 × 620 i stället för 660 × 470, som en
-riktig stryktipskupong, med samma mitt så att högen och handen ligger där de ligger (`KUP`
-i rum.js). Raderna har två våningar – lagen överst, dagen och motiveringen under – och
+riktig stryktipskupong (`KUP` i rum.js; på pulten förminskad, se *Bordet på höjden*). Raderna har två våningar – lagen överst, dagen och motiveringen under – och
 rutorna är större (44 × 26). Lagen har de korta namnen (*Tottenham –
 Crystal Palace*, *Southampton – QPR*; `short` i rum.js, där Bristol City, Bristol Rovers och
 Notts County behåller hela namnet och Milton Keynes Dons blir MK Dons), så att de ryms i
