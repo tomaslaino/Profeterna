@@ -2189,7 +2189,10 @@ ${window.RumRegister ? RumRegister.nara() : ''}
     // har du lämnat in ligger din kupong i högen, och på pulten en ny – eller
     // gängets kupong, när du ser de andras tips (uppgörelsen)
     set('rum-kupong', couponHtml(rd, rows, p && p.gang ? view(p, 'gang') : p && !p.inne ? view(p, 'fyll') : null));
-    tidningPult(set);
+    tidningPult();
+    // (notiserna och matchbladen, högst var femte minut: veckans bild på framsidan står i dem)
+    hamtaNotiser();
+    hamtaPoddsidor();
     levande();
     if (p && p.gang && p.s.spel && window.Folket) Folket.hamta(p.s.spel.nr).then((ny) => { if (ny && R.on) levande(); });
     const pa = document.getElementById('rum-kupong');
@@ -3066,7 +3069,7 @@ ${window.RumRegister ? RumRegister.nara() : ''}
     const m = document.querySelector('script[type="importmap"]');
     const im = m ? JSON.parse(m.textContent).imports : {};
     const fil = ['environments/RoomEnvironment.js', 'geometries/RoundedBoxGeometry.js', 'utils/BufferGeometryUtils.js'].map((f) => im['three/addons/'] + f);
-    for (const href of ['rum-3d.js', 'rum-gpu.js', 'rum-fika.js', 'rum-fest.js', 'rum-tecken.js', 'rum-dans.js', 'rum-uttryck.js', im.three, ...fil]) {
+    for (const href of ['rum-3d.js', 'rum-gpu.js', 'rum-fika.js', 'rum-fest.js', 'rum-tecken.js', 'rum-dans.js', 'rum-uttryck.js', 'rum-vaxter.js', im.three, ...fil]) {
       const l = document.createElement('link');
       l.rel = 'modulepreload';
       l.href = href;
@@ -3739,7 +3742,12 @@ ${window.RumRegister ? RumRegister.nara() : ''}
     if (notisReq && Date.now() - notisAt < 5 * 60000) return notisReq;
     notisAt = Date.now();
     notisReq = fetch('data/tidning.json', { cache: 'no-cache' }).then((r) => (r.ok ? r.json() : null)).catch(() => null)
-      .then((t) => { notisData = t && Array.isArray(t.notiser) ? t : null; return notisData; });
+      .then((t) => {
+        notisData = t && Array.isArray(t.notiser) ? t : null;
+        // (veckans bild på framsidan står i notiserna)
+        if (R.on) tidningPult();
+        return notisData;
+      });
     return notisReq;
   }
   // Notiserna för omgången rd, om sidan är skriven för den (samma id, eller minst hälften av matcherna)
@@ -3761,7 +3769,12 @@ ${window.RumRegister ? RumRegister.nara() : ''}
     if (poddReq && Date.now() - poddAt < 5 * 60000) return poddReq;
     poddAt = Date.now();
     poddReq = fetch('data/poddsidor.json', { cache: 'no-cache' }).then((r) => (r.ok ? r.json() : null)).catch(() => null)
-      .then((t) => { poddData = t && Array.isArray(t.sidor) ? t : null; return poddData; });
+      .then((t) => {
+        poddData = t && Array.isArray(t.sidor) ? t : null;
+        // (veckans bild på framsidan står också i matchbladen)
+        if (R.on) tidningPult();
+        return poddData;
+      });
     return poddReq;
   }
   // Sidorna för omgångens matcher, högst tio dagar gamla.
@@ -3796,8 +3809,13 @@ ${window.RumRegister ? RumRegister.nara() : ''}
     if (R.summa) {
       const g = window.Samtal && Samtal.pult && Samtal.pult.gang ? Samtal.pult.gang() : null;
       const sista = Math.max(...avsparkar(R.summa.rader.map((r) => String(r.id))));
+      const ids = R.summa.rader.map((r) => String(r.id));
       return {
         ...u, id: R.summa.id, efter: R.summa, citat: g ? { notes: g.notes || {}, efter: g.efter || {} } : null, liga: tidningsLiga(R.summa.id, true),
+        matcher: R.summa.rader.map((r) => ({ nr: r.nr, id: String(r.id), h: r.h, b: r.b, hemma: r.hemma, borta: r.borta,
+          avspark: typeof matchById === 'function' && matchById(String(r.id)) ? matchById(String(r.id)).kickoff : null })),
+        notiser: notiserFor({ id: R.summa.id, ids }),
+        poddsidor: poddsidorFor({ id: R.summa.id, ids }),
         datum: Number.isFinite(sista) ? Math.min(Date.now(), sista + 20 * 3600e3) : Date.now(),
       };
     }
@@ -3825,7 +3843,7 @@ ${window.RumRegister ? RumRegister.nara() : ''}
       const m = matchById(id);
       if (!m) return null;
       const a = per.get(String(id));
-      return { nr: i + 1, id: String(id), h: short(m.home), b: short(m.away), avspark: m.kickoff, pr: m.j && m.j.p ? m.j.p : m.f ? m.f.p : null, expert: a && a.tip ? tecknen(a.tip.signs) : '', klar: Boolean(m.completed) };
+      return { nr: i + 1, id: String(id), h: short(m.home), b: short(m.away), hemma: m.home, borta: m.away, avspark: m.kickoff, pr: m.j && m.j.p ? m.j.p : m.f ? m.f.p : null, expert: a && a.tip ? tecknen(a.tip.signs) : '', klar: Boolean(m.completed) };
     }).filter(Boolean);
     // en omgång som är färdigspelad utan sammanställning (dolda resultat) har ingen tidning inför sig
     if (!matcher.length || (!gammal && matcher.every((x) => x.klar))) return null;
@@ -3852,11 +3870,17 @@ ${window.RumRegister ? RumRegister.nara() : ''}
     hamtaPoddsidor();
     if (typeof loadAnalyser === 'function') loadAnalyser();
   }
-  // Framsidan på pulten, när den har ändrats (set i fill). Den är så stor (--z i rum-tidning.css) att namnet,
-  // rubriken och kupongens första rader syns ovanför kupongerna i högen (HOG).
-  function tidningPult(set) {
-    if (!window.RumTidning || !RumTidning.forsta) return;
-    set('rum-helgarderat', `<span class="hf-pult">${RumTidning.forsta(upplaga())}</span>`);
+  // Framsidan på pulten, när den har ändrats (i fill, och när notiserna har kommit: veckans bild står i dem), med
+  // bilden rastrerad. Den är så stor (--z i rum-tidning.css) att namnet, numret och bilden syns ovanför kupongerna i
+  // högen (HOG).
+  function tidningPult() {
+    const a = R.el && R.el.querySelector('#rum-helgarderat');
+    if (!a || !window.RumTidning || !RumTidning.forsta) return;
+    const html = `<span class="hf-pult">${RumTidning.forsta(upplaga())}</span>`;
+    if (a.skrivet === html) return;
+    a.skrivet = html;
+    a.innerHTML = html;
+    RumTidning.rastrera(a);
   }
   // Ett klick på tidningen, eller L: före omgången hämtas notiserna och analyserna först (högst ett par sekunder),
   // så att de kommer med, och sedan lyfts den från pulten och läggs fram.
@@ -3932,11 +3956,14 @@ ${window.RumRegister ? RumRegister.nara() : ''}
     for (const n of ['pointerdown', 'pointerup', 'pointermove', 'mouseover', 'wheel', 'touchstart', 'touchmove']) el.addEventListener(n, (e) => e.stopPropagation());
     el.addEventListener('click', (e) => {
       e.stopPropagation();
-      // I tidningen: till sidan
-      const b = e.target.closest('.tn-inne button[data-sida]');
-      const s = b && el.querySelector(`#tn-sida-${b.dataset.sida}`);
+      // Innehållet: till sidan, och på en sida med flera matcher till matchen. Namnet i sidhuvudet: till innehållet.
+      const b = e.target.closest('button[data-till]');
+      const s = b && el.querySelector(`#tn-${b.dataset.till}`);
       if (s) {
-        el.scrollTo({ top: s.offsetTop - 8, behavior: calm() ? 'auto' : 'smooth' });
+        const m = (b.dataset.match && [...s.querySelectorAll('[data-match]')].find((x) => x.dataset.match === b.dataset.match)) || s;
+        let y = 0;
+        for (let n = m; n && n !== el; n = n.offsetParent) y += n.offsetTop;
+        el.scrollTo({ top: y - (m === s ? 8 : 14), behavior: calm() ? 'auto' : 'smooth' });
         return;
       }
       if (!e.target.closest('.tn-ark') || e.target.closest('.tn-tillbaka')) tidningen(false);
@@ -3961,7 +3988,10 @@ ${window.RumRegister ? RumRegister.nara() : ''}
     const tn = t.querySelector('.tn');
     tn.style.setProperty('--k', k.toFixed(3));
     tn.classList.toggle('smal', k * 100 < 470);
-    t.querySelector('.hf-forsta').style.zoom = k.toFixed(3);
+    const f = t.querySelector('.hf-forsta');
+    f.style.zoom = k.toFixed(3);
+    // (papperets mönster delas med förstoringen, så att de är lika fina som på pulten)
+    f.style.setProperty('--zz', k.toFixed(3));
   }
 
   // Gängets kupong med baksidan upp vänds på pulten: den lyfts och vänds

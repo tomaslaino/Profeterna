@@ -4,8 +4,10 @@
   Supporterpoddarna till tidningen: scripts/tidning/poddar.mjs. Mallen fylls i av
   installera.sh och hamnar i ~/Library/LaunchAgents.
 
-  Varje natt kl. 02.15, när datorn inte används, och lördag kl. 08.00 för avsnitten som kom
-  på fredagskvällen. Sover datorn körs jobbet när den vaknar. LowPriorityIO och Nice: utskriften
+  Startas varje natt kl. 02.15, när datorn inte används, och lördag kl. 08.00 för avsnitten som
+  kom på fredagskvällen, men skriptet går bara på tiderna i config/poddar.js (2026-11-10: natten
+  mot tisdag, natten mot fredag och lördag kl. 08.00) och slutar annars direkt. Sover datorn
+  körs jobbet när den vaknar. LowPriorityIO och Nice: utskriften
   får inte tränga undan något annat. Skriptet körs ur analysernas klon och rör aldrig git.
 -->
 <plist version="1.0">

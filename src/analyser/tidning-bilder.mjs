@@ -3,16 +3,18 @@
 // tidning trycker bredvid notisen. Hämtas på iMacen i samma jobb som tidningen
 // (scripts/analyser/skriv.mjs), med vanliga hämtningar och utan någon språkmodell:
 //
-//   1. ESPN:s lagnyheter, där Premier League-lagen har egna artiklar med bild och fotograf.
+//   1. ESPN:s lagnyheter, där Premier League-lagen har egna artiklar med bild och fotograf, och BBC Sports
+//      flöde för laget (alla ligalag, med bild).
 //   2. Notisens egna källor och Bing News (lokaltidningarna och klubbarnas sidor, som skriver om
 //      de lägre divisionerna): sidans delningsbild (og:image).
 //
 // Bara bilder från de senaste DAGAR dagarna, liggande och minst MIN_BREDD bildpunkter breda, inga
 // loggor, inga spelbolag och inga sajter som är spärrade på datorn. Samma bild används inte för
-// två lag. Bilden förminskas till BREDD bildpunkter (sips, som finns i macOS) och sparas som
-// <lag>-<hash>.jpg i mappen.
+// två lag. Bilden förminskas till BREDD bildpunkter (eller bredd) och sparas som <lag>-<hash>.jpg i
+// mappen: med sips, som finns i macOS, på iMacen och med ImageMagick på GitHub Actions (matchbladens
+// bilder, scripts/tidning/matchbilder.mjs).
 //
-// veckansBilder(lagen, { mapp, espnId, kallor }) → Map lag → { lag, fil, kalla, foto, sida, datum }
+// veckansBilder(lagen, { mapp, espnId, kallor, bredd }) → Map lag → { lag, fil, kalla, foto, sida, datum }
 
 import crypto from 'node:crypto';
 import { execFileSync } from 'node:child_process';
@@ -26,8 +28,9 @@ export const DAGAR = 8;
 const BREDD = 320;
 const MIN_BREDD = 480;
 const DAG = 86400000;
-// Sajter vars delningsbild är en hopklippt grafik med text och sköldar, inte ett foto.
-const GRAFIK = ['footballleagueworld.co.uk', 'givemesport.com', 'thisisfutbol.com', 'teamtalk.com', 'football365.com', 'sportskeeda.com', 'footballinsider247.com', 'goal.com', 'onefootball.com', 'msn.com', 'aol.com', 'yahoo.com', 'youtube.com'];
+// Sajter vars delningsbild är en hopklippt grafik med text och sköldar, inte ett foto, och sajter som skrapar andras
+// artiklar (el-balad.com).
+const GRAFIK = ['el-balad.com', 'footballleagueworld.co.uk', 'givemesport.com', 'thisisfutbol.com', 'teamtalk.com', 'football365.com', 'sportskeeda.com', 'footballinsider247.com', 'goal.com', 'onefootball.com', 'msn.com', 'aol.com', 'yahoo.com', 'youtube.com'];
 const INTE_FOTO = /logo|placeholder|default[-_.]|fallback|badge|crest|favicon|icon[-_.]|share[-_]?image|social[-_]?(share|card)|og[-_]default|blank\./i;
 // Damlaget, akademin och ungdomslagen är inte laget i omgången.
 const ANDRA_LAG = /\b(women|ladies|wfc|academy|youth|under[- ]?(18|19|21|23)s?|u-?(18|19|21|23)s?)\b/i;
@@ -36,6 +39,9 @@ const LIVE = /\b(live|as it happened|matchday live|recap|highlights)\b/i;
 // En jämn grafik (en sköld på färg) packas mycket hårdare än ett foto: under så här många byte per
 // bildpunkt i den förminskade bilden är det inte ett foto (foton låg på 0,2–0,6, en sköld på 0,12).
 const MIN_BYTE_PER_PX = 0.15;
+// ImageMagick sparar utan metadata (sips behåller färgprofilen), så samma bilder blir mindre: foton låg på 0,15–0,31
+// och en enfärgad grafik med text på 0,04 (2026-11-10).
+const MIN_BYTE_PER_PX_IM = 0.1;
 
 const hostOf = (u) => { try { return new URL(u).hostname.replace(/^www\./, ''); } catch { return ''; } };
 const pa = (host, lista) => lista.some((d) => host === d || host.endsWith(`.${d}`));
@@ -52,9 +58,29 @@ export const slug = (s) => String(s).normalize('NFD').replace(/[̀-ͯ]/g, '').to
 
 // Lagets namn i texter: söknamnen i config/news.js (Bradford City, Bradford, Bantams).
 export const namnen = (lag) => (newsCfg.names && newsCfg.names[lag]) || [lag];
+const ordRe = (n) => new RegExp(`[^a-z]${n.toLowerCase().replace(/[.*+?^${}()|[\]\\]/g, '\\$&')}[^a-z]`);
 export function namner(text, lag) {
   const t = ` ${String(text || '').toLowerCase()} `;
-  return namnen(lag).filter((n) => n.length >= 4).some((n) => new RegExp(`[^a-z]${n.toLowerCase().replace(/[.*+?^${}()|[\]\\]/g, '\\$&')}[^a-z]`).test(t));
+  return namnen(lag).filter((n) => n.length >= 4).some((n) => ordRe(n).test(t));
+}
+// Var i texten laget nämns först (999 om inte alls).
+const forstI = (t, lag) => Math.min(...namnen(lag).filter((n) => n.length >= 4).map((n) => { const m = ordRe(n).exec(t); return m ? m.index : 999; }));
+
+// Alla klubbarna i config/news.js. En artikel där en annan klubb står före laget i rubriken (York City smash
+// Northampton Town), eller som ligger på en annan klubbs egen sajt (fleetwoodtownfc.com om Rochdale) eller hos en
+// annan klubbs lokaltidning (readingchronicle.co.uk), handlar om den klubben, och bilden visar dess spelare.
+const KLUBBAR = Object.keys(newsCfg.names || {});
+const kompakt = (s) => String(s || '').toLowerCase().normalize('NFD').replace(/[^a-z0-9]/g, '');
+export function annanKlubbForst(titel, lag) {
+  const t = ` ${String(titel || '').toLowerCase()} `;
+  const var_ = forstI(t, lag);
+  const egna = new Set(namnen(lag).map((n) => n.toLowerCase()));
+  return KLUBBAR.some((k) => k !== lag && !namnen(k).some((n) => egna.has(n.toLowerCase())) && forstI(t, k) < var_);
+}
+export function annanKlubbsSajt(url, lag) {
+  const h = kompakt(hostOf(url));
+  const i = (k) => namnen(k).some((n) => kompakt(n).length >= 6 && h.includes(kompakt(n)));
+  return !i(lag) && KLUBBAR.some((k) => k !== lag && i(k));
 }
 
 // Sidans delningsbild, namn och datum ur <meta> och JSON-LD.
@@ -99,6 +125,10 @@ async function hamta(url, { fetchImpl, typ = 'text', max = 800000 }) {
 const FOTBOLL = /\b(football|soccer|sport|fc|afc|efl|premier league|championship|league|cup|club|season|manager|boss|head coach|coach|striker|midfielder|defender|goalkeeper|keeper|winger|forward|players?|signing|signs|transfer|loan|injury|injured|squad|team news|goals?|scored?|wins?|won|defeat|draw|vs?|fixture|match|clash|derby|promotion|relegation|play-?offs?|stadium|fans|supporters|sack(ed|ing)?|predictions?)\b/i;
 const ordI = (titel, url) => `${titel || ''} ${String(url || '').replace(/[-_/.]/g, ' ')}`;
 
+// Ett rykte om en värvning eller en övergång, och en minnesartikel om en tidigare spelare.
+const RYKTE = /\b(racing|race|target(s|ed|ing)?|eye(s|ing)?|linked|interest(ed)?|swoop|bid|chase|chasing|pursuit|rekindle[sd]?|monitor(s|ing)?|scout(s|ed|ing)?|joins|joined|signs for|should have signed|could sign|wants? to sign|january|transfer)\b/;
+const MINNE = /\b(tributes?|dies|died|death|funeral|passed away|obituary|rip)\b/;
+
 // Hur väl en rubrik handlar om just laget. En match mot motståndaren eller en artikel om flera av
 // omgångens lag kan ha bilden från det andra laget, och en förhandstitt har ofta en grafik.
 export function poang(titel, lag, { mot = null, alla = [] } = {}) {
@@ -110,18 +140,21 @@ export function poang(titel, lag, { mot = null, alla = [] } = {}) {
   if (alla.some((x) => x !== lag && x !== mot && namner(titel, x))) p -= 1;
   if (/\b(vs?\.?|versus)\b|\d+\s*-\s*\d+/.test(t)) p -= 1;
   if (/predict|preview|odds|tips\b|line-?ups?|player ratings/.test(t)) p -= 1;
-  // ett rykte om en värvning har spelaren i den andra klubbens tröja
-  if (/\b(racing|race|target(s|ing)?|eye(s|ing)?|linked|interest(ed)?|swoop|bid|chase|chasing|monitor(s|ing)?|scout(s|ed|ing)?)\b/.test(t)) p -= 1;
+  // ett rykte om en värvning eller en övergång har spelaren i den andra klubbens tröja
+  if (RYKTE.test(t)) p -= 2;
+  // en annan klubb först i rubriken, och minnesord om en tidigare spelare
+  if (annanKlubbForst(titel, lag)) p -= 2;
+  if (MINNE.test(t)) p -= 2;
   return p;
 }
 
 // ESPN: artiklar om laget med bild och fotograf. Kategorin räcker inte (Arteta efter matchen mot
 // Hull har Hull som kategori): rubriken ska nämna laget.
-async function espn(lag, id, { fetchImpl, now, rang }) {
+async function espn(lag, id, { fetchImpl, now, rang, dagar = DAGAR }) {
   if (!id) return [];
   const j = JSON.parse(await hamta(`https://site.api.espn.com/apis/site/v2/sports/soccer/eng.1/news?team=${id}&limit=25`, { fetchImpl }));
   return (j.articles || [])
-    .filter((a) => a.type !== 'Media' && a.images && a.images[0] && a.images[0].url && a.published && now - Date.parse(a.published) < DAGAR * DAG)
+    .filter((a) => a.type !== 'Media' && a.images && a.images[0] && a.images[0].url && a.published && now - Date.parse(a.published) < dagar * DAG)
     .filter((a) => (a.categories || []).some((c) => String(c.teamId || (c.team && c.team.id)) === String(id)))
     .filter((a) => namner(a.headline, lag) && !ANDRA_LAG.test(a.headline) && !LIVE.test(a.headline))
     .map((a) => ({
@@ -134,9 +167,36 @@ async function espn(lag, id, { fetchImpl, now, rang }) {
     }));
 }
 
+// BBC Sport: lagets eget flöde (feeds.bbci.co.uk/sport/football/teams/<lag>/rss.xml) har veckans artiklar och
+// matchrapporter med bild (ichef.bbci.co.uk), också för de lägre divisionerna. Bilden finns i flera bredder; 976
+// bildpunkter räcker (…/ace/standard/240/…, …/news/240/… och …/images/ic/240x135/…). En artikel i lagets eget flöde
+// handlar om laget: ett poäng till, och egen = true (matchbladens andra försök, veckansBilder med egnaBbc).
+export const bbcBild = (u) => avkoda(u)
+  .replace(/\/ace\/([a-z]+)\/\d{2,4}\//, '/ace/$1/976/')
+  .replace(/\/news\/\d{2,4}\//, '/news/976/')
+  .replace(/\/images\/ic\/(\d+)x(\d+|n)\//, (a, w, h) => `/images/ic/976x${h === 'n' ? 'n' : Math.round((976 * Number(h)) / Number(w))}/`);
+async function bbc(lag, { fetchImpl, now, rang, dagar = DAGAR }) {
+  const xml = await hamta(`https://feeds.bbci.co.uk/sport/football/teams/${slug(lag)}/rss.xml`, { fetchImpl });
+  const ut = [];
+  for (const m of String(xml).matchAll(/<item\b[^>]*>([\s\S]*?)<\/item>/g)) {
+    const x = m[1];
+    const falt = (tag) => { const r = new RegExp(`<${tag}>(?:<!\\[CDATA\\[)?([\\s\\S]*?)(?:\\]\\]>)?</${tag}>`).exec(x); return r ? avkoda(r[1]) : ''; };
+    const titel = falt('title');
+    const d = Date.parse(falt('pubDate'));
+    const t = /<media:thumbnail\b[^>]*\burl="([^"]+)"/.exec(x);
+    // BBC Sounds och iPlayer har programmets bild, inte ett foto från veckan
+    if (/\/(sounds|iplayer)\//.test(falt('link'))) continue;
+    if (!t || !Number.isFinite(d) || now - d > dagar * DAG || !namner(titel, lag) || ANDRA_LAG.test(titel) || LIVE.test(titel)) continue;
+    const tl = titel.toLowerCase();
+    ut.push({ bild: bbcBild(t[1]), titel, kalla: 'BBC Sport', foto: null, sida: falt('link').split('?')[0] || null, datum: new Date(d).toISOString(), poang: rang(titel) + 1, egen: !RYKTE.test(tl) && !MINNE.test(tl) });
+  }
+  return ut;
+}
+
 // Bing News: de senaste fotbollsartiklarna som nämner laget i rubriken (lokaltidningarna).
-async function bing(lag, { fetchImpl, now, rang }) {
-  const fragor = [`${namnen(lag)[0]} FC`, `${lag} football`];
+async function bing(lag, { fetchImpl, now, rang, dagar = DAGAR }) {
+  // och tränaren (bilden av honom är oftast i klubbens kläder, från lokaltidningen)
+  const fragor = [`${namnen(lag)[0]} FC`, `${lag} football`, `${namnen(lag)[0]} boss`];
   const sett = new Set();
   const ut = [];
   for (const q of fragor) {
@@ -149,7 +209,7 @@ async function bing(lag, { fetchImpl, now, rang }) {
       ut.push({ sida: url, titel: x.title, kalla: x.source || hostOf(url), datum: x.pubDate ? new Date(x.pubDate).toISOString() : null });
     }
   }
-  return ut.filter((x) => x.datum && now - Date.parse(x.datum) < DAGAR * DAG && sidanDuger(x.titel, x.sida, lag))
+  return ut.filter((x) => x.datum && now - Date.parse(x.datum) < dagar * DAG && sidanDuger(x.titel, x.sida, lag))
     .map((x) => ({ ...x, poang: rang(x.titel) }));
 }
 
@@ -157,35 +217,40 @@ async function bing(lag, { fetchImpl, now, rang }) {
 function sidanDuger(titel, url, lag) {
   const ord = ordI(titel, url);
   const helt = /\s/.test(lag) && String(titel || '').toLowerCase().includes(lag.toLowerCase());
-  return namner(titel, lag) && (helt || FOTBOLL.test(ord)) && !sparrad(url) && !newsCfg.excludeTitle.test(ord) && !ANDRA_LAG.test(ord) && !LIVE.test(ord);
+  return namner(titel, lag) && (helt || FOTBOLL.test(ord)) && !sparrad(url) && !annanKlubbsSajt(url, lag) && !newsCfg.excludeTitle.test(ord) && !ANDRA_LAG.test(ord) && !LIVE.test(ord);
 }
 
 // En sida → kandidat med sidans delningsbild, om sidan är från veckan.
-async function franSidan(k, { fetchImpl, now }) {
+async function franSidan(k, { fetchImpl, now, dagar = DAGAR }) {
   const s = sidansBild(await hamta(k.sida, { fetchImpl }));
   if (!s.bild) return null;
   const bild = new URL(s.bild, k.sida).href;
   const datum = k.datum || (s.datum && !Number.isNaN(Date.parse(s.datum)) ? new Date(s.datum).toISOString() : null);
-  if (!datum || now - Date.parse(datum) > DAGAR * DAG) return null;
+  if (!datum || now - Date.parse(datum) > dagar * DAG) return null;
   return { bild, kalla: s.namn || k.kalla || hostOf(k.sida), foto: null, sida: k.sida, datum, poang: k.poang };
 }
 
 // Lagets kandidater, bäst först: rubriken som handlar mest om laget, ESPN (med fotograf) före
-// sidorna, och den nyaste. Sidorna läses i den ordningen tills det finns fyra bilder att välja på.
-async function kandidater(lag, { espnId, kallor, mot, alla, fetchImpl, now, logg }) {
+// sidorna, och den nyaste. Sidorna läses i den ordningen tills det finns sex bilder att välja på.
+async function kandidater(lag, { espnId, kallor, mot, alla, fetchImpl, now, logg, minPoang = -Infinity, egnaBbc = false, dagar = DAGAR }) {
   const rang = (titel) => poang(titel, lag, { mot, alla });
-  const opts = { fetchImpl, now, rang };
+  const opts = { fetchImpl, now, rang, dagar };
   const lista = [];
   try { lista.push(...(await espn(lag, espnId, opts))); } catch (err) { logg(`bilder: ESPN för ${lag}: ${err.message}`); }
+  try { lista.push(...(await bbc(lag, opts))); } catch (err) { logg(`bilder: BBC för ${lag}: ${err.message}`); }
   for (const k of kallor || []) {
     if (k && k.url && sidanDuger(k.title, k.url, lag)) lista.push({ sida: k.url, titel: k.title, kalla: k.source, datum: k.publishedAt || null, poang: rang(k.title) });
   }
   try { lista.push(...(await bing(lag, opts))); } catch (err) { logg(`bilder: Bing för ${lag}: ${err.message}`); }
   lista.sort((a, b) => b.poang - a.poang || Boolean(b.bild) - Boolean(a.bild) || Date.parse(b.datum || 0) - Date.parse(a.datum || 0));
+  // Med minPoang (matchbladen) tas bara artiklar som handlar om laget och inte om en annan klubb, ett rykte eller en
+  // minnesstund. Med egnaBbc (andra försöket) duger också allt i lagets eget BBC-flöde utom rykten och minnesord.
+  const fore = lista.slice(0, 6);
+  for (let i = lista.length - 1; i >= 0; i--) if (lista[i].poang < minPoang && !(egnaBbc && lista[i].egen)) lista.splice(i, 1);
   const ut = [];
   const sett = new Set();
   for (const k of lista) {
-    if (ut.length >= 4) break;
+    if (ut.length >= 6) break;
     if (k.bild) { ut.push(k); continue; }
     if (sett.has(k.sida)) continue;
     sett.add(k.sida);
@@ -196,18 +261,44 @@ async function kandidater(lag, { espnId, kallor, mot, alla, fetchImpl, now, logg
       logg(`bilder: ${lag}, ${hostOf(k.sida)}: ${err.message}`);
     }
   }
+  // Utan kandidater: de bästa som fanns, i loggen, så att det syns varför.
+  if (!ut.length) logg(`bilder: ${lag}: ingen kandidat${fore.length ? ` (${fore.map((k) => `${k.poang} ${k.kalla || hostOf(k.sida)} "${String(k.titel || '').slice(0, 70)}"`).join('; ')})` : ' alls'}`);
   return ut;
 }
 
 // ---------- bilden ----------
 
-function sips(args) {
-  return execFileSync('/usr/bin/sips', args, { encoding: 'utf8', timeout: 60000, stdio: ['ignore', 'pipe', 'pipe'] });
+// Verktyget som läser och förminskar bilden: sips i macOS, annars ImageMagick (magick i version 7,
+// identify och convert i version 6). → 'sips', 'magick', 'convert' eller null
+let verktyget;
+export function bildverktyg() {
+  if (verktyget !== undefined) return verktyget;
+  const finns = (cmd) => { try { execFileSync(cmd, ['-version'], { stdio: 'ignore', timeout: 10000 }); return true; } catch { return false; } };
+  verktyget = fs.existsSync('/usr/bin/sips') ? 'sips' : finns('magick') ? 'magick' : finns('convert') ? 'convert' : null;
+  return verktyget;
+}
+const kor = (cmd, args) => execFileSync(cmd, args, { encoding: 'utf8', timeout: 60000, stdio: ['ignore', 'pipe', 'pipe'] });
+// Bildens storlek. → { w, h }
+function storlek(fil) {
+  const v = bildverktyg();
+  if (v === 'sips') {
+    const g = kor('/usr/bin/sips', ['-g', 'pixelWidth', '-g', 'pixelHeight', fil]);
+    return { w: Number((g.match(/pixelWidth:\s*(\d+)/) || [])[1]), h: Number((g.match(/pixelHeight:\s*(\d+)/) || [])[1]) };
+  }
+  const [w, h] = kor(v === 'magick' ? 'magick' : 'identify', [...(v === 'magick' ? ['identify'] : []), '-format', '%w %h', `${fil}[0]`]).trim().split(/\s+/).map(Number);
+  return { w, h };
+}
+// Förminskar till bredd bildpunkter, som jpeg i kvalitet 72.
+function forminska(inn, ut, bredd) {
+  const v = bildverktyg();
+  if (v === 'sips') kor('/usr/bin/sips', ['-s', 'format', 'jpeg', '-s', 'formatOptions', '72', '--resampleWidth', String(bredd), inn, '--out', ut]);
+  else kor(v, [`${inn}[0]`, '-auto-orient', '-resize', `${bredd}x`, '-strip', '-interlace', 'Plane', '-quality', '72', ut]);
 }
 
 // Hämtar, kontrollerar och förminskar bilden. → { data (jpeg), w, h } eller kastar
-async function bilden(url, { fetchImpl }) {
+async function bilden(url, { fetchImpl, bredd = BREDD }) {
   if (INTE_FOTO.test(url) || sparrad(url)) throw new Error('inte ett foto');
+  if (!bildverktyg()) throw new Error('varken sips eller ImageMagick');
   const b = await hamta(url, { fetchImpl, typ: 'bild' });
   if (b.length < 12000) throw new Error('för liten fil');
   const dir = fs.mkdtempSync(path.join(os.tmpdir(), 'tidning-bild-'));
@@ -215,17 +306,17 @@ async function bilden(url, { fetchImpl }) {
     const inn = path.join(dir, 'in');
     const ut = path.join(dir, 'ut.jpg');
     fs.writeFileSync(inn, b);
-    const g = sips(['-g', 'pixelWidth', '-g', 'pixelHeight', inn]);
-    const w = Number((g.match(/pixelWidth:\s*(\d+)/) || [])[1]);
-    const h = Number((g.match(/pixelHeight:\s*(\d+)/) || [])[1]);
+    const { w, h } = storlek(inn);
     if (!w || !h) throw new Error('okänt format');
     if (w < MIN_BREDD) throw new Error(`för smal (${w} px)`);
     if (w / h < 1.2 || w / h > 2.1) throw new Error(`inte liggande (${w}×${h})`);
-    sips(['-s', 'format', 'jpeg', '-s', 'formatOptions', '72', '--resampleWidth', String(BREDD), inn, '--out', ut]);
-    const data = fs.readFileSync(ut);
-    const hu = Math.round((BREDD * h) / w);
-    if (data.length / (BREDD * hu) < MIN_BYTE_PER_PX) throw new Error('en grafik, inte ett foto');
-    return { data, w: BREDD, h: hu };
+    // En jämn grafik känns igen i BREDD bildpunkter, som gränsen är satt för.
+    forminska(inn, ut, BREDD);
+    const hk = Math.round((BREDD * h) / w);
+    if (fs.statSync(ut).size / (BREDD * hk) < (bildverktyg() === 'sips' ? MIN_BYTE_PER_PX : MIN_BYTE_PER_PX_IM)) throw new Error('en grafik, inte ett foto');
+    const b2 = Math.min(bredd, w);
+    if (b2 !== BREDD) forminska(inn, ut, b2);
+    return { data: fs.readFileSync(ut), w: b2, h: Math.round((b2 * h) / w) };
   } finally {
     fs.rmSync(dir, { recursive: true, force: true });
   }
@@ -244,20 +335,23 @@ async function iTur(lista, n, f) {
 
 // lagen: lagnamnen. espnId: lag → ESPN:s id (data/skoldar.json). kallor: lag → notisens källor
 // [{url, title, source, publishedAt}]. mot: lag → motståndaren i omgången. mapp: dit bilderna skrivs.
+// bredd: bildens bredd i bildpunkter (BREDD i tidningen, större i matchbladen). minPoang: lägsta poäng för artikeln
+// (poang), så att en bild hellre saknas än visar fel lag. egnaBbc: allt i lagets eget BBC-flöde duger utom rykten och
+// minnesord. dagar: hur gammal artikeln får vara. tagna: bilder som redan används (delas mellan anropen). alla: lagen i
+// omgången, för poang (annars lagen i anropet).
 // → Map lag → { lag, fil, kalla, foto, sida, datum, w, h } för de lag som fick en bild
-export async function veckansBilder(lagen, { mapp, espnId = {}, kallor = {}, mot = {}, now = Date.now(), fetchImpl = globalThis.fetch, logg = () => {} } = {}) {
+export async function veckansBilder(lagen, { mapp, espnId = {}, kallor = {}, mot = {}, now = Date.now(), fetchImpl = globalThis.fetch, logg = () => {}, bredd = BREDD, minPoang = -Infinity, egnaBbc = false, dagar = DAGAR, tagna = new Set(), alla = null } = {}) {
   const unika = [...new Set(lagen.filter(Boolean))];
-  const kand = await iTur(unika, 4, (lag) => kandidater(lag, { espnId: espnId[lag], kallor: kallor[lag], mot: mot[lag] || null, alla: unika, fetchImpl, now, logg }));
+  const kand = await iTur(unika, 4, (lag) => kandidater(lag, { espnId: espnId[lag], kallor: kallor[lag], mot: mot[lag] || null, alla: alla || unika, fetchImpl, now, logg, minPoang, egnaBbc, dagar }));
   // bilderna i tur och ordning, så att samma bild inte hamnar hos två lag
   fs.mkdirSync(mapp, { recursive: true });
-  const tagna = new Set();
   const ut = new Map();
   for (const [i, lag] of unika.entries()) {
     for (const k of kand[i]) {
       const nyckel = k.bild.replace(/[?#].*$/, '');
       if (tagna.has(nyckel)) continue;
       try {
-        const b = await bilden(k.bild, { fetchImpl });
+        const b = await bilden(k.bild, { fetchImpl, bredd });
         const hash = crypto.createHash('sha1').update(b.data).digest('hex');
         if (tagna.has(hash)) continue;
         tagna.add(nyckel);
@@ -267,7 +361,7 @@ export async function veckansBilder(lagen, { mapp, espnId = {}, kallor = {}, mot
         ut.set(lag, { lag, fil, kalla: k.kalla || null, foto: k.foto || null, sida: k.sida || null, datum: k.datum || null, w: b.w, h: b.h });
         break;
       } catch (err) {
-        logg(`bilder: ${lag}, ${hostOf(k.bild)}: ${err.message}`);
+        logg(`bilder: ${lag}, ${String(k.bild).slice(0, 110)}: ${err.message}`);
       }
     }
   }

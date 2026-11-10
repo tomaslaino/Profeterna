@@ -31,7 +31,9 @@
 // på en dator med Claude Code (scripts/analyser/skriv.mjs), som committar
 // data/analyser.json, data/omgangsnamn.json och data/tidning.json. Bygget kopierar dem
 // till sajten, och tidningens bilder ur grenen tidning-bilder (som workflowen hämtar till
-// data/tidning-bilder/) till data/tidning-bilder/.
+// data/tidning-bilder/) till data/tidning-bilder/. Matchbladens bilder
+// (scripts/tidning/matchbilder.mjs, som workflowen kör före bygget) läggs i matchbladen i
+// data/poddsidor.json och filerna i data/matchbilder/.
 //
 // Hasse Backes röst (src/rost.js): Tomas egen röst ur grenen rost (som workflowen
 // hämtar till data/egen-rost/) där den finns, annars tar bygget fram ljudet som
@@ -111,6 +113,29 @@ function writeSite(outDir = OUT, { journal = false, couponEndpoint, samtal = nul
   for (const f of ['analyser.json', 'omgangsnamn.json', 'tidning.json', 'poddsidor.json']) {
     const src = path.join(ROOT, 'data', f);
     if (fs.existsSync(src)) fs.copyFileSync(src, path.join(dataDir, f));
+  }
+  // Matchbladens bilder (scripts/tidning/matchbilder.mjs, som workflowen kör före bygget): veckans bild av varje
+  // lag läggs i matchbladet i sajtens data/poddsidor.json (bilder: [hemma, borta]) och filerna i data/matchbilder/.
+  try {
+    const mb = JSON.parse(fs.readFileSync(path.join(ROOT, 'data', 'matchbilder.json'), 'utf8'));
+    const psFil = path.join(dataDir, 'poddsidor.json');
+    const ps = fs.existsSync(psFil) ? JSON.parse(fs.readFileSync(psFil, 'utf8')) : null;
+    if (ps && Array.isArray(ps.sidor) && mb && mb.lag && mb.omgang === ps.omgang) {
+      fs.mkdirSync(path.join(dataDir, 'matchbilder'), { recursive: true });
+      for (const s of ps.sidor) {
+        const l = (s.lag || []).map((lag) => {
+          const x = mb.lag[lag];
+          const fil = x && path.join(ROOT, 'data', 'matchbilder', x.fil);
+          if (!fil || !fs.existsSync(fil)) return null;
+          fs.copyFileSync(fil, path.join(dataDir, 'matchbilder', x.fil));
+          return { fil: x.fil, kalla: x.kalla, foto: x.foto, sida: x.sida, datum: x.datum };
+        });
+        if (l.some(Boolean)) s.bilder = l;
+      }
+      fs.writeFileSync(psFil, JSON.stringify(ps));
+    }
+  } catch (e) {
+    if (e.code !== 'ENOENT') console.warn(`Matchbladens bilder: ${e.message}`);
   }
   // Tidningens bilder, en per lag (workflowen hämtar grenen tidning-bilder hit).
   const bilder = path.join(ROOT, 'data', 'tidning-bilder');

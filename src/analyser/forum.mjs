@@ -1,7 +1,8 @@
 // Lagets supporterforum till tidningen inför omgången (config/forum.js): läs de mest aktuella
-// trådarna på forumets tavla, dela upp dem i inlägg (vem som skrev och när) och låt Claude Code
-// ta ut det intressanta inför matchen. Körs av scripts/tidning/poddar.mjs på iMacen, i samma
-// jobb som supporterpoddarna, och uppgifterna hamnar på samma informationssidor.
+// trådarna på tavlan i vart och ett av lagets forum, dela upp dem i inlägg (vem som skrev och när)
+// och låt Claude Code ta ut det intressanta inför matchen ur alla forumen på en gång. Körs av
+// scripts/tidning/poddar.mjs på iMacen, i samma jobb som supporterpoddarna, och uppgifterna
+// hamnar på samma informationssidor, en läsning per forum.
 //
 // Forumen läses som en vanlig läsare gör: några sidor per lag och natt, med ett ärligt namn i
 // förfrågan och med hänsyn till robots.txt. Ett forum som spärrar sådant som inte är en
@@ -26,13 +27,17 @@ const ren = (s) => String(s || '').normalize('NFD').replace(/[̀-ͯ]/g, '').toLo
 const antalOrd = (s) => String(s || '').split(/\s+/).filter(Boolean).length;
 const hash = (s) => crypto.createHash('sha1').update(String(s)).digest('hex').slice(0, 12);
 
+// Lagets forum som en lista: config/forum.js och registret har en lista per lag (förut ett
+// forum, {namn, tavlor}, som också går). → [{namn, tavlor}]
+export const forumenAv = (x) => (Array.isArray(x) ? x : x ? [x] : []).filter((f) => f && f.namn && Array.isArray(f.tavlor) && f.tavlor.length);
+
 // ---------- hämtningen ----------
 
 export class Sparrad extends Error {}
 
 // Spärrar som inte är något fel hos oss: en sådan sida läses inte, och forumet räknas som oläsligt.
 // (Cloudflares passiva skript, /cdn-cgi/challenge-platform/…, finns på många vanliga sidor och är ingen spärr.)
-const SPARR_RE = /cf-chl-|_cf_chl_opt|<title>\s*(?:just a moment|attention required|access denied|login|log in|sign in)\b|id="challenge-form"/i;
+const SPARR_RE = /cf-chl-|_cf_chl_opt|<title>\s*(?:just a moment|attention required|access denied|checking your browser|verifying you are human|login|log in|sign in)\b|id="challenge-form"|http-equiv=["']refresh["'][^>]*\/challenge\//i;
 
 export async function hamtaSida(url, { timeoutMs = 30000, fetchImpl = globalThis.fetch } = {}) {
   const res = await fetchImpl(url, { signal: AbortSignal.timeout(timeoutMs), headers: { 'user-agent': UA, accept: 'text/html,application/xhtml+xml', 'accept-language': 'en-GB,en;q=0.8' }, redirect: 'follow' });
@@ -180,6 +185,12 @@ export function tradAdress(href) {
   let m;
   // XenForo utan vänliga adresser: index.php?threads/titel.123/page-4
   if (/\/index\.php$/.test(v) && (m = q.match(/^\?((?:threads|forums)\/[^&]*)(.*)$/))) { v = `${v.replace(/index\.php$/, '')}${decodeURIComponent(m[1])}`; q = m[2].replace(/^&/, '?'); }
+  // Phorum: read.php?1,123 (forumet, tråden), read.php?1,123,page=4; read.php?1,123,567 är inlägg 567
+  // (sidan med det; på tavlan länken till det senaste)
+  if (/\/read\.php$/.test(v) && (m = q.match(/^\?(\d+),(\d+)(?:,(?:page=(\d+)|(\d+)))?/))) {
+    if (m[3]) return +m[3] > 1 ? { nyckel: `h${m[2]}`, slag: 'sida', nr: +m[3] } : { nyckel: `h${m[2]}`, slag: 'forsta' };
+    return m[4] && m[4] !== m[2] ? { nyckel: `h${m[2]}`, slag: 'sista' } : { nyckel: `h${m[2]}`, slag: 'forsta' };
+  }
   // Discourse: /t/titel/123 (/45 är inlägg 45)
   if ((m = v.match(/^(?:\/[^/]+)*\/t\/[^/]+\/(\d+)(?:\/(\d+))?\/?$/))) return m[2] ? { nyckel: `d${m[1]}`, slag: 'sista', nr: +m[2] } : { nyckel: `d${m[1]}`, slag: 'forsta' };
   // ProBoards: /thread/123/titel (?page=4); /threads/recent/123 och /post/567/thread är senaste inlägget
@@ -252,6 +263,12 @@ export function tradAdress(href) {
   if ((m = v.match(/\/discussion\/comment\/\d+/))) return { nyckel: null, slag: 'sista' };
   if ((m = v.match(/\/discussion\/(\d+)(?:\/[^/]*)?(?:\/p(\d+))?\/?$/))) {
     return m[2] && +m[2] > 1 ? { nyckel: `n${m[1]}`, slag: 'sida', nr: +m[2] } : { nyckel: `n${m[1]}`, slag: 'forsta' };
+  }
+  // phpBB med sökvänliga adresser (Tigers Talk): /titel-t123 (?start=20 är förskjutningen), /titel-t123-p456 är ett inlägg
+  if ((m = v.match(/^\/[a-z0-9-]*-t(\d+)(?:-p(\d+))?\/?$/i))) {
+    if (m[2]) return { nyckel: `p${m[1]}`, slag: 'sista' };
+    const st = q.match(/[?&]start=(\d+)/);
+    return st && +st[1] > 0 ? { nyckel: `p${m[1]}`, slag: 'sida', nr: +st[1] } : { nyckel: `p${m[1]}`, slag: 'forsta' };
   }
   return null;
 }
@@ -414,6 +431,7 @@ const MOTORER = [
   { namn: 'forumotion', start: /<div\b[^>]*\bclass=["']post post--\d+/gi, vem: /class=["']username["'][^>]*>(?:\s*<[^>]+>)*\s*([^<]+)/, tid: /<div\b[^>]*\bclass=["']posthead["'][\s\S]*?<\/a>\s*([^<]{6,60})</, text: /<div\b[^>]*\bclass=["']entry-content["'][^>]*>/i },
   { namn: 'fansnetwork', start: /<a name=["']post\d+["']><\/a>|<table\b[^>]*\bborder-width: 1px 1px 1px 5px/gi, vem: /\/members\/[^"']+["'][^>]*font-weight: bold[^>]*>([^<]+)<|<a\b[^>]*\bhref=["'][^"']*\/members\/[^"']+["'][^>]*>([^<]{2,40})<\/a>/, tid: /(\d{1,2}:\d\d - [A-Z][a-z]{2} \d{1,2}(?:,? \d{4})?)/, text: /<td valign=["']?top["']?>/i },
   { namn: 'fishy', start: /<a id=["']num\d+["']><\/a>/gi, vem: /<strong><a\b[^>]*>([^<]+)<\/a><\/strong>/, tid: /class=["']smalltext didate["']>([^<]+)</, text: /<div\b[^>]*\bid=["']m\d+["'][^>]*>/i },
+  { namn: 'phorum', start: /<ins\b[^>]*\bclass=["']anchor["'][^>]*\bid=["']msg-\d+["']/gi, vem: /class=["'][^"']*\bauthor-name\b[^"']*["'][^>]*>([^<]+)</, tid: /<span class=["']text-uppercase["']>\s*(\d{1,2}:\d\d,[^<]{4,40})<\/span>/, text: /<div\b[^>]*\bclass=["'][^"']*\bmessage-body\b[^"']*["'][^>]*>/i },
   { namn: 'vbulletin', start: /<li\b[^>]*\bclass=["'][^"']*\bpostbit(?:legacy|old)?\b|<div\b[^>]*\bid=["']edit\d+["']/gi, vem: /class=["'](?:bigusername|username[^"']*)["'][^>]*>(?:\s*<[^>]+>)*\s*([^<]+)/, tid: /<span class=["']date["']>([^<]+(?:<span class=["']time["']>[^<]+)?)/, text: /<div\b[^>]*\bid=["']post_message_\d+["'][^>]*>/i },
   { namn: 'mybb', start: /<div\b[^>]*\bclass=["']post\b[^"']*["'][^>]*\bid=["']post_\d+["']/gi, vem: /class=["']largetext["'][^>]*>\s*(?:<[^>]+>\s*)*([^<]+)/, tid: /<span class=["']post_date["']>([^<]+)/, text: /<div\b[^>]*\bclass=["']post_body[^"']*["'][^>]*>/i },
   { namn: 'vanilla', start: /<li\b[^>]*\bclass=["'][^"']*\bItem(?:Comment|Discussion)?\b[^"']*["'][^>]*\bid=["'](?:Comment|Discussion)_\d+["']|<li\b[^>]*\bid=["'](?:Comment|Discussion)_\d+["'][^>]*\bclass=["'][^"']*\bItem\b/gi, vem: /class=["']Username[^"']*["'][^>]*>([^<]+)/, text: /<div\b[^>]*\bclass=["']Message userContent[^"']*["'][^>]*>/i },
@@ -518,6 +536,14 @@ function sidansNr(sida) {
     if (a && a.slag === 'sida') return a.nr;
     if (a && a.slag === 'forsta') return 0;
   }
+  // Annars sidväljarens markerade sida (Phorum, när man kom via länken till ett inlägg).
+  for (const m of String(sida.html).matchAll(LANK_RE)) {
+    if (!/\bclass=["'][^"']*\bactive\b|aria-current=["']page["']/i.test(`${m[1]} ${m[3]}`)) continue;
+    let a = null;
+    try { a = tradAdress(adressAv(m[2], sida.url)); } catch { /* inte en adress */ }
+    if (a && a.slag === 'sida') return a.nr;
+    if (a && a.slag === 'forsta') return 0;
+  }
   return null;
 }
 const inlaggsNyckel = (x) => `${x.vem}|${x.tid}|${x.text.slice(0, 80)}`;
@@ -589,24 +615,39 @@ export async function lasForum(forum, { mot = null, now = Date.now(), logg = () 
   return { forum, tradar, kandidater: alla.length };
 }
 
-// Inläggen som de ges till Claude: numrerade genom alla trådar, med vem och när.
-// → {text, inlagg: [{nr, vem, tid, text, trad}]}
-export function forumText(lasning, { flestTecken = fc.flestTecken } = {}) {
+const somLista = (lasningar) => (Array.isArray(lasningar) ? lasningar : [lasningar]).filter((l) => l && Array.isArray(l.tradar) && l.tradar.length);
+
+// Inläggen som de ges till Claude: numrerade genom alla forum och trådar, med vem och när.
+// lasningar: lagets läsningar, en per forum (eller en ensam läsning). Utrymmet delas lika mellan
+// forumen, och det ett forum inte behöver går till de andra.
+// → {text, inlagg: [{nr, vem, tid, text, trad, forum}]}
+export function forumText(lasningar, { flestTecken = fc.flestTecken } = {}) {
+  const lista = somLista(lasningar);
+  const flera = lista.length > 1;
+  const rad = (nr, x) => `[${nr}] ${x.vem || 'okänd'}${x.tid ? `, ${tidFmt.format(new Date(x.tid))}` : ''}:\n${x.text}`;
+  const behov = lista.map((l) => l.tradar.reduce((n, t) => n + t.inlagg.reduce((m, x) => m + rad(9999, x).length, 0), 0));
+  const del = lista.map(() => 0);
+  let kvar = flestTecken;
+  behov.map((b, i) => i).sort((a, b) => behov[a] - behov[b]).forEach((i, k, ordning) => {
+    del[i] = Math.min(behov[i], Math.floor(kvar / (ordning.length - k)));
+    kvar -= del[i];
+  });
   const inlagg = [];
   const delar = [];
-  let langd = 0;
-  for (const t of lasning.tradar) {
-    const rader = [];
-    for (const x of t.inlagg) {
-      const nr = inlagg.length + 1;
-      const rad = `[${nr}] ${x.vem || 'okänd'}${x.tid ? `, ${tidFmt.format(new Date(x.tid))}` : ''}:\n${x.text}`;
-      if (langd + rad.length > flestTecken) break;
-      langd += rad.length;
-      inlagg.push({ nr, vem: x.vem, tid: x.tid, text: x.text, trad: t.titel });
-      rader.push(rad);
+  lista.forEach((l, i) => {
+    let langd = 0;
+    for (const t of l.tradar) {
+      const rader = [];
+      for (const x of t.inlagg) {
+        const r = rad(inlagg.length + 1, x);
+        if (langd + r.length > del[i]) break;
+        langd += r.length;
+        inlagg.push({ nr: inlagg.length + 1, vem: x.vem, tid: x.tid, text: x.text, trad: t.titel, forum: l.forum.namn });
+        rader.push(r);
+      }
+      if (rader.length) delar.push(`### ${flera ? `Forumet ${l.forum.namn}, tråden` : 'Tråden'} "${t.titel}"\n\n${rader.join('\n\n')}`);
     }
-    if (rader.length) delar.push(`### Tråden "${t.titel}"\n\n${rader.join('\n\n')}`);
-  }
+  });
   return { text: delar.join('\n\n'), inlagg };
 }
 
@@ -616,11 +657,15 @@ const TIPS_RE = /\b(spik\w*|\w*gardera\w*|\w*gardering\w*|odds\w*|favorit(?:en|e
 const AMNEN = ['trupp', 'elva', 'spel', 'klubb', 'match'];
 
 // Claudes svar → uppgifterna som håller: citatet står i inlägget (eller i exakt ett annat
-// inlägg), och den som skrev inlägget står som avsändare. → {rattKlubb, handlarOm, uppgifter, strukna}
+// inlägg), och den som skrev inlägget står som avsändare. Uppgiften hör till inläggets forum.
+// felForum: forumen bland inläggen som handlar om en annan klubb; deras uppgifter stryks.
+// → {rattKlubb, felForum, handlarOm, uppgifter, strukna}
 export function forumUppgifterAv(content, inlagg) {
   let j;
   try { j = jsonOf(content); } catch { return null; }
   if (!j || !Array.isArray(j.uppgifter)) return null;
+  const forumen = new Set(inlagg.map((p) => p.forum).filter(Boolean));
+  const felForum = [...new Set((Array.isArray(j.fel_forum) ? j.fel_forum : []).filter((x) => typeof x === 'string').map((x) => x.trim()))].filter((n) => forumen.has(n));
   const uppgifter = [];
   let strukna = 0;
   for (const x of j.uppgifter) {
@@ -634,53 +679,63 @@ export function forumUppgifterAv(content, inlagg) {
       const andra = inlagg.filter((p) => citatStar(citat, p.text));
       post = andra.length === 1 ? andra[0] : null;
     }
-    if (!t || antalOrd(t) > 65 || TIPS_RE.test(t) || !post) { strukna++; continue; }
+    if (!t || antalOrd(t) > 65 || TIPS_RE.test(t) || !post || felForum.includes(post.forum)) { strukna++; continue; }
     const sagt0 = typeof x.sagt === 'string' ? x.sagt.trim().replace(/^[”"»«'‘’]+|[”"»«'‘’]+$/g, '') : '';
     const sagt = sagt0 && antalOrd(sagt0) >= 4 && antalOrd(sagt0) <= 50 && !TIPS_RE.test(sagt0) ? sagt0 : null;
-    uppgifter.push({ a, t, s, inlagg: post.nr, vikt, citat, sagt, vem: sagt ? post.vem : null, tid: post.tid || null, trad: post.trad });
+    uppgifter.push({ a, t, s, inlagg: post.nr, vikt, citat, sagt, vem: sagt ? post.vem : null, tid: post.tid || null, trad: post.trad, forum: post.forum || null });
   }
   uppgifter.sort((p, q) => q.vikt - p.vikt);
-  return { rattKlubb: j.ratt_klubb !== false, handlarOm: typeof j.handlar_om === 'string' ? j.handlar_om.trim() : null, uppgifter: uppgifter.slice(0, fc.uppgifter), strukna };
+  return { rattKlubb: j.ratt_klubb !== false, felForum, handlarOm: typeof j.handlar_om === 'string' ? j.handlar_om.trim() : null, uppgifter: uppgifter.slice(0, fc.uppgifter), strukna };
 }
 
-// Tar ut det intressanta ur forumets inlägg. → {handlarOm, uppgifter, strukna, sekunder, rattKlubb}
-export async function taUtForum(lasning, { lag, mot = null, avspark = null, spelare = [], id, now = () => new Date(), claude = claudeSvar } = {}) {
-  const { text, inlagg } = forumText(lasning);
-  if (!inlagg.length) return { handlarOm: null, uppgifter: [], strukna: 0, sekunder: 0, rattKlubb: true };
+// Tar ut det intressanta ur lagets forum, alla på en gång (ett anrop per lag, hur många forum det
+// än har). lasningar: en läsning per forum (lasForum). → {handlarOm, uppgifter, felForum, strukna, sekunder, rattKlubb}
+export async function taUtForum(lasningar, { lag, mot = null, avspark = null, spelare = [], now = () => new Date(), claude = claudeSvar } = {}) {
+  const lista = somLista(lasningar);
+  const { text, inlagg } = forumText(lista);
+  if (!inlagg.length) return { handlarOm: null, uppgifter: [], felForum: [], strukna: 0, sekunder: 0, rattKlubb: true };
+  const namn = [...new Set(lista.map((l) => l.forum.namn))];
   const fraga = [
     `Idag är det ${nowFmt.format(now())}.`,
     `Laget: ${lag}.${mot ? ` Nästa match: mot ${mot}${avspark ? `, ${nowFmt.format(new Date(avspark))}` : ''}.` : ''}`,
-    `Forumet: ${lasning.forum.namn}.`,
+    namn.length > 1 ? `Forumen: ${namn.join(', ')}.` : `Forumet: ${namn[0]}.`,
     spelare.length ? `Spelare i de två lagens trupper (för stavningen): ${spelare.join(', ')}.` : '',
     `\nInläggen:\n\n${text}`,
   ].filter(Boolean).join('\n');
   const r = await claude({ system: fc.urvalPrompt.replace('{flest}', fc.uppgifter).replace('{dagar}', fc.dagar), prompt: fraga, tools: [], model: fc.model, effort: fc.effort, timeoutMs: fc.timeoutMs });
   const u = r.refused ? null : forumUppgifterAv(r.content, inlagg);
   if (!u) throw new Error(r.refused ? 'Claude avböjde' : 'svaret gick inte att läsa');
-  u.uppgifter.forEach((x, i) => { x.id = `${id}-${i + 1}`; });
-  return { ...u, sekunder: r.seconds };
+  // Ett ensamt forum som handlar om en annan klubb (det gamla svaret, ratt_klubb: false).
+  if (!u.rattKlubb && namn.length === 1 && !u.felForum.length) { u.felForum = namn; u.uppgifter = []; }
+  return { ...u, rattKlubb: !namn.every((n) => u.felForum.includes(n)), sekunder: r.seconds };
 }
 
-// Läsningens fingeravtryck: samma inlägg som förra natten behöver inte läsas av Claude igen.
-export const lasningsNyckel = (lasning) => hash(lasning.tradar.map((t) => t.inlagg.map((x) => `${x.vem}|${x.tid}|${x.text.slice(0, 200)}`).join('\n')).join('\n#\n'));
+// Läsningarnas fingeravtryck: samma inlägg som förra natten behöver inte läsas av Claude igen.
+export const lasningsNyckel = (lasningar) => hash(somLista(lasningar).map((l) => `${l.forum ? l.forum.namn : ''}\n${l.tradar.map((t) => t.inlagg.map((x) => `${x.vem}|${x.tid}|${x.text.slice(0, 200)}`).join('\n')).join('\n#\n')}`).join('\n##\n'));
 
-// Läsningen som den sparas i omgångens fil, bredvid poddavsnitten.
-export function forumPost(lasning, u, { id, nyckel, version, now = new Date() }) {
-  const tider = lasning.tradar.flatMap((t) => t.inlagg.map((x) => Date.parse(x.tid))).filter(Number.isFinite);
-  return {
-    id,
-    typ: 'forum',
-    podd: lasning.forum.namn,
-    titel: lasning.tradar.map((t) => t.titel).join(' · ').slice(0, 300),
-    datum: (tider.length ? new Date(Math.max(...tider)) : now).toISOString(),
-    sida: (lasning.tradar[0] && lasning.tradar[0].adress) || lasning.forum.tavlor[0],
-    tradar: lasning.tradar.map((t) => ({ titel: t.titel, adress: t.adress, inlagg: t.inlagg.length })),
-    nyckel,
-    version,
-    uttaget: now.toISOString(),
-    handlarOm: u.handlarOm,
-    uppgifter: u.uppgifter,
-  };
+// Läsningarna som de sparas i omgångens fil, bredvid poddavsnitten: en post per forum, med
+// uppgifterna ur just det forumet. lasning är nyckeln för alla lagets forum tillsammans, och den
+// jämförs nästa natt. Forum i u.felForum sparas inte. → [post]
+export function forumPoster(lasningar, u, { lag, nyckel, version, now = new Date() }) {
+  return somLista(lasningar).filter((l) => !(u.felForum || []).includes(l.forum.namn)).map((l) => {
+    const id = `f${hash(`${lag}|${l.forum.namn}|${nyckel}`).slice(0, 11)}`;
+    const tider = l.tradar.flatMap((t) => t.inlagg.map((x) => Date.parse(x.tid))).filter(Number.isFinite);
+    return {
+      id,
+      typ: 'forum',
+      podd: l.forum.namn,
+      titel: l.tradar.map((t) => t.titel).join(' · ').slice(0, 300),
+      datum: (tider.length ? new Date(Math.max(...tider)) : now).toISOString(),
+      sida: (l.tradar[0] && l.tradar[0].adress) || l.forum.tavlor[0],
+      tradar: l.tradar.map((t) => ({ titel: t.titel, adress: t.adress, inlagg: t.inlagg.length })),
+      nyckel: lasningsNyckel([l]),
+      lasning: nyckel,
+      version,
+      uttaget: now.toISOString(),
+      handlarOm: u.handlarOm,
+      uppgifter: u.uppgifter.filter((x) => (x.forum || l.forum.namn) === l.forum.namn).map(({ forum, ...x }, i) => ({ ...x, id: `${id}-${i + 1}` })),
+    };
+  });
 }
 
 // ---------- registret: lagens forum ----------
@@ -702,10 +757,11 @@ export async function provaForum(forum, { now = Date.now(), ...opts } = {}) {
   return { ok: true, orsak: null, tradar: tradar.length, senast };
 }
 
-// Frågar Claude efter forumen för lagen som inte står i config/forum.js. → {lag: {namn, tavlor}}
+// Frågar Claude efter forumen för lagen som inte står i config/forum.js: alla relevanta, det
+// viktigaste först. → {lag: [{namn, tavlor}] eller null}
 export async function fragaEfterForum(lagen, { claude = claudeSvar } = {}) {
   const r = await claude({
-    system: fc.letaPrompt.replace('{sokningar}', fc.sokningar),
+    system: fc.letaPrompt.replace('{sokningar}', fc.sokningar).replace('{flest}', fc.flestForum),
     prompt: `Klubbarna:\n${lagen.map((l) => `- ${l}`).join('\n')}`,
     tools: ['WebSearch'], model: fc.model, effort: fc.letaEffort, timeoutMs: fc.timeoutMs,
   });
@@ -713,15 +769,22 @@ export async function fragaEfterForum(lagen, { claude = claudeSvar } = {}) {
   const ut = {};
   for (const lag of lagen) {
     const f = j && j.klubbar && j.klubbar[lag];
-    const tavlor = f && Array.isArray(f.tavlor) ? f.tavlor.filter((x) => typeof x === 'string' && /^https?:\/\//.test(x)).slice(0, 2) : [];
-    ut[lag] = f && typeof f.namn === 'string' && tavlor.length ? { namn: f.namn.trim(), tavlor } : null;
+    const forumen = (Array.isArray(f) ? f : f ? [f] : []).map((x) => ({
+      namn: x && typeof x.namn === 'string' ? x.namn.trim() : '',
+      tavlor: x && Array.isArray(x.tavlor) ? x.tavlor.filter((t) => typeof t === 'string' && /^https?:\/\//.test(t)).slice(0, 2) : [],
+    })).filter((x) => x.namn && x.tavlor.length);
+    const unika = forumen.filter((x, i) => forumen.findIndex((y) => y.namn === x.namn || y.tavlor[0] === x.tavlor[0]) === i).slice(0, fc.flestForum);
+    ut[lag] = unika.length ? unika : null;
   }
   return ut;
 }
 
 // Ska lagets forum letas upp (igen)? post: registrets rad. kant: lagets rad i config/forum.js.
+// Ett forum som inte svarade (inte ett som handlade om fel klubb) prövas igen efter letaOmDagar.fel.
 export function forumSkaLetas(post, now = Date.now(), kant = null) {
   if (!post || !post.kollad) return true;
   if (kant && JSON.stringify(kant) !== JSON.stringify(post.kant || null)) return true;
-  return now - Date.parse(post.kollad) > (post.forum ? fc.letaOmDagar.med : fc.letaOmDagar.utan) * DAG;
+  const svaradeInte = post.fel && typeof post.fel === 'object' && Object.values(post.fel).some((x) => x !== 'fel klubb');
+  const dagar = svaradeInte ? fc.letaOmDagar.fel : forumenAv(post.forum).length ? fc.letaOmDagar.med : fc.letaOmDagar.utan;
+  return now - Date.parse(post.kollad) > dagar * DAG;
 }

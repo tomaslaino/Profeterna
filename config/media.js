@@ -20,6 +20,31 @@
 // länken till artikeln.
 // ============================================================================
 
+// Lokaltidningarna i de regionala koncernerna. De räknas inte som insatta, men klubbens egna
+// besked och lokaltidningen läses för sig (config/lokal.js), och där är de med.
+const LOKALTIDNINGAR = [
+  // Reach plc
+  'manchestereveningnews.co.uk', 'liverpoolecho.co.uk', 'plymouthherald.co.uk', 'bristolpost.co.uk', 'birminghammail.co.uk',
+  'stokesentinel.co.uk', 'examinerlive.co.uk', 'hulldailymail.co.uk', 'leicestermercury.co.uk', 'nottinghampost.com',
+  'derbytelegraph.co.uk', 'walesonline.co.uk', 'devonlive.com', 'gloucestershirelive.co.uk', 'cambridge-news.co.uk',
+  'kentlive.news', 'essexlive.news', 'coventrytelegraph.net', 'getwestlondon.co.uk', 'mylondon.news', 'chroniclelive.co.uk',
+  'gazettelive.co.uk', 'grimsbytelegraph.co.uk', 'lincolnshirelive.co.uk', 'cornwalllive.com', 'somersetlive.co.uk',
+  'football.london', 'lancs.live', 'cheshire-live.co.uk', 'dailypost.co.uk', 'yorkshirelive.co.uk', 'burtonmail.co.uk',
+  'accringtonobserver.co.uk', 'crewechronicle.co.uk', 'leek-news.co.uk', 'bucksfreepress.co.uk', 'surreylive.news',
+  'bedfordshirelive.co.uk', 'northantslive.news', 'hertfordshiremercury.co.uk', 'irishmirror.ie', 'dailyrecord.co.uk',
+  // National World
+  'thestar.co.uk', 'yorkshirepost.co.uk', 'wigantoday.net', 'blackpoolgazette.co.uk', 'lep.co.uk', 'northamptonchron.co.uk',
+  'miltonkeynes.co.uk', 'sunderlandecho.com', 'shieldsgazette.com', 'hartlepoolmail.co.uk', 'portsmouth.co.uk',
+  'doncasterfreepress.co.uk', 'peterboroughtoday.co.uk', 'derbyshiretimes.co.uk', 'lutontoday.co.uk', 'nationalworld.com',
+  'yorkshireeveningpost.co.uk', 'thestaronline.co.uk', 'scotsman.com', 'bucksherald.co.uk', 'worksopguardian.co.uk',
+  // Newsquest och andra regionala koncerner
+  'thenorthernecho.co.uk', 'bournemouthecho.co.uk', 'oxfordmail.co.uk', 'swindonadvertiser.co.uk', 'gazette-news.co.uk',
+  'southwalesargus.co.uk', 'yorkpress.co.uk', 'lancashiretelegraph.co.uk', 'theboltonnews.co.uk', 'burytimes.co.uk',
+  'echo-news.co.uk', 'thisisoxfordshire.co.uk', 'wiltshiretimes.co.uk', 'shropshirestar.com',
+  'expressandstar.com', 'kentonline.co.uk', 'eadt.co.uk', 'edp24.co.uk', 'thenational.scot', 'heraldscotland.com',
+  'warringtonguardian.co.uk', 'messengernewspapers.co.uk', 'thetelegraphandargus.co.uk', 'thewestmorlandgazette.co.uk',
+];
+
 module.exports = {
   model: 'claude-opus-5-5',
   // Sökningen är ett omdöme om vilka källor som är insatta, urvalet om vad som är värt att veta.
@@ -43,6 +68,10 @@ module.exports = {
   tillTidningen: 2,
   // Så många artiklar per lag ligger kvar i omgångens fil.
   behall: 6,
+  // Källans slag i omgångens fil, och början på artiklarnas id.
+  typ: 'media',
+  idBorjan: 'm',
+  lokaltidningar: LOKALTIDNINGAR,
 
   // Sajter som aldrig räknas som insatta alternativa medier: de stora mediehusen och deras
   // lokaltidningar, spelsajter, aggregatorer och klickfabriker, statistiksajter, sociala medier
@@ -54,26 +83,8 @@ module.exports = {
     'independent.co.uk', 'mirror.co.uk', 'dailymail.co.uk', 'thesun.co.uk', 'express.co.uk', 'standard.co.uk', 'dailystar.co.uk',
     'talksport.com', 'theathletic.com', 'nytimes.com', 'espn.com', 'espn.co.uk', 'reuters.com', 'pa.media', 'itv.com', 'msn.com',
     'yahoo.com', 'news.google.com', 'newsnow.co.uk', 'inews.co.uk', 'metro.co.uk', 'eveningstandard.co.uk',
-    // Reach plc (lokaltidningarna)
-    'manchestereveningnews.co.uk', 'liverpoolecho.co.uk', 'plymouthherald.co.uk', 'bristolpost.co.uk', 'birminghammail.co.uk',
-    'stokesentinel.co.uk', 'examinerlive.co.uk', 'hulldailymail.co.uk', 'leicestermercury.co.uk', 'nottinghampost.com',
-    'derbytelegraph.co.uk', 'walesonline.co.uk', 'devonlive.com', 'gloucestershirelive.co.uk', 'cambridge-news.co.uk',
-    'kentlive.news', 'essexlive.news', 'coventrytelegraph.net', 'getwestlondon.co.uk', 'mylondon.news', 'chroniclelive.co.uk',
-    'gazettelive.co.uk', 'grimsbytelegraph.co.uk', 'lincolnshirelive.co.uk', 'cornwalllive.com', 'somersetlive.co.uk',
-    'football.london', 'lancs.live', 'cheshire-live.co.uk', 'dailypost.co.uk', 'yorkshirelive.co.uk', 'burtonmail.co.uk',
-    'accringtonobserver.co.uk', 'crewechronicle.co.uk', 'leek-news.co.uk', 'bucksfreepress.co.uk', 'surreylive.news',
-    'bedfordshirelive.co.uk', 'northantslive.news', 'hertfordshiremercury.co.uk', 'irishmirror.ie', 'dailyrecord.co.uk',
-    // National World
-    'thestar.co.uk', 'yorkshirepost.co.uk', 'wigantoday.net', 'blackpoolgazette.co.uk', 'lep.co.uk', 'northamptonchron.co.uk',
-    'miltonkeynes.co.uk', 'sunderlandecho.com', 'shieldsgazette.com', 'hartlepoolmail.co.uk', 'portsmouth.co.uk',
-    'doncasterfreepress.co.uk', 'peterboroughtoday.co.uk', 'derbyshiretimes.co.uk', 'lutontoday.co.uk', 'nationalworld.com',
-    'yorkshireeveningpost.co.uk', 'thestaronline.co.uk', 'scotsman.com', 'bucksherald.co.uk', 'worksopguardian.co.uk',
-    // Newsquest och andra regionala koncerner
-    'thenorthernecho.co.uk', 'bournemouthecho.co.uk', 'oxfordmail.co.uk', 'swindonadvertiser.co.uk', 'gazette-news.co.uk',
-    'southwalesargus.co.uk', 'yorkpress.co.uk', 'lancashiretelegraph.co.uk', 'theboltonnews.co.uk', 'burytimes.co.uk',
-    'echo-news.co.uk', 'thisisoxfordshire.co.uk', 'wiltshiretimes.co.uk', 'shropshirestar.com',
-    'expressandstar.com', 'kentonline.co.uk', 'eadt.co.uk', 'edp24.co.uk', 'thenational.scot', 'heraldscotland.com',
-    'warringtonguardian.co.uk', 'messengernewspapers.co.uk', 'thetelegraphandargus.co.uk', 'thewestmorlandgazette.co.uk',
+    // de regionala koncernernas lokaltidningar (Reach, National World, Newsquest och andra)
+    ...LOKALTIDNINGAR,
     // spelsajter och tips
     'sportsmole.co.uk', 'footystats.org', 'forebet.com', 'oddschecker.com', 'bet365.com', 'skybet.com', 'williamhill.com',
     'paddypower.com', 'betfair.com', 'ladbrokes.com', 'coral.co.uk', 'betway.com', 'racingpost.com', 'freesupertips.com',

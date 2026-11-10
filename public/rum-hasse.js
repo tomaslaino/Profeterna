@@ -31,7 +31,7 @@ window.RumHasse = (() => {
   const PAN = { TID: 420, BILDER: 28, GLIPA: 0.12, OSKARPA: 0.046, K: 40 };
   // fort i början, som ett ryck, och mjukt på slutet (0 → 1)
   const ryck = (t) => { const x = t ** 0.8; const k = 5.5; return 0.5 + (0.5 * Math.tanh(k * (x - 0.5))) / Math.tanh(k / 2); };
-  const H = { on: false, rum: null, fig: null, last: null, t0: 0, T: 0, raf: 0, tal: 0, talMal: 0, mun: 0, munMal: null, ko: [], klipp: null, trum: 0, vanaT: 0, vana: 0 };
+  const H = { on: false, rum: null, fig: null, last: null, t0: 0, T: 0, raf: 0, tal: 0, talMal: 0, mun: 0, munMal: null, ko: [], klipp: null, trum: 0, vanaT: 0, vanaNasta: null, senast: {}, vill: null };
   const calm = () => matchMedia('(prefers-reduced-motion: reduce)').matches;
   const hog = () => innerWidth / innerHeight < 1.15;
   const latt = () => matchMedia('(max-width: 700px), (max-height: 500px)').matches;
@@ -89,6 +89,22 @@ window.RumHasse = (() => {
     vy.addEventListener('click', (e) => {
       e.stopPropagation();
       stang();
+    });
+    // utom på kaffet, askkoppen och de andra sakerna på disken: då gör han det man pekar på (sakerna nedan).
+    // (Samtalets spalt når över tändaren i datorn: där den är tom gäller saken under.)
+    const iSamtalet = (t) => t.closest('.rh-fot, .rh-kupong, .rd-lapp, a, button, input') || (t.closest('.rh-samtal') && !t.matches('.rh-samtal'));
+    vy.addEventListener('click', (e) => {
+      if (!H.on || H.blad || calm() || (H.kupong && H.kupong.fas === 'hand') || iSamtalet(e.target)) return;
+      const sak = sakVid(e.clientX, e.clientY, e.pointerType === 'mouse' ? 6 : 14);
+      if (!sak) return;
+      e.stopImmediatePropagation();
+      vakna();
+      vill(sak);
+    }, true);
+    vy.addEventListener('pointermove', (e) => {
+      if (e.pointerType !== 'mouse') return;
+      const pa = H.on && !H.blad && !calm() && !iSamtalet(e.target) && Boolean(sakVid(e.clientX, e.clientY, 6));
+      vy.classList.toggle('rh-pa-sak', pa);
     });
     // Samma drag som i rummet (swipe i rum.js): där drar man bilden åt höger för att se åt vänster, och
     // längst till vänster sitter han. Här drar man den åt vänster och vänder sig tillbaka mot rummet.
@@ -496,6 +512,8 @@ window.RumHasse = (() => {
         e.className = `rh-pa ${kl}`;
         e.innerHTML = kl === 'kup' ? `<span class="rum-kup rh-pa-kup">${html}</span>` : kl === 'hg' ? `<span class="rh-pa-hg">${html}</span>` : html;
         e.html = html;
+        // (veckans bild på tidningens framsida är en duk, som ritas på nytt i kopian)
+        if (kl === 'hg' && window.RumTidning) RumTidning.rastrera(e);
         H.papper[kl] = e;
       }
       Object.assign(e.style, { width: `${s.w}px`, height: `${s.h}px`, transform: p.form, clipPath: p.klipp });
@@ -691,6 +709,8 @@ window.RumHasse = (() => {
       }
       H.raf = requestAnimationFrame(tick);
       if (!H.fig) return;
+      // det man har klickat på (sakerna), så snart han kan
+      if (H.vill) villSteg(ms);
       // då och då gör han något litet medan han väntar på en: trummar med fingrarna, tittar bort, nickar
       // för sig själv, suckar (smatt)
       if (ms > H.trum) {
@@ -741,6 +761,8 @@ window.RumHasse = (() => {
     cancelAnimationFrame(H.raf);
     H.klipp = null;
     H.ko.length = 0;
+    H.vill = null;
+    H.vy.classList.remove('rh-pa-sak');
     // han sitter stilla med armarna på disken när man vänder sig bort
     H.T = 0;
     H.fig.rita(0, performance.now() / 1000);
@@ -958,10 +980,135 @@ window.RumHasse = (() => {
   const GRUPP = {};
   const grupp = (g) => (GRUPP[g] = GRUPP[g] && GRUPP[g].length ? GRUPP[g] : Object.keys(GEST).filter((n) => GEST[n].grupp === g));
   const ettAv = (g, annars) => lott(grupp(g)) || annars;
-  // kaffet och cigarren varannan gång, kaffet först
+  // Kaffet eller cigarren, det han känner för: det som var längst sedan lockar mest (sedan han tog det själv
+  // eller man klickade på det), så att det oftast blir omväxlande men inte varannan gång som ett urverk.
+  // (Det han har tänkt på, vanaNasta, går före: den slocknade cigarren när han har sagt sitt.)
   function vana() {
-    H.vana = (H.vana + 1) % 2;
-    gest(H.vana ? ettAv('kaffe', 'klunk') : cigarrGest());
+    const nu = performance.now();
+    let sak = H.vanaNasta;
+    H.vanaNasta = null;
+    if (!sak) {
+      const sedan = (s) => nu - (H.senast[s] == null ? nu - 60000 : H.senast[s]);
+      const k = sedan('kaffe') ** 1.5;
+      const c = sedan('cigarr') ** 1.5;
+      sak = Math.random() * (k + c) < k ? 'kaffe' : 'cigarr';
+    }
+    H.senast[sak] = nu;
+    gest(sak === 'kaffe' ? ettAv('kaffe', 'klunk') : cigarrGest());
+  }
+
+  // ---------- sakerna på disken ----------
+  //
+  // Kaffet, askkoppen med cigarren, tändsticksstället, tändaren och notan går att klicka på, och då gör han det:
+  // dricker kaffet på ett av sina sätt, röker cigarren (har den slocknat tänder han den, med stickorna eller
+  // tändaren om det var dem man klickade på), eller tittar på notan och skakar på huvudet. Han gör färdigt det
+  // han håller på med först (det som går att skynda på går fortare, tidningen läggs ned vid nästa gräns), och
+  // pratar han säger han det färdigt; blir det inte av inom VILL_TID ms glömmer han det. Det som redan är på
+  // gång (han dricker redan) gör han inte en gång till. Annars tar han dem när han känner för det (vana).
+  const VILL_TID = 25000;
+  // Var sakerna står på disken (KOPP, ASK, STALL_P, TANDARE_P och NOTAN i rum-hasse-3d.js), som punkter i
+  // figurens värld runt var och en; i bilden blir de ett hölje (holje). De minsta först, så att de vinner där
+  // de ligger nära varandra, och notan sist, under koppen.
+  function sakPunkter() {
+    const m = H.m;
+    if (!m || !m.KOPP || !m.ASK || !m.BORD) return [];
+    const Y = m.BORD.Y;
+    const ring = ([x, , z], r, y, n = 12) => Array.from({ length: n }, (_, i) => [x + r * Math.cos((i / n) * 2 * Math.PI), y, z + r * Math.sin((i / n) * 2 * Math.PI)]);
+    const ut = [];
+    // stället med stickorna som sticker upp
+    if (m.STALL_P) ut.push({ sak: 'stall', p: [...ring(m.STALL_P, 34, Y), ...ring(m.STALL_P, 34, Y + 130)] });
+    // tändaren ligger från TANDARE_P och bakåt, vriden 0,75 från att peka mot en
+    if (m.TANDARE_P) {
+      const c = [m.TANDARE_P[0] - 0.68 * 44, Y, m.TANDARE_P[2] - 0.73 * 44];
+      ut.push({ sak: 'tandare', p: [...ring(c, 58, Y), ...ring(c, 58, Y + 26)] });
+    }
+    // fatet, koppens kant och örat
+    ut.push({ sak: 'kaffe', p: [...ring(m.KOPP, 120, Y), ...ring(m.KOPP, 64, Y + 126), [m.KOPP[0] + 92, Y + 74, m.KOPP[2]]] });
+    // askkoppen och cigarren i den, som går ut ur urtaget mot hans mitt (ASKV i figuren)
+    const cig = [m.ASK[0] + 0.97 * 200, Y, m.ASK[2] - 0.25 * 200];
+    ut.push({ sak: 'cigarr', p: [...ring(m.ASK, 96, Y), ...ring(m.ASK, 96, Y + 36), ...ring(cig, 18, Y), ...ring(cig, 18, Y + 42)] });
+    if (m.NOTAN) ut.push({ sak: 'notan', p: m.NOTAN.horn });
+    return ut;
+  }
+  // det konvexa höljet kring punkterna i bilden
+  function holje(p) {
+    const s = [...p].sort((a, b) => a[0] - b[0] || a[1] - b[1]);
+    const kors = (o, a, b) => (a[0] - o[0]) * (b[1] - o[1]) - (a[1] - o[1]) * (b[0] - o[0]);
+    const halva = (l) => {
+      const h = [];
+      for (const q of l) {
+        while (h.length >= 2 && kors(h[h.length - 2], h[h.length - 1], q) <= 0) h.pop();
+        h.push(q);
+      }
+      h.pop();
+      return h;
+    };
+    return [...halva(s), ...halva([...s].reverse())];
+  }
+  // inne i höljet, eller högst pad bildpunkter utanför
+  function iHoljet(h, x, y, pad) {
+    let inne = h.length > 2;
+    let d = Infinity;
+    for (let i = 0; i < h.length; i++) {
+      const [ax, ay] = h[i];
+      const [bx, by] = h[(i + 1) % h.length];
+      const ex = bx - ax;
+      const ey = by - ay;
+      if (ex * (y - ay) - ey * (x - ax) < 0) inne = false;
+      const t = Math.max(0, Math.min(1, ((x - ax) * ex + (y - ay) * ey) / (ex * ex + ey * ey || 1)));
+      d = Math.min(d, Math.hypot(x - ax - t * ex, y - ay - t * ey));
+    }
+    return inne || d <= pad;
+  }
+  // saken under (x, y) i fönstret, eller null
+  function sakVid(x, y, pad = 6) {
+    if (!H.m || !H.v || !H.m.iBild) return null;
+    if (!H.sakH || H.sakH.v !== H.v) H.sakH = { v: H.v, l: sakPunkter().map((s) => ({ sak: s.sak, h: holje(s.p.map((q) => H.m.iBild(H.v, ...q))) })) };
+    const s = H.sakH.l.find((q) => iHoljet(q.h, x, y, pad));
+    return s ? s.sak : null;
+  }
+  // det han gör med saken, och vad som räknas som samma sak (grupperna i KLIPP)
+  const SAK_GRUPP = { kaffe: ['kaffe', 'lasa'], cigarr: ['cigarr', 'tanda'], stall: ['cigarr', 'tanda'], tandare: ['cigarr', 'tanda'] };
+  const ELD = {};
+  function sakKlipp(sak) {
+    if (sak === 'kaffe') return ettAv('kaffe', 'klunk');
+    if (sak === 'notan') return GEST.notan ? 'notan' : null;
+    const c = cigarren();
+    // den brinner: han röker den, vad man än pekade på
+    if (c.tand) return ettAv('cigarr', 'cigarr');
+    // slocknad: med det man pekade på (tändaren när stickorna är slut), eller som han brukar
+    const sort = sak === 'tandare' || (sak === 'stall' && c.kvar <= 0) ? 'tandare' : sak === 'stall' ? 'sticka' : null;
+    if (!sort) return cigarrGest();
+    if (!ELD[sort] || !ELD[sort].length) ELD[sort] = grupp('tanda').filter((n) => GEST[n].tander === sort);
+    return lott(ELD[sort]) || cigarrGest();
+  }
+  function gorRedan(sak) {
+    const g = SAK_GRUPP[sak];
+    return [H.klipp, ...H.ko].some((k) => k && (g ? g.includes(k.grupp) && (k.grupp !== 'lasa' || k.fran === (GEST.tomKopp || {}).fran) : GEST.notan && k.fran === GEST.notan.fran));
+  }
+  function vill(sak) {
+    if (calm() || gorRedan(sak)) return;
+    H.vill = { sak, till: performance.now() + VILL_TID };
+    villSteg(performance.now());
+  }
+  // Så snart han kan: inte mitt i det han säger, med kupongen i handen eller medan han skriver på den, och
+  // inte medan matchbladet ligger framme eller fingrarna trummar. Det som väntar på sin tur går först.
+  function villSteg(ms) {
+    const w = H.vill;
+    if (!w || !H.fig) return;
+    if (ms > w.till) { H.vill = null; return; }
+    const k = H.kupong;
+    if ((H.sagt && !H.sagt.klar) || H.blad || H.ko.length || H.fig.ror() || (k && (k.skriver || ['hand', 'fram', 'ut'].includes(k.fas)))) return;
+    H.vill = null;
+    if (gorRedan(w.sak)) return;
+    const namn = sakKlipp(w.sak);
+    if (!namn || !GEST[namn]) return;
+    // tillbaka till vilan först, om han står kvar där han pratade
+    if (GEST.hem && Math.abs((H.klipp ? H.klipp.vila : H.T) - GEST.hem.vila) > 0.01) spela('hem');
+    spela(namn);
+    if (w.sak !== 'notan') H.senast[w.sak === 'kaffe' ? 'kaffe' : 'cigarr'] = ms;
+    // och sedan dröjer det en stund innan han tar något av sig själv
+    H.vanaT = Math.max(H.vanaT, ms + VANA[0] * 0.6);
   }
   // Cigarren (H.cig): tänd eller slocknad i askkoppen, när han rökte den sist (rokT, ms) och hur länge den
   // brinner av sig själv sedan (liv, ms), och tändstickorna kvar i stället och de brända i askkoppen
@@ -2607,7 +2754,7 @@ window.RumHasse = (() => {
     H.fas = 'klar';
     // har cigarren slocknat tänder han den gärna när han har sagt sitt
     if (!cigarren().tand && Math.random() < 0.5) {
-      H.vana = 1;
+      H.vanaNasta = 'cigarr';
       H.vanaT = Math.min(H.vanaT, performance.now() + 2500 + Math.random() * 4000);
     }
     // tillbaka till vilan efter det han håller på med, om det inte slutar där

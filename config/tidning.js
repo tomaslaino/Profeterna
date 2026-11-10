@@ -22,20 +22,20 @@ module.exports = {
   tools: ['WebSearch', 'WebFetch'],
   timeoutMs: 600000,
 
-  // När sidan skrivs om, i svensk tid (dag: 0 = söndag, 1 = måndag …): måndag när
-  // veckans omgång har kommit och fredag inför helgen. Samma klockslag som
-  // analysernas, så att launchd-jobbet redan startar då. En ny omgång utan tidning
-  // får sin direkt.
+  // När sidan skrivs om, i svensk tid (dag: 0 = söndag, 1 = måndag …). En ny omgång utan
+  // tidning får sin direkt, oftast måndag strax efter 16, och sedan skrivs den om en gång,
+  // fredag inför helgen: två gånger per omgång (användarens beslut 2026-11-10; före det
+  // också måndag 17). Samma klockslag som analysernas, så att launchd-jobbet redan startar då.
   tider: [
-    { dag: 1, kl: '17:00' },
     { dag: 5, kl: '16:00' },
   ],
-  // En tid skriver inte om en sida som är yngre än så här (en omgång som kom
-  // kl. 16 och fick sin tidning då skrivs inte om redan kl. 17).
+  // En tid skriver inte om en sida som är yngre än så här (en omgång som kom fredag
+  // förmiddag och fick sin tidning då skrivs inte om redan kl. 16).
   minstTimmar: 12,
-  // Har supporterpoddarna gett nya uppgifter (scripts/tidning/poddar.mjs, varje natt) skrivs
-  // sidan om, men inte oftare än så här.
-  poddTimmar: 6,
+  // Har supporterpoddarna gett nya uppgifter (scripts/tidning/poddar.mjs) skrivs sidan om,
+  // men inte oftare än så här. null: aldrig för poddarnas skull, bara på tiderna ovan, och
+  // då följer uppgifterna med (användarens beslut 2026-11-10; före det 6).
+  poddTimmar: null,
 
   // Gränserna i prompten.
   sokningar: 12,
@@ -58,9 +58,11 @@ Sök och läs på nätet först, med högst {sokningar} sökningar och högst {s
 
 Underlaget kan också ha uppgifter ur lagens supporterpoddar, under "ur supporterpoddarna": avsnitt som tidningen har lyssnat igenom den här veckan. Det är det läsarna inte hittar på annat håll. Finns det sådana uppgifter om en match ska den mest intressanta bära notisen, före det som står i de vanliga källorna, och det ska stå vem som säger det ("enligt supporterpodden …"). Varje uppgift har ett slag: det som är "bekräftat" får stå som det är, det som är "hört i podden" är poddens egen uppgift och skrivs så, och "supportrarnas åsikt" är just en åsikt. Ange avsnittet bland källorna, med adressen ur underlaget.
 
-På samma sätt kan underlaget ha uppgifter ur lagets supporterforum, under "ur supporterforumet": det supportrarna har skrivit på forumet den här veckan. Det som är "skrivet på forumet" är en supporters egen uppgift eller ett rykte och skrivs så ("enligt supportrar på forumet …"). Säger podden och forumet samma sak väger det tyngre. Ange forumet bland källorna, med adressen ur underlaget.
+På samma sätt kan underlaget ha uppgifter ur lagets supporterforum (ett eller flera), under "ur supporterforumet": det supportrarna har skrivit på forumen den här veckan. Det som är "skrivet på forumet" är en supporters egen uppgift eller ett rykte och skrivs så ("enligt supportrar på forumet …"). Säger podden och ett forum, eller två forum, samma sak väger det tyngre. Ange forumen bland källorna, med adressen ur underlaget.
 
 Underlaget kan också ha uppgifter ur de insatta medierna, under "ur insatta medier": artiklar den här veckan i oberoende medier som följer laget på nära håll (fansajter, fanzines, klubbnära nyhetsbrev och bloggar, oberoende lokala reportrar), som tidningen har läst. Det som är "de insattas egen uppgift" skrivs så, med källans namn ("enligt fansajten …", "enligt nyhetsbrevet …"), och "de insattas åsikt" är en åsikt. Säger de insatta och supportrarna samma sak väger det tyngre. Ange artikeln bland källorna, med adressen ur underlaget.
+
+Underlaget kan också ha uppgifter från klubben och lokaltidningen, under "ur klubben och lokaltidningen": tränarens presskonferens, klubbens skadebesked och lokaltidningens reporter den här veckan, och ibland motståndarlagets intervju med en av lagets supportrar inför matchen (kalltyp). Det som är "bekräftat" är klubbens eller tränarens besked och får stå som det är, "lokaltidningens egen uppgift" skrivs så ("enligt lokaltidningen …") och det supportern säger i intervjun är en supporters uppgift eller åsikt. Ange artikeln bland källorna, med adressen ur underlaget.
 
 Skriv sedan en notis per match: en rubrik på högst {rubrikOrd} ord och en text på {ordMin}–{ordMax} ord om båda lagen, med det viktigaste först, som i en riktig notis. Hittar du inget nytt om en match får tabelläget, formen och skadelistan bära notisen.
 

@@ -17,7 +17,6 @@
 //                    grupperat efter ämne, med slag, podd och citat.
 //   efter omgången   Omgången (resultaten, rätt rad och siffrorna), Betygen, Skrällen och citaten (det ni
 //                    skrev på kupongen, med facit under) och Hasse Backes krönika med Tipsligan efteråt.
-//   alltid, sist     Åtta knep.
 //
 // Allt räknas ur omgångens data, och samma omgång ger samma tidning på alla enheter: där texten kan
 // variera väljer omgångens id. Inget här anropar någon språkmodell: notiserna och analysen är skrivna i
@@ -87,51 +86,20 @@
       betygen: 'Betygen',
       skrallen: 'Skrällen',
       kronikan: 'Krönikan',
-      knep: 'Åtta knep',
     },
-    // Framsidan: rubriken och raden under väljs av omgången. Inför omgången är Rysaren den jämnaste matchen och
-    // Spika den största favoriten; efter den står gängets rätt i rubriken, rätt rad på kupongen och skrällen i
-    // stjärnan. Priset är tre kronor, tre rader: helgarderat.
+    // Innehållet under framsidan: avdelningarna och kupongens matcher.
+    inne: {
+      tidningen: 'I tidningen',
+      kupongen: 'På kupongen',
+    },
+    // Framsidan: numret, vilken omgång det gäller och veckans bild. Priset är tre kronor, tre rader: helgarderat.
     forsta: {
-      rubrik: [
-        ['Så tar du hem', '13 rätt'],
-        ['Allt om', 'helgens 13'],
-        ['Här är den', 'säkra raden'],
-      ],
-      under: ['Experterna avslöjar allt', 'Datorn, notiserna och Sixten', 'Nästan i alla fall'],
-      kupongen: 'Kupongen',
-      datorn: 'Datorn',
       nr: (n) => `Nr ${n}`,
       vecka: (v) => `Vecka ${v}`,
       pris: '3 kr',
-      rysaren: 'Rysaren',
-      spika: 'Spika',
-      knep: ['8 enkla knep', 'Femman gör alla fel'],
-      efter: {
-        rubrik: ['Gänget fick', 'Facit:', 'Det blev'],
-        ratt: (n) => `${n} rätt`,
-        utanKupong: ['Här är', 'facit'],
-        under: ['Betygen, skrällen och krönikan', 'Hasse Backe förklarar allt', 'Vem kom sist?'],
-        rattRad: 'Rätt rad',
-        resultat: 'Resultaten',
-        skrall: 'Skräll',
-        kronikan: 'Krönikan',
-      },
-    },
-    knep: {
-      rubrik: 'Så blir du rik på tipset',
-      ingress: 'Åtta enkla knep. Nummer 5 gör alla fel.',
-      lista: [
-        ['Spika inte allt', 'Tretton favoriter låter som en säker rad, men de vinner nästan aldrig alla på samma lördag.'],
-        ['Gardera det jämna', 'Där ingen utgång har mer än fyra chanser på tio är en gardering billigare än ett tecken man ångrar.'],
-        ['Formen före tabellen', 'Ett lag som har vunnit fyra raka bryr sig inte om var det står i tabellen.'],
-        ['Hemmaplan är värd något', 'Särskilt i regn, i november och längre ner i divisionerna.'],
-        ['Tippa inte med hjärtat', 'Ditt eget lag ska ha det tecken det förtjänar, inte det du önskar dig.'],
-        ['Läs notiserna', 'En skadad målvakt syns inte alltid i oddsen, men den står i lokaltidningen.'],
-        ['Lämna in i tid', 'Spelstoppet väntar inte på någon, och en kupong i fickan har aldrig vunnit något.'],
-        ['Lyssna inte på experterna', 'Inte ens på oss.'],
-      ],
-      stampel: 'Här gör alla fel',
+      infor: (dag) => `Inför ${dag}`,
+      efter: (dag) => `Efter ${dag}`,
+      foto: (f) => `Foto: ${f}`,
     },
     tipset: {
       rubrik: 'Omgångens matcher',
@@ -149,26 +117,23 @@
     analys: {
       tipset: 'Sixtens tips',
     },
+    // Matchbladen ur supportrarnas poddar, forum och insatta medier, klubben, lokaltidningen och motståndarens
+    // intervju med en av lagets supportrar (samma i helgarderat.html).
     poddar: {
-      slag: { b: 'Bekräftat', h: 'Hört i podden', o: 'Supportrarnas åsikt' },
-      // Slaget h är källans egen uppgift: poddens, forumets, de insatta mediernas eller flera av dem.
-      egen: { podd: 'Hört i podden', forum: 'Från forumet', media: 'Enligt insatta', blandat: 'Hört bland supportrarna' },
       amnen: { trupp: 'Skador och trupp', elva: 'Väntad uppställning', spel: 'Så spelar laget', klubb: 'Tränaren och klubben', match: 'Inför matchen' },
+      // Källans slag framför namnet: podden …, forumet …, intervjun i … (motståndarens medier) och (de insatta,
+      // klubben och lokaltidningen) bara namnet.
+      typord: { podd: 'podden', forum: 'forumet', media: '', lokal: '', motstand: 'intervjun i' },
       rubrik: (h, b) => `${h}–${b}: det supportrarna vet`,
-      ur: (l) => `Ur ${l}`,
-      ingen: 'Ingen supporterpodd, inget forum och inget från de insatta att hämta något ur den här veckan.',
-      forumet: (n) => `forumet ${n}`,
-      forklaring: {
-        b: 'källan återger något som klubben, tränaren eller en spelare har sagt, eller något som har hänt.',
-        podd: 'poddens egna uppgifter, intryck från läktaren och rykten.',
-        forum: 'det supportrarna på forumet själva har sett och hört, och rykten.',
-        media: 'det skribenter som följer laget varje vecka – fansajter, fanzines, nyhetsbrev och oberoende lokala reportrar – själva har tagit reda på, och rykten.',
-        blandat: 'det flera av källorna tar upp: egna uppgifter och rykten.',
-        o: 'vad de som följer laget varje vecka tycker och hoppas.',
-      },
+      ingen: 'Ingen supporterpodd, inget forum och inget från de insatta, klubben eller lokaltidningen att hämta något ur den här veckan.',
+      sammanfattning: 'Sammanfattning',
+      kallorna: 'Källorna',
+      matchen: 'Matchen',
       // Källans namn som det står på sidan: forumet med ordet forumet framför, poddens namn utan
-      // undertiteln och de insatta medierna med sitt eget namn.
-      kalla: (k) => (k.typ === 'forum' ? `forumet ${k.podd}` : k.typ === 'media' ? String(k.podd || '') : poddNamn(k.podd)),
+      // undertiteln, motståndarens intervju med intervjun i framför och de insatta medierna, klubben och
+      // lokaltidningen med sitt eget namn.
+      kalla: (k) => (k.typ === 'forum' ? `forumet ${k.podd}` : k.typ === 'motstand' ? `intervjun i ${k.podd}`
+        : ['media', 'lokal'].includes(k.typ) ? String(k.podd || '') : poddNamn(k.podd)),
       citaten: 'Citaten är översatta från engelska.',
     },
     omgangen: {
@@ -258,10 +223,11 @@
   // ---------- delarna ----------
 
   // Sidhuvudet som i en tidning: sidnumret ytterst, tidningens namn och datumet.
+  // Namnet går tillbaka till innehållet under framsidan (tidningen i rum.js), som på Helgarderats egen sida.
   const folio = (u, nr) => {
     const namn = esc(NAMN);
     const dag = esc(u.datumText || '');
-    return `<div class="tn-folio${nr % 2 ? ' h' : ''}"><b>${nr}</b><span>${namn}</span><span>${dag}</span></div>`;
+    return `<div class="tn-folio${nr % 2 ? ' h' : ''}"><b>${nr}</b><button type="button" data-till="innehall">${namn}</button><span>${dag}</span></div>`;
   };
   // Vinjetten överst på sidan: avdelningen, och till höger det som gäller hela sidan.
   const vinjett = (namn, hoger = '') => `<div class="tn-vinjett"><b>${esc(namn.toUpperCase())}</b>${hoger ? `<span>${esc(hoger)}</span>` : ''}</div>`;
@@ -314,13 +280,14 @@
   function tipset(u) {
     const m = u.matcher || [];
     if (!m.length) return null;
-    const rad = m.map((x) => `<tr><td class="tn-nr">${x.nr}</td><td class="tn-match"><span>${matchNamn(x.h, x.b)}</span><small>${esc(avspark(x.avspark))}</small></td>${procent(x.pr)}<td class="tn-tk">${esc(x.expert || '')}</td></tr>`).join('');
+    const rad = m.map((x) => `<tr data-match="${esc(x.id)}"><td class="tn-nr">${x.nr}</td><td class="tn-match"><span>${matchNamn(x.h, x.b)}</span><small>${esc(avspark(x.avspark))}</small></td>${procent(x.pr)}<td class="tn-tk">${esc(x.expert || '')}</td></tr>`).join('');
     const T = TEXT.tipset;
     const tabell = `<table class="tn-tabell tn-tips"><thead><tr><th></th><th></th><th colspan="3">${esc(T.datorn)}, %</th><th>${esc(T.experten)}</th></tr>` +
       `<tr class="sm"><th></th><th></th><th>1</th><th>X</th><th>2</th><th></th></tr></thead><tbody>${rad}</tbody></table>`;
     const l = u.liga && u.liga.efter && u.liga.efter.length ? liga(u, u.liga.efter, null, u.liga.omg) : '';
     return {
       namn: TEXT.sidor.tipset,
+      om: m.map((x) => ({ id: String(x.id) })),
       html: vinjett(TEXT.sidor.tipset, u.nr ? `Kupong ${u.nr}` : '') + rubrik(T.rubrik) + tabell + (l ? `<div class="tn-under">${l}</div>` : ''),
     };
   }
@@ -362,17 +329,21 @@
     // i kupongens ordning, med kupongens nummer
     const match = (n) => (u.matcher || []).find((x) => String(x.id) === String(n.id)) || (u.matcher || []).find((x) => x.nr === n.nr);
     const nr = (n) => (match(n) ? match(n).nr : n.nr);
-    const sida = l.slice().sort((a, b) => nr(a) - nr(b)).map((n) => {
+    const id = (n) => String(match(n) ? match(n).id : n.id || '');
+    const ordning = l.slice().sort((a, b) => nr(a) - nr(b));
+    const sida = ordning.map((n) => {
       const m = match(n);
       const kicker = m ? matchNamn(m.h, m.b) : esc(n.match || '');
       const k = kallorna(n.kallor);
       const bilder = notisBilder(u, n);
       const foto = fotoText(bilder.filter((x) => x && !x.skold).map((x) => x.foto));
-      return `<article class="tn-notis">${bildrad(bilder, m ? [m.h, m.b] : lagI(n))}<p class="tn-kick"><b>${m ? m.nr : n.nr}</b>${kicker}</p><h4>${esc(n.rubrik)}</h4><p>${esc(utanRef(n.text))}</p>` +
+      return `<article class="tn-notis"${id(n) ? ` data-match="${esc(id(n))}"` : ''}>${bildrad(bilder, m ? [m.h, m.b] : lagI(n))}<p class="tn-kick"><b>${m ? m.nr : n.nr}</b>${kicker}</p><h4>${esc(n.rubrik)}</h4><p>${esc(utanRef(n.text))}</p>` +
         (k.length || bilder.length ? `<p class="tn-kalla">${esc(k.join(', '))}${k.length && foto ? '. ' : ''}<span class="tn-fotoav">${esc(foto)}</span></p>` : '') + '</article>';
     }).join('');
     return {
       namn: TEXT.sidor.notiser,
+      om: ordning.filter(id).map((n) => ({ id: id(n), rubrik: n.rubrik })),
+      vikt: 1,
       html: vinjett(TEXT.sidor.notiser) + `<p class="tn-ingress">${esc(TEXT.notiser.ingress)}</p><div class="tn-spalter">${sida}</div>`,
     };
   }
@@ -385,8 +356,11 @@
     const t = a.tip;
     const tips = t && t.sign ? `<aside class="tn-tipsruta"><p class="tn-rad-rub"><b>${esc(TEXT.analys.tipset.toUpperCase())}</b></p><p class="tn-tecken"><b>${esc(t.sign)}</b>${t.note ? `<em>${esc(t.note)}</em>` : ''}</p>` +
       (t.text ? `<p>${esc(utanRef(t.text))}</p>` : '') + '</aside>' : '';
+    const m = a.nr ? (u.matcher || []).find((x) => x.nr === a.nr) : null;
     return {
       namn: TEXT.sidor.analys,
+      om: m ? [{ id: String(m.id), rubrik: a.title }] : [],
+      vikt: 2,
       html: vinjett(TEXT.sidor.analys, `${a.nr ? `${a.nr} · ` : ''}${a.h}–${a.b}`) + `<h3 class="tn-rub stor">${esc(a.title)}</h3>` +
         (a.lead ? `<p class="tn-ingress fet">${esc(utanRef(a.lead))}</p>` : '') +
         `<p class="tn-byline">${esc(String(a.author || 'Sixten Bråvall').replace(/\s*\(påhittad\)\s*$/, ''))}${a.avspark ? ` · avspark ${esc(avspark(a.avspark))}` : ''}</p>` +
@@ -394,49 +368,98 @@
     };
   }
 
-  // Supporterpoddarna: en informationssida per match (data/poddsidor.json, skrivna på iMacen av
-  // scripts/tidning/poddar.mjs). Hemmalaget till vänster och bortalaget till höger, uppgifterna under
-  // sina ämnen, var och en med slaget som stämpel och, för de tyngsta, vad som sades och av vem.
+  // Supporterpoddarna: ett matchblad per match (data/poddsidor.json, skrivna på iMacen av scripts/tidning/poddar.mjs).
+  // Användarens önskemål 2026-11-10: "ett matchblad med information. Först en kort introduktion, sen diskussion om
+  // ena laget, sen det andra och sist en sammanfattning", snygga artiklar och en aktuell bild för varje match. Sidan
+  // har rubriken, veckans bilder av lagen (matchbladets egna, annars notisens ur data/tidning.json), introduktionen, ett stycke eller
+  // tre om hemmalaget och om bortalaget, sammanfattningen och sist källorna med datum. Ett nummer från före artiklarna
+  // (utan text under laget) får uppgifterna som löptext, ett stycke per ämne. Helgarderat (helgarderat.js) ställer upp
+  // samma matchblad med poddText, poddKallor, poddKallText och poddCitat härifrån.
   const fKort = new Intl.DateTimeFormat('sv-SE', { timeZone: 'Europe/Stockholm', day: 'numeric', month: 'short' });
   const kortDatum = (d) => (Number.isFinite(Date.parse(d)) ? fKort.format(new Date(d)).replace('.', '') : '');
   // "The Tilehurst End - A Reading FC Podcast" → "The Tilehurst End"
   const poddNamn = (n) => String(n || '').split(/\s+[-–|:]\s+/)[0].trim() || String(n || '');
+  const iso = (d) => (typeof d === 'string' && /^\d{4}-\d\d-\d\d/.test(d) ? d.slice(0, 10) : '');
+  // ['2026-11-02', '2026-11-09'] → "2 och 9 nov", ['2026-10-28', '2026-11-03'] → "28 okt och 3 nov"
+  function datumen(l0) {
+    const d = [...new Set([].concat(l0).map(iso).filter(Boolean))].sort().map(kortDatum).filter(Boolean);
+    const man = d.map((x) => x.split(' ')[1]);
+    return lista(man.every((m) => m === man[0]) ? d.map((x, i) => (i < d.length - 1 ? x.split(' ')[0] : x)) : d);
+  }
+  const kallansNamn = (k) => (k.typ === 'podd' ? poddNamn(k.podd) : String(k.podd || ''));
+  // Lagets text: artikelns stycken (text), och för ett äldre nummer uppgifterna som löptext, ett stycke per ämne.
+  function poddText(d) {
+    if (d && Array.isArray(d.text) && d.text.some((x) => x && String(x).trim())) return d.text.map((x) => String(x || '').trim()).filter(Boolean);
+    return ((d && d.grupper) || []).map((g) => (g.punkter || []).filter((p) => p && p.t).map((p) => String(p.t).trim()).join(' ')).filter(Boolean);
+  }
+  // Lagets källor i underlagets ordning (poddarna, forumet, de insatta, klubben och lokaltidningen, intervjun), var
+  // och en en gång med alla sina datum och länken till den senaste. → [{podd, typ, adress, datum: [...]}]
+  function poddKallor(d) {
+    const kallor = [];
+    for (const k of ((d && d.kallor) || []).filter((y) => y && y.podd)) {
+      const typ = ['forum', 'media', 'lokal', 'motstand'].includes(k.typ) ? k.typ : 'podd';
+      let x = kallor.find((y) => y.typ === typ && y.podd === k.podd);
+      if (!x) kallor.push((x = { podd: k.podd, typ, adress: null, datum: [], senast: '' }));
+      const dt = iso(k.datum);
+      if (dt && !x.datum.includes(dt)) x.datum = [...x.datum, dt].sort();
+      if (k.adress && (!x.adress || dt >= x.senast)) x.adress = k.adress;
+      if (dt > x.senast) x.senast = dt;
+    }
+    return kallor;
+  }
+  // Källorna som text: podden SK3 TV (9 nov) och forumet Owlstalk (10 nov). lank: med länkar. → html
+  function poddKallText(kallor, lank = false) {
+    const T = TEXT.poddar;
+    return lista(kallor.map((k) => {
+      const namn = esc(kallansNamn(k));
+      const a = lank && k.adress ? `<a href="${esc(k.adress)}" target="_blank" rel="noopener">${namn}</a>` : namn;
+      return `${T.typord[k.typ] ? `${esc(T.typord[k.typ])} ` : ''}${a}${k.datum.length ? ` (${esc(datumen(k.datum))})` : ''}`;
+    }));
+  }
+  // Sidans citat (redaktören väljer högst ett, och bara när det säger något): { sagt, vem, podd, typ, datum }
+  // → { sagt, vem: "Stevie, The Wednesday Week, 9 nov" } eller null
+  function poddCitat(c) {
+    if (!c || !c.sagt) return null;
+    return { sagt: c.sagt, vem: stor([c.vem, c.podd ? TEXT.poddar.kalla(c) : '', kortDatum(iso(c.datum))].filter(Boolean).join(', ')) };
+  }
   function poddar(u) {
     const ps = u.poddsidor;
-    const l = ((ps && ps.sidor) || []).filter((x) => x && Array.isArray(x.delar) && x.delar.some((d) => d && (d.grupper || []).length));
+    const l = ((ps && ps.sidor) || []).filter((x) => x && Array.isArray(x.delar) && x.delar.some((d) => poddText(d).length));
     if (!l.length) return null;
     const T = TEXT.poddar;
-    const amne = (a) => T.amnen[a] || (ps.amnen && ps.amnen[a]) || T.amnen.match;
     const match = (x) => (u.matcher || []).find((m) => String(m.id) === String(x.id));
     const nr = (x) => (match(x) ? match(x).nr : x.nr);
-    const stampel = (k, typ = 'podd') => { const kk = T.slag[k] ? k : 'h'; return `<i class="tn-slag s-${kk}">${esc(kk === 'h' ? (T.egen[typ] || T.slag.h) : T.slag[kk])}</i>`; };
     return l.slice().sort((a, b) => nr(a) - nr(b)).map((x) => {
       const m = match(x);
       const namn = m ? [m.h, m.b] : (x.lag || []);
-      const delar = x.delar.map((d, i) => {
-        const kallor0 = (d.kallor || []).filter((k) => k && k.podd);
-        // Forumet läses varje natt: det står en gång, med den senaste läsningens datum. Två artiklar ur
-        // samma insatta medium står också en gång.
-        const kallor = kallor0.filter((k, i) => !['forum', 'media'].includes(k.typ) || kallor0.findIndex((x) => x.typ === k.typ && x.podd === k.podd) === i);
-        const flera = new Set(kallor.map((k) => k.podd)).size > 1;
-        const ur = kallor.length ? T.ur(lista(kallor.map((k) => `${T.kalla(k)}${kortDatum(k.datum) ? ` (${kortDatum(k.datum)})` : ''}`))) : '';
-        const grupper = (d.grupper || []).map((g) => `<div class="tn-pod-grupp"><h5>${esc(amne(g.amne))}</h5>${(g.punkter || []).filter((p) => p && p.t).map((p) => {
-          const c = p.citat && p.citat.sagt ? p.citat : null;
-          const vem = c ? (c.vem ? `${c.vem}, ${T.kalla(c)}` : T.kalla(c)) : '';
-          return `<div class="tn-pod-punkt">${stampel(p.s, p.typ)}${flera && (p.podd || []).length ? `<small>${esc(lista(p.podd.map(poddNamn)))}</small>` : ''}<p>${esc(hel(p.t))}</p>` +
-            (c ? `<blockquote><p>”${esc(hel(c.sagt))}”</p>${vem ? `<cite>${esc(vem)}</cite>` : ''}</blockquote>` : '') + '</div>';
-        }).join('')}</div>`).join('');
-        return `<section class="tn-pod-lag${grupper ? '' : ' tom'}"><h4>${esc(namn[i] || d.lag || '')}</h4>${ur ? `<p class="tn-kalla">${esc(ur)}</p>` : ''}${grupper || `<p class="tn-pod-ingen">${esc(T.ingen)}</p>`}</section>`;
+      // veckans bilder av lagen: matchbladets egna (data/matchbilder/, som GitHub Actions hämtar), annars notisens
+      const n = (u.notiser || []).find((y) => y && String(y.id) === String(x.id));
+      const skold = (lag) => (lag && typeof u.skold === 'function' ? u.skold(lag) || '' : '');
+      const egna = Array.isArray(x.bilder) && x.bilder.some((b) => b && b.fil) ? namn.map((lag, i) => {
+        const b = x.bilder[i];
+        if (b && b.fil) return { src: `data/matchbilder/${b.fil}`, reserv: skold(lag), lag, foto: fotograf(b) };
+        return skold(lag) ? { src: skold(lag), skold: true, lag } : null;
+      }) : null;
+      const bilder = egna || (n ? notisBilder(u, n) : []);
+      const foto = fotoText(bilder.filter((b) => b && !b.skold).map((b) => b.foto));
+      const lagen = x.delar.map((d, i) => {
+        const text = poddText(d);
+        return `<h4 class="tn-mb-lag">${esc(namn[i] || d.lag || '')}</h4>${(text.length ? text : [T.ingen]).map((t) => `<p${text.length ? '' : ' class="tom"'}>${esc(hel(t))}</p>`).join('')}`;
       }).join('');
-      const harCitat = x.delar.some((d) => (d.grupper || []).some((g) => (g.punkter || []).some((p) => p.citat)));
-      // Förklaringen till stämplarna: en för varje slags egen uppgift som står på sidan.
-      const typer = new Set(x.delar.flatMap((d) => (d.grupper || []).flatMap((g) => (g.punkter || []).filter((p) => p.s === 'h').map((p) => p.typ || 'podd'))));
-      const egna = ['podd', 'forum', 'media', 'blandat'].filter((t) => typer.has(t));
-      const fot = `<p class="tn-pod-fot">${[['b', 'podd'], ...(egna.length ? egna : ['podd']).map((t) => ['h', t]), ['o', 'podd']].map(([k, t]) => `${stampel(k, t)} ${esc(T.forklaring[k === 'h' ? t : k])}`).join(' ')}${harCitat ? ` ${esc(T.citaten)}` : ''}</p>`;
+      const cit = poddCitat(x.citat);
+      const kallor = x.delar.map((d, i) => {
+        const k = poddKallor(d);
+        return k.length ? `${esc(namn[i] || d.lag || '')}: ${poddKallText(k)}` : '';
+      }).filter(Boolean);
       return {
         namn: TEXT.sidor.poddar,
+        om: [{ id: String(m ? m.id : x.id), rubrik: x.rubrik }],
+        vikt: 3,
         html: vinjett(TEXT.sidor.poddar, `${nr(x) ? `${nr(x)} · ` : ''}${namn.join('–')}`) + `<h3 class="tn-rub stor">${esc(x.rubrik || T.rubrik(namn[0], namn[1]))}</h3>` +
-          (x.ingress ? `<p class="tn-ingress fet">${esc(hel(x.ingress))}</p>` : '') + `<div class="tn-pod${x.delar.filter((d) => (d.grupper || []).length).length < 2 ? ' en' : ''}">${delar}</div>${fot}`,
+          bildrad(bilder, namn) + (x.ingress ? `<p class="tn-ingress fet">${esc(hel(x.ingress))}</p>` : '') +
+          `<div class="tn-artikel tn-matchblad">${lagen}${cit ? `<blockquote class="tn-mb-citat"><p>”${esc(hel(cit.sagt))}”</p><cite>${esc(cit.vem)}</cite></blockquote>` : ''}</div>` +
+          (x.summering ? `<div class="tn-mb-summering"><b>${esc(T.sammanfattning.toUpperCase())}</b><p>${esc(hel(x.summering))}</p></div>` : '') +
+          (kallor.length || foto ? `<p class="tn-kalla">${kallor.length ? `${esc(T.kallorna)}: ${kallor.join('. ')}.` : ''}${foto ? ` <span class="tn-fotoav">${esc(foto)}</span>` : ''}${cit ? ` ${esc(T.citaten)}` : ''}</p>` : ''),
       };
     });
   }
@@ -465,7 +488,7 @@
     const rader = sum.rader.map((r) => {
       const p = r.res != null && r.pr ? pr(r.pr[r.res]) : null;
       const ratt = folk.filter((x) => r.ratt.includes(x.id)).length;
-      return `<tr><td class="tn-nr">${r.nr}</td><td class="tn-match"><span>${matchNamn(r.h, r.b)}</span></td><td class="tn-res">${esc(r.mal)}</td><td class="tn-tk">${esc(r.tecken)}</td>` +
+      return `<tr data-match="${esc(r.id)}"><td class="tn-nr">${r.nr}</td><td class="tn-match"><span>${matchNamn(r.h, r.b)}</span></td><td class="tn-res">${esc(r.mal)}</td><td class="tn-tk">${esc(r.tecken)}</td>` +
         `<td class="tn-p${p != null && p <= 25 ? ' rod' : ''}">${p == null ? '–' : `${p} %`}</td><td class="tn-ratt">${folk.length ? `${ratt}/${folk.length}` : ''}</td></tr>`;
     }).join('');
     const tabell = `<table class="tn-tabell tn-res-tab"><thead><tr><th></th><th></th><th>Res</th><th>Tecken</th><th title="Datorns chans för det som hände">Datorn</th><th title="Hur många av er som hade rätt">Rätt</th></tr></thead><tbody>${rader}</tbody></table>`;
@@ -487,6 +510,7 @@
     const siffror = s.length ? `<aside class="tn-fakta"><b>${esc(T.siffror.toUpperCase())}</b><div>${s.map((t) => `<p>${esc(hel(t))}</p>`).join('')}</div></aside>` : '';
     return {
       namn: TEXT.sidor.omgangen,
+      om: sum.rader.map((r) => ({ id: String(r.id) })),
       html: vinjett(TEXT.sidor.omgangen, sum.nr ? `Kupong ${sum.nr}` : '') + rubrik(T.rubrik) + (sum.namn ? `<p class="tn-omgnamn">”${esc(sum.namn.replace(/[.!?…]+$/, ''))}”</p>` : '') +
         tabell + rad + siffror,
     };
@@ -654,93 +678,115 @@
     const n = Math.round((mandag - FORSTA) / (7 * 864e5)) + 1;
     return n >= 1 ? n : null;
   }
-  // Det troligaste tecknet enligt datorn, och hur troligt det är.
-  const troligast = (p) => {
-    if (!p) return null;
-    const max = Math.max(...p);
-    return { tecken: SIGNS[p.indexOf(max)], max };
-  };
-
-  // Rutorna 1, X och 2 framför namnet, som på kupongen, alla ikryssade med kulspetspenna: helgarderat. Samma kryss
-  // som på utkastet (helgarderat.js), dragna lite olika och en bit utanför rutan.
+  // Rutorna 1, X och 2 framför namnet, som på kupongen, alla ikryssade med kulspetspenna: helgarderat. Kryssen är
+  // dragna lite olika och går en bit utanför rutan. Samma rutor på löpsedeln (rum-affischer.js) och på Helgarderats
+  // egen sida (helgarderat.js), med sin klass (kl).
   const KRYSS = [
     'M4.5 6.2 C13 14.6 24 25.8 35.6 35.1 M34.2 4.6 C25.8 14.1 15.6 25.2 5.3 36.4',
     'M5.6 4.9 C14.6 14.2 23.4 23.6 34.6 36.2 M36.1 6.4 C26.6 15 15.2 26 3.9 34.6',
     'M3.8 7.1 C12.8 15.2 25.4 24.4 36.3 34 M33.4 3.9 C26.3 13.5 17 26.1 7.2 37.1',
   ];
-  const rutor = () => `<svg class="hf-rutor" viewBox="0 0 134 64" aria-hidden="true">${SIGNS.map((t, i) => `<g transform="translate(${i * 46.5 + 0.8} 0)">` +
+  const rutor = (kl = 'hf-rutor') => `<svg class="${kl}" viewBox="0 0 134 64" aria-hidden="true">${SIGNS.map((t, i) => `<g transform="translate(${i * 46.5 + 0.8} 0)">` +
     `<text x="19.5" y="15" text-anchor="middle">${t}</text><g transform="translate(0 23.2)"><rect width="39" height="39" class="r"/><path d="${KRYSS[i]}" class="k"/></g></g>`).join('')}</svg>`;
 
-  // Framsidan, 100 × 140 (zoom i rum.js): numret, datumet och priset, namnet, en rubrik, kupongen och puffarna.
-  // Inför omgången står kupongens matcher med datorns tecken (först på raden, så att Spika inte skymmer dem), och
-  // efter den rätt rad med resultaten och skrällen. Samma på pulten och när den är framme.
+  // Inför lördagen den 14 november: omgångens första dag
+  const fVdagLang = new Intl.DateTimeFormat('sv-SE', { timeZone: 'Europe/Stockholm', weekday: 'long' });
+  const fDagManad = new Intl.DateTimeFormat('sv-SE', { timeZone: 'Europe/Stockholm', day: 'numeric', month: 'long' });
+  const omgangsdag = (t) => `${fVdagLang.format(new Date(t))}en den ${fDagManad.format(new Date(t))}`;
+  // Veckans bild på framsidan: ett av veckans foton av lagen, matchbladets (data/matchbilder/, som GitHub Actions hämtar
+  // till varje omgång) eller notisens (data/tidning-bilder/, som iMacen hämtar), med matchbladets eller notisens rubrik.
+  // Helst om matchen som Veckans analys handlar om (efter omgången skrällen), annars den första i kupongens ordning som
+  // har ett foto. Finns inget foto står lagens sköldar för den matchen där, så att framsidan alltid har en bild.
+  // → { foto: { src, reserv, foto } | null, skoldar: [src, src] | null, rubrik, under } eller null
+  function veckansBild(u, sum) {
+    const m = u.matcher || [];
+    let pref = null;
+    if (sum) {
+      try { pref = (skrall(u, sum) || { r: {} }).r.id; } catch (e) { pref = null; }
+    } else if (u.analys) pref = (m.find((x) => x.nr === u.analys.nr) || {}).id;
+    const ids = [...new Set([pref, ...m.map((x) => x.id)].filter(Boolean).map(String))];
+    const skold = (lag) => (lag && typeof u.skold === 'function' ? u.skold(lag) || '' : '');
+    const sidor = (u.poddsidor && u.poddsidor.sidor) || [];
+    for (const id of ids) {
+      const x = sidor.find((y) => y && String(y.id) === id);
+      const i = x && Array.isArray(x.bilder) ? x.bilder.findIndex((b) => b && b.fil) : -1;
+      if (i >= 0) {
+        const b = x.bilder[i];
+        return { foto: { src: `data/matchbilder/${b.fil}`, reserv: skold((x.lag || [])[i]), foto: fotograf(b) }, rubrik: x.rubrik || '' };
+      }
+      const n = (u.notiser || []).find((y) => y && String(y.id) === id);
+      const f = n ? notisBilder(u, n).find((y) => y && !y.skold) : null;
+      if (f) return { foto: f, rubrik: n.rubrik || '' };
+    }
+    // utan foto: sköldarna, med matchen och avsparken (efter omgången resultatet)
+    const x = m.find((y) => String(y.id) === ids[0]);
+    if (!x) return null;
+    const skoldar = [skold(x.hemma), skold(x.borta)];
+    if (!skoldar.some(Boolean)) return null;
+    const r = sum && (sum.rader || []).find((y) => String(y.id) === String(x.id));
+    return { skoldar, rubrik: `${x.h}–${x.b}`, under: r && r.mal ? r.mal : avspark(x.avspark) };
+  }
+
+  // Framsidan, 100 × 140 (zoom i rum.js), utan annat än det som säger vilket nummer det är (2026-11-10, användarens
+  // önskemål: "Tidningen ser plottrig ut. Ta bort massa saker där som vi är ointresserade av"): veckan, datumet och
+  // priset, namnet, numret stort med omgångens dag under, och veckans bild (veckansBild) med rubriken. Samma på pulten
+  // och när den är framme.
   function forsta(u0) {
     const u = { namnAv: (id, n) => n, ...u0 };
     const G = TEXT.forsta;
     const sum = u.efter || null;
-    const m = sum ? [] : u.matcher || [];
-    const nyckel0 = (sum && sum.id) || u.id || m.map((x) => x.id).join(',');
-    const i = frö(`${nyckel0}${sum ? 'hge' : 'hg'}`) % G.rubrik.length;
+    const m = u.matcher || [];
     const forst = Math.min(...m.map((x) => Date.parse(x.avspark)).filter(Number.isFinite));
-    // numret och veckan: inför omgången den första matchens, efter den dagens
-    const dagen = !sum && Number.isFinite(forst) ? forst : Number.isFinite(u.datum) ? u.datum : NaN;
+    // numret och veckan: omgångens första matchs, annars dagens
+    const dagen = Number.isFinite(forst) ? forst : Number.isFinite(u.datum) ? u.datum : NaN;
     const nr = Number.isFinite(dagen) ? nummer(dagen) : null;
     const v = Number.isFinite(dagen) ? vecka(dagen) : null;
-    const numret = [nr != null ? G.nr(nr) : '', v != null ? G.vecka(v) : ''].filter(Boolean).join(' · ');
     const dag = Number.isFinite(u.datum) ? fDatum.format(new Date(u.datum)) : '';
-    const puff = (kick, text, kl = '') => `<span class="hf-puff${kl ? ` ${kl}` : ''}"><b>${esc(kick)}</b><span>${esc(text)}</span></span>`;
-    const stjarna = (kick, text) => `<span class="hf-spik"><b>${esc(kick)}</b><span>${esc(text)}</span></span>`;
-    const kup = (rub, under, rader, spik = '') => `<div class="hf-kup"><p><b>${esc(rub.toUpperCase())}</b>${under ? `<span>${esc(under)}</span>` : ''}</p><ol>${rader}</ol>${spik}</div>`;
-    let r1;
-    let r2;
-    let underRad;
-    let innehall;
-    if (sum) {
-      const E = G.efter;
-      const ok = sum.kupong && sum.kupong.n ? sum.kupong.ok : null;
-      [r1, r2] = ok == null ? E.utanKupong : [E.rubrik[i % E.rubrik.length], E.ratt(ok)];
-      underRad = E.under[i % E.under.length];
-      const rader = (sum.rader || []).map((r) => `<li><b>${r.nr}</b><i>${esc(r.tecken || '')}</i><span>${matchNamn(r.h, r.b)}</span><em>${esc(r.mal || '')}</em></li>`).join('');
-      let sk = null;
-      let kr = null;
-      try { sk = skrall(u, sum); } catch (e) { sk = null; }
-      try { kr = kronika(u, sum); } catch (e) { kr = null; }
-      const puffar = [kr ? puff(E.kronikan, kr.rubrik) : '', puff(G.knep[0], G.knep[1], 'gul')].join('');
-      innehall = kup(E.rattRad, E.resultat, rader, sk ? stjarna(E.skrall, sk.r.res === 1 ? `${sk.r.h}–${sk.r.b}` : `${sk.v}!`) : '') + `<div class="hf-puffar">${puffar}</div>`;
-    } else {
-      [r1, r2] = G.rubrik[i];
-      underRad = G.under[i % G.under.length];
-      const rader = m.map((x) => {
-        const t = troligast(x.pr);
-        return `<li><b>${x.nr}</b><i>${t ? t.tecken : ''}</i><span>${matchNamn(x.h, x.b)}</span></li>`;
-      }).join('');
-      const med = m.map((x) => ({ x, t: troligast(x.pr) })).filter((y) => y.t);
-      const jamn = med.filter((y) => y.t.max <= 42).sort((a, b) => a.t.max - b.t.max)[0];
-      const fav = med.filter((y) => y.t.max >= 68 && y.t.tecken !== 'X').sort((a, b) => b.t.max - a.t.max)[0];
-      const puffar = [jamn ? puff(G.rysaren, `${jamn.x.h}–${jamn.x.b}`) : '', puff(G.knep[0], G.knep[1], 'gul')].join('');
-      innehall = rader ? kup(G.kupongen, G.datorn, rader, fav ? stjarna(G.spika, `${fav.t.tecken === '1' ? fav.x.h : fav.x.b}!`) : '') + `<div class="hf-puffar">${puffar}</div>`
-        // utan kupong: knepen på framsidan
-        : kup(TEXT.knep.rubrik, '', TEXT.knep.lista.map(([t], n) => `<li><b>${n + 1}</b><span>${esc(t)}</span></li>`).join(''));
-    }
-    return `<div class="hf-forsta${sum ? ' efter' : ''}" aria-label="${NAMN}${nr != null ? ` nr ${nr}` : ''}">` +
-      `<div class="hf-linje"><b>${esc(numret)}</b><span>${esc(dag)}</span><span>${esc(G.pris)}</span></div>` +
+    const omg = Number.isFinite(forst) ? (sum ? G.efter : G.infor)(omgangsdag(forst)) : '';
+    const b = veckansBild(u, sum);
+    const duk = (src, reserv, kl, w, h) => `<canvas class="${kl}" width="${w}" height="${h}" data-bild="${esc(src)}"${reserv ? ` data-reserv="${esc(reserv)}"` : ''}></canvas>`;
+    const under = b && (b.foto ? (b.foto.foto ? G.foto(b.foto.foto) : '') : b.under);
+    const bild = !b ? '' : `<figure class="hf-bild">${b.foto ? duk(b.foto.src, b.foto.reserv, 'hf-foto', 320, 200)
+      : `<div class="hf-foto hf-skoldar">${b.skoldar.map((x) => (x ? duk(x, '', 'skold genom', 160, 160) : '<span></span>')).join('<i>–</i>')}</div>`}` +
+      `<figcaption><b>${esc(hel(b.rubrik || ''))}</b>${under ? `<small>${esc(under)}</small>` : ''}</figcaption></figure>`;
+    return `<div class="hf-forsta${bild ? '' : ' utan-bild'}" aria-label="${NAMN}${nr != null ? ` nr ${nr}` : ''}">` +
+      `<div class="hf-linje"><b>${v != null ? esc(G.vecka(v)) : ''}</b><span>${esc(dag)}</span><span>${esc(G.pris)}</span></div>` +
       `<div class="hf-namn">${rutor()}<b>${NAMN.toUpperCase()}</b></div>` +
-      `<h2 class="hf-rub"><b>${esc(r1)}</b><b class="gron">${esc(r2)}</b></h2><p class="hf-under">${esc(underRad)}</p>` +
-      innehall + '</div>';
-  }
-
-  // Åtta knep, som alltid står sist: tidningens råd, och nummer 5 är det alla gör fel.
-  function knep() {
-    const K = TEXT.knep;
-    const rader = K.lista.map(([t, s], i) => `<li${i === 4 ? ' class="fel"' : ''}><b>${i + 1}</b><div><h4>${esc(t)}</h4><p>${esc(s)}</p>` +
-      `${i === 4 ? `<span class="hf-stampel">${esc(K.stampel)}</span>` : ''}</div></li>`).join('');
-    return {
-      namn: TEXT.sidor.knep,
-      html: vinjett(TEXT.sidor.knep) + rubrik(K.rubrik, 'stor') + `<p class="tn-ingress">${esc(K.ingress)}</p><ol class="hf-knep">${rader}</ol>`,
-    };
+      `<div class="hf-numret">${nr != null ? `<b>${esc(G.nr(nr))}</b>` : ''}${omg ? `<span>${esc(omg)}</span>` : ''}</div>` +
+      bild + '<span class="hf-blad"></span><span class="hf-yta"></span></div>';
   }
 
   // ---------- tidningen ----------
+
+  // Innehållet under framsidan (2026-11-10, användarens önskemål: "en innehållsförteckning - med matcherna på
+  // kupongen - på ett snyggt sätt", "som man alltså kan klicka sig fram till"), som i en riktig tidning: I tidningen
+  // med avdelningarna och deras första sida, och På kupongen med omgångens matcher i kupongens ordning, var och en med
+  // sidan som handlar mest om den (s.om och s.vikt: matchbladet, annars Veckans analys, notisen eller raden i Tipset)
+  // och under matchen sidans rubrik, som Lördagens matcher på Helgarderats egen sida. Efter omgången står resultatet
+  // i stället för sidnumret (alla matcher står i Omgången, och tretton tvåor säger ingenting), och raden går dit. Varje rad har prickar fram till sidnumret och går dit med ett
+  // klick (tidningen i rum.js): data-till är sidan och data-match matchen, på en sida med flera matcher.
+  function innehall(u, sidor) {
+    const T = TEXT.inne;
+    // hoger: sidnumret, efter omgången resultatet
+    const rad = (nr, namn, under = '', match = '', hoger = `<i>${nr}</i>`) => `<li><button type="button" data-till="sida-${nr}"${match ? ` data-match="${esc(match)}"` : ''}>` +
+      `${namn}<em></em>${hoger}${under ? `<small>${esc(hel(under))}</small>` : ''}</button></li>`;
+    const avd = sidor.map((s, i) => (i && sidor[i - 1].namn === s.namn ? '' : rad(i + 2, `<span>${esc(s.namn)}</span>`))).join('');
+    const matcher = (u.matcher || []).slice().sort((a, b) => a.nr - b.nr).map((m) => {
+      const id = String(m.id);
+      // sidan med högst vikt, och bland dem den första
+      let bast = null;
+      sidor.forEach((s, i) => {
+        const om = (s.om || []).find((x) => x && x.id === id);
+        if (om && (!bast || (s.vikt || 0) > bast.vikt)) bast = { nr: i + 2, vikt: s.vikt || 0, rubrik: om.rubrik || '' };
+      });
+      if (!bast) return '';
+      const r = u.efter ? (u.efter.rader || []).find((x) => String(x.id) === id) : null;
+      const namn = `<b>${esc(m.nr)}</b><span>${matchNamn(m.h, m.b)}</span>`;
+      return r && r.mal ? rad(bast.nr, namn, '', id, `<strong>${esc(hel(r.mal))}</strong>`) : rad(bast.nr, namn, bast.rubrik, id);
+    }).join('');
+    const del = (rub, rader, kl) => `<div class="tn-inne-del ${kl}"><p class="tn-inne-rub"><b>${esc(rub.toUpperCase())}</b></p><ol>${rader}</ol></div>`;
+    return `<nav class="tn-inne" id="tn-innehall" aria-label="${esc(T.tidningen)}">${del(T.tidningen, avd, 'avd')}${matcher ? del(T.kupongen, matcher, 'matcher') : ''}</nav>`;
+  }
 
   // Sidorna ur listan, med sidnummer från 2 (framsidan är 1). En avdelning kan vara flera sidor: supporterpoddarna
   // har en per match. → { inne, blad, sidor } eller null
@@ -754,17 +800,16 @@
       }
     }).filter(Boolean);
     if (!sidor.length) return null;
-    // I tidningen: avdelningens första sida
-    const inne = `<nav class="tn-inne" aria-label="I tidningen"><b>I TIDNINGEN</b>${sidor.map((s, i) => (i && sidor[i - 1].namn === s.namn ? '' : `<button type="button" data-sida="${i + 2}"><span>${esc(s.namn)}</span><i>${i + 2}</i></button>`)).join('')}</nav>`;
+    const inne = innehall(u, sidor);
     const blad = sidor.map((s, i) => `<section class="tn-ark tn-sida" id="tn-sida-${i + 2}" aria-label="Sidan ${i + 2}: ${esc(s.namn)}">${folio(u, i + 2)}${s.html}</section>`).join('');
     return { inne, blad, sidor: sidor.map((s) => s.namn) };
   }
-  // Hela tidningen: framsidan och sidorna – efter omgången (u.efter) om den, annars inför den – och Åtta knep sist,
-  // som alltid finns. → { forsta, inne, blad, sidor }
+  // Hela tidningen: framsidan och sidorna, efter omgången (u.efter) om den, annars inför den. Utan omgång står bara
+  // framsidan. → { forsta, inne, blad, sidor }
   function tidning(u0) {
     const u = { namnAv: (id, n) => n, ...u0 };
     u.datumText = u.datumText || (Number.isFinite(u.datum) ? fDatum.format(new Date(u.datum)) : '');
-    const lista = u.efter ? [omgangen, betygen, skrallen, kronikan, knep] : [tipset, notiser, analys, poddar, knep];
+    const lista = u.efter ? [omgangen, betygen, skrallen, kronikan] : [tipset, notiser, analys, poddar];
     return { inne: '', blad: '', sidor: [], ...sidorna(u, lista), forsta: forsta(u) };
   }
 
@@ -792,10 +837,14 @@
         const { width: W, height: H } = c;
         const iw = img.naturalWidth;
         const ih = img.naturalHeight;
+        // (genom: trycket ligger direkt på papperet, utan någon vit ruta – sköldarna på framsidan)
+        const genom = c.classList.contains('genom');
         if (c.classList.contains('skold')) {
           const k = (Math.min(W / iw, H / ih) * 0.78);
-          x.fillStyle = '#fff';
-          x.fillRect(0, 0, W, H);
+          if (!genom) {
+            x.fillStyle = '#fff';
+            x.fillRect(0, 0, W, H);
+          }
           x.drawImage(img, (W - iw * k) / 2, (H - ih * k) / 2, iw * k, ih * k);
         } else {
           const k = Math.max(W / iw, H / ih);
@@ -810,12 +859,22 @@
         for (let y = 0; y < H; y++) {
           for (let i = 0; i < W; i++) {
             const o = (y * W + i) * 4;
-            const g = Math.min(1, Math.max(0, ((0.3 * p[o] + 0.59 * p[o + 1] + 0.11 * p[o + 2]) / 255 - 0.5) * 1.25 + 0.55));
+            // (det genomskinliga är papper)
+            const a = genom ? p[o + 3] / 255 : 1;
+            const g = Math.min(1, Math.max(0, ((a * (0.3 * p[o] + 0.59 * p[o + 1] + 0.11 * p[o + 2]) / 255 + 1 - a) - 0.5) * 1.25 + 0.55));
             // punkternas storlek efter hur mörkt det är: 45 grader, med tonen kvar under
             const uu = ((i + y) / ruta) % 1;
             const vv = ((i - y + 4 * H) / ruta) % 1;
             const r = Math.hypot(uu - 0.5, vv - 0.5) / 0.71;
             const v2 = g * 0.72 + (r < 1 - g ? 0 : 0.28);
+            if (genom) {
+              // svärtan som täckning: papperet lyser igenom där trycket är ljust
+              p[o] = 28;
+              p[o + 1] = 24;
+              p[o + 2] = 18;
+              p[o + 3] = Math.round((1 - v2) * 255);
+              continue;
+            }
             p[o] = 28 + v2 * 208;
             p[o + 1] = 24 + v2 * 208;
             p[o + 2] = 18 + v2 * 200;
@@ -827,5 +886,5 @@
     }
   }
 
-  return { tidning, forsta, rastrera, nummer, kronika, skrall, citaten, omdome, poddNamn, TEXT };
+  return { tidning, forsta, rastrera, nummer, rutor, kronika, skrall, citaten, omdome, poddNamn, poddText, poddKallor, poddKallText, poddCitat, kortDatum, TEXT };
 });

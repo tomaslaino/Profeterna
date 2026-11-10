@@ -1,8 +1,9 @@
 #!/usr/bin/env node
-// Supporterpoddarna, supporterforumen och de insatta medierna till tidningen inför omgången
-// (config/poddar.js, config/forum.js, config/media.js, src/analyser/poddar.mjs, forum.mjs och
-// media.mjs). Körs på iMacen av launchd (se.matchfixarna.poddar) varje natt: läser lagens forum,
-// letar upp och läser veckans artiklar i de insatta medierna, hittar poddarna för lagen i gängets
+// Supporterpoddarna, supporterforumen, de insatta medierna och klubben, lokaltidningen och motståndarens
+// intervju till tidningen inför omgången (config/poddar.js, config/forum.js, config/media.js, config/lokal.js,
+// src/analyser/poddar.mjs, forum.mjs och media.mjs). Körs på iMacen av launchd (se.matchfixarna.poddar) på
+// tiderna i config/poddar.js: läser lagens forum, letar upp och läser veckans artiklar i de insatta medierna,
+// hos klubben och i lokaltidningen, hittar poddarna för lagen i gängets
 // omgång, skriver ut veckans avsnitt med whisper.cpp och låter Claude Code (claude -p på
 // Claude-kontot) ta ut det mest intressanta inför matcherna.
 //
@@ -13,7 +14,8 @@
 //   utskrifter/     utskrifterna, ett stycke per minut; tas bort efter tre veckor
 // Skriptet rör aldrig git. Ljudet tas bort så snart det är utskrivet.
 //
-//   node scripts/tidning/poddar.mjs                      omgångens lag
+//   node scripts/tidning/poddar.mjs                      omgångens lag, bara på tiderna (som launchd)
+//   node scripts/tidning/poddar.mjs --nu                 omgångens lag, oavsett tid
 //   node scripts/tidning/poddar.mjs --torrt              visar vilka avsnitt som skulle skrivas ut
 //   node scripts/tidning/poddar.mjs --visa               visar det som är uttaget för omgången
 //   node scripts/tidning/poddar.mjs --lag "Reading" --mot "Stockport County"
@@ -25,20 +27,23 @@
 //   node scripts/tidning/poddar.mjs --utan-forum         utan forumen
 //   node scripts/tidning/poddar.mjs --bara-media         bara de insatta medierna
 //   node scripts/tidning/poddar.mjs --utan-media         utan de insatta medierna
+//   node scripts/tidning/poddar.mjs --bara-lokal         bara klubben, lokaltidningen och motståndarens intervju
+//   node scripts/tidning/poddar.mjs --utan-lokal         utan dem
 
 import { execFileSync } from 'node:child_process';
-import crypto from 'node:crypto';
 import fs from 'node:fs';
 import os from 'node:os';
 import path from 'node:path';
 import pc from '../../config/poddar.js';
 import fc from '../../config/forum.js';
 import mc from '../../config/media.js';
+import lc from '../../config/lokal.js';
 import kupongCfg from '../../config/kupong.js';
 import { betalvagar, inloggning, Stopp } from '../../src/analyser/claude.mjs';
-import { lasForum, taUtForum, lasningsNyckel, forumPost, provaForum, fragaEfterForum, forumSkaLetas, Sparrad } from '../../src/analyser/forum.mjs';
-import { letaArtiklar, lasArtikel, nyaArtiklar, taUtMedia, mediaPoster, laggTill, Sparrad as MediaSparrad } from '../../src/analyser/media.mjs';
-import { appleKandidater, fragaEfterPoddar, levandePoddar, skaLetas, hamtaFlode, valjAvsnitt, skrivUt, taUt, whisperLedtrad, poddUnderlag, forumUnderlag, mediaUnderlag, sidansUnderlag, sidNyckel, skrivSida } from '../../src/analyser/poddar.mjs';
+import { lasForum, taUtForum, lasningsNyckel, forumPoster, forumenAv, provaForum, fragaEfterForum, forumSkaLetas, Sparrad } from '../../src/analyser/forum.mjs';
+import { letaArtiklar, lasArtikel, nyaArtiklar, lastaAvAndra, renAdress, taUtMedia, mediaPoster, laggTill, Sparrad as MediaSparrad } from '../../src/analyser/media.mjs';
+import { senasteTid, nastaTid } from '../../src/analyser/tider.mjs';
+import { appleKandidater, fragaEfterPoddar, levandePoddar, skaLetas, hamtaFlode, valjAvsnitt, skrivUt, taUt, whisperLedtrad, poddUnderlag, forumUnderlag, mediaUnderlag, lokalUnderlag, sidansUnderlag, sidNyckel, skrivSida } from '../../src/analyser/poddar.mjs';
 
 const ARGV = process.argv.slice(2);
 const flagga = (n) => ARGV.includes(n);
@@ -54,10 +59,20 @@ const BARA_FORUM = flagga('--bara-forum');
 const UTAN_FORUM = flagga('--utan-forum');
 const BARA_MEDIA = flagga('--bara-media');
 const UTAN_MEDIA = flagga('--utan-media');
-// Vad som körs: forumen, de insatta medierna och poddarna (informationssidorna skrivs alltid).
-const MED_FORUM = !UTAN_FORUM && !BARA_SIDOR && !BARA_MEDIA;
-const MED_MEDIA = !UTAN_MEDIA && !BARA_SIDOR && !BARA_FORUM;
-const MED_PODDAR = !BARA_SIDOR && !BARA_FORUM && !BARA_MEDIA;
+const BARA_LOKAL = flagga('--bara-lokal');
+const UTAN_LOKAL = flagga('--utan-lokal');
+// Utan val är det launchd: då går skriptet bara på tiderna (config/poddar.js, tider). --nu
+// eller något annat val kör oavsett tid.
+const PA_TID = !ARGV.length;
+// Vad som körs: forumen, de insatta medierna, klubben och lokaltidningen, och poddarna (informationssidorna
+// skrivs alltid).
+const BARA = BARA_SIDOR || BARA_FORUM || BARA_MEDIA || BARA_LOKAL;
+const MED_FORUM = !UTAN_FORUM && (!BARA || BARA_FORUM);
+const MED_MEDIA = !UTAN_MEDIA && (!BARA || BARA_MEDIA);
+const MED_LOKAL = !UTAN_LOKAL && (!BARA || BARA_LOKAL);
+const MED_PODDAR = !BARA;
+// Källans slag som det står i loggen och i --visa.
+const TYPORD = { forum: 'forumet ', media: 'insatta ', lokal: 'lokalt ', motstand: 'intervjun i ' };
 
 const HEM = os.homedir();
 const MAPP = process.env.PODDAR_MAPP || path.join(HEM, 'Library', 'Application Support', 'Matchfixarna', pc.mapp);
@@ -66,6 +81,7 @@ const REGISTER = path.join(MAPP, 'register.json');
 const FORUMREG = path.join(MAPP, 'forum.json');
 const OMGANG = path.join(MAPP, FIL_UT || (ETT_LAG || PROV ? 'prov.json' : 'omgang.json'));
 const LAS = path.join(MAPP, 'las');
+const TIDER = path.join(MAPP, 'tider.json');
 const DAG = 86400000;
 const site = String(process.env.ANALYSER_SAJT || kupongCfg.site).replace(/\/+$/, '');
 const samtalUrl = kupongCfg.endpoint.replace(/kupong$/, 'samtal');
@@ -111,6 +127,20 @@ for (const s of ['SIGTERM', 'SIGINT']) process.on(s, () => { logg(`avbruten (${s
 function annanUtskrift() {
   try { return execFileSync('pgrep', ['-x', path.basename(pc.whisper)], { encoding: 'utf8' }).trim() !== ''; } catch { return false; }
 }
+
+// Är det dags (config/poddar.js, tider)? launchd startar skriptet varje natt och lördag morgon,
+// och en körning går bara när en tid har slagit sedan den senaste lyckade (tider.json: den
+// tiden). En tid som missas medan datorn sover körs när den vaknar, och en körning som stoppas
+// försöks igen vid nästa start. Saknas filen räknas den senaste tiden som körd, så att ett nytt
+// schema inte ger en extra körning. → {dags, tid, nasta}
+function schemat(now = Date.now()) {
+  const tid = senasteTid(now, pc.tider || []);
+  const nasta = nastaTid(now, pc.tider || []);
+  const fil = lasJson(TIDER, null);
+  if (!fil) { skrivJson(TIDER, { senast: new Date(tid).toISOString() }); return { dags: false, tid, nasta }; }
+  return { dags: tid > (Date.parse(fil.senast) || 0), tid, nasta };
+}
+const klockan = (ms) => (ms ? new Date(ms).toLocaleString('sv-SE', { timeZone: 'Europe/Stockholm', weekday: 'long', hour: '2-digit', minute: '2-digit' }) : '–');
 
 // Lagen som har en match kvar i omgången. → [{lag, mot, avspark, spelare}]
 async function omgangensLag(round) {
@@ -162,8 +192,9 @@ async function fyllRegistret(register, lagen) {
   }
 }
 
-// Forumregistret: lagen i config/forum.js prövas (lever tavlan och går den att läsa?), lagen som
-// varken står där eller bland dem utan forum letas upp av Claude, några i taget.
+// Forumregistret: lagens forum i config/forum.js prövas (lever tavlan och går den att läsa?), lagen
+// som varken står där eller bland dem utan forum letas upp av Claude, några i taget. Registret har
+// en lista per lag: alla forum som gick att läsa, det viktigaste först.
 async function fyllForum(reg, lagen) {
   const nya = lagen.filter((l) => !fc.utan.includes(l) && forumSkaLetas(reg[l], Date.now(), fc.kanda[l] || null));
   if (!nya.length) return;
@@ -182,84 +213,111 @@ async function fyllForum(reg, lagen) {
   }
   for (const lag of nya) {
     if (!fc.kanda[lag] && !(lag in svar)) continue;
-    const f = fc.kanda[lag] || svar[lag];
-    const p = f ? await provaForum(f).catch((err) => ({ ok: false, orsak: err.message })) : { ok: false, orsak: 'inget forum hittat' };
-    // Ett känt forum som inte svarar just nu får stå kvar; det prövas igen nästa gång.
-    const forum = p.ok ? f : (fc.kanda[lag] && reg[lag] && reg[lag].forum) || null;
-    reg[lag] = { forum, kollad: new Date().toISOString(), ...(fc.kanda[lag] ? { kant: fc.kanda[lag] } : {}), ...(p.ok ? {} : { fel: p.orsak }) };
-    logg(`${lag}: ${p.ok ? `forumet ${f.namn} (${p.tradar} trådar)` : `inget forum att läsa${f ? ` (${f.namn}: ${p.orsak})` : ''}`}`);
+    const kanda = forumenAv(fc.kanda[lag]);
+    const forut = forumenAv(reg[lag] && reg[lag].forum);
+    const prova = kanda.length ? kanda : forumenAv(svar[lag]);
+    const forum = [];
+    const fel = {};
+    for (const f of prova.slice(0, fc.flestForum)) {
+      const p = await provaForum(f).catch((err) => ({ ok: false, orsak: err.message }));
+      // Ett känt forum som inte svarar just nu får stå kvar; det prövas igen nästa gång.
+      if (p.ok || (kanda.length && forut.some((x) => x.namn === f.namn))) forum.push(f);
+      if (!p.ok) fel[f.namn] = p.orsak;
+      logg(`${lag}: ${p.ok ? `forumet ${f.namn} (${p.tradar} trådar)` : `forumet ${f.namn} gick inte att läsa (${p.orsak})${forum.includes(f) ? ', står kvar' : ''}`}`);
+    }
+    if (!prova.length) logg(`${lag}: inget forum hittat`);
+    reg[lag] = { forum, kollad: new Date().toISOString(), ...(fc.kanda[lag] ? { kant: fc.kanda[lag] } : {}), ...(Object.keys(fel).length ? { fel } : !prova.length ? { fel: 'inget forum hittat' } : {}) };
     skrivJson(FORUMREG, reg);
   }
 }
 
-// Läser lagens forum och tar ut det intressanta. Samma inlägg som förra läsningen läses inte av
-// Claude igen. → antal nya uppgifter
+// Läser alla lagets forum och tar ut det intressanta ur dem tillsammans, ett anrop per lag. Samma
+// inlägg som förra läsningen läses inte av Claude igen. Varje forum sparas som en egen läsning,
+// så att det står som källa för sig. → antal nya uppgifter
 async function lasForumen(fil, reg, lagen) {
   let nya = 0;
   for (const l of lagen) {
-    const forum = reg[l.lag] && reg[l.lag].forum;
-    if (!forum) continue;
+    const forumen = forumenAv(reg[l.lag] && reg[l.lag].forum);
+    if (!forumen.length) continue;
     const post = fil.lag[l.lag] || (fil.lag[l.lag] = { mot: l.mot, avsnitt: [] });
     post.mot = l.mot;
-    try {
-      const lasning = await lasForum(forum, { mot: l.mot, logg });
-      if (!lasning.tradar.length) { logg(`${l.lag}: ${forum.namn} – inga nya inlägg i trådarna inför matchen`); continue; }
-      const nyckel = lasningsNyckel(lasning);
-      const forra = post.avsnitt.filter((a) => a.typ === 'forum').sort((a, b) => b.uttaget.localeCompare(a.uttaget))[0];
-      if (forra && forra.nyckel === nyckel && forra.version === fc.promptVersion) { logg(`${l.lag}: ${forum.namn} – inget nytt sedan förra läsningen`); continue; }
-      if (TORRT) { logg(`skulle läsa ${l.lag}: ${forum.namn} – ${lasning.tradar.map((t) => `"${t.titel}" (${t.inlagg.length})`).join(', ')}`); continue; }
-      const id = `f${crypto.createHash('sha1').update(`${l.lag}|${nyckel}`).digest('hex').slice(0, 11)}`;
-      const u = await taUtForum(lasning, { lag: l.lag, mot: l.mot, avspark: l.avspark, spelare: l.spelare, id });
-      if (!u.rattKlubb) {
-        logg(`${l.lag}: ${forum.namn} handlar om en annan klubb (${u.handlarOm || '–'}) och tas bort ur registret`);
-        reg[l.lag] = { forum: null, kollad: new Date().toISOString(), fel: 'fel klubb' };
-        skrivJson(FORUMREG, reg);
-        continue;
+    const lasningar = [];
+    for (const forum of forumen) {
+      try {
+        const lasning = await lasForum(forum, { mot: l.mot, logg });
+        if (lasning.tradar.length) lasningar.push(lasning);
+        else logg(`${l.lag}: ${forum.namn} – inga nya inlägg i trådarna inför matchen`);
+      } catch (err) {
+        if (err instanceof Stopp) throw err;
+        logg(`${err instanceof Sparrad ? 'SPÄRRAT' : 'FEL'} ${l.lag}: ${forum.namn}: ${err.message}`);
       }
-      // Högst fyra läsningar per lag ligger kvar i omgången (sidan och tidningen tar de senaste).
-      post.avsnitt = [...post.avsnitt.filter((a) => a.typ !== 'forum'), ...post.avsnitt.filter((a) => a.typ === 'forum' && a.id !== id).sort((a, b) => b.uttaget.localeCompare(a.uttaget)).slice(0, 3), forumPost(lasning, u, { id, nyckel, version: fc.promptVersion })];
+    }
+    if (!lasningar.length) continue;
+    const namn = lasningar.map((x) => x.forum.namn).join(', ');
+    try {
+      const nyckel = lasningsNyckel(lasningar);
+      const forra = post.avsnitt.filter((a) => a.typ === 'forum').sort((a, b) => b.uttaget.localeCompare(a.uttaget))[0];
+      if (forra && (forra.lasning || forra.nyckel) === nyckel && forra.version === fc.promptVersion) { logg(`${l.lag}: ${namn} – inget nytt sedan förra läsningen`); continue; }
+      if (TORRT) { logg(`skulle läsa ${l.lag}: ${lasningar.map((x) => `${x.forum.namn} – ${x.tradar.map((t) => `"${t.titel}" (${t.inlagg.length})`).join(', ')}`).join('; ')}`); continue; }
+      const u = await taUtForum(lasningar, { lag: l.lag, mot: l.mot, avspark: l.avspark, spelare: l.spelare });
+      if (u.felForum.length) {
+        logg(`${l.lag}: ${u.felForum.join(', ')} handlar om en annan klubb (${u.handlarOm || '–'}) och tas bort ur registret`);
+        const kvar = forumenAv(reg[l.lag] && reg[l.lag].forum).filter((f) => !u.felForum.includes(f.namn));
+        reg[l.lag] = { ...(reg[l.lag] || {}), forum: kvar, kollad: new Date().toISOString(), fel: { ...((reg[l.lag] && typeof reg[l.lag].fel === 'object' && reg[l.lag].fel) || {}), ...Object.fromEntries(u.felForum.map((n) => [n, 'fel klubb'])) } };
+        skrivJson(FORUMREG, reg);
+      }
+      const poster = forumPoster(lasningar, u, { lag: l.lag, nyckel, version: fc.promptVersion });
+      if (!poster.length) continue;
+      // Högst fyra läsningar per forum ligger kvar i omgången (sidan och tidningen tar de senaste).
+      const nyaId = new Set(poster.map((p) => p.id));
+      const gamla = post.avsnitt.filter((a) => a.typ === 'forum' && !nyaId.has(a.id) && !u.felForum.includes(a.podd)).sort((a, b) => b.uttaget.localeCompare(a.uttaget));
+      const behall = gamla.filter((a, i) => gamla.slice(0, i).filter((x) => x.podd === a.podd).length < 3);
+      post.avsnitt = [...post.avsnitt.filter((a) => a.typ !== 'forum'), ...behall, ...poster];
       nya += u.uppgifter.length;
       fil.uppdaterad = new Date().toISOString();
       skrivJson(OMGANG, fil);
-      logg(`${l.lag}: ${forum.namn} – ${lasning.tradar.length} trådar, ${lasning.tradar.reduce((n, t) => n + t.inlagg.length, 0)} inlägg: ${u.uppgifter.length} uppgifter${u.strukna ? `, ${u.strukna} strukna` : ''} (${u.sekunder} s)`);
+      logg(`${l.lag}: ${poster.map((p) => `${p.podd} – ${p.tradar.length} trådar, ${p.tradar.reduce((n, t) => n + t.inlagg, 0)} inlägg, ${p.uppgifter.length} uppgifter`).join('; ')}${u.strukna ? ` (${u.strukna} strukna)` : ''} (${u.sekunder} s)`);
     } catch (err) {
       if (err instanceof Stopp) throw err;
-      logg(`${err instanceof Sparrad ? 'SPÄRRAT' : 'FEL'} ${l.lag}: ${forum.namn}: ${err.message}`);
+      logg(`FEL ${l.lag}: ${namn}: ${err.message}`);
     }
   }
   return nya;
 }
 
-// Letar upp veckans artiklar om laget i de insatta medierna, läser dem och tar ut det intressanta.
-// En artikel som redan är läst med samma text läses inte av Claude igen. → antal nya uppgifter
-async function lasMedierna(fil, lagen) {
+// Letar upp veckans artiklar om laget i de insatta medierna (cfg = config/media.js) eller hos klubben, i
+// lokaltidningen och i motståndarens intervju (cfg = config/lokal.js), läser dem och tar ut det intressanta.
+// En artikel som redan är läst med samma text läses inte av Claude igen, och en som den andra läsningen
+// redan har läses inte alls. vad: källorna som de står i loggen. → antal nya uppgifter
+async function lasMedierna(fil, lagen, { cfg = mc, vad = 'de insatta medierna' } = {}) {
   let nya = 0;
   for (const l of lagen) {
-    if (TORRT) { logg(`skulle leta i de insatta medierna för ${l.lag}`); continue; }
+    if (TORRT) { logg(`skulle leta i ${vad} för ${l.lag}`); continue; }
     const post = fil.lag[l.lag] || (fil.lag[l.lag] = { mot: l.mot, avsnitt: [] });
     post.mot = l.mot;
     try {
-      const hittade = await letaArtiklar({ lag: l.lag, mot: l.mot, avspark: l.avspark });
-      if (!hittade.length) { logg(`${l.lag}: inga artiklar i de insatta medierna`); continue; }
+      const andras = lastaAvAndra(post, { cfg });
+      const hittade = (await letaArtiklar({ lag: l.lag, mot: l.mot, avspark: l.avspark, cfg })).filter((a) => !andras.has(renAdress(a.adress)));
+      if (!hittade.length) { logg(`${l.lag}: inga artiklar i ${vad}`); continue; }
       const lasta = [];
       for (const a of hittade) {
         try {
-          lasta.push(await lasArtikel(a));
+          lasta.push(await lasArtikel(a, { cfg }));
         } catch (err) {
           logg(`${err instanceof MediaSparrad ? 'SPÄRRAT' : 'hoppar över'} ${l.lag}: ${a.kalla || a.adress} – ${err.message}`);
         }
       }
-      const nyaA = nyaArtiklar(lasta, post);
+      const nyaA = nyaArtiklar(lasta, post, { cfg });
       if (!nyaA.length) { logg(`${l.lag}: ${lasta.length ? 'inga nya artiklar sedan förra läsningen' : 'ingen av artiklarna gick att läsa'}`); continue; }
-      const u = await taUtMedia(nyaA, { lag: l.lag, mot: l.mot, avspark: l.avspark, spelare: l.spelare });
-      laggTill(post, mediaPoster(u.artiklar, u));
+      const u = await taUtMedia(nyaA, { lag: l.lag, mot: l.mot, avspark: l.avspark, spelare: l.spelare, cfg });
+      laggTill(post, mediaPoster(u.artiklar, u, { cfg }), { cfg });
       nya += u.uppgifter.length;
       fil.uppdaterad = new Date().toISOString();
       skrivJson(OMGANG, fil);
       logg(`${l.lag}: ${u.artiklar.map((a) => a.kalla).join(', ')} – ${u.artiklar.length} artiklar: ${u.uppgifter.length} uppgifter${u.strukna ? `, ${u.strukna} strukna` : ''} (${u.sekunder} s)`);
     } catch (err) {
       if (err instanceof Stopp) throw err;
-      logg(`FEL ${l.lag}: de insatta medierna: ${err.message}`);
+      logg(`FEL ${l.lag}: ${vad}: ${err.message}`);
     }
   }
   return nya;
@@ -279,22 +337,21 @@ function visa(fil) {
   for (const [lag, post] of Object.entries(fil.lag || {})) {
     console.log(`\n${lag}${post.mot ? ` (mot ${post.mot})` : ''}`);
     for (const a of post.avsnitt || []) {
-      console.log(`  ${a.typ === 'forum' ? 'forumet ' : a.typ === 'media' ? 'insatta ' : ''}${a.podd}: "${a.titel}" (${String(a.datum).slice(0, 10)})${a.handlarOm ? `\n  – ${a.handlarOm}` : ''}`);
+      console.log(`  ${TYPORD[a.typ] || ''}${a.podd}: "${a.titel}" (${String(a.datum).slice(0, 10)})${a.handlarOm ? `\n  – ${a.handlarOm}` : ''}`);
       for (const u of a.uppgifter || []) console.log(`    [${u.s} ${u.vikt}] ${u.t}${u.min != null ? ` (min ${u.min})` : ''}${u.vem ? ` – ${u.vem}` : ''}`);
       if (!(a.uppgifter || []).length) console.log('    (inget värt att ta med)');
     }
-    const t = [...poddUnderlag(fil, lag), ...forumUnderlag(fil, lag), ...mediaUnderlag(fil, lag)];
+    const t = [...poddUnderlag(fil, lag), ...forumUnderlag(fil, lag), ...mediaUnderlag(fil, lag), ...lokalUnderlag(fil, lag)];
     if (!t.length) console.log('  → inget till tidningen');
   }
   for (const s of Object.values(fil.sidor || {})) {
     console.log(`\n=== ${s.match}${s.redigerad ? '' : ' (oredigerad)'}\n${s.rubrik || '(ingen rubrik)'}\n${s.ingress || ''}`);
     for (const d of s.delar) {
-      console.log(`\n  ${d.lag}${d.kallor.length ? ` – ${d.kallor.map((k) => `${k.typ === 'forum' ? 'forumet ' : k.typ === 'media' ? 'insatta ' : ''}${k.podd} (${k.datum})`).join(', ')}` : ' – ingen podd, inget forum och inget från de insatta den här veckan'}`);
-      for (const g of d.grupper) {
-        console.log(`   ${pc.amnen[g.amne]}`);
-        for (const p of g.punkter) console.log(`    [${p.s}${p.typ && p.typ !== 'podd' ? ` ${p.typ}` : ''}] ${p.t}${p.citat ? `\n        ”${p.citat.sagt}” (${[p.citat.vem, p.citat.podd].filter(Boolean).join(', ')})` : ''}`);
-      }
+      console.log(`\n  ${d.lag}${d.kallor.length ? ` – ${d.kallor.map((k) => `${TYPORD[k.typ] || ''}${k.podd} (${k.datum})`).join(', ')}` : ' – ingen podd, inget forum, inget från de insatta och inget från klubben eller lokaltidningen den här veckan'}`);
+      for (const t of d.text || []) console.log(`    ${t}`);
     }
+    if (s.summering) console.log(`\n  Sammanfattning: ${s.summering}`);
+    if (s.citat) console.log(`  ”${s.citat.sagt}” (${[s.citat.vem, s.citat.podd, s.citat.datum].filter(Boolean).join(', ')})`);
   }
 }
 
@@ -303,7 +360,7 @@ async function sidorna(fil, matcher) {
   fil.sidor = fil.sidor || {};
   let n = 0;
   for (const m of matcher) {
-    const nyckel = sidNyckel(sidansUnderlag(fil, m.lagen));
+    const nyckel = sidNyckel(sidansUnderlag(fil, m.lagen, { avspark: m.avspark }));
     const nu = fil.sidor[m.id];
     if (nu && nu.nyckel === nyckel && nu.redigerad) continue;
     if (TORRT) { logg(`skulle skriva sidan ${m.lagen.join(' – ')}`); continue; }
@@ -313,13 +370,15 @@ async function sidorna(fil, matcher) {
     fil.uppdaterad = new Date().toISOString();
     skrivJson(OMGANG, fil);
     n++;
-    logg(`sidan ${m.lagen.join(' – ')}: ${s.delar.map((d) => d.grupper.reduce((a, g) => a + g.punkter.length, 0)).join(' + ')} punkter${s.redigerad ? '' : ', oredigerad'} (${s.sekunder} s)`);
+    logg(`matchbladet ${m.lagen.join(' – ')}: ${s.delar.map((d) => (d.text || []).length).join(' + ')} stycken${s.redigerad ? '' : ', oredigerat'} (${s.sekunder} s)`);
   }
   return n;
 }
 
 async function main() {
   if (VISA) { visa(lasJson(OMGANG, {})); return; }
+  const schema = PA_TID ? schemat() : null;
+  if (schema && !schema.dags) { logg(`inte dags, nästa gång ${klockan(schema.nasta)}`); return; }
   const fel = betalvagar();
   if (fel.length) { logg(`STOPP: ${fel.join(', ')} är satt. Då skulle Claude Code kunna debiteras som API. Ta bort variabeln.`); process.exit(1); }
   if (!tagLas()) { logg('en körning pågår redan'); return; }
@@ -378,9 +437,11 @@ async function main() {
   // Forumen och medierna först: de går fort (några sidor och ett eller två anrop per lag), poddarna tar timmar.
   let nyaForum = 0;
   let nyaMedia = 0;
+  let nyaLokal = 0;
   try {
     if (MED_FORUM) nyaForum = await lasForumen(fil, forumreg, lagen);
     if (MED_MEDIA) nyaMedia = await lasMedierna(fil, lagen);
+    if (MED_LOKAL) nyaLokal = await lasMedierna(fil, lagen, { cfg: lc, vad: 'klubben och lokaltidningen' });
   } catch (err) {
     if (err instanceof Stopp) { logg(`STOPP (${err.slag}): ${err.message}`); process.exit(1); }
     throw err;
@@ -434,7 +495,8 @@ async function main() {
     if (err instanceof Stopp) { logg(`STOPP (${err.slag}): ${err.message}`); process.exit(1); }
     throw err;
   }
-  if (!TORRT) logg(`klart: ${id}, ${gjorda} avsnitt, ${nya} nya uppgifter ur poddarna, ${nyaForum} ur forumen, ${nyaMedia} ur de insatta medierna, ${sidor} sidor`);
+  if (!TORRT) logg(`klart: ${id}, ${gjorda} avsnitt, ${nya} nya uppgifter ur poddarna, ${nyaForum} ur forumen, ${nyaMedia} ur de insatta medierna, ${nyaLokal} ur klubben och lokaltidningen, ${sidor} sidor`);
+  if (schema) skrivJson(TIDER, { senast: new Date(schema.tid).toISOString() });
   if ((ETT_LAG || PROV) && !TORRT) visa(fil);
 }
 

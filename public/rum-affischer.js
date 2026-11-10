@@ -32,8 +32,8 @@
 // Slitaget följer tippningen som sakerna på pulten; löpsedeln blir bara lite
 // böjd.
 //
-// Löpsedeln (rubrik): Sportbladets eller Expressens (två veckor i taget),
-// med namnet som text och våra rubriker i kvällstidningens tonläge, torrt
+// Löpsedeln (rubrik): Helgarderats, tidningen på pulten (rum-tidning.js), med
+// namnet och rutorna som på tidningen och rubriker i kvällstidningens tonläge, torrt
 // ironiska, om det mest dramatiska som har hänt eller ska hända – i förra
 // omgången den som tippade bäst eller sämst, en ny ledare i Tipsligan, modellen
 // mot gänget, skrällen, krossen och gängets kupong; i nästa omgång den jämnaste
@@ -41,7 +41,7 @@
 // största nyheten. Förra omgångens nyheter väger tyngst de första dagarna och
 // nästa omgångs bara innan någon av dess matcher har startat. Omgångar och
 // kuponger som spoilerskyddet döljer räknas inte. Utan något att skriva om blir
-// det tipsguiden. Som de andra föremålen leder den inte ut ur rummet: ett klick
+// det knepen i tidningen. Som de andra föremålen leder den inte ut ur rummet: ett klick
 // går fram till den (rum.js).
 //
 // affischer(back, { short, namn }) → { slit(w, seed), data(rows, old), rubrik() }
@@ -50,7 +50,7 @@
 //   kupongerna (Historik.coupons()); säsongens omgångar läses ur TP.season
 //   (tippare.js).
 // För bilder: ?rum-vecka=<tal> en annan vecka (löpsedelns plats),
-// ?rum-tidning=sb|ex en viss tidning, ?rum-rubrik=<typ> en viss rubrik om den
+// ?rum-rubrik=<typ> en viss rubrik om den
 // finns (typ i bakat, matchRubriker, kupongRubriker och framat) och
 // ?rum-variant=<tal> en viss variant av den.
 
@@ -251,23 +251,14 @@ function nacional() {
 
 // ---------- löpsedeln: tidningen och rubrikerna ----------
 //
-// Veckans löpsedel är från en riktig kvällstidning, som de andra (Tomas
-// önskemål): Sportbladet, Aftonbladets sportdel på sitt rosa papper, eller
-// Expressen med det röda namnet, två veckor i taget. Namnen är skrivna som
-// text, inte tidningarnas loggor, och rubrikerna är våra: kvällstidningens
-// tonläge om gängets tips, allvarligt menat på ytan. ?rum-tidning=sb|ex ger
-// en viss tidning.
-export const TIDNINGAR = {
-  sb: { namn: 'Sportbladet', gen: 'Sportbladets', T: 'SPORTBLADET', font: '900 100px "Helvetica Neue", Arial, sans-serif', bred: 90 },
-  ex: { namn: 'EXPRESSEN', gen: 'Expressens', T: 'EXPRESSEN', font: '400 100px "Alfa Slab One", Georgia, serif', bred: 84 },
-};
-function tidning(fro) {
-  const v = q.get('rum-tidning');
-  if (v && TIDNINGAR[v]) return v;
-  return ((Math.floor(fro / 2) % 2) + 2) % 2 ? 'ex' : 'sb';
-}
-// Veckans tidning ('sb' eller 'ex'): samma som löpsedeln, också den Hasse läser (rum-hasse-tidning.js).
-export const veckansTidning = (t = Date.now()) => tidning(veckaFro(t));
+// Veckans löpsedel är Helgarderats (2026-11-10, Tomas önskemål: "Döp om
+// löpsedeln till Helgarderat också"), samma tidning som ligger på pulten: namnet
+// i flaskgrönt i Alfa Slab One med rutorna 1, X och 2 ikryssade framför
+// (RumTidning.rutor), och det som lyfts fram i rubriken också grönt. Förut var
+// den Sportbladets eller Expressens, två veckor i taget. Rubrikerna är våra:
+// kvällstidningens tonläge om gängets tips, allvarligt menat på ytan.
+// (T: namnet i vinjetten, {T} i kick)
+const TIDNINGEN = { namn: 'HELGARDERAT', gen: 'Helgarderats', T: 'HELGARDERAT', font: '400 100px "Alfa Slab One", Georgia, serif', bred: 88, rutor: 1.6 };
 
 const fDatum = new Intl.DateTimeFormat('sv-SE', { timeZone: 'Europe/Stockholm', weekday: 'long', day: 'numeric', month: 'long' });
 const fDag = new Intl.DateTimeFormat('sv-SE', { timeZone: 'Europe/Stockholm', weekday: 'short' });
@@ -487,12 +478,12 @@ function framat(rows, alla, short) {
   return out;
 }
 
-// Utan något att skriva om: tipsguiden, och nyheten längst ner när veckan
-// bara har en.
+// Utan något att skriva om: det som står i tidningen (notiserna, det
+// supportrarna vet och Tipset), och nyheten längst ner när veckan bara har en.
 const GUIDEN = { typ: 'guide', poang: 0, v: [
-  { kick: 'EXTRA', rad: [['STORA'], ['TIPSGUIDEN', 1]], under: 'Så tar du hem 13 rätt – experterna avslöjar allt' },
-  { kick: 'GUIDEN', rad: [['SÅ BLIR'], ['DU RIK', 1], ['PÅ TIPSET']], under: '8 enkla knep – nummer 5 gör alla fel' },
-  { kick: 'EXPERTERNA', rad: [['SÅ SLÅR'], ['DU'], ['DATORN', 1]], under: 'Hela guiden – steg för steg' },
+  { kick: 'EXTRA', rad: [['SÅ MÅR'], ['TIPSLAGEN', 1]], under: 'Skador, sviter och vad tränarna säger' },
+  { kick: 'SUPPORTRARNA', rad: [['DET'], ['SUPPORTRARNA', 1], ['VET']], under: 'Poddarna och forumen inför helgen' },
+  { kick: 'TIPSET', rad: [['ALLA'], ['MATCHERNA', 1]], under: 'Datorns procent och Sixtens tecken' },
 ] };
 const PLUS = ['HOROSKOPET: TIPPA X', 'BÄST I TEST: TIPSPENNOR', '13 RÄTT – SÅ DELAR DU VINSTEN', 'LÄKAREN: SÅ PÅVERKAR TIPSET SÖMNEN'];
 
@@ -502,9 +493,9 @@ const radText = (rad) => rad.map(([t]) => String(t).toUpperCase()).join(' ').rep
 // Veckans rubrik: förra omgångens nyheter väger fullt tre dagar, sedan
 // mindre; nästa omgångs bara innan den har startat. Den näst största nyheten
 // (helst av ett annat slag) står längst ner. Samma vecka och samma data ger
-// samma löpsedel. → { typ, tidning, kick, rad, under, plus, datum, id }, där id är matchen rubriken handlar om
+// samma löpsedel. → { typ, kick, rad, under, plus, datum, id }, där id är matchen rubriken handlar om
 // (tidningen i rum.js lägger Veckans analys om den)
-export function rubrik({ rows, old, short = (x) => x, namn = null, now = Date.now(), fro = veckaFro(now), tid = tidning(fro) }) {
+export function rubrik({ rows, old, short = (x) => x, namn = null, now = Date.now(), fro = veckaFro(now) }) {
   if (namn) namnAv = namn;
   const alla = omgangar();
   const kand = [];
@@ -532,7 +523,7 @@ export function rubrik({ rows, old, short = (x) => x, namn = null, now = Date.no
   }).sort((a, b) => b.vikt - a.vikt);
   const vill = q.get('rum-rubrik');
   const val = (vill && lista.find((x) => x.typ === vill)) || lista[0] || GUIDEN;
-  const T = TIDNINGAR[tid];
+  const T = TIDNINGEN;
   // veckans variant (?rum-variant=<tal> en viss)
   const valj = (x, k) => {
     const n = Number(q.get('rum-variant'));
@@ -544,7 +535,7 @@ export function rubrik({ rows, old, short = (x) => x, namn = null, now = Date.no
   const plus = andra ? radText(valj(andra, 1).rad) : PLUS[Math.floor(hash(fro + 9.3) * PLUS.length) % PLUS.length];
   // tidningen är från dagen det hände (en sen match: dagen efter), eller idag
   const t = val === GUIDEN || val.framat ? now : Math.min(now, val.t + 3 * 3600e3);
-  return { typ: val.typ, tidning: tid, ...valj(val, 0), plus, datum: datum(t), id: val.id || val.mid || null };
+  return { typ: val.typ, ...valj(val, 0), plus, datum: datum(t), id: val.id || val.mid || null };
 }
 
 // ---------- löpsedeln: papperet ----------
@@ -573,17 +564,16 @@ function lopsedel() {
 }
 
 function rita(el, r, vagg) {
-  const T = TIDNINGAR[r.tidning] || TIDNINGAR.sb;
+  const T = TIDNINGEN;
   const rad = r.rad.map(([t, s]) => [String(t).toUpperCase(), Number(s) || 0]);
   el.title = `${T.gen} löpsedel: ${radText(rad)} – ${r.under}${r.plus ? `. ${r.plus}` : ''}`;
   el.setAttribute('aria-label', el.title);
-  el.classList.remove(...Object.keys(TIDNINGAR).map((k) => `tid-${k}`));
-  el.classList.add(`tid-${r.tidning}`);
+  const rutor = window.RumTidning && RumTidning.rutor ? RumTidning.rutor('rutor') : '';
   const stil = (t, s) => {
     const k = [s === 1 ? 'rod' : s === 2 ? 'inv' : '', PRICK.test(t) ? 'prick' : ''].filter(Boolean).join(' ');
     return k ? ` class="${k}"` : '';
   };
-  el.innerHTML = `<span class="ark"><span class="huvud"><b class="namn">${esc(T.namn)}</b></span>` +
+  el.innerHTML = `<span class="ark"><span class="huvud"><b class="namn">${rutor}${esc(T.namn)}</b></span>` +
     `<span class="linje"><span class="kick${PRICK.test(r.kick) ? ' prick' : ''}">${esc(r.kick)}</span><small>${esc(r.datum)}</small></span>` +
     `<span class="rub">${rad.map(([t, s]) => `<b${stil(t, s)}>${esc(t)}</b>`).join('')}</span>` +
     `<span class="under">${esc(r.under)}</span>` +
@@ -591,12 +581,13 @@ function rita(el, r, vagg) {
     '<span class="blad"></span><span class="veck"></span><span class="tryck"></span></span>' +
     `<span class="hund"></span>${vagg ? '<i class="nal a"></i><i class="nal b"></i>' : '<i class="tejp a"></i><i class="tejp b"></i>'}`;
   // namnet, vinjetten och den andra nyheten så stora som ryms (sp: spärren
-  // mellan bokstäverna och kanterna i em, som i CSS:en)
-  const fyll = (sel, text, font, bred, max, sp = 0) => {
+  // mellan bokstäverna och kanterna i em, som i CSS:en; mer: det som står
+  // bredvid i em, rutorna framför namnet)
+  const fyll = (sel, text, font, bred, max, sp = 0, mer = 0) => {
     const b = el.querySelector(sel);
-    if (b) b.style.fontSize = `${Math.min(max, bred / Math.max(0.3, bredd(text, font) + sp * text.length)).toFixed(2)}px`;
+    if (b) b.style.fontSize = `${Math.min(max, bred / Math.max(0.3, bredd(text, font) + sp * text.length + mer)).toFixed(2)}px`;
   };
-  fyll('.namn', T.namn, T.font, T.bred, 22);
+  fyll('.namn', T.namn, T.font, T.bred, 22, 0, rutor ? T.rutor : 0);
   fyll('.kick', r.kick + '  ', undefined, 66, 6.4, 0.06);
   if (r.plus) fyll('.plus', `+ ${r.plus}`, undefined, 88, 5.6, 0.02);
   // rubriken får det som blir över av höjden: papperet 140 utan kanterna
@@ -704,10 +695,10 @@ export function affischer(back, { short = (x) => x, namn = null } = {}) {
         r = rubrik({ rows, old, short, fro });
       } catch (err) {
         console.warn('Rummet: löpsedeln', err);
-        r = { ...GUIDEN.v[0], typ: 'guide', tidning: 'sb', plus: PLUS[0], datum: datum(Date.now()) };
+        r = { ...GUIDEN.v[0], typ: 'guide', plus: PLUS[0], datum: datum(Date.now()) };
       }
       senastR = r;
-      const k = JSON.stringify([r.tidning, r.kick, r.rad, r.under, r.plus, r.datum, fonter, vagg]);
+      const k = JSON.stringify([r.kick, r.rad, r.under, r.plus, r.datum, fonter, vagg]);
       if (k === ritad) return;
       ritad = k;
       rita(l, r, vagg);
