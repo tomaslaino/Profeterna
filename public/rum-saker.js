@@ -19,10 +19,13 @@
 // röken. ?rum-slit=0…1 bestämmer slitaget (för bilder).
 //
 // Fikat på vissa dagar – semlor, pepparkakor, lussekatter och annat från
-// konditoriet – står bakom högen eller där det får plats (rum-fika.js).
+// konditoriet – står till höger om högen där det får plats (rum-fika.js).
+// Bakom högen ligger veckans kvällstidning (#rum-kvallstidningen i rum.js),
+// och där står inget, så att den syns och går att ta.
 //
-// saker(el, { calm, short, namn }) → { draw(t, mx, my, rows, old, syns), kval({ pr, skugga }) } (syns: pulten
-// ritas, rum.js; kval: hur fint, KVAL i rum.js; short och namn: lagen och gänget på löpsedeln)
+// saker(el, { calm, short, namn, omritad }) → { draw(t, mx, my, rows, old, syns), kval({ pr, skugga }), sedel(), rubrik() }
+// (syns: pulten ritas, rum.js; kval: hur fint, KVAL i rum.js; short och namn: lagen och gänget på löpsedeln;
+// omritad: när löpsedeln har ritats om, som tidningen på pulten utgår från; sedel och rubrik: rum-affischer.js)
 
 import { dagens, bord } from './rum-fika.js';
 import { utanSkuggor } from './rum-gpu.js';
@@ -43,14 +46,15 @@ const HOGEN = { x0: 1080, x1: 1322, y0: 732, y1: 948 };
 // Platserna på pulten (pultens px), en per dag: fläkten med det håll den
 // svänger kring (grader, 90 = mot betraktaren, 180 = åt vänster),
 // askkoppen och snusdosan. Locket och prisen läggs där det finns plats.
+// (Allt till höger om högen och tidningen, x ≥ 1345.)
 const LAYOUTS = [
   { fan: [1478, 672, 160], ash: [1385, 742], snus: [1482, 812] },
   { fan: [1480, 670, 140], ash: [1462, 792], snus: [1392, 748] },
-  { fan: [1236, 668, 35], ash: [1402, 738], snus: [1490, 806] },
+  { fan: [1432, 668, 80], ash: [1390, 792], snus: [1490, 804] },
   { fan: [1392, 668, 100], ash: [1478, 748], snus: [1394, 815] },
 ];
-// där det finns plats: till höger om högen, och bakom den längst bak
-const free = ([px, py]) => py >= 662 && py <= 846 && px <= 1522 && (px >= 1345 || (py <= 690 && px >= 1140));
+// där det finns plats: till höger om högen och tidningen bakom den
+const free = ([px, py]) => py >= 662 && py <= 846 && px <= 1522 && px >= 1345;
 const hash = (n) => { const x = Math.sin(n * 127.1 + 311.7) * 43758.5453; return x - Math.floor(x); };
 const clamp = (x, a = 0, b = 1) => Math.min(b, Math.max(a, x));
 const sm = (a, b, x) => { const u = clamp((x - a) / (b - a)); return u * u * (3 - 2 * u); };
@@ -99,7 +103,7 @@ export async function saker(el, opt = {}) {
   const back = planes[0];
   const pult = planes.find((p) => /translateZ\(-60px\)/.test(p.style.transform));
   // löpsedlarna i fönstret (rum-affischer.js)
-  const aff = back ? affischer(back, { short: opt.short, namn: opt.namn }) : null;
+  const aff = back ? affischer(back, { short: opt.short, namn: opt.namn, omritad: opt.omritad }) : null;
 
   // Fläkten står där bara när det känns som VARMT grader eller mer i Stockholm,
   // samma gräns som gängets tunnaste kläder (dress i rum-3d.js). Vädret
@@ -798,8 +802,8 @@ async function props(pult, opt) {
   }
 
   // ---------- fikat ----------
-  // Dagens fika (rum-fika.js): bakom högen om det får plats där, annars
-  // till höger, fritt från askkoppen, dosan, locket, prisen och fläkten.
+  // Dagens fika (rum-fika.js): till höger om högen, fritt från askkoppen,
+  // dosan, locket, prisen och fläkten (bakom högen ligger tidningen).
 
   const FK = bord(THREE, { world, mat, mesh, canvasTex, specks, heap, hash });
   let fikat = null;
@@ -810,7 +814,7 @@ async function props(pult, opt) {
     const busy = [[ASH.x, ASH.z, ASH.R], [SN.x, SN.z, 21], [LID.x, LID.z, 22]];
     if (fan.visible) busy.push([FAN.x, FAN.z, FAN.R]);
     if (pris.visible) busy.push([pris.position.x, pris.position.z, 8]);
-    const cand = [[1250, 682], [1200, 682], [1300, 682]];
+    const cand = [];
     for (let y = 700; y <= 836; y += 12) for (let x = 1370; x <= 1510; x += 14) cand.push([x, y]);
     const ok = cand.find((c) => { const p = onDesk(...c); return free(c) && !paHogen(p.x, p.z, r * 0.8) && busy.every(([bx, bz, br]) => Math.hypot(p.x - bx, p.z - bz) > br + r * 0.8); });
     FK.visa(fikat, onDesk(...(ok || cand[0])), w, s);

@@ -27,7 +27,7 @@
 
   // finns en sköld för laget? (lagrutan visar annars initialerna)
   const has = (name) => !!lag[name];
-  // adressen till lagets sköld, eller '' (tidningen bakom löpsedeln, rum-tidning.js)
+  // adressen till lagets sköld, eller '' (kvällstidningen och Tipsguiden, rum-tidning.js)
   const src = (name) => (lag[name] ? `skoldar/${lag[name][0]}.png` : '');
 
   window.Skoldar = { ready, img, has, src };
