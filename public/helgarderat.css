@@ -1,7 +1,7 @@
 /* Helgarderat (helgarderat.html, helgarderat.js): tidningen med det supportrarna vet, ark för ark på den mörka
    disken. Eget utseende: tidningspapper med tryck i svart och flaskgrönt, namnet i Alfa Slab One och tre rutor
-   (1, X och 2) som är ikryssade med kulspetspenna. Stämplarna betyder samma sak som i tidningen på pulten i
-   rummet (rum-tidning.css), som har samma namn och färger. Smalt (under 720 px): en spalt. */
+   (1, X och 2) som är ikryssade med kulspetspenna. Markörerna för slaget betyder samma sak som i tidningen på pulten
+   i rummet (rum-tidning.css), som har samma namn och färger. Smalt (under 720 px): en spalt. */
 
 html { background: #1a1510; }
 body.hg-bord { margin: 0; padding: 28px 0 56px; min-height: 100vh; box-sizing: border-box;
@@ -91,7 +91,8 @@ body.hg-bord { margin: 0; padding: 28px 0 56px; min-height: 100vh; box-sizing: b
 .hg-hort-l article { padding: 0 18px; border-left: 1px solid var(--streck); }
 .hg-hort-l article:first-child { padding-left: 0; border-left: 0; }
 .hg-hort-l article:last-child { padding-right: 0; }
-.hg-hort-l article > p:not(.hg-kick):not(.hg-vidare) { margin-top: 5px; font: 400 14.5px/1.4 var(--serif); hyphens: auto; -webkit-hyphens: auto; }
+.hg-hort-l article > p:not(.hg-kick):not(.hg-vidare):not(.hg-kallrad) { margin-top: 5px; font: 400 14.5px/1.4 var(--serif); hyphens: auto; -webkit-hyphens: auto; }
+.hg-kallrad { margin-top: 4px !important; font: 400 11px/1.3 var(--sans); color: var(--gra); }
 
 /* ---------- matchens sida ---------- */
 
@@ -118,30 +119,42 @@ body.hg-bord { margin: 0; padding: 28px 0 56px; min-height: 100vh; box-sizing: b
 .hg-lag h3 .hg-skold { width: 28px; height: 28px; vertical-align: 0; }
 .hg-ur { margin-top: 5px !important; font: italic 400 12px/1.35 var(--serif); color: var(--gra); }
 .hg-ur a { text-decoration-color: rgba(92, 86, 76, 0.5); text-underline-offset: 2px; }
-.hg-grupp { margin-top: 12px; }
-.hg .hg-grupp h4 { margin: 0 0 7px; padding: 0; border: 0; color: var(--gron); font: 800 11.5px/1.2 var(--sans); letter-spacing: 0.08em; text-transform: uppercase; }
-.hg-punkt { margin: 0 0 10px; padding-bottom: 10px; border-bottom: 1px dotted rgba(21, 18, 14, 0.45); }
-.hg-grupp .hg-punkt:last-child { margin-bottom: 0; padding-bottom: 0; border-bottom: 0; }
-.hg-punkt > p { margin-top: 4px; font: 400 15px/1.42 var(--serif); hyphens: auto; -webkit-hyphens: auto; }
-.hg-punkt > small { margin-left: 6px; font: italic 400 11px/1.2 var(--serif); color: var(--gra); }
 .hg-ingen { margin-top: 10px !important; font: italic 400 13.5px/1.35 var(--serif); color: var(--gra); }
+
+/* Lagets punkter: ämnet med ett ord i en smal spalt till vänster, punkterna bredvid med markören framför och
+   källan och datumet efter, när de behövs. Ett tunt streck mellan ämnena. */
+.hg-rader { margin-top: 8px; }
+.hg-rad { display: grid; grid-template-columns: 64px minmax(0, 1fr); column-gap: 10px; padding: 8px 0; border-top: 1px solid var(--streck); }
+.hg-rad:first-child { padding-top: 2px; border-top: 0; }
+.hg-rad > b { padding-top: 3px; color: var(--gron); font: 800 10.5px/1.3 var(--sans); letter-spacing: 0.08em; text-transform: uppercase; }
+.hg-rad ul { margin: 0; padding: 0; list-style: none; }
+.hg-rad li { position: relative; padding-left: 14px; font: 400 14.5px/1.4 var(--serif); hyphens: auto; -webkit-hyphens: auto; }
+.hg-rad li + li { margin-top: 6px; }
+.hg-rad li small { font: 400 11px/1.2 var(--sans); color: var(--gra); hyphens: manual; -webkit-hyphens: manual; }
+
+/* markörerna: bekräftat en svart fyrkant, en egen uppgift eller ett rykte en röd prick, en åsikt en ring */
+.hg-mark { display: inline-block; flex: none; width: 7px; height: 7px; box-sizing: border-box; }
+.hg-rad .hg-mark { position: absolute; left: 0; top: 0.56em; }
+.hg-mark.s-b { background: var(--svart); }
+.hg-mark.s-h { border-radius: 50%; background: var(--rod); }
+.hg-mark.s-o { border: 1.5px solid var(--gra); border-radius: 50%; }
+
+/* sidans enda citat, under laget det gäller */
+.hg .hg-citat.sida { margin: 12px 0 0; padding: 2px 0 2px 11px; }
+.hg-citat.sida p { color: var(--gron); font: italic 500 17px/1.3 var(--rubrik); }
+
+/* nyckeln till markörerna längst ner på sidan */
+.hg-nyckel { display: flex; flex-wrap: wrap; gap: 4px 16px; margin-top: 16px !important; padding-top: 7px; border-top: 1px solid var(--streck); font: 400 11.5px/1.4 var(--sans); color: var(--gra); }
+.hg-nyckel .hg-mark { margin-right: 6px; vertical-align: 0.5px; }
 
 /* bara det ena laget har något: det får hela bredden i två spalter, och det andra står sist */
 .hg-lagen.en { grid-template-columns: minmax(0, 1fr); }
 .hg-lagen.en .hg-lag { padding: 0; border-left: 0; }
 .hg-lagen.en .hg-lag:not(.tom) { column-count: 2; column-gap: 24px; column-rule: 1px solid var(--streck); }
 .hg-lagen.en .hg-lag h3, .hg-lagen.en .hg-lag > .hg-ur { column-span: all; }
-.hg-lagen.en .hg-punkt, .hg-lagen.en .hg-grupp h4 { break-inside: avoid; }
-.hg-lagen.en .hg-grupp h4 { break-after: avoid; }
+.hg-lagen.en .hg-rad, .hg-lagen.en .hg-citat { break-inside: avoid; }
+.hg-lagen.en .hg-rad:first-child { padding-top: 8px; }
 .hg-lagen.en .hg-lag.tom { order: 2; margin-top: 16px; }
-
-/* stämplarna: bekräftat i svart, egna uppgifter i rött (de insattas i grönt), åsikter streckade */
-.hg-slag { display: inline-block; box-sizing: border-box; padding: 2px 5px 1px; border: 1.2px solid var(--svart); font: 800 9.5px/1.15 var(--sans); font-style: normal; letter-spacing: 0.07em; text-transform: uppercase; white-space: nowrap; vertical-align: 1px; }
-.hg-slag.s-b { background: var(--svart); color: var(--p); }
-.hg-slag.s-h { border-color: var(--rod); color: var(--rod); }
-.hg-slag.s-o { border-style: dashed; border-color: var(--gra); color: var(--gra); }
-.hg-slag.s-h.t-media { border-color: var(--gron); color: var(--gron); }
-.hg-hort-l article > small { margin-left: 6px; font: italic 400 11.5px/1.2 var(--serif); color: var(--gra); }
 
 /* ---------- baksidan ---------- */
 
@@ -155,7 +168,8 @@ body.hg-bord { margin: 0; padding: 28px 0 56px; min-height: 100vh; box-sizing: b
 .hg-kalla li a { text-decoration-color: rgba(92, 86, 76, 0.5); text-underline-offset: 2px; }
 .hg-stamplar { display: grid; grid-template-columns: repeat(auto-fill, minmax(260px, 1fr)); gap: 8px 24px; margin-top: 10px; padding-top: 12px; border-top: 3px solid var(--svart); }
 .hg-stamplar p { font: 400 13px/1.4 var(--serif); color: var(--gra); }
-.hg-stamplar .hg-slag { margin-right: 4px; }
+.hg-stamplar b { color: var(--svart); font-weight: 700; }
+.hg-stamplar .hg-mark { margin-right: 7px; vertical-align: 0.5px; }
 .hg-kolofon { display: flex; flex-wrap: wrap; justify-content: center; align-items: baseline; gap: 4px 12px; margin-top: 22px !important; padding-top: 10px; border-top: 1px solid var(--svart);
   font: 600 10.5px/1.3 var(--sans); letter-spacing: 0.06em; text-transform: uppercase; color: var(--gra); text-align: center; }
 .hg-litet { color: var(--gron); font: 400 17px/1 var(--slab); letter-spacing: 0.03em; }
@@ -184,6 +198,7 @@ body.hg-bord { margin: 0; padding: 28px 0 56px; min-height: 100vh; box-sizing: b
   .hg-lag, .hg-lag:first-child { padding: 0; border-left: 0; }
   .hg-lag + .hg-lag { margin-top: 20px; }
   .hg-lagen.en .hg-lag:not(.tom) { column-count: 1; }
+  .hg-rad { grid-template-columns: 62px minmax(0, 1fr); column-gap: 8px; }
   .hg-kallor { column-count: 1; }
 }
 @media (min-width: 721px) and (max-width: 900px) {
