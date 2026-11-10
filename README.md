@@ -1167,6 +1167,14 @@ bara lokalt. Analyserna visas som de ligger i `data/analyser.json`; hur de skriv
   hamna under samtalets text (`matt` i [public/rum-hasse.js](public/rum-hasse.js)). Väggen bakom honom är
   ombakad för den nya platsen (i bakningen syns pulten bara som skugga och ljus på väggen). Se [Hasse Backe](#hasse-backe),
   *Bilden* och *Kaffet i rummet*.
+- **Protokollet och Tipsguiden på pulten också hos Hasse Backe (2026-11-10, användarens önskemål):** "kan du justera det
+  här bordet/inzoomningen på hasse, då det inte riktigt ser ut som att det tillhör det bordet på animationsbilden där man
+  bara tittar rakt fram. Där finns det ju bl a ett protokoll - vilket inte ses på frontalbilden på hasse". I rummet ligger
+  protokollet (före omgången kupongen) och Tipsguiden på pulten bredvid notan, men hos honom var pultens arm tom. Nu ligger
+  samma papper på samma ställe där: på tvären längs armen som går fram längs ens högra sida, med överkanten mot armens
+  bortre kant, Tipsguiden under protokollet och notan och koppen överst, som i rummet. I telefonen ligger protokollet på
+  armen under notan; på datorn, där armen går ut ur bilden nere till höger, syns dess övre hörn. Kameran och bildens
+  utsnitt är oförändrade. Se [Hasse Backe](#hasse-backe), *Det som ligger på pulten*.
 - **Hasse läser DN och SvD, med läsglasögon (2026-11-09, användarens önskemål):** "Kan du göra tidningarna bättre som
   hasse läser - han läser SVD och DN. Det ska verka vara riktiga tidningar och det behöver inte vara någon sportdel", och
   "Han får sätta på sig och ta av sig glasögonen när han läser tidningarna - ordna olika animeringar kopplat till detta".
@@ -5587,7 +5595,7 @@ ritas en gång på en egen duk under figuren (`diskBild`): benet framför honom 
 i skugga under den tjocka skivan. Träet speglar väggen bakom honom svagt: den
 speglade strålen träffar väggen, och där hämtas färgen ur väggens bild, suddigare ju längre strålen
 går; han själv speglas som en mörk form. Notan ligger under fatet,
-samma nota som på pulten, med den främre änden lite uppböjd. Den ritas på en duk efter notan i rummet
+samma nota som på pulten, med den främre änden lite uppböjd, ovanpå det som ligger på pulten (se *Det som ligger på pulten*). Den ritas på en duk efter notan i rummet
 (`#rum-hasse .nota` i rum.css): samma typsnitt, rader, vinklar och pappersstruktur, med baslinjerna mätta
 där. Notan, koppen, fatet, askkoppen och cigarren får barens ljus, men bara dess styrka och dagsljusets
 färg (`ljusDag` i [public/rum-hasse-arm.js](public/rum-hasse-arm.js)): de skiftar med dagsljuset som han och
@@ -5648,6 +5656,26 @@ lysrörets och dagens, svalare än barens lampor och lite ljusare, och rummets e
 så att träet har samma dämpade bruna som framför honom och inte är orange. Förut var pulten i rummet en målad bild
 med plankor som gick mot en, mer orange, utan hörn, med ringarna utspridda för sig, en list i aluminium mot en och
 inga ringar i hans bild (ändrat 2026-11-08).
+
+**Det som ligger på pulten.** Det som ligger på pulten i rummet ligger där också i hans bild: kupongen, efter omgången
+protokollet, och Tipsguiden (`pultPapper` i [public/rum-hasse.js](public/rum-hasse.js)). Det är samma papper med samma
+innehåll, kopierade ur rummet, och de ligger på pultens arm som går fram längs ens högra sida: på tvären, med överkanten mot
+armens bortre kant och raderna mot en, i rummets ordning (Tipsguiden underst) och under notan, koppen och hans händer.
+Var de ligger räknas ur rummet: pappersbladets hörn i rummets scen (dess och kupongens transformer i rummets plan), genom
+rummets kamera ned på pulten (`franRum` i [public/rum-pult.js](public/rum-pult.js)) och genom hans kamera upp i hans bild,
+som en `matrix3d` (`papper` i [public/rum-hasse-3d.js](public/rum-hasse-3d.js)). Rummets papper ligger i ett ritat
+perspektiv (rum.css) och inte genom rummets kamera, så hörnen blir ingen rektangel på pulten; bladet läggs därför från sitt
+övre vänstra hörn, längs överkanten och i överkantens skala, så att det som syns i rummet (hörnet bredvid notan och kanten
+längs pulten) hamnar på samma ställe. Protokollets nedre del, som i rummet går ut över pultens kant mot en och är utanför
+bilden, skärs bort där skivan börjar runda av: härifrån ses kanten nästan rakt från sidan. Eftersom läget räknas ur
+rummet stämmer det också i telefonen, där rummet lägger bladen annorlunda (`.rum.smal`). Skuggan ligger tätt intill utan
+att falla åt något håll, och på natten mörknar papperet som pulten (`--natt`). Notan ritas på en egen liten duk ovanpå
+dem (`.rh-nota`, i `diskBild`), med en svag skugga, och disken utan den. Kupongen är borta från pulten medan han har den
+(se *Din kupong*), och när den är tillbaka ritas rummet om, så att hans kryss syns på den. Högen med inlämnade
+kuponger, dosan och askkoppen ligger längre bort på pulten, nedanför bilden. Pingklockan, som står bredvid notan till
+uppgörelsen, finns inte här: rummet ritar koppen, notan och klockan på ett ungefär och inte genom sin kamera, och räknad
+därifrån hamnade den under hans kaffefat. I telefonen ligger protokollet under samtalet, mörkt som pulten där. Förut var pultens arm tom i hans bild, fast protokollet och
+Tipsguiden låg där i rummet (ändrat 2026-11-10).
 
 **Panoreringen.** Rummet och hans bild ligger bredvid varandra, med hans till vänster och en bit
 vägg emellan, och allt glider åt höger på 0,42 s, som när kameran slås åt vänster: fort i början,
@@ -6517,6 +6545,13 @@ tiden: de räknas nu i den större handens skala, handen går upp och över kopp
 pulten ligger 20 bildpunkter till vänster om mains nya läge. Provat i headless Chrome mot main bild för
 bild: vilan, talet, slaget, gesterna, klunken (tätt när handen tar och ställer koppen), cigarren och
 pennan i 1440 × 900, vilan, klunken och talet i telefonen (412 × 915), och handen på pulten i rummet.
+
+Det som ligger på pulten (2026-11-10) är provat i headless Chromium med mjukvarugrafik, i hela sidan med `?rum-kval=0`
+och ett påhittat protokoll lagt i rummets pult (kupongtjänsten gick inte att nå från provet): rummet och hans bild i
+1440 × 900, 1024 × 700 och 2000 × 1080 och telefonen på höjden (390 × 844), med protokollet och med kupongen, på dagen och
+på natten (klockan 01.30), och att kupongen döljs medan han har den. Typsnitten och färgerna i kopiorna är jämförda med
+rummets, element för element. Inte provat i Safari eller på en riktig telefon, och inte med en riktig omgång eller medan
+han fyller i din kupong.
 
 Samma pult och samma armar (2026-11-08) är provade i headless Chromium med mjukvarugrafik, i hela sidan med
 `?rum-kval=0` (rummets fulla steg, som på en Mac): rummet och hans bild i 1440 × 900 med täthet 1 och 2, och
