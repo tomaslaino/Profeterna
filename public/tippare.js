@@ -163,7 +163,7 @@ function tpRow(p, rank, s) {
   const cls = ['tp-row', p.model ? 'tp-model' : '', p.award ? `is-${p.award}` : ''].filter(Boolean).join(' ');
   return `<li class="${cls}">` +
     `<span class="tp-rank">${p.model ? '' : rank}</span>` +
-    `<span class="tp-name"><b>${esc(p.name)}</b>${p.model ? '<span class="sub">troligaste utfallet</span>' : tpBadge(p, s.done)}</span>` +
+    `<span class="tp-name"><b${p.model ? '' : ` title="${esc(p.name)}"`}>${esc(p.model ? p.name : Tippoang.kallas(p))}</b>${p.model ? '<span class="sub">troligaste utfallet</span>' : tpBadge(p, s.done)}</span>` +
     `<span class="tp-ok" title="Rätt av de spelade matcherna">${p.ok}<span>/${p.n}</span></span>` +
     `<span class="tp-pts ${tpTone(p.pts)}" title="Rätt minus modellens chans för tipsen">${tpPts(p.pts)}</span></li>`;
 }
@@ -234,7 +234,7 @@ function tpCard(now = Date.now()) {
     (window.Kronan ? Kronan.html(s, tpPts) : '') +
     (window.Utmarkelser ? Utmarkelser.live(round, s) : '') +
     `<ol class="tp-list">${list.join('')}</ol>` +
-    (none.length ? `<p class="legend tp-missing">Tippade inte: ${none.map((p) => esc(p.name)).join(', ')}</p>` : '') +
+    (none.length ? `<p class="legend tp-missing">Tippade inte: ${none.map((p) => esc(Tippoang.kallas(p))).join(', ')}</p>` : '') +
     `<p class="kp-line tp-status">${tpStatus(s)}</p>` +
     tpTable(s) + '</div>';
 }

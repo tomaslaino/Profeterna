@@ -1278,6 +1278,16 @@ bara lokalt. Analyserna visas som de ligger i `data/analyser.json`; hur de skriv
   historiken. Nu tar bakåt bort ett lager i taget och lämnar sajten först när inget är framme. Namnet
   Matchfixarna i rummet är inte längre en länk, eftersom den bara lade till en rad som nästa bakåt
   stannade på. Se [Bakåt](#bakåt) under Tobaksaffären.
+- **Dogge överallt (2026-11-10, användarens önskemål):** Daniel Johansson heter Dogge på hela sidan,
+  inte bara på skårtavlan och i tidningen. Regeln står på ett ställe, `Tippoang.kallas` i
+  [public/tippoang.js](public/tippoang.js): efternamnet – alla i gänget heter Daniel – men *Dogge* för
+  Johansson. Allt som skriver ut ett namn i gänget använder den: Olympen (ställningen, kurvan, duellerna,
+  utmärkelserna, betygen och kröningen), Omgångens tippare, samtalet och raden på förstasidan, namnen på
+  kupongen, Tipsligan, löpsedeln, tidningen, protokollet och Hasse Backe, vars röst (`src/rost.js`) får
+  samma namn. Han kallar honom ibland nästan rätt, *Docke* eller *Dugge* (`felnamn`). Där sidan förut skrev
+  hela namn i löptext (Omgångens tippare, *Tippade inte:* och *Ta bort kupongen?*) står nu samma korta namn
+  för alla, så att inte bara en heter något annat. Hela namnet står kvar där det måste: Om oss, tryckt
+  under autograferna på visitkortet (autografen är *Dogge*) och när man pekar på ett namn.
 - **Kuponghistoriken flyttar till Olympen (2026-10-20, användarens önskemål):** Kupong
   handlar bara om nästa kupong – växlaren Omgången | Historik försvinner. De färdigspelade
   kupongerna står sist i Olympen under rubriken *Grupparbetena* (`#olympen/kuponger`, en
@@ -2268,7 +2278,7 @@ under omgången.
    Medan kupongen fylls i står den överst på förstasidan och under Kupong.
    Förstasidan visar hur lång tid som är kvar – till första avsparken, då inlämningen
    stänger (nedräkningen går av sig själv och blir bärnstensfärgad den sista timmen) – och
-   en rad som säger samma sak som stämpeln på papperet, med efternamnen: *Väntar på
+   en rad som säger samma sak som stämpeln på papperet, med namnen vi kallas: *Väntar på
    Tejder*, *Väntar på dig och Tejder*, *Väntar på alla* (vilka som är inne när man
    pekar), och grönt *Alla inne*. När tiden är ute står det *Dags för uppgörelsen* och vem
    som inte lämnade in; när gängets kupong är gjord tar den över. Porträtt står inte där –
@@ -2399,7 +2409,7 @@ under omgången.
    papperet flyttar sig: lagen (länk till matchrutan), avspark, oddsen, vad som ska sägas,
    motiveringarna och kommentaren i efterhand (ett ” vid lagen betyder att någon har skrivit
    något). Vad som ska sägas är en fråga till var och en vars tecken förslaget lämnar utanför –
-   eller, när förslaget får med allt, till den som är ensam om ett tecken: *Tvåan, Johansson?*,
+   eller, när förslaget får med allt, till den som är ensam om ett tecken: *Tvåan, Dogge?*,
    *Din etta?*. Är ingen särskild att fråga står det *Alla olika*, *Ettan eller krysset?* eller
    *Helgardera?*, och annars *Alla har krysset – modellen tror på ettan*, *Ingen behöver backa* eller
    *Klubbas utan snack*. När sidan öppnas är lappen framme för den första omtvistade matchen, och
@@ -2967,13 +2977,13 @@ Enter och mellanslag klickar på dem. En match på text-tv:n lägger fram matchb
   inte hinner med](#när-datorn-inte-hinner-med)) och strålarna som vrider sig – bakom
   glaset i en förgylld ram i 3D med pärlstav, rosetter i hörnen och en palmett överst. Ett
   skimmer drar snett över glaset var elfte sekund. Mässingsskylten under säger
-  *Omgångens orakel* och hela efternamnet (delat: *Laino & Johansson*, i mindre stil), och
+  *Omgångens orakel* och namnet (delat: *Laino & Dogge*, i mindre stil), och
   ramen och skylten lyser med när man pekar på dem.
 - **Visitkortet** (på väggen mellan stationsuret och orakelramen, till höger om palmetten,
   fäst med ett mässingsstift och lite snett; under oraklet sitter veckans löpsedel varannan
   vecka) → närbild: Matchfixarnas visitkort på tjockt gräddvitt papper med en dubbel linje i
-  terrakotta, logon och MATCHFIXARNA i guldfolie överst, i mitten våra autografer – efternamnet
-  i var och ens handstil och bläck, samma som på kupongen (`sm-k0`–`sm-k2`), med en släng under
+  terrakotta, logon och MATCHFIXARNA i guldfolie överst, i mitten våra autografer – det vi kallas
+  (*Laino*, *Tejder*, *Dogge*) i var och ens handstil och bläck, samma som på kupongen (`sm-k0`–`sm-k2`), med en släng under
   – över var sin linje med namnet tryckt under, och längst ner devisen från Om oss: *Vi tippar
   engelsk fotboll tillsammans.* och *O det handlar om pengarna. Det har alltid handlat om
   pengarna.* (`kortHtml` i rum.js, `.rum-kort` i rum.css). Kortet ritas i sina egna mått
@@ -2990,8 +3000,8 @@ Enter och mellanslag klickar på dem. En match på text-tv:n lägger fram matchb
   omgången (se [Kortregistret](#kortregistret)).
 - **Skårtavlan** (mitt på högra väggen, under pokalhyllan) → närbild: *Tipsligan*, säsongens ställning i gänget
   – samma poäng och placering som ställningen i Olympen (`kampRounds`, med omgången som
-  pågår), lika placering vid lika poäng och antal rätt. Efternamnen står där, och Johansson
-  som *Dogge* (`SMEKNAMN` i rum.js); före första omgången bara namnen, i mitten. Vita
+  pågår), lika placering vid lika poäng och antal rätt. Namnen står där som överallt
+  (`Tippoang.kallas`: efternamnet, *Dogge* för Johansson); före första omgången bara namnen, i mitten. Vita
   plastbokstäver i spåren på svart filt – rubriken över hela bredden, ett tomt spår och de tre,
   med placering, namn och poäng i var sin spalt och lika mycket filt över och under – i en
   smal aluminiumram (3D). Varje bokstav sitter lite snett för sig (samma frö varje gång, så
@@ -5989,7 +5999,7 @@ tummen rak fast handen är knuten, nionde talet i `extra` i `bojFingrar`), och h
 sitt läge (`sv`: när han rullar och gnuggar). Han pekade också på en ett tag, men fingret pekade då
 rakt in i kameran och syntes inte, så det sättet är borttaget.
 
-**Samtalet.** Det är han som frågar, *Vilken match ska jag hjälpa dig med?*, och när du kommer tillbaka *Har du kört fast igen, Laino?*, med ditt efternamn om kupongen
+**Samtalet.** Det är han som frågar, *Vilken match ska jag hjälpa dig med?*, och när du kommer tillbaka *Har du kört fast igen, Laino?*, med det du kallas (efternamnet, *Dogge* för Johansson) om kupongen
 vet vem du är. Han talar i hela meningar som går att förstå för sig: han säger vad det gäller (*Vilken match vill du ha hjälp med nu då?*, inte *Vilken match är det nu då?*), och "den" syftar bara på matchen du har valt. Över matchlistan finns alltid plats för två rader, så att listan står still vad han än säger. Man svarar genom att välja en match. Då frågar han tillbaka (*Den är solklar. Vill du
 veta, eller ska du gissa?*), och först *Jag är idel öra* ger analysen (knappen lottas som hans repliker: också *Tala om det för mig*), så att ett felklick inte visar ett tips. *Jag gissar* går tillbaka till listan och
 *Matchbladet* lägger fram matchbladet över baren – samma blad som när man klickar på lagen på kupongen i
@@ -6102,7 +6112,7 @@ och länken *Matcherna* till hans rader och facit (borta 2026-11-09). Med dolda 
 som förut.
 
 Till er säger han ni och er, aldrig gänget, eftersom det bara är ni som använder sidan (`npm run repliker` säger till om
-ordet). Namnen sitter inte riktigt: ungefär var tredje dom säger han ett namn som nästan stämmer (*Tejler*, *Johanson*;
+ordet). Namnen sitter inte riktigt: ungefär var tredje dom säger han ett namn som nästan stämmer (*Tejler*, *Docke*;
 `felnamn` i rum-hasse-repliker.js, `kallar` i rum-hasse.js), samma i hela domen och på alla enheter, men aldrig om den som
 vann. Ungefär var fjärde gång han hälsar på dig händer samma sak. Han rättar sig aldrig och säger inget om det. Står man kvar
 vid listan kan han nämna *Revisorn* när någon vann på helgarderingar och *Semesterfiraren* när någon inte lämnade in,
@@ -6120,7 +6130,9 @@ armbågarna nedåt. Det är han man ska se, inte tidningen, och eftersom kameran
 så att sidorna inte går att läsa. Han tittar ned i den med huvudet böjt och lite vridet mot den i stället för in i kameran
 (Tomas önskemål 2026-11-09 och 2026-11-10; `LAS` och `LAS_T`, och bitarna utgår från dem). Förut höll han den lutad bakåt,
 mot sig: då vändes förstasidan rakt mot kameran, kanterna, som viks mot honom, sjönk ned i disken, och med den åt ena
-sidan och huvudet vridet dit såg han konstig ut. Bara när han gömmer sig för han den upp framför ansiktet, och innan han
+sidan och huvudet vridet dit såg han konstig ut. Bara när han gömmer sig för han den upp framför ansiktet, och då hopvikt
+som ett V med ryggen mot en och överkanten lite framåt, så att båda sidorna står snett och han kikar över vecket (Tomas
+önskemål 2026-11-10; vriden bara åt ena hållet vändes den andra halvan, förstasidan eller vädret, rakt mot en). Innan han
 lägger ned den för han in den framför sig igen och upp över diskens kant. Ingen del av tidningen går ned i disken i något av
 klippen (räknat var hundradels sekund: som lägst 14 enheter över skivan, när ryggen passerar diskens kant; provat i
 headless Chromium med mjukvarugrafik i 1280 × 800 och i telefonen, 412 × 915, med bilder genom `lasa` och `lasa2`, 2026-11-10).
@@ -6224,7 +6236,7 @@ något han inte har sagt säger han emot (*Jag håller inte med, men det är din
 du hans tecken håller han med. Rutorna står också under en match du redan har frågat om, under det han sa då, så att
 du kan fylla i den eller byta tecken utan att höra analysen igen; det han säger om kupongen står då på raden där han
 erbjöd sig att titta igen (i telefonen sist i texten, så att allt ryms). Vet kupongen inte vem du är frågar han först
-*Vems kupong ska jag fylla i?*, med efternamnen på dem som inte har lämnat in i rutornas ställe, och den du väljer blir
+*Vems kupong ska jag fylla i?*, med namnen (*Laino*, *Tejder*, *Dogge*) på dem som inte har lämnat in i rutornas ställe, och den du väljer blir
 den du är, som när du väljer namn på kupongen (`Samtal.pult.vem`). Han fyller i kupongen medan den går att fylla i, och ändrar den när du har lämnat
 in, tills matcherna startar (`Samtal.pult.state().andra`). Visas allas tips utan att du har lämnat in ser samtalet
 ut som förut, med *Jag gissar*.
@@ -6336,7 +6348,7 @@ fria nivån (F0: 500 000 tecken i månaden; när de är slut stryps tjänsten, o
 aldrig), med den svenska mansrösten Mattias lite långsammare och mörkare än vanligt (`rost` i
 [config/hasse.js](config/hasse.js)). Han säger två slags saker ([src/rost.js](src/rost.js)): de färdiga
 replikerna i [public/rum-hasse-repliker.js](public/rum-hasse-repliker.js) med fälten ifyllda på
-alla sätt som sidan kan fylla dem (gängets efternamn, dagarna, tecknen i ord och resultaten 0–0
+alla sätt som sidan kan fylla dem (gängets namn, `Tippoang.kallas`, dagarna, tecknen i ord och resultaten 0–0
 till 4–4 – 183 repliker, 6 000 tecken), och sin text till varje analys, mening för mening, delad som sidan delar den
 ([public/rum-hasse-meningar.js](public/rum-hasse-meningar.js)). En omgång med tretton matcher är
 ungefär 10 000 tecken.

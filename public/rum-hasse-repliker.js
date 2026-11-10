@@ -12,7 +12,7 @@
 // (scripts/hasse/kolla-repliker.js) fäller det som går att fälla, och underkända uttryck
 // läggs till där.
 //
-// {namn} ditt efternamn, {dag} när spelstoppet är (på lördag, i morgon, i dag),
+// {namn} det du kallas (efternamnet, Dogge för Johansson), {dag} när spelstoppet är (på lördag, i morgon, i dag),
 // {du} dina tecken (etta och kryss), {Bada} tecknet ni båda har (Ettan), {res} resultatet (2–1),
 // {ratt} och {av} hur många rätt han hade av hur många, i ord (två, sex), {antal} och {Antal} ett tal
 // från två till tretton i ord (i domarna).
@@ -564,8 +564,9 @@
   domord: { forsakring: 'Garderad', forst: 'Turlig', alla: 'Felfri', mitten: 'Osynlig', sist: 'Generös', sistLika: 'Snuvad', inget: 'Klok' },
   // Namnen han nästan kan. Ibland säger han ett av dem i stället för det riktiga, i domen (aldrig om den som
   // vann) och när han hälsar på dig (kallar i rum-hasse.js). Han rättar sig aldrig och säger inget om det.
-  // Efternamnen i gänget; rösten får dem också (src/rost.js). Sägs inte som egna rader.
-  felnamn: { Laino: ['Lainio', 'Leino'], Tejder: ['Tejler', 'Teider'], Johansson: ['Johanson', 'Johansen'] },
+  // Namnen vi kallas (Tippoang.kallas: efternamnen, Dogge för Johansson); rösten får dem också (src/rost.js).
+  // Sägs inte som egna rader.
+  felnamn: { Laino: ['Lainio', 'Leino'], Tejder: ['Tejler', 'Teider'], Dogge: ['Docke', 'Dugge'] },
 
   // Om man bara står där och inte frågar: han lottar bland raderna och säger en då och då, så de ska gå
   // att säga i vilken ordning som helst, och när det finns en match kvar att fråga om.

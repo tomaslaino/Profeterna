@@ -216,10 +216,12 @@ const LASBIT = {
       blund: [[0.3, L('blund')], [0.9, 0.1], [4.0, 0.1], [4.6, L('blund')]], blickX: [[0.3, L('blickX')], [0.9, 0], [1.4, 0], [1.6, 2], [2.4, 2], [2.6, -2.5], [3.5, -2.5], [3.7, 0], [4.0, 0], [4.6, L('blickX')]],
       brynX: [[0.6, -0.3], [1.2, 0.65], [4.0, 0.6], [4.7, -0.3]], brynY: [[0.6, -0.25], [1.2, 0.85], [4.0, 0.8], [4.7, -0.25]], lut: [[0.8, -0.01], [4.2, -0.01]],
     },
-    // (han för den framför ansiktet, fortfarande halvt hopvikt och lite vriden, och sedan tillbaka åt sidan)
+    // (han för den upp framför ansiktet, hopvikt som ett V med ryggen mot en och överkanten lite framåt, så att båda
+    // sidorna står snett och han kikar över vecket, och sedan ned igen; rak framför honom syntes förstasidan rakt
+    // framifrån, och bara vriden vändes den ena halvan mot en)
     t: {
-      y: [[0.3, LY], [1.0, LY + 105], [4.0, LY + 105], [4.7, LY]], z: [[0.3, LZ], [1.0, 550], [4.0, 550], [4.7, LZ]], tilt: [[0.3, LAS_T.tilt], [1.0, 0.12], [4.0, 0.12], [4.7, LAS_T.tilt]],
-      x: [[0.3, LX], [1.0, -70], [4.0, -70], [4.7, LX]], yaw: [[0.3, LAS_T.yaw], [1.0, -0.3], [4.0, -0.3], [4.7, LAS_T.yaw]], beta: [[0.3, LAS_T.beta], [1.0, 0.42], [4.0, 0.42], [4.7, LAS_T.beta]],
+      y: [[0.3, LY], [1.0, LY + 209], [4.0, LY + 209], [4.7, LY]], z: [[0.3, LZ], [1.0, 620], [4.0, 620], [4.7, LZ]], tilt: [[0.3, LAS_T.tilt], [1.0, -0.3], [4.0, -0.3], [4.7, LAS_T.tilt]],
+      x: [[0.3, LX], [1.0, -20], [4.0, -20], [4.7, LX]], yaw: [[0.3, LAS_T.yaw], [1.0, 0], [4.0, 0], [4.7, LAS_T.yaw]], beta: [[0.3, LAS_T.beta], [1.0, 1.0], [4.0, 1.0], [4.7, LAS_T.beta]],
     },
   },
   // läser, håller med det som står och nickar belåtet för sig själv

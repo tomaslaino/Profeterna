@@ -602,7 +602,7 @@
   }
 
   // Det som ska sägas om en match, på lappen. Omtvistad: en fråga till var och
-  // en vars tecken förslaget lämnar utanför – Tvåan, Johansson? eller Din etta?
+  // en vars tecken förslaget lämnar utanför – Tvåan, Dogge? eller Din etta?
   // – eller, när förslaget får med allt, till den som är ensam om ett tecken.
   // Är ingen särskild att fråga: Alla olika, Ettan eller krysset? eller
   // Helgardera? Annars om vi är eniga mot modellen, om någon behöver backa.
@@ -620,7 +620,7 @@
     }
     const vem = tillSvars(r);
     if (!vem.length) return r.proposal.length === 3 ? 'Helgardera?' : 'Halvgardera?';
-    return vem.map(([k, t]) => `<b class="sm-k${pnum(k)}">${k === me() ? cap(lista(t.map((sg) => DITT[sg]))) : `${cap(lista(t.map((sg) => ORD[sg])))}, ${esc(surname(person(k)))}`}?</b>`).join('');
+    return vem.map(([k, t]) => `<b class="sm-k${pnum(k)}">${k === me() ? cap(lista(t.map((sg) => DITT[sg]))) : `${cap(lista(t.map((sg) => ORD[sg])))}, ${esc(Tippoang.kallas(person(k)))}`}?</b>`).join('');
   }
 
   // Under namnet i raden Till svars: hur många matcher hen har kvar att svara för.
@@ -641,7 +641,7 @@
     const lyft = inne(SM.lyft) ? SM.lyft : null;
     const har = (k) => rows.some((r) => tillSvars(r).some(([v]) => v === k));
     return `<div class="sm-svar" id="sm-svar"${lyft && har(lyft) ? ` data-lyft="${pnum(lyft)}"` : ''}>` + s.gang.map((g) => {
-      const namn = surname(person(g.id));
+      const namn = Tippoang.kallas(person(g.id));
       const attrs = inne(g.id) ? ` type="button" data-lyft="${esc(g.id)}" aria-pressed="${g.id === lyft}" aria-label="${esc(`Visa bara det ${namn} står till svars för`)}"` : '';
       return `<${inne(g.id) ? 'button' : 'span'}${attrs} class="sm-svar-p sm-k${pnum(g.id)}${inne(g.id) ? ' inne' : ''}${har(g.id) ? ' har' : ''}">` +
         `<span class="sm-svar-f">${face(g.id, false)}${har(g.id) ? Papper.ring(`svar${s.id}${g.id}`, 'sm-svar-o', 26) : ''}</span>` +
@@ -1811,7 +1811,7 @@
       d.addEventListener('click', (e) => { if (e.target === d || e.target.closest('[data-close]')) d.close(); });
       document.body.appendChild(d);
     }
-    const inne = s.gang.filter((g) => g.inne).map((g) => g.namn);
+    const inne = s.gang.filter((g) => g.inne).map(Tippoang.kallas);
     d.innerHTML = '<div class="kp-confirm-box"><h2>Ta bort kupongen?</h2>' +
       `<p>Den tas bort för alla${inne.length ? `, med tipsen som ${esc(inne.join(' och '))} har lämnat in` : ''}.</p>` +
       '<div class="kp-actions"><button type="button" class="kp-btn kp-danger" data-ok>Ta bort</button>' +
@@ -2042,16 +2042,16 @@
   }
 
   // Raden på förstasidan: samma besked som stämpeln på papperet, med
-  // efternamnen – vem omgången väntar på, du först, eller Alla inne – och
-  // vilka som är inne när man pekar. När tipsen visas: vem som inte hann.
-  const surname = (g) => { const n = String(g.namn || g.id); const i = n.indexOf(' '); return i > 0 ? n.slice(i + 1) : n; };
+  // namnen vi kallas (Tippoang.kallas: efternamnen, Dogge för Johansson) – vem
+  // omgången väntar på, du först, eller Alla inne – och vilka som är inne när
+  // man pekar. När tipsen visas: vem som inte hann.
   function raden(s) {
     const v = me();
     const ute = s.gang.filter((g) => !g.inne).sort((a, b) => (b.id === v) - (a.id === v));
     if (!ute.length) return '<p class="sm-raden inne">Alla inne</p>';
-    if (s.visas) return `<p class="sm-raden">${esc(cap(andList(ute.map((g) => (g.id === v ? 'du' : surname(g))))))} lämnade inte in</p>`;
-    const inne = s.gang.filter((g) => g.inne).sort((a, b) => (b.id === v) - (a.id === v)).map((g) => (g.id === v ? 'du' : surname(g)));
-    const who = ute.length === s.gang.length ? 'alla' : andList(ute.map((g) => (g.id === v ? 'dig' : surname(g))));
+    if (s.visas) return `<p class="sm-raden">${esc(cap(andList(ute.map((g) => (g.id === v ? 'du' : Tippoang.kallas(g))))))} lämnade inte in</p>`;
+    const inne = s.gang.filter((g) => g.inne).sort((a, b) => (b.id === v) - (a.id === v)).map((g) => (g.id === v ? 'du' : Tippoang.kallas(g)));
+    const who = ute.length === s.gang.length ? 'alla' : andList(ute.map((g) => (g.id === v ? 'dig' : Tippoang.kallas(g))));
     return `<p class="sm-raden" title="${esc(inne.length ? `${cap(andList(inne))} har lämnat in` : 'Ingen har lämnat in än')}">Väntar på ${esc(who)}</p>`;
   }
 
@@ -2280,7 +2280,7 @@
         stamp: stamp(s),
         namn: s.gang.map((g) => {
           const du = g.id === (ring || v);
-          const text = esc(String(g.namn || g.id).trim().split(/\s+/).pop());
+          const text = esc(Tippoang.kallas(g));
           const cls = `sm-namn sm-k${pnum(g.id)}${du ? ' du' : ''}`;
           return choose(g)
             ? `<button type="button" class="${cls}" aria-pressed="${du}" data-vem="${esc(g.id)}" aria-label="${esc(g.namn || g.id)}">${text}</button>`
