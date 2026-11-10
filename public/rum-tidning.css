@@ -199,11 +199,12 @@
 
 /* ---------- framsidan (RumTidning.forsta) ---------- */
 
-/* 100 × 140, förstorad med zoom: på pulten (2,5) och när den är framme (--k, passaTidning i rum.js). Numret, datumet
+/* 100 × 140, förstorad med zoom: på pulten (--z) och när den är framme (--k, passaTidning i rum.js). Veckan, datumet
    och priset överst, namnet i flaskgrönt i Alfa Slab One med rutorna 1, X och 2 ikryssade med kulspetspenna, som på
-   utkastet (helgarderat.css), och dubbla streck under. Sedan rubriken, kupongen med ett grönt band överst och
-   puffarna. Spika och Skräll står i en röd stjärna över kupongens hörn, där raderna är tomma. */
-.hf-forsta { --hf-p: #e9e4d6; --hf-p2: #e1dbca; --hf-gron: #2a5a40; --hf-rod: #b23a2c; --hf-svart: #25221e; --hf-gra: #645d52; --hf-penna: #34509a; --hf-gul: #d8b84f;
+   Helgarderats egen sida (helgarderat.css), och dubbla streck under. Sedan numret stort, med omgångens dag och namn
+   under, och veckans bild, rastrerad i svartvitt, med notisens rubrik. Utan bild står numret ensamt och större, mitt
+   på sidan. Inget annat: det var plottrigt (2026-11-10). */
+.hf-forsta { --hf-p: #e9e4d6; --hf-p2: #e1dbca; --hf-gron: #2a5a40; --hf-svart: #25221e; --hf-gra: #645d52; --hf-penna: #34509a;
   position: relative; display: flex; flex-direction: column; box-sizing: border-box; width: 100px; height: 140px; overflow: hidden; padding: 1.4px 3.5px 3px;
   background: linear-gradient(180deg, var(--hf-p), var(--hf-p2));
   color: var(--hf-svart); font-family: "Helvetica Neue", Arial, sans-serif; text-align: left; }
@@ -225,44 +226,24 @@
 .hf-rutor .r { fill: none; stroke: var(--hf-gron); stroke-width: 3.4; }
 .hf-rutor text { fill: var(--hf-gron); font: 800 19px/1 Fraunces, Georgia, serif; }
 .hf-rutor .k { fill: none; stroke: var(--hf-penna); stroke-width: 4.6; stroke-linecap: round; opacity: 0.9; }
-.hf-forsta .hf-rub { margin: 2.6px 0 0; padding: 0; border: 0; color: inherit; text-align: center; text-transform: uppercase; }
-.hf-rub b { display: block; font: 400 8.6px/0.98 Anton, Impact, sans-serif; letter-spacing: 0.1px; white-space: nowrap; }
-.hf-rub b.gron { margin-top: 1.4px; font-size: 16px; line-height: 0.96; color: var(--hf-gron); }
-.hf-forsta .hf-under { margin: 1.3px 0 2.2px; text-align: center; font: italic 700 4px/1.1 Georgia, Fraunces, serif; }
-.hf-kup { position: relative; display: flex; flex-direction: column; flex: 1 1 auto; min-height: 0; padding: 0 1.6px 0.6px; border: 0.6px solid var(--hf-svart); }
-.hf-forsta .hf-kup p { display: flex; gap: 1.6px; align-items: baseline; margin: 0 -1.6px 0.6px; padding: 1px 1.6px 0.8px; background: var(--hf-gron); color: var(--hf-p); font: 800 2.7px/1 "Helvetica Neue", Arial, sans-serif; letter-spacing: 0.25px; }
-.hf-kup p span { font-weight: 600; letter-spacing: 0; text-transform: none; }
-/* raderna fyller rutan, som i en tipstabell, men blir inte glesare än så här när de är få */
-.hf-kup ol { display: flex; flex-direction: column; flex: 1 1 auto; min-height: 0; margin: 0; padding: 0; list-style: none; }
-.hf-kup li { display: flex; flex: 1 1 0; max-height: 5.6px; align-items: center; gap: 1.2px; border-bottom: 0.2px solid rgba(23, 19, 14, 0.28); font: 600 2.75px/1.22 "Helvetica Neue", Arial, sans-serif; }
-.hf-kup li:last-child { border-bottom: 0; }
-.hf-kup li b { flex: 0 0 3.4px; text-align: right; font-weight: 800; }
-.hf-kup li span { flex: 1 1 auto; min-width: 0; overflow: hidden; white-space: nowrap; text-overflow: ellipsis; }
-.hf-kup li i { flex: 0 0 3.3px; background: var(--hf-gron); color: var(--hf-p); font-style: normal; font-weight: 800; text-align: center; }
-.hf-kup li em { flex: none; margin-left: 0.4px; font-style: normal; font-weight: 800; }
-/* efter omgången: resultatet direkt efter matchen, så att stjärnan inte skymmer det */
-.hf-forsta.efter .hf-kup li span { flex: 0 1 auto; }
-.hf-spik { position: absolute; right: -2.5px; top: -4px; display: flex; flex-direction: column; align-items: center; justify-content: center; width: 23px; height: 23px; border-radius: 50%; background: var(--hf-rod); color: var(--hf-p); text-align: center; transform: rotate(9deg); box-shadow: 0 0 0 0.5px var(--hf-p); }
-.hf-spik b { font: 400 5.2px/1 Anton, Impact, sans-serif; text-transform: uppercase; }
-.hf-spik span { max-width: 20px; overflow: hidden; font: 800 2.9px/1.05 "Helvetica Neue", Arial, sans-serif; white-space: nowrap; text-overflow: ellipsis; }
-.hf-puffar { display: flex; gap: 1.5px; margin-top: 2px; }
-.hf-puff { flex: 1 1 0; min-width: 0; padding: 1.3px 1.6px 1.1px; background: var(--hf-svart); color: var(--hf-p); }
-.hf-puff.gul { background: var(--hf-gul); color: var(--hf-svart); }
-.hf-puff b { display: block; font: 400 4.7px/1 Anton, Impact, sans-serif; text-transform: uppercase; white-space: nowrap; }
-.hf-puff span { display: block; overflow: hidden; font: 700 2.7px/1.2 "Helvetica Neue", Arial, sans-serif; white-space: nowrap; text-overflow: ellipsis; }
+/* numret: stort i grönt, med omgångens dag och namn under */
+.hf-numret { display: flex; flex-direction: column; align-items: center; margin: 3.4px 0 3px; text-align: center; }
+.hf-numret b { color: var(--hf-gron); font: 400 17px/0.92 Anton, Impact, sans-serif; letter-spacing: 0.2px; text-transform: uppercase; }
+.hf-numret span { margin-top: 1.6px; font: 800 2.9px/1.2 "Helvetica Neue", Arial, sans-serif; letter-spacing: 0.3px; text-transform: uppercase; }
+.hf-numret em { margin-top: 1px; font: italic 600 3.8px/1.2 Georgia, Fraunces, serif; }
+.hf-forsta.utan-bild .hf-numret { flex: 1 1 auto; justify-content: center; margin: 0 0 12px; }
+.hf-forsta.utan-bild .hf-numret b { font-size: 42px; }
+.hf-forsta.utan-bild .hf-numret span { margin-top: 3px; font-size: 4px; }
+.hf-forsta.utan-bild .hf-numret em { margin-top: 1.6px; font-size: 5px; }
+/* veckans bild över hela bredden, med rubriken under */
+.hf-bild { display: flex; flex-direction: column; flex: 1 1 auto; min-height: 0; margin: 0; padding-top: 2.4px; border-top: 0.6px solid var(--hf-svart); }
+.hf-foto { display: block; width: 100%; height: auto; aspect-ratio: 8 / 5; background: #cbc4b4; }
+.hf-bild figcaption { margin-top: 2px; }
+.hf-bild figcaption b { display: block; font: 400 7px/1 Anton, Impact, sans-serif; text-transform: uppercase; letter-spacing: 0.1px; }
+.hf-bild figcaption small { display: block; margin-top: 1px; color: var(--hf-gra); font: 600 2.3px/1.2 "Helvetica Neue", Arial, sans-serif; letter-spacing: 0.1px; }
 
 /* framme: framsidan överst på första arket */
 .tn .hf-forsta { flex: none; }
-
-/* Åtta knep: numret stort i grönt, och nummer 5 med en röd stämpel */
-.hf-knep { margin: 4px 0 0; padding: 0; list-style: none; column-count: 2; column-gap: 18px; column-rule: 1px solid var(--streck); }
-.hf-knep li { position: relative; display: flex; gap: 10px; break-inside: avoid; padding: 8px 0 10px; border-bottom: 1px solid var(--streck); }
-.hf-knep li > b { flex: none; width: 30px; color: var(--gron); font: 400 42px/0.9 Anton, Impact, sans-serif; text-align: center; }
-.tn .hf-knep h4 { margin: 3px 0 4px; font: 400 19px/1.05 Anton, Impact, sans-serif; text-transform: uppercase; }
-.hf-knep p { font: 400 14.5px/1.38 var(--serif); }
-.hf-knep li.fel { padding-right: 6px; background: rgba(216, 184, 79, 0.34); }
-.hf-stampel { display: inline-block; margin-top: 7px; padding: 4px 8px 2px; border: 2.5px solid var(--rod); color: var(--rod); font: 400 16px/1 Anton, Impact, sans-serif; text-transform: uppercase; transform: rotate(-4deg); opacity: 0.88; }
-.tn.smal .hf-knep { column-count: 1; }
 
 /* ---------- på pulten (tidningPult i rum.js) ---------- */
 

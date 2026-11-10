@@ -2189,7 +2189,9 @@ ${window.RumRegister ? RumRegister.nara() : ''}
     // har du lämnat in ligger din kupong i högen, och på pulten en ny – eller
     // gängets kupong, när du ser de andras tips (uppgörelsen)
     set('rum-kupong', couponHtml(rd, rows, p && p.gang ? view(p, 'gang') : p && !p.inne ? view(p, 'fyll') : null));
-    tidningPult(set);
+    tidningPult();
+    // (notiserna, högst var femte minut: veckans bild på framsidan)
+    hamtaNotiser();
     levande();
     if (p && p.gang && p.s.spel && window.Folket) Folket.hamta(p.s.spel.nr).then((ny) => { if (ny && R.on) levande(); });
     const pa = document.getElementById('rum-kupong');
@@ -3739,7 +3741,12 @@ ${window.RumRegister ? RumRegister.nara() : ''}
     if (notisReq && Date.now() - notisAt < 5 * 60000) return notisReq;
     notisAt = Date.now();
     notisReq = fetch('data/tidning.json', { cache: 'no-cache' }).then((r) => (r.ok ? r.json() : null)).catch(() => null)
-      .then((t) => { notisData = t && Array.isArray(t.notiser) ? t : null; return notisData; });
+      .then((t) => {
+        notisData = t && Array.isArray(t.notiser) ? t : null;
+        // (veckans bild på framsidan står i notiserna)
+        if (R.on) tidningPult();
+        return notisData;
+      });
     return notisReq;
   }
   // Notiserna för omgången rd, om sidan är skriven för den (samma id, eller minst hälften av matcherna)
@@ -3796,8 +3803,11 @@ ${window.RumRegister ? RumRegister.nara() : ''}
     if (R.summa) {
       const g = window.Samtal && Samtal.pult && Samtal.pult.gang ? Samtal.pult.gang() : null;
       const sista = Math.max(...avsparkar(R.summa.rader.map((r) => String(r.id))));
+      const ids = R.summa.rader.map((r) => String(r.id));
       return {
         ...u, id: R.summa.id, efter: R.summa, citat: g ? { notes: g.notes || {}, efter: g.efter || {} } : null, liga: tidningsLiga(R.summa.id, true),
+        matcher: ids.map((id) => ({ id, avspark: typeof matchById === 'function' && matchById(id) ? matchById(id).kickoff : null })),
+        notiser: notiserFor({ id: R.summa.id, ids }),
         datum: Number.isFinite(sista) ? Math.min(Date.now(), sista + 20 * 3600e3) : Date.now(),
       };
     }
@@ -3805,15 +3815,17 @@ ${window.RumRegister ? RumRegister.nara() : ''}
     const rub = R.saker && R.saker.rubrik ? R.saker.rubrik() : null;
     let f = infor(rd, rub, true);
     let id = rd && rd.id;
+    let namn = rd && f ? rd.name : null;
     if (!f) {
       const c = (R.old || []).find((x) => x && (x.rows || []).length && !(window.Historik && Historik.hidden && Historik.hidden(x)));
       if (c) {
         id = c.id || null;
+        namn = c.name || null;
         f = infor({ id, ids: c.rows.map((r) => String(r.id)) }, null, true);
       }
     }
     const forst = f ? Math.min(...avsparkar(f.matcher.map((x) => x.id))) : NaN;
-    return { ...u, ...(f || { matcher: [] }), id, datum: Number.isFinite(forst) ? Math.min(Date.now(), forst - 18 * 3600e3) : Date.now() };
+    return { ...u, ...(f || { matcher: [] }), id, namn, datum: Number.isFinite(forst) ? Math.min(Date.now(), forst - 18 * 3600e3) : Date.now() };
   }
   // Det som står i tidningen inför omgången rd: matcherna, notiserna, Tipsligan och Veckans analys (om matchen
   // som löpsedeln handlar om, rub, annars den jämnaste som inte har börjat). Är alla matcherna spelade finns
@@ -3852,11 +3864,17 @@ ${window.RumRegister ? RumRegister.nara() : ''}
     hamtaPoddsidor();
     if (typeof loadAnalyser === 'function') loadAnalyser();
   }
-  // Framsidan på pulten, när den har ändrats (set i fill). Den är så stor (--z i rum-tidning.css) att namnet,
-  // rubriken och kupongens första rader syns ovanför kupongerna i högen (HOG).
-  function tidningPult(set) {
-    if (!window.RumTidning || !RumTidning.forsta) return;
-    set('rum-helgarderat', `<span class="hf-pult">${RumTidning.forsta(upplaga())}</span>`);
+  // Framsidan på pulten, när den har ändrats (i fill, och när notiserna har kommit: veckans bild står i dem), med
+  // bilden rastrerad. Den är så stor (--z i rum-tidning.css) att namnet, numret och bilden syns ovanför kupongerna i
+  // högen (HOG).
+  function tidningPult() {
+    const a = R.el && R.el.querySelector('#rum-helgarderat');
+    if (!a || !window.RumTidning || !RumTidning.forsta) return;
+    const html = `<span class="hf-pult">${RumTidning.forsta(upplaga())}</span>`;
+    if (a.skrivet === html) return;
+    a.skrivet = html;
+    a.innerHTML = html;
+    RumTidning.rastrera(a);
   }
   // Ett klick på tidningen, eller L: före omgången hämtas notiserna och analyserna först (högst ett par sekunder),
   // så att de kommer med, och sedan lyfts den från pulten och läggs fram.
