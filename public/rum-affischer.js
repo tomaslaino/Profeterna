@@ -16,8 +16,8 @@
 //
 // De fyra gamla sitter på Skivan i högra delen av skyltfönstret: en plywoodskiva
 // i två kedjor, i årsordning, lika stora, med en skruv i varje hörn och en
-// Dymo-remsa under. Det ska synas att en person har hand om det. Skivan,
-// kedjorna, remsorna och vattenpasset ritas i 3D (rum-inredning.js, en gång);
+// Dymo-remsa under. Det ska synas att en person har hand om det, och skivan
+// är färdig. Skivan, kedjorna och remsorna ritas i 3D (rum-inredning.js, en gång);
 // här finns sedlarna, som knappar i #rum-skiva:s plan, och skruvarna, som
 // följer med i sedlarnas lager. Skuggorna är bakade i skivan, inga filter.
 // Sedlarna sitter alltid på samma ställe, raka; slitaget (rum-saker.js) bleker
@@ -607,6 +607,9 @@ function rita(el, r, vagg) {
   const underRader = Math.max(1, Math.ceil((bredd(r.under, UNDER) * 4.6) / BRED));
   const hog = 140 - 6.5 - 18 - 12 - (underRader * 5.52 + 2.5) - (r.plus ? 11.8 : 0) - 5 - 1;
   passa(el, { rad, bred: BRED, hog, max: MAX, topp: 1.55, prick: 0.2, drag: 1.42, sp: 0.2 });
+  // var rubriken slutar på papperet (kanten, raden under och den andra nyheten under den): tidningen på
+  // pulten är så stor att den slutar ovanför kupongerna i högen (tidningPult i rum.js)
+  el.dataset.rub = (140 - 3.5 - (underRader * 5.52 + 2.5) - (r.plus ? 11.8 : 0)).toFixed(1);
 }
 
 // ---------- slitaget och platserna ----------
@@ -691,6 +694,7 @@ export function affischer(back, { short = (x) => x, namn = null, omritad = null 
       const el = document.createElement('div');
       el.className = `rum-aff rum-lop tid-${senastR.tidning} rt-sedel`;
       el.style.setProperty('--blek', l.style.getPropertyValue('--blek'));
+      el.dataset.rub = l.dataset.rub || '';
       el.append(ark.cloneNode(true));
       return el;
     },
