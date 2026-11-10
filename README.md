@@ -272,6 +272,11 @@ ingen falsk precision · sidan kraschar aldrig av en död källa · endast fria 
   som förut. Samma dag ("Gör så att rubriken syns ovanför kupongerna"): högen ligger längre fram, och tidningen är så
   stor att rubriken slutar ovanför kupongerna. Den är ritad som Tipsguiden, i sidan och inte i 3D, och kostar lika lite som den (se
   [Tidningen](#tidningen))
+- [x] **Helgarderat Nr 1 (2026-11-10, användarens önskemål: "gör första numret av Helgarderat nu och inte väntar på
+  det"):** numret inför lördagen den 14 november ligger på sajten, utan provstämpel, med *Nr 1 · Vecka 46* i huvudet.
+  Det är lagt för hand ur provomgångens material, som är lördagens matcher och veckans källor; nattjobbet byter ut
+  det när det har skrivit sidorna för omgången. Provnumret är nu *Nr 0* (se *Helgarderat* under
+  [Tidningen](#helgarderat))
 
 ## Publicering
 
@@ -869,6 +874,12 @@ bara lokalt. Analyserna visas som de ligger i `data/analyser.json`; hur de skriv
   och tidningen. Först låg tidningen hopvikt, och kupongerna täckte rubriken; samma dag ("Gör så att rubriken syns
   ovanför kupongerna") flyttades högen fram och tidningen gjordes mindre, så att hela rubriken syns ovanför dem.
   Att lägga tidningen över kupongerna gick inte: porträttet och namnet sitter överst på dem. Se [Tidningen](#tidningen).
+- **Helgarderats första nummer nu, inte efter nattjobbet (2026-11-10, användarens önskemål):** "Jag vill att du gör
+  första numret av Helgarderat nu och inte väntar på det". Nattjobbets första riktiga körning skulle bli natten
+  efter. Provomgången från iMacen samma natt var redan lördagens matcher med veckans avsnitt, foruminlägg och
+  artiklar, så det första numret är samma tolv sidor, lagda i `data/poddsidor.json` och visade utan provstämpel.
+  Numren räknas från det: Nr 1 är veckan med lördagen den 14 november, och provnumret blev ett nollnummer, *Nr 0*.
+  Se [Helgarderat](#helgarderat).
 - **Ett nummer av Tipsguiden att ta upp (2026-11-09, användarens önskemål):** "Jag vill att det ska ligga nåt nr av
   tipsguiden på animationssidan nånstans som man kan plocka upp o läsa". Tidningen fanns då bara när man
   klickade på löpsedeln i fönstret, och mellan omgångarna inte alls. Nu ligger Tipsguiden, tidningens tipsbilaga, på pulten
@@ -7061,14 +7072,26 @@ ligger på sajten som en egen sida, [matchfixarna.se/helgarderat.html](https://m
 ("gör ett utkast av tidningen Helgarderat så att man får se hur den ser ut. Lägg ut på sajten"), och visar veckans
 omgång av sig själv: informationssidorna i `data/poddsidor.json`, som nattjobbet på iMacen skriver inför varje omgång
 ur poddarna, forumen och de insatta medierna (se [Analyserna](#analyserna)), så länge omgångens sista match är högst
-tre dagar gammal (2026-11-10: "Ordnas det här automatiskt inför varje omgång nu? Det ska det ju"). Då står veckan i
-huvudet och ingen stämpel. Annars visar den provnumret (*Nr 1*, med stämpeln *Provnummer*). Var namnet ska stå i
+tre dagar gammal (2026-11-10: "Ordnas det här automatiskt inför varje omgång nu? Det ska det ju"). Då står numret
+och veckan i huvudet (*Nr 1 · Vecka 46*) och ingen stämpel. Annars visar den provnumret, ett nollnummer (*Nr 0*, med
+stämpeln *Provnummer*). Numret räknas på veckorna: Nr 1 är veckan med lördagen den 14 november 2026, och sedan
+ett nummer i veckan där omgången börjar (`nummer` i [public/helgarderat.js](public/helgarderat.js)).
+
+**Det första numret** (2026-11-10, användarens önskemål: "Jag vill att du gör första numret av Helgarderat nu och
+inte väntar på det") gäller lördagen den 14 november och lades i `data/poddsidor.json` för hand, innan nattjobbet
+hade kört: samma tolv sidor som provnumret, eftersom provomgången var lördagens matcher och dess avsnitt,
+foruminlägg och artiklar är veckans (4–10 november). Bara `omgang` (`2026-11-14`) och `uppdaterad` skiljer. Att
+läsa poddarna, forumen och artiklarna på nytt gick inte i molnmiljön, där varken kupongtjänsten eller källorna
+gick att nå; det gör nattjobbet. När det skriver sidorna för omgången (inför lördagen) byter
+`poddsidorna` i scripts/analyser/skriv.mjs ut filen, eftersom omgångens id inte är `2026-11-14`, och numret står
+kvar som Nr 1. Kupongen kunde inte hämtas härifrån, så det är inte kontrollerat att de tolv matcherna och deras
+ordning är omgångens; i rummet syns bara sidorna för omgångens matcher (`poddsidorFor` i rum.js). Var namnet ska stå i
 rummet, på hela tidningen bakom löpsedeln, bara på poddsidorna eller på en egen tidning, är inte bestämt, så rummet är
 orört. Sidan har noindex och ingen länk från resten av sajten.
 
-Utkastet har ett eget utseende ([public/helgarderat.css](public/helgarderat.css)): tidningspapper med tryck i svart och
+Tidningen har ett eget utseende ([public/helgarderat.css](public/helgarderat.css)): tidningspapper med tryck i svart och
 flaskgrönt, namnet i Alfa Slab One och till vänster om det rutorna 1, X och 2, alla ikryssade med kulspetspenna. Priset
-är 3 kr, tre rader. Framsidan har en stämpel, *Provnummer*, och ettan och tvåan är matcherna med flest uppgifter, helst
+är 3 kr, tre rader. Provnumrets framsida har en stämpel, *Provnummer*. Ettan och tvåan är matcherna med flest uppgifter, helst
 där båda lagen har något (`storst` i [public/helgarderat.js](public/helgarderat.js)). Ettan har ett stort citat, helst
 om truppen och med ett namn. Bredvid står *Lördagens matcher* med sidnumren och under *Hört bland supportrarna*, med en
 egen uppgift (slaget h) ur poddarna eller forumen, ur var och en av tre andra matcher, och *De insatta skriver*, med en
@@ -7080,7 +7103,7 @@ källor. Texterna för slagen,
 ämnena och förklaringarna kommer från `RumTidning.TEXT.poddar`, så att det står samma sak i båda tidningarna. Under
 720 px är allt en spalt.
 
-Innehållet är provomgången som poddjobbet gjorde på iMacen 2026-11-10 (`prov-omgang-forum.json`, tolv matcher i League
+Provnumrets innehåll är provomgången som poddjobbet gjorde på iMacen 2026-11-10 (`prov-omgang-forum.json`, tolv matcher i League
 One och Two den 14 november). Den ligger i [public/helgarderat/utkast.json](public/helgarderat/utkast.json) och är
 uttagen med `poddsidor` i src/analyser/poddar.mjs, samma uttag som `data/poddsidor.json`, så att varken utskrifterna
 eller de engelska citaten följer med. Numren är 1–12 i kupongens ordning, utan luckan efter matchen som saknade sida.
@@ -7097,7 +7120,10 @@ det (Wigan–Barnsley), baksidan och att inget sticker ut åt sidan i telefonen.
 telefon. De insatta medierna och veckans omgång provades 2026-11-10 i huvudlös Chromium med public/ ur arbetskopian
 (utan sköldarna), i 1280 bredd och 390 × 844: rutan *De insatta skriver*, en sida där ett lag bara har de insatta
 (Blackpool), baksidan, inget fel i konsolen och inget som sticker ut åt sidan, och med en påhittad
-`data/poddsidor.json` att veckans omgång visas utan provstämpel och att provnumret kommer tillbaka utan den.
+`data/poddsidor.json` att veckans omgång visas utan provstämpel och att provnumret kommer tillbaka utan den. Det första
+numret provades 2026-11-10 i huvudlös Chromium med public/ ur arbetskopian och `data/poddsidor.json` (utan sköldarna),
+i 1280 bredd och 390 × 844: *Nr 1 · Vecka 46* i huvudet och i kolofonen, ingen stämpel, tolv sidor och baksidan, och
+inget som sticker ut åt sidan; utan filen *Nr 0 · Vecka 46* med stämpeln.
 
 ### Närbilderna
 
