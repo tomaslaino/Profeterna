@@ -15,6 +15,7 @@
 
 const repliker = require('../../public/rum-hasse-repliker.js');
 const block = require('../../public/rum-block.js');
+const tidning = require('../../public/rum-tidning.js');
 const { repliktexter } = require('../../src/rost.js');
 
 // Underkänt av Tomas, med det som ska stå i stället.
@@ -39,6 +40,10 @@ const UNDERKANT = [
   [/\bgick du bet på\b/i, 'Vilken match har du kört fast på?'],
   [/\bDet ska gå till så här\b/i, 'Man ska inte stressa fram ett tips.'],
   [/\b(live|online|playoff|spoiler)\b/i, 'pågår, på nätet, kval, dölj resultat'],
+  [/\bvinner den\b/i, 'vinner matchen: efter "Ge hit kupongen" är den kupongen'],
+  [/\bförsäkring\b/i, 'gardering: på en kupong garderar man sig'],
+  [/\bDär har du hela\b/i, 'Det var hela gänget.'],
+  [/\bfinns inte att säga\b/i, 'Mer än så finns det inte att säga.'],
 ];
 
 // Korta meningar som Tomas själv har valt eller som har ett verb.
@@ -53,21 +58,25 @@ const FALT = {
   'kupong.farre': ['du'], 'kupong.fler': ['du'], 'kupong.skilda': ['du'], 'kupong.korsar': ['du', 'Bada'],
   'efter.ratt': ['ratt', 'av'], 'efter.exakt': ['res'],
   domar: ['namn', 'antal', 'Antal'],
+  'stallning.ratt': ['ratt', 'av'], 'stallning.leder': ['lag', 'mot', 'res'], 'stallning.lika': ['match', 'res'], 'stallning.mal': ['match', 'res'],
 };
 // Sidan lottar bland de här, så de måste vara listor.
-const LISTOR = ['oppning', 'oppningNamn', 'tillbaka', 'tillbakaNamn', 'nasta', 'halva', 'enKvar', 'alla', 'allaKvar', 'allaIgen', 'ledig', 'val', 'valLasa',
-  'fragaTillbaka', 'lar', 'gissar', 'erbjud', 'erbjudNytt', 'resultat', 'ejKlar', 'anslagSvar',
+const LISTOR = ['oppning', 'oppningNamn', 'tillbaka', 'tillbakaNamn', 'nasta', 'halva', 'enKvar', 'alla', 'allaKvar', 'allaIgen', 'ledig', 'val', 'valLasa', 'valVanta',
+  'fragaTillbaka', 'lar', 'gissar', 'erbjud', 'erbjudNytt', 'resultat', 'ejKlar', 'ropSvar',
   'fyller.foreslar', 'fyller.hit', 'fyller.skriver.1', 'fyller.skriver.X', 'fyller.skriver.2', 'fyller.gardera', 'fyller.medhall', 'fyller.emot',
   'fyller.suddar', 'fyller.inne', 'fyller.fel',
   'kupong.samma', 'kupong.farre', 'kupong.fler', 'kupong.korsar', 'kupong.skilda',
   'efter.alla', 'efter.bra', 'efter.mitten', 'efter.daligt', 'efter.inget', 'efter.forst', 'efter.sist', 'efter.exakt', 'efter.pagar', 'efter.dolt', 'efter.ofragad',
-  'domar.fraga', 'domar.igen', 'domar.alla', 'domar.matcherna', 'domar.forsakring',
+  'domar.fraga', 'domar.igen', 'domar.alla', 'domar.ledig', 'domar.revisorn', 'domar.borta', 'domar.forsakring',
   ...['forst', 'alla', 'mitten', 'sist', 'sistLika', 'inget'].map((k) => `domar.in.${k}`),
   ...['forsakring', 'forst', 'alla', 'mitten', 'sist', 'sistLika', 'inget'].map((k) => `domar.ut.${k}`),
   'domar.hel.en', 'domar.hel.fler', 'domar.ensam.ingen', 'domar.ensam.en', 'domar.ensam.fler',
-  ...['ingen', 'enda', 'endaInte', 'alla', 'inga', 'en', 'fler'].map((k) => `domar.spik.${k}`)];
+  ...['ingen', 'enda', 'endaInte', 'alla', 'inga', 'en', 'fler'].map((k) => `domar.spik.${k}`),
+  ...['ratt', 'alla', 'bra', 'mitten', 'daligt', 'leder', 'lika', 'haller', 'hallerLika', 'emot', 'emotLika', 'mal', 'malBra', 'malLugn', 'malFel'].map((k) => `stallning.${k}`),
+  ...['italo', 'guld', 'rock', 'p1', 'p3', 'p4g', 'rix', 'sport', 'talksport', 'caroline', 'brus'].map((k) => `radio.${k}`),
+  ...['bradskar', 'natt', 'morgon', 'kvall'].map((k) => `tid.${k}`)];
 // Knappar och ord, inte meningar.
-const INTE_MENINGAR = ['lar', 'tecken', 'tal', 'domord'];
+const INTE_MENINGAR = ['lar', 'tecken', 'tal', 'domord', 'felnamn'];
 
 const fel = [];
 const varde = (vag) => vag.split('.').reduce((o, k) => (o == null ? o : o[k]), repliker);
@@ -93,6 +102,8 @@ for (const [vag, t] of alla) {
 
 for (const vag of LISTOR) if (!Array.isArray(varde(vag))) fel.push(`${vag} måste vara en lista: sidan lottar bland raderna`);
 for (const [n, v] of Object.entries(repliker.antal || {})) if (!Array.isArray(v)) fel.push(`antal.${n} måste vara en lista`);
+// Raderna under en vald match ska få plats på en rad, annars flyttar sig knapparna under dem.
+for (const vag of ['val', 'valLasa', 'valVanta']) for (const t of varde(vag) || []) if (t.length > 31) fel.push(`${vag}: "${t}" är för lång: högst 31 tecken, annars flyttar sig knapparna`);
 for (const vag of LISTOR) {
   const l = varde(vag);
   if (Array.isArray(l) && new Set(l).size !== l.length) fel.push(`${vag} har samma rad två gånger`);
@@ -102,6 +113,8 @@ for (const k of ['forsakring', 'forst', 'alla', 'mitten', 'sist', 'sistLika', 'i
   if (!(repliker.domord && repliker.domord[k])) fel.push(`domord.${k} saknas`);
   if (!(k === 'forsakring' || (repliker.domar && repliker.domar.in && repliker.domar.in[k]))) fel.push(`domar.in.${k} saknas`);
 }
+// Till gruppen säger han ni och er: det är bara ni som använder sidan (Tomas 2026-11-09).
+for (const [vag, t] of alla) if (/\bgäng/i.test(t)) fel.push(`${vag}: "${t}" säger gänget. Skriv ni, er eller allihop.`);
 for (const [vag, t] of alla) if (vag.startsWith('domar.') && t.split(/(?<=[.?!])\s+/).length > 1 && !['domar.fraga', 'domar.alla'].includes(vag)) fel.push(`${vag}: "${t}" är två meningar. Domen läses upp mening för mening, så skriv en.`);
 for (const k of ['1', 'X', '2']) {
   const t = repliker.tecken && repliker.tecken[k];
@@ -123,6 +136,16 @@ const blockTexter = (o) => (typeof o === 'string' ? [o] : typeof o === 'function
 for (const t of blockTexter(block.TEXT)) {
   for (const [re, istallet] of UNDERKANT) if (re.test(t)) fel.push(`protokollet: "${t}" är underkänt. Skriv: ${istallet}`);
   if (!/[.?!]$/.test(t) && !/^[A-ZÅÄÖ][a-zåäö]+( [a-zåäö]+){1,4}$/.test(t)) fel.push(`protokollet: "${t}" saknar punkt`);
+}
+
+// Tidningen bakom löpsedeln (public/rum-tidning.js) sägs inte heller. Det som är underkänt gäller, en mening ska
+// sluta med punkt (rubrikerna har ingen, och orden i tabellerna är kortare än fem ord), och i krönikan säger Hasse ni och er.
+const tidningsTexter = (o, vag = '') => (typeof o === 'string' ? [[vag, o]] : typeof o === 'function' ? [[vag, o(9, 11, '1–0', 18)]]
+  : Array.isArray(o) ? o.flatMap((x) => tidningsTexter(x, vag)) : Object.entries(o).flatMap(([k, v]) => tidningsTexter(v, vag ? `${vag}.${k}` : k)));
+for (const [vag, t] of tidningsTexter(tidning.TEXT)) {
+  for (const [re, istallet] of UNDERKANT) if (re.test(t)) fel.push(`tidningen ${vag}: "${t}" är underkänt. Skriv: ${istallet}`);
+  if (!/\.rubrik\b/.test(vag) && t.split(/\s+/).length >= 5 && !/[.?!]$/.test(t)) fel.push(`tidningen ${vag}: "${t}" saknar punkt`);
+  if (vag.startsWith('kronika.') && /\bgäng/i.test(t)) fel.push(`tidningen ${vag}: "${t}" säger gänget. Hasse skriver ni, er eller allihop.`);
 }
 
 if (fel.length) {

@@ -21,7 +21,8 @@ export const ATLAS = { W: 1372, H: 1350, X0: 280, Y0: 130, TW: 860, TH: 1350, rx
 
 // Samma ljus på allt: varmt framifrån till vänster (NYCKEL), ett varmt kantljus bakifrån från barens
 // lampor, och i baren (uButik) neonskyltens röda sken och gatans kalla ljus från affären till höger.
-// Där lyser också lysröret i affärens tak (uLys, tänt från sex till midnatt) och dagsljuset genom
+// Där lyser också lysröret i affärens tak (uLys, w 0,75 när det är tänt; det dämpas från 23 och tänds från sex, en timme
+// åt gången, rum-hasse.js) och dagsljuset genom
 // affärens stora fönster (uDag): ett brett, mjukt ljus från höger och lite framifrån, i himlens färg och
 // så starkt som det är ljust ute. När det är dag tar fönstret över: lamporna, neonen och gatan syns mindre.
 // Riktningarna är i figurens värld; VY är riktningen mot kameran (rum-hasse-scen.js).
@@ -29,12 +30,13 @@ export const ATLAS = { W: 1372, H: 1350, X0: 280, Y0: 130, TW: 860, TH: 1350, rx
 const VY = kamera().bak.map((x) => x.toFixed(3)).join(', ');
 // Natten: lysröret är släckt och det är inte ljust ute (i baren, uButik). Då är bara neonen, gatan och
 // cigarrens glöd kvar, som i rummet (.natt .rum-mork i rum-folk.css). ton() mörkar allt till 42 %. Inte lika
-// mörkt som rummet (en fjärdedel), så att man fortfarande ser honom när man pratar.
+// mörkt som rummet (en fjärdedel), så att man fortfarande ser honom när man pratar. Medan lysröret dämpas
+// eller tänds (uLys.w mellan 0 och 0,75) är det natt i samma grad.
 const NATT_GLSL = `
 uniform float uButik;
 uniform vec4 uDag;
 uniform vec4 uLys;
-float nattGrad() { return uButik * (1. - step(.01, uLys.w)) * (1. - uDag.w); }
+float nattGrad() { return uButik * (1. - clamp(uLys.w / .75, 0., 1.)) * (1. - uDag.w); }
 float natten() { return mix(1., .42, nattGrad()); }
 `;
 export const LJUS = `${NATT_GLSL}
@@ -44,6 +46,12 @@ const vec3 GATA = vec3(.54, .19, .82);
 const vec3 ROR = vec3(.72, .42, .55);
 const vec3 FONSTER = vec3(.62, .2, .76);
 const vec3 VY = vec3(${VY});
+// dagsljuset genom fönstret (en del av ljus()): stort, så ljuset sveper långt runt (mjuka skuggor), och
+// himlen ger lite ljus överallt
+vec3 dagsljus(vec3 n) {
+  float f = clamp(dot(normalize(n + .6 * VY), FONSTER) * .6 + .4, 0., 1.);
+  return uDag.rgb * (.08 + .95 * f * f) * uButik;
+}
 vec3 ljus(vec3 n) {
   float k = max(0., dot(n, NYCKEL) * .86 + .14);
   vec3 a = mix(vec3(.28, .225, .19), vec3(.43, .395, .36), .5 + .5 * n.y);
@@ -55,18 +63,18 @@ vec3 ljus(vec3 n) {
   float g = clamp(dot(ns, GATA) * .5 + .5, 0., 1.);
   // lysröret: ett brett sken från affären och lite mer ljus överallt
   float d = clamp(dot(ns, ROR) * .55 + .45, 0., 1.);
-  // fönstret: stort, så ljuset sveper långt runt (mjuka skuggor), och himlen ger lite ljus överallt
-  float f = clamp(dot(ns, FONSTER) * .6 + .4, 0., 1.);
   float dag = uDag.w;
   float lys = uLys.w;
   float natt = nattGrad();
   vec3 b = l * vec3(.95, .93, .92) * (1. + .16 * lys) * (1. - .5 * dag)
     + vec3(.27, .027, .022) * r * r * r * (1. - .55 * lys) * (1. - .7 * dag) * (1. + .4 * natt)
     + vec3(.06, .085, .14) * g * g * (1. - lys) * (1. - dag) * (1. + 1.6 * natt)
-    + uLys.rgb * (.1 + .62 * d * d) * (1. - .5 * dag)
-    + uDag.rgb * (.08 + .95 * f * f);
-  return mix(l, b, uButik);
+    + uLys.rgb * (.1 + .62 * d * d) * (1. - .5 * dag);
+  return mix(l, b, uButik) + dagsljus(n);
 }
+// Det som ligger på disken (notan, koppen, fatet, askkoppen och cigarren): ljusets styrka, men färgen bara
+// dagsljusets, så att det skiftar med det som i rummet men inte blir rosa av neonskylten och barens lampor.
+vec3 ljusDag(vec3 n) { vec3 d = dagsljus(n); return vec3(dot(ljus(n) - d, vec3(.2126, .7152, .0722))) + d; }
 float fotoLjus(vec3 n) { return max(.3, .42 + .58 * dot(n, vec3(-.249, .549, .798))); }
 vec3 kant(vec3 n, float styrka) {
   vec3 bak = mix(vec3(.62, .62, -.48), vec3(-.55, .62, -.56), uButik);
@@ -75,6 +83,17 @@ vec3 kant(vec3 n, float styrka) {
     + vec3(1., .12, .08) * styrka * uButik * f * f * max(0., dot(n, NEON)) * .8;
 }
 vec3 ton(vec3 c) { c *= natten(); return c * (1.03 - .15 * c); }
+// Lågan när han tänder cigarren (rum-hasse-eld.js, uEld: var den är och hur stark, 0 när det inte brinner): ett
+// varmt sken som avtar med avståndet, mest på det som vänder sig mot den, och lika starkt på natten (natten()
+// i ton dämpar annars allt).
+uniform vec4 uEld;
+vec3 eldsken(vec3 p, vec3 n) {
+  if (uEld.w <= 0.) return vec3(0.);
+  vec3 d = uEld.xyz - p;
+  float r = length(d);
+  float f = min(1.6, uEld.w * 9000. / (r * r + 6000.));
+  return vec3(1., .6, .28) * f * (.3 + .7 * max(0., dot(n, d / max(r, 1.)))) / natten();
+}
 `;
 
 // Disken (rum-hasse-3d.js, rum-hasse-scen.js): dess bakre plan n·(x, z) = c (uBord.xy och z) och
@@ -91,6 +110,8 @@ bool underBord(vec3 w) {
 `;
 // (utan disk döljs ingenting, och det är rummets ljus utan baren)
 const BUTIK_AV = { value: 0 };
+// (utan låga)
+export const ELD_AV = { value: new THREE.Vector4() };
 // Kavajens tyg i ljuset (uTyg i ARM_F): 1 i baren. Från rummet ses ärmarnas sida bort från lamporna, och då
 // sätter bord.tyg tonen, så att det är samma gråa kavaj som framifrån.
 const TYG = { value: 1 };
@@ -103,6 +124,36 @@ const medVy = (fs, bord) => (bord.vy ? fs.replace(VY_RAD, `const vec3 VY = vec3(
 // (ljuset i rum-hasse.js).
 export const DAG = { value: new THREE.Vector4(0, 0, 0, 0) };
 export const LYS = { value: new THREE.Vector4(0, 0, 0, 0) };
+
+// Färgen på något vitt som ligger på disken i ljuset (ljusDag), med den starkaste kanalen 1: för det som
+// inte ritas med three, som notan på pulten i rummet (rum.css), så att det tonas som koppen bredvid.
+// Räknas av grafikkortet med samma kod, på en bildpunkt.
+export function vittTon(r, bord) {
+  const mal = new THREE.WebGLRenderTarget(1, 1);
+  const g = new THREE.PlaneGeometry(2, 2);
+  const m = new THREE.ShaderMaterial({
+    uniforms: { uButik: bord.butik || BUTIK_AV, uDag: bord.dag || DAG, uLys: bord.lys || LYS },
+    depthTest: false,
+    depthWrite: false,
+    vertexShader: 'void main() { gl_Position = vec4(position.xy, 0., 1.); }',
+    // (halva, eftersom ljuset kan vara starkare än 1)
+    fragmentShader: medVy(`precision highp float;\n${LJUS}\nvoid main() { gl_FragColor = vec4(ljusDag(vec3(0., 1., 0.)) * .5, 1.); }`, bord),
+  });
+  const s = new THREE.Scene();
+  s.add(new THREE.Mesh(g, m));
+  const px = new Uint8Array(4);
+  const forr = r.getRenderTarget();
+  r.setRenderTarget(mal);
+  r.render(s, new THREE.Camera());
+  r.readRenderTargetPixels(mal, 0, 0, 1, 1, px);
+  r.setRenderTarget(forr);
+  mal.dispose();
+  g.dispose();
+  m.dispose();
+  const c = [px[0], px[1], px[2]];
+  const max = Math.max(...c, 1);
+  return c.map((x) => x / max);
+}
 export const ingenBord = () => ({ value: new THREE.Vector4(0, 1, -1e9, -1e9) });
 
 // figurens kamera (rum-hasse-3d.js): ögat på höjden CY, CZ framför fotots plan
@@ -248,7 +299,7 @@ void main() {
   nc = mix(nc, vec3(.9, .86, .8), .8 * smoothstep(.7, .95, vNagel.y));
   c = mix(c, nc, nagel * .75);
   c *= 1. - .12 * rygg * exp(-rd * rd * 160.);
-  vec3 l = ljus(n);
+  vec3 l = ljus(n) + eldsken(vP, n);
   // ljuset som går igenom huden: varmare där ljuset tar slut
   float ter = max(0., dot(n, NYCKEL) + .3);
   l += vec3(.16, .045, .025) * ter * (1. - ter) * 1.7;
@@ -279,7 +330,7 @@ export function byggHand(modell, sida, foto, bord = ingenBord()) {
     foto: { value: foto },
     uB: { value: ut },
     uHud: { value: new THREE.Vector4((a.hx + 0.5) / a.W, 1 - (a.hy + a.hh - 0.5) / a.H, (a.hw - 1) / a.W, (a.hh - 1) / a.H) },
-    uBord: bord, uButik: bord.butik || BUTIK_AV, uDag: bord.dag || DAG, uLys: bord.lys || LYS,
+    uBord: bord, uButik: bord.butik || BUTIK_AV, uDag: bord.dag || DAG, uLys: bord.lys || LYS, uEld: bord.eld || ELD_AV,
   };
   const mesh = new THREE.Mesh(modell.g, new THREE.ShaderMaterial({ uniforms: U, vertexShader: HUD_V, fragmentShader: medVy(HUD_F, bord), transparent: true, depthWrite: true, blending: THREE.CustomBlending, blendSrc: THREE.OneFactor, blendDst: THREE.OneMinusSrcAlphaFactor }));
   mesh.frustumCulled = false;
@@ -432,7 +483,7 @@ void main() {
   // remsan är utjämnad: skuggorna kommer från ljuset, vecken från formen och fotot (mjukare, för armen
   // ligger inte som i fotot)
   c.rgb = .135 + (c.rgb - .135) * .62;
-  vec3 ut = c.rgb * ljus(n) * 1.14 * uTyg;
+  vec3 ut = c.rgb * (ljus(n) + .8 * eldsken(vW, n)) * 1.14 * uTyg;
   vec3 e = normalize(cameraPosition - vW);
   // ylle: ljuset fastnar i luddet där tyget vänder sig bort, och vecken skuggar sig själva
   float gr = 1. - clamp(dot(n, e), 0., 1.);
@@ -517,7 +568,7 @@ export function byggArm(scen, sida, foto, modell, vidd = 1, bord = ingenBord()) 
   g.setAttribute('aVeck', new THREE.BufferAttribute(vk, 1));
   g.setIndex(ix);
   // (dubbelsidig: genom ärmslutet syns insidan)
-  const rorM = new THREE.ShaderMaterial({ uniforms: { foto: { value: foto }, uTyg: bord.tyg || TYG, uBord: bord, uButik: bord.butik || BUTIK_AV, uDag: bord.dag || DAG, uLys: bord.lys || LYS }, vertexShader: ARM_V, fragmentShader: medVy(ARM_F, bord), transparent: true, depthWrite: true, side: THREE.DoubleSide, blending: THREE.CustomBlending, blendSrc: THREE.OneFactor, blendDst: THREE.OneMinusSrcAlphaFactor });
+  const rorM = new THREE.ShaderMaterial({ uniforms: { foto: { value: foto }, uTyg: bord.tyg || TYG, uBord: bord, uButik: bord.butik || BUTIK_AV, uDag: bord.dag || DAG, uLys: bord.lys || LYS, uEld: bord.eld || ELD_AV }, vertexShader: ARM_V, fragmentShader: medVy(ARM_F, bord), transparent: true, depthWrite: true, side: THREE.DoubleSide, blending: THREE.CustomBlending, blendSrc: THREE.OneFactor, blendDst: THREE.OneMinusSrcAlphaFactor });
   const ror = new THREE.Mesh(g, rorM);
   ror.frustumCulled = false;
   // skjortans manschett: ett rör med en rundad kant, lite plattare som handleden (handflatan åt z)
@@ -720,7 +771,8 @@ void main() {
   float y = uRand > .5 ? vL.x : vL.y;
   for (int i = 0; i < 3; i++) { float m = smoothstep(uBand[i].x - .8, uBand[i].x + .8, y) * (1. - smoothstep(uBand[i].y - .8, uBand[i].y + .8, y)); c = mix(c, vec3(.22, .34, .6), m); }
   if (uKaffe > .5) c = vec3(.11, .055, .03);
-  vec3 ut = c * ljus(n) * .9;
+  // vitt porslin, som den ritade koppen i rummet (rum.js), i dagsljusets färg (ljusDag)
+  vec3 ut = c * ljusDag(n) * .9;
   // nära bordet blir det mörkare, och det är en blank yta
   ut *= uRand > .5 ? 1. : .62 + .38 * smoothstep(0., 34., vL.y);
   // (mot kameran, som står snett och lite högre i baren)
@@ -778,7 +830,7 @@ float brus(vec2 p) { vec2 i = floor(p), f = fract(p); f = f * f * (3. - 2. * f);
 const CIG_V = `varying vec3 vN, vP, vL;
 void main() { vL = position; vec4 w = modelMatrix * vec4(position, 1.); vP = w.xyz; vN = normalize(mat3(modelMatrix) * normal); gl_Position = projectionMatrix * viewMatrix * w; }`;
 const CIG_F = `precision highp float;
-uniform float uGlod, uTid;
+uniform float uGlod, uTid, uTand;
 varying vec3 vN, vP, vL;
 ${LJUS}
 ${BORD_GLSL}
@@ -822,23 +874,24 @@ void main() {
   ac = mix(ac, vec3(.72, .7, .66), smoothstep(L - 2., L, y) * .6);
   c = mix(c, ac, aska);
   glans *= 1. - aska;
-  vec3 ut = c * ljus(n);
+  // i dagsljusets färg som koppen (ljusDag), och kantljuset bara som styrka: inte rosa av neonskylten
+  vec3 ut = c * (ljusDag(n) + eldsken(vP, n));
   vec3 h = normalize(NYCKEL + normalize(cameraPosition - vP));
   ut += vec3(1., .92, .8) * pow(max(0., dot(n, h)), mix(18., 60., ring)) * glans;
-  ut += kant(n, .2) * (1. - aska * .5);
-  // glöden: en ring under askan, och fläckar i änden när han drar
+  ut += vec3(dot(kant(n, .2), vec3(.2126, .7152, .0722))) * (1. - aska * .5);
+  // glöden: en ring under askan (inte när den har slocknat: uTand), och fläckar i änden när han drar
   float f = brus(q * .45 + vec2(uTid * 2.3, 0.)) * .6 + brus(q * 1.3 - vec2(0., uTid * 3.1)) * .4;
   float glod = exp(-pow((y - G0 + .8) / 2.4, 2.)) * (.45 + .55 * f);
   glod += smoothstep(L - 1.5, L, y) * smoothstep(.55, .8, f) * uGlod * .8;
   glod += exp(-pow((y - G0 - 4.) / 4., 2.)) * smoothstep(.62, .85, f) * uGlod * .5;
-  ut += vec3(1., .3, .05) * glod * (.22 + 1.5 * uGlod) / natten();
+  ut += vec3(1., .3, .05) * glod * (.22 * uTand + 1.5 * uGlod) / natten();
   gl_FragColor = vec4(ton(ut), 1.);
 }`;
 export function byggCigarr(bord = ingenBord()) {
   const { L, R, ASKA } = CIGARR;
   const prof = [[0, 0], [4.5, 0.5], [8, 1.9], [10.6, 4.2], [12, 7.2], [R, 11], [R, 40], [R, L - ASKA - 6], [R - 0.15, L - ASKA - 1], [R - 0.5, L - ASKA + 1], [R - 0.3, L - 12], [R - 0.8, L - 4], [R - 2.6, L - 1.1], [R - 6, L - 0.1], [0, L + 0.2]];
   const g = new THREE.LatheGeometry(V2(prof), 24);
-  const U = { uGlod: { value: 0 }, uTid: { value: 0 }, uBord: bord, uButik: bord.butik || BUTIK_AV, uDag: bord.dag || DAG, uLys: bord.lys || LYS };
+  const U = { uGlod: { value: 0 }, uTid: { value: 0 }, uTand: { value: 1 }, uBord: bord, uButik: bord.butik || BUTIK_AV, uDag: bord.dag || DAG, uLys: bord.lys || LYS, uEld: bord.eld || ELD_AV };
   const mesh = new THREE.Mesh(g, new THREE.ShaderMaterial({ uniforms: U, vertexShader: CIG_V, fragmentShader: CIG_F, transparent: true, blending: THREE.CustomBlending, blendSrc: THREE.OneFactor, blendDst: THREE.OneMinusSrcAlphaFactor }));
   mesh.renderOrder = 6;
   mesh.frustumCulled = false;
@@ -888,6 +941,168 @@ export function byggPenna(bord = ingenBord()) {
   return { mesh, borta() { g.dispose(); mesh.material.dispose(); } };
 }
 
+// ---------- glasögonen ----------
+// Hans läsglasögon (rum-hasse-3d.js sätter på och tar av dem): bågen i mörk sköldpadd, två rektangulära glas med
+// rundade hörn, bryggan och skalmarna som fälls ut i gångjärnen. Mitt mellan glasen i bågens plan är origo, x åt
+// hans vänstra sida (åt höger i bild), y uppåt och z framåt (bort från ansiktet). Glasen: halva bredden A och höjden
+// B och mitten C från origo; bågens tjocklek T, gångjärnen (GANG) och hur långt skalmarna går ut åt sidan (UT, radianer).
+// Måtten i världens enheter (0,62 mm): glasen är 47 × 26 mm.
+export const GLAS = { A: 38, B: 21, C: 54.5, T: 2.3, GANG: [95, 8, -5], UT: 0.24 };
+// glasets kontur, runt (cx, 0)
+function glasKontur(cx, n = 64) {
+  const { A, B } = GLAS;
+  const pts = [];
+  for (let i = 0; i < n; i++) {
+    const t = (i / n) * Math.PI * 2;
+    const c = Math.cos(t);
+    const s = Math.sin(t);
+    // en superellips: nästan raka kanter och runda hörn, lite smalare nedtill
+    const x = Math.sign(c) * Math.abs(c) ** 0.4 * A;
+    const y = Math.sign(s) * Math.abs(s) ** 0.4 * B;
+    pts.push(new THREE.Vector3(cx + x * (y < 0 ? 0.96 : 1), y, 0));
+  }
+  return pts;
+}
+const GLAS_F = `precision highp float;
+varying vec3 vN, vP, vL;
+${LJUS}
+${BORD_GLSL}
+${BRUS_GLSL}
+void main() {
+  if (underBord(vP)) discard;
+  vec3 n = normalize(vN);
+  // sköldpadd: mörkbrunt med flammor i bärnsten, nästan svart på kanterna
+  float b = brus(vL.xy * .09 + vL.z * .05) * .65 + brus(vL.xy * .27) * .35;
+  vec3 c = mix(vec3(.06, .035, .02), vec3(.36, .19, .07), smoothstep(.35, .8, b));
+  vec3 ut = c * ljus(n);
+  vec3 e = normalize(cameraPosition - vP);
+  vec3 h = normalize(NYCKEL + e);
+  // blank acetat: en skarp glans och lite av baren i kanten
+  ut += vec3(1., .95, .88) * pow(max(0., dot(n, h)), 60.) * .55;
+  ut += kant(n, .25);
+  gl_FragColor = vec4(ton(ut), 1.);
+}`;
+// glasen: nästan osynliga, utom en svag spegling av baren och ljuset som blänker i dem
+const LINS_F = `precision highp float;
+uniform float uSyn;
+varying vec3 vN, vP, vL;
+${LJUS}
+${BORD_GLSL}
+void main() {
+  if (underBord(vP)) discard;
+  vec3 n = normalize(vN);
+  vec3 e = normalize(cameraPosition - vP);
+  if (dot(n, e) < 0.) n = -n;
+  vec3 rf = reflect(-e, n);
+  vec3 om = mix(vec3(.05, .035, .03), vec3(.55, .42, .3), smoothstep(-.2, .6, rf.y));
+  om += vec3(1.2, 1.1, .95) * smoothstep(.9, .99, dot(rf, NYCKEL));
+  float f = .06 + .94 * pow(1. - clamp(dot(n, e), 0., 1.), 5.);
+  // (en svag ton i glaset, och blänket)
+  float a = (.05 + .5 * f + .4 * smoothstep(.95, .995, dot(rf, NYCKEL))) * uSyn;
+  gl_FragColor = vec4(ton(om) * a, a);
+}`;
+// geometrier med läge och normal → en
+function slaIhop(lista) {
+  let n = 0;
+  let m = 0;
+  for (const g of lista) { n += g.attributes.position.count; m += g.index.count; }
+  const pos = new Float32Array(n * 3);
+  const nor = new Float32Array(n * 3);
+  const idx = new Uint32Array(m);
+  let o = 0;
+  let oi = 0;
+  for (const g of lista) {
+    pos.set(g.attributes.position.array, o * 3);
+    nor.set(g.attributes.normal.array, o * 3);
+    const ix = g.index.array;
+    for (let i = 0; i < ix.length; i++) idx[oi + i] = ix[i] + o;
+    o += g.attributes.position.count;
+    oi += ix.length;
+  }
+  const ut = new THREE.BufferGeometry();
+  ut.setAttribute('position', new THREE.BufferAttribute(pos, 3));
+  ut.setAttribute('normal', new THREE.BufferAttribute(nor, 3));
+  ut.setIndex(new THREE.BufferAttribute(idx, 1));
+  return ut;
+}
+// → { grupp, U, satt(matris, fallH, fallV, syn), ande(s, fall), borta() }; fall: skalmarna (0 hopfällda, 1 utfällda)
+export function byggGlasogon(bord = ingenBord()) {
+  const { C, T, GANG, UT } = GLAS;
+  const U = { uBord: bord, uButik: bord.butik || BUTIK_AV, uDag: bord.dag || DAG, uLys: bord.lys || LYS };
+  const mat = new THREE.ShaderMaterial({ uniforms: U, vertexShader: CIG_V, fragmentShader: GLAS_F });
+  const UL = { ...U, uSyn: { value: 1 } };
+  const lmat = new THREE.ShaderMaterial({ uniforms: UL, vertexShader: CIG_V, fragmentShader: LINS_F, transparent: true, depthWrite: false, side: THREE.DoubleSide, blending: THREE.CustomBlending, blendSrc: THREE.OneFactor, blendDst: THREE.OneMinusSrcAlphaFactor });
+  const geos = [];
+  const tub = (pts, r, slut = false, n = 64) => {
+    const g = new THREE.TubeGeometry(new THREE.CatmullRomCurve3(pts, slut, 'centripetal'), n, r, 7, slut);
+    geos.push(g);
+    return g;
+  };
+  const grupp = new THREE.Group();
+  grupp.matrixAutoUpdate = false;
+  const del = (g, m = mat) => { const x = new THREE.Mesh(g, m); x.frustumCulled = false; return x; };
+  // bågen fram i en enda geometri och glasen i en (färre ritanrop)
+  const bage = [];
+  const glasen = [];
+  for (const s of [-1, 1]) {
+    const k = glasKontur(s * C);
+    bage.push(tub(k, T, true, 96));
+    // överkanten lite kraftigare
+    bage.push(tub(k.filter((p) => p.y > GLAS.B * 0.55).sort((a, b) => a.x - b.x), T * 1.35, false, 24));
+    const lg = new THREE.ShapeGeometry(new THREE.Shape(k.map((p) => new THREE.Vector2(p.x, p.y))), 8);
+    lg.translate(0, 0, 0.6);
+    glasen.push(lg);
+    // gångjärnet: från glasets yttre övre hörn bakåt
+    bage.push(tub([new THREE.Vector3(s * (C + GLAS.A - 2), GANG[1] + 2, 0), new THREE.Vector3(s * (GANG[0] + 1), GANG[1], -1), new THREE.Vector3(s * GANG[0], GANG[1], GANG[2])], T * 1.2, false, 8));
+  }
+  // bryggan över näsan, och näsdynorna
+  bage.push(tub([new THREE.Vector3(-C + GLAS.A - 3, 9, 0), new THREE.Vector3(-8, 13, 1.5), new THREE.Vector3(8, 13, 1.5), new THREE.Vector3(C - GLAS.A + 3, 9, 0)], T * 1.1, false, 16));
+  for (const s of [-1, 1]) bage.push(tub([new THREE.Vector3(s * 12, 6, -1), new THREE.Vector3(s * 11, -6, -7)], 2.2, false, 4));
+  const fram = del(slaIhop(bage));
+  const lins = del(slaIhop(glasen), lmat);
+  for (const g of [...bage, ...glasen]) g.dispose();
+  geos.length = 0;
+  geos.push(fram.geometry, lins.geometry);
+  grupp.add(fram, lins);
+  // skalmarna: raka bakåt från gångjärnet och böjda nedåt bakom örat; vridna runt gångjärnet (y)
+  // (kortare än en riktig: resten är bakom örat, och där är huvudet bara en platt yta som inte döljer den)
+  const skalmPts = [[0, 0, 0], [0, 0, -60], [0, -1, -112], [0, -6, -145], [0, -22, -166], [0, -42, -178]].map((p) => new THREE.Vector3(...p));
+  const skalmar = [-1, 1].map((s) => {
+    const p = new THREE.Group();
+    p.position.set(s * GANG[0], GANG[1], GANG[2]);
+    p.add(del(tub(skalmPts, T * 0.95, false, 32)));
+    grupp.add(p);
+    return p;
+  });
+  // vinkeln runt gångjärnet: utfälld lite utåt (UT), hopfälld in bakom glasen (den vänstra lite mer, så att de
+  // inte går genom varandra)
+  const vinkel = (s, f) => {
+    const oppen = -s * UT;
+    const ihop = s * (Math.PI / 2 - (s > 0 ? 0.03 : 0.07));
+    return ihop + (oppen - ihop) * f;
+  };
+  // Bågen ritas före kroppen (ogenomskinlig, och kroppen döljer det som är bakom huvudet och i fickan), glasen efter
+  // den (genomskinliga; djupet börjar om efter kroppen, så de ritas över allt som är bakom dem)
+  grupp.traverse((o) => { if (o.isMesh) o.renderOrder = o.material === lmat ? 1.5 : 0.9; });
+  grupp.visible = false;
+  // skalmens ände (bakom örat) i bågens mått, med skalmen utfälld
+  const ande = (s, f, ut = new THREE.Vector3()) => ut.copy(skalmPts[skalmPts.length - 1]).applyAxisAngle(new THREE.Vector3(0, 1, 0), vinkel(s, f)).add(new THREE.Vector3(s * GANG[0], GANG[1], GANG[2]));
+  return {
+    grupp, U, UL, ande,
+    // bågens läge (matris), skalmarna (höger s = −1, vänster s = 1) och hur mycket glasen syns
+    satt(m, fallH, fallV, syn = 1) {
+      grupp.matrix.copy(m);
+      grupp.matrixWorldNeedsUpdate = true;
+      skalmar[0].rotation.y = vinkel(-1, fallH);
+      skalmar[1].rotation.y = vinkel(1, fallV);
+      UL.uSyn.value = syn;
+      lins.visible = syn > 0.01;
+      grupp.visible = true;
+    },
+    borta() { for (const g of geos) g.dispose(); mat.dispose(); lmat.dispose(); },
+  };
+}
+
 // ---------- askkoppen ----------
 // Rund och tung, av samma glaserade gods som koppen, med två urtag för cigarren mitt emot
 // varandra (urtaget pekar åt +x). Botten i origo, y uppåt.
@@ -912,7 +1127,8 @@ void main() {
   float inne = (1. - smoothstep(70., 78., r)) * (1. - smoothstep(13., 18., y));
   float ab = brus(vL.xz * .09) * .6 + brus(vL.xz * .31) * .4;
   c = mix(c, vec3(.58, .56, .53) * (.7 + .5 * ab), inne * smoothstep(.3, .6, ab + .2 * (1. - r / 70.)));
-  vec3 ut = c * ljus(n) * .9;
+  // vitt porslin som koppen (ljusDag)
+  vec3 ut = c * ljusDag(n) * .9;
   // mörkare mot disken och inne i skålen
   ut *= .64 + .36 * smoothstep(0., 20., y);
   ut *= 1. - .18 * (1. - smoothstep(60., 82., r)) * smoothstep(20., 30., 40. - y);

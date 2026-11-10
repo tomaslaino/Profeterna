@@ -4,6 +4,8 @@ __pycache__/
 data/cache/
 # Hasse Backes egen röst: grenen rost, hämtad av workflowen (src/rost.js)
 data/egen-rost/
+# Tidningens bilder: grenen tidning-bilder, hämtad av workflowen (src/analyser/tidning-bilder.mjs)
+data/tidning-bilder/
 _site/
 _site.tmp/
 .DS_Store

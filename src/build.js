@@ -27,9 +27,11 @@
 //                          tippare på förstasidan, src/tippare.js)
 //   data/journal/*.jsonl   prognosjournalen som den ligger i repot
 //
-// Analyserna och omgångarnas namn skrivs inte i bygget utan på en dator med Claude
-// Code (scripts/analyser/skriv.mjs), som committar data/analyser.json och
-// data/omgangsnamn.json. Bygget kopierar dem till sajten.
+// Analyserna, omgångarnas namn och tidningen inför omgången skrivs inte i bygget utan
+// på en dator med Claude Code (scripts/analyser/skriv.mjs), som committar
+// data/analyser.json, data/omgangsnamn.json och data/tidning.json. Bygget kopierar dem
+// till sajten, och tidningens bilder ur grenen tidning-bilder (som workflowen hämtar till
+// data/tidning-bilder/) till data/tidning-bilder/.
 //
 // Hasse Backes röst (src/rost.js): Tomas egen röst ur grenen rost (som workflowen
 // hämtar till data/egen-rost/) där den finns, annars tar bygget fram ljudet som
@@ -105,10 +107,16 @@ function writeSite(outDir = OUT, { journal = false, couponEndpoint, samtal = nul
     journalHorizonDays: HORIZON_DAYS,
     competitions: COMPETITIONS.map((c) => ({ id: c.id, name: c.name, short: c.short, type: c.type, espn: c.espn })),
   });
-  // Analyserna och omgångarnas namn, som de ligger i repot.
-  for (const f of ['analyser.json', 'omgangsnamn.json']) {
+  // Analyserna, omgångarnas namn och tidningen, som de ligger i repot.
+  for (const f of ['analyser.json', 'omgangsnamn.json', 'tidning.json', 'poddsidor.json']) {
     const src = path.join(ROOT, 'data', f);
     if (fs.existsSync(src)) fs.copyFileSync(src, path.join(dataDir, f));
+  }
+  // Tidningens bilder, en per lag (workflowen hämtar grenen tidning-bilder hit).
+  const bilder = path.join(ROOT, 'data', 'tidning-bilder');
+  if (fs.existsSync(bilder)) {
+    fs.mkdirSync(path.join(dataDir, 'tidning-bilder'), { recursive: true });
+    for (const f of fs.readdirSync(bilder)) if (/\.jpg$/.test(f)) fs.copyFileSync(path.join(bilder, f), path.join(dataDir, 'tidning-bilder', f));
   }
   // Hasse Backes röst: den egna där den finns, annars Azures ur cachen (build() tar fram det som saknas).
   const rosten = rost.publicera(dataDir, { gang: kupongCfg.gang || [] });

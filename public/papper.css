@@ -1,44 +1,77 @@
 /* Papperskupongen (papper.js): omgångens kupong som en ifylld tipskupong.
    Krämvitt papper med synkmarkeringar längs vänster kant och ett band i
    terrakotta överst, som kupongen på pulten i rummet (rum.css .rum-kup):
-   tunna linjer, smala rutor, lagen i antikva och fälten som rader med
-   prickad linje. Kryss med blå kulspetspenna, utfallet inringat med grönt
+   tunna tryckta linjer, smala rutor, lagen på skrivmaskin och fälten som rader
+   med prickad linje. Kryss med blå kulspetspenna, utfallet inringat med grönt
    (rätt) eller rött (fel), betyget i rött och det som pågår i blyerts med
    märkpenna över. Kupongerna har klassen .pp-kup och raka kanter; betyget
    (betyg.js) har kvar perforeringen och bården. Laddas efter kupong.css. */
 
 /* Caveat ligger i typsnitt.css */
 
-.pp {
+/* Allt papper har samma färger, samma struktur och samma tre röster, så att
+   kupongen, matchbladet och resten ser ut att komma ur samma låda:
+   - det förtryckta (--tryck): bandet, rubrikerna, rutorna och numren, i
+     terrakotta, som en blankett tryckt i en färg;
+   - det maskinskrivna (--skriv): lagen, tiderna och alla värden, i färgbandets
+     svart. Typsnittet slår varje bokstav olika (typsnitt.css);
+   - pennan (--pp-hand): kryssen, ringarna, namnen och ställningen.
+   --display och --sans pekar om till skrivmaskinen på papperet, så att allt som
+   inte är förtryckt blir maskinskrivet av sig självt. En skrivmaskin har inget
+   fetstilt, så inget får tjockas till (font-synthesis): det som ska framhållas
+   stryks under. */
+.pp, .rum-kup, .rum-blad, .rum-block, .rd-lapp, dialog.mr-modal {
+  --display: var(--skriv);
+  --sans: var(--skriv);
+  --serif: var(--skriv);
   --pp-paper: #f1e8d5;
-  --pp-ink: #2a231d;
-  --pp-ink-soft: rgba(42, 35, 29, 0.66);
+  --pp-ink: #221f1b;
+  --pp-ink-soft: rgba(34, 31, 27, 0.74);
   --pp-print: #a9452b;
   --pp-print-line: rgba(169, 69, 43, 0.28);
   --pp-print-tint: rgba(169, 69, 43, 0.055);
   --pp-box: #fbf7ec;
-  /* kupongens band, rutornas kant, numren och linjerna mellan raderna */
+  /* kupongens band, rutornas kant, det svaga trycket och linjerna mellan raderna */
   --pp-band: #c35f36;
-  --pp-rule: #9a876a;
-  --pp-faint: #a08f74;
-  --pp-line: rgba(90, 70, 40, 0.22);
-  --pp-dots: rgba(90, 70, 40, 0.4);
+  --pp-rule: #b4664a;
+  --pp-faint: #a8573a;
+  --pp-line: rgba(169, 69, 43, 0.25);
+  --pp-dots: rgba(169, 69, 43, 0.45);
   --pp-pen: #2146a6;
   --pp-ok: #17824a;
   --pp-no: #cf2a20;
   --pp-pencil: #6f6c69;
   --pp-marker: rgba(255, 214, 10, 0.6);
   --pp-hand: "Caveat", "Bradley Hand", "Segoe Print", cursive;
-  /* papperets fibrer */
-  --pp-grain: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='180' height='180'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.85' numOctaves='2' stitchTiles='stitch'/%3E%3CfeColorMatrix values='0 0 0 0 .35 0 0 0 0 .27 0 0 0 0 .18 0 0 0 .09 0'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
+  font-family: var(--skriv);
+  font-synthesis: none;
+}
+/* samma text på flera rader (lör 16:00) ska inte slå likadant: varje rad börjar
+   på ett annat anslag (ss01–ss06 i typsnittet) */
+:is(.pp-row, .pb-row, .sm-r, .rum-kup .row, .pp-field, .rl-m, .rb-mote, .rb-tabell tr):nth-child(7n+1) { --anslag: "ss01"; }
+:is(.pp-row, .pb-row, .sm-r, .rum-kup .row, .pp-field, .rl-m, .rb-mote, .rb-tabell tr):nth-child(7n+2) { --anslag: "ss04"; }
+:is(.pp-row, .pb-row, .sm-r, .rum-kup .row, .pp-field, .rl-m, .rb-mote, .rb-tabell tr):nth-child(7n+3) { --anslag: "ss02"; }
+:is(.pp-row, .pb-row, .sm-r, .rum-kup .row, .pp-field, .rl-m, .rb-mote, .rb-tabell tr):nth-child(7n+4) { --anslag: "ss06"; }
+:is(.pp-row, .pb-row, .sm-r, .rum-kup .row, .pp-field, .rl-m, .rb-mote, .rb-tabell tr):nth-child(7n+5) { --anslag: "ss03"; }
+:is(.pp-row, .pb-row, .sm-r, .rum-kup .row, .pp-field, .rl-m, .rb-mote, .rb-tabell tr):nth-child(7n+6) { --anslag: "ss05"; }
+.pp-small, .pp-field b, .pp-stop b, .pp-cell small, .rl-m b, .rl-m small, .rb-mote, .rb-tabell td { font-feature-settings: var(--anslag, normal); }
+
+/* de små spärrade rubrikerna på resten av papperet är också förtryckta */
+.pp .sm-hd-nr, .pp .sm-hd-l, .pp .sm-q, .pp .sm-act-l, .pp .sm-foot .pp-field > span,
+.bg-table thead th, .bg-table tfoot th, .bg-label, .bg-field > span,
+dialog.mr-modal .fc h5, dialog.mr-modal .mt-zline div, dialog.mr-modal .ref-figs span, dialog.mr-modal .mr-ht span, dialog.mr-modal .mr-team h5 { font-family: var(--tryck); }
+.pp .sm-hd-nr, .pp .sm-hd-l, .pp .sm-q { color: var(--pp-print); }
+/* flikarna i matchbladet: tryckta ord, som i rummets blad (rum-matchblad.css) */
+dialog.mr-modal .mr-tabs button { font-family: var(--tryck); font-size: 11px; font-weight: 700; letter-spacing: 0.15em; text-transform: uppercase; color: var(--pp-print); }
+@media (max-width: 640px) { dialog.mr-modal .mr-tabs button { font-size: 10.5px; letter-spacing: 0.07em; } }
+
+.pp {
   --pp-hole: 5px;
   position: relative;
   padding: 30px 30px 24px 54px;
   color: var(--pp-ink);
-  background:
-    var(--pp-grain),
-    linear-gradient(170deg, rgba(255, 255, 255, 0.42), rgba(255, 255, 255, 0) 38%, rgba(120, 90, 50, 0.06)),
-    var(--pp-paper);
+  /* (kanterna gulnar av slitaget, slitage.js, som också ligger över raderna som står kvar) */
+  background: var(--pp-grain), var(--pp-paper);
   /* perforeringen upptill och nedtill */
   -webkit-mask:
     radial-gradient(circle at 50% 0, transparent var(--pp-hole), #000 calc(var(--pp-hole) + 0.5px)) 0 0 / 15px 51% repeat-x,
@@ -82,9 +115,9 @@
   color: var(--pp-paper);
   background: var(--pp-grain), var(--pp-band);
 }
-.pp-banner span { font-size: 12px; font-weight: 700; letter-spacing: 0.3em; text-transform: uppercase; }
+.pp-banner span { font-family: var(--tryck); font-size: 12px; font-weight: 700; letter-spacing: 0.3em; text-transform: uppercase; }
 .pp-banner i { font-style: normal; }
-.pp-banner b { font-family: var(--display); font-size: 30px; font-weight: 800; line-height: 1; letter-spacing: -0.01em; white-space: nowrap; }
+.pp-banner b { font-family: var(--tryck); font-size: 30px; font-weight: 800; line-height: 1; letter-spacing: -0.01em; white-space: nowrap; }
 .pp-fill > .pp-banner { margin-top: -26px; }
 
 .pp-head {
@@ -95,13 +128,14 @@
   padding-bottom: 16px;
 }
 .pp-kup .pp-head { padding: 18px 0 14px; }
-.pp-kup .pp-head .pp-title { margin-top: 0; font-size: clamp(28px, 4.5vw, 36px); font-weight: 600; }
+.pp-kup .pp-head .pp-title { margin-top: 0; font-size: clamp(25px, 4vw, 32px); }
 .pp-head > p, .pp-head > h2 { grid-column: 1; }
 .pp-brand {
   display: flex;
   align-items: center;
   gap: 8px;
   margin: 0;
+  font-family: var(--tryck);
   font-size: 11px;
   font-weight: 800;
   letter-spacing: 0.2em;
@@ -113,10 +147,10 @@
 .pp-title {
   margin: 10px 0 0;
   font-family: var(--display);
-  font-size: clamp(36px, 6vw, 52px);
-  font-weight: 700;
+  font-size: clamp(30px, 5vw, 44px);
+  font-weight: 400;
   line-height: 1;
-  letter-spacing: -0.01em;
+  letter-spacing: 0;
   color: var(--pp-ink);
 }
 .pp-meta {
@@ -191,8 +225,10 @@
   color: var(--pp-ink-soft);
   border-bottom: 1px dotted var(--pp-dots);
 }
+/* etiketten är förtryckt, värdet maskinskrivet */
+.pp-stop > span, .pp-field > span { font-family: var(--tryck); font-size: 10.5px; font-weight: 700; letter-spacing: 0.15em; text-transform: uppercase; color: var(--pp-print); }
 .pp-stop { min-width: 200px; }
-.pp-stop b, .pp-field b { font-family: var(--display); font-size: 16px; font-weight: 700; color: var(--pp-ink); font-variant-numeric: tabular-nums; white-space: nowrap; }
+.pp-stop b, .pp-field b { font-family: var(--display); font-size: 16px; font-weight: 400; color: var(--pp-ink); white-space: nowrap; }
 
 /* meanderbården under huvudet */
 .pp-band {
@@ -214,25 +250,27 @@
 /* rubrikerna över raderna, i svagt tryck */
 .pp-cols {
   padding-block: 4px;
+  font-family: var(--tryck);
   font-size: 10.5px;
   font-weight: 700;
   letter-spacing: 0.16em;
   text-transform: uppercase;
-  color: var(--pp-faint);
-  border-bottom: 1px solid var(--pp-line);
+  color: var(--pp-print);
+  border-bottom: 1px solid var(--pp-dots);
 }
 .pp-cols > :nth-child(4) { text-align: center; }
 .pp-cols-s { display: flex; gap: 8px; }
-.pp-cols-s b { width: 40px; text-align: center; font-family: var(--display); font-size: 15px; font-weight: 600; letter-spacing: 0; }
+.pp-cols-s b { width: 40px; text-align: center; font-family: var(--tryck); font-size: 15px; font-weight: 600; letter-spacing: 0; }
 
 .pp-day {
   margin: 12px 0 0;
   padding: 4px 8px 3px;
+  font-family: var(--tryck);
   font-size: 10.5px;
   font-weight: 700;
   letter-spacing: 0.16em;
   text-transform: uppercase;
-  color: var(--pp-faint);
+  color: var(--pp-print);
   border-bottom: 1px solid var(--pp-line);
 }
 
@@ -244,6 +282,8 @@
   text-decoration: none;
   border-bottom: 1px solid var(--pp-line);
 }
+/* varannan rad i tryckets svaga ton, som på en gammal blankett */
+.pp-row:nth-child(even), .pb-row:nth-child(even) { background: var(--pp-print-tint); }
 a.pp-row:hover { color: var(--pp-ink); background: rgba(90, 70, 40, 0.06); }
 a.pp-row:focus-visible { outline: 2px solid var(--pp-pen); outline-offset: -2px; }
 /* synkmarkeringen i vänsterkanten, en per rad */
@@ -264,17 +304,17 @@ a.pp-row:focus-visible { outline: 2px solid var(--pp-pen); outline-offset: -2px;
   place-items: center;
   width: 24px;
   height: 24px;
-  font-family: var(--display);
+  font-family: var(--tryck);
   font-size: 15px;
-  font-weight: 800;
+  font-weight: 700;
   font-variant-numeric: tabular-nums;
-  color: var(--pp-faint);
+  color: var(--pp-print);
 }
 .pp-match { min-width: 0; }
 /* lagen i antikva */
-.pp-tm { display: block; font-family: var(--display); font-size: 16.5px; font-weight: 500; line-height: 1.25; }
-.pp-tm .vs { color: var(--pp-faint); font-weight: 400; }
-.pp-small { display: block; margin-top: 1px; font-size: 11.5px; color: var(--pp-ink-soft); font-variant-numeric: tabular-nums; }
+.pp-tm { display: block; font-family: var(--display); font-size: 15.5px; font-weight: 400; line-height: 1.25; }
+.pp-tm .vs { color: var(--pp-ink-soft); font-weight: 400; }
+.pp-small { display: block; margin-top: 1px; font-size: 11px; color: var(--pp-ink-soft); }
 .pp-note {
   display: block;
   margin-top: 1px;
@@ -288,8 +328,8 @@ a.pp-row:focus-visible { outline: 2px solid var(--pp-pen); outline-offset: -2px;
 /* rutorna 1 X 2 med modellens odds under */
 .pp-signs { display: flex; gap: 8px; }
 .pp-cell { display: flex; flex-direction: column; align-items: center; gap: 3px; }
-.pp-cell small { font-size: 10.5px; line-height: 1; color: var(--pp-ink-soft); font-variant-numeric: tabular-nums; }
-.pp-cell small.fav { font-weight: 800; color: var(--pp-ink); }
+.pp-cell small { font-size: 10.5px; line-height: 1; color: var(--pp-ink-soft); }
+.pp-cell small.fav { color: var(--pp-ink); text-decoration: underline 1px; text-underline-offset: 2px; }
 /* rutan: bredare än hög, med tunn kant och tecknet svagt i */
 .pp-box {
   position: relative;
@@ -298,17 +338,17 @@ a.pp-row:focus-visible { outline: 2px solid var(--pp-pen); outline-offset: -2px;
   width: 40px;
   height: 26px;
   box-sizing: border-box;
-  border: 1.4px solid var(--pp-rule);
-  border-radius: 4px;
+  border: 1.2px solid var(--pp-rule);
+  border-radius: 2px;
   background: color-mix(in srgb, var(--pp-box) 45%, transparent);
 }
 .pp-box i {
-  font-family: var(--display);
+  font-family: var(--tryck);
   font-size: 13px;
   font-style: normal;
   font-weight: 600;
-  color: var(--pp-faint);
-  opacity: 0.75;
+  color: var(--pp-print);
+  opacity: 0.62;
 }
 .pp-x {
   position: absolute;
@@ -395,12 +435,12 @@ a.pp-row:focus-visible { outline: 2px solid var(--pp-pen); outline-offset: -2px;
 /* fälten (.pp-field ovan) i lika breda spalter */
 .pp-fields { display: grid; grid-template-columns: repeat(auto-fill, minmax(170px, 1fr)); gap: 2px 28px; }
 /* vad gängets kupong kostar per person, bredvid priset (spela.js) */
-.pp-field b small { margin-left: 6px; font-family: var(--sans); font-size: 11px; font-weight: 700; letter-spacing: 0.02em; color: var(--pp-ink-soft); white-space: nowrap; }
+.pp-field b small { margin-left: 6px; font-family: var(--sans); font-size: 11px; font-weight: 400; letter-spacing: 0; color: var(--pp-ink-soft); white-space: nowrap; }
 .pp-fine { display: flex; align-items: flex-end; justify-content: space-between; gap: 18px; margin-top: 18px; }
 .pp .kp-src { margin: 0; font-size: 11px; color: var(--pp-ink-soft); }
 .pp .kp-src .note { color: var(--pp-no); }
 .pp-code { display: grid; justify-items: center; gap: 3px; flex: none; }
-.pp-code > span { font-family: ui-monospace, "SF Mono", Menlo, monospace; font-size: 10.5px; letter-spacing: 0.18em; color: var(--pp-ink-soft); }
+.pp-code > span { font-family: var(--skriv); font-size: 10.5px; letter-spacing: 0.06em; color: var(--pp-ink-soft); }
 .pp-bars { width: 150px; height: 26px; fill: var(--pp-ink); opacity: 0.8; }
 
 /* knapparna mitt ovanför kupongen */
@@ -436,7 +476,7 @@ a.pp-row:focus-visible { outline: 2px solid var(--pp-pen); outline-offset: -2px;
   justify-items: center;
   width: 42px;
   padding: 0;
-  font-family: var(--display);
+  font-family: var(--tryck);
   font-size: 13px;
   font-weight: 600;
   line-height: 1;
@@ -455,8 +495,8 @@ a.pp-row:focus-visible { outline: 2px solid var(--pp-pen); outline-offset: -2px;
   width: 40px;
   height: 26px;
   margin-left: -20px;
-  border: 1.4px solid var(--pp-rule);
-  border-radius: 4px;
+  border: 1.2px solid var(--pp-rule);
+  border-radius: 2px;
   background: color-mix(in srgb, var(--pp-box) 45%, transparent);
   box-sizing: border-box;
   transition: background-color 0.12s ease;
@@ -474,7 +514,7 @@ a.pp-row:focus-visible { outline: 2px solid var(--pp-pen); outline-offset: -2px;
   font-variant-numeric: tabular-nums;
 }
 .pp-fill .kp-tg button[aria-pressed="true"] { color: var(--pp-faint); background: none; }
-.pp-fill .kp-tg button[aria-pressed="true"] small { color: var(--pp-ink); font-weight: 700; }
+.pp-fill .kp-tg button[aria-pressed="true"] small { color: var(--pp-ink); }
 /* krysset, i tre handstilar */
 .pp-fill .kp-tg button[aria-pressed="true"]::after {
   content: "";

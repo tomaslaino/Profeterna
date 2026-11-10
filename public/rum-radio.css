@@ -1,0 +1,53 @@
+/* Kassettradion nära (rum-radio.js): genomskinliga reglage över delarna i 3D, och över bladet med stationerna. */
+/* rutan runt radion i rummet, som ger handen: det kameran siktar på (radioRuta i rum.js) */
+.rum-pl > #rum-radio { visibility: visible; pointer-events: auto; cursor: pointer; }
+.rum.sak-nara .rum-pl > #rum-radio { pointer-events: none; }
+/* (fingret: lite större än radion, som är liten på håll) */
+.rum-pl > #rum-radio::after { content: ""; position: absolute; inset: -6px; }
+/* nära radion: rummets varma sken ligger ovanpå allt och tvättar ur det svarta på fronten */
+.rum.radio-nara .rum-warm { opacity: 0; }
+.rum-radio-reglage { position: absolute; inset: 0; z-index: 3; pointer-events: none; }
+.rum-radio-reglage[hidden] { display: none; }
+.rum-radio-reglage .r-del {
+  position: absolute;
+  margin: 0;
+  padding: 0;
+  border: 0;
+  background: none;
+  pointer-events: auto;
+  touch-action: none;
+  -webkit-tap-highlight-color: transparent;
+  outline-offset: 2px;
+  cursor: pointer;
+}
+.rum-radio-reglage .r-kropp { cursor: default; touch-action: auto; }
+.rum-radio-reglage .r-skala,
+.rum-radio-reglage .r-spak { cursor: ew-resize; }
+.rum-radio-reglage .r-band { cursor: ns-resize; }
+.rum-radio-reglage .r-ratt { cursor: grab; border-radius: 50%; }
+.rum-radio-reglage .r-ratt:active { cursor: grabbing; }
+.rum-radio-reglage .r-del:focus { outline: none; }
+.rum-radio-reglage .r-del:focus-visible { outline: 2px solid rgba(255, 214, 140, 0.7); }
+
+/* Bladet med stationerna på fönsterkarmen (radiolapp i rum-inredning.js): knappen kring duken i rummet, som
+   uret. Nära radion ligger genomskinliga knappar över bladet och raderna (lappen i rum-radio.js): raderna går
+   att trycka på när de är stora nog att läsa, annars går ett tryck på bladet fram till det. */
+.rum-radiolapp { position: absolute; display: block; padding: 0; border: 0; background: none; }
+.rum-radio-reglage .r-lapp,
+.rum-radio-reglage .r-st {
+  position: absolute;
+  margin: 0;
+  padding: 0;
+  border: 0;
+  background: none;
+  pointer-events: auto;
+  -webkit-tap-highlight-color: transparent;
+  cursor: zoom-in;
+}
+.rum-radio-reglage .r-lapp.las { cursor: default; }
+.rum-radio-reglage .r-st { cursor: pointer; }
+.rum-radio-reglage .r-lapp[hidden], .rum-radio-reglage .r-rader[hidden] { display: none; }
+/* (texten står på papperet: den här är till för skärmläsaren) */
+.rum-radio-reglage .r-st { overflow: hidden; color: transparent; font-size: 1px; white-space: nowrap; border-radius: 3px; }
+.rum-radio-reglage .r-st:focus, .rum-radio-reglage .r-lapp:focus { outline: none; }
+.rum-radio-reglage .r-st:focus-visible, .rum-radio-reglage .r-lapp:focus-visible { outline: 2px solid rgba(255, 214, 140, 0.7); }

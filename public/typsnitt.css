@@ -5,10 +5,23 @@
    (sidan → stilmall → Googles stilmall → typsnitt) som höll tillbaka dem. En
    fil hämtas först när en bokstav i dess unicode-range syns i det typsnittet.
    Länkas först i varje sidas <head>; förut låg de som @import i stilmallarna:
-     Fraunces (theme.css), Caveat (papper.css), Special Elite (rum-anslag.css,
+     Fraunces (theme.css), Caveat (papper.css), Skrivmaskin (papper.css, rum-anslag.css,
      rum-register.css), VT323, Anton och Alfa Slab One samt handstilarna
-     Cedarville Cursive, Mr Dafoe och Reenie Beanie (rum.css).
-   Licens: SIL Open Font License 1.1 för alla. */
+     Cedarville Cursive, Mr Dafoe och Reenie Beanie (rum.css), och Playfair Display (rum-hasse-tidning.js).
+   Licens: SIL Open Font License 1.1 för alla utom Skrivmaskin, som är Special
+   Elite (Apache 2.0) ombyggd av scripts/typsnitt/skrivmaskin.py: en bredd för
+   alla tecken, och varje bokstav slår olika varje gång. */
+
+/* Papperets tre röster, samma på allt papper (papper.css): det förtryckta, det
+   maskinskrivna och pennan (--pp-hand). */
+:root {
+  --tryck: "Fraunces", Georgia, "Times New Roman", serif;
+  --skriv: "Skrivmaskin", "American Typewriter", "Courier New", monospace;
+  /* pappersstrukturen under allt papper (scripts/rum/papper.mjs), som ett lager i background */
+  --pp-grain: url(rum/papper.webp) 0 0 / 320px 320px;
+  /* kanterna, som gulnat mer än mitten, på papper utan slitage.js (i rummet) */
+  --pp-kant: radial-gradient(130% 120% at 50% 42%, rgba(122, 86, 40, 0) 56%, rgba(122, 86, 40, 0.15) 100%);
+}
 /* vietnamese */
 @font-face {
   font-family: 'Fraunces';
@@ -101,20 +114,20 @@
 }
 /* latin-ext */
 @font-face {
-  font-family: 'Special Elite';
+  font-family: 'Skrivmaskin';
   font-style: normal;
   font-weight: 400;
   font-display: swap;
-  src: url(typsnitt/special-elite-latin-ext.woff2) format('woff2');
+  src: url(typsnitt/skrivmaskin-latin-ext.woff2) format('woff2');
   unicode-range: U+0100-02BA, U+02BD-02C5, U+02C7-02CC, U+02CE-02D7, U+02DD-02FF, U+0304, U+0308, U+0329, U+1D00-1DBF, U+1E00-1E9F, U+1EF2-1EFF, U+2020, U+20A0-20AB, U+20AD-20C4, U+2113, U+2C60-2C7F, U+A720-A7FF;
 }
 /* latin */
 @font-face {
-  font-family: 'Special Elite';
+  font-family: 'Skrivmaskin';
   font-style: normal;
   font-weight: 400;
   font-display: swap;
-  src: url(typsnitt/special-elite-latin.woff2) format('woff2');
+  src: url(typsnitt/skrivmaskin-latin.woff2) format('woff2');
   unicode-range: U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6, U+02DA, U+02DC, U+0304, U+0308, U+0329, U+2000-206F, U+20AC, U+2122, U+2191, U+2193, U+2212, U+2215, U+FEFF, U+FFFD;
 }
 /* vietnamese */
@@ -232,5 +245,25 @@
   font-weight: 400;
   font-display: swap;
   src: url(typsnitt/reenie-beanie-latin.woff2) format('woff2');
+  unicode-range: U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6, U+02DA, U+02DC, U+0304, U+0308, U+0329, U+2000-206F, U+20AC, U+2122, U+2191, U+2193, U+2212, U+2215, U+FEFF, U+FFFD;
+}
+/* Playfair Display: Dagens Nyheters namn och rubriker i tidningen Hasse Backe läser (rum-hasse-tidning.js), en Bodoni
+   som DN:s. Från fontsource (samma filer som Google Fonts, variabel vikt). */
+/* latin-ext */
+@font-face {
+  font-family: 'Playfair Display';
+  font-style: normal;
+  font-weight: 400 900;
+  font-display: swap;
+  src: url(typsnitt/playfair-display-latin-ext.woff2) format('woff2');
+  unicode-range: U+0100-02BA, U+02BD-02C5, U+02C7-02CC, U+02CE-02D7, U+02DD-02FF, U+0304, U+0308, U+0329, U+1D00-1DBF, U+1E00-1E9F, U+1EF2-1EFF, U+2020, U+20A0-20AB, U+20AD-20C0, U+2113, U+2C60-2C7F, U+A720-A7FF;
+}
+/* latin */
+@font-face {
+  font-family: 'Playfair Display';
+  font-style: normal;
+  font-weight: 400 900;
+  font-display: swap;
+  src: url(typsnitt/playfair-display-latin.woff2) format('woff2');
   unicode-range: U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6, U+02DA, U+02DC, U+0304, U+0308, U+0329, U+2000-206F, U+20AC, U+2122, U+2191, U+2193, U+2212, U+2215, U+FEFF, U+FFFD;
 }

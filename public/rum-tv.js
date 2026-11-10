@@ -144,9 +144,13 @@ window.RumTv = (() => {
   const fWhen = new Intl.DateTimeFormat('sv-SE', { timeZone: TZ, weekday: 'short', day: 'numeric', month: 'short', hour: '2-digit', minute: '2-digit' });
   const partsOf = (f, d) => Object.fromEntries(f.formatToParts(d).map((x) => [x.type, x.value.replace('.', '')]));
 
+  // Stockholms klocka, samma som uret och utsikten (vader.js: ?rum-klocka, och
+  // stilla i en fast bild)
+  const klockan = () => (window.Vader && Vader.tid ? Vader.tid() : Date.now());
+
   // Rubrikraden: sidnumret (grönt medan det rullar), namnet, datumet och klockan.
   function head(nr, rolling) {
-    const p = partsOf(fHead, new Date());
+    const p = partsOf(fHead, new Date(klockan()));
     return line(' ', [String(nr), rolling ? 'g' : 'w'], ' Matchfix Text  ', pad(`${p.weekday} ${p.day} ${p.month}`, 10), ' ', [`${p.hour}:${p.minute}:${p.second}`, 'y']);
   }
 
@@ -397,7 +401,7 @@ window.RumTv = (() => {
       '<div class="rum-tv3" id="rum-tv3">' +
       '<i class="tv-antenn"><b class="folie"></b><b></b></i>' +
       '<i class="tv-hylla h-botten"></i><i class="tv-hylla h-fram"></i><i class="tv-hylla h-vanster"></i><i class="tv-hylla h-hoger"></i>' +
-      '<i class="tv-f tv-kapa k-topp"></i><i class="tv-f tv-kapa k-botten"></i><i class="tv-f tv-kapa k-vanster"></i><i class="tv-f tv-kapa k-hoger"></i><i class="tv-f tv-kapa k-bak"></i>' +
+      '<i class="tv-f tv-kapa k-topp"></i><i class="tv-f tv-kapa k-botten"></i><i class="tv-f tv-kapa k-vanster"></i><i class="tv-f tv-kapa k-hoger"></i>' +
       '<i class="tv-f tv-topp"></i><i class="tv-f tv-botten"></i><i class="tv-f tv-vanster"></i><i class="tv-f tv-hoger"></i>' +
       '<div class="tv-front" id="rum-tvfront" inert>' +
       '<div class="tv-ram"><div class="tv-glas" id="rum-ttx"><div class="tt"><div class="tr hd"></div><div class="tb"></div></div>' +
@@ -494,7 +498,7 @@ window.RumTv = (() => {
       // på håll bläddrar undersidorna själva var tolfte sekund
       const subs = subsOf(T.nr);
       if (!T.near && !T.roll && subs > 1) {
-        const sub = Math.floor(Date.now() / 12000) % subs;
+        const sub = Math.floor(klockan() / 12000) % subs;
         if (sub !== T.sub) {
           T.sub = sub;
           draw(true);

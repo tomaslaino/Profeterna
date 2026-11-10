@@ -1,4 +1,4 @@
-/* Special Elite ligger i typsnitt.css */
+/* Skrivmaskin ligger i typsnitt.css */
 
 /* Kortregistret i tobaksaffären (rum-register.js): kortlådan på disken är en
    duk i three.js (rum-kortlada.js) i en länk i bakväggens plan, ovanför
@@ -46,12 +46,13 @@
   transform-origin: 50% 50%;
   pointer-events: auto;
   color: #2b2419;
-  font: 13.5px/21px "Special Elite", "American Typewriter", "Courier New", monospace;
+  font: 13.5px/21px var(--skriv);
   border-radius: 2px;
   background:
     linear-gradient(180deg, rgba(0, 0, 0, 0) 62px, rgba(200, 44, 40, 0.62) 62px 64px, rgba(0, 0, 0, 0) 64px),
     repeating-linear-gradient(180deg, rgba(0, 0, 0, 0) 0 20px, rgba(70, 120, 190, 0.3) 20px 21px) 0 66px / 100% calc(100% - 66px) no-repeat,
-    linear-gradient(170deg, rgba(255, 255, 255, 0.35), rgba(0, 0, 0, 0) 40%, rgba(120, 90, 40, 0.06)),
+    var(--pp-grain),
+    var(--pp-kant),
     #f5f0e1;
   box-shadow: 0 22px 44px rgba(0, 0, 0, 0.55), 0 0 1px rgba(0, 0, 0, 0.4);
 }
@@ -81,7 +82,8 @@
   background:
     repeating-linear-gradient(180deg, rgba(0, 0, 0, 0) 0 20px, rgba(60, 90, 150, 0.24) 20px 21px) 0 66px / 100% calc(100% - 66px) no-repeat,
     linear-gradient(180deg, rgba(0, 0, 0, 0) 62px, rgba(31, 42, 68, 0.5) 62px 63.5px, rgba(0, 0, 0, 0) 63.5px),
-    linear-gradient(170deg, rgba(255, 255, 255, 0.3), rgba(0, 0, 0, 0) 40%),
+    var(--pp-grain),
+    var(--pp-kant),
     #dde8f0;
   color: #1f2a44;
 }

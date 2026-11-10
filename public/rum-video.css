@@ -413,7 +413,7 @@
 /* skrivmaskin: matchen så stor den får plats (--fs, passa i rum-video.js)
    och resultatet, som aldrig kortas; förra omgångens kupongnummer på en
    rund röd lapp */
-.vhs-kas .lapp :is(b, u) { font: 400 var(--fs, 20px)/28px "Special Elite", "American Typewriter", "Courier New", monospace; letter-spacing: -0.4px; white-space: nowrap; text-decoration: none; }
+.vhs-kas .lapp :is(b, u) { font: 400 var(--fs, 20px)/28px var(--skriv); letter-spacing: -0.4px; white-space: nowrap; text-decoration: none; }
 .vhs-kas .lapp b { flex: 1 1 auto; min-width: 0; overflow: hidden; text-overflow: ellipsis; text-align: left; }
 .vhs-kas .lapp u { flex: none; }
 .vhs-kas .lapp i { display: none; }

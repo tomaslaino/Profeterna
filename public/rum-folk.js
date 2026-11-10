@@ -32,10 +32,14 @@
 // förut – tas kupongen sedan i handen att fylla i eller ändra (ta i rum.js),
 // när namnet är skrivet eller tecknet syns.
 //
-// Natten: mellan midnatt och sex (Stockholms tid, Vader.nu()) är lysröret
-// släckt – rummet mörkt utom gatan, neonen och tv:n (.natt, rum-folk.css),
-// gänget och lysröret i 3D – och på morgonen blinkar det igång igen. Nära
-// tv:n, videon, en sak eller med kupongen i handen är det ljust.
+// Natten: lysröret dämpas långsamt från elva på kvällen och är släckt från
+// midnatt (Stockholms tid, Vader.nu()) – rummet mörkt utom gatan, neonen och tv:n
+// (.natt och --natt-grad, rum-folk.css), gänget och lysröret i 3D – och från sex
+// tänds det lika långsamt, tills det lyser fullt klockan sju (nattGrad, 0–1, en
+// gång i minuten). Nära tv:n, videon, en sak eller med kupongen i handen är det ljust.
+//
+// Sömnen: mellan 22.30 och sju (Stockholms tid) sover gänget (somn i rum-3d.js),
+// och radion, matcherna eller ett klick på någon väcker dem.
 //
 // Dagen efter: dagen efter och dagen därpå efter att gängets kupong spelats
 // färdigt syns det hur det gick, efter betyget i historiken (4–5 bra, 1–2
@@ -45,18 +49,22 @@
 // senaste gick (senastAv, rum-3d.js senast och rum-uttryck.js) – om det
 // blev vinst och efter betyget – utom med dolda resultat.
 //
-// Radion: ett klick på bergsprängaren på fönsterbänken sätter på den (gänget
-// sjunger, rum-3d.js) och den spelar en webbradiokanal med italiensk disco (ljud).
+// Radion: ett klick på kassettradion på fönsterbänken går fram till den (radio, sak i rum.js).
+// Band, skala och ljud står i rum-radio.js.
 //
 //   RumFolk.mount(el, { fig, inr, now, nara, fokus, teckna, lappKlick, visa, ta })  när gänget har laddats
 //   RumFolk.on(true | false)                           rummet visas eller inte
 //   RumFolk.ute(v)                                     klockan (Vader.nu())
 //   RumFolk.fyll(old, seen)                            de färdiga kupongerna och omgångarna
-//   RumFolk.natt()                                     är det natt?
+//   RumFolk.natt()                                     är det natt (lysröret mer än halvvägs släckt)?
+//   RumFolk.nattGrad()                                 hur släckt lysröret är (0 tänt – 1 släckt)
+//   RumFolk.somn()                                     sover gänget (22.30–07)?
 //   RumFolk.senast()                                   hur den senaste kupongen gick (ansiktena)
 //   RumFolk.ansikte(betyg, n, fel)                     ansiktena efter en färdig kupong
 //
-// För bilder: ?rum-natt (=0 dag), ?rum-efter=bra|illa (=inget),
+// För bilder: ?rum-natt (=0 dag, =0.5 halvvägs; gänget sover då också), ?rum-somn (=0 vakna)
+// gänget sover (utan att lysröret släcks), ?rum-vakna=dl:ryck:3 (DL vaknade med
+// ett ryck för tre sekunder sedan; strack, bakis), ?rum-efter=bra|illa (=inget),
 // ?rum-ansikte=jublar|glad|nojd|sur|deppig|orolig (=inget),
 // ?rum-pekar=dt:tv,dl:dj (som om de pekade), ?rum-hej=dl (som om man
 // pekade på DL), ?rum-vald=dl (som om man just hade blivit DL; dl:3 tre
@@ -69,16 +77,17 @@ window.RumFolk = (() => {
   const GANG = ['dl', 'dt', 'dj'];
   // Sakerna man kan peka på, med samma namn som det man har framme (fokus i
   // rum.js: kupong, tv, video, anslag, register och närbilderna ur, skar,
-  // ram, pokal, kork, vm94, ifk, nacional, lopsedel, chelsea, dorr och kupong).
+  // ram, pokal, kork, vm94, ifk, nacional, lopsedel, chelsea, dorr och kupong, och Tipsguiden på pulten).
   const SAKER = {
     tv: '#rum-tv', video: '.vhs-hit', anslag: '#rum-ans', register: '#rum-reg', kupong: '#rum-kupong', tag: '#rum-tag',
     hogen: '.rum-bak', ur: '.rum-ur', skar: '.rum-skar', ram: '.rum-ram',
     pokal: '.rum-pokal', kork: '.rum-kork', vm94: '#rum-vm94', ifk: '#rum-ifk', nacional: '#rum-nacional', lopsedel: '#rum-lopsedel', chelsea: '#rum-chelsea', dorr: '#rum-dorrnamn',
+    tipsguiden: '#rum-tipsguiden',
   };
   const F = {
     el: null, o: null, on: false, ws: null, timer: 0, ping: 0, retry: 0, loop: 0,
     over: null, pa: null, mot: undefined, sent: undefined, sentAt: 0, sendT: 0, inne: {},
-    natt: null, efter: undefined, pek: null, typ: 'mouse', hejAt: -1, rorAt: 0, vem: null,
+    natt: null, grad: null, somn: null, efter: undefined, pek: null, typ: 'mouse', hejAt: -1, rorAt: 0, vem: null,
   };
   const fig = () => (F.o && F.o.fig()) || null;
 
@@ -240,7 +249,7 @@ window.RumFolk = (() => {
   // Vem i gänget syns under punkten (x, y) i fönstret?
   function vemUnder(x, y, mal = null) {
     const f = fig();
-    // (guldordet och det som ligger på pulten är framför gängets ben, som står bakom pulten)
+    // (pingklockan och det som ligger på pulten är framför gängets ben, som står bakom pulten)
     if (mal && mal.closest && mal.closest('.rum-tag, #rum-kupong')) return null;
     const c = F.el && F.el.querySelector('#rum-3d');
     if (!f || !f.under || !c || F.o.nara()) return null;
@@ -262,7 +271,7 @@ window.RumFolk = (() => {
     if (!p || !(p.byt || []).includes(g.id) || !Samtal.pult.vem(g.id)) return null;
     const f = fig();
     if (f && f.vald) f.vald(k, F.o.now());
-    // kupongen på pulten, namnet, stämpeln och guldordet efter vem du är
+    // kupongen på pulten, namnet, stämpeln och pingklockan efter vem du är
     const ms = window.Rum && Rum.skriv ? Rum.skriv() : 0;
     vemKoll();
     egen();
@@ -312,11 +321,9 @@ window.RumFolk = (() => {
       if (ms - F.rorAt < 60) return;
       F.rorAt = ms;
       const k = vemUnder(e.clientX, e.clientY, e.target);
-      // (radion på fönsterbänken som gänget: ingen hand, och ett klick sätter på den –
-      // kanalerna hämtas redan nu, så att klicket kan börja med den bästa)
-      if (k === 'radio') hamtaKanaler();
+      // (radion på fönsterbänken: handen sitter på #rum-radio, rum-radio.css)
       pa(k === 'radio' ? null : k);
-      markor(k ? e.target.closest('.rum-sak, .rum-tag') : null);
+      markor(k && k !== 'radio' ? e.target.closest('.rum-sak, .rum-tag') : null);
     });
     el.addEventListener('mouseleave', () => {
       F.over = null;
@@ -325,25 +332,21 @@ window.RumFolk = (() => {
     });
     // ett klick (eller tryck) på en figur: ett tecken, namnet på kupongen
     // (valj) och i telefonen ett hej en stund – och inget annat; på radion på
-    // fönsterbänken: på eller av
+    // fönsterbänken: kameran går fram till den
     el.addEventListener('click', (e) => {
       // (inte klicket efter ett drag, som rum.js redan har stoppat, och inte i
       // Hasses vy, som står framför gänget)
       if (e.defaultPrevented || e.target.closest('.rum-hasse-vy')) return;
-      const k = vemUnder(e.clientX, e.clientY, e.target);
+      // (radion: hela rutan runt den räknas, också där strålen går mellan handtaget och lådan)
+      const k = e.target.id === 'rum-radio' ? 'radio' : vemUnder(e.clientX, e.clientY, e.target);
       // (ett klick på något annat: kupongen tas inte i handen)
       clearTimeout(F.taT);
       if (!k) return;
       e.preventDefault();
       e.stopPropagation();
-      // radion på fönsterbänken: på eller av (och då sjunger gänget, rum-3d.js, och den spelar, ljud)
+      // radion på fönsterbänken: kameran går fram till den (rum-radio.js)
       if (k === 'radio') {
-        const f = fig();
-        if (f && f.radio) {
-          const pa = !f.radioPa();
-          f.radio(pa, F.o.now());
-          ljud(pa);
-        }
+        if (F.o.radio) F.o.radio();
         return;
       }
       // (skylten ner på bordet eller upp igen, och inget annat)
@@ -363,117 +366,56 @@ window.RumFolk = (() => {
     }, true);
   }
 
-  // ---------- radions ljud ----------
-  // Bergsprängaren spelar en riktig webbradiokanal med italiensk disco. Kanalerna
-  // hämtas när musen går över radion eller den sätts på, ur den fria katalogen
-  // radio-browser (taggen "italo disco", de mest lyssnade först, bara de som sänder
-  // mp3 eller aac över https och fungerade vid katalogens senaste kontroll), och
-  // sist laut.fm:s Italo Disco (RESERV). Ljudet måste sättas igång i själva klicket
-  // (Safari, och Chrome innan man har klickat på sidan): hinner listan inte komma
-  // börjar den med RESERV. Går en kanal inte att spela – fel, slut eller inget ljud
-  // inom åtta sekunder – tas nästa, och nästa gång börjar den på kanalen som spelade
-  // sist. Går ingen att spela är radion tyst, men gänget sjunger ändå. Den stängs av
-  // när man lämnar rummet (on).
-  const RADIO_API = ['https://all.api.radio-browser.info', 'https://de1.api.radio-browser.info'];
-  const RADIO_RESERV = ['https://stream.laut.fm/italo-disco'];
-  const RADIO_VOLYM = 0.5;
-  const L = { el: null, pa: false, lista: RADIO_RESERV.slice(), i: 0, hamtad: null, vakt: null, borjat: false };
-  function hamtaKanaler() {
-    if (!L.hamtad) {
-      L.hamtad = (async () => {
-        for (const api of RADIO_API) {
-          try {
-            const r = await fetch(`${api}/json/stations/search?tag=italo%20disco&hidebroken=true&order=clickcount&reverse=true&limit=40`);
-            if (!r.ok) continue;
-            const ut = (await r.json())
-              .filter((x) => x.lastcheckok === 1 && /^https:\/\//.test(x.url_resolved || '') && /^(mp3|aac\+?)$/i.test(x.codec || ''))
-              .map((x) => x.url_resolved);
-            if (!ut.length) continue;
-            // (katalogens först, om radion inte redan har börjat på reserven)
-            if (L.borjat) for (const u of ut) { if (!L.lista.includes(u)) L.lista.push(u); }
-            else L.lista = [...new Set([...ut, ...RADIO_RESERV])];
-            return;
-          } catch (err) {
-            // (nästa server)
-          }
-        }
-      })();
-    }
-    return L.hamtad;
-  }
-  function spela(i) {
-    clearTimeout(L.vakt);
-    const a = L.el;
-    if (i >= L.lista.length) {
-      a.removeAttribute('src');
-      a.load();
-      return;
-    }
-    L.i = i;
-    L.borjat = true;
-    a.src = L.lista[i];
-    const p = a.play();
-    if (p && p.catch) p.catch(() => {});
-    L.vakt = setTimeout(nasta, 8000);
-  }
-  async function nasta() {
-    if (!L.pa) return;
-    await hamtaKanaler();
-    if (L.pa) spela(L.i + 1);
-  }
-  function ljud(pa) {
-    L.pa = Boolean(pa);
-    clearTimeout(L.vakt);
-    if (!L.pa) {
-      if (L.el) {
-        L.el.pause();
-        L.el.removeAttribute('src');
-        L.el.load();
-      }
-      return;
-    }
-    if (!L.el) {
-      L.el = new Audio();
-      L.el.volume = RADIO_VOLYM;
-      L.el.addEventListener('playing', () => clearTimeout(L.vakt));
-      for (const h of ['error', 'ended']) L.el.addEventListener(h, () => { if (L.pa && L.el.getAttribute('src')) nasta(); });
-    }
-    hamtaKanaler();
-    spela(L.i < L.lista.length ? L.i : 0);
-  }
-
   // ---------- natten ----------
 
-  function arNatt(v) {
+  // hur släckt lysröret är: dämpas från 23 till midnatt, släckt till sex och tänds till sju
+  function nattGrad(v) {
+    if (q.has('rum-natt')) {
+      const x = parseFloat(q.get('rum-natt'));
+      return Number.isFinite(x) ? Math.max(0, Math.min(1, x)) : 1;
+    }
+    if (!v) return 0;
+    const m = v.timme * 60 + (v.minut || 0);
+    if (m >= 23 * 60) return (m - 23 * 60) / 60;
+    if (m < 6 * 60) return 1;
+    if (m < 7 * 60) return 1 - (m - 6 * 60) / 60;
+    return 0;
+  }
+  // gänget sover från 22.30 till sju
+  function arSomn(v) {
+    if (q.has('rum-somn')) return q.get('rum-somn') !== '0';
     if (q.has('rum-natt')) return q.get('rum-natt') !== '0';
-    return Boolean(v && v.timme < 6);
+    return Boolean(v && (v.timme < 7 || v.timme * 60 + (v.minut || 0) >= 22 * 60 + 30));
   }
   function ute(v) {
-    const on = arNatt(v);
-    if (on === F.natt) return;
-    const forr = F.natt;
-    F.natt = on;
+    const s = arSomn(v);
+    if (s !== F.somn) {
+      F.somn = s;
+      somnTill();
+    }
+    const g = Math.round(nattGrad(v) * 1000) / 1000;
+    if (g === F.grad) return;
+    F.grad = g;
+    F.natt = g >= 0.5;
     const el = F.el || document.getElementById('rum-section');
     if (el) {
-      el.classList.toggle('natt', on);
-      // på morgonen blinkar lysröret igång (.rum-mork.tands i rum.css)
+      el.classList.toggle('natt', g > 0);
+      // (mörkrets styrka på mörkret självt, inte på hela rummet: en variabel ärvs av allt i det)
       const m = el.querySelector('#rum-mork');
-      if (forr && !on && m && !matchMedia('(prefers-reduced-motion: reduce)').matches) {
-        m.classList.add('tands');
-        m.addEventListener('animationend', function slut(e) {
-          if (e.animationName !== 'rum-tands') return;
-          m.classList.remove('tands');
-          m.removeEventListener('animationend', slut);
-        });
-      }
+      if (m) m.style.setProperty('--natt-grad', String(g));
     }
     nattTill();
   }
   function nattTill() {
+    if (F.grad == null) return;
     const f = fig();
-    if (f && f.natt) f.natt(F.natt, F.o.now());
+    if (f && f.natt) f.natt(F.grad, F.o.now());
     const inr = F.o && F.o.inr();
-    if (inr && inr.natt) inr.natt(F.natt);
+    if (inr && inr.natt) inr.natt(F.grad);
+  }
+  function somnTill() {
+    const f = fig();
+    if (f && f.somn && F.somn != null) f.somn(F.somn, F.o.now());
   }
 
   // ---------- dagen efter ----------
@@ -562,6 +504,16 @@ window.RumFolk = (() => {
       }
     }
     nattTill();
+    // (sömnen redan nu efter klockan, också innan vädret är hämtat)
+    if (F.somn == null) F.somn = arSomn(window.Vader ? Vader.nu() : null);
+    somnTill();
+    // ?rum-vakna=dl:ryck:3 (efter sömnen, så att hen sov)
+    if (f && f.vakna && q.has('rum-vakna')) {
+      for (const x of q.get('rum-vakna').toLowerCase().split(',')) {
+        const [k, satt, sek] = x.split(':');
+        if (GANG.includes(k)) f.vakna(k, o.now() - (parseFloat(sek) || 0), satt);
+      }
+    }
     andra();
     on(F.on || !el.hidden);
   }
@@ -571,9 +523,7 @@ window.RumFolk = (() => {
     if (!F.on || !F.o) {
       kopplaNer();
       // (radion stängs av när man lämnar rummet)
-      const f = fig();
-      if (L.pa && f && f.radio) f.radio(false, F.o ? F.o.now() : 0);
-      ljud(false);
+      if (window.RumRadio) RumRadio.av();
       return;
     }
     koppla();
@@ -585,5 +535,5 @@ window.RumFolk = (() => {
     }, 250);
   }
 
-  return { mount, on, ute, fyll, natt: () => Boolean(F.natt), senast: () => (F.senast !== undefined ? F.senast : senastAv(null)), ansikte: ansikteAv };
+  return { mount, on, ute, fyll, natt: () => Boolean(F.natt), nattGrad: () => F.grad || 0, somn: () => Boolean(F.somn), senast: () => (F.senast !== undefined ? F.senast : senastAv(null)), ansikte: ansikteAv };
 })();

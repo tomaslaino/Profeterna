@@ -54,7 +54,6 @@
 .k-botten { left: 40px; top: 172px; width: 212px; height: 22px; transform: translateZ(-105px) rotateX(-90deg); background: linear-gradient(rgba(0, 0, 0, 0.45), rgba(0, 0, 0, 0.45)), repeating-linear-gradient(90deg, rgba(0, 0, 0, 0) 0 9px, rgba(0, 0, 0, 0.6) 9px 11px), linear-gradient(180deg, #2e2f32, #1b1c1e); }
 .k-vanster { left: 40px; top: 24px; width: 22px; height: 148px; transform: translateZ(-105px) rotateY(90deg); background: linear-gradient(rgba(0, 0, 0, 0.25), rgba(0, 0, 0, 0.25)), repeating-linear-gradient(90deg, rgba(0, 0, 0, 0) 0 9px, rgba(0, 0, 0, 0.6) 9px 11px), linear-gradient(180deg, #2e2f32, #1b1c1e); }
 .k-hoger { left: 252px; top: 24px; width: 22px; height: 148px; transform: translateZ(-105px) rotateY(90deg); }
-.k-bak { left: 40px; top: 24px; width: 212px; height: 148px; transform: translateZ(-127px); }
 
 /* hyllan som tv:n står på: svartlackerat stål med en låg kant runt om */
 .tv-hylla { position: absolute; transform-origin: 0 0; background: linear-gradient(180deg, #2b2a28, #121110); }
@@ -216,6 +215,7 @@
   animation: tv-rull 9s linear infinite;
 }
 @keyframes tv-rull { to { transform: translateY(420%); } }
+.rum.enkel .tv-glas::after { animation: none; }
 /* I telefonen rullar det inte: bandet blev ett eget lager, och det som
    ligger över det i tv:n blev egna lager bara när tv:n syntes – Safari
    byggde om dem varje gång tv:n kom in i eller gick ut ur bild när man drog

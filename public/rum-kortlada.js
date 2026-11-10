@@ -57,7 +57,7 @@ export async function kortlada(o) {
   const THREE = await import('three');
   const { RoomEnvironment } = await import('three/addons/environments/RoomEnvironment.js');
   const { RoundedBoxGeometry: RB } = await import('three/addons/geometries/RoundedBoxGeometry.js');
-  await document.fonts.load('40px "Special Elite"').catch(() => null);
+  await document.fonts.load('40px "Skrivmaskin"').catch(() => null);
 
   // i telefonen färre bildpunkter, ingen kantutjämning och mindre skuggkartor,
   // så att minnet räcker
@@ -175,10 +175,10 @@ export async function kortlada(o) {
       c.fillStyle = 'rgba(120,90,40,.12)';
       c.fillRect(0, 0, w, 10);
       let px = 56;
-      c.font = `${px}px "Special Elite", "Courier New", monospace`;
+      c.font = `${px}px "Skrivmaskin", "Courier New", monospace`;
       while (c.measureText(ETIKETT).width > w * 0.86 && px > 20) {
         px -= 1;
-        c.font = `${px}px "Special Elite", "Courier New", monospace`;
+        c.font = `${px}px "Skrivmaskin", "Courier New", monospace`;
       }
       c.fillStyle = '#2b2419';
       c.textAlign = 'center';
@@ -244,10 +244,10 @@ export async function kortlada(o) {
     return tex(w, h, (c) => {
       if (bg) { c.fillStyle = bg; c.fillRect(0, 0, w, h); }
       let px = h * 0.62;
-      c.font = `${px}px "Special Elite", "Courier New", monospace`;
+      c.font = `${px}px "Skrivmaskin", "Courier New", monospace`;
       while (c.measureText(text).width > w * 0.9 && px > 10) {
         px -= 1;
-        c.font = `${px}px "Special Elite", "Courier New", monospace`;
+        c.font = `${px}px "Skrivmaskin", "Courier New", monospace`;
       }
       c.fillStyle = ink;
       c.textAlign = 'center';

@@ -15,22 +15,6 @@
    - sidan delas i tredjedelar (1 X 2) eller halvor (hemma och borta, .rl-halvor). */
 
 .rum-blad {
-  --pp-paper: #f1e8d5;
-  --pp-ink: #2a231d;
-  --pp-ink-soft: rgba(42, 35, 29, 0.66);
-  --pp-box: #fbf7ec;
-  --pp-rule: #9a876a;
-  --pp-faint: #a08f74;
-  --pp-line: rgba(90, 70, 40, 0.22);
-  --pp-dots: rgba(90, 70, 40, 0.4);
-  --pp-ok: #17824a;
-  --pp-no: #cf2a20;
-  --pp-pen: #2146a6;
-  --pp-hand: "Caveat", "Bradley Hand", "Segoe Print", cursive;
-  --pp-print: #a9452b;
-  --pp-print-line: rgba(169, 69, 43, 0.28);
-  --pp-print-tint: rgba(169, 69, 43, 0.055);
-  --pp-pencil: #6f6c69;
   --o-home: #2f6fd6;
   --o-draw: #8f826e;
   --o-away: #d0642c;
@@ -61,21 +45,20 @@
   display: flex;
   flex-direction: column;
   padding: 0 22px 12px 46px;
-  background: linear-gradient(180deg, #f5ecd8, #e9ddc3);
-  color: #2b241b;
+  background: var(--pp-grain), var(--pp-kant), linear-gradient(180deg, #f5ecd8, #e9ddc3);
+  color: var(--pp-ink);
   box-shadow: 0 1px 2px rgba(0, 0, 0, 0.35), 0 18px 34px rgba(0, 0, 0, 0.5);
   transform: translate(5px, 7px) rotate(-1.1deg);
   outline: none;
   cursor: default;
-  font-family: var(--sans);
   text-align: left;
   text-shadow: none;
   line-height: normal;
 }
 /* bandet som på kupongen (rum.css), också när bladet inte ligger på en kupong */
-.rum-blad .band { flex: none; display: flex; justify-content: space-between; align-items: center; height: 46px; margin: 0 -22px 0 -46px; padding: 0 22px 0 46px; background: #c8643a; color: #f6ecd9; }
-.rum-blad .band small { font-size: 11px; letter-spacing: 0.3em; font-weight: 700; }
-.rum-blad .band b { margin-left: auto; font-family: var(--display); font-size: 24px; font-weight: 800; letter-spacing: -0.01em; }
+.rum-blad .band { flex: none; display: flex; justify-content: space-between; align-items: center; height: 46px; margin: 0 -22px 0 -46px; padding: 0 22px 0 46px; background: var(--pp-grain), #c8643a; color: #f6ecd9; box-shadow: 0 2px 0 #f1e8d5, 0 3.5px 0 #c8643a; }
+.rum-blad .band small { font-family: var(--tryck); font-size: 11px; letter-spacing: 0.3em; font-weight: 700; }
+.rum-blad .band b { margin-left: auto; font-family: var(--tryck); font-size: 24px; font-weight: 800; letter-spacing: -0.01em; }
 /* tillbaka: det runda krysset, som matchbladet på resten av sajten (.mr-close) */
 .rl-stang { flex: none; position: relative; display: grid; place-items: center; width: 26px; height: 26px; margin: 0 0 0 14px; padding: 0; border: 1.4px solid rgba(246, 236, 217, 0.75); border-radius: 50%; background: none; color: #f6ecd9; cursor: pointer; -webkit-tap-highlight-color: transparent; transition: background-color 0.12s; }
 .rl-stang::before { content: ""; position: absolute; inset: -9px; }
@@ -89,7 +72,7 @@
 .rl-topp { flex: none; display: grid; grid-template-columns: minmax(0, 1fr) auto minmax(0, 1fr); align-items: center; gap: 12px; height: 42px; }
 .rl-t { display: flex; align-items: center; gap: 8px; min-width: 0; }
 .rl-t.a { justify-content: flex-end; }
-.rl-t b { min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; font: 650 20px/1.1 var(--display); letter-spacing: -0.01em; }
+.rl-t b { min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; font: 400 19px/1.1 var(--display); }
 .rum-blad .kort { display: none; }
 .rl-t .skold { width: 26px; height: 26px; }
 .rl-nar { display: grid; justify-items: center; white-space: nowrap; }
@@ -98,7 +81,7 @@
 
 /* flikarna: bladets sidor, tryckta ord på en linje och den valda med terrakotta under */
 .rb-flikar { flex: none; display: flex; justify-content: space-between; height: 26px; border-bottom: 1.5px solid var(--pp-print); }
-.rb-flikar button { position: relative; flex: none; margin: 0; padding: 0; border: 0; background: none; color: var(--pp-faint); font: 700 10px/26px Fraunces, Georgia, serif; letter-spacing: 0.15em; text-transform: uppercase; white-space: nowrap; cursor: pointer; -webkit-tap-highlight-color: transparent; transition: color 0.12s; }
+.rb-flikar button { position: relative; flex: none; margin: 0; padding: 0; border: 0; background: none; color: var(--pp-print); font: 700 10px/26px var(--tryck); letter-spacing: 0.15em; text-transform: uppercase; white-space: nowrap; cursor: pointer; -webkit-tap-highlight-color: transparent; transition: color 0.12s; }
 .rb-flikar button:hover, .rb-flikar button[aria-selected="true"] { color: var(--pp-ink); }
 .rb-flikar button[aria-selected="true"]::after { content: ""; position: absolute; left: 0; right: 0.15em; bottom: -1.5px; height: 3px; background: var(--pp-print); }
 .rb-flikar button:focus-visible { outline: 2px solid #2146a6; outline-offset: 1px; }
@@ -114,7 +97,7 @@
 .rl-del + .rl-del { margin-top: 7px; padding-top: 6px; border-top: 1px solid var(--pp-line); }
 /* rubriken i små spärrade versaler, som kupongens överst, och det den säger till höger */
 .rl-rubrad { display: flex; align-items: baseline; justify-content: space-between; gap: 12px; margin-bottom: 3px; }
-.rl-rub { display: block; flex: none; font-size: 10px; font-weight: 700; line-height: 13px; letter-spacing: 0.16em; text-transform: uppercase; color: var(--pp-print); }
+.rl-rub { display: block; flex: none; font-family: var(--tryck); font-size: 10px; font-weight: 700; line-height: 13px; letter-spacing: 0.16em; text-transform: uppercase; color: var(--pp-print); }
 .rl-hoger { min-width: 0; overflow: hidden; font-size: 11px; line-height: 13px; color: var(--pp-ink-soft); text-overflow: ellipsis; white-space: nowrap; font-variant-numeric: tabular-nums; }
 .rl-hoger b { font-weight: 650; color: var(--pp-ink); }
 .rl-hoger .rl-prick { margin-right: 5px; vertical-align: 0; }
@@ -126,7 +109,7 @@
 /* tal mot tal runt ett ord i mitten */
 .rl-spegel { display: grid; grid-template-columns: minmax(0, 1fr) 44px minmax(0, 1fr); align-items: baseline; }
 .rl-spegel .h { text-align: right; }
-.rl-spegel .mid { text-align: center; font-size: 10px; font-weight: 700; letter-spacing: 0.16em; text-transform: uppercase; color: var(--pp-faint); }
+.rl-spegel .mid { text-align: center; font-family: var(--tryck); font-size: 10px; font-weight: 700; letter-spacing: 0.16em; text-transform: uppercase; color: var(--pp-faint); }
 .rl-spegel .h, .rl-spegel .a, .rl-tal { font: 600 17px/1.2 var(--display); font-variant-numeric: tabular-nums; }
 .rl-tal { display: block; }
 /* laget: pricken och namnet */
@@ -135,8 +118,8 @@
 /* 1 X 2: kupongens tre rutor med oddset stort, chansen i stapeln under */
 .rb-rutor { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 12px; }
 .rb-ruta { display: flex; align-items: baseline; justify-content: center; gap: 8px; min-width: 0; padding: 3px 4px 2px; background: var(--pp-box); border: 1.5px solid var(--pp-print); border-radius: 3px; }
-.rb-ruta i { font: 700 12px/1 var(--display); font-style: normal; color: var(--pp-print); }
-.rb-ruta b { font: 700 23px/1.1 var(--display); color: var(--pp-ink); font-variant-numeric: tabular-nums; }
+.rb-ruta i { font: 700 12px/1 var(--tryck); font-style: normal; color: var(--pp-print); }
+.rb-ruta b { font: 400 22px/1.1 var(--display); color: var(--pp-ink); font-variant-numeric: tabular-nums; }
 .rum-blad .tug-stack { height: 13px; margin-top: 4px; border-radius: 2px; }
 .rum-blad .tug-stack span { overflow: hidden; font: 600 9px/13px var(--sans); color: #fff; text-align: center; font-variant-numeric: tabular-nums; }
 
@@ -145,7 +128,7 @@
 /* formen: tio kolumner, nyast till vänster, hemma uppe och borta nere */
 .rl-banor { display: grid; grid-template-columns: 50px repeat(10, minmax(0, 1fr)); grid-template-rows: 33px 33px; column-gap: 5px; align-items: start; }
 .rl-lag + .rl-lag { margin-top: 4px; }
-.rl-bana { grid-column: 1; align-self: start; height: 22px; font-size: 9px; line-height: 22px; font-weight: 700; letter-spacing: 0.14em; text-transform: uppercase; color: var(--pp-faint); }
+.rl-bana { grid-column: 1; align-self: start; height: 22px; font-family: var(--tryck); font-size: 9px; line-height: 22px; font-weight: 700; letter-spacing: 0.14em; text-transform: uppercase; color: var(--pp-faint); }
 .rl-m { display: flex; flex-direction: column; align-items: center; gap: 1px; min-width: 0; }
 /* formens stämplade rutor (matchblad.css): grön vinst, grå oavgjort, röd förlust */
 .rl-m b, .rb-mote b {
@@ -248,7 +231,7 @@
 /* (lagets namn över listorna när elvorna inte har några platser på planen: pricken som på bladets övriga sidor) */
 .rum-blad .mr-team h4::before { content: ""; display: inline-block; width: 8px; height: 8px; margin-right: 6px; border-radius: 50%; background: var(--o-home); }
 .rum-blad .mr-team.a h4::before { background: var(--o-away); }
-.rum-blad .mr-team h5 { margin: 7px 0 2px; font-size: 10px; font-weight: 700; line-height: 13px; letter-spacing: 0.16em; text-transform: uppercase; color: var(--pp-print); }
+.rum-blad .mr-team h5 { margin: 7px 0 2px; font-family: var(--tryck); font-size: 10px; font-weight: 700; line-height: 13px; letter-spacing: 0.16em; text-transform: uppercase; color: var(--pp-print); }
 .rum-blad .mr-names li, .rum-blad .mr-out li { padding: 0; font-size: 12px; line-height: 16px; }
 .rum-blad .mr-out li .muted { font-size: 11px; }
 .rum-blad .mr-nr { width: 1.7em; font-size: 11px; }
@@ -256,7 +239,7 @@
 .rum-blad .mr-flod { margin: 0; font-size: 12px; line-height: 16px; color: var(--pp-ink-soft); }
 .rum-blad .mr-flod .mr-card { color: inherit; }
 .rum-blad .mr-coach { margin: 7px 0 0; font-size: 12px; line-height: 16px; }
-.rum-blad .mr-coach span, .rb-domare span { margin-right: 6px; font-size: 10px; font-weight: 700; letter-spacing: 0.16em; text-transform: uppercase; color: var(--pp-print); }
+.rum-blad .mr-coach span, .rb-domare span { margin-right: 6px; font-family: var(--tryck); font-size: 10px; font-weight: 700; letter-spacing: 0.16em; text-transform: uppercase; color: var(--pp-print); }
 .rum-blad .mr-wait, .rum-blad .unknown, .rum-blad .muted { color: var(--pp-faint); }
 .rb-domare { flex: none; margin: 8px 0 0; padding: 6px 0 0; border-top: 1px solid var(--pp-line); font-size: 12px; line-height: 16px; }
 
@@ -265,7 +248,7 @@
 /* rubriken är tabellens huvud; raderna går lite utanför texten, så att texten står där allt annat står */
 .rb-tabell { flex: none; width: calc(100% + 6px); margin: 0 -3px; border-collapse: collapse; font-size: 12.5px; font-variant-numeric: tabular-nums; }
 .rb-tabell + .rb-tabell { margin-top: 12px; }
-.rb-tabell th { padding: 0 5px 4px; border-bottom: 1px solid var(--pp-line); font-size: 10px; font-weight: 700; line-height: 13px; letter-spacing: 0.12em; text-transform: uppercase; color: var(--pp-print); text-align: right; }
+.rb-tabell th { padding: 0 5px 4px; border-bottom: 1px solid var(--pp-line); font-family: var(--tryck); font-size: 10px; font-weight: 700; line-height: 13px; letter-spacing: 0.12em; text-transform: uppercase; color: var(--pp-print); text-align: right; }
 .rb-tabell td { padding: 3.5px 5px; border-bottom: 1px solid rgba(42, 35, 29, 0.08); text-align: right; white-space: nowrap; }
 .rb-tabell td:first-child { padding-left: 3px; }
 .rb-tabell td:nth-child(2) { padding-left: 2px; }
@@ -290,7 +273,7 @@
 .rb-mote > span { display: flex; align-items: center; gap: 6px; min-width: 0; white-space: nowrap; }
 .rb-mote > span > span { min-width: 0; overflow: hidden; text-overflow: ellipsis; }
 .rb-mote .nar { font-size: 11px; color: var(--pp-ink-soft); }
-.rb-mote .tav { font-size: 10px; font-weight: 700; letter-spacing: 0.1em; color: var(--pp-faint); }
+.rb-mote .tav { font-family: var(--tryck); font-size: 10px; font-weight: 700; letter-spacing: 0.1em; color: var(--pp-faint); }
 .rb-mote .h { justify-content: flex-end; }
 .rb-mote b { height: 19px; line-height: 16px; }
 

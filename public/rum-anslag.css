@@ -1,4 +1,4 @@
-/* Special Elite ligger i typsnitt.css */
+/* Skrivmaskin ligger i typsnitt.css */
 
 /* Anslagstavlan i tobaksaffären (rum-anslag.js): juteväv i en ram av
    lackad ek, 1000 × 568 och 18 djup, på högra väggen under tv:n (förminskad
@@ -41,7 +41,7 @@
   height: 568px;
   transform-style: preserve-3d;
   color: #2b2419;
-  font-family: "Special Elite", "American Typewriter", "Courier New", monospace;
+  font-family: var(--skriv);
 }
 .ans-f, .ans-glans, .ans-hal, .ans-rest, .ans-blek, .ans-nal, .ans-stift, .ans-lapp .d { display: block; }
 .ans-lapp i, .ans-lapp em { font-style: normal; }
@@ -107,7 +107,7 @@
   background: none;
   text-align: left;
   color: #2b2419;
-  font: 11px/1.3 "Special Elite", "American Typewriter", "Courier New", monospace;
+  font: 11px/1.3 var(--skriv);
   appearance: none;
   -webkit-appearance: none;
   transform-origin: 50% 4%;
@@ -118,6 +118,8 @@
 .ans-ark { position: absolute; inset: 0; display: block; color: #2b2419; border-radius: 1px; transform-origin: 50% 9px; box-shadow: 1px 3px 4px rgba(0, 0, 0, 0.45), 0 0 1px rgba(0, 0, 0, 0.35); }
 /* bladen längre ner i bunten ligger i skuggan av dem ovanpå */
 .ans-ark::after { content: ""; position: absolute; inset: 0; pointer-events: none; border-radius: inherit; background: rgba(40, 26, 8, calc(var(--lag, 0) * 0.06)); }
+/* samma pappersstruktur som på resten av papperet */
+.ans-ark:not(.p-polaroid)::after { background: var(--pp-grain), rgba(40, 26, 8, calc(var(--lag, 0) * 0.06)); }
 .ans-in { position: absolute; inset: 0; display: block; padding: 14px 16px 10px; overflow: hidden; }
 
 /* Den vikta lappen (.vikt, rum-anslag.js): det som inte ryms är vikt bakom
@@ -342,7 +344,8 @@
 .ans-tavla.stor.hog .ans-botten { top: 1070px; width: 598px; }
 .ans-tavla.stor.hog .ans-vanster { height: 1070px; }
 .ans-tavla.stor.hog .ans-hoger { left: 598px; height: 1070px; }
-@media (max-width: 700px), (max-height: 500px) { .ans-tavla.stor.hog .ans-glans { width: 150px; height: 268px; } }
+/* (i telefonen utan glans i närbilden: den ritades i över dubbel storlek och tog 7 MB av ritminnet) */
+@media (max-width: 700px), (max-height: 500px) { .ans-tavla.stor .ans-glans { display: none; } }
 .ans-luta { position: absolute; inset: 0; transform-style: preserve-3d; transform: rotateX(0deg) rotateY(0deg); transition: transform 0.4s ease-out; }
 .ans-tavla.stor .ans-yta { box-shadow: 0 34px 70px rgba(0, 0, 0, 0.6), inset 0 1.5px 0 rgba(255, 230, 190, 0.35), inset 0 -2px 0 rgba(0, 0, 0, 0.45), inset 1.5px 0 0 rgba(255, 230, 190, 0.18), inset -2px 0 0 rgba(0, 0, 0, 0.35); }
 .ans-tavla.stor:focus { outline: none; }
@@ -374,61 +377,8 @@
 /* (i telefonen bryts raden hellre än att gå utanför fönstret) */
 .ans-rad { flex-wrap: wrap; row-gap: 10px; padding: 0 16px; }
 
-/* Hasse svarar (rum-anslag.js): det man ropar till honom står under lappen, och han lutar sig
-   in från baren nere till vänster (.ans-hasse-fig, kostymfotot) och svarar i en mörk pratbubbla
-   med guldkant vars spets (.ans-svans) pekar mot hans mun. Orden syns när han har sagt dem och
-   det han redan har sagt är lite dämpat, som hans tal i baren (rum-hasse.css: .rh-rep, .rh-o).
-   Bakom mörknar det lite från vänster, och helt när bubblan ligger över lappen. */
-.ans-ropa { border: 0; padding: 0; background: none; cursor: pointer; font: italic 17px Fraunces, Georgia, serif; color: #e9cf8e; text-decoration: underline dotted; text-underline-offset: 4px; text-decoration-thickness: 1px; text-shadow: 0 1px 8px #000; }
-.ans-ropa:hover { color: #fbe8b8; }
-.ans-ropa:empty { display: none; }
-.ans-hasse-mork { position: absolute; left: 0; top: 0; bottom: 0; width: 0; opacity: 0; pointer-events: none; background: linear-gradient(to right, rgba(14, 8, 4, 0.5) calc(100% - 90px), rgba(14, 8, 4, 0)); transition: opacity 0.3s ease; }
-.ans-hasse-mork.over { right: 0; width: auto; background: rgba(14, 8, 4, 0.86); }
-.rum-ansn.hasse .ans-hasse-mork { opacity: 1; }
-/* läge, storlek och utsnitt sätts i hkPlats */
-.ans-hasse-fig {
-  position: absolute;
-  visibility: hidden;
-  pointer-events: none;
-  background: url(rum/hasse-atlas.webp) no-repeat;
-  transform-origin: 0 100%;
-  /* i rummets dova ljus, och med en skugga mot tavlan */
-  filter: drop-shadow(0 10px 22px rgba(0, 0, 0, 0.7)) brightness(0.92) sepia(0.15);
-}
-.ans-svans { position: absolute; left: 0; top: 0; width: 100%; height: 100%; overflow: visible; visibility: hidden; pointer-events: none; }
-.ans-svans .f { fill: rgb(24, 16, 10); }
-.ans-svans .k { fill: none; stroke: rgba(233, 207, 142, 0.75); stroke-width: 1.5; stroke-linejoin: round; }
-.ans-hasse-fig.on, .ans-svans.on { visibility: visible; }
-.ans-hasse {
-  position: absolute;
-  left: 0;
-  top: 0;
-  width: 400px;
-  max-width: calc(100% - 32px);
-  box-sizing: border-box;
-  padding: 18px 22px 6px 24px;
-  overflow-y: auto;
-  overscroll-behavior: contain;
-  touch-action: pan-y;
-  visibility: hidden;
-  pointer-events: none;
-  color: #f6efdc;
-  background: rgba(24, 16, 10, 0.94);
-  border: 1.5px solid rgba(233, 207, 142, 0.75);
-  border-radius: 24px;
-  box-shadow: 0 14px 34px rgba(0, 0, 0, 0.55);
-  font: 400 clamp(15.5px, 1.22vw, 18px)/1.42 Fraunces, Georgia, serif;
-  text-align: left;
-  text-shadow: 0 1px 2px rgba(0, 0, 0, 0.6);
-  cursor: default;
-}
-.ans-hasse.on { visibility: visible; pointer-events: auto; }
-.ans-hasse p { margin: 0 0 0.62em; }
-.ans-hasse .ans-o { visibility: hidden; }
-.ans-hasse.on .ans-o.s { visibility: visible; }
-.ans-rep { color: rgba(246, 239, 220, 0.66); }
-.ans-rep.nu, .ans-hasse.klar .ans-rep { color: #f6efdc; }
-
+/* Hasse svarar (rum-hasse-svar.js, rum-hasse-svar.css): det man ropar till honom står under lappen
+   (.hs-ropa), och han lutar sig in från baren nere till vänster och svarar. */
 @media (prefers-reduced-motion: reduce) {
-  .ans-bak, .ans-luta, .ans-vand, .ans-rad, .ans-lyft::before, .ans-tavla.stor .ans-lapp, .ans-hasse-mork { transition: none; }
+  .ans-bak, .ans-luta, .ans-vand, .ans-rad, .ans-lyft::before, .ans-tavla.stor .ans-lapp { transition: none; }
 }
