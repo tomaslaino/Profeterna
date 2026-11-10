@@ -1,14 +1,15 @@
 #!/usr/bin/env node
-// Supporterpoddarna och supporterforumen till tidningen inför omgången (config/poddar.js,
-// config/forum.js, src/analyser/poddar.mjs, src/analyser/forum.mjs). Körs på iMacen av launchd
-// (se.matchfixarna.poddar) varje natt: läser lagens forum, hittar poddarna för lagen i gängets
+// Supporterpoddarna, supporterforumen och de insatta medierna till tidningen inför omgången
+// (config/poddar.js, config/forum.js, config/media.js, src/analyser/poddar.mjs, forum.mjs och
+// media.mjs). Körs på iMacen av launchd (se.matchfixarna.poddar) varje natt: läser lagens forum,
+// letar upp och läser veckans artiklar i de insatta medierna, hittar poddarna för lagen i gängets
 // omgång, skriver ut veckans avsnitt med whisper.cpp och låter Claude Code (claude -p på
 // Claude-kontot) ta ut det mest intressanta inför matcherna.
 //
 // Allt sparas utanför repot, i ~/Library/Application Support/Matchfixarna/Tidning/:
 //   register.json   lagens poddar (namn och flöde), så att de bara letas upp en gång
 //   forum.json      lagens forum (namn och tavla), likaså
-//   omgang.json     omgångens avsnitt, forumläsningar och uppgifter; tidningen läser den (scripts/analyser/skriv.mjs)
+//   omgang.json     omgångens avsnitt, forumläsningar, artiklar och uppgifter; tidningen läser den (scripts/analyser/skriv.mjs)
 //   utskrifter/     utskrifterna, ett stycke per minut; tas bort efter tre veckor
 // Skriptet rör aldrig git. Ljudet tas bort så snart det är utskrivet.
 //
@@ -20,8 +21,10 @@
 //   node scripts/tidning/poddar.mjs --prov 401880745,401880747
 //                                                        en påhittad omgång av sajtens matcher (prov.json)
 //   node scripts/tidning/poddar.mjs --sidor              skriver bara om informationssidorna
-//   node scripts/tidning/poddar.mjs --bara-forum         bara forumen (inga poddar)
-//   node scripts/tidning/poddar.mjs --utan-forum         bara poddarna
+//   node scripts/tidning/poddar.mjs --bara-forum         bara forumen (inga poddar eller medier)
+//   node scripts/tidning/poddar.mjs --utan-forum         utan forumen
+//   node scripts/tidning/poddar.mjs --bara-media         bara de insatta medierna
+//   node scripts/tidning/poddar.mjs --utan-media         utan de insatta medierna
 
 import { execFileSync } from 'node:child_process';
 import crypto from 'node:crypto';
@@ -30,10 +33,12 @@ import os from 'node:os';
 import path from 'node:path';
 import pc from '../../config/poddar.js';
 import fc from '../../config/forum.js';
+import mc from '../../config/media.js';
 import kupongCfg from '../../config/kupong.js';
 import { betalvagar, inloggning, Stopp } from '../../src/analyser/claude.mjs';
 import { lasForum, taUtForum, lasningsNyckel, forumPost, provaForum, fragaEfterForum, forumSkaLetas, Sparrad } from '../../src/analyser/forum.mjs';
-import { appleKandidater, fragaEfterPoddar, levandePoddar, skaLetas, hamtaFlode, valjAvsnitt, skrivUt, taUt, whisperLedtrad, poddUnderlag, forumUnderlag, sidansUnderlag, sidNyckel, skrivSida } from '../../src/analyser/poddar.mjs';
+import { letaArtiklar, lasArtikel, nyaArtiklar, taUtMedia, mediaPoster, laggTill, Sparrad as MediaSparrad } from '../../src/analyser/media.mjs';
+import { appleKandidater, fragaEfterPoddar, levandePoddar, skaLetas, hamtaFlode, valjAvsnitt, skrivUt, taUt, whisperLedtrad, poddUnderlag, forumUnderlag, mediaUnderlag, sidansUnderlag, sidNyckel, skrivSida } from '../../src/analyser/poddar.mjs';
 
 const ARGV = process.argv.slice(2);
 const flagga = (n) => ARGV.includes(n);
@@ -47,6 +52,12 @@ const BARA_SIDOR = flagga('--sidor');
 const FIL_UT = varde('--fil');
 const BARA_FORUM = flagga('--bara-forum');
 const UTAN_FORUM = flagga('--utan-forum');
+const BARA_MEDIA = flagga('--bara-media');
+const UTAN_MEDIA = flagga('--utan-media');
+// Vad som körs: forumen, de insatta medierna och poddarna (informationssidorna skrivs alltid).
+const MED_FORUM = !UTAN_FORUM && !BARA_SIDOR && !BARA_MEDIA;
+const MED_MEDIA = !UTAN_MEDIA && !BARA_SIDOR && !BARA_FORUM;
+const MED_PODDAR = !BARA_SIDOR && !BARA_FORUM && !BARA_MEDIA;
 
 const HEM = os.homedir();
 const MAPP = process.env.PODDAR_MAPP || path.join(HEM, 'Library', 'Application Support', 'Matchfixarna', pc.mapp);
@@ -219,6 +230,41 @@ async function lasForumen(fil, reg, lagen) {
   return nya;
 }
 
+// Letar upp veckans artiklar om laget i de insatta medierna, läser dem och tar ut det intressanta.
+// En artikel som redan är läst med samma text läses inte av Claude igen. → antal nya uppgifter
+async function lasMedierna(fil, lagen) {
+  let nya = 0;
+  for (const l of lagen) {
+    if (TORRT) { logg(`skulle leta i de insatta medierna för ${l.lag}`); continue; }
+    const post = fil.lag[l.lag] || (fil.lag[l.lag] = { mot: l.mot, avsnitt: [] });
+    post.mot = l.mot;
+    try {
+      const hittade = await letaArtiklar({ lag: l.lag, mot: l.mot, avspark: l.avspark });
+      if (!hittade.length) { logg(`${l.lag}: inga artiklar i de insatta medierna`); continue; }
+      const lasta = [];
+      for (const a of hittade) {
+        try {
+          lasta.push(await lasArtikel(a));
+        } catch (err) {
+          logg(`${err instanceof MediaSparrad ? 'SPÄRRAT' : 'hoppar över'} ${l.lag}: ${a.kalla || a.adress} – ${err.message}`);
+        }
+      }
+      const nyaA = nyaArtiklar(lasta, post);
+      if (!nyaA.length) { logg(`${l.lag}: ${lasta.length ? 'inga nya artiklar sedan förra läsningen' : 'ingen av artiklarna gick att läsa'}`); continue; }
+      const u = await taUtMedia(nyaA, { lag: l.lag, mot: l.mot, avspark: l.avspark, spelare: l.spelare });
+      laggTill(post, mediaPoster(u.artiklar, u));
+      nya += u.uppgifter.length;
+      fil.uppdaterad = new Date().toISOString();
+      skrivJson(OMGANG, fil);
+      logg(`${l.lag}: ${u.artiklar.map((a) => a.kalla).join(', ')} – ${u.artiklar.length} artiklar: ${u.uppgifter.length} uppgifter${u.strukna ? `, ${u.strukna} strukna` : ''} (${u.sekunder} s)`);
+    } catch (err) {
+      if (err instanceof Stopp) throw err;
+      logg(`FEL ${l.lag}: de insatta medierna: ${err.message}`);
+    }
+  }
+  return nya;
+}
+
 function stada() {
   const ut = path.join(MAPP, 'utskrifter');
   if (!fs.existsSync(ut)) return;
@@ -233,20 +279,20 @@ function visa(fil) {
   for (const [lag, post] of Object.entries(fil.lag || {})) {
     console.log(`\n${lag}${post.mot ? ` (mot ${post.mot})` : ''}`);
     for (const a of post.avsnitt || []) {
-      console.log(`  ${a.typ === 'forum' ? 'forumet ' : ''}${a.podd}: "${a.titel}" (${a.datum.slice(0, 10)})${a.handlarOm ? `\n  – ${a.handlarOm}` : ''}`);
+      console.log(`  ${a.typ === 'forum' ? 'forumet ' : a.typ === 'media' ? 'insatta ' : ''}${a.podd}: "${a.titel}" (${String(a.datum).slice(0, 10)})${a.handlarOm ? `\n  – ${a.handlarOm}` : ''}`);
       for (const u of a.uppgifter || []) console.log(`    [${u.s} ${u.vikt}] ${u.t}${u.min != null ? ` (min ${u.min})` : ''}${u.vem ? ` – ${u.vem}` : ''}`);
       if (!(a.uppgifter || []).length) console.log('    (inget värt att ta med)');
     }
-    const t = [...poddUnderlag(fil, lag), ...forumUnderlag(fil, lag)];
+    const t = [...poddUnderlag(fil, lag), ...forumUnderlag(fil, lag), ...mediaUnderlag(fil, lag)];
     if (!t.length) console.log('  → inget till tidningen');
   }
   for (const s of Object.values(fil.sidor || {})) {
     console.log(`\n=== ${s.match}${s.redigerad ? '' : ' (oredigerad)'}\n${s.rubrik || '(ingen rubrik)'}\n${s.ingress || ''}`);
     for (const d of s.delar) {
-      console.log(`\n  ${d.lag}${d.kallor.length ? ` – ${d.kallor.map((k) => `${k.typ === 'forum' ? 'forumet ' : ''}${k.podd} (${k.datum})`).join(', ')}` : ' – ingen podd eller forum den här veckan'}`);
+      console.log(`\n  ${d.lag}${d.kallor.length ? ` – ${d.kallor.map((k) => `${k.typ === 'forum' ? 'forumet ' : k.typ === 'media' ? 'insatta ' : ''}${k.podd} (${k.datum})`).join(', ')}` : ' – ingen podd, inget forum och inget från de insatta den här veckan'}`);
       for (const g of d.grupper) {
         console.log(`   ${pc.amnen[g.amne]}`);
-        for (const p of g.punkter) console.log(`    [${p.s}${p.typ === 'forum' ? ' forum' : ''}] ${p.t}${p.citat ? `\n        ”${p.citat.sagt}” (${[p.citat.vem, p.citat.podd].filter(Boolean).join(', ')})` : ''}`);
+        for (const p of g.punkter) console.log(`    [${p.s}${p.typ && p.typ !== 'podd' ? ` ${p.typ}` : ''}] ${p.t}${p.citat ? `\n        ”${p.citat.sagt}” (${[p.citat.vem, p.citat.podd].filter(Boolean).join(', ')})` : ''}`);
       }
     }
   }
@@ -277,7 +323,7 @@ async function main() {
   const fel = betalvagar();
   if (fel.length) { logg(`STOPP: ${fel.join(', ')} är satt. Då skulle Claude Code kunna debiteras som API. Ta bort variabeln.`); process.exit(1); }
   if (!tagLas()) { logg('en körning pågår redan'); return; }
-  if (!BARA_FORUM && !BARA_SIDOR && !fs.existsSync(path.join(MAPP, pc.modell))) { logg(`STOPP: whisper-modellen saknas (${path.join(MAPP, pc.modell)})`); process.exit(1); }
+  if (MED_PODDAR && !fs.existsSync(path.join(MAPP, pc.modell))) { logg(`STOPP: whisper-modellen saknas (${path.join(MAPP, pc.modell)})`); process.exit(1); }
 
   let round = null;
   let lagen;
@@ -311,8 +357,8 @@ async function main() {
   const register = lasJson(REGISTER, {});
   const forumreg = lasJson(FORUMREG, {});
   try {
-    if (!UTAN_FORUM && !BARA_SIDOR) await fyllForum(forumreg, lagen.map((l) => l.lag));
-    if (!BARA_FORUM && !BARA_SIDOR) await fyllRegistret(register, lagen.map((l) => l.lag));
+    if (MED_FORUM) await fyllForum(forumreg, lagen.map((l) => l.lag));
+    if (MED_PODDAR) await fyllRegistret(register, lagen.map((l) => l.lag));
   } catch (err) {
     if (err instanceof Stopp) { logg(`STOPP (${err.slag}): ${err.message}`); process.exit(1); }
     throw err;
@@ -329,17 +375,17 @@ async function main() {
 
   let gjorda = 0;
   let nya = 0;
-  // Forumen först: de går fort (några sidor och ett anrop per lag), poddarna tar timmar.
+  // Forumen och medierna först: de går fort (några sidor och ett eller två anrop per lag), poddarna tar timmar.
   let nyaForum = 0;
-  if (!UTAN_FORUM && !BARA_SIDOR) {
-    try {
-      nyaForum = await lasForumen(fil, forumreg, lagen);
-    } catch (err) {
-      if (err instanceof Stopp) { logg(`STOPP (${err.slag}): ${err.message}`); process.exit(1); }
-      throw err;
-    }
+  let nyaMedia = 0;
+  try {
+    if (MED_FORUM) nyaForum = await lasForumen(fil, forumreg, lagen);
+    if (MED_MEDIA) nyaMedia = await lasMedierna(fil, lagen);
+  } catch (err) {
+    if (err instanceof Stopp) { logg(`STOPP (${err.slag}): ${err.message}`); process.exit(1); }
+    throw err;
   }
-  for (const l of BARA_SIDOR || BARA_FORUM ? [] : lagen) {
+  for (const l of MED_PODDAR ? lagen : []) {
     const poddar = (register[l.lag] && register[l.lag].poddar) || [];
     if (!poddar.length) continue;
     const post = fil.lag[l.lag] || (fil.lag[l.lag] = { mot: l.mot, avsnitt: [] });
@@ -388,7 +434,7 @@ async function main() {
     if (err instanceof Stopp) { logg(`STOPP (${err.slag}): ${err.message}`); process.exit(1); }
     throw err;
   }
-  if (!TORRT) logg(`klart: ${id}, ${gjorda} avsnitt, ${nya} nya uppgifter ur poddarna, ${nyaForum} ur forumen, ${sidor} sidor`);
+  if (!TORRT) logg(`klart: ${id}, ${gjorda} avsnitt, ${nya} nya uppgifter ur poddarna, ${nyaForum} ur forumen, ${nyaMedia} ur de insatta medierna, ${sidor} sidor`);
   if ((ETT_LAG || PROV) && !TORRT) visa(fil);
 }
 

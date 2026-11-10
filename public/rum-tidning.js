@@ -2,10 +2,10 @@
 
 // ---------- kvällstidningen ----------
 //
-// Veckans tidning – Sportbladet eller Expressen, samma som löpsedeln (rum-affischer.js) – ligger hopvikt på
-// pulten i tobaksaffären, och ett klick tar upp den och lägger fram den över rummet (tidningPult och
-// tidningen i rum.js). Överst ligger sedeln själv, förstorad, som tidningens framsida (på pulten syns dess övre
-// halva), och under den sidorna, en under en, med sidnummer,
+// Veckans tidning – Sportbladet eller Expressen, samma som löpsedeln (rum-affischer.js) – ligger på pulten i
+// tobaksaffären, och ett klick tar upp den och lägger fram den över rummet (tidningPult och tidningen i rum.js).
+// Överst ligger sedeln själv, förstorad, som tidningens framsida (på pulten syns den ner till rubrikens slut,
+// ovanför kupongerna i högen), och under den sidorna, en under en, med sidnummer,
 // tidningens namn och datumet i huvudet som i en riktig tidning. Vad som står i den beror på omgången:
 //
 //   inför omgången   Tipset (omgångens matcher med avsparken, datorns procent och Sixten Bråvalls tecken,
@@ -141,20 +141,24 @@
     },
     poddar: {
       slag: { b: 'Bekräftat', h: 'Hört i podden', o: 'Supportrarnas åsikt' },
-      // Slaget h är källans egen uppgift: poddens, forumets eller båda.
-      egen: { podd: 'Hört i podden', forum: 'Från forumet', blandat: 'Hört bland supportrarna' },
+      // Slaget h är källans egen uppgift: poddens, forumets, de insatta mediernas eller flera av dem.
+      egen: { podd: 'Hört i podden', forum: 'Från forumet', media: 'Enligt insatta', blandat: 'Hört bland supportrarna' },
       amnen: { trupp: 'Skador och trupp', elva: 'Väntad uppställning', spel: 'Så spelar laget', klubb: 'Tränaren och klubben', match: 'Inför matchen' },
       rubrik: (h, b) => `${h}–${b}: det supportrarna vet`,
       ur: (l) => `Ur ${l}`,
-      ingen: 'Ingen supporterpodd eller forum att hämta något ur den här veckan.',
+      ingen: 'Ingen supporterpodd, inget forum och inget från de insatta att hämta något ur den här veckan.',
       forumet: (n) => `forumet ${n}`,
       forklaring: {
-        b: 'podden eller forumet återger något som klubben, tränaren eller en spelare har sagt, eller något som har hänt.',
+        b: 'källan återger något som klubben, tränaren eller en spelare har sagt, eller något som har hänt.',
         podd: 'poddens egna uppgifter, intryck från läktaren och rykten.',
         forum: 'det supportrarna på forumet själva har sett och hört, och rykten.',
-        blandat: 'det podden och forumet båda tar upp: egna uppgifter och rykten.',
+        media: 'det skribenter som följer laget varje vecka – fansajter, fanzines, nyhetsbrev och oberoende lokala reportrar – själva har tagit reda på, och rykten.',
+        blandat: 'det flera av källorna tar upp: egna uppgifter och rykten.',
         o: 'vad de som följer laget varje vecka tycker och hoppas.',
       },
+      // Källans namn som det står på sidan: forumet med ordet forumet framför, poddens namn utan
+      // undertiteln och de insatta medierna med sitt eget namn.
+      kalla: (k) => (k.typ === 'forum' ? `forumet ${k.podd}` : k.typ === 'media' ? String(k.podd || '') : poddNamn(k.podd)),
       citaten: 'Citaten är översatta från engelska.',
     },
     omgangen: {
@@ -401,13 +405,14 @@
       const namn = m ? [m.h, m.b] : (x.lag || []);
       const delar = x.delar.map((d, i) => {
         const kallor0 = (d.kallor || []).filter((k) => k && k.podd);
-        // Forumet läses varje natt: det står en gång, med den senaste läsningens datum.
-        const kallor = kallor0.filter((k, i) => k.typ !== 'forum' || kallor0.findIndex((x) => x.typ === 'forum' && x.podd === k.podd) === i);
+        // Forumet läses varje natt: det står en gång, med den senaste läsningens datum. Två artiklar ur
+        // samma insatta medium står också en gång.
+        const kallor = kallor0.filter((k, i) => !['forum', 'media'].includes(k.typ) || kallor0.findIndex((x) => x.typ === k.typ && x.podd === k.podd) === i);
         const flera = new Set(kallor.map((k) => k.podd)).size > 1;
-        const ur = kallor.length ? T.ur(lista(kallor.map((k) => `${k.typ === 'forum' ? T.forumet(k.podd) : poddNamn(k.podd)}${kortDatum(k.datum) ? ` (${kortDatum(k.datum)})` : ''}`))) : '';
+        const ur = kallor.length ? T.ur(lista(kallor.map((k) => `${T.kalla(k)}${kortDatum(k.datum) ? ` (${kortDatum(k.datum)})` : ''}`))) : '';
         const grupper = (d.grupper || []).map((g) => `<div class="tn-pod-grupp"><h5>${esc(amne(g.amne))}</h5>${(g.punkter || []).filter((p) => p && p.t).map((p) => {
           const c = p.citat && p.citat.sagt ? p.citat : null;
-          const vem = c ? (c.vem ? `${c.vem}, ${poddNamn(c.podd)}` : poddNamn(c.podd)) : '';
+          const vem = c ? (c.vem ? `${c.vem}, ${T.kalla(c)}` : T.kalla(c)) : '';
           return `<div class="tn-pod-punkt">${stampel(p.s, p.typ)}${flera && (p.podd || []).length ? `<small>${esc(lista(p.podd.map(poddNamn)))}</small>` : ''}<p>${esc(hel(p.t))}</p>` +
             (c ? `<blockquote><p>”${esc(hel(c.sagt))}”</p>${vem ? `<cite>${esc(vem)}</cite>` : ''}</blockquote>` : '') + '</div>';
         }).join('')}</div>`).join('');
@@ -416,7 +421,7 @@
       const harCitat = x.delar.some((d) => (d.grupper || []).some((g) => (g.punkter || []).some((p) => p.citat)));
       // Förklaringen till stämplarna: en för varje slags egen uppgift som står på sidan.
       const typer = new Set(x.delar.flatMap((d) => (d.grupper || []).flatMap((g) => (g.punkter || []).filter((p) => p.s === 'h').map((p) => p.typ || 'podd'))));
-      const egna = ['podd', 'forum', 'blandat'].filter((t) => typer.has(t));
+      const egna = ['podd', 'forum', 'media', 'blandat'].filter((t) => typer.has(t));
       const fot = `<p class="tn-pod-fot">${[['b', 'podd'], ...(egna.length ? egna : ['podd']).map((t) => ['h', t]), ['o', 'podd']].map(([k, t]) => `${stampel(k, t)} ${esc(T.forklaring[k === 'h' ? t : k])}`).join(' ')}${harCitat ? ` ${esc(T.citaten)}` : ''}</p>`;
       return {
         namn: TEXT.sidor.poddar,

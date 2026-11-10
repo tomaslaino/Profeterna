@@ -1,5 +1,5 @@
 // Fikat på pulten i tobaksaffären (rum-saker.js): på vissa dagar står det
-// något från konditoriet mittemot där, som fläkten bara står där när det är
+// något från konditoriet där, som fläkten bara står där när det är
 // varmt – semlor i pappersform på fettisdagen, pepparkakor i december,
 // lussekatter på luciadagen, kanelbullar på kanelbullens dag (4 oktober),
 // chokladägg i folie i påskveckan och chokladbollar på chokladbollens dag

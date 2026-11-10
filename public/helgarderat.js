@@ -2,18 +2,20 @@
 
 // ---------- Helgarderat ----------
 //
-// Tidningen med det supportrarna vet inför lördagens matcher: det intressanta ur lagens supporterpoddar och
-// forum, en sida per match (samma uppgifter som Supportrarna i tidningen bakom löpsedeln, rum-tidning.js).
-// Det här är ett utkast som visar hur tidningen ser ut, med provomgången som poddjobbet gjorde 2026-11-10
-// (helgarderat/utkast.json, i samma form som data/poddsidor.json). Var i rummet tidningen ska ligga är inte
-// bestämt.
+// Tidningen med det supportrarna vet inför lördagens matcher: det intressanta ur lagens supporterpoddar, forum
+// och insatta medier (fansajter, fanzines, nyhetsbrev och oberoende lokala reportrar), en sida per match (samma
+// uppgifter som Supportrarna i tidningen bakom löpsedeln, rum-tidning.js).
+// Sidan visar veckans omgång ur data/poddsidor.json, som nattjobbet på iMacen skriver inför varje omgång, så länge
+// omgångens sista match är högst tre dagar gammal. Annars visar den provnumret: provomgången som poddjobbet gjorde
+// 2026-11-10 (helgarderat/utkast.json, i samma form). Var i rummet tidningen ska ligga är inte bestämt.
 //
 //   Framsidan   namnet med tre ikryssade rutor (1, X och 2: helgarderat), numret, datumet och priset (tre rader,
-//               tre kronor), etta (matchen med mest i), Lördagens matcher med sidnumren och Hört bland
-//               supportrarna (tre uppgifter som är supportrarnas egna, ur andra matcher)
+//               tre kronor), etta (matchen med mest i), Lördagens matcher med sidnumren, Hört bland
+//               supportrarna (tre uppgifter som är supportrarnas egna, ur andra matcher) och De insatta skriver
+//               (tre uppgifter ur de insatta medierna, ur ännu andra matcher när det går)
 //   Sidorna     en per match: lagen bredvid varandra, uppgifterna under sina ämnen med slaget som stämpel och
 //               citaten med vem som säger det
-//   Baksidan    källorna, avsnitt och forumtrådar med datum, och stämplarna
+//   Baksidan    källorna, avsnitt, forumtrådar och artiklar med datum, och stämplarna
 //
 // Texterna för slagen och ämnena kommer från RumTidning.TEXT.poddar, så att det står samma sak i båda tidningarna.
 
@@ -76,19 +78,20 @@
 
   const STAMPEL = (s, typ = 'podd') => {
     const k = T.slag[s] ? s : 'h';
-    return `<i class="hg-slag s-${k}">${esc(k === 'h' ? (T.egen[typ] || T.slag.h) : T.slag[k])}</i>`;
+    return `<i class="hg-slag s-${k}${typ === 'media' ? ' t-media' : ''}">${esc(k === 'h' ? (T.egen[typ] || T.slag.h) : T.slag[k])}</i>`;
   };
   const amne = (u, a) => T.amnen[a] || (u.amnen && u.amnen[a]) || T.amnen.match;
-  // Vem som säger det: namnet när det framgår, annars podden eller forumet.
+  // Vem som säger det: namnet när det framgår, annars podden, forumet eller de insatta.
   const vem = (c) => {
-    const kalla = c.typ === 'forum' ? T.forumet(c.podd) : poddNamn(c.podd);
+    const kalla = T.kalla(c);
     return c.vem ? `${c.vem}, ${kalla}` : stor(kalla);
   };
   const citat = (c, kl = '') => `<blockquote class="hg-citat${kl ? ` ${kl}` : ''}"><p>”${esc(hel(c.sagt))}”</p><cite>${esc(vem(c))}</cite></blockquote>`;
-  // Forumet läses varje natt: det står en gång.
-  const kallorna = (d) => {
+  // Forumet läses varje natt: det står en gång. Artiklarna ur samma insatta medium står en gång under laget
+  // (alla), men var för sig på baksidan.
+  const kallorna = (d, alla = false) => {
     const l = (d.kallor || []).filter((k) => k && k.podd);
-    return l.filter((k, i) => k.typ !== 'forum' || l.findIndex((x) => x.typ === 'forum' && x.podd === k.podd) === i);
+    return l.filter((k, i) => k.typ !== 'forum' && (alla || k.typ !== 'media') || l.findIndex((x) => x.typ === k.typ && x.podd === k.podd) === i);
   };
   const punkter = (d) => (d.grupper || []).flatMap((g) => (g.punkter || []).filter((p) => p && p.t).map((p) => ({ ...p, amne: g.amne })));
   const harInnehall = (d) => punkter(d).length > 0;
@@ -106,21 +109,40 @@
     const poang = (x) => (x.c.vem ? 2 : 0) + (['trupp', 'elva'].includes(x.amne) ? 1 : 0) - (x.c.sagt.length > 170 ? 4 : 0) - (x.c.sagt.length < 45 ? 2 : 0);
     return l.sort((a, b) => poang(b) - poang(a))[0] || null;
   }
-  // Hört bland supportrarna: en egen uppgift (slaget h) var ur tre andra matcher, helst om truppen.
+  // Hört bland supportrarna: en egen uppgift (slaget h) ur poddarna eller forumen, var ur tre andra matcher, helst
+  // om truppen. De insatta skriver: en uppgift ur de insatta medierna (bekräftad eller deras egen), var ur tre
+  // matcher som inte redan står på framsidan, och annars ur de andra.
+  const ruta = (s, val) => {
+    const l = s.delar.flatMap((d, i) => punkter(d).filter((p) => val(p) && p.t.length <= 240).map((p) => ({ s, i, p })));
+    return l.find((y) => y.p.amne === 'trupp') || l.find((y) => y.p.amne === 'elva') || l[0];
+  };
   function hort(sidor, utom) {
     const ut = [];
     for (const s of sidor) {
       if (utom.includes(s) || ut.length >= 3) continue;
-      const l = s.delar.flatMap((d, i) => punkter(d).filter((p) => p.s === 'h' && p.t.length <= 240).map((p) => ({ s, i, p })));
-      const x = l.find((y) => y.p.amne === 'trupp') || l[0];
+      const x = ruta(s, (p) => p.s === 'h' && p.typ !== 'media');
       if (x) ut.push(x);
     }
     return ut;
+  }
+  function insatta(sidor, utom) {
+    const val = (p) => p.typ === 'media' && p.s !== 'o';
+    const ut = [];
+    for (const forst of [true, false]) {
+      for (const s of sidor) {
+        if (ut.length >= 3 || ut.some((x) => x.s === s) || (forst && utom.includes(s))) continue;
+        const x = ruta(s, val);
+        if (x) ut.push(x);
+      }
+    }
+    return ut.sort((a, b) => a.s.nr - b.s.nr);
   }
 
   // ---------- sidorna ----------
 
   const sidnr = (s) => s.nr + 1;
+  // Numret: provnumret är Nr 1, veckans nummer har veckan.
+  const numret = (u, lordag) => [u.prov ? 'Nr 1' : '', lordag ? `Vecka ${vecka(lordag)}` : ''].filter(Boolean).join(' · ');
   const folio = (u, nr) => `<div class="hg-folio${nr % 2 ? ' h' : ''}"><b>${nr}</b><a href="#forsta">Helgarderat</a><span>${esc(u.datumText)}</span></div>`;
 
   function forstasidan(u) {
@@ -131,9 +153,9 @@
     const lordag = sidor.map((s) => s.avspark).filter(giltig).sort()[0];
     const lor = lordag ? `Inför ${fVdagLang.format(new Date(lordag))}en den ${fDagMan.format(new Date(lordag))}` : '';
     const huvud = `<header class="hg-huvud">` +
-      `<div class="hg-overrad"><span>Nr 1${lordag ? ` · Vecka ${vecka(lordag)}` : ''}</span><span>${esc(stor(u.datumText))}</span><span>Pris 3 kr</span></div>` +
+      `<div class="hg-overrad"><span>${esc(numret(u, lordag))}</span><span>${esc(stor(u.datumText))}</span><span>Pris 3 kr</span></div>` +
       `<h1 class="hg-namn">${rutor()}<span>Helgarderat</span></h1>` +
-      `<div class="hg-slogan"><span>Det supportrarna vet</span><span class="hg-stampel">Provnummer</span><span>${esc(lor)}</span></div></header>`;
+      `<div class="hg-slogan"><span>Det supportrarna vet</span>${u.prov ? '<span class="hg-stampel">Provnummer</span>' : ''}<span>${esc(lor)}</span></div></header>`;
     const ettan = `<article class="hg-etta">` +
       `<p class="hg-kick"><b>${s1.nr}</b><span>${skold(lag1[0], 'liten')}${esc(lag1[0])}–${skold(lag1[1], 'liten')}${esc(lag1[1])}</span><em>${esc(avspark(s1.avspark))}</em></p>` +
       `<h2><a href="#sida-${sidnr(s1)}">${esc(hel(s1.rubrik || T.rubrik(lag1[0], lag1[1])))}</a></h2>` +
@@ -152,12 +174,15 @@
         `<small>${esc(hel(s.rubrik || ''))}</small></a></li>`;
     }).join('')}</ol></nav>`;
     const h = hort(sidor, [s1, s2]);
-    const hortat = h.length ? `<section class="hg-hort" aria-label="Hört bland supportrarna"><h3>Hört bland supportrarna</h3><div class="hg-hort-l">${h.map((x) => {
+    const rutan = (namn, l, kl = '') => (l.length ? `<section class="hg-hort${kl}" aria-label="${esc(namn)}"><h3>${esc(namn)}</h3><div class="hg-hort-l">${l.map((x) => {
       const lag = (x.s.lag || [])[x.i];
-      return `<article><p class="hg-kick"><b>${x.s.nr}</b><span>${skold(lag, 'liten')}${esc(lag)}</span></p>${STAMPEL(x.p.s, x.p.typ)}<p>${esc(hel(x.p.t))}</p>` +
+      const kalla = x.p.typ === 'media' && (x.p.podd || []).length ? `<small>${esc(lista(x.p.podd))}</small>` : '';
+      return `<article><p class="hg-kick"><b>${x.s.nr}</b><span>${skold(lag, 'liten')}${esc(lag)}</span></p>${STAMPEL(x.p.s, x.p.typ)}${kalla}<p>${esc(hel(x.p.t))}</p>` +
         `<p class="hg-vidare"><a href="#sida-${sidnr(x.s)}">Sidan ${sidnr(x.s)}</a></p></article>`;
-    }).join('')}</div></section>` : '';
-    return `<section class="hg-ark hg-forsta" id="forsta" aria-label="Framsidan">${huvud}<div class="hg-front"><div class="hg-vanster">${ettan}${tvaan}</div>${matcher}</div>${hortat}</section>`;
+    }).join('')}</div></section>` : '');
+    const i = insatta(sidor, [s1, s2, ...h.map((x) => x.s)]);
+    return `<section class="hg-ark hg-forsta" id="forsta" aria-label="Framsidan">${huvud}<div class="hg-front"><div class="hg-vanster">${ettan}${tvaan}</div>${matcher}</div>` +
+      `${rutan('Hört bland supportrarna', h)}${rutan('De insatta skriver', i, ' hg-insatta')}</section>`;
   }
 
   function matchsidan(u, s) {
@@ -165,7 +190,7 @@
     const lag = s.lag || [];
     const delar = s.delar.map((d, i) => {
       const k = kallorna(d);
-      const ur = k.length ? `<p class="hg-ur">Ur ${k.map((x, j) => `${j && j === k.length - 1 ? 'och ' : ''}${x.adress ? `<a href="${esc(x.adress)}" target="_blank" rel="noopener">` : ''}${esc(x.typ === 'forum' ? T.forumet(x.podd) : poddNamn(x.podd))}${x.adress ? '</a>' : ''}${kortDatum(x.datum) ? ` (${kortDatum(x.datum)})` : ''}`).join(', ').replace(/, och /, ' och ')}</p>` : '';
+      const ur = k.length ? `<p class="hg-ur">Ur ${k.map((x, j) => `${j && j === k.length - 1 ? 'och ' : ''}${x.adress ? `<a href="${esc(x.adress)}" target="_blank" rel="noopener">` : ''}${esc(T.kalla(x))}${x.adress ? '</a>' : ''}${kortDatum(x.datum) ? ` (${kortDatum(x.datum)})` : ''}`).join(', ').replace(/, och /, ' och ')}</p>` : '';
       const flera = new Set(k.map((x) => x.podd)).size > 1;
       const grupper = (d.grupper || []).filter((g) => (g.punkter || []).some((p) => p && p.t)).map((g) => `<div class="hg-grupp"><h4>${esc(amne(u, g.amne))}</h4>${g.punkter.filter((p) => p && p.t).map((p) =>
         `<div class="hg-punkt">${STAMPEL(p.s, p.typ)}${flera && (p.podd || []).length ? `<small>${esc(lista(p.podd.map(poddNamn)))}</small>` : ''}<p>${esc(hel(p.t))}</p>${p.citat && p.citat.sagt ? citat(p.citat) : ''}</div>`).join('')}</div>`).join('');
@@ -182,23 +207,30 @@
   function baksidan(u) {
     const nr = u.sidor.length + 2;
     const kallor = u.sidor.map((s) => {
-      const l = s.delar.flatMap((d) => kallorna(d));
+      const l = s.delar.flatMap((d) => kallorna(d, true));
       if (!l.length) return '';
-      return `<div class="hg-kalla"><h4><b>${s.nr}</b>${esc(kort(s.lag[0]))}–${esc(kort(s.lag[1]))}</h4><ul>${l.map((k) => `<li><b>${esc(k.typ === 'forum' ? stor(T.forumet(k.podd)) : poddNamn(k.podd))}</b> ` +
+      return `<div class="hg-kalla"><h4><b>${s.nr}</b>${esc(kort(s.lag[0]))}–${esc(kort(s.lag[1]))}</h4><ul>${l.map((k) => `<li><b>${esc(stor(T.kalla(k)))}</b> ` +
         `${k.adress ? `<a href="${esc(k.adress)}" target="_blank" rel="noopener">${esc(k.avsnitt || k.adress)}</a>` : esc(k.avsnitt || '')}${kortDatum(k.datum) ? `, ${esc(kortDatum(k.datum))}` : ''}</li>`).join('')}</ul></div>`;
     }).join('');
-    const egna = ['podd', 'forum', 'blandat'];
+    const egna = ['podd', 'forum', 'media', 'blandat'];
     const stamplar = [['b', 'podd'], ...egna.map((t) => ['h', t]), ['o', 'podd']].map(([k, t]) => `<p>${STAMPEL(k, t)} ${esc(stor(T.forklaring[k === 'h' ? t : k]))}</p>`).join('');
     return `<section class="hg-ark hg-sida hg-baksida" id="sida-${nr}" aria-label="Sidan ${nr}: Källorna">${folio(u, nr)}` +
       `<div class="hg-vinjett enkel"><b>Källorna</b></div><div class="hg-kallor">${kallor}</div>` +
       `<div class="hg-stamplar">${stamplar}</div>` +
-      `<p class="hg-kolofon"><span class="hg-litet">Helgarderat</span>Nr 1 · Provnummer · ${esc(T.citaten)}</p></section>`;
+      `<p class="hg-kolofon"><span class="hg-litet">Helgarderat</span>${esc(numret(u, u.sidor.map((s) => s.avspark).filter(giltig).sort()[0]))}${u.prov ? ' · Provnummer' : ''} · ${esc(T.citaten)}</p></section>`;
   }
 
-  function rita(data) {
-    const sidor = ((data && data.sidor) || []).filter((s) => s && Array.isArray(s.delar) && s.delar.some(harInnehall)).sort((a, b) => a.nr - b.nr);
+  const sidorna = (data) => ((data && data.sidor) || []).filter((s) => s && Array.isArray(s.delar) && s.delar.some(harInnehall)).sort((a, b) => a.nr - b.nr);
+  // Veckans omgång gäller tills tre dagar efter dess sista match.
+  const aktuell = (data, now = Date.now()) => {
+    const tider = sidorna(data).map((s) => Date.parse(s.avspark)).filter(Number.isFinite);
+    return tider.length > 0 && Math.max(...tider) > now - 3 * 864e5;
+  };
+
+  function rita(data, prov) {
+    const sidor = sidorna(data);
     if (!sidor.length) throw new Error('inga sidor');
-    const u = { ...data, sidor, datumText: giltig(data.uppdaterad) ? fDatum.format(new Date(data.uppdaterad)) : '' };
+    const u = { ...data, sidor, prov, datumText: giltig(data.uppdaterad) ? fDatum.format(new Date(data.uppdaterad)) : '' };
     rot.innerHTML = forstasidan(u) + sidor.map((s) => matchsidan(u, s)).join('') + baksidan(u);
     rot.removeAttribute('aria-busy');
     // en länk till en sida (#sida-5) när den kommer in utifrån
@@ -209,8 +241,9 @@
   }
 
   const skoldar = window.Skoldar ? Skoldar.ready : Promise.resolve();
-  Promise.all([fetch('helgarderat/utkast.json', { cache: 'no-cache' }).then((r) => (r.ok ? r.json() : null)), skoldar.catch(() => null)])
-    .then(([data]) => rita(data))
+  const hamta = (url) => fetch(url, { cache: 'no-cache' }).then((r) => (r.ok ? r.json() : null)).catch(() => null);
+  Promise.all([hamta('data/poddsidor.json'), hamta('helgarderat/utkast.json'), skoldar.catch(() => null)])
+    .then(([veckans, utkast]) => (aktuell(veckans) ? rita(veckans, false) : rita(utkast, true)))
     .catch((e) => {
       console.warn('Helgarderat:', e);
       rot.innerHTML = '<section class="hg-ark hg-fel"><p>Tidningen kunde inte hämtas.</p></section>';
