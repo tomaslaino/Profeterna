@@ -32,7 +32,7 @@ const BREDD = 800;
 // en minnesstund, så att bilden hellre saknas än visar fel lag (2026-11-10, efter den första hämtningen).
 const MIN_POANG = 0;
 // Byts den väljs bilderna om (cachen gäller bara samma version).
-const VERSION = 3;
+const VERSION = 4;
 const BEHOVER = process.argv.includes('--behover');
 
 const las = (f, d) => { try { return JSON.parse(fs.readFileSync(f, 'utf8')); } catch { return d; } };

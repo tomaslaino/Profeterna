@@ -3,7 +3,8 @@
 // tidning trycker bredvid notisen. Hämtas på iMacen i samma jobb som tidningen
 // (scripts/analyser/skriv.mjs), med vanliga hämtningar och utan någon språkmodell:
 //
-//   1. ESPN:s lagnyheter, där Premier League-lagen har egna artiklar med bild och fotograf.
+//   1. ESPN:s lagnyheter, där Premier League-lagen har egna artiklar med bild och fotograf, och BBC Sports
+//      flöde för laget (alla ligalag, med bild).
 //   2. Notisens egna källor och Bing News (lokaltidningarna och klubbarnas sidor, som skriver om
 //      de lägre divisionerna): sidans delningsbild (og:image).
 //
@@ -162,6 +163,24 @@ async function espn(lag, id, { fetchImpl, now, rang }) {
     }));
 }
 
+// BBC Sport: lagets eget flöde (feeds.bbci.co.uk/sport/football/teams/<lag>/rss.xml) har veckans artiklar och
+// matchrapporter med bild (ichef.bbci.co.uk), också för de lägre divisionerna. Bilden finns i flera bredder; 976
+// bildpunkter räcker. En artikel i lagets eget flöde handlar om laget: ett poäng till.
+async function bbc(lag, { fetchImpl, now, rang }) {
+  const xml = await hamta(`https://feeds.bbci.co.uk/sport/football/teams/${slug(lag)}/rss.xml`, { fetchImpl });
+  const ut = [];
+  for (const m of String(xml).matchAll(/<item\b[^>]*>([\s\S]*?)<\/item>/g)) {
+    const x = m[1];
+    const falt = (tag) => { const r = new RegExp(`<${tag}>(?:<!\\[CDATA\\[)?([\\s\\S]*?)(?:\\]\\]>)?</${tag}>`).exec(x); return r ? avkoda(r[1]) : ''; };
+    const titel = falt('title');
+    const d = Date.parse(falt('pubDate'));
+    const t = /<media:thumbnail\b[^>]*\burl="([^"]+)"/.exec(x);
+    if (!t || !Number.isFinite(d) || now - d > DAGAR * DAG || !namner(titel, lag) || ANDRA_LAG.test(titel) || LIVE.test(titel)) continue;
+    ut.push({ bild: avkoda(t[1]).replace(/\/(?:ace\/standard\/)?\d{2,4}\//, (a) => a.replace(/\d{2,4}/, '976')), kalla: 'BBC Sport', foto: null, sida: falt('link').split('?')[0] || null, datum: new Date(d).toISOString(), poang: rang(titel) + 1 });
+  }
+  return ut;
+}
+
 // Bing News: de senaste fotbollsartiklarna som nämner laget i rubriken (lokaltidningarna).
 async function bing(lag, { fetchImpl, now, rang }) {
   // och tränaren (bilden av honom är oftast i klubbens kläder, från lokaltidningen)
@@ -206,6 +225,7 @@ async function kandidater(lag, { espnId, kallor, mot, alla, fetchImpl, now, logg
   const opts = { fetchImpl, now, rang };
   const lista = [];
   try { lista.push(...(await espn(lag, espnId, opts))); } catch (err) { logg(`bilder: ESPN för ${lag}: ${err.message}`); }
+  try { lista.push(...(await bbc(lag, opts))); } catch (err) { logg(`bilder: BBC för ${lag}: ${err.message}`); }
   for (const k of kallor || []) {
     if (k && k.url && sidanDuger(k.title, k.url, lag)) lista.push({ sida: k.url, titel: k.title, kalla: k.source, datum: k.publishedAt || null, poang: rang(k.title) });
   }

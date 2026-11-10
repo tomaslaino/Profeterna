@@ -932,7 +932,8 @@ bara lokalt. Analyserna visas som de ligger i `data/analyser.json`; hur de skriv
   Att lägga tidningen över kupongerna gick inte: porträttet och namnet sitter överst på dem. Sedan ("Gör tidningen lite
   större") ligger kupongerna i högen tätare, så att namnen nätt och jämnt syns, och tidningen fick det som blev över.
   Se [Tidningen](#tidningen).
-- **Riktiga bilder i matchbladen, hämtade av GitHub Actions (2026-11-10, användarens önskemål):** "Fixa så att det
+- **Riktiga bilder i matchbladen, hämtade av GitHub Actions (2026-11-10, användarens önskemål; BBC Sports flöde för
+  laget lades till samma dag, när lokaltidningarna stängde ute GitHubs servrar):** "Fixa så att det
   kommer riktiga bilder nu". Den första hämtningen gav 21 av 24 lag en bild, men flera ur artiklar om motståndaren
   (Fleetwoods matchguide om Rochdale, *York City smash Northampton*, *Wycombe defeat Accrington*), övergångsrykten
   och en minnesartikel, alltså troligen fel lag på bilden. Därför tar matchbladen bara artiklar som handlar om laget
@@ -7291,8 +7292,9 @@ lagets sköld.
 Matchbladets bilder hämtas av GitHub Actions före bygget (2026-11-10, användarens önskemål: "Fixa så att det kommer
 riktiga bilder nu"), eftersom molnmiljön där matchbladen skrevs inte når nyhetssajterna, men GitHub gör det:
 [scripts/tidning/matchbilder.mjs](scripts/tidning/matchbilder.mjs) tar lagen i `data/poddsidor.json` och hämtar en bild
-per lag med samma kod som tidningens bilder på iMacen (`veckansBilder` i src/analyser/tidning-bilder.mjs): de insatta
-mediernas artiklar om laget först, sedan Bing News, sidans delningsbild från de senaste åtta dagarna, liggande och
+per lag med samma kod som tidningens bilder på iMacen (`veckansBilder` i src/analyser/tidning-bilder.mjs): BBC Sports
+flöde för laget (`feeds.bbci.co.uk/sport/football/teams/<lag>/rss.xml`, artiklar och matchrapporter med bild för alla
+ligalag; en artikel i lagets eget flöde får ett poäng till), de insatta mediernas artiklar om laget och Bing News, sidans delningsbild från de senaste åtta dagarna, liggande och
 minst 480 bildpunkter bred, inga loggor, ingen grafik och inte samma bild för två lag. Till skillnad från tidningen
 tas bara artiklar som handlar om laget självt (`MIN_POANG`): inte en där motståndaren eller en annan klubb står först i
 rubriken, en förhandstitt med odds, ett övergångsrykte eller en minnesartikel, eftersom bilden då oftast visar fel lag.
@@ -7355,8 +7357,10 @@ hämtade inget och tog bilderna ur cachen, bygget lade dem i alla tolv matchblad
 390 × 844. Gränsen för grafik mättes på fotona i public/ och en ritad grafik. Den första riktiga hämtningen
 (workflowen 2026-11-10 17.37) gav 21 av 24 lag en bild; källorna står i stegets logg, men bilderna själva gick inte
 att se härifrån. Reglerna för rätt lag provades med Node på rubrikerna från den hämtningen; körningen efter dem gav
-14 av 24 lag en bild, och flera lokaltidningar svarade HTTP 403 på GitHubs servrar. Sedan frågas också efter
-tränaren, och en ensam bild står över hela bredden (provat i 390 × 844 och 1280 bredd).
+14 av 24 lag en bild, och flera lokaltidningar svarade HTTP 403 på GitHubs servrar (wigantoday.net, expressandstar.com,
+shropshirestar.com, Substack). Sedan frågas också efter tränaren, och en ensam bild står över hela bredden (provat i
+390 × 844 och 1280 bredd); det gav 13 av 24. Därefter lades BBC Sports flöde för laget till (provat med ett
+låtsasflöde: bilden i 976 bildpunkters bredd och en matchrapport i lagets eget flöde godtas).
 
 ### Närbilderna
 
