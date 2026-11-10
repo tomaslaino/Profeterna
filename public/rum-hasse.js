@@ -90,10 +90,11 @@ window.RumHasse = (() => {
       e.stopPropagation();
       stang();
     });
-    // utom på kaffet, askkoppen och de andra sakerna på disken: då gör han det man pekar på (sakerna nedan)
+    // utom på kaffet, askkoppen och de andra sakerna på disken: då gör han det man pekar på (sakerna nedan).
+    // (Samtalets spalt når över tändaren i datorn: där den är tom gäller saken under.)
+    const iSamtalet = (t) => t.closest('.rh-fot, .rh-kupong, .rd-lapp, a, button, input') || (t.closest('.rh-samtal') && !t.matches('.rh-samtal'));
     vy.addEventListener('click', (e) => {
-      if (!H.on || H.blad || calm() || (H.kupong && H.kupong.fas === 'hand')) return;
-      if (e.target.closest('.rh-samtal, .rh-fot, .rh-kupong, .rd-lapp, a, button, input')) return;
+      if (!H.on || H.blad || calm() || (H.kupong && H.kupong.fas === 'hand') || iSamtalet(e.target)) return;
       const sak = sakVid(e.clientX, e.clientY, e.pointerType === 'mouse' ? 6 : 14);
       if (!sak) return;
       e.stopImmediatePropagation();
@@ -102,7 +103,7 @@ window.RumHasse = (() => {
     }, true);
     vy.addEventListener('pointermove', (e) => {
       if (e.pointerType !== 'mouse') return;
-      const pa = H.on && !H.blad && !calm() && !e.target.closest('.rh-samtal, .rh-fot, .rh-kupong') && Boolean(sakVid(e.clientX, e.clientY, 6));
+      const pa = H.on && !H.blad && !calm() && !iSamtalet(e.target) && Boolean(sakVid(e.clientX, e.clientY, 6));
       vy.classList.toggle('rh-pa-sak', pa);
     });
     // Samma drag som i rummet (swipe i rum.js): där drar man bilden åt höger för att se åt vänster, och
