@@ -210,8 +210,15 @@ export async function inredning(el, opt = {}) {
     cam.updateMatrixWorld();
     return cam;
   }
+  // Spotarna i taket (SPOT i rum.js målar deras ljus på väggarna): mot orakelramen och mot pokalhyllan med
+  // Tipsligan, som också lyser på disken under. De finns i alla sakers ljus, så att alla delar samma
+  // grafikprogram och ljuset faller lika överallt; sakerna ritas en gång, så det kostar inget i bildrutorna.
+  const SPOTAR = [
+    { fran: [1050, 30, 330], mot: [1050, -372, WZ], styrka: 1.6, vinkel: 0.34 },
+    { fran: [880, 30, 470], mot: [WX, -366, 377], styrka: 0.8, vinkel: 0.36 },
+  ];
   // ljuset som i rummet: lysröret ovanför och framför till vänster, neonen
-  // från fönstret och tv:n från hörnet
+  // från fönstret, tv:n från hörnet och spotarna
   function wallLights(b, box, skugga = true) {
     const { scene } = b;
     scene.add(new THREE.HemisphereLight('#eadcc0', '#3a2a1a', 0.55));
@@ -239,6 +246,13 @@ export async function inredning(el, opt = {}) {
     const f = new THREE.DirectionalLight('#ffd9b0', 0.35);
     f.position.set(760, -400, 1000);
     scene.add(f);
+    for (const { fran, mot, styrka, vinkel } of SPOTAR) {
+      const s = new THREE.SpotLight('#ffe2b8', 0, 0, vinkel, 0.9, 2);
+      s.position.set(...fran);
+      s.target.position.set(...mot);
+      s.intensity = styrka * s.position.distanceToSquared(s.target.position);
+      scene.add(s, s.target);
+    }
   }
   // skuggorna faller bara där det finns vägg (högra väggen bara ovanför disken)
   function catcher(b, g, rot, pos, o = 0.42) {

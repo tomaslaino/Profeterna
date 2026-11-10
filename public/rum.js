@@ -142,7 +142,9 @@ window.Rum = (() => {
     <linearGradient id="rum-streak" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#ffb35c" stop-opacity=".5"/><stop offset="1" stop-color="#ffb35c" stop-opacity="0"/></linearGradient>
     <linearGradient id="rum-streakred" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#ff3b30" stop-opacity=".55"/><stop offset="1" stop-color="#ff3b30" stop-opacity="0"/></linearGradient>
     <linearGradient id="rum-cupg" x1="0" y1="0" x2="1" y2="0"><stop offset="0" stop-color="#fff" stop-opacity=".55"/><stop offset=".35" stop-color="#fff" stop-opacity="0"/><stop offset="1" stop-color="#000" stop-opacity=".45"/></linearGradient>
+    <radialGradient id="rum-spot" fx=".5" fy=".32"><stop offset="0" stop-color="#72613f"/><stop offset=".45" stop-color="#665737"/><stop offset=".78" stop-color="#332b1b"/><stop offset="1" stop-color="#000"/></radialGradient>
     <linearGradient id="rum-guld" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#f7e3a8"/><stop offset=".55" stop-color="#d4a650"/><stop offset="1" stop-color="#9c7230"/></linearGradient>
+    <clipPath id="rum-hogerklipp"><polygon points="1140,90 1250,0 1600,0 1600,1000 1140,730"/></clipPath>
     <clipPath id="rum-win"><rect ${box(WIN)}/></clipPath>
     <clipPath id="rum-doorglass"><rect ${box(DORR)}/></clipPath>
     <mask id="rum-hal" maskUnits="userSpaceOnUse" x="0" y="0" width="${W}" height="${H}"><rect width="${W}" height="${H}" fill="#fff"/><rect ${box(WIN)} fill="#000"/><rect ${box(DORR)} fill="#000"/></mask>
@@ -161,6 +163,18 @@ window.Rum = (() => {
   function shelf(yb, x0, x1) {
     return `<polygon points="${x0},${r1(at(x0, yb))} ${x1},${r1(at(x1, yb))} ${x1},${r1(at(x1, yb) + 8 * sc(x1))} ${x0},${r1(at(x0, yb) + 8 * sc(x0))}" fill="#241d15"/>` +
       `<polygon points="${x0},${r1(at(x0, yb))} ${x1},${r1(at(x1, yb))} ${x1},${r1(at(x1, yb) + 1.4 * sc(x1))} ${x0},${r1(at(x0, yb) + 1.4 * sc(x0))}" fill="#c9bfa5" opacity=".18"/>`;
+  }
+
+  // Spotarna i taket: mjukt ljus på orakelramen och på pokalhyllan med Tipsligan ([cx, cy, rx, ry, styrka] i
+  // scenens mått). Ljuset är målat i väggens bild, som ritas en gång och följer väggen när kameran rör sig, och
+  // ramarna, paketen och disken får samma ljus i 3D (SPOTAR i rum-inredning.js). Färgskiftningen (color-dodge)
+  // gör väggen ljusare i sin egen färg, som ljus gör, i stället för att lägga en ljus hinna över den.
+  const SPOT = {
+    ram: [1050, 372, 150, 190, 1],
+    pokal: [1370, 350, 104, 150, 0.9],
+  };
+  function spotYta([cx, cy, rx, ry, a], klipp = '') {
+    return `<ellipse ${klipp}cx="${cx}" cy="${cy}" rx="${rx}" ry="${ry}" fill="url(#rum-spot)" opacity="${a.toFixed(2)}" style="mix-blend-mode:color-dodge"/>`;
   }
 
   // Furupanelen på bakväggen: lackade bräder med kvistar och ådring, mörka av
@@ -307,6 +321,7 @@ window.Rum = (() => {
   <g mask="url(#rum-hal)">
   ${furu()}
   <path d="M640 92 q30 26 18 60 q-6 22 10 40" fill="none" stroke="#3b2a12" stroke-opacity=".28" stroke-width="7" filter="url(#rum-b4)"/>
+  ${spotYta(SPOT.ram)}
   </g>
   <ellipse cx="760" cy="104" rx="58" ry="16" fill="none" stroke="#4a3412" stroke-opacity=".3" stroke-width="3" filter="url(#rum-b1)"/>
   <ellipse cx="768" cy="106" rx="40" ry="10" fill="#4a3412" opacity=".12" filter="url(#rum-b4)"/>
@@ -318,6 +333,7 @@ window.Rum = (() => {
   <polygon points="1140,90 1250,0 1600,0 1600,1000 1140,730" filter="url(#rum-flack)" opacity=".55"/>
   <line x1="1140" y1="90" x2="1140" y2="730" stroke="#000" stroke-opacity=".35" stroke-width="3"/>
   <polygon points="1140,90 1600,0 1600,1000 1140,730" fill="#000" opacity=".2"/>
+  ${spotYta(SPOT.pokal, 'clip-path="url(#rum-hogerklipp)" ')}
 
   <rect x="36" y="122" width="200" height="610" fill="#3b3b3d" mask="url(#rum-hal)"/>
   <g clip-path="url(#rum-doorglass)"><rect x="50" y="136" width="172" height="560" filter="url(#rum-grime)" opacity=".5"/></g>
@@ -1210,7 +1226,7 @@ window.Rum = (() => {
         g.fillRect(0, y0v, W, hv);
       }
       if (kvall > 0.02) {
-        // (mörkret går runt lamporna: neonen och tv:n ska lysa)
+        // (mörkret går runt lamporna: neonen, tv:n och spotarna ska lysa)
         const m = document.createElement('canvas');
         m.width = 200;
         m.height = 125;
@@ -1221,6 +1237,7 @@ window.Rum = (() => {
         q.setTransform(200 / W, 0, 0, 125 / hv, 0, -y0v * 125 / hv);
         rad(q, 400, 130, 300, 120, '0, 0, 0', 0.9);
         rad(q, 1232, 180, 230, 150, '0, 0, 0', 0.9);
+        for (const [x, y, rx, ry] of Object.values(SPOT)) rad(q, x, y, rx, ry, '0, 0, 0', 0.7);
         g.drawImage(m, 0, y0v, W, hv);
       }
     });
